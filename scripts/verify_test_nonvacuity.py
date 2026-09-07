@@ -1298,6 +1298,100 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_implied_return.py::test_historical_view_does_not_leak_future_horizon_or_valuation",
         guards="INV-6：T 時刻不存在的 horizon 判斷不得參與 T 的報酬",
     ),
+    # ---- Phase 2 Step 3：Entry Logic v1（2026-09-06）------------------------------------------------
+    Mutation(
+        name="進場：沒有判準就補一個 15% 的預設 hurdle",
+        path="alpha/entry/model.py",
+        old="    criterion: EntryCriterion | None = accepted[0] if accepted else None\n    if criterion is None:",
+        new="    criterion: EntryCriterion | None = accepted[0] if accepted else None\n"
+            "    if criterion is None:\n"
+            "        from datetime import datetime as _dt, timezone as _tz\n"
+            "        from .criteria import entry_criterion_record as _rec, parse_entry_criterion_record as _parse\n"
+            "        criterion = _parse(_rec(company_id=company_id, ticker=ticker, value=0.15,\n"
+            "                                basis='investor_policy', rationale='default',\n"
+            "                                created_at=_dt(2020, 1, 1, tzinfo=_tz.utc)))\n"
+            "    if False:",
+        test="tests/test_entry_logic.py::test_no_criterion_is_missing_and_names_the_missing_judgment_not_an_etl_gap",
+        guards="沒有明示 hurdle 一律 missing——不得 invent 10%／15%／20%（缺的是投資門檻判斷，不是 ETL）",
+    ),
+    Mutation(
+        name="進場：門檻價不折現（直接拿 fair value 當門檻價）",
+        path="alpha/entry/model.py",
+        old="    return fair_value / (1.0 + hurdle) ** (days / DAYS_PER_YEAR)",
+        new="    return fair_value",
+        test="tests/test_entry_logic.py::test_higher_hurdle_monotonically_lowers_the_entry_price",
+        guards="hurdle 變高 → 門檻價單調下降；折現公式與公式字串必須一致",
+    ),
+    Mutation(
+        name="進場：現價等於門檻價時判成 above（等號歸錯邊）",
+        path="alpha/entry/model.py",
+        old="    return COMPARISON_MEETS if price <= entry_price else COMPARISON_ABOVE",
+        new="    return COMPARISON_MEETS if price < entry_price else COMPARISON_ABOVE",
+        test="tests/test_entry_logic.py::test_price_above_below_and_exactly_at_the_entry_price",
+        guards="`current_price <= entry_price` 的等號歸 meets——門檻價的定義就是「恰好滿足」",
+    ),
+    Mutation(
+        name="進場：alignment 不對齊也標 clean",
+        path="alpha/entry/model.py",
+        old="    if alignment in CLEAN_ALIGNMENTS:",
+        new="    if True or alignment in CLEAN_ALIGNMENTS:",
+        test="tests/test_entry_logic.py::test_alignment_mismatch_is_not_a_clean_entry_result",
+        guards="value_date 與 horizon_end 不一致時只能 review_required，不得冒充 clean actionable result",
+    ),
+    Mutation(
+        name="進場：判準的 basis 開放成任何研究 basis（hurdle 變成對公司的判斷）",
+        path="alpha/entry/contracts.py",
+        old="CRITERION_BASES: tuple[str, ...] = (CRITERION_BASIS_INVESTOR_POLICY,)",
+        new="CRITERION_BASES: tuple[str, ...] = (CRITERION_BASIS_INVESTOR_POLICY, \"session_judgment\")",
+        test="tests/test_entry_logic.py::test_missing_is_never_zero_and_the_same_inputs_give_the_same_result",
+        guards="hurdle 是投資人政策，不是研究對公司的判斷——basis 是封閉字彙",
+    ),
+    Mutation(
+        name="進場：契約允許 action 欄位（buy／sell 洩漏進型別）",
+        path="alpha/entry/contracts.py",
+        old="def _assert_no_capital_fields(cls: type) -> None:\n    for f in fields(cls):",
+        new="def _assert_no_capital_fields(cls: type) -> None:\n    for f in []:",
+        test="tests/test_entry_logic.py::test_no_buy_sell_sizing_or_portfolio_authority_leaks_anywhere",
+        guards="Entry Logic 只輸出 analytical threshold；部位／action 欄位在 import 當下就該炸",
+    ),
+    Mutation(
+        name="進場：entry assessment 的 refs 不宣告 criterion",
+        path="alpha/refresh/artifacts.py",
+        old="    refs[result.criterion.criterion_id] = ROLE_INPUT",
+        new="    refs.pop(result.criterion.criterion_id, None)",
+        test="tests/test_entry_logic.py::test_price_only_change_recalculates_the_entry_assessment_deterministically",
+        guards="門檻價依賴 criterion，依賴宣告是契約（refs 那一半）",
+    ),
+    # ⚠ 刻意**沒有**「assumption_ids 不含 criterion」這條突變：實測（2026-09-06）它砍掉後測試仍然綠，因為
+    # criterion 的變化一律由 refs 路徑命中，而第二輪傳播（上游 state → 下游）對 criterion **今天走不到**——
+    # 判準沒有 supporting evidence，所以它只會是 current（被選中）或 missing／superseded（沒被選中，此時
+    # assessment 本身就是 missing）。與其留一個測不到卻看起來有守的斷言，不如把這件事寫在
+    # `artifacts_from_entry` 的註解裡（L14：未量測的機制不得享有默認信任，包括我自己寫的守衛）。
+    Mutation(
+        name="進場：builder 自己把 fair value 折現算一遍門檻價",
+        path="briefing/alpha_view/builder.py",
+        old="            value=result.entry_price, status=base_status, basis=\"deterministic\", authority=A_ENTRY,",
+        new="            value=(result.fair_value / (1 + result.required_annualized_return) ** (result.holding_period_days / 365.25)),\n"
+            "            status=base_status, basis=\"deterministic\", authority=A_ENTRY,",
+        test="tests/test_entry_logic.py::test_builder_and_renderer_copy_the_threshold_without_computing_it",
+        guards="briefing/alpha_view 只消費 canonical result，不含門檻價公式",
+    ),
+    Mutation(
+        name="進場：as-of 視角選判準時不看 as_of（偷看未來的 hurdle）",
+        path="alpha/entry/model.py",
+        old="    accepted, selection = select_entry_criteria(criterion_records, as_of=as_of, today=today, parse_errors=parse_errors)",
+        new="    accepted, selection = select_entry_criteria(criterion_records, as_of=None, today=today, parse_errors=parse_errors)",
+        test="tests/test_entry_logic.py::test_historical_view_does_not_leak_a_future_criterion",
+        guards="INV-6：T 時刻不存在的判準不得參與 T 的門檻價",
+    ),
+    Mutation(
+        name="進場：sandbox 判準可以寫進 ledger",
+        path="alpha/providers/entry_criteria.py",
+        old="    if parsed.author.lower() == \"sandbox\":",
+        new="    if False and parsed.author.lower() == \"sandbox\":",
+        test="tests/test_entry_logic.py::test_the_hurdle_is_investor_policy_not_a_research_judgment",
+        guards="驗算用的非持久 hurdle 不得變成使用者宣告的政策（demo 好看不是寫入 authority 的理由）",
+    ),
 )
 
 

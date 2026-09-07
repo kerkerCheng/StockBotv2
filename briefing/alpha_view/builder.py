@@ -13,11 +13,12 @@
 
 ## 缺口一律標 `not_modeled`，不用預設值補
 
-downside／entry logic／probability-weighted expected return／total return 今天 runtime 上**沒有任何程式路徑產生**。
+downside／probability-weighted expected return／total return 今天 runtime 上**沒有任何程式路徑產生**。
 這些格仍然存在於 view 裡，好讓下一階段有明確的插座，但值一律 `None`、status 一律 `not_modeled`——
 **不得**拿 Q3 分數、分析師目標價、fair value gap、implied return 或 bull/base 散文冒充。
-internal fundamentals／earnings bridge／numeric gap（2026-09-05）、valuation（2026-09-06 Step 1）與
-base-case implied return（2026-09-06 Step 2）**有能力了**：沒資料是 `missing`，不再是 `not_modeled`。
+internal fundamentals／earnings bridge／numeric gap（2026-09-05）、valuation（2026-09-06 Step 1）、
+base-case implied return（2026-09-06 Step 2）與 entry logic（2026-09-06 Step 3）**有能力了**：沒資料是
+`missing`，不再是 `not_modeled`——entry logic 沒有判準時的 `missing` 理由明寫「缺的是投資門檻判斷」。
 """
 from __future__ import annotations
 
@@ -28,27 +29,29 @@ from typing import Any, Mapping, Sequence
 from alpha.causal import CausalPath, CompanyImpact, StructuralEvent
 from alpha.context import ContextBuild
 from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
+from alpha.entry.contracts import EntryAssessmentResult, EntryCriterion
 from alpha.fundamental.contracts import FundamentalModelResult, OperatingAssumption
 from alpha.implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from alpha.provider import SupplyExposure
 from alpha.refresh import (
     CONTEXT_DIGEST, CURRENT, INVALIDATED, MISSING, RECALCULATE, REVIEW_REQUIRED, STALE, SUPERSEDED,
     THESIS_ARTIFACT_ID, AffectedArtifact, ChangeEvent, MetricObservation, artifacts_from_context,
-    artifacts_from_implied_return, artifacts_from_model, artifacts_from_signal, artifacts_from_valuation,
-    build_instant, resolve_refresh,
+    artifacts_from_entry, artifacts_from_implied_return, artifacts_from_model, artifacts_from_signal,
+    artifacts_from_valuation, build_instant, resolve_refresh,
 )
 from alpha.valuation.contracts import ValuationAssumption, ValuationResult
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from .contracts import (
-    BASIS_LABEL, CAP_AUTOMATIC_INVALIDATION, CAP_BASE_CASE_IMPLIED_RETURN, CAP_CATALYST_UNLINKED,
+    BASIS_LABEL, CAP_ANALYTICAL_ENTRY_THRESHOLD, CAP_AUTOMATIC_INVALIDATION, CAP_BASE_CASE_IMPLIED_RETURN,
+    CAP_CATALYST_UNLINKED,
     CAP_DEPENDENCY_IMPACT, CAP_DETERMINISTIC_FAIR_VALUE, CAP_FINANCIAL_CAUSAL,
     CAP_NARRATIVE_SCENARIOS, CAP_NUMERIC_EXPECTATION_GAP, CAP_QUANTITATIVE_SCENARIOS,
     CAP_STRUCTURAL_CAUSAL,
     CAP_STRUCTURED_DISPROOF, SCHEMA_VERSION, STATUS_LABEL, AlphaInvestmentView, CatalystItem,
     CatalystSection, CausalPathSection, ChangeItem, CheckpointItem, ConsensusSection, Datum,
-    DisproofItem, EarningsBridgeSection, EventItem, EvidenceItem, EvidenceSection,
+    DisproofItem, EarningsBridgeSection, EntryLogicSection, EventItem, EvidenceItem, EvidenceSection,
     EvidenceSelectionCounts, ExpectationGapSection, ExposureItem, FalsificationSection,
     FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem, ImpliedReturnSection,
     InternalFundamentalsSection, LifecycleFacts, NotModeledSection, PathItem,
@@ -117,7 +120,8 @@ NEXT_PHASE_NOTE = (
     "Expectation Gap。沒有假設或沒有基期觀測的公司是 missing（有能力、沒資料）；"
     "估值（Step 1，2026-09-06）已落地於 valuation section（internal EPS × explicit target multiple）；"
     "base-case 隱含報酬（Step 2，2026-09-06）已落地於 implied_return section（現價＋fair value 時點語意＋明示 horizon）；"
-    "機率加權期望報酬／總報酬／下檔／進場邏輯仍 not_modeled。"
+    "進場邏輯（Step 3，2026-09-06）已落地於 entry_logic section（implied return＋明示的要求報酬判準→門檻價；"
+    "不是 buy／sell）；機率加權期望報酬／總報酬／下檔仍 not_modeled。"
 )
 FUNDAMENTAL_EPISTEMIC_WARNING = (
     "每個內部數字的 calculation 是 deterministic，但輸入假設是 session 判斷／heuristic——"
@@ -611,7 +615,7 @@ A_HORIZON_ASSUMPTIONS = "alpha://implied_return/horizon"
 RETURN_IS_NOT: tuple[str, ...] = (
     "不是 probability-weighted expected return（沒有 bull／base／bear 機率；名稱刻意用 implied）",
     "不是 total return（沒有股利／分配預測；只有價格報酬）",
-    "不是 required return、不是 entry price、不是 buy／sell、不是 actionable-now（Entry Logic 未建模）",
+    "不是 required return、不是 entry price（那兩格住 entry_logic section，且要有明示的投資人判準）、不是 buy／sell、不是 actionable-now",
     "不是 opportunity ranking、不是回測或統計勝率——它是一檔在 base case 下從 bar_date 到 horizon_end 的隱含價格報酬",
 )
 RETURN_EPISTEMIC_WARNING = (
@@ -771,6 +775,216 @@ def _implied_return_section(
         value_date=value_date_datum, horizon=horizon_datum, horizon_window=window_datum, price_return=price_return_datum,
         annualized_price_return=annualized_datum, total_return=fixed[0], probability_weighted_return=fixed[1],
         trace=tuple(trace), epistemics=epistemics_datum, selection=selection, is_not=RETURN_IS_NOT,
+        period=target.label if target else None, period_end=target.end if target else None,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Entry logic（Step 3）：只選取 `alpha.entry` 的輸出。**本檔沒有門檻價公式**——值、公式字串、依賴全部照抄
+# `EntryAssessmentResult`；builder 不折現任何數、不比較任何價格、不把 comparison 翻譯成 action。
+# ---------------------------------------------------------------------------
+A_ENTRY = "alpha://entry/model"
+A_ENTRY_CRITERIA = "alpha://entry/criterion"
+
+#: entry logic 不是什麼——每次都列，讀者不必靠記憶區分。
+ENTRY_IS_NOT: tuple[str, ...] = (
+    "不是 buy／sell／hold 建議——meets_analytical_hurdle 只是「現價 ≤ 門檻價」的算術事實",
+    "不是 position size／capital allocation／order——系統不給部位尺寸，買多少、何時買由使用者判斷",
+    "不是 portfolio permission——A5（Decision Store）是唯一能授權資本的地方，且 live 100% 人工",
+    "不是 opportunity ranking、不是回測或統計勝率——它是一檔在明示 hurdle 下的門檻價",
+    "hurdle 是投資人政策（investor_policy），不是研究對公司的判斷；沒有宣告就是 missing，不補 10%／15%／20%",
+)
+ENTRY_EPISTEMIC_WARNING = (
+    "entry price 是判斷的確定性函數：研究側（營運假設、目標倍數、value-date、horizon）是 session 判斷，hurdle 是投資人"
+    "政策——看 entry_price.dependencies.input_dependency 與 criterion；不得把門檻價讀成「該買的價格」。"
+)
+_STATUS_RANK: Mapping[str, int] = {"available": 0, "stale": 1, "review_required": 2, "invalidated": 3}
+
+
+def _worst_status(*statuses: str) -> str:
+    return max(statuses, key=lambda s: _STATUS_RANK.get(s, 0))
+
+
+def _entry_logic_section(
+    result: Any, reason: str | None, *, reference_day: date, reporting_unit: str,
+    refresh: Mapping[str, AffectedArtifact],
+) -> EntryLogicSection:
+    def _unit(unit: str) -> str:
+        return reporting_unit if unit == "currency" else unit
+
+    def _absent(why: str, *, status: str = "missing") -> EntryLogicSection:
+        meta = SectionMeta(status=status, basis="none", authority=A_ENTRY, capability=CAP_ANALYTICAL_ENTRY_THRESHOLD,
+                           reason=why, as_of=reference_day)
+        return EntryLogicSection(
+            meta=meta,
+            convention=missing("entry_convention", "要求報酬的 convention", why, authority=A_ENTRY),
+            criterion=missing("entry_criterion", "Entry criterion（投資人的要求報酬判準）", why, authority=A_ENTRY_CRITERIA),
+            required_annualized_return=missing("required_annualized_return", "要求年化價格報酬", why, authority=A_ENTRY_CRITERIA),
+            current_price=missing("current_price", "現價（Engine C）", why, authority=A_SNAP),
+            fair_value=missing("fair_value", "Fair value（照抄 implied return）", why, authority=A_VALUATION),
+            value_date=missing("value_date", "fair value 是哪一天的值", why, authority=A_VALUATION_ASSUMPTIONS),
+            horizon_window=missing("horizon_window", "Horizon 區間（照抄 implied return）", why, authority=A_IMPLIED_RETURN),
+            current_annualized_implied_return=missing("current_annualized_implied_return", "現價的年化隱含價格報酬", why,
+                                                      authority=A_IMPLIED_RETURN),
+            entry_price=missing("entry_price", "Analytical entry price", why, authority=A_ENTRY),
+            price_to_entry_gap=missing("price_to_entry_gap", "現價相對門檻價", why, authority=A_ENTRY),
+            hurdle_comparison=missing("hurdle_comparison", "現價 vs 門檻價（算術比較）", why, authority=A_ENTRY),
+            assessment=missing("entry_assessment", "這次評估能不能當 clean 讀", why, authority=A_ENTRY),
+            trace=(), epistemics=missing("entry_epistemics", "entry logic 的認識論分解", why, authority=A_ENTRY),
+            selection=None, is_not=ENTRY_IS_NOT,
+        )
+
+    if result is None:
+        return _absent(reason or "本次未執行 entry model（呼叫端未注入）")
+
+    ent_refresh = refresh.get("entry_assessment:entry_assessment")
+    base_status = _refresh_status(ent_refresh)
+    target = result.target_period
+    price = result.current_price
+    upstream_known = result.implied_return_status == "available" and result.fair_value is not None
+    upstream_why = f"上游 implied return 缺席：{result.implied_return_reason or '未知'}（缺席不是 0）"
+
+    convention_datum = Datum(
+        key="entry_convention", label="要求報酬的 convention", value=result.convention, status="available",
+        basis="deterministic", authority=A_ENTRY, method=result.model_version, as_of=reference_day,
+        reason="v1 只有一種：年化要求價格報酬；多一種 convention 就要多一段算術")
+    c = result.criterion
+    if c is not None:
+        c_refresh = refresh.get(f"entry_criterion:{c.criterion_id}")
+        c_deps = {"criterion_id": c.criterion_id, "convention": c.convention, "author": c.author,
+                  "created_at": c.created_at.isoformat(), "supersedes_id": c.supersedes_id,
+                  "reference_refs": list(c.reference_refs), "persisted": c.author.lower() != "sandbox",
+                  "basis": c.basis, **_refresh_deps(c_refresh)}
+        criterion_datum = Datum(
+            key="entry_criterion", label=f"Entry criterion：要求年化價格報酬（{c.author} 宣告）", value=c.value,
+            status=_refresh_status(c_refresh), basis=c.basis, authority=A_ENTRY_CRITERIA, unit="ratio",
+            as_of=c.created_on, reason=c.rationale, dependencies=c_deps)
+        required_datum = Datum(
+            key="required_annualized_return", label="要求年化價格報酬（投資人政策，不是研究判斷）", value=c.value,
+            status=_refresh_status(c_refresh), basis=c.basis, authority=A_ENTRY_CRITERIA, unit="ratio",
+            as_of=c.created_on, dependencies={"criterion_id": c.criterion_id, "persisted": c.author.lower() != "sandbox"})
+    else:
+        why_c = result.criterion_reason or "沒有生效的 entry criterion"
+        criterion_datum = missing("entry_criterion", "Entry criterion（投資人的要求報酬判準）", why_c, authority=A_ENTRY_CRITERIA)
+        required_datum = missing("required_annualized_return", "要求年化價格報酬", why_c, authority=A_ENTRY_CRITERIA)
+    current_price_datum = (
+        Datum(key="current_price", label="現價（Engine C；照抄 implied return 的起點）", value=price.value, status="available",
+              basis="observation", authority=A_SNAP, unit=f"quote_unit（{price.unit or '未知'}）", as_of=price.bar_date,
+              evidence_refs=tuple(price.evidence_refs))
+        if price.is_known else missing("current_price", "現價（Engine C）", price.reason or "無現價", authority=A_SNAP))
+    fair_value_datum = (
+        Datum(key="fair_value", label=f"Fair value（{target.label if target else '?'}；照抄 implied return）",
+              value=result.fair_value, status="available", basis="deterministic", authority=A_VALUATION,
+              unit=_unit("currency_per_share"), as_of=reference_day, reason="照抄，不重算",
+              dependencies={"currency": result.fair_value_currency,
+                            "assumption_ids": [a for a in result.research_assumption_ids if not a.startswith("ha_")]})
+        if result.fair_value is not None else
+        missing("fair_value", "Fair value（照抄 implied return）", upstream_why, authority=A_VALUATION))
+    value_date_datum = (
+        Datum(key="value_date", label=f"fair value 是哪一天的值（{result.value_date_semantics}）", value=result.value_date,
+              status="available", basis="session_judgment", authority=A_VALUATION_ASSUMPTIONS, unit="date",
+              as_of=reference_day, dependencies={"value_date_semantics": result.value_date_semantics})
+        if result.value_date is not None else
+        missing("value_date", "fair value 是哪一天的值", upstream_why, authority=A_VALUATION_ASSUMPTIONS))
+    window_datum = (
+        Datum(key="horizon_window", label="Horizon 區間（照抄 implied return）",
+              value={"horizon_start": result.horizon_start, "horizon_end": result.horizon_end,
+                     "holding_period_days": result.holding_period_days, "alignment": result.alignment},
+              status="available", basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day,
+              dependencies={"horizon_assumption_id": result.horizon.assumption_id if result.horizon else None,
+                            "alignment": result.alignment})
+        if result.horizon_start is not None and result.horizon_end is not None and result.holding_period_days is not None
+        else missing("horizon_window", "Horizon 區間（照抄 implied return）", upstream_why, authority=A_IMPLIED_RETURN))
+    current_ann_datum = (
+        Datum(key="current_annualized_implied_return", label="現價的年化隱含價格報酬（照抄 implied return）",
+              value=result.current_annualized_implied_return, status="available", basis="deterministic",
+              authority=A_IMPLIED_RETURN, unit="ratio", as_of=price.bar_date,
+              dependencies={"input_dependency": result.input_dependency})
+        if result.current_annualized_implied_return is not None else
+        missing("current_annualized_implied_return", "現價的年化隱含價格報酬",
+                upstream_why if not upstream_known else "上游未年化（持有期間不足 1 天）", authority=A_IMPLIED_RETURN))
+    # ⚠ 這一格是上游照抄值：**缺判準時仍然看得見**（fair value／horizon 也是）——讀者要先知道「現在的年化隱含報酬
+    # 是多少」才知道自己要不要宣告 hurdle；把它跟本層自己算的門檻價一起吞掉會讓 missing 看起來比實際更空。
+
+    if result.is_known:
+        note = (f"；refresh={ent_refresh.state}：{ent_refresh.reasons[0]}"
+                if ent_refresh is not None and ent_refresh.state != CURRENT else "")
+        deps = {"input_dependency": result.input_dependency, "criterion_basis": result.criterion_basis,
+                "criterion_id": result.criterion_id, "research_assumption_ids": list(result.research_assumption_ids),
+                "observation_refs": list(result.observation_refs),
+                "horizon_start": result.horizon_start.isoformat(), "horizon_end": result.horizon_end.isoformat(),
+                "holding_period_days": result.holding_period_days,
+                "value_date": result.value_date.isoformat() if result.value_date else None,
+                "value_date_semantics": result.value_date_semantics, "alignment": result.alignment,
+                "convention": result.convention, **_refresh_deps(ent_refresh)}
+        assessment_status = ("review_required" if result.assessment == "review_required" else base_status)
+        entry_price_datum = Datum(
+            key="entry_price", label=f"Analytical entry price（現價等於它時年化隱含報酬＝要求報酬；{result.horizon_start} → {result.horizon_end}）",
+            value=result.entry_price, status=base_status, basis="deterministic", authority=A_ENTRY,
+            method=f"{result.formulas['entry_price']}（{result.model_version}）", unit=_unit("currency_per_share"),
+            as_of=price.bar_date, evidence_refs=tuple(result.observation_refs),
+            reason=(f"calculation=deterministic；input_dependency={result.input_dependency}"
+                    f"（{BASIS_LABEL.get(str(result.input_dependency), result.input_dependency)}）；hurdle 是投資人政策；"
+                    + ENTRY_IS_NOT[0] + note),
+            dependencies=deps)
+        gap_datum = Datum(
+            key="price_to_entry_gap", label="現價相對門檻價（正值＝現價高於門檻價）",
+            value={"relative": result.price_to_entry_gap, "absolute": result.price_to_entry_gap_abs},
+            status=base_status, basis="deterministic", authority=A_ENTRY, method=result.formulas["price_to_entry_gap"],
+            unit=f"ratio／{_unit('currency_per_share')}", as_of=price.bar_date, dependencies=deps)
+        comparison_datum = Datum(
+            key="hurdle_comparison", label="現價 vs 門檻價（算術比較，不是 action）", value=result.hurdle_comparison,
+            status=base_status, basis="deterministic", authority=A_ENTRY, method=result.formulas["hurdle_comparison"],
+            as_of=price.bar_date, reason=ENTRY_IS_NOT[0], dependencies=deps)
+        assessment_datum = Datum(
+            key="entry_assessment", label="這次評估能不能當 clean 讀（alignment／refresh）",
+            value={"state": result.assessment, "alignment": result.alignment, "reason": result.assessment_reason},
+            status=assessment_status, basis="deterministic", authority=A_ENTRY, as_of=reference_day,
+            reason=result.assessment_reason, dependencies=deps)
+        epistemics_datum = Datum(
+            key="entry_epistemics", label="entry logic 的認識論分解（算術 vs 研究判斷 vs 投資人政策）",
+            value=dict(result.epistemics), status="available", basis="deterministic", authority=A_ENTRY, as_of=reference_day,
+            method="純計數與選取：列出哪些是確定性算術、哪些輸入是研究判斷、哪一格是投資人政策；one_sentence 是機器組出的一句話")
+        section_status = _worst_status(base_status, assessment_status)
+        meta_reason = result.assessment_reason if result.assessment == "review_required" else None
+    else:
+        why = f"{result.reason}（缺席不是 0）"
+        entry_price_datum = missing("entry_price", "Analytical entry price", why, authority=A_ENTRY)
+        gap_datum = missing("price_to_entry_gap", "現價相對門檻價", why, authority=A_ENTRY)
+        comparison_datum = missing("hurdle_comparison", "現價 vs 門檻價（算術比較）", why, authority=A_ENTRY)
+        assessment_datum = missing("entry_assessment", "這次評估能不能當 clean 讀", why, authority=A_ENTRY)
+        epistemics_datum = missing("entry_epistemics", "entry logic 的認識論分解", why, authority=A_ENTRY)
+        section_status = "missing"
+        meta_reason = result.reason
+    trace: list[Datum] = []
+    for step in result.steps:
+        authority = {"criterion_input": A_ENTRY_CRITERIA, "return_input": A_IMPLIED_RETURN, "price_input": A_SNAP,
+                     "derived": A_ENTRY}[step.kind]
+        if step.value is None:
+            trace.append(missing(f"entry_step:{step.key}", step.label, step.reason or "上游缺料（不是 0）", authority=authority))
+            continue
+        trace.append(Datum(
+            key=f"entry_step:{step.key}", label=step.label, value=step.value, status="available", basis=step.basis,
+            authority=authority, method=step.formula, unit=_unit(step.unit), as_of=reference_day,
+            evidence_refs=tuple(step.observation_refs), reason=step.reason,
+            dependencies={"kind": step.kind, "assumption_ids": list(step.assumption_ids),
+                          "input_dependency": step.input_dependency}))
+    selection = EvidenceSelectionCounts(
+        input_count=result.criterion_selection.input_count, accepted_count=result.criterion_selection.accepted_count,
+        filtered_count=result.criterion_selection.filtered_count, reasons=dict(result.criterion_selection.reasons))
+    meta = SectionMeta(
+        status=section_status, basis="deterministic" if result.is_known else "none", authority=A_ENTRY,
+        capability=CAP_ANALYTICAL_ENTRY_THRESHOLD, reason=meta_reason, as_of=reference_day,
+        warnings=(ENTRY_EPISTEMIC_WARNING,
+                  "判準缺席就 missing（理由明寫「缺的是投資門檻判斷」）；alignment 不對齊只能 review_required，不得冒充 clean。",
+                  "entry logic " + "；".join(ENTRY_IS_NOT), *result.warnings),
+    )
+    return EntryLogicSection(
+        meta=meta, convention=convention_datum, criterion=criterion_datum, required_annualized_return=required_datum,
+        current_price=current_price_datum, fair_value=fair_value_datum, value_date=value_date_datum,
+        horizon_window=window_datum, current_annualized_implied_return=current_ann_datum, entry_price=entry_price_datum,
+        price_to_entry_gap=gap_datum, hurdle_comparison=comparison_datum, assessment=assessment_datum,
+        trace=tuple(trace), epistemics=epistemics_datum, selection=selection, is_not=ENTRY_IS_NOT,
         period=target.label if target else None, period_end=target.end if target else None,
     )
 
@@ -965,6 +1179,9 @@ def build_alpha_investment_view(
     implied_return: ImpliedReturnResult | None = None,
     implied_return_reason: str | None = None,
     horizon_records: Sequence[HorizonAssumption] = (),
+    entry: EntryAssessmentResult | None = None,
+    entry_reason: str | None = None,
+    entry_records: Sequence[EntryCriterion] = (),
     today: date | None = None,
     refresh_changes: Sequence[ChangeEvent] | None = None,
     assumption_records: Sequence[OperatingAssumption] = (),
@@ -1024,6 +1241,10 @@ def build_alpha_investment_view(
             implied_return_reason = (f"as-of {as_of_iso} 模式：傳入的 implied return 以 as_of={implied_return.as_of} 執行，"
                                      "與 context 不符，拒收（INV-6）")
             implied_return = None
+        if entry is not None and entry.as_of != context.as_of:
+            entry_reason = (f"as-of {as_of_iso} 模式：傳入的 entry assessment 以 as_of={entry.as_of} 執行，"
+                            "與 context 不符，拒收（INV-6）")
+            entry = None
     #: 沒有時點語意的來源在 as-of 下是 not_applicable；authority 回答「T 時刻沒有」則是 missing。
     thesis_absent_status = "not_applicable" if as_of_mode else "missing"
     decision_absent_status = "not_applicable" if (as_of_mode and decision_refused) else "missing"
@@ -1078,6 +1299,7 @@ def build_alpha_investment_view(
     artifacts += artifacts_from_implied_return(
         implied_return, build_at=build_at, horizon_records=horizon_records,
         base_period_end=(fundamental_model.base_period.end if fundamental_model and fundamental_model.base_period else None))
+    artifacts += artifacts_from_entry(entry, build_at=build_at, criterion_records=entry_records)
     artifacts += artifacts_from_context(context, build_at=build_at)
     detection = change_detection or ("not_run" if refresh_changes is None else "authority_time_series")
     changes = list(refresh_changes or ())
@@ -1124,6 +1346,11 @@ def build_alpha_investment_view(
     )
     implied_return_section = _implied_return_section(
         implied_return, implied_return_reason, reference_day=reference_day,
+        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        refresh=refresh_by_key,
+    )
+    entry_section = _entry_logic_section(
+        entry, entry_reason, reference_day=reference_day,
         reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
@@ -1912,7 +2139,7 @@ def build_alpha_investment_view(
     )
 
     # =======================================================================
-    # N. Downside / Entry logic（全部 not_modeled）；implied return 已於上方由 alpha.implied_return 組裝
+    # N. Downside（not_modeled）；implied return／entry logic 已於上方由 alpha.implied_return／alpha.entry 組裝
     # =======================================================================
     def _not_modeled_section(reason: str, items: Sequence[tuple[str, str]], confusions: Sequence[str]) -> NotModeledSection:
         return NotModeledSection(
@@ -1924,16 +2151,8 @@ def build_alpha_investment_view(
     downside_section = _not_modeled_section(
         "系統不產生下檔估計：沒有 bear case 的數值、沒有最大回撤模型。",
         (("downside", "下檔幅度"), ("max_drawdown_estimate", "最大回撤估計")),
-        ("scenarios.bear 是散文，不是下檔數字", "falsification 的條件是出場觸發，不是下檔幅度"),
-    )
-    entry_section = _not_modeled_section(
-        "系統不產生 required return／entry price／wait-for-price threshold／actionable-now；買多少、什麼時候買由使用者判斷。",
-        (("required_return", "要求報酬"), ("entry_price", "進場價"),
-         ("wait_for_price_threshold", "等待價位門檻"), ("actionable_now", "現在可行動")),
-        ("structural_thesis.ranking 是 rank_bottlenecks 的研究注意力順序，不是 opportunity ranking",
-         "decision_lab today 的 attention（MONITOR／REVIEW）是「今天要不要看」，不是「該不該買」；本 view 不重算它",
-         "valuation.fair_value_gap 不是 entry signal——fair value 低於現價不代表賣、高於不代表買",
-         "implied_return.price_return 不是 required return、不是 entry price——它只說 base case 下從哪天到哪天的隱含報酬"),
+        ("scenarios.bear 是散文，不是下檔數字", "falsification 的條件是出場觸發，不是下檔幅度",
+         "entry_logic.entry_price 是門檻價不是下檔估計——現價高於它多少不是「會跌多少」"),
     )
 
     # =======================================================================
@@ -2059,6 +2278,8 @@ def build_alpha_investment_view(
         warnings.append(VALUATION_EPISTEMIC_WARNING)
     if implied_return_section.price_return.is_known:
         warnings.append(RETURN_EPISTEMIC_WARNING)
+    if entry_section.entry_price.is_known:
+        warnings.append(ENTRY_EPISTEMIC_WARNING)
 
     return AlphaInvestmentView(
         schema_version=SCHEMA_VERSION,
@@ -2192,6 +2413,22 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
                                      if view.implied_return.value_date.is_known else None),
             "total_return_status": view.implied_return.total_return.status,
             "reason": None if view.implied_return.price_return.is_known else view.implied_return.price_return.reason,
+        },
+        # Step 3：entry logic 摘要——只抄 entry_logic section；**不是 buy／sell**，comparison 是算術比較
+        "entry_logic": {
+            "status": view.entry_logic.meta.status,
+            "entry_price": _val(view.entry_logic.entry_price),
+            "current_price": _val(view.entry_logic.current_price),
+            "price_to_entry_gap": ((view.entry_logic.price_to_entry_gap.value or {}).get("relative")
+                                   if view.entry_logic.price_to_entry_gap.is_known else None),
+            "required_annualized_return": _val(view.entry_logic.required_annualized_return),
+            "current_annualized_implied_return": _val(view.entry_logic.current_annualized_implied_return),
+            "hurdle_comparison": _val(view.entry_logic.hurdle_comparison),
+            "assessment": ((view.entry_logic.assessment.value or {}).get("state")
+                           if view.entry_logic.assessment.is_known else None),
+            "criterion_persisted": ((view.entry_logic.criterion.dependencies or {}).get("persisted")
+                                    if view.entry_logic.criterion.is_known else None),
+            "reason": None if view.entry_logic.entry_price.is_known else view.entry_logic.entry_price.reason,
         },
         "internal_fundamentals_status": view.internal_fundamentals.meta.status,
         "not_modeled": not_modeled_keys,

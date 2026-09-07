@@ -106,11 +106,19 @@ surface 引用次數全是 0**。這是 L13 的復發——當時的驗收是「
 
 使用者問「這一檔到底知道什麼、還不知道什麼」時用它，不要自己從 packet／圖／Engine C 拼。
 它是 `briefing/alpha_view/` 的 read model：每一格都帶 **status**（有／部分／過期／缺料／
-尚未建模）與 **basis**（確定性規則／觀測值／粗略代理／session 判斷／散文／結構推論）。
-**本 skill 只轉述，三條不得改寫：**（a）`not_modeled` 的格（內部基本面、earnings bridge、
-預期報酬、下檔、進場邏輯）就說「尚未建模」，不得用 Q 分數、賣方目標價或散文補；
-（b）`stale` 的 session 判斷要明說「判斷是對舊 context 做的」；（c）`heuristic_proxy`
-不得寫成「模型」。Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
+尚未建模／需複查／已失效／不適用）與 **basis**（確定性規則／觀測值／粗略代理／session 判斷／
+散文／結構推論／**投資人政策**）。
+**本 skill 只轉述，四條不得改寫：**（a）`not_modeled`（系統**沒有這個能力**）就說「尚未建模」，
+`missing`（有能力、這檔沒資料）就說「缺料」＋原因——**兩者不得互換**，也不得用 Q 分數、賣方
+目標價或散文補；（b）`stale` 的 session 判斷要明說「判斷是對舊 context 做的」；
+（c）`heuristic_proxy` 不得寫成「模型」；（d）`entry_logic` 的 `meets_analytical_hurdle`
+只表示「現價 ≤ 門檻價」，**不得轉述成「該買」**，也不得把門檻價講成建議價或下檔估計。
+Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
+
+⚠ **哪些 section 是 `not_modeled` 會隨開發而變**（Phase 2 已讓內部基本面／earnings bridge／
+估值／隱含報酬／進場邏輯陸續從 not_modeled 變成有能力）——**不要在本檔維護那份清單**，
+每次直接問 view：
+`python -m briefing alpha-card <T> --format json | python -c "import json,sys;print({k:v['status'] for k,v in json.load(sys.stdin)['capability_map'].items()})"`
 
 ### 四維度（`AGENTS.md` 為唯一權威，此處只是操作提示）
 

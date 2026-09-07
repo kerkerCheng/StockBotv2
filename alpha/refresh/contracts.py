@@ -79,6 +79,9 @@ VALUATION_ASSUMPTION = "valuation_assumption"
 #: Step 2（2026-09-06）：horizon 判斷 ledger 的新增／取代／撤回。它只動 implied return，不動 fair value、
 #: 不動任何基本面判斷（policy 表對 Q1–Q5 與假設層一格都不動）。
 HORIZON_ASSUMPTION = "horizon_assumption"
+#: Step 3（2026-09-06）：entry criterion（投資人的要求報酬判準）ledger 的新增／取代／撤回。它只動 entry assessment，
+#: 不動 implied return、fair value 或任何研究判斷（policy 表對 Q1–Q5 與假設層一格都不動）——hurdle 變了不代表對公司的看法變了。
+ENTRY_CRITERION = "entry_criterion"
 FISCAL_PERIOD_ROLLOVER = "fiscal_period_rollover"
 THESIS_REVIEW_DUE = "thesis_review_due"
 DISPROOF_SIGNAL = "disproof_signal"
@@ -87,8 +90,8 @@ CONTEXT_DIGEST = "context_digest"
 
 CHANGE_TYPES: tuple[str, ...] = (
     MARKET_PRICE, CONSENSUS, FINANCIAL_ACTUAL, COMPANY_GUIDANCE, GRAPH_EDGE, GRAPH_CLAIM,
-    EVIDENCE, OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, HORIZON_ASSUMPTION, FISCAL_PERIOD_ROLLOVER,
-    THESIS_REVIEW_DUE, DISPROOF_SIGNAL, CONTEXT_DIGEST,
+    EVIDENCE, OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, HORIZON_ASSUMPTION, ENTRY_CRITERION,
+    FISCAL_PERIOD_ROLLOVER, THESIS_REVIEW_DUE, DISPROOF_SIGNAL, CONTEXT_DIGEST,
 )
 
 # artifact 型別。判斷型（session 判斷／假設）與確定性型（模型輸出）在 policy 裡走不同 state。
@@ -108,15 +111,22 @@ ARTIFACT_FAIR_VALUE_GAP = "fair_value_gap"
 #: implied return 是確定性型，依賴＝fair value 的依賴＋現價 ref＋horizon 假設。
 ARTIFACT_HORIZON_ASSUMPTION = "horizon_assumption"
 ARTIFACT_IMPLIED_RETURN = "implied_return"
+#: Step 3：entry 層的兩種成果。entry criterion 是投資人政策（判斷型紀錄：supersede／retract／as-of 的終局 state 與
+#: 其他判斷型紀錄同形；沒有 supporting evidence，所以結構事件不會動它）；entry assessment 是確定性型，
+#: 依賴＝implied return 的依賴＋criterion（`assumption_ids` 含 `ec_*`）。
+ARTIFACT_ENTRY_CRITERION = "entry_criterion"
+ARTIFACT_ENTRY_ASSESSMENT = "entry_assessment"
 
 ARTIFACT_TYPES: tuple[str, ...] = (
     ARTIFACT_AXIS, ARTIFACT_THESIS, ARTIFACT_ASSUMPTION, ARTIFACT_METRIC, ARTIFACT_COMPARISON,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_MODEL, ARTIFACT_VALUATION_ASSUMPTION, ARTIFACT_FAIR_VALUE,
     ARTIFACT_FAIR_VALUE_GAP, ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
+    ARTIFACT_ENTRY_CRITERION, ARTIFACT_ENTRY_ASSESSMENT,
 )
-#: 判斷型假設的三種成果型別（refresh 規則相同：supporting 變了 → review、撤回 → invalidated…）。
+#: 判斷型紀錄的成果型別（refresh 規則相同：supporting 變了 → review、撤回 → invalidated…；下游沿 `assumption_ids`
+#: 傳播）。entry criterion 列在這裡是為了**傳播**（被取代 → entry assessment recalculate），不是因為它是研究判斷。
 ASSUMPTION_ARTIFACT_TYPES: frozenset[str] = frozenset({ARTIFACT_ASSUMPTION, ARTIFACT_VALUATION_ASSUMPTION,
-                                                        ARTIFACT_HORIZON_ASSUMPTION})
+                                                        ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_ENTRY_CRITERION})
 
 #: 成果的「性質」：判斷型輸入變了要人複查；確定性型輸入變了重算就好。
 KIND_JUDGMENT = "judgment"
@@ -457,6 +467,7 @@ class RefreshReport:
 
 __all__ = [
     "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_FAIR_VALUE", "ARTIFACT_FAIR_VALUE_GAP",
+    "ARTIFACT_ENTRY_ASSESSMENT", "ARTIFACT_ENTRY_CRITERION", "ENTRY_CRITERION",
     "ARTIFACT_HORIZON_ASSUMPTION", "ARTIFACT_IMPLIED_RETURN", "HORIZON_ASSUMPTION",
     "ARTIFACT_MARKET_IMPLIED", "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES",
     "ARTIFACT_VALUATION_ASSUMPTION", "ASSUMPTION_ARTIFACT_TYPES", "VALUATION_ASSUMPTION", "AffectedArtifact",

@@ -16,11 +16,12 @@ RefreshReport → AffectedArtifact[]（state＋理由＋變了哪個依賴＋下
 from __future__ import annotations
 
 from .artifacts import (
-    AXIS_LABEL, THESIS_ARTIFACT_ID, artifacts_from_context, artifacts_from_implied_return, artifacts_from_model,
-    artifacts_from_signal, artifacts_from_valuation, build_instant, end_of_day, start_of_day,
+    AXIS_LABEL, THESIS_ARTIFACT_ID, artifacts_from_context, artifacts_from_entry, artifacts_from_implied_return,
+    artifacts_from_model, artifacts_from_signal, artifacts_from_valuation, build_instant, end_of_day, start_of_day,
 )
 from .contracts import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_ENTRY_ASSESSMENT, ARTIFACT_ENTRY_CRITERION,
+    ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP, ENTRY_CRITERION,
     ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN, HORIZON_ASSUMPTION,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_TYPES,
     ARTIFACT_VALUATION_ASSUMPTION, ASSUMPTION_ARTIFACT_TYPES, CHANGE_TYPES, VALUATION_ASSUMPTION,
@@ -40,6 +41,7 @@ from .resolver import resolve_refresh
 
 __all__ = [
     "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_FAIR_VALUE", "ARTIFACT_FAIR_VALUE_GAP",
+    "ARTIFACT_ENTRY_ASSESSMENT", "ARTIFACT_ENTRY_CRITERION", "ENTRY_CRITERION", "artifacts_from_entry",
     "ARTIFACT_HORIZON_ASSUMPTION", "ARTIFACT_IMPLIED_RETURN", "HORIZON_ASSUMPTION", "artifacts_from_implied_return",
     "ARTIFACT_MARKET_IMPLIED", "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES",
     "ARTIFACT_VALUATION_ASSUMPTION", "ASSUMPTION_ARTIFACT_TYPES", "VALUATION_ASSUMPTION", "AXIS_LABEL",

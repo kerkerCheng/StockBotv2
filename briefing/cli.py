@@ -174,6 +174,56 @@ def cmd_implied_return(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_entry(args: argparse.Namespace) -> int:
+    """單一公司的 entry logic（read model 第 13c 節）：implied return ＋ 明示的要求報酬判準 → 門檻價／現價相對門檻價。
+
+    `--sandbox-hurdle 0.15` 只在記憶體疊一筆非持久判準驗算（author=sandbox），**不寫任何 authority**；
+    真正的判準要走 `python -m alpha entry-criterion <T> --add spec.json`。
+    """
+    from alpha.errors import AlphaError, PointInTimeUnsupported
+
+    from .alpha_view.render import render_entry_logic_lines
+    from .alpha_view.sources import fetch_alpha_investment_view
+
+    as_of = date.fromisoformat(args.as_of) if args.as_of else None
+    try:
+        view = fetch_alpha_investment_view(
+            args.ticker, as_of=as_of, include_causal=False, scenario=args.scenario,
+            judgment_path=Path(args.judgment) if args.judgment else None,
+            sandbox_hurdle=args.sandbox_hurdle)
+    except PointInTimeUnsupported as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 3
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    if args.format == "json":
+        payload = view.to_dict()["entry_logic"]
+        payload["identity"] = {"ticker": view.identity.ticker, "company_id": view.identity.company_id,
+                               "as_of": view.identity.as_of.isoformat() if view.identity.as_of else None,
+                               "generated_on": view.identity.generated_on.isoformat(),
+                               "sandbox_hurdle": args.sandbox_hurdle}
+        payload["refresh_items"] = [i for i in view.to_dict()["refresh_status"]["items"]
+                                    if i["artifact_type"] in ("entry_criterion", "entry_assessment", "implied_return",
+                                                              "horizon_assumption", "valuation_assumption", "fair_value")]
+        payload["refresh_notes"] = list(view.refresh_status.notes)
+        text = json.dumps(payload, ensure_ascii=False, indent=2)
+    else:
+        head = [f"# Entry logic — {view.identity.company_label}",
+                f"- 生成日 {view.identity.generated_on.isoformat()}｜視角 {view.identity.point_in_time_mode}"
+                + (f"（as-of {view.identity.as_of.isoformat()}）" if view.identity.as_of else "")
+                + (f"｜情境 **{args.scenario}**" if args.scenario else "")
+                + (f"｜**SANDBOX hurdle {args.sandbox_hurdle:+.1%}（非持久，未寫入 ledger）**" if args.sandbox_hurdle is not None else ""),
+                ""]
+        text = "\n".join(head + render_entry_logic_lines(view))
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"entry logic → {args.out}（{len(text)} chars）")
+    else:
+        print(text)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m briefing", description=__doc__,
@@ -219,6 +269,18 @@ def build_parser() -> argparse.ArgumentParser:
     implied.add_argument("--format", choices=("markdown", "json"), default="markdown")
     implied.add_argument("-o", "--out", help="輸出路徑")
     implied.set_defaults(func=cmd_implied_return)
+    entry = sub.add_parser("entry", help="單一公司的 entry logic（Step 3：門檻價／現價相對門檻價／assessment／refresh state；不是 buy／sell）")
+    entry.add_argument("ticker")
+    entry.add_argument("--as-of", help="YYYY-MM-DD：只看 T 之前已知的判準、horizon、估值假設、內部基本面與行情")
+    entry.add_argument("--scenario", choices=("price_only", "consensus_revision", "graph_edge", "new_guidance",
+                                              "new_actual", "fiscal_rollover", "disproof"),
+                       help="在真實 state 上疊一件假想變化（不寫任何 authority）")
+    entry.add_argument("--sandbox-hurdle", type=float, default=None,
+                       help="非持久驗算：只在記憶體疊一筆 author=sandbox 的年化要求報酬（例 0.15）；不寫 ledger")
+    entry.add_argument("--judgment", help="指定 session 判斷 JSON")
+    entry.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    entry.add_argument("-o", "--out", help="輸出路徑")
+    entry.set_defaults(func=cmd_entry)
     return parser
 
 

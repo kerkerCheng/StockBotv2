@@ -266,6 +266,14 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 `alpha/implied_return/model.py::build_implied_return`：`price_return = fair_value / current_price − 1`；`holding_period_days = horizon_end − current_price.bar_date`；`annualized_price_return = (1 + price_return) ** (365.25 / days) − 1`。四個輸入缺一就 `missing`（現價含 bar_date、fair value 同單位、value-date 語意、生效 horizon）；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者。**它不是** probability-weighted expected return（沒有機率；名稱刻意用 implied）、不是 total return（`total_return_status` 恆 `not_modeled`）、不是 entry signal／required return／buy-sell；read model 第 13a 節 `implied_return` 每次列 `is_not`。COHR 2026-09-06：從 2026-09-04（281.86）到 2027-06-30，simple −20.7%、年化 −24.6%。
 *Avoid:* 叫它 expected return、把 price return 冒充 total return、拿它排序或給尺寸、horizon 缺就偷用一年
 
+### EntryCriterion（要求報酬判準）
+使用者對「這檔要求多少年化價格報酬」的**明示**宣告（`alpha/entry/contracts.py`，2026-09-06 Step 3）：`convention`（封閉字彙，v1 只有 `annualized_required_price_return`）、值（小數）、`basis`（**只有** `investor_policy`）、rationale、`reference_refs`、`created_at`、supersede／retract。id 前綴 `ec_`，住 `library/private/alpha/entry_criteria/<TICKER>.jsonl`。**它不是公司事實、不是研究對公司的判斷、也不是資本許可**——它回答「我的資本要求多少報酬」，主詞是投資人；在模型裡與現價同一種地位（注入的輸入）。**刻意沒有 `period`**（要求報酬不隨估值換年度失效），也**刻意不共用 `select_assumptions`**（判準的 provenance 不在公司的證據池裡）。
+*Avoid:* 讓程式或 LLM 補 10%／15%／20%、把 basis 開放成 `session_judgment`（那會讓 hurdle 變成對公司的判斷）、把 sandbox 驗算值寫進 ledger
+
+### Analytical Entry Threshold（Step 3）
+`alpha/entry/model.py::build_entry_assessment`：`entry_price = fair_value / (1 + annualized_hurdle) ** (holding_period_days / 365.25)`；`price_to_entry_gap = current_price / entry_price − 1`；`hurdle_comparison = current_price <= entry_price ? meets_analytical_hurdle : above_analytical_entry`（等號歸 meets——門檻價的定義就是「恰好滿足」）。兩個輸入缺一就 `missing`，且理由分開：判準缺席寫「**缺投資門檻判斷**，不是資料 ETL 缺口」。`assessment` 是 `clean`／`review_required`——`value_date` 與 `horizon_end` 不一致時算術照列但**不得冒充 clean**。**它不是** buy／sell／hold、不是 position size／capital allocation／order、不是 portfolio permission（型別在 import 當下就掃描這些欄位名）；read model 第 13c 節 `entry_logic` 每次列 `is_not`。COHR 2026-09-06：ledger 0 筆判準 → missing；以 sandbox 15% 驗算 → 門檻價 199.43 vs 現價 281.86，`above_analytical_entry`。
+*Avoid:* 把 `meets_analytical_hurdle` 讀成「該買」、拿門檻價當下檔估計、拿它跨標的排序、缺判準就補一個常見值
+
 ### Review Condition（假設自帶的 machine-readable 觸發條件）
 `metric`／`scope`／`period_end`／`period_kind`／`operator`／`threshold`／`on_trigger`／`note`。由寫假設的人明示，引擎拿 Engine C 觀測（年度＋exit quarter）對照；滿足 → `disproof_signal` → 該假設 `on_trigger` state。`note` 是人寫的下一步（例：下修至 +45%），引擎只讀不做。也可經 Event Watch `hypothesis_ref=oa_*` 喚醒。
 *Avoid:* parser 讀 rationale 自由文字、觸發後自動寫新假設

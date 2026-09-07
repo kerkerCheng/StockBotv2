@@ -26,12 +26,14 @@ from .contracts import (
     StructuralEdgeItem,
 )
 
-__all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards", "render_implied_return_lines"]
+__all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards", "render_entry_logic_lines",
+           "render_implied_return_lines"]
 
 _LEGEND = (
     "> 圖例——每一格後面的〔〕標的是**這是哪一種知識**："
     "〔確定性規則〕由既有規則算出／〔觀測值〕直接讀自 authority／〔粗略代理〕heuristic proxy／"
-    "〔session 判斷〕LLM／session 的判斷／〔散文〕未結構化文字／〔結構推論〕圖上多跳推論。"
+    "〔session 判斷〕LLM／session 的判斷／〔散文〕未結構化文字／〔結構推論〕圖上多跳推論／"
+    "〔投資人政策〕使用者自己宣告的要求（不是觀測、不是研究判斷）。"
     "狀態字：有／部分／過期／缺料（有能力、這檔沒資料）／證據不足／**尚未建模**（系統還沒有這個能力）／不適用。"
     "**缺席一律不是 0。**"
 )
@@ -418,14 +420,16 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # 13a. Base-case implied return（Step 2；`python -m briefing implied-return` 單獨印這一節）
     lines += render_implied_return_lines(view)
 
-    # 13b–c. Not modeled（報酬之後的兩個插座）
-    for title, section in (("13b. 下檔", view.downside),
-                           ("13c. 進場邏輯／可行動性", view.entry_logic)):
+    # 13b. Not modeled（下檔）
+    for title, section in (("13b. 下檔", view.downside),):
         lines += _section(title, section.meta)
         lines += [_datum_line(d) for d in section.items]
         lines.append("不要跟這些混淆：")
         lines += [f"- {markdown_text(x)}" for x in section.not_to_be_confused_with]
         lines.append("")
+
+    # 13c. Entry logic（Step 3；`python -m briefing entry` 單獨印這一節）
+    lines += render_entry_logic_lines(view)
 
     # 14. Evidence
     ev = view.evidence
@@ -520,6 +524,33 @@ def render_implied_return_lines(view: AlphaInvestmentView) -> list[str]:
     lines.append(_datum_line(ir.epistemics))
     lines.append("implied return 不是什麼：")
     lines += [f"- {markdown_text(x)}" for x in ir.is_not]
+    lines.append("")
+    return lines
+
+
+def render_entry_logic_lines(view: AlphaInvestmentView) -> list[str]:
+    """第 13c 節（entry logic）。只印 entry_logic section 的 Datum；公式字串來自 `alpha.entry`，本檔不含公式、
+    不比較任何價格、不把 comparison 翻譯成 action。"""
+    lines: list[str] = []
+    el = view.entry_logic
+    lines += _section("13c. 進場邏輯（implied return ＋ 明示的要求報酬判準 → analytical entry threshold；不是 buy／sell）", el.meta)
+    if el.period:
+        lines.append(f"目標期間：{markdown_text(el.period)}" + (f"（至 {el.period_end.isoformat()}）" if el.period_end else ""))
+    for datum in (el.convention, el.criterion, el.required_annualized_return, el.current_price, el.fair_value, el.value_date,
+                  el.horizon_window, el.current_annualized_implied_return, el.entry_price, el.price_to_entry_gap,
+                  el.hurdle_comparison, el.assessment):
+        lines.append(_datum_line(datum))
+    if el.selection is not None:
+        sel = el.selection
+        lines.append(
+            f"entry criterion 選取：input {sel.input_count}／accepted {sel.accepted_count}／filtered {sel.filtered_count}"
+            f"（{_mapping_text(sel.reasons, None) or '無過濾'}）")
+    if el.trace:
+        lines.append("算式（每格標 criterion_input／return_input／price_input／derived）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in el.trace]
+    lines.append(_datum_line(el.epistemics))
+    lines.append("entry logic 不是什麼：")
+    lines += [f"- {markdown_text(x)}" for x in el.is_not]
     lines.append("")
     return lines
 
@@ -781,7 +812,7 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
         "- 「Fair value vs 現價」是內部 EPS × 明示目標倍數（session 判斷）算出的 fair value 與現價的相對差；"
         "**它不是 expected return、不是 upside forecast、不是進場訊號**（報酬語意住完整卡第 13a 節的 base-case implied return，"
         "那也只是 base case 從 bar_date 到明示 horizon 的隱含價格報酬，不是機率加權期望值）；沒有估值假設一律「未知」。",
-        "- 「尚未建模」列的是 downside／entry logic 等系統還沒有的能力。",
+        "- 「尚未建模」列的是 downside 等系統還沒有的能力。",
         "",
     ]
     return lines

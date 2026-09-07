@@ -235,7 +235,8 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 | scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率 `not_modeled`；`target_valuation` 自 2026-09-06 起照抄 valuation 的單點 fair value（逐情境仍無） |
 | valuation | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／`value_date`／現價／gap 分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing`；估值假設未宣告時點語意時 `value_date`＝`missing` |
 | implied_return | **`alpha/implied_return`**（§6.5）：現價 ＋ fair value 時點語意 ＋ 明示 horizon | `deterministic`（capability `base_case_implied_return_v1`）；`price_return`／`annualized_price_return` 確定性、`horizon` 與 `value_date` 是判斷、`total_return`／`probability_weighted_return` **`not_modeled`**；四個輸入缺一＝`missing`；每次列 `is_not` |
-| downside／entry_logic | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次、**fair value gap**、**implied return**） |
+| entry_logic | **`alpha/entry`**（§6.6）：implied return ＋ **明示的要求報酬判準**（`investor_policy`） | `deterministic`（capability `analytical_entry_threshold_v1`）；`entry_price`／`price_to_entry_gap`／`hurdle_comparison` 確定性、`required_annualized_return` 是**投資人政策**（新 basis `investor_policy`）；沒有判準＝`missing`＋「缺投資門檻判斷，不是 ETL 缺口」；alignment 不對齊＝`review_required`；每次列 `is_not`（**不是 buy／sell、不是部位、不是資本許可**） |
+| downside | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次、**fair value gap**、**implied return**、**entry price**） |
 | evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
 
 **as-of 視角的邊界（2026-09-05 Phase 1.1 定案）：** 三種來源三種處置，判準是「authority
@@ -483,8 +484,71 @@ default。② **horizon 已過就不是報酬**（`horizon_end <= bar_date` → 
 **認識論：** 算術＝報酬／年化／持有期間／估值／橋；判斷＝營運假設＋估值假設（含 value-date 語意）＋horizon；觀測＝現價＋基期實際值。
 `ImpliedReturnResult.epistemics.one_sentence` 把「從哪天、到哪天、在什麼假設下」機器組成一句話。
 
-**刻意不做（v1 限制）：** Entry Logic／buy-sell／portfolio／consumer UI／機率加權情境／Valuation v2（historical normalized
+**刻意不做（v1 限制）：** buy-sell／portfolio／consumer UI／機率加權情境／Valuation v2（historical normalized
 multiple、peer multiple、growth durability、margin／ROIC quality、cycle position——backlog 不遺失）／total return／跨標的比較。
+**Entry Logic 自 2026-09-06 起住 §6.6。**
+
+### 6.6 Entry Logic（`alpha/entry/`，2026-09-06 Phase 2 Step 3 v1）
+
+**角色一句話：已知現價、fair value（含時點語意）、明示 horizon 與**明示的要求報酬判準**，回答
+「什麼價格以下才滿足這個報酬門檻」，以及現價相對那個門檻價在哪裡。**
+它**不是** buy／sell、不是部位尺寸、不是資本許可——名稱刻意叫 **analytical entry threshold**。
+
+```
+alpha/implied_return（現價、fair value、value_date、horizon、年化隱含報酬）─┐
+EntryCriterion[]（投資人政策 ledger）── select(as_of) ────────────────────┼─► build_entry_assessment ─► EntryAssessmentResult
+                                                                            │   entry_price ＝ fair_value / (1 + h) ** (days / 365.25)
+                                                                            │   gap ＝ current_price / entry_price − 1
+                                                                            ▼   comparison ＝ current_price <= entry_price ? meets : above
+                                              briefing/alpha_view（只選取）→ entry_logic section（第 13c 節）／精簡卡 entry_logic 欄
+```
+
+**先回答「hurdle 是誰的？」（動工前的 authority 盤點，2026-09-06）：** required return **不是公司事實**
+（A1／A2 不擁有它）、**不是研究對公司的信念**（A3 的內容是「我們相信這家公司會怎樣」，不含「我要求幾 %」）、
+**也不是資本決策**（A5 是「當時憑什麼決定、使用者選了什麼」，append-only 且 live 100% 人工——宣告一個 hurdle
+不授權任何資本、不建立任何決策紀錄）。它回答的是「**我的資本**要求多少報酬才值得」，主詞是投資人。
+結論：新增第三種知識種類 **`investor_policy`**，在本層與 A2 現價同一種地位——**注入的輸入**，只讀、不猜、
+不補預設、不自動改。**沒有把 capital permission 偷塞進 Alpha。**
+
+| 東西 | 擁有者 | 住哪 |
+|---|---|---|
+| 要求報酬判準（`convention`／值／`basis`／rationale／`reference_refs`／`created_at`／supersede／retract） | **投資人政策**（使用者明示） | `library/private/alpha/entry_criteria/<TICKER>.jsonl`（append-only；`python -m alpha entry-criterion`） |
+| 門檻價／gap／comparison 算術 | A3 確定性導出，`alpha/entry/model.py` | 純函式，版本 `entry-model/v1`；公式字串唯一定義處 `ENTRY_PRICE_FORMULA`／`PRICE_TO_ENTRY_GAP_FORMULA`／`HURDLE_COMPARISON_RULE` |
+| fair value／horizon／年化隱含報酬 | `alpha/implied_return`（§6.5） | 本層**照抄**，不重算 |
+| 「該不該買、買多少」 | **使用者**（成為資本動作時才是 A5） | 本層型別裡**沒有那個欄位** |
+
+**六條規則：** ① **兩個輸入缺一就 `missing`**：可用的 implied return、生效的判準；兩者的理由**分開寫**——
+判準缺席是「**缺投資門檻判斷**，不是資料 ETL 缺口」，**不 invent 10%／15%／20%**。② **判準是注入的輸入**：
+`basis` 封閉字彙只有 `investor_policy`（開放它就等於讓 hurdle 變成「對公司的判斷」）；`criterion_basis` 與
+研究側的 `input_dependency` **分兩格**，不混。③ **判準刻意沒有 `period`**——要求報酬不隨估值換會計年度而失效；
+也**刻意不共用 `select_assumptions`**（那支以會計期間為身分並要求證據解析到公司 evidence index，而投資人的
+機會成本本來就不在那裡；硬套會製造「換了年度 hurdle 就 other_period」的假失效）。④ **alignment 不對齊不得
+冒充 clean**：`aligned`／`spot`（明示）→ `clean`；`horizon_before/after_value_date` → 算術照列但
+`assessment=review_required`＋理由，型別層擋住「不對齊卻標 clean」。⑤ **只有算術比較，沒有 action**：
+`meets_analytical_hurdle` 就是 `current_price <= entry_price`（等號歸 meets——門檻價的定義就是「恰好滿足」）。
+⑥ **型別層在 import 當下擋住資本語意**：`_assert_no_capital_fields` 掃描 `FORBIDDEN_POSITION_TOKENS` ＋
+buy／sell／order／action／trade／permission，長出那種欄位是 import 失敗不是 lint 警告。
+
+**Refresh 整合（沿用 `alpha/refresh`）：** 新 change class `entry_criterion`（Q1–Q5、假設層、fair value、
+implied return **一格不動**——投資人政策變了不代表對公司的看法變了）；新 artifact `entry_criterion`（判斷型，
+**`refs` 為空**：判準沒有 supporting evidence，所以結構事件／共識／指引都不會動它）／`entry_assessment`
+（確定性；policy `{market_price, financial_actual}`；依賴＝implied return 的依賴＋criterion）。
+實跑 COHR：price-only→`entry_assessment` `recalculate`、判準 `current`；graph_edge／consensus／new_actual／
+disproof→上游 review 傳播成 `review_required`，**判準始終 `current`**；horizon 到期→整條 `stale`。
+⚠ **criterion 同時列在 `refs` 與 `assumption_ids`，但今天只有 refs 那條會發動**（突變實測）：判準不可能變成
+`review_required`／`invalidated`，第二輪傳播對它是 no-op——`assumption_ids` 留著是為了依賴宣告完整，
+**不是一道已量測的守衛**（L14 同樣適用於自己寫的守衛）。
+
+**PIT：** 判準 `created_at <= T`；上游 implied return 的 `as_of` 與本層視角不符一律拒用（INV-6）。
+實跑 COHR `--as-of 2026-09-05`／`2026-08-15`：上游缺 → `missing`；`--as-of 2026-09-06` → available。
+
+**Sandbox 驗算：** `python -m briefing entry <T> --sandbox-hurdle 0.15` 只在**記憶體**疊一筆 `author=sandbox`
+的判準（`persisted=false`、warning 標明），**不寫任何 authority、不進變更偵測**；ledger 的 append 入口
+明文拒收 `author=sandbox`——**demo 好看不是寫入 authority 的理由**。
+
+**刻意不做（v1 限制）：** buy／sell／hold、position size／capital allocation／order、portfolio permission、
+多 convention（total return hurdle、IRR、風險調整後門檻都要先有各自的算術與資料）、跨標的比較、
+判準的到期語意（今天沒有 `expires_at`）、Analyst Consumer／APP／API（Step 3.5 以後）。
 
 ---
 

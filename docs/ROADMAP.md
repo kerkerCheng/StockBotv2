@@ -142,6 +142,7 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 
 | 做什麼 | 為什麼 | 驗收（哪個數字會變） | 前置 |
 |---|---|---|---|
+| ~~**Entry Logic v1（Phase 2 Step 3）**~~ ✅ **2026-09-06 交付（標的＝COHR）** | Step 2 給出「年化隱含 −24.6%」，但答不出使用者真正會問的下一句：**「那要跌到多少我才有興趣？」** read model 的 `entry_logic` 整段是 `not_modeled`（`required_return`／`entry_price`／`wait_for_price_threshold`／`actionable_now` 四個空格），而且 required return 這個東西當時**沒有任何 authority 擁有它** | ✅ **Audit 先行（authority 盤點）：** `required return／hurdle` **不是公司事實**（A1／A2 不擁有）、**不是研究對公司的信念**（A3 的內容不含它）、**也不是資本決策**（A5 是「當時憑什麼決定、使用者選了什麼」，append-only）——它回答「**我的資本**要求多少報酬」，主詞是投資人。結論：新增第三種知識種類 **`investor_policy`**，與 A2 現價同一種地位（**注入的輸入**：只讀、不猜、不補預設、不自動改），**不把 capital permission 偷塞進 Alpha**。<br>**新增：** `alpha/entry/`（contracts／criteria／model，純邏輯零外部相依）：`EntryCriterion`（`ec_*`，private append-only ledger `library/private/alpha/entry_criteria/<T>.jsonl`；`basis` 封閉字彙**只有** `investor_policy`；**刻意沒有 `period`**——要求報酬不隨估值換年度而失效；**刻意不共用 `select_assumptions`**：那支以會計期間為身分並要求證據解析到公司 evidence index，而投資人的機會成本本來就不在那裡）＋`EntryAssessmentResult`。公式（唯一定義處 `alpha/entry/contracts.py`）：`entry_price = fair_value / (1 + annualized_hurdle) ** (holding_period_days / 365.25)`；`price_to_entry_gap = current_price / entry_price − 1`；`comparison = current_price <= entry_price ? meets_analytical_hurdle : above_analytical_entry`。＋`alpha/providers/entry_criteria.py`＋`python -m alpha entry-criterion <T> --list／--add／--retract`＋`python -m briefing entry <T> [--sandbox-hurdle] [--scenario …] [--as-of]`＋read model 第 13c 節 `entry_logic`（原 `NotModeledSection` 插座換成 `EntryLogicSection`；capability `analytical_entry_threshold_v1`）／精簡卡 `entry_logic` 欄。<br>**型別層強制的授權邊界：** `EntryCriterion`／`EntryAssessmentResult` 在 **import 當下**被 `_assert_no_capital_fields` 掃描（`FORBIDDEN_POSITION_TOKENS` ＋ buy／sell／order／action／trade／permission）——長出那種欄位是 import 失敗不是 lint 警告；`meets_analytical_hurdle` 刻意帶 `analytical` 字樣，只表示「現價 ≤ 門檻價」。<br>**alignment 不對齊不得冒充 clean：** `aligned`／`spot`（明示）→ `assessment=clean`；`horizon_before/after_value_date` → 算術照列但 `review_required`＋理由，型別層擋住「不對齊卻標 clean」。<br>**Refresh 整合：** change class `entry_criterion`（Q1–Q5、假設層、fair value、implied return 一格不動）；artifact `entry_criterion`（判斷型，`refs` 為空——判準沒有 supporting evidence，結構事件／共識／指引都不動它）／`entry_assessment`（確定性；policy `{market_price, financial_actual}`）。<br>**實跑 COHR（2026-09-06）：** ledger **0 筆判準** → `entry_logic` 誠實 `missing`，理由逐字寫「**缺投資門檻判斷**（entry criterion）……**這不是資料 ETL 缺口**，是使用者尚未寫下『要求多少年化報酬』；不補 10%／15%／20%」；**上游照抄值仍看得見**（fair value 223.60、value_date 2027-06-30、horizon 2026-09-04→2027-06-30／299 天、年化隱含 −24.6%）。以 `--sandbox-hurdle 0.15` **非持久**驗算（`author=sandbox`，ledger 拒收、`persisted=false`）：門檻價 **199.43**、現價 281.86、gap **+41.3%**（+82.43）、`above_analytical_entry`、`assessment=clean`。情境：price_only→entry_assessment `recalculate`、判準 `current`；graph_edge／consensus_revision／new_actual／disproof→上游 review 傳播成 `review_required`，**判準始終 `current`**（投資人政策不因公司證據動搖）。PIT：`--as-of 2026-09-05`／`2026-08-15` 上游缺→missing；`--as-of 2026-09-06` available。<br>**驗收：** 1,769 → **1,785 passed**（＋1 skipped，既有）；突變 130 → **141、空跑 0**；`audit invariants` FAIL 0｜PASS 11｜SKIPPED 1；golden 漂移 0；既有測試 4 處依 intended 語意調整（`entry_logic` not_modeled→missing、卡表 not_modeled 清單、renderer 節名）。⚠ **突變實測抓到兩件真事**：①「criterion 放進 `assumption_ids` 的傳播路徑」砍掉後測試仍綠——判準沒有 supporting evidence，第二輪傳播對它**今天走不到**，所以**不留那條測不到的守衛**，改寫進 `artifacts_from_entry` 註解（L14 同樣適用於我自己寫的守衛）；②有一條測試呼叫 ledger 寫入時沒指定 `directory=`，突變把守衛關掉後**真的把一筆 sandbox 判準寫進 private ledger**——已刪除該行並要求測試一律指定 tmp 目錄（測試不得有能力污染 authority）。查證：`python -m briefing entry COHR --format json \| python -c "import json,sys;r=json.load(sys.stdin);print(r['meta']['status'], r['entry_price']['value'], r['criterion']['status'])"`<br>**刻意不做：** buy／sell／sizing／portfolio／capital permission；Step 3.5 Analyst Consumer；APP／API；Valuation v2；下方 Post-MVP A–H 一項都沒實作。 | ✅ |
 | ~~**Base-case Implied Return v1（Phase 2 Step 2）**~~ ✅ **2026-09-06 交付（標的＝COHR）** | Step 1 只給「fair value 與現價差 −20.7%」，沒有時間：v1 估值契約只有 `target_period`（EPS 屬於哪一年）與 `as_of`（知識視角），答不出「223.60 是今天的 fair value（A）還是某個未來日期的 target value（B）」——兩種讀法算術相同、報酬語意不同；read model 的 `expected_return` 全是 `not_modeled` | ✅ **Audit 先行：** v1 契約**答不出** A／B → 最小擴充：`ValuationAssumption.value_date_convention`（封閉字彙 `spot`／`target_period_end`，**沒有預設**；舊紀錄讀成 unspecified，content-addressed id 不變）＋`ValuationResult.value_date`／`value_date_semantics`（`VALUE_DATE_FORMULA` 唯一定義處）。fair value 算術不變；**時點未宣告時報酬層拒算**。<br>**新增：** `alpha/implied_return/`（contracts／assumptions／model，純邏輯零外部相依）：`HorizonAssumption`（`ha_*`，private append-only ledger `library/private/alpha/horizon/<T>.jsonl`，與營運／估值假設**同一套** epistemic system 與**同一支選取器**；`horizon_end` 是明示日期，寫下時已過去的 horizon 契約拒收）＋`ImpliedReturnResult`（現價／`price_as_of`／fair value／`value_date`／horizon 起迄／持有天數／`price_return`／`annualized_price_return`／`total_return_status`＝**not_modeled**／`return_convention`／trace／`input_dependency`；型別裡**沒有** probability-weighted 欄位）＋`alpha/providers/horizon_assumptions.py`＋`python -m alpha horizon <T> --list／--add／--retract`＋`python -m briefing implied-return <T> [--scenario …] [--as-of]`＋read model 第 13a 節 **`implied_return`**（原 `expected_return` 插座改名；capability `base_case_implied_return_v1`）／估值 section 多 `value_date` 格／精簡卡 `implied_return` 欄。公式（唯一定義處 `alpha/implied_return/contracts.py`）：`price_return = fair_value / current_price − 1`；`annualized = (1 + price_return) ** (365.25 / days) − 1`；`days = horizon_end − bar_date`。四個輸入缺一就 missing，**不補 12 個月**。<br>**Refresh 整合（沿用 alpha/refresh）：** change class `horizon_assumption`（Q1–Q5 與假設層一格不動）；artifact `horizon_assumption`（判斷型，帶 `expires_at=horizon_end`——到期即 stale，INV-2）／`implied_return`（確定性；policy `{market_price, financial_actual}`）；傳播上游泛化到 `oa_*`／`va_*`／`ha_*`。<br>**實跑 COHR（2026-09-06）：** `va_07dcbc388c814a91` supersede `va_30800fc2323efd6b`（25x 不變，宣告 **`target_period_end`**：223.60 是 **2027-06-30** 的值——25x 是「FY27 幾乎入帳時市場對那一年 EPS 願付的倍數」，今天的 29.9x 只是 calibration；讀成 spot 會變成「今天就該跌到 223.60」的即時錯價主張）；`ha_586fe0ff9658a2d4`＝FY27 fair value 於 **2027-06-30** 前實現（session_judgment；與 value_date 對齊，早於它是「提前定價」、晚於它報酬被稀釋，兩者都沒證據）。結果：**從 2026-09-04（現價 281.86，bar）到 2027-06-30，299 天，simple −20.7%、年化 −24.6%**；total return `not_modeled`；`input_dependency=session_judgment`。情境：price_only→只有 implied_return recalculate；graph_edge→估值假設 review→fair value／implied_return review（horizon current）；consensus_revision→估值＋horizon（calibration 命中）review；new_actual→heuristic 營運假設 review→傳播；disproof→review。PIT：`--as-of 2026-09-05` 估值假設與 horizon 皆 created_after_as_of→missing，JSON 無 `ha_*`；`--as-of 2026-09-06` available；`--as-of 2026-08-15` 無基期→missing。<br>**驗收：** 1,753 → **1,769 passed**（＋1 skipped，既有）；突變 122 → **130、空跑 0**；`audit invariants` FAIL 0；golden 漂移 0；既有測試 7 處依 intended 語意調整（`expected_return` 插座→`implied_return`、沒資料 not_modeled→missing、估值 `value_date` 格）。查證：`python -m briefing implied-return COHR --format json \| python -c "import json,sys;r=json.load(sys.stdin);print(r['meta']['status'], r['price_return']['value'], r['annualized_price_return']['value'], r['horizon_window']['value'])"`<br>**刻意不做：** Entry Logic／buy-sell／portfolio／consumer UI／機率加權情境／Valuation v2（historical normalized multiple、peer multiple、growth durability、margin／ROIC quality、cycle position——**backlog 不遺失**，25x 仍是 session_judgment）；total return（無股利預測）；跨標的比較；只有 COHR 一檔有 horizon 判斷。 | ✅ |
 | ~~**Valuation Model v1（Phase 2 Step 1）**~~ ✅ **2026-09-06 交付（標的＝COHR）** | read model 的 `expected_return`／`scenarios.target_valuation`／`internal_vs_price_implied` 全是 `not_modeled`；內部 EPS 算得出來卻沒有任何「值多少」的確定性表達；估值判斷若存在也只在 session 口頭，沒有 provenance／as-of／supersede | ✅ **Audit 先行（用資料證明）：** 內部可靠的 forward metric 只有 FY2027 non-GAAP 稀釋 EPS（橋 v1 無 FCF／D&A／EBITDA，snapshot 的 debt／cash 無會計年度身分）→ EV/EBITDA、DCF、reverse DCF **沒有資料可餵，不硬做**；v1 唯一 method＝`forward_earnings_multiple`。<br>**新增：** `alpha/valuation/`（contracts／assumptions／model，純邏輯零外部相依）＋`alpha/providers/valuation_assumptions.py`（private append-only JSONL，`library/private/alpha/valuation/<T>.jsonl`）＋`python -m alpha valuation <T> --list／--add／--retract`＋`python -m briefing valuation <T> [--scenario …] [--as-of]`＋read model 第 13 節 `valuation`／精簡卡 `valuation` 欄／daily brief 卡表「Fair value vs 現價」欄。`ValuationAssumption` 與 `OperatingAssumption` 同一套 epistemic system（同 basis 字彙、同 ref 角色、同 append-only／as-of／supersede，**同一支選取器**）；id 前綴 `va_`；`accounting_basis` 必填 gaap／non_gaap；同期共識與市場倍數只能是 calibration（契約拒收 supporting）。**沒有 hidden default**：ledger 沒生效倍數就 missing。<br>**Refresh 整合（沿用 alpha/refresh）：** change class `valuation_assumption`（Q1–Q5 一格不動）；artifact `valuation_assumption`（判斷型）／`fair_value`／`fair_value_gap`（確定性、**分開**：fair value 的依賴不含現價 ref、policy 無 market_price）；傳播上游可為 `oa_*` 或 `va_*`。<br>**實跑 COHR（2026-09-06）：** 估值假設 `va_30800fc2323efd6b`＝FY2027 non-GAAP 目標本益比 **25x**（session_judgment；supporting＝FY26 8-K 實際值、Q1 FY27 指引、NVIDIA supplies_to 邊、InP 6 吋 fab depends_on 邊；calibration＝snapshot forward/trailing PE、FY27／FY28 EPS 共識；review_condition Q2 FY27 D&C <1.85B → review）。內部 FY27 non-GAAP EPS **8.94** × 25 ＝ fair value **223.60 USD**；現價 **281.86**（bar 09-04）；gap **−58.26／−20.7%**；價格隱含（對內部 EPS）倍數 **31.5x**（市場對 FY27 共識 9.42 付 29.9x、對 FY28 共識 13.96 付 20.2x）。認識論：算術＝橋＋乘法＋基期實際值；判斷＝7 條營運假設（3 session＋4 heuristic）＋1 條估值假設；**給定內部 EPS，整個 gap ＝ 25/31.5 − 1**。情境：price_only→fair value current／gap recalculate；consensus_revision→估值假設（calibration 命中）review_required→fair value／gap review_required；graph_edge→營運＋估值假設 review→傳播現形；new_actual→heuristic 營運假設 review→fair value review；disproof→D&C 條件觸發→review。PIT：`--as-of 2026-09-05` 估值假設 created_after_as_of→missing（EPS 在）；`--as-of 2026-08-15` 無基期→missing，JSON 無 `va_*`。<br>**驗收：** 1,739 → **1,753 passed**；突變 116 → **122、空跑 0**；`audit invariants` FAIL 0｜PASS 11｜SKIPPED 1；golden 漂移 0；既有測試 2 條依 intended 語意調整（`scenarios.target_valuation` not_modeled→missing；卡表 11→12 欄）。查證：`python -m briefing valuation COHR --format json \| python -c "import json,sys;v=json.load(sys.stdin);print(v['meta']['status'], v['fair_value']['value'], v['fair_value_gap']['value'])"`<br>**刻意不做（Step 2 以後）：** expected return／horizon／entry logic／buy-sell／portfolio／機率加權情境／逐情境目標估值／多 method（EV/EBITDA、DCF 要先有內部現金流）／跨標的比較；**沒有內部 FY28 view** 是 COHR 這條 25x 判斷最大的弱點（rationale 已明說）；只有 COHR 一檔有估值假設。 | ✅ |
 | ~~**Alpha Investment Read Model（canonical Alpha Card backend contract）**~~ ✅ **2026-09-05 交付** | 散在 Graph／AlphaSignal／ResearchContext／Engine C／catalyst／disproof／briefing 裡的資訊沒有一份 presentation-independent 的結構化表示；不同種類的知識（deterministic／proxy／session 判斷／尚未建模）在純文字裡看起來同樣可信 | ✅ `briefing/alpha_view/`（contracts／builder／render／sources）＋`python -m briefing alpha-card <TICKER>`＋`decision_lab today` 的「Alpha Card 摘要」區。**實測 COHR：** 16 個 section 的 `capability_map` 為 available 4／partial 3／stale 4（判斷是 09-04 對舊 context 做的，現形而非藏起）／**not_modeled 5**（internal_fundamentals／earnings_bridge／expected_return／downside／entry_logic）。`Datum` 型別層強制 Missing != Zero；renderer 只依賴 contracts＋`shared.markdown`（import 掃描守著）。新增 3 個測試檔 45 條、突變 +10。順手修一條正確性：`alpha.context._implied_valuation` 對非正 PE 不再算出 −240% 這種數（與 `alpha_expectation_gap.py` 同判準）。<br>**同日審計後修正（CONDITIONAL GO → GO 的三個擋門項）：** ① as-of 視角下 Decision Store／thesis／watch_state 沒有時點投影，builder 一律標 `not_applicable`（INV-6；先前會拿 08-31 的 coverage 與 12-01 的檢核點冒充 06-30 的知識）；② 精簡卡 `condition_count`／`structured_count` 在無判斷時為 `null` 不是 0，renderer 的 `has_signal` 分支移除；③ 人填的 thesis 檢核點與 status 由 `deterministic` 改 `observation`。不擋門但一併做：Decision Store 改 `mode=ro` 連線＋Engine D 自己的 `company_decision_facts`（cohort 選擇規則寫進回傳值）、五檔精簡卡共用一個 provider、移除 view 自算的 `target_vs_price`（已在 `alpha_expectation_gap.py`）、`sole_source=False` 標註上游 `bool()` 壓平、拿掉永遠是 None 的 `attention` 欄位。<br>**Phase 1.1 語意硬化（同日，使用者指定四項）：** ① as-of 改成「authority 答得出就真的歷史過濾」——Decision Store 依 cohort／decision／coverage／lifecycle 事件／variant perception 的時間戳過濾（`company_decision_facts(as_of=…)`），builder 只收帶相符 `point_in_time_as_of` 標記的事實；判斷日期晚於 as_of 的 session 判斷視為 lookahead 拒用；thesis 檔無歷史維持 `not_applicable`。實測 COHR as-of 2026-08-15：decision 08-15、coverage expiry 11-30、lifecycle 由事件回放為 `expired`（epoch 2 要到 08-19 才開始），整份 JSON 無任何 08-31／12-01 的事實。② 精簡卡 `condition_count`／`structured_count` 無判斷時為 `null`，renderer 全面改為只看 status。③ 人填的檢核點／thesis status 標 `observation`。④ **上游** `rank_bottlenecks` 保留 `sole_source` 三態（`None`≠`False`），`alpha.ranking` 跟著傳三態，`_structural_diff` 只把明確轉換當事件；排序鍵不變（None 與 False 同為 0）。新增 `tests/test_sole_source_tristate.py`、COHR 歷史整合測試 `tests/test_alpha_view_as_of_cohr.py`；突變 96 → 99。查證：`python -m briefing alpha-card COHR --format json \| python -c "import json,sys;print(json.load(sys.stdin)['capability_map'])"` | ✅ |
@@ -162,6 +163,101 @@ engine｜**Engine D** ＝capital permission 與 accountability。
 | ~~**把 `mcp_server/` 的 domain 抽出到 application layer**~~ ✅ **已隨 Phase 3 交付** | 實測：`mcp_server/` 4,016 行有 **79%（3,165 行）不是 MCP**——Research Action 的 domain、filesystem provenance 原語、local-only Git 發布，全被關在 transport package 裡。因此 5 個 core 消費端被迫 import 它，其中包含 pq2 待辦池本身 | `Core → mcp_server` 的 import **5 → 0**；`scripts/prepare_research_action.py` 不再呼叫私有 `_impl` 函式 | 併入 Phase 3（分類見 `target-architecture.md` §14.2） |
 | ~~**`audit invariants` runtime checker**~~ ✅ **2026-09-04 交付（10/12）** | — | **驗收達標**：上線首跑就抓到真實問題——3 筆 `trace_attempts_ref` 有 2 筆指向已不存在的檔案（daily 把追源原文寫進 `library/raw/`、路徑寫進 leads state，但 publisher pathset 不含它）。搬到 top-level `audit/`（讀遍所有層的東西不能住 core）。**2026-09-04 Phase 6 補上 `PointInTime`（11/12）**——它會**實跑一次 as-of 投影**驗它沒漏出未來，不是只讀覆蓋率。剩 `GateDiscrimination`（Phase 4）。查證：`python -m audit invariants` | ✅ |
 | ~~**Golden fixtures / 歷史回歸套件**~~ ✅ **2026-09-03 交付** | — | 14/14 類已凍結（`scripts/capture_golden_fixtures.py --verify` 偵測漂移）。B1／B5／B6 的 dual run 仍待各批執行 | ✅ |
+
+---
+
+## Post-MVP Alpha Edge Roadmap（2026-09-06 記下；**本輪只記 roadmap，一項都沒實作**）
+
+> **核心原則（先寫在最前面，因為它決定其他七項的成敗判準）：**
+>
+> **StockBot 不應為了製造 alpha 而強迫 Internal Forecast 與 analyst consensus 不同。沒有
+> differentiated evidence 時，收斂到 consensus 是合法且健康的結果。Graph 的 mission 是找出
+> 市場可能尚未充分反映的 causal dependencies，讓差異透過 explicit operating assumptions 進入
+> deterministic earnings model，最後能 attribution 與驗證。**
+
+這條原則的直接後果：**「內部 EPS 跟共識一樣」不是失敗，是一次誠實的觀測**；真正的失敗是
+「差異存在但說不出它從哪條 edge 來」，以及「差異存在但事後沒人檢查它對不對」。
+以下 A–F 是把這條原則變成可執行系統的順序；G 是模型 backlog；H 是與消費端的相對順序。
+
+### A. Graph → Fundamental Attribution
+
+把 graph-derived belief 明確連到 operating assumption，再量化每條 variant belief 對
+Revenue／Margin／EPS 的 contribution。未來應能回答類似：
+
+```
+Structural bottleneck   +0.55 EPS
+Margin view             +0.30
+Industrial weakness     −0.18
+Interest assumption     −0.20
+─────────────────────────────
+Net variant vs consensus +0.47
+```
+
+**重點不是只顯示 Internal EPS vs Consensus，而是回答「為什麼不同」。**
+（今天 `alpha/fundamental` 已有 `sensitivities`，但那是「動一格變多少」，不是「這個差異來自哪條 belief」。）
+
+### B. Consensus Implied Assumptions／Reverse Bridge
+
+在資料足夠時，從 consensus Revenue／EPS 等**反推**市場大致隱含的 growth／margin／other assumptions。
+目的是把比較從最末端往上游移：
+
+```
+Our assumption            vs   Market-implied assumption
+（+60% D&C 成長）              （反推出來的 ~+X%）
+```
+
+**不得假造市場沒有提供的精確 driver**——共識只給總量時，反推出的分項是欠定的，該說「解不唯一」。
+
+### C. Lead Indicator／Event Propagation
+
+利用 Graph 的 upstream／downstream dependency 捕捉：customer capex、capacity expansion／delay、
+qualification、supplier bottleneck、competitor capacity、substitution、product ramp。
+把新 evidence **定位到受影響的 assumption**，透過既有 Refresh／Event Watch 觸發 review。
+
+目標是**可能在 consensus 更新前形成 justified variant view**；**不是 auto-LLM 改 EPS**
+（假設的變更永遠是人的動作，refresh 只標 state）。
+
+### D. Bottleneck／Substitutability／Timing Quality
+
+讓 graph edge 不只是「A related to B」，而逐步增加真正影響 earnings 的：
+direction、constraint、substitutability、timing、capacity、qualification delay、value-capture path。
+
+**這是 Q1 → Q2 → Q3 真正產生 edge 的核心**——沒有這一層，A 的 attribution 只會把
+「我們讀了幾份文件」當成 belief 強度。
+
+### E. Cross-company／industry coverage
+
+把 COHR vertical slice 擴成多公司、多供應鏈，測試 Graph 是否真的能發現
+**company-centric analyst model 容易漏掉的二階／三階 exposure**。
+
+### F. Outcome Learning／Alpha Validation
+
+最終必須驗證：**Graph-derived variant assumptions 是否真的比 consensus 更早／更準？**
+保存當時的 PIT view，事後對 actual 計算：forecast error、consensus error、variant contribution、
+which graph edges helped／hurt。
+
+**沒有這層就只能證明系統「很會解釋」，不能證明有 alpha。**
+
+### G. Model expansion backlog
+
+Valuation v2｜bull／base／bear scenarios｜probability-weighted expected return（**只有真的有
+probability contract 才做**）｜total return｜historical normalized multiples｜peer valuation｜
+growth durability｜margin／ROIC quality｜cycle position。
+
+### H. Consumer／production sequence（near-term 固定順序）
+
+```
+Step 3 Entry Logic ✅（2026-09-06）
+  → Step 3.5 Analyst Consumer
+  → Step 4 Full-chain adversarial acceptance
+  → Step 5 APP／API
+  → Post-MVP Alpha Edge（A–F）
+  → Portfolio／Risk later
+```
+
+⚠ **不得因為順手就在別的 Step 裡實作 A–H 的任何一項。**
+
+---
 
 ### 明確不排程（理由已量測，勿重開）
 

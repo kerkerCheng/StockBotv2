@@ -291,6 +291,7 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --as-of 2026-06-30   # as-of 視角（Engine A 投影＋Engine C 時序）
 & '.venv\Scripts\python.exe' -m briefing valuation COHR                      # 只印第 13 節：fair value／現價／gap／refresh state（Step 1）
 & '.venv\Scripts\python.exe' -m briefing implied-return COHR                 # 只印第 13a 節：現價／fair value 時點／horizon／隱含報酬／refresh state（Step 2）
+& '.venv\Scripts\python.exe' -m briefing entry COHR                         # 只印第 13c 節：判準／門檻價／現價相對門檻價／assessment（Step 3；不是 buy／sell）
 ```
 
 純讀：不 freeze context、不建 decision、不寫任何 authority。session 判斷檔預設找
@@ -773,6 +774,43 @@ python -m briefing implied-return COHR --as-of 2026-09-05       # 估值假設 v
 ⚠ 四個輸入缺一就是 `missing`（現價含 bar_date、fair value 同單位、fair value 的 value-date 語意、生效的 horizon 判斷），**不補 12 個月、
 不補下一會計年度**；horizon 到期即 stale，要新的判斷。它是 **base-case 隱含價格報酬**：不是機率加權期望報酬（沒有機率）、不是 total
 return（沒有股利預測）、不是 entry signal（型別沒有那些欄位，section 每次列 `is_not`）。
+
+### Sandbox impact review 結論（2026-09-06，Entry Logic v1／Step 3）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m alpha entry-criterion <T> --list／--add／--retract` | append `library/private/alpha/entry_criteria/<T>.jsonl`（**投資人政策**，不是研究判斷）；`--list` 唯讀 | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule。⚠ 這是全系統唯一會寫這個 ledger 的入口，且只由使用者執行——**排程不得替使用者決定要求幾 % 報酬** |
+| `python -m briefing entry <T> [--sandbox-hurdle] [--scenario …] [--as-of]` | 唯讀：與 `alpha-card` 相同的來源＋估值／horizon／判準 ledger；`--sandbox-hurdle` 只在記憶體疊一筆 `author=sandbox` 的判準，**不寫任何 authority**（ledger 的 append 入口明文拒收 sandbox） | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多讀判準 ledger＋跑純函式 `build_entry_assessment`；`entry_logic` 插座由 `NotModeledSection` 換成 `EntryLogicSection`、精簡卡多 `entry_logic` 欄；**卡表欄位不變** | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
+
+查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'entry-criterion|briefing entry|hurdle'
+```
+
+### Entry Logic：怎麼跑（互動）
+
+```powershell
+# 0) 先看有沒有判準（沒有就是 missing——那是「投資門檻尚未宣告」，不是資料缺口）
+python -m alpha entry-criterion COHR --list
+# 1) 非持久驗算：只在記憶體疊一筆 hurdle 看門檻價會落在哪，**不寫任何 authority**
+python -m briefing entry COHR --sandbox-hurdle 0.15
+# 2) 真的要宣告成政策才寫 ledger（spec：value／basis＝investor_policy／rationale＋可選 reference_refs／supersedes_id）
+python -m alpha entry-criterion COHR --add spec.json
+python -m alpha entry-criterion COHR --retract ec_xxx --rationale "..."
+# 3) 看結果（read model 第 13c 節：判準／要求報酬／現價／fair value／horizon／年化隱含／門檻價／gap／comparison／assessment）
+python -m briefing entry COHR
+python -m briefing entry COHR --format json | python -c "import json,sys;r=json.load(sys.stdin);print(r['meta']['status'], r['entry_price']['value'], r['hurdle_comparison']['value'])"
+# 4) 情境與歷史視角
+python -m briefing entry COHR --sandbox-hurdle 0.15 --scenario price_only   # entry_assessment recalculate；判準 current
+python -m briefing entry COHR --sandbox-hurdle 0.15 --scenario graph_edge   # 上游 review 傳播；判準仍 current
+python -m briefing entry COHR --as-of 2026-09-05                            # 上游缺 → missing
+```
+
+⚠ 它是 **analytical entry threshold**：`meets_analytical_hurdle` 只表示「現價 ≤ 門檻價」這個算術事實，
+**不是 buy／sell、不是部位尺寸、不是資本許可**（型別裡沒有那些欄位，section 每次列 `is_not`）。
+沒有明示判準就是 `missing`，**不補 10%／15%／20%**；`value_date` 與 `horizon_end` 不一致時算術照列但
+`assessment=review_required`，不得當成 clean 的門檻價。
 
 ### Research Refresh／Dependency Invalidation：怎麼跑（互動）
 

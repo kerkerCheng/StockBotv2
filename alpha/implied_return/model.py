@@ -253,7 +253,8 @@ def build_implied_return(
         "observations": ["現價（Engine C snapshot）", "基期實際值（Engine C mechanical 觀測）"],
         "return_input_dependency": dependency,
         "this_is_not": ["probability-weighted expected return（沒有情境機率）", "total return（沒有股利／分配預測）",
-                        "required return／entry price／buy-sell（Entry Logic 未建模）", "回測或統計勝率"],
+                        "required return／entry price（那是 alpha/entry 的事，且要有明示的投資人判準）／buy-sell",
+                        "回測或統計勝率"],
         "one_sentence": (f"從 {horizon_start}（現價 {price.value:g} {price.unit}）到 {horizon_end}，在「{valuation.target_period.label if valuation.target_period else '?'} "
                          f"fair value {valuation.fair_value:.2f} 是 {valuation.value_date}（{valuation.value_date_semantics}）的值」與"
                          f"「市場在 {horizon_end} 前定價到那裡」的假設下，base-case 隱含價格報酬 {price_return:+.1%}"

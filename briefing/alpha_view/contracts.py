@@ -78,6 +78,7 @@ Basis = Literal[
     "session_judgment",       # session／LLM 判斷（Q2–Q5、thesis、variant view）
     "narrative",              # 散文（bull/base/bear、Decision Store 的 catalyst／disproof 原文）
     "structural_inference",   # 圖上多跳推論（CausalPath／CompanyImpact）
+    "investor_policy",        # 投資人自己宣告的政策（Step 3 的要求報酬判準）——不是觀測、不是研究判斷
     "none",                   # 沒有值，也就沒有 basis
 ]
 BASES: frozenset[str] = frozenset(Basis.__args__)  # type: ignore[attr-defined]
@@ -90,6 +91,7 @@ BASIS_LABEL: Mapping[str, str] = {
     "session_judgment": "session 判斷",
     "narrative": "散文",
     "structural_inference": "結構推論",
+    "investor_policy": "投資人政策",
     "none": "—",
 }
 STATUS_LABEL: Mapping[str, str] = {
@@ -125,6 +127,10 @@ CAP_DETERMINISTIC_FAIR_VALUE = "deterministic_fair_value_v1"
 #: **價格**報酬（simple＋年化）。它**不是** probability-weighted expected return（沒有機率）、不是 total return
 #: （沒有股利預測）、不是 entry signal。名稱刻意用 implied 不用 expected。
 CAP_BASE_CASE_IMPLIED_RETURN = "base_case_implied_return_v1"
+#: Step 3（2026-09-06）：implied return ＋ 明示的要求報酬判準（投資人政策）→ 確定性 analytical entry threshold
+#: （門檻價／現價相對門檻價／算術比較／alignment 對齊與否）。它**不是** buy／sell、不是部位、不是資本許可；
+#: `meets_analytical_hurdle` 只是「現價 ≤ 門檻價」。沒有判準就是 missing，不補 10%／15%／20%。
+CAP_ANALYTICAL_ENTRY_THRESHOLD = "analytical_entry_threshold_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -579,8 +585,40 @@ class ImpliedReturnSection:
 
 
 @dataclass(frozen=True, slots=True)
+class EntryLogicSection:
+    """Entry Logic（Step 3）：**只消費** `alpha.entry.build_entry_assessment` 的輸出，builder 不含任何門檻價公式。
+
+    - `criterion`／`required_annualized_return` 是投資人政策（`ec_*`，basis `investor_policy`）——不是觀測、不是
+      session 對公司的判斷；沒有宣告就是 `missing`（理由明寫「缺的是投資門檻判斷」），不補預設。
+    - `entry_price`／`price_to_entry_gap`／`hurdle_comparison` 是確定性算術；`assessment` 說這次評估能不能當 clean 讀
+      （alignment 不對齊 → `review_required`，算術照列但 meta 不得是 available）。
+    - `is_not`：這格明列它不是什麼（buy／sell、size、allocation、order、permission、ranking）。
+    """
+
+    meta: SectionMeta                          # available／missing／review_required／invalidated／stale
+    convention: Datum
+    criterion: Datum                           # 生效的 entry criterion（ec_*）
+    required_annualized_return: Datum
+    current_price: Datum
+    fair_value: Datum
+    value_date: Datum
+    horizon_window: Datum
+    current_annualized_implied_return: Datum
+    entry_price: Datum
+    price_to_entry_gap: Datum                  # {relative, absolute}
+    hurdle_comparison: Datum                   # meets_analytical_hurdle／above_analytical_entry
+    assessment: Datum                          # {state: clean／review_required, alignment, reason}
+    trace: tuple[Datum, ...]
+    epistemics: Datum
+    selection: "EvidenceSelectionCounts | None"
+    is_not: tuple[str, ...]
+    period: str | None = None
+    period_end: date | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class NotModeledSection:
-    """downside／entry_logic 共用的形狀：全 not_modeled，附「不是什麼」。"""
+    """downside 的形狀（entry_logic 自 2026-09-06 Step 3 起有自己的 section）：全 not_modeled，附「不是什麼」。"""
 
     meta: SectionMeta
     items: tuple[Datum, ...]
@@ -715,7 +753,7 @@ class AlphaInvestmentView:
     valuation: ValuationSection
     implied_return: ImpliedReturnSection
     downside: NotModeledSection
-    entry_logic: NotModeledSection
+    entry_logic: EntryLogicSection
     evidence: EvidenceSection
     freshness: tuple[FreshnessItem, ...]
     refresh_status: RefreshStatusSection

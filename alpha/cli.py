@@ -458,11 +458,102 @@ def cmd_horizon(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_entry_criterion(args: argparse.Namespace) -> int:
+    """EntryCriterion ledger 的讀寫入口（Entry Logic v1，Step 3）。
+
+    - `--list`：列出 ledger 全部紀錄（含已撤回／被取代者，稽核用）。
+    - `--add spec.json`：append 一筆。spec 必須明寫 value（年化要求價格報酬，小數）／basis（只接受 investor_policy）／
+      rationale；可選 convention（預設 annualized_required_price_return）／reference_refs／supersedes_id／author（預設 user）。
+    - `--retract <id>`：append 一筆撤回紀錄。
+
+    ⚠ 這裡**不算門檻價**。**沒有 hidden hurdle**：ledger 沒紀錄，entry logic 就是 missing（不補 10%／15%／20%）。
+    這是全系統唯一會寫這個 ledger 的入口，且只在互動 session 由使用者執行——排程、refresh、sandbox 都不寫它。
+    """
+    from datetime import datetime, timezone
+
+    from .entry.criteria import entry_criterion_record
+    from .providers.entry_criteria import append_entry_criterion_record, read_entry_criterion_records
+
+    try:
+        resolved_ticker, company_id = _resolve_company(args.ticker)
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    ticker = str(resolved_ticker)
+
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            try:
+                record = entry_criterion_record(
+                    company_id=str(company_id), ticker=ticker, value=float(spec["value"]), basis=str(spec["basis"]),
+                    rationale=str(spec.get("rationale") or ""),
+                    convention=str(spec.get("convention") or "annualized_required_price_return"),
+                    reference_refs=list(spec.get("reference_refs") or []), supersedes_id=spec.get("supersedes_id"),
+                    author=str(spec.get("author") or "user"), created_at=datetime.now(timezone.utc),
+                )
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ entry criterion 不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            existing, _ = read_entry_criterion_records(ticker)
+            target = next((r for r in existing if r.criterion_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = entry_criterion_record(
+                company_id=target.company_id, ticker=ticker, value=target.value, basis=target.basis,
+                rationale=str(args.rationale or "retracted"), convention=target.convention,
+                reference_refs=list(target.reference_refs), supersedes_id=target.criterion_id, retracted=True,
+                author=target.author, created_at=datetime.now(timezone.utc),
+            )
+        try:
+            path = append_entry_criterion_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['criterion_id']} → {path}")
+        print(f"  下一步：python -m briefing entry {ticker}（門檻價／現價相對門檻價；不是 buy／sell）")
+        return 0
+
+    records, errors = read_entry_criterion_records(ticker)
+    if args.format == "json":
+        payload = [{
+            "criterion_id": r.criterion_id, "convention": r.convention, "value": r.value, "unit": "ratio",
+            "basis": r.basis, "created_at": r.created_at.isoformat(), "author": r.author,
+            "supersedes_id": r.supersedes_id, "retracted": r.retracted,
+            "reference_refs": list(r.reference_refs), "rationale": r.rationale,
+        } for r in records]
+        print(json.dumps({"ticker": ticker, "records": payload, "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# {ticker} EntryCriterion ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
+    for r in records:
+        flag = "（已撤回）" if r.retracted else ""
+        print(f"- {r.criterion_id}{flag} {r.convention} = {r.value:+.1%}｜{r.basis}｜{r.author}｜寫於 {r.created_at.date()}"
+              + (f"｜取代 {r.supersedes_id}" if r.supersedes_id else ""))
+        print(f"  {r.rationale[:200]}")
+    for e in errors:
+        print(f"  ✗ {e}")
+    if not records:
+        print("（沒有判準——entry logic 是 missing；這是「投資門檻尚未宣告」，不是資料缺口）")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m alpha", description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
+
+    criterion = sub.add_parser(
+        "entry-criterion", help="EntryCriterion ledger：--list／--add spec.json／--retract <id>（Step 3；投資人的要求報酬判準）")
+    criterion.add_argument("ticker")
+    criterion.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    criterion.add_argument("--add", help="append 一筆判準（JSON spec 檔路徑；basis 必須明寫 investor_policy）")
+    criterion.add_argument("--retract", help="append 一筆撤回紀錄（指定 criterion_id）")
+    criterion.add_argument("--rationale", help="撤回理由")
+    criterion.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    criterion.set_defaults(func=cmd_entry_criterion)
 
     valuation = sub.add_parser(
         "valuation", help="ValuationAssumption ledger：--list／--add spec.json／--retract <id>（Step 1）")

@@ -16,6 +16,8 @@
 | fair value gap（Step 1） | fair value 的依賴＋`CurrentPrice.evidence_refs` |
 | horizon 假設（Step 2） | `HorizonAssumption.evidence_refs`＋`dependency_roles`＋`review_conditions`；`expires_at`＝`horizon_end` |
 | implied return（Step 2） | fair value 的依賴＋`CurrentPrice.evidence_refs`＋horizon 假設（`assumption_ids` 含 `ha_*`） |
+| entry criterion（Step 3） | 投資人政策紀錄：**沒有** supporting evidence（機會成本不是公司文件）；只有 supersede／retract／as-of 的終局 state |
+| entry assessment（Step 3） | implied return 的依賴＋entry criterion（`assumption_ids` 含 `ec_*`） |
 
 `established_at` 是 PIT 的錨：session 判斷＝判斷檔自報的產出日；假設＝`created_at`；
 確定性輸出＝這次 build 的參考時點（它們每次都重算，所以在 build 之前發生的變化都已納入）。
@@ -29,11 +31,12 @@ from ..contracts import AXES, AlphaSignal, ComponentTrace, ResearchContext
 from ..fundamental.contracts import (
     FiscalPeriod, FundamentalModelResult, OperatingAssumption,
 )
+from ..entry.contracts import EntryAssessmentResult, EntryCriterion
 from ..implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from ..valuation.contracts import ValuationAssumption, ValuationResult
 from .contracts import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
-    ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_ENTRY_ASSESSMENT, ARTIFACT_ENTRY_CRITERION,
+    ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP, ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_VALUATION_ASSUMPTION,
     INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT, MISSING, ROLE_CALIBRATION, ROLE_COMPARISON, ROLE_INPUT,
     ROLE_LEGACY, ROLE_OBSERVATION, ROLE_SUPPORTING, SUPERSEDED, ArtifactDependency,
@@ -366,6 +369,78 @@ def artifacts_from_implied_return(
 
 
 # ---------------------------------------------------------------------------
+# Entry（Step 3）：entry criterion（投資人政策紀錄）＋ entry assessment（確定性，含現價／研究假設／criterion）
+# ---------------------------------------------------------------------------
+
+def _criterion_state(record: EntryCriterion, *, accepted: set[str], rejection: dict[str, str]) -> tuple[str | None, str | None]:
+    """未被選取的 criterion 紀錄各自的終局 state（與其他判斷型紀錄同一套判準；沒有 other_period／unresolved_evidence）。"""
+    if record.criterion_id in accepted:
+        return None, None
+    reason = rejection.get(record.criterion_id, "")
+    if record.retracted:
+        return SUPERSEDED, "已撤回（retracted）——歷史紀錄"
+    if reason.startswith("superseded"):
+        return SUPERSEDED, f"已被較新的同 convention 紀錄取代（{reason}）——歷史紀錄"
+    if reason == "created_after_as_of":
+        return MISSING, "as-of 之後才建立——在此時點不存在（INV-6）"
+    return MISSING, f"未被選取（{reason or '原因未知'}）"
+
+
+def artifacts_from_entry(
+    result: EntryAssessmentResult | None,
+    *,
+    build_at: datetime,
+    criterion_records: Sequence[EntryCriterion] = (),
+) -> list[ArtifactDependency]:
+    """entry criterion（含歷史紀錄）＋ entry assessment。
+
+    criterion 是投資人政策：`refs` 為空（沒有 supporting evidence，結構事件／共識／指引都不會動它），只有
+    supersede／retract／as-of 決定它的 state。entry assessment 的依賴＝implied return 的依賴（現價 ref＋基期觀測＋
+    營運／估值／horizon 假設）＋criterion——所以 price-only → recalculate；上游假設 review → 傳播成 review；
+    criterion 被取代 → recalculate；無關的圖變化 → current。
+
+    ⚠ **criterion 同時列在 `refs` 與 `assumption_ids`，但今天只有 refs 那條路徑會發動**（2026-09-06 突變實測）：
+    判準沒有 supporting evidence，所以它不可能變成 `review_required`／`invalidated`——第二輪傳播（上游 state →
+    下游）對它是 no-op。`assumption_ids` 留著是為了讓依賴宣告完整（讀者與未來的 expiry 機制），不是一道已量測的
+    守衛；**不得**因為「它在 assumption_ids 裡」就相信有東西在守（L14）。
+    """
+    out: list[ArtifactDependency] = []
+    if result is None:
+        return out
+    accepted = {result.criterion.criterion_id} if result.criterion is not None else set()
+    rejection = {cid: reason for cid, reason in result.criterion_selection.rejected}
+    seen: set[str] = set()
+    for record in (*((result.criterion,) if result.criterion is not None else ()), *criterion_records):
+        if record.criterion_id in seen:
+            continue
+        seen.add(record.criterion_id)
+        preset, why = _criterion_state(record, accepted=accepted, rejection=rejection)
+        out.append(ArtifactDependency(
+            artifact_type=ARTIFACT_ENTRY_CRITERION, artifact_id=record.criterion_id,
+            label=f"Entry criterion：要求年化價格報酬 {record.value:+.1%}（{record.basis}，{record.author}）",
+            kind=KIND_JUDGMENT, established_at=record.created_at, refs={}, basis=record.basis,
+            driver=record.driver, scope=record.scope, preset_state=preset, preset_reason=why,
+            extras={"convention": record.convention, "value": record.value, "author": record.author},
+        ))
+    if not result.is_known or result.criterion is None:
+        return out
+    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs}
+    refs.update({a: ROLE_INPUT for a in result.research_assumption_ids})
+    refs[result.criterion.criterion_id] = ROLE_INPUT
+    out.append(ArtifactDependency(
+        artifact_type=ARTIFACT_ENTRY_ASSESSMENT, artifact_id="entry_assessment",
+        label=(f"Entry assessment（{result.target_period.label if result.target_period else '?'}；門檻價 vs 現價；"
+               "不是 buy／sell）"),
+        kind=KIND_DETERMINISTIC, established_at=build_at, refs=refs,
+        assumption_ids=tuple(result.research_assumption_ids) + (result.criterion.criterion_id,),
+        basis=result.input_dependency, period_end=(result.target_period.end if result.target_period else None),
+        extras={"convention": result.convention, "hurdle_comparison": result.hurdle_comparison,
+                "assessment": result.assessment, "alignment": result.alignment},
+    ))
+    return out
+
+
+# ---------------------------------------------------------------------------
 # 市場導出量（確定性 proxy）
 # ---------------------------------------------------------------------------
 
@@ -389,7 +464,7 @@ def artifacts_from_context(context: ResearchContext, *, build_at: datetime) -> l
 
 
 __all__ = [
-    "AXIS_LABEL", "THESIS_ARTIFACT_ID", "artifacts_from_context", "artifacts_from_implied_return",
-    "artifacts_from_model", "artifacts_from_signal", "artifacts_from_valuation", "build_instant", "end_of_day",
-    "start_of_day",
+    "AXIS_LABEL", "THESIS_ARTIFACT_ID", "artifacts_from_context", "artifacts_from_entry",
+    "artifacts_from_implied_return", "artifacts_from_model", "artifacts_from_signal", "artifacts_from_valuation",
+    "build_instant", "end_of_day", "start_of_day",
 ]

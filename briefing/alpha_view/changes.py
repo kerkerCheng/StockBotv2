@@ -24,7 +24,7 @@ from typing import Any, Mapping, Sequence
 
 from alpha.fundamental.contracts import OperatingAssumption
 from alpha.refresh import (
-    COMPANY_GUIDANCE, CONSENSUS, CONSENSUS_NOISE_FLOOR_REL, DISPROOF_SIGNAL, FINANCIAL_ACTUAL,
+    COMPANY_GUIDANCE, CONSENSUS, CONSENSUS_NOISE_FLOOR_REL, DISPROOF_SIGNAL, ENTRY_CRITERION, FINANCIAL_ACTUAL,
     GRAPH_EDGE, HORIZON_ASSUMPTION, MARKET_PRICE, OPERATING_ASSUMPTION, THESIS_ARTIFACT_ID, THESIS_REVIEW_DUE,
     VALUATION_ASSUMPTION, ChangeEvent, MetricObservation, end_of_day, start_of_day,
 )
@@ -39,6 +39,7 @@ A_GRAPH = "engine_a://graph_research_provider"
 A_ASSUMPTIONS = "alpha://fundamental/assumptions"
 A_VALUATION_ASSUMPTIONS = "alpha://valuation/assumptions"
 A_HORIZON_ASSUMPTIONS = "alpha://implied_return/horizon"
+A_ENTRY_CRITERIA = "alpha://entry/criterion"
 A_LIFECYCLE = "thesis://lifecycle.json"
 A_WATCH = "engine_b://event_watch"
 
@@ -233,6 +234,30 @@ def assumption_changes(
     return out
 
 
+def criterion_changes(
+    records: Sequence[Any], *, ticker: str, company_id: str | None, since: datetime,
+) -> list[ChangeEvent]:
+    """entry criterion ledger 新紀錄：新建／取代／撤回都是「投資人政策變了」（class `entry_criterion`）。
+
+    與 `assumption_changes` 分開寫，因為判準沒有會計期間（它不是對某一年的判斷）；其餘語意相同。
+    """
+    ordered = sorted(records, key=lambda r: (r.created_at, r.criterion_id))
+    latest_before: dict[tuple[str, str], str] = {}
+    out: list[ChangeEvent] = []
+    for record in ordered:
+        predecessor = record.supersedes_id or latest_before.get(record.key)
+        if record.created_at > since:
+            kind = "撤回" if record.retracted else ("取代" if predecessor else "新增")
+            out.append(ChangeEvent(
+                change_type=ENTRY_CRITERION, ticker=ticker, company_id=company_id, authority=A_ENTRY_CRITERIA,
+                changed_ref=record.criterion_id, observed_at=record.created_at, new_version=f"{record.value:g}",
+                old_version=None, material_fields=(record.convention, record.scope),
+                detail=f"{kind}entry criterion {record.convention} = {record.value:+.1%}（{record.basis}，{record.author}）",
+                related_refs=((predecessor,) if predecessor else ())))
+        latest_before[record.key] = record.criterion_id
+    return out
+
+
 def lifecycle_due_changes(
     entry: Mapping[str, Any] | None, *, ticker: str, company_id: str | None, today: date,
 ) -> list[ChangeEvent]:
@@ -340,6 +365,7 @@ def detect_changes(
     ticker_obj: Any = None,
     valuation_records: Sequence[Any] = (),
     horizon_records: Sequence[Any] = (),
+    entry_records: Sequence[Any] = (),
 ) -> tuple[list[ChangeEvent], list[MetricObservation], list[str]]:
     """把 `since` 之後各 authority 的變化收成一份 `ChangeEvent` 清單（每段各自 fail-soft，原因進 notes）。"""
     events: list[ChangeEvent] = []
@@ -399,6 +425,7 @@ def detect_changes(
                                  change_type=VALUATION_ASSUMPTION, authority=A_VALUATION_ASSUMPTIONS)
     events += assumption_changes(horizon_records, ticker=ticker, company_id=company_id, since=since,
                                  change_type=HORIZON_ASSUMPTION, authority=A_HORIZON_ASSUMPTIONS)
+    events += criterion_changes(entry_records, ticker=ticker, company_id=company_id, since=since)
     events += lifecycle_due_changes(lifecycle_entry, ticker=ticker, company_id=company_id, today=as_of or today)
     events += watch_changes(watches, ticker=ticker, company_id=company_id,
                             assumption_ids=[r.assumption_id for r in (*assumption_records, *valuation_records, *horizon_records)])

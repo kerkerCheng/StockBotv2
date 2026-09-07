@@ -389,9 +389,12 @@ def test_view_contains_no_position_fields() -> None:
         if parts & banned:
             offenders.append(path)
     assert not offenders, f"read model 出現部位欄位：{offenders}"
+    # entry logic 自 2026-09-06 Step 3 起**有能力**（門檻價），所以沒判準時是 missing 不是 not_modeled；
+    # 但它仍然一格 action／部位欄位都不得長出來——上面的 token 掃描已經走過整份 to_dict()。
     entry = view.entry_logic
-    assert entry.meta.status == "not_modeled"
-    assert all(d.value is None for d in entry.items)
+    assert entry.meta.status == "missing"
+    assert entry.entry_price.value is None and entry.hurdle_comparison.value is None
+    assert "buy" in " ".join(entry.is_not).lower() and "position size" in " ".join(entry.is_not)
     assert view.downside.meta.status == "not_modeled"
 
 
@@ -488,6 +491,7 @@ def test_to_dict_round_trips_json_and_keeps_nulls() -> None:
     assert back["identity"]["ticker"] == "COHR"
     assert back["capability_map"]["downside"]["status"] == "not_modeled"
     assert back["capability_map"]["implied_return"]["status"] == "missing"
+    assert back["capability_map"]["entry_logic"]["status"] == "missing"
     nulls = [p for p, k, v in _walk(back) if k == "value" and v is None]
     assert nulls, "read model 裡沒有任何 null——代表缺席被填掉了"
 
@@ -514,8 +518,13 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     assert card["market_implied_eps_growth"]["value"] == growth.value
     assert card["market_implied_eps_growth"]["basis"] == "heuristic_proxy"
     assert card["catalyst"]["state"] == "watch"
-    assert set(card["not_modeled"]) >= {"downside", "entry_logic"}
+    assert set(card["not_modeled"]) >= {"downside"}
     assert "implied_return" not in card["not_modeled"]                 # Step 2：有能力了；沒資料是 missing
+    assert "entry_logic" not in card["not_modeled"]                    # Step 3：有能力了；沒判準是 missing
+    assert card["entry_logic"]["status"] == "missing" and card["entry_logic"]["entry_price"] is None
+    # 本 fixture 根本沒注入 entry model，理由就該這樣說；「缺的是投資門檻判斷」那個理由由 tests/test_entry_logic.py 守
+    assert "未執行 entry model" in (card["entry_logic"]["reason"] or "")
+    assert card["entry_logic"]["hurdle_comparison"] is None and card["entry_logic"]["assessment"] is None
     assert card["implied_return"]["status"] == "missing" and card["implied_return"]["price_return"] is None
     assert "internal_fundamentals" not in card["not_modeled"]          # 有能力了；沒資料是 missing
     assert card["internal_fundamentals_status"] == "missing"

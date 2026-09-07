@@ -24,11 +24,12 @@ from typing import Any, Mapping, Sequence
 from ..fundamental.contracts import PERIOD_MATCH_TOLERANCE_DAYS
 from .artifacts import THESIS_ARTIFACT_ID, end_of_day
 from .contracts import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP,
-    ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_ENTRY_ASSESSMENT, ARTIFACT_ENTRY_CRITERION,
+    ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP, ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
     ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_VALUATION_ASSUMPTION,
     ASSUMPTION_ARTIFACT_TYPES, CONSENSUS, CONTEXT_DIGEST, CURRENT,
-    DISPROOF_SIGNAL, FISCAL_PERIOD_ROLLOVER, HORIZON_ASSUMPTION, INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT,
+    DISPROOF_SIGNAL, ENTRY_CRITERION, FISCAL_PERIOD_ROLLOVER, HORIZON_ASSUMPTION, INVALIDATED, KIND_DETERMINISTIC,
+    KIND_JUDGMENT,
     MISSING, OPERATING_ASSUMPTION, RECALCULATE, REVIEW_REQUIRED, ROLE_CALIBRATION, ROLE_LEGACY,
     ROLE_SUPPORTING, STALE, SUPERSEDED, THESIS_REVIEW_DUE, COMPANY_GUIDANCE, VALUATION_ASSUMPTION,
     AffectedArtifact, ArtifactDependency, ChangeEvent, MetricObservation, RefreshReport,
@@ -42,9 +43,11 @@ from .policy import (
 _ORDER = {ARTIFACT_AXIS: 0, ARTIFACT_THESIS: 1, ARTIFACT_ASSUMPTION: 2, ARTIFACT_METRIC: 3,
           ARTIFACT_COMPARISON: 4, ARTIFACT_MARKET_IMPLIED: 5, ARTIFACT_MODEL: 6,
           ARTIFACT_VALUATION_ASSUMPTION: 7, ARTIFACT_FAIR_VALUE: 8, ARTIFACT_FAIR_VALUE_GAP: 9,
-          ARTIFACT_HORIZON_ASSUMPTION: 10, ARTIFACT_IMPLIED_RETURN: 11}
+          ARTIFACT_HORIZON_ASSUMPTION: 10, ARTIFACT_IMPLIED_RETURN: 11,
+          ARTIFACT_ENTRY_CRITERION: 12, ARTIFACT_ENTRY_ASSESSMENT: 13}
 #: 「自己就是那筆新紀錄」的 change class（新紀錄的建立不是對它自己的變化）。
-_LEDGER_CHANGE_TYPES: frozenset[str] = frozenset({OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, HORIZON_ASSUMPTION})
+_LEDGER_CHANGE_TYPES: frozenset[str] = frozenset({OPERATING_ASSUMPTION, VALUATION_ASSUMPTION, HORIZON_ASSUMPTION,
+                                                  ENTRY_CRITERION})
 _AXIS_ORDER = {"structural": 0, "value_capture": 1, "earnings_exposure": 2, "expectation_gap": 3,
                "catalyst": 4}
 
@@ -388,7 +391,8 @@ def resolve_refresh(
         states: list[str] = [current.state]
         inherited: list[tuple[str, str]] = []
         for aid in artifact.assumption_ids:
-            # 上游可能是營運假設（oa_*）、估值假設（va_*）或 horizon 假設（ha_*）；都是宣告過的依賴，都沿一層傳播。
+            # 上游可能是營運假設（oa_*）、估值假設（va_*）、horizon 假設（ha_*）或 entry criterion（ec_*）；
+            # 都是宣告過的依賴，都沿一層傳播。
             upstream = next((resolved[f"{t}:{aid}"] for t in sorted(ASSUMPTION_ARTIFACT_TYPES)
                              if f"{t}:{aid}" in resolved), None)
             if upstream is None or upstream.state in (CURRENT, MISSING):
