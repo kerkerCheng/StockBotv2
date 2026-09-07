@@ -1,7 +1,12 @@
 # StockBot Web App — Cloudflare 部署（重用既有 Tunnel）
 
-> **這份文件描述的狀態：程式與設定已就緒，Cloudflare 端的步驟尚未執行。**
-> 下方「還沒做的事」逐項列出需要你在 Cloudflare Dashboard／終端機做什麼，**沒有任何一步被偽造成已完成**。
+> **狀態（2026-09-07 實測）：已上線並可從外部使用。**
+> Access 應用程式、DNS、ingress 三步都已完成；未登入時 `https://stockbot.minatoyukina.uk`
+> 回 **302 導向 Access 登入頁**，登入後可看到判讀清單。既有 `mcp.` 與 `neo4j.` 未受影響。
+> **唯一還沒做的是 Google 登入（步驟 0，可選）**——目前用 Cloudflare 內建的一次性 PIN。
+>
+> ⚠ **介面名稱：Cloudflare 已把 Zero Trust 主控台改名為 Cloudflare One，側欄整組重排。**
+> 下方路徑是 **2026-09-07 在實際畫面上確認過的**；標「未實地驗證」的那幾條還沒有。
 
 ## 一句話
 
@@ -49,7 +54,7 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 
 ---
 
-## 還沒做的事（都需要你本人操作）
+## 部署步驟（步驟 1–3 已於 2026-09-07 完成；步驟 0 可選、尚未做）
 
 ### 步驟 0 — Google OAuth（可選但建議；不做就用內建的一次性 PIN）
 
@@ -59,9 +64,10 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 > ⚠ **下面每個欄位都標了「中文（English）」。** Cloudflare 與 Google 的中文化都不完整，
 > 同一頁常常一半中文一半英文；兩個名字都給，你看到哪個就對哪個。
 
-**先拿到 team domain：** Zero Trust 主控台 → **設定（Settings）→ 自訂頁面（Custom Pages）**
-（或 **一般（General）**），會看到 `https://<team-name>.cloudflareaccess.com`。
-下一步的重新導向 URI 要用它。
+**先拿到 team domain：** Cloudflare One 主控台 → 側欄最下面的 **設定（Settings）**
+→ 頁面第一段 **Team name and domain**，`Team domain` 那一格就是
+`<team-name>.cloudflareaccess.com`。下一步的重新導向 URI 要用它。
+✅ *2026-09-07 實地確認*
 
 **A. Google Cloud Console（<https://console.cloud.google.com>，右上角可切「繁體中文」）**
 
@@ -84,8 +90,13 @@ python -m webapp serve                                   # http://127.0.0.1:8790
      `https://<team-name>.cloudflareaccess.com/cdn-cgi/access/callback`
    - 建立後記下 **用戶端 ID（Client ID）** 與 **用戶端密碼（Client secret）**
 
-**B. Cloudflare Zero Trust → 設定（Settings）→ 驗證（Authentication）→
-登入方法（Login methods）→ 新增（Add new）→ Google**
+**B. Cloudflare One → 側欄 整合（Integrations）→ 身分識別提供者（Identity providers）
+→ 新增（Add new）→ Google**
+
+⚠ **這一頁在新版介面搬家了。** 舊版是 `Zero Trust → Settings → Authentication → Login methods`，
+**新版在「整合（Integrations）」底下**（同一區還有 Cloud & SaaS、Service providers）。
+找不到就用左上角的 **Quick search（`Ctrl + K`）** 打 `identity`。
+✅ *2026-09-07 實地確認位置；Google IdP 本身尚未設定*
 
 | 欄位 | 值 |
 |---|---|
@@ -97,8 +108,20 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 
 ### 步驟 1 — 建立 Cloudflare Access 應用程式（**必須在 DNS 之前**）
 
-Zero Trust 主控台 → **Access → 應用程式（Applications）→
-新增應用程式（Add an application）→ 自我託管（Self-hosted）**
+Cloudflare One 主控台 → **存取控制（Access controls）→ 應用程式（Applications）**
+→ 右上角 **Create new application**
+→ 上排分頁 **Self-hosted and private** → 下排選 **Public DNS**
+→ **Continue with Self-hosted and private**
+✅ *2026-09-07 實地確認*
+
+**下排那四個選項在問「這個應用程式住在哪種目的地」，選錯會連不上：**
+
+| 選項 | 適用 | 我們 |
+|---|---|---|
+| Private destinations | 只能透過 WARP 用戶端連的私有資源 | ❌ 要用手機瀏覽器直接開 |
+| Workers | 應用程式本體是 Cloudflare Worker | ❌ APP 跑在本機 |
+| **Public DNS** | **對外可解析的主機名，流量經 Cloudflare 進來** | ✅ `stockbot.minatoyukina.uk` |
+| Service auth | 只給機器用、沒有人登入（service token） | ❌ 要人登入 |
 
 | 欄位 | 值 |
 |---|---|
@@ -158,7 +181,17 @@ Start-Process -FilePath "C:\Program Files (x86)\cloudflared\cloudflared.exe" `
 ⚠ 重啟期間 `mcp.minatoyukina.uk` 與 `neo4j.minatoyukina.uk` 會短暫中斷（數秒）。
 挑一個沒有排程在跑的時間做。
 
-### 驗收（每一步都要看到預期輸出才算完成）
+### 驗收（2026-09-07 實跑結果）
+
+| 檢查 | 實際輸出 | 判讀 |
+|---|---|---|
+| `nslookup stockbot.minatoyukina.uk` | `104.21.83.81`／`172.67.217.216`（＋IPv6） | ✅ CNAME 已建立且走 Cloudflare 代理 |
+| `curl -sI https://stockbot.minatoyukina.uk/api/v1/health` | **`302`** → `bold-…cloudflareaccess.com/cdn-cgi/access/login/…` | ✅ **未登入拿不到研究內容**（最重要的一條） |
+| 瀏覽器登入後 | 四檔判讀清單 | ✅ 使用者實測 |
+| `curl -sI https://mcp.minatoyukina.uk/` | `404` | ✅ **正常**——MCP 的網址含 40 字元 path token，沒帶就是 404，不是被打壞 |
+| `curl -s http://127.0.0.1:8790/api/v1/health` | `{"status":"ok",…}` | ✅ 本機直連未受影響 |
+
+### 驗收指令（重跑用）
 
 ```bash
 # 1. 本機直連仍然可用
@@ -198,7 +231,8 @@ Cloudflare Access 的 session 是它自己簽發的 cookie、不靠 Google 的 r
 「可能會提早」去改設計（那是還沒量測就先加機制，本專案記過的形狀）。
 
 **要立刻踢掉所有已登入 session**（例如手機遺失）：
-Zero Trust → **我的團隊（My Team）→ 使用者（Users）** → 選自己 → **撤銷工作階段（Revoke sessions）**。
+Cloudflare One → **團隊與資源（Team & Resources）→ 使用者（Users）** → 選自己 →
+**撤銷工作階段（Revoke sessions）**。⚠ *未實地驗證；找不到就用 `Ctrl + K` 搜 `users`。*
 
 ---
 

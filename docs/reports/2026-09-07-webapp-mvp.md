@@ -1,7 +1,7 @@
 # StockBot Web App／API MVP（Phase 2 Step 5）— 交付報告
 
 > 2026-09-07｜標的＝COHR／LYC.AX／6324.T／IQE.L（Coverage Pilot 四檔）
-> 判定：**CONDITIONAL GO**（條件：Cloudflare 端三個人工步驟；本機部分全部完成並實測）
+> 判定：**原判 CONDITIONAL GO → 條件已於同日解除 → GO**（見 §14）
 > 上一站：[Coverage Pilot](2026-09-07-coverage-pilot.md)｜[Full-chain Adversarial Acceptance](2026-09-07-full-chain-adversarial-acceptance.md)
 
 ---
@@ -453,7 +453,30 @@ refresh overall **current**。
 
 ---
 
-## 14. 判定：**CONDITIONAL GO**
+## 14. 判定：原判 **CONDITIONAL GO**，條件已於同日解除 → **GO**
+
+> **2026-09-07 稍晚更新（原判定逐字保留在下方，不改寫）：** 使用者已完成 Cloudflare 端步驟，
+> **`https://stockbot.minatoyukina.uk` 已可從外部使用**，prompt Goal 的那條路徑成立。
+>
+> | 檢查 | 實際輸出 |
+> |---|---|
+> | DNS | `stockbot.minatoyukina.uk` → `104.21.83.81`／`172.67.217.216`（Cloudflare 代理） |
+> | **未登入** | **`302` → `bold-…cloudflareaccess.com/cdn-cgi/access/login/stockbot.minatoyukina.uk`** |
+> | 登入後 | 四檔判讀清單（使用者實測「能開」） |
+> | `mcp.minatoyukina.uk` | `404`——**正常**（path token 未帶），既有 MCP 未被打壞 |
+> | `~/.cloudflared/config.yml` | 新增一條 `stockbot` ingress；`neo4j`／`mcp` 兩條（含 `httpHostHeader`）一字未動；catch-all 仍在最後；備份 `config.yml.bak` 存在 |
+> | 本機直連 | `http://127.0.0.1:8790/api/v1/health` → `{"status":"ok",…}` |
+>
+> **仍未做、但不影響判定的一項：** Google OAuth（步驟 0）。目前登入方式是 Cloudflare 內建的
+> 一次性 PIN，**認證邊界一樣是 Access、原則一樣只放行單一 email**——Google 只是把「等信收驗證碼」
+> 換成「一鍵」，屬 UX 不屬安全邊界。位置已確認在 **Integrations → Identity providers**（新版介面
+> 把它從 `Settings → Authentication → Login methods` 搬走了）。
+>
+> ⚠ **介面路徑已回填 `deploy/cloudflare/README.md`**：Cloudflare 已把 Zero Trust 主控台改名
+> **Cloudflare One** 並重排側欄，本報告初版寫的是舊版路徑。實地確認過的三條已標 ✅，
+> 未驗證的（撤銷 session）明確標成「未實地驗證」——**不把猜測寫成事實**。
+
+### 原判定（2026-09-07 交付當下，逐字保留）
 
 **GO 的部分（本機，全部實測完成）：**
 - 四檔 materialize ＋ serve ＋ 瀏覽器實際渲染（headless Edge dump-DOM 驗證清單頁與三張明細頁）。
