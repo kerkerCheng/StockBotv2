@@ -170,22 +170,45 @@ def test_go_does_not_open_the_next_step() -> None:
     assert "AGENT_WORKFLOW.md" in agents, "AGENTS.md 應指得到流程檔"
 
 
-def test_step_result_keeps_all_seven_fields() -> None:
-    """七欄缺一不可；少一欄，使用者就得回頭讀 transcript 才知道發生了什麼。"""
+STEP_RESULT_FIELDS = (
+    "Current Phase",
+    "Current Step",
+    "Zoom / Review",
+    "Verdict",
+    "Acceptance status",
+    "Blocking findings",
+    "Non-blocking debt",
+    "Suggested next Step",
+)
+
+
+def test_step_result_keeps_all_eight_fields() -> None:
+    """八欄缺一不可；少一欄，使用者就得回頭讀 transcript 才知道發生了什麼。"""
     runner = DEV_FLOW.read_text(encoding="utf-8")
     model = WORKFLOW.read_text(encoding="utf-8")
-    for field in (
-        "Current Phase",
-        "Current Step",
-        "Zoom / Review",
-        "Verdict",
-        "Acceptance status",
-        "Blocking findings",
-        "Non-blocking debt",
-        "Suggested next Step",
-    ):
+    for field in STEP_RESULT_FIELDS:
         assert field in runner, f"STEP_RESULT 少了 `{field}`（執行檔）"
         assert field in model, f"STEP_RESULT 少了 `{field}`（模型檔）"
+
+
+def test_the_declared_step_result_count_matches_the_actual_block() -> None:
+    """文件寫「八欄」時，那個區塊裡真的要有八欄。
+
+    ⚠ 這條是第一版漏掉的檢查，而漏掉的代價當場發生：第一版把八個欄位寫成「七欄」，
+    因為那個數字是**手寫的標籤，沒有任何東西去數它**。這正是 L14 的形狀——
+    一個沒被量測的宣稱，看起來完全正常。修法不是把標籤改對就好，是讓它被數。
+    """
+    runner = DEV_FLOW.read_text(encoding="utf-8")
+    block = runner.split("## Step 5｜STEP_RESULT", 1)[1].split("```", 2)[1]
+    rows = [
+        line for line in block.splitlines()
+        if re.match(r"^[A-Za-z][^:]*:", line)
+    ]
+    assert len(rows) == len(STEP_RESULT_FIELDS), (
+        f"STEP_RESULT 區塊實際有 {len(rows)} 欄，宣告是 {len(STEP_RESULT_FIELDS)} 欄：{rows}"
+    )
+    heading = runner.split("## Step 5｜STEP_RESULT", 1)[1].split("\n", 1)[0]
+    assert "八欄" in heading, f"標題宣告的欄數與實際不符：{heading!r}"
 
 
 def test_r2_has_exactly_six_auto_triggers() -> None:

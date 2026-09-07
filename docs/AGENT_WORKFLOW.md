@@ -132,7 +132,7 @@ human checkpoint：agent 說明「為什麼這題值得第二份 token」，使�
 等待對**下一個 Step** 的明確指示。這與 `AGENTS.md`「`go` 的語意＝推進到下一個人工 gate」一致：
 Step 邊界本身就是那個 gate。
 
-### `STEP_RESULT` 必填七欄
+### `STEP_RESULT` 必填八欄
 
 每個 Step 結束時**一定要**呈現，缺一不可：
 
@@ -204,7 +204,8 @@ reviewer 判 NO_GO 後**不要**進入 `Reviewer → Worker → Reviewer → Wor
 |---|---|---|
 | `python -m audit invariants` | deterministic runtime invariant checker。語意保證：`SKIPPED ≠ PASS`、`examined == 0` 自動降級成 `SKIPPED`、check 自己爆了算 FAIL 不算 SKIPPED | **不是 agent、不是 reviewer**。reviewer 可以引用它當 evidence source，不得拿它代替判斷，也不得 wholesale rewrite |
 | ROADMAP 的 Phase completion gate（八項） | Phase 級的關閉條件 | 不是 Step 級。單一 Step 的 acceptance 由該 Step 自己的 success criteria 決定 |
-| pq2 待辦池 | **研究**與 authority 動作的唯一授權介面 | 開發項不進 pq2，唯一載體是 `ROADMAP.md`（`AGENTS.md` 2026-08-31 定案） |
+| pq1 | routine 自動研究的工作佇列（intake／source-trace／extraction） | **不是核准佇列**，不占 pq2 編號 |
+| pq2 待辦池 | **exact authority mutation proposal** 的唯一授權介面（prepared RA 入圖、Engine C 判讀寫入、thesis mutation、手動 authority） | 不是「所有研究」的入口——研究先在 pq1 跑完才鑄號；開發項則完全不進 pq2，唯一載體是 `ROADMAP.md`（`AGENTS.md` 2026-08-31 定案） |
 | sandbox impact review 五步 | unattended routine 的 executable surface 變更必經 | 不是 code review。它只問「這條命令會不會在無人值守時做出沒被 gate 約束的事」 |
 | `scripts/sync_agent_skills.py` | canonical skill → `.claude`／`.agents` 轉接層 | 轉接層**不是** SSOT，不手改 |
 | `scripts/verify_test_nonvacuity.py` | 證明斷言不是空跑（故意違規 → 確認會紅） | 不是覆蓋率工具 |
@@ -237,7 +238,7 @@ thesis mutation／live choice-fill。
 | 觀測到什麼 → 就代表這套流程沒生效 | 核查頻率 | 觸發後 48 小時 |
 |---|---|---|
 | 出現「因為上一個 Step GO 了所以我就繼續做下一個」 | 每次 Step 收尾 | 把該次 transcript 當事故記錄；若是流程講不清楚造成的，改判準句而不是加文件 |
-| `STEP_RESULT` 的七欄開始有欄位長期空白或寫「N/A」 | 每次 Step 收尾 | 那一欄要嘛沒用（刪掉），要嘛沒人填（改成會自己出現的東西）。**不要留著假裝有** |
+| `STEP_RESULT` 的八欄開始有欄位長期空白或寫「N/A」 | 每次 Step 收尾 | 那一欄要嘛沒用（刪掉），要嘛沒人填（改成會自己出現的東西）。**不要留著假裝有** |
 | R2 從未被觸發過，或每次都觸發 | 每季 | 恆亮或不會滅＝零鑑別力（L14 第 4 點）。六條 trigger 要重寫，不是調鬆緊 |
 | 開發請求繞過 intake 直接開工，而事後看 zoom 判錯了 | 每次 | 記錄實際 zoom vs 應有 zoom；若判準四問答不出來，是四問的問題 |
 

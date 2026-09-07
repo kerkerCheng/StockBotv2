@@ -1765,8 +1765,16 @@ MUTATIONS: tuple[Mutation, ...] = (
         path="skills/development-flow/SKILL.md",
         old="Non-blocking debt:",
         new="Debt:",
-        test="tests/test_agent_workflow.py::test_step_result_keeps_all_seven_fields",
+        test="tests/test_agent_workflow.py::test_step_result_keeps_all_eight_fields",
         guards="少一欄，使用者就得回頭讀 transcript 才知道這輪留下了什麼債",
+    ),
+    Mutation(
+        name="AgentFlow：STEP_RESULT 偷加第九欄",
+        path="skills/development-flow/SKILL.md",
+        old="Suggested next Step:  ＋它的 success criteria（**只是建議**）",
+        new="Suggested next Step:  ＋它的 success criteria（**只是建議**）\nOwner:                誰負責這個 Step",
+        test="tests/test_agent_workflow.py::test_the_declared_step_result_count_matches_the_actual_block",
+        guards="欄數標籤必須被真的數過——第一版把八欄寫成七欄，正因為沒有東西在數它",
     ),
     Mutation(
         name="AgentFlow：退役字彙回流 blind-spot",

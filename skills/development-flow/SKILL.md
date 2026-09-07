@@ -2,11 +2,12 @@
 name: development-flow
 description: >
   開發請求的統一入口：先做一次便宜的 scope triage（Zoom Level），再決定要多遠的 review
-  （Review Level），最後以固定七欄的 STEP_RESULT 交回使用者。當使用者提出任何「改程式、
+  （Review Level），最後以固定八欄的 STEP_RESULT 交回使用者。當使用者提出任何「改程式、
   改 config、改 schema、改呈現邏輯」的請求時使用——包含「我想做 X」「這裡壞了」「加一個
   功能」「重構 XXX」「這個能不能改成…」「zoom out」。它不是另一個 agent，預設由當前主
   agent 在既有 context 內完成，不 spawn。研究請求（改變「我知道什麼」）不走本 skill，
-  走 pq2 待辦池。觸發詞：我想做、幫我改、加一個、修一下、重構、zoom out、這個 Step、
+  走研究路徑：intake／source-trace／extraction 在 pq1，只有產生 exact authority mutation
+  proposal 時才進 pq2 核准。觸發詞：我想做、幫我改、加一個、修一下、重構、zoom out、這個 Step、
   下一步要做什麼。
 ---
 <!-- agent-workflow-canonical -->
@@ -20,10 +21,20 @@ description: >
 
 **判準一句話：`go` 之後改變的是「我知道什麼」還是「系統怎麼運作」？**
 
-- 改變「我知道什麼」（圖、Engine C、thesis、資本裡的事實）→ **不走本 skill**，走 pq2 待辦池。
+- 改變「我知道什麼」（圖、Engine C、thesis、資本裡的事實）→ **不走本 skill**，走研究路徑。
 - 改變「系統怎麼運作」（程式、config、schema、呈現邏輯）→ 走本 skill，載體是 `docs/ROADMAP.md`。
 
-例：「補某條邊的 substitutability」＝研究（pq2）；「改 `rank_bottlenecks` 的排序鍵」＝開發（本 skill）。
+⚠ **「研究」不等於「pq2」。** 研究路徑本身有兩段，別把整段路由到核准佇列：
+
+| 段 | 誰在做 | 佔不佔編號 |
+|---|---|---|
+| **intake／source-trace／extraction** | routine 在 **pq1** 自動研究（raw／triaged leads 不占 pq2 編號） | 否 |
+| **exact authority mutation proposal**（prepared RA 入圖、Engine C 判讀寫入、thesis mutation、手動 authority） | 鑄 **pq2** 編號請使用者核准 | 是 |
+
+把 pq1 的工作提早鑄成 pq2，會讓同一題在研究前與入圖前被問兩次——那正是統一編號空間要消除的事。
+
+例：「補某條邊的 substitutability」＝研究——**追源與抽取在 pq1 自動跑**，只有最後那筆
+graph-write 提案才鑄 pq2 編號等核准；「改 `rank_bottlenecks` 的排序鍵」＝開發（本 skill）。
 
 ---
 
@@ -156,7 +167,7 @@ Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis
 
 ---
 
-## Step 5｜STEP_RESULT（七欄，缺一不可）
+## Step 5｜STEP_RESULT（八欄，缺一不可）
 
 ```
 STEP_RESULT
