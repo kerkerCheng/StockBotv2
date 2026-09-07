@@ -51,66 +51,77 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 
 ## 還沒做的事（都需要你本人操作）
 
-### 步驟 0 — Google OAuth（可選但建議；不做就用內建的 One-time PIN）
+### 步驟 0 — Google OAuth（可選但建議；不做就用內建的一次性 PIN）
 
-> **兩個都設起來。** Google 是日常入口（一鍵，不用等信），One-time PIN 是備援
-> （Google 設定壞掉時還進得去）。多一個 login method 不增加風險——policy 仍然只允許同一個 email。
+> **兩個都設起來。** Google 是日常入口（一鍵，不用等信），一次性 PIN 是備援
+> （Google 設定壞掉時還進得去）。多一個登入方法不增加風險——原則仍然只允許同一個 email。
+>
+> ⚠ **下面每個欄位都標了「中文（English）」。** Cloudflare 與 Google 的中文化都不完整，
+> 同一頁常常一半中文一半英文；兩個名字都給，你看到哪個就對哪個。
 
-**先拿到 team domain：** Zero Trust Dashboard → **Settings → Custom Pages**（或 **General**）
-會看到 `https://<team-name>.cloudflareaccess.com`。下面的 redirect URI 要用它。
+**先拿到 team domain：** Zero Trust 主控台 → **設定（Settings）→ 自訂頁面（Custom Pages）**
+（或 **一般（General）**），會看到 `https://<team-name>.cloudflareaccess.com`。
+下一步的重新導向 URI 要用它。
 
-**A. Google Cloud Console（<https://console.cloud.google.com>）**
+**A. Google Cloud Console（<https://console.cloud.google.com>，右上角可切「繁體中文」）**
 
-1. 建立一個新專案（例：`stockbot-access`）。
-2. **APIs & Services → OAuth consent screen**
-   - User Type：**External**（個人 Gmail 沒有 Internal，那是 Google Workspace 才有的）
-   - App name：`StockBot`｜User support email／Developer contact：你的信箱
-   - **Scopes：什麼都不用加。** Cloudflare 只要 `openid`／`email`／`profile`，那是非敏感的預設範圍
-   - Test users：加自己
-   - ⚠ **最後按 `PUBLISH APP` 切到 Production**（理由見下方「多久要 renew」）
-3. **APIs & Services → Credentials → Create Credentials → OAuth client ID**
-   - Application type：**Web application**
-   - Name：`Cloudflare Access`
-   - **Authorized redirect URI**（一字不差）：
+1. 左上角建立新專案，例如 `stockbot-access`。
+2. 左側 **API 和服務（APIs & Services）→ OAuth 同意畫面（OAuth consent screen）**
+   ⚠ 新版介面已改叫 **Google 驗證平台（Google Auth Platform）**，欄位散在四個分頁裡：
+
+   | 新版分頁 | 舊版位置 | 要填什麼 |
+   |---|---|---|
+   | **品牌宣傳（Branding）** | 同意畫面上半部 | 應用程式名稱 `StockBot`；使用者支援電子郵件、開發人員聯絡資訊填你的信箱 |
+   | **目標對象（Audience）** | 同意畫面「使用者類型」 | 使用者類型選 **外部（External）**——個人 Gmail 沒有「內部」，那是 Google Workspace 專屬；測試使用者（Test users）加自己 |
+   | **資料存取權（Data Access）** | 同意畫面「範圍」 | **什麼都不要加**。Cloudflare 只要 `openid`／`email`／`profile`，那是非敏感的預設範圍 |
+   | **目標對象（Audience）** 頁上方 | — | ⚠ 最後按 **發布應用程式（PUBLISH APP）**，把發布狀態由「測試中（Testing）」切成「正式版（In production）」 |
+
+3. 左側 **憑證（Credentials）→ 建立憑證（Create Credentials）→ OAuth 用戶端 ID（OAuth client ID）**
+   （新版在 **用戶端（Clients）→ 建立用戶端（Create client）**）
+   - 應用程式類型（Application type）：**網頁應用程式（Web application）**
+   - 名稱（Name）：`Cloudflare Access`
+   - **已授權的重新導向 URI（Authorized redirect URIs）**——**一字不差**：
      `https://<team-name>.cloudflareaccess.com/cdn-cgi/access/callback`
-   - 建立後記下 **Client ID** 與 **Client secret**
+   - 建立後記下 **用戶端 ID（Client ID）** 與 **用戶端密碼（Client secret）**
 
-**B. Cloudflare Zero Trust → Settings → Authentication → Login methods → Add new → Google**
+**B. Cloudflare Zero Trust → 設定（Settings）→ 驗證（Authentication）→
+登入方法（Login methods）→ 新增（Add new）→ Google**
 
 | 欄位 | 值 |
 |---|---|
-| App ID | 上面的 Client ID |
-| Client secret | 上面的 Client secret |
+| App ID | 上面的**用戶端 ID** |
+| Client secret | 上面的**用戶端密碼** |
 
-存檔後按 **Test**——這一步會直接告訴你 redirect URI 對不對，**不要跳過**。
-同一頁確認 **One-time PIN** 是啟用的（Cloudflare 內建，不需任何設定）。
+存檔後按 **測試（Test）**——這一步會直接告訴你重新導向 URI 對不對，**不要跳過**。
+同一頁確認 **一次性 PIN（One-time PIN）** 是啟用的（Cloudflare 內建，不需任何設定）。
 
 ### 步驟 1 — 建立 Cloudflare Access 應用程式（**必須在 DNS 之前**）
 
-Zero Trust Dashboard → **Access → Applications → Add an application → Self-hosted**
+Zero Trust 主控台 → **Access → 應用程式（Applications）→
+新增應用程式（Add an application）→ 自我託管（Self-hosted）**
 
 | 欄位 | 值 |
 |---|---|
-| Application name | `StockBot` |
-| **Session Duration** | **選下拉選單裡最長的那個（`1 month`）** |
-| Subdomain / Domain | `stockbot` / `minatoyukina.uk` |
-| Path | 留空（保護整個 hostname） |
-| Identity providers | 勾 **Google** ＋ **One-time PIN** |
+| 應用程式名稱（Application name） | `StockBot` |
+| **工作階段持續時間（Session Duration）** | **選下拉選單裡最長的（`1 個月` / `1 month`）** |
+| 子網域（Subdomain）／網域（Domain） | `stockbot` ／ `minatoyukina.uk` |
+| 路徑（Path） | 留空（保護整個 hostname） |
+| 身分識別提供者（Identity providers） | 勾 **Google** ＋ **一次性 PIN（One-time PIN）** |
 
-Policy：
+原則（Policies）：
 
 | 欄位 | 值 |
 |---|---|
-| Policy name | `owner-only` |
-| Action | `Allow` |
-| Include → Emails | `c3035281@gmail.com` |
-| **Session Duration**（policy 層） | **同樣設 `1 month`** |
+| 原則名稱（Policy name） | `owner-only` |
+| 動作（Action） | **允許（Allow）** |
+| 包含（Include）→ 電子郵件（Emails） | `c3035281@gmail.com` |
+| **工作階段持續時間（Session Duration）** | **同樣設 `1 個月`** |
 
-⚠ **policy 層的 session duration 會覆寫 application 層。** 兩邊都設，否則你會發現
+⚠ **原則層的工作階段持續時間會覆寫應用程式層。** 兩邊都設，否則你會發現
 「明明設了 1 個月卻天天要登入」——那不是 bug，是另一層的預設值在生效。
 
 > **為什麼這一步必須排在 DNS 之前：** DNS 記錄一建立，hostname 就會開始解析。
-> 若那時還沒有 Access policy，這個網址在建立到設定完成之間是**公開可讀**的。
+> 若那時還沒有 Access 原則，這個網址在建立到設定完成之間是**公開可讀**的。
 > 順序反過來就是把 private 研究內容短暫公開，沒有理由冒這個險。
 
 ### 步驟 2 — 建立 DNS 記錄（一行指令）
@@ -169,15 +180,15 @@ curl -sI https://mcp.minatoyukina.uk/ | head -1
 
 | 什麼 | 會不會過期 | 怎麼調長 |
 |---|---|---|
-| **Access 登入 session**（決定你多久要重登一次） | **會**——由 Session Duration 決定 | 下拉選單**最長 1 個月**；application 層與 policy 層**兩邊都要設**（policy 層會覆寫 application 層） |
-| **Google OAuth Client ID／Secret** | **不會過期**，不需要定期更換 | 除非你自己在 Google Cloud Console 輪換 secret；輪換後要回 Zero Trust 更新 |
-| **Google OAuth 同意畫面的發布狀態** | Testing 模式有 7 天限制 | **按 `PUBLISH APP` 切到 Production**——只用 `openid`／`email`／`profile` 這類非敏感範圍時，**Google 不需要審查**，按下去就生效 |
+| **Access 登入工作階段**（決定你多久要重登一次） | **會**——由工作階段持續時間決定 | 下拉選單**最長 1 個月**；應用程式層與原則層**兩邊都要設**（原則層會覆寫應用程式層） |
+| **Google 用戶端 ID／用戶端密碼** | **不會過期**，不需要定期更換 | 除非你自己在 Google Cloud Console 輪換密碼；輪換後要回 Zero Trust 更新 |
+| **Google 同意畫面的發布狀態** | 「測試中（Testing）」有 7 天限制 | **按「發布應用程式（PUBLISH APP）」切到「正式版（In production）」**——只用 `openid`／`email`／`profile` 這類非敏感範圍時，**Google 不需要審查**，按下去就生效 |
 
-**建議設定：Session Duration = `1 month`（兩層都設）。** 那是 Cloudflare 給的上限；
+**建議設定：工作階段持續時間 = `1 個月`（應用程式層與原則層都設）。** 那是 Cloudflare 給的上限；
 沒有「永不過期」這個選項，而那其實是好事——手機掉了之後，最壞情況有一個自然的到期日，
 不必依賴你記得去撤銷。
 
-⚠ **關於 Testing vs Production 的實際差別：** 留在 Testing 也「能用」，但每次登入會出現
+⚠ **關於「測試中」vs「正式版」的實際差別：** 留在「測試中」也「能用」，但每次登入會出現
 Google 的「這個應用程式未經驗證」警告畫面，而且該模式的 refresh token 7 天到期。
 Cloudflare Access 的 session 是它自己簽發的 cookie、不靠 Google 的 refresh token，
 所以 7 天限制**不會**縮短你的 Access session；但那個警告畫面每次都要多點兩下，沒必要忍。
@@ -187,7 +198,7 @@ Cloudflare Access 的 session 是它自己簽發的 cookie、不靠 Google 的 r
 「可能會提早」去改設計（那是還沒量測就先加機制，本專案記過的形狀）。
 
 **要立刻踢掉所有已登入 session**（例如手機遺失）：
-Zero Trust → **My Team → Users** → 選自己 → **Revoke sessions**。
+Zero Trust → **我的團隊（My Team）→ 使用者（Users）** → 選自己 → **撤銷工作階段（Revoke sessions）**。
 
 ---
 
