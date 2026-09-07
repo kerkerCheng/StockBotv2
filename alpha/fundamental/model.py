@@ -25,7 +25,7 @@ from ..contracts import EvidenceRef, content_digest
 from ..errors import ContractViolation
 from .assumptions import select_assumptions
 from .bridge import build_bridge
-from .compare import compare_metric, verify_consensus_basis
+from .compare import compare_metric, reconcile_consensus_base, verify_consensus_basis
 from .contracts import (
     ASSUMPTION_DRIVERS, AssumptionSelection, ConsensusEstimate, ExpectationComparison,
     FiscalPeriod, FiscalYearActuals, FundamentalModelResult, GuidanceObservation, ModeledMetric,
@@ -201,6 +201,9 @@ def build_fundamental_model(
             consensus_basis=(consensus_bases[f"{estimate.metric}:{estimate.period.end.isoformat()}"]
                              if estimate else "unverified"),
             internal_currency=actuals.currency if actuals else None,
+            # 共識的去年實際值必須對得上我們的基期，否則兩邊量的不是同一個東西（6324.T 實測：
+            # 同一批共識的 EPS 是連結、營收是單體）。EPS 的同一件事在 verify_consensus_basis 裡做。
+            base_reconciliation=(reconcile_consensus_base(estimate, actuals) if estimate else None),
         )
 
     # ---- 6. 狀態 -------------------------------------------------------------

@@ -8077,6 +8077,44 @@
       "source": "manual",
       "title": "COHR Q4 判斷 re-anchor：_packet_digest 對齊新的 ResearchContext digest",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-07T07:37:41.456736+00:00",
+      "hint": "使用者 2026-09-07 明示指示的 Coverage Pilot（驗證 Evidence→…→Analyst View 是否只對 COHR 成立）。涵蓋：Engine C fiscal_year_results mechanical 觀測、alpha OperatingAssumption／ValuationAssumption／HorizonAssumption ledger append、session judgment 檔。不入圖、不動 thesis／variant view、不動資本。鑄號僅為稽核，受理時即 go resolve（AGENTS：使用者主動指示＝已授權）。",
+      "n": 484,
+      "reason": "使用者 2026-09-07 明示指示的 Coverage Pilot，鑄號僅為稽核、受理時即 resolve（AGENTS：使用者主動指示＝已授權）。判定 GO。標的 LYC.AX／6324.T／IQE.L。寫入：Engine C mechanical 觀測 3 筆（LYC fiscal_year_results、HDS fiscal_year_results＋company_guidance，全部 verifiability=mechanical 不需 pq2）、OperatingAssumption 12 筆、ValuationAssumption 1 筆、HorizonAssumption 1 筆、session judgment 2 份、library/raw 1 份。結果：LYC.AX Analyst View ready（隱含報酬 −36.3% simple／−42.7% 年化）；6324.T blocked at valuation（刻意——現價對內部 FY2027 EPS 是 126.2x，無 FY2029+ 證據可錨定倍數）；IQE.L blocked at data＋model applicability（無基期年報，且共識兩年皆虧損而唯一 method 要求正 forward EPS）。修掉 5 個 generic 缺陷（GBp/GBP 大小寫折疊、本益比法套虧損公司、共識營收未與基期對帳、implied multiple 綁 fair value、相關性警語斷言每檔都是 AI 光互連）。COHR baseline 核心 10 格未動；1,880 passed／1 skipped、突變 162 空跑 0、audit FAIL 0 PASS 12 SKIPPED 0、golden 漂移 1（EXPECTED_CHANGE）。未入圖、未動 thesis／variant view、未動資本。",
+      "receipt": "authority:engine_c_mechanical+alpha_ledgers+session_judgment;ref:docs/reports/2026-09-07-coverage-pilot.md",
+      "ref_id": "alpha://coverage_pilot/2026-09-07",
+      "resolution": "go",
+      "resolved_at": "2026-09-07T08:21:30.012938+00:00",
+      "source": "manual",
+      "title": "Coverage Pilot：LYC.AX／6324.T／IQE.L 三檔 heterogeneous 標的建立 Analyst View 所需的 A3 假設與判斷",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-07T08:21:41.487294+00:00",
+      "hint": "Coverage Pilot 實測：iqep.com/investors/results-reports-presentations/ 靜態抓取回 200 但 href=\"*.pdf\" 0 命中（與 HDS 官方 IR 頁、聯亞官網同一種結構性阻礙）。要建立 IQE.L 的 fiscal_year_results 必須改走 carrier（RNS 聚合／Companies House／LSE 公告鏡像），屬 source-trace 工作。⚠ 這只解得掉 IQE 的**第一個** blocker：即使補齊基期，估值層仍會 fail closed，因為分析師對 FY2026／FY2027 兩年都預估虧損（−0.01158／−0.00196 GBP），而唯一登記的 valuation method（forward_earnings_multiple）要求正的 forward EPS——那需要新的 method，不是補資料。go 之後改變的是「我知道什麼」（IQE 的基期財務），所以是研究不是開發。",
+      "n": 485,
+      "reason": "已完成，且不需要 carrier——本項的前提是錯的。IQE 2025 年報的直接 URL 早就在自家庫裡（library/raw/iqe_ar2025_raw_material_counterpath.txt 的 Source URL），是 Coverage Pilot 第一版漏了 L11-4（追源前先 grep 自家庫）才判成「沒有年報」。抓取 https://www.iqep.com/media/ceqnt5tt/iqe-2025-annual-report.pdf（82 頁）後已建立基期 mo_48bb9164…（FY2025 至 2025-12-31，GBP，含 gaap 與 non_gaap 兩塊、分部營收、加權平均股數）。連帶成果：共識口徑機械核實通過（year_ago_actual −0.0282 ＝ adjusted 稀釋 EPS 2.82p → non_gaap）、營收對帳逐字相等（97,300,000）；並揪出第 6 個 generic 缺陷——口徑判定的絕對容忍 0.011 是美元級校準，在便士級讓 GAAP −0.0377 與 adjusted −0.0282 一起命中而判成 unverified（已修為純相對容忍，四檔中改變 1 檔）。⚠ 本項只解掉 IQE 的資料層 blocker；方法層 blocker（虧損公司無可用 valuation method）一動未動。",
+      "receipt": "authority:engine_c_mechanical;ref:engine_c://manual_observation/mo_48bb916496c97b4cef20d1fda140b3d5",
+      "ref_id": "engine_c://manual_observation/IQE.L#fiscal_year_results",
+      "resolution": "go",
+      "resolved_at": "2026-09-07T08:33:43.721847+00:00",
+      "source": "manual",
+      "title": "IQE.L FY2025 年報追源：官方 IR 頁為 JS 動態載入，需改走 carrier 才能建立基期",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-07T08:33:43.898646+00:00",
+      "hint": "Coverage Pilot 刻意停在這裡。IQE FY2025 年報查核報告該段為雙欄重疊排版，可逐字讀出的只有兩件事：(a) 查核人員評估過「償還既有 loan notes 與 facilities 所需的再融資」是否構成 material uncertainty；(b)「We inspected confirmation of the waiver of the December 2025 covenant requirements by the Group's lenders in that month」。**是否實際出具 material uncertainty 陳述無法判定**——依 L11-1（具體審計術語的措辭精度本身就是一個 claim）不得推論。在那個問題解決前對一家上一個報告期才被債權人豁免 covenant 的公司做盈餘預測，正是 L11-2 記過的「對外部 claim 嚴、對自己引用鬆」。go 之後要做的：重抽查核報告該段（單欄或改用 pdfminer layout 模式）、讀 going concern note、把 CLN／RCF 的到期與 covenant 條款寫成 Engine C 觀測，然後才決定要不要建 OperatingAssumption。⚠ 即使做完，估值層仍會 fail closed（虧損公司無可用 method）——本項買的是「我知道 IQE 的財務狀況」，不是 fair value。",
+      "n": 486,
+      "reason": null,
+      "ref_id": "engine_c://manual_observation/IQE.L#debt_maturity_and_covenants",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "IQE.L 流動性／going-concern 評估，作為建立 forward view 的前置",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17519,8 +17557,26 @@
       "ref_id": "docs/reports/2026-09-07-full-chain-adversarial-acceptance.md",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-07T08:21:30.012938+00:00",
+      "n": 484,
+      "reason": "使用者 2026-09-07 明示指示的 Coverage Pilot，鑄號僅為稽核、受理時即 resolve（AGENTS：使用者主動指示＝已授權）。判定 GO。標的 LYC.AX／6324.T／IQE.L。寫入：Engine C mechanical 觀測 3 筆（LYC fiscal_year_results、HDS fiscal_year_results＋company_guidance，全部 verifiability=mechanical 不需 pq2）、OperatingAssumption 12 筆、ValuationAssumption 1 筆、HorizonAssumption 1 筆、session judgment 2 份、library/raw 1 份。結果：LYC.AX Analyst View ready（隱含報酬 −36.3% simple／−42.7% 年化）；6324.T blocked at valuation（刻意——現價對內部 FY2027 EPS 是 126.2x，無 FY2029+ 證據可錨定倍數）；IQE.L blocked at data＋model applicability（無基期年報，且共識兩年皆虧損而唯一 method 要求正 forward EPS）。修掉 5 個 generic 缺陷（GBp/GBP 大小寫折疊、本益比法套虧損公司、共識營收未與基期對帳、implied multiple 綁 fair value、相關性警語斷言每檔都是 AI 光互連）。COHR baseline 核心 10 格未動；1,880 passed／1 skipped、突變 162 空跑 0、audit FAIL 0 PASS 12 SKIPPED 0、golden 漂移 1（EXPECTED_CHANGE）。未入圖、未動 thesis／variant view、未動資本。",
+      "receipt": "authority:engine_c_mechanical+alpha_ledgers+session_judgment;ref:docs/reports/2026-09-07-coverage-pilot.md",
+      "ref_id": "alpha://coverage_pilot/2026-09-07",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-07T08:33:43.721847+00:00",
+      "n": 485,
+      "reason": "已完成，且不需要 carrier——本項的前提是錯的。IQE 2025 年報的直接 URL 早就在自家庫裡（library/raw/iqe_ar2025_raw_material_counterpath.txt 的 Source URL），是 Coverage Pilot 第一版漏了 L11-4（追源前先 grep 自家庫）才判成「沒有年報」。抓取 https://www.iqep.com/media/ceqnt5tt/iqe-2025-annual-report.pdf（82 頁）後已建立基期 mo_48bb9164…（FY2025 至 2025-12-31，GBP，含 gaap 與 non_gaap 兩塊、分部營收、加權平均股數）。連帶成果：共識口徑機械核實通過（year_ago_actual −0.0282 ＝ adjusted 稀釋 EPS 2.82p → non_gaap）、營收對帳逐字相等（97,300,000）；並揪出第 6 個 generic 缺陷——口徑判定的絕對容忍 0.011 是美元級校準，在便士級讓 GAAP −0.0377 與 adjusted −0.0282 一起命中而判成 unverified（已修為純相對容忍，四檔中改變 1 檔）。⚠ 本項只解掉 IQE 的資料層 blocker；方法層 blocker（虧損公司無可用 valuation method）一動未動。",
+      "receipt": "authority:engine_c_mechanical;ref:engine_c://manual_observation/mo_48bb916496c97b4cef20d1fda140b3d5",
+      "ref_id": "engine_c://manual_observation/IQE.L#fiscal_year_results",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 484,
+  "next_n": 487,
   "schema_version": "1"
 }

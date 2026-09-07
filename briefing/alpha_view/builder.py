@@ -109,8 +109,15 @@ A_COMPARE = "alpha://fundamental/compare"
 A_CONSENSUS_FY = "engine_c://consensus_estimates"
 
 #: 本圖標的高度集中的固定提醒（`AGENTS.md` Alpha 呈現契約：每次都講，不因一樣而省略）。
+#: ⚠ 措辭在 2026-09-07 Coverage Pilot 修正過：舊句「本圖標的高度集中於 AI 光互連：列出 N 檔
+#: 不等於 N 個獨立機會」是**無條件**掛在每一檔的單檔 view 上的，於是它對 LYC.AX（稀土）與
+#: 6324.T（機器人減速機）變成一句假話——這兩檔不在那個群裡。要按產業條件化就得有一份
+#: 「這檔屬於哪個群」的分類，而系統**沒有**那個 SSOT，在這裡自己猜一份正是 L16 記過的形狀。
+#: 因此改成把主詞明確放回「這份圖的組成」，讓它對任何一檔都為真，且不對本檔的產業下斷言。
 CORRELATION_WARNING = (
-    "本圖標的高度集中於 AI 光互連：列出 N 檔不等於 N 個獨立機會，全買是同一賭注下 N 次。"
+    "相關性：本圖收錄的標的高度集中於 AI 光互連。把本檔與圖中其他標的並列時，"
+    "列出 N 檔不等於 N 個獨立機會，全買可能是同一賭注下 N 次。"
+    "⚠ 這是對**這份圖的組成**的提醒，不是對本檔所屬產業的斷言。"
 )
 JUDGMENT_WARNING = "本 view 內的排序與分數是研究判斷，不是回測或統計勝率；系統不給部位尺寸。"
 NEXT_PHASE_NOTE = (
@@ -140,10 +147,13 @@ _COMPARISON_LABELS: Mapping[str, str] = {
     "eps": "內部 EPS vs 共識 EPS（同期同口徑）",
     "operating_margin": "內部營益率 vs 共識營益率",
 }
+#: ⚠ 這張表必須涵蓋 `alpha.fundamental.contracts.COMPARISON_STATUSES` 的每一個值——它是直接
+#: 索引（不是 `.get`），漏一個就是整個 fundamental section 在那檔標的上爆掉。
+#: `tests/test_coverage_pilot_generalization.py` 斷言兩者一致（L16：字彙有 SSOT 就不要在下游自己記）。
 _COMPARISON_STATUS_TO_DATUM: Mapping[str, str] = {
     "comparable": "available", "internal_missing": "missing", "consensus_missing": "missing",
     "incompatible_period": "not_applicable", "incompatible_basis": "not_applicable",
-    "incompatible_unit": "not_applicable",
+    "incompatible_unit": "not_applicable", "unreconciled_base": "not_applicable",
 }
 _CONSENSUS_METRIC_LABEL: Mapping[str, str] = {"eps": "EPS", "revenue": "營收"}
 

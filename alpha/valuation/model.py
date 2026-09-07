@@ -25,6 +25,8 @@ from dataclasses import replace
 from datetime import date
 from typing import Any, Mapping, Sequence
 
+from identity.currency import resolve_quote_unit
+
 from ..contracts import EvidenceRef, content_digest
 from ..fundamental.contracts import (
     AssumptionSelection, FiscalPeriod, FundamentalModelResult, OperatingAssumption,
@@ -35,6 +37,7 @@ from .contracts import (
     METHOD_PARAMETERS, VALUATION_METHODS, VALUE_DATE_SPOT, VALUE_DATE_TARGET_PERIOD_END,
     VALUE_DATE_UNSPECIFIED, CurrentPrice, FairValueGap, FairValueSensitivity,
     FundamentalInput, ValuationAssumption, ValuationResult, ValuationStep, combined_input_dependency,
+    method_applicability,
 )
 
 #: 估值假設的微擾：倍數 ×1.01。
@@ -45,14 +48,36 @@ def units_comparable(fair_value_currency: str | None, price_unit: str | None) ->
     """fair value 的幣別（報表幣別）與現價的報價單位是否同尺度。（報酬層共用同一判準，不另寫一份。）
 
     ⚠ 報價單位 ≠ 結算幣別（AGENTS：GBp／ILA／ZAc 是 minor unit）。這裡**不換算**——
-    任一邊不知道 → `unverified_unit`；兩邊都知道但不同 → `incompatible_unit`。價格會差 100 倍的事
-    不得靠猜。
+    任一邊解析不出來 → `unverified_unit`；兩邊都解析得出但尺度不同 → `incompatible_unit`。
+    價格會差 100 倍的事不得靠猜。
+
+    ⚠ **判準走 `identity/currency.py` 這個唯一 registry，不在這裡自己再寫一份**（L16）。
+    第一版寫的是 `fair_value_currency.upper() != price_unit.upper()`，於是 `GBp`（便士）
+    與 `GBP`（英鎊）折疊成同一個字串被判為 comparable——**這道 gate 唯一存在的理由就是擋
+    這一個 case，而它剛好只放行這一個**。`GBX`／`ILA`／`ZAc` 是因為字母不同才被偶然攔下，
+    不是因為判準對。實測（2026-09-07 Coverage Pilot，IQE.L）：fair value GBP 對現價 GBp，
+    gap 判 comparable、差 100 倍。
     """
     if not fair_value_currency or not price_unit:
         return "unverified_unit", "fair value 幣別或現價報價單位未知——不得假設同尺度"
-    if fair_value_currency.upper() != price_unit.upper():
+    left = resolve_quote_unit(fair_value_currency)
+    right = resolve_quote_unit(price_unit)
+    if left is None or right is None:
+        unknown = fair_value_currency if left is None else price_unit
+        return "unverified_unit", (
+            f"{unknown!r} 不在 quote unit registry（config/currency_units.json）也不是 ISO-4217 形式"
+            "——無法確定尺度，不猜（identity/currency.py 是唯一入口）")
+    if left.currency != right.currency:
         return "incompatible_unit", (f"fair value 以 {fair_value_currency} 計，現價報價單位是 {price_unit}"
-                                     "——不同尺度不得相減（報價單位 ≠ 結算幣別，本層不換算）")
+                                     f"——結算幣別 {left.currency} vs {right.currency} 不同，不得相減"
+                                     "（本層不換算）")
+    if left.factor != right.factor:
+        ratio = right.factor / left.factor if left.factor else None
+        return "incompatible_unit", (
+            f"fair value 以 {fair_value_currency} 計，現價報價單位是 {price_unit}——同為 "
+            f"{left.currency} 但尺度不同"
+            + (f"（差 {1 / ratio:,.0f} 倍）" if ratio else "")
+            + "，不得相減（報價單位 ≠ 結算幣別，本層不換算）")
     return "comparable", None
 
 
@@ -194,6 +219,11 @@ def build_valuation(
             elif assumption.accounting_basis != fundamental_input.accounting_basis:
                 reason = (f"估值假設口徑 {assumption.accounting_basis}，內部 EPS 口徑 {fundamental_input.accounting_basis}"
                           "——GAAP／non-GAAP 不得混算（不是缺假設，是口徑不合）")
+            elif (not_applicable := method_applicability(method, fundamental_input.value)) is not None:
+                # 期間對、口徑對、資料齊全——但 method 本身不適用（虧損公司的本益比法）。
+                # 這條與「缺料」刻意分開：訊息說的是「方法不適用」，不是「還沒算出來」。
+                reason = not_applicable
+                warnings.append(f"valuation_method_not_applicable：{method}")
             else:
                 fair_value = _fair_value(method, fundamental_input, assumption)
                 dependency = combined_input_dependency(fundamental_input.input_dependency, [assumption])
@@ -215,8 +245,27 @@ def build_valuation(
 
     # ---- 3. 現價與 gap（price 不進 fair value）----------------------------------------
     gap = _gap(fair_value, price, currency=currency)
-    if gap.is_known and fundamental_input is not None and fundamental_input.value:
-        gap = replace(gap, implied_multiple_at_price=price.value / fundamental_input.value)  # type: ignore[operator]
+    # `implied_multiple_at_price = 現價 / 內部 EPS` 是**純算術**，它不需要 fair value——
+    # 需要的只有現價、內部 EPS 與同尺度。第一版把它綁在 `gap.is_known` 上，於是
+    # 「沒有目標倍數」這件事同時把「市場為我們的 EPS 付幾倍」也一起藏掉了，而那正是
+    # 判斷「本益比法在這檔到底適不適用」最直接的診斷（2026-09-07 Coverage Pilot／6324.T：
+    # 現價 5,970 對內部 FY2027 EPS 47.32 是 126x，這個數字才說明為什麼沒有可錨定的目標倍數）。
+    # ⚠ `> 0` 不是防禦性程式碼：EPS 為負時 price/eps 是負的本益比，那個數字沒有意義
+    # （COHR 測試以 −0.02 代入得到 −14,093x）。條件與 `method_applicability` 同源——
+    # 倍數在盈餘非正時無定義，診斷數字也一樣。
+    if (price.is_known and price.value and fundamental_input is not None
+            and fundamental_input.value is not None and fundamental_input.value > 0
+            and units_comparable(currency, price.unit)[0] == "comparable"):
+        implied_multiple = price.value / fundamental_input.value
+        gap = replace(gap, implied_multiple_at_price=implied_multiple)
+        # 也走 trace：`gap` 在 fair value 缺席時是 missing datum，值會被讀取端整個丟掉，
+        # 而這個數字恰好在那個情況下最有用。它是 step 不是 gap 的一部分——它不需要 fair value。
+        steps.append(ValuationStep(
+            key="implied_multiple_at_price", label=f"市場為內部 EPS 付的倍數（{target.label if target else '?'}）",
+            kind="derived", value=implied_multiple, unit="multiple", basis="deterministic",
+            formula=IMPLIED_MULTIPLE_FORMULA, observation_refs=tuple(price.evidence_refs),
+            reason="現價 ÷ 內部 EPS，純算術；**不需要目標倍數**——它回答的是「市場現在為我們自己"
+                   "的盈餘估計付幾倍」，是判斷本益比法適不適用的直接診斷，不是 fair value 也不是報酬"))
 
     # ---- 4. 敏感度：每條輸入判斷動一格，fair value 動多少 ----------------------------
     sensitivities: list[FairValueSensitivity] = []

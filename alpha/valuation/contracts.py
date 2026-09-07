@@ -80,6 +80,30 @@ METHOD_FUNDAMENTAL_INPUT: Mapping[str, tuple[str, str]] = {
 FAIR_VALUE_FORMULA: Mapping[str, str] = {
     METHOD_FORWARD_EARNINGS_MULTIPLE: "fair_value = internal_eps[target_period] × target_pe",
 }
+
+
+def method_applicability(method: str, fundamental_value: float | None) -> str | None:
+    """method 對這個內部指標**適不適用**；適用回 `None`，不適用回逐字理由。
+
+    ⚠ 這與「缺料」是兩件事，刻意分開（L12：一個表示不得承載兩種語意）。缺料＝我們還沒算出
+    這個數；不適用＝數算出來了，但這個 method 套在它身上沒有意義。
+
+    `forward_earnings_multiple` 要求**正的** forward EPS：倍數法的語意是「市場願意為一塊錢
+    盈餘付幾倍」，盈餘為負時它沒有定義。實測（2026-09-07 Coverage Pilot）不擋的後果是
+    負 EPS × 倍數 ＝ 負的 fair value，gap 判為 `comparable`、relative_gap −100.8%，並以
+    〔確定性規則〕呈現成隱含報酬——**一個做多部位不可能跌超過 100%**，那不是估值結果，
+    是把方法套在它不適用的資料上。虧損公司要估值需要另一個 method（EV/Sales、DCF…），v1 沒有。
+    """
+    if fundamental_value is None:
+        return None                                   # 缺料由呼叫端自己的 missing 路徑處理
+    if method == METHOD_FORWARD_EARNINGS_MULTIPLE and fundamental_value <= 0:
+        return (f"method {method} 不適用：內部 forward EPS = {fundamental_value:,.4f}（非正）。"
+                "本益比法只在盈餘為正時有定義——負 EPS × 目標倍數會產生負的 fair value 與 "
+                "< −100% 的隱含報酬。這不是缺料，是**方法不適用**；虧損公司需要另一個 "
+                "valuation method（v1 只有 forward_earnings_multiple）")
+    return None
+
+
 GAP_FORMULA = "absolute_gap = fair_value − current_price；relative_gap = fair_value / current_price − 1"
 IMPLIED_MULTIPLE_FORMULA = "implied_multiple_at_price = current_price / internal_eps[target_period]"
 
@@ -474,6 +498,7 @@ def combined_input_dependency(fundamental_dependency: str | None, assumptions: S
 __all__ = [
     "FAIR_VALUE_FORMULA", "GAP_FORMULA", "GAP_STATUSES", "IMPLIED_MULTIPLE_FORMULA",
     "METHOD_FORWARD_EARNINGS_MULTIPLE", "METHOD_FUNDAMENTAL_INPUT", "METHOD_PARAMETERS", "MODEL_VERSION",
+    "method_applicability",
     "VALUATION_ACCOUNTING_BASES", "VALUATION_METHODS", "VALUATION_STATUSES", "VALUE_DATE_CONVENTIONS",
     "VALUE_DATE_FORMULA", "VALUE_DATE_SEMANTICS", "VALUE_DATE_SPOT", "VALUE_DATE_TARGET_PERIOD_END",
     "VALUE_DATE_UNSPECIFIED", "CurrentPrice",

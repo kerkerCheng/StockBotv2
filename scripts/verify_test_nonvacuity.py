@@ -1539,6 +1539,63 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards=("「3 天前備份」看起來很健康，而那三本 alpha 假設 ledger（fair value 的唯一來源）"
                 "建立於備份之後，覆蓋是 0——年齡與覆蓋是兩個問題（L13-2）"),
     ),
+    # ---- Coverage Pilot（2026-09-07）：離開 COHR 之後才現形的六個缺陷 ------------
+    Mutation(
+        name="報價單位判準折疊大小寫（GBp ≡ GBP）",
+        path="alpha/valuation/model.py",
+        old="    left = resolve_quote_unit(fair_value_currency)\n    right = resolve_quote_unit(price_unit)",
+        new="    left = resolve_quote_unit(fair_value_currency.upper())\n    right = resolve_quote_unit(price_unit.upper())",
+        test="tests/test_coverage_pilot_generalization.py",
+        guards="GBp（便士）與 GBP（英鎊）差 100 倍——這道 gate 唯一要擋的就是這個 case，而 .upper() 剛好只放行它",
+    ),
+    Mutation(
+        name="本益比法套在虧損公司上",
+        path="alpha/valuation/contracts.py",
+        old="    if method == METHOD_FORWARD_EARNINGS_MULTIPLE and fundamental_value <= 0:",
+        new="    if method == METHOD_FORWARD_EARNINGS_MULTIPLE and fundamental_value <= -1e30:",
+        test="tests/test_coverage_pilot_generalization.py",
+        guards="負 EPS × 目標倍數 ＝ 負的 fair value 與 <−100% 的隱含報酬；做多部位不可能跌超過 100%",
+    ),
+    Mutation(
+        name="共識營收不與基期對帳",
+        path="alpha/fundamental/compare.py",
+        old="    if estimate.metric != \"revenue\":\n        return None",
+        new="    if estimate.metric != \"__never_matches__\":\n        return None",
+        test="tests/test_coverage_pilot_generalization.py",
+        guards="6324.T 的共識營收 year_ago 是單體、EPS 是連結，差 −43.9%——year_ago_actual 是唯一能機械檢查合併範圍的把手",
+    ),
+    Mutation(
+        name="市場付的倍數又被綁回 fair value",
+        path="alpha/valuation/model.py",
+        old="    if (price.is_known and price.value and fundamental_input is not None",
+        new="    if (gap.is_known and price.is_known and price.value and fundamental_input is not None",
+        test="tests/test_coverage_pilot_generalization.py::test_market_multiple_on_internal_eps_is_available_without_a_target_multiple",
+        guards="price ÷ 內部 EPS 是純算術，不需要目標倍數——而沒有目標倍數時正是最需要看它的時候（6324.T：126x）",
+    ),
+    Mutation(
+        name="負 EPS 也算市場付的倍數",
+        path="alpha/valuation/model.py",
+        old="            and fundamental_input.value is not None and fundamental_input.value > 0",
+        new="            and fundamental_input.value is not None and fundamental_input.value != 0",
+        test="tests/test_coverage_pilot_generalization.py::test_negative_internal_eps_fails_closed_at_the_valuation_layer",
+        guards="盈餘為負時 price/eps 是負的本益比（實測 −14,093x），與負的 fair value 同一種無意義",
+    ),
+    Mutation(
+        name="口徑判定的絕對容忍在便士級把兩個候選一起放進來",
+        path="alpha/fundamental/compare.py",
+        old="_BASIS_MATCH_ABS_TOL = 0.0",
+        new="_BASIS_MATCH_ABS_TOL = 0.011",
+        test="tests/test_coverage_pilot_generalization.py::test_basis_is_identified_at_pence_scale_where_an_absolute_tolerance_would_blur_it",
+        guards="IQE.L 的 GAAP −0.0377 與 adjusted −0.0282 只差 0.0095——美元級校準的絕對容忍在便士級讓兩個口徑無法區分，判成 unverified 而不是 non_gaap",
+    ),
+    Mutation(
+        name="相關性警語又對本檔的產業下斷言",
+        path="briefing/alpha_view/builder.py",
+        old="    \"⚠ 這是對**這份圖的組成**的提醒，不是對本檔所屬產業的斷言。\"",
+        new="    \"\"",
+        test="tests/test_coverage_pilot_generalization.py::test_correlation_warning_is_about_the_graph_not_about_this_company",
+        guards="它無條件掛在每一檔上——對 LYC.AX（稀土）與 6324.T（減速機）斷言「高度集中於 AI 光互連」是假話",
+    ),
 )
 
 

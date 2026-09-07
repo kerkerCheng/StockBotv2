@@ -1,0 +1,202 @@
+SOURCE: IQE plc（IQE.L，London Stock Exchange AIM）Annual Report and Accounts 2025（會計年度至 2025-12-31），
+獨立查核報告日 2026-05-28。
+CARRIER URL: https://www.iqep.com/media/ceqnt5tt/iqe-2025-annual-report.pdf
+NOTE: issuer 一手（年報本文），tier 1。以 pdfplumber 自 PDF 抽取（82 頁），逐字未改寫（僅空白正規化）。
+⚠ 追源說明：iqep.com 的「Results, Reports & Presentations」頁為 JS 動態載入，靜態抓取 href="*.pdf" 命中 0——
+本檔的直接 URL 來自本庫既有的 iqe_ar2025_raw_material_counterpath.txt 的 Source URL（L11-4：追源前先 grep 自家庫）。
+
+⚠ 一手支持的：FY2025 合併損益表逐行、五年財務摘要、分部營收（Wireless／Photonics／CMOS++）、
+期中加權平均股數與稀釋股數、adjusted 與 unadjusted 的 basic／diluted EPS。
+⚠ **單位陷阱**：本報表以 £'000 表示，而 EPS 以**便士（p）**表示——(3.77p) ＝ −0.0377 GBP。
+IQE.L 的**報價單位**是 GBp（便士），**報表幣別**是 GBP，兩者差 100 倍（AGENTS：報價單位 ≠ 結算幣別）。
+⚠ 一手**不**支持：關於 going concern 結論的任何斷言。查核報告本段為雙欄重疊、文字交錯，
+可逐字讀出的只有兩件事：(a) 查核人員評估「償還既有 loan notes 與 facilities 所需的再融資」
+是否構成 material uncertainty；(b)「We inspected confirmation of the waiver of the December 2025
+covenant requirements by the Group's lenders in that month」。**是否實際出具 material uncertainty
+陳述，本次抽取無法判定，不得推論**（L11-1：具體審計術語的措辭精度本身就是一個 claim）。
+
+[A] 第 50 頁：五年財務摘要 ＋ 合併損益表（Consolidated income statement，for the year ended 31 December 2025）
+Strategic Report Governance Report Financial Statements Other Information IQIQE EA Annnnuuaal lR Reeppoorrtt aanndd AAccccoouunnttss 2 2002255 || 9977
+Five-year financial summary Consolidated income statement
+for the year ended 31 December 2025
+2025 2024 2023 2022 2021 2025 2024
+£’000 £’000 £’000 £’000 £’000 Note £’000 £’000
+Revenue 97,300 118,034 115,252 167,494 154,096 Revenue 4 97,300 118,034
+Adjusted EBITDA (see below) 3,237 8,112 4,313 23,365 18,679 Cost of sales (95,948) (113,588)
+Operating loss Gross profit 1,352 4,446
+• Adjusted* (20,964) (18,357) (20,199) (3,557) (6,454) Selling, general and administrative expenses (27,758) (29,982)
+• Reported (30,059) (32,958) (25,779) (72,976) (19,978) Impairment loss on intangible assets 5 (9,586) (3,772)
+Loss after tax Impairment loss on property, plant and equipment 5 (402) (4,615)
+• Adjusted* (27,439) (23,734) (23,990) (5,920) (19,281) Impairment loss on right-of-use asset 5 (245) (31)
+• Reported (36,695) (38,178) (29,378) (74,541) (31,002) Gain on disposal of foreign operation 5 8,167 –
+Net cash flow from operations Gain on remeasurement of right-of-use asset 5 – 202
+Adjusted* (note 5) 11,180 6,087 15,744 15,652 17,940 Impairment loss on trade receivables and contract assets 23 (787) (3)
+Reported 8,070 1,282 10,074 8,873 18,883 (Loss)/profit on disposal of intangible assets and property, plant and equipment 5 (800) 797
+Free cash flow** Operating loss 6 (30,059) (32,958)
+Before adjusted* cash flows 2,037 (4,948) (3,128) 4,148 (1,640)
+Finance income 294 –
+Reported (1,073) (9,753) (8,798) (2,631) (697)
+Finance costs 8 (7,269) (3,947)
+Adjusted loss before income tax (27,939) (22,304)
+Adjusted net (debt)/cash*** (31,484) (18,800) (2,228) (15,248) (5,804)
+Adjustments 5 (9,095) (14,601)
+Loss before income tax (37,034) (36,905)
+Equity shareholders’ funds 89,694 134,110 169,785 175,060 234,621
+Taxation 9 339 (1,273)
+Basic EPS – adjusted**** (2.82p) (2.46p) (2.68p) (0.74p) (2.41p)
+Loss for the year (36,695) (38,178)
+Basic EPS – unadjusted (3.77p) (3.96p) (3.28p) (9.27p) (3.87p)
+Loss attributable to:
+Diluted EPS – adjusted**** (2.82p) (2.46p) (2.68p) (0.74p) (2.41p)
+Equity shareholders (36,695) (38,178)
+Diluted EPS – unadjusted (3.77p) (3.96p) (3.28p) (9.27p) (3.87p)
+(36,695) (38,178)
+* The adjusted performance measures for 2025 and 2024 are reconciled in Note 5. The adjusted performance measures for 2021-2023 are reconciled
+in those financial statements.
+** Free cash flow is defined as net cash inflow of £11,155,000 (2024: outflow of £910,000) before cash inflows from financing activities of £15,821,000 Loss per share attributable to owners of the parent during the year
+(2024: £12,160,000) and net interest paid of £3,593,000 (2024: £3,317,000).
+Basic loss per share 12 (3.77p) (3.96p)
+*** Adjusted net (debt)/cash is defined as cash less borrowings but excluding lease liabilities and fair value gains/losses on derivative instruments.
+**** Adjusted EPS measures exclude the impact of certain non-cash charges, non-operational items and significant infrequent items that would distort Diluted loss per share 12 (3.77p) (3.96p)
+period-on-period comparability (see Note 12).
+Adjusted basic and diluted loss per share are presented in Note 12.
+Adjusted EBITDA has been calculated as follows:
+All items included in the loss for the year relate to continuing operations.
+2025 2024 2023 2022 2021
+£’000 £’000 £’000 £’000 £’000 The notes on pages 105 to 153 form an integral part of these consolidated financial statements.
+Loss after tax (36,695) (38,178) (29,378) (74,541) (31,002)
+Tax (credit)/charge (339) 1,273 567 (862) 8,811
+Interest income (294) – – – –
+Interest expense 7,269 3,947 3,032 2,427 2,213
+(Profit)/Loss on disposal of PPE and intangibles – (62) (152) 628 (77)
+Adjusted items 9,095 14,601 5,580 69,419 13,524
+Depreciation of PPE 16,021 16,552 13,186 14,529 13,309
+Depreciation of right-of-use asset 3,592 3,791 3,790 3,981 3,854
+Amortisation of intangible assets 4,588 6,390 7,688 7,784 8,047
+Gain on remeasurement of right-of-use assets – (202) – – –
+Adjusted EBITDA 3,237 8,112 4,313 23,365 18,679
+
+[B] 第 61 頁：分部營收拆解（4.3 Revenue – Disaggregation of segmental revenue）與地區別營收
+
+Strategic Report Governance Report Financial Statements Other Information IQIQEE A Annnnuuaall RReeppoorrtt aanndd AAccccoouunnttss 2 2002255 | | 111199
+Notes to the financial statements continued
+for the year ended 31 December 2025
+4. Segmental analysis continued 4.4 Geographical information
+4.3 Revenue – Disaggregation of segmental revenue from contracts with customers Revenue by location of customer
+The Group derives revenue from the transfer of goods, services and intellectual property over time and at a point in time. 2025 2024
+£’000 £’000
+Revenues from external customers derive from the sale of standard or bespoke compound semiconductor material, or from
+Americas 59,640 52,025
+the sale or licensing of intellectual property.
+United States of America 59,640 51,974
+Wireless Photonics CMOS++ Total
+2025 2025 2025 2025 Rest of Americas – 51
+Disaggregate Segment Revenue £’000 £’000 £’000 £’000
+Timing of revenue recognition
+Europe, Middle East & Africa (EMEA) 16,894 24,914
+At a point in time
+France 1,417 663
+Standard customer products – 10,314 – 10,314
+Germany 2,390 1,618
+Intellectual property licences – – – –
+Israel 4,344 5,008
+Over time
+United Kingdom 3,259 12,642
+Bespoke customer products 40,101 46,820 65 86,986
+Rest of EMEA 5,484 4,983
+Total revenue 40,101 57,134 65 97,300
+Asia Pacific 20,766 41,095
+Wireless Photonics CMOS++ Total
+2024 2024 2024 2024 People’s Republic of China 1,231 1,928
+Disaggregate Segment Revenue £’000 £’000 £’000 £’000 Japan 6,855 6,456
+Timing of revenue recognition
+Taiwan 10,571 27,142
+At a point in time
+Rest of Asia Pacific 2,109 5,569
+Standard customer products – 7,852 – 7,852
+Intellectual property licences – – – –
+Total revenue 97,300 118,034
+Over time
+Bespoke customer products 67,295 42,024 863 110,182 Non-current assets by location
+Total revenue 67,295 49,876 863 118,034 Property, plant and equipment Intangible assets Right-of-use assets
+2025 2024 2025 2024 2025 2024
+Included within bespoke customer product revenue is revenue of £32,222,000 (2024: £45,379,000) that relates to supplier £’000 £’000 £’000 £’000 £’000 £’000
+managed inventory arrangements where billing occurs from the earlier of a specified contractual backstop date following USA 23,807 32,651 4,560 13,679 13,325 15,312
+delivery, or when the product is drawn from inventory by the customer.
+Taiwan 23,657 28,060 941 1,171 348 386
+Revenues of approximately £17,668,000 (2024: £37,752,000) are derived from one customer (2024: two) who accounts for UK 47,789 52,963 11,743 14,100 24,473 26,512
+greater than 10% of the Group’s total revenues:
+95,253 113,674 17,244 28,950 38,146 42,210
+2025 2025 2024 2024
+Customer Segment £’000 % revenue £’000 % revenue
+Customer 1 Wireless 17,668 18% 22,169 19%
+Customer 2 Photonics & Wireless N/A N/A 15,583 13%
+There are no customers in the CMOS++ segment that account for greater than 10% of the Group’s total revenue.
+
+[C] 第 66 頁：每股盈餘與加權平均股數（含 adjusted 與 unadjusted）
+
+Strategic Report Governance Report Financial Statements Other Information IQIQEE A Annnnuuaall RReeppoorrtt aanndd AAccccoouunnttss 2 2002255 | | 112299
+Notes to the financial statements continued
+for the year ended 31 December 2025
+10. Deferred Taxation continued 2025 2024
+Number Number
+Tax losses in the UK totalling £187,746,000 (2024: £173,474,000) have no date of expiry. Tax losses in the US can be carried forward Weighted average number of ordinary shares 972,928,093 964,315,248
+against future taxable income for 20 years before expiring. Of the Group’s total US tax losses of £77,517,000 (2024: £84,514,000)
+Potentially dilutive share options 14,929,308 14,291,760
+losses amounting to £15,940,000 (2024: £16,090,000) expire within 5 years, £31,997,000 (2024: £34,592,000) expire within 6-10
+Potentially dilutive convertible instruments 123,866,839 –
+years, £10,197,000 (2024: £11,024,000) expire within 11-15 years and £19,383,000 (2024: £22,809,000) may be carried forward
+indefinitely. Tax losses in Taiwan totalling £3,052,000 (2024: £nil) expire within 10 years. Adjusted weighted average number of ordinary shares 1,111,724,240 978,607,008
+Deferred tax liabilities have not been recognised for the withholding tax and other taxes that would be payable on the
+unremitted earnings of certain subsidiaries, as such amounts are permanently reinvested. Unremitted Taiwanese earnings Adjusted basic loss per share (2.82p) (2.46p)
+total £29,076,000 (2024: £34,365,000). Tax credits in relation to claims made under the R&D Expenditure Credit Scheme (RDEC) Basic loss per share (3.77p) (3.96p)
+in the UK are recognised within operating loss. Tax credits of this nature total £1,366,000 (2024: £1,528,000).
+Company Adjusted diluted loss per share (2.82p) (2.46p)
+Diluted loss per share (3.77p) (3.96p)
+Share Other Timing
+Tax Losses Options Differences Total
+Deferred tax assets £’000 £’000 £’000 £’000
+At 1 January 2024 1,521 89 (1,610) –
+13. Intangible assets
+(Charged)/credited to income statement 263 61 (324) –
+Development Customer
+Charged to equity – – – – Goodwill Patents costs Software contracts Total
+Group £’000 £’000 £’000 £’000 £’000 £’000
+At 31 December 2024 1,784 150 (1,934) –
+Cost
+(Charged)/credited to income statement (184) (7) 191 –
+At 1 January 2025 69,388 8,486 94,480 17,884 1,490 191,728
+At 31 December 2025 1,600 143 (1,743) –
+Additions – 153 3,096 12 – 3,261
+The Company did not recognise deferred tax assets of £7,974,000 (2024: £7,568,000) in respect of tax losses amounting to Disposals – (307) – – – (307)
+£31,897,000 (2024: £30,273,000) that can be carried forward against future taxable income. The Company did not recognise
+Foreign exchange (4,469) (16) (4,008) (80) – (8,573)
+other deferred tax assets of £39,000 (2024: £39,000) in respect of UK notional tax credits associated with R&D Expenditure Credit
+At 31 December 2025 64,919 8,316 93,568 17,816 1,490 186,109
+Scheme (RDEC) claims.
+11. Dividends
+Accumulated amortisation and impairment
+No dividend has been paid or proposed in 2025 (2024: £nil). At 1 January 2025 61,805 7,705 81,952 9,826 1,490 162,778
+Charge for the year – 307 3,453 828 – 4,588
+12. Loss per share
+Disposals – (307) – – – (307)
+Basic loss per share is calculated by dividing the loss attributable to ordinary shareholders by the weighted average number
+Impairment 7,215 498 1,873 – – 9,586
+of ordinary shares in issue during the year.
+Foreign exchange (4,101) (16) (3,582) (81) – (7,780)
+Diluted loss per share is calculated by dividing the loss attributable to ordinary shareholders by the weighted average number
+At 31 December 2025 64,919 8,187 83,696 10,573 1,490 168,865
+of shares and the dilutive effect of ‘in the money’ share options in issue. Share options are classified as ‘in the money’ if their
+exercise price is lower than the average share price for the year. As required by IAS 33, this calculation assumes that the proceeds
+receivable from the exercise of ‘in the money’ options would be used to purchase shares in the open market to reduce the Net book value
+number of new shares that would need to be issued. At 31 December 2025 – 129 9,872 7,243 – 17,244
+The Directors also present an adjusted earnings per share measure which eliminates certain adjusted items. The Directors At 31 December 2024 7,583 781 12,528 8,058 – 28,950
+believe that the adjusted earnings per share measure provides a useful comparison of performance and allows management
+and other stakeholders to better compare the performance of the Group between the current and prior year, excluding the
+effects of certain non-cash charges, non-operational items and significant infrequent items that would distort period-on-
+period comparability. The adjustments are detailed in Note 5.
+2025 2024
+£’000 £’000
+Loss attributable to ordinary shareholders (36,695) (38,178)
+Adjustments to loss after tax (Note 5) 9,256 14,444
+Adjusted loss attributable to ordinary shareholders (27,439) (23,734)

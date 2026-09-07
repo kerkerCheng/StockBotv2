@@ -137,9 +137,12 @@ ASSUMPTION_DRIVERS: Mapping[str, DriverSpec] = {
     "diluted_shares": DriverSpec("shares", "total", "稀釋加權平均股數（絕對股數）", lower=0.0),
 }
 
+#: 比較不成立的每一種原因各有自己的名字，**不合併成一個 unavailable**。
+#: `unreconciled_base`（2026-09-07 Coverage Pilot 補）＝ provider 的 `year_ago_actual` 與我們的
+#: 基期實際值對不上，也就是這串共識量的不是我們基期量的那個東西——它既不是缺料也不是口徑不同。
 COMPARISON_STATUSES: tuple[str, ...] = (
     "comparable", "internal_missing", "consensus_missing",
-    "incompatible_period", "incompatible_basis", "incompatible_unit",
+    "incompatible_period", "incompatible_basis", "incompatible_unit", "unreconciled_base",
 )
 
 
