@@ -1,6 +1,6 @@
 # StockBot Web App — Cloudflare 部署（重用既有 Tunnel）
 
-> **這份文件描述的狀態：程式與設定已就緒，Cloudflare 端的三個步驟尚未執行。**
+> **這份文件描述的狀態：程式與設定已就緒，Cloudflare 端的步驟尚未執行。**
 > 下方「還沒做的事」逐項列出需要你在 Cloudflare Dashboard／終端機做什麼，**沒有任何一步被偽造成已完成**。
 
 ## 一句話
@@ -49,18 +49,53 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 
 ---
 
-## 還沒做的事（三步，都需要你本人操作）
+## 還沒做的事（都需要你本人操作）
 
-### 步驟 1 — 建立 Cloudflare Access 應用程式（**必須最先做**）
+### 步驟 0 — Google OAuth（可選但建議；不做就用內建的 One-time PIN）
+
+> **兩個都設起來。** Google 是日常入口（一鍵，不用等信），One-time PIN 是備援
+> （Google 設定壞掉時還進得去）。多一個 login method 不增加風險——policy 仍然只允許同一個 email。
+
+**先拿到 team domain：** Zero Trust Dashboard → **Settings → Custom Pages**（或 **General**）
+會看到 `https://<team-name>.cloudflareaccess.com`。下面的 redirect URI 要用它。
+
+**A. Google Cloud Console（<https://console.cloud.google.com>）**
+
+1. 建立一個新專案（例：`stockbot-access`）。
+2. **APIs & Services → OAuth consent screen**
+   - User Type：**External**（個人 Gmail 沒有 Internal，那是 Google Workspace 才有的）
+   - App name：`StockBot`｜User support email／Developer contact：你的信箱
+   - **Scopes：什麼都不用加。** Cloudflare 只要 `openid`／`email`／`profile`，那是非敏感的預設範圍
+   - Test users：加自己
+   - ⚠ **最後按 `PUBLISH APP` 切到 Production**（理由見下方「多久要 renew」）
+3. **APIs & Services → Credentials → Create Credentials → OAuth client ID**
+   - Application type：**Web application**
+   - Name：`Cloudflare Access`
+   - **Authorized redirect URI**（一字不差）：
+     `https://<team-name>.cloudflareaccess.com/cdn-cgi/access/callback`
+   - 建立後記下 **Client ID** 與 **Client secret**
+
+**B. Cloudflare Zero Trust → Settings → Authentication → Login methods → Add new → Google**
+
+| 欄位 | 值 |
+|---|---|
+| App ID | 上面的 Client ID |
+| Client secret | 上面的 Client secret |
+
+存檔後按 **Test**——這一步會直接告訴你 redirect URI 對不對，**不要跳過**。
+同一頁確認 **One-time PIN** 是啟用的（Cloudflare 內建，不需任何設定）。
+
+### 步驟 1 — 建立 Cloudflare Access 應用程式（**必須在 DNS 之前**）
 
 Zero Trust Dashboard → **Access → Applications → Add an application → Self-hosted**
 
 | 欄位 | 值 |
 |---|---|
 | Application name | `StockBot` |
-| Session Duration | 建議 `1 month`（手機上不用每次登入） |
+| **Session Duration** | **選下拉選單裡最長的那個（`1 month`）** |
 | Subdomain / Domain | `stockbot` / `minatoyukina.uk` |
 | Path | 留空（保護整個 hostname） |
+| Identity providers | 勾 **Google** ＋ **One-time PIN** |
 
 Policy：
 
@@ -69,11 +104,10 @@ Policy：
 | Policy name | `owner-only` |
 | Action | `Allow` |
 | Include → Emails | `c3035281@gmail.com` |
+| **Session Duration**（policy 層） | **同樣設 `1 month`** |
 
-登入方式：Zero Trust → **Settings → Authentication** 至少啟用一個 IdP。
-最省事的是 **One-time PIN**（Cloudflare 內建，寄驗證碼到上面那個信箱，不需要任何 OAuth 設定）；
-想免密碼可另外加 Google OAuth，但那需要在 Google Cloud Console 建 OAuth client——
-**第一版不需要**。
+⚠ **policy 層的 session duration 會覆寫 application 層。** 兩邊都設，否則你會發現
+「明明設了 1 個月卻天天要登入」——那不是 bug，是另一層的預設值在生效。
 
 > **為什麼這一步必須排在 DNS 之前：** DNS 記錄一建立，hostname 就會開始解析。
 > 若那時還沒有 Access policy，這個網址在建立到設定完成之間是**公開可讀**的。
@@ -82,7 +116,7 @@ Policy：
 ### 步驟 2 — 建立 DNS 記錄（一行指令）
 
 ```bash
-cloudflared tunnel route dns d3074ec2-c2a3-4782-9c54-8604289b5fd3 stockbot.minatoyukina.uk
+cloudflared tunnel route dns stockbotv2-neo4j stockbot.minatoyukina.uk
 ```
 
 它會用 `~/.cloudflared/cert.pem` 的授權建立一筆指向 tunnel 的 CNAME。
@@ -102,9 +136,13 @@ cloudflared tunnel route dns d3074ec2-c2a3-4782-9c54-8604289b5fd3 stockbot.minat
 然後重啟 cloudflared：
 
 ```powershell
-Get-Process cloudflared -ErrorAction SilentlyContinue | Stop-Process
-# 重新啟動：雙擊 shell:startup 裡的 stockbotv2-graph-services.vbs
+Get-Process cloudflared -ErrorAction SilentlyContinue | Stop-Process -Force
+Start-Process -FilePath "C:\Program Files (x86)\cloudflared\cloudflared.exe" `
+  -ArgumentList 'tunnel','run','stockbotv2-neo4j' -WindowStyle Hidden
 ```
+
+⚠ **只重啟 cloudflared 一個行程**，不要雙擊 `stockbotv2-graph-services.vbs`——
+那支會連 Neo4j 與 MCP server 一起再啟動一次（雖然會因 port 佔用自然退出、無害，但沒必要）。
 
 ⚠ 重啟期間 `mcp.minatoyukina.uk` 與 `neo4j.minatoyukina.uk` 會短暫中斷（數秒）。
 挑一個沒有排程在跑的時間做。
@@ -124,6 +162,32 @@ curl -sI https://mcp.minatoyukina.uk/ | head -1
 
 # 4. 手機：Safari 開 https://stockbot.minatoyukina.uk → Access 登入 → 清單頁
 ```
+
+---
+
+## 多久要 renew 一次？（三件不同的事，不要混在一起）
+
+| 什麼 | 會不會過期 | 怎麼調長 |
+|---|---|---|
+| **Access 登入 session**（決定你多久要重登一次） | **會**——由 Session Duration 決定 | 下拉選單**最長 1 個月**；application 層與 policy 層**兩邊都要設**（policy 層會覆寫 application 層） |
+| **Google OAuth Client ID／Secret** | **不會過期**，不需要定期更換 | 除非你自己在 Google Cloud Console 輪換 secret；輪換後要回 Zero Trust 更新 |
+| **Google OAuth 同意畫面的發布狀態** | Testing 模式有 7 天限制 | **按 `PUBLISH APP` 切到 Production**——只用 `openid`／`email`／`profile` 這類非敏感範圍時，**Google 不需要審查**，按下去就生效 |
+
+**建議設定：Session Duration = `1 month`（兩層都設）。** 那是 Cloudflare 給的上限；
+沒有「永不過期」這個選項，而那其實是好事——手機掉了之後，最壞情況有一個自然的到期日，
+不必依賴你記得去撤銷。
+
+⚠ **關於 Testing vs Production 的實際差別：** 留在 Testing 也「能用」，但每次登入會出現
+Google 的「這個應用程式未經驗證」警告畫面，而且該模式的 refresh token 7 天到期。
+Cloudflare Access 的 session 是它自己簽發的 cookie、不靠 Google 的 refresh token，
+所以 7 天限制**不會**縮短你的 Access session；但那個警告畫面每次都要多點兩下，沒必要忍。
+
+⚠ **手機上若比設定值更早要求重登，那是瀏覽器行為不是設定錯誤。** Safari 對 cookie 有自己的
+保存政策，實測才知道會不會比 1 個月短。**先照上面設，再看實際行為**——不要一開始就為了
+「可能會提早」去改設計（那是還沒量測就先加機制，本專案記過的形狀）。
+
+**要立刻踢掉所有已登入 session**（例如手機遺失）：
+Zero Trust → **My Team → Users** → 選自己 → **Revoke sessions**。
 
 ---
 
