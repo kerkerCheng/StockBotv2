@@ -6,12 +6,17 @@
 > Baseline commit：`ba2e7c6`。標的＝COHR（唯一有完整 Step 0–3.5 鏈的公司）。
 > 本輪**沒有**新增金融模型、**沒有** onboarding 新公司、**沒有**動 thesis／variant view。
 
-## 判定：**CONDITIONAL GO**
+## 判定：**GO**（原判 CONDITIONAL GO，條件已於同日解除）
 
-條件只有一條，而且是**操作動作不是程式修改**：跑一次
-`python scripts/backup_private.py run --no-drive`。
-理由見 §6——`fair value 223.60` 的唯一來源（三本 private ledger）目前**不在任何一份備份裡**。
-除此之外全部達標，可以進 2–3 檔 heterogeneous Coverage Pilot（見 §10）。
+> **2026-09-07 收尾補記。** 原本的唯一條件是「跑一次 private authority 備份」——
+> `fair value 223.60` 的唯一來源（三本 private ledger）當時不在任何一份備份裡。
+> 使用者當日指示執行，已完成：備份 `20260907T070519Z`（524 檔，含
+> `alpha/assumptions|valuation|horizon/COHR.jsonl` 與 `alpha/cohr_judgment.json`），
+> `unbacked_files` **17 → 0**。同時 [483] 已 `go` 並執行 re-anchor（見 §8）。
+> ⚠ **仍未解除的是異地副本**：`drive: skipped`，本機單一磁碟。首屏計數器照樣紅字。
+> 查證：`python scripts/backup_private.py status`
+
+可以進 2–3 檔 heterogeneous Coverage Pilot（見 §10）。
 
 ---
 
@@ -220,8 +225,18 @@ Q4 是 ordinal 判斷，numeric gap 是確定性成果——**兩個 authority**
 | `alpha/valuation/COHR.jsonl` | target PE 25x → fair value 223.60 | **沒有** |
 | `alpha/horizon/COHR.jsonl` | horizon 2027-06-30 | **沒有** |
 
-也就是說：**`fair value 223.60` 與 `−20.7%` 的全部輸入判斷，目前沒有任何一份備份收過**，
+也就是說：**`fair value 223.60` 與 `−20.7%` 的全部輸入判斷，當時沒有任何一份備份收過**，
 而 `drive: skipped`（沒有異地副本）。**這是本輪唯一的 CONDITIONAL 條件。**
+
+> **2026-09-07 已解除（本機那一半）。** 使用者當日指示執行
+> `python scripts/backup_private.py run --no-drive` → 備份 `20260907T070519Z`
+> （decision_lab.db ＋ engine_c.db ＋ neo4j_export 1,536 nodes／1,861 rels ＋ files.zip 524 檔），
+> 其中 `alpha/` 由 4 檔變 **7 檔**——三本 ledger 全部收錄；`unbacked_files` **17 → 0**。
+> ⚠ 輪替 `LOCAL_RETENTION=3`，最舊的 `20260830T031723Z` 已被輪出，而
+> `last_backup.json.restore_verification.backup_id` 仍指向它——**「restore 已驗證」現在指向
+> 一個已不存在的備份**。這不影響本次備份的完整性（manifest checksum 自成一體），
+> 但那個欄位已經是 stale。要清掉就跑 `python scripts/backup_private.py verify-restore`。
+> **異地副本仍未解決**（`drive: skipped`，需要一次瀏覽器 OAuth：`backup_private.py auth`）。
 
 **對抗測試（全部通過）：** file missing／malformed JSON／partial write（截斷行）／stale 舊判斷
 四種都**不會**靜默回退成一個看起來 current 的舊判斷——
@@ -291,15 +306,18 @@ F-26 記的是 `axis_ceiling`／`live_supported_range` 那一層，而**那一�
 
 **兩處確實漂了，provenance 如下（沒有改 golden 讓測試過）：**
 
-1. **`judged_context_matches`：True → False。**
+1. **`judged_context_matches`：True → False → True（已於同日 re-anchor 修復）。**
    起因是 B1：`ValuationSnapshot.method`（Q4 的原料描述）由
    「estimate_revision=forward EPS +68.3% vs 股價 −2.2%」變成
    「estimate_revision=not_comparable（…）」，而 `method` 進 `ResearchContext.digest`。
    **這是正確的**：Q4 判斷所看到的原料確實變了。判斷本身的結論不受影響——它早就自己
    把那兩個代理列為「不得引用」——但 digest 錨點需要重新對齊。
-   **這是 A3 的 private authority，需要人工 gate，本輪不動它。**
-   建議動作：下一次 Q4 複查時順手 re-append（`_packet_digest` 換成新的 context digest）。
-   ⚠ 在那之前畫面會一直顯示「判斷與目前 context：**不一致**」——那是誠實的，不是壞掉。
+   **這是 A3 的 private authority，走人工 gate**：鑄成 **pq2 [483]**，使用者 2026-09-07 `go`。
+   已執行：`_packet_digest` `sha256:178a17f9…` → `sha256:bc32a785…`，`_restated` 新增第 3 條
+   逐字記錄。**逐鍵驗證只動了這兩格**——五軸、thesis、variant_view、bull／base／bear、
+   risks、catalysts、disproof_conditions 與三本 assumption ledger **一格未動**；
+   Q4 仍是 weak／0.25、`axis:expectation_gap = current`。
+   ⚠ **動手前先跑了備份**——那個檔案當時是唯一副本。
 
 2. **refresh 成果數：30 → 29（`current` 26 → 25）。**
    消失的是 `market_implied:estimate_revision_vs_price`——`estimate_revision_30d` 現在是 `None`，

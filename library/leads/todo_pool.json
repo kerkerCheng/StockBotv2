@@ -8069,10 +8069,11 @@
       "added_at": "2026-09-07T06:47:35.832546+00:00",
       "hint": "Step 4 修掉 forward-year rollover 污染後，ValuationSnapshot.method（Q4 原料描述）由「estimate_revision +68.3%」變成「not_comparable」，而 method 進 context digest → 判斷檔的 _packet_digest 對不上，畫面永久顯示「判斷與目前 context：不一致」。Q4 的結論不受影響（該判斷本來就自己把那兩個代理列為不得引用），但 re-append 判斷檔屬 A3 private authority，需要人工 gate。go 之後改變的是「我知道什麼」（判斷錨點），所以是研究不是開發。",
       "n": 483,
-      "reason": null,
+      "reason": "使用者 2026-09-07 明示 483 go。只換 _packet_digest 錨點（sha256:178a17f9… → sha256:bc32a785…）並在 _restated 新增第 3 條逐字記錄；逐鍵驗證只動了這兩格，五軸／thesis／variant_view／bull-base-bear／risks／catalysts／disproof_conditions 與三本 assumption ledger 一格未動。起因是 Step 4 把 estimate_revision_30d 由 +68.3% 改判為 not_comparable（forward year 2026-08-13 由 FY2027 換 FY2028），該描述住 ValuationSnapshot.method、method 進 context digest；Q4 的實質結論不受影響——本檔早就自己把那兩個代理列為「會計年度換檔假象，不得引用」，Step 4 只是把它變成機器強制的 contract。驗證：analyst-view 顯示「判斷與目前 context：一致」、Q4 weak 0.25 available、axis:expectation_gap current、核心數字 223.60／281.86／−20.7%／−24.6% 全部不變；audit invariants FAIL 0｜PASS 12｜SKIPPED 0；test_full_chain_acceptance.py 35 條全綠。動手前已跑 backup_private.py run --no-drive（20260907T070519Z，收錄三本 ledger＋判斷檔，unbacked_files 0）。",
+      "receipt": "authority:session_judgment;ref:alpha://session_assessor/COHR#_packet_digest",
       "ref_id": "docs/reports/2026-09-07-full-chain-adversarial-acceptance.md",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-07T07:09:43.558460+00:00",
       "source": "manual",
       "title": "COHR Q4 判斷 re-anchor：_packet_digest 對齊新的 ResearchContext digest",
       "type": "manual"
@@ -17507,6 +17508,15 @@
       "reason": "使用者 2026-09-07 明示指示的 Q4 重判，鑄號僅為稽核、受理時即 resolve（AGENTS：使用者主動指示＝已授權）。結果：expectation_gap weak(0.25) → weak(0.25)，ordinal 未變；理由由質性推測換成可核對的數值分解——EPS 落差 −5.0% 完全由 (a) D&C +60% vs 共識隱含 +67.4% 與 (b) 自陳保守的 interest placeholder 解釋，兩者修正後內部 EPS 9.49 反而高於共識 9.42；並記錄 market_implied_eps_growth 與 estimate_revision_30d 兩個代理是 2026-08-14 會計年度換檔假象、不得引用。變更欄位僅 axes.expectation_gap／_produced_at／_packet_digest／_restated；未動 thesis、variant_view、其他三軸、任何 operating／valuation／horizon assumption 與任何程式碼。",
       "receipt": "authority:session_judgment;ref:alpha://session_assessor/COHR#expectation_gap",
       "ref_id": "alpha://session_assessor/COHR#expectation_gap",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-07T07:09:43.558460+00:00",
+      "n": 483,
+      "reason": "使用者 2026-09-07 明示 483 go。只換 _packet_digest 錨點（sha256:178a17f9… → sha256:bc32a785…）並在 _restated 新增第 3 條逐字記錄；逐鍵驗證只動了這兩格，五軸／thesis／variant_view／bull-base-bear／risks／catalysts／disproof_conditions 與三本 assumption ledger 一格未動。起因是 Step 4 把 estimate_revision_30d 由 +68.3% 改判為 not_comparable（forward year 2026-08-13 由 FY2027 換 FY2028），該描述住 ValuationSnapshot.method、method 進 context digest；Q4 的實質結論不受影響——本檔早就自己把那兩個代理列為「會計年度換檔假象，不得引用」，Step 4 只是把它變成機器強制的 contract。驗證：analyst-view 顯示「判斷與目前 context：一致」、Q4 weak 0.25 available、axis:expectation_gap current、核心數字 223.60／281.86／−20.7%／−24.6% 全部不變；audit invariants FAIL 0｜PASS 12｜SKIPPED 0；test_full_chain_acceptance.py 35 條全綠。動手前已跑 backup_private.py run --no-drive（20260907T070519Z，收錄三本 ledger＋判斷檔，unbacked_files 0）。",
+      "receipt": "authority:session_judgment;ref:alpha://session_assessor/COHR#_packet_digest",
+      "ref_id": "docs/reports/2026-09-07-full-chain-adversarial-acceptance.md",
       "type": "manual",
       "verb": "go"
     }
