@@ -224,6 +224,43 @@ def cmd_entry(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_analyst_view(args: argparse.Namespace) -> int:
+    """Analyst Consumer（Step 3.5）：把 canonical read model 依消費者問句投影成一份判讀畫面。
+
+    **純讀、純投影**：不重算 EPS／估值／報酬，不寫任何 authority，不呼叫 LLM。
+    產出可預先 materialize（`--format json`）讓未來 APP 點擊直接讀。
+    """
+    from alpha.errors import AlphaError, PointInTimeUnsupported
+
+    from .alpha_view.sources import fetch_alpha_investment_view
+    from .analyst_view import build_analyst_view, render_analyst_view_markdown
+
+    as_of = date.fromisoformat(args.as_of) if args.as_of else None
+    try:
+        view = fetch_alpha_investment_view(
+            args.ticker, as_of=as_of,
+            judgment_path=Path(args.judgment) if args.judgment else None,
+            include_causal=False, scenario=args.scenario,
+            sandbox_hurdle=args.sandbox_hurdle)
+    except PointInTimeUnsupported as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 3
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    analyst = build_analyst_view(view)
+    if args.format == "json":
+        text = json.dumps(analyst.to_dict(), ensure_ascii=False, indent=2)
+    else:
+        text = render_analyst_view_markdown(analyst)
+    if args.out:
+        Path(args.out).write_text(text, encoding="utf-8")
+        print(f"analyst view → {args.out}（{len(text)} chars）")
+    else:
+        print(text)
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="python -m briefing", description=__doc__,
@@ -281,6 +318,20 @@ def build_parser() -> argparse.ArgumentParser:
     entry.add_argument("--format", choices=("markdown", "json"), default="markdown")
     entry.add_argument("-o", "--out", help="輸出路徑")
     entry.set_defaults(func=cmd_entry)
+    analyst = sub.add_parser(
+        "analyst-view",
+        help="Analyst Consumer（Step 3.5）：一檔股票的完整判讀畫面（頭條／基本面／怎麼算的／研究現況／optional entry）")
+    analyst.add_argument("ticker")
+    analyst.add_argument("--as-of", help="YYYY-MM-DD：只看 T 之前已知的判斷、假設、內部基本面與行情")
+    analyst.add_argument("--scenario", choices=("price_only", "consensus_revision", "graph_edge", "new_guidance",
+                                                "new_actual", "fiscal_rollover", "disproof"),
+                         help="在真實 state 上疊一件假想變化（不寫任何 authority）")
+    analyst.add_argument("--sandbox-hurdle", type=float, default=None,
+                         help="非持久驗算：只在記憶體疊一筆 author=sandbox 的年化要求報酬（例 0.15）；不寫 ledger")
+    analyst.add_argument("--judgment", help="指定 session 判斷 JSON")
+    analyst.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    analyst.add_argument("-o", "--out", help="輸出路徑（可預先 materialize 給 APP 讀）")
+    analyst.set_defaults(func=cmd_analyst_view)
     return parser
 
 

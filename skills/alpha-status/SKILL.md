@@ -120,6 +120,23 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 每次直接問 view：
 `python -m briefing alpha-card <T> --format json | python -c "import json,sys;print({k:v['status'] for k,v in json.load(sys.stdin)['capability_map'].items()})"`
 
+### 第 6b 塊：單檔 Analyst View（消費端投影，2026-09-07 Step 3.5 新增）
+
+```powershell
+& '.venv\Scripts\python.exe' -m briefing analyst-view <TICKER>
+```
+
+**使用者問「我該怎麼看這一檔」時用它；問「系統對這一檔知道什麼、缺什麼」時才用 `alpha-card`。**
+同一份 read model，差別在排列方式：`alpha-card` 依 section 編號，`analyst-view` 依消費者問句
+（頭條的隱含報酬 → 我們預測什麼 → 市場預測什麼 → 差異 → 最脆弱的假設 → 什麼會改變答案 →
+optional entry threshold）。它一個數字都不重算。
+
+**轉述時再多守兩條：**（e）**主流程的終點是 implied return，不是 entry threshold**——
+沒有 `EntryCriterion` 時只能說「optional entry threshold 未設定」，**不得**說這檔研究不完整、
+也**不得**建議使用者「先訂一個 15% 之類的門檻讓系統算得出來」；
+（f）`readiness` 的三態（`ready`／`ready_with_flags`／`blocked`）只描述**核心四段**讀不讀得成，
+**不是**可不可以買的信號，也不是 Engine D 的 `research_status`。
+
 ### 四維度（`AGENTS.md` 為唯一權威，此處只是操作提示）
 
 1. **瓶頸地位** — `substitutability` 4–5／5、`sole_source`、距需求端跳數

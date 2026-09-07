@@ -274,6 +274,18 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 `alpha/entry/model.py::build_entry_assessment`：`entry_price = fair_value / (1 + annualized_hurdle) ** (holding_period_days / 365.25)`；`price_to_entry_gap = current_price / entry_price − 1`；`hurdle_comparison = current_price <= entry_price ? meets_analytical_hurdle : above_analytical_entry`（等號歸 meets——門檻價的定義就是「恰好滿足」）。兩個輸入缺一就 `missing`，且理由分開：判準缺席寫「**缺投資門檻判斷**，不是資料 ETL 缺口」。`assessment` 是 `clean`／`review_required`——`value_date` 與 `horizon_end` 不一致時算術照列但**不得冒充 clean**。**它不是** buy／sell／hold、不是 position size／capital allocation／order、不是 portfolio permission（型別在 import 當下就掃描這些欄位名）；read model 第 13c 節 `entry_logic` 每次列 `is_not`。COHR 2026-09-06：ledger 0 筆判準 → missing；以 sandbox 15% 驗算 → 門檻價 199.43 vs 現價 281.86，`above_analytical_entry`。
 *Avoid:* 把 `meets_analytical_hurdle` 讀成「該買」、拿門檻價當下檔估計、拿它跨標的排序、缺判準就補一個常見值
 
+### Analyst View（Step 3.5 的消費端投影）
+把 `AlphaInvestmentView` **依消費者問句重新投影**的呈現 DTO（`briefing/analyst_view/`，2026-09-07 Step 3.5）。read model 依資料結構排列（估值第 13 節、報酬 13a、共識第 5 節、假設第 8 節）；Analyst View 依六個問句排列——**我們預測什麼／市場預測什麼／差異在哪／現價隱含什麼報酬／哪些假設最脆弱／什麼 evidence 會改變答案**——成四個核心 panel（headline／fundamental／why／research）＋一個 optional panel（entry）。**它只組裝、排序、label**：每一行持有 read model 裡**同一個 `Datum` 物件的參照**（`is` 相等），所以「consumer 重算了 EPS／估值／報酬」在型別層就不可能發生；全模組沒有公式、沒有 float 字面值，唯一的數值動作是排序鍵 `abs(既有敏感度)`。純函式、確定性、可預先 materialize 成 JSON 讓 APP 直接讀（`python -m briefing analyst-view <TICKER> [--as-of] [--format json]`）。
+*Avoid:* 第二份研究 authority、runtime 用 LLM 重寫 thesis、在 consumer 補一格 read model 沒有的數字、把它叫 dashboard 或 recommendation
+
+### Core Readiness（核心 panel 讀不讀得成一份判讀）
+`AnalystView.readiness`（2026-09-07）：`ready`（核心四段都有內容）／`ready_with_flags`（有內容，但至少一段 `stale`／`review_required`／`not_applicable`）／`blocked`（至少一段缺內容：`missing`／`invalidated`／`not_modeled`／`insufficient_evidence`）。它是既有 section `meta.status` 的**查表計數**，不是新的研究完整度分數；判準逐字寫在 `readiness.rule` 裡。**optional panel 一律不參與**。
+*Avoid:* research_status（那是 Engine D 的覆蓋度）、把 readiness 當作可不可以買的信號、讓 optional 缺席拉低它
+
+### Optional Analytical Capability（可選的分析能力）
+一種**不是主流程、也不是研究完整度 gate** 的能力。stock-level 主流程是 **Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return**，終點是 implied return；`EntryCriterion`／hurdle 屬 optional analytical capability——**沒有它不代表這檔研究不完整**，只表示「optional entry threshold unavailable」。系統**不得**為了讓自己有答案而要求使用者宣告一個固定的 10%／15%／20%。機會成本、風險調整後 hurdle 與跨標的比較留給未來的 Portfolio／Investor Policy 階段。
+*Avoid:* 把 optional 缺席算成 blocker、用預設 hurdle 讓畫面「完整」、把 entry threshold 當成主流程終點
+
 ### Review Condition（假設自帶的 machine-readable 觸發條件）
 `metric`／`scope`／`period_end`／`period_kind`／`operator`／`threshold`／`on_trigger`／`note`。由寫假設的人明示，引擎拿 Engine C 觀測（年度＋exit quarter）對照；滿足 → `disproof_signal` → 該假設 `on_trigger` state。`note` 是人寫的下一步（例：下修至 +45%），引擎只讀不做。也可經 Event Watch `hypothesis_ref=oa_*` 喚醒。
 *Avoid:* parser 讀 rationale 自由文字、觸發後自動寫新假設

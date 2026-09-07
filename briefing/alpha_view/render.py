@@ -27,7 +27,8 @@ from .contracts import (
 )
 
 __all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards", "render_entry_logic_lines",
-           "render_implied_return_lines"]
+           "render_implied_return_lines", "format_datum_value", "format_ratio", "format_scalar",
+           "render_datum_line", "status_label"]
 
 _LEGEND = (
     "> 圖例——每一格後面的〔〕標的是**這是哪一種知識**："
@@ -159,6 +160,24 @@ def _datum_line(datum: Datum) -> str:
     if datum.dependencies:
         line += "".join("\n" + dep for dep in _dependency_lines(datum.dependencies))
     return line
+
+
+# ---------------------------------------------------------------------------
+# 給同層其他 renderer 重用的呈現原語
+#
+# 「缺席怎麼印」「數字怎麼格式化」只能有一處定義（L12：同一件事兩份實作 ⇒ 兩種語意）。
+# `briefing/analyst_view/render.py` 消費這幾個別名，而不是自己再寫一次 `_pct`／`_datum_line`。
+# ---------------------------------------------------------------------------
+
+format_ratio = _pct
+format_scalar = _scalar
+format_datum_value = _value_text
+render_datum_line = _datum_line
+
+
+def status_label(status: str) -> str:
+    """狀態字 → 中文（`available` 也有字；呼叫端自己決定 available 要不要印）。"""
+    return STATUS_LABEL.get(status, status)
 
 
 def _meta_lines(meta: SectionMeta) -> list[str]:

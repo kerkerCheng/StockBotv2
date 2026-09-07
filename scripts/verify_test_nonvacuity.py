@@ -1392,6 +1392,74 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_entry_logic.py::test_the_hurdle_is_investor_policy_not_a_research_judgment",
         guards="驗算用的非持久 hurdle 不得變成使用者宣告的政策（demo 好看不是寫入 authority 的理由）",
     ),
+    # ---- Step 3.5 Analyst Consumer ----------------------------------------
+    Mutation(
+        name="消費端：自己複製一份 Datum（值一樣、物件不同）",
+        path="briefing/analyst_view/compose.py",
+        old="    return AnalystLine(key=key, display_label=label, datum=datum, role=role)",
+        new="    from briefing.alpha_view.contracts import Datum as _D\n"
+            "    copy = _D(key=datum.key, label=datum.label, value=datum.value, status=datum.status,\n"
+            "              basis=datum.basis, authority=datum.authority, unit=datum.unit)\n"
+            "    return AnalystLine(key=key, display_label=label, datum=copy, role=role)",
+        test="tests/test_analyst_view.py::test_every_consumer_cell_is_the_same_object_as_the_read_model_cell",
+        guards="Consumer 不重算＝每一格都是 read model 裡**同一個物件**；值一樣但重建過就已經是第二份真相",
+    ),
+    Mutation(
+        name="消費端：optional 的 entry 被算進 core readiness",
+        path="briefing/analyst_view/compose.py",
+        old="    for name in CORE_PANELS:",
+        new="    for name in CORE_PANELS + OPTIONAL_PANELS:",
+        test="tests/test_analyst_view.py::test_missing_entry_criterion_does_not_change_core_readiness",
+        guards="EntryCriterion 不是 research completeness gate：沒有 hurdle 不得把這檔標成研究不完整",
+    ),
+    Mutation(
+        name="消費端：缺席的格子印成 0",
+        path="briefing/analyst_view/render.py",
+        old="        return f\"**{status_label(datum.status)}**\"",
+        new="        return \"0\"",
+        test="tests/test_analyst_view.py::test_missing_upstream_is_blocked_and_never_rendered_as_zero",
+        guards="Missing != Zero：上游缺席時頭條不得出現一個看起來像結論的數字",
+    ),
+    Mutation(
+        name="消費端：panel status 取最寬鬆而不是取最嚴",
+        path="briefing/analyst_view/contracts.py",
+        old="    return max(statuses, key=_WORST_FIRST.index)",
+        new="    return min(statuses, key=_WORST_FIRST.index)",
+        test="tests/test_analyst_view.py::test_worst_status_and_readiness_class_are_declared_lookups",
+        guards="一段裡有 review_required 就整段 review_required——取最寬鬆會把需要重看的段落藏起來",
+    ),
+    Mutation(
+        name="消費端：review_required 不算「需要重看」",
+        path="briefing/analyst_view/compose.py",
+        old="ATTENTION_STATES = (\"recalculate\", \"review_required\", \"invalidated\", \"stale\")",
+        new="ATTENTION_STATES = (\"recalculate\", \"invalidated\", \"stale\")",
+        test="tests/test_analyst_view.py::test_review_required_upstream_surfaces_in_readiness_attention_and_markdown",
+        guards="stale／review_required 必須現形——看不見的缺口等於沒有缺口（INV-3）",
+    ),
+    Mutation(
+        name="消費端：投影丟掉 as-of（歷史視角看起來像當前）",
+        path="briefing/analyst_view/compose.py",
+        old="        as_of=ident.as_of, point_in_time_mode=ident.point_in_time_mode,",
+        new="        as_of=None, point_in_time_mode=ident.point_in_time_mode,",
+        test="tests/test_analyst_view.py::test_as_of_view_keeps_the_point_in_time_mode_and_does_not_leak_future_values",
+        guards="INV-6：答不出「T 時刻我知道什麼」就要說出來，不得讓歷史視角看起來像當前",
+    ),
+    Mutation(
+        name="消費端：敏感度由小到大排（最大的那條沉到最後）",
+        path="briefing/analyst_view/compose.py",
+        old="    return tuple(sorted(data, key=_sensitivity_magnitude, reverse=True))",
+        new="    return tuple(sorted(data, key=_sensitivity_magnitude, reverse=False))",
+        test="tests/test_analyst_view.py::test_weak_inputs_declare_the_rule_that_listed_them_and_order_by_existing_sensitivity",
+        guards="排序是 consumer 唯一被允許的數值動作，它必須真的把 |Δ| 最大的放最前面",
+    ),
+    Mutation(
+        name="消費端：未知的軸不列進脆弱清單",
+        path="briefing/analyst_view/compose.py",
+        old="        if not score.is_known:",
+        new="        if False and not score.is_known:",
+        test="tests/test_analyst_view.py::test_unknown_axis_is_listed_as_unknown_not_as_a_passing_grade",
+        guards="未知不是「沒問題」——把未知軸藏起來會讓畫面看起來比實際完整",
+    ),
 )
 
 

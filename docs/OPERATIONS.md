@@ -300,6 +300,29 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 `decision_lab today` 的「Alpha Card 摘要」區消費**同一份** view（可行動排序前 5 檔各一列）。
 架構與 authority map 見 `docs/ARCHITECTURE.md` §6.1。**互動專用，不進 unattended rule。**
 
+### Analyst View（消費端投影，2026-09-07 Step 3.5）
+
+**要「看懂一檔股票」時用這個，不是 `alpha-card`。** `alpha-card` 依資料結構排列（18 個 section），
+Analyst View 依**消費者問句**排列：頭條（現價 → future target value → 隱含報酬）→ 我們預測什麼 →
+市場預測什麼 → 差異在哪 → 怎麼算到這裡／最脆弱的假設 → 什麼會改變答案 → optional entry threshold。
+
+```powershell
+& '.venv\Scripts\python.exe' -m briefing analyst-view COHR                  # 完整判讀畫面（Markdown）
+& '.venv\Scripts\python.exe' -m briefing analyst-view COHR --format json -o analyst.json   # 預先 materialize 給 APP 讀
+& '.venv\Scripts\python.exe' -m briefing analyst-view COHR --as-of 2026-09-06              # 歷史視角（PIT）
+& '.venv\Scripts\python.exe' -m briefing analyst-view COHR --sandbox-hurdle 0.15           # 非持久驗算 optional entry（不寫 ledger）
+```
+
+**純投影：** 它消費 `alpha-card` 的同一份 `AlphaInvestmentView`，**一個數字都不重算**
+（每一行都是 read model 裡同一個 `Datum` 物件的參照），不寫任何 authority、不呼叫 LLM。
+`--format json` 的輸出完全 JSON-able 且保留 `null`，可預先產生給未來 APP 點擊直接讀。
+
+**讀 readiness：** `ready`／`ready_with_flags`／`blocked` **只看核心四段**；
+optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 readiness 變差
+（產品決策見 `docs/ROADMAP.md`「主流程的終點是 Implied Return」）。
+架構見 `docs/ARCHITECTURE.md` §6.7。**互動專用，不進 unattended rule。**
+
+
 ### Engine C
 ```powershell
 & '.venv\Scripts\python.exe' engine_c\etl_yfinance.py <TICKER>
@@ -660,8 +683,7 @@ rule 缺漏時不得把重啟當修復。詳細五步見上方「Sandbox／priva
 
 查證（三者都不該出現在 rules）：
 ```powershell
-Select-String -Path .codex
-ules\stockbot-automations.rules `
+Select-String -Path .codex\rules\stockbot-automations.rules `
   -Pattern 'backfill_source_dating|rank_forward_returns|alpha_exposure'
 ```
 ⚠ 十六條 fixed entry **數量未變**；`tests/test_codex_daily_permissions.py` 斷言
@@ -811,6 +833,36 @@ python -m briefing entry COHR --as-of 2026-09-05                            # �
 **不是 buy／sell、不是部位尺寸、不是資本許可**（型別裡沒有那些欄位，section 每次列 `is_not`）。
 沒有明示判準就是 `missing`，**不補 10%／15%／20%**；`value_date` 與 `horizon_end` 不一致時算術照列但
 `assessment=review_required`，不得當成 clean 的門檻價。
+
+### Sandbox impact review 結論（2026-09-07，Analyst Consumer v1／Step 3.5）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m briefing analyst-view <T> [--as-of] [--scenario …] [--sandbox-hurdle] [--format] [-o]` | 唯讀：消費與 `alpha-card` **完全相同**的一次 `fetch_alpha_investment_view`，之後是純函式投影；`-o` 只寫使用者自己指定的輸出檔（不是 authority） | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `briefing/analyst_view/`（新 package） | 無：三支檔案的 import allowlist 不含任何 I/O 模組（`tests/test_analyst_view.py` 以 AST 掃描守著），也不含 `open(`／`write_text`／`store.` 等寫入型 token | 無 | 純函式層，沒有 executable surface |
+
+查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'analyst-view|analyst_view'
+```
+
+### Analyst View：怎麼跑（互動）
+
+```powershell
+# 1) 看一檔（Markdown；依消費者問句排列，不是依 section 編號）
+python -m briefing analyst-view COHR
+# 2) 只看頭條與 readiness（機器可讀）
+python -m briefing analyst-view COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);h={l['key']:l['datum']['value'] for l in v['headline']['lines']};print(v['readiness']['state'], h['current_price'], h['fair_value'], h['price_return'], h['annualized_price_return'])"
+# 3) 確認 optional 的 entry 不影響 core readiness
+python -m briefing analyst-view COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);print(v['entry']['status'], v['readiness']['blockers'], v['readiness']['optional_unavailable'])"
+# 4) 歷史視角（上游缺 → blocked，而不是拿當前值冒充）
+python -m briefing analyst-view COHR --as-of 2026-09-05
+# 5) 預先 materialize 給未來 APP 讀（純函式輸出，不需要 runtime LLM）
+python -m briefing analyst-view COHR --format json -o analyst_COHR.json
+```
+
+⚠ 它**不重算任何數字**：每一行都是 read model 裡同一個 `Datum` 物件的參照。要改一個數字只能去改上游 authority
+（假設 ledger／估值假設／horizon／判準），改不了「畫面上的那格」——這是刻意的阻力。
 
 ### Research Refresh／Dependency Invalidation：怎麼跑（互動）
 

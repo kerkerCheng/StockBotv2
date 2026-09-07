@@ -548,7 +548,67 @@ disproof→上游 review 傳播成 `review_required`，**判準始終 `current`*
 
 **刻意不做（v1 限制）：** buy／sell／hold、position size／capital allocation／order、portfolio permission、
 多 convention（total return hurdle、IRR、風險調整後門檻都要先有各自的算術與資料）、跨標的比較、
-判準的到期語意（今天沒有 `expires_at`）、Analyst Consumer／APP／API（Step 3.5 以後）。
+判準的到期語意（今天沒有 `expires_at`）；Analyst Consumer 已於 Step 3.5 交付（§6.7），APP／API 仍未做。
+
+---
+
+### 6.7 Analyst Consumer（`briefing/analyst_view/`，2026-09-07 Phase 2 Step 3.5 v1）
+
+**角色一句話：把 canonical read model 依「使用者打開一檔股票時會依序問的六個問題」重新投影，
+讓人在很短時間內看懂 StockBot 相信什麼、跟市場差在哪、怎麼算到這裡、最弱假設是什麼、什麼會讓結論需要重看。**
+
+**先記下產品決策（它決定這一層長什麼樣）：** stock-level **主流程**是
+`Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return`，
+**終點是 implied return**；`EntryCriterion`／hurdle 是 **optional analytical capability**，
+**不是必填資料，也不是 research completeness gate**。沒有 hurdle 時系統只說
+「optional entry threshold unavailable」，**不得把這檔標成研究不完整**，也**不得**為了讓自己有答案
+而要求使用者宣告一個固定的 10%／15%／20%。機會成本、風險調整後 hurdle 與跨標的比較留給未來的
+Portfolio／Investor Policy 階段。
+
+```
+AlphaInvestmentView（§6.1 canonical read model；18 個 section，依資料結構排列）
+        │  build_analyst_view（純函式；只組裝／排序／label）
+        ▼
+AnalystView ── headline   （Q4 現價 → future target value → 隱含報酬｜refresh／review state）
+            ├─ fundamental（Q1 內部 revenue／EPS｜Q2 同期共識｜Q3 數值 gap｜口徑與會計期間）
+            ├─ why        （Q5 生效假設＋basis｜脆弱輸入｜既有敏感度｜算式｜證據）
+            ├─ research   （Q6 Q1–Q5／thesis／催化劑／disproof／missing・stale・review_required）
+            └─ entry      （**optional**：有判準就顯示 analytical entry threshold；沒有就 Not set (optional)）
+                │
+        readiness（只看核心四段）＋refresh 摘要＋limits（「不是什麼」）
+                │
+     `python -m briefing analyst-view <T> [--as-of] [--format markdown|json] [-o]`
+```
+
+**它為什麼不可能變成第二個研究層（型別層強制，不是自律）：** panel 裡每一行的 `datum` 都是
+`AlphaInvestmentView` 裡**同一個 `Datum` 物件的參照**（`is` 相等）；`AnalystLine` 刻意**沒有 `value` 欄位**，
+所以「值」只有一個住處。`tests/test_analyst_view.py` 用 `id()` 集合逐行比對——compose 只要自己 `Datum(...)`
+生一格（哪怕值一模一樣）就會紅。三支檔案另有 import allowlist、float 字面值掃描（**全模組 0 個**）與
+「不得 import 任何 `alpha.*` 模型模組」的檢查。
+
+**唯一被允許的數值動作是排序**：既有敏感度依 `abs(fair_value_relative)` 由大到小。它不產生新值，
+也**不是新的 attribution model**——`context.sensitivity_order` 把這句話寫在資料裡。
+
+**「最脆弱的輸入」是宣告好的列入規則，不是新判斷。** `WEAK_INPUT_RULES` 是封閉字彙，每一條 `WeakInput`
+必須說出自己被哪一條規則列進來：`largest_modeled_sensitivity`（既有敏感度中 |Δ| 最大）／`refresh_flagged`／
+`heuristic_proxy_input`／`session_judgment_input`／`weakest_known_axis`（抄 `AlphaSignal.weakest_axis`）／
+`unknown_axis`（該軸 missing——**未知不是「沒問題」**）。
+
+**status roll-up 與 readiness 都是查表。** panel `status` ＝來源 section `meta.status` 取最嚴
+（`_WORST_FIRST` 是宣告好的嚴重度序，且 `source_statuses` 保留取最嚴之前的原值）；
+`readiness` ∈ `ready`／`ready_with_flags`／`blocked`，**只看核心四段**，判準逐字寫在 `readiness.rule`。
+**optional panel 不參與**——`tests/test_analyst_view.py` 逐欄比對「有判準 vs 沒判準」兩份投影的 readiness。
+
+**頭條那一句話不是 consumer 造的。** `implied_return.epistemics.one_sentence` 由
+`alpha://implied_return/model` 自己組出，consumer 只是把它挪到最前面並註明出處——造句就是在 read model
+之外生出第二種說法。
+
+**PIT／materialize：** `--as-of` 直接透傳到 `fetch_alpha_investment_view`；投影本身是純函式，
+`AnalystView.to_dict()` 完全 JSON-able 且保留 `null`，可預先產生給未來 APP 點擊直接讀
+（不需要 runtime LLM，也不需要重跑任何 authority）。
+
+**刻意不做：** buy／sell／sizing／portfolio、跨標的比較與排序、任何新的 forecast／valuation／return 公式、
+為 consumer 新建 attribution model、runtime LLM、APP／API（Step 5）。
 
 ---
 
