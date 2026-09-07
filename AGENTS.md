@@ -8,7 +8,7 @@
 **系統不給部位尺寸**——買多少、什麼時候買由使用者在買入前自行判斷，並自行手動下單。
 本機單人自用，使用者會寫 Python、碰過 API。
 
-## 本檔的角色與另外四份
+## 本檔的角色與另外五份
 
 | 檔案 | 回答的問句 | 什麼時候讀 |
 |---|---|---|
@@ -17,6 +17,7 @@
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | 系統長什麼樣、為什麼這樣切？ | 新增 module／動邊界前 |
 | [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | 這件事怎麼跑？ | 要實際執行操作時 |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | 接下來要做什麼？ | 規劃或決定下一步時 |
+| [`docs/AGENT_WORKFLOW.md`](docs/AGENT_WORKFLOW.md) | 一個開發請求要經過哪些節點？ | 收到「我想做 X」時 |
 
 **判準：這句話改變的是我的行為、我的用詞、我的結構、我的按鍵、還是我的排程？**
 最實用的一條分野：**OPERATIONS 被改壞 → 跑不起來；本檔被改壞 → 跑起來了，但做錯事。**
@@ -363,6 +364,15 @@ tier／pace／`campaign_budget_fraction_by_sleeve`／三態系統動作／「本
 
 - **專案記憶唯一權威：** 本檔。`CLAUDE.md` 只用 `@AGENTS.md` 匯入，不再複製內容。
   **研究 skill 唯一權威：** `skills/<name>/SKILL.md`。
+- **開發流程唯一權威：** [`docs/AGENT_WORKFLOW.md`](docs/AGENT_WORKFLOW.md)（模型）＋
+  [`skills/development-flow/SKILL.md`](skills/development-flow/SKILL.md)（執行）。
+  開發請求先過一次便宜的 scope triage（Zoom Z0–Z3），再決定 review 距離（R0–R2）；
+  **R2＝另開 context 的獨立 reviewer，是唯一會花第二份 token 的路徑，六條 trigger 之外不啟動，
+  且啟動本身要人工 opt-in**（與本節 subagent 委派那條同源）。
+  ⚠ **hard invariant：`GO` 只關閉本 Step，不開啟下一個 Step。**
+  `STEP_RESULT` 的「建議下一步」永遠只是建議——**不得因為上一個 Step 被核准就自行開工下一個**，
+  也不得偷改 [`ROADMAP.md`](docs/ROADMAP.md) 後繼續跑（要改先給五欄 amendment 再等人）。
+  這與「`go` ＝推進到下一個人工 gate」一致：**Step 邊界本身就是那個 gate**。
 - **Local-first（2026-07-26 定案）：** 未特別寫 `claude.ai`／cloud 時，文件中的「Claude」
   一律指**本機 Claude Code session**。**cloud session＋MCP 是備援**，不要求等權。
   新核心必須能在完全沒有 MCP 的情況下運作；若 MCP 相容性與新核心架構衝突，**優先選新核心**。

@@ -685,6 +685,21 @@ fixed entry，與 `edgar.py` 同構：無憑證、不碰 Windows identity／ACL�
 - 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector
   的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
 
+### 開發流程（Agent Development Flow，2026-09-07）
+
+判準與流程模型在 [`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md)，執行步驟在
+`skills/development-flow/SKILL.md`。**這裡只放怎麼跑。**
+
+```powershell
+& '.venv\Scripts\python.exe' -m pytest tests\test_agent_workflow.py -q      # 流程文件的防腐測試
+& '.venv\Scripts\python.exe' scripts\verify_test_nonvacuity.py --only AgentFlow   # 證明上面那些斷言會紅
+& '.venv\Scripts\python.exe' scripts\sync_agent_skills.py --check           # 兩端轉接層無漂移
+```
+
+⚠ **沒有新的 executable surface**：本流程不新增 CLI、不新增排程入口、不改任何
+`python -m <module>` 命令字串，`.codex/rules` 的 `prefix_rule(` 仍是 16 條（`tests/test_codex_daily_permissions.py` 斷言）。
+它改變的是 agent 的行為，不是機器的權限——**因此沒有 sandbox impact review 要做**。
+
 ### Push 政策（2026-07-22 使用者定案）
 
 push 是常規動作——session 收尾（邏輯 commits 完成後）把 master push 到 origin，

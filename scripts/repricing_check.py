@@ -4,7 +4,7 @@
 
 `AGENTS.md` 的 Lane Memo 規格把 **variant perception 列為必填**，操作定義是
 「當前股價／估值隱含的假設是 X，本 thesis 認為真實情況會是 Y」。但系統**沒有任何欄位
-或報表在回答它**——`blind-spot-audit` 的 A2 lens（反身性／已被定價）因此每次都只能靠
+或報表在回答它**——`blind-spot-audit` 的 A2 lens（共識與 expectation gap 的語意）因此每次都只能靠
 人臨場判斷。2026-08-18 使用者問「COHR 是不是已經被 price in」時，答案是「答不出來」。
 
 ## 這不是估值模型，是算術

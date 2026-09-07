@@ -1733,6 +1733,57 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_webapp_api.py::test_an_unexpected_exception_returns_a_fixed_shape_not_its_message",
         guards="例外訊息可能含檔案路徑或查詢內容；固定形狀的錯誤回應是唯一安全的做法",
     ),
+    # ── Agent Development Flow（2026-09-07 bootstrap）──────────────────────
+    # 這套流程的載體是 Markdown，不是可執行程式，所以它的斷言特別容易變成空跑：
+    # 「文件裡有沒有這句話」很容易寫成一條永遠綠的檢查。以下六個突變逐一證明不是。
+    Mutation(
+        name="AgentFlow：canonical 標記被拿掉",
+        path="skills/development-flow/SKILL.md",
+        old="<!-- agent-workflow-canonical -->",
+        new="",
+        test="tests/test_agent_workflow.py::test_canonical_workflow_docs_stay_within_the_budget",
+        guards="宣告的 canonical 清單必須與實際帶標記的檔案逐字相同（預算 hard max 4）",
+    ),
+    Mutation(
+        name="AgentFlow：GO 判準被刪",
+        path="AGENTS.md",
+        old="**hard invariant：`GO` 只關閉本 Step，不開啟下一個 Step。**",
+        new="**建議：`GO` 之後可以視情況接續。**",
+        test="tests/test_agent_workflow.py::test_go_does_not_open_the_next_step",
+        guards="這條被刪掉不會有東西壞掉，系統只會安靜地開始自己往下一個 Step 跑",
+    ),
+    Mutation(
+        name="AgentFlow：R2 trigger 長出第七條",
+        path="docs/AGENT_WORKFLOW.md",
+        old="**其餘情況預設不花第二份 agent token。**",
+        new="7. 其他看起來值得多看一眼的情況\n\n**其餘情況預設不花第二份 agent token。**",
+        test="tests/test_agent_workflow.py::test_r2_has_exactly_six_auto_triggers",
+        guards="trigger 悄悄長出第七條，R2 就會從例外變成預設——token 是一級設計約束",
+    ),
+    Mutation(
+        name="AgentFlow：STEP_RESULT 少一欄",
+        path="skills/development-flow/SKILL.md",
+        old="Non-blocking debt:",
+        new="Debt:",
+        test="tests/test_agent_workflow.py::test_step_result_keeps_all_seven_fields",
+        guards="少一欄，使用者就得回頭讀 transcript 才知道這輪留下了什麼債",
+    ),
+    Mutation(
+        name="AgentFlow：退役字彙回流 blind-spot",
+        path="skills/blind-spot-audit/SKILL.md",
+        old="### A8 相關性與退出（Correlation & exit）",
+        new="### A8 相關性與退出（Correlation & exit）\n\n這條規則歷來產出過幾筆非零 supported_range？",
+        test="tests/test_agent_workflow.py::test_blind_spot_audit_is_research_only_and_carries_no_retired_framing",
+        guards="已移除的資本表達層字彙回到 reviewer 手上，它就會對著不存在的機制開火",
+    ),
+    Mutation(
+        name="AgentFlow：Convergence 句被刪",
+        path="skills/blind-spot-audit/SKILL.md",
+        old="Convergence without differentiated evidence is healthy.",
+        new="與市場共識一致就代表沒有 alpha。",
+        test="tests/test_agent_workflow.py::test_blind_spot_audit_is_research_only_and_carries_no_retired_framing",
+        guards="沒有這句，research reviewer 會逼內部預測人為偏離共識",
+    ),
 )
 
 
