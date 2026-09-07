@@ -1,7 +1,7 @@
 # StockBot Web App／API MVP（Phase 2 Step 5）— 交付報告
 
 > 2026-09-07｜標的＝COHR／LYC.AX／6324.T／IQE.L（Coverage Pilot 四檔）
-> 判定：**原判 CONDITIONAL GO → 條件已於同日解除 → GO**（見 §14）
+> 判定：**原判 CONDITIONAL GO → 條件同日解除 → GO｜2026-09-07 結案**（見 §14、§16）
 > 上一站：[Coverage Pilot](2026-09-07-coverage-pilot.md)｜[Full-chain Adversarial Acceptance](2026-09-07-full-chain-adversarial-acceptance.md)
 
 ---
@@ -511,3 +511,58 @@ Portfolio 排序、FY2028 model 擴充、Valuation v2、Post-MVP Graph Alpha Edg
 
 **沒有動的：** 圖（零新增節點／邊）、Engine C ledger、thesis／lifecycle、Decision Store、
 資本或部位、`ACCOUNTING_BASES` 字彙、既有三本假設 ledger 的任何一行。
+
+---
+
+## 16. 結案（2026-09-07，部署完成後）
+
+### 16.1 最終狀態——全部實測，不是宣稱
+
+| 項目 | 狀態 | 證據 |
+|---|---|---|
+| 對外網址 | ✅ `https://stockbot.minatoyukina.uk` | 未登入 → **302** 導向 `bold-…cloudflareaccess.com/cdn-cgi/access/login/…` |
+| 認證 | ✅ **Google OAuth** | Access event analytics：`Identity provider = google`、`Users = c3035281@gmail.com`、`Granted 1`、`App types = Self-hosted`。⚠ **不是我們手動設的**——新版 Cloudflare One 在建立 Access 應用程式的流程中已把 Google 加成 identity provider，所以文件裡的「步驟 0」實際上被跳過了 |
+| 手機 | ✅ iPhone Safari 可開 | 使用者實測 |
+| 既有 MCP | ✅ 未受影響 | `mcp.minatoyukina.uk` → `404`（**正常**：path token 未帶）；`neo4j.` → `200` |
+| tunnel 設定 | ✅ 只多一條 ingress | `config.yml` 內 `stockbot` 一條；`neo4j`／`mcp`（含 `httpHostHeader`）一字未動；catch-all 仍在最後；備份 `config.yml.bak` 在 |
+| 綁定介面 | ✅ `127.0.0.1` | `Get-NetTCPConnection -LocalPort 8790` → `LocalAddress = 127.0.0.1`（**不是 `0.0.0.0`**——安全預設確實生效，不是只寫在文件裡） |
+| 開機自啟 | ✅ 已加入 | `stockbotv2-graph-services.vbs` 檔尾追加 `ws.CurrentDirectory` ＋ `ws.Run … -m webapp serve`；抽成獨立 vbs 單獨實跑驗證（APP 起得來、無可見視窗、只綁 loopback）；備份 `.bak-2026-09-07`，`diff` 確認除檔尾 6 行外一個位元組未動 |
+| artifact | ✅ 4 份 | `webapp status`：COHR ready／LYC.AX ready／6324.T blocked（`deliberate_abstention`）／IQE.L blocked（`upstream_unavailable`），全部 `fresh`、`refresh=current` |
+
+### 16.2 最終驗收數字
+
+| | 交付前 | 結案 |
+|---|---|---|
+| pytest | 1,884 passed／1 skipped | **1,989 passed／1 skipped** |
+| 突變非空跑 | 163、空跑 0 | **180、空跑 0** |
+| `audit invariants` | FAIL 0｜PASS 12｜SKIPPED 0 | **FAIL 0｜PASS 12｜SKIPPED 0**（2,100 筆） |
+| golden fixtures | 14/14 | **14/14，漂移 0**（`display_name` 那筆 EXPECTED_CHANGE 已重新擷取） |
+| `git ls-files library/private` | 0 | **0** |
+
+### 16.3 ⚠ 誠實邊界（結案不等於每一格都被驗過）
+
+1. **Access policy 的內容是使用者目視確認的，我沒有驗過。**
+   Access analytics 顯示「1 個使用者、granted 1」——那只證明**你進得來**，
+   **不證明別人進不來**（只有你試過）。這條 gate 至今**沒有被負面案例測試過**（L14 的形狀）。
+   真要驗，得用另一個 Google 帳號開一次無痕視窗看它擋不擋。
+2. **Session Duration 是否兩層都設成 1 個月，未確認。** 症狀（每天要重登）會過幾天才出現，
+   而那時很容易怪錯地方。判準：application 層與 policy 層**都要設**，policy 層會覆寫 application 層。
+3. **Google IdP 是被自動加上的，不是走文件的步驟 0。** 文件的步驟 0 仍然正確且保留，
+   但它現在是「如果沒有被自動加上時該怎麼做」，不是必經路徑。
+4. **只有四檔有 artifact。** 其他公司要看必須先手動 `materialize`——**APP 不會替你補**。
+
+### 16.4 未做（各有去處，不是遺漏）
+
+| 項目 | 去處 |
+|---|---|
+| 全 cohort materialize 排程 | ROADMAP 待排（需先走 sandbox impact review 五步；驗收條件已寫成「artifact 數由 4 變成 N」） |
+| IQE.L 的 blocker 往下走到方法層 | pq2 **[486]**（IQE 流動性／going-concern 評估）。完成後**畫面上的字會自己改變，不需要改任何呈現程式碼** |
+| PWA meta 標籤（iPhone 加入主畫面全螢幕） | 純呈現層，未排程；使用者要就做 |
+| Post-MVP Alpha Edge A–H | 下一站，本 Step 一項未碰 |
+
+### 16.5 判定：**GO — Phase 2 Step 5 結案**
+
+prompt 的 Goal 逐字達成：**iPhone／桌機瀏覽器 → private Cloudflare hostname → Cloudflare Access
+→ StockBot Web App**，點一檔股票直接看到系統已經形成的判讀。
+核心產品 invariant **`LLM changes cognition; APP reads cognition`** 由四種互相獨立的機械證明守著，
+而不是靠自律。四個人工 gate 一個都沒放寬；APP 沒有任何寫入端點。

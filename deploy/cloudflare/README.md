@@ -3,7 +3,11 @@
 > **狀態（2026-09-07 實測）：已上線並可從外部使用。**
 > Access 應用程式、DNS、ingress 三步都已完成；未登入時 `https://stockbot.minatoyukina.uk`
 > 回 **302 導向 Access 登入頁**，登入後可看到判讀清單。既有 `mcp.` 與 `neo4j.` 未受影響。
-> **唯一還沒做的是 Google 登入（步驟 0，可選）**——目前用 Cloudflare 內建的一次性 PIN。
+> **Google 登入也已生效**——Access event analytics 顯示 `Identity provider = google`。
+> ⚠ **不是照下方步驟 0 手動設的**：新版 Cloudflare One 在建立 Access 應用程式的流程中
+> 已自動把 Google 加成 identity provider。**步驟 0 仍然保留**，但它現在的用途是
+> 「沒有被自動加上時該怎麼做」，不是必經路徑。
+> **開機自啟也已完成**（見下方「開機自啟」）。
 >
 > ⚠ **介面名稱：Cloudflare 已把 Zero Trust 主控台改名為 Cloudflare One，側欄整組重排。**
 > 下方路徑是 **2026-09-07 在實際畫面上確認過的**；標「未實地驗證」的那幾條還沒有。
@@ -56,7 +60,11 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 
 ## 部署步驟（步驟 1–3 已於 2026-09-07 完成；步驟 0 可選、尚未做）
 
-### 步驟 0 — Google OAuth（可選但建議；不做就用內建的一次性 PIN）
+### 步驟 0 — Google OAuth ✅ *2026-09-07 實測已生效（由新版介面自動設定，未手動執行本步驟）*
+
+> **先確認你需不需要做這一步。** Cloudflare One → `Insights & Logs → Dashboards →
+> Access event analytics`，看「Identity provider」那一格。若已經是 `google`，
+> 這整段可以跳過。以下是**沒有被自動加上時**的手動程序。
 
 > **兩個都設起來。** Google 是日常入口（一鍵，不用等信），一次性 PIN 是備援
 > （Google 設定壞掉時還進得去）。多一個登入方法不增加風險——原則仍然只允許同一個 email。
