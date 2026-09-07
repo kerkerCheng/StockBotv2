@@ -236,20 +236,35 @@ Cloudflare One → **團隊與資源（Team & Resources）→ 使用者（Users�
 
 ---
 
-## 開機自啟（可選）
+## 開機自啟 ✅ 已完成（2026-09-07）
 
 現有的 `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\stockbotv2-graph-services.vbs`
-已經負責 Neo4j＋cloudflared＋MCP。要讓 APP 也自動起來，在該檔加一行同形的隱藏視窗啟動：
+（原本負責 Neo4j＋cloudflared＋MCP）**已在檔尾追加兩行**，讓 APP 也隨登入啟動：
 
 ```vbs
-' StockBot Web App（read-only；不 materialize、不寫任何 authority）
-WshShell.Run "cmd /c cd /d C:\Users\Cheng\code\StockBotv2 && .venv\Scripts\python.exe -m webapp serve", 0, False
+' StockBot Web App（Phase 2 Step 5，2026-09-07）——read-only serve。
+' 只放 serve，絕對不要放 materialize：那會在每次開機時跑模型、連 Neo4j、讀 private ledger。
+' CurrentDirectory 必須先切到 repo root——python -m webapp 靠 cwd 找到 webapp 套件。
+' 放在最後一行，所以上面三個 Run 不受工作目錄變更影響。
+ws.CurrentDirectory = "C:\Users\Cheng\code\StockBotv2"
+ws.Run """C:\Users\Cheng\code\StockBotv2\.venv\Scripts\python.exe"" -m webapp serve", 0, False
 ```
 
-⚠ **不要**在自啟腳本裡放 `materialize`——那會在每次開機時跑模型、連 Neo4j、讀 private ledger。
-更新判讀應該由你在互動 session 明確執行，或由既有排程機制安排（需先走 sandbox impact review 五步）。
+**三個設計決定：**
 
----
+1. **用 `ws.CurrentDirectory` 而不是 `cmd /c cd /d … &&`。** `python -m webapp` 需要 cwd 是 repo root
+   才找得到 `webapp` 套件；設屬性比多起一個 `cmd.exe` 乾淨。
+2. **放在檔尾。** `CurrentDirectory` 是行程層的狀態，放前面會影響上面三個 `ws.Run`。
+3. **只放 `serve`。** ⚠ **絕對不要在自啟腳本裡放 `materialize`**——那會在每次開機時跑模型、
+   連 Neo4j、讀 private ledger。更新判讀應該由你在互動 session 明確執行。
+
+**驗收（2026-09-07 實跑）：** 把新增的兩行抽成獨立 vbs 單獨執行（不碰 Neo4j／cloudflared／MCP），
+結果——APP 起得來（`/api/v1/health` 回 `ok`）、**沒有任何可見視窗**、
+`Get-NetTCPConnection -LocalPort 8790` 顯示 **`LocalAddress = 127.0.0.1`**（不是 `0.0.0.0`，
+確認安全預設生效）。原檔備份在同目錄 `stockbotv2-graph-services.vbs.bak-2026-09-07`；
+`diff` 確認除了檔尾那 6 行之外**一個位元組都沒動**。
+
+**要停用：** 把那兩行（與上面四行註解）刪掉，或直接還原備份。
 
 ## 安全邊界（分層，與 MCP 同一套思路）
 
