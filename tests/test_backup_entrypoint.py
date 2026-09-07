@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -72,7 +73,42 @@ def test_payload_ok_reports_age_drive_and_verification(tmp_path):
         "backup_id": "20260820T000000Z",
         "drive_status": "uploaded",
         "restore_verified": True,
+        "unbacked_files": 0,
+        "unbacked_sample": [],
     }
+
+
+def test_a_file_created_after_the_last_backup_is_counted_as_not_covered(tmp_path):
+    """⚠ **「N 天前備份」答不出「這幾個檔有沒有被收進去」——那是兩個問題。**
+
+    2026-09-07 實測：alpha 的三本假設 ledger（fair value 223.60 的唯一來源）建立於
+    09-05／09-06，最後一次備份是 09-04。備份年齡只有 3 天看起來很健康，**覆蓋卻是 0**。
+    這正是 L13-2 的形狀：成功與失敗在同一個訊號上同形。
+    """
+    _write_status(
+        tmp_path,
+        {
+            "backup_id": "20260820T000000Z",
+            "created_at": "2026-08-20T00:00:00+00:00",
+            "drive": {"status": "uploaded"},
+            "restore_verification": {"verified_at": "2026-08-20T01:00:00+00:00"},
+        },
+    )
+    ledger = tmp_path / "alpha" / "valuation" / "COHR.jsonl"
+    ledger.parent.mkdir(parents=True, exist_ok=True)
+    ledger.write_text("{}\n", encoding="utf-8")
+    os.utime(ledger, (NOW.timestamp(), NOW.timestamp()))
+    # 備份自己的產物不算——不然這個計數器會恆亮（那是 F-26 記過的形狀）
+    stale_artifact = tmp_path / "backups" / "20260820T000000Z" / "files.zip"
+    stale_artifact.parent.mkdir(parents=True, exist_ok=True)
+    stale_artifact.write_text("x", encoding="utf-8")
+    os.utime(stale_artifact, (NOW.timestamp(), NOW.timestamp()))
+
+    payload = _backup_status_payload(NOW, private_root=tmp_path)
+    assert payload["unbacked_files"] == 1
+    assert payload["unbacked_sample"] == ["alpha/valuation/COHR.jsonl"]
+    line = next(line for line in _render(payload).splitlines() if "最後一次備份" in line)
+    assert "🔴" in line and "1 個 private authority 檔不在這份備份裡" in line
 
 
 def _render(backup_status) -> str:

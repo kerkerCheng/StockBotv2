@@ -216,20 +216,40 @@ def _implied_valuation(
             # forward 相對 trailing 的折價＝市場隱含的盈餘成長。
             # ⚠ 粗略 proxy：它假設本益比不變，而那正是要質疑的東西。
             implied_growth = (consensus.trailing_pe / consensus.forward_pe) - 1.0
-            method_parts.append("implied_growth=trailing_pe/forward_pe-1（假設倍數不變）")
+            # ⚠ forward 是**相對標籤**：公司報完年報它就換一個會計年度，而比值本身看不出來。
+            # 把身分寫進 method——沒有它，讀者無從知道這個「成長」跨的是一年還是兩年
+            # （COHR 在 FY2026 財報後 forward 指 FY2028，對 trailing FY2026 是兩年）。
+            forward_period = (revision or {}).get("forward_period_to")
+            method_parts.append(
+                "implied_growth=trailing_pe/forward_pe-1（假設倍數不變）"
+                f"；forward 會計年度={forward_period or '身分不明（consensus_estimates 無對應列）'}"
+                "——跨幾年由 trailing 與這一年的距離決定，不必然是一年"
+            )
         else:
             # 負的 forward PE＝分析師預估下一年度仍虧損，比值無意義（POET 現值 −43）。
             # 不擋會算出 −2.4 並被讀成「−240%」——一個看起來像資訊、實際什麼都不是的數字。
             # 與 scripts/alpha_expectation_gap.py 的 `pe_forward_nonpositive` 同一條判準。
             method_parts.append("implied_growth=不可算（forward／trailing PE 非正，比值無意義）")
-    if revision:
+    if revision and revision.get("comparable"):
         # Phase 4 的核心：**估計修正與股價變動分開**。原版取 `pe_forward` 的 30 日
         # 變化，而倍數同時被兩者推動，下游無從分辨（L12）。分開之後才問得出 Q4 的
         # 問題——「分析師改了估計，而股價還沒反映」正是 expectation gap 的形狀。
         method_parts.append(
             f"estimate_revision=forward EPS {revision['eps_change']:+.1%}"
             f" vs 股價 {revision['price_change']:+.1%}"
-            f"（{revision['observations']} 個觀測，{revision['from']}→{revision['to']}）"
+            f"（{revision['observations']} 個觀測，{revision['from']}→{revision['to']}"
+            f"，forward 會計年度 {revision.get('forward_period_to')} 兩端一致）"
+        )
+    elif revision:
+        # 2026-09-07：第二個一表兩義——forward 是相對標籤不是會計年度身分。兩端身分不同或
+        # 不明時，比值是「換了一把尺」不是修正。**明說不可比，不退回一個數字**（INV-3）。
+        method_parts.append(
+            f"estimate_revision=not_comparable（{revision.get('not_comparable_reason')}）；"
+            f"同窗口股價 {revision['price_change']:+.1%}——股價沒有會計年度身分問題"
+        )
+        notes.append(
+            "Q4 原料 estimate_revision 不可比：" + str(revision.get("not_comparable_reason"))
+            + "。⚠ 不得把 forward year rollover 讀成 analyst estimate revision 或 Q4 正向證據"
         )
     elif consensus.forward_pe:
         method_parts.append("estimate_revision=不可得（序列太短、起點為 0 或跨越正負號）")

@@ -1818,8 +1818,10 @@ def build_alpha_investment_view(
         _observation("estimate_revision_30d", "forward EPS 30 個觀測修正幅度",
                      c.estimate_revision_30d, authority=A_ESTIMATES, unit="ratio",
                      as_of=cons_as_of, freshness=cons_fresh, evidence_refs=consensus_refs,
-                     method="engine_c.estimates.revision_over：同一標的導出 forward EPS 的序列比值",
-                     missing_reason="序列太短、起點為 0 或跨越正負號——算不出來不是沒修正"),
+                     method="engine_c.estimates.revision_over：同一標的、**同一個 forward 會計年度**"
+                            "導出 forward EPS 的序列比值",
+                     missing_reason="序列太短、起點為 0、跨越正負號，或窗口兩端的 forward 會計年度"
+                                    "身分不明／不相同（rollover）——算不出來不是沒修正"),
     )
     cons_has_snapshot = cons_fresh in ("available", "stale")
     fiscal_periods = sorted({d.dependencies.get("period") if d.dependencies else d.key.rsplit("_", 1)[-1]
@@ -1836,7 +1838,11 @@ def build_alpha_investment_view(
             warnings=("這不是 multi-year consensus earnings model：fiscal_items 只到 provider 的 0y／+1y 兩個年度，"
                       "沒有目標價高低區間、沒有逐位分析師分布；修正歷史只有由 price/pe_forward 導出的序列。",
                       "快照裡的 forward_eps 是 price/pe_forward 導出、revenue_estimate_next_fy 是相對標籤 +1y——"
-                      "兩者都不是會計年度身分明確的共識；同期比較只用 fiscal_items。"),
+                      "兩者都不是會計年度身分明確的共識；同期比較只用 fiscal_items。")
+            + ((f"⚠ 估計修正不可比：{estimate_revision.get('not_comparable_reason')}"
+                f"（同窗口股價 {estimate_revision.get('price_change', 0):+.1%}）。"
+                "forward year rollover 不是 analyst estimate revision，不得當 Q4 正向證據。",)
+               if estimate_revision and not estimate_revision.get("comparable") else ()),
         ),
         items=consensus_items,
         coverage_note=("partial：snapshot（next-FY revenue estimate ＋ forward／trailing PE ＋ EV/Rev ＋ target mean ＋ "
@@ -1880,6 +1886,14 @@ def build_alpha_investment_view(
                method="engine_c.estimates.revision_over：forward EPS 變動與股價變動分開；estimate_vs_price 正值＝估計跑在股價前面",
                evidence_refs=consensus_refs,
                reason="這是 expectation gap 的**原料**，不是 gap 本身")
+         if estimate_revision and estimate_revision.get("comparable") else
+         # ⚠ 不可比不是缺料：序列在、股價變動也算得出來，但兩端不是同一個會計年度的估計。
+         # 用 not_applicable ＋ 原文理由，讓「換了一把尺」不會被讀成「分析師上修」（2026-09-07）。
+         Datum(key="estimate_revision_vs_price", label="估計修正 vs 股價變動（Q4 原料）",
+               value=None, status="not_applicable", basis="none", authority=A_ESTIMATES,
+               reason=f"不可比：{estimate_revision.get('not_comparable_reason')}"
+                      f"（同窗口股價 {estimate_revision.get('price_change', 0):+.1%}）"
+                      "。⚠ forward year rollover 不是 analyst estimate revision，不得當 Q4 正向證據")
          if estimate_revision else
          missing("estimate_revision_vs_price", "估計修正 vs 股價變動（Q4 原料）",
                  "序列太短、起點為 0 或跨越正負號，或本次未取", authority=A_ESTIMATES)),

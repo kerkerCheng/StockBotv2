@@ -120,7 +120,12 @@ def _render_backup_status(backup: Mapping[str, Any]) -> list[str]:
         "Drive ✓" if drive_status == "uploaded" else f"Drive 🔴 {markdown_text(drive_status)}",
         "restore 已驗證" if backup.get("restore_verified") else "restore 🔴 未驗證",
     ]
-    marker = "🔴 " if age > 7 or drive_status != "uploaded" else ""
+    unbacked = int(backup.get("unbacked_files") or 0)
+    if unbacked:
+        sample = "、".join(markdown_text(x) for x in (backup.get("unbacked_sample") or []))
+        notes.append(f"🔴 {unbacked} 個 private authority 檔不在這份備份裡"
+                     + (f"（例：{sample}）" if sample else ""))
+    marker = "🔴 " if age > 7 or drive_status != "uploaded" or unbacked else ""
     return [f"- {marker}最後一次備份：{age} 天前（{'，'.join(notes)}）"]
 
 

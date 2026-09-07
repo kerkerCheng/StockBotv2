@@ -81,13 +81,43 @@ def load_backup_status(
         if isinstance(raw.get("restore_verification"), dict)
         else {}
     )
+    newer, sample = _files_newer_than(private_root, created)
     return {
         "status": "ok",
         "age_days": max(0, (current - created).days),
         "backup_id": str(raw.get("backup_id") or ""),
         "drive_status": str((drive or {}).get("status") or "unknown"),
         "restore_verified": bool((verification or {}).get("verified_at")),
+        # ⚠ 2026-09-07 實測補上：「N 天前備份」答不出「**這幾個檔有沒有被收進去**」。
+        # 當天的實況是 alpha 的三本假設 ledger（fair value 223.60 的唯一來源）建立於
+        # 09-05／09-06，而最後一次備份是 09-04——備份年齡只有 3 天，覆蓋卻是 0。
+        # 兩者是不同的問題，所以是兩個數字（L12）。
+        "unbacked_files": newer,
+        "unbacked_sample": sample,
     }
+
+
+#: 掃描時略過的頂層目錄——與 `scripts/backup_private.py` 的 `EXCLUDE_TOP_DIRS` 對齊
+#: （備份本來就不收它們，算進來會恆亮）。
+_BACKUP_SCAN_SKIP = {"models", "lead_media", "backups", "backups_verify_tmp", "gdrive_oauth"}
+
+
+def _files_newer_than(private_root: Path, moment: datetime) -> tuple[int, list[str]]:
+    """private root 底下有幾個檔在 `moment` 之後才變動過（＝不在最後一份備份裡）。"""
+    cutoff = moment.timestamp()
+    count, sample = 0, []
+    for path in private_root.rglob("*"):
+        try:
+            rel = path.relative_to(private_root)
+            if not path.is_file() or rel.parts[0] in _BACKUP_SCAN_SKIP:
+                continue
+            if path.stat().st_mtime > cutoff:
+                count += 1
+                if len(sample) < 3:
+                    sample.append(rel.as_posix())
+        except OSError:
+            continue
+    return count, sample
 
 
 def fetch_alpha_position_events(

@@ -136,7 +136,8 @@ def _registry() -> tuple[AuditCheck, ...]:
                    "expired_still_scheduled／blocked_without_reason／stalled_over_threshold",
                    run=checks.check_queue_liveness),
         AuditCheck("GateDiscrimination", "INV-5", ("F-26",), "Phase 4",
-                   "每個 gate 的觸發率與清除率——偵測恆亮（近 100%）與恆滅（近 0%）"),
+                   "每個 gate 的觸發率與清除率——偵測恆亮（近 100%）與恆滅（近 0%）",
+                   run=checks.check_gate_discrimination),
         AuditCheck("PointInTime", "INV-6", ("F-27", "F-28", "F-31"), "Phase 6",
                    "實跑 as-of 投影驗它沒漏出未來；published_at 不得晚於 retrieved_at；"
                    "回填的 basis 指得回一手出處",

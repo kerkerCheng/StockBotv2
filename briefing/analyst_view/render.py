@@ -95,11 +95,22 @@ def _slot(panel: AnalystPanel, key: str) -> str:
     return _value_cell(line.datum)
 
 
-def _attention_lines(items: Sequence[RefreshItem], *, header: str | None = "需要重看的研究成果") -> list[str]:
+def _attention_lines(items: Sequence[RefreshItem], *, header: str | None = "需要重看的研究成果",
+                     scope: str | None = None, total: int | None = None) -> list[str]:
+    """⚠ **「無」是一句斷言，它的範圍必須跟著它一起印。**
+
+    2026-09-07 實測：headline 只看 `HEADLINE_ARTIFACTS`，卻印出「需要重看的研究成果：無」，
+    而同一畫面上方寫著 `overall=review_required`——讀者看到的是兩句互相否定的話（L12）。
+    有 `scope` 就一定要寫出範圍，並在有全域計數時寫出「本節之外還有幾項」。
+    """
     prefix = f"{header}：" if header else ""
+    scope_note = f"（範圍：{scope}）" if scope else ""
+    elsewhere = (total - len(items)) if (total is not None) else None
+    tail = (f"；本節之外另有 **{elsewhere}** 項需要動作——見「5.6 需要重看的研究成果」"
+            if elsewhere else "")
     if not items:
-        return [f"- {prefix}**無**（其餘成果 current 或屬歷史）", ""]
-    out = [f"- **{prefix}**"] if header else []
+        return [f"- {prefix}**無**{scope_note}（本節其餘成果 current 或屬歷史）{tail}", ""]
+    out = [f"- **{prefix}**{scope_note}{tail}"] if header else []
     for item in items:
         out.append(f"  - **{item.state}** {markdown_text(item.label)}"
                    f"（`{item.artifact_type}:{item.artifact_id}`）→ {markdown_text(item.required_action)}")
@@ -228,7 +239,8 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
               f"（來源 {markdown_text('、'.join(f'{k}={v}' for k, v in head.source_statuses.items()))}）"
               + (f"｜{markdown_text(head.reason)}" if head.reason else ""), ""]
     lines += _compact_table(_by_role(head, "headline_number", "headline_context"))
-    lines += _attention_lines(head.attention)
+    lines += _attention_lines(head.attention, scope=head.attention_scope,
+                              total=head.attention_total)
     lines += ["- **這個數字不是什麼：**"] + [f"  - {markdown_text(x)}" for x in head.notes] + [""]
 
     # ---- 基本面（Q1／Q2／Q3）---------------------------------------------

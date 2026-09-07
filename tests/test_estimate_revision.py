@@ -5,22 +5,37 @@
 分辨（L12）。分開之後才問得出 Q4 的問題：「分析師上修了，而股價還沒反映」
 正是 expectation gap 的形狀。
 
-實測 2026-09-04（2026-07-08 起的每日快照）：COHR forward EPS **+68.3%** 而股價
-**+0.6%**；同期 AAPL／GOOGL／TSM／MU 幾乎完全同步。**便宜不等於 gap，
-估計與價格脫鉤才是**——這正是 exit criterion 的第二句。
+⚠ **本檔原本引用的實測結論已於 2026-09-07 撤回。** 原文是「COHR forward EPS +68.3%
+而股價 +0.6%——expectation gap 的原型」。實測後那個 +68.3% **不是分析師修正**：
+COHR 在 2026-08-12 公布 FY2026 財報，yfinance 的 forward year 隔天由 FY2027 換成
+FY2028，導出 EPS 一天跳 **+62.3%**（8.21 → 13.59）。整段窗口跨過了那個換尺點。
+
+因此第二層契約在這裡：**forward 是相對標籤，不是會計年度身分。** 只有窗口兩端
+`forward_period_end` 相同才叫修正；身分不明或不同一律 `comparable=False`，
+`eps_change` 是 `None` 不是 0（L11-5：「我算不出來」與「它沒動」是兩個 claim）。
 """
 from __future__ import annotations
 
 import pytest
 
-from engine_c.estimates import forward_eps_from, revision_over
+from engine_c.estimates import (
+    FISCAL_IDENTITY_REL_TOL, attach_forward_period, forward_eps_from, resolve_forward_period,
+    revision_over,
+)
 
 
-def _series(*pairs: tuple[str, float, float]) -> list[dict]:
-    """`(as_of, price, pe_forward)` → provider 序列。"""
+#: 測試序列的預設 forward 會計年度身分。**同一年**才是「修正」的前提；
+#: 想測 rollover 就用 `_series(..., periods=(...))` 明示每一筆的身分。
+SAME_YEAR = "2027-06-30"
+
+
+def _series(*pairs: tuple[str, float, float], periods: tuple[str | None, ...] | None = None) -> list[dict]:
+    """`(as_of, price, pe_forward)` → provider 序列（預設全部同一個 forward 會計年度）。"""
+    ends = periods if periods is not None else (SAME_YEAR,) * len(pairs)
+    assert len(ends) == len(pairs)
     return [
-        {"as_of": d, "forward_eps": forward_eps_from(px, pe), "price": px}
-        for d, px, pe in pairs
+        {"as_of": d, "forward_eps": forward_eps_from(px, pe), "price": px, "forward_period_end": end}
+        for (d, px, pe), end in zip(pairs, ends)
     ]
 
 
@@ -72,7 +87,7 @@ def test_estimate_and_price_are_reported_separately() -> None:
     series = _series(("2026-07-08", 100.0, 20.0), ("2026-09-03", 100.0, 10.0))
     result = revision_over(series, sessions=30)
 
-    assert result is not None
+    assert result is not None and result["comparable"] is True
     assert result["eps_change"] == pytest.approx(1.0)
     assert result["price_change"] == pytest.approx(0.0)
     assert result["estimate_vs_price"] == pytest.approx(1.0)
@@ -247,3 +262,93 @@ def test_absent_observation_stays_none_and_does_not_fall_back_to_margins() -> No
 
     assert snapshot.segment_revenue_share is None
     assert snapshot.revenue_ttm == 1000.0, "其餘欄位照常，缺的只有分部資料"
+
+
+# ---------------------------------------------------------------------------
+# forward year rollover：第二個一表兩義（2026-09-07 實測後補）
+#
+# yfinance 的 `forwardPE` 指「下一個會計年度」——那是**相對於抓取日的標籤**，公司一
+# 報完年報就換一年，而序列本身完全看不出來。COHR 2026-08-13 一天跳 +62.3%。
+# 這一組守的是：換尺不得被讀成修正，而且**不用幅度門檻去猜**（那本身是未經量測的
+# gate，L14）——身分由 consensus_estimates 的值反查，查不到就 fail closed。
+# ---------------------------------------------------------------------------
+
+def test_a_window_that_crosses_the_forward_year_is_not_comparable() -> None:
+    """跨 rollover 的窗口：`comparable=False`，`eps_change` 是 None 不是 +62%。"""
+    series = _series(
+        ("2026-08-12", 327.0, 39.88),        # forward EPS ≈ 8.2（FY2027）
+        ("2026-08-13", 327.23, 24.08),       # forward EPS ≈ 13.6（FY2028）← 換尺
+        periods=("2027-06-30", "2028-06-30"),
+    )
+    result = revision_over(series, sessions=30)
+
+    assert result is not None
+    assert result["comparable"] is False
+    assert result["eps_change"] is None, "換一把尺不是修正——不得回報一個 +62% 的『上修』"
+    assert result["estimate_vs_price"] is None
+    assert "2027-06-30" in str(result["not_comparable_reason"])
+    assert "2028-06-30" in str(result["not_comparable_reason"])
+    # 股價沒有會計年度身分問題，那一腿仍然給
+    assert result["price_change"] == pytest.approx(327.23 / 327.0 - 1.0)
+
+
+def test_unknown_fiscal_identity_fails_closed_rather_than_assuming_no_rollover() -> None:
+    """身分不明＝不知道有沒有換尺。**不得假設沒換**——那是拿沉默當同意。
+
+    這正是 COHR 的實況：`consensus_estimates` 只從 2026-09-04 起有列，窗口起點
+    2026-08-04 沒有可反查的身分，所以整個 +68.3% 是不可比的。
+    """
+    series = _series(
+        ("2026-08-04", 288.0, 35.1),
+        ("2026-09-04", 281.86, 20.2),
+        periods=(None, "2028-06-30"),
+    )
+    result = revision_over(series, sessions=30)
+
+    assert result is not None and result["comparable"] is False
+    assert result["eps_change"] is None
+    assert "2026-08-04" in str(result["not_comparable_reason"])
+    assert "身分不明" in str(result["not_comparable_reason"])
+
+
+def test_same_forward_year_is_still_a_real_revision() -> None:
+    """收緊不得把真的修正也擋掉——同一個會計年度的兩點照常回報。"""
+    series = _series(("2026-09-01", 100.0, 20.0), ("2026-09-04", 100.0, 10.0))
+    result = revision_over(series, sessions=30)
+
+    assert result is not None and result["comparable"] is True
+    assert result["eps_change"] == pytest.approx(1.0)
+    assert result["forward_period_from"] == result["forward_period_to"] == SAME_YEAR
+
+
+def test_identity_is_resolved_by_matching_the_value_not_by_guessing() -> None:
+    """身分反查是**值比對**：導出 EPS 必須等於某一年的共識估計才算命中。
+
+    對不上任何一年 → None（不知道）。⚠ 刻意不做「最接近的那一年」——最接近永遠
+    有一個答案，於是「不知道」這個狀態就消失了（L12：一個表示兩種語意）。
+    """
+    candidates = [("2027-06-30", 9.41634), ("2028-06-30", 13.95531)]
+    assert resolve_forward_period(13.9553, candidates) == "2028-06-30"
+    assert resolve_forward_period(9.4163, candidates) == "2027-06-30"
+    assert resolve_forward_period(11.5, candidates) is None, "落在兩年中間＝不知道，不是就近取一年"
+    assert resolve_forward_period(None, candidates) is None
+    assert resolve_forward_period(13.9553, []) is None, "沒有候選＝身分不明"
+
+
+def test_the_tolerance_absorbs_rounding_but_cannot_swap_two_adjacent_years() -> None:
+    """容差只吸收四捨五入。COHR 相鄰兩年差 48%，遠大於 1e-3——不可能互相冒充。"""
+    assert FISCAL_IDENTITY_REL_TOL <= 1e-2
+    candidates = [("2027-06-30", 9.41634), ("2028-06-30", 13.95531)]
+    nudged = 9.41634 * (1 + FISCAL_IDENTITY_REL_TOL * 0.5)
+    assert resolve_forward_period(nudged, candidates) == "2027-06-30"
+    assert resolve_forward_period(9.41634 * 1.05, candidates) is None
+
+
+def test_attach_forward_period_leaves_unknown_days_as_none() -> None:
+    """身分表沒有那天的列 → `None`，不是沿用前一天（沿用會讓 rollover 隱形）。"""
+    series = [{"as_of": "2026-08-04", "forward_eps": 8.2, "price": 288.0},
+              {"as_of": "2026-09-04", "forward_eps": 13.9553, "price": 281.86}]
+    identity = {"2026-09-04": [("2027-06-30", 9.41634), ("2028-06-30", 13.95531)]}
+    out = attach_forward_period(series, identity)
+    assert out[0]["forward_period_end"] is None
+    assert out[1]["forward_period_end"] == "2028-06-30"

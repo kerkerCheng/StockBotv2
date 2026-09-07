@@ -18,7 +18,9 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
-from engine_c.estimates import forward_eps_from, revision_over
+from engine_c.estimates import (
+    attach_forward_period, forward_eps_from, forward_period_candidates, revision_over,
+)
 
 from ..contracts import (
     ConsensusSnapshot, EvidenceRef, FreshnessState, FundamentalsSnapshot, MarketSnapshot,
@@ -40,12 +42,15 @@ class EngineCFundamentalsProvider:
 
     conn: Any = None
 
-    def _cursor(self):
+    def _conn(self):
         if self.conn is None:
             from engine_c.db import get_conn
 
             self.conn = get_conn()
-        return self.conn.cursor()
+        return self.conn
+
+    def _cursor(self):
+        return self._conn().cursor()
 
     # ---- 內部：取 as-of 之前的最新一筆快照 --------------------------------
     def _snapshot_row(self, ticker: Ticker, as_of: date | None) -> Mapping[str, Any] | None:
@@ -183,8 +188,10 @@ class EngineCFundamentalsProvider:
                 revenue_estimate_next_fy=_num(row.get("revenue_estimate_next_fy")),
                 revenue_estimate_next_fy_growth=_num(
                     row.get("revenue_estimate_next_fy_growth")),
+                # ⚠ 只有**同一個 forward 會計年度**的兩點才叫修正；不可比一律 None（不是 0）。
+                # 完整原因在 `estimate_revision()` 的 payload 裡（`not_comparable_reason`）。
                 estimate_revision_30d=(
-                    revision["eps_change"] if revision else None  # type: ignore[index]
+                    revision["eps_change"] if revision and revision.get("comparable") else None  # type: ignore[index]
                 ),
                 evidence=(self._ref(ticker, row, "engine_c_snapshot"),),
             ),
@@ -461,6 +468,10 @@ class EngineCFundamentalsProvider:
             for r in cur.fetchall()
             if (eps := forward_eps_from(r[1], r[2])) is not None
         ]
+        # ⚠ 先把 forward 會計年度身分補上再算修正——沒有身分就沒有「同一年的修正」這回事。
+        # yfinance 的 forward 是相對標籤，公司報完年報就換一年（COHR 2026-08-13 一天跳 +62.3%）。
+        series = attach_forward_period(
+            series, forward_period_candidates(self._conn(), str(ticker), as_of=anchor))
         return revision_over(series, sessions=sessions)
 
 

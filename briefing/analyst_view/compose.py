@@ -165,6 +165,8 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
         source_sections=("implied_return", "valuation", "refresh_status"),
         source_statuses=statuses, lines=numbers + context_lines,
         attention=_attention(view, artifact_types=HEADLINE_ARTIFACTS),
+        attention_scope="只列頭條這幾格自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",
+        attention_total=len(_attention(view)),
         notes=ir.is_not,
         context={"period": ir.period, "period_end": ir.period_end,
                  "accounting_basis": va.accounting_basis,
@@ -199,7 +201,9 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("internal_fundamentals", "consensus", "expectation_gap"),
         source_statuses=statuses, lines=lines,
-        notes=(cs.coverage_note,) + inf.meta.warnings,
+        # ⚠ 共識段的 warnings 也要進來：「forward 是相對標籤不是會計年度身分」這條警告
+        # 正是 2026-09-07 rollover 污染事故的判準，藏在 section 裡等於沒有（INV-3）。
+        notes=(cs.coverage_note,) + inf.meta.warnings + cs.meta.warnings,
         context={"period": inf.period, "period_end": inf.period_end,
                  "base_period_end": inf.base_period_end, "accounting_basis": inf.accounting_basis,
                  "same_period_rule": "只有同期、同口徑、同幣別的共識才與內部相減；其他期間只呈現，不比較"},
@@ -269,7 +273,7 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
         source_sections=("variant_view", "falsification", "catalysts", "refresh_status"),
         source_statuses=statuses, lines=lines,
         catalysts=ct.structured, checkpoints=ct.checkpoints, disproofs=fs.conditions,
-        attention=_attention(view), risks=vv.risks,
+        attention=_attention(view), attention_total=len(_attention(view)), risks=vv.risks,
         notes=tuple(ct.problems) + tuple(rs.notes),
         context={"has_signal": signal.has_signal, "judged_at": signal.judged_at,
                  "is_incomplete": signal.is_incomplete, "known_axes": list(signal.known_axes),
@@ -380,7 +384,8 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),
                                change_detection=rs.change_detection,
                                judged_context_matches=rs.judged_context_matches,
-                               attention=_attention(view), notes=rs.notes),
+                               attention=_attention(view),
+                               notes=rs.notes),
         limits=_limits(view), warnings=view.warnings,
     )
 

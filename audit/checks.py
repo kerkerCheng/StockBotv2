@@ -687,6 +687,117 @@ def _projection_leaks() -> list[str]:
     return leaks
 
 
+# ---------------------------------------------------------------------------
+# INV-5 — GateDiscrimination
+# ---------------------------------------------------------------------------
+
+#: 恆亮門檻：觸發率高到這個地步的 gate 幾乎不鑑別任何東西（F-26 的「恆亮」）。
+GATE_ALWAYS_ON = 0.95
+#: 不會滅門檻：曾經響過、而且**之後還有過評估**的 cohort 裡，清除率低到這個地步
+#: 就不是閘門是牆（F-26 的「不會滅」）。
+GATE_NEVER_CLEARS = 0.05
+#: 樣本地板。⚠ 這兩個數字是為了**不讓本 audit 自己變成恆亮閘門**：3 個 cohort 的
+#: 0% 清除率什麼都不代表（2026-09-07 實測：identity_unresolved 的 9 個 cohort 有 6 個
+#: 只被評估過一次，根本沒有清除的機會）。樣本不足一律報 insufficient_data，不判好壞。
+GATE_MIN_ASSESSMENTS = 30
+GATE_MIN_COHORTS = 5
+
+
+def check_gate_discrimination() -> AuditResult:
+    """每個 gate 的**觸發率**與**清除率**——偵測恆亮（近 100%）與不會滅（近 0%）。
+
+    F-26 的教訓是 `axis_ceiling` 這種「從未被驗證卻在決定資本」的機制；那一層已整組
+    移除，但 gate 本身沒有消失——現在真正在擋研究流程的是 coverage／paper／live 三條
+    lane 的 blocker。它們有 269 份帶時戳的 assessment，**是可以被量的**。
+
+    兩個率的分母刻意不同，因為它們問的是不同的問題：
+
+    - **觸發率** = 出現在幾份 assessment 裡 ÷ 全部 assessment。近 100% ＝零鑑別力。
+    - **清除率** = 曾經響過、**且之後還有過評估**的 cohort 裡有幾個後來不再響。
+      ⚠ 分母必須是「有機會被清除的」——用「曾經響過」當分母會把「只被評估過一次」
+      算成「從未清除」，那是把沒發生讀成失敗（L13-2）。
+
+    ⚠ 本 check 自己也受 INV-5 約束：樣本不足的 gate 一律 `insufficient_data` 並列進
+    findings，**不當作通過**；未登記在 `config/decision_blockers.json` 的 code 也是
+    finding（L16：有行為後果的字彙必須被強制）。
+    """
+    def run() -> AuditResult:
+        from shared.blockers import get_blocker_registry
+
+        history = sources.coverage_gate_history()
+        registry = get_blocker_registry()
+        total = len(history)
+        by_cohort: dict[str, list[dict]] = {}
+        for row in history:
+            by_cohort.setdefault(str(row["cohort_id"]), []).append(row)
+
+        findings: list[str] = []
+        thin: list[str] = []
+        measured = 0
+        for lane in ("coverage", "paper", "live"):
+            fired: dict[str, int] = {}
+            opportunity: dict[str, set[str]] = {}
+            cleared: dict[str, set[str]] = {}
+            for row in history:
+                for gate in row["lanes"][lane]:
+                    fired[gate] = fired.get(gate, 0) + 1
+            for cohort, sequence in by_cohort.items():
+                lanes = [r["lanes"][lane] for r in sequence]
+                for index, gates in enumerate(lanes):
+                    later = lanes[index + 1:]
+                    if not later:
+                        continue                       # 沒有後續評估＝沒有清除的機會
+                    for gate in gates:
+                        opportunity.setdefault(gate, set()).add(cohort)
+                        if any(gate not in future for future in later):
+                            cleared.setdefault(gate, set()).add(cohort)
+            for gate, count in sorted(fired.items(), key=lambda kv: -kv[1]):
+                measured += 1
+                name = f"{lane}:{gate}"
+                if not registry.is_registered(gate):
+                    findings.append(
+                        f"{name} 不在 config/decision_blockers.json——"
+                        "有行為後果的字彙未登記，打錯不會報錯只會靜默沉底（L16）")
+                trigger = count / total
+                chances = len(opportunity.get(gate, ()))
+                clears = len(cleared.get(gate, ()))
+                if total >= GATE_MIN_ASSESSMENTS and trigger >= GATE_ALWAYS_ON:
+                    findings.append(
+                        f"{name} 恆亮：{count}/{total}（{trigger:.1%}）份 assessment 都在響"
+                        "——零鑑別力，它不是閘門是行政流程")
+                if chances >= GATE_MIN_COHORTS and (clears / chances) <= GATE_NEVER_CLEARS:
+                    findings.append(
+                        f"{name} 不會滅：{chances} 個有機會清除的 cohort 只清掉 {clears} 個"
+                        f"（{clears / chances:.1%}）——那是牆不是閘門")
+                if chances < GATE_MIN_COHORTS:
+                    thin.append(f"{name}（觸發 {trigger:.1%}，只有 {chances} 個 cohort 有清除機會）")
+        judged = measured - len(thin)
+        if thin:
+            findings.append(
+                f"⚠ {len(thin)}/{measured} 個 gate 樣本不足，清除率無從判斷（"
+                f"<{GATE_MIN_COHORTS} 個 cohort 有過後續評估）——**不當作通過也不當作失敗**："
+                + "、".join(sorted(thin)[:8]) + ("…" if len(thin) > 8 else ""))
+        real = [f for f in findings if not f.startswith("⚠ ")]
+        if real:
+            return fail("GateDiscrimination",
+                        f"{len(real)} 個 gate 沒有鑑別力（恆亮／不會滅／未登記）",
+                        _clip([*real, *[f for f in findings if f.startswith("⚠ ")]], len(findings)),
+                        measured)
+        if judged == 0:
+            # ⚠ 模組 docstring ③ 的同一條規則：一個**一個 gate 都判不動**的鑑別力檢查，
+            # 鑑別力自己就是零。它會在報表上顯示成綠色的 PASS——那正是本 audit 要防的形狀。
+            return skip("GateDiscrimination",
+                        f"{measured} 個 gate 全部樣本不足（都 <{GATE_MIN_COHORTS} 個 cohort 有過"
+                        f"後續評估）——觸發率量得到，清除率一個都量不到，不足以宣稱通過")
+        return ok("GateDiscrimination",
+                  f"三條 lane {measured} 個 gate 量過觸發率、其中 {judged} 個樣本夠也量得出清除率"
+                  f"（{total} 份 assessment、{len(by_cohort)} 個 cohort）："
+                  f"沒有恆亮（≥{GATE_ALWAYS_ON:.0%}）也沒有不會滅（≤{GATE_NEVER_CLEARS:.0%}）的",
+                  measured, _clip(findings))
+
+    return _guard("GateDiscrimination", run)
+
+
 def check_decision_lineage() -> AuditResult:
     """每一筆 decision 的 `context_digest` 都要在 `context_bundles` 裡找得到。
 

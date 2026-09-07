@@ -8,6 +8,8 @@ from __future__ import annotations
 from dataclasses import replace
 from datetime import date
 
+import json
+
 import pytest
 
 from alpha.context import build_research_context, structural_score
@@ -290,6 +292,42 @@ def test_unresolvable_evidence_reference_is_rejected() -> None:
     judgment["axes"]["value_capture"]["evidence"] = ["graph://assertion/i_made_this_up"]
     with pytest.raises(ContractViolation, match="不在 ResearchContext"):
         compose_signal(_build(), judgment)
+
+
+def test_an_out_of_scope_reference_is_named_as_a_layer_error_not_as_laundering() -> None:
+    """⚠ 兩種失敗必須分開講（L12）。
+
+    2026-09-07 事發：Q4 重判想引用「內部 EPS vs 同期共識」的數值落差，而
+    `ResearchContext.evidence_refs` 解析不到 `engine_c://consensus_estimate/*`——
+    錯誤訊息卻寫成「引用了不在 ResearchContext 裡的證據」，與真正的 authority
+    laundering 完全同形。**「這個 ref 不存在」與「這個 ref 存在但不屬於這一層」
+    是兩個 claim**，混成一句話會讓層級錯誤看起來像作弊，也會讓作弊藏進層級錯誤。
+
+    邊界本身不放寬（`ResearchContext` 先建、模型層後擴充是單向的），
+    但它必須說得出「那東西住哪」。
+    """
+    judgment = _judgment()
+    judgment["axes"]["expectation_gap"]["evidence"] = [
+        "engine_c://consensus_estimate/COHR/eps/2027-06-30"]
+    with pytest.raises(ContractViolation) as excinfo:
+        compose_signal(_build(), judgment)
+    message = str(excinfo.value)
+    assert "層級錯誤" in message
+    assert "alpha://fundamental/compare" in message
+    assert "不在 ResearchContext" not in message
+
+
+def test_the_packet_declares_what_its_evidence_index_does_not_cover() -> None:
+    """涵蓋邊界要在 packet 裡**被宣告**，不是讓寫判斷的人撞牆才知道。"""
+    from alpha.models.session_assessor import EVIDENCE_SCOPE, build_packet
+
+    packet = json.loads(build_packet(_build()).to_json())
+    scope = packet["evidence_scope"]
+    assert scope["in_scope_prefixes"] == list(EVIDENCE_SCOPE["in_scope_prefixes"])
+    assert "engine_c://consensus_estimate/" in scope["out_of_scope"]
+    assert "engine_c://manual_observation/" in scope["out_of_scope"]
+    # 每一條「不涵蓋」都必須說出它住哪——只說「不行」等於沒說
+    assert all(len(str(v)) > 20 for v in scope["out_of_scope"].values())
 
 
 def test_level_without_evidence_is_rejected() -> None:

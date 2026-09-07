@@ -180,6 +180,13 @@ class AnalystPanel:
     disproofs: tuple[DisproofItem, ...] = ()
     evidence: tuple[EvidenceItem, ...] = ()
     attention: tuple[RefreshItem, ...] = ()
+    #: `attention` 被篩過時，這裡逐字寫出**篩到剩下什麼**；`None`＝沒篩，就是全部。
+    #: ⚠ 2026-09-07 實測到的呈現陷阱：headline 只列 `HEADLINE_ARTIFACTS`，卻印出
+    #: 「需要重看的研究成果：無」——那是一句全域斷言配一個局部範圍，與同一畫面上的
+    #: `overall=review_required` 直接矛盾（L12：一個表示兩種語意）。
+    attention_scope: str | None = None
+    #: 整份 view 有幾項需要動作（不分 section）。有 scope 時，讀者必須看得到「本節之外還有幾項」。
+    attention_total: int | None = None
     risks: tuple[str, ...] = ()
     notes: tuple[str, ...] = ()
     context: Mapping[str, Any] = field(default_factory=dict)

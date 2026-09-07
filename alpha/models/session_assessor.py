@@ -29,7 +29,7 @@ L15 的順序不可反：先解析身分，再查權限。**LLM 可以解析與�
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Mapping, Sequence
 
@@ -101,6 +101,8 @@ class JudgmentPacket:
     axis_prompts: Mapping[str, Mapping[str, str]]
     schema: Mapping[str, Any]
     notes: tuple[str, ...]
+    #: 這份索引**涵蓋到哪裡、不涵蓋什麼、不涵蓋的住哪裡**。見 `EVIDENCE_SCOPE`。
+    evidence_scope: Mapping[str, Any] = field(default_factory=lambda: EVIDENCE_SCOPE)
 
     def to_json(self) -> str:
         return json.dumps({
@@ -109,12 +111,14 @@ class JudgmentPacket:
                 "2) 對 axis_prompts 的四個問題各給一個判斷；"
                 "3) 每個判斷的 evidence 必須是 evidence_index 的 key——"
                 "**不在索引裡的引用會被 reject**（L15：先解析身分，再查權限）；"
+                "索引涵蓋到哪裡看 evidence_scope，**不涵蓋的東西那裡會告訴你它住哪**；"
                 "4) 答不出來就填 unknown，**不要猜**——unknown 與 weak 是不同的資訊。"
             ),
             "ticker": self.ticker, "company_id": self.company_id,
             "as_of": self.as_of, "context_digest": self.context_digest,
             "deterministic": self.deterministic,
             "evidence_index": self.evidence_index,
+            "evidence_scope": self.evidence_scope,
             "axis_prompts": self.axis_prompts,
             "judgment_schema": self.schema,
             "notes": list(self.notes),
@@ -145,6 +149,49 @@ JUDGMENT_SCHEMA: Mapping[str, Any] = {
         "action_within_48h": "L7 必填：觸發後 48 小時內做什麼",
     }],
 }
+
+
+#: **ResearchContext 的證據涵蓋邊界，明示成契約**（2026-09-07，Step 4 稽核後補）。
+#:
+#: 事發：Q4 重判時想引用「內部 EPS vs 同期共識」的數值落差，卻發現
+#: `ResearchContext.evidence_refs` 解析不到 `engine_c://consensus_estimate/*` 與
+#: `engine_c://manual_observation/*`——於是「這個引用不合法」與「這個引用不屬於這一層」
+#: 長成同一個錯誤訊息（L12）。
+#:
+#: 它**不是 coverage hole，是建構順序決定的邊界**：`ResearchContext` 必須先建好，
+#: 財務模型才拿它當 `evidence_index` 的底去擴充（`alpha/fundamental/model.py` §2）。
+#: 反過來把模型層的 ref 灌回 context 會是一個循環。
+#:
+#: 所以邊界維持原樣，但**必須說出來**：軸判斷只能引用結構與快照層；
+#: 期間別共識與人工觀測住模型層，它們的 provenance 由 `alpha://fundamental/compare`
+#: 這個成果自己帶（AlphaInvestmentView §4.6 的證據索引已經列得出來，**不是第二份
+#: evidence authority**——同一批 `EvidenceRef` 物件，只是索引在模型層做了 superset 擴充）。
+EVIDENCE_SCOPE: Mapping[str, Any] = {
+    "in_scope_prefixes": ("graph://edge/", "graph://source/", "graph://claim/",
+                          "engine_c://financial_snapshot/"),
+    "out_of_scope": {
+        "engine_c://consensus_estimate/": (
+            "期間別共識住財務模型層。Q4 是 ordinal 判斷；要引用數值落差請引用成果"
+            "`alpha://fundamental/compare`（它自己帶共識 ref），**不要把共識當成 Q4 的證據**"
+            "——那會把一個 numeric gap 直接映射成 ordinal 分數，兩者是不同的 authority。"),
+        "engine_c://manual_observation/": (
+            "人工觀測（實際值／指引／分部）住財務模型層與假設 ledger；"
+            "軸判斷要用它請改由 `alpha://fundamental/*` 的成果引用。"),
+        "alpha://": (
+            "模型成果不是原始證據。軸判斷引用成果會讓 provenance 變成循環"
+            "（成果的輸入是判斷，判斷的證據又是成果）。"),
+    },
+    "why": ("ResearchContext 先建、模型層後擴充（單向）；把模型層的 ref 灌回 context 是循環。"
+            "邊界寫在這裡是為了讓「引用不合法」與「引用不屬於這一層」不再同形。"),
+}
+
+
+def out_of_scope_hint(ref: str) -> str | None:
+    """這個 ref 是**已知但不屬於本層**的嗎？是就回那句該去哪裡的話。"""
+    for prefix, hint in EVIDENCE_SCOPE["out_of_scope"].items():
+        if ref.startswith(prefix):
+            return f"{ref} → {hint}"
+    return None
 
 
 def build_packet(build: Any) -> JudgmentPacket:
@@ -201,6 +248,7 @@ def build_packet(build: Any) -> JudgmentPacket:
         axis_prompts=AXIS_PROMPTS,
         schema=JUDGMENT_SCHEMA,
         notes=tuple(build.notes),
+        evidence_scope=EVIDENCE_SCOPE,
     )
 
 
@@ -285,6 +333,15 @@ def compose_signal(
             ref = index.get(str(raw))
             (resolved.append(ref) if ref is not None else missing.append(str(raw)))
         if missing:
+            # ⚠ 兩種失敗必須分開講（L12）：「這個 ref 不存在」與「這個 ref 存在但不屬於
+            # 這一層」是不同的事，混成一句會讓真正的 laundering 藏在合法的層級錯誤裡。
+            hints = [h for h in (out_of_scope_hint(ref) for ref in missing) if h]
+            if hints:
+                raise ContractViolation(
+                    f"{axis} 引用了**不屬於軸判斷這一層**的證據：{hints[0]}"
+                    f"（共 {len(hints)} 條）。這不是引用錯誤也不是 laundering，是層級錯誤——"
+                    "邊界見 packet 的 evidence_scope；**不得為此放寬解析**"
+                )
             raise ContractViolation(
                 f"{axis} 引用了不在 ResearchContext 裡的證據：{missing[:3]}。"
                 "⚠ 不得放寬解析——那會讓引用去尋找能通過的權威（L15／L8）"

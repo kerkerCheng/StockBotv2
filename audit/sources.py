@@ -178,6 +178,39 @@ def decision_rows(sql: str, *params: Any) -> list[dict]:
         return [dict(row) for row in store._conn.execute(sql, params)]  # noqa: SLF001
 
 
+def coverage_gate_history() -> list[dict]:
+    """每一份 coverage assessment 的三條 lane blockers，依時序排好。
+
+    這是 `GateDiscrimination`（INV-5）唯一的資料源：**gate 實際上有沒有響過、響完
+    有沒有被清掉**，只有這張表答得出來。schema 讀不到就丟例外（不回空 list）。
+    """
+    rows = decision_rows(
+        "select assessment_id, cohort_id, created_at, blockers_json, "
+        "       paper_blockers_json, live_blockers_json "
+        "from coverage_assessments order by created_at, assessment_id")
+    if not rows:
+        raise SourceUnavailable("coverage_assessments 沒有任何列——gate 從未被評估過")
+    out: list[dict] = []
+    for row in rows:
+        lanes: dict[str, frozenset[str]] = {}
+        for lane, column in (("coverage", "blockers_json"), ("paper", "paper_blockers_json"),
+                             ("live", "live_blockers_json")):
+            raw = row.get(column)
+            try:
+                items = (json.loads(raw) or {}).get("items") if raw else []
+            except json.JSONDecodeError as exc:
+                raise SourceUnavailable(
+                    f"assessment {row.get('assessment_id')} 的 {column} 不是合法 JSON：{exc}") from exc
+            if items is None:
+                items = []
+            if not isinstance(items, list):
+                raise SourceUnavailable(f"{column}.items 不是 list——schema 變了")
+            lanes[lane] = frozenset(str(x) for x in items)
+        out.append({"assessment_id": row.get("assessment_id"), "cohort_id": row.get("cohort_id"),
+                    "created_at": row.get("created_at"), "lanes": lanes})
+    return out
+
+
 # ---------------------------------------------------------------------------
 # 已產出的 AlphaSignal（private）
 # ---------------------------------------------------------------------------

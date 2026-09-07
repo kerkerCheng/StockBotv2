@@ -12,6 +12,7 @@ from __future__ import annotations
 import ast
 import json
 import re
+from dataclasses import replace
 from datetime import date
 from pathlib import Path
 from typing import Any, Iterator
@@ -19,7 +20,7 @@ from typing import Any, Iterator
 import pytest
 
 from alpha.contracts import FORBIDDEN_POSITION_TOKENS
-from briefing.alpha_view.contracts import AlphaInvestmentView, Datum
+from briefing.alpha_view.contracts import AlphaInvestmentView, Datum, RefreshItem
 from briefing.analyst_view import (
     CORE_PANELS, OPTIONAL_PANELS, QUESTIONS, SCHEMA_VERSION, AnalystLine,
     AnalystViewContractViolation, build_analyst_view, render_analyst_view_markdown,
@@ -256,7 +257,33 @@ def test_review_required_upstream_surfaces_in_readiness_attention_and_markdown()
 def test_clean_state_says_nothing_needs_action_instead_of_staying_silent() -> None:
     analyst = build_analyst_view(_full_view(with_criterion=True))
     text = render_analyst_view_markdown(analyst)
-    assert "無**（其餘成果 current 或屬歷史）" in text
+    assert "無**（範圍：" in text and "本節其餘成果 current 或屬歷史" in text
+
+
+def test_headline_no_attention_states_its_scope_and_the_count_outside_it() -> None:
+    """「無」是一句斷言，它的**範圍**必須跟著印。
+
+    2026-09-07 實測（`--scenario fiscal_rollover`）：畫面上方寫 `overall=review_required`，
+    頭條卻寫「需要重看的研究成果：無」——兩句互相否定。原因是頭條只看
+    `HEADLINE_ARTIFACTS`，卻用一句全域措辭把它說出來（L12：一個表示兩種語意）。
+    """
+    from briefing.analyst_view.compose import HEADLINE_ARTIFACTS
+
+    view = _full_view(with_criterion=True)
+    outside = RefreshItem(artifact_type="axis", artifact_id="expectation_gap", label="Q4 預期落差",
+                          state="review_required", reasons=("consensus 變了",), changed_refs=(),
+                          dependency_refs=(), detected_at=None, established_at=None,
+                          required_action="reassess in a session", propagated_from=(), kind="judgment")
+    view = replace(view, refresh_status=replace(view.refresh_status, overall="review_required",
+                                                items=(*view.refresh_status.items, outside)))
+    analyst = build_analyst_view(view)
+    assert analyst.headline.attention == ()                       # 頭條那幾格確實乾淨
+    assert analyst.headline.attention_scope is not None
+    assert all(t in analyst.headline.attention_scope for t in HEADLINE_ARTIFACTS)
+    assert analyst.headline.attention_total == 1                  # 但整份 view 有 1 項
+
+    text = render_analyst_view_markdown(analyst)
+    assert "本節之外另有 **1** 項需要動作" in text
 
 
 # ---------------------------------------------------------------------------

@@ -1460,6 +1460,85 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_analyst_view.py::test_unknown_axis_is_listed_as_unknown_not_as_a_passing_grade",
         guards="未知不是「沒問題」——把未知軸藏起來會讓畫面看起來比實際完整",
     ),
+    # --- Step 4 full-chain adversarial acceptance（2026-09-07）-------------
+    Mutation(
+        name="跨會計年度的 forward EPS 照樣當成分析師修正",
+        path="engine_c/estimates.py",
+        old="    if id0 != id1:",
+        new="    if False:",
+        test=("tests/test_estimate_revision.py::"
+              "test_a_window_that_crosses_the_forward_year_is_not_comparable"),
+        guards=("forward 是相對標籤不是會計年度身分：COHR 2026-08-13 換尺讓導出 EPS 一天跳 "
+                "+62.3%，被讀成「分析師上修 +68.3%」＝一個完全錯誤的 Q4 正向證據"),
+    ),
+    Mutation(
+        name="身分不明時假設沒有換過尺",
+        path="engine_c/estimates.py",
+        old="    if id0 is None or id1 is None:",
+        new="    if False:",
+        test=("tests/test_estimate_revision.py::"
+              "test_unknown_fiscal_identity_fails_closed_rather_than_assuming_no_rollover"),
+        guards="「我不知道有沒有換尺」不得被當成「沒換」——那是拿沉默當同意（L11-5）",
+    ),
+    Mutation(
+        name="會計年度身分改成就近取一年",
+        path="engine_c/estimates.py",
+        old="    return hits[0] if len(hits) == 1 else None",
+        new=("    return hits[0] if len(hits) == 1 else (\n"
+             "        min(candidates, key=lambda c: abs(forward_eps - c[1]))[0] if candidates else None)"),
+        test=("tests/test_estimate_revision.py::"
+              "test_identity_is_resolved_by_matching_the_value_not_by_guessing"),
+        guards="就近取一年永遠有答案，於是「不知道」這個狀態消失（L12：一個表示兩種語意）",
+    ),
+    Mutation(
+        name="頭條用全域措辭講一句局部範圍的「無」",
+        path="briefing/analyst_view/compose.py",
+        old='        attention_scope="只列頭條這幾格自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",',
+        new="        attention_scope=None,",
+        test=("tests/test_analyst_view.py::"
+              "test_headline_no_attention_states_its_scope_and_the_count_outside_it"),
+        guards=("`overall=review_required` 配「需要重看的研究成果：無」是兩句互相否定的話——"
+                "實測在 --scenario fiscal_rollover 下同時出現在同一個畫面上"),
+    ),
+    Mutation(
+        name="gate 鑑別力在樣本不足時照樣判",
+        path="audit/checks.py",
+        old="                if chances >= GATE_MIN_COHORTS and (clears / chances) <= GATE_NEVER_CLEARS:",
+        new="                if chances >= 1 and (clears / chances) <= GATE_NEVER_CLEARS:",
+        test=("tests/test_audit.py::"
+              "test_a_gate_with_too_few_cohorts_is_insufficient_data_not_a_verdict"),
+        guards=("3 個 cohort 的 0% 清除率什麼都不代表——實測 identity_unresolved 的 9 個 cohort "
+                "有 6 個只被評估過一次，根本沒有清除的機會（L13-2：把沒發生讀成失敗）"),
+    ),
+    Mutation(
+        name="一個 gate 都判不動的鑑別力檢查回報 PASS",
+        path="audit/checks.py",
+        old="        if judged == 0:",
+        new="        if False:",
+        test=("tests/test_audit.py::"
+              "test_a_check_that_cannot_judge_a_single_gate_is_skipped_not_passed"),
+        guards="判不動任何一個 gate 的鑑別力檢查，鑑別力自己是零——它會顯示成綠色的 PASS",
+    ),
+    Mutation(
+        name="層級錯誤與 authority laundering 混成同一句話",
+        path="alpha/models/session_assessor.py",
+        old="            if hints:",
+        new="            if False:",
+        test=("tests/test_alpha_vertical_slice.py::"
+              "test_an_out_of_scope_reference_is_named_as_a_layer_error_not_as_laundering"),
+        guards=("「這個 ref 不存在」與「這個 ref 存在但不屬於這一層」是兩個 claim；"
+                "混成一句會讓真正的 laundering 藏在合法的層級錯誤裡"),
+    ),
+    Mutation(
+        name="備份計數器只報年齡、不報覆蓋",
+        path="briefing/sources.py",
+        old="    newer, sample = _files_newer_than(private_root, created)",
+        new="    newer, sample = 0, []",
+        test=("tests/test_backup_entrypoint.py::"
+              "test_a_file_created_after_the_last_backup_is_counted_as_not_covered"),
+        guards=("「3 天前備份」看起來很健康，而那三本 alpha 假設 ledger（fair value 的唯一來源）"
+                "建立於備份之後，覆蓋是 0——年齡與覆蓋是兩個問題（L13-2）"),
+    ),
 )
 
 
