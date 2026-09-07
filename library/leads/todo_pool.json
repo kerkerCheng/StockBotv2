@@ -8064,6 +8064,18 @@
       "source": "manual",
       "title": "COHR Q4 expectation-gap 重判（使用者 2026-09-07 明示指示）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-07T06:47:35.832546+00:00",
+      "hint": "Step 4 修掉 forward-year rollover 污染後，ValuationSnapshot.method（Q4 原料描述）由「estimate_revision +68.3%」變成「not_comparable」，而 method 進 context digest → 判斷檔的 _packet_digest 對不上，畫面永久顯示「判斷與目前 context：不一致」。Q4 的結論不受影響（該判斷本來就自己把那兩個代理列為不得引用），但 re-append 判斷檔屬 A3 private authority，需要人工 gate。go 之後改變的是「我知道什麼」（判斷錨點），所以是研究不是開發。",
+      "n": 483,
+      "reason": null,
+      "ref_id": "docs/reports/2026-09-07-full-chain-adversarial-acceptance.md",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "COHR Q4 判斷 re-anchor：_packet_digest 對齊新的 ResearchContext digest",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17499,6 +17511,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 483,
+  "next_n": 484,
   "schema_version": "1"
 }
