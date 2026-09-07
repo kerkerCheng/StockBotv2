@@ -8051,6 +8051,19 @@
       "source": "research_action",
       "title": "JL MAG 2026 中報：已獲選人形馬達轉子供應商並持續小批量交付",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-07T04:30:12.078703+00:00",
+      "hint": "只改 session judgment 的 expectation_gap 軸與 _produced_at／_packet_digest；不動 operating／valuation／horizon assumptions、不動 thesis／variant_view、不改程式。鑄號僅為稽核，使用者主動指示即已授權。",
+      "n": 482,
+      "reason": "使用者 2026-09-07 明示指示的 Q4 重判，鑄號僅為稽核、受理時即 resolve（AGENTS：使用者主動指示＝已授權）。結果：expectation_gap weak(0.25) → weak(0.25)，ordinal 未變；理由由質性推測換成可核對的數值分解——EPS 落差 −5.0% 完全由 (a) D&C +60% vs 共識隱含 +67.4% 與 (b) 自陳保守的 interest placeholder 解釋，兩者修正後內部 EPS 9.49 反而高於共識 9.42；並記錄 market_implied_eps_growth 與 estimate_revision_30d 兩個代理是 2026-08-14 會計年度換檔假象、不得引用。變更欄位僅 axes.expectation_gap／_produced_at／_packet_digest／_restated；未動 thesis、variant_view、其他三軸、任何 operating／valuation／horizon assumption 與任何程式碼。",
+      "receipt": "authority:session_judgment;ref:alpha://session_assessor/COHR#expectation_gap",
+      "ref_id": "alpha://session_assessor/COHR#expectation_gap",
+      "resolution": "go",
+      "resolved_at": "2026-09-07T04:32:56.748178+00:00",
+      "source": "manual",
+      "title": "COHR Q4 expectation-gap 重判（使用者 2026-09-07 明示指示）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17475,8 +17488,17 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-07T04:32:56.748178+00:00",
+      "n": 482,
+      "reason": "使用者 2026-09-07 明示指示的 Q4 重判，鑄號僅為稽核、受理時即 resolve（AGENTS：使用者主動指示＝已授權）。結果：expectation_gap weak(0.25) → weak(0.25)，ordinal 未變；理由由質性推測換成可核對的數值分解——EPS 落差 −5.0% 完全由 (a) D&C +60% vs 共識隱含 +67.4% 與 (b) 自陳保守的 interest placeholder 解釋，兩者修正後內部 EPS 9.49 反而高於共識 9.42；並記錄 market_implied_eps_growth 與 estimate_revision_30d 兩個代理是 2026-08-14 會計年度換檔假象、不得引用。變更欄位僅 axes.expectation_gap／_produced_at／_packet_digest／_restated；未動 thesis、variant_view、其他三軸、任何 operating／valuation／horizon assumption 與任何程式碼。",
+      "receipt": "authority:session_judgment;ref:alpha://session_assessor/COHR#expectation_gap",
+      "ref_id": "alpha://session_assessor/COHR#expectation_gap",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 482,
+  "next_n": 483,
   "schema_version": "1"
 }
