@@ -36,6 +36,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
+from ..absence import check_absence_kind, default_absence_kind
 from ..contracts import EvidenceRef
 from ..errors import ContractViolation
 from ..fundamental.contracts import (
@@ -287,8 +288,15 @@ class ImpliedReturnResult:
     digest: str = ""
     warnings: tuple[str, ...] = ()
     evidence: tuple[EvidenceRef, ...] = field(default_factory=tuple)
+    #: Step 5：報酬缺席時**是哪一種缺席**（`alpha/absence.py`）。上游（估值）缺席時直接繼承它的 kind——
+    #: 「fair value 是刻意不主張」與「horizon 還沒寫」對使用者是兩件完全不同的事。
+    absence_kind: str | None = None
 
     def __post_init__(self) -> None:
+        if self.absence_kind is not None:
+            check_absence_kind(self.absence_kind, "ImpliedReturnResult.absence_kind")
+            if self.status != "missing":
+                raise ContractViolation("有報酬就沒有缺席語意——absence_kind 只在 status=missing 時存在")
         if self.status not in RETURN_STATUSES:
             raise ContractViolation(f"ImpliedReturnResult.status 未登記：{self.status!r}")
         if self.return_convention not in RETURN_CONVENTIONS:
@@ -314,6 +322,13 @@ class ImpliedReturnResult:
                 raise ContractViolation("missing 的報酬不得帶 input_dependency")
             if not self.reason:
                 raise ContractViolation("missing 必須附理由（L12：因果不得被截斷）")
+
+    @property
+    def effective_absence_kind(self) -> str | None:
+        """報酬「為什麼沒有」。明示優先；沒明示就查 `status` 的預設表（查表，不推論）。"""
+        if self.status != "missing":
+            return None
+        return self.absence_kind or default_absence_kind("missing")
 
     @property
     def is_known(self) -> bool:

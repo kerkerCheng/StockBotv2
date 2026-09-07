@@ -32,6 +32,7 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Mapping, Sequence
 
+from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS, check_absence_kind
 from briefing.alpha_view.contracts import (
     CatalystItem, CheckpointItem, Datum, DisproofItem, EvidenceItem, RefreshItem, _jsonable,
 )
@@ -61,6 +62,10 @@ _WORST_FIRST: tuple[str, ...] = (
     "available", "partial", "not_applicable", "stale", "review_required",
     "insufficient_evidence", "not_modeled", "missing", "invalidated",
 )
+
+#: 哪些 panel status 代表「這一段沒有內容」——與 `alpha_view` 的 `VALUELESS_STATUSES` 同一組。
+_VALUELESS_PANEL_STATUSES: frozenset[str] = frozenset(
+    {"missing", "not_modeled", "not_applicable", "insufficient_evidence", "invalidated"})
 
 #: readiness 三態。**只看核心 panel**。
 READY = "ready"                        # 核心四段都有內容，且沒有被標記需要動作
@@ -105,6 +110,52 @@ WEAK_INPUT_RULES: Mapping[str, str] = {
     "weakest_known_axis": "AlphaSignal 已算出的最弱軸（不是本層重算）",
     "unknown_axis": "這一軸目前未知——缺席不是 0，也不是「沒問題」",
 }
+
+
+# ---------------------------------------------------------------------------
+# 呈現別名：accounting_basis（Step 5）
+# ---------------------------------------------------------------------------
+
+#: `alpha` 的 `ACCOUNTING_BASES = ("gaap", "non_gaap", "not_applicable", "unverified")` 是
+#: **contract identity**——它是三本 private append-only ledger 每一筆紀錄身分的一部分，
+#: 改字彙等於改既有紀錄的身分（L10）。所以**不改字彙，加一層呈現別名**。
+#:
+#: ⚠ 這一層唯一的責任是**不要多說**。系統實際記錄的區別只有「as reported（法定財報）」
+#: vs「公司自己調整後」；它**沒有**任何欄位知道那份法定財報是 US GAAP、IFRS、AASB、
+#: 日本基準還是台灣 IFRS。2026-09-07 Coverage Pilot 實測：Lynas（AASB／IFRS）、
+#: HDS（日本基準）、IQE（IFRS）三檔在 ledger 裡全都寫著 `gaap`——語意正確、字面錯誤。
+#: **所以 label 一律不含準則名稱**，而 `raw` 永遠一併輸出讓稽核追得回 contract 值。
+ACCOUNTING_BASIS_DISPLAY: Mapping[str, Mapping[str, str]] = {
+    "gaap": {
+        "label": "As reported（法定財報口徑）",
+        "note": "系統只記錄「法定財報 vs 公司調整後」這個區別，**不主張**它是 US GAAP／IFRS／"
+                "AASB／日本基準——authority 裡沒有那一格，猜一個就是造一個沒人宣告過的事實。",
+    },
+    "non_gaap": {
+        "label": "公司調整後（adjusted，非法定口徑）",
+        "note": "由公司自己在財報中揭露的調整後數字；調整項目由公司定義，跨公司不可比。",
+    },
+    "not_applicable": {
+        "label": "不適用（這一格沒有口徑語意）",
+        "note": "這個數字不是損益表項目，沒有 as-reported／adjusted 的區別。",
+    },
+    "unverified": {
+        "label": "口徑未確認",
+        "note": "無法從一手來源判定這個數字是法定口徑還是公司調整後——**不猜**；"
+                "與內部估計的比較因此不成立。",
+    },
+}
+
+
+def accounting_basis_display(raw: str | None) -> dict[str, str | None]:
+    """contract 值 → 面向使用者的三欄。**raw 永遠保留**；未登記的值原樣回傳、不編故事。"""
+    if raw is None:
+        return {"raw": None, "label": "未宣告", "note": "authority 沒有記錄這一格的口徑。"}
+    entry = ACCOUNTING_BASIS_DISPLAY.get(raw)
+    if entry is None:
+        return {"raw": raw, "label": raw,
+                "note": "未登記的口徑值——呈現層不翻譯未知字彙，原樣顯示以便稽核。"}
+    return {"raw": raw, "label": entry["label"], "note": entry["note"]}
 
 
 class AnalystViewContractViolation(ValueError):
@@ -173,6 +224,8 @@ class AnalystPanel:
     optional: bool
     source_sections: tuple[str, ...]
     source_statuses: Mapping[str, str]
+    #: 每個來源 section 的缺席語意（`alpha/absence.py`；有內容的 section 是 None）。**抄，不推論。**
+    source_absence_kinds: Mapping[str, str | None] = field(default_factory=dict)
     lines: tuple[AnalystLine, ...] = ()
     weak_inputs: tuple[WeakInput, ...] = ()
     catalysts: tuple[CatalystItem, ...] = ()
@@ -196,6 +249,53 @@ class AnalystPanel:
         _check(self.status, set(_WORST_FIRST), "AnalystPanel.status")
         for question in self.questions:
             _check(question, set(QUESTIONS), "AnalystPanel.questions")
+        for kind in self.source_absence_kinds.values():
+            if kind is not None:
+                check_absence_kind(kind, "AnalystPanel.source_absence_kinds")
+
+    @property
+    def absence_kind(self) -> str | None:
+        """這個 panel 缺內容時**是哪一種缺席**。
+
+        **宣告好的挑選規則，不是新判斷：** panel 的 status 已經是來源 section 的「取最嚴」；
+        這裡取**第一個 status 等於 panel status 的來源 section**（依 `source_sections` 的宣告順序）
+        的缺席語意。有內容的 panel 一律 None。
+        """
+        if self.status not in _VALUELESS_PANEL_STATUSES:
+            return None
+        for name in self.source_sections:
+            if self.source_statuses.get(name) == self.status:
+                return self.source_absence_kinds.get(name)
+        return None
+
+    @property
+    def absence_is_settled(self) -> bool:
+        """這一格的缺席**已經是答案**（刻意不主張／方法不適用／本層沒有這個能力）。
+
+        ⚠ 它**不**讓 readiness 變好——blocked 還是 blocked。它只回答「使用者看到這格該不該去補」。
+        """
+        return self.absence_kind in SETTLED_ABSENCE_KINDS
+
+
+@dataclass(frozen=True, slots=True)
+class AnalystBlocker:
+    """一條 blocker 的**結構化**形式——`blockers` 那串字串的機器可讀版本。
+
+    為什麼要有它：APP 必須分得出「6324.T 的估值是刻意不主張」與「IQE.L 的估值是上游缺料」，
+    而那個區別在一句中文散文裡只能靠 parse 猜（L16 記過三次的形狀）。
+    `blockers`（字串）保留原樣供人閱讀與既有消費端使用；這裡是同一件事的欄位化。
+    """
+
+    panel: str
+    status: str
+    absence_kind: str | None
+    settled: bool
+    reason: str | None
+
+    def __post_init__(self) -> None:
+        _check(self.status, set(_WORST_FIRST), "AnalystBlocker.status")
+        if self.absence_kind is not None:
+            check_absence_kind(self.absence_kind, "AnalystBlocker.absence_kind")
 
 
 @dataclass(frozen=True, slots=True)
@@ -212,9 +312,16 @@ class AnalystReadiness:
     blockers: tuple[str, ...]
     optional_unavailable: tuple[str, ...]
     rule: str
+    #: `blockers` 的欄位化版本（同一批項目、同一個順序）。**不是第二份判斷**，是同一份的機器可讀形式。
+    blocker_details: tuple[AnalystBlocker, ...] = ()
+    #: `flags` 的欄位化版本，規則同上。
+    flag_details: tuple[AnalystBlocker, ...] = ()
 
     def __post_init__(self) -> None:
         _check(self.state, READINESS_STATES, "AnalystReadiness.state")
+        if self.blocker_details and len(self.blocker_details) != len(self.blockers):
+            raise AnalystViewContractViolation(
+                "blocker_details 與 blockers 必須一一對應——兩份不同長度就是兩份判斷")
 
 
 @dataclass(frozen=True, slots=True)
@@ -262,6 +369,16 @@ class AnalystView:
         payload = _jsonable(self)
         payload["questions"] = dict(QUESTIONS)
         payload["panel_order"] = list(self.PANEL_ORDER)
+        # `absence_kind`／`absence_is_settled` 是 property（宣告好的挑選規則），不是欄位。
+        # 序列化後的消費端沒有 property，所以在這裡一次寫出來——否則 APP 會自己再實作一次
+        # 那條規則，而重造品會立刻開始偏離（L16）。
+        for name in self.PANEL_ORDER:
+            panel = getattr(self, name)
+            payload[name]["absence_kind"] = panel.absence_kind
+            payload[name]["absence_is_settled"] = panel.absence_is_settled
+        payload["absence_kinds"] = dict(ABSENCE_KINDS)
+        payload["settled_absence_kinds"] = sorted(SETTLED_ABSENCE_KINDS)
+        payload["accounting_basis_display"] = {k: dict(v) for k, v in ACCOUNTING_BASIS_DISPLAY.items()}
         return payload
 
 
@@ -281,6 +398,7 @@ def readiness_class(status: str) -> str:
 
 
 __all__ = [
+    "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",
     "AnalystLine", "AnalystPanel", "AnalystReadiness", "AnalystView", "AnalystViewContractViolation",
     "BLOCKED", "CORE_PANELS", "LINE_ROLES", "OPTIONAL_PANELS", "QUESTIONS", "READINESS_STATES",
     "READY", "READY_WITH_FLAGS", "RefreshSummary", "SCHEMA_VERSION", "WEAK_INPUT_RULES", "WeakInput",

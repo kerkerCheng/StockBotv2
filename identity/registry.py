@@ -63,6 +63,11 @@ class CompanyIdentity:
     # alpha 歸因的基準——兩者角色不同。半導體標的可覆寫成 SOXX，回答「在對的產業
     # 裡有沒有選對股」。值必須是系統已在抓行情的 symbol，否則歸因會靜默失效。
     benchmark_symbol: str = "QQQ"
+    # 面向人的公司名稱（Step 5）。**只是名字，不是新的知識主張**——它可重新取得、
+    # 任何人讀一次公司自己的財報封面都得到同一個字串（AGENTS 的 mechanical 判準）。
+    # 沒登記就是 None：呈現層改用 `company_id（ticker）`，**不從 ID 猜名字**
+    # （`co:iqe` → 「Iqe」是編出來的，不是公司的名字）。
+    display_name: str | None = None
 
 
 class IdentityRegistry:
@@ -117,6 +122,8 @@ class IdentityRegistry:
                 market_quote_unit=_quote_code(item.get("market_currency")),
                 execution_quote_unit=_quote_code(item.get("execution_currency")),
                 benchmark_symbol=str(item.get("benchmark_symbol") or "QQQ").strip().upper(),
+                display_name=(str(item["display_name"]).strip() or None
+                              if item.get("display_name") is not None else None),
                 aliases=tuple(
                     str(a).strip().upper()
                     for a in (item.get("aliases") or ())

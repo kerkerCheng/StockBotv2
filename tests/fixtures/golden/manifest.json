@@ -5,7 +5,7 @@
     "normal_company": {
       "guards": "baseline",
       "private": false,
-      "digest": "sha256:a0973fa6107baa4cad4c3bbbe8480c83503f27f602c0ab8d6f05b25f9901384c"
+      "digest": "sha256:f6483fabf04e06771cf5684d800b00a380e7f9676ab5e6216e3af6a10269e9f8"
     },
     "symbol_layers": {
       "guards": "F-05",

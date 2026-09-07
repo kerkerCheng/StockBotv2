@@ -42,8 +42,16 @@ def test_renderer_only_imports_contracts_and_markdown_primitives() -> None:
 
 
 def test_contracts_module_is_pure_stdlib() -> None:
+    """contracts 只准 stdlib ＋ **一個**例外：`alpha.absence`（缺席語意的封閉字彙 SSOT）。
+
+    ⚠ 放行與收緊同時發生（L15）：例外只在 `alpha/absence.py` 自己也是零相依時成立——
+    否則這條例外會變成把整個 `alpha` 拖進呈現層的後門。所以下面同時斷言那一支的相依。
+    第二份字彙表就是 L16 記過的形狀（分類有 SSOT，但沒跟著資料走，於是每個消費端各猜一份）。
+    """
     stdlib = {"dataclasses", "datetime", "enum", "typing", "__future__"}
-    assert _imports(CONTRACTS) <= stdlib, _imports(CONTRACTS)
+    assert _imports(CONTRACTS) <= stdlib | {"alpha.absence"}, _imports(CONTRACTS)
+    absence = CONTRACTS.parents[2] / "alpha" / "absence.py"
+    assert _imports(absence) <= {"__future__", "typing"}, _imports(absence)
 
 
 def test_builder_does_not_touch_io_layers() -> None:

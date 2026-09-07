@@ -458,6 +458,91 @@ def cmd_horizon(args: argparse.Namespace) -> int:
     return 0
 
 
+
+def cmd_abstention(args: argparse.Namespace) -> int:
+    """Abstention ledger 的讀寫入口（Step 5：**「刻意不主張」是研究結論，不是待辦**）。
+
+    - `--list`：列出 ledger 全部紀錄（含已撤回者，稽核用）。
+    - `--add spec.json`：append 一筆。spec 必須明寫 `layer`／`subject`／`reason`／`revisit_when`；
+      可選 `period_end`／`evidence_refs`／`supersedes_id`／`author`。
+    - `--retract <id>`：append 一筆撤回紀錄（撤回後該格回到 `not_yet_recorded`）。
+
+    ⚠ **它不會產生任何數字。** `Abstention` 在 import 當下就被掃描，長出 value／target／multiple
+    之類的欄位是 import 失敗——所以不可能用它偷渡一個估值。宣告後 fair value 仍然缺席、
+    readiness 仍然 blocked；改變的只有「為什麼缺席」這句話。
+    """
+    from datetime import date, datetime, timezone
+
+    from .abstention.contracts import ABSTENTION_LAYERS, ABSTENTION_SUBJECTS, abstention_record
+    from .providers.abstentions import append_abstention_record, read_abstention_records
+
+    try:
+        resolved_ticker, company_id = _resolve_company(args.ticker)
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    ticker = str(resolved_ticker)
+
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            try:
+                record = abstention_record(
+                    company_id=str(company_id), ticker=ticker,
+                    layer=str(spec["layer"]), subject=str(spec["subject"]),
+                    reason=str(spec.get("reason") or ""), revisit_when=str(spec.get("revisit_when") or ""),
+                    period_end=(date.fromisoformat(str(spec["period_end"])[:10]) if spec.get("period_end") else None),
+                    evidence_refs=list(spec.get("evidence_refs") or []),
+                    supersedes_id=spec.get("supersedes_id"),
+                    author=str(spec.get("author") or "user"), created_at=datetime.now(timezone.utc),
+                )
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ abstention 不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            existing, _ = read_abstention_records(ticker)
+            target = next((r for r in existing if r.abstention_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = abstention_record(
+                company_id=target.company_id, ticker=ticker, layer=target.layer, subject=target.subject,
+                reason=target.reason, revisit_when=target.revisit_when, period_end=target.period_end,
+                evidence_refs=list(target.evidence_refs), supersedes_id=target.abstention_id, retracted=True,
+                author=target.author, created_at=datetime.now(timezone.utc),
+            )
+        try:
+            path = append_abstention_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['abstention_id']} → {path}")
+        print(f"  下一步：python -m briefing analyst-view {ticker}"
+              "（fair value 仍然缺席——改變的是「為什麼」，不是有沒有）")
+        return 0
+
+    records, errors = read_abstention_records(ticker)
+    if args.format == "json":
+        print(json.dumps({"ticker": ticker, "records": [r.to_display() for r in records],
+                          "parse_errors": errors,
+                          "layers": list(ABSTENTION_LAYERS),
+                          "subjects": {k: list(v) for k, v in ABSTENTION_SUBJECTS.items()}},
+                         ensure_ascii=False, indent=2))
+        return 0
+    print(f"# Abstention ledger — {ticker}（{len(records)} 筆；解析失敗 {len(errors)} 行）")
+    if not records:
+        print("（空）——這一檔沒有任何「刻意不主張」宣告；缺席一律讀成 not_yet_recorded（還沒做）")
+    for r in records:
+        mark = "（已撤回）" if r.retracted else ""
+        period = r.period_end.isoformat() if r.period_end else "不綁期間"
+        print(f"- `{r.abstention_id}`{mark} {r.layer}／{r.subject}｜{period}｜宣告於 {r.created_on.isoformat()}")
+        print(f"  - 為什麼不主張：{r.reason}")
+        print(f"  - 什麼會改寫它：{r.revisit_when}")
+    for line in errors:
+        print(f"- ⚠ 解析失敗：{line}")
+    return 0
+
+
 def cmd_entry_criterion(args: argparse.Namespace) -> int:
     """EntryCriterion ledger 的讀寫入口（Entry Logic v1，Step 3）。
 
@@ -554,6 +639,15 @@ def build_parser() -> argparse.ArgumentParser:
     criterion.add_argument("--rationale", help="撤回理由")
     criterion.add_argument("--format", choices=("markdown", "json"), default="markdown")
     criterion.set_defaults(func=cmd_entry_criterion)
+
+    abstention = sub.add_parser(
+        "abstention", help="Abstention ledger：--list／--add spec.json／--retract <id>（Step 5；「刻意不主張」）")
+    abstention.add_argument("ticker")
+    abstention.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    abstention.add_argument("--add", help="append 一筆 abstention（JSON spec 檔路徑；reason 與 revisit_when 必填）")
+    abstention.add_argument("--retract", help="append 一筆撤回紀錄（指定 abstention_id）")
+    abstention.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    abstention.set_defaults(func=cmd_abstention)
 
     valuation = sub.add_parser(
         "valuation", help="ValuationAssumption ledger：--list／--add spec.json／--retract <id>（Step 1）")

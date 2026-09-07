@@ -612,6 +612,118 @@ AnalystView ── headline   （Q4 現價 → future target value → 隱含報
 
 ---
 
+### 6.8 缺席語意（`alpha/absence.py`＋`alpha/abstention/`，2026-09-07 Phase 2 Step 5）
+
+**角色一句話：`status` 回答「這一格能不能用」，`absence_kind` 回答「它為什麼沒有」——兩者正交。**
+
+事發（2026-09-07 Coverage Pilot §4.3）：6324.T 的估值 blocker 逐字是「尚未寫入任何估值假設」，
+而真實狀態是研究結論「126x 錨不住任何可辯護的倍數，所以不寫」。**兩種語意共用一句話**（L12），
+而 APP 會把那句話直接放到使用者眼前——他無從分辨「還沒做」與「這已經是答案」。
+
+```
+alpha/absence.py         封閉字彙 ABSENCE_KINDS（11 種）＋ DEFAULT_ABSENCE_KIND（status → kind 的查表）
+        │                零相依（只有 __future__／typing），所以呈現層 import 它不違反分層
+        ├─ ValuationResult.absence_kind      ← build_valuation 走到哪個分支**自己宣告**
+        ├─ ImpliedReturnResult.absence_kind  ← 上游缺席時**繼承**估值層的 kind，不降級成「還沒寫」
+        ├─ Datum.absence_kind / SectionMeta.absence_kind（read model）
+        └─ AnalystPanel.absence_kind / AnalystBlocker（consumer；blockers 的欄位化版本）
+```
+
+**十一種 kind**：`not_yet_recorded`（還沒做）／`deliberate_abstention`（刻意不主張）／
+`method_not_applicable`（方法對這筆資料無定義）／`upstream_unavailable`（上游缺，要補的是上游）／
+`inputs_incompatible`（每格都有值但身分不相容）／`provider_missing`／`capability_absent`（not_modeled）／
+`point_in_time_unavailable`／`insufficient_evidence`／`invalidated`／`not_applicable_unspecified`。
+
+⚠ **`not_applicable` 的預設刻意是 `not_applicable_unspecified`。** 它今天同時被 PIT（沒有時點投影）
+與方法層（本益比法遇到虧損）使用；猜任何一邊都是替 authority 造一個它沒說過的區別。知道自己是哪一種的
+呼叫端要**明示**——那正是這張表存在的目的。
+
+**`SETTLED_ABSENCE_KINDS`（刻意不主張／方法不適用／本層沒有這個能力）表示「這已經是答案，不要去補」。**
+⚠ 它**不**讓 readiness 變好——blocked 還是 blocked，只是使用者知道該不該花力氣。
+
+**`Abstention`（`alpha/abstention/`）是「刻意不主張」的 append-only authority。**
+`library/private/alpha/abstentions/<TICKER>.jsonl`；content-addressed `ab_*` id、
+`supersedes_id`／`retracted` 語意與假設 ledger 完全一致、as-of 選取共用同一套規則。
+三條型別層強制：①**結構上不可能攜帶數字**（`_assert_no_value_fields` 在 import 當下掃描欄位名，
+長出 `value`／`target_pe`／`multiple` 之類的欄位是 import 失敗）；②`reason` 與 `revisit_when` 都必填
+（沒有「什麼證據出現才會改寫」的 abstention 是永遠不會響的火警警報，L7）；③`layer`／`subject` 是封閉字彙
+（v1 只有 `valuation.forward_earnings_multiple.target_pe`），否則它會變成「任何一格都可以宣布自己是刻意留白」
+的萬用擋箭牌。入口 `python -m alpha abstention <T> --list／--add spec.json／--retract <id>`。
+
+**它不是第二份 ValuationAssumption authority。** 後者擁有「目標倍數是幾」，前者只擁有「我們不主張」；
+宣告之後 `fair_value` 仍然是 `None`、readiness 仍然 `blocked`，改變的只有那句「為什麼」。
+
+**accounting basis 的呈現別名（`ACCOUNTING_BASIS_DISPLAY`）** 解的是同一天記下的另一筆語意債：
+`ACCOUNTING_BASES = ("gaap", "non_gaap", "not_applicable", "unverified")` 是 **contract identity**——
+它是三本 private append-only ledger 每一筆紀錄身分的一部分，改字彙等於改既有紀錄的身分（L10）。
+所以**不改字彙，加一層呈現別名**：`gaap` → 「As reported（法定財報口徑）」，
+且 label **一律不含準則名稱**（Lynas 是 AASB／IFRS、HDS 是日本基準、IQE 是 IFRS，三者在 ledger 裡都寫 `gaap`；
+authority 裡沒有「是哪一套準則」那一格，寫上去就是替它主張它沒說過的事）。`raw` 永遠一併輸出供稽核。
+
+---
+
+### 6.9 Web App／API（`webapp/`，2026-09-07 Phase 2 Step 5 MVP）
+
+**產品 invariant：`LLM changes cognition; APP reads cognition.`**
+
+```
+authority（Neo4j／Engine C／private ledger）
+     │  python -m webapp materialize   ← **唯一**會跑模型、連 DB、讀 ledger 的地方（約 4.2 秒／檔）
+     ▼
+AlphaInvestmentView → AnalystView → MaterializedArtifact（JSON，atomic write）
+     │                                library/private/app/analyst_view/<TICKER>.json
+     │  python -m webapp serve         ← 純讀：open → json.loads → validate → return
+     ▼
+GET /api/v1/{health,meta,stocks,stocks/{ticker}} ＋ / （responsive Web App）
+     ▼
+Cloudflare Tunnel（既有那條）→ Cloudflare Access → iPhone Safari／桌機瀏覽器
+```
+
+**為什麼 materialize 與 serve 必須是兩條責任鏈：** 不只是「組裝一次要 4.2 秒」，而是
+**點一下就重跑一次研究會讓 request path 有能力改變（或看起來改變）系統對一家公司的認知**。
+分開之後，「APP 只是讀」變成一件可以被機械證明的事。
+
+**四種互相獨立的證明**（`tests/test_webapp_request_path.py`，25 條）：
+①**import 靜態掃描**（serve 端三個模組的 import 是 allowlist）；
+②**runtime 模組哨兵**（打完一輪 request，斷言 `sys.modules` 沒多出任何模型／IO 模組——擋函式內延遲 import）；
+③**檔案系統快照**（request 前後對 artifact 目錄與 `library/private/` 取雜湊，斷言一格未動——同時擋寫入與
+cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`create_connection` 直接 raise，
+斷言回應照樣完整正確）。⚠ 第 4 條攔的是 `connect` 而不是 socket 建構子：TestClient 的 event loop 自己要用
+一對 loopback socket，攔建構子會攔到測試腳手架而不是被測物（L15-1）。
+
+**artifact 契約**（`webapp/contracts.py`）：`schema_version`／`generated_at`／`as_of`／
+`research_context_digest`／**兩個 digest**／`readiness`／`refresh`／`overview`／完整 `view`。
+- **`content_digest`** 對整份內容取雜湊——偵測寫到一半或寫入後被改。
+- **`freshness_identity`** 只對「認知狀態」取雜湊（as-of、context digest、read model 版本、readiness、
+  refresh overall）。**價格動了不算認知變了**；兩件事共用一個訊號就會讓其中一件永遠讀不出來（L12）。
+- fail closed：解析失敗／版本不符／digest 不合／缺必要欄位 → `ArtifactUnavailable` → **503**。
+  ⚠ **「artifact 讀不到」（503）與「這檔沒有研究結論」（200 ＋ `readiness=blocked`）是兩件事，不得同形。**
+- **stale 是狀態不是錯誤**：過期照樣回，明確標年齡，**絕不重建**。
+
+**overview 是選取不是計算。** 清單卡片要的那幾格全部照抄 `AnalystView`——沒有百分比換算、沒有幣別換算、
+沒有 gap 重算。單位原樣帶著走（GBp 與 GBP 差 100 倍，`dependencies.quote_unit` 是欄位不是要 parse 的句子）。
+
+**private path 在 materialize 端遮蔽一次。** read model 的理由句會寫出 authority 檔案路徑
+（例：「找不到 session 判斷檔（library/private/alpha/judgments/…）」）；那對開發者有用，但它是 private
+filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，**其餘文字逐字保留**。
+在 materialize 端做一次，而不是讓每個消費端各自記得要遮（L16）。
+
+**Web App 的資訊階層**（`webapp/static/`，vanilla JS，零外部資源，CSP 只允許 same-origin）：
+清單卡片 → ①判讀狀態（blocked 時逐條寫「卡在哪一層＋為什麼」）→ ②頭條 → ③內部 vs 市場 →
+④最脆弱的假設 → ⑤研究現況／disproof → ⑥Entry（optional）→ ⑦新鮮度 → ⑧「這份判讀不是什麼」。
+formula／provenance／evidence／epistemics 全部收進 `<details>` drill-down。
+**UI 只改資訊階層，不產生任何新的 summary judgment**：頭條那句話取自
+`implied_return.epistemics.one_sentence`（authority 自組）並註明出處；
+缺席語意的中文說明來自 `/api/v1/meta` 的字彙表，前端不維護第二份對照表。
+
+**技術棧沿用既有的**：`starlette` ＋ `uvicorn` 已隨 `mcp>=1.28` 安裝，**本次沒有新增任何套件**，
+也沒有前端建置工具鏈。部署重用既有 Cloudflare Tunnel（見 `deploy/cloudflare/README.md`）。
+
+**刻意不做：** runtime chatbot／LLM、broker、買賣、部位尺寸、Portfolio 排序、跨標的比較、
+任何寫入端點、原生 App。
+
+---
+
 ## 7. Engine D（Decision Lab）runtime
 
 - Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許

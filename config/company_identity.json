@@ -112,7 +112,8 @@
       "research_ticker": "COHR",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NYSE"
+      "execution_venue": "NYSE",
+      "display_name": "Coherent Corp."
     },
     {
       "company_id": "co:coreweave",
@@ -168,7 +169,8 @@
       "research_ticker": "6324.T",
       "market_currency": "JPY",
       "execution_currency": "JPY",
-      "execution_venue": "TSE"
+      "execution_venue": "TSE",
+      "display_name": "Harmonic Drive Systems Inc."
     },
     {
       "company_id": "co:hexagon",
@@ -211,7 +213,8 @@
     {
       "company_id": "co:iqe",
       "research_ticker": "IQE.L",
-      "market_currency": "GBp"
+      "market_currency": "GBp",
+      "display_name": "IQE plc"
     },
     {
       "company_id": "co:iren",
@@ -289,7 +292,8 @@
       "research_ticker": "LYC.AX",
       "market_currency": "AUD",
       "execution_currency": "AUD",
-      "execution_venue": "ASX"
+      "execution_venue": "ASX",
+      "display_name": "Lynas Rare Earths Ltd."
     },
     {
       "company_id": "co:macom",

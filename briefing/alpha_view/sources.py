@@ -29,6 +29,7 @@ from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
 from alpha.providers import entry_criteria as entry_ledger
 from alpha.providers import horizon_assumptions as horizon_ledger
+from alpha.providers import abstentions as abstention_ledger
 from alpha.providers import valuation_assumptions as valuation_ledger
 from alpha.refresh import build_instant
 from alpha.valuation import CurrentPrice, ValuationResult, build_valuation
@@ -230,12 +231,19 @@ def _valuation_model(
         records, parse_errors = valuation_ledger.read_valuation_assumption_records(str(ticker))
     except Exception as exc:  # noqa: BLE001
         return None, f"估值假設 ledger 讀取失敗：{type(exc).__name__}", records
+    # 「刻意不主張目標倍數」是另一本 append-only ledger（`alpha/abstention/`）。讀不到就是沒有——
+    # 不得因為讀取失敗而把「刻意」降級成「還沒寫」，所以失敗一樣 fail-soft 並保持 not_yet_recorded。
+    try:
+        abstentions, _abstention_errors = abstention_ledger.read_abstention_records(str(ticker))
+    except Exception:  # noqa: BLE001
+        abstentions = []
     price = _current_price(build, identity)
     try:
         result = build_valuation(
             company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
             fundamental=fundamental_model, fundamental_reason=fundamental_reason,
             assumption_records=records, parse_errors=parse_errors,
+            abstention_records=abstentions,
             evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price,
         )
     except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗
@@ -362,6 +370,7 @@ def fetch_alpha_investment_view(
         "market_currency": getattr(company, "market_currency", None),
         "market_quote_unit": getattr(company, "market_quote_unit", None),
         "execution_venue": getattr(company, "execution_venue", None),
+        "display_name": getattr(company, "display_name", None),
     }
 
     owns_graph = graph_provider is None

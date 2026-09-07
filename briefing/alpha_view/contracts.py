@@ -47,6 +47,8 @@ from datetime import date, datetime
 from enum import Enum
 from typing import Any, Literal, Mapping
 
+from alpha.absence import ABSENCE_KINDS, check_absence_kind, default_absence_kind
+
 SCHEMA_VERSION = "alpha-investment-view/v1"
 
 # ---------------------------------------------------------------------------
@@ -174,6 +176,10 @@ class Datum:
     reason: str | None = None
     evidence_refs: tuple[str, ...] = ()
     dependencies: Mapping[str, Any] | None = None
+    #: **Step 5：「沒有值」是哪一種沒有**（`alpha/absence.py` 的封閉字彙）。
+    #: 由知道自己走了哪個分支的那一段程式明示；沒明示就由 `status` 查表得到預設
+    #: （`effective_absence_kind`）。消費端一律不得 parse `reason` 去猜（L16）。
+    absence_kind: str | None = None
 
     def __post_init__(self) -> None:
         if not self.key or not self.label:
@@ -197,6 +203,12 @@ class Datum:
             raise ViewContractViolation(
                 f"Datum[{self.key}] 有值（{self.status}）必須說出它是哪一種知識（basis）"
             )
+        if self.absence_kind is not None:
+            check_absence_kind(self.absence_kind, f"Datum[{self.key}].absence_kind")
+            if self.status not in VALUELESS_STATUSES:
+                raise ViewContractViolation(
+                    f"Datum[{self.key}] 有值（{self.status}）卻帶缺席語意 {self.absence_kind!r}——"
+                    "absence_kind 只描述「為什麼沒有」")
         if self.authority and ("\\" in self.authority or "/library/" in self.authority
                                or self.authority.startswith(("C:", "/"))):
             raise ViewContractViolation(
@@ -207,6 +219,13 @@ class Datum:
     @property
     def is_known(self) -> bool:
         return self.status not in VALUELESS_STATUSES
+
+    @property
+    def effective_absence_kind(self) -> str | None:
+        """這一格「為什麼沒有」。有值 → `None`；明示優先；沒明示就查 `status` 的預設表。"""
+        if self.is_known:
+            return None
+        return self.absence_kind or default_absence_kind(self.status)
 
 
 @dataclass(frozen=True, slots=True)
@@ -221,10 +240,23 @@ class SectionMeta:
     as_of: date | None = None
     freshness: str | None = None
     warnings: tuple[str, ...] = ()
+    #: Step 5：整個 section 缺內容時**是哪一種缺席**（`alpha/absence.py`）。與 `Datum` 同一套字彙。
+    absence_kind: str | None = None
+
+    @property
+    def effective_absence_kind(self) -> str | None:
+        if self.status not in VALUELESS_STATUSES:
+            return None
+        return self.absence_kind or default_absence_kind(self.status)
 
     def __post_init__(self) -> None:
         _check_vocab(self.status, SECTION_STATUSES, "SectionMeta.status")
         _check_vocab(self.basis, BASES, "SectionMeta.basis")
+        if self.absence_kind is not None:
+            check_absence_kind(self.absence_kind, "SectionMeta.absence_kind")
+            if self.status not in VALUELESS_STATUSES:
+                raise ViewContractViolation(
+                    f"SectionMeta 有內容（{self.status}）卻帶缺席語意 {self.absence_kind!r}")
         if self.status in VALUELESS_STATUSES and self.basis != "none":
             raise ViewContractViolation(
                 f"SectionMeta status={self.status} 沒有內容，basis 必須是 none"
@@ -241,9 +273,12 @@ def not_modeled(key: str, label: str, reason: str) -> Datum:
                  basis="none", reason=reason)
 
 
-def missing(key: str, label: str, reason: str, *, authority: str | None = None) -> Datum:
+def missing(key: str, label: str, reason: str, *, authority: str | None = None,
+            absence_kind: str | None = None) -> Datum:
+    """「有能力、沒資料」的標準格。`absence_kind` 由知道自己走了哪個分支的呼叫端明示；
+    不給就是 `not_yet_recorded`（`alpha/absence.py` 的預設表）。"""
     return Datum(key=key, label=label, value=None, status="missing", basis="none",
-                 authority=authority, reason=reason)
+                 authority=authority, reason=reason, absence_kind=absence_kind)
 
 
 # ---------------------------------------------------------------------------
@@ -786,7 +821,13 @@ class AlphaInvestmentView:
 def _jsonable(obj: Any) -> Any:
     """遞迴轉成可 JSON 序列化的結構。⚠ `None` 永遠保留——它是 read model 的一等值。"""
     if is_dataclass(obj) and not isinstance(obj, type):
-        return {f.name: _jsonable(getattr(obj, f.name)) for f in fields(obj)}
+        payload = {f.name: _jsonable(getattr(obj, f.name)) for f in fields(obj)}
+        # `Datum`／`SectionMeta` 的 `absence_kind` 對外一律輸出**生效值**（明示優先，否則查
+        # `status` 的預設表）。序列化後的消費端（APP／API）沒有 property，若原樣輸出 None，
+        # 每個消費端都得自己再實作一次那張表——而重造品會立刻開始偏離（L16）。
+        if isinstance(obj, (Datum, SectionMeta)):
+            payload["absence_kind"] = obj.effective_absence_kind
+        return payload
     if isinstance(obj, Enum):
         return obj.value if not isinstance(obj.value, int) else obj.name.lower()
     if isinstance(obj, (datetime, date)):
@@ -817,6 +858,6 @@ __all__ = [
     "NotModeledSection", "PathItem", "PriceImpliedSection", "SCHEMA_VERSION",
     "SECTION_STATUSES", "STATUS_LABEL", "ScenarioSection", "SectionMeta", "SectionStatus",
     "SignalCompleteness", "StructuralEdgeItem", "StructuralThesisSection",
-    "VALUELESS_STATUSES", "VariantViewSection", "ViewContractViolation", "missing",
+    "ABSENCE_KINDS", "VALUELESS_STATUSES", "VariantViewSection", "ViewContractViolation", "missing",
     "not_modeled",
 ]

@@ -322,6 +322,49 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 （產品決策見 `docs/ROADMAP.md`「主流程的終點是 Implied Return」）。
 架構見 `docs/ARCHITECTURE.md` §6.7。**互動專用，不進 unattended rule。**
 
+### Web App／API（2026-09-07 Step 5）
+
+**日常要看一檔股票，開瀏覽器比開終端機快。** APP 讀的是**已經算好**的判讀——
+`LLM changes cognition; APP reads cognition`。
+
+```powershell
+# 1) materialize：**唯一**會跑模型、連 Neo4j／Engine C、讀 private ledger 的一步（約 4.2 秒／檔）
+& '.venv\Scripts\python.exe' -m webapp materialize COHR LYC.AX 6324.T IQE.L
+& '.venv\Scripts\python.exe' -m webapp materialize            # 不給 ticker ＝ 重跑目錄裡已有的每一檔
+& '.venv\Scripts\python.exe' -m webapp materialize COHR --as-of 2026-09-05   # PIT 視角
+
+# 2) serve：純讀。**不重建任何東西**
+& '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/
+
+# 3) 現況與健檢
+& '.venv\Scripts\python.exe' -m webapp status                 # 每份 artifact 的新鮮度／readiness／blocker kind
+& '.venv\Scripts\python.exe' -m webapp verify                 # 重新驗 schema／digest／必要欄位（fail closed）
+```
+
+**判讀舊了怎麼辦：** artifact 超過 24 小時會標 `stale`（`STOCKBOT_APP_MAX_AGE_HOURS` 可調）。
+**stale 不會自己重建**——那是刻意的：request path 一旦能重建，它就有能力改變系統對一家公司的認知。
+要更新就重跑 `materialize`。
+
+**blocked 怎麼讀：** 畫面會逐條寫「卡在哪一層 ＋ 為什麼」，而「為什麼」是封閉字彙不是散文：
+`還沒寫`（去研究）／`刻意不主張`（**這已經是答案，不用動作**）／`方法不適用`（補資料解不掉）／
+`上游缺料`（要補的是上游）。紫色徽章 ＝ settled ＝ 不必去補。
+
+**遠端存取：** 重用既有 Cloudflare Tunnel ＋ Cloudflare Access，程序與**尚未完成的人工步驟**見
+[`deploy/cloudflare/README.md`](../deploy/cloudflare/README.md)。APP 預設只綁 `127.0.0.1`，
+**沒有自己的帳號密碼系統**；要綁其他介面必須明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則拒絕啟動。
+
+**Abstention ledger（「刻意不主張」）：**
+
+```powershell
+& '.venv\Scripts\python.exe' -m alpha abstention 6324.T                       # 列出
+& '.venv\Scripts\python.exe' -m alpha abstention 6324.T --add spec.json       # append（reason 與 revisit_when 必填）
+& '.venv\Scripts\python.exe' -m alpha abstention 6324.T --retract ab_xxxx     # append 一筆撤回
+```
+
+⚠ 它**不會產生任何數字**——宣告之後 fair value 仍然缺席、readiness 仍然 blocked，改變的只有
+「為什麼缺席」。`Abstention` 在型別層不可能長出可裝數值的欄位。
+架構見 `docs/ARCHITECTURE.md` §6.8／§6.9。**互動專用，不進 unattended rule。**
+
 
 ### Engine C
 ```powershell
@@ -833,6 +876,21 @@ python -m briefing entry COHR --as-of 2026-09-05                            # �
 **不是 buy／sell、不是部位尺寸、不是資本許可**（型別裡沒有那些欄位，section 每次列 `is_not`）。
 沒有明示判準就是 `missing`，**不補 10%／15%／20%**；`value_date` 與 `horizon_end` 不一致時算術照列但
 `assessment=review_required`，不得當成 clean 的門檻價。
+
+### Sandbox impact review 結論（2026-09-07，Web App／API／Abstention ledger／Step 5）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m webapp materialize [T ...] [--as-of] [--dir]` | 寫 **derived cache**（`library/private/app/analyst_view/*.json`，atomic）；讀 Neo4j／Engine C／private ledger。**不寫任何 authority**、不入圖、不建 decision | 與 `alpha-card` 相同的本機資源；無新增網路主機或憑證 | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m webapp serve [--host] [--port] [--dir]` | **開一個本機 listener**（預設 `127.0.0.1:8790`）。唯讀：無寫入端點、無模型執行、無外部抓取 | ⚠ **新增 executable surface**：綁定本機 port。非 `127.0.0.1` 需明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式拒絕啟動。外部認證邊界是 Cloudflare Access（`deploy/cloudflare/README.md`），不是本程式 | **互動／長駐專用**，不進 unattended rule |
+| `python -m webapp status｜verify [--dir]` | 唯讀：只讀 artifact 目錄 | 無 | 互動專用 |
+| `python -m alpha abstention <T> [--list｜--add｜--retract]` | `--add`／`--retract` **append** 一筆到 private ledger（`library/private/alpha/abstentions/`）；**結構上不可能寫入任何數值主張** | 無 | **互動專用**（authority write，需使用者明確執行） |
+| `webapp/{api,store,contracts}.py`（serve 端） | 無：import allowlist 不含任何模型／DB／LLM 模組，且四種互相獨立的證明逐條斷言（`tests/test_webapp_request_path.py`） | 無 | 純讀層 |
+
+查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'webapp|abstention'
+```
 
 ### Sandbox impact review 結論（2026-09-07，Analyst Consumer v1／Step 3.5）
 

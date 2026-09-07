@@ -8115,6 +8115,19 @@
       "source": "manual",
       "title": "IQE.L 流動性／going-concern 評估，作為建立 forward view 的前置",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-07T09:23:45.393903+00:00",
+      "hint": "Step 5 語意債 A。理由與 revisit 條件逐字引用已提交的 docs/reports/2026-09-07-coverage-pilot.md §2.2／§6；不新增知識主張，只把既有研究結論改成機器可讀。鑄號僅為稽核——使用者於 Step 5 prompt 明示此檔是刻意不主張，受理時即 go resolve。",
+      "n": 487,
+      "reason": null,
+      "receipt": "authority:abstention_ledger;ref:ab_fc42c0f42c2df1ce",
+      "ref_id": "docs/reports/2026-09-07-coverage-pilot.md",
+      "resolution": "go",
+      "resolved_at": "2026-09-07T09:25:16.884300+00:00",
+      "source": "manual",
+      "title": "6324.T 估值 abstention 入帳：把『無法錨定倍數，所以刻意不寫 target_pe』由散文改成結構化 append-only 紀錄",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17575,8 +17588,17 @@
       "ref_id": "engine_c://manual_observation/IQE.L#fiscal_year_results",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-07T09:25:16.884300+00:00",
+      "n": 487,
+      "reason": null,
+      "receipt": "authority:abstention_ledger;ref:ab_fc42c0f42c2df1ce",
+      "ref_id": "docs/reports/2026-09-07-coverage-pilot.md",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 487,
+  "next_n": 488,
   "schema_version": "1"
 }

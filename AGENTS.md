@@ -307,6 +307,35 @@ probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再�
 呈現細節（欄位、燈號文字、台股 freshness、槓桿商品序列）見
 [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) §8。
 
+## APP 呈現契約：**LLM changes cognition; APP reads cognition**（2026-09-07 Step 5 定案）
+
+**APP 讀的是已經形成的判讀，不是在點擊時形成判讀。** HTTP request path **不得**：跑 LLM、
+寫任何 authority、抓外部資料（現價／共識）、跑任何金融模型、重算隱含報酬、或因為 cache miss／stale
+就偷偷重建。要更新判讀只有一條路：明確跑一次 materialize。
+**這不是效能考量**——一旦 request path 有能力重建，它就有能力改變（或看起來改變）系統對一家公司的
+認知，而「使用者剛才看到的是哪一版判斷」就再也答不出來。查證：
+`python -m pytest tests/test_webapp_request_path.py`（四種互相獨立的證明）。
+
+**缺席不得被壓成一句「無資料」。** `absence_kind` 是與 `status` 正交的封閉字彙
+（`alpha/absence.py`），由**產生缺席的那段程式自己宣告**；呈現層一律不得 parse 理由句去猜（L16）。
+使用者必須分得出四件事：**還沒做**（去研究）／**刻意不主張**（這已經是答案，不用動作）／
+**方法不適用**（補資料解不掉）／**上游缺料**（要補的是上游）。
+
+⚠ **「刻意不主張」只能來自 append-only 的 `Abstention` 紀錄，不能在呈現層打一個標籤。**
+它必須同時說出 `reason` 與 `revisit_when`（什麼證據出現才會改寫，L7），且**結構上不可能攜帶數字**。
+宣告之後 fair value 仍然缺席、readiness 仍然 `blocked`——**settled 不讓 readiness 變好**，
+它只回答「該不該花力氣去補」。
+
+**`accounting_basis` 的面向使用者標籤不得宣稱 authority 沒有的東西。** 系統記錄的區別只有
+「as reported（法定財報）vs 公司調整後」；它**沒有**任何欄位知道那是 US GAAP、IFRS、AASB 還是日本基準
+（Lynas／HDS／IQE 在 ledger 裡全都寫 `gaap`）。**字彙不改**（它是三本 private ledger 每筆紀錄身分的一部分，
+L10），改的是呈現別名，且 label 一律不含準則名稱。
+
+**APP 沒有任何寫入端點，也沒有自己的帳號密碼系統。** 沒有 POST／PUT／PATCH／DELETE 路由；
+不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。外部認證邊界是 **Cloudflare Access**；
+程式預設只綁 `127.0.0.1`，綁其他介面必須明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則拒絕啟動。
+**四個人工 gate 不因為多了一個畫面而放寬。**
+
 ## 技術訊號的地位（2026-08-01 實測後定案；2026-08-29 整組移除）
 
 **實測記錄（歷史，不因後續移除而改寫，任何改寫都不得刪減它）：** 三次實測全部失敗——

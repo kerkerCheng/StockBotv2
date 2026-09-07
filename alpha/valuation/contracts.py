@@ -32,6 +32,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
+from ..absence import check_absence_kind, default_absence_kind
 from ..contracts import EvidenceRef
 from ..errors import ContractViolation
 from ..fundamental.contracts import (
@@ -443,6 +444,9 @@ class ValuationResult:
     evidence: tuple[EvidenceRef, ...] = field(default_factory=tuple)
     value_date: date | None = None
     value_date_semantics: str = VALUE_DATE_UNSPECIFIED
+    #: Step 5：fair value 缺席時**是哪一種缺席**（`alpha/absence.py` 的封閉字彙）。由 `build_valuation`
+    #: 走到哪個分支自己宣告——消費端不得 parse `reason` 去猜（L16）。`available` 時必須是 None。
+    absence_kind: str | None = None
 
     def __post_init__(self) -> None:
         if self.status not in VALUATION_STATUSES:
@@ -463,8 +467,19 @@ class ValuationResult:
             if self.fair_value is None or self.input_dependency is None or not self.formula:
                 raise ContractViolation("available 的估值必須有 fair_value、input_dependency 與 formula")
             _finite(self.fair_value, "ValuationResult.fair_value")
+            if self.absence_kind is not None:
+                raise ContractViolation("有 fair value 就沒有缺席語意——absence_kind 必須是 None")
         elif self.fair_value is not None or self.input_dependency is not None:
             raise ContractViolation("missing 的估值不得帶 fair_value 或 input_dependency（missing != zero）")
+        if self.absence_kind is not None:
+            check_absence_kind(self.absence_kind, "ValuationResult.absence_kind")
+
+    @property
+    def effective_absence_kind(self) -> str | None:
+        """明示的 kind 優先；沒明示就由 `status` 查表得到預設。**查表，不推論。**"""
+        if self.fair_value is not None:
+            return None
+        return self.absence_kind or default_absence_kind(self.status)
 
     @property
     def is_known(self) -> bool:

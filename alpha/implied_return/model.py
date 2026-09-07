@@ -62,7 +62,7 @@ def _missing(
     *, company_id: str, ticker: str, as_of: date, reason: str, price: CurrentPrice, valuation: ValuationResult | None,
     horizon: HorizonAssumption | None, selection: AssumptionSelection, steps: Sequence[ReturnStep],
     warnings: Sequence[str], horizon_start: date | None = None, horizon_end: date | None = None,
-    alignment: str | None = None,
+    alignment: str | None = None, absence_kind: str | None = None,
 ) -> ImpliedReturnResult:
     fv_known = valuation is not None and valuation.is_known
     ids = tuple(valuation.assumption_ids) if valuation else ()
@@ -86,7 +86,7 @@ def _missing(
         input_dependency=None, steps=tuple(steps), assumption_ids=ids, observation_refs=tuple(dict.fromkeys(obs)),
         digest=content_digest({"company_id": company_id, "ticker": ticker, "as_of": as_of, "status": "missing",
                                "reason": reason}),
-        warnings=tuple(warnings),
+        warnings=tuple(warnings), absence_kind=absence_kind,
     )
 
 
@@ -190,7 +190,11 @@ def build_implied_return(
     if price.bar_date is None:
         return _stop("現價快照沒有 bar_date——沒有起算日就沒有 horizon（不得用 ETL 日冒充）")
     if valuation is None or not valuation.is_known:
-        return _stop(fv_reason or "fair value 缺席")
+        # 缺席語意**繼承上游**：估值層若已宣告「刻意不主張」，報酬層不得把它降級成「還沒寫」。
+        # 沒有上游 kind（例如根本沒跑 valuation）就是 upstream_unavailable。
+        return _stop(fv_reason or "fair value 缺席",
+                     absence_kind=(valuation.effective_absence_kind if valuation is not None
+                                   else "upstream_unavailable"))
     unit_status, unit_why = units_comparable(valuation.currency, price.unit)
     if unit_status != "comparable":
         return _stop(f"{unit_status}：{unit_why}")

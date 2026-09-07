@@ -1,0 +1,30 @@
+# cloudflared ingress——加入 StockBot APP 之後的**完整**檔案。
+#
+# 目標路徑：C:\Users\Cheng\.cloudflared\config.yml（**不在 repo 裡**，本檔只是範本）
+# 相對於現況，唯一的差異是多了 `stockbot.minatoyukina.uk` 那一段；
+# neo4j 與 mcp 兩條（含 mcp 的 httpHostHeader 改寫）**一個字都沒改**。
+#
+# ⚠ 順序有意義：cloudflared 由上往下比對，catch-all `http_status:404` 必須永遠在最後。
+# ⚠ 這裡沒有任何 credential。tunnel credentials JSON 與 cert.pem 只住在 ~/.cloudflared/，
+#   從來不進 Git（`git ls-files | grep cloudflared` 應為空）。
+
+tunnel: d3074ec2-c2a3-4782-9c54-8604289b5fd3
+credentials-file: C:\Users\Cheng\.cloudflared\d3074ec2-c2a3-4782-9c54-8604289b5fd3.json
+
+ingress:
+  - hostname: neo4j.minatoyukina.uk
+    service: http://localhost:7474
+
+  - hostname: mcp.minatoyukina.uk
+    service: http://localhost:8788
+    originRequest:
+      # MCP SDK 的 DNS-rebinding 防護只認 localhost Host，不改寫會回 421。
+      httpHostHeader: 127.0.0.1:8788
+
+  # ---- StockBot Web App（Phase 2 Step 5 新增）--------------------------------
+  # 認證邊界是 Cloudflare Access，不是這裡（見 README「還沒做的事」步驟 1）。
+  # APP 是 Starlette，沒有 MCP 那種 Host 檢查，所以**不需要** httpHostHeader 改寫。
+  - hostname: stockbot.minatoyukina.uk
+    service: http://localhost:8790
+
+  - service: http_status:404

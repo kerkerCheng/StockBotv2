@@ -523,7 +523,8 @@ def _valuation_section(
                           "observation_refs": list(fi.observation_refs) if fi else [],
                           "price_in_formula": False, **_refresh_deps(fv_refresh)})
     else:
-        fair_value_datum = missing("fair_value", "Fair value", f"{valuation.reason}（缺席不是 0）", authority=A_VALUATION)
+        fair_value_datum = missing("fair_value", "Fair value", f"{valuation.reason}（缺席不是 0）",
+                                   authority=A_VALUATION, absence_kind=valuation.effective_absence_kind)
     # Step 2：fair value 是哪一天的值——抄估值層的 value_date／value_date_semantics，不猜。
     if valuation.is_known and valuation.value_date is not None:
         value_date_datum = Datum(
@@ -538,12 +539,16 @@ def _valuation_section(
             "value_date", "fair value 是哪一天的值（value_date）",
             ("估值假設未宣告 value_date_convention——時點語意 unspecified（不猜；報酬層拒算）"
              if valuation.is_known else f"{valuation.reason}（fair value 缺席）"),
-            authority=A_VALUATION_ASSUMPTIONS)
+            authority=A_VALUATION_ASSUMPTIONS,
+            absence_kind=None if valuation.is_known else "upstream_unavailable")
     price = valuation.current_price
     current_price_datum = (
         Datum(key="current_price", label="現價（Engine C）", value=price.value, status="available", basis="observation",
               authority=A_SNAP, unit=f"quote_unit（{price.unit or '未知'}）", as_of=price.bar_date,
-              evidence_refs=tuple(price.evidence_refs), reason="估值層只讀現價；它不進 fair value，只進 gap")
+              evidence_refs=tuple(price.evidence_refs), reason="估值層只讀現價；它不進 fair value，只進 gap",
+              # 報價單位以**欄位**帶著走，不要讓消費端去 parse `unit` 那句中文。
+              # GBp（便士）與 GBP（英鎊）差 100 倍，而字串解析正是 2026-09-07 那個 100 倍陷阱的近親（L16）。
+              dependencies={"quote_unit": price.unit})
         if price.is_known else
         missing("current_price", "現價（Engine C）", price.reason or "無現價", authority=A_SNAP))
     gap = valuation.gap
@@ -563,8 +568,14 @@ def _valuation_section(
                           "implied_multiple_formula": valuation.implied_multiple_formula, **_refresh_deps(gap_refresh)})
     else:
         gap_status = "not_applicable" if gap.status in ("incompatible_unit", "unverified_unit") else "missing"
+        # gap 缺席的原因分兩種：**單位不可比**（報價單位 ≠ 結算幣別，兩個數不同尺度）
+        # 與**上游沒有 fair value**。前者是 inputs_incompatible，後者繼承估值層的 kind——
+        # 「刻意不主張」與「還沒寫」的區別必須一路傳到 gap 這一格，不能在這裡被抹平。
+        gap_kind = ("inputs_incompatible" if gap_status == "not_applicable"
+                    else (valuation.effective_absence_kind if not valuation.is_known else "upstream_unavailable"))
         gap_datum = Datum(key="fair_value_gap", label="Fair value vs 現價（gap；不是 expected return）", value=None,
-                          status=gap_status, basis="none", authority=A_VALUATION, reason=f"{gap.status}：{gap.reason}")
+                          status=gap_status, basis="none", authority=A_VALUATION, reason=f"{gap.status}：{gap.reason}",
+                          absence_kind=gap_kind)
     trace: list[Datum] = []
     for step in valuation.steps:
         authority = {"fundamental_input": A_BRIDGE, "assumption": A_VALUATION_ASSUMPTIONS, "derived": A_VALUATION}[step.kind]
@@ -592,7 +603,8 @@ def _valuation_section(
               status="available", basis="deterministic", authority=A_VALUATION, as_of=reference_day,
               method="純計數與選取：列出哪些是確定性算術、哪些輸入是判斷（按 basis 計數）；不是新判斷")
         if valuation.epistemics else
-        missing("valuation_epistemics", "fair value 的認識論分解（算術 vs 判斷）", "fair value 缺席，無可分解", authority=A_VALUATION))
+        missing("valuation_epistemics", "fair value 的認識論分解（算術 vs 判斷）", "fair value 缺席，無可分解",
+                authority=A_VALUATION, absence_kind="upstream_unavailable"))
     selection = EvidenceSelectionCounts(
         input_count=valuation.selection.input_count, accepted_count=valuation.selection.accepted_count,
         filtered_count=valuation.selection.filtered_count, reasons=dict(valuation.selection.reasons))
@@ -600,6 +612,7 @@ def _valuation_section(
     meta = SectionMeta(
         status=section_status, basis="deterministic" if valuation.is_known else "none", authority=A_VALUATION,
         capability=CAP_DETERMINISTIC_FAIR_VALUE, reason=valuation.reason, as_of=reference_day,
+        absence_kind=valuation.effective_absence_kind,
         warnings=(VALUATION_EPISTEMIC_WARNING,
                   "fair value 不含現價：price-only 變化只動 gap，不動 fair value。",
                   "gap " + "；".join(GAP_IS_NOT), *valuation.warnings),
@@ -673,7 +686,8 @@ def _implied_return_section(
     current_price_datum = (
         Datum(key="current_price", label="現價（Engine C；horizon 起點）", value=price.value, status="available",
               basis="observation", authority=A_SNAP, unit=f"quote_unit（{price.unit or '未知'}）", as_of=price.bar_date,
-              evidence_refs=tuple(price.evidence_refs), reason="報酬從這個價格所屬的 bar_date 起算")
+              evidence_refs=tuple(price.evidence_refs), reason="報酬從這個價格所屬的 bar_date 起算",
+              dependencies={"quote_unit": price.unit})
         if price.is_known else missing("current_price", "現價（Engine C）", price.reason or "無現價", authority=A_SNAP))
     fair_value_datum = (
         Datum(key="fair_value", label=f"Fair value（{target.label if target else '?'}；照抄 valuation）", value=result.fair_value,
@@ -682,7 +696,8 @@ def _implied_return_section(
               dependencies={"currency": result.fair_value_currency,
                             "assumption_ids": [a for a in result.assumption_ids if not a.startswith("ha_")]})
         if result.fair_value is not None else
-        missing("fair_value", "Fair value（照抄 valuation）", result.reason or "fair value 缺席", authority=A_VALUATION))
+        missing("fair_value", "Fair value（照抄 valuation）", result.reason or "fair value 缺席",
+                authority=A_VALUATION, absence_kind=result.effective_absence_kind))
     value_date_datum = (
         Datum(key="value_date", label=f"fair value 是哪一天的值（{result.value_date_semantics}）", value=result.value_date,
               status="available", basis="session_judgment", authority=A_VALUATION_ASSUMPTIONS, unit="date",
@@ -691,7 +706,8 @@ def _implied_return_section(
         if result.value_date is not None else
         missing("value_date", "fair value 是哪一天的值",
                 "估值假設未宣告 value_date_convention——時點語意 unspecified，不猜" if result.fair_value is not None
-                else "fair value 缺席", authority=A_VALUATION_ASSUMPTIONS))
+                else "fair value 缺席", authority=A_VALUATION_ASSUMPTIONS,
+                absence_kind=None if result.fair_value is not None else "upstream_unavailable"))
     h = result.horizon
     if h is not None:
         h_refresh = refresh.get(f"horizon_assumption:{h.assumption_id}")
@@ -748,10 +764,14 @@ def _implied_return_section(
             method="純計數與選取：列出哪些是確定性算術、哪些輸入是判斷；one_sentence 是機器組出的一句話，不是新判斷")
     else:
         why = f"{result.reason}（缺席不是 0）"
-        window_datum = missing("horizon_window", "Horizon 區間（起／迄／天數）", why, authority=A_IMPLIED_RETURN)
-        price_return_datum = missing("base_case_implied_price_return", "Base-case 隱含價格報酬（simple）", why, authority=A_IMPLIED_RETURN)
-        annualized_datum = missing("annualized_price_return", "年化隱含價格報酬", why, authority=A_IMPLIED_RETURN)
-        epistemics_datum = missing("return_epistemics", "implied return 的認識論分解", why, authority=A_IMPLIED_RETURN)
+        # 缺席語意由報酬層宣告（它自己知道是上游 deliberate_abstention 還是 horizon 還沒寫）；
+        # 呈現端不得從 `why` 這段散文回推（L16）。
+        kind = result.effective_absence_kind
+        window_datum = missing("horizon_window", "Horizon 區間（起／迄／天數）", why, authority=A_IMPLIED_RETURN, absence_kind=kind)
+        price_return_datum = missing("base_case_implied_price_return", "Base-case 隱含價格報酬（simple）", why,
+                                     authority=A_IMPLIED_RETURN, absence_kind=kind)
+        annualized_datum = missing("annualized_price_return", "年化隱含價格報酬", why, authority=A_IMPLIED_RETURN, absence_kind=kind)
+        epistemics_datum = missing("return_epistemics", "implied return 的認識論分解", why, authority=A_IMPLIED_RETURN, absence_kind=kind)
     convention_datum = Datum(
         key="return_convention", label="報酬種類", value=result.return_convention, status="available", basis="deterministic",
         authority=A_IMPLIED_RETURN, method=result.model_version, as_of=reference_day,
@@ -776,6 +796,7 @@ def _implied_return_section(
     meta = SectionMeta(
         status=section_status, basis="deterministic" if result.is_known else "none", authority=A_IMPLIED_RETURN,
         capability=CAP_BASE_CASE_IMPLIED_RETURN, reason=result.reason, as_of=reference_day,
+        absence_kind=result.effective_absence_kind,
         warnings=(RETURN_EPISTEMIC_WARNING,
                   "四個輸入缺一就 missing：現價（含 bar_date）、fair value（同單位）、fair value 的時點語意、生效的 horizon 判斷；不補 12 個月。",
                   "implied return " + "；".join(RETURN_IS_NOT), *result.warnings),
@@ -1469,7 +1490,12 @@ def build_alpha_investment_view(
         )
     identity_section = IdentitySection(
         ticker=ticker, company_id=company_id,
-        company_label=f"{company_id}（{ticker}）" if company_id else ticker,
+        # 面向人的標籤。registry 有 `display_name` 就用它，沒有就退回 `co:*（ticker）`——
+        # **不從 company_id 猜名字**（`co:iqe` → 「Iqe」是編出來的）。AGENTS 的判準是
+        # 「不得假設使用者能從 co:* ID 或內部術語自行還原主詞」，而缺名字時誠實露出 ID
+        # 比編一個像模像樣的名字安全。
+        company_label=(str(identity.get("display_name")) if identity.get("display_name")
+                       else (f"{company_id}（{ticker}）" if company_id else ticker)),
         market_currency=market_currency, market_quote_unit=quote_unit,
         execution_venue=identity.get("execution_venue"),
         as_of=context.as_of,

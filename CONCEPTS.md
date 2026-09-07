@@ -286,6 +286,18 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 一種**不是主流程、也不是研究完整度 gate** 的能力。stock-level 主流程是 **Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return**，終點是 implied return；`EntryCriterion`／hurdle 屬 optional analytical capability——**沒有它不代表這檔研究不完整**，只表示「optional entry threshold unavailable」。系統**不得**為了讓自己有答案而要求使用者宣告一個固定的 10%／15%／20%。機會成本、風險調整後 hurdle 與跨標的比較留給未來的 Portfolio／Investor Policy 階段。
 *Avoid:* 把 optional 缺席算成 blocker、用預設 hurdle 讓畫面「完整」、把 entry threshold 當成主流程終點
 
+### absence_kind（「沒有值」是哪一種沒有）
+與 `status` **正交**的第二個語意軸（`alpha/absence.py`，2026-09-07 Step 5）：`status` 回答「這一格能不能用」，`absence_kind` 回答「它**為什麼**沒有」。封閉字彙 11 種：`not_yet_recorded`（還沒做）／`deliberate_abstention`（**刻意不主張——這已經是答案**）／`method_not_applicable`（方法對這筆資料無定義，補資料解不掉）／`upstream_unavailable`（這一格沒問題，是上游缺）／`inputs_incompatible`（每格都有值但期間／口徑／單位身分不相容）／`provider_missing`／`capability_absent`（＝`not_modeled`）／`point_in_time_unavailable`／`insufficient_evidence`／`invalidated`／`not_applicable_unspecified`。**由知道自己走了哪個分支的那段程式明示**；沒明示就由 `DEFAULT_ABSENCE_KIND` 這張**查表**給預設。消費端一律不得 parse `reason` 去猜（L16）。⚠ `not_applicable` 的預設刻意是 `not_applicable_unspecified`——它今天同時被 PIT 與方法層使用，猜任一邊都是替 authority 造一個它沒說過的區別。`SETTLED_ABSENCE_KINDS`（前三種裡的刻意不主張／方法不適用／能力不存在）表示「不必去補」，但**不讓 readiness 變好**。
+*Avoid:* 把它當成新的 status、用它讓 blocked 變 ready、在呈現層 parse 理由句推導它
+
+### Abstention（刻意不主張）
+「對某一層的某個主題，現在沒有可辯護的假設，所以刻意不 assert」的 **append-only 紀錄**（`alpha/abstention/`，`library/private/alpha/abstentions/<TICKER>.jsonl`，2026-09-07 Step 5）。它**不是**第二份 `ValuationAssumption` authority——後者擁有「目標倍數是幾」，它**結構上不可能擁有任何數字**（`_assert_no_value_fields` 在 import 當下掃描欄位名，長出 `value`／`target_pe`／`multiple` 是 import 失敗）。`reason` 與 `revisit_when` 都必填：沒有「什麼證據出現才會改寫」的 abstention 是一個永遠不會響的火警警報（L7）。`layer`／`subject` 是封閉字彙（v1 只有 `valuation.forward_earnings_multiple.target_pe`），否則它會變成「任何一格都可以宣布自己是刻意留白」的萬用擋箭牌。宣告之後 fair value **仍然缺席**、readiness **仍然 blocked**——改變的只有那句「為什麼」。
+*Avoid:* 用它填一個 fair value、沒有 revisit 條件就宣告、把它當成 thesis 的替代品
+
+### Materialized Analyst View（APP 讀的那份 artifact）
+`AnalystView` 預先算好並 atomic 寫下的 JSON（`webapp/`，`library/private/app/analyst_view/<TICKER>.json`，2026-09-07 Step 5）。產品 invariant：**`LLM changes cognition; APP reads cognition`**——materialize 是唯一會跑模型、連 DB、讀 private ledger 的一步；serve 只做 open → parse → validate。它是 **derived cache 不是 authority**：刪掉重跑就會回來（L10）。帶**兩個 digest**：`content_digest`（整份內容，偵測半份寫入或事後竄改）與 `freshness_identity`（只含**認知狀態**——as-of、context digest、read model 版本、readiness、refresh overall；**價格動了不算認知變了**）。malformed／版本不符／digest 不合一律 fail closed 回 **503**；⚠ **「artifact 讀不到」（503）與「這檔沒有研究結論」（200 ＋ `readiness=blocked`）是兩件事，不得同形**。超過 `STOCKBOT_APP_MAX_AGE_HOURS`（預設 24h）標 `stale`——**stale 照樣回，但絕不觸發重建**。
+*Avoid:* 把 artifact 當資料來源回寫、cache miss 時自動重建、用 stale 當錯誤
+
 ### Review Condition（假設自帶的 machine-readable 觸發條件）
 `metric`／`scope`／`period_end`／`period_kind`／`operator`／`threshold`／`on_trigger`／`note`。由寫假設的人明示，引擎拿 Engine C 觀測（年度＋exit quarter）對照；滿足 → `disproof_signal` → 該假設 `on_trigger` state。`note` 是人寫的下一步（例：下修至 +45%），引擎只讀不做。也可經 Event Watch `hypothesis_ref=oa_*` 喚醒。
 *Avoid:* parser 讀 rationale 自由文字、觸發後自動寫新假設

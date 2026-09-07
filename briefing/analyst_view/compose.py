@@ -17,16 +17,16 @@
 """
 from __future__ import annotations
 
-from typing import Iterable, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from briefing.alpha_view.contracts import (
     VALUELESS_STATUSES, AlphaInvestmentView, Datum, EvidenceItem, RefreshItem,
 )
 
 from .contracts import (
-    BLOCKED, CORE_PANELS, OPTIONAL_PANELS, READY, READY_WITH_FLAGS, SCHEMA_VERSION, AnalystLine,
-    AnalystPanel, AnalystReadiness, AnalystView, RefreshSummary, WeakInput, readiness_class,
-    worst_status,
+    BLOCKED, CORE_PANELS, OPTIONAL_PANELS, READY, READY_WITH_FLAGS, SCHEMA_VERSION, AnalystBlocker,
+    AnalystLine, AnalystPanel, AnalystReadiness, AnalystView, RefreshSummary, WeakInput,
+    readiness_class, worst_status,
 )
 
 #: refresh 引擎標成這些 state 的成果＝「還有事要做」。`current`／`superseded`／`missing` 不在此列
@@ -37,6 +37,12 @@ ATTENTION_STATES = ("recalculate", "review_required", "invalidated", "stale")
 HEADLINE_ARTIFACTS = (
     "implied_return", "fair_value", "fair_value_gap", "horizon_assumption", "valuation_assumption",
 )
+
+
+
+def _absence_kinds(**metas: Any) -> dict[str, str | None]:
+    """每個來源 section 的缺席語意——**照抄 `SectionMeta.effective_absence_kind`，不推論**。"""
+    return {name: meta.effective_absence_kind for name, meta in metas.items()}
 
 
 def _line(key: str, label: str, datum: Datum, role: str) -> AnalystLine:
@@ -158,12 +164,13 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
         _line("epistemics_one_sentence", "一句話（authority 自組）", ir.epistemics, "headline_context"),
     )
     statuses = {"implied_return": ir.meta.status, "valuation": va.meta.status}
+    kinds = _absence_kinds(implied_return=ir.meta, valuation=va.meta)
     return AnalystPanel(
         key="headline", title="頭條：現價 → future target value → 隱含報酬",
         questions=("q4_implied_return",),
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("implied_return", "valuation", "refresh_status"),
-        source_statuses=statuses, lines=numbers + context_lines,
+        source_statuses=statuses, source_absence_kinds=kinds, lines=numbers + context_lines,
         attention=_attention(view, artifact_types=HEADLINE_ARTIFACTS),
         attention_scope="只列頭條這幾格自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",
         attention_total=len(_attention(view)),
@@ -195,12 +202,13 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
     statuses = {"internal_fundamentals": inf.meta.status, "consensus": cs.meta.status,
                 "expectation_gap": eg.meta.status}
+    kinds = _absence_kinds(internal_fundamentals=inf.meta, consensus=cs.meta, expectation_gap=eg.meta)
     return AnalystPanel(
         key="fundamental", title="基本面：我們預測什麼／市場預測什麼／差異在哪",
         questions=("q1_internal", "q2_market", "q3_gap"),
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("internal_fundamentals", "consensus", "expectation_gap"),
-        source_statuses=statuses, lines=lines,
+        source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
         # ⚠ 共識段的 warnings 也要進來：「forward 是相對標籤不是會計年度身分」這條警告
         # 正是 2026-09-07 rollover 污染事故的判準，藏在 section 裡等於沒有（INV-3）。
         notes=(cs.coverage_note,) + inf.meta.warnings + cs.meta.warnings,
@@ -225,12 +233,13 @@ def _why_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
     statuses = {"earnings_bridge": eb.meta.status, "valuation": va.meta.status,
                 "implied_return": ir.meta.status}
+    kinds = _absence_kinds(earnings_bridge=eb.meta, valuation=va.meta, implied_return=ir.meta)
     return AnalystPanel(
         key="why", title="怎麼算到這裡：假設、敏感度、算式、證據",
         questions=("q5_fragile",),
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("earnings_bridge", "valuation", "implied_return"),
-        source_statuses=statuses, lines=lines,
+        source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
         weak_inputs=_weak_inputs(view, assumptions, sensitivities),
         evidence=_evidence_for(view, assumptions + (ir.current_price, ir.fair_value, ir.price_return)),
         notes=va.meta.warnings + ir.meta.warnings,
@@ -266,12 +275,14 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
     statuses = {"variant_view": vv.meta.status, "falsification": fs.meta.status,
                 "catalysts": ct.meta.status, "refresh_status": rs.meta.status}
+    kinds = _absence_kinds(variant_view=vv.meta, falsification=fs.meta, catalysts=ct.meta,
+                           refresh_status=rs.meta)
     return AnalystPanel(
         key="research", title="研究現況：thesis、催化劑、什麼會推翻它、什麼需要重看",
         questions=("q6_change",),
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("variant_view", "falsification", "catalysts", "refresh_status"),
-        source_statuses=statuses, lines=lines,
+        source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
         catalysts=ct.structured, checkpoints=ct.checkpoints, disproofs=fs.conditions,
         attention=_attention(view), attention_total=len(_attention(view)), risks=vv.risks,
         notes=tuple(ct.problems) + tuple(rs.notes),
@@ -303,6 +314,7 @@ def _entry_panel(view: AlphaInvestmentView) -> AnalystPanel:
         questions=("q4_implied_return",),
         status=el.meta.status, optional=True,
         source_sections=("entry_logic",), source_statuses={"entry_logic": el.meta.status},
+        source_absence_kinds=_absence_kinds(entry_logic=el.meta),
         lines=lines, notes=el.is_not,
         context={"capability": el.meta.capability,
                  "available": el.meta.status not in VALUELESS_STATUSES,
@@ -329,21 +341,29 @@ _READINESS_RULE = (
 def _readiness(panels: Mapping[str, AnalystPanel]) -> AnalystReadiness:
     flags: list[str] = []
     blockers: list[str] = []
+    blocker_details: list[AnalystBlocker] = []
+    flag_details: list[AnalystBlocker] = []
     for name in CORE_PANELS:
         panel = panels[name]
         bucket = readiness_class(panel.status)
         detail = f"{name}：{panel.status}" + (f"（{panel.reason}）" if panel.reason else "")
+        # 同一件事的兩種形式：字串給人讀，`AnalystBlocker` 給機器讀。**不是兩份判斷**——
+        # 兩者都由同一個迴圈、同一個 bucket 決定，長度不同會在型別層被擋下。
+        item = AnalystBlocker(panel=name, status=panel.status, absence_kind=panel.absence_kind,
+                              settled=panel.absence_is_settled, reason=panel.reason)
         if bucket == BLOCKED:
             blockers.append(detail)
+            blocker_details.append(item)
         elif bucket == READY_WITH_FLAGS:
             flags.append(detail)
+            flag_details.append(item)
     unavailable = tuple(f"{name}：{panels[name].status}" for name in OPTIONAL_PANELS
                         if panels[name].status in VALUELESS_STATUSES)
     state = BLOCKED if blockers else (READY_WITH_FLAGS if flags else READY)
     return AnalystReadiness(
         state=state, core_panels=CORE_PANELS, optional_panels=OPTIONAL_PANELS,
         flags=tuple(flags), blockers=tuple(blockers), optional_unavailable=unavailable,
-        rule=_READINESS_RULE,
+        rule=_READINESS_RULE, blocker_details=tuple(blocker_details), flag_details=tuple(flag_details),
     )
 
 

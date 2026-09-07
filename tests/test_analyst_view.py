@@ -139,8 +139,11 @@ def test_consumer_carries_no_formula_and_no_numeric_literal_of_its_own() -> None
 
 def test_module_import_allowlists_keep_the_layer_presentation_independent() -> None:
     allowed = {
+        # `alpha.absence` 是缺席語意的封閉字彙 SSOT，本身零相依（見
+        # tests/test_alpha_view_render.py::test_contracts_module_is_pure_stdlib 的同步斷言）。
+        # 允許它是為了**不要**在呈現層複製第二份字彙表——L16 記過三次的形狀。
         "contracts.py": {"__future__", "dataclasses", "datetime", "typing",
-                         "briefing.alpha_view.contracts"},
+                         "alpha.absence", "briefing.alpha_view.contracts"},
         "compose.py": {"__future__", "typing", "briefing.alpha_view.contracts", ".contracts"},
         "render.py": {"__future__", "typing", "briefing.alpha_view.contracts",
                       "briefing.alpha_view.render", "shared.markdown", ".contracts"},

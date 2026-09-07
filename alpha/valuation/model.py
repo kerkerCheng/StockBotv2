@@ -27,6 +27,7 @@ from typing import Any, Mapping, Sequence
 
 from identity.currency import resolve_quote_unit
 
+from ..abstention.contracts import Abstention, select_abstention
 from ..contracts import EvidenceRef, content_digest
 from ..fundamental.contracts import (
     AssumptionSelection, FiscalPeriod, FundamentalModelResult, OperatingAssumption,
@@ -124,6 +125,7 @@ def build_valuation(
     price: CurrentPrice,
     parse_errors: Sequence[str] = (),
     method: str = "forward_earnings_multiple",
+    abstention_records: Sequence[Abstention] = (),
 ) -> ValuationResult:
     """一次估值執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。"""
     if method not in VALUATION_METHODS:
@@ -134,6 +136,9 @@ def build_valuation(
     warnings: list[str] = []
     steps: list[ValuationStep] = []
     reason: str | None = None
+    #: 缺席語意（`alpha/absence.py`）。**每個把 `reason` 設起來的分支自己宣告它是哪一種缺席**——
+    #: 消費端不得回頭 parse 這段散文（L16：分類要跟著資料走）。None ＝ 用 status 的預設。
+    absence_kind: str | None = None
 
     # ---- 1. 內部指標（照抄，不重算）------------------------------------------------
     fundamental_input: FundamentalInput | None = None
@@ -141,19 +146,23 @@ def build_valuation(
     currency: str | None = None
     if fundamental is None:
         reason = fundamental_reason or "本次未執行 fundamental model——沒有內部 EPS 就沒有估值"
+        absence_kind = "upstream_unavailable"
     else:
         metric = fundamental.metrics.get(metric_name)
         currency = fundamental.base_actuals.currency if fundamental.base_actuals else None
         target = fundamental.target_period
         if metric is None:
             reason = f"fundamental model 沒有 {metric_name} 輸出"
+            absence_kind = "upstream_unavailable"
         else:
             fundamental_input = FundamentalInput.from_metric(metric, currency=currency)
             if not fundamental_input.is_known:
                 reason = f"內部 {metric_name} 缺席：{metric.reason or fundamental.reason or '未知'}（不是 0）"
+                absence_kind = "upstream_unavailable"
         if fundamental.as_of != as_of:
             warnings.append("fundamental model 的 as_of 與估值視角不符——拒用（INV-6）")
             fundamental_input, reason = None, "fundamental model 是在不同 as-of 視角下算的，拒用（INV-6）"
+            absence_kind = "point_in_time_unavailable"
     if fundamental_input is not None:
         steps.append(ValuationStep(
             key=f"internal_{metric_name}", label=f"內部稀釋 EPS（{fundamental_input.period.label}，{fundamental_input.accounting_basis}）",
@@ -199,10 +208,22 @@ def build_valuation(
     formula: str | None = None
     basis_used: str | None = fundamental_input.accounting_basis if fundamental_input else None
     if assumption is None:
-        if reason is None:
+        # 「刻意不主張」與「還沒寫」在 2026-09-07 之前是同一句話（L12：一個表示兩種語意）。
+        # 有 append-only 的 `Abstention` 紀錄時，缺席的語意變成 **deliberate_abstention**：
+        # 這已經是研究結論，不是待辦。**它不會讓 fair value 出現**——abstention 型別上不可能帶值。
+        declared = select_abstention(
+            abstention_records, layer="valuation", subject=f"{method}.{parameter}",
+            period_end=target.end if target is not None else None, as_of=as_of, today=today)
+        if declared is not None and reason is None:
+            reason = (f"刻意不主張目標倍數（{method}.{parameter}）：{declared.reason}"
+                      f"｜什麼會改寫它：{declared.revisit_when}"
+                      f"｜宣告於 {declared.created_on.isoformat()}（{declared.abstention_id}）")
+            absence_kind = "deliberate_abstention"
+        elif reason is None:
             reason = ("沒有生效的估值假設（" + "；".join(f"{k}={v}" for k, v in selection.reasons.items()) + "）"
                       if selection.input_count else
                       f"尚未寫入任何估值假設（{method}.{parameter}）——沒有 explicit target multiple 就沒有 fair value，不補預設")
+            absence_kind = "not_yet_recorded"
         steps.append(ValuationStep(key=parameter, label="目標本益比假設", kind="assumption", value=None,
                                    unit="multiple", basis="none", reason=reason))
     else:
@@ -216,13 +237,16 @@ def build_valuation(
             if not assumption.period.same_as(fundamental_input.period):
                 reason = (f"估值假設針對 {assumption.period.label}（至 {assumption.period.end}），內部 EPS 是 "
                           f"{fundamental_input.period.label}（至 {fundamental_input.period.end}）——不同會計期間不得相乘")
+                absence_kind = "inputs_incompatible"
             elif assumption.accounting_basis != fundamental_input.accounting_basis:
                 reason = (f"估值假設口徑 {assumption.accounting_basis}，內部 EPS 口徑 {fundamental_input.accounting_basis}"
                           "——GAAP／non-GAAP 不得混算（不是缺假設，是口徑不合）")
+                absence_kind = "inputs_incompatible"
             elif (not_applicable := method_applicability(method, fundamental_input.value)) is not None:
                 # 期間對、口徑對、資料齊全——但 method 本身不適用（虧損公司的本益比法）。
                 # 這條與「缺料」刻意分開：訊息說的是「方法不適用」，不是「還沒算出來」。
                 reason = not_applicable
+                absence_kind = "method_not_applicable"
                 warnings.append(f"valuation_method_not_applicable：{method}")
             else:
                 fair_value = _fair_value(method, fundamental_input, assumption)
@@ -330,6 +354,7 @@ def build_valuation(
         sensitivities=tuple(sensitivities), epistemics=epistemics, digest=digest, warnings=tuple(warnings),
         evidence=tuple({r.ref: r for r in model_evidence}.values()),
         value_date=value_date, value_date_semantics=value_date_semantics,
+        absence_kind=None if fair_value is not None else absence_kind,
     )
 
 
