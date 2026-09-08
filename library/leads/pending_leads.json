@@ -6868,6 +6868,174 @@
       "result": "ok",
       "run_at": "2026-09-04T22:34:09.721534+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:15.789834+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:16.795753+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:17.503671+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 12,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:21.781146+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:23.508547+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:24.238444+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:24.952013+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:25.656617+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:26.165017+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:26.895255+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:27.573083+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:28.093382+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:28.786848+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:29.476637+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:30.256052+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:31.007074+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:31.703155+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:32.389399+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:32.903653+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:33.613086+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:34.159731+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:34.886134+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:35.473096+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:36.040795+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:36.741716+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:37.576455+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:38.090014+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T05:08:38.815893+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -8240,6 +8408,90 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326003097/f6k_050726.htm"
     },
+    "lead_05cbb5a9038f9098f905b8daaa35ca23": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology",
+          "co:sandisk"
+        ],
+        "tickers": [
+          "MU",
+          "SNDK",
+          "SPCX"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.778012+00:00",
+      "lead_id": "lead_05cbb5a9038f9098f905b8daaa35ca23",
+      "media": [
+        {
+          "cache": {
+            "bytes": 92055,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_05cbb5a9038f9098f905b8daaa35ca23/3_2096149196122599424.jpg",
+            "sha256": "6d24272a44b5e38dcba8bc0ba0820cc3e07b9f48fd7ebefc9a7cfbe73a81dc15"
+          },
+          "height": 1130,
+          "media_key": "3_2096149196122599424",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRcElocbsAA2KrQ.jpg",
+          "width": 1220
+        },
+        {
+          "cache": {
+            "bytes": 84824,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_05cbb5a9038f9098f905b8daaa35ca23/3_2096149196051210240.jpg",
+            "sha256": "882e7c49a5b300eb761f20667f0622761ab39cffa7ad0a3f6e61a3f7f3900f4b"
+          },
+          "height": 1144,
+          "media_key": "3_2096149196051210240",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRcEloLaYAAIOZN.jpg",
+          "width": 1161
+        }
+      ],
+      "published_at": "2026-09-05T08:11:29.000Z",
+      "raw_text": "Now that $MU to $SNDK have pulled a major recovery. \n\nGood to have a reminder that the memory bottleneck hasn’t changed!\n\nSame with CW lasers… substrates… or others.\n\nBut short term sentiment (depending on prices/macro) often does.\n\nI think a lot of demand imbalances get worse than people expect:\n\n- There’s some Japanese distributors in Nikkei today saying memory demand deficit has reached 40-60% (67-150% higher than supply). With general prices going up 50% by years end.\n\n- $SPCX isn’t included in the $1.3T hyperscaler capex figures (I think Wells Fargo ets. ~$263b AI capex), so total capex figures might be surprising.\n\n- $SNDK expects 80% gross margins to continue into 2030… (welcome to S&P 100)\n\n- and once again you have long term visibility into 2031 now with companies like Samsung\n\nMemory is very really volatile… some of my positions are up 270%+, so I find it a bit easier to hold through volatile periods.\n\nBut regardless, operating fundamentals doesn’t always align with short term price movements.\n\nSame concept can be applied to other sectors.",
+      "refs": {
+        "parked_reason": "Nikkei Asia 原文已定位（Memory shortage set to run until 2027 as chipmakers focus on AI：美韓龍頭增產僅能滿足約 60% 需求），但推文的「缺口 40–60%／年底漲 50%」具體數字未能在該文逐字核對，只算部分追回。屬記憶體供需時變觀測，依 L4 歸 Engine C 不入圖；SNDK 80% 毛利到 2030 為公司自報 guidance，非本圖主題。",
+        "primary_url": "https://asia.nikkei.com/business/tech/semiconductors/memory-shortage-set-to-run-until-2027-as-chipmakers-focus-on-ai",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "WebSearch → Nikkei Asia 英文站定位到短缺至 2027／60% 需求覆蓋一文；40–60%、+50% 未逐字命中（可能在日文版或另一篇通路報導）",
+        "trace_next_trigger": "MU FQ4 FY26 財報（2026-09-24 推估）或 Nikkei 日文版原文可逐字核對缺口數字",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "MU",
+          "SNDK",
+          "SPCX",
+          "co:micron_technology",
+          "co:sandisk"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Now that $MU to $SNDK have pulled a major recovery. Good to have a reminder that the memory bottleneck hasn’t changed! Same with CW lasers… substrates… or others. But short term sentiment (depending on prices/macro) often does. I think a lot of demand imbalances get worse than people expect: - There’s some Japanese distributors in Nikkei today saying memory demand deficit has reached 40-60% (67-150% higher than supply). With general prices going up 50% by years end. - $SPCX isn’t included in the $1.3T hyperscaler capex figures (I think Wells Fargo ets. ~$263b AI capex), so total capex figures might be surprising. - $SNDK expects 80% gross margins to continue into 2030… (welcome to S&P 100) - and once again you have long term visibility into 2031 now with companies like Samsung Memory is very really volatile… some of my positions are up 270%+, so I find it a bit easier to hold through volatile periods. But regardless, operating fundamentals doesn’t always align with short term price movements. Same concept can be applied to other sectors.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T05:14:01.091376+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "需求缺口與價格是時變觀測，不新增候選也不改排序"
+        },
+        "decided_at": "2026-09-08T05:14:01.091376+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "引 Nikkei：日本通路稱記憶體需求缺口 40–60%、年底價漲 50%；SNDK 80% 毛利到 2030。記憶體產業組目前零列，屬需求端事實",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096149203278037407"
+    },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
       "entities": {
         "company_ids": [
@@ -9403,6 +9655,94 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2095957075302273257"
+    },
+    "lead_0c3f6509a8ac25a0ebfb9b9afe0f2f84": {
+      "entities": {
+        "company_ids": [
+          "co:axt",
+          "co:nebius",
+          "co:micron_technology",
+          "co:intel",
+          "co:lumentum",
+          "co:iqe",
+          "co:applied_optoelectronics",
+          "co:aehr_test_systems",
+          "co:soitec",
+          "co:sandisk",
+          "co:marvell_technology",
+          "co:sivers_semiconductors",
+          "co:tower_semiconductor",
+          "co:x_fab",
+          "co:churchill_capital_xi"
+        ],
+        "tickers": [
+          "AXTI",
+          "NBIS",
+          "MU",
+          "INTC",
+          "LITE",
+          "IQE",
+          "AAOI",
+          "GDRZF",
+          "AEHR",
+          "EWY",
+          "RPI",
+          "SOI",
+          "SNDK",
+          "SIMO",
+          "MRVL",
+          "ARM",
+          "SIVE",
+          "TSEM",
+          "HPS.A",
+          "LPK",
+          "ALRIB",
+          "XFAB",
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.771050+00:00",
+      "lead_id": "lead_0c3f6509a8ac25a0ebfb9b9afe0f2f84",
+      "media": [],
+      "published_at": "2026-09-07T04:14:23.000Z",
+      "raw_text": "Got curious and decided to track which thesis of mine were still up 100%+ YTD after the recent drawdown: \n\n1. $AXTI - InP substrates\n2. $NBIS - Neoclouds\n3. $MU - Memory\n4. $INTC - Foundry\n5. $LITE - Photonics\n6. $IQE - Epiwafers\n7. $AAOI - Photonics\n8. $GDRZF - Venezuela\n9. $AEHR - Machines\n10. $EWY (volatility + underlying)\n11. $RPI - AI orchestration\n12. $SOI - SIlicon Photonics Substrates\n13. $SNDK - Memory\n14. $SIMO - Memory\n15. $MRVL - ASICs\n16. Nanya - memory\n17. Unimicron - substrates\n18. $ARM - CPUs\n19. $SIVE - Photonics\n\nFrom H1 2026, around 19 names across several themes up 100%+ still from the selection of winners.  \n\nSince many like $TSEM / $HPS.A / $LPK / $ALRIB fell out of the range. (obviously not all are green like Shunsin / $XFAB and disappointed by performance). \n\nRegardless, glad a lot of my ideas turned out decently, rather than just being known for one like $AXTI. To the point the Chinese community gave my investing style a name \"Perilla Leaf Theory\".\n\nAgain not too sure if my new ideas replicate this performance again in H2 2026 or 2027... \n\nFor H2, my new thesis was on $CCXI for humanoids/downstream physical AI shift and ESMT for DDR2/DDR3/legacy memory. \n\nBut I'll keep sharing my core ideas and thought process for free so people can poke holes or debate it until things get validated.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "InP",
+            "LITE"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI",
+            "physical AI"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "Got curious and decided to track which thesis of mine were still up 100%+ YTD after the recent drawdown: 1. $AXTI - InP substrates 2. $NBIS - Neoclouds 3. $MU - Memory 4. $INTC - Foundry 5. $LITE - Photonics 6. $IQE - Epiwafers 7. $AAOI - Photonics 8. $GDRZF - Venezuela 9. $AEHR - Machines 10. $EWY (volatility + underlying) 11. $RPI - AI orchestration 12. $SOI - SIlicon Photonics Substrates 13. $SNDK - Memory 14. $SIMO - Memory 15. $MRVL - ASICs 16. Nanya - memory 17. Unimicron - substrates 18. $ARM - CPUs 19. $SIVE - Photonics From H1 2026, around 19 names across several themes up 100%+ still from the selection of winners. Since many like $TSEM / $HPS.A / $LPK / $ALRIB fell out of the range. (obviously not all are green like Shunsin / $XFAB and disappointed by performance). Regardless, glad a lot of my ideas turned out decently, rather than just being known for one like $AXTI. To the point the Chinese community gave my investing style a name \"Perilla Leaf Theory\". Again not too sure if my new ideas replicate this performance again in H2 2026 or 2027... For H2, my new thesis was on $CCXI for humanoids/downstream physical AI shift and ESMT for DDR2/DDR3/legacy memory. But I'll keep sharing my core ideas and thought process for free so people can poke holes or debate it until things get validated.",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:02.065589+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "作者 YTD 績效回顧與主題清單，無可追的結構或財務 claim；新提的 CCXI／ESMT 主題待其具體貼文再判",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096814311306129776"
     },
     "lead_0c4d787d641296115df7d94fdddb0c3e": {
       "entities": {
@@ -12002,6 +12342,82 @@
       },
       "url": "https://github.com/local/robotics-sub-backfill?work=448"
     },
+    "lead_1b42074dd23fcc1e48bbc8dd41306c49": {
+      "entities": {
+        "company_ids": [
+          "co:sk_hynix",
+          "co:micron_technology",
+          "co:sandisk"
+        ],
+        "tickers": [
+          "SKHY",
+          "MU",
+          "SNDK"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.768645+00:00",
+      "lead_id": "lead_1b42074dd23fcc1e48bbc8dd41306c49",
+      "media": [
+        {
+          "cache": {
+            "bytes": 236175,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_1b42074dd23fcc1e48bbc8dd41306c49/3_2096856707150614528.jpg",
+            "sha256": "c9dde2cf785e12e703d44cfda024da2b9cfe3dd176e637fb87da345aa74ad65a"
+          },
+          "height": 1634,
+          "media_key": "3_2096856707150614528",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRmIEMabkAAXr64.jpg",
+          "width": 2124
+        },
+        {
+          "cache": {
+            "bytes": 90149,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_1b42074dd23fcc1e48bbc8dd41306c49/3_2096857979870126080.jpg",
+            "sha256": "d5344fdfc77386075e61b93dc6d1366e413c22320608f64a2749e97e2d4cb952"
+          },
+          "height": 1238,
+          "media_key": "3_2096857979870126080",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRmJORqaIAAWvfs.jpg",
+          "width": 1802
+        }
+      ],
+      "published_at": "2026-09-07T07:09:05.000Z",
+      "raw_text": "Is there any other industry... Where every investor is cheering for shortages and price hikes? \n\nSED reported today that: Samsung / $SKHY \"stockpiles have fallen to less than 10 days of supply, and a severe shortage could emerge next year, according to a new forecast\"\n\nKB Securities said that the memory market next year will see \"the tightest supply conditions in history\"\n\nKB Securities projects memory's share of AI infrastructure costs to expand from 40% this year to 57% next year, with others like TrendForce placing next year's figure at 68% (total hyperscaler capex, pretty wild forecast attached)\n\n\"Both stocks have fallen 38% from their peaks over the past three months, pushing their price-to-earnings ratios based on next year's expected results down to about three times.\"\n\nLikewise, commentary around Phison stated they expect extremely tight NAND supply in 2027, so hard to see memory flooding the market or prices collapsing next year... \n\nThey gave some color that \"soaring NAND prices have forced some Chinese consumer module makers to liquidate inventory, giving Phison opportunities to buy lower-priced stock\", so it does show some price declines can coexist with broader shortages. \n\nTLDR: KOSPI + read through for other names like $MU / $SNDK might be happy for 2027 given demand causing shortages + infra spend share increase.",
+      "refs": {
+        "parked_reason": "Seoul Economic Daily 2026-09-07 原文已逐字核對（庫存 <10 天、KB Securities「tightest supply conditions in history」、記憶體占 AI 基建投資 40%→57%、TrendForce 68%、股價自高點 -38%／明年 P/E 約 3x）；Phison NAND 2027 那句不在文中。全部屬記憶體供需與估值的時變觀測，依 L4 歸 Engine C 不入圖；記憶體產業組在排序中零列的原因是 substitutability 覆蓋未及，不是缺需求證據。",
+        "primary_url": "https://en.sedaily.com/finance/2026/09/07/samsung-sk-hynix-memory-stockpiles-fall-below-10-days",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "WebSearch → en.sedaily.com 原文（Byun Soo-yeon，2026-09-07 09:07）；五項數字逐句比對，Phison 句未命中",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Is there any other industry... Where every investor is cheering for shortages and price hikes? SED reported today that: Samsung / $SKHY \"stockpiles have fallen to less than 10 days of supply, and a severe shortage could emerge next year, according to a new forecast\" KB Securities said that the memory market next year will see \"the tightest supply conditions in history\" KB Securities projects memory's share of AI infrastructure costs to expand from 40% this year to 57% next year, with others like TrendForce placing next year's figure at 68% (total hyperscaler capex, pretty wild forecast attached) \"Both stocks have fallen 38% from their peaks over the past three months, pushing their price-to-earnings ratios based on next year's expected results down to about three times.\" Likewise, commentary around Phison stated they expect extremely tight NAND supply in 2027, so hard to see memory flooding the market or prices collapsing next year... They gave some color that \"soaring NAND prices have forced some Chinese consumer module makers to liquidate inventory, giving Phison opportunities to buy lower-priced stock\", so it does show some price declines can coexist with broader shortages. TLDR: KOSPI + read through for other names like $MU / $SNDK might be happy for 2027 given demand causing shortages + infra spend share increase.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T05:14:01.420573+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "供需與成本占比是時變觀測，只增信心"
+        },
+        "decided_at": "2026-09-08T05:14:01.420573+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "引 SED／KB Securities／Phison：Samsung/SK Hynix 庫存 <10 天、記憶體占 AI 基建成本 40%→57%、2027 NAND 極緊；可追回 SED 原文",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096858276290015563"
+    },
     "lead_1b561ff0f07f8e5497f68cb0a15c6885": {
       "entities": {
         "company_ids": [],
@@ -13618,6 +14034,34 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000147/xslF345X06/wk-form4_1782496850.xml"
+    },
+    "lead_23266eefeeeca2a94da6e8d021cdb915": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-08T05:21:04.462694+00:00",
+      "lead_id": "lead_23266eefeeeca2a94da6e8d021cdb915",
+      "published_at": "2026-08-26",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 8-K Q2 FY27 CFO commentary：對 OpenAI／SB Energy Ohio PORTS-Pike 4.25 GW 資料中心提供信用擔保，上限 USD 105B、20 年租約、首批 FY2029 ready；另有 3.8 GW 選擇權（event watch ew_0020 命中）",
+      "triage": null,
+      "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000073/q2fy27cfocommentary.htm"
     },
     "lead_235412651973a56c50f902fc69f1216b": {
       "entities": {
@@ -25234,6 +25678,44 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1801368/000180136826000041/xslF345X06/wk-form4_1781568190.xml"
     },
+    "lead_60d0870795a65a99c112d4dffbdebcaf": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-08T05:08:21.774410+00:00",
+      "lead_id": "lead_60d0870795a65a99c112d4dffbdebcaf",
+      "media": [
+        {
+          "cache": {
+            "bytes": 165913,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_60d0870795a65a99c112d4dffbdebcaf/3_2096721909614530560.jpg",
+            "sha256": "4052322517dcc146c9c37bd53330573c7d8beaedba829492c54012b085fcf201"
+          },
+          "height": 1786,
+          "media_key": "3_2096721909614530560",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRkNd8daUAA2WwO.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-09-06T22:07:14.000Z",
+      "raw_text": "I didn’t know my ESMT thesis was making some rounds in Taiwanese media like Cnyes/Anue.\n\nJust found it funny that I wanted to read about any recent commentary, then my name kept appearing…\n\nSpecial thanks to BlockBeats for the original coverage. https://t.co/nS0lBHJmgH https://t.co/85HhMPoU8W",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "I didn’t know my ESMT thesis was making some rounds in Taiwanese media like Cnyes/Anue. Just found it funny that I wanted to read about any recent commentary, then my name kept appearing… Special thanks to BlockBeats for the original coverage. https://t.co/nS0lBHJmgH https://t.co/85HhMPoU8W",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:02.378083+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "作者談自己的 ESMT 論點被台媒轉載，情緒／自我引用，無 claim",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096721917386641756"
+    },
     "lead_61053b6d935c61b2c3def03c953b1994": {
       "entities": {
         "company_ids": [
@@ -25442,6 +25924,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072731699990143058"
+    },
+    "lead_61bbe50a3bac23788394cd4014b4ed1a": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "LAPTOP"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.765251+00:00",
+      "lead_id": "lead_61bbe50a3bac23788394cd4014b4ed1a",
+      "media": [],
+      "published_at": "2026-09-07T16:55:22.000Z",
+      "raw_text": "I don’t think I want to be in this timeline anymore. \n\nWe got AGI with Astra and Hunter Biden $LAPTOP in the same weekend.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "I don’t think I want to be in this timeline anymore. We got AGI with Astra and Hunter Biden $LAPTOP in the same weekend.",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:02.698287+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "玩笑貼文，與供應鏈無關",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097005818302607682"
     },
     "lead_6218747d4f0360a48659c5c6f95cc735": {
       "content_updated_at": "2026-07-29T13:46:52.972371+00:00",
@@ -29398,9 +29906,16 @@
       "first_seen": "2026-09-04T07:46:55.429642+00:00",
       "lead_id": "lead_75b6ff16300b8da2f360a3f118eca4b6",
       "published_at": "2026-09-03",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 Alphabet Form 4 已逐字核對：SVP 暨 Chief Business Officer Philipp Schindler 2026-09-01 贈與（code G）295 股；贈與不是市場交易，不改供應鏈結構，留作聚合 insider 觀測，無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526382332/xslF345X06/ownership.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: gift (code G) 295 sh on 2026-09-01; routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:GOOGL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GOOGL 4 filed 2026-09-03",
       "triage": {
@@ -32881,6 +33396,109 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2089908198694351064"
     },
+    "lead_8274c2215e9241cafe7441b60d0fd236": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:lumentum",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "SIVE",
+          "LITE",
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.766618+00:00",
+      "lead_id": "lead_8274c2215e9241cafe7441b60d0fd236",
+      "media": [
+        {
+          "cache": {
+            "bytes": 91396,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_8274c2215e9241cafe7441b60d0fd236/3_2096884727332651008.jpg",
+            "sha256": "b3151f09700d262e5190289e7c9b183844b12e08b0ea7057522093e698258710"
+          },
+          "height": 389,
+          "media_key": "3_2096884727332651008",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRmhjLuawAA25YS.jpg",
+          "width": 1742
+        },
+        {
+          "cache": {
+            "bytes": 70414,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_8274c2215e9241cafe7441b60d0fd236/3_2096884740565659648.jpg",
+            "sha256": "959e8d08f7bd11206301ef9a960b16d9d937dcbb0099d64155c468f2de56dd94"
+          },
+          "height": 1037,
+          "media_key": "3_2096884740565659648",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRmhj9BacAAf7-O.jpg",
+          "width": 2269
+        },
+        {
+          "cache": {
+            "bytes": 33980,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_8274c2215e9241cafe7441b60d0fd236/3_2096884751592542208.jpg",
+            "sha256": "9cd47f6bda352d173d9bbb438a164312ebf393f17ba43cd478ba0b0043632cd0"
+          },
+          "height": 561,
+          "media_key": "3_2096884751592542208",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRmhkmGbUAAUWU1.jpg",
+          "width": 3034
+        }
+      ],
+      "published_at": "2026-09-07T09:16:19.000Z",
+      "raw_text": "I'll let you decide that for yourself since that was an illustrative laser revenue modeling off $SIVE 100M CW DFB laser/year target. \n\nBut... do you want to know the main reason I like laser companies so much?\n\nThey don't just have to stay laser companies... just look at $LITE! \n\nIf we look at Lumentum's previous Cloud Light acqusition (pluggables)... it enabled: \n\n- more than a 5X+ expansion in served opportunity inside DCs. \n\nFrom Lumentum's OFC deck:\n\n- ELS expansion from UHP laser chips was 2X TAM opportunity..\n\nBut selling lasers alone... just from one UHP laser fab was $5B in projected revenue capacity (their fab expected to ramp in early 2028), if we apply similar 55-65% CPO laser margin quotes by $AAOI. \n\nSo lasers by itself is very profitable, and despite industry capacity expansion, there would likely still be a demand imbalance for lasers. \n\nIsn't that pretty cool? \n\nSo it's not quite just modeling component value for certain types of companies since they can keep growing into other products. \n\nAnd you have new overlapping cycles eg. NPO/CPO/1.6T pluggables increasing demand. \n\nSo I'd personally assign higher premiums for laser companies over types of suppliers that stay in the same layer.",
+      "refs": {
+        "primary_url": "https://s21.q4cdn.com/377324469/files/doc_presentations/2026/2026-Lumentum-at-OFC_final.pdf",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "一手簡報（2026-03-17 Lumentum Investor Briefing at OFC 2026）已下載至 library/raw/lumentum_ofc2026_investor_briefing.pdf 並以 pypdf 抽字（.txt，21K 字）；逐字命中：New UHP Laser Fab to Generate $5B Annual Revenue Capacity／Acquired from Qorvo—Greensboro, NC／Expect to be ramping UHP production by early 2028／Future expansion into ELS to increase opportunity by ~2X above UHP chips alone／Multi-hundred-million-dollar（UHP PO）。圖中僅有 Q3 FY26 法說的 Greensboro 六季內不貢獻營收（lumentum_q3fy26_cpo_cl3），上述四項尚未入圖；本輪追源完成、抽取與 prepare 留下一輪 drain"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "researching",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "CW DFB laser",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "ELS",
+            "SIVE"
+          ]
+        }
+      },
+      "title": "I'll let you decide that for yourself since that was an illustrative laser revenue modeling off $SIVE 100M CW DFB laser/year target. But... do you want to know the main reason I like laser companies so much? They don't just have to stay laser companies... just look at $LITE! If we look at Lumentum's previous Cloud Light acqusition (pluggables)... it enabled: - more than a 5X+ expansion in served opportunity inside DCs. From Lumentum's OFC deck: - ELS expansion from UHP laser chips was 2X TAM opportunity.. But selling lasers alone... just from one UHP laser fab was $5B in projected revenue capacity (their fab expected to ramp in early 2028), if we apply similar 55-65% CPO laser margin quotes by $AAOI. So lasers by itself is very profitable, and despite industry capacity expansion, there would likely still be a demand imbalance for lasers. Isn't that pretty cool? So it's not quite just modeling component value for certain types of companies since they can keep growing into other products. And you have new overlapping cycles eg. NPO/CPO/1.6T pluggables increasing demand. So I'd personally assign higher premiums for laser companies over types of suppliers that stay in the same layer.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T05:14:00.458655+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "產能／營收容量投影只增信心，不改候選集合或排序"
+        },
+        "decided_at": "2026-09-08T05:14:00.458655+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "引 Lumentum OFC 投資人簡報：ELS 擴 2X TAM、單一 UHP 雷射 fab 投影 5B 營收容量、2028 初 ramp；對應排序第 1 LITE→tech:uhp_laser，可追回一手簡報",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096890295128625153"
+    },
     "lead_830c264f2672720822ce495e715d1893": {
       "entities": {
         "company_ids": [
@@ -33019,9 +33637,16 @@
       "first_seen": "2026-09-04T22:33:57.047739+00:00",
       "lead_id": "lead_844d2bb07b3890ed458eac0e7fce2bd4",
       "published_at": "2026-09-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 Aeva Form 4 已逐字核對：財務長 Saurabh Sinha 2026-09-02 售出 34,146 股 @14.83（非 10b5-1），後持 547,226 股；相對持股約 6%，屬單筆高管售股，不改供應鏈結構，留作聚合 insider 觀測（AEVA cohort 自追蹤 -32.6%，售出與價格弱勢並存但不構成 thesis 證據），無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526383903/xslF345X06/ownership.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: CFO open-market sale 34,146 sh @14.8307 on 2026-09-02, no 10b5-1 footnote; routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AEVA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEVA 4 filed 2026-09-04",
       "triage": {
@@ -38376,6 +39001,53 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2078283847612186739"
+    },
+    "lead_9d1e0ee296b7890f4c08236b6734b5cd": {
+      "entities": {
+        "company_ids": [
+          "co:iren"
+        ],
+        "tickers": [
+          "KYTX",
+          "PRQR",
+          "VSTM",
+          "CNTB",
+          "RANI",
+          "IVA",
+          "SILC",
+          "AMPX",
+          "EOSE",
+          "ZVRA",
+          "INO",
+          "CAPR",
+          "GOSS",
+          "SLS",
+          "IREN",
+          "WULF",
+          "OKLO",
+          "SMR",
+          "RGTI",
+          "QBTS"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.775095+00:00",
+      "lead_id": "lead_9d1e0ee296b7890f4c08236b6734b5cd",
+      "media": [],
+      "published_at": "2026-09-06T14:23:02.000Z",
+      "raw_text": "I asked OpenAI Astra Ultra + Anthropic Fable 5.1 Max to make me a 5x-10x return type portfolio in 1 year. \n\nBurnt a lot of credits, and the results are in: \n\nOpenAI: - $KYTX (autoimmune CAR-T results)\n- $PRQR (human RNA-editing datasets)\n- $VSTM (KRAS cancer-drug)\n- $CNTB (asthma and COPD)\n- $RANI (oral biologics)\n- $IVA (MASH)\n- $SILC (networking + inference hardware)\n- $AMPX (batteries)\n- $EOSE (batteries)\n- $ZVRA (rare-disease drug growth)\n\nAnthropic: - $INO (respiratory papillomatosis)\n- $CAPR (PDUFA for deramiocel)\n- $GOSS (seralutinib)\n- $SLS (Phase 3 binary)\n- $IREN (familiar face)\n- $WULF (familiar face)\n- $OKLO (nuclear)\n- $SMR (nuclear)\n- $RGTI (quantum)\n- $QBTS (quantum)\n\n*Disclosure don't own any of these aside from 1 share in IREN, not a recommendation, just TLDR of LLM output for educational purposes. \n\nSo very interesting results:\n\nOur beloved AGI Astra prefers really obscure biotech I've never heard about. And a few familiar names like $EOSE and $AMPX. \n\nAnd Fable... yeah idk, feels like it learned a little too much from /r/wallstreetbets and X but maybe it's right, who knows.  \n\nAnyway no judgement, I'll save this and revisit it in a few months. If one of them actually delivers... I'll be impressed.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "I asked OpenAI Astra Ultra + Anthropic Fable 5.1 Max to make me a 5x-10x return type portfolio in 1 year. Burnt a lot of credits, and the results are in: OpenAI: - $KYTX (autoimmune CAR-T results) - $PRQR (human RNA-editing datasets) - $VSTM (KRAS cancer-drug) - $CNTB (asthma and COPD) - $RANI (oral biologics) - $IVA (MASH) - $SILC (networking + inference hardware) - $AMPX (batteries) - $EOSE (batteries) - $ZVRA (rare-disease drug growth) Anthropic: - $INO (respiratory papillomatosis) - $CAPR (PDUFA for deramiocel) - $GOSS (seralutinib) - $SLS (Phase 3 binary) - $IREN (familiar face) - $WULF (familiar face) - $OKLO (nuclear) - $SMR (nuclear) - $RGTI (quantum) - $QBTS (quantum) *Disclosure don't own any of these aside from 1 share in IREN, not a recommendation, just TLDR of LLM output for educational purposes. So very interesting results: Our beloved AGI Astra prefers really obscure biotech I've never heard about. And a few familiar names like $EOSE and $AMPX. And Fable... yeah idk, feels like it learned a little too much from /r/wallstreetbets and X but maybe it's right, who knows. Anyway no judgement, I'll save this and revisit it in a few months. If one of them actually delivers... I'll be impressed.",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:03.029514+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "LLM 選股清單娛樂貼文，作者自承非推薦，與瓶頸研究無關",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096605093986787380"
     },
     "lead_9d94ea7e84e76c027a3bfe373e8a32bd": {
       "entities": {
@@ -44381,9 +45053,16 @@
       "first_seen": "2026-09-04T07:46:55.429834+00:00",
       "lead_id": "lead_b9ea75681bdf1885d5d65218da043569",
       "published_at": "2026-09-03",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 Alphabet Form 4 已逐字核對：董事 R. Martin Chavez 2026-09-01 贈與（code G）1,181 股，後持 9,989 股；贈與不是市場交易，不改供應鏈結構，留作聚合 insider 觀測，無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526382328/xslF345X06/ownership.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: gift (code G) 1,181 sh on 2026-09-01; routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:GOOGL",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GOOGL 4 filed 2026-09-03",
       "triage": {
@@ -45628,6 +46307,34 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000135956126000004/xslF345X06/wk-form4_1782940899.xml"
     },
+    "lead_c1b11ca068b42c9d6e6e6a09268e1951": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.780556+00:00",
+      "lead_id": "lead_c1b11ca068b42c9d6e6e6a09268e1951",
+      "media": [],
+      "published_at": "2026-09-05T06:25:56.000Z",
+      "raw_text": "我觉得这种思路很好：借鉴我对 ESMT DDR2/DDR3 等老一代存储芯片的研究, 举一反三.\n\n或者把我研究 $AAOI 时关于 CW 激光器供需失衡的思路, 应用到 A 股.\n\n很开心看到大家学习我的思考方式，而不是照抄具体的股票, 并用这些思路去寻找自己看好的做多标的！ https://t.co/pppIo47t15",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "我觉得这种思路很好：借鉴我对 ESMT DDR2/DDR3 等老一代存储芯片的研究, 举一反三. 或者把我研究 $AAOI 时关于 CW 激光器供需失衡的思路, 应用到 A 股. 很开心看到大家学习我的思考方式，而不是照抄具体的股票, 并用这些思路去寻找自己看好的做多标的！ https://t.co/pppIo47t15",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:03.362128+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "談思考方式被學習的感想，無 claim",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096122640465645937"
+    },
     "lead_c25320aec473f73ca6c5f1b830e6ba27": {
       "entities": {
         "company_ids": [
@@ -46710,6 +47417,46 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1801368/000103160926000004/xslF345X06/wk-form4_1781568136.xml"
     },
+    "lead_c68460fed3723b243702bba6d8d5e882": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "BRK.B"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.765656+00:00",
+      "lead_id": "lead_c68460fed3723b243702bba6d8d5e882",
+      "media": [
+        {
+          "cache": {
+            "bytes": 143379,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_c68460fed3723b243702bba6d8d5e882/3_2096933070964498432.jpg",
+            "sha256": "3da08be9ab2b0681e6eed32ebbf789d3e90cb051e29a86d6da1cc3cc9f6fb43f"
+          },
+          "height": 1286,
+          "media_key": "3_2096933070964498432",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRnNhJyboAABZXe.jpg",
+          "width": 2130
+        }
+      ],
+      "published_at": "2026-09-07T12:07:15.000Z",
+      "raw_text": "Uhh chat, did we accidentally AI bottleneck-pill Warren Buffett's $BRK.B successor Greg Abel? https://t.co/FnHS87s6XN",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Uhh chat, did we accidentally AI bottleneck-pill Warren Buffett's $BRK.B successor Greg Abel? https://t.co/FnHS87s6XN",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:03.721429+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "截圖玩笑（Greg Abel），情緒貼文，無可引用 claim",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096933313785242098"
+    },
     "lead_c6b2150d6ec2db0bf22b046dbe4ddb5d": {
       "entities": {
         "company_ids": [
@@ -47291,9 +48038,16 @@
       "first_seen": "2026-09-04T22:34:00.269010+00:00",
       "lead_id": "lead_c8441a91c1bd085c7424eeaf9f6a5f5b",
       "published_at": "2026-09-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 Coherent Form 4 已逐字核對：董事 Lisa Neal-Graves 2026-09-02 售出 2,200 股 @268.42（非 10b5-1），後持 13,033 股；單筆董事售股不改供應鏈結構，留作聚合 insider 觀測，無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001054/xslF345X06/form4.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: director sale 2,200 sh @268.42 on 2026-09-02, no 10b5-1 footnote; routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:COHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -48661,6 +49415,28 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072940349300122098"
     },
+    "lead_cd01ccac1f5c13150ca7863993612d72": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-08T05:08:17.483707+00:00",
+      "lead_id": "lead_cd01ccac1f5c13150ca7863993612d72",
+      "published_at": "Mon, 07 Sep 2026 06:30:30 +0000",
+      "refs": {},
+      "source": "yahoo:iqe-l",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "UK Stock Market News: IQE, Grainger, The Works",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:04.046115+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "armchairtrader 三家英股市場新聞聚合，僅標題無具體 claim；IQE 一手由 RNS／EDGAR watch 涵蓋",
+        "tier": 3
+      },
+      "url": "https://www.thearmchairtrader.com/uk-stock-market-news/iqe-grainger-theworks/?.tsrc=rss"
+    },
     "lead_cd45be9f8f96a123f579b730130c9766": {
       "entities": {
         "company_ids": [],
@@ -49336,6 +50112,46 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074979055410266452"
     },
+    "lead_d0a0a9c3b14312aa90b8f1e97dd06347": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "SPCX"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.777390+00:00",
+      "lead_id": "lead_d0a0a9c3b14312aa90b8f1e97dd06347",
+      "media": [
+        {
+          "cache": {
+            "bytes": 71270,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_d0a0a9c3b14312aa90b8f1e97dd06347/3_2096455066945470464.jpg",
+            "sha256": "b3dcaa0087fa6be224c0d2decbaf2494671916f07ad30b37f036ae247390d49a"
+          },
+          "height": 456,
+          "media_key": "3_2096455066945470464",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRgaxqDaQAABKFN.jpg",
+          "width": 1241
+        }
+      ],
+      "published_at": "2026-09-06T04:26:54.000Z",
+      "raw_text": "I’m not sure how OpenAI was likely holding off their IPO to 2027.\n\nBecause they had concerns about a $1T valuation 3 months ago.\n\nThen Anthropic investors go and say **** it, lets one-up $SPCX and IPO at $2T next month? https://t.co/wkMuzkCrzd",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "I’m not sure how OpenAI was likely holding off their IPO to 2027. Because they had concerns about a $1T valuation 3 months ago. Then Anthropic investors go and say **** it, lets one-up $SPCX and IPO at $2T next month? https://t.co/wkMuzkCrzd",
+      "triage": {
+        "decided_at": "2026-09-08T05:14:04.371169+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "OpenAI／Anthropic IPO 估值評論，非供應鏈事實",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096455073580908908"
+    },
     "lead_d0c1e3a405d5ef6c42473f982c21edd9": {
       "entities": {
         "company_ids": [
@@ -49773,9 +50589,16 @@
       "first_seen": "2026-09-04T22:34:07.333547+00:00",
       "lead_id": "lead_d248abb3982f975a435d1c63cc7ca496",
       "published_at": "2026-09-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 NVIDIA Form 4 已逐字核對：董事 Tench Coxe 2026-09-02 依 10b5-1 計畫贈與（code G）500,000 股，後持 24,171,360 股；贈與不是市場售出，不改供應鏈結構，留作聚合 insider 觀測，無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764726000009/xslF345X06/wk-form4_1788555631.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: 10b5-1 gift (code G) 500,000 sh on 2026-09-02; routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:NVDA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -52971,9 +53794,16 @@
       "first_seen": "2026-09-04T22:34:00.943121+00:00",
       "lead_id": "lead_e41f44f7b1c507fdd965e34899202c43",
       "published_at": "2026-09-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 GlobalFoundries Form 4 已逐字核對：法務長 Samak Azar 2026-09-03 依 10b5-1 售出 335 股 @43.24，後持 10,134 股；既定計畫小額售股不改供應鏈結構，留作聚合 insider 觀測，無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000230/xslF345X06/wk-form4_1788553011.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: 10b5-1 sale 335 sh @43.24 on 2026-09-03; routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-09-04",
       "triage": {
@@ -53218,9 +54048,16 @@
       "first_seen": "2026-09-04T22:34:09.721342+00:00",
       "lead_id": "lead_e53df528c346154592533616d6ee2358",
       "published_at": "2026-09-04",
-      "refs": {},
+      "refs": {
+        "parked_reason": "官方 TSMC Form 4 已逐字核對：SVP 暨法務長 Fang Shu-Hua 2026-07-02 兩筆買進各 1,000 股 @77.09（申報幣別依原文），後持 8,206 股；高管小額買進不改供應鏈結構，留作聚合 insider 觀測，無唯一 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000596/xslF345X06/wk-form4_1788517801.xml",
+        "research_outcome": "official_form4_no_unique_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "SEC canonical Form 4 XML inspected: officer purchases 2x1,000 sh @77.09 on 2026-07-02 (code P); routed to aggregate insider monitoring",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-04",
       "triage": {
@@ -53299,6 +54136,75 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072902886712094919"
+    },
+    "lead_e5542657ceef05cdb7425496d5c18ecc": {
+      "entities": {
+        "company_ids": [
+          "co:iqe",
+          "co:axt"
+        ],
+        "tickers": [
+          "IQE",
+          "AXTI"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.765983+00:00",
+      "lead_id": "lead_e5542657ceef05cdb7425496d5c18ecc",
+      "media": [
+        {
+          "cache": {
+            "bytes": 110616,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_e5542657ceef05cdb7425496d5c18ecc/3_2096904201888751616.jpg",
+            "sha256": "d7871da40cd33d5757afe2a023f7909cdfbf3d03ab6da8b896beaa74ce332cb4"
+          },
+          "height": 687,
+          "media_key": "3_2096904201888751616",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRmzQwGaYAAifrw.jpg",
+          "width": 1220
+        }
+      ],
+      "published_at": "2026-09-07T10:11:36.000Z",
+      "raw_text": "New report from Bloomberg on $IQE:\n\n“indium phosphide substrates is emerging as a key risk for the semiconductor industry.”\n\nI wonder who could have guessed this last year with $AXTI? https://t.co/ETW7Y2Pz7z https://t.co/xuSezBWFWO",
+      "refs": {
+        "parked_reason": "Bloomberg 2026-09-07「IQE CEO Warns of Emerging China Supply Risk for Chip Industry」付費牆 403 讀不到；改追 IQE 同日 H1 2026 中報 RNS（一手）：只寫「converting existing capacity in H2 to support the increasing demand for Indium Phosphide solutions」，沒有任何 substrate 供應風險或中國出口管制句——推文引的「key risk」句只存在於 Bloomberg 訪談，一手不可得。InP 基板受中國出口管制的事實圖裡已有（AXT／Tongmei 許可證，SEC 10-Q），本 lead 的增量是「客戶端（IQE）指認基板取得為風險」這一句，逐字核對前不得升 evidence。",
+        "primary_url": "https://www.iqep.com/media/press-releases/2026/2026-interim-results/",
+        "research_outcome": "engine_c_financial_observation_no_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "WebFetch https://www.bloomberg.com/news/articles/2026-09-07/iqe-ceo-warns-of-emerging-china-supply-risk-for-chip-industry → 403；WebSearch iqep.com／investegate → H1 2026 Interim Results RNS（2026-09-07）逐句掃 indium phosphide／substrate，無風險句；二手 cryptobriefing／moomoo 轉述不可引",
+        "trace_next_trigger": "IQE H1 2026 法說逐字稿或 Bloomberg 原文經可讀管道（BNN／Yahoo 轉載）出現 substrate access 句",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AXTI",
+          "IQE",
+          "co:axt",
+          "co:iqe"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "New report from Bloomberg on $IQE: “indium phosphide substrates is emerging as a key risk for the semiconductor industry.” I wonder who could have guessed this last year with $AXTI? https://t.co/ETW7Y2Pz7z https://t.co/xuSezBWFWO",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T05:14:00.765546+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "第三方印證可把 self_reported 升為 externally_corroborated，改可行動排序"
+        },
+        "decided_at": "2026-09-08T05:14:00.765546+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "Bloomberg 報導 InP 基板成為半導體業關鍵風險：第三方對 mat:inp_substrate 瓶頸的獨立印證，可升 AXTI／IQE 相關邊的 evidence",
+        "tier": 2
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096904209371427277"
     },
     "lead_e590eca752d976cef58be766a5b17d62": {
       "entities": {
@@ -54508,6 +55414,91 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526347443/xslF345X06/ownership.xml"
+    },
+    "lead_e8f9a50830dcb03ab607db0bcc4af318": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors"
+        ],
+        "tickers": [
+          "SIVE"
+        ]
+      },
+      "first_seen": "2026-09-08T05:08:21.773330+00:00",
+      "lead_id": "lead_e8f9a50830dcb03ab607db0bcc4af318",
+      "media": [
+        {
+          "cache": {
+            "bytes": 95256,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_e8f9a50830dcb03ab607db0bcc4af318/3_2096749788024999938.jpg",
+            "sha256": "d6e4a3ff8e4c034fee3b30ad75bb8fe2d506af3dd770b7cf2ef12ffd084b2fcd"
+          },
+          "height": 782,
+          "media_key": "3_2096749788024999938",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRkm0robEAI5H4G.jpg",
+          "width": 1228
+        },
+        {
+          "cache": {
+            "bytes": 144893,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_e8f9a50830dcb03ab607db0bcc4af318/3_2096749788025028608.jpg",
+            "sha256": "28f3477e279c292e1e19fe551e8c8ed907e9da081dda1d1bfa83378076fa2529"
+          },
+          "height": 1535,
+          "media_key": "3_2096749788025028608",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRkm0robgAA9RWx.jpg",
+          "width": 1115
+        }
+      ],
+      "published_at": "2026-09-06T23:58:01.000Z",
+      "raw_text": "Oh cool! $SIVE also made it there on cnyes too (leading Taiwan financial media)!\n\nThe English translation might be off a bit, but this was summarizing Sivers surprising 100M+ CW DFB annual laser capacity expansion, ~ operational Q4 2027.\n\nAnd how given historical ASP from previous year presentation slides, it could translate to $625M-$1.25B capacity revenue ceiling at full utilization.\n\nSivers might be of more interest given its partnerships with local foundries like Win Semi.\n\nAnd since its downstream partners like Ayar (Mediatek / Alchip CPO partner) are heavily investing in Taiwanese optical supply chains.",
+      "refs": {
+        "parked_reason": "推文轉述的 Sivers Glasgow US0M 擴建（>100M CW DFB／年、Q4 2027 投產）已於 2026-09-04 經 RA ra_51171727ae171518974b4196f814c7b2 入圖（claim sivers_glasgow_capacity_2026_09_03_cl1，來源 lead_9a57f8b8 為同一份 09-03 新聞稿）。推文自算的 US25M–1.25B 營收上限與穩懋／Ayar 關聯在新聞稿裡都沒有具名，不入圖。無新 graph delta。",
+        "primary_url": "https://www.prnewswire.com/news-releases/sivers-semiconductors-invests-usd-30-million-to-expand-european-photonics-manufacturing-for-ai-datacenters-302868705.html",
+        "research_outcome": "already_in_graph_via_ra_51171727ae171518974b4196f814c7b2_no_new_graph_delta",
+        "research_run": "daily-brief-2026-09-08",
+        "trace_attempts_ref": "新聞稿一手已重取並存 library/raw/sivers_glasgow_expansion_pr_20260903.txt；Neo4j 查 Claim.statement 含 glasgow → 已存在 sivers_glasgow_capacity_2026_09_03_cl1",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "Oh cool! $SIVE also made it there on cnyes too (leading Taiwan financial media)! The English translation might be off a bit, but this was summarizing Sivers surprising 100M+ CW DFB annual laser capacity expansion, ~ operational Q4 2027. And how given historical ASP from previous year presentation slides, it could translate to $625M-$1.25B capacity revenue ceiling at full utilization. Sivers might be of more interest given its partnerships with local foundries like Win Semi. And since its downstream partners like Ayar (Mediatek / Alchip CPO partner) are heavily investing in Taiwanese optical supply chains.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T05:14:01.735429+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "供應商自報產能時程，不改候選集合或排序"
+        },
+        "decided_at": "2026-09-08T05:14:01.735429+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "cnyes 轉述 Sivers 100M CW DFB 雷射年產能擴張、Q4 2027 投產，與穩懋合作；SIVE 在 Watchlist，可追回 Sivers 簡報",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2096749796023538032"
     },
     "lead_e909b67f1150431797982719ffce53e2": {
       "entities": {
@@ -58924,8 +59915,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2095957075302273257",
-      "updated_at": "2026-09-04T22:33:53.650981+00:00",
+      "since_id": "2097005818302607682",
+      "updated_at": "2026-09-08T05:08:21.781135+00:00",
       "user_id": "1940360837547565056"
     }
   }
