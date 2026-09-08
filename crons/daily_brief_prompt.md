@@ -24,8 +24,8 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
    `fetchers\edgar.py`、`fetchers\mops.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
    `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
-   `engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`。
-   十六條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
+   `engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`。
+   十七條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
    exact `go` 且已有 `dispatch_ref` 的 decision-review work order；不得用它代替 `dispatch`／`resolve`／`reassess`。
    若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
@@ -146,7 +146,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
    graph admission 仍是另一個 `ra_admission` pq2。
-8. 收尾執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
+8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --ranking --beta --coverage --watches`，
+   把 APP 讀的五個畫面更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
+   不手寫清單）。它只寫 ignored derived cache（`library/private/app/`），**不寫任何 authority、不入圖、不建 decision**，
+   `serve` 不在 rule 內、排程不啟動它。**失敗只記入健康段、不中止 Daily**：artifact 是 derived cache，
+   舊的那份仍在，APP 自己會顯示 stale——這與 harvest 失敗必須中止整輪不同（那個會讓兩個 writer 撞上）。
+   接著執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
    `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
    回報，不要改用廣泛 `git add/commit/push` 繞過。
 9. Daily Brief 的**最終完整 Markdown 已組成後**，先以 UTF-8 寫入 ignored private brief file，再呼叫

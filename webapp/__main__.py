@@ -19,6 +19,18 @@ from pathlib import Path
 from .store import ArtifactStore, StateArtifactStore, resolve_state_dir
 
 
+def _tracked_tickers() -> list[str]:
+    """daily 追蹤中的 ticker。
+
+    **與 pq1 drain 用的是同一個導出權威**（`engine_b.routine_config`：非 retired lifecycle ＋
+    non-terminal Decision cohort ＋主題核心公司），不在這裡另寫一份清單——手寫清單會腐壞，
+    而腐壞的方式是「某一檔安靜地不再被 materialize」，沒有任何東西會報錯。
+    """
+    from engine_b.routine_config import discover_tracked_tickers, load_config
+
+    return sorted(discover_tracked_tickers(load_config()))
+
+
 def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore]:
     analyst_dir = Path(args.dir) if getattr(args, "dir", None) else None
     explicit_state = Path(args.state_dir) if getattr(args, "state_dir", None) else None
@@ -87,6 +99,10 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
     state_only = bool(args.ranking or args.beta or args.coverage or args.watches)
     tickers = list(args.tickers) if args.tickers else ([] if state_only else store.tickers())
+    if args.tracked:
+        tracked = _tracked_tickers()
+        print(f"追蹤中 {len(tracked)} 檔（來源：thesis lifecycle ＋ Decision cohort ＋主題核心公司）")
+        tickers = sorted(set(tickers) | set(tracked))
     if not tickers and not state_only:
         print("✗ 沒有指定 ticker，而 artifact 目錄也是空的——第一次請明寫要 materialize 哪幾檔",
               file=sys.stderr)
@@ -228,6 +244,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 跨標的瓶頸排序：rank_bottlenecks() 的輸出照抄")
     mat.add_argument("--beta", action="store_true",
                      help="另外（或只）materialize 資產配置：daily_beta_snapshot（--no-refresh --no-record-risk）的輸出照抄")
+    mat.add_argument("--tracked", action="store_true",
+                     help="materialize 所有追蹤中的標的（與 pq1 drain 同一個導出權威，不手寫清單）")
     mat.add_argument("--coverage", action="store_true",
                      help="另外（或只）materialize 覆蓋掃描：query.coverage_gaps.scan() 的輸出照抄")
     mat.add_argument("--watches", action="store_true",

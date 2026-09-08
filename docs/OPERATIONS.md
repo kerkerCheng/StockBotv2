@@ -322,6 +322,22 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 （產品決策見 `docs/ROADMAP.md`「主流程的終點是 Implied Return」）。
 架構見 `docs/ARCHITECTURE.md` §6.7。**互動專用，不進 unattended rule。**
 
+### Sandbox impact review 結論（2026-09-08，APP materialize 納入 Daily 收尾）
+
+| 入口 | side effect | OS／network capability | 判定 |
+|---|---|---|---|
+| `python -m webapp materialize --tracked --ranking --beta --coverage --watches` | 寫 **ignored derived cache**（`library/private/app/{analyst_view,state}/*.json`，atomic）。**不寫任何 authority**：不入圖、不寫 Engine C、不建 decision、不 append 風險快照、不碰 `.git` 或任何 tracked 檔 | Neo4j bolt（本機）＋Engine C SQLite＋private ledger（唯讀）＋Google Sheet `spreadsheets.readonly`＋yfinance FX——**與既有 fixed entry `daily_beta_snapshot.py`／`decision_lab today` 完全同一組**，無新增網路主機或憑證 | **納入 Daily 收尾**（第十七個 fixed entry）。ticker 清單由 `engine_b.routine_config` 導出，與 pq1 drain 同一權威，不手寫 |
+| `python -m webapp serve` | **綁定本機 port**（listener surface） | 新增 listener；外部認證邊界在 Cloudflare Access 而非程式本身 | **仍不在 rule 內**。它由開機自啟的 `stockbot-graph-services.vbs` 長駐，排程不啟動它。放行整個 `-m webapp` 會把它一併帶進去 |
+| `python -m webapp status｜verify` | 唯讀 | 無 | **互動專用**，不在 rule 內（prefix 只到 `materialize`） |
+
+**為什麼 fail-soft：** materialize 失敗只記入健康段、不中止 Daily——artifact 是 derived cache，舊的那份仍在，且 APP 會自己顯示 stale。這與 harvest 失敗必須中止整輪**刻意不同**：harvest 持有 writer lock 且會寫共用檔，跳過它續跑會讓兩個 writer 撞上；materialize 不碰任何共用檔，失敗的代價只是「畫面舊了一天」，而那是看得見的。
+
+查證：
+```powershell
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'webapp'   # 只該有 materialize，不該有 serve
+& '.venv\Scripts\python.exe' -m webapp status                                    # artifact 年齡應 < 1 天
+```
+
 ### Web App／API（2026-09-07 Step 5）
 
 **日常要看一檔股票，開瀏覽器比開終端機快。** APP 讀的是**已經算好**的判讀——
@@ -336,6 +352,7 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 & '.venv\Scripts\python.exe' -m webapp materialize --ranking --as-of 2026-09-05   # as-of 視角的排序；被排除的 assertion 計數帶在 artifact 內
 & '.venv\Scripts\python.exe' -m webapp materialize --beta                    # 資產配置（state artifact；daily_beta_snapshot --no-refresh --no-record-risk 照抄，2026-09-08）
 & '.venv\Scripts\python.exe' -m webapp materialize --coverage --watches      # 研究缺口＋在等什麼（唯讀照抄；2026-09-08）
+& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches   # Daily 收尾用的完整一輪（追蹤中 30 檔＋四種 state）
 
 # 2) serve：純讀。**不重建任何東西**
 & '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/
@@ -524,7 +541,7 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十六個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、MOPS 台股 pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十七個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、MOPS 台股 pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher、APP materialize，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
 
 **Triage classification surface impact（2026-08-27）：** `engine_b.cli triage` 新增的分類參數只會
 atomic 寫 tracked `library/leads/pending_leads.json`；`classification-health` 只讀同檔並以 exit 2
@@ -900,7 +917,7 @@ python -m briefing entry COHR --as-of 2026-09-05                            # �
 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
-| `python -m webapp materialize [T ...] [--as-of] [--dir]` | 寫 **derived cache**（`library/private/app/analyst_view/*.json`，atomic）；讀 Neo4j／Engine C／private ledger。**不寫任何 authority**、不入圖、不建 decision | 與 `alpha-card` 相同的本機資源；無新增網路主機或憑證 | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| `python -m webapp materialize [T ...] [--as-of] [--dir]`　⚠ **本列的「互動專用」判定已於 2026-09-08 改判**（見下方該日 review：materialize 已納入 Daily 收尾，成為第十七個 fixed entry；`serve` 仍不在列） | 寫 **derived cache**（`library/private/app/analyst_view/*.json`，atomic）；讀 Neo4j／Engine C／private ledger。**不寫任何 authority**、不入圖、不建 decision | 與 `alpha-card` 相同的本機資源；無新增網路主機或憑證 | **互動專用**。新 CLI 名稱，不進 unattended rule |
 | `python -m webapp serve [--host] [--port] [--dir]` | **開一個本機 listener**（預設 `127.0.0.1:8790`）。唯讀：無寫入端點、無模型執行、無外部抓取 | ⚠ **新增 executable surface**：綁定本機 port。非 `127.0.0.1` 需明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式拒絕啟動。外部認證邊界是 Cloudflare Access（`deploy/cloudflare/README.md`），不是本程式 | **互動／長駐專用**，不進 unattended rule |
 | `python -m webapp status｜verify [--dir]` | 唯讀：只讀 artifact 目錄 | 無 | 互動專用 |
 | `python -m webapp materialize --coverage｜--watches [--state-dir]`（2026-09-08 B2b） | 寫 **derived cache**（`state/coverage.json`／`state/watches.json`，atomic）；`--coverage` 讀 Neo4j（`coverage_gaps.scan`），`--watches` 只讀 repo 內的 `event_watches.json` 與 `pending_leads.json`。**唯讀**：不喚醒 watch、不 mark-checked、不改 lead | `--coverage` 同 `python -m query.coverage_gaps`（本機 Neo4j bolt）；`--watches` 無網路、無憑證 | **互動專用**。同一命令字串的新 flag，不進 unattended rule；Phase A 排進 daily 收尾前須再走一次本表 |

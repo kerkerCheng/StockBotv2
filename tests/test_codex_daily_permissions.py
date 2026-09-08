@@ -18,7 +18,7 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 16
+    assert rules.count("prefix_rule(") == 17
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
@@ -36,6 +36,7 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '"-m", "engine_b.todo", "work"',
         "scripts\\\\publish_daily_state.py",
         "scripts\\\\publish_daily_brief.py",
+        '"-m", "webapp", "materialize"',
     ):
         assert fixed_entry in rules
     assert '"scripts\\\\prepare_research_action.py", "--action-file"' in rules
@@ -56,6 +57,25 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
     ):
         assert broad_entry not in rules
     assert "stockbot-daily" not in rules
+
+
+def test_webapp_serve_is_not_allowed_alongside_materialize() -> None:
+    """`webapp` 模組只放行 materialize，**不放行 serve**。
+
+    兩者的 side effect 不同級：materialize 只寫 ignored derived cache，serve 會**綁定本機 port**
+    ——那是新增 listener surface，且外部認證邊界在 Cloudflare Access 而不是程式本身。
+    放行整個 `-m webapp` 會把 serve 一併帶進去，那正是 AGENTS.md 說的「用 broad permission
+    掩蓋整合缺口」。serve 由開機自啟的 vbs 長駐，不需要、也不該由排程啟動。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+
+    assert '"-m", "webapp", "materialize"' in rules
+    for adjacent_but_forbidden in (
+        '"-m", "webapp", "serve"',
+        'pattern=[".venv\\\\Scripts\\\\python.exe", "-m", "webapp"]',
+        '"-m", "webapp", "verify"',
+    ):
+        assert adjacent_but_forbidden not in rules, adjacent_but_forbidden
 
 
 def test_fetchers_directory_is_not_broadly_allowed() -> None:

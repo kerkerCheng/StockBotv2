@@ -1,4 +1,4 @@
-# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下十六個 fixed entry
+# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下十七個 fixed entry
 # 是 Daily 唯一的 outside-sandbox 權限來源。首次呼叫就使用 exact rule，不先失敗再重跑；
 # 不放行任意 Python、PowerShell、shell、Git 或 working tree。
 #
@@ -99,6 +99,12 @@ prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "work"],
     decision="allow",
     justification="Daily 只 checkpoint 已由使用者 exact go 且已 dispatch 的 decision-review work order；不 dispatch、不 resolve、不 reassess，也不跨越 graph 或 live gate。",
+)
+
+prefix_rule(
+    pattern=[".venv\\Scripts\\python.exe", "-m", "webapp", "materialize"],
+    decision="allow",
+    justification="Daily 收尾把 APP 讀的判讀重算一次並寫進 ignored derived cache（library/private/app/）。讀 Neo4j、Engine C SQLite、private ledger 與 Google Sheet（readonly）——與 daily_beta_snapshot.py／decision_lab today 同一組本機資源，無新增網路主機或憑證；不寫任何 authority、不入圖、不建 decision、不碰 .git 或 tracked 檔。⚠ 只放行 materialize 子命令：同一個模組的 serve 會綁定本機 port（新增 listener surface），刻意不在列——那是開機自啟的長駐服務，不是排程動作。",
 )
 
 prefix_rule(

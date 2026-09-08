@@ -72,7 +72,7 @@ fixed entry 包含
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
 `decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`；十六條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`scripts\publish_daily_brief.py`、`-m webapp materialize`；十七條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
 ⚠ `fetchers/` 不是整包放行：只有 `edgar.py` 與 `mops.py` 在列，`gsheets.py` 帶 Google 憑證故排除。
 `engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
 它不授權 `dispatch`／`resolve`／`reassess`，也不放寬 graph admission 或 live gate。
@@ -691,6 +691,10 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 
 ### Step 7 — 收尾同步
 
+- **更新 APP 讀的畫面**（2026-09-08）：`& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches`。
+  APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
+  不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
+  只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。
 - **本機 scheduled task**：執行 `& '.venv\Scripts\python.exe' scripts\publish_daily_state.py`；它只准提交
   `pending_leads.json` 與 `todo_pool.json`，guard 失敗不得改用廣泛 Git 命令繞過。
 - **入圖帳本**：有實際 apply 才另外跑 `scripts/commit_pending_intake.py`。
