@@ -326,7 +326,7 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
-| `python -m webapp materialize --tracked --ranking --beta --coverage --watches` | 寫 **ignored derived cache**（`library/private/app/{analyst_view,state}/*.json`，atomic）。**不寫任何 authority**：不入圖、不寫 Engine C、不建 decision、不 append 風險快照、不碰 `.git` 或任何 tracked 檔 | Neo4j bolt（本機）＋Engine C SQLite＋private ledger（唯讀）＋Google Sheet `spreadsheets.readonly`＋yfinance FX——**與既有 fixed entry `daily_beta_snapshot.py`／`decision_lab today` 完全同一組**，無新增網路主機或憑證 | **納入 Daily 收尾**（第十七個 fixed entry）。ticker 清單由 `engine_b.routine_config` 導出，與 pq1 drain 同一權威，不手寫 |
+| `python -m webapp materialize --tracked --ranking --beta --coverage --watches --positions` | 寫 **ignored derived cache**（`library/private/app/{analyst_view,state}/*.json`，atomic）。**不寫任何 authority**：不入圖、不寫 Engine C、不建 decision、不 append 風險快照、不碰 `.git` 或任何 tracked 檔 | Neo4j bolt（本機）＋Engine C SQLite＋private ledger（唯讀）＋Google Sheet `spreadsheets.readonly`＋yfinance FX——**與既有 fixed entry `daily_beta_snapshot.py`／`decision_lab today` 完全同一組**，無新增網路主機或憑證 | **納入 Daily 收尾**（第十七個 fixed entry）。ticker 清單由 `engine_b.routine_config` 導出，與 pq1 drain 同一權威，不手寫 |
 | `python -m webapp serve` | **綁定本機 port**（listener surface） | 新增 listener；外部認證邊界在 Cloudflare Access 而非程式本身 | **仍不在 rule 內**。它由開機自啟的 `stockbot-graph-services.vbs` 長駐，排程不啟動它。放行整個 `-m webapp` 會把它一併帶進去 |
 | `python -m webapp status｜verify` | 唯讀 | 無 | **互動專用**，不在 rule 內（prefix 只到 `materialize`） |
 
@@ -352,7 +352,7 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'webapp'   
 & '.venv\Scripts\python.exe' -m webapp materialize --ranking --as-of 2026-09-05   # as-of 視角的排序；被排除的 assertion 計數帶在 artifact 內
 & '.venv\Scripts\python.exe' -m webapp materialize --beta                    # 資產配置（state artifact；daily_beta_snapshot --no-refresh --no-record-risk 照抄，2026-09-08）
 & '.venv\Scripts\python.exe' -m webapp materialize --coverage --watches      # 研究缺口＋在等什麼（唯讀照抄；2026-09-08）
-& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches   # Daily 收尾用的完整一輪（追蹤中 30 檔＋四種 state）
+& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches --positions   # Daily 收尾用的完整一輪（追蹤中 30 檔＋四種 state）
 
 # 2) serve：純讀。**不重建任何東西**
 & '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/

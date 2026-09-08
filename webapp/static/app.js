@@ -1682,6 +1682,153 @@ function stateFooter(payload, notTitle) {
   return wrap;
 }
 
+/* ---------- 部位與問責（positions state；照抄 outcome 腳本與 Decision Store，不重算） ----------
+   ⚠ 這一頁最容易被讀錯：兩種報酬的錨點語意不同，而且**樣本效度必須先於數字**——
+   反過來排版的話，一份有效 n 接近 1 的觀測會看起來像 N 個獨立驗證。 */
+
+function returnCell(value) {
+  const cell = el('td', 'nowrap');
+  const text = fmtRatioPct(value, 1);
+  if (text === null) { cell.textContent = '—'; return cell; }
+  cell.textContent = (value > 0 ? '+' : '') + text;
+  cell.classList.add(signClass(value));
+  return cell;
+}
+
+const POSITION_COLUMNS = [
+  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
+  { title: '錨點日', cell: (row) => el('td', 'nowrap', row.anchor_date || '—') },
+  { title: '現價日', cell: (row) => el('td', 'nowrap', row.current_date || '—') },
+  { title: '錨點前', cell: (row) => returnCell(row.pre_anchor_return) },
+  { title: '入圖以來', cell: (row) => returnCell(row.absolute_return) },
+  { title: '超額', cell: (row) => returnCell(row.excess_return) },
+];
+
+const LIVE_COLUMNS = [
+  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
+  { title: '成交日', cell: (row) => el('td', 'nowrap', row.executed_at || '—') },
+  { title: '成交價', cell: (row) => el('td', 'nowrap', fmtQuantity(row.price, row.currency) || '—') },
+  { title: '股數', cell: (row) => el('td', 'nowrap', fmtNumber(row.shares, 4) || '—') },
+  { title: '現價', cell: (row) => el('td', 'nowrap', fmtQuantity(row.current, row.current_currency) || '—') },
+  { title: 'live 報酬', cell: (row) => returnCell(row.live_return) },
+  { title: '同檔 shadow', cell: (row) => returnCell(row.shadow_return) },
+];
+
+async function renderPositions() {
+  markNav('positions');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/positions`);
+  } catch (err) {
+    renderStateError(err, '讀不到部位與問責');
+    return;
+  }
+  const notes = payload.notes || {};
+  const c = payload.counters || {};
+  const agg = payload.aggregate || {};
+  const health = payload.anchor_health;
+  const live = payload.live || {};
+  const detailSet = new Set(payload.analyst_view_tickers || []);
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
+  }
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  // ① 真實部位在最前面——那才是「你的錢在哪」。
+  const sec0 = el('section', 'panel callout');
+  sec0.appendChild(el('h2', null, `真實成交的部位（${(live.tickers || []).length} 檔）`));
+  if ((live.rows || []).length) {
+    sec0.appendChild(rankTable(live.rows, LIVE_COLUMNS, detailSet));
+  } else {
+    sec0.appendChild(el('p', 'note', '目前沒有任何真實成交的部位——所有 cohort 都只有 paper 記分板。'));
+  }
+  sec0.appendChild(mdParagraph(notes.two_anchors || ''));
+  if ((live.tickers || []).length < 3) {
+    sec0.appendChild(el('p', 'warn',
+      `▲ live 樣本僅 ${(live.tickers || []).length} 檔，不足以回答「系統準不準」。`
+      + '這個數字只有靠累積真實下單才會變大，時間經過不會讓它自己滿足。'));
+  }
+  sec0.appendChild(el('p', 'note', `只有 paper 的 cohort：${(live.paper_only || []).length} 個。`));
+  app.appendChild(sec0);
+
+  // ② 樣本效度**先於**數字——排版順序本身就是判準的一部分。
+  if (health) {
+    const sec1 = el('section', 'panel');
+    sec1.appendChild(el('h2', null, '這批數字能證明什麼（先看這裡）'));
+    if (health.judgment_anchors === 0) {
+      sec1.appendChild(el('p', 'warn',
+        '■ 沒有任何錨點來自進場判斷——下方的「入圖以來」不構成選股能力的證據。'
+        + 'cohort 由入圖建立，錨點的語意是「這家公司的 claim 那天進圖」，不是「那天是進場時機」。'));
+      sec1.appendChild(el('p', 'note', notes.judgment_anchor || ''));
+    }
+    if (health.span_days < health.span_warn_days) {
+      sec1.appendChild(el('p', 'warn',
+        `▲ 錨點跨度僅 ${health.span_days} 天——不得視為 ${health.paired} 個獨立樣本。`
+        + '這批 cohort 建立於同一段期間，若又同屬一個主題，超額很可能是同一次行情被相關標的複製多次。'));
+    }
+    const rows = el('div', 'rows');
+    rows.appendChild(kv('來自進場判斷的錨點', `${health.judgment_anchors} 筆｜來自入圖日 ${health.paired} 筆`));
+    rows.appendChild(kv('錨點跨度', `${health.first} ~ ${health.last}（${health.span_days} 天）｜獨立日曆週 ${health.weeks}`));
+    rows.appendChild(kv(`錨點前 ${health.pre_anchor_days} 日中位`, fmtRatioPct(health.pre_median, 1) || '—'));
+    rows.appendChild(kv('錨點後中位', fmtRatioPct(health.post_median, 1) || '—'));
+    rows.appendChild(kv('錨點前漲幅大於錨點後',
+      `${health.chasing} / ${health.paired}` + (health.chasing_tickers.length ? `（${health.chasing_tickers.join('、')}）` : '')));
+    sec1.appendChild(rows);
+    sec1.appendChild(mdParagraph(notes.sample_validity || ''));
+    app.appendChild(sec1);
+  }
+
+  // ③ 常駐計數器
+  const sec2 = el('section', 'panel');
+  sec2.appendChild(el('h2', null, '常駐計數器'));
+  sec2.appendChild(kpiRow([
+    { label: '上線標的', value: `${c.eligible_cohorts}/${c.total_cohorts}`, sub: `另有 ${c.legacy_eligible_cohorts} 個舊判準` },
+    { label: '可量測', value: `${c.shadow_measurable_cohorts}/${c.shadow_anchored_cohorts}`, sub: '有價格錨、算得出報酬' },
+    { label: '真實下單', value: `${c.live_choices} 選擇／${c.live_fills} 成交`, sub: '這個數字只靠真實下單變大' },
+    { label: '結案歸因', value: `${c.measured_outcomes}/${c.outcomes}`, sub: '已量測 outcome' },
+  ]));
+  if (c.duplicate_cohort_companies || c.orphan_cohorts) {
+    sec2.appendChild(el('p', 'note',
+      `不進分母但必須現形：重複 cohort ${c.duplicate_cohort_companies || 0}｜無 identity 殘骸 ${c.orphan_cohorts || 0}`));
+  }
+  app.appendChild(sec2);
+
+  // ④ 等權重聚合
+  const sec3 = el('section', 'panel');
+  sec3.appendChild(el('h2', null, '推薦籃子整體（等權重）'));
+  const aggRow = el('div', 'numbers');
+  aggRow.appendChild(numberBlock('絕對', agg.absolute === null || agg.absolute === undefined ? '—' :
+    (agg.absolute > 0 ? '+' : '') + fmtRatioPct(agg.absolute, 1), `${agg.n} 檔等權`, signClass(agg.absolute)));
+  if (agg.excess !== null && agg.excess !== undefined) {
+    aggRow.appendChild(numberBlock(`超額（vs ${agg.benchmark}）`,
+      (agg.excess > 0 ? '+' : '') + fmtRatioPct(agg.excess, 1), `已量測 ${agg.measured}/${agg.total}`, signClass(agg.excess)));
+  }
+  sec3.appendChild(aggRow);
+  sec3.appendChild(mdParagraph(notes.aggregate || ''));
+  app.appendChild(sec3);
+
+  // ⑤ 逐檔
+  const sec4 = el('section', 'panel');
+  sec4.appendChild(el('h2', null, `逐檔（${payload.rows.length}）`));
+  sec4.appendChild(rankTable(payload.rows, POSITION_COLUMNS, detailSet));
+  if ((payload.unavailable || []).length) {
+    sec4.appendChild(el('p', 'note',
+      `另有 ${payload.unavailable.length} 個 cohort 的 Shadow 是 unavailable，無錨點可計算（多半是無 ticker 的未上市或殘骸）。`));
+  }
+  sec4.appendChild(el('p', 'warn', '▲ ' + (notes.monitoring || '')));
+  app.appendChild(sec4);
+
+  app.appendChild(stateFooter(payload, '這一頁不是什麼'));
+  window.scrollTo(0, 0);
+}
+
 /* ---------- 路由 ---------- */
 
 async function route() {
@@ -1699,6 +1846,7 @@ async function route() {
     else if (target === 'beta') await renderBeta();
     else if (target === 'coverage') await renderCoverage();
     else if (target === 'watches') await renderWatches();
+    else if (target === 'positions') await renderPositions();
     else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {

@@ -205,10 +205,14 @@ def test_every_alpha_pane_still_has_a_home_after_daily_stopped_embedding_them() 
     for pointer in ("#/ranking", "#/coverage", "$alpha-status"):
         assert pointer in text, f"Daily 沒有指出 {pointer}"
 
-    # ③ Pane 4 還沒有 APP 畫面 → **仍留在 Daily 且不得省略**
-    assert "## 部位與問責（無 pq2 編號）" in text
-    assert "scripts\\outcome_if_settled_today.py" in text
-    assert "順序是 invariant：APP 先讀得到，Daily 才能不印" in text
+    # ③ Pane 4 於 2026-09-08 也搬進 APP（`positions` kind）→ Daily 只印變動。
+    #    **規則本身不變**：還沒有 APP 畫面的段落一律留在 Daily；判準改成機械的——
+    #    `webapp status` 列得出那個 kind 才算搬完，不靠誰記得哪一段還沒搬。
+    assert "#/positions" in text
+    assert "只印變動" in text
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    assert "還沒有 APP 畫面的段落一律留在 Daily" in agents
+    assert "webapp status" in agents, "判準必須可機械查證"
 
     # ④ 移出的動作必須被寫出來，不是安靜消失
     assert "2026-09-08" in text and "不再由 Daily 印出" in text

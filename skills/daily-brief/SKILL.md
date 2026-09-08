@@ -496,10 +496,11 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
   **都住 APP，Daily 不再複述**（2026-09-08 使用者定案；契約見 `AGENTS.md`「Beta 呈現契約」與
   「APP 呈現契約」）。要看完整版本：開 APP，或呼叫 `$alpha-status`（它仍是四 pane 的完整權威）。
 
-## 部位與問責（無 pq2 編號）
+## 部位與問責：只印變動（無 pq2 編號）
 
-⚠ **這一段還沒有 APP 畫面**（`positions` kind 未做），所以**留在 Daily 且不得省略**——
-順序是 invariant：APP 先讀得到，Daily 才能不印。
+完整內容住 APP `#/positions`（真實成交、逐檔報酬、常駐計數器、錨點體檢），由收尾 materialize 每天更新。
+**Daily 只印今天不一樣的**：新增 fill、disproof 觸發、計數器分子變動、live 樣本數變化。沒有變動就一行帶過。
+⚠ 兩種報酬的錨點語意不同（live 以成交價、shadow 以入圖日），**Daily 引用任一數字時必須標明是哪一種**。
 
 TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位、錨點樣本效度與監控覆蓋>
 
@@ -600,7 +601,7 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 
 ### Step 7 — 收尾同步
 
-- **更新 APP 讀的畫面**（2026-09-08）：`& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches`。
+- **更新 APP 讀的畫面**（2026-09-08）：`& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches --positions`。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
   只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。

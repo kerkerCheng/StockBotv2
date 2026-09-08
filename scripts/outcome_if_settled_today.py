@@ -244,11 +244,14 @@ def _at_or_before(series: dict[date, float], target: date) -> tuple[date, float]
     return best, series[best]
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--no-benchmark", action="store_true", help="不連外抓基準")
-    args = parser.parse_args()
+def collect(*, no_benchmark: bool = False) -> tuple[list[dict], list[dict], dict]:
+    """把資料收集段與 render 分開，讓 APP 的 `positions` artifact 能拿到同一份結果。
 
+    ⚠ **這是純抽取，不是行為改動**：`main()` 仍是「collect → render」，輸出逐位元組不變
+    （驗收條件就是這句話——它是 daily 排程在跑的腳本，`.codex/rules` 有 exact entry）。
+    抽出來的理由是 L13 的正面版：同一份計算要有第二個消費端時，讓兩邊讀**同一個函式**，
+    而不是讓 APP 端另算一份——第二份會立刻開始偏離。
+    """
     shadows = _load_shadows()
     observed = [s for s in shadows if s["status"] == "observed"]
     unavailable = [s for s in shadows if s["status"] != "observed"]
@@ -339,7 +342,7 @@ def main() -> int:
     # 基準
     benchmarks: dict[str, dict[date, float]] = {}
     dated = [r for r in results if r.get("anchor_date") and r.get("current_date")]
-    if not args.no_benchmark and dated:
+    if not no_benchmark and dated:
         start = min(r["anchor_date"] for r in dated)
         end = max(r["current_date"] for r in dated)
         benchmarks = _benchmark_series([PRIMARY_BENCHMARK, REFERENCE_BENCHMARK], start, end)
@@ -355,12 +358,96 @@ def main() -> int:
                 row[f"bench_{symbol}"] = b[1] / a[1] - 1.0
                 row[f"excess_{symbol}"] = row["absolute_return"] - row[f"bench_{symbol}"]
 
+    return results, unavailable, benchmarks
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--no-benchmark", action="store_true", help="不連外抓基準")
+    args = parser.parse_args()
+
+    results, unavailable, benchmarks = collect(no_benchmark=args.no_benchmark)
     _render(results, unavailable, bool(benchmarks))
     return 0
 
 
 def _pct(value: float | None) -> str:
     return "—" if value is None else f"{value * 100:+.1f}%"
+
+
+def equal_weight_aggregate(results: list[dict]) -> dict:
+    """推薦籃子的等權重聚合——AGENTS outcome 契約的量測基準。
+
+    ⚠ 純函式，**markdown 與 APP artifact 讀同一份**：第二份實作會立刻開始偏離（L16）。
+    各檔錨點日不同，這是跨持有期的粗聚合，**不是回測**。
+    """
+    abs_returns = [r["absolute_return"] for r in results if r.get("absolute_return") is not None]
+    excess = [r.get(f"excess_{PRIMARY_BENCHMARK}") for r in results
+              if r.get(f"excess_{PRIMARY_BENCHMARK}") is not None]
+    return {
+        "n": len(abs_returns),
+        "absolute": (sum(abs_returns) / len(abs_returns)) if abs_returns else None,
+        "excess": (sum(excess) / len(excess)) if excess else None,
+        "benchmark": PRIMARY_BENCHMARK,
+        "measured": len(abs_returns),
+        "total": len(results),
+    }
+
+
+def live_lane_rows(results: list[dict], fills: dict[str, list[dict]]) -> tuple[list[dict], list[str]]:
+    """真實成交 vs 只有 paper。回傳 (逐筆 fill 列, 只有 paper 的 ticker)。
+
+    「live 報酬」以**實際成交價**為錨點，「shadow 報酬」以**入圖日**為錨點——兩者語意不同，
+    後者不含任何進場時點判斷，不構成選股能力的證據。幣別不一致一律 fail closed，不猜匯率。
+    """
+    by_ticker = {str(r["ticker"]): r for r in results if r.get("ticker")}
+    live_tickers = sorted(t for t in fills if t in by_ticker)
+    paper_only = [t for t in by_ticker if t not in fills]
+    rows: list[dict] = []
+    for ticker in live_tickers:
+        row = by_ticker[ticker]
+        current_val, current_ccy = _to_settlement(
+            row.get("current_raw"), _market_quote_unit(row.get("company_id"), ticker)
+        )
+        for fill in sorted(fills[ticker], key=lambda f: f["executed_at"] or date.min):
+            live_ret = None
+            if current_val is not None and fill["price"] > 0 and fill["currency"] == current_ccy:
+                live_ret = current_val / fill["price"] - 1.0
+            rows.append({
+                "ticker": ticker, "company_id": row.get("company_id"),
+                "executed_at": fill["executed_at"], "price": fill["price"],
+                "shares": fill["shares"], "currency": fill["currency"],
+                "current": current_val, "current_currency": current_ccy,
+                "live_return": live_ret, "shadow_return": row.get("absolute_return"),
+            })
+    return rows, paper_only
+
+
+def anchor_health(results: list[dict]) -> dict | None:
+    """錨點體檢：樣本效度先於數字。
+
+    ⚠ **刻意先講樣本效度再講數字**——反過來寫的話讀者會先看到「超額 +11%」再把 caveat
+    當客套話，於是一份有效 n=1 的觀測讀起來像 10 個獨立驗證。
+    """
+    paired = [r for r in results
+              if r.get("pre_anchor_return") is not None and r.get("absolute_return") is not None]
+    if not paired:
+        return None
+    anchors = sorted(r["anchor_date"] for r in paired)
+    chasing = [r for r in paired if r["pre_anchor_return"] > r["absolute_return"]]
+    return {
+        "paired": len(paired),
+        "judgment_anchors": _judgment_anchor_count(),
+        "first": anchors[0], "last": anchors[-1],
+        "span_days": (anchors[-1] - anchors[0]).days,
+        "weeks": len({(d.isocalendar()[0], d.isocalendar()[1]) for d in anchors}),
+        "span_warn_days": ANCHOR_SPAN_WARN_DAYS,
+        "pre_median": _median([r["pre_anchor_return"] for r in paired]),
+        "post_median": _median([r["absolute_return"] for r in paired]),
+        "chasing": len(chasing),
+        "chasing_tickers": [str(r["ticker"]) for r in chasing],
+        "pre_anchor_days": PRE_ANCHOR_DAYS,
+    }
 
 
 def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> None:
@@ -402,27 +489,15 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     # 「推薦籃子」以每檔等權計，回答排序整體有沒有跑贏。錨點日各異，
     # 這是跨持有期的粗聚合，明標不是回測；前段 vs 後段對照需排序歷史快照
     #（本腳本已開始 append，見 _append_ranking_snapshot），累積後才能算。
-    abs_returns = [
-        row["absolute_return"] for row in results
-        if row.get("absolute_return") is not None
-    ]
-    excess_returns = [
-        row.get(f"excess_{PRIMARY_BENCHMARK}") for row in results
-        if row.get(f"excess_{PRIMARY_BENCHMARK}") is not None
-    ]
-    if abs_returns:
-        ew_abs = sum(abs_returns) / len(abs_returns)
-        line = f"\n**等權重聚合（{len(abs_returns)} 檔）：絕對 {_pct(ew_abs)}"
-        if excess_returns:
-            ew_ex = sum(excess_returns) / len(excess_returns)
-            line += f"｜超額({PRIMARY_BENCHMARK}) {_pct(ew_ex)}"
+    aggregate = equal_weight_aggregate(results)
+    if aggregate["n"]:
+        line = f"\n**等權重聚合（{aggregate['n']} 檔）：絕對 {_pct(aggregate['absolute'])}"
+        if aggregate["excess"] is not None:
+            line += f"｜超額({PRIMARY_BENCHMARK}) {_pct(aggregate['excess'])}"
         line += "**——各檔錨點日不同，粗聚合非回測；前/後段對照待排序快照累積"
         print(line)
-        _persist_aggregate(
-            n=len(abs_returns),
-            ew_abs=ew_abs,
-            ew_excess=(sum(excess_returns) / len(excess_returns)) if excess_returns else None,
-        )
+        _persist_aggregate(n=aggregate["n"], ew_abs=aggregate["absolute"],
+                           ew_excess=aggregate["excess"])
 
     _append_ranking_snapshot()
     _render_live_lane(results, _live_fills())
@@ -547,9 +622,8 @@ def _render_live_lane(results: list[dict], fills: dict[str, list[dict]]) -> None
 
     print("\n## Live 部位 vs 只有 paper 的 cohort\n")
 
-    by_ticker = {str(r["ticker"]): r for r in results if r.get("ticker")}
-    live_tickers = [t for t in fills if t in by_ticker]
-    paper_only = [t for t in by_ticker if t not in fills]
+    rows, paper_only = live_lane_rows(results, fills)
+    live_tickers = sorted({row["ticker"] for row in rows})
 
     if not live_tickers:
         print(
@@ -570,28 +644,16 @@ def _render_live_lane(results: list[dict], fills: dict[str, list[dict]]) -> None
     )
 
     measured = 0
-    for ticker in sorted(live_tickers):
-        row = by_ticker[ticker]
-        current_val, current_ccy = _to_settlement(
-            row.get("current_raw"), _market_quote_unit(row.get("company_id"), ticker)
+    for row in rows:
+        if row["live_return"] is not None:
+            measured += 1
+        current_val = row["current"]
+        print(
+            f"| {row['ticker']:9} | {str(row['executed_at'] or '—'):10} "
+            f"| {row['price']:>10.2f} | {row['shares']:>7.4g} "
+            f"| {(f'{current_val:.2f}' if current_val else '—'):>10} "
+            f"| {_pct(row['live_return']):>10} | {_pct(row['shadow_return']):>16} |"
         )
-        for fill in sorted(fills[ticker], key=lambda f: f["executed_at"] or date.min):
-            live_ret = None
-            # fill 的 currency 已是結算幣別（record-fill 要求明確指定），不再折第二次；
-            # 與現價的結算幣別不一致就 fail closed，不猜匯率。
-            if (
-                current_val is not None
-                and fill["price"] > 0
-                and fill["currency"] == current_ccy
-            ):
-                live_ret = current_val / fill["price"] - 1.0
-                measured += 1
-            print(
-                f"| {ticker:9} | {str(fill['executed_at'] or '—'):10} "
-                f"| {fill['price']:>10.2f} | {fill['shares']:>7.4g} "
-                f"| {(f'{current_val:.2f}' if current_val else '—'):>10} "
-                f"| {_pct(live_ret):>10} | {_pct(row.get('absolute_return')):>16} |"
-            )
 
     print(
         f"\n- **有 live fill：{len(live_tickers)} 檔（已算出報酬 {measured} 筆）"
@@ -641,18 +703,16 @@ def _render_chase_check(results: list[dict]) -> None:
     再把 caveat 當客套話——首版正是那樣，於是一份有效 n=1 的觀測讀起來像 10 個
     獨立驗證。這是 L14 說的「接錯資料源的計數器＝反向防呆」。
     """
-    paired = [
-        r
-        for r in results
-        if r.get("pre_anchor_return") is not None and r.get("absolute_return") is not None
-    ]
-    if not paired:
+    health = anchor_health(results)
+    if health is None:
         return
 
-    anchors = sorted(r["anchor_date"] for r in paired)
-    span = (anchors[-1] - anchors[0]).days
-    weeks = len({(d.isocalendar()[0], d.isocalendar()[1]) for d in anchors})
-    judgment = _judgment_anchor_count()
+    paired = [r for r in results
+              if r.get("pre_anchor_return") is not None and r.get("absolute_return") is not None]
+    anchors = [health["first"], health["last"]]
+    span = health["span_days"]
+    weeks = health["weeks"]
+    judgment = health["judgment_anchors"]
 
     print(f"\n## 錨點體檢（列 {len(paired)} 筆）\n")
     print(
@@ -680,13 +740,13 @@ def _render_chase_check(results: list[dict]) -> None:
             "被相關標的複製多次（有效 n 接近 1）。"
         )
 
-    chasing = [r for r in paired if r["pre_anchor_return"] > r["absolute_return"]]
-    pre_med = _median([r["pre_anchor_return"] for r in paired])
-    post_med = _median([r["absolute_return"] for r in paired])
+    chasing = health["chasing_tickers"]
+    pre_med = health["pre_median"]
+    post_med = health["post_median"]
     print(
         f"\n- 錨點前 {PRE_ANCHOR_DAYS} 日中位：{_pct(pre_med)}｜錨點後中位：{_pct(post_med)}\n"
         f"- 錨點前漲幅大於錨點後：{len(chasing)} / {len(paired)}"
-        + (f"（{'、'.join(str(r['ticker']) for r in chasing)}）" if chasing else "")
+        + (f"（{'、'.join(chasing)}）" if chasing else "")
     )
     if pre_med > 0:
         print(

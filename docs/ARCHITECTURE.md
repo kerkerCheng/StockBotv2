@@ -734,7 +734,16 @@ Engine C `technical_observations` 的 `session_date`＋`close_adjusted`——那
 `counters()`／`sweep_due()`／`is_stalled()` 與 `leads.trace_backlog()`，把**停滯**與**需要當場處置的追源**
 獨立成區——那是這個機制唯一會安靜失效的地方（L14：防呆要自己出現）。兩者的 `freshness_identity` 只含
 「哪些節點還空白」「有哪些 watch、各自什麼狀態」，節點改名或 `poll.last_checked` 更新不算認知變了。
-⚠ **APP 不寫任何東西**：不喚醒 watch、不消化 fired、不改 lead 狀態。state 目錄的解析只有一條規則
+⚠ **APP 不寫任何東西**：不喚醒 watch、不消化 fired、不改 lead 狀態。
+
+**`positions` kind（2026-09-08 B2-positions）：** 把 `scripts/outcome_if_settled_today.py` 的資料收集段
+抽成 `collect()`，另抽 `equal_weight_aggregate()`／`live_lane_rows()`／`anchor_health()` 三個純函式——
+**markdown 與 artifact 讀同一份**（L16；第二份實作會立刻開始偏離）。抽取是行為保持的：`main()` 只剩
+「collect → render」，輸出以「去數字後的骨架」比對零差異（盤中重跑會因價格變動換名次，所以不能比位元組）。
+materialize **只呼叫 `collect()` 不呼叫 render**，因此不 append 排序快照、不寫聚合檔：維持唯讀。
+計數器直接取 `DecisionStore.capital_expression_counters()`（本來就回傳 dict，不需重構 Engine D）。
+⚠ 這一頁的**排版順序本身是判準**：真實部位 → **樣本效度** → 計數器 → 聚合 → 逐檔。反過來排的話，
+一份有效 n 接近 1 的觀測會讀起來像 N 個獨立驗證（`tests/test_webapp_positions.py` 斷言這個順序）。state 目錄的解析只有一條規則
 （`webapp/store.py::resolve_state_dir`：明示 > analyst 目錄下的 `state/` > 預設），serve／materialize／status 都走它。
 
 **Web App 的資訊階層**（`webapp/static/`，vanilla JS，零外部資源，CSP 只允許 same-origin）：

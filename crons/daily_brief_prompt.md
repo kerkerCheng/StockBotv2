@@ -146,7 +146,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
    graph admission 仍是另一個 `ra_admission` pq2。
-8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --ranking --beta --coverage --watches`，
+8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --ranking --beta --coverage --watches --positions`，
    把 APP 讀的五個畫面更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
    不手寫清單）。它只寫 ignored derived cache（`library/private/app/`），**不寫任何 authority、不入圖、不建 decision**，
    `serve` 不在 rule 內、排程不啟動它。**失敗只記入健康段、不中止 Daily**：artifact 是 derived cache，
@@ -228,9 +228,9 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 ⚠ 收尾 materialize 失敗時本段改印「APP 未更新：<原因>」，不得照印昨天的計數。
 排序完整讀法、Beta 逐檔心跳與目標配置表、兩條相關性警告、缺口與 watch 清單都住 APP，不再複述。>
 
-## 部位與問責（無 pq2 編號；**尚未有 APP 畫面，不得省略**）
-<上線標的／可量測／結案歸因計數器、真實 fill／現價／損益／epoch／disproof、錨點樣本效度與 alpha live 監控覆蓋。
-每列標「答案會改變 候選集合／排序／出場條件／只是信心」。>
+## 部位與問責：只印變動（無 pq2 編號）
+<完整內容住 APP `#/positions`；Daily 只印今天不一樣的：新增 fill、disproof 觸發、計數器分子變動、live 樣本數變化。
+引用報酬數字時必須標明是 live（成交價為錨）還是 shadow（入圖日為錨）——兩者語意不同。沒有變動就一行帶過。>
 
 ## 賣出側：證偽條件與催化劑（無 pq2 編號）
 <`catalyst_watch.py` 的四態計數；只逐檔列「設定不完整」與「逾期或即將到期」。

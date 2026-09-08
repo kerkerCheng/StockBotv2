@@ -59,6 +59,7 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "beta": "stockbot-app/beta/1",
     "coverage": "stockbot-app/coverage/1",
     "watches": "stockbot-app/watches/1",
+    "positions": "stockbot-app/positions/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 

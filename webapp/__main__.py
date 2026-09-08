@@ -40,8 +40,8 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_beta, materialize_coverage, materialize_many, materialize_ranking,
-        materialize_watches, write_vocabularies,
+        materialize_beta, materialize_coverage, materialize_many, materialize_positions,
+        materialize_ranking, materialize_watches, write_vocabularies,
     )
 
     store, state_store = _stores(args)
@@ -95,9 +95,20 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ watches → {path.name}（{path.stat().st_size:,} bytes；"
                   f"在等 {k['active']}／停滯 {k['stalled']}／fired 未消化 {k['fired_unconsumed']}）")
 
+    if args.positions:
+        total += 1
+        try:
+            path, payload = materialize_positions(store=state_store)
+        except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
+            failed += 1
+            print(f"✗ positions：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            print(f"✓ positions → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"逐檔 {len(payload['rows'])}／真實成交 {len(payload['live']['tickers'])} 檔）")
+
     # 不給 ticker 且沒要求 ranking ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
-    state_only = bool(args.ranking or args.beta or args.coverage or args.watches)
+    state_only = bool(args.ranking or args.beta or args.coverage or args.watches or args.positions)
     tickers = list(args.tickers) if args.tickers else ([] if state_only else store.tickers())
     if args.tracked:
         tracked = _tracked_tickers()
@@ -207,6 +218,9 @@ def cmd_status(args: argparse.Namespace) -> int:
         elif kind == "watches":
             extra = (f"｜在等 {payload['counters']['active']}"
                      f"／停滯 {payload['counters']['stalled']}")
+        elif kind == "positions":
+            extra = (f"｜逐檔 {len(payload['rows'])}"
+                     f"／真實成交 {len(payload['live']['tickers'])} 檔")
         print(f"- {kind}｜{freshness.state}（{freshness.age_hours:.1f}h）"
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
@@ -250,6 +264,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 覆蓋掃描：query.coverage_gaps.scan() 的輸出照抄")
     mat.add_argument("--watches", action="store_true",
                      help="另外（或只）materialize 事件監看：Event Watch registry ＋ 追源 backlog 的原值照抄")
+    mat.add_argument("--positions", action="store_true",
+                     help="另外（或只）materialize 部位與問責：outcome 腳本 collect() ＋ Decision Store 計數器")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與 ranking 都適用）")
     _dirs(mat)
     mat.set_defaults(func=cmd_materialize)

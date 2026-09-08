@@ -32,6 +32,7 @@ from webapp.store import ArtifactStore, StateArtifactStore
 from test_webapp_materialize import fake_view
 from test_webapp_beta import fake_beta_payload
 from test_webapp_coverage_watches import fake_coverage_payload, fake_watches_payload
+from test_webapp_positions import fake_positions_payload
 from test_webapp_ranking import fake_ranking_payload
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -89,6 +90,7 @@ def app_dir(tmp_path):
     StateArtifactStore(tmp_path / "state").write(fake_beta_payload())
     StateArtifactStore(tmp_path / "state").write(fake_coverage_payload())
     StateArtifactStore(tmp_path / "state").write(fake_watches_payload())
+    StateArtifactStore(tmp_path / "state").write(fake_positions_payload())
     return tmp_path
 
 
@@ -152,7 +154,7 @@ def test_a_full_request_round_imports_no_model_module(served) -> None:
     for path in ("/api/v1/health", "/api/v1/meta", "/api/v1/stocks",
                  "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/stocks/PENCE",
                  "/api/v1/stocks/NOPE", "/api/v1/ranking", "/api/v1/beta", "/api/v1/coverage",
-                 "/api/v1/watches", "/", "/static/app.js"):
+                 "/api/v1/watches", "/api/v1/positions", "/", "/static/app.js"):
         client.get(path)
     added = set(sys.modules) - before
     leaked = sorted(m for m in added
@@ -186,7 +188,7 @@ def test_requests_change_not_a_single_byte_on_disk(served) -> None:
     client, directory = served
     before = _tree_digest(directory)
     for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/ranking", "/api/v1/beta",
-                 "/api/v1/coverage", "/api/v1/watches"):
+                 "/api/v1/coverage", "/api/v1/watches", "/api/v1/positions"):
         assert client.get(path).status_code == 200
     assert _tree_digest(directory) == before
 
@@ -258,6 +260,7 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
         assert client.get("/api/v1/beta").json()["kind"] == "beta"
         assert client.get("/api/v1/coverage").json()["kind"] == "coverage"
         assert client.get("/api/v1/watches").json()["kind"] == "watches"
+        assert client.get("/api/v1/positions").json()["kind"] == "positions"
         assert client.get("/api/v1/stocks/NEVERBUILT").status_code == 503
 
 
@@ -267,7 +270,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
 
 @pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
 @pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/ranking", "/api/v1/beta",
-                                  "/api/v1/coverage", "/api/v1/watches", "/"])
+                                  "/api/v1/coverage", "/api/v1/watches",
+                                  "/api/v1/positions", "/"])
 def test_no_mutation_verb_is_routed_anywhere(served, method: str, path: str) -> None:
     client, _ = served
     assert getattr(client, method)(path).status_code == 405

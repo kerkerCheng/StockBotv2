@@ -209,7 +209,7 @@ def test_watches_identity_ignores_last_checked() -> None:
 # ---------------------------------------------------------------------------
 
 def test_both_kinds_are_registered_and_validate() -> None:
-    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches")
+    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches", "positions")
     for kind, payload in (("coverage", fake_coverage_payload()), ("watches", fake_watches_payload())):
         assert validate_state_artifact(kind, payload) is payload
         with pytest.raises(ArtifactUnavailable, match="content_digest"):

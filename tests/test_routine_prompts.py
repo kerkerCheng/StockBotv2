@@ -187,8 +187,9 @@ def test_daily_prompt_points_at_where_the_panes_live_now() -> None:
     text = DAILY.read_text(encoding="utf-8")
     for pointer in ("#/ranking", "#/beta", "#/coverage", "#/watches"):
         assert pointer in text, f"prompt 沒有指出 {pointer}"
-    # 還沒有 APP 畫面的那一段：留在 Daily 且明文不得省略
-    assert "尚未有 APP 畫面，不得省略" in text
+    # 部位與問責 2026-09-08 也搬進 APP，Daily 只印變動；兩種報酬的錨點語意必須標明
+    assert "#/positions" in text
+    assert "live（成交價為錨）還是 shadow（入圖日為錨）" in text
     assert "outcome_if_settled_today.py" in text
     # APP 當天沒更新時必須現形，否則「看不到」與「沒發生」同形（L12）
     assert "APP 未更新" in text

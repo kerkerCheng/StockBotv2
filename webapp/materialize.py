@@ -854,6 +854,167 @@ def materialize_watches(*, store: StateArtifactStore | None = None,
     return target.write(payload), payload
 
 
+# ---------------------------------------------------------------------------
+# state artifact：`positions`（部位與問責；照抄 outcome 腳本與 Decision Store 計數器）
+# ---------------------------------------------------------------------------
+
+POSITIONS_MATERIALIZER_VERSION = "webapp-materialize-positions/1"
+
+POSITIONS_THIS_IS_NOT = (
+    "**不是績效報告。** 「shadow 報酬」的錨點是**入圖日**——那天的語意是「這家公司的 claim 進圖了」，"
+    "不是「那天該買」。它不含任何進場時點判斷，**不構成選股能力的證據**。",
+    "「live 報酬」才以實際成交價為錨點；兩者語意不同，不得混為同一個數字。",
+    "不是回測：各檔錨點日不同，等權重聚合是跨持有期的粗聚合。",
+    "樣本效度先於數字：錨點跨度短就不得視為 N 個獨立樣本——同一段行情被相關標的複製多次時，有效 n 接近 1。",
+    "本 APP 不寫任何東西：不 close、不記錄選擇、不改 thesis；live choice／fill 永遠是本機人工動作。",
+    "本 APP 不重算：每一格都是 materialize 當下 `scripts/outcome_if_settled_today.py` 與 Decision Store 的輸出照抄。",
+)
+
+_POSITIONS_AUTHORITY = {
+    "function": "scripts.outcome_if_settled_today.collect ＋ DecisionStore.capital_expression_counters",
+    "command": "python scripts/outcome_if_settled_today.py",
+    "note": "與 daily 印的那份**同一個函式**——APP 不另算一份（第二份會立刻開始偏離）。"
+            "materialize 只呼叫 collect()，不呼叫 render，所以不 append 排序快照、不寫聚合檔：唯讀。",
+}
+
+
+def _iso(value: Any) -> Any:
+    return value.isoformat() if hasattr(value, "isoformat") else value
+
+
+def _position_row(row: Mapping[str, Any], *, benchmark: str, reference: str) -> dict[str, Any]:
+    """一列的投影：每一格照抄，只把日期序列化。"""
+    return {
+        "ticker": row.get("ticker"), "company_id": row.get("company_id"),
+        "anchor_date": _iso(row.get("anchor_date")), "current_date": _iso(row.get("current_date")),
+        "anchor_price": row.get("anchor_raw"), "anchor_currency": row.get("anchor_ccy"),
+        "anchor_source": row.get("anchor_source"), "current_price": row.get("current_raw"),
+        "pre_anchor_return": row.get("pre_anchor_return"),
+        "absolute_return": row.get("absolute_return"),
+        "benchmark_return": row.get(f"bench_{benchmark}"),
+        "excess_return": row.get(f"excess_{benchmark}"),
+        "reference_return": row.get(f"bench_{reference}"),
+        "notes": list(row.get("note") or ()),
+    }
+
+
+def build_positions_artifact(results: Sequence[Mapping[str, Any]],
+                             unavailable: Sequence[Mapping[str, Any]], *,
+                             has_benchmark: bool, aggregate: Mapping[str, Any],
+                             health: Mapping[str, Any] | None, live_rows: Sequence[Mapping[str, Any]],
+                             paper_only: Sequence[str], counters: Mapping[str, Any],
+                             benchmarks: tuple[str, str],
+                             generated_at: datetime | None = None) -> dict[str, Any]:
+    """outcome 腳本的結果 ＋ Decision Store 計數器 → `positions` state artifact。**純函式**。"""
+    primary, reference = benchmarks
+    stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    rows = [_position_row(r, benchmark=primary, reference=reference) for r in results]
+    rows.sort(key=lambda r: -(r["absolute_return"] if r["absolute_return"] is not None else -9))
+    live = [{**dict(row), "executed_at": _iso(row.get("executed_at"))} for row in live_rows]
+    measured_live = sum(1 for row in live if row.get("live_return") is not None)
+    payload: dict[str, Any] = {
+        "schema_version": STATE_SCHEMA_VERSIONS["positions"],
+        "kind": "positions",
+        "title": "部位與問責：已投的怎麼樣、系統準不準",
+        "generated_at": stamp.isoformat(),
+        "as_of": None,
+        "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
+        "authority": dict(_POSITIONS_AUTHORITY),
+        "counters": {
+            "eligible_cohorts": counters.get("eligible_cohorts"),
+            "legacy_eligible_cohorts": counters.get("legacy_eligible_cohorts"),
+            "total_cohorts": counters.get("total_cohorts"),
+            "shadow_measurable_cohorts": counters.get("shadow_measurable_cohorts"),
+            "shadow_anchored_cohorts": counters.get("shadow_anchored_cohorts"),
+            "outcomes": counters.get("outcomes"),
+            "measured_outcomes": counters.get("measured_outcomes"),
+            "live_choices": counters.get("live_choices"),
+            "live_fills": counters.get("live_fills"),
+            "duplicate_cohort_companies": counters.get("duplicate_cohort_companies"),
+            "orphan_cohorts": counters.get("orphan_cohorts"),
+        },
+        "benchmarks": {"primary": primary, "reference": reference, "available": bool(has_benchmark)},
+        "aggregate": dict(aggregate),
+        "anchor_health": None if health is None else {
+            **{k: v for k, v in health.items() if k not in {"first", "last"}},
+            "first": _iso(health["first"]), "last": _iso(health["last"]),
+        },
+        "rows": rows,
+        "unavailable": [{"ticker": u.get("ticker") or u.get("research_ticker"),
+                         "cohort_id": u.get("cohort_id"), "status": u.get("status")}
+                        for u in unavailable],
+        "live": {"rows": live, "measured": measured_live,
+                 "tickers": sorted({row["ticker"] for row in live}),
+                 "paper_only": sorted(paper_only)},
+        "notes": {
+            "two_anchors": "「live 報酬」以**實際成交價**為錨點，「shadow 報酬」以**入圖日**為錨點。"
+                           "兩者語意不同：後者不含任何進場時點判斷，不構成選股能力的證據。",
+            "aggregate": "等權重聚合是**推薦籃子**的量測基準：每檔等權，回答排序整體有沒有跑贏。"
+                         "各檔錨點日不同，這是跨持有期的粗聚合，**不是回測**。",
+            "sample_validity": "**樣本效度先於數字**：錨點跨度短就不得視為 N 個獨立樣本——"
+                               "反過來讀的話，一份有效 n 接近 1 的觀測會看起來像 N 個獨立驗證。",
+            "judgment_anchor": "要讓這張表變成選股能力的證據，需要的不是等更久，"
+                               "是讓錨點帶有進場判斷（`record-choice --user-sized` 的 `decided_at`）。",
+            "monitoring": "alpha live 部位目前**不在** `event_search_requests` 的自動監控範圍"
+                          "（那條只走 beta instruments）——有 live 部位時沒有人在自動看跌幅。",
+        },
+        "this_is_not": list(POSITIONS_THIS_IS_NOT),
+        "materializer": {
+            "version": POSITIONS_MATERIALIZER_VERSION,
+            "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+    }
+    payload = redact_private_paths(payload)
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="positions", as_of=None,
+        # 認知狀態＝有哪些 cohort 被量測、有哪些真實成交、計數器的分子分母。
+        # 價格與報酬每天都在動，那是內容變了不是判斷變了（L12）。
+        identity={"tickers": sorted(str(r["ticker"]) for r in rows),
+                  "measured": sorted(str(r["ticker"]) for r in rows if r["absolute_return"] is not None),
+                  "live": sorted({str(row["ticker"]) for row in live}),
+                  "counters": {k: payload["counters"][k] for k in
+                               ("eligible_cohorts", "total_cohorts", "live_choices", "live_fills")}})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload
+
+
+def materialize_positions(*, store: StateArtifactStore | None = None,
+                          generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """跑一次 outcome 的 `collect()` 並寫下 artifact。
+
+    ⚠ **只呼叫 `collect()`，不呼叫 render**——所以不 append 排序快照、不寫聚合檔：
+    materialize 端維持唯讀（那兩個寫入是 daily 那支腳本的責任，不該被 APP 重複觸發）。
+    """
+    import importlib.util
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "outcome_if_settled_today", root / "scripts" / "outcome_if_settled_today.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError("找不到 scripts/outcome_if_settled_today.py")
+    outcome = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(outcome)
+
+    results, unavailable, benchmarks = outcome.collect()
+    from decision_lab.bootstrap import open_default_store
+
+    store_handle = open_default_store()
+    try:
+        counters = dict(store_handle.capital_expression_counters())
+    finally:
+        store_handle.close()
+    live_rows, paper_only = outcome.live_lane_rows(results, outcome._live_fills())
+    payload = build_positions_artifact(
+        results, unavailable, has_benchmark=bool(benchmarks),
+        aggregate=outcome.equal_weight_aggregate(results), health=outcome.anchor_health(results),
+        live_rows=live_rows, paper_only=paper_only, counters=counters,
+        benchmarks=(outcome.PRIMARY_BENCHMARK, outcome.REFERENCE_BENCHMARK),
+        generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """把封閉字彙寫成 `.meta.json`，讓 serve 端讀得到而**不必 import `alpha`／`briefing`**。
 
@@ -894,4 +1055,6 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "COVERAGE_MATERIALIZ
            "WAKE_STATE_LABELS", "build_beta_artifact", "build_coverage_artifact", "build_overview",
            "build_ranking_artifact", "build_watches_artifact", "materialize", "materialize_beta",
            "materialize_coverage", "materialize_many", "materialize_ranking", "materialize_view",
-           "materialize_watches", "redact_private_paths", "write_vocabularies"]
+           "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
+           "build_positions_artifact", "materialize_positions",
+           "redact_private_paths", "write_vocabularies"]

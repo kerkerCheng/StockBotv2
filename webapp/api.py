@@ -98,6 +98,7 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/beta",
             f"GET /api/{API_VERSION}/coverage",
             f"GET /api/{API_VERSION}/watches",
+            f"GET /api/{API_VERSION}/positions",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -165,6 +166,8 @@ _STATE_NOTES = {
                  "「artifact 讀不到」與「圖裡沒有缺口」是兩件事——後者會以 200 ＋ counts 全零回。"),
     "watches": ("跑 `python -m webapp materialize --watches`",
                 "「artifact 讀不到」與「沒有東西在等」是兩件事——後者會以 200 ＋ counters.active=0 回。"),
+    "positions": ("跑 `python -m webapp materialize --positions`",
+                  "「artifact 讀不到」與「還沒有任何真實部位」是兩件事——後者會以 200 ＋ live.rows=[] 回。"),
 }
 
 
@@ -202,6 +205,11 @@ async def coverage(request: Request) -> Response:
 async def watches(request: Request) -> Response:
     """在等什麼：Event Watch registry ＋ 追源 backlog 的原值照抄。"""
     return await _serve_state(request, "watches")
+
+
+async def positions(request: Request) -> Response:
+    """部位與問責：outcome 腳本與 Decision Store 計數器的輸出照抄。"""
+    return await _serve_state(request, "positions")
 
 
 async def index(request: Request) -> Response:
@@ -287,6 +295,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/beta", beta, methods=["GET"]),
         Route(f"/api/{API_VERSION}/coverage", coverage, methods=["GET"]),
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]
