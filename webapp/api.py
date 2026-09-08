@@ -96,6 +96,8 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/stocks/{{ticker}}",
             f"GET /api/{API_VERSION}/ranking",
             f"GET /api/{API_VERSION}/beta",
+            f"GET /api/{API_VERSION}/coverage",
+            f"GET /api/{API_VERSION}/watches",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -159,6 +161,10 @@ _STATE_NOTES = {
                 "「artifact 讀不到」與「排不出任何一列」是兩件事——後者會以 200 ＋ top_pick=null ＋ top_pick_absent_reason 回。"),
     "beta": ("跑 `python -m webapp materialize --beta`",
              "「artifact 讀不到」與「配置算不出來」是兩件事——後者會以 200 ＋ allocation.status=unavailable ＋ 理由回。"),
+    "coverage": ("跑 `python -m webapp materialize --coverage`",
+                 "「artifact 讀不到」與「圖裡沒有缺口」是兩件事——後者會以 200 ＋ counts 全零回。"),
+    "watches": ("跑 `python -m webapp materialize --watches`",
+                "「artifact 讀不到」與「沒有東西在等」是兩件事——後者會以 200 ＋ counters.active=0 回。"),
 }
 
 
@@ -186,6 +192,16 @@ async def ranking(request: Request) -> Response:
 async def beta(request: Request) -> Response:
     """資產配置：距目標多遠、現在在什麼水位（Engine D beta monitor 的輸出照抄）。"""
     return await _serve_state(request, "beta")
+
+
+async def coverage(request: Request) -> Response:
+    """供給側覆蓋掃描：圖裡哪些瓶頸還沒有供應商（`coverage_gaps.scan()` 的輸出照抄）。"""
+    return await _serve_state(request, "coverage")
+
+
+async def watches(request: Request) -> Response:
+    """在等什麼：Event Watch registry ＋ 追源 backlog 的原值照抄。"""
+    return await _serve_state(request, "watches")
 
 
 async def index(request: Request) -> Response:
@@ -269,6 +285,8 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/meta", meta, methods=["GET"]),
         Route(f"/api/{API_VERSION}/ranking", ranking, methods=["GET"]),
         Route(f"/api/{API_VERSION}/beta", beta, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/coverage", coverage, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

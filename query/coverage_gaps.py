@@ -58,6 +58,76 @@ ORDER BY size(direct_ids), size(indirect_ids), node
 """
 
 
+# ---------------------------------------------------------------------------
+# 呈現用的固定文字與分桶：**跟著資料走**（L16）。markdown（本檔）與 APP artifact
+# （`webapp/materialize.py`）都從這裡拿，不各自抄一份——抄第二份的那天起，後改的
+# 那份就不會回頭更新前一份。
+# ---------------------------------------------------------------------------
+
+COVERAGE_TITLE = "Chokepoint 供給側覆蓋掃描"
+
+BUCKET_NOTE = (
+    "> 🔴 **研究缺口**＝沒有任何公司連到它（直接或間接）——這才是真正該去挖的。\n"
+    "> 🟡 **建模待補**＝已有公司經 `prod:` 或公司對公司邊間接相連，代表**這個領域已經研究過**，\n"
+    "> 只是邊沒接到 chokepoint 節點上。下一步是補邊（走 graph admission），不是重新研究。\n"
+    "> ⚪ 概念／政策節點不適用「誰供應它」，不列入缺口。"
+)
+
+BUCKET_LABELS = {
+    "research_gap": "🔴 研究缺口（沒有任何公司連到它）",
+    "modelling_gap": "🟡 建模待補（已研究過，邊沒接上）",
+    "covered": "✅ 已覆蓋",
+    "concept": "⚪ 概念／政策節點（不適用「誰供應它」）",
+}
+
+BUCKET_NEXT_STEP = {
+    "research_gap": "去挖：誰供應它——可直接進 pq1 的研究題目",
+    "modelling_gap": "補邊（走 graph admission），**不是**重新研究",
+    "covered": "無；已有公司直接連上",
+    "concept": "不適用——概念／政策節點沒有「誰供應它」這個問題",
+}
+
+#: 🔴 桶裡混了兩種東西，下一步完全不同（判準出自 `skills/alpha-status`）。
+#: ⚠ 這個切分是**前綴比對**，不是語意判斷——任何人重跑都得到同一組，可被機械重導。
+PRODUCT_NOISE_PREFIX = "prod:"
+
+RESEARCH_GAP_SPLIT_NOTE = (
+    "🔴 的數字**不可直接當研究待辦**：`tech:`／`mat:` 前綴是有名有姓、零供應商的子瓶頸"
+    "（新 alpha 候選最可能從這裡長出來）；`prod:` 前綴是抽取的副產品（文件裡掉出來的產品型號），"
+    "**從來不是我們選定要研究的瓶頸**——只計數、不列為研究題目。"
+)
+
+#: 研究題目的固定模板：它是**排版**不是新判斷（同一個節點永遠得到同一句）。
+RESEARCH_QUESTION_TEMPLATE = "誰供應 `{node}`？"
+
+COVERAGE_SCOPE_NOTE = (
+    "本掃描只能從**既有節點**往回看：它答得出「圖裡這個瓶頸還沒有供應商」，"
+    "答不出「有一個我們從沒聽過的瓶頸」。後者要由上而下拆解一個真實系統"
+    "（`skills/system-decompose`），且選題由使用者決定。"
+)
+
+
+def bucketize(rows: Iterable[Mapping[str, Any]]) -> dict[str, list[Mapping[str, Any]]]:
+    """依 `classify()` 的三態＋概念節點分桶。順序固定，消費端不必自己排。"""
+
+    buckets: dict[str, list[Mapping[str, Any]]] = {
+        "research_gap": [], "modelling_gap": [], "covered": [], "concept": [],
+    }
+    for row in rows:
+        buckets[row["status"]].append(row)
+    return buckets
+
+
+def split_research_gaps(
+    rows: Iterable[Mapping[str, Any]],
+) -> tuple[list[Mapping[str, Any]], list[Mapping[str, Any]]]:
+    """🔴 桶 → (真正該挖的子瓶頸, 抽取產生的產品名詞)。純前綴比對。"""
+
+    real = [r for r in rows if not str(r["node"]).startswith(PRODUCT_NOISE_PREFIX)]
+    noise = [r for r in rows if str(r["node"]).startswith(PRODUCT_NOISE_PREFIX)]
+    return real, noise
+
+
 def is_concept_node(node_id: str) -> bool:
     return any(token in node_id for token in CONCEPT_SUBSTRINGS)
 
@@ -94,16 +164,9 @@ def scan(session) -> list[dict[str, Any]]:
 
 def render_markdown(rows: Iterable[Mapping[str, Any]]) -> list[str]:
     rows = list(rows)
-    buckets: dict[str, list[Mapping[str, Any]]] = {
-        "research_gap": [],
-        "modelling_gap": [],
-        "covered": [],
-        "concept": [],
-    }
-    for row in rows:
-        buckets[row["status"]].append(row)
+    buckets = bucketize(rows)
 
-    out = ["", "# Chokepoint 供給側覆蓋掃描", ""]
+    out = ["", f"# {COVERAGE_TITLE}", ""]
     out.append(
         f"節點 {len(rows)}｜🔴 研究缺口 **{len(buckets['research_gap'])}**"
         f"｜🟡 建模待補 **{len(buckets['modelling_gap'])}**"
@@ -111,12 +174,7 @@ def render_markdown(rows: Iterable[Mapping[str, Any]]) -> list[str]:
         f"｜⚪ 概念節點 {len(buckets['concept'])}"
     )
     out.append("")
-    out.append(
-        "> 🔴 **研究缺口**＝沒有任何公司連到它（直接或間接）——這才是真正該去挖的。\n"
-        "> 🟡 **建模待補**＝已有公司經 `prod:` 或公司對公司邊間接相連，代表**這個領域已經研究過**，\n"
-        "> 只是邊沒接到 chokepoint 節點上。下一步是補邊（走 graph admission），不是重新研究。\n"
-        "> ⚪ 概念／政策節點不適用「誰供應它」，不列入缺口。"
-    )
+    out.append(BUCKET_NOTE)
 
     if buckets["modelling_gap"]:
         out += ["", "## 🟡 建模待補（已研究過，邊沒接上）", ""]

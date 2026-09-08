@@ -623,6 +623,235 @@ def materialize_beta(*, store: StateArtifactStore | None = None,
     return target.write(payload), payload
 
 
+# ---------------------------------------------------------------------------
+# state artifact：`coverage`（圖的供給側覆蓋掃描；照抄 `query.coverage_gaps.scan()`）
+# ---------------------------------------------------------------------------
+
+COVERAGE_MATERIALIZER_VERSION = "webapp-materialize-coverage/1"
+
+COVERAGE_THIS_IS_NOT = (
+    "不是「世界上還缺哪些瓶頸」——它只能從**圖裡既有的節點**往回看；圖裡沒有的瓶頸不會出現在這裡。",
+    "🔴 的數字不是研究待辦數：`prod:` 前綴是抽取副產品（文件掉出來的產品型號），只計數、不是題目。",
+    "🟡 不是「還沒研究」——那個領域已經研究過，缺的是把邊接到 chokepoint 節點上（走入圖核准）。",
+    "不排序、不評分：這一頁沒有名次，補哪一個由使用者決定。",
+    "本 APP 不重算：每一格都是 materialize 當下 `python -m query.coverage_gaps` 的輸出照抄。",
+)
+
+_COVERAGE_AUTHORITY = {
+    "function": "query.coverage_gaps.scan",
+    "command": "python -m query.coverage_gaps",
+    "note": "唯一覆蓋掃描權威。本 artifact 照抄它的分桶結果：不重新分類、不補節點、不排序。",
+}
+
+
+def _coverage_row(row: Mapping[str, Any], *, with_question: bool = False) -> dict[str, Any]:
+    out = {"node": row["node"], "name": row.get("name"),
+           "direct": list(row.get("direct") or ()), "indirect": list(row.get("indirect") or ())}
+    if with_question:
+        from query.coverage_gaps import RESEARCH_QUESTION_TEMPLATE
+
+        out["question"] = RESEARCH_QUESTION_TEMPLATE.format(node=row["node"])
+    return out
+
+
+def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
+                            generated_at: datetime | None = None) -> dict[str, Any]:
+    """`coverage_gaps.scan()` 的結果 → `coverage` state artifact。**純函式**：不連 DB、不重新分類。"""
+    from query.coverage_gaps import (
+        BUCKET_LABELS, BUCKET_NEXT_STEP, BUCKET_NOTE, COVERAGE_SCOPE_NOTE, COVERAGE_TITLE,
+        PRODUCT_NOISE_PREFIX, RESEARCH_GAP_SPLIT_NOTE, bucketize, split_research_gaps,
+    )
+
+    stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    buckets = bucketize(rows)
+    real_gaps, product_noise = split_research_gaps(buckets["research_gap"])
+    payload: dict[str, Any] = {
+        "schema_version": STATE_SCHEMA_VERSIONS["coverage"],
+        "kind": "coverage",
+        "title": COVERAGE_TITLE,
+        "generated_at": stamp.isoformat(),
+        "as_of": None,
+        "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
+        "authority": dict(_COVERAGE_AUTHORITY),
+        "counts": {"nodes": len(rows), **{k: len(v) for k, v in buckets.items()},
+                   "research_gap_real": len(real_gaps), "research_gap_product_noise": len(product_noise)},
+        "labels": dict(BUCKET_LABELS),
+        "next_steps": dict(BUCKET_NEXT_STEP),
+        "notes": {"buckets": BUCKET_NOTE, "research_gap_split": RESEARCH_GAP_SPLIT_NOTE,
+                  "scope": COVERAGE_SCOPE_NOTE,
+                  "question_template": "研究題目是固定模板不是新判斷：同一個節點永遠得到同一句。",
+                  "product_noise_rule": f"前綴 `{PRODUCT_NOISE_PREFIX}` ＝抽取副產品（機械比對，可重導）"},
+        "research_gaps": [_coverage_row(r, with_question=True) for r in real_gaps],
+        "product_noise": [_coverage_row(r) for r in product_noise],
+        "modelling_gaps": [_coverage_row(r) for r in buckets["modelling_gap"]],
+        "covered": [_coverage_row(r) for r in buckets["covered"]],
+        "concept": [_coverage_row(r) for r in buckets["concept"]],
+        "this_is_not": list(COVERAGE_THIS_IS_NOT),
+        "materializer": {
+            "version": COVERAGE_MATERIALIZER_VERSION,
+            "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+    }
+    payload = redact_private_paths(payload)
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="coverage", as_of=None,
+        # 認知狀態＝哪些節點還空白、哪些已覆蓋。節點名稱改字不算認知變了。
+        identity={"research_gap": sorted(r["node"] for r in real_gaps),
+                  "product_noise": sorted(r["node"] for r in product_noise),
+                  "modelling_gap": sorted(r["node"] for r in buckets["modelling_gap"]),
+                  "covered": sorted(r["node"] for r in buckets["covered"])})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload
+
+
+def materialize_coverage(*, store: StateArtifactStore | None = None,
+                         generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """跑一次 `coverage_gaps.scan()` 並寫下 artifact。**只有這裡會連 Neo4j。**"""
+    from dotenv import load_dotenv
+    from neo4j import GraphDatabase
+
+    from query.coverage_gaps import scan
+
+    load_dotenv()
+    password = os.environ.get("NEO4J_PASSWORD")
+    if not password:
+        raise RuntimeError("請設 NEO4J_PASSWORD（與 python -m query.coverage_gaps 相同的前置）")
+    driver = GraphDatabase.driver(
+        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+        auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+    )
+    try:
+        with driver.session() as session:
+            rows = scan(session)
+    finally:
+        driver.close()
+    payload = build_coverage_artifact(rows, generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
+# ---------------------------------------------------------------------------
+# state artifact：`watches`（在等什麼；照抄 Event Watch registry ＋ 追源 backlog）
+# ---------------------------------------------------------------------------
+
+WATCHES_MATERIALIZER_VERSION = "webapp-materialize-watches/1"
+
+WATCHES_THIS_IS_NOT = (
+    "不是提醒系統：這一頁不會通知你，它只讓「還有什麼在等」現形（L14：防呆要自己出現）。",
+    "**停滯（stalled）不等於死亡**：具名標的都觸發過一輪、被動層短期不會再醒，但到期日仍會兜底。",
+    "「等事件」不代表不用動作：`unwatched`／`expired`／停滯三種都需要人當場處置（延長／改主動輪詢／改 terminal）。",
+    "本 APP 不寫任何東西：不喚醒 watch、不消化 fired、不改 lead 狀態——那些只能在對話裡做。",
+    "本 APP 不重算：每一格都是 materialize 當下 registry 的原值照抄。",
+)
+
+_WATCHES_AUTHORITY = {
+    "function": "engine_b.event_watch（registry）＋ engine_b.leads.trace_backlog",
+    "command": "python -m engine_b.event_watch counters｜list；python -m engine_b.cli trace-backlog --needs-attention",
+    "note": "等待狀態的單一 authority 是 Event Watch registry；本 artifact 照抄，不自己推導誰該醒。",
+}
+
+#: 「還會不會醒」的四種狀態——與 `trace_backlog` 的 `wake_state` 同一組字彙（L16）。
+WAKE_STATE_LABELS = {
+    "watching": "有機制在等（具名標的還沒全部觸發過）",
+    "stalled": "停滯——具名標的都觸發過一輪，只剩到期日或主動輪詢能救它",
+    "expired": "等待已到期——要決定續等、改主動輪詢，還是放棄",
+    "unwatched": "**沒有任何機制在等它**——唯一真正的黑洞，必須當場處置",
+}
+
+
+def _watch_row(watch: Mapping[str, Any]) -> dict[str, Any]:
+    from engine_b.event_watch import is_stalled, watch_detail, wake_target
+
+    return {
+        "watch_id": watch["watch_id"], "kind": watch["kind"], "status": watch.get("status"),
+        "detail": watch_detail(watch), "target": wake_target(watch),
+        "entities": list(watch.get("entities") or ()),
+        "consumed_entities": list(watch.get("consumed_entities") or ()),
+        "poll_eligible": bool((watch.get("poll") or {}).get("eligible")),
+        "poll_last_checked": (watch.get("poll") or {}).get("last_checked"),
+        "query_hint": watch.get("query_hint"),
+        "created_at": watch.get("created_at"), "expires": watch.get("expires"),
+        "stalled": is_stalled(watch),
+    }
+
+
+def build_watches_artifact(watch_data: Mapping[str, Any], *, config: Mapping[str, Any],
+                           backlog: Sequence[Mapping[str, Any]], due: Sequence[Mapping[str, Any]],
+                           generated_at: datetime | None = None) -> dict[str, Any]:
+    """Event Watch registry ＋ 追源 backlog → `watches` state artifact。**純函式**。"""
+    from engine_b.event_watch import counters
+
+    stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    watches = list(watch_data.get("watches") or ())
+    by_status: dict[str, list[dict[str, Any]]] = {}
+    for watch in watches:
+        by_status.setdefault(str(watch.get("status")), []).append(_watch_row(watch))
+    active = by_status.get("active") or []
+    needs_attention = [dict(row) for row in backlog
+                       if str(row.get("wake_state")) in {"stalled", "expired", "unwatched"}]
+    payload: dict[str, Any] = {
+        "schema_version": STATE_SCHEMA_VERSIONS["watches"],
+        "kind": "watches",
+        "title": "在等什麼（事件監看與追源 backlog）",
+        "generated_at": stamp.isoformat(),
+        "as_of": None,
+        "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
+        "authority": dict(_WATCHES_AUTHORITY),
+        "counters": dict(counters(watch_data)),
+        "config": dict(config),
+        "active": active,
+        "stalled": [row for row in active if row["stalled"]],
+        "pollable": [row for row in active if row["poll_eligible"]],
+        "due_this_round": [_watch_row(w) for w in due],
+        "fired_unconsumed": by_status.get("fired") or [],
+        "expired": by_status.get("expired") or [],
+        "trace_backlog": {
+            "needs_attention": needs_attention,
+            "total": len(backlog),
+            "wake_state_labels": dict(WAKE_STATE_LABELS),
+        },
+        "notes": {
+            "stalled": "停滯不等於死亡：到期日仍會兜底，主動輪詢也能撈回。持續攀升代表被動喚醒涵蓋率不足。",
+            "budget": "每輪主動輪詢的上限由 `config/event_watch.json` 的 `sweep_budget_per_run` 決定；"
+                      "budget=0 或 enabled=false 時系統退回純被動。",
+            "fired": "fired 未消化＝事件已觸發但還沒有人去處理；它不會自己消失。",
+        },
+        "this_is_not": list(WATCHES_THIS_IS_NOT),
+        "materializer": {
+            "version": WATCHES_MATERIALIZER_VERSION,
+            "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+    }
+    payload = redact_private_paths(payload)
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="watches", as_of=None,
+        # 認知狀態＝有哪些 watch、各自什麼狀態、哪些停滯、哪幾筆 backlog 需要人。
+        # `poll.last_checked` 動了不算認知變了（那只是「我今天查過了」）。
+        identity={"active": sorted(row["watch_id"] for row in active),
+                  "stalled": sorted(row["watch_id"] for row in active if row["stalled"]),
+                  "fired": sorted(row["watch_id"] for row in payload["fired_unconsumed"]),
+                  "expired": sorted(row["watch_id"] for row in payload["expired"]),
+                  "needs_attention": sorted(str(row.get("lead_id")) for row in needs_attention)})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload
+
+
+def materialize_watches(*, store: StateArtifactStore | None = None,
+                        generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """讀 Event Watch registry 與追源 backlog 並寫下 artifact。**唯讀**：不喚醒、不標記、不寫 lead。"""
+    from engine_b import event_watch as ew
+    from engine_b import leads as leads_mod
+
+    watch_data = ew.load_watches()
+    payload = build_watches_artifact(
+        watch_data, config=ew.load_config(), backlog=leads_mod.trace_backlog(leads_mod.load()),
+        due=ew.sweep_due(watch_data), generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """把封閉字彙寫成 `.meta.json`，讓 serve 端讀得到而**不必 import `alpha`／`briefing`**。
 
@@ -657,8 +886,10 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     return path
 
 
-__all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "MATERIALIZER_VERSION",
-           "RANKING_MATERIALIZER_VERSION", "RANKING_THIS_IS_NOT", "build_beta_artifact",
-           "build_overview", "build_ranking_artifact", "materialize", "materialize_beta",
-           "materialize_many", "materialize_ranking", "materialize_view", "redact_private_paths",
-           "write_vocabularies"]
+__all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "COVERAGE_MATERIALIZER_VERSION",
+           "COVERAGE_THIS_IS_NOT", "MATERIALIZER_VERSION", "RANKING_MATERIALIZER_VERSION",
+           "RANKING_THIS_IS_NOT", "WATCHES_MATERIALIZER_VERSION", "WATCHES_THIS_IS_NOT",
+           "WAKE_STATE_LABELS", "build_beta_artifact", "build_coverage_artifact", "build_overview",
+           "build_ranking_artifact", "build_watches_artifact", "materialize", "materialize_beta",
+           "materialize_coverage", "materialize_many", "materialize_ranking", "materialize_view",
+           "materialize_watches", "redact_private_paths", "write_vocabularies"]

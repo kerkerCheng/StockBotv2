@@ -31,6 +31,7 @@ from webapp.store import ArtifactStore, StateArtifactStore
 
 from test_webapp_materialize import fake_view
 from test_webapp_beta import fake_beta_payload
+from test_webapp_coverage_watches import fake_coverage_payload, fake_watches_payload
 from test_webapp_ranking import fake_ranking_payload
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -86,6 +87,8 @@ def app_dir(tmp_path):
     # 跨標的 state artifact（ranking）住 analyst 目錄旁的 state/——與 create_app 的解析規則一致。
     StateArtifactStore(tmp_path / "state").write(fake_ranking_payload())
     StateArtifactStore(tmp_path / "state").write(fake_beta_payload())
+    StateArtifactStore(tmp_path / "state").write(fake_coverage_payload())
+    StateArtifactStore(tmp_path / "state").write(fake_watches_payload())
     return tmp_path
 
 
@@ -148,7 +151,8 @@ def test_a_full_request_round_imports_no_model_module(served) -> None:
     before = set(sys.modules)
     for path in ("/api/v1/health", "/api/v1/meta", "/api/v1/stocks",
                  "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/stocks/PENCE",
-                 "/api/v1/stocks/NOPE", "/api/v1/ranking", "/api/v1/beta", "/", "/static/app.js"):
+                 "/api/v1/stocks/NOPE", "/api/v1/ranking", "/api/v1/beta", "/api/v1/coverage",
+                 "/api/v1/watches", "/", "/static/app.js"):
         client.get(path)
     added = set(sys.modules) - before
     leaked = sorted(m for m in added
@@ -181,7 +185,8 @@ def test_tree_digest_actually_notices_a_change(tmp_path) -> None:
 def test_requests_change_not_a_single_byte_on_disk(served) -> None:
     client, directory = served
     before = _tree_digest(directory)
-    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/ranking", "/api/v1/beta"):
+    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/ranking", "/api/v1/beta",
+                 "/api/v1/coverage", "/api/v1/watches"):
         assert client.get(path).status_code == 200
     assert _tree_digest(directory) == before
 
@@ -251,6 +256,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
         assert client.get("/api/v1/stocks").json()["count"] == 3
         assert client.get("/api/v1/ranking").json()["kind"] == "ranking"
         assert client.get("/api/v1/beta").json()["kind"] == "beta"
+        assert client.get("/api/v1/coverage").json()["kind"] == "coverage"
+        assert client.get("/api/v1/watches").json()["kind"] == "watches"
         assert client.get("/api/v1/stocks/NEVERBUILT").status_code == 503
 
 
@@ -259,7 +266,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
-@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/ranking", "/api/v1/beta", "/"])
+@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/ranking", "/api/v1/beta",
+                                  "/api/v1/coverage", "/api/v1/watches", "/"])
 def test_no_mutation_verb_is_routed_anywhere(served, method: str, path: str) -> None:
     client, _ = served
     assert getattr(client, method)(path).status_code == 405

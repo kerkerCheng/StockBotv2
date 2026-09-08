@@ -674,7 +674,7 @@ AlphaInvestmentView → AnalystView → MaterializedArtifact（JSON，atomic wri
      │                                library/private/app/analyst_view/<TICKER>.json
      │  python -m webapp serve         ← 純讀：open → json.loads → validate → return
      ▼
-GET /api/v1/{health,meta,stocks,stocks/{ticker},ranking,beta} ＋ / （responsive Web App）
+GET /api/v1/{health,meta,stocks,stocks/{ticker},ranking,beta,coverage,watches} ＋ / （responsive Web App）
      ▼
 Cloudflare Tunnel（既有那條）→ Cloudflare Access → iPhone Safari／桌機瀏覽器
 ```
@@ -710,7 +710,7 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
-目前有 `ranking` 與 `beta`）。`python -m webapp materialize --ranking` 走與 `python -m query.bottleneck` **同一條路**
+目前有 `ranking`／`beta`／`coverage`／`watches`）。`python -m webapp materialize --ranking` 走與 `python -m query.bottleneck` **同一條路**
 （同一個 driver、`fetch_assertions`、registry），把 `rank_bottlenecks()` 的兩份排序**照抄**成 artifact——
 不重排、不加權、不自建第二套結構評分；**每列每格與 CLI 輸出逐格相等**是驗收條件（`tests/test_webapp_ranking.py`）。
 已知限制、兩份排序的說明、落差判準（可行動名次比純結構低 ≥ 2）與空產業組都從 `query.bottleneck` 的常數／函式取，
@@ -726,7 +726,15 @@ Engine C `technical_observations` 的 `session_date`＋`close_adjusted`——那
 （`tests/test_webapp_beta.py` 掃整份 JSON 鍵名）。畫面依 dataviz skill：水平堆疊條（現在的配置，色跟 sleeve 走）、分歧條
 （距目標多遠，灰帶＝容忍區間）、儀表（風控上限、52 週位置）、單系列折線（自身收盤，含十字線 tooltip 與表格版）；
 調色盤用 dataviz 參考實例的已驗證值（深淺兩套）。`freshness_identity` 只含各 sleeve 狀態／各檔行情狀態／風險警告，
-價格心跳變了不算認知變了。state 目錄的解析只有一條規則
+價格心跳變了不算認知變了。
+
+**`coverage`／`watches` kind（2026-09-08 B2b）：** 前者照抄 `query.coverage_gaps.scan()` 的分桶，並把 🔴 桶依
+**前綴**切成「真正該挖的子瓶頸（`tech:`／`mat:`）」與「抽取產生的產品名詞（`prod:`）」——那是機械比對不是語意判斷，
+判準與固定文字都住 `query/coverage_gaps.py`（markdown 與 artifact 同源）。後者照抄 Event Watch registry 的
+`counters()`／`sweep_due()`／`is_stalled()` 與 `leads.trace_backlog()`，把**停滯**與**需要當場處置的追源**
+獨立成區——那是這個機制唯一會安靜失效的地方（L14：防呆要自己出現）。兩者的 `freshness_identity` 只含
+「哪些節點還空白」「有哪些 watch、各自什麼狀態」，節點改名或 `poll.last_checked` 更新不算認知變了。
+⚠ **APP 不寫任何東西**：不喚醒 watch、不消化 fired、不改 lead 狀態。state 目錄的解析只有一條規則
 （`webapp/store.py::resolve_state_dir`：明示 > analyst 目錄下的 `state/` > 預設），serve／materialize／status 都走它。
 
 **Web App 的資訊階層**（`webapp/static/`，vanilla JS，零外部資源，CSP 只允許 same-origin）：

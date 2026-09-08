@@ -429,25 +429,38 @@ def reactivate(data: dict[str, Any], watch_id: str) -> None:
     raise EventWatchError(f"沒有待消化的 fired watch：{watch_id}")
 
 
-def _render_watch(watch: Mapping[str, Any]) -> str:
-    kind = watch["kind"]
-    # ⚠ 這裡是 WATCH_KINDS 的平行消費端（L16）：新增 kind 必須同步補一行，
-    # 否則 2026-09-02 的事故重演——[321] 併入 `related_entity_signal` 後這裡沒跟上，
-    # daily 的 sweep 整批 KeyError、38 筆 watch 一輪 0 檢查。用 .get 兜底讓
-    # 單一未知 kind 只影響自己那一行，不再炸掉整個 render。
-    detail = {
+def watch_detail(watch: Mapping[str, Any]) -> str:
+    """一句話說出「這個 watch 在等什麼」。
+
+    ⚠ 這裡是 WATCH_KINDS 的平行消費端（L16）：新增 kind 必須同步補一行，
+    否則 2026-09-02 的事故重演——[321] 併入 `related_entity_signal` 後這裡沒跟上，
+    daily 的 sweep 整批 KeyError、38 筆 watch 一輪 0 檢查。用 .get 兜底讓
+    單一未知 kind 只影響自己那一行，不再炸掉整份輸出。
+    """
+    return {
         "date": f"until {watch.get('until')}",
         "entity_filing_signal": f"等 {','.join(watch.get('entities') or [])} 的一手文件",
         "fact_verification": f"對照 {watch.get('fact', '')[:50]}",
         "related_entity_signal": f"等 {','.join(watch.get('entities') or [])} 的新動靜",
-    }.get(kind, "（未知 kind——render 端缺條目，請補 _render_watch）")
-    poll = "｜可輪詢" if (watch.get("poll") or {}).get("eligible") else ""
+    }.get(watch["kind"], "（未知 kind——render 端缺條目，請補 watch_detail）")
+
+
+def wake_target(watch: Mapping[str, Any]) -> dict[str, Any]:
+    """這個 watch 觸發時會喚醒誰。三種去處，混在一起就看不出比例。"""
+
     if watch.get("wake_pq2"):
-        target = f"pq2 [{watch['wake_pq2']}]"
-    elif watch.get("wake_lead"):
-        target = f"lead {watch['wake_lead']}"
-    else:
-        target = f"假設 {watch.get('hypothesis_ref')}"
+        return {"kind": "pq2", "ref": watch["wake_pq2"], "label": f"pq2 [{watch['wake_pq2']}]"}
+    if watch.get("wake_lead"):
+        return {"kind": "lead", "ref": watch["wake_lead"], "label": f"lead {watch['wake_lead']}"}
+    return {"kind": "hypothesis", "ref": watch.get("hypothesis_ref"),
+            "label": f"假設 {watch.get('hypothesis_ref')}"}
+
+
+def _render_watch(watch: Mapping[str, Any]) -> str:
+    kind = watch["kind"]
+    detail = watch_detail(watch)
+    poll = "｜可輪詢" if (watch.get("poll") or {}).get("eligible") else ""
+    target = wake_target(watch)["label"]
     return (
         f"  {watch['watch_id']} [{watch['status']}] {kind}：{detail}"
         f" → 喚醒 {target}{poll}（expires {watch['expires']}）"

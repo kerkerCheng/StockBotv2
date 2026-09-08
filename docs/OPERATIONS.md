@@ -335,6 +335,7 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 & '.venv\Scripts\python.exe' -m webapp materialize --ranking                 # 跨標的瓶頸排序（state artifact；照抄 rank_bottlenecks，2026-09-08）
 & '.venv\Scripts\python.exe' -m webapp materialize --ranking --as-of 2026-09-05   # as-of 視角的排序；被排除的 assertion 計數帶在 artifact 內
 & '.venv\Scripts\python.exe' -m webapp materialize --beta                    # 資產配置（state artifact；daily_beta_snapshot --no-refresh --no-record-risk 照抄，2026-09-08）
+& '.venv\Scripts\python.exe' -m webapp materialize --coverage --watches      # 研究缺口＋在等什麼（唯讀照抄；2026-09-08）
 
 # 2) serve：純讀。**不重建任何東西**
 & '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/
@@ -902,6 +903,7 @@ python -m briefing entry COHR --as-of 2026-09-05                            # �
 | `python -m webapp materialize [T ...] [--as-of] [--dir]` | 寫 **derived cache**（`library/private/app/analyst_view/*.json`，atomic）；讀 Neo4j／Engine C／private ledger。**不寫任何 authority**、不入圖、不建 decision | 與 `alpha-card` 相同的本機資源；無新增網路主機或憑證 | **互動專用**。新 CLI 名稱，不進 unattended rule |
 | `python -m webapp serve [--host] [--port] [--dir]` | **開一個本機 listener**（預設 `127.0.0.1:8790`）。唯讀：無寫入端點、無模型執行、無外部抓取 | ⚠ **新增 executable surface**：綁定本機 port。非 `127.0.0.1` 需明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式拒絕啟動。外部認證邊界是 Cloudflare Access（`deploy/cloudflare/README.md`），不是本程式 | **互動／長駐專用**，不進 unattended rule |
 | `python -m webapp status｜verify [--dir]` | 唯讀：只讀 artifact 目錄 | 無 | 互動專用 |
+| `python -m webapp materialize --coverage｜--watches [--state-dir]`（2026-09-08 B2b） | 寫 **derived cache**（`state/coverage.json`／`state/watches.json`，atomic）；`--coverage` 讀 Neo4j（`coverage_gaps.scan`），`--watches` 只讀 repo 內的 `event_watches.json` 與 `pending_leads.json`。**唯讀**：不喚醒 watch、不 mark-checked、不改 lead | `--coverage` 同 `python -m query.coverage_gaps`（本機 Neo4j bolt）；`--watches` 無網路、無憑證 | **互動專用**。同一命令字串的新 flag，不進 unattended rule；Phase A 排進 daily 收尾前須再走一次本表 |
 | `python -m webapp materialize --beta [--state-dir]`（2026-09-08 B2） | 寫 **derived cache**（`library/private/app/state/beta.json`，atomic）；讀 Google Sheet 持股與 Capital Authority（`spreadsheets.readonly`）、yfinance FX、Engine C technical_observations。**不寫任何 authority**：`--no-refresh` 不寫 Engine C、`--no-record-risk` 不 append 風險快照 | 與 `scripts\daily_beta_snapshot.py` 相同的本機資源與憑證；無新增網路主機 | **互動專用**。同一命令字串的新 flag，不進 unattended rule；Phase A 排進 daily 收尾前須再走一次本表 |
 | `python -m webapp materialize --ranking [--as-of] [--state-dir]`（2026-09-08 B1） | 寫 **derived cache**（`library/private/app/state/ranking.json`，atomic）；讀 Neo4j（`query.bottleneck.fetch_assertions`，與 `python -m query.bottleneck` 同一條路）與 registry。**不寫任何 authority**、不入圖 | 與 `python -m query.bottleneck` 相同的本機資源（Neo4j bolt）；無新增網路主機或憑證 | **互動專用**。同一個命令字串的新 flag，不進 unattended rule；日後 Phase A 要排進 daily 收尾前須再走一次本表 |
 | `python -m alpha abstention <T> [--list｜--add｜--retract]` | `--add`／`--retract` **append** 一筆到 private ledger（`library/private/alpha/abstentions/`）；**結構上不可能寫入任何數值主張** | 無 | **互動專用**（authority write，需使用者明確執行） |

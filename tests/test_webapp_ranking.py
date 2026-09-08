@@ -209,7 +209,7 @@ def test_empty_ranking_is_honest_not_silent() -> None:
 # ---------------------------------------------------------------------------
 
 def test_state_kinds_are_a_closed_vocabulary() -> None:
-    assert STATE_KINDS == ("ranking", "beta")
+    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches")
     assert STATE_SCHEMA_VERSIONS["ranking"] == "stockbot-app/ranking/1"
 
 
@@ -217,7 +217,7 @@ def test_state_artifact_fails_closed() -> None:
     payload = fake_ranking_payload()
     assert validate_state_artifact("ranking", payload) is payload
     with pytest.raises(ArtifactUnavailable, match="未登記"):
-        validate_state_artifact("coverage", payload)
+        validate_state_artifact("positions", payload)
     with pytest.raises(ArtifactUnavailable, match="kind"):
         validate_state_artifact("beta", payload)          # 已登記的 kind，但檔名與內容不一致
     with pytest.raises(ArtifactUnavailable, match="kind"):
@@ -270,9 +270,9 @@ def test_state_store_round_trip(tmp_path) -> None:
     assert not list(tmp_path.glob(".*.tmp"))
     got, fresh = store.read("ranking")
     assert got == payload and fresh.state == "fresh"
-    assert store.kinds() == ["ranking"] and store.missing_kinds() == ["beta"]
+    assert store.kinds() == ["ranking"] and store.missing_kinds() == ["beta", "coverage", "watches"]
     with pytest.raises(ArtifactUnavailable, match="未登記"):
-        store.read("coverage")
+        store.read("positions")
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("beta")
     with pytest.raises(ArtifactUnavailable):
@@ -281,7 +281,7 @@ def test_state_store_round_trip(tmp_path) -> None:
 
 def test_state_store_reports_missing_and_broken_separately(tmp_path) -> None:
     store = StateArtifactStore(tmp_path)
-    assert store.kinds() == [] and store.missing_kinds() == ["ranking", "beta"]
+    assert store.kinds() == [] and store.missing_kinds() == ["ranking", "beta", "coverage", "watches"]
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("ranking")
     (tmp_path / "ranking.json").write_text('{"kind": "ranking", "rows": [', encoding="utf-8")
@@ -358,7 +358,8 @@ def test_status_and_verify_commands_include_state(tmp_path, capsys) -> None:
     assert "2/2" in capsys.readouterr().out
     assert main(["status", "--dir", str(tmp_path), "--format", "json"]) == 0
     doc = json.loads(capsys.readouterr().out)
-    assert [s["kind"] for s in doc["state"]] == ["ranking"] and doc["state_missing"] == ["beta"]
+    assert [s["kind"] for s in doc["state"]] == ["ranking"]
+    assert doc["state_missing"] == ["beta", "coverage", "watches"]
 
 
 # ---------------------------------------------------------------------------

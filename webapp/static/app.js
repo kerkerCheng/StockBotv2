@@ -1457,6 +1457,231 @@ function renderStateError(err, title) {
   app.appendChild(box);
 }
 
+/* ---------- 覆蓋掃描（coverage state）與在等什麼（watches state） ----------
+   兩頁都是「計數＋清單」——依 dataviz 的 form heuristic，>7 類且每類都有意義時用表格／清單，
+   不是更多顏色；四個桶的數字用 KPI stat tile。這裡沒有圖表，也沒有排序。 */
+
+function kpiRow(items) {
+  const row = el('div', 'tiles');
+  items.forEach((it) => row.appendChild(tile(it.label, it.value, it.sub, it.cls)));
+  return row;
+}
+
+function nodeList(rows, opts) {
+  const o = opts || {};
+  const list = el('ul', 'weak');
+  rows.forEach((row) => {
+    const li = el('li');
+    if (o.question && row.question) {
+      li.appendChild(el('div', null, row.question));
+      li.appendChild(el('span', 'rule', `${row.node}${row.name ? '　' + row.name : ''}`));
+    } else {
+      const head = el('div');
+      head.appendChild(el('code', null, row.node));
+      if (row.name) head.appendChild(el('span', 'dim', '　' + row.name));
+      li.appendChild(head);
+      const linked = (row.indirect || []).slice(0, 6);
+      if (linked.length) li.appendChild(el('span', 'rule', '間接相連：' + linked.join('、')));
+      const direct = (row.direct || []).slice(0, 6);
+      if (direct.length) li.appendChild(el('span', 'rule', '直接供應：' + direct.join('、')));
+    }
+    list.appendChild(li);
+  });
+  return list;
+}
+
+async function renderCoverage() {
+  markNav('coverage');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/coverage`);
+  } catch (err) {
+    renderStateError(err, '讀不到覆蓋掃描');
+    return;
+  }
+  const c = payload.counts || {};
+  const notes = payload.notes || {};
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
+  }
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('h2', null, `圖裡 ${c.nodes} 個瓶頸節點，哪些還沒有供應商`));
+  sec0.appendChild(kpiRow([
+    { label: '🔴 真的還沒挖', value: String(c.research_gap_real), sub: '有名有姓、零供應商的子瓶頸', cls: 'hero' },
+    { label: '🟡 建模待補', value: String(c.modelling_gap), sub: '研究過了，邊沒接上' },
+    { label: '✅ 已覆蓋', value: String(c.covered), sub: '有公司直接連上' },
+    { label: '⚪ 概念節點', value: String(c.concept), sub: '不適用「誰供應它」' },
+  ]));
+  sec0.appendChild(mdParagraph(notes.buckets || ''));
+  sec0.appendChild(mdParagraph(notes.scope || ''));
+  app.appendChild(sec0);
+
+  const sec1 = el('section', 'panel callout');
+  sec1.appendChild(el('h2', null, `🔴 真正的空白（${c.research_gap_real}）——可以直接拿去研究的題目`));
+  sec1.appendChild(mdParagraph(notes.research_gap_split || ''));
+  sec1.appendChild(nodeList(payload.research_gaps || [], { question: true }));
+  sec1.appendChild(el('p', 'note', notes.question_template || ''));
+  if ((payload.product_noise || []).length) {
+    sec1.appendChild(drill(`展開：另有 ${payload.product_noise.length} 個是抽取產生的產品名詞（只計數，不是題目）`,
+      () => nodeList(payload.product_noise)));
+  }
+  app.appendChild(sec1);
+
+  const sec2 = el('section', 'panel');
+  sec2.appendChild(el('h2', null, `🟡 建模待補（${c.modelling_gap}）——補邊，不是重新研究`));
+  sec2.appendChild(el('div', 'panel-questions', (payload.next_steps || {}).modelling_gap || ''));
+  sec2.appendChild(nodeList(payload.modelling_gaps || []));
+  app.appendChild(sec2);
+
+  const sec3 = el('section', 'panel');
+  sec3.appendChild(el('h2', null, '其餘'));
+  sec3.appendChild(drill(`展開：✅ 已覆蓋（${c.covered}）`, () => nodeList(payload.covered || [])));
+  sec3.appendChild(drill(`展開：⚪ 概念／政策節點（${c.concept}）`, () => nodeList(payload.concept || [])));
+  app.appendChild(sec3);
+
+  app.appendChild(stateFooter(payload, '這份掃描不是什麼'));
+  window.scrollTo(0, 0);
+}
+
+function watchRow(row, labels) {
+  const li = el('li');
+  const head = el('div');
+  head.appendChild(el('span', 'ticker-plain', row.detail));
+  li.appendChild(head);
+  const bits = [];
+  if (row.target && row.target.label) bits.push('喚醒 ' + row.target.label);
+  if (row.expires) bits.push('到期 ' + row.expires);
+  if (row.poll_eligible) bits.push('可主動輪詢' + (row.poll_last_checked ? `（上次查 ${row.poll_last_checked}）` : ''));
+  li.appendChild(el('span', 'rule', bits.join('｜')));
+  if (row.stalled && labels) li.appendChild(el('span', 'rule', labels.stalled || ''));
+  if (row.query_hint) li.appendChild(el('span', 'rule', '查詢提示：' + row.query_hint));
+  li.appendChild(el('span', 'rule', `${row.watch_id}｜${row.kind}`));
+  return li;
+}
+
+function watchList(rows, labels) {
+  const list = el('ul', 'weak');
+  rows.forEach((row) => list.appendChild(watchRow(row, labels)));
+  return list;
+}
+
+async function renderWatches() {
+  markNav('watches');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/watches`);
+  } catch (err) {
+    renderStateError(err, '讀不到事件監看');
+    return;
+  }
+  const k = payload.counters || {};
+  const notes = payload.notes || {};
+  const backlog = payload.trace_backlog || {};
+  const labels = backlog.wake_state_labels || {};
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
+  }
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('h2', null, '常駐計數器'));
+  sec0.appendChild(kpiRow([
+    { label: '還在等的事件', value: String(k.active), sub: `其中可主動輪詢 ${k.t2_pollable}`, cls: 'hero' },
+    { label: '停滯', value: String(k.stalled), sub: '被動層短期不會再醒' },
+    { label: 'fired 未消化', value: String(k.fired_unconsumed), sub: '已觸發、還沒有人處理' },
+    { label: '追源需處置', value: String((backlog.needs_attention || []).length), sub: `追源 backlog 共 ${backlog.total}` },
+  ]));
+  sec0.appendChild(el('p', 'note', `喚醒去處：pq2 ${k.wake_pq2}｜lead ${k.wake_lead}｜假設 ${k.wake_hypothesis}`));
+  sec0.appendChild(el('p', 'note', notes.budget || ''));
+  app.appendChild(sec0);
+
+  if ((payload.stalled || []).length) {
+    const sec1 = el('section', 'panel callout');
+    sec1.appendChild(el('h2', null, `停滯（${payload.stalled.length}）——等下去不會有事發生`));
+    sec1.appendChild(el('p', 'note', notes.stalled || ''));
+    sec1.appendChild(watchList(payload.stalled, labels));
+    app.appendChild(sec1);
+  }
+
+  if ((backlog.needs_attention || []).length) {
+    const sec2 = el('section', 'panel');
+    sec2.appendChild(el('h2', null, `追源 backlog：需要當場處置（${backlog.needs_attention.length}）`));
+    const list = el('ul', 'weak');
+    backlog.needs_attention.forEach((row) => {
+      const li = el('li');
+      li.appendChild(el('div', null, truncate(row.title || row.lead_id, 160)));
+      const bits = [];
+      if (row.wake_state) bits.push(labels[row.wake_state] || row.wake_state);
+      if (row.trace_status) bits.push('追源狀態 ' + row.trace_status);
+      if (row.expires) bits.push('到期 ' + row.expires);
+      li.appendChild(el('span', 'rule', bits.join('｜')));
+      if (row.next_trigger) li.appendChild(el('span', 'rule', '下一個 trigger：' + truncate(row.next_trigger, 160)));
+      li.appendChild(el('span', 'rule', row.lead_id));
+      list.appendChild(li);
+    });
+    sec2.appendChild(list);
+    app.appendChild(sec2);
+  }
+
+  const sec3 = el('section', 'panel');
+  sec3.appendChild(el('h2', null, `全部在等的事件（${(payload.active || []).length}）`));
+  if ((payload.due_this_round || []).length) {
+    sec3.appendChild(el('div', 'group-title', `本輪該主動查的（${payload.due_this_round.length}，依 budget）`));
+    sec3.appendChild(watchList(payload.due_this_round, labels));
+  }
+  sec3.appendChild(drill(`展開：全部 ${(payload.active || []).length} 筆`, () => watchList(payload.active || [], labels)));
+  if ((payload.fired_unconsumed || []).length) {
+    sec3.appendChild(drill(`展開：fired 未消化（${payload.fired_unconsumed.length}）`,
+      () => watchList(payload.fired_unconsumed, labels)));
+  }
+  if ((payload.expired || []).length) {
+    sec3.appendChild(drill(`展開：已到期（${payload.expired.length}）`, () => watchList(payload.expired, labels)));
+  }
+  sec3.appendChild(el('p', 'note', notes.fired || ''));
+  app.appendChild(sec3);
+
+  app.appendChild(stateFooter(payload, '這一頁不是什麼'));
+  window.scrollTo(0, 0);
+}
+
+/* 共用頁尾：新鮮度 ＋ authority ＋「不是什麼」。三個 state 頁面同一份。 */
+function stateFooter(payload, notTitle) {
+  const wrap = el('div');
+  const f = payload.freshness || {};
+  const sec = el('section', 'panel');
+  sec.appendChild(el('h2', null, '這份畫面有多新'));
+  const rows = el('div', 'rows');
+  rows.appendChild(kv('materialize 於', `${f.generated_at}（${Number(f.age_hours).toFixed(1)} 小時前，${f.state}）`));
+  rows.appendChild(kv('權威', `${(payload.authority || {}).function}（${(payload.authority || {}).command}）`));
+  rows.appendChild(kv('新鮮度身分', payload.freshness_identity));
+  rows.appendChild(kv('artifact content digest', payload.content_digest));
+  sec.appendChild(rows);
+  sec.appendChild(el('p', 'note', f.rule || ''));
+  sec.appendChild(el('p', 'note', (payload.authority || {}).note || ''));
+  wrap.appendChild(sec);
+  const not = el('section', 'panel');
+  not.appendChild(el('h2', null, notTitle));
+  not.appendChild(listOf(payload.this_is_not || []));
+  wrap.appendChild(not);
+  return wrap;
+}
+
 /* ---------- 路由 ---------- */
 
 async function route() {
@@ -1472,6 +1697,8 @@ async function route() {
     // `ranking` 是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
     if (target === 'ranking') await renderRanking();
     else if (target === 'beta') await renderBeta();
+    else if (target === 'coverage') await renderCoverage();
+    else if (target === 'watches') await renderWatches();
     else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {
