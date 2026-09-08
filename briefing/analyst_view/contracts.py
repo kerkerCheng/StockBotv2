@@ -125,6 +125,81 @@ WEAK_INPUT_RULES: Mapping[str, str] = {
 #: 日本基準還是台灣 IFRS。2026-09-07 Coverage Pilot 實測：Lynas（AASB／IFRS）、
 #: HDS（日本基準）、IQE（IFRS）三檔在 ledger 裡全都寫著 `gaap`——語意正確、字面錯誤。
 #: **所以 label 一律不含準則名稱**，而 `raw` 永遠一併輸出讓稽核追得回 contract 值。
+#: **面向使用者的顯示別名。字彙一個字不改**——`absence_kind`／panel key／line key 都是 read model
+#: 與 private ledger 的身分（L10），改它們等於改紀錄。這裡只加「同一個東西怎麼講給人聽」。
+#:
+#: 判準（2026-08-31 使用者定案，2026-09-08 套到 APP）：**望文生義還是要查表？**
+#: 望文生義的留著（`COHR`、`52 週高點`）；含縮寫或內部命名的要翻（`fair_value`、`absence_kind`、
+#: `externally_corroborated`）。翻譯**不得宣稱 authority 沒有的東西**——同 `accounting_basis` 那條：
+#: 「獨家供應」可以，因為那就是 `sole_source` 的意思；但不得順手加上「所以很安全」。
+PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
+    "headline": {"title": "結論：現在的價格划不划算",
+                 "hint": "現價、我們算出的未來目標價、以及兩者之間要漲跌多少"},
+    "fundamental": {"title": "我們和市場，預期差在哪",
+                    "hint": "同一個會計期間、同一種口徑才拿來比；不可比的一律標「不可比」"},
+    "why": {"title": "這個結論最脆弱的地方",
+            "hint": "哪幾個假設最經不起挑戰——它們錯了，上面的數字就跟著錯"},
+    "research": {"title": "什麼會推翻它",
+                 "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
+    "entry": {"title": "進場門檻（選配）",
+              "hint": "你自己設的要求報酬換算成的價格。沒設不代表這檔研究不完整"},
+}
+
+#: 逐格標籤的白話版。沒列到的沿用 read model 的 `display_label`（那些多半本來就看得懂）。
+PLAIN_LINE_LABELS: Mapping[str, str] = {
+    "current_price": "現在股價",
+    "fair_value": "我們算出的未來目標價",
+    "value_date": "目標價是哪一天的值",
+    "horizon": "多久之後",
+    "price_return": "從現價到目標價，要漲跌多少",
+    "annualized_price_return": "換算成一年多少",
+    "epistemics_one_sentence": "一句話說明這個數字怎麼來的",
+    "internal_revenue": "我們估的營收",
+    "internal_operating_margin": "我們估的營益率",
+    "internal_eps": "我們估的每股盈餘",
+    "internal_gross_margin": "我們估的毛利率",
+    "thesis": "我們的看法",
+    "variant_view": "我們和市場看法差在哪",
+    "direction": "看多還看空",
+    "confidence": "信心程度",
+    "expected_horizon": "預期多久見分曉",
+    "criterion": "你要求的報酬",
+    "required_annualized_return": "要求的年化報酬",
+    "entry_price": "換算出來的門檻價",
+    "price_to_entry_gap": "現價離門檻價多遠",
+}
+
+#: 缺席語意的短標籤（畫面寬度用）。完整說明仍是 `ABSENCE_KINDS`，兩者同一個家——
+#: 前端**不維護第二份**（先前它是 app.js 裡的硬編碼表，那正是 L16 說的重造品）。
+PLAIN_ABSENCE_SHORT: Mapping[str, str] = {
+    "not_yet_recorded": "還沒做",
+    "deliberate_abstention": "刻意不下判斷",
+    "method_not_applicable": "這個方法不適用",
+    "upstream_unavailable": "缺上游資料",
+    "inputs_incompatible": "拿來比會出錯",
+    "provider_missing": "資料源沒有",
+    "capability_absent": "系統還沒這能力",
+    "point_in_time_unavailable": "回看那天沒有這筆",
+    "insufficient_evidence": "證據不夠",
+    "invalidated": "已失效",
+    "not_applicable_unspecified": "說了不適用但沒說哪一種",
+}
+
+#: 三個 readiness 狀態的白話版。**不得寫成能不能買**——它只描述「這份判讀讀不讀得成」。
+PLAIN_READINESS: Mapping[str, Mapping[str, str]] = {
+    "ready": {"label": "四段都讀得成", "note": "不是「可以買」的意思——這裡只講資料完不完整"},
+    "ready_with_flags": {"label": "讀得成，但有幾格要留意",
+                         "note": "有內容，但至少一段過期或需要重看"},
+    "blocked": {"label": "有一段讀不成", "note": "看下面「卡在哪」——它會說是還沒做、刻意不做，還是缺上游"},
+}
+
+#: 圖表用的一句話。價格是**脈絡不是訊號**：不排序、不決定尺寸、不產生任何建議。
+PRICE_SERIES_NOTE = (
+    "這是這檔自己的收盤價（provider 報價單位原值，未換算幣別）。"
+    "它是**脈絡不是訊號**——系統不用它排序、不用它決定買多少，也不從中推導任何進出場建議。"
+    "只取已收盤的交易日，所以不含今天的盤中價。"
+)
+
 ACCOUNTING_BASIS_DISPLAY: Mapping[str, Mapping[str, str]] = {
     "gaap": {
         "label": "As reported（法定財報口徑）",
@@ -398,6 +473,11 @@ def readiness_class(status: str) -> str:
 
 
 __all__ = [
+    "PLAIN_ABSENCE_SHORT",
+    "PLAIN_LINE_LABELS",
+    "PLAIN_PANEL_TITLES",
+    "PLAIN_READINESS",
+    "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",
     "AnalystLine", "AnalystPanel", "AnalystReadiness", "AnalystView", "AnalystViewContractViolation",
     "BLOCKED", "CORE_PANELS", "LINE_ROLES", "OPTIONAL_PANELS", "QUESTIONS", "READINESS_STATES",

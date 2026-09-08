@@ -87,24 +87,13 @@ function isSettled(kind) {
   return list.indexOf(kind) >= 0;
 }
 
-const ABSENCE_SHORT = {
-  not_yet_recorded: '還沒寫',
-  deliberate_abstention: '刻意不主張',
-  method_not_applicable: '方法不適用',
-  upstream_unavailable: '上游缺料',
-  inputs_incompatible: '輸入身分不相容',
-  provider_missing: '來源不提供',
-  capability_absent: '本層沒有這個能力',
-  point_in_time_unavailable: '此視角無時點投影',
-  insufficient_evidence: '證據不足',
-  invalidated: '已失效',
-  not_applicable_unspecified: '宣告不適用（未說哪一種）',
-};
-
 function absenceBadge(kind) {
   if (!kind) return null;
+  // 短標籤來自 /api/v1/meta（`plain_absence_short`）——前端**不維護第二份對照表**：
+  // 先前這裡是硬編碼的 ABSENCE_SHORT，那正是 L16 說的重造品，字彙一改它就開始偏離。
+  const short = (VOCAB && VOCAB.plain_absence_short) || {};
   const badge = el('span', 'badge ' + (isSettled(kind) ? 'badge-settled' : 'badge-absence'),
-                   ABSENCE_SHORT[kind] || kind);
+                   short[kind] || kind);
   badge.title = absenceLabel(kind);
   return badge;
 }
@@ -579,6 +568,203 @@ function renderReadiness(payload) {
   return node;
 }
 
+/* ---------- 白話別名：全部來自 /api/v1/meta，前端不維護第二份（L16） ---------- */
+
+function plainPanel(key, fallback) {
+  const table = (VOCAB && VOCAB.plain_panel_titles) || {};
+  return table[key] || { title: fallback || key, hint: '' };
+}
+
+function plainLine(key, fallback) {
+  const table = (VOCAB && VOCAB.plain_line_labels) || {};
+  return table[key] || fallback || key;
+}
+
+function plainReadiness(state) {
+  const table = (VOCAB && VOCAB.plain_readiness) || {};
+  return table[state] || { label: state, note: readinessLabel(state) };
+}
+
+/* ---------- 單檔判讀：先給答案，細節收起來 ----------
+   2026-09-08 使用者回饋：「太多展開、太多字、全部是內部術語，基本上看不懂」。
+   改法有三條，順序就是這一頁的結構：
+   ① **先給結論與價格**——現在多少錢、我們認為值多少、差多少，再配一張這檔自己的走勢；
+   ② **只留會改變你行動的四塊**（卡在哪／最脆弱／什麼會推翻它／我們 vs 市場）；
+   ③ 其餘**全部收進一個** `<details>`——原本六個面板的完整欄位一格沒刪，只是不再預設攤開。
+   ⚠ 刪的是版面不是內容：任何一格都還在，`/api/v1/stocks/<T>` 也一個欄位沒少。 */
+
+function conclusionCard(payload, view) {
+  const panel = view.headline;
+  const lines = lineMap(panel);
+  const meta = plainPanel('headline', panel.title);
+  const node = el('section', 'panel callout');
+  node.appendChild(el('h2', null, meta.title));
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+
+  const numbers = el('div', 'headline-numbers');
+  const price = lines.current_price && lines.current_price.datum;
+  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
+  if (price) {
+    numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
+      price.as_of ? `收盤 ${price.as_of}` : ''));
+  }
+  const target = lines.fair_value && lines.fair_value.datum;
+  const valueDate = lines.value_date && lines.value_date.datum;
+  if (target && target.value !== null && target.value !== undefined) {
+    const currency = target.dependencies ? target.dependencies.currency : null;
+    numbers.appendChild(numberBlock(plainLine('fair_value'), fmtQuantity(target.value, currency) || '—',
+      valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
+  }
+  const ret = lines.price_return && lines.price_return.datum;
+  const ann = lines.annualized_price_return && lines.annualized_price_return.datum;
+  if (ret && typeof ret.value === 'number') {
+    numbers.appendChild(numberBlock(plainLine('price_return'), fmtPercent(ret.value),
+      ann && typeof ann.value === 'number' ? `一年約 ${fmtPercent(ann.value)}` : '', signClass(ret.value)));
+  }
+  if (numbers.childNodes.length) node.appendChild(numbers);
+
+  // 沒有目標價時，把「為什麼沒有」放在跟數字一樣顯眼的位置——不留白、不寫 0。
+  [[plainLine('fair_value'), target], [plainLine('price_return'), ret]].forEach(([label, datum]) => {
+    if (!datum || (datum.value !== null && datum.value !== undefined)) return;
+    const box = el('div', 'attention ' + (isSettled(datum.absence_kind) ? 'settled' : 'blocked'));
+    const head = el('div', 'attention-head');
+    head.appendChild(document.createTextNode(label + '：'));
+    const badge = absenceBadge(datum.absence_kind);
+    if (badge) head.appendChild(badge);
+    box.appendChild(head);
+    if (datum.reason) box.appendChild(el('div', 'attention-body', datum.reason));
+    node.appendChild(box);
+  });
+
+  const one = lines.epistemics_one_sentence && lines.epistemics_one_sentence.datum;
+  if (one && one.value && one.value.one_sentence) {
+    const box = el('div', 'onesentence', one.value.one_sentence);
+    box.appendChild(el('span', 'src', '這句話由計算層自己組出，不是本畫面寫的'));
+    node.appendChild(box);
+  }
+  return node;
+}
+
+function priceCard(payload) {
+  const series = payload.price_series || [];
+  const node = el('section', 'panel');
+  node.appendChild(el('h2', null, '股價走勢（這檔自己的收盤價）'));
+  const price = (payload.overview && payload.overview.price) || {};
+  node.appendChild(lineChart(series, {
+    ariaLabel: `${payload.ticker} 收盤價`,
+    emptyNote: '沒有取到這檔的收盤序列——沒有折線不是價格為 0。',
+  }));
+  const note = (VOCAB && VOCAB.price_series_note) || '';
+  node.appendChild(el('p', 'note',
+    (series.length ? `${series[0].session_date} 起，共 ${series.length} 個已收盤交易日` +
+      (price.quote_unit ? `（單位 ${price.quote_unit}）。` : '。') : '') + note));
+  if (series.length) node.appendChild(drill('表格版：每一個交易日的收盤', () => seriesTable(series)));
+  return node;
+}
+
+function blockerCard(payload) {
+  const readiness = payload.readiness;
+  const plain = plainReadiness(readiness.state);
+  const blockers = readiness.blocker_details || [];
+  const flags = readiness.flag_details || [];
+  if (!blockers.length && !flags.length) return null;
+  const node = el('section', 'panel');
+  const head = el('h2');
+  head.appendChild(document.createTextNode('卡在哪　'));
+  head.appendChild(el('span', 'badge badge-' + readiness.state, plain.label));
+  node.appendChild(head);
+  node.appendChild(el('div', 'panel-questions', plain.note));
+  blockers.forEach((item) => {
+    const box = el('div', 'attention ' + (item.settled ? 'settled' : 'blocked'));
+    const head2 = el('div', 'attention-head');
+    head2.appendChild(document.createTextNode(
+      `${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}　`));
+    const badge = absenceBadge(item.absence_kind);
+    if (badge) head2.appendChild(badge);
+    box.appendChild(head2);
+    box.appendChild(el('div', 'attention-body', absenceLabel(item.absence_kind) || ''));
+    if (item.reason) box.appendChild(el('div', 'attention-body', truncate(item.reason, 260)));
+    node.appendChild(box);
+  });
+  flags.forEach((item) => {
+    const box = el('div', 'attention flags');
+    box.appendChild(el('div', 'attention-head',
+      `要留意：${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}`));
+    if (item.reason) box.appendChild(el('div', 'attention-body', truncate(item.reason, 220)));
+    node.appendChild(box);
+  });
+  return node;
+}
+
+function fragileCard(view) {
+  const panel = view.why;
+  const weak = (panel.weak_inputs || []).slice(0, 3);
+  if (!weak.length) return null;
+  const meta = plainPanel('why', panel.title);
+  const node = el('section', 'panel');
+  node.appendChild(el('h2', null, meta.title));
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+  const list = el('ul', 'weak');
+  weak.forEach((item) => {
+    const li = el('li');
+    const text = valueText(item.datum);
+    li.appendChild(document.createTextNode(
+      plainLine(item.datum.key || '', item.display_label) + (text ? '：' + text : '')));
+    const rule = (VOCAB && VOCAB.weak_input_rules && VOCAB.weak_input_rules[item.rule]) || item.rule;
+    li.appendChild(el('span', 'rule', rule));
+    if (item.datum.reason) li.appendChild(el('span', 'rule', truncate(item.datum.reason, 200)));
+    list.appendChild(li);
+  });
+  node.appendChild(list);
+  if ((panel.weak_inputs || []).length > weak.length) {
+    node.appendChild(el('p', 'note', `另有 ${panel.weak_inputs.length - weak.length} 條較次要的，收在下方完整細節裡。`));
+  }
+  return node;
+}
+
+function disproofCard(view) {
+  const panel = view.research;
+  const disproofs = panel.disproofs || [];
+  const catalysts = panel.catalysts || [];
+  if (!disproofs.length && !catalysts.length) return null;
+  const meta = plainPanel('research', panel.title);
+  const node = el('section', 'panel');
+  node.appendChild(el('h2', null, meta.title));
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+  if (disproofs.length) {
+    const list = el('ul', 'weak');
+    disproofs.forEach((item) => {
+      const li = el('li', null, item.condition || item.label || '');
+      const bits = [];
+      if (item.check_frequency) bits.push('多久看一次：' + item.check_frequency);
+      if (item.action_on_trigger) bits.push('觸發後要做什麼：' + item.action_on_trigger);
+      if (item.status) bits.push('狀態 ' + item.status);
+      if (bits.length) li.appendChild(el('span', 'rule', bits.join('｜')));
+      list.appendChild(li);
+    });
+    node.appendChild(list);
+  }
+  if (catalysts.length) {
+    node.appendChild(el('div', 'group-title', '什麼時候會知道'));
+    node.appendChild(listOf(catalysts.map((c) => [c.label, c.due, c.state].filter(Boolean).join('｜'))));
+  }
+  return node;
+}
+
+function versusMarketCard(view) {
+  const panel = view.fundamental;
+  const rows = (panel.lines || []).filter((line) => line.role === 'comparison');
+  if (!rows.length) return null;
+  const meta = plainPanel('fundamental', panel.title);
+  const node = el('section', 'panel');
+  node.appendChild(el('h2', null, meta.title));
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+  node.appendChild(renderRows(rows));
+  const basis = basisDisplay((panel.context || {}).accounting_basis);
+  node.appendChild(el('p', 'note', `口徑：${basis.label}。${(panel.context || {}).same_period_rule || ''}`));
+  return node;
+}
+
 async function renderDetail(ticker) {
   markNav('stocks');
   let payload;
@@ -617,21 +803,32 @@ async function renderDetail(ticker) {
   head.appendChild(el('div', 'company', payload.company_label || ''));
   app.appendChild(head);
 
-  app.appendChild(renderReadiness(payload));
-  app.appendChild(renderHeadline(view));
-  app.appendChild(renderFundamental(view));
-  app.appendChild(renderWhy(view));
-  app.appendChild(renderResearch(view));
-  app.appendChild(renderEntry(view));
-  app.appendChild(renderFreshness(payload));
+  // 先給答案與價格，再給會改變行動的四塊，其餘收起來（2026-09-08 使用者回饋）
+  app.appendChild(conclusionCard(payload, view));
+  app.appendChild(priceCard(payload));
+  [blockerCard(payload), fragileCard(view), disproofCard(view), versusMarketCard(view)]
+    .forEach((card) => { if (card) app.appendChild(card); });
 
-  const limits = el('section', 'panel');
-  limits.appendChild(el('h2', null, '這份判讀不是什麼'));
-  limits.appendChild(listOf(view.limits || []));
-  if (view.warnings && view.warnings.length) {
-    limits.appendChild(drill(`展開：組裝時的警告（${view.warnings.length}）`, () => listOf(view.warnings)));
-  }
-  app.appendChild(limits);
+  const details = el('section', 'panel');
+  details.appendChild(el('h2', null, '完整細節'));
+  details.appendChild(el('p', 'note',
+    '上面那幾塊是摘要，這裡一格都沒少：每個面板的每一欄、每個缺席理由、算式與證據都在。'));
+  details.appendChild(drill('展開：結論那幾個數字的每一格', () => renderRows(view.headline.lines)));
+  details.appendChild(drill('展開：我們與市場的完整預測', () => renderFundamental(view)));
+  details.appendChild(drill('展開：假設、敏感度、算式、證據', () => renderWhy(view)));
+  details.appendChild(drill('展開：研究現況與五軸判斷', () => renderResearch(view)));
+  details.appendChild(drill('展開：進場門檻（選配）', () => renderEntry(view)));
+  details.appendChild(drill('展開：這份判讀有多新', () => renderFreshness(payload)));
+  details.appendChild(drill('展開：這份判讀不是什麼', () => {
+    const box = el('div');
+    box.appendChild(listOf(view.limits || []));
+    if (view.warnings && view.warnings.length) {
+      box.appendChild(el('div', 'group-title', `組裝時的警告（${view.warnings.length}）`));
+      box.appendChild(listOf(view.warnings));
+    }
+    return box;
+  }));
+  app.appendChild(details);
   window.scrollTo(0, 0);
 }
 
@@ -677,9 +874,9 @@ function mdParagraph(text, className) {
 function soleSourceBadge(value) {
   const table = (RANK_VOCAB && RANK_VOCAB.sole_source_states) || {};
   let text; let key;
-  if (value === true) { text = 'sole_source'; key = 'true'; }
+  if (value === true) { text = '獨家供應'; key = 'true'; }
   else if (value === false) { text = '有第二來源'; key = 'false'; }
-  else { text = 'sole_source 未填'; key = 'null'; }
+  else { text = '沒人說過是不是獨家'; key = 'null'; }
   const badge = el('span', 'badge ' + (value === true ? 'badge-sole' : 'badge-absence'), text);
   badge.title = table[key] || '';
   return badge;
@@ -704,10 +901,17 @@ function companyCell(row, detailSet) {
   return cell;
 }
 
+/* 關係動詞寫成人話，原始 label 附在 title 供查圖（判準：望文生義還是要查表）。 */
+const RELATION_PLAIN = { supplies_to: '供貨給', depends_on: '依賴', constrained_by: '受限於' };
+
 function edgeCell(row) {
   const cell = el('td', 'rank-edge');
-  cell.appendChild(el('div', 'dim', row.relation + ' →'));
-  cell.appendChild(el('code', null, row.bottleneck));
+  const verb = el('div', 'dim', RELATION_PLAIN[row.relation] || row.relation);
+  verb.title = row.relation;
+  cell.appendChild(verb);
+  const node = el('code', null, row.bottleneck);
+  node.title = '圖裡的節點 ID，可貼回來查';
+  cell.appendChild(node);
   return cell;
 }
 
@@ -724,9 +928,9 @@ function anchorCell(row) {
   const cell = el('td', 'rank-anchor');
   if (row.demand_anchor) {
     cell.appendChild(el('code', null, row.demand_anchor));
-    cell.appendChild(el('div', 'dim', `距需求端 ${row.demand_hops} 跳`));
+    cell.appendChild(el('div', 'dim', `離它 ${row.demand_hops} 步`));
   } else {
-    cell.appendChild(el('span', 'badge badge-blocked', '🔴 無需求錨'));
+    cell.appendChild(el('span', 'badge badge-blocked', '🔴 找不到誰在花錢'));
   }
   return cell;
 }
@@ -757,20 +961,20 @@ function rankTable(rows, columns, detailSet) {
 const ACTIONABLE_COLUMNS = [
   { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
   { title: '標的', cell: companyCell },
-  { title: '卡在哪', cell: edgeCell },
-  { title: '替代難度', cell: subCell },
-  { title: '證據', cell: (row) => el('td', 'nowrap', row.evidence_label || row.evidence) },
+  { title: '卡在哪一層', cell: edgeCell },
+  { title: '有多難換掉', cell: subCell },
+  { title: '證據強度', cell: (row) => { const c = el('td', 'nowrap', row.evidence_label || row.evidence); c.title = row.evidence; return c; } },
   { title: '合格狀態', cell: (row) => el('td', 'nowrap', row.qualification_status || '—') },
-  { title: '需求錨點', cell: anchorCell },
+  { title: '誰在花錢', cell: anchorCell },
 ];
 
 const STRUCTURAL_COLUMNS = [
   { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
   { title: '標的', cell: companyCell },
-  { title: '卡在哪', cell: edgeCell },
-  { title: '替代難度', cell: subCell },
-  { title: '距需求端', cell: (row) => el('td', 'nowrap', hopsText(row)) },
-  { title: '目前證據', cell: (row) => el('td', 'nowrap', row.evidence_label || row.evidence) },
+  { title: '卡在哪一層', cell: edgeCell },
+  { title: '有多難換掉', cell: subCell },
+  { title: '離花錢的人幾步', cell: (row) => el('td', 'nowrap', hopsText(row)) },
+  { title: '目前證據強度', cell: (row) => { const c = el('td', 'nowrap', row.evidence_label || row.evidence); c.title = row.evidence; return c; } },
   { title: '落差', cell: (row) => {
       const cell = el('td', 'dim nowrap');
       if (row.gap_note) cell.textContent = row.gap_note;
@@ -1695,14 +1899,18 @@ function returnCell(value) {
   return cell;
 }
 
-const POSITION_COLUMNS = [
-  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
-  { title: '錨點日', cell: (row) => el('td', 'nowrap', row.anchor_date || '—') },
-  { title: '現價日', cell: (row) => el('td', 'nowrap', row.current_date || '—') },
-  { title: '錨點前', cell: (row) => returnCell(row.pre_anchor_return) },
-  { title: '入圖以來', cell: (row) => returnCell(row.absolute_return) },
-  { title: '超額', cell: (row) => returnCell(row.excess_return) },
-];
+/* 欄位名一律白話：術語（錨點／excess）只出現在下方說明列，不放進表頭。
+   2026-09-08 使用者：「錨點前／入圖以來／超額是啥意思」——那三個詞要查表才懂，就不該當欄名。 */
+function positionColumns(benchmark) {
+  return [
+    { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
+    { title: '起算日', cell: (row) => el('td', 'nowrap', row.anchor_date || '—') },
+    { title: '報價日', cell: (row) => el('td', 'nowrap', row.current_date || '—') },
+    { title: '起算前 30 天', cell: (row) => returnCell(row.pre_anchor_return) },
+    { title: '起算後到現在', cell: (row) => returnCell(row.absolute_return) },
+    { title: `同期比 ${benchmark || 'QQQ'} 多／少`, cell: (row) => returnCell(row.excess_return) },
+  ];
+}
 
 const LIVE_COLUMNS = [
   { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
@@ -1762,24 +1970,29 @@ async function renderPositions() {
   if (health) {
     const sec1 = el('section', 'panel');
     sec1.appendChild(el('h2', null, '這批數字能證明什麼（先看這裡）'));
+    sec1.appendChild(el('div', 'panel-questions',
+      '下面的漲跌是真的，但「它代表系統選股很準」不一定成立——差別在起算日的意義。'));
     if (health.judgment_anchors === 0) {
       sec1.appendChild(el('p', 'warn',
-        '■ 沒有任何錨點來自進場判斷——下方的「入圖以來」不構成選股能力的證據。'
+        '■ 沒有任何一檔的起算日是「你決定要買」的那天——所以下面的漲跌不能當成選股能力的證據。'
         + 'cohort 由入圖建立，錨點的語意是「這家公司的 claim 那天進圖」，不是「那天是進場時機」。'));
       sec1.appendChild(el('p', 'note', notes.judgment_anchor || ''));
     }
     if (health.span_days < health.span_warn_days) {
       sec1.appendChild(el('p', 'warn',
-        `▲ 錨點跨度僅 ${health.span_days} 天——不得視為 ${health.paired} 個獨立樣本。`
+        `▲ 這些起算日全擠在 ${health.span_days} 天內——不能當成 ${health.paired} 個獨立的驗證。`
         + '這批 cohort 建立於同一段期間，若又同屬一個主題，超額很可能是同一次行情被相關標的複製多次。'));
     }
     const rows = el('div', 'rows');
-    rows.appendChild(kv('來自進場判斷的錨點', `${health.judgment_anchors} 筆｜來自入圖日 ${health.paired} 筆`));
-    rows.appendChild(kv('錨點跨度', `${health.first} ~ ${health.last}（${health.span_days} 天）｜獨立日曆週 ${health.weeks}`));
-    rows.appendChild(kv(`錨點前 ${health.pre_anchor_days} 日中位`, fmtRatioPct(health.pre_median, 1) || '—'));
-    rows.appendChild(kv('錨點後中位', fmtRatioPct(health.post_median, 1) || '—'));
-    rows.appendChild(kv('錨點前漲幅大於錨點後',
-      `${health.chasing} / ${health.paired}` + (health.chasing_tickers.length ? `（${health.chasing_tickers.join('、')}）` : '')));
+    rows.appendChild(kv('起算日是「你真的決定要買」的那天',
+      `${health.judgment_anchors} 檔｜其餘 ${health.paired - health.judgment_anchors} 檔的起算日只是「被放進清單」`));
+    rows.appendChild(kv('這些起算日集中在多長的期間',
+      `${health.first} ~ ${health.last}（${health.span_days} 天，橫跨 ${health.weeks} 個日曆週）`));
+    rows.appendChild(kv(`被放進清單前 ${health.pre_anchor_days} 天，中位漲跌`, fmtRatioPct(health.pre_median, 1) || '—'));
+    rows.appendChild(kv('被放進清單後到現在，中位漲跌', fmtRatioPct(health.post_median, 1) || '—'));
+    rows.appendChild(kv('放進清單前漲得比放進後多的',
+      `${health.chasing} / ${health.paired} 檔` + (health.chasing_tickers.length ? `（${health.chasing_tickers.join('、')}）` : '')
+      + '——這個比例高代表我們常在漲完之後才注意到'));
     sec1.appendChild(rows);
     sec1.appendChild(mdParagraph(notes.sample_validity || ''));
     app.appendChild(sec1);
@@ -1789,10 +2002,14 @@ async function renderPositions() {
   const sec2 = el('section', 'panel');
   sec2.appendChild(el('h2', null, '常駐計數器'));
   sec2.appendChild(kpiRow([
-    { label: '上線標的', value: `${c.eligible_cohorts}/${c.total_cohorts}`, sub: `另有 ${c.legacy_eligible_cohorts} 個舊判準` },
-    { label: '可量測', value: `${c.shadow_measurable_cohorts}/${c.shadow_anchored_cohorts}`, sub: '有價格錨、算得出報酬' },
-    { label: '真實下單', value: `${c.live_choices} 選擇／${c.live_fills} 成交`, sub: '這個數字只靠真實下單變大' },
-    { label: '結案歸因', value: `${c.measured_outcomes}/${c.outcomes}`, sub: '已量測 outcome' },
+    { label: '追蹤中的公司', value: `${c.eligible_cohorts}/${c.total_cohorts}`,
+      sub: `研究完整到可以進清單的／全部建過檔的${c.legacy_eligible_cohorts ? `；另有 ${c.legacy_eligible_cohorts} 個還用舊判準` : ''}` },
+    { label: '算得出報酬的', value: `${c.shadow_measurable_cohorts}/${c.shadow_anchored_cohorts}`,
+      sub: '有起算價、抓得到現價的；其餘多半是未上市或沒有代碼' },
+    { label: '真實下單', value: `${c.live_choices} 次決定／${c.live_fills} 筆成交`,
+      sub: '「系統準不準」只靠這個數字變大，時間經過不會讓它自己滿足' },
+    { label: '已結案的判斷', value: `${c.measured_outcomes}/${c.outcomes}`,
+      sub: '已經收尾、而且算得出結果的／全部收尾的（內部叫「結案歸因」）' },
   ]));
   if (c.duplicate_cohort_companies || c.orphan_cohorts) {
     sec2.appendChild(el('p', 'note',
@@ -1817,7 +2034,21 @@ async function renderPositions() {
   // ⑤ 逐檔
   const sec4 = el('section', 'panel');
   sec4.appendChild(el('h2', null, `逐檔（${payload.rows.length}）`));
-  sec4.appendChild(rankTable(payload.rows, POSITION_COLUMNS, detailSet));
+  sec4.appendChild(rankTable(payload.rows, positionColumns((payload.benchmarks || {}).primary), detailSet));
+  const legend = el('ul', 'notes');
+  [['起算日', '這檔被放進追蹤清單的那天（內部叫「錨點」）。**它不是你買進的日子**——除非那筆有真實成交。'],
+   ['起算前 30 天', '在被放進清單之前的一個月，它自己漲跌了多少。這一欄是用來看「我們是不是總在追已經漲完的東西」。'],
+   ['起算後到現在', '從那天到最新收盤，它漲跌了多少（內部叫「入圖以來」）。'],
+   [`同期比 ${(payload.benchmarks || {}).primary || 'QQQ'} 多／少`,
+    '同一段期間內，它比大盤多賺或少賺幾個百分點（內部叫「超額報酬」）。正的代表跑贏。']]
+    .forEach(([term, note]) => {
+      const li = el('li');
+      li.appendChild(el('b', null, term));
+      li.appendChild(document.createTextNode('：'));
+      li.appendChild(mdInline(note));
+      legend.appendChild(li);
+    });
+  sec4.appendChild(legend);
   if ((payload.unavailable || []).length) {
     sec4.appendChild(el('p', 'note',
       `另有 ${payload.unavailable.length} 個 cohort 的 Shadow 是 unavailable，無錨點可計算（多半是無 ticker 的未上市或殘骸）。`));

@@ -747,9 +747,24 @@ materialize **只呼叫 `collect()` 不呼叫 render**，因此不 append 排序
 （`webapp/store.py::resolve_state_dir`：明示 > analyst 目錄下的 `state/` > 預設），serve／materialize／status 都走它。
 
 **Web App 的資訊階層**（`webapp/static/`，vanilla JS，零外部資源，CSP 只允許 same-origin）：
-清單卡片 → ①判讀狀態（blocked 時逐條寫「卡在哪一層＋為什麼」）→ ②頭條 → ③內部 vs 市場 →
-④最脆弱的假設 → ⑤研究現況／disproof → ⑥Entry（optional）→ ⑦新鮮度 → ⑧「這份判讀不是什麼」。
-formula／provenance／evidence／epistemics 全部收進 `<details>` drill-down。
+⚠ **2026-09-08 依使用者回饋重排**（原話：「太多展開、太多字、全部是內部術語，基本上看不懂」）。
+單檔頁順序改為：①**結論**（現價／我們算的目標價／要漲跌多少）→ ②**這檔自己的收盤走勢**
+→ ③卡在哪（只在 blocked／有旗標時出現）→ ④最脆弱的地方（前 3 條）→ ⑤什麼會推翻它
+→ ⑥我們 vs 市場 → ⑦**一個** `<details>`「完整細節」把原本六個面板的每一格原樣收進去。
+**刪的是版面不是內容**：API 回應一個欄位沒少，`tests/test_webapp_api.py` 斷言六個面板的
+renderer 都還在那個 details 裡。
+
+**白話別名（2026-09-08）：** `PLAIN_PANEL_TITLES`／`PLAIN_LINE_LABELS`／`PLAIN_ABSENCE_SHORT`／
+`PLAIN_READINESS` 住 `briefing/analyst_view/contracts.py`，經 `.meta.json` 送到 API——
+**字彙一個字沒改**（那是 read model 與 private ledger 的身分，L10），加的是「同一個東西怎麼講給人聽」，
+同 `ACCOUNTING_BASIS_DISPLAY` 的先例。前端**不維護第二份**：原本 app.js 裡硬編碼的 `ABSENCE_SHORT`
+已移除（它正是 L16 說的重造品，字彙一改它就安靜偏離）。別名**不得宣稱 authority 沒有的東西**——
+`ready` 的說明逐字寫著「不是『可以買』的意思」。
+
+**單檔走勢圖：** `alpha/providers/close_series.py` 取 180 個**已收盤**交易日（不含今天的盤中 bar，L12），
+在 materialize 端抓、存進 artifact 的 `price_series`。它是**脈絡不是訊號**：不參與排序、不決定尺寸、
+不畫任何均線或動能指標（`tests/test_webapp_api.py` 掃這段程式碼）；`freshness_identity` 不含它——
+價格動了不算認知變了。抓失敗只是沒有折線，不讓整份 artifact 失敗。
 **UI 只改資訊階層，不產生任何新的 summary judgment**：頭條那句話取自
 `implied_return.epistemics.one_sentence`（authority 自組）並註明出處；
 缺席語意的中文說明來自 `/api/v1/meta` 的字彙表，前端不維護第二份對照表。

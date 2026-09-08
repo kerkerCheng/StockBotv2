@@ -110,8 +110,13 @@ def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def materialize_view(analyst_view_dict: Mapping[str, Any], *,
-                     generated_at: datetime | None = None) -> dict[str, Any]:
-    """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。"""
+                     generated_at: datetime | None = None,
+                     price_series: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any]:
+    """`AnalystView.to_dict()` → artifact payload（含遮蔽、overview、兩個 digest）。純函式。
+
+    `price_series` 是**脈絡不是判讀**：一條這檔自己的已收盤收盤價序列，讓使用者看得懂
+    「現在這個價位在哪」。它不參與任何計算——`freshness_identity` 不含它（價格動了不算認知變了）。
+    """
     view = redact_private_paths(dict(analyst_view_dict))
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     payload: dict[str, Any] = {
@@ -129,6 +134,7 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "refresh": view["refresh"],
         "overview": build_overview(view),
         "view": view,
+        "price_series": [dict(row) for row in (price_series or ())],
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
@@ -156,9 +162,24 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
 
     view = fetch_alpha_investment_view(ticker, as_of=as_of, include_causal=False, scenario=scenario)
     analyst = build_analyst_view(view)
-    payload = materialize_view(analyst.to_dict(), generated_at=generated_at)
+    payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
+                               price_series=_close_series(ticker))
     target = store or ArtifactStore()
     return target.write(payload), payload
+
+
+def _close_series(ticker: str, *, sessions: int = 180) -> list[dict[str, Any]]:
+    """這檔自己的已收盤收盤價序列。抓失敗只是沒有折線，**不讓整份 artifact 失敗**。
+
+    ⚠ 只取已收盤的交易日（provider 會回一根未結算的當日 bar，那會讓「單日報酬」時而是
+    昨收到現價、時而是昨收到今收——一個欄位兩種語意，L12）。
+    """
+    from alpha.providers.close_series import fetch_close_series
+
+    try:
+        return list(fetch_close_series([ticker], sessions=sessions).get(ticker) or ())
+    except Exception:  # noqa: BLE001 — 價格是脈絡，缺了不該讓判讀讀不到
+        return []
 
 
 def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
@@ -1023,7 +1044,9 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
-        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, QUESTIONS, WEAK_INPUT_RULES,
+        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
+        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS, PRICE_SERIES_NOTE, QUESTIONS,
+        WEAK_INPUT_RULES,
     )
 
     target = store or ArtifactStore()
@@ -1032,6 +1055,13 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "absence_kinds": dict(ABSENCE_KINDS),
         "settled_absence_kinds": sorted(SETTLED_ABSENCE_KINDS),
         "accounting_basis_display": {k: dict(v) for k, v in ACCOUNTING_BASIS_DISPLAY.items()},
+        # 面向使用者的白話別名（2026-09-08）。**字彙一個字沒改**——這是同一個東西的第二種說法，
+        # 而且只有一份：前端不得再自己維護一張對照表（先前 app.js 的 ABSENCE_SHORT 就是重造品，L16）。
+        "plain_panel_titles": {k: dict(v) for k, v in PLAIN_PANEL_TITLES.items()},
+        "plain_line_labels": dict(PLAIN_LINE_LABELS),
+        "plain_absence_short": dict(PLAIN_ABSENCE_SHORT),
+        "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
+        "price_series_note": PRICE_SERIES_NOTE,
         "questions": dict(QUESTIONS),
         "weak_input_rules": dict(WEAK_INPUT_RULES),
         "core_panels": list(CORE_PANELS),

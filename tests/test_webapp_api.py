@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -270,3 +271,69 @@ def test_index_html_loads_no_external_resource() -> None:
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
     for token in ("http://", "https://", "cdn.", "googleapis"):
         assert token not in html, token
+
+
+# ---------------------------------------------------------------------------
+# 白話別名（2026-09-08 使用者：「全部是內部術語，基本上看不懂」）
+# ---------------------------------------------------------------------------
+
+def test_plain_labels_are_served_from_the_api_not_a_second_frontend_table(client) -> None:
+    """白話別名的家只有一個：read model 的 contracts → `.meta.json` → API。
+
+    ⚠ 先前 `absence_kind` 的短標籤是 app.js 裡的硬編碼表——那是 L16 說的重造品：
+    字彙一改它就開始偏離，而且不會有東西報錯。
+    """
+    vocab = client.get("/api/v1/meta").json()["vocabularies"]
+    for key in ("plain_panel_titles", "plain_line_labels", "plain_absence_short",
+                "plain_readiness", "price_series_note"):
+        assert key in vocab, key
+    assert vocab["plain_absence_short"]["deliberate_abstention"] == "刻意不下判斷"
+    assert set(vocab["plain_absence_short"]) == set(vocab["absence_kinds"]), (
+        "短標籤與完整說明必須涵蓋同一組字彙——少一個就會有一格顯示裸 key"
+    )
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    # ⚠ 禁的是「當成現行對照表使用」，不是提到這個名字——app.js 刻意留著一行移除紀錄，
+    #    那正是防止它被重新加回來的剎車（同 AGENTS 對已拔除訊號字彙的處理）。
+    for usage in ("const ABSENCE_SHORT", "ABSENCE_SHORT["):
+        assert usage not in source, f"前端不得再維護第二份缺席字彙對照表：{usage}"
+    assert "VOCAB.plain_absence_short" in source
+
+
+def test_plain_labels_never_claim_more_than_the_vocabulary_does() -> None:
+    """白話化**不得順手加上 authority 沒有的東西**（同 `accounting_basis` 那條）。"""
+    from briefing.analyst_view.contracts import PLAIN_ABSENCE_SHORT, PLAIN_READINESS
+
+    joined = " ".join(PLAIN_ABSENCE_SHORT.values()) + " ".join(
+        f"{v['label']}{v['note']}" for v in PLAIN_READINESS.values())
+    for overclaim in ("建議", "推薦", "安全", "值得買", "該買"):
+        assert overclaim not in joined, f"白話別名不得宣稱 authority 沒有的東西：{overclaim}"
+    # 「可以買」只准以否定形式出現——那句話正是這一欄最容易被誤讀的地方。
+    assert "不是「可以買」的意思" in PLAIN_READINESS["ready"]["note"]
+    assert joined.count("可以買") == joined.count("不是「可以買」")
+
+
+def test_single_stock_page_leads_with_the_answer_then_the_price(client) -> None:
+    """單檔頁的順序本身是回饋的修正：先結論、再價格，細節收成一個 details。"""
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    block = source.split("async function renderDetail", 1)[1]
+    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+    order = [block.index(name) for name in
+             ("conclusionCard(", "priceCard(", "blockerCard(", "完整細節")]
+    assert order == sorted(order), "順序必須是：結論 → 價格 → 卡在哪 → 完整細節"
+    # 細節一格都沒少：六個面板的 render 全都還在 details 裡
+    for renderer in ("renderFundamental(view)", "renderWhy(view)", "renderResearch(view)",
+                     "renderEntry(view)", "renderFreshness(payload)"):
+        assert renderer in block, f"完整細節少了 {renderer}"
+
+
+def test_price_series_is_context_not_a_signal(client) -> None:
+    """單檔頁的走勢圖是脈絡：不得出現任何動能指標或買賣語言。"""
+    from briefing.analyst_view.contracts import PRICE_SERIES_NOTE
+
+    assert "脈絡不是訊號" in PRICE_SERIES_NOTE
+    assert "不用它排序" in PRICE_SERIES_NOTE and "不用它決定買多少" in PRICE_SERIES_NOTE
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    block = source.split("function priceCard", 1)[1]
+    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+    for banned in ("sma", "SMA", "rsi", "RSI", "macd", "MACD", "均線", "突破"):
+        assert banned not in block, f"走勢圖不得帶動能指標：{banned}"
