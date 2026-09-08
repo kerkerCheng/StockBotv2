@@ -1,0 +1,733 @@
+SOURCE: https://s21.q4cdn.com/377324469/files/doc_presentations/2026/2026-Lumentum-at-OFC_final.pdf
+RETRIEVED: 2026-09-08
+PUBLISHED: 2026-03-17 (Lumentum Investor Briefing at OFC 2026)
+
+© 2026 Lumentum Operations LLC      1
+Illuminating the 
+Networks of Tomorrow
+Lumentum Investor Briefing 
+OFC 2026 Los Angeles
+March 17, 2026
+© 2026 Lumentum Operations LLC      2 
+Cautionary Note Regarding Forward-Looking Statements and Non-GAAP Measures
+This presentation contains forward-looking statements within the meaning of Section 27A of the Securities Act of 1933 and Section 21E of the Securities Exchange Act of 1934. These include 
+statements regarding our belief and expectations with respect to our markets, including the AI and datacenter market and the broader networking market, demand for our products offerings from 
+existing and prospective customers, revenue growth opportunities and drivers, new technologies and products, our R&D investment, our ability to service customer demand with our existing and 
+expected manufacturing capacity, backlog and expected volume of product shipments, product quality and yield, our ability to deliver at scale and our customer support, as well as information 
+regarding our financial models, including future revenue, timing of revenue, revenue mix, gross margin, operating expenses, operating margin, profitability, and related assumptions. These 
+forward-looking statements involve risks and uncertainties that could cause actual results to differ materially from those projected.  Among the factors that could cause actual results to differ from 
+those contemplated are: (a) uncertainty and volatility in the global markets, including uncertainty and volatility in the macroeconomic environment, volatility and uncertainty with respect to 
+economic growth, inflationary pressures, market disruptions impacting demand for our products, technology spending by our customers and our ability to obtain components for our products, 
+uncertainty in the political or economic environment, such as geopolitical conflicts and war, changes in the regulatory environment, including trade and export restrictions and the imposition of 
+tariffs, duties, export controls, and other restrictions on business; (b) quarter-over-quarter product mix fluctuations, which can materially impact profitability measures; (c) decline of average 
+selling prices across our businesses or increase in costs; (d) effects of seasonality; (e) our ability to increase our manufacturing capacity and our ability and the ability of our suppliers and 
+contract manufacturers to meet production, quality, and delivery requirements for our forecasted demand and the effect of ongoing supply chain constraints; (f) changes in customer demand; (g) 
+our ability to retain and attract new customers; (h) the risk that our markets will not grow or develop as expected or that our strategies and ability to compete in those markets are not successful, 
+(i) the risk that our financing or operating strategies will not be successful; (j) risks related to our restructuring initiatives and changes to our operations, (k) failure to successfully integrate 
+acquisitions into our business or that we will not achieve the expected benefits; (l) risks related to servicing our current and future debt and compliance with the covenants under our revolving 
+credit facility.  A detailed discussion of these and other risks and uncertainties that could cause actual results and events to differ materially from such forward-looking statements is included in 
+our Quarterly Report on Form 10-Q for the fiscal quarter ended December 27, 2025, filed with the Securities and Exchange (the “SEC”) and in our other filings with the SEC, available at 
+www.sec.gov, under the caption “Risk Factors” and elsewhere. The forward-looking statements contained in this presentation are made as of the date hereof and the Company assumes no 
+obligation to update such statements, except as required by applicable law.
+Unless otherwise stated, all financial results and projections are on a non-GAAP basis. Our GAAP results, details about our non-GAAP financial measures, and a reconciliation between historical 
+GAAP and non-GAAP results can be found in our earnings releases on our web site, www.lumentum.com, under the investors section. Our non-GAAP measures used in this presentation 
+exclude (i) stock-based compensation and related payroll taxes, (ii) acquisition related costs (income), (iii) integration related costs, (iv) amortization of acquired intangibles, (v) restructuring and 
+related charges (reversals), (vi) foreign exchange (gains) losses, net, (vii) non-cash interest expense on convertible notes, (viii) intangible assets write-off, (ix) inducement expense on partial 
+repurchase of 2026 Notes, (x) escrow settlement and related charges, (xi) non-GAAP income tax reconciling adjustments, and (xii) other charges or income related to non-recurring activities.  
+We have not provided reconciliations from GAAP to non-GAAP measures or the equivalent GAAP measure for non-GAAP measures in our outlook or forecasts, as they cannot be provided 
+without unreasonable effort. 
+This presentation contains industry market data, industry forecasts, and other statistical information from third party sources.  Such information has been obtained from publicly available 
+information, industry publications and other sources, and the Company makes no representations as to the accuracy of such information.  The Company has not independently verified any such 
+third-party information.  Certain information in this presentation is also based on management forecasts and reflects prevailing conditions and management’s views as of this date, all of which are 
+subject to change. 
+© 2026 Lumentum Operations LLC      3 
+Today’s Speakers
+WAJID ALI
+Executive Vice President 
+and CFO
+WUPEN YUEN
+President
+Global Business Units
+MICHAEL HURLSTON
+President and CEO
+KATHY TA
+Vice President 
+Investor Relations
+
+© 2026 Lumentum Operations LLC      4 
+Illuminating the 
+Networks of 
+Tomorrow
+MICHAEL HURLSTON
+PRESIDENT AND CEO
+
+© 2026 Lumentum Operations LLC      5 
+Deep Roots, Wide Moat:
+Converting decades of expertise into sustained optical leadership
+Deep Networking 
+Heritage
+Leading component supplier to 
+long-haul and DCI networks
+Foundational Laser 
+Technology
+The gold standard for laser chip 
+performance and reliability
+Optical Switching 
+Leadership
+Decades of WSS MEMS expertise 
+applied to OCS optical engine
+Flexible, Growing 
+InP Footprint
+Adding capacity across a network 
+of four unique fabs
+© 2026 Lumentum Operations LLC   |   LUMENTUM CONFIDENTIAL AND PROPRIETARY INFORMATION        5 
+© 2026 Lumentum Operations LLC      6 
+InP Capacity 
+Leadership: 
+Accelerating EML 
+Output
+FY20 FY21 FY22 FY23 FY24 FY25 FY26E
+EML Laser Shipments, Units
+>8X
+Expansion
+© 2026 Lumentum Operations LLC      6 
+Expect to add an 
+additional 
+50%+ 
+EML unit capacity by 
+end CY26 vs. end CY25
+Source: Lumentum
+Fiscal Year
+© 2026 Lumentum Operations LLC      7 
+InP Optical Lane Demand from AI Data Centers 
+Navigating the InP Capacity Shortage
+© 2026 Lumentum Operations LLC      7 
+CY26 CY27 CY28 CY29 CY30
+ LITE InP lane volume demand
+ LITE lane capacity forecast Industry Tailwinds: 
+Expect 85% CAGR in InP 
+optical lane volume demand 
+for EML, CW, and UHP lasers
+Unmatched Scale: 
+Lumentum is growing from 
+the industry’s largest InP 
+wafer fab baseline
+Source: Lumentum; InP capacity model based on top-down and bottom-up triangulation
+~85%
+Lane Unit 
+CAGR
+Calendar Year
+© 2026 Lumentum Operations LLC      8 
+Cloud 
+Transceivers
+Four Engines Driving Lumentum’s Growth
+OCS Scale-Out 
+CPO
+Scale-Up 
+CPO
+© 2026 Lumentum Operations LLC      8 
+© 2026 Lumentum Operations LLC      9 
+Turning Point Reached in Cloud Transceivers
+Entered “lead pack” of suppliers for 1.6T—better 
+engineering execution
+Profitability Improving; higher yields and volume 
+loading
+1.6T volume shipments start this summer
+Vertical integration (CW lasers) expected CQ3
+© 2026 Lumentum Operations LLC      9 
+© 2026 Lumentum Operations LLC      10 
+OCS Ramping to >$1B 2027 Run Rate
+March 2026 update: New multi-year, multi-billion-dollar 
+OCS agreement reached
+Order backlog of $400M+ to be fulfilled in 2H CY26
+Field-proven reliability
+Elegant design lends itself to high-volume manufacturing
+Future-proofed via wavelength-agnostic architecture and 
+native high-radix scalability
+© 2026 Lumentum Operations LLC      10 
+© 2026 Lumentum Operations LLC      11 
+Building Capacity to Meet UHP demand
+CY25 CY26 CY27 CY28 CY29 CY30
+UHP Laser Chip [Units]
+>200%
+CY25 – CY30 
+Unit CAGR
+Initial supply out of San Jose, CA facility
+Starting late summer 2027, begin 
+incremental shipments out of UK fab
+Working to ‘presell’ remaining capacity 
+to a small handful of customers
+New fab to 
+augment 
+capacity
+© 2026 Lumentum Operations LLC      11 
+Calendar Year
+© 2026 Lumentum Operations LLC      12 
+New UHP Laser Fab to Generate $5B 
+Annual Revenue Capacity
+▪ Acquired from Qorvo—Greensboro, NC
+▪ Fully operational fab with compound semiconductor equipment
+▪ Deal closed today (March 17, 2026)
+▪ Expect to be ramping UHP production by early 2028
+© 2026 Lumentum Operations LLC      12 
+
+© 2026 Lumentum Operations LLC      13 © 2026 Lumentum Operations LLC      13 
+Scale-Out in FY27 Starts CPO Pipeline
+Success of scale-out switches and CPO attach rates 
+remains an underappreciated catalyst for growth
+Existing capacity can support multi-hundred-million UHP 
+revenue in CY27
+Future expansion into ELS to increase opportunity by 
+~2X above UHP chips alone
+Engaging multiple hyperscaler customers with turnkey 
+ELS support
+© 2026 Lumentum Operations LLC      13 
+© 2026 Lumentum Operations LLC      14 
+“Copper Wall” Requires Scale-Up CPO
+Generational shift to optical as copper begins to reach limits
+First scale-up CPO shipments expected by late CY27
+Scaling fiber bandwidth by integrating multi-wavelength 
+variants into UHP laser platform
+Engaging multiple hyperscaler and chipset customers with 
+turnkey ELS support
+ 
+© 2026 Lumentum Operations LLC      14 
+© 2026 Lumentum Operations LLC      15 
+Four Engines Driving Lumentum’s Growth
+© 2026 Lumentum Operations LLC      15 
+Cloud Transceivers: 
+Focused on small number of 
+customers
+Improving Profitability
+OCS:
+Data traffic at scale
+>$1B ramp in CY27
+Scale-out CPO: 
+Anchor UHP platform
+Multi-hundred-million-dollar 
+ramp in CY27
+Scale-up CPO:
+Phase 1 is 3X – 4X larger than 
+scale-out CPO
+Unlocks new InP fab
+© 2026 Lumentum Operations LLC      16 
+Operating at
+Cloud Velocity
+WUPEN YUEN
+President, Global Business Units
+© 2026 Lumentum Operations LLC      17 
+Intelligence at Scale: 
+AI is Redefining Data Traffic Demand
+80%
+20%
+East-West
+North-South
+2026 Total Global Traffic: 
+65 – 95 ZB
+Traffic Type Primary Drivers
+East-West 
+(Intra-Data Center)
+xPU-to-xPU clusters, 
+AI model training
+North-South 
+(External)
+User requests, 
+video streaming, 5G 
+© 2026 Lumentum Operations LLC      17 
+Key attributes of AI data flow:
+▪ Highest scale-out and scale-up bandwidth
+▪ Non-blocking network
+▪ Low latency
+▪ Massive “Elephant” flows
+© 2026 Lumentum Operations LLC      18 
+2023 2024 2025 2026F
+The Optical Arms Race: Hyperscalers Battle for AI Compute
+Source: Customer public CapEx announcements
+>70%
+YoY Growth
+$650B+
+AWS
+Google
+Meta
+Microsoft
+$380B
+TOP 4 CLOUD CAPEX
+TSMC projects that 
+AI semiconductor revenue CAGR
+will grow in the 
+mid-to-high 50s%
+range from 2025 – 2030 
+© 2026 Lumentum Operations LLC      18 
+© 2026 Lumentum Operations LLC      19 
+The Optical Arms Race: Hyperscalers Battle for AI Compute
+Increasing Compute Shoreline Through 
+Optical Evolution
+CPO Scale
+-
+Out
+Phase 0
+CPO Scale
+-
+Up
+Phase 1
+CPO Scale
+-
+Up
+Phase 2
+More HBM & Compute Chiplets
+xPU
+ 
+Packaging 
+Evolution
+Backplane 
+Evolution
+Full Copper 
+Backplane
+Hybrid Copper/
+Optical Backplane
+Full Copper 
+Backplane
+Compute 
+Domain
+Evolution
+CPO links between switches 
+Single-rack compute cluster
+3X to 4X CPO links, including inter-racks 
+Multi-rack compute cluster
+3X to 4X CPO links vs. Phase 1, incl. intra-rack 
+More racks per compute cluster
+OCS 
+Evolution
+ Medium Radix
+64x64 
+High Radix
+300x300
+High Radix
+300x300 
+Spine/Super Spine Switch Scale-Up Switch (~10K XPUs)Scale-Up Switch (~1K XPUs)
+© 2026 Lumentum Operations LLC      19 
+© 2026 Lumentum Operations LLC      20 
+© 2026 Lumentum Operations LLC      20 
+CPO: 
+“The ultimate interconnect”
+High-Speed 
+Lasers:
+Fastest path to scale 
+cluster bandwidth
+Optical 
+Transceivers: 
+Complementary to CPO
+OCS: 
+The switch for 
+massive data flow
+Key Optical Elements for 
+Scaling AI Clusters
+© 2026 Lumentum Operations LLC      21 
+0
+1
+2
+3
+4
+5
+6
+7
+Maximum Reach [meters]
+Total Bandwidth (Standard)
+400G 800G 1.6T 3.2T
+Passive Copper
+CPO: “The Ultimate Interconnect”
+Optical Domain
+Standard Rack Height (2.2m)
+Copper Domain
+At 1.6T, optical required 
+between racks
+At 3.2T, optical links required 
+within racks (hybrid)
+  
+Reach (m)
+© 2026 Lumentum Operations LLC      21 
+Retimed Copper
+© 2026 Lumentum Operations LLC      22 
+EMLs: Growing Volume at 1.6T; Setting the Standard at 3.2T
+Data Rate EML-Based 
+Transceivers
+SiPho-Based 
+Transceivers
+1.6T
+(8x200G)
+One chip per transmitter;
+proven transceiver yields; 
+improved BW per fiber
+InP + SiPho per transmitter; 
+all channels must be yielded 
+simultaneously; 
+more complex supply chain
+3.2T 
+(8x400G)
+Extension of 1.6T platform 
+and its benefits by 400G 
+differential EML
+SiPho does not have sufficient 
+bandwidth for 400G/lane; 
+Replacement materials unproven 
+in mass production
+© 2026 Lumentum Operations LLC      22 © 2026 Lumentum Operations LLC      22 
+Expect EMLs to become de facto standard at 400G per lane (3.2T era)
+© 2026 Lumentum Operations LLC      23 © 2026 Lumentum Operations LLC      23 
+High-Speed Lasers: Scaling I/O Bandwidth Effectively 
+Lumentum EML Enables 
+Highest Speed Modules
+Year Lumentum EML Optical I/O Milestone
+2008 25G/28G (NRZ) 100G (4x25G) QSFP28
+2016 56G (PAM4) 400G (8x50G) Pluggables
+2019 112G (PAM4) 800G Pluggables 
+2022 224G (PAM4) 1.6T Pluggables
+2025 448G 3.2T per Port
+2006 2008 2010 2012 2014 2016 2018 2020 2022 2024 2026
+Launch Year 
+Data Rate 
+(Gb/sec)
+25G NRZ
+43G NRZ
+106G
+PAM4
+56G 
+PAM4
+106G 
+PAM4 Differential Drive
+224G
+PAM4
+200G
+PAM4
+384G
+PAM8
+225G 
+PAM4 10km 
+400G 
+PAM4
+226G PAM4 
+Differential 
+Drive
+448G 
+DD-EML
+400G EMLs 
+enable 3.2T era
+Lumentum Leads EML Evolution
+© 2026 Lumentum Operations LLC      24 © 2026 Lumentum Operations LLC      24 
+High-Speed 
+Lanes in AI 
+Data Centers 
+Shifting to InP
+EML volume will continue to grow with 1.6T and 3.2T modules for 
+excellent performance, applicability, scale, and supply chain maturity 
+LANES IN 
+2025
+InP
+91%
+VCSEL
+9%
+LANES IN 
+2030F
+InP
+79%
+VCSEL
+21%
+Source: LightCounting: Optics for AI, Jan 2026
+LANES IN 
+2022
+InP
+44%VCSEL
+56%
+© 2026 Lumentum Operations LLC      25 
+© 2026 Lumentum Operations LLC      25 
+Customers driving toward highest bandwidth per fiber
+Shifting to 1.6T speeds, followed by 3.2T
+Vertical integration with leading laser and PIC technologies
+Participating early in life and ramp cycles
+Cloud Transceivers: Breaking New Ground
+© 2026 Lumentum Operations LLC      26 
+Decades of Innovations in 
+MEMS-Based Optical Switching
+2010
+Mini WSS
+(50 & 100GHz) 
+2000
+MEMS team formed
+2002
+1D MEMS array
+2004
+2D MEMS 
+array
+2008
+Low-drift MEMS
+2010
+Comb drive
+2012
+New MEMS
+2019
+Reduced drive 
+voltage + high 
+reliability DAC
+2024
+Large 2D 
+array for OCS
+2005
+1st multi-port WSS
+(50GHz & 100GHz) 2011
+1xN high durability switch
+2012
+TrueFlex® OCM
+2019
+TrueFlex® 8x24 
+C-WSS
+2024
+TrueFlex® 
+16x24 C-WSS
+2022
+New drive 
+structure
+
+© 2026 Lumentum Operations LLC      27 
+Note: WSS = Wavelength Selective Switch
+Unlocking Data 
+Center Scale: 
+The Case for 
+MEMS-Based 
+OCS
+Lumentum’s 
+MEMS-Based 300x300 OCS
+Insertion Loss Superior: ~1.5 dB
+Return Loss Excellent: < -50 dB
+Signal Integrity Transparent to wavelength & data rate
+Propagation 
+Latency Low and fixed: 10s of nanoseconds
+Power 
+Consumption Low: <10% of packet switches
+Reliability Proven through 20+ years field data
+Manufacturability Proven in high-volume manufacturing
+Roadmap 
+Extendibility Well suited for various-radix applications
+© 2026 Lumentum Operations LLC      27 
+© 2026 Lumentum Operations LLC      28 
+Expanding OCS Use Cases to Scale AI Networking
+Use Case Port-to-xPU Ratio Driver
+Scale-Up (today) 1.5:1 Topology enablement & 
+cluster resiliency
+Scale-Up (future) 2:1 to 10:1 Increased bandwidth; multiple 
+customers and use cases
+Spine and Super-Spine for 
+Scale-Out or Scale-Across 0.2:1 to 1:1 Inter-cluster routing
+© 2026 Lumentum Operations LLC      28 
+© 2026 Lumentum Operations LLC      29 
+OCS Production Ramp
+CY25 CY26 CY27 CY28
+OCS [Units]
+>150%
+CY25 – CY28 
+Unit CAGR
+25+ years of MEMS engine expertise 
+now deployed in the data center 
+Field-proven reliability, performance, 
+and scale
+Upside scenario: new scale-up 
+application
+Upside 
+scenario
+© 2026 Lumentum Operations LLC      29 
+© 2026 Lumentum Operations LLC      30 
+2025 2030F
+Optical AI TAM Forecast
+Lumentum is well-positioned to address all optical TAM growth drivers
+Sources: LightCounting: Market Forecast, Oct 2025, LightCounting: Optics for AI Jan 2026, 650 Group, Lumentum estimates
+Note: AI datacom transceivers as defined by LightCounting
+~40%
+CAGR
+industry
+revenue
+$90B+
+$18B
+DCI 
+(incl. Scale 
+Across)
+Scale-Out
+Scale-Up
+OCS
+2030 BANDWIDTH 
+ESTIMATE
+Scale-up
+45%
+Scale-out
+55%
+© 2026 Lumentum Operations LLC      30 
+© 2026 Lumentum Operations LLC      31 
+OFC Technology Demonstrations
+Investor Tours @ Lumentum Booth
+Two joint demos with NVIDIA: 
+• Lumentum Ultra-High-Power 
+(UHP) Laser in an NVIDIA 
+1.6T 2xDR4 OSFP module 
+• Lumentum 200G EMLs in an 
+NVIDIA 1.6T 2xDR4 OSFP 
+module 
+1.6T 2xDR4 Module
+8x200G Scale-Out
+• 1.6T DR4 OSFP module 
+with 400G differential EMLs
+1.6T DR4 OSFP Module
+4x400G Scale-Out
+VCSEL Array
+• VCSEL-based Scale-Up 
+Interconnect   
+• 800 mW Super-High-Power 
+(SHP) Laser 
+• 16-Channel DWDM Ultra-High-
+Power (UHP) Laser
+SHP & DWDM UHP Lasers
+Next-Gen Scale-Up
+• Multi-rail DGE with 
+Integrated OCM 
+ 
+• Multi-rail Coherent OCM
+OCM
+DGE OCM
+Multi-Rail Scale-Across
+© 2026 Lumentum Operations LLC      32 
+Investing for 
+Rapid Growth
+WAJID ALI
+EVP and CFO
+
+© 2026 Lumentum Operations LLC      33 
+Increased operational scale to deliver significant profit expansion
+▪ Grow top line revenue 
+▪ Hybrid manufacturing strategy 
+for back-end assembly
+▪ Leverage fixed manufacturing 
+and operating costs
+Expand Operating Margin
+▪ R&D investment for product 
+differentiation
+▪ Strategic CapEx for wafer fabs 
+▪ Unlock $5B annual revenue 
+capacity with new fab
+Invest for Growth
+Operating Strategy to Optimize Profitability
+▪ Reduce net debt
+▪ Increase operating cash flow 
+▪ Strengthen balance sheet 
+for organic & inorganic growth
+$
+Optimize Capital Structure
+© 2026 Lumentum Operations LLC      34 
+Record Backlog Due to AI Infrastructure Investment
+Product Area Lumentum’s 
+Current Backlog
+Laser chips (EML, CW) >2 years
+UHP Multi-year
+Cloud transceivers >1 year
+DCI/Telecom >1 year
+OCS Multi-year
+200G PAM4 EML
+© 2026 Lumentum Operations LLC      34 
+© 2026 Lumentum Operations LLC      35 
+MAKE (Insource)
+Short lifecycle products
+IP-sensitive builds
+Laser chip products
+BUY (Outsource)
+Widely available 
+manufacturing processes
+IP-insensitive steps
+of the production flow
+MAKE + BUY 
+(Hybrid)
+Tariff risk mitigation & 
+supply-chain agility
+In-house learning before 
+outsourcing
+Engaging with 7+ 
+Contract 
+Manufacturers
+Hybrid Manufacturing to Increase Scale
+© 2026 Lumentum Operations LLC      36 © 2025 Lumentum Operations LLC      36 
+New Growth Drivers
+25%
+Balance
+75%
+Guidance 
+Midpoint 
+$805M
+Q3 FY26
+Revenue > $2B
+Future quarter
+New Growth Drivers
+60%
+Balance
+40%
+New Growth Drivers Comprise 60% 
+of Revenue Mix at $2B/Quarter
+© 2026 Lumentum Operations LLC      37 
+$805M
+$2,000M
+Q3'26
+Guidance
+Midpoint
+$2B Target
+>
+Balanced growth across 
+the AI product portfolio
+AI-Driven Evolution to 
+$2B/Quarter and Beyond
+CPO
+(Scale-out)
+Cloud 
+Transceivers
+OCS
+EML, DCI 
+components
+▪ New fab with $5B annual run rate capacity
+▪ CPO scale-out
+▪ CPO phase 1 scale-up
+▪ OCS new use cases
+▪ Cloud transceivers
+▪ EML 
+▪ DCI, including scale across
+Growth drivers above $2B/quarter
+© 2026 Lumentum Operations LLC      38 
+Non-GAAP Model
+Target Financial Model
+Targeting >1,000 bps OM expansion in <2 years
+New fab with $5B annual run rate capacity to contribute meaningfully beyond $2B/quarter
+*Source: FactSet, March 17, 2026, consensus estimates on LITE
+Note: This is a target model and is not intended to represent guidance on actual outcomes. Actual results and timing is subject to the various assumptions and other risks and uncertainties. 
+FY26 Consensus 
+Estimates*
+$1.25B Quarterly 
+Revenue
+$2B Quarterly 
+Revenue
+Annualized Revenue $2.9B $5B $8B
+Gross Margin 43% 45 – 48% 49 – 52%
+Operating Expenses 16% 11 – 12% 10 – 11%
+Operating Margin 27% 33 – 37% 38 – 42%
+© 2026 Lumentum Operations LLC      39 
+Structural cost savings & 
+cloud growth will drive 
+>1,000 bps of 
+op margin expansion
+Key Takeaways
+Funding manufacturing 
+capacity and R&D for
+AI data center 
+opportunities
+Driving to >$2B 
+quarterly revenue at 
+~40% operating margin
+
+© 2026 Lumentum Operations LLC      40 
+40
+Q&A
+© 2026 Lumentum Operations LLC      41 
+41
+Thank You
+© 2026 Lumentum Operations LLC      42 

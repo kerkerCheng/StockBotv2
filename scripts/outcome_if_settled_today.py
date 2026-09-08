@@ -425,6 +425,8 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
         )
 
     _append_ranking_snapshot()
+    _render_live_lane(results, _live_fills())
+    _render_chase_check(results)
 
 
 def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None) -> None:
@@ -487,9 +489,6 @@ def _append_ranking_snapshot() -> None:
         print(f"\n（排序快照已 append：{len(order)} 檔 → {out.name}）")
     except Exception:  # noqa: BLE001 — 快照缺一天不影響報告
         pass
-
-    _render_live_lane(results, _live_fills())
-    _render_chase_check(results)
 
 
 def _live_fills() -> dict[str, list[dict]]:
