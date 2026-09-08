@@ -461,6 +461,12 @@ def build_beta_artifact(report: Mapping[str, Any], *, series_by_key: Mapping[str
         key = str(row.get("price_series_key") or "")
         series = _series_rows(series_by_key.get(key))
         item["series"] = series
+        # 看股網站式的「價格」：最新完整交易日的收盤，不是即時價。報價單位目前沒有 SSOT 可帶
+        # （Engine C／policy 都沒有每檔的 quote unit 欄位）——寫 None，畫面標「未登記」，不猜。
+        item["latest_close"] = None if not series else {
+            "session_date": series[-1]["session_date"], "close": series[-1]["close"],
+            "quote_unit": None,
+            "note": "最新完整交易日收盤（provider 報價單位原值；單位未登記、未換算），不是即時價"}
         item["series_note"] = (
             f"Engine C 觀測序列自 {series[0]['session_date']} 起（{len(series)} 個已收盤交易日；"
             "只含 data_status=observed 的日子，會隨每日 ETL 變長）；數值是 provider 報價單位的原值，"

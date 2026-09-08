@@ -1252,6 +1252,19 @@ function instrumentCard(inst) {
   card.appendChild(head);
 
   const hb = inst.heartbeat || {};
+  // 價格先於一切（看股網站的讀法）：最新完整交易日收盤＋1 日漲跌；單位未登記就明說，不猜。
+  const latest = inst.latest_close;
+  const priceRow = el('div', 'numbers');
+  if (latest && typeof latest.close === 'number') {
+    priceRow.appendChild(numberBlock('收盤（' + (latest.session_date || '—') + '）',
+      fmtNumber(latest.close, decimalsFor(latest.close)) || '—',
+      latest.quote_unit ? latest.quote_unit : '報價單位未登記（provider 原值）'));
+  } else {
+    priceRow.appendChild(numberBlock('收盤', '—', '沒有已收盤觀測——不是 0'));
+  }
+  priceRow.appendChild(numberBlock('1 日', signedPct(hb.return_1d, 1), hb.session_date ? '至 ' + hb.session_date : '',
+    typeof hb.return_1d === 'number' ? signClass(hb.return_1d) : ''));
+  card.appendChild(priceRow);
   const hbRow = el('div', 'hb');
   const dateNode = el('span');
   dateNode.appendChild(document.createTextNode('最新完整交易日 '));

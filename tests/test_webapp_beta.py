@@ -196,6 +196,16 @@ def test_freshness_identity_tracks_states_not_prices() -> None:
     assert c["freshness_identity"] != a["freshness_identity"]
 
 
+def test_latest_close_is_the_last_observed_session_not_a_live_price() -> None:
+    payload = fake_beta_payload()
+    qqq, tw = payload["instruments"]
+    assert qqq["latest_close"]["close"] is qqq["series"][-1]["close"]
+    assert qqq["latest_close"]["session_date"] == "2026-09-04"
+    assert qqq["latest_close"]["quote_unit"] is None      # 沒有 SSOT 就不猜單位
+    assert "不是即時價" in qqq["latest_close"]["note"]
+    assert tw["latest_close"] is None                       # 沒有序列就沒有價格，不是 0
+
+
 def test_state_kind_registered_and_validates() -> None:
     assert "beta" in STATE_KINDS
     payload = fake_beta_payload()
