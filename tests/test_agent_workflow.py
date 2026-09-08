@@ -211,6 +211,40 @@ def test_the_declared_step_result_count_matches_the_actual_block() -> None:
     assert "八欄" in heading, f"標題宣告的欄數與實際不符：{heading!r}"
 
 
+HUMAN_SUMMARY_LINES = ("做了什麼", "為什麼重要", "現在在哪", "下一步")
+NEXT_STEP_SEGMENTS = ("What", "Why now", "After this")
+
+
+def test_human_summary_is_specified_in_both_canonical_files() -> None:
+    """人話那幾行也要被數。
+
+    ⚠ 同 `八欄` 那條的教訓：一個手寫的宣稱若沒有東西去數它，它會安靜地少一行
+    （L14）。這裡數的是「四行問句」與「下一步的三段」，因為少任何一個，
+    使用者就得回頭問「所以這對我的目標做了什麼／為什麼現在做」。
+    """
+    runner = DEV_FLOW.read_text(encoding="utf-8")
+    model = WORKFLOW.read_text(encoding="utf-8")
+    for name, text in (("執行檔", runner), ("模型檔", model)):
+        assert "HUMAN SUMMARY" in text, f"{name} 少了 HUMAN SUMMARY 規格"
+        for line in HUMAN_SUMMARY_LINES:
+            assert line in text, f"{name} 的 HUMAN SUMMARY 少了「{line}」"
+        for segment in NEXT_STEP_SEGMENTS:
+            assert segment in text, f"{name} 的「下一步」少了 {segment} 段"
+
+
+def test_human_summary_never_replaces_the_eight_fields() -> None:
+    """它是**另一個問題**的答案，不是八欄的摘要——兩份文件都要寫明這件事，
+    否則下一個 agent 會把八欄壓縮一遍交差，而那等於什麼都沒加。"""
+    runner = DEV_FLOW.read_text(encoding="utf-8")
+    model = WORKFLOW.read_text(encoding="utf-8")
+    assert "不是摘要與被摘要的關係" in runner
+    assert "不是八欄的摘要" in model
+    for text in (runner, model):
+        assert "HUMAN SUMMARY 在前" in text or "在 `STEP_RESULT` 之前" in text, (
+            "必須寫明輸出順序：人話在前、證據在後"
+        )
+
+
 def test_r2_has_exactly_six_auto_triggers() -> None:
     """R2 是唯一會花第二份 token 的路徑，trigger 清單必須維持六條且可數。
 

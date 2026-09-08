@@ -2,7 +2,7 @@
 name: development-flow
 description: >
   開發請求的統一入口：先做一次便宜的 scope triage（Zoom Level），再決定要多遠的 review
-  （Review Level），最後以固定八欄的 STEP_RESULT 交回使用者。當使用者提出任何「改程式、
+  （Review Level），最後以「HUMAN SUMMARY（人話 5–10 行）＋固定八欄 STEP_RESULT」交回使用者。當使用者提出任何「改程式、
   改 config、改 schema、改呈現邏輯」的請求時使用——包含「我想做 X」「這裡壞了」「加一個
   功能」「重構 XXX」「這個能不能改成…」「zoom out」。它不是另一個 agent，預設由當前主
   agent 在既有 context 內完成，不 spawn。研究請求（改變「我知道什麼」）不走本 skill，
@@ -167,6 +167,39 @@ Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis
 
 ---
 
+## Step 4.5｜HUMAN SUMMARY（先講人話，預設 5–10 行）
+
+**八欄回答「這個結果可不可信」；HUMAN SUMMARY 回答「這對我的目標意味著什麼」。**
+兩者問的不是同一件事，所以**不是摘要與被摘要的關係**——把八欄壓縮一遍充當它，等於什麼都沒加。
+
+輸出順序固定：**HUMAN SUMMARY 在前，`STEP_RESULT` 在後。**
+
+```text
+HUMAN SUMMARY
+做了什麼：<產品／責任層一句話——使用者拿到什麼能力。不先出現 module／class／artifact 名稱>
+為什麼重要：<它讓使用者離 Phase goal 更近在哪一步>
+現在在哪：<一行 progress map：✅ 已完成 → ▶ 這一步 → ○ 剩餘主要 Step；每項用看得懂的名字>
+下一步：What — <實際會做什麼>
+        Why now — <為什麼現在做它最合理>
+        After this — <做完後這個 Phase 還缺什麼>
+```
+
+**五條硬要求：**
+
+1. **預設 5–10 行。** 超出就是第二份報告——使用者會兩份都不讀。
+2. **roadmap／內部 ID 不得單獨出現。** 首次出現必須同時給 plain-language title，例如
+   `B2b — 把研究缺口與事件監看搬成 APP 可持久讀取的狀態`；同一份輸出內第二次起可只用 ID。
+3. **工程證據留在八欄**：測試數、bytes、函式／模組／artifact 名稱不進這一段。
+   **唯一例外**是那個數字本身會改變使用者的產品判斷（例：「只有四檔有資料，其餘要手動跑」）。
+4. **progress map 只列 Phase 的主要 Step**，不列子任務、不列內部編號。
+5. **「下一步」三段缺一不可。** 少了 `Why now`，使用者無從判斷要不要現在做；
+   少了 `After this`，他答應之後仍不知道距離終點還有多遠。
+
+⚠ 這一節**不改變任何 routing**：Zoom／Review 判定、`GO` 的語意、八欄內容一律不動，
+也不新增 agent 或 canonical 檔。它只規定「先給人看的那幾行長什麼樣」。
+
+---
+
 ## Step 5｜STEP_RESULT（八欄，缺一不可）
 
 ```
@@ -182,6 +215,8 @@ Suggested next Step:  ＋它的 success criteria（**只是建議**）
 ```
 
 然後 **`AWAITING_HUMAN`**。
+
+⚠ 八欄之前必須先有 `HUMAN SUMMARY`（Step 4.5）——兩者一起交回，缺任一半都不算交付。
 
 ---
 
