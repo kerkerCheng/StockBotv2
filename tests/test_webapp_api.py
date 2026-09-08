@@ -337,3 +337,58 @@ def test_price_series_is_context_not_a_signal(client) -> None:
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
     for banned in ("sma", "SMA", "rsi", "RSI", "macd", "MACD", "均線", "突破"):
         assert banned not in block, f"走勢圖不得帶動能指標：{banned}"
+
+
+def test_no_row_ever_defers_to_an_expansion_that_does_not_exist() -> None:
+    """「見下方展開」是這一輪回饋的正中紅心：那句話什麼都沒說，**而且假裝有下文**。
+
+    2026-09-08 使用者原話：「感覺很多地方你就只是收乾淨而寫『見展開』」。事發位置是
+    `renderRow`——值是結構化物件時它印「見下方展開」，而底下並沒有那個展開。
+    現在每一種形狀都有一句人話（`structuredText`），認不得的退回逐格 `鍵：值`
+    （`keyValueList`），所以**沒有任何一條路徑會產生「請看別處」**。
+
+    ⚠ 禁的是它**當成畫面文字**（單引號字串），不是提到這四個字——註解裡刻意留著
+    這段歷史，那正是防止它被寫回來的剎車。
+    """
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "'見下方展開'" not in source, "又出現「見下方展開」——那是把問題推給一個不存在的展開"
+    block = source.split("function renderRow(label, datum)", 1)[1]
+    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+    assert "structuredText(datum)" in block, "結構化的值必須被翻成人話"
+    assert "keyValueList(datum.value)" in block, "認不得的形狀也要看得到內容，不能留白"
+    # 逐格標籤也走白話別名（先前這裡直接印 read model 的 display_label）
+    rows = source.split("function renderRows(lines, filterRoles)", 1)[1]
+    rows = re.split(r"\n(?:async )?function ", rows, maxsplit=1)[0]
+    assert "plainLine(line.key, line.display_label)" in rows
+
+
+def test_versus_market_is_a_real_comparison_table() -> None:
+    """「我們和市場差在哪」必須是一張看得懂的表，不是三列「見下方展開」。
+
+    先前這張卡用 `renderRows` 印 `comparison` 那三列，而那三列的值全是結構化物件——
+    於是整張卡等於空的。現在是四欄：項目／我們估／市場共識／我們比市場。
+    """
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    block = source.split("function versusMarketCard(view)", 1)[1]
+    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+    for token in ("COMPARE_ROWS", "'我們估'", "'市場共識'", "'我們比市場'"):
+        assert token in block, f"比較表少了 {token}"
+    assert "renderRows(" not in block, "比較表不得退回 renderRows——那正是空表的來源"
+    # 市場沒有共識的那一列不留白也不寫 0：印缺席徽章＋理由
+    assert "absenceBadge(gap.absence_kind)" in block
+
+
+def test_full_detail_has_exactly_one_level_of_expansion() -> None:
+    """「完整細節」點一次就是全部——展開裡不得再套展開。
+
+    2026-09-08 使用者原話：「太多展開」。先前是七個 details，每個裡面還有第二層
+    details，摘要一律寫著「展開：某某（N 項）」。現在六個面板的內部一律用 `group()`
+    （有標題、直接看得到內容），只有最外層那一個 `drill()`。
+    """
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    panels = source.split("function renderHeadline(view)", 1)[1].split("/* ---------- 白話別名", 1)[0]
+    assert "drill(" not in panels, "完整細節裡的面板不得再有第二層展開"
+    assert panels.count("group(") >= 6, "面板內容應改用 group()——有標題但直接看得到"
+    block = source.split("async function renderDetail", 1)[1]
+    block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+    assert block.count("drill(") == 1, "單檔頁只准有一個展開（就是「完整細節」那一個）"

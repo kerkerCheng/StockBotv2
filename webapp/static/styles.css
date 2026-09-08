@@ -299,3 +299,16 @@ table.rank td.rank-anchor .dim { white-space: nowrap; }
 .table-view table { border-collapse: collapse; width: 100%; font-size: 12px; }
 .table-view th, .table-view td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
 .table-view th { color: var(--dim); font-weight: 600; font-size: 11px; }
+
+/* ---------- 單檔判讀：完整細節（2026-09-08 回饋後的收斂） ---------- */
+
+/* 我們 vs 市場的四欄比較表：欄少，不需要 rank 表的 640px 最小寬度（那會在手機上橫向捲）。 */
+table.rank.compare { min-width: 0; }
+table.rank.compare td:first-child { color: var(--muted); }
+
+/* 「完整細節」裡的面板：內嵌一層，用較深的表面色與細一點的內距與外層區隔。
+   ⚠ 這裡刻意**不再有第二層 <details>**——展開後就是全部。 */
+.full-detail > .panel { background: var(--surface-2); margin-top: 10px; padding: 12px 14px; }
+.full-detail > .panel:first-child { margin-top: 8px; }
+.group { margin-top: 10px; }
+.group > .group-title { margin-top: 0; }

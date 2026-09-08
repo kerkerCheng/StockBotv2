@@ -67,6 +67,135 @@ function signClass(value) {
   return value >= 0 ? 'pos' : 'neg';
 }
 
+/* 大數字的可讀寫法：10227652000 → 「102.3 億」。**只是排版**，與百分比的 ×100 同性質——
+   不換幣別、不改語意，原值仍放在 title 屬性裡隨時查得到。 */
+function fmtBig(n, unit) {
+  if (typeof n !== 'number' || !isFinite(n)) return null;
+  const abs = Math.abs(n);
+  let text;
+  if (abs >= 1e8) text = fmtNumber(n / 1e8, 1) + ' 億';
+  else if (abs >= 1e4) text = fmtNumber(n / 1e4, 1) + ' 萬';
+  else text = fmtNumber(n, decimalsFor(n));
+  return unit ? `${text} ${unit}` : text;
+}
+
+/* ---------- 結構化的值也要看得懂 ----------
+   2026-09-08 使用者回饋：「感覺很多地方你就只是收乾淨而寫『見展開』」。
+   說的就是這裡——值是物件時，先前那一列印的是「見下方展開」，而底下**沒有**那個展開。
+   一句「見下方展開」等於什麼都沒說，而且它假裝有下文。
+
+   現在每一種形狀都在這裡有一句人話；認不得的形狀退回逐格 `鍵：值`，**永遠看得到內容**。
+   ⚠ 這一層**不算任何新數字**：`relative_gap`／`growth`／`delta_fair_value` 都是 authority
+   已經算好的欄位，這裡只挑欄位、排版、翻標籤。 */
+function structuredText(datum) {
+  const v = datum && datum.value;
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+  const bits = [];
+
+  // ① 市場共識：平均值＋幾位分析師＋高低區間
+  if ('avg' in v && 'analyst_count' in v) {
+    if (typeof v.analyst_count === 'number') bits.push(`${v.analyst_count} 位分析師`);
+    if (typeof v.low === 'number' && typeof v.high === 'number') {
+      bits.push(`區間 ${fmtBig(v.low)}–${fmtBig(v.high)}`);
+    }
+    if (typeof v.growth === 'number') bits.push(`比去年 ${fmtPercent(v.growth)}`);
+    return { text: fmtBig(v.avg, v.currency), sub: bits.join('｜') };
+  }
+  // ② 我們 vs 市場：兩個數字與差距全在 datum 裡，不必再算
+  if ('internal' in v && 'consensus' in v) {
+    const ratio = datum.unit === 'ratio';
+    if (typeof v.relative_gap === 'number') bits.push(`我們比市場 ${fmtPercent(v.relative_gap)}`);
+    if (v.period) bits.push(v.period);
+    if (v.consensus_captured_at) bits.push(`共識取自 ${v.consensus_captured_at}`);
+    const ours = ratio ? fmtPercent(v.internal) : fmtBig(v.internal);
+    const theirs = ratio ? fmtPercent(v.consensus) : fmtBig(v.consensus);
+    return { text: `我們 ${ours}　市場 ${theirs}`, sub: bits.join('｜') };
+  }
+  // ③ 兩個指標的差距摘要（上面那兩列的濃縮版）
+  if ('eps' in v || 'revenue' in v) {
+    [['revenue', '營收'], ['eps', 'EPS']].forEach(([key, label]) => {
+      const item = v[key];
+      if (item && typeof item.relative_gap === 'number') {
+        bits.push(`${label} ${fmtPercent(item.relative_gap)}`);
+      }
+    });
+    if (bits.length) return { text: bits.join('　'), sub: '我們的估計相對市場共識' };
+  }
+  // ④ 五軸分數：宣告了什麼、實際採用什麼、為什麼被降級
+  if ('declared' in v && 'effective' in v) {
+    if (v.session_level_label) bits.push(v.session_level_label);
+    if (v.downgrade_reason) bits.push(`降級原因：${v.downgrade_reason}`);
+    return {
+      text: v.declared === v.effective ? String(v.effective) : `${v.effective}（宣告 ${v.declared}）`,
+      sub: bits.join('｜'),
+    };
+  }
+  // ⑤ 到期／催化劑監看
+  if ('days_to_expiry' in v || ('state' in v && 'label' in v)) {
+    if (typeof v.days_to_expiry === 'number') bits.push(`還有 ${v.days_to_expiry} 天到期`);
+    if (v.next_catalyst) bits.push(`下一個事件 ${v.next_catalyst}`);
+    if (v.next_catalyst_confidence) bits.push(`把握度 ${v.next_catalyst_confidence}`);
+    return { text: [v.label, v.state].filter(Boolean).join('｜'), sub: bits.join('｜') };
+  }
+  // ⑥ thesis 狀態
+  if ('status' in v && 'next_check' in v) {
+    bits.push(`下次核查 ${v.next_check || '未排定'}`);
+    if (v.next_check_source) bits.push(`依據 ${v.next_check_source}`);
+    return { text: String(v.status), sub: bits.join('｜') };
+  }
+  // ⑦ 自動失效能力：它會做什麼、不會做什麼
+  if ('overall' in v && 'capability' in v) {
+    if (v.capability) bits.push(v.capability);
+    if (v.does_not) bits.push(`不做：${v.does_not}`);
+    return { text: String(v.overall), sub: bits.join('｜') };
+  }
+  // ⑧ 敏感度：動一個假設，目標價變多少
+  if ('bump' in v && 'delta_fair_value' in v) {
+    bits.push(`假設變動 ${fmtNumber(v.bump, 3)} ${v.bump_unit || ''}`.trim());
+    bits.push(`目標價變 ${fmtBig(v.delta_fair_value)}`);
+    return {
+      text: typeof v.fair_value_relative === 'number'
+        ? fmtPercent(v.fair_value_relative) : fmtBig(v.delta_fair_value),
+      sub: bits.join('｜'),
+    };
+  }
+  // ⑨ 目標價與現價的差（**不是報酬**——報酬在結論那一段）
+  if ('fair_value' in v && 'current_price' in v) {
+    bits.push(`目標價 ${fmtBig(v.fair_value, v.unit)}`);
+    bits.push(`現價 ${fmtBig(v.current_price, v.unit)}`);
+    if (typeof v.implied_multiple_at_price === 'number') {
+      bits.push(`以現價回推的倍數 ${fmtNumber(v.implied_multiple_at_price, 1)}x`);
+    }
+    return {
+      text: typeof v.relative_gap === 'number' ? fmtPercent(v.relative_gap) : null,
+      sub: bits.join('｜'),
+    };
+  }
+  // ⑩ 持有區間
+  if ('horizon_start' in v && 'horizon_end' in v) {
+    if (typeof v.holding_period_days === 'number') bits.push(`${v.holding_period_days} 天`);
+    if (v.alignment) bits.push(v.alignment);
+    return { text: `${v.horizon_start} → ${v.horizon_end}`, sub: bits.join('｜') };
+  }
+  // ⑪ authority 自己組好的一句話——照抄，不改寫
+  if (v.one_sentence) return { text: null, sub: v.one_sentence };
+  if (v.note) return { text: null, sub: v.note };
+  return null;
+}
+
+/* 認不得的形狀：逐格 `鍵：值` 攤出來。醜，但**看得到**——這比一句「見下方展開」誠實。 */
+function keyValueList(obj) {
+  const box = el('div', 'row-reason');
+  box.textContent = Object.keys(obj).map((key) => {
+    const item = obj[key];
+    if (item === null || item === undefined) return `${key}：—`;
+    if (typeof item === 'number') return `${key}：${fmtBig(item)}`;
+    if (typeof item === 'object') return `${key}：${JSON.stringify(item)}`;
+    return `${key}：${item}`;
+  }).join('　');
+  return box;
+}
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -257,12 +386,15 @@ function renderRow(label, datum) {
   const row = el('div', 'row');
   row.appendChild(el('div', 'row-label', label));
   const text = valueText(datum);
+  const struct = text === null ? structuredText(datum) : null;
   if (text !== null) {
     const cell = el('div', 'row-value', text);
     if (datum.unit === 'ratio' && typeof datum.value === 'number') cell.classList.add(signClass(datum.value));
     row.appendChild(cell);
+  } else if (struct && struct.text) {
+    row.appendChild(el('div', 'row-value', struct.text));
   } else if (datum.value && typeof datum.value === 'object') {
-    row.appendChild(el('div', 'row-value', '見下方展開'));
+    row.appendChild(el('div', 'row-value', ''));   // 內容在下一行，不寫「見下方展開」
   } else {
     row.classList.add('row-absent');
     const cell = el('div', 'row-value');
@@ -270,14 +402,31 @@ function renderRow(label, datum) {
     if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
     row.appendChild(cell);
   }
+  if (struct && struct.sub) row.appendChild(el('div', 'row-reason', struct.sub));
+  else if (!struct && datum.value && typeof datum.value === 'object') {
+    row.appendChild(keyValueList(datum.value));
+  }
   if (datum.reason) row.appendChild(el('div', 'row-reason', datum.reason));
   return row;
 }
 
 function renderRows(lines, filterRoles) {
   const box = el('div', 'rows');
+  const seen = {};
+  let duplicates = 0;
   lines.filter((line) => !filterRoles || filterRoles.indexOf(line.role) >= 0)
-    .forEach((line) => box.appendChild(renderRow(line.display_label, line.datum)));
+    .forEach((line) => {
+      // 上游偶爾送來完全相同的兩列（同 key 同值，例如 COHR 的 FY2027 共識各出現兩次）。
+      // 這裡只印一次，**但把丟掉幾列講出來**——靜默去重會讓「沒有」與「被吃掉」同形（INV-3）。
+      const fingerprint = line.key + '|' + JSON.stringify(line.datum.value);
+      if (seen[fingerprint]) { duplicates += 1; return; }
+      seen[fingerprint] = true;
+      box.appendChild(renderRow(plainLine(line.key, line.display_label), line.datum));
+    });
+  if (duplicates) {
+    box.appendChild(el('div', 'row-reason',
+      `（上游送來 ${duplicates} 列與上面完全相同的重複資料，這裡只印一次。）`));
+  }
   return box;
 }
 
@@ -294,6 +443,15 @@ function panelShell(panel, title) {
   return node;
 }
 
+/* 展開裡不再套展開：`group` 是「有標題、但直接看得到內容」的區塊。
+   判準一句話——**使用者已經點開「完整細節」了，他要的就是內容**。 */
+function group(title, buildBody) {
+  const box = el('div', 'group');
+  box.appendChild(el('div', 'group-title', title));
+  box.appendChild(buildBody());
+  return box;
+}
+
 function drill(title, buildBody) {
   const node = document.createElement('details');
   node.appendChild(el('summary', null, title));
@@ -303,7 +461,7 @@ function drill(title, buildBody) {
 
 function renderHeadline(view) {
   const panel = view.headline;
-  const node = panelShell(panel, '① 頭條：現價 → future target → 隱含報酬');
+  const node = panelShell(panel, '結論那幾個數字的每一格');
   const lines = lineMap(panel);
 
   const numbers = el('div', 'headline-numbers');
@@ -357,9 +515,9 @@ function renderHeadline(view) {
   node.appendChild(meta);
   node.appendChild(el('p', 'note', basis.note));
 
-  node.appendChild(drill('展開：頭條的每一格（含缺席理由）', () => renderRows(panel.lines)));
+  node.appendChild(group('頭條的每一格（含缺席理由）', () => renderRows(panel.lines)));
   if (one && one.value) {
-    node.appendChild(drill('展開：這個數字裡多少是算術、多少是判斷', () => {
+    node.appendChild(group('這個數字裡多少是算術、多少是判斷', () => {
       const box = el('div', 'rows');
       const e = one.value;
       (e.deterministic || []).forEach((t) => box.appendChild(kv('確定性算術', t)));
@@ -372,7 +530,7 @@ function renderHeadline(view) {
     }));
   }
   if (panel.notes && panel.notes.length) {
-    node.appendChild(drill('展開：這一段不是什麼', () => listOf(panel.notes)));
+    node.appendChild(group('這一段不是什麼', () => listOf(panel.notes)));
   }
   return node;
 }
@@ -393,7 +551,7 @@ function listOf(items) {
 
 function renderFundamental(view) {
   const panel = view.fundamental;
-  const node = panelShell(panel, '② 我們預測什麼 vs 市場預測什麼');
+  const node = panelShell(panel, '我們與市場的完整預測');
   const groups = [
     ['internal', '我們的內部預測'],
     ['consensus_same_period', '同期、同口徑的市場共識（可比）'],
@@ -405,23 +563,22 @@ function renderFundamental(view) {
   groups.forEach(([role, title], index) => {
     const rows = (panel.lines || []).filter((line) => line.role === role);
     if (!rows.length) return;
-    node.appendChild(el('div', 'group-title', title));
-    // 前三組直接展開（那是消費者要的答案）；其餘收進 drill-down，避免首屏被淹掉。
-    if (index < 3) node.appendChild(renderRows(rows));
-    else node.appendChild(drill(`展開：${title}（${rows.length} 項）`, () => renderRows(rows)));
+    // 六組全部直接印出來。使用者已經點開「完整細節」了，再藏一層只是多一次摩擦。
+    node.appendChild(el('div', 'group-title', `${title}（${rows.length} 項）`));
+    node.appendChild(renderRows(rows));
   });
   const basis = basisDisplay((panel.context || {}).accounting_basis);
   node.appendChild(el('p', 'note',
     `內部口徑：${basis.label}（contract 值 ${basis.raw || 'null'}）。${(panel.context || {}).same_period_rule || ''}`));
   if (panel.notes && panel.notes.length) {
-    node.appendChild(drill('展開：這一段的警告與涵蓋率說明', () => listOf(panel.notes)));
+    node.appendChild(group('這一段的警告與涵蓋率說明', () => listOf(panel.notes)));
   }
   return node;
 }
 
 function renderWhy(view) {
   const panel = view.why;
-  const node = panelShell(panel, '③ 為什麼：最脆弱的假設在哪');
+  const node = panelShell(panel, '假設、敏感度、算式、證據');
   if (panel.weak_inputs && panel.weak_inputs.length) {
     node.appendChild(el('div', 'group-title', '最脆弱的輸入（依宣告好的列入規則，不是新判斷）'));
     const list = el('ul', 'weak');
@@ -445,10 +602,10 @@ function renderWhy(view) {
   byRole.forEach(([role, title]) => {
     const rows = (panel.lines || []).filter((line) => line.role === role);
     if (!rows.length) return;
-    node.appendChild(drill(`展開：${title}（${rows.length} 項）`, () => renderRows(rows)));
+    node.appendChild(group(`${title}（${rows.length} 項）`, () => renderRows(rows)));
   });
   if (panel.evidence && panel.evidence.length) {
-    node.appendChild(drill(`展開：證據來源（${panel.evidence.length} 條）`, () => {
+    node.appendChild(group(`證據來源（${panel.evidence.length} 條）`, () => {
       const box = el('div', 'rows');
       panel.evidence.forEach((item) => {
         const row = el('div', 'row');
@@ -465,7 +622,7 @@ function renderWhy(view) {
 
 function renderResearch(view) {
   const panel = view.research;
-  const node = panelShell(panel, '④ 研究現況：什麼會改變這個答案');
+  const node = panelShell(panel, '研究現況與五軸判斷');
   const rows = (panel.lines || []).filter((line) => line.role === 'thesis' || line.role === 'lifecycle');
   if (rows.length) node.appendChild(renderRows(rows));
 
@@ -484,20 +641,20 @@ function renderResearch(view) {
     node.appendChild(list);
   }
   if (panel.catalysts && panel.catalysts.length) {
-    node.appendChild(drill(`展開：催化劑（${panel.catalysts.length}）`, () => listOf(
+    node.appendChild(group(`催化劑（${panel.catalysts.length}）`, () => listOf(
       panel.catalysts.map((c) => [c.label, c.due, c.state].filter(Boolean).join('｜')))));
   }
   if (panel.checkpoints && panel.checkpoints.length) {
-    node.appendChild(drill(`展開：檢核點（${panel.checkpoints.length}）`, () => listOf(
+    node.appendChild(group(`檢核點（${panel.checkpoints.length}）`, () => listOf(
       panel.checkpoints.map((c) => [c.label, c.due, c.state].filter(Boolean).join('｜')))));
   }
   if (panel.risks && panel.risks.length) {
-    node.appendChild(drill(`展開：風險（${panel.risks.length}）`, () => listOf(panel.risks)));
+    node.appendChild(group(`風險（${panel.risks.length}）`, () => listOf(panel.risks)));
   }
   const scores = (panel.lines || []).filter((line) => line.role === 'score');
-  if (scores.length) node.appendChild(drill(`展開：五軸判斷（${scores.length}）`, () => renderRows(scores)));
+  if (scores.length) node.appendChild(group(`五軸判斷（${scores.length}）`, () => renderRows(scores)));
   if (panel.attention && panel.attention.length) {
-    node.appendChild(drill(`展開：需要重看的研究成果（${panel.attention.length}）`, () => listOf(
+    node.appendChild(group(`需要重看的研究成果（${panel.attention.length}）`, () => listOf(
       panel.attention.map((a) => `${a.artifact_type}：${a.state}｜${(a.reasons || []).join('；')}`))));
   }
   return node;
@@ -505,7 +662,7 @@ function renderResearch(view) {
 
 function renderEntry(view) {
   const panel = view.entry;
-  const node = panelShell(panel, '⑤ Entry threshold（optional，不影響 readiness）');
+  const node = panelShell(panel, '進場門檻（選配，不影響這份判讀完不完整）');
   node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
   node.appendChild(renderRows(panel.lines));
   return node;
@@ -525,7 +682,7 @@ function renderFreshness(payload) {
   node.appendChild(rows);
   node.appendChild(el('p', 'note', f.rule));
   if (payload.refresh.notes && payload.refresh.notes.length) {
-    node.appendChild(drill('展開：refresh 註記', () => listOf(payload.refresh.notes)));
+    node.appendChild(group('refresh 註記', () => listOf(payload.refresh.notes)));
   }
   return node;
 }
@@ -564,7 +721,7 @@ function renderReadiness(payload) {
       'optional 能力未提供：' + readiness.optional_unavailable.join('、') +
       '（**不影響** readiness——沒有 entry 判準不代表這檔研究不完整）'));
   }
-  node.appendChild(drill('展開：readiness 的判準原文', () => el('p', 'note', readiness.rule)));
+  node.appendChild(group('readiness 的判準原文', () => el('p', 'note', readiness.rule)));
   return node;
 }
 
@@ -683,7 +840,7 @@ function blockerCard(payload) {
     if (badge) head2.appendChild(badge);
     box.appendChild(head2);
     box.appendChild(el('div', 'attention-body', absenceLabel(item.absence_kind) || ''));
-    if (item.reason) box.appendChild(el('div', 'attention-body', truncate(item.reason, 260)));
+    if (item.reason) box.appendChild(el('div', 'attention-body', truncate(item.reason, 160)));
     node.appendChild(box);
   });
   flags.forEach((item) => {
@@ -712,13 +869,14 @@ function fragileCard(view) {
       plainLine(item.datum.key || '', item.display_label) + (text ? '：' + text : '')));
     const rule = (VOCAB && VOCAB.weak_input_rules && VOCAB.weak_input_rules[item.rule]) || item.rule;
     li.appendChild(el('span', 'rule', rule));
-    if (item.datum.reason) li.appendChild(el('span', 'rule', truncate(item.datum.reason, 200)));
+    if (item.datum.reason) li.appendChild(el('span', 'rule', truncate(item.datum.reason, 130)));
     list.appendChild(li);
   });
   node.appendChild(list);
-  if ((panel.weak_inputs || []).length > weak.length) {
-    node.appendChild(el('p', 'note', `另有 ${panel.weak_inputs.length - weak.length} 條較次要的，收在下方完整細節裡。`));
-  }
+  node.appendChild(el('p', 'note',
+    (panel.weak_inputs.length > weak.length
+      ? `另有 ${panel.weak_inputs.length - weak.length} 條較次要的，` : '這裡的理由是摘要，')
+    + '完整原文在下方「完整細節」裡，一個字沒少。'));
   return node;
 }
 
@@ -751,17 +909,107 @@ function disproofCard(view) {
   return node;
 }
 
+/* 我們 vs 市場：**一張表就是答案**。
+   2026-09-08 使用者回饋修正的就是這一塊——先前它只印 `comparison` 那三列，而那三列的值
+   是結構化物件，於是每一列都寫著「見下方展開」、底下卻沒有展開：一張看起來有內容的空表。
+   現在左邊是我們估、中間是市場共識、右邊是差多少；市場沒有共識的那一列**不留白也不寫 0**，
+   直接說是哪一種缺席。 */
+const COMPARE_ROWS = [
+  ['營收', 'internal_revenue', 'internal_vs_consensus_revenue'],
+  ['EPS（每股盈餘）', 'internal_eps', 'internal_vs_consensus_eps'],
+  ['營益率', 'internal_operating_margin', 'internal_vs_consensus_operating_margin'],
+];
+
 function versusMarketCard(view) {
   const panel = view.fundamental;
-  const rows = (panel.lines || []).filter((line) => line.role === 'comparison');
-  if (!rows.length) return null;
+  const lines = lineMap(panel);
+  const ctx = panel.context || {};
   const meta = plainPanel('fundamental', panel.title);
   const node = el('section', 'panel');
   node.appendChild(el('h2', null, meta.title));
   node.appendChild(el('div', 'panel-questions', meta.hint));
-  node.appendChild(renderRows(rows));
-  const basis = basisDisplay((panel.context || {}).accounting_basis);
-  node.appendChild(el('p', 'note', `口徑：${basis.label}。${(panel.context || {}).same_period_rule || ''}`));
+
+  const table = el('table', 'rank compare');
+  const headRow = el('tr');
+  [ctx.period ? `${ctx.period} 預測` : '預測項目', '我們估', '市場共識', '我們比市場']
+    .forEach((title) => headRow.appendChild(th(title)));
+  const thead = el('thead'); thead.appendChild(headRow); table.appendChild(thead);
+
+  const body = el('tbody');
+  const missing = [];
+  let printed = 0;
+  COMPARE_ROWS.forEach(([label, ourKey, gapKey]) => {
+    const ourLine = lines[ourKey];
+    const gapLine = lines[gapKey];
+    if (!ourLine && !gapLine) return;
+    const gap = gapLine && gapLine.datum;
+    const paired = gap && gap.value && typeof gap.value === 'object' && 'consensus' in gap.value;
+    const ratio = (ourLine && ourLine.datum.unit === 'ratio') || (gap && gap.unit === 'ratio');
+    const show = (n) => (n === null || n === undefined ? null
+      : (ratio ? fmtPercent(n) : fmtBig(n)));
+
+    const tr = el('tr');
+    tr.appendChild(el('td', null, label));
+
+    const ourValue = paired ? gap.value.internal : (ourLine && ourLine.datum.value);
+    const ourCell = el('td', 'rank-num', show(ourValue) || '—');
+    if (typeof ourValue === 'number') ourCell.title = String(ourValue);
+    tr.appendChild(ourCell);
+
+    if (paired) {
+      const consensusCell = el('td', 'rank-num', show(gap.value.consensus) || '—');
+      if (typeof gap.value.analyst_count === 'number') {
+        consensusCell.title = `${gap.value.analyst_count} 位分析師`;
+      }
+      tr.appendChild(consensusCell);
+      const relative = gap.value.relative_gap;
+      const gapCell = el('td', 'rank-num ' + signClass(relative),
+        typeof relative === 'number' ? fmtPercent(relative) : '—');
+      if (typeof gap.value.absolute_gap === 'number') {
+        gapCell.title = `絕對差 ${fmtBig(gap.value.absolute_gap)}`;
+      }
+      tr.appendChild(gapCell);
+      printed += 1;
+    } else {
+      const cell = el('td', 'rank-num');
+      const badge = gap ? absenceBadge(gap.absence_kind) : null;
+      if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
+      tr.appendChild(cell);
+      tr.appendChild(el('td', 'rank-num', '—'));
+      if (gap && gap.reason && missing.indexOf(gap.reason) < 0) missing.push(gap.reason);
+    }
+    body.appendChild(tr);
+  });
+  if (!body.childNodes.length) return null;   // 一列都沒有就不要留一張只有表頭的空表
+  table.appendChild(body);
+  const wrap = el('div', 'table-wrap');
+  wrap.appendChild(table);
+  node.appendChild(wrap);
+
+  if (!printed) {
+    node.appendChild(el('p', 'note',
+      '這一期沒有任何一項可以跟市場相減——上表的缺席理由就是原因，補資料的方向也在那裡。'));
+  }
+  missing.forEach((text) => node.appendChild(el('p', 'note', text)));
+
+  // 市場還說了什麼：賣方目標價與倍數。**這是別人的數字**，不是本系統的預期報酬。
+  const context = el('div', 'headline-numbers');
+  const target = lines.target_mean && lines.target_mean.datum;
+  const count = lines.analyst_count && lines.analyst_count.datum;
+  if (target && typeof target.value === 'number') {
+    context.appendChild(numberBlock('賣方目標價（均值）', fmtBig(target.value),
+      count && typeof count.value === 'number'
+        ? `${count.value} 家；不是我們的目標價` : '不是我們的目標價'));
+  }
+  const forwardPe = lines.forward_pe && lines.forward_pe.datum;
+  if (forwardPe && typeof forwardPe.value === 'number') {
+    context.appendChild(numberBlock('市場給的預估本益比', fmtNumber(forwardPe.value, 1) + 'x',
+      '以市場共識 EPS 計'));
+  }
+  if (context.childNodes.length) node.appendChild(context);
+
+  const basis = basisDisplay(ctx.accounting_basis);
+  node.appendChild(el('p', 'note', `口徑：${basis.label}。${ctx.same_period_rule || ''}`));
   return node;
 }
 
@@ -809,25 +1057,33 @@ async function renderDetail(ticker) {
   [blockerCard(payload), fragileCard(view), disproofCard(view), versusMarketCard(view)]
     .forEach((card) => { if (card) app.appendChild(card); });
 
+  // 完整細節：**一個展開，展開後就是全部**。先前這裡是七個 details，每個裡面還有第二層
+  // details，摘要一律寫著「展開：某某（N 項）」——那是把東西收乾淨，然後叫人再點一次。
   const details = el('section', 'panel');
   details.appendChild(el('h2', null, '完整細節'));
   details.appendChild(el('p', 'note',
-    '上面那幾塊是摘要，這裡一格都沒少：每個面板的每一欄、每個缺席理由、算式與證據都在。'));
-  details.appendChild(drill('展開：結論那幾個數字的每一格', () => renderRows(view.headline.lines)));
-  details.appendChild(drill('展開：我們與市場的完整預測', () => renderFundamental(view)));
-  details.appendChild(drill('展開：假設、敏感度、算式、證據', () => renderWhy(view)));
-  details.appendChild(drill('展開：研究現況與五軸判斷', () => renderResearch(view)));
-  details.appendChild(drill('展開：進場門檻（選配）', () => renderEntry(view)));
-  details.appendChild(drill('展開：這份判讀有多新', () => renderFreshness(payload)));
-  details.appendChild(drill('展開：這份判讀不是什麼', () => {
-    const box = el('div');
-    box.appendChild(listOf(view.limits || []));
-    if (view.warnings && view.warnings.length) {
-      box.appendChild(el('div', 'group-title', `組裝時的警告（${view.warnings.length}）`));
-      box.appendChild(listOf(view.warnings));
-    }
-    return box;
-  }));
+    '上面那幾塊是摘要。這裡是同一份判讀的每一格：點一次就全部攤開，裡面沒有第二層展開，' +
+    '也沒有任何一列會叫你「見下方展開」。'));
+  details.appendChild(drill('展開完整細節（結論數字／我們與市場／假設與證據／研究現況／進場門檻／判讀狀態／新鮮度）',
+    () => {
+      const box = el('div', 'full-detail');
+      box.appendChild(renderHeadline(view));
+      box.appendChild(renderFundamental(view));
+      box.appendChild(renderWhy(view));
+      box.appendChild(renderResearch(view));
+      box.appendChild(renderEntry(view));
+      box.appendChild(renderReadiness(payload));
+      box.appendChild(renderFreshness(payload));
+      const limits = el('section', 'panel');
+      limits.appendChild(el('h2', null, '這份判讀不是什麼'));
+      limits.appendChild(listOf(view.limits || []));
+      if (view.warnings && view.warnings.length) {
+        limits.appendChild(el('div', 'group-title', `組裝時的警告（${view.warnings.length}）`));
+        limits.appendChild(listOf(view.warnings));
+      }
+      box.appendChild(limits);
+      return box;
+    }));
   app.appendChild(details);
   window.scrollTo(0, 0);
 }
