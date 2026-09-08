@@ -31,7 +31,7 @@ from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.routing import Route
 
 from .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours
-from .store import ArtifactStore
+from .store import ArtifactStore, StateArtifactStore, resolve_state_dir
 
 API_VERSION = "v1"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
@@ -59,6 +59,10 @@ def _store(request: Request) -> ArtifactStore:
     return request.app.state.store
 
 
+def _state(request: Request) -> StateArtifactStore:
+    return request.app.state.state_store
+
+
 # ---------------------------------------------------------------------------
 # endpoints
 # ---------------------------------------------------------------------------
@@ -71,6 +75,7 @@ async def health(request: Request) -> Response:
         "api_version": API_VERSION,
         "artifact_schema_version": ARTIFACT_SCHEMA_VERSION,
         "materialized_count": len(store.tickers()),
+        "state_kinds": _state(request).kinds(),
         "request_path": "read-only：no LLM、no authority write、no external fetch、no model execution",
     })
 
@@ -89,11 +94,13 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/meta",
             f"GET /api/{API_VERSION}/stocks",
             f"GET /api/{API_VERSION}/stocks/{{ticker}}",
+            f"GET /api/{API_VERSION}/ranking",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
             "沒有 runtime LLM：APP 讀已經形成的判讀，不在點擊時產生新判斷。",
-            "沒有跨標的排序：瓶頸排序的唯一權威是 rank_bottlenecks，不在本 APP。",
+            "不重算排序：/api/v1/ranking 照抄 materialize 當下 rank_bottlenecks() 的輸出（唯一排序權威）；"
+            "APP 不重排、不加權、不自建第二套結構評分。",
             "沒有部位尺寸：買多少、什麼時候買由使用者自行判斷並手動下單。",
         ],
     }
@@ -142,6 +149,29 @@ async def stock_detail(request: Request) -> Response:
     body = dict(payload)
     body["freshness"] = freshness.to_dict()
     body["correlation_warning"] = _CORRELATION_WARNING
+    return _json(body)
+
+
+async def ranking(request: Request) -> Response:
+    """跨標的瓶頸排序。**照抄 materialize 當下 `rank_bottlenecks()` 的輸出**——不重排、不重算。
+
+    「artifact 讀不到」回 503 ＋ remedy；「排不出任何一列」則是 200 ＋ `top_pick=null` ＋ 理由，
+    兩者不得同形（與單檔的 503 vs `readiness=blocked` 同一條紀律）。
+    """
+    try:
+        payload, freshness = _state(request).read("ranking")
+    except ArtifactUnavailable as exc:
+        return _json({"error": {"kind": "artifact_unavailable", "state_kind": "ranking",
+                                "reason": exc.reason,
+                                "remedy": "跑 `python -m webapp materialize --ranking`",
+                                "note": "「artifact 讀不到」與「排不出任何一列」是兩件事——"
+                                        "後者會以 200 ＋ top_pick=null ＋ top_pick_absent_reason 回。"}},
+                     status=503)
+    body = dict(payload)
+    body["freshness"] = freshness.to_dict()
+    body["correlation_warning"] = _CORRELATION_WARNING
+    # 哪幾檔有單檔判讀可以點進去：只是**列目錄**（與 /stocks 同一個動作），不讀檔、不重建。
+    body["analyst_view_tickers"] = _store(request).tickers()
     return _json(body)
 
 
@@ -214,19 +244,24 @@ _SAFE_MESSAGES = {
 }
 
 
-def create_app(directory: Path | None = None) -> Starlette:
-    """建立 read-only app。`methods=["GET"]` 讓任何寫入動詞在路由層就是 405。"""
+def create_app(directory: Path | None = None, state_directory: Path | None = None) -> Starlette:
+    """建立 read-only app。`methods=["GET"]` 讓任何寫入動詞在路由層就是 405。
+
+    state 目錄不另猜：`resolve_state_dir` 是唯一規則（明示 > analyst 目錄下的 `state/` > 預設）。
+    """
     routes = [
         Route("/", index, methods=["GET"]),
         Route("/static/{asset}", static_asset, methods=["GET"]),
         Route(f"/api/{API_VERSION}/health", health, methods=["GET"]),
         Route(f"/api/{API_VERSION}/meta", meta, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/ranking", ranking, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]
     app = Starlette(routes=routes, exception_handlers={
         HTTPException: http_error, Exception: unhandled_error})
     app.state.store = ArtifactStore(directory)
+    app.state.state_store = StateArtifactStore(resolve_state_dir(directory, state_directory))
     return app
 
 

@@ -51,6 +51,21 @@ REQUIRED_FIELDS: tuple[str, ...] = (
     "readiness", "refresh", "overview", "view", "materializer",
 )
 
+#: **state artifact**（跨標的的單一 JSON，不是 per-ticker）的 kind → schema 版本。
+#: 這是**封閉字彙**：新 kind 必須先在這裡登記，store 才認得（`STATE_KINDS` 由此導出，
+#: 不另抄一份）。目前只有 `ranking`；coverage／positions／beta／watches 依 ROADMAP 逐一加。
+STATE_SCHEMA_VERSIONS: dict[str, str] = {
+    "ranking": "stockbot-app/ranking/1",
+}
+STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
+
+#: state artifact 的必要欄位。內容欄位（rows／sectors…）由各 kind 自己定義；這裡只鎖
+#: 「每一份都答得出：是哪一種、何時生成、什麼視角、誰是 authority、有沒有被改過」。
+STATE_REQUIRED_FIELDS: tuple[str, ...] = (
+    "schema_version", "kind", "generated_at", "as_of", "point_in_time",
+    "authority", "freshness_identity", "content_digest", "materializer",
+)
+
 #: 預設新鮮度上限（小時）。可用 `STOCKBOT_APP_MAX_AGE_HOURS` 覆寫。
 #: ⚠ 這是**呈現用的年齡門檻**，不是資料正確性的判準——真正的「什麼變了」由 refresh 引擎
 #: 在 materialize 當下算好並寫進 artifact（`refresh.overall`）。年齡只回答「這份快照多舊」。
@@ -66,6 +81,8 @@ class ArtifactUnavailable(RuntimeError):
     def __init__(self, ticker: str, reason: str) -> None:
         super().__init__(f"{ticker}: {reason}")
         self.ticker = ticker
+        # state artifact 的主詞是 kind 不是 ticker；兩個名字指同一個值。
+        self.subject = ticker
         self.reason = reason
 
 
@@ -92,6 +109,17 @@ def freshness_identity(*, ticker: str, as_of: str | None, point_in_time_mode: st
         "source_schema_version": source_schema_version,
         "readiness_state": readiness_state, "refresh_overall": refresh_overall,
     }, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def state_freshness_identity(*, kind: str, as_of: str | None, identity: Any) -> str:
+    """state artifact 的**認知狀態身分**。與 per-ticker 的 `freshness_identity` 同一個用途：
+    兩次 materialize 若 identity 相同，代表「我們的判斷該重看了」這件事沒發生——即使
+    content digest 因為文件計數或時戳而不同（L12：兩個訊號分開）。
+    每種 kind 自己決定 identity 裡放什麼；本函式只負責把它變成可比對的雜湊。
+    """
+    text = json.dumps({"kind": kind, "as_of": as_of, "identity": identity},
+                      ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "sha256:" + hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
@@ -160,8 +188,32 @@ def validate_artifact(ticker: str, payload: Any) -> Mapping[str, Any]:
     return payload
 
 
+def validate_state_artifact(kind: str, payload: Any) -> Mapping[str, Any]:
+    """state artifact 讀取端的 fail-closed 檢查——與 `validate_artifact` 同一套紀律，主詞是 kind。"""
+    if kind not in STATE_SCHEMA_VERSIONS:
+        raise ArtifactUnavailable(
+            kind, f"未登記的 state kind {kind!r}——封閉字彙只有 {sorted(STATE_SCHEMA_VERSIONS)}")
+    if not isinstance(payload, Mapping):
+        raise ArtifactUnavailable(kind, "artifact 不是物件（可能是半份寫入或被改壞）")
+    missing = [f for f in STATE_REQUIRED_FIELDS if f not in payload]
+    if missing:
+        raise ArtifactUnavailable(kind, f"artifact 缺必要欄位 {missing}——partial write 一律拒收")
+    if payload.get("kind") != kind:
+        raise ArtifactUnavailable(kind, f"artifact 內的 kind 是 {payload.get('kind')!r}——檔名與內容不一致")
+    version = payload.get("schema_version")
+    expected = STATE_SCHEMA_VERSIONS[kind]
+    if version != expected:
+        raise ArtifactUnavailable(
+            kind, f"artifact schema {version!r} 與本版 {expected!r} 不符——"
+                  f"請重跑 `python -m webapp materialize --{kind}`（artifact 是可重建的 cache，不是 authority）")
+    if payload.get("content_digest") != canonical_digest(payload):
+        raise ArtifactUnavailable(kind, "artifact content_digest 對不上——內容在寫入後被改過或寫到一半")
+    return payload
+
+
 __all__ = [
     "ARTIFACT_SCHEMA_VERSION", "ArtifactUnavailable", "DEFAULT_MAX_AGE_HOURS", "FRESH",
-    "Freshness", "REQUIRED_FIELDS", "STALE", "canonical_digest", "freshness_identity",
-    "freshness_of", "max_age_hours", "validate_artifact",
+    "Freshness", "REQUIRED_FIELDS", "STALE", "STATE_KINDS", "STATE_REQUIRED_FIELDS",
+    "STATE_SCHEMA_VERSIONS", "canonical_digest", "freshness_identity", "freshness_of",
+    "max_age_hours", "state_freshness_identity", "validate_artifact", "validate_state_artifact",
 ]

@@ -54,6 +54,7 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 | `STOCKBOT_APP_PORT` | `8790` | MCP 是 8788，刻意錯開 |
 | `STOCKBOT_APP_HOST` | `127.0.0.1` | 改成別的介面**必須**同時設 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式拒絕啟動 |
 | `STOCKBOT_APP_ARTIFACT_DIR` | `library/private/app/analyst_view` | artifact 目錄（在 ignored 的 private 樹下） |
+| `STOCKBOT_APP_STATE_DIR` | `library/private/app/state` | 跨標的 state artifact 目錄（`ranking`；同在 ignored 的 private 樹下） |
 | `STOCKBOT_APP_MAX_AGE_HOURS` | `24` | 超過就標 `stale`；**stale 不會觸發重建** |
 
 ---

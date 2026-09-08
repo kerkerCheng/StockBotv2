@@ -218,6 +218,7 @@ const PANEL_TITLE = {
 };
 
 async function renderList() {
+  markNav('stocks');
   const data = await getJSON(`${API}/stocks`);
   app.textContent = '';
   footerWarning.textContent = data.correlation_warning || '';
@@ -579,6 +580,7 @@ function renderReadiness(payload) {
 }
 
 async function renderDetail(ticker) {
+  markNav('stocks');
   let payload;
   try {
     payload = await getJSON(`${API}/stocks/${encodeURIComponent(ticker)}`);
@@ -633,11 +635,339 @@ async function renderDetail(ticker) {
   window.scrollTo(0, 0);
 }
 
+/* ---------- 瓶頸排序（跨標的 state；照抄 rank_bottlenecks 的輸出，不重排、不加權） ---------- */
+
+let RANK_VOCAB = null;
+
+function markNav(name) {
+  document.querySelectorAll('.nav a').forEach((link) => {
+    const active = link.dataset.view === name;
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+}
+
+/** authority 的固定文字帶著 markdown 強調（**x**、`x`）。這裡只把它們變成 <strong>／<code>，
+    不改一個字——用 DOM 節點組，不用 innerHTML。 */
+function mdInline(text) {
+  const frag = document.createDocumentFragment();
+  const source = String(text || '');
+  const re = /(\*\*[^*]+\*\*|`[^`]+`)/g;
+  let last = 0;
+  let match;
+  while ((match = re.exec(source)) !== null) {
+    if (match.index > last) frag.appendChild(document.createTextNode(source.slice(last, match.index)));
+    const token = match[0];
+    if (token.startsWith('**')) frag.appendChild(el('strong', null, token.slice(2, token.length - 2)));
+    else frag.appendChild(el('code', null, token.slice(1, token.length - 1)));
+    last = match.index + token.length;
+  }
+  if (last < source.length) frag.appendChild(document.createTextNode(source.slice(last)));
+  return frag;
+}
+
+function mdParagraph(text, className) {
+  const p = el('p', className || 'note');
+  p.appendChild(mdInline(text));
+  return p;
+}
+
+/** sole_source 是三態：true／false／null。**null 是「未填」，不是 false**——畫面必須分得出來。 */
+function soleSourceBadge(value) {
+  const table = (RANK_VOCAB && RANK_VOCAB.sole_source_states) || {};
+  let text; let key;
+  if (value === true) { text = 'sole_source'; key = 'true'; }
+  else if (value === false) { text = '有第二來源'; key = 'false'; }
+  else { text = 'sole_source 未填'; key = 'null'; }
+  const badge = el('span', 'badge ' + (value === true ? 'badge-sole' : 'badge-absence'), text);
+  badge.title = table[key] || '';
+  return badge;
+}
+
+function th(text) { return el('th', null, text); }
+
+function companyCell(row, detailSet) {
+  const cell = el('td', 'rank-company');
+  const ticker = row.ticker || '—';
+  if (row.ticker && detailSet.has(row.ticker)) {
+    const link = el('a', 'ticker-link', ticker);
+    link.href = '#/' + encodeURIComponent(row.ticker);
+    link.title = '開單檔判讀（含 disproof 與催化劑）';
+    cell.appendChild(link);
+  } else {
+    const plain = el('span', 'ticker-plain', ticker);
+    plain.title = row.ticker ? '這檔尚未 materialize 單檔判讀' : 'registry 沒有登記 research ticker';
+    cell.appendChild(plain);
+  }
+  cell.appendChild(el('div', 'company', row.company_label || row.company_id));
+  return cell;
+}
+
+function edgeCell(row) {
+  const cell = el('td', 'rank-edge');
+  cell.appendChild(el('div', 'dim', row.relation + ' →'));
+  cell.appendChild(el('code', null, row.bottleneck));
+  return cell;
+}
+
+function subCell(row) {
+  const cell = el('td', 'rank-sub');
+  const hasSub = row.substitutability !== null && row.substitutability !== undefined;
+  cell.appendChild(el('span', 'sub-score', hasSub ? `${row.substitutability}/5` : '未填'));
+  cell.appendChild(document.createTextNode(' '));
+  cell.appendChild(soleSourceBadge(row.sole_source));
+  return cell;
+}
+
+function anchorCell(row) {
+  const cell = el('td', 'rank-anchor');
+  if (row.demand_anchor) {
+    cell.appendChild(el('code', null, row.demand_anchor));
+    cell.appendChild(el('div', 'dim', `距需求端 ${row.demand_hops} 跳`));
+  } else {
+    cell.appendChild(el('span', 'badge badge-blocked', '🔴 無需求錨'));
+  }
+  return cell;
+}
+
+function hopsText(row) {
+  return (row.demand_hops === null || row.demand_hops === undefined) ? '—' : `${row.demand_hops} 跳`;
+}
+
+function rankTable(rows, columns, detailSet) {
+  const wrap = el('div', 'table-wrap');
+  const table = el('table', 'rank');
+  const head = el('thead');
+  const headRow = el('tr');
+  columns.forEach((col) => headRow.appendChild(th(col.title)));
+  head.appendChild(headRow);
+  table.appendChild(head);
+  const body = el('tbody');
+  rows.forEach((row) => {
+    const tr = el('tr');
+    columns.forEach((col) => tr.appendChild(col.cell(row, detailSet)));
+    body.appendChild(tr);
+  });
+  table.appendChild(body);
+  wrap.appendChild(table);
+  return wrap;
+}
+
+const ACTIONABLE_COLUMNS = [
+  { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
+  { title: '標的', cell: companyCell },
+  { title: '卡在哪', cell: edgeCell },
+  { title: '替代難度', cell: subCell },
+  { title: '證據', cell: (row) => el('td', null, row.evidence_label || row.evidence) },
+  { title: '合格狀態', cell: (row) => el('td', null, row.qualification_status || '—') },
+  { title: '需求錨點', cell: anchorCell },
+];
+
+const STRUCTURAL_COLUMNS = [
+  { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
+  { title: '標的', cell: companyCell },
+  { title: '卡在哪', cell: edgeCell },
+  { title: '替代難度', cell: subCell },
+  { title: '距需求端', cell: (row) => el('td', null, hopsText(row)) },
+  { title: '目前證據', cell: (row) => el('td', null, row.evidence_label || row.evidence) },
+  { title: '落差', cell: (row) => {
+      const cell = el('td', 'dim');
+      if (row.gap_note) cell.textContent = row.gap_note;
+      else if (row.actionable_rank) cell.textContent = `可行動排序第 ${row.actionable_rank}`;
+      else cell.textContent = '—';
+      return cell;
+    } },
+];
+
+function renderRankingError(err) {
+  app.textContent = '';
+  const box = el('div', 'error');
+  const detail = (err.body && err.body.error) || {};
+  box.appendChild(el('h2', null, '讀不到瓶頸排序'));
+  box.appendChild(el('p', null, detail.reason || detail.message || 'request failed'));
+  if (detail.remedy) {
+    const p = el('p', 'note');
+    p.appendChild(document.createTextNode('修法：'));
+    p.appendChild(el('code', null, detail.remedy));
+    box.appendChild(p);
+  }
+  if (detail.note) box.appendChild(el('p', 'note', detail.note));
+  app.appendChild(box);
+}
+
+async function renderRanking() {
+  markNav('ranking');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/ranking`);
+  } catch (err) {
+    renderRankingError(err);
+    return;
+  }
+  RANK_VOCAB = payload.vocab || {};
+  const detailSet = new Set(payload.analyst_view_tickers || []);
+  const notes = payload.notes || {};
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  const pit = payload.point_in_time || {};
+  badges.appendChild(el('span', 'badge badge-fresh', pit.mode === 'as_of' ? `as-of ${payload.as_of}` : '現況'));
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale');
+    b.title = payload.freshness.rule;
+    badges.appendChild(b);
+  }
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  // ① 首選：authority 的第 1 名，不是本畫面的判斷。
+  const pick = el('section', 'panel callout');
+  pick.appendChild(el('h2', null, '現在要投哪一檔'));
+  if (payload.top_pick) {
+    const p = payload.top_pick;
+    const line = el('div', 'pick-line');
+    line.appendChild(el('span', 'pick-rank', '#1'));
+    if (p.ticker && detailSet.has(p.ticker)) {
+      const link = el('a', 'ticker-link', p.ticker);
+      link.href = '#/' + encodeURIComponent(p.ticker);
+      line.appendChild(link);
+    } else {
+      line.appendChild(el('span', 'ticker-plain', p.ticker || '—'));
+    }
+    line.appendChild(el('span', 'company', p.company_label || p.company_id));
+    line.appendChild(el('span', 'dim', `${p.relation} →`));
+    line.appendChild(el('code', null, p.bottleneck));
+    pick.appendChild(line);
+    pick.appendChild(el('p', 'note', p.note));
+  } else {
+    pick.appendChild(el('p', 'note', payload.top_pick_absent_reason || '無候選'));
+  }
+  app.appendChild(pick);
+
+  // ② 已知限制：契約說「解讀前必讀」，所以不摺疊。
+  const limits = el('section', 'panel');
+  limits.appendChild(el('h2', null, '🔴 已知限制，解讀前必讀'));
+  const ol = el('ol', 'limits');
+  (payload.limitations || []).forEach((text) => {
+    const li = el('li');
+    li.appendChild(mdInline(text));
+    ol.appendChild(li);
+  });
+  limits.appendChild(ol);
+  const cov = payload.coverage || {};
+  limits.appendChild(el('p', 'note',
+    `EdgeAssertion ${cov.assertions} → canonical edge ${cov.canonical_edges}（去重收斂 ${cov.duplicate_collapse} 筆）` +
+    `｜substitutability 有值 ${cov.edges_with_substitutability}/${cov.canonical_edges}` +
+    `｜lead time 有值 ${cov.edges_with_lead_time} 條`));
+  app.appendChild(limits);
+
+  // ③ 可行動排序
+  const sortKeys = (RANK_VOCAB.sort_keys) || {};
+  const sec1 = el('section', 'panel');
+  sec1.appendChild(el('h2', null, `可行動排序（${payload.rows.length} 條）——現在能投什麼`));
+  sec1.appendChild(el('div', 'panel-questions', '排序鍵優先序（不是加權）：' + (sortKeys.rows || []).join(' › ')));
+  if (payload.rows.length) sec1.appendChild(rankTable(payload.rows, ACTIONABLE_COLUMNS, detailSet));
+  else sec1.appendChild(el('p', 'empty', '（無符合門檻的瓶頸邊）'));
+  app.appendChild(sec1);
+
+  // ④ 純結構排序
+  const sec2 = el('section', 'panel');
+  sec2.appendChild(el('h2', null, '純結構排序（只看多卡，不看證據）——該去補誰的證據'));
+  sec2.appendChild(el('div', 'panel-questions', '排序鍵優先序（不是加權）：' + (sortKeys.structural_rows || []).join(' › ')));
+  (notes.two_rankings || []).forEach((text) => sec2.appendChild(mdParagraph(text)));
+  const structural = payload.structural_rows || [];
+  const shown = structural.slice(0, 10);
+  if (shown.length) sec2.appendChild(rankTable(shown, STRUCTURAL_COLUMNS, detailSet));
+  else sec2.appendChild(el('p', 'empty', '（無）'));
+  if (structural.length > shown.length) {
+    const rest = structural.slice(shown.length);
+    sec2.appendChild(drill(`展開：其餘 ${rest.length} 條`, () => rankTable(rest, STRUCTURAL_COLUMNS, detailSet)));
+  }
+  if (notes.structural_table) sec2.appendChild(mdParagraph(notes.structural_table));
+  app.appendChild(sec2);
+
+  // ⑤ 產業別分組：解決可視性，不解決可比性。
+  const sec3 = el('section', 'panel');
+  sec3.appendChild(el('h2', null, '產業別分組（解決可視性，分數不可跨組比較）'));
+  (payload.correlation_notes || []).forEach((text) => sec3.appendChild(el('p', 'warn', '⚠ ' + text)));
+  if (payload.empty_sectors && payload.empty_sectors.length) {
+    sec3.appendChild(el('p', 'warn', '🔴 空產業組（sub 覆蓋未及，研究缺口）：' + payload.empty_sectors.join('、')));
+  }
+  if (notes.no_anchor_reading) sec3.appendChild(mdParagraph(notes.no_anchor_reading));
+  const byRank = {};
+  payload.rows.forEach((row) => { byRank[row.rank] = row; });
+  (payload.sectors || []).forEach((sector) => {
+    const box = el('div', 'sector');
+    box.appendChild(el('div', 'group-title', `${sector.sector}（可行動 ${sector.actionable_count} 條）`));
+    const ul = el('ul', 'notes');
+    sector.actionable_ranks.slice(0, 3).forEach((rank) => {
+      const row = byRank[rank];
+      if (!row) return;
+      const hasSub = row.substitutability !== null && row.substitutability !== undefined;
+      ul.appendChild(el('li', null,
+        `#${row.rank} ${row.ticker || '—'}（${row.company_label || row.company_id}） ${row.relation} → ${row.bottleneck}` +
+        `｜sub ${hasSub ? row.substitutability : '未填'}${row.sole_source === true ? '｜sole_source' : ''}` +
+        `｜${row.evidence_label || row.evidence}`));
+    });
+    if (sector.structural_first) {
+      const f = sector.structural_first;
+      ul.appendChild(el('li', 'dim', `↳ 純結構第一（該去補證據的）：${f.ticker || f.company_id} → ${f.bottleneck}`));
+    }
+    box.appendChild(ul);
+    sec3.appendChild(box);
+  });
+  app.appendChild(sec3);
+
+  // ⑥ 需求鏈
+  const sec4 = el('section', 'panel');
+  sec4.appendChild(el('h2', null, '需求鏈（誰在花錢 → 這家公司）'));
+  sec4.appendChild(drill(`展開：每一列的鏈路（${payload.rows.length}）`, () => {
+    const ul = el('ul', 'notes');
+    payload.rows.forEach((row) => {
+      const li = el('li', null, `#${row.rank} ${row.company_id} ${row.relation} ${row.bottleneck}`);
+      const sub = el('div', 'dim');
+      if (row.chain && row.chain.length) sub.textContent = row.chain.join(' → ') + `　（距需求端 ${row.demand_hops} 跳）`;
+      else sub.appendChild(mdInline(notes.no_anchor_chain || ''));
+      li.appendChild(sub);
+      ul.appendChild(li);
+    });
+    return ul;
+  }));
+  app.appendChild(sec4);
+
+  // ⑦ 新鮮度與 authority
+  const f = payload.freshness || {};
+  const sec5 = el('section', 'panel');
+  sec5.appendChild(el('h2', null, '這份排序有多新'));
+  const rows = el('div', 'rows');
+  rows.appendChild(kv('materialize 於', `${f.generated_at}（${Number(f.age_hours).toFixed(1)} 小時前，${f.state}）`));
+  rows.appendChild(kv('排序權威', `${payload.authority.function}（${payload.authority.command}）`));
+  rows.appendChild(kv('視角', pit.mode === 'as_of' ? `as-of ${payload.as_of}` : '現況'));
+  if (pit.excluded) rows.appendChild(kv('as-of 視角排除的 assertion', JSON.stringify(pit.excluded)));
+  rows.appendChild(kv('新鮮度身分', payload.freshness_identity));
+  rows.appendChild(kv('artifact content digest', payload.content_digest));
+  sec5.appendChild(rows);
+  sec5.appendChild(el('p', 'note', f.rule || ''));
+  sec5.appendChild(el('p', 'note', payload.authority.note || ''));
+  app.appendChild(sec5);
+
+  // ⑧ 這份排序不是什麼
+  const sec6 = el('section', 'panel');
+  sec6.appendChild(el('h2', null, '這份排序不是什麼'));
+  sec6.appendChild(listOf(payload.this_is_not || []));
+  app.appendChild(sec6);
+  window.scrollTo(0, 0);
+}
+
 /* ---------- 路由 ---------- */
 
 async function route() {
   const hash = window.location.hash || '#/';
-  const ticker = decodeURIComponent(hash.replace(/^#\/?/, ''));
+  const target = decodeURIComponent(hash.replace(/^#\/?/, ''));
   app.textContent = '';
   app.appendChild(el('p', 'loading', '載入中…'));
   try {
@@ -645,7 +975,9 @@ async function route() {
       const meta = await getJSON(`${API}/meta`);
       VOCAB = meta.vocabularies || {};
     }
-    if (ticker) await renderDetail(ticker);
+    // `ranking` 是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
+    if (target === 'ranking') await renderRanking();
+    else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {
     app.textContent = '';

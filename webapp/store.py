@@ -13,19 +13,47 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
-from .contracts import ArtifactUnavailable, Freshness, freshness_of, validate_artifact
+from .contracts import (
+    STATE_KINDS, ArtifactUnavailable, Freshness, freshness_of, validate_artifact,
+    validate_state_artifact,
+)
 
 _ROOT = Path(__file__).resolve().parents[1]
 
 #: artifact 住在 **ignored** 的 `library/private/` 底下——它是由 private ledger 導出的衍生物，
 #: 進 Git 等於把 private authority 的內容推上去。`.gitignore` 的 `library/private/` 涵蓋它。
-DEFAULT_ARTIFACT_DIR = _ROOT / "library" / "private" / "app" / "analyst_view"
+DEFAULT_APP_DIR = _ROOT / "library" / "private" / "app"
+DEFAULT_ARTIFACT_DIR = DEFAULT_APP_DIR / "analyst_view"
+#: 跨標的的 state artifact（ranking／…）住 analyst view 的**旁邊**，不混在同一個目錄：
+#: 它們不是股票，`tickers()` 不該看到它們，而且每種 kind 只有一份。
+DEFAULT_STATE_DIR = DEFAULT_APP_DIR / "state"
 
 
 def artifact_dir() -> Path:
     """artifact 目錄。`STOCKBOT_APP_ARTIFACT_DIR` 可覆寫（測試與多視角快照用）。"""
     raw = os.environ.get("STOCKBOT_APP_ARTIFACT_DIR")
     return Path(raw) if raw else DEFAULT_ARTIFACT_DIR
+
+
+def state_dir() -> Path:
+    """state artifact 目錄。`STOCKBOT_APP_STATE_DIR` 可覆寫。"""
+    raw = os.environ.get("STOCKBOT_APP_STATE_DIR")
+    return Path(raw) if raw else DEFAULT_STATE_DIR
+
+
+def resolve_state_dir(analyst_dir: Path | None, explicit: Path | None) -> Path:
+    """state 目錄的**唯一**解析規則（serve、materialize、status 都走這一條，不各自猜）：
+
+    1. 明示的 state 目錄 → 用它；
+    2. 否則若 analyst view 目錄被明示（`--dir`、測試的 tmp dir）→ 用它底下的 `state/`。
+       這讓「指了一個 analyst 目錄」自動隔離：測試與 `--dir` 快照不會讀到真實機器上的 state；
+    3. 否則 → 環境變數／預設（`library/private/app/state`）。
+    """
+    if explicit is not None:
+        return Path(explicit)
+    if analyst_dir is not None:
+        return Path(analyst_dir) / "state"
+    return state_dir()
 
 
 def _safe_slug(ticker: str) -> str:
@@ -97,23 +125,83 @@ class ArtifactStore:
         """atomic write：先寫暫存檔再 `os.replace`。讀取端永遠看不到半份 JSON。"""
         ticker = str(payload.get("ticker") or "")
         path = self.path_for(ticker)
-        self.directory.mkdir(parents=True, exist_ok=True)
-        text = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2)
-        handle = tempfile.NamedTemporaryFile(
-            "w", encoding="utf-8", dir=str(self.directory), prefix=f".{path.stem}.", suffix=".tmp",
-            delete=False, newline="\n")
+        _atomic_write(self.directory, path, payload)
+        return path
+
+
+def _atomic_write(directory: Path, path: Path, payload: Mapping[str, Any]) -> None:
+    """先寫暫存檔再 `os.replace`。讀取端永遠看不到半份 JSON。兩個 store 共用這一份。"""
+    directory.mkdir(parents=True, exist_ok=True)
+    text = json.dumps(payload, ensure_ascii=False, sort_keys=True, indent=2)
+    handle = tempfile.NamedTemporaryFile(
+        "w", encoding="utf-8", dir=str(directory), prefix=f".{path.stem}.", suffix=".tmp",
+        delete=False, newline="\n")
+    try:
+        with handle:
+            handle.write(text)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(handle.name, path)
+    except BaseException:
         try:
-            with handle:
-                handle.write(text)
-                handle.flush()
-                os.fsync(handle.fileno())
-            os.replace(handle.name, path)
-        except BaseException:
+            os.unlink(handle.name)
+        except OSError:
+            pass
+        raise
+
+
+class StateArtifactStore:
+    """跨標的的 state artifact（每種 kind 一份）。與 `ArtifactStore` 同一套讀寫紀律：
+    atomic write、fail-closed read、stale 只是狀態、**request path 絕不重建**。"""
+
+    def __init__(self, directory: Path | None = None) -> None:
+        self.directory = Path(directory) if directory is not None else state_dir()
+
+    def path_for(self, kind: str) -> Path:
+        # kind 是封閉字彙（`contracts.STATE_KINDS`），所以檔名不需要 slug 過濾：不在字彙裡就拒絕。
+        if kind not in STATE_KINDS:
+            raise ArtifactUnavailable(kind, f"未登記的 state kind {kind!r}——封閉字彙只有 {list(STATE_KINDS)}")
+        return self.directory / f"{kind}.json"
+
+    def kinds(self) -> list[str]:
+        """目前**存在檔案**的 kind。缺席的由 `missing_kinds()` 現形，不混在一起。"""
+        return [kind for kind in STATE_KINDS if self.path_for(kind).is_file()]
+
+    def missing_kinds(self) -> list[str]:
+        return [kind for kind in STATE_KINDS if not self.path_for(kind).is_file()]
+
+    def read(self, kind: str) -> tuple[Mapping[str, Any], Freshness]:
+        path = self.path_for(kind)
+        if not path.is_file():
+            raise ArtifactUnavailable(kind, f"尚未 materialize（請跑 `python -m webapp materialize --{kind}`）")
+        try:
+            raw = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            raise ArtifactUnavailable(kind, f"artifact 讀取失敗：{type(exc).__name__}") from None
+        try:
+            payload = json.loads(raw)
+        except json.JSONDecodeError as exc:
+            raise ArtifactUnavailable(kind, f"artifact JSON 解析失敗（行 {exc.lineno}）——很可能是半份寫入") from None
+        payload = validate_state_artifact(kind, payload)
+        generated = _parse_instant(payload.get("generated_at"))
+        if generated is None:
+            raise ArtifactUnavailable(kind, "artifact 的 generated_at 不是合法時戳")
+        return payload, freshness_of(generated)
+
+    def read_all(self) -> Iterator[tuple[str, Mapping[str, Any] | None, Freshness | None, str | None]]:
+        """存在檔案的每一種 kind。壞掉的**不靜默丟棄**（INV-3）。"""
+        for kind in self.kinds():
             try:
-                os.unlink(handle.name)
-            except OSError:
-                pass
-            raise
+                payload, freshness = self.read(kind)
+            except ArtifactUnavailable as exc:
+                yield kind, None, None, exc.reason
+            else:
+                yield kind, payload, freshness, None
+
+    def write(self, payload: Mapping[str, Any]) -> Path:
+        """只有 materialize 會呼叫；**不在 request path 上**。"""
+        path = self.path_for(str(payload.get("kind") or ""))
+        _atomic_write(self.directory, path, payload)
         return path
 
 
@@ -127,4 +215,5 @@ def _parse_instant(raw: Any) -> datetime | None:
     return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
 
 
-__all__ = ["ArtifactStore", "DEFAULT_ARTIFACT_DIR", "artifact_dir"]
+__all__ = ["ArtifactStore", "DEFAULT_APP_DIR", "DEFAULT_ARTIFACT_DIR", "DEFAULT_STATE_DIR",
+           "StateArtifactStore", "artifact_dir", "resolve_state_dir", "state_dir"]

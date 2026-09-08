@@ -27,9 +27,10 @@ from starlette.testclient import TestClient
 
 from webapp.api import create_app
 from webapp.materialize import materialize_view
-from webapp.store import ArtifactStore
+from webapp.store import ArtifactStore, StateArtifactStore
 
 from test_webapp_materialize import fake_view
+from test_webapp_ranking import fake_ranking_payload
 
 ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT / "webapp"
@@ -81,6 +82,8 @@ def app_dir(tmp_path):
     store.write(materialize_view(fake_view(
         "PENCE", price=47.518, quote_unit="GBp", fair_value=None, readiness_state="blocked",
         absence_kind="upstream_unavailable", blockers=["headline：missing"], reason="上游缺內部 EPS")))
+    # 跨標的 state artifact（ranking）住 analyst 目錄旁的 state/——與 create_app 的解析規則一致。
+    StateArtifactStore(tmp_path / "state").write(fake_ranking_payload())
     return tmp_path
 
 
@@ -143,7 +146,7 @@ def test_a_full_request_round_imports_no_model_module(served) -> None:
     before = set(sys.modules)
     for path in ("/api/v1/health", "/api/v1/meta", "/api/v1/stocks",
                  "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/stocks/PENCE",
-                 "/api/v1/stocks/NOPE", "/", "/static/app.js"):
+                 "/api/v1/stocks/NOPE", "/api/v1/ranking", "/", "/static/app.js"):
         client.get(path)
     added = set(sys.modules) - before
     leaked = sorted(m for m in added
@@ -176,7 +179,7 @@ def test_tree_digest_actually_notices_a_change(tmp_path) -> None:
 def test_requests_change_not_a_single_byte_on_disk(served) -> None:
     client, directory = served
     before = _tree_digest(directory)
-    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN"):
+    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/ranking"):
         assert client.get(path).status_code == 200
     assert _tree_digest(directory) == before
 
@@ -244,6 +247,7 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
         body = client.get("/api/v1/stocks/READY").json()
         assert body["overview"]["implied_return"]["simple"]["value"] == -0.2
         assert client.get("/api/v1/stocks").json()["count"] == 3
+        assert client.get("/api/v1/ranking").json()["kind"] == "ranking"
         assert client.get("/api/v1/stocks/NEVERBUILT").status_code == 503
 
 
@@ -252,7 +256,7 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
-@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", "/"])
+@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/ranking", "/"])
 def test_no_mutation_verb_is_routed_anywhere(served, method: str, path: str) -> None:
     client, _ = served
     assert getattr(client, method)(path).status_code == 405

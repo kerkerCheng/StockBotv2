@@ -596,9 +596,94 @@ def project_assertions_as_of(
                           excluded_undated=undated, dated_total=dated)
 
 
+# ---------------------------------------------------------------------------
+# 呈現用的固定文字與判準：**跟著資料走**（L16）。
+# markdown（本檔）與 APP artifact（`webapp/materialize.py`）都從這裡拿，不各自抄一份——
+# 抄第二份的那天起，後改的那份就不會回頭更新前一份（AGENTS「清單會腐壞，判準不會」）。
+# ---------------------------------------------------------------------------
+
+RANKING_TITLE = "瓶頸鏈排序（在已研究過的公司中排序，不是發現新標的）"
+
+TWO_RANKINGS_NOTE = (
+    "上表回答「**現在能投什麼**」——證據不夠強的邊不能拿來下注，所以 evidence "
+    "排在 substitutability 之前。代價是它同時被「我們挖得多深」影響：`evidence` "
+    "的最高級必須靠研究找到客戶端或第三方文件才拿得到，預設每條邊都是 "
+    "`self_reported`。",
+    "本表回答「**該去補誰的證據**」——結構很卡但證據沒跟上的邊，是研究投入的"
+    "最高 ROI。兩份排序用途不同，不可互換。",
+)
+
+STRUCTURAL_TABLE_NOTE = (
+    "⚠ **本表不含「瓶頸業務占該公司多少」**。同為 `sub=5`，大型多角化公司的"
+    "單一瓶頸邊對其整體營收影響可能很小（研究它接近研究 beta），小型專業廠則"
+    "接近純曝險。判斷投資意義時必須另看市值、營收結構與分析師覆蓋度——"
+    "那些資料在 Engine C，不在本排序內。"
+)
+
+NO_ANCHOR_CHAIN_NOTE = (
+    "🔴 **走不到任何已登記的需求錨點**——可能是鏈路真的斷了，"
+    "也可能是 `DEMAND_ANCHORS` 還沒登記到這個領域。不得當作已錨定使用。"
+)
+
+NO_ANCHOR_READING = (
+    "🔴 **無需求錨組的讀法**：這些邊「難替代」但「不知服務誰」。三種可能："
+    "①需求端在圖裡但缺中間的邊 → 補邊；②它服務的市場還沒登記成錨 → "
+    "在 `config/sector_anchors.json` 補錨（**可能要開新產業群**）；"
+    "③真的沒有終端需求 → 不是投資標的。**不得預設是第③種**。"
+)
+
+#: 排序鍵的**優先序**（不是加權），供消費端原樣呈現。
+#: ⚠ 它是散文，會腐壞：`tests/test_bottleneck_ranking.py` 以行為鎖住前兩個優先序
+#: （錨點先於證據、純結構不看證據），改排序鍵時兩處要一起動。
+SORT_KEY_DESCRIPTIONS = {
+    "rows": ("需求錨點可達", "證據等級", "替代難度", "sole_source", "合格狀態",
+             "距需求端跳數（越近越前）"),
+    "structural_rows": ("需求錨點可達", "替代難度", "sole_source", "距需求端跳數（越近越前）",
+                        "合格狀態"),
+}
+
+
+def known_limitations(coverage: Mapping[str, Any]) -> list[str]:
+    """排序的三條已知限制，**隨輸出常駐**（模組 docstring 的要求）。任何消費端都從這裡拿。"""
+    return [
+        f"覆蓋率 {coverage['substitutability_coverage']:.0%}——排名必然偏向已被抽取過的邊，"
+        "沒填的邊是隱形的。",
+        "**本排名不含 lead time**（換掉一個供應商要多久）。「難替代」與「換掉要多久」"
+        "是兩件事：第二供應商若半年可合格，sub=5 也很脆。",
+        "`documents` 是注意力指標，**不參與排序**——否則分數會變成「我們讀了幾份文件」。",
+    ]
+
+
+def structural_gap_notes(
+    result: Mapping[str, Any], *, top_n: int = 10
+) -> list[tuple[Mapping[str, Any], int | None, str]]:
+    """純結構前 N 名各附「可行動排序第幾名」與落差註記。
+
+    落差判準（可行動名次比純結構名次低 ≥ 2 ＝ 補證據可翻上來）只有這一份——
+    markdown 與 APP artifact 都從這裡拿。依 `id()` 對應是刻意的：兩份排序是同一批
+    dict 物件的不同順序，不需要（也不該）另造一個 key。
+    """
+    rank_in_actionable = {id(r): i for i, r in enumerate(result["rows"], 1)}
+    out: list[tuple[Mapping[str, Any], int | None, str]] = []
+    for i, r in enumerate((result.get("structural_rows") or [])[:top_n], 1):
+        actionable_rank = rank_in_actionable.get(id(r))
+        gap = ""
+        if actionable_rank and actionable_rank - i >= 2:
+            gap = f"⬆ 可行動排序第 {actionable_rank}——補證據可翻上來"
+        out.append((r, actionable_rank, gap))
+    return out
+
+
+def empty_sectors(grouped: Mapping[str, Any],
+                  sector_map: Mapping[str, Any] | None = None) -> list[str]:
+    """configured 但零列的產業組——那是 sub 覆蓋缺口，**必須現形**，不是省略對象。"""
+    configured = list(((sector_map or load_sector_map()).get("sectors") or {}).keys())
+    return [s for s in configured if s not in grouped["sectors"]]
+
+
 def render_markdown(result: Mapping[str, Any]) -> str:
     cov = result["coverage"]
-    out = ["# 瓶頸鏈排序（在已研究過的公司中排序，不是發現新標的）\n"]
+    out = [f"# {RANKING_TITLE}\n"]
     out.append(
         f"- EdgeAssertion {cov['assertions']} → canonical edge {cov['canonical_edges']}"
         f"（去重收斂 {cov['duplicate_collapse']} 筆）"
@@ -611,11 +696,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     out.append(f"- `structural_lead_time_weeks` 有值：{cov['edges_with_lead_time']} 條")
     out.append(
         "\n🔴 **已知限制，解讀前必讀：**\n"
-        f"1. 覆蓋率 {cov['substitutability_coverage']:.0%}——排名必然偏向已被抽取過的邊，"
-        "沒填的邊是隱形的。\n"
-        "2. **本排名不含 lead time**（換掉一個供應商要多久）。「難替代」與「換掉要多久」"
-        "是兩件事：第二供應商若半年可合格，sub=5 也很脆。\n"
-        "3. `documents` 是注意力指標，**不參與排序**——否則分數會變成「我們讀了幾份文件」。\n"
+        + "".join(f"{i}. {text}\n" for i, text in enumerate(known_limitations(cov), 1))
     )
     if not result["rows"]:
         out.append("\n（無符合門檻的瓶頸邊）")
@@ -637,37 +718,20 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     if structural:
         out.append(
             "\n## 純結構排序（只看多卡，**不看證據**）\n\n"
-            "> 上表回答「**現在能投什麼**」——證據不夠強的邊不能拿來下注，所以 evidence "
-            "排在 substitutability 之前。代價是它同時被「我們挖得多深」影響：`evidence` "
-            "的最高級必須靠研究找到客戶端或第三方文件才拿得到，預設每條邊都是 "
-            "`self_reported`。\n>\n"
-            "> 本表回答「**該去補誰的證據**」——結構很卡但證據沒跟上的邊，是研究投入的"
-            "最高 ROI。兩份排序用途不同，不可互換。"
+            f"> {TWO_RANKINGS_NOTE[0]}\n>\n> {TWO_RANKINGS_NOTE[1]}"
         )
         out.append("\n| # | 標的 | 卡在哪 | 替代難度 | 距需求端 | 目前證據 | 落差 |")
         out.append("|---|---|---|---|---|---|---|")
-        rank_in_actionable = {
-            id(r): i for i, r in enumerate(result["rows"], 1)
-        }
-        for i, r in enumerate(structural[:10], 1):
+        for i, (r, _actionable_rank, gap) in enumerate(structural_gap_notes(result, top_n=10), 1):
             ticker = r["ticker"] or "—"
             sole = "｜sole_source" if r["sole_source"] else ""
             hops = r["demand_hops"] if r["demand_hops"] is not None else "—"
-            actionable_rank = rank_in_actionable.get(id(r))
-            gap = ""
-            if actionable_rank and actionable_rank - i >= 2:
-                gap = f"⬆ 可行動排序第 {actionable_rank}——補證據可翻上來"
             out.append(
                 f"| {i} | {r['company_id']}（{ticker}） | {r['relation']} → "
                 f"`{r['bottleneck']}` | {r['substitutability']}/5{sole} | {hops} 跳 "
                 f"| {EVIDENCE_LABEL[r['evidence']]} | {gap} |"
             )
-        out.append(
-            "\n⚠ **本表不含「瓶頸業務占該公司多少」**。同為 `sub=5`，大型多角化公司的"
-            "單一瓶頸邊對其整體營收影響可能很小（研究它接近研究 beta），小型專業廠則"
-            "接近純曝險。判斷投資意義時必須另看市值、營收結構與分析師覆蓋度——"
-            "那些資料在 Engine C，不在本排序內。"
-        )
+        out.append("\n" + STRUCTURAL_TABLE_NOTE)
 
     out.append("\n## 需求鏈（誰在花錢 → 這家公司）\n")
     for i, r in enumerate(result["rows"], 1):
@@ -677,10 +741,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         if r["chain"]:
             out.append(f"   {' → '.join(r['chain'])}　（距需求端 {r['demand_hops']} 跳）")
         else:
-            out.append(
-                "   🔴 **走不到任何已登記的需求錨點**——可能是鏈路真的斷了，"
-                "也可能是 `DEMAND_ANCHORS` 還沒登記到這個領域。不得當作已錨定使用。"
-            )
+            out.append("   " + NO_ANCHOR_CHAIN_NOTE)
     return "\n".join(out)
 
 
@@ -739,8 +800,7 @@ def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
     if grouped["correlation_notes"]:
         lines.append("")
     # 空產業組要現形（prompt 契約）：configured 但零列的組是 sub 覆蓋缺口，不是省略對象。
-    configured = list((load_sector_map().get("sectors") or {}).keys())
-    empty = [s for s in configured if s not in grouped["sectors"]]
+    empty = empty_sectors(grouped)
     if empty:
         lines.append(
             "🔴 **空產業組（sub 覆蓋未及，研究缺口）**：" + "、".join(empty)
@@ -752,12 +812,7 @@ def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
     # ⚠ [323] 把 DEMAND_ANCHORS 收斂到 config 之後，原本的「（未映射錨）」偵測恆為空
     # （錨就是從 config 讀的，不可能不在 config 裡），本組因此是僅存的新群訊號。
     if "🔴 無需求錨" in grouped["sectors"]:
-        lines.append(
-            "> 🔴 **無需求錨組的讀法**：這些邊「難替代」但「不知服務誰」。三種可能："
-            "①需求端在圖裡但缺中間的邊 → 補邊；②它服務的市場還沒登記成錨 → "
-            "在 `config/sector_anchors.json` 補錨（**可能要開新產業群**）；"
-            "③真的沒有終端需求 → 不是投資標的。**不得預設是第③種**。"
-        )
+        lines.append("> " + NO_ANCHOR_READING)
         lines.append("")
     for sector, buckets in sorted(
         grouped["sectors"].items(), key=lambda kv: -len(kv[1]["rows"])

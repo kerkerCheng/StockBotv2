@@ -264,3 +264,54 @@ def test_evidence_five_level_costly_and_joint() -> None:
         )
         == "externally_corroborated"
     )
+
+
+def test_presentation_text_has_one_home_and_the_markdown_prints_it() -> None:
+    """限制文字、兩份排序的說明與純結構表註記只有一份（L16）：markdown 從常數印，
+    APP artifact（`webapp/materialize.py`）從同一批常數拿。抄第二份的那天起，後改的那份
+    不會回頭更新前一份。"""
+    from query.bottleneck import (
+        RANKING_TITLE, STRUCTURAL_TABLE_NOTE, TWO_RANKINGS_NOTE, known_limitations,
+        rank_bottlenecks, render_markdown, structural_gap_notes,
+    )
+
+    rows = [
+        _row("co:coherent", "supplies_to", "co:nvidia", conf=0.9,
+             attrs={"substitutability": 5, "sole_source": True}, origin="NVIDIA"),
+        _row("co:nvidia", "supplies_to", "tech:ai_switch", conf=0.9, origin="NVIDIA"),
+        _row("co:axt", "supplies_to", "co:coherent", conf=0.8,
+             attrs={"substitutability": 4}, origin="AXT"),
+    ]
+    result = rank_bottlenecks(rows, _FakeRegistry())
+    md = render_markdown(result)
+    assert RANKING_TITLE in md
+    for text in known_limitations(result["coverage"]):
+        assert text in md
+    for text in TWO_RANKINGS_NOTE:
+        assert text in md
+    assert STRUCTURAL_TABLE_NOTE in md
+    notes = structural_gap_notes(result)
+    assert notes and all(rank is not None for _, rank, _ in notes)   # 兩份排序是同一批物件
+    for _, _, gap in notes:
+        if gap:
+            assert gap in md
+
+
+def test_sort_key_priority_anchor_first_then_evidence_or_substitutability() -> None:
+    """`SORT_KEY_DESCRIPTIONS` 是散文，會腐壞；這裡用行為鎖住它宣稱的前兩個優先序。"""
+    from query.bottleneck import SORT_KEY_DESCRIPTIONS, rank_bottlenecks
+
+    assert SORT_KEY_DESCRIPTIONS["rows"][:2] == ("需求錨點可達", "證據等級")
+    assert SORT_KEY_DESCRIPTIONS["structural_rows"][:2] == ("需求錨點可達", "替代難度")
+    rows = [
+        # 有錨、只有自報、sub 4
+        _row("co:axt", "supplies_to", "co:nvidia", conf=0.9,
+             attrs={"substitutability": 4}, origin="AXT"),
+        _row("co:nvidia", "supplies_to", "tech:ai_switch", conf=0.9, origin="NVIDIA"),
+        # 外部印證、sub 5、sole——但走不到任何錨
+        _row("co:coherent", "supplies_to", "mat:nowhere", conf=0.9,
+             attrs={"substitutability": 5, "sole_source": True}, origin="NVIDIA"),
+    ]
+    result = rank_bottlenecks(rows, _FakeRegistry())
+    assert [r["company_id"] for r in result["rows"]] == ["co:axt", "co:coherent"]
+    assert [r["company_id"] for r in result["structural_rows"]] == ["co:axt", "co:coherent"]

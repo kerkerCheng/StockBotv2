@@ -26,8 +26,11 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
-from .contracts import ARTIFACT_SCHEMA_VERSION, canonical_digest, freshness_identity
-from .store import ArtifactStore
+from .contracts import (
+    ARTIFACT_SCHEMA_VERSION, STATE_SCHEMA_VERSIONS, canonical_digest, freshness_identity,
+    state_freshness_identity,
+)
+from .store import ArtifactStore, StateArtifactStore
 
 MATERIALIZER_VERSION = "webapp-materialize/1"
 
@@ -173,6 +176,215 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     return results
 
 
+# ---------------------------------------------------------------------------
+# state artifact：`ranking`（跨標的；照抄 `rank_bottlenecks()` 的輸出）
+# ---------------------------------------------------------------------------
+
+RANKING_MATERIALIZER_VERSION = "webapp-materialize-ranking/1"
+
+#: 這份排序**不是什麼**。隨 artifact 出門，讓畫面永遠印得出來（AGENTS Alpha 呈現契約：
+#: 排序是研究判斷，必須明標它不是回測或統計勝率；系統不給部位尺寸）。
+RANKING_THIS_IS_NOT = (
+    "不是回測、不是統計勝率——它是對圖中結構邊的研究判斷（AGENTS「哪些標的值得看」的交付要求）。",
+    "不給部位尺寸：買多少、什麼時候買由使用者自行判斷並手動下單。",
+    "不是「發現新標的」——只在已研究過的公司中排序；圖裡沒有的公司不會出現。",
+    "不含 lead time、不含瓶頸業務占該公司營收多少、不含市值／分析師覆蓋——那些在 Engine C，不在本排序內。",
+    "每檔的 disproof 與催化劑不在本表：點進單檔判讀（Analyst View）的「研究現況」才有。",
+    "本 APP 不重算、不重排、不加權：順序與每一格都是 materialize 當下 rank_bottlenecks() 的輸出照抄。",
+)
+
+_RANKING_AUTHORITY = {
+    "function": "query.bottleneck.rank_bottlenecks",
+    "command": "python -m query.bottleneck",
+    "note": "唯一排序權威（AGENTS）。本 artifact 照抄它的輸出：不重算結構分、不重排、不加權，"
+            "也不自建第二套結構評分。",
+}
+
+_TOP_PICK_NOTE = (
+    "首選＝可行動排序第 1 名——這是 authority 的順序，不是本 APP 的判斷。"
+    "它是研究判斷，不是回測或統計勝率；每檔的 disproof 在單檔判讀的「研究現況」。"
+)
+
+
+def _row_key(row: Mapping[str, Any]) -> tuple[str, str, str]:
+    return (str(row["company_id"]), str(row["relation"]), str(row["bottleneck"]))
+
+
+def _company_label(registry: Any, company_id: str) -> str | None:
+    """面向人的公司名：registry 的 `display_name`，退而求其次用 `name`；**都沒有就 None，
+    不從 ID 猜名字**（`co:iqe` → 「Iqe」是編出來的，不是公司的名字）。"""
+    lookup = getattr(registry, "company", None)
+    company = lookup(company_id) if callable(lookup) else None
+    if company is None:
+        return None
+    return getattr(company, "display_name", None) or getattr(company, "name", None) or None
+
+
+def _project_ranking_row(row: Mapping[str, Any], *, rank: int, registry: Any,
+                         evidence_label: Mapping[str, str]) -> dict[str, Any]:
+    """一列的投影：**每一格照抄**，只加上名次、公司名與證據標籤——沒有任何算術。"""
+    out = dict(row)
+    out["rank"] = rank
+    out["company_label"] = _company_label(registry, str(row["company_id"]))
+    out["evidence_label"] = evidence_label.get(str(row.get("evidence")), str(row.get("evidence")))
+    return out
+
+
+def build_ranking_artifact(result: Mapping[str, Any], *, registry: Any,
+                           sector_map: Mapping[str, Any] | None = None,
+                           as_of: date | None = None, projection: Any = None,
+                           generated_at: datetime | None = None) -> dict[str, Any]:
+    """`rank_bottlenecks()` 的結果 → `ranking` state artifact。**純函式**：不連 DB、不重排。
+
+    所有固定文字（已知限制、兩份排序的說明、無需求錨的讀法）與落差判準都從
+    `query.bottleneck` 取——那裡是唯一一份（L16）。
+    """
+    from query.bottleneck import (
+        EVIDENCE_LABEL, EVIDENCE_RANK, MIN_SUBSTITUTABILITY, NO_ANCHOR_CHAIN_NOTE,
+        NO_ANCHOR_READING, QUALIFICATION_RANK, RANKING_TITLE, SORT_KEY_DESCRIPTIONS,
+        STRUCTURAL_TABLE_NOTE, TWO_RANKINGS_NOTE, empty_sectors, group_rows_by_sector,
+        known_limitations, load_sector_map, structural_gap_notes,
+    )
+
+    stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    rows = [_project_ranking_row(r, rank=i, registry=registry, evidence_label=EVIDENCE_LABEL)
+            for i, r in enumerate(result.get("rows") or (), 1)]
+    rank_by_key = {_row_key(r): r["rank"] for r in rows}
+
+    structural: list[dict[str, Any]] = []
+    all_structural = result.get("structural_rows") or []
+    for i, (r, actionable_rank, gap) in enumerate(
+            structural_gap_notes(result, top_n=len(all_structural)), 1):
+        row = _project_ranking_row(r, rank=i, registry=registry, evidence_label=EVIDENCE_LABEL)
+        row["actionable_rank"] = actionable_rank
+        row["gap_note"] = gap or None
+        structural.append(row)
+
+    sector_map = dict(sector_map) if sector_map is not None else load_sector_map()
+    grouped = group_rows_by_sector(result, sector_map)
+    sectors: list[dict[str, Any]] = []
+    for name, buckets in sorted(grouped["sectors"].items(), key=lambda kv: -len(kv[1]["rows"])):
+        first = buckets["structural_rows"][0] if buckets["structural_rows"] else None
+        sectors.append({
+            "sector": name,
+            "actionable_count": len(buckets["rows"]),
+            # 只放**名次**不放副本：一列的家只有 `rows`，分組是索引不是第二份資料。
+            "actionable_ranks": [rank_by_key[_row_key(r)] for r in buckets["rows"]],
+            "structural_first": None if first is None else {
+                "company_id": first["company_id"], "ticker": first.get("ticker"),
+                "company_label": _company_label(registry, str(first["company_id"])),
+                "relation": first["relation"], "bottleneck": first["bottleneck"]},
+        })
+
+    coverage = dict(result["coverage"])
+    top = rows[0] if rows else None
+    payload: dict[str, Any] = {
+        "schema_version": STATE_SCHEMA_VERSIONS["ranking"],
+        "kind": "ranking",
+        "title": RANKING_TITLE,
+        "generated_at": stamp.isoformat(),
+        "as_of": as_of.isoformat() if as_of else None,
+        "point_in_time": {
+            "mode": "as_of" if as_of else "current",
+            "as_of": as_of.isoformat() if as_of else None,
+            # as-of 視角下被排除的 assertion 計數：沒有它，「as-of 之後證據變少」與
+            # 「本來就沒有證據」在畫面上同形（INV-3）。
+            "excluded": projection.reasons() if projection is not None else None,
+            "input_count": (projection.input_count if projection is not None
+                            else coverage.get("assertions")),
+        },
+        "authority": dict(_RANKING_AUTHORITY),
+        "coverage": coverage,
+        "limitations": known_limitations(coverage),
+        "top_pick": None if top is None else {
+            "rank": 1, "company_id": top["company_id"], "ticker": top["ticker"],
+            "company_label": top["company_label"], "relation": top["relation"],
+            "bottleneck": top["bottleneck"], "note": _TOP_PICK_NOTE},
+        "top_pick_absent_reason": None if top is not None else (
+            f"無符合門檻的瓶頸邊（substitutability ≥ {MIN_SUBSTITUTABILITY} 且 src 為公司）——"
+            "這是「排不出來」，不是「沒有標的值得看」；先看 coverage 與純結構表。"),
+        "rows": rows,
+        "structural_rows": structural,
+        "notes": {
+            "two_rankings": list(TWO_RANKINGS_NOTE),
+            "structural_table": STRUCTURAL_TABLE_NOTE,
+            "no_anchor_chain": NO_ANCHOR_CHAIN_NOTE,
+            "no_anchor_reading": NO_ANCHOR_READING if "🔴 無需求錨" in grouped["sectors"] else None,
+        },
+        "sectors": sectors,
+        "empty_sectors": empty_sectors(grouped, sector_map),
+        "correlation_notes": list(grouped["correlation_notes"]),
+        "vocab": {
+            "evidence_labels": dict(EVIDENCE_LABEL),
+            "evidence_rank": dict(EVIDENCE_RANK),
+            "qualification_rank": dict(QUALIFICATION_RANK),
+            "min_substitutability": MIN_SUBSTITUTABILITY,
+            "sort_keys": {k: list(v) for k, v in SORT_KEY_DESCRIPTIONS.items()},
+            "sole_source_states": {
+                "true": "有文件說這條邊是唯一來源（強弱看 evidence：供應商自稱只算弱印證）",
+                "false": "有文件說有第二來源",
+                "null": "圖上沒有任何文件對這條邊的 sole_source 發言過——**未填不是否**",
+            },
+        },
+        "this_is_not": list(RANKING_THIS_IS_NOT),
+        "materializer": {
+            "version": RANKING_MATERIALIZER_VERSION,
+            "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+    }
+    payload = redact_private_paths(payload)
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="ranking", as_of=payload["as_of"],
+        # 認知狀態＝順序與每列的結構／證據欄位；`documents`（多讀一份文件）與 `confidence`
+        # 不算——那是注意力指標，變了不代表我們對瓶頸的判斷變了（L12 兩個 digest 分開的理由）。
+        identity={"rows": [[r["company_id"], r["relation"], r["bottleneck"], r["substitutability"],
+                            r["sole_source"], r["evidence"], r["qualification_status"],
+                            r["demand_anchor"]] for r in rows],
+                  "canonical_edges": coverage.get("canonical_edges")})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload
+
+
+def materialize_ranking(*, as_of: date | None = None, store: StateArtifactStore | None = None,
+                        generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """跑一次 `rank_bottlenecks()` 並寫下 `ranking` artifact。**只有這裡會連 Neo4j。**
+
+    與 `python -m query.bottleneck` 走同一條路：同一個 driver 設定、同一個 `fetch_assertions`、
+    同一個 registry。差別只在最後一步是寫 artifact 而不是印 markdown。
+    """
+    from dotenv import load_dotenv
+    from neo4j import GraphDatabase
+
+    from identity.registry import get_registry
+    from query.bottleneck import fetch_assertions, project_assertions_as_of, rank_bottlenecks
+
+    load_dotenv()
+    password = os.environ.get("NEO4J_PASSWORD")
+    if not password:
+        raise RuntimeError("請設 NEO4J_PASSWORD（與 python -m query.bottleneck 相同的前置）")
+    driver = GraphDatabase.driver(
+        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+        auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+    )
+    try:
+        with driver.session() as session:
+            raw_rows = fetch_assertions(session)
+    finally:
+        driver.close()
+    projection = None
+    rows: Sequence[Mapping[str, Any]] = raw_rows
+    if as_of is not None:
+        projection = project_assertions_as_of(raw_rows, as_of)
+        rows = list(projection.rows)
+    registry = get_registry()
+    result = rank_bottlenecks(rows, registry)
+    payload = build_ranking_artifact(result, registry=registry, as_of=as_of,
+                                     projection=projection, generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """把封閉字彙寫成 `.meta.json`，讓 serve 端讀得到而**不必 import `alpha`／`briefing`**。
 
@@ -207,5 +419,6 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     return path
 
 
-__all__ = ["MATERIALIZER_VERSION", "build_overview", "materialize", "materialize_many",
-           "materialize_view", "redact_private_paths", "write_vocabularies"]
+__all__ = ["MATERIALIZER_VERSION", "RANKING_MATERIALIZER_VERSION", "RANKING_THIS_IS_NOT",
+           "build_overview", "build_ranking_artifact", "materialize", "materialize_many",
+           "materialize_ranking", "materialize_view", "redact_private_paths", "write_vocabularies"]

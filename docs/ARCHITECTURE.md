@@ -674,7 +674,7 @@ AlphaInvestmentView → AnalystView → MaterializedArtifact（JSON，atomic wri
      │                                library/private/app/analyst_view/<TICKER>.json
      │  python -m webapp serve         ← 純讀：open → json.loads → validate → return
      ▼
-GET /api/v1/{health,meta,stocks,stocks/{ticker}} ＋ / （responsive Web App）
+GET /api/v1/{health,meta,stocks,stocks/{ticker},ranking} ＋ / （responsive Web App）
      ▼
 Cloudflare Tunnel（既有那條）→ Cloudflare Access → iPhone Safari／桌機瀏覽器
 ```
@@ -708,6 +708,18 @@ cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`
 filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，**其餘文字逐字保留**。
 在 materialize 端做一次，而不是讓每個消費端各自記得要遮（L16）。
 
+**state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
+（`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
+目前只有 `ranking`）。`python -m webapp materialize --ranking` 走與 `python -m query.bottleneck` **同一條路**
+（同一個 driver、`fetch_assertions`、registry），把 `rank_bottlenecks()` 的兩份排序**照抄**成 artifact——
+不重排、不加權、不自建第二套結構評分；**每列每格與 CLI 輸出逐格相等**是驗收條件（`tests/test_webapp_ranking.py`）。
+已知限制、兩份排序的說明、落差判準（可行動名次比純結構低 ≥ 2）與空產業組都從 `query.bottleneck` 的常數／函式取，
+markdown 與 artifact 同源（L16）。`freshness_identity` 只含順序與每列的結構／證據欄位——`documents` 多一份
+不算認知變了（L12）。`GET /api/v1/ranking` 與單檔同一套紀律：讀不到 503 ＋ remedy；排不出任何一列是
+200 ＋ `top_pick=null` ＋ 理由，兩者不同形；四種 request-path 證明已涵蓋這條路由。
+**APP 顯示排序但不重算排序**：唯一排序權威仍是 `rank_bottlenecks()`。state 目錄的解析只有一條規則
+（`webapp/store.py::resolve_state_dir`：明示 > analyst 目錄下的 `state/` > 預設），serve／materialize／status 都走它。
+
 **Web App 的資訊階層**（`webapp/static/`，vanilla JS，零外部資源，CSP 只允許 same-origin）：
 清單卡片 → ①判讀狀態（blocked 時逐條寫「卡在哪一層＋為什麼」）→ ②頭條 → ③內部 vs 市場 →
 ④最脆弱的假設 → ⑤研究現況／disproof → ⑥Entry（optional）→ ⑦新鮮度 → ⑧「這份判讀不是什麼」。
@@ -719,7 +731,7 @@ formula／provenance／evidence／epistemics 全部收進 `<details>` drill-down
 **技術棧沿用既有的**：`starlette` ＋ `uvicorn` 已隨 `mcp>=1.28` 安裝，**本次沒有新增任何套件**，
 也沒有前端建置工具鏈。部署重用既有 Cloudflare Tunnel（見 `deploy/cloudflare/README.md`）。
 
-**刻意不做：** runtime chatbot／LLM、broker、買賣、部位尺寸、Portfolio 排序、跨標的比較、
+**刻意不做：** runtime chatbot／LLM、broker、買賣、部位尺寸、Portfolio 排序、跨標的排序的**重算**（`/ranking` 只照抄 `rank_bottlenecks()`）、
 任何寫入端點、原生 App。
 
 ---
