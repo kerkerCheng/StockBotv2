@@ -617,7 +617,13 @@ def _cli_json() -> dict:
 
 def test_black_box_cli_agrees_with_the_canonical_read_model_on_every_core_number() -> None:
     payload = _cli_json()
-    v = view()
+    # 子行程那一端沒有 --today，用的是真實今天；比對側必須用同一個時鐘——否則日曆一過 TODAY，
+    # refresh（有到期日的判斷）就在兩側分歧（2026-09-08 實測：CLI review_required vs 凍結側 current）。
+    from datetime import date as _date
+
+    from briefing.alpha_view.sources import fetch_alpha_investment_view
+
+    v = fetch_alpha_investment_view(TICKER, include_causal=False, today=_date.today())
     panels = [payload[name] for name in ("headline", "fundamental", "why", "research", "entry")]
     lines = {line["key"]: line["datum"] for panel in panels for line in panel["lines"]}
 

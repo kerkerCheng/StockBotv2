@@ -385,6 +385,238 @@ def materialize_ranking(*, as_of: date | None = None, store: StateArtifactStore 
     return target.write(payload), payload
 
 
+# ---------------------------------------------------------------------------
+# state artifact：`beta`（配置差距＋逐檔水位；照抄 daily_beta_snapshot／Engine D 的輸出）
+# ---------------------------------------------------------------------------
+
+BETA_MATERIALIZER_VERSION = "webapp-materialize-beta/1"
+
+#: 這份畫面**不是什麼**。隨 artifact 出門（AGENTS Beta 呈現契約：只回答「距目標多遠」與「在什麼水位」）。
+BETA_THIS_IS_NOT = (
+    "不判斷今天要不要投入、不給金額、不給時間表——只回答各 sleeve 距目標多遠、每檔現在在什麼水位。",
+    "相對水位是脈絡不是訊號：不參與排序、不換算金額。長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號。",
+    "容忍區間是「到位」的判準，不是 gate：落在區間內即視為到位、沒有偏好；再平衡只用新投入的錢往低於目標的格子補，不賣出。",
+    "沒有任何動能或擇時指標：那一整組 2026-08-01 三次實測全部輸給無腦定投，已於 08-29 移除，不以任何名義回來。",
+    "貸款 tranche 不適用配置建議：未動用額度不算自有現金，每次提款仍是逐次人工核准。",
+    "發行人穿透（例：TSMC）只涵蓋 policy 已登記的部分：畫面上是「已知至少」，不是完整曝險。",
+    "本 APP 不重算：每一格都是 materialize 當下 Engine D beta monitor 的輸出照抄；價格序列來自 Engine C 每日 ETL 已存的觀測，materialize 不重抓行情。",
+)
+
+_BETA_AUTHORITY = {
+    "function": "portfolio.allocation.build_beta_monitor",
+    "command": "python scripts/daily_beta_snapshot.py --format json --no-refresh --no-record-risk",
+    "note": "Engine D 的 beta monitor 是唯一權威。本 artifact 照抄它的輸出：不重算差距、不重算水位、不補任何比例。"
+            "`--no-refresh`＝不重抓行情（讀 daily ETL 已存的觀測）；`--no-record-risk`＝不 append 風險快照（那是 authority）。",
+}
+
+#: 逐檔價格序列只搬這兩格。`technical_observations` 表裡還留著 08-29 前的動能欄位——**永遠不搬進 artifact**，
+#: 這條由 `tests/test_webapp_beta.py` 掃整份 JSON 守著。
+_SERIES_FIELDS = ("session_date", "close_adjusted")
+
+
+def _series_rows(rows: Sequence[Mapping[str, Any]] | None) -> list[dict[str, Any]]:
+    """Engine C 觀測 → `[{session_date, close}]`，由舊到新；只挑 `_SERIES_FIELDS`，其餘一格不碰。"""
+    out: list[dict[str, Any]] = []
+    for row in rows or ():
+        close = row.get("close_adjusted")
+        if close is None:
+            continue
+        out.append({"session_date": row.get("session_date"), "close": close})
+    out.sort(key=lambda r: str(r["session_date"]))
+    return out
+
+
+def build_beta_artifact(report: Mapping[str, Any], *, series_by_key: Mapping[str, Sequence[Mapping[str, Any]]],
+                        policy_risk: Mapping[str, Any], generated_at: datetime | None = None) -> dict[str, Any]:
+    """`daily_beta_snapshot` 的 JSON report → `beta` state artifact。**純函式**：每格照抄，只加標籤與序列。
+
+    標籤全部從 `portfolio.allocation` 的對照函式取（sleeve／差距狀態／行情狀態／降級原因／警告），
+    那裡是 markdown 用的同一份（L16）——APP 不自己維護第二份對照表。
+    """
+    from portfolio.allocation import (
+        _constraint_label, _gap_reason_label, _gap_state_label, _price_status_label, _sleeve_label,
+        _warning_label,
+    )
+
+    stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    gap = dict(report.get("allocation_gap") or {})
+    sleeves: list[dict[str, Any]] = []
+    for i, row in enumerate(gap.get("sleeves") or (), 1):
+        item = dict(row)
+        item["label"] = _sleeve_label(row.get("sleeve"))
+        item["state_label"] = _gap_state_label(row.get("state"))
+        item["unavailable_label"] = (_gap_reason_label(row["unavailable_reason"])
+                                     if row.get("unavailable_reason") else None)
+        # 固定色序：依 target_allocation 的 sleeve 順序給 slot，永遠不因排序或過濾重排（dataviz：色跟實體走）。
+        item["slot"] = i
+        sleeves.append(item)
+
+    instruments: list[dict[str, Any]] = []
+    for row in report.get("items") or ():
+        item = dict(row)
+        item["sleeve_label"] = _sleeve_label(row.get("sleeve"))
+        item["status_label"] = _price_status_label(row)
+        item["blocker_labels"] = [_constraint_label(b) for b in row.get("blockers") or ()]
+        item["warning_labels"] = [_warning_label(w) for w in row.get("warnings") or ()]
+        key = str(row.get("price_series_key") or "")
+        series = _series_rows(series_by_key.get(key))
+        item["series"] = series
+        item["series_note"] = (
+            f"Engine C 觀測序列自 {series[0]['session_date']} 起（{len(series)} 個已收盤交易日；"
+            "只含 data_status=observed 的日子，會隨每日 ETL 變長）；數值是 provider 報價單位的原值，"
+            "未換算幣別——不同檔的折線不可互比高低"
+            if series else "Engine C 沒有這檔的已收盤觀測序列（尚未 ETL 或全部被隔離）——沒有折線不是價格為 0")
+        instruments.append(item)
+
+    capital_view = dict(report.get("capital_view") or {})
+    portfolio = dict(report.get("portfolio") or {})
+    credit = dict(report.get("contingent_credit_available") or {})
+    risk_snapshot = dict(report.get("risk_snapshot") or {})
+    issuer_exposures = dict(risk_snapshot.get("issuer_exposures") or {})
+    payload: dict[str, Any] = {
+        "schema_version": STATE_SCHEMA_VERSIONS["beta"],
+        "kind": "beta",
+        "title": "資產配置：距目標多遠、現在在什麼水位",
+        "generated_at": stamp.isoformat(),
+        "as_of": None,
+        "point_in_time": {"mode": "current", "as_of": None, "excluded": None,
+                          "report_as_of": report.get("as_of")},
+        "authority": dict(_BETA_AUTHORITY),
+        "report_status": report.get("status"),
+        "refresh": {
+            **dict(report.get("refresh") or {}),
+            "note": "materialize 不重抓行情：逐檔的最新完整交易日是 daily ETL 最後一次寫入的 session_date。",
+        },
+        "twse_freshness": dict(report.get("twse_freshness") or {}),
+        "blockers": list(report.get("blockers") or ()),
+        "warnings": list(report.get("warnings") or ()),
+        "warning_labels": [_warning_label(w) for w in report.get("warnings") or ()],
+        "capital": {
+            "base_currency": portfolio.get("base_currency") or capital_view.get("base_currency"),
+            "status": capital_view.get("status"),
+            "authority_as_of": capital_view.get("authority_as_of"),
+            "blockers": list(capital_view.get("blockers") or ()),
+            "nav_base": portfolio.get("nav_base"),
+            "invested_non_cash_base": portfolio.get("invested_non_cash_base"),
+            "portfolio_cash_base": portfolio.get("cash_base"),
+            "cash_floor_base": portfolio.get("cash_floor_base"),
+            "deployable_cash_base": portfolio.get("deployable_cash_base"),
+            "self_funded_supported_range": list(report.get("self_funded_supported_range") or ()),
+            "loan_funded_supported_range": report.get("loan_funded_supported_range"),
+            "credit": {
+                "status": credit.get("status"),
+                "terms_status": credit.get("terms_status"),
+                "currency": credit.get("currency"),
+                "undrawn_amount_base": credit.get("undrawn_amount_base"),
+                "drawn_amount_base": credit.get("drawn_amount_base"),
+                "estimated_monthly_interest_base": credit.get("estimated_monthly_interest_base"),
+                "estimated_annual_interest_base": credit.get("estimated_annual_interest_base"),
+                "facilities": list(credit.get("facilities") or ()),
+                "blockers": list(credit.get("blockers") or ()),
+            },
+            "fx": dict(capital_view.get("fx") or {}),
+        },
+        "allocation": {
+            "status": gap.get("status"),
+            "unavailable_reason": gap.get("unavailable_reason"),
+            "basis": gap.get("basis"),
+            "invested_non_cash_base": gap.get("invested_non_cash_base"),
+            "rebalancing": dict(gap.get("rebalancing") or {}),
+            "policy_version": gap.get("policy_version"),
+            "sleeves": sleeves,
+            "correlation_warnings": list(gap.get("correlation_warnings") or ()),
+        },
+        "instruments": instruments,
+        "risk": {
+            "snapshot": risk_snapshot,
+            "thresholds": dict(policy_risk),
+            "warning_labels": [_warning_label(w) for w in risk_snapshot.get("warnings") or ()],
+            "hard_blocks": list(risk_snapshot.get("hard_blocks") or ()),
+            "issuer_focus": {name: dict(value) for name, value in issuer_exposures.items()
+                             if _finite_ratio(value.get("total_weight")) is not None
+                             and value.get("total_weight") >= float(policy_risk.get("issuer_concentration_warning") or 0)},
+        },
+        "notes": {
+            "water_level": "相對水位只呈現、不參與排序、不換算金額；長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號。",
+            "band": "容忍區間內＝到位、沒有偏好。再平衡只用新投入的錢往低於目標的格子補，不賣出；本表只給差距，不給金額。",
+            "lookthrough": "發行人穿透覆蓋恆為 partial：顯示的是「已知至少」。",
+            "loan": "未動用貸款額度不算自有現金；貸款 tranche 不適用配置建議，逐次人工核准。",
+            "leverage_labels": "「槓桿 ETF 資金占比」＝投入槓桿 ETF 的資金占 NAV；「換算槓桿曝險」＝乘上 2x／3x 後的曝險。兩者不得混用。",
+        },
+        "vocab": {
+            "sleeve_labels": {s["sleeve"]: s["label"] for s in sleeves},
+            "gap_state_labels": {k: _gap_state_label(k) for k in ("below_band", "on_target", "above_band", "unknown")},
+            "price_status_labels": {"observed": "行情正常", "insufficient_history": "歷史不足",
+                                    "unavailable": "資料不足", "quarantined": "資料不足（TWSE 官方較新，暫時隔離）",
+                                    "stale": "資料不足（行情過期）"},
+        },
+        "this_is_not": list(BETA_THIS_IS_NOT),
+        "materializer": {
+            "version": BETA_MATERIALIZER_VERSION,
+            "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+    }
+    payload = redact_private_paths(payload)
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="beta", as_of=None,
+        # 認知狀態＝各 sleeve 到位／偏離的狀態、各檔行情資料狀態、風險警告與硬擋。
+        # 價格動了（心跳、水位百分比）是內容變了，不是判斷該重看了（L12）。
+        identity={"sleeves": [[s.get("sleeve"), s.get("state")] for s in sleeves],
+                  "instruments": [[i.get("ticker"), i.get("price_status")] for i in instruments],
+                  "warnings": sorted(risk_snapshot.get("warnings") or ()),
+                  "hard_blocks": sorted(risk_snapshot.get("hard_blocks") or ()),
+                  "allocation_status": gap.get("status"), "capital_status": capital_view.get("status")})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload
+
+
+def _finite_ratio(value: Any) -> float | None:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return number if number == number else None
+
+
+def materialize_beta(*, store: StateArtifactStore | None = None,
+                     generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """跑一次 Engine D beta monitor（純讀）並寫下 `beta` artifact。
+
+    與 daily 的 `scripts/daily_beta_snapshot.py` 同一支程式、同一個 `build_beta_monitor`；差別是
+    `--no-refresh`（不重抓行情、不寫 Engine C）與 `--no-record-risk`（不 append 風險快照）。
+    它仍會讀 Google Sheet 持股（readonly）與 FX——那是 authority 讀取，只准發生在 materialize。
+    """
+    import importlib.util
+    import io
+
+    from engine_c.db import get_conn
+    from engine_c.technical import recent_technical_observations
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location("daily_beta_snapshot", root / "scripts" / "daily_beta_snapshot.py")
+    if spec is None or spec.loader is None:
+        raise RuntimeError("找不到 scripts/daily_beta_snapshot.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    buffer = io.StringIO()
+    code = module.run(["--format", "json", "--no-refresh", "--no-record-risk"], stdout=buffer)
+    report = json.loads(buffer.getvalue() or "{}")
+    if code != 0 or report.get("status") == "error":
+        raise RuntimeError(f"daily_beta_snapshot 失敗（exit {code}，status={report.get('status')}）")
+    policy = module.load_beta_policy()
+    keys = {str(item.get("price_series_key")) for item in report.get("items") or () if item.get("price_series_key")}
+    conn = get_conn()
+    try:
+        series_by_key = {key: recent_technical_observations(conn, key, limit=260) for key in sorted(keys)}
+    finally:
+        conn.close()
+    payload = build_beta_artifact(report, series_by_key=series_by_key,
+                                  policy_risk=dict(policy.get("risk") or {}), generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """把封閉字彙寫成 `.meta.json`，讓 serve 端讀得到而**不必 import `alpha`／`briefing`**。
 
@@ -419,6 +651,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     return path
 
 
-__all__ = ["MATERIALIZER_VERSION", "RANKING_MATERIALIZER_VERSION", "RANKING_THIS_IS_NOT",
-           "build_overview", "build_ranking_artifact", "materialize", "materialize_many",
-           "materialize_ranking", "materialize_view", "redact_private_paths", "write_vocabularies"]
+__all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "MATERIALIZER_VERSION",
+           "RANKING_MATERIALIZER_VERSION", "RANKING_THIS_IS_NOT", "build_beta_artifact",
+           "build_overview", "build_ranking_artifact", "materialize", "materialize_beta",
+           "materialize_many", "materialize_ranking", "materialize_view", "redact_private_paths",
+           "write_vocabularies"]

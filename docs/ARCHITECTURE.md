@@ -674,7 +674,7 @@ AlphaInvestmentView → AnalystView → MaterializedArtifact（JSON，atomic wri
      │                                library/private/app/analyst_view/<TICKER>.json
      │  python -m webapp serve         ← 純讀：open → json.loads → validate → return
      ▼
-GET /api/v1/{health,meta,stocks,stocks/{ticker},ranking} ＋ / （responsive Web App）
+GET /api/v1/{health,meta,stocks,stocks/{ticker},ranking,beta} ＋ / （responsive Web App）
      ▼
 Cloudflare Tunnel（既有那條）→ Cloudflare Access → iPhone Safari／桌機瀏覽器
 ```
@@ -710,14 +710,23 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
-目前只有 `ranking`）。`python -m webapp materialize --ranking` 走與 `python -m query.bottleneck` **同一條路**
+目前有 `ranking` 與 `beta`）。`python -m webapp materialize --ranking` 走與 `python -m query.bottleneck` **同一條路**
 （同一個 driver、`fetch_assertions`、registry），把 `rank_bottlenecks()` 的兩份排序**照抄**成 artifact——
 不重排、不加權、不自建第二套結構評分；**每列每格與 CLI 輸出逐格相等**是驗收條件（`tests/test_webapp_ranking.py`）。
 已知限制、兩份排序的說明、落差判準（可行動名次比純結構低 ≥ 2）與空產業組都從 `query.bottleneck` 的常數／函式取，
 markdown 與 artifact 同源（L16）。`freshness_identity` 只含順序與每列的結構／證據欄位——`documents` 多一份
 不算認知變了（L12）。`GET /api/v1/ranking` 與單檔同一套紀律：讀不到 503 ＋ remedy；排不出任何一列是
 200 ＋ `top_pick=null` ＋ 理由，兩者不同形；四種 request-path 證明已涵蓋這條路由。
-**APP 顯示排序但不重算排序**：唯一排序權威仍是 `rank_bottlenecks()`。state 目錄的解析只有一條規則
+**APP 顯示排序但不重算排序**：唯一排序權威仍是 `rank_bottlenecks()`。
+
+**`beta` kind（2026-09-08 B2）：** `python -m webapp materialize --beta` 以 `--no-refresh --no-record-risk` 純讀呼叫
+`scripts/daily_beta_snapshot.run()`（同一個 `portfolio.allocation.build_beta_monitor`），**不重抓行情、不 append 風險快照**；
+sleeve／差距狀態／行情狀態／降級原因的中文標籤全部從 `portfolio.allocation` 的對照函式取（L16）。逐檔折線的序列只搬
+Engine C `technical_observations` 的 `session_date`＋`close_adjusted`——那張表還留著 08-29 前的動能欄位，**永遠不進 artifact**
+（`tests/test_webapp_beta.py` 掃整份 JSON 鍵名）。畫面依 dataviz skill：水平堆疊條（現在的配置，色跟 sleeve 走）、分歧條
+（距目標多遠，灰帶＝容忍區間）、儀表（風控上限、52 週位置）、單系列折線（自身收盤，含十字線 tooltip 與表格版）；
+調色盤用 dataviz 參考實例的已驗證值（深淺兩套）。`freshness_identity` 只含各 sleeve 狀態／各檔行情狀態／風險警告，
+價格心跳變了不算認知變了。state 目錄的解析只有一條規則
 （`webapp/store.py::resolve_state_dir`：明示 > analyst 目錄下的 `state/` > 預設），serve／materialize／status 都走它。
 
 **Web App 的資訊階層**（`webapp/static/`，vanilla JS，零外部資源，CSP 只允許 same-origin）：

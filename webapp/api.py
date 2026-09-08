@@ -95,6 +95,7 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/stocks",
             f"GET /api/{API_VERSION}/stocks/{{ticker}}",
             f"GET /api/{API_VERSION}/ranking",
+            f"GET /api/{API_VERSION}/beta",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -152,27 +153,39 @@ async def stock_detail(request: Request) -> Response:
     return _json(body)
 
 
-async def ranking(request: Request) -> Response:
-    """跨標的瓶頸排序。**照抄 materialize 當下 `rank_bottlenecks()` 的輸出**——不重排、不重算。
+#: 每種 state kind 的「讀不到 vs 沒結論」說明——兩者不得同形，所以要各自講清楚。
+_STATE_NOTES = {
+    "ranking": ("跑 `python -m webapp materialize --ranking`",
+                "「artifact 讀不到」與「排不出任何一列」是兩件事——後者會以 200 ＋ top_pick=null ＋ top_pick_absent_reason 回。"),
+    "beta": ("跑 `python -m webapp materialize --beta`",
+             "「artifact 讀不到」與「配置算不出來」是兩件事——後者會以 200 ＋ allocation.status=unavailable ＋ 理由回。"),
+}
 
-    「artifact 讀不到」回 503 ＋ remedy；「排不出任何一列」則是 200 ＋ `top_pick=null` ＋ 理由，
-    兩者不得同形（與單檔的 503 vs `readiness=blocked` 同一條紀律）。
-    """
+
+async def _serve_state(request: Request, kind: str) -> Response:
+    """跨標的 state artifact 的共用讀法：**照抄 materialize 當下的輸出**——不重排、不重算。"""
+    remedy, note = _STATE_NOTES[kind]
     try:
-        payload, freshness = _state(request).read("ranking")
+        payload, freshness = _state(request).read(kind)
     except ArtifactUnavailable as exc:
-        return _json({"error": {"kind": "artifact_unavailable", "state_kind": "ranking",
-                                "reason": exc.reason,
-                                "remedy": "跑 `python -m webapp materialize --ranking`",
-                                "note": "「artifact 讀不到」與「排不出任何一列」是兩件事——"
-                                        "後者會以 200 ＋ top_pick=null ＋ top_pick_absent_reason 回。"}},
-                     status=503)
+        return _json({"error": {"kind": "artifact_unavailable", "state_kind": kind,
+                                "reason": exc.reason, "remedy": remedy, "note": note}}, status=503)
     body = dict(payload)
     body["freshness"] = freshness.to_dict()
     body["correlation_warning"] = _CORRELATION_WARNING
     # 哪幾檔有單檔判讀可以點進去：只是**列目錄**（與 /stocks 同一個動作），不讀檔、不重建。
     body["analyst_view_tickers"] = _store(request).tickers()
     return _json(body)
+
+
+async def ranking(request: Request) -> Response:
+    """跨標的瓶頸排序（`rank_bottlenecks()` 的輸出照抄）。"""
+    return await _serve_state(request, "ranking")
+
+
+async def beta(request: Request) -> Response:
+    """資產配置：距目標多遠、現在在什麼水位（Engine D beta monitor 的輸出照抄）。"""
+    return await _serve_state(request, "beta")
 
 
 async def index(request: Request) -> Response:
@@ -255,6 +268,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/health", health, methods=["GET"]),
         Route(f"/api/{API_VERSION}/meta", meta, methods=["GET"]),
         Route(f"/api/{API_VERSION}/ranking", ranking, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/beta", beta, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

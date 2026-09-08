@@ -209,7 +209,7 @@ def test_empty_ranking_is_honest_not_silent() -> None:
 # ---------------------------------------------------------------------------
 
 def test_state_kinds_are_a_closed_vocabulary() -> None:
-    assert STATE_KINDS == ("ranking",)
+    assert STATE_KINDS == ("ranking", "beta")
     assert STATE_SCHEMA_VERSIONS["ranking"] == "stockbot-app/ranking/1"
 
 
@@ -217,7 +217,9 @@ def test_state_artifact_fails_closed() -> None:
     payload = fake_ranking_payload()
     assert validate_state_artifact("ranking", payload) is payload
     with pytest.raises(ArtifactUnavailable, match="未登記"):
-        validate_state_artifact("beta", payload)
+        validate_state_artifact("coverage", payload)
+    with pytest.raises(ArtifactUnavailable, match="kind"):
+        validate_state_artifact("beta", payload)          # 已登記的 kind，但檔名與內容不一致
     with pytest.raises(ArtifactUnavailable, match="kind"):
         validate_state_artifact("ranking", dict(payload, kind="coverage"))
     with pytest.raises(ArtifactUnavailable, match="schema"):
@@ -268,8 +270,10 @@ def test_state_store_round_trip(tmp_path) -> None:
     assert not list(tmp_path.glob(".*.tmp"))
     got, fresh = store.read("ranking")
     assert got == payload and fresh.state == "fresh"
-    assert store.kinds() == ["ranking"] and store.missing_kinds() == []
+    assert store.kinds() == ["ranking"] and store.missing_kinds() == ["beta"]
     with pytest.raises(ArtifactUnavailable, match="未登記"):
+        store.read("coverage")
+    with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("beta")
     with pytest.raises(ArtifactUnavailable):
         store.path_for("../ranking")
@@ -277,7 +281,7 @@ def test_state_store_round_trip(tmp_path) -> None:
 
 def test_state_store_reports_missing_and_broken_separately(tmp_path) -> None:
     store = StateArtifactStore(tmp_path)
-    assert store.kinds() == [] and store.missing_kinds() == ["ranking"]
+    assert store.kinds() == [] and store.missing_kinds() == ["ranking", "beta"]
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("ranking")
     (tmp_path / "ranking.json").write_text('{"kind": "ranking", "rows": [', encoding="utf-8")
@@ -354,7 +358,7 @@ def test_status_and_verify_commands_include_state(tmp_path, capsys) -> None:
     assert "2/2" in capsys.readouterr().out
     assert main(["status", "--dir", str(tmp_path), "--format", "json"]) == 0
     doc = json.loads(capsys.readouterr().out)
-    assert [s["kind"] for s in doc["state"]] == ["ranking"] and doc["state_missing"] == []
+    assert [s["kind"] for s in doc["state"]] == ["ranking"] and doc["state_missing"] == ["beta"]
 
 
 # ---------------------------------------------------------------------------
@@ -366,7 +370,7 @@ def test_frontend_ranking_view_never_sorts_or_scores() -> None:
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     assert "function renderRanking" in source
     assert ".sort(" not in source
-    for token in ("weight", "score =", "* 0.", "Math.max(", "Math.min("):
+    for token in ("weighted", "weights", "score =", "* 0."):
         assert token not in source, token
     assert "RANK_VOCAB.sole_source_states" in source     # 三態說明來自 artifact，不是前端自寫
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")

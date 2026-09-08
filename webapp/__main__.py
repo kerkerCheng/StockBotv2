@@ -27,7 +27,7 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
-    from .materialize import materialize_many, materialize_ranking, write_vocabularies
+    from .materialize import materialize_beta, materialize_many, materialize_ranking, write_vocabularies
 
     store, state_store = _stores(args)
     as_of = date.fromisoformat(args.as_of) if args.as_of else None
@@ -45,10 +45,22 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ ranking → {path.name}（{path.stat().st_size:,} bytes；"
                   f"可行動 {len(payload['rows'])} 條／純結構 {len(payload['structural_rows'])} 條）")
 
+    if args.beta:
+        total += 1
+        try:
+            path, payload = materialize_beta(store=state_store)
+        except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
+            failed += 1
+            print(f"✗ beta：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            print(f"✓ beta → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"sleeve {len(payload['allocation']['sleeves'])} 格／商品 {len(payload['instruments'])} 檔）")
+
     # 不給 ticker 且沒要求 ranking ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
-    tickers = list(args.tickers) if args.tickers else ([] if args.ranking else store.tickers())
-    if not tickers and not args.ranking:
+    state_only = bool(args.ranking or args.beta)
+    tickers = list(args.tickers) if args.tickers else ([] if state_only else store.tickers())
+    if not tickers and not state_only:
         print("✗ 沒有指定 ticker，而 artifact 目錄也是空的——第一次請明寫要 materialize 哪幾檔",
               file=sys.stderr)
         return 2
@@ -144,6 +156,8 @@ def cmd_status(args: argparse.Namespace) -> int:
         extra = ""
         if kind == "ranking":
             extra = f"｜可行動 {len(payload['rows'])} 條／純結構 {len(payload['structural_rows'])} 條"
+        elif kind == "beta":
+            extra = f"｜sleeve {len(payload['allocation']['sleeves'])} 格／商品 {len(payload['instruments'])} 檔"
         print(f"- {kind}｜{freshness.state}（{freshness.age_hours:.1f}h）"
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
@@ -179,6 +193,8 @@ def build_parser() -> argparse.ArgumentParser:
     mat.add_argument("tickers", nargs="*", help="不給就重新 materialize 目錄裡已有的每一檔")
     mat.add_argument("--ranking", action="store_true",
                      help="另外（或只）materialize 跨標的瓶頸排序：rank_bottlenecks() 的輸出照抄")
+    mat.add_argument("--beta", action="store_true",
+                     help="另外（或只）materialize 資產配置：daily_beta_snapshot（--no-refresh --no-record-risk）的輸出照抄")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與 ranking 都適用）")
     _dirs(mat)
     mat.set_defaults(func=cmd_materialize)

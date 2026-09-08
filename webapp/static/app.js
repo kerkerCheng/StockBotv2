@@ -963,6 +963,487 @@ async function renderRanking() {
   window.scrollTo(0, 0);
 }
 
+/* ---------- 資產配置（beta state；照抄 Engine D beta monitor 的輸出，不重算、不排序） ----------
+   圖表依 dataviz skill：形式先於顏色；色跟實體走（sleeve 的 slot 由 materialize 固定）；細的 mark、
+   hairline 格線；每張圖都有表格版；tooltip 只加分不當唯一讀法。所有數字都是 artifact 的原值，
+   這裡只做 ×100 的百分比排版與座標換算——沒有任何財務算術。 */
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function svgEl(tag, attrs, text) {
+  const node = document.createElementNS(SVG_NS, tag);
+  Object.keys(attrs || {}).forEach((k) => node.setAttribute(k, String(attrs[k])));
+  if (text !== undefined && text !== null) node.textContent = String(text);
+  return node;
+}
+
+function fmtMoney(value, currency) {
+  if (typeof value !== 'number' || !isFinite(value)) return null;
+  const text = value.toLocaleString('zh-Hant', { maximumFractionDigits: 0 });
+  return currency ? `${currency} ${text}` : text;
+}
+
+function fmtRatioPct(value, digits) {
+  if (typeof value !== 'number' || !isFinite(value)) return null;
+  return (value * 100).toLocaleString('zh-Hant', { minimumFractionDigits: digits, maximumFractionDigits: digits }) + '%';
+}
+
+function tile(label, valueText, subText, extraClass) {
+  const box = el('div', 'tile ' + (extraClass || ''));
+  box.appendChild(el('div', 'tile-label', label));
+  box.appendChild(el('div', 'tile-value', valueText === null || valueText === undefined ? '—' : valueText));
+  if (subText) box.appendChild(el('div', 'tile-sub', subText));
+  return box;
+}
+
+function statusBadge(kind, text) {
+  const icon = { good: '●', warning: '▲', serious: '▲', critical: '■', neutral: '○' }[kind] || '○';
+  const badge = el('span', 'badge badge-' + ({ good: 'ready', warning: 'stale', serious: 'stale', critical: 'blocked', neutral: 'absence' }[kind] || 'absence'), `${icon} ${text}`);
+  return badge;
+}
+
+/* 行情狀態 → 徽章（圖示＋文字，永遠不只靠顏色）。字彙來自 artifact.vocab，不在這裡另寫。 */
+function priceStatusBadge(inst) {
+  const table = (BETA_VOCAB && BETA_VOCAB.price_status_labels) || {};
+  const status = inst.price_status;
+  const kind = status === 'observed' ? 'good' : (status === 'insufficient_history' ? 'neutral' : 'critical');
+  return statusBadge(kind, inst.status_label || table[status] || status);
+}
+
+/* ① 現在的配置：水平堆疊條（部分對整體，≤ 6 段，2px 表面間隙）＋ 圖例（≥ 2 系列必有） */
+function allocationStack(sleeves) {
+  const wrap = el('div');
+  const stack = el('div', 'stack');
+  const legend = el('div', 'legend');
+  sleeves.forEach((s) => {
+    if (typeof s.actual !== 'number') return;
+    const seg = el('div');
+    seg.className = 'swatch-' + s.slot;
+    seg.style.flexGrow = String(s.actual);
+    seg.title = `${s.label} ${fmtRatioPct(s.actual, 1)}`;
+    stack.appendChild(seg);
+    const item = el('span');
+    item.appendChild(el('span', 'key swatch-' + s.slot));
+    item.appendChild(document.createTextNode(`${s.label} ${fmtRatioPct(s.actual, 1) || '算不到'}`));
+    legend.appendChild(item);
+  });
+  wrap.appendChild(stack);
+  wrap.appendChild(legend);
+  return wrap;
+}
+
+/* ② 距目標多遠：每個 sleeve 一條分歧條（低於目標往左、高於往右），灰帶＝容忍區間（到位、無偏好）。 */
+function gapRows(sleeves) {
+  const box = el('div', 'gaps');
+  let extent = 0.02;
+  sleeves.forEach((s) => {
+    if (typeof s.gap === 'number') extent = Math.max(extent, Math.abs(s.gap));
+    if (typeof s.band === 'number') extent = Math.max(extent, s.band);
+  });
+  extent = extent * 1.15;
+  const pct = (ratio) => 50 + (ratio / extent) * 50;
+  sleeves.forEach((s) => {
+    const row = el('div', 'gap-row');
+    const head = el('div', 'gap-head');
+    const name = el('div');
+    name.appendChild(el('span', 'key swatch-' + s.slot));
+    name.appendChild(document.createTextNode(s.label));
+    head.appendChild(name);
+    head.appendChild(el('div', 'gap-nums',
+      `目標 ${fmtRatioPct(s.target, 1)}｜容忍 ±${fmtRatioPct(s.band, 1)}｜實際 ${fmtRatioPct(s.actual, 1) || '算不到'}`));
+    row.appendChild(head);
+    const right = el('div');
+    const track = el('div', 'gap-track');
+    if (typeof s.band === 'number') {
+      const band = el('div', 'gap-band');
+      band.style.left = pct(-s.band) + '%';
+      band.style.width = (pct(s.band) - pct(-s.band)) + '%';
+      track.appendChild(band);
+    }
+    const zero = el('div', 'gap-zero');
+    zero.style.left = '50%';
+    track.appendChild(zero);
+    if (typeof s.gap === 'number') {
+      const bar = el('div', 'gap-bar ' + (s.gap < 0 ? 'neg' : 'pos'));
+      const a = pct(Math.min(0, s.gap));
+      const b = pct(Math.max(0, s.gap));
+      bar.style.left = a + '%';
+      bar.style.width = Math.max(b - a, 0.4) + '%';
+      bar.title = `${s.label} 差距 ${fmtRatioPct(s.gap, 1)}`;
+      track.appendChild(bar);
+    }
+    right.appendChild(track);
+    const state = el('div', 'gap-state');
+    state.appendChild(document.createTextNode(
+      (typeof s.gap === 'number' ? `差距 ${s.gap > 0 ? '+' : ''}${fmtRatioPct(s.gap, 1)}　` : '') + (s.state_label || '')));
+    if (s.unavailable_label) state.appendChild(el('span', 'dim', '　' + s.unavailable_label));
+    right.appendChild(state);
+    row.appendChild(right);
+    box.appendChild(row);
+  });
+  return box;
+}
+
+function allocationTable(sleeves) {
+  const box = el('div', 'table-view');
+  const table = el('table');
+  const head = el('thead');
+  const hr = el('tr');
+  ['Sleeve', '角色', '目標', '容忍區間', '實際', '差距', '狀態'].forEach((t) => hr.appendChild(el('th', null, t)));
+  head.appendChild(hr);
+  table.appendChild(head);
+  const body = el('tbody');
+  sleeves.forEach((s) => {
+    const tr = el('tr');
+    [s.label, s.role || '', fmtRatioPct(s.target, 1), '±' + fmtRatioPct(s.band, 1), fmtRatioPct(s.actual, 1) || '算不到',
+      typeof s.gap === 'number' ? (s.gap > 0 ? '+' : '') + fmtRatioPct(s.gap, 1) : '—', s.state_label || ''].forEach((t) => tr.appendChild(el('td', null, t)));
+    body.appendChild(tr);
+  });
+  table.appendChild(body);
+  box.appendChild(table);
+  return box;
+}
+
+/* ③ 儀表：單一比值對一個上限（同色系軌道；狀態色一定配圖示＋文字）。 */
+function meter(ratio, cap, opts) {
+  const o = opts || {};
+  const wrap = el('div');
+  const track = el('div', 'meter');
+  const fill = el('div', 'meter-fill ' + (o.tone || ''));
+  const scale = o.scale || cap || 1;
+  fill.style.width = (typeof ratio === 'number' ? Math.max(0, Math.min(100, (ratio / scale) * 100)) : 0) + '%';
+  track.appendChild(fill);
+  if (typeof o.warn === 'number') { const w = el('div', 'meter-cap'); w.style.left = (o.warn / scale) * 100 + '%'; w.title = '警戒'; track.appendChild(w); }
+  if (typeof cap === 'number' && cap < scale) { const c = el('div', 'meter-cap'); c.style.left = (cap / scale) * 100 + '%'; c.title = '上限'; track.appendChild(c); }
+  wrap.appendChild(track);
+  const labels = el('div', 'meter-labels');
+  labels.appendChild(el('span', null, o.left || '0'));
+  labels.appendChild(el('span', null, o.right || ''));
+  wrap.appendChild(labels);
+  return wrap;
+}
+
+/* ④ 52 週區間位置：軌道＝低點→高點，標記＝現在。純位置，不是訊號。 */
+function rangeMeter(level) {
+  const wrap = el('div');
+  const track = el('div', 'meter');
+  const p = level && typeof level.range_percentile_52w === 'number' ? level.range_percentile_52w : null;
+  const fill = el('div', 'meter-fill');
+  fill.style.width = (p === null ? 0 : p * 100) + '%';
+  track.appendChild(fill);
+  if (p !== null) { const mark = el('div', 'meter-mark'); mark.style.left = (p * 100) + '%'; track.appendChild(mark); }
+  wrap.appendChild(track);
+  const labels = el('div', 'meter-labels');
+  labels.appendChild(el('span', null, '52 週低點'));
+  labels.appendChild(el('span', null, p === null ? '位置：算不到' : `位置 ${fmtRatioPct(p, 0)}`));
+  labels.appendChild(el('span', null, '52 週高點'));
+  wrap.appendChild(labels);
+  return wrap;
+}
+
+/* ⑤ 折線：單一系列（不需圖例）、2px、10% 面積淡色、hairline 格線、端點標籤、十字線 tooltip。 */
+function niceTicks(lo, hi, count) {
+  if (!(hi > lo)) return [lo];
+  const span = hi - lo;
+  const raw = span / count;
+  const mag = Number('1e' + Math.floor(Math.log10(raw)));
+  const norm = raw / mag;
+  const step = (norm >= 5 ? 10 : (norm >= 2 ? 5 : (norm >= 1 ? 2 : 1))) * mag;
+  const ticks = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) ticks.push(Number(v.toFixed(10)));
+  return ticks;
+}
+
+function lineChart(series, opts) {
+  const o = opts || {};
+  const W = 640; const H = 200; const padL = 46; const padR = 60; const padT = 10; const padB = 24;
+  const wrap = el('div', 'chart');
+  if (!series || series.length < 2) {
+    wrap.appendChild(el('p', 'note', o.emptyNote || '沒有足夠的序列可畫。'));
+    return wrap;
+  }
+  const values = series.map((r) => r.close);
+  const lo = Math.min.apply(null, values);
+  const hi = Math.max.apply(null, values);
+  const padY = (hi - lo) / 12.5 || Math.abs(hi) / 50 || 1;   // 座標留白，不是任何財務算術
+  const yMin = lo - padY; const yMax = hi + padY;
+  const x = (i) => padL + (i / (series.length - 1)) * (W - padL - padR);
+  const y = (v) => padT + (1 - (v - yMin) / (yMax - yMin)) * (H - padT - padB);
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': o.ariaLabel || '' });
+  niceTicks(yMin, yMax, 3).forEach((t) => {
+    svg.appendChild(svgEl('line', { x1: padL, x2: W - padR, y1: y(t), y2: y(t), class: 'grid' }));
+    svg.appendChild(svgEl('text', { x: padL - 6, y: y(t) + 3, 'text-anchor': 'end', class: 'tick' }, fmtNumber(t, decimalsFor(t))));
+  });
+  svg.appendChild(svgEl('line', { x1: padL, x2: W - padR, y1: H - padB, y2: H - padB, class: 'axis' }));
+  const d = series.map((r, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)},${y(r.close).toFixed(1)}`).join(' ');
+  svg.appendChild(svgEl('path', { d: `${d} L${x(series.length - 1).toFixed(1)},${H - padB} L${x(0).toFixed(1)},${H - padB} Z`, class: 'area' }));
+  svg.appendChild(svgEl('path', { d: d, class: 'line' }));
+  const last = series[series.length - 1];
+  svg.appendChild(svgEl('circle', { cx: x(series.length - 1), cy: y(last.close), r: 4, class: 'dot' }));
+  svg.appendChild(svgEl('text', { x: x(series.length - 1) + 8, y: y(last.close) + 4, class: 'end-label' }, fmtNumber(last.close, decimalsFor(last.close))));
+  svg.appendChild(svgEl('text', { x: padL, y: H - 6, class: 'tick' }, series[0].session_date));
+  svg.appendChild(svgEl('text', { x: W - padR, y: H - 6, 'text-anchor': 'end', class: 'tick' }, last.session_date));
+  const cross = svgEl('line', { x1: 0, x2: 0, y1: padT, y2: H - padB, class: 'cross', visibility: 'hidden' });
+  const hoverDot = svgEl('circle', { cx: 0, cy: 0, r: 4, class: 'dot', visibility: 'hidden' });
+  svg.appendChild(cross);
+  svg.appendChild(hoverDot);
+  const hit = svgEl('rect', { x: padL, y: padT, width: W - padL - padR, height: H - padT - padB, class: 'hit', tabindex: 0 });
+  svg.appendChild(hit);
+  wrap.appendChild(svg);
+  const tip = el('div', 'tip');
+  wrap.appendChild(tip);
+  const show = (i, clientX) => {
+    const r = series[i];
+    cross.setAttribute('x1', x(i)); cross.setAttribute('x2', x(i)); cross.setAttribute('visibility', 'visible');
+    hoverDot.setAttribute('cx', x(i)); hoverDot.setAttribute('cy', y(r.close)); hoverDot.setAttribute('visibility', 'visible');
+    tip.textContent = '';
+    const b = el('b', null, fmtNumber(r.close, decimalsFor(r.close)));
+    tip.appendChild(el('span', 'k'));
+    tip.appendChild(b);
+    tip.appendChild(document.createTextNode(`　${r.session_date}`));
+    tip.style.display = 'block';
+    const box = wrap.getBoundingClientRect();
+    const px = clientX === null ? (x(i) / W) * box.width : clientX - box.left;
+    tip.style.left = Math.min(Math.max(px + 12, 0), box.width - tip.offsetWidth - 4) + 'px';
+    tip.style.top = '4px';
+  };
+  const hide = () => { cross.setAttribute('visibility', 'hidden'); hoverDot.setAttribute('visibility', 'hidden'); tip.style.display = 'none'; };
+  hit.addEventListener('pointermove', (ev) => {
+    const box = svg.getBoundingClientRect();
+    const rel = ((ev.clientX - box.left) / box.width) * W;
+    const i = Math.round(((rel - padL) / (W - padL - padR)) * (series.length - 1));
+    show(Math.max(0, Math.min(series.length - 1, i)), ev.clientX);
+  });
+  hit.addEventListener('pointerleave', hide);
+  hit.addEventListener('focus', () => show(series.length - 1, null));
+  hit.addEventListener('blur', hide);
+  return wrap;
+}
+
+function seriesTable(series) {
+  const box = el('div', 'table-view');
+  const table = el('table');
+  const head = el('thead'); const hr = el('tr');
+  ['交易日', '收盤（自身序列）'].forEach((t) => hr.appendChild(el('th', null, t)));
+  head.appendChild(hr); table.appendChild(head);
+  const body = el('tbody');
+  series.slice().reverse().forEach((r) => {
+    const tr = el('tr');
+    tr.appendChild(el('td', null, r.session_date));
+    tr.appendChild(el('td', null, fmtNumber(r.close, decimalsFor(r.close))));
+    body.appendChild(tr);
+  });
+  table.appendChild(body); box.appendChild(table);
+  return box;
+}
+
+function signedPct(value, digits) {
+  const text = fmtRatioPct(value, digits);
+  return text === null ? '—' : (value > 0 ? '+' + text : text);
+}
+
+function instrumentCard(inst) {
+  const card = el('section', 'panel inst');
+  const head = el('div', 'inst-head');
+  head.appendChild(el('span', 'ticker', inst.ticker));
+  head.appendChild(el('span', 'company', inst.sleeve_label || inst.sleeve));
+  head.appendChild(priceStatusBadge(inst));
+  if (typeof inst.current_nominal_weight === 'number') head.appendChild(el('span', 'dim', `占 NAV ${fmtRatioPct(inst.current_nominal_weight, 1)}`));
+  card.appendChild(head);
+
+  const hb = inst.heartbeat || {};
+  const hbRow = el('div', 'hb');
+  const dateNode = el('span');
+  dateNode.appendChild(document.createTextNode('最新完整交易日 '));
+  dateNode.appendChild(el('b', null, hb.session_date || '—'));
+  hbRow.appendChild(dateNode);
+  [['1日', hb.return_1d], ['5日', hb.return_5d], ['20日', hb.return_20d]].forEach(([k, v]) => {
+    const n = el('span');
+    n.appendChild(document.createTextNode(k + ' '));
+    const b = el('b', null, signedPct(v, 1));
+    if (typeof v === 'number') b.classList.add(signClass(v));
+    n.appendChild(b);
+    hbRow.appendChild(n);
+  });
+  card.appendChild(hbRow);
+  if (hb.twse_reference) {
+    const t = hb.twse_reference;
+    card.appendChild(el('p', 'note', `TWSE 官方參考 ${t.session_date || ''}：${signedPct(t.return_1d, 1)}（只作最新日期與當日漲跌 reference，不混入自身序列）`));
+  }
+
+  const level = inst.water_level || {};
+  card.appendChild(rangeMeter(level));
+  const wl = el('div', 'status-line');
+  wl.appendChild(el('span', null, `距 52 週高點 ${signedPct(level.pct_from_52w_high, 1)}`));
+  wl.appendChild(el('span', null, `距 200 日均線 ${signedPct(level.pct_from_sma200, 1)}`));
+  if (level.status && level.status !== 'observed') wl.appendChild(statusBadge('neutral', `水位：${level.status}`));
+  card.appendChild(wl);
+
+  (inst.blocker_labels || []).forEach((t) => card.appendChild(el('p', 'warn', '▲ ' + t)));
+  (inst.warning_labels || []).forEach((t) => card.appendChild(el('p', 'note', t)));
+
+  card.appendChild(lineChart(inst.series, { ariaLabel: `${inst.ticker} 已收盤收盤價`, emptyNote: inst.series_note }));
+  card.appendChild(el('p', 'note', inst.series_note || ''));
+  if (inst.series && inst.series.length) card.appendChild(drill('表格版：每一個交易日的收盤', () => seriesTable(inst.series)));
+  return card;
+}
+
+function riskTone(value, warn, cap) {
+  if (typeof value !== 'number') return 'neutral';
+  if (typeof cap === 'number' && value >= cap) return 'critical';
+  if (typeof warn === 'number' && value >= warn) return 'warning';
+  return 'good';
+}
+
+function riskItem(label, value, warn, cap, opts) {
+  const o = opts || {};
+  const box = el('div', 'tile risk-item');
+  const head = el('div', 'tile-label');
+  head.appendChild(el('span', null, label));
+  const tone = riskTone(value, warn, cap);
+  head.appendChild(statusBadge(tone, { good: '正常', warning: '警戒', critical: '達上限', neutral: '未知' }[tone]));
+  box.appendChild(head);
+  box.appendChild(el('div', 'tile-value', o.valueText || (typeof value === 'number' ? fmtRatioPct(value, 1) : '算不到')));
+  box.appendChild(meter(value, cap, { warn: warn, scale: o.scale || cap, tone: tone === 'good' ? '' : tone,
+    left: '0', right: o.rightText || (typeof cap === 'number' ? `上限 ${o.capText || fmtRatioPct(cap, 1)}` : '') }));
+  if (o.sub) box.appendChild(el('div', 'tile-sub', o.sub));
+  return box;
+}
+
+let BETA_VOCAB = null;
+
+async function renderBeta() {
+  markNav('beta');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/beta`);
+  } catch (err) {
+    renderStateError(err, '讀不到資產配置');
+    return;
+  }
+  BETA_VOCAB = payload.vocab || {};
+  const notes = payload.notes || {};
+  const cap = payload.capital || {};
+  const cur = cap.base_currency || '';
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
+  }
+  badges.appendChild(el('span', 'badge badge-fresh', `monitor ${(payload.point_in_time || {}).report_as_of ? String(payload.point_in_time.report_as_of).slice(0, 16) : ''}`));
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  // ① 資本：一個主數字（可部署現金）＋三個小數字。
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('h2', null, '現在有多少錢可以動'));
+  const tiles = el('div', 'tiles');
+  tiles.appendChild(tile('自有現金可部署', fmtMoney(cap.deployable_cash_base, cur), 'cash floor 以上，alpha／beta 共用', 'hero'));
+  tiles.appendChild(tile('投資組合總值（NAV）', fmtMoney(cap.nav_base, cur), `其中已投入非現金 ${fmtMoney(cap.invested_non_cash_base, cur) || '—'}`));
+  const credit = cap.credit || {};
+  tiles.appendChild(tile('未動用貸款額度', fmtMoney(credit.undrawn_amount_base, cur), '不算自有現金；提款逐次人工核准'));
+  tiles.appendChild(tile('已借款／月息', `${fmtMoney(credit.drawn_amount_base, cur) || '—'}`, `月息約 ${fmtMoney(credit.estimated_monthly_interest_base, cur) || '—'}｜條件 ${credit.terms_status || '—'}`));
+  sec0.appendChild(tiles);
+  sec0.appendChild(el('p', 'note', notes.loan || ''));
+  app.appendChild(sec0);
+
+  // ② 配置：堆疊條（現在長怎樣）＋ 分歧條（距目標多遠）。
+  const alloc = payload.allocation || {};
+  const sec1 = el('section', 'panel');
+  sec1.appendChild(el('h2', null, '現在的配置 vs 目標'));
+  if (alloc.status !== 'available') {
+    sec1.appendChild(el('p', 'warn', '▲ 配置算不出來：' + (alloc.unavailable_reason || '未知原因') + '（不是 0，是沒讀到）'));
+  } else {
+    sec1.appendChild(el('div', 'panel-questions', `分母＝已投入的非現金部位 ${fmtMoney(alloc.invested_non_cash_base, cur) || ''}；不含現金，cash floor 是另一個 authority`));
+    sec1.appendChild(allocationStack(alloc.sleeves || []));
+    sec1.appendChild(el('div', 'group-title', '距目標多遠（灰帶＝容忍區間，落在裡面就是到位）'));
+    sec1.appendChild(gapRows(alloc.sleeves || []));
+    sec1.appendChild(el('p', 'note', notes.band || ''));
+    sec1.appendChild(drill('表格版', () => allocationTable(alloc.sleeves || [])));
+  }
+  (alloc.correlation_warnings || []).forEach((w) => {
+    const p = el('p', 'warn');
+    p.appendChild(document.createTextNode('▲ ' + (w.name || '') + '：' + (w.detail || '')));
+    sec1.appendChild(p);
+  });
+  app.appendChild(sec1);
+
+  // ③ 風控：只量測，不建議。
+  const risk = payload.risk || {};
+  const snap = risk.snapshot || {};
+  const th = risk.thresholds || {};
+  const sec2 = el('section', 'panel');
+  sec2.appendChild(el('h2', null, '風控儀表（只量測，不建議）'));
+  const grid = el('div', 'risk-grid');
+  grid.appendChild(riskItem('總曝險（持股＋槓桿 ETF＋借款）', snap.total_exposure_weight, th.total_exposure_warning, th.total_exposure_cap,
+    { valueText: typeof snap.total_exposure_weight === 'number' ? snap.total_exposure_weight.toFixed(2) + 'x' : '算不到',
+      capText: typeof th.total_exposure_cap === 'number' ? th.total_exposure_cap.toFixed(2) + 'x' : '',
+      sub: typeof snap.wipeout_index_drawdown === 'number' ? `自有資本歸零門檻：指數跌 ${fmtRatioPct(snap.wipeout_index_drawdown, 0)}` : '' }));
+  const etf = snap.etf_leverage || {};
+  grid.appendChild(riskItem('槓桿 ETF 資金占比', etf.nominal_weight, th.leveraged_nominal_warning, th.leveraged_nominal_cap, { sub: '投入槓桿 ETF 的資金占 NAV' }));
+  grid.appendChild(riskItem('換算槓桿曝險', etf.effective_weight, th.leveraged_effective_warning, th.leveraged_effective_cap, { sub: '乘上 2x／3x 之後' }));
+  grid.appendChild(riskItem('已提款貸款占 NAV', snap.loan_leverage_weight, null, null, { scale: 0.25, rightText: '（只記錄，不設上限）' }));
+  Object.keys(risk.issuer_focus || {}).forEach((issuer) => {
+    const e = risk.issuer_focus[issuer];
+    grid.appendChild(riskItem(`${issuer} 穿透曝險（已知至少）`, e.total_weight, th.issuer_concentration_warning, null,
+      { scale: 0.5, rightText: `警戒 ${fmtRatioPct(th.issuer_concentration_warning, 0)}`,
+        sub: `直接 ${fmtRatioPct(e.direct_weight, 1)}｜間接 ${fmtRatioPct(e.indirect_weight, 1)}；覆蓋 partial` }));
+  });
+  sec2.appendChild(grid);
+  (risk.warning_labels || []).forEach((t) => sec2.appendChild(el('p', 'note', '· ' + t)));
+  if (risk.hard_blocks && risk.hard_blocks.length) sec2.appendChild(el('p', 'warn', '■ 硬擋：' + risk.hard_blocks.join('、')));
+  sec2.appendChild(el('p', 'note', notes.leverage_labels || ''));
+  sec2.appendChild(el('p', 'note', notes.lookthrough || ''));
+  app.appendChild(sec2);
+
+  // ④ 逐檔：每一檔自己的心跳、52 週位置、自身收盤折線。
+  const sec3 = el('section', 'panel');
+  sec3.appendChild(el('h2', null, '每一檔現在在哪裡'));
+  sec3.appendChild(el('p', 'note', notes.water_level || ''));
+  app.appendChild(sec3);
+  (payload.instruments || []).forEach((inst) => app.appendChild(instrumentCard(inst)));
+
+  // ⑤ 新鮮度與 authority；這份畫面不是什麼。
+  const f = payload.freshness || {};
+  const sec5 = el('section', 'panel');
+  sec5.appendChild(el('h2', null, '這份畫面有多新'));
+  const rows = el('div', 'rows');
+  rows.appendChild(kv('materialize 於', `${f.generated_at}（${Number(f.age_hours).toFixed(1)} 小時前，${f.state}）`));
+  rows.appendChild(kv('權威', `${(payload.authority || {}).function}（${(payload.authority || {}).command}）`));
+  rows.appendChild(kv('行情更新', `${(payload.refresh || {}).status || '—'}｜${(payload.refresh || {}).note || ''}`));
+  rows.appendChild(kv('新鮮度身分', payload.freshness_identity));
+  rows.appendChild(kv('artifact content digest', payload.content_digest));
+  sec5.appendChild(rows);
+  sec5.appendChild(el('p', 'note', f.rule || ''));
+  app.appendChild(sec5);
+
+  const sec6 = el('section', 'panel');
+  sec6.appendChild(el('h2', null, '這份畫面不是什麼'));
+  sec6.appendChild(listOf(payload.this_is_not || []));
+  app.appendChild(sec6);
+  window.scrollTo(0, 0);
+}
+
+function renderStateError(err, title) {
+  app.textContent = '';
+  const box = el('div', 'error');
+  const detail = (err.body && err.body.error) || {};
+  box.appendChild(el('h2', null, title));
+  box.appendChild(el('p', null, detail.reason || detail.message || 'request failed'));
+  if (detail.remedy) {
+    const p = el('p', 'note');
+    p.appendChild(document.createTextNode('修法：'));
+    p.appendChild(el('code', null, detail.remedy));
+    box.appendChild(p);
+  }
+  if (detail.note) box.appendChild(el('p', 'note', detail.note));
+  app.appendChild(box);
+}
+
 /* ---------- 路由 ---------- */
 
 async function route() {
@@ -977,6 +1458,7 @@ async function route() {
     }
     // `ranking` 是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
     if (target === 'ranking') await renderRanking();
+    else if (target === 'beta') await renderBeta();
     else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {

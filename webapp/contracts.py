@@ -56,6 +56,7 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 #: 不另抄一份）。目前只有 `ranking`；coverage／positions／beta／watches 依 ROADMAP 逐一加。
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "ranking": "stockbot-app/ranking/1",
+    "beta": "stockbot-app/beta/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 
