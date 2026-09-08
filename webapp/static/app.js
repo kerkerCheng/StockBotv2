@@ -759,8 +759,8 @@ const ACTIONABLE_COLUMNS = [
   { title: '標的', cell: companyCell },
   { title: '卡在哪', cell: edgeCell },
   { title: '替代難度', cell: subCell },
-  { title: '證據', cell: (row) => el('td', null, row.evidence_label || row.evidence) },
-  { title: '合格狀態', cell: (row) => el('td', null, row.qualification_status || '—') },
+  { title: '證據', cell: (row) => el('td', 'nowrap', row.evidence_label || row.evidence) },
+  { title: '合格狀態', cell: (row) => el('td', 'nowrap', row.qualification_status || '—') },
   { title: '需求錨點', cell: anchorCell },
 ];
 
@@ -769,10 +769,10 @@ const STRUCTURAL_COLUMNS = [
   { title: '標的', cell: companyCell },
   { title: '卡在哪', cell: edgeCell },
   { title: '替代難度', cell: subCell },
-  { title: '距需求端', cell: (row) => el('td', null, hopsText(row)) },
-  { title: '目前證據', cell: (row) => el('td', null, row.evidence_label || row.evidence) },
+  { title: '距需求端', cell: (row) => el('td', 'nowrap', hopsText(row)) },
+  { title: '目前證據', cell: (row) => el('td', 'nowrap', row.evidence_label || row.evidence) },
   { title: '落差', cell: (row) => {
-      const cell = el('td', 'dim');
+      const cell = el('td', 'dim nowrap');
       if (row.gap_note) cell.textContent = row.gap_note;
       else if (row.actionable_rank) cell.textContent = `可行動排序第 ${row.actionable_rank}`;
       else cell.textContent = '—';

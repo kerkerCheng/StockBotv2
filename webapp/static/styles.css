@@ -202,3 +202,9 @@ ol.limits li { margin: 4px 0; }
 .warn { color: var(--flags); font-size: 13px; margin: 6px 0 0; }
 .sector { margin-top: 4px; }
 .dim { color: var(--dim); font-size: 12px; }
+
+/* 手機寬度下表格會橫向滑動（設計如此），但格內文字不得逐字直排：短欄位一律不換行。 */
+table.rank th, table.rank td.nowrap, table.rank td.rank-num, table.rank td.rank-sub { white-space: nowrap; }
+table.rank td.rank-company { min-width: 130px; }
+table.rank td.rank-edge { min-width: 170px; }
+table.rank td.rank-anchor .dim { white-space: nowrap; }
