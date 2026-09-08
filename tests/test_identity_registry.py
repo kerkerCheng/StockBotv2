@@ -16,7 +16,6 @@ KNOWN_CONSUMERS = (
     "thesis/generate_lane_memo.py",
     "engine_c/etl_yfinance.py",
     "query/health_audit.py",
-    "crons/weekly_scan_digest.py",
     "scripts/add_tickers.py",
 )
 

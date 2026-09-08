@@ -3,7 +3,7 @@ name: alpha-status
 description: >
   Alpha 現況總覽：回答「現在最值得投哪一檔」「該去補誰的證據」「哪裡還是空白」「已投的
   部位怎麼樣」四題。當使用者說「alpha status」「alpha 現況」「瓶頸排序」「現在該投什麼」
-  「我們缺什麼」「哪裡還沒挖」「挖到哪了」時使用；daily-brief 目前嵌入本 skill 的完整四個 pane。
+  「我們缺什麼」「哪裡還沒挖」「挖到哪了」時使用。四個 pane 的持久內容自 2026-09-08 起住 APP，daily-brief 只印較昨變動；本 skill 仍是「完整四 pane」的權威，隨叫隨到。
   **純消費端：只讀既有 authority 的輸出，一個數字都不自己重算**——它報告排程實際做了什麼，
   不是自己另算一份。不入圖、不改 thesis、不動資本，所有人工 gate 不受影響。
   觸發詞：alpha status、alpha 現況、瓶頸排序、現在該投什麼、缺什麼、哪裡還沒挖。
@@ -245,8 +245,8 @@ optional entry threshold）。它一個數字都不重算。
 
 ## 輸出格式
 
-四個 pane 依序出，每個 pane 開頭一句 TL;DR。**pane 1 必須有明確首選。**獨立呼叫與嵌入
-Daily Brief 時使用同一份輸出契約；Daily 不得另建刪減版或平行判準，直到使用者看過完整成品後另行定案。
+四個 pane 依序出，每個 pane 開頭一句 TL;DR。**pane 1 必須有明確首選。**
+⚠ **2026-09-08 起 Daily 不再嵌入四 pane**（持久內容住 APP，Daily 只印較昨變動）——那不是「另建刪減版判準」，而是把同一份內容移到每天都會更新、隨時可看的地方；判準本身仍只有本檔一份。被呼叫時（`$alpha-status`）一律輸出完整四 pane，不因 Daily 縮了就跟著縮。
 
 **每一列都要標「答案回來會改變什麼」**：`候選集合`／`排序`／`出場條件`／`只是信心`。
 標到「只是信心」的，就是在告訴使用者別做——那一級的上限被鎖死在「把已知第一名確認成第一名」。
@@ -275,7 +275,7 @@ Daily Brief 時使用同一份輸出契約；Daily 不得另建刪減版或平�
 
 | 情況 | 用哪個 |
 |---|---|
-| 今天有什麼要核准 | `skills/daily-brief`（目前嵌入本 skill 的完整四個 pane） |
+| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP `#/ranking`／`#/coverage`） |
 | 單一標的深挖 | `skills/investment-research` |
 | 由上而下拆解一個系統、產生新節點 | `skills/system-decompose` |
 | 新公司入圖 | `skills/company-onboard` |

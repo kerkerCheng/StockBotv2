@@ -73,10 +73,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      不得原樣留著——那是安靜沉底，而漏掉時沒有人會發現。
    - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe scripts\catalyst_watch.py`
-   - `.venv\Scripts\python.exe -m query.bottleneck`（Alpha Pane 1／2；已可在 sandbox 讀本機 Neo4j，不需要 outside-sandbox rule）
-   - `.venv\Scripts\python.exe scripts\alpha_purity_snapshot.py --format markdown --tickers <Pane 1 前段候選 tickers>`（Alpha Pane 1 標的純度；固定 outside-sandbox 唯讀 consumer，正規化市值並讀 analyst_count；不寫 Engine C）
-   - `.venv\Scripts\python.exe -m query.coverage_gaps`（Alpha Pane 3；區分真正 chokepoint 缺口與產品名詞）
-   - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（Alpha Pane 4；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority）
+   - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（部位與問責；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority；同時 append 當日排序快照，那是「較昨變動」的基準）
+   ⚠ **2026-09-08 起不再跑 `query.bottleneck`／`--by-sector`／`alpha_purity_snapshot`／`query.coverage_gaps`**：
+     排序與覆蓋缺口的完整內容住 APP（收尾 materialize 每天更新），Daily 只用 `decision_lab today` 已含的兩份排序
+     與 `ranking_order_snapshots.jsonl` 的前一筆比對出「較昨變動」。它們仍是 `$alpha-status` 的入口，隨叫隨到。
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
    - `.venv\Scripts\python.exe -m engine_b.todo list`
    - `.venv\Scripts\python.exe -m engine_b.event_watch sweep`（T2 主動輪詢，2026-08-31 sandbox review 後放行：
@@ -219,31 +219,23 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 有 trigger、需要使用者、或 `partial`／`isolated_tier_3` 的才逐欄列並說明缺哪份一手。
 同發行人同類文件（如一批 Form 4）彙總一行列數量與唯一例外，不逐筆點名。>
 
-## Alpha 現況（完整四 pane｜無 pq2 編號）
-### Pane 1 — 現在要投哪一檔
-<`rank_bottlenecks().rows` 的有序清單、明確首選、四維度、相關性警告、每檔 disproof；明標研究判斷且不給尺寸。
-**同公司多條邊壓成一列**（2026-09-02 定案）：列最高名次那條邊，其餘瓶頸併同格一句帶過。>
-<末尾附產業別分組（2026-08-31 定案）：`python -m query.bottleneck --by-sector` 的每產業 top-3
-＋開頭兩條需求錨重疊警告原樣照印；分組解決可視性、分數不可跨組比較，單一排序仍是唯一權威；
-「🔴 無需求錨」與空產業組（如記憶體/機器人/稀土——sub 覆蓋未及）要現形，那是研究缺口不是省略對象。>
-### Pane 2 — 該去補誰的證據
-<同一次輸出的 `structural_rows`；點出與 Pane 1 的排名差異及最高 ROI 補證據題目。
-**已在「需要你動作」出現過的研究題只引用編號**（2026-09-02 定案），不重述理由；
-本 pane 的價值是沒有 pq2 編號的結構缺口。>
-### Pane 3 — 哪裡還是空白
-<`query.coverage_gaps`；分開真正 chokepoint 研究缺口與抽取產生的產品名詞，只把前者轉成研究題目。
-**缺口清單改「計數＋較昨變動」**（2026-09-02 定案），有變動才點名節點；完整清單附查證命令，不逐日重印。>
-### Pane 4 — 部位與問責
-<上線標的／可量測／結案歸因計數器、真實 fill／現價／損益／epoch／disproof、錨點樣本效度與 alpha live 監控覆蓋缺口>
-<四個 pane 每列都標答案會改變 `候選集合`／`排序`／`出場條件`／`只是信心`；即使全部 `MONITOR` 或無新事件也不得省略。>
+## 現況：都在 APP，只講變動（無 pq2 編號）
+<四個畫面由收尾的 materialize 更新；本段只印計數與較昨變動，完整內容不重印。
+一張四列小表：瓶頸排序 `#/ranking`（可行動 N 條、首選是誰）｜資產配置 `#/beta`（低於／高於／到位各 N）｜
+研究缺口 `#/coverage`（🔴 真缺口 N／🟡 N）｜在等什麼 `#/watches`（在等 N／停滯 N／fired 未消化 N／追源需處置 N）。
+**有變動才展開**：首選換人、sleeve 進出容忍區間、風控門檻跨越、缺口節點增減、watch 轉 fired／stalled，
+各一行寫清楚什麼變了；排序的較昨基準是 `ranking_order_snapshots.jsonl`。
+⚠ 收尾 materialize 失敗時本段改印「APP 未更新：<原因>」，不得照印昨天的計數。
+排序完整讀法、Beta 逐檔心跳與目標配置表、兩條相關性警告、缺口與 watch 清單都住 APP，不再複述。>
 
-## Beta capital observation（無 pq2 編號）
-<**輕量版面（2026-09-02 使用者定案：投入頻率約半年一次）——無 TL;DR 段**，目標句收斂為本行：
-約 30 年後 `retirement_net_terminal_wealth` 最大化；本報告不判斷「今天該不該投」、不給金額或時間表。固定四塊：
-① 一行資本狀態：「自有現金可部署 <Portfolio CASH − cash floor；Alpha／Beta 共用> ｜ 未動用貸款額度 <amount>／已借款 <amount>／月息約 <amount>（不算自有現金；**貸款 tranche 不適用配置建議**，仍 manual_review_required）」。
-② 「目標配置差距」表（讀 `config/target_allocation.json`）：欄位「Sleeve｜目標｜容忍區間｜實際｜差距｜狀態」，分母是已投入的非現金部位，band 是容忍區間不是 gate，區間內即「到位」。**不加**「低於目標可優先補」複述行（狀態欄已講）。只給差距不給金額；再平衡只用新錢補低格、不賣出。
-③ 兩條相關性警告每天講一次、各一行：(a) alpha 與 beta 是同一個 AI 賭注，分 sleeve 不代表風險獨立；(b) TSMC look-through 已知至少約 28%，高於 0.25 warning，`issuer_loads` 恆 partial。
-④ 主力逐檔表 QQQ／TQQQ／LON:VWRA／SOXX／00631L.TW／2330.TW／00981A.TW，欄位固定「標的｜行情狀態｜行情心跳（自身價格）｜相對水位（自身價格）｜sleeve 狀態」；心跳寫「最新完整交易日 YYYY-MM-DD：1日 ±X%」再加 5／20 日，相對水位列 52 週區間位置（主要）、距 52 週高點、距 SMA200（2026-09-02 使用者定案：表格橫向可滑，欄位保留完整；輕量化砍的是段落與重複敘述，不是表格欄位）。主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留。燈號只表達資料狀態、不表達投入建議（🟢行情正常／🔴資料不足／⚪歷史不足；🟡 與「可評估／冷卻／暫停新增」等舊語意已於 2026-08-29 廢止，不得回填）。52 週區間位置取自商品**自身**價格序列（TQQQ 不冒用 QQQ、00631L／006208 不冒用 0050）；水位**只呈現、不參與排序、不換算金額**，不得用 RSI／MACD 等動能指標表達水位；表末固定一行「長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號」。stale／quarantined 改列官方 reference 日期、當日漲跌與降級原因。portfolio risk threshold 只在實際跨越時出現一行，沒跨越整句省略（drawn loan 等既有 warning 照常）。>
+## 部位與問責（無 pq2 編號；**尚未有 APP 畫面，不得省略**）
+<上線標的／可量測／結案歸因計數器、真實 fill／現價／損益／epoch／disproof、錨點樣本效度與 alpha live 監控覆蓋。
+每列標「答案會改變 候選集合／排序／出場條件／只是信心」。>
+
+## 賣出側：證偽條件與催化劑（無 pq2 編號）
+<`catalyst_watch.py` 的四態計數；只逐檔列「設定不完整」與「逾期或即將到期」。
+「N/M 檔有結構化催化劑日期」不得省略。>
+
 
 ## 健康／資料降級
 <本次 harvest、Engine C、beta technical、Neo4j、Sheet 的失敗或缺口；無則寫正常>

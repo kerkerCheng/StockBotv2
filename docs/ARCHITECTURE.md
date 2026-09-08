@@ -772,6 +772,11 @@ formula／provenance／evidence／epistemics 全部收進 `<details>` drill-down
 判準與禁令（band 不是 gate、水位只呈現、不得復刻擇時語言）住 `AGENTS.md`；
 這裡是它今天長什麼樣。
 
+⚠ **呈現的家自 2026-09-08 起是 APP（`#/beta`），不是 Daily。** 下面這些欄位規格、燈號文字、
+台股 freshness 與槓桿商品序列規則**一條都沒改**，改的是它們每天出現在哪裡：APP 由
+`-m webapp materialize --beta` 每日更新、隨時可看，Daily 只印門檻跨越與狀態翻轉。
+**Daily 仍須在 APP 當天沒被 materialize 時把這件事印出來**——否則「看不到」與「沒發生」同形（L12）。
+
 **輸入／輸出（`target-architecture.md` §9）：**
 
 | | `portfolio/` | `risk/` |

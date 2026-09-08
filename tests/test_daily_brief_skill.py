@@ -72,25 +72,38 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "contingent_credit_available" in text
     assert "loan_funded_supported_range=manual_review_required" in text
     assert "spreadsheets.readonly" in text
-    assert "retirement_net_terminal_wealth" in text
+    # ⚠ 2026-09-08：beta 的**呈現**搬到 APP，所以目標句與心跳欄位規格跟著資料走到 artifact
+    # （L16）。invariant 沒有放寬，只是換了家——這裡改成驗新家，不是刪掉這條檢查。
+    beta_home = (ROOT / "webapp" / "materialize.py").read_text(encoding="utf-8")
+    assert "retirement_net_terminal_wealth" in beta_home
+    assert "最新完整交易日" in beta_home
+    assert "52 週區間位置" in beta_home
+    assert "#/beta" in text, "skill 必須指得出 beta 現在住哪裡"
+    assert "APP 未更新" in text, "APP 沒被 materialize 時 Daily 必須說出來（否則看不到＝沒發生）"
     # 2026-08-29 訊號拔除（commit 6aa31de）：舊契約是「technical 只決定新增 timing／pace」，
     # 新契約是水位只呈現、不參與排序，且 beta 不回答「今天該不該投」。
-    assert "beta 不回答「今天該不該投」" in text
-    assert "只呈現、不參與排序、不換算金額" in text
-    assert "不得用 RSI／MACD 等動能指標表達" in text
-    assert "不是該等\n回檔的訊號" in text or "不是該等回檔的訊號" in text
-    assert "config/target_allocation.json" in text
-    assert "band 是容忍區間" in text or "容忍區間內視為到位" in text
-    assert "貸款 tranche 不適用配置建議" in text
+    # ⚠ 2026-09-08：這些契約句跟著呈現搬進 beta artifact——**呈現在哪裡，契約句就要在哪裡**，
+    # 否則規則會留在一份沒有人再照著印的文件裡（L16：分類要跟著資料走到消費端）。
+    for clause in ("beta 不回答「今天該不該投」",
+                   "只呈現、不參與排序、不換算金額",
+                   "不得用 RSI／MACD 等動能指標表達水位",
+                   "不是該等回檔的訊號",
+                   "config/target_allocation.json",
+                   "band 是容忍區間不是 gate",
+                   "貸款 tranche 不適用配置建議"):
+        assert clause in beta_home, f"beta artifact 少了契約句：{clause}"
+    assert "貸款 tranche 不適用配置建議" in text, "skill 仍須保留貸款不適用配置的判準"
     # ⚠ 禁的是「當成現行欄位／動作使用」，不是提到這些詞——skill 刻意留著一段移除紀錄，
     # 那段本身是防回填的剎車。
     for banned in ("本輪可評估上限：", "CONTRIBUTE REVIEW", "PAUSE CONTRIBUTION",
                    "節奏 25%", "🟢 `可評估`"):
         assert banned not in text, f"daily-brief skill 不得再描述已拔除的訊號機制：{banned}"
     assert "訊號整組已於 2026-08-29 移除" in text
-    assert "自有現金可部署" in text
-    assert "未動用貸款額度" in text
-    assert "槓桿 ETF 資金占比" in text
+    app_js = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    for clause in ("自有現金可部署", "未動用貸款額度", "槓桿 ETF 資金占比"):
+        assert clause in text or clause in beta_home or clause in app_js, (
+            f"資本欄位標籤消失了：{clause}"
+        )
     assert "換算槓桿曝險" in text
     assert "已投入的非現金部位" in text
     # 燈號只表達行情資料狀態；🟡 與 `可評估／冷卻` 舊語意已廢止。
@@ -172,21 +185,33 @@ def test_decision_review_go_dispatches_gap_pq1_before_reassess() -> None:
     assert "不授權 `dispatch`／`resolve`／`reassess`" in text
 
 
-def test_daily_embeds_full_alpha_status_contract() -> None:
+def test_every_alpha_pane_still_has_a_home_after_daily_stopped_embedding_them() -> None:
+    """四個 pane **不得因為 Daily 不再嵌入就消失**——每一個都要指得出新家。
+
+    ⚠ 這條在 2026-09-08 由「Daily 必須嵌入完整四 pane」改寫。改寫的合法前提只有一個：
+    **內容在別處已經讀得到**（L13：要移走一段內容，先確認它有消費端）。所以這裡驗的不是
+    「Daily 有沒有印」，而是「每一 pane 現在住哪、Daily 有沒有指得出來」。
+    """
     text = _text()
     alpha = ALPHA_STATUS.read_text(encoding="utf-8")
-    for token in (
-        "## Alpha 現況（完整四 pane｜無 pq2 編號）",
-        "### Pane 1 — 現在要投哪一檔",
-        "### Pane 2 — 該去補誰的證據",
-        "### Pane 3 — 哪裡還是空白",
-        "### Pane 4 — 部位與問責",
-        "query.coverage_gaps",
-        "scripts\\outcome_if_settled_today.py",
-        "scripts\\alpha_purity_snapshot.py",
-        # U7 後注意力狀態只剩 MONITOR／REVIEW；規則不變，只是措辭跟著字彙改。
-        "不得因今天無新事件或全部 `MONITOR` 而省略",
-    ):
-        assert token in text
-    assert "只出**可行動排序**" not in text
-    assert "daily-brief 目前嵌入本 skill 的完整四個 pane" in alpha
+
+    # ① alpha-status 仍是四 pane 的完整權威——判準只有一份，沒有被稀釋
+    for pane in ("## Pane 1 — 現在要投哪一檔", "## Pane 2 — 該去補誰的證據",
+                 "## Pane 3 — 哪裡還是空白", "## Pane 4 — 部位與問責"):
+        assert pane in alpha, f"alpha-status 少了 {pane}"
+    assert "本 skill 仍是「完整四 pane」的權威" in alpha
+
+    # ② Daily 必須指得出前三個 pane 的新家（APP），而不是安靜不提
+    for pointer in ("#/ranking", "#/coverage", "$alpha-status"):
+        assert pointer in text, f"Daily 沒有指出 {pointer}"
+
+    # ③ Pane 4 還沒有 APP 畫面 → **仍留在 Daily 且不得省略**
+    assert "## 部位與問責（無 pq2 編號）" in text
+    assert "scripts\\outcome_if_settled_today.py" in text
+    assert "順序是 invariant：APP 先讀得到，Daily 才能不印" in text
+
+    # ④ 移出的動作必須被寫出來，不是安靜消失
+    assert "2026-09-08" in text and "不再由 Daily 印出" in text
+    assert "daily-brief 目前嵌入本 skill 的完整四個 pane" not in alpha, (
+        "alpha-status 不得繼續宣稱自己被 Daily 嵌入——那句話已經是假的"
+    )

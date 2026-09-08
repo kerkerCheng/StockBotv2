@@ -74,7 +74,9 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "contingent_credit_available" in text
     assert "loan_funded_supported_range" in text
     assert "spreadsheets.readonly" in text
-    assert "retirement_net_terminal_wealth" in text
+    # ⚠ 2026-09-08：beta 呈現搬 APP，目標句跟著資料走進 artifact（見 test_daily_brief_skill 同一條）。
+    assert "retirement_net_terminal_wealth" in (ROOT / "webapp" / "materialize.py").read_text(encoding="utf-8")
+    assert "#/beta" in text and "APP 未更新" in text
     assert "failure_class" in text
     assert "access_blocked" in text
     assert "同一來源後續成功才算 recovered" in text
@@ -87,25 +89,32 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "自有現金可部署" in text
     # 2026-08-29 訊號拔除：beta 不再回答「今天該不該投」，只回答距目標多遠與在什麼水位。
     assert "目標配置差距" in text
-    assert "config/target_allocation.json" in text
-    assert "band 是容忍區間不是 gate" in text
-    assert "只呈現、不參與排序、不換算金額" in text
-    assert "不得用 RSI／MACD 等動能指標表達水位" in text
-    assert "不是該等回檔的訊號" in text
-    assert "貸款 tranche 不適用配置建議" in text
+    # ⚠ 2026-09-08：beta 呈現搬 APP，契約句跟著搬進 artifact（見 test_daily_brief_skill 同一條）。
+    beta_home = (ROOT / "webapp" / "materialize.py").read_text(encoding="utf-8")
+    for clause in ("config/target_allocation.json", "band 是容忍區間不是 gate",
+                   "只呈現、不參與排序、不換算金額", "不得用 RSI／MACD 等動能指標表達水位",
+                   "不是該等回檔的訊號", "貸款 tranche 不適用配置建議"):
+        assert clause in beta_home, f"beta artifact 少了契約句：{clause}"
     for banned in ("本輪可評估上限", "CONTRIBUTE REVIEW", "PAUSE CONTRIBUTION",
                    "baseline_pace", "campaign budget", "節奏"):
         assert banned not in text, f"daily prompt 不得再描述已拔除的訊號機制：{banned}"
-    assert "未動用貸款額度" in text
-    assert "槓桿 ETF 資金占比" in text
-    assert "換算槓桿曝險" in text
-    assert "不得用未解釋的斜線" in text
-    # 燈號只表達行情資料狀態；🟡 與舊語意已於 2026-08-29 廢止，且該廢止必須寫在 prompt 裡
-    # 當剎車——只是刪掉舊燈號不會阻止下一個 session 把它加回來。
-    for light in ("🟢行情正常", "🔴資料不足", "⚪歷史不足"):
-        assert light in text
-    assert "燈號只表達資料狀態、不表達投入建議" in text
-    assert "等舊語意已於 2026-08-29 廢止，不得回填" in text
+    app_js = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    for clause in ("未動用貸款額度", "槓桿 ETF 資金占比", "換算槓桿曝險"):
+        assert clause in text or clause in beta_home or clause in app_js, (
+            f"資本欄位標籤消失了：{clause}"
+        )
+    assert "不得用未解釋的斜線" in AGENTS.read_text(encoding="utf-8") or "不得用未解釋的斜線" in text
+    # 燈號只表達行情資料狀態；🟡 與舊語意已於 2026-08-29 廢止，該廢止必須留著當剎車——
+    # 只是刪掉舊燈號不會阻止下一個 session 把它加回來。
+    # ⚠ 2026-09-08：燈號隨 beta 呈現搬到 APP，所以**文字的產生端**才是該驗的地方；
+    #    prompt 只需保留「只表達資料狀態」這條判準與廢止紀錄。
+    allocation = (ROOT / "portfolio" / "allocation.py").read_text(encoding="utf-8")
+    for light in ("🟢 行情正常", "🔴 資料不足", "⚪ 歷史不足"):
+        assert light in allocation, f"燈號文字的產生端少了 {light}"
+    assert "燈號只表達行情資料狀態，不表達投入建議" in AGENTS.read_text(encoding="utf-8"), (
+        "燈號判準的家是 AGENTS.md 的 Beta 呈現契約"
+    )
+    assert "已於 2026-08-29 明文**廢止**" in AGENTS.read_text(encoding="utf-8")
 
 
 def test_daily_prompt_requires_subject_complete_pq2_items() -> None:
@@ -139,41 +148,52 @@ def test_daily_brief_preserves_beta_market_heartbeat_and_canonical_output() -> N
     """
     architecture = ROOT / "docs" / "ARCHITECTURE.md"
     # ① 判準：不得省略心跳、舊語意必須明文廢止、canonical brief 只有一份
+    materialize = (ROOT / "webapp" / "materialize.py").read_text(encoding="utf-8")
     for path in (AGENTS, DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
         text = path.read_text(encoding="utf-8")
-        assert "最新完整交易日" in text
         # ⚠ 禁的是「當成現行欄位使用」，不是提到這個詞——文件刻意留著移除紀錄，
         # 那正是防止它被重新加回來的剎車（見 AGENTS.md「技術訊號的地位」移除清單）。
         assert "本輪可評估上限：" not in text
-        # 舊燈號語意必須被明文廢止，而不是安靜消失——安靜消失擋不住下次回填。
-        assert "廢止" in text and "2026-08-29" in text
         assert "canonical Markdown" in text or "Canonical Brief" in text
-    # ② 欄位細節：逐檔表要有哪幾欄
-    for path in (architecture, DAILY, ROOT / "skills" / "daily-brief" / "SKILL.md"):
+    # ① 舊燈號語意必須被明文廢止，而不是安靜消失——安靜消失擋不住下次回填。
+    #    2026-09-08 Daily 不再印 beta 逐檔表，這份紀錄因此跟著搬到「呈現的新家」。
+    for path in (AGENTS, architecture, ROOT / "skills" / "daily-brief" / "SKILL.md"):
         text = path.read_text(encoding="utf-8")
-        assert "1 日" in text or "1日" in text
+        assert "廢止" in text and "2026-08-29" in text, f"{path.name} 少了明文廢止紀錄"
+    # ⚠ APP 端的防回填**不是**把廢止清單印給使用者看（那會讓那些字重新出現在畫面上），
+    #    而是機械斷言：producer 一個字都不准吐。散文記錄留在 AGENTS／ARCHITECTURE／skill。
+    for retired in ("可評估", "冷卻", "暫停新增", "本輪上限", "熱度"):
+        assert retired not in materialize, f"beta artifact producer 不得吐出已廢止字彙：{retired}"
+    # ② 心跳欄位規格：跟著 artifact 走（Daily 已不印逐檔表）
+    for path_text in (architecture, materialize):
+        text = path_text if isinstance(path_text, str) else path_text.read_text(encoding="utf-8")
+        assert "最新完整交易日" in text
         assert "52 週區間位置" in text or "52週區間位置" in text
         assert "本輪可評估上限：" not in text
     daily = DAILY.read_text(encoding="utf-8")
     skill = (ROOT / "skills" / "daily-brief" / "SKILL.md").read_text(encoding="utf-8")
-    assert "主力表在沒有任何配置缺口、全部 sleeve 到位時仍強制保留" in daily
+    # ③ 「不得省略」換成新的保險：APP 沒更新時 Daily 必須說出來（看不到 ≠ 沒發生）
+    assert "APP 未更新" in daily and "APP 未更新" in skill
+    assert "逐檔表永遠看得到" in materialize
     assert "task 最終回覆必須原樣輸出" in daily
-    assert "沒有任何配置缺口、全部 sleeve 到位時也不得刪除主力表" in skill
     assert "不得在取得 delivery receipt 後另產生" in skill
 
 
-def test_daily_prompt_requires_complete_alpha_status_heartbeat() -> None:
+def test_daily_prompt_points_at_where_the_panes_live_now() -> None:
+    """Daily 不再印四 pane，但**每一段都要指得出新家**；還沒有 APP 畫面的不得先砍。
+
+    ⚠ 2026-09-08 由「必須印完整四 pane」改寫。合法前提只有一個：內容在別處已經讀得到（L13）。
+    """
     text = DAILY.read_text(encoding="utf-8")
-    for token in (
-        "## Alpha 現況（完整四 pane｜無 pq2 編號）",
-        "### Pane 1 — 現在要投哪一檔",
-        "### Pane 2 — 該去補誰的證據",
-        "### Pane 3 — 哪裡還是空白",
-        "### Pane 4 — 部位與問責",
-        # U7 後注意力狀態只剩 MONITOR／REVIEW；規則不變，只是措辭跟著字彙改。
-        "即使全部 `MONITOR` 或無新事件也不得省略",
-    ):
-        assert token in text
+    for pointer in ("#/ranking", "#/beta", "#/coverage", "#/watches"):
+        assert pointer in text, f"prompt 沒有指出 {pointer}"
+    # 還沒有 APP 畫面的那一段：留在 Daily 且明文不得省略
+    assert "尚未有 APP 畫面，不得省略" in text
+    assert "outcome_if_settled_today.py" in text
+    # APP 當天沒更新時必須現形，否則「看不到」與「沒發生」同形（L12）
+    assert "APP 未更新" in text
+    # 已移出的四支命令不得又悄悄回到 daily 命令清單
+    assert "不再跑" in text and "query.coverage_gaps" in text
 
 
 def test_daily_prompt_is_not_the_retired_cloud_runner() -> None:

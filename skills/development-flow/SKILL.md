@@ -222,7 +222,10 @@ Suggested next Step:  ＋它的 success criteria（**只是建議**）
 
 ## 硬禁止（違反即視為未完成）
 
-1. **GO 只關閉本 Step，不開啟下一個 Step。** 不得因為上一個 Step 被核准就自行開工下一個。
+1. **GO 只關閉本 Step，不開啟下一個 Step。** 但 2026-09-08 起使用者已常規授權：**Verdict 為 GO
+   且下一步沒有待他決定的問題時，可直接接續**（六條停止條件見 `AGENT_WORKFLOW.md` §5：Z2／Z3、
+   四個人工 gate、資本／live／append-only authority、改 `AGENTS.md` 判準句或 ROADMAP Step 定義、
+   需要 R2、Verdict 不是 GO）。**買的是「不必為了說一聲而停」，不是「不必為了決定而停」。**
 2. **不得偷改 `ROADMAP.md` 並繼續跑。** 要改先給五欄 amendment（原 roadmap／新觀察／proposed change／why／impact）→ `AWAITING_HUMAN`。
 3. **NO_GO 之後不自動 repair loop。** 顯示 findings → `AWAITING_HUMAN`，由使用者選修／挑戰／改 scope／park／放棄。
 4. **不自行 spawn subagent。** 每次委派都要明確 opt-in；回傳是 review packet 不是 authority。

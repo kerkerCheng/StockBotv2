@@ -2,7 +2,8 @@
 name: daily-brief
 description: >
   每日核准迴路：把 harvest → triage → pq1 自動研究 → 今日決策 → 到期 thesis 聚合成一份
-  action-first 的 Daily Approval Brief，並嵌入 alpha-status 的完整四 pane 現況。使用者用一行批次語法
+  action-first 的 Daily Approval Brief。持久現況（瓶頸排序／資產配置／研究缺口／在等什麼）自 2026-09-08
+  起住 APP，Daily 只印較昨變動。使用者用一行批次語法
   （`1 3 7 go 4 drop 5 6 pending`）
   核准。當使用者說「daily brief」「今天有什麼要處理」「跑每日摘要」「有哪些待判斷」「今天需要
   動作嗎」時使用。三道閘門不放寬：graph admission 必經核准、深挖由 priority/使用者驅動但入圖仍

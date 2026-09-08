@@ -1,7 +1,7 @@
 """pending_leads_digest.py — SessionStart hook：開 session 時提示待判斷 leads。
 
-沿用 crons/weekly_scan_digest.py 的雙通道模式：systemMessage 給終端 UI、
-additionalContext 進 agent context（讓手機 App 遙控與 cloud session 也能轉述）。
+雙通道輸出：systemMessage 給終端 UI、additionalContext 進 agent context
+（讓手機 App 遙控與 cloud session 也能轉述）。
 安靜原則：沒有 pending／triaged_go 就不輸出，不打擾。gh/檔案缺失都優雅跳過，
 不能讓 session 開不起來。
 

@@ -543,8 +543,10 @@ def build_beta_artifact(report: Mapping[str, Any], *, series_by_key: Mapping[str
                              and value.get("total_weight") >= float(policy_risk.get("issuer_concentration_warning") or 0)},
         },
         "notes": {
-            "water_level": "相對水位只呈現、不參與排序、不換算金額；長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號。",
-            "band": "容忍區間內＝到位、沒有偏好。再平衡只用新投入的錢往低於目標的格子補，不賣出；本表只給差距，不給金額。",
+            "goal": "約 30 年後 `retirement_net_terminal_wealth` 最大化。本頁不判斷「今天該不該投」、不給金額或時間表——beta 只回答兩件事：各 sleeve 距目標多遠、每檔現在在什麼水位。",
+            "heartbeat": "逐檔心跳的最小要求：每列明示商品自身的**最新完整交易日**與 1 日漲跌，相對水位列 52 週區間位置（主要）、距 52 週高點、距 SMA200，全部取自商品**自身**價格序列（TQQQ 不冒用 QQQ、00631L 不冒用 0050）。這條在 Daily 收斂後由本頁承擔：**逐檔表永遠看得到**，不因今天沒有配置缺口而消失。",
+            "water_level": "相對水位**只呈現、不參與排序、不換算金額**，且**不得用 RSI／MACD 等動能指標表達水位**；長期上漲的標的多數時間落在高位是正確資訊，不是該等回檔的訊號。**beta 不回答「今天該不該投」**——只回答各 sleeve 距目標多遠、每檔在什麼水位。",
+            "band": "**band 是容忍區間不是 gate**：落在區間內即視為到位、沒有偏好。再平衡只用新投入的錢往低於目標的格子補，不賣出；本表只給差距，不給金額、不排名、不產生部位尺寸。目標比例的 SSOT 是 `config/target_allocation.json`，分母是已投入的非現金部位。**貸款 tranche 不適用配置建議**，仍走 Capital Authority 的逐次人工核准。",
             "lookthrough": "發行人穿透覆蓋恆為 partial：顯示的是「已知至少」。",
             "loan": "未動用貸款額度不算自有現金；貸款 tranche 不適用配置建議，逐次人工核准。",
             "leverage_labels": "「槓桿 ETF 資金占比」＝投入槓桿 ETF 的資金占 NAV；「換算槓桿曝險」＝乘上 2x／3x 後的曝險。兩者不得混用。",

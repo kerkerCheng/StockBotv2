@@ -298,12 +298,20 @@ probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再�
   **一旦有人拿它排序或調整尺寸，它就變回訊號。**
 - **燈號只表達行情資料狀態，不表達投入建議。** 舊語意（可評估／冷卻／暫停新增）
   已於 2026-08-29 明文**廢止**——安靜消失擋不住下次回填，所以廢止必須寫出來。
-- **行情表是每日心跳，不受今日是否投入影響**——即使所有 sleeve 都到位、今天沒有任何
-  配置缺口，逐檔表仍**不得省略**，且每列必須明示商品自身的**最新完整交易日**。
-- **兩條相關性警告每天都要講一次，不因每天一樣而省略：**（a）**alpha 與 beta 是同一個
-  賭注**——兩個 sleeve 的目標比例分開寫**不代表**它們是兩個獨立風險來源；
-  （b）**TSMC look-through 約 28%**，高於 `issuer_concentration_warning` 0.25，
-  且系統算不出精確值（`issuer_loads` 覆蓋恆為 `partial`）。
+- **逐檔行情表與目標配置表住 APP（2026-09-08 使用者定案）。** 兩者由每日 materialize 更新、
+  在 `#/beta` 隨時可看；**Daily 只印門檻跨越與狀態翻轉**（sleeve 進出容忍區間、某檔行情降級、
+  風控門檻被跨過）。
+  ⚠ **舊規則「即使沒有配置缺口，逐檔表仍不得省略」到此廢止**——它成立的前提是「Daily 是唯一
+  會更新的 surface」，而 APP 每天被 materialize 之後那個前提不再成立。**廢止必須寫出來：
+  安靜消失擋不住下次回填。**
+  ⚠ **不變的是 invariant 本身：逐檔心跳必須永遠看得到，每列明示商品自身的最新完整交易日。**
+  改的是它住在哪裡，不是它可不可以消失。**APP 當天沒被 materialize 時，Daily 必須把這件事印出來**
+  ——否則「看不到」與「沒發生」又同形了（L12）。
+- **兩條相關性警告改由 APP 常駐呈現**（每個畫面的頁尾），不再要求 Daily 每天複述。
+  內容一字不改：（a）**alpha 與 beta 是同一個賭注**——兩個 sleeve 的目標比例分開寫**不代表**
+  它們是兩個獨立風險來源；（b）**TSMC look-through 約 28%**，高於 `issuer_concentration_warning`
+  0.25，且系統算不出精確值（`issuer_loads` 覆蓋恆為 `partial`）。
+  ⚠ 這不是放寬：「每天講一次」變成「每次看都看得到」，後者不依賴使用者當天有沒有讀 brief。
 
 呈現細節（欄位、燈號文字、台股 freshness、槓桿商品序列）見
 [`ARCHITECTURE.md`](docs/ARCHITECTURE.md) §8。
@@ -331,6 +339,13 @@ probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再�
 「as reported（法定財報）vs 公司調整後」；它**沒有**任何欄位知道那是 US GAAP、IFRS、AASB 還是日本基準
 （Lynas／HDS／IQE 在 ledger 裡全都寫 `gaap`）。**字彙不改**（它是三本 private ledger 每筆紀錄身分的一部分，
 L10），改的是呈現別名，且 label 一律不含準則名稱。
+
+**Daily 與 APP 的分工（2026-09-08 使用者定案）：** 判準一句話——**昨天和今天一樣的住 APP，
+今天變了的＋要你決定的住 Daily**。所以 pq2 的四段完整留在 Daily（核准的載體是對話，APP 沒有寫入
+端點，放 APP 只多一次摩擦）；瓶頸排序、資產配置、研究缺口、事件監看住 APP，Daily 只印它們的
+計數與變動。⚠ **順序是 invariant：APP 先讀得到，Daily 才能不印。** 反過來做，使用者會打開看到
+幾天前的數字，那是 L13（管子只接一頭）的形狀——所以「讓 APP 每天自動更新」必須先於「Daily 收斂」。
+⚠ 還沒有 APP 畫面的段落（目前是**部位與問責**）**一律留在 Daily**，不得因為「遲早會搬」而先砍。
 
 **APP 沒有任何寫入端點，也沒有自己的帳號密碼系統。** 沒有 POST／PUT／PATCH／DELETE 路由；
 不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。外部認證邊界是 **Cloudflare Access**；
@@ -373,6 +388,14 @@ tier／pace／`campaign_budget_fraction_by_sleeve`／三態系統動作／「本
   `STEP_RESULT` 的「建議下一步」永遠只是建議——**不得因為上一個 Step 被核准就自行開工下一個**，
   也不得偷改 [`ROADMAP.md`](docs/ROADMAP.md) 後繼續跑（要改先給五欄 amendment 再等人）。
   這與「`go` ＝推進到下一個人工 gate」一致：**Step 邊界本身就是那個 gate**。
+  **常規推進授權（2026-09-08 使用者定案）：** 上面那條仍是預設，但使用者已常規授權一個例外——
+  **Verdict 為 `GO`、且 `Suggested next Step` 沒有任何待使用者決定的問題時，可直接接續下一個 Step**，
+  每個 Step 仍照常交回 `HUMAN SUMMARY` ＋八欄。**下列任一項成立時一律停下等人**，不因這條授權放寬：
+  ①Zoom 判為 **Z2／Z3**；②動到四個人工 gate 之一；③動到資本、live 或任何 append-only authority；
+  ④要改本檔的判準句，或改 [`ROADMAP.md`](docs/ROADMAP.md) 的 Phase／Step 定義（後者仍須先給五欄
+  amendment）；⑤需要 R2（第二份 token）；⑥Verdict 不是 `GO`。
+  判準一句話：**這條授權買的是「不必為了說一聲而停」，不是「不必為了決定而停」。**
+
 - **Local-first（2026-07-26 定案）：** 未特別寫 `claude.ai`／cloud 時，文件中的「Claude」
   一律指**本機 Claude Code session**。**cloud session＋MCP 是備援**，不要求等權。
   新核心必須能在完全沒有 MCP 的情況下運作；若 MCP 相容性與新核心架構衝突，**優先選新核心**。

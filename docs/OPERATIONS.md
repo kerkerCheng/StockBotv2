@@ -1014,6 +1014,24 @@ python -m briefing alpha-card COHR --format json | python -c "import json,sys;v=
 4. 更新 permission contract test，明確斷言允許項**與禁止的相鄰動詞**
 5. 用 scheduled task 的相同 sandbox／exact command 跑一次端到端 smoke test
 
+### SessionStart hook 的分工（2026-09-08 重審）
+
+**重審結論：兩個 hook 都留，刪掉的是一支沒有呼叫端的死碼。**
+
+| 誰在講 thesis 到期 | 什麼時候 | 講什麼 | 為什麼不重複 |
+|---|---|---|---|
+| `crons/thesis_freshness_check.py`（SessionStart hook） | 你開 session 時 | **尚未進待辦池**的新到期項目 | 它是 Daily 沒跑時的唯一提醒。2026-09-05→09-08 排程停了三天，那三天只有它會說話 |
+| Daily Brief 的「賣出側」 | 每天 06:30 | 每筆 decision 的 `disproof`／`catalyst`／`expiry` 四態 | 那是 decision 層的到期，不是 lifecycle 層；且已進池的項目 hook 會靜默 |
+| Weekly report 的「Thesis 核查」 | 每週日 | 唯讀複查提醒 | 週期不同、對象是整體健康而非單筆 |
+
+⚠ **「三個嘴」曾被判為重複，實測後不成立**：hook 對已進池項目會靜默（`active_lifecycle_todo_refs`），
+而 `thesis/lifecycle.json` 現有 3 條 active 且都有 `next_check`（最近 2026-09-28）——它會觸發、不是死機制。
+**判準是「這個機制實際產出過幾筆」，不是「看起來像不像重複」。**
+
+**刪掉的是 `crons/weekly_scan_digest.py`**：它自 U7b（2026-07-11）之後就沒有掛在任何 `hooks.json` 上，
+weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同 `tests/test_weekly_scan_digest.py` 一起刪。
+查證：`Select-String -Path .claude\settings.json,.codex\hooks.json -Pattern 'weekly_scan_digest'` 應為空。
+
 ## Daily / pq1 / 待辦池的參數與去重
 
 - **Daily pq1 budget：** 每輪上限唯一 authority 是 `config/daily_routine.json` 的
@@ -1022,7 +1040,8 @@ python -m briefing alpha-card COHR --format json | python -c "import json,sys;v=
   排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired
   lifecycle ＋ non-terminal Decision cohorts 自動導出。
 - **提醒去重：** lifecycle SessionStart hook 只提醒**尚未進池**的新到期項目；已存在的
-  `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。
+  `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。分工全表見上方
+  「SessionStart hook 的分工」。
   新提醒只走 `additionalContext` 呈現一次。
 - **Sheet 持股覆蓋分類：** `portfolio/brief.py::build_sheet_only_items` 依 Sheet ticker
   分三類——beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究

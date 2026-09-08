@@ -128,9 +128,26 @@ human checkpoint：agent 說明「為什麼這題值得第二份 token」，使�
 
 > **GO 只關閉本 Step，不開啟下一個 Step。**
 
-`STEP_RESULT` 裡的「建議下一步」永遠只是建議。使用者說 GO 之後，agent 回到 AWAITING_HUMAN，
-等待對**下一個 Step** 的明確指示。這與 `AGENTS.md`「`go` 的語意＝推進到下一個人工 gate」一致：
-Step 邊界本身就是那個 gate。
+`STEP_RESULT` 裡的「建議下一步」永遠只是建議。這與 `AGENTS.md`「`go` 的語意＝推進到下一個人工
+gate」一致：Step 邊界本身就是那個 gate。
+
+### 常規推進授權（2026-09-08 使用者定案）
+
+預設仍是上面那條，但使用者已常規授權一個例外：**Verdict 為 `GO`、且 `Suggested next Step` 沒有
+任何待他決定的問題時，agent 可直接接續下一個 Step**，每個 Step 仍照常交回 `HUMAN SUMMARY` ＋八欄。
+
+**六條停止條件（任一成立就回 AWAITING_HUMAN，不因這條授權放寬）：**
+
+1. Zoom 判為 **Z2／Z3**（跨模組責任、contract／語意改動、architecture boundary）
+2. 動到四個人工 gate 之一（graph admission／Engine C 判讀寫入／thesis mutation／live choice-fill）
+3. 動到資本、live，或任何 append-only authority
+4. 要改 `AGENTS.md` 的判準句，或改 `ROADMAP.md` 的 Phase／Step 定義（後者仍須先給五欄 amendment）
+5. 需要 R2（第二份 token）
+6. Verdict 不是 `GO`（`CONDITIONAL_GO`／`NO_GO`／`HUMAN_REQUIRED` 都要停）
+
+**判準一句話：這條授權買的是「不必為了說一聲而停」，不是「不必為了決定而停」。**
+⚠ 它**不放寬**任何 gate，也不改變 `GO` 的語意——`GO` 依然只關閉本 Step；改變的只是
+「關閉之後要不要停在原地等一句話」。
 
 ### 先給人看的 `HUMAN SUMMARY`（在 `STEP_RESULT` 之前）
 
@@ -261,7 +278,7 @@ thesis mutation／live choice-fill。
 
 | 觀測到什麼 → 就代表這套流程沒生效 | 核查頻率 | 觸發後 48 小時 |
 |---|---|---|
-| 出現「因為上一個 Step GO 了所以我就繼續做下一個」 | 每次 Step 收尾 | 把該次 transcript 當事故記錄；若是流程講不清楚造成的，改判準句而不是加文件 |
+| 在六條停止條件之一成立時仍自行接續下一個 Step（例如動了 `AGENTS.md` 判準句、Verdict 不是 GO、或該題需要 R2） | 每次 Step 收尾 | 把該次 transcript 當事故記錄；若是六條講不清楚造成的，改判準句而不是加文件。**這一條在 2026-09-08 由「不得接續」改寫成「越界才算違規」**——常規推進授權讓前者恆真而失去鑑別力（L14 第 4 點：恆亮＝零鑑別力） |
 | `STEP_RESULT` 的八欄開始有欄位長期空白或寫「N/A」 | 每次 Step 收尾 | 那一欄要嘛沒用（刪掉），要嘛沒人填（改成會自己出現的東西）。**不要留著假裝有** |
 | 使用者讀完交付後**仍要追問**「所以這對我的目標做了什麼／現在到哪」；或 `HUMAN SUMMARY` 長成第二份報告（>10 行）、每一行都能從八欄剪貼出來 | 每次 Step 收尾 | 前者代表那幾行沒回答到問題，後者代表它退化成摘要——**改寫那四行，不是再加一節說明**。摘要的邊際價值是零，因為使用者兩份都不會讀 |
 | R2 從未被觸發過，或每次都觸發 | 每季 | 恆亮或不會滅＝零鑑別力（L14 第 4 點）。六條 trigger 要重寫，不是調鬆緊 |

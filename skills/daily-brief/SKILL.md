@@ -2,7 +2,8 @@
 name: daily-brief
 description: >
   每日核准迴路：把 harvest → triage → pq1 自動研究 → 今日決策 → 到期 thesis 聚合成一份
-  action-first 的 Daily Approval Brief，並嵌入 alpha-status 的完整四 pane 現況。使用者用一行批次語法
+  action-first 的 Daily Approval Brief。持久現況（瓶頸排序／資產配置／研究缺口／在等什麼）自 2026-09-08
+  起住 APP，Daily 只印較昨變動。使用者用一行批次語法
   （`1 3 7 go 4 drop 5 6 pending`）
   核准。當使用者說「daily brief」「今天有什麼要處理」「跑每日摘要」「有哪些待判斷」「今天需要
   動作嗎」時使用。三道閘門不放寬：graph admission 必經核准、深挖由 priority/使用者驅動但入圖仍
@@ -276,65 +277,44 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 `isolated_tier_3`／截圖／paywall 則要說明「缺哪一份可逐字核對的一手原文」。park 不得被簡寫成已入圖或
 「已完成」；若沒有任何可核對 reason，視為 brief 缺欄而非正常 park。
 
-### Step 4 — 今日決策佇列、完整 alpha 現況與到期 thesis
+### Step 4 — 今日決策佇列、部位與到期 thesis
 
 ```powershell
 & '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 & '.venv\Scripts\python.exe' scripts\catalyst_watch.py
-& '.venv\Scripts\python.exe' -m query.bottleneck
-& '.venv\Scripts\python.exe' -m query.bottleneck --by-sector   # Pane 1 末尾產業別分組（2026-08-31）
-& '.venv\Scripts\python.exe' scripts\alpha_purity_snapshot.py --format markdown --tickers <Pane 1 前段候選 tickers>
-& '.venv\Scripts\python.exe' -m query.coverage_gaps
 & '.venv\Scripts\python.exe' scripts\outcome_if_settled_today.py
 ```
 
-第三支是 alpha-status Pane 1／2 的共同 authority：Pane 1 是**買進側**，與第二支的賣出側對稱；
-Pane 2 顯示純結構排序與最值得補證據的標的。第四支只讀 Engine C，提供 Pane 1 的正規化市值與
-`analyst_count`，不寫 authority；第五支提供 Pane 3 的既有 chokepoint coverage gaps；
-第六支與第一支的 `decision_lab today` 共同提供 Pane 4 的計數器、真實 fill 與 point-in-time 報酬。
-它們合起來回答——
-「哪個公司佔據了瓶頸、且是市場資金關注的部分」——輸出即
-`## Alpha 現況（完整四 pane）`，不另建平行排序或重算數字。
+⚠ **2026-09-08 起，瓶頸排序、產業分組、覆蓋缺口與標的純度不再由 Daily 印出**——它們住 APP
+（`#/ranking`、`#/coverage`），由收尾的 `-m webapp materialize` 每天更新。Daily 仍需要排序資料，
+但只用來算「較昨變動」：`decision_lab today` 的輸出已含兩份排序，與
+`library/private/decision_lab/ranking_order_snapshots.jsonl` 的前一筆比對即可。因此
+`query.bottleneck`／`--by-sector`／`alpha_purity_snapshot`／`query.coverage_gaps` 四支從 Daily
+的命令清單移除；它們仍是 [`skills/alpha-status`](../alpha-status/SKILL.md) 的入口，隨叫隨到。
 
-⚠ **呈現判準委派給 [`skills/alpha-status`](../alpha-status/SKILL.md)，本檔不再複製一份。**
-2026-08-19 本節曾自行維護一份三維度判準，08-21 判準收斂為四維度（新增**客戶端資本承諾**
-與**標的純度**）後就地過期而無人察覺——同一份呈現契約有兩個副本時，後改的那份不會回頭
-更新前一份（`AGENTS.md`「清單會腐壞，判準不會」）。四維度、禁用指標、相關性警告與
-「outcome 0/8 不是拒絕排序的理由」與四個 pane 的完整輸出契約一律以 alpha-status 為準。
+⚠ **這不推翻 2026-08-19 的教訓，正好相反。** 當時的問題是 `rank_bottlenecks()` 早就把
+COHR→NVIDIA 排在第 1，但 brief 沒有消費端，於是使用者問「推薦哪一檔」時 agent 只能答
+「無法推薦」——**做了正確的工作，產出沒有消費端**（L13）。今天它有兩個消費端：APP 的
+`#/ranking`（完整、隨時可看）與 Daily 的「較昨變動」（只講今天不一樣的地方）。
+**要把一段內容移出 Daily，唯一合法的前提是它在別處已經讀得到**；反過來做就是 L13 重演。
 
-`bottleneck` 的表格直接給出四維度中的前兩項（替代難度／`sole_source`＝瓶頸地位；
-需求錨點與距需求端跳數＝資金是否在那條鏈上）。**第 3 項（誰付錢給誰）與第 4 項
-（市值／`analyst_count`）不在排序內，必須另看** ——固定消費端是
-`scripts\alpha_purity_snapshot.py`，呈現規則見 alpha-status pane 1。若它回
-`private_acl_verification_unavailable`，只能說 ACL 驗證工具不可用且本輪 fail closed，不得寫成 ACL 不合格。
-⚠ **2026-08-19 之前這支從未進入 daily 流程**：`rank_bottlenecks()` 早就把 COHR→NVIDIA
-（5/5 sole_source、外部印證、距需求端 2 跳）排在第 1，但 brief 沒有消費端，使用者看不到，
-於是 agent 被問「推薦哪一檔」時只能答「無法推薦」。這是 L13「管子只接了一頭」的實例。
-它的已知限制必須隨表一起呈現，不得只貼排名：`substitutability` 覆蓋率僅約 16%（沒填的邊
-是隱形的）、不含 lead time（難替代 ≠ 換掉要很久）、`documents` 是注意力指標不參與排序。
+第一支是決策佇列與常駐計數器的唯一權威，也提供部位與問責那一段的資料。第二支是**賣出側**：
+把每筆 decision 已經必填的 `disproof`／`catalyst`／`expiry` 從卡片上的散文變成每天被檢查的狀態。
+L7 的原話是「欄位有填但沒有後續流程，等於貼了一個永遠不會響的火警警報」——這一支就是那個缺掉的
+流程。它是**條件檢查不是訊號**（只回答「你自己寫下的條件今天到了沒」，不預測任何東西），因此不受
+「先量測後放閘」限制。輸出四態：`設定不完整`／`已逾期`／`即將到期`／`監控中`，**`設定不完整`
+排最前面**——它的到期提醒本身就是假的，先修它才有意義。散文裡的日期**不猜**：只用結構化的
+`expiry` 與 `thesis/lifecycle.json` 的 `catalyst_checkpoints`，猜出來的日期會產生「看起來有排程、
+其實是編的」提醒，比沒有提醒危險。報表末尾必須顯示「N/M 檔有結構化催化劑日期」——其餘檔的
+`expiry 早於催化劑` 錯誤測不到，**沒抓到問題不等於沒有問題**（L13）。
 
-第二支是**賣出側**：把每筆 decision 已經必填的 `disproof`／`catalyst`／`expiry` 從卡片上的
-散文變成每天被檢查的狀態。L7 的原話是「欄位有填但沒有後續流程，等於貼了一個永遠不會響的
-火警警報」——這一支就是那個缺掉的流程。它是**條件檢查不是訊號**（只回答「你自己寫下的條件
-今天到了沒」，不預測任何東西），因此不受 D7「先量測後放閘」限制。輸出四態：
-`設定不完整`／`已逾期`／`即將到期`／`監控中`，**`設定不完整` 排最前面**——它的到期提醒本身
-就是假的，先修它才有意義。散文裡的日期**不猜**：只用結構化的 `expiry` 與
-`thesis/lifecycle.json` 的 `catalyst_checkpoints`，猜出來的日期會產生「看起來有排程、
-其實是編的」提醒，比沒有提醒危險。報表末尾必須顯示「N/M 檔有結構化催化劑日期」——
-其餘檔的 `expiry 早於催化劑` 錯誤測不到，**沒抓到問題不等於沒有問題**（L13）。
+第三支唯讀提供真實 fill、最新已收盤價與 point-in-time 報酬，不 close、不寫 authority；它也負責
+append 當日的排序快照（同日去重），那是「較昨變動」的基準。
 
-第一支自 2026-09-05 起在排序之後多一區 **「Alpha Card 摘要」**：對可行動排序前 5 檔，
-各由 `briefing/alpha_view/` 的 canonical read model 壓成一列（Q1 確定性／Q2–Q5 session 判斷／
-市場隱含 EPS 成長 proxy／共識營收成長／催化劑到期狀態／disproof 條數／尚未建模的區數）。
-它回答「排序第一名到底知道什麼、還不知道什麼」，是排序的補充不是替代；「未知」是不知道
-不是 0，⌛ 代表判斷是對舊 context 做的。完整卡片隨叫隨到：
-`& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER>`（互動專用，不進 unattended rule）。
-該區寫「未提供」代表這一批讀取失敗，與「無候選可摘要」不同。
+`decision_lab today` 自 2026-09-05 起在排序之後多一區 **「Alpha Card 摘要」**（可行動排序前 5 檔
+各壓成一列）。**Daily 不再印它**——單檔的完整判讀在 APP 的單檔頁面，比一列摘要完整得多；需要
+終端機版本時用 `& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER>`。
 
-第一支回今日的瓶頸排序與注意力狀態（`MONITOR`／`REVIEW`，四動作已於 2026-08-28 移除），
-每個 probe 附**自追蹤變化%**與**evidence_delta**
-（material=有觸及 thesis 因果結構的新證據 → 建議 reassess；peripheral=只多週邊 source；none=無變或
-純價格波動）。再讀 `thesis/lifecycle.json` 列到期需複查的 thesis。純讀，不建 decision。
 
 ### Step 5 — 同步統一待辦池並組 brief（繁中、exception-first、**穩定編號**）
 
@@ -494,114 +474,49 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 每筆尚未 drain 的 lead 必須標明「本輪 cap 延後／尚未 harvest／尚未 triage」
 等具體原因與 score，不能只列總數。
 
-## Alpha 現況（完整四 pane｜無 pq2 編號）
+## 現況：都在 APP，Daily 只講變動（無 pq2 編號）
 
-### Pane 1 — 現在要投哪一檔
-TL;DR：<直接回答「今天要不要加碼、加哪一檔」；不得只列清單不給首選>
-排序來源：`query/bottleneck.py` 的 `rank_bottlenecks()`（唯一權威；`research_status` 是研究完整度，不得拿來排序）
-相關性提醒：<本清單集中在哪個主題；列 N 檔不等於 N 個獨立機會，全買是同一賭注下 N 次>
-判斷性質：研究判斷，非回測或統計勝率；尺寸一律不給，由使用者決定
-| # | 標的 | 卡在哪（瓶頸邊） | 替代難度 | 證據強度 | 需求錨點／距需求端 | 現在的判斷 | 出場條件狀態 |
-|---|---|---|---|---|---|---|---|
-| 1 | Coherent（COHR） | 供貨給 NVIDIA | 5/5｜獨家供應 | 客戶端印證（客戶出資） | AI 交換器／2 跳 | 首選；已持有可加碼 | 已綁定，Q1 FY2027 檢查毛利率 40.2% |
-| 2 | Lumentum（LITE） | 超高功率雷射 `tech:uhp_laser` | 5/5｜獨家供應 | 供應商自報（L8 弱） | 同上鏈／3 跳 | 觀察；等客戶端印證 | 未綁定 → 該補 |
+四個持久畫面由收尾的 `-m webapp materialize` 每天更新；**本段只印計數與較昨變動，完整內容一律不重印**。
 
-表格措辭：**節點寫中文，首次出現附原始 label**（如「超高功率雷射 `tech:uhp_laser`」），
-讓使用者能把 label 貼回來查圖；同一份 brief 內重複出現可只寫中文。
-`supplies_to`／`depends_on` 寫成「供貨給 X」／「依賴 X」；`sole_source` 寫「獨家供應」；
-`externally_corroborated`／`self_reported` 寫「客戶端印證」／「供應商自報」。
-**同公司多條邊壓成一列**（2026-09-02 使用者定案）：列最高名次那條邊，其餘瓶頸併同格
-一句帶過（「另 3/4/6 名：InP 基板、6 吋 fab、外部雷射源」）——排序權威不變，
-呈現不讓同一家公司佔四列。
+| 畫面 | 今天 | 較昨 |
+|---|---|---|
+| 瓶頸排序 `#/ranking` | 可行動 N 條；首選 <公司（ticker）→ 瓶頸> | 首選未變／前五無進出 |
+| 資產配置 `#/beta` | 6 sleeve：低於 N／高於 N／到位 N | 無門檻跨越 |
+| 研究缺口 `#/coverage` | 🔴 真缺口 N／🟡 建模待補 N | ±0 |
+| 在等什麼 `#/watches` | 在等 N／停滯 N／fired 未消化 N／追源需處置 N | fired +1 |
 
-### Pane 2 — 該去補誰的證據
-TL;DR：<取同一次 `rank_bottlenecks()` 的 `structural_rows`；指出與 Pane 1 排名差異最大的標的>
-<列有標的但證據沒跟上的最高 ROI 研究題目；每列標示答案會改變 `排序` 或 `只是信心`>
-**已在「需要你動作」出現過的研究題只引用編號**（2026-09-02 使用者定案）：寫
-「[400] Soitec assessment（見上）」即可，不重述理由——2026-09-02 實測 Pane 2 五點
-有四點是 go 項理由的複述。本 pane 的價值是**沒有** pq2 編號的結構缺口。
+必填規則：
 
-### Pane 3 — 哪裡還是空白
-TL;DR：<取 `query.coverage_gaps`；把真正 chokepoint 研究缺口與文件掉出的產品名詞分開>
-<只把真正 chokepoint 缺口寫成「誰供應 tech:X」的可執行研究題目；每列標示答案會改變 `候選集合`>
-**缺口清單改「計數＋變動」呈現**（2026-09-02 使用者定案）：紅／黃／已覆蓋只列計數與
-較昨日變動（「紅 11（+0）」），**有變動才點名**新增或消失的節點；完整清單附查證命令
-`python -m query.coverage_gaps`，不逐日重印 11 個名字。
+- **有變動才展開，各一行寫清楚「什麼變了」**：首選換人、sleeve 進出容忍區間、風控門檻被跨過、
+  缺口節點增減、watch 由 active 轉 fired／stalled。沒變就只留計數。
+  排序的較昨基準是 `library/private/decision_lab/ranking_order_snapshots.jsonl`（每日 append、同日去重）。
+- ⚠ **APP 若沒被 materialize（收尾那一步失敗），本段必須改印「APP 未更新：<原因>」**，
+  不得照印昨天的計數——否則「看不到」與「沒發生」又同形了（L12）。
+- 排序的完整讀法與已知限制、Beta 的逐檔心跳與目標配置表、兩條相關性警告、缺口清單與 watch 清單
+  **都住 APP，Daily 不再複述**（2026-09-08 使用者定案；契約見 `AGENTS.md`「Beta 呈現契約」與
+  「APP 呈現契約」）。要看完整版本：開 APP，或呼叫 `$alpha-status`（它仍是四 pane 的完整權威）。
 
-### Pane 4 — 部位與問責
+## 部位與問責（無 pq2 編號）
+
+⚠ **這一段還沒有 APP 畫面**（`positions` kind 未做），所以**留在 Daily 且不得省略**——
+順序是 invariant：APP 先讀得到，Daily 才能不印。
+
 TL;DR：<上線標的／可量測／結案歸因常駐計數器；真實部位、錨點樣本效度與監控覆蓋>
+
 | 標的 | 進場 | 現價／損益 | catalyst（何時會知道） | disproof 是否觸發 | lifecycle／監控覆蓋 |
 |---|---|---|---|---|---|
+
 逐筆列出 `live_execution_reports` 中的部位。**進場價與 disproof 判準必須同列**。監控覆蓋一欄自
 2026-08-25 起由 `alpha_position_events` 回答：有 live fill 的部位一律在覆蓋內，該欄改記今日是否觸發
 （未觸發寫「覆蓋中／今日未觸發」，不得再寫「不在覆蓋範圍」）。
+已持有部位必須列 disproof 狀態；`None` 或 lifecycle `expired` 要當成缺口提出。
 
-四個 pane 的完整必填規則**只以 [`skills/alpha-status`](../alpha-status/SKILL.md) 為準**。Daily
-不另存判準副本，只補兩條 daily 特有規則：
+## 賣出側：證偽條件與催化劑（無 pq2 編號）
 
-- 已持有部位必須列 disproof 狀態；`None` 或 lifecycle `expired` 要當成缺口提出。
-- 四個 pane **不得因今天無新事件或全部 `MONITOR` 而省略**；先完整放進 Daily，之後由使用者看過
-  實際成品再決定裁切哪一段。規則同 Beta 主力表。
+資料源 `scripts/catalyst_watch.py`。**只印四態計數，加上「設定不完整」與「逾期或即將到期」的逐檔**；
+全部監控中就一行帶過（含追蹤檔數與最近一個到期日）。**「N/M 檔有結構化催化劑日期」那一行不得省略**
+——其餘檔的「expiry 早於催化劑」測不到，沒抓到問題不等於沒有問題（L13）。
 
-## 追蹤中的外部事件（無 pq2 編號）
-資料源：`& '.venv\Scripts\python.exe' -m engine_b.cli trace-backlog`
-| 標的／主題 | 在等什麼 | 可自動喚醒 | 已等待 |
-|---|---|---|---|
-| Agility Robotics（CCXI→AGLT） | 公開 Form S-4 含 Agility 經審計財務，或交易完成取得 AGLT ticker | 是 | 自 2026-08-13 |
-
-必填規則：
-- 只列 `trace_status=original_obtained` 或 `partial` **且**有 `trace_next_trigger` 的項目——
-  那代表「一手已追過、在等世界產生新事實」，不是研究失敗。
-- `trace_requires_user=true` 的**不放這裡**，它們該走 `source_trace_review` 取 pq2 編號。
-- **每列必須寫 `wake_state` 與到期日（2026-08-31 [321]）。** 等待狀態的唯一 authority 是
-  Event Watch registry，四種值講人話：`watching`＝有事件在等、`stalled`＝具名標的都觸發過
-  一輪了（被動層短期不會再醒，靠到期或主動輪詢救）、`expired`＝等待到期該重新決定、
-  `unwatched`＝**沒有任何機制在等它**（唯一真正的黑洞，必須當場處置）。
-  `stalled`／`expired`／`unwatched` 用 `engine_b.cli trace-backlog --needs-attention` 一次撈出，
-  它們**不得只列在表格裡就算數**——這三種等下去不會有事發生。
-- ⚠ **本段不得因為「今天沒有新進展」而省略。** 這正是它存在的理由：
-  2026-08-20 使用者問「追蹤 X 這麼久，humanoid 的 lead 為何圖裡都沒有」，而 CCXI 那條
-  其實被處理得很好——9 筆 filing 逐一取得一手、逐字比對（`agility 0 次、robotics 0 次`）、
-  確認 S-4 仍為 confidential submission、設好 `related_entity_signal` 喚醒條件、並連到
-  pq2 [74]。問題只在於 brief 僅顯示**當輪** park 的項目，08-13 之後它就再也不出現，
-  使用者因此完全看不到系統正在等什麼。這與「bottleneck 排名早就把 COHR 排第一卻沒進
-  brief」是同一個病：**做了正確的工作，但產出沒有消費端**（L13）。
-
-## Beta capital observation（無 pq2 編號）
-
-⚠ **輕量版面（2026-09-02 使用者定案：實際投入頻率約半年一次，不需要大版面）。**
-砍的是重複敘述與非必要欄位，**心跳契約的最小要求（每檔最新完整交易日＋1日漲跌）與
-兩條相關性警告一項不減**。固定結構四塊、無 TL;DR 段——目標句收斂為一行：
-約 30 年後 `retirement_net_terminal_wealth` 最大化；本報告不判斷「今天該不該投」、不給金額或時間表。
-
-自有現金可部署：<Portfolio CASH − cash floor；Alpha／Beta 共用> ｜ 未動用貸款額度 <amount>／已借款 <amount>／月息約 <amount>（不算自有現金；**貸款 tranche 不適用配置建議**，仍 manual_review_required）
-
-### 目標配置差距（分母＝已投入非現金部位；band 是容忍區間不是 gate；只給差距不給金額；再平衡只用新錢補低格、不賣出）
-| Sleeve | 目標 | 容忍區間 | 實際 | 差距 | 狀態 |
-|---|---|---|---|---|---|
-| beta_core（全球廣度錨） | 40.0% | ±5.0% | 28.1% | -11.9pp | 低於目標 |
-表格自己講完，**不加**「低於目標可優先補：…」複述行（狀態欄已講）。
-
-相關性警告（每天講一次，各一行，不因每天一樣而省略）：
-- **alpha 與 beta 是同一個 AI 賭注**：alpha 集中 AI 光互連、`beta_tilt` 是 QQQ／SOXX／台股半導體；分 sleeve 不代表風險獨立。
-- **TSMC look-through 已知至少約 28%**，高於 `issuer_concentration_warning` 0.25；`issuer_loads` 覆蓋恆為 partial。
-
-| 標的 | 行情狀態 | 行情心跳（自身價格） | 相對水位（自身價格） | sleeve 狀態 |
-|---|---|---|---|---|
-| QQQ | 🟢 行情正常 | 2026-08-28：1日 -0.6%｜5日 +0.4%｜20日 +4.1% | 52週區間位置 85%｜距高點 -3.9%｜距SMA200 +9.5% | beta_tilt 高於目標 |
-| TQQQ | 🟢 行情正常 | 2026-08-28：1日 -2.0%｜… | 52週區間位置 69%（自身序列，未冒用 QQQ）｜… | beta_leverage 到位 |
-| 00631L.TW | 🔴 資料不足（Yahoo 落後 TWSE，暫時隔離） | Yahoo 2026-08-27：…；TWSE 08-28 +1.0% | …（降級，水位不可信） | beta_leverage 到位 |
-
-**欄位保留完整（2026-09-02 使用者定案：表格橫向可滑，欄位不是版面成本）**：心跳寫
-「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」再加 5／20 日；相對水位列 52 週區間位置（主要）、
-距 52 週高點、距 SMA200。輕量化砍的是**段落與重複敘述**，不是表格欄位。既有規則不變：
-quarantine 降級照舊現形（官方 reference 日期＋當日漲跌＋降級原因）；52 週區間位置取自
-**自身**價格序列（TQQQ 不冒用 QQQ、00631L 不冒用 0050）；
-水位只呈現、不參與排序、不換算金額，**不得用 RSI／MACD 等動能指標表達水位**（2026-08-01 實測失敗的輸入，
-換名回歸即違規）；表末固定一行「長期上漲的標的多數時間落在高位是正確資訊，不是該等
-回檔的訊號」（2026-07-31 回測：等回檔對 30 年終值是負貢獻）。
-portfolio risk threshold **只在實際跨越時**出現一行，沒跨越整句省略（drawn loan 等
-既有 warning 照常）。
 
 ## 低優先（摺疊）
 EDGAR Form 4 ×55、較舊 filing——預設摺疊只列數量（要看再展開）
@@ -613,21 +528,15 @@ paper 無異動｜live 無 pending fill｜...
 回覆：`<編號…> go｜drop｜pending`（例：`3 4 go 5 drop`）
 ```
 
-pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。Beta
-行情區可用配有文字的燈號表達 deterministic state，但不得只靠顏色，也不得把 `行情正常` 讀成 `可買進`——
-燈號講的是**資料狀態**，不是投入建議。
-Beta 必須使用上述兩張表格（目標配置差距、主力逐檔），每個 ticker 一列；不能再用一長串 bullet 堆 raw 數字。
-首屏先出目標配置差距與兩條相關性警告，逐檔表才比較商品。每列至少回答「這檔在自己 52 週區間的哪裡、
-所屬 sleeve 距目標多遠」。**相對水位不改變 `config/beta_policy.json` 的 numeric gate、不參與排序、不構成
-live permission。**
-沒有任何配置缺口、全部 sleeve 到位時也不得刪除主力表；配置差距只控制 capital discussion，
-不控制行情是否顯示。
-Codex desktop 若支援 inline mobile visualization，Beta 區依「自有現金可部署／未動用貸款額度 →
-目標配置差距 → 相關性警告 → 風險燈號 → 標的行情狀態」層級呈現；不支援的 executor 必須輸出相同層級的
-Markdown，不能因此退化成 raw field names 或省略燈號。
-主力首屏依序顯示 `QQQ`、`TQQQ`、`LON:VWRA`、`SOXX`、`00631L.TW`、`2330.TW`、`00981A.TW`；
-個股與其他標的縮成 exception-first 摘要。Form 4 與較舊 filing 一律進
-「低優先（摺疊）」只列數量——冷啟動 EDGAR seed 偏 Form 4，別淹沒新訊號。
+pq2／lead priority **不使用顏色維度**（顏色曾混淆 triage 與優先度），一律使用明確指令字串。
+Form 4 與較舊 filing 一律進「低優先（摺疊）」只列數量——冷啟動 EDGAR seed 偏 Form 4，別淹沒新訊號。
+
+**Beta 的呈現規則整組移到 APP（2026-09-08 使用者定案）：** 目標配置差距表、主力逐檔表、燈號文字、
+52 週相對水位、兩條相關性警告都在 `#/beta`，由 `-m webapp materialize --beta` 每天更新。Daily 只在
+**門檻被跨越或狀態翻轉**時各印一行（sleeve 進出容忍區間、某檔行情降級、風控門檻跨越）。
+**判準一個字都沒改，改的是它住在哪裡**——完整契約見 `AGENTS.md`「Beta 呈現契約」，
+呈現細節見 `docs/ARCHITECTURE.md` §8。⚠ 燈號仍不得只靠顏色、`行情正常` 仍不得讀成 `可買進`，
+那條在 APP 端一樣成立。
 
 ### Step 6 — 批次 dispatch（type-aware）
 
