@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "_doc": [
+    "常規授權類別（2026-09-09 使用者定案；AGENTS.md「授權介面唯一」）。",
+    "pq2 裡有些類型的 `go` 只是**注意力 gate**：授權的是 bounded research／派回 pq1 這類可逆、不寫任何",
+    "authority 的事。使用者已預先授權這些類別——系統直接排入 pq1、brief 只印計數，不再逐項請求 `go`。",
+    "",
+    "判準一句話：這個 `go` 攔的是注意力還是 authority？攔 authority 的永遠不進 authorized。",
+    "",
+    "封閉字彙：engine_b/todo.py 的 ITEM_TYPES 每一種都必須出現在 authorized 或 never 其中之一",
+    "（engine_b/standing_authorization.py 是唯一 loader，載入時驗證；漏一種就拒絕載入）。",
+    "consumer：`python -m engine_b.todo standing-go --run`（互動／research-drain 段 2b）。daily 無人值守",
+    "採用前要先過 sandbox impact review（ROADMAP 研究閉環 P5）。",
+    "",
+    "兩種例外一律不動：使用者明示 `pending`（deferred_at）與在等世界（waiting_on）——常規授權買的是",
+    "注意力，不是替使用者改決定、也不是替世界發生事情。"
+  ],
+  "authorized": {
+    "decision_review": {
+      "label": "決策缺口的 bounded research",
+      "go_means": "advance_decision_review 全函數：有 work order → dispatch 回 pq1；無 work order → reassess；仍有實質 blocker → 以 assessment-gap 排入 pq1",
+      "excludes": ["入圖", "Engine C 判讀寫入", "thesis mutation", "live"]
+    },
+    "source_trace_review": {
+      "label": "追源派回 pq1",
+      "go_means": "requeue_trace 回 pq1 做 bounded 追源",
+      "excludes": ["付費取得（訂閱、報告購買——另核准 exact 金額）", "接受 claim", "提高 evidence tier", "入圖"],
+      "skip_when_hint_mentions": ["付費", "訂閱", "購買", "paywall", "paid"]
+    }
+  },
+  "never": {
+    "ra_admission": "graph admission 是四個 authority gate 之一",
+    "engine_c_observation": "Engine C 判讀寫入是 authority gate",
+    "thesis_mutation": "thesis mutation 是 authority gate",
+    "thesis_lifecycle": "lifecycle 結論由使用者決定",
+    "manual": "manual 型是使用者指示或系統提案（含 decompose 提案），逐項核准",
+    "sheet_only_holding": "持股要不要研究是使用者的 scope 決定",
+    "lead_research": "legacy，已移回 pq1，不再建立"
+  }
+}

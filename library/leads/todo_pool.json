@@ -7720,6 +7720,11 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_cc5365ecce4b1042520ee86fc41c389e",
+      "dispatch_ref": "wo_3073bbebf323cc04d1194b3c17ab22b8",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：RV 市占的審計級或客戶端來源(Estun/双環年報路徑未建)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 459,
       "reason": null,
@@ -7732,6 +7737,11 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_bbf7da3cbada857a6a83769613b22bb4",
+      "dispatch_ref": "wo_609c957217480557ee0f94c60c1898e0",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 460,
       "reason": null,
@@ -7840,6 +7850,11 @@
     },
     {
       "added_at": "2026-09-03T01:36:00.085206+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_acb634f831d77468f094c074c1ddffb0",
+      "dispatch_ref": "wo_7295b36af400cce5d413d7e94feea1b8",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 466,
       "reason": null,
@@ -7852,6 +7867,11 @@
     },
     {
       "added_at": "2026-09-03T01:36:00.085206+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_aeaf79962e4fb235241d9a73d9f7a584",
+      "dispatch_ref": "wo_12589de2a5edeef5c3e8a0b065c9910a",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 467,
       "reason": null,
@@ -17683,6 +17703,118 @@
       "ref_id": "decision-disproof:dc_a94362af0d6a7398f02bdeb4f0fb893c:2026-08-14",
       "type": "manual",
       "verb": "watch_wake"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 279,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_6bfe1063bee5af53cf61a927a1aed3d6",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 279,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=reassessed",
+      "receipt": "pd_6bfe1063bee5af53cf61a927a1aed3d6",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "attempt": 1,
+      "n": 459,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_3073bbebf323cc04d1194b3c17ab22b8",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 459,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_3073bbebf323cc04d1194b3c17ab22b8",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "attempt": 1,
+      "n": 460,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_609c957217480557ee0f94c60c1898e0",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 460,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_609c957217480557ee0f94c60c1898e0",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "attempt": 1,
+      "n": 466,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_7295b36af400cce5d413d7e94feea1b8",
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 466,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_7295b36af400cce5d413d7e94feea1b8",
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "attempt": 1,
+      "n": 467,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_12589de2a5edeef5c3e8a0b065c9910a",
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 467,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_12589de2a5edeef5c3e8a0b065c9910a",
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 479,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_8eb6602f2e3addf131fefd3b63f37b75",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T05:31:41.648240+00:00",
+      "n": 479,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=reassessed",
+      "receipt": "pd_8eb6602f2e3addf131fefd3b63f37b75",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "standing_go"
     }
   ],
   "next_n": 489,

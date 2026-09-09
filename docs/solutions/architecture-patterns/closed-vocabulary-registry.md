@@ -81,6 +81,7 @@ tags:
 | 比較狀態與會計口徑 | 同檔 `COMPARISON_STATUSES`／`ACCOUNTING_BASES` | `comparable` 以外的狀態**不得帶 gap 數字**（型別層強制）；`unverified` 口徑不得與任何口徑相減。多一種「不可比」要先想清楚 renderer 怎麼呈現它 |
 | FY 別共識的指標與期間種類 | `engine_c/db.py` `consensus_estimates` 的 CHECK（`metric IN ('eps','revenue')`、`period_kind IN ('fiscal_year')`） | 同時是 DB 約束，需配 migration；季度期間要進來得先決定季度結束日的解析規則（`shared/fiscal.py` v1 只做年度） |
 | lead 狀態機 | `engine_b/leads.py` 的 `ALLOWED_TRANSITIONS` | 狀態是行為不是分類；加狀態本來就要加邏輯 |
+| 常規授權類別（哪些 pq2 類型的 go 只是注意力 gate） | `config/standing_authorization.json`（`engine_b/standing_authorization.py` 是唯一 loader） | **不是擴充清單，是分類表**：`engine_b/todo.py` 的 `ITEM_TYPES` 每一種都必須落在 `authorized` 或 `never` 其中之一，漏一種 loader 就拒絕載入——新增 pq2 類型時逼你先回答「它攔的是注意力還是 authority」。四個 authority gate 的類型永遠在 `never`；付費取得永遠要 exact 金額核准（`skip_when_hint_mentions`）。consumer 是 `todo standing-go`，使用者明示 pending 與在等世界的項目不碰 |
 | 佇列段序（有工作的狀態 → 誰來取） | `engine_b/queue_segments.py` 的 `SEGMENTS`（＋`LEAD_STATUSES`／`WATCH_STATUSES`／`DISPATCH_STATUSES`／`NOT_WORK`） | 每一段必須指得出 consumer（沒有 consumer 的段就是黑洞，registry 在 import 時拒絕）。**新的工作狀態要先在這裡登記段與 consumer，再寫產生它的程式**——反過來做，`audit invariants --only QueueSegments` 會在第一筆資料出現當天 FAIL（2026-09-08 實測 39 個 fired watch 與 27 檔 forward view 就是這樣躺了一週沒人取）。`cost`（mechanical／research）決定吃不吃 `drain_limit_per_run` |
 | thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |
 | 執行 intent | `decision_lab/workflow.py` 的 `_INTENTS`（research／paper／live） | 資本邊界 |

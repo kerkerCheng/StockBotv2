@@ -77,6 +77,7 @@ git status --short
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired          # 段 1：fired 的追源 watch 排回 pq1（零 token）
 & '.venv\Scripts\python.exe' -m engine_b.todo sync                  # 段 1 的 pq2 型翻醒＋同步待辦池
 & '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run  # 段 2：只因 context 過期而 REVIEW 的，reassess 後結案
+& '.venv\Scripts\python.exe' -m engine_b.todo standing-go --run     # 段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go
 & '.venv\Scripts\python.exe' -m engine_b.cli counts
 & '.venv\Scripts\python.exe' -m engine_b.todo list
 & '.venv\Scripts\python.exe' -m engine_b.cli drain                  # 首行是段 0–1 計數器；假設對照的 fired watch 逐筆列在這裡
@@ -106,10 +107,25 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 2. **`triaged_go` 線索** — 順序**只認 `engine_b.cli drain` 的輸出**。
    ⚠ 不得另建排序：`engine_b/priority.py` 是 pq1 排序的唯一權威，
    「我覺得這條比較有趣」正是它要防的東西。
-3. **圖的覆蓋缺口** — 只有前兩段清空後才做。這一段沒有既有排序，是唯一需要判斷的地方，
+3. **每檔閉環（段 5，2026-09-09 起）** — 前兩段清空後、覆蓋缺口之前。工單不是自己列的：
+   `drain` 首行的「段5 每檔閉環」一行與 `python -m webapp status` 的「每檔閉環」段，都由
+   `alpha/closure.py` 從 analyst view artifact 的 `readiness.blocker_details` 照抄（每格帶
+   `absence_kind`／`settled`）。**下一檔選誰不是自由心證**——`closure.NEXT_PICK_RULE` 五條依序比：
+   有同期 EPS 共識 → forward EPS 為正 → 產業能加一（所屬產業尚無 ready 檔）→ 瓶頸排序名次 → ticker。
+   **深度優先**：第 N 檔未到終局不開第 N+1 檔，除非它卡在 pq2 或世界。終局三種：ready／
+   剩餘 blocker 全部 settled／全部掛在 pq2 編號上。每一格的路（判準機械，見 `alpha/absence.py`）：
+   - `not_yet_recorded`／`upstream_unavailable` 的基期實績、指引 → 抓一手財報寫 mechanical 觀測（不碰 gate）
+   - 營運假設、倍數、horizon、判斷檔 → session 判斷寫 ledger，evidence_refs 必須解析得到；倍數依
+     `AGENTS.md`「隱含報酬的兩個桿」預設校準倍數，折價要指得出證據
+   - 客戶端承諾、獨立來源 → source-trace，可能結成 RA packet（入圖仍是 pq2）
+   - `provider_missing` → 換來源，否則提案 Abstention（pq2，因為它把這格從工單上拿掉）
+   - `method_not_applicable`（虧損）→ 留給 ROADMAP P6，不硬做
+   - 判讀型 Engine C 觀測（backlog、客戶集中）→ 打包觀測提案（pq2）；同類缺口跨多檔就打包成一批
+   每消一格 `python -m webapp materialize <TICKER>` 一次，讓下一格的判斷讀到新狀態。
+4. **圖的覆蓋缺口** — 只有前三段清空後才做。這一段沒有既有排序，是唯一需要判斷的地方，
    判準見下。
 
-### 第 3 段的排序判準（唯一需要判斷之處）
+### 第 4 段（覆蓋缺口）的排序判準（唯一需要判斷之處）
 
 依序問，先滿足者先做：
 
@@ -236,15 +252,17 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.event_watch counters   # fired_unconsumed 只剩假設對照型（lead 型與 pq2 型為 0）
 & '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale    # 候選 0
+& '.venv\Scripts\python.exe' -m engine_b.todo standing-go       # 候選 0（常規授權類別都已排入 pq1）
 & '.venv\Scripts\python.exe' -m engine_b.cli counts          # triaged_go 為 0
 & '.venv\Scripts\python.exe' -m engine_b.todo list           # 無 queued／researching 的 dispatch_status
 & '.venv\Scripts\python.exe' -m query.coverage_gaps          # 每個 🔴 都已有對應終局（packet／park／pq1）
 & '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段的數字；分不到段的狀態＝新工作沒有 consumer
 ```
 
-⚠ **forward view backlog（段 5）自 2026-09-09 起是工作集合的一部分**——`QueueSegments` 會印出
-`forward_view_backlog=N`。它的 consumer（每檔閉環、深度優先）由 ROADMAP「研究閉環 P3」落地；
-落地前本 skill 對這一段的義務是**把數字報出來**，不得因為它還沒有流程就當作不存在。
+⚠ **forward view backlog（段 5）自 2026-09-09 起是工作集合的一部分**——閉包多一個條件：
+`python -m webapp status` 的「每檔閉環」一行，**到終局檔數在本輪至少 +1，或下一檔已掛在 pq2／世界上**
+（深度優先：一檔沒到終局就不算這一段有進度，開了三檔各補一格不算）。成績單（Step 6）固定加三個數：
+到終局檔數（ready＋settled）、有 ready 檔的產業數、下一檔與它還缺的格。
 
 前兩個是硬條件。第三個的判準是「這一輪有沒有真的往前推」——覆蓋缺口可能因為
 新節點入圖而增加，**增加不代表退步**，代表發現了新的層。

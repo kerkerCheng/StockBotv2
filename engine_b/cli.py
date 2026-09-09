@@ -276,6 +276,21 @@ def _print_segment_counters(pending_count: int, fired: dict[str, list[dict]]) ->
     for watch in fired["hypothesis"]:
         fact = str(watch.get("fact") or "")[:70]
         print(f"      ⚠ {watch['watch_id']}：{fact}")
+    print(_closure_line())
+
+
+def _closure_line() -> str:
+    """段 5（每檔閉環）一行：到終局幾檔、下一檔是誰。讀不到就說讀不到，不印 0。"""
+    try:
+        from alpha import closure
+        from alpha.providers.closure import collect_backlog
+
+        rows, notes = collect_backlog()
+        if not rows:
+            return "段5 每檔閉環：未讀到（" + "；".join(notes) + "）"
+        return closure.render_summary(closure.summarize(rows), notes=notes)
+    except Exception as exc:  # noqa: BLE001 — drain 的主責是研究佇列；閉環讀不到由 audit 現形
+        return f"段5 每檔閉環：未讀到（{type(exc).__name__}）"
 
 
 def _cmd_consume_fired(args: argparse.Namespace) -> int:

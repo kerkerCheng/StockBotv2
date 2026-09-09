@@ -506,3 +506,14 @@ def test_drain_prints_segment_counters_and_lists_fired_hypothesis_checks(tmp_pat
     rows = json.loads(capsys.readouterr().out)
     fired_rows = [r for r in rows if r["kind"] == "fired_watch_pending"]
     assert {r["target"] for r in fired_rows} == {"lead", "hypothesis"}
+
+
+def test_drain_prints_closure_line_and_says_unread_when_no_artifacts(tmp_path, capsys, monkeypatch) -> None:
+    """段 5（每檔閉環）一行：artifact 目錄空的時候要說「未讀到」，不能印 0。"""
+    monkeypatch.setenv("STOCKBOT_APP_ARTIFACT_DIR", str(tmp_path / "empty_app"))
+    path = tmp_path / "pending_leads.json"
+    leads.save(leads.empty_store(), path)
+    assert cli.main(["--leads", str(path), "drain", "--decision-work-orders", "skip"]) == 0
+    out = capsys.readouterr().out
+    assert "段5 每檔閉環：未讀到" in out
+    assert "到終局 0" not in out

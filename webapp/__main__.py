@@ -244,6 +244,19 @@ def cmd_status(args: argparse.Namespace) -> int:
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
         print(f"- — {kind}：尚未 materialize（`python -m webapp materialize --{kind}`）")
+    # 研究閉環 P3 的常駐計數器（L14）：到終局幾檔、有 ready 檔的產業幾個、下一檔是誰。
+    try:
+        from alpha import closure
+        from alpha.providers.closure import collect_backlog
+
+        analyst_dir = Path(args.dir) if getattr(args, "dir", None) else None
+        explicit_state = Path(args.state_dir) if getattr(args, "state_dir", None) else None
+        rows_c, notes = collect_backlog(artifact_dir=analyst_dir, state_dir=explicit_state)
+        if rows_c:
+            print("# 每檔閉環")
+            print("- " + closure.render_summary(closure.summarize(rows_c), notes=notes))
+    except Exception as exc:  # noqa: BLE001
+        print(f"# 每檔閉環\n- 未讀到（{type(exc).__name__}）")
     ok = (all(p is not None for _, p, _, _ in rows)
           and all(p is not None for _, p, _, _ in state_rows))
     return 0 if ok else 1

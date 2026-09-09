@@ -728,6 +728,106 @@ def reassess_stale(
     return result
 
 
+#: 常規授權不動的兩種項目：使用者明示 pending 的、與在等世界的（見 config/standing_authorization.json _doc）。
+_STANDING_SKIP_DISPATCH = frozenset({"queued", "researching", "awaiting_approval", "completed", "parked"})
+
+
+def standing_go_candidates(
+    pool: Mapping[str, Any],
+    *,
+    authorization: Any,
+    leads_store: Mapping[str, Any] | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """常規授權（佇列段 2b）的成員與被跳過者。判準全部機械：
+
+    - 類型在 `authorized`（config/standing_authorization.json 是唯一 SSOT）；
+    - 不在 pq1 in-flight、沒有 terminal receipt；
+    - **沒有** `deferred_at`（使用者明示 pending——常規授權不替使用者改決定）；
+    - **沒有** `waiting_on`（在等世界——常規授權買的是注意力，不是讓事情發生）；
+    - `source_trace_review` 的 hint 含付費字樣者跳過（付費取得永遠要 exact 金額核准）。
+    """
+
+    candidates: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
+    for item in active_items(pool):
+        item_type = str(item["type"])
+        if not authorization.is_authorized(item_type):
+            continue
+        if item.get("dispatch_status") in _STANDING_SKIP_DISPATCH:
+            continue
+        # 先判「等世界」再判「使用者 pending」：`pending --trigger` 兩個欄位都會設，更具體的理由要先講。
+        if item.get("waiting_on"):
+            skipped.append({"n": item["n"], "reason": "在等世界（waiting_on）——常規授權買的是注意力，不是讓事情發生"})
+            continue
+        if item.get("deferred_at"):
+            skipped.append({"n": item["n"], "reason": "使用者明示 pending（deferred_at）——常規授權不替使用者改決定"})
+            continue
+        tokens = authorization.skip_hint_tokens(item_type)
+        text = f"{item.get('title') or ''}｜{item.get('hint') or ''}"
+        if tokens and any(tok in text for tok in tokens):
+            skipped.append({"n": item["n"], "reason": "hint 提及付費／訂閱——付費取得永遠要 exact 金額核准"})
+            continue
+        candidates.append(item)
+    return candidates, skipped
+
+
+def standing_go(
+    pool: dict[str, Any],
+    store: Any,
+    *,
+    leads_path: Path | str | None = None,
+    at: str | None = None,
+    dry_run: bool = False,
+    authorization: Any = None,
+) -> dict[str, Any]:
+    """段 2b 的 consumer：對常規授權類別執行「使用者本來會下的那個 go」，一個都不多。
+
+    decision_review → `advance_decision_review`（全函數：dispatch／reassess／assessment-gap）；
+    source_trace_review → `dispatch_source_trace_review`（requeue 回 pq1）。兩者都是 pq2 既有的 go
+    語意，本函式只是把「誰按的」從使用者換成 config——receipt 一樣、gate 一樣、不含入圖與 authority 寫入。
+    """
+
+    from engine_b.leads import DEFAULT_LEADS_PATH
+
+    if authorization is None:
+        from engine_b import standing_authorization as sa
+
+        authorization = sa.load()
+    stamp = at or _now()
+    candidates, skipped = standing_go_candidates(pool, authorization=authorization)
+    result: dict[str, Any] = {
+        "candidates": [int(it["n"]) for it in candidates], "skipped": skipped,
+        "done": [], "failed": [], "dry_run": dry_run, "config": str(getattr(authorization, "path", "")),
+    }
+    if dry_run:
+        return result
+    for item in candidates:
+        n = int(item["n"])
+        item_type = str(item["type"])
+        try:
+            if item_type == "decision_review":
+                outcome = advance_decision_review(pool, n, store=store, at=stamp)
+                verb_outcome = str(outcome.get("outcome"))
+                receipt = str(item.get("dispatch_ref") or outcome.get("decision_id") or "")
+            elif item_type == "source_trace_review":
+                outcome = dispatch_source_trace_review(pool, n, leads_path=leads_path or DEFAULT_LEADS_PATH, at=stamp)
+                verb_outcome = "dispatched"
+                receipt = str(item.get("dispatch_ref") or "")
+            else:  # config 驗過封閉性，這裡理論上到不了
+                raise TodoError(f"[{n}] 類型 {item_type} 在 authorized 卻沒有 consumer 分支")
+        except Exception as exc:  # noqa: BLE001 — 單筆失敗不擋其餘，但要現形
+            result["failed"].append({"n": n, "reason": f"{type(exc).__name__}: {exc}"})
+            continue
+        pool["log"].append({
+            "at": stamp, "n": n, "type": item_type, "ref_id": item["ref_id"],
+            "verb": "standing_go",
+            "reason": f"常規授權（{Path(str(getattr(authorization, 'path', ''))).name}）：{item_type} 的 go 只是注意力 gate；outcome={verb_outcome}",
+            "receipt": receipt,
+        })
+        result["done"].append({"n": n, "type": item_type, "outcome": verb_outcome, "receipt": receipt})
+    return result
+
+
 def advance_decision_review(
     pool: dict[str, Any],
     n: int,
@@ -2486,6 +2586,14 @@ def main(argv: list[str] | None = None) -> int:
     p_stale.add_argument("--run", action="store_true", help="實際 reassess 並結案；預設只列出候選")
     p_stale.add_argument("--json", action="store_true")
 
+    p_standing = sub.add_parser(
+        "standing-go",
+        help="佇列段 2b：對常規授權類別（config/standing_authorization.json）執行使用者本來會下的 go；預設只列候選",
+    )
+    p_standing.add_argument("--run", action="store_true", help="實際 dispatch／reassess；預設只列出候選與跳過者")
+    p_standing.add_argument("--leads", default="")
+    p_standing.add_argument("--json", action="store_true")
+
     p_res = sub.add_parser("resolve", help="處理編號：go／drop／pending")
     p_res.add_argument("numbers", nargs="+")
     p_res.add_argument("--verb", required=True, choices=VERBS)
@@ -2587,6 +2695,36 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(_render(pool))
         return 0
+
+    if args.command == "standing-go":
+        from decision_lab.bootstrap import open_default_store
+        from engine_b.leads import DEFAULT_LEADS_PATH
+
+        decision_store = open_default_store() if args.run else None
+        try:
+            outcome = standing_go(
+                pool, decision_store, leads_path=args.leads or DEFAULT_LEADS_PATH, dry_run=not args.run,
+            )
+        finally:
+            if decision_store is not None:
+                decision_store.close()
+        if args.run:
+            save(pool, args.pool)
+        if args.json:
+            print(json.dumps(outcome, ensure_ascii=False, indent=2))
+        else:
+            if outcome["dry_run"]:
+                print(f"段2b 常規授權候選 {len(outcome['candidates'])} 項：{outcome['candidates'] or '—'}"
+                      f"｜跳過 {len(outcome['skipped'])}（加 --run 執行）")
+            else:
+                done = [f"[{row['n']}]→{row['outcome']}" for row in outcome["done"]]
+                print(f"段2b 常規授權：候選 {len(outcome['candidates'])}｜執行 {len(outcome['done'])}"
+                      f"（{'、'.join(done) or '—'}）｜跳過 {len(outcome['skipped'])}｜失敗 {len(outcome['failed'])}")
+            for row in outcome["skipped"]:
+                print(f"  · [{row['n']}] 跳過：{row['reason']}")
+            for row in outcome["failed"]:
+                print(f"  ✗ [{row['n']}] {row['reason']}", file=sys.stderr)
+        return 1 if outcome["failed"] else 0
 
     if args.command == "reassess-stale":
         from decision_lab.bootstrap import open_default_store

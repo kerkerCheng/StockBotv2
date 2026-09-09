@@ -173,6 +173,7 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-observation <n>       # Engine C 人工觀測寫入
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-thesis-mutation <n>   # thesis lifecycle 變更
 & '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale [--run]      # 佇列段 2：只因凍結 context 過期而 REVIEW 的 decision_review（機械、零 token；不加 --run 只列）
+& '.venv\Scripts\python.exe' -m engine_b.todo standing-go [--run]         # 佇列段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go；pending／等世界／付費的不碰
 ```
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
@@ -460,8 +461,12 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired             # 段 1
 & '.venv\Scripts\python.exe' -m engine_b.todo sync                     # 段 1 的 pq2 型（順便同步待辦池）
 & '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run     # 段 2
-& '.venv\Scripts\python.exe' -m engine_b.cli drain                     # 段 3–4（首行印段 0–1 計數器）
+& '.venv\Scripts\python.exe' -m engine_b.todo standing-go --run        # 段 2b（常規授權；互動限定，daily 採用歸 P5）
+& '.venv\Scripts\python.exe' -m engine_b.cli drain                     # 段 3–4（首行印段 0–1 計數器＋段 5 一行）
+& '.venv\Scripts\python.exe' -m webapp status                          # 段 5 的完整版：每檔閉環（到終局幾檔、下一檔是誰、為什麼）
 ```
+
+段 5 的工單與下一檔選取住 `alpha/closure.py`（`NEXT_PICK_RULE` 五條依序比；深度優先由 skill 執行）。
 
 新增一種工作狀態時：先在 `queue_segments.py` 登記它屬於哪一段、誰來取，再寫產生它的程式——
 反過來做，`QueueSegments` 會在第一筆資料出現當天變紅，那是設計，不是誤報。
