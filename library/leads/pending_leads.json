@@ -8274,13 +8274,13 @@
       "lead_id": "lead_03e036c05aea97310171ca07772eb352",
       "published_at": "2026-08-17",
       "refs": {
-        "parked_reason": "6-K_wrapper已取得但本次未取得interim_statement_exhibits；沒有可驗證的新graph_delta",
-        "trace_attempts_ref": "SEC_TSEM_6-K_2026-08-17_wrapper",
-        "trace_next_trigger": "取得並解析6-K_exhibits或Tower官方Q2報告",
+        "parked_reason": "觸發條件『取得並解析 TSEM 6-K Exhibit 99.1』**本輪達成**——先前兩輪只取到 6-K wrapper（zk2635828.htm，8KB），本輪由 SEC Archives index.json 直接定位到同一 accession 下的 exhibit_99-1.htm（331KB）並抽成純文字存 library/raw/tsem_6k_20260804_exhibit_99_1.txt。內容逐字取得三件事：①SiPho 年化 run rate 由 2025Q2 US$180M 增至 2026Q2 US$680M，目標 2026Q4 破 US$10 億；②2028 目標商業模式上調至營收 US$3.6B／淨利 US$1.2B，公司稱『being fully spoken for by our customers』；③風險因子逐字證實客戶預付款仍在——『SiPho customer prepayments received for certain minimum capacity commitments』，付款方向 customer→supplier。已鑄 Engine C 觀測提案 [503]（TSEM/backlog，supersedes mo_4d0ba11f）。⚠ 不入圖：SiPho run rate 與目標營收皆為時變數字（L4／A1 不含時變數字）；預付款機制的存在已由既有 backlog 觀測承載，本次只是更新，無新 graph delta。⚠ 同一文件也是 [469] oversupply watch 的材料，且方向相反（大幅擴產＋新建 300mm 廠），引用時不得只取需求那一半。",
+        "trace_attempts_ref": "2026-09-09 research-drain：SEC submissions API 取 CIK 0000928876 的 6-K 清單，經 Archives index.json 定位 accession 0001178913-26-003776 的 exhibit_99-1.htm 並抓取（先前輪次失敗於只取 primaryDocument）",
+        "trace_next_trigger": "TSEM Q3 2026 6-K（約 2026-11）驗證 SiPho 是否如期跨過 US$10 億年化 run rate——這是公司自己給的可否證時點；未達成即為 [469] 的第一個實質訊號",
         "trace_requeue_trigger": "event_watch:ew_0008_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "TSEM",
           "co:tower_semiconductor"
@@ -8290,7 +8290,7 @@
         "trace_trigger_watch_ref": "ew_0008_2026-08-31"
       },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-17",
       "triage": {
@@ -8701,11 +8701,11 @@
       "published_at": "2026-09-05T08:11:29.000Z",
       "raw_text": "Now that $MU to $SNDK have pulled a major recovery. \n\nGood to have a reminder that the memory bottleneck hasn’t changed!\n\nSame with CW lasers… substrates… or others.\n\nBut short term sentiment (depending on prices/macro) often does.\n\nI think a lot of demand imbalances get worse than people expect:\n\n- There’s some Japanese distributors in Nikkei today saying memory demand deficit has reached 40-60% (67-150% higher than supply). With general prices going up 50% by years end.\n\n- $SPCX isn’t included in the $1.3T hyperscaler capex figures (I think Wells Fargo ets. ~$263b AI capex), so total capex figures might be surprising.\n\n- $SNDK expects 80% gross margins to continue into 2030… (welcome to S&P 100)\n\n- and once again you have long term visibility into 2031 now with companies like Samsung\n\nMemory is very really volatile… some of my positions are up 270%+, so I find it a bit easier to hold through volatile periods.\n\nBut regardless, operating fundamentals doesn’t always align with short term price movements.\n\nSame concept can be applied to other sectors.",
       "refs": {
-        "parked_reason": "Nikkei Asia 原文已定位（Memory shortage set to run until 2027 as chipmakers focus on AI：美韓龍頭增產僅能滿足約 60% 需求），但推文的「缺口 40–60%／年底漲 50%」具體數字未能在該文逐字核對，只算部分追回。屬記憶體供需時變觀測，依 L4 歸 Engine C 不入圖；SNDK 80% 毛利到 2030 為公司自報 guidance，非本圖主題。",
+        "parked_reason": "Nikkei Asia 原文已定位（增產僅能滿足約 60% 需求），但推文的『缺口 40–60%／年底漲 50%』具體數字無法逐字核對。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。 ⚠ 記憶體供需不是本圖的主題層，SNDK 80% 毛利到 2030 為公司自報 guidance。",
         "primary_url": "https://asia.nikkei.com/business/tech/semiconductors/memory-shortage-set-to-run-until-2027-as-chipmakers-focus-on-ai",
         "research_outcome": "engine_c_financial_observation_no_graph_delta",
         "research_run": "daily-brief-2026-09-08",
-        "trace_attempts_ref": "WebSearch → Nikkei Asia 英文站定位到短缺至 2027／60% 需求覆蓋一文；40–60%、+50% 未逐字命中（可能在日文版或另一篇通路報導）",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發未命中（等 MU FQ4 FY26，約 2026-09-24）",
         "trace_next_trigger": "MU FQ4 FY26 財報（2026-09-24 推估）或 Nikkei 日文版原文可逐字核對缺口數字",
         "trace_requeue_trigger": "event_watch:ew_0077_2026-09-08",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -8723,7 +8723,7 @@
         "trace_trigger_watch_ref": "ew_0077_2026-09-08"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Now that $MU to $SNDK have pulled a major recovery. Good to have a reminder that the memory bottleneck hasn’t changed! Same with CW lasers… substrates… or others. But short term sentiment (depending on prices/macro) often does. I think a lot of demand imbalances get worse than people expect: - There’s some Japanese distributors in Nikkei today saying memory demand deficit has reached 40-60% (67-150% higher than supply). With general prices going up 50% by years end. - $SPCX isn’t included in the $1.3T hyperscaler capex figures (I think Wells Fargo ets. ~$263b AI capex), so total capex figures might be surprising. - $SNDK expects 80% gross margins to continue into 2030… (welcome to S&P 100) - and once again you have long term visibility into 2031 now with companies like Samsung Memory is very really volatile… some of my positions are up 270%+, so I find it a bit easier to hold through volatile periods. But regardless, operating fundamentals doesn’t always align with short term price movements. Same concept can be applied to other sectors.",
       "triage": {
@@ -15139,15 +15139,15 @@
       "lead_id": "lead_242c5b23ddc83fa9820d7d35f0fc91d9",
       "published_at": "2026-08-04",
       "refs": {
-        "parked_reason": "只取得 Tower 2026-08-04 6-K wrapper；真正 Q2 press release Exhibit 99.1 未在本輪取得，不能把 wrapper 當作財務或供應鏈內容",
+        "parked_reason": "觸發條件『取得並解析 TSEM 6-K Exhibit 99.1』**本輪達成**——先前兩輪只取到 6-K wrapper（zk2635828.htm，8KB），本輪由 SEC Archives index.json 直接定位到同一 accession 下的 exhibit_99-1.htm（331KB）並抽成純文字存 library/raw/tsem_6k_20260804_exhibit_99_1.txt。內容逐字取得三件事：①SiPho 年化 run rate 由 2025Q2 US$180M 增至 2026Q2 US$680M，目標 2026Q4 破 US$10 億；②2028 目標商業模式上調至營收 US$3.6B／淨利 US$1.2B，公司稱『being fully spoken for by our customers』；③風險因子逐字證實客戶預付款仍在——『SiPho customer prepayments received for certain minimum capacity commitments』，付款方向 customer→supplier。已鑄 Engine C 觀測提案 [503]（TSEM/backlog，supersedes mo_4d0ba11f）。⚠ 不入圖：SiPho run rate 與目標營收皆為時變數字（L4／A1 不含時變數字）；預付款機制的存在已由既有 backlog 觀測承載，本次只是更新，無新 graph delta。⚠ 同一文件也是 [469] oversupply watch 的材料，且方向相反（大幅擴產＋新建 300mm 廠），引用時不得只取需求那一半。",
         "research_outcome": "可確認公司當日公告 Q2 results，但無 exhibit 逐字內容",
-        "trace_attempts_ref": "SEC_TSEM_6K_20260804_wrapper",
-        "trace_next_trigger": "obtain_TSEM_6K_20260804_Exhibit_99_1_or_official_Q2_release",
+        "trace_attempts_ref": "2026-09-09 research-drain：SEC submissions API 取 CIK 0000928876 的 6-K 清單，經 Archives index.json 定位 accession 0001178913-26-003776 的 exhibit_99-1.htm 並抓取（先前輪次失敗於只取 primaryDocument）",
+        "trace_next_trigger": "TSEM Q3 2026 6-K（約 2026-11）驗證 SiPho 是否如期跨過 US$10 億年化 run rate——這是公司自己給的可否證時點；未達成即為 [469] 的第一個實質訊號",
         "trace_origin_entity": "Tower Semiconductor Ltd.",
         "trace_requeue_trigger": "event_watch:ew_0019_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "TSEM",
           "co:tower_semiconductor"
@@ -15157,7 +15157,7 @@
         "trace_trigger_watch_ref": "ew_0019_2026-08-31"
       },
       "source": "edgar:TSEM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-04",
       "triage": {
@@ -28951,10 +28951,10 @@
       "raw_text": "As a earnings recap: $AMZN, $META, $GOOGL, and $MSFT guided a 2026 combined capex forecast to ~$720-$745 Billion.\n\nUp from $695-$725B Billion previously.\n\nAmazon: $220B\nGoogle: $195B-$205B\nMeta: $130B-$145B\nMicrosoft: $175B\n\nWe've already seen significant deleveraging and retail/institutional margin liquidations (maybe it continues for more time, who knows). \n\nBut medium-long term, I'm not quite sure how anyone can be bearish the upstream semis or neoclouds. \n\nGiven each hyperscaler has flagged either compute shortages, rising cloud demand + pricing power, or increased spending for chips/networking.  \n\nMy \"bottleneck\" thesis with many of these upstream semi supply chains is that when trillions in capital flows into things from InP substrates or memory (which were both treated as cheap commodities) or even energy. \n\nLot of these current AI names that were treated as useless before in telecom cycles or even toilet sellers. \n\nGets rerated when their inflection period hits and capex flows into their balance sheets. \n\nAs seen with $NVDA GPUs past few years, memory this year, CPUs/MLCCs next few years, CPO in 2027, Glass Substrates in 2027, 800V in 2027, and so on.",
       "refs": {
         "gap": "Amazon／Meta／Microsoft 各自最新 capex 指引的一手出處",
-        "parked_reason": "Requeue 後複查：四大 CSP 2026 capex 合計 $720-745B 為推文自行加總，前次已核 Alphabet 部分與一手相符、合計數未逐家驗證；capex guidance 屬時變財務訊號（Engine C 範疇），本輪無需重複驗證。維持 partial。",
+        "parked_reason": "四大 CSP 2026 capex 合計 $720-745B 為推文自行加總（Alphabet 部分前次已核與一手相符，合計未逐家驗證）。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。 ⚠ 更根本的是：AI capex 需求錨在本圖已由大量證據建立，再多一筆合計數不改變任何候選或排序——這條的 decision_impact 上限就是 confidence_only。",
         "research_outcome": "Alphabet 部分與一手相符；四家合計 7,200–7,450 億美元為推文自行加總，未逐家驗證",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "僅逐一核對 Alphabet 一手指引；其餘三家合計數字未逐家回一手 filing",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認無新一手；capex guidance 屬 Engine C 範疇，不重複驗證",
         "trace_origin_entity": "Alphabet / Amazon / Meta / Microsoft",
         "trace_requeue_trigger": "event_watch:ew_0030_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -28971,7 +28971,7 @@
         "trace_trigger_watch_ref": "ew_0030_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -36330,10 +36330,10 @@
       "published_at": "2026-08-11T21:09:43.000Z",
       "raw_text": "Insane earnings today for the AI theme with $CRWV, $SMCI, and $LITE. \n\nCoreweave: Absurd ~$104B+ backlog, which doesn't include $25B+ of new customer agreements added in early Q3. \n\nCompute demand read through for Neoclouds is enormous (For Nebius, Iren and others)\n\nSupermicro:  Absurd $65-72B in revenue guidance, adding $60B+ in new orders... \n\nAI DC buildout read through is just enormous. \n\nLumentum: $808M -> $1.01B -> $1.25B revenue ramp, with operating margins growing quarter after quarter. \n\nPhotonics players just keeps printing. \n\nTLDR: Every layer of the AI buildout goes brrrrr, and it's showing up in earnings.",
       "refs": {
-        "parked_reason": "Requeue 後複查：前次 receipt 已核 SMCI 65-72B 指引與 LITE 808M→1.25B；CoreWeave $104B backlog 一手仍只見近 $100B、$104B＋$25B 未核實。均屬時變財務訊號，未產 RA。維持 partial。",
+        "parked_reason": "CoreWeave $104B backlog＋$25B 新增客戶合約仍未核實（一手只見近 $100B）；SMCI 與 LITE 部分前次已核。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。 ⚠ CoreWeave 屬需求側 neocloud，即使數字核實也不新增瓶頸層節點。",
         "research_outcome": "SMCI 65–72B 指引／逾 60B 新訂單及 LITE 808M→1.01B→1.25B 已核實；CoreWeave 一手只見近 100B，104B＋25B 未核實，且均屬時變財務訊號，未產 RA",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "2026-08-26：SMCI 2026-08-11 官方結果、Lumentum FY26 Q4 官方結果、CoreWeave 官方 Q1 backlog 公告",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發未命中（等 CoreWeave 下一季 10-Q）",
         "trace_next_trigger": "CoreWeave 下一季 10-Q backlog 揭露",
         "trace_requeue_consumed_entities": [
           "CO:LUMENTUM",
@@ -36355,7 +36355,7 @@
         "trace_trigger_watch_ref": "ew_0037_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -41826,10 +41826,11 @@
       "refs": {
         "gap": "JP Morgan 對談的逐字來源與 NVIDIA IR 原始簡報未取得",
         "original_claim_status": "Q2 FY27 營收 962.21 億美元、Data Center 年增 117% 可核；unconstrained 年增逾 100% 與 inference/training mix 未核",
-        "parked_reason": "一手文件可支持成長背景，但不支持聲稱的 JP Morgan 原句",
+        "parked_reason": "『NVIDIA 告訴 JP Morgan 無限制下可成長逾 100%』的原句無一手支持——一手只支持成長背景，不支持該轉述。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。 ⚠ 私下對投行的說法在結構上不會有一手文件，此觸發條件期望值低，下輪若仍無應考慮改判結構性不可得。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000073/q2fy27cfocommentary.htm",
         "research_outcome": "只保留已核財務背景；tweet 的超額成長與 mix 說法不提高 tier",
         "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發未命中",
         "trace_next_trigger": "NVIDIA IR、SEC filing 或公開 conference transcript 明列 unconstrained growth 與 inference／training mix",
         "trace_origin_entity": "NVIDIA",
         "trace_origin_linkage": "NVIDIA SEC CFO commentary 可核當季財務與 commitments；未包含 JPMorgan 私下對話",
@@ -41845,7 +41846,7 @@
         "trace_trigger_watch_ref": "ew_0071_2026-09-02"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -42013,9 +42014,9 @@
       "refs": {
         "claimed_origin": "Goldman Sachs research note",
         "original_claim_status": "unverified_secondary_restatement",
-        "parked_reason": "未取得 Goldman Sachs canonical note，無法逐字核對 USD67.7B／131.4B／148.5B、Rubin Ultra 每 GPU 模組數與 80% silicon photonics penetration。這些又屬市場預測與時變數字，不得由社群轉述進圖或 Engine C authority；保留具名 disclosure 觸發後再查。",
+        "parked_reason": "Goldman Sachs canonical note 仍未取得，USD67.7B／131.4B／148.5B、Rubin Ultra 每 GPU 模組數與 80% 矽光滲透率全部無法逐字核對。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。 ⚠ 券商市場預測即使取得原文也只是第三方估計，不是可入圖的結構事實——它的用途上限是脈絡。",
         "research_outcome": "isolated_tier3_market_forecast_no_primary_note",
-        "trace_attempts_ref": "WebSearch：Goldman Sachs public research、NVIDIA Rubin Ultra official disclosure、issuer IR；未取得可逐字核對的 canonical note",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發未命中，未投搜尋預算（券商 note 需公開釋出）",
         "trace_next_trigger": "Goldman Sachs 公開報告／研究摘要釋出，或 NVIDIA／光模組供應商正式文件給出 Rubin Ultra 每 GPU 光模組數與 2027–2028 市場規模",
         "trace_requeue_trigger": "event_watch:ew_0079_2026-09-08",
         "trace_requeued_at": "2026-09-09T01:13:33.501862+00:00",
@@ -42032,7 +42033,7 @@
         "trace_trigger_watch_ref": "ew_0079_2026-09-08"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -47906,9 +47907,9 @@
       "published_at": "2026-08-26T21:17:10.000Z",
       "raw_text": "$NVDA: \"We expect to grow revenue by approximately 70% in fiscal 2028. This is a supply constrained outlook\"\n\nThat statement alone is probably more important than the entire earnings beat just now? \n\nInsane upward revision beat from +43.9% expected to 70%. \n\n\"With cloud industry backlog now greater than 2 trillion, CapEx by the top five hyperscalers is expected to reach nearly $800 Billion in 2026 and 1.3 Trillion in 2027\"\n\n$1.3 Trillion in 2027. (MS was around $1.2T June, so this is upward projection revisions)\n\nYeah the high-beta parts of the supply chain growth is going to like this.",
       "refs": {
-        "parked_reason": "財報事件屬實，但推文的 FY28 70%、cloud backlog 與 hyperscaler capex 數字尚無可逐字核對的一手段落。",
+        "parked_reason": "NVIDIA FY28 約 70% 成長與『supply constrained outlook』原句仍待官方 transcript／CFO commentary 可逐字核對。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。",
         "research_outcome": "保留為高價值 demand lead；未取得原文前不得進圖。",
-        "trace_attempts_ref": "NVIDIA 2026-08-26 8-K／10-Q、官方 IR event page；站內搜尋未取得 70%／2T／800B／1.3T 原句",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發未命中",
         "trace_next_trigger": "NVIDIA 官方 Q2 FY27 transcript／CFO commentary公開可逐字核對 70% FY28 與供應受限原句",
         "trace_requeue_trigger": "event_watch:ew_0048_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -47923,7 +47924,7 @@
         "trace_trigger_watch_ref": "ew_0048_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -58639,10 +58640,11 @@
       "refs": {
         "gap": "官方可逐字搜尋的 earnings-call transcript 尚未取得",
         "original_claim_status": "Q3 營收 296 億美元、AI semiconductor 167 億、Q4 指引 348 億均確認；FY27 1150 億、FY28 2300 億與 EPS 30 僅見 call 轉述",
-        "parked_reason": "一手 release 只支持當季與次季數字，長期 call 原句仍待可逐字核對版本",
+        "parked_reason": "Broadcom FY27E ~$115B／FY28E ~$230B 長期 call 原句仍待可逐字核對版本；一手 release 只支持當季與次季。⚠ 本條屬**時變財務訊號**：依 L4（值會隨時間變 → 帶時戳觀測，不進圖）與 A1（不含時變數字），它結構上不會產生 graph delta，最好的終局就是等發行人下一份法定文件，而不是反覆搜尋轉述。",
         "primary_url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-inc-announces-third-quarter-fiscal-year-2026-financial",
         "research_outcome": "已確認當季財務事實；長期 guidance 不提高 tier",
         "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發未命中",
         "trace_next_trigger": "Broadcom 發布 Q3 FY2026 conference-call transcript 或 filing 明列 FY27／FY28 AI revenue guidance",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "官方財報新聞稿與官方 conference-call replay",
@@ -58657,7 +58659,7 @@
         "trace_trigger_watch_ref": "ew_0070_2026-09-02"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,

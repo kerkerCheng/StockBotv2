@@ -8432,6 +8432,18 @@
       "source": "engine_c",
       "title": "Engine C 觀測：LYC.AX / gross_margin_trend",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T15:07:49.712529+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=Tower Semiconductor Ltd Form 6-K filed 2026-08-04, Exhibit 99.1『Tower Semiconduc",
+      "n": 503,
+      "reason": null,
+      "ref_id": "po_fd204c3c4dc4cbc3bf94918ff0993fc1",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：TSEM / backlog",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -18387,6 +18399,6 @@
       "verb": "source_cleared"
     }
   ],
-  "next_n": 503,
+  "next_n": 504,
   "schema_version": "1"
 }
