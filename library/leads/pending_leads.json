@@ -11306,10 +11306,10 @@
       "lead_id": "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
       "published_at": null,
       "refs": {
-        "parked_reason": "物理層存在獲一手支持，供應商 mapping 仍空白；研究地圖不等於知識入圖。",
+        "parked_reason": "decompose 產生的層缺口 lead，本輪觸發條件未命中，維持既有處置。物理層存在已有一手支持，缺的是供應商 mapping／可逐字核對的技術文件——研究地圖不等於知識入圖。⚠ 這類 lead 的共同形狀：TSMC 與其學術共同作者在最有理由具名供應商的場合仍不具名（見 [317] 已判定為結構性可能長期不可得），因此不應繼續投 pq1 預算於『等 TSMC 具名』；能推進的替代路徑是 IEEE／機構 repository 的公開 manuscript，或供應商端自己出的可逐字核對文件。",
         "primary_url": "https://research.tsmc.com/page/on-chip-interconnect/14.html",
         "research_outcome": "無新 graph delta；維持 partial，等待 TSMC 或合作方具名製造／供應角色。",
-        "trace_attempts_ref": "2026-08-31：重查 TSMC COUPE 官方研究頁與 NVIDIA 技術 blog；GC/EC、EIC-PIC 與 wafer-level micro-lens 架構可確認，但沒有外部 grating/microlens 供應商。",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中；未投新搜尋預算（觸發條件明載需第三方先公開可核對文件）",
         "trace_next_trigger": "TSMC 或共同作者公開可核對文件具名 embedded micro-lens array 與製造／供應角色",
         "trace_requeue_trigger": "event_watch:ew_0010_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -11324,7 +11324,7 @@
         "trace_trigger_watch_ref": "ew_0010_2026-08-31"
       },
       "source": "system_decompose",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose] 垂直光柵耦合器＋微透鏡陣列層：TSMC COUPE 官方研究頁述及 embedded micro-lens array、backside metal reflector、GC/EC 插入損耗。圖中無 grating coupler 節點",
       "triage": {
@@ -13097,11 +13097,11 @@
       "lead_id": "lead_1c805d1c401d5ede0572182a5bfcbbea",
       "published_at": "2026-08-29",
       "refs": {
-        "parked_reason": "智邦一般 switch ODM 能力可核對，NVIDIA CPO 系統組裝角色仍是第三方推定；新 trigger 無清除。",
+        "parked_reason": "智邦一般 switch ODM 能力可核對，NVIDIA CPO 系統組裝角色仍是第三方推定，觸發條件未命中。⚠ 本輪的共同發現：這批 decompose 產生的層缺口 lead 全部卡在**同一個結構性事實**——鏈條頂端的客戶（TSMC／NVIDIA／Broadcom／Google）在最有理由具名供應商的場合仍不具名（[317] 已就 TSMC 做出此判定：2026-08-31 其先進封裝副總公開點名 CPO 四大瓶頸卻不點名任何供應商）。因此『再搜一次』對這類缺口沒有期望值，本輪不投搜尋預算；能翻轉它們的只有對方主動發文件。",
         "primary_url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91",
         "research_outcome": "無新 graph delta；維持等待 Accton 或 NVIDIA 一手具名。",
         "research_run": "session:2026-08-29-tw-cpo-drain",
-        "trace_attempts_ref": "2026-08-31：重查 Accton 官方 CPO／102.4T switch 資料與 NVIDIA 官方合作文件；可確認智邦具 CPO-ready ODM 能力，但沒有 NVIDIA CPO switch 指派。",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中",
         "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
         "trace_requeue_trigger": "event_watch:ew_0013_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -13118,7 +13118,7 @@
         "trace_trigger_watch_ref": "ew_0013_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13573,12 +13573,13 @@
       "refs": {
         "gap": "MRM／MZM／其他調變器類型仍未揭露",
         "original_claim_status": "Davisson 102.4T CPO、16 顆 6.4T optical engines 與 TSMC COUPE 已確認；公告未揭露 modulator 類型",
-        "parked_reason": "一手公告對 exact modulator 欄位保持沉默",
+        "parked_reason": "觸發條件仍未命中，且本輪查到一個**必須明確拒絕記錄**的東西：二手分析（SemiAnalysis 等）寫『Broadcom most probably uses a Mach-Zehnder Modulator (MZM)』並對比 NVIDIA CPO 採 MRM——『most probably』是推論不是揭露，依 L11-3（多個二手都這樣說 != 一手已證實）與 L6-3（LLM 從類別詞推出具體實體是最常見幻覺型態）不得寫進圖或記為事實。可確認的只有規格層面：Tomahawk 6 Davisson 為 102.4 Tb/s CPO 乙太交換器，整合 16 顆 6.4T 矽光引擎，是 Broadcom 第三代 CPO（Gen 1 為 2021 年 Humboldt）——這些不含調變器類型。⚠ 亦未找到任何 Hot Chips 2026 的相關發表，該條觸發路徑本輪落空。",
         "primary_url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-tomahawkr-6-davisson-industrys-first-1024",
         "research_outcome": "產品架構一手已核；調變器屬性保持 unknown，不建 RA",
         "research_run": "session:2026-08-30-loop2-r4",
         "storage_permission": "repo_excerpt",
-        "trace_next_trigger": "Broadcom OFC／Hot Chips 論文、datasheet 或客戶技術文件明列 Davisson modulator 類型",
+        "trace_attempts_ref": "2026-09-09 research-drain：web search『Broadcom Davisson modulator micro-ring MZM Hot Chips 2026』7 筆，全部為科普／分析／不相關專利與 arXiv 論文，無 Broadcom 一手揭露；Hot Chips 2026 相關發表未見",
+        "trace_next_trigger": "Broadcom 官方 datasheet／OFC 或 Hot Chips 正式論文／客戶技術文件明列 Davisson 的調變器類型。⚠ 分析師 note 與科普文不算，不再因二手推論而 requeue",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "產品發行公司一手公告",
         "trace_requeue_trigger": "event_watch:ew_0014_2026-08-31",
@@ -13593,7 +13594,7 @@
         "trace_trigger_watch_ref": "ew_0014_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14975,12 +14976,12 @@
       "lead_id": "lead_23ed2dd8e137c0a94e7a2411fdebc7ec",
       "published_at": "2026-08-30",
       "refs": {
-        "parked_reason": "Davisson ELSFP 供應商綁定結構性未公開:供應端 PO 證據已到位(Lumentum 首張 ELS module PO 交付 2H CY2027+Cignal 稱 largest ELSFP PO ever)但雙方都不具名;等交易對手方具名文件(L8:不能靠再讀供應商自述補具名)",
+        "parked_reason": "觸發條件未命中，維持 awaiting_named_disclosure。供應端 PO 證據已到位且付款方向明確（有人下單給供應商）：Lumentum 首張 ELS module PO、交付 2H CY2027；Cignal 稱 largest ELSFP PO ever——但**雙方都不具名對手**。依 L8，再讀一次供應商自述補不出具名（那正是它結構上不會說的東西），因此本輪不投搜尋預算於供應端。⚠ 這與同輪 Sivers／SemiNex 的判定一致：有金額、有時程，仍不足以構成具名的客戶端資本承諾。付費取得 Cignal 報告需使用者另行核准（exact 金額與方案未定，本輪不提案）。",
         "primary_url": "https://cignal.ai/2026/04/cpo-and-elsfp-1q26-update/",
         "research_outcome": "three_supplier_landscape_tier3_corroborated_no_exclusive_binding",
         "research_run": "session:2026-08-30-loop2-r4",
-        "trace_attempts_ref": "Cignal AI 1Q26 CPO/ELSFP update(paywall,可見部分:Lumentum largest ELSFP PO ever+Coherent high-power laser PO,買方名在牆後);Lumentum Q4 FY26 earnings call 2026-08-18 逐字:We received its first external line source or ELS module purchase for delivery in the second half of calendar 2027,全場無 Broadcom/Davisson/客戶具名",
-        "trace_next_trigger": "Broadcom 或 ELSFP 供應商任一方具名對手(filing/PR/法說),或使用者授權 Cignal 付費取得",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中；依 L8 不重讀供應端自述",
+        "trace_next_trigger": "Broadcom 或任一 ELSFP 供應商在 filing／PR／法說具名對手方；或使用者授權付費取得 Cignal 報告（需先給 exact 金額與方案）",
         "trace_requeue_trigger": "event_watch:ew_0018_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
@@ -14993,7 +14994,7 @@
         "trace_trigger_watch_ref": "ew_0018_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -18687,9 +18688,9 @@
       "lead_id": "lead_359cb1c9e8c4f11997943e4c7f01727d",
       "published_at": null,
       "refs": {
-        "parked_reason": "可確認 COUPE wafer-level characterization 與 micro-lens 降低對準敏感度的架構方向，無法支持 lead 所稱 1152 芯良率或特定 know-how owner。",
+        "parked_reason": "decompose 產生的層缺口 lead，本輪觸發條件未命中，維持既有處置。物理層存在已有一手支持，缺的是供應商 mapping／可逐字核對的技術文件——研究地圖不等於知識入圖。⚠ 這類 lead 的共同形狀：TSMC 與其學術共同作者在最有理由具名供應商的場合仍不具名（見 [317] 已判定為結構性可能長期不可得），因此不應繼續投 pq1 預算於『等 TSMC 具名』；能推進的替代路徑是 IEEE／機構 repository 的公開 manuscript，或供應商端自己出的可逐字核對文件。",
         "research_outcome": "無新 RA；維持 partial，等待作者 manuscript 或具名製程供應商。",
-        "trace_attempts_ref": "2026-08-31：取得 IEEE metadata／摘要與 NVIDIA wafer-level micro-lens 技術說明；完整 manuscript 仍不可逐字取得，且沒有第三方 active-alignment vendor 具名。",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中；未投新搜尋預算（觸發條件明載需第三方先公開可核對文件）",
         "trace_next_trigger": "IEEE／作者公開 manuscript 或 institution repository 可逐字核對 1152-fiber coupling 與 active-alignment yield",
         "trace_requeue_trigger": "event_watch:ew_0022_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -18704,7 +18705,7 @@
         "trace_trigger_watch_ref": "ew_0022_2026-08-31"
       },
       "source": "system_decompose",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose] 光學耦合／主動對準層：IEEE 論文 Optical and Electrical Characterization of a Compact Universal Photonic Engine。圖中無主動對準製程節點；1152 芯耦合良率是誰的 know-how",
       "triage": {
@@ -19901,9 +19902,9 @@
       "published_at": "2026-07-31T08:25:39.000Z",
       "raw_text": "For $XFAB ER transcript:  \n\nJust to recap, my idea on $XFAB foundry growth opportunities stemmed from SiC for 800v and photonixfab/MTP for CPO applicability.   \n\n- $XFAB: \"We are making progress in co-packaged optics\".  \n\n- \"The transition to 800v... is expected to support demand for both SiC and GaN... for XFAB\"  \n\nSo those analysts/people that were confidently bearposting about $XFAB that they had \"0 exposure to 800V, photonics, CPO\" just turned out plainly wrong. \n\nAt the time I shared my idea, industry materials showed ASE and others cited photonixfab + XFAB as an upcoming CPO player in EU. And filings showed they had exposure names like $NVTS / $POWI in general. \n\nSo glad $XFAB went out to explicitly clear things up to state they were developing in CPO/800v.   \n\nOkay back to the ER:  \n\n- \"We continue to expect photonics volume production to start in 2028\".  Company currently has three silicon photonics projects in development with key partners.   \n\nI thought it would ramp sometime in H2 2027, but was probably early by a few months. \n\n- Several new data center design wins, eg. 3 new SiC design wins (consistent with general 2027 ramp as 800v deployment takes off).  \n\nSo once those ramp in 2027-2028, (markets tend to price things ahead of time), I'd expect $XFAB to be rerated based on growth opportunities.   \n\nTLDR:  \n- Current revenue numbers not as impressive.\n- $XFAB confirmed direct exposure to CPO and 800V shifts (biggest win for thesis) \n- 800V exposure opportunities for SiC (should be 2027)\n-  Timeline is 2028 ramp for photonics volume production  \n\nHappy exposure thesis to CPO/800V was confirmed from this ER. Might be a bit of waiting for revenue ramp.",
       "refs": {
-        "parked_reason": "Requeue 後複查：XFAB ER transcript 的 SiC 800V 與 photonixfab/MTP CPO 適用性說法维持前次 partial receipt；本輪無新一手（XFAB 未有新揭露、photonixfab 未具名 CPO 客戶）。",
+        "parked_reason": "X-FAB 未有新揭露、photonixfab 未具名 CPO 客戶，觸發條件未命中；維持前次 partial。此條的觸發是 X-FAB 自己的下一次法說，屬等世界。",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "official_XFAB_Q4_2025_investor_presentation_and_2025_annual_report",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中（等 X-FAB 下一次法說）",
         "trace_next_trigger": "X-FAB 具名 photonics/CPO 客戶或產能揭露",
         "trace_requeue_consumed_entities": [
           "NVTS"
@@ -19923,7 +19924,7 @@
         "trace_trigger_watch_ref": "ew_0024_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -22016,10 +22017,10 @@
       "lead_id": "lead_464d4849949994fc18d5192a484b6c57",
       "published_at": null,
       "refs": {
-        "parked_reason": "FAU 仍是圖中真實缺層，但可投公司對應未獲交易對手一手；維持 awaiting_named_disclosure。",
+        "parked_reason": "FAU 的可投公司對應仍未獲交易對手一手。⚠ 更正本 lead 的『FAU 仍是圖中真實缺層』：2026-09-09 實查，層節點 tech:fiber_attach_unit 已存在（IS_COMPONENT_OF → tech:cpo／tech:pm_fiber／tech:microlens_array），co:foci 與 co:coherent 兩家供應商已入圖——缺的不再是層，是那兩條 SUPPLIES_TO 邊的 substitutability（皆為 null，在瓶頸排序裡隱形）。該工作已移交第 4 段。⚠ 本輪的共同發現：這批 decompose 產生的層缺口 lead 全部卡在**同一個結構性事實**——鏈條頂端的客戶（TSMC／NVIDIA／Broadcom／Google）在最有理由具名供應商的場合仍不具名（[317] 已就 TSMC 做出此判定：2026-08-31 其先進封裝副總公開點名 CPO 四大瓶頸卻不點名任何供應商）。因此『再搜一次』對這類缺口沒有期望值，本輪不投搜尋預算；能翻轉它們的只有對方主動發文件。",
         "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories/",
         "research_outcome": "無新 graph delta；[302] 僅提供第三方專利鏈 origin，仍需 admission gate。",
-        "trace_attempts_ref": "2026-08-31：重查 FOCI 年報、NVIDIA 官方 CPO PR／技術 blog；FOCI 的 FAU 技術可確認，NVIDIA/TSMC 客戶映射與 Largan/Browave/HST 相對角色仍未具名。",
+        "trace_attempts_ref": "2026-09-09 research-drain：Neo4j 直查 FAU 層節點與兩條供應商邊，更正過時的缺層描述",
         "trace_next_trigger": "NVIDIA／TSMC／MOPS 文件具名 FOCI、Largan、Browave、HST 的 FAU 供應角色",
         "trace_requeue_trigger": "event_watch:ew_0025_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -22040,7 +22041,7 @@
         "trace_trigger_watch_ref": "ew_0025_2026-08-31"
       },
       "source": "system_decompose",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -24207,11 +24208,11 @@
         "onboard_candidate_names": [
           "ASMPT"
         ],
-        "parked_reason": "供應商自報工具能力成立，仍缺獨立客戶 qualification 與 ASMPT graph identity；新 trigger 無清除。",
+        "parked_reason": "onboard 候選 ASMPT（0522.HK）四維初判**不過**。①瓶頸地位：先進封裝鍵合工具（TCB／熱壓鍵合）確實是 HBM 與 2.5D 封裝的實質關卡，但**同層有多家規模供應商**（Besi、Hanmi、Shinkawa、K&S），無 sole-source 或高替代難度的一手證據；②需求錨＝AI capex，與圖中既有錨相同；③客戶端資本承諾：**明確不過**——現況只有供應商自報工具能力，缺任何客戶 qualification、訂單或產能協議的具名一手（這正是本 lead 原本的 trace_next_trigger，至今未命中）；④標的純度：ASMPT 業務橫跨半導體解決方案與 SMT，AI 先進封裝只佔一部分。依 Step 2，初判不過即誠實 park 並寫明哪一維不過，不打 onboard 包、不建 registry 條目。",
         "primary_url": "https://semi.asmpt.com/en/news-center/press-releases/asmpt-showcases-ap-innovations-for-ai-and-hpc-at-ectc-2027/",
         "research_outcome": "無新 RA；維持 partial，等待客戶端訂單或量產 qualification。",
-        "trace_attempts_ref": "2026-08-31：重查 ASMPT 官方 SiPh/PIC bonder 與活動頁；一般 sub-micron placement、高吞吐工具能力可確認，但 lead 所指 ECTC 2027 頁尚無客戶 qualification 或量產採用證據。",
-        "trace_next_trigger": "ASMPT 客戶端文件、訂單或量產 qualification 具名揭露",
+        "trace_attempts_ref": "2026-09-09 research-drain：執行四維初判判定，未再投搜尋預算（原觸發條件明載需客戶端先發文件）",
+        "trace_next_trigger": "ASMPT 客戶端（記憶體廠或 OSAT）文件、訂單或量產 qualification 具名揭露——四維中只有這一維翻轉才值得重啟初判",
         "trace_requeue_trigger": "event_watch:ew_0028_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
@@ -24227,7 +24228,7 @@
         "trace_trigger_watch_ref": "ew_0028_2026-08-31"
       },
       "source": "weekly:cpo",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -24661,13 +24662,13 @@
           "SENKO Advanced Components"
         ],
         "original_claim_status": "已確認 SENKO 提供高速可拆卸光纖 PIC connectors；供應商家數與 qualification 週期未揭露",
-        "parked_reason": "具名供應關係一手已取得；公司尚未完成 onboarding，未直接打包入圖",
+        "parked_reason": "onboard 候選 SENKO Advanced Components 四維初判**結構性不適用**：SENKO 為日本非上市公司，無可投資的上市母體——標的純度這一維不是『不夠純』而是『不存在可買的標的』，因此不打 onboard 包（本圖對私有公司的處理是映射到明確 null，見 L9／INV-1，不是留白）。具名供應關係的一手已取得（trace_status=original_obtained），該知識已可支持 CPO connector 層的結構理解，但無法轉成候選。",
         "primary_url": "https://www.senko.com/senko-advanced-components-joins-nvidia-photonics-ecosystem/",
         "research_outcome": "形成 SENKO onboarding 候選；未自行推定 sole-source 或 qualification 週期",
         "research_run": "session:2026-08-29-decompose-drain",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "2026-08-30：SENKO／US Conec 皆未上市；以 NVIDIA／Marvell 一手 CPO connector 文件作可執行 trigger",
-        "trace_next_trigger": "SENKO/US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈",
+        "trace_attempts_ref": "2026-09-09 research-drain：執行四維初判判定；一手供應關係文件先前已取得，本輪不重取",
+        "trace_next_trigger": "SENKO 或 US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈——前兩者才會讓四維初判從『不適用』變成可評",
         "trace_origin_entity": "SENKO Advanced Components",
         "trace_origin_linkage": "供應商一手具名 NVIDIA Spectrum-X／Quantum-X 產品與供應角色；NVIDIA 公告另列同一生態系",
         "trace_requeue_trigger": "event_watch:ew_0029_2026-08-31",
@@ -24685,7 +24686,7 @@
         "trace_trigger_watch_ref": "ew_0029_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "可拆卸光連接器層：Spectrum-X 用 detachable optical connector 支撐自動化量產；SENKO 具名於 NVIDIA PR 生態系（連接器商、未上市？）——connector 幾家能做、qualification 週期？",
       "triage": {
@@ -31287,11 +31288,11 @@
       "lead_id": "lead_77539b327d06e48a3073ec7c8c2569c8",
       "published_at": null,
       "refs": {
-        "parked_reason": "Google 一手論文確認 Jupiter 使用 MEMS OCS，但完全沒有 foundry 名稱；問題本身仍是具名缺口，只能等 Google、專利、供應商 filing 或 teardown 點名。",
+        "parked_reason": "Google 一手論文確認 Jupiter 使用 MEMS OCS，但完全沒有 foundry 名稱，觸發條件未命中。⚠ 本輪的共同發現：這批 decompose 產生的層缺口 lead 全部卡在**同一個結構性事實**——鏈條頂端的客戶（TSMC／NVIDIA／Broadcom／Google）在最有理由具名供應商的場合仍不具名（[317] 已就 TSMC 做出此判定：2026-08-31 其先進封裝副總公開點名 CPO 四大瓶頸卻不點名任何供應商）。因此『再搜一次』對這類缺口沒有期望值，本輪不投搜尋預算；能翻轉它們的只有對方主動發文件。",
         "primary_url": "https://research.google/pubs/jupiter-evolving-transforming-googles-datacenter-network-via-optical-circuit-switches-and-software-defined-networking/",
         "research_outcome": "google_paper_confirms_mems_ocs_but_not_foundry",
         "research_run": "daily-brief-2026-09-05",
-        "trace_attempts_ref": "Google Research Jupiter Evolving paper and Google author pages searched; MEMS OCS architecture is explicit, manufacturing foundry is not named",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中",
         "trace_next_trigger": "Google paper patent supplier filing or teardown explicitly names the MEMS mirror-array foundry",
         "trace_requeue_trigger": "event_watch:ew_0068_2026-09-02",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -31301,7 +31302,7 @@
         "trace_trigger_watch_ref": "ew_0068_2026-09-02"
       },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "[decompose|Palomar OCS] MEMS 代工層——Google 自研 2D MEMS 鏡陣列由哪家 MEMS foundry 製造?136x136 duplex 已部署數萬台;tech:mems_mirror_array 有節點但零供應商",
       "triage": {
@@ -33341,10 +33342,10 @@
       "published_at": "2026-08-29T14:48:53.000Z",
       "raw_text": "Missed this mention earlier but IC design insiders reveal that OSAT providers have already warned clients:\n\n\"traditional packaging capacity could face a deficit exceeding 20% by 2027\" (eg. $AMKR, ethereum:0x041ff0e49f6f774e7dc7bd10ee4a14c00b1d80b2, Powertech as potential beneficaries)\n\nWith: \"wire bonding equipment\" emerging as the primary bottleneck (ASMPT, $KLIC)\n\n-> influx of AI server shipments has triggered a spike in demand for mature chips\n-> existing mature packaging capacity at OSATs is being rapidly absorbed\n-> securing early access to traditional packaging capacity is now becoming a challenge \n\nCascading bottleneck patterns are occurring across memory (eg. DDR2, DDR3) and now packaging capacity I guess.",
       "refs": {
-        "parked_reason": "線索引述匿名 IC design insiders，找不到可逐字核對的原始文件；K&S 與 Amkor 官方資料不等於該精確缺口主張",
+        "parked_reason": "『traditional packaging capacity 2027 缺口逾 20%』引述匿名 IC design insiders，無可逐字核對的原始文件；K&S 與 Amkor 官方資料不等於該精確缺口主張（L11-3：多個二手都這樣說 != 一手已證實）。⚠ 產業級缺口百分比是公司幾乎不會量化的東西，此觸發條件的期望值本身就低——若下一輪仍無一手，應考慮改判為結構性不可得並停止重試（比照 [470] 的兩種合法終局）。",
         "primary_url": "https://ir.amkor.com/news-releases/news-release-details/amkor-technology-reports-financial-results-second-quarter-2026",
         "research_outcome": "一手只能支持需求與產品分類，不能支持社群貼文的 20% 缺口與 primary bottleneck 排名",
-        "trace_attempts_ref": "2026-08-30：查找 Amkor Q2 2026 官方結果與 K&S 2026 官方結果／產品公告；確認 wirebond 仍屬 Amkor mainstream 產品、K&S 一般半導體與 memory 需求強，但未找到 2027 傳統封裝缺口超過 20% 或 wire bonding 為首要瓶頸的具名原文",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認無新一手；未投搜尋預算",
         "trace_next_trigger": "AMKR、KLIC、ASE 或 IC design 公司正式法說／filing 逐字揭露 2027 traditional packaging capacity deficit",
         "trace_requeue_trigger": "event_watch:ew_0033_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
@@ -33359,7 +33360,7 @@
         "trace_trigger_watch_ref": "ew_0033_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Missed this mention earlier but IC design insiders reveal that OSAT providers have already warned clients: \"traditional packaging capacity could face a deficit exceeding 20% by 2027\" (eg. $AMKR, ethereum:0x041ff0e49f6f774e7dc7bd10ee4a14c00b1d80b2, Powertech as potential beneficaries) With: \"wire bonding equipment\" emerging as the primary bottleneck (ASMPT, $KLIC) -> influx of AI server shipments has triggered a spike in demand for mature chips -> existing mature packaging capacity at OSATs is being rapidly absorbed -> securing early access to traditional packaging capacity is now becoming a challenge Cascading bottleneck patterns are occurring across memory (eg. DDR2, DDR3) and now packaging capacity I guess.",
       "triage": {
@@ -57555,11 +57556,12 @@
       "refs": {
         "gap": "Davisson assembly／test 由 TSMC 內部或 ASE／SPIL 承作仍無具名一手",
         "original_claim_status": "Broadcom 官方確認 substrate-level 多晶片 CPO packaging；未具名 Davisson 的 OSAT",
-        "parked_reason": "缺交易雙方具名 Davisson OSAT 角色",
+        "parked_reason": "Davisson 的 assembly／test 由 TSMC 內部或 ASE／SPIL 承作仍無具名一手，觸發條件未命中。⚠ 本輪的共同發現：這批 decompose 產生的層缺口 lead 全部卡在**同一個結構性事實**——鏈條頂端的客戶（TSMC／NVIDIA／Broadcom／Google）在最有理由具名供應商的場合仍不具名（[317] 已就 TSMC 做出此判定：2026-08-31 其先進封裝副總公開點名 CPO 四大瓶頸卻不點名任何供應商）。因此『再搜一次』對這類缺口沒有期望值，本輪不投搜尋預算；能翻轉它們的只有對方主動發文件。",
         "primary_url": "https://www.broadcom.com/info/optics/cpo",
         "research_outcome": "OSAT 欄位維持 unknown，不把同一生態系名單推成產品供應關係",
         "research_run": "session:2026-08-30-loop2-r4",
         "storage_permission": "repo_excerpt",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中",
         "trace_next_trigger": "Broadcom、TSMC、ASE 或 SPIL 一手文件具名 Davisson assembly／test 分工",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "Broadcom CPO 官方頁只列生態系標誌；NVIDIA 公告雖列 SPIL，未綁定 Davisson",
@@ -57577,7 +57579,7 @@
         "trace_trigger_watch_ref": "ew_0054_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
