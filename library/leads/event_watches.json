@@ -120,20 +120,32 @@
         "query_hint": "US ban Chinese optical transceivers rule Federal Register Innolight Eoptolink"
       },
       "note": "2026-09-09 對照：觸發 lead_624d76（COHR 8-K 2026-08-31）內容為高階主管特別績效 RSU，與「禁令草案→正式規則」無關（entity 交集誤觸）；fact 未驗證，等待條件仍成立 → 回 active，lead 進 consumed_leads。",
-      "status": "active",
+      "status": "fired",
       "woken_by": {
         "kind": "fact_verification",
-        "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
+        "lead_id": "lead_078cfd6337b274fe8c29dfccd1b74540",
         "shared_entities": [
           "COHR"
         ],
-        "at": "2026-08-31T22:39:01.539284+00:00",
+        "at": "2026-09-09T10:34:50.188178+00:00",
         "fact": "中國光模組禁令由草案轉正式規則",
         "fact_check_ref": "",
         "hypothesis_ref": "hy_0005_2026-08-31"
       },
       "consumed_leads": [
-        "lead_624d76a113c73f726163ed9b578521cb"
+        "lead_078cfd6337b274fe8c29dfccd1b74540",
+        "lead_1cc8a618f313fef294d383ac05a1e016",
+        "lead_4c624bf197b688bce6b5a827922583cd",
+        "lead_624d76a113c73f726163ed9b578521cb",
+        "lead_67d32f7e8f057b93fc1f35a99930833c",
+        "lead_702acc97c325101cd482e95c46cd62ae",
+        "lead_784638384b09744c90b7efc253f62704",
+        "lead_9086e8525c8d8dcccb58b78d140d128b",
+        "lead_a9a12c2b8ad54e92dce8dc3afac2ecee",
+        "lead_aa2866407b0c98500f424e294e833e03",
+        "lead_c2d6b5c68a631a1ab627e5fb2f2dedb7",
+        "lead_c8441a91c1bd085c7424eeaf9f6a5f5b",
+        "lead_e43bbbebc27c5bacc0a2ab090629b278"
       ]
     },
     {
@@ -2145,21 +2157,32 @@
         "query_hint": "Morgan Stanley CPO note Sivers Coherent Lumentum laser supply key participants"
       },
       "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層｜2026-09-09 對照：觸發 lead_624d76（COHR 8-K RSU）與「MS CPO note 並列 Sivers」無關（entity 交集誤觸）；fact 未驗證 → 回 active，lead 進 consumed_leads。poll 仍 eligible。",
-      "status": "active",
+      "status": "fired",
       "woken_by": {
         "kind": "fact_verification",
-        "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
+        "lead_id": "lead_078cfd6337b274fe8c29dfccd1b74540",
         "shared_entities": [
           "COHR",
           "co:coherent"
         ],
-        "at": "2026-08-31T22:39:01.539388+00:00",
+        "at": "2026-09-09T10:34:50.215148+00:00",
         "fact": "Morgan Stanley CPO note 將 Sivers 與 COHR/LITE 並列 laser supply 關鍵參與者",
         "fact_check_ref": "",
         "hypothesis_ref": "hy_0002_2026-08-31"
       },
       "consumed_leads": [
-        "lead_624d76a113c73f726163ed9b578521cb"
+        "lead_078cfd6337b274fe8c29dfccd1b74540",
+        "lead_1cc8a618f313fef294d383ac05a1e016",
+        "lead_4c624bf197b688bce6b5a827922583cd",
+        "lead_624d76a113c73f726163ed9b578521cb",
+        "lead_67d32f7e8f057b93fc1f35a99930833c",
+        "lead_702acc97c325101cd482e95c46cd62ae",
+        "lead_9086e8525c8d8dcccb58b78d140d128b",
+        "lead_a9a12c2b8ad54e92dce8dc3afac2ecee",
+        "lead_aa2866407b0c98500f424e294e833e03",
+        "lead_c2d6b5c68a631a1ab627e5fb2f2dedb7",
+        "lead_c8441a91c1bd085c7424eeaf9f6a5f5b",
+        "lead_e43bbbebc27c5bacc0a2ab090629b278"
       ]
     },
     {

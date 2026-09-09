@@ -7446,21 +7446,22 @@
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
       "dispatch_baseline_decision_id": "pd_c824b600c9f88663e7c84e72c63c04d2",
-      "dispatch_receipt": "manual_todo:490;manual_todo:491",
+      "dispatch_receipt": "decision:pd_04c4fc5e32f2007be54462375ea29e5d",
       "dispatch_ref": "assessment_gap:dc_48446dbceb85d4b785634e3c4ca5d669",
       "dispatch_scope": [
         "assessment_context_mismatch:commercial_maturity",
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-09-09T10:03:10.130042+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-09T10:44:01.522394+00:00",
       "dispatched_at": "2026-09-02T23:40:18.275510+00:00",
       "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：assessment_context_mismatch:commercial_maturity、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 442,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_04c4fc5e32f2007be54462375ea29e5d",
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T10:44:01.522394+00:00",
       "source": "decision_lab",
       "title": "co:lynas：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -8068,13 +8069,15 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "source_cleared": {
-        "at": "2026-09-09T09:47:21.388664+00:00",
-        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
-        "source_healthy": true
-      },
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-09T10:34:50.147107+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      }
     },
     {
       "added_at": "2026-09-04T23:09:52.902998+00:00",
@@ -8196,10 +8199,11 @@
       "added_at": "2026-09-09T10:02:27.056532+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-31T00:00:00+00:00；來源=Soitec Universal Registration Document 2025-2026 (EN) Note 7.1 Revenue p.253 (PD",
       "n": 489,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_04b5b568ef9c7e4a3136924130ea0161;proposal:po_04b5b568ef9c7e4a3136924130ea0161",
       "ref_id": "po_04b5b568ef9c7e4a3136924130ea0161",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T10:33:47.384096+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：SOI.PA / customer_concentration",
       "type": "engine_c_observation"
@@ -8208,10 +8212,11 @@
       "added_at": "2026-09-09T10:02:27.056532+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=Lynas ASX 2026-03-10 JARE enhanced agreement ＋ ASX 2026-03-16 DoW LOI ＋ FY2026 A",
       "n": 490,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_14aad57bdb4381689c3109f1d55bf69d;proposal:po_c6ed3855a31340e476b3d36cafde548f",
       "ref_id": "po_c6ed3855a31340e476b3d36cafde548f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T10:33:53.325312+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LYC.AX / backlog",
       "type": "engine_c_observation"
@@ -8220,10 +8225,11 @@
       "added_at": "2026-09-09T10:02:27.056532+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=Lynas ASX 2026-03-10 JARE enhanced agreement (announcements.asx.com.au 06x8fmmzv",
       "n": 491,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_dba7cb80a2af28c45e570b2ca6a45a81;proposal:po_ed9b3e53e90ae12e0a807cd404ee389b",
       "ref_id": "po_ed9b3e53e90ae12e0a807cd404ee389b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T10:33:54.143078+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：LYC.AX / customer_concentration",
       "type": "engine_c_observation"
@@ -8309,12 +8315,68 @@
       "hint": "go＝寫入 append-only Abstention（layer=valuation, subject=forward_earnings_multiple.target_pe, period_end=2027-03-31；reason：FY27 谷底 EPS 無可錨定倍數，市場錨在 FY28；revisit_when：FY2027 實際公布、目標期間推進到 FY2028，或橋支援兩年期內部 EPS）。寫入後 read model 自動改跑 ev_to_sales（va 已在 ledger），SOI.PA 才會有 fair value／隱含報酬。與 6324.T [487] 同一形狀（abstention 走 pq2，因為它把這格從工單上拿掉）。不含入圖、不含 thesis mutation、不含 live。",
       "n": 496,
       "reason": null,
+      "receipt": "authority:abstention_ledger;ref:ab_d7026cc8103966e9",
       "ref_id": "abstention:SOI.PA:forward_earnings_multiple.target_pe:2027-03-31",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T10:33:52.531460+00:00",
       "source": "manual",
       "title": "SOI.PA 估值 abstention：FY2027 是谷底年，本益比法對 FY27 EPS（內部 €0.63／共識 €0.69，現價 200 倍以上）無可錨定倍數——刻意不主張 target_pe，改以 EV/Sales（已寫 7.25x 校準倍數）估值",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-09T10:34:50.147614+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_acc6aa1db9c9a717ce63b198ac4d0466",
+      "dispatch_ref": "wo_4413512fb9526b4d20c65f72abde641d",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-09T10:35:42.891672+00:00",
+      "hint": "當前 missing_data：上詮法說會對『獨供兩代』的可稽核逐字（年報未揭露，替代 TSMC 具名的主要路徑）；客戶端（Coherent／Lumentum／Broadcom）filing 對 FAU 供應商的具名；⚠ TSMC 具名已改判為結構性可能不可得——不建議再投入 pq1 預算於此路徑（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 497,
+      "reason": null,
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-09T10:34:50.147614+00:00",
+      "hint": "當前 missing_data：Lumilens 訂單的實際出貨與收款驗證（PO ≠ 營收）；Marvell 保密爭議的後續（訴訟或和解揭露）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 498,
+      "reason": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-09T10:34:50.147327+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-09T10:34:50.147614+00:00",
+      "hint": "當前 missing_data：2026-08-27 重編與收入認列核對；獨立客戶端量產訂單（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "n": 499,
+      "reason": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-09T10:34:50.147381+00:00",
+        "trigger": "執行面 context 缺失",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -18127,8 +18189,95 @@
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-09-09T10:33:47.384096+00:00",
+      "n": 489,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_04b5b568ef9c7e4a3136924130ea0161;proposal:po_04b5b568ef9c7e4a3136924130ea0161",
+      "ref_id": "po_04b5b568ef9c7e4a3136924130ea0161",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T10:33:52.531460+00:00",
+      "n": 496,
+      "reason": null,
+      "receipt": "authority:abstention_ledger;ref:ab_d7026cc8103966e9",
+      "ref_id": "abstention:SOI.PA:forward_earnings_multiple.target_pe:2027-03-31",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T10:33:53.325312+00:00",
+      "n": 490,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_14aad57bdb4381689c3109f1d55bf69d;proposal:po_c6ed3855a31340e476b3d36cafde548f",
+      "ref_id": "po_c6ed3855a31340e476b3d36cafde548f",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T10:33:54.143078+00:00",
+      "n": 491,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_dba7cb80a2af28c45e570b2ca6a45a81;proposal:po_ed9b3e53e90ae12e0a807cd404ee389b",
+      "ref_id": "po_ed9b3e53e90ae12e0a807cd404ee389b",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T10:34:50.147614+00:00",
+      "n": 479,
+      "prior_source_cleared": {
+        "at": "2026-09-09T09:47:21.388664+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
+      "reason": "來源再次產出此項，撤銷完成候選標記",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_returned"
+    },
+    {
+      "at": "2026-09-09T10:35:42.891672+00:00",
+      "attempt": 1,
+      "n": 497,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_4413512fb9526b4d20c65f72abde641d",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-09T10:35:42.891672+00:00",
+      "n": 497,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_4413512fb9526b4d20c65f72abde641d",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T10:44:01.522394+00:00",
+      "n": 442,
+      "reason": null,
+      "receipt": "decision:pd_04c4fc5e32f2007be54462375ea29e5d",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-09T10:44:01.522394+00:00",
+      "n": 442,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_04c4fc5e32f2007be54462375ea29e5d",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 497,
+  "next_n": 500,
   "schema_version": "1"
 }
