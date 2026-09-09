@@ -487,3 +487,34 @@ def test_pe_path_is_unchanged_by_the_new_method() -> None:
     assert result.fair_value == pytest.approx(model.metrics["eps"].value * 25.0)
     assert result.gap.implied_multiple_at_price is not None
     assert {s.key for s in result.steps}.isdisjoint({"net_debt", "diluted_shares"})
+
+
+def test_read_model_switches_to_ev_to_sales_only_when_pe_is_abstained_or_not_applicable(monkeypatch) -> None:
+    """2026-09-09 SOI.PA：本益比法被 append-only Abstention 宣告「刻意不主張」（谷底年 EPS 無可錨定倍數）且 ledger
+    有 EV/S 假設 → read model 改跑 EV/S。只是「還沒寫 target_pe」**不**切——方法選擇是判斷，要由 abstention 明示。"""
+    from alpha.abstention import abstention_record, parse_abstention_record
+    from alpha.identity import CompanyId, Ticker
+    from briefing.alpha_view import sources
+    from tests.test_alpha_investment_view import _build
+
+    build = _build()
+    model = _run(today=date(2026, 9, 7), index=_index())          # abstention 建於 09-06，視角日要在其後
+    ev = _ev_multiple(8.0)
+    abstained = parse_abstention_record(abstention_record(
+        company_id="co:coherent", ticker="COHR", layer="valuation", subject="forward_earnings_multiple.target_pe",
+        period_end=TARGET.end, reason="FY2027 是谷底年：現價對內部 FY2027 EPS 超過 200 倍，市場錨在 FY2028，本益比法套在谷底 EPS 上沒有可錨定的倍數，任何倍數產出的 gap 都只反映倍數本身", revisit_when="FY2027 實際公布、目標期間 rollover 到 FY2028 後重評；每季業績後核查",
+        created_at=CREATED))
+    identity = {"market_currency": "USD", "market_quote_unit": "USD"}
+    common = dict(as_of=None, today=date(2026, 9, 7), identity=identity)
+    monkeypatch.setattr(sources.valuation_ledger, "read_valuation_assumption_records", lambda t: ([ev], []))
+
+    monkeypatch.setattr(sources.abstention_ledger, "read_abstention_records", lambda t: ([abstained], []))
+    result, reason, _ = sources._valuation_model(  # noqa: SLF001
+        build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
+    assert reason is None and result is not None and result.method == "ev_to_sales"
+
+    monkeypatch.setattr(sources.abstention_ledger, "read_abstention_records", lambda t: ([], []))
+    untouched, _, _ = sources._valuation_model(  # noqa: SLF001
+        build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
+    assert untouched.method == "forward_earnings_multiple"
+    assert not untouched.is_known and untouched.absence_kind == "not_yet_recorded"

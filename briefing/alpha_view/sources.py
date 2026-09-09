@@ -248,9 +248,11 @@ def _valuation_model(
     )
     try:
         result = build_valuation(**common)
-        # 2026-09-09 P6：本益比法「方法不適用」（forward EPS 非正）且 ledger 裡有 ev_to_sales 假設 → 改跑 EV/Sales。
-        # 沒有 EV/S 假設就保留本益比法的 method_not_applicable（理由已寫該寫哪一筆假設）；不自動補倍數。
-        if (not result.is_known and result.absence_kind == "method_not_applicable"
+        # 2026-09-09 P6：本益比法「方法不適用」（forward EPS 非正）**或**「刻意不主張目標倍數」（谷底年 EPS
+        # 無可錨定倍數、已由 append-only Abstention 宣告）、且 ledger 裡有 ev_to_sales 假設 → 改跑 EV/Sales。
+        # 「還沒寫 target_pe」（not_yet_recorded）**不**觸發：方法選擇是判斷，要由 abstention 明示，不能靠不寫。
+        # 沒有 EV/S 假設就保留本益比法的缺席理由；不自動補倍數。
+        if (not result.is_known and result.absence_kind in {"method_not_applicable", "deliberate_abstention"}
                 and _has_method_records(records, METHOD_EV_TO_SALES)):
             result = build_valuation(method=METHOD_EV_TO_SALES, **common)
     except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗

@@ -4599,7 +4599,14 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-09T09:47:21.388307+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
@@ -7439,12 +7446,14 @@
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
       "dispatch_baseline_decision_id": "pd_c824b600c9f88663e7c84e72c63c04d2",
+      "dispatch_receipt": "manual_todo:490;manual_todo:491",
       "dispatch_ref": "assessment_gap:dc_48446dbceb85d4b785634e3c4ca5d669",
       "dispatch_scope": [
         "assessment_context_mismatch:commercial_maturity",
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-09T10:03:10.130042+00:00",
       "dispatched_at": "2026-09-02T23:40:18.275510+00:00",
       "hint": "當前 missing_data：customer_concentration：日本／JARE 佔營收比重（FY26 全年報告可查，尚未核對）；美國政府 US$96M binding LOI 的一手 ASX 公告核對（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：assessment_context_mismatch:commercial_maturity、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 442,
@@ -7722,15 +7731,18 @@
       "added_at": "2026-09-03T00:34:53.882999+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_cc5365ecce4b1042520ee86fc41c389e",
+      "dispatch_receipt": "parked:customer_concentration_not_disclosed_in_tanshin;counter_path_needs_ra",
       "dispatch_ref": "wo_3073bbebf323cc04d1194b3c17ab22b8",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-09T09:58:03.436194+00:00",
       "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：RV 市占的審計級或客戶端來源(Estun/双環年報路徑未建)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 459,
-      "reason": null,
+      "reason": "Nabtesco 2026 Q2 決算短信（19 頁）只有地區別營收，無主要顧客揭露（pypdf 全文 1 命中且為地區註腳）；客戶集中度（engine_c_customer，judgment）需 有価証券報告書「主要な販売先」段（≥10% 才列），FY2026 有報預計 2027-03 公布。counter_path_missing（RV 減速機的替代路徑：諧波／行星／中國擺線廠）需另起 RA packet，屬入圖核准。兩者都不是本輪 bounded research 能在無新一手下完成的——誠實 park，trigger＝有報公布或任一客戶端具名揭露。",
+      "receipt": "parked:customer_concentration_not_disclosed_in_tanshin;counter_path_needs_ra",
       "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T09:58:03.436194+00:00",
       "source": "decision_lab",
       "title": "co:nabtesco：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -7739,15 +7751,18 @@
       "added_at": "2026-09-03T00:34:53.882999+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_bbf7da3cbada857a6a83769613b22bb4",
+      "dispatch_receipt": "parked:customer_concentration_not_disclosed_in_h1_2026",
       "dispatch_ref": "wo_609c957217480557ee0f94c60c1898e0",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-09T09:58:04.579479+00:00",
       "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 460,
-      "reason": null,
+      "reason": "Schaeffler 2026 年半年報（library/private/schaeffler_h1_2026.pdf，44 頁）pypdf 全文對 largest/top/key customer、customer concentration、Volkswagen、Kunden 0 命中——半年報不揭露客戶占比；財務核驗的客戶集中度（judgment）需 AR 2025／2026 的客戶結構段或 humanoid 夥伴的付款揭露（四家具名夥伴尚無金額）。誠實 park；trigger＝AR 2026（約 2027-03）或任一人形夥伴公開訂單金額。",
+      "receipt": "parked:customer_concentration_not_disclosed_in_h1_2026",
       "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T09:58:04.579479+00:00",
       "source": "decision_lab",
       "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -7852,15 +7867,18 @@
       "added_at": "2026-09-03T01:36:00.085206+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_acb634f831d77468f094c074c1ddffb0",
+      "dispatch_receipt": "parked:private_company_financial_axis_unavailable",
       "dispatch_ref": "wo_7295b36af400cce5d413d7e94feea1b8",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-09T09:57:58.216268+00:00",
       "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 466,
-      "reason": null,
+      "reason": "Niron Magnetics 為未上市公司（registry research_ticker=None）：財務核驗五項（backlog／客戶集中度／稀釋／毛利趨勢／runway）無任何法定揭露可取，financial_* blocker 結構性不可解；catalyst／disproof 仍需使用者確認（L8）。已有一手：GM／Stellantis 2023-11 US$33M 投資、Dow／OSC 2026-08 US$150M——供應商側資本承諾證據已在圖中。誠實 park，等 S-1／任何法定財報出現（event watch 兜底）。",
+      "receipt": "parked:private_company_financial_axis_unavailable",
       "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T09:57:58.216268+00:00",
       "source": "decision_lab",
       "title": "co:niron_magnetics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -7869,15 +7887,18 @@
       "added_at": "2026-09-03T01:36:00.085206+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_aeaf79962e4fb235241d9a73d9f7a584",
+      "dispatch_receipt": "parked:private_company_financial_axis_unavailable",
       "dispatch_ref": "wo_12589de2a5edeef5c3e8a0b065c9910a",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-09T09:57:59.359482+00:00",
       "dispatched_at": "2026-09-09T05:31:41.648240+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 467,
-      "reason": null,
+      "reason": "Ewellix 為 Schaeffler 全資子公司（2023 年收購；registry research_ticker=None）：無獨立財報，financial_* blocker 結構性不可解；counter_path／catalyst／disproof 需隨 Schaeffler 母公司 cohort（[460]）處理，不單獨研究。誠實 park；母公司 AR 2026 揭露行星滾柱螺桿營收拆分時再醒（event watch 兜底）。",
+      "receipt": "parked:private_company_financial_axis_unavailable",
       "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T09:57:59.359482+00:00",
       "source": "decision_lab",
       "title": "co:ewellix：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -8047,6 +8068,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-09T09:47:21.388664+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -8165,6 +8191,130 @@
       "source": "research_action",
       "title": "NVIDIA 的 DSX AI factory platform 取得 OpenAI 具名部署路徑",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-03-31T00:00:00+00:00；來源=Soitec Universal Registration Document 2025-2026 (EN) Note 7.1 Revenue p.253 (PD",
+      "n": 489,
+      "reason": null,
+      "ref_id": "po_04b5b568ef9c7e4a3136924130ea0161",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：SOI.PA / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=Lynas ASX 2026-03-10 JARE enhanced agreement ＋ ASX 2026-03-16 DoW LOI ＋ FY2026 A",
+      "n": 490,
+      "reason": null,
+      "ref_id": "po_c6ed3855a31340e476b3d36cafde548f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LYC.AX / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=Lynas ASX 2026-03-10 JARE enhanced agreement (announcements.asx.com.au 06x8fmmzv",
+      "n": 491,
+      "reason": null,
+      "ref_id": "po_ed9b3e53e90ae12e0a807cd404ee389b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LYC.AX / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "deferred_at": "2026-09-09T10:04:40.720386+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 492,
+      "reason": null,
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:niron_magnetics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-09-09T10:04:40.720386+00:00",
+        "trigger": "Niron Magnetics 任何法定財報／S-1 出現（watch ew_0080 兜底；原 [466] 已 park：未上市、財務軸結構性不可解）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "deferred_at": "2026-09-09T10:04:40.921832+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 493,
+      "reason": null,
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:ewellix：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-09-09T10:04:40.921832+00:00",
+        "trigger": "Schaeffler 一手揭露 Ewellix／行星滾柱螺桿營收拆分（watch ew_0081；原 [467] 已 park）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "deferred_at": "2026-09-09T10:04:41.109978+00:00",
+      "hint": "當前 missing_data：RV 市占的審計級或客戶端來源(Estun/双環年報路徑未建)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 494,
+      "reason": null,
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nabtesco：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-09-09T10:04:41.109978+00:00",
+        "trigger": "Nabtesco 有価証券報告書『主要な販売先』或客戶端具名揭露（watch ew_0082；原 [459] 已 park：短信不揭露客戶集中度）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "deferred_at": "2026-09-09T10:04:41.296628+00:00",
+      "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 495,
+      "reason": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:schaeffler：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": null,
+        "set_at": "2026-09-09T10:04:41.296628+00:00",
+        "trigger": "Schaeffler AR 2026 客戶結構或人形夥伴訂單金額（watch ew_0083；原 [460] 已 park：半年報不揭露）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-09T10:07:55.038677+00:00",
+      "hint": "go＝寫入 append-only Abstention（layer=valuation, subject=forward_earnings_multiple.target_pe, period_end=2027-03-31；reason：FY27 谷底 EPS 無可錨定倍數，市場錨在 FY28；revisit_when：FY2027 實際公布、目標期間推進到 FY2028，或橋支援兩年期內部 EPS）。寫入後 read model 自動改跑 ev_to_sales（va 已在 ledger），SOI.PA 才會有 fair value／隱含報酬。與 6324.T [487] 同一形狀（abstention 走 pq2，因為它把這格從工單上拿掉）。不含入圖、不含 thesis mutation、不含 live。",
+      "n": 496,
+      "reason": null,
+      "ref_id": "abstention:SOI.PA:forward_earnings_multiple.target_pe:2027-03-31",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "SOI.PA 估值 abstention：FY2027 是谷底年，本益比法對 FY27 EPS（內部 €0.63／共識 €0.69，現價 200 倍以上）無可錨定倍數——刻意不主張 target_pe，改以 EV/Sales（已寫 7.25x 校準倍數）估值",
+      "type": "manual"
     }
   ],
   "log": [
@@ -17851,8 +18001,134 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T09:47:21.388664+00:00",
+      "n": 479,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-09T09:57:58.216268+00:00",
+      "n": 466,
+      "reason": "Niron Magnetics 為未上市公司（registry research_ticker=None）：財務核驗五項（backlog／客戶集中度／稀釋／毛利趨勢／runway）無任何法定揭露可取，financial_* blocker 結構性不可解；catalyst／disproof 仍需使用者確認（L8）。已有一手：GM／Stellantis 2023-11 US$33M 投資、Dow／OSC 2026-08 US$150M——供應商側資本承諾證據已在圖中。誠實 park，等 S-1／任何法定財報出現（event watch 兜底）。",
+      "receipt": "parked:private_company_financial_axis_unavailable",
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-09T09:57:58.216268+00:00",
+      "n": 466,
+      "reason": "Niron Magnetics 為未上市公司（registry research_ticker=None）：財務核驗五項（backlog／客戶集中度／稀釋／毛利趨勢／runway）無任何法定揭露可取，financial_* blocker 結構性不可解；catalyst／disproof 仍需使用者確認（L8）。已有一手：GM／Stellantis 2023-11 US$33M 投資、Dow／OSC 2026-08 US$150M——供應商側資本承諾證據已在圖中。誠實 park，等 S-1／任何法定財報出現（event watch 兜底）。",
+      "receipt": "parked:private_company_financial_axis_unavailable",
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T09:57:59.359482+00:00",
+      "n": 467,
+      "reason": "Ewellix 為 Schaeffler 全資子公司（2023 年收購；registry research_ticker=None）：無獨立財報，financial_* blocker 結構性不可解；counter_path／catalyst／disproof 需隨 Schaeffler 母公司 cohort（[460]）處理，不單獨研究。誠實 park；母公司 AR 2026 揭露行星滾柱螺桿營收拆分時再醒（event watch 兜底）。",
+      "receipt": "parked:private_company_financial_axis_unavailable",
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-09T09:57:59.359482+00:00",
+      "n": 467,
+      "reason": "Ewellix 為 Schaeffler 全資子公司（2023 年收購；registry research_ticker=None）：無獨立財報，financial_* blocker 結構性不可解；counter_path／catalyst／disproof 需隨 Schaeffler 母公司 cohort（[460]）處理，不單獨研究。誠實 park；母公司 AR 2026 揭露行星滾柱螺桿營收拆分時再醒（event watch 兜底）。",
+      "receipt": "parked:private_company_financial_axis_unavailable",
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T09:58:03.436194+00:00",
+      "n": 459,
+      "reason": "Nabtesco 2026 Q2 決算短信（19 頁）只有地區別營收，無主要顧客揭露（pypdf 全文 1 命中且為地區註腳）；客戶集中度（engine_c_customer，judgment）需 有価証券報告書「主要な販売先」段（≥10% 才列），FY2026 有報預計 2027-03 公布。counter_path_missing（RV 減速機的替代路徑：諧波／行星／中國擺線廠）需另起 RA packet，屬入圖核准。兩者都不是本輪 bounded research 能在無新一手下完成的——誠實 park，trigger＝有報公布或任一客戶端具名揭露。",
+      "receipt": "parked:customer_concentration_not_disclosed_in_tanshin;counter_path_needs_ra",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-09T09:58:03.436194+00:00",
+      "n": 459,
+      "reason": "Nabtesco 2026 Q2 決算短信（19 頁）只有地區別營收，無主要顧客揭露（pypdf 全文 1 命中且為地區註腳）；客戶集中度（engine_c_customer，judgment）需 有価証券報告書「主要な販売先」段（≥10% 才列），FY2026 有報預計 2027-03 公布。counter_path_missing（RV 減速機的替代路徑：諧波／行星／中國擺線廠）需另起 RA packet，屬入圖核准。兩者都不是本輪 bounded research 能在無新一手下完成的——誠實 park，trigger＝有報公布或任一客戶端具名揭露。",
+      "receipt": "parked:customer_concentration_not_disclosed_in_tanshin;counter_path_needs_ra",
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T09:58:04.579479+00:00",
+      "n": 460,
+      "reason": "Schaeffler 2026 年半年報（library/private/schaeffler_h1_2026.pdf，44 頁）pypdf 全文對 largest/top/key customer、customer concentration、Volkswagen、Kunden 0 命中——半年報不揭露客戶占比；財務核驗的客戶集中度（judgment）需 AR 2025／2026 的客戶結構段或 humanoid 夥伴的付款揭露（四家具名夥伴尚無金額）。誠實 park；trigger＝AR 2026（約 2027-03）或任一人形夥伴公開訂單金額。",
+      "receipt": "parked:customer_concentration_not_disclosed_in_h1_2026",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-09T09:58:04.579479+00:00",
+      "n": 460,
+      "reason": "Schaeffler 2026 年半年報（library/private/schaeffler_h1_2026.pdf，44 頁）pypdf 全文對 largest/top/key customer、customer concentration、Volkswagen、Kunden 0 命中——半年報不揭露客戶占比；財務核驗的客戶集中度（judgment）需 AR 2025／2026 的客戶結構段或 humanoid 夥伴的付款揭露（四家具名夥伴尚無金額）。誠實 park；trigger＝AR 2026（約 2027-03）或任一人形夥伴公開訂單金額。",
+      "receipt": "parked:customer_concentration_not_disclosed_in_h1_2026",
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T10:03:10.130042+00:00",
+      "n": 442,
+      "reason": "commercial_maturity 軸只吃 engine_c_backlog／engine_c_customer（judgment 觀測，使用者 gate）。bounded research 已完成：JARE 12 年 firm offtake（5,000 t/yr ＝ FY26 NdPr 銷量 68%）＋美國國防部 LOI US$96M／4 年，已從 ASX 一手與 FY26 Appendix 4E 整理成兩筆觀測提案 [490] backlog、[491] customer_concentration。核准寫入後 reassess 即可清掉 assessment_context_mismatch:commercial_maturity。",
+      "receipt": "manual_todo:490;manual_todo:491",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-09T10:04:40.720386+00:00",
+      "n": 492,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_d940b7dc21e559ead10c75eb1f74db7a",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-09T10:04:40.921832+00:00",
+      "n": 493,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_f18630675b314a83fcbc871290d5d8c3",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-09T10:04:41.109978+00:00",
+      "n": 494,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_db19d3b490013f4cc464b2aab37b0bc8",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-09T10:04:41.296628+00:00",
+      "n": 495,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_912a03a50135ea5e29000a0417c3f477",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
-  "next_n": 489,
+  "next_n": 497,
   "schema_version": "1"
 }

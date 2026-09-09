@@ -8294,6 +8294,14 @@
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-17",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Tower 6-K（2026-08-17）：定期申報／季度資料，不改候選集合或排序，只影響對既有 TSEM 邊的信心"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
@@ -11562,6 +11570,14 @@
       },
       "title": "$NVDA earnings TLDR: Revenue: $96.22B vs. ~$92.17B (beat) Adj. EPS: $2.22 vs. $2.09-$2.10 (beat) DC: $89.0B vs. ~$86.3B (beat) Adj. gross margin: 75% vs. 75% Hyperscaler Revenue: $48.71B from $43.05B last quarter (custom ASIC growth hasn't really prevented this revenue from accelerating) For guidance: Revenue: $108B vs. ~$104.2B Adj. gross margin: 74% vs. 75% (kinda the only soft spot) Revenue ramp has been genuinely absurd over last 4 quarters. -> $68.1B -> $81.6B -> $96.2B (we are here) -> next quarter guidance: $108B, despite assuming zero China DC compute revenue. Fun thing to note is Nvidia says its commitments jumped from $119B last quarter to $279B, primarily related to procurement of memory (for next few years).. So memory goes brrr. TLDR: AI keeps on going brrr. Nvidia is clearly leading the charge and no obvious signs of demand slowing. Given Nvidia is already a $5T+ company, I think most of the alpha comes from how Nvidia's architecture/capacity decisions impact elsewhere in the supply chain (eg. CPO, memory, 800V) nowadays. Rather than simply finding mispricing in Nvidia itself. Regardless, all the fun stuff happens in the earnings call in a few min.",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "NVDA 財報 TLDR：需求錨的財務事實，已在共識內，只影響信心"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
@@ -13868,6 +13884,15 @@
       "themes": {},
       "title": "Leaked Anthropic docs show plans to secure 1.4GW capacity from Australia, amounting to ~$21.6B. Recently $IREN, $SHAZ, and other Neoclouds have been building sovereign DCs in Australia. Guess like a lot of things are stating to make more sense connection wise? (disclosure: no open positions in any of the above).",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "Anthropic 1.4GW 澳洲容量（~US$21.6B）→ 客戶付錢綁 neocloud（IREN／SHAZ），可能新增候選（sovereign DC 供應鏈）"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
@@ -14296,6 +14321,14 @@
       },
       "title": "\"Severe InP Shortage Triggers Largest Price Hike Ever\" - $AXTI. Suppliers have bluntly stated that \"even if you have the money, you still may not be able to get the material\" (lol). - Industry sources revealed that InP substrate prices began rising in Q4 last year and was the fourth consecutive substrate price hike. - The latest Q4 hike is expected to be >10%, - Meanwhile, prices for epitaxial wafers made from those substrates have already been raised two times, and the market is moving toward a 3rd consecutive increase in Q4. (I also wrote a thesis on $IQE, which benefits here too). Article states VPEC, Landmark, IET benefits (Taiwan centric reporting). I did predict this last year... The bottleneck is real, but I do have higher expectations for price hikes that comes next. Glad it's starting to play out.",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "InP 基板嚴重短缺與史上最大漲價：AXTI 的瓶頸地位證據，會動 AXTI 在排序內的相對位置（供給側稀缺）"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
@@ -15127,6 +15160,14 @@
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-04",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "Tower 6-K（2026-08-04）：季度結果申報，只影響信心"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
@@ -43752,6 +43793,14 @@
       },
       "title": "Just some of the more interesting news I came across recently: 1. MS: Revised China humanoid shipments to reach 50,000 in 2026 from 14,000u and 28,000u earlier this year. 2. MS: Probe cards and test sockets likely to be priced hike (precious metal hikes + severe shortage of test pin capacity) 3. Capacitor price hikes: MLCC, aluminum electrolytic, tantalum, polymer aluminum, film, and super capacitors from Yageo. 4. $META Vistara architecture: Older DDR4 Memory with CXL as memory expansion 5. OpenAI achieved inference optimization breakthrough that halves costs and reduces GPU requirements. 6. LTAs are being signed with MLCC after Samsung signed LTA with US big tech customer 7. Grid power bottlenecks triggered 5x increase ($25B) in Brookfield's financing for $BE fuel cells. 8. Taiwan's chip packaging and testing supply chain includes major OSAT providers such as $ASX, Powertech, Winstek Semiconductor, Chipbond, ChipMOS, and ShunSin. Dedicated testing companies include KYEC, Ardentec, and Sigurd Microelectronics, while testing interface suppliers include WinWay, MPI, Keystone Microtech, Chunghwa Precision, and Hermes Testing Solutions. Leadframe makers include Jih Lin Tech, SDI, and CWTC, while major IC substrate suppliers include Unimicron, Kinsus, Nan Ya PCB, and Zhen Ding Tech. (Digitimes) - Taiwan-based OSAT providers are raising prices - Memory and IC packaging and testing capacity have both become bottlenecks in the semiconductor supply chain",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "MS 上修中國人形出貨至 2026 年 5 萬台：第三方需求預測（tier 3），支持 humanoid 需求錨但不改候選或排序"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
@@ -47884,6 +47933,14 @@
       },
       "title": "$NVDA: \"We expect to grow revenue by approximately 70% in fiscal 2028. This is a supply constrained outlook\" That statement alone is probably more important than the entire earnings beat just now? Insane upward revision beat from +43.9% expected to 70%. \"With cloud industry backlog now greater than 2 trillion, CapEx by the top five hyperscalers is expected to reach nearly $800 Billion in 2026 and 1.3 Trillion in 2027\" $1.3 Trillion in 2027. (MS was around $1.2T June, so this is upward projection revisions) Yeah the high-beta parts of the supply chain growth is going to like this.",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "NVDA 自陳 FY2028 營收 +70%、供給受限：CPO／光互連需求錨的強度陳述，影響上游供應商相對排序"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
@@ -56695,6 +56752,15 @@
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
+        "classification": {
+          "backfill_ref": "classify_8.json",
+          "classified_at": "2026-09-09T09:55:44.833440+00:00",
+          "classified_by": "backfill_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "confidence_only",
+          "payment_direction": "customer_to_supplier",
+          "reason": "META 擬租算力給 Anthropic（US$10B）：客戶付錢方向明確，但對手方不在本圖供應鏈內，只影響 AI capex 需求錨信心"
+        },
         "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {

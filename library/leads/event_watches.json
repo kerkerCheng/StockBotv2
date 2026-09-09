@@ -119,8 +119,8 @@
         "last_checked": "2026-08-31",
         "query_hint": "US ban Chinese optical transceivers rule Federal Register Innolight Eoptolink"
       },
-      "note": "",
-      "status": "fired",
+      "note": "2026-09-09 對照：觸發 lead_624d76（COHR 8-K 2026-08-31）內容為高階主管特別績效 RSU，與「禁令草案→正式規則」無關（entity 交集誤觸）；fact 未驗證，等待條件仍成立 → 回 active，lead 進 consumed_leads。",
+      "status": "active",
       "woken_by": {
         "kind": "fact_verification",
         "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
@@ -131,7 +131,10 @@
         "fact": "中國光模組禁令由草案轉正式規則",
         "fact_check_ref": "",
         "hypothesis_ref": "hy_0005_2026-08-31"
-      }
+      },
+      "consumed_leads": [
+        "lead_624d76a113c73f726163ed9b578521cb"
+      ]
     },
     {
       "watch_id": "ew_0006_2026-08-31",
@@ -175,8 +178,8 @@
         "last_checked": null,
         "query_hint": ""
       },
-      "note": "",
-      "status": "fired",
+      "note": "2026-09-09 對照：觸發 lead_784638（AAOI 8-K 2026-09-01）為 Houston Buildings 4/5 租賃（約 1.094m sqft、10 年、購買選擇權約 $146.57m）——方向上支持產能擴張意圖，但不驗證「產能售罄至 2H／美國產線溢價」；check_ref 仍是 Q3 2026 10-Q／法說（約 2026-11）→ 回 active。",
+      "status": "active",
       "woken_by": {
         "kind": "fact_verification",
         "lead_id": "lead_784638384b09744c90b7efc253f62704",
@@ -188,7 +191,10 @@
         "fact": "AAOI 產能售罄至 2H＋美國產線溢價（summit 截圖）——對照 Q3 財報 ASP/毛利/產能陳述",
         "fact_check_ref": "AAOI Q3 2026 10-Q/法說",
         "hypothesis_ref": "hy_0004_2026-08-31"
-      }
+      },
+      "consumed_leads": [
+        "lead_784638384b09744c90b7efc253f62704"
+      ]
     },
     {
       "watch_id": "ew_0008_2026-08-31",
@@ -2138,8 +2144,8 @@
         "last_checked": null,
         "query_hint": "Morgan Stanley CPO note Sivers Coherent Lumentum laser supply key participants"
       },
-      "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層",
-      "status": "fired",
+      "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層｜2026-09-09 對照：觸發 lead_624d76（COHR 8-K RSU）與「MS CPO note 並列 Sivers」無關（entity 交集誤觸）；fact 未驗證 → 回 active，lead 進 consumed_leads。poll 仍 eligible。",
+      "status": "active",
       "woken_by": {
         "kind": "fact_verification",
         "lead_id": "lead_624d76a113c73f726163ed9b578521cb",
@@ -2151,7 +2157,10 @@
         "fact": "Morgan Stanley CPO note 將 Sivers 與 COHR/LITE 並列 laser supply 關鍵參與者",
         "fact_check_ref": "",
         "hypothesis_ref": "hy_0002_2026-08-31"
-      }
+      },
+      "consumed_leads": [
+        "lead_624d76a113c73f726163ed9b578521cb"
+      ]
     },
     {
       "watch_id": "ew_0058_2026-08-31",
@@ -2988,6 +2997,106 @@
         "at": "2026-09-09T01:10:06.807165+00:00",
         "wake_lead": "lead_a7add74cce651d491e353a7f71b94f6b"
       }
+    },
+    {
+      "watch_id": "ew_0080_2026-09-09",
+      "created_at": "2026-09-09T09:57:59.557241+00:00",
+      "expires": "2027-09-30",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "co:niron_magnetics"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": 492,
+      "hypothesis_ref": "",
+      "wake_lead": "",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "[466] parked：未上市；任何法定財報／S-1 出現即醒｜wake_pq2 466→492（park 自動 resolve 後 collector 換號重生）",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0081_2026-09-09",
+      "created_at": "2026-09-09T09:57:59.707258+00:00",
+      "expires": "2027-09-30",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "SHA0.DE",
+        "co:ewellix",
+        "co:schaeffler"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": 493,
+      "hypothesis_ref": "",
+      "wake_lead": "",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "[467] parked：Ewellix 無獨立財報；Schaeffler 一手揭露 PRS 拆分即醒｜wake_pq2 467→493（park 自動 resolve 後 collector 換號重生）",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0082_2026-09-09",
+      "created_at": "2026-09-09T09:58:04.768540+00:00",
+      "expires": "2027-06-30",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "6268.T",
+        "co:nabtesco"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": 494,
+      "hypothesis_ref": "",
+      "wake_lead": "",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "[459] parked：等 有報 主要な販売先 或客戶端具名｜wake_pq2 459→494（park 自動 resolve 後 collector 換號重生）",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0083_2026-09-09",
+      "created_at": "2026-09-09T09:58:04.924396+00:00",
+      "expires": "2027-06-30",
+      "kind": "entity_filing_signal",
+      "until": null,
+      "entities": [
+        "SHA0.DE",
+        "co:schaeffler"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": 495,
+      "hypothesis_ref": "",
+      "wake_lead": "",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "[460] parked：等 AR 2026 客戶結構或人形夥伴訂單金額｜wake_pq2 460→495（park 自動 resolve 後 collector 換號重生）",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }
