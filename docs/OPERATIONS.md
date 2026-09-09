@@ -342,6 +342,15 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'webapp'   
 
 ### Web App／API（2026-09-07 Step 5）
 
+**兩種 materialize 宇宙（2026-09-09 P4）：** `--tracked`＝pq1 的導出權威（thesis lifecycle＋cohort＋主題核心，
+與 drain 同一份）；`--registry-listed`＝registry 裡所有有 research_ticker 的公司（上市 73 家）。後者**只給
+materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 EDGAR harvest 並稀釋 priority 加分。
+
+```powershell
+& '.venv\Scripts\python.exe' -m webapp materialize --registry-listed      # 全部上市公司的單檔判讀（多數 blocked，那是起點）
+& '.venv\Scripts\python.exe' -m webapp status | Select-String "ready"     # 到終局的檔數看這裡
+```
+
 **日常要看一檔股票，開瀏覽器比開終端機快。** APP 讀的是**已經算好**的判讀——
 `LLM changes cognition; APP reads cognition`。
 

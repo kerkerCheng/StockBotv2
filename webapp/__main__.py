@@ -31,6 +31,20 @@ def _tracked_tickers() -> list[str]:
     return sorted(discover_tracked_tickers(load_config()))
 
 
+def _registry_listed_tickers() -> list[str]:
+    """registry 裡**所有有 research_ticker 的公司**（上市者）——materialize 的第二種宇宙（2026-09-09 P4）。
+
+    為什麼不直接給 `discover_tracked_tickers` 加第四個來源：那個導出同時餵 pq1 priority（tracked 加分）
+    與 EDGAR harvest 的 watch 推導（`crons/harvest_leads.py` 的 `derive_from_tracked`）。把 registry 全部
+    73 家塞進去，等於讓 daily 多抓 43 家的 Form 4、並把 priority 的 tracked 加分稀釋成人人有獎——
+    兩個都是行為變更，而 P4 要的只是「APP 看得到更多檔」。所以這裡另開一個宇宙，只給 materialize 用。
+    """
+    from identity import get_registry
+
+    tickers = {c.research_ticker.strip().upper() for c in get_registry().companies if c.research_ticker}
+    return sorted(tickers)
+
+
 def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore]:
     analyst_dir = Path(args.dir) if getattr(args, "dir", None) else None
     explicit_state = Path(args.state_dir) if getattr(args, "state_dir", None) else None
@@ -114,6 +128,11 @@ def cmd_materialize(args: argparse.Namespace) -> int:
         tracked = _tracked_tickers()
         print(f"追蹤中 {len(tracked)} 檔（來源：thesis lifecycle ＋ Decision cohort ＋主題核心公司）")
         tickers = sorted(set(tickers) | set(tracked))
+    if getattr(args, "registry_listed", False):
+        listed = _registry_listed_tickers()
+        print(f"registry 已上市 {len(listed)} 檔（來源：config/company_identity.json 的 research_ticker；"
+              "不動 pq1 的 tracked 導出）")
+        tickers = sorted(set(tickers) | set(listed))
     if not tickers and not state_only:
         print("✗ 沒有指定 ticker，而 artifact 目錄也是空的——第一次請明寫要 materialize 哪幾檔",
               file=sys.stderr)
@@ -258,6 +277,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 跨標的瓶頸排序：rank_bottlenecks() 的輸出照抄")
     mat.add_argument("--beta", action="store_true",
                      help="另外（或只）materialize 資產配置：daily_beta_snapshot（--no-refresh --no-record-risk）的輸出照抄")
+    mat.add_argument("--registry-listed", action="store_true",
+                     help="materialize registry 裡所有有 research_ticker 的公司（APP 的第二種宇宙；不改 pq1 的 tracked 導出）")
     mat.add_argument("--tracked", action="store_true",
                      help="materialize 所有追蹤中的標的（與 pq1 drain 同一個導出權威，不手寫清單）")
     mat.add_argument("--coverage", action="store_true",
