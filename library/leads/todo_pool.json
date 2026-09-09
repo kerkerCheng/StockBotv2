@@ -8069,6 +8069,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-09T14:47:38.784867+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review",
       "waiting_on": {
@@ -8352,6 +8357,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-09T14:47:38.784867+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review",
       "waiting_on": {
@@ -8371,6 +8381,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-09T14:47:38.784867+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review",
       "waiting_on": {
@@ -8380,6 +8395,31 @@
         "trigger": "執行面 context 缺失",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-09-09T14:47:38.784867+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=AXT, Inc. Form 10-Q filed 2026-08-13 (period 2026-06-30)，local: library/raw/axti",
+      "n": 500,
+      "reason": null,
+      "ref_id": "po_bdc31b443dbb1dfdacda22d4484a46ea",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：AXTI / gross_margin_trend",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T14:47:38.784867+00:00",
+      "hint": "當前 missing_data：JARE 公告（ASX 2026-03-10）與 Sojitz 客戶端公告（2025-10-30）尚未入圖——升級本軸 ；美國政府 US$96M binding LOI offtake（2026-03-16）僅二手轉述（rare-earth-（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 501,
+      "reason": null,
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "residual_digest": "16aa4aabb12ae1d7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:lynas：殘餘缺口——JARE 公告（ASX 2026-03-10）與 Sojitz 客戶端公告（2025-10-30）尚未入圖——升級本軸 graph 引用需另",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -18306,8 +18346,35 @@
       "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-09T14:47:38.784867+00:00",
+      "n": 479,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-09T14:47:38.784867+00:00",
+      "n": 498,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-09T14:47:38.784867+00:00",
+      "n": 499,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "source_cleared"
     }
   ],
-  "next_n": 500,
+  "next_n": 502,
   "schema_version": "1"
 }

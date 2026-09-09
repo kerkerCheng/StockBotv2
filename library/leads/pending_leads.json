@@ -13856,12 +13856,12 @@
         "campaign_topic": "ai_infrastructure",
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
-        "parked_reason": "今日 AAOI／IREN 提及只因共用 IREN 喚醒，沒有帶來 Anthropic 澳洲 tender 原文；官方仍只確認澳洲合作，1.4GW 與 USD 21.6B 只見 AFR／二手轉述，不產 prepared RA。",
+        "parked_reason": "第二次追源仍未取得 1.4GW／US$15B（A$21.6B）的一手：ABC News 2026-08-26『Claude maker Anthropic's massive data centre plans NSW』引述 NSW 政府內部 email（Dena Jacobs 3-18），揭露 Anthropic 洽談 NSW 最高 5GW AI 訓練容量——這是另一種文件類別的獨立印證，但該文明文把 1.4GW／逾 $20B 這組數字歸給 AFR 七月報導（paywall），本身不重述來源。因此 exact 數字仍是單一 paywall 來源。⚠ 更關鍵的是：全篇（含 AFR 轉述的投標名單 CDC／AirTrunk／NextDC／IREN／Stack）沒有任何瓶頸層供應商具名，全是資料中心營運商＝需求側，本圖不會因此新增任何節點或邊。即使拿到一手也只是又一筆 AI capex 需求錨證據。",
         "research_mode": "delta_only",
         "research_outcome": "unrelated_entity_trigger_original_still_unavailable_no_ra",
         "research_run": "daily:2026-08-25",
-        "trace_attempts_ref": "Australian Government Anthropic MoU、FOI disclosure index 與 exact 1.4GW／21.6bn 搜尋；本次觸發無新文件。",
-        "trace_next_trigger": "Anthropic 或 Australian Government 公布 tender、capacity 與 contract value 原文。",
+        "trace_attempts_ref": "2026-09-09 research-drain：web search『Anthropic Australia 1.4GW 21.6 billion』取得 8 筆全為二手（thetechcapital／w.media／Switzer／EqualOcean／techiexpert／certifiedstrategic／techstories）＋ABC News 一手轉述 NSW 內部 email；ABC 全文逐字核對，確認數字歸屬 AFR",
+        "trace_next_trigger": "NSW GIPA／FOI 正式釋出該批 email 原文，或 Anthropic／任一營運商（CDC／AirTrunk／NextDC／IREN／Stack）官方公告具名合約與容量——且公告需觸及供應鏈層（光模組／FAU／變壓器等）才對本圖有意義",
         "trace_requeue_consumed_entities": [
           "CO:IREN",
           "IREN"
@@ -13880,7 +13880,7 @@
         "trace_trigger_watch_ref": "ew_0015_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Leaked Anthropic docs show plans to secure 1.4GW capacity from Australia, amounting to ~$21.6B. Recently $IREN, $SHAZ, and other Neoclouds have been building sovereign DCs in Australia. Guess like a lot of things are stating to make more sense connection wise? (disclosure: no open positions in any of the above).",
       "triage": {
@@ -33849,13 +33849,13 @@
         "campaign_window_end": "2026-07-29T13:46:25Z",
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "gap": "InP 基板 ASP 漲幅缺乏任何可逐字核對的一手來源。這是分辨 axt_inp thesis「週期 vs 結構」的關鍵缺口，目前無法由公開資料填補；最可能的解答來源是 AXT 自己在 Q3 財報揭露 ASP 貢獻，或下游公司揭露基板成本上升。",
-        "parked_reason": "Requeue 後複查（trigger: related lead b630）：Nomura InP substrate ASP 報告 canonical 原文仍未合法取得，AXTI/IQE 發行人資料仍不足以重建 exact ASP 漲幅；b630 內容（SKHY/SNDK/NVDA 陳述）與 ASP 數字無直接印證關係。維持 isolated_tier_3。最可能解答來源不變：AXT Q3 財報 ASP 揭露或下游成本揭露。",
+        "parked_reason": "Nomura 報告 canonical 仍不可得（第三次），但本輪改走 trace_next_trigger 的第二條路徑『AXT 財報 ASP 揭露』並取得**一手否證**：AXT Form 10-Q（2026-08-13 送件，期間 2026Q2，即所謂 Nomura 七月報告之後）把營收與毛利增幅完整歸因於量與組合——營收『primarily the result of higher demand for InP wafer substrates ... as a result of additional export approvals granted by the China government』；毛利『attributed to higher revenue resulting in fixed costs being spread over more units and a favorable change in product mix』（毛利率 8.0%→44.9%）。全文『price increase』0 次；唯一 ASP 語句是方向相反的風險因子樣板（『characterized by declining average selling prices』『decline of ... approximately 5% to 10%』）。依 L11-5 已做結構檢查：MD&A 本就以量／價／組合語法逐段歸因，因此 0 次命中在此可解讀。⚠ 這推翻推文『pricing, demand, to supply shortages 全面驗證』的框架——一手指向的驅動是政策（中國出口許可放行）＋需求＋營運槓桿，而非結構性漲價。已鑄成 Engine C 觀測提案 [500]（AXTI/gross_margin_trend，judgment 型）。無 graph delta：42–76% 這組數字仍無任何可逐字核對的來源，不入圖。",
         "primary_url": "https://x.com/aleabitoreddit/status/2074007618046345249",
         "research_mode": "delta_only",
         "research_outcome": "isolated_broker_note_no_ra",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "2026-08-29 復查：Nomura 公開搜尋無 canonical；MFN/RNS/EDGAR 均無可核對 excerpt",
-        "trace_next_trigger": "canonical Nomura 報告、AXT Q3 財報 ASP 貢獻揭露、或下游公司揭露基板成本上升",
+        "trace_attempts_ref": "2026-09-09 research-drain：SEC EDGAR 直取 axti_10_q_20260813.txt（435,288 chars），全文檢索 average selling price 13 次／ASP 5 次／price increase 0 次，MD&A Revenue 與 Gross Profit 段、Risk Factors ASP 段、Significant Customers 註逐字核對",
+        "trace_next_trigger": "AXT Q3 2026 10-Q（約 2026-11）若在 MD&A 出現價格驅動語句則本結論需修正；或 IQE 端揭露基板售價；或 canonical Nomura 報告合法取得",
         "trace_requeue_consumed_entities": [
           "AXTI",
           "CO:AXT",
@@ -33866,7 +33866,7 @@
         "trace_requeue_trigger": "event_watch:ew_0034_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "contradicts",
         "trace_trigger_entities": [
           "AXTI",
           "IQE",
@@ -33880,7 +33880,7 @@
         "trace_trigger_watch_ref": "ew_0034_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -56610,12 +56610,12 @@
       "refs": {
         "campaign_focus": "primary",
         "campaign_topic": "pane3_cxl_memory_tiering",
-        "parked_reason": "trace: 取得官方產品頁逐字（Leo A1000 / CM5082E / CM5162E / CM5162P，支援 5th Gen AMD EPYC 與 Intel Xeon Scalable，up to 2TB）。但投資關鍵原子全部未被支持：無具名客戶／hyperscaler、無競爭供應商、無產能數字，僅有 stress tested with all major xPUs 的泛稱。無客戶端資本承諾即不構成瓶頸證據。Record quarterly revenue 392.4M 屬 Engine C 時變觀測，不進圖。",
+        "parked_reason": "次要觸發條件（『ALAB 10-K/10-Q 客戶集中度揭露』）本輪達成，取得一手數字，但四維初判仍不過，因此不打 onboard 包。ALAB 10-Q（2026-08-05 送件，期間 Q2 2026）逐字：『The Company had the following customers that individually comprised 10% or more of its revenue』Customer A 29%／B 25%／C 15%／D 13%（Q2 2026 前四大合計 82%；六個月 A 29/B 21/C 17/D 13＝80%；去年同期 A 27/C 13/D 24/E 11/F 12）。決定性的一句是緊接其後的『Certain of the customers listed above are manufacturing partners that purchase the Company\\'s products on behalf of the Company\\'s end customers』——揭露的是 ODM／製造夥伴，不是終端客戶，且公司自己說明因此百分比『may fluctuate in a manner that is not necessarily representative of changes in underlying end-customer demand』。四維：①標的純度 高（Q2 營收 392.4M，年增 104%，AI 資料中心單一部門）；②需求錨 ＝ AI capex，與圖中既有錨相同、不新增層；③瓶頸地位 未建立（無 sole-source 或替代難度的一手證據）；④客戶端資本承諾 明確不過——客戶全部以代號揭露、無具名 hyperscaler、無 offtake／預付款／產能保留。依 research-drain Step 2 與 ESMT 先例，缺客戶端資本承諾即 park 並寫明哪一維不過。",
         "research_bundle_id": "alpha_gap_round2_20260824",
         "research_mode": "full",
         "research_run": "user_go_2026-08-24_round2",
-        "trace_attempts_ref": "asteralabs.com/products/leo-cxl-smart-memory-controllers/",
-        "trace_next_trigger": "ALAB 10-K/10-Q 客戶集中度揭露，或 hyperscaler／OEM 客戶端文件點名 Leo 採用",
+        "trace_attempts_ref": "2026-09-09 research-drain：SEC EDGAR 直取 ALAB 10-Q 2026-08-05（library/raw/alab_10_q_20260805.txt，114,956 chars）＋10-Q 2026-05-06；全文檢索 concentration／Customer A／10% of，客戶集中度表逐字核對。先前輪次已取官方 Leo 產品頁。",
+        "trace_next_trigger": "①任一 hyperscaler／OEM 客戶端文件具名採用 Leo CXL（不是 ALAB 自報）；②ALAB 揭露 offtake／產能保留／預付款；③CXL memory tiering 層出現供應商計數 <=2 的一手證據（現況無法判定該層是否為瓶頸）",
         "trace_requeue_trigger": "event_watch:ew_0052_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
@@ -56628,7 +56628,7 @@
         "trace_trigger_watch_ref": "ew_0052_2026-08-31"
       },
       "source": "official:astera_labs",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$ALAB Leo CXL smart memory controllers for AI memory expansion and pooling; verify customer adoption and competing suppliers",
       "triage": {
