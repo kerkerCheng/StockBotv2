@@ -4,11 +4,13 @@ description: >
   開發請求的統一入口：先做一次便宜的 scope triage（Zoom Level），再決定要多遠的 review
   （Review Level），最後以「HUMAN SUMMARY（人話 5–10 行）＋固定八欄 STEP_RESULT」交回使用者。當使用者提出任何「改程式、
   改 config、改 schema、改呈現邏輯」的請求時使用——包含「我想做 X」「這裡壞了」「加一個
-  功能」「重構 XXX」「這個能不能改成…」「zoom out」。它不是另一個 agent，預設由當前主
+  功能」「重構 XXX」「這個能不能改成…」「zoom out」。**使用者說「先討論、不實作」「重新 review
+  整個工作流」「大方向」時同樣要進**：Z2／Z3 的規定產出本來就是討論（PLAN_PROPOSAL），
+  「只討論」不是跳過 scope triage 的理由。它不是另一個 agent，預設由當前主
   agent 在既有 context 內完成，不 spawn。研究請求（改變「我知道什麼」）不走本 skill，
   走研究路徑：intake／source-trace／extraction 在 pq1，只有產生 exact authority mutation
   proposal 時才進 pq2 核准。觸發詞：我想做、幫我改、加一個、修一下、重構、zoom out、這個 Step、
-  下一步要做什麼。
+  下一步要做什麼、重新 review、先討論、大方向、整個工作流。
 ---
 <!-- agent-workflow-canonical -->
 
@@ -35,6 +37,13 @@ description: >
 
 例：「補某條邊的 substitutability」＝研究——**追源與抽取在 pq1 自動跑**，只有最後那筆
 graph-write 提案才鑄 pq2 編號等核准；「改 `rank_bottlenecks` 的排序鍵」＝開發（本 skill）。
+
+⚠ **「先討論、不實作」不是豁免，是 Z2／Z3 的正常路徑。** 判準一句話沒有「討論」這個例外：
+只要 `go` 之後改變的是系統怎麼運作，就先做 INTAKE；Zoom 判出 Z2／Z3 時，規定產出**就是**討論
+（PLAN_PROPOSAL → `AWAITING_HUMAN`），不是 diff。事發（2026-09-08）：使用者要求「重新 review 整個
+工作流……research drain skill 重構……可以先討論不實作」，執行者把「先討論」讀成不走本 skill，
+直接寫了一份沒有 INTAKE、沒有 proposed current Step 的分析——內容接近 zoom-out 七段，但使用者
+拿不到一個可以核准的 Step，這正是 Z3 格式要防的事。
 
 ---
 
