@@ -1,0 +1,29 @@
+{
+ "period_end": "2027-06-27",
+ "driver": "revenue_growth",
+ "scope": "total",
+ "value": 1.0835,
+ "basis": "session_judgment",
+ "accounting_basis": "not_applicable",
+ "rationale": "FY2026 營收 US$3,014.0M（+83.2%）。FY2027 取共識成長 +108.35%（至 US$6,280M）——**沒有差異化證據時收斂到共識是健康的**（AGENTS.md：保守選擇若說不出證據就是偏差不是審慎）。可得的一手都與該軌跡相容而非牴觸：①公司 Q1 FY27 指引營收中位 US$1.25B（8-K 2026-08-11），對 Q4 FY26 的 US$1,006.3M 為 +24% 季增；②要達成 US$6,280M，Q2–Q4 需平均約 US$1.68B，即由 Q1 起約每季 +13%——**低於**剛發生的 +24%，因此共識隱含的是**減速**而非加速；③產能面：FY26 capex US$451.3M（前年 US$231.0M）、泰國 PP&E 由 US$218.6M 增至 US$450.6M，10-K 逐字『we remain on track for manufacturing expansion over the coming quarters to support future growth』。⚠ 反面證據必須並列：10-K 逐字『the majority of our customers do not have contractual purchase commitments』『our backlog may not be an accurate indicator』，且合約負債（deferred revenue and customer deposits）僅 US$15.4M——**這家公司沒有可觀的訂單保護**，營收軌跡完全依賴當期需求。\n【引用維護：基期觀測現為 mo_72b0cdf703f205898643e632b1b4a9cd（前身補上下游固定讀取鍵 diluted_eps，使共識口徑可被機械核實為 non_gaap、兩桿拆解得以呈現）。數值與判斷自首次寫入起一字未改。】",
+ "evidence_refs": [
+  "engine_c://manual_observation/mo_72b0cdf703f205898643e632b1b4a9cd",
+  "engine_c://manual_observation/mo_7595ed4557587eabf6963ea16122d371"
+ ],
+ "calibration_refs": [
+  "engine_c://consensus_estimate/LITE/revenue/2027-06-27"
+ ],
+ "review_conditions": [
+  {
+   "metric": "revenue",
+   "scope": "total",
+   "period_end": "2027-06-27",
+   "period_kind": "fiscal_year",
+   "operator": "<",
+   "threshold": 5613600000.0,
+   "on_trigger": "review_required",
+   "note": "低於共識下緣 US$5,613.6M（+86%）→ 改用共識下緣重寫本假設"
+  }
+ ],
+ "supersedes_id": "oa_40a93d6bfdaaf01c"
+}
