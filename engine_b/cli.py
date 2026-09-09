@@ -664,6 +664,42 @@ def _cmd_onboard_candidates(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_decompose_propose(args: argparse.Namespace) -> int:
+    """研究閉環 P∥：把一個 decompose 選題鑄成 `manual` 型 pq2 編號（核准仍逐題）。
+
+    廣度判準機械（需求錨不在 sector_anchors 各組、且不在圖的 coverage 快照裡）；drop 過沒新 lead 不重生；
+    同時 open ≤ 2。提名（系統名／為什麼是新錨）是語意工作，由呼叫端（research-drain／weekly／使用者）給。
+    """
+    from engine_b import decompose_proposals as dp
+    from engine_b import todo
+
+    graph_nodes = None
+    try:
+        from webapp.store import StateArtifactStore
+
+        payload, _fresh = StateArtifactStore().read("coverage")
+        graph_nodes = dp.graph_nodes_from_coverage(payload)
+    except Exception:  # noqa: BLE001 — 讀不到就只驗產業組，判準會在 hint 註明
+        graph_nodes = None
+    pool = todo.load(args.pool) if args.pool else todo.load(todo.DEFAULT_POOL_PATH)
+    try:
+        item = dp.propose(
+            pool, system=args.system, anchor=args.anchor, why_new_anchor=args.why,
+            lead_ids=[x for x in (args.lead or []) if x], layers_estimate=args.layers, graph_nodes=graph_nodes,
+        )
+    except dp.DecomposeProposalError as exc:
+        print(f"✗ 不鑄號：{exc}", file=sys.stderr)
+        return 2
+    if args.dry_run:
+        print(json.dumps({"dry_run": True, "would_mint": item["ref_id"], "title": item["title"], "hint": item["hint"]},
+                         ensure_ascii=False, indent=2))
+        return 0
+    todo.save(pool, args.pool or todo.DEFAULT_POOL_PATH)
+    print(f"✓ 已鑄 [{item['n']}] {item['title']}")
+    print(f"   {item['hint']}")
+    return 0
+
+
 def _cmd_trace_backlog(args: argparse.Namespace) -> int:
     """列出不會被一般 drain 撿回的 parked source-trace backlog。"""
 
@@ -873,6 +909,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="只列被動層救不了的：stalled（標的已消化完）／expired（等待到期）／unwatched（無人在等）",
     )
     p_trace.set_defaults(func=_cmd_trace_backlog)
+
+    p_decomp = sub.add_parser(
+        "decompose-propose",
+        help="研究閉環 P∥：把一個 decompose 選題鑄成 manual 型 pq2（新需求錨才鑄；drop 過不重生；open ≤2）",
+    )
+    p_decomp.add_argument("--system", required=True, help="一台實體（例：Starlink V2 Mini 衛星），不是類別")
+    p_decomp.add_argument("--anchor", required=True, help="需求錨節點 id（例：tech:leo_satellite_bus）")
+    p_decomp.add_argument("--why", required=True, help="為什麼是新錨（選題理由，留在輸出裡）")
+    p_decomp.add_argument("--lead", action="append", default=[], help="點名這個系統的 lead_id（可重複）")
+    p_decomp.add_argument("--layers", type=int, default=None, help="預估會拆出幾層")
+    p_decomp.add_argument("--pool", default=None, help="待辦池路徑（預設 library/leads/todo_pool.json）")
+    p_decomp.add_argument("--dry-run", action="store_true")
+    p_decomp.set_defaults(func=_cmd_decompose_propose)
 
     p_onboard = sub.add_parser(
         "onboard-candidates",

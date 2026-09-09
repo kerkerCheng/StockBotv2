@@ -249,6 +249,7 @@ live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「�
 & '.venv\Scripts\python.exe' -m engine_b.cli related <lead_id>      # 共用具名標的的其他 lead
 & '.venv\Scripts\python.exe' -m engine_b.cli harvest-health         # 各來源最新未恢復失敗
 & '.venv\Scripts\python.exe' -m engine_b.cli onboard-candidates --min-leads 3
+& '.venv\Scripts\python.exe' -m engine_b.cli decompose-propose --system "<一台實體>" --anchor <tech:x> --why "<為什麼是新錨>" [--lead <id>] [--dry-run]   # 新需求錨才鑄 pq2；drop 過不重生；open ≤2
 ```
 
 Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。

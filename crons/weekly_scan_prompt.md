@@ -39,6 +39,11 @@ Daily 負責已知來源的 X／EDGAR harvest、triage、Engine C refresh、toda
   但 registry 沒有」的標的——這份清單此前存在但無人消費，onboard 漏不漏全靠運氣（L16）。
   輸出整理進報告「建議 onboard 候選」段（ticker＋被點名次數＋樣本標題），
   **只提名不 onboard**：選題權在使用者，週報照舊不造核准編號。
+- **新需求錨的 decompose 提案（2026-09-09 起）例外可鑄號**：本週 topic 裡若出現一台實體系統，
+  其需求錨不在 `config/sector_anchors.json` 各組、也不在圖裡，就以
+  `.venv\Scripts\python.exe -m engine_b.cli decompose-propose --system "<實體>" --anchor <tech:x> --why "<為什麼是新錨>" --lead <id>`
+  鑄成 `manual` 型 pq2（命令自己會擋深度題、drop 過的題與 open>2）。`go` 只授權跑 system-decompose，
+  核准仍逐題。這是「分散度優先於主線」的落地：CPO／humanoid 之外的錨要能自己浮上來。
 - 對每個 active theme 搜尋過去 7 天的新事件；每個主題以 2–3 次搜尋為度。
 - 掃 Engine B 策展來源近期內容，但 X 已由 daily API harvest 覆蓋，Weekly 只找 daily watch 外的聚類與
   新題材，不重複按 tweet 建項。

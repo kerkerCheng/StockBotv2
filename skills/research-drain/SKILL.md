@@ -328,10 +328,13 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 依 `AGENTS.md` 的收尾義務，最後一則回覆必須有：
 
 - **建議摘要表**：每個新編號＋建議動詞＋一句理由
-- **「建議下一個 decompose 題目」固定一行**：pane 3（覆蓋缺口）只會減不會增——
-  `coverage_gaps` 只能從既有節點往回看，新層唯一產生器是 `system-decompose` 且選題權
-  在使用者。本 skill 每輪收尾**提案一個題目**（從 🔴 真瓶頸類或既有拆解殘骸推導），
-  使用者順手回一行就補貨；**系統只提案、不自行開題**，decompose gate 不因此放寬
+- **decompose 提案直接鑄成 pq2 編號（2026-09-09 起）**：覆蓋缺口只會減不會增——
+  `coverage_gaps` 只能從既有節點往回看，新層唯一產生器是 `system-decompose`。本 skill 每輪收尾
+  若本輪的 lead／研究裡出現**需求錨不是 AI capex 也不是人形放量**的實體系統（判準機械：
+  錨不在 `config/sector_anchors.json` 各組、且不在圖裡），就用
+  `python -m engine_b.cli decompose-propose --system "<一台實體>" --anchor <tech:x> --why "<為什麼是新錨>" --lead <id>`
+  鑄一個 `manual` 型編號，讓使用者在批次行裡一起決定；**同時 open ≤2、drop 過沒新 lead 不重生**。
+  核准仍逐題、系統不自行開題，decompose gate 不因此放寬。沒有合格候選就寫「本輪無新錨」。
 - **最後一行單獨給可複製的批次指令**（如 `341 342 343 go 344 drop`）
 - **本輪的否定結果**：哪些研究做完後結論是「不是瓶頸」——這一段不得省略，
   它是這個 skill 最容易被誤讀成「沒產出」的部分
