@@ -8327,15 +8327,18 @@
       "added_at": "2026-09-09T10:34:50.147614+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_acc6aa1db9c9a717ce63b198ac4d0466",
+      "dispatch_receipt": "decision:pd_f9e4a69a3b3a8eb64d2c1f23e40a356b",
       "dispatch_ref": "wo_4413512fb9526b4d20c65f72abde641d",
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-09T10:46:04.569308+00:00",
       "dispatched_at": "2026-09-09T10:35:42.891672+00:00",
       "hint": "當前 missing_data：上詮法說會對『獨供兩代』的可稽核逐字（年報未揭露，替代 TSMC 具名的主要路徑）；客戶端（Coherent／Lumentum／Broadcom）filing 對 FAU 供應商的具名；⚠ TSMC 具名已改判為結構性可能不可得——不建議再投入 pq1 預算於此路徑（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 497,
-      "reason": null,
+      "reason": "凍結 context 過期（backlog 觀測 mo_89b8bcb 記於 2026-08-31T16:17，context 凍結於 16:08）；reassess 重新凍結後 financial_backlog_manual_required 自行消失，研究完整度 READY，決策狀態由『需要複查』回到『監控中』",
+      "receipt": "decision:pd_f9e4a69a3b3a8eb64d2c1f23e40a356b",
       "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-09T10:46:04.569308+00:00",
       "source": "decision_lab",
       "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -18274,6 +18277,33 @@
       "reason": "pq1 completed",
       "receipt": "decision:pd_04c4fc5e32f2007be54462375ea29e5d",
       "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-09T10:46:03.467076+00:00",
+      "n": 497,
+      "reason": null,
+      "receipt": "decision:pd_f9e4a69a3b3a8eb64d2c1f23e40a356b",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-09T10:46:04.569308+00:00",
+      "n": 497,
+      "reason": "凍結 context 過期（backlog 觀測 mo_89b8bcb 記於 2026-08-31T16:17，context 凍結於 16:08）；reassess 重新凍結後 financial_backlog_manual_required 自行消失，研究完整度 READY，決策狀態由『需要複查』回到『監控中』",
+      "receipt": "decision:pd_f9e4a69a3b3a8eb64d2c1f23e40a356b",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-09T10:46:04.569308+00:00",
+      "n": 497,
+      "reason": "凍結 context 過期（backlog 觀測 mo_89b8bcb 記於 2026-08-31T16:17，context 凍結於 16:08）；reassess 重新凍結後 financial_backlog_manual_required 自行消失，研究完整度 READY，決策狀態由『需要複查』回到『監控中』",
+      "receipt": "decision:pd_f9e4a69a3b3a8eb64d2c1f23e40a356b",
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
       "type": "decision_review",
       "verb": "go"
     }
