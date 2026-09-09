@@ -8456,6 +8456,18 @@
       "source": "engine_c",
       "title": "Engine C 觀測：NVDA / committed_capex",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T15:33:06.216604+00:00",
+      "hint": "2026-09-09 research-drain 段4 實查（Neo4j）。六個節點指的是同一層：tech:nand『NAND Flash Memory fabrication』→SUPPLIES_TO co:applied_materials；tech:nand_production『NAND / non-volatile memory wafer fabrication』→SUPPLIES_TO co:applied_materials；tech:nand_manufacturing『NAND / Non-Volatile Memory Manufacturing』→SUPPLIES_TO co:lam_research；tech:3d_nand_manufacturing『Non-volatile memory (3D NAND) wafer fabrication』→SUPPLIES_TO co:lam_research；tech:nand_flash『Flash Memory (NAND)』→ENABLES prod:amat_semiconductor_systems；tech:nand_technology『NAND Flash Memory Fab』→ENABLES tech:semiconductor_manufacturing_equipment。\n兩個具體後果：①**證據被切碎**——同一層的供應商關係散在四個節點上，任何以節點為單位的結構評分都會低估它；②**覆蓋掃描誤報**——coverage_gaps 把 tech:nand_technology 列為 🔴『沒有任何公司連到它』，但同層另外四個節點各自都有 co:applied_materials 或 co:lam_research，紅燈是碎片化的產物不是真空白。\n形狀＝L6-2（局部 ID 跨文件 MERGE 後的命名空間問題）的反面：不是撞在一起，是**該撞而沒撞**，每次抽取按 LLM 當下的措辭各造一個 id，且不會有任何東西壞掉，只會安靜地把一層攤成六份。\ngo＝授權起草 canonical 合併的 prepared RA（選 canonical id、重指所有邊、保留每條原始 provenance 與 SourceDoc、不新增任何知識主張），**入圖仍走 ra_admission 逐項核准**；不含 thesis mutation、不含 Engine C 寫入、不含 live。\n⚠ 相鄰但不同的一件事屬開發不屬研究，已另記於本輪摘要、不佔本編號：『要怎麼防止下一次抽取再造第七個 NAND 節點』改變的是系統行為，載體是 ROADMAP。",
+      "n": 505,
+      "reason": null,
+      "ref_id": "source=research-drain-2026-09-09-segment4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "圖中六個語意重疊的 NAND 節點需合併——證據被切碎，且讓覆蓋掃描把一個已覆蓋的層報成 🔴 研究缺口",
+      "type": "manual"
     }
   ],
   "log": [
@@ -18411,6 +18423,6 @@
       "verb": "source_cleared"
     }
   ],
-  "next_n": 505,
+  "next_n": 506,
   "schema_version": "1"
 }
