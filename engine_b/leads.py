@@ -897,6 +897,92 @@ def _requeue_related_trace_backlog(
     return sorted(requeued)
 
 
+def consume_fired_lead_watches(
+    store: dict[str, Any],
+    watch_data: dict[str, Any],
+    *,
+    at: str | None = None,
+) -> dict[str, Any]:
+    """把**所有**已 fired、喚醒對象是追源 lead 的 watch 消化掉（佇列段 1：fired_lead_requeue）。
+
+    為什麼需要一個獨立的 consumer（2026-09-08 實測 34 筆卡死）：`check_watches` 有兩個
+    呼叫端——triage PASS 路徑只處理 `wake_lead`、`todo sync` 只處理 `wake_pq2`——而
+    check 的回傳只含**這一次**新觸發的 watch。A 端把 B 端該處理的 watch 標成 fired 存檔後，
+    B 端再呼叫 check 時它已不是 active，永遠不會再出現在回傳清單裡。兩個 consumer
+    各自正確，合起來是一個洞。本函式改掃 `status == "fired"` 本身，不依賴誰觸發的。
+
+    三種處置，全部留 receipt（INV-3：每個 filter 都能報 accepted／filtered／reasons）：
+
+    - lead 仍 `parked` → `requeue_trace` 回 pq1（沿用最近合法 triage receipt），watch 回 active
+      續等（等待條件「拿到那份原文」在重查未果時依然成立；標的已進 consumed_entities）。
+    - lead 已在路上（pending／triaged_go／researching／action_prepared）→ 只把 watch 回 active，
+      不重複排隊。
+    - lead 已終局（applied／triaged_no_go）或不存在 → watch 直接 consumed（沒有東西可醒）。
+    - `requeue_trace` 拒絕（lead 沒有 trace receipt）→ **留在 fired 現形**並記 skipped 理由，
+      不硬塞。
+
+    不改任何 authority：只動 lead 的 status／triage receipt 與 watch 的 status。
+    """
+    from engine_b import event_watch as ew
+
+    stamp = at or _now()
+    requeued: list[str] = []
+    reactivated: list[str] = []
+    consumed: list[dict[str, str]] = []
+    skipped: list[dict[str, str]] = []
+    for watch in watch_data.get("watches", []):
+        if watch.get("status") != "fired" or not watch.get("wake_lead"):
+            continue
+        watch_id = str(watch["watch_id"])
+        lead_id = str(watch["wake_lead"])
+        woken = watch.get("woken_by") or {}
+        lead = store["leads"].get(lead_id)
+        if lead is None:
+            ew.consume_fired(watch_data, watch_id)
+            consumed.append({"watch_id": watch_id, "lead_id": lead_id, "reason": "lead 不存在"})
+            continue
+        status = str(lead.get("status") or "")
+        if status == "parked":
+            shared = ", ".join(woken.get("shared_entities") or []) or "（未記錄）"
+            trigger_lead = str(woken.get("lead_id") or "")
+            try:
+                requeue_trace(
+                    store,
+                    lead_id,
+                    trigger=f"event_watch:{watch_id}",
+                    reason=(
+                        f"Event Watch {watch_id} 已觸發（{watch.get('kind')}；共用具名標的 {shared}"
+                        f"{'；觸發 lead ' + trigger_lead if trigger_lead else ''}）"
+                        "；由 consume-fired 排回 pq1 做 bounded 重查"
+                    ),
+                    requeued_at=stamp,
+                )
+            except (LeadStateError, ValueError) as exc:
+                skipped.append({"watch_id": watch_id, "lead_id": lead_id, "reason": str(exc)})
+                continue
+            lead.setdefault("refs", {}).update({
+                "trace_trigger_event_ref": (
+                    f"lead:{trigger_lead}" if trigger_lead else f"watch:{watch_id}"
+                ),
+                "trace_trigger_watch_ref": watch_id,
+            })
+            ew.reactivate(watch_data, watch_id)
+            requeued.append(lead_id)
+        elif status in {"pending", "triaged_go", "researching", "action_prepared"}:
+            ew.reactivate(watch_data, watch_id)
+            reactivated.append(lead_id)
+        else:
+            ew.consume_fired(watch_data, watch_id)
+            consumed.append({"watch_id": watch_id, "lead_id": lead_id, "reason": f"lead 已終局：{status}"})
+    return {
+        "at": stamp,
+        "requeued": sorted(requeued),
+        "reactivated": sorted(reactivated),
+        "consumed": consumed,
+        "skipped": skipped,
+    }
+
+
 def record_run(
     store: dict[str, Any],
     *,

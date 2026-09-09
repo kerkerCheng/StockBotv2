@@ -438,18 +438,25 @@ def check_queue_liveness() -> AuditResult:
             if waiting and not isinstance(waiting, (str, list, dict)):
                 findings.append(f"[{n}] waiting_on 型別異常：{type(waiting).__name__}")
 
-        # 線索側：triaged_go 卻長期沒有前進
+        # 線索側：triaged_go 卻長期沒有前進。
+        # 起算點是**這一次 PASS 的時間**（`triage.decided_at`），不是 `first_seen`：
+        # fired watch 把 parked lead 重排回 pq1 時會重寫 triage receipt，lead 是「今天」
+        # 才回到佇列的；用 first_seen 會把當天重排的 lead 全報成「27 天沒人取」
+        # （2026-09-09 consume-fired 上線首跑實測 35 筆假警報）。沒有 decided_at 才退回 first_seen。
         leads = sources.leads()
         stuck_leads = 0
         for lead_id, lead in leads.items():
             if lead.get("status") != "triaged_go":
                 continue
-            seen = _parse_dt(lead.get("first_seen"))
-            if seen and (now - seen).days > _STALLED_DAYS:
+            entered = (
+                _parse_dt((lead.get("triage") or {}).get("decided_at"))
+                or _parse_dt(lead.get("first_seen"))
+            )
+            if entered and (now - entered).days > _STALLED_DAYS:
                 stuck_leads += 1
                 findings.append(
                     f"線索 {lead_id[:22]}（{lead.get('source')}）triaged_go 已 "
-                    f"{(now - seen).days} 天未進 pq1——PASS 了但沒有人取")
+                    f"{(now - entered).days} 天未進 pq1——PASS 了但沒有人取")
 
         examined = len(active) + sum(1 for l in leads.values()
                                      if l.get("status") == "triaged_go")
@@ -462,6 +469,99 @@ def check_queue_liveness() -> AuditResult:
                   f"{examined} 項進行中工作全部在 {_STALLED_DAYS} 天內有進展", examined)
 
     return _guard("QueueLiveness", run)
+
+
+# ---------------------------------------------------------------------------
+# INV-4 — Queue segments（佇列段序的封閉字彙）
+# ---------------------------------------------------------------------------
+
+def _forward_view_backlog() -> tuple[int | None, str | None]:
+    """tracked 標的中「單檔判讀 blocked 且仍有未 settled blocker」的檔數。
+
+    authority 是 materialize 出來的 analyst view artifact（不是 request path 重算）。
+    讀不到就回 `(None, 原因)`——寫 0 會把「沒讀到」偽裝成「沒有工作」（INV-3）。
+    """
+    try:
+        from webapp.store import ArtifactStore
+
+        rows = list(ArtifactStore().read_all())
+    except Exception as exc:  # noqa: BLE001
+        return None, f"analyst view artifact 讀不到：{type(exc).__name__}"
+    if not rows:
+        return None, "尚無 materialized analyst view"
+    count = 0
+    for _ticker, payload, _fresh, _reason in rows:
+        if payload is None:
+            continue
+        readiness = payload.get("readiness") or {}
+        if readiness.get("state") != "blocked":
+            continue
+        details = readiness.get("blocker_details") or []
+        if any(not d.get("settled") for d in details):
+            count += 1
+    return count, None
+
+
+def _reassess_only_numbers(items: list[dict]) -> tuple[list[int] | None, str | None]:
+    """段 2（reassess_stale）的成員編號；Decision Store 不可用時回 `(None, 原因)`。"""
+    try:
+        from decision_lab.bootstrap import open_default_store
+        from engine_b import todo
+
+        store = open_default_store()
+    except Exception as exc:  # noqa: BLE001
+        return None, f"Decision Store 不可用：{type(exc).__name__}"
+    try:
+        pool = {"items": items, "log": []}
+        return [int(it["n"]) for it in todo.reassess_only_items(pool, store)], None
+    except Exception as exc:  # noqa: BLE001
+        return None, f"reassess_only_items 失敗：{type(exc).__name__}: {exc}"
+    finally:
+        store.close()
+
+
+def check_queue_segments() -> AuditResult:
+    """佇列裡每一種「有工作」的狀態，都必須對得到一個登記了 consumer 的段。
+
+    這是 QueueLiveness 的補集：那一條問「進了佇列的東西有沒有在動」，本條問
+    「有工作的狀態**有沒有進任何佇列**」。2026-09-08 實測 39 個 fired watch 與 27 檔
+    forward view backlog 都是第二種——佇列看起來很乾淨，因為它們根本不在佇列的定義裡。
+    段序是封閉字彙（`engine_b/queue_segments.py`）；資料裡出現分不到段的狀態就 FAIL，
+    修法是去那裡登記 consumer，不是在這裡放寬。
+    """
+    def run() -> AuditResult:
+        from engine_b import queue_segments as qs
+
+        leads_map = sources.leads()
+        watches = sources.event_watches()
+        items = sources.todo_items()
+        reassess_ns, reassess_note = _reassess_only_numbers(items)
+        forward, forward_note = _forward_view_backlog()
+        observation = qs.observe(
+            leads=leads_map,
+            watches=watches,
+            todo_items=items,
+            reassess_only_numbers=reassess_ns or (),
+            forward_view_backlog=forward,
+            coverage_gaps=None,  # authority 在 Neo4j；由 query.coverage_gaps 另報，這裡不冒充
+        )
+        examined = len(leads_map) + len(watches) + len(items)
+        findings = list(observation["unmapped"])
+        notes = [n for n in (reassess_note, forward_note) if n]
+        counts = "；".join(
+            f"{seg['key']}={'未讀到' if seg['count'] is None else seg['count']}"
+            for seg in observation["segments"]
+        )
+        if findings:
+            return fail(
+                "QueueSegments",
+                f"{len(findings)} 筆狀態分不到任何段——新工作類型沒有 consumer（{counts}）",
+                _clip(findings), examined,
+            )
+        summary = counts + (f"｜未讀到：{'；'.join(notes)}" if notes else "")
+        return ok("QueueSegments", summary, examined)
+
+    return _guard("QueueSegments", run)
 
 
 # ---------------------------------------------------------------------------

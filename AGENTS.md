@@ -138,6 +138,15 @@ authority 動作**——研究工程、終局 cohort 的重建、sub 補值這�
 resolve，receipt 註明語境），**不得回頭再請求一次 `go`**——重複要核准是介面失敗。
 `go` 請求流程只適用於**系統主動提案**的項目。四個 authority gate 不因此放寬。
 
+**常規授權類別（2026-09-09 使用者定案）：** 系統主動提案中，若該項的 `go` 只是**注意力 gate**
+（授權的是 bounded research／派回 pq1 這類**可逆、不寫任何 authority** 的事），使用者已預先授權：
+收集端直接排入 pq1、brief 只印計數，**不再逐項請求 `go`**。清單是封閉字彙，SSOT 為
+`config/standing_authorization.json`（該檔落地前以本段所列為準）：`decision_review` 的 bounded gap
+research、`source_trace_review` 的派回 pq1（**付費取得除外**）。**永不列入：** `ra_admission`、
+`engine_c_observation`、`thesis_mutation`／`thesis_lifecycle`、live、任何付費、decompose 選題
+（提案由系統自動鑄成 pq2，核准仍逐題）。判準一句話：**這個 `go` 攔的是注意力還是 authority？**
+攔 authority 的永遠不進清單。
+
 **⚠ 系統開發項不走 pq2，唯一載體是 [`ROADMAP.md`](docs/ROADMAP.md)（2026-08-31 定案）。**
 判準一句話：**`go` 之後改變的是「我知道什麼」還是「系統怎麼運作」？**
 前者是研究（pq2），後者是開發（ROADMAP）。例：「補某條邊的 substitutability」改變圖裡的
@@ -273,6 +282,16 @@ probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再�
 **進場靠判斷，出場靠 disproof。** 反證的用途是決定何時承認判斷錯了，不是進場的前置條件；
 混用會產生「永遠不出手、只累積反證」的無效產出。
 
+### 隱含報酬的兩個桿：EPS 與倍數適用同一條原則（2026-09-09 使用者定案）
+
+**沒有 re-rating 證據時，目標倍數預設等於校準用的市場倍數**；任何折價或溢價必須指得出證據並寫進
+rationale——這與 ROADMAP「沒有 differentiated evidence 時 EPS 收斂到 consensus 是健康的」是同一條
+原則，只是先前沒寫到倍數。**隱含報酬必須拆成兩欄呈現：EPS 差異貢獻、倍數差異貢獻。**
+事發（2026-09-08 實測，數字為當時快照）：僅有的兩檔 ready 標的 COHR／LYC.AX 隱含報酬為 −20.7%／
+−36.3%，其中倍數折價貢獻約 −16%／−20%，來源是「較市場折價約 17%」這個習慣，不是任何證據。
+兩個桿都往保守壓，任何公司都會是負的；30 檔全負時仍分不出「方法偏空」與「市場太貴」。
+判準一句話：**一個保守選擇若說不出證據，它是偏差，不是審慎。** 把量拉大只在有這兩欄對照時才有資訊。
+
 ### ⚠ 已知會失焦的指標——不得單獨用作瓶頸性證據
 
 - **`evidence` 等級**：最高級必須靠研究找到客戶端文件才拿得到，它是**研究深度的函數**。
@@ -341,9 +360,13 @@ probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再�
 L10），改的是呈現別名，且 label 一律不含準則名稱。
 
 **Daily 與 APP 的分工（2026-09-08 使用者定案）：** 判準一句話——**昨天和今天一樣的住 APP，
-今天變了的＋要你決定的住 Daily**。所以 pq2 的四段完整留在 Daily（核准的載體是對話，APP 沒有寫入
-端點，放 APP 只多一次摩擦）；瓶頸排序、資產配置、研究缺口、事件監看住 APP，Daily 只印它們的
-計數與變動。⚠ **順序是 invariant：APP 先讀得到，Daily 才能不印。** 反過來做，使用者會打開看到
+今天變了的＋要你決定的住 Daily**。所以 pq2 的**核准**留在 Daily（核准的載體是對話，APP 沒有寫入
+端點）；瓶頸排序、資產配置、研究缺口、事件監看住 APP，Daily 只印它們的計數與變動。
+**修正（2026-09-09 使用者定案）：「球在誰手上」的清單是持久狀態，也住 APP**——唯讀，固定四段：
+卡在你／系統在做／在等世界／已完成待關，編號照印但不可操作；分段依據是 blocker registry 的
+`resolution_mode` 與 dispatch 狀態，不是 pq2 類型。⚠ 09-08 原句「放 APP 只多一次摩擦」到此**廢止**：
+唯讀清單不增加摩擦，省掉的是回捲 brief 找編號；安靜消失擋不住下次回填，所以廢止寫出來。
+在 `python -m webapp status` 列得出 `queue` kind 之前，Daily 的四段照舊完整印出。⚠ **順序是 invariant：APP 先讀得到，Daily 才能不印。** 反過來做，使用者會打開看到
 幾天前的數字，那是 L13（管子只接一頭）的形狀——所以「讓 APP 每天自動更新」必須先於「Daily 收斂」。
 ⚠ **還沒有 APP 畫面的段落一律留在 Daily**，不得因為「遲早會搬」而先砍。判準是機械的：`python -m webapp status` 列得出那個 kind 才算搬完。
 

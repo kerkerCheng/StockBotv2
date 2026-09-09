@@ -70,14 +70,20 @@ exit 2 代表期間排程側提交過共用檔——**立刻重讀 `todo_pool.js
 ⚠ **這是單向避讓不是互斥鎖**：只有互動側會檢查。真正的雙向鎖要動 daily 的 sandbox
 allowlist（見 ROADMAP）。單向仍然有效，因為 daily 有界且時間可預測——讓開就不會撞。
 
-接著讀狀態：
+接著**先清機械段，再讀狀態**（2026-09-09 起；段序定義見 `engine_b/queue_segments.py`）：
 
 ```powershell
 git status --short
+& '.venv\Scripts\python.exe' -m engine_b.cli consume-fired          # 段 1：fired 的追源 watch 排回 pq1（零 token）
+& '.venv\Scripts\python.exe' -m engine_b.todo sync                  # 段 1 的 pq2 型翻醒＋同步待辦池
+& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run  # 段 2：只因 context 過期而 REVIEW 的，reassess 後結案
 & '.venv\Scripts\python.exe' -m engine_b.cli counts
 & '.venv\Scripts\python.exe' -m engine_b.todo list
-& '.venv\Scripts\python.exe' -m engine_b.cli drain
+& '.venv\Scripts\python.exe' -m engine_b.cli drain                  # 首行是段 0–1 計數器；假設對照的 fired watch 逐筆列在這裡
 ```
+
+機械段不吃研究預算，跑完才知道研究段真正有多少工作——2026-09-08 實測 39 筆 fired 沒人接、
+`drain` 卻顯示佇列只剩 2 件，就是因為這三支從沒被排進任何流程。
 
 ⚠ **這一步在續跑時同樣要做。** token 用完後的新 session 必須能只靠 repo 狀態接手——
 `git status --short`、`todo_pool.json`、`counts`、各 action／decision receipt——
@@ -87,7 +93,9 @@ git status --short
 
 ## Step 1 — 工作順序：已核准的先做，其餘用既有排序
 
-**順序不是自由心證，三段固定：**
+**順序不是自由心證，三段固定**（前面另有機械段 1–2，見 Step 0；`drain` 首行列出的**假設對照**
+fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engine_b.hypotheses` 的 verification 後
+`python -m engine_b.event_watch consume <watch_id>` 收掉——它是研究，不是機械）：
 
 1. **所有「使用者已授權、還沒做完」的項目** — 放著不動是本 skill 要修的那個 bug。
    **永遠排第一，不論它們看起來多無聊。** 包含兩類，同級處理：
@@ -226,10 +234,17 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 新 harvest（一天一批，有界）與 decompose 開新題（選題權在使用者，不會自己長）。
 
 ```powershell
+& '.venv\Scripts\python.exe' -m engine_b.event_watch counters   # fired_unconsumed 只剩假設對照型（lead 型與 pq2 型為 0）
+& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale    # 候選 0
 & '.venv\Scripts\python.exe' -m engine_b.cli counts          # triaged_go 為 0
 & '.venv\Scripts\python.exe' -m engine_b.todo list           # 無 queued／researching 的 dispatch_status
 & '.venv\Scripts\python.exe' -m query.coverage_gaps          # 每個 🔴 都已有對應終局（packet／park／pq1）
+& '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段的數字；分不到段的狀態＝新工作沒有 consumer
 ```
+
+⚠ **forward view backlog（段 5）自 2026-09-09 起是工作集合的一部分**——`QueueSegments` 會印出
+`forward_view_backlog=N`。它的 consumer（每檔閉環、深度優先）由 ROADMAP「研究閉環 P3」落地；
+落地前本 skill 對這一段的義務是**把數字報出來**，不得因為它還沒有流程就當作不存在。
 
 前兩個是硬條件。第三個的判準是「這一輪有沒有真的往前推」——覆蓋缺口可能因為
 新節點入圖而增加，**增加不代表退步**，代表發現了新的層。

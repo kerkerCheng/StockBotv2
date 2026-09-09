@@ -2122,7 +2122,6 @@
     },
     {
       "added_at": "2026-08-13T22:54:28.916939+00:00",
-      "deferred_at": "2026-08-15T03:26:38.989889+00:00",
       "hint": "TL;DR：Applied Optoelectronics（AAOI）的 800G／1.6T、FAB4／Pearland 與 400mW CPO pump laser thesis 已有一手材料，但 disproof 尚未由你確認。建議條件：若 AAOI Q4 2026 實際營收低於 US，或截至 2026-12-31 800G 仍未超過 400G 出貨／營收、400mW pump laser 仍停在 sampling，則成長／CPO thesis 失效；每季財報核查，觸發後 48 小時內 reassess 並停止新增 paper。Catalyst：Q4 2026 財報，預計 2027 年 2 月；expiry=2027-02-20。go 授權：把這組 catalyst／disproof／expiry 用於下一次 paper reassess；不下單、不入圖、不改 Sheet。",
       "n": 134,
       "reason": null,
@@ -2132,11 +2131,16 @@
       "source": "manual",
       "title": "確認 AAOI decision disproof 與 Q4 2026 catalyst",
       "type": "manual",
-      "waiting_on": {
-        "reason": "使用者採納建議：不在缺乏 guidance 時任意指定 Q4 營收門檻",
-        "set_at": "2026-08-15T03:26:38.989889+00:00",
-        "trigger": "AAOI Q3 2026 財報 guidance 公布後，以其 Q4 營收下緣設定可觀測 disproof 門檻",
-        "until": null
+      "watch_wake": {
+        "at": "2026-09-01T22:36:17.651757+00:00",
+        "fact": "AAOI Q3 2026 財報 guidance 公布後，以 Q4 營收下緣設定可觀測 disproof 門檻",
+        "fact_check_ref": "engine_c:AAOI:revenue_guidance",
+        "kind": "fact_verification",
+        "lead_id": "lead_784638384b09744c90b7efc253f62704",
+        "shared_entities": [
+          "AAOI",
+          "co:applied_optoelectronics"
+        ]
       }
     },
     {
@@ -6961,10 +6965,10 @@
       "added_at": "2026-09-02T01:16:51.472047+00:00",
       "hint": "當前 missing_data：諧波市占的第二獨立來源（產業報告或客戶側陳述）；綠的諧波/雙環年報一手（A 股取得路徑未建）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 412,
-      "reason": null,
+      "reason": "reassess-stale：新 decision pd_f5655e29983836fc27a70607b5f33be3 的 attention=MONITOR，不再需要使用者決定",
       "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-09T01:06:25.339663+00:00",
       "source": "decision_lab",
       "title": "co:harmonic_drive_systems：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -7655,10 +7659,10 @@
       "added_at": "2026-09-02T23:42:49.763263+00:00",
       "hint": "當前 missing_data：NVIDIA 自家 10-Q 對 Series A Preferred 投資的揭露逐字核對（externally_cor；Distributor A（44% 營收）不具名，終端需求被通路遮蔽，無法取得客戶端佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 454,
-      "reason": null,
+      "reason": "reassess-stale：新 decision pd_2f57a4fe7c16fee49e1c3f9958d81759 的 attention=MONITOR，不再需要使用者決定",
       "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-09T01:06:25.339663+00:00",
       "source": "decision_lab",
       "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -7667,10 +7671,10 @@
       "added_at": "2026-09-02T23:42:49.763263+00:00",
       "hint": "當前 missing_data：2026-08-27 重編與收入認列核對；獨立客戶端量產訂單（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 455,
-      "reason": null,
+      "reason": "reassess-stale：新 decision pd_e7ae758f6a3b108bceb597be32860a52 的 attention=MONITOR，不再需要使用者決定",
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-09T01:06:25.339663+00:00",
       "source": "decision_lab",
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -17610,6 +17614,75 @@
       "ref_id": "docs/reports/2026-09-07-coverage-pilot.md",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-09T01:06:25.339663+00:00",
+      "n": 412,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_f5655e29983836fc27a70607b5f33be3",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T01:06:25.339663+00:00",
+      "n": 412,
+      "reason": "reassess-stale：新 decision pd_f5655e29983836fc27a70607b5f33be3 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_f5655e29983836fc27a70607b5f33be3",
+      "ref_id": "dc_cc46527aac12ba14191ee71c0460f3fe",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-09T01:06:25.339663+00:00",
+      "n": 454,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_2f57a4fe7c16fee49e1c3f9958d81759",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T01:06:25.339663+00:00",
+      "n": 454,
+      "reason": "reassess-stale：新 decision pd_2f57a4fe7c16fee49e1c3f9958d81759 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_2f57a4fe7c16fee49e1c3f9958d81759",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-09T01:06:25.339663+00:00",
+      "n": 455,
+      "reason": "reassess-stale：僅 context 老化，以 intent=paper 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_e7ae758f6a3b108bceb597be32860a52",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T01:06:25.339663+00:00",
+      "n": 455,
+      "reason": "reassess-stale：新 decision pd_e7ae758f6a3b108bceb597be32860a52 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_e7ae758f6a3b108bceb597be32860a52",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-09T01:10:06.739622+00:00",
+      "n": 134,
+      "prior_waiting_on": {
+        "reason": "使用者採納建議：不在缺乏 guidance 時任意指定 Q4 營收門檻",
+        "set_at": "2026-08-15T03:26:38.989889+00:00",
+        "trigger": "AAOI Q3 2026 財報 guidance 公布後，以其 Q4 營收下緣設定可觀測 disproof 門檻",
+        "until": null
+      },
+      "reason": "event watch ew_0002_2026-08-31 觸發（fact_verification）",
+      "receipt": "{\"kind\": \"fact_verification\", \"lead_id\": \"lead_784638384b09744c90b7efc253f62704\", \"shared_entities\": [\"AAOI\", \"co:applied_optoelectronics\"], \"at\": \"2026-09-01T22:36:17.651757+00:00\", \"fact\": \"AAOI Q3 2026 財報 guidance 公布後，以 Q4 營收下緣設定可觀測 disproof 門檻\", \"fact_check_ref\": \"engine_c:AAOI:revenue_guidance\"}",
+      "ref_id": "decision-disproof:dc_a94362af0d6a7398f02bdeb4f0fb893c:2026-08-14",
+      "type": "manual",
+      "verb": "watch_wake"
     }
   ],
   "next_n": 489,

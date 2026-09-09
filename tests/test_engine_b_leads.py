@@ -656,3 +656,97 @@ def test_trace_backlog_flags_entries_no_trigger_can_ever_reach() -> None:
     assert rows[manual]["auto_trigger_reachable"] is True, (
         "requires_user 走 pq2 人工授權，不該被標成不可達"
     )
+
+
+def _park_with_trace(store, *, url, title, entities_hint=""):
+    lead_id, _ = leads.register(store, source="x:old", url=url, title=title)
+    leads.triage(
+        store, lead_id, go=True, tier=4, reason="需要追原文",
+        decided_at="2026-08-01T00:00:00+00:00",
+    )
+    leads.advance(store, lead_id, "parked", ref={
+        "parked_reason": "目前只有 tier 3 轉述",
+        "trace_status": "isolated_tier_3",
+        "trace_next_trigger": "下一份一手文件",
+        "trace_requires_user": "false",
+    })
+    return lead_id
+
+
+def test_consume_fired_lead_watches_requeues_parked_and_reactivates_watch() -> None:
+    """段 1（fired_lead_requeue）：不論是誰把 watch 標成 fired，parked lead 都要被排回 pq1。"""
+    from engine_b import event_watch as ew
+
+    store = leads.empty_store()
+    parked_id = _park_with_trace(
+        store, url="https://x.com/old/status/1", title="Waiting for $AXTI primary source",
+    )
+    watch_data = ew.load_watches()          # conftest 已把 registry 導向暫存檔；park 建了一個 watch
+    watch = next(w for w in watch_data["watches"] if w.get("wake_lead") == parked_id)
+    # 模擬「另一個呼叫端」（todo sync）把它標成 fired 後存檔，而 triage 路徑再也看不到它
+    watch["status"] = "fired"
+    watch["woken_by"] = {"kind": "related_entity_signal", "lead_id": "lead_event",
+                         "shared_entities": ["AXTI"], "at": "2026-09-08T00:00:00+00:00"}
+
+    result = leads.consume_fired_lead_watches(store, watch_data, at="2026-09-09T00:00:00+00:00")
+
+    assert result["requeued"] == [parked_id]
+    lead = store["leads"][parked_id]
+    assert lead["status"] == "triaged_go"
+    assert lead["refs"]["trace_requeue_trigger"] == f"event_watch:{watch['watch_id']}"
+    assert lead["refs"]["trace_trigger_watch_ref"] == watch["watch_id"]
+    assert lead["refs"]["trace_trigger_event_ref"] == "lead:lead_event"
+    assert watch["status"] == "active"          # 等待條件仍成立，回去續等
+    assert result["skipped"] == [] and result["consumed"] == []
+
+
+def test_consume_fired_lead_watches_handles_in_flight_and_terminal_leads() -> None:
+    from engine_b import event_watch as ew
+
+    store = leads.empty_store()
+    in_flight, _ = leads.register(store, source="edgar:LITE", url="https://x.io/f")
+    leads.triage(store, in_flight, go=True, tier=1, reason="一手")
+    done, _ = leads.register(store, source="edgar:COHR", url="https://x.io/d")
+    leads.triage(store, done, go=False, tier=4, reason="無關")
+    watch_data = {"schema_version": 1, "watches": [
+        {"watch_id": "ew_a", "status": "fired", "kind": "related_entity_signal",
+         "wake_lead": in_flight, "entities": ["LITE"], "expires": "2027-01-01",
+         "woken_by": {"kind": "related_entity_signal", "lead_id": "x", "shared_entities": ["LITE"]}},
+        {"watch_id": "ew_b", "status": "fired", "kind": "related_entity_signal",
+         "wake_lead": done, "entities": ["COHR"], "expires": "2027-01-01", "woken_by": {}},
+        {"watch_id": "ew_c", "status": "fired", "kind": "related_entity_signal",
+         "wake_lead": "lead_ghost", "entities": ["X"], "expires": "2027-01-01", "woken_by": {}},
+        {"watch_id": "ew_d", "status": "active", "kind": "related_entity_signal",
+         "wake_lead": in_flight, "entities": ["LITE"], "expires": "2027-01-01", "woken_by": None},
+        {"watch_id": "ew_e", "status": "fired", "kind": "fact_verification",
+         "wake_pq2": 12, "entities": ["X"], "expires": "2027-01-01", "woken_by": {}},
+    ]}
+
+    result = leads.consume_fired_lead_watches(store, watch_data)
+
+    by_id = {w["watch_id"]: w for w in watch_data["watches"]}
+    assert result["reactivated"] == [in_flight] and by_id["ew_a"]["status"] == "active"
+    assert by_id["ew_b"]["status"] == "consumed"                 # 終局 lead：沒有東西可醒
+    assert by_id["ew_c"]["status"] == "consumed"                 # lead 不存在
+    assert {row["watch_id"] for row in result["consumed"]} == {"ew_b", "ew_c"}
+    assert by_id["ew_d"]["status"] == "active"                   # 沒 fired 的不動
+    assert by_id["ew_e"]["status"] == "fired"                    # pq2 型不是本 consumer 的事
+    assert store["leads"][in_flight]["status"] == "triaged_go"   # 不重複排隊
+    assert store["leads"][done]["status"] == "triaged_no_go"
+
+
+def test_consume_fired_lead_watches_leaves_unrequeueable_lead_visible() -> None:
+    """lead 沒有 trace receipt 時 requeue 會拒絕——必須留在 fired 現形，不硬塞、不吞掉。"""
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="x:old", url="https://x.io/p")
+    leads.triage(store, lead_id, go=True, tier=4, reason="ok")
+    store["leads"][lead_id]["status"] = "parked"                 # 直接改：故意沒有 trace receipt
+    watch_data = {"schema_version": 1, "watches": [
+        {"watch_id": "ew_z", "status": "fired", "kind": "related_entity_signal",
+         "wake_lead": lead_id, "entities": ["X"], "expires": "2027-01-01", "woken_by": {}},
+    ]}
+    result = leads.consume_fired_lead_watches(store, watch_data)
+    assert result["requeued"] == []
+    assert len(result["skipped"]) == 1 and "trace backlog receipt" in result["skipped"][0]["reason"]
+    assert watch_data["watches"][0]["status"] == "fired"
+    assert store["leads"][lead_id]["status"] == "parked"

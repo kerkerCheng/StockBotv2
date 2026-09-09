@@ -233,3 +233,47 @@ def test_render_watch_covers_every_kind_and_wake_target():
     assert rendered_kinds == set(ew.WATCH_KINDS)
     lead_line = ew._render_watch(data["watches"][-1])
     assert "lead lead_2" in lead_line
+
+
+def test_same_lead_does_not_refire_a_reactivated_watch() -> None:
+    """fired watch 被 consumer 回 active 後，同一則 lead 不得每輪再叫醒它一次。
+    PRIMARY_ONLY kind 沒有 entity 消化標記（下一季 10-Q 是新事件），所以要靠 lead 粒度的標記。"""
+    data = _fresh()
+    watch = ew.add_watch(
+        data, kind="entity_filing_signal", wake_lead="lead_parked",
+        expires="2027-03-31", entities=["co:tsmc"],
+    )
+    watch["created_at"] = "2026-09-01T00:00:00+00:00"
+    # 兩則歷史一手同時命中：叫醒一次（第一則），兩則都進 consumed_leads——
+    # 否則 consumer 回 active 後第二則會在下一輪再叫醒一次，數十則 Form 4 就是數十輪。
+    leads = {
+        "l_10q": _lead(entities=["co:tsmc"]),
+        "l_form4": _lead(decided="2026-09-03T00:00:00+00:00", entities=["co:tsmc"]),
+    }
+    fired = ew.check_watches(data, leads=leads, today=date(2026, 9, 9))
+    assert len(fired) == 1 and fired[0]["woken_by"]["lead_id"] == "l_10q"
+    assert data["watches"][0]["consumed_leads"] == ["l_10q", "l_form4"]
+    ew.reactivate(data, watch["watch_id"])
+    assert ew.check_watches(data, leads=leads, today=date(2026, 9, 9)) == []
+    # 下一份文件（不同 lead_id）仍然是新事件
+    leads["l_next_10q"] = _lead(decided="2026-09-05T00:00:00+00:00", entities=["co:tsmc"])
+    fired = ew.check_watches(data, leads=leads, today=date(2026, 9, 9))
+    assert len(fired) == 1 and fired[0]["woken_by"]["lead_id"] == "l_next_10q"
+
+
+def test_trace_requeue_is_not_an_event() -> None:
+    """requeue_trace 會把 triage receipt 整包重寫成今天——那不是新 PASS，不得叫醒任何 watch。"""
+    data = _fresh()
+    watch = ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_other",
+        expires="2027-03-31", entities=["co:axt"],
+    )
+    watch["created_at"] = "2026-09-01T00:00:00+00:00"
+    requeued = _lead(decided="2026-09-09T00:00:00+00:00", entities=["co:axt"])
+    requeued["refs"] = {"trace_requeued_at": "2026-09-09T00:00:00+00:00",
+                        "trace_requeue_trigger": "event_watch:ew_x"}
+    assert ew.check_watches(data, leads={"l_requeued": requeued}, today=date(2026, 9, 9)) == []
+    # 同一則 lead 若之後被**重新** triage（decided_at 晚於 requeue stamp），那才是新事件
+    fresh = _lead(decided="2026-09-10T00:00:00+00:00", entities=["co:axt"])
+    fresh["refs"] = dict(requeued["refs"])
+    assert len(ew.check_watches(data, leads={"l_requeued": fresh}, today=date(2026, 9, 10))) == 1

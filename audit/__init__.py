@@ -135,6 +135,10 @@ def _registry() -> tuple[AuditCheck, ...]:
                    "queued_without_consumer／watching_without_next_action／"
                    "expired_still_scheduled／blocked_without_reason／stalled_over_threshold",
                    run=checks.check_queue_liveness),
+        AuditCheck("QueueSegments", "INV-4", ("F-09", "F-13"), "Phase 3",
+                   "佇列段序封閉字彙：每一種「有工作」的狀態都對得到登記了 consumer 的段；"
+                   "分不到段＝新工作類型沒有 consumer（engine_b/queue_segments.py）",
+                   run=checks.check_queue_segments),
         AuditCheck("GateDiscrimination", "INV-5", ("F-26",), "Phase 4",
                    "每個 gate 的觸發率與清除率——偵測恆亮（近 100%）與恆滅（近 0%）",
                    run=checks.check_gate_discrimination),

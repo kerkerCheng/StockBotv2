@@ -240,6 +240,64 @@ def _print_classification_gaps(gaps: list[dict]) -> None:
         )
 
 
+def _fired_watch_summary() -> dict[str, list[dict]]:
+    """佇列段 1 的現況：已 fired、還沒被任何 consumer 收掉的 watch，依喚醒對象分三堆。
+
+    讀不到 registry 時回三個空 list——**這是 fail-soft 不是 fail-closed**，因為 drain 的主責是
+    列研究工作；但 audit 的 QueueSegments 會用同一份資料 fail closed，兩邊不會同時安靜。
+    """
+    out: dict[str, list[dict]] = {"lead": [], "pq2": [], "hypothesis": []}
+    try:
+        from engine_b import event_watch as ew
+
+        watches = ew.load_watches().get("watches", [])
+    except Exception:  # noqa: BLE001 — registry 壞掉由 audit 現形
+        return out
+    for watch in watches:
+        if watch.get("status") != "fired":
+            continue
+        if watch.get("wake_pq2"):
+            out["pq2"].append(watch)
+        elif watch.get("wake_lead"):
+            out["lead"].append(watch)
+        else:
+            out["hypothesis"].append(watch)
+    return out
+
+
+def _print_segment_counters(pending_count: int, fired: dict[str, list[dict]]) -> None:
+    """段 0–1 常駐計數器（L14：防呆要自己出現）。段序定義見 engine_b/queue_segments.py。"""
+    print(
+        f"段0 pending 分流 {pending_count}｜段1 fired 未消化："
+        f"lead 型 {len(fired['lead'])}（→ `engine_b.cli consume-fired`）／"
+        f"pq2 型 {len(fired['pq2'])}（→ `engine_b.todo sync`）／"
+        f"假設對照 {len(fired['hypothesis'])}（→ 對照後 `engine_b.event_watch consume <id>`）"
+    )
+    for watch in fired["hypothesis"]:
+        fact = str(watch.get("fact") or "")[:70]
+        print(f"      ⚠ {watch['watch_id']}：{fact}")
+
+
+def _cmd_consume_fired(args: argparse.Namespace) -> int:
+    """佇列段 1（fired_lead_requeue）的 consumer：把 fired 的追源 watch 排回 pq1。
+
+    機械、零 token、不改任何 authority；語意見 `leads.consume_fired_lead_watches`。
+    """
+    from engine_b import event_watch as ew
+
+    store = leads.load(args.leads)
+    watch_data = ew.load_watches()
+    result = leads.consume_fired_lead_watches(store, watch_data)
+    if args.dry_run:
+        print(json.dumps({**result, "dry_run": True}, ensure_ascii=False, indent=2))
+        return 0
+    if result["requeued"] or result["reactivated"] or result["consumed"]:
+        leads.save(store, args.leads)
+        ew.save_watches(watch_data)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
 def _cmd_drain(args: argparse.Namespace) -> int:
     """列出 pq1 接下來的 bounded jobs，供 agent 逐個研究與 checkpoint。
 
@@ -289,6 +347,10 @@ def _cmd_drain(args: argparse.Namespace) -> int:
                 return 2
             print(f"警告：Decision pq1 無法讀取：{exc}", file=sys.stderr)
 
+    fired = _fired_watch_summary()
+    pending_count = sum(
+        1 for l in store["leads"].values() if l.get("status") == "pending"
+    )
     all_candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
@@ -334,9 +396,15 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         ] + [
             {"kind": "withheld_work_order", "work_order": job}
             for job in withheld_jobs
+        ] + [
+            # 段 1 的 fired 未消化：只在非零時出現，讓「沒有」與「沒讀到」分得開。
+            {"kind": "fired_watch_pending", "target": target, "watch": watch}
+            for target in ("lead", "pq2", "hypothesis")
+            for watch in fired[target]
         ]
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
+    _print_segment_counters(pending_count, fired)
     if not decision_jobs and not lead_batch and not classification_gaps:
         print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
         _print_withheld(withheld_jobs)
@@ -676,6 +744,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_list.add_argument("--tracked", help="逗號分隔的已追蹤 ticker（thesis 影響度）")
     p_list.add_argument("--json", action="store_true")
     p_list.set_defaults(func=_cmd_list)
+
+    p_consume = sub.add_parser(
+        "consume-fired",
+        help="佇列段 1：把已 fired 的追源 watch 排回 pq1（機械、零 token；drain 之前先跑）",
+    )
+    p_consume.add_argument("--dry-run", action="store_true", help="只印處置，不寫檔")
+    p_consume.set_defaults(func=_cmd_consume_fired)
 
     p_drain = sub.add_parser("drain", help="列出 pq1 接下來該處理的 leads（依 priority）")
     p_drain.add_argument("--limit", type=int, default=None,

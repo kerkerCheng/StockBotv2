@@ -543,20 +543,42 @@ def _prior_execution_intent(store: Any, cohort_id: str) -> str:
     return intent or "research"
 
 
-def _substantive_blockers(cohort_id: str) -> list[str]:
-    """該 cohort 目前**真的需要人動手**的 blocker。
-
-    唯一權威是 `config/decision_blockers.json` 的 `resolution_mode`；
-    這裡不另外猜一份（2026-08-26 手寫過一份 stale 清單，立刻就誤判了 co:axt）。
-    """
+def _load_brief_items() -> list[dict[str, Any]] | None:
+    """今日 decision brief 的 items；讀不到回 `None`（不是空 list——兩者導向相反的判斷）。"""
 
     from briefing.public_view import get_decision_brief_core
 
     try:
-        items = get_decision_brief_core().get("items") or []
+        return list(get_decision_brief_core().get("items") or [])
     except Exception:  # noqa: BLE001
-        return []
-    for item in items:
+        return None
+
+
+def _brief_item_for(
+    cohort_id: str,
+    brief_items: Sequence[Mapping[str, Any]] | None,
+) -> Mapping[str, Any] | None:
+    for item in brief_items or ():
+        if str(item.get("cohort_id") or "") == cohort_id:
+            return item
+    return None
+
+
+def _substantive_blockers(
+    cohort_id: str,
+    *,
+    brief_items: Sequence[Mapping[str, Any]] | None = None,
+) -> list[str]:
+    """該 cohort 目前**真的需要人動手**的 blocker。
+
+    唯一權威是 `config/decision_blockers.json` 的 `resolution_mode`；
+    這裡不另外猜一份（2026-08-26 手寫過一份 stale 清單，立刻就誤判了 co:axt）。
+    `brief_items` 可由呼叫端注入（一次 brief 服務多個 cohort），不給就自己讀一次。
+    """
+
+    if brief_items is None:
+        brief_items = _load_brief_items() or []
+    for item in brief_items:
         if str(item.get("cohort_id") or "") != cohort_id:
             continue
         # brief 已經附上分組（`_blockers_by_mode`），直接用——這裡刻意**不**再分一次組。
@@ -573,6 +595,137 @@ def _substantive_blockers(cohort_id: str) -> list[str]:
             == "user_decision"
         )
     return []
+
+
+#: 已進 pq1 或已有 terminal receipt 的 dispatch 狀態——這些都不是「只需 reassess」。
+_NOT_REASSESS_ONLY_DISPATCH = frozenset({
+    "queued", "researching", "awaiting_approval", "completed", "parked",
+})
+
+
+def reassess_only_items(
+    pool: Mapping[str, Any],
+    store: Any,
+    *,
+    brief_items: Sequence[Mapping[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """佇列段 2（reassess_stale）的成員：REVIEW **純粹**來自凍結 context 過期的 decision_review。
+
+    三個條件缺一不可：①不在 pq1 in-flight、也沒有 terminal receipt；②cohort 沒有
+    research work order（有就該 dispatch，不是 reassess）；③brief 對這個 cohort **有列**、
+    且 blocker **只有 `system_internal`**（判定重用 `_only_system_internal_blockers`，不另猜）。
+
+    為什麼比 `_decision_review_hint` 的「無 user_decision」更嚴（2026-09-09 實測）：hint 對
+    [276]／[279]／[472]／[479] 也寫「請跑 reassess」，但它們各帶一個 `awaiting_external`
+    blocker（fx 缺、corroboration 未齊、財務過期）——那些要等世界先發生事，reassess 只會
+    多 append 一筆同樣 REVIEW 的 decision。機械維護的定義是「跑完會變」，所以只收純
+    system_internal 的；其餘留在「等事件」，由 trigger 或使用者決定。
+
+    ⚠ brief 讀不到或沒列這個 cohort → **不算**（不是「沒有 blocker」）。把讀不到當成
+    沒有，會把整批 decision_review 誤判成機械維護——那是 L12 的兩義同形。
+    """
+
+    if brief_items is None:
+        brief_items = _load_brief_items()
+    if brief_items is None:
+        return []
+    out: list[dict[str, Any]] = []
+    for item in active_items(pool):
+        if item["type"] != "decision_review":
+            continue
+        if item.get("dispatch_status") in _NOT_REASSESS_ONLY_DISPATCH:
+            continue
+        cohort_id = str(item["ref_id"])
+        if not cohort_id.startswith("dc_"):
+            continue
+        brief_item = _brief_item_for(cohort_id, brief_items)
+        if brief_item is None:
+            continue
+        try:
+            if store.latest_research_work_order(cohort_id) is not None:
+                continue
+        except Exception:  # noqa: BLE001 — 讀不到就不判，不猜
+            continue
+        if not _only_system_internal_blockers(brief_item.get("blockers") or []):
+            continue
+        out.append(item)
+    return out
+
+
+def reassess_stale(
+    pool: dict[str, Any],
+    store: Any,
+    provider: Any,
+    *,
+    at: str | None = None,
+    dry_run: bool = False,
+    brief_items: Sequence[Mapping[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """段 2 的 consumer：對 `reassess_only_items` 逐筆 reassess，新 decision 不再 REVIEW 就結案。
+
+    這是確定性維護不是研究：reassess 只以既有 Signal 與相同 intent 重新凍結 context，
+    decision 是 append-only、舊筆原封不動、不寫任何 authority。結案的 receipt 是真的
+    （`decision:<新 id>`），與 `system_internal_retired` 同一類——項目本來就不需要使用者
+    決定任何事，留在池裡只是噪音。仍 REVIEW 的**不**結案（代表有新 blocker 冒出來），
+    留給 collector 更新 hint。四個人工 gate 不受影響。
+    """
+
+    stamp = at or _now()
+    candidates = reassess_only_items(pool, store, brief_items=brief_items)
+    numbers = [int(it["n"]) for it in candidates]
+    result: dict[str, Any] = {
+        "candidates": numbers, "closed": [], "still_review": [], "failed": [],
+        "dry_run": dry_run,
+    }
+    if dry_run:
+        return result
+    from decision_lab.workflow import reassess
+
+    for item in candidates:
+        cohort_id = str(item["ref_id"])
+        intent = _prior_execution_intent(store, cohort_id)
+        try:
+            outcome = reassess(store, provider, cohort_id, execution_intent=intent)
+        except Exception as exc:  # noqa: BLE001 — 單筆失敗不擋其餘，但要現形
+            result["failed"].append({
+                "n": item["n"], "cohort_id": cohort_id,
+                "reason": f"{type(exc).__name__}: {exc}",
+            })
+            continue
+        decision_id = str(outcome.get("decision_id") or "")
+        attention = str((outcome.get("action_card") or {}).get("attention") or "")
+        receipt = f"decision:{decision_id}"
+        pool["log"].append({
+            "at": stamp,
+            "n": int(item["n"]),
+            "type": item["type"],
+            "ref_id": cohort_id,
+            "verb": "pq1_reassessed",
+            "reason": f"reassess-stale：僅 context 老化，以 intent={intent} 重新凍結（attention={attention}）",
+            "receipt": receipt,
+        })
+        if attention == "REVIEW":
+            result["still_review"].append({"n": item["n"], "decision_id": decision_id})
+            continue
+        item.pop("waiting_on", None)
+        item.pop("deferred_at", None)
+        item["resolved_at"] = stamp
+        item["resolution"] = "reassessed"
+        item["reason"] = (
+            f"reassess-stale：新 decision {decision_id} 的 attention={attention}，"
+            "不再需要使用者決定"
+        )
+        pool["log"].append({
+            "at": stamp,
+            "n": int(item["n"]),
+            "type": item["type"],
+            "ref_id": cohort_id,
+            "verb": "reassessed_closed",
+            "reason": item["reason"],
+            "receipt": receipt,
+        })
+        result["closed"].append({"n": item["n"], "decision_id": decision_id, "attention": attention})
+    return result
 
 
 def advance_decision_review(
@@ -1382,8 +1535,18 @@ def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict
         except Exception:
             leads = {}
         fired = event_watch.check_watches(data, leads=leads)
+        # 也收「先前已 fired、但由別的呼叫端觸發而本函式沒看到」的 pq2 型 watch。
+        # 2026-09-08 實測：triage 路徑先把 ew_0002（喚醒 [134]）標成 fired 存檔；本函式
+        # 之後每天 check 時它已不是 active，永遠不會再回到 fired 清單——掛了一週。
+        # check 的回傳只含「這一次新觸發的」，consumer 卻該掃 status 本身。
+        fresh_ids = {w["watch_id"] for w in fired}
+        backlog = [
+            dict(w) for w in data["watches"]
+            if w.get("status") == "fired" and w.get("wake_pq2")
+            and w["watch_id"] not in fresh_ids
+        ]
         woken = 0
-        for watch in fired:
+        for watch in fired + backlog:
             if not watch.get("wake_pq2"):
                 # 假設型 fact-check 到點：沒有 pq2 可翻醒——停在 fired 現形於
                 # 計數器（fired_unconsumed），agent 對照＋verify 後以
@@ -2316,6 +2479,13 @@ def main(argv: list[str] | None = None) -> int:
                         help="跳過 Engine D 決策佇列（免外部連線）")
     p_sync.add_argument("--json", action="store_true")
 
+    p_stale = sub.add_parser(
+        "reassess-stale",
+        help="佇列段 2：列出／執行「只因凍結 context 過期而 REVIEW」的 decision_review reassess（機械維護，不吃 pq1 預算）",
+    )
+    p_stale.add_argument("--run", action="store_true", help="實際 reassess 並結案；預設只列出候選")
+    p_stale.add_argument("--json", action="store_true")
+
     p_res = sub.add_parser("resolve", help="處理編號：go／drop／pending")
     p_res.add_argument("numbers", nargs="+")
     p_res.add_argument("--verb", required=True, choices=VERBS)
@@ -2417,6 +2587,43 @@ def main(argv: list[str] | None = None) -> int:
             )
             print(_render(pool))
         return 0
+
+    if args.command == "reassess-stale":
+        from decision_lab.bootstrap import open_default_store
+
+        decision_store = open_default_store()
+        try:
+            provider = None
+            if args.run:
+                from engine_d_runtime.bootstrap import build_default_runtime_provider
+
+                provider = build_default_runtime_provider()
+            outcome = reassess_stale(
+                pool, decision_store, provider, dry_run=not args.run,
+            )
+        finally:
+            decision_store.close()
+        if args.run:
+            save(pool, args.pool)
+        if args.json:
+            print(json.dumps(outcome, ensure_ascii=False, indent=2))
+        else:
+            if outcome["dry_run"]:
+                print(
+                    f"段2 reassess-stale 候選 {len(outcome['candidates'])} 項："
+                    f"{outcome['candidates'] or '—'}（加 --run 執行）"
+                )
+            else:
+                closed = [f"[{row['n']}]→{row['attention']}" for row in outcome["closed"]]
+                print(
+                    f"段2 reassess-stale：候選 {len(outcome['candidates'])}"
+                    f"｜結案 {len(outcome['closed'])}（{'、'.join(closed) or '—'}）"
+                    f"｜仍 REVIEW {len(outcome['still_review'])}"
+                    f"｜失敗 {len(outcome['failed'])}"
+                )
+                for row in outcome["failed"]:
+                    print(f"  ✗ [{row['n']}] {row['reason']}", file=sys.stderr)
+        return 1 if outcome["failed"] else 0
 
     if args.command == "resolve":
         failures = 0

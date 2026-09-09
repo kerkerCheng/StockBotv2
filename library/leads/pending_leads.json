@@ -8277,31 +8277,53 @@
         "parked_reason": "6-K_wrapper已取得但本次未取得interim_statement_exhibits；沒有可驗證的新graph_delta",
         "trace_attempts_ref": "SEC_TSEM_6-K_2026-08-17_wrapper",
         "trace_next_trigger": "取得並解析6-K_exhibits或Tower官方Q2報告",
+        "trace_requeue_trigger": "event_watch:ew_0008_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSEM",
           "co:tower_semiconductor"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_03e036c05aea97310171ca07772eb352",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0008_2026-08-31"
       },
       "source": "edgar:TSEM",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-17",
       "triage": {
-        "decided_at": "2026-08-17T22:34:27.864087+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "TSEM 為已登記研究公司；官方 6-K 可逐字核對，放行追查是否含新供應鏈或財務事件",
-        "related_trace_requeues": [
-          "lead_b1e793c560334131dfe7c1619715784d"
-        ],
+        "reason": "Event Watch ew_0008_2026-08-31 已觸發（related_entity_signal；共用具名標的 TSEM, co:tower_semiconductor；觸發 lead lead_03e036c05aea97310171ca07772eb352）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0008_2026-08-31 已觸發（related_entity_signal；共用具名標的 TSEM, co:tower_semiconductor；觸發 lead lead_03e036c05aea97310171ca07772eb352）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0008_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-17T22:34:27.864087+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "TSEM 為已登記研究公司；官方 6-K 可逐字核對，放行追查是否含新供應鏈或財務事件",
+            "related_trace_requeues": [
+              "lead_b1e793c560334131dfe7c1619715784d"
+            ],
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004158/zk2635857.htm"
     },
     "lead_03ec88277b05d7cb337f5367d546ff0e": {
@@ -8677,6 +8699,8 @@
         "research_run": "daily-brief-2026-09-08",
         "trace_attempts_ref": "WebSearch → Nikkei Asia 英文站定位到短缺至 2027／60% 需求覆蓋一文；40–60%、+50% 未逐字命中（可能在日文版或另一篇通路報導）",
         "trace_next_trigger": "MU FQ4 FY26 財報（2026-09-24 推估）或 Nikkei 日文版原文可逐字核對缺口數字",
+        "trace_requeue_trigger": "event_watch:ew_0077_2026-09-08",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -8686,10 +8710,12 @@
           "co:micron_technology",
           "co:sandisk"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_1b42074dd23fcc1e48bbc8dd41306c49",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0077_2026-09-08"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Now that $MU to $SNDK have pulled a major recovery. Good to have a reminder that the memory bottleneck hasn’t changed! Same with CW lasers… substrates… or others. But short term sentiment (depending on prices/macro) often does. I think a lot of demand imbalances get worse than people expect: - There’s some Japanese distributors in Nikkei today saying memory demand deficit has reached 40-60% (67-150% higher than supply). With general prices going up 50% by years end. - $SPCX isn’t included in the $1.3T hyperscaler capex figures (I think Wells Fargo ets. ~$263b AI capex), so total capex figures might be surprising. - $SNDK expects 80% gross margins to continue into 2030… (welcome to S&P 100) - and once again you have long term visibility into 2031 now with companies like Samsung Memory is very really volatile… some of my positions are up 270%+, so I find it a bit easier to hold through volatile periods. But regardless, operating fundamentals doesn’t always align with short term price movements. Same concept can be applied to other sectors.",
       "triage": {
@@ -8700,14 +8726,38 @@
           "decision_impact": "confidence_only",
           "reason": "需求缺口與價格是時變觀測，不新增候選也不改排序"
         },
-        "decided_at": "2026-09-08T05:14:01.091376+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true
         },
-        "reason": "引 Nikkei：日本通路稱記憶體需求缺口 40–60%、年底價漲 50%；SNDK 80% 毛利到 2030。記憶體產業組目前零列，屬需求端事實",
+        "reason": "Event Watch ew_0077_2026-09-08 已觸發（related_entity_signal；共用具名標的 MU, SNDK, co:micron_technology, co:sandisk；觸發 lead lead_1b42074dd23fcc1e48bbc8dd41306c49）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0077_2026-09-08 已觸發（related_entity_signal；共用具名標的 MU, SNDK, co:micron_technology, co:sandisk；觸發 lead lead_1b42074dd23fcc1e48bbc8dd41306c49）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0077_2026-09-08",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-08T05:14:01.091376+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "confidence_only",
+              "reason": "需求缺口與價格是時變觀測，不新增候選也不改排序"
+            },
+            "decided_at": "2026-09-08T05:14:01.091376+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true
+            },
+            "reason": "引 Nikkei：日本通路稱記憶體需求缺口 40–60%、年底價漲 50%；SNDK 80% 毛利到 2030。記憶體產業組目前零列，屬需求端事實",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2096149203278037407"
     },
     "lead_05f01a6f616c2fd1ba2c5881d83ff17b": {
@@ -11253,8 +11303,8 @@
         "research_outcome": "無新 graph delta；維持 partial，等待 TSMC 或合作方具名製造／供應角色。",
         "trace_attempts_ref": "2026-08-31：重查 TSMC COUPE 官方研究頁與 NVIDIA 技術 blog；GC/EC、EIC-PIC 與 wafer-level micro-lens 架構可確認，但沒有外部 grating/microlens 供應商。",
         "trace_next_trigger": "TSMC 或共同作者公開可核對文件具名 embedded micro-lens array 與製造／供應角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0010_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -11262,10 +11312,11 @@
           "co:tsmc"
         ],
         "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0010_2026-08-31"
       },
       "source": "system_decompose",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "[decompose] 垂直光柵耦合器＋微透鏡陣列層：TSMC COUPE 官方研究頁述及 embedded micro-lens array、backside metal reflector、GC/EC 插入損耗。圖中無 grating coupler 節點",
       "triage": {
@@ -11277,10 +11328,10 @@
           "decision_impact": "candidate_set",
           "reason": "system-decompose 已有 TSMC COUPE 官方研究頁；答案會新增或排除 grating coupler／micro-lens 供應商候選"
         },
-        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0010_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -11294,6 +11345,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "TSMC 官方研究頁，一手；光柵耦合器與微透鏡層圖中無節點",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0010_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0010_2026-08-31",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-31_active_classification_backfill.json",
+              "classified_at": "2026-08-30T22:37:12.935023+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "system-decompose 已有 TSMC COUPE 官方研究頁；答案會新增或排除 grating coupler／micro-lens 供應商候選"
+            },
+            "decided_at": "2026-08-30T22:35:38.109712+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -11464,16 +11536,20 @@
         "research_outcome": "96.22B revenue 等需逐字官方 exhibits；不以 X 摘要入圖或提高 evidence tier。",
         "trace_attempts_ref": "NVIDIA 2026-08-26 8-K／10-Q、官方 IR event page 與 quarterly-results index",
         "trace_next_trigger": "NVIDIA 官方 Q2 FY27 earnings release／CFO commentary／transcript 可逐字索引",
+        "trace_requeue_trigger": "event_watch:ew_0011_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
         ],
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0011_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -11486,12 +11562,27 @@
       },
       "title": "$NVDA earnings TLDR: Revenue: $96.22B vs. ~$92.17B (beat) Adj. EPS: $2.22 vs. $2.09-$2.10 (beat) DC: $89.0B vs. ~$86.3B (beat) Adj. gross margin: 75% vs. 75% Hyperscaler Revenue: $48.71B from $43.05B last quarter (custom ASIC growth hasn't really prevented this revenue from accelerating) For guidance: Revenue: $108B vs. ~$104.2B Adj. gross margin: 74% vs. 75% (kinda the only soft spot) Revenue ramp has been genuinely absurd over last 4 quarters. -> $68.1B -> $81.6B -> $96.2B (we are here) -> next quarter guidance: $108B, despite assuming zero China DC compute revenue. Fun thing to note is Nvidia says its commitments jumped from $119B last quarter to $279B, primarily related to procurement of memory (for next few years).. So memory goes brrr. TLDR: AI keeps on going brrr. Nvidia is clearly leading the charge and no obvious signs of demand slowing. Given Nvidia is already a $5T+ company, I think most of the alpha comes from how Nvidia's architecture/capacity decisions impact elsewhere in the supply chain (eg. CPO, memory, 800V) nowadays. Rather than simply finding mispricing in Nvidia itself. Regardless, all the fun stuff happens in the earnings call in a few min.",
       "triage": {
-        "decided_at": "2026-08-26T22:37:00.679108+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "NVDA 季度營收、資料中心營收、毛利與採購承諾均為可逐字回查的財務 atoms；同輪已有官方 filing，屬 financial_fact、decision_impact=confidence_only，交 pq1 對 SEC 原文。",
+        "reason": "Event Watch ew_0011_2026-08-31 已觸發（entity_filing_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_53e31d26909b973cac66af50394abd98）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0011_2026-08-31 已觸發（entity_filing_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_53e31d26909b973cac66af50394abd98）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0011_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-26T22:37:00.679108+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "NVDA 季度營收、資料中心營收、毛利與採購承諾均為可逐字回查的財務 atoms；同輪已有官方 filing，屬 financial_fact、decision_impact=confidence_only，交 pq1 對 SEC 原文。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2092718416683819292"
     },
     "lead_1609bc2f7219c606bfd788882fef693d": {
@@ -12996,8 +13087,8 @@
         "research_run": "session:2026-08-29-tw-cpo-drain",
         "trace_attempts_ref": "2026-08-31：重查 Accton 官方 CPO／102.4T switch 資料與 NVIDIA 官方合作文件；可確認智邦具 CPO-ready ODM 能力，但沒有 NVIDIA CPO switch 指派。",
         "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0013_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -13007,10 +13098,11 @@
           "co:tsmc"
         ],
         "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0013_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13029,10 +13121,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 衍生之台系 CPO 供應鏈候選"
         },
-        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0013_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
       "triage_history": [
@@ -13053,6 +13145,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "tier-3 聚合（BigGo）但引用 TSMC 法說與 LightCounting 兩個可追上游來源；台系 CPO 供應鏈與既有 alpha 鏈直接相關，具名公司可追。識別未確認前不入 registry（L15）。",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0013_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0013_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T09:17:07.984899+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 衍生之台系 CPO 供應鏈候選"
+            },
+            "decided_at": "2026-08-30T22:35:38.109712+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -13453,8 +13565,8 @@
         "trace_next_trigger": "Broadcom OFC／Hot Chips 論文、datasheet 或客戶技術文件明列 Davisson modulator 類型",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "產品發行公司一手公告",
-        "trace_requeue_trigger": "related_triaged_lead:lead_ea2fd285d490a695264e1452765ecc28",
-        "trace_requeued_at": "2026-09-02T22:37:09.245708+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0014_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -13465,7 +13577,7 @@
         "trace_trigger_watch_ref": "ew_0014_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13484,10 +13596,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 未知層"
         },
-        "decided_at": "2026-09-02T22:37:09.245708+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0014_2026-08-31 觸發：新 triage PASS lead lead_ea2fd285d490a695264e1452765ecc28 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0014_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -13508,6 +13620,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Davisson decompose 衍生；一手 PR 錨定、缺口具體",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0014_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0014_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-30T07:21:57.668377+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 未知層"
+            },
+            "decided_at": "2026-09-02T22:37:09.245708+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0014_2026-08-31 觸發：新 triage PASS lead lead_ea2fd285d490a695264e1452765ecc28 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -13718,8 +13850,8 @@
           "CO:IREN",
           "IREN"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
-        "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0015_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -13727,21 +13859,22 @@
           "SHAZ",
           "co:iren"
         ],
-        "trace_trigger_event_ref": "lead:lead_1a75aa118ad109781c02fcd497236dda",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0015_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Leaked Anthropic docs show plans to secure 1.4GW capacity from Australia, amounting to ~$21.6B. Recently $IREN, $SHAZ, and other Neoclouds have been building sovereign DCs in Australia. Guess like a lot of things are stating to make more sense connection wise? (disclosure: no open positions in any of the above).",
       "triage": {
-        "decided_at": "2026-08-24T22:36:50.439001+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 IREN, co:iren（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0015_2026-08-31 已觸發（related_entity_signal；共用具名標的 SHAZ；觸發 lead lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -13758,6 +13891,22 @@
               "user_requested": true
             },
             "reason": "AI infrastructure／power 方向：具名合約、容量、LTA 或 capex 數字可回公司／filing 追源；只作需求端研究，不把作者市場看法當 evidence",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0015_2026-08-31 已觸發（related_entity_signal；共用具名標的 SHAZ；觸發 lead lead_1f55ec9eae7d1e4a1b68fa245ed1ee7f）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0015_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-24T22:36:50.439001+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 IREN, co:iren（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -14120,8 +14269,8 @@
           "AXTI",
           "CO:AXT"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_291b058af07f3f0a6e43107b0bec57b3",
-        "trace_requeued_at": "2026-08-19T22:33:19.734483+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0016_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -14130,11 +14279,12 @@
           "co:axt",
           "co:iqe"
         ],
-        "trace_trigger_event_ref": "lead:lead_291b058af07f3f0a6e43107b0bec57b3",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_2061d895e6e162c47132019a07869d92",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0016_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14146,13 +14296,13 @@
       },
       "title": "\"Severe InP Shortage Triggers Largest Price Hike Ever\" - $AXTI. Suppliers have bluntly stated that \"even if you have the money, you still may not be able to get the material\" (lol). - Industry sources revealed that InP substrate prices began rising in Q4 last year and was the fourth consecutive substrate price hike. - The latest Q4 hike is expected to be >10%, - Meanwhile, prices for epitaxial wafers made from those substrates have already been raised two times, and the market is moving toward a 3rd consecutive increase in Q4. (I also wrote a thesis on $IQE, which benefits here too). Article states VPEC, Landmark, IET benefits (Taiwan centric reporting). I did predict this last year... The bottleneck is real, but I do have higher expectations for price hikes that comes next. Glad it's starting to play out.",
       "triage": {
-        "decided_at": "2026-08-19T22:33:19.734483+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true,
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_291b058af07f3f0a6e43107b0bec57b3 與 parked trace 共用具名標的 AXTI, co:axt（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0016_2026-08-31 已觸發（related_entity_signal；共用具名標的 IQE, co:iqe；觸發 lead lead_2061d895e6e162c47132019a07869d92）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -14172,6 +14322,22 @@
             "related_trace_requeues": [
               "lead_8088f665e358a7744d9b6bc1646bccbf"
             ],
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0016_2026-08-31 已觸發（related_entity_signal；共用具名標的 IQE, co:iqe；觸發 lead lead_2061d895e6e162c47132019a07869d92）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0016_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-19T22:33:19.734483+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true,
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_291b058af07f3f0a6e43107b0bec57b3 與 parked trace 共用具名標的 AXTI, co:axt（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -14265,8 +14431,8 @@
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
-        "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0017_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -14277,20 +14443,28 @@
           "co:applied_optoelectronics",
           "co:macom"
         ],
-        "trace_trigger_event_ref": "lead:lead_1a75aa118ad109781c02fcd497236dda",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_event_ref": "lead:lead_49085eb7b51c402c925cc29ab5e33cc6",
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0017_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Some more TLDR takeaways from $AAOI ER: - They also flagged DSP and TIA bottlenecks, which is a positive industry read through for names like $MXL, then $SMTC and $MTSI. - For revenue growth, they're expecting more than $500 million revenue Q4, which is absurd growth. For reference: Q2: $191.9M Q3: ~$255M-$290M Q4: $500M+ By mid-2027: ~$1.41B quarterly revenue run-rate Always impressed by the revenue ramp from some of these optical players.",
       "triage": {
-        "decided_at": "2026-08-24T22:36:50.439001+00:00",
+        "classification": {
+          "classified_at": "2026-08-21T16:05:59.208377+00:00",
+          "classified_by": "semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "AAOI 法說點名 DSP 與 TIA 瓶頸並牽出 MXL／SMTC／MTSI：可能新增候選"
+        },
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0017_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_49085eb7b51c402c925cc29ab5e33cc6）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -14313,6 +14487,21 @@
               "novelty": true
             },
             "reason": "PASS：具體轉述 AAOI 法說中的 DSP／TIA 瓶頸與 Q2、Q3、Q4、2027 營收節點，關聯已追蹤 AAOI 與光互連供應鏈；數字可回到 earnings transcript／filing 逐字核對，值得進 pq1。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0017_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_49085eb7b51c402c925cc29ab5e33cc6）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0017_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-24T22:36:50.439001+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -14759,19 +14948,19 @@
         "research_run": "session:2026-08-30-loop2-r4",
         "trace_attempts_ref": "Cignal AI 1Q26 CPO/ELSFP update(paywall,可見部分:Lumentum largest ELSFP PO ever+Coherent high-power laser PO,買方名在牆後);Lumentum Q4 FY26 earnings call 2026-08-18 逐字:We received its first external line source or ELS module purchase for delivery in the second half of calendar 2027,全場無 Broadcom/Davisson/客戶具名",
         "trace_next_trigger": "Broadcom 或 ELSFP 供應商任一方具名對手(filing/PR/法說),或使用者授權 Cignal 付費取得",
-        "trace_requeue_trigger": "related_triaged_lead:lead_b7fb056592186e1d35d8da16f3b7c0b7",
-        "trace_requeued_at": "2026-08-31T10:44:09.687187+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0018_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
           "edgar:AVGO,edgar:LITE,edgar:COHR,edgar:AAOI"
         ],
-        "trace_trigger_event_ref": "lead:lead_b7fb056592186e1d35d8da16f3b7c0b7",
+        "trace_trigger_event_ref": "lead:lead_1f5a72a9cba09c5fd62dbe8771534c95",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0018_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -14790,10 +14979,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 未知層"
         },
-        "decided_at": "2026-08-31T10:44:09.687187+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0018_2026-08-31 觸發：新 triage PASS lead lead_b7fb056592186e1d35d8da16f3b7c0b7 與等待中的追源共用具名標的 COHR, LITE, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0018_2026-08-31 已觸發（related_entity_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_1f5a72a9cba09c5fd62dbe8771534c95）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -14814,6 +15003,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Davisson decompose 衍生；一手 PR 錨定、缺口具體",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0018_2026-08-31 已觸發（related_entity_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_1f5a72a9cba09c5fd62dbe8771534c95）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0018_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-30T07:21:57.657044+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 未知層"
+            },
+            "decided_at": "2026-08-31T10:44:09.687187+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0018_2026-08-31 觸發：新 triage PASS lead lead_b7fb056592186e1d35d8da16f3b7c0b7 與等待中的追源共用具名標的 COHR, LITE, co:coherent, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -14901,27 +15110,48 @@
         "trace_attempts_ref": "SEC_TSEM_6K_20260804_wrapper",
         "trace_next_trigger": "obtain_TSEM_6K_20260804_Exhibit_99_1_or_official_Q2_release",
         "trace_origin_entity": "Tower Semiconductor Ltd.",
+        "trace_requeue_trigger": "event_watch:ew_0019_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSEM",
           "co:tower_semiconductor"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_03e036c05aea97310171ca07772eb352",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0019_2026-08-31"
       },
       "source": "edgar:TSEM",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "TSEM 6-K filed 2026-08-04",
       "triage": {
-        "decided_at": "2026-08-15T06:38:17.003413+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true
         },
-        "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+        "reason": "Event Watch ew_0019_2026-08-31 已觸發（related_entity_signal；共用具名標的 TSEM, co:tower_semiconductor；觸發 lead lead_03e036c05aea97310171ca07772eb352）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0019_2026-08-31 已觸發（related_entity_signal；共用具名標的 TSEM, co:tower_semiconductor；觸發 lead lead_03e036c05aea97310171ca07772eb352）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0019_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-15T06:38:17.003413+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true
+            },
+            "reason": "SEC 一手 filing（6-K／10-Q／8-K）且屬 InP／CPO 瓶頸鏈追蹤標的；外國發行人的 6-K 是重大事件報告，地位等同 8-K",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326003776/zk2635828.htm"
     },
     "lead_244fca10f947028444c8c7dcc4aad611": {
@@ -15349,6 +15579,8 @@
         "trace_origin_entity": "MediaTek; Samsung Electro-Mechanics; SK hynix",
         "trace_origin_linkage": "不同發行人一手，但只各自支持摘要中的個別 atoms",
         "trace_original_date": "2026-08-31/2026-09-01",
+        "trace_requeue_trigger": "event_watch:ew_0066_2026-09-01",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -15380,10 +15612,12 @@
           "co:sk_hynix",
           "co:soitec"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_4529c66f2414f1fa331f8567836c589b",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0066_2026-09-01"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -15405,15 +15639,40 @@
           "decision_impact": "candidate_set",
           "reason": "查證不同 atoms 可能新增或排除候選，會改變候選集合。"
         },
-        "decided_at": "2026-09-01T22:36:11.594012+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true,
           "novelty": true
         },
-        "reason": "具名公司、供應鏈動作與數字可追查；多項主張可能新增候選並含 SK Hynix 反證，但目前只是社群彙整，需逐條追原文。",
+        "reason": "Event Watch ew_0066_2026-09-01 已觸發（related_entity_signal；共用具名標的 GOOGL, co:google；觸發 lead lead_4529c66f2414f1fa331f8567836c589b）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0066_2026-09-01 已觸發（related_entity_signal；共用具名標的 GOOGL, co:google；觸發 lead lead_4529c66f2414f1fa331f8567836c589b）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0066_2026-09-01",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-01T22:36:11.594012+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "查證不同 atoms 可能新增或排除候選，會改變候選集合。"
+            },
+            "decided_at": "2026-09-01T22:36:11.594012+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true,
+              "novelty": true
+            },
+            "reason": "具名公司、供應鏈動作與數字可追查；多項主張可能新增候選並含 SK Hynix 反證，但目前只是社群彙整，需逐條追原文。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2094704372831920324"
     },
     "lead_26ed9096f88f869e77178205b74682d7": {
@@ -18391,8 +18650,8 @@
         "research_outcome": "無新 RA；維持 partial，等待作者 manuscript 或具名製程供應商。",
         "trace_attempts_ref": "2026-08-31：取得 IEEE metadata／摘要與 NVIDIA wafer-level micro-lens 技術說明；完整 manuscript 仍不可逐字取得，且沒有第三方 active-alignment vendor 具名。",
         "trace_next_trigger": "IEEE／作者公開 manuscript 或 institution repository 可逐字核對 1152-fiber coupling 與 active-alignment yield",
-        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0022_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -18400,10 +18659,11 @@
           "co:tsmc"
         ],
         "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0022_2026-08-31"
       },
       "source": "system_decompose",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "[decompose] 光學耦合／主動對準層：IEEE 論文 Optical and Electrical Characterization of a Compact Universal Photonic Engine。圖中無主動對準製程節點；1152 芯耦合良率是誰的 know-how",
       "triage": {
@@ -18415,10 +18675,10 @@
           "decision_impact": "candidate_set",
           "reason": "system-decompose 已有 IEEE photonic engine 論文；答案會新增或排除 active-alignment／光學耦合供應商候選"
         },
-        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0022_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -18432,6 +18692,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "IEEE peer-reviewed，一手；主動對準層圖中無節點",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0022_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0022_2026-08-31",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-31_active_classification_backfill.json",
+              "classified_at": "2026-08-30T22:37:12.935023+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "system-decompose 已有 IEEE photonic engine 論文；答案會新增或排除 active-alignment／光學耦合供應商候選"
+            },
+            "decided_at": "2026-08-30T22:35:38.109712+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -19265,8 +19546,8 @@
           "NVDA",
           "TSM"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0023_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
@@ -19276,11 +19557,12 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_3a4468d30e6a22eb826a8c8157682b64",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0023_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19300,13 +19582,13 @@
           "decision_impact": "candidate_set",
           "reason": "FAU 產能缺口與具名供應商若獲一手支持，會新增 CPO 子瓶頸與可研究供應商候選。"
         },
-        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0023_2026-08-31 已觸發（related_entity_signal；共用具名標的 BE；觸發 lead lead_3a4468d30e6a22eb826a8c8157682b64）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
       "triage_history": [
@@ -19350,6 +19632,29 @@
               "novelty": true
             },
             "reason": "新 triage PASS lead lead_0f0fc6255a25848dd10cf6e205e7f427 與 parked trace 共用具名標的 NVDA, co:nvidia（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0023_2026-08-31 已觸發（related_entity_signal；共用具名標的 BE；觸發 lead lead_3a4468d30e6a22eb826a8c8157682b64）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0023_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-24T22:37:23.275402+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "FAU 產能缺口與具名供應商若獲一手支持，會新增 CPO 子瓶頸與可研究供應商候選。"
+            },
+            "decided_at": "2026-08-30T22:35:38.109712+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -19562,8 +19867,8 @@
         "trace_requeue_consumed_entities": [
           "NVTS"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_f82cfe4629a23bc3a83a328b45bc7676",
-        "trace_requeued_at": "2026-08-24T07:01:43.896952+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0024_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -19572,11 +19877,12 @@
           "XFAB",
           "co:x_fab"
         ],
-        "trace_trigger_event_ref": "lead:lead_f82cfe4629a23bc3a83a328b45bc7676",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_3a7c4e5db3ecc1c420c1464fb73ac3c2",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0024_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19598,12 +19904,12 @@
           "restored_at": "2026-08-27T03:18:48.063011+00:00",
           "restored_by": "backfill_history_restore_v1"
         },
-        "decided_at": "2026-08-24T07:01:43.896952+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_f82cfe4629a23bc3a83a328b45bc7676 與 parked trace 共用具名標的 NVTS（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0024_2026-08-31 已觸發（related_entity_signal；共用具名標的 POWI, XFAB, co:x_fab；觸發 lead lead_3a7c4e5db3ecc1c420c1464fb73ac3c2）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -19626,6 +19932,30 @@
               "novelty": true
             },
             "reason": "XFAB 與 CPO／800V 主題相關，轉述含可追查法說措辭、三項 silicon photonics 專案與 2028 volume-production 時程；社群來源需追回公司原文。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0024_2026-08-31 已觸發（related_entity_signal；共用具名標的 POWI, XFAB, co:x_fab；觸發 lead lead_3a7c4e5db3ecc1c420c1464fb73ac3c2）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0024_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "X-FAB 自述 CPO 進展與 photonixfab：圖中尚無此節點，可能新增候選",
+              "restored_at": "2026-08-27T03:18:48.063011+00:00",
+              "restored_by": "backfill_history_restore_v1"
+            },
+            "decided_at": "2026-08-24T07:01:43.896952+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_f82cfe4629a23bc3a83a328b45bc7676 與 parked trace 共用具名標的 NVTS（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -21650,8 +21980,8 @@
         "research_outcome": "無新 graph delta；[302] 僅提供第三方專利鏈 origin，仍需 admission gate。",
         "trace_attempts_ref": "2026-08-31：重查 FOCI 年報、NVIDIA 官方 CPO PR／技術 blog；FOCI 的 FAU 技術可確認，NVIDIA/TSMC 客戶映射與 Largan/Browave/HST 相對角色仍未具名。",
         "trace_next_trigger": "NVIDIA／TSMC／MOPS 文件具名 FOCI、Largan、Browave、HST 的 FAU 供應角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0025_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
@@ -21665,10 +21995,11 @@
           "co:tsmc"
         ],
         "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0025_2026-08-31"
       },
       "source": "system_decompose",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -21689,10 +22020,10 @@
           "decision_impact": "candidate_set",
           "reason": "system-decompose 已具名 FOCI、Largan、Browave、HST；答案會新增或排除 FAU 層供應商候選"
         },
-        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0025_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 2
       },
       "triage_history": [
@@ -21719,6 +22050,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "指定實體的 tier-1 一手來源 lead_53e31d26909b973cac66af50394abd98 與 parked trace 共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+            "tier": 2
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0025_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0025_2026-08-31",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-31_active_classification_backfill.json",
+              "classified_at": "2026-08-30T22:37:12.935023+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "system-decompose 已具名 FOCI、Largan、Browave、HST；答案會新增或排除 FAU 層供應商候選"
+            },
+            "decided_at": "2026-08-30T22:35:38.109712+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 2
           }
         }
@@ -23819,8 +24171,8 @@
         "research_outcome": "無新 RA；維持 partial，等待客戶端訂單或量產 qualification。",
         "trace_attempts_ref": "2026-08-31：重查 ASMPT 官方 SiPh/PIC bonder 與活動頁；一般 sub-micron placement、高吞吐工具能力可確認，但 lead 所指 ECTC 2027 頁尚無客戶 qualification 或量產採用證據。",
         "trace_next_trigger": "ASMPT 客戶端文件、訂單或量產 qualification 具名揭露",
-        "trace_requeue_trigger": "related_triaged_lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_requeued_at": "2026-08-30T22:35:38.109712+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0028_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -23830,10 +24182,11 @@
           "co:tsmc"
         ],
         "trace_trigger_event_ref": "lead:lead_004478d161be47a5f8d9323bccfc8573",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0028_2026-08-31"
       },
       "source": "weekly:cpo",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -23852,10 +24205,10 @@
           "decision_impact": "candidate_set",
           "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
         },
-        "decided_at": "2026-08-30T22:35:38.109712+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0028_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -23876,6 +24229,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "PASS：ASMPT 8/24 官方頁具名 CPO、sub-micron precision bonding、high-throughput photonics bonding 與 multi-chip assembly，關聯性與可引用性均通過；ASMPT／該工具鏈在既有 leads 與 identity registry 中未出現，能新增 CPO active-alignment／assembly 候選集合。這只是供應商自報與 ECOC 展示預告，未證明客戶 qualification、採購或量產占有率。",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0028_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0028_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T20:06:47.816718+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
+            },
+            "decided_at": "2026-08-30T22:35:38.109712+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_004478d161be47a5f8d9323bccfc8573 與 parked trace 共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -24256,8 +24629,8 @@
         "trace_next_trigger": "SENKO/US Conec 出現上市母體、被上市公司併購，或第三家 connector 供應商進入 CPO 供應鏈",
         "trace_origin_entity": "SENKO Advanced Components",
         "trace_origin_linkage": "供應商一手具名 NVIDIA Spectrum-X／Quantum-X 產品與供應角色；NVIDIA 公告另列同一生態系",
-        "trace_requeue_trigger": "related_triaged_lead:lead_1900dc8a3a9795331553496fc7b83dc4",
-        "trace_requeued_at": "2026-09-02T22:37:43.506915+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0029_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "original_obtained",
         "trace_trigger_entities": [
@@ -24271,7 +24644,7 @@
         "trace_trigger_watch_ref": "ew_0029_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "可拆卸光連接器層：Spectrum-X 用 detachable optical connector 支撐自動化量產；SENKO 具名於 NVIDIA PR 生態系（連接器商、未上市？）——connector 幾家能做、qualification 週期？",
       "triage": {
@@ -24282,10 +24655,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 產出之未知層研究題目"
         },
-        "decided_at": "2026-09-02T22:37:43.506915+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0029_2026-08-31 觸發：新 triage PASS lead lead_1900dc8a3a9795331553496fc7b83dc4 與等待中的追源共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0029_2026-08-31 已觸發（entity_filing_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_1900dc8a3a9795331553496fc7b83dc4）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -24306,6 +24679,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "NVIDIA PR（2025-03-18）具名 SENKO；blog 明寫 detachable optical connector 是 mass-manufacturing 關鍵。圖中無 connector 層節點。",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0029_2026-08-31 已觸發（entity_filing_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_1900dc8a3a9795331553496fc7b83dc4）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0029_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T07:59:24.021186+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 產出之未知層研究題目"
+            },
+            "decided_at": "2026-09-02T22:37:43.506915+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0029_2026-08-31 觸發：新 triage PASS lead lead_1900dc8a3a9795331553496fc7b83dc4 與等待中的追源共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -27700,20 +28093,20 @@
         "trace_next_trigger": "Anthropic、Lambda、Hut 8 或 NVIDIA 正式公告／filing 具名確認 350 億美元、350MW 與付款／租賃關係",
         "trace_origin_entity": "Wall Street Journal",
         "trace_origin_linkage": "Tom's Guide、DCD 等報導同源於 WSJ 匿名消息，不構成獨立印證",
-        "trace_requeue_trigger": "related_triaged_lead:lead_f13d5ec04d05bf49cd1a3e9424983e3f",
-        "trace_requeued_at": "2026-09-02T22:35:29.642537+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0067_2026-09-01",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "NVDA",
           "HUT"
         ],
-        "trace_trigger_event_ref": "lead:lead_f13d5ec04d05bf49cd1a3e9424983e3f",
+        "trace_trigger_event_ref": "lead:lead_66075f8a2712979c5c1403d078d5c37e",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0067_2026-09-01"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -27733,12 +28126,12 @@
           "payment_direction": "customer_to_supplier",
           "reason": "客戶鎖定算力供應方的承諾可新增或排除 neocloud 候選，會改變候選集合。"
         },
-        "decided_at": "2026-09-02T22:35:29.642537+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "Event Watch ew_0067_2026-09-01 觸發：新 triage PASS lead lead_f13d5ec04d05bf49cd1a3e9424983e3f 與等待中的追源共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0067_2026-09-01 已觸發（related_entity_signal；共用具名標的 HUT；觸發 lead lead_66075f8a2712979c5c1403d078d5c37e）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -27762,6 +28155,29 @@
               "novelty": true
             },
             "reason": "Anthropic、Lambda、NVIDIA 與 350 億美元 compute deal 均具名且可追；若官方文件成立，會新增 neocloud／colo 需求錨候選。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0067_2026-09-01 已觸發（related_entity_signal；共用具名標的 HUT；觸發 lead lead_66075f8a2712979c5c1403d078d5c37e）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0067_2026-09-01",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-01T22:36:13.076858+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "capital_commitment",
+              "decision_impact": "candidate_set",
+              "payment_direction": "customer_to_supplier",
+              "reason": "客戶鎖定算力供應方的承諾可新增或排除 neocloud 候選，會改變候選集合。"
+            },
+            "decided_at": "2026-09-02T22:35:29.642537+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0067_2026-09-01 觸發：新 triage PASS lead lead_f13d5ec04d05bf49cd1a3e9424983e3f 與等待中的追源共用具名標的 NVDA, co:nvidia；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -28497,8 +28913,8 @@
         "research_run": "session:2026-08-29-pq1-full-drain",
         "trace_attempts_ref": "僅逐一核對 Alphabet 一手指引；其餘三家合計數字未逐家回一手 filing",
         "trace_origin_entity": "Alphabet / Amazon / Meta / Microsoft",
-        "trace_requeue_trigger": "related_triaged_lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
-        "trace_requeued_at": "2026-08-19T22:33:19.248616+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0030_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -28508,10 +28924,11 @@
           "MSFT"
         ],
         "trace_trigger_event_ref": "lead:lead_018171ed92846e0a0f14f1c1a20e6c07",
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0030_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -28532,12 +28949,12 @@
           "decision_impact": "confidence_only",
           "reason": "四大雲廠 2026 capex 上修至 7,200–7,450 億美元：需求錨點已成立，不改候選或排序"
         },
-        "decided_at": "2026-08-19T22:33:19.248616+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "指定實體的 tier-1 一手來源 lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0030_2026-08-31 已觸發（entity_filing_signal；共用具名標的 META；觸發 lead lead_018171ed92846e0a0f14f1c1a20e6c07）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -28553,6 +28970,28 @@
               "novelty": true
             },
             "reason": "具名 hyperscaler 與 2026 capex 數字，能追查法說／guidance，可能影響 AI 上游半導體需求；社群彙整需逐家公司追原文。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0030_2026-08-31 已觸發（entity_filing_signal；共用具名標的 META；觸發 lead lead_018171ed92846e0a0f14f1c1a20e6c07）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0030_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "confidence_only",
+              "reason": "四大雲廠 2026 capex 上修至 7,200–7,450 億美元：需求錨點已成立，不改候選或排序"
+            },
+            "decided_at": "2026-08-19T22:33:19.248616+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "指定實體的 tier-1 一手來源 lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -30812,15 +31251,15 @@
         "research_run": "daily-brief-2026-09-05",
         "trace_attempts_ref": "Google Research Jupiter Evolving paper and Google author pages searched; MEMS OCS architecture is explicit, manufacturing foundry is not named",
         "trace_next_trigger": "Google paper patent supplier filing or teardown explicitly names the MEMS mirror-array foundry",
-        "trace_requeue_trigger": "related_triaged_lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
-        "trace_requeued_at": "2026-09-04T22:38:31.704822+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0068_2026-09-02",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_event_ref": "lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
         "trace_trigger_watch_ref": "ew_0068_2026-09-02"
       },
       "source": "decompose-palomar-ocs-2026-09-02",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "[decompose|Palomar OCS] MEMS 代工層——Google 自研 2D MEMS 鏡陣列由哪家 MEMS foundry 製造?136x136 duplex 已部署數萬台;tech:mems_mirror_array 有節點但零供應商",
       "triage": {
@@ -30831,10 +31270,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
         },
-        "decided_at": "2026-09-04T22:38:31.704822+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0068_2026-09-02 已觸發（fact_verification；共用具名標的 GOOGL, co:google；觸發 lead lead_75b6ff16300b8da2f360a3f118eca4b6）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 2
       },
       "triage_history": [
@@ -30855,6 +31294,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商",
+            "tier": 2
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0068_2026-09-02 已觸發（fact_verification；共用具名標的 GOOGL, co:google；觸發 lead lead_75b6ff16300b8da2f360a3f118eca4b6）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0068_2026-09-02",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T12:24:41.544428+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
+            },
+            "decided_at": "2026-09-04T22:38:31.704822+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
             "tier": 2
           }
         }
@@ -32845,16 +33304,20 @@
         "research_outcome": "一手只能支持需求與產品分類，不能支持社群貼文的 20% 缺口與 primary bottleneck 排名",
         "trace_attempts_ref": "2026-08-30：查找 Amkor Q2 2026 官方結果與 K&S 2026 官方結果／產品公告；確認 wirebond 仍屬 Amkor mainstream 產品、K&S 一般半導體與 memory 需求強，但未找到 2027 傳統封裝缺口超過 20% 或 wire bonding 為首要瓶頸的具名原文",
         "trace_next_trigger": "AMKR、KLIC、ASE 或 IC design 公司正式法說／filing 逐字揭露 2027 traditional packaging capacity deficit",
+        "trace_requeue_trigger": "event_watch:ew_0033_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
           "AMKR",
           "KLIC"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_7f7cc2f42ad124758ecc16b42fea1d53",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0033_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Missed this mention earlier but IC design insiders reveal that OSAT providers have already warned clients: \"traditional packaging capacity could face a deficit exceeding 20% by 2027\" (eg. $AMKR, ethereum:0x041ff0e49f6f774e7dc7bd10ee4a14c00b1d80b2, Powertech as potential beneficaries) With: \"wire bonding equipment\" emerging as the primary bottleneck (ASMPT, $KLIC) -> influx of AI server shipments has triggered a spike in demand for mature chips -> existing mature packaging capacity at OSATs is being rapidly absorbed -> securing early access to traditional packaging capacity is now becoming a challenge Cascading bottleneck patterns are occurring across memory (eg. DDR2, DDR3) and now packaging capacity I guess.",
       "triage": {
@@ -32865,14 +33328,38 @@
           "decision_impact": "candidate_set",
           "reason": "若傳統封裝缺口與 wire bonding 瓶頸獲一手支持，可能新增 OSAT 或設備候選；若無原文則不納入"
         },
-        "decided_at": "2026-08-29T22:37:35.661253+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "具名 2027 traditional packaging deficit 20%、wire bonding equipment bottleneck 與 AMKR、Powertech、ASMPT、KLIC 潛在受益者；可追 IC 設計或 OSAT 一手來源，答案可能擴張候選集合。",
+        "reason": "Event Watch ew_0033_2026-08-31 已觸發（related_entity_signal；共用具名標的 AMKR, KLIC；觸發 lead lead_7f7cc2f42ad124758ecc16b42fea1d53）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0033_2026-08-31 已觸發（related_entity_signal；共用具名標的 AMKR, KLIC；觸發 lead lead_7f7cc2f42ad124758ecc16b42fea1d53）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0033_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T22:37:35.661253+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "若傳統封裝缺口與 wire bonding 瓶頸獲一手支持，可能新增 OSAT 或設備候選；若無原文則不納入"
+            },
+            "decided_at": "2026-08-29T22:37:35.661253+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "具名 2027 traditional packaging deficit 20%、wire bonding equipment bottleneck 與 AMKR、Powertech、ASMPT、KLIC 潛在受益者；可追 IC 設計或 OSAT 一手來源，答案可能擴張候選集合。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2093712497949950242"
     },
     "lead_7ffb373885549dcbf1942919d192a9fb": {
@@ -33335,8 +33822,8 @@
           "IQE",
           "SNDK"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_b630ec6df13900d37d775a05601a1ab1",
-        "trace_requeued_at": "2026-08-29T00:08:55.758177+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0034_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -33347,11 +33834,12 @@
           "co:iqe",
           "co:sandisk"
         ],
-        "trace_trigger_event_ref": "lead:lead_b630ec6df13900d37d775a05601a1ab1",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_8088f665e358a7744d9b6bc1646bccbf",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0034_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -33371,13 +33859,13 @@
           "decision_impact": "ranking",
           "reason": "既有 Nomura InP ASP trace 因共用標的被喚醒；若 AXTI／IQE 漲價與供給約束獲原報告或客戶端文件支持，會改變候選排序。"
         },
-        "decided_at": "2026-08-29T00:08:55.758177+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_b630ec6df13900d37d775a05601a1ab1 與 parked trace 共用具名標的 co:sandisk（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0034_2026-08-31 已觸發（related_entity_signal；共用具名標的 co:iqe；觸發 lead lead_8088f665e358a7744d9b6bc1646bccbf）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -33498,6 +33986,30 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_12e45d3439ad1cdbc752dde904447629 與 parked trace 共用具名標的 SNDK（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0034_2026-08-31 已觸發（related_entity_signal；共用具名標的 co:iqe；觸發 lead lead_8088f665e358a7744d9b6bc1646bccbf）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0034_2026-08-31",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-28_active_classification_backfill.json",
+              "classified_at": "2026-08-27T22:38:38.894302+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "既有 Nomura InP ASP trace 因共用標的被喚醒；若 AXTI／IQE 漲價與供給約束獲原報告或客戶端文件支持，會改變候選排序。"
+            },
+            "decided_at": "2026-08-29T00:08:55.758177+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_b630ec6df13900d37d775a05601a1ab1 與 parked trace 共用具名標的 co:sandisk（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -35784,8 +36296,8 @@
           "CO:LUMENTUM",
           "LITE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_68bb437cf03c35a2406f3f29618fe53a",
-        "trace_requeued_at": "2026-08-27T22:37:17.723047+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0037_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -35795,11 +36307,12 @@
           "co:coreweave",
           "co:lumentum"
         ],
-        "trace_trigger_event_ref": "lead:lead_68bb437cf03c35a2406f3f29618fe53a",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_891dfebbd908d822ef6f4a55e1e465c0",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0037_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -35819,10 +36332,10 @@
           "decision_impact": "confidence_only",
           "reason": "既有 CRWV／SMCI／LITE earnings composite 因 LITE filing 喚醒；目前僅補 demand／財務信心，CoreWeave 精確數字仍待一手確認。"
         },
-        "decided_at": "2026-08-27T22:37:17.723047+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "指定實體的 tier-1 一手來源 lead_68bb437cf03c35a2406f3f29618fe53a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0037_2026-08-31 已觸發（related_entity_signal；共用具名標的 CRWV, SMCI, co:coreweave；觸發 lead lead_891dfebbd908d822ef6f4a55e1e465c0）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
       "triage_history": [
@@ -35854,6 +36367,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "新 triage PASS lead lead_093b321c79c6e73e6c2aa73e787c4ef0 與 parked trace 共用具名標的 LITE, co:lumentum（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0037_2026-08-31 已觸發（related_entity_signal；共用具名標的 CRWV, SMCI, co:coreweave；觸發 lead lead_891dfebbd908d822ef6f4a55e1e465c0）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0037_2026-08-31",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-28_active_classification_backfill.json",
+              "classified_at": "2026-08-27T22:38:38.894302+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "confidence_only",
+              "reason": "既有 CRWV／SMCI／LITE earnings composite 因 LITE filing 喚醒；目前僅補 demand／財務信心，CoreWeave 精確數字仍待一手確認。"
+            },
+            "decided_at": "2026-08-27T22:37:17.723047+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "指定實體的 tier-1 一手來源 lead_68bb437cf03c35a2406f3f29618fe53a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -36659,8 +37193,8 @@
         "trace_origin_entity": "GoPro",
         "trace_origin_linkage": "交易當事公司投資人關係公告",
         "trace_original_date": "2026-09-01",
-        "trace_requeue_trigger": "related_triaged_lead:lead_c6b2150d6ec2db0bf22b046dbe4ddb5d",
-        "trace_requeued_at": "2026-09-02T22:35:28.297507+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0065_2026-09-01",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "original_obtained",
         "trace_trigger_entities": [
@@ -36668,12 +37202,12 @@
           "GPRO",
           "co:applied_optoelectronics"
         ],
-        "trace_trigger_event_ref": "lead:lead_c6b2150d6ec2db0bf22b046dbe4ddb5d",
+        "trace_trigger_event_ref": "lead:lead_8dd4d56f7e99ca94983ea9de53b817be",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0065_2026-09-01"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "What... $GPRO is up 79.17% after planning to merge with a photonics company \"Starman Optical\" To build US 800G/1.6T optical transceivers for AI data centers. GoPro trying to compete with $AAOI was definitely not on my radar. https://t.co/5z2XXHaxvs",
       "triage": {
@@ -36684,12 +37218,12 @@
           "decision_impact": "candidate_set",
           "reason": "合併若成立會新增一個可投資光通訊候選，會改變候選集合。"
         },
-        "decided_at": "2026-09-02T22:35:28.297507+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "Event Watch ew_0065_2026-09-01 觸發：新 triage PASS lead lead_c6b2150d6ec2db0bf22b046dbe4ddb5d 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0065_2026-09-01 已觸發（related_entity_signal；共用具名標的 GPRO；觸發 lead lead_8dd4d56f7e99ca94983ea9de53b817be）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -36712,6 +37246,28 @@
               "novelty": true
             },
             "reason": "GoPro、Starman Optical、800G／1.6T transceiver 與合併動作均具名可追；若正式交易文件成立，會新增 optical transceiver 候選。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0065_2026-09-01 已觸發（related_entity_signal；共用具名標的 GPRO；觸發 lead lead_8dd4d56f7e99ca94983ea9de53b817be）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0065_2026-09-01",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-01T22:36:17.946500+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "合併若成立會新增一個可投資光通訊候選，會改變候選集合。"
+            },
+            "decided_at": "2026-09-02T22:35:28.297507+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0065_2026-09-01 觸發：新 triage PASS lead lead_c6b2150d6ec2db0bf22b046dbe4ddb5d 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -41234,15 +41790,19 @@
         "trace_next_trigger": "NVIDIA IR、SEC filing 或公開 conference transcript 明列 unconstrained growth 與 inference／training mix",
         "trace_origin_entity": "NVIDIA",
         "trace_origin_linkage": "NVIDIA SEC CFO commentary 可核當季財務與 commitments；未包含 JPMorgan 私下對話",
+        "trace_requeue_trigger": "event_watch:ew_0071_2026-09-02",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
-        ]
+        ],
+        "trace_trigger_event_ref": "lead:lead_1900dc8a3a9795331553496fc7b83dc4",
+        "trace_trigger_watch_ref": "ew_0071_2026-09-02"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -41261,12 +41821,34 @@
           "decision_impact": "confidence_only",
           "reason": "查證補 NVIDIA 需求與供應限制信心，不直接改變瓶頸候選集合。"
         },
-        "decided_at": "2026-09-02T22:36:01.700223+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "含 NVIDIA 對 JP Morgan 的營收增長與 inference mix 具體數字，可追回 NVIDIA IR 或會議原文。",
+        "reason": "Event Watch ew_0071_2026-09-02 已觸發（related_entity_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_1900dc8a3a9795331553496fc7b83dc4）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0071_2026-09-02 已觸發（related_entity_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_1900dc8a3a9795331553496fc7b83dc4）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0071_2026-09-02",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T22:36:01.700223+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "confidence_only",
+              "reason": "查證補 NVIDIA 需求與供應限制信心，不直接改變瓶頸候選集合。"
+            },
+            "decided_at": "2026-09-02T22:36:01.700223+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "含 NVIDIA 對 JP Morgan 的營收增長與 inference mix 具體數字，可追回 NVIDIA IR 或會議原文。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2095153855818547571"
     },
     "lead_a7655e310d5e73cb919a0cdbd5f5e84d": {
@@ -41392,6 +41974,8 @@
         "research_outcome": "isolated_tier3_market_forecast_no_primary_note",
         "trace_attempts_ref": "WebSearch：Goldman Sachs public research、NVIDIA Rubin Ultra official disclosure、issuer IR；未取得可逐字核對的 canonical note",
         "trace_next_trigger": "Goldman Sachs 公開報告／研究摘要釋出，或 NVIDIA／光模組供應商正式文件給出 Rubin Ultra 每 GPU 光模組數與 2027–2028 市場規模",
+        "trace_requeue_trigger": "event_watch:ew_0079_2026-09-08",
+        "trace_requeued_at": "2026-09-09T01:13:33.501862+00:00",
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
@@ -41400,10 +41984,12 @@
           "COHR",
           "SOI"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_15a813e6531ffe790f9e1bca78aa342a",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0079_2026-09-08"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -41422,15 +42008,40 @@
           "decision_impact": "ranking",
           "reason": "答案回來會改變排序"
         },
-        "decided_at": "2026-09-08T22:37:45.669443+00:00",
+        "decided_at": "2026-09-09T01:13:33.501862+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true,
           "novelty": true
         },
-        "reason": "Goldman 光模組市場與 Rubin Ultra 光學含量預測含具體年度、金額、模組數與 silicon photonics 滲透率；雖是二手轉述，追回原 note 可改變 CPO 供應鏈排序判斷。",
+        "reason": "Event Watch ew_0079_2026-09-08 已觸發（related_entity_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_15a813e6531ffe790f9e1bca78aa342a）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T01:13:33.501862+00:00",
+          "superseded_reason": "Event Watch ew_0079_2026-09-08 已觸發（related_entity_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_15a813e6531ffe790f9e1bca78aa342a）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0079_2026-09-08",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-08T22:37:45.669443+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "ranking",
+              "reason": "答案回來會改變排序"
+            },
+            "decided_at": "2026-09-08T22:37:45.669443+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true,
+              "novelty": true
+            },
+            "reason": "Goldman 光模組市場與 Rubin Ultra 光學含量預測含具體年度、金額、模組數與 silicon photonics 滲透率；雖是二手轉述，追回原 note 可改變 CPO 供應鏈排序判斷。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2097365614402969638"
     },
     "lead_a7bde7bc0f16b8d05ace967989d47a57": {
@@ -43114,8 +43725,8 @@
           "CO:META",
           "META"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_3a4468d30e6a22eb826a8c8157682b64",
-        "trace_requeued_at": "2026-08-24T22:36:52.348479+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0045_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -43124,11 +43735,12 @@
           "META",
           "co:meta"
         ],
-        "trace_trigger_event_ref": "lead:lead_3a4468d30e6a22eb826a8c8157682b64",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_afa72193be496499ef950552d9146c38",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0045_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -43140,13 +43752,13 @@
       },
       "title": "Just some of the more interesting news I came across recently: 1. MS: Revised China humanoid shipments to reach 50,000 in 2026 from 14,000u and 28,000u earlier this year. 2. MS: Probe cards and test sockets likely to be priced hike (precious metal hikes + severe shortage of test pin capacity) 3. Capacitor price hikes: MLCC, aluminum electrolytic, tantalum, polymer aluminum, film, and super capacitors from Yageo. 4. $META Vistara architecture: Older DDR4 Memory with CXL as memory expansion 5. OpenAI achieved inference optimization breakthrough that halves costs and reduces GPU requirements. 6. LTAs are being signed with MLCC after Samsung signed LTA with US big tech customer 7. Grid power bottlenecks triggered 5x increase ($25B) in Brookfield's financing for $BE fuel cells. 8. Taiwan's chip packaging and testing supply chain includes major OSAT providers such as $ASX, Powertech, Winstek Semiconductor, Chipbond, ChipMOS, and ShunSin. Dedicated testing companies include KYEC, Ardentec, and Sigurd Microelectronics, while testing interface suppliers include WinWay, MPI, Keystone Microtech, Chunghwa Precision, and Hermes Testing Solutions. Leadframe makers include Jih Lin Tech, SDI, and CWTC, while major IC substrate suppliers include Unimicron, Kinsus, Nan Ya PCB, and Zhen Ding Tech. (Digitimes) - Taiwan-based OSAT providers are raising prices - Memory and IC packaging and testing capacity have both become bottlenecks in the semiconductor supply chain",
       "triage": {
-        "decided_at": "2026-08-24T22:36:52.348479+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_3a4468d30e6a22eb826a8c8157682b64 與 parked trace 共用具名標的 BE（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0045_2026-08-31 已觸發（related_entity_signal；共用具名標的 ASX；觸發 lead lead_afa72193be496499ef950552d9146c38）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -43211,6 +43823,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0045_2026-08-31 已觸發（related_entity_signal；共用具名標的 ASX；觸發 lead lead_afa72193be496499ef950552d9146c38）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0045_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-24T22:36:52.348479+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_3a4468d30e6a22eb826a8c8157682b64 與 parked trace 共用具名標的 BE（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -43609,6 +44237,8 @@
         "outcome": "倉位/情緒類(L4 市場認知,不進圖):Situational Awareness Q2 13F 記憶體重倉(SNDK/MU 前二,合計逾 11B 級)+BE/TSM/NBIS/CRWV;貼文金額本輪未對上 EDGAR(fund 實體名搜尋未命中),數字視為未驗證轉述;對 SNDK/MU 的擁擠度脈絡已記錄",
         "parked_reason": "sentiment/positioning,無 graph delta;需要時 13F-HR 是可驗證一手",
         "trace_next_trigger": "SNDK/MU 相關 decision 需要擁擠度證據時,以 EDGAR 13F-HR 原檔核對",
+        "trace_requeue_trigger": "event_watch:ew_0072_2026-09-03",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "APLD",
@@ -43637,10 +44267,12 @@
           "co:sandisk",
           "co:tsmc"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_19075d8c72a6e63c865ac7892028a08b",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0072_2026-09-03"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th: 1. $SNDK - $5.674B 2. $MU - $5.574B 3. $BE - $1.899B 4. $TSM - $1.265B 5. $NBIS - $1.232B 6. $CRWV - $744.5M 7. $CORZ - $665.6M 8. $STM - $584.3M (new) 9. $APLD - $469.0M 10. $RIOT - $468.2M 11. $SHAZ - $456.8M 12. $IREN - $433.3M Less material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. Seems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030. As well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. Some of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes). With core winners of everything such as $TSM (but less high-beta). This looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap). But always cool to see what others are doing.",
       "triage": {
@@ -43651,12 +44283,34 @@
           "decision_impact": "confidence_only",
           "reason": "查證只補市場資金定位信心，不改變候選集合或瓶頸排序。"
         },
-        "decided_at": "2026-09-02T22:35:26.960266+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "具名列出 Situational Awareness 最新 13F 持倉與金額，可追至官方 13F；與記憶體與 AI 基建主題相關。",
+        "reason": "Event Watch ew_0072_2026-09-03 已觸發（related_entity_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_19075d8c72a6e63c865ac7892028a08b）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0072_2026-09-03 已觸發（related_entity_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_19075d8c72a6e63c865ac7892028a08b）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0072_2026-09-03",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T22:35:26.960266+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "sentiment",
+              "decision_impact": "confidence_only",
+              "reason": "查證只補市場資金定位信心，不改變候選集合或瓶頸排序。"
+            },
+            "decided_at": "2026-09-02T22:35:26.960266+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "具名列出 Situational Awareness 最新 13F 持倉與金額，可追至官方 13F；與記憶體與 AI 基建主題相關。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2095087925822190023"
     },
     "lead_b17774619e11d4e923796f2710a55e58": {
@@ -47205,16 +47859,20 @@
         "research_outcome": "保留為高價值 demand lead；未取得原文前不得進圖。",
         "trace_attempts_ref": "NVIDIA 2026-08-26 8-K／10-Q、官方 IR event page；站內搜尋未取得 70%／2T／800B／1.3T 原句",
         "trace_next_trigger": "NVIDIA 官方 Q2 FY27 transcript／CFO commentary公開可逐字核對 70% FY28 與供應受限原句",
+        "trace_requeue_trigger": "event_watch:ew_0048_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
         ],
-        "trace_trigger_kind": "primary_source_signal"
+        "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
+        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_watch_ref": "ew_0048_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -47226,14 +47884,31 @@
       },
       "title": "$NVDA: \"We expect to grow revenue by approximately 70% in fiscal 2028. This is a supply constrained outlook\" That statement alone is probably more important than the entire earnings beat just now? Insane upward revision beat from +43.9% expected to 70%. \"With cloud industry backlog now greater than 2 trillion, CapEx by the top five hyperscalers is expected to reach nearly $800 Billion in 2026 and 1.3 Trillion in 2027\" $1.3 Trillion in 2027. (MS was around $1.2T June, so this is upward projection revisions) Yeah the high-beta parts of the supply chain growth is going to like this.",
       "triage": {
-        "decided_at": "2026-08-26T22:37:02.308119+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "NVDA FY2028 70% 成長與 cloud backlog／capex 具明確數字及管理層 quote，可追 earnings call／filing；屬 financial_fact、decision_impact=candidate_set。",
+        "reason": "Event Watch ew_0048_2026-08-31 已觸發（entity_filing_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_53e31d26909b973cac66af50394abd98）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0048_2026-08-31 已觸發（entity_filing_signal；共用具名標的 NVDA, co:nvidia；觸發 lead lead_53e31d26909b973cac66af50394abd98）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0048_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-26T22:37:02.308119+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "NVDA FY2028 70% 成長與 cloud backlog／capex 具明確數字及管理層 quote，可追 earnings call／filing；屬 financial_fact、decision_impact=candidate_set。",
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2092723047107355133"
     },
     "lead_c27e417db9b04ea06a227bedfb773c88": {
@@ -48398,8 +49073,8 @@
           "MTSI",
           "SIVE"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
-        "trace_requeued_at": "2026-08-29T22:37:30.869492+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0049_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
@@ -48417,11 +49092,12 @@
           "co:macom",
           "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_4fc2da14b0d039e4d27e517c136de5e9",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_c7498202abd0bdcd20c035dc615bcec2",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0049_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -48452,12 +49128,12 @@
           "decision_impact": "ranking",
           "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
         },
-        "decided_at": "2026-08-29T22:37:30.869492+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AVGO, COHR, co:broadcom, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0049_2026-08-31 已觸發（related_entity_signal；共用具名標的 SMTC；觸發 lead lead_c7498202abd0bdcd20c035dc615bcec2）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -48532,6 +49208,28 @@
               "novelty": true
             },
             "reason": "指定實體的 tier-1 一手來源 lead_68bb437cf03c35a2406f3f29618fe53a 與 parked trace 共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0049_2026-08-31 已觸發（related_entity_signal；共用具名標的 SMTC；觸發 lead lead_c7498202abd0bdcd20c035dc615bcec2）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0049_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "LITE／AAOI 法說指 CW DFB 雷射供需失衡與中國落後：強化既有 chokepoint 排序"
+            },
+            "decided_at": "2026-08-29T22:37:30.869492+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "新 triage PASS lead lead_4fc2da14b0d039e4d27e517c136de5e9 與 parked trace 共用具名標的 AVGO, COHR, co:broadcom, co:coherent（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -54997,6 +55695,8 @@
         "research_run": "daily-brief-2026-09-08",
         "trace_attempts_ref": "WebFetch https://www.bloomberg.com/news/articles/2026-09-07/iqe-ceo-warns-of-emerging-china-supply-risk-for-chip-industry → 403；WebSearch iqep.com／investegate → H1 2026 Interim Results RNS（2026-09-07）逐句掃 indium phosphide／substrate，無風險句；二手 cryptobriefing／moomoo 轉述不可引",
         "trace_next_trigger": "IQE H1 2026 法說逐字稿或 Bloomberg 原文經可讀管道（BNN／Yahoo 轉載）出現 substrate access 句",
+        "trace_requeue_trigger": "event_watch:ew_0078_2026-09-08",
+        "trace_requeued_at": "2026-09-09T01:13:33.501862+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -55005,10 +55705,12 @@
           "co:axt",
           "co:iqe"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_2061d895e6e162c47132019a07869d92",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0078_2026-09-08"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "New report from Bloomberg on $IQE: “indium phosphide substrates is emerging as a key risk for the semiconductor industry.” I wonder who could have guessed this last year with $AXTI? https://t.co/ETW7Y2Pz7z https://t.co/xuSezBWFWO",
       "triage": {
@@ -55019,14 +55721,38 @@
           "decision_impact": "ranking",
           "reason": "第三方印證可把 self_reported 升為 externally_corroborated，改可行動排序"
         },
-        "decided_at": "2026-09-08T05:14:00.765546+00:00",
+        "decided_at": "2026-09-09T01:13:33.501862+00:00",
         "decision": "go",
         "priority_flags": {
           "independent_source": true
         },
-        "reason": "Bloomberg 報導 InP 基板成為半導體業關鍵風險：第三方對 mat:inp_substrate 瓶頸的獨立印證，可升 AXTI／IQE 相關邊的 evidence",
+        "reason": "Event Watch ew_0078_2026-09-08 已觸發（related_entity_signal；共用具名標的 AXTI, IQE, co:axt, co:iqe；觸發 lead lead_2061d895e6e162c47132019a07869d92）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 2
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T01:13:33.501862+00:00",
+          "superseded_reason": "Event Watch ew_0078_2026-09-08 已觸發（related_entity_signal；共用具名標的 AXTI, IQE, co:axt, co:iqe；觸發 lead lead_2061d895e6e162c47132019a07869d92）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0078_2026-09-08",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-08T05:14:00.765546+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "第三方印證可把 self_reported 升為 externally_corroborated，改可行動排序"
+            },
+            "decided_at": "2026-09-08T05:14:00.765546+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "independent_source": true
+            },
+            "reason": "Bloomberg 報導 InP 基板成為半導體業關鍵風險：第三方對 mat:inp_substrate 瓶頸的獨立印證，可升 AXTI／IQE 相關邊的 evidence",
+            "tier": 2
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2096904209371427277"
     },
     "lead_e590eca752d976cef58be766a5b17d62": {
@@ -55833,15 +56559,19 @@
         "research_run": "user_go_2026-08-24_round2",
         "trace_attempts_ref": "asteralabs.com/products/leo-cxl-smart-memory-controllers/",
         "trace_next_trigger": "ALAB 10-K/10-Q 客戶集中度揭露，或 hyperscaler／OEM 客戶端文件點名 Leo 採用",
+        "trace_requeue_trigger": "event_watch:ew_0052_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "ALAB"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_e84068655e3db45b0a81a9b5a1a0d546",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0052_2026-08-31"
       },
       "source": "official:astera_labs",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "$ALAB Leo CXL smart memory controllers for AI memory expansion and pooling; verify customer adoption and competing suppliers",
       "triage": {
@@ -55852,14 +56582,38 @@
           "decision_impact": "candidate_set",
           "reason": "Tracing production adoption and competing CXL memory-tiering suppliers can add or remove candidates in an uncovered layer."
         },
-        "decided_at": "2026-08-24T07:01:43.004902+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "User-approved CXL memory-tiering candidate-set research. Official product page has concrete controller, memory expansion/pooling, and production-qualification claims; customer adoption remains to trace. PASS authorizes pq1 only.",
+        "reason": "Event Watch ew_0052_2026-08-31 已觸發（related_entity_signal；共用具名標的 ALAB；觸發 lead lead_e84068655e3db45b0a81a9b5a1a0d546）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0052_2026-08-31 已觸發（related_entity_signal；共用具名標的 ALAB；觸發 lead lead_e84068655e3db45b0a81a9b5a1a0d546）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0052_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-24T07:02:14.025392+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "Tracing production adoption and competing CXL memory-tiering suppliers can add or remove candidates in an uncovered layer."
+            },
+            "decided_at": "2026-08-24T07:01:43.004902+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "User-approved CXL memory-tiering candidate-set research. Official product page has concrete controller, memory expansion/pooling, and production-qualification claims; customer adoption remains to trace. PASS authorizes pq1 only.",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://www.asteralabs.com/products/leo-cxl-smart-memory-controllers/"
     },
     "lead_e87032df984f0fa40a6bd12a7130b39a": {
@@ -55919,8 +56673,8 @@
           "IREN",
           "META"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_1a75aa118ad109781c02fcd497236dda",
-        "trace_requeued_at": "2026-08-24T22:36:50.439001+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0053_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -55932,21 +56686,22 @@
           "co:meta",
           "co:nebius"
         ],
-        "trace_trigger_event_ref": "lead:lead_1a75aa118ad109781c02fcd497236dda",
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_2d6a14cf1d209934f5139ed7ed78c3e4",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0053_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
-        "decided_at": "2026-08-24T22:36:50.439001+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true,
           "user_requested": true
         },
-        "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 IREN, co:iren（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0053_2026-08-31 已觸發（related_entity_signal；共用具名標的 NBIS, co:nebius；觸發 lead lead_2d6a14cf1d209934f5139ed7ed78c3e4）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
       "triage_history": [
@@ -56027,6 +56782,22 @@
               "user_requested": true
             },
             "reason": "新 triage PASS lead lead_018171ed92846e0a0f14f1c1a20e6c07 與 parked trace 共用具名標的 META, co:meta（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0053_2026-08-31 已觸發（related_entity_signal；共用具名標的 NBIS, co:nebius；觸發 lead lead_2d6a14cf1d209934f5139ed7ed78c3e4）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0053_2026-08-31",
+          "triage": {
+            "decided_at": "2026-08-24T22:36:50.439001+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true,
+              "user_requested": true
+            },
+            "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 IREN, co:iren（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -56725,8 +57496,8 @@
         "trace_next_trigger": "Broadcom、TSMC、ASE 或 SPIL 一手文件具名 Davisson assembly／test 分工",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "Broadcom CPO 官方頁只列生態系標誌；NVIDIA 公告雖列 SPIL，未綁定 Davisson",
-        "trace_requeue_trigger": "related_triaged_lead:lead_ea2fd285d490a695264e1452765ecc28",
-        "trace_requeued_at": "2026-09-02T22:37:09.245708+00:00",
+        "trace_requeue_trigger": "event_watch:ew_0054_2026-08-31",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "awaiting_named_disclosure",
         "trace_trigger_entities": [
@@ -56739,7 +57510,7 @@
         "trace_trigger_watch_ref": "ew_0054_2026-08-31"
       },
       "source": "decompose:avgo-davisson-2026-08-30",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -56758,10 +57529,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 未知層"
         },
-        "decided_at": "2026-09-02T22:37:09.245708+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0054_2026-08-31 觸發：新 triage PASS lead lead_ea2fd285d490a695264e1452765ecc28 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0054_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 1
       },
       "triage_history": [
@@ -56782,6 +57553,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Davisson decompose 衍生；一手 PR 錨定、缺口具體",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0054_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0054_2026-08-31",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-30T07:21:57.668136+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 未知層"
+            },
+            "decided_at": "2026-09-02T22:37:09.245708+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0054_2026-08-31 觸發：新 triage PASS lead lead_ea2fd285d490a695264e1452765ecc28 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -57786,14 +58577,18 @@
         "trace_next_trigger": "Broadcom 發布 Q3 FY2026 conference-call transcript 或 filing 明列 FY27／FY28 AI revenue guidance",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "官方財報新聞稿與官方 conference-call replay",
+        "trace_requeue_trigger": "event_watch:ew_0070_2026-09-02",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "AVGO"
-        ]
+        ],
+        "trace_trigger_event_ref": "lead:lead_ea2fd285d490a695264e1452765ecc28",
+        "trace_trigger_watch_ref": "ew_0070_2026-09-02"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -57813,15 +58608,37 @@
           "decision_impact": "confidence_only",
           "reason": "查證補財務與需求信心，但不直接改變既有候選集合或結構排序。"
         },
-        "decided_at": "2026-09-02T22:35:29.642537+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "含 Broadcom FY27/FY28 指引、EPS 與 AI networking 成長逐字引述，可追回官方 earnings call。",
-        "related_trace_requeues": [
-          "lead_66075f8a2712979c5c1403d078d5c37e"
-        ],
+        "reason": "Event Watch ew_0070_2026-09-02 已觸發（related_entity_signal；共用具名標的 AVGO；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0070_2026-09-02 已觸發（related_entity_signal；共用具名標的 AVGO；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0070_2026-09-02",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T22:35:29.642537+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "confidence_only",
+              "reason": "查證補財務與需求信心，但不直接改變既有候選集合或結構排序。"
+            },
+            "decided_at": "2026-09-02T22:35:29.642537+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "含 Broadcom FY27/FY28 指引、EPS 與 AI networking 成長逐字引述，可追回官方 earnings call。",
+            "related_trace_requeues": [
+              "lead_66075f8a2712979c5c1403d078d5c37e"
+            ],
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2095261816767283663"
     },
     "lead_f14b0508299201ea095bacf1ed3a083d": {
@@ -60187,6 +61004,8 @@
         "research_run": "daily-brief-2026-09-05",
         "trace_attempts_ref": "METI 2026 press briefings plus Lynas Proterial Shin-Etsu official-site search; official sources confirm export-control stress but not this posts June zero-flow and latest halt quantities",
         "trace_next_trigger": "Lynas quarterly report or Japanese customs METI disclosure names Dy Tb volumes, or Proterial Shin-Etsu directly discloses license or order interruption",
+        "trace_requeue_trigger": "event_watch:ew_0073_2026-09-04",
+        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -60197,10 +61016,12 @@
           "co:lumentum",
           "co:lynas"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_a9a12c2b8ad54e92dce8dc3afac2ecee",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0073_2026-09-04"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -60220,15 +61041,37 @@
           "decision_impact": "candidate_set",
           "reason": "出口中斷與替代供應來源查證可能改變稀土／InP 候選集合。"
         },
-        "decided_at": "2026-09-04T22:38:33.530738+00:00",
+        "decided_at": "2026-09-09T00:59:16.088432+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "具名中國稀土出口、Shin-Etsu、Proterial、Lynas、AXTI、LITE 與多個材料／數字，可逐 atom 追 Reuters 與公司一手；若成立會改變稀土與 InP 候選集合。",
-        "related_trace_requeues": [
-          "lead_3238fc77ac974944b52a2916205b98a6"
-        ],
+        "reason": "Event Watch ew_0073_2026-09-04 已觸發（related_entity_signal；共用具名標的 LITE, co:lumentum；觸發 lead lead_a9a12c2b8ad54e92dce8dc3afac2ecee）；由 consume-fired 排回 pq1 做 bounded 重查",
         "tier": 4
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-09T00:59:16.088432+00:00",
+          "superseded_reason": "Event Watch ew_0073_2026-09-04 已觸發（related_entity_signal；共用具名標的 LITE, co:lumentum；觸發 lead lead_a9a12c2b8ad54e92dce8dc3afac2ecee）；由 consume-fired 排回 pq1 做 bounded 重查",
+          "trace_trigger": "event_watch:ew_0073_2026-09-04",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-04T22:38:33.530738+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "出口中斷與替代供應來源查證可能改變稀土／InP 候選集合。"
+            },
+            "decided_at": "2026-09-04T22:38:33.530738+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "具名中國稀土出口、Shin-Etsu、Proterial、Lynas、AXTI、LITE 與多個材料／數字，可逐 atom 追 Reuters 與公司一手；若成立會改變稀土與 InP 候選集合。",
+            "related_trace_requeues": [
+              "lead_3238fc77ac974944b52a2916205b98a6"
+            ],
+            "tier": 4
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2095802636876619928"
     },
     "lead_fcbf2bd4a87932e4d67c12f0c188c3ac": {

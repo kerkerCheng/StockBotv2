@@ -25,7 +25,7 @@ from audit.sources import SourceUnavailable
 def test_every_check_names_an_invariant_and_an_owner() -> None:
     """沒有 owner 的檢查＝沒有人會實作它（L13 的「管子只接一頭」）。"""
     checks = audit.all_checks()
-    assert len(checks) == 12
+    assert len(checks) == 13
     for check in checks:
         assert check.invariant.startswith("INV-"), check.name
         assert check.owner_phase.startswith("Phase "), check.name
@@ -54,7 +54,7 @@ def test_unimplemented_checks_report_not_implemented_not_pass() -> None:
 
 
 def test_every_registered_check_is_actually_implemented() -> None:
-    """12/12 都有 `run`。**這條擋的是「悄悄把一個實作不出來的 check 改回 `run=None`」**
+    """13/13 都有 `run`。**這條擋的是「悄悄把一個實作不出來的 check 改回 `run=None`」**
     ——那會讓報表變綠，而變綠的原因是檢查被拿掉了。
 
     歷史：`PointInTime` 於 Phase 6（2026-09-04）實作、`GateDiscrimination` 於

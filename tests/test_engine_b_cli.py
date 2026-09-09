@@ -443,3 +443,66 @@ def test_default_priority_list_fails_closed_when_holdings_are_unavailable(
         "--leads", str(path), "list", "--by-priority",
     ]) == 2
     assert "pq1 priority context 無法讀取" in capsys.readouterr().err
+
+
+def test_consume_fired_cli_requeues_and_persists_both_stores(tmp_path, capsys) -> None:
+    """段 1 的 consumer 是一條命令：讀 leads＋registry，寫回兩邊，印 receipt。"""
+    from engine_b import event_watch as ew
+
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    parked_id, _ = leads.register(store, source="x:old", url="https://x.com/old/status/7",
+                                  title="Waiting for $AXTI primary source")
+    leads.triage(store, parked_id, go=True, tier=4, reason="需要追原文",
+                 decided_at="2026-08-01T00:00:00+00:00")
+    leads.advance(store, parked_id, "parked", ref={
+        "parked_reason": "目前只有 tier 3 轉述",
+        "trace_status": "isolated_tier_3",
+        "trace_next_trigger": "下一份一手文件",
+        "trace_requires_user": "false",
+    })
+    leads.save(store, path)
+    data = ew.load_watches()
+    watch = next(w for w in data["watches"] if w.get("wake_lead") == parked_id)
+    watch["status"] = "fired"
+    watch["woken_by"] = {"kind": "related_entity_signal", "lead_id": "lead_event",
+                         "shared_entities": ["AXTI"], "at": "2026-09-08T00:00:00+00:00"}
+    ew.save_watches(data)
+
+    assert cli.main(["--leads", str(path), "consume-fired", "--dry-run"]) == 0
+    dry = json.loads(capsys.readouterr().out)
+    assert dry["dry_run"] is True and dry["requeued"] == [parked_id]
+    assert leads.load(path)["leads"][parked_id]["status"] == "parked"   # dry-run 不寫
+
+    assert cli.main(["--leads", str(path), "consume-fired"]) == 0
+    receipt = json.loads(capsys.readouterr().out)
+    assert receipt["requeued"] == [parked_id]
+    assert leads.load(path)["leads"][parked_id]["status"] == "triaged_go"
+    assert ew.load_watches()["watches"][0]["status"] == "active"
+
+
+def test_drain_prints_segment_counters_and_lists_fired_hypothesis_checks(tmp_path, capsys) -> None:
+    from engine_b import event_watch as ew
+
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    leads.register(store, source="x:new", url="https://x.io/pending")   # pending → 段 0
+    leads.save(store, path)
+    ew.save_watches({"schema_version": 1, "watches": [
+        {"watch_id": "ew_h", "status": "fired", "kind": "fact_verification",
+         "hypothesis_ref": "hyp_1", "fact": "TSMC 3Q26 COUPE 出貨量", "entities": ["TSM"],
+         "expires": "2027-01-01", "woken_by": {}},
+        {"watch_id": "ew_l", "status": "fired", "kind": "related_entity_signal",
+         "wake_lead": "lead_x", "entities": ["X"], "expires": "2027-01-01", "woken_by": {}},
+    ]})
+
+    assert cli.main(["--leads", str(path), "drain", "--decision-work-orders", "skip"]) == 0
+    out = capsys.readouterr().out
+    assert "段0 pending 分流 1" in out
+    assert "lead 型 1" in out and "假設對照 1" in out
+    assert "ew_h" in out and "COUPE" in out
+
+    assert cli.main(["--leads", str(path), "drain", "--decision-work-orders", "skip", "--json"]) == 0
+    rows = json.loads(capsys.readouterr().out)
+    fired_rows = [r for r in rows if r["kind"] == "fired_watch_pending"]
+    assert {r["target"] for r in fired_rows} == {"lead", "hypothesis"}

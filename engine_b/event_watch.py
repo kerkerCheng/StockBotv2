@@ -277,8 +277,28 @@ def check_watches(
             targets = set(watch.get("entities") or ())
             created = str(watch.get("created_at") or "")
             consumed = set(watch.get("consumed_entities") or ())
+            consumed_leads = set(watch.get("consumed_leads") or ())
+            from engine_b.entities import lead_entities
+
+            # 先把**這一刻**所有會命中的 lead 收齊，再決定叫醒一次。
+            # 叫醒只用第一則（woken_by），但全部命中的 lead 都進 consumed_leads：
+            # 它們對這個 watch 而言都是「已經發生」的事件，被 consumer 回 active 之後
+            # 不該再被其中任何一則逐輪叫醒。2026-09-09 實測：NVDA／TSM 的 entity_filing
+            # watch 各有數十則歷史 Form 4 命中，逐則消化要跑數十輪 sync 才會收斂。
+            matches: list[tuple[str, list[str]]] = []
             for lead_id, lead in leads.items():
                 if (lead.get("triage") or {}).get("decision") != "go":
+                    continue
+                # 同一則 lead 只能把同一個 watch 叫醒一次。fired watch 被 consumer 回 active
+                # 之後（2026-09-09 起 lead 型會這樣做），沒有這條它會被同一則 lead 每輪再叫醒
+                # 一次——對 PRIMARY_ONLY kind 尤其如此，因為那類刻意不用 entity 消化標記
+                # （下一季的 10-Q 是新事件，但**同一份** 10-Q 不是）。
+                if lead_id in consumed_leads:
+                    continue
+                # 追源重排不是事件：requeue_trace 會把 triage receipt 整包重寫成今天，
+                # 於是這則舊 lead 看起來像剛 PASS 的新 lead。2026-09-09 實測：35 筆重排後
+                # 下一次 sync 又叫醒 21 個 watch，其中 7 個的觸發者就是重排回來的同一批。
+                if _is_trace_requeue(lead):
                     continue
                 # `related_entity_signal` 等的是「同一標的有任何新動靜」，不限一手；
                 # 其餘 kind 等的是正式文件，不該被任何一則提及觸發。
@@ -286,8 +306,6 @@ def check_watches(
                     continue
                 if _lead_stamp(lead) <= created:
                     continue
-                from engine_b.entities import lead_entities
-
                 shared = sorted(targets & lead_entities(lead))
                 if not shared:
                     continue
@@ -299,30 +317,45 @@ def check_watches(
                     if not novel:
                         continue
                     shared = novel
-                watch["status"] = "fired"
-                woken: dict[str, Any] = {
-                    "kind": kind,
-                    "lead_id": lead_id,
-                    "shared_entities": shared,
-                    "at": _now(),
-                }
-                # fact_verification 喚醒必帶對照欄位——醒來的人（agent）要直接
-                # 拿 fact 去對觸發 lead 的一手數字，不必回頭翻 watch（L16：
-                # 分類跟著資料走到消費端）。
-                if kind == "fact_verification":
-                    woken["fact"] = watch.get("fact")
-                    woken["fact_check_ref"] = watch.get("fact_check_ref")
-                if watch.get("hypothesis_ref"):
-                    woken["hypothesis_ref"] = watch["hypothesis_ref"]
-                if watch.get("wake_lead"):
-                    woken["wake_lead"] = watch["wake_lead"]
-                    watch["consumed_entities"] = sorted(
-                        consumed | {s.strip().upper() for s in shared}
-                    )
-                watch["woken_by"] = woken
-                fired.append(dict(watch))
-                break
+                matches.append((lead_id, shared))
+            if not matches:
+                continue
+            lead_id, shared = matches[0]
+            watch["status"] = "fired"
+            woken: dict[str, Any] = {
+                "kind": kind,
+                "lead_id": lead_id,
+                "shared_entities": shared,
+                "at": _now(),
+            }
+            # fact_verification 喚醒必帶對照欄位——醒來的人（agent）要直接
+            # 拿 fact 去對觸發 lead 的一手數字，不必回頭翻 watch（L16：
+            # 分類跟著資料走到消費端）。
+            if kind == "fact_verification":
+                woken["fact"] = watch.get("fact")
+                woken["fact_check_ref"] = watch.get("fact_check_ref")
+            if watch.get("hypothesis_ref"):
+                woken["hypothesis_ref"] = watch["hypothesis_ref"]
+            if watch.get("wake_lead"):
+                woken["wake_lead"] = watch["wake_lead"]
+                watch["consumed_entities"] = sorted(
+                    consumed | {s.strip().upper() for _lid, sh in matches for s in sh}
+                )
+            watch["consumed_leads"] = sorted(consumed_leads | {lid for lid, _sh in matches})
+            watch["woken_by"] = woken
+            fired.append(dict(watch))
     return fired
+
+
+def _is_trace_requeue(lead: Mapping[str, Any]) -> bool:
+    """這則 lead 目前的 triage receipt 是不是由追源重排寫的（而非原始 PASS）。
+
+    `requeue_trace` 把 `triage.decided_at` 與 `refs.trace_requeued_at` 寫成同一個 stamp；
+    兩者相等＝這一輪是重排。原始 PASS 的 decided_at 早於任何 requeue，不會相等。
+    """
+    refs = lead.get("refs") or {}
+    stamp = str(refs.get("trace_requeued_at") or "")
+    return bool(stamp) and stamp == str((lead.get("triage") or {}).get("decided_at") or "")
 
 
 def sweep_due(data: Mapping[str, Any], *, today: date | None = None) -> list[dict[str, Any]]:

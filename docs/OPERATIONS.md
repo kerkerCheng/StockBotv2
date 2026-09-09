@@ -172,6 +172,7 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-ra <n> --digest <sha256> [--company-id ...]
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-observation <n>       # Engine C 人工觀測寫入
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-thesis-mutation <n>   # thesis lifecycle 變更
+& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale [--run]      # 佇列段 2：只因凍結 context 過期而 REVIEW 的 decision_review（機械、零 token；不加 --run 只列）
 ```
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
@@ -237,7 +238,8 @@ live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「�
 ### Leads
 ```powershell
 & '.venv\Scripts\python.exe' crons\harvest_leads.py                 # 零 token；--dry-run 只印不寫
-& '.venv\Scripts\python.exe' -m engine_b.cli drain                  # pq1 依 priority 的下一批
+& '.venv\Scripts\python.exe' -m engine_b.cli consume-fired [--dry-run]  # 佇列段 1：fired 的追源 watch 排回 pq1（機械、零 token；drain 之前先跑）
+& '.venv\Scripts\python.exe' -m engine_b.cli drain                  # pq1 依 priority 的下一批（首行印段 0–1 計數器）
 & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier N --reason ... --content-type <type> --decision-impact <impact> [--payment-direction <direction>]
 & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --no-go --tier N --reason ...
 & '.venv\Scripts\python.exe' -m engine_b.cli classification-health # active 缺分類回 exit 2
@@ -436,6 +438,24 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'webapp'   
 & '.venv\Scripts\python.exe' scripts\sync_agent_skills.py           # 新增 skill 或改 name/description 後
 & '.venv\Scripts\python.exe' scripts\sync_agent_skills.py --check   # 交接前驗證兩端無漂移
 ```
+
+### 佇列段序（2026-09-09）
+
+「有工作存在」的每一種狀態都必須指得出 consumer；段序是封閉字彙，住
+`engine_b/queue_segments.py`（段 0 pending 分流 → 段 1 fired 消化 → 段 2 reassess 維護 → 段 3
+已核准工單 → 段 4 triaged_go → 段 5 forward view backlog → 段 6 覆蓋缺口 → 段 7 主動輪詢）。
+機械段（fired 重排、pq2 翻醒、reassess）**不吃** `drain_limit_per_run`；研究段共用它。
+
+```powershell
+& '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段幾筆；分不到段的狀態 FAIL（＝新工作類型沒有 consumer）
+& '.venv\Scripts\python.exe' -m engine_b.cli consume-fired             # 段 1
+& '.venv\Scripts\python.exe' -m engine_b.todo sync                     # 段 1 的 pq2 型（順便同步待辦池）
+& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run     # 段 2
+& '.venv\Scripts\python.exe' -m engine_b.cli drain                     # 段 3–4（首行印段 0–1 計數器）
+```
+
+新增一種工作狀態時：先在 `queue_segments.py` 登記它屬於哪一段、誰來取，再寫產生它的程式——
+反過來做，`QueueSegments` 會在第一筆資料出現當天變紅，那是設計，不是誤報。
 
 ### Event Watch（等待事件統一 registry，2026-08-31）
 

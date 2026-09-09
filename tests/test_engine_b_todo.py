@@ -1647,3 +1647,124 @@ def test_graph_impact_reads_the_frozen_payload_not_only_the_draft() -> None:
     assert todo._ra_graph_impact(frozen) == expected
     assert todo._ra_graph_impact(draft) == expected
     assert todo._ra_graph_impact({"documents": [{"doc_id": "d"}]}) == ""
+
+
+# ---------------------------------------------------------------------------
+# 佇列段 1／段 2（2026-09-09 P1）
+# ---------------------------------------------------------------------------
+
+def test_check_event_watches_consumes_already_fired_pq2_watches(monkeypatch) -> None:
+    """triage 路徑先把 pq2 型 watch 標成 fired 存檔 → 本函式再 check 時它已不是 active，
+    先前永遠不會再收它（[134] 的 ew_0002 掛了一週）。修法：consumer 掃 status 本身。"""
+    from engine_b import event_watch as ew
+
+    pool = _pool_with({"type": "manual", "ref_id": "m", "title": "等 Q3 guidance"})
+    n = todo.active_items(pool)[0]["n"]
+    todo.resolve(pool, n, "pending", trigger="等 Q3 guidance")
+    assert todo.get(pool, n).get("waiting_on")
+
+    data = {"schema_version": 1, "watches": [
+        {"watch_id": "ew_pre", "status": "fired", "kind": "fact_verification",
+         "wake_pq2": n, "entities": ["AAOI"], "expires": "2027-01-01",
+         "woken_by": {"kind": "fact_verification", "lead_id": "lead_x",
+                      "shared_entities": ["AAOI"], "at": "2026-09-01T00:00:00+00:00"}},
+    ]}
+    saved: dict = {}
+    monkeypatch.setattr(ew, "load_watches", lambda path=None: data)
+    monkeypatch.setattr(ew, "save_watches", lambda d, path=None: saved.update(d))
+    monkeypatch.setattr(ew, "check_watches", lambda d, leads=None, today=None: [])  # 本輪沒有新觸發
+
+    woken, counters = todo._check_event_watches(pool, stamp="2026-09-09T00:00:00+00:00")
+
+    assert woken == 1
+    assert "waiting_on" not in todo.get(pool, n)
+    assert data["watches"][0]["status"] == "consumed"
+    assert counters["fired_unconsumed"] == 0
+    assert pool["log"][-1]["verb"] == "watch_wake" and pool["log"][-1]["n"] == n
+
+
+class _StoreStub:
+    def __init__(self, work_orders: dict[str, object]):
+        self._wo = work_orders
+
+    def latest_research_work_order(self, cohort_id: str):
+        return self._wo.get(cohort_id)
+
+
+def test_reassess_only_items_requires_all_three_conditions() -> None:
+    pool = _pool_with(
+        {"type": "decision_review", "ref_id": "dc_stale", "title": "A"},       # 只因 context 過期
+        {"type": "decision_review", "ref_id": "dc_has_wo", "title": "B"},      # 有 work order → dispatch
+        {"type": "decision_review", "ref_id": "dc_user", "title": "C"},        # 有需人決定的 blocker
+        {"type": "decision_review", "ref_id": "dc_unlisted", "title": "D"},    # brief 沒列 → 不判
+        {"type": "manual", "ref_id": "m1", "title": "E"},
+    )
+    by_ref = {it["ref_id"]: it for it in todo.active_items(pool)}
+    by_ref["dc_has_wo"]["dispatch_status"] = None
+    # blocker 代碼用真的 registry 值（config/decision_blockers.json 的 resolution_mode）：
+    # market_stale_since_decision＝system_internal；execution_fx_missing＝awaiting_external；
+    # financial_resilience_corroboration_incomplete＝user_decision。
+    brief = [
+        {"cohort_id": "dc_stale", "blockers": ["market_stale_since_decision", "holdings_unconfirmed"]},
+        {"cohort_id": "dc_has_wo", "blockers": ["market_stale_since_decision"]},
+        {"cohort_id": "dc_user", "blockers": ["market_stale_since_decision",
+                                             "financial_resilience_corroboration_incomplete"]},
+        {"cohort_id": "dc_waiting", "blockers": ["market_stale_since_decision", "execution_fx_missing"]},
+        {"cohort_id": "dc_empty", "blockers": []},
+    ]
+    todo.sync(pool, [
+        {"type": "decision_review", "ref_id": "dc_waiting", "title": "F"},   # 帶 awaiting_external → 不算
+        {"type": "decision_review", "ref_id": "dc_empty", "title": "G"},     # 零 blocker 的 REVIEW → 不算
+    ])
+    store = _StoreStub({"dc_has_wo": {"work_order_id": "wo_1"}})
+
+    got = todo.reassess_only_items(pool, store, brief_items=brief)
+    assert [it["ref_id"] for it in got] == ["dc_stale"]
+
+    # in-flight 或已有 terminal receipt 的不算
+    by_ref["dc_stale"]["dispatch_status"] = "queued"
+    assert todo.reassess_only_items(pool, store, brief_items=brief) == []
+    by_ref["dc_stale"]["dispatch_status"] = "completed"
+    assert todo.reassess_only_items(pool, store, brief_items=brief) == []
+
+    # brief 讀不到 → 一個都不判（不是全部都算）
+    by_ref["dc_stale"]["dispatch_status"] = None
+    assert todo.reassess_only_items(pool, store, brief_items=[]) == []
+
+
+def test_reassess_stale_closes_only_when_new_decision_is_not_review(monkeypatch) -> None:
+    pool = _pool_with(
+        {"type": "decision_review", "ref_id": "dc_a", "title": "A"},
+        {"type": "decision_review", "ref_id": "dc_b", "title": "B"},
+        {"type": "decision_review", "ref_id": "dc_c", "title": "C"},
+    )
+    brief = [{"cohort_id": ref, "blockers": ["market_stale_since_decision"]} for ref in ("dc_a", "dc_b", "dc_c")]
+    store = _StoreStub({})
+    monkeypatch.setattr(todo, "_prior_execution_intent", lambda s, c: "paper")
+
+    def fake_reassess(s, provider, cohort_id, *, execution_intent=None, **kw):
+        if cohort_id == "dc_c":
+            raise RuntimeError("provider 壞了")
+        attention = "REVIEW" if cohort_id == "dc_b" else "MONITOR"
+        return {"decision_id": f"pd_{cohort_id}", "action_card": {"attention": attention}}
+
+    import decision_lab.workflow as wf
+    monkeypatch.setattr(wf, "reassess", fake_reassess)
+
+    dry = todo.reassess_stale(pool, store, None, dry_run=True, brief_items=brief)
+    assert dry["dry_run"] is True and sorted(dry["candidates"]) == [1, 2, 3]
+    assert len(todo.active_items(pool)) == 3            # dry-run 一個都不動
+
+    out = todo.reassess_stale(pool, store, object(), at="2026-09-09T00:00:00+00:00", brief_items=brief)
+    assert [row["n"] for row in out["closed"]] == [1]
+    assert [row["n"] for row in out["still_review"]] == [2]
+    assert [row["n"] for row in out["failed"]] == [3]
+    remaining = {it["ref_id"] for it in todo.active_items(pool)}
+    assert remaining == {"dc_b", "dc_c"}
+    closed = next(it for it in pool["items"] if it["ref_id"] == "dc_a")
+    assert closed["resolution"] == "reassessed" and closed["resolved_at"]
+    verbs = [e["verb"] for e in pool["log"] if e["n"] == 1]
+    assert verbs[-2:] == ["pq1_reassessed", "reassessed_closed"]
+    assert pool["log"][-1]["receipt"].startswith("decision:pd_") or any(
+        e["receipt"] == "decision:pd_dc_a" for e in pool["log"]
+    )
