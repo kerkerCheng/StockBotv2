@@ -11540,24 +11540,24 @@
       "published_at": "2026-08-26T20:58:46.000Z",
       "raw_text": "$NVDA earnings TLDR:\n\nRevenue: $96.22B vs. ~$92.17B (beat)\nAdj. EPS: $2.22 vs. $2.09-$2.10 (beat)\nDC: $89.0B vs. ~$86.3B (beat)\nAdj. gross margin: 75% vs. 75%\n\nHyperscaler Revenue: $48.71B from $43.05B last quarter (custom ASIC growth hasn't really prevented this revenue from accelerating)\n\nFor guidance:\nRevenue: $108B vs. ~$104.2B\nAdj. gross margin: 74% vs. 75% (kinda the only soft spot)\n\nRevenue ramp has been genuinely absurd over last 4 quarters. \n-> $68.1B\n-> $81.6B\n-> $96.2B (we are here)\n-> next quarter guidance: $108B, despite assuming zero China DC compute revenue. \n\nFun thing to note is Nvidia says its commitments jumped from $119B last quarter to $279B, primarily related to procurement of memory (for next few years).. So memory goes brrr. \n\nTLDR: AI keeps on going brrr. Nvidia is clearly leading the charge and no obvious signs of demand slowing. \n\nGiven Nvidia is already a $5T+ company, I think most of the alpha comes from how Nvidia's architecture/capacity decisions impact elsewhere in the supply chain (eg. CPO, memory, 800V) nowadays.\n\nRather than simply finding mispricing in Nvidia itself.\n\nRegardless, all the fun stuff happens in the earnings call in a few min.",
       "refs": {
-        "parked_reason": "官方 filing 與 IR 頁確認財報事件，但目前抓到的 wrapper／截斷摘錄未含推文全部數字與 279B commitments 原句。",
+        "parked_reason": "觸發條件『NVIDIA 官方文件可逐字索引』**本輪達成**，且推文最關鍵的那個數字已由一手證實。NVDA Form 10-Q（2026-08-26 送件，期間至 2026-07-26）Commitments 表逐字：Supply and capacity 合計 US$279B（92/87/88/6/5/1，依會計年度），全部承諾合計 US$366B；敘述逐字『increasing supply commitments from $119 billion last quarter to $279 billion as of July 26, 2026』『These supply commitments are for our data center infrastructure systems, **primarily memory and manufacturing facilities**』。⚠ 兩個必須一起記的限定：①逐字『in certain instances, these agreements may be cancelable, rescheduled, or adjustable for our business needs prior to placing firm orders』——279B 不是 firm order；②H200 於 FY27 上半年提列 US$0.4B 過剩存貨與採購義務費用（前一年 H20 為 US$4.5B），這類承諾會反轉成費用。已鑄 [504]（NVDA/committed_capex）。⚠⚠ 對本圖的校準意義：最上游客戶最大一筆資本承諾明文流向**記憶體與晶圓廠**，不是本圖排序集中的 CPO／雷射／FAU／InP 層——這不否定光互連是瓶頸，但本圖尚未建模記憶體層，而那是這筆錢的主要去向。營收／EPS／毛利率等其餘數字屬時變觀測，不入圖。",
         "research_outcome": "96.22B revenue 等需逐字官方 exhibits；不以 X 摘要入圖或提高 evidence tier。",
-        "trace_attempts_ref": "NVIDIA 2026-08-26 8-K／10-Q、官方 IR event page 與 quarterly-results index",
-        "trace_next_trigger": "NVIDIA 官方 Q2 FY27 earnings release／CFO commentary／transcript 可逐字索引",
+        "trace_attempts_ref": "2026-09-09 research-drain：SEC EDGAR 直取 nvda_10_q_20260826.txt（184,965 chars），Commitments 表、Supply and capacity 段、Liquidity 段、H200 費用段逐字核對",
+        "trace_next_trigger": "NVDA FY2027 Q3 10-Q（約 2026-11）：supply commitments 是否續增，以及『primarily memory and manufacturing facilities』的措辭是否出現光學／封裝成分",
         "trace_requeue_trigger": "event_watch:ew_0011_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "NVDA",
           "co:nvidia"
         ],
         "trace_trigger_event_ref": "lead:lead_53e31d26909b973cac66af50394abd98",
-        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0011_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -44287,11 +44287,13 @@
       "raw_text": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th:\n\n1. $SNDK - $5.674B \n2. $MU - $5.574B \n3. $BE -  $1.899B\n4. $TSM - $1.265B\n5. $NBIS - $1.232B\n6. $CRWV - $744.5M\n7. $CORZ - $665.6M\n8. $STM - $584.3M (new)\n9. $APLD - $469.0M\n10. $RIOT - $468.2M\n11. $SHAZ - $456.8M\n12. $IREN - $433.3M\n\nLess material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. \n\nSeems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030.  \n\nAs well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. \n\nSome of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes).\n\nWith core winners of everything such as $TSM (but less high-beta). \n\nThis looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap).  \n\nBut always cool to see what others are doing.",
       "refs": {
         "outcome": "倉位/情緒類(L4 市場認知,不進圖):Situational Awareness Q2 13F 記憶體重倉(SNDK/MU 前二,合計逾 11B 級)+BE/TSM/NBIS/CRWV;貼文金額本輪未對上 EDGAR(fund 實體名搜尋未命中),數字視為未驗證轉述;對 SNDK/MU 的擁擠度脈絡已記錄",
-        "parked_reason": "sentiment/positioning,無 graph delta;需要時 13F-HR 是可驗證一手",
-        "trace_next_trigger": "SNDK/MU 相關 decision 需要擁擠度證據時,以 EDGAR 13F-HR 原檔核對",
+        "parked_reason": "部位／情緒訊號，結構上不產生 graph delta——內部人交易與 13F 持股反映的是別人怎麼想，不是世界怎麼運作（本圖的 A1 只裝結構與證據）。13F-HR 與 Form 4 都是隨時可核的一手，因此不需要預先追源：真正需要擁擠度證據時（例如某 decision 要判斷市場擁擠度）再以 EDGAR 原檔核對即可。⚠ 另依 AGENTS.md，市場擁擠度屬時變觀測，且位置類指標不得參與排序或尺寸。",
+        "trace_attempts_ref": "2026-09-09 research-drain：判定為 sentiment/positioning 類，依規則不追源",
+        "trace_next_trigger": "某個 decision 明確需要擁擠度或內部人訊號作為輸入時，以 EDGAR 13F-HR／Form 4 原檔核對——在那之前不投預算",
         "trace_requeue_trigger": "event_watch:ew_0072_2026-09-03",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
-        "trace_status": "partial",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued",
         "trace_trigger_entities": [
           "APLD",
           "BE",
@@ -44324,7 +44326,7 @@
         "trace_trigger_watch_ref": "ew_0072_2026-09-03"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th: 1. $SNDK - $5.674B 2. $MU - $5.574B 3. $BE - $1.899B 4. $TSM - $1.265B 5. $NBIS - $1.232B 6. $CRWV - $744.5M 7. $CORZ - $665.6M 8. $STM - $584.3M (new) 9. $APLD - $469.0M 10. $RIOT - $468.2M 11. $SHAZ - $456.8M 12. $IREN - $433.3M Less material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. Seems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030. As well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. Some of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes). With core winners of everything such as $TSM (but less high-beta). This looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap). But always cool to see what others are doing.",
       "triage": {
@@ -54933,9 +54935,20 @@
       "first_seen": "2026-09-03T22:33:18.499876+00:00",
       "lead_id": "lead_e11e6bf3708003d280916a6fea59f549",
       "published_at": "2026-09-03",
-      "refs": {},
+      "refs": {
+        "parked_reason": "部位／情緒訊號，結構上不產生 graph delta——內部人交易與 13F 持股反映的是別人怎麼想，不是世界怎麼運作（本圖的 A1 只裝結構與證據）。13F-HR 與 Form 4 都是隨時可核的一手，因此不需要預先追源：真正需要擁擠度證據時（例如某 decision 要判斷市場擁擠度）再以 EDGAR 原檔核對即可。⚠ 另依 AGENTS.md，市場擁擠度屬時變觀測，且位置類指標不得參與排序或尺寸。",
+        "trace_attempts_ref": "2026-09-09 research-drain：判定為 sentiment/positioning 類，依規則不追源",
+        "trace_next_trigger": "某個 decision 明確需要擁擠度或內部人訊號作為輸入時，以 EDGAR 13F-HR／Form 4 原檔核對——在那之前不投預算",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued",
+        "trace_trigger_entities": [
+          "LRCX",
+          "co:lam_research"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 4 filed 2026-09-03",
       "triage": {

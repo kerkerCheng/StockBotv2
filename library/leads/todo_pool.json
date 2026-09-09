@@ -8444,6 +8444,18 @@
       "source": "engine_c",
       "title": "Engine C 觀測：TSEM / backlog",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-09T15:11:47.041066+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-07-26T00:00:00+00:00；來源=NVIDIA Corporation Form 10-Q filed 2026-08-26（期間至 2026-07-26，FY2027 Q2），local: l",
+      "n": 504,
+      "reason": null,
+      "ref_id": "po_091272adef4393071b38084345ecac48",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：NVDA / committed_capex",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -18399,6 +18411,6 @@
       "verb": "source_cleared"
     }
   ],
-  "next_n": 504,
+  "next_n": 505,
   "schema_version": "1"
 }
