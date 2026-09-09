@@ -1,0 +1,338 @@
+false 
+ 0001964789 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001964789 
+ 
+ 
+ 2026-08-04 
+ 2026-08-04 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ UNITED
+STATES 
+SECURITIES AND EXCHANGE COMMISSION 
+Washington, D.C. 20549 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ FORM 8-K 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ CURRENT REPORT 
+
+ &#160; 
+
+ Pursuant to Section 13 or 15(d) of
+the 
+Securities Exchange Act of 1934 
+
+ &#160; 
+
+ Date of Report (Date of earliest event reported): August 4, 2026 &#160; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ Hut
+8 Corp. 
+ (Exact name of registrant as specified in its charter) 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ 
+ 
+ Delaware 
+ 001-41864 
+ 92-2056803 
+ 
+ (State
+ or other Jurisdiction of 
+ incorporation) 
+ (Commission
+ 
+ File Number) 
+ (IRS
+ Employer 
+ &#8239;Identification No.) 
+ 
+ &#160; 
+
+ 
+ 
+ 777 Brickell Avenue , Suite 200 
+ Miami , Florida 
+ 33131 
+ 
+ (Address of Principal Executive Offices) 
+ (Zip
+ Code) 
+ 
+ &#160; 
+
+ Registrant&#146;s Telephone Number,
+Including Area Code: ( 305 ) 224-6427 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ Check the appropriate box below if the Form 8-K&#8239;filing
+is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions: 
+
+ &#160; 
+
+ 
+ &#168; 
+ Written communications pursuant to Rule 425 under the Securities Act (17 CFR 230.425) 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#168; 
+ Soliciting material pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12) 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#168; 
+ Pre-commencement communications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#168; 
+ Pre-commencement communications pursuant to Rule 13e-4(c) under the Exchange Act (17 CFR 240.13e-4(c)) 
+
+ &#160; 
+
+ Securities registered
+pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+ 
+ 
+ Title of each
+ class 
+ &#160; 
+ 
+ Trading 
+ &#160; 
+ 
+ Name of each
+ exchange on which registered 
+ 
+ Common Stock, par value $0.01 per share 
+ &#160; 
+ HUT 
+ &#160; 
+ The Nasdaq 
+Stock Market LLC 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ Indicate by check mark whether the registrant
+is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the
+Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company &#168; &#8239; 
+
+ &#160; 
+
+ If an emerging growth company, indicate by check
+mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting
+standards provided pursuant to Section 13(a) of the Exchange Act. &#168; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ Item 2.02&#8195;Results of Operations and
+Financial Condition. 
+
+ &#160; 
+
+ On August
+4, 2026, Hut 8 Corp. (the &#8220;Company&#8221;) issued a press release announcing its financial results for the three and six months
+ended June 30, 2026. A copy of such press release is furnished as Exhibit 99.1 to this Current Report on Form 8-K and is incorporated
+herein by reference. 
+
+ &#160; 
+
+ The
+information in this Item 2.02 and Exhibit 99.1 attached hereto is being furnished to the U.S. Securities and Exchange Commission and shall
+not be deemed &#8220;filed&#8221; for purposes of Section 18 of the Securities Exchange Act of 1934, as amended (the &#8220;Exchange Act&#8221;),
+or otherwise subject to the liabilities of that Section, nor shall it be deemed incorporated by reference into any filing under the Securities
+Act of 1933, as amended, or the Exchange Act, regardless of any general incorporation language in such filing, except as expressly set
+forth by specific reference in such filing. 
+
+ &#160; 
+
+ Item 9.01&#8195;Financial Statements and Exhibits. 
+
+ &#160; 
+
+ 
+ 
+ Exhibit No. 
+ Description 
+ 
+ &#160; 
+ &#160; 
+ 
+ 99.1 
+ Press Release of the Company, dated August 4, 2026. 
+ 
+ &#160; 
+ &#160; 
+ 
+ 104 
+ Cover Page Interactive Data File (embedded within the Inline XBRL document). 
+ 
+ &#160; 
+
+ 
+
+ 
+ 2 
+ &#160; 
+ 
+
+ &#160; 
+
+ SIGNATURES 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities Exchange Act of 1934,
+the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+
+ &#160; 
+
+ 
+ 
+ &#160; 
+ HUT 8 CORP. 
+ 
+ &#160; 
+ (Registrant) 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ Date: August 4, 2026 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ &#160; 
+ By:&#160; 
+ /s/ Victor Semah 
+ 
+ &#160; 
+ &#160; 
+ Name:&#160; 
+ Victor Semah 
+ 
+ &#160; 
+ &#160; 
+ Title: 
+ Chief Legal Officer &amp; Corporate Secretary 
+ 
+ &#160; 
+
+ 
+
+ 
+ 3 
+ 
+
+ &#160;

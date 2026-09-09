@@ -1,0 +1,451 @@
+false 
+ 0001964789 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001964789 
+ 
+ 
+ 2026-06-11 
+ 2026-06-11 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ UNITED
+STATES 
+SECURITIES AND EXCHANGE COMMISSION 
+Washington, D.C. 20549 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ FORM 8-K 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ CURRENT REPORT 
+
+ &#160; 
+
+ Pursuant to Section 13 or 15(d) of
+the 
+Securities Exchange Act of 1934 
+
+ &#160; 
+
+ Date of Report (Date of earliest event reported): June 11, 2026 &#160; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ Hut
+8 Corp. 
+(Exact name of registrant as specified in its charter) 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ 
+ 
+ Delaware 
+ 001-41864 
+ 92-2056803 
+ 
+ (State
+ or other Jurisdiction of 
+ incorporation) 
+ (Commission
+ 
+ File Number) 
+ (IRS
+ Employer 
+ &#8239;Identification No.) 
+ 
+ &#160; 
+
+ 
+ 
+ 1101 Brickell Avenue , Suite 1500 , Miami , Florida 
+ 33131 
+ 
+ (Address of Principal Executive Offices) 
+ (Zip
+ Code) 
+ 
+ &#160; 
+
+ Registrant&#146;s Telephone Number,
+Including Area Code: ( 305 ) 224
+6427 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ Check the appropriate box below if the Form 8-K&#8239;filing
+is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions: 
+
+ &#160; 
+
+ 
+ &#168; 
+ Written communications pursuant to Rule 425 under the Securities Act (17 CFR 230.425) 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#168; 
+ Soliciting material pursuant to Rule 14a-12 under the Exchange Act (17 CFR 240.14a-12) 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#168; 
+ Pre-commencement communications pursuant to Rule 14d-2(b) under the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+ &#160; 
+ &#160; 
+ 
+ &#168; 
+ Pre-commencement communications pursuant to Rule 13e-4(c) under the Exchange Act (17 CFR 240.13e-4(c)) 
+
+ &#160; 
+
+ Securities registered
+pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+ 
+ 
+ Title of each
+ class 
+ &#160; 
+ 
+ Trading 
+ &#160; 
+ 
+ Name of each
+ exchange on which registered 
+ 
+ Common Stock, par value $0.01 per share 
+ &#160; 
+ HUT 
+ &#160; 
+ The Nasdaq 
+Stock Market LLC 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ Indicate by check mark whether the registrant
+is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2 of the
+Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company &#168; &#8239; 
+
+ &#160; 
+
+ If an emerging growth company, indicate by check
+mark if the registrant has elected not to use the extended transition period for complying with any new or revised financial accounting
+standards provided pursuant to Section 13(a) of the Exchange Act. &#168; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ Item 5.07&#8195;Submission of Matters to a Vote of Security Holders. 
+
+ &#160; 
+
+ On June 11, 2026, Hut 8 Corp. (the &#8220;Company&#8221;) held its
+2026 Annual Meeting of Stockholders (the &#8220;Annual Meeting&#8221;) to consider and vote upon four proposals, which are described in
+greater detail in the Company&#8217;s proxy statement filed with the U.S. Securities and Exchange Commission on April 28, 2026 (the &#8220;Proxy
+Statement&#8221;). A total of 83,316,655 shares of the Company&#8217;s common stock were represented at the Annual Meeting, constituting
+a quorum for all matters presented at the Annual Meeting. The final voting results are set forth below. 
+
+ &#160; 
+
+ Proposal 1: Election of Directors 
+
+ &#160; 
+
+ The stockholders elected each of the persons named below to serve as
+a director of the Company until the 2027 Annual Meeting of Stockholders and until his or her successor has been duly elected and qualified,
+or until his or her earlier death, resignation or removal. The results of such vote were as follows: 
+
+ &#160; 
+
+ 
+ 
+ Nominee &#160; 
+ For &#160; &#160; 
+ Against &#160; &#160; 
+ Abstentions &#160; &#160; 
+ Broker Non-Votes &#160; 
+ 
+ Joseph Flinn &#160; 
+ 69,524,014 &#160; &#160; 
+ 1,269,489 &#160; &#160; 
+ 66,383 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ Asher Genoot &#160; 
+ 70,536,078 &#160; &#160; 
+ 276,248 &#160; &#160; 
+ 47,560 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ Michael Ho &#160; 
+ 70,530,325 &#160; &#160; 
+ 282,072 &#160; &#160; 
+ 47,489 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ E. Stanley O&#8217;Neal &#160; 
+ 65,940,165 &#160; &#160; 
+ 4,854,376 &#160; &#160; 
+ 65,345 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ Carl J. (Rick) Rickertsen &#160; 
+ 70,370,263 &#160; &#160; 
+ 420,204 &#160; &#160; 
+ 69,419 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ Mayo A. Shattuck III &#160; 
+ 63,437,474 &#160; &#160; 
+ 7,353,696 &#160; &#160; 
+ 68,716 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ William Tai &#160; 
+ 68,982,263 &#160; &#160; 
+ 1,642,740 &#160; &#160; 
+ 234,883 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+ Amy Wilkinson &#160; 
+ 62,429,791 &#160; &#160; 
+ 5,483,217 &#160; &#160; 
+ 2,946,878 &#160; &#160; 
+ 12,456,769 &#160; 
+ 
+
+ &#160; 
+
+ Proposal 2: Advisory Vote on the Compensation of the Company&#8217;s
+Named Executive Officers 
+
+ &#160; 
+
+ The stockholders approved, on an advisory basis, the compensation of
+the Company&#8217;s named executive officers, as described in the Compensation Discussion and Analysis section and related compensation
+tables of the Proxy Statement. The results of such vote were as follows: 
+
+ &#160; 
+
+ 
+ 
+ For &#160; 
+ Against &#160; 
+ Abstentions &#160; 
+ Broker Non-Votes 
+ 
+ 38,689,226 &#160; 
+ 31,950,016 &#160; 
+ 220,644 &#160; 
+ 12,456,769 
+ 
+
+ &#160; 
+
+ Proposal 3: Ratification of the Appointment of the Independent
+Registered Public Accounting Firm 
+
+ &#160; 
+
+ The stockholders ratified the appointment of KPMG LLP as the Company&#8217;s
+independent registered public accounting firm for the year ending December 31, 2026. The results of such vote were as follows: 
+
+ &#160; 
+
+ 
+ 
+ For &#160; 
+ Against &#160; 
+ Abstentions 
+ 
+ 81,763,405 &#160; 
+ 1,486,135 &#160; 
+ 67,115 
+ 
+
+ &#160; 
+
+ Proposal 4: Approval of an Amendment to the Amended and Restated
+Hut 8 Corp. 2023 Omnibus Incentive Plan 
+
+ &#160; 
+
+ The stockholders approved the amendment to the Amended and Restated
+Hut 8 Corp. 2023 Omnibus Incentive Plan. The results of such vote were as follows: 
+
+ &#160; 
+
+ 
+ 
+ For &#160; 
+ Against &#160; 
+ Abstentions &#160; 
+ Broker Non-Votes 
+ 
+ 59,930,290 &#160; 
+ 10,705,328 &#160; 
+ 224,268 &#160; 
+ 12,456,769 
+ 
+
+ &#160; 
+
+ No other matters were presented for consideration or stockholder action
+at the Annual Meeting. 
+
+ 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ 2 
+ &#160; 
+ 
+
+ &#160; 
+
+ SIGNATURES 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities
+Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+
+ &#160; 
+
+ 
+ 
+ &#160; 
+ HUT 8 CORP. 
+ 
+ &#160; 
+ &#160; 
+ (Registrant) 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ Date: June 12, 2026 
+ By: 
+ /s/ Victor Semah 
+ 
+ &#160; 
+ &#160; 
+ Name: 
+ Victor Semah 
+ 
+ &#160; 
+ &#160; 
+ Title: &#8239;&#8239;&#8239; 
+ Chief Legal Officer &amp; Corporate Secretary 
+ 
+ &#160; 
+
+ 
+
+ 
+ 3 
+ 
+
+ &#160;

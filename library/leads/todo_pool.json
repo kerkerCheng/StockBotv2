@@ -8420,6 +8420,18 @@
       "source": "decision_lab",
       "title": "co:lynas：殘餘缺口——JARE 公告（ASX 2026-03-10）與 Sojitz 客戶端公告（2025-10-30）尚未入圖——升級本軸 graph 引用需另",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-09T14:55:09.230249+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=Lynas Rare Earths Limited FY2026 Annual Report（ASX『Appendix 4E and 2026 Annual R",
+      "n": 502,
+      "reason": null,
+      "ref_id": "po_d1250199aee8a46c6d43fc3b767c3d1b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：LYC.AX / gross_margin_trend",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -18375,6 +18387,6 @@
       "verb": "source_cleared"
     }
   ],
-  "next_n": 502,
+  "next_n": 503,
   "schema_version": "1"
 }

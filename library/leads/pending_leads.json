@@ -14454,12 +14454,12 @@
       "published_at": "2026-08-07T12:55:47.000Z",
       "raw_text": "Some more TLDR takeaways from $AAOI ER:\n\n- They also flagged DSP and TIA bottlenecks, which is a positive industry read through for names like $MXL, then $SMTC and $MTSI. \n\n- For revenue growth, they're expecting more than $500 million revenue Q4, which is absurd growth. \n\nFor reference:\nQ2: $191.9M\nQ3: ~$255M-$290M\nQ4: $500M+\nBy mid-2027: ~$1.41B quarterly revenue run-rate\n\nAlways impressed by the revenue ramp from some of these optical players.",
       "refs": {
-        "parked_reason": "核心產能訊號已部分核實，精確遠期營收仍待正式指引，沒有 unique graph delta",
+        "parked_reason": "觸發條件『AAOI Q3 正式結果與指引』尚未發生——AAOI 會計季於 2026-09-30 結束，Q3 財報約 2026-11 才公布，本輪無法推進。既有結論不變：官方已支持 800G ramp 與產能由每月 20 萬走向年底 65 萬且需求超過供給；DSP／TIA／laser 瓶頸與 Q4 500M+ 只有 tier-2 逐字稿；2027 年中季營收 1.41B 為推文自行外推，無任何來源支持。圖中已含同場法說的雷射瓶頸 claim，無 unique graph delta。⚠ 本輪為 related_entity_signal 喚醒，非原觸發條件命中。",
         "primary_url": "https://investors.ao-inc.com/news-releases/news-release-details/applied-optoelectronics-announces-second-quarter-2026-financial",
         "research_outcome": "官方支持 800G ramp、產能由每月 20 萬走向年底 65 萬且需求超過供給；tier-2 支持 DSP／TIA／laser 瓶頸與 Q4 500M+，但 2027 年中 1.41B 季營收未核實，圖已含同場法說雷射瓶頸，未產 RA",
         "research_run": "daily:2026-08-22",
-        "trace_attempts_ref": "2026-08-26：AAOI 官方 Q2 新聞稿＋法說 tier-2 逐字稿",
-        "trace_next_trigger": "AAOI Q3 正式結果與指引，核對 Q4 500M+ 及 2027 產能／營收換算",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認 AAOI Q3 尚未報告（季末 2026-09-30），不投搜尋預算；沿用 2026-08-26 已取得的官方 Q2 新聞稿與法說逐字稿",
+        "trace_next_trigger": "AAOI Q3 2026 財報與正式指引（約 2026-11）：核對 Q4 是否達 500M+、產能 65 萬/月是否兌現、DSP／TIA 瓶頸是否進入官方措辭。⚠ 這也是 [134] disproof 條件的同一個核查點",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS"
@@ -14477,11 +14477,11 @@
           "co:macom"
         ],
         "trace_trigger_event_ref": "lead:lead_49085eb7b51c402c925cc29ab5e33cc6",
-        "trace_trigger_kind": "primary_source_signal",
+        "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0017_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Some more TLDR takeaways from $AAOI ER: - They also flagged DSP and TIA bottlenecks, which is a positive industry read through for names like $MXL, then $SMTC and $MTSI. - For revenue growth, they're expecting more than $500 million revenue Q4, which is absurd growth. For reference: Q2: $191.9M Q3: ~$255M-$290M Q4: $500M+ By mid-2027: ~$1.41B quarterly revenue run-rate Always impressed by the revenue ramp from some of these optical players.",
       "triage": {
@@ -15612,11 +15612,11 @@
           "MediaTek Inc. (2454.TW)",
           "Samsung Electro-Mechanics (009150.KS)"
         ],
-        "parked_reason": "多原子社群彙整只部分取得，不能整篇當證據",
+        "parked_reason": "兩個 onboard 候選的四維初判**皆不過**，因此不打 onboard 包。①MediaTek（2454.TW）：客戶端資本承諾這一維有實料（NVIDIA US$35 億可轉債投資已一手核實、MediaTek 採 NVLink Fusion），但**標的純度明確不過**——聯發科主體是手機／消費 SoC，AI 資料中心只佔一小部分，買它等於買一籃子與本圖無關的業務；且 ASIC 設計是競爭層（Broadcom／Marvell／Alchip／GUC），非 chokepoint。②Samsung Electro-Mechanics（009150.KS）：MLCC 已一手核實 2027 年合約 KRW 1.0722 兆，但瓶頸地位不過——MLCC 有 Murata／TDK／國巨／SEMCO 多家規模供應商；純度亦不過（SEMCO 業務分散）。其餘 atoms（Google 共投、Soitec 10+ LTA 與 $200m floor、Intel HBM4E base die、ABF／HVLP4／lead-time）仍無 canonical，維持逐 atom 分開註冊的既有規則，混合貼文不再當單一證據。⚠ Soitec 那個 atom 值得單獨追：SOI.PA 已是本輪 forward view 到終局的檔（EV/Sales 法），$200m 營收 floor 與 10+ LTA 若取得一手會直接影響它的營運假設。",
         "research_outcome": "確認 NVIDIA 投資 MediaTek 35 億美元 convertible bonds、MediaTek 採 NVLink Fusion；確認 Samsung EM 2027 年 MLCC 合約 KRW 1.0722 兆；SK hynix 只確認 HBM4E 已送樣，未確認 Intel 傳聞",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "查 MediaTek、Samsung Electro-Mechanics、Soitec、SK hynix 官方站；取得 MediaTek/NVIDIA 與 Samsung MLCC 一手，未取得其餘 channel-check 原文",
-        "trace_next_trigger": "相關公司正式 filing、IR 或交易對手具名公告支持尚未核實 atoms",
+        "trace_attempts_ref": "2026-09-09 research-drain：對兩個 onboard 候選執行四維初判判定；未對其餘 atoms 另投搜尋預算（先前輪次已查 MediaTek／Samsung EM／Soitec／SK hynix 官網）",
+        "trace_next_trigger": "Soitec 於 URD／半年報／法說具名揭露 LTA 家數與 $200m floor（優先，直接影響 SOI.PA 估值輸入）；其餘 atoms 各自等 issuer／客戶／監管一手",
         "trace_origin_entity": "MediaTek; Samsung Electro-Mechanics; SK hynix",
         "trace_origin_linkage": "不同發行人一手，但只各自支持摘要中的個別 atoms",
         "trace_original_date": "2026-08-31/2026-09-01",
@@ -15658,7 +15658,7 @@
         "trace_trigger_watch_ref": "ew_0066_2026-09-01"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -19577,10 +19577,10 @@
           "TFC Communication 天孚通信"
         ],
         "outcome": "圖層缺口確認：Neo4j 查無任何 fiber array / FAU 節點。CPO、NPO、glass CPO、in-package optical I/O 都在，唯獨缺把光纖接到矽光子晶片的物理介面層。候選供應商 Largan 3008.TW、FOCI 3363.TWO、Browave 3163.TW、HST 7928.TW、Sunny Optical 全部不在圖中，同類僅有 co:corning。這是排序與覆蓋掃描無法產出的那種缺口，它們只能從既有節點往回看。",
-        "parked_reason": "FOCI 的 FAU 能力與量產準備有 issuer 一手，UDN 所稱 NVIDIA 供應角色、需求量與供不應求仍是 tier-3；依 L8 不入圖。",
+        "parked_reason": "⚠ 先更正本 lead 自己的過時註記：2026-08-31 寫的『Neo4j 查無任何 fiber array / FAU 節點……FOCI 3363.TWO 不在圖中』**已不成立**。2026-09-09 實查：層節點 tech:fiber_attach_unit（Fiber Attach Unit）存在，IS_COMPONENT_OF → tech:cpo／tech:pm_fiber／tech:microlens_array；co:foci 已入圖並有 SUPPLIES_TO → tech:fiber_attach_unit（confidence 0.8）、PARTNERSHIP_WITH → co:himax、三則 MOPS 年報 claim 與一則 DigiTimes claim。該層目前兩家供應商：co:coherent（conf 0.9）與 co:foci。原觸發條件（Largan／FOCI／TFC 任一被客戶端具名）仍未命中，且與 [317] 同一結論相符——TSMC 在最有理由提及供應商的場合（2026-08-31 矽光子論壇，其先進封裝副總公開點名『光纖連接器』為 CPO 四大瓶頸之一）仍不具名任何供應商，此路徑結構性可能長期不可得。⚠ 本輪發現的真正可做工作不在 lead 端而在圖端：tech:fiber_attach_unit 的兩條 SUPPLIES_TO 邊 substitutability 與 sole_source 皆為 null——沒填 substitutability 的邊在瓶頸排序裡是隱形的，這比證據薄弱更危險。已移交第 4 段（覆蓋缺口）處理。",
         "research_outcome": "無新 RA；維持 awaiting_named_disclosure，[302] 的第三方專利鏈 RA 為另一個已備妥 admission gate。",
-        "trace_attempts_ref": "2026-08-31：核對 UDN 轉述、FOCI 2025 年報與 NVIDIA 官方 CPO 文件；FOCI 可支持 FAU 自動化線、精密對準與 CPO 應用，仍無 NVIDIA/TSMC 客戶具名與 60–70 萬需求一手。",
-        "trace_next_trigger": "Largan(3008)／FOCI(3363)／TFC 任一在 MOPS 重大訊息、法說會或 NVIDIA／Broadcom 官方文件中具名對方；或 NVIDIA 發布帶角色分工的 CPO 供應鏈說明",
+        "trace_attempts_ref": "2026-09-09 research-drain：Neo4j 直查 FAU 層與 co:foci 全部邊，更正 2026-08-31 的圖層缺口註記；未對 UDN 轉述另投搜尋預算（其觸發條件明載需對方先發文件）",
+        "trace_next_trigger": "Largan(3008)／TFC 天孚通信任一在 MOPS 重大訊息或法說具名 NVIDIA／TSMC；或 NVIDIA／Broadcom 官方發布帶角色分工的 CPO 供應鏈說明。⚠ 不再等 TSMC 具名（已判結構性不可得）",
         "trace_requeue_consumed_entities": [
           "CO:NVIDIA",
           "CO:TSMC",
@@ -19603,7 +19603,7 @@
         "trace_trigger_watch_ref": "ew_0023_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -28127,11 +28127,11 @@
       "refs": {
         "claimed_origin": "Wall Street Journal",
         "gap": "350 億美元金額、350MW、付款及租賃鏈尚無一手文件",
-        "parked_reason": "只有共用同一匿名消息源的三手轉述；等待交易任一方正式揭露",
+        "parked_reason": "觸發條件仍未命中，且本輪取得一個**有界的否定證據**：Hut 8（HUT，SEC 註冊）最近三份 8-K 為 2026-08-04／07-20／06-12——推文所述交易發生於 2026-09-01 前後，至今（2026-09-09）Hut 8 未提交任何新 8-K。⚠ 依 L11-5 誠實界定這個否定的強度：若 Hut 8 是 material definitive agreement 的當事人，Item 1.01 通常要求四個營業日內申報，六個營業日無申報是有意義的；但它不是結論——合約可能簽在子公司／JV 層、或 Hut 8 根本不是締約方（推文的結構是 Lambda 出 GPU、Hut 8 出 DC，Anthropic 可能只與 Lambda 締約）。原始來源仍是 WSJ 匿名消息，Tom's Guide／DCD 同源轉述不構成獨立印證。350 億美元／350MW 兩個數字無任何一手。維持 isolated_tier_3，不入圖、不提高 evidence tier。",
         "research_outcome": "保留候選集合線索；不提高 evidence tier，不建 Research Action",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "2026-09-03 搜索 Anthropic、Lambda、SEC、NVIDIA 官方站；未見直接揭露",
-        "trace_next_trigger": "Anthropic、Lambda、Hut 8 或 NVIDIA 正式公告／filing 具名確認 350 億美元、350MW 與付款／租賃關係",
+        "trace_attempts_ref": "2026-09-09 research-drain：SEC EDGAR 直取 HUT 最近三份 8-K（2026-08-04／07-20／06-12），確認交易日之後無新申報；先前輪次已搜 Anthropic／Lambda／NVIDIA 官方站",
+        "trace_next_trigger": "Anthropic／Lambda（若上市或提交 S-1）／Hut 8 8-K／NVIDIA 任一正式公告或 filing 具名確認 350 億美元、350MW 與付款／租賃關係；Hut 8 後續 8-K 或 10-Q 的 subsequent events 註是最可能的落點",
         "trace_origin_entity": "Wall Street Journal",
         "trace_origin_linkage": "Tom's Guide、DCD 等報導同源於 WSJ 匿名消息，不構成獨立印證",
         "trace_requeue_trigger": "event_watch:ew_0067_2026-09-01",
@@ -28139,15 +28139,16 @@
         "trace_requires_user": "false",
         "trace_status": "isolated_tier_3",
         "trace_trigger_entities": [
+          "HUT",
           "NVDA",
-          "HUT"
+          "co:nvidia"
         ],
         "trace_trigger_event_ref": "lead:lead_66075f8a2712979c5c1403d078d5c37e",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0067_2026-09-01"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -37225,12 +37226,12 @@
           "Starman Holding"
         ],
         "original_claim_status": "已確認簽署合併協議、預計 2026 年底完成、Starman 將帶入美國光收發器業務；公告未寫 800G／1.6T 速率",
-        "parked_reason": "一手已取得；下一步若要納入研究圖，需另做 onboard packet 與入圖核准",
+        "parked_reason": "onboard 候選 Starman Optical 的四維初判**不過**，因此不打 onboard 包（依 research-drain Step 2：初判不過就誠實 park 並寫明哪一維不過，不得 park 成開放式 scope 問題）。①標的純度：合併尚待 GoPro 股東會與監管核准，交易前不存在可分析的實體；②需求錨＝AI 資料中心 capex，與圖中既有錨相同，不新增層；③瓶頸地位：官方聯合 release 只支持『美國製 optical transceivers／AI infrastructure』，**未出現 800G 或 1.6T**——推文的規格宣稱無一手支持；且光收發模組是本圖已覆蓋且供應商眾多的層（co:applied_optoelectronics、co:coherent 等），不是 chokepoint；④客戶端資本承諾：零——無具名客戶、無 offtake、無預付款。⚠ 這是 GPRO 單日 +79% 的那種標的，價格反應與可核實的結構事實之間的落差本身就是不入場的理由。",
         "primary_url": "https://investor.gopro.com/press-releases/press-release-details/2026/GOPRO-ENTERS-INTO-DEFINITIVE-AGREEMENT-TO-MERGE-WITH-STARMAN-OPTICAL-INC-/default.aspx",
         "research_outcome": "形成 Starman onboarding 候選；尚未建立 registry 或 graph delta",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "官方聯合 release 支持 definitive merger、Starman 美國製 optical transceivers、AI infrastructure；未出現 800G 或 1.6T",
-        "trace_next_trigger": "GoPro proxy、交易 closing 或 Starman 公布具名 800G／1.6T transceiver 規格",
+        "trace_attempts_ref": "2026-09-09 research-drain：沿用先前已取得的官方聯合 release（trace_status 已是 original_obtained），本輪只做四維初判判定，未再投搜尋預算",
+        "trace_next_trigger": "交易 closing 後 Starman 出現：具名客戶／offtake，或 800G／1.6T 規格的一手技術文件，或任一客戶端 filing 具名採用——三者任一才重啟四維初判",
         "trace_origin_entity": "GoPro",
         "trace_origin_linkage": "交易當事公司投資人關係公告",
         "trace_original_date": "2026-09-01",
@@ -37248,7 +37249,7 @@
         "trace_trigger_watch_ref": "ew_0065_2026-09-01"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "What... $GPRO is up 79.17% after planning to merge with a photonics company \"Starman Optical\" To build US 800G/1.6T optical transceivers for AI data centers. GoPro trying to compete with $AAOI was definitely not on my radar. https://t.co/5z2XXHaxvs",
       "triage": {
@@ -43752,14 +43753,14 @@
         "campaign_window_start": "2026-06-29T13:46:25Z",
         "original_claim_status": "partial_one_of_eight_primary_confirmed",
         "outcome": "no_prepared_ra_mixed_bundle_partial",
-        "parked_reason": "混合貼文已拆分；既有 Bloom Energy／Brookfield USD 25B 官方事件另有 Research Action，其餘券商／Digitimes atoms 未取得 canonical 原文。今日 FAU lead 與這些 atoms 無內容關聯，不產新 prepared RA。",
+        "parked_reason": "混合貼文（16 個 atom）先前已拆分處理，本輪 related_entity_signal 喚醒未帶來任何 atom 的 canonical 原文。既有處置不變：Bloom Energy／Brookfield USD 25B 已有官方事件與 Research Action；其餘券商（MS 人形出貨修正、探針卡漲價、MLCC LTA）與 Digitimes 轉述（OSAT 缺口、ABF 滿載、CCL 七度調漲、HVLP4 銅箔缺口）仍無 canonical。⚠ 依既有規則不再把混合貼文當單一證據——每個 atom 要各自出現 issuer／客戶／監管或 canonical 原文才分開註冊。decision_impact 為 confidence_only。",
         "primary_url": "https://investor.bloomenergy.com/press-releases/press-release-details/2026/Brookfield-and-Bloom-Energy-Expand-AI-Infrastructure-Partnership-to-25-Billion-Fivefold-Increase-to-Build-and-Finance-Rapid-Power-for-AI-Infrastructure/default.aspx",
         "related_research_action_id": "ra_62c5841f8de2c67890cbefb805ba8d77",
         "research_mode": "delta_only",
         "research_outcome": "unrelated_trigger_existing_partial_result_unchanged",
         "research_run": "daily:2026-08-25",
-        "trace_attempts_ref": "既有 Bloom Energy 2026-06-30 官方公告、Meta Vistara ISCA 2026 與逐 atom 搜尋；本次觸發無新原始事件。",
-        "trace_next_trigger": "各 atom 出現 issuer／客戶／監管或 canonical 券商原文時分開註冊，不再把混合貼文當單一證據。",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認本輪觸發為共用具名標的（related_entity_signal）而非任一 atom 的原觸發條件；未投入新搜尋預算（每個 atom 的觸發條件都寫明需要對方先發文件）",
+        "trace_next_trigger": "任一 atom 出現 issuer／客戶／監管一手或 canonical 券商原文時，以該 atom 單獨註冊為新 lead；混合貼文本身不再 requeue",
         "trace_origin_entity": "Bloom Energy／Brookfield",
         "trace_requeue_consumed_entities": [
           "BE",
@@ -43781,7 +43782,7 @@
         "trace_trigger_watch_ref": "ew_0045_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -56716,12 +56717,12 @@
         "claimed_origin": "New York Times 及三名知情人士",
         "original_claim_status": "partial_support_potential_talks_contract_inference_rejected",
         "outcome": "trigger_unrelated_trace_unchanged",
-        "parked_reason": "今日 AAOI／IREN 提及只因共用 IREN 喚醒，與 Meta–Anthropic compute lease 無內容關聯；現有來源仍只支持 early-stage talks、兩年最高 USD 10B 且條款可變，不能寫成已簽約或承諾收入。",
+        "parked_reason": "第三次複查，觸發條件仍未命中。2026-09-09 查證：所有可得來源仍一致寫成 early/preliminary talks——最高 USD 10B、為期兩年、按月付款、雙方皆有 early-exit 條款、兩家公司均拒絕置評、明載『no guarantee the talks will result in a signed agreement』。⚠ 本次是 related_entity_signal（共用 IREN）把它喚醒，不是原觸發條件（definitive agreement 或 filing 揭露對手方／期限／capacity／revenue commitment）發生。決策影響為 confidence_only：即使成案也只是又一筆 AI capex 需求錨，不改變候選集合或排序，不入圖。",
         "research_mode": "delta_only",
         "research_outcome": "unrelated_entity_trigger_talks_only_no_ra",
         "research_run": "daily:2026-08-25",
-        "trace_attempts_ref": "既有 Reuters carrier／NYT 同源報導與 Meta 官方路徑；本次觸發沒有 definitive agreement。",
-        "trace_next_trigger": "Meta 或 Anthropic 公告 definitive compute lease，或 filing 揭露對手方、期限、capacity 與 revenue commitment。",
+        "trace_attempts_ref": "2026-09-09 research-drain：web search『Meta Anthropic compute lease definitive agreement announcement』8 筆全為二手且全部維持 talks 措辭（thenextweb／Yahoo Finance x2／enterprisedna／entrepreneurloop／mlq.ai）；無任何一方官方公告或 filing",
+        "trace_next_trigger": "Meta 或 Anthropic 公告 definitive compute lease，或 10-Q/10-K 揭露對手方、期限、capacity 與 revenue commitment（early talks 的重複報導不再構成 requeue 理由）",
         "trace_origin_entity": "Reuters/unnamed source",
         "trace_origin_linkage": "Reuters 與 NYT 都依未具名知情人士；公司方未確認",
         "trace_requeue_consumed_entities": [
@@ -56748,7 +56749,7 @@
         "trace_trigger_watch_ref": "ew_0053_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "$META in talks to lease compute to Anthropic in a $10B dollar deal. Seems like they saw how profitable $SPCX $45B compute deal was. But just goes to validate Neocloud business models like $NBIS, $IREN, and co if hyperscalers are copying their homework. Source: NYT https://t.co/3Mu3UXQtFT",
       "triage": {
@@ -61064,12 +61065,12 @@
       "published_at": "2026-09-04T09:14:21.000Z",
       "raw_text": "China reportedly halts some rare earth shipments to US.\n\nNot a new blanket ban, or any mention of specific rare earths. \n\nBut… if I had to guess, Japan is usually a decent indicator of what’s actively important since Japan:\n\n- “sources virtually all of its dysprosium and terbium from China.”\n- gallium, dysprosium, terbium and yttrium from China to Japan all stood at “zero” in June. \n- Shin-Etsu Chemical has reportedly suspended acceptance of new orders for magnets containing dysprosium.\n- Global magnet producer Proterial had received no export licenses for Chinese dysprosium as of last month\n\nThe Reuters piece mentioned yttrium, gallium, terbium, indium phosphide, and tungsten as historical examples (doesn’t say what’s being targeted now).\n\nOn a side note, $LYC.AX is becoming one of the most important alternatives, as Japan has locked up 75% of Lynas’s medium/heavy rare-earth output. (8 tons of dysprosium + terbium in Q1)\n\nSomething fun I also read is that Japan’s deep sea resource is enormous (est. at 16 million tons of rare earth rich mud, but commercialization is post-2028)\n\nBut in the meantime, China seem to be choking off feedstock that would materially affect Japan.\n\nSince you’ve already seen the WF6 Japanese industry stressed from tungsten related halts.\n\nAnd indium/others earlier this year that is used to make InP substrates from Sumitomo/JX.\n\nBut still gradually allowing exports directly eg. $AXTI -> $LITE to allow US/China trade to continue, kinda disrupting that from time to time, then using that as leverage.\n\nIt’s interesting since Japan has so many different monopolies like ABF, so we’ll see if they do anything back.\n\nBut if I had to give a prediction, it does look like the US has a countdown timer until China becomes self-sufficient on semiconductors.\n\nTLDR:\n- rare earth disruption to US\n- China actively targeting Japan for upstream feedstock (which goes to Us supply chains), probably want to focus on that\n- many many second/third order effects from disruptions\n- we’ll see what US/Japan wants to do back, but supply chain wars are being fought upstream.",
       "refs": {
-        "parked_reason": "已取得日本 METI 對中國稀土出口管制造成供應鏈衝擊的一手脈絡；但貼文的最新對美停運、6 月對日歸零、個別公司許可與停單仍只有轉述，不能把具體量或公司狀態入圖。",
+        "parked_reason": "觸發條件『Lynas quarterly report ... names Dy Tb volumes』本輪**部分**達成：Lynas FY2026 Annual Report（141 頁 PDF，以 pypdf 逐頁抽出）p.17 確認首批分離 HRE 氧化物（Dy、Tb）已於 FY26 出貨、Sm 於 2026-03 首產，並逐字給出訂價機制『The Lynas pricing offer for Dysprosium (Dy) and Terbium (Tb) reflects the high demand for these products outside China rather than the market index』；全公司 FY26 ASP A0.7/kg（+59.4%）為歷史新高，歸因含『sales with pricing not linked to the market index』。⚠ 但**仍無 Dy/Tb 噸數或個別售價**——推文所稱『日本鎖定 Lynas 75% 中重稀土產出』『Q1 8 噸 Dy+Tb』在量的層次仍無一手。對美停運量、6 月對日歸零、Shin-Etsu／Proterial 個別停單同樣仍是轉述。已鑄 Engine C 觀測提案 [502]（LYC.AX/gross_margin_trend）記錄訂價權證據。不入圖：訂價與量屬時變觀測（A1 不含時變數字）。",
         "primary_url": "https://www.meti.go.jp/english/speeches/press_conferences/2026/0203001.html",
         "research_outcome": "official_macro_context_only_specific_shipment_claims_unverified",
         "research_run": "daily-brief-2026-09-05",
-        "trace_attempts_ref": "METI 2026 press briefings plus Lynas Proterial Shin-Etsu official-site search; official sources confirm export-control stress but not this posts June zero-flow and latest halt quantities",
-        "trace_next_trigger": "Lynas quarterly report or Japanese customs METI disclosure names Dy Tb volumes, or Proterial Shin-Etsu directly discloses license or order interruption",
+        "trace_attempts_ref": "2026-09-09 research-drain：pypdf 逐頁掃描 lynas_appendix4e_annual_report_fy2026.pdf 141 頁，Dysprosium/Terbium 命中 p.5/6/20（＝報告頁 2/3/17），三處全段逐字核對；先前輪次已查 METI briefings 與三家公司官網",
+        "trace_next_trigger": "Lynas 季報揭露 Dy/Tb 個別噸數或售價；或 Shin-Etsu／Proterial 法定文件直接揭露許可中斷或停單（公司自己的文件，不是媒體轉述）；或日本財務省貿易統計逐月 Dy/Tb 進口量",
         "trace_requeue_trigger": "event_watch:ew_0073_2026-09-04",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
@@ -61087,7 +61088,7 @@
         "trace_trigger_watch_ref": "ew_0073_2026-09-04"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
