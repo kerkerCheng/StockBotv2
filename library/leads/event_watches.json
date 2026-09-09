@@ -120,7 +120,7 @@
         "query_hint": "US ban Chinese optical transceivers rule Federal Register Innolight Eoptolink"
       },
       "note": "2026-09-09 對照：觸發 lead_624d76（COHR 8-K 2026-08-31）內容為高階主管特別績效 RSU，與「禁令草案→正式規則」無關（entity 交集誤觸）；fact 未驗證，等待條件仍成立 → 回 active，lead 進 consumed_leads。",
-      "status": "fired",
+      "status": "consumed",
       "woken_by": {
         "kind": "fact_verification",
         "lead_id": "lead_078cfd6337b274fe8c29dfccd1b74540",
@@ -2157,7 +2157,7 @@
         "query_hint": "Morgan Stanley CPO note Sivers Coherent Lumentum laser supply key participants"
       },
       "note": "[321] 收尾稽核補上：五個假設中唯一沒有喚醒條件的一個；其對應追源線索（9715784d）同時是停滯 10 筆之一，同一個等待漏了兩層｜2026-09-09 對照：觸發 lead_624d76（COHR 8-K RSU）與「MS CPO note 並列 Sivers」無關（entity 交集誤觸）；fact 未驗證 → 回 active，lead 進 consumed_leads。poll 仍 eligible。",
-      "status": "fired",
+      "status": "consumed",
       "woken_by": {
         "kind": "fact_verification",
         "lead_id": "lead_078cfd6337b274fe8c29dfccd1b74540",
