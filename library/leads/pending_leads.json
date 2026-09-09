@@ -7036,6 +7036,174 @@
       "result": "ok",
       "run_at": "2026-09-08T05:08:38.815893+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:18.174678+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:19.212522+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:19.850925+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:23.869283+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:26.115952+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:26.620998+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:27.298321+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:27.983866+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:28.667848+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:29.357580+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:30.130183+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:30.636114+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:31.321635+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:31.847011+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:32.535768+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:33.221683+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:33.915166+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:34.594887+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:35.112861+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:35.794848+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:36.309351+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:37.001763+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:37.680934+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:38.365017+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:39.044157+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:39.840433+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:40.517189+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-08T22:32:41.198749+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -7595,6 +7763,56 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/xslF345X06/ownership.xml"
+    },
+    "lead_019d8e4d8f7c86d3363971c987ffefd0": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:38.364834+00:00",
+      "lead_id": "lead_019d8e4d8f7c86d3363971c987ffefd0",
+      "published_at": "2026-09-08",
+      "refs": {
+        "parked_reason": "SEC Form 4 顯示 Mark A. Stevens 於 2026-09-03 至 09-04 透過信託依既定交易安排出售合計 1,022,239 股；屬時變 insider transaction，不是供應鏈或慢變公司屬性，不產生 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000119903926000014/xslF345X06/wk-form4_1788901755.xml",
+        "research_outcome": "insider_transaction_time_varying_observation_no_graph_delta",
+        "source_doc": "library/raw/nvda_4_20260908.txt",
+        "trace_origin_entity": "U.S. SEC / NVIDIA",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:NVDA",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-08",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:37:41.434689+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "答案回來會改變只是信心"
+        },
+        "decided_at": "2026-09-08T22:37:41.434689+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "NVIDIA 為追蹤公司，官方 Form 4 可核對內部人交易；屬低優先時變觀測但應讓 pq1 依分類降序處理。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119903926000014/xslF345X06/wk-form4_1788901755.xml"
     },
     "lead_02d0c5235a34d0dbddfdb5a80cfe0c5c": {
       "entities": {
@@ -8492,6 +8710,83 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2096149203278037407"
     },
+    "lead_05f01a6f616c2fd1ba2c5881d83ff17b": {
+      "entities": {
+        "company_ids": [
+          "co:nebius"
+        ],
+        "tickers": [
+          "NBIS",
+          "PLTR"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.858974+00:00",
+      "lead_id": "lead_05f01a6f616c2fd1ba2c5881d83ff17b",
+      "media": [
+        {
+          "cache": {
+            "bytes": 69794,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_05f01a6f616c2fd1ba2c5881d83ff17b/3_2097327645667311616.jpg",
+            "sha256": "6eeb7b884161766c0e11d3898407de81a556b52ca905e57bf5ff698023f8ddd3"
+          },
+          "height": 1181,
+          "media_key": "3_2097327645667311616",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRs0YbGbQAAl6-u.jpg",
+          "width": 901
+        },
+        {
+          "cache": {
+            "bytes": 67735,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_05f01a6f616c2fd1ba2c5881d83ff17b/3_2097327645675712512.jpg",
+            "sha256": "146a59b194fd81ea0ff7999cbc449d7fda8a6c75efed4c50e149ce51ea21815e"
+          },
+          "height": 570,
+          "media_key": "3_2097327645675712512",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRs0YbIbcAAmplu.jpg",
+          "width": 627
+        }
+      ],
+      "published_at": "2026-09-08T14:14:13.000Z",
+      "raw_text": "$NBIS is back, and coming in hot with a new partnership with $PLTR.\n\nPalantir also named Nebius its preferred sovereign AI infrastructure partner.\n\nThe implications are potentially significant considering Palantir’s existing relations with the US Gov + Enterprises. https://t.co/izCDuR4r6Q https://t.co/1CKhfpy1BO",
+      "refs": {
+        "onboard_candidate_names": [
+          "Palantir Technologies Inc. (PLTR)"
+        ],
+        "original_claim_status": "verified_partnership_future_integration",
+        "parked_reason": "Nebius／Palantir 共同公告確認策略合作與 preferred sovereign AI infrastructure partner 身分；compute／inference endpoint 整合、容量上線及終端客戶採用仍是未來事項。Palantir 未登記 registry，且只有單一共同 origin_event，本輪不繞過 identity gate 準備 graph action。",
+        "primary_url": "https://nebius.com/newsroom/palantir-and-nebius-partner-to-deliver-a-complete-sovereign-ai-stack-to-palantir-customers",
+        "research_outcome": "verified_joint_announcement_blocked_by_unregistered_palantir_context",
+        "trace_origin_entity": "Nebius / Palantir joint announcement",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "$NBIS is back, and coming in hot with a new partnership with $PLTR. Palantir also named Nebius its preferred sovereign AI infrastructure partner. The implications are potentially significant considering Palantir’s existing relations with the US Gov + Enterprises. https://t.co/izCDuR4r6Q https://t.co/1CKhfpy1BO",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:38:22.023039+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "答案回來會改變候選集合"
+        },
+        "decided_at": "2026-09-08T22:38:22.023039+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Nebius–Palantir partnership 與 preferred sovereign AI infrastructure partner 是具名、可追官方公告的結構事件，可能把新需求錨與候選供應鏈連上。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097327653116363127"
+    },
     "lead_061fe889e9090fd14b4711fafda3fafe": {
       "entities": {
         "company_ids": [
@@ -9167,6 +9462,48 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072728939324428655"
     },
+    "lead_088c456d4f3a74f2cf50c4b43c4b1afd": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:35.112677+00:00",
+      "lead_id": "lead_088c456d4f3a74f2cf50c4b43c4b1afd",
+      "published_at": "2026-09-08",
+      "refs": {
+        "parked_reason": "SEC Form 4 顯示 Chief Accounting Officer Aaron Anderson 於 2026-09-03 依 2026-05-29 採用的 Rule 10b5-1 plan 出售 3,240 股、加權均價約 USD618.06；屬時變 insider transaction，不形成 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326013672/xslF345X06/ownership.xml",
+        "research_outcome": "insider_transaction_time_varying_observation_no_graph_delta",
+        "source_doc": "library/raw/meta_4_20260908.txt",
+        "trace_origin_entity": "U.S. SEC / Meta Platforms",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:META",
+      "status": "parked",
+      "themes": {},
+      "title": "META 4 filed 2026-09-08",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:38:23.379102+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "答案回來會改變只是信心"
+        },
+        "decided_at": "2026-09-08T22:38:23.379102+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Meta 為追蹤 hyperscaler，官方 Form 4 可核對內部人交易；屬低優先時變觀測但分類後可避免搶占高價值 pq1。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326013672/xslF345X06/ownership.xml"
+    },
     "lead_08a45ebf832a2e8484d241e9b4060df5": {
       "entities": {
         "company_ids": [],
@@ -9385,6 +9722,70 @@
         "tier": 3
       },
       "url": "https://x.com/aleabitoreddit/status/2080445777395298454"
+    },
+    "lead_0a453f862fd0e86097b3ac000f763189": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-08T22:32:23.833383+00:00",
+      "lead_id": "lead_0a453f862fd0e86097b3ac000f763189",
+      "media": [
+        {
+          "cache": {
+            "bytes": 127593,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0a453f862fd0e86097b3ac000f763189/3_2097398661408006144.jpg",
+            "sha256": "00923253c1bd9c6ad7b01f2f015b156f6e2f12e6856cf3d0a1b043b999f4a5b1"
+          },
+          "height": 1421,
+          "media_key": "3_2097398661408006144",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRt0-FWaoAAg3id.jpg",
+          "width": 1468
+        },
+        {
+          "cache": {
+            "bytes": 87308,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0a453f862fd0e86097b3ac000f763189/3_2097399001427709952.jpg",
+            "sha256": "3d0b2ba977331c7c014f0e15cfe44c58da78d55aa8b86483af5ebe0b65a0d5e2"
+          },
+          "height": 1100,
+          "media_key": "3_2097399001427709952",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRt1R4BbkAAaPDs.jpg",
+          "width": 1160
+        },
+        {
+          "cache": {
+            "bytes": 101025,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0a453f862fd0e86097b3ac000f763189/3_2097399001444470784.jpg",
+            "sha256": "f32eccda92f2f845ac6651e09d92c53f9c0658fc489a622ada3be936407a6abb"
+          },
+          "height": 1173,
+          "media_key": "3_2097399001444470784",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRt1R4FbUAAkcmc.jpg",
+          "width": 1119
+        }
+      ],
+      "published_at": "2026-09-08T18:58:00.000Z",
+      "raw_text": "How https://t.co/pkCKZ7zIrK",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "How https://t.co/pkCKZ7zIrK",
+      "triage": {
+        "decided_at": "2026-09-08T22:38:24.728719+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "貼文只有「How」與短連結，沒有具名可拆的事件、數字或可逐字核查主張，可引用性不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097399066959491480"
     },
     "lead_0a46048d5ac04fc3f4ee3d89698432a2": {
       "entities": {
@@ -14047,9 +14448,25 @@
       "first_seen": "2026-09-08T05:21:04.462694+00:00",
       "lead_id": "lead_23266eefeeeca2a94da6e8d021cdb915",
       "published_at": "2026-08-26",
-      "refs": {},
+      "refs": {
+        "action_digest": "12a8b6539dcf331129ae58231730d6a0754f373afb3d161d5a3c6821bf8c8469",
+        "focus_company_id": "co:nvidia",
+        "onboard_candidate_names": [
+          "SB Energy"
+        ],
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm",
+        "research_action_id": "ra_72ea0538f2ce32994f4ff205f5342d08",
+        "research_outcome": "prepared_dsx_openai_deployment_path",
+        "research_run": "daily-brief-2026-09-09",
+        "source_doc": "nvda_sb_energy_ports_pike_8k_2026_08_17",
+        "storage_permission": "repo_excerpt",
+        "trace_origin_entity": "NVIDIA / U.S. SEC",
+        "trace_original_date": "2026-08-17",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:NVDA",
-      "status": "pending",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -14060,7 +14477,23 @@
         }
       },
       "title": "NVDA 8-K Q2 FY27 CFO commentary：對 OpenAI／SB Energy Ohio PORTS-Pike 4.25 GW 資料中心提供信用擔保，上限 USD 105B、20 年租約、首批 FY2029 ready；另有 3.8 GW 選擇權（event watch ew_0020 命中）",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:37:42.810459+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "supplier_to_customer",
+          "reason": "答案回來會改變候選集合"
+        },
+        "decided_at": "2026-09-08T22:37:42.810459+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "NVIDIA 官方 CFO commentary 具 USD 105B、4.25GW、20 年租約與 FY2029 時點；信用擔保方向與資料中心需求錨可核查，可能擴充候選供應鏈。",
+        "tier": 1
+      },
       "url": "https://www.sec.gov/Archives/edgar/data/0001045810/000104581026000073/q2fy27cfocommentary.htm"
     },
     "lead_235412651973a56c50f902fc69f1216b": {
@@ -16106,6 +16539,52 @@
         "tier": 3
       },
       "url": "https://x.com/aleabitoreddit/status/2091909391238979970"
+    },
+    "lead_2de7e1a5e8d0c944e39f782f05d9fbf1": {
+      "entities": {
+        "company_ids": [
+          "co:intel"
+        ],
+        "tickers": [
+          "INTC"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.861506+00:00",
+      "lead_id": "lead_2de7e1a5e8d0c944e39f782f05d9fbf1",
+      "media": [],
+      "published_at": "2026-09-08T07:56:28.000Z",
+      "raw_text": "So $INTC is raising PC CPU prices by 10% apparently in October per Digitimes, which I think markets might appreciate.\n\nThe legacy memory trade also just going brrr from August revenues:\n\n-> ESMT revenue up ~+605% Y/Y, 16.4% M/M\nWhich is interesting given gross margins also rising tremendously too. \n\n-> Etron revenue up +525% Y/Y, +6.4% M/M \nChairman says he sees growth momentum in memory to extend through 2028 or longer, potentially 2030. (which is very positive read through for ESMT given what Etron sells) *own ESMT/Etron\n\n-> Winbond revenue up +289.43% Y/Y, up 2% M/M\nTheir president says memory supply and demand are expected to be even tighter in 2027 than in 2026.\n\n-> Macronix revenue up +218.5% Y/Y, +5.4% M/M\nSays SLC NAND, eMMC, NOR remain tight (kinda known there). \n\nSo... if you think your 80%-100% type revenue growth players are insane. \n\nCheck out legacy memory (operating income is even more hilarious). There's a few more where ~ modeled  forward P/E values of like 2-3 from my estimates.\n\nI personally find the theme a better value investing type idea than your 16 P/E no-growth dividend companies.",
+      "refs": {
+        "original_claim_status": "esmt_revenue_supported_other_atoms_not_relied_on",
+        "parked_reason": "ESMT 官方月營收頁確認 2026-08 營收 NT,904.8M、年增 605.24%；Winbond 官方 1Q26 資料亦支持特定舊世代記憶體供給緊張。推文其餘 Intel／Etron／Macronix 百分比與作者 forward P/E 未作為證據；整體屬時變營收、價格與估值觀測，依 A1/A2 分離不入圖。",
+        "primary_url": "https://www.esmt.com.tw/en/investor/financial",
+        "research_outcome": "time_varying_financial_composite_no_graph_delta",
+        "trace_origin_entity": "ESMT and issuer IR pages",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "So $INTC is raising PC CPU prices by 10% apparently in October per Digitimes, which I think markets might appreciate. The legacy memory trade also just going brrr from August revenues: -> ESMT revenue up ~+605% Y/Y, 16.4% M/M Which is interesting given gross margins also rising tremendously too. -> Etron revenue up +525% Y/Y, +6.4% M/M Chairman says he sees growth momentum in memory to extend through 2028 or longer, potentially 2030. (which is very positive read through for ESMT given what Etron sells) *own ESMT/Etron -> Winbond revenue up +289.43% Y/Y, up 2% M/M Their president says memory supply and demand are expected to be even tighter in 2027 than in 2026. -> Macronix revenue up +218.5% Y/Y, +5.4% M/M Says SLC NAND, eMMC, NOR remain tight (kinda known there). So... if you think your 80%-100% type revenue growth players are insane. Check out legacy memory (operating income is even more hilarious). There's a few more where ~ modeled forward P/E values of like 2-3 from my estimates. I personally find the theme a better value investing type idea than your 16 P/E no-growth dividend companies.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:38:26.104867+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "答案回來會改變候選集合"
+        },
+        "decided_at": "2026-09-08T22:38:26.104867+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Intel 漲價與 ESMT／Etron／Winbond／Macronix 月營收、供需與價格主張均有具體數字與公司，可追回 DIGITIMES、月營收公告及公司說法，結果可能擴充 legacy memory 候選。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097232588796780856"
     },
     "lead_2e0c7f6c8054c3ddcb37ef825ec4e508": {
       "entities": {
@@ -32612,6 +33091,118 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2074842421620527157"
     },
+    "lead_80305e9e703177004c1a150f74ff5e8d": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:coherent",
+          "co:applied_optoelectronics",
+          "co:lumentum",
+          "co:macom",
+          "co:amd"
+        ],
+        "tickers": [
+          "SIVE",
+          "COHR",
+          "AAOI",
+          "LITE",
+          "MTSI",
+          "AMD"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.863543+00:00",
+      "lead_id": "lead_80305e9e703177004c1a150f74ff5e8d",
+      "media": [
+        {
+          "cache": {
+            "bytes": 159712,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_80305e9e703177004c1a150f74ff5e8d/3_2097200448109490176.jpg",
+            "sha256": "d32fb0d226c0b6f55f287cf88eb24d42bf26edeaae58a695857c2e72fe50f108"
+          },
+          "height": 865,
+          "media_key": "3_2097200448109490176",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRrAsjRbMAAd8_c.jpg",
+          "width": 1208
+        },
+        {
+          "cache": {
+            "bytes": 164670,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_80305e9e703177004c1a150f74ff5e8d/3_2097200448105308160.jpg",
+            "sha256": "a8daebe09acc6419343dca4a0f9b12bfc85d42b24c2a74932ee0e5747fd11a30"
+          },
+          "height": 905,
+          "media_key": "3_2097200448105308160",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRrAsjQbYAAeMUZ.jpg",
+          "width": 1146
+        },
+        {
+          "cache": {
+            "bytes": 33455,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_80305e9e703177004c1a150f74ff5e8d/3_2097200448105299968.jpg",
+            "sha256": "192ea4f7f9bcc871f4f28302040c90aa57b82717740956747a768dd838eaf074"
+          },
+          "height": 823,
+          "media_key": "3_2097200448105299968",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRrAsjQbQAAmjB2.jpg",
+          "width": 754
+        }
+      ],
+      "published_at": "2026-09-08T05:48:47.000Z",
+      "raw_text": "Glad $SIVE is attending CIOE Shenzen and hope my followers can go too!\n\nIf you want my read on current landscape:\n\n-> Chinese pluggable makers like CIG (剑桥科技) are facing severe shortages in 70mW-200mW lasers.\n\nIf you look at filings from CIG, they claim \"substantially longer delivery times and deposits to secure capacity” along with statements of shortages.\n\n-> Innolight and others were also looking to secure multiple laser suppliers with LTAs recently from their filings. \n\nOn the US side of things:\n\n-> $COHR was a major merchant laser supplier before, but largely withdrew from the market after rerouting them internally. \n\n\"I do not see any time in the near future where we would be selling Indium Phosphide lasers externally.\" From their ER transcript. \n\nAnd then likely turned into a buyer in an already supply constrained market... where \n\n\"over the long term, we will have some portion of our datacom transceivers that will be supported by external sources.\"\n\n-> $AAOI not really known to be a merchant supplier, but said same thing about laser capacity being rerouted towards transceivers. And having to turn away customers for lasers. \n\n-> For $LITE, they still supply lasers but stated: \"We are commanding a significant price premium\" for CW lasers\n\n$LITE Wupen Yuen: \"wherever they can get the laser source, they will use that solution to support their build-out.\"\n\nSo hinting... about customers just finding anything available due to shortages. \n\n-> $MTSI has no meaningful capacity online now, but they're already stating customers are approaching them with urgency to secure CW laser supply. \n\n-> Trendforce reported $AMD and hyperscaler CSPs are aggressively going out to secure CW laser supply to avoid future bottlenecks. \n\nAnd then you have Europe... \n\nWhere $SIVE is coming online with \"tremendous capacity available now\" from their foundry partners. \n\nWith 100M+ laser capacity Q4 2027, and maybe if you look at their 2:1 ratio implying ~200M targeted laser capacity from external foundries. \n\nThey also happen to offer the same power range (70mW, 100 mW, 200mW) as the ones currently in shortage by pluggable makers in China. \n\nThere's a massive void to fill, so this dramatically increases the chance of converting customers. (esp. Supported by Lumentum statements)\n\nMy speculation was that some of the 6 active pluggable engagements were from China? \n\nWhich is why they're attending the conference. \n\nSo to any of my Chinese followers, maybe you can ask a few questions like:\n\n- if Europe is a laser source geography, if Innolight/Eoptolink/Cambridge are considering $SIVE. \n- if they're seeing ASP hikes in lasers, and what CW products are hardest to obtain\n\nIf you are attending CIOE in Shenzhen!",
+      "refs": {
+        "original_claim_status": "industry_tightness_partially_supported_sivers_customer_inference_unsupported",
+        "parked_reason": "CIG 官方投資者問答確認 CW 光源等核心物料供應仍緊、公司以保供協議與投資鎖定供應；Lumentum／Coherent／AAOI 官方資料亦支持雷射自用與供需緊張。這些結構已在圖中；沒有客戶端文件具名 Innolight／Eoptolink／CIG 採用 Sivers，社群推導的中國客戶轉換不成立為新 graph delta。",
+        "primary_url": "https://dataclouds.cninfo.com.cn/shgonggao/investor/2026/20260519/f66529f68ffaa15ab4cc4d6b7eef6dc0.pdf",
+        "research_outcome": "official_sources_restate_existing_laser_constraints_no_named_sivers_customer",
+        "trace_origin_entity": "CIG and issuer filings",
+        "trace_original_date": "2026-05-19",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "LITE"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "Glad $SIVE is attending CIOE Shenzen and hope my followers can go too! If you want my read on current landscape: -> Chinese pluggable makers like CIG (剑桥科技) are facing severe shortages in 70mW-200mW lasers. If you look at filings from CIG, they claim \"substantially longer delivery times and deposits to secure capacity” along with statements of shortages. -> Innolight and others were also looking to secure multiple laser suppliers with LTAs recently from their filings. On the US side of things: -> $COHR was a major merchant laser supplier before, but largely withdrew from the market after rerouting them internally. \"I do not see any time in the near future where we would be selling Indium Phosphide lasers externally.\" From their ER transcript. And then likely turned into a buyer in an already supply constrained market... where \"over the long term, we will have some portion of our datacom transceivers that will be supported by external sources.\" -> $AAOI not really known to be a merchant supplier, but said same thing about laser capacity being rerouted towards transceivers. And having to turn away customers for lasers. -> For $LITE, they still supply lasers but stated: \"We are commanding a significant price premium\" for CW lasers $LITE Wupen Yuen: \"wherever they can get the laser source, they will use that solution to support their build-out.\" So hinting... about customers just finding anything available due to shortages. -> $MTSI has no meaningful capacity online now, but they're already stating customers are approaching them with urgency to secure CW laser supply. -> Trendforce reported $AMD and hyperscaler CSPs are aggressively going out to secure CW laser supply to avoid future bottlenecks. And then you have Europe... Where $SIVE is coming online with \"tremendous capacity available now\" from their foundry partners. With 100M+ laser capacity Q4 2027, and maybe if you look at their 2:1 ratio implying ~200M targeted laser capacity from external foundries. They also happen to offer the same power range (70mW, 100 mW, 200mW) as the ones currently in shortage by pluggable makers in China. There's a massive void to fill, so this dramatically increases the chance of converting customers. (esp. Supported by Lumentum statements) My speculation was that some of the 6 active pluggable engagements were from China? Which is why they're attending the conference. So to any of my Chinese followers, maybe you can ask a few questions like: - if Europe is a laser source geography, if Innolight/Eoptolink/Cambridge are considering $SIVE. - if they're seeing ASP hikes in lasers, and what CW products are hardest to obtain If you are attending CIOE in Shenzhen!",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:36:31.785658+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "答案回來會改變排序"
+        },
+        "decided_at": "2026-09-08T22:36:31.785658+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "關聯 Sivers、COHR、AAOI、Lumentum、MACOM 與 CW laser 短缺；含 70mW–200mW、交期、訂金、100M+ 產能等可追原文主張，可能改變 Sivers 相對瓶頸排序。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097200456090952096"
+    },
     "lead_803eac7fae908efdcbe67e9cc470e646": {
       "entities": {
         "company_ids": [
@@ -33455,12 +34046,20 @@
       "published_at": "2026-09-07T09:16:19.000Z",
       "raw_text": "I'll let you decide that for yourself since that was an illustrative laser revenue modeling off $SIVE 100M CW DFB laser/year target. \n\nBut... do you want to know the main reason I like laser companies so much?\n\nThey don't just have to stay laser companies... just look at $LITE! \n\nIf we look at Lumentum's previous Cloud Light acqusition (pluggables)... it enabled: \n\n- more than a 5X+ expansion in served opportunity inside DCs. \n\nFrom Lumentum's OFC deck:\n\n- ELS expansion from UHP laser chips was 2X TAM opportunity..\n\nBut selling lasers alone... just from one UHP laser fab was $5B in projected revenue capacity (their fab expected to ramp in early 2028), if we apply similar 55-65% CPO laser margin quotes by $AAOI. \n\nSo lasers by itself is very profitable, and despite industry capacity expansion, there would likely still be a demand imbalance for lasers. \n\nIsn't that pretty cool? \n\nSo it's not quite just modeling component value for certain types of companies since they can keep growing into other products. \n\nAnd you have new overlapping cycles eg. NPO/CPO/1.6T pluggables increasing demand. \n\nSo I'd personally assign higher premiums for laser companies over types of suppliers that stay in the same layer.",
       "refs": {
+        "original_claim_status": "official_deck_confirms_targets_not_actuals",
+        "parked_reason": "Lumentum OFC 2026 一手簡報逐字確認 Greensboro UHP fab 目標 early-2028 ramp、USD5B annual revenue capacity、CY27 multi-hundred-million UHP capacity 與 ELS 約 2x opportunity；簡報明示 target model 非 guidance。這些都是未來產能／收入／TAM 數字，依 A1/A2 分離不入圖，且未跨 Engine C 人工 observation gate。",
         "primary_url": "https://s21.q4cdn.com/377324469/files/doc_presentations/2026/2026-Lumentum-at-OFC_final.pdf",
+        "research_outcome": "forward_capacity_and_tam_targets_are_engine_c_observations",
         "research_run": "daily-brief-2026-09-08",
-        "trace_attempts_ref": "一手簡報（2026-03-17 Lumentum Investor Briefing at OFC 2026）已下載至 library/raw/lumentum_ofc2026_investor_briefing.pdf 並以 pypdf 抽字（.txt，21K 字）；逐字命中：New UHP Laser Fab to Generate $5B Annual Revenue Capacity／Acquired from Qorvo—Greensboro, NC／Expect to be ramping UHP production by early 2028／Future expansion into ELS to increase opportunity by ~2X above UHP chips alone／Multi-hundred-million-dollar（UHP PO）。圖中僅有 Q3 FY26 法說的 Greensboro 六季內不貢獻營收（lumentum_q3fy26_cpo_cl3），上述四項尚未入圖；本輪追源完成、抽取與 prepare 留下一輪 drain"
+        "source_doc": "library/raw/lumentum_ofc2026_investor_briefing.pdf",
+        "trace_attempts_ref": "一手簡報（2026-03-17 Lumentum Investor Briefing at OFC 2026）已下載至 library/raw/lumentum_ofc2026_investor_briefing.pdf 並以 pypdf 抽字（.txt，21K 字）；逐字命中：New UHP Laser Fab to Generate $5B Annual Revenue Capacity／Acquired from Qorvo—Greensboro, NC／Expect to be ramping UHP production by early 2028／Future expansion into ELS to increase opportunity by ~2X above UHP chips alone／Multi-hundred-million-dollar（UHP PO）。圖中僅有 Q3 FY26 法說的 Greensboro 六季內不貢獻營收（lumentum_q3fy26_cpo_cl3），上述四項尚未入圖；本輪追源完成、抽取與 prepare 留下一輪 drain",
+        "trace_origin_entity": "Lumentum",
+        "trace_original_date": "2026-03-17",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
-      "status": "researching",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -33546,6 +34145,86 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000190/xslF345X06/wk-form4_1785439283.xml"
+    },
+    "lead_83a0425062febbdf6e85291b37093342": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:marvell_technology",
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AMZN",
+          "QCOM",
+          "NVDA",
+          "MRVL",
+          "ALAB",
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.859705+00:00",
+      "lead_id": "lead_83a0425062febbdf6e85291b37093342",
+      "media": [
+        {
+          "cache": {
+            "bytes": 67894,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_83a0425062febbdf6e85291b37093342/3_2097321341309571072.jpg",
+            "sha256": "1f8abeb6aa6568ec93ecb2e69092331cc9576b5c6490859bb0aaf057e4a45f21"
+          },
+          "height": 437,
+          "media_key": "3_2097321341309571072",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRsupdiaUAASdF1.jpg",
+          "width": 1231
+        }
+      ],
+      "published_at": "2026-09-08T13:49:10.000Z",
+      "raw_text": "$AMZN signs a new deal with $QCOM, giving Amazon the right to buy a ~$4B stake of Qualcomm through warrants.\n\nAt this rate.. Amazon will be more of a semi ETF than $NVDA?\n\nGiven their existing equity/warrants with AlChip, $MRVL, $ALAB, $AAOI, and others.\n\nThis of course is linked with up to $60B in milestone revenue from Amazon/Qualcomm custom silicon partnership.\n\nGood for both companies, moreso Qualcomm.",
+      "refs": {
+        "onboard_candidate_names": [
+          "QUALCOMM Incorporated (QCOM)",
+          "Amazon.com, Inc. (AMZN)"
+        ],
+        "original_claim_status": "partially_supported_warrant_not_current_stake",
+        "parked_reason": "Qualcomm 8-K 確認 Amazon 取得最多 25M 股、行使價 USD161.26 的 warrant；3.75M 股因初始採購承諾已 vest，其餘與最高 USD60B 的 binding PO／實際採購掛鉤。未行使 warrant 沒有股東權利，故不是 Amazon 已持有約 USD4B 股權。Qualcomm 與 Amazon 均未登記 registry，本輪不繞過 identity gate 準備 graph action。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/804328/000110465926105718/tm2623289d1_8k.htm",
+        "research_outcome": "verified_purchase_commitment_and_warrant_context_entities_not_registered",
+        "trace_origin_entity": "Qualcomm / U.S. SEC",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "$AMZN signs a new deal with $QCOM, giving Amazon the right to buy a ~$4B stake of Qualcomm through warrants. At this rate.. Amazon will be more of a semi ETF than $NVDA? Given their existing equity/warrants with AlChip, $MRVL, $ALAB, $AAOI, and others. This of course is linked with up to $60B in milestone revenue from Amazon/Qualcomm custom silicon partnership. Good for both companies, moreso Qualcomm.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:37:44.264271+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "unclear",
+          "reason": "答案回來會改變候選集合"
+        },
+        "decided_at": "2026-09-08T22:37:44.264271+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "Amazon–Qualcomm 具約 USD 4B warrants 與至多 USD 60B milestone revenue 等可查主張，關聯 custom silicon 與既有 Alchip／Marvell／AAOI 路徑；資金方向為複合安排，先標不明。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097321349555306512"
     },
     "lead_83d49b45107bf97f2c98508d73279111": {
       "entities": {
@@ -37270,6 +37949,46 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826006945/xslF345X06/doc4.xml"
     },
+    "lead_960f624f0e987d10fa9a5fe5b48c0609": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "HOOD"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.860474+00:00",
+      "lead_id": "lead_960f624f0e987d10fa9a5fe5b48c0609",
+      "media": [
+        {
+          "cache": {
+            "bytes": 134763,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_960f624f0e987d10fa9a5fe5b48c0609/3_2097309692964028416.jpg",
+            "sha256": "d97caaa2fe264a77ce668b359a7e013db8dab8de65ad44030ff2d99ccbcccea1"
+          },
+          "height": 1096,
+          "media_key": "3_2097309692964028416",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRskDcEawAA6qaW.jpg",
+          "width": 1166
+        }
+      ],
+      "published_at": "2026-09-08T13:02:53.000Z",
+      "raw_text": "Wow, $HOOD has taken minority ownership in Crypto‌.com.\n\nIt does feel like the future of the finance industry is slowly consolidating around Stripe/Robinhood.\n\nEspecially after the successful expansion of Robinhood Chain, Prediction Markets, and Credit Cards/Banking. https://t.co/FXZTmVaIo5",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "Wow, $HOOD has taken minority ownership in Crypto‌.com. It does feel like the future of the finance industry is slowly consolidating around Stripe/Robinhood. Especially after the successful expansion of Robinhood Chain, Prediction Markets, and Credit Cards/Banking. https://t.co/FXZTmVaIo5",
+      "triage": {
+        "decided_at": "2026-09-08T22:38:27.472946+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "Robinhood–Crypto.com 少數持股與加密金融整合不屬目前 StockBotv2 的追蹤公司、CPO／半導體供應鏈或既定主題，關聯性不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097309699645546763"
+    },
     "lead_966dbb4d445ea90ff30a2086aab45a90": {
       "entities": {
         "company_ids": [
@@ -40651,6 +41370,68 @@
         "tier": 3
       },
       "url": "https://uk.advfn.com/market-news/article/18722/iqe-appoints-macom-executives-to-board-under-strategic-partnership-agreement-iqe?.tsrc=rss"
+    },
+    "lead_a7add74cce651d491e353a7f71b94f6b": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.854241+00:00",
+      "lead_id": "lead_a7add74cce651d491e353a7f71b94f6b",
+      "media": [],
+      "published_at": "2026-09-08T16:45:04.000Z",
+      "raw_text": "Goldman Sachs in their recent note upgraded their global optical module market forecast to:  \n\n- $67.7 billion (+33% revision) for 2026\n- $131.4 billion (+81% revision) for 2027\n- $148.5 billion (+115% revision) for 2028\n\nFor $NVDA Rubin Ultra, GS increased its modeled optical modules per GPU:\n\n1.6T: 0 -> 2\n3.2T: 3 -> 5 \n\nGS also raised their 1.6T and above forecast for 2027 by 61%... so that's also very material, with 80% silicon photonics penetration rate estimated. \n\nSo more optical content per chip = a lot more CW lasers, more SOI substrates, happy optical companies.",
+      "refs": {
+        "claimed_origin": "Goldman Sachs research note",
+        "original_claim_status": "unverified_secondary_restatement",
+        "parked_reason": "未取得 Goldman Sachs canonical note，無法逐字核對 USD67.7B／131.4B／148.5B、Rubin Ultra 每 GPU 模組數與 80% silicon photonics penetration。這些又屬市場預測與時變數字，不得由社群轉述進圖或 Engine C authority；保留具名 disclosure 觸發後再查。",
+        "research_outcome": "isolated_tier3_market_forecast_no_primary_note",
+        "trace_attempts_ref": "WebSearch：Goldman Sachs public research、NVIDIA Rubin Ultra official disclosure、issuer IR；未取得可逐字核對的 canonical note",
+        "trace_next_trigger": "Goldman Sachs 公開報告／研究摘要釋出，或 NVIDIA／光模組供應商正式文件給出 Rubin Ultra 每 GPU 光模組數與 2027–2028 市場規模",
+        "trace_requires_user": "false",
+        "trace_status": "isolated_tier_3",
+        "trace_trigger_entities": [
+          "NVDA",
+          "LITE",
+          "COHR",
+          "SOI"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Goldman Sachs in their recent note upgraded their global optical module market forecast to: - $67.7 billion (+33% revision) for 2026 - $131.4 billion (+81% revision) for 2027 - $148.5 billion (+115% revision) for 2028 For $NVDA Rubin Ultra, GS increased its modeled optical modules per GPU: 1.6T: 0 -> 2 3.2T: 3 -> 5 GS also raised their 1.6T and above forecast for 2027 by 61%... so that's also very material, with 80% silicon photonics penetration rate estimated. So more optical content per chip = a lot more CW lasers, more SOI substrates, happy optical companies.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:37:45.669443+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "答案回來會改變排序"
+        },
+        "decided_at": "2026-09-08T22:37:45.669443+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "Goldman 光模組市場與 Rubin Ultra 光學含量預測含具體年度、金額、模組數與 silicon photonics 滲透率；雖是二手轉述，追回原 note 可改變 CPO 供應鏈排序判斷。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097365614402969638"
     },
     "lead_a7bde7bc0f16b8d05ace967989d47a57": {
       "entities": {
@@ -51881,6 +52662,48 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2095823005595439615"
     },
+    "lead_d9389c8a69d76481e03526e3f50b9f2d": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:31.321448+00:00",
+      "lead_id": "lead_d9389c8a69d76481e03526e3f50b9f2d",
+      "published_at": "2026-09-08",
+      "refs": {
+        "parked_reason": "GlobalFoundries 6-K 揭露 2026-09-03 與美國商務部簽署證券發行協議，以每股 USD37.85 發行 9,907,399 股、約 USD375M；這是帶日期的資本／政府持股事件，且政府機關不符合現行 Company node schema，因此不以供應鏈 graph claim 入圖。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000234/a6-ksiaclean.htm",
+        "research_outcome": "dated_government_equity_issuance_observation_no_graph_delta",
+        "source_doc": "library/raw/gfs_6_k_20260908.txt",
+        "trace_origin_entity": "U.S. SEC / GlobalFoundries",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:GFS",
+      "status": "parked",
+      "themes": {},
+      "title": "GFS 6-K filed 2026-09-08",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:36:33.178233+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "答案回來會改變只是信心"
+        },
+        "decided_at": "2026-09-08T22:36:33.178233+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "GlobalFoundries 為追蹤公司，官方 6-K 與日期可逐字核對；先寬鬆放行讀原文，內容若僅例行觀測再依 L4 park。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000234/a6-ksiaclean.htm"
+    },
     "lead_d95d26c1e9be71f3422d0b4d10ee6ad8": {
       "entities": {
         "company_ids": [
@@ -55965,6 +56788,94 @@
       ],
       "url": "https://www.globenewswire.com/news-release/2025/10/08/3163429/19933/en/Broadcom-Announces-Tomahawk-6-Davisson-the-Industry-s-First-102-4-Tbps-Ethernet-Switch-with-Co-Packaged-Optics.html?decompose=osat"
     },
+    "lead_ec731dc5efce9d1a812523c3cfbf17c9": {
+      "entities": {
+        "company_ids": [
+          "co:sandisk"
+        ],
+        "tickers": [
+          "ESMT",
+          "SNDK",
+          "COST"
+        ]
+      },
+      "first_seen": "2026-09-08T22:32:23.855416+00:00",
+      "lead_id": "lead_ec731dc5efce9d1a812523c3cfbf17c9",
+      "media": [
+        {
+          "cache": {
+            "bytes": 82392,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ec731dc5efce9d1a812523c3cfbf17c9/3_2097348478741721089.jpg",
+            "sha256": "ea335a6b908b2a8b8fcbf6168a1e25423db636f804104c991ed2302f3cdef48e"
+          },
+          "height": 1127,
+          "media_key": "3_2097348478741721089",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRtHVEWbMAEUBev.jpg",
+          "width": 1193
+        },
+        {
+          "cache": {
+            "bytes": 100052,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ec731dc5efce9d1a812523c3cfbf17c9/3_2097348478750056448.jpg",
+            "sha256": "2d972468b50e696cfa69d60073a52ab2c99db02eea1c73d81fbcee77e3b7ff7b"
+          },
+          "height": 1528,
+          "media_key": "3_2097348478750056448",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRtHVEYaYAAihqp.jpg",
+          "width": 1227
+        },
+        {
+          "cache": {
+            "bytes": 30294,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_ec731dc5efce9d1a812523c3cfbf17c9/3_2097348478737551360.jpg",
+            "sha256": "6e2dc1e6768efd491507263e7ba5272dd11236c8d2a825c802c5c88171f8da09"
+          },
+          "height": 639,
+          "media_key": "3_2097348478737551360",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HRtHVEVbkAArEf8.jpg",
+          "width": 631
+        }
+      ],
+      "published_at": "2026-09-08T15:37:00.000Z",
+      "raw_text": "Okay I know this is US time and this is a Taiwan stock...\n\nBut I really am starting to think $ESMT (3006) can cook like $SNDK. And I’m excited.\n\nSo hopefully in a few months, people can something say similar... \n\nFUN FACT CHAT: \n\nDid you know.. 1 old DDR2 memory chip is.. ~$0.96? (from LCSC data) \n\nObviously different per spec since some can be $2.5... \n\nBut if you 3x ASP Hike this. \n\nThat's a whole... ~$2 added to final BOM cost. \n\nSo about the same cost as a $COST hot dog. \n\nIt goes into things like a D-Link security camera, maybe like $33 final cost... \n\nand adds like $2. (which people won't mind)\n\nBut... 3X ASP hike to ESMT? Is very, very material. \n\nThat's just for one product category, and there's many others from SLC NAND (eg. +120–170% H2) to NOR Flash products for H2 ASP hike projections. \n\nAnd my favorite thing is, they've already shown they're willing to partake in the price hike games (seems like there's a long way to go)…\n\nCurrently they make ~$111M net income a month from July earnings ($2.8B MC), which annualized is like ~2.1X P/E. *I have positions.\n\nSo... I think $ESMT has room to cook like masterchef Sandisk. \n\nTLDR:\n- Repeated rounds of price hiking = seems absurd for the company's net income... but has potential due to starting low component cost. \n\n- Reminds me of early $SNDK but for other segments (legacy/niche memory).",
+      "refs": {
+        "original_claim_status": "issuer_financials_supported_component_price_and_pe_are_author_model",
+        "parked_reason": "ESMT 官方頁確認 2026-08 營收大幅成長，2025 年報亦描述 DDR2／DDR3 價格回升；但 LCSC 單顆價格、3x ASP、月淨利年化與約 2.1x P/E 是時變市場資料或作者模型。這些數字不屬 A1，未經 Engine C 人工 observation gate 不寫入任何 authority。",
+        "primary_url": "https://www.esmt.com.tw/en/investor/financial",
+        "research_outcome": "time_varying_financial_and_valuation_observation_no_graph_delta",
+        "trace_origin_entity": "ESMT",
+        "trace_original_date": "2026-09-08",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Okay I know this is US time and this is a Taiwan stock... But I really am starting to think $ESMT (3006) can cook like $SNDK. And I’m excited. So hopefully in a few months, people can something say similar... FUN FACT CHAT: Did you know.. 1 old DDR2 memory chip is.. ~$0.96? (from LCSC data) Obviously different per spec since some can be $2.5... But if you 3x ASP Hike this. That's a whole... ~$2 added to final BOM cost. So about the same cost as a $COST hot dog. It goes into things like a D-Link security camera, maybe like $33 final cost... and adds like $2. (which people won't mind) But... 3X ASP hike to ESMT? Is very, very material. That's just for one product category, and there's many others from SLC NAND (eg. +120–170% H2) to NOR Flash products for H2 ASP hike projections. And my favorite thing is, they've already shown they're willing to partake in the price hike games (seems like there's a long way to go)… Currently they make ~$111M net income a month from July earnings ($2.8B MC), which annualized is like ~2.1X P/E. *I have positions. So... I think $ESMT has room to cook like masterchef Sandisk. TLDR: - Repeated rounds of price hiking = seems absurd for the company's net income... but has potential due to starting low component cost. - Reminds me of early $SNDK but for other segments (legacy/niche memory).",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-08T22:38:28.839042+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "答案回來會改變候選集合"
+        },
+        "decided_at": "2026-09-08T22:38:28.839042+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "ESMT 產品 ASP、月淨利與 forward P/E 敘述含具體數字，關聯 legacy memory 候選與既有 SNDK 對照；追回公司月營收／財報與價格來源可改變候選集合。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097348486635368686"
+    },
     "lead_ecaab49dd6acfe4163a0128d2f522cb8": {
       "entities": {
         "company_ids": [
@@ -56259,9 +57170,18 @@
       "first_seen": "2026-09-04T07:46:50.617345+00:00",
       "lead_id": "lead_eede896d2f8835aad9f4c315755960a0",
       "published_at": "2026-09-03",
-      "refs": {},
+      "refs": {
+        "original_claim_status": "official_form4_tax_withholding_not_market_sale",
+        "parked_reason": "SEC Form 4 顯示 EVP R&D Didier Wimmers 以交易代碼 F 由公司代扣 317 股、每股 USD76.27 履行稅負；文件明示不代表出售，屬時變薪酬／稅務 observation，不形成 graph delta。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000111/xslF345X06/ownership.xml",
+        "research_outcome": "insider_tax_withholding_time_varying_observation_no_graph_delta",
+        "trace_origin_entity": "U.S. SEC / Aehr Test Systems",
+        "trace_original_date": "2026-09-03",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AEHR",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AEHR 4 filed 2026-09-03",
       "triage": {
@@ -59915,8 +60835,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2097005818302607682",
-      "updated_at": "2026-09-08T05:08:21.781135+00:00",
+      "since_id": "2097399066959491480",
+      "updated_at": "2026-09-08T22:32:23.869276+00:00",
       "user_id": "1940360837547565056"
     }
   }

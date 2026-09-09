@@ -8128,6 +8128,19 @@
       "source": "manual",
       "title": "6324.T 估值 abstention 入帳：把『無法錨定倍數，所以刻意不寫 target_pe』由散文改成結構化 append-only 紀錄",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-08T23:11:17.110587+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：NVIDIA Corporation（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:nvidia。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 488,
+      "reason": null,
+      "ref_id": "ra_72ea0538f2ce32994f4ff205f5342d08",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "NVIDIA 的 DSX AI factory platform 取得 OpenAI 具名部署路徑",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -17599,6 +17612,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 488,
+  "next_n": 489,
   "schema_version": "1"
 }

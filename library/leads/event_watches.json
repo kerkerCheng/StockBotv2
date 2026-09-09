@@ -253,7 +253,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-03",
+        "last_checked": "2026-09-08",
         "query_hint": "取得 canonical Rosenblatt／B. Riley note，或 AAOI／Broadcom 官方量化 MRC／RNG 對 optical unit demand 的影響"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
@@ -1100,7 +1100,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-03",
+        "last_checked": "2026-09-08",
         "query_hint": "FCC 正式發布 NPRM／Report and Order，或把中國光模組廠列入 Covered List。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -2702,6 +2702,31 @@
         "query_hint": "IQE H1 2026 法說逐字稿或 Bloomberg 原文經可讀管道（BNN／Yahoo 轉載）出現 substrate access 句"
       },
       "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0079_2026-09-08",
+      "created_at": "2026-09-08T22:37:45.669443+00:00",
+      "expires": "2027-01-06",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "NVDA",
+        "co:nvidia"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_a7add74cce651d491e353a7f71b94f6b",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Goldman Sachs 公開報告／研究摘要釋出，或 NVIDIA／光模組供應商正式文件給出 Rubin Ultra 每 GPU 光模組數與 2027–2028 市場規模"
+      },
+      "note": "park 時自動建立；trace_status=isolated_tier_3",
       "status": "active",
       "woken_by": null
     }
