@@ -152,8 +152,13 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
         _line("horizon", "Horizon（判斷：何時實現）", ir.horizon, "headline_number"),
         _line("price_return", "隱含價格報酬（simple）", ir.price_return, "headline_number"),
         _line("annualized_price_return", "隱含價格報酬（年化）", ir.annualized_price_return, "headline_number"),
+        # 2026-09-09 P2：兩桿拆解跟在總報酬旁邊——使用者要一眼分得出「負的是因為我們 EPS 比共識低，
+        # 還是因為我們的倍數比市場低」。拆不出來就 missing，不影響前面幾格。
+        _line("eps_contribution", "其中：EPS 差異貢獻（我們 vs 共識）", ir.eps_contribution, "headline_number"),
+        _line("multiple_contribution", "其中：倍數差異貢獻（我們 vs 市場倍數）", ir.multiple_contribution, "headline_number"),
     )
     context_lines = (
+        _line("return_attribution", "兩桿拆解整包（恆等式、市場倍數、原則提醒）", ir.attribution, "headline_context"),
         _line("return_convention", "報酬語意", ir.return_convention, "headline_context"),
         _line("horizon_window", "Horizon 區間", ir.horizon_window, "headline_context"),
         _line("fair_value_gap", "Fair value 與現價的差（不是報酬）", va.fair_value_gap, "headline_context"),

@@ -530,7 +530,8 @@ def render_implied_return_lines(view: AlphaInvestmentView) -> list[str]:
     if ir.period:
         lines.append(f"目標期間：{markdown_text(ir.period)}" + (f"（至 {ir.period_end.isoformat()}）" if ir.period_end else ""))
     for datum in (ir.return_convention, ir.current_price, ir.fair_value, ir.value_date, ir.horizon, ir.horizon_window,
-                  ir.price_return, ir.annualized_price_return, ir.total_return, ir.probability_weighted_return):
+                  ir.price_return, ir.annualized_price_return, ir.eps_contribution, ir.multiple_contribution,
+                  ir.attribution, ir.total_return, ir.probability_weighted_return):
         lines.append(_datum_line(datum))
     if ir.selection is not None:
         sel = ir.selection

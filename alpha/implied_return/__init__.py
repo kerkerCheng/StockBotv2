@@ -28,17 +28,21 @@ from .assumptions import (
     RECORD_VERSION, horizon_assumption_record, new_horizon_assumption_id, parse_horizon_assumption_record,
     select_horizon_assumptions,
 )
+from .attribution import MULTIPLE_WARNING_THRESHOLD, attribute_price_return, attribution_payload, multiple_principle_note
 from .contracts import (
     ALIGNMENTS, ALIGNMENT_ALIGNED, ALIGNMENT_HORIZON_AFTER, ALIGNMENT_HORIZON_BEFORE, ALIGNMENT_SPOT,
-    ANNUALIZED_RETURN_FORMULA, DAYS_PER_YEAR, HOLDING_PERIOD_FORMULA, HORIZON_DRIVER, HORIZON_START_FORMULA,
-    MODEL_VERSION, PRICE_RETURN_FORMULA, RETURN_CONVENTIONS, RETURN_CONVENTION_BASE_CASE_PRICE, RETURN_STATUSES,
-    TOTAL_RETURN_STATUSES, HorizonAssumption, ImpliedReturnResult, ReturnStep, combined_return_dependency,
+    ANNUALIZED_RETURN_FORMULA, ATTRIBUTION_FORMULA, ATTRIBUTION_STATUSES, DAYS_PER_YEAR, HOLDING_PERIOD_FORMULA,
+    HORIZON_DRIVER, HORIZON_START_FORMULA, MODEL_VERSION, PRICE_RETURN_FORMULA, RETURN_CONVENTIONS,
+    RETURN_CONVENTION_BASE_CASE_PRICE, RETURN_STATUSES, TOTAL_RETURN_STATUSES, HorizonAssumption,
+    ImpliedReturnResult, ReturnAttribution, ReturnStep, combined_return_dependency,
 )
 from .model import build_implied_return
 
 __all__ = [
     "ALIGNMENTS", "ALIGNMENT_ALIGNED", "ALIGNMENT_HORIZON_AFTER", "ALIGNMENT_HORIZON_BEFORE", "ALIGNMENT_SPOT",
-    "ANNUALIZED_RETURN_FORMULA", "DAYS_PER_YEAR", "HOLDING_PERIOD_FORMULA", "HORIZON_DRIVER", "HORIZON_START_FORMULA",
+    "ANNUALIZED_RETURN_FORMULA", "ATTRIBUTION_FORMULA", "ATTRIBUTION_STATUSES", "MULTIPLE_WARNING_THRESHOLD",
+    "ReturnAttribution", "attribute_price_return", "attribution_payload", "multiple_principle_note",
+    "DAYS_PER_YEAR", "HOLDING_PERIOD_FORMULA", "HORIZON_DRIVER", "HORIZON_START_FORMULA",
     "MODEL_VERSION", "PRICE_RETURN_FORMULA", "RECORD_VERSION", "RETURN_CONVENTIONS",
     "RETURN_CONVENTION_BASE_CASE_PRICE", "RETURN_STATUSES", "TOTAL_RETURN_STATUSES", "HorizonAssumption",
     "ImpliedReturnResult", "ReturnStep", "build_implied_return", "combined_return_dependency",

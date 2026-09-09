@@ -896,6 +896,14 @@ python -m briefing implied-return COHR --as-of 2026-09-05       # 估值假設 v
 不補下一會計年度**；horizon 到期即 stale，要新的判斷。它是 **base-case 隱含價格報酬**：不是機率加權期望報酬（沒有機率）、不是 total
 return（沒有股利預測）、不是 entry signal（型別沒有那些欄位，section 每次列 `is_not`）。
 
+**兩桿拆解（2026-09-09）：** 同一份輸出多三格 `eps_contribution`／`multiple_contribution`／`return_attribution`
+（`alpha/implied_return/attribution.py`；恆等式 `(1+R) = (內部 EPS／共識 EPS) × (目標倍數／市場對共識付的倍數)`）。
+拆不出來（沒有同期同口徑的 EPS 共識）就 `missing`＋`absence_kind`，**報酬本身不受影響**。讀法：負的報酬先看是哪一桿——
+EPS 桿是圖該產生的東西；倍數桿依 `AGENTS.md`「隱含報酬的兩個桿」要指得出 re-rating 證據。
+```powershell
+python -m briefing analyst-view COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);h={l['key']:l['datum']['value'] for l in v['headline']['lines']};print(h['price_return'], h['eps_contribution'], h['multiple_contribution'])"
+```
+
 ### Sandbox impact review 結論（2026-09-06，Entry Logic v1／Step 3）
 
 | 入口 | side effect | OS／network capability | 判定 |

@@ -485,6 +485,13 @@ function renderHeadline(view) {
     numbers.appendChild(numberBlock('隱含價格報酬', fmtPercent(ret.value),
       ann && typeof ann.value === 'number' ? `年化 ${fmtPercent(ann.value)}` : '', signClass(ret.value)));
   }
+  // 兩桿拆解（2026-09-09）：只在算得出來時顯示；缺席由下方 attention 區用 absence_kind 說明。
+  const epsC = lines.eps_contribution && lines.eps_contribution.datum;
+  const mulC = lines.multiple_contribution && lines.multiple_contribution.datum;
+  if (epsC && typeof epsC.value === 'number' && mulC && typeof mulC.value === 'number') {
+    numbers.appendChild(numberBlock('其中 EPS 差異', fmtPercent(epsC.value), '我們的 EPS vs 共識', signClass(epsC.value)));
+    numbers.appendChild(numberBlock('其中倍數差異', fmtPercent(mulC.value), '我們的倍數 vs 市場倍數', signClass(mulC.value)));
+  }
   if (numbers.childNodes.length) node.appendChild(numbers);
 
   // 沒有 target／沒有報酬時：把「為什麼沒有」放到跟數字一樣顯眼的位置，而不是留白。
@@ -777,6 +784,13 @@ function conclusionCard(payload, view) {
   if (ret && typeof ret.value === 'number') {
     numbers.appendChild(numberBlock(plainLine('price_return'), fmtPercent(ret.value),
       ann && typeof ann.value === 'number' ? `一年約 ${fmtPercent(ann.value)}` : '', signClass(ret.value)));
+  }
+  // 兩桿拆解（2026-09-09）：負的是因為我們 EPS 比共識低，還是因為我們的倍數比市場低——一眼要分得出。
+  const epsC = lines.eps_contribution && lines.eps_contribution.datum;
+  const mulC = lines.multiple_contribution && lines.multiple_contribution.datum;
+  if (epsC && typeof epsC.value === 'number' && mulC && typeof mulC.value === 'number') {
+    numbers.appendChild(numberBlock(plainLine('eps_contribution'), fmtPercent(epsC.value), '', signClass(epsC.value)));
+    numbers.appendChild(numberBlock(plainLine('multiple_contribution'), fmtPercent(mulC.value), '', signClass(mulC.value)));
   }
   if (numbers.childNodes.length) node.appendChild(numbers);
 

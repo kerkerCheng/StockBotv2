@@ -484,3 +484,103 @@ def test_implied_return_core_never_imports_io_or_llm_clients() -> None:
             elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
                 roots.add(node.module.split(".")[0])
         assert not (roots & forbidden), (path, roots & forbidden)
+
+
+# ---------------------------------------------------------------------------
+# 13. 兩桿拆解（2026-09-09 P2）：EPS 差異 × 倍數差異；拆不出來不影響報酬
+# ---------------------------------------------------------------------------
+
+def _return_with_comparison(model=None, *, multiple: float = 25.0, comparison="model"):
+    from tests.test_fundamental_model import _run as run_model
+
+    model = model or run_model(as_of=None, today=TODAY, index=_index())
+    valuation = _valuation([_multiple(multiple, value_date_convention=VALUE_DATE_TARGET_PERIOD_END)],
+                           model=model, as_of=None, today=TODAY, price=PRICE)
+    eps_cmp = model.comparisons["eps"] if comparison == "model" else comparison
+    result = build_implied_return(
+        company_id="co:coherent", ticker="COHR", as_of=None, today=TODAY, valuation=valuation,
+        valuation_reason=None, horizon_records=[_horizon()], evidence_index=_index(), price=PRICE,
+        eps_comparison=eps_cmp)
+    return model, valuation, result
+
+
+def test_attribution_is_an_identity_of_the_price_return() -> None:
+    """(1+R) = (E_int/E_cons) × (PE_t / (P/E_cons))；兩桿加上交互項必須等於總報酬（浮點 1e-9）。"""
+    model, valuation, result = _return_with_comparison()
+    attr = result.attribution
+    assert attr is not None and attr.is_known
+    cmp = model.comparisons["eps"]
+    assert cmp.status == "comparable"
+    market_pe = PRICE.value / cmp.consensus
+    assert attr.market_multiple_on_consensus == pytest.approx(market_pe)
+    assert attr.eps_contribution == pytest.approx(cmp.internal / cmp.consensus - 1)
+    assert attr.multiple_contribution == pytest.approx(25.0 / market_pe - 1)
+    assert attr.eps_contribution + attr.multiple_contribution + attr.interaction == pytest.approx(result.price_return, abs=1e-9)
+    # COHR 形狀：內部 EPS 略低於共識（小負），倍數 25x vs 市場 ~29.9x（−16% 左右）——倍數桿是主因
+    assert attr.multiple_contribution < attr.eps_contribution < 0.05
+    assert attr.multiple_contribution == pytest.approx(-0.1648, abs=5e-3)
+    # step 與 epistemics 都帶著它；one_sentence 說出兩桿
+    keys = {s.key: s for s in result.steps}
+    assert keys["eps_contribution"].value == pytest.approx(attr.eps_contribution)
+    assert keys["multiple_contribution"].value == pytest.approx(attr.multiple_contribution)
+    assert result.epistemics["attribution"]["multiple_contribution"] == pytest.approx(attr.multiple_contribution)
+    assert "EPS 差異貢獻" in result.epistemics["one_sentence"] and "倍數差異貢獻" in result.epistemics["one_sentence"]
+    # 倍數折價超過 5% → warning 提醒原則（提醒，不阻擋、不改數字）
+    assert any("倍數桿" in w and "折價" in w for w in result.warnings)
+
+
+def test_attribution_missing_never_removes_the_return() -> None:
+    """拆不出來（沒有共識比較）→ 拆解 missing＋語意；price_return 照樣 available。"""
+    _model, _valuation, result = _return_with_comparison(comparison=None)
+    assert result.status == "available" and result.price_return is not None
+    attr = result.attribution
+    assert attr is not None and attr.status == "missing" and attr.absence_kind == "upstream_unavailable"
+    assert attr.eps_contribution is None and attr.multiple_contribution is None
+    keys = {s.key: s for s in result.steps}
+    assert keys["eps_contribution"].value is None and keys["eps_contribution"].reason
+    assert "兩桿拆解缺席" in result.epistemics["one_sentence"]
+
+
+def test_attribution_declares_which_kind_of_absence() -> None:
+    from tests.test_fundamental_model import _consensus, _run as run_model
+
+    # 共識缺 → provider_missing
+    model = run_model(as_of=None, today=TODAY, index=_index(),
+                      consensus=(_consensus("eps", None), _consensus("revenue", 10_618_193_080.0)))
+    _m, _v, result = _return_with_comparison(model=model)
+    assert result.attribution.status == "missing" and result.attribution.absence_kind == "provider_missing"
+    # 共識非正 → method_not_applicable（市場倍數無定義，與本益比法同一條件）
+    model = run_model(as_of=None, today=TODAY, index=_index(),
+                      consensus=(_consensus("eps", -1.0, year_ago=5.61), _consensus("revenue", 10_618_193_080.0)))
+    if model.comparisons["eps"].status == "comparable":
+        _m, _v, result = _return_with_comparison(model=model)
+        assert result.attribution.absence_kind == "method_not_applicable"
+
+
+def test_attribution_contract_rejects_broken_identity_and_numbers_on_missing() -> None:
+    from alpha.implied_return import ReturnAttribution
+
+    with pytest.raises(ContractViolation):
+        ReturnAttribution(status="available", reason=None, absence_kind=None, consensus_eps=9.0, internal_eps=9.0,
+                          target_multiple=25.0, market_multiple_on_consensus=30.0, eps_ratio=1.0, multiple_ratio=25 / 30,
+                          eps_contribution=0.0, multiple_contribution=25 / 30 - 1, interaction=0.0, price_return=0.1)
+    with pytest.raises(ContractViolation):
+        ReturnAttribution(status="missing", reason="x", absence_kind="provider_missing", eps_contribution=0.0)
+
+
+def test_read_model_and_analyst_headline_copy_the_two_levers_without_computing() -> None:
+    """builder／analyst 只抄：兩格的值＝模型的值；缺席時仍占一格並帶 absence_kind。"""
+    from briefing.alpha_view.builder import _implied_return_section
+    from tests.test_valuation_model import TARGET as _T  # noqa: F401 — 只確認 fixture 可用
+
+    _model, _valuation, result = _return_with_comparison()
+    section = _implied_return_section(result, None, reference_day=TODAY, reporting_unit="USD", refresh={})
+    assert section.eps_contribution.value == pytest.approx(result.attribution.eps_contribution)
+    assert section.multiple_contribution.value == pytest.approx(result.attribution.multiple_contribution)
+    assert section.attribution.value["market_multiple_on_consensus"] == pytest.approx(result.attribution.market_multiple_on_consensus)
+    assert "折價" in section.multiple_contribution.reason
+
+    _model, _valuation, absent = _return_with_comparison(comparison=None)
+    section = _implied_return_section(absent, None, reference_day=TODAY, reporting_unit="USD", refresh={})
+    assert section.eps_contribution.value is None and section.eps_contribution.absence_kind == "upstream_unavailable"
+    assert section.price_return.value is not None

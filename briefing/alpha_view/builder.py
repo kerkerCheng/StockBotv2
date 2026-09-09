@@ -31,6 +31,7 @@ from alpha.context import ContextBuild
 from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
 from alpha.entry.contracts import EntryAssessmentResult, EntryCriterion
 from alpha.fundamental.contracts import FundamentalModelResult, OperatingAssumption
+from alpha.implied_return.attribution import attribution_payload
 from alpha.implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from alpha.provider import SupplyExposure
 from alpha.refresh import (
@@ -675,6 +676,9 @@ def _implied_return_section(
             total_return=fixed[0], probability_weighted_return=fixed[1], trace=(),
             epistemics=missing("return_epistemics", "implied return 的認識論分解", why, authority=A_IMPLIED_RETURN),
             selection=None, is_not=RETURN_IS_NOT,
+            eps_contribution=missing("eps_contribution", "其中：EPS 差異貢獻", why, authority=A_IMPLIED_RETURN),
+            multiple_contribution=missing("multiple_contribution", "其中：倍數差異貢獻", why, authority=A_IMPLIED_RETURN),
+            attribution=missing("return_attribution", "兩桿拆解（EPS 差異 × 倍數差異）", why, authority=A_IMPLIED_RETURN),
         )
 
     if result is None:
@@ -792,6 +796,40 @@ def _implied_return_section(
     selection = EvidenceSelectionCounts(
         input_count=result.horizon_selection.input_count, accepted_count=result.horizon_selection.accepted_count,
         filtered_count=result.horizon_selection.filtered_count, reasons=dict(result.horizon_selection.reasons))
+    # ---- 兩桿拆解（2026-09-09 P2）：照抄 result.attribution，不算任何數 ----------------------------
+    attribution = result.attribution
+    if attribution is not None and attribution.is_known:
+        attr_deps = {"consensus_eps": attribution.consensus_eps, "internal_eps": attribution.internal_eps,
+                     "target_multiple": attribution.target_multiple,
+                     "market_multiple_on_consensus": attribution.market_multiple_on_consensus,
+                     "analyst_count": attribution.analyst_count, "input_dependency": result.input_dependency}
+        eps_datum = Datum(
+            key="eps_contribution", label="其中：EPS 差異貢獻（我們的 EPS vs 共識）", value=attribution.eps_contribution,
+            status="available", basis="deterministic", authority=A_IMPLIED_RETURN, method=attribution.formula,
+            unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
+            reason=f"內部 EPS {attribution.internal_eps:g} ÷ 共識 EPS {attribution.consensus_eps:g} − 1", dependencies=attr_deps)
+        multiple_datum = Datum(
+            key="multiple_contribution", label="其中：倍數差異貢獻（我們的倍數 vs 市場對共識付的倍數）",
+            value=attribution.multiple_contribution, status="available", basis="deterministic", authority=A_IMPLIED_RETURN,
+            method=attribution.formula, unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
+            reason=attribution.principle_note, dependencies=attr_deps)
+        attribution_datum = Datum(
+            key="return_attribution", label="兩桿拆解（EPS 差異 × 倍數差異；恆等式）", value=attribution_payload(attribution),
+            status="available", basis="deterministic", authority=A_IMPLIED_RETURN, method=attribution.formula,
+            as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
+            reason="price_return 的確定性恆等分解；判斷都在輸入（內部 EPS 的假設、目標倍數），拆解本身不是新判斷")
+    else:
+        if attribution is None:
+            attr_why = f"報酬缺席，沒有可拆的東西（{result.reason or '未知'}）"
+            attr_kind = result.effective_absence_kind
+        else:
+            attr_why = f"{attribution.reason}（缺席不是 0；報酬本身不受影響）"
+            attr_kind = attribution.absence_kind
+        eps_datum = missing("eps_contribution", "其中：EPS 差異貢獻", attr_why, authority=A_IMPLIED_RETURN, absence_kind=attr_kind)
+        multiple_datum = missing("multiple_contribution", "其中：倍數差異貢獻", attr_why, authority=A_IMPLIED_RETURN, absence_kind=attr_kind)
+        attribution_datum = missing("return_attribution", "兩桿拆解（EPS 差異 × 倍數差異）", attr_why,
+                                    authority=A_IMPLIED_RETURN, absence_kind=attr_kind)
+
     section_status = price_return_datum.status if result.is_known else "missing"
     meta = SectionMeta(
         status=section_status, basis="deterministic" if result.is_known else "none", authority=A_IMPLIED_RETURN,
@@ -806,6 +844,7 @@ def _implied_return_section(
         value_date=value_date_datum, horizon=horizon_datum, horizon_window=window_datum, price_return=price_return_datum,
         annualized_price_return=annualized_datum, total_return=fixed[0], probability_weighted_return=fixed[1],
         trace=tuple(trace), epistemics=epistemics_datum, selection=selection, is_not=RETURN_IS_NOT,
+        eps_contribution=eps_datum, multiple_contribution=multiple_datum, attribution=attribution_datum,
         period=target.label if target else None, period_end=target.end if target else None,
     )
 

@@ -229,6 +229,7 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
         f"**{_slot(head, 'current_price')}**（{_slot(head, 'value_date')} 的目標值："
         f"**{_slot(head, 'fair_value')}**）→ horizon **{_slot(head, 'horizon')}** → "
         f"**{_slot(head, 'price_return')}** simple ／ **{_slot(head, 'annualized_price_return')}** 年化"
+        f"｜其中 EPS 差異 **{_slot(head, 'eps_contribution')}**／倍數差異 **{_slot(head, 'multiple_contribution')}**"
     )
     sentence = _one_sentence(_line_by_key(head, "epistemics_one_sentence"))
     if sentence:

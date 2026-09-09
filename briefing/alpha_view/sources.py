@@ -265,6 +265,7 @@ def _current_price(build: ContextBuild, identity: Mapping[str, Any]) -> CurrentP
 def _implied_return_model(
     build: ContextBuild, valuation: ValuationResult | None, valuation_reason: str | None,
     ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date, identity: Mapping[str, Any],
+    fundamental_model: FundamentalModelResult | None = None,
 ) -> tuple[ImpliedReturnResult | None, str | None, list[Any]]:
     """Base-case Implied Return v1（Step 2）的取數與執行。
 
@@ -278,10 +279,14 @@ def _implied_return_model(
     except Exception as exc:  # noqa: BLE001
         return None, f"horizon 假設 ledger 讀取失敗：{type(exc).__name__}", records
     try:
+        # 兩桿拆解（2026-09-09 P2）只讀 fundamental model 已算好的 EPS 比較；同一個物件，不另取共識。
+        eps_comparison = (fundamental_model.comparisons.get("eps")
+                          if fundamental_model is not None and fundamental_model.as_of == as_of else None)
         result = build_implied_return(
             company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
             valuation=valuation, valuation_reason=valuation_reason, horizon_records=records, parse_errors=parse_errors,
             evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=_current_price(build, identity),
+            eps_comparison=eps_comparison,
         )
     except Exception as exc:  # noqa: BLE001 — 報酬失敗只讓該區 missing，不讓整份 view 失敗
         return None, f"implied return model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
@@ -413,7 +418,9 @@ def fetch_alpha_investment_view(
             identity=identity)
         implied_return_model, implied_return_reason, horizon_records = _implied_return_model(
             build, valuation_model, valuation_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-            identity=identity)
+            identity=identity,
+            fundamental_model=fundamental_model,
+        )
         entry_model, entry_reason, entry_records = _entry_model(
             build, implied_return_model, implied_return_reason, resolved_ticker, company_id, as_of=as_of, today=today,
             identity=identity, sandbox_hurdle=sandbox_hurdle)

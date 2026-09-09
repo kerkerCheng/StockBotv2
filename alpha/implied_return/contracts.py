@@ -64,6 +64,16 @@ HOLDING_PERIOD_FORMULA = ("holding_period_days = (horizon_end − horizon_start)
 PRICE_RETURN_FORMULA = "price_return = fair_value / current_price − 1"
 ANNUALIZED_RETURN_FORMULA = "annualized_price_return = (1 + price_return) ** (365.25 / holding_period_days) − 1"
 DAYS_PER_YEAR = 365.25
+#: 兩桿拆解（2026-09-09）：唯一定義處；`attribution.py` 照抄、read model 只抄字串。
+ATTRIBUTION_FORMULA = (
+    "1 + price_return = (internal_eps / consensus_eps) × (target_multiple / market_multiple_on_consensus)；"
+    "market_multiple_on_consensus = current_price / consensus_eps；"
+    "eps_contribution = internal_eps / consensus_eps − 1；"
+    "multiple_contribution = target_multiple / market_multiple_on_consensus − 1；"
+    "interaction = eps_contribution × multiple_contribution；"
+    "eps_contribution + multiple_contribution + interaction = price_return"
+)
+ATTRIBUTION_STATUSES: tuple[str, ...] = ("available", "missing")
 
 #: value_date 與 horizon_end 的關係（機器可讀；不阻擋、只現形）。
 ALIGNMENT_ALIGNED = "aligned"                              # horizon_end == value_date
@@ -96,6 +106,66 @@ def _date(value: Any, label: str) -> date:
     if not isinstance(value, date) or isinstance(value, datetime):
         raise ContractViolation(f"{label} 必須是 date：{value!r}")
     return value
+
+
+# ---------------------------------------------------------------------------
+# 0.5 ReturnAttribution（兩桿拆解；2026-09-09）
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True, slots=True)
+class ReturnAttribution:
+    """price_return 的確定性恆等分解：EPS 差異 × 倍數差異（算術在 `attribution.py`）。
+
+    - `available` ⇒ 全部數字齊、且恆等式 `eps + multiple + interaction == price_return` 成立。
+    - `missing` ⇒ 一個數字都不帶（除了共識本身的觀測值），`absence_kind` 說是哪一種缺席。
+    - 它**不會**讓 `ImpliedReturnResult` 變 missing：拆不出來不影響報酬本身。
+    """
+
+    status: str
+    reason: str | None
+    absence_kind: str | None
+    consensus_eps: float | None = None
+    internal_eps: float | None = None
+    target_multiple: float | None = None
+    market_multiple_on_consensus: float | None = None
+    eps_ratio: float | None = None
+    multiple_ratio: float | None = None
+    eps_contribution: float | None = None
+    multiple_contribution: float | None = None
+    interaction: float | None = None
+    price_return: float | None = None
+    analyst_count: int | None = None
+    consensus_captured_at: date | None = None
+    consensus_refs: tuple[str, ...] = ()
+    formula: str = ATTRIBUTION_FORMULA
+    principle_note: str | None = None
+
+    def __post_init__(self) -> None:
+        if self.status not in ATTRIBUTION_STATUSES:
+            raise ContractViolation(f"ReturnAttribution.status 未登記：{self.status!r}")
+        if self.absence_kind is not None:
+            check_absence_kind(self.absence_kind, "ReturnAttribution.absence_kind")
+            if self.status != "missing":
+                raise ContractViolation("有拆解就沒有缺席語意")
+        numbers = (self.eps_contribution, self.multiple_contribution, self.interaction, self.price_return,
+                   self.eps_ratio, self.multiple_ratio, self.target_multiple, self.market_multiple_on_consensus)
+        if self.status == "available":
+            if any(v is None for v in numbers):
+                raise ContractViolation("available 的拆解必須帶全部數字")
+            for v in numbers:
+                _finite(v, "ReturnAttribution")
+            total = self.eps_contribution + self.multiple_contribution + self.interaction  # type: ignore[operator]
+            if abs(total - self.price_return) > 1e-9 * max(1.0, abs(self.price_return)):  # type: ignore[arg-type]
+                raise ContractViolation("ReturnAttribution 恆等式不成立——這不是四捨五入，是輸入不同源")
+        else:
+            if any(v is not None for v in numbers):
+                raise ContractViolation("missing 的拆解不得帶數字（missing != zero）")
+            if not self.reason or self.absence_kind is None:
+                raise ContractViolation("missing 的拆解必須說理由與缺席語意")
+
+    @property
+    def is_known(self) -> bool:
+        return self.status == "available"
 
 
 # ---------------------------------------------------------------------------
@@ -291,8 +361,13 @@ class ImpliedReturnResult:
     #: Step 5：報酬缺席時**是哪一種缺席**（`alpha/absence.py`）。上游（估值）缺席時直接繼承它的 kind——
     #: 「fair value 是刻意不主張」與「horizon 還沒寫」對使用者是兩件完全不同的事。
     absence_kind: str | None = None
+    #: 2026-09-09 P2：price_return 的兩桿拆解（EPS 差異 × 倍數差異）。`None`＝本次沒有嘗試拆解
+    #: （報酬本身 missing）；`missing`＝報酬有、拆不出來（共識缺／口徑不合），**不影響報酬**。
+    attribution: "ReturnAttribution | None" = None
 
     def __post_init__(self) -> None:
+        if self.attribution is not None and self.status != "available":
+            raise ContractViolation("報酬 missing 時不得帶拆解——沒有報酬就沒有可拆的東西")
         if self.absence_kind is not None:
             check_absence_kind(self.absence_kind, "ImpliedReturnResult.absence_kind")
             if self.status != "missing":

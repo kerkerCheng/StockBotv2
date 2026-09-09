@@ -615,6 +615,11 @@ class ImpliedReturnSection:
     epistemics: Datum
     selection: "EvidenceSelectionCounts | None"
     is_not: tuple[str, ...]
+    #: 2026-09-09 P2 兩桿拆解：EPS 差異貢獻／倍數差異貢獻／整包（含市場倍數、共識、恆等式、原則提醒）。
+    #: 拆不出來就是 missing（帶 absence_kind），**不影響 price_return**。
+    eps_contribution: Datum
+    multiple_contribution: Datum
+    attribution: Datum
     period: str | None = None
     period_end: date | None = None
 

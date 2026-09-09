@@ -25,13 +25,14 @@ from datetime import date
 from typing import Any, Mapping, Sequence
 
 from ..contracts import EvidenceRef, content_digest
-from ..fundamental.contracts import AssumptionSelection, FiscalPeriod
+from ..fundamental.contracts import AssumptionSelection, ExpectationComparison, FiscalPeriod
 from ..valuation.contracts import VALUE_DATE_SPOT, VALUE_DATE_UNSPECIFIED, CurrentPrice, ValuationResult
 from ..valuation.model import units_comparable
 from .assumptions import select_horizon_assumptions
+from .attribution import MULTIPLE_WARNING_THRESHOLD, attribute_price_return, attribution_payload
 from .contracts import (
     ALIGNMENT_ALIGNED, ALIGNMENT_HORIZON_AFTER, ALIGNMENT_HORIZON_BEFORE, ALIGNMENT_SPOT,
-    ANNUALIZED_RETURN_FORMULA, DAYS_PER_YEAR, HOLDING_PERIOD_FORMULA, HORIZON_START_FORMULA,
+    ANNUALIZED_RETURN_FORMULA, ATTRIBUTION_FORMULA, DAYS_PER_YEAR, HOLDING_PERIOD_FORMULA, HORIZON_START_FORMULA,
     PRICE_RETURN_FORMULA, RETURN_CONVENTION_BASE_CASE_PRICE, HorizonAssumption, ImpliedReturnResult,
     ReturnStep, combined_return_dependency,
 )
@@ -102,8 +103,13 @@ def build_implied_return(
     evidence_index: Mapping[str, EvidenceRef],
     price: CurrentPrice,
     parse_errors: Sequence[str] = (),
+    eps_comparison: ExpectationComparison | None = None,
 ) -> ImpliedReturnResult:
-    """一次 base-case implied return 執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。"""
+    """一次 base-case implied return 執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。
+
+    `eps_comparison`（fundamental model 的內部 vs 共識 EPS 比較）只用來做**兩桿拆解**（2026-09-09 P2）；
+    沒給或不可比，拆解 missing、報酬照算。
+    """
     cutoff = as_of or today
     warnings: list[str] = []
     steps: list[ReturnStep] = []
@@ -244,6 +250,30 @@ def build_implied_return(
         warnings.append(f"持有期間只有 {days} 天——年化會放大任何誤差，讀年化數字時請看 simple 報酬")
     warnings.extend(valuation.warnings)
 
+    # ---- 5.5 兩桿拆解（2026-09-09 P2）：EPS 差異 × 倍數差異；拆不出來不影響報酬 ----------------
+    attribution = attribute_price_return(valuation=valuation, price=price, comparison=eps_comparison,
+                                         price_return=price_return)
+    if attribution.is_known:
+        attr_refs = tuple(dict.fromkeys(obs_refs + tuple(attribution.consensus_refs)))
+        steps.append(ReturnStep(key="eps_contribution", label="其中：EPS 差異貢獻（內部 EPS ÷ 共識 EPS − 1）",
+                                kind="derived", value=attribution.eps_contribution, unit="ratio", basis="deterministic",
+                                formula=ATTRIBUTION_FORMULA, assumption_ids=tuple(valuation.assumption_ids),
+                                observation_refs=attr_refs, input_dependency=valuation.input_dependency,
+                                reason=f"內部 {attribution.internal_eps:g} vs 共識 {attribution.consensus_eps:g}"
+                                       f"（{attribution.analyst_count or '?'} 位分析師）"))
+        steps.append(ReturnStep(key="multiple_contribution", label="其中：倍數差異貢獻（目標倍數 ÷ 市場對共識付的倍數 − 1）",
+                                kind="derived", value=attribution.multiple_contribution, unit="ratio", basis="deterministic",
+                                formula=ATTRIBUTION_FORMULA, assumption_ids=tuple(a.assumption_id for a in valuation.assumptions),
+                                observation_refs=attr_refs, input_dependency=valuation.input_dependency,
+                                reason=attribution.principle_note))
+        if abs(attribution.multiple_contribution or 0.0) >= MULTIPLE_WARNING_THRESHOLD:
+            warnings.append("倍數桿：" + str(attribution.principle_note))
+    else:
+        steps.append(ReturnStep(key="eps_contribution", label="其中：EPS 差異貢獻", kind="derived", value=None,
+                                unit="ratio", basis="none", reason=attribution.reason))
+        steps.append(ReturnStep(key="multiple_contribution", label="其中：倍數差異貢獻", kind="derived", value=None,
+                                unit="ratio", basis="none", reason=attribution.reason))
+
     epistemics: dict[str, Any] = {
         "deterministic": ["報酬算術（fair_value / price − 1）", "年化算術（compound，365.25 天）",
                           "持有期間算術（horizon_end − bar_date）", "估值算術（內部 EPS × target_pe）", "財務橋算術"],
@@ -254,20 +284,25 @@ def build_implied_return(
                                       "declared_by": [a.assumption_id for a in valuation.assumptions]},
             "horizon": {"count": 1, "by_basis": {horizon.basis: 1}, "assumption_id": horizon.assumption_id},
         },
-        "observations": ["現價（Engine C snapshot）", "基期實際值（Engine C mechanical 觀測）"],
+        "observations": ["現價（Engine C snapshot）", "基期實際值（Engine C mechanical 觀測）"]
+                        + (["同期 EPS 共識（Engine C consensus_estimates）"] if attribution.is_known else []),
         "return_input_dependency": dependency,
+        "attribution": attribution_payload(attribution),
         "this_is_not": ["probability-weighted expected return（沒有情境機率）", "total return（沒有股利／分配預測）",
                         "required return／entry price（那是 alpha/entry 的事，且要有明示的投資人判準）／buy-sell",
                         "回測或統計勝率"],
         "one_sentence": (f"從 {horizon_start}（現價 {price.value:g} {price.unit}）到 {horizon_end}，在「{valuation.target_period.label if valuation.target_period else '?'} "
                          f"fair value {valuation.fair_value:.2f} 是 {valuation.value_date}（{valuation.value_date_semantics}）的值」與"
                          f"「市場在 {horizon_end} 前定價到那裡」的假設下，base-case 隱含價格報酬 {price_return:+.1%}"
-                         + (f"、年化 {annualized:+.1%}" if annualized is not None else "") + "；輸入判斷最弱處＝"
-                         f"{dependency}；total return 未建模"),
+                         + (f"、年化 {annualized:+.1%}" if annualized is not None else "")
+                         + (f"；其中 EPS 差異貢獻 {attribution.eps_contribution:+.1%}、倍數差異貢獻 "
+                            f"{attribution.multiple_contribution:+.1%}" if attribution.is_known else "；兩桿拆解缺席")
+                         + f"；輸入判斷最弱處＝{dependency}；total return 未建模"),
     }
     digest = content_digest({
         "company_id": company_id, "ticker": ticker, "as_of": as_of, "valuation_digest": valuation.digest,
         "horizon": horizon.assumption_id, "price": (price.value, price.bar_date),
+        "consensus_eps": attribution.consensus_eps,
     })
     evidence = [index[r] for r in horizon.evidence_refs if r in index]
     return ImpliedReturnResult(
@@ -282,6 +317,7 @@ def build_implied_return(
         alignment=alignment, input_dependency=dependency, steps=tuple(steps), assumption_ids=all_ids,
         observation_refs=obs_refs, epistemics=epistemics, digest=digest, warnings=tuple(warnings),
         evidence=tuple({r.ref: r for r in evidence}.values()),
+        attribution=attribution,
     )
 
 
