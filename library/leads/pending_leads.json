@@ -14288,9 +14288,9 @@
       "refs": {
         "claimed_origin": "未具名產業文章／industry sources",
         "outcome": "no_prepared_ra_original_not_obtained",
-        "parked_reason": "AXTI／IQE 的 InP 第四次漲價與 Q4 再漲逾 10% 只追回社群轉述與同源鏡像；未找到聲稱的產業文章或供應商逐字原文，不能把價格與受益公司當 evidence。",
-        "trace_attempts_ref": "exact title／獨特句搜尋；AXT、IQE、VPEC、LandMark、IET 官方路徑",
-        "trace_next_trigger": "AXT／IQE／VPEC／LandMark／IET 官方揭露 InP substrate 或 epiwafer 漲價、交期或供應限制，或取得原始產業文章",
+        "parked_reason": "與 lead_8088f665（Nomura InP ASP）是同一組主張，本輪由發行人一手處理。AXT Form 10-Q（filed 2026-08-13，期間 2026Q2）逐字把營收增幅歸因於『higher demand for InP wafer substrates ... as a result of additional export approvals granted by the China government』、毛利增幅歸因於『fixed costs being spread over more units and a favorable change in product mix』，全文『price increase』0 次，唯一 ASP 語句是方向相反的風險因子樣板。⚠ 必須精確界定這個否證涵蓋什麼：推文的**回顧部分**（『InP 基板價格自去年 Q4 起連四次調漲』）所涵蓋的期間，正是 AXT 這份 10-Q 與 FY2025 10-K 已報告的期間——而 AXT 的已實現業績沒有任何價格歸因，所以那部分被否證；推文的**前瞻部分**（『Q4 預期再漲逾 10%』指 2026Q4）不在本文件涵蓋範圍內，**未被否證也未被支持**，要等 AXT Q3／Q4 10-Q。另『even if you have the money, you still may not be able to get the material』引自匿名 industry sources，仍無原始文章。已鑄 [500] 記錄此一手歸因。不入圖。",
+        "trace_attempts_ref": "2026-09-09 research-drain：沿用同輪對 axti_10_q_20260813.txt（435,288 chars）的全文檢索與 MD&A 逐字核對（見 lead_8088f665 與 [500]）",
+        "trace_next_trigger": "AXT Q3 2026 10-Q（約 2026-11）的 MD&A 若出現價格驅動語句，則本結論的回顧部分需修正、前瞻部分獲支持；或 IQE／VPEC／LandMark 官方揭露 epiwafer 漲價",
         "trace_requeue_consumed_entities": [
           "AXTI",
           "CO:AXT"
@@ -14298,7 +14298,7 @@
         "trace_requeue_trigger": "event_watch:ew_0016_2026-08-31",
         "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
         "trace_requires_user": "false",
-        "trace_status": "isolated_tier_3",
+        "trace_status": "contradicts",
         "trace_trigger_entities": [
           "AXTI",
           "IQE",
@@ -14310,7 +14310,7 @@
         "trace_trigger_watch_ref": "ew_0016_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -49108,13 +49108,13 @@
       "refs": {
         "gap": "first ELS module order 的買方未具名；定價權主張須以後續毛利率交叉驗證",
         "original_claim_status": "confirmed_but_tier_not_upgradable",
-        "parked_reason": "產業級證據不能替代 Sivers 的 transaction-specific linkage；維持等待具名揭露，未產新 RA",
+        "parked_reason": "觸發條件『Sivers 具名 CW DFB 客戶或客戶端文件點名 Sivers』仍未命中——產業級短缺證據（LITE 稱 UHP CW 雷射需求與供給失衡且有能力調升 ASP；AAOI 稱 CW 雷射產能不足）不能替代 Sivers 的 transaction-specific linkage，作者由『產業缺貨』推論『Sivers 因此拿到需求』仍是推論。⚠ 但同輪 hy_0002 的驗證取得一個相鄰的正面結果：Sivers 對 ELS／雷射層的結構性邊已由四則 2026 官方公告支持，其中 GlobalFoundries 自家新聞稿具名 Sivers＝夥伴端外部印證（見 hy_0002 receipt）。兩者不衝突：結構位置已證，具體交易對手仍未具名。⚠ 本 lead 內的 LITE 材料（UHP CW 雷射定價權）已移交段 5——LITE 正是本輪閉環的下一檔，其 headline／fundamental／why／research 四格都缺，該材料應在那裡以一手法說核對後使用，不在此重複處理。",
         "pq2_ref": "223",
         "primary_url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-publishes-interim-report-for-the-second-quarter-2026/",
         "research_outcome": "CW DFB 供需緊張維持既有結論；沒有新增具名 Sivers 客戶、qualification 或唯一供應證據",
         "research_run": "session:2026-08-29-pq1-full-drain",
-        "trace_attempts_ref": "2026-08-30：重核既有 Lumentum／AAOI／MACOM 法說與 Sivers Q2 文件；產業短缺有一手／tier-2 支持，但 Sivers 因此取得需求仍為作者推論",
-        "trace_next_trigger": "Sivers 具名 CW DFB 客戶或客戶端文件點名 Sivers",
+        "trace_attempts_ref": "2026-09-09 research-drain：確認具名觸發未命中；同輪已透過 hy_0002 驗證取得 Sivers 四則官方公告（O-Net/Enablence、Jabil、GlobalFoundries、SemiNex）並判定 SemiNex 付款方向 unclear",
+        "trace_next_trigger": "Sivers 具名 CW DFB 客戶，或客戶端（Lumentum／Coherent／Broadcom／GF 之外的實際買方）文件點名 Sivers 為供應商；定價權主張須以 Sivers 後續毛利率交叉驗證",
         "trace_origin_entity": "Lumentum Holdings Inc. (Q4 FY2026 earnings call, 第三方轉錄 Motley Fool)",
         "trace_origin_linkage": "supplier_self_report",
         "trace_original_date": "2026-08-18",
@@ -49156,7 +49156,7 @@
         "trace_trigger_watch_ref": "ew_0049_2026-08-31"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -55748,12 +55748,12 @@
       "published_at": "2026-09-07T10:11:36.000Z",
       "raw_text": "New report from Bloomberg on $IQE:\n\n“indium phosphide substrates is emerging as a key risk for the semiconductor industry.”\n\nI wonder who could have guessed this last year with $AXTI? https://t.co/ETW7Y2Pz7z https://t.co/xuSezBWFWO",
       "refs": {
-        "parked_reason": "Bloomberg 2026-09-07「IQE CEO Warns of Emerging China Supply Risk for Chip Industry」付費牆 403 讀不到；改追 IQE 同日 H1 2026 中報 RNS（一手）：只寫「converting existing capacity in H2 to support the increasing demand for Indium Phosphide solutions」，沒有任何 substrate 供應風險或中國出口管制句——推文引的「key risk」句只存在於 Bloomberg 訪談，一手不可得。InP 基板受中國出口管制的事實圖裡已有（AXT／Tongmei 許可證，SEC 10-Q），本 lead 的增量是「客戶端（IQE）指認基板取得為風險」這一句，逐字核對前不得升 evidence。",
+        "parked_reason": "觸發條件『Bloomberg 原文經可讀管道出現 substrate access 句』**已命中**：TNW（thenextweb.com）轉載該句，具名歸屬 IQE 執行長 Jutta Meier——『access to indium phosphide substrates is becoming a key risk for the semiconductor industry』，並補述主要挑戰是取得該材料的 geopolitical constraints、供給跟不上需求。⚠ 這條的價值在於**方向**：IQE 是買基板做磊晶的一方，其執行長的陳述屬**客戶端**對基板稀缺的證言，依 L8 比供應商自報強。⚠⚠ 但價格數字必須明確拒絕：搜尋摘要給出『6 吋 InP 均價自管制以來漲約 250%、約 US$5,000/片』，抓 TNW 原文後**該文只有『wafer prices had risen around 250%』，沒有尺寸、沒有美元金額，且該 250% 是 TNW 自引其六月報導、非 Bloomberg 亦非一手**——『六吋』與『$5,000』是跨來源合成，正是 research-drain Step 4.1 記過的失敗型態（L11-3）。Bloomberg 原文仍 403。⚠ 另一個值得記的不對稱：同一位執行長在 IQE 自家 H1 2026 中報 RNS（2026-09-07）裡**沒有**任何基板供應風險句，只寫『converting existing capacity in H2 to support the increasing demand for Indium Phosphide solutions』——訪談說得比法定文件重。",
         "primary_url": "https://www.iqep.com/media/press-releases/2026/2026-interim-results/",
         "research_outcome": "engine_c_financial_observation_no_graph_delta",
         "research_run": "daily-brief-2026-09-08",
-        "trace_attempts_ref": "WebFetch https://www.bloomberg.com/news/articles/2026-09-07/iqe-ceo-warns-of-emerging-china-supply-risk-for-chip-industry → 403；WebSearch iqep.com／investegate → H1 2026 Interim Results RNS（2026-09-07）逐句掃 indium phosphide／substrate，無風險句；二手 cryptobriefing／moomoo 轉述不可引",
-        "trace_next_trigger": "IQE H1 2026 法說逐字稿或 Bloomberg 原文經可讀管道（BNN／Yahoo 轉載）出現 substrate access 句",
+        "trace_attempts_ref": "2026-09-09 research-drain：WebSearch 取得可讀管道清單，WebFetch thenextweb 原文逐句核對 CEO 引句與價格數字歸屬；Bloomberg 原文仍 403",
+        "trace_next_trigger": "IQE H1 2026 法說逐字稿（CEO 若在正式場合重述該風險則可升 tier）；或 AXT／Sumitomo／IQE 任一在法定文件量化 InP 基板價格或交期；⚠ 二手轉述的 250% 不再構成 requeue 理由",
         "trace_requeue_trigger": "event_watch:ew_0078_2026-09-08",
         "trace_requeued_at": "2026-09-09T01:13:33.501862+00:00",
         "trace_requires_user": "false",
@@ -55769,7 +55769,7 @@
         "trace_trigger_watch_ref": "ew_0078_2026-09-08"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "New report from Bloomberg on $IQE: “indium phosphide substrates is emerging as a key risk for the semiconductor industry.” I wonder who could have guessed this last year with $AXTI? https://t.co/ETW7Y2Pz7z https://t.co/xuSezBWFWO",
       "triage": {
