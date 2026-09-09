@@ -475,7 +475,7 @@ def _valuation_section(
     fundamental_datum = (
         Datum(key="valuation_fundamental_input", label=f"估值消費的內部指標：{fi.metric}（{fi.period.label}，{fi.accounting_basis}）",
               value=fi.value, status="available", basis="deterministic", authority=A_BRIDGE,
-              method=fi.formula, unit=_unit("currency_per_share"), as_of=reference_day,
+              method=fi.formula, unit=_unit(fi.unit or "currency_per_share"), as_of=reference_day,
               evidence_refs=tuple(fi.observation_refs),
               reason=f"照抄 internal_fundamentals.internal_{fi.metric}；calculation=deterministic；input_dependency={fi.input_dependency}",
               dependencies={"period": fi.period.label, "fiscal_period_end": fi.period.end.isoformat(),
@@ -503,8 +503,9 @@ def _valuation_section(
     method_datum = Datum(
         key="valuation_method", label="估值方法", value=valuation.method, status="available", basis="deterministic",
         authority=A_VALUATION, method=valuation.model_version, as_of=reference_day,
-        reason="audit（2026-09-06）：內部可靠的 forward metric 只有 FY 目標期間 EPS；無內部 FCF／EBITDA，"
-               "所以 EV/EBITDA、DCF、reverse DCF 沒有資料可餵——不為完整硬做")
+        reason=("forward_earnings_multiple＝內部 EPS × 目標本益比（盈餘為正）；ev_to_sales（2026-09-09 P6）＝"
+                "(內部營收 × 目標 EV/Sales − 淨負債快照) / 稀釋股數（forward EPS 非正時、且 ledger 有該假設才用）。"
+                "無內部 FCF／EBITDA，所以 EV/EBITDA、DCF、reverse DCF 仍沒有資料可餵——不為完整硬做"))
     if valuation.is_known:
         fv_note = (f"；refresh={fv_refresh.state}：{fv_refresh.reasons[0]}"
                    if fv_refresh is not None and fv_refresh.state != CURRENT else "")

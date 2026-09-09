@@ -17815,6 +17815,42 @@
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "type": "decision_review",
       "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T06:27:50.326784+00:00",
+      "n": 279,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_78f86b8160feb2aaf9f9a80c731de5d2",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T06:27:50.326784+00:00",
+      "n": 279,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=reassessed",
+      "receipt": "pd_78f86b8160feb2aaf9f9a80c731de5d2",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-09T06:27:50.326784+00:00",
+      "n": 479,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_8d8e2c920d1a7ca41285dfd605c67dd3",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-09T06:27:50.326784+00:00",
+      "n": 479,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=reassessed",
+      "receipt": "pd_8d8e2c920d1a7ca41285dfd605c67dd3",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "standing_go"
     }
   ],
   "next_n": 489,

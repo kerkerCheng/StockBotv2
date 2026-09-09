@@ -544,14 +544,24 @@ def _prior_execution_intent(store: Any, cohort_id: str) -> str:
 
 
 def _load_brief_items() -> list[dict[str, Any]] | None:
-    """今日 decision brief 的 items；讀不到回 `None`（不是空 list——兩者導向相反的判斷）。"""
+    """今日 decision brief 的 items；讀不到回 `None`（不是空 list——兩者導向相反的判斷）。
+
+    ⚠ `get_decision_brief_core()` 把 Store 開不起來／runtime 沒 ready 都吞成 `{"status": "unavailable"|"error"}`
+    而**不拋例外**（2026-09-09 R2 實測）；只靠 try/except 抓不到，`.get("items") or []` 會把「讀不到」
+    壓成「沒東西」。所以這裡看 status：不是 ok／有 items 鍵的才算讀到。
+    """
 
     from briefing.public_view import get_decision_brief_core
 
     try:
-        return list(get_decision_brief_core().get("items") or [])
+        payload = get_decision_brief_core()
     except Exception:  # noqa: BLE001
         return None
+    if not isinstance(payload, Mapping):
+        return None
+    if str(payload.get("status") or "") in {"unavailable", "error"} or "items" not in payload:
+        return None
+    return list(payload.get("items") or [])
 
 
 def _brief_item_for(
@@ -601,6 +611,52 @@ def _substantive_blockers(
 _NOT_REASSESS_ONLY_DISPATCH = frozenset({
     "queued", "researching", "awaiting_approval", "completed", "parked",
 })
+#: reassess-stale 的冷卻天數：同一項目 7 天內只自動 reassess 一次（見 reassess_only_items）。
+REASSESS_COOLDOWN_DAYS = 7
+
+
+def _recently_reassessed(pool: Mapping[str, Any], n: int, *, days: int = REASSESS_COOLDOWN_DAYS,
+                         now: datetime | None = None) -> bool:
+    """這個編號最近 `days` 天內有沒有 `pq1_reassessed` 的 log（機械維護留下的收據）。"""
+    from datetime import timedelta
+
+    moment = now or datetime.now(timezone.utc)
+    for entry in reversed(pool.get("log") or ()):
+        if int(entry.get("n", -1)) != int(n) or entry.get("verb") != "pq1_reassessed":
+            continue
+        try:
+            at = datetime.fromisoformat(str(entry.get("at")).replace("Z", "+00:00"))
+        except ValueError:
+            return False
+        if at.tzinfo is None:
+            at = at.replace(tzinfo=timezone.utc)
+        return (moment - at) < timedelta(days=days)
+    return False
+
+
+def assessment_gap_jobs(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """standing-go／使用者 go 排入 pq1、但**不在 Decision Store work order 表**的 assessment-gap 工單。
+
+    2026-09-09 R2 指出：`engine_b.cli drain` 的 decision_jobs 只來自 `rank_work_orders`，這類 pool-only 的項目
+    drain 看不到、`todo list` 又把它歸在「不需動作」——常規授權每天自動排入之後，唯一會撿它的是使用者
+    哪天主動跑 research-drain（L13：管子只接一頭）。drain 從這裡把它們列出來。
+    """
+    out: list[dict[str, Any]] = []
+    for item in active_items(pool):
+        if item.get("type") != "decision_review":
+            continue
+        if item.get("dispatch_status") not in {"queued", "researching"}:
+            continue
+        ref = str(item.get("dispatch_ref") or "")
+        if not ref.startswith(ASSESSMENT_GAP_PREFIX):
+            continue
+        out.append({
+            "n": int(item["n"]), "cohort_id": ref.removeprefix(ASSESSMENT_GAP_PREFIX),
+            "dispatch_status": item.get("dispatch_status"), "scope": list(item.get("dispatch_scope") or []),
+            "title": item.get("title"), "dispatched_at": item.get("dispatched_at"),
+            "baseline_decision_id": item.get("dispatch_baseline_decision_id"),
+        })
+    return out
 
 
 def reassess_only_items(
@@ -637,6 +693,10 @@ def reassess_only_items(
             continue
         cohort_id = str(item["ref_id"])
         if not cohort_id.startswith("dc_"):
+            continue
+        if _recently_reassessed(pool, int(item["n"])):
+            # 冷卻（2026-09-09 R2）：reassess 後若仍 REVIEW 且 blocker 沒變，沒有冷卻就會每天多 append 一筆
+            # 同樣 REVIEW 的 decision。7 天內 reassess 過的等下一個事件（sync 的 watch_wake／evidence delta）。
             continue
         brief_item = _brief_item_for(cohort_id, brief_items)
         if brief_item is None:
@@ -736,7 +796,8 @@ def standing_go_candidates(
     pool: Mapping[str, Any],
     *,
     authorization: Any,
-    leads_store: Mapping[str, Any] | None = None,
+    store: Any = None,
+    brief_items: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """常規授權（佇列段 2b）的成員與被跳過者。判準全部機械：
 
@@ -744,7 +805,12 @@ def standing_go_candidates(
     - 不在 pq1 in-flight、沒有 terminal receipt；
     - **沒有** `deferred_at`（使用者明示 pending——常規授權不替使用者改決定）；
     - **沒有** `waiting_on`（在等世界——常規授權買的是注意力，不是讓事情發生）；
-    - `source_trace_review` 的 hint 含付費字樣者跳過（付費取得永遠要 exact 金額核准）。
+    - `source_trace_review` 的 hint 含付費字樣者跳過（付費取得永遠要 exact 金額核准）；
+    - `decision_review` **還要答得出「go 會讓哪個數字變」**（L14）：有 work order（→ dispatch）或有
+      `user_decision` blocker（→ assessment-gap 排入 pq1）才算；只剩 awaiting_external／system_internal 的
+      一律跳過——對它下 go 只會多 append 一筆同樣 REVIEW 的 decision。2026-09-09 P5 smoke 實測：[279][479]
+      首跑 reassess 後仍 REVIEW，第二跑又 reassess 一次——沒有這條，daily 會每天替它們多寫一筆。
+      brief 讀不到時 decision_review 全部跳過（fail closed，不猜）。
     """
 
     candidates: list[dict[str, Any]] = []
@@ -767,6 +833,26 @@ def standing_go_candidates(
         if tokens and any(tok in text for tok in tokens):
             skipped.append({"n": item["n"], "reason": "hint 提及付費／訂閱——付費取得永遠要 exact 金額核准"})
             continue
+        if item_type == "decision_review":
+            cohort_id = str(item["ref_id"])
+            has_work_order = False
+            if store is not None:
+                try:
+                    has_work_order = store.latest_research_work_order(cohort_id) is not None
+                except Exception:  # noqa: BLE001 — 讀不到就當沒有，交給下面的 brief 判定
+                    has_work_order = False
+            if not has_work_order:
+                if brief_items is None:
+                    skipped.append({"n": item["n"], "reason": "brief 讀不到，無法判定 go 會讓哪個數字變——不猜（fail closed）"})
+                    continue
+                if _brief_item_for(cohort_id, brief_items) is None:
+                    skipped.append({"n": item["n"], "reason": "brief 沒列這個 cohort，無法判定 go 會做什麼"})
+                    continue
+                if not _substantive_blockers(cohort_id, brief_items=brief_items):
+                    skipped.append({"n": item["n"], "reason": (
+                        "沒有 work order、也沒有需人決定的 blocker——go 只會多 append 一筆同樣 REVIEW 的 decision；"
+                        "純 context 老化交 reassess-stale，等世界的等 trigger")})
+                    continue
         candidates.append(item)
     return candidates, skipped
 
@@ -779,6 +865,7 @@ def standing_go(
     at: str | None = None,
     dry_run: bool = False,
     authorization: Any = None,
+    brief_items: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """段 2b 的 consumer：對常規授權類別執行「使用者本來會下的那個 go」，一個都不多。
 
@@ -794,7 +881,10 @@ def standing_go(
 
         authorization = sa.load()
     stamp = at or _now()
-    candidates, skipped = standing_go_candidates(pool, authorization=authorization)
+    if brief_items is None:
+        brief_items = _load_brief_items()
+    candidates, skipped = standing_go_candidates(
+        pool, authorization=authorization, store=store, brief_items=brief_items)
     result: dict[str, Any] = {
         "candidates": [int(it["n"]) for it in candidates], "skipped": skipped,
         "done": [], "failed": [], "dry_run": dry_run, "config": str(getattr(authorization, "path", "")),
@@ -891,7 +981,23 @@ def advance_decision_review(
         result["decision_id"] = decision_id
         return result
 
-    remaining = _substantive_blockers(cohort_id)
+    brief_items = _load_brief_items()
+    if brief_items is None or _brief_item_for(cohort_id, brief_items) is None:
+        # fail closed（2026-09-09 R2）：brief 服務降級或沒列這個 cohort 時，**不能**把「讀不到」記成
+        # 「僅 context 老化已解決」——那會把一個真實存在、只是這一刻讀不到的 user_decision blocker 靜默關掉。
+        # reassess 已經做了（append-only，無害）；這裡只留 receipt，不下結論、不排隊，交下一輪重判。
+        pool["log"].append({
+            "at": stamp,
+            "n": int(n),
+            "type": item["type"],
+            "ref_id": cohort_id,
+            "verb": "pq1_reassessed",
+            "reason": (f"go：已以 intent={intent} 重新凍結，但 decision brief 讀不到／未列此 cohort，"
+                       "殘餘 blocker 未判定——不視為已解決，下一輪 sync 重判"),
+            "receipt": f"decision:{decision_id}",
+        })
+        return {"item": item, "outcome": "reassessed_blockers_unknown", "decision_id": decision_id}
+    remaining = _substantive_blockers(cohort_id, brief_items=brief_items)
     if not remaining:
         # context 老化而已；sync 會依新 decision 自行結案，這裡不強制 resolve。
         pool["log"].append({
@@ -2700,14 +2806,13 @@ def main(argv: list[str] | None = None) -> int:
         from decision_lab.bootstrap import open_default_store
         from engine_b.leads import DEFAULT_LEADS_PATH
 
-        decision_store = open_default_store() if args.run else None
+        decision_store = open_default_store()          # dry-run 也要開：候選判定要看 work order
         try:
             outcome = standing_go(
                 pool, decision_store, leads_path=args.leads or DEFAULT_LEADS_PATH, dry_run=not args.run,
             )
         finally:
-            if decision_store is not None:
-                decision_store.close()
+            decision_store.close()
         if args.run:
             save(pool, args.pool)
         if args.json:

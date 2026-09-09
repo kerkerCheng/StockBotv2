@@ -1530,7 +1530,10 @@ def test_go_reassesses_when_only_context_aged(monkeypatch) -> None:
     monkeypatch.setattr("decision_lab.workflow.reassess", fake_reassess)
     monkeypatch.setattr("engine_d_runtime.bootstrap.build_default_runtime_provider",
                         lambda: object())
-    monkeypatch.setattr(todo, "_substantive_blockers", lambda cohort_id: [])
+    ref = todo.get(pool, 1)["ref_id"]
+    # 2026-09-09 R2 起 advance 先確認 brief 讀得到且列了這個 cohort（fail closed），再判殘餘 blocker
+    monkeypatch.setattr(todo, "_load_brief_items", lambda: [{"cohort_id": ref, "blockers": []}])
+    monkeypatch.setattr(todo, "_substantive_blockers", lambda cohort_id, **kw: [])
 
     out = todo.advance_decision_review(pool, 1, store=store)
     assert out["outcome"] == "reassessed"
@@ -1549,8 +1552,11 @@ def test_go_queues_assessment_gap_when_blockers_remain(monkeypatch) -> None:
                         lambda *a, **k: {"decision_id": "pd_new"})
     monkeypatch.setattr("engine_d_runtime.bootstrap.build_default_runtime_provider",
                         lambda: object())
+    ref = todo.get(pool, 1)["ref_id"]
+    monkeypatch.setattr(todo, "_load_brief_items",
+                        lambda: [{"cohort_id": ref, "blockers": ["financial_resilience_corroboration_incomplete"]}])
     monkeypatch.setattr(todo, "_substantive_blockers",
-                        lambda cohort_id: ["financial_resilience_corroboration_incomplete"])
+                        lambda cohort_id, **kw: ["financial_resilience_corroboration_incomplete"])
 
     out = todo.advance_decision_review(pool, 1, store=store)
     assert out["outcome"] == "queued_assessment_gap"
@@ -1768,3 +1774,75 @@ def test_reassess_stale_closes_only_when_new_decision_is_not_review(monkeypatch)
     assert pool["log"][-1]["receipt"].startswith("decision:pd_") or any(
         e["receipt"] == "decision:pd_dc_a" for e in pool["log"]
     )
+
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-09 R2（P5）findings 的回歸測試
+# ---------------------------------------------------------------------------
+
+def test_load_brief_items_returns_none_when_brief_service_degrades(monkeypatch) -> None:
+    """brief 服務把失敗吞成 status=unavailable 而不拋——讀不到不得變成空清單。"""
+    import briefing.public_view as pv
+
+    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "unavailable", "as_of": "x"})
+    assert todo._load_brief_items() is None
+    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "error", "as_of": "x"})
+    assert todo._load_brief_items() is None
+    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "ok", "items": []})
+    assert todo._load_brief_items() == []                      # 真的沒東西才是空
+    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "ok", "items": [{"cohort_id": "dc_1"}]})
+    assert todo._load_brief_items() == [{"cohort_id": "dc_1"}]
+
+
+def test_advance_decision_review_fails_closed_when_brief_is_unreadable(monkeypatch) -> None:
+    """reassess 後 brief 讀不到 → 不得下「僅 context 老化已解決」的結論，也不排隊；留收據等下一輪。"""
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_x", "title": "X"})
+    n = todo.active_items(pool)[0]["n"]
+
+    class _Store:
+        def latest_research_work_order(self, cohort_id):
+            return None
+
+    import decision_lab.workflow as wf
+    import engine_d_runtime.bootstrap as bs
+
+    monkeypatch.setattr(wf, "reassess", lambda s, p, c, *, execution_intent=None, **kw: {"decision_id": "pd_new", "action_card": {"attention": "REVIEW"}})
+    monkeypatch.setattr(bs, "build_default_runtime_provider", lambda: object())
+    monkeypatch.setattr(todo, "_prior_execution_intent", lambda s, c: "paper")
+    monkeypatch.setattr(todo, "_load_brief_items", lambda: None)
+
+    out = todo.advance_decision_review(pool, n, store=_Store(), at="2026-09-09T00:00:00+00:00")
+    assert out["outcome"] == "reassessed_blockers_unknown"
+    item = todo.get(pool, n)
+    assert item.get("dispatch_status") is None                 # 沒排隊（不知道 scope）
+    assert item.get("resolved_at") is None                     # 沒關掉
+    assert "殘餘 blocker 未判定" in pool["log"][-1]["reason"]
+
+
+def test_reassess_stale_has_a_cooldown_so_it_cannot_append_daily() -> None:
+    pool = _pool_with({"type": "decision_review", "ref_id": "dc_cool", "title": "C"})
+    n = todo.active_items(pool)[0]["n"]
+    brief = [{"cohort_id": "dc_cool", "blockers": ["market_stale_since_decision"]}]
+    store = _StoreStub({})
+    assert [it["n"] for it in todo.reassess_only_items(pool, store, brief_items=brief)] == [n]
+    pool["log"].append({"at": "2026-09-09T00:00:00+00:00", "n": n, "type": "decision_review", "ref_id": "dc_cool",
+                        "verb": "pq1_reassessed", "reason": "x", "receipt": "decision:pd_1"})
+    from datetime import datetime, timezone
+    assert todo._recently_reassessed(pool, n, now=datetime(2026, 9, 10, tzinfo=timezone.utc))
+    assert not todo._recently_reassessed(pool, n, now=datetime(2026, 9, 20, tzinfo=timezone.utc))
+
+
+def test_assessment_gap_jobs_lists_pool_only_work_that_drain_would_otherwise_miss() -> None:
+    pool = _pool_with(
+        {"type": "decision_review", "ref_id": "dc_gap", "title": "G"},
+        {"type": "decision_review", "ref_id": "dc_wo", "title": "W"},
+        {"type": "decision_review", "ref_id": "dc_idle", "title": "I"},
+    )
+    by = {it["ref_id"]: it for it in todo.active_items(pool)}
+    by["dc_gap"].update({"dispatch_status": "queued", "dispatch_ref": f"{todo.ASSESSMENT_GAP_PREFIX}dc_gap",
+                         "dispatch_scope": ["financial_resilience_corroboration_incomplete"]})
+    by["dc_wo"].update({"dispatch_status": "queued", "dispatch_ref": "wo_123"})     # 真 work order：drain 另有來源
+    jobs = todo.assessment_gap_jobs(pool)
+    assert [j["cohort_id"] for j in jobs] == ["dc_gap"]
+    assert jobs[0]["scope"] == ["financial_resilience_corroboration_incomplete"]

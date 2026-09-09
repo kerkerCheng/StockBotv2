@@ -104,11 +104,15 @@ def _gap(fair_value: float | None, price: CurrentPrice, *, currency: str | None)
                         unit=currency, reason=None, price_refs=price.evidence_refs)
 
 
-def _fair_value(method: str, fundamental: FundamentalInput, assumption: ValuationAssumption) -> float:
-    """每個 method 一段算術。v1 只有 forward earnings multiple。"""
+def _fair_value(method: str, fundamental: FundamentalInput, assumption: ValuationAssumption, *,
+                net_debt: float | None = None, diluted_shares: float | None = None) -> float:
+    """每個 method 一段算術。forward earnings multiple／ev_to_sales（2026-09-09 P6）。"""
     if method == "forward_earnings_multiple":
         assert fundamental.value is not None
         return fundamental.value * assumption.value
+    if method == "ev_to_sales":
+        assert fundamental.value is not None and net_debt is not None and diluted_shares
+        return (fundamental.value * assumption.value - net_debt) / diluted_shares
     raise AssertionError(f"method {method} 沒有算術——契約層應已擋下")
 
 
@@ -126,8 +130,12 @@ def build_valuation(
     parse_errors: Sequence[str] = (),
     method: str = "forward_earnings_multiple",
     abstention_records: Sequence[Abstention] = (),
+    balance: Any = None,
 ) -> ValuationResult:
-    """一次估值執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。"""
+    """一次估值執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。
+
+    `balance`（`BalanceSheetInput`）只給 `ev_to_sales` 換每股用；本益比法不讀它。
+    """
     if method not in VALUATION_METHODS:
         raise ValueError(f"valuation method 未登記：{method!r}；已知 {VALUATION_METHODS}")
     metric_name, _unit = METHOD_FUNDAMENTAL_INPUT[method]
@@ -207,6 +215,8 @@ def build_valuation(
     dependency: str | None = None
     formula: str | None = None
     basis_used: str | None = fundamental_input.accounting_basis if fundamental_input else None
+    net_debt: float | None = None
+    diluted_shares: float | None = None
     if assumption is None:
         # 「刻意不主張」與「還沒寫」在 2026-09-07 之前是同一句話（L12：一個表示兩種語意）。
         # 有 append-only 的 `Abstention` 紀錄時，缺席的語意變成 **deliberate_abstention**：
@@ -238,7 +248,9 @@ def build_valuation(
                 reason = (f"估值假設針對 {assumption.period.label}（至 {assumption.period.end}），內部 EPS 是 "
                           f"{fundamental_input.period.label}（至 {fundamental_input.period.end}）——不同會計期間不得相乘")
                 absence_kind = "inputs_incompatible"
-            elif assumption.accounting_basis != fundamental_input.accounting_basis:
+            elif (method != "ev_to_sales"
+                  and assumption.accounting_basis != fundamental_input.accounting_basis):
+                # 營收沒有 GAAP／non-GAAP 之分（EV／Sales 假設固定 not_applicable），口徑檢查只對 EPS 有意義。
                 reason = (f"估值假設口徑 {assumption.accounting_basis}，內部 EPS 口徑 {fundamental_input.accounting_basis}"
                           "——GAAP／non-GAAP 不得混算（不是缺假設，是口徑不合）")
                 absence_kind = "inputs_incompatible"
@@ -249,12 +261,46 @@ def build_valuation(
                 absence_kind = "method_not_applicable"
                 warnings.append(f"valuation_method_not_applicable：{method}")
             else:
-                fair_value = _fair_value(method, fundamental_input, assumption)
-                dependency = combined_input_dependency(fundamental_input.input_dependency, [assumption])
-                formula = FAIR_VALUE_FORMULA[method]
-                for ref in assumption.evidence_refs:
-                    if ref in index:
-                        model_evidence.append(index[ref])
+                shares_assumption = None
+                if method == "ev_to_sales":
+                    # 每股換算的兩個輸入：稀釋股數（fundamental model 已生效的 diluted_shares[total] 假設）
+                    # 與淨負債（Engine C 最新快照）。任一缺就 missing，**不補 0**。
+                    shares_assumption = next(
+                        (a for a in (fundamental.assumptions if fundamental is not None else ())
+                         if a.driver == "diluted_shares" and a.scope == "total" and a.value), None)
+                    if shares_assumption is None:
+                        reason = ("ev_to_sales 需要 diluted_shares[total] 假設換算每股——fundamental model 沒有生效的稀釋股數假設"
+                                  "（不是 0）")
+                        absence_kind = "upstream_unavailable"
+                    elif balance is None or not getattr(balance, "is_known", False):
+                        reason = ("ev_to_sales 需要淨負債（Engine C total_debt 與 cash_and_equivalents）："
+                                  + str(getattr(balance, "reason", None) or "Engine C 快照缺負債或現金") + "（不是 0）")
+                        absence_kind = "provider_missing"
+                    else:
+                        net_debt = float(balance.net_debt)
+                        diluted_shares = float(shares_assumption.value)
+                        steps.append(ValuationStep(
+                            key="net_debt", label=f"淨負債（Engine C 快照{('，' + balance.as_of.isoformat()) if balance.as_of else ''}）",
+                            kind="fundamental_input", value=net_debt, unit="currency", basis="observation",
+                            formula="net_debt = total_debt − cash_and_equivalents",
+                            observation_refs=tuple(balance.evidence_refs),
+                            reason="⚠ 現況快照，不是目標期末的資產負債表——EV/Sales v1 的已知近似"))
+                        steps.append(ValuationStep(
+                            key="diluted_shares", label=f"稀釋股數（{shares_assumption.period.label} 假設）",
+                            kind="assumption", value=diluted_shares, unit="shares", basis=shares_assumption.basis,
+                            assumption_ids=(shares_assumption.assumption_id,),
+                            observation_refs=tuple(shares_assumption.evidence_refs),
+                            reason=shares_assumption.rationale[:200]))
+                if reason is None:
+                    fair_value = _fair_value(method, fundamental_input, assumption,
+                                             net_debt=net_debt, diluted_shares=diluted_shares)
+                    dependency = combined_input_dependency(
+                        fundamental_input.input_dependency,
+                        [assumption] + ([shares_assumption] if shares_assumption is not None else []))
+                    formula = FAIR_VALUE_FORMULA[method]
+                    for ref in assumption.evidence_refs:
+                        if ref in index:
+                            model_evidence.append(index[ref])
     all_ids = (tuple(fundamental_input.assumption_ids) if fundamental_input else ()) \
         + ((assumption.assumption_id,) if assumption is not None else ())
     if fair_value is not None:
@@ -277,7 +323,7 @@ def build_valuation(
     # ⚠ `> 0` 不是防禦性程式碼：EPS 為負時 price/eps 是負的本益比，那個數字沒有意義
     # （COHR 測試以 −0.02 代入得到 −14,093x）。條件與 `method_applicability` 同源——
     # 倍數在盈餘非正時無定義，診斷數字也一樣。
-    if (price.is_known and price.value and fundamental_input is not None
+    if (method == "forward_earnings_multiple" and price.is_known and price.value and fundamental_input is not None
             and fundamental_input.value is not None and fundamental_input.value > 0
             and units_comparable(currency, price.unit)[0] == "comparable"):
         implied_multiple = price.value / fundamental_input.value
@@ -294,12 +340,15 @@ def build_valuation(
     # ---- 4. 敏感度：每條輸入判斷動一格，fair value 動多少 ----------------------------
     sensitivities: list[FairValueSensitivity] = []
     if fair_value is not None and assumption is not None and fundamental is not None:
-        for s in fundamental.sensitivities:
-            delta = (s.delta_eps * assumption.value) if s.delta_eps is not None else None
-            sensitivities.append(FairValueSensitivity(
-                assumption_id=s.assumption_id, driver=s.driver, scope=s.scope, bump=s.bump, bump_unit=s.bump_unit,
-                delta_fair_value=delta, fair_value_relative=(delta / fair_value) if (delta is not None and fair_value) else None))
-        bumped = _fair_value(method, fundamental_input, replace(assumption, value=assumption.value * (1 + _RELATIVE_BUMP)))  # type: ignore[arg-type]
+        if method == "forward_earnings_multiple":
+            for s in fundamental.sensitivities:
+                delta = (s.delta_eps * assumption.value) if s.delta_eps is not None else None
+                sensitivities.append(FairValueSensitivity(
+                    assumption_id=s.assumption_id, driver=s.driver, scope=s.scope, bump=s.bump, bump_unit=s.bump_unit,
+                    delta_fair_value=delta, fair_value_relative=(delta / fair_value) if (delta is not None and fair_value) else None))
+        bumped = _fair_value(method, fundamental_input, replace(assumption, value=assumption.value * (1 + _RELATIVE_BUMP)),  # type: ignore[arg-type]
+                             net_debt=net_debt if method == "ev_to_sales" else None,
+                             diluted_shares=diluted_shares if method == "ev_to_sales" else None)
         sensitivities.append(FairValueSensitivity(
             assumption_id=assumption.assumption_id, driver=assumption.driver, scope=assumption.scope,
             bump=_RELATIVE_BUMP, bump_unit="relative", delta_fair_value=bumped - fair_value,
@@ -320,9 +369,13 @@ def build_valuation(
                 "valuation_assumptions": {"count": 1, "by_basis": {assumption.basis: 1}},
             },
             "fair_value_input_dependency": dependency,
-            "multiple_share_of_gap": ("gap 完全可寫成 target_pe / implied_multiple_at_price − 1：給定內部 EPS，"
-                                      "整個 gap 就是「我們的倍數 vs 市場對我們 EPS 付的倍數」；EPS 本身的判斷"
-                                      "則藏在 implied_multiple_at_price 與市場對共識 EPS 付的倍數之差裡"),
+            "multiple_share_of_gap": (
+                ("gap 完全可寫成 target_pe / implied_multiple_at_price − 1：給定內部 EPS，"
+                 "整個 gap 就是「我們的倍數 vs 市場對我們 EPS 付的倍數」；EPS 本身的判斷"
+                 "則藏在 implied_multiple_at_price 與市場對共識 EPS 付的倍數之差裡")
+                if method == "forward_earnings_multiple" else
+                ("ev_to_sales：gap 由目標 EV/Sales、內部營收、淨負債快照與稀釋股數四者決定；"
+                 "兩桿拆解（EPS vs 倍數）對本方法無定義，attribution 會 missing")),
             "note": "沒有任何一個輸入數字是觀測到的 fair value；fair value 是判斷的確定性函數，不是事實",
         }
 

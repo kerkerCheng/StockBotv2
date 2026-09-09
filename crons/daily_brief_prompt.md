@@ -24,8 +24,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
    `fetchers\edgar.py`、`fetchers\mops.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
    `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
-   `engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`。
-   十七條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
+   `engine_b.todo sync`、`engine_b.todo work`、`engine_b.todo reassess-stale`、`engine_b.todo standing-go`、
+   `scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`（十九條）。
+   十九條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
    exact `go` 且已有 `dispatch_ref` 的 decision-review work order；不得用它代替 `dispatch`／`resolve`／`reassess`。
    若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
@@ -77,7 +78,15 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    ⚠ **2026-09-08 起不再跑 `query.bottleneck`／`--by-sector`／`alpha_purity_snapshot`／`query.coverage_gaps`**：
      排序與覆蓋缺口的完整內容住 APP（收尾 materialize 每天更新），Daily 只用 `decision_lab today` 已含的兩份排序
      與 `ranking_order_snapshots.jsonl` 的前一筆比對出「較昨變動」。它們仍是 `$alpha-status` 的入口，隨叫隨到。
+   - `.venv\Scripts\python.exe -m engine_b.cli consume-fired`（佇列段 1：把 fired 的追源 watch 排回 pq1。只讀寫 repo 內
+     `pending_leads.json`／`event_watches.json`，無網路無憑證，**在 sandbox 內、不需 escalation**。輸出 JSON 的
+     requeued／reactivated／consumed／skipped 四個數記進健康段；skipped 非零逐筆列理由。）
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
+   - `.venv\Scripts\python.exe -m engine_b.todo reassess-stale --run`（佇列段 2；首次呼叫命中 exact rule。只對
+     「純 system_internal blocker」的 decision_review reassess；結案數與仍 REVIEW 數記進健康段。）
+   - `.venv\Scripts\python.exe -m engine_b.todo standing-go --run`（佇列段 2b；首次呼叫命中 exact rule。對
+     `config/standing_authorization.json` 的 authorized 類型執行使用者本來會下的 go；pending／等世界／付費的一律
+     跳過並逐筆列理由。**這些編號從此不再進「需要你動作」，改在「系統在做」印計數。**）
    - `.venv\Scripts\python.exe -m engine_b.todo list`
    - `.venv\Scripts\python.exe -m engine_b.event_watch sweep`（T2 主動輪詢，2026-08-31 sandbox review 後放行：
      命令只讀寫 repo 內 watch registry、無網路無憑證，在 workspace-write sandbox 內、不需 escalation。
@@ -146,8 +155,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
    graph admission 仍是另一個 `ra_admission` pq2。
-8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --ranking --beta --coverage --watches --positions`，
-   把 APP 讀的五個畫面更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
+8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions`，
+   把 APP 讀的五個畫面與 registry 全部上市公司（73 檔；`--registry-listed` 是 materialize 自己的宇宙，**不動** pq1 的
+   tracked 導出）更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
    不手寫清單）。它只寫 ignored derived cache（`library/private/app/`），**不寫任何 authority、不入圖、不建 decision**，
    `serve` 不在 rule 內、排程不啟動它。**失敗只記入健康段、不中止 Daily**：artifact 是 derived cache，
    舊的那份仍在，APP 自己會顯示 stale——這與 harvest 失敗必須中止整輪不同（那個會讓兩個 writer 撞上）。
@@ -220,6 +230,9 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 同發行人同類文件（如一批 Form 4）彙總一行列數量與唯一例外，不逐筆點名。>
 
 ## 現況：都在 APP，只講變動（無 pq2 編號）
+<固定加一行機械段計數器（2026-09-09 P5，L14 常駐計數器）：「今日自動清了 N（fired 重排 a／reassess 結案 b／常規授權 go c），
+機械段剩 M；每檔閉環：到終局 T／未到終局 U，下一檔 X」——數字照抄 consume-fired／reassess-stale／standing-go 的輸出與
+`webapp status` 的「每檔閉環」行。任何一支沒跑成就寫「未跑：<原因>」，不得印 0。>
 <四個畫面由收尾的 materialize 更新；本段只印計數與較昨變動，完整內容不重印。
 一張四列小表：瓶頸排序 `#/ranking`（可行動 N 條、首選是誰）｜資產配置 `#/beta`（低於／高於／到位各 N）｜
 研究缺口 `#/coverage`（🔴 真缺口 N／🟡 N）｜在等什麼 `#/watches`（在等 N／停滯 N／fired 未消化 N／追源需處置 N）。

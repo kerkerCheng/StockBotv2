@@ -403,3 +403,87 @@ def test_valuation_core_never_imports_io_or_llm_clients() -> None:
             elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
                 roots.add(node.module.split(".")[0])
         assert not (roots & forbidden), (path, roots & forbidden)
+
+
+
+# ---------------------------------------------------------------------------
+# P6（2026-09-09）：ev_to_sales——虧損公司的第二種方法
+# ---------------------------------------------------------------------------
+
+def _ev_multiple(value: float = 8.0, *, created: datetime = CREATED, refs=(EDGE, ACT_REF.ref), **kw):
+    from alpha.valuation import parse_valuation_assumption_record, valuation_assumption_record
+
+    record = valuation_assumption_record(
+        company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=value, basis="session_judgment",
+        accounting_basis="not_applicable", rationale=f"test target_ev_to_sales {value}", evidence_refs=list(refs),
+        created_at=created, method="ev_to_sales", parameter="target_ev_to_sales", **kw)
+    return parse_valuation_assumption_record(record)
+
+
+def _balance(debt: float | None = 3_540_000_000.0, cash: float | None = 1_990_000_000.0):
+    from alpha.valuation import BalanceSheetInput
+
+    return BalanceSheetInput(total_debt=debt, cash_and_equivalents=cash, as_of=PRICE.bar_date, evidence_refs=(SNAP,),
+                             reason=None if (debt is not None and cash is not None) else "快照缺負債或現金")
+
+
+def test_ev_to_sales_fair_value_is_revenue_times_multiple_minus_net_debt_per_share() -> None:
+    model = _run(index=_index())
+    result = build_valuation(
+        company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7), fundamental=model,
+        fundamental_reason=None, assumption_records=[_ev_multiple(8.0)], evidence_index=_index(), price=PRICE,
+        method="ev_to_sales", balance=_balance())
+    revenue = model.metrics["revenue"].value
+    shares = next(a.value for a in model.assumptions if a.driver == "diluted_shares")
+    assert result.status == "available" and result.method == "ev_to_sales"
+    assert result.fair_value == pytest.approx((revenue * 8.0 - (3_540_000_000.0 - 1_990_000_000.0)) / shares)
+    assert result.formula == FAIR_VALUE_FORMULA["ev_to_sales"]
+    keys = {s.key: (s.kind, s.basis) for s in result.steps}
+    assert keys["internal_revenue"] == ("fundamental_input", "deterministic")
+    assert keys["net_debt"] == ("fundamental_input", "observation")
+    assert keys["diluted_shares"][0] == "assumption"
+    assert result.gap.implied_multiple_at_price is None            # 本益比診斷對 EV/S 無定義
+    assert result.input_dependency == "session_judgment"
+    assert len(result.sensitivities) == 1 and result.sensitivities[0].driver.endswith("target_ev_to_sales")
+
+
+def test_ev_to_sales_never_fills_missing_net_debt_or_shares_with_zero() -> None:
+    model = _run(index=_index())
+    common = dict(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7), fundamental=model,
+                  fundamental_reason=None, assumption_records=[_ev_multiple(8.0)], evidence_index=_index(),
+                  price=PRICE, method="ev_to_sales")
+    no_balance = build_valuation(**common, balance=None)
+    assert no_balance.status == "missing" and no_balance.absence_kind == "provider_missing"
+    assert "淨負債" in (no_balance.reason or "") and "不是 0" in (no_balance.reason or "")
+    half = build_valuation(**common, balance=_balance(cash=None))
+    assert half.status == "missing" and half.absence_kind == "provider_missing"
+    no_shares_model = _run([a for a in _full_set() if a.driver != "diluted_shares"], index=_index())
+    no_shares = build_valuation(**{**common, "fundamental": no_shares_model}, balance=_balance())
+    assert no_shares.status == "missing" and no_shares.absence_kind == "upstream_unavailable"
+    assert "diluted_shares" in (no_shares.reason or "")
+
+
+def test_ev_to_sales_assumption_must_be_not_applicable_basis_and_pe_message_points_to_it() -> None:
+    from alpha.valuation import parse_valuation_assumption_record, valuation_assumption_record
+
+    with pytest.raises(ContractViolation, match="not_applicable"):
+        parse_valuation_assumption_record(valuation_assumption_record(
+            company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=8.0, basis="session_judgment",
+            accounting_basis="non_gaap", rationale="x", evidence_refs=[EDGE, ACT_REF.ref], created_at=CREATED,
+            method="ev_to_sales", parameter="target_ev_to_sales"))
+    from alpha.valuation.contracts import method_applicability
+
+    msg = method_applicability("forward_earnings_multiple", -0.5) or ""
+    assert "ev_to_sales" in msg and "target_ev_to_sales" in msg
+    assert method_applicability("ev_to_sales", 0.0) is not None
+    assert method_applicability("ev_to_sales", 1.0) is None
+
+
+def test_pe_path_is_unchanged_by_the_new_method() -> None:
+    """既有 COHR 本益比法的 baseline 一格都不動（P6 是加方法，不是改方法）。"""
+    model = _run(index=_index())
+    result = _valuation(model=model)
+    assert result.method == "forward_earnings_multiple"
+    assert result.fair_value == pytest.approx(model.metrics["eps"].value * 25.0)
+    assert result.gap.implied_multiple_at_price is not None
+    assert {s.key for s in result.steps}.isdisjoint({"net_debt", "diluted_shares"})

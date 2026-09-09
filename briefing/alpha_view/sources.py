@@ -23,6 +23,7 @@ from alpha.entry import (
 )
 from alpha.errors import AlphaError, ContractViolation, PointInTimeUnsupported
 from alpha.fundamental import FundamentalModelResult, build_fundamental_model
+from alpha.valuation.contracts import METHOD_EV_TO_SALES, BalanceSheetInput
 from alpha.identity import CompanyId, Ticker
 from alpha.implied_return import ImpliedReturnResult, build_implied_return
 from alpha.models import compose_signal
@@ -238,17 +239,40 @@ def _valuation_model(
     except Exception:  # noqa: BLE001
         abstentions = []
     price = _current_price(build, identity)
+    balance = _balance_input(build)
+    common = dict(
+        company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
+        fundamental=fundamental_model, fundamental_reason=fundamental_reason,
+        assumption_records=records, parse_errors=parse_errors, abstention_records=abstentions,
+        evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price, balance=balance,
+    )
     try:
-        result = build_valuation(
-            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
-            fundamental=fundamental_model, fundamental_reason=fundamental_reason,
-            assumption_records=records, parse_errors=parse_errors,
-            abstention_records=abstentions,
-            evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price,
-        )
+        result = build_valuation(**common)
+        # 2026-09-09 P6：本益比法「方法不適用」（forward EPS 非正）且 ledger 裡有 ev_to_sales 假設 → 改跑 EV/Sales。
+        # 沒有 EV/S 假設就保留本益比法的 method_not_applicable（理由已寫該寫哪一筆假設）；不自動補倍數。
+        if (not result.is_known and result.absence_kind == "method_not_applicable"
+                and _has_method_records(records, METHOD_EV_TO_SALES)):
+            result = build_valuation(method=METHOD_EV_TO_SALES, **common)
     except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗
         return None, f"valuation model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
     return result, None, records
+
+
+def _has_method_records(records: Sequence[Any], method: str) -> bool:
+    """ledger 裡有沒有這個 method 的未撤回估值假設（選取仍由 build_valuation 依 as-of／期間決定）。"""
+    return any(getattr(r, "method", None) == method and not getattr(r, "retracted", False) for r in records)
+
+
+def _balance_input(build: ContextBuild) -> BalanceSheetInput:
+    """Engine C 快照的負債與現金（A2 觀測；只給 ev_to_sales 換每股）。缺就帶 reason，不補 0。"""
+    snap = build.context.fundamentals
+    missing_fields = [name for name in ("total_debt", "cash_and_equivalents") if getattr(snap, name, None) is None]
+    return BalanceSheetInput(
+        total_debt=snap.total_debt, cash_and_equivalents=snap.cash_and_equivalents,
+        as_of=build.context.market.bar_date,
+        evidence_refs=tuple(r.ref for r in snap.evidence),
+        reason=(f"Engine C 快照缺 {'、'.join(missing_fields)}" if missing_fields else None),
+    )
 
 
 def _current_price(build: ContextBuild, identity: Mapping[str, Any]) -> CurrentPrice:

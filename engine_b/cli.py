@@ -366,6 +366,14 @@ def _cmd_drain(args: argparse.Namespace) -> int:
     pending_count = sum(
         1 for l in store["leads"].values() if l.get("status") == "pending"
     )
+    gap_jobs: list[dict] = []
+    if include_decisions:
+        try:
+            from engine_b import todo as _todo
+
+            gap_jobs = _todo.assessment_gap_jobs(_todo.load(_todo.DEFAULT_POOL_PATH))
+        except Exception as exc:  # noqa: BLE001 — 讀不到就說讀不到；不擋 drain
+            print(f"警告：assessment-gap 工單讀不到：{type(exc).__name__}", file=sys.stderr)
     all_candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
@@ -403,6 +411,9 @@ def _cmd_drain(args: argparse.Namespace) -> int:
             {"kind": "decision_work_order", "work_order": job}
             for job in decision_jobs
         ] + [
+            {"kind": "assessment_gap_item", "item": job}
+            for job in gap_jobs
+        ] + [
             {"kind": "lead", "priority": rank.label, "lead": lead}
             for rank, lead in lead_batch
         ] + [
@@ -420,12 +431,12 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
     _print_segment_counters(pending_count, fired)
-    if not decision_jobs and not lead_batch and not classification_gaps:
+    if not decision_jobs and not gap_jobs and not lead_batch and not classification_gaps:
         print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
         _print_withheld(withheld_jobs)
         return 0
-    if decision_jobs or lead_batch:
-        print(f"pq1 drain：接下來 {len(decision_jobs) + len(lead_batch)} 件：")
+    if decision_jobs or lead_batch or gap_jobs:
+        print(f"pq1 drain：接下來 {len(decision_jobs) + len(gap_jobs) + len(lead_batch)} 件：")
     for job in decision_jobs:
         print(
             f"  [USER-GO] {job['work_order_id']}  {job['status']:12}  "
@@ -434,6 +445,13 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         print(f"            blockers={','.join(job.get('blockers') or [])}")
         for note in job.get("lifecycle_notes") or []:
             print(f"            ⚠ {note}")
+    for job in gap_jobs:
+        # pool-only 的 assessment-gap 工單（standing-go／使用者 go 排入）：不在 Decision Store work order 表，
+        # 但一樣是「已授權、還沒做完」——研究範圍就是 scope 那幾個 blocker code。
+        print(
+            f"  [ASSESSMENT-GAP] [{job['n']}]  {job['dispatch_status']:12}  cohort={job['cohort_id']}"
+        )
+        print(f"            scope={','.join(job.get('scope') or []) or '（未列）'}｜{job.get('title') or ''}")
     for rank, l in lead_batch:
         print(f"  [{rank.label}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")

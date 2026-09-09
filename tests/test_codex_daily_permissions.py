@@ -18,7 +18,7 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 17
+    assert rules.count("prefix_rule(") == 19
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
@@ -34,6 +34,8 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',
         '"-m", "engine_b.todo", "work"',
+        '"-m", "engine_b.todo", "reassess-stale"',
+        '"-m", "engine_b.todo", "standing-go"',
         "scripts\\\\publish_daily_state.py",
         "scripts\\\\publish_daily_brief.py",
         '"-m", "webapp", "materialize"',
@@ -131,6 +133,36 @@ def test_project_memory_defines_common_sandbox_impact_review() -> None:
         "不新增 unattended rule",
     ):
         assert token in operations
+
+
+def test_mechanical_queue_segments_are_split_by_capability_not_by_convenience() -> None:
+    """研究閉環 P5（2026-09-09）：daily 吃機械段，三支命令按 side effect 分兩邊。
+
+    - `engine_b.cli consume-fired` 只讀寫 repo 內 `pending_leads.json`／`event_watches.json`（同目錄 tempfile
+      原子替換），無網路無憑證——**留在 workspace-write sandbox，不得出現在 rule pattern**（與 event_watch
+      sweep 同一條先例；放進去就是 broad permission 掩蓋整合缺口）。
+    - `engine_b.todo reassess-stale`／`standing-go` 會跑 reassess（Neo4j／Engine C／Sheet readonly），
+      需要 exact rule；**相鄰的 dispatch／resolve 仍不放行**——使用者的 go／drop 動詞不進無人值守。
+    - daily prompt 必須帶這三步與 `--registry-listed`（APP 73 檔每天更新），否則 rule 放了沒人用（L13）。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+    patterns = re.findall(r"pattern=\[(.*?)\]", rules, re.S)
+    assert not [p for p in patterns if "consume-fired" in p], "consume-fired 不需要 escalation"
+    assert '"engine_b.todo", "reassess-stale"' in rules and '"engine_b.todo", "standing-go"' in rules
+    assert '"engine_b.todo", "dispatch"' not in rules and '"engine_b.todo", "resolve"' not in rules
+
+    prompt = (ROOT / "crons" / "daily_brief_prompt.md").read_text(encoding="utf-8")
+    for token in (
+        "engine_b.cli consume-fired",
+        "engine_b.todo reassess-stale --run",
+        "engine_b.todo standing-go --run",
+        "--registry-listed",
+        "今日自動清了",
+    ):
+        assert token in prompt, f"daily prompt 缺 {token}"
+    skill = (ROOT / "skills" / "daily-brief" / "SKILL.md").read_text(encoding="utf-8")
+    for token in ("consume-fired", "reassess-stale --run", "standing-go --run", "--registry-listed"):
+        assert token in skill, f"daily-brief skill 缺 {token}"
 
 
 def test_event_watch_sweep_is_in_sandbox_not_escalated() -> None:

@@ -141,7 +141,8 @@ resolve，receipt 註明語境），**不得回頭再請求一次 `go`**——�
 **常規授權類別（2026-09-09 使用者定案）：** 系統主動提案中，若該項的 `go` 只是**注意力 gate**
 （授權的是 bounded research／派回 pq1 這類**可逆、不寫任何 authority** 的事），使用者已預先授權：
 收集端直接排入 pq1、brief 只印計數，**不再逐項請求 `go`**。清單是封閉字彙，SSOT 為
-`config/standing_authorization.json`（該檔落地前以本段所列為準）：`decision_review` 的 bounded gap
+`config/standing_authorization.json`（`engine_b/standing_authorization.py` 是唯一 loader；載入時驗封閉性），
+consumer 是 `engine_b.todo standing-go`（2026-09-09 起 Daily 每天跑）：`decision_review` 的 bounded gap
 research、`source_trace_review` 的派回 pq1（**付費取得除外**）。**永不列入：** `ra_admission`、
 `engine_c_observation`、`thesis_mutation`／`thesis_lifecycle`、live、任何付費、decompose 選題
 （提案由系統自動鑄成 pq2，核准仍逐題）。判準一句話：**這個 `go` 攔的是注意力還是 authority？**

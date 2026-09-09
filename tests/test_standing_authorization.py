@@ -61,10 +61,41 @@ def _pool():
     return pool, by
 
 
+class _StoreStub:
+    def __init__(self, work_orders: dict[str, object] | None = None):
+        self._wo = work_orders or {}
+
+    def latest_research_work_order(self, cohort_id: str):
+        return self._wo.get(cohort_id)
+
+
+#: brief：dc_go 有需人決定的 blocker（go → assessment-gap 排入 pq1）；dc_stale_only 只剩 system_internal／awaiting_external
+BRIEF = [
+    {"cohort_id": "dc_go", "blockers": ["financial_resilience_corroboration_incomplete", "market_stale_since_decision"]},
+    {"cohort_id": "dc_deferred", "blockers": ["financial_resilience_corroboration_incomplete"]},
+    {"cohort_id": "dc_waiting", "blockers": ["financial_resilience_corroboration_incomplete"]},
+    {"cohort_id": "dc_inflight", "blockers": ["financial_resilience_corroboration_incomplete"]},
+    {"cohort_id": "dc_stale_only", "blockers": ["market_stale_since_decision", "execution_fx_missing"]},
+]
+
+
 def test_candidates_exclude_pending_waiting_inflight_paid_and_never_types() -> None:
     pool, by = _pool()
-    candidates, skipped = todo.standing_go_candidates(pool, authorization=sa.load())
+    todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_stale_only", "title": "I"}])
+    by = {it["ref_id"]: it for it in todo.active_items(pool)}
+    candidates, skipped = todo.standing_go_candidates(
+        pool, authorization=sa.load(), store=_StoreStub(), brief_items=BRIEF)
     assert [it["ref_id"] for it in candidates] == ["dc_go", "lead_free"]
+    reasons_by_ref = {todo.get(pool, row["n"])["ref_id"]: row["reason"] for row in skipped}
+    assert "go 只會多 append" in reasons_by_ref["dc_stale_only"]        # L14：go 不會讓數字變 → 不下
+    # 有 work order 的即使沒有 user_decision blocker 也算（→ dispatch）
+    with_wo, _ = todo.standing_go_candidates(
+        pool, authorization=sa.load(), store=_StoreStub({"dc_stale_only": {"work_order_id": "wo_1"}}), brief_items=BRIEF)
+    assert "dc_stale_only" in [it["ref_id"] for it in with_wo]
+    # brief 讀不到 → decision_review 全部跳過（fail closed），source_trace 不受影響
+    none_brief, skipped_nb = todo.standing_go_candidates(pool, authorization=sa.load(), store=_StoreStub(), brief_items=None)
+    assert [it["ref_id"] for it in none_brief] == ["lead_free"]
+    assert any("fail closed" in row["reason"] for row in skipped_nb)
     reasons = {row["n"]: row["reason"] for row in skipped}
     assert "pending" in reasons[by["dc_deferred"]["n"]]
     assert "等世界" in reasons[by["dc_waiting"]["n"]]
@@ -90,10 +121,10 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
     monkeypatch.setattr(todo, "advance_decision_review", fake_advance)
     monkeypatch.setattr(todo, "dispatch_source_trace_review", fake_dispatch)
 
-    dry = todo.standing_go(pool, object(), dry_run=True)
+    dry = todo.standing_go(pool, _StoreStub(), dry_run=True, brief_items=BRIEF)
     assert dry["dry_run"] and calls == []
 
-    out = todo.standing_go(pool, object(), at="2026-09-09T00:00:00+00:00")
+    out = todo.standing_go(pool, _StoreStub(), at="2026-09-09T00:00:00+00:00", brief_items=BRIEF)
     assert [(c[0]) for c in calls] == ["decision", "trace"]
     assert [row["outcome"] for row in out["done"]] == ["queued_assessment_gap", "dispatched"]
     logs = [e for e in pool["log"] if e["verb"] == "standing_go"]
@@ -114,6 +145,6 @@ def test_standing_go_reports_single_failures_without_stopping(monkeypatch) -> No
     monkeypatch.setattr(todo, "advance_decision_review", boom)
     monkeypatch.setattr(todo, "dispatch_source_trace_review",
                         lambda p, n, *, leads_path, at=None: {"item": todo.get(p, n)})
-    out = todo.standing_go(pool, object())
+    out = todo.standing_go(pool, _StoreStub(), brief_items=BRIEF)
     assert [row["n"] for row in out["failed"]] == [by["dc_go"]["n"]]
     assert [row["n"] for row in out["done"]] == [by["lead_free"]["n"]]

@@ -72,8 +72,10 @@ fixed entry 包含
 `scripts\alpha_purity_snapshot.py`、
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
-`decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`、`-m webapp materialize`；十七條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`engine_b.todo reassess-stale`、
+`engine_b.todo standing-go`、`scripts\publish_daily_state.py` 與
+`scripts\publish_daily_brief.py`、`-m webapp materialize`；十九條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`engine_b.cli consume-fired` 刻意**不在列**：它只讀寫 repo 內 JSON，在 sandbox 內就能跑（與 `event_watch sweep` 同先例）。
 ⚠ `fetchers/` 不是整包放行：只有 `edgar.py` 與 `mops.py` 在列，`gsheets.py` 帶 Google 憑證故排除。
 `engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
 它不授權 `dispatch`／`resolve`／`reassess`，也不放寬 graph admission 或 live gate。
@@ -143,7 +145,20 @@ PASS classification 的封閉字彙與判準只認 `skills/signal-triage/SKILL.m
 `config/lead_classification.json`；health 非零必須在健康段逐筆列出。缺分類 lead 不進 drain 排名，
 但不得因此隱藏或自動 FILTER。
 
-### Step 3 — pq1 drain（priority，可續跑）
+### Step 3 — 先清機械段，再 pq1 drain（priority，可續跑）
+
+**機械段（2026-09-09 研究閉環 P5 起由 Daily 每天跑；零 token、不吃 drain_limit_per_run）：**
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.cli consume-fired          # 段 1：fired 的追源 watch 排回 pq1（sandbox 內）
+& '.venv\Scripts\python.exe' -m engine_b.todo sync                  # 段 1 的 pq2 型翻醒（既有）
+& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run  # 段 2：純 system_internal blocker 的 REVIEW → reassess 結案（exact rule）
+& '.venv\Scripts\python.exe' -m engine_b.todo standing-go --run     # 段 2b：常規授權類別直接下使用者本來會下的 go（exact rule）
+```
+
+三支的輸出數字進 brief 首屏的「今日自動清了 N」計數器（見模板）；skipped 逐筆列理由。**判斷類（forward view、
+decision gap 研究）不在 daily 自動做**——LLM 無人值守寫判斷檔的 allowlist 縮不到安全範圍，那是 research-drain 的事。
+段序定義見 `engine_b/queue_segments.py`。
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.cli drain
@@ -476,6 +491,9 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ## 現況：都在 APP，Daily 只講變動（無 pq2 編號）
 
+今日自動清了 N（fired 重排 a／reassess 結案 b／常規授權 go c），機械段剩 M｜每檔閉環：到終局 T／未到終局 U，下一檔 X
+<2026-09-09 P5 固定第一行（L14 常駐計數器）：數字照抄三支機械段命令與 `webapp status` 的「每檔閉環」行；沒跑成寫「未跑：<原因>」，不得印 0>
+
 四個持久畫面由收尾的 `-m webapp materialize` 每天更新；**本段只印計數與較昨變動，完整內容一律不重印**。
 
 | 畫面 | 今天 | 較昨 |
@@ -601,7 +619,8 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 
 ### Step 7 — 收尾同步
 
-- **更新 APP 讀的畫面**（2026-09-08）：`& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches --positions`。
+- **更新 APP 讀的畫面**（2026-09-08；2026-09-09 起加 `--registry-listed`，APP 73 檔每天更新）：
+  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions`。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
   只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。

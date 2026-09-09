@@ -52,7 +52,11 @@ MODEL_VERSION = "valuation-model/v1"
 #: FY 目標期間的稀釋 EPS；沒有內部 FCF、D&A、EBITDA、資本支出或營運資金，所以 EV/EBITDA、
 #: DCF、reverse DCF 都沒有資料可餵，**不為了完整硬做**。
 METHOD_FORWARD_EARNINGS_MULTIPLE = "forward_earnings_multiple"
-VALUATION_METHODS: tuple[str, ...] = (METHOD_FORWARD_EARNINGS_MULTIPLE,)
+#: 2026-09-09 研究閉環 P6（使用者定案 EV／Sales）：給 forward EPS 非正的公司。**同一個形狀**——內部指標 × 明示倍數——
+#: 只是內部指標換成目標期間的總營收，再減淨負債、除以稀釋股數換成每股。沒有內部 FCF／EBITDA 的限制不變，
+#: 所以仍然沒有 DCF／EV/EBITDA。
+METHOD_EV_TO_SALES = "ev_to_sales"
+VALUATION_METHODS: tuple[str, ...] = (METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_EV_TO_SALES)
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,16 +74,31 @@ METHOD_PARAMETERS: Mapping[str, Mapping[str, ParameterSpec]] = {
             "multiple", "目標本益比（倍）；套用在**同一目標會計期間、同一口徑**的內部稀釋 EPS 上",
             lower=0.0, upper=500.0),
     },
+    METHOD_EV_TO_SALES: {
+        "target_ev_to_sales": ParameterSpec(
+            "multiple", "目標 EV／Sales（倍）；套用在同一目標會計期間的內部總營收上，減淨負債、除以稀釋股數得每股",
+            lower=0.0, upper=200.0),
+    },
 }
 
 #: method → 它消費的內部指標與該指標的單位。
 METHOD_FUNDAMENTAL_INPUT: Mapping[str, tuple[str, str]] = {
     METHOD_FORWARD_EARNINGS_MULTIPLE: ("eps", "currency_per_share"),
+    METHOD_EV_TO_SALES: ("revenue", "currency"),
+}
+
+#: method → 估值假設允許的 accounting_basis。倍數套在哪一種 EPS 上是身分（gaap／non_gaap）；
+#: 營收沒有 GAAP／non-GAAP 之分，EV／Sales 的假設只能是 not_applicable。
+METHOD_ACCOUNTING_BASES: Mapping[str, tuple[str, ...]] = {
+    METHOD_FORWARD_EARNINGS_MULTIPLE: ("gaap", "non_gaap"),
+    METHOD_EV_TO_SALES: ("not_applicable",),
 }
 
 #: fair value 與 gap 的公式字串（**唯一定義處**；read model 只抄，不得自己再寫一份）。
 FAIR_VALUE_FORMULA: Mapping[str, str] = {
     METHOD_FORWARD_EARNINGS_MULTIPLE: "fair_value = internal_eps[target_period] × target_pe",
+    METHOD_EV_TO_SALES: ("fair_value = (internal_revenue[target_period] × target_ev_to_sales − net_debt) "
+                         "/ diluted_shares[target_period]；net_debt = total_debt − cash_and_equivalents（Engine C 最新快照）"),
 }
 
 
@@ -100,9 +119,38 @@ def method_applicability(method: str, fundamental_value: float | None) -> str | 
     if method == METHOD_FORWARD_EARNINGS_MULTIPLE and fundamental_value <= 0:
         return (f"method {method} 不適用：內部 forward EPS = {fundamental_value:,.4f}（非正）。"
                 "本益比法只在盈餘為正時有定義——負 EPS × 目標倍數會產生負的 fair value 與 "
-                "< −100% 的隱含報酬。這不是缺料，是**方法不適用**；虧損公司需要另一個 "
-                "valuation method（v1 只有 forward_earnings_multiple）")
+                "< −100% 的隱含報酬。這不是缺料，是**方法不適用**；虧損公司改用 "
+                f"{METHOD_EV_TO_SALES}（寫一筆 target_ev_to_sales 估值假設，accounting_basis=not_applicable）")
+    if method == METHOD_EV_TO_SALES and fundamental_value <= 0:
+        return (f"method {method} 不適用：內部目標期間營收 = {fundamental_value:,.0f}（非正）——"
+                "EV／Sales 只在營收為正時有定義；沒有營收的公司本層沒有方法")
     return None
+
+
+@dataclass(frozen=True, slots=True)
+class BalanceSheetInput:
+    """Engine C 最新快照的負債與現金（A2 觀測；只給 ev_to_sales 換每股用）。
+
+    `net_debt = total_debt − cash_and_equivalents`；任一缺就是 `missing`（不補 0——把「沒讀到負債」
+    當成「零負債」會讓 fair value 憑空多出整個負債）。`as_of` 是快照的 bar_date／snapshot 日；
+    ⚠ 它是**現況**快照不是目標期末的資產負債表，這個近似寫在公式字串裡讓讀者看見。
+    """
+
+    total_debt: float | None
+    cash_and_equivalents: float | None
+    as_of: date | None = None
+    evidence_refs: tuple[str, ...] = ()
+    reason: str | None = None
+
+    @property
+    def is_known(self) -> bool:
+        return self.total_debt is not None and self.cash_and_equivalents is not None
+
+    @property
+    def net_debt(self) -> float | None:
+        if not self.is_known:
+            return None
+        return float(self.total_debt) - float(self.cash_and_equivalents)   # type: ignore[arg-type]
 
 
 GAP_FORMULA = "absolute_gap = fair_value − current_price；relative_gap = fair_value / current_price − 1"
@@ -213,10 +261,11 @@ class ValuationAssumption:
             raise ContractViolation(f"v1 估值假設的 scope 只能是 {TOTAL_SCOPE!r}")
         if self.basis not in ASSUMPTION_BASES:
             raise ContractViolation(f"basis 未登記：{self.basis!r}；已知 {ASSUMPTION_BASES}")
-        if self.accounting_basis not in VALUATION_ACCOUNTING_BASES:
+        allowed_bases = METHOD_ACCOUNTING_BASES.get(self.method, VALUATION_ACCOUNTING_BASES)
+        if self.accounting_basis not in allowed_bases:
             raise ContractViolation(
-                f"估值假設的 accounting_basis 必須是 {VALUATION_ACCOUNTING_BASES}，收到 {self.accounting_basis!r}"
-                "——倍數套在 GAAP 還是 non-GAAP EPS 上是身分，不得留空或 unverified")
+                f"{self.method} 的估值假設 accounting_basis 必須是 {allowed_bases}，收到 {self.accounting_basis!r}"
+                "——倍數套在 GAAP 還是 non-GAAP EPS 上是身分（營收沒有這個分別，EV／Sales 只能是 not_applicable）")
         value = _finite(self.value, "ValuationAssumption.value")
         if spec.lower is not None and value < spec.lower:
             raise ContractViolation(f"{self.parameter}={value} 低於下限 {spec.lower}")
@@ -512,8 +561,9 @@ def combined_input_dependency(fundamental_dependency: str | None, assumptions: S
 
 __all__ = [
     "FAIR_VALUE_FORMULA", "GAP_FORMULA", "GAP_STATUSES", "IMPLIED_MULTIPLE_FORMULA",
+    "METHOD_ACCOUNTING_BASES", "METHOD_EV_TO_SALES",
     "METHOD_FORWARD_EARNINGS_MULTIPLE", "METHOD_FUNDAMENTAL_INPUT", "METHOD_PARAMETERS", "MODEL_VERSION",
-    "method_applicability",
+    "BalanceSheetInput", "method_applicability",
     "VALUATION_ACCOUNTING_BASES", "VALUATION_METHODS", "VALUATION_STATUSES", "VALUE_DATE_CONVENTIONS",
     "VALUE_DATE_FORMULA", "VALUE_DATE_SEMANTICS", "VALUE_DATE_SPOT", "VALUE_DATE_TARGET_PERIOD_END",
     "VALUE_DATE_UNSPECIFIED", "CurrentPrice",

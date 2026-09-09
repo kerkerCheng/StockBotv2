@@ -326,6 +326,22 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 （產品決策見 `docs/ROADMAP.md`「主流程的終點是 Implied Return」）。
 架構見 `docs/ARCHITECTURE.md` §6.7。**互動專用，不進 unattended rule。**
 
+### Sandbox impact review 結論（2026-09-09，研究閉環 P5：Daily 吃機械段）
+
+五步：
+
+1. **path＋side effect＋capability**：
+   - `-m engine_b.cli consume-fired`：讀寫 `library/leads/pending_leads.json`／`event_watches.json`（同目錄 tempfile 原子替換）。無網路、無憑證、無 identity／ACL、無 private authority → **sandbox 內，不需 rule**（同 `event_watch sweep` 先例）。
+   - `-m engine_b.todo reassess-stale --run`：讀 brief（Neo4j／Engine C／Sheet readonly）判候選；對候選跑 `decision_lab.workflow.reassess`（append 新 decision 到 private Decision Store，舊筆不動）；寫 `todo_pool.json`。→ **exact rule**。
+   - `-m engine_b.todo standing-go --run`：同上資源；對 authorized 類型執行 `advance_decision_review`／`dispatch_source_trace_review`（與使用者 `go` 同一段程式）；寫 `todo_pool.json`、`pending_leads.json`、Decision Store work order。→ **exact rule**。
+   - `-m webapp materialize --registry-listed`：既有 rule 的 prefix 已涵蓋（多一個旗標、同一組資源、多 43 檔 Neo4j／SQLite 讀取，寫 ignored derived cache）。
+2. **canonical skill／prompt／本檔**：`crons/daily_brief_prompt.md` 步驟 3 加三支、步驟 8 加旗標、brief 加「今日自動清了」計數器；`skills/daily-brief/SKILL.md` Step 3／Step 7／模板同步；本節。
+3. **最窄 rule**：`.codex/rules/stockbot-automations.rules` 由 17 條增為 **19** 條（`engine_b.todo reassess-stale`、`engine_b.todo standing-go`）。**相鄰不放行**：`engine_b.todo dispatch`／`resolve`（使用者動詞）、`engine_b.cli consume-fired`（不需要）、`-m engine_b.todo`（整包）。
+4. **permission contract test**：`tests/test_codex_daily_permissions.py::test_mechanical_queue_segments_are_split_by_capability_not_by_convenience` 斷言三件事：consume-fired 不得出現在任何 pattern、兩條新 rule 存在、dispatch／resolve 仍不在；並斷言 prompt／skill 帶三支命令與 `--registry-listed`。
+5. **smoke test**：三支命令以 exact 字串在本機各跑一次（2026-09-09：consume-fired requeued 0／reactivated 0；reassess-stale 候選 0；standing-go 候選 0——都是首跑清完後的穩態）。⚠ Codex sandbox 本身無法從互動 session 觸發：**真正的端到端驗收是下一次 06:30 排程的 brief 首屏出現「今日自動清了 N」那一行**——出現＝管子兩頭接上；沒出現＝rule 未載入或 prompt 沒跑到，依「Sandbox／private authority 排錯」處理。
+
+不放寬：四個人工 gate 一個不動；`standing-go` 只對 config 明列的注意力 gate 類型動作，使用者明示 pending 與在等世界的一律跳過；付費永遠 exact 核准。
+
 ### Sandbox impact review 結論（2026-09-08，APP materialize 納入 Daily 收尾）
 
 | 入口 | side effect | OS／network capability | 判定 |
@@ -874,6 +890,18 @@ python -m briefing valuation COHR --as-of 2026-09-05         # 估值假設寫�
 
 ⚠ 沒有生效的估值假設就是 `missing`（不補 default）；口徑／期間與內部 EPS 不合是 `missing`＋「不合」理由；gap **不是**
 expected return／upside／entry signal（型別沒有那些欄位，section 每次列 `gap_is_not`）。
+
+**虧損公司（forward EPS 非正）改用 `ev_to_sales`（2026-09-09 P6，使用者定案）：** 同一個形狀——內部指標 × 明示倍數——
+內部指標換成目標期間總營收，`fair_value = (internal_revenue × target_ev_to_sales − net_debt) / diluted_shares`；
+淨負債取 Engine C 最新快照（`total_debt − cash_and_equivalents`，**現況近似**，公式字串會寫明），稀釋股數取 fundamental
+model 生效的 `diluted_shares[total]` 假設。任一缺就 missing，不補 0。read model 自動選方法：本益比法回
+`method_not_applicable` 且 ledger 有 `ev_to_sales` 假設才改跑；沒有假設就維持「方法不適用」並在理由裡說該寫哪一筆。
+```powershell
+# spec：period_end／value／basis／rationale／evidence_refs／calibration_refs，method 與 parameter 明寫，accounting_basis 固定 not_applicable
+python -m alpha valuation AEVA --add spec.json     # {"method":"ev_to_sales","parameter":"target_ev_to_sales","accounting_basis":"not_applicable","value_date_convention":"target_period_end",...}
+python -m briefing valuation AEVA                  # method=ev_to_sales；步驟多 net_debt／diluted_shares 兩格
+```
+兩桿拆解（EPS vs 倍數）對 EV/S 無定義，`eps_contribution`／`multiple_contribution` 會 missing 並說明原因。
 
 ### Sandbox impact review 結論（2026-09-06，Base-case Implied Return v1／Step 2）
 
