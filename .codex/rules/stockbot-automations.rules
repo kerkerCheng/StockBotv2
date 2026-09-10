@@ -77,10 +77,10 @@ prefix_rule(
     decision="allow",
     justification=(
         "固定 publisher 提交四個 leads state files（pending_leads／todo_pool／"
-        "event_watches／hypotheses）並推送 master。2026-09-04 起同時帶上"
-        "**被那份 state 指名引用、且確實存在**的 library/raw/ 追源原文——"
-        "集合由 state 推導而來，不是整目錄放行；上限 20 份，超過 fail closed。"
-        "命令、旗標與 OS／網路能力皆未改變（同一支腳本、同一組 git 動作）。"
+        + "event_watches／hypotheses）並推送 master。2026-09-04 起同時帶上"
+        + "**被那份 state 指名引用、且確實存在**的 library/raw/ 追源原文——"
+        + "集合由 state 推導而來，不是整目錄放行；上限 20 份，超過 fail closed。"
+        + "命令、旗標與 OS／網路能力皆未改變（同一支腳本、同一組 git 動作）。"
     ),
 )
 
@@ -127,7 +127,7 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern=[".venv\Scripts\python.exe", "scripts\backfill_fiscal_year_results.py"],
+    pattern=[".venv\\Scripts\\python.exe", "scripts\\backfill_fiscal_year_results.py"],
     decision="allow",
     justification="研究閉環 P7-a（2026-09-10）：把段 5 backlog 裡卡在「Engine C 無 fiscal_year_results 觀測」的美股標的，用 SEC XBRL companyfacts 補上基期實績（revenue、gaap.operating_income 兩個數）。網路只連 data.sec.gov 與 www.sec.gov 的公開端點，與既有的 fetchers\edgar.py 同一組主機、無憑證。寫入 Engine C SQLite 的 manual_observations（ignored private runtime），且**只寫得了 fiscal_year_results 這一個 verifiability=mechanical 欄位**——腳本啟動時以 observation_fields registry 驗證，非 mechanical 直接 exit 3；FIELD 是常數、無 CLI 參數可改。mechanical 依 AGENTS.md 明定不需 pq2，其補償控制（value 必須是可機械比對的 JSON 數值）由 append_manual_observation 強制，另加白名單 tag 歧異拒寫、20-F/10-K 年報期間限定、單一幣別、source_filed_at 取 accession 的 filed 日期（不得用今天）、基期超過 550 天拒寫五道。不寫任何判讀欄位、不入圖、不建 decision、不動 thesis、不動 live、不碰 .git 或 tracked 檔。⚠ 只放行這一支：同目錄的 record_mechanical_observation.py 接受任意 --field，刻意不在列。",
 )

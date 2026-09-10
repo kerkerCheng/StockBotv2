@@ -592,7 +592,16 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的十七個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、MOPS 台股 pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、已核准 work order checkpoint、state publisher、Discord publisher、APP materialize，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在**，因為重啟不能修復漏寫的 rule。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的二十個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、MOPS 台股 pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、todo reassess-stale、todo standing-go、已核准 work order checkpoint、state publisher、Discord publisher、APP materialize、基期實績 XBRL 補值，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在、而且整份檔載入得起來**——重啟不能修復漏寫的 rule，**也不能修復語法錯誤**。
+
+⚠ **文字存在不等於 rule 生效（2026-09-10 事故）。** 一段 Python 式的隱式字串串接不是合法 Starlark，整份 allowlist 因此**完全沒有載入**，二十條 fixed entry 全部落回 Auto-review；而本檔各節慣用的 `Select-String`「字串在不在檔裡」查證**全部是綠的**，因為它們驗的是文字不是載入。唯一算數的查證是拿產品自己的 parser 跑一次（decision 應為 `allow`；整份檔壞掉時它會直接報 parse error）：
+
+```powershell
+codex execpolicy check --rules .codex\rules\stockbot-automations.rules `
+  -- .venv\Scripts\python.exe -m engine_b.todo standing-go
+```
+
+`tests/test_codex_daily_permissions.py` 已把**二十條 prefix 全部**與五個相鄰禁止動詞接上這支 parser（`ALLOWED_PREFIXES` 是 fixed entry 數量的唯一權威）。⚠ 它只在真的找不到 Codex CLI 時 skip——**恆 skip 的測試與恆綠的測試同形**，所以 `_codex_binary()` 除了 PATH 也會問 app bundle 的安裝點。
 
 **Triage classification surface impact（2026-08-27）：** `engine_b.cli triage` 新增的分類參數只會
 atomic 寫 tracked `library/leads/pending_leads.json`；`classification-health` 只讀同檔並以 exit 2

@@ -1,8 +1,13 @@
 """Daily Brief scheduled task 只使用窄 fixed-entry rules。"""
 from __future__ import annotations
 
+import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -10,6 +15,97 @@ CONFIG = ROOT / ".codex" / "config.toml"
 RULES = ROOT / ".codex" / "rules" / "stockbot-automations.rules"
 AGENTS = ROOT / "AGENTS.md"
 OPERATIONS = ROOT / "docs" / "OPERATIONS.md"
+
+
+ALLOWED_PREFIXES = (
+    (r".venv\Scripts\python.exe", r"crons\harvest_leads.py"),
+    (r".venv\Scripts\python.exe", r"engine_c\etl_yfinance.py"),
+    (r".venv\Scripts\python.exe", r"scripts\alpha_purity_snapshot.py"),
+    (r".venv\Scripts\python.exe", r"fetchers\edgar.py"),
+    (r".venv\Scripts\python.exe", r"fetchers\mops.py"),
+    (r".venv\Scripts\python.exe", r"scripts\daily_beta_snapshot.py"),
+    (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "list"),
+    (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "drain"),
+    (r".venv\Scripts\python.exe", r"scripts\catalyst_watch.py"),
+    (r".venv\Scripts\python.exe", r"scripts\outcome_if_settled_today.py"),
+    (
+        r".venv\Scripts\python.exe",
+        r"scripts\prepare_research_action.py",
+        "--action-file",
+    ),
+    (r".venv\Scripts\python.exe", r"scripts\publish_daily_state.py"),
+    (r".venv\Scripts\python.exe", "-m", "decision_lab", "today"),
+    (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "sync"),
+    (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "work"),
+    (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "reassess-stale"),
+    (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "standing-go"),
+    (r".venv\Scripts\python.exe", "-m", "webapp", "materialize"),
+    (r".venv\Scripts\python.exe", r"scripts\publish_daily_brief.py"),
+    (r".venv\Scripts\python.exe", r"scripts\backfill_fiscal_year_results.py"),
+)
+
+
+def _codex_binary() -> str | None:
+    """Codex CLI 的位置——PATH 找不到時再問已知安裝點。
+
+    2026-09-11 實測：只靠 `shutil.which("codex")` 時，本機六個 execpolicy 測試
+    **永遠 skip**（Codex 以 app bundle 安裝，可執行檔不在 PATH 上）。而它們存在的
+    全部理由就是驗「rules 真的載入得起來」——恆 skip 的測試與恆綠的測試同形，
+    兩者都不會因為 rules 壞掉而變紅（L13：要驗的是那個會因為真的成功而改變的東西）。
+    """
+    found = shutil.which("codex")
+    if found:
+        return found
+    bundled = Path.home() / ".codex" / ".sandbox-bin" / "codex.exe"
+    return str(bundled) if bundled.exists() else None
+
+
+CODEX = _codex_binary()
+
+
+def _execpolicy_check(*command: str) -> dict[str, object]:
+    assert CODEX is not None
+    proc = subprocess.run(
+        [CODEX, "execpolicy", "check", "--rules", str(RULES), "--", *command],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=30,
+        shell=False,
+    )
+    assert proc.returncode == 0, proc.stderr
+    return json.loads(proc.stdout)
+
+
+@pytest.mark.skipif(CODEX is None, reason="Codex CLI 未安裝")
+def test_all_twenty_rules_parse_and_allow_their_existing_prefixes() -> None:
+    """文字存在不代表 rule 能載入；用產品自己的 parser 驗完整檔與每條 prefix。
+
+    2026-09-10 實際事故：permission contract test 全綠，但一段 Python 式隱式
+    字串串接不是合法 Starlark，導致整份 allowlist 未載入，所有 fixed entry
+    落入 Auto-review。這裡刻意不自製 parser，直接使用官方排錯入口。
+    """
+    assert len(ALLOWED_PREFIXES) == 20
+    for prefix in ALLOWED_PREFIXES:
+        result = _execpolicy_check(*prefix)
+        assert result.get("decision") == "allow", prefix
+
+
+@pytest.mark.skipif(CODEX is None, reason="Codex CLI 未安裝")
+@pytest.mark.parametrize(
+    "command",
+    (
+        (r".venv\Scripts\python.exe", r"scripts\publish_daily_state_backup.py"),
+        (r".venv\Scripts\python.exe", r"scripts\publish_daily_brief_backup.py"),
+        (r".venv\Scripts\python.exe", r"scripts\record_mechanical_observation.py"),
+        (r".venv\Scripts\python.exe", "-m", "webapp", "serve"),
+        ("git", "push", "origin", "master"),
+    ),
+)
+def test_adjacent_privileged_commands_remain_outside_the_allowlist(
+    command: tuple[str, ...],
+) -> None:
+    assert _execpolicy_check(*command).get("decision") != "allow"
 
 
 def test_project_does_not_define_an_ignored_permission_profile() -> None:
@@ -208,7 +304,7 @@ def test_xbrl_backfill_is_allowed_but_the_generic_observation_writer_is_not() ->
     無人值守只放行能由既有 gate 約束的**最窄** prefix（`AGENTS.md` 協作與邊界）。
     """
     rules = RULES.read_text(encoding="utf-8")
-    assert 'scripts\\backfill_fiscal_year_results.py' in rules
+    assert 'scripts\\\\backfill_fiscal_year_results.py' in rules
 
     for adjacent_but_forbidden in (
         'scripts\\record_mechanical_observation.py',   # 任意 --field
