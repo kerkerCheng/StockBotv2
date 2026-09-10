@@ -18,7 +18,7 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 19
+    assert rules.count("prefix_rule(") == 20
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
@@ -198,3 +198,37 @@ def test_event_watch_sweep_is_in_sandbox_not_escalated() -> None:
         "--mark-checked",
     ):
         assert token in prompt
+
+
+def test_xbrl_backfill_is_allowed_but_the_generic_observation_writer_is_not() -> None:
+    """研究閉環 P7-a：放行的必須是**只寫得了一個 mechanical 欄位**的那一支。
+
+    `scripts/record_mechanical_observation.py` 接受任意 `--field`，雖然它自己會擋
+    judgment 欄位，但它的 surface 是「registry 裡所有 mechanical 欄位」而不是一個。
+    無人值守只放行能由既有 gate 約束的**最窄** prefix（`AGENTS.md` 協作與邊界）。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+    assert 'scripts\\backfill_fiscal_year_results.py' in rules
+
+    for adjacent_but_forbidden in (
+        'scripts\\record_mechanical_observation.py',   # 任意 --field
+        '"-m", "engine_c"',                                  # 整個 package
+        '"engine_b.todo", "complete"',                       # pq2 核准後的 Engine C 判讀寫入
+    ):
+        assert adjacent_but_forbidden not in rules, adjacent_but_forbidden
+
+
+def test_xbrl_backfill_can_only_write_one_mechanical_field() -> None:
+    """腳本自己就是那道閘門：欄位是常數、非 mechanical 直接 exit 3。
+
+    `append_manual_observation` **不擋** judgment 欄位（它只在 mechanical 時多驗數值），
+    所以這道收緊必須在腳本裡，不能靠「FIELD 常數沒被改過」（L15：放行與收緊同時發生）。
+    """
+    from engine_c.observation_fields import validate_field_name
+
+    source = (ROOT / "scripts" / "backfill_fiscal_year_results.py").read_text(encoding="utf-8")
+    assert 'FIELD = "fiscal_year_results"' in source
+    assert 'spec.verifiability != "mechanical"' in source
+    # 沒有任何 CLI 參數可以換掉欄位
+    assert "--field" not in source
+    assert validate_field_name("fiscal_year_results").verifiability == "mechanical"

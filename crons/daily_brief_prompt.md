@@ -25,8 +25,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `fetchers\edgar.py`、`fetchers\mops.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
    `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
    `engine_b.todo sync`、`engine_b.todo work`、`engine_b.todo reassess-stale`、`engine_b.todo standing-go`、
-   `scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`（十九條）。
-   十九條 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
+   `scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`、
+   `scripts\backfill_fiscal_year_results.py`（條數由 `tests/test_codex_daily_permissions.py` 斷言，
+   **刻意不在散文裡寫死**——寫死的數字會腐壞，而它已經腐壞過一次：檔頭寫「十七個」時實際有十九條）。
+   這組 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
    exact `go` 且已有 `dispatch_ref` 的 decision-review work order；不得用它代替 `dispatch`／`resolve`／`reassess`。
    若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
@@ -87,6 +89,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    - `.venv\Scripts\python.exe -m engine_b.todo standing-go --run`（佇列段 2b；首次呼叫命中 exact rule。對
      `config/standing_authorization.json` 的 authorized 類型執行使用者本來會下的 go；pending／等世界／付費的一律
      跳過並逐筆列理由。**這些編號從此不再進「需要你動作」，改在「系統在做」印計數。**）
+   - `.venv\Scripts\python.exe scripts\backfill_fiscal_year_results.py --write`（佇列段 5 的**機械格**；
+     首次呼叫命中 exact rule。把段 5 backlog 裡卡在「Engine C 無 fiscal_year_results 觀測」的美股標的，
+     用 SEC XBRL companyfacts 補上基期兩個數。**只寫得了 fiscal_year_results 這一個 mechanical 欄位**
+     ——腳本啟動時驗 registry，非 mechanical 直接 exit 3。判斷格（營運假設、倍數、判斷檔）**一格都不碰**，
+     那是互動 session 的事。written／skipped_current／no_cik／refused 四個數記進健康段；
+     **refused 非零逐筆列理由**——那是「留 null 並列進報告」，不是靜默跳過。）
    - `.venv\Scripts\python.exe -m engine_b.todo list`
    - `.venv\Scripts\python.exe -m engine_b.event_watch sweep`（T2 主動輪詢，2026-08-31 sandbox review 後放行：
      命令只讀寫 repo 內 watch registry、無網路無憑證，在 workspace-write sandbox 內、不需 escalation。
@@ -231,7 +239,7 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 
 ## 現況：都在 APP，只講變動（無 pq2 編號）
 <固定加一行機械段計數器（2026-09-09 P5，L14 常駐計數器）：「今日自動清了 N（fired 重排 a／reassess 結案 b／常規授權 go c），
-機械段剩 M；每檔閉環：到終局 T／未到終局 U，下一檔 X」——數字照抄 consume-fired／reassess-stale／standing-go 的輸出與
+機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R；每檔閉環：到終局 T／未到終局 U，下一檔 X」——數字照抄 consume-fired／reassess-stale／standing-go／backfill_fiscal_year_results 的輸出與
 `webapp status` 的「每檔閉環」行。任何一支沒跑成就寫「未跑：<原因>」，不得印 0。>
 <四個畫面由收尾的 materialize 更新；本段只印計數與較昨變動，完整內容不重印。
 一張四列小表：瓶頸排序 `#/ranking`（可行動 N 條、首選是誰）｜資產配置 `#/beta`（低於／高於／到位各 N）｜

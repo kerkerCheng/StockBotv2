@@ -700,6 +700,30 @@ fixed entry，與 `edgar.py` 同構：無憑證、不碰 Windows identity／ACL�
 不觸 `.git`，只把公開文件下載到 `library/raw/`。Daily pq1 遇到台股標的時直接以
 `require_escalated` 命中該 exact rule。
 
+### 基期實績 XBRL 補值（P7-a，2026-09-10 完成 sandbox impact review）
+
+`scripts\backfill_fiscal_year_results.py` 已納入 Daily。五步結論：
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 網路只連 `data.sec.gov`（companyfacts）與 `www.sec.gov`（company_tickers.json），與既有 `fetchers\edgar.py` **同一組主機、無憑證**。寫 Engine C SQLite 的 `manual_observations`（ignored private runtime）。不碰 `.git`、不碰 tracked 檔、不碰 Google Sheet、不連 Neo4j。 |
+| **2 skill／prompt／本檔** | daily prompt 步驟 3 加一行（`--write`）；`skills/daily-brief/SKILL.md` 健康段加「寫入 W／跳過 S／拒寫 R」；本節。 |
+| **3 最窄 rule** | `pattern=[".venv\\Scripts\\python.exe", "scripts\\backfill_fiscal_year_results.py"]`。**刻意只放行這一支**：同目錄的 `record_mechanical_observation.py` 接受任意 `--field`，它的 surface 是「registry 裡所有 mechanical 欄位」而不是一個。 |
+| **4 permission contract test** | `test_xbrl_backfill_is_allowed_but_the_generic_observation_writer_is_not`（允許項＋三個相鄰禁止動詞）＋ `test_xbrl_backfill_can_only_write_one_mechanical_field`（斷言腳本內建那道閘門）。 |
+| **5 端到端 smoke** | 見下。 |
+
+**⚠ 這支能進 allowlist 的唯一理由是它只寫得了一個欄位，而那道閘門在腳本裡。**
+`append_manual_observation` 本身**不擋** judgment 欄位（它只在 mechanical 時多驗數值是否可機械比對），
+所以「只寫 mechanical」不能靠 `FIELD` 常數沒被改過——腳本啟動時查 `observation_fields` registry，
+非 mechanical 直接 `exit 3`，且沒有任何 CLI 參數可以換掉欄位。放行與收緊必須同時發生（L15）。
+
+**另外五道收緊**（都在 `fetchers/edgar_xbrl.py`，各有實測事故）：白名單 tag 歧異拒寫｜
+只收 10-K／20-F 且期間 300–400 天｜單一計價單位不換算｜`source_filed_at` 取 accession 的
+`filed` 日期（**不得用今天**，INV-6）｜基期超過 550 天拒寫。
+
+**⚠ 非美股（25 檔）本支一律不碰**，記 `no_cik` 並列進報告。TWSE／EDINET／DART／KIND 各有各的
+格式，硬套會在 `source_ref` 上造假——那正是 L11 記過的坑。
+
 **⚠ `fetchers/` 不是整包放行。** 只有 `edgar.py` 與 `mops.py` 兩支公開文件下載器在列；
 同目錄的 `gsheets.py` 使用 Google service account 憑證，屬 credential-bearing surface，
 刻意排除。`tests/test_codex_daily_permissions.py::test_fetchers_directory_is_not_broadly_allowed`

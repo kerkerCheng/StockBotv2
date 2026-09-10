@@ -13,9 +13,9 @@
 
 1. **預設 dry-run。** 寫入 append-only authority 要顯式 `--write`——寫錯了只能用
    correction record supersede，兩筆都留在 ledger 裡（L10）。
-2. **既有觀測預設不覆寫。** 已經有 `fiscal_year_results` 的檔直接跳過（`--force` 才重寫）。
-   人工寫的那幾筆（LITE 有完整損益表、分部與逐字 segment_note）**比本支豐富得多**，
-   蓋掉它們是淨損失。
+2. **比年度，不比「有沒有」。** 已記錄年度 >= XBRL 最新年度就跳過；同一年度絕不覆寫
+   （人工寫的那幾筆有完整損益表、分部與逐字 note，**比本支豐富得多**）。XBRL 出現更新的
+   會計年度時才 append 一筆——這樣排進每日才會在明年的 10-K 出來時真的有產出。
 3. **非美股不碰。** 沒有 CIK 就記 `no_cik` 並列進報告——TWSE／EDINET／DART／KIND 各有各的
    格式，硬套會在 source_ref 上造假。
 
@@ -57,11 +57,17 @@ def _backlog_tickers() -> list[str]:
             if r.absence_kinds.get(TARGET_PANEL) == "upstream_unavailable"]
 
 
-def _existing(conn, ticker: str) -> bool:
+def _latest_recorded(conn, ticker: str) -> str | None:
+    """該檔 ledger 裡最新的 `fiscal_year_end`（沒有就 None）。
+
+    ⚠ **回的是年度不是布林。** 第一版寫成「有沒有觀測」，於是明年的 10-K 永遠不會被撿起來——
+    排進每日卻永遠 0 產出的機制比不排更糟（L17：機制只認得我當初那個案例；
+    development profile 的 dead mechanism 一問）。
+    """
     row = conn.execute(
-        "SELECT 1 FROM manual_observations WHERE ticker = ? AND field_name = ? LIMIT 1",
+        "SELECT MAX(as_of) FROM manual_observations WHERE ticker = ? AND field_name = ?",
         (ticker, FIELD)).fetchone()
-    return row is not None
+    return str(row[0])[:10] if row and row[0] else None
 
 
 def main() -> int:
@@ -87,6 +93,18 @@ def main() -> int:
         fetch_companyfacts,
     )
 
+    # ⚠ **這一段是本支能進無人值守 allowlist 的理由，不是防禦性程式碼。**
+    # `append_manual_observation` 本身**不擋** judgment 欄位（它只在 mechanical 時多驗數值），
+    # 所以「這支只寫得了 mechanical」必須由這裡強制，而不是靠 FIELD 常數沒被改過。
+    # 放行與收緊必須同時發生（L15）：daily 拿到這條 prefix 的同時，這道閘門就必須在。
+    from engine_c.observation_fields import validate_field_name
+
+    spec = validate_field_name(FIELD)
+    if spec.verifiability != "mechanical" or spec.requires_user_approval:
+        print(f"✗ `{FIELD}` 不是 mechanical 欄位（verifiability={spec.verifiability}）——"
+              "judgment 欄位必須走 pq2，本支拒絕執行。", file=sys.stderr)
+        return 3
+
     tickers = args.tickers or _backlog_tickers()
     if args.limit:
         tickers = tickers[: args.limit]
@@ -104,10 +122,7 @@ def main() -> int:
     mode = "寫入" if args.write else "dry-run"
     print(f"# 基期實績 XBRL 補值（{mode}）：{len(tickers)} 檔\n")
     for ticker in tickers:
-        if not args.force and _existing(conn, ticker):
-            outcomes["skipped_existing"] += 1
-            print(f"- {ticker}：已有 {FIELD} 觀測，跳過（--force 才覆寫）")
-            continue
+        recorded = _latest_recorded(conn, ticker)
         try:
             cik = get_cik(ticker)
         except Exception:  # noqa: BLE001
@@ -130,6 +145,13 @@ def main() -> int:
             print(f"- {ticker}：✗ 拒寫——{reason}")
             continue
         as_of = payload["fiscal_year_end"]
+        # ⚠ **比年度，不比「有沒有」。** 已記錄的年度 >= XBRL 最新年度就沒有新事實可寫；
+        # 人工寫的那幾筆（LITE 有完整損益表、分部與逐字 segment_note）比本支豐富得多，
+        # 同一年度絕不覆寫。XBRL 有更新的年度時才 append 一筆新的（ledger 是 append-only）。
+        if recorded and not args.force and as_of <= recorded:
+            outcomes["skipped_current"] += 1
+            print(f"- {ticker}：已有 FY{recorded} 觀測，XBRL 最新也只到 FY{as_of}——跳過")
+            continue
         if not args.write:
             outcomes["would_write"] += 1
             print(f"- {ticker}：（dry-run）FY{as_of} 營收 {payload['revenue']:,.0f} "
@@ -150,7 +172,7 @@ def main() -> int:
         print(f"- {ticker}：✓ {observation_id} FY{as_of}")
 
     print(f"\n## 結局分佈（每一檔都有具名結局，沒有靜默跳過）")
-    for key in ("written", "would_write", "skipped_existing", "no_cik", "unavailable", "refused"):
+    for key in ("written", "would_write", "skipped_current", "no_cik", "unavailable", "refused"):
         if outcomes[key]:
             print(f"- {key}：{outcomes[key]}")
     if refused:
