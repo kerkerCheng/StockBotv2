@@ -351,11 +351,14 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
         # name，其中 tech:vcsel 被改成產品規格）。要改 name 有明確路徑——migration 或
         # 人工 SET——不該是載入的副作用。
         name = n["name"]
-        existing = _execute(
+        existing_rows = _execute(
             session,
             "MATCH (n:Entity {id: $id}) RETURN n.name AS name, n.attributes AS attrs",
             id=n["id"],
-        ).single()
+        )
+        # ⚠ 不用 .single()：測試的 fake session 直接回 list，只有真實 driver 回 Result
+        # ——假設回傳型別只有一種，正是本次要修的那個形狀（L17）。兩者都 iterable。
+        existing = next(iter(existing_rows), None)
         if existing:
             prior_name = existing["name"]
             if prior_name and prior_name != name:
