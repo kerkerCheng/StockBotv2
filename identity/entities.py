@@ -6,13 +6,16 @@
 
 本模組只做一件事：**把 alias id 解析成 canonical id**。它不判斷「這兩個東西是不是
 同一個」——那是研究判斷，門檻與載體都在 pq2（L15：解析與權限分開，權限那一側永遠
-deterministic 且要人核准）。這裡只接受**名稱逐字相同**這種機械可驗的登記。
+deterministic 且要人核准）。因此登記分兩種依據：`name_identical` 機械可驗、直接收；
+`semantic_reviewed` 是已核准的研究判斷，**必須帶指向 pq2 編號的 approval_receipt**，
+沒有 receipt 的語意判斷不是 canonical identity，只是某個 agent 的意見。
 
 載入時驗封閉性，任何衝突直接 raise——一個解析不到或互相打架的 registry 比沒有更糟。
 """
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Mapping
@@ -25,9 +28,22 @@ SCHEMA_VERSION = "entity-aliases-v1"
 #: 混在一起就會出現「同一家公司在兩個地方有不同答案」。
 ENTITY_PREFIXES = ("tech:", "mat:", "prod:", "std:")
 
-#: 登記依據的封閉字彙。目前只有一種，且刻意只有一種：機械可驗。
-#: 要放寬到語意判斷，必須先有一個帶核准 receipt 的載體，不是在這裡多加一個值。
-ALLOWED_BASIS = frozenset({"name_identical"})
+#: 登記依據的封閉字彙。
+#: - `name_identical`：兩個 id 的 `name` 逐字相同。**機械可驗**，任何人重跑得到同一組。
+#: - `semantic_reviewed`：「這兩個名字不同的節點其實是同一個東西」。這是研究判斷，
+#:   因此**必須**帶 `approval_receipt` 指向核准它的 pq2 編號（見 `_BASIS_REQUIRES_RECEIPT`）。
+#:
+#: ⚠ 2026-09-10 由只有前者放寬到兩者，同一個 change 補上 receipt 強制——放行與收緊
+#: 必須同時發生（AGENTS）。少了 receipt 這道，registry 就會慢慢變成「某個 agent 當時
+#: 覺得它們是同一個」的堆積場，而那正是 canonical identity 最不該有的東西（L15）。
+ALLOWED_BASIS = frozenset({"name_identical", "semantic_reviewed"})
+
+#: 哪些 basis 不得沒有核准 receipt。**這是補償控制，不是欄位潔癖。**
+_BASIS_REQUIRES_RECEIPT = frozenset({"semantic_reviewed"})
+
+#: receipt 目前只認 pq2 編號。字彙留鬆會讓「口頭同意」偷渡成 receipt（AGENTS：
+#: 授權載體唯一）。
+_RECEIPT_PATTERN = re.compile(r"^todo:\d+$")
 
 
 class EntityAliasError(ValueError):
@@ -50,11 +66,20 @@ def _validate(raw: Mapping) -> dict[str, dict]:
             raise EntityAliasError(
                 f"{canonical_id} 前綴不在 {ENTITY_PREFIXES}；公司走 company_identity.json"
             )
-        if entry.get("basis") not in ALLOWED_BASIS:
+        basis = entry.get("basis")
+        if basis not in ALLOWED_BASIS:
             raise EntityAliasError(
-                f"{canonical_id} 的 basis={entry.get('basis')!r} 未登記"
-                f"（目前只接受 {sorted(ALLOWED_BASIS)}——語意判斷走 pq2，不在這裡）"
+                f"{canonical_id} 的 basis={basis!r} 未登記"
+                f"（封閉字彙：{sorted(ALLOWED_BASIS)}）"
             )
+        if basis in _BASIS_REQUIRES_RECEIPT:
+            receipt = str(entry.get("approval_receipt") or "")
+            if not _RECEIPT_PATTERN.match(receipt):
+                raise EntityAliasError(
+                    f"{canonical_id} 的 basis={basis} 必須帶 approval_receipt"
+                    f"（格式 todo:<pq2 編號>），收到 {entry.get('approval_receipt')!r}"
+                    "——語意判斷沒有核准就不是 canonical identity，只是某個 agent 的意見"
+                )
         if canonical_id in seen:
             raise EntityAliasError(f"{canonical_id} 重複登記")
         seen[canonical_id] = canonical_id

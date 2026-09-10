@@ -15,6 +15,7 @@ from identity import entities
 
 
 def _registry(tmp_path, canonical: dict):
+    tmp_path.mkdir(parents=True, exist_ok=True)
     path = tmp_path / "aliases.json"
     path.write_text(
         json.dumps({"schema_version": entities.SCHEMA_VERSION, "canonical": canonical}),
@@ -70,18 +71,52 @@ def test_company_ids_are_rejected_by_this_registry(tmp_path) -> None:
         entities.load(path)
 
 
-def test_semantic_basis_is_not_accepted_here(tmp_path) -> None:
-    """「這兩個名字不同的東西其實一樣」是研究判斷，載體是 pq2，不是這個檔（L15）。
-
-    ⚠ 這一條刻意收緊：`basis` 是封閉字彙，寫入端連沒登記過的值都要拒絕——
-    自由字串會讓寫的人以為表達了一個沒被記錄的區別（L16-3）。
-    """
+def test_unregistered_basis_is_rejected(tmp_path) -> None:
+    """`basis` 是封閉字彙，寫入端連沒登記過的值都要拒絕——自由字串會讓寫的人
+    以為表達了一個沒被記錄的區別（L16-3）。"""
 
     path = _registry(tmp_path, {
         "tech:nand": {"name": "NAND", "aliases": ["tech:nand_flash"], "basis": "semantic_judgment"},
     })
     with pytest.raises(entities.EntityAliasError):
         entities.load(path)
+
+
+def test_semantic_basis_requires_an_approval_receipt(tmp_path) -> None:
+    """語意判斷可以登記，但**沒有核准 receipt 就不行**。
+
+    2026-09-10 由「只接受機械依據」放寬到接受 `semantic_reviewed`；放行與收緊必須
+    同時發生（AGENTS），補償控制就是這道 receipt 強制。少了它，registry 會慢慢變成
+    「某個 agent 當時覺得它們是同一個」的堆積場，而那正是 canonical identity 最不該
+    有的東西（L15）。
+    """
+
+    base = {"name": "NAND", "aliases": ["tech:nand_flash"], "basis": "semantic_reviewed"}
+
+    # 沒有 receipt → 擋
+    with pytest.raises(entities.EntityAliasError):
+        entities.load(_registry(tmp_path / "a", {"tech:nand": dict(base)}))
+
+    # receipt 格式不對（口頭同意不是授權載體）→ 擋
+    with pytest.raises(entities.EntityAliasError):
+        entities.load(_registry(
+            tmp_path / "b", {"tech:nand": {**base, "approval_receipt": "使用者說可以"}}
+        ))
+
+    # 指向 pq2 編號 → 收
+    ok = entities.load(_registry(
+        tmp_path / "c", {"tech:nand": {**base, "approval_receipt": "todo:505"}}
+    ))
+    assert ok["tech:nand"]["approval_receipt"] == "todo:505"
+
+
+def test_mechanical_basis_needs_no_receipt(tmp_path) -> None:
+    """機械依據不必帶 receipt——它本來就任何人重跑都得到同一組，沒有判斷可核准。"""
+
+    path = _registry(tmp_path, {
+        "tech:eml": {"name": "EML", "aliases": ["tech:eml_laser"], "basis": "name_identical"},
+    })
+    assert entities.load(path)["tech:eml"]["basis"] == "name_identical"
 
 
 def test_document_rewrite_covers_nodes_edges_and_node_claims(tmp_path) -> None:
@@ -116,3 +151,6 @@ def test_shipped_registry_loads_and_only_registers_mechanical_basis() -> None:
     assert canonical, "registry 不應為空"
     for entry in canonical.values():
         assert entry["basis"] in entities.ALLOWED_BASIS
+        # 語意登記一律附得出核准編號——這是本 registry 與「某人的意見」的分界
+        if entry["basis"] in entities._BASIS_REQUIRES_RECEIPT:
+            assert entities._RECEIPT_PATTERN.match(entry["approval_receipt"])

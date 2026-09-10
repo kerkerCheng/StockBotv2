@@ -12,6 +12,13 @@ requests
 # （fetchers/mops.py）。美股 EDGAR 走 HTML 故 edgar.py 不需要這個。
 pypdf
 
+# pypdf 按內容流順序吐字，遇到**雙欄排版就會把兩欄交錯**——IQE FY2025 年報的
+# 查核報告那段抽出來長這樣：「IQIQE EA Annnnuuaal lR Reeppoorrtt」，逐字引用因此
+# 不可用（2026-09-10 實測，[486] 卡在這裡）。pdfminer 的 LAParams 會先還原版面
+# 再取文字，是雙欄 filing 的唯一解。純 Python，不需要 poppler 那種系統二進位。
+# 兩者並存不是重複：pypdf 快且夠用，pdfminer 只在版面出問題時才動用。
+pdfminer.six
+
 # Local-first audio transcription for source tracing. Model weights are cached
 # under ignored library/private/ on first use.
 faster-whisper==1.2.1
