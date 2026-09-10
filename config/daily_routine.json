@@ -19,7 +19,7 @@
     "guard_margin_minutes": 15
   },
   "pq1": {
-    "drain_limit_per_run": 12,
+    "drain_limit_per_run": 5,
     "tracked_ticker_sources": {
       "thesis_lifecycle": true,
       "decision_cohorts": true,
