@@ -446,8 +446,14 @@ def checkpoint_decision_review(
     receipt: str,
     reason: str = "",
     at: str | None = None,
+    awaiting_gate: int | None = None,
 ) -> dict[str, Any]:
-    """Checkpoint dispatched research；terminal 狀態必須留下 underlying receipt。"""
+    """Checkpoint dispatched research；terminal 狀態必須留下 underlying receipt。
+
+    進 `awaiting_approval` 時可帶 `awaiting_gate`＝它在等的 pq2 編號。缺值不擋
+    （既有工單沒有這個欄位），但會被 `gated_items` 報成 `no_pointer`——一個說不出
+    在等誰的等待，就是沒有到期的等待（INV-2）。
+    """
 
     if to_status not in {"researching", "awaiting_approval", "completed", "parked"}:
         raise TodoError(f"不支援的 pq1 checkpoint：{to_status}")
@@ -495,6 +501,12 @@ def checkpoint_decision_review(
     item["dispatch_status"] = to_status
     item["dispatch_receipt"] = receipt
     item["dispatch_updated_at"] = stamp
+    if to_status == "awaiting_approval":
+        if awaiting_gate is not None:
+            set_awaiting_gate(pool, n, awaiting_gate)
+    else:
+        # 離開 awaiting_approval 就沒有 gate 可等了——留著會變成過期的 pointer。
+        item.pop(AWAITING_GATE_KEY, None)
     pool["log"].append({
         "at": stamp,
         "n": int(n),
@@ -514,6 +526,89 @@ def checkpoint_decision_review(
             at=stamp,
         )
     return {"item": item, "work_order": work_order}
+
+
+#: `awaiting_approval` 的工單在等哪一個 pq2 編號。**結構化欄位，不是 receipt 字串。**
+#: 過渡期仍會讀既有 receipt 裡的 `manual_todo:<n>`（那是人手寫的），但新寫入一律走這裡。
+AWAITING_GATE_KEY = "awaiting_gate"
+
+#: receipt 裡人手寫的舊式 pointer。只用於讀取既有資料，不是寫入格式。
+_LEGACY_GATE_PATTERN = re.compile(r"manual_todo:(\d+)")
+
+
+def gate_pointer(item: Mapping[str, Any]) -> dict[str, Any] | None:
+    """這張工單在等哪個 pq2 編號？回傳 `{"n": int, "origin": ...}` 或 None。
+
+    `origin` 誠實記錄這個 pointer 是**結構化欄位**還是**從舊 receipt 解析出來的**——
+    後者是過渡相容，不該被當成同等可靠的紀錄（解析自由字串本來就會漏）。
+    """
+
+    structured = item.get(AWAITING_GATE_KEY)
+    if isinstance(structured, Mapping) and structured.get("n") is not None:
+        return {"n": int(structured["n"]), "origin": "structured"}
+    if isinstance(structured, int):
+        return {"n": int(structured), "origin": "structured"}
+    match = _LEGACY_GATE_PATTERN.search(str(item.get("dispatch_receipt") or ""))
+    if match:
+        return {"n": int(match.group(1)), "origin": "legacy_receipt"}
+    return None
+
+
+def set_awaiting_gate(pool: dict[str, Any], n: int, gate_n: int | None) -> dict[str, Any]:
+    """記錄／清掉這張工單在等的 pq2 編號。"""
+
+    item = get(pool, n)
+    if gate_n is None:
+        item.pop(AWAITING_GATE_KEY, None)
+        return item
+    gate_n = int(gate_n)
+    if gate_n == int(n):
+        raise TodoError(f"[{n}] 不能等自己")
+    get(pool, gate_n)  # 指不到的編號直接拋——pointer 必須解析得到（INV-4）
+    item[AWAITING_GATE_KEY] = {"n": gate_n, "set_at": _now()}
+    return item
+
+
+def gated_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """所有停在 `awaiting_approval` 的工單，附上它等的 gate 現況。
+
+    三種結果，下一步完全不同——這正是原本被壓成同一個狀態的三件事：
+    - `waiting`：pointer 指得到、那個編號還沒 resolve → 真的在等你，不必動。
+    - `gate_resolved`：pointer 指得到、但那個編號**已經 resolve** → gate 沒了，
+      工單卻還掛著。下一步是 reassess 拿新的 decision receipt，不是直接收掉
+      （2026-09-10 實測：兩張工單 reassess 後都浮出**不同的**新缺口）。
+    - `no_pointer`：說不出在等誰 ＝ 沒有到期，也沒有人會叫醒它（INV-2／INV-4）。
+    """
+
+    by_n = {int(i["n"]): i for i in pool.get("items", []) if i.get("n") is not None}
+    out: list[dict[str, Any]] = []
+    for item in active_items(pool):
+        if item.get("dispatch_status") != "awaiting_approval":
+            continue
+        pointer = gate_pointer(item)
+        if pointer is None:
+            state = "no_pointer"
+            gate = None
+        else:
+            gate = by_n.get(pointer["n"])
+            if gate is None:
+                state = "no_pointer"
+            elif gate.get("resolution"):
+                state = "gate_resolved"
+            else:
+                state = "waiting"
+        out.append({
+            "n": int(item["n"]),
+            "title": item.get("title"),
+            "ref_id": item.get("ref_id"),
+            "state": state,
+            "gate_n": (pointer or {}).get("n"),
+            "gate_origin": (pointer or {}).get("origin"),
+            "gate_resolution": (gate or {}).get("resolution"),
+            "gate_resolved_at": (gate or {}).get("resolved_at"),
+            "dispatch_updated_at": item.get("dispatch_updated_at"),
+        })
+    return out
 
 
 #: 由 assessment 層缺口（非 coverage blocker）驅動的 pq1 dispatch。
@@ -1147,6 +1242,9 @@ def checkpoint_source_trace_review(
     item["dispatch_status"] = to_status
     item["dispatch_receipt"] = receipt
     item["dispatch_updated_at"] = stamp
+    if to_status != "awaiting_approval":
+        # 離開 awaiting_approval 就沒有 gate 可等了——留著會變成過期的 pointer。
+        item.pop(AWAITING_GATE_KEY, None)
     pool["log"].append({
         "at": stamp,
         "n": int(n),
@@ -2624,11 +2722,24 @@ def _render(pool: Mapping[str, Any]) -> str:
         lines += ["待辦事項統整：目前沒有需要你決定的項目。", ""]
 
     if gated:
+        # ⚠ 這一段原本把兩件事寫成同一句「等人工 gate」：真的在等你核准，以及
+        # gate 早就 resolve 了卻沒人回頭動這張工單（2026-09-10 實測 [311]／[411]）。
+        # 分開講，因為下一步不同——後者要 reassess，不是等你。
+        gate_state = {row["n"]: row for row in gated_items(pool)}
         lines.append(
             f"## pq1 已交回，等人工 gate（{len(gated)} 項；不吃 go／drop／pending）"
         )
         for item in gated:
-            lines.append(f"  [{item['n']}] {item['title']}")
+            state = gate_state.get(int(item["n"]), {})
+            suffix = ""
+            if state.get("state") == "gate_resolved":
+                suffix = (
+                    f"　⚠ 它等的 [{state['gate_n']}] 已 {state['gate_resolution']}"
+                    "——gate 已消失，下一步是 reassess 拿新 decision receipt"
+                )
+            elif state.get("state") == "no_pointer":
+                suffix = "　⚠ 說不出在等哪個編號——這個等待沒有到期（INV-2）"
+            lines.append(f"  [{item['n']}] {item['title']}{suffix}")
             checkpoint = _last_checkpoint(pool, item["n"], "pq1_awaiting_approval")
             reason = str((checkpoint or {}).get("reason") or "").strip()
             receipt = str((checkpoint or {}).get("receipt") or "").strip()
@@ -2735,6 +2846,15 @@ def main(argv: list[str] | None = None) -> int:
     p_work.add_argument("--receipt", required=True)
     p_work.add_argument("--reason", default="")
     p_work.add_argument("--leads", default="")
+    p_work.add_argument(
+        "--awaiting-gate", type=int, default=None,
+        help="進 awaiting_approval 時：它在等哪個 pq2 編號（結構化 pointer，不要寫進 receipt）",
+    )
+
+    sub.add_parser(
+        "gated",
+        help="列出停在 awaiting_approval 的工單，並分辨『真的在等你』與『gate 已消失』",
+    ).add_argument("--json", action="store_true")
 
     p_complete_obs = sub.add_parser(
         "complete-observation",
@@ -2914,6 +3034,32 @@ def main(argv: list[str] | None = None) -> int:
         save(pool, args.pool)
         return 1 if failures else 0
 
+    if args.command == "gated":
+        rows = gated_items(pool)
+        if getattr(args, "json", False):
+            print(json.dumps(rows, ensure_ascii=False, indent=2))
+            return 0
+        if not rows:
+            print("沒有工單停在 awaiting_approval。")
+            return 0
+        label = {
+            "waiting": "真的在等你核准",
+            "gate_resolved": "⚠ gate 已消失（下一步：reassess 拿新 decision receipt）",
+            "no_pointer": "⚠ 說不出在等哪個編號——沒有到期（INV-2）",
+        }
+        for state in ("gate_resolved", "no_pointer", "waiting"):
+            group = [r for r in rows if r["state"] == state]
+            if not group:
+                continue
+            print(f"\n## {label[state]}（{len(group)} 項）")
+            for row in group:
+                gate = f"等 [{row['gate_n']}]" if row["gate_n"] else "無 pointer"
+                origin = row["gate_origin"] or "—"
+                print(f"  [{row['n']}] {row['title']}")
+                print(f"        ↳ {gate}（pointer 來源：{origin}）"
+                      f"｜最後更新 {row['dispatch_updated_at']}")
+        return 0
+
     if args.command in {"dispatch", "work"}:
         from engine_b.leads import DEFAULT_LEADS_PATH
 
@@ -2957,6 +3103,7 @@ def main(argv: list[str] | None = None) -> int:
                             pool, args.number, store=decision_store,
                             to_status=args.to, receipt=args.receipt,
                             reason=args.reason,
+                            awaiting_gate=getattr(args, "awaiting_gate", None),
                         )
                     elif item["type"] == "source_trace_review":
                         result = checkpoint_source_trace_review(

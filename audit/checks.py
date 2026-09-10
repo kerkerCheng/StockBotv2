@@ -417,6 +417,9 @@ def check_queue_liveness() -> AuditResult:
     def run() -> AuditResult:
         items = sources.todo_items()
         active = [i for i in items if not i.get("resolution")]
+        # gate pointer 要解析得到「那個編號現在怎麼了」，所以查的是**全部**項目
+        # （已 resolve 的正是我們要偵測的情況），不是只有 active。
+        _todo_by_n = {int(i["n"]): i for i in items if i.get("n") is not None}
         findings: list[str] = []
         now = _now()
         stalled = 0
@@ -433,6 +436,28 @@ def check_queue_liveness() -> AuditResult:
                     findings.append(
                         f"[{n}] dispatch_status={status} 已 {(now - moved).days} 天沒有更新"
                         "——它在佇列裡，但沒有東西在動它")
+            # `awaiting_approval` 從前不在這個檢查裡，於是一張工單可以無限期停著
+            # 而不被任何東西看見（2026-09-10 實測：[311]／[411] 的 gate 早已 resolve，
+            # [129] 停了 28 天）。「在等人」不等於「可以無限期等」——INV-2 要求每個
+            # 等待都有到期。判準跟著 pointer 走，不是跟著天數走：
+            #   gate 還沒 resolve → 真的在等人，不報（人沒動不是系統失聯）
+            #   gate 已 resolve   → 報：沒有東西會回頭動它
+            #   說不出在等誰       → 報：沒有到期，也沒有 consumer（INV-4）
+            if status == "awaiting_approval":
+                from engine_b.todo import gate_pointer
+
+                pointer = gate_pointer(item)
+                gate = _todo_by_n.get(pointer["n"]) if pointer else None
+                if pointer is None or gate is None:
+                    findings.append(
+                        f"[{n}] dispatch_status=awaiting_approval 但說不出在等哪個編號"
+                        "——這個等待沒有到期，也沒有 consumer")
+                elif gate.get("resolution"):
+                    stalled += 1
+                    findings.append(
+                        f"[{n}] 等的 [{pointer['n']}] 已 {gate['resolution']}"
+                        f"（{gate.get('resolved_at')}）——gate 已消失，工單卻還掛著")
+
             # 等待中卻沒有等待條件：等於沒有人會叫醒它
             waiting = item.get("waiting_on")
             if waiting and not isinstance(waiting, (str, list, dict)):

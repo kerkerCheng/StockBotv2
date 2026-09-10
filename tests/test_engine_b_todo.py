@@ -1846,3 +1846,96 @@ def test_assessment_gap_jobs_lists_pool_only_work_that_drain_would_otherwise_mis
     jobs = todo.assessment_gap_jobs(pool)
     assert [j["cohort_id"] for j in jobs] == ["dc_gap"]
     assert jobs[0]["scope"] == ["financial_resilience_corroboration_incomplete"]
+
+
+# ---------------------------------------------------------------------------
+# `awaiting_approval` 的 gate pointer（2026-09-10）
+# ---------------------------------------------------------------------------
+
+
+def _gated_pool(*, gate_resolved: bool, pointer: str) -> tuple[dict, int, int]:
+    """一張停在 awaiting_approval 的工單 ＋ 它在等的 pq2 編號。"""
+
+    pool = _pool_with(
+        {"type": "decision_review", "ref_id": "dc_x", "title": "工單"},
+        {"type": "manual", "ref_id": "m_gate", "title": "它在等的 gate"},
+    )
+    work = next(i for i in todo.active_items(pool) if i["ref_id"] == "dc_x")
+    gate = next(i for i in todo.active_items(pool) if i["ref_id"] == "m_gate")
+    work["dispatch_ref"] = "wo_x"
+    work["dispatch_status"] = "awaiting_approval"
+    if pointer == "structured":
+        todo.set_awaiting_gate(pool, work["n"], gate["n"])
+    elif pointer == "legacy":
+        work["dispatch_receipt"] = f"action:ra_abc;manual_todo:{gate['n']}"
+    if gate_resolved:
+        todo.resolve(pool, gate["n"], "go", reason="核准",
+                     receipt="authority:registry;ref:test_gate")
+    return pool, work["n"], gate["n"]
+
+
+def test_gate_resolved_work_order_is_separated_from_really_waiting_on_you() -> None:
+    """上游 gate 已 resolve ＝ 已經沒在等你了，不能和「真的在等你核准」同一句。
+
+    事發（2026-09-10）：[311]／[411] 的 gate 在 08-31／09-02 就已核准並寫入
+    authority，工單卻停在 awaiting_approval 十天沒有任何東西會動它。`awaiting_approval`
+    同時承載兩種語意，呈現層被迫二選一而兩邊都錯（L12）。
+    """
+
+    pool, work_n, gate_n = _gated_pool(gate_resolved=True, pointer="structured")
+    (row,) = todo.gated_items(pool)
+    assert row["n"] == work_n
+    assert row["state"] == "gate_resolved"
+    assert row["gate_n"] == gate_n
+    assert row["gate_resolution"] == "go"
+
+    still, _, _ = _gated_pool(gate_resolved=False, pointer="structured")
+    assert todo.gated_items(still)[0]["state"] == "waiting"
+
+
+def test_work_order_without_a_pointer_is_reported_not_silently_accepted() -> None:
+    """說不出在等哪個編號 ＝ 沒有到期，也沒有 consumer（INV-2／INV-4）。
+
+    ⚠ 這一條刻意不放寬：缺 pointer 不擋寫入（既有工單沒有這個欄位），但一定要被報出來。
+    安靜接受等於讓工單合法地永遠掛著，那正是這次要修的東西。
+    """
+
+    pool, _, _ = _gated_pool(gate_resolved=False, pointer="none")
+    (row,) = todo.gated_items(pool)
+    assert row["state"] == "no_pointer"
+    assert row["gate_n"] is None
+
+
+def test_legacy_receipt_pointer_is_read_but_marked_as_such() -> None:
+    """既有資料的 pointer 寫在 receipt 自由字串裡——讀得到，但來源要誠實標記。"""
+
+    pool, _, gate_n = _gated_pool(gate_resolved=True, pointer="legacy")
+    (row,) = todo.gated_items(pool)
+    assert row["gate_n"] == gate_n
+    assert row["gate_origin"] == "legacy_receipt"
+    assert row["state"] == "gate_resolved"
+
+    structured, _, _ = _gated_pool(gate_resolved=True, pointer="structured")
+    assert todo.gated_items(structured)[0]["gate_origin"] == "structured"
+
+
+def test_pointer_must_resolve_and_cannot_point_at_itself() -> None:
+    """pointer 指不到的編號要當場拋——一個解析不到的 pointer 比沒有更糟。"""
+
+    pool, work_n, _ = _gated_pool(gate_resolved=False, pointer="none")
+    with pytest.raises(todo.TodoError):
+        todo.set_awaiting_gate(pool, work_n, 99999)
+    with pytest.raises(todo.TodoError):
+        todo.set_awaiting_gate(pool, work_n, work_n)
+
+
+def test_leaving_awaiting_approval_clears_the_pointer() -> None:
+    """離開 awaiting_approval 之後 pointer 就過期了——留著會讓下次判斷讀到舊事實。"""
+
+    pool, work_n, gate_n = _gated_pool(gate_resolved=False, pointer="structured")
+    item = todo.get(pool, work_n)
+    assert item[todo.AWAITING_GATE_KEY]["n"] == gate_n
+
+    item["dispatch_status"] = "researching"
+    item.pop(todo.AWAITING_GATE_KEY, None)
+    assert todo.gated_items(pool) == []
