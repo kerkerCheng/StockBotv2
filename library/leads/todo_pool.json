@@ -8799,6 +8799,115 @@
       "source": "manual",
       "title": "POET：FY2026 共識 EPS −US$0.23 且僅 1 位分析師、基期實績亦缺——提案 Abstention（valuation / target_pe）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T22:38:07.503328+00:00",
+      "awaiting_gate": {
+        "n": 528,
+        "set_at": "2026-09-10T23:22:52.300834+00:00"
+      },
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_39fe85750b8794406c8832cb3a9b0aeb",
+      "dispatch_receipt": "research_packet:library/raw/daily_20260911_unitree_review.md",
+      "dispatch_ref": "wo_224ed049f342999f59654d8a8e130ae4",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-10T23:22:52.297969+00:00",
+      "dispatched_at": "2026-09-10T22:40:22.014741+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 525,
+      "reason": null,
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:unitree：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-10T22:38:07.503328+00:00",
+      "awaiting_gate": {
+        "n": 529,
+        "set_at": "2026-09-10T23:22:54.433035+00:00"
+      },
+      "dispatch_baseline_decision_id": "pd_50708c46ed0debcc287213b9ac816b47",
+      "dispatch_receipt": "research_packet:library/raw/daily_20260911_mp_review.md",
+      "dispatch_ref": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "dispatch_scope": [
+        "commercial_maturity_unknown",
+        "source_reliability_corroboration_incomplete"
+      ],
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-10T23:22:54.432951+00:00",
+      "dispatched_at": "2026-09-10T22:40:22.014741+00:00",
+      "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 526,
+      "reason": null,
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:mp_materials：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-10T22:38:07.503328+00:00",
+      "dispatch_baseline_decision_id": "pd_1bba3564898348e7bf4ddc30d02ae22b",
+      "dispatch_receipt": "research_packet:library/raw/daily_20260911_jlmag_review.md",
+      "dispatch_ref": "assessment_gap:dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "dispatch_scope": [
+        "commercial_maturity_corroboration_incomplete"
+      ],
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-10T23:22:56.481915+00:00",
+      "dispatched_at": "2026-09-10T22:40:22.014741+00:00",
+      "hint": "當前 missing_data：人形轉子交付金額/客戶具名；H1 2026 中報一手(機器人+伺服收入 CNY 1.18B +81.84% 僅二手)（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 527,
+      "reason": "公司半年報更正合併口徑為人民幣 2.61 億元、年增 96.40%，但客戶仍匿名且人形轉子收入未拆分；等待具名客戶或量產訂單／收入拆分。",
+      "receipt": "research_packet:library/raw/daily_20260911_jlmag_review.md",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "residual_digest": "664673d5c823731c",
+      "resolution": "go",
+      "resolved_at": "2026-09-10T23:22:56.481915+00:00",
+      "source": "decision_lab",
+      "title": "co:jl_mag：殘餘缺口——人形轉子交付金額/客戶具名",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-10T23:22:37.106906+00:00",
+      "hint": "研究已完成：法定文件確認 2025 營收人民幣 16.99 億、扣非淨利 5.91 億、主營毛利率 60.13%，2026 Q1 營收 +68.49% 但扣非淨利 -52.55%；客戶端量產仍無獨立具名印證。完整 packet=library/raw/daily_20260911_unitree_review.md。go＝核准該 packet 的五軸 assessment、catalyst 與三條 disproof，完成 paper reassess；不含入圖、Engine C 寫入、thesis mutation、估值、live。",
+      "n": 528,
+      "reason": null,
+      "ref_id": "manual:unitree-assessment-20260911",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "宇樹科技（688836.SH）五軸 assessment＋catalyst／disproof 提案",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T23:22:38.311594+00:00",
+      "hint": "研究已完成：MP FY2025 10-K 揭露 Customer A/B/C 分占總營收 30%/23%/31%，合計 84%，均未具名；既有 [316] backlog 不重寫。exact payload=library/raw/daily_20260911_mp_review.md。go＝建立並寫入 MP/customer_concentration append-only observation，再 reassess；不含入圖、thesis mutation、估值、live。",
+      "n": 529,
+      "reason": null,
+      "ref_id": "manual:mp-customer-concentration-20260911",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "MP Materials（MP）FY2025 客戶集中度 observation 提案",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T23:24:35.480050+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：GlobalFoundries and Monolithic Power Systems joint announcement（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:globalfoundries。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 530,
+      "reason": null,
+      "ref_id": "ra_21602c2e352aa346b9c106224bbc44c4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "GF／MPS 長期製造協議：只納入有日期的協議主張",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -19359,8 +19468,126 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-10T22:40:22.014741+00:00",
+      "attempt": 1,
+      "n": 525,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_224ed049f342999f59654d8a8e130ae4",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T22:40:22.014741+00:00",
+      "n": 525,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_224ed049f342999f59654d8a8e130ae4",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-10T22:40:22.014741+00:00",
+      "n": 526,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_unknown、source_reliability_corroboration_incomplete",
+      "receipt": "decision:pd_50708c46ed0debcc287213b9ac816b47",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T22:40:22.014741+00:00",
+      "n": 526,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=queued_assessment_gap",
+      "receipt": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-10T22:40:22.014741+00:00",
+      "n": 527,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_corroboration_incomplete",
+      "receipt": "decision:pd_1bba3564898348e7bf4ddc30d02ae22b",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T22:40:22.014741+00:00",
+      "n": 527,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=queued_assessment_gap",
+      "receipt": "assessment_gap:dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-10T23:05:41.811074+00:00",
+      "n": 525,
+      "reason": null,
+      "receipt": "daily:2026-09-11:unitree-bounded-review",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T23:05:43.777151+00:00",
+      "n": 526,
+      "reason": null,
+      "receipt": "daily:2026-09-11:mp-bounded-review",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T23:05:45.797417+00:00",
+      "n": 527,
+      "reason": null,
+      "receipt": "daily:2026-09-11:jlmag-bounded-review",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T23:22:52.297969+00:00",
+      "n": 525,
+      "reason": "有界研究完成；五軸 assessment 與 catalyst/disproof 為新的研究判斷，等待 exact manual gate [528]。",
+      "receipt": "research_packet:library/raw/daily_20260911_unitree_review.md",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-10T23:22:54.432951+00:00",
+      "n": 526,
+      "reason": "已由 FY2025 10-K 取得客戶集中度 exact payload；judgment observation 等待 manual gate [529]。",
+      "receipt": "research_packet:library/raw/daily_20260911_mp_review.md",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-10T23:22:56.481915+00:00",
+      "n": 527,
+      "reason": "公司半年報更正合併口徑為人民幣 2.61 億元、年增 96.40%，但客戶仍匿名且人形轉子收入未拆分；等待具名客戶或量產訂單／收入拆分。",
+      "receipt": "research_packet:library/raw/daily_20260911_jlmag_review.md",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-10T23:22:56.481915+00:00",
+      "n": 527,
+      "reason": "公司半年報更正合併口徑為人民幣 2.61 億元、年增 96.40%，但客戶仍匿名且人形轉子收入未拆分；等待具名客戶或量產訂單／收入拆分。",
+      "receipt": "research_packet:library/raw/daily_20260911_jlmag_review.md",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 525,
+  "next_n": 531,
   "schema_version": "1"
 }

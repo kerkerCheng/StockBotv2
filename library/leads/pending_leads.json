@@ -7372,6 +7372,174 @@
       "result": "ok",
       "run_at": "2026-09-09T22:33:28.027373+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:28.582695+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:29.636031+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:30.294224+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:31.081794+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:32.745930+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:33.427823+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:34.200031+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:34.894628+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:35.409465+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:36.212751+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:36.921280+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:37.440281+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:38.111012+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:38.804987+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:39.584659+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:40.097940+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:40.766157+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:41.502809+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:42.038991+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:42.712925+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:43.237264+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:43.910747+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:44.456611+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:44.970988+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:45.668312+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:46.338247+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:47.028161+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-10T22:32:47.709948+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -7598,6 +7766,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000532/xslF345X06/wk-form4_1786363225.xml"
     },
     "lead_006b8786fd4026bcec4e8314540e8130": {
+      "content_updated_at": "2026-09-10T22:32:34.199686+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -7627,7 +7796,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 4 filed 2026-08-12",
+      "title": "AEVA 4 filed 2026-08-12 [347439]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -7876,6 +8045,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan-314f3dcb"
     },
     "lead_018171ed92846e0a0f14f1c1a20e6c07": {
+      "content_updated_at": "2026-09-10T22:32:42.038643+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -7906,7 +8076,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-18",
+      "title": "META 4 filed 2026-08-18 [012611]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -7933,6 +8103,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012611/xslF345X06/ownership.xml"
     },
     "lead_019d8e4d8f7c86d3363971c987ffefd0": {
+      "content_updated_at": "2026-09-10T22:32:44.970215+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -7965,7 +8136,7 @@
           ]
         }
       },
-      "title": "NVDA 4 filed 2026-09-08",
+      "title": "NVDA 4 filed 2026-09-08 [000014]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-08T22:37:41.434689+00:00",
@@ -8430,6 +8601,7 @@
       "url": "https://x.com/aleabitoreddit/status/2091177173789069797"
     },
     "lead_03e036c05aea97310171ca07772eb352": {
+      "content_updated_at": "2026-09-10T22:32:46.337476+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -8460,7 +8632,7 @@
       "source": "edgar:TSEM",
       "status": "parked",
       "themes": {},
-      "title": "TSEM 6-K filed 2026-08-17",
+      "title": "TSEM 6-K filed 2026-08-17 [004158]",
       "triage": {
         "classification": {
           "backfill_ref": "classify_8.json",
@@ -8678,6 +8850,7 @@
       "url": "https://x.com/aleabitoreddit/status/2073523410643366242"
     },
     "lead_044f4bac035e99bae20544c3c96367df": {
+      "content_updated_at": "2026-09-10T22:32:46.338073+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -8705,7 +8878,7 @@
       "source": "edgar:TSEM",
       "status": "parked",
       "themes": {},
-      "title": "TSEM 6-K filed 2026-07-14",
+      "title": "TSEM 6-K filed 2026-07-14 [003477]",
       "triage": {
         "decided_at": "2026-08-15T06:38:15.792631+00:00",
         "decision": "go",
@@ -8799,6 +8972,7 @@
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091312/iqe-shares-fall-19-after-81m-fundraise-priced-at-steep-discount-1091312.html?.tsrc=rss"
     },
     "lead_04e8454c97fb63285ace44dfa133837f": {
+      "content_updated_at": "2026-09-10T22:32:39.584391+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -8814,7 +8988,7 @@
       "source": "edgar:HIMX",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-05-07",
+      "title": "HIMX 6-K filed 2026-05-07 [003097]",
       "triage": {
         "decided_at": "2026-08-31T05:31:50.393008+00:00",
         "decision": "no_go",
@@ -9558,6 +9732,7 @@
       "url": "https://x.com/aleabitoreddit/status/2075645547978084371"
     },
     "lead_078cfd6337b274fe8c29dfccd1b74540": {
+      "content_updated_at": "2026-09-10T22:32:37.439930+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -9592,7 +9767,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-01",
+      "title": "COHR 4 filed 2026-09-01 [001039]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:11.391264+00:00",
@@ -9610,6 +9785,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001039/xslF345X06/form4.xml"
     },
     "lead_07f2f679a7d00292b35bdc4f3658e6c9": {
+      "content_updated_at": "2026-09-10T22:32:43.910394+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -9625,7 +9801,7 @@
       "source": "edgar:MTSI",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "MTSI 4 filed 2026-06-29",
+      "title": "MTSI 4 filed 2026-06-29 [000379]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -9727,6 +9903,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072728939324428655"
     },
     "lead_088c456d4f3a74f2cf50c4b43c4b1afd": {
+      "content_updated_at": "2026-09-10T22:32:42.038241+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -9751,7 +9928,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-09-08",
+      "title": "META 4 filed 2026-09-08 [013672]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-08T22:38:23.379102+00:00",
@@ -10207,6 +10384,7 @@
       "url": "https://www.shinetsu-rare-earth-magnet.jp/e/masspro/sintering_p.html?decompose=metal_alloy_layer"
     },
     "lead_0b11a59c45db180334576a982817e036": {
+      "content_updated_at": "2026-09-10T22:32:47.709509+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -10227,7 +10405,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000654]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:20.211298+00:00",
@@ -10329,6 +10507,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000189/xslF345X06/wk-form4_1785439277.xml"
     },
     "lead_0c0103436da32df8b1e22d66018888d5": {
+      "content_updated_at": "2026-09-10T22:32:47.709687+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -10349,7 +10528,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000652]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:21.542452+00:00",
@@ -10727,6 +10906,7 @@
       "url": "https://x.com/aleabitoreddit/status/2086730782425727183"
     },
     "lead_0d984353ea605a89e6cf74cf941eac0f": {
+      "content_updated_at": "2026-09-10T22:32:33.427658+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -10746,7 +10926,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-08-14",
+      "title": "AEHR 4 filed 2026-08-14 [000253]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:15.121622+00:00",
@@ -11364,6 +11544,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044039/xslF345X06/wk-form4_1781733475.xml"
     },
     "lead_11eada841639396400115f999d8f8739": {
+      "content_updated_at": "2026-09-10T22:32:45.667957+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -11392,7 +11573,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-06-30",
+      "title": "POET 6-K filed 2026-06-30 [004397]",
       "triage": {
         "decided_at": "2026-08-15T06:38:16.527196+00:00",
         "decision": "go",
@@ -11405,6 +11586,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326004397/f6k_063026.htm"
     },
     "lead_12d182c33d678a3ec14ef956dd80765a": {
+      "content_updated_at": "2026-09-10T22:32:33.427745+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -11424,7 +11606,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-08-13",
+      "title": "AEHR 4 filed 2026-08-13 [000251]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:15.418481+00:00",
@@ -11503,6 +11685,7 @@
       "url": "https://x.com/aleabitoreddit/status/2092851118233764178"
     },
     "lead_12e6d36358668be9a97afc6c21f89b74": {
+      "content_updated_at": "2026-09-10T22:32:38.110932+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -11531,7 +11714,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 4 filed 2026-08-17",
+      "title": "GFS 4 filed 2026-08-17 [057360]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -11595,20 +11778,20 @@
       "lead_id": "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
       "published_at": null,
       "refs": {
-        "parked_reason": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有具名 micro-lens／grating coupler 製造或供應角色；原等待條件未命中，維持 partial。 這是有期限 Event Watch 的等待，不是靜默遺失。",
+        "parked_reason": "TSMC 6-K 是月營收與財務附表，沒有微透鏡／耦合器具名製程披露。",
         "primary_url": "https://research.tsmc.com/page/on-chip-interconnect/14.html",
-        "research_outcome": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有具名 micro-lens／grating coupler 製造或供應角色；原等待條件未命中，維持 partial。",
-        "trace_attempts_ref": "2026-09-10 research-drain：核對觸發 filing 為 TSMC 主管小額 ESPP 購股，未命中本 lead 的具名技術／供應條件",
-        "trace_next_trigger": "TSMC 或共同作者公開可核對文件具名 embedded micro-lens array 與製造／供應角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0b11a59c45db180334576a982817e036",
-        "trace_requeued_at": "2026-09-09T22:37:20.211298+00:00",
+        "research_outcome": "TSMC 6-K 是月營收與財務附表，沒有微透鏡／耦合器具名製程披露。",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "TSMC 技術論文或客戶文件披露 COUPE 微透鏡／耦合器製程與供應商",
+        "trace_requeue_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+        "trace_requeued_at": "2026-09-10T22:34:59.914295+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSM",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_0b11a59c45db180334576a982817e036",
+        "trace_trigger_event_ref": "lead:lead_994f96ce74b5da75a5611c2c00801bee",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0010_2026-08-31"
       },
@@ -11625,10 +11808,10 @@
           "decision_impact": "candidate_set",
           "reason": "system-decompose 已有 TSMC COUPE 官方研究頁；答案會新增或排除 grating coupler／micro-lens 供應商候選"
         },
-        "decided_at": "2026-09-09T22:37:20.211298+00:00",
+        "decided_at": "2026-09-10T22:34:59.914295+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0010_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0010_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 1
       },
       "triage_history": [
@@ -11684,6 +11867,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0010_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:59.914295+00:00",
+          "superseded_reason": "Event Watch ew_0010_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-31_active_classification_backfill.json",
+              "classified_at": "2026-08-30T22:37:12.935023+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "system-decompose 已有 TSMC COUPE 官方研究頁；答案會新增或排除 grating coupler／micro-lens 供應商候選"
+            },
+            "decided_at": "2026-09-09T22:37:20.211298+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0010_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -11912,6 +12116,7 @@
       "url": "https://x.com/aleabitoreddit/status/2092718416683819292"
     },
     "lead_1609bc2f7219c606bfd788882fef693d": {
+      "content_updated_at": "2026-09-10T22:32:42.712305+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -11932,7 +12137,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 8-K filed 2026-08-06",
+      "title": "MP 8-K filed 2026-08-06 [000047]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:47.807814+00:00",
@@ -12103,6 +12308,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074951295027568736"
     },
     "lead_16e6ed4903e19d7e036bc502aceb68ad": {
+      "content_updated_at": "2026-09-10T22:32:32.745646+00:00",
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics"
@@ -12131,7 +12337,7 @@
       "source": "edgar:AAOI",
       "status": "parked",
       "themes": {},
-      "title": "AAOI 8-K filed 2026-08-21",
+      "title": "AAOI 8-K filed 2026-08-21 [099688]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -12151,6 +12357,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000110465926099688/tm2623389d2_8k.htm"
     },
     "lead_17864efa590ef84785c24a4ed01004c5": {
+      "content_updated_at": "2026-09-10T22:32:36.921197+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -12179,7 +12386,7 @@
           ]
         }
       },
-      "title": "CCXI 10-K filed 2026-03-26",
+      "title": "CCXI 10-K filed 2026-03-26 [034863]",
       "triage": {
         "decided_at": "2026-08-11T05:13:15.888250+00:00",
         "decision": "go",
@@ -12362,6 +12569,7 @@
       "url": "https://x.com/aleabitoreddit/status/2075294412377358828"
     },
     "lead_1900dc8a3a9795331553496fc7b83dc4": {
+      "content_updated_at": "2026-09-10T22:32:44.970536+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -12390,7 +12598,7 @@
           ]
         }
       },
-      "title": "NVDA 4 filed 2026-09-02",
+      "title": "NVDA 4 filed 2026-09-02 [000012]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:43.506915+00:00",
@@ -12455,6 +12663,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000592/xslF345X06/wk-form4_1788344654.xml"
     },
     "lead_190b059db6c27b9bb7025eda28a9c61c": {
+      "content_updated_at": "2026-09-10T22:32:34.894463+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -12470,7 +12679,7 @@
       "source": "edgar:AMAT",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "AMAT 4 filed 2026-07-06",
+      "title": "AMAT 4 filed 2026-07-06 [047328]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -12727,6 +12936,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000004/xslF345X06/form4-08192026_120815.xml"
     },
     "lead_19c2d0ce3f563d028b0eefa4ff300ede": {
+      "content_updated_at": "2026-09-10T22:32:43.909964+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -12746,7 +12956,7 @@
       "source": "edgar:MTSI",
       "status": "parked",
       "themes": {},
-      "title": "MTSI 4 filed 2026-09-01",
+      "title": "MTSI 4 filed 2026-09-01 [000476]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:15.703233+00:00",
@@ -12764,6 +12974,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000476/xslF345X06/edgar.xml"
     },
     "lead_1a70d988b953b5e01a4dab9ceb97184b": {
+      "content_updated_at": "2026-09-10T22:32:32.745743+00:00",
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics"
@@ -12794,7 +13005,7 @@
       "source": "edgar:AAOI",
       "status": "parked",
       "themes": {},
-      "title": "AAOI 4 filed 2026-08-20",
+      "title": "AAOI 4 filed 2026-08-20 [006634]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -12872,6 +13083,7 @@
       "url": "https://x.com/aleabitoreddit/status/2091843192639672553"
     },
     "lead_1a9c1baadcfa09d748a4832bb75cfdc5": {
+      "content_updated_at": "2026-09-10T22:32:45.668048+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -12900,7 +13112,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-05-18",
+      "title": "POET 6-K filed 2026-05-18 [003507]",
       "triage": {
         "decided_at": "2026-08-15T06:38:16.769630+00:00",
         "decision": "go",
@@ -13413,8 +13625,8 @@
         "research_run": "session:2026-08-29-tw-cpo-drain",
         "trace_attempts_ref": "2026-09-10 research-drain：核對觸發 filing 為 TSMC 主管小額 ESPP 購股，未命中本 lead 的具名技術／供應條件",
         "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0b11a59c45db180334576a982817e036",
-        "trace_requeued_at": "2026-09-09T22:37:20.211298+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+        "trace_requeued_at": "2026-09-10T22:34:59.914295+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -13423,12 +13635,12 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_0b11a59c45db180334576a982817e036",
+        "trace_trigger_event_ref": "lead:lead_994f96ce74b5da75a5611c2c00801bee",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0013_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13447,10 +13659,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 衍生之台系 CPO 供應鏈候選"
         },
-        "decided_at": "2026-09-09T22:37:20.211298+00:00",
+        "decided_at": "2026-09-10T22:34:59.914295+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0013_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0013_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -13511,6 +13723,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0013_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:59.914295+00:00",
+          "superseded_reason": "Event Watch ew_0013_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T09:17:07.984899+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 衍生之台系 CPO 供應鏈候選"
+            },
+            "decided_at": "2026-09-09T22:37:20.211298+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0013_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -13619,6 +13851,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000186650326000006/xslF345X06/form4-07072026_110711.xml"
     },
     "lead_1cc8a618f313fef294d383ac05a1e016": {
+      "content_updated_at": "2026-09-10T22:32:37.440112+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -13647,7 +13880,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-01",
+      "title": "COHR 4 filed 2026-09-01 [001037]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:13.539343+00:00",
@@ -13903,23 +14136,23 @@
       "refs": {
         "gap": "MRM／MZM／其他調變器類型仍未揭露",
         "original_claim_status": "Davisson 102.4T CPO、16 顆 6.4T optical engines 與 TSMC COUPE 已確認；公告未揭露 modulator 類型",
-        "parked_reason": "觸發條件仍未命中，且本輪查到一個**必須明確拒絕記錄**的東西：二手分析（SemiAnalysis 等）寫『Broadcom most probably uses a Mach-Zehnder Modulator (MZM)』並對比 NVIDIA CPO 採 MRM——『most probably』是推論不是揭露，依 L11-3（多個二手都這樣說 != 一手已證實）與 L6-3（LLM 從類別詞推出具體實體是最常見幻覺型態）不得寫進圖或記為事實。可確認的只有規格層面：Tomahawk 6 Davisson 為 102.4 Tb/s CPO 乙太交換器，整合 16 顆 6.4T 矽光引擎，是 Broadcom 第三代 CPO（Gen 1 為 2021 年 Humboldt）——這些不含調變器類型。⚠ 亦未找到任何 Hot Chips 2026 的相關發表，該條觸發路徑本輪落空。",
+        "parked_reason": "Broadcom 10-Q 沒有能確定 Davisson 調變器類型的設計文件。",
         "primary_url": "https://investors.broadcom.com/news-releases/news-release-details/broadcom-announces-tomahawkr-6-davisson-industrys-first-1024",
-        "research_outcome": "產品架構一手已核；調變器屬性保持 unknown，不建 RA",
+        "research_outcome": "Broadcom 10-Q 沒有能確定 Davisson 調變器類型的設計文件。",
         "research_run": "session:2026-08-30-loop2-r4",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "2026-09-09 research-drain：web search『Broadcom Davisson modulator micro-ring MZM Hot Chips 2026』7 筆，全部為科普／分析／不相關專利與 arXiv 論文，無 Broadcom 一手揭露；Hot Chips 2026 相關發表未見",
-        "trace_next_trigger": "Broadcom 官方 datasheet／OFC 或 Hot Chips 正式論文／客戶技術文件明列 Davisson 的調變器類型。⚠ 分析師 note 與科普文不算，不再因二手推論而 requeue",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "Broadcom Davisson 論文或 datasheet 明示 MRM／MZM／其他調變器",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "產品發行公司一手公告",
-        "trace_requeue_trigger": "event_watch:ew_0014_2026-08-31",
-        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_721a96cd48f28b4c0aa3b0d96426c9b7",
+        "trace_requeued_at": "2026-09-10T22:34:23.574427+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "AVGO"
         ],
-        "trace_trigger_event_ref": "lead:lead_ea2fd285d490a695264e1452765ecc28",
+        "trace_trigger_event_ref": "lead:lead_721a96cd48f28b4c0aa3b0d96426c9b7",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0014_2026-08-31"
       },
@@ -13943,10 +14176,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 未知層"
         },
-        "decided_at": "2026-09-09T00:59:16.088432+00:00",
+        "decided_at": "2026-09-10T22:34:23.574427+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0014_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
+        "reason": "Event Watch ew_0014_2026-08-31 觸發：新 triage PASS lead lead_721a96cd48f28b4c0aa3b0d96426c9b7 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
         "tier": 1
       },
       "triage_history": [
@@ -13987,6 +14220,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0014_2026-08-31 觸發：新 triage PASS lead lead_ea2fd285d490a695264e1452765ecc28 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:23.574427+00:00",
+          "superseded_reason": "Event Watch ew_0014_2026-08-31 觸發：新 triage PASS lead lead_721a96cd48f28b4c0aa3b0d96426c9b7 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_721a96cd48f28b4c0aa3b0d96426c9b7",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-30T07:21:57.668377+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 未知層"
+            },
+            "decided_at": "2026-09-09T00:59:16.088432+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0014_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
             "tier": 1
           }
         }
@@ -14048,6 +14301,30 @@
         "tier": 2
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000166489826000005/xslF345X06/form4-08282026_010847.xml"
+    },
+    "lead_1dd89474736d5bfee298463a265e2a80": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-10T22:32:31.060254+00:00",
+      "lead_id": "lead_1dd89474736d5bfee298463a265e2a80",
+      "media": [],
+      "published_at": "2026-09-10T12:49:19.000Z",
+      "raw_text": "共和党が議会で多数派を維持できたら、トランプが成人1人につき5,000ドルを配ると約束している理由が、正直よく分からない。（総額約1.35兆ドル）\n\nそれより、アメリカ中のトイレを、日本にあるような便座が温かくなるTOTO（5332.T）のトイレにアップグレードしたほうが、支持率はもっと上がるんじゃないかと思う。\n\n計算してみた：\n\n3億3,500万台のトイレをTOTO UltraMax II + S7Aに交換すると、約9,900億ドル。\n設置費用まで含めると、総額は約1.3兆ドル。\n\n僕の案のほうがかなり安い。",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "共和党が議会で多数派を維持できたら、トランプが成人1人につき5,000ドルを配ると約束している理由が、正直よく分からない。（総額約1.35兆ドル） それより、アメリカ中のトイレを、日本にあるような便座が温かくなるTOTO（5332.T）のトイレにアップグレードしたほうが、支持率はもっと上がるんじゃないかと思う。 計算してみた： 3億3,500万台のトイレをTOTO UltraMax II + S7Aに交換すると、約9,900億ドル。 設置費用まで含めると、総額は約1.3兆ドル。 僕の案のほうがかなり安い。",
+      "triage": {
+        "decided_at": "2026-09-10T22:35:03.832652+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "以 TOTO 馬桶替代現金發放的政治幽默與作者假設，無已發生採購或供應鏈事件，亦不在現行研究主題。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2098031064002535908"
     },
     "lead_1deb20d98ab9585882a57b307d940f6c": {
       "entities": {
@@ -14337,6 +14614,7 @@
       "url": "https://x.com/aleabitoreddit/status/2094027369648681284"
     },
     "lead_1f7757ebab570135cb422c11d725089a": {
+      "content_updated_at": "2026-09-10T22:32:41.502453+00:00",
       "entities": {
         "company_ids": [
           "co:lam_research"
@@ -14367,7 +14645,7 @@
       "source": "edgar:LRCX",
       "status": "parked",
       "themes": {},
-      "title": "LRCX 8-K filed 2026-08-27",
+      "title": "LRCX 8-K filed 2026-08-27 [000043]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-27T22:37:18.829016+00:00",
@@ -14785,18 +15063,18 @@
       "published_at": "2026-08-07T12:55:47.000Z",
       "raw_text": "Some more TLDR takeaways from $AAOI ER:\n\n- They also flagged DSP and TIA bottlenecks, which is a positive industry read through for names like $MXL, then $SMTC and $MTSI. \n\n- For revenue growth, they're expecting more than $500 million revenue Q4, which is absurd growth. \n\nFor reference:\nQ2: $191.9M\nQ3: ~$255M-$290M\nQ4: $500M+\nBy mid-2027: ~$1.41B quarterly revenue run-rate\n\nAlways impressed by the revenue ramp from some of these optical players.",
       "refs": {
-        "parked_reason": "觸發條件『AAOI Q3 正式結果與指引』尚未發生——AAOI 會計季於 2026-09-30 結束，Q3 財報約 2026-11 才公布，本輪無法推進。既有結論不變：官方已支持 800G ramp 與產能由每月 20 萬走向年底 65 萬且需求超過供給；DSP／TIA／laser 瓶頸與 Q4 500M+ 只有 tier-2 逐字稿；2027 年中季營收 1.41B 為推文自行外推，無任何來源支持。圖中已含同場法說的雷射瓶頸 claim，無 unique graph delta。⚠ 本輪為 related_entity_signal 喚醒，非原觸發條件命中。",
+        "parked_reason": "AAOI 8-K 是房地產購置，未回答 DSP／TIA 供應商問題。",
         "primary_url": "https://investors.ao-inc.com/news-releases/news-release-details/applied-optoelectronics-announces-second-quarter-2026-financial",
-        "research_outcome": "官方支持 800G ramp、產能由每月 20 萬走向年底 65 萬且需求超過供給；tier-2 支持 DSP／TIA／laser 瓶頸與 Q4 500M+，但 2027 年中 1.41B 季營收未核實，圖已含同場法說雷射瓶頸，未產 RA",
+        "research_outcome": "AAOI 8-K 是房地產購置，未回答 DSP／TIA 供應商問題。",
         "research_run": "daily:2026-08-22",
-        "trace_attempts_ref": "2026-09-09 research-drain：確認 AAOI Q3 尚未報告（季末 2026-09-30），不投搜尋預算；沿用 2026-08-26 已取得的官方 Q2 新聞稿與法說逐字稿",
-        "trace_next_trigger": "AAOI Q3 2026 財報與正式指引（約 2026-11）：核對 Q4 是否達 500M+、產能 65 萬/月是否兌現、DSP／TIA 瓶頸是否進入官方措辭。⚠ 這也是 [134] disproof 條件的同一個核查點",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "AAOI／MXL／SMTC／MTSI 一手文件具名披露 DSP 或 TIA 供應及交付",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS"
         ],
-        "trace_requeue_trigger": "event_watch:ew_0017_2026-08-31",
-        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_55c8b7a797abe1ef2704c0ab958b1ca6",
+        "trace_requeued_at": "2026-09-10T22:34:21.225236+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -14807,7 +15085,7 @@
           "co:applied_optoelectronics",
           "co:macom"
         ],
-        "trace_trigger_event_ref": "lead:lead_49085eb7b51c402c925cc29ab5e33cc6",
+        "trace_trigger_event_ref": "lead:lead_55c8b7a797abe1ef2704c0ab958b1ca6",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0017_2026-08-31"
       },
@@ -14823,12 +15101,12 @@
           "decision_impact": "candidate_set",
           "reason": "AAOI 法說點名 DSP 與 TIA 瓶頸並牽出 MXL／SMTC／MTSI：可能新增候選"
         },
-        "decided_at": "2026-09-09T00:59:16.088432+00:00",
+        "decided_at": "2026-09-10T22:34:21.225236+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "Event Watch ew_0017_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_49085eb7b51c402c925cc29ab5e33cc6）；由 consume-fired 排回 pq1 做 bounded 重查",
+        "reason": "Event Watch ew_0017_2026-08-31 觸發：新 triage PASS lead lead_55c8b7a797abe1ef2704c0ab958b1ca6 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -14866,6 +15144,28 @@
               "novelty": true
             },
             "reason": "新 triage PASS lead lead_1a75aa118ad109781c02fcd497236dda 與 parked trace 共用具名標的 AAOI, co:applied_optoelectronics（首次觸發；其餘共用標的已消化）；事件觸發 bounded pq1 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:21.225236+00:00",
+          "superseded_reason": "Event Watch ew_0017_2026-08-31 觸發：新 triage PASS lead lead_55c8b7a797abe1ef2704c0ab958b1ca6 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_55c8b7a797abe1ef2704c0ab958b1ca6",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "AAOI 法說點名 DSP 與 TIA 瓶頸並牽出 MXL／SMTC／MTSI：可能新增候選"
+            },
+            "decided_at": "2026-09-09T00:59:16.088432+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0017_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_49085eb7b51c402c925cc29ab5e33cc6）；由 consume-fired 排回 pq1 做 bounded 重查",
             "tier": 4
           }
         }
@@ -15457,6 +15757,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/bootstrap-exercises-warrants-in-sivers-semiconductors-bb8a1506"
     },
     "lead_242c5b23ddc83fa9820d7d35f0fc91d9": {
+      "content_updated_at": "2026-09-10T22:32:46.337892+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -15489,7 +15790,7 @@
       "source": "edgar:TSEM",
       "status": "parked",
       "themes": {},
-      "title": "TSEM 6-K filed 2026-08-04",
+      "title": "TSEM 6-K filed 2026-08-04 [003776]",
       "triage": {
         "classification": {
           "backfill_ref": "classify_8.json",
@@ -15690,6 +15991,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1051627/000143774926020633/xslF345X06/rdgdoc.xml"
     },
     "lead_24e98e2fb4e446ac129f3334c9189fc5": {
+      "content_updated_at": "2026-09-10T22:32:43.236506+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -15710,7 +16012,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 4 filed 2026-09-02",
+      "title": "MRVL 4 filed 2026-09-02 [060112]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:47.801364+00:00",
@@ -15858,6 +16160,7 @@
       "url": "https://x.com/aleabitoreddit/status/2073374325420503417"
     },
     "lead_25f524c1ca59584f1fe0b2347f9d1b91": {
+      "content_updated_at": "2026-09-10T22:32:47.028079+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -15881,7 +16184,7 @@
           ]
         }
       },
-      "title": "TSLA 4 filed 2026-05-04",
+      "title": "TSLA 4 filed 2026-05-04 [055079]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -16249,6 +16552,7 @@
       "url": "https://x.com/aleabitoreddit/status/2076767097674514474"
     },
     "lead_291b058af07f3f0a6e43107b0bec57b3": {
+      "content_updated_at": "2026-09-10T22:32:36.212109+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -16273,7 +16577,7 @@
       "source": "edgar:AXTI",
       "status": "parked",
       "themes": {},
-      "title": "AXTI 4 filed 2026-08-19",
+      "title": "AXTI 4 filed 2026-08-19 [028573]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -16710,6 +17014,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-withdraws-items-from-the-agenda-of-the-2026-annual-general-meeting-29ebe74f"
     },
     "lead_2a763ab4030790d77094e88483d76c3c": {
+      "content_updated_at": "2026-09-10T22:32:44.455995+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -16731,7 +17036,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 8-K filed 2026-08-26",
+      "title": "MU 8-K filed 2026-08-26 [101067]",
       "triage": {
         "decided_at": "2026-08-26T22:37:00.942659+00:00",
         "decision": "go",
@@ -16777,6 +17082,51 @@
         "tier": 3
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-tillkannager-program-vart-3-4-musd-med-seminex-for-nasta-generations-inp-ljuskallor-for-ai-datacenter-cec7456a"
+    },
+    "lead_2b2f52a2081a91572dd5a667abf9f948": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:40.765392+00:00",
+      "lead_id": "lead_2b2f52a2081a91572dd5a667abf9f948",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-09-10 [000010]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:19.978321+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:19.978321+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "related_trace_requeues": [
+          "lead_77539b327d06e48a3073ec7c8c2569c8",
+          "lead_c349675fdb415bc16ec36afe3d5d91f2"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000010/xslF345X06/form4-09102026_090944.xml"
     },
     "lead_2b43cb181b7cac79e1ef6a05bad6b150": {
       "entities": {
@@ -16943,6 +17293,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072630036600103340"
     },
     "lead_2c2802d82ab3e6d9b79d7ed634486844": {
+      "content_updated_at": "2026-09-10T22:32:38.110662+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -16973,7 +17324,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 6-K filed 2026-08-27",
+      "title": "GFS 6-K filed 2026-08-27 [000225]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-27T22:37:19.103689+00:00",
@@ -16994,6 +17345,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000225/gf-igrcfxclosing6xkdraft82.htm"
     },
     "lead_2ca9a6e6edfae16e892996fee78444ea": {
+      "content_updated_at": "2026-09-10T22:32:47.027988+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -17017,7 +17369,7 @@
           ]
         }
       },
-      "title": "TSLA 4 filed 2026-05-15",
+      "title": "TSLA 4 filed 2026-05-15 [062860]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -18428,6 +18780,7 @@
       "url": "https://x.com/aleabitoreddit/status/2094854529967862140"
     },
     "lead_330dd99ad380ce1a207e4fb53c046f03": {
+      "content_updated_at": "2026-09-10T22:32:46.337984+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -18443,7 +18796,7 @@
       "source": "edgar:TSEM",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "TSEM 4 filed 2026-07-15",
+      "title": "TSEM 4 filed 2026-07-15 [000651]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -18601,6 +18954,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-valkomnar-nomineringen-av-de-nya-styrelseledamoterna-joakim-nideborn-och-helena-svancar-8b3b2de1"
     },
     "lead_3453d7487a96340cfae68508e7ad4a72": {
+      "content_updated_at": "2026-09-10T22:32:43.236633+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -18620,7 +18974,7 @@
       "source": "edgar:MRVL",
       "status": "applied",
       "themes": {},
-      "title": "MRVL 10-Q filed 2026-08-28",
+      "title": "MRVL 10-Q filed 2026-08-28 [000025]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:09:08.601058+00:00",
@@ -18932,6 +19286,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-aterkallar-punkter-fran-dagordningen-for-arsstamman-2026-fb23131a"
     },
     "lead_3550af54b806e4a7e943c8d26ad37be0": {
+      "content_updated_at": "2026-09-10T22:32:35.409023+00:00",
       "entities": {
         "company_ids": [
           "co:broadcom"
@@ -18955,7 +19310,7 @@
           ]
         }
       },
-      "title": "AVGO 4 filed 2026-07-14",
+      "title": "AVGO 4 filed 2026-07-14 [000072]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -19019,19 +19374,19 @@
       "lead_id": "lead_359cb1c9e8c4f11997943e4c7f01727d",
       "published_at": null,
       "refs": {
-        "parked_reason": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有 1152-fiber coupling 或 active-alignment yield 內容；原等待條件未命中，維持 partial。 這是有期限 Event Watch 的等待，不是靜默遺失。",
-        "research_outcome": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有 1152-fiber coupling 或 active-alignment yield 內容；原等待條件未命中，維持 partial。",
-        "trace_attempts_ref": "2026-09-10 research-drain：核對觸發 filing 為 TSMC 主管小額 ESPP 購股，未命中本 lead 的具名技術／供應條件",
-        "trace_next_trigger": "IEEE／作者公開 manuscript 或 institution repository 可逐字核對 1152-fiber coupling 與 active-alignment yield",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0b11a59c45db180334576a982817e036",
-        "trace_requeued_at": "2026-09-09T22:37:20.211298+00:00",
+        "parked_reason": "TSMC 月營收 6-K 不回答光學主動對準的製程／設備供應商。",
+        "research_outcome": "TSMC 月營收 6-K 不回答光學主動對準的製程／設備供應商。",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "TSMC／客戶一手文件具名披露 1152 芯耦合與主動對準的量產製程或設備",
+        "trace_requeue_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+        "trace_requeued_at": "2026-09-10T22:34:59.914295+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "TSM",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_0b11a59c45db180334576a982817e036",
+        "trace_trigger_event_ref": "lead:lead_994f96ce74b5da75a5611c2c00801bee",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0022_2026-08-31"
       },
@@ -19048,10 +19403,10 @@
           "decision_impact": "candidate_set",
           "reason": "system-decompose 已有 IEEE photonic engine 論文；答案會新增或排除 active-alignment／光學耦合供應商候選"
         },
-        "decided_at": "2026-09-09T22:37:20.211298+00:00",
+        "decided_at": "2026-09-10T22:34:59.914295+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0022_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0022_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 1
       },
       "triage_history": [
@@ -19107,6 +19462,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0022_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:59.914295+00:00",
+          "superseded_reason": "Event Watch ew_0022_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-31_active_classification_backfill.json",
+              "classified_at": "2026-08-30T22:37:12.935023+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "system-decompose 已有 IEEE photonic engine 論文；答案會新增或排除 active-alignment／光學耦合供應商候選"
+            },
+            "decided_at": "2026-09-09T22:37:20.211298+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0022_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -19241,6 +19617,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074109998544846954"
     },
     "lead_365f503ef06a76b13750113789c7c200": {
+      "content_updated_at": "2026-09-10T22:32:33.427299+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -19260,7 +19637,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-08-18",
+      "title": "AEHR 4 filed 2026-08-18 [000261]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:16.284636+00:00",
@@ -19278,6 +19655,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000261/xslF345X06/primary_01.xml"
     },
     "lead_36a8bd9ccadf6314b3b0763af5730dc5": {
+      "content_updated_at": "2026-09-10T22:32:42.712672+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -19297,7 +19675,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 4 filed 2026-06-15",
+      "title": "MP 4 filed 2026-06-15 [000006]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:41.989198+00:00",
@@ -19353,6 +19731,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000587/xslF345X06/wk-form4_1788344492.xml"
     },
     "lead_371966aa5c74144595758b25ae702179": {
+      "content_updated_at": "2026-09-10T22:32:44.456536+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -19383,7 +19762,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-07-17",
+      "title": "MU 4 filed 2026-07-17 [000004]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -20571,6 +20950,22 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000185/xslF345X06/wk-form4_1785439252.xml"
     },
+    "lead_3db65dc4a33a681d69720b090d25d4b0": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-10T22:38:30.331894+00:00",
+      "lead_id": "lead_3db65dc4a33a681d69720b090d25d4b0",
+      "published_at": "2026-08-18",
+      "refs": {},
+      "source": "event_watch:ew_0012_2026-08-31",
+      "status": "pending",
+      "themes": {},
+      "title": "AAOI Rosenblatt 2026-08-18 公開第三方逐字稿：美國產能溢價、LTA 與雷射產能；摘要日期多處錯置，需逐段核對全文與官方音訊",
+      "triage": null,
+      "url": "https://www.investing.com/news/transcripts/applied-optoelectronics-at-rosenblatt-summit-capacity-ai-demand-93CH-4865745"
+    },
     "lead_3df060cf842783e4709ae6cd86b1be74": {
       "entities": {
         "company_ids": [
@@ -21046,6 +21441,7 @@
       "url": "https://x.com/aleabitoreddit/status/2085174977272360987"
     },
     "lead_3ed9a47f9e24928f8a6e5ec4de850d1d": {
+      "content_updated_at": "2026-09-10T22:32:44.970909+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -21084,7 +21480,7 @@
           ]
         }
       },
-      "title": "NVDA 4 filed 2026-08-24",
+      "title": "NVDA 4 filed 2026-08-24 [000015]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-24T22:37:23.275402+00:00",
@@ -21243,6 +21639,7 @@
       "url": "https://x.com/aleabitoreddit/status/2071903552608362500"
     },
     "lead_413e8aec4f160aae1e90619952b472a2": {
+      "content_updated_at": "2026-09-10T22:32:34.199409+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -21273,7 +21670,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 4 filed 2026-08-20",
+      "title": "AEVA 4 filed 2026-08-20 [359631]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -21593,6 +21990,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074965761345642660"
     },
     "lead_43d817f5de68720748c01933cfe443f7": {
+      "content_updated_at": "2026-09-10T22:32:43.910487+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -21608,7 +22006,7 @@
       "source": "edgar:MTSI",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "MTSI 4 filed 2026-06-02",
+      "title": "MTSI 4 filed 2026-06-02 [000328]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -21782,6 +22180,7 @@
       "url": "https://www.twelfthmagpie.com/2026/08/02/up-523-in-6-months-is-this-the-best-growth-stock-to-buy-in-august-2026/?.tsrc=rss"
     },
     "lead_447924a4a87e69d8a5393c695ad141af": {
+      "content_updated_at": "2026-09-10T22:32:40.097308+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -21805,7 +22204,7 @@
           ]
         }
       },
-      "title": "JBL 4 filed 2026-07-21",
+      "title": "JBL 4 filed 2026-07-21 [006697]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -21899,6 +22298,7 @@
       "url": "https://x.com/aleabitoreddit/status/2095580088620449880"
     },
     "lead_44ce140c224422130eecf4bb9766219e": {
+      "content_updated_at": "2026-09-10T22:32:36.212486+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -21916,7 +22316,7 @@
       "source": "edgar:AXTI",
       "status": "parked",
       "themes": {},
-      "title": "AXTI 8-K filed 2026-07-29",
+      "title": "AXTI 8-K filed 2026-07-29 [024882]",
       "triage": {
         "decided_at": "2026-07-29T22:36:52.056895+00:00",
         "decision": "go",
@@ -22135,6 +22535,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074581698604593367"
     },
     "lead_4529c66f2414f1fa331f8567836c589b": {
+      "content_updated_at": "2026-09-10T22:32:38.804688+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -22160,7 +22561,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-08-27",
+      "title": "GOOGL 4 filed 2026-08-27 [371794]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:12.479320+00:00",
@@ -22260,6 +22661,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2082720873908494456"
+    },
+    "lead_45665deb20f2526c77c0566d37d45369": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:41.502176+00:00",
+      "lead_id": "lead_45665deb20f2526c77c0566d37d45369",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "LRCX 4 filed 2026-09-10 [000013]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:20.912928+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:20.912928+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000134360026000013/xslF345X06/wk-form4_1789059918.xml"
     },
     "lead_45c16c3d1b589d5a3a64e100be09c1b2": {
       "entities": {
@@ -22369,15 +22803,15 @@
       "lead_id": "lead_464d4849949994fc18d5192a484b6c57",
       "published_at": null,
       "refs": {
-        "parked_reason": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有具名 FOCI、Largan、Browave、HST 的 FAU 供應角色；原等待條件未命中。 這是有期限 Event Watch 的等待，不是靜默遺失。",
+        "parked_reason": "TSMC 月營收 6-K 沒有 FAU 供應商或量產認證披露。",
         "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories/",
-        "research_outcome": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有具名 FOCI、Largan、Browave、HST 的 FAU 供應角色；原等待條件未命中。",
-        "trace_attempts_ref": "2026-09-10 research-drain：核對觸發 filing 為 TSMC 主管小額 ESPP 購股，未命中本 lead 的具名技術／供應條件",
-        "trace_next_trigger": "NVIDIA／TSMC／MOPS 文件具名 FOCI、Largan、Browave、HST 的 FAU 供應角色",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0b11a59c45db180334576a982817e036",
-        "trace_requeued_at": "2026-09-09T22:37:20.211298+00:00",
+        "research_outcome": "TSMC 月營收 6-K 沒有 FAU 供應商或量產認證披露。",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "TSMC／NVIDIA／FAU 供應商文件具名披露供應或 qualification",
+        "trace_requeue_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+        "trace_requeued_at": "2026-09-10T22:34:59.914295+00:00",
         "trace_requires_user": "false",
-        "trace_status": "awaiting_named_disclosure",
+        "trace_status": "partial",
         "trace_trigger_entities": [
           "3008.TW",
           "3163.TWO",
@@ -22388,7 +22822,7 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_0b11a59c45db180334576a982817e036",
+        "trace_trigger_event_ref": "lead:lead_994f96ce74b5da75a5611c2c00801bee",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0025_2026-08-31"
       },
@@ -22414,10 +22848,10 @@
           "decision_impact": "candidate_set",
           "reason": "system-decompose 已具名 FOCI、Largan、Browave、HST；答案會新增或排除 FAU 層供應商候選"
         },
-        "decided_at": "2026-09-09T22:37:20.211298+00:00",
+        "decided_at": "2026-09-10T22:34:59.914295+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0025_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0025_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 2
       },
       "triage_history": [
@@ -22486,6 +22920,27 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0025_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 2
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:59.914295+00:00",
+          "superseded_reason": "Event Watch ew_0025_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+          "triage": {
+            "classification": {
+              "backfill_ref": "2026-08-31_active_classification_backfill.json",
+              "classified_at": "2026-08-30T22:37:12.935023+00:00",
+              "classified_by": "backfill_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "system-decompose 已具名 FOCI、Largan、Browave、HST；答案會新增或排除 FAU 層供應商候選"
+            },
+            "decided_at": "2026-09-09T22:37:20.211298+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0025_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 2
           }
         }
@@ -22646,6 +23101,7 @@
       "url": "https://x.com/aleabitoreddit/status/2071743355684626656"
     },
     "lead_477cf1e67aaee3d331ec78212fdce7c5": {
+      "content_updated_at": "2026-09-10T22:32:34.894006+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -22668,7 +23124,7 @@
       "source": "edgar:AMAT",
       "status": "parked",
       "themes": {},
-      "title": "AMAT 4 filed 2026-08-31",
+      "title": "AMAT 4 filed 2026-08-31 [059643]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-31T22:39:03.297397+00:00",
@@ -22955,6 +23411,7 @@
       "url": "https://x.com/aleabitoreddit/status/2075557588159058076"
     },
     "lead_49085eb7b51c402c925cc29ab5e33cc6": {
+      "content_updated_at": "2026-09-10T22:32:32.745542+00:00",
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics"
@@ -22983,7 +23440,7 @@
       "source": "edgar:AAOI",
       "status": "parked",
       "themes": {},
-      "title": "AAOI 8-K filed 2026-08-24",
+      "title": "AAOI 8-K filed 2026-08-24 [006693]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-24T22:37:23.275402+00:00",
@@ -23504,6 +23961,7 @@
       "url": "https://developer.nvidia.com/blog/nvidia-800-v-hvdc-architecture-will-power-the-next-generation-of-ai-factories/?gap=rectifier_busway"
     },
     "lead_4c624bf197b688bce6b5a827922583cd": {
+      "content_updated_at": "2026-09-10T22:32:37.440203+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -23532,7 +23990,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-01",
+      "title": "COHR 4 filed 2026-09-01 [001036]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:15.674318+00:00",
@@ -23729,6 +24187,7 @@
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=scale_out_anchor"
     },
     "lead_4e01f16dd69b10649a4960ad46f3ef7b": {
+      "content_updated_at": "2026-09-10T22:32:42.712760+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -23748,7 +24207,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 4 filed 2026-06-15",
+      "title": "MP 4 filed 2026-06-15 [000004]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:42.964574+00:00",
@@ -23837,6 +24296,7 @@
       "url": "https://x.com/aleabitoreddit/status/2076030743655109063"
     },
     "lead_4e16633643902ae216814d3373f5f051": {
+      "content_updated_at": "2026-09-10T22:32:33.427206+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -23856,7 +24316,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-09-01",
+      "title": "AEHR 4 filed 2026-09-01 [000263]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:16.594018+00:00",
@@ -23874,6 +24334,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000263/xslF345X06/primary_01.xml"
     },
     "lead_4e7209f20ae3951d218afe470fbf58d6": {
+      "content_updated_at": "2026-09-10T22:32:40.766079+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -23912,7 +24373,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-08-27",
+      "title": "LITE 4 filed 2026-08-27 [000007]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:35.711507+00:00",
@@ -24221,6 +24682,7 @@
       "url": "https://www.schaeffler.com/en/technology-innovation/technology/humanoid-robots/?gap=force_torque_sensor"
     },
     "lead_5105c989c73d16226293c3dd5da999ec": {
+      "content_updated_at": "2026-09-10T22:32:40.765713+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -24259,7 +24721,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-08-27",
+      "title": "LITE 4 filed 2026-08-27 [000017]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:35.998976+00:00",
@@ -24277,6 +24739,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000017/xslF345X06/form4-08282026_010801.xml"
     },
     "lead_51262d0814ea1b61ea98ccdc976793d8": {
+      "content_updated_at": "2026-09-10T22:32:42.712176+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -24297,7 +24760,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 10-Q filed 2026-08-07",
+      "title": "MP 10-Q filed 2026-08-07 [000048]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:48.782771+00:00",
@@ -24542,6 +25005,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077212864948162871"
     },
     "lead_522e298dc1a193b34d3afcf3f9949096": {
+      "content_updated_at": "2026-09-10T22:32:44.970627+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -24570,7 +25034,7 @@
           ]
         }
       },
-      "title": "NVDA 4 filed 2026-09-02",
+      "title": "NVDA 4 filed 2026-09-02 [000010]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:45.632465+00:00",
@@ -24664,13 +25128,13 @@
         "onboard_candidate_names": [
           "ASMPT"
         ],
-        "parked_reason": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有 ASMPT 客戶端訂單或量產 qualification；四維初判不翻轉，維持 partial。 這是有期限 Event Watch 的等待，不是靜默遺失。",
+        "parked_reason": "TSMC 月營收 6-K 沒有 ASMPT 訂單或量產 qualification，原 URL 年份亦不能當事件日期。",
         "primary_url": "https://semi.asmpt.com/en/news-center/press-releases/asmpt-showcases-ap-innovations-for-ai-and-hpc-at-ectc-2027/",
-        "research_outcome": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有 ASMPT 客戶端訂單或量產 qualification；四維初判不翻轉，維持 partial。",
-        "trace_attempts_ref": "2026-09-10 research-drain：核對觸發 filing 為 TSMC 主管小額 ESPP 購股，未命中本 lead 的具名技術／供應條件",
-        "trace_next_trigger": "ASMPT 客戶端（記憶體廠或 OSAT）文件、訂單或量產 qualification 具名揭露",
-        "trace_requeue_trigger": "related_triaged_lead:lead_0b11a59c45db180334576a982817e036",
-        "trace_requeued_at": "2026-09-09T22:37:20.211298+00:00",
+        "research_outcome": "TSMC 月營收 6-K 沒有 ASMPT 訂單或量產 qualification，原 URL 年份亦不能當事件日期。",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "ASMPT 客戶端記憶體廠或 OSAT 文件具名揭露訂單或量產 qualification",
+        "trace_requeue_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+        "trace_requeued_at": "2026-09-10T22:34:59.914295+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -24679,7 +25143,7 @@
           "co:nvidia",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_0b11a59c45db180334576a982817e036",
+        "trace_trigger_event_ref": "lead:lead_994f96ce74b5da75a5611c2c00801bee",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0028_2026-08-31"
       },
@@ -24703,10 +25167,10 @@
           "decision_impact": "candidate_set",
           "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
         },
-        "decided_at": "2026-09-09T22:37:20.211298+00:00",
+        "decided_at": "2026-09-10T22:34:59.914295+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0028_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0028_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
         "tier": 1
       },
       "triage_history": [
@@ -24767,6 +25231,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0028_2026-08-31 已觸發（entity_filing_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_004478d161be47a5f8d9323bccfc8573）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:59.914295+00:00",
+          "superseded_reason": "Event Watch ew_0028_2026-08-31 觸發：新 triage PASS lead lead_994f96ce74b5da75a5611c2c00801bee 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-29T20:06:47.816718+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "查證若有客戶採用與量產 qualification，ASMPT 會進 CPO 製造設備候選集合；若只是展會展示，則維持工具候選而不提升排序。"
+            },
+            "decided_at": "2026-09-09T22:37:20.211298+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0028_2026-08-31 觸發：新 triage PASS lead lead_0b11a59c45db180334576a982817e036 與等待中的追源共用具名標的 TSM, co:tsmc；事件觸發 bounded pq1 重查",
             "tier": 1
           }
         }
@@ -24853,6 +25337,7 @@
       "url": "https://uk.advfn.com/market-news/article/16903/iqe-schedules-annual-general-meeting-and-releases-2025-annual-report-iqe?.tsrc=rss"
     },
     "lead_53e31d26909b973cac66af50394abd98": {
+      "content_updated_at": "2026-09-10T22:32:44.970816+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -24882,7 +25367,7 @@
           ]
         }
       },
-      "title": "NVDA 8-K filed 2026-08-26",
+      "title": "NVDA 8-K filed 2026-08-26 [000073]",
       "triage": {
         "decided_at": "2026-08-26T22:37:01.208359+00:00",
         "decision": "go",
@@ -25029,6 +25514,7 @@
       "url": "https://x.com/aleabitoreddit/status/2095590610967421206"
     },
     "lead_54bf82feffa718f34f8d8ce6e2a6184a": {
+      "content_updated_at": "2026-09-10T22:32:36.921105+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -25057,7 +25543,7 @@
           ]
         }
       },
-      "title": "CCXI 10-Q filed 2026-05-13",
+      "title": "CCXI 10-Q filed 2026-05-13 [055787]",
       "triage": {
         "decided_at": "2026-08-11T05:13:15.676192+00:00",
         "decision": "go",
@@ -25223,6 +25709,42 @@
       ],
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=connector"
     },
+    "lead_55c8b7a797abe1ef2704c0ab958b1ca6": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:32.745250+00:00",
+      "lead_id": "lead_55c8b7a797abe1ef2704c0ab958b1ca6",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AAOI 4 filed 2026-09-10 [007058]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:21.225236+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:21.225236+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "related_trace_requeues": [
+          "lead_20eb32acaf78ffb751ee07966e185534"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007058/xslF345X06/ownership.xml"
+    },
     "lead_55cab39b615fdf8874be6ca518e6618e": {
       "entities": {
         "company_ids": [],
@@ -25360,6 +25882,7 @@
       "url": "https://x.com/aleabitoreddit/status/2085644051446108223"
     },
     "lead_562b72dc85828086e5489daff91712c0": {
+      "content_updated_at": "2026-09-10T22:32:36.211978+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -25384,7 +25907,7 @@
       "source": "edgar:AXTI",
       "status": "parked",
       "themes": {},
-      "title": "AXTI 4 filed 2026-08-19",
+      "title": "AXTI 4 filed 2026-08-19 [028577]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -25450,6 +25973,7 @@
       "url": "https://x.com/aleabitoreddit/status/2089264987328151637"
     },
     "lead_569add44124d25b961da71868b7e1fb6": {
+      "content_updated_at": "2026-09-10T22:32:36.921012+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -25484,7 +26008,7 @@
           ]
         }
       },
-      "title": "CCXI 8-K filed 2026-06-24",
+      "title": "CCXI 8-K filed 2026-06-24 [071287]",
       "triage": {
         "decided_at": "2026-08-11T05:13:15.467114+00:00",
         "decision": "go",
@@ -25637,6 +26161,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/all-space-lagger-produktionsorder-vard-8-2-musd-hos-sivers-semiconductors-for-ka-band-beamforming-kretsar-07d97937"
     },
     "lead_572f73ed0ae5002a8e9091d316c88565": {
+      "content_updated_at": "2026-09-10T22:32:36.920919+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -25669,7 +26194,7 @@
           ]
         }
       },
-      "title": "CCXI 8-K filed 2026-07-06",
+      "title": "CCXI 8-K filed 2026-07-06 [075480]",
       "triage": {
         "decided_at": "2026-08-11T05:13:15.259003+00:00",
         "decision": "go",
@@ -26958,6 +27483,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072906728853881251"
     },
     "lead_60475ffbca4f0535c1a31fcfe42a392a": {
+      "content_updated_at": "2026-09-10T22:32:45.667768+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -26986,7 +27512,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-08-13",
+      "title": "POET 6-K filed 2026-08-13 [005485]",
       "triage": {
         "decided_at": "2026-08-15T06:38:17.791369+00:00",
         "decision": "go",
@@ -27032,6 +27558,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044048/xslF345X06/wk-form4_1781734174.xml"
     },
     "lead_609f70123c19f56604512c8c62be6eb6": {
+      "content_updated_at": "2026-09-10T22:32:42.712489+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -27051,7 +27578,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 4 filed 2026-06-15",
+      "title": "MP 4 filed 2026-06-15 [000041]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:43.938729+00:00",
@@ -27200,6 +27727,7 @@
       "url": "https://www.sivers-semiconductors.com/press/bootstrap-exercises-warrants-in-sivers-semiconductors/"
     },
     "lead_614068d1cfe961a0c644ef511588b9cd": {
+      "content_updated_at": "2026-09-10T22:32:47.709871+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -27220,7 +27748,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000646]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:22.873953+00:00",
@@ -27703,6 +28231,7 @@
       "url": "https://x.com/aleabitoreddit/status/2078130772121399553"
     },
     "lead_62b8e5bf01607049e3d8108570946b57": {
+      "content_updated_at": "2026-09-10T22:32:40.097493+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -27726,7 +28255,7 @@
           ]
         }
       },
-      "title": "JBL 4 filed 2026-07-08",
+      "title": "JBL 4 filed 2026-07-08 [006546]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -27945,6 +28474,7 @@
       "url": "https://www.proterial.com/e/press/2025/n0722b.html?decompose=hre_free_threat"
     },
     "lead_63b835be28af06ea59e52b18fb66b1f1": {
+      "content_updated_at": "2026-09-10T22:32:43.236913+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -27975,7 +28505,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 4 filed 2026-08-17",
+      "title": "MRVL 4 filed 2026-08-17 [057525]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -27993,6 +28523,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026057525/xslF345X06/wk-form4_1787014784.xml"
     },
     "lead_63bebdac96bfa01b58c5e28bd471df0c": {
+      "content_updated_at": "2026-09-10T22:32:44.456090+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -28014,7 +28545,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-08-25",
+      "title": "MU 4 filed 2026-08-25 [000015]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-27T03:18:48.063011+00:00",
@@ -28127,6 +28658,7 @@
       "url": "https://x.com/aleabitoreddit/status/2087505570941239683"
     },
     "lead_642cfd67ada28b82f7cfb145055cfa57": {
+      "content_updated_at": "2026-09-10T22:32:36.920629+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -28162,7 +28694,7 @@
           ]
         }
       },
-      "title": "CCXI 10-Q filed 2026-08-13",
+      "title": "CCXI 10-Q filed 2026-08-13 [089245]",
       "triage": {
         "decided_at": "2026-08-13T22:36:36.849198+00:00",
         "decision": "go",
@@ -28858,6 +29390,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048548/xslF345X06/wk-form4_1784242458.xml"
     },
     "lead_6678b4ba3bd0df6b4d66efbeca398782": {
+      "content_updated_at": "2026-09-10T22:32:41.502362+00:00",
       "entities": {
         "company_ids": [
           "co:lam_research"
@@ -28877,7 +29410,7 @@
       "source": "edgar:LRCX",
       "status": "parked",
       "themes": {},
-      "title": "LRCX 4 filed 2026-09-01",
+      "title": "LRCX 4 filed 2026-09-01 [000012]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:16.882293+00:00",
@@ -28985,6 +29518,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074525146736738396"
     },
     "lead_676999f1ba2da90ecb2f7be44ea2733f": {
+      "content_updated_at": "2026-09-10T22:32:33.427478+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -29004,7 +29538,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-08-14",
+      "title": "AEHR 4 filed 2026-08-14 [000257]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:17.173582+00:00",
@@ -29022,6 +29556,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000257/xslF345X06/primary_01.xml"
     },
     "lead_67a6151431a9274ed74eb80e60d6a622": {
+      "content_updated_at": "2026-09-10T22:32:43.236728+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -29051,7 +29586,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 8-K filed 2026-08-27",
+      "title": "MRVL 8-K filed 2026-08-27 [000022]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-27T22:37:19.931015+00:00",
@@ -29071,6 +29606,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000022/mrvl-20260827.htm"
     },
     "lead_67d32f7e8f057b93fc1f35a99930833c": {
+      "content_updated_at": "2026-09-10T22:32:37.439740+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -29101,7 +29637,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-02",
+      "title": "COHR 4 filed 2026-09-02 [001047]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-03T22:36:13.244857+00:00",
@@ -29777,6 +30313,72 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000116007726000008/xslF345X06/form4-08072026_010856.xml"
     },
+    "lead_6ba5165cd7a533faebe5ccd56ff7d8f7": {
+      "entities": {
+        "company_ids": [
+          "co:sk_hynix",
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "SKHY",
+          "MU"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:31.080623+00:00",
+      "lead_id": "lead_6ba5165cd7a533faebe5ccd56ff7d8f7",
+      "media": [
+        {
+          "cache": {
+            "bytes": 76040,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_6ba5165cd7a533faebe5ccd56ff7d8f7/3_2097936070717644800.jpg",
+            "sha256": "65ece774125c9bfdc29dd5dfbfb1c91f1f23ee6f10f91787e479603dc7673e43"
+          },
+          "height": 503,
+          "media_key": "3_2097936070717644800",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HR1dvbCaoAA_J6j.jpg",
+          "width": 1797
+        },
+        {
+          "cache": {
+            "bytes": 113151,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_6ba5165cd7a533faebe5ccd56ff7d8f7/3_2097936618971881472.jpg",
+            "sha256": "825281802e38c660e5005f56383919e34f60b231ad71c775b9a600abc1250e7f"
+          },
+          "height": 817,
+          "media_key": "3_2097936618971881472",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HR1ePVcaYAA02aN.jpg",
+          "width": 1649
+        }
+      ],
+      "published_at": "2026-09-10T06:38:22.000Z",
+      "raw_text": "Wow, HBM reportedly drove up AI accelerator/card prices by 20-50% in China.\n\nSo $SKHY, Samsung, $MU, should be happy to hear this:\n\n- Huawei has raised indicated pricing for the Ascend 950DT 20–50% above quotes from just 2 months ago\n\n- Cambricon's upcoming 690 is reportedly +20–30%\n\nReuters stated that HBM acquired through grey market channels in China can cost several times regular pricing. \n\nAs someone who is long memory, I'm happy about memory causing this much inflation.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "Wow, HBM reportedly drove up AI accelerator/card prices by 20-50% in China. So $SKHY, Samsung, $MU, should be happy to hear this: - Huawei has raised indicated pricing for the Ascend 950DT 20–50% above quotes from just 2 months ago - Cambricon's upcoming 690 is reportedly +20–30% Reuters stated that HBM acquired through grey market channels in China can cost several times regular pricing. As someone who is long memory, I'm happy about memory causing this much inflation.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:35:02.532682+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "HBM 與 Huawei Ascend 950DT、Cambricon 690 漲價數字可追 Reuters 原文，可能改變記憶體需求判讀；社群未驗證。"
+        },
+        "decided_at": "2026-09-10T22:35:02.532682+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "HBM 與 Huawei Ascend 950DT、Cambricon 690 漲價數字可追 Reuters 原文，可能改變記憶體需求判讀；社群未驗證。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2097937708178186303"
+    },
     "lead_6baf3ec25835e624b5763ea8212236e2": {
       "entities": {
         "company_ids": [
@@ -29848,6 +30450,7 @@
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1095761/iqe-shares-surge-as-ai-demand-lifts-guidance-and-prompts-broker-upgrades-1095761.html?.tsrc=rss"
     },
     "lead_6c6ee0cc90206989d9672587f20a9dea": {
+      "content_updated_at": "2026-09-10T22:32:35.409206+00:00",
       "entities": {
         "company_ids": [
           "co:broadcom"
@@ -29871,7 +30474,7 @@
           ]
         }
       },
-      "title": "AVGO 4 filed 2026-07-10",
+      "title": "AVGO 4 filed 2026-07-10 [000068]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -29929,6 +30532,7 @@
       "url": "https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8375891?decompose=gbd_patents"
     },
     "lead_6cc7c974eab84a76ef68831129f474e3": {
+      "content_updated_at": "2026-09-10T22:32:41.502545+00:00",
       "entities": {
         "company_ids": [
           "co:lam_research"
@@ -29959,7 +30563,7 @@
       "source": "edgar:LRCX",
       "status": "parked",
       "themes": {},
-      "title": "LRCX 10-K filed 2026-08-07",
+      "title": "LRCX 10-K filed 2026-08-07 [000037]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -30027,6 +30631,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072610437817078056"
     },
     "lead_6d5296dc7864f7b685e4fdf26490b23e": {
+      "content_updated_at": "2026-09-10T22:32:41.502728+00:00",
       "entities": {
         "company_ids": [
           "co:lam_research"
@@ -30057,7 +30662,7 @@
       "source": "edgar:LRCX",
       "status": "parked",
       "themes": {},
-      "title": "LRCX 4 filed 2026-08-06",
+      "title": "LRCX 4 filed 2026-08-06 [000010]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -30077,6 +30682,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000164241526000010/xslF345X06/wk-form4_1786030738.xml"
     },
     "lead_6d553a5b34a8818c2dfe51eeaa8b784d": {
+      "content_updated_at": "2026-09-10T22:32:45.667674+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -30113,7 +30719,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-08-13",
+      "title": "POET 6-K filed 2026-08-13 [037615]",
       "triage": {
         "decided_at": "2026-08-21T22:35:41.720555+00:00",
         "decision": "go",
@@ -30695,6 +31301,7 @@
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-rapporterar-resultat-for-q2-2026-tillvaxt-i-produktforsaljning-rekordstor-pipeline-och-kunder-som-skalar-upp-positionerar-bolaget-for-accelererad-tillvaxt/"
     },
     "lead_702acc97c325101cd482e95c46cd62ae": {
+      "content_updated_at": "2026-09-10T22:32:40.765621+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -30723,7 +31330,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-09-01",
+      "title": "LITE 4 filed 2026-09-01 [000008]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:24.271834+00:00",
@@ -31013,6 +31620,51 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/tachyon-networks-expands-fwa-portfolio-with-1-5m-development-partnership-with-sivers-semiconductors-3575c079"
     },
+    "lead_721a96cd48f28b4c0aa3b0d96426c9b7": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:35.408693+00:00",
+      "lead_id": "lead_721a96cd48f28b4c0aa3b0d96426c9b7",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 10-Q filed 2026-09-10 [000080]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:23.574427+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "Broadcom 新季度法定申報，可驗證 AI 半導體需求與客戶集中度，可能改變排序脈絡。"
+        },
+        "decided_at": "2026-09-10T22:34:23.574427+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Broadcom 新季度法定申報，可驗證 AI 半導體需求與客戶集中度，可能改變排序脈絡。",
+        "related_trace_requeues": [
+          "lead_1d85eafbfe0bd9a69efc298d24259be3",
+          "lead_ec5da7de15f538edef3b6b1d4c062632"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm"
+    },
     "lead_728850e5cfe698ffcb164cb0ffb42279": {
       "entities": {
         "company_ids": [
@@ -31055,6 +31707,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119903926000009/xslF345X06/wk-form4_1782767219.xml"
     },
     "lead_729d8ae123c2ddb5398ec37a4b8864f4": {
+      "content_updated_at": "2026-09-10T22:32:42.038913+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -31085,7 +31738,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-18",
+      "title": "META 4 filed 2026-08-18 [012608]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -31319,6 +31972,7 @@
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?gap=optical_circulator"
     },
     "lead_75079e941495ca5c5c5b0ae145ea90ee": {
+      "content_updated_at": "2026-09-10T22:32:39.584205+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -31334,7 +31988,7 @@
       "source": "edgar:HIMX",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-06-12",
+      "title": "HIMX 6-K filed 2026-06-12 [004076]",
       "triage": {
         "decided_at": "2026-08-31T05:31:50.966597+00:00",
         "decision": "no_go",
@@ -31407,7 +32061,49 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-starker-sitt-engagemang-i-sivers-semiconductors-med-finansiering-for-andra-aret-ffc72f3e"
     },
+    "lead_7585304d983e288be2de817c586fc516": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:35.408826+00:00",
+      "lead_id": "lead_7585304d983e288be2de817c586fc516",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO S-4 filed 2026-09-10 [387881]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:24.995343+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "Broadcom S-4 為可逐字查核的新證券註冊文件，先確認是否改變企業邊界或只是債務交換。"
+        },
+        "decided_at": "2026-09-10T22:34:24.995343+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Broadcom S-4 為可逐字查核的新證券註冊文件，先確認是否改變企業邊界或只是債務交換。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526387881/d154803ds4.htm"
+    },
     "lead_75b6ff16300b8da2f360a3f118eca4b6": {
+      "content_updated_at": "2026-09-10T22:32:38.804072+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -31430,7 +32126,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-09-03",
+      "title": "GOOGL 4 filed 2026-09-03 [382332]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:31.704822+00:00",
@@ -31840,17 +32536,17 @@
       "lead_id": "lead_77539b327d06e48a3073ec7c8c2569c8",
       "published_at": null,
       "refs": {
-        "parked_reason": "Google 一手論文確認 Jupiter 使用 MEMS OCS，但完全沒有 foundry 名稱，觸發條件未命中。⚠ 本輪的共同發現：這批 decompose 產生的層缺口 lead 全部卡在**同一個結構性事實**——鏈條頂端的客戶（TSMC／NVIDIA／Broadcom／Google）在最有理由具名供應商的場合仍不具名（[317] 已就 TSMC 做出此判定：2026-08-31 其先進封裝副總公開點名 CPO 四大瓶頸卻不點名任何供應商）。因此『再搜一次』對這類缺口沒有期望值，本輪不投搜尋預算；能翻轉它們的只有對方主動發文件。",
+        "parked_reason": "喚醒文件為 Lumentum Form 4 內部人申報，無法回答 Google MEMS foundry。",
         "primary_url": "https://research.google/pubs/jupiter-evolving-transforming-googles-datacenter-network-via-optical-circuit-switches-and-software-defined-networking/",
-        "research_outcome": "google_paper_confirms_mems_ocs_but_not_foundry",
+        "research_outcome": "喚醒文件為 Lumentum Form 4 內部人申報，無法回答 Google MEMS foundry。",
         "research_run": "daily-brief-2026-09-05",
-        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中",
-        "trace_next_trigger": "Google paper patent supplier filing or teardown explicitly names the MEMS mirror-array foundry",
-        "trace_requeue_trigger": "event_watch:ew_0068_2026-09-02",
-        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "Google 論文／專利、供應商申報或可核對拆解具名揭露 MEMS foundry",
+        "trace_requeue_trigger": "related_triaged_lead:lead_2b2f52a2081a91572dd5a667abf9f948",
+        "trace_requeued_at": "2026-09-10T22:34:19.978321+00:00",
         "trace_requires_user": "false",
-        "trace_status": "awaiting_named_disclosure",
-        "trace_trigger_event_ref": "lead:lead_75b6ff16300b8da2f360a3f118eca4b6",
+        "trace_status": "partial",
+        "trace_trigger_event_ref": "lead:lead_2b2f52a2081a91572dd5a667abf9f948",
         "trace_trigger_watch_ref": "ew_0068_2026-09-02"
       },
       "source": "decompose-palomar-ocs-2026-09-02",
@@ -31865,10 +32561,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
         },
-        "decided_at": "2026-09-09T00:59:16.088432+00:00",
+        "decided_at": "2026-09-10T22:34:19.978321+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0068_2026-09-02 已觸發（fact_verification；共用具名標的 GOOGL, co:google；觸發 lead lead_75b6ff16300b8da2f360a3f118eca4b6）；由 consume-fired 排回 pq1 做 bounded 重查",
+        "reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_2b2f52a2081a91572dd5a667abf9f948 與等待中的追源共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 2
       },
       "triage_history": [
@@ -31909,6 +32605,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_75b6ff16300b8da2f360a3f118eca4b6 與等待中的追源共用具名標的 GOOGL, co:google；事件觸發 bounded pq1 重查",
+            "tier": 2
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:19.978321+00:00",
+          "superseded_reason": "Event Watch ew_0068_2026-09-02 觸發：新 triage PASS lead lead_2b2f52a2081a91572dd5a667abf9f948 與等待中的追源共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_2b2f52a2081a91572dd5a667abf9f948",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T12:24:41.544428+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose Palomar OCS(使用者核准 [443]):Apollo 論文一手列層,圖中無節點或零供應商"
+            },
+            "decided_at": "2026-09-09T00:59:16.088432+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0068_2026-09-02 已觸發（fact_verification；共用具名標的 GOOGL, co:google；觸發 lead lead_75b6ff16300b8da2f360a3f118eca4b6）；由 consume-fired 排回 pq1 做 bounded 重查",
             "tier": 2
           }
         }
@@ -32014,6 +32730,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000186/xslF345X06/wk-form4_1785439258.xml"
     },
     "lead_784638384b09744c90b7efc253f62704": {
+      "content_updated_at": "2026-09-10T22:32:32.745444+00:00",
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics"
@@ -32039,7 +32756,7 @@
       "source": "edgar:AAOI",
       "status": "parked",
       "themes": {},
-      "title": "AAOI 8-K filed 2026-09-01",
+      "title": "AAOI 8-K filed 2026-09-01 [006862]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:17.649348+00:00",
@@ -32059,6 +32776,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826006862/aaoi_8k.htm"
     },
     "lead_78a436583f2713170fa633740dc21af2": {
+      "content_updated_at": "2026-09-10T22:32:41.502639+00:00",
       "entities": {
         "company_ids": [
           "co:lam_research"
@@ -32074,7 +32792,7 @@
       "source": "edgar:LRCX",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "LRCX 4 filed 2026-08-07",
+      "title": "LRCX 4 filed 2026-08-07 [000011]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -32466,6 +33184,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2075291803537027204"
+    },
+    "lead_79e1eada7e7dadf7d71a2ee36d68315d": {
+      "entities": {
+        "company_ids": [
+          "co:lam_research"
+        ],
+        "tickers": [
+          "LRCX"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:41.502041+00:00",
+      "lead_id": "lead_79e1eada7e7dadf7d71a2ee36d68315d",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:LRCX",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "LRCX 4 filed 2026-09-10 [000011]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:21.535657+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:21.535657+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/707549/000140569326000011/xslF345X06/wk-form4_1789059862.xml"
     },
     "lead_7a036af49c326a6c32a50d4c0a5255a2": {
       "entities": {
@@ -33301,6 +34052,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072904441104343444"
     },
     "lead_7daf5468fbf69d8f8cd8eced18bd6704": {
+      "content_updated_at": "2026-09-10T22:32:34.894098+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -33331,7 +34083,7 @@
       "source": "edgar:AMAT",
       "status": "parked",
       "themes": {},
-      "title": "AMAT 4 filed 2026-08-27",
+      "title": "AMAT 4 filed 2026-08-27 [059277]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-27T22:37:20.461702+00:00",
@@ -33539,6 +34291,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077784594959725056"
     },
     "lead_7ecf9784b09432248115ffd46a98387d": {
+      "content_updated_at": "2026-09-10T22:32:46.337795+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -33561,7 +34314,7 @@
       "source": "edgar:TSEM",
       "status": "applied",
       "themes": {},
-      "title": "TSEM 6-K filed 2026-08-11",
+      "title": "TSEM 6-K filed 2026-08-11 [004009]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -33958,6 +34711,7 @@
       "url": "https://x.com/aleabitoreddit/status/2093712497949950242"
     },
     "lead_7ffb373885549dcbf1942919d192a9fb": {
+      "content_updated_at": "2026-09-10T22:32:45.667543+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -33987,7 +34741,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-09-04",
+      "title": "POET 6-K filed 2026-09-04 [005894]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:35.638153+00:00",
@@ -34612,6 +35366,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074007618046345249"
     },
     "lead_80ad137ec40349c4a806e77e716c8391": {
+      "content_updated_at": "2026-09-10T22:32:47.027517+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -34635,7 +35390,7 @@
           ]
         }
       },
-      "title": "TSLA 10-Q filed 2026-07-23",
+      "title": "TSLA 10-Q filed 2026-07-23 [049270]",
       "triage": {
         "decided_at": "2026-08-14T06:36:24.425406+00:00",
         "decision": "no_go",
@@ -35412,6 +36167,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000199/xslF345X06/wk-form4_1785530512.xml"
     },
     "lead_844d2bb07b3890ed458eac0e7fce2bd4": {
+      "content_updated_at": "2026-09-10T22:32:34.199280+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -35434,7 +36190,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 4 filed 2026-09-04",
+      "title": "AEVA 4 filed 2026-09-04 [383903]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:33.824729+00:00",
@@ -35752,6 +36508,7 @@
       "url": "https://x.com/aleabitoreddit/status/2080153334888182065"
     },
     "lead_858f34fcfe2e81ce825b004406087391": {
+      "content_updated_at": "2026-09-10T22:32:36.212202+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -35782,7 +36539,7 @@
       "source": "edgar:AXTI",
       "status": "parked",
       "themes": {},
-      "title": "AXTI 10-Q filed 2026-08-13",
+      "title": "AXTI 10-Q filed 2026-08-13 [027677]",
       "triage": {
         "decided_at": "2026-08-13T22:36:36.627987+00:00",
         "decision": "go",
@@ -36053,6 +36810,7 @@
       "url": "https://x.com/aleabitoreddit/status/2089057857652338993"
     },
     "lead_8601e0f81517fd0e7852fb7642d66762": {
+      "content_updated_at": "2026-09-10T22:32:42.038734+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -36083,7 +36841,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-18",
+      "title": "META 4 filed 2026-08-18 [012610]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -36511,6 +37269,7 @@
       "url": "https://www.thk.com/?q=eng/node/124&align=robotics_group"
     },
     "lead_87e42a055ae88243e091c31d1dcabb83": {
+      "content_updated_at": "2026-09-10T22:32:38.804539+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -36536,7 +37295,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-08-27",
+      "title": "GOOGL 4 filed 2026-08-27 [371797]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:13.368115+00:00",
@@ -36653,6 +37412,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072795186263187831"
     },
     "lead_88516b16c6038533278d8eb0fd9b41b8": {
+      "content_updated_at": "2026-09-10T22:32:46.338167+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -36683,7 +37443,7 @@
       "source": "edgar:TSEM",
       "status": "parked",
       "themes": {},
-      "title": "TSEM 6-K filed 2026-07-07",
+      "title": "TSEM 6-K filed 2026-07-07 [003423]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -36815,6 +37575,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-stark-kursuppgang-medfor-omvardering-av-skuld-for-sociala-avgifter-under-q2-2026-72487f72"
     },
     "lead_88ede4d485350da6e978f2f242a3efeb": {
+      "content_updated_at": "2026-09-10T22:32:43.910204+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -36845,7 +37606,7 @@
       "source": "edgar:MTSI",
       "status": "parked",
       "themes": {},
-      "title": "MTSI 10-Q filed 2026-08-06",
+      "title": "MTSI 10-Q filed 2026-08-06 [000038]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -37060,6 +37821,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072765527764971642"
     },
     "lead_89bbfc611561b6a141cf5021f60108e2": {
+      "content_updated_at": "2026-09-10T22:32:47.709599+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -37080,7 +37842,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000653]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:24.211143+00:00",
@@ -37692,6 +38454,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326011028/xslF345X06/ownership.xml"
     },
     "lead_8d6b5710ab62f537e8dd17d153adf10d": {
+      "content_updated_at": "2026-09-10T22:32:35.409295+00:00",
       "entities": {
         "company_ids": [
           "co:broadcom"
@@ -37715,7 +38478,7 @@
           ]
         }
       },
-      "title": "AVGO 4 filed 2026-07-10",
+      "title": "AVGO 4 filed 2026-07-10 [000066]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -37733,6 +38496,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000066/xslF345X06/wk-form4_1783723055.xml"
     },
     "lead_8db3c04adc3aad50284c288883a5238a": {
+      "content_updated_at": "2026-09-10T22:32:34.199954+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -37762,7 +38526,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 4 filed 2026-07-29",
+      "title": "AEVA 4 filed 2026-07-29 [324440]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -38271,6 +39035,7 @@
       "url": "https://www.release.tdnet.info/inbs/I_list_001_6324.html?loop=runway-refresh-q1fy2027"
     },
     "lead_9086e8525c8d8dcccb58b78d140d128b": {
+      "content_updated_at": "2026-09-10T22:32:37.439645+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -38301,7 +39066,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-02",
+      "title": "COHR 4 filed 2026-09-02 [001048]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-03T22:36:13.552857+00:00",
@@ -38414,6 +39179,7 @@
       "url": "https://x.com/aleabitoreddit/status/2087733927930929435"
     },
     "lead_9151a89d47c24f0830e230d6cf29cd58": {
+      "content_updated_at": "2026-09-10T22:32:43.910668+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -38429,7 +39195,7 @@
       "source": "edgar:MTSI",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "MTSI 4 filed 2026-05-20",
+      "title": "MTSI 4 filed 2026-05-20 [000314]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -38480,6 +39246,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000196659826000004/xslF345X06/wk-form4_1780416309.xml"
     },
     "lead_91a73c290d7257f4102c49d31d1b3c19": {
+      "content_updated_at": "2026-09-10T22:32:36.920732+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -38513,7 +39280,7 @@
           ]
         }
       },
-      "title": "CCXI 8-K filed 2026-08-10",
+      "title": "CCXI 8-K filed 2026-08-10 [086928]",
       "triage": {
         "decided_at": "2026-08-11T05:13:14.849213+00:00",
         "decision": "go",
@@ -38527,6 +39294,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026086928/ea0301196-8k_church11.htm"
     },
     "lead_920158c2057b7526b2b474dc099d0403": {
+      "content_updated_at": "2026-09-10T22:32:33.427565+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -38546,7 +39314,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-08-14",
+      "title": "AEHR 4 filed 2026-08-14 [000255]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:18.247872+00:00",
@@ -38564,6 +39332,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000255/xslF345X06/primary_01.xml"
     },
     "lead_928514b80dea6644f199f48c0803092d": {
+      "content_updated_at": "2026-09-10T22:32:36.212394+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -38587,7 +39356,7 @@
       "source": "edgar:AXTI",
       "status": "applied",
       "themes": {},
-      "title": "AXTI 8-K filed 2026-07-29",
+      "title": "AXTI 8-K filed 2026-07-29 [024883]",
       "triage": {
         "decided_at": "2026-07-29T22:36:52.598454+00:00",
         "decision": "go",
@@ -38654,6 +39423,7 @@
       "url": "https://x.com/aleabitoreddit/status/2085823672569467005"
     },
     "lead_942c7773612e0a65939f173fb684615b": {
+      "content_updated_at": "2026-09-10T22:32:44.455870+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -38684,7 +39454,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-08-28",
+      "title": "MU 4 filed 2026-08-28 [000007]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:45.638700+00:00",
@@ -39098,6 +39868,7 @@
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?decompose=fiber"
     },
     "lead_95daa27b4775895e2bec873b7b829bd5": {
+      "content_updated_at": "2026-09-10T22:32:40.097178+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -39121,7 +39892,7 @@
           ]
         }
       },
-      "title": "JBL 4 filed 2026-08-05",
+      "title": "JBL 4 filed 2026-08-05 [006945]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -39481,6 +40252,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074504394608193799"
     },
     "lead_9766c07e071be8d46637df5aa4e1c371": {
+      "content_updated_at": "2026-09-10T22:32:34.199508+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -39510,7 +40282,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 4 filed 2026-08-14",
+      "title": "AEVA 4 filed 2026-08-14 [352272]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -39530,6 +40302,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526352272/xslF345X06/ownership.xml"
     },
     "lead_97954aa904e68a28cf7d1c3b1013490c": {
+      "content_updated_at": "2026-09-10T22:32:42.712400+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -39549,7 +40322,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 4 filed 2026-06-30",
+      "title": "MP 4 filed 2026-06-30 [000043]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:44.893013+00:00",
@@ -39677,6 +40450,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077044267151925411"
     },
     "lead_98d430a549ccdef60e969effc3ab63fe": {
+      "content_updated_at": "2026-09-10T22:32:34.894188+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -39707,7 +40481,7 @@
       "source": "edgar:AMAT",
       "status": "parked",
       "themes": {},
-      "title": "AMAT 8-K filed 2026-08-27",
+      "title": "AMAT 8-K filed 2026-08-27 [059257]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-27T22:37:21.010301+00:00",
@@ -39856,6 +40630,46 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2082175588555702410"
+    },
+    "lead_994f96ce74b5da75a5611c2c00801bee": {
+      "entities": {
+        "company_ids": [
+          "co:tsmc"
+        ],
+        "tickers": [
+          "TSM"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:47.709190+00:00",
+      "lead_id": "lead_994f96ce74b5da75a5611c2c00801bee",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:TSM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSM 6-K filed 2026-09-10 [000658]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:59.914295+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "台積電新月營收申報具一手數字，可核對需求但不能由月營收推導光互連供應关系。"
+        },
+        "decided_at": "2026-09-10T22:34:59.914295+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "台積電新月營收申報具一手數字，可核對需求但不能由月營收推導光互連供應关系。",
+        "related_trace_requeues": [
+          "lead_13b62234a2ec38a45eaa9c8bedcbc6f8",
+          "lead_1c805d1c401d5ede0572182a5bfcbbea",
+          "lead_359cb1c9e8c4f11997943e4c7f01727d",
+          "lead_464d4849949994fc18d5192a484b6c57",
+          "lead_5365613adf1bce24257876e3dab03eea"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000658/tsm-revenue20260910.htm"
     },
     "lead_9957a9e65aee680f5aa5bba637494eac": {
       "entities": {
@@ -40431,6 +41245,7 @@
       "url": "https://x.com/aleabitoreddit/status/2085603590903902621"
     },
     "lead_9b21f27f0d9e2c46c3382657635587de": {
+      "content_updated_at": "2026-09-10T22:32:43.237003+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -40461,7 +41276,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 4 filed 2026-08-17",
+      "title": "MRVL 4 filed 2026-08-17 [057399]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -40958,6 +41773,7 @@
       "url": "https://x.com/aleabitoreddit/status/2096605093986787380"
     },
     "lead_9d94ea7e84e76c027a3bfe373e8a32bd": {
+      "content_updated_at": "2026-09-10T22:32:40.765805+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -40996,7 +41812,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-08-27",
+      "title": "LITE 4 filed 2026-08-27 [000016]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:36.554287+00:00",
@@ -41014,6 +41830,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157333826000016/xslF345X06/form4-08282026_010823.xml"
     },
     "lead_9f9ed402e43168da878626a812f3a150": {
+      "content_updated_at": "2026-09-10T22:32:43.910102+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -41044,7 +41861,7 @@
       "source": "edgar:MTSI",
       "status": "parked",
       "themes": {},
-      "title": "MTSI 4 filed 2026-08-19",
+      "title": "MTSI 4 filed 2026-08-19 [000468]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -41064,6 +41881,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1493594/000090445426000468/xslF345X06/edgar.xml"
     },
     "lead_9fafee55d98cff33135a5df4a04d1e0a": {
+      "content_updated_at": "2026-09-10T22:32:47.709419+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -41084,7 +41902,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000655]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:25.575302+00:00",
@@ -41549,6 +42367,80 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026051078/lite-20260727.htm"
     },
+    "lead_a13c0821159580743ce512156fb2150f": {
+      "entities": {
+        "company_ids": [
+          "co:applied_materials"
+        ],
+        "tickers": [
+          "AMAT"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:34.893877+00:00",
+      "lead_id": "lead_a13c0821159580743ce512156fb2150f",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:AMAT",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AMAT 4 filed 2026-09-10 [061408]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:21.851902+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:21.851902+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026061408/xslF345X06/wk-form4_1789074224.xml"
+    },
+    "lead_a20546668cd334f92251bdb30f6373c2": {
+      "entities": {
+        "company_ids": [
+          "co:tesla"
+        ],
+        "tickers": [
+          "TSLA"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:47.027387+00:00",
+      "lead_id": "lead_a20546668cd334f92251bdb30f6373c2",
+      "published_at": "2026-09-09",
+      "refs": {},
+      "source": "edgar:TSLA",
+      "status": "triaged_go",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "TSLA 4 filed 2026-09-09 [106432]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:20.603865+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:20.603865+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926106432/xslF345X06/tm2625055d1_4seq1.xml"
+    },
     "lead_a233915b0ec4520fd7aa34f73d8e1613": {
       "entities": {
         "company_ids": [
@@ -41610,6 +42502,7 @@
       "url": "https://x.com/aleabitoreddit/status/2075496116481884524"
     },
     "lead_a270e36f331c79a362f629939c5c8dda": {
+      "content_updated_at": "2026-09-10T22:32:35.409385+00:00",
       "entities": {
         "company_ids": [
           "co:broadcom"
@@ -41641,7 +42534,7 @@
           ]
         }
       },
-      "title": "AVGO 8-K filed 2026-07-06",
+      "title": "AVGO 8-K filed 2026-07-06 [295589]",
       "triage": {
         "decided_at": "2026-08-14T06:36:25.497468+00:00",
         "decision": "go",
@@ -41685,6 +42578,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000119063926000006/xslF345X06/wk-form4_1781566408.xml"
     },
     "lead_a31266aef970594a8df8d0910fda7901": {
+      "content_updated_at": "2026-09-10T22:32:34.894373+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -41713,7 +42607,7 @@
       "source": "edgar:AMAT",
       "status": "parked",
       "themes": {},
-      "title": "AMAT 8-K filed 2026-08-13",
+      "title": "AMAT 8-K filed 2026-08-13 [056699]",
       "triage": {
         "decided_at": "2026-08-13T22:36:36.411510+00:00",
         "decision": "go",
@@ -41768,6 +42662,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000160799026000001/xslF345X06/form4-07172026_120732.xml"
     },
     "lead_a426ad19ef39ad20e97f4116e6b660e3": {
+      "content_updated_at": "2026-09-10T22:32:39.584012+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -41788,7 +42683,7 @@
       "source": "edgar:HIMX",
       "status": "parked",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-08-06",
+      "title": "HIMX 6-K filed 2026-08-06 [005288]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-31T05:31:34.386522+00:00",
@@ -42908,6 +43803,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000131606526000012/xslF345X06/wk-form4_1784048170.xml"
     },
     "lead_a9a12c2b8ad54e92dce8dc3afac2ecee": {
+      "content_updated_at": "2026-09-10T22:32:40.765524+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -42938,7 +43834,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-09-04",
+      "title": "LITE 4 filed 2026-09-04 [000009]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:35.032848+00:00",
@@ -43082,6 +43978,7 @@
       "url": "https://x.com/aleabitoreddit/status/2079622706572804368"
     },
     "lead_a9de791efdbd4c8c5571536f5d62d81e": {
+      "content_updated_at": "2026-09-10T22:32:39.584487+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -43102,7 +43999,7 @@
       "source": "edgar:HIMX",
       "status": "parked",
       "themes": {},
-      "title": "HIMX 20-F filed 2026-03-27",
+      "title": "HIMX 20-F filed 2026-03-27 [035507]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-31T05:31:34.113190+00:00",
@@ -43298,6 +44195,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171103526000002/xslF345X06/form4-07172026_120709.xml"
     },
     "lead_aa00cda139834f060a0d24b0245844ac": {
+      "content_updated_at": "2026-09-10T22:32:34.894550+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -43313,7 +44211,7 @@
       "source": "edgar:AMAT",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "AMAT 4 filed 2026-07-01",
+      "title": "AMAT 4 filed 2026-07-01 [046609]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -43331,6 +44229,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026046609/xslF345X06/wk-form4_1782940748.xml"
     },
     "lead_aa2866407b0c98500f424e294e833e03": {
+      "content_updated_at": "2026-09-10T22:32:37.440020+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -43359,7 +44258,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-01",
+      "title": "COHR 4 filed 2026-09-01 [001038]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:17.838683+00:00",
@@ -43530,6 +44429,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072936659369517341"
     },
     "lead_abcad31413719cc6d9d7050a03e4100e": {
+      "content_updated_at": "2026-09-10T22:32:44.970722+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -43559,7 +44459,7 @@
           ]
         }
       },
-      "title": "NVDA 10-Q filed 2026-08-26",
+      "title": "NVDA 10-Q filed 2026-08-26 [000075]",
       "triage": {
         "decided_at": "2026-08-26T22:37:02.034054+00:00",
         "decision": "go",
@@ -43572,6 +44472,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000075/nvda-20260726.htm"
     },
     "lead_ac19b6d0b592484acada292ba8525bfe": {
+      "content_updated_at": "2026-09-10T22:32:42.038553+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -43602,7 +44503,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-20",
+      "title": "META 4 filed 2026-08-20 [012726]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -44116,6 +45017,7 @@
       "url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories?gap=wdm_laser_16ch"
     },
     "lead_aef8632559fcf57c9fd942cd333e5a85": {
+      "content_updated_at": "2026-09-10T22:32:43.910299+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -44146,7 +45048,7 @@
       "source": "edgar:MTSI",
       "status": "parked",
       "themes": {},
-      "title": "MTSI 8-K filed 2026-08-06",
+      "title": "MTSI 8-K filed 2026-08-06 [000036]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -45312,6 +46214,7 @@
       "url": "https://x.com/aleabitoreddit/status/2076748688559587338"
     },
     "lead_b1ef391e297899ec152ece7f57547ade": {
+      "content_updated_at": "2026-09-10T22:32:44.970443+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -45343,7 +46246,7 @@
           ]
         }
       },
-      "title": "NVDA 8-K filed 2026-09-03",
+      "title": "NVDA 8-K filed 2026-09-03 [000078]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-03T22:36:14.158208+00:00",
@@ -46036,6 +46939,7 @@
       "url": "https://x.com/aleabitoreddit/status/2080379612736221325"
     },
     "lead_b4a3b997eb24ac512af213af8a885722": {
+      "content_updated_at": "2026-09-10T22:32:47.027898+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -46059,7 +46963,7 @@
           ]
         }
       },
-      "title": "TSLA 4 filed 2026-06-09",
+      "title": "TSLA 4 filed 2026-06-09 [071970]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -46352,6 +47256,7 @@
       "url": "https://x.com/aleabitoreddit/status/2094378666927239596"
     },
     "lead_b6bb90eec89726b178b323ca06e2c91e": {
+      "content_updated_at": "2026-09-10T22:32:38.804316+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -46377,7 +47282,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-08-31",
+      "title": "GOOGL 4 filed 2026-08-31 [377149]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:13.948610+00:00",
@@ -46557,6 +47462,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000206/xslF345X06/wk-form4_1785530603.xml"
     },
     "lead_b70448fbdb09a920d299afae967148ca": {
+      "content_updated_at": "2026-09-10T22:32:39.583876+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -46577,7 +47483,7 @@
       "source": "edgar:HIMX",
       "status": "parked",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-08-12",
+      "title": "HIMX 6-K filed 2026-08-12 [005436]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-31T05:31:34.680440+00:00",
@@ -46770,6 +47676,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012606/xslF345X06/ownership.xml"
     },
     "lead_b79863ea7b63f7fac47abf4b4c244d8a": {
+      "content_updated_at": "2026-09-10T22:32:34.894278+00:00",
       "entities": {
         "company_ids": [
           "co:applied_materials"
@@ -46800,7 +47707,7 @@
       "source": "edgar:AMAT",
       "status": "parked",
       "themes": {},
-      "title": "AMAT 10-Q filed 2026-08-20",
+      "title": "AMAT 10-Q filed 2026-08-20 [058235]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -46907,6 +47814,7 @@
       "url": "https://x.com/aleabitoreddit/status/2094298008955535500"
     },
     "lead_b8b6907dcdb7b1cb07a9eed1abcb7556": {
+      "content_updated_at": "2026-09-10T22:32:36.212297+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -46933,7 +47841,7 @@
       "source": "edgar:AXTI",
       "status": "parked",
       "themes": {},
-      "title": "AXTI 8-K filed 2026-07-30",
+      "title": "AXTI 8-K filed 2026-07-30 [025061]",
       "triage": {
         "decided_at": "2026-07-30T22:41:08.490373+00:00",
         "decision": "go",
@@ -47159,6 +48067,7 @@
       "url": "https://www.schaeffler.com/en/technology-innovation/technology/humanoid-robots/?wiring=robot_anchor_chain"
     },
     "lead_b9ea75681bdf1885d5d65218da043569": {
+      "content_updated_at": "2026-09-10T22:32:38.804218+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -47181,7 +48090,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-09-03",
+      "title": "GOOGL 4 filed 2026-09-03 [382328]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:32.004055+00:00",
@@ -47518,6 +48427,7 @@
       "url": "https://247wallst.com/investing/2026/08/17/axt-soars-again-on-monday-to-lead-optics-stocks-coherent-and-lumentum-rally-on-indium-phosphide-price-hikes/"
     },
     "lead_baf13ca0773a70940d289449b2d3d3e6": {
+      "content_updated_at": "2026-09-10T22:32:45.668140+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -47538,7 +48448,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-05-18",
+      "title": "POET 6-K filed 2026-05-18 [024093]",
       "triage": {
         "decided_at": "2026-08-15T06:38:20.315130+00:00",
         "decision": "go",
@@ -48035,6 +48945,7 @@
       "url": "https://eureka.patsnap.com/materials/ndfeb-robotics-material?decompose=gbd_tb"
     },
     "lead_be91fa7b4a0cc45b6f4d624445483836": {
+      "content_updated_at": "2026-09-10T22:32:38.110753+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -48065,7 +48976,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 4 filed 2026-08-24",
+      "title": "GFS 4 filed 2026-08-24 [000221]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-24T22:37:23.275402+00:00",
@@ -48180,7 +49091,41 @@
       },
       "url": "https://investors.mpmaterials.com/investor-news/news-details/2025/MP-Materials-and-Apple-Announce-500-Million-Partnership-to-Produce-Recycled-Rare-Earth-Magnets-in-the-United-States/default.aspx"
     },
+    "lead_bf15d126a1e462c989705e171e506c3c": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:32.745109+00:00",
+      "lead_id": "lead_bf15d126a1e462c989705e171e506c3c",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AAOI 4 filed 2026-09-10 [007059]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:22.163088+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:22.163088+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007059/xslF345X06/ownership.xml"
+    },
     "lead_bf2575dffd26407d059d9d6e0c958513": {
+      "content_updated_at": "2026-09-10T22:32:42.712849+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -48200,7 +49145,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 4 filed 2026-06-10",
+      "title": "MP 4 filed 2026-06-10 [000002]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:45.867297+00:00",
@@ -48313,6 +49258,7 @@
       "url": "https://github.com/local/robotics-sub-backfill?cluster=magnets"
     },
     "lead_c0d903fffe41657bd0ebd171471eed13": {
+      "content_updated_at": "2026-09-10T22:32:45.667860+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -48333,7 +49279,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-08-03",
+      "title": "POET 6-K filed 2026-08-03 [005153]",
       "triage": {
         "decided_at": "2026-08-15T06:38:20.563318+00:00",
         "decision": "go",
@@ -48922,8 +49868,8 @@
         "research_outcome": "self-trigger 未帶來新證據；維持 partial，外部一手背景支持供應緊缺，但核心 Citi／Lightmatter 原文仍缺。",
         "trace_attempts_ref": "2026-09-10：第二次 checkpoint 僅用來消化剛建立 watch 的 self-match；沒有新的外部文件。原研究已查 Citi／Lightmatter note、Lumentum FY2026 與 Sivers Q2／產能公告",
         "trace_next_trigger": "Citi 公開該 TMT note，或 Lightmatter 官方 recap／transcript 逐字呈現 lasers、fiber、NPO/CPO 時程與 supply constraint",
-        "trace_requeue_trigger": "event_watch:ew_0084_2026-09-09",
-        "trace_requeued_at": "2026-09-09T23:13:01.470417+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_2b2f52a2081a91572dd5a667abf9f948",
+        "trace_requeued_at": "2026-09-10T22:34:19.978321+00:00",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "AAOI",
@@ -48939,12 +49885,12 @@
           "co:macom",
           "co:sivers_semiconductors"
         ],
-        "trace_trigger_event_ref": "lead:lead_e6f2bbd1d5be38912659f700d625f4f8",
+        "trace_trigger_event_ref": "lead:lead_2b2f52a2081a91572dd5a667abf9f948",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0084_2026-09-09"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -48971,12 +49917,12 @@
           "decision_impact": "ranking",
           "reason": "若查證成立會改變瓶頸稀缺性排序"
         },
-        "decided_at": "2026-09-09T23:13:01.470417+00:00",
+        "decided_at": "2026-09-10T22:34:19.978321+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "Event Watch ew_0084_2026-09-09 已觸發（related_entity_signal；共用具名標的 SIVE, co:sivers_semiconductors；觸發 lead lead_e6f2bbd1d5be38912659f700d625f4f8）；由 consume-fired 排回 pq1 做 bounded 重查",
+        "reason": "Event Watch ew_0084_2026-09-09 觸發：新 triage PASS lead lead_2b2f52a2081a91572dd5a667abf9f948 與等待中的追源共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -48999,6 +49945,28 @@
               "novelty": true
             },
             "reason": "命中 LITE／AAOI／SIVE／COHR／MTSI／GLW 與雷射／光纖具名供應鏈，且有價格上調、70mW／800G 等可追查主張；目前僅 X 轉述與圖片，需追 Citi／公司原文。",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:19.978321+00:00",
+          "superseded_reason": "Event Watch ew_0084_2026-09-09 觸發：新 triage PASS lead lead_2b2f52a2081a91572dd5a667abf9f948 與等待中的追源共用具名標的 LITE, co:lumentum；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_2b2f52a2081a91572dd5a667abf9f948",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-09T22:37:12.260797+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "ranking",
+              "reason": "若查證成立會改變瓶頸稀缺性排序"
+            },
+            "decided_at": "2026-09-09T23:13:01.470417+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0084_2026-09-09 已觸發（related_entity_signal；共用具名標的 SIVE, co:sivers_semiconductors；觸發 lead lead_e6f2bbd1d5be38912659f700d625f4f8）；由 consume-fired 排回 pq1 做 bounded 重查",
             "tier": 4
           }
         }
@@ -49028,6 +49996,7 @@
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/iqe-galileo-seeen/?.tsrc=rss"
     },
     "lead_c3f2223f6b6fcce3d5e73fd0fa25d5af": {
+      "content_updated_at": "2026-09-10T22:32:45.668232+00:00",
       "entities": {
         "company_ids": [
           "co:poet_technologies"
@@ -49048,7 +50017,7 @@
       "source": "edgar:POET",
       "status": "parked",
       "themes": {},
-      "title": "POET 6-K filed 2026-05-15",
+      "title": "POET 6-K filed 2026-05-15 [003487]",
       "triage": {
         "decided_at": "2026-08-15T06:38:20.850251+00:00",
         "decision": "go",
@@ -49288,6 +50257,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026044741/xslF345X06/wk-form4_1782164283.xml"
     },
     "lead_c4880a725602f78dc035e4ae77667b3a": {
+      "content_updated_at": "2026-09-10T22:32:40.097588+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -49324,7 +50294,7 @@
           ]
         }
       },
-      "title": "JBL 10-Q filed 2026-06-30",
+      "title": "JBL 10-Q filed 2026-06-30 [046138]",
       "triage": {
         "decided_at": "2026-08-14T06:36:25.976526+00:00",
         "decision": "go",
@@ -49655,6 +50625,7 @@
       "url": "https://udn.com/news/story/7240/9715655"
     },
     "lead_c6254c77c2e1789ddbd6ab10c985733b": {
+      "content_updated_at": "2026-09-10T22:32:42.712583+00:00",
       "entities": {
         "company_ids": [
           "co:mp_materials"
@@ -49674,7 +50645,7 @@
       "source": "edgar:MP",
       "status": "parked",
       "themes": {},
-      "title": "MP 4 filed 2026-06-15",
+      "title": "MP 4 filed 2026-06-15 [000004]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-30T22:35:46.841076+00:00",
@@ -50324,6 +51295,7 @@
       "url": "https://x.com/aleabitoreddit/status/2078274370795954384"
     },
     "lead_c8441a91c1bd085c7424eeaf9f6a5f5b": {
+      "content_updated_at": "2026-09-10T22:32:37.439514+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -50354,7 +51326,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-04",
+      "title": "COHR 4 filed 2026-09-04 [001054]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:34.433180+00:00",
@@ -50372,6 +51344,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001054/xslF345X06/form4.xml"
     },
     "lead_c8aedcfeccfebd35b0baad3bf4be5225": {
+      "content_updated_at": "2026-09-10T22:32:34.199774+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -50402,7 +51375,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 10-Q filed 2026-08-06",
+      "title": "AEVA 10-Q filed 2026-08-06 [338179]",
       "triage": {
         "decided_at": "2026-08-15T22:33:59.014553+00:00",
         "decision": "go",
@@ -50415,6 +51388,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1789029/000119312526338179/aeva-20260630.htm"
     },
     "lead_c8cd04bab33205258807ea5513031487": {
+      "content_updated_at": "2026-09-10T22:32:43.237092+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -50445,7 +51419,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 4 filed 2026-08-03",
+      "title": "MRVL 4 filed 2026-08-03 [051905]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -51591,6 +52565,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072575509880512555"
     },
     "lead_cca515c744b6b10b891ffc0ae2a95ca2": {
+      "content_updated_at": "2026-09-10T22:32:32.745835+00:00",
       "entities": {
         "company_ids": [
           "co:applied_optoelectronics"
@@ -51623,7 +52598,7 @@
       "source": "edgar:AAOI",
       "status": "parked",
       "themes": {},
-      "title": "AAOI 4 filed 2026-08-12",
+      "title": "AAOI 4 filed 2026-08-12 [006272]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -51765,6 +52740,7 @@
       "url": "https://www.sivers-semiconductors.com/press/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-11/"
     },
     "lead_cd5eb60049242d32d1ed09dc91180487": {
+      "content_updated_at": "2026-09-10T22:32:38.804811+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -51790,7 +52766,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-08-27",
+      "title": "GOOGL 4 filed 2026-08-27 [371788]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:14.257273+00:00",
@@ -51808,6 +52784,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371788/xslF345X06/ownership.xml"
     },
     "lead_cd76b656370ae7a291e5de116bf5a679": {
+      "content_updated_at": "2026-09-10T22:32:44.456361+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -51838,7 +52815,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-07-28",
+      "title": "MU 4 filed 2026-07-28 [000013]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -52146,6 +53123,7 @@
       "url": "https://x.com/aleabitoreddit/status/2083133191112843575"
     },
     "lead_cf99032c1efe3a6feab880c2e9d0bb14": {
+      "content_updated_at": "2026-09-10T22:32:46.337702+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -52176,7 +53154,7 @@
       "source": "edgar:TSEM",
       "status": "parked",
       "themes": {},
-      "title": "TSEM 6-K filed 2026-08-12",
+      "title": "TSEM 6-K filed 2026-08-12 [004045]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T16:05:59.208377+00:00",
@@ -52750,6 +53728,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026055726/lite-20260811.htm"
     },
     "lead_d155cb2cd9abb44170b783a7e37ce838": {
+      "content_updated_at": "2026-09-10T22:32:47.709324+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -52771,7 +53750,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000656]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:26.909889+00:00",
@@ -52954,6 +53933,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072741541404406008"
     },
     "lead_d248abb3982f975a435d1c63cc7ca496": {
+      "content_updated_at": "2026-09-10T22:32:44.970347+00:00",
       "entities": {
         "company_ids": [
           "co:nvidia"
@@ -52984,7 +53964,7 @@
           ]
         }
       },
-      "title": "NVDA 4 filed 2026-09-04",
+      "title": "NVDA 4 filed 2026-09-04 [000009]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:35.338756+00:00",
@@ -53573,6 +54553,7 @@
       "url": "https://x.com/aleabitoreddit/status/2073467493998555192"
     },
     "lead_d56b464aec0b15d2ab5cd6f4d836fc6f": {
+      "content_updated_at": "2026-09-10T22:32:38.110572+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -53603,7 +54584,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 4 filed 2026-08-28",
+      "title": "GFS 4 filed 2026-08-28 [000227]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:45.908233+00:00",
@@ -53621,6 +54602,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000227/xslF345X06/wk-form4_1787949262.xml"
     },
     "lead_d5cdc2de416d8ec6c979742bcd570708": {
+      "content_updated_at": "2026-09-10T22:32:39.584580+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -53636,7 +54618,7 @@
       "source": "edgar:HIMX",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-02-12",
+      "title": "HIMX 6-K filed 2026-02-12 [000763]",
       "triage": {
         "decided_at": "2026-08-31T05:31:50.118089+00:00",
         "decision": "no_go",
@@ -53692,6 +54674,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077217140042760358"
     },
     "lead_d5f5d236895081d43904ff6501af8e0e": {
+      "content_updated_at": "2026-09-10T22:32:43.910577+00:00",
       "entities": {
         "company_ids": [
           "co:macom"
@@ -53707,7 +54690,7 @@
       "source": "edgar:MTSI",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "MTSI 4 filed 2026-05-21",
+      "title": "MTSI 4 filed 2026-05-21 [000317]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -53926,6 +54909,7 @@
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1091301/iqe-seals-13m-equity-raise-as-it-works-to-complete-larger-funding-package-1091301.html?.tsrc=rss"
     },
     "lead_d710334801beece520ec2c7f9ac2ab25": {
+      "content_updated_at": "2026-09-10T22:32:43.236821+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -53949,7 +54933,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 8-K filed 2026-08-19",
+      "title": "MRVL 8-K filed 2026-08-19 [356217]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -54629,6 +55613,7 @@
       "url": "https://x.com/aleabitoreddit/status/2078119073741971893"
     },
     "lead_daed54b63799e4c4821e4eaca55bc4ae": {
+      "content_updated_at": "2026-09-10T22:32:40.765987+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -54667,7 +55652,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-08-27",
+      "title": "LITE 4 filed 2026-08-27 [000008]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:36.824520+00:00",
@@ -55299,6 +56284,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077406548012466390"
     },
     "lead_df6fc939b25f3b14e1fbb4d1b3e32731": {
+      "content_updated_at": "2026-09-10T22:32:39.584111+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -55314,7 +56300,7 @@
       "source": "edgar:HIMX",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-07-01",
+      "title": "HIMX 6-K filed 2026-07-01 [004416]",
       "triage": {
         "decided_at": "2026-08-31T05:31:51.245522+00:00",
         "decision": "no_go",
@@ -55325,6 +56311,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326004416/f6k_070126.htm"
     },
     "lead_df8768dd263a4c8dd999f11abe902c8c": {
+      "content_updated_at": "2026-09-10T22:32:47.027807+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -55348,7 +56335,7 @@
           ]
         }
       },
-      "title": "TSLA 4 filed 2026-06-17",
+      "title": "TSLA 4 filed 2026-06-17 [075213]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -55530,6 +56517,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074159948523860147"
     },
     "lead_e06ae19be285787dd07e690fd6cb0abf": {
+      "content_updated_at": "2026-09-10T22:32:47.027620+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -55553,7 +56541,7 @@
           ]
         }
       },
-      "title": "TSLA 8-K filed 2026-07-22",
+      "title": "TSLA 8-K filed 2026-07-22 [049213]",
       "triage": {
         "decided_at": "2026-08-14T06:36:24.640208+00:00",
         "decision": "no_go",
@@ -55564,6 +56552,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1318605/000162828026049213/tsla-20260722.htm"
     },
     "lead_e0e2b31dddb62a3a1f5b4b75b9e2283e": {
+      "content_updated_at": "2026-09-10T22:32:38.804906+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -55583,7 +56572,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-08-27",
+      "title": "GOOGL 4 filed 2026-08-27 [371785]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:14.542960+00:00",
@@ -55760,6 +56749,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326012607/xslF345X06/ownership.xml"
     },
     "lead_e11e6bf3708003d280916a6fea59f549": {
+      "content_updated_at": "2026-09-10T22:32:41.502270+00:00",
       "entities": {
         "company_ids": [
           "co:lam_research"
@@ -55786,7 +56776,7 @@
       "source": "edgar:LRCX",
       "status": "parked",
       "themes": {},
-      "title": "LRCX 4 filed 2026-09-03",
+      "title": "LRCX 4 filed 2026-09-03 [000006]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-03T22:36:15.210151+00:00",
@@ -56034,6 +57024,7 @@
       "url": "https://x.com/aleabitoreddit/status/2086304269943419276"
     },
     "lead_e28829cbe06215f29a34c994db872362": {
+      "content_updated_at": "2026-09-10T22:32:44.456271+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -56064,7 +57055,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-07-28",
+      "title": "MU 4 filed 2026-07-28 [000014]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -56082,6 +57073,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/723125/000124265426000014/xslF345X06/primarydocument.xml"
     },
     "lead_e2f0b3abb687d9fcc8a9667cf04091e0": {
+      "content_updated_at": "2026-09-10T22:32:44.456448+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -56112,7 +57104,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-07-27",
+      "title": "MU 4 filed 2026-07-27 [000005]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -56213,6 +57205,7 @@
       "url": "https://x.com/aleabitoreddit/status/2076847779037790620"
     },
     "lead_e41f44f7b1c507fdd965e34899202c43": {
+      "content_updated_at": "2026-09-10T22:32:38.110479+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -56235,7 +57228,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 4 filed 2026-09-04",
+      "title": "GFS 4 filed 2026-09-04 [000230]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:34.732347+00:00",
@@ -56253,6 +57246,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000230/xslF345X06/wk-form4_1788553011.xml"
     },
     "lead_e43bbbebc27c5bacc0a2ab090629b278": {
+      "content_updated_at": "2026-09-10T22:32:37.439836+00:00",
       "entities": {
         "company_ids": [
           "co:coherent"
@@ -56281,7 +57275,7 @@
           ]
         }
       },
-      "title": "COHR 4 filed 2026-09-01",
+      "title": "COHR 4 filed 2026-09-01 [001040]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:22.122548+00:00",
@@ -56416,6 +57410,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000164823126000004/xslF345X06/form4-07172026_120753.xml"
     },
     "lead_e530c84ac4d95741430cd21a813d8942": {
+      "content_updated_at": "2026-09-10T22:32:38.110842+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -56446,7 +57441,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 4 filed 2026-08-20",
+      "title": "GFS 4 filed 2026-08-20 [058190]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -56697,6 +57692,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826004885/aaoi_8k.htm"
     },
     "lead_e5c642239fefa5ac4b912d2d10a5c866": {
+      "content_updated_at": "2026-09-10T22:32:42.038823+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -56727,7 +57723,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-18",
+      "title": "META 4 filed 2026-08-18 [012609]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -56941,6 +57937,7 @@
       "url": "https://x.com/aleabitoreddit/status/2073867745243127973"
     },
     "lead_e5f4ae45354e9de33bef221952491fd4": {
+      "content_updated_at": "2026-09-10T22:32:47.027713+00:00",
       "entities": {
         "company_ids": [
           "co:tesla"
@@ -56964,7 +57961,7 @@
           ]
         }
       },
-      "title": "TSLA 8-K filed 2026-07-02",
+      "title": "TSLA 8-K filed 2026-07-02 [046717]",
       "triage": {
         "decided_at": "2026-08-14T06:36:24.852591+00:00",
         "decision": "no_go",
@@ -57341,6 +58338,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-welcomes-the-nomination-of-new-board-members-joakim-nideborn-and-helena-svancar-83998a2b"
     },
     "lead_e81f027f56717723558a60ab41113825": {
+      "content_updated_at": "2026-09-10T22:32:40.765896+00:00",
       "entities": {
         "company_ids": [
           "co:lumentum"
@@ -57379,7 +58377,7 @@
           ]
         }
       },
-      "title": "LITE 4 filed 2026-08-27",
+      "title": "LITE 4 filed 2026-08-27 [000007]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-29T00:08:37.098303+00:00",
@@ -57937,6 +58935,7 @@
       "url": "https://newsletter.semianalysis.com/p/tpuv7-google-takes-a-swing-at-the?decompose=ici_optics"
     },
     "lead_e8cef605c60f6b36ad82feb2849600e4": {
+      "content_updated_at": "2026-09-10T22:32:34.199597+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -57966,7 +58965,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 4 filed 2026-08-12",
+      "title": "AEVA 4 filed 2026-08-12 [347443]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -58165,6 +59164,7 @@
       "url": "https://x.com/aleabitoreddit/status/2081581943142167034"
     },
     "lead_ea08e69759d09645010dd6d10b092b10": {
+      "content_updated_at": "2026-09-10T22:32:39.584299+00:00",
       "entities": {
         "company_ids": [
           "co:himax"
@@ -58180,7 +59180,7 @@
       "source": "edgar:HIMX",
       "status": "triaged_no_go",
       "themes": {},
-      "title": "HIMX 6-K filed 2026-05-07",
+      "title": "HIMX 6-K filed 2026-05-07 [003108]",
       "triage": {
         "decided_at": "2026-08-31T05:31:50.682646+00:00",
         "decision": "no_go",
@@ -58191,6 +59191,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1342338/000117184326003108/f6k_050726.htm"
     },
     "lead_ea2fd285d490a695264e1452765ecc28": {
+      "content_updated_at": "2026-09-10T22:32:35.408923+00:00",
       "entities": {
         "company_ids": [
           "co:broadcom"
@@ -58225,7 +59226,7 @@
           ]
         }
       },
-      "title": "AVGO 8-K filed 2026-09-02",
+      "title": "AVGO 8-K filed 2026-09-02 [000076]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-02T22:37:09.245708+00:00",
@@ -58428,6 +59429,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000119312526208972/d57080d8k.htm"
     },
     "lead_ebb5f32204da8a8530ca60eca23e9604": {
+      "content_updated_at": "2026-09-10T22:32:47.709781+00:00",
       "entities": {
         "company_ids": [
           "co:tsmc"
@@ -58449,7 +59451,7 @@
       "source": "edgar:TSM",
       "status": "parked",
       "themes": {},
-      "title": "TSM 4 filed 2026-09-09",
+      "title": "TSM 4 filed 2026-09-09 [000648]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-09T22:37:29.578995+00:00",
@@ -58491,6 +59493,7 @@
       "url": "https://x.com/aleabitoreddit/status/2084388023689679001"
     },
     "lead_ec22223e9d6a2ff8e896e8c881d01dad": {
+      "content_updated_at": "2026-09-10T22:32:40.097773+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -58514,7 +59517,7 @@
           ]
         }
       },
-      "title": "JBL 4 filed 2026-05-04",
+      "title": "JBL 4 filed 2026-05-04 [004910]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -58531,6 +59534,39 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004910/xslF345X06/doc4.xml"
     },
+    "lead_ec439978dbc1e212e509da1914aea41e": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:32.745347+00:00",
+      "lead_id": "lead_ec439978dbc1e212e509da1914aea41e",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "AAOI 8-K filed 2026-09-10 [007057]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:35:01.229727+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "Applied Optoelectronics 新重大事件申報與追蹤標的相關，先確認事件內容再判有無結構增量。"
+        },
+        "decided_at": "2026-09-10T22:35:01.229727+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Applied Optoelectronics 新重大事件申報與追蹤標的相關，先確認事件內容再判有無結構增量。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007057/aaoi_8k.htm"
+    },
     "lead_ec5da7de15f538edef3b6b1d4c062632": {
       "entities": {
         "company_ids": [],
@@ -58542,25 +59578,25 @@
       "refs": {
         "gap": "Davisson assembly／test 由 TSMC 內部或 ASE／SPIL 承作仍無具名一手",
         "original_claim_status": "Broadcom 官方確認 substrate-level 多晶片 CPO packaging；未具名 Davisson 的 OSAT",
-        "parked_reason": "Davisson 的 assembly／test 由 TSMC 內部或 ASE／SPIL 承作仍無具名一手，觸發條件未命中。⚠ 本輪的共同發現：這批 decompose 產生的層缺口 lead 全部卡在**同一個結構性事實**——鏈條頂端的客戶（TSMC／NVIDIA／Broadcom／Google）在最有理由具名供應商的場合仍不具名（[317] 已就 TSMC 做出此判定：2026-08-31 其先進封裝副總公開點名 CPO 四大瓶頸卻不點名任何供應商）。因此『再搜一次』對這類缺口沒有期望值，本輪不投搜尋預算；能翻轉它們的只有對方主動發文件。",
+        "parked_reason": "Broadcom 10-Q 未具名 Davisson OSAT，不從其他陣營供應商反推。",
         "primary_url": "https://www.broadcom.com/info/optics/cpo",
-        "research_outcome": "OSAT 欄位維持 unknown，不把同一生態系名單推成產品供應關係",
+        "research_outcome": "Broadcom 10-Q 未具名 Davisson OSAT，不從其他陣營供應商反推。",
         "research_run": "session:2026-08-30-loop2-r4",
         "storage_permission": "repo_excerpt",
-        "trace_attempts_ref": "2026-09-09 research-drain：確認觸發條件未命中",
-        "trace_next_trigger": "Broadcom、TSMC、ASE 或 SPIL 一手文件具名 Davisson assembly／test 分工",
+        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
+        "trace_next_trigger": "Broadcom 或 OSAT 客戶一手文件具名確認 Davisson 封裝供應者",
         "trace_origin_entity": "Broadcom",
         "trace_origin_linkage": "Broadcom CPO 官方頁只列生態系標誌；NVIDIA 公告雖列 SPIL，未綁定 Davisson",
-        "trace_requeue_trigger": "event_watch:ew_0054_2026-08-31",
-        "trace_requeued_at": "2026-09-09T00:59:16.088432+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_721a96cd48f28b4c0aa3b0d96426c9b7",
+        "trace_requeued_at": "2026-09-10T22:34:23.574427+00:00",
         "trace_requires_user": "false",
-        "trace_status": "awaiting_named_disclosure",
+        "trace_status": "partial",
         "trace_trigger_entities": [
           "AVGO",
           "TSM",
           "3711.TW"
         ],
-        "trace_trigger_event_ref": "lead:lead_ea2fd285d490a695264e1452765ecc28",
+        "trace_trigger_event_ref": "lead:lead_721a96cd48f28b4c0aa3b0d96426c9b7",
         "trace_trigger_kind": "primary_source_signal",
         "trace_trigger_watch_ref": "ew_0054_2026-08-31"
       },
@@ -58584,10 +59620,10 @@
           "decision_impact": "candidate_set",
           "reason": "decompose 未知層"
         },
-        "decided_at": "2026-09-09T00:59:16.088432+00:00",
+        "decided_at": "2026-09-10T22:34:23.574427+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0054_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
+        "reason": "Event Watch ew_0054_2026-08-31 觸發：新 triage PASS lead lead_721a96cd48f28b4c0aa3b0d96426c9b7 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
         "tier": 1
       },
       "triage_history": [
@@ -58628,6 +59664,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0054_2026-08-31 觸發：新 triage PASS lead lead_ea2fd285d490a695264e1452765ecc28 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
+            "tier": 1
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-10T22:34:23.574427+00:00",
+          "superseded_reason": "Event Watch ew_0054_2026-08-31 觸發：新 triage PASS lead lead_721a96cd48f28b4c0aa3b0d96426c9b7 與等待中的追源共用具名標的 AVGO, co:broadcom；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_721a96cd48f28b4c0aa3b0d96426c9b7",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-30T07:21:57.668136+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "decompose 未知層"
+            },
+            "decided_at": "2026-09-09T00:59:16.088432+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0054_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AVGO, co:broadcom；觸發 lead lead_ea2fd285d490a695264e1452765ecc28）；由 consume-fired 排回 pq1 做 bounded 重查",
             "tier": 1
           }
         }
@@ -58761,6 +59817,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077423269066784942"
     },
     "lead_ecf6a75f8cf51b5754d672b3db281d50": {
+      "content_updated_at": "2026-09-10T22:32:40.097403+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -58784,7 +59841,7 @@
           ]
         }
       },
-      "title": "JBL 4 filed 2026-07-17",
+      "title": "JBL 4 filed 2026-07-17 [006639]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -58957,6 +60014,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005948/xslF345X06/ownership.xml"
     },
     "lead_eea44f3ae623397f4f337620ce0e1c41": {
+      "content_updated_at": "2026-09-10T22:32:36.920827+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -58991,7 +60049,7 @@
           ]
         }
       },
-      "title": "CCXI 8-K filed 2026-07-14",
+      "title": "CCXI 8-K filed 2026-07-14 [077978]",
       "triage": {
         "decided_at": "2026-08-11T05:13:15.053699+00:00",
         "decision": "go",
@@ -59005,6 +60063,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026077978/ea0297923-8k425_churchill11.htm"
     },
     "lead_eede896d2f8835aad9f4c315755960a0": {
+      "content_updated_at": "2026-09-10T22:32:33.427076+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -59029,7 +60088,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-09-03",
+      "title": "AEHR 4 filed 2026-09-03 [000265]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:31.410410+00:00",
@@ -59184,6 +60243,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000162828026057358/lite-20260627.htm"
     },
     "lead_efaed6f7fca48768336da263c8150d0e": {
+      "content_updated_at": "2026-09-10T22:32:35.409116+00:00",
       "entities": {
         "company_ids": [
           "co:broadcom"
@@ -59207,7 +60267,7 @@
           ]
         }
       },
-      "title": "AVGO 4 filed 2026-07-14",
+      "title": "AVGO 4 filed 2026-07-14 [000070]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -59329,6 +60389,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/microelectronics-commons-strengthens-commitment-to-sivers-semiconductors-with-year-2-funding-8ddd55df"
     },
     "lead_f05f3fd8a753c084704afc3b06330a47": {
+      "content_updated_at": "2026-09-10T22:32:36.212670+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -59348,7 +60409,7 @@
       "source": "edgar:AXTI",
       "status": "applied",
       "themes": {},
-      "title": "AXTI 8-K filed 2026-07-08",
+      "title": "AXTI 8-K filed 2026-07-08 [022984]",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713749+00:00",
         "decision": "go",
@@ -59405,6 +60466,7 @@
       "url": "https://x.com/aleabitoreddit/status/2077437150715666900"
     },
     "lead_f0daf2ddb446375c532977e1b5830701": {
+      "content_updated_at": "2026-09-10T22:32:38.804410+00:00",
       "entities": {
         "company_ids": [
           "co:google"
@@ -59424,7 +60486,7 @@
       "source": "edgar:GOOGL",
       "status": "parked",
       "themes": {},
-      "title": "GOOGL 4 filed 2026-08-27",
+      "title": "GOOGL 4 filed 2026-08-27 [371799]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:14.832992+00:00",
@@ -59442,6 +60504,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526371799/xslF345X06/ownership.xml"
     },
     "lead_f0ee13549fb9a8fbd348f8282b221680": {
+      "content_updated_at": "2026-09-10T22:32:40.097862+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -59465,7 +60528,7 @@
           ]
         }
       },
-      "title": "JBL 4 filed 2026-04-29",
+      "title": "JBL 4 filed 2026-04-29 [004703]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -59483,6 +60546,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/898293/000122520826004703/xslF345X06/doc4.xml"
     },
     "lead_f1018c2c5b37d811292d3f3fe1fb29c7": {
+      "content_updated_at": "2026-09-10T22:32:34.199865+00:00",
       "entities": {
         "company_ids": [
           "co:aeva"
@@ -59513,7 +60577,7 @@
       "source": "edgar:AEVA",
       "status": "parked",
       "themes": {},
-      "title": "AEVA 8-K filed 2026-08-05",
+      "title": "AEVA 8-K filed 2026-08-05 [335102]",
       "triage": {
         "decided_at": "2026-08-15T22:33:59.245264+00:00",
         "decision": "go",
@@ -59846,6 +60910,7 @@
       "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026048546/xslF345X06/wk-form4_1784242364.xml"
     },
     "lead_f1cf205e2c5d75400f98dea3391b1e3b": {
+      "content_updated_at": "2026-09-10T22:32:36.920496+00:00",
       "entities": {
         "company_ids": [
           "co:churchill_capital_xi"
@@ -59883,7 +60948,7 @@
           ]
         }
       },
-      "title": "CCXI S-4 filed 2026-09-04",
+      "title": "CCXI S-4 filed 2026-09-04 [097764]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-04T22:38:34.138522+00:00",
@@ -60002,6 +61067,7 @@
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-uppdaterar-sin-finansiella-kalender/"
     },
     "lead_f2a05f8ffbc3ad014140a10c39cbfe58": {
+      "content_updated_at": "2026-09-10T22:32:40.097682+00:00",
       "entities": {
         "company_ids": [
           "co:jabil"
@@ -60045,7 +61111,7 @@
           ]
         }
       },
-      "title": "JBL 8-K filed 2026-06-17",
+      "title": "JBL 8-K filed 2026-06-17 [043719]",
       "triage": {
         "decided_at": "2026-08-25T22:36:11.305861+00:00",
         "decision": "go",
@@ -60158,6 +61224,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072726120706007465"
     },
     "lead_f3d1d9e1cb09216d66e7b894cdaec4d3": {
+      "content_updated_at": "2026-09-10T22:32:42.038462+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -60188,7 +61255,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-20",
+      "title": "META 4 filed 2026-08-20 [012727]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -60271,6 +61338,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077422416482250990"
+    },
+    "lead_f4387005bbc0d5135033574762a6197c": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-09-10T22:32:38.110339+00:00",
+      "lead_id": "lead_f4387005bbc0d5135033574762a6197c",
+      "published_at": "2026-09-10",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-09-10 [061371]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T22:34:20.290083+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "insider_transaction",
+          "decision_impact": "confidence_only",
+          "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。"
+        },
+        "decided_at": "2026-09-10T22:34:20.290083+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "已追蹤發行人的具體 SEC 內部人申報可逐字查核；新文件寬鬆放行，僅增加持股交易脈絡，不提高結構排序。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026061371/xslF345X06/wk-form4_1789072130.xml"
     },
     "lead_f46f2008ddd3e1d7f2629a34dbd95207": {
       "entities": {
@@ -60843,6 +61943,7 @@
       "url": "https://x.com/aleabitoreddit/status/2088947694886920409"
     },
     "lead_f6d7fdd6bff7d38b4edf021c49835f5f": {
+      "content_updated_at": "2026-09-10T22:32:36.212579+00:00",
       "entities": {
         "company_ids": [
           "co:axt"
@@ -60860,7 +61961,7 @@
       "source": "edgar:AXTI",
       "status": "parked",
       "themes": {},
-      "title": "AXTI 8-K filed 2026-07-22",
+      "title": "AXTI 8-K filed 2026-07-22 [024184]",
       "triage": {
         "decided_at": "2026-07-25T03:52:34.713753+00:00",
         "decision": "go",
@@ -60911,6 +62012,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072242322688057579"
     },
     "lead_f7021b526cbad34684b3c5580e8fdea7": {
+      "content_updated_at": "2026-09-10T22:32:46.337608+00:00",
       "entities": {
         "company_ids": [
           "co:tower_semiconductor"
@@ -60941,7 +62043,7 @@
       "source": "edgar:TSEM",
       "status": "parked",
       "themes": {},
-      "title": "TSEM 4 filed 2026-08-12",
+      "title": "TSEM 4 filed 2026-08-12 [000719]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T12:24:04.421886+00:00",
@@ -61488,9 +62590,15 @@
       "first_seen": "2026-09-10T10:37:31.736727+00:00",
       "lead_id": "lead_f8c1017d1e9ef8ec25021c252a8597a5",
       "published_at": "2026-09-09",
-      "refs": {},
+      "refs": {
+        "action_digest": "ba2826ff6065b48d93c6c745172c01d7774e6465df2a395451881d99e5564efd",
+        "focus_company_id": "co:globalfoundries",
+        "research_action_id": "ra_21602c2e352aa346b9c106224bbc44c4",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
       "source": "web:globenewswire",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "GF 與 Monolithic Power Systems 簽長期製造協議（2026-09-09）：MPS 專有製程導入 GF 新加坡 300mm 廠，2027 年初量產；終端含汽車、工業機器人與 AI／雲的 smart power stage。無金額／產能／最低採購量",
       "triage": {
@@ -61544,6 +62652,7 @@
       "url": "https://x.com/aleabitoreddit/status/2076232450121118133"
     },
     "lead_f97a2c6b2da5a8c2e46dd17a6c441ccd": {
+      "content_updated_at": "2026-09-10T22:32:43.237185+00:00",
       "entities": {
         "company_ids": [
           "co:marvell_technology"
@@ -61574,7 +62683,7 @@
       "source": "edgar:MRVL",
       "status": "parked",
       "themes": {},
-      "title": "MRVL 4 filed 2026-07-16",
+      "title": "MRVL 4 filed 2026-07-16 [048556]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -61708,6 +62817,7 @@
       "url": "https://x.com/aleabitoreddit/status/2072616481846898782"
     },
     "lead_fa51013e283073a404520da8dbb0cd90": {
+      "content_updated_at": "2026-09-10T22:32:42.038368+00:00",
       "entities": {
         "company_ids": [
           "co:meta"
@@ -61738,7 +62848,7 @@
       "source": "edgar:META",
       "status": "parked",
       "themes": {},
-      "title": "META 4 filed 2026-08-20",
+      "title": "META 4 filed 2026-08-20 [012729]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -61978,6 +63088,7 @@
       "url": "https://mfn.se/cis/a/sivers-semiconductors/all-space-awards-8-2m-production-order-to-sivers-semiconductors-for-ka-band-beamforming-ics-c26f39e4"
     },
     "lead_fbc7f9da43d7ef918aa4f4349a73d15a": {
+      "content_updated_at": "2026-09-10T22:32:44.456179+00:00",
       "entities": {
         "company_ids": [
           "co:micron_technology"
@@ -62008,7 +63119,7 @@
       "source": "edgar:MU",
       "status": "parked",
       "themes": {},
-      "title": "MU 4 filed 2026-08-20",
+      "title": "MU 4 filed 2026-08-20 [000003]",
       "triage": {
         "classification": {
           "classified_at": "2026-08-21T22:36:12.143882+00:00",
@@ -62488,6 +63599,7 @@
       "url": "https://x.com/aleabitoreddit/status/2074587024959709419"
     },
     "lead_fef083d0d0a5733547cfea3cc87fe310": {
+      "content_updated_at": "2026-09-10T22:32:33.427389+00:00",
       "entities": {
         "company_ids": [
           "co:aehr_test_systems"
@@ -62507,7 +63619,7 @@
       "source": "edgar:AEHR",
       "status": "parked",
       "themes": {},
-      "title": "AEHR 4 filed 2026-08-14",
+      "title": "AEHR 4 filed 2026-08-14 [000259]",
       "triage": {
         "classification": {
           "classified_at": "2026-09-01T22:36:18.843207+00:00",
@@ -62767,8 +63879,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2097815176838017066",
-      "updated_at": "2026-09-09T22:33:10.330604+00:00",
+      "since_id": "2098031064002535908",
+      "updated_at": "2026-09-10T22:32:31.081787+00:00",
       "user_id": "1940360837547565056"
     }
   }
