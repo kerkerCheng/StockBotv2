@@ -8201,10 +8201,11 @@
       "added_at": "2026-09-07T08:33:43.898646+00:00",
       "hint": "Coverage Pilot 刻意停在這裡。IQE FY2025 年報查核報告該段為雙欄重疊排版，可逐字讀出的只有兩件事：(a) 查核人員評估過「償還既有 loan notes 與 facilities 所需的再融資」是否構成 material uncertainty；(b)「We inspected confirmation of the waiver of the December 2025 covenant requirements by the Group's lenders in that month」。**是否實際出具 material uncertainty 陳述無法判定**——依 L11-1（具體審計術語的措辭精度本身就是一個 claim）不得推論。在那個問題解決前對一家上一個報告期才被債權人豁免 covenant 的公司做盈餘預測，正是 L11-2 記過的「對外部 claim 嚴、對自己引用鬆」。go 之後要做的：重抽查核報告該段（單欄或改用 pdfminer layout 模式）、讀 going concern note、把 CLN／RCF 的到期與 covenant 條款寫成 Engine C 觀測，然後才決定要不要建 OperatingAssumption。⚠ 即使做完，估值層仍會 fail closed（虧損公司無可用 method）——本項買的是「我知道 IQE 的財務狀況」，不是 fair value。",
       "n": 486,
-      "reason": null,
+      "reason": "bounded research 完成：pdfminer layout 取得查核報告逐字，going concern 結論已可核實（無 material uncertainty；2026-05-28 募資完成後查核人員同意不構成重大判斷）。Engine C 寫入提案另鑄 [507]",
+      "receipt": "authority:research_packet;ref:iqe_ar2025_audit_pdfminer",
       "ref_id": "engine_c://manual_observation/IQE.L#debt_maturity_and_covenants",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T04:54:19.500875+00:00",
       "source": "manual",
       "title": "IQE.L 流動性／going-concern 評估，作為建立 forward view 的前置",
       "type": "manual"
@@ -8524,6 +8525,18 @@
       "resolved_at": null,
       "source": "manual",
       "title": "圖中三組名稱逐字相同的實體需合併存量——registry 已登記，但它只改未來的抽取",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T04:54:13.269657+00:00",
+      "hint": "[486] 的 bounded research 完成。原本卡住的原因是**格式不是研究**：IQE FY2025 年報查核報告為雙欄排版，pypdf 按內容流順序吐字會把兩欄交錯（抽出來長成『IQIQE EA Annnnuuaal lR Reeppoorrtt』），逐字引用因此不可用。2026-09-10 裝入 pdfminer.six 並以 LAParams 還原版面後，該段完整可讀。\n\n⚠ **結論與先前的假設相反，方向是正面的**（L11-2：別對外部 claim 嚴、對自己引用鬆——先前因為讀不到而傾向假設有問題，實際一手證據顯示沒有）：\n\n逐字（KPMG 查核報告，IQE Annual Report and Accounts 2025，Independent Auditor's Report，本機 library/private/iqe_ar2025_audit_pdfminer.txt）：\n① 董事結論：『The directors have concluded that it is appropriate to adopt the going concern basis of preparation and that **no material uncertainty exists** for the Group and parent Company for the reasons set out in note 2.2.』\n② 查核人員規劃階段：『we considered that the requirement to raise financing to repay existing loan notes and facilities was a condition that **could have given rise to** a material uncertainty』——注意措辭是 could have，不是 did（L11-1）。\n③ 查核人員最終結論：『the Group **completed their fundraising on 28 May 2026**. In conducting our final audit work, we reassessed the level of risk relating to the directors' conclusion. As a result, we reassessed the risk to our audit and **agree with the directors that the assessment of the going concern is not a significant judgement in these financial statements.**』\n\nnote 2.2 的 base case 逐字（可寫成觀測的結構化數字）：\n• Fundraising 用於償還既有 CLN 與銀行債務，時點 Q2 FY26\n• 流動性 headroom：2025-12 £11.7m → 2026-05 £6.1m（募資到位前的低點）→ 之後最低 £34.0m\n• base case 假設：2026 與 H1 2027 營收成長至少 20%、GBP:USD 1.34、直接晶圓產品毛利率與 2025 實績大致持平、capex 2026 與 H1 2027 各為 mid-single digit £ millions\n• severe but plausible downside：營收較 base case 下修 H1 2026 −9%、H2 2026 −20%、H1 2027 −24%，且無任何緩解措施\n\ngo＝把上述寫入 Engine C append-only ledger，欄位 `debt_maturity_and_covenants`（config/engine_c_observation_fields.json 標為 **judgment**，故維持 pq2；`runway_inputs` 雖是 mechanical，但它的定義是現金／總債／FCF TTM，把 liquidity headroom 塞進去是欄位濫用，不做）。as_of=2025-12-31。不含入圖、不含 thesis mutation、不含 live。\n\n⚠ 完成後 IQE 的估值層**仍會 fail closed**（虧損公司無可用 method）——本項買的是「我知道 IQE 的財務狀況」，不是 fair value。這一點與 [486] 原始 hint 一致，沒有改變。\n⚠ 下一個可查的缺口：2026-05-28 的 fundraising 條款（金額、稀釋、CLN 清償是否全額）。手邊 library/private/iqe_rns_texts.json 的 placing_results 提到 loan note 3 次，但尚未逐字核對——那是另一份 bounded research，不佔本編號。",
+      "n": 507,
+      "reason": null,
+      "ref_id": "iqe_going_concern_observation_20260910",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "IQE.L going-concern 結論已取得一手逐字——待寫入 Engine C（debt_maturity_and_covenants）",
       "type": "manual"
     }
   ],
@@ -18694,8 +18707,17 @@
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
       "type": "decision_review",
       "verb": "drop"
+    },
+    {
+      "at": "2026-09-10T04:54:19.500875+00:00",
+      "n": 486,
+      "reason": "bounded research 完成：pdfminer layout 取得查核報告逐字，going concern 結論已可核實（無 material uncertainty；2026-05-28 募資完成後查核人員同意不構成重大判斷）。Engine C 寫入提案另鑄 [507]",
+      "receipt": "authority:research_packet;ref:iqe_ar2025_audit_pdfminer",
+      "ref_id": "engine_c://manual_observation/IQE.L#debt_maturity_and_covenants",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 507,
+  "next_n": 508,
   "schema_version": "1"
 }
