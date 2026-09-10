@@ -8747,6 +8747,18 @@
       "source": "engine_c",
       "title": "Engine C 觀測：6594.T / litigation_and_audit_flags",
       "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-10T09:46:19.679429+00:00",
+      "hint": "go＝執行 `python -m alpha abstention MP --add library/private/alpha/abstention_proposals/MP_forward_pe.json`，把這一格從段5 工單上拿掉並標為 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：內部 FY2026 GAAP EPS -0.2685 與同期共識 EPS -0.00374 都是負的，市場倍數在該期間不存在；現有 forward_pe 60.63x 是用 +1y（FY2027）共識算的，拿來當 FY2026 校準倍數會混年度。｜drop＝你認為應該改用別的 method 或改寫倍數，那我會改走 ROADMAP。｜revisit：FY2026 10-K 後基期滾動、目標期間變 FY2027（共識 EPS 0.89562 為正）時撤回本 abstention 並改寫 ValuationAssumption。",
+      "n": 521,
+      "reason": null,
+      "ref_id": "manual:521",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "MP：FY2026 是虧損年，forward_earnings_multiple 無校準倍數——提案 Abstention（valuation / target_pe）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -19192,6 +19204,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 521,
+  "next_n": 522,
   "schema_version": "1"
 }
