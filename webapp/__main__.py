@@ -262,6 +262,47 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
+def cmd_closure_gate(args: argparse.Namespace) -> int:
+    """段 5 閉包成立嗎？**exit code 就是答案**：0＝閉包／1＝還有工作／2＝讀不到（fail closed）。
+
+    research-drain 的 loop 每輪必須跑它。它存在的理由是 skill 的閉包條件曾被寫成
+    「本輪至少 +1」，於是做完一檔就算做完（2026-09-09 實測：LITE 到終局後段 5 還剩 67 檔
+    就收工了）。判準是散文時沒有東西會叫——所以把它變成回傳值（L14）。
+
+    ⚠ `--skip` 是**呼叫端的顯式宣告**，不是 gate 的推論：某檔卡在 pq2 或卡在世界上時，
+    執行者把它列出來並在該輪收尾寫明理由。gate 不去 parse `todo_pool.json` 的標題猜
+    pq2 歸屬（L16：呈現層不得 parse 理由句去猜分類）。
+    """
+    from alpha import closure
+    from alpha.providers.closure import collect_backlog
+
+    try:
+        rows, notes = collect_backlog(
+            artifact_dir=Path(args.dir) if args.dir else None,
+            state_dir=Path(args.state_dir) if args.state_dir else None)
+    except Exception as exc:  # noqa: BLE001
+        print(f"✗ 讀不到 backlog（{type(exc).__name__}）——fail closed，不得當成閉包", file=sys.stderr)
+        return 2
+    result = closure.closure_gate(rows, skip=args.skip or ())
+    if args.format == "json":
+        print(json.dumps({
+            "state": result.state, "open_count": result.open_count,
+            "actionable": list(result.actionable), "skipped": list(result.skipped),
+            "next": result.next_ticker, "reason": result.reason, "notes": notes,
+        }, ensure_ascii=False, indent=2))
+    else:
+        mark = {"closed": "✅", "open": "▶", "unknown": "✗"}[result.state]
+        print(f"{mark} 段5 閉包：{result.state}——{result.reason}")
+        if result.actionable:
+            print(f"- 可自主推進 {len(result.actionable)} 檔，下一檔：{result.next_ticker}")
+            print(f"- 接下來十檔：{'、'.join(result.actionable[:10])}")
+        if result.skipped:
+            print(f"- 本輪顯式跳過（卡 pq2／卡世界）{len(result.skipped)} 檔：{'、'.join(result.skipped)}")
+        for note in notes:
+            print(f"- 未讀到：{note}")
+    return {"closed": 0, "open": 1, "unknown": 2}[result.state]
+
+
 def cmd_verify(args: argparse.Namespace) -> int:
     """把每一份 artifact 重新驗一次（schema／digest／必要欄位）。CI 與備份後的健檢用。"""
     store, state_store = _stores(args)
@@ -315,6 +356,15 @@ def build_parser() -> argparse.ArgumentParser:
     _dirs(status)
     status.add_argument("--format", choices=("markdown", "json"), default="markdown")
     status.set_defaults(func=cmd_status)
+
+    gate = sub.add_parser(
+        "closure-gate",
+        help="段5 閉包成立嗎（exit 0＝閉包／1＝還有工作／2＝讀不到）；research-drain loop 每輪必跑")
+    _dirs(gate)
+    gate.add_argument("--skip", action="append", metavar="TICKER",
+                      help="顯式宣告本輪推不動的檔（卡 pq2／卡世界），可重複；理由寫在該輪收尾")
+    gate.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    gate.set_defaults(func=cmd_closure_gate)
 
     verify = sub.add_parser("verify", help="重新驗證全部 artifact（schema／digest／必要欄位）")
     _dirs(verify)

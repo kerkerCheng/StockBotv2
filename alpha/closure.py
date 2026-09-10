@@ -225,7 +225,62 @@ def _sector_and_rank(ranking_payload: Mapping[str, Any], registry: Any) -> dict[
     return out
 
 
+# ---------------------------------------------------------------------------
+# 閉包 gate（P7-c，2026-09-10）——**「這一段做完了沒」必須是機器回答的**
+# ---------------------------------------------------------------------------
+#
+# 事發（2026-09-09，git log 可查）：skill Step 5 把段 5 的閉包條件寫成「到終局檔數在本輪
+# 至少 +1」。那一句同時承載兩種語意（L12）：**進度下限**（不准開三檔各補一格）與
+# **停止條件**（滿足就算做完）。執行者讀成後者——`23:18→23:28` 做完 LITE 一檔，`23:33`
+# 就轉去段 4 收工，段 5 還剩 67 檔。skill 自己的開場白是「停止條件若能在任意時刻被滿足，
+# 它就不是停止條件」，這次是**被滿足得太早**。
+#
+# 修法是先把兩種語意分開，再讓程式回答其中一種：
+#   - 停止條件 → 本函式（`open_count == 0`）
+#   - 進度下限 → 留在 skill，一輪 0 檔到終局要報告原因，不得靜默宣告 noop
+#
+# ⚠ **深度優先是「同時開幾檔」的上限（1），不是「一輪做幾檔」的上限（無上限）。**
+# 兩者被混為一談正是「我是不是要說七十幾次繼續」的來源。
+
+#: gate 的三種結果。`unknown` 存在的唯一理由是 fail closed——**讀不到 artifact 不得算閉包**
+#: （INV-3：「查不到了」不是合法 lifecycle）。
+GATE_STATES: tuple[str, ...] = ("closed", "open", "unknown")
+
+
+@dataclass(frozen=True, slots=True)
+class GateResult:
+    """段 5 閉包判定。`state` 直接對應 CLI 的 exit code：closed=0／open=1／unknown=2。"""
+
+    state: str
+    open_count: int
+    #: 這一輪還可以自己往前推的（未到終局，且不在 skip 裡）
+    actionable: tuple[str, ...]
+    #: 呼叫端顯式宣告「本輪推不動」的（卡 pq2／卡世界）。**gate 不自己猜**——
+    #: pq2 歸屬今天只存在於 `todo_pool.json` 的散文標題裡，去 parse 它就是 L16 禁的那件事。
+    skipped: tuple[str, ...]
+    next_ticker: str | None
+    reason: str
+
+
+def closure_gate(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> GateResult:
+    """段 5 閉包成立嗎？**不看「本輪做了幾檔」**——只看還剩幾檔可做。"""
+    if not rows:
+        return GateResult("unknown", 0, (), (), None,
+                          "讀不到任何 analyst view artifact——fail closed，不得當成閉包")
+    skip_set = {str(t).upper() for t in skip}
+    ranked = rank_backlog(rows)
+    actionable = tuple(r.ticker for r in ranked if r.ticker.upper() not in skip_set)
+    skipped = tuple(r.ticker for r in ranked if r.ticker.upper() in skip_set)
+    if actionable:
+        return GateResult("open", len(ranked), actionable, skipped, actionable[0],
+                          f"還有 {len(actionable)} 檔可自主推進——不得宣告 noop、不得拉長 loop 間隔")
+    if skipped:
+        return GateResult("closed", len(ranked), (), skipped, None,
+                          f"剩下的 {len(skipped)} 檔都已顯式標為卡 pq2／卡世界")
+    return GateResult("closed", 0, (), (), None, "每一檔都到終局")
+
 __all__ = [
-    "NEXT_PICK_RULE", "READY_STATES", "BacklogRow", "explain_pick", "rank_backlog",
-    "render_summary", "row_from_artifact", "sectors_with_ready", "summarize",
+    "GATE_STATES", "NEXT_PICK_RULE", "READY_STATES", "BacklogRow", "GateResult",
+    "closure_gate", "explain_pick", "rank_backlog", "render_summary",
+    "row_from_artifact", "sectors_with_ready", "summarize",
 ]

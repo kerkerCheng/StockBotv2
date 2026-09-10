@@ -113,3 +113,55 @@ def test_sector_and_rank_use_row_order_and_registry_ticker() -> None:
     assert got["AAA"] == ("X", 1)        # 同一檔多列取最佳名次
     assert got["BBB"] == ("Y", 2)
     assert "co:private" not in got and len(got) == 2
+
+
+# ---------------------------------------------------------------------------
+# 閉包 gate（P7-c）——這幾條守的是「做完了沒」不再由執行者自稱
+# ---------------------------------------------------------------------------
+
+def _gate_row(ticker: str, readiness: str = "blocked", open_panels=("why",)) -> closure.BacklogRow:
+    return closure.BacklogRow(ticker=ticker, readiness=readiness,
+                              open_panels=tuple(open_panels), settled_panels=())
+
+
+def test_gate_open_while_any_ticker_can_still_move() -> None:
+    """做完一檔**不算**閉包——這正是 2026-09-09 的失敗（+1 就收工，還剩 67 檔）。"""
+    rows = [_gate_row("AAA", "ready", ()), _gate_row("BBB"), _gate_row("CCC")]
+    got = closure.closure_gate(rows)
+    assert got.state == "open"
+    assert got.open_count == 2 and got.actionable == ("BBB", "CCC")
+    assert got.next_ticker == "BBB"
+
+
+def test_gate_closed_only_when_nothing_left() -> None:
+    rows = [_gate_row("AAA", "ready", ()), _gate_row("BBB", "ready", ())]
+    got = closure.closure_gate(rows)
+    assert got.state == "closed" and got.open_count == 0 and got.next_ticker is None
+
+
+def test_gate_closed_when_remaining_are_explicitly_skipped() -> None:
+    """卡 pq2／卡世界要由呼叫端**顯式**宣告——gate 不 parse 散文去猜（L16）。"""
+    rows = [_gate_row("AAA", "ready", ()), _gate_row("BBB"), _gate_row("CCC")]
+    got = closure.closure_gate(rows, skip=["bbb", "CCC"])   # 大小寫不敏感
+    assert got.state == "closed"
+    assert got.skipped == ("BBB", "CCC") and got.actionable == ()
+    assert got.open_count == 2          # 仍誠實回報還有 2 檔沒到終局，不假裝歸零
+
+
+def test_gate_partial_skip_still_open() -> None:
+    rows = [_gate_row("BBB"), _gate_row("CCC")]
+    got = closure.closure_gate(rows, skip=["BBB"])
+    assert got.state == "open" and got.next_ticker == "CCC" and got.skipped == ("BBB",)
+
+
+def test_gate_unknown_when_no_artifact_is_not_closed() -> None:
+    """讀不到 ≠ 做完。fail closed（INV-3：「查不到了」不是合法 lifecycle）。"""
+    got = closure.closure_gate([])
+    assert got.state == "unknown"
+    assert got.state != "closed"
+
+
+def test_gate_states_are_a_closed_vocabulary() -> None:
+    assert closure.GATE_STATES == ("closed", "open", "unknown")
+    for rows, skip in (([], ()), ([_gate_row("A")], ()), ([_gate_row("A")], ("A",))):
+        assert closure.closure_gate(rows, skip=skip).state in closure.GATE_STATES
