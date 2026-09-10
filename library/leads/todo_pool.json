@@ -8507,10 +8507,11 @@
       "added_at": "2026-09-09T15:33:06.216604+00:00",
       "hint": "2026-09-09 research-drain 段4 實查（Neo4j）。六個節點指的是同一層：tech:nand『NAND Flash Memory fabrication』→SUPPLIES_TO co:applied_materials；tech:nand_production『NAND / non-volatile memory wafer fabrication』→SUPPLIES_TO co:applied_materials；tech:nand_manufacturing『NAND / Non-Volatile Memory Manufacturing』→SUPPLIES_TO co:lam_research；tech:3d_nand_manufacturing『Non-volatile memory (3D NAND) wafer fabrication』→SUPPLIES_TO co:lam_research；tech:nand_flash『Flash Memory (NAND)』→ENABLES prod:amat_semiconductor_systems；tech:nand_technology『NAND Flash Memory Fab』→ENABLES tech:semiconductor_manufacturing_equipment。\n兩個具體後果：①**證據被切碎**——同一層的供應商關係散在四個節點上，任何以節點為單位的結構評分都會低估它；②**覆蓋掃描誤報**——coverage_gaps 把 tech:nand_technology 列為 🔴『沒有任何公司連到它』，但同層另外四個節點各自都有 co:applied_materials 或 co:lam_research，紅燈是碎片化的產物不是真空白。\n形狀＝L6-2（局部 ID 跨文件 MERGE 後的命名空間問題）的反面：不是撞在一起，是**該撞而沒撞**，每次抽取按 LLM 當下的措辭各造一個 id，且不會有任何東西壞掉，只會安靜地把一層攤成六份。\ngo＝授權起草 canonical 合併的 prepared RA（選 canonical id、重指所有邊、保留每條原始 provenance 與 SourceDoc、不新增任何知識主張），**入圖仍走 ra_admission 逐項核准**；不含 thesis mutation、不含 Engine C 寫入、不含 live。\n⚠ 相鄰但不同的一件事屬開發不屬研究，已另記於本輪摘要、不佔本編號：『要怎麼防止下一次抽取再造第七個 NAND 節點』改變的是系統行為，載體是 ROADMAP。",
       "n": 505,
-      "reason": null,
+      "reason": "NAND 五節點併入 tech:nand（選項 A）：刪 4 節點／5 assertion，6 條邊集中，coverage_gaps 的 🔴 由 5 降到 4，tech:nand 由碎片變 covered（直連 AMAT 與 Lam）。tech:3d_nand_manufacturing 依核准範圍保留",
+      "receipt": "authority:graph_migration;ref:migrate_nand_merge_20260910",
       "ref_id": "source=research-drain-2026-09-09-segment4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T05:34:59.633941+00:00",
       "source": "manual",
       "title": "圖中六個語意重疊的 NAND 節點需合併——證據被切碎，且讓覆蓋掃描把一個已覆蓋的層報成 🔴 研究缺口",
       "type": "manual"
@@ -8519,10 +8520,11 @@
       "added_at": "2026-09-10T02:56:20.225794+00:00",
       "hint": "2026-09-10 開發項交付後的殘留。config/entity_aliases.json 已登記三組 canonical：tech:eml ← tech:eml_laser、tech:advanced_packaging ← tech:advanced_packaging_integration、tech:dram_manufacturing ← tech:dram_production。三組的 name 逐字相同（『Electro-absorption Modulated Laser (EML)』／『Advanced packaging chip integration』／『DRAM wafer fabrication』），所以登記依據是機械的 name_identical，不含任何語意判斷。\n⚠ registry 只作用於**未來**的抽取（loader 在入圖前解析 node／edge 端點／node claim subject）；**圖裡既有的六個節點不會自己合併**，那是 graph write。查證：ROADMAP 第 177 行驗收查詢 (b)，現值 3。\ngo＝授權起草 canonical 合併的 prepared RA（把 alias 節點的邊重指到 canonical、保留每條原始 provenance 與 SourceDoc、不新增任何知識主張），**入圖仍走 ra_admission 逐項核准**；不含 thesis mutation、不含 Engine C 寫入、不含 live。\n與 [505] 的分工：[505] 是 NAND 六個，name 各不相同，需要語意判斷「這六個是不是同一層」；本項三組 name 逐字相同，不需要語意判斷，只是存量搬遷。兩者證據門檻不同，故分開編號。",
       "n": 506,
-      "reason": null,
+      "reason": "三組 name 逐字相同的存量合併完成（advanced_packaging／dram_manufacturing／eml），腳本泛化為吃 registry 全部組別且冪等（重跑四組皆 skip）",
+      "receipt": "authority:graph_migration;ref:migrate_entity_alias_backfill",
       "ref_id": "entity_alias_backfill_20260910",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T05:34:59.832922+00:00",
       "source": "manual",
       "title": "圖中三組名稱逐字相同的實體需合併存量——registry 已登記，但它只改未來的抽取",
       "type": "manual"
@@ -8531,12 +8533,37 @@
       "added_at": "2026-09-10T04:54:13.269657+00:00",
       "hint": "[486] 的 bounded research 完成。原本卡住的原因是**格式不是研究**：IQE FY2025 年報查核報告為雙欄排版，pypdf 按內容流順序吐字會把兩欄交錯（抽出來長成『IQIQE EA Annnnuuaal lR Reeppoorrtt』），逐字引用因此不可用。2026-09-10 裝入 pdfminer.six 並以 LAParams 還原版面後，該段完整可讀。\n\n⚠ **結論與先前的假設相反，方向是正面的**（L11-2：別對外部 claim 嚴、對自己引用鬆——先前因為讀不到而傾向假設有問題，實際一手證據顯示沒有）：\n\n逐字（KPMG 查核報告，IQE Annual Report and Accounts 2025，Independent Auditor's Report，本機 library/private/iqe_ar2025_audit_pdfminer.txt）：\n① 董事結論：『The directors have concluded that it is appropriate to adopt the going concern basis of preparation and that **no material uncertainty exists** for the Group and parent Company for the reasons set out in note 2.2.』\n② 查核人員規劃階段：『we considered that the requirement to raise financing to repay existing loan notes and facilities was a condition that **could have given rise to** a material uncertainty』——注意措辭是 could have，不是 did（L11-1）。\n③ 查核人員最終結論：『the Group **completed their fundraising on 28 May 2026**. In conducting our final audit work, we reassessed the level of risk relating to the directors' conclusion. As a result, we reassessed the risk to our audit and **agree with the directors that the assessment of the going concern is not a significant judgement in these financial statements.**』\n\nnote 2.2 的 base case 逐字（可寫成觀測的結構化數字）：\n• Fundraising 用於償還既有 CLN 與銀行債務，時點 Q2 FY26\n• 流動性 headroom：2025-12 £11.7m → 2026-05 £6.1m（募資到位前的低點）→ 之後最低 £34.0m\n• base case 假設：2026 與 H1 2027 營收成長至少 20%、GBP:USD 1.34、直接晶圓產品毛利率與 2025 實績大致持平、capex 2026 與 H1 2027 各為 mid-single digit £ millions\n• severe but plausible downside：營收較 base case 下修 H1 2026 −9%、H2 2026 −20%、H1 2027 −24%，且無任何緩解措施\n\ngo＝把上述寫入 Engine C append-only ledger，欄位 `debt_maturity_and_covenants`（config/engine_c_observation_fields.json 標為 **judgment**，故維持 pq2；`runway_inputs` 雖是 mechanical，但它的定義是現金／總債／FCF TTM，把 liquidity headroom 塞進去是欄位濫用，不做）。as_of=2025-12-31。不含入圖、不含 thesis mutation、不含 live。\n\n⚠ 完成後 IQE 的估值層**仍會 fail closed**（虧損公司無可用 method）——本項買的是「我知道 IQE 的財務狀況」，不是 fair value。這一點與 [486] 原始 hint 一致，沒有改變。\n⚠ 下一個可查的缺口：2026-05-28 的 fundraising 條款（金額、稀釋、CLN 清償是否全額）。手邊 library/private/iqe_rns_texts.json 的 placing_results 提到 loan note 3 次，但尚未逐字核對——那是另一份 bounded research，不佔本編號。",
       "n": 507,
-      "reason": null,
+      "reason": "IQE going-concern 查核結論與 note 2.2 揭露已寫入 Engine C append-only ledger",
+      "receipt": "authority:engine_c;ref:mo_25ad0409668300548e4e86d7d14696b0",
       "ref_id": "iqe_going_concern_observation_20260910",
+      "resolution": "go",
+      "resolved_at": "2026-09-10T05:34:45.439163+00:00",
+      "source": "manual",
+      "title": "IQE.L going-concern 結論已取得一手逐字——待寫入 Engine C（debt_maturity_and_covenants）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T05:35:35.735153+00:00",
+      "hint": "2026-09-10 [506] 執行後由 ROADMAP 驗收查詢 (b) 抓到。**先講最重要的一句：這一組不能走 name_identical 登記，那會是循環論證。**\n\n實測（比對 migration 前的備份快照 library/private/backups/20260910T053041Z/neo4j_export.json）：\n  migration 前 tech:ocs 的 name＝『Optical Circuit Switching (OCS)』\n  migration 後 tech:ocs 的 name＝『Optical Circuit Switch』\n  tech:optical_circuit_switch 的 name 前後都是『Optical Circuit Switch』\n也就是說，兩者 name 現在一致，是因為 [506] 重載時 `MERGE_NODE` 直接 `SET n.name`，**後載入的文件蓋掉了前一份**（只有 source_ids 會聯集）。這個隱患 09-04 的 migrate_entity_dedup 註解就記過，這次是它第一次產生可觀察的後果。\n\n⚠ 因此登記依據只能是 `semantic_reviewed`（需本編號核准），不能是 name_identical：用一個被自己的遷移改出來的相同 name 去當機械依據，是拿自己製造的證據當獨立佐證。\n\n兩節點現況：\n  tech:ocs                    11 個 source、9 條邊（含 SUPPLIES_TO co:lumentum／co:coherent、IS_COMPONENT_OF tech:mems_mirror_array、ENABLES tech:optical_circulator）\n  tech:optical_circuit_switch  3 個 source、4 條邊（ENABLES tech:ai_compute_buildout、SUPPLIES_TO co:lumentum／co:coherent）\n兩者 abstraction_level 都是 network_systems，供應商也重疊——語意上高度可能是同一個東西，但那個判斷要你核准，不是我推。\n\n⚠ 相鄰但更值得注意的一件事：**Coherent → OCS 那條邊（今天剛核准 qualification_status=qualified）掛在 tech:ocs 上**，而 tech:optical_circuit_switch 也有一條 SUPPLIES_TO co:coherent。同一家公司對同一個東西的關係散在兩個節點上——這正是 [505] 修的那個形狀。\n\ngo＝授權登記為 semantic_reviewed（approval_receipt: todo:508）並跑 `loader/migrate_entity_alias_backfill.py`（已泛化、冪等）；canonical 依 registry 的機械選法取最短 id ＝ `tech:ocs`。不含 thesis mutation、不含 Engine C 寫入、不含 live。\n\n⚠ 另一個獨立的開發項（不佔本編號，載體是 ROADMAP）：`MERGE_NODE` 覆蓋 name／attributes 使 ROADMAP 驗收 (b)『名稱逐字相同的重複組』**不是穩定指標**——重載任何文件都可能改變它。要嘛讓 name 也走聯集／保留最長，要嘛驗收改用不受重載影響的判準。",
+      "n": 508,
+      "reason": null,
+      "ref_id": "ocs_duplicate_20260910",
       "resolution": null,
       "resolved_at": null,
       "source": "manual",
-      "title": "IQE.L going-concern 結論已取得一手逐字——待寫入 Engine C（debt_maturity_and_covenants）",
+      "title": "tech:ocs 與 tech:optical_circuit_switch 重複——但『name 相同』是 [506] 重載造成的，不得當作合併依據",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T05:43:23.040080+00:00",
+      "hint": "2026-09-10 [506] 執行後由備份快照比對抓到（library/private/backups/20260910T053041Z）。`MERGE_NODE` 對 `n.name` 是直接 `SET`，**後載入的文件整包蓋掉前一份**（只有 `source_ids` 會聯集）。這個隱患 09-04 的 migrate_entity_dedup 註解就記過，這次是它第一次產生可觀察的後果。level 全部沒變，只有 name 被改。\n\n七筆逐一（前 → 後）：\n  tech:vcsel               'VCSEL laser' → **'200G VCSEL-based solution'**  ⚠ 最嚴重\n  tech:silicon_photonics   'Silicon Photonics' → 'Silicon Photonics transceiver'  ⚠ 語意變窄\n  tech:ocs                 'Optical Circuit Switching (OCS)' → 'Optical Circuit Switch'\n  tech:uhp_laser           'Ultra-high-power laser' → 'Ultra-high-power laser chip'\n  tech:eml                 'Electro-absorption Modulated Laser (EML)' → 'Electro-absorption Modulated Laser'\n  tech:nand                'NAND / non-volatile memory wafer fabrication' → 'NAND / Non-Volatile Memory Manufacturing'\n  tech:narrow_linewidth_laser 'Narrow-linewidth laser assembly' → 'Narrow linewidth laser assembly'\n\n⚠ **tech:vcsel 是實質傷害**：把一個技術節點的名字換成具體產品規格（'200G VCSEL-based solution'），任何讀圖的人都會誤以為那是一個產品而不是一層技術。tech:silicon_photonics 同型但輕微（transceiver 只是矽光的一種應用）。其餘四筆是措辭差異，不影響理解。\n\n⚠ 這連帶讓 ROADMAP 第 177 行的驗收 (b)『名稱逐字相同的重複組』**不是穩定指標**：tech:ocs 就是因為 name 被改成與 tech:optical_circuit_switch 相同才進了那個分組（見 [508]）。讀那個數字之前要先問「上一次重載是什麼時候」。\n\ngo＝授權把上列 name 還原成備份快照的值（純節點屬性寫入，不動邊、不動 provenance、不新增任何知識主張）。**⚠ 這是判斷不是機械操作**：備份裡的值也只是「前一次載入的結果」，不是權威——我判斷前者品質較好（更通用、更準確），但哪個名字對這一層最貼切是你的決定。也可以只還原 tech:vcsel 與 tech:silicon_photonics 兩筆，其餘照舊。不含入圖新事實、不含 Engine C 寫入、不含 thesis mutation、不含 live。\n\n⚠ 相鄰但屬**開發項不是研究項**（載體 ROADMAP，不佔本編號）：要不要讓 `MERGE_NODE` 的 `name`／`attributes` 也走聯集或「保留較長／較早」，而不是無條件覆蓋。不修的話，下一次任何重載都會再發生一次，而且一樣不會有東西壞掉。",
+      "n": 509,
+      "reason": null,
+      "ref_id": "merge_name_overwrite_20260910",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "[506] 重載覆蓋了 7 個節點的 name，其中 tech:vcsel 退化成產品型號——要不要還原",
       "type": "manual"
     }
   ],
@@ -18716,8 +18743,35 @@
       "ref_id": "engine_c://manual_observation/IQE.L#debt_maturity_and_covenants",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-10T05:34:45.439163+00:00",
+      "n": 507,
+      "reason": "IQE going-concern 查核結論與 note 2.2 揭露已寫入 Engine C append-only ledger",
+      "receipt": "authority:engine_c;ref:mo_25ad0409668300548e4e86d7d14696b0",
+      "ref_id": "iqe_going_concern_observation_20260910",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T05:34:59.633941+00:00",
+      "n": 505,
+      "reason": "NAND 五節點併入 tech:nand（選項 A）：刪 4 節點／5 assertion，6 條邊集中，coverage_gaps 的 🔴 由 5 降到 4，tech:nand 由碎片變 covered（直連 AMAT 與 Lam）。tech:3d_nand_manufacturing 依核准範圍保留",
+      "receipt": "authority:graph_migration;ref:migrate_nand_merge_20260910",
+      "ref_id": "source=research-drain-2026-09-09-segment4",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T05:34:59.832922+00:00",
+      "n": 506,
+      "reason": "三組 name 逐字相同的存量合併完成（advanced_packaging／dram_manufacturing／eml），腳本泛化為吃 registry 全部組別且冪等（重跑四組皆 skip）",
+      "receipt": "authority:graph_migration;ref:migrate_entity_alias_backfill",
+      "ref_id": "entity_alias_backfill_20260910",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 508,
+  "next_n": 510,
   "schema_version": "1"
 }

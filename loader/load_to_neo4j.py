@@ -323,12 +323,14 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
     # ⚠ 未登記的新 id **放行**（世界一直在長新的 tech 節點，擋下來等於停掉抽取），
     # 但一定要說出口——安靜放行就是下一個同義節點的來源。
     resolution = entity_registry.resolve_document(doc)
+    # ⚠ 走 stderr：呼叫端（migrate_* 腳本）的 stdout 是要被 json.load() 解析的。
+    # 診斷混進去會讓「已經成功」看起來像「解析失敗」（L12：一個 stream 兩種語意）。
     if resolution["remapped"]:
         for alias_id, canonical_id in sorted(resolution["remapped"].items()):
-            print(f"  [entity-id] {alias_id} → {canonical_id}")
+            print(f"  [entity-id] {alias_id} → {canonical_id}", file=sys.stderr)
     if resolution["unregistered"]:
         print(f"  [entity-id] 未登記的實體 id {len(resolution['unregistered'])} 個："
-              f"{', '.join(resolution['unregistered'])}")
+              f"{', '.join(resolution['unregistered'])}", file=sys.stderr)
 
     # Fail closed on the same source URL under a different doc_id (silent-duplicate guard).
     check_duplicate_url(doc["source_doc"], session, allow_dup_url)
