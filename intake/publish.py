@@ -230,6 +230,70 @@ def _path_status(paths: list[str], *, root: Path) -> dict[str, str]:
     return statuses
 
 
+def _out_of_band_commits(record: dict, *, root: Path, remote: str) -> list[str] | None:
+    """這筆 RA 的產出是不是已經由**別的 commit**進了版本庫？
+
+    只在能完全確定時回傳 commit 清單，其餘一律回 None 走原本的 commit 路徑：
+    ①每個 eligible path 都已 tracked、②都沒有任何未提交變更、③最後改動它們的
+    commit 全部已在 `remote` 的歷史裡。三者缺一就不是「已發布」，而是「還沒做」。
+
+    ⚠ 這條路徑**不放寬任何 gate**：record 仍必須是 `applied`（呼叫端保證），
+    也就是 graph mutation 已經按核准發生過；這裡只修正「它進版本庫的方式沒有被
+    記下來」這一件事。回傳的 commit 沒有 Research-Action-ID trailer——所以要記成
+    `out_of_band`，讓稽核一眼看出它反查不到 trailer，而不是假裝它是正規 commit。
+    """
+
+    eligible = _eligible_paths(record, root=root)
+    if not eligible:
+        return None
+    if _path_status(eligible, root=root):
+        return None
+    commits: list[str] = []
+    for path in eligible:
+        tracked = _run_git(["ls-files", "--error-unmatch", "--", path], root=root)
+        if tracked.returncode != 0:
+            return None
+        last = _git_text(["log", "-1", "--format=%H", "--", path], root=root)
+        if not last:
+            return None
+        if not _is_ancestor(last, remote, root=root):
+            # 還沒 push 的 out-of-band commit 會撞 `_reconcile_ahead` 的 trailer
+            # 檢查，那是另一個問題；這裡不處理，讓它照舊 raise 而不是靜默放行。
+            return None
+        if last not in commits:
+            commits.append(last)
+    return commits or None
+
+
+def _record_out_of_band(
+    record: dict, commits: list[str], *, root: Path
+) -> dict:
+    """把「已由別的 commit 發布」寫成收據。產出已在 remote，所以狀態直接是 pushed。"""
+
+    action_id = record["action_id"]
+    with research_actions.action_lock(action_id, root=root):
+        fresh = research_actions.read_action(action_id, root=root)
+        if fresh["action_digest"] != record["action_digest"]:
+            raise PublicationError("action_digest_mismatch", action_id)
+        if fresh["state"] != "applied":
+            raise PublicationError("action_not_commit_eligible", fresh["state"])
+        now = datetime.now(timezone.utc).isoformat()
+        fresh["state"] = "pushed"
+        fresh["git"]["status"] = "pushed"
+        fresh["git"]["commit"] = commits[0]
+        fresh["git"]["commit_provenance"] = "out_of_band"
+        fresh["git"]["out_of_band_commits"] = list(commits)
+        fresh["git"]["committed_paths"] = _eligible_paths(record, root=root)
+        fresh["git"]["committed_at"] = now
+        fresh["git"]["pushed_at"] = now
+        research_actions.save_action(fresh, root=root)
+    return {
+        "action_id": action_id,
+        "commits": list(commits),
+        "paths": _eligible_paths(record, root=root),
+    }
+
+
 def _record_commit(
     action_id: str,
     action_digest: str,
@@ -425,6 +489,9 @@ def publication_status(*, root: Path = ROOT) -> dict:
                     "state": record["state"],
                     "git_status": git_status,
                     "commit": record.get("git", {}).get("commit"),
+                    "commit_provenance": record.get("git", {}).get(
+                        "commit_provenance", "action_commit"
+                    ),
                     "path_count": len(record.get("git", {}).get("eligible_paths") or []),
                 }
             )
@@ -458,18 +525,44 @@ def publish_pending_actions(
             and record.get("git", {}).get("status") == "pending"
         ]
         records.sort(key=lambda item: (item.get("applied_at") or item["created_at"]))
+        out_of_band_plan: list[str] = []
+        to_commit: list[dict] = []
+        for record in records:
+            commits = _out_of_band_commits(
+                record, root=root, remote=preflight["remote"]
+            )
+            if commits:
+                out_of_band_plan.append(record["action_id"])
+            else:
+                to_commit.append(record)
+
         if dry_run:
-            for record in records:
+            for record in to_commit:
                 _validate_action_worktree(record, root=root)
             return {
                 "status": "dry_run",
-                "would_commit": [record["action_id"] for record in records],
+                "would_commit": [record["action_id"] for record in to_commit],
+                "would_mark_out_of_band": out_of_band_plan,
                 "would_push_existing": [item["action_id"] for item in explained],
                 "already_pushed": already_pushed,
             }
 
-        committed = []
+        out_of_band = []
         for record in records:
+            if record["action_id"] not in out_of_band_plan:
+                continue
+            commits = _out_of_band_commits(
+                record, root=root, remote=preflight["remote"]
+            )
+            if not commits:
+                # 兩次偵測之間狀態變了：不猜，交回讓人重跑。
+                raise PublicationError(
+                    "out_of_band_state_changed", record["action_id"]
+                )
+            out_of_band.append(_record_out_of_band(record, commits, root=root))
+
+        committed = []
+        for record in to_commit:
             committed.append(
                 _commit_action(record, root=root, after_commit=after_commit)
             )
@@ -480,6 +573,7 @@ def publish_pending_actions(
             return {
                 "status": "nothing_to_push",
                 "committed": committed,
+                "out_of_band": out_of_band,
                 "already_pushed": already_pushed,
             }
 
@@ -520,6 +614,7 @@ def publish_pending_actions(
         return {
             "status": "pushed",
             "committed": committed,
+            "out_of_band": out_of_band,
             "pushed_actions": pushed_actions,
             "commit_count": len(ahead),
         }

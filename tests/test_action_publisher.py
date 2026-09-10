@@ -395,3 +395,86 @@ def test_git_timeout_is_returned_as_structured_publication_error(
         action_publisher._run_git(["fetch", "origin", "master"], root=tmp_path)
 
     assert captured.value.code == "git_timeout"
+
+
+def _commit_out_of_band(repo: Path, record: dict, *, push: bool) -> str:
+    """模擬「一次手動 commit 順手把 RA 的產出帶進版本庫」——不帶任何 action trailer。"""
+
+    paths = record["git"]["eligible_paths"]
+    _git(repo, "add", "--", *paths)
+    _git(repo, "commit", "-m", "chore: unrelated migration that swept intake files")
+    commit = _git(repo, "rev-parse", "HEAD")
+    if push:
+        _git(repo, "push", "origin", "master")
+    return commit
+
+
+def test_out_of_band_published_action_is_recorded_and_does_not_block_the_batch(
+    tmp_git_repo: Path, tmp_path: Path
+) -> None:
+    """已由別的 commit 進 remote 的 RA：標成 pushed，且**不拖垮同批其他項**。
+
+    這是 2026-09-10 實測到的形狀（L13-2）：空 staged 同時代表「已經完成」與
+    「什麼都沒做」，publisher 讀成後者就整批 raise，把三筆無辜的 RA 一起擋住。
+    """
+
+    _ready_remote(tmp_git_repo, tmp_path / "remote.git")
+    stale = _create_applied_action(tmp_git_repo, "stale")
+    commit = _commit_out_of_band(tmp_git_repo, stale, push=True)
+    fresh = _create_applied_action(tmp_git_repo, "fresh")
+
+    result = action_publisher.publish_pending_actions(root=tmp_git_repo)
+
+    assert result["status"] == "pushed"
+    # 分流：一筆走 out-of-band 收據、一筆走正規 commit。
+    assert [item["action_id"] for item in result["out_of_band"]] == [stale["action_id"]]
+    assert [item["action_id"] for item in result["committed"]] == [fresh["action_id"]]
+
+    stored = research_actions.read_action(stale["action_id"], root=tmp_git_repo)
+    assert stored["state"] == "pushed"
+    assert stored["git"]["commit_provenance"] == "out_of_band"
+    assert stored["git"]["out_of_band_commits"] == [commit]
+    # ⚠ 那個 commit 沒有 trailer——收據必須誠實記下，不得冒充正規 action commit。
+    assert stale["action_id"] not in _git(tmp_git_repo, "log", "-1", "--format=%B", commit)
+
+    正規 = research_actions.read_action(fresh["action_id"], root=tmp_git_repo)
+    assert 正規["git"].get("commit_provenance", "action_commit") == "action_commit"
+
+
+def test_missing_paths_still_reject_instead_of_being_read_as_published(
+    tmp_git_repo: Path, tmp_path: Path
+) -> None:
+    """真的什麼都沒做（產出不在版本庫）→ 維持 raise。分開之後這一邊不放寬。"""
+
+    _ready_remote(tmp_git_repo, tmp_path / "remote.git")
+    action = _create_applied_action(tmp_git_repo, "vanished")
+    for path in action["git"]["eligible_paths"]:
+        (tmp_git_repo / path).unlink()
+
+    result = action_publisher.publish_pending_actions(root=tmp_git_repo)
+
+    assert result["status"] == "rejected"
+    stored = research_actions.read_action(action["action_id"], root=tmp_git_repo)
+    assert stored["state"] == "applied"
+    assert stored["git"]["status"] == "pending"
+
+
+def test_unpushed_out_of_band_commit_is_not_silently_accepted(
+    tmp_git_repo: Path, tmp_path: Path
+) -> None:
+    """out-of-band commit 還沒 push → 不走這條捷徑（它會撞 ahead 的 trailer 檢查）。
+
+    放行它等於讓一個沒有 trailer 的本地 commit 取得已發布身分，而 `_reconcile_ahead`
+    正是為了擋這件事存在的。
+    """
+
+    _ready_remote(tmp_git_repo, tmp_path / "remote.git")
+    action = _create_applied_action(tmp_git_repo, "localonly")
+    _commit_out_of_band(tmp_git_repo, action, push=False)
+
+    result = action_publisher.publish_pending_actions(root=tmp_git_repo)
+
+    assert result["status"] == "rejected"
+    assert result["reason"] == "unexplained_ahead_commit"
+    stored = research_actions.read_action(action["action_id"], root=tmp_git_repo)
+    assert stored["git"]["status"] == "pending"

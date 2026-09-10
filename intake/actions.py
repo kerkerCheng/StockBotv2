@@ -551,6 +551,21 @@ def _validate_record(record: object) -> dict:
         "pushed",
     }:
         raise ValueError("Research Action Git receipt is invalid")
+    # ⚠ 封閉字彙：一筆 RA 的產出**怎麼進版本庫的**是稽核事實，不是自由字串。
+    # `action_commit`＝publisher 自己建的一筆一 commit（帶 Research-Action-ID trailer）；
+    # `out_of_band`＝產出已由別的 commit 帶進版本庫（例如一次手動 migration 順手 commit
+    # 了 intake 報告），因此**不會有 trailer**。兩者都是已發布，但只有前者可用 trailer
+    # 反查——分開記錄，稽核才不必猜。缺值時視為 action_commit（既有紀錄的相容值）。
+    if git.get("commit_provenance") is not None and git["commit_provenance"] not in {
+        "action_commit",
+        "out_of_band",
+    }:
+        raise ValueError("Research Action commit provenance is invalid")
+    if git.get("out_of_band_commits") is not None and not (
+        isinstance(git["out_of_band_commits"], list)
+        and all(isinstance(item, str) for item in git["out_of_band_commits"])
+    ):
+        raise ValueError("Research Action out-of-band commit receipt is invalid")
     if not isinstance(git.get("eligible_paths"), list) or not all(
         isinstance(path, str) for path in git["eligible_paths"]
     ):
@@ -624,6 +639,8 @@ def _next_action(state: str, git_status: str | None = None) -> str:
         return "Retry the local publish command after verifying origin/master."
     if state == "pushed":
         return "No action required."
+    if state == "applied" and git_status == "committed_out_of_band":
+        return "Already in origin/master via an out-of-band commit; no action required."
     return "Inspect the local Research Action record."
 
 
