@@ -8558,10 +8558,11 @@
       "added_at": "2026-09-10T05:43:23.040080+00:00",
       "hint": "2026-09-10 [506] 執行後由備份快照比對抓到（library/private/backups/20260910T053041Z）。`MERGE_NODE` 對 `n.name` 是直接 `SET`，**後載入的文件整包蓋掉前一份**（只有 `source_ids` 會聯集）。這個隱患 09-04 的 migrate_entity_dedup 註解就記過，這次是它第一次產生可觀察的後果。level 全部沒變，只有 name 被改。\n\n七筆逐一（前 → 後）：\n  tech:vcsel               'VCSEL laser' → **'200G VCSEL-based solution'**  ⚠ 最嚴重\n  tech:silicon_photonics   'Silicon Photonics' → 'Silicon Photonics transceiver'  ⚠ 語意變窄\n  tech:ocs                 'Optical Circuit Switching (OCS)' → 'Optical Circuit Switch'\n  tech:uhp_laser           'Ultra-high-power laser' → 'Ultra-high-power laser chip'\n  tech:eml                 'Electro-absorption Modulated Laser (EML)' → 'Electro-absorption Modulated Laser'\n  tech:nand                'NAND / non-volatile memory wafer fabrication' → 'NAND / Non-Volatile Memory Manufacturing'\n  tech:narrow_linewidth_laser 'Narrow-linewidth laser assembly' → 'Narrow linewidth laser assembly'\n\n⚠ **tech:vcsel 是實質傷害**：把一個技術節點的名字換成具體產品規格（'200G VCSEL-based solution'），任何讀圖的人都會誤以為那是一個產品而不是一層技術。tech:silicon_photonics 同型但輕微（transceiver 只是矽光的一種應用）。其餘四筆是措辭差異，不影響理解。\n\n⚠ 這連帶讓 ROADMAP 第 177 行的驗收 (b)『名稱逐字相同的重複組』**不是穩定指標**：tech:ocs 就是因為 name 被改成與 tech:optical_circuit_switch 相同才進了那個分組（見 [508]）。讀那個數字之前要先問「上一次重載是什麼時候」。\n\ngo＝授權把上列 name 還原成備份快照的值（純節點屬性寫入，不動邊、不動 provenance、不新增任何知識主張）。**⚠ 這是判斷不是機械操作**：備份裡的值也只是「前一次載入的結果」，不是權威——我判斷前者品質較好（更通用、更準確），但哪個名字對這一層最貼切是你的決定。也可以只還原 tech:vcsel 與 tech:silicon_photonics 兩筆，其餘照舊。不含入圖新事實、不含 Engine C 寫入、不含 thesis mutation、不含 live。\n\n⚠ 相鄰但屬**開發項不是研究項**（載體 ROADMAP，不佔本編號）：要不要讓 `MERGE_NODE` 的 `name`／`attributes` 也走聯集或「保留較長／較早」，而不是無條件覆蓋。不修的話，下一次任何重載都會再發生一次，而且一樣不會有東西壞掉。",
       "n": 509,
-      "reason": null,
+      "reason": "依建議只還原 tech:vcsel（'200G VCSEL-based solution' → 'VCSEL laser'）與 tech:silicon_photonics（'Silicon Photonics transceiver' → 'Silicon Photonics'）兩筆實質誤導；其餘五筆是措辭差異，維持現值不動",
+      "receipt": "authority:graph_node_property;ref:name_restore_vcsel_siph_20260910",
       "ref_id": "merge_name_overwrite_20260910",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T05:51:59.968977+00:00",
       "source": "manual",
       "title": "[506] 重載覆蓋了 7 個節點的 name，其中 tech:vcsel 退化成產品型號——要不要還原",
       "type": "manual"
@@ -18768,6 +18769,15 @@
       "reason": "三組 name 逐字相同的存量合併完成（advanced_packaging／dram_manufacturing／eml），腳本泛化為吃 registry 全部組別且冪等（重跑四組皆 skip）",
       "receipt": "authority:graph_migration;ref:migrate_entity_alias_backfill",
       "ref_id": "entity_alias_backfill_20260910",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T05:51:59.968977+00:00",
+      "n": 509,
+      "reason": "依建議只還原 tech:vcsel（'200G VCSEL-based solution' → 'VCSEL laser'）與 tech:silicon_photonics（'Silicon Photonics transceiver' → 'Silicon Photonics'）兩筆實質誤導；其餘五筆是措辭差異，維持現值不動",
+      "receipt": "authority:graph_node_property;ref:name_restore_vcsel_siph_20260910",
+      "ref_id": "merge_name_overwrite_20260910",
       "type": "manual",
       "verb": "go"
     }
