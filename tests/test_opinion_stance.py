@@ -132,3 +132,25 @@ def test_frontend_does_not_hardcode_a_second_stance_table() -> None:
     # 長句夠長到不可能巧合，短標籤不夠。
     for entry in PLAIN_STANCE.values():
         assert entry["reason"][:14] not in source, f"app.js 不該硬編措辭：{entry['reason'][:14]}"
+
+
+def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
+    """三個 surface 印同一個大數字，必須共用同一段判斷。
+
+    事發（2026-09-10）：第一版只改了詳情頁「我們比市場」那一欄，而使用者最先看到的是
+    **列表卡片與頭條的隱含報酬**——那兩處照樣印 `0.0%`。使用者的原話是「002472 明明
+    missing 還是 0.0%」「5802.T AXTI ready without any comment」。
+
+    這是 L13：驗收條件必須寫成「產出出現在下游消費者手上」，而當時驗的是 artifact 裡的
+    欄位對不對——那一層早就對了。
+    """
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(
+        encoding="utf-8")
+    # 1 個定義 + 3 個呼叫（列表卡片／頭條／白話頭條）
+    assert source.count("appendReturnBlock") == 4, "有 surface 沒有共用那段判斷"
+    # 列表卡片要看得到 stance，否則 ready 會被讀成「有結論」
+    assert "stanceBadge(cardStance)" in source
+    # 解釋的那句話要跟大數字在同一張卡
+    assert "stanceBanner(headStance)" in source

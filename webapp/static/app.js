@@ -227,6 +227,60 @@ function absenceBadge(kind) {
   return badge;
 }
 
+/* ---------- opinion stance ----------
+   stance 決定隱含報酬能不能當成一個判斷來讀。`consensus_inverted` 時 EPS 由同期共識反解、
+   目標倍數校準到現價，兩個桿都被構造成 1.0，於是 fair value **恆等於**現價——那個 0 是
+   代數上的必然，不是判斷結果。印出「0.0%」等於謊報一個不存在的判斷，所以那一格改印標籤，
+   原值只留在 hover 供稽核。措辭一律取自 /api/v1/meta，前端不維護第二份（L16）。 */
+function stanceInfo(stance) {
+  return ((VOCAB && VOCAB.plain_stance) || {})[stance] || null;
+}
+
+function isOpinionless(stance) { return stance === 'consensus_inverted'; }
+
+function viewStance(view) {
+  const panel = view && view.fundamental;
+  if (!panel || !panel.lines) return null;
+  const line = panel.lines.filter((l) => l.key === 'opinion_stance')[0];
+  return line && line.datum ? line.datum.value : null;
+}
+
+function stanceBadge(stance) {
+  const info = stanceInfo(stance);
+  if (!stance || stance === 'independent') return null;
+  const badge = el('span', 'badge badge-absence', (info && info.short) || stance);
+  if (info && info.reason) badge.title = info.reason;
+  return badge;
+}
+
+function stanceBanner(stance) {
+  const info = stanceInfo(stance);
+  if (!stance || stance === 'independent' || !info) return null;
+  const warn = el('p', 'note note-warn');
+  const badge = el('span', 'badge badge-absence', info.short);
+  warn.appendChild(badge);
+  warn.appendChild(document.createTextNode(' ' + info.reason));
+  return warn;
+}
+
+/* 隱含報酬那一格。三個 surface（列表卡片／頭條／白話頭條）共用同一段邏輯，
+   否則改一處漏兩處——而使用者最先看到的正是這個大數字。 */
+function appendReturnBlock(numbers, label, ret, ann, stance, annPrefix) {
+  if (isOpinionless(stance)) {
+    const info = stanceInfo(stance);
+    const block = numberBlock(label, (info && info.short) || stance,
+      ret && typeof ret.value === 'number'
+        ? `原值 ${fmtPercent(ret.value)}——由共識反解，代數上必然接近 0` : '');
+    numbers.appendChild(block);
+    return;
+  }
+  if (ret && typeof ret.value === 'number') {
+    numbers.appendChild(numberBlock(label, fmtPercent(ret.value),
+      ann && typeof ann.value === 'number' ? annPrefix + fmtPercent(ann.value) : '',
+      signClass(ret.value)));
+  }
+}
+
 function readinessLabel(state) {
   const table = (VOCAB && VOCAB.readiness_states) || {};
   return table[state] || '';
@@ -268,6 +322,11 @@ function renderCard(row) {
 
   const badges = el('div', 'badges');
   badges.appendChild(readinessBadge(row.readiness.state));
+  /* readiness 講的是「這份判讀讀不讀得成」，stance 講的是「這份判讀是不是我們自己的」
+     ——兩件正交的事，清單上必須同時看得到，否則 ready 會被讀成「有結論」。 */
+  const cardStance = (row.opinion_stance || {}).value;
+  const sBadge = stanceBadge(cardStance);
+  if (sBadge) badges.appendChild(sBadge);
   if (row.freshness && row.freshness.state === 'stale') {
     const b = el('span', 'badge badge-stale', 'stale');
     b.title = row.freshness.rule;
@@ -292,15 +351,8 @@ function renderCard(row) {
       target.value_date && target.value_date.value ? `@ ${target.value_date.value}` : ''));
   }
 
-  const ret = row.implied_return.simple;
-  const ann = row.implied_return.annualized;
-  if (typeof ret.value === 'number') {
-    numbers.appendChild(numberBlock(
-      '隱含報酬',
-      fmtPercent(ret.value),
-      typeof ann.value === 'number' ? `年化 ${fmtPercent(ann.value)}` : '',
-      signClass(ret.value)));
-  }
+  appendReturnBlock(numbers, '隱含報酬', row.implied_return.simple,
+                    row.implied_return.annualized, cardStance, '年化 ');
   card.appendChild(numbers);
 
   const attention = row.primary_attention;
@@ -506,10 +558,7 @@ function renderHeadline(view) {
   }
   const ret = lines.price_return && lines.price_return.datum;
   const ann = lines.annualized_price_return && lines.annualized_price_return.datum;
-  if (ret && typeof ret.value === 'number') {
-    numbers.appendChild(numberBlock('隱含價格報酬', fmtPercent(ret.value),
-      ann && typeof ann.value === 'number' ? `年化 ${fmtPercent(ann.value)}` : '', signClass(ret.value)));
-  }
+  appendReturnBlock(numbers, '隱含價格報酬', ret, ann, viewStance(view), '年化 ');
   // 兩桿拆解（2026-09-09）：只在算得出來時顯示；缺席由下方 attention 區用 absence_kind 說明。
   const epsC = lines.eps_contribution && lines.eps_contribution.datum;
   const mulC = lines.multiple_contribution && lines.multiple_contribution.datum;
@@ -806,10 +855,8 @@ function conclusionCard(payload, view) {
   }
   const ret = lines.price_return && lines.price_return.datum;
   const ann = lines.annualized_price_return && lines.annualized_price_return.datum;
-  if (ret && typeof ret.value === 'number') {
-    numbers.appendChild(numberBlock(plainLine('price_return'), fmtPercent(ret.value),
-      ann && typeof ann.value === 'number' ? `一年約 ${fmtPercent(ann.value)}` : '', signClass(ret.value)));
-  }
+  const headStance = viewStance(view);
+  appendReturnBlock(numbers, plainLine('price_return'), ret, ann, headStance, '一年約 ');
   // 兩桿拆解（2026-09-09）：負的是因為我們 EPS 比共識低，還是因為我們的倍數比市場低——一眼要分得出。
   const epsC = lines.eps_contribution && lines.eps_contribution.datum;
   const mulC = lines.multiple_contribution && lines.multiple_contribution.datum;
@@ -818,6 +865,10 @@ function conclusionCard(payload, view) {
     numbers.appendChild(numberBlock(plainLine('multiple_contribution'), fmtPercent(mulC.value), '', signClass(mulC.value)));
   }
   if (numbers.childNodes.length) node.appendChild(numbers);
+  /* 這句話必須跟大數字在同一張卡——使用者最先看到的就是隱含報酬，
+     解釋它為什麼不能當判斷讀的那句話放在下面第三張卡等於沒說。 */
+  const headBanner = stanceBanner(headStance);
+  if (headBanner) node.appendChild(headBanner);
 
   // 沒有目標價時，把「為什麼沒有」放在跟數字一樣顯眼的位置——不留白、不寫 0。
   [[plainLine('fair_value'), target], [plainLine('price_return'), ret]].forEach(([label, datum]) => {
@@ -972,18 +1023,12 @@ function versusMarketCard(view) {
      短標籤與長句都取自 /api/v1/meta 的 plain_stance——不維護第二份對照表（L16）。 */
   const stanceDatum = lines.opinion_stance && lines.opinion_stance.datum;
   const stance = stanceDatum ? stanceDatum.value : null;
-  const stanceInfo = ((VOCAB && VOCAB.plain_stance) || {})[stance] || null;
+  const sInfo = stanceInfo(stance);
   /* `consensus_inverted` 的「我們比市場」在代數上必然接近 0——印出那個數字等於謊報一個
      不存在的判斷，所以那一欄改印標籤，數字只留在 hover 供稽核。 */
-  const opinionless = stance === 'consensus_inverted';
-  if (stance && stance !== 'independent') {
-    const warn = el('p', 'note note-warn');
-    const tag = el('span', 'badge badge-absence', (stanceInfo && stanceInfo.short) || stance);
-    warn.appendChild(tag);
-    warn.appendChild(document.createTextNode(' ' +
-      ((stanceInfo && stanceInfo.reason) || (stanceDatum && stanceDatum.reason) || '')));
-    node.appendChild(warn);
-  }
+  const opinionless = isOpinionless(stance);
+  const banner = stanceBanner(stance);
+  if (banner) node.appendChild(banner);
 
   const table = el('table', 'rank compare');
   const headRow = el('tr');
@@ -1023,7 +1068,7 @@ function versusMarketCard(view) {
       if (opinionless) {
         gapCell = el('td', 'rank-num');
         gapCell.appendChild(el('span', 'badge badge-absence',
-          (stanceInfo && stanceInfo.short) || stance));
+          (sInfo && sInfo.short) || stance));
         gapCell.title = typeof relative === 'number'
           ? `${fmtPercent(relative)}——由共識反解，代數上必然接近 0，不是判斷結果`
           : '由共識反解，不是判斷結果';
