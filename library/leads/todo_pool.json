@@ -7716,15 +7716,18 @@
       "added_at": "2026-09-03T00:34:53.882999+00:00",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_6a09b7ba4d1ada5c3ba10737df0c0747",
+      "dispatch_receipt": "trace:nidec_20260616_yuho_extension_to_20260930",
       "dispatch_ref": "wo_84a8ad3b17958d14dada59d55733e182",
-      "dispatch_status": "queued",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-10T09:29:07.785994+00:00",
       "dispatched_at": "2026-09-10T07:17:24.118910+00:00",
       "hint": "當前 missing_data：Nidec 決算短信/有報的精密減速器(Drive Technology)segment 受注或營收拆分(Engine （共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 457,
-      "reason": null,
+      "reason": "一手來源結構上尚不存在：第53期(2026/3期)決算短信與有価証券報告書皆未提出，公司 2026-06-16 公告向關東財務局申請延長至 2026-09-30；第三者委員会已查出多拠点會計不正、過年度決算訂正進行中，既有第52期數字亦在更正範圍。相手先別販売実績／受注残高只存在於未提出的有報。已改記 litigation_and_audit_flags 提案 [520]",
+      "receipt": "trace:nidec_20260616_yuho_extension_to_20260930",
       "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T09:29:07.785994+00:00",
       "source": "decision_lab",
       "title": "co:nidec：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -8582,10 +8585,16 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "awaiting_gate": {
+        "n": 517,
+        "set_at": "2026-09-10T09:28:47.547951+00:00"
+      },
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_761c2bee80ed662412a20e8c10b9284c",
+      "dispatch_receipt": "observation:po_57ca78a036e43c572c4e5e9fb820a52e",
       "dispatch_ref": "wo_4df9b545308f14a64b8c5b22de3efe32",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-10T09:28:47.545275+00:00",
       "dispatched_at": "2026-09-10T09:09:17.739996+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 510,
@@ -8599,10 +8608,16 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "awaiting_gate": {
+        "n": 518,
+        "set_at": "2026-09-10T09:28:32.921012+00:00"
+      },
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_599f914a7520398c83ad40dbea806c48",
+      "dispatch_receipt": "observation:po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
       "dispatch_ref": "wo_892cf59432d95f91d952ab87290719d8",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-10T09:28:32.918502+00:00",
       "dispatched_at": "2026-09-10T09:09:17.739996+00:00",
       "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 511,
@@ -8652,10 +8667,16 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "awaiting_gate": {
+        "n": 519,
+        "set_at": "2026-09-10T09:28:49.761047+00:00"
+      },
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_0f521871fed1b7d5a450beaf05a37d3e",
+      "dispatch_receipt": "observation:po_7808b2e1aed29a31fe4b539755bd5b51",
       "dispatch_ref": "wo_69bc61534d902091dacec875dd145713",
-      "dispatch_status": "queued",
+      "dispatch_status": "awaiting_approval",
+      "dispatch_updated_at": "2026-09-10T09:28:49.758439+00:00",
       "dispatched_at": "2026-09-10T09:09:17.739996+00:00",
       "hint": "當前 missing_data：人形轉子交付金額/客戶具名；H1 2026 中報一手(機器人+伺服收入 CNY 1.18B +81.84% 僅二手)（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 515,
@@ -8701,6 +8722,30 @@
       "resolved_at": null,
       "source": "engine_c",
       "title": "Engine C 觀測：MP / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-10T09:27:48.948225+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=江西金力永磁科技股份有限公司 2026 年半年度報告全文（2026-08-21 巨潮資訊：https://static.cninfo.com.cn/finalp",
+      "n": 519,
+      "reason": null,
+      "ref_id": "po_7808b2e1aed29a31fe4b539755bd5b51",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：6680.HK / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-10T09:27:48.948225+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-16T00:00:00+00:00；來源=ニデック株式会社（東証プライム 6594）2026-06-16「第 53 期（2026 年 3 月期）有価証券報告書の提出期限延長に係る承認申請の検討に関するお",
+      "n": 520,
+      "reason": null,
+      "ref_id": "po_fba6864b178ff7eee893484703a1a630",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：6594.T / litigation_and_audit_flags",
       "type": "engine_c_observation"
     }
   ],
@@ -19064,8 +19109,89 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-10T09:28:26.573162+00:00",
+      "n": 511,
+      "reason": "抓 MP FY2025 10-K 全文（EDGAR 0001801368-26-000008）Note 2 Concentration of Customer Risk",
+      "receipt": "research:mp_10k_fy2025_concentration_of_customer_risk",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T09:28:32.918502+00:00",
+      "n": 511,
+      "reason": "MP FY2025 10-K Note 2 逐字一手已取得（前三大 30/23/31%＝84%）；寫入 ledger 需 pq2 [518] 核准",
+      "receipt": "observation:po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-10T09:28:46.444726+00:00",
+      "n": 510,
+      "reason": "宇樹招股書 382 頁逐頁抽取：前五大客戶表、合同負債、現金流量表",
+      "receipt": "research:unitree_688836_prospectus_20260814",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T09:28:47.545275+00:00",
+      "n": 510,
+      "reason": "客戶集中 12.08%／backlog 結構性不存在 兩筆已取一手；runway_inputs 已以 mechanical 直寫 mo_c2f02d41。殘餘 catalyst/disproof/counter_path 非本工單可解",
+      "receipt": "observation:po_57ca78a036e43c572c4e5e9fb820a52e",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-10T09:28:48.665408+00:00",
+      "n": 515,
+      "reason": "金力永磁 2026 半年報 127 頁逐頁抽取：在手訂單、合同負債、供應商集中",
+      "receipt": "research:jlmag_6680hk_h1_2026_interim",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T09:28:49.758439+00:00",
+      "n": 515,
+      "reason": "backlog 一手已取（無量化揭露＋合同負債 1.56 億元）；寫入 ledger 需 pq2 [519] 核准",
+      "receipt": "observation:po_7808b2e1aed29a31fe4b539755bd5b51",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_awaiting_approval"
+    },
+    {
+      "at": "2026-09-10T09:29:06.669843+00:00",
+      "n": 457,
+      "reason": "追 Nidec 客戶集中／受注残高一手：有報為唯一載體",
+      "receipt": "research:nidec_6594t_yuho_extension_20260616",
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-10T09:29:07.785994+00:00",
+      "n": 457,
+      "reason": "一手來源結構上尚不存在：第53期(2026/3期)決算短信與有価証券報告書皆未提出，公司 2026-06-16 公告向關東財務局申請延長至 2026-09-30；第三者委員会已查出多拠点會計不正、過年度決算訂正進行中，既有第52期數字亦在更正範圍。相手先別販売実績／受注残高只存在於未提出的有報。已改記 litigation_and_audit_flags 提案 [520]",
+      "receipt": "trace:nidec_20260616_yuho_extension_to_20260930",
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-10T09:29:07.785994+00:00",
+      "n": 457,
+      "reason": "一手來源結構上尚不存在：第53期(2026/3期)決算短信與有価証券報告書皆未提出，公司 2026-06-16 公告向關東財務局申請延長至 2026-09-30；第三者委員会已查出多拠点會計不正、過年度決算訂正進行中，既有第52期數字亦在更正範圍。相手先別販売実績／受注残高只存在於未提出的有報。已改記 litigation_and_audit_flags 提案 [520]",
+      "receipt": "trace:nidec_20260616_yuho_extension_to_20260930",
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 519,
+  "next_n": 521,
   "schema_version": "1"
 }
