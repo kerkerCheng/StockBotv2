@@ -1,24 +1,25 @@
 {
   "schema_version": "1",
-  "resolution_id": "resolution_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098_994db8521ee9",
+  "resolution_id": "resolution_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098_80e4adf58669",
   "conflict_id": "conflict_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098",
   "edge_key": "edge:0e25fcc6381a52f5a51a303e8cc856dcc17ed07058d66d5e5251c44d8a8f224c",
   "attribute": "qualification_status",
-  "candidate_set_hash": "994db8521ee9df906ddb7393a2b010b432b6464373147ad84f0e6eaa184e09de",
+  "candidate_set_hash": "80e4adf5866907c6026ea5bbe66f20d455ad10bdfff96485eb99b01e49dd3733",
   "action": "choose_value",
   "selected_value": "qualified",
   "supporting_assertion_ids": [
     "coherent_q3fy26_cpo_e17"
   ],
   "rejected_assertion_ids": [
-    "coherent_q2fy26_cpo_e19"
+    "coherent_q2fy26_cpo_e19",
+    "cohr_ocs_dlx_pr_2024_03_25_e1"
   ],
   "supporting_source_ids": [
     "coherent_q3fy26_cpo_s15",
     "coherent_q3fy26_cpo_s20"
   ],
-  "rationale": "同一 scope（OCS 平台）。Q2「strong progress」→ Q3 已在 ramp production capacity 且本季認列營收、市場機會上修至 $4B+；狀態隨時間前進，Q3 supersede Q2。",
-  "resolved_confidence": 0.8,
+  "rationale": "這是 stale resolution 的重新提案，不是改判。2026-07-18 已核准過 qualified；之後圖中新增 cohr_ocs_dlx_pr_2024_03_25，candidate set 改變使舊 resolution 失效。三份候選構成**一致的時間序，不是矛盾**：2024-03-25 產品 PR 宣布 300x300 OCS（qualifying）→ FY26 Q2 法說『strong progress for our optical circuit switch platform』（qualifying）→ FY26 Q3 法說『we did kind of have a breakthrough over the last couple of months on removing a bottleneck in the production capacity』與『We expect OCS revenue to grow this quarter as we ramp production capacity to meet demand』（qualified）。qualification_status 是隨時間單向前進的狀態；新加入的那份是**更早**的階段證據，加入一份更舊的證據不構成推翻較新狀態的理由，因此維持 qualified。⚠ 兩點誠實標記，都不改變本次結論：①Q3 的逐字講的是產能瓶頸突破與營收將成長，並未逐字說客戶 qualification 完成——qualified 是抽取者的解讀（L11-1：措辭精度本身是一個 claim），若日後要提高這條邊的證據等級，該回到原文重新核對；②兩份法說 source_doc 都缺 published_at，在任何 as-of 查詢中會被排除並計為 undated（INV-6）。",
+  "resolved_confidence": 0.7,
   "approved_by": "Cheng",
-  "approved_at": "2026-07-18T07:14:08+08:00"
+  "approved_at": "2026-09-10T12:55:46+08:00"
 }
