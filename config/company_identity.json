@@ -236,7 +236,8 @@
     },
     {
       "company_id": "co:jx_advanced_metals",
-      "research_ticker": "5016.T"
+      "research_ticker": "5016.T",
+      "market_currency": "JPY"
     },
     {
       "company_id": "co:lam_research",
@@ -269,7 +270,8 @@
     },
     {
       "company_id": "co:liteon",
-      "research_ticker": "2301.TW"
+      "research_ticker": "2301.TW",
+      "market_currency": "TWD"
     },
     {
       "company_id": "co:lumentum",
@@ -420,7 +422,8 @@
     },
     {
       "company_id": "co:samsung",
-      "research_ticker": "005930.KS"
+      "research_ticker": "005930.KS",
+      "market_currency": "KRW"
     },
     {
       "company_id": "co:sandisk",
@@ -476,7 +479,8 @@
     },
     {
       "company_id": "co:sumitomo_electric",
-      "research_ticker": "5802.T"
+      "research_ticker": "5802.T",
+      "market_currency": "JPY"
     },
     {
       "company_id": "co:tachyon_networks",
@@ -533,7 +537,8 @@
     },
     {
       "company_id": "co:win_semiconductor",
-      "research_ticker": "3105.TWO"
+      "research_ticker": "3105.TWO",
+      "market_currency": "TWD"
     },
     {
       "company_id": "co:x_fab",
@@ -554,7 +559,8 @@
     },
     {
       "company_id": "co:zhongji_innolight",
-      "research_ticker": "300308.SZ"
+      "research_ticker": "300308.SZ",
+      "market_currency": "CNY"
     }
   ]
 }
