@@ -24481,9 +24481,14 @@
       ],
       "published_at": "2026-09-09T22:31:28.000Z",
       "raw_text": "Anthropic's Economic Scenario publication was a pretty interesting read:\n\n1. Anthropic's \"extreme\" scenario has GDP growth reaching 15.4% in 2030\n\nSo around 7.3x current rates (~2.1% Y/Y), which is consistent with what Elon Musk is saying about outgrowing the national debt with AI.  \n\n2. Almost all of the divergence happens after 2027. \n\nTheir model shows relatively little separation in 2026-2027, then the curves bend sharply into 2028-2030. \n\nSo my read is that it points to 2026-2027 as buildout years and 2028-2030 as economic acceleration. \n\nKinda gets mapped as well when you look at $AMZN / $META / $GOOGL capex, and short term FCF headwinds (but massive projected profitability post 2028)\n\n3. In an extreme scenario, unemployment of knowledge workers goes to 17.9%. With 11.9% economy-wide unemployment\n\n\"At the individual level, it means coders and call service center agents may have to switch to jobs like electrician and nurse, which are less exposed to AI.\"\n\nGG computer science majors. \n\n4. Non-cognitive wages: +33.6% vs. baseline in an extreme scenario. \n\nSo your electricians/construction-type labor becomes extremely valuable? (but this isn't factoring in humanoids yet...)\n\nWhereas -11.5% for knowledge workers in 2030 vs. baseline. \n\n5. Aggregate capital income is ~81% higher than it would have been without AI\n\nProductivity explodes -> aggregate labor income barely changes -> essentially all of the incremental GDP accrues to capital.\n\nSo that makes ownership of capital rather than labor... so equities like compute, power, semis, networking, robotics, etc. become pretty important... \n\nTLDR:\n\n- Economic growth go brr\n- Jobs that require thinking = unemployment + lower wages\n- Physical labor = more important, like electricians. \n- AI equities go brrr.",
-      "refs": {},
+      "refs": {
+        "parked_reason": "第三方對 Anthropic 經濟情境報告的個人解讀；可拆的 atom 全是模型情境值（2030 GDP 15.4%、知識工作者失業 17.9%、非認知工資 +33.6%），屬總體預測而非供應鏈事實。本圖的需求錨是 AI capex 實際支出與人形出貨量，情境報告不產生任何節點或邊，也不改變候選集合。terminal not_pursued",
+        "research_outcome": "追一手（Anthropic 原始出版品）即使成功也是 0 graph delta；依 L14『go 會讓哪個數字變』判定不投入。",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Anthropic's Economic Scenario publication was a pretty interesting read: 1. Anthropic's \"extreme\" scenario has GDP growth reaching 15.4% in 2030 So around 7.3x current rates (~2.1% Y/Y), which is consistent with what Elon Musk is saying about outgrowing the national debt with AI. 2. Almost all of the divergence happens after 2027. Their model shows relatively little separation in 2026-2027, then the curves bend sharply into 2028-2030. So my read is that it points to 2026-2027 as buildout years and 2028-2030 as economic acceleration. Kinda gets mapped as well when you look at $AMZN / $META / $GOOGL capex, and short term FCF headwinds (but massive projected profitability post 2028) 3. In an extreme scenario, unemployment of knowledge workers goes to 17.9%. With 11.9% economy-wide unemployment \"At the individual level, it means coders and call service center agents may have to switch to jobs like electrician and nurse, which are less exposed to AI.\" GG computer science majors. 4. Non-cognitive wages: +33.6% vs. baseline in an extreme scenario. So your electricians/construction-type labor becomes extremely valuable? (but this isn't factoring in humanoids yet...) Whereas -11.5% for knowledge workers in 2030 vs. baseline. 5. Aggregate capital income is ~81% higher than it would have been without AI Productivity explodes -> aggregate labor income barely changes -> essentially all of the incremental GDP accrues to capital. So that makes ownership of capital rather than labor... so equities like compute, power, semis, networking, robotics, etc. become pretty important... TLDR: - Economic growth go brr - Jobs that require thinking = unemployment + lower wages - Physical labor = more important, like electricians. - AI equities go brrr.",
       "triage": {
@@ -27242,9 +27247,14 @@
       "media": [],
       "published_at": "2026-09-09T07:30:28.000Z",
       "raw_text": "Demand for Astra is unprecedented to the point OpenAI might pause new Pro subscriptions.\n\nIf you want a translation: \n\nAI buildout + compute go brrr. https://t.co/RquU9PXs6E",
-      "refs": {},
+      "refs": {
+        "parked_reason": "可拆的 atom 只到『OpenAI Codex／ChatGPT 負責人公開表示 Astra 需求空前、可能暫停新 Pro 訂閱』這個意向陳述，沒有數量、沒有交付對象、沒有供應關係。二手側可交叉（PANews、すまほん!! 等多家同日報導同一段發言），但一手是該高管本人的 X 貼文，且即使取得也只是 dated 需求陳述——A1 不含時變數字，不入圖。terminal not_pursued",
+        "research_outcome": "方向與既有 AI capex 需求錨一致，屬 L8／L11-2 最該起疑的那類『剛好嵌得進已成形敘事』的材料；不改變任何邊、任何候選排序。",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Demand for Astra is unprecedented to the point OpenAI might pause new Pro subscriptions. If you want a translation: AI buildout + compute go brrr. https://t.co/RquU9PXs6E",
       "triage": {
@@ -52751,9 +52761,15 @@
       "first_seen": "2026-09-09T22:33:28.026653+00:00",
       "lead_id": "lead_d155cb2cd9abb44170b783a7e37ce838",
       "published_at": "2026-09-09",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行 Form 4 內部人申報，非本系統研究對象；terminal not_pursued",
+        "research_outcome": "已抓一手 XML 核對（Wu_Yi-Huang_VP_40股，2026-09-07，code P，@US$76.20）：三筆皆為 footnote 明載『purchased by the administrator of the issuer's ESPP pursuant to terms predetermined by the issuer』的 ESPP 自動申購，非自主決策，連『內部人信心』都不成立。無供應鏈 atom 可抽、無 graph delta。",
+        "trace_attempts_ref": "SEC EDGAR CIK 0001046179 Form 4 原始 XML 逐欄解析（accession 0001046179-26-000656／000644／000648）",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-09",
       "triage": {
@@ -58319,9 +58335,15 @@
       "first_seen": "2026-09-09T22:33:28.027288+00:00",
       "lead_id": "lead_eaeac8901d07727471911ea401e7bac2",
       "published_at": "2026-09-09",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行 Form 4 內部人申報，非本系統研究對象；terminal not_pursued",
+        "research_outcome": "已抓一手 XML 核對（Wei_Che-Chia_Chairman_CEO_149股，2026-09-07，code P，@US$76.20）：三筆皆為 footnote 明載『purchased by the administrator of the issuer's ESPP pursuant to terms predetermined by the issuer』的 ESPP 自動申購，非自主決策，連『內部人信心』都不成立。無供應鏈 atom 可抽、無 graph delta。",
+        "trace_attempts_ref": "SEC EDGAR CIK 0001046179 Form 4 原始 XML 逐欄解析（accession 0001046179-26-000656／000644／000648）",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-09",
       "triage": {
@@ -58416,9 +58438,15 @@
       "first_seen": "2026-09-09T22:33:28.027131+00:00",
       "lead_id": "lead_ebb5f32204da8a8530ca60eca23e9604",
       "published_at": "2026-09-09",
-      "refs": {},
+      "refs": {
+        "parked_reason": "例行 Form 4 內部人申報，非本系統研究對象；terminal not_pursued",
+        "research_outcome": "已抓一手 XML 核對（Mii_Yuh-Jier_EVP_CoCOO_71股，2026-09-07，code P，@US$76.20）：三筆皆為 footnote 明載『purchased by the administrator of the issuer's ESPP pursuant to terms predetermined by the issuer』的 ESPP 自動申購，非自主決策，連『內部人信心』都不成立。無供應鏈 atom 可抽、無 graph delta。",
+        "trace_attempts_ref": "SEC EDGAR CIK 0001046179 Form 4 原始 XML 逐欄解析（accession 0001046179-26-000656／000644／000648）",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 4 filed 2026-09-09",
       "triage": {
