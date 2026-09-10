@@ -8089,10 +8089,11 @@
       "added_at": "2026-09-04T22:45:56.191164+00:00",
       "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 479,
-      "reason": null,
+      "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
+      "receipt": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-10T02:57:17.599952+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-09-09T14:47:38.784867+00:00",
@@ -8100,14 +8101,7 @@
         "source_healthy": true
       },
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-09-09T10:34:50.147107+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-09-04T23:09:52.902998+00:00",
@@ -8401,10 +8395,11 @@
       "added_at": "2026-09-09T10:34:50.147614+00:00",
       "hint": "當前 missing_data：Lumilens 訂單的實際出貨與收款驗證（PO ≠ 營收）；Marvell 保密爭議的後續（訴訟或和解揭露）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 498,
-      "reason": null,
+      "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
+      "receipt": null,
       "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-10T02:57:17.600036+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-09-09T14:47:38.784867+00:00",
@@ -8412,23 +8407,17 @@
         "source_healthy": true
       },
       "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-09-09T10:34:50.147327+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-09-09T10:34:50.147614+00:00",
       "hint": "當前 missing_data：2026-08-27 重編與收入認列核對；獨立客戶端量產訂單（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 499,
-      "reason": null,
+      "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
+      "receipt": null,
       "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-10T02:57:17.600101+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-09-09T14:47:38.784867+00:00",
@@ -8436,14 +8425,7 @@
         "source_healthy": true
       },
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-09-09T10:34:50.147381+00:00",
-        "trigger": "執行面 context 缺失",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-09-09T14:47:38.784867+00:00",
@@ -8530,6 +8512,18 @@
       "resolved_at": null,
       "source": "manual",
       "title": "圖中六個語意重疊的 NAND 節點需合併——證據被切碎，且讓覆蓋掃描把一個已覆蓋的層報成 🔴 研究缺口",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T02:56:20.225794+00:00",
+      "hint": "2026-09-10 開發項交付後的殘留。config/entity_aliases.json 已登記三組 canonical：tech:eml ← tech:eml_laser、tech:advanced_packaging ← tech:advanced_packaging_integration、tech:dram_manufacturing ← tech:dram_production。三組的 name 逐字相同（『Electro-absorption Modulated Laser (EML)』／『Advanced packaging chip integration』／『DRAM wafer fabrication』），所以登記依據是機械的 name_identical，不含任何語意判斷。\n⚠ registry 只作用於**未來**的抽取（loader 在入圖前解析 node／edge 端點／node claim subject）；**圖裡既有的六個節點不會自己合併**，那是 graph write。查證：ROADMAP 第 177 行驗收查詢 (b)，現值 3。\ngo＝授權起草 canonical 合併的 prepared RA（把 alias 節點的邊重指到 canonical、保留每條原始 provenance 與 SourceDoc、不新增任何知識主張），**入圖仍走 ra_admission 逐項核准**；不含 thesis mutation、不含 Engine C 寫入、不含 live。\n與 [505] 的分工：[505] 是 NAND 六個，name 各不相同，需要語意判斷「這六個是不是同一層」；本項三組 name 逐字相同，不需要語意判斷，只是存量搬遷。兩者證據門檻不同，故分開編號。",
+      "n": 506,
+      "reason": null,
+      "ref_id": "entity_alias_backfill_20260910",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "圖中三組名稱逐字相同的實體需合併存量——registry 已登記，但它只改未來的抽取",
       "type": "manual"
     }
   ],
@@ -18673,8 +18667,35 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-10T02:57:17.599952+00:00",
+      "n": 479,
+      "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-10T02:57:17.600036+00:00",
+      "n": 498,
+      "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
+      "receipt": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-10T02:57:17.600101+00:00",
+      "n": 499,
+      "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
+      "receipt": null,
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "drop"
     }
   ],
-  "next_n": 506,
+  "next_n": 507,
   "schema_version": "1"
 }
