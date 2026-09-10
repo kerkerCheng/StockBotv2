@@ -1067,6 +1067,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
+        PLAIN_DRIVER_LABELS,
         PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS, PLAIN_STANCE,
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
@@ -1086,6 +1087,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
         # opinion stance 的白話層（2026-09-10）：前端不得再寫第二份（L16）。
         "plain_stance": {k: dict(v) for k, v in PLAIN_STANCE.items()},
+        "plain_driver_labels": dict(PLAIN_DRIVER_LABELS),
         "price_series_note": PRICE_SERIES_NOTE,
         "questions": dict(QUESTIONS),
         "weak_input_rules": dict(WEAK_INPUT_RULES),

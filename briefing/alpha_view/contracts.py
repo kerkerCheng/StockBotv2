@@ -499,6 +499,9 @@ class ExpectationGapSection:
     #: 我們有沒有形成自己的觀點（`OPINION_STANCES`）。**與上面那排正交**：一份每格都有數字的
     #: 比較表，完全可以整組由共識反解而來——那時「我們比市場」的 0 是代數必然，不是判斷。
     opinion_stance: Datum | None = None
+    #: 反過來問：現價要成立，某個 driver 必須是多少（其餘假設固定成我們的）。
+    #: **每個值都是條件解不是唯一解**——共識只給總量，分項欠定（ROADMAP §B）。
+    reverse_bridge: Datum | None = None
 
 
 @dataclass(frozen=True, slots=True)

@@ -326,3 +326,7 @@ table.rank.compare td:first-child { color: var(--muted); }
 /* 分段標題。分段是研究完整度，不是投資排序——樣式刻意平淡，不做成排行榜。 */
 .group-head { font-size: 14px; font-weight: 600; color: var(--muted);
               margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+
+/* 反推區塊：跟正向的比較表在同一張卡，但視覺上分開——它問的是反過來的問題。 */
+.reverse { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border); }
+.reverse h3 { font-size: 14px; margin: 0 0 8px; }

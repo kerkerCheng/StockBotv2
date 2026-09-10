@@ -1010,6 +1010,70 @@ const COMPARE_ROWS = [
   ['營益率', 'internal_operating_margin', 'internal_vs_consensus_operating_margin'],
 ];
 
+/* 反過來問：現價要成立，某個 driver 必須是多少（其餘假設固定成我們的）。
+   資深買方不信目標倍數法，因為倍數的自由度會吃掉一切——把目標 P/E 從 20x 改成 25x 是
+   +25%，而讓 EPS 比共識高 5% 要一整條證據鏈。反推法不需要你給新的倍數，那個自由度
+   根本不存在。⚠ 每個值都是**條件解**：共識只給總量，分項欠定，同時套用兩個解會超過。 */
+function reverseBridgeBlock(datum) {
+  if (!datum) return null;
+  const v = datum.value;
+  const box = el('div', 'reverse');
+  box.appendChild(el('h3', null, '現價隱含什麼'));
+  if (!v) {
+    box.appendChild(el('p', 'note', datum.reason || '這一格沒有內容'));
+    return box;
+  }
+  const head = el('div', 'headline-numbers');
+  head.appendChild(numberBlock('市場隱含 EPS', fmtNumber(v.market_implied_eps, 2),
+    `以我們的目標倍數 ${fmtNumber(v.target_multiple, 1)}x 反推現價 ${fmtBig(v.current_price)}`));
+  if (typeof v.our_eps === 'number') {
+    head.appendChild(numberBlock('我們估的 EPS', fmtNumber(v.our_eps, 2),
+      typeof v.eps_gap === 'number'
+        ? `市場比我們${v.eps_gap >= 0 ? '樂觀' : '保守'} ${fmtPercent(Math.abs(v.eps_gap))}` : ''));
+  }
+  if (typeof v.consensus_eps === 'number') {
+    head.appendChild(numberBlock('分析師共識 EPS', fmtNumber(v.consensus_eps, 2), '別人的數字'));
+  }
+  box.appendChild(head);
+
+  const table = el('table', 'rank compare');
+  const headRow = el('tr');
+  ['要獨力撐起現價的話', '我們的假設', '市場隱含'].forEach((t) => headRow.appendChild(th(t)));
+  const thead = el('thead'); thead.appendChild(headRow); table.appendChild(thead);
+  const body = el('tbody');
+  (v.solutions || []).forEach((sol) => {
+    const tr = el('tr');
+    const names = (VOCAB && VOCAB.plain_driver_labels) || {};
+    const driverName = names[sol.driver] || sol.driver;
+    const label = sol.scope && sol.scope !== 'total'
+      ? `${driverName}（${sol.scope}）` : driverName;
+    tr.appendChild(el('td', null, label));
+    tr.appendChild(el('td', 'rank-num', fmtPercent(sol.our_value)));
+    if (typeof sol.implied_value === 'number') {
+      const cell = el('td', 'rank-num ' + signClass(sol.gap), fmtPercent(sol.implied_value));
+      if (sol.status === 'already_equal') {
+        cell.textContent = fmtPercent(sol.implied_value) + '（相同）';
+        cell.className = 'rank-num';
+        cell.title = sol.reason || '';
+      }
+      tr.appendChild(cell);
+    } else {
+      const cell = el('td', 'rank-num');
+      cell.appendChild(el('span', 'badge badge-absence', '撐不起'));
+      cell.title = sol.reason || '';
+      tr.appendChild(cell);
+    }
+    body.appendChild(tr);
+  });
+  table.appendChild(body);
+  const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
+  box.appendChild(wrap);
+  box.appendChild(el('p', 'note',
+    '每一列都是**條件解**：算這一列時其餘假設固定成我們的值，所以兩列不能同時成立。'
+    + '共識只給一個總量，分項本來就欠定——這裡不假造市場沒有提供的精確 driver。'));
+  return box;
+}
+
 function versusMarketCard(view) {
   const panel = view.fundamental;
   const lines = lineMap(panel);
@@ -1118,6 +1182,9 @@ function versusMarketCard(view) {
       '以市場共識 EPS 計'));
   }
   if (context.childNodes.length) node.appendChild(context);
+
+  const reverse = reverseBridgeBlock(lines.reverse_bridge && lines.reverse_bridge.datum);
+  if (reverse) node.appendChild(reverse);
 
   const basis = basisDisplay(ctx.accounting_basis);
   node.appendChild(el('p', 'note', `口徑：${basis.label}。${ctx.same_period_rule || ''}`));

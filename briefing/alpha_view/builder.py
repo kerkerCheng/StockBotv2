@@ -162,6 +162,37 @@ _COMPARISON_STATUS_TO_DATUM: Mapping[str, str] = {
 _CONSENSUS_METRIC_LABEL: Mapping[str, str] = {"eps": "EPS", "revenue": "營收"}
 
 
+def _reverse_datum(reverse: Any, reason: str | None, *, reference_day: date) -> Datum:
+    """Reverse Bridge → 一格 Datum。**照抄**，不重算、不排序、不挑掉解不出來的那些（INV-3）。"""
+    if reverse is None:
+        return missing("reverse_bridge", "現價隱含的營運假設",
+                       reason or "本次未執行 reverse bridge", authority=A_COMPARE)
+    payload = {
+        "market_implied_eps": reverse.market_implied_eps,
+        "our_eps": reverse.our_eps,
+        "consensus_eps": reverse.consensus_eps,
+        "target_multiple": reverse.target_multiple,
+        "current_price": reverse.current_price,
+        "eps_gap": reverse.eps_gap,
+        "solutions": [
+            {"driver": s.driver, "scope": s.scope, "unit": s.unit, "our_value": s.our_value,
+             "implied_value": s.implied_value, "gap": s.gap, "status": s.status,
+             "reason": s.reason, "assumption_id": s.assumption_id}
+            for s in reverse.solutions
+        ],
+    }
+    if reverse.status == "missing":
+        return Datum(key="reverse_bridge", label="現價隱含的營運假設", value=None,
+                     status="missing", basis="none", authority=A_COMPARE,
+                     reason=reverse.reason, as_of=reference_day)
+    return Datum(
+        key="reverse_bridge", label="現價隱含的營運假設", value=payload,
+        status=("available" if reverse.status == "available" else "partial"),
+        basis="deterministic", authority=A_COMPARE, as_of=reference_day,
+        method=reverse.method, reason=reverse.reason,
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class _FundamentalParts:
     """`_fundamental_parts()` 的產物：模型輸出被**選取**成各 section 要用的 Datum。"""
@@ -1280,6 +1311,8 @@ def build_alpha_investment_view(
     entry: EntryAssessmentResult | None = None,
     entry_reason: str | None = None,
     entry_records: Sequence[EntryCriterion] = (),
+    reverse: Any = None,
+    reverse_reason: str | None = None,
     today: date | None = None,
     refresh_changes: Sequence[ChangeEvent] | None = None,
     assumption_records: Sequence[OperatingAssumption] = (),
@@ -2080,6 +2113,7 @@ def build_alpha_investment_view(
                                               "不是內部基本面 vs 價格隱含基本面"),
         numeric_comparisons=fund.comparisons,
         opinion_stance=fund.opinion_stance,
+        reverse_bridge=_reverse_datum(reverse, reverse_reason, reference_day=today),
     )
 
     # =======================================================================

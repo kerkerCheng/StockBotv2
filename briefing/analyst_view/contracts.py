@@ -196,6 +196,19 @@ PLAIN_READINESS: Mapping[str, Mapping[str, str]] = {
     "blocked": {"label": "有一段讀不成", "note": "看下面「卡在哪」——它會說是還沒做、刻意不做，還是缺上游"},
 }
 
+#: `OperatingAssumption.driver` 的白話標籤（2026-09-10）。反推表的每一列印的是 driver，
+#: 而 `PLAIN_LINE_LABELS` 的 key 是 line key 不是 driver——混用會讓使用者看到 `revenue_growth`。
+#: ⚠ 這不是重造 `ASSUMPTION_DRIVERS`（那裡的 description 是給寫假設的人看的長句，
+#: 含 scope 規則）；這裡只有短標籤，且 `tests` 守著 key 集合完全相同。
+PLAIN_DRIVER_LABELS: Mapping[str, str] = {
+    "revenue_growth": "營收成長",
+    "operating_margin_delta": "營益率變化",
+    "interest_and_other_net": "利息與其他淨額",
+    "tax_rate": "有效稅率",
+    "nci_attribution": "非控制權益調整",
+    "diluted_shares": "稀釋股數",
+}
+
 #: opinion stance 的白話措辭層（2026-09-10）。**short 與 reason 只有這一份**——
 #: builder 寫進 datum.reason 的長句、APP badge 的短標籤、meta API 的字彙表全部取自這裡。
 #: 分成兩份就會有一份開始偏離（L16），所以 `tests` 守著它的 key 集合＝`OPINION_STANCES`。
@@ -514,6 +527,7 @@ __all__ = [
     "PLAIN_LINE_LABELS",
     "PLAIN_PANEL_TITLES",
     "PLAIN_READINESS",
+    "PLAIN_DRIVER_LABELS",
     "PLAIN_STANCE",
     "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",
