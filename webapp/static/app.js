@@ -345,9 +345,34 @@ async function renderList() {
       '還沒有任何 materialized 判讀。請在本機跑 `python -m webapp materialize <TICKER>`。'));
     return;
   }
-  const cards = el('div', 'cards');
-  data.stocks.forEach((row) => cards.appendChild(renderCard(row)));
-  app.appendChild(cards);
+  /* 常駐計數器。**它必須自己出現**——寫在文件裡的檢查點六天內就被同一個形狀繞過兩次，
+     所以「有幾檔的判讀是我們自己的」要長在第一屏，不是等人去讀某一段（L14）。 */
+  const counters = data.opinion_counters;
+  if (counters) {
+    const bar = el('div', 'counter-bar');
+    bar.appendChild(el('strong', null, counters.headline || ''));
+    if (counters.note) bar.appendChild(el('span', 'note', counters.note));
+    app.appendChild(bar);
+  }
+
+  /* 分段呈現。順序來自 /api/v1/stocks 的 groups（後端已排好），前端不自己排、不自己命名。 */
+  const groups = data.groups || [];
+  if (groups.length) {
+    groups.forEach((group) => {
+      const rows = data.stocks.filter((row) => row.group === group.key);
+      if (!rows.length) return;
+      const head = el('h2', 'group-head', `${group.label}（${rows.length}）`);
+      app.appendChild(head);
+      const cards = el('div', 'cards');
+      rows.forEach((row) => cards.appendChild(renderCard(row)));
+      app.appendChild(cards);
+    });
+    if (data.group_note) app.appendChild(el('p', 'note', data.group_note));
+  } else {
+    const cards = el('div', 'cards');
+    data.stocks.forEach((row) => cards.appendChild(renderCard(row)));
+    app.appendChild(cards);
+  }
 
   if (data.unavailable.length) {
     const box = el('div', 'error');
@@ -943,6 +968,23 @@ function versusMarketCard(view) {
   node.appendChild(el('h2', null, meta.title));
   node.appendChild(el('div', 'panel-questions', meta.hint));
 
+  /* 我們有沒有形成自己的觀點。**由模型層宣告**（datum.value），前端不 parse 理由句去猜，
+     短標籤與長句都取自 /api/v1/meta 的 plain_stance——不維護第二份對照表（L16）。 */
+  const stanceDatum = lines.opinion_stance && lines.opinion_stance.datum;
+  const stance = stanceDatum ? stanceDatum.value : null;
+  const stanceInfo = ((VOCAB && VOCAB.plain_stance) || {})[stance] || null;
+  /* `consensus_inverted` 的「我們比市場」在代數上必然接近 0——印出那個數字等於謊報一個
+     不存在的判斷，所以那一欄改印標籤，數字只留在 hover 供稽核。 */
+  const opinionless = stance === 'consensus_inverted';
+  if (stance && stance !== 'independent') {
+    const warn = el('p', 'note note-warn');
+    const tag = el('span', 'badge badge-absence', (stanceInfo && stanceInfo.short) || stance);
+    warn.appendChild(tag);
+    warn.appendChild(document.createTextNode(' ' +
+      ((stanceInfo && stanceInfo.reason) || (stanceDatum && stanceDatum.reason) || '')));
+    node.appendChild(warn);
+  }
+
   const table = el('table', 'rank compare');
   const headRow = el('tr');
   [ctx.period ? `${ctx.period} 預測` : '預測項目', '我們估', '市場共識', '我們比市場']
@@ -977,10 +1019,20 @@ function versusMarketCard(view) {
       }
       tr.appendChild(consensusCell);
       const relative = gap.value.relative_gap;
-      const gapCell = el('td', 'rank-num ' + signClass(relative),
-        typeof relative === 'number' ? fmtPercent(relative) : '—');
-      if (typeof gap.value.absolute_gap === 'number') {
-        gapCell.title = `絕對差 ${fmtBig(gap.value.absolute_gap)}`;
+      let gapCell;
+      if (opinionless) {
+        gapCell = el('td', 'rank-num');
+        gapCell.appendChild(el('span', 'badge badge-absence',
+          (stanceInfo && stanceInfo.short) || stance));
+        gapCell.title = typeof relative === 'number'
+          ? `${fmtPercent(relative)}——由共識反解，代數上必然接近 0，不是判斷結果`
+          : '由共識反解，不是判斷結果';
+      } else {
+        gapCell = el('td', 'rank-num ' + signClass(relative),
+          typeof relative === 'number' ? fmtPercent(relative) : '—');
+        if (typeof gap.value.absolute_gap === 'number') {
+          gapCell.title = `絕對差 ${fmtBig(gap.value.absolute_gap)}`;
+        }
       }
       tr.appendChild(gapCell);
       printed += 1;

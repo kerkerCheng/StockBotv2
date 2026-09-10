@@ -496,6 +496,9 @@ class ExpectationGapSection:
     internal_vs_consensus: Datum             # 數值 gap 總表（只在 apples-to-apples 時有值）
     internal_vs_price_implied: Datum         # not_modeled（估值側是下一階段）
     numeric_comparisons: tuple[Datum, ...] = ()   # 逐指標：revenue／eps／operating_margin
+    #: 我們有沒有形成自己的觀點（`OPINION_STANCES`）。**與上面那排正交**：一份每格都有數字的
+    #: 比較表，完全可以整組由共識反解而來——那時「我們比市場」的 0 是代數必然，不是判斷。
+    opinion_stance: Datum | None = None
 
 
 @dataclass(frozen=True, slots=True)

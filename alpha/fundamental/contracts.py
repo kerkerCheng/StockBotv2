@@ -177,6 +177,70 @@ ASSUMPTION_REF_ROLES: tuple[str, ...] = ("supporting", "calibration", "compariso
 #: 由 ref 前綴機械判定「這是同期共識」——它是可重導的字串規則，不是判斷。
 CONSENSUS_REF_PREFIX = "engine_c://consensus_estimate/"
 
+#: 這條假設的**值是怎麼決定的**——與 `dependency_roles`（每條證據扮演什麼角色）正交。
+#:
+#: ⚠ 為什麼 `dependency_roles` 擋不住這件事（2026-09-10 實測 14 本 ledger）：每一條
+#: 「由共識 EPS 逆推」的假設都**完整滿足** v2 的 provenance gate——基期觀測標
+#: `supporting`、同期共識標 `calibration`，兩個標記都誠實，而循環照樣發生。原因是那道
+#: gate 問的是「共識有沒有被當成支持證據」，**而逆推根本不需要那樣標**：共識不支持
+#: 「成長率是 11.59%」，它只是被反解出這個值（L15-1：這個 gate 攔下的不是它想攔的東西）。
+#: 基期觀測 supporting 的是「基期是多少」，不是「成長率該是多少」。
+#:
+#: - `independent`：值由我們自己的分析決定（結論接不接近共識由 `eps_contribution` 自己說，
+#:   **不在這裡再標一次**——那會變成兩個地方講同一件事）。
+#: - `consensus_inverted`：值由同期共識反解得出。**這不是觀點，是佔位**。
+#: - `company_guidance`：採公司自家指引（6324.T／LYC.AX 的形狀）。
+#: - `carried_forward`：沿用基期實績（tax_rate／nci／shares／interest 的常見且正確做法）。
+#: - `unclassified`：舊紀錄的 fail safe；**寫入端一律拒絕**。
+#:
+#: ⚠ 刻意**沒有** `consensus_convergent`（「獨立算過剛好接近共識」）：今天 14 本 ledger
+#: 沒有任何一筆是那個形狀，在沒有資料支撐的地方泛化只會得到會誤報的分類（L17-4）。
+ASSUMPTION_DERIVATIONS: tuple[str, ...] = (
+    "independent", "consensus_inverted", "company_guidance", "carried_forward", "unclassified",
+)
+
+#: `derivation` 屬於「我們有沒有形成觀點」這一題的**核心 driver**。其餘四個 driver
+#: （tax_rate／nci_attribution／diluted_shares／interest_and_other_net）沿用基期實績是正確做法，
+#: 把它們算進來會讓每一家公司都被判成沒有觀點——那個判準會恆亮，也就等於沒有鑑別力（L14-4）。
+OPINION_BEARING_DRIVERS: frozenset[str] = frozenset({"revenue_growth", "operating_margin_delta"})
+
+#: 一家公司在**這一期**有沒有形成自己的觀點。由 `derivation` 聚合而來，是**模型層的宣告**，
+#: 不是呈現層 parse 理由句猜出來的（APP 呈現契約：`absence_kind` 那條同理）。
+#:
+#: 優先序刻意 fail safe 到「沒有觀點」：`unclassified` 永遠不會被算成 independent。
+#: - `independent`：至少一條核心 driver 由我們自己決定 → **這一格有內容可讀**。
+#: - `consensus_inverted`：核心 driver 沒有一條是自己的，且至少一條由共識反解 → **這是佔位，
+#:   隱含報酬的 0 不攜帶資訊**。
+#: - `company_guidance`：核心 driver 全部採公司指引 → 既不是我們的觀點，也不是共識循環。
+#: - `undeclared`：只有舊紀錄（未宣告）。
+#: - `no_opinion_bearing_assumptions`：連核心 driver 的假設都沒有 → 還沒開始。
+OPINION_STANCES: tuple[str, ...] = (
+    "independent", "consensus_inverted", "company_guidance", "undeclared",
+    "no_opinion_bearing_assumptions",
+)
+
+
+def opinion_stance(assumptions: Sequence["OperatingAssumption"]) -> str:
+    """一組 accepted 假設 → 這家公司這一期的 opinion stance。**純函式**。
+
+    只看 `OPINION_BEARING_DRIVERS`：沿用基期實績的 tax／shares／NCI／interest 不參與，
+    否則每一家公司都會被判成沒有觀點，而一個恆亮的判準等於零鑑別力（L14-4）。
+    """
+    live = [a for a in assumptions
+            if a.driver in OPINION_BEARING_DRIVERS and not a.retracted]
+    if not live:
+        return "no_opinion_bearing_assumptions"
+    kinds = {a.derivation for a in live}
+    # ⚠ 順序不是「哪個聽起來比較強」，是**哪一種結構上可能產生預期差**（2026-09-10 實測後修正）：
+    # `consensus_inverted` 的值就是從共識反解的，所以它**結構上不可能**與共識不同；
+    # `company_guidance` 的值來自公司指引，而公司指引與共識**可以**不同、而且常常不同。
+    # 實例：LITE 的營益率取自公司 Q1 指引持平外推，共識沒這樣做——那條假設一條就貢獻了
+    # +8.92% 的 EPS 差異。把它壓成「還沒形成觀點」會把一個真實的立場說成空白。
+    for stance in ("independent", "company_guidance", "consensus_inverted"):
+        if stance in kinds:
+            return stance
+    return "undeclared"
+
 
 @dataclass(frozen=True, slots=True)
 class OperatingAssumption:
@@ -211,6 +275,7 @@ class OperatingAssumption:
     dependency_roles: Mapping[str, str] = field(default_factory=dict)
     review_conditions: tuple[Any, ...] = ()
     provenance_semantics: str = "legacy"
+    derivation: str = "unclassified"
 
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "OperatingAssumption.assumption_id")
@@ -250,6 +315,16 @@ class OperatingAssumption:
         if self.provenance_semantics not in PROVENANCE_SEMANTICS:
             raise ContractViolation(
                 f"provenance_semantics 未登記：{self.provenance_semantics!r}；已知 {PROVENANCE_SEMANTICS}")
+        if self.derivation not in ASSUMPTION_DERIVATIONS:
+            raise ContractViolation(
+                f"derivation 未登記：{self.derivation!r}；已知 {ASSUMPTION_DERIVATIONS}")
+        if self.derivation == "consensus_inverted" and not self.retracted:
+            # 補償控制（放行與收緊同時發生）：宣告「由共識反解」就必須指得出被反解的那筆共識，
+            # 否則這個宣告無法被交叉檢查，只是一個自由字串。
+            if not any(r.startswith(CONSENSUS_REF_PREFIX) for r in self.evidence_refs):
+                raise ContractViolation(
+                    "derivation=consensus_inverted 必須引用被反解的那筆同期共識"
+                    f"（{CONSENSUS_REF_PREFIX}...），否則這個宣告無從查證")
         for ref, role in self.dependency_roles.items():
             if role not in ASSUMPTION_REF_ROLES:
                 raise ContractViolation(f"dependency_roles[{ref}] 未登記：{role!r}；已知 {ASSUMPTION_REF_ROLES}")
@@ -563,6 +638,16 @@ class FundamentalModelResult:
     def metric(self, name: str) -> ModeledMetric | None:
         return self.metrics.get(name)
 
+    @property
+    def stance(self) -> str:
+        """這一期我們有沒有形成自己的觀點（`OPINION_STANCES`）。
+
+        ⚠ 它**不是** readiness 也不是 status：一份 `available` 的模型完全可能 stance 是
+        `consensus_inverted`——每一格都有數字、每一個數字都是共識反解出來的。那正是
+        2026-09-10 實測到的 5 檔（隱含報酬 ±0.01%，而那個 0 是代數上的必然，不是判斷）。
+        """
+        return opinion_stance(self.assumptions)
+
 
 __all__ = [
     "ACCOUNTING_BASES", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "ASSUMPTION_REF_ROLES", "BRIDGE_VERSION",
@@ -571,5 +656,6 @@ __all__ = [
     "PERIOD_MATCH_TOLERANCE_DAYS", "TOTAL_SCOPE", "AssumptionSelection", "BridgeStep",
     "ConsensusEstimate", "DriverSpec", "ExpectationComparison", "FiscalPeriod",
     "FiscalYearActuals", "FundamentalModelResult", "GuidanceObservation", "ModeledMetric",
-    "OperatingAssumption", "Sensitivity", "weakest_basis",
+    "OPINION_BEARING_DRIVERS", "OPINION_STANCES", "ASSUMPTION_DERIVATIONS",
+    "OperatingAssumption", "Sensitivity", "opinion_stance", "weakest_basis",
 ]

@@ -218,6 +218,9 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
                     calibration_refs=list(spec.get("calibration_refs") or []),
                     comparison_refs=list(spec.get("comparison_refs") or []),
                     review_conditions=list(spec.get("review_conditions") or []),
+                    # v3：這個值是怎麼決定的。spec 沒給就在 assumption_record 被拒——
+                    # 未宣告不會被當成 independent（那會把佔位冒充成主張）。
+                    derivation=spec.get("derivation"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 假設不合法：{exc}", file=sys.stderr)

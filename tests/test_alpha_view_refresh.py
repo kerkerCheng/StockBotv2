@@ -101,11 +101,12 @@ def test_assumption_lifecycle_and_watch_changes() -> None:
     old = parse_assumption_record(assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="tax_rate", scope="total",
         value=0.19, basis="heuristic_proxy", rationale="r", evidence_refs=[ACT_REF.ref],
-        created_at=datetime(2026, 9, 5, 8, 0, tzinfo=UTC)))
+        created_at=datetime(2026, 9, 5, 8, 0, tzinfo=UTC), derivation="carried_forward"))
     new = parse_assumption_record(assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="tax_rate", scope="total",
         value=0.18, basis="heuristic_proxy", rationale="r2", evidence_refs=[ACT_REF.ref],
-        supersedes_id=old.assumption_id, created_at=datetime(2026, 9, 8, 8, 0, tzinfo=UTC)))
+        supersedes_id=old.assumption_id, created_at=datetime(2026, 9, 8, 8, 0, tzinfo=UTC),
+        derivation="carried_forward"))
     events = ch.assumption_changes([old, new], ticker="COHR", company_id="co:coherent", since=SINCE)
     assert [e.change_type for e in events] == [OPERATING_ASSUMPTION, OPERATING_ASSUMPTION]
     assert events[1].related_refs == (old.assumption_id,) and "取代" in events[1].detail

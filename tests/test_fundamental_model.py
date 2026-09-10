@@ -64,11 +64,12 @@ def _actuals(**over) -> FiscalYearActuals:
 
 def _assumption(driver: str, scope: str, value: float, *, basis: str = "session_judgment",
                 created: str = "2026-09-05T08:00:00+00:00", refs=(GRAPH_REF.ref,),
-                period_end: date = TARGET.end, **kw) -> OperatingAssumption:
+                period_end: date = TARGET.end, derivation: str = "independent",
+                **kw) -> OperatingAssumption:
     record = assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=period_end, driver=driver, scope=scope,
         value=value, basis=basis, rationale=f"test {driver}[{scope}]", evidence_refs=list(refs),
-        created_at=datetime.fromisoformat(created), **kw)
+        created_at=datetime.fromisoformat(created), derivation=derivation, **kw)
     return parse_assumption_record(record)
 
 
@@ -416,7 +417,8 @@ def test_driver_vocabulary_is_closed_and_validated() -> None:
         _assumption("tax_rate", "total", 0.19, basis="deterministic")
     record = assumption_record(company_id="co:x", ticker="X", period_end=TARGET.end, driver="tax_rate",
                                scope="total", value=0.2, basis="heuristic_proxy", rationale="r",
-                               evidence_refs=["e"], created_at=datetime(2026, 9, 5, tzinfo=UTC))
+                               evidence_refs=["e"], created_at=datetime(2026, 9, 5, tzinfo=UTC),
+                               derivation="carried_forward")
     record["unit"] = "currency"                               # 單位跟著 driver，改了就拒收
     with pytest.raises(ContractViolation, match="單位必須是"):
         parse_assumption_record(record)
@@ -532,3 +534,71 @@ def test_basis_free_drivers_are_not_subject_to_the_basis_check() -> None:
     ]
     result = _run(labelled)                                            # non-GAAP 橋
     assert result.metrics["eps"].value is not None
+
+
+# ---------------------------------------------------------------------------
+# derivation：這個值是怎麼決定的（2026-09-10）
+# ---------------------------------------------------------------------------
+
+def test_derivation_must_be_declared_and_is_not_defaulted_to_independent():
+    """未宣告 → 拒收；**且 fail safe 的方向是「不知道」，不是「我們自己想的」。**
+
+    這道 gate 存在的理由是實測出來的：14 本 ledger 裡每一條「由共識 EPS 逆推」的假設都
+    完整滿足既有的 v2 provenance gate（基期觀測 supporting、共識 calibration），
+    因為那道 gate 問的是「共識有沒有被當成支持證據」，而逆推不需要那樣標（L15-1）。
+    """
+    with pytest.raises(ContractViolation, match="必須明示 derivation"):
+        assumption_record(
+            company_id="co:x", ticker="X", period_end=TARGET.end, driver="tax_rate", scope="total",
+            value=0.2, basis="heuristic_proxy", rationale="r", evidence_refs=["e"],
+            created_at=datetime(2026, 9, 5, tzinfo=UTC))
+    with pytest.raises(ContractViolation, match="derivation 未登記"):
+        _assumption("tax_rate", "total", 0.19, derivation="probably_fine")
+    # 舊行（沒有這個欄位）讀得進來，且落在 unclassified——不是 independent。
+    legacy = dict(assumption_record(
+        company_id="co:x", ticker="X", period_end=TARGET.end, driver="tax_rate", scope="total",
+        value=0.2, basis="heuristic_proxy", rationale="r", evidence_refs=["e"],
+        created_at=datetime(2026, 9, 5, tzinfo=UTC), derivation="carried_forward"))
+    legacy.pop("derivation")
+    assert parse_assumption_record(legacy).derivation == "unclassified"
+
+
+def test_consensus_inverted_must_point_at_the_consensus_it_inverted():
+    """宣告「由共識反解」就要指得出被反解的那筆共識，否則這個宣告無從查證。
+
+    補償控制：新增一個分類（放行）的同一個 change 內就要有可機械驗證的檢查（收緊）。
+    """
+    with pytest.raises(ContractViolation, match="必須引用被反解的那筆同期共識"):
+        _assumption("revenue_growth", "total", 0.12, derivation="consensus_inverted")
+    ok = _assumption(
+        "revenue_growth", "total", 0.12, derivation="consensus_inverted",
+        refs=(GRAPH_REF.ref,),
+        calibration_refs=["engine_c://consensus_estimate/COHR/revenue/2027-06-30"])
+    assert ok.derivation == "consensus_inverted"
+
+
+def test_unclassified_derivation_does_not_change_existing_assumption_ids():
+    """additive：`unclassified` 視同沒值，舊紀錄的 content-addressed id 一個位元都不變。"""
+    from alpha.fundamental.assumptions import new_assumption_id
+
+    payload = {"company_id": "co:x", "ticker": "X", "period_end": "2027-06-30",
+               "period_kind": "fiscal_year", "driver": "tax_rate", "scope": "total", "value": 0.2,
+               "unit": "ratio", "basis": "heuristic_proxy", "accounting_basis": "not_applicable",
+               "rationale": "r", "evidence_refs": ["e"], "created_at": "2026-09-05T00:00:00+00:00",
+               "author": "session", "supersedes_id": None, "retracted": False}
+    before = new_assumption_id(payload)
+    assert new_assumption_id({**payload, "derivation": "unclassified"}) == before
+    assert new_assumption_id({**payload, "derivation": "independent"}) != before
+
+
+def test_opinion_bearing_drivers_exclude_the_mechanical_ones():
+    """「有沒有形成觀點」只看兩個核心 driver。
+
+    把沿用基期實績的 tax／shares／NCI／interest 算進來，會讓每一家公司都被判成沒有觀點——
+    一個恆亮的判準等於零鑑別力（L14-4）。
+    """
+    from alpha.fundamental.contracts import OPINION_BEARING_DRIVERS
+
+    assert OPINION_BEARING_DRIVERS == {"revenue_growth", "operating_margin_delta"}
+    assert OPINION_BEARING_DRIVERS < set(ASSUMPTION_DRIVERS)
+

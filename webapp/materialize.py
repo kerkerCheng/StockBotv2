@@ -58,6 +58,9 @@ def redact_private_paths(value: Any) -> Any:
     return value
 
 
+from alpha.closure import row_from_artifact
+
+
 def _line_map(panel: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
     return {line["key"]: line["datum"] for line in panel.get("lines", [])}
 
@@ -106,6 +109,14 @@ def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
         "accounting_basis": (headline.get("context") or {}).get("accounting_basis"),
         "period": (headline.get("context") or {}).get("period"),
         "refresh_overall": view["refresh"]["overall"],
+        # 我們有沒有形成自己的觀點。**照抄 fundamental panel 的宣告**，這裡不重算、不推論。
+        # 它與 readiness 正交：一份 ready 的判讀完全可以是 `consensus_inverted`（每一格都有
+        # 數字，而每個數字都是共識反解出來的）——列表頁必須分得出這兩件事。
+        "opinion_stance": _cell(_line_map(view.get("fundamental") or {}).get("opinion_stance")),
+        # 這一檔到終局了沒（ready／settled／None）。**照抄 `alpha.closure` 的判定**——
+        # 它已經是這個分類的 SSOT（drain 選題與 `webapp status` 都消費它），
+        # 在 APP 端再寫一份「什麼叫做完」的規則就是 L16 記過的重造品。
+        "closure_terminal": row_from_artifact(str(view["ticker"]), view).terminal,
     }
 
 
@@ -1056,7 +1067,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
-        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS, PRICE_SERIES_NOTE, QUESTIONS,
+        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS, PLAIN_STANCE,
+        PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
     )
 
@@ -1072,6 +1084,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_line_labels": dict(PLAIN_LINE_LABELS),
         "plain_absence_short": dict(PLAIN_ABSENCE_SHORT),
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
+        # opinion stance 的白話層（2026-09-10）：前端不得再寫第二份（L16）。
+        "plain_stance": {k: dict(v) for k, v in PLAIN_STANCE.items()},
         "price_series_note": PRICE_SERIES_NOTE,
         "questions": dict(QUESTIONS),
         "weak_input_rules": dict(WEAK_INPUT_RULES),

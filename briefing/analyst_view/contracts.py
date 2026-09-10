@@ -196,6 +196,40 @@ PLAIN_READINESS: Mapping[str, Mapping[str, str]] = {
     "blocked": {"label": "有一段讀不成", "note": "看下面「卡在哪」——它會說是還沒做、刻意不做，還是缺上游"},
 }
 
+#: opinion stance 的白話措辭層（2026-09-10）。**short 與 reason 只有這一份**——
+#: builder 寫進 datum.reason 的長句、APP badge 的短標籤、meta API 的字彙表全部取自這裡。
+#: 分成兩份就會有一份開始偏離（L16），所以 `tests` 守著它的 key 集合＝`OPINION_STANCES`。
+#:
+#: ⚠ 措辭必須答出「這是不是要我做事」，不能只是重述分類名。使用者看到的不該是
+#: 「consensus_inverted」，而是「我們還沒形成觀點，這裡的 0 不是判斷」。
+PLAIN_STANCE: Mapping[str, Mapping[str, str]] = {
+    "independent": {
+        "short": "有我們自己的看法",
+        "reason": "核心假設裡至少有一條是我們自己決定的——這一格的預期差有內容可讀",
+    },
+    "consensus_inverted": {
+        "short": "還沒形成觀點",
+        "reason": "核心假設全部由同期共識反解得出：我們**尚未形成獨立觀點**。此時「我們比市場」"
+                  "必然接近 0，那是代數上的必然，不是判斷結果——要讓這一格有內容，"
+                  "需要的是研究，不是重算",
+    },
+    "company_guidance": {
+        "short": "採信公司指引",
+        "reason": "核心假設取自公司自家指引，不是我們的獨立分析——但它**可以**與共識不同"
+                  "（而且常常不同），所以這一格的預期差是有內容的：那個內容是"
+                  "「我們選擇相信公司，而不是相信分析師」",
+    },
+    "undeclared": {
+        "short": "未宣告",
+        "reason": "核心假設是 2026-09-10 之前寫的舊紀錄，未宣告推導方式；"
+                  "**不預設成獨立觀點**（那會把佔位冒充成主張）",
+    },
+    "no_opinion_bearing_assumptions": {
+        "short": "還沒開始",
+        "reason": "還沒有任何營收／營益率假設——這一檔還沒開始做",
+    },
+}
+
 #: 圖表用的一句話。價格是**脈絡不是訊號**：不排序、不決定尺寸、不產生任何建議。
 PRICE_SERIES_NOTE = (
     "這是這檔自己的收盤價（provider 報價單位原值，未換算幣別）。"
@@ -480,6 +514,7 @@ __all__ = [
     "PLAIN_LINE_LABELS",
     "PLAIN_PANEL_TITLES",
     "PLAIN_READINESS",
+    "PLAIN_STANCE",
     "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",
     "AnalystLine", "AnalystPanel", "AnalystReadiness", "AnalystView", "AnalystViewContractViolation",

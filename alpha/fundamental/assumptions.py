@@ -22,7 +22,8 @@ from typing import Any, Mapping, Sequence
 
 from ..errors import ContractViolation
 from .contracts import (
-    ASSUMPTION_DRIVERS, TOTAL_SCOPE, AssumptionSelection, FiscalPeriod, OperatingAssumption,
+    ASSUMPTION_DERIVATIONS, ASSUMPTION_DRIVERS, TOTAL_SCOPE, AssumptionSelection, FiscalPeriod,
+    OperatingAssumption,
 )
 
 #: v1＝2026-09-05 的原始形狀；v2（Step 0.5，2026-09-06）多了 `dependency_roles`／`review_conditions`／
@@ -35,12 +36,17 @@ _ID_FIELDS = ("company_id", "ticker", "period_end", "period_kind", "driver", "sc
               "author", "supersedes_id", "retracted")
 #: v2 才有的欄位：**只在有值時**參與 id——舊紀錄的 id 不因新欄位存在而改變。
 _ID_FIELDS_V2 = ("dependency_roles", "review_conditions", "provenance_semantics")
+#: v3（2026-09-10）：`derivation`＝這個值是怎麼決定的。同樣**只在有值時**參與 id，
+#: 且 `unclassified` 視同沒值——舊紀錄與撤回紀錄的 id 一個位元都不變。
+_ID_FIELDS_V3 = ("derivation",)
 
 
 def new_assumption_id(payload: Mapping[str, Any]) -> str:
     """content-addressed id：同一份內容永遠得到同一個 id（重複 append 可被偵測）。"""
     body = {k: payload.get(k) for k in _ID_FIELDS}
     body.update({k: payload[k] for k in _ID_FIELDS_V2 if payload.get(k)})
+    body.update({k: payload[k] for k in _ID_FIELDS_V3
+                 if payload.get(k) and payload[k] != "unclassified"})
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "oa_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -66,16 +72,28 @@ def assumption_record(
     comparison_refs: Sequence[str] = (),
     review_conditions: Sequence[Mapping[str, Any]] = (),
     legacy_roles: bool = False,
+    derivation: str | None = None,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `OperatingAssumption` 驗證，驗不過就不產生）。
 
     `evidence_refs` 是 **supporting** 證據；`calibration_refs`／`comparison_refs` 另列
     （同期共識只能出現在這兩個，出現在 supporting 會被契約拒絕）。
     `legacy_roles=True` 只給撤回舊紀錄用：沿用舊紀錄的 refs、不強迫補角色。
+
+    `derivation` **必填**（撤回紀錄除外）。字彙一旦有行為後果就必須被強制，否則打錯不會
+    報錯、只會靜默沉底（L16-3）；而這個欄位的行為後果是「使用者看不看得出我們有沒有
+    形成觀點」。**未宣告不是預設成 independent**——那個方向的預設會把佔位冒充成主張。
     """
     spec = ASSUMPTION_DRIVERS.get(driver)
     if spec is None:
         raise ContractViolation(f"driver 未登記：{driver!r}；已知 {sorted(ASSUMPTION_DRIVERS)}")
+    if derivation is None:
+        if not retracted:
+            raise ContractViolation(
+                "assumption_record 必須明示 derivation（這個值是怎麼決定的）；"
+                f"已知 {[d for d in ASSUMPTION_DERIVATIONS if d != 'unclassified']}——"
+                "未宣告不會被當成 independent，因為那會把佔位冒充成主張")
+        derivation = "unclassified"
     stamp = created_at or datetime.now(timezone.utc)
     if stamp.tzinfo is None:
         raise ContractViolation("created_at 必須帶時區")
@@ -108,6 +126,7 @@ def assumption_record(
         "author": author,
         "supersedes_id": supersedes_id,
         "retracted": bool(retracted),
+        "derivation": derivation,
     }
     if not legacy_roles:
         payload["dependency_roles"] = roles
@@ -162,6 +181,8 @@ def parse_assumption_record(raw: Mapping[str, Any]) -> OperatingAssumption:
         dependency_roles={str(k): str(v) for k, v in roles_raw.items()},
         review_conditions=tuple(ReviewCondition.from_dict(c) for c in conditions_raw),
         provenance_semantics=semantics,
+        # 舊行沒有這個欄位 → `unclassified`（fail safe 到「不知道」，不是 `independent`）。
+        derivation=str(raw.get("derivation") or "unclassified"),
     )
 
 

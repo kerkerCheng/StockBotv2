@@ -22,7 +22,7 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from starlette.applications import Starlette
 from starlette.exceptions import HTTPException
@@ -112,6 +112,38 @@ async def meta(request: Request) -> Response:
     return _json(payload)
 
 
+#: 清單分段。**照抄 `alpha.closure` 的 terminal**（materialize 端已寫進 overview）——
+#: APP 不自己定義「什麼叫做完」（L16）。
+_GROUP_LABELS: dict[str, str] = {
+    "ready": "已有判讀",
+    "settled": "刻意不主張",
+    "not_started": "還沒做",
+}
+_GROUP_ORDER: dict[str, int] = {k: i for i, k in enumerate(_GROUP_LABELS)}
+
+
+def _group_of(row: Mapping[str, Any]) -> str:
+    terminal = row.get("closure_terminal")
+    return str(terminal) if terminal in ("ready", "settled") else "not_started"
+
+
+def _opinion_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """stance 分布。**純計數**——不重算、不推論，只數 materialize 端已經寫下的宣告。"""
+    counts: dict[str, int] = {}
+    for row in items:
+        stance = (row.get("opinion_stance") or {}).get("value")
+        counts[str(stance)] = counts.get(str(stance), 0) + 1
+    with_view = sum(1 for r in items if _group_of(r) == "ready")
+    return {
+        "by_stance": counts,
+        "our_own_view": counts.get("independent", 0),
+        "with_view": with_view,
+        "headline": f"有我們自己的看法 {counts.get('independent', 0)} 檔／已有判讀 {with_view} 檔",
+        "note": "`independent` 之外的都不是我們的獨立分析：consensus_inverted 是共識反解的佔位、"
+                "company_guidance 是採信公司、undeclared 是還沒宣告。",
+    }
+
+
 async def stocks(request: Request) -> Response:
     """清單／總覽。壞掉的 artifact **不靜默丟棄**——以 `unavailable` 一併回報（INV-3）。"""
     store = _store(request)
@@ -127,13 +159,26 @@ async def stocks(request: Request) -> Response:
         overview["generated_at"] = payload["generated_at"]
         overview["research_context_digest"] = payload.get("research_context_digest")
         items.append(overview)
-    items.sort(key=lambda row: str(row.get("ticker") or ""))
+    # 分組**不是排序**。`AGENTS.md`：唯一排序權威是 rank_bottlenecks()，且研究完整度不得
+    # 拿來排序——「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果
+    # （LYC.AX 是 ready，隱含報酬 −35.7%）。分段解決「打開第一屏全是空的」這個真實問題，
+    # 又不製造第二套投資排序：**組內順序一個字都沒動**（仍是字母序）。
+    items.sort(key=lambda row: (_GROUP_ORDER.get(_group_of(row), 9), str(row.get("ticker") or "")))
+    for row in items:
+        row["group"] = _group_of(row)
     return _json({
         "api_version": API_VERSION,
         "count": len(items),
         "stocks": items,
+        "groups": [{"key": k, "label": v, "count": sum(1 for r in items if r.get("group") == k)}
+                   for k, v in _GROUP_LABELS.items()],
+        # 常駐計數器（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。
+        # 「有幾檔的判讀是我們自己的」這個數字，在 2026-09-10 之前從來沒有被印出來過。
+        "opinion_counters": _opinion_counters(items),
         "unavailable": unavailable,
         "correlation_warning": _CORRELATION_WARNING,
+        "group_note": "分組是研究完整度，**不是投資排序**——組內順序未改動（字母序），"
+                      "唯一排序權威仍是 /api/v1/ranking 照抄的 rank_bottlenecks()。",
     })
 
 

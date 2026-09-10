@@ -392,3 +392,67 @@ def test_full_detail_has_exactly_one_level_of_expansion() -> None:
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
     assert block.count("drill(") == 1, "單檔頁只准有一個展開（就是「完整細節」那一個）"
+
+
+# ---------------------------------------------------------------------------
+# 分段與常駐計數器（2026-09-10）
+# ---------------------------------------------------------------------------
+
+def test_list_is_grouped_but_the_order_inside_a_group_is_untouched(client) -> None:
+    """分組**不是排序**。
+
+    `AGENTS.md`：唯一排序權威是 `rank_bottlenecks()`，且研究完整度不得拿來排序。
+    「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果——
+    LYC.AX 是 ready，隱含報酬 −35.7%。分段解決「打開第一屏全是空的」這個真實問題，
+    但組內順序必須一個字都沒動，否則它就變成第二套投資排序了。
+    """
+    body = client.get("/api/v1/stocks").json()
+    assert [g["key"] for g in body["groups"]] == ["ready", "settled", "not_started"]
+    for group in body["groups"]:
+        tickers = [r["ticker"] for r in body["stocks"] if r["group"] == group["key"]]
+        assert tickers == sorted(tickers), f"{group['key']} 組內順序被動過了"
+    assert "不是投資排序" in body["group_note"]
+
+
+def test_group_is_copied_from_closure_not_re_derived_in_the_app(client) -> None:
+    """分組照抄 `alpha.closure` 的 terminal（materialize 端寫進 overview）。
+
+    APP 自己定義「什麼叫做完」就是 L16 記過的重造品——重造品會立刻開始偏離。
+    """
+    body = client.get("/api/v1/stocks").json()
+    for row in body["stocks"]:
+        expected = row["closure_terminal"] if row.get("closure_terminal") in ("ready", "settled") \
+            else "not_started"
+        assert row["group"] == expected, row["ticker"]
+
+
+def test_opinion_counter_is_always_on_the_first_screen(client) -> None:
+    """「有幾檔的判讀是我們自己的」必須自己出現。
+
+    寫在文件裡的檢查點六天內被同一個形狀繞過兩次（L12 → L13），所以 L14 的結論是：
+    真正的防呆是會自己出現的常駐計數器，不是要人讀的段落。
+    """
+    body = client.get("/api/v1/stocks").json()
+    counters = body["opinion_counters"]
+    assert "our_own_view" in counters and "with_view" in counters
+    assert counters["headline"]
+    # 純計數：by_stance 的總和必須等於清單長度，一檔都不能被吃掉（INV-3）。
+    assert sum(counters["by_stance"].values()) == len(body["stocks"])
+
+
+def test_counters_do_not_invent_a_view_for_stocks_that_have_none(tmp_path) -> None:
+    """沒有 stance 的檔案算進 `None` 那一格，**不算進 our_own_view**。
+
+    「我沒讀到你有觀點」與「你沒有觀點」導向同一個行動（去研究），但都不等於「你有觀點」
+    ——fail safe 的方向只有一個。
+    """
+    store = ArtifactStore(tmp_path)
+    store.write(materialize_view(fake_view("AAA", stance="independent")))
+    store.write(materialize_view(fake_view("BBB", stance="consensus_inverted")))
+    store.write(materialize_view(fake_view("CCC")))            # 沒有 fundamental 判讀
+    write_vocabularies(store)
+    body = TestClient(create_app(tmp_path)).get("/api/v1/stocks").json()
+    counters = body["opinion_counters"]
+    assert counters["our_own_view"] == 1
+    assert counters["by_stance"]["consensus_inverted"] == 1
+    assert counters["by_stance"]["None"] == 1

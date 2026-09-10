@@ -157,6 +157,11 @@ details > summary::before { content: "▸ "; }
 details[open] > summary::before { content: "▾ "; }
 
 .note { color: var(--muted); font-size: 12px; margin: 6px 0 0; }
+/* 「我們還沒形成觀點」不是一句可以埋在灰字裡的話——它決定使用者要不要去做研究。 */
+.note-warn { color: var(--fg); background: var(--panel-alt, rgba(127,127,127,.08));
+             border-left: 3px solid var(--border); padding: 8px 10px; border-radius: 4px;
+             font-size: 13px; line-height: 1.6; }
+.note-warn .badge { margin-right: 6px; }
 .notes { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 12px; }
 .notes li { margin: 3px 0; }
 
@@ -312,3 +317,12 @@ table.rank.compare td:first-child { color: var(--muted); }
 .full-detail > .panel:first-child { margin-top: 8px; }
 .group { margin-top: 10px; }
 .group > .group-title { margin-top: 0; }
+
+/* 常駐計數器：第一屏就看得到「有幾檔的判讀是我們自己的」。 */
+.counter-bar { display: flex; flex-direction: column; gap: 4px; margin: 0 0 14px;
+               padding: 10px 12px; border: 1px solid var(--border); border-radius: 6px; }
+.counter-bar strong { font-size: 15px; }
+.counter-bar .note { margin: 0; }
+/* 分段標題。分段是研究完整度，不是投資排序——樣式刻意平淡，不做成排行榜。 */
+.group-head { font-size: 14px; font-weight: 600; color: var(--muted);
+              margin: 18px 0 8px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }

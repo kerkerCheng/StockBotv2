@@ -34,8 +34,12 @@ def _line(key, datum, role="headline_number"):
 
 def fake_view(ticker="TEST", *, fair_value=100.0, absence_kind=None, reason=None,
               readiness_state="ready", blockers=(), price=50.0, quote_unit="USD",
-              currency="USD"):
-    """一份最小但形狀正確的 `AnalystView.to_dict()`。"""
+              currency="USD", stance=None):
+    """一份最小但形狀正確的 `AnalystView.to_dict()`。
+
+    `stance` 給定時，fundamental panel 會帶一條 `opinion_stance` line——形狀與 production
+    一致（值由模型層宣告，呈現層只讀）。不給就是「這份 view 沒有這一格」，也是合法狀態。
+    """
     has_fv = fair_value is not None
     lines = [
         _line("current_price", _datum("current_price", "現價", price, unit="quote_unit（%s）" % quote_unit,
@@ -74,12 +78,18 @@ def fake_view(ticker="TEST", *, fair_value=100.0, absence_kind=None, reason=None
              "absence_is_settled": absence_kind in SETTLED_ABSENCE_KINDS}
     empty = dict(panel, key="other", lines=[], status="available", absence_kind=None,
                  absence_is_settled=False)
+    fundamental = dict(empty, key="fundamental")
+    if stance is not None:
+        fundamental = dict(fundamental, lines=[_line("opinion_stance", _datum(
+            "opinion_stance", "我們有沒有形成自己的觀點", stance,
+            status="available", basis="deterministic"))])
     return {
         "schema_version": "analyst-view/1", "source_schema_version": "alpha-investment-view/v1",
         "ticker": ticker, "company_id": "co:test", "company_label": "Test Corp.",
         "as_of": None, "point_in_time_mode": "current", "generated_on": "2026-09-07",
         "research_context_digest": "sha256:abc",
-        "headline": panel, "fundamental": empty, "why": empty, "research": empty, "entry": empty,
+        "headline": panel, "fundamental": fundamental, "why": empty, "research": empty,
+        "entry": empty,
         "readiness": {"state": readiness_state, "core_panels": ["headline"], "optional_panels": ["entry"],
                       "flags": [], "blockers": list(blockers), "optional_unavailable": ["entry：missing"],
                       "rule": "rule", "blocker_details": [

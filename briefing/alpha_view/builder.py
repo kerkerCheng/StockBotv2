@@ -30,7 +30,10 @@ from alpha.causal import CausalPath, CompanyImpact, StructuralEvent
 from alpha.context import ContextBuild
 from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
 from alpha.entry.contracts import EntryAssessmentResult, EntryCriterion
-from alpha.fundamental.contracts import FundamentalModelResult, OperatingAssumption
+from alpha.fundamental.contracts import (
+    OPINION_BEARING_DRIVERS, FundamentalModelResult, OperatingAssumption,
+)
+from briefing.analyst_view.contracts import PLAIN_STANCE
 from alpha.implied_return.attribution import attribution_payload
 from alpha.implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from alpha.provider import SupplyExposure
@@ -172,6 +175,9 @@ class _FundamentalParts:
     bridge_period: str | None
     comparisons: tuple[Datum, ...]
     internal_vs_consensus: Datum
+    #: **不放進 comparisons**：它不是一筆「內部 vs 共識」的數值比較，混進去會讓
+    #: 「所有比較都缺席」這種斷言被一格永遠 available 的東西破壞（L12：一個集合兩種語意）。
+    opinion_stance: Datum
     financial_causal: Datum
     fiscal_items: tuple[Datum, ...]
     has_numeric_gap: bool
@@ -208,6 +214,8 @@ def _fundamental_parts(
             bridge_period=None, comparisons=absent_cmp,
             internal_vs_consensus=missing("internal_vs_consensus", "內部估計 vs 共識（數值）", absent,
                                           authority=A_COMPARE),
+            opinion_stance=missing("opinion_stance", "我們有沒有形成自己的觀點", absent,
+                                   authority=A_COMPARE),
             financial_causal=missing("financial_causal_model",
                                      "財務因果模型（operating assumptions → revenue／margin／EPS）",
                                      absent, authority=A_BRIDGE),
@@ -372,6 +380,24 @@ def _fundamental_parts(
                                 else "missing"),
                         basis="none", authority=A_COMPARE, reason=reasons)
 
+    # ---- 我們有沒有形成自己的觀點（2026-09-10）---------------------------------
+    # ⚠ 這一格**由模型層宣告**，呈現層不得 parse rationale 去猜（APP 呈現契約；L16）。
+    # 它與 status／readiness 正交：`available` 的模型完全可以是 `consensus_inverted`——
+    # 每一格都有數字，而每一個數字都是共識反解出來的，於是「我們比市場 −0.0%」不攜帶資訊。
+    stance = model.stance
+    stance_detail = {a.driver: {"scope": a.scope, "derivation": a.derivation,
+                                "assumption_id": a.assumption_id}
+                     for a in model.assumptions if a.driver in OPINION_BEARING_DRIVERS}
+    stance_datum = Datum(
+        key="opinion_stance", label="我們有沒有形成自己的觀點", value=stance,
+        status="available", basis="deterministic", authority=A_COMPARE, as_of=reference_day,
+        method="由核心 driver（revenue_growth／operating_margin_delta）的 derivation 聚合；"
+               "任一條 independent 即 independent，未宣告永遠不算 independent",
+        reason=PLAIN_STANCE.get(stance, {}).get("reason", stance),
+        dependencies={"by_driver": stance_detail,
+                      "opinion_bearing_drivers": sorted(OPINION_BEARING_DRIVERS)},
+    )
+
     # ---- 因果 section 的財務橋一格 -----------------------------------------------
     if model.status != "missing":
         financial_causal = Datum(
@@ -417,6 +443,7 @@ def _fundamental_parts(
         bridge_assumptions=tuple(assumptions), bridge_sensitivities=tuple(sensitivities),
         bridge_selection=selection, bridge_period=target.label if target else None,
         comparisons=tuple(comparisons), internal_vs_consensus=summary,
+        opinion_stance=stance_datum,
         financial_causal=financial_causal, fiscal_items=tuple(fiscal_items),
         has_numeric_gap=bool(comparable), warnings=tuple(model.warnings),
     )
@@ -2052,6 +2079,7 @@ def build_alpha_investment_view(
                                               "fair value 與現價的差住 valuation section，它是 fair_value − price，"
                                               "不是內部基本面 vs 價格隱含基本面"),
         numeric_comparisons=fund.comparisons,
+        opinion_stance=fund.opinion_stance,
     )
 
     # =======================================================================

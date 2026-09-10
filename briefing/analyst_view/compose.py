@@ -201,6 +201,8 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
         + _lines(cs.items, "market_context")
         + _lines(eg.proxies, "market_proxy")
         + _lines(eg.numeric_comparisons, "comparison")
+        + ((_line("opinion_stance", eg.opinion_stance.label, eg.opinion_stance, "comparison"),)
+           if eg.opinion_stance is not None else ())
         + (_line("internal_vs_consensus", eg.internal_vs_consensus.label, eg.internal_vs_consensus, "comparison"),
            _line("internal_vs_price_implied", eg.internal_vs_price_implied.label,
                  eg.internal_vs_price_implied, "comparison"))

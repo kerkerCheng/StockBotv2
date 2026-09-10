@@ -59,7 +59,8 @@ def _dc_assumption(**kw):
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="revenue_growth",
         scope="Datacenter & Communications", value=0.60, basis="session_judgment",
         rationale="test D&C", evidence_refs=[EDGE, ACT_REF.ref], calibration_refs=[CONS_REV],
-        created_at=datetime(2026, 9, 5, 8, 0, tzinfo=UTC), **kw)
+        created_at=datetime(2026, 9, 5, 8, 0, tzinfo=UTC),
+        **{"derivation": "independent", **kw})
     return parse_assumption_record(record)
 
 
@@ -262,7 +263,7 @@ def test_superseded_assumption_is_historical_and_downstream_recalculates() -> No
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="revenue_growth",
         scope="Datacenter & Communications", value=0.50, basis="session_judgment", rationale="下修",
         evidence_refs=[EDGE, ACT_REF.ref], supersedes_id=old.assumption_id,
-        created_at=datetime(2026, 9, 6, 9, 0, tzinfo=UTC)))
+        created_at=datetime(2026, 9, 6, 9, 0, tzinfo=UTC), derivation="independent"))
     records = [old, new, _industrial(), *[a for a in _full_set() if a.driver != "revenue_growth"]]
     model = build_fundamental_model(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 6),
                                     actuals=_actuals(), actuals_reason=None, consensus=FY_CONSENSUS, guidance=(),
@@ -441,11 +442,13 @@ def test_same_period_consensus_cannot_be_supporting_evidence_but_legacy_records_
     with pytest.raises(ContractViolation, match="provenance 循環"):
         assumption_record(company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="revenue_growth",
                           scope="Datacenter & Communications", value=0.6, basis="session_judgment", rationale="r",
-                          evidence_refs=[EDGE, CONS_REV], created_at=datetime(2026, 9, 6, tzinfo=UTC))
+                          evidence_refs=[EDGE, CONS_REV], created_at=datetime(2026, 9, 6, tzinfo=UTC),
+                          derivation="independent")
     with pytest.raises(ContractViolation, match="至少要有一條 supporting"):
         assumption_record(company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="revenue_growth",
                           scope="Datacenter & Communications", value=0.6, basis="session_judgment", rationale="r",
-                          evidence_refs=[], calibration_refs=[CONS_REV], created_at=datetime(2026, 9, 6, tzinfo=UTC))
+                          evidence_refs=[], calibration_refs=[CONS_REV],
+                          created_at=datetime(2026, 9, 6, tzinfo=UTC), derivation="independent")
     # 2026-09-05 的原始形狀：沒有角色欄位 → legacy；共識 ref 依前綴當 calibration，其餘當 supporting
     legacy_raw = {"record_version": "operating-assumption/v1", "company_id": "co:coherent", "ticker": "COHR",
                   "period_end": "2027-06-30", "period_kind": "fiscal_year", "driver": "revenue_growth",
