@@ -1,0 +1,27 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_01132bbd5eacc24b72ad229bbd9e0750f2429a2b7b376c1d2dfd48d7b456c245_c5a96baf4a73",
+  "conflict_id": "conflict_01132bbd5eacc24b72ad229bbd9e0750f2429a2b7b376c1d2dfd48d7b456c245",
+  "edge_key": "edge:403e757f1132f9b7a24b3d58eab10177e3886403d9dbf54b943287abdc56bb7c",
+  "attribute": "substitutability",
+  "candidate_set_hash": "c5a96baf4a732290c0ae5b542a4d462db96ebdeb8c32cde133bd0d8f70fc2e59",
+  "action": "choose_value",
+  "selected_value": 3,
+  "supporting_assertion_ids": [
+    "noveon_series_c_2026_01_19_e1",
+    "usar_stillwater_phase1a_2026_03_26_e1"
+  ],
+  "rejected_assertion_ids": [
+    "fas_dod_mp_partnership_2025_07_15_substitutability_e_sub1"
+  ],
+  "supporting_source_ids": [
+    "noveon_series_c_2026_01_19_s1",
+    "noveon_series_c_2026_01_19_s2",
+    "usar_stillwater_phase1a_2026_03_26_s1",
+    "usar_stillwater_phase1a_2026_03_26_s2"
+  ],
+  "rationale": "兩個獨立理由同時指向 3，時間 supersession 與 scope 精準度。（一）supersession：值 4 的唯一依據是 FAS 2025-07-15 逐字『MP Materials, the only active domestic producer of NdPr』與『the only currently operating producer of NdPr—all the other projects are still in development』。那個『all others still in development』在 2026 已被兩份具名一手公告推翻：Noveon 2026-01-19『first company to reshore full-scale production of sintered rare earth magnets to the United States』並『expanding capacity beyond 2,000 tons per year』；USA Rare Earth 2026-03-26『successful commissioning of its commercial magnet production line (Phase 1a)』並將於『second quarter of 2026』開始履行 NdFeB 磁石客戶訂單。這不是「較新所以贏」，是舊證據的那個具體事實條件已不再成立。（二）scope：本邊的 dst 是 mat:rare_earth_magnets（磁石）。FAS 的兩段逐字講的是 **NdPr**——磁石的上游原料，不是磁石本身；兩份新證據則直接講 sintered magnets／NdFeB magnets。舊證據其實不完全在講這條邊的主體（L11-1：措辭精度本身就是一個 claim）。不採更低值的理由：Noveon 與 USA Rare Earth 都是 MP 的**競爭對手**，『我們也能做』屬利害關係方陳述，與 L8 防的供應商自報是同一種偏誤的反面。兩者皆為具名、可證偽的產能與訂單事實，足以推翻『唯一』，但不足以支撐『容易替代』。",
+  "resolved_confidence": 0.65,
+  "approved_by": "Cheng",
+  "approved_at": "2026-09-10T10:49:55+08:00"
+}

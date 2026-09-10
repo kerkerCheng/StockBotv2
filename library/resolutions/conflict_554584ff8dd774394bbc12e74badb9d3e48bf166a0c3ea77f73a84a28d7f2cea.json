@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_554584ff8dd774394bbc12e74badb9d3e48bf166a0c3ea77f73a84a28d7f2cea_abb319985808",
+  "conflict_id": "conflict_554584ff8dd774394bbc12e74badb9d3e48bf166a0c3ea77f73a84a28d7f2cea",
+  "edge_key": "edge:c8719ff0cdcd679bcb0c57b61675f2d22c9445777641c14121edda7155e8d7e9",
+  "attribute": "substitutability",
+  "candidate_set_hash": "abb319985808e3e787940f8592f728c23c241bcdb2d8c01a0e18cf46f18457c4",
+  "action": "choose_value",
+  "selected_value": 3,
+  "supporting_assertion_ids": [
+    "nabtesco_official_precision_gears_e1",
+    "nextfinancial_joint_problem_2026_06_02_rv_reducer_e_sub1"
+  ],
+  "rejected_assertion_ids": [
+    "nabtesco_ventures_share_sub_20260903_e1"
+  ],
+  "supporting_source_ids": [
+    "nabtesco_official_precision_gears_s1",
+    "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1",
+    "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2"
+  ],
+  "rationale": "三份候選講的是**同一個底層事實**，差別只在抽取時給了不同的評分——這不是證據衝突，是同一份事實被評成兩個值。Nabtesco 官方『approximately 60% (Nabtesco's estimate) share of the global market for precision reduction gears』；Next Financial 獨立轉述『generally credited with around 60% of the RV-reducer market』；被拒的那筆同樣是 Nabtesco 官方頁『world's leading manufacturer... with 60 percent of the global market』——**也是 60%**。60% 市占在定義上就代表另外 40% 由別人供應，因此不能給接近 sole-source 的 4；而值 4 的那筆是供應商自報，且沒有帶來任何 60% 以外的新事實（L8）。同輪還有一個獨立方向的佐證：Next Financial 逐字載明 Zhejiang Shuanghuan Driveline（双环传动）『moved into both RV and harmonic reducers, supplies Optimus and Unitree』——具名新進入者供應具名客戶，同樣指向 3 而非 4。⚠ 三份都不是客戶端揭露，60% 的原始出處是 Nabtesco 自估；因此 confidence 不宜再高。",
+  "resolved_confidence": 0.7,
+  "approved_by": "Cheng",
+  "approved_at": "2026-09-10T10:49:55+08:00"
+}

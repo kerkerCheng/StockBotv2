@@ -1,0 +1,20 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_98da1429243be40ceaf6916f2d733635f6cd57885c480256607dd1d530b548b3_e17d848e9615",
+  "conflict_id": "conflict_98da1429243be40ceaf6916f2d733635f6cd57885c480256607dd1d530b548b3",
+  "edge_key": "edge:d698668c60fea4c6f786c38d87eef6cd057fc9007732e0b3047f764d385f4e78",
+  "attribute": "substitutability",
+  "candidate_set_hash": "e17d848e9615d9b69dc90e71800b0ea3a23a34e1bdac47d5c0fc0ff7b27d79e9",
+  "action": "unknown",
+  "selected_value": null,
+  "supporting_assertion_ids": [],
+  "rejected_assertion_ids": [
+    "hds_us_technology_sub_20260903_e1",
+    "nextfinancial_joint_problem_2026_06_02_substitutability_e1"
+  ],
+  "supporting_source_ids": [],
+  "rationale": "兩個候選都不夠格，且不夠格的方式不同——這正是 unknown 的用途，不是硬選一個。值 4 來自 Harmonic Drive Systems **自己的產品頁**，而逐字內容是『Zero Backlash』『unique operating principle』——那是**技術特性描述，不是可替代性證據**。供應商自稱不可替代依 L8 只能是 verified_by_absence（弱），何況這兩段連『沒有別人做得到』都沒說。該來源另外沒有 published_at，在 as-of 查詢裡本來就會被排除（INV-6）。值 2 來自 Next Financial（Substack，tier 3），逐字是『One source describes it as the sole reducer supplier to Tesla's Mexico facility』與『by some accounts, more than a third of the global harmonic market』——『one source describes』『by some accounts』是二手轉述的模糊語氣，不構成一手證實（L11-3：多個二手都這樣說 ≠ 一手已證實）。要離開 unknown，需要的是客戶端一手（例如 Tesla／機器人 OEM 具名揭露 harmonic reducer 供應商或雙源狀態），或 Leaderdrive／綠的諧波的法定財報揭露對應出貨。",
+  "resolved_confidence": 0.0,
+  "approved_by": "Cheng",
+  "approved_at": "2026-09-10T10:49:55+08:00"
+}
