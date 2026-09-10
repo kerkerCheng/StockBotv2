@@ -1,0 +1,122 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續 SEC filing 顯示 OpenAI 不再是承租客戶、取消 DSX 部署，或 PORTS-Pike 改由非 NVIDIA 基礎設施供應，則下修或移除相關主張；每季核查 NVIDIA filing，觸發後 48 小時內 review。",
+      "id": "nvda_sb_energy_ports_pike_8k_2026_08_17_cl1",
+      "source_ids": [
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s2",
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s3"
+      ],
+      "statement": "OpenAI 為 PORTS-Pike 的具名承租客戶，將使用該容量部署 NVIDIA full-stack DSX AI factory platform；場址完工、租賃起始與實際部署仍尚待條件成就。",
+      "subject_id": "co:nvidia"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "prod:dsx_ai_factory_platform",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s3"
+      ],
+      "src_id": "co:nvidia"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:openai",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s2",
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s3"
+      ],
+      "src_id": "co:nvidia"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVIDIA",
+        "NVDA"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:nvidia",
+      "name": "NVIDIA Corporation",
+      "role": "leader",
+      "source_ids": [
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s1",
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "end_demand",
+      "aliases": [
+        "OpenAI"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:openai",
+      "name": "OpenAI Group PBC",
+      "role": null,
+      "source_ids": [
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s2",
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "DSX AI factory platform"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "prod:dsx_ai_factory_platform",
+      "name": "NVIDIA DSX AI factory platform",
+      "role": null,
+      "source_ids": [
+        "nvda_sb_energy_ports_pike_8k_2026_08_17_s3"
+      ],
+      "type": "Product"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvda_sb_energy_ports_pike_8k_2026_08_17",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA Corporation",
+    "permission_basis": "SEC public filing; canonical URL retained, only short research excerpts stored.",
+    "published_at": "2026-08-17",
+    "publisher": "U.S. Securities and Exchange Commission",
+    "retrieved_at": "2026-09-09",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "NVIDIA Form 8-K: PORTS Technology Campus partnership and residual value guaranties",
+    "url": "https://www.sec.gov/Archives/edgar/data/1045810/000104581026000069/nvda-20260817.htm"
+  },
+  "sources": [
+    {
+      "id": "nvda_sb_energy_ports_pike_8k_2026_08_17_s1",
+      "locator": "Item 1.01, partnership",
+      "quote": "NVIDIA announced a multi-year partnership with SB Energy Corp."
+    },
+    {
+      "id": "nvda_sb_energy_ports_pike_8k_2026_08_17_s2",
+      "locator": "Item 1.01, tenant",
+      "quote": "An affiliate of OpenAI Group PBC ... will be the tenant."
+    },
+    {
+      "id": "nvda_sb_energy_ports_pike_8k_2026_08_17_s3",
+      "locator": "Item 1.01, platform deployment",
+      "quote": "OpenAI ... will utilize capacity ... to deploy NVIDIA's full-stack DSX AI factory platform"
+    }
+  ]
+}
