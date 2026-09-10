@@ -43,6 +43,8 @@ import os
 import sys
 from pathlib import Path
 
+from identity import entities as entity_registry
+
 try:
     from dotenv import load_dotenv
     load_dotenv(Path(__file__).resolve().parent / ".env")
@@ -63,20 +65,90 @@ def _load_system_prompt() -> str:
     return SYSTEM_PROMPT_FILE.read_text(encoding="utf-8")
 
 
+def _entity_line(node: dict) -> str:
+    role_note = f", role: {node['role']}" if node.get("role") else ""
+    level = node.get("abstraction_level") or "?"
+    return (
+        f'  - id: "{node["id"]}", name: "{node["name"]}"'
+        f', type: {node.get("type") or "?"}, level: {level}{role_note}'
+    )
+
+
+def _graph_entities() -> list[dict] | None:
+    """圖裡現有的非公司實體。**連不上回 None，不靜默降級。**
+
+    只取 chokepoint 前綴：公司有自己的 registry，混進來會讓 LLM 以為公司 id 也
+    可以自由創造。
+    """
+
+    try:
+        from dotenv import load_dotenv
+        from neo4j import GraphDatabase
+    except ImportError:
+        return None
+    load_dotenv()
+    password = os.environ.get("NEO4J_PASSWORD")
+    if not password:
+        return None
+    try:
+        driver = GraphDatabase.driver(
+            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+        )
+        with driver.session() as session:
+            rows = [
+                dict(record)
+                for record in session.run(
+                    """
+                    MATCH (n:Entity)
+                    WHERE any(p IN $prefixes WHERE n.id STARTS WITH p)
+                    RETURN n.id AS id, n.name AS name, n.type AS type,
+                           n.abstraction_level AS abstraction_level, n.role AS role
+                    ORDER BY n.id
+                    """,
+                    prefixes=list(entity_registry.ENTITY_PREFIXES),
+                )
+            ]
+        driver.close()
+        return rows
+    except Exception:  # noqa: BLE001 — 連不上就是連不上，交給呼叫端誠實標記
+        return None
+
+
 def _known_entities_block() -> str:
-    """Build the known-entity list from the hand-authored sample for the system prompt."""
+    """給 system prompt 的既有實體清單。
+
+    優先用圖裡的實際節點（那才是「已經存在的東西」）；registry 的 canonical id 一併
+    列出，讓 LLM 知道哪些寫法是正規的。
+    """
+
+    canonical = entity_registry.load()
+    header: list[str] = []
+    if canonical:
+        header.append(
+            "  # canonical id（同一個東西的正規寫法；下列別名一律不要再產生）："
+        )
+        for canonical_id, entry in sorted(canonical.items()):
+            aliases = "、".join(entry.get("aliases") or ()) or "—"
+            header.append(f'  #   "{canonical_id}" ← 別名：{aliases}')
+
+    rows = _graph_entities()
+    if rows:
+        lines = [_entity_line(node) for node in rows]
+        return "\n".join(header + [f"  # 圖中現有實體 {len(rows)} 個："] + lines)
+
+    # 退回範例檔——但必須說出這份清單不完整，否則 LLM 會以為世界只有這幾個東西。
     if not SAMPLE_FILE.exists():
         return "(no sample file found — entity list unavailable)"
     with open(SAMPLE_FILE, encoding="utf-8") as f:
         sample = json.load(f)
-    lines = []
-    for n in sample.get("nodes", []):
-        role_note = f", role: {n['role']}" if n.get("role") else ""
-        lines.append(
-            f'  - id: "{n["id"]}", name: "{n["name"]}"'
-            f', type: {n["type"]}, level: {n["abstraction_level"]}{role_note}'
-        )
-    return "\n".join(lines)
+    lines = [_entity_line(n) for n in sample.get("nodes", [])]
+    warning = (
+        "  # ⚠ 無法連線知識圖譜，以下只是**範例檔**中的少數實體，不是完整清單。"
+        "\n  # 若你要用的實體不在下面，它很可能仍然已經存在——請沿用文件中的既有措辭，"
+        "\n  # 不要為了避開衝突而發明新的 id 變體。"
+    )
+    return "\n".join(header + [warning] + lines)
 
 
 def _prefix_source_ids(doc: dict, doc_id: str) -> dict:

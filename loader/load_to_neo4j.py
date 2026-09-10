@@ -37,6 +37,11 @@ try:
 except ImportError:
     pass
 
+#: 非公司實體的 canonical-id registry。**在任何 MERGE 之前解析**——節點合併了但邊
+#: 還指著舊 id，會產生指不到的端點，比不合併更糟。
+from identity import entities as entity_registry
+
+
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -311,6 +316,20 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
     ts = _now()
     doc_id = doc["source_doc"]["doc_id"]
 
+    # ── canonical entity id ──
+    # 抽取端每份文件由 LLM 自造 tech:／mat:／prod: id，於是同一層會被攤成多個節點
+    # （2026-09-10 實測：NAND 6 個、DRAM 4 個）。在這裡解析一次，node／edge 端點／
+    # claim subject 一起換，之後所有 MERGE 都吃 canonical id。
+    # ⚠ 未登記的新 id **放行**（世界一直在長新的 tech 節點，擋下來等於停掉抽取），
+    # 但一定要說出口——安靜放行就是下一個同義節點的來源。
+    resolution = entity_registry.resolve_document(doc)
+    if resolution["remapped"]:
+        for alias_id, canonical_id in sorted(resolution["remapped"].items()):
+            print(f"  [entity-id] {alias_id} → {canonical_id}")
+    if resolution["unregistered"]:
+        print(f"  [entity-id] 未登記的實體 id {len(resolution['unregistered'])} 個："
+              f"{', '.join(resolution['unregistered'])}")
+
     # Fail closed on the same source URL under a different doc_id (silent-duplicate guard).
     check_duplicate_url(doc["source_doc"], session, allow_dup_url)
 
@@ -415,8 +434,14 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
 
 
 def dry_run(doc: dict) -> None:
+    # dry-run 必須跑同一條解析，否則它預覽的是一份與實際載入不同的文件。
+    resolution = entity_registry.resolve_document(doc)
     print(f"[dry-run] doc={doc['source_doc']['doc_id']} "
           f"tier={doc['source_doc']['evidence_tier']}")
+    if resolution["remapped"]:
+        print(f"  entity-id 改寫 : {resolution['remapped']}")
+    if resolution["unregistered"]:
+        print(f"  未登記實體 id  : {resolution['unregistered']}")
     print(f"  nodes : {len(doc.get('nodes', []))}")
     for n in doc.get("nodes", []):
         print(f"    MERGE (:{n['type']} {{id:{n['id']}}})  conf={n['confidence']}")

@@ -105,6 +105,12 @@ Do NOT invent new IDs for them:
 For entities not in the list above, create a new ID following the convention.
 If you are unsure whether an entity matches an existing one, prefer reusing the existing ID.
 
+The most common cause of duplicates is **the same layer described in different words**.
+`NAND Flash Memory fabrication`, `NAND / non-volatile memory wafer fabrication` and
+`NAND Flash Memory Fab` are one entity, not three — match on what the thing *is*, not on
+how this particular document phrases it. If an existing entry means the same thing, reuse
+its ID verbatim even when your wording would be more precise.
+
 ---
 
 ## 4. PROPERTY ATTRIBUTION RULES  (L4 — physical / relational / time-varying)

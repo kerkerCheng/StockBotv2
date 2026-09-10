@@ -1,0 +1,37 @@
+{
+  "schema_version": "entity-aliases-v1",
+  "_readme": [
+    "非公司實體（tech:／mat:／prod:／std:）的 canonical-id SSOT。公司走 config/company_identity.json（INV-1）。",
+    "為什麼需要它：抽取端每份文件由 LLM 自造 id，loader 照收，於是同一層會被攤成 2～6 個節點。",
+    "後果有兩個且都是安靜的：①同一層的供應關係散在多個節點上，任何以節點為單位的結構評分都低估它；",
+    "②coverage_gaps 把其中孤立的那個報成「🔴 沒有任何公司連到它」，派研究去挖一個已經有供應商的東西。",
+    "",
+    "⚠ 登記門檻是機械的，不是語意的：只登記**名稱逐字相同**的 id。",
+    "「這兩個名字不同的節點其實是同一個東西」是研究判斷，走 pq2 的 ra_admission，不在這裡決定（L15：",
+    "解析可以交給語言處理，但 canonical identity 的權限永遠在 registry 這一側，且要有人核准）。",
+    "例：tech:advanced_packaging_gf『Advanced Packaging and Testing (GF Fab 8)』指的是特定廠，",
+    "tech:inp_eml『Indium Phosphide EML』指的是特定材質——兩者都**不**登記為 alias。",
+    "",
+    "canonical 的選法也是機械的：同組取最短 id；等長取字母序在前者。任何人重跑都得到同一個。"
+  ],
+  "canonical": {
+    "tech:advanced_packaging": {
+      "name": "Advanced packaging chip integration",
+      "aliases": ["tech:advanced_packaging_integration"],
+      "basis": "name_identical",
+      "note": "兩個 id 的 name 逐字相同。tech:advanced_packaging_gf 是 GF Fab 8 特指，不併。"
+    },
+    "tech:dram_manufacturing": {
+      "name": "DRAM wafer fabrication",
+      "aliases": ["tech:dram_production"],
+      "basis": "name_identical",
+      "note": "兩個 id 的 name 逐字相同。tech:dram／tech:dram_technology 名稱不同，留待研究判斷。"
+    },
+    "tech:eml": {
+      "name": "Electro-absorption Modulated Laser (EML)",
+      "aliases": ["tech:eml_laser"],
+      "basis": "name_identical",
+      "note": "兩個 id 的 name 逐字相同。tech:inp_eml 是 InP 材質特指，不併。"
+    }
+  }
+}
