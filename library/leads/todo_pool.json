@@ -8692,10 +8692,11 @@
       "added_at": "2026-09-10T09:23:51.928258+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=宇樹科技（688836.SS）首次公開發行股票並在科創板上市招股說明書（2026-08-14 公告；容誠審字[2026]230Z1692 標準無保留意見） 第六",
       "n": 516,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d9b3bac678b0d42194727f28dcdeac0e;proposal:po_39cae8ec6683a9daa059aa57fd6eb0ae",
       "ref_id": "po_39cae8ec6683a9daa059aa57fd6eb0ae",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T10:18:22.368246+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：688836.SS / backlog",
       "type": "engine_c_observation"
@@ -8704,10 +8705,11 @@
       "added_at": "2026-09-10T09:23:51.928258+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=宇樹科技（688836.SS）首次公開發行股票並在科創板上市招股說明書（2026-08-14 公告；容誠審字[2026]230Z1692 標準無保留意見） 第五",
       "n": 517,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_13ae2763f35d695c621854ba173ac50e;proposal:po_57ca78a036e43c572c4e5e9fb820a52e",
       "ref_id": "po_57ca78a036e43c572c4e5e9fb820a52e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T10:18:23.222608+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：688836.SS / customer_concentration",
       "type": "engine_c_observation"
@@ -8716,10 +8718,11 @@
       "added_at": "2026-09-10T09:23:51.928258+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MP Materials FY2025 10-K (EDGAR 0001801368-26-000008, filed 2026-02-26, CIK 0001",
       "n": 518,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_eab62d81412844210a05548f5c365ccb;proposal:po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
       "ref_id": "po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T10:18:24.060115+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：MP / customer_concentration",
       "type": "engine_c_observation"
@@ -8728,10 +8731,11 @@
       "added_at": "2026-09-10T09:27:48.948225+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=江西金力永磁科技股份有限公司 2026 年半年度報告全文（2026-08-21 巨潮資訊：https://static.cninfo.com.cn/finalp",
       "n": 519,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_0705fc3d30a52e48d35e71492077e412;proposal:po_7808b2e1aed29a31fe4b539755bd5b51",
       "ref_id": "po_7808b2e1aed29a31fe4b539755bd5b51",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T10:18:24.885422+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：6680.HK / backlog",
       "type": "engine_c_observation"
@@ -8740,10 +8744,11 @@
       "added_at": "2026-09-10T09:27:48.948225+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-16T00:00:00+00:00；來源=ニデック株式会社（東証プライム 6594）2026-06-16「第 53 期（2026 年 3 月期）有価証券報告書の提出期限延長に係る承認申請の検討に関するお",
       "n": 520,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_82888d543f6740752fdacc0e1fc63bb5;proposal:po_fba6864b178ff7eee893484703a1a630",
       "ref_id": "po_fba6864b178ff7eee893484703a1a630",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T10:18:25.721789+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：6594.T / litigation_and_audit_flags",
       "type": "engine_c_observation"
@@ -8752,13 +8757,33 @@
       "added_at": "2026-09-10T09:46:19.679429+00:00",
       "hint": "go＝執行 `python -m alpha abstention MP --add library/private/alpha/abstention_proposals/MP_forward_pe.json`，把這一格從段5 工單上拿掉並標為 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：內部 FY2026 GAAP EPS -0.2685 與同期共識 EPS -0.00374 都是負的，市場倍數在該期間不存在；現有 forward_pe 60.63x 是用 +1y（FY2027）共識算的，拿來當 FY2026 校準倍數會混年度。｜drop＝你認為應該改用別的 method 或改寫倍數，那我會改走 ROADMAP。｜revisit：FY2026 10-K 後基期滾動、目標期間變 FY2027（共識 EPS 0.89562 為正）時撤回本 abstention 並改寫 ValuationAssumption。",
       "n": 521,
-      "reason": null,
+      "reason": "使用者 2026-09-10 批次核准；已執行 alpha abstention MP --add，MP 的 forward_earnings_multiple.target_pe 標為 deliberate_abstention",
+      "receipt": "authority:abstention;ref:ab_76cd5a997d4e9ee6",
       "ref_id": "manual:521",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T10:18:52.698183+00:00",
       "source": "manual",
       "title": "MP：FY2026 是虧損年，forward_earnings_multiple 無校準倍數——提案 Abstention（valuation / target_pe）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T10:20:27.923580+00:00",
+      "deferred_at": "2026-09-10T10:20:40.132601+00:00",
+      "hint": "當前 missing_data：Nidec 決算短信/有報的精密減速器(Drive Technology)segment 受注或營收拆分(Engine （共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 522,
+      "reason": null,
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:nidec：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "使用者 2026-09-10 指示（原 [457] 於 park 工單時自動 resolve，collector 重新推導為 [522]）",
+        "set_at": "2026-09-10T10:20:40.132601+00:00",
+        "trigger": "第53期(2026/3期)有価証券報告書提出（法定期限 2026-06-30，公司 2026-06-16 公告申請延長至 2026-09-30）——相手先別販売実績與受注残高只存在於這份尚未提出的文件；同時第三者委員会已查出多拠点會計不正、過年度決算訂正進行中，既有第52期數字亦在更正範圍",
+        "until": "2026-09-30"
+      }
     }
   ],
   "log": [
@@ -19202,8 +19227,71 @@
       "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:18:22.368246+00:00",
+      "n": 516,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_d9b3bac678b0d42194727f28dcdeac0e;proposal:po_39cae8ec6683a9daa059aa57fd6eb0ae",
+      "ref_id": "po_39cae8ec6683a9daa059aa57fd6eb0ae",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:18:23.222608+00:00",
+      "n": 517,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_13ae2763f35d695c621854ba173ac50e;proposal:po_57ca78a036e43c572c4e5e9fb820a52e",
+      "ref_id": "po_57ca78a036e43c572c4e5e9fb820a52e",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:18:24.060115+00:00",
+      "n": 518,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_eab62d81412844210a05548f5c365ccb;proposal:po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
+      "ref_id": "po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:18:24.885422+00:00",
+      "n": 519,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_0705fc3d30a52e48d35e71492077e412;proposal:po_7808b2e1aed29a31fe4b539755bd5b51",
+      "ref_id": "po_7808b2e1aed29a31fe4b539755bd5b51",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:18:25.721789+00:00",
+      "n": 520,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_82888d543f6740752fdacc0e1fc63bb5;proposal:po_fba6864b178ff7eee893484703a1a630",
+      "ref_id": "po_fba6864b178ff7eee893484703a1a630",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:18:52.698183+00:00",
+      "n": 521,
+      "reason": "使用者 2026-09-10 批次核准；已執行 alpha abstention MP --add，MP 的 forward_earnings_multiple.target_pe 標為 deliberate_abstention",
+      "receipt": "authority:abstention;ref:ab_76cd5a997d4e9ee6",
+      "ref_id": "manual:521",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T10:20:40.132601+00:00",
+      "n": 522,
+      "reason": "使用者 2026-09-10 指示（原 [457] 於 park 工單時自動 resolve，collector 重新推導為 [522]）",
+      "receipt": null,
+      "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
-  "next_n": 522,
+  "next_n": 523,
   "schema_version": "1"
 }
