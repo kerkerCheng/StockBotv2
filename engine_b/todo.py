@@ -18,6 +18,7 @@ from __future__ import annotations
 import json
 import os
 import re
+import sys
 import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -504,6 +505,14 @@ def checkpoint_decision_review(
     if to_status == "awaiting_approval":
         if awaiting_gate is not None:
             set_awaiting_gate(pool, n, awaiting_gate)
+        elif gate_pointer(item) is None:
+            # 不擋（既有工單沒有這個欄位），但不再靜默：一個說不出在等誰的等待
+            # 就是沒有到期的等待（INV-2），而它會安靜地掛在池子裡沒有人回來動它。
+            print(
+                f"  ⚠ [{n}] 進 awaiting_approval 但未指定 --awaiting-gate："
+                "`todo gated` 與 audit 的 QueueLiveness 會把它報成 no_pointer",
+                file=sys.stderr,
+            )
     else:
         # 離開 awaiting_approval 就沒有 gate 可等了——留著會變成過期的 pointer。
         item.pop(AWAITING_GATE_KEY, None)
@@ -1224,8 +1233,15 @@ def checkpoint_source_trace_review(
                 raise TodoError("graph receipt 必須是 graph:<lead refs 的 source_doc>")
             if lead.get("status") != "applied":
                 raise TodoError("graph receipt 要求 lead 已 applied（loader 無 prepared 中間態）")
-            if not (_ROOT / "extractions" / f"{doc_id}.json").exists():
-                raise TodoError(f"找不到 extractions/{doc_id}.json，graph receipt 無可稽核依據")
+            # ⚠ 問的是「有沒有抽取依據」，不是「有沒有這個檔名」。206 個 doc_id 中有
+            # 11 個的 `extractions/<doc_id>.json` 不存在（檔名與 doc_id 不同），
+            # 拼檔名會把它們全部誤報成無依據（L15：gate 攔下的不是它想攔的東西）。
+            from loader.extraction_index import exists as _extraction_exists
+
+            if not _extraction_exists(doc_id):
+                raise TodoError(
+                    f"找不到 doc_id={doc_id} 的抽取檔，graph receipt 無可稽核依據"
+                )
         elif receipt != f"action:{action_id}" or not action_id.startswith("ra_"):
             raise TodoError(
                 "completed trace receipt 必須是 action:<ra_id>（RA 路徑）"

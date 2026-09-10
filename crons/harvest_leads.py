@@ -140,7 +140,11 @@ def filings_to_leads(ticker: str, cik: str, filings: list[dict]) -> list[dict]:
             {
                 "source": f"edgar:{ticker.upper()}",
                 "url": url,
-                "title": f"{ticker.upper()} {f['form_type']} filed {f['filed_date']}",
+                # ⚠ 同一天可能有多份同型 filing（實測 2026-09-09 的 TSM Form 4 有三份，
+                # accession 各不相同）。只寫 ticker/form/date 會讓三筆長得一模一樣，
+                # 看起來像去重失敗——去重其實是對的（鍵是 url），**是標題不足以區分**。
+                "title": (f"{ticker.upper()} {f['form_type']} filed {f['filed_date']}"
+                          f" [{accession[-6:]}]"),
                 "published_at": f["filed_date"],
             }
         )

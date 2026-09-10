@@ -49,33 +49,12 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from identity import entities as entity_registry
+from loader.extraction_index import build_index
 from loader.edge_resolution import project_edge_keys
 from loader.load_to_neo4j import load
 from loader.migrate_entity_dedup_20260904 import _admin_driver
 
 _SOURCE_ID = re.compile(r"^(?P<doc>.+)_s\d+$")
-
-
-def _extraction_index() -> dict[str, list[Path]]:
-    """doc_id → 抽取檔路徑**清單**。掃內容，不靠檔名；一個 doc_id 可能有多份。
-
-    兩件事都是實測出來的，不能省：
-    - doc_id 與檔名不保證一致（`cpo_chip_package_paper.json` 的 doc_id 是
-      `Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era`）。
-    - **一個 doc_id 可能對應多份檔案**（addendum 慣例，全庫 21 組）。用 dict 存單一
-      path 會讓後掃到的覆蓋先掃到的，重載時就少一份 provenance 而且不會報錯。
-    """
-
-    index: dict[str, list[Path]] = {}
-    for path in sorted((ROOT / "extractions").glob("*.json")):
-        try:
-            doc = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        doc_id = (doc.get("source_doc") or {}).get("doc_id")
-        if doc_id:
-            index.setdefault(str(doc_id), []).append(path)
-    return index
 
 
 def _doc_ids(source_ids) -> set[str]:
@@ -87,7 +66,7 @@ def _doc_ids(source_ids) -> set[str]:
     return out
 
 
-def _plan(session, index: dict[str, list[Path]]) -> list[dict]:
+def _plan(session, index: dict[str, tuple[Path, ...]]) -> list[dict]:
     """每一組登記 → 它在圖裡的現況與要重載的文件。"""
 
     plan: list[dict] = []
@@ -127,7 +106,7 @@ def migrate(*, dry_run: bool, backup_dir: str | None) -> dict:
         if not export.is_file() or export.stat().st_size == 0:
             raise RuntimeError(f"找不到 Neo4j 匯出或為空：{export}")
 
-    index = _extraction_index()
+    index = build_index()
     driver = _admin_driver()
     result: dict = {
         "dry_run": dry_run,

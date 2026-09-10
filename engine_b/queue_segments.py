@@ -94,6 +94,19 @@ SEGMENTS: tuple[Segment, ...] = (
         "pollable_watches", 7, "stalled 且可主動輪詢的 watch（被動層不會再醒）",
         "research", "python -m engine_b.event_watch sweep（budget 見 config/event_watch.json）",
     ),
+    # 下面兩段是 2026-09-10 新增的偵測。它們**必須有一個會自己出現的地方**，否則
+    # 就只是「要人讀的段落」（L14）——而 `engine_b.todo work` 是 daily 的 fixed entry，
+    # 排程有能力製造這兩種狀態。
+    Segment(
+        "gated_gate_resolved", 8, "停在 awaiting_approval，但它等的 pq2 編號已經 resolve",
+        "mechanical", "python -m engine_b.todo gated（下一步是 reassess 拿新 decision receipt）",
+        "gate 消失不等於可以直接收單：實測三張工單 reassess 後都浮出不同的新缺口。",
+    ),
+    Segment(
+        "gated_no_pointer", 9, "停在 awaiting_approval，卻說不出在等哪個編號",
+        "mechanical", "python -m engine_b.todo gated（補 `todo work --awaiting-gate <n>`）",
+        "說不出在等誰的等待就是沒有到期的等待（INV-2），也沒有 consumer（INV-4）。",
+    ),
 )
 
 SEGMENT_BY_KEY: dict[str, Segment] = {s.key: s for s in SEGMENTS}
@@ -239,7 +252,10 @@ def observe(
             examples[key].append(str(watch.get("watch_id", "?")))
 
     reassess = {int(n) for n in reassess_only_numbers}
-    for item in todo_items:
+    # ⚠ 固化：`todo_items` 是 Iterable，下面要走訪兩次（分段計數 ＋ gated 判定）。
+    # 傳 generator 進來時第二次會是空的，而空集合不會報錯——只會安靜地少報（L13-2）。
+    todo_rows = list(todo_items)
+    for item in todo_rows:
         key = classify_todo(item, reassess_only=int(item.get("n", -1)) in reassess)
         if key is None:
             continue
@@ -252,6 +268,25 @@ def observe(
 
     counts["forward_view_backlog"] = forward_view_backlog
     counts["coverage_gaps"] = coverage_gaps
+
+    # gated 兩段由 todo_items 直接算得出來（不需要外部 authority），所以不走注入。
+    from engine_b.todo import gate_pointer
+
+    by_n = {int(i["n"]): i for i in todo_rows if i.get("n") is not None}
+    for item in todo_rows:
+        if item.get("resolution") or item.get("dispatch_status") != "awaiting_approval":
+            continue
+        pointer = gate_pointer(item)
+        gate = by_n.get(pointer["n"]) if pointer else None
+        if pointer is None or gate is None:
+            key = "gated_no_pointer"
+        elif gate.get("resolution"):
+            key = "gated_gate_resolved"
+        else:
+            continue
+        counts[key] = (counts[key] or 0) + 1
+        if len(examples[key]) < 3:
+            examples[key].append(f"[{item.get('n', '?')}]")
 
     return {
         "segments": [

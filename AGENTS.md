@@ -724,6 +724,27 @@ in-flight 狀態，實際上 5 個 slot 全滿。
 手上**，否則每個消費端都會重造一份，而重造品會立刻開始偏離。
 **Implementation：** `blockers_by_mode` 等｜**可改？NO**。
 
+### L17 — 不夠 general 的機制當下就修，別讓它進 backlog
+**Invariant（2026-09-10 使用者定案）：**
+1. **看到「這個機制只認得我當初那個案例」就當下修掉**，不是記一筆 backlog。
+   理由是這一類缺陷**不會壞、不會報錯、測試不會紅**——正因為沒有東西被它逼著回來修，
+   放進 backlog 等於永遠不修，而它每天都在安靜地偏。
+2. **檔次判準（決定當下修還是排程）：** 十行內、不動 contract → **當下修**；
+   動到 contract／封閉字彙／多個 owner → Z2 給 proposal；
+   **等於重寫一個既有子系統** → 才進 ROADMAP（例：為節點屬性做一套 `edge_resolution`
+   等價物）。⚠「不是重構等級」是門檻，不是藉口——說不出它動到哪個 contract 就是當下修。
+3. **三個問句：** ①這個 key 真的唯一嗎（寫 `dict[k]=v` 前先問 k 會不會重複）？
+   ②這個欄位是覆蓋還是聯集，覆蓋掉的那份還有第二個地方留著嗎？
+   ③這個機制的對稱面做了嗎（邊做了點呢、偵測做了誰消費）？
+4. **「不夠 general」的相反不是「盡量 general」，是「general 到資料支持的那一格為止」。**
+   在沒有事實支撐的地方泛化，得到的是會誤報的分類（L16-4）。
+**事發（2026-09-10）：** 一個 session 內撞到六個同形缺陷——`MERGE_NODE` 重載時靜默覆蓋
+`name`、`doc_id → 檔案` 被當成一對一（實測 229 份檔案只有 206 個 doc_id）、
+publisher 對「別人順手 commit 過」沒有表示、新增的兩個偵測沒有 consumer。
+**六個沒有一個會讓測試變紅。** 逐案與判準見
+[`mechanism-built-for-one-case.md`](docs/solutions/architecture-patterns/mechanism-built-for-one-case.md)。
+**Implementation：** 各處｜**可改？NO**（判準）／**YES**（各處實作）。
+
 ---
 
 ## 文件化學習

@@ -344,10 +344,37 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
         # Inject ticker for known Company nodes (Engine A→C join key)
         if n.get("type") == "Company" and n["id"] in TICKER_MAP:
             attrs["ticker"] = TICKER_MAP[n["id"]]
+
+        # ⚠ 既有節點的 name／attributes 不得被這次載入靜默覆蓋。
+        # `MERGE_NODE` 只有 `source_ids` 會聯集；name 與 attributes 原本是直接 SET，
+        # 於是**重載**一份既有文件就會改寫別的文件寫下的值（2026-09-10 實測改掉 7 個
+        # name，其中 tech:vcsel 被改成產品規格）。要改 name 有明確路徑——migration 或
+        # 人工 SET——不該是載入的副作用。
+        name = n["name"]
+        existing = _execute(
+            session,
+            "MATCH (n:Entity {id: $id}) RETURN n.name AS name, n.attributes AS attrs",
+            id=n["id"],
+        ).single()
+        if existing:
+            prior_name = existing["name"]
+            if prior_name and prior_name != name:
+                print(f"  [node-merge] {n['id']} name 保留既有 {prior_name!r}"
+                      f"（本次文件寫 {name!r}）", file=sys.stderr)
+                name = prior_name
+            prior_attrs = json.loads(existing["attrs"] or "{}")
+            clashed = {k: (prior_attrs[k], attrs[k]) for k in attrs
+                       if k in prior_attrs and prior_attrs[k] != attrs[k]}
+            if clashed:
+                print(f"  [node-merge] {n['id']} attributes 保留既有 {clashed}",
+                      file=sys.stderr)
+            # 既有 key 優先；本次文件只補上既有沒有的 key。
+            attrs = {**attrs, **prior_attrs}
+
         params = {
             "id": n["id"],
             "type": n["type"],
-            "name": n["name"],
+            "name": name,
             "abstraction_level": n["abstraction_level"],
             "role": n.get("role"),
             "aliases": n.get("aliases", []),
