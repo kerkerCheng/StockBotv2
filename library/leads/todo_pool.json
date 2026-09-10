@@ -8784,6 +8784,30 @@
         "trigger": "第53期(2026/3期)有価証券報告書提出（法定期限 2026-06-30，公司 2026-06-16 公告申請延長至 2026-09-30）——相手先別販売実績與受注残高只存在於這份尚未提出的文件；同時第三者委員会已查出多拠点會計不正、過年度決算訂正進行中，既有第52期數字亦在更正範圍",
         "until": "2026-09-30"
       }
+    },
+    {
+      "added_at": "2026-09-10T11:18:18.506734+00:00",
+      "hint": "go＝執行 `python -m alpha abstention IQE.L --add library/private/alpha/abstention_proposals/IQE.L_forward_pe.json`，把這一格從段5 工單拿掉並標 settled。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：內部 FY2026 EPS −£0.01143 與同期共識完全相同（口徑已核實 non_gaap），FY2027 共識仍為 −£0.00208。另有 GBp/GBP 100 倍單位風險，不宜在不適用的方法上再疊一層換算。｜revisit：FY2027 共識區間上緣已觸及 0，轉正時撤回本 abstention 並改寫 ValuationAssumption。",
+      "n": 523,
+      "reason": null,
+      "ref_id": "manual:523",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "IQE.L：FY2026／FY2027 共識 EPS 皆為負，forward_earnings_multiple 無校準倍數——提案 Abstention（valuation / target_pe）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-10T11:18:18.702438+00:00",
+      "hint": "go＝執行 `python -m alpha abstention POET --add library/private/alpha/abstention_proposals/POET_forward_pe.json`。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live。｜依據：FY2026 共識 EPS −0.23（high＝low＝−0.23，1 位分析師，區間寬度為零）、FY2027 −0.17，皆為負；Engine C 無 fiscal_year_results，P7-a 的 XBRL 補值已明確拒寫。**刻意不先補基期再宣告不適用**——補了也沒有可乘的倍數。｜drop＝你認為應改用別的 method，那我改走 ROADMAP。",
+      "n": 524,
+      "reason": null,
+      "ref_id": "manual:524",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "POET：FY2026 共識 EPS −US$0.23 且僅 1 位分析師、基期實績亦缺——提案 Abstention（valuation / target_pe）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -19292,6 +19316,6 @@
       "verb": "pending"
     }
   ],
-  "next_n": 523,
+  "next_n": 525,
   "schema_version": "1"
 }
