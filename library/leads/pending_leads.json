@@ -54258,6 +54258,7 @@
       "url": "https://x.com/aleabitoreddit/status/2095823005595439615"
     },
     "lead_d9389c8a69d76481e03526e3f50b9f2d": {
+      "content_updated_at": "2026-09-10T10:36:36.075853+00:00",
       "entities": {
         "company_ids": [
           "co:globalfoundries"
@@ -54282,7 +54283,7 @@
       "source": "edgar:GFS",
       "status": "parked",
       "themes": {},
-      "title": "GFS 6-K filed 2026-09-08",
+      "title": "GFS 6-K filed 2026-09-08 [000234]：GF 與美國商務部 Securities Issuance Agreement（2026-09-03），發行 9,907,399 股 @ US$37.85（約 3.75 億美元）給 DOC，附轉讓／表決限制與 shelf 註冊權",
       "triage": {
         "classification": {
           "classified_at": "2026-09-08T22:36:33.178233+00:00",
@@ -61478,6 +61479,39 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2078228019584668121"
+    },
+    "lead_f8c1017d1e9ef8ec25021c252a8597a5": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-10T10:37:31.736727+00:00",
+      "lead_id": "lead_f8c1017d1e9ef8ec25021c252a8597a5",
+      "published_at": "2026-09-09",
+      "refs": {},
+      "source": "web:globenewswire",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GF 與 Monolithic Power Systems 簽長期製造協議（2026-09-09）：MPS 專有製程導入 GF 新加坡 300mm 廠，2027 年初量產；終端含汽車、工業機器人與 AI／雲的 smart power stage。無金額／產能／最低採購量",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-10T10:37:50.173772+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "payment_direction": "unclear",
+          "reason": "雙方共同發布的長期製造協議：客戶（MPS）把專有製程搬進 GF 新加坡 300mm 廠並訂 2027 年初量產，屬結構事實；但新聞稿無金額、無產能、無最低採購量，看不出誰付錢給誰，故 payment_direction 判 unclear（不得把合作公告當客戶端資本承諾）"
+        },
+        "decided_at": "2026-09-10T10:37:50.173772+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "GFS 在圖中的 catalyst 軸目前為 unknown——六條邊全出自它自己的 20-F、沒有任何具名事件。本則是雙方具名、帶日期（2026-09-09）、帶晶圓廠與時程的一手公告，且終端明確含 AI／雲的 smart power stage，可能同時補上 GF 的 catalyst 與一條新的 supplies_to 邊。追源與抽取後仍需另行核准入圖",
+        "tier": 2
+      },
+      "url": "https://www.globenewswire.com/news-release/2026/09/09/3358648/0/en/globalfoundries-and-monolithic-power-systems-form-manufacturing-partnership-to-scale-high-performance-power-solutions.html"
     },
     "lead_f94a189ddbbc45691fecb4f67ceb73ee": {
       "entities": {
