@@ -657,6 +657,7 @@ COVERAGE_THIS_IS_NOT = (
     "🔴 的數字不是研究待辦數：`prod:` 前綴是抽取副產品（文件掉出來的產品型號），只計數、不是題目。",
     "🟡 不是「還沒研究」——那個領域已經研究過，缺的是把邊接到 chokepoint 節點上（走入圖核准）。",
     "不排序、不評分：這一頁沒有名次，補哪一個由使用者決定。",
+    "`層` 與 `邊` 不是分類也不是分數：它們是節點自己的屬性與邊數，只用來讓「下一步做什麼」看得出差別。",
     "本 APP 不重算：每一格都是 materialize 當下 `python -m query.coverage_gaps` 的輸出照抄。",
 )
 
@@ -669,11 +670,19 @@ _COVERAGE_AUTHORITY = {
 
 def _coverage_row(row: Mapping[str, Any], *, with_question: bool = False) -> dict[str, Any]:
     out = {"node": row["node"], "name": row.get("name"),
-           "direct": list(row.get("direct") or ()), "indirect": list(row.get("indirect") or ())}
+           "direct": list(row.get("direct") or ()), "indirect": list(row.get("indirect") or ()),
+           # 脈絡欄位（非分類）：節點自己的邊數與 stack 層別，照抄不重算。
+           "degree": row.get("degree"), "abstraction_level": row.get("abstraction_level")}
     if with_question:
-        from query.coverage_gaps import RESEARCH_QUESTION_TEMPLATE
+        from query.coverage_gaps import ISOLATED_DEGREE, RESEARCH_QUESTION_TEMPLATE
 
-        out["question"] = RESEARCH_QUESTION_TEMPLATE.format(node=row["node"])
+        # 孤立節點的下一步不是「誰供應它」——它連 stack 都還沒接上。
+        out["question"] = (
+            "先確認它該掛在 stack 哪一層"
+            if row.get("degree") == ISOLATED_DEGREE
+            else RESEARCH_QUESTION_TEMPLATE.format(node=row["node"])
+        )
+        out["isolated"] = row.get("degree") == ISOLATED_DEGREE
     return out
 
 
@@ -682,7 +691,8 @@ def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
     """`coverage_gaps.scan()` 的結果 → `coverage` state artifact。**純函式**：不連 DB、不重新分類。"""
     from query.coverage_gaps import (
         BUCKET_LABELS, BUCKET_NEXT_STEP, BUCKET_NOTE, COVERAGE_SCOPE_NOTE, COVERAGE_TITLE,
-        PRODUCT_NOISE_PREFIX, RESEARCH_GAP_SPLIT_NOTE, bucketize, split_research_gaps,
+        ISOLATED_NOTE, LEVEL_NOTE, PRODUCT_NOISE_PREFIX, RESEARCH_GAP_SPLIT_NOTE,
+        bucketize, split_research_gaps,
     )
 
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -703,7 +713,8 @@ def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
         "notes": {"buckets": BUCKET_NOTE, "research_gap_split": RESEARCH_GAP_SPLIT_NOTE,
                   "scope": COVERAGE_SCOPE_NOTE,
                   "question_template": "研究題目是固定模板不是新判斷：同一個節點永遠得到同一句。",
-                  "product_noise_rule": f"前綴 `{PRODUCT_NOISE_PREFIX}` ＝抽取副產品（機械比對，可重導）"},
+                  "product_noise_rule": f"前綴 `{PRODUCT_NOISE_PREFIX}` ＝抽取副產品（機械比對，可重導）",
+                  "isolated": ISOLATED_NOTE, "abstraction_level": LEVEL_NOTE},
         "research_gaps": [_coverage_row(r, with_question=True) for r in real_gaps],
         "product_noise": [_coverage_row(r) for r in product_noise],
         "modelling_gaps": [_coverage_row(r) for r in buckets["modelling_gap"]],

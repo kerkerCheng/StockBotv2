@@ -53,7 +53,10 @@ WHERE NOT c.id IN direct_ids
   AND (mid.id STARTS WITH 'prod:' OR mid:Company)
   AND c <> n AND mid <> n AND mid <> c
 WITH n, direct_ids, collect(DISTINCT c.id) AS indirect_ids
-RETURN n.id AS node, n.name AS name, direct_ids, indirect_ids
+OPTIONAL MATCH (n)-[any_rel]-()
+WITH n, direct_ids, indirect_ids, count(any_rel) AS degree
+RETURN n.id AS node, n.name AS name, direct_ids, indirect_ids,
+       degree, n.abstraction_level AS abstraction_level
 ORDER BY size(direct_ids), size(indirect_ids), node
 """
 
@@ -99,6 +102,23 @@ RESEARCH_GAP_SPLIT_NOTE = (
 
 #: 研究題目的固定模板：它是**排版**不是新判斷（同一個節點永遠得到同一句）。
 RESEARCH_QUESTION_TEMPLATE = "誰供應 `{node}`？"
+
+#: 🔴 桶的兩個脈絡欄位。**它們不是分類**——不改變任何節點落在哪一桶，只是把節點
+#: 自己已有的事實一起印出來，讓「下一步做什麼」看得出差別。
+#: ⚠ 刻意不再往下分桶：2026-09-10 逐節點查證過，🔴 裡的節點在 `source_ids`、
+#: `abstraction_level`、ABOUT 文件數上完全同形，沒有可機械分辨的差異。在沒有事實
+#: 支撐的地方切一刀，得到的是會誤報的分類（L16-4）。
+ISOLATED_DEGREE = 0
+
+ISOLATED_NOTE = (
+    "`degree=0` ＝這個節點連一條邊都沒有——它還沒接進 stack。下一步是**先確認它該掛在哪**，"
+    "不是「去查誰供應它」；把它當研究題目派出去，研究者會找不到題目的落點。"
+)
+
+LEVEL_NOTE = (
+    "`層` 是節點自己的 `abstraction_level`（封閉字彙，SSOT 在 `schema/vocab.json`）——"
+    "決定先挖哪個空白時，同一層的空白通常該一起挖。"
+)
 
 COVERAGE_SCOPE_NOTE = (
     "本掃描只能從**既有節點**往回看：它答得出「圖裡這個瓶頸還沒有供應商」，"
@@ -157,6 +177,9 @@ def scan(session) -> list[dict[str, Any]]:
                 "direct": sorted(direct),
                 "indirect": sorted(indirect),
                 "status": classify(direct, indirect, node_id),
+                # 脈絡欄位，不參與分類；缺值時誠實留 None／0，不猜。
+                "degree": int(record["degree"] or 0),
+                "abstraction_level": record["abstraction_level"],
             }
         )
     return rows
@@ -185,9 +208,27 @@ def render_markdown(rows: Iterable[Mapping[str, Any]]) -> list[str]:
             out.append(f"| `{row['node']}` | {companies} |")
 
     if buckets["research_gap"]:
+        real, noise = split_research_gaps(buckets["research_gap"])
         out += ["", "## 🔴 研究缺口（真正的空白）", ""]
-        for row in buckets["research_gap"]:
-            out.append(f"- `{row['node']}`　{row['name'] or ''}")
+        out.append(RESEARCH_GAP_SPLIT_NOTE)
+        if real:
+            out += ["", f"{ISOLATED_NOTE}", f"{LEVEL_NOTE}", ""]
+            out.append("| 節點 | 名稱 | 層 | 邊 | 下一步 |")
+            out.append("|---|---|---|---|---|")
+            for row in real:
+                level = row.get("abstraction_level") or "—"
+                degree = row.get("degree", 0)
+                step = (
+                    "先確認它該掛在 stack 哪一層"
+                    if degree == ISOLATED_DEGREE
+                    else RESEARCH_QUESTION_TEMPLATE.format(node=row["node"])
+                )
+                out.append(
+                    f"| `{row['node']}` | {row['name'] or ''} | {level} | {degree} | {step} |"
+                )
+        if noise:
+            out += ["", f"抽取副產品（`{PRODUCT_NOISE_PREFIX}` 前綴）{len(noise)} 個，只計數：", ""]
+            out += [f"- `{row['node']}`" for row in noise]
     return out
 
 

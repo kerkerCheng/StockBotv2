@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from query.coverage_gaps import classify, is_concept_node, render_markdown
+from query.coverage_gaps import (
+    ISOLATED_DEGREE, classify, is_concept_node, render_markdown, split_research_gaps,
+)
 
 
 def test_indirect_only_is_modelling_gap_not_research_gap() -> None:
@@ -41,3 +43,43 @@ def test_render_separates_two_gap_kinds_with_counts() -> None:
     # 兩種缺口必須分開呈現：下一步動作不同（補研究 vs 補邊）
     assert "## 🟡 建模待補" in out and "## 🔴 研究缺口" in out
     assert "`co:boston_dynamics`" in out
+
+
+def test_isolated_node_gets_a_different_next_step_than_a_real_research_question() -> None:
+    """`degree=0` 的節點連 stack 都沒接上——派它去「查誰供應」會找不到落點。
+
+    ⚠ 這**不是**新分類：它不改變任何節點落在哪一桶，只是把節點自己的邊數印出來。
+    2026-09-10 逐節點查證過，🔴 裡的節點在 source_ids／abstraction_level／ABOUT 上
+    完全同形，沒有可機械分辨的差異——在那裡切一刀只會得到會誤報的分類（L16-4）。
+    """
+
+    rows = [
+        {"node": "tech:orphan", "name": "Orphan", "direct": [], "indirect": [],
+         "status": "research_gap", "degree": ISOLATED_DEGREE,
+         "abstraction_level": "network_systems"},
+        {"node": "tech:serdes", "name": "SerDes", "direct": [], "indirect": [],
+         "status": "research_gap", "degree": 3, "abstraction_level": "device_chip"},
+    ]
+    out = "\n".join(render_markdown(rows))
+
+    assert "先確認它該掛在 stack 哪一層" in out
+    assert "誰供應 `tech:serdes`？" in out
+    # 孤立節點不得同時拿到「去查誰供應它」那句
+    assert "誰供應 `tech:orphan`？" not in out
+    # 兩欄脈絡都要出現在表裡
+    assert "network_systems" in out and "device_chip" in out
+
+
+def test_context_columns_do_not_change_any_bucket() -> None:
+    """脈絡欄位不參與分類：同樣的 direct／indirect，分桶結果必須完全不受 degree 影響。"""
+
+    assert classify([], [], "tech:a") == "research_gap"
+    rows = [
+        {"node": "tech:a", "name": "A", "direct": [], "indirect": [],
+         "status": "research_gap", "degree": 0, "abstraction_level": None},
+        {"node": "prod:b", "name": "B", "direct": [], "indirect": [],
+         "status": "research_gap", "degree": 9, "abstraction_level": "device_chip"},
+    ]
+    real, noise = split_research_gaps(rows)
+    assert [r["node"] for r in real] == ["tech:a"]
+    assert [r["node"] for r in noise] == ["prod:b"]
