@@ -1,0 +1,424 @@
+Applied Optoelectronics, Inc. 10-Q 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ false 
+ 0001158114 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001158114 
+ 
+ 
+ 2026-09-04 
+ 2026-09-04 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+
+ &#160; 
+
+ UNITED STATES 
+
+ SECURITIES AND
+EXCHANGE COMMISSION 
+
+ Washington, D.C.
+20549 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+
+ &#160; 
+
+ FORM 8-K 
+
+ &#160; 
+
+ CURRENT REPORT 
+
+ 
+
+ Pursuant to Section 13 or 15(d) of the Securities
+Exchange Act of 1934 
+
+ &#160; 
+
+ Date of Report (Date of earliest event reported):
+ September 4, 2026 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ Applied Optoelectronics, Inc. 
+
+ (Exact name of registrant as specified
+in its charter) 
+
+ &#160; 
+
+ 
+ 
+ Delaware 
+ 001-36083 
+ 76-0533927 
+ 
+ (State or other jurisdiction of incorporation) 
+ (Commission File Number) 
+ (I.R.S. Employer Identification No.) 
+ 
+
+ 
+
+ &#160; 
+
+ 13139
+Jess Pirtle Blvd. Sugar
+Land , Texas 77478 
+
+ (Address
+of principal executive offices and z ip code) 
+
+ &#160; 
+
+ ( 281 ) 295-1800 
+
+ (Registrant&#8217;s telephone number, including
+area code) 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ Check the appropriate box below if the
+Form 8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions
+(see General Instruction A.2. below): 
+
+ &#160; 
+
+ 
+ &#168; Written communications pursuant to Rule 425 under the Securities
+Act (17 CFR 230.425) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Soliciting material pursuant to Rule 14a-12 under the Exchange
+Act (17 CFR 240.14a-12) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Pre-commencement communications pursuant to Rule 14d-2(b) under
+the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Pre-commencement communications pursuant to Rule 13e-4(c) under
+the Exchange Act (17 CFR 240.13e-4(c)) 
+ 
+
+ &#160; 
+
+ Securities registered pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+ 
+ Title
+ of each class 
+ Trading
+ Symbol(s) 
+ Name of each exchange on which registered 
+ 
+ Common
+ Stock, Par value $0.001 
+ AAOI 
+ NASDAQ
+ Global Market 
+ 
+ &#160; 
+
+ Indicate by check mark whether the registrant
+is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2
+of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company
+ &#168; 
+
+ &#160; 
+
+ If
+an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for
+complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. o 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; &#160; &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ 
+ 
+ Item 1.01 
+ 
+ Entry into a Material Definitive Agreement. 
+ 
+
+ &#160; 
+
+ On September 4, 2026, Applied Optoelectronics,
+Inc. (the &#8220;Company&#8221;) entered into a Purchase and Sale Agreement (the &#8220;Purchase Agreement&#8221;) with Blue Ridge Commerce
+Center West LLC (the &#8220;Seller&#8221;) in connection with the Company&#8217;s exercise of the one-time purchase option granted under
+a Lease Agreement with the Seller, which became effective on February 10, 2026 (the &#8220;Lease&#8221;). The Lease and the purchase option
+were previously disclosed in the Company&#8217;s Current Report on Form 8-K filed with the Securities and Exchange Commission on February
+27, 2026. 
+
+ &#160; 
+
+ Pursuant to the Purchase Agreement, the Company
+acquired the real property located at 16851 Blue Ridge Commerce Dr., Building 3, Houston, Texas 77489, consisting of approximately 8.858
+acres of land and all improvements thereon, including an approximately 153,928 rentable-square-foot building, together with certain related
+tangible and intangible personal property (collectively, the &#8220;Property&#8221;). The Company intends to use the Property for office,
+warehouse, light manufacturing and assembly purposes. 
+
+ &#160; 
+
+ The aggregate purchase price for the Property was
+$26,783,472.00, subject to the prorations and other adjustments set forth in the Purchase Agreement. The Company paid the purchase price
+in cash at the closing on September 4, 2026, at which time the Seller conveyed the Property to the Company by special warranty deed, subject
+to permitted encumbrances. 
+
+ &#160; 
+
+ The Purchase Agreement contains customary representations,
+warranties, covenants and limitations of liability for a commercial real estate acquisition. Except for the express representations and
+warranties of the Seller set forth in the Purchase Agreement, the Company acquired the Property on an &#8220;as is&#8221; basis. 
+
+ &#160; 
+
+ The foregoing description of the Purchase Agreement
+does not purport to be a complete statement of the parties&#8217; rights and obligations under the Purchase Agreement and is qualified
+in its entirety by reference to the full text of the Purchase Agreement, which is filed as Exhibit 10.1 to this Current Report on Form
+8-K and incorporated herein by reference. 
+
+ 
+
+ &#160; 
+
+ 
+ 
+ Item 9.01 
+ Financial Statements and Exhibits. 
+ 
+ &#160; 
+
+ (d) Exhibits 
+
+ &#160; 
+
+ 
+ 
+ Exhibit No. &#160; 
+ &#160; 
+ Description &#160; 
+ 
+ 10.1+* 
+ &#160; 
+ Purchase and Sale Agreement, dated September 4, 2026, by and between Applied Optoelectronics, Inc. and Blue Ridge Commerce Center West LLC. 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 104 
+ &#160; 
+ Cover Page Interactive Data File (the cover page tags are embedded within the&#160;Inline XBRL&#160;document). 
+ 
+ &#160; 
+
+ 
+
+ + Certain personally identifiable information has been omitted from
+this exhibit pursuant to Item 601(a)(6) of Regulation S-K. 
+
+ &#160; 
+
+ * Schedules or similar attachments have been omitted from this filing
+pursuant to Item 601(a)(5) of Regulation S-K. The Company agrees to furnish a copy of any omitted schedule to the Securities and Exchange
+Commission upon request. 
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 2 &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ 
+
+ SIGNATURES 
+
+ &#160; 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities
+Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+
+ &#160; 
+
+ 
+ 
+ Date: September 10, 2026 
+ APPLIED OPTOELECTRONICS, INC. 
+ &#160; 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ &#160; 
+ By: 
+ /s/ David C. Kuo 
+ &#160; 
+ 
+ &#160; 
+ Name 
+ David C. Kuo 
+ &#160; 
+ 
+ &#160; 
+ Title: 
+ Senior Vice President and Chief Legal Officer 
+ &#160; 
+ 
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 3 &#160; 
+ 
+
+ &#160;
