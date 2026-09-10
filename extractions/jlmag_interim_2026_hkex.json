@@ -1,0 +1,71 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續法定報告撤回供應商選定狀態、停止小批量交付，或到 FY2026 年報仍無可辨識的量產進展，則下修此商業成熟度；每半年核查，觸發後 48 小時內 review。",
+      "id": "jlmag_interim_2026_hkex_cl1",
+      "source_ids": [
+        "jlmag_interim_2026_hkex_s1",
+        "jlmag_interim_2026_hkex_s2",
+        "jlmag_interim_2026_hkex_s3"
+      ],
+      "statement": "JL MAG 的 2026 中報稱，公司已獲某世界知名科技公司選為人形機器人馬達轉子供應商，量產準備依客戶時程推進且已有小批量交付；機器人及工業伺服馬達合併領域收入為人民幣 260.8 百萬元、年增 96.40%。這把商業狀態推進到供應商選定與小批量交付，但客戶未具名、沒有交付金額／最低量／排他性，且合併領域收入不能等同人形轉子收入。",
+      "subject_id": "co:jl_mag"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "6680.HK",
+        "300748.SZ",
+        "金力永磁",
+        "JLMAG"
+      ],
+      "attributes": {
+        "ticker": "6680.HK"
+      },
+      "confidence": 0.85,
+      "id": "co:jl_mag",
+      "name": "JL MAG Rare-Earth（金力永磁）",
+      "role": null,
+      "source_ids": [
+        "jlmag_interim_2026_hkex_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jlmag_interim_2026_hkex",
+    "evidence_tier": 1,
+    "origin_entity": "JL MAG（發行人法定中報）",
+    "permission_basis": "Public HKEX filing; short excerpts only.",
+    "published_at": "2026-08-27",
+    "publisher": "HKEX news",
+    "retrieved_at": "2026-09-05",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "JL MAG Rare-Earth Co., Ltd. 2026 Interim Report",
+    "url": "https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0827/2026082701193.pdf"
+  },
+  "sources": [
+    {
+      "id": "jlmag_interim_2026_hkex_s1",
+      "locator": "Management discussion — robotics and industrial servo motors",
+      "quote": "revenue from the fields of robotics and industrial servo motors amounted to RMB260.8 million, representing a year-on-year increase of 96.40%"
+    },
+    {
+      "id": "jlmag_interim_2026_hkex_s2",
+      "locator": "Humanoid robot motor rotor supplier and delivery status",
+      "quote": "selected as the supplier of humanoid robot motor rotors by a world-renowned technology company"
+    },
+    {
+      "id": "jlmag_interim_2026_hkex_s3",
+      "locator": "Humanoid rotor investment and production readiness",
+      "quote": "small batches of products have been delivered"
+    }
+  ]
+}
