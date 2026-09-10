@@ -279,8 +279,106 @@ def closure_gate(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> Gat
                           f"剩下的 {len(skipped)} 檔都已顯式標為卡 pq2／卡世界")
     return GateResult("closed", 0, (), (), None, "每一檔都到終局")
 
+# ---------------------------------------------------------------------------
+# 品質計數器（P7-b，2026-09-10）——**衝檔數最容易犧牲的東西，要自己出現**
+# ---------------------------------------------------------------------------
+#
+# 68 檔的 blocker 完全同形，意味著最省事的做法是套同一份模板；而模板化的判斷在 readiness
+# 上看起來跟真的一模一樣（ready 就是 ready）。所以「品質沒被犧牲」不能靠自律，要有數字。
+#
+# 印的三個數直接對應 `AGENTS.md`「隱含報酬的兩個桿」：
+#   - **沒有 re-rating 證據時目標倍數預設等於校準倍數** → `multiple_contribution` 應該 ≈ 0
+#   - 折價或溢價必須指得出證據 → 非零的那幾檔要點名，讓人回頭看 rationale
+#   - 正負分布 → 這正是 ROADMAP 研究閉環 P0 的 goal：**「全部是負的，是方法偏空還是市場太貴」**
+#     只有在這張表上答得出來。倍數貢獻接近 0 而報酬仍為負 ＝ 市場太貴；
+#     負值大半來自倍數折價 ＝ 方法偏空。
+
+#: `multiple_contribution` 小於這個絕對值就視為「目標倍數＝校準倍數」（沒有主張折溢價）。
+MULTIPLE_NEUTRAL_TOLERANCE = 0.005
+
+
+@dataclass(frozen=True, slots=True)
+class QualityScore:
+    """已到終局那幾檔的品質分布。**不打分、不排序**——只把數字放到看得見的地方。"""
+
+    positive: tuple[str, ...]
+    negative: tuple[str, ...]
+    multiple_neutral: tuple[str, ...]
+    multiple_priced: tuple[tuple[str, float], ...]
+    unreadable: tuple[str, ...]
+
+    @property
+    def scored(self) -> int:
+        return len(self.positive) + len(self.negative)
+
+
+def _find_attribution(payload: Any) -> Mapping[str, Any] | None:
+    """在 artifact 裡找兩欄拆解。刻意用結構搜尋而不是寫死路徑——它住在
+    `view.headline.lines[*].datum.value`，而那個索引會隨呈現層調整而變。"""
+    if isinstance(payload, Mapping):
+        if "eps_contribution" in payload and "multiple_contribution" in payload:
+            return payload
+        for value in payload.values():
+            found = _find_attribution(value)
+            if found is not None:
+                return found
+    elif isinstance(payload, (list, tuple)):
+        for item in payload:
+            found = _find_attribution(item)
+            if found is not None:
+                return found
+    return None
+
+
+def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
+    """`{ticker: analyst view payload}` → 品質分布。讀不到就進 `unreadable`，**不當成 0**。"""
+    positive: list[str] = []
+    negative: list[str] = []
+    neutral: list[str] = []
+    priced: list[tuple[str, float]] = []
+    unreadable: list[str] = []
+    for ticker in sorted(artifacts):
+        payload = artifacts[ticker]
+        simple = (((payload.get("overview") or {}).get("implied_return") or {}).get("simple") or {})
+        value = simple.get("value") if simple.get("status") == "available" else None
+        if not isinstance(value, (int, float)):
+            unreadable.append(ticker)
+            continue
+        (positive if value > 0 else negative).append(ticker)
+        attribution = _find_attribution(payload.get("view"))
+        contribution = (attribution or {}).get("multiple_contribution")
+        if not isinstance(contribution, (int, float)):
+            continue
+        if abs(contribution) <= MULTIPLE_NEUTRAL_TOLERANCE:
+            neutral.append(ticker)
+        else:
+            priced.append((ticker, float(contribution)))
+    return QualityScore(tuple(positive), tuple(negative), tuple(neutral),
+                        tuple(priced), tuple(unreadable))
+
+
+def render_quality(score: QualityScore) -> list[str]:
+    """成績單三行。**沒有到終局的檔就誠實說沒有**，不印 0/0 假裝有量測。"""
+    if not score.scored and not score.unreadable:
+        return ["品質計數器：尚無可評分的檔（沒有隱含報酬就沒有兩桿可看）"]
+    lines = [f"隱含報酬分布：正 {len(score.positive)}／負 {len(score.negative)}"
+             + (f"（讀不到 {len(score.unreadable)}：{'、'.join(score.unreadable)}）"
+                if score.unreadable else "")]
+    lines.append(
+        f"倍數＝校準倍數（未主張折溢價）：{len(score.multiple_neutral)} 檔"
+        + (f"｜有折溢價主張：{len(score.multiple_priced)} 檔——"
+           + "、".join(f"{t} {c:+.1%}" for t, c in score.multiple_priced)
+           + "（每一筆的 rationale 都必須指得出證據，AGENTS.md「隱含報酬的兩個桿」）"
+           if score.multiple_priced else "｜有折溢價主張：0 檔"))
+    if score.negative and not score.positive and score.scored >= 3:
+        lines.append(
+            "⚠ 全部為負：倍數貢獻接近 0 ＝**市場太貴**；負值大半來自倍數折價 ＝**方法偏空**。"
+            "在分得出這兩者之前，不要把「全負」讀成結論（ROADMAP 研究閉環 P0 的 goal）。")
+    return lines
+
 __all__ = [
-    "GATE_STATES", "NEXT_PICK_RULE", "READY_STATES", "BacklogRow", "GateResult",
-    "closure_gate", "explain_pick", "rank_backlog", "render_summary",
-    "row_from_artifact", "sectors_with_ready", "summarize",
+    "GATE_STATES", "MULTIPLE_NEUTRAL_TOLERANCE", "NEXT_PICK_RULE", "READY_STATES",
+    "BacklogRow", "GateResult", "QualityScore", "closure_gate", "explain_pick",
+    "rank_backlog", "render_quality", "render_summary", "row_from_artifact",
+    "score_quality", "sectors_with_ready", "summarize",
 ]

@@ -165,3 +165,70 @@ def test_gate_states_are_a_closed_vocabulary() -> None:
     assert closure.GATE_STATES == ("closed", "open", "unknown")
     for rows, skip in (([], ()), ([_gate_row("A")], ()), ([_gate_row("A")], ("A",))):
         assert closure.closure_gate(rows, skip=skip).state in closure.GATE_STATES
+
+
+# ---------------------------------------------------------------------------
+# 品質計數器（P7-b）——守的是「衝檔數不會讓品質靜默退化」
+# ---------------------------------------------------------------------------
+
+def _artifact(implied: float | None, multiple: float | None = None,
+              status: str = "available") -> dict:
+    view: dict = {"headline": {"lines": [{"datum": {"value": {}}}]}}
+    if multiple is not None:
+        view["headline"]["lines"][0]["datum"]["value"] = {
+            "eps_contribution": 0.1, "multiple_contribution": multiple, "status": "available"}
+    return {
+        "overview": {"implied_return": {"simple": {
+            "status": status, "value": implied}}},
+        "view": view,
+    }
+
+
+def test_quality_splits_implied_return_by_sign() -> None:
+    score = closure.score_quality({
+        "AAA": _artifact(0.09), "BBB": _artifact(-0.20), "CCC": _artifact(-0.05)})
+    assert score.positive == ("AAA",) and score.negative == ("BBB", "CCC")
+    assert score.scored == 3
+
+
+def test_quality_separates_neutral_multiple_from_a_priced_one() -> None:
+    """`AGENTS.md`「隱含報酬的兩個桿」：沒有 re-rating 證據時目標倍數＝校準倍數。"""
+    score = closure.score_quality({
+        "NEUTRAL": _artifact(0.05, multiple=-0.001),
+        "PRICED": _artifact(-0.30, multiple=-0.20)})
+    assert score.multiple_neutral == ("NEUTRAL",)
+    assert score.multiple_priced == (("PRICED", -0.20),)
+
+
+def test_quality_unreadable_is_not_counted_as_zero() -> None:
+    """讀不到 ≠ 隱含報酬是 0。混進來會讓分布看起來比實際好（INV-3）。"""
+    score = closure.score_quality({
+        "OK": _artifact(0.05), "GONE": _artifact(None, status="missing")})
+    assert score.unreadable == ("GONE",)
+    assert score.scored == 1 and "GONE" not in score.positive + score.negative
+
+
+def test_quality_warns_only_when_everything_is_negative() -> None:
+    """全負時要能分辨「方法偏空」與「市場太貴」——那正是 ROADMAP 研究閉環 P0 的 goal。"""
+    all_negative = closure.render_quality(closure.score_quality({
+        "A": _artifact(-0.1, multiple=-0.2), "B": _artifact(-0.2, multiple=-0.2),
+        "C": _artifact(-0.3, multiple=-0.2)}))
+    assert any("方法偏空" in line and "市場太貴" in line for line in all_negative)
+
+    mixed = closure.render_quality(closure.score_quality({
+        "A": _artifact(0.1), "B": _artifact(-0.2), "C": _artifact(-0.3)}))
+    assert not any("方法偏空" in line for line in mixed)
+
+
+def test_quality_says_nothing_rather_than_printing_a_fake_zero() -> None:
+    lines = closure.render_quality(closure.score_quality({}))
+    assert len(lines) == 1 and "尚無可評分" in lines[0]
+
+
+def test_attribution_is_found_structurally_not_by_a_hardcoded_path() -> None:
+    """兩欄拆解住在 `view.headline.lines[*].datum.value`，那個索引會隨呈現層調整而變。"""
+    deep = {"overview": {"implied_return": {"simple": {"status": "available", "value": -0.1}}},
+            "view": {"a": {"b": [{"c": [{"eps_contribution": 0.0,
+                                         "multiple_contribution": -0.3}]}]}}}
+    score = closure.score_quality({"DEEP": deep})
+    assert score.multiple_priced == (("DEEP", -0.3),)
