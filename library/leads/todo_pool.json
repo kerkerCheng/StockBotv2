@@ -8582,6 +8582,11 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_761c2bee80ed662412a20e8c10b9284c",
+      "dispatch_ref": "wo_4df9b545308f14a64b8c5b22de3efe32",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-10T09:09:17.739996+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 510,
       "reason": null,
@@ -8594,6 +8599,11 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_599f914a7520398c83ad40dbea806c48",
+      "dispatch_ref": "wo_892cf59432d95f91d952ab87290719d8",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-10T09:09:17.739996+00:00",
       "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 511,
       "reason": null,
@@ -8620,10 +8630,10 @@
       "added_at": "2026-09-10T07:19:25.694077+00:00",
       "hint": "當前 missing_data：ELS／UHP CPO 客戶端的 qualification、採購量與交付確認；OCS 三家客戶的獨立訂單／部署佐證；initial ELS order 的金額、數量與可取消條款（共 4 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 513,
-      "reason": null,
+      "reason": "reassess-stale：新 decision pd_e46223a28f31f108eaac876ba28ee55b 的 attention=MONITOR，不再需要使用者決定",
       "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-10T09:07:37.139535+00:00",
       "source": "decision_lab",
       "title": "co:lumentum：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
@@ -8632,16 +8642,21 @@
       "added_at": "2026-09-10T07:19:25.694077+00:00",
       "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 514,
-      "reason": null,
+      "reason": "reassess-stale：新 decision pd_113b3a0078f11cf7bf3c320a986c34f6 的 attention=MONITOR，不再需要使用者決定",
       "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-10T09:07:37.139535+00:00",
       "source": "decision_lab",
       "title": "co:coherent：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
       "type": "decision_review"
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_0f521871fed1b7d5a450beaf05a37d3e",
+      "dispatch_ref": "wo_69bc61534d902091dacec875dd145713",
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-10T09:09:17.739996+00:00",
       "hint": "當前 missing_data：人形轉子交付金額/客戶具名；H1 2026 中報一手(機器人+伺服收入 CNY 1.18B +81.84% 僅二手)（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 515,
       "reason": null,
@@ -8651,6 +8666,42 @@
       "source": "decision_lab",
       "title": "co:jl_mag：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-10T09:23:51.928258+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=宇樹科技（688836.SS）首次公開發行股票並在科創板上市招股說明書（2026-08-14 公告；容誠審字[2026]230Z1692 標準無保留意見） 第六",
+      "n": 516,
+      "reason": null,
+      "ref_id": "po_39cae8ec6683a9daa059aa57fd6eb0ae",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：688836.SS / backlog",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-10T09:23:51.928258+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=宇樹科技（688836.SS）首次公開發行股票並在科創板上市招股說明書（2026-08-14 公告；容誠審字[2026]230Z1692 標準無保留意見） 第五",
+      "n": 517,
+      "reason": null,
+      "ref_id": "po_57ca78a036e43c572c4e5e9fb820a52e",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：688836.SS / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-10T09:23:51.928258+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=MP Materials FY2025 10-K (EDGAR 0001801368-26-000008, filed 2026-02-26, CIK 0001",
+      "n": 518,
+      "reason": null,
+      "ref_id": "po_6bed2f3cdc6b4ea96ab1b88d4dedb903",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：MP / customer_concentration",
+      "type": "engine_c_observation"
     }
   ],
   "log": [
@@ -18920,8 +18971,101 @@
       "ref_id": "dc_ff57320d45f0cb4be3857308e32b578a",
       "type": "decision_review",
       "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T09:07:37.139535+00:00",
+      "n": 513,
+      "reason": "reassess-stale：僅 context 老化，以 intent=paper 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_e46223a28f31f108eaac876ba28ee55b",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-10T09:07:37.139535+00:00",
+      "n": 513,
+      "reason": "reassess-stale：新 decision pd_e46223a28f31f108eaac876ba28ee55b 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_e46223a28f31f108eaac876ba28ee55b",
+      "ref_id": "dc_4d28e50810e46da7fd77ee042ee7bd1c",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-10T09:07:37.139535+00:00",
+      "n": 514,
+      "reason": "reassess-stale：僅 context 老化，以 intent=live 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_113b3a0078f11cf7bf3c320a986c34f6",
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-10T09:07:37.139535+00:00",
+      "n": 514,
+      "reason": "reassess-stale：新 decision pd_113b3a0078f11cf7bf3c320a986c34f6 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_113b3a0078f11cf7bf3c320a986c34f6",
+      "ref_id": "dc_957bff3701ea4e46d962bfb9ff0932c8",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-10T09:09:17.739996+00:00",
+      "attempt": 1,
+      "n": 510,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_4df9b545308f14a64b8c5b22de3efe32",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T09:09:17.739996+00:00",
+      "n": 510,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_4df9b545308f14a64b8c5b22de3efe32",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-10T09:09:17.739996+00:00",
+      "attempt": 1,
+      "n": 511,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_892cf59432d95f91d952ab87290719d8",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T09:09:17.739996+00:00",
+      "n": 511,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_892cf59432d95f91d952ab87290719d8",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-10T09:09:17.739996+00:00",
+      "attempt": 1,
+      "n": 515,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_69bc61534d902091dacec875dd145713",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-10T09:09:17.739996+00:00",
+      "n": 515,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_69bc61534d902091dacec875dd145713",
+      "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
+      "type": "decision_review",
+      "verb": "standing_go"
     }
   ],
-  "next_n": 516,
+  "next_n": 519,
   "schema_version": "1"
 }
