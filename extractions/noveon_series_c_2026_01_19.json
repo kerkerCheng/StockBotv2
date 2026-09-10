@@ -1,0 +1,93 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Noveon 後續揭露停產、無法持續達到商用產量，或主要客戶 qualification 失敗，則其作為 MP 磁材替代供應者的證據失效；每季核查，觸發後 48 小時內 review。",
+      "id": "noveon_series_c_2026_01_19_cl1",
+      "source_ids": [
+        "noveon_series_c_2026_01_19_s1",
+        "noveon_series_c_2026_01_19_s2"
+      ],
+      "statement": "Noveon 已在美國恢復全規模燒結 NdFeB 稀土磁體生產，並以 2026 年 Series C 資金把產能擴至每年逾 2,000 噸；這是 MP Materials 美國磁體製造獨家敘事的直接反證，故 MP→稀土磁材 substitutability 提議由 4 下修至 3，但客戶 qualification 與實際出貨量仍未揭露。",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 3
+      },
+      "confidence": 0.75,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "noveon_series_c_2026_01_19_s1",
+        "noveon_series_c_2026_01_19_s2"
+      ],
+      "src_id": "co:mp_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {
+        "ticker": "MP"
+      },
+      "confidence": 0.8,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "role": null,
+      "source_ids": [
+        "noveon_series_c_2026_01_19_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "noveon_series_c_2026_01_19_s1"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "noveon_series_c_2026_01_19",
+    "evidence_tier": 2,
+    "origin_entity": "Noveon Magnetics",
+    "permission_basis": "Public issuer announcement; short excerpts only.",
+    "published_at": "2026-01-19",
+    "publisher": "Noveon Magnetics",
+    "retrieved_at": "2026-09-05",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Noveon Magnetics Completes $215 Million Series C",
+    "url": "https://noveon.co/noveon-completes-series-c"
+  },
+  "sources": [
+    {
+      "id": "noveon_series_c_2026_01_19_s1",
+      "locator": "capacity and operating status",
+      "quote": "Noveon was the first company to reshore full-scale production of sintered rare earth magnets to the United States."
+    },
+    {
+      "id": "noveon_series_c_2026_01_19_s2",
+      "locator": "capacity expansion",
+      "quote": "expanding capacity beyond 2,000 tons per year"
+    }
+  ]
+}

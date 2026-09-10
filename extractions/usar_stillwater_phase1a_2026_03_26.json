@@ -1,0 +1,93 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 USA Rare Earth 無法在 2026Q4 達 600 mtpa run-rate、客戶訂單取消或產線停擺，則替代供應者證據下修；每季核查，觸發後 48 小時內 review。",
+      "id": "usar_stillwater_phase1a_2026_03_26_cl1",
+      "source_ids": [
+        "usar_stillwater_phase1a_2026_03_26_s1",
+        "usar_stillwater_phase1a_2026_03_26_s2"
+      ],
+      "statement": "USA Rare Earth 已於 2026-03-26 宣布 Stillwater Phase 1a 商用 NdFeB 磁體線完成 commissioning，可自 2026Q2 履行客戶訂單；目標 2026Q4 run-rate 600 mtpa、2027Q1 兩線合計 1,200 mtpa。這是第二條美國磁體供應替代路徑，支持 MP→稀土磁材 substitutability 由 4 下修至 3；但 ramp 目標尚非已實現產量。",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 3
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "usar_stillwater_phase1a_2026_03_26_s1",
+        "usar_stillwater_phase1a_2026_03_26_s2"
+      ],
+      "src_id": "co:mp_materials"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "MP"
+      ],
+      "attributes": {
+        "ticker": "MP"
+      },
+      "confidence": 0.85,
+      "id": "co:mp_materials",
+      "name": "MP Materials",
+      "role": null,
+      "source_ids": [
+        "usar_stillwater_phase1a_2026_03_26_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "usar_stillwater_phase1a_2026_03_26_s2"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "usar_stillwater_phase1a_2026_03_26",
+    "evidence_tier": 2,
+    "origin_entity": "USA Rare Earth",
+    "permission_basis": "Public issuer announcement; short excerpts only.",
+    "published_at": "2026-03-26",
+    "publisher": "USA Rare Earth",
+    "retrieved_at": "2026-09-05",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "USA Rare Earth commissions Phase 1a magnet production at Stillwater",
+    "url": "https://investors.usare.com/news-releases/news-release-details/usa-rare-earth-achieves-major-operational-and-strategic"
+  },
+  "sources": [
+    {
+      "id": "usar_stillwater_phase1a_2026_03_26_s1",
+      "locator": "commissioning",
+      "quote": "successful commissioning of its commercial magnet production line (Phase 1a) at its facility in Stillwater, Oklahoma"
+    },
+    {
+      "id": "usar_stillwater_phase1a_2026_03_26_s2",
+      "locator": "customer orders",
+      "quote": "begin fulfilling customer orders for sintered neodymium-iron-boron (NdFeB) permanent magnets in the second quarter of 2026"
+    }
+  ]
+}
