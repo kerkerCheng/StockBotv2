@@ -8546,10 +8546,11 @@
       "added_at": "2026-09-10T05:35:35.735153+00:00",
       "hint": "2026-09-10 [506] 執行後由 ROADMAP 驗收查詢 (b) 抓到。**先講最重要的一句：這一組不能走 name_identical 登記，那會是循環論證。**\n\n實測（比對 migration 前的備份快照 library/private/backups/20260910T053041Z/neo4j_export.json）：\n  migration 前 tech:ocs 的 name＝『Optical Circuit Switching (OCS)』\n  migration 後 tech:ocs 的 name＝『Optical Circuit Switch』\n  tech:optical_circuit_switch 的 name 前後都是『Optical Circuit Switch』\n也就是說，兩者 name 現在一致，是因為 [506] 重載時 `MERGE_NODE` 直接 `SET n.name`，**後載入的文件蓋掉了前一份**（只有 source_ids 會聯集）。這個隱患 09-04 的 migrate_entity_dedup 註解就記過，這次是它第一次產生可觀察的後果。\n\n⚠ 因此登記依據只能是 `semantic_reviewed`（需本編號核准），不能是 name_identical：用一個被自己的遷移改出來的相同 name 去當機械依據，是拿自己製造的證據當獨立佐證。\n\n兩節點現況：\n  tech:ocs                    11 個 source、9 條邊（含 SUPPLIES_TO co:lumentum／co:coherent、IS_COMPONENT_OF tech:mems_mirror_array、ENABLES tech:optical_circulator）\n  tech:optical_circuit_switch  3 個 source、4 條邊（ENABLES tech:ai_compute_buildout、SUPPLIES_TO co:lumentum／co:coherent）\n兩者 abstraction_level 都是 network_systems，供應商也重疊——語意上高度可能是同一個東西，但那個判斷要你核准，不是我推。\n\n⚠ 相鄰但更值得注意的一件事：**Coherent → OCS 那條邊（今天剛核准 qualification_status=qualified）掛在 tech:ocs 上**，而 tech:optical_circuit_switch 也有一條 SUPPLIES_TO co:coherent。同一家公司對同一個東西的關係散在兩個節點上——這正是 [505] 修的那個形狀。\n\ngo＝授權登記為 semantic_reviewed（approval_receipt: todo:508）並跑 `loader/migrate_entity_alias_backfill.py`（已泛化、冪等）；canonical 依 registry 的機械選法取最短 id ＝ `tech:ocs`。不含 thesis mutation、不含 Engine C 寫入、不含 live。\n\n⚠ 另一個獨立的開發項（不佔本編號，載體是 ROADMAP）：`MERGE_NODE` 覆蓋 name／attributes 使 ROADMAP 驗收 (b)『名稱逐字相同的重複組』**不是穩定指標**——重載任何文件都可能改變它。要嘛讓 name 也走聯集／保留最長，要嘛驗收改用不受重載影響的判準。",
       "n": 508,
-      "reason": null,
+      "reason": "tech:optical_circuit_switch 併入 tech:ocs（semantic_reviewed，receipt todo:508）；alias 節點已刪，tech:ocs 邊由 9 增至 10",
+      "receipt": "authority:graph_migration;ref:migrate_entity_alias_backfill_ocs",
       "ref_id": "ocs_duplicate_20260910",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-10T06:51:02.377461+00:00",
       "source": "manual",
       "title": "tech:ocs 與 tech:optical_circuit_switch 重複——但『name 相同』是 [506] 重載造成的，不得當作合併依據",
       "type": "manual"
@@ -18778,6 +18779,15 @@
       "reason": "依建議只還原 tech:vcsel（'200G VCSEL-based solution' → 'VCSEL laser'）與 tech:silicon_photonics（'Silicon Photonics transceiver' → 'Silicon Photonics'）兩筆實質誤導；其餘五筆是措辭差異，維持現值不動",
       "receipt": "authority:graph_node_property;ref:name_restore_vcsel_siph_20260910",
       "ref_id": "merge_name_overwrite_20260910",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-10T06:51:02.377461+00:00",
+      "n": 508,
+      "reason": "tech:optical_circuit_switch 併入 tech:ocs（semantic_reviewed，receipt todo:508）；alias 節點已刪，tech:ocs 邊由 9 增至 10",
+      "receipt": "authority:graph_migration;ref:migrate_entity_alias_backfill_ocs",
+      "ref_id": "ocs_duplicate_20260910",
       "type": "manual",
       "verb": "go"
     }

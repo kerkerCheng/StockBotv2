@@ -351,13 +351,14 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
         # name，其中 tech:vcsel 被改成產品規格）。要改 name 有明確路徑——migration 或
         # 人工 SET——不該是載入的副作用。
         name = n["name"]
-        existing_rows = _execute(
-            session,
+            # ⚠ 這裡**不能走 `_execute`**：它會 consume() 掉 Result，之後 iterate 會拋
+        # ResultConsumedError。也不能用 .single()：測試的 fake session 直接回 list。
+        # 兩個型別假設都踩過（2026-09-10，同一天各一次）——所以直接 session.run 後
+        # 立刻取第一筆，list 與未消費的 Result 都適用。
+        existing_rows = session.run(
             "MATCH (n:Entity {id: $id}) RETURN n.name AS name, n.attributes AS attrs",
             id=n["id"],
         )
-        # ⚠ 不用 .single()：測試的 fake session 直接回 list，只有真實 driver 回 Result
-        # ——假設回傳型別只有一種，正是本次要修的那個形狀（L17）。兩者都 iterable。
         existing = next(iter(existing_rows), None)
         if existing:
             prior_name = existing["name"]

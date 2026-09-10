@@ -59,6 +59,15 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:505",
       "note": "使用者 2026-09-10 核准（[505] 選項 A）。五個 id 的 name 各不相同，但逐字讀完六份原文後全部指向同一件事——設備商賣給 NAND 製造市場的營收／客戶資本支出：AMAT 10-Q『Revenue for Semiconductor Systems by market… Flash memory (NAND) 4%』（同一段同時生出 tech:nand_technology 與 tech:nand_flash）、Lam 10-K『decreases in non-volatile memory spending… by our customers』。⚠ tech:nand_flash 原被標成 device_chip（其餘是 foundry_packaging），但它的兩份 source 都是 AMAT 的 by-market 營收拆分——那個分層沒有證據支持，故一併併入。⚠ tech:3d_nand_manufacturing **刻意不併**：它的唯一 quote 是『Lam Research Corporation is a global supplier of wafer fabrication equipment and services to the semiconductor industry.』，完全沒提 3D NAND——它不是重複節點，是 L6 Gap 4 型（LLM 從類別詞推斷出具體實體）的證據不足節點，另案處理，不得靠合併洗進 canonical。"
+    },
+    "tech:ocs": {
+      "name": "Optical Circuit Switch",
+      "aliases": [
+        "tech:optical_circuit_switch"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:508",
+      "note": "使用者 2026-09-10 核准（[508]）。⚠ **不得用 name_identical 登記**：兩者 name 現在相同，是 [506] 重載時 MERGE_NODE 覆蓋造成的（tech:ocs 原本是『Optical Circuit Switching (OCS)』，比對備份快照 20260910T053041Z 可驗）——拿自己遷移改出來的 name 當機械依據是循環論證。語意依據：兩者 abstraction_level 同為 network_systems，供應商重疊（都有 SUPPLIES_TO co:lumentum 與 co:coherent），指的是同一層光路交換。canonical 取最短 id ＝ tech:ocs，它也是證據較厚的一端（11 個 source／9 條邊 vs 3 個 source／4 條邊），且今天核准的 Coherent → OCS qualification_status=qualified 就掛在它身上。"
     }
   }
 }
