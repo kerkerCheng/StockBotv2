@@ -581,43 +581,26 @@ def _cmd_triage_campaign(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_advance(args: argparse.Namespace) -> int:
-    store = leads.load(args.leads)
-    ref = {}
-    if args.ref:
-        for pair in args.ref:
-            key, separator, value = pair.partition("=")
-            if not separator or not key.strip():
-                print(f"advance 失敗：ref 必須是非空 key=value：{pair}", file=sys.stderr)
-                return 1
-            ref[key.strip()] = value
-    try:
-        leads.advance(store, args.lead_id, args.to_status, ref=ref or None)
-    except (leads.LeadStateError, ValueError) as exc:
-        print(f"advance 失敗：{exc}", file=sys.stderr)
-        return 1
-    leads.save(store, args.leads)
-    print(f"✓ {args.lead_id} → {args.to_status}")
-    return 0
+def _parse_ref_pairs(pairs: list[str], *, command: str) -> dict[str, object] | None:
+    """把 CLI 的 ``--ref key=value`` 依 registry 登記的型別轉成值；失敗回 None。
 
+    ``advance`` 與 ``annotate`` 共用同一個 ``--ref`` 介面與同一份 registry，先前卻只有
+    ``annotate`` 認得 ``string_list``——於是 ``advance --ref onboard_candidate_names=...``
+    一律失敗，呼叫端只能改跑第二支命令或乾脆不寫那個欄位（L17：機制的對稱面沒做）。
+    """
 
-def _cmd_annotate(args: argparse.Namespace) -> int:
-    """只補 refs，不藉 metadata 更新繞過封閉狀態機。"""
     from engine_b.lead_refs import get_lead_ref_registry
 
-    store = leads.load(args.leads)
     specs = get_lead_ref_registry().keys
-    refs = {}
-    for pair in args.ref:
+    refs: dict[str, object] = {}
+    for pair in pairs:
         key, separator, value = pair.partition("=")
         if not separator or not key.strip():
-            print(f"annotate 失敗：ref 必須是非空 key=value：{pair}", file=sys.stderr)
-            return 1
+            print(f"{command} 失敗：ref 必須是非空 key=value：{pair}", file=sys.stderr)
+            return None
         key = key.strip()
         spec = specs.get(key)
-        # string_list 型的 ref 先前只能由程式內部寫入，CLI 完全設不了——
-        # 於是 registry 登記了型別、命令列卻沒有對應的表達方式。JSON 陣列優先
-        # （值本身含分號時仍可精確表達），否則以分號切。
+        # string_list：JSON 陣列優先（值本身含分號時仍可精確表達），否則以分號切。
         if spec is not None and spec.value_type == "string_list":
             parsed = None
             if value.lstrip().startswith("["):
@@ -632,6 +615,30 @@ def _cmd_annotate(args: argparse.Namespace) -> int:
             refs[key] = parsed
             continue
         refs[key] = value
+    return refs
+
+
+def _cmd_advance(args: argparse.Namespace) -> int:
+    store = leads.load(args.leads)
+    ref = _parse_ref_pairs(args.ref or [], command="advance")
+    if ref is None:
+        return 1
+    try:
+        leads.advance(store, args.lead_id, args.to_status, ref=ref or None)
+    except (leads.LeadStateError, ValueError) as exc:
+        print(f"advance 失敗：{exc}", file=sys.stderr)
+        return 1
+    leads.save(store, args.leads)
+    print(f"✓ {args.lead_id} → {args.to_status}")
+    return 0
+
+
+def _cmd_annotate(args: argparse.Namespace) -> int:
+    """只補 refs，不藉 metadata 更新繞過封閉狀態機。"""
+    store = leads.load(args.leads)
+    refs = _parse_ref_pairs(args.ref, command="annotate")
+    if refs is None:
+        return 1
     try:
         lead = leads.annotate_refs(store, args.lead_id, refs=refs)
     except (leads.LeadStateError, ValueError) as exc:

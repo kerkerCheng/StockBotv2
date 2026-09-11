@@ -517,3 +517,36 @@ def test_drain_prints_closure_line_and_says_unread_when_no_artifacts(tmp_path, c
     out = capsys.readouterr().out
     assert "段5 每檔閉環：未讀到" in out
     assert "到終局 0" not in out
+
+
+def test_advance_and_annotate_parse_string_list_refs_identically(tmp_path) -> None:
+    """``--ref`` 的 string_list 解析在 advance 與 annotate 上必須一致。
+
+    先前只有 annotate 認得 registry 登記的 ``string_list``，advance 直接把整串當字串塞進去，
+    於是 ``advance --ref onboard_candidate_names=...`` 一律被 registry 擋下——同一個介面、
+    同一份 registry、兩種行為（L17：機制的對稱面沒做）。
+    """
+    path = tmp_path / "pending_leads.json"
+    lead_id = _seed(path)
+    assert cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "3",
+                     "--reason", "t", *PASS_CLASSIFICATION_ARGS]) == 0
+
+    assert cli.main([
+        "--leads", str(path), "advance", lead_id, "parked",
+        "--ref", "trace_status=not_pursued",
+        "--ref", "parked_reason=trace 完成",
+        "--ref", "trace_requires_user=no",
+        "--ref", "onboard_candidate_names=Furukawa Electric (5801.T); Fujikura (5803.T)",
+    ]) == 0
+    refs = leads.load(path)["leads"][lead_id]["refs"]
+    assert refs["onboard_candidate_names"] == ["Furukawa Electric (5801.T)", "Fujikura (5803.T)"]
+    assert refs["parked_reason"] == "trace 完成"
+
+    # JSON 陣列形式（值本身含分號時用）在兩支命令上都要成立。
+    assert cli.main([
+        "--leads", str(path), "annotate", lead_id,
+        "--ref", 'onboard_candidate_names=["A Corp; Ltd", "B Corp"]',
+    ]) == 0
+    assert leads.load(path)["leads"][lead_id]["refs"]["onboard_candidate_names"] == [
+        "A Corp; Ltd", "B Corp",
+    ]

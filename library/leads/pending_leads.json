@@ -32093,9 +32093,18 @@
       "first_seen": "2026-09-10T22:32:35.408826+00:00",
       "lead_id": "lead_7585304d983e288be2de817c586fc516",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "gap": "無——一手已完整取得，本件結構上不含瓶頸資訊",
+        "original_claim_status": "no_investment_content",
+        "parked_reason": "已抓一手 S-4 全文核對：內容為例行『registered exchange offer』——Broadcom 以已註冊的 4.926% Senior Notes due 2037 換回 2022-04-18 發行、金額 US$654,004,000 的同條件 144A/Reg S 舊券（逐字：Exchange Offer for Up to $654,004,000 4.926% Senior Notes due 2037 ... for a like principal amount of notes that have been registered under the Securities Act）。同額同條件、同一筆負債，無新增募資、無併購對價、無任何結構或客戶資本承諾內容。harvest 端把 form=S-4 一律歸為『候選集合·財務事實·瓶頸』是 form-type 推定，本件不成立；無 graph delta，不改變候選集合。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1730168/000119312526387881/d154803ds4.htm",
+        "trace_origin_entity": "Broadcom Inc.（SEC EDGAR 一手）",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AVGO",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -49882,15 +49891,23 @@
       "published_at": "2026-09-09T12:16:07.000Z",
       "raw_text": "Citibank TMT:  \"lasers and optical fibers are being positioned as the \"next HBM.\" \n\nI've been talking about lasers like $LITE / $AAOI since 2025... and architectural shifts toward CW, ahead of the current industry consensus.\n\nAnd fully agree with Lightmatter/Citi.\n\nJust for reference: \n\nFor lasers: $LITE / $SIVE / $AAOI / $COHR / $MTSI / Furukawa / Sumitomo are your better known ones.\n\nFor fiber: $GLW / Furukawa / Fujikura / Sumitomo are your more well-known exposure (obviously a lot more in the supply chain) *disclosure, personal exposure to theme\n\nWith added commentary that: \"Tight supply conditions will support a scarcity premium for these assets.\"\n\nWe're already seeing price hikes with lasers as seen with $SIVE channel checks at CIOE 2026 Shenzhen today + $LITE commentary from earnings. \n\nSo I think the 2027–2028 photonics supercycle will look a lot like memory did in 2025–2026.\n\nEspecially as optical content/GPU-ASIC goes up significantly per Goldman Sachs revised estimates...",
       "refs": {
-        "gap": "Citi note／Lightmatter 會議逐字原文仍未公開；next HBM、NPO 2027／2028 與 scarcity premium 只能歸屬同源轉述",
-        "parked_reason": "消化 watch self-match 後回到有到期等待；沒有新增 RA。",
-        "primary_url": "https://investor.lumentum.com/financial-news-releases/news-details/2026/Lumentum-Announces-Fourth-Quarter-and-Full-Fiscal-Year-2026-Results/default.aspx",
+        "gap": "Citi／Goldman 原始 note 與 SIVE 通路查核皆結構性非公開；可核對的唯一 atom 已在庫",
+        "onboard_candidate_names": [
+          "Furukawa Electric (5801.T)",
+          "Fujikura (5803.T)"
+        ],
+        "original_claim_status": "directionally_supported_by_existing_tier2",
+        "parked_reason": "拆四個 atom 分別追源。①『Citi TMT 把雷射／光纖定位為 next HBM』與『Tight supply conditions will support a scarcity premium』：原始載體是機構 note，推文無 locator、無日期、無報告編號，結構上非公開；且依 L8（利害關係人自述不算獨立佐證）賣方 note 本來就不是客戶端證據，發文者另自陳 personal exposure to theme。②『LITE commentary from earnings 指價格上調』：唯一可核對的 atom，且自家庫已持有——library/raw/lite_transcript_q4fy2026.txt（Q4 FY2026 法說，2026-08-11，tier 2 第三方轉錄）逐字為『We are way behind in our shipments, unfortunately, on high-powered lasers.』與『we are able to command a nice price premium that we expect to sustain』。方向成立，但不是新證據。③『SIVE channel checks at CIOE 2026 Shenzhen』：通路查核依定義非公開；查 Sivers 官方 newsroom 與 Cision 發布清單無 CIOE 2026 相關項目，無一手可核對。④『Goldman Sachs revised optical content/GPU-ASIC estimates』：同①，無 locator。結論：無新證據、不改變候選集合、不改變排序（排序唯一權威是 rank_bottlenecks，推文不參與）。",
+        "primary_url": "https://www.sivers-semiconductors.com/sivers-newsroom/",
         "research_outcome": "self-trigger 未帶來新證據；維持 partial，外部一手背景支持供應緊缺，但核心 Citi／Lightmatter 原文仍缺。",
         "trace_attempts_ref": "2026-09-10：第二次 checkpoint 僅用來消化剛建立 watch 的 self-match；沒有新的外部文件。原研究已查 Citi／Lightmatter note、Lumentum FY2026 與 Sivers Q2／產能公告",
         "trace_next_trigger": "Citi 公開該 TMT note，或 Lightmatter 官方 recap／transcript 逐字呈現 lasers、fiber、NPO/CPO 時程與 supply constraint",
+        "trace_origin_entity": "x:aleabitoreddit（三手轉述機構 note；發文者自陳持有該主題部位）",
+        "trace_origin_linkage": "非獨立——發文者自陳 personal exposure；所引券商 note 屬賣方，非客戶端",
         "trace_requeue_trigger": "related_triaged_lead:lead_2b2f52a2081a91572dd5a667abf9f948",
         "trace_requeued_at": "2026-09-10T22:34:19.978321+00:00",
-        "trace_status": "partial",
+        "trace_requires_user": "no",
+        "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
           "AAOI",
           "COHR",
@@ -49910,7 +49927,7 @@
         "trace_trigger_watch_ref": "ew_0084_2026-09-09"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
