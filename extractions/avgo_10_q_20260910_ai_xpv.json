@@ -1,0 +1,116 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "隨每份 10-Q／10-K 核查（每季）：若後續 filing 揭露 AI XPV 平台終止、初始 tranche 未動用或縮減、或 2028 年 20 GW 目標被下修，則本主張降級為 guided；若 filing 停止揭露該平台而未說明原因，維持未知不推定續存。命中後 48 小時內提交人工複查，並同步重評 cl2／cl3。",
+      "id": "avgo_10_q_20260910_ai_xpv_cl1",
+      "source_ids": [
+        "avgo_10_q_20260910_ai_xpv_s1",
+        "avgo_10_q_20260910_ai_xpv_s2"
+      ],
+      "statement": "Broadcom 於 FY2026 Q3 10-Q（期間至 2026-08-02）揭露已建立 AI XPV 平台：與金融夥伴合作，目標在 2028 年前以自家 custom AI accelerator（XPU）與網路產品支持超過 20 GW 的算力部署；2026 年 6 月以 350 億美元的首筆 tranche 啟動，由一家金融夥伴主導，用於為「我們的客戶」部署超過 1 GW 算力基礎設施。這是把 AI 需求錨點從『客戶自有現金流』改為『第三方融資 + 供應商背書』的結構性轉變——filing 自述其目的為 bridges the gap between the current cash flows of the leading frontier AI labs and significant upfront investments。客戶未具名，20 GW 為平台容量目標而非已簽約量，僅首筆 350 億美元 tranche 有具體金額。",
+      "subject_id": "co:broadcom"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "隨每份 10-Q／10-K 核查（每季）：若任一後續 filing 揭露 Backstop 已有實際支付、最大潛在責任顯著上升，或 Backstop 公允價值由不重大轉為重大，代表終端客戶信用惡化已開始傳導至 Broadcom 損益，應立即重評整條 AI 需求鏈的品質。命中後 48 小時內提交人工複查。",
+      "id": "avgo_10_q_20260910_ai_xpv_cl2",
+      "source_ids": [
+        "avgo_10_q_20260910_ai_xpv_s3",
+        "avgo_10_q_20260910_ai_xpv_s6"
+      ],
+      "statement": "同一份 10-Q 揭露 Broadcom 就上述客戶的 5 年租約義務向金融夥伴提供 Backstop（背書）：全部 AI rack 部署後的最大潛在責任、以未折現基礎計算約為 290 億美元；違約時 Broadcom 的責任等於未償租約金額之 85% 與 AI rack 處分價值之間的差額；截至 2026-08-02 未曾支付任何金額，Backstop 公允價值不重大。此為供應商對終端客戶信用風險的直接承擔，方向是 supplier→customer 的財務支持，**不是** customer_to_supplier 的資本承諾，不得計入客戶端資本承諾維度。",
+      "subject_id": "co:broadcom"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "隨每份 10-Q／10-K 核查（每季）：若後續 filing 揭露已實際發行任何金額的可轉換本票，即為『客戶付不出租金』的第一個硬證據，本主張應由 confirmed 升級為已觸發的風險事件並重評 cl1；若該 facility 到期未動用而終止，則本主張降級。命中後 48 小時內提交人工複查。",
+      "id": "avgo_10_q_20260910_ai_xpv_cl3",
+      "source_ids": [
+        "avgo_10_q_20260910_ai_xpv_s4"
+      ],
+      "statement": "同一份 10-Q 另揭露：在租約安排下，該客戶在特定情況下且於需要時，得向 Broadcom 發行合計本金上限 420 億美元的可轉換本票，且動用款項限用於客戶在租約下的義務；截至 2026-08-02 尚未發行任何票據。這是一條尚未動用的條件式融資管道——其存在本身說明交易雙方預期客戶可能需要額外流動性才付得出租金。",
+      "subject_id": "co:broadcom"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "隨每份 10-Q／10-K 核查（每季）：若下一份 filing 的同一張 contractual commitments 表顯示採購承諾總額較本期下降逾 20%，或 FY2027／FY2028 兩格金額顯著前移或消失，代表 AI 上游採購承諾轉弱，本主張應降級並重評整條瓶頸鏈的需求強度。命中後 48 小時內提交人工複查。",
+      "id": "avgo_10_q_20260910_ai_xpv_cl4",
+      "source_ids": [
+        "avgo_10_q_20260910_ai_xpv_s5"
+      ],
+      "statement": "截至 2026-08-02，Broadcom 的無條件採購承諾（unconditional purchase commitments，filing 定義為可執行且具法律拘束力、載明固定或最低採購量與價格條款）總額為 1,268.21 億美元，期程高度集中於FY2027 的 526.74 億與 FY2028 的 729.52 億；FY2026 剩餘僅 11.10 億、FY2029 僅 0.85 億。這是 Broadcom 作為**客戶**對其上游供應鏈已鎖定的付錢承諾，方向為 customer_to_supplier，且集中在 2027–2028 兩年。filing 未具名任何供應商，故不得據此建立任何具名供應邊。",
+      "subject_id": "co:broadcom"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "AVGO"
+      ],
+      "attributes": {
+        "ticker": "AVGO"
+      },
+      "confidence": 0.9,
+      "id": "co:broadcom",
+      "name": "Broadcom",
+      "role": null,
+      "source_ids": [
+        "avgo_10_q_20260910_ai_xpv_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "avgo_10_q_20260910_ai_xpv",
+    "evidence_tier": 1,
+    "origin_entity": "Broadcom Inc.",
+    "permission_basis": "SEC 公開申報文件；全文已存於 library/raw 供逐字核對。",
+    "published_at": "2026-09-10",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-11",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Broadcom Inc. Form 10-Q（期間至 2026-08-02）節錄：AI XPV 平台、Backstop、可轉換本票、採購承諾",
+    "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm"
+  },
+  "sources": [
+    {
+      "id": "avgo_10_q_20260910_ai_xpv_s1",
+      "locator": "Item 2 MD&A, 'Recent Developments', 第一段",
+      "quote": "We established the AI XPV platform with certain sophisticated financial partners to enable more than 20 gigawatts in compute capacity using our custom AI accelerators or XPUs and networking solutions customized for the leading frontier AI labs through 2028."
+    },
+    {
+      "id": "avgo_10_q_20260910_ai_xpv_s2",
+      "locator": "Item 2 MD&A, 'Recent Developments', 初始 tranche 一句",
+      "quote": "In June 2026, we launched the AI XPV platform with an initial tranche of $35 billion led by a financial partner to facilitate the deployment of more than 1 gigawatt of compute infrastructure for our customer."
+    },
+    {
+      "id": "avgo_10_q_20260910_ai_xpv_s3",
+      "locator": "Note 10 Commitments and Contingencies — Financial Guarantee",
+      "quote": "Our maximum potential liability under the Backstop upon the deployment of all AI racks, on an undiscounted basis, was approximately $ 29 billion. The fair value of the Backstop was not material. No amounts have been paid under the Backstop."
+    },
+    {
+      "id": "avgo_10_q_20260910_ai_xpv_s4",
+      "locator": "Note 10 Commitments and Contingencies — Convertible Notes",
+      "quote": "our customer may, under certain circumstances and if needed, issue to us convertible promissory notes up to an aggregate principal amount of $ 42 billion. ... As of August 2, 2026, no notes have been issued to us."
+    },
+    {
+      "id": "avgo_10_q_20260910_ai_xpv_s5",
+      "locator": "Note 10 Commitments and Contingencies — contractual commitments 表（as of August 2, 2026）",
+      "quote": "Purchase Commitments 表（單位：百萬美元）逐格：2026 (remainder) $ 1,110；2027 52,674；2028 72,952；2029 85；2030 —；Thereafter —；Total $ 126,821。表註逐字：\"Represent unconditional purchase commitments to purchase goods or services, primarily inventory, that are enforceable and legally binding on us and specify all significant terms, including fixed or minimum quantities to be purchased, price provisions, and the approximate timing of the transaction.\""
+    },
+    {
+      "id": "avgo_10_q_20260910_ai_xpv_s6",
+      "locator": "Note 10 — Backstop 違約條款",
+      "quote": "In the event of a lease default by the customer, our Backstop liability will be equal to any difference between 85 % of the outstanding amounts owed on the lease Backstop and the value of the AI racks received upon sale of the assets at that time."
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm
+
+Excerpt:
+We established the AI XPV platform with certain sophisticated financial partners to enable more than 20 gigawatts in compute capacity using our custom AI accelerators or XPUs and networking solutions customized for the leading frontier AI labs through 2028.
+In June 2026, we launched the AI XPV platform with an initial tranche of $35 billion led by a financial partner to facilitate the deployment of more than 1 gigawatt of compute infrastructure for our customer.
+Our maximum potential liability under the Backstop upon the deployment of all AI racks, on an undiscounted basis, was approximately $ 29 billion. The fair value of the Backstop was not material. No amounts have been paid under the Backstop.
+our customer may, under certain circumstances and if needed, issue to us convertible promissory notes up to an aggregate principal amount of $ 42 billion. ... As of August 2, 2026, no notes have been issued to us.
+Purchase Commitments 表（單位：百萬美元）逐格：2026 (remainder) $ 1,110；2027 52,674；2028 72,952；2029 85；2030 —；Thereafter —；Total $ 126,821。表註逐字："Represent unconditional purchase commitments to purchase goods or services, primarily inventory, that are enforceable and legally binding on us and specify all significant terms, including fixed or minimum quantities to be purchased, price provisions, and the approximate timing of the transaction."
+In the event of a lease default by the customer, our Backstop liability will be equal to any difference between 85 % of the outstanding amounts owed on the lease Backstop and the value of the AI racks received upon sale of the assets at that time.
