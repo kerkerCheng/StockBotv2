@@ -461,14 +461,17 @@ def test_valuation_ledger_v2_keeps_old_ids_and_parses_legacy_rows() -> None:
 
     base = valuation_assumption_record(company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=25.0,
                                        basis="session_judgment", accounting_basis="non_gaap", rationale="r",
-                                       evidence_refs=[EDGE], created_at=CREATED)
+                                       evidence_refs=[EDGE], created_at=CREATED,
+                                       derivation="independent")
     assert "value_date_convention" not in base
     legacy_payload = {k: v for k, v in base.items() if k != "assumption_id"}
     assert new_valuation_assumption_id(legacy_payload) == base["assumption_id"]
     assert new_valuation_assumption_id({**legacy_payload, "value_date_convention": None}) == base["assumption_id"]
     declared = valuation_assumption_record(company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=25.0,
                                            basis="session_judgment", accounting_basis="non_gaap", rationale="r",
-                                           evidence_refs=[EDGE], created_at=CREATED, value_date_convention="target_period_end")
+                                           evidence_refs=[EDGE], created_at=CREATED,
+                                           derivation="independent",
+                                           value_date_convention="target_period_end")
     assert declared["assumption_id"] != base["assumption_id"] and declared["value_date_convention"] == "target_period_end"
 
 

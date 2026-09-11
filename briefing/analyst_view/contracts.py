@@ -196,6 +196,25 @@ PLAIN_READINESS: Mapping[str, Mapping[str, str]] = {
     "blocked": {"label": "有一段讀不成", "note": "看下面「卡在哪」——它會說是還沒做、刻意不做，還是缺上游"},
 }
 
+#: 目標倍數的來源（2026-09-11）。與 `PLAIN_STANCE`（EPS 桿）是同一個病的兩半：
+#: 一個是判斷、一個是抄市場，而畫面上 COHR 的 25x 與 TSM 的 25.71x 長得一模一樣。
+PLAIN_MULTIPLE_DERIVATION: Mapping[str, Mapping[str, str]] = {
+    "independent": {
+        "short": "我們判斷的倍數",
+        "reason": "目標倍數是我們自己決定的——它會貢獻隱含報酬，所以它需要指得出 re-rating 證據",
+    },
+    "calibrated_to_market": {
+        "short": "＝市場現在付的倍數",
+        "reason": "目標倍數直接取市場現在付的倍數（現價 ÷ 同期共識），零折溢價——"
+                  "**倍數這根桿因此不貢獻任何報酬**，隱含報酬全部來自 EPS 差異。"
+                  "這是刻意的：沒有 re-rating 證據時不該憑感覺給折溢價",
+    },
+    "unclassified": {
+        "short": "未宣告",
+        "reason": "2026-09-11 之前寫的舊紀錄，未宣告倍數來源；**不預設成我們的判斷**",
+    },
+}
+
 #: `OperatingAssumption.driver` 的白話標籤（2026-09-10）。反推表的每一列印的是 driver，
 #: 而 `PLAIN_LINE_LABELS` 的 key 是 line key 不是 driver——混用會讓使用者看到 `revenue_growth`。
 #: ⚠ 這不是重造 `ASSUMPTION_DRIVERS`（那裡的 description 是給寫假設的人看的長句，
@@ -528,6 +547,7 @@ __all__ = [
     "PLAIN_PANEL_TITLES",
     "PLAIN_READINESS",
     "PLAIN_DRIVER_LABELS",
+    "PLAIN_MULTIPLE_DERIVATION",
     "PLAIN_STANCE",
     "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",

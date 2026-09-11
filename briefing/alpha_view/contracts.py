@@ -502,6 +502,9 @@ class ExpectationGapSection:
     #: 反過來問：現價要成立，某個 driver 必須是多少（其餘假設固定成我們的）。
     #: **每個值都是條件解不是唯一解**——共識只給總量，分項欠定（ROADMAP §B）。
     reverse_bridge: Datum | None = None
+    #: 目標倍數是我們判斷的，還是抄市場現在付的（`VALUATION_DERIVATIONS`）。
+    #: 與 `opinion_stance`（EPS 桿）並排：**兩根桿各有各的來源問題**。
+    multiple_derivation: Datum | None = None
 
 
 @dataclass(frozen=True, slots=True)

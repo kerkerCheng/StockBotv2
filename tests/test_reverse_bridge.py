@@ -232,3 +232,63 @@ def test_reverse_bridge_reaches_the_app(tmp_path) -> None:
     assert "reverseBridgeBlock" in source
     # 「條件解」這句話必須跟表在一起——沒有它，讀者會把兩列當成可以同時成立
     assert "條件解" in source
+
+
+# ---------------------------------------------------------------------------
+# 5. 倍數桿的 derivation（2026-09-11）——EPS 桿那個病的另一半
+# ---------------------------------------------------------------------------
+
+def test_multiple_derivation_must_be_declared_and_never_defaults_to_independent() -> None:
+    """未宣告 → 拒收，且 fail safe 的方向是「不知道」不是「我們判斷的」。
+
+    實測 11 本 ledger：8 本的目標倍數是「＝校準倍數，零折溢價」（抄市場），只有 COHR 25x
+    與 LYC.AX 22x 是判斷。而畫面上 COHR 的 25x 與 TSM 的 25.71x 長得一模一樣——
+    這跟 5 個 `-0.0%` 是完全相同的形狀，只是換一根桿（L17-3：機制的對稱面）。
+    """
+    from alpha.valuation.assumptions import valuation_assumption_record
+    from alpha.valuation.contracts import VALUATION_DERIVATIONS
+
+    common = dict(company_id="co:test", ticker="TEST", period_end=TARGET.end, value=20.0,
+                  basis="session_judgment", accounting_basis="gaap", rationale="r",
+                  evidence_refs=[REF.ref],
+                  created_at=datetime(2026, 9, 11, tzinfo=UTC))
+    with pytest.raises(ContractViolation, match="必須明示 derivation"):
+        valuation_assumption_record(**common)
+    with pytest.raises(ContractViolation, match="derivation 未登記"):
+        valuation_assumption_record(**common, derivation="vibes")
+    assert set(VALUATION_DERIVATIONS) == {"independent", "calibrated_to_market", "unclassified"}
+
+
+def test_calibrated_to_market_must_point_at_the_consensus_it_copied() -> None:
+    """宣告「＝市場倍數」就要指得出校準用的那筆共識——校準倍數的分母就是它。
+
+    補償控制：新增一個分類（放行）的同一個 change 內就要有可機械驗證的檢查（收緊）。
+    """
+    from alpha.valuation.assumptions import valuation_assumption_record
+
+    common = dict(company_id="co:test", ticker="TEST", period_end=TARGET.end, value=20.0,
+                  basis="session_judgment", accounting_basis="gaap", rationale="r",
+                  created_at=datetime(2026, 9, 11, tzinfo=UTC),
+                  derivation="calibrated_to_market")
+    with pytest.raises(ContractViolation, match="必須引用校準用的那筆同期共識"):
+        valuation_assumption_record(**common, evidence_refs=[REF.ref])
+    ok = valuation_assumption_record(
+        **common, evidence_refs=[REF.ref],
+        calibration_refs=["engine_c://consensus_estimate/TEST/eps/2027-06-30"])
+    assert ok["derivation"] == "calibrated_to_market"
+
+
+def test_both_levers_have_their_own_plain_wording_and_neither_is_hardcoded() -> None:
+    """兩根桿各有各的措辭層，而且都只有一份（L16）。"""
+    from pathlib import Path
+
+    from alpha.valuation.contracts import VALUATION_DERIVATIONS
+    from briefing.analyst_view.contracts import PLAIN_MULTIPLE_DERIVATION, PLAIN_STANCE
+
+    assert set(PLAIN_MULTIPLE_DERIVATION) == set(VALUATION_DERIVATIONS)
+    assert set(PLAIN_MULTIPLE_DERIVATION) != set(PLAIN_STANCE)   # 兩根桿不是同一組字彙
+    source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(
+        encoding="utf-8")
+    assert "VOCAB.plain_multiple_derivation" in source
+    for entry in PLAIN_MULTIPLE_DERIVATION.values():
+        assert entry["reason"][:14] not in source, "app.js 不該硬編措辭"

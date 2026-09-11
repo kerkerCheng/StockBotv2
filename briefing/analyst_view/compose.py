@@ -205,6 +205,9 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
            if eg.opinion_stance is not None else ())
         + ((_line("reverse_bridge", eg.reverse_bridge.label, eg.reverse_bridge, "comparison"),)
            if eg.reverse_bridge is not None else ())
+        + ((_line("multiple_derivation", eg.multiple_derivation.label,
+                  eg.multiple_derivation, "comparison"),)
+           if eg.multiple_derivation is not None else ())
         + (_line("internal_vs_consensus", eg.internal_vs_consensus.label, eg.internal_vs_consensus, "comparison"),
            _line("internal_vs_price_implied", eg.internal_vs_price_implied.label,
                  eg.internal_vs_price_implied, "comparison"))

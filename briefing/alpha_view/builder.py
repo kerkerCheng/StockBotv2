@@ -33,7 +33,7 @@ from alpha.entry.contracts import EntryAssessmentResult, EntryCriterion
 from alpha.fundamental.contracts import (
     OPINION_BEARING_DRIVERS, FundamentalModelResult, OperatingAssumption,
 )
-from briefing.analyst_view.contracts import PLAIN_STANCE
+from briefing.analyst_view.contracts import PLAIN_MULTIPLE_DERIVATION, PLAIN_STANCE
 from alpha.implied_return.attribution import attribution_payload
 from alpha.implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from alpha.provider import SupplyExposure
@@ -162,7 +162,26 @@ _COMPARISON_STATUS_TO_DATUM: Mapping[str, str] = {
 _CONSENSUS_METRIC_LABEL: Mapping[str, str] = {"eps": "EPS", "revenue": "營收"}
 
 
-def _reverse_datum(reverse: Any, reason: str | None, *, reference_day: date) -> Datum:
+def _multiple_derivation_datum(valuation: ValuationResult | None, *, reference_day: date) -> Datum:
+    """目標倍數的來源 → 一格 Datum。**由估值層宣告**，呈現層不 parse rationale 去猜（L16）。"""
+    if valuation is None:
+        return missing("multiple_derivation", "目標倍數是怎麼決定的",
+                       "沒有 valuation", authority=A_COMPARE)
+    kind = valuation.multiple_derivation
+    return Datum(
+        key="multiple_derivation", label="目標倍數是怎麼決定的", value=kind,
+        status="available", basis="deterministic", authority=A_COMPARE, as_of=reference_day,
+        method="由 ValuationAssumption.derivation 聚合；任一條 independent 即 independent，"
+               "未宣告永遠不算 independent",
+        reason=PLAIN_MULTIPLE_DERIVATION.get(kind, {}).get("reason", kind),
+        dependencies={"method": valuation.method,
+                      "by_assumption": {a.assumption_id: a.derivation
+                                        for a in valuation.assumptions if not a.retracted}},
+    )
+
+
+def _reverse_datum(reverse: Any, reason: str | None, *, reference_day: date,
+                   multiple_derivation: str | None = None) -> Datum:
     """Reverse Bridge → 一格 Datum。**照抄**，不重算、不排序、不挑掉解不出來的那些（INV-3）。"""
     if reverse is None:
         return missing("reverse_bridge", "現價隱含的營運假設",
@@ -174,6 +193,8 @@ def _reverse_datum(reverse: Any, reason: str | None, *, reference_day: date) -> 
         "target_multiple": reverse.target_multiple,
         "current_price": reverse.current_price,
         "eps_gap": reverse.eps_gap,
+        # 反推的分母就是這個倍數——它是我們判斷的還是抄市場的，決定了整張表怎麼讀。
+        "multiple_derivation": multiple_derivation,
         "solutions": [
             {"driver": s.driver, "scope": s.scope, "unit": s.unit, "our_value": s.our_value,
              "implied_value": s.implied_value, "gap": s.gap, "status": s.status,
@@ -2113,7 +2134,10 @@ def build_alpha_investment_view(
                                               "不是內部基本面 vs 價格隱含基本面"),
         numeric_comparisons=fund.comparisons,
         opinion_stance=fund.opinion_stance,
-        reverse_bridge=_reverse_datum(reverse, reverse_reason, reference_day=today),
+        reverse_bridge=_reverse_datum(reverse, reverse_reason, reference_day=today,
+                                      multiple_derivation=(valuation.multiple_derivation
+                                                           if valuation is not None else None)),
+        multiple_derivation=_multiple_derivation_datum(valuation, reference_day=today),
     )
 
     # =======================================================================

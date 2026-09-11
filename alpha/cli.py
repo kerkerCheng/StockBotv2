@@ -320,6 +320,8 @@ def cmd_valuation(args: argparse.Namespace) -> int:
                     calibration_refs=list(spec.get("calibration_refs") or []),
                     comparison_refs=list(spec.get("comparison_refs") or []),
                     review_conditions=list(spec.get("review_conditions") or []),
+                    # v3：這個目標倍數是我們決定的，還是抄市場的。未宣告會被拒。
+                    derivation=spec.get("derivation"),
                     value_date_convention=spec.get("value_date_convention"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:

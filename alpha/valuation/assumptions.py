@@ -21,7 +21,8 @@ from ..errors import ContractViolation
 from ..fundamental.assumptions import select_assumptions
 from ..fundamental.contracts import AssumptionSelection, FiscalPeriod
 from .contracts import (
-    METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_PARAMETERS, ValuationAssumption,
+    METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_PARAMETERS, VALUATION_DERIVATIONS,
+    ValuationAssumption,
 )
 
 #: v1＝2026-09-06 Step 1 的原始形狀；v2（Step 2，同日）多了 `value_date_convention`。**舊行不改寫**：
@@ -34,12 +35,17 @@ _ID_FIELDS = ("company_id", "ticker", "period_end", "period_kind", "method", "pa
               "author", "supersedes_id", "retracted", "dependency_roles", "review_conditions")
 #: v2 才有的欄位：**只在有值時**參與 id——舊紀錄的 id 不因新欄位存在而改變。
 _ID_FIELDS_V2 = ("value_date_convention",)
+#: v3（2026-09-11）：`derivation`＝這個目標倍數是怎麼決定的。同樣只在有值且非 `unclassified`
+#: 時參與 id——舊紀錄與撤回紀錄的 id 一個位元都不變。
+_ID_FIELDS_V3 = ("derivation",)
 
 
 def new_valuation_assumption_id(payload: Mapping[str, Any]) -> str:
     """content-addressed id：同一份內容永遠得到同一個 id（重複 append 可被偵測）。"""
     body = {k: payload.get(k) for k in _ID_FIELDS}
     body.update({k: payload[k] for k in _ID_FIELDS_V2 if payload.get(k)})
+    body.update({k: payload[k] for k in _ID_FIELDS_V3
+                 if payload.get(k) and payload[k] != "unclassified"})
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "va_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -65,6 +71,7 @@ def valuation_assumption_record(
     comparison_refs: Sequence[str] = (),
     review_conditions: Sequence[Mapping[str, Any]] = (),
     value_date_convention: str | None = None,
+    derivation: str | None = None,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `ValuationAssumption` 驗證，驗不過就不產生）。
 
@@ -72,7 +79,17 @@ def valuation_assumption_record(
     同期共識、市場倍數、賣方目標價只能出現在後兩者（出現在 supporting 會被契約拒絕）。
     撤回紀錄沿用被撤回者的 refs 與角色。`value_date_convention`（Step 2）宣告 fair value 是哪一天的值；
     不給就是 unspecified——fair value 照算，但報酬層拒算。
+
+    `derivation` **必填**（撤回紀錄除外）：這個目標倍數是我們自己決定的，還是把市場現在付的
+    倍數抄過來。**未宣告不是預設成 independent**——那個方向的預設會把「抄市場」冒充成判斷。
     """
+    if derivation is None:
+        if not retracted:
+            raise ContractViolation(
+                "valuation_assumption_record 必須明示 derivation（這個目標倍數是怎麼決定的）；"
+                f"已知 {[d for d in VALUATION_DERIVATIONS if d != 'unclassified']}——"
+                "未宣告不會被當成 independent，因為那會把「抄市場」冒充成判斷")
+        derivation = "unclassified"
     params = METHOD_PARAMETERS.get(method)
     if params is None or parameter not in params:
         raise ContractViolation(f"valuation method 未登記或 parameter 未登記：{method}.{parameter}"
@@ -111,6 +128,7 @@ def valuation_assumption_record(
         "author": author,
         "supersedes_id": supersedes_id,
         "retracted": bool(retracted),
+        "derivation": derivation,
     }
     if value_date_convention is not None:
         payload["value_date_convention"] = str(value_date_convention)
@@ -163,6 +181,8 @@ def parse_valuation_assumption_record(raw: Mapping[str, Any]) -> ValuationAssump
         dependency_roles={str(k): str(v) for k, v in roles_raw.items()},
         review_conditions=tuple(ReviewCondition.from_dict(c) for c in conditions_raw),
         provenance_semantics=str(raw.get("provenance_semantics") or "v2"),
+        # 舊行沒有這個欄位 → `unclassified`（fail safe 到「不知道」，不是 `independent`）。
+        derivation=str(raw.get("derivation") or "unclassified"),
         value_date_convention=(str(raw["value_date_convention"]) if raw.get("value_date_convention") else None),
     )
 

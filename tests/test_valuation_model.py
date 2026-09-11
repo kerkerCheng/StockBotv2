@@ -49,7 +49,7 @@ def _multiple(value: float = 25.0, *, basis: str = "session_judgment", accountin
     record = valuation_assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=period_end, value=value, basis=basis,
         accounting_basis=accounting_basis, rationale=f"test target_pe {value}", evidence_refs=list(refs),
-        created_at=created, **kw)
+        created_at=created, **{"derivation": "independent", **kw})
     return parse_valuation_assumption_record(record)
 
 
@@ -372,7 +372,8 @@ def test_valuation_ledger_round_trips_and_rejects_duplicates(tmp_path: Path) -> 
     record = valuation_assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=25.0, basis="session_judgment",
         accounting_basis="non_gaap", rationale="r", evidence_refs=[EDGE],
-        calibration_refs=["engine_c://consensus_estimate/COHR/eps/2027-06-30"], created_at=CREATED)
+        calibration_refs=["engine_c://consensus_estimate/COHR/eps/2027-06-30"], created_at=CREATED,
+        derivation="calibrated_to_market")
     path = append_valuation_assumption_record(record, directory=tmp_path)
     assert path.name == "COHR.jsonl"
     loaded, errors = read_valuation_assumption_records("COHR", directory=tmp_path)
@@ -384,7 +385,7 @@ def test_valuation_ledger_round_trips_and_rejects_duplicates(tmp_path: Path) -> 
         append_valuation_assumption_record(valuation_assumption_record(
             company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=20.0, basis="session_judgment",
             accounting_basis="non_gaap", rationale="r", evidence_refs=[EDGE], supersedes_id="va_nope",
-            created_at=CREATED), directory=tmp_path)
+            created_at=CREATED, derivation="independent"), directory=tmp_path)
     # 壞行不靜默：計入 parse_errors
     path.write_text(path.read_text(encoding="utf-8") + '{"period_end": "2027-06-30"}\n', encoding="utf-8")
     loaded2, errors2 = read_valuation_assumption_records("COHR", directory=tmp_path)
@@ -416,7 +417,8 @@ def _ev_multiple(value: float = 8.0, *, created: datetime = CREATED, refs=(EDGE,
     record = valuation_assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=value, basis="session_judgment",
         accounting_basis="not_applicable", rationale=f"test target_ev_to_sales {value}", evidence_refs=list(refs),
-        created_at=created, method="ev_to_sales", parameter="target_ev_to_sales", **kw)
+        created_at=created, method="ev_to_sales", parameter="target_ev_to_sales",
+        **{"derivation": "independent", **kw})
     return parse_valuation_assumption_record(record)
 
 
@@ -470,7 +472,7 @@ def test_ev_to_sales_assumption_must_be_not_applicable_basis_and_pe_message_poin
         parse_valuation_assumption_record(valuation_assumption_record(
             company_id="co:coherent", ticker="COHR", period_end=TARGET.end, value=8.0, basis="session_judgment",
             accounting_basis="non_gaap", rationale="x", evidence_refs=[EDGE, ACT_REF.ref], created_at=CREATED,
-            method="ev_to_sales", parameter="target_ev_to_sales"))
+            method="ev_to_sales", parameter="target_ev_to_sales", derivation="independent"))
     from alpha.valuation.contracts import method_applicability
 
     msg = method_applicability("forward_earnings_multiple", -0.5) or ""

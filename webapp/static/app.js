@@ -1023,6 +1023,9 @@ function reverseBridgeBlock(datum) {
     box.appendChild(el('p', 'note', datum.reason || '這一格沒有內容'));
     return box;
   }
+  /* 反推的分母就是那個目標倍數——它是我們判斷的還是抄市場的，決定整張表怎麼讀：
+     抄市場時倍數這根桿**結構上不可能**貢獻報酬，隱含報酬全部來自 EPS 差異。 */
+  const mdInfo = ((VOCAB && VOCAB.plain_multiple_derivation) || {})[v.multiple_derivation] || null;
   const head = el('div', 'headline-numbers');
   head.appendChild(numberBlock('市場隱含 EPS', fmtNumber(v.market_implied_eps, 2),
     `以我們的目標倍數 ${fmtNumber(v.target_multiple, 1)}x 反推現價 ${fmtBig(v.current_price)}`));
@@ -1035,6 +1038,13 @@ function reverseBridgeBlock(datum) {
     head.appendChild(numberBlock('分析師共識 EPS', fmtNumber(v.consensus_eps, 2), '別人的數字'));
   }
   box.appendChild(head);
+  if (mdInfo) {
+    const note = el('p', 'note');
+    const tag = el('span', 'badge badge-absence', mdInfo.short);
+    note.appendChild(tag);
+    note.appendChild(document.createTextNode(' ' + mdInfo.reason));
+    box.appendChild(note);
+  }
 
   const table = el('table', 'rank compare');
   const headRow = el('tr');

@@ -67,6 +67,26 @@ class ParameterSpec:
     upper: float | None = None
 
 
+#: 這個**目標倍數**是怎麼決定的——與 `dependency_roles`（每條證據扮演什麼角色）正交。
+#: 與 `ASSUMPTION_DERIVATIONS`（EPS 桿）是同一個病的兩半：2026-09-10 修了 EPS 桿，
+#: 而倍數桿的「＝校準倍數」當時仍只存在於 rationale 的中文字裡（L17-3：機制的對稱面）。
+#:
+#: 實測 11 本 ledger（2026-09-11）：**8 本是「目標倍數＝校準倍數，零折溢價」**，
+#: 只有 COHR 25x 與 LYC.AX 22x 是我們自己判斷的。而畫面上 COHR 的 25x 與 TSM 的 25.71x
+#: 長得一模一樣——一個是判斷、一個是抄市場，使用者分不出來。
+#:
+#: - `independent`：我們自己決定的目標倍數（要指得出 re-rating 證據，見 AGENTS「兩個桿」）。
+#: - `calibrated_to_market`：＝校準倍數（現價 ÷ 同期共識），零折溢價。**這不是判斷，
+#:   是把市場現在付的倍數抄過來**——倍數桿因此不貢獻任何隱含報酬。
+#: - `unclassified`：舊紀錄的 fail safe；**寫入端一律拒絕**。
+#:
+#: ⚠ 刻意**沒有** `peer_anchored`／`historical_normal`：今天 11 本 ledger 沒有任何一筆是
+#: 那個形狀（peer 已於 2026-09-11 量測後移入「明確不排程」，歷史倍數只有 28 天資料）。
+#: 在沒有事實支撐的地方泛化只會得到會誤報的分類（L17-4）。
+VALUATION_DERIVATIONS: tuple[str, ...] = (
+    "independent", "calibrated_to_market", "unclassified",
+)
+
 #: method → 它需要的 parameter（`ValuationAssumption.parameter`）。目前一個 method 一個 parameter。
 METHOD_PARAMETERS: Mapping[str, Mapping[str, ParameterSpec]] = {
     METHOD_FORWARD_EARNINGS_MULTIPLE: {
@@ -234,6 +254,7 @@ class ValuationAssumption:
     supersedes_id: str | None = None
     retracted: bool = False
     dependency_roles: Mapping[str, str] = field(default_factory=dict)
+    derivation: str = "unclassified"
     review_conditions: tuple[Any, ...] = ()
     provenance_semantics: str = "v2"
     #: Step 2：這條倍數判斷算出來的 fair value 是哪一天的值（`VALUE_DATE_CONVENTIONS`）。**沒有預設**：
@@ -283,6 +304,16 @@ class ValuationAssumption:
                 "ValuationAssumption 必須至少引用一條證據——沒有 provenance 的估值判斷不得存在（INV-6）")
         if any(not isinstance(r, str) or not r.strip() for r in self.evidence_refs):
             raise ContractViolation("evidence_refs 每一項必須是非空字串")
+        if self.derivation not in VALUATION_DERIVATIONS:
+            raise ContractViolation(
+                f"derivation 未登記：{self.derivation!r}；已知 {VALUATION_DERIVATIONS}")
+        if self.derivation == "calibrated_to_market" and not self.retracted:
+            # 補償控制（放行與收緊同時發生）：校準倍數 ＝ 現價 ÷ **同期共識 EPS**，
+            # 所以宣告「抄市場」就必須指得出那筆共識，否則這個宣告無從查證。
+            if not any(r.startswith(CONSENSUS_REF_PREFIX) for r in self.evidence_refs):
+                raise ContractViolation(
+                    "derivation=calibrated_to_market 必須引用校準用的那筆同期共識"
+                    f"（{CONSENSUS_REF_PREFIX}...）——校準倍數的分母就是它，指不出來就無從查證")
         if self.provenance_semantics not in PROVENANCE_SEMANTICS:
             raise ContractViolation(f"provenance_semantics 未登記：{self.provenance_semantics!r}")
         for ref, role in self.dependency_roles.items():
@@ -522,6 +553,21 @@ class ValuationResult:
             raise ContractViolation("missing 的估值不得帶 fair_value 或 input_dependency（missing != zero）")
         if self.absence_kind is not None:
             check_absence_kind(self.absence_kind, "ValuationResult.absence_kind")
+
+    @property
+    def multiple_derivation(self) -> str:
+        """這個目標倍數是怎麼決定的（`VALUATION_DERIVATIONS`）。
+
+        ⚠ 它與 fair value 算不算得出來**正交**：一個 `available` 的估值完全可以是
+        `calibrated_to_market`——目標倍數就是市場現在付的倍數，於是倍數這根桿
+        **結構上不可能**貢獻任何隱含報酬。畫面上必須分得出它與 COHR 那種判斷型倍數。
+        """
+        live = [a for a in self.assumptions if not a.retracted]
+        kinds = {a.derivation for a in live}
+        for stance in ("independent", "calibrated_to_market"):
+            if stance in kinds:
+                return stance
+        return "unclassified"
 
     @property
     def effective_absence_kind(self) -> str | None:

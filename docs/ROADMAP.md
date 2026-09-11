@@ -271,7 +271,22 @@ Net variant vs consensus +0.47
 > 查證：`python -m pytest tests/test_reverse_bridge.py`
 >
 > ⚠ **EV/Sales 的反解沒做**（SOI.PA 走那條）：那是另一條算術（營收 → EV → 每股），
-> 誠實 `missing` 並說明，不共用本益比法這一條。
+> 誠實 `missing` 並說明，不共用本益比法這一條。**只有一個實例時不抽象**（L17-4）——
+> 等第二檔走 EV/Sales 再做。
+
+**兩根桿的 derivation 都已落地（2026-09-10 EPS 桿／2026-09-11 倍數桿）。** 實測 11 本
+valuation ledger：8 本的目標倍數是「＝校準倍數」（抄市場），只有 COHR 25x 與 LYC.AX 22x
+是判斷——而畫面上 COHR 的 25x 與 TSM 的 25.71x 原本長得一模一樣。
+兩桿對照的現況（2026-09-11，會變，查證用 `python -m webapp materialize` 後讀 artifact）：
+**只有 COHR 與 LYC.AX 兩檔是兩根桿都有自己的判斷**。
+
+**留下的 debt（都不排程，理由各自寫明）：**
+
+| 項 | 為什麼現在不做 |
+|---|---|
+| COHR 的 D&C 假設仍 `unclassified` | 被 `ew_0076` 以 `hypothesis_ref` 指著，supersede 會讓那個 watch 指向已取代的紀錄；watch registry 是另一個 owner 的 authority，不是「十行內、不動 contract」的檔次（L17-2）。**沒有行為後果**：COHR 的 stance 靠另外兩條假設已經是 `independent` |
+| outcome 時序的歷史 | 2026-09-11 之前是覆寫制，**歷史結構上拿不回來**（不是讀不到）。畫面上明說了 |
+| §A Graph → Fundamental Attribution | **分母太小**：9 檔 ready 只有 3 檔 independent，而 COHR 的 −26.3% 裡 −22.4% 來自倍數、只有 −5.0% 來自 EPS。等 independent 到兩位數再開——現在的瓶頸是研究量不是能力 |
 
 
 在資料足夠時，從 consensus Revenue／EPS 等**反推**市場大致隱含的 growth／margin／other assumptions。
