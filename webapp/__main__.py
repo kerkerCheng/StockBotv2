@@ -290,6 +290,9 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     artifacts = {t: p for t, p, _f, _r in ArtifactStore(
         Path(args.dir) if args.dir else None).read_all() if p is not None and t in terminal}
     score = closure.score_quality(artifacts)
+    # 未到終局那批卡在哪——與品質計數器同一個理由掛在這裡：每輪本來就會跑 closure-gate，
+    # 掛上去它才會自己出現。它回答的不是「還剩幾檔」而是「剩下的檔寫得出有資訊的判斷嗎」。
+    profile = closure.open_profile(rows, skip=args.skip or ())
     if args.format == "json":
         print(json.dumps({
             "state": result.state, "open_count": result.open_count,
@@ -301,6 +304,7 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                         "multiple_priced": [{"ticker": t, "contribution": c}
                                             for t, c in score.multiple_priced],
                         "unreadable": list(score.unreadable)},
+            "open_profile": profile,
         }, ensure_ascii=False, indent=2))
     else:
         mark = {"closed": "✅", "open": "▶", "unknown": "✗"}[result.state]
@@ -315,6 +319,10 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
         print("# 品質計數器（到終局那幾檔；衝檔數最容易犧牲的就是這個）")
         for line in closure.render_quality(score):
             print(f"- {line}")
+        if result.actionable:
+            print("# 未到終局那幾檔卡在哪（三項可重疊，不相加；欄位與 NEXT_PICK_RULE 同一組）")
+            for line in closure.render_open_profile(profile):
+                print(f"- {line}")
     return {"closed": 0, "open": 1, "unknown": 2}[result.state]
 
 

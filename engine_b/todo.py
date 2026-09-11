@@ -953,9 +953,25 @@ def standing_go_candidates(
                     skipped.append({"n": item["n"], "reason": "brief 沒列這個 cohort，無法判定 go 會做什麼"})
                     continue
                 if not _substantive_blockers(cohort_id, brief_items=brief_items):
-                    skipped.append({"n": item["n"], "reason": (
-                        "沒有 work order、也沒有需人決定的 blocker——go 只會多 append 一筆同樣 REVIEW 的 decision；"
-                        "純 context 老化交 reassess-stale，等世界的等 trigger")})
+                    # ⚠ 跳過的理由要說對是哪一種，否則使用者會照著一句不合身的話去做白工。
+                    # 2026-09-11 實測 [512]：它既不是「純 context 老化」也不是「等世界」，
+                    # 而是 evidence_delta=material——證據變了但沒有任何 blocker 需要人決定。
+                    # 這一批**確實**不該自動 go（L14：答不出 go 會讓哪個數字變），但它需要人看一眼，
+                    # 所以理由必須指回 missing_data，而不是叫人去跑兩支不收它的命令。
+                    brief_item = _brief_item_for(cohort_id, brief_items) or {}
+                    if str(brief_item.get("evidence_delta") or "none") in {
+                        "material", "positive", "negative"
+                    }:
+                        reason = (
+                            "證據有實質變動（evidence_delta）但沒有任何需人決定的 blocker——"
+                            "常規授權答不出「go 會讓哪個數字變」，留給你逐項看 missing_data 決定"
+                        )
+                    else:
+                        reason = (
+                            "沒有 work order、也沒有需人決定的 blocker——go 只會多 append 一筆同樣 REVIEW 的 decision；"
+                            "純 context 老化交 reassess-stale，等世界的等 trigger"
+                        )
+                    skipped.append({"n": item["n"], "reason": reason})
                     continue
         candidates.append(item)
     return candidates, skipped
@@ -2339,6 +2355,8 @@ def _decision_review_hint(
     ref: str,
     dispatchable: frozenset[str],
     blockers: Sequence[str] = (),
+    *,
+    material_event: bool = False,
 ) -> str:
     """逐項說出「這一筆現在該做什麼」。
 
@@ -2383,10 +2401,44 @@ def _decision_review_hint(
             + "、".join(substantive)
             + "。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案"
         )
+    # ⚠ 這裡原本只有一句「請跑 reassess」，而它對三種完全不同的情況都照說一次。
+    # 2026-09-11 實測 [512] co:iqe：它拿到那句話，但 `reassess-stale` 根本不收它
+    # （段 2 的判準是 `_only_system_internal_blockers`，比「無 user_decision」嚴得多），
+    # `standing-go` 又把它推回給 `reassess-stale`——兩支互相推，使用者照著做只會白跑。
+    #
+    # 往下追才發現它留在佇列的真正原因是 **evidence_delta=material**：證據有實質變動時
+    # 刻意蓋過 `waiting_on` 推導與 system_internal 退休路徑（見 collect 端註解）。
+    # 所以縫隙不只一條，要分成三種各自說清楚，而且 material 必須排最前面——
+    # 它是「為什麼這一筆在你眼前」的答案，其餘兩種是「為什麼自動化不會碰它」。
+    if material_event:
+        return (
+            "留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker"
+            "——所以 reassess-stale 與 standing-go 都不會自動處理它。"
+            "go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；"
+            "不含入圖、Engine C 寫入與 live"
+        )
+    if _only_system_internal_blockers(blockers):
+        return (
+            "coverage 已無 blocker，REVIEW 只來自凍結 context 過期——不是 dispatch；"
+            "段 2 的 `todo reassess-stale --run` 會自動接手並結案，**不需要你下 go**"
+        )
+    waiting = sorted(
+        code
+        for code in {str(b) for b in blockers if b}
+        if getattr(describe_blocker(code), "resolution_mode", "user_decision")
+        == "awaiting_external"
+    )
+    if waiting:
+        return (
+            "沒有需要你決定的 blocker，但仍帶等世界的項目："
+            + "、".join(waiting)
+            + "。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），"
+            "go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件"
+        )
+    # blockers 讀不到或為空：不知道就說不知道，不要落進上面任何一句有指示性的話（INV-3）。
     return (
-        "coverage 已無 blocker，REVIEW 來自凍結 context 過期——"
-        "不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，"
-        "下次 sync 會自動結案"
+        "讀不到這一筆的 blocker 分類——**不當成「沒有 blocker」**。"
+        "請跑 `python -m decision_lab references <cohort_id>` 看它到底缺什麼"
     )
 
 
@@ -2498,7 +2550,8 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
             sheet_only=bool(item.get("sheet_only")),
         )
         hint = (
-            _decision_review_hint(ref, dispatchable, blockers)
+            _decision_review_hint(ref, dispatchable, blockers,
+                                  material_event=material_event)
             if not item.get("sheet_only") else ""
         )
         corroboration_codes = (

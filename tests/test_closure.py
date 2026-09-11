@@ -232,3 +232,45 @@ def test_attribution_is_found_structurally_not_by_a_hardcoded_path() -> None:
                                          "multiple_contribution": -0.3}]}]}}}
     score = closure.score_quality({"DEEP": deep})
     assert score.multiple_priced == (("DEEP", -0.3),)
+
+
+# ---------------------------------------------------------------------------
+# 未到終局那批卡在哪（2026-09-11）——計數器要自己出現，不能靠人記得去查（L14）
+# ---------------------------------------------------------------------------
+
+def test_open_profile_counts_only_open_rows_and_honours_skip() -> None:
+    rows = [
+        _row("READY", readiness="ready", open_panels=(), bottleneck_rank=None),
+        _row("SETTLED", open_panels=(), settled=("why",), bottleneck_rank=None),
+        _row("OPEN1", bottleneck_rank=None),
+        _row("OPEN2", bottleneck_rank=3),
+        _row("SKIPPED", bottleneck_rank=None),
+    ]
+    prof = closure.open_profile(rows, skip=["skipped"])   # 大小寫不該影響 skip 比對
+    assert prof["open_count"] == 2
+    # 終局檔與 skip 檔都不進計數——它們不是「還推得動」的那批
+    assert prof["no_bottleneck_edge"] == ["OPEN1"]
+
+
+def test_open_profile_treats_none_as_unread_not_as_no() -> None:
+    """`None` 是讀不到，不是「否」。把它算進去等於 Missing != Zero 那個毛病（L12）。"""
+    rows = [
+        _row("A", has_consensus=None, forward_eps_positive=None),
+        _row("B", has_consensus=False, forward_eps_positive=False),
+    ]
+    prof = closure.open_profile(rows)
+    assert prof["no_consensus"] == ["B"]
+    assert prof["forward_eps_not_positive"] == ["B"]
+
+
+def test_open_profile_render_prints_every_field_even_at_zero() -> None:
+    """0 也是資訊：某一項歸零時那一行仍要在，否則「沒印」與「沒發生」同形（L12／L13）。"""
+    rows = [_row("A", bottleneck_rank=1, has_consensus=True, forward_eps_positive=True)]
+    lines = closure.render_open_profile(closure.open_profile(rows))
+    assert len(lines) == len(closure.OPEN_PROFILE_FIELDS)
+    assert all("0／1 檔" in line for line in lines)
+
+
+def test_open_profile_says_nothing_left_when_everything_is_terminal() -> None:
+    rows = [_row("A", readiness="ready", open_panels=())]
+    assert closure.render_open_profile(closure.open_profile(rows)) == ["未到終局 0 檔"]

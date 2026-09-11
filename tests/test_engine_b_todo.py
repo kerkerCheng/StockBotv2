@@ -1939,3 +1939,45 @@ def test_leaving_awaiting_approval_clears_the_pointer() -> None:
     item["dispatch_status"] = "researching"
     item.pop(todo.AWAITING_GATE_KEY, None)
     assert todo.gated_items(pool) == []
+
+
+def test_decision_review_hint_names_material_evidence_before_the_other_causes() -> None:
+    """`REVIEW` 有第三種成因：證據有實質變動（evidence_delta=material）。
+
+    事發（2026-09-11 實測 [512] co:iqe）：它的 blocker 全部不需要使用者決定，於是 hint
+    落到「請跑 reassess」那一句。但 `reassess-stale` 不收它（段 2 的判準是
+    `_only_system_internal_blockers`，比「無 user_decision」嚴得多），`standing-go` 又把它
+    推回給 `reassess-stale`——使用者照著做只會白跑兩次。
+
+    再往下追，它留在佇列的真正原因是 material evidence delta：collect 端刻意讓它蓋過
+    `waiting_on` 推導與 system_internal 退休路徑。所以這一句必須**排在最前面**，
+    它回答的是「為什麼這一筆在你眼前」，其餘兩種回答的是「為什麼自動化不碰它」。
+    """
+
+    from engine_b.todo import _decision_review_hint
+
+    execution_only = [
+        "execution_fx_missing", "execution_intent_research_only",
+        "execution_market_stale_since_decision", "holdings_unconfirmed",
+        "live_context_not_ready", "market_stale_since_decision",
+    ]
+    material = _decision_review_hint("dc_x", frozenset(), execution_only, material_event=True)
+    assert "evidence_delta" in material and "missing_data" in material
+    # 不得再叫人去跑那兩支不收它的東西
+    assert "reassess-stale 與 standing-go 都不會自動處理" in material
+
+    # 同一組 blocker、沒有 material 時，要說的是「在等世界」而不是「請跑 reassess」——
+    # execution_fx_missing 是 awaiting_external，段 2 也不收它。
+    waiting = _decision_review_hint("dc_x", frozenset(), execution_only, material_event=False)
+    assert "execution_fx_missing" in waiting and "等世界" in waiting
+    assert waiting != material
+
+
+def test_decision_review_hint_fails_closed_when_blockers_are_unreadable() -> None:
+    """讀不到 blocker 時不得落進任何一句有指示性的話——「查不到了」不是合法 lifecycle（INV-3）。"""
+
+    from engine_b.todo import _decision_review_hint
+
+    hint = _decision_review_hint("dc_x", frozenset(), [])
+    assert "讀不到" in hint
+    assert "reassess" not in hint

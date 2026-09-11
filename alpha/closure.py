@@ -154,6 +154,49 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
     }
 
 
+#: 未到終局那一批「卡在哪」的彙總欄位。**刻意只用 `_sort_key` 已經在讀的那幾個**——
+#: 新造一組分類就會是 L16 說的「我需要一個分類，系統有，但我手上的介面沒帶」的第二份。
+OPEN_PROFILE_FIELDS: tuple[tuple[str, str], ...] = (
+    ("no_bottleneck_edge", "不在瓶頸排序內（Q1 結構分算不出：沒有帶 substitutability 的結構邊）"),
+    ("no_consensus", "沒有同期 EPS 共識"),
+    ("forward_eps_not_positive", "forward EPS 共識非正（v1 只有本益比法）"),
+)
+
+
+def open_profile(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> dict[str, Any]:
+    """未到終局的那批各自卡在哪——**計數器要自己出現，不能靠人記得去查**（L14）。
+
+    事發（2026-09-11）：段5 一次卡在 60 檔時，執行者得自己去讀 Neo4j export 才算得出
+    「59 檔的 Q1 結構分是 None」。那個數字每輪都該在眼前，因為它決定的不是「還有幾檔」，
+    而是**剩下的檔寫得出有資訊的判斷嗎**——`bottleneck_rank is None` 代表這檔沒有任何
+    帶 substitutability 的結構邊，硬寫判斷只會得到「2 軸 unknown ＋ 2 軸只靠行情快照」。
+
+    ⚠ 三個計數**可以重疊**（同一檔可能同時沒共識又不在排序內），所以不相加、不算百分比。
+    ⚠ `None` 是「讀不到」不是「否」：只數明確為否的那些（Missing != Zero，L12）。
+    """
+    skip_set = {str(t).upper() for t in skip}
+    open_rows = [r for r in rows if r.terminal is None and r.ticker.upper() not in skip_set]
+    return {
+        "open_count": len(open_rows),
+        "no_bottleneck_edge": sorted(r.ticker for r in open_rows if r.bottleneck_rank is None),
+        "no_consensus": sorted(r.ticker for r in open_rows if r.has_consensus is False),
+        "forward_eps_not_positive": sorted(
+            r.ticker for r in open_rows if r.forward_eps_positive is False),
+    }
+
+
+def render_open_profile(profile: Mapping[str, Any]) -> list[str]:
+    """把 `open_profile` 印成人看得懂的幾行。空集合仍然印出來——0 也是資訊。"""
+    total = int(profile.get("open_count") or 0)
+    if not total:
+        return ["未到終局 0 檔"]
+    out = []
+    for key, label in OPEN_PROFILE_FIELDS:
+        hit = list(profile.get(key) or [])
+        out.append(f"{label}：{len(hit)}／{total} 檔")
+    return out
+
+
 def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> str:
     nxt = summary.get("next")
     line = (

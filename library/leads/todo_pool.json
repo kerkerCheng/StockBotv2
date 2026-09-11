@@ -4528,7 +4528,7 @@
     },
     {
       "added_at": "2026-08-30T08:28:24.953849+00:00",
-      "hint": "當前 missing_data：TH5/TH6 CPO 的具名部署客戶（hyperscaler 側揭露，結構上可能長期不可得）；Davisson 調變器類型第三方驗證（pq1 題進行中）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "當前 missing_data：TH5/TH6 CPO 的具名部署客戶（hyperscaler 側揭露，結構上可能長期不可得）；Davisson 調變器類型第三方驗證（pq1 題進行中）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：execution_fx_missing、technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 276,
       "reactivated_at": "2026-08-31T11:29:12.846318+00:00",
       "reactivation_event": {
@@ -4589,7 +4589,7 @@
     },
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
-      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 279,
       "reactivated_at": "2026-09-04T22:45:56.191164+00:00",
       "reactivation_event": {
@@ -7979,7 +7979,7 @@
     },
     {
       "added_at": "2026-09-03T22:40:31.052222+00:00",
-      "hint": "當前 missing_data：JDA 客戶或 hyperscaler 的具名一手確認；Optical Connectivity 的第三方 qualification／design-win 證據；任何 Sivers／Aeva 供應關係的一手揭露（共 3 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "當前 missing_data：JDA 客戶或 hyperscaler 的具名一手確認；Optical Connectivity 的第三方 qualification／design-win 證據；任何 Sivers／Aeva 供應關係的一手揭露（共 3 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：financial_stale_since_decision。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 472,
       "reason": null,
       "ref_id": "dc_2906500af891541ea4bdd52503b9b3aa",
@@ -8625,7 +8625,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
-      "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
+      "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
       "n": 512,
       "reason": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
