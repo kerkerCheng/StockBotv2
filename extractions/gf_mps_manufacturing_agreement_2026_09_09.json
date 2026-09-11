@@ -1,0 +1,60 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "於 2027-03-31 核對雙方最新公告／季報：若撤回或延期原定 2027 年初擴產，則標記時程假說未成立；若未披露進度則維持未知，不推定已量產。每季核查，命中後 48 小時提交人工複查。",
+      "id": "gf_mps_manufacturing_agreement_2026_09_09_cl1",
+      "source_ids": [
+        "gf_mps_manufacturing_agreement_2026_09_09_s1",
+        "gf_mps_manufacturing_agreement_2026_09_09_s2"
+      ],
+      "statement": "2026-09-09，GlobalFoundries 與 Monolithic Power Systems 聯合宣布長期製造協議，將 MPS 專有製程導入 GF 新加坡 300mm 廠，預期於 2027 年初擴大電源管理產品產能。此為具名客戶的已宣布製造協議，尚非量產交付或不可取消採購承諾。",
+      "subject_id": "co:globalfoundries"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "GFS"
+      ],
+      "attributes": {},
+      "confidence": 0.8,
+      "id": "co:globalfoundries",
+      "name": "GlobalFoundries",
+      "role": null,
+      "source_ids": [
+        "gf_mps_manufacturing_agreement_2026_09_09_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "gf_mps_manufacturing_agreement_2026_09_09",
+    "evidence_tier": 2,
+    "origin_entity": "GlobalFoundries and Monolithic Power Systems joint announcement",
+    "permission_basis": "公開公告短引文與來源連結；不保存全文。",
+    "published_at": "2026-09-09",
+    "publisher": "GlobeNewswire",
+    "retrieved_at": "2026-09-11",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "GlobalFoundries and Monolithic Power Systems form manufacturing partnership",
+    "url": "https://www.globenewswire.com/news-release/2026/09/09/3358648/0/en/globalfoundries-and-monolithic-power-systems-form-manufacturing-partnership-to-scale-high-performance-power-solutions.html"
+  },
+  "sources": [
+    {
+      "id": "gf_mps_manufacturing_agreement_2026_09_09_s1",
+      "locator": "Opening paragraph, long-term manufacturing agreement",
+      "quote": "announced a long-term manufacturing agreement that will deploy MPS’s proprietary process technology to GF’s advanced 300mm manufacturing facility in Singapore."
+    },
+    {
+      "id": "gf_mps_manufacturing_agreement_2026_09_09_s2",
+      "locator": "Second paragraph, expected capacity expansion timing",
+      "quote": "in early 2027"
+    }
+  ]
+}
