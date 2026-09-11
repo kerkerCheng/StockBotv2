@@ -783,7 +783,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-08",
+        "last_checked": "2026-09-11",
         "query_hint": "NVDA 8-K 或 10-Q 揭露對 OpenAI／資料中心融資的擔保或承諾；或 OpenAI／SoftBank 側的正式公告"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -1705,7 +1705,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-08",
+        "last_checked": "2026-09-11",
         "query_hint": "作者公開原始 dataset／方法論，或具名公司 filing 揭露可逐筆核對的 physical-AI／world-model 融資事件"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=lead_only_tier_4",
@@ -2552,7 +2552,8 @@
         "MRVL",
         "NVDA",
         "SKHY",
-        "SOI"
+        "SOI",
+        "SPCX"
       ],
       "poll": {
         "eligible": false,
@@ -2561,17 +2562,9 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": {
-        "kind": "related_entity_signal",
-        "lead_id": "lead_d8fee64e0334807bb0f1af3c5dee0bc8",
-        "shared_entities": [
-          "SOI",
-          "co:soitec"
-        ],
-        "at": "2026-09-09T01:25:08.632163+00:00",
-        "wake_lead": "lead_26bd4214b4b0434765071f14a7a955e4"
-      },
+      "woken_by": null,
       "consumed_leads": [
+        "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
         "lead_1b42074dd23fcc1e48bbc8dd41306c49",
         "lead_24e98e2fb4e446ac129f3334c9189fc5",
         "lead_2de7e1a5e8d0c944e39f782f05d9fbf1",
@@ -2579,6 +2572,20 @@
         "lead_80305e9e703177004c1a150f74ff5e8d",
         "lead_83a0425062febbdf6e85291b37093342",
         "lead_d8fee64e0334807bb0f1af3c5dee0bc8"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-11T21:36:46.314664+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
+            "shared_entities": [
+              "SPCX"
+            ],
+            "at": "2026-09-11T21:36:46.314528+00:00",
+            "wake_lead": "lead_26bd4214b4b0434765071f14a7a955e4"
+          }
+        }
       ]
     },
     {
@@ -2805,10 +2812,13 @@
       "hypothesis_ref": "",
       "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97",
       "consumed_entities": [
+        "BE",
+        "CO:COREWEAVE",
         "CO:MICRON_TECHNOLOGY",
         "CO:NEBIUS",
         "CO:SANDISK",
         "CO:TSMC",
+        "CRWV",
         "MU",
         "NBIS",
         "SNDK",
@@ -2821,18 +2831,26 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": {
-        "kind": "related_entity_signal",
-        "lead_id": "lead_05f01a6f616c2fd1ba2c5881d83ff17b",
-        "shared_entities": [
-          "NBIS",
-          "co:nebius"
-        ],
-        "at": "2026-09-09T01:14:49.471503+00:00",
-        "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97"
-      },
+      "woken_by": null,
       "consumed_leads": [
-        "lead_05f01a6f616c2fd1ba2c5881d83ff17b"
+        "lead_05f01a6f616c2fd1ba2c5881d83ff17b",
+        "lead_78c2a9a1bf04ad6abd7d0b786056e2b1"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-11T21:36:47.663324+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_78c2a9a1bf04ad6abd7d0b786056e2b1",
+            "shared_entities": [
+              "BE",
+              "CRWV",
+              "co:coreweave"
+            ],
+            "at": "2026-09-11T21:36:47.663228+00:00",
+            "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97"
+          }
+        }
       ]
     },
     {
@@ -3203,8 +3221,10 @@
       "consumed_entities": [
         "AAOI",
         "CO:APPLIED_OPTOELECTRONICS",
+        "CO:COHERENT",
         "CO:LUMENTUM",
         "CO:SIVERS_SEMICONDUCTORS",
+        "COHR",
         "LITE",
         "SIVE"
       ],
@@ -3215,20 +3235,27 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": {
-        "kind": "related_entity_signal",
-        "lead_id": "lead_55c8b7a797abe1ef2704c0ab958b1ca6",
-        "shared_entities": [
-          "AAOI",
-          "co:applied_optoelectronics"
-        ],
-        "at": "2026-09-10T22:34:21.228318+00:00",
-        "wake_lead": "lead_c349675fdb415bc16ec36afe3d5d91f2"
-      },
+      "woken_by": null,
       "consumed_leads": [
+        "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
         "lead_2b2f52a2081a91572dd5a667abf9f948",
         "lead_55c8b7a797abe1ef2704c0ab958b1ca6",
         "lead_e6f2bbd1d5be38912659f700d625f4f8"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-11T21:36:46.314690+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
+            "shared_entities": [
+              "COHR",
+              "co:coherent"
+            ],
+            "at": "2026-09-11T21:36:46.314616+00:00",
+            "wake_lead": "lead_c349675fdb415bc16ec36afe3d5d91f2"
+          }
+        }
       ]
     },
     {
@@ -3246,13 +3273,89 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_e6f2bbd1d5be38912659f700d625f4f8",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:SIVERS_SEMICONDUCTORS",
+        "SIVE"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
         "query_hint": "Sivers、具名中國 pluggable 客戶或 CIOE 公開資料披露 laser ASP／價格調整、客戶 qualification，或按功率拆分的供需狀況"
       },
       "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null,
+      "consumed_leads": [
+        "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-11T21:36:46.314710+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
+            "shared_entities": [
+              "SIVE",
+              "co:sivers_semiconductors"
+            ],
+            "at": "2026-09-11T21:36:46.314631+00:00",
+            "wake_lead": "lead_e6f2bbd1d5be38912659f700d625f4f8"
+          }
+        }
+      ]
+    },
+    {
+      "watch_id": "ew_0086_2026-09-11",
+      "created_at": "2026-09-11T21:54:39.456829+00:00",
+      "expires": "2027-01-10",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AAOI",
+        "COHR",
+        "LITE",
+        "MU",
+        "NVDA",
+        "SIVE",
+        "SNDK",
+        "SPCX"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "WF WSJ TrendForce Goldman 原始文件，或公司 filing 揭露具名供應承諾"
+      },
+      "note": "daily-brief 2026-09-12：補上 park 後 unwatched lifecycle",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0087_2026-09-11",
+      "created_at": "2026-09-11T21:54:39.578079+00:00",
+      "expires": "2027-01-10",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "SIVE"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_8b32ad00a47303f2cc350a82eee95c10",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": true,
+        "last_checked": null,
+        "query_hint": "Sivers official price increase ASP CIOE 2026 laser"
+      },
+      "note": "daily-brief 2026-09-12：補上 park 後 unwatched lifecycle",
       "status": "active",
       "woken_by": null
     }

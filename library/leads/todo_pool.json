@@ -9391,6 +9391,46 @@
       "source": "manual",
       "title": "AAOI：內部 FY2026 GAAP EPS −0.10 而共識 +0.68 是 non-GAAP、公司不公布 non-GAAP 營業利益——提案 Abstention（valuation / target_pe）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-11T21:41:10.072300+00:00",
+      "dispatch_attempt": 1,
+      "dispatch_baseline_decision_id": "pd_c1e8872ac15e064a82d07786ed522f7a",
+      "dispatch_receipt": "orphan-cohort:dc_bb19966e2aafab5e24f4fd74d7ed9443;supersedes-todo:547",
+      "dispatch_ref": "wo_3182212759a82a8adaab4bd670244ef6",
+      "dispatch_status": "parked",
+      "dispatch_updated_at": "2026-09-11T21:48:36.490411+00:00",
+      "dispatched_at": "2026-09-11T21:42:46.650981+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 551,
+      "reason": "不可研究：同一 orphan cohort 主詞為技術節點 tech:hbm，不是公司；identity_unresolved 結構上解不掉。此問題已由 [540]、[547] 診斷，正確修法是 collector 端停止換號重生，ROADMAP 已記錄。",
+      "receipt": "orphan-cohort:dc_bb19966e2aafab5e24f4fd74d7ed9443;supersedes-todo:547",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "resolution": "go",
+      "resolved_at": "2026-09-11T21:48:36.490411+00:00",
+      "source": "decision_lab",
+      "title": "unknown：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-11T21:41:10.072300+00:00",
+      "company_id": "co:axt",
+      "hint": "當前 missing_data：Coherent、Lumentum 或 Casela 客戶端對採購量、qualification 與交付節奏的獨立確認；三份供應／產能協議的完整 exhibit 與逐季履約數據；美國 InP 出口許可的核准範圍與時間（共 3 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：financial_stale_since_decision。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
+      "n": 552,
+      "reason": null,
+      "ref_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:axt：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-11T21:41:10.071820+00:00",
+        "trigger": "財務核驗清單欄位缺失或待人工填入",
+        "until": null
+      }
     }
   ],
   "log": [
@@ -20406,8 +20446,54 @@
       "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-11T21:42:46.650981+00:00",
+      "attempt": 1,
+      "n": 551,
+      "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
+      "receipt": "wo_3182212759a82a8adaab4bd670244ef6",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-11T21:42:46.650981+00:00",
+      "n": 551,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=dispatched",
+      "receipt": "wo_3182212759a82a8adaab4bd670244ef6",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-11T21:47:45.030124+00:00",
+      "n": 551,
+      "reason": null,
+      "receipt": "daily-brief:2026-09-12",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-11T21:48:36.490411+00:00",
+      "n": 551,
+      "reason": "不可研究：同一 orphan cohort 主詞為技術節點 tech:hbm，不是公司；identity_unresolved 結構上解不掉。此問題已由 [540]、[547] 診斷，正確修法是 collector 端停止換號重生，ROADMAP 已記錄。",
+      "receipt": "orphan-cohort:dc_bb19966e2aafab5e24f4fd74d7ed9443;supersedes-todo:547",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "type": "decision_review",
+      "verb": "pq1_parked"
+    },
+    {
+      "at": "2026-09-11T21:48:36.490411+00:00",
+      "n": 551,
+      "reason": "不可研究：同一 orphan cohort 主詞為技術節點 tech:hbm，不是公司；identity_unresolved 結構上解不掉。此問題已由 [540]、[547] 診斷，正確修法是 collector 端停止換號重生，ROADMAP 已記錄。",
+      "receipt": "orphan-cohort:dc_bb19966e2aafab5e24f4fd74d7ed9443;supersedes-todo:547",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 551,
+  "next_n": 553,
   "schema_version": "1"
 }
