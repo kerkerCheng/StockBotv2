@@ -256,6 +256,10 @@
       "trace_trigger_kind": {
         "value_type": "string",
         "description": "機器可執行的 trace 觸發類型，例如 related_entity_signal"
+      },
+      "source_routes_receipt": {
+        "value_type": "string",
+        "description": "`python -m sourcing.routes <TICKER> --attempted a,b` 產生的收據。park 時若 trace_status 屬「我沒拿到」型（見 config/source_routes.json 的park_requires_receipt_when_trace_status_in），這一欄必填——它記的是**哪幾條路真的走過**，不是執行者說他走過。"
       }
     }
   }

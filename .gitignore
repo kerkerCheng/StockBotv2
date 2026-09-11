@@ -100,3 +100,4 @@ library/leads/action_drafts/
 # Session-local advisory writer lock（engine_b/writer_lock.py）——機器狀態不是資料。
 library/leads/.writer_lock.json
 .pytest_tmp/
+!config/source_routes.json

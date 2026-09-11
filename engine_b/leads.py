@@ -297,6 +297,57 @@ def _require(store: dict[str, Any], lead_id: str) -> dict[str, Any]:
     return lead
 
 
+def _stamp_source_routes_receipt(
+    lead: Mapping[str, Any], cleaned_ref: dict[str, Any]
+) -> None:
+    """park 成「我沒拿到」型時，把「哪幾條路沒走」寫進 refs（2026-09-11 使用者定案）。
+
+    事發：2026-09-11 一個 session 內三次把「我沒試」講成「拿不到」——深交所公告 API、
+    pypdf、MOPS fetcher 都早就可用。三次都不是證據不夠。
+
+    ⚠ **修法層級：顯形，不是根除——而且根除在構造上不存在。**
+    沒有任何程式驗得了「我真的跑過那條路」，所以「沒試」無法被杜絕。能做到的上限是
+    **讓它無法隱藏**：什麼都不做時，收據自動長成「已走=無；未走=szse(rung2),...」，
+    這行字會留在 park 紀錄裡，下一個 session 一眼看得到。
+    要造假得主動寫一份不實的 `--attempted`——那是另一種行為，不是沉默地略過。
+
+    ⚠ 為什麼是自動補而不是 raise：第一版寫成缺收據就 raise，實測打紅 9 條測試，
+    其中包含 `consume_fired` 這類**無人值守 routine 會走的路徑**。讓 daily 在 park
+    時崩潰違反「不得用 broad permission 掩蓋整合缺口」的反面——它是用硬擋掩蓋設計問題。
+    而且 raise 只會逼呼叫端塞一個假收據過關，等於又回到自陳。
+
+    終局型 trace_status 不蓋章：`original_obtained`／`contradicts`／
+    `tier_1_2_honest_passthrough` 代表拿到了，`not_pursued` 代表判定不研究。
+    """
+    refs = {**(lead.get("refs") or {}), **cleaned_ref}
+    trace_status = str(refs.get("trace_status") or "").strip()
+    if not trace_status or str(refs.get("source_routes_receipt") or "").strip():
+        return
+    try:
+        from sourcing.routes import build_receipt
+        from sourcing.routes import load as load_routes
+
+        if not load_routes().requires_receipt(trace_status):
+            return
+        ticker = _lead_ticker_hint(lead)
+        if not ticker:
+            return
+        cleaned_ref["source_routes_receipt"] = build_receipt(
+            ticker, (), outcome=f"park/{trace_status}；未宣告已走路徑（自動蓋章）")
+    except Exception:  # noqa: BLE001 — 路徑表壞掉不得讓 park 失敗；缺收據本身就會現形
+        return
+
+
+def _lead_ticker_hint(lead: Mapping[str, Any]) -> str | None:
+    """lead 上最有把握的 ticker——沒有就回 None，不從標題猜（INV-1）。"""
+    tickers = ((lead.get("entities") or {}).get("tickers")) or ()
+    for raw in tickers:
+        candidate = str(raw).strip().upper().lstrip("$")
+        if candidate:
+            return candidate
+    return None
+
+
 def advance(
     store: dict[str, Any],
     lead_id: str,
@@ -324,6 +375,8 @@ def advance(
         if entities:
             cleaned_ref.setdefault("trace_trigger_kind", "related_entity_signal")
             cleaned_ref.setdefault("trace_trigger_entities", entities)
+    if to_status == "parked":
+        _stamp_source_routes_receipt(lead, cleaned_ref)
     current = lead["status"]
     if to_status not in ALLOWED_TRANSITIONS[current]:
         raise LeadStateError(f"非法轉移：{current} → {to_status}")
