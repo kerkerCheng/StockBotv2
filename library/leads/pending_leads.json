@@ -13619,16 +13619,21 @@
       "lead_id": "lead_1c805d1c401d5ede0572182a5bfcbbea",
       "published_at": "2026-08-29",
       "refs": {
-        "parked_reason": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有智邦 CPO switch 組裝／ODM 角色；原等待條件未命中，維持 partial。 這是有期限 Event Watch 的等待，不是靜默遺失。",
-        "primary_url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91",
+        "gap": "無——問題本身建立在誤讀之上，Accton 不在 NVIDIA CPO 具名鏈",
+        "original_claim_status": "refuted_by_original",
+        "parked_reason": "線索主張被一手否定：BigGo 原文（2026-07-24）把 Accton（2345.TW）列在『下游 AI 交換器』同業比較表（單季 EPS NT14.92、800G/1.6T），逐字未主張它參與 CPO；同文的 TSMC 法說（CPO 已量產）與 LightCounting（2027 年 CPO 埠占 800G/1.6T 近 30%）兩段都與 Accton 無關——lead 標題把同一篇裡三件事誤接成一件。NVIDIA 一手（2025-03-18 GTC 發布）逐字名單為 TSMC、Browave、Coherent、Corning、Fabrinet、Foxconn、Lumentum、SENKO、SPIL、Sumitomo Electric、TFC；pluggable 另列 Coherent/Eoptolink/Fabrinet/Innolight——Accton 兩份皆未出現。結論：Accton 不是 NVIDIA CPO switch 的具名組裝方；CPO switch 的系統與光學組裝在 NVIDIA 自己的表述裡歸 Foxconn 與 Fabrinet，Accton 屬 pluggable 世代交換器 ODM 賽道，不因本線索成為 onboard 候選。",
+        "primary_url": "https://nvidianews.nvidia.com/news/nvidia-spectrum-x-co-packaged-optics-networking-switches-ai-factories",
         "research_outcome": "本輪觸發只是一筆 TSMC 主管小額 ESPP 購股 Form 4，沒有智邦 CPO switch 組裝／ODM 角色；原等待條件未命中，維持 partial。",
         "research_run": "session:2026-08-29-tw-cpo-drain",
         "trace_attempts_ref": "2026-09-10 research-drain：核對觸發 filing 為 TSMC 主管小額 ESPP 購股，未命中本 lead 的具名技術／供應條件",
         "trace_next_trigger": "智邦法說或 NVIDIA 側具名其 CPO switch 組裝角色",
+        "trace_origin_entity": "BigGo Finance（二手聚合）；對照一手 NVIDIA Newsroom",
+        "trace_original_date": "2026-07-24",
+        "trace_original_url": "https://finance.biggo.com/news/18d4225c-e1a8-4df5-9217-e88dc0929a91",
         "trace_requeue_trigger": "related_triaged_lead:lead_994f96ce74b5da75a5611c2c00801bee",
         "trace_requeued_at": "2026-09-10T22:34:59.914295+00:00",
-        "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_requires_user": "no",
+        "trace_status": "contradicts",
         "trace_trigger_entities": [
           "NVDA",
           "TSM",
@@ -13640,7 +13645,7 @@
         "trace_trigger_watch_ref": "ew_0013_2026-08-31"
       },
       "source": "decompose:nvda-cpo-switch-2026-08-29",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -20960,10 +20965,25 @@
       "published_at": "2026-08-18",
       "refs": {},
       "source": "event_watch:ew_0012_2026-08-31",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "AAOI Rosenblatt 2026-08-18 公開第三方逐字稿：美國產能溢價、LTA 與雷射產能；摘要日期多處錯置，需逐段核對全文與官方音訊",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-11T01:28:22.678076+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "AAOI 在 Rosenblatt summit 的第三方逐字稿，主題為美國產能溢價、長期供貨協議(LTA)與雷射產能——直接對應圖中 AAOI/雷射瓶頸軸；tier 3 因為是 investing.com 轉錄而非公司官方發布，且來源自陳摘要日期錯置，需對官方音訊逐段核對"
+        },
+        "decided_at": "2026-09-11T01:28:22.678076+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "AAOI 為圖中標的，內容涉及雷射產能與 LTA（客戶端資本承諾線索），值得進 pq1 追一手",
+        "tier": 3
+      },
       "url": "https://www.investing.com/news/transcripts/applied-optoelectronics-at-rosenblatt-summit-capacity-ai-demand-93CH-4865745"
     },
     "lead_3df060cf842783e4709ae6cd86b1be74": {
