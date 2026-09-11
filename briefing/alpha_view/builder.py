@@ -306,11 +306,22 @@ def _fundamental_parts(
         ))
     internal_items.extend(fixed_not_modeled)
     section_basis = "deterministic" if model.status != "missing" else "none"
+    # 基期作者寫下的話要送到**會去寫假設的那個人**手上（L16：分類跟著資料走到消費端）。
+    # 它逐字轉述、不改寫——那是一手紀錄，不是我們的判斷；`warnings` 會經 compose 進到
+    # fundamental panel 的 notes，也就是寫假設前會讀到的那一格。
+    base = model.base_actuals
+    author_warnings: list[str] = []
+    if base is not None and base.coverage_note:
+        author_warnings.append(f"⚠ 基期觀測作者註記（逐字，{base.observation_id or '無 id'}）：{base.coverage_note}")
+    for key, value in sorted((base.author_notes or {}).items() if base is not None else ()):
+        if isinstance(value, str) and value.strip():
+            author_warnings.append(f"⚠ 基期觀測 `{key}`（逐字）：{value.strip()}")
     internal_meta = SectionMeta(
         status=model.status, basis=section_basis, authority=A_BRIDGE,
         capability=CAP_FINANCIAL_CAUSAL, reason=model.reason, as_of=reference_day,
         warnings=(FUNDAMENTAL_EPISTEMIC_WARNING,
                   f"口徑：{model.accounting_basis}；與共識比較只在同期、同口徑時成立。",
+                  *author_warnings,
                   *model.warnings),
     )
     internal_section = InternalFundamentalsSection(

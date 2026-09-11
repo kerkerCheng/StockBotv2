@@ -33,6 +33,14 @@ from ..identity import CompanyId, Ticker
 
 #: Causal Fundamental Model 的兩個 Engine C 人工 ledger 欄位（`config/engine_c_observation_fields.json`）。
 FISCAL_RESULTS_FIELD = "fiscal_year_results"
+
+#: `fiscal_year_results` payload 裡**有對應欄位**的鍵。其餘一律原樣進 `author_notes`——
+#: **不得靜默丟棄作者寫下的東西**（INV-3）。這個集合是可測的，所以「新增欄位卻忘了接」
+#: 會在 `tests/test_fundamental_model.py` 變紅，而不是安靜少一格。
+_PARSED_FISCAL_KEYS: frozenset[str] = frozenset({
+    "fiscal_year_end", "currency", "revenue", "segment_revenue", "gaap",
+    "non_gaap", "exit_quarter", "source_filed_at", "coverage_note",
+})
 GUIDANCE_FIELD = "company_guidance"
 
 
@@ -342,6 +350,9 @@ class EngineCFundamentalsProvider:
                 filed = _as_date(payload.get("source_filed_at"))
                 ref = self._ledger_ref(row, published_at=filed or end)
                 segments = payload.get("segment_revenue")
+                # **不得靜默丟棄作者寫下的東西**：列舉式解析每多一個新鍵就多一次無聲遺失。
+                # 已有對應欄位的鍵在這裡扣掉，其餘原樣進 author_notes（INV-3）。
+                leftovers = {k: v for k, v in payload.items() if k not in _PARSED_FISCAL_KEYS}
                 return FiscalYearActuals(
                     period=FiscalPeriod(end=end),
                     currency=str(payload.get("currency") or ""),
@@ -354,6 +365,9 @@ class EngineCFundamentalsProvider:
                     evidence=(ref,), source_filed_at=filed,
                     recorded_at=_as_datetime(row.get("recorded_at")),
                     observation_id=str(row["observation_id"]),
+                    coverage_note=(str(payload["coverage_note"]).strip() or None
+                                   if payload.get("coverage_note") else None),
+                    author_notes=leftovers,
                 ), None
             except (KeyError, TypeError, ValueError, ContractViolation) as exc:
                 errors.append(f"{row['observation_id']}: {exc}")

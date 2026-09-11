@@ -602,3 +602,72 @@ def test_opinion_bearing_drivers_exclude_the_mechanical_ones():
     assert OPINION_BEARING_DRIVERS == {"revenue_growth", "operating_margin_delta"}
     assert OPINION_BEARING_DRIVERS < set(ASSUMPTION_DRIVERS)
 
+
+
+# ---------------------------------------------------------------------------
+# 基期作者註記（2026-09-11）：parser 不得靜默丟棄作者寫下的東西
+# ---------------------------------------------------------------------------
+
+#: 2026-09-11 全庫 46 筆 `fiscal_year_results` 實際出現過的鍵。
+#: 這份清單在**新增一個鍵而沒人接**時會讓下面那條測試變紅。
+_REAL_LEDGER_KEYS = (
+    "accounting_basis", "consolidation_scope", "coverage_note", "critical_note", "currency",
+    "customer_concentration_note", "exit_quarter", "fiscal_year_end", "gaap", "key_note",
+    "non_gaap", "prior_year", "revenue", "revenue_by_product_type", "segment_note",
+    "segment_revenue", "source_filed_at", "unit_note", "xbrl_provenance",
+)
+
+
+def _ledger_payload(**overrides):
+    payload = {
+        "fiscal_year_end": "2026-06-30", "currency": "USD", "revenue": 1.0e9,
+        "gaap": {"operating_income": 1.0e8, "diluted_eps": 1.5},
+        "coverage_note": "本筆刻意未填非營業損益：業績發布沒有印，要補必須取得法定年報。",
+        "unit_note": "USD absolute", "critical_note": "股票分割口徑要注意",
+    }
+    payload.update(overrides)
+    return payload
+
+
+def test_every_key_the_author_wrote_reaches_a_field_or_author_notes() -> None:
+    """**不得靜默丟棄。** 列舉式解析每多一個新鍵就多一次無聲遺失，而作者不會知道。
+
+    事發（2026-09-11 實測）：46 筆基期觀測有 **40 筆**寫了 `coverage_note`，下游 **0 筆**
+    看得到——parser 只挑八個鍵，其餘直接掉地上。其中好幾條會咬人：002472.SZ「共識口徑是
+    扣非」、5802.T「股票分割口徑」、000660.KS「非營業損益與稅率刻意未填，不得合併塞進
+    tax_rate」。寫下它的人已經做對了事，是管子只接了一頭（L13）。
+    """
+    from alpha.providers import fundamentals as fund_provider
+
+    payload = {k: (f"<{k}>" if k not in {"revenue", "gaap", "segment_revenue", "exit_quarter"}
+                   else {"operating_income": 1.0} if k in {"gaap"} else
+                   {"A": 1.0} if k == "segment_revenue" else {"q": 1} if k == "exit_quarter" else 1.0e9)
+               for k in _REAL_LEDGER_KEYS}
+    payload["fiscal_year_end"] = "2026-06-30"
+    payload["currency"] = "USD"
+    payload["source_filed_at"] = "2026-08-12"
+
+    parsed = fund_provider._PARSED_FISCAL_KEYS
+    leftovers = set(payload) - parsed
+    assert parsed | leftovers == set(payload), "每一個鍵都必須要嘛有欄位、要嘛進 author_notes"
+    # 這幾個是「作者寫給人看的」，一定要進得了 author_notes 或自己的欄位
+    for note_key in ("critical_note", "key_note", "segment_note", "unit_note",
+                     "customer_concentration_note"):
+        assert note_key in leftovers, f"{note_key} 沒有欄位，就必須落進 author_notes"
+    assert "coverage_note" in parsed, "coverage_note 是一等公民（40/46 筆有寫）"
+
+
+def test_coverage_note_and_leftovers_survive_the_parser() -> None:
+    from alpha.fundamental.contracts import FiscalPeriod, FiscalYearActuals
+
+    actuals = FiscalYearActuals(
+        period=FiscalPeriod(end=date(2026, 6, 30)), currency="USD", revenue=1.0e9,
+        segment_revenue=None, gaap={"operating_income": 1.0e8}, non_gaap=None, evidence=(ACT_REF,),
+        coverage_note="刻意未填非營業損益", author_notes={"unit_note": "USD absolute"})
+    assert actuals.coverage_note == "刻意未填非營業損益"
+    assert actuals.author_notes["unit_note"] == "USD absolute"
+    # 沒寫就是 None／空，不得補一個看起來像內容的預設（Missing != Zero）
+    plain = FiscalYearActuals(
+        period=FiscalPeriod(end=date(2026, 6, 30)), currency="USD", revenue=1.0e9,
+        segment_revenue=None, gaap={"operating_income": 1.0e8}, non_gaap=None, evidence=(ACT_REF,))
+    assert plain.coverage_note is None and dict(plain.author_notes) == {}

@@ -421,6 +421,16 @@ class FiscalYearActuals:
     source_filed_at: date | None = None
     recorded_at: datetime | None = None
     observation_id: str | None = None
+    #: 基期作者寫下的「這一格為什麼是這樣、哪一格刻意留空、不准怎麼補」。
+    #: 2026-09-11 之前 parser 直接丟掉它：46 筆基期觀測有 **40 筆**寫了，下游 **0 筆**看得到。
+    #: 而其中好幾條是會咬人的——002472.SZ「共識口徑是扣非，已一手核實」、5802.T「股票分割
+    #: 口徑」、000660.KS「非營業損益與稅率刻意未填，不得合併塞進 tax_rate（那會一格兩義）」。
+    #: 寫下它的人已經做對了事，是管子只接了一頭（L13）。
+    coverage_note: str | None = None
+    #: parser 沒有對應欄位的其餘鍵，**原樣保留**。
+    #: ⚠ 這是「不得靜默丟棄」的那一半：列舉式解析每多一個新鍵就多一次無聲遺失，
+    #: 而作者不會知道自己寫的東西沒人收到（INV-3：查不到了不是合法 lifecycle）。
+    author_notes: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         _nonempty(self.currency, "FiscalYearActuals.currency")
