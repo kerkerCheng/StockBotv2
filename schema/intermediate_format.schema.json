@@ -102,8 +102,19 @@
           "maximum": 4
         },
         "section": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "description": "同一 canonical URL 文件被刻意拆成多段抽取時，標記此段（如 financials / photonics）。同 URL 的多個 doc 需各自 section 非空且互不相同才算合法多段，否則視為靜默重複。"
+        },
+        "supersedes_extraction_sha256": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[0-9a-f]{64}$",
+          "description": "具名更正走廊（2026-09-11）：本份 extraction 要取代的**那一版**的 canonical hash。必須等於現存檔案的 hash——不能說「取代現在那份，不管它是什麼」。舊版由 intake/provenance.publish_provenance 歸檔到 extractions/superseded/，**兩份都留**。未填時 no-clobber 照舊：任何改寫都會被判成 conflict。"
         }
       }
     },
