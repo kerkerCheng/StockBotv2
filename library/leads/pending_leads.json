@@ -30390,9 +30390,14 @@
       ],
       "published_at": "2026-09-10T06:38:22.000Z",
       "raw_text": "Wow, HBM reportedly drove up AI accelerator/card prices by 20-50% in China.\n\nSo $SKHY, Samsung, $MU, should be happy to hear this:\n\n- Huawei has raised indicated pricing for the Ascend 950DT 20–50% above quotes from just 2 months ago\n\n- Cambricon's upcoming 690 is reportedly +20–30%\n\nReuters stated that HBM acquired through grey market channels in China can cost several times regular pricing. \n\nAs someone who is long memory, I'm happy about memory causing this much inflation.",
-      "refs": {},
+      "refs": {
+        "outcome": "推文轉述的三個數字都對得上 Reuters 原文，但推文的歸因（純記憶體超級週期）不完整：Reuters 給的是全球短缺＋中國出口管制灰市數倍溢價兩個效應疊加。產出 1 條 tech:hbm dated claim，明文禁止把中國售價漲幅當全球 HBM 價格代理。",
+        "primary_url": "https://www.freemalaysiatoday.com/category/business/2026/09/10/china-s-ai-chipmakers-raise-prices-as-high-bandwidth-memory-shortage-bites",
+        "research_action_id": "ra_0c7326fa93ceb6d40855b157f0909063",
+        "trace_origin_entity": "Reuters（獨家，2026-09-10）；經 Free Malaysia Today 授權轉載取得逐字"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "Wow, HBM reportedly drove up AI accelerator/card prices by 20-50% in China. So $SKHY, Samsung, $MU, should be happy to hear this: - Huawei has raised indicated pricing for the Ascend 950DT 20–50% above quotes from just 2 months ago - Cambricon's upcoming 690 is reportedly +20–30% Reuters stated that HBM acquired through grey market channels in China can cost several times regular pricing. As someone who is long memory, I'm happy about memory causing this much inflation.",
       "triage": {
@@ -59601,9 +59606,18 @@
       "first_seen": "2026-09-10T22:32:32.745347+00:00",
       "lead_id": "lead_ec439978dbc1e212e509da1914aea41e",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "一手取得並逐字核對：8-K Item 1.01，AAOI 於 2026-09-04 行使 2026-02-10 生效租約下的一次性購買選擇權，向 Blue Ridge Commerce Center West LLC 買下 16851 Blue Ridge Commerce Dr, Building 3, Houston, Texas 77489——8.858 英畝土地及其改良物、含約 153,928 可出租平方呎建物，用途逐字為 office, warehouse, light manufacturing and assembly；總價 US$26,783,472，交割日以現金付清，賣方以 special warranty deed 移轉，以 as is 基礎承受。依既有先例（lead_784638 的 2026-09-01 Houston Buildings 4/5 租賃案判為『公司財務/產能觀測，不直接構成新 canonical edge』），本件屬同類、不另造分類（L16），故不產 graph RA。但它與另外三份一手合起來構成 AAOI 的 committed_capex 缺口，已打包成 pq2 [534]。",
+        "pq2_ref": "534",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007057/aaoi_8k.htm",
+        "research_outcome": "無 graph RA（依先例屬財務／產能觀測）；併入 Engine C committed_capex 提案 pq2 [534]",
+        "trace_origin_entity": "Applied Optoelectronics, Inc.（SEC 一手）",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 8-K filed 2026-09-10 [007057]",
       "triage": {
