@@ -17100,9 +17100,16 @@
       "first_seen": "2026-09-10T22:32:40.765392+00:00",
       "lead_id": "lead_2b2f52a2081a91572dd5a667abf9f948",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "LITE 一手核對：Wupen Yuen（President, Global Business Units）2026-09-08／09／10 連三日各以代碼 S 賣出 500 股，價格分別 $895.99、$978.54、$961.44，交易後直接持有 114,627 股。10b5-1 勾選框已勾選，說明段明載係依 2026-05-19 採用之計畫執行——每日固定股數正是計畫性賣出的形狀，不得讀成對股價的擇時判斷。合計 1,500 股、約 US$1.42M。LITE 是本圖目前排序首選，故記錄於此供檢索；但內部人交易不入圖、不參與排序。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000010/xslF345X06/form4-09102026_090944.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:LITE",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -22708,9 +22715,16 @@
       "first_seen": "2026-09-10T22:32:41.502176+00:00",
       "lead_id": "lead_45665deb20f2526c77c0566d37d45369",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "LRCX 一手核對：Timothy Archer（President & CEO）2026-09-09 行使選擇權取得 30,000 股（代碼 M，$30.033）並同日以代碼 S 賣出 30,000 股 @ $319.26，交易後直接持有 1,075,966 股。10b5-1 勾選框已勾選，說明段明載係依 2026-02-24 採用之計畫執行，且為典型 option-exercise-and-sell。LRCX 非本圖投資候選。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/707549/000134360026000013/xslF345X06/wk-form4_1789059918.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 4 filed 2026-09-10 [000013]",
       "triage": {
@@ -25755,9 +25769,16 @@
       "first_seen": "2026-09-10T22:32:32.745250+00:00",
       "lead_id": "lead_55c8b7a797abe1ef2704c0ab958b1ca6",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "AAOI 一手核對：Stefan J. Murry（CFO）2026-09-10 以代碼 S 賣出 4,000 股，加權均價 $105.33（區間 $104.60–$105.98），交易後直接持有 367,168 股。10b5-1 勾選框**已勾選**，說明段明載係依 2025-08-12 採用之 Rule 10b5-1 交易計畫執行——屬預定計畫，非對當前資訊的反應。金額約 US$421K。⚠ 這位正是 Rosenblatt summit 逐字稿的發言人（見 lead_3db65dc4 追源紀錄）。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007058/xslF345X06/ownership.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 4 filed 2026-09-10 [007058]",
       "triage": {
@@ -33249,9 +33270,16 @@
       "first_seen": "2026-09-10T22:32:41.502041+00:00",
       "lead_id": "lead_79e1eada7e7dadf7d71a2ee36d68315d",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "LRCX 一手核對：Bethany Mayer（董事）2026-09-09 以代碼 S 賣出 9,557 股，加權均價 $314.74（區間 $314.08–$314.99，信託間接持有），交易後間接持有 20,995 股。10b5-1 勾選框未勾選，說明段只解釋加權均價。金額約 US$3.01M。LRCX 非本圖投資候選。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/707549/000140569326000011/xslF345X06/wk-form4_1789059862.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:LRCX",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "LRCX 4 filed 2026-09-10 [000011]",
       "triage": {
@@ -40695,9 +40723,17 @@
       "first_seen": "2026-09-10T22:32:47.709190+00:00",
       "lead_id": "lead_994f96ce74b5da75a5611c2c00801bee",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "一手取得並逐字核對：TSMC 2026 年 8 月合併營收 NT$514,806 百萬（新台幣 5,148.06 億），較 2026 年 7 月（NT$467,580 百萬）增 10.1%，較 2025 年 8 月增 53.3%；2026 年 1–8 月累計 NT$3,386,870 百萬，年增 39.3%。簽署人 CFO Wendell Huang，2026-09-10。這是每月例行揭露，屬時變財務數字——依 A1『不含時變數字』不入圖；Engine C 的 observation 欄位登記表也沒有『月營收』這一格（有的是 fiscal_year_results／segment_revenue_share／company_guidance，皆非月頻），故不另開欄位（L16：字彙有行為後果就必須被強制，不自創同義詞）。沿用既有先例（TSM 6-K 例行揭露一律 original_obtained + 無結構事實）。⚠ 數字本身仍是強的需求錨佐證（年增 53.3%），已寫在此供日後檢索。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1046179/000104617926000658/tsm-revenue20260910.htm",
+        "research_outcome": "例行月營收揭露；無 graph delta、無新 Engine C 欄位",
+        "trace_origin_entity": "Taiwan Semiconductor Manufacturing Company Limited（SEC 6-K 一手）",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSM",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "TSM 6-K filed 2026-09-10 [000658]",
       "triage": {
@@ -42431,9 +42467,16 @@
       "first_seen": "2026-09-10T22:32:34.893877+00:00",
       "lead_id": "lead_a13c0821159580743ce512156fb2150f",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "AMAT 一手核對：Judy Bruner（董事）2026-09-08 以代碼 S 賣出 1,000 股 @ $465（家族信託間接持有），交易後間接持有 25,544 股；另有 741 股 RSU 於 2027 年 3 月歸屬。10b5-1 勾選框未勾選。金額約 US$465K，相對持股比例小。AMAT 非本圖投資候選（設備端上游）。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026061408/xslF345X06/wk-form4_1789074224.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AMAT",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AMAT 4 filed 2026-09-10 [061408]",
       "triage": {
@@ -42464,9 +42507,16 @@
       "first_seen": "2026-09-10T22:32:47.027387+00:00",
       "lead_id": "lead_a20546668cd334f92251bdb30f6373c2",
       "published_at": "2026-09-09",
-      "refs": {},
+      "refs": {
+        "parked_reason": "TSLA 一手核對：Vaibhav Taneja（CFO）2026-09-05 RSU 歸屬取得 6,539 股（代碼 M，$0.0），2026-09-08 以代碼 S 賣出 2,605.75 股 @ $360.134——說明段逐字載明係依發行人股權計畫與政策『AUTOMATICALLY WITHHELD AND SOLD BY THE ISSUER』以支應 RSU 歸屬之扣繳稅款，非裁量性賣出。10b5-1 勾選框未勾選（自動代扣本來就不需要）。TSLA 非本圖投資候選。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1318605/000110465926106432/xslF345X06/tm2625055d1_4seq1.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:TSLA",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "robotics": {
           "counter_only": false,
@@ -49155,9 +49205,16 @@
       "first_seen": "2026-09-10T22:32:32.745109+00:00",
       "lead_id": "lead_bf15d126a1e462c989705e171e506c3c",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "AAOI 一手核對：Chang Hung-Lun（Fred，Officer）2026-09-08 以代碼 S 賣出 32,172 股，加權均價 $110.21（實際成交區間 $110.00–$110.76），交易後直接持有 249,276 股——本次賣出約當賣後持股的 11.4%，金額約 US$3.55M。⚠ **10b5-1 勾選框未勾選，說明段也未載明任何交易計畫**，故屬裁量性賣出。這與同公司 CFO Stefan Murry 同週的賣出性質不同（後者明載 2025-08-12 採用的 10b5-1 計畫）。AAOI 是本圖雷射軸候選，此為決策脈絡，記錄於此供檢索；但內部人交易不入圖、不參與排序。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007059/xslF345X06/ownership.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:AAOI",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "AAOI 4 filed 2026-09-10 [007059]",
       "triage": {
@@ -61420,9 +61477,16 @@
       "first_seen": "2026-09-10T22:32:38.110339+00:00",
       "lead_id": "lead_f4387005bbc0d5135033574762a6197c",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "parked_reason": "GFS 一手核對：Camilla Languille（董事）2026-09-08 RSU 歸屬 5,235 股，其中 1,571 股以代碼 F 由公司扣繳抵稅（$45.21），非裁量性賣出；另餘 3,291 股 RSU 於 2027-07-28 歸屬。10b5-1 勾選框**未勾選**，但本件本來就不是賣出決策。無投資訊號。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026061371/xslF345X06/wk-form4_1789072130.xml",
+        "research_outcome": "內部人交易屬所有權／市場資料，不入圖（A1 不含時變數字）；Engine C observation 欄位登記表亦無 insider_transaction 這一格，依 L16-3 不自創欄位。",
+        "trace_original_date": "2026-09-10",
+        "trace_requires_user": "no",
+        "trace_status": "original_obtained"
+      },
       "source": "edgar:GFS",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GFS 4 filed 2026-09-10 [061371]",
       "triage": {
