@@ -256,7 +256,23 @@ Net variant vs consensus +0.47
 **重點不是只顯示 Internal EPS vs Consensus，而是回答「為什麼不同」。**
 （今天 `alpha/fundamental` 已有 `sensitivities`，但那是「動一格變多少」，不是「這個差異來自哪條 belief」。）
 
-### B. Consensus Implied Assumptions／Reverse Bridge
+### B. Consensus Implied Assumptions／Reverse Bridge ✅ **2026-09-11 交付**
+
+> **交付的比原構想窄，而那是刻意的。** 原文想「反推市場大致隱含的 growth／margin／other
+> assumptions」——那是欠定的（共識只給一個總量）。實作改成**一次只解一個 driver、其餘固定
+> 成我們自己的假設**，所以每個值都是條件解，畫面與 `method` 都逐字說出「兩列不能同時成立」。
+> 落地：`alpha/reverse/`（二分求解，區間照抄 `ASSUMPTION_DRIVERS` 的合法上下限，
+> **走真正的 `build_bridge`**，不另立第二套算術）→ `ExpectationGapSection.reverse_bridge`
+> → APP「現價隱含什麼」。
+>
+> 實跑：COHR 在 25x 下市場隱含 EPS 12.14（我們 8.94、共識 9.42），要獨力撐起需 D&C 成長
+> +126%（我們 +60%）；LITE 我們比市場樂觀 7.2%；TSM／AVGO 全部 `already_equal`——那是
+> `consensus_inverted` 的**機械證明**，不是推論。
+> 查證：`python -m pytest tests/test_reverse_bridge.py`
+>
+> ⚠ **EV/Sales 的反解沒做**（SOI.PA 走那條）：那是另一條算術（營收 → EV → 每股），
+> 誠實 `missing` 並說明，不共用本益比法這一條。
+
 
 在資料足夠時，從 consensus Revenue／EPS 等**反推**市場大致隱含的 growth／margin／other assumptions。
 目的是把比較從最末端往上游移：
@@ -301,7 +317,8 @@ which graph edges helped／hurt。
 ### G. Model expansion backlog
 
 Valuation v2｜bull／base／bear scenarios｜probability-weighted expected return（**只有真的有
-probability contract 才做**）｜total return｜historical normalized multiples｜peer valuation｜
+probability contract 才做**）｜total return｜historical normalized multiples｜
+~~peer valuation~~（**2026-09-11 移到「明確不排程」，理由已量測**）｜
 growth durability｜margin／ROIC quality｜cycle position。
 
 ### H. Consumer／production sequence（near-term 固定順序）
@@ -317,6 +334,9 @@ Step 3 Entry Logic ✅（2026-09-06）
   → 呈現責任重切 C（Daily 收斂成心跳）✅（2026-09-08）
   → B2-positions（部位與問責搬 APP）✅（2026-09-08）
   → APP 白話化＋單檔走勢圖 ✅（2026-09-08，GO）
+  → derivation ＋ opinion stance（分開「還沒形成觀點」與「算過但接近共識」）✅（2026-09-10）
+  → 清單分段 ＋ 首屏常駐計數器「有我們自己的看法 N／已有判讀 M」 ✅（2026-09-10）
+  → Reverse Bridge（§B）✅（2026-09-11）
   → Phase 只剩：C 的「≤7K 實測待下一份 brief」（外部驗證，不需再開工）
      ⚠ 順序修正（2026-09-08）：**A 必須在 C 之前**——Daily 一旦不印，APP 就得每天被 materialize，
      否則使用者打開看到的是幾天前的數字（L13：管子只接一頭）。
@@ -395,6 +415,7 @@ Access 應用程式＝`Access controls → Applications`（右上 `Create new ap
 
 | 項 | 為什麼不做 |
 |---|---|
+| **peer valuation／`config/peer_groups.json`**（2026-09-11 量測後否決） | 樣本結構上不足，**換一個分組軸也解決不了**。實測最新交易日 `pe_forward`：可映射到 `sector_anchors` 的四組裡，3 組 n≤2（一組 n=1）；最大的「AI 光互連／CPO」9 檔裡 7 個正值，範圍 **9.9x–33.2x（最高是最低的 3.3 倍）**，而且組內混著 IC 設計（AVGO）、晶圓代工（TSM）、化合物半導體基板（AXTI／IQE.L）、綜合電線電纜（5802.T）——**需求同源不代表估值可比**：分組軸是「誰的需求驅動你」，而本益比取決於「你的生意長什麼樣」，兩個軸正交。另有 2 檔本益比為負（IQE.L −224.8x、POET −47.1x），剔除虧損公司本身又是一個判斷。<br>取代它的是 **§B Reverse Bridge**：只用這一檔自己的價格與假設，不需要 peer 樣本。<br>查證：`python -c "import json;print(json.load(open('config/sector_anchors.json',encoding='utf-8'))['sectors'])"` ＋ Engine C `SELECT ticker,pe_forward FROM financial_snapshots WHERE bar_date=(SELECT MAX(bar_date) ...)` |
 | `_only_system_internal_blockers` 的空集合分支 | 依 L14：改了 **0 筆**資料會變，且風險不對稱（會把 L7 的火警警報藏掉）。要動必須先出現真實實例 |
 | 等待機制三套併入 Event Watch | 2026-09-02 實測三套的「假死」實例全為 **0/0/0**。**重構不得以「統一」為由推翻已量測結論** |
 | 待辦池 evidence conflict 類型 | 史上最重度 drain 期 `open_conflicts` 仍為 **0**，滯留 0 |
