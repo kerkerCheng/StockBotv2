@@ -9379,6 +9379,18 @@
       "source": "decision_lab",
       "title": "co:sk_hynix：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-11T14:47:02.842832+00:00",
+      "hint": "go＝執行 `python -m alpha abstention AAOI --add library/private/alpha/abstention_proposals/AAOI_forward_pe.json`。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live。｜依據：本輪已把基期補到最完整（mo_487f6ea8，8-K EX-99.1 印出的 GAAP 與 non-GAAP 全部）並寫好六條 FY2026 假設，橋算得出來、結果是內部 GAAP EPS −0.1006；共識 +0.68 是 non-GAAP 口徑（FY2025 year_ago_actual −0.26 ＝ 新聞稿 non-GAAP EPS，GAAP 是 −0.64），而公司**不公布 non-GAAP 營業利益**，橋無法在共識的口徑上重建。**這是 method／口徑不適用，不是缺料**——刻意不硬給一個 target_pe 生出負的 fair value。｜go 之後會變的數字：AAOI 的 headline `absence_kind` 由 `not_yet_recorded` 變 `deliberate_abstention`（settled）；readiness **仍然 blocked**（AGENTS.md：settled 不讓 readiness 變好），但段 5 的『到終局』會多一檔。｜drop＝你認為應改用別的 method（例如營收倍數），那我改走 ROADMAP 開發項。",
+      "n": 550,
+      "reason": null,
+      "ref_id": "abstention_proposal:AAOI_forward_pe",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "AAOI：內部 FY2026 GAAP EPS −0.10 而共識 +0.68 是 non-GAAP、公司不公布 non-GAAP 營業利益——提案 Abstention（valuation / target_pe）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -20396,6 +20408,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 550,
+  "next_n": 551,
   "schema_version": "1"
 }
