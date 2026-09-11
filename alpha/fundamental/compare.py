@@ -67,6 +67,39 @@ def verify_consensus_basis(estimate: ConsensusEstimate, base: FiscalYearActuals 
     return matches[0] if len(matches) == 1 else "unverified"
 
 
+def describe_basis_mismatch(
+    estimate: ConsensusEstimate, base: FiscalYearActuals | None
+) -> str | None:
+    """`unverified` 時把**兩個數字**寫出來，讓讀者自己看得出差多少。
+
+    事發（2026-09-09 SOI.PA）：理由句只說「provider 未宣告且無法用去年實際值核實」，
+    於是「差 2%」與「差 40%」長得一模一樣。而那兩種差距的處置完全相反——前者多半是
+    換算匯率（TSM 實測：provider 10.65 用年均價、20-F 印的 10.43 用年末 NT$31.37），
+    後者才是真的會計口徑不同。
+
+    ⚠ 本函式**只描述，不分類**：它不宣稱差距的成因是匯率還是口徑。把
+    `incompatible_basis` 拆成兩個訊號是 ROADMAP「`incompatible_basis` 兩義」那一條的事，
+    需要先決定「願意接受多少換算差」——那是使用者的判斷，不是這裡能猜的。
+    """
+    if estimate.metric != "eps" or base is None or estimate.year_ago_actual is None:
+        return None
+    if not base.period.same_as(estimate.period.shifted(-1)):
+        return None
+    provider = float(estimate.year_ago_actual)
+    parts: list[str] = []
+    for name, block in (("gaap", base.gaap), ("non_gaap", base.non_gaap)):
+        value = (block or {}).get("diluted_eps")
+        if value is None:
+            continue
+        delta = (provider / float(value) - 1.0) if float(value) else None
+        parts.append(f"一手 {name} {float(value):,.4g}"
+                     + (f"（差 {delta:+.1%}）" if delta is not None else ""))
+    if not parts:
+        return None
+    return (f"provider 去年實際 {provider:,.4g} vs " + "／".join(parts)
+            + "——差距大小自己看：換算匯率差通常在個位數 %，會計口徑差不會")
+
+
 def reconcile_consensus_base(
     estimate: ConsensusEstimate, base: FiscalYearActuals | None
 ) -> str | None:
@@ -102,6 +135,7 @@ def compare_metric(
     consensus_basis: str,
     internal_currency: str | None,
     base_reconciliation: str | None = None,
+    basis_detail: str | None = None,
 ) -> ExpectationComparison:
     """一個指標的比較。回傳物件的 `status != comparable` 時**沒有任何 gap 數字**。"""
     unit = _METRIC_UNIT.get(metric)
@@ -138,7 +172,9 @@ def compare_metric(
     if metric == "eps":
         if consensus_basis not in ("gaap", "non_gaap"):
             return _no("incompatible_basis",
-                       f"共識口徑 {consensus_basis}：provider 未宣告且無法用去年實際值核實，不得與內部 {internal.accounting_basis} 相減")
+                       f"共識口徑 {consensus_basis}：provider 未宣告且無法用去年實際值核實，"
+                       f"不得與內部 {internal.accounting_basis} 相減"
+                       + (f"｜{basis_detail}" if basis_detail else ""))
         if internal.accounting_basis != consensus_basis:
             return _no("incompatible_basis",
                        f"內部 {internal.accounting_basis} vs 共識 {consensus_basis}——口徑不同不得相減")
@@ -152,4 +188,5 @@ def compare_metric(
                                  reason=reason, **common)
 
 
-__all__ = ["compare_metric", "reconcile_consensus_base", "verify_consensus_basis"]
+__all__ = ["compare_metric", "describe_basis_mismatch", "reconcile_consensus_base",
+           "verify_consensus_basis"]

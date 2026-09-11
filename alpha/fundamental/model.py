@@ -25,7 +25,12 @@ from ..contracts import EvidenceRef, content_digest
 from ..errors import ContractViolation
 from .assumptions import select_assumptions
 from .bridge import build_bridge
-from .compare import compare_metric, reconcile_consensus_base, verify_consensus_basis
+from .compare import (
+    compare_metric,
+    describe_basis_mismatch,
+    reconcile_consensus_base,
+    verify_consensus_basis,
+)
 from .contracts import (
     ASSUMPTION_DRIVERS, AssumptionSelection, ConsensusEstimate, ExpectationComparison,
     FiscalPeriod, FiscalYearActuals, FundamentalModelResult, GuidanceObservation, ModeledMetric,
@@ -204,6 +209,9 @@ def build_fundamental_model(
             # 共識的去年實際值必須對得上我們的基期，否則兩邊量的不是同一個東西（6324.T 實測：
             # 同一批共識的 EPS 是連結、營收是單體）。EPS 的同一件事在 verify_consensus_basis 裡做。
             base_reconciliation=(reconcile_consensus_base(estimate, actuals) if estimate else None),
+            # `unverified` 時把兩個數字一起印出來——不分類成因，只讓「差 2%」與「差 40%」
+            # 在理由句上分得出來（ROADMAP「full-chain／SOI.PA 三筆小債」③）。
+            basis_detail=(describe_basis_mismatch(estimate, actuals) if estimate else None),
         )
 
     # ---- 6. 狀態 -------------------------------------------------------------
