@@ -98,6 +98,14 @@ git status --short
 fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engine_b.hypotheses` 的 verification 後
 `python -m engine_b.event_watch consume <watch_id>` 收掉——它是研究，不是機械）：
 
+⚠ **段 0b 對照下來是「無關」時用 `reactivate`，不是 `consume`**（2026-09-11 補上 CLI）：
+`python -m engine_b.event_watch reactivate <watch_id> --note "為什麼判定無關"`。
+`consume` 說的是「這個等待結束了」；`reactivate` 說的是「觸發它的那則 lead 不是它在等的東西，
+等待條件依然成立」。用錯會讓一個還沒被回答的問題安靜消失。觸發 lead 在 fire 時就已進
+`consumed_leads`，所以同一則不會再叫醒第二次；到期仍由 `expires` 收斂。
+實測（2026-09-09）：ew_0005／0007／0057 三個 `fact_verification` 都被**無關的** tier-1 lead
+以 entity 交集誤觸（COHR 8-K 是 RSU、AAOI 8-K 是租賃），當時沒有這個命令，只能直接改 JSON。
+
 1. **所有「使用者已授權、還沒做完」的項目** — 放著不動是本 skill 要修的那個 bug。
    **永遠排第一，不論它們看起來多無聊。** 包含兩類，同級處理：
    - **`pq1 進行中` 的工單**（`dispatch_status` 為 queued／researching）
@@ -110,8 +118,14 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 3. **每檔閉環（段 5，2026-09-09 起）** — 前兩段清空後、覆蓋缺口之前。工單不是自己列的：
    `drain` 首行的「段5 每檔閉環」一行與 `python -m webapp status` 的「每檔閉環」段，都由
    `alpha/closure.py` 從 analyst view artifact 的 `readiness.blocker_details` 照抄（每格帶
-   `absence_kind`／`settled`）。**下一檔選誰不是自由心證**——`closure.NEXT_PICK_RULE` 五條依序比：
-   有同期 EPS 共識 → forward EPS 為正 → 產業能加一（所屬產業尚無 ready 檔）→ 瓶頸排序名次 → ticker。
+   `absence_kind`／`settled`）。**下一檔選誰不是自由心證**——`closure.NEXT_PICK_RULE` 七條依序比：
+   使用者沒有明示 defer → 有同期 EPS 共識 → forward EPS 為正（0y 與 +1y 同時為正）
+   → 產業能加一（所屬產業尚無 ready 檔）→ 瓶頸排序名次 → 已有基期觀測 → ticker。
+   ⚠ 第一條是**使用者的明示指示**（pq2 有未結案的 `deferred_at`），所以排在四條研究判準之前；
+   它往後排、**不過濾**——藏起來會讓「沒做」與「不存在」同形。
+   ⚠ 倒數第二條的成本維度相反，**只破平手**：前四條的相對順序一格都沒動，它只在四條全部同分時
+   才說話（2026-09-11 實測：59 檔未到終局，57 檔落在 3 個前四條同分的群組裡——原本真正在決定
+   順序的是 ticker 字典序）。
    **深度優先**：第 N 檔未到終局不開第 N+1 檔，除非它卡在 pq2 或世界。終局三種：ready／
    剩餘 blocker 全部 settled／全部掛在 pq2 編號上。每一格的路（判準機械，見 `alpha/absence.py`）：
    - `not_yet_recorded`／`upstream_unavailable` 的基期實績、指引 → 抓一手財報寫 mechanical 觀測（不碰 gate）

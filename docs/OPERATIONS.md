@@ -483,7 +483,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m webapp status                          # 段 5 的完整版：每檔閉環（到終局幾檔、下一檔是誰、為什麼）
 ```
 
-段 5 的工單與下一檔選取住 `alpha/closure.py`（`NEXT_PICK_RULE` 五條依序比；深度優先由 skill 執行）。
+段 5 的工單與下一檔選取住 `alpha/closure.py`（`NEXT_PICK_RULE` 七條依序比：第一條是「使用者沒有明示 defer」，倒數第二條「已有基期觀測」只破平手；深度優先由 skill 執行）。
 
 新增一種工作狀態時：先在 `queue_segments.py` 登記它屬於哪一段、誰來取，再寫產生它的程式——
 反過來做，`QueueSegments` 會在第一筆資料出現當天變紅，那是設計，不是誤報。

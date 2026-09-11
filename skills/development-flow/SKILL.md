@@ -201,6 +201,7 @@ Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis
 兩者問的不是同一件事，所以**不是摘要與被摘要的關係**——把八欄壓縮一遍充當它，等於什麼都沒加。
 
 輸出順序固定：**決策／收據區塊 → HUMAN SUMMARY → `STEP_RESULT`。**
+人話在前、證據在後——**HUMAN SUMMARY 一律在 `STEP_RESULT` 之前**，不得反過來。
 
 ⚠ **本 Step 若要使用者決定任何事，最前面必須是決策區塊**，格式用共用的那一份：
 [`skills/daily-brief/SKILL.md`](../daily-brief/SKILL.md)「待核准項目的內容密度」。
