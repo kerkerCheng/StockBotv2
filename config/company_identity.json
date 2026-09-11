@@ -40,11 +40,13 @@
     },
     {
       "company_id": "co:apollo",
-      "research_ticker": "APO"
+      "research_ticker": "APO",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:apple",
-      "research_ticker": "AAPL"
+      "research_ticker": "AAPL",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:applied_materials",
@@ -62,7 +64,8 @@
     },
     {
       "company_id": "co:arista",
-      "research_ticker": "ANET"
+      "research_ticker": "ANET",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:axt",
@@ -77,7 +80,8 @@
     },
     {
       "company_id": "co:blackstone",
-      "research_ticker": "BX"
+      "research_ticker": "BX",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:boston_dynamics",
@@ -90,7 +94,8 @@
     },
     {
       "company_id": "co:cadence",
-      "research_ticker": "CDNS"
+      "research_ticker": "CDNS",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:casela_technologies",
@@ -124,11 +129,13 @@
     },
     {
       "company_id": "co:corning",
-      "research_ticker": "GLW"
+      "research_ticker": "GLW",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:enablence_technologies",
-      "research_ticker": "ENA.V"
+      "research_ticker": "ENA.V",
+      "market_currency": "CAD"
     },
     {
       "company_id": "co:ewellix",
@@ -155,7 +162,8 @@
     },
     {
       "company_id": "co:google",
-      "research_ticker": "GOOGL"
+      "research_ticker": "GOOGL",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:gxo_logistics",
@@ -203,7 +211,8 @@
     },
     {
       "company_id": "co:intel",
-      "research_ticker": "INTC"
+      "research_ticker": "INTC",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:intelliepi",
@@ -225,7 +234,8 @@
     },
     {
       "company_id": "co:jabil",
-      "research_ticker": "JBL"
+      "research_ticker": "JBL",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:jl_mag",
@@ -521,7 +531,8 @@
     },
     {
       "company_id": "co:umc",
-      "research_ticker": "UMC"
+      "research_ticker": "UMC",
+      "market_currency": "USD"
     },
     {
       "company_id": "co:unitree",
