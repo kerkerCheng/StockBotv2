@@ -28,6 +28,7 @@ from .bridge import build_bridge
 from .compare import (
     compare_metric,
     describe_basis_mismatch,
+    fx_tolerated_delta,
     reconcile_consensus_base,
     verify_consensus_basis,
 )
@@ -212,6 +213,8 @@ def build_fundamental_model(
             # `unverified` 時把兩個數字一起印出來——不分類成因，只讓「差 2%」與「差 40%」
             # 在理由句上分得出來（ROADMAP「full-chain／SOI.PA 三筆小債」③）。
             basis_detail=(describe_basis_mismatch(estimate, actuals) if estimate else None),
+            # 換算容差認定時的殘差跟著走——它與 gap 同量級，靜默吸收就是把訊號換成噪音。
+            fx_delta=(fx_tolerated_delta(estimate, actuals) if estimate else None),
         )
 
     # ---- 6. 狀態 -------------------------------------------------------------

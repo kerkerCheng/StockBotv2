@@ -25,7 +25,12 @@ from pathlib import Path
 import pytest
 
 from alpha.fundamental.compare import reconcile_consensus_base
-from alpha.fundamental.contracts import COMPARISON_STATUSES, FiscalPeriod
+from alpha.fundamental.contracts import (
+    COMPARISON_STATUSES,
+    FiscalPeriod,
+    FiscalYearActuals,
+    ModeledMetric,
+)
 from alpha.valuation.contracts import METHOD_FORWARD_EARNINGS_MULTIPLE, method_applicability
 from alpha.valuation.model import units_comparable
 from tests.test_fundamental_model import _actuals, _consensus, _run
@@ -254,3 +259,106 @@ def test_dollar_scale_identification_is_unchanged() -> None:
     base = _actuals()
     assert verify_consensus_basis(_consensus("eps", 9.41634, year_ago=5.61), base) == "non_gaap"
     assert verify_consensus_basis(_consensus("eps", 9.41634, year_ago=4.12), base) == "gaap"
+
+
+# ---------------------------------------------------------------------------
+# 換算匯率容差（2026-09-11）：把 `unverified` 的兩種語意拆開
+# ---------------------------------------------------------------------------
+
+def _single_candidate_base(diluted_eps: float = 10.43):
+    """只有 gaap 區塊的基期——TSM 的形狀（20-F 沒印 adjusted EPS）。"""
+    from tests.test_fundamental_model import ACT_REF
+
+    return FiscalYearActuals(
+        period=FiscalPeriod(end=date(2025, 12, 31)), currency="USD", revenue=1.0e11,
+        segment_revenue=None, gaap={"diluted_eps": diluted_eps}, non_gaap=None,
+        evidence=(ACT_REF,))
+
+
+def test_translation_difference_is_no_longer_the_same_signal_as_a_basis_difference() -> None:
+    """TSM 2.11%（換算率）與 SOI.PA 46.84%（真的口徑不同）不得再共用一個訊號。
+
+    2026-09-11 實測 13 檔樣本：11 檔逐字相等、TSM 2.11%、SOI.PA 46.84%——
+    2.11% 與「最窄的 gaap↔non_gaap 間距 4.70%」之間沒有任何樣本，容差 3% 落在中間。
+    """
+    from alpha.fundamental.compare import fx_tolerated_delta, verify_consensus_basis
+
+    base = _single_candidate_base()                       # 一手 10.43（年末 NT$31.37）
+    tsm = _consensus("eps", 12.0, period=FiscalPeriod(end=date(2026, 12, 31)), year_ago=10.65)
+    assert verify_consensus_basis(tsm, base) == "gaap_fx_tolerated"
+    assert fx_tolerated_delta(tsm, base) == pytest.approx(0.0211, abs=5e-4)
+
+    soi = _consensus("eps", 12.0, period=FiscalPeriod(end=date(2026, 12, 31)), year_ago=-3.28)
+    assert verify_consensus_basis(soi, _single_candidate_base(-6.17)) == "unverified"
+    assert fx_tolerated_delta(soi, _single_candidate_base(-6.17)) is None
+
+
+def test_exact_match_always_beats_a_tolerated_one() -> None:
+    """放寬的只有識別，判準反而更嚴（L15-4）。
+
+    non_gaap 逐字相等、gaap 剛好落在 3% 內時，答案不得取決於字典序。
+    """
+    from alpha.fundamental.compare import verify_consensus_basis
+    from tests.test_fundamental_model import ACT_REF
+
+    base = FiscalYearActuals(
+        period=FiscalPeriod(end=date(2025, 12, 31)), currency="USD", revenue=1.0e10,
+        segment_revenue=None, gaap={"diluted_eps": 5.75}, non_gaap={"diluted_eps": 5.61},
+        evidence=(ACT_REF,))                              # 5.61 與 5.75 只差 2.5%
+    est = _consensus("eps", 9.0, period=FiscalPeriod(end=date(2026, 12, 31)), year_ago=5.61)
+    assert verify_consensus_basis(est, base) == "non_gaap", "逐字相等的那個必須贏"
+
+
+def test_two_candidates_inside_the_tolerance_fail_closed() -> None:
+    """容差內恰好一個才算數——0 個或 2 個都是 unverified。
+
+    這是「寬容不會選錯」的唯一保證：放寬只可能讓答案退回不知道，不會讓它選錯一個。
+    """
+    from alpha.fundamental.compare import verify_consensus_basis
+    from tests.test_fundamental_model import ACT_REF
+
+    base = FiscalYearActuals(
+        period=FiscalPeriod(end=date(2025, 12, 31)), currency="USD", revenue=1.0e10,
+        segment_revenue=None, gaap={"diluted_eps": 5.70}, non_gaap={"diluted_eps": 5.80},
+        evidence=(ACT_REF,))
+    est = _consensus("eps", 9.0, period=FiscalPeriod(end=date(2026, 12, 31)), year_ago=5.75)
+    assert verify_consensus_basis(est, base) == "unverified"
+
+
+def test_the_tolerance_stops_short_of_the_narrowest_observed_basis_gap() -> None:
+    """3% 不是挑的，是量出來的：必須低於 002472.SZ 的 4.70%（最窄的 gaap↔non_gaap 間距）。
+
+    這條會在有人把容差調到 4.7% 以上時變紅——那一刻 gaap 與 non_gaap 開始互相污染。
+    """
+    from alpha.fundamental.compare import _FX_TOLERATED_REL_TOL, _BASIS_MATCH_REL_TOL
+
+    assert _BASIS_MATCH_REL_TOL < _FX_TOLERATED_REL_TOL < 0.047
+
+
+def test_a_tolerated_comparison_carries_its_residual_as_a_number_not_only_prose() -> None:
+    """殘差是結構化欄位——下游要拿它比大小，不得 parse 理由句（L16）。"""
+    from alpha.fundamental.compare import compare_metric
+
+    internal = ModeledMetric(
+        metric="eps", period=FiscalPeriod(end=date(2026, 12, 31)), value=12.5,
+        unit="currency_per_share", accounting_basis="gaap", input_dependency="session_judgment")
+    est = _consensus("eps", 12.0, period=FiscalPeriod(end=date(2026, 12, 31)), year_ago=10.65)
+    cmp_ = compare_metric("eps", internal, est, consensus_basis="gaap_fx_tolerated",
+                          internal_currency="USD", fx_delta=0.0211)
+    assert cmp_.status == "comparable"
+    assert cmp_.fx_translation_delta == pytest.approx(0.0211)
+    assert "換算容差" in (cmp_.reason or "")
+
+
+def test_a_lever_smaller_than_the_residual_says_so_instead_of_looking_like_a_finding() -> None:
+    """TSM 實測：倍數桿 +1.71% 配 +2.11% 殘差——**它在雜訊裡**，畫面必須講出來。
+
+    這條守的是「放寬識別」不得變成「拿精度換覆蓋率而不說」。
+    """
+    from alpha.implied_return.attribution import noise_floor_note
+
+    note = noise_floor_note(fx_delta=0.0211, eps_contribution=-0.0000005, multiple_contribution=0.01715)
+    assert note is not None and "雜訊裡" in note and "EPS 桿" in note and "倍數桿" in note
+    # 殘差不存在（逐字相等）或桿明顯大於殘差時不得亂講話
+    assert noise_floor_note(fx_delta=None, eps_contribution=0.3, multiple_contribution=0.4) is None
+    assert noise_floor_note(fx_delta=0.0211, eps_contribution=0.30, multiple_contribution=0.25) is None

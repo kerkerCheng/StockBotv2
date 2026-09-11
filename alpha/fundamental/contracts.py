@@ -92,6 +92,32 @@ class FiscalPeriod:
 #: 也沒能用一手數字核對出來——**不得**與任何口徑相減。
 ACCOUNTING_BASES: tuple[str, ...] = ("gaap", "non_gaap", "not_applicable", "unverified")
 
+#: **共識口徑的核實結果**——與 `ACCOUNTING_BASES` 刻意分開的第二個封閉字彙（2026-09-11）。
+#:
+#: `ACCOUNTING_BASES` 是三本 private append-only ledger 每筆紀錄**身分**的一部分（L10），
+#: 動它等於動既有紀錄；而這一組是**每次跑都重算**的判定結果，可以有自己的字彙。
+#:
+#: 拆它的理由是 L12（一個表示兩種語意）：`unverified` 原本同時承載
+#: ①「provider 的數字對不上任何一個候選」＝真的會計口徑不同，與
+#: ②「對得上，但換算匯率不同」＝同一個口徑、不同 FX 慣例。
+#: 兩者的處置完全相反——①要補 `non_gaap` 區塊，②要的是承認換算差或用同一條 FX 路徑重算。
+#: 壓在一格時下游只能取兩者的下限：全部拒絕比較，於是非美股那一批的
+#: **兩欄拆解（EPS 桿／倍數桿）永遠缺席**，而那兩欄正是回答「全負是方法偏空還是市場太貴」
+#: 的唯一證據。
+#:
+#: ⚠ `*_fx_tolerated` **不是** `gaap`／`non_gaap` 的同義詞，呈現層不得把它壓回去講：
+#: 它明說「口徑認出來了，但這個數字帶著一個已知的換算誤差」。
+CONSENSUS_BASES: tuple[str, ...] = (
+    "gaap", "non_gaap",
+    "gaap_fx_tolerated", "non_gaap_fx_tolerated",
+    "unverified", "not_applicable",
+)
+
+
+def consensus_basis_stem(value: str) -> str:
+    """`gaap_fx_tolerated` → `gaap`。未知值原樣回傳，由呼叫端的封閉性檢查去擋。"""
+    return value[: -len("_fx_tolerated")] if value.endswith("_fx_tolerated") else value
+
 #: 假設的知識種類。**與 read model 的 `Basis` 字彙同名同義**（`tests` 斷言它是子集）：
 #: `observation`＝值直接取自同期觀測；`heuristic_proxy`＝機械規則（如「沿用上一年」）；
 #: `session_judgment`＝session／LLM 的判斷。刻意沒有 `deterministic`——輸入假設不會是
@@ -575,6 +601,11 @@ class ExpectationComparison:
     assumption_ids: tuple[str, ...] = ()
     observation_refs: tuple[str, ...] = ()
     consensus_refs: tuple[str, ...] = ()
+    #: 共識口徑經**換算容差**認定時的殘差（provider ÷ 一手 − 1）。逐字相等或不可比時是 None。
+    #: ⚠ 它是**這個 gap 的雜訊下限**：同一個換算差原樣進到 gap 裡，所以任何小於它的
+    #: 差異都不具意義。結構化欄位而不是只寫在 `reason` 裡——下游要拿它做比較，
+    #: 而呈現層不得 parse 理由句去猜（L16）。
+    fx_translation_delta: float | None = None
 
     def __post_init__(self) -> None:
         if self.status not in COMPARISON_STATUSES:
@@ -584,6 +615,12 @@ class ExpectationComparison:
                 f"ExpectationComparison[{self.metric}] status={self.status} 不得帶 gap 數字——不能硬減")
         if self.status == "comparable" and (self.internal is None or self.consensus is None):
             raise ContractViolation("comparable 必須兩邊都有值")
+        if self.fx_translation_delta is not None:
+            _finite(self.fx_translation_delta, "ExpectationComparison.fx_translation_delta")
+            if not str(self.accounting_basis_consensus or "").endswith("_fx_tolerated"):
+                raise ContractViolation(
+                    "fx_translation_delta 只屬於 *_fx_tolerated 的共識口徑——"
+                    f"收到 {self.accounting_basis_consensus!r}")
 
 
 @dataclass(frozen=True, slots=True)
@@ -634,6 +671,12 @@ class FundamentalModelResult:
             raise ContractViolation(f"FundamentalModelResult.status 未登記：{self.status!r}")
         if self.accounting_basis not in ACCOUNTING_BASES:
             raise ContractViolation(f"accounting_basis 未登記：{self.accounting_basis!r}")
+        # 字彙一旦有行為後果就必須被強制（L16-3）：`consensus_bases` 的值決定
+        # `compare_metric` 比不比較，先前是自由字串——打錯不會報錯，只會靜默變成不可比。
+        for key, value in (self.consensus_bases or {}).items():
+            if value not in CONSENSUS_BASES:
+                raise ContractViolation(
+                    f"consensus_bases[{key!r}] 未登記：{value!r}（合法值 {CONSENSUS_BASES}）")
 
     def metric(self, name: str) -> ModeledMetric | None:
         return self.metrics.get(name)
@@ -650,7 +693,7 @@ class FundamentalModelResult:
 
 
 __all__ = [
-    "ACCOUNTING_BASES", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "ASSUMPTION_REF_ROLES", "BRIDGE_VERSION",
+    "ACCOUNTING_BASES", "CONSENSUS_BASES", "consensus_basis_stem", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "ASSUMPTION_REF_ROLES", "BRIDGE_VERSION",
     "CONSENSUS_REF_PREFIX", "PROVENANCE_SEMANTICS",
     "COMPARISON_STATUSES", "FISCAL_PERIOD_KINDS", "MODEL_VERSION",
     "PERIOD_MATCH_TOLERANCE_DAYS", "TOTAL_SCOPE", "AssumptionSelection", "BridgeStep",
