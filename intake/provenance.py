@@ -228,29 +228,60 @@ def inspect_provenance(
     if alternate_extraction.exists():
         conflicts.append(_relative(alternate_extraction, root))
 
+    superseded: str | None = None
     if extraction_path.exists():
         try:
             current = json.loads(extraction_path.read_text(encoding="utf-8"))
         except (OSError, ValueError):
             conflicts.append(_relative(extraction_path, root))
         else:
-            if canonical_extraction_hash(current) != canonical_extraction_hash(prepared):
-                conflicts.append(_relative(extraction_path, root))
+            current_hash = canonical_extraction_hash(current)
+            if current_hash != canonical_extraction_hash(prepared):
+                # ⚠ 更正走廊（2026-09-11 使用者定案）——**不是放寬 no-clobber，是給它一條
+                # 具名的出口**。先前 intake 只有「發布後不可竄改」而沒有配對的更正路徑，
+                # 唯一繞道是換一個 doc_id 指向同一個 URL——那會在圖裡產生兩份 SourceDoc、
+                # 同一個 origin_entity，正是 L8 要防的假交叉驗證形狀。
+                #
+                # 合法更正的三個條件（缺一即照舊當 conflict）：
+                #   ①新 extraction 明寫 `supersedes_extraction_sha256`；
+                #   ②該值**等於現存檔案的 hash**——你必須指名你要取代的是哪一版，
+                #     不能說「取代現在那份，不管它是什麼」；
+                #   ③舊檔會被歸檔保留（publish 端負責），兩份都留。
+                declared = str(
+                    (prepared.get("source_doc") or {}).get("supersedes_extraction_sha256") or ""
+                ).strip().lower()
+                if declared and declared == current_hash:
+                    superseded = current_hash
+                else:
+                    conflicts.append(_relative(extraction_path, root))
     else:
         missing.append(_relative(extraction_path, root))
 
     if raw_text is not None:
         if raw_path.exists():
             if raw_path.read_text(encoding="utf-8") != raw_text:
-                conflicts.append(_relative(raw_path, root))
+                # 更正是一次完整的提交：extraction 改了、它的節錄多半也改了。
+                # 只放行 extraction 而把 raw 判成 conflict，會讓合法更正永遠過不了。
+                # ⚠ 但只有在 extraction 已經合法 supersede 時才放行——單獨改 raw
+                # 而不動 extraction 仍然是竄改。
+                if not superseded:
+                    conflicts.append(_relative(raw_path, root))
         else:
             missing.append(_relative(raw_path, root))
 
-    status = "conflict" if conflicts else ("absent" if missing else "matching")
+    if conflicts:
+        status = "conflict"
+    elif superseded:
+        status = "supersede"
+    elif missing:
+        status = "absent"
+    else:
+        status = "matching"
     return {
         "status": status,
         "missing": missing,
         "conflicts": conflicts,
+        "superseded_sha256": superseded,
         "paths": [
             _relative(extraction_path, root),
             *([_relative(raw_path, root)] if raw_text is not None else []),
@@ -304,6 +335,21 @@ def publish_provenance(
 
     permission = prepared["source_doc"]["storage_permission"]
     extraction_path, raw_path = _target_paths(doc_id, permission, root)
+    archived: str | None = None
+    if inspection["status"] == "supersede":
+        # 兩份都留：舊的搬去 superseded/<doc_id>.<hash8>.json，新的才寫上去。
+        # 「更正」與「竄改」的分界就在這裡——竄改讓舊版消失，更正讓兩版並存且指得出來。
+        old_hash = str(inspection["superseded_sha256"])
+        archive = extraction_path.parent / "superseded" / f"{doc_id}.{old_hash[:8]}.json"
+        if not archive.exists():
+            _atomic_publish(archive, extraction_path.read_text(encoding="utf-8"))
+        archived = _relative(archive, root)
+        extraction_path.unlink()
+        if raw_path.exists() and raw_text is not None and                 raw_path.read_text(encoding="utf-8") != raw_text:
+            raw_archive = raw_path.parent / "superseded" / f"{raw_path.stem}.{old_hash[:8]}{raw_path.suffix}"
+            if not raw_archive.exists():
+                _atomic_publish(raw_archive, raw_path.read_text(encoding="utf-8"))
+            raw_path.unlink()
     if not extraction_path.exists():
         _atomic_publish(extraction_path, extraction_text)
     if raw_text is not None and not raw_path.exists():
@@ -311,7 +357,8 @@ def publish_provenance(
     final = inspect_provenance(doc_id, prepared, raw_payload, root=root)
     if final["status"] != "matching":
         raise RuntimeError(f"provenance publication incomplete for {doc_id}: {final}")
-    return {**final, "status": "published", "doc_id": doc_id}
+    return {**final, "status": "published", "doc_id": doc_id,
+            "archived_previous": archived}
 
 
 def mark_graph_complete(
