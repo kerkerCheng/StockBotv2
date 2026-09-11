@@ -71,6 +71,19 @@ pytestmark = pytest.mark.skipif(
 _CACHE: dict[tuple, Any] = {}
 
 
+def _coherent_today(as_of: date | None) -> date | None:
+    """`today` 只有在 PIT 釘點時才跟著釘；**當前視角一律不釘**。
+
+    2026-09-11 實測：`today=TODAY` 配 `as_of=None` 是兩個互相矛盾的視角——ledger 讀的是
+    「現在」，而 `today` 停在 09-07，於是 09-10／09-11 才 append 的假設被判成「此時點尚未
+    成立」，連帶把依賴它們的 D&C 成長、target_pe、horizon 三筆判成 `invalidated`，
+    `rollover_actuals` 也因 revenue 未知而整個不發生（實測 `period_end` 停在 2027-06-30）。
+    每 append 一筆假設就再腐壞一次，所以這裡**不是把日期往後挪**，是讓那個混合視角在本檔
+    結構上不可能被表達出來。
+    """
+    return TODAY if as_of is not None else None
+
+
 def view(**kwargs: Any):
     """預設 `as_of=TODAY`（PIT 投影），不是 `today=TODAY` 配當前資料。
 
@@ -83,10 +96,11 @@ def view(**kwargs: Any):
     from briefing.alpha_view.sources import fetch_alpha_investment_view
 
     kwargs.setdefault("as_of", TODAY)
+    kwargs.setdefault("today", _coherent_today(kwargs["as_of"]))
     key = tuple(sorted((k, str(v)) for k, v in kwargs.items()))
     if key not in _CACHE:
         _CACHE[key] = fetch_alpha_investment_view(
-            TICKER, include_causal=False, today=TODAY, **kwargs)
+            TICKER, include_causal=False, **kwargs)
     return _CACHE[key]
 
 
@@ -228,11 +242,6 @@ def test_price_alone_never_stales_a_research_judgment() -> None:
     assert judgmental == [], f"價格變動動到了判斷型成果：{judgmental}"
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ROADMAP 開放 backlog「full-chain rollover 兩條紅」：rollover 情境下假設因 unresolved consensus／observation refs "
-           "被判 invalidated 而非 superseded（2026-09-09 實測；09-07 驗收報告時為綠）。strict：修好會變紅提醒拿掉本標記。",
-)
 def test_a_fiscal_rollover_does_not_let_old_period_numbers_pose_as_current() -> None:
     """會計期間推進：舊年度的假設全部 `superseded`，而**新年度沒有假設**。
 
@@ -339,7 +348,8 @@ def _fresh_view(**kwargs: Any):
     kwargs.setdefault("graph_provider", open_default_provider())
     kwargs.setdefault("fundamentals_provider", EngineCFundamentalsProvider())
     kwargs.setdefault("as_of", TODAY)          # 同 view()：釘 PIT 視角，不釘「今天的當前資料」
-    return fetch_alpha_investment_view(TICKER, include_causal=False, today=TODAY, **kwargs)
+    kwargs.setdefault("today", _coherent_today(kwargs["as_of"]))
+    return fetch_alpha_investment_view(TICKER, include_causal=False, **kwargs)
 
 
 def _real_fundamentals():
@@ -575,11 +585,6 @@ def test_review_required_and_stale_are_never_rendered_as_clean() -> None:
     assert "review_required" in text
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason="ROADMAP 開放 backlog「full-chain rollover 兩條紅」：rollover 情境下假設因 unresolved consensus／observation refs "
-           "被判 invalidated 而非 superseded（2026-09-09 實測；09-07 驗收報告時為綠）。strict：修好會變紅提醒拿掉本標記。",
-)
 def test_a_scoped_no_attention_claim_states_its_scope_and_what_lies_outside() -> None:
     """「需要重看的研究成果：無」是一句斷言，它的**範圍**必須跟著印。
 
