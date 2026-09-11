@@ -14340,10 +14340,12 @@
       "lead_id": "lead_1deb20d98ab9585882a57b307d940f6c",
       "published_at": "2026-09-01",
       "refs": {
+        "action_digest": "82e6604d58d14f4fe7b1dea587cbe9701648b2c6a1ab058f65feb3b076ca5133",
+        "focus_company_id": "co:google",
         "research_action_id": "ra_ef824697819900205016d1580220ad38"
       },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose D3|TPU] OCS 供應結構:TPU v4 論文確認 OCS 動態重構拓撲+光元件<5%系統成本;圖中 tech:ocs 僅 Lumentum 供應商自報一條邊——Google 量產 OCS(Palomar)是自製還是外購?找 Google 客戶端文件印證 Lumentum OCS 或確認自製排擠商用",
       "triage": {
@@ -28933,10 +28935,12 @@
       "lead_id": "lead_64d1bb19c9eea1fcaf7580e0ffa5d843",
       "published_at": "2026-09-01",
       "refs": {
+        "action_digest": "82e6604d58d14f4fe7b1dea587cbe9701648b2c6a1ab058f65feb3b076ca5133",
+        "focus_company_id": "co:google",
         "research_action_id": "ra_ef824697819900205016d1580220ad38"
       },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose D3|TPU] MEMS 鏡陣列層:Palomar OCS 的 MEMS 上游(Apollo 論文待抽)——圖中無 MEMS 節點。誰做 OCS 級 MEMS 鏡陣列、換掉要多久?",
       "triage": {
@@ -52745,10 +52749,12 @@
       "lead_id": "lead_ccdc37ad3e3655d907064b8f3eeefde1",
       "published_at": "2026-09-01",
       "refs": {
+        "action_digest": "82e6604d58d14f4fe7b1dea587cbe9701648b2c6a1ab058f65feb3b076ca5133",
+        "focus_company_id": "co:google",
         "research_action_id": "ra_ef824697819900205016d1580220ad38"
       },
       "source": "decompose:tpu-ironwood-2026-09-01",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "[decompose D3|TPU] 光循環器層:TPU ICI 單纖雙向依賴 optical circulator(v4 論文全文待逐字核對)——圖中無此節點。誰量產資料中心級 circulator、幾家能做?建節點+找供應商",
       "triage": {
