@@ -505,25 +505,51 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
 
 
 def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None) -> None:
-    """把最新聚合值落成狀態檔——brief 首屏讀這裡，不重打行情 API（2026-09-02 前置）。"""
+    """把最新聚合值落成狀態檔 **＋ append 一筆時序**（2026-09-11 補時序）。
+
+    ⚠ **為什麼要兩個檔**：`.json` 是 brief 首屏的最新值（既有消費端，形狀不動）；
+    `.jsonl` 是時序。先前只有前者，而它是 `write_text` **覆寫**——於是「系統的判斷準不準」
+    永遠只有今天一個點，**樣本外驗證結構上不可能做**（ROADMAP §F 要的是「保存當時的
+    PIT view，事後對 actual 算誤差」，那需要歷史）。
+
+    同一支腳本裡 `_append_ranking_snapshot` 早就是 append——**一個機制做了、它的對稱面
+    沒做**，而且不會有任何東西壞掉，所以它安靜存在了 9 天（L17-3）。
+
+    同一天重跑只保留最後一筆（以 `date` 去重），否則一天跑三次會讓那天的權重變三倍。
+    """
     import json as _json
 
+    payload = {
+        "date": date.today().isoformat(),
+        "n": n,
+        "equal_weight_absolute": ew_abs,
+        "equal_weight_excess": ew_excess,
+        "benchmark": PRIMARY_BENCHMARK,
+    }
     out = Path("library/private/decision_lab/outcome_aggregate.json")
     try:
         out.parent.mkdir(parents=True, exist_ok=True)
-        out.write_text(
-            _json.dumps(
-                {
-                    "date": date.today().isoformat(),
-                    "n": n,
-                    "equal_weight_absolute": ew_abs,
-                    "equal_weight_excess": ew_excess,
-                    "benchmark": PRIMARY_BENCHMARK,
-                },
-                ensure_ascii=False,
-            ),
-            encoding="utf-8",
-        )
+        out.write_text(_json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+    except OSError:
+        pass
+    series = out.with_suffix(".jsonl")
+    try:
+        rows = []
+        if series.is_file():
+            for line in series.read_text(encoding="utf-8").splitlines():
+                text = line.strip()
+                if not text:
+                    continue
+                try:
+                    row = _json.loads(text)
+                except ValueError:
+                    continue          # 壞掉的行不靜默丟掉整串，只跳過這一行
+                if str(row.get("date")) != payload["date"]:
+                    rows.append(row)
+        rows.append(payload)
+        series.write_text(
+            "".join(_json.dumps(r, ensure_ascii=False) + chr(10) for r in rows),
+            encoding="utf-8")
     except OSError:
         pass
 

@@ -410,9 +410,17 @@ tier／pace／`campaign_budget_fraction_by_sleeve`／三態系統動作／「本
 3. 過 L14-4 的三個**免 outcome** 測試：恆亮？不會滅？講不出因果機制？
 4. 驗收寫成「**現有資料有幾筆真的變了**」，答案 0 就不算完成。
 
-⚠ **前置條件是 outcome 追蹤**：`measured_outcomes` 太少時，任何指標的驗證都只會得到
-比 2026-07-31 更弱的結論。查證：
-`python -c "import json;print(json.load(open('library/private/app/state/positions.json'))['counters'])"`
+⚠ **前置條件是 outcome 追蹤：樣本太少時，任何指標的驗證都只會得到比 2026-07-31 更弱的結論。**
+⚠ **這裡有兩個數字，不要混用**（2026-09-11 更正——前一版只給了後者，而它低估了實況）：
+
+- **等權報酬追蹤**（現行 SSOT，`AGENTS.md`「outcome 量測改為等權重報酬追蹤」講的就是它）：
+  `python -c "import json;print(json.load(open('library/private/decision_lab/outcome_aggregate.json')))"`
+  時序在同目錄的 `.jsonl`（2026-09-11 起累積；**在那之前只有當天一個快照，覆寫制**）。
+- **`measured_outcomes`**（Decision Store 的 `outcome_envelopes`，正式結算的決策）：
+  `python -c "import json;print(json.load(open('library/private/app/state/positions.json'))['counters'])"`
+  它衡量的是**另一件事**（人工 close 過幾筆），不是追蹤廣度。
+
+判準一句話：**問「追蹤了幾檔、跑了多久」看等權那組；問「正式結算過幾筆」看 `measured_outcomes`。**
 
 ⚠ **一條該保留的機制性警告（與 scope 無關）：** 測試三的歸因是機制性的，不只是單一路徑的
 運氣——**「買跌最深的」會系統性把錢導向長期較弱的資產**（EFA CAGR 7.2%，被選了 98 次）。

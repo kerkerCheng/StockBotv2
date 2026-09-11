@@ -978,6 +978,9 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
         },
         "benchmarks": {"primary": primary, "reference": reference, "available": bool(has_benchmark)},
         "aggregate": dict(aggregate),
+        # 時序（2026-09-11）。**照抄 `outcome_if_settled_today` 落的檔案，不重算**——
+        # 沒有歷史就做不了樣本外驗證（ROADMAP §F：保存當時的 PIT view，事後對 actual 算誤差）。
+        "aggregate_series": _outcome_series(),
         "anchor_health": None if health is None else {
             **{k: v for k, v in health.items() if k not in {"first", "last"}},
             "first": _iso(health["first"]), "last": _iso(health["last"]),
@@ -1056,6 +1059,29 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
         generated_at=generated_at)
     target = store or StateArtifactStore()
     return target.write(payload), payload
+
+
+def _outcome_series(limit: int = 180) -> dict[str, Any]:
+    """等權聚合的時序。唯讀既有檔案；壞掉的行跳過但**不靜默丟掉整串**（INV-3）。"""
+    path = (Path(__file__).resolve().parents[1] / "library" / "private" / "decision_lab"
+            / "outcome_aggregate.jsonl")
+    if not path.is_file():
+        return {"rows": [], "skipped": 0,
+                "reason": "尚無時序——2026-09-11 起才累積；在那之前是覆寫制，"
+                          "只有當天一個快照（所以歷史拿不回來，不是讀不到）"}
+    rows: list[dict[str, Any]] = []
+    skipped = 0
+    for line in path.read_text(encoding="utf-8").splitlines():
+        text = line.strip()
+        if not text:
+            continue
+        try:
+            rows.append(json.loads(text))
+        except ValueError:
+            skipped += 1
+    rows.sort(key=lambda r: str(r.get("date") or ""))
+    return {"rows": rows[-limit:], "skipped": skipped,
+            "reason": None if rows else "檔案存在但沒有可解析的列"}
 
 
 def write_vocabularies(store: ArtifactStore | None = None) -> Path:

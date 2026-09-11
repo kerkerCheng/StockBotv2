@@ -154,3 +154,53 @@ def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
     assert "stanceBadge(cardStance)" in source
     # 解釋的那句話要跟大數字在同一張卡
     assert "stanceBanner(headStance)" in source
+
+
+# ---------------------------------------------------------------------------
+# outcome 時序（D2，2026-09-11）
+# ---------------------------------------------------------------------------
+
+def test_outcome_aggregate_is_appended_not_overwritten(tmp_path, monkeypatch) -> None:
+    """等權聚合必須留下時序——一個點不是趨勢。
+
+    事發：`_persist_aggregate` 用 `write_text` 覆寫，於是「系統的判斷準不準」結構上只能
+    回答今天；而**同一支腳本裡** `_append_ranking_snapshot` 早就是 append——一個機制做了、
+    它的對稱面沒做，而且不會有任何東西壞掉，所以它安靜存在了 9 天（L17-3）。
+    """
+    import importlib.util
+    import json
+    import os
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "oist_under_test", root / "scripts" / "outcome_if_settled_today.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(spec and module)
+
+    cwd = os.getcwd()
+    os.chdir(tmp_path)
+    try:
+        module._persist_aggregate(n=20, ew_abs=0.034, ew_excess=0.035)
+        module._persist_aggregate(n=21, ew_abs=0.040, ew_excess=0.041)   # 同一天重跑
+        series = tmp_path / "library" / "private" / "decision_lab" / "outcome_aggregate.jsonl"
+        rows = [json.loads(line) for line in series.read_text(encoding="utf-8").splitlines()
+                if line.strip()]
+    finally:
+        os.chdir(cwd)
+
+    # 同一天重跑只留最後一筆——否則一天跑三次會讓那天的權重變三倍
+    assert len(rows) == 1 and rows[0]["n"] == 21
+    assert len({r["date"] for r in rows}) == len(rows)
+
+
+def test_positions_artifact_carries_the_series_and_never_recomputes_it() -> None:
+    """APP 端照抄檔案，不自己算聚合——那是 `outcome_if_settled_today` 的職責。"""
+    import inspect
+
+    from webapp.materialize import _outcome_series
+
+    source = inspect.getsource(_outcome_series)
+    assert "outcome_aggregate.jsonl" in source
+    for forbidden in ("mean(", "sum(", "/ len("):
+        assert forbidden not in source, f"_outcome_series 不該自己算聚合：{forbidden}"

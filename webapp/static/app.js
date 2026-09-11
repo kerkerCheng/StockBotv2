@@ -2462,6 +2462,23 @@ async function renderPositions() {
       (agg.excess > 0 ? '+' : '') + fmtRatioPct(agg.excess, 1), `已量測 ${agg.measured}/${agg.total}`, signClass(agg.excess)));
   }
   sec3.appendChild(aggRow);
+  /* 時序（2026-09-11）。**一個點不是趨勢**——先前這裡只有當天的聚合值，因為落檔用的是
+     覆寫制，於是「系統的判斷準不準」結構上只能回答今天。樣本外驗證需要歷史。 */
+  const series = payload.aggregate_series || {};
+  const srows = series.rows || [];
+  if (srows.length >= 2) {
+    const first = srows[0];
+    const last = srows[srows.length - 1];
+    sec3.appendChild(el('p', 'note',
+      `時序：${srows.length} 個交易日（${first.date} → ${last.date}）；`
+      + `等權絕對 ${fmtRatioPct(first.equal_weight_absolute, 1)} → ${fmtRatioPct(last.equal_weight_absolute, 1)}。`));
+  } else {
+    sec3.appendChild(el('p', 'note',
+      `時序：目前 ${srows.length} 天。${series.reason || '每天累積一筆，兩天以上才看得出趨勢。'}`));
+  }
+  if (series.skipped) {
+    sec3.appendChild(el('p', 'note', `（時序檔有 ${series.skipped} 行解析失敗，已跳過但沒有靜默丟棄）`));
+  }
   sec3.appendChild(mdParagraph(notes.aggregate || ''));
   app.appendChild(sec3);
 
