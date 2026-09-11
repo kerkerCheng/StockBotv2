@@ -882,17 +882,23 @@ def _implied_return_section(
         attr_deps = {"consensus_eps": attribution.consensus_eps, "internal_eps": attribution.internal_eps,
                      "target_multiple": attribution.target_multiple,
                      "market_multiple_on_consensus": attribution.market_multiple_on_consensus,
-                     "analyst_count": attribution.analyst_count, "input_dependency": result.input_dependency}
+                     "analyst_count": attribution.analyst_count, "input_dependency": result.input_dependency,
+                     "fx_translation_delta": attribution.fx_translation_delta}
+        # 雜訊下限跟著**兩個桿自己的那一行**走，不是只寫在 fundamental panel（L16：分類要
+        # 送到消費端手上）。讀者看的是這兩行，而 +1.7% 配 ±2.1% 殘差不能讀成發現。
+        floor = attribution.noise_floor_note
+        eps_reason = f"內部 EPS {attribution.internal_eps:g} ÷ 共識 EPS {attribution.consensus_eps:g} − 1"
         eps_datum = Datum(
             key="eps_contribution", label="其中：EPS 差異貢獻（我們的 EPS vs 共識）", value=attribution.eps_contribution,
             status="available", basis="deterministic", authority=A_IMPLIED_RETURN, method=attribution.formula,
             unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
-            reason=f"內部 EPS {attribution.internal_eps:g} ÷ 共識 EPS {attribution.consensus_eps:g} − 1", dependencies=attr_deps)
+            reason=f"{eps_reason}｜{floor}" if floor else eps_reason, dependencies=attr_deps)
         multiple_datum = Datum(
             key="multiple_contribution", label="其中：倍數差異貢獻（我們的倍數 vs 市場對共識付的倍數）",
             value=attribution.multiple_contribution, status="available", basis="deterministic", authority=A_IMPLIED_RETURN,
             method=attribution.formula, unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
-            reason=attribution.principle_note, dependencies=attr_deps)
+            reason=(f"{attribution.principle_note}｜{floor}" if floor else attribution.principle_note),
+            dependencies=attr_deps)
         attribution_datum = Datum(
             key="return_attribution", label="兩桿拆解（EPS 差異 × 倍數差異；恆等式）", value=attribution_payload(attribution),
             status="available", basis="deterministic", authority=A_IMPLIED_RETURN, method=attribution.formula,
@@ -1337,6 +1343,7 @@ def build_alpha_investment_view(
     today: date | None = None,
     refresh_changes: Sequence[ChangeEvent] | None = None,
     assumption_records: Sequence[OperatingAssumption] = (),
+    abstention_records: Sequence[Any] = (),
     metric_observations: Sequence[MetricObservation] = (),
     change_detection: str | None = None,
     refresh_notes: Sequence[str] = (),
@@ -2198,9 +2205,20 @@ def build_alpha_investment_view(
         absent_status=decision_absent_status,
     )
     has_catalyst = bool(structured or checkpoint_items or narrative_catalyst.is_known or q5.is_known)
+    # 「已研究、結論是沒有可監看事件」只能來自 append-only 的 Abstention，不能在呈現層打標籤
+    # （AGENTS「APP 呈現契約」）。它**不讓 readiness 變好**——status 仍是 missing；
+    # 變的只有 absence_kind，也就是「該不該花力氣去補」。
+    catalyst_abstention = None
+    if not has_catalyst and abstention_records:
+        from alpha.abstention.contracts import select_abstention
+
+        catalyst_abstention = select_abstention(
+            list(abstention_records), layer="research", subject="axis.catalyst",
+            period_end=None, as_of=context.as_of, today=today)
     catalyst_section = CatalystSection(
         meta=SectionMeta(
             status="partial" if has_catalyst else "missing",
+            absence_kind=("deliberate_abstention" if catalyst_abstention is not None else None),
             # 檢核點是人手填進 thesis JSON 的結構化紀錄（含 estimated 標記），是 observation
             # 不是 deterministic；deterministic 的是 assess_entry 算出來的 watch_state。
             basis=("session_judgment" if structured or q5.is_known else
@@ -2209,7 +2227,11 @@ def build_alpha_investment_view(
             authority=A_SESSION if structured else (checkpoint_source or A_COVERAGE),
             capability=CAP_CATALYST_UNLINKED,
             reason=("催化劑有結構化日期與狀態，但尚未量化連結到盈餘／重定價（partial capability）"
-                    if has_catalyst else "沒有任何來源提供催化劑"),
+                    if has_catalyst else
+                    (f"刻意不主張：{catalyst_abstention.reason}｜什麼會改寫："
+                     f"{catalyst_abstention.revisit_when}｜宣告於 "
+                     f"{catalyst_abstention.created_on.isoformat()}（{catalyst_abstention.abstention_id}）"
+                     if catalyst_abstention is not None else "沒有任何來源提供催化劑")),
             as_of=reference_day,
             warnings=("推估（estimated）日期照樣排程但必須標明；散文裡的日期不猜。",),
         ),

@@ -414,7 +414,9 @@ def closure_gate(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> Gat
 #     負值大半來自倍數折價 ＝ 方法偏空。
 
 #: `multiple_contribution` 小於這個絕對值就視為「目標倍數＝校準倍數」（沒有主張折溢價）。
-MULTIPLE_NEUTRAL_TOLERANCE = 0.005
+#: **不在這裡定義**——唯一 SSOT 是 `alpha/implied_return/contracts.py`，卡片散文與本計數器
+#: 必須用同一個數（2026-09-11：先前是兩份，TSM +1.7% 同時被寫成「一致」與「有折溢價主張」）。
+from alpha.implied_return.contracts import MULTIPLE_NEUTRAL_TOLERANCE  # noqa: E402
 
 
 @dataclass(frozen=True, slots=True)
@@ -426,6 +428,9 @@ class QualityScore:
     multiple_neutral: tuple[str, ...]
     multiple_priced: tuple[tuple[str, float], ...]
     unreadable: tuple[str, ...]
+    #: 倍數桿比它自己的換算殘差還小——**既不是校準也不是主張，是讀不出來**。
+    #: 把它算進 `multiple_priced` 會送人去找一份不需要存在的證據（TSM +1.7% vs 殘差 2.11%）。
+    multiple_in_noise: tuple[tuple[str, float, float], ...] = ()
 
     @property
     def scored(self) -> int:
@@ -457,6 +462,7 @@ def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
     neutral: list[str] = []
     priced: list[tuple[str, float]] = []
     unreadable: list[str] = []
+    multiple_in_noise: list[tuple[str, float, float]] = []
     for ticker in sorted(artifacts):
         payload = artifacts[ticker]
         simple = (((payload.get("overview") or {}).get("implied_return") or {}).get("simple") or {})
@@ -469,12 +475,17 @@ def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
         contribution = (attribution or {}).get("multiple_contribution")
         if not isinstance(contribution, (int, float)):
             continue
-        if abs(contribution) <= MULTIPLE_NEUTRAL_TOLERANCE:
+        # 換算殘差是這個桿的雜訊下限：桿小於它 ＝ 我們沒有主張任何東西，也沒有確認校準。
+        # 三分而不是二分——二分時它只能被歸進其中一邊，而兩邊都是錯的（L12）。
+        residual = (attribution or {}).get("fx_translation_delta")
+        if isinstance(residual, (int, float)) and abs(contribution) < abs(residual):
+            multiple_in_noise.append((ticker, float(contribution), float(residual)))
+        elif abs(contribution) <= MULTIPLE_NEUTRAL_TOLERANCE:
             neutral.append(ticker)
         else:
             priced.append((ticker, float(contribution)))
     return QualityScore(tuple(positive), tuple(negative), tuple(neutral),
-                        tuple(priced), tuple(unreadable))
+                        tuple(priced), tuple(unreadable), tuple(multiple_in_noise))
 
 
 def render_quality(score: QualityScore) -> list[str]:
@@ -490,6 +501,11 @@ def render_quality(score: QualityScore) -> list[str]:
            + "、".join(f"{t} {c:+.1%}" for t, c in score.multiple_priced)
            + "（每一筆的 rationale 都必須指得出證據，AGENTS.md「隱含報酬的兩個桿」）"
            if score.multiple_priced else "｜有折溢價主張：0 檔"))
+    if score.multiple_in_noise:
+        lines.append(
+            f"倍數桿落在換算殘差以下（讀不出來，不是校準也不是主張）：{len(score.multiple_in_noise)} 檔——"
+            + "、".join(f"{t} {c:+.1%}（殘差 {r:+.1%}）" for t, c, r in score.multiple_in_noise)
+            + "。要拿到有意義的數字得用同一條 FX 路徑重算共識，不是調容差。")
     if score.negative and not score.positive and score.scored >= 3:
         lines.append(
             "⚠ 全部為負：倍數貢獻接近 0 ＝**市場太貴**；負值大半來自倍數折價 ＝**方法偏空**。"

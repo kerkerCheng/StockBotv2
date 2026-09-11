@@ -33,10 +33,11 @@ from typing import Any
 
 from ..fundamental.contracts import ExpectationComparison
 from ..valuation.contracts import CurrentPrice, ValuationResult
-from .contracts import ATTRIBUTION_FORMULA, ReturnAttribution
+from .contracts import ATTRIBUTION_FORMULA, MULTIPLE_NEUTRAL_TOLERANCE, ReturnAttribution
 
-#: 倍數差距小於此門檻視為「與市場倍數一致」——這不是判準，是呈現用的雜訊下限（避免 0.3% 也寫成折價）。
-_MULTIPLE_TOLERANCE = 0.02
+#: 倍數差距小於此門檻視為「與市場倍數一致」。**唯一定義在 `contracts.py`**——
+#: 2026-09-11 之前這裡是 0.02、品質計數器是 0.005，同一個問題兩個答案（見該處註解）。
+_MULTIPLE_TOLERANCE = MULTIPLE_NEUTRAL_TOLERANCE
 #: 倍數差距超過此門檻時，模型層另發一條 warning 提醒原則（只提醒，不阻擋、不改數字）。
 MULTIPLE_WARNING_THRESHOLD = 0.05
 
@@ -65,12 +66,34 @@ def _missing(reason: str, kind: str, *, comparison: ExpectationComparison | None
 def multiple_principle_note(multiple_contribution: float, *, target_multiple: float, market_multiple: float) -> str:
     """把倍數差距翻成一句面向使用者的話。**只陳述差距與原則，不判斷證據**。"""
     if abs(multiple_contribution) < _MULTIPLE_TOLERANCE:
-        return (f"目標倍數 {target_multiple:.1f}x 與市場對共識付的 {market_multiple:.1f}x 一致（差 <{_MULTIPLE_TOLERANCE:.0%}）"
+        return (f"目標倍數 {target_multiple:.1f}x 與市場對共識付的 {market_multiple:.1f}x 一致（差 <{_MULTIPLE_TOLERANCE:.1%}）"
                 "——倍數桿沒有貢獻，隱含報酬幾乎全來自 EPS 差異")
     direction = "折價" if multiple_contribution < 0 else "溢價"
     return (f"目標倍數 {target_multiple:.1f}x 較市場對共識付的 {market_multiple:.1f}x {direction} "
             f"{abs(multiple_contribution):.1%}——依 2026-09-09 原則，{direction}必須在估值假設的 rationale 指得出 "
             "re-rating 證據；說不出證據的保守選擇是偏差，不是審慎")
+
+
+def noise_floor_note(
+    *, fx_delta: float | None, eps_contribution: float, multiple_contribution: float
+) -> str | None:
+    """兩個桿有沒有小到落在換算殘差以下？有就明講——**不改數字，只擋住誤讀**。
+
+    事發（2026-09-11 TSM）：3% 換算容差讓 TSM 的兩欄第一次算得出來，殘差 +2.11%，
+    而算出來的倍數桿是 **+1.71%**——比殘差還小。畫面上它會被歸進「目標倍數＝校準倍數」，
+    讀起來像一個發現，實際上在雜訊裡。**放寬識別的同時必須把雜訊下限一起印出來**，
+    否則這條容差就是拿精度換覆蓋率而不說。
+    """
+    if fx_delta is None:
+        return None
+    floor = abs(fx_delta)
+    inside = [name for name, value in (("EPS 桿", eps_contribution), ("倍數桿", multiple_contribution))
+              if abs(value) < floor]
+    if not inside:
+        return None
+    return (f"⚠ 共識 EPS 帶著 {fx_delta:+.1%} 的換算殘差，而{'、'.join(inside)}比它還小"
+            "——這（些）桿落在雜訊裡，**不要當成發現**。要拿到有意義的數字得用同一條 FX 路徑"
+            "重算共識，不是調容差。")
 
 
 def attribute_price_return(
@@ -122,8 +145,13 @@ def attribute_price_return(
             f"恆等式不成立：eps {eps_contribution:+.4f} + multiple {multiple_contribution:+.4f} + interaction "
             f"{interaction:+.4f} ≠ price_return {price_return:+.4f}——輸入不同源，拒印", "inputs_incompatible",
             comparison=comparison)
+    fx_delta = comparison.fx_translation_delta
     return ReturnAttribution(
         status="available", reason=None, absence_kind=None,
+        fx_translation_delta=fx_delta,
+        noise_floor_note=noise_floor_note(
+            fx_delta=fx_delta, eps_contribution=eps_contribution,
+            multiple_contribution=multiple_contribution),
         consensus_eps=comparison.consensus, internal_eps=comparison.internal,
         target_multiple=target_multiple, market_multiple_on_consensus=market_multiple,
         eps_ratio=eps_ratio, multiple_ratio=multiple_ratio,
@@ -155,10 +183,12 @@ def attribution_payload(attribution: ReturnAttribution) -> dict[str, Any]:
         "interaction": attribution.interaction,
         "price_return": attribution.price_return,
         "principle_note": attribution.principle_note,
+        "fx_translation_delta": attribution.fx_translation_delta,
+        "noise_floor_note": attribution.noise_floor_note,
         "formula": attribution.formula,
         "reason": attribution.reason,
         "absence_kind": attribution.absence_kind,
     }
 
 
-__all__ = ["MULTIPLE_WARNING_THRESHOLD", "attribute_price_return", "attribution_payload", "multiple_principle_note"]
+__all__ = ["MULTIPLE_WARNING_THRESHOLD", "attribute_price_return", "attribution_payload", "multiple_principle_note", "noise_floor_note"]

@@ -65,6 +65,18 @@ PRICE_RETURN_FORMULA = "price_return = fair_value / current_price − 1"
 ANNUALIZED_RETURN_FORMULA = "annualized_price_return = (1 + price_return) ** (365.25 / holding_period_days) − 1"
 DAYS_PER_YEAR = 365.25
 #: 兩桿拆解（2026-09-09）：唯一定義處；`attribution.py` 照抄、read model 只抄字串。
+#: 倍數桿小於這個絕對值 ＝「目標倍數＝校準倍數」，也就是**沒有主張折溢價**。
+#:
+#: ⚠ **這是唯一的那個數字。** 2026-09-11 之前它有兩份：`attribution._MULTIPLE_TOLERANCE`
+#: 0.02 決定卡片上的散文怎麼寫，`closure.MULTIPLE_NEUTRAL_TOLERANCE` 0.005 決定品質計數器
+#: 把這一檔算進哪一欄——同一個問題兩個答案。TSM（+1.7%）是第一檔落在兩者之間的：
+#: 卡片寫「與市場一致、倍數桿沒有貢獻」，計數器同時把它列進「有折溢價主張」。
+#: 使用者兩邊都會讀到，而它們互相否定（L12／L16）。
+#:
+#: 合併時取**較嚴的 0.005**，不是較寬的 0.02——放寬一個稽核用的計數器要人決定，
+#: 收緊不用。代價是 AVGO／TSM 這類 1–2% 的檔，卡片散文改口說折溢價，與計數器一致。
+MULTIPLE_NEUTRAL_TOLERANCE = 0.005
+
 ATTRIBUTION_FORMULA = (
     "1 + price_return = (internal_eps / consensus_eps) × (target_multiple / market_multiple_on_consensus)；"
     "market_multiple_on_consensus = current_price / consensus_eps；"
@@ -139,6 +151,12 @@ class ReturnAttribution:
     consensus_refs: tuple[str, ...] = ()
     formula: str = ATTRIBUTION_FORMULA
     principle_note: str | None = None
+    #: 共識 EPS 帶著的換算殘差（見 `ExpectationComparison.fx_translation_delta`）。
+    #: 它是**兩個桿共同的雜訊下限**：同一個換算差進到 eps_ratio 的分母、也進到
+    #: market_multiple 的分母。任一個桿小於它，那個桿就在雜訊裡。
+    fx_translation_delta: float | None = None
+    #: 有殘差、且至少一個桿小於它時的一句話。**不改任何數字**，只讓讀者不會把雜訊讀成發現。
+    noise_floor_note: str | None = None
 
     def __post_init__(self) -> None:
         if self.status not in ATTRIBUTION_STATUSES:
@@ -424,6 +442,7 @@ def combined_return_dependency(valuation_dependency: str | None, horizon: Horizo
 
 
 __all__ = [
+    "MULTIPLE_NEUTRAL_TOLERANCE",
     "ALIGNMENTS", "ALIGNMENT_ALIGNED", "ALIGNMENT_HORIZON_AFTER", "ALIGNMENT_HORIZON_BEFORE", "ALIGNMENT_SPOT",
     "ANNUALIZED_RETURN_FORMULA", "DAYS_PER_YEAR", "HOLDING_PERIOD_FORMULA", "HORIZON_DRIVER",
     "HORIZON_START_FORMULA", "MODEL_VERSION", "PRICE_RETURN_FORMULA", "RETURN_CONVENTIONS",
