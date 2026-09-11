@@ -2070,3 +2070,23 @@ def test_complete_ra_does_not_pick_a_focus_when_two_authorities_disagree(
         assert "不符" in str(exc) and "不猜" in str(exc)
     else:
         raise AssertionError("兩個 authority 矛盾時必須拒絕")
+
+
+def test_complete_ra_never_overwrites_a_conflicting_digest(monkeypatch, tmp_path) -> None:
+    """帶著「別的 digest」的 lead 是綁在另一個已核准版本上——衝突，不是漏記。
+
+    第一版我寫成「digest 不符就補成正確的」，被既有測試
+    `test_ra_lead_context_requires_matching_digest` 當場打臉。蓋過去就是讓引用去尋找
+    能通過的權威（L15）。規則是**只補空白**。
+    """
+    from engine_b import todo as T
+
+    path = _lead_ctx(monkeypatch, tmp_path,
+                     {"l1": _lead("l1", "applied", digest="9" * 64, focus="co:a")},
+                     declared="co:a")
+    try:
+        T._lead_context_for_action("ra_x", action_digest="c" * 64, leads_path=path)
+    except T.TodoError as exc:
+        assert "不覆寫" in str(exc)
+    else:
+        raise AssertionError("digest 衝突必須拒絕，不得覆寫")

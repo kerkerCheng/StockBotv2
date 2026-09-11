@@ -1352,10 +1352,12 @@ def _lead_context_for_action(
     from engine_b.leads import load as load_leads
 
     store = load_leads(leads_path)
-    matches = [
-        lead for lead in store["leads"].values()
+    # 帶著 lead_id 一起走：id 是 dict 的 key，不在值裡（先前只取 values() 就拿不到）。
+    pairs = [
+        (str(lead_id), lead) for lead_id, lead in store["leads"].items()
         if (lead.get("refs") or {}).get("research_action_id") == action_id
     ]
+    matches = [lead for _lead_id, lead in pairs]
     if not matches:
         # 從 decision gap work order 產出的 RA 沒有來源 lead——它的 focus 由 RA
         # 自己聲明（見 mcp_server/research_actions 的 focus_company_id）。lead
@@ -1394,24 +1396,40 @@ def _lead_context_for_action(
         raise TodoError(
             f"{action_id} 既沒有 lead 帶 focus_company_id，RA 也未自報——無法決定 handoff 對象")
 
-    stale = [lead for lead in matches if lead.get("status") != "applied"]
-    illegal = [lead for lead in stale if lead.get("status") != "action_prepared"]
+    # ⚠ **只補空白，不覆寫不符的值。** 已經帶著「別的 digest」的 lead 代表它綁在另一個
+    # 已核准版本上——那是衝突，不是漏記；蓋過去就是讓引用去尋找能通過的權威（L15）。
+    conflicting = [
+        lead_id for lead_id, lead in pairs
+        if str((lead.get("refs") or {}).get("action_digest") or "").strip()
+        not in ("", action_digest)
+    ]
+    if conflicting:
+        raise TodoError(
+            "來源 lead 帶的 action_digest 與本次核准內容不符（不覆寫，請先確認綁錯了哪一個）："
+            + "、".join(conflicting))
+
+    stale = [(lead_id, lead) for lead_id, lead in pairs if lead.get("status") != "applied"]
+    illegal = [(i, l) for i, l in stale if l.get("status") != "action_prepared"]
     if illegal:
         # `parked` 是「我們決定不要」的終局，`triaged_go`／`researching` 代表根本還沒備妥 RA。
         # 這兩種都不是簿記漏掉，是真的狀態不對——不得自動推進。
         raise TodoError(
             "來源 lead 的狀態不合法（只有 action_prepared 可由本函式推進到 applied）："
-            + "、".join(f"{lead['lead_id']}={lead.get('status')}" for lead in illegal))
-    if stale or any((lead.get("refs") or {}).get("action_digest") != action_digest
-                    for lead in matches):
+            + "、".join(f"{i}={l.get('status')}" for i, l in illegal))
+
+    missing_refs = [
+        lead_id for lead_id, lead in pairs
+        if not str((lead.get("refs") or {}).get("action_digest") or "").strip()
+        or not str((lead.get("refs") or {}).get("focus_company_id") or "").strip()
+    ]
+    if stale or missing_refs:
         from engine_b.leads import advance as advance_lead
         from engine_b.leads import annotate_refs, save as save_leads
 
-        for lead in matches:
-            lead_id = str(lead["lead_id"])
+        for lead_id, lead in pairs:
             refs = lead.get("refs") or {}
             patch = {}
-            if refs.get("action_digest") != action_digest:
+            if not str(refs.get("action_digest") or "").strip():
                 patch["action_digest"] = action_digest
             if not str(refs.get("focus_company_id") or "").strip():
                 patch["focus_company_id"] = focus
