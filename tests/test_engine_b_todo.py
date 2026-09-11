@@ -1981,3 +1981,92 @@ def test_decision_review_hint_fails_closed_when_blockers_are_unreadable() -> Non
     hint = _decision_review_hint("dc_x", frozenset(), [])
     assert "讀不到" in hint
     assert "reassess" not in hint
+
+
+# ---------------------------------------------------------------------------
+# complete-ra 自己記帳（2026-09-11）——孤兒不可能產生，而不是事後看得見
+# ---------------------------------------------------------------------------
+
+def _lead_ctx(monkeypatch, tmp_path, leads_payload, *, declared=None):
+    """組一個最小 leads store，回傳 (path, store)。"""
+    import json
+
+    from engine_b import leads as L
+
+    store = L.empty_store()
+    store["leads"] = leads_payload
+    path = tmp_path / "pending_leads.json"
+    L.save(store, path)
+    from engine_b import todo as T
+
+    monkeypatch.setattr(T, "_declared_focus_for_action", lambda _a: declared)
+    return path
+
+
+def _lead(lead_id, status, *, digest=None, focus=None, action="ra_x"):
+    refs = {"research_action_id": action}
+    if digest:
+        refs["action_digest"] = digest
+    if focus:
+        refs["focus_company_id"] = focus
+    return {"lead_id": lead_id, "status": status, "title": "t", "refs": refs,
+            "url": f"https://x.io/{lead_id}", "source": "edgar:X", "triage": None,
+            "entities": {"company_ids": [], "tickers": []}, "themes": {},
+            "first_seen": "2026-09-01T00:00:00+00:00"}
+
+
+def test_complete_ra_advances_action_prepared_leads_instead_of_demanding_it(
+        monkeypatch, tmp_path) -> None:
+    """事發（2026-09-11）：三條 lead 卡在 action_prepared 十天，它們等的 pq2 早已結案。
+
+    到這一步 digest、state、document／report receipt 都驗過了——RA 落地是既成事實，
+    把它記進 lead 是**簿記**不是判斷。先前把簿記外包給呼叫端，於是漏掉就產生孤兒。
+    """
+    import json
+
+    from engine_b import leads as L
+    from engine_b import todo as T
+
+    digest = "a" * 64
+    payload = {"l1": _lead("l1", "action_prepared"), "l2": _lead("l2", "action_prepared")}
+    path = _lead_ctx(monkeypatch, tmp_path, payload, declared="co:google")
+
+    ctx = T._lead_context_for_action("ra_x", action_digest=digest, leads_path=path)
+    assert ctx["company_id"] == "co:google"
+
+    after = L.load(path)["leads"]
+    assert {v["status"] for v in after.values()} == {"applied"}
+    assert all(v["refs"]["action_digest"] == digest for v in after.values())
+    assert all(v["refs"]["focus_company_id"] == "co:google" for v in after.values())
+
+
+def test_complete_ra_refuses_to_advance_from_a_terminal_or_early_state(
+        monkeypatch, tmp_path) -> None:
+    """`parked` 是「我們決定不要」，`triaged_go` 是「還沒備妥」——兩者都不是簿記漏掉。"""
+    from engine_b import todo as T
+
+    for bad in ("parked", "triaged_go", "researching"):
+        path = _lead_ctx(monkeypatch, tmp_path / bad, {"l1": _lead("l1", bad)},
+                         declared="co:google")
+        try:
+            T._lead_context_for_action("ra_x", action_digest="b" * 64, leads_path=path)
+        except T.TodoError as exc:
+            assert "狀態不合法" in str(exc)
+        else:
+            raise AssertionError(f"{bad} 不該被自動推進")
+
+
+def test_complete_ra_does_not_pick_a_focus_when_two_authorities_disagree(
+        monkeypatch, tmp_path) -> None:
+    """lead 與 RA 自報的 focus 打架時不得靜默挑一個（L15：authority laundering）。"""
+    from engine_b import todo as T
+
+    path = _lead_ctx(monkeypatch, tmp_path,
+                     {"l1": _lead("l1", "applied", digest="c" * 64, focus="co:a")},
+                     declared="co:b")
+    try:
+        T._lead_context_for_action("ra_x", action_digest="c" * 64, leads_path=path)
+    except T.TodoError as exc:
+        assert "不符" in str(exc) and "不猜" in str(exc)
+    else:
+        raise AssertionError("兩個 authority 矛盾時必須拒絕")

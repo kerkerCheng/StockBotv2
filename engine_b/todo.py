@@ -1366,19 +1366,61 @@ def _lead_context_for_action(
         raise TodoError(
             f"找不到綁定 {action_id} 的 lead receipt，且該 RA 未自報 focus_company_id"
         )
-    if any(lead.get("status") != "applied" for lead in matches):
-        raise TodoError("Research Action 的來源 lead 尚未全部標記 applied")
-    if any(
-        (lead.get("refs") or {}).get("action_digest") != action_digest
-        for lead in matches
-    ):
-        raise TodoError("applied lead 的 action_digest 缺失或與核准內容不符")
-    companies = {
+    # ⚠ 這裡**自己記帳，不向呼叫端索取**（2026-09-11 改）。
+    #
+    # 先前這三段是檢查：lead 必須已經是 applied、必須已帶 action_digest、必須已帶唯一
+    # focus_company_id——否則報錯。但呼叫端到這一步已經通過 digest 比對、state=pushed/applied、
+    # 每份 document receipt 與 report receipt 都 complete 的驗證：**RA 確實落地了是既成事實**，
+    # 把它記進 lead 是簿記，不是判斷。要求呼叫端先手動做，造成兩個實測後果：
+    #   ① 2026-09-11 三筆 RA 各失敗兩次才補齊（先補 action_digest、再補 focus_company_id）；
+    #   ② 更糟的是反向——[363] 由另一條走廊結案時沒人補，三條 lead 就卡在 action_prepared
+    #      十天，而 `queue_segments` 把它歸成「等 pq2 入圖核准」所以稽核照過。
+    # 兩者是同一個缺陷的兩端：結案走廊不負責 lead 簿記。加偵測只會讓孤兒**被看見**；
+    # 讓結案自己記帳，孤兒才**不可能產生**（修法層級：根除）。
+    declared_focus = (_declared_focus_for_action(action_id) or "").strip()
+    recorded = {
         str((lead.get("refs") or {}).get("focus_company_id") or "").strip()
         for lead in matches
     } - {""}
-    if len(companies) != 1:
-        raise TodoError("applied lead 必須留下唯一 focus_company_id")
+    if len(recorded) > 1:
+        raise TodoError(f"來源 lead 的 focus_company_id 不一致：{sorted(recorded)}")
+    if recorded and declared_focus and recorded != {declared_focus}:
+        # 兩個 authority 互相矛盾時不得靜默挑一個——那正是 L15 的 authority laundering。
+        raise TodoError(
+            f"lead 的 focus_company_id（{sorted(recorded)[0]}）與 RA 自報的"
+            f"（{declared_focus}）不符——不猜，請先確認哪一個是對的")
+    focus = (sorted(recorded)[0] if recorded else declared_focus)
+    if not focus:
+        raise TodoError(
+            f"{action_id} 既沒有 lead 帶 focus_company_id，RA 也未自報——無法決定 handoff 對象")
+
+    stale = [lead for lead in matches if lead.get("status") != "applied"]
+    illegal = [lead for lead in stale if lead.get("status") != "action_prepared"]
+    if illegal:
+        # `parked` 是「我們決定不要」的終局，`triaged_go`／`researching` 代表根本還沒備妥 RA。
+        # 這兩種都不是簿記漏掉，是真的狀態不對——不得自動推進。
+        raise TodoError(
+            "來源 lead 的狀態不合法（只有 action_prepared 可由本函式推進到 applied）："
+            + "、".join(f"{lead['lead_id']}={lead.get('status')}" for lead in illegal))
+    if stale or any((lead.get("refs") or {}).get("action_digest") != action_digest
+                    for lead in matches):
+        from engine_b.leads import advance as advance_lead
+        from engine_b.leads import annotate_refs, save as save_leads
+
+        for lead in matches:
+            lead_id = str(lead["lead_id"])
+            refs = lead.get("refs") or {}
+            patch = {}
+            if refs.get("action_digest") != action_digest:
+                patch["action_digest"] = action_digest
+            if not str(refs.get("focus_company_id") or "").strip():
+                patch["focus_company_id"] = focus
+            if patch:
+                annotate_refs(store, lead_id, refs=patch)
+            if lead.get("status") == "action_prepared":
+                advance_lead(store, lead_id, "applied")
+        save_leads(store, leads_path)
+    companies = {focus}
     # lead title 是入圖當下對「這是什麼」最接近的一句話；帶下去當 atomic_claim，
     # 讓 cohort 自己記得住當初的判斷，而不必事後翻 intake 報告反推。
     titles = [str(lead.get("title") or "").strip() for lead in matches]
