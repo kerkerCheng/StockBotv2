@@ -1,0 +1,95 @@
+{
+  "claims": [],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualified",
+        "sole_source": false,
+        "substitutability": 4,
+        "substitutability_rationale": "4／5＝難換但非唯一。往下壓到 4 而不是 5 的理由：全球有三家合格 HBM 供應商（SK hynix、Samsung、Micron），本圖自身也已有 co:micron_technology SUPPLIES_TO tech:hbm 與 co:sk_hynix COMPETES_WITH co:micron_technology 兩條邊，所以 sole_source 明確為 false。撐住 4 的理由是切換的實際阻力：①HBM 認證是逐客戶、跨季的流程；②供應商已與約 10 家客戶簽定 LTA（逐字 s2），在合約窗內可競逐的份額被綁住；③本圖既有的 NVIDIA 承諾 claim 顯示客戶端以資本承諾鎖定記憶體採購。⚠ 反面意見要留著：若把『存在三家合格供應商』看得比『切換阻力』重，3 也說得通——本 RA 選 4 是判斷不是量測，核准時可以改。"
+      },
+      "confidence": 0.9,
+      "dst_id": "tech:hbm",
+      "id": "sk_hynix_hbm4_development_complete_2025_09_12_e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "sk_hynix_hbm4_development_complete_2025_09_12_s1",
+        "sk_hynix_hbm4_development_complete_2025_09_12_s3",
+        "sk_hynix_hbm4_development_complete_2025_09_12_s4"
+      ],
+      "src_id": "co:sk_hynix"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "SKHY",
+        "000660.KS"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:sk_hynix",
+      "name": "SK hynix",
+      "role": null,
+      "source_ids": [
+        "sk_hynix_hbm4_development_complete_2025_09_12_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:hbm",
+      "name": "High-Bandwidth Memory (HBM)",
+      "role": null,
+      "source_ids": [
+        "sk_hynix_hbm4_development_complete_2025_09_12_s1"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "sk_hynix_hbm4_development_complete_2025_09_12",
+    "evidence_tier": 1,
+    "origin_entity": "SK hynix",
+    "permission_basis": "官方 newsroom 短引文與來源連結；不保存全文。",
+    "published_at": "2025-09-12",
+    "publisher": "SK hynix Newsroom",
+    "retrieved_at": "2026-09-11",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "SK hynix Completes World-First HBM4 Development and Readies Mass Production",
+    "url": "https://news.skhynix.com/sk-hynix-completes-worlds-first-hbm4-development-and-readies-mass-production/"
+  },
+  "sources": [
+    {
+      "id": "sk_hynix_hbm4_development_complete_2025_09_12_s1",
+      "locator": "開場宣布段",
+      "quote": "SK hynix Inc. announced today that it has completed development and finished preparation of HBM4, a next generation memory product for ultra-high performance AI, mass production for the world's first time."
+    },
+    {
+      "id": "sk_hynix_hbm4_development_complete_2025_09_12_s2",
+      "locator": "規格段（頻寬／I/O／能效）",
+      "quote": "The bandwidth doubled through adoption of 2,048 I/O terminals, double from the previous generation, and power efficiency improved by more than 40%."
+    },
+    {
+      "id": "sk_hynix_hbm4_development_complete_2025_09_12_s3",
+      "locator": "JEDEC 速度段",
+      "quote": "The company has far exceeded the JEDEC standard operating speed(8Gbps) by implementing over 10Gbps(Gigabit per second) operating speed in HBM4."
+    },
+    {
+      "id": "sk_hynix_hbm4_development_complete_2025_09_12_s4",
+      "locator": "供應客戶段",
+      "quote": "By supplying the product that meets customer needs in performance, power efficiency and reliability in timely manner, the company will fulfill time to market and maintain competitive position."
+    },
+    {
+      "id": "sk_hynix_hbm4_development_complete_2025_09_12_s5",
+      "locator": "製程段",
+      "quote": "The company adopted the Advanced MR-MUF process in HBM4, which has been proven to be reliable in the market, and the 1bnm process, or the fifth-generation of the 10-nanometer technology, to minimize the risk in mass production."
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+Source URL: https://news.skhynix.com/sk-hynix-completes-worlds-first-hbm4-development-and-readies-mass-production/
+
+Excerpt:
+SK hynix Inc. announced today that it has completed development and finished preparation of HBM4, a next generation memory product for ultra-high performance AI, mass production for the world's first time.
+The bandwidth doubled through adoption of 2,048 I/O terminals, double from the previous generation, and power efficiency improved by more than 40%.
+The company has far exceeded the JEDEC standard operating speed(8Gbps) by implementing over 10Gbps(Gigabit per second) operating speed in HBM4.
+By supplying the product that meets customer needs in performance, power efficiency and reliability in timely manner, the company will fulfill time to market and maintain competitive position.
+The company adopted the Advanced MR-MUF process in HBM4, which has been proven to be reliable in the market, and the 1bnm process, or the fifth-generation of the 10-nanometer technology, to minimize the risk in mass production.
