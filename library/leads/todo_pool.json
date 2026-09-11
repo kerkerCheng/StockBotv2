@@ -9061,6 +9061,18 @@
       "source": "decision_lab",
       "title": "unknown：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-11T04:46:43.188053+00:00",
+      "hint": "研究已完成，一手為浙江双环传动 2026 年半年度報告全文（深交所 2026-08-26 揭露，attachPath /disc/disk03/finalpage/2026-08-26/a31c4ef8-f6e6-4f21-88a3-78e518cf9597.PDF，132 頁 143,047 字元，本輪以 pypdf 抽全文逐字核對）。圖中 claim nextfinancial_joint_problem_2026_06_02_rv_reducer_cl1 目前寫著『Zhejiang Shuanghuan Driveline has moved into RV reducers and already supplies Optimus and Unitree — a validated Chinese alternative in the adjacent humanoid segment』，來源是單一 tier-3 Substack、demand_proof_level=inferred、confidence 0.7。法定文件對不上三點：①『人形』在全文出現 0 次、『RV减速』0 次、『谐波』0 次，公司自述用途為『工業機器人』；②未具名任何客戶（應收帳款前五名合計僅 16.41%，且未列名）；③減速器及其他 H1 2026 占營收 9.67%（人民幣 4.40 億／45.59 億），而二手普遍引用的是『16 億、占約 35%』，差約 3.6 倍。⚠ 這不推翻『雙環供應 RV 減速器』本身（分產品表證實該業務存在），推翻的是『validated』與『already supplies <具名整機廠>』這兩個措辭——依 L11-1，措辭精度本身就是一個 claim。go＝核准把該 claim 降級為不含具名客戶與 validated 字樣的版本（或改記為 dated observation）；不含提高任何 evidence tier、不含新增邊、不含 live。⚠ 執行時會撞到 ROADMAP 已記的『intake 沒有更正既有 extraction 的路徑』那條，需一併決定走哪條走廊。",
+      "n": 541,
+      "reason": null,
+      "ref_id": "manual:541",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "修正圖中 RV 減速器 claim 的『validated／already supplies Optimus and Unitree』措辭（tier-3 vs 法定文件）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -19838,6 +19850,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 541,
+  "next_n": 542,
   "schema_version": "1"
 }
