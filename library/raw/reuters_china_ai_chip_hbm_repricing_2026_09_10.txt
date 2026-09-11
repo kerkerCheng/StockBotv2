@@ -1,0 +1,8 @@
+Source URL: https://www.freemalaysiatoday.com/category/business/2026/09/10/china-s-ai-chipmakers-raise-prices-as-high-bandwidth-memory-shortage-bites
+
+Excerpt:
+Since Washington tightened controls on exports of certain advanced HBM products to China in December 2024, Chinese chipmakers have increasingly relied on grey-market channels to secure supplies
+Such HBM typically costs several times what buyers outside China pay
+The price hikes illustrate how a worldwide shortage of HBM is reverberating through China's AI industry
+Because memory accounts for a large share of an AI accelerator's production cost, the higher prices are feeding directly into finished cards
+The advanced HBM market is dominated by South Korea's SK Hynix and Samsung Electronics, and US-based Micron Technology

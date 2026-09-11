@@ -1,0 +1,76 @@
+{
+  "claims": [
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "每季核查（隨 SK hynix／Micron 財報與後續 Reuters 追蹤報導）：若下一輪報導或供應商揭露顯示中國 AI 加速卡售價回落、或 HBM 現貨／合約價轉為下行，代表本件反映的是一次性的管制衝擊而非持續稀缺，本 claim 應由 guided 降為 inferred；若美方放寬對中國的 HBM 出口管制而中國售價仍維持高檔，則可分離出『全球短缺』這一半並升級。命中後 48 小時內提交人工複查。",
+      "id": "reuters_china_ai_chip_hbm_repricing_2026_09_10_cl1",
+      "source_ids": [
+        "reuters_china_ai_chip_hbm_repricing_2026_09_10_s1",
+        "reuters_china_ai_chip_hbm_repricing_2026_09_10_s2",
+        "reuters_china_ai_chip_hbm_repricing_2026_09_10_s3",
+        "reuters_china_ai_chip_hbm_repricing_2026_09_10_s4",
+        "reuters_china_ai_chip_hbm_repricing_2026_09_10_s5"
+      ],
+      "statement": "2026-09-10 Reuters 獨家報導：中國 AI 晶片業者因 HBM 成本上升而調漲終端售價——華為 Ascend 950DT 加速卡報價提高至逾人民幣 25 萬元（約 37,255 美元），較兩個月前對客戶的報價上漲 20–50%；寒武紀對下一代 690 晶片較兩個月前調漲 20–30%。報導對成因給出**兩個疊加的效應**，不是一個：①全球性 HBM 短缺（逐字：a worldwide shortage of HBM is reverberating through China's AI industry）；②中國特有的出口管制溢價——自 2024 年 12 月美方收緊對中國的先進 HBM 出口管制後，中國業者轉向灰市，而灰市 HBM 通常是中國境外買家所付價格的**數倍**。本 claim 的結構意義在於它是**獨立第三方由下游價格反推的稀缺性證據**：圖中既有的 HBM 稀缺主張全部來自供應端自報（Micron 10-Q、SK hynix 法說），而本件由買方側價格行為佐證，依 L8 屬不同性質的來源。⚠ 明文限制：不得把中國終端售價漲幅當成全球 HBM 價格漲幅的代理——兩者之間隔著一個數倍的灰市乘數；也不得據此推斷 SK hynix／Samsung／Micron 任一家的售價或市占變化，報導只點名三家主導該市場，未給任何一家的價格或份額數字。",
+      "subject_id": "tech:hbm"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:hbm",
+      "name": "High-Bandwidth Memory (HBM)",
+      "role": null,
+      "source_ids": [
+        "reuters_china_ai_chip_hbm_repricing_2026_09_10_s3"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "reuters_china_ai_chip_hbm_repricing_2026_09_10",
+    "evidence_tier": 2,
+    "origin_entity": "Reuters",
+    "permission_basis": "公開新聞短引文與來源連結；不保存全文。",
+    "published_at": "2026-09-10",
+    "publisher": "Free Malaysia Today（Reuters 全文轉載）",
+    "retrieved_at": "2026-09-11",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Exclusive: China's AI chipmakers raise prices as high-bandwidth memory shortage bites",
+    "url": "https://www.freemalaysiatoday.com/category/business/2026/09/10/china-s-ai-chipmakers-raise-prices-as-high-bandwidth-memory-shortage-bites"
+  },
+  "sources": [
+    {
+      "id": "reuters_china_ai_chip_hbm_repricing_2026_09_10_s1",
+      "locator": "出口管制與灰市段",
+      "quote": "Since Washington tightened controls on exports of certain advanced HBM products to China in December 2024, Chinese chipmakers have increasingly relied on grey-market channels to secure supplies"
+    },
+    {
+      "id": "reuters_china_ai_chip_hbm_repricing_2026_09_10_s2",
+      "locator": "灰市價差一句",
+      "quote": "Such HBM typically costs several times what buyers outside China pay"
+    },
+    {
+      "id": "reuters_china_ai_chip_hbm_repricing_2026_09_10_s3",
+      "locator": "全球短缺歸因一句",
+      "quote": "The price hikes illustrate how a worldwide shortage of HBM is reverberating through China's AI industry"
+    },
+    {
+      "id": "reuters_china_ai_chip_hbm_repricing_2026_09_10_s4",
+      "locator": "成本結構傳導一句",
+      "quote": "Because memory accounts for a large share of an AI accelerator's production cost, the higher prices are feeding directly into finished cards"
+    },
+    {
+      "id": "reuters_china_ai_chip_hbm_repricing_2026_09_10_s5",
+      "locator": "HBM 供應端市場結構一句",
+      "quote": "The advanced HBM market is dominated by South Korea's SK Hynix and Samsung Electronics, and US-based Micron Technology"
+    }
+  ]
+}
