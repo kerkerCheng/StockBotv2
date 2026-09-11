@@ -422,9 +422,9 @@
       "poll": {
         "eligible": true,
         "last_checked": "2026-09-10",
-        "query_hint": "AAOI 於 10-Q／10-K／8-K 或官方 PR 揭露上述任一項；或使用者核准 [193] 的 Rosenblatt access"
+        "query_hint": "AAOI 於 10-Q／10-K／8-K 或官方 PR 揭露下列任一項：美國產能溢價、數份 LTA 在桌上但刻意不簽、CPO 後毛利率水準"
       },
-      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
+      "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3｜2026-09-11 收窄：原 hint 的第二條路『使用者核准 [193] 的 Rosenblatt access』已失效（[193] 於 2026-08-31 resolve 為 drop）；另兩個 atom（sold out、300–400mW）已由 aaoi_q2fy26_earnings_call_20260806 與 aaoi_400mw_cpo_pump_laser_pr_2025_12_18 涵蓋，移出等待清單。",
       "status": "active",
       "woken_by": null
     },
