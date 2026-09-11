@@ -171,3 +171,49 @@ def test_the_download_error_message_names_the_region() -> None:
     source = inspect.getsource(fetch_document)
     assert "mtype={mtype}" in source
     assert "先確認 mtype 與列檔時相同" in source
+
+
+# ---------------------------------------------------------------------------
+# `--list` 必須套 --kind（2026-09-11）
+# ---------------------------------------------------------------------------
+
+def test_list_applies_the_kind_filter_not_just_the_region(monkeypatch, capsys) -> None:
+    """事發（2026-09-11）：`--list` 只依 mtype 抓、沒套 `--kind`，於是
+    consolidated 與 separate 回傳完全相同的清單（同屬 mtype=A），
+    差點被讀成「這家公司只出個別財報」——那是濾網沒接上，不是申報事實。
+    """
+    from fetchers import mops
+
+    docs = [
+        {"data_year": "115 年 第二季", "detail": "IFRSs個別財報",
+         "filename": "202602_3081_AI2.pdf", "size": "1", "uploaded_at": "115/08/12"},
+        {"data_year": "115 年 第二季", "detail": "IFRSs合併財報",
+         "filename": "202602_3081_AI1.pdf", "size": "1", "uploaded_at": "115/08/12"},
+    ]
+    monkeypatch.setattr(mops, "list_documents", lambda *a, **k: docs)
+
+    assert mops.main(["--co-id", "3081", "--list", "--year", "115",
+                      "--kind", "separate_financial_statement"]) == 0
+    out = capsys.readouterr()
+    assert "AI2" in out.out and "AI1" not in out.out          # 只列個別
+    assert "這一區 2 份，符合 1 份，濾掉 1 份" in out.err       # INV-3：報得出三個數
+
+
+def test_list_distinguishes_empty_region_from_everything_filtered_out(
+        monkeypatch, capsys) -> None:
+    """「這區沒文件」與「有文件但都被濾掉」的下一步不同（換來源 vs 換 kind），
+    所以不得印成同一句（INV-3：查不到了不是合法 lifecycle）。"""
+    from fetchers import mops
+
+    monkeypatch.setattr(mops, "list_documents", lambda *a, **k: [
+        {"data_year": "115 年", "detail": "IFRSs個別財報", "filename": "x.pdf",
+         "size": "1", "uploaded_at": "115/08/12"}])
+    assert mops.main(["--co-id", "3081", "--list", "--year", "115",
+                      "--kind", "consolidated_financial_statement"]) == 1
+    err = capsys.readouterr().err
+    assert "沒有一份是" in err and "實際有的是：IFRSs個別財報" in err
+
+    monkeypatch.setattr(mops, "list_documents", lambda *a, **k: [])
+    assert mops.main(["--co-id", "3081", "--list", "--year", "115",
+                      "--kind", "consolidated_financial_statement"]) == 1
+    assert "這一區查無任何文件" in capsys.readouterr().err

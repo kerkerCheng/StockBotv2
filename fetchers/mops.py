@@ -311,7 +311,7 @@ def _default_roc_year() -> str:
     return str(date.today().year - 1911)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="從公開資訊觀測站（MOPS）抓台股年報／財報"
     )
@@ -335,7 +335,7 @@ def main() -> int:
         help="同年度有多份修訂時全部保留（doc_id 附表單碼）；預設只取最新一份",
     )
     parser.add_argument("--out", default="library/raw", help="輸出目錄")
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     year = args.year or _default_roc_year()
 
@@ -345,10 +345,26 @@ def main() -> int:
         mtype = KIND_MTYPE.get(args.kind, "F")
         documents = list_documents(args.co_id, year, mtype=mtype)
         if not documents:
-            print(f"[mops] {args.co_id} year={year}（mtype={mtype}）：查無文件",
+            print(f"[mops] {args.co_id} year={year}（mtype={mtype}）：這一區查無任何文件",
                   file=sys.stderr)
             return 1
-        for doc in documents:
+        # ⚠ `--list` 先前只依 mtype 抓、**沒有套 `--kind`**，於是 consolidated 與 separate
+        # 回傳完全相同的清單（同屬 mtype=A）。2026-09-11 實測 3081 時差點據此誤判成
+        # 「這家公司只出個別財報」——那是 fetcher 的濾網沒接上，不是公司的申報事實。
+        picked = select_documents(documents, args.kind, include_english=args.include_english)
+        # 只補 filter 還不夠：「這區沒東西」與「有東西但都被我濾掉」會印成同一句，
+        # 那正是 INV-3 禁的（每個 filter 都要報得出 input／accepted／filtered）。
+        print(f"[mops] {args.co_id} year={year} mtype={mtype} kind={args.kind}："
+              f"這一區 {len(documents)} 份，符合 {len(picked)} 份，濾掉 {len(documents) - len(picked)} 份",
+              file=sys.stderr)
+        if not picked:
+            kinds = sorted({d["detail"].replace("英文版-", "") for d in documents})
+            print(f"[mops] ⚠ 這一區有文件，但沒有一份是 {args.kind}——"
+                  f"實際有的是：{'、'.join(kinds)}。**這是「本公司未申報此類」，"
+                  f"不是「查無文件」**，兩者的下一步不同（換 kind vs 換來源）。",
+                  file=sys.stderr)
+            return 1
+        for doc in picked:
             print(f"  {doc['data_year']:>6} | {doc['detail'][:34]:36} | "
                   f"{doc['filename']} | {doc['size']:>12} | {doc['uploaded_at']}")
         return 0
