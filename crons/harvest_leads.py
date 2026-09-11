@@ -69,6 +69,14 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
             watch.get("forms"), list
         ):
             raise ValueError("edgar_watch 必須有 tickers 與 forms list")
+        auto_no_go = watch.get("auto_no_go_forms", [])
+        if not isinstance(auto_no_go, list) or not all(isinstance(x, str) for x in auto_no_go):
+            raise ValueError("edgar_watch.auto_no_go_forms 必須是 string list")
+        # 子集檢查：列了一個不在 forms 裡的 form，它永遠不會被 harvest 到，於是這條
+        # 規則看起來生效、實際上是死設定（L16-3：字彙有行為後果就必須被強制）。
+        orphan = sorted(set(auto_no_go) - set(watch.get("forms") or []))
+        if orphan:
+            raise ValueError(f"edgar_watch.auto_no_go_forms 不在 forms 裡：{orphan}")
     x_section = data.get("x_accounts") or {}
     if x_section and not isinstance(x_section.get("handles"), list):
         raise ValueError("x_accounts 必須有 handles list")
@@ -146,16 +154,35 @@ def filings_to_leads(ticker: str, cik: str, filings: list[dict]) -> list[dict]:
                 "title": (f"{ticker.upper()} {f['form_type']} filed {f['filed_date']}"
                           f" [{accession[-6:]}]"),
                 "published_at": f["filed_date"],
+                # form_type 跟著 payload 走：下游要判「這一型要不要吃 pq1 預算」時，
+                # 不必回頭 parse 標題去猜（L16：分類已有 SSOT 就讓它跟著資料送到）。
+                "form_type": f["form_type"],
             }
         )
     return out
 
 
-def _register_all(store: dict, source: str, items: list[dict], seen_at: str | None) -> int:
+#: 自動 no-go 的理由句。寫死成一句而不是每次現組，讓「為什麼這批沒進 pq1」可以被
+#: 一條 grep 全部撈出來。
+AUTO_NO_GO_REASON = (
+    "harvest 端自動 no_go：{form} 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead："
+    "applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。"
+    "大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。"
+)
+
+
+def _register_all(
+    store: dict,
+    source: str,
+    items: list[dict],
+    seen_at: str | None,
+    *,
+    auto_no_go_forms: frozenset[str] = frozenset(),
+) -> int:
     new = 0
     for item in items:
         try:
-            _lead_id, is_new = leads.register(
+            lead_id, is_new = leads.register(
                 store,
                 source=source,
                 url=item["url"],
@@ -169,6 +196,25 @@ def _register_all(store: dict, source: str, items: list[dict], seen_at: str | No
             continue  # 壞 URL 跳過，不讓單筆汙染整批
         if is_new:
             new += 1
+            form = str(item.get("form_type") or "")
+            if form and form in auto_no_go_forms:
+                # 註冊後立刻 triage 成 triaged_no_go：記錄留著（可 grep、可
+                # requeue-campaign 叫回），但不進 pending → 不進 triage 佇列 → 不吃 drain。
+                try:
+                    leads.triage(
+                        store,
+                        lead_id,
+                        go=False,
+                        tier=1,
+                        reason=AUTO_NO_GO_REASON.format(form=f"Form {form}"),
+                        decided_at=seen_at,
+                    )
+                except ValueError as exc:
+                    # 單筆 triage 失敗不得讓整批 harvest 死掉——那會讓所有來源當天靜默停擺。
+                    # 降級的結果是這一筆留在 pending（＝本改動之前的行為，安全但吃 drain
+                    # 名額），而降級必須說話（INV-3）。
+                    print(f"[harvest] auto no_go 失敗，{lead_id} 留在 pending：{exc}",
+                          file=sys.stderr)
     return new
 
 
@@ -571,6 +617,7 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
     watch = config.get("edgar_watch") or {}
     tickers = _edgar_watch_tickers(watch)
     forms = watch.get("forms") or []
+    auto_no_go = frozenset(str(f) for f in (watch.get("auto_no_go_forms") or []))
     count = int(watch.get("lookback_count", 8))
     if not tickers:
         return
@@ -596,7 +643,8 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
             print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
             continue
         items = filings_to_leads(ticker, cik, filings)
-        new = _register_all(store, source, items, seen_at)
+        new = _register_all(store, source, items, seen_at,
+                            auto_no_go_forms=auto_no_go)
         leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
         print(f"[harvest] {source} ok: {new} new / {len(items)} filings")
 

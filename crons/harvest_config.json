@@ -86,6 +86,10 @@
       "6-K",
       "20-F"
     ],
+    "_auto_no_go_note": "auto_no_go_forms：harvest 註冊後立刻 triage 成 triaged_no_go，不進 pending、不吃 pq1 drain 預算。**不是把它從 forms 移除**——移除會連「大額裁量性內部人賣出」的脈絡一起丟（2026-09-11 實測 AAOI officer 賣 32,172 股、未勾 10b5-1，那是候選標的的決策脈絡）。留著 lead 記錄可 grep、可用 `engine_b.cli requeue-campaign` 明確叫回。⚠ 這裡的值必須是 forms 的子集，load_config 會擋——列一個不在 forms 裡的 form，規則看起來生效、實際是死設定。",
+    "auto_no_go_forms": [
+      "4"
+    ],
     "lookback_count": 8
   }
 }

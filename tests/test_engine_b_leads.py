@@ -405,6 +405,44 @@ def test_filings_to_leads_builds_stable_urls() -> None:
     assert "10-Q filed 2026-05-06" in out[0]["title"]
 
 
+def test_auto_no_go_forms_never_reach_the_triage_queue() -> None:
+    """Form 4 要留下記錄、但不得吃 pq1 預算。
+
+    2026-09-10 實測 267 筆 Form 4 lead：applied 0、action_prepared 0，其中 160 筆
+    走完 triaged_go → pq1 → parked。**不是把 "4" 從 forms 移除**——移除連「大額裁量性
+    內部人賣出」的脈絡也一起丟；這裡驗的是「登記了但不進 pending」。
+    """
+    store = leads.empty_store()
+    items = harvest_leads.filings_to_leads("TSM", "1046179", [
+        {"accession": "000110465926100001", "primary_doc": "a.htm",
+         "form_type": "4", "filed_date": "2026-09-09"},
+        {"accession": "000110465926100002", "primary_doc": "b.htm",
+         "form_type": "8-K", "filed_date": "2026-09-09"},
+    ])
+    new = harvest_leads._register_all(store, "edgar:TSM", items, None,
+                                      auto_no_go_forms=frozenset({"4"}))
+    assert new == 2, "兩筆都要被登記——記錄留著才 grep 得到"
+    by_status = {lead["status"]: lead for lead in store["leads"].values()}
+    assert set(by_status) == {"triaged_no_go", "pending"}
+    assert "4 filed" in by_status["triaged_no_go"]["title"]
+    assert "8-K filed" in by_status["pending"]["title"]
+    # no_go 必須說得出理由（INV-3：不得靜默沉底）
+    assert "pq1 drain" in by_status["triaged_no_go"]["triage"]["reason"]
+    # 不在清單裡的 form 一律照舊走 pending → triage
+    assert by_status["pending"]["triage"] is None
+
+
+def test_auto_no_go_forms_must_be_a_subset_of_harvested_forms(tmp_path: Path) -> None:
+    """列一個不在 forms 裡的 form＝死設定：規則看起來生效，實際永遠沒東西可套。"""
+    bad = tmp_path / "cfg.json"
+    bad.write_text(json.dumps({
+        "feeds": [],
+        "edgar_watch": {"tickers": ["COHR"], "forms": ["8-K"], "auto_no_go_forms": ["4"]},
+    }), encoding="utf-8")
+    with pytest.raises(ValueError, match="auto_no_go_forms"):
+        harvest_leads.load_config(bad)
+
+
 # --- config fail closed ---------------------------------------------------
 
 def test_load_config_fail_closed_on_missing_fields(tmp_path: Path) -> None:
