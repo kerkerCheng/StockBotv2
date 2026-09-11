@@ -218,7 +218,21 @@ def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> 
 # ---------------------------------------------------------------------------
 
 def _consensus_flags(tickers: Iterable[str], conn: Any) -> dict[str, tuple[bool, bool | None]]:
-    """ticker → (有 EPS 共識, forward EPS 為正)。取每檔最新 snapshot 的 eps 列；+1y 優先、0y 兜底。"""
+    """ticker → (有 EPS 共識, forward EPS 為正)。取每檔最新 snapshot 的 eps 列。
+
+    ⚠ **要求 0y 與 +1y 同時為正**（2026-09-11 改；原本是「+1y 優先、0y 兜底」）。
+
+    事發（2026-09-10 實測 MP）：舊規則刻意優先 +1y，但 `alpha/fundamental/bridge.py` 建模的
+    目標期間是「基期後一個會計年度」——對 12 月結算的公司就是 **0y**。MP 的 +1y（FY2027）
+    共識 EPS 是 +0.89562，於是 gate 判「EPS 為正」並把它選為下一檔；而實際建模的 FY2026
+    同期共識是 **−0.00374**，內部 GAAP EPS 推出來 −0.2685，forward_earnings_multiple
+    型別上不適用，整檔只能走 Abstention（[521]）。
+    **這條規則會系統性地把虧損年的檔選成「可以做」，而它存在的理由正是要避開那些檔。**
+
+    為什麼是「兩者皆正」而不是「只讀 0y」：0y 缺值的檔不少（新上市、換會計年度），
+    只讀 0y 會把它們全判成 None 而排到後面；要求兩者皆正在資料完整時等於讀 0y，
+    在 0y 缺值時退回 +1y——**方向一致地偏保守**，不會把虧損年放進來。
+    """
     rows = conn.execute(
         "SELECT ticker, snapshot_date, relative_label, estimate_avg FROM consensus_estimates WHERE metric = 'eps'"
     ).fetchall()
@@ -239,8 +253,10 @@ def _consensus_flags(tickers: Iterable[str], conn: Any) -> dict[str, tuple[bool,
         if not vals:
             out[t] = (False, None)
             continue
-        pick = vals.get("+1y") if vals.get("+1y") is not None else vals.get("0y")
-        out[t] = (True, (pick > 0) if pick is not None else None)
+        near, far = vals.get("0y"), vals.get("+1y")
+        present = [v for v in (near, far) if v is not None]
+        # 兩者皆正才算正；任一為負就不算——虧損年不得被選成「可以做」。
+        out[t] = (True, all(v > 0 for v in present) if present else None)
     return out
 
 

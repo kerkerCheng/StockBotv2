@@ -274,3 +274,31 @@ def test_open_profile_render_prints_every_field_even_at_zero() -> None:
 def test_open_profile_says_nothing_left_when_everything_is_terminal() -> None:
     rows = [_row("A", readiness="ready", open_panels=())]
     assert closure.render_open_profile(closure.open_profile(rows)) == ["未到終局 0 檔"]
+
+
+def test_consensus_flag_requires_both_periods_positive(tmp_path) -> None:
+    """0y 與 +1y 必須同時為正（2026-09-11 改）。
+
+    事發（2026-09-10 實測 MP）：舊規則「+1y 優先、0y 兜底」會把虧損年的檔選成「可以做」，
+    而它存在的理由正是要避開那些檔——MP 的 +1y 是 +0.89562，實際建模的 0y 是 −0.00374，
+    整檔只能走 Abstention。實測改完有 2 檔旗標翻轉（MP、XPEV），兩檔的 0y 都是負的。
+    """
+    import sqlite3
+
+    from alpha import closure
+
+    conn = sqlite3.connect(":memory:")
+    conn.execute("CREATE TABLE consensus_estimates(ticker TEXT, snapshot_date TEXT, "
+                 "relative_label TEXT, estimate_avg REAL, metric TEXT)")
+    conn.executemany(
+        "INSERT INTO consensus_estimates VALUES (?,?,?,?, 'eps')",
+        [("MPX", "2026-09-10", "0y", -0.004), ("MPX", "2026-09-10", "+1y", 0.90),
+         ("GOODX", "2026-09-10", "0y", 1.1), ("GOODX", "2026-09-10", "+1y", 1.4),
+         ("ONLYFARX", "2026-09-10", "+1y", 2.0)],
+    )
+    flags = closure._consensus_flags(["MPX", "GOODX", "ONLYFARX", "NOPEX"], conn)
+    assert flags["MPX"] == (True, False), "虧損的 0y 不得被 +1y 蓋過"
+    assert flags["GOODX"] == (True, True)
+    # 0y 缺值時退回 +1y——方向一致地偏保守，不是把缺值當成負
+    assert flags["ONLYFARX"] == (True, True)
+    assert flags["NOPEX"] == (False, None)
