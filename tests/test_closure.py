@@ -54,6 +54,78 @@ def test_next_pick_follows_the_five_rules_in_order() -> None:
     assert "READY1" not in order                       # 到終局的不在佇列裡
 
 
+def test_user_defer_sorts_last_but_is_never_hidden() -> None:
+    """「使用者剛說先不要」與「系統排第一」不得同時成立（L12）——但也不得消失（INV-3）。"""
+    rows = [
+        _row("DEFERRED_BEST", has_consensus=True, forward_eps_positive=True,
+             sector="機器人", bottleneck_rank=1, user_deferred=True),
+        _row("PLAIN_WORST", has_consensus=False, forward_eps_positive=False,
+             sector="AI 光互連／CPO", bottleneck_rank=99),
+    ]
+    order = [r.ticker for r in closure.rank_backlog(rows)]
+    assert order == ["PLAIN_WORST", "DEFERRED_BEST"], "四條研究判準不得蓋過使用者的明示指示"
+    assert len(order) == 2, "往後排不是過濾——藏起來會讓「沒做」與「不存在」同形"
+    why = closure.explain_pick(rows[0], frozenset())
+    assert "使用者已 defer" in why
+
+
+def test_deferred_tickers_reads_structured_fields_and_never_parses_titles() -> None:
+    """標的歸屬只從 `ticker`／`company_id` 來。去 parse `co:xxx：` 標題就是 L16 禁的那件事。"""
+    pool = {"items": [
+        {"n": 1, "deferred_at": "2026-09-04", "company_id": "co:soitec", "title": "co:soitec：殘餘缺口"},
+        {"n": 2, "deferred_at": "2026-09-04", "ticker": "NVDA", "title": "co:nvidia：x"},
+        # 已結案的不算
+        {"n": 3, "deferred_at": "2026-09-04", "ticker": "AAOI", "resolution": "go"},
+        # 沒 defer 的不算
+        {"n": 4, "ticker": "COHR"},
+        # 只有散文標題、沒有結構化欄位 → 讀不到就是讀不到，不猜
+        {"n": 5, "deferred_at": "2026-09-04", "title": "co:google：補估值錨點"},
+    ]}
+    got = closure.deferred_tickers(pool, lambda cid: {"co:soitec": "SOI.PA"}.get(cid))
+    assert got == frozenset({"SOI.PA", "NVDA"})
+
+
+def test_base_observation_only_breaks_ties_and_never_outranks_the_four_rules() -> None:
+    """成本維度只在前四條完全同分時才說話——它不是「先做簡單的」。
+
+    2026-09-11 實測（59 檔未到終局）：**57 檔落在 3 個前四條同分的群組裡**，也就是原本
+    真正在決定順序的是 ticker 字典序，而那讓 000660.KS／2301.TW 這類「要自己去找一手
+    年報」的檔一路排在前面。
+    """
+    rows = [
+        # 前四條同分，只差有無基期觀測
+        _row("TIE_NOBASE", has_consensus=True, forward_eps_positive=True,
+             sector="機器人", bottleneck_rank=5, has_base_observation=False),
+        _row("TIE_BASE", has_consensus=True, forward_eps_positive=True,
+             sector="機器人", bottleneck_rank=5, has_base_observation=True),
+        # 名次較前但沒有基期觀測——第四條仍然贏過成本維度
+        _row("RANK1_NOBASE", has_consensus=True, forward_eps_positive=True,
+             sector="機器人", bottleneck_rank=1, has_base_observation=False),
+    ]
+    assert [r.ticker for r in closure.rank_backlog(rows)] == [
+        "RANK1_NOBASE", "TIE_BASE", "TIE_NOBASE"]
+
+
+def test_base_observation_unknown_sorts_between_have_and_have_not() -> None:
+    """讀不到 Engine C 時是 None，不是 False——否則整批會被推到最後（L12）。"""
+    rows = [
+        _row("NOBASE", has_consensus=True, sector="機器人", bottleneck_rank=5, has_base_observation=False),
+        _row("UNKNOWN", has_consensus=True, sector="機器人", bottleneck_rank=5, has_base_observation=None),
+        _row("HASBASE", has_consensus=True, sector="機器人", bottleneck_rank=5, has_base_observation=True),
+    ]
+    assert [r.ticker for r in closure.rank_backlog(rows)] == ["HASBASE", "UNKNOWN", "NOBASE"]
+
+
+def test_next_pick_rule_prose_matches_the_sort_key_arity() -> None:
+    """可讀版本與排序鍵一一對應——多一格少一格都會讓 drain 印出與實際不符的規則。"""
+    key = closure._sort_key(_row("X"), frozenset())
+    # 排序鍵把「不在排序內」與「名次」拆成兩格，所以是散文條數 + 1
+    assert len(key) == len(closure.NEXT_PICK_RULE) + 1
+    assert "defer" in closure.NEXT_PICK_RULE[0]
+    assert closure.NEXT_PICK_RULE[-1] == "ticker 字典序"
+    assert "基期觀測" in closure.NEXT_PICK_RULE[-2]
+
+
 def test_summary_counts_terminal_and_names_the_next_pick_with_reasons() -> None:
     rows = [
         _row("COHR", readiness="ready", open_panels=(), sector="AI 光互連／CPO", bottleneck_rank=2),

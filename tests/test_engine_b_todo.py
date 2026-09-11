@@ -1035,18 +1035,23 @@ def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
         ],
     })
 
+    # 標的歸屬跟著 payload 走（L16，2026-09-11）：下游不必 parse `co:xxx：` 標題去猜。
+    # `unresolved` 的那一筆刻意只有 ticker——不得把佔位字串當成 company_id 塞下去。
     assert todo.collect_from_decisions() == [
         {
             "type": "sheet_only_holding",
             "ref_id": "sheet:co:nvidia",
             "title": "複查 — co:nvidia",
             "source": "decision_lab",
+            "company_id": "co:nvidia",
+            "ticker": "NVDA",
         },
         {
             "type": "sheet_only_holding",
             "ref_id": "sheet:ticker:QQQ",
             "title": "複查 — QQQ",
             "source": "decision_lab",
+            "ticker": "QQQ",
         },
     ]
 

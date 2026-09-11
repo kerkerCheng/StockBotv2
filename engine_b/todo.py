@@ -1782,6 +1782,11 @@ def sync(
         # 圖影響一句話跟著項目走（L16）；collector 沒算出來就維持缺席。
         if row.get("graph_impact"):
             item["graph_impact"] = str(row["graph_impact"])
+        # 同理：標的歸屬。既有 item 在下一次 sync 一併補上（upsert 是同一條路）。
+        if row.get("company_id"):
+            item["company_id"] = str(row["company_id"])
+        if row.get("ticker"):
+            item["ticker"] = str(row["ticker"])
         if row.get("residual_digest"):
             item["residual_digest"] = str(row["residual_digest"])
 
@@ -2633,6 +2638,13 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
             **({"hint": hint} if hint else {}),
             "source": "decision_lab",
         }
+        # 標的歸屬跟著 payload 走（L16）：在這裡它是結構化欄位，到下游卻只剩散文
+        # 標題裡的 `co:xxx：` 前綴，於是每個消費端都得 parse 一次去猜——`closure` 就是
+        # 因此看不見「使用者已 defer 這一檔」。**不是寫一份文件叫人記得去查。**
+        if company not in {"", "unknown", "unresolved"}:
+            row["company_id"] = company
+        if ticker:
+            row["ticker"] = ticker
         if corroboration_codes:
             row["residual_digest"] = _residual_digest(corroboration_codes, missing)
         if not item.get("sheet_only") and item.get("evidence_delta"):

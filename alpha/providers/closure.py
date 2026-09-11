@@ -8,7 +8,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from alpha.closure import BacklogRow, _consensus_flags, _sector_and_rank, row_from_artifact
+from alpha.closure import (
+    BacklogRow,
+    _base_observation_tickers,
+    _consensus_flags,
+    _sector_and_rank,
+    deferred_tickers,
+    row_from_artifact,
+)
 
 
 def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None = None,
@@ -29,6 +36,7 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
 
     # 共識：Engine C
     flags: dict[str, tuple[bool, bool | None]] = {}
+    base_obs: frozenset[str] | None = None
     try:
         if conn is None:
             from engine_c.db import get_conn
@@ -37,6 +45,13 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         flags = _consensus_flags([r.ticker for r in rows], conn)
     except Exception as exc:  # noqa: BLE001
         notes.append(f"Engine C 共識讀不到：{type(exc).__name__}")
+    # 基期觀測分開 try：共識讀不到不該把成本維度一起拖成「全部未知」，反之亦然。
+    # 讀不到時留 None（＝「未讀到」），不是 False——False 會把整批推到最後面（L12）。
+    if conn is not None:
+        try:
+            base_obs = _base_observation_tickers(conn)
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"Engine C 基期觀測讀不到：{type(exc).__name__}")
 
     # 產業與名次：ranking state ＋ registry
     sector_rank: dict[str, tuple[str | None, int | None]] = {}
@@ -48,6 +63,24 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
     except Exception as exc:  # noqa: BLE001
         notes.append(f"ranking state 讀不到：{type(exc).__name__}")
 
+    # pq2 的使用者 defer：讀結構化欄位，讀不到就是空集合（不猜、不 parse 標題）
+    deferred: frozenset[str] = frozenset()
+    try:
+        from engine_b.todo import load as load_pool
+        from identity import get_registry
+
+        registry = get_registry()
+
+        def _resolve(company_id: str) -> str | None:
+            try:
+                return getattr(registry.company(company_id), "research_ticker", None)
+            except Exception:  # noqa: BLE001
+                return None
+
+        deferred = deferred_tickers(load_pool(), _resolve)
+    except Exception as exc:  # noqa: BLE001
+        notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」：{type(exc).__name__}")
+
     enriched: list[BacklogRow] = []
     for r in rows:
         has_c, pos = flags.get(r.ticker, (None, None))
@@ -55,7 +88,10 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         enriched.append(BacklogRow(
             ticker=r.ticker, readiness=r.readiness, open_panels=r.open_panels, settled_panels=r.settled_panels,
             absence_kinds=r.absence_kinds, has_consensus=has_c, forward_eps_positive=pos,
-            sector=sector, bottleneck_rank=rank, generated_at=r.generated_at,
+            sector=sector, bottleneck_rank=rank,
+            has_base_observation=(None if base_obs is None else r.ticker.upper() in base_obs),
+            user_deferred=r.ticker.upper() in deferred,
+            generated_at=r.generated_at,
         ))
     return enriched, notes
 

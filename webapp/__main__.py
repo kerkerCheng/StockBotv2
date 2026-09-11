@@ -320,7 +320,9 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
         for line in closure.render_quality(score):
             print(f"- {line}")
         if result.actionable:
-            print("# 未到終局那幾檔卡在哪（三項可重疊，不相加；欄位與 NEXT_PICK_RULE 同一組）")
+            # 條目數跟著 OPEN_PROFILE_FIELDS 走——寫死「三項」會在加第四項那天變成假的。
+            print(f"# 未到終局那幾檔卡在哪（{len(closure.OPEN_PROFILE_FIELDS)} 項可重疊，"
+                  "不相加；欄位與 NEXT_PICK_RULE 同一組）")
             for line in closure.render_open_profile(profile):
                 print(f"- {line}")
     return {"closed": 0, "open": 1, "unknown": 2}[result.state]

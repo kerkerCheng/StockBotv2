@@ -42,10 +42,12 @@ READY_STATES: frozenset[str] = frozenset({"ready", "ready_with_flags"})
 
 #: 選取規則的**可讀版本**——與 `_sort_key` 一一對應；drain／skill 印這個，不另寫一份。
 NEXT_PICK_RULE: tuple[str, ...] = (
+    "使用者沒有明示 defer（pq2 有 deferred_at 的往後排，仍列出不藏）",
     "有同期 EPS 共識",
     "forward EPS 共識為正（v1 只有本益比法）",
     "產業能加一（所屬產業尚無 ready 檔）",
     "瓶頸排序名次（不在排序內排最後）",
+    "已有基期觀測（缺的要另外找一手年報／決算短信，實測成本約 3 倍）",
     "ticker 字典序",
 )
 
@@ -61,6 +63,10 @@ class BacklogRow:
     forward_eps_positive: bool | None = None
     sector: str | None = None
     bottleneck_rank: int | None = None
+    has_base_observation: bool | None = None
+    #: 這一檔在 pq2 有未結案且被使用者明示 defer 的項目。
+    #: **它不是啟發法，是使用者的一句話**，所以排在四條研究判準之前。
+    user_deferred: bool = False
     generated_at: str | None = None
 
     @property
@@ -100,12 +106,22 @@ def _sort_key(row: BacklogRow, ready_sectors: frozenset[str]) -> tuple:
         return 0 if value is True else (1 if value is None else 2)
 
     return (
+        # 第 0 條（2026-09-11）：「使用者剛說先不要」與「系統排第一」不得同時成立（L12）。
+        # 往後排、**不過濾**——藏起來會讓「沒做」與「不存在」同形（INV-3）。
+        # 它排在四條研究判準之前，因為那四條是機器對研究價值的啟發法，而這一條是
+        # 使用者的明示指示；讓啟發法蓋過指示，方向就反了。
+        1 if row.user_deferred else 0,
         _flag(row.has_consensus),
         _flag(row.forward_eps_positive),
         # 只有「產業已知、且該產業還沒有 ready 檔」才算能加一；產業未知（不在排序內）不給分散度加分
         0 if (row.sector and row.sector not in ready_sectors) else 1,
         1 if row.bottleneck_rank is None else 0,
         row.bottleneck_rank or 0,
+        # 成本維度（2026-09-11 使用者定案）：**只破平手**——放在四條判準之後、ticker 之前。
+        # 不放在 ticker 之後：那一格永遠碰不到（ticker 唯一），會變成看起來生效的死設定。
+        # 它不是「先做簡單的」——前四條的相對順序一格都沒動；它只在前四條完全同分時，
+        # 讓順序不再對「這一檔要不要另外去找一手年報」盲目（實測成本差約 3 倍）。
+        _flag(row.has_base_observation),
         row.ticker,
     )
 
@@ -119,11 +135,14 @@ def rank_backlog(rows: Sequence[BacklogRow]) -> list[BacklogRow]:
 
 def explain_pick(row: BacklogRow, ready_sectors: frozenset[str]) -> str:
     parts = [
+        *(["⚠ 使用者已 defer 相關 pq2——已往後排，仍列出"] if row.user_deferred else []),
         "有共識" if row.has_consensus else ("共識未讀到" if row.has_consensus is None else "無共識"),
         "EPS 為正" if row.forward_eps_positive else ("EPS 未讀到" if row.forward_eps_positive is None else "EPS 非正"),
         (f"產業「{row.sector}」尚無 ready 檔" if row.sector and row.sector not in ready_sectors
          else (f"產業「{row.sector}」已有 ready 檔" if row.sector else "不在瓶頸排序的產業組內")),
         (f"瓶頸排序第 {row.bottleneck_rank}" if row.bottleneck_rank else "不在瓶頸排序內"),
+        ("已有基期觀測" if row.has_base_observation
+         else ("基期觀測未讀到" if row.has_base_observation is None else "無基期觀測（要先找一手年報）")),
     ]
     return "；".join(parts)
 
@@ -160,6 +179,8 @@ OPEN_PROFILE_FIELDS: tuple[tuple[str, str], ...] = (
     ("no_bottleneck_edge", "不在瓶頸排序內（Q1 結構分算不出：沒有帶 substitutability 的結構邊）"),
     ("no_consensus", "沒有同期 EPS 共識"),
     ("forward_eps_not_positive", "forward EPS 共識非正（v1 只有本益比法）"),
+    ("no_base_observation", "沒有基期觀測（要先自己找一手年報／決算短信，實測成本約 3 倍）"),
+    ("user_deferred", "使用者已 defer 相關 pq2（已往後排，仍列出）"),
 )
 
 
@@ -182,6 +203,9 @@ def open_profile(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> dic
         "no_consensus": sorted(r.ticker for r in open_rows if r.has_consensus is False),
         "forward_eps_not_positive": sorted(
             r.ticker for r in open_rows if r.forward_eps_positive is False),
+        "no_base_observation": sorted(
+            r.ticker for r in open_rows if r.has_base_observation is False),
+        "user_deferred": sorted(r.ticker for r in open_rows if r.user_deferred),
     }
 
 
@@ -216,6 +240,43 @@ def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> 
 # 以下兩個 helper 接受已開好的 conn／registry 物件，不 import 任何 I/O 模組——
 # 真正讀檔／連線的 `collect_backlog()` 住 `alpha/providers/closure.py`（alpha 核心層保持純淨）。
 # ---------------------------------------------------------------------------
+
+def deferred_tickers(pool: Mapping[str, Any], resolve: Any) -> frozenset[str]:
+    """pq2 裡**未結案且使用者明示 defer** 的項目對應到哪些 ticker。
+
+    只讀結構化欄位（`ticker`／`company_id`），**不 parse 標題**——標題裡的 `co:xxx：`
+    前綴是散文，去 parse 它就是 L16 禁的那件事（同一個理由讓 `closure_gate` 的
+    `--skip` 是呼叫端顯式宣告而不是 gate 自己猜）。舊項目在下一次 `todo sync`
+    upsert 時補上欄位；在那之前它們就是讀不到，**寧可少排也不要猜錯**。
+
+    `resolve` 是 company_id → ticker 的解析函式（registry），失敗回 None。
+    """
+    out: set[str] = set()
+    for item in pool.get("items") or ():
+        if item.get("resolved_at") or item.get("resolution"):
+            continue
+        if not item.get("deferred_at"):
+            continue
+        ticker = str(item.get("ticker") or "").strip()
+        if not ticker and item.get("company_id"):
+            ticker = str(resolve(str(item["company_id"])) or "").strip()
+        if ticker:
+            out.add(ticker.upper())
+    return frozenset(out)
+
+
+def _base_observation_tickers(conn: Any) -> frozenset[str]:
+    """有 `fiscal_year_results` 基期觀測的 ticker 集合（Engine C 人工 ledger）。
+
+    這是 `NEXT_PICK_RULE` 倒數第二格（ticker 之前）的成本代理：沒有基期觀測的檔，
+    session 要自己去找一手年報／決算短信／業績發表，2026-09-10 實測工具呼叫數差約 3 倍。
+    ⚠ 它只回答「基期在不在手上」，不回答基期對不對——後者是研究判斷，不進排序鍵。
+    """
+    rows = conn.execute(
+        "SELECT DISTINCT ticker FROM manual_fields WHERE field_name = 'fiscal_year_results'"
+    ).fetchall()
+    return frozenset(str(r[0]).upper() for r in rows if r and r[0])
+
 
 def _consensus_flags(tickers: Iterable[str], conn: Any) -> dict[str, tuple[bool, bool | None]]:
     """ticker → (有 EPS 共識, forward EPS 為正)。取每檔最新 snapshot 的 eps 列。
@@ -437,6 +498,7 @@ def render_quality(score: QualityScore) -> list[str]:
 
 __all__ = [
     "GATE_STATES", "MULTIPLE_NEUTRAL_TOLERANCE", "NEXT_PICK_RULE", "READY_STATES",
+    "deferred_tickers",
     "BacklogRow", "GateResult", "QualityScore", "closure_gate", "explain_pick",
     "rank_backlog", "render_quality", "render_summary", "row_from_artifact",
     "score_quality", "sectors_with_ready", "summarize",

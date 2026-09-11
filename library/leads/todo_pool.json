@@ -432,6 +432,7 @@
     },
     {
       "added_at": "2026-07-26T13:07:56.663666+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "重新評估該 probe（reassess）",
       "n": 35,
       "reason": "AAOI reassess 完成；baseline pd_fc9369418bbc3fd261a771c5eaa08eb1 → new pd_f48b4cb31d2a2b883f4abed022972716；結果 REVIEW、research intent、無 paper/live 動作。",
@@ -444,6 +445,7 @@
     },
     {
       "added_at": "2026-07-26T13:07:56.663708+00:00",
+      "company_id": "co:sivers_semiconductors",
       "hint": "重新評估該 probe（reassess）",
       "n": 36,
       "reason": "Sivers reassess 完成；baseline pd_e297eca103fbffe0eeeaf4c6bedb6061 → new pd_11ec8776b62cc368c5549c3d7ce7833c；結果 REVIEW、research intent、無 paper/live 動作。",
@@ -456,6 +458,7 @@
     },
     {
       "added_at": "2026-07-27T14:46:57.350563+00:00",
+      "company_id": "co:applied_optoelectronics",
       "dispatch_baseline_decision_id": "pd_f48b4cb31d2a2b883f4abed022972716",
       "dispatch_receipt": "decision:pd_ce5c1b9396dadafb9b238be8b6f44dcb",
       "dispatch_ref": "wo_23faa9def046e05bc23bdb5735bb774f",
@@ -475,6 +478,7 @@
     },
     {
       "added_at": "2026-07-27T14:46:57.350607+00:00",
+      "company_id": "co:sivers_semiconductors",
       "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
       "dispatch_receipt": "decision:pd_343e33c5c1cf6637d77a9b2eb41b58ea",
       "dispatch_ref": "wo_a3e54af91361c3babb82b9d66e2d0ace",
@@ -520,6 +524,7 @@
     },
     {
       "added_at": "2026-07-28T01:10:21.849151+00:00",
+      "company_id": "co:applied_optoelectronics",
       "dispatch_baseline_decision_id": "pd_ce5c1b9396dadafb9b238be8b6f44dcb",
       "dispatch_receipt": "decision:pd_062179e09086fa2dcbe65e1932466a97",
       "dispatch_ref": "wo_b82c8b5cbb4a0b3480036f93a72bdade",
@@ -539,6 +544,7 @@
     },
     {
       "added_at": "2026-07-28T01:10:21.849173+00:00",
+      "company_id": "co:sivers_semiconductors",
       "deferred_at": "2026-07-30T15:33:49.863872+00:00",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 42,
@@ -571,6 +577,7 @@
     },
     {
       "added_at": "2026-07-29T01:01:43.676817+00:00",
+      "company_id": "co:axt",
       "dispatch_baseline_decision_id": "pd_c4f127d6aef075a5a30a22610e714e08",
       "dispatch_receipt": "decision:pd_1ef7e53eeaf409ac6f2ec11c56fe35f7",
       "dispatch_ref": "wo_ad3bcb0304d451c9cf2d8ada1008baaa",
@@ -853,6 +860,7 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028013+00:00",
+      "company_id": "co:applied_optoelectronics",
       "dispatch_baseline_decision_id": "pd_8e6917ab2c5d2438eed27876132f3cd9",
       "dispatch_receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
       "dispatch_ref": "wo_dc79ed71de333dade7e3d3dff89de9d4",
@@ -872,6 +880,7 @@
     },
     {
       "added_at": "2026-07-29T15:16:58.028043+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_c4f127d6aef075a5a30a22610e714e08",
       "dispatch_receipt": "decision:pd_78364234e23f6f1deceae00e5662dea6",
@@ -1113,6 +1122,7 @@
     },
     {
       "added_at": "2026-07-30T22:42:06.988142+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 77,
       "reason": null,
@@ -1146,6 +1156,7 @@
     },
     {
       "added_at": "2026-08-01T16:06:19.781609+00:00",
+      "company_id": "co:applied_optoelectronics",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_8e6917ab2c5d2438eed27876132f3cd9",
       "dispatch_receipt": "decision:pd_0a0b28a84859817afabaafa9f1411298",
@@ -1238,6 +1249,7 @@
     },
     {
       "added_at": "2026-08-02T22:42:49.491922+00:00",
+      "company_id": "co:axt",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 84,
       "reactivated_at": "2026-08-05T03:31:36.474050+00:00",
@@ -1255,6 +1267,7 @@
     },
     {
       "added_at": "2026-08-03T22:36:54.439794+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 85,
       "reason": "Engine D 最新 decision pd_c17f84a51567ee17d27750cf97a18e55 為 NO ACTION，無實質缺口；來源 row 已不再產生，屬殘留項",
@@ -1380,6 +1393,7 @@
     },
     {
       "added_at": "2026-08-04T07:27:57.692312+00:00",
+      "company_id": "co:iqe",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_285c1b339ec9e6c2d01769fcb8b1ce05",
       "dispatch_receipt": "decision:pd_c3a1064daa4698ba24f4ffb21d718d1e",
@@ -1417,6 +1431,7 @@
     },
     {
       "added_at": "2026-08-05T22:34:50.515129+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 95,
       "reactivated_at": "2026-08-06T08:37:02.590356+00:00",
@@ -1439,6 +1454,7 @@
     },
     {
       "added_at": "2026-08-05T22:34:50.515129+00:00",
+      "company_id": "co:axt",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 96,
       "reactivated_at": "2026-08-06T08:37:02.590356+00:00",
@@ -1538,6 +1554,7 @@
     },
     {
       "added_at": "2026-08-07T22:41:22.800262+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 102,
       "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
@@ -1556,6 +1573,7 @@
     },
     {
       "added_at": "2026-08-07T22:41:22.800262+00:00",
+      "company_id": "co:axt",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 103,
       "reason": "expiry 訂錯（早於各自催化劑）已於 2026-08-08 修正並 reassess，三筆新決策皆 NO_ACTION；成因已除，非僅清編號",
@@ -1632,6 +1650,7 @@
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 107,
       "reason": null,
@@ -1650,6 +1669,7 @@
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "company_id": "co:axt",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 108,
       "reason": null,
@@ -1668,6 +1688,7 @@
     },
     {
       "added_at": "2026-08-08T20:07:50.101937+00:00",
+      "company_id": "co:iqe",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_08309301779fe5f4fc97f93aafdcbfa2",
       "dispatch_receipt": "decision:pd_57b4e7958752fd4645d1850d85b91b05",
@@ -1710,6 +1731,7 @@
     },
     {
       "added_at": "2026-08-09T22:36:03.607769+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 111,
       "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
@@ -1728,6 +1750,7 @@
     },
     {
       "added_at": "2026-08-09T22:36:03.607769+00:00",
+      "company_id": "co:axt",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 112,
       "reason": "根因已除：holdings_digest 不再涵蓋市值，持倉確認不會因股價變動而失效；三筆 reassess 後皆 NO_ACTION，collector 不再產出",
@@ -1857,6 +1880,7 @@
     },
     {
       "added_at": "2026-08-11T13:36:08.757245+00:00",
+      "company_id": "co:applied_optoelectronics",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 119,
       "reason": "使用者於 2026-08-12 確認關閉。底層 cohort dc_a94362af（co:applied_optoelectronics）已於 2026-08-11 reassess，expiry 對齊 Q3 財報（2026-11-20），action 為 NO_ACTION，collector 不再產出此項。",
@@ -1875,6 +1899,7 @@
     },
     {
       "added_at": "2026-08-11T13:36:08.757245+00:00",
+      "company_id": "co:sivers_semiconductors",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_11ec8776b62cc368c5549c3d7ce7833c",
       "dispatch_receipt": "decision:pd_52d99b4d5e888f505324beca21b16ddb",
@@ -2030,6 +2055,7 @@
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "company_id": "co:applied_optoelectronics",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_880a9a7fa1682a3acfb827e7d39fd96e",
       "dispatch_receipt": "decision:pd_04af7e9092e95cacef3878da96420ad6",
@@ -2050,6 +2076,7 @@
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_023deab6fa06ad34b3f2d9e7069da0ff",
       "dispatch_receipt": "decision:pd_2d219a1037a187b60e151986680460cb",
@@ -2070,6 +2097,7 @@
     },
     {
       "added_at": "2026-08-12T15:06:20.702884+00:00",
+      "company_id": "co:lumentum",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_e0f213a4bbc75598270ce0b73facec88",
       "dispatch_receipt": "decision:pd_954e99e10975f46041ca434ebbf8425e",
@@ -2172,6 +2200,7 @@
     },
     {
       "added_at": "2026-08-14T06:37:55.335929+00:00",
+      "company_id": "co:sivers_semiconductors",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 137,
       "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
@@ -2184,6 +2213,7 @@
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
       "dispatch_receipt": "decision:pd_fdd8467f919eadbc48e8f97032191ebb",
@@ -2208,6 +2238,7 @@
     },
     {
       "added_at": "2026-08-14T22:45:36.984090+00:00",
+      "company_id": "co:lumentum",
       "dispatch_attempt": 2,
       "dispatch_baseline_decision_id": "pd_f9d25b48ca3054dfadc384f7c6ee6447",
       "dispatch_receipt": "decision:pd_53e76ad473aa48633bf10e1225b91241",
@@ -2317,6 +2348,7 @@
     },
     {
       "added_at": "2026-08-15T03:10:23.531520+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
       "dispatch_receipt": "decision:pd_7058045c5ca86e9216af59d424333ed6",
@@ -2363,6 +2395,7 @@
     },
     {
       "added_at": "2026-08-15T03:33:25.100536+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
       "dispatch_receipt": "decision:pd_033b3441f15a7a60f8aef994b5958637",
@@ -2447,6 +2480,7 @@
     },
     {
       "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "company_id": "co:aeva",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_5c85fda6edce30e4652b8a046437b00a",
       "dispatch_receipt": "decision:pd_5169fba5cb2597d4c8a50d56a03536f6",
@@ -2467,6 +2501,7 @@
     },
     {
       "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_d214a6d7ccb93dbf2fcd620dad791cef",
       "dispatch_receipt": "decision:pd_c65571209897d9fd15d2d21ca57daef6",
@@ -2487,6 +2522,7 @@
     },
     {
       "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "company_id": "co:iqe",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 156,
       "reason": null,
@@ -2525,6 +2561,7 @@
     },
     {
       "added_at": "2026-08-15T20:06:20.186969+00:00",
+      "company_id": "co:sivers_semiconductors",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 158,
       "reason": "blocker registry 判定只剩 system_internal；不需要使用者決定，亦不冒充外部事件",
@@ -2603,6 +2640,7 @@
     },
     {
       "added_at": "2026-08-16T22:51:45.815468+00:00",
+      "company_id": "co:axt",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 163,
       "reason": null,
@@ -2639,6 +2677,7 @@
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
+      "company_id": "co:aeva",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_5169fba5cb2597d4c8a50d56a03536f6",
       "dispatch_receipt": "decision:pd_b64ce4a43686c91ffc8b17fe09690aaf",
@@ -2693,6 +2732,7 @@
     },
     {
       "added_at": "2026-08-17T00:05:29.905984+00:00",
+      "company_id": "co:sivers_semiconductors",
       "deferred_at": "2026-08-25T01:24:41.911625+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 168,
@@ -2712,6 +2752,7 @@
     },
     {
       "added_at": "2026-08-17T01:35:31.016351+00:00",
+      "company_id": "co:iqe",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 169,
       "reason": null,
@@ -2795,6 +2836,7 @@
     },
     {
       "added_at": "2026-08-18T00:05:54.299066+00:00",
+      "company_id": "co:iqe",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 175,
       "reactivated_at": "2026-08-18T11:16:47.740144+00:00",
@@ -2903,6 +2945,7 @@
     },
     {
       "added_at": "2026-08-19T04:56:42.255659+00:00",
+      "company_id": "co:axt",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_4e91b107001f7b3ac7f1b6a9f9fbb564",
       "dispatch_receipt": "superseded：dispatch 取到 2026-08-16 22:53 的舊 assessment，最新 decision 為 2026-08-17 01:36 的 ca_5ce065ff（analyzable、blockers 空）。AXTI 的 10-K 反證屬新證據，應走 reassess 而非 gap research。retire 舊 job，不關閉 probe。",
@@ -3070,6 +3113,7 @@
     },
     {
       "added_at": "2026-08-20T11:02:30.643377+00:00",
+      "company_id": "co:micron_technology",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f87f24f695192e4901496350ea629b1b",
       "dispatch_receipt": "decision:pd_85176e9aa4c96f7c67706791e18da550",
@@ -3104,6 +3148,7 @@
     },
     {
       "added_at": "2026-08-20T15:36:57.789792+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
       "dispatch_receipt": "bounded research 未果，非未嘗試。已試路徑：(1) hds.co.jp/english/ir 三層導覽（consolidatedfinancialresults／achievements／achievements/segment）——頁面存在但 bookings／sales 數字以動態表格與圖表呈現，可抽文字為 0，取不到逐字數值；(2) 第三方聚合有具體數字（日產汽車佔 FY2025/3 營收 10.3%、FY2026/3 降至 10% 以下；FY2027/3 Q1 受注 241.3 億日圓 +55.7%；FY2026/3 營收 595.57 億日圓），但依 source-trace 屬 tier 2-3，不足以支持 Engine C manual observation 的 traceability 要求，不予採用。⚠ 未嘗試且應為正解的路徑：日本 issuer 的客戶集中度揭露在**有価証券報告書**，應走 EDINET（金融庁 EDGAR 對應機構）而非公司 IR 網頁；受注殘高同樣在該文件與決算短信。下輪應直接以 EDINET 檢索 6324。blockers 全數未清（counter_path_missing／financial_backlog_manual_required／financial_customer_concentration_manual_required／financial_runway_manual_required／independent_source_missing）。",
@@ -3190,6 +3235,7 @@
     },
     {
       "added_at": "2026-08-21T05:39:13.337745+00:00",
+      "company_id": "co:iqe",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_08309301779fe5f4fc97f93aafdcbfa2",
       "dispatch_receipt": "superseded：本 work order 綁 2026-08-15 01:29 的 assessment，cohort 最新 decision 為 2026-08-19 23:34 的 ca_f93496f0（analyzable、blockers 空、無 work order），已無 bounded gap 可補。retire 舊 job，不關閉 probe。",
@@ -3253,6 +3299,7 @@
     },
     {
       "added_at": "2026-08-21T06:31:47.875434+00:00",
+      "company_id": "co:coherent",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_40e187d95a2fa8fd26e111a7974e8853",
       "dispatch_receipt": "superseded：本 work order 綁 2026-07-22 的 assessment，其後同 cohort 已有 4 個更新的 decision，最新為 2026-08-19 07:31 的 ca_217789a0（analyzable、blockers 空、無 work order）。retire 舊 job，不關閉 probe。",
@@ -3273,6 +3320,7 @@
     },
     {
       "added_at": "2026-08-21T22:37:52.268912+00:00",
+      "company_id": "co:lumentum",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f9d25b48ca3054dfadc384f7c6ee6447",
       "dispatch_receipt": "superseded：本 work order 綁 2026-08-15 05:14 的 assessment，最新 decision 為 2026-08-21 06:54 的 ca_db1413f2（analyzable、blockers 空、無 work order）。LITE runway 研究成果另存 library/private/research_notes/2026-08-24_pq1_drain_lite_runway.md。retire 舊 job，不關閉 probe。",
@@ -3293,6 +3341,7 @@
     },
     {
       "added_at": "2026-08-21T22:37:52.268912+00:00",
+      "company_id": "co:marvell_technology",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
       "dispatch_receipt": "research_packet:library/private/research_notes/2026-08-25_pq1_mrvl_concentration_backlog.md｜bounded research 完成：4 個 coverage blocker 清掉 2 個（financial_customer_concentration_manual_required 由 mo_77d38cb26e5d5009c419063f76feba05 清除、financial_backlog_manual_required 由 mo_bc5ec274f92d8ee2a87ce740f96e1131 記為 issuer 不揭露）。剩餘 catalyst_missing／disproof_missing 為 thesis 判斷，使用者 2026-08-25 定案比照 [134] AAOI 等 MRVL Q2 FY2027 財報（2026-08-28）以 guidance 設可觀測 disproof 門檻後再 reassess。另註：五軸仍為 research_assessment_missing，axis_ceiling 維持 0，binding constraint 是缺 MRVL assessment 而非缺觀測。",
@@ -3453,6 +3502,7 @@
     },
     {
       "added_at": "2026-08-23T02:35:45.020394+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f5d3b323f0a6a18157be84b2f7bdaba0",
       "dispatch_receipt": "bounded research 未果，卡在 access control 非未嘗試。已試路徑：官方 Annual Report 2025 PDF（schaeffler.com/remotemedien/.../2025_schaeffler_annual_report_en_kj52sl.pdf）回 HTTP 403 Forbidden——依 source-trace §3 遇 anti-bot 即停止，不偽裝 UA、不偽造 Referer、不用規避快取。可得的僅為 press release 層級數字（2025 全年 order intake 約 155 億歐元，其中 BEV 20 億、hybrid 88 億；H1 2025 E-Mobility 46 億、Powertrain & Chassis 47 億），屬 tier 2 且未含客戶集中度，不足以支持 Engine C manual observation。⚠ 下一步兩條：(1) 該 PDF 在瀏覽器可正常下載，使用者提供本機副本即可標 local_only 續做；(2) 或找年報的 HTML 版／IFRS 8 分部附註單獨頁。⚠ 另 catalyst_missing 與 disproof_missing 屬 thesis 判斷，本來就不由 pq1 代填（drain 已警示 disproof 未填等於警報永遠不會響 L7）。blockers 全數未清。",
@@ -3589,6 +3639,7 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "company_id": "co:axt",
       "hint": "沒有 work order，go 不成立；但 reassess 也清不掉——實質 blocker：execution_fx_missing、execution_market_stale_since_decision、holdings_unavailable、live_nav_missing、portfolio_leverage_unavailable。要動的是這些（補證據／研究），補完才 reassess",
       "n": 220,
       "reason": "使用者 2026-08-26 確認關閉；co:axt 經 reassess 後 action 轉 NO ACTION，來源不再產出此項",
@@ -3607,6 +3658,7 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "company_id": "co:coherent",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 221,
       "reason": "使用者 2026-08-26 確認關閉 source-cleared stale todo；不撤銷既有 evidence／decision",
@@ -3625,6 +3677,7 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "company_id": "co:iqe",
       "hint": "核准 bounded gap research；完成後才 reassess",
       "n": 222,
       "reason": "使用者 2026-08-26 確認關閉 source-cleared stale todo；不撤銷既有 evidence／decision",
@@ -3643,6 +3696,7 @@
     },
     {
       "added_at": "2026-08-25T07:37:57.851137+00:00",
+      "company_id": "co:lumentum",
       "dispatch_baseline_decision_id": "pd_f28ad18b3604dd8345df7ae0c59eeced",
       "dispatch_receipt": "decision:pd_18560084eaad197c4242f44b583b9f21",
       "dispatch_ref": "assessment_gap:dc_4d28e50810e46da7fd77ee042ee7bd1c",
@@ -3665,6 +3719,7 @@
     },
     {
       "added_at": "2026-08-25T08:00:29.959820+00:00",
+      "company_id": "co:marvell_technology",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9a7d6db5f7562ce63ff8579f03537a47",
       "dispatch_receipt": "decision:pd_47e093c8e89a9c8b931af6643389eb09",
@@ -3737,6 +3792,7 @@
     },
     {
       "added_at": "2026-08-25T13:30:44.275553+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1a7bdffc5ee4c80cd89da79ea90f13f5",
       "dispatch_receipt": "decision:pd_2d701958b386fe5e1492c4161ef171b9",
@@ -3757,6 +3813,7 @@
     },
     {
       "added_at": "2026-08-25T13:30:44.275553+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f5d3b323f0a6a18157be84b2f7bdaba0",
       "dispatch_receipt": "decision:pd_f557308434860ae6e5d7e5da4b64cf37",
@@ -3875,6 +3932,7 @@
     },
     {
       "added_at": "2026-08-27T22:41:25.012489+00:00",
+      "company_id": "co:landmark_optoelectronics",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_b898711fd48b4d82069adc6311bcfb1f",
       "dispatch_receipt": "decision:pd_d98d4dd84766992f3362cbb612a05a30",
@@ -3908,6 +3966,7 @@
     },
     {
       "added_at": "2026-08-28T00:25:09.190134+00:00",
+      "company_id": "co:iqe",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 240,
       "reason": "完成候選標記經逐項驗證屬實：[10] sivers thesis 已於 2026-08-28 由 [239] 寫入 revised（lifecycle.json status=revised、next_check=2026-09-27）；[240] IQE 已由 reassess 產出 NO_ACTION decision pd_534e911d，coverage 無 blocker、REVIEW 成因（凍結 context 過期）已消除。與 2026-08-27 那批被 sync 自行撤銷的標記不同，本次兩項皆有 underlying receipt 支持",
@@ -3952,6 +4011,7 @@
     },
     {
       "added_at": "2026-08-28T14:10:58.036032+00:00",
+      "company_id": "co:axt",
       "deferred_at": "2026-08-29T00:43:09.977618+00:00",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 243,
@@ -3971,6 +4031,7 @@
     },
     {
       "added_at": "2026-08-28T14:10:58.036032+00:00",
+      "company_id": "co:iqe",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 244,
       "reason": null,
@@ -4048,6 +4109,7 @@
     },
     {
       "added_at": "2026-08-29T01:10:04.654512+00:00",
+      "company_id": "co:marvell_technology",
       "dispatch_baseline_decision_id": "pd_2812054ab36a89b5aef5180de3fc69e2",
       "dispatch_receipt": "decision:pd_b173b3285bd7960c2885c0b48674a7dc",
       "dispatch_ref": "assessment_gap:dc_0fca807c963dc3b9888e0f83ba6d45a5",
@@ -4103,6 +4165,7 @@
     },
     {
       "added_at": "2026-08-29T06:40:44.906295+00:00",
+      "company_id": "co:tower_semiconductor",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_ade577267432dd08abd1b5b85dc2685b",
       "dispatch_receipt": "decision:pd_f3deb3f2d11ea6da30a9bbef4c18bf33",
@@ -4123,6 +4186,7 @@
     },
     {
       "added_at": "2026-08-29T08:10:17.546596+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_2d701958b386fe5e1492c4161ef171b9",
       "dispatch_receipt": "decision:pd_3a363ccea2634afce0f9aa549b2f70fc",
@@ -4143,6 +4207,7 @@
     },
     {
       "added_at": "2026-08-29T08:10:17.546596+00:00",
+      "company_id": "co:landmark_optoelectronics",
       "dispatch_baseline_decision_id": "pd_e1079bb3647771f1f8b729e1cd331773",
       "dispatch_receipt": "decision:pd_bb0df963b0f2eddb506e84eac0b5b40f",
       "dispatch_ref": "assessment_gap:dc_f94148d8545de35cb2c5d048640b913e",
@@ -4167,6 +4232,7 @@
     },
     {
       "added_at": "2026-08-29T08:10:17.546596+00:00",
+      "company_id": "co:micron_technology",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_85176e9aa4c96f7c67706791e18da550",
       "dispatch_receipt": "decision:pd_1a0f172f525fb411e2938bee3ee932a6",
@@ -4246,6 +4312,7 @@
     },
     {
       "added_at": "2026-08-29T23:59:19.880516+00:00",
+      "company_id": "co:nvidia",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_057cc4ca9929ab8ddfef2c82894e010e",
       "dispatch_receipt": "decision:pd_96d8290d4aee924c3bfafd59da088eba",
@@ -4266,6 +4333,7 @@
     },
     {
       "added_at": "2026-08-30T00:01:36.893829+00:00",
+      "company_id": "co:tower_semiconductor",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f3deb3f2d11ea6da30a9bbef4c18bf33",
       "dispatch_receipt": "decision:pd_1bdeb0d86a91c568157e5cc659ea6145",
@@ -4286,6 +4354,7 @@
     },
     {
       "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_57e2625d3ce6f046353a16f0f0dd1c43",
       "dispatch_receipt": "decision:pd_ad9a9c2ac7e3e0da22654dbec7f40aa7",
@@ -4306,6 +4375,7 @@
     },
     {
       "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "company_id": "co:micron_technology",
       "dispatch_baseline_decision_id": "pd_fbb643303d5a52997ff6bd16070b63b7",
       "dispatch_receipt": "decision:pd_88dd515f9b57213025bcdc16fb9f73be",
       "dispatch_ref": "assessment_gap:dc_b05cc1360e4bdf2a238787c23e7b227d",
@@ -4330,6 +4400,7 @@
     },
     {
       "added_at": "2026-08-30T04:27:19.725609+00:00",
+      "company_id": "co:landmark_optoelectronics",
       "dispatch_baseline_decision_id": "pd_137fa15eaedcd2e13f81f48d3bd21a32",
       "dispatch_receipt": "decision:pd_50c9347f5e8a9b095284b5e7c33e9277",
       "dispatch_ref": "assessment_gap:dc_f94148d8545de35cb2c5d048640b913e",
@@ -4352,6 +4423,7 @@
     },
     {
       "added_at": "2026-08-30T05:25:09.755357+00:00",
+      "company_id": "co:nvidia",
       "dispatch_baseline_decision_id": "pd_b79f8ae7df78a5d51283010911957a7b",
       "dispatch_receipt": "decision:pd_9f9d74f43b7e55130bc9270cfbdcae03",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
@@ -4420,6 +4492,7 @@
     },
     {
       "added_at": "2026-08-30T07:21:33.865312+00:00",
+      "company_id": "co:tower_semiconductor",
       "dispatch_baseline_decision_id": "pd_dc19bb776e402a8df67ab26de274a81d",
       "dispatch_receipt": "decision:pd_913e71b7d2cdfc9a8777ccc939ada3b9",
       "dispatch_ref": "assessment_gap:dc_2bd6137c75808ec4f28541111927d588",
@@ -4508,6 +4581,7 @@
     },
     {
       "added_at": "2026-08-30T08:28:24.953849+00:00",
+      "company_id": "co:tsmc",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_21e4eb29c290cbb9f50225378e8a55f9",
       "dispatch_receipt": "decision:pd_aaf1064e4ca1cdb28f1c9c1fe96e3437",
@@ -4528,6 +4602,7 @@
     },
     {
       "added_at": "2026-08-30T08:28:24.953849+00:00",
+      "company_id": "co:broadcom",
       "hint": "當前 missing_data：TH5/TH6 CPO 的具名部署客戶（hyperscaler 側揭露，結構上可能長期不可得）；Davisson 調變器類型第三方驗證（pq1 題進行中）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：execution_fx_missing、technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 276,
       "reactivated_at": "2026-08-31T11:29:12.846318+00:00",
@@ -4571,6 +4646,7 @@
     },
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
+      "company_id": "co:iqe",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 278,
       "reason": null,
@@ -4589,6 +4665,7 @@
     },
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
+      "company_id": "co:micron_technology",
       "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
       "n": 279,
       "reactivated_at": "2026-09-11T04:35:48.814119+00:00",
@@ -4790,6 +4867,7 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "company_id": "co:foci",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1bff14ca9e2853bf5c2ad2bc98a6a051",
       "dispatch_receipt": "decision:pd_ad303bd0b73efcf212cd2e70b7a4423a",
@@ -4810,6 +4888,7 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "dispatch_baseline_decision_id": "pd_665289d3f50ab2987333dcd4646c49a6",
       "dispatch_receipt": "decision:pd_092bcbe47bad20e365898ee6f992086d",
       "dispatch_ref": "assessment_gap:dc_cc46527aac12ba14191ee71c0460f3fe",
@@ -4834,6 +4913,7 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "company_id": "co:marvell_technology",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 293,
       "reason": null,
@@ -4852,6 +4932,7 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "company_id": "co:nvidia",
       "dispatch_baseline_decision_id": "pd_54e0323c47b253589b22c4bbc9d39db9",
       "dispatch_receipt": "decision:pd_2ef79b95c7fe81efbf6620480b05d424",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
@@ -4874,6 +4955,7 @@
     },
     {
       "added_at": "2026-08-30T13:43:26.064880+00:00",
+      "company_id": "co:poet_technologies",
       "hint": "coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 295,
       "reason": null,
@@ -4932,6 +5014,7 @@
     },
     {
       "added_at": "2026-08-30T15:04:43.518545+00:00",
+      "company_id": "co:mp_materials",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9605734821681fa5f38ba51d08fa763a",
       "dispatch_receipt": "decision:pd_85f1aa694458d713f358da174984d274",
@@ -5090,6 +5173,7 @@
     },
     {
       "added_at": "2026-08-31T02:18:35.642701+00:00",
+      "company_id": "co:nvidia",
       "dispatch_baseline_decision_id": "pd_b7f1d9fae03dada22e0dedbc0ea2c8b5",
       "dispatch_receipt": "decision:pd_d11b5ca740393409387c85ba6cdbb652",
       "dispatch_ref": "assessment_gap:dc_fdab434d1fad67666c57a6eefd379337",
@@ -5133,6 +5217,7 @@
     },
     {
       "added_at": "2026-08-31T02:33:17.973418+00:00",
+      "company_id": "co:foci",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_e4200559e3ad240527cee3e328ddab0e",
       "dispatch_receipt": "decision:pd_b3c36b9fabbe75af93c097a1c0baad0b",
@@ -5153,6 +5238,7 @@
     },
     {
       "added_at": "2026-08-31T02:33:17.973418+00:00",
+      "company_id": "co:mp_materials",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_85f1aa694458d713f358da174984d274",
       "dispatch_receipt": "decision:pd_599f914a7520398c83ad40dbea806c48",
@@ -5193,6 +5279,7 @@
     },
     {
       "added_at": "2026-08-31T02:45:27.304373+00:00",
+      "company_id": "co:himax",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_86aad23459e108afccebb8abc9f5ca3f",
       "dispatch_receipt": "decision:pd_c90a383db1b8e69f4648d997ba54a4c0",
@@ -5213,6 +5300,7 @@
     },
     {
       "added_at": "2026-08-31T02:45:27.304373+00:00",
+      "company_id": "co:lynas",
       "dispatch_attempt": 2,
       "dispatch_baseline_decision_id": "pd_5ebd5b05db7a6058087fc66b5be8e2b5",
       "dispatch_receipt": "decision:pd_4994dfb0d003bc0cd08a2ab6079c1495",
@@ -5259,6 +5347,7 @@
     },
     {
       "added_at": "2026-08-31T04:42:07.944868+00:00",
+      "company_id": "co:foci",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_b3c36b9fabbe75af93c097a1c0baad0b",
       "dispatch_receipt": "decision:pd_acc6aa1db9c9a717ce63b198ac4d0466",
@@ -5397,6 +5486,7 @@
     },
     {
       "added_at": "2026-08-31T10:47:21.401936+00:00",
+      "company_id": "co:landmark_optoelectronics",
       "hint": "當前 missing_data：客戶端具名：Coherent/Lumentum/Broadcom 任一方文件點名聯亞為磊晶供應商；四年 CW laser 長約交易對手方的具名或第三方獨立佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 326,
       "reason": null,
@@ -5415,6 +5505,7 @@
     },
     {
       "added_at": "2026-08-31T10:47:21.401936+00:00",
+      "company_id": "co:coherent",
       "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 327,
       "reason": null,
@@ -5506,6 +5597,7 @@
     },
     {
       "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "company_id": "co:lumentum",
       "hint": "當前 missing_data：ELS／UHP CPO 客戶端的 qualification、採購量與交付確認；OCS 三家客戶的獨立訂單／部署佐證；initial ELS order 的金額、數量與可取消條款（共 4 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 332,
       "reason": null,
@@ -5524,6 +5616,7 @@
     },
     {
       "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "company_id": "co:marvell_technology",
       "hint": "當前 missing_data：NVIDIA 自家 10-Q 對 Series A Preferred 投資的揭露逐字核對（externally_cor；Distributor A（44% 營收）不具名，終端需求被通路遮蔽，無法取得客戶端佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 333,
       "reason": null,
@@ -5542,6 +5635,7 @@
     },
     {
       "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "company_id": "co:poet_technologies",
       "hint": "當前 missing_data：Lumilens 訂單的實際出貨與收款驗證（PO ≠ 營收）；Marvell 保密爭議的後續（訴訟或和解揭露）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 334,
       "reason": null,
@@ -5560,6 +5654,7 @@
     },
     {
       "added_at": "2026-08-31T11:29:12.846318+00:00",
+      "company_id": "co:coherent",
       "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 335,
       "reason": null,
@@ -5688,6 +5783,7 @@
     },
     {
       "added_at": "2026-08-31T14:52:18.093481+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f557308434860ae6e5d7e5da4b64cf37",
       "dispatch_receipt": "decision:pd_0b3df70f5111eef0866e1a8a350dbf99",
@@ -5747,6 +5843,7 @@
     },
     {
       "added_at": "2026-08-31T16:10:08.944664+00:00",
+      "company_id": "co:foci",
       "hint": "當前 missing_data：上詮法說會對『獨供兩代』的可稽核逐字（年報未揭露，替代 TSMC 具名的主要路徑）；客戶端（Coherent／Lumentum／Broadcom）filing 對 FAU 供應商的具名；⚠ TSMC 具名已改判為結構性可能不可得——不建議再投入 pq1 預算於此路徑（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 346,
       "reason": null,
@@ -5778,6 +5875,7 @@
     },
     {
       "added_at": "2026-08-31T16:29:32.145069+00:00",
+      "company_id": "co:nvidia",
       "deferred_at": "2026-09-10T07:17:22.969335+00:00",
       "hint": "當前 missing_data：MRM 良率數字改判結構性不可得:TSMC 不揭露 wafer/die 良率,公開唯一量化是 BER<1E-08(pro（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 348,
@@ -5918,6 +6016,7 @@
     },
     {
       "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "company_id": "co:soitec",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_9122e42205dbf3240e26c3db87882782",
       "dispatch_receipt": "decision:pd_a9038b904b9ee9ebaa8840eea8af5d0d",
@@ -5938,6 +6037,7 @@
     },
     {
       "added_at": "2026-08-31T23:54:29.624234+00:00",
+      "company_id": "co:lynas",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_4994dfb0d003bc0cd08a2ab6079c1495",
       "dispatch_receipt": "decision:pd_e761c4c827da4956711035f0a1d79345",
@@ -5971,6 +6071,7 @@
     },
     {
       "added_at": "2026-09-01T01:05:24.243791+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_0b3df70f5111eef0866e1a8a350dbf99",
       "dispatch_receipt": "decision:pd_78e747c4bcf1f99b0b205cd78f907218",
@@ -6019,6 +6120,7 @@
     },
     {
       "added_at": "2026-09-01T01:37:52.092320+00:00",
+      "company_id": "co:tsmc",
       "deferred_at": "2026-09-01T09:10:34.584186+00:00",
       "hint": "當前 missing_data：MRM/COUPE 量產爬坡的實測出貨（3Q26 財報季 FII/Fabrinet 驗證點；與 NVIDIA cohor（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 362,
@@ -6153,6 +6255,7 @@
     },
     {
       "added_at": "2026-09-01T05:29:56.872153+00:00",
+      "company_id": "co:google",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_b59d99bfd9f5ad3b0699e32270844233",
       "dispatch_receipt": "decision:pd_64e6414ecf3ac09634bbef9f538b8577",
@@ -6194,6 +6297,7 @@
     },
     {
       "added_at": "2026-09-01T05:43:30.794350+00:00",
+      "company_id": "co:nabtesco",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_4c50eab5fc28acb84461c05c90e5210a",
       "dispatch_receipt": "decision:pd_51bf9d0be65f1aeeff6a456e3310f967",
@@ -6214,6 +6318,7 @@
     },
     {
       "added_at": "2026-09-01T05:43:30.794350+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "hint": "當前 missing_data：諧波市占的第二獨立來源（產業報告或客戶側陳述）；綠的諧波/雙環年報一手（A 股取得路徑未建）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 372,
       "reason": "使用者 drop:已 reassess 為 MONITOR/READY,市占第二 origin 缺口留待 A 股年報路徑建立",
@@ -6301,6 +6406,7 @@
     },
     {
       "added_at": "2026-09-01T06:49:25.643616+00:00",
+      "company_id": "co:jl_mag",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_f596bc961659927a63fb559245ee8ec8",
       "dispatch_receipt": "decision:pd_c49ad9a8820654fd8e9cbc9abc660f0e",
@@ -6464,6 +6570,7 @@
     },
     {
       "added_at": "2026-09-01T10:36:48.970317+00:00",
+      "company_id": "co:aehr_test_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_8e58ce58b427883480fbbe6aeb6a6397",
       "dispatch_receipt": "decision:pd_749996b9d3effd934c2a9fcd78e20394",
@@ -6538,6 +6645,7 @@
     },
     {
       "added_at": "2026-09-01T11:06:17.935917+00:00",
+      "company_id": "co:lynas",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_e761c4c827da4956711035f0a1d79345",
       "dispatch_receipt": "decision:pd_b55d1c8ba0d4112f58e3904075158b5e",
@@ -6676,6 +6784,7 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "company_id": "co:google",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_64e6414ecf3ac09634bbef9f538b8577",
       "dispatch_receipt": "decision:pd_7d9c2ba725cd0da0280021c1aaa6a18e",
@@ -6696,6 +6805,7 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "company_id": "co:jl_mag",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_c49ad9a8820654fd8e9cbc9abc660f0e",
       "dispatch_receipt": "decision:pd_7a24ffd7f560b53c24dac52d712b904e",
@@ -6716,6 +6826,7 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "company_id": "co:nabtesco",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_51bf9d0be65f1aeeff6a456e3310f967",
       "dispatch_receipt": "decision:pd_3abb906bcce99559c275cd7a7017824c",
@@ -6736,6 +6847,7 @@
     },
     {
       "added_at": "2026-09-01T13:44:29.878804+00:00",
+      "company_id": "co:soitec",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_a9038b904b9ee9ebaa8840eea8af5d0d",
       "dispatch_receipt": "decision:pd_213d9a0f9f3281ab0078b33d9c8f8035",
@@ -6852,6 +6964,7 @@
     },
     {
       "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "company_id": "co:aehr_test_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_749996b9d3effd934c2a9fcd78e20394",
       "dispatch_receipt": "decision:pd_1385a2fc648da686d43db290597d34ab",
@@ -6891,6 +7004,7 @@
     },
     {
       "added_at": "2026-09-01T15:06:12.743064+00:00",
+      "company_id": "co:lynas",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_b55d1c8ba0d4112f58e3904075158b5e",
       "dispatch_receipt": "decision:pd_4ee67e6db5c63de9bbcdf8238fefb7ae",
@@ -6953,6 +7067,7 @@
     },
     {
       "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "company_id": "co:unitree",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_ee5cacfbc732d3318d068c30e1914fc9",
       "dispatch_receipt": "decision:pd_761c2bee80ed662412a20e8c10b9284c",
@@ -6973,6 +7088,7 @@
     },
     {
       "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "company_id": "co:harmonic_drive_systems",
       "hint": "當前 missing_data：諧波市占的第二獨立來源（產業報告或客戶側陳述）；綠的諧波/雙環年報一手（A 股取得路徑未建）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 412,
       "reason": "reassess-stale：新 decision pd_f5655e29983836fc27a70607b5f33be3 的 attention=MONITOR，不再需要使用者決定",
@@ -6985,6 +7101,7 @@
     },
     {
       "added_at": "2026-09-02T01:16:51.472047+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_78e747c4bcf1f99b0b205cd78f907218",
       "dispatch_receipt": "decision:pd_bbf7da3cbada857a6a83769613b22bb4",
@@ -7170,6 +7287,7 @@
     },
     {
       "added_at": "2026-09-02T11:10:42.811312+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_bbf7da3cbada857a6a83769613b22bb4",
       "dispatch_receipt": "wo:wo_609c957217480557ee0f94c60c1898e0;trace:schaeffler_ar2025_access_blocked_20260903",
@@ -7328,6 +7446,7 @@
     },
     {
       "added_at": "2026-09-02T12:17:22.281566+00:00",
+      "company_id": "co:nidec",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_c142edc321e88107f75c697fc4386f48",
       "dispatch_receipt": "decision:pd_6a09b7ba4d1ada5c3ba10737df0c0747",
@@ -7348,6 +7467,7 @@
     },
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
+      "company_id": "co:aehr_test_systems",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_1385a2fc648da686d43db290597d34ab",
       "dispatch_receipt": "decision:pd_2ea85b8f96e58daf2498540b89f0b435",
@@ -7368,6 +7488,7 @@
     },
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
+      "company_id": "co:google",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_7d9c2ba725cd0da0280021c1aaa6a18e",
       "dispatch_receipt": "decision:pd_0e5251a50126e9aebc6894d8733d6656",
@@ -7388,6 +7509,7 @@
     },
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
+      "company_id": "co:jl_mag",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_7a24ffd7f560b53c24dac52d712b904e",
       "dispatch_receipt": "decision:pd_fc6700785d33708362bb9bc798ec5272",
@@ -7408,6 +7530,7 @@
     },
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
+      "company_id": "co:nabtesco",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_3abb906bcce99559c275cd7a7017824c",
       "dispatch_receipt": "decision:pd_cc5365ecce4b1042520ee86fc41c389e",
@@ -7428,6 +7551,7 @@
     },
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
+      "company_id": "co:soitec",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_213d9a0f9f3281ab0078b33d9c8f8035",
       "dispatch_receipt": "decision:pd_cfa49aab64f9ebb430749ae37f796c46",
@@ -7448,6 +7572,7 @@
     },
     {
       "added_at": "2026-09-02T12:21:10.148214+00:00",
+      "company_id": "co:lynas",
       "dispatch_baseline_decision_id": "pd_c824b600c9f88663e7c84e72c63c04d2",
       "dispatch_receipt": "decision:pd_04c4fc5e32f2007be54462375ea29e5d",
       "dispatch_ref": "assessment_gap:dc_48446dbceb85d4b785634e3c4ca5d669",
@@ -7670,6 +7795,7 @@
     },
     {
       "added_at": "2026-09-02T23:42:49.763263+00:00",
+      "company_id": "co:marvell_technology",
       "hint": "當前 missing_data：NVIDIA 自家 10-Q 對 Series A Preferred 投資的揭露逐字核對（externally_cor；Distributor A（44% 營收）不具名，終端需求被通路遮蔽，無法取得客戶端佐證（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 454,
       "reason": "reassess-stale：新 decision pd_2f57a4fe7c16fee49e1c3f9958d81759 的 attention=MONITOR，不再需要使用者決定",
@@ -7682,6 +7808,7 @@
     },
     {
       "added_at": "2026-09-02T23:42:49.763263+00:00",
+      "company_id": "co:sivers_semiconductors",
       "hint": "當前 missing_data：2026-08-27 重編與收入認列核對；獨立客戶端量產訂單（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 455,
       "reason": "reassess-stale：新 decision pd_e7ae758f6a3b108bceb597be32860a52 的 attention=MONITOR，不再需要使用者決定",
@@ -7707,6 +7834,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "company_id": "co:nidec",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_6a09b7ba4d1ada5c3ba10737df0c0747",
       "dispatch_receipt": "trace:nidec_20260616_yuho_extension_to_20260930",
@@ -7727,6 +7855,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "company_id": "co:google",
       "deferred_at": "2026-09-10T00:34:25.225197+00:00",
       "hint": "當前 missing_data：GOOGL 價格序列進 Engine C ETL(上游資料缺,非研究可解)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 458,
@@ -7746,6 +7875,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "company_id": "co:nabtesco",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_cc5365ecce4b1042520ee86fc41c389e",
       "dispatch_receipt": "parked:customer_concentration_not_disclosed_in_tanshin;counter_path_needs_ra",
@@ -7766,6 +7896,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "company_id": "co:schaeffler",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_bbf7da3cbada857a6a83769613b22bb4",
       "dispatch_receipt": "parked:customer_concentration_not_disclosed_in_h1_2026",
@@ -7786,6 +7917,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "company_id": "co:soitec",
       "deferred_at": "2026-09-04T14:28:00.390643+00:00",
       "hint": "當前 missing_data：產能保留協議任一對手方具名(客戶端或法定文件)（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 461,
@@ -7800,6 +7932,7 @@
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
+      "company_id": "co:jl_mag",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_fc6700785d33708362bb9bc798ec5272",
       "dispatch_receipt": "decision:pd_0f521871fed1b7d5a450beaf05a37d3e",
@@ -7972,6 +8105,7 @@
     },
     {
       "added_at": "2026-09-03T22:40:31.052222+00:00",
+      "company_id": "co:aeva",
       "hint": "當前 missing_data：JDA 客戶或 hyperscaler 的具名一手確認；Optical Connectivity 的第三方 qualification／design-win 證據；任何 Sivers／Aeva 供應關係的一手揭露（共 3 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：financial_stale_since_decision。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 472,
       "reason": null,
@@ -8095,6 +8229,7 @@
     },
     {
       "added_at": "2026-09-04T22:45:56.191164+00:00",
+      "company_id": "co:iqe",
       "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 479,
       "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
@@ -8331,6 +8466,7 @@
     },
     {
       "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "company_id": "co:nabtesco",
       "deferred_at": "2026-09-09T10:04:41.109978+00:00",
       "hint": "當前 missing_data：RV 市占的審計級或客戶端來源(Estun/双環年報路徑未建)（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 494,
@@ -8350,6 +8486,7 @@
     },
     {
       "added_at": "2026-09-09T10:02:27.056532+00:00",
+      "company_id": "co:schaeffler",
       "deferred_at": "2026-09-09T10:04:41.296628+00:00",
       "hint": "當前 missing_data：四家具名人形夥伴中任一家的付款方向證據（訂單金額、產能協議或預付款）——partnership 具名已有，缺的是誰付錢給；Schaeffler 官方一手（收購新聞稿、2026-02-05 humanoid IR 簡報）——schaeffler（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 495,
@@ -8382,6 +8519,7 @@
     },
     {
       "added_at": "2026-09-09T10:34:50.147614+00:00",
+      "company_id": "co:foci",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_acc6aa1db9c9a717ce63b198ac4d0466",
       "dispatch_receipt": "decision:pd_f9e4a69a3b3a8eb64d2c1f23e40a356b",
@@ -8402,6 +8540,7 @@
     },
     {
       "added_at": "2026-09-09T10:34:50.147614+00:00",
+      "company_id": "co:poet_technologies",
       "hint": "當前 missing_data：Lumilens 訂單的實際出貨與收款驗證（PO ≠ 營收）；Marvell 保密爭議的後續（訴訟或和解揭露）（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 498,
       "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
@@ -8420,6 +8559,7 @@
     },
     {
       "added_at": "2026-09-09T10:34:50.147614+00:00",
+      "company_id": "co:sivers_semiconductors",
       "hint": "當前 missing_data：2026-08-27 重編與收入認列核對；獨立客戶端量產訂單（共 2 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 499,
       "reason": "reassess 後 attention 由 REVIEW 降為 MONITOR（pd_5f48095f/pd_2c50c4c5/pd_eabd86cd），collector 不會再推導出 decision_review 項目，因此關閉不會換號重生",
@@ -8451,6 +8591,7 @@
     },
     {
       "added_at": "2026-09-09T14:47:38.784867+00:00",
+      "company_id": "co:lynas",
       "dispatch_baseline_decision_id": "pd_8325817b76f46618eac2b58fee026ed8",
       "dispatch_receipt": "decision:pd_ff6820e9aad494dfde12437b924f888e",
       "dispatch_ref": "assessment_gap:dc_48446dbceb85d4b785634e3c4ca5d669",
@@ -8578,6 +8719,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "company_id": "co:unitree",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_761c2bee80ed662412a20e8c10b9284c",
       "dispatch_receipt": "decision:pd_39fe85750b8794406c8832cb3a9b0aeb",
@@ -8598,6 +8740,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "company_id": "co:mp_materials",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_599f914a7520398c83ad40dbea806c48",
       "dispatch_receipt": "decision:pd_b459faff369f0f5406651e4b1c80c8c8",
@@ -8618,6 +8761,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "company_id": "co:iqe",
       "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
       "n": 512,
       "reason": null,
@@ -8630,6 +8774,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "company_id": "co:lumentum",
       "hint": "當前 missing_data：ELS／UHP CPO 客戶端的 qualification、採購量與交付確認；OCS 三家客戶的獨立訂單／部署佐證；initial ELS order 的金額、數量與可取消條款（共 4 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 513,
       "reason": "reassess-stale：新 decision pd_e46223a28f31f108eaac876ba28ee55b 的 attention=MONITOR，不再需要使用者決定",
@@ -8642,6 +8787,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "company_id": "co:coherent",
       "hint": "當前 missing_data：counter_thesis_path（共 1 項）｜coverage 已無 blocker，REVIEW 來自凍結 context 過期——不是 dispatch，請跑 `decision_lab reassess <cohort_id> --intent <原 intent>`，下次 sync 會自動結案",
       "n": 514,
       "reason": "reassess-stale：新 decision pd_113b3a0078f11cf7bf3c320a986c34f6 的 attention=MONITOR，不再需要使用者決定",
@@ -8654,6 +8800,7 @@
     },
     {
       "added_at": "2026-09-10T07:19:25.694077+00:00",
+      "company_id": "co:jl_mag",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_0f521871fed1b7d5a450beaf05a37d3e",
       "dispatch_receipt": "decision:pd_8d99be6ee451a3e558740cfcd5f42d95",
@@ -8752,6 +8899,7 @@
     },
     {
       "added_at": "2026-09-10T10:20:27.923580+00:00",
+      "company_id": "co:nidec",
       "deferred_at": "2026-09-10T10:20:40.132601+00:00",
       "hint": "當前 missing_data：Nidec 決算短信/有報的精密減速器(Drive Technology)segment 受注或營收拆分(Engine （共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 522,
@@ -8800,6 +8948,7 @@
         "n": 528,
         "set_at": "2026-09-10T23:22:52.300834+00:00"
       },
+      "company_id": "co:unitree",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_39fe85750b8794406c8832cb3a9b0aeb",
       "dispatch_receipt": "research_packet:library/raw/daily_20260911_unitree_review.md",
@@ -8823,6 +8972,7 @@
         "n": 529,
         "set_at": "2026-09-10T23:22:54.433035+00:00"
       },
+      "company_id": "co:mp_materials",
       "dispatch_baseline_decision_id": "pd_50708c46ed0debcc287213b9ac816b47",
       "dispatch_receipt": "research_packet:library/raw/daily_20260911_mp_review.md",
       "dispatch_ref": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
@@ -8845,6 +8995,7 @@
     },
     {
       "added_at": "2026-09-10T22:38:07.503328+00:00",
+      "company_id": "co:jl_mag",
       "dispatch_baseline_decision_id": "pd_1bba3564898348e7bf4ddc30d02ae22b",
       "dispatch_receipt": "research_packet:library/raw/daily_20260911_jlmag_review.md",
       "dispatch_ref": "assessment_gap:dc_32872cf6a80c5f273b9b4c55a57ff229",
@@ -9028,6 +9179,7 @@
     },
     {
       "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "company_id": "co:globalfoundries",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 538,
       "reason": null,
@@ -9040,6 +9192,7 @@
     },
     {
       "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "company_id": "co:sk_hynix",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 539,
       "reason": null,
