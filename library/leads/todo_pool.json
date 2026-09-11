@@ -8908,6 +8908,31 @@
       "source": "research_action",
       "title": "GF／MPS 長期製造協議：只納入有日期的協議主張",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-11T01:50:57.589085+00:00",
+      "graph_impact": "+1 節點、0 邊、4 claims｜來源：Broadcom Inc.（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:broadcom。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 531,
+      "reason": null,
+      "ref_id": "ra_9bd374a7410dd3a9ccd649c6d6123f4a",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Broadcom AI XPV 平台與 290 億美元 Backstop：需求錨點改由供應商背書支撐",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-11T01:55:07.834826+00:00",
+      "hint": "研究已完成：AVGO FY2026 Q3 10-Q（期間至 2026-08-02）逐字揭露『top five end customers accounted for approximately 50% of our net revenue for the three fiscal quarters ended August 2, 2026』，同段另揭露通路商占營收 56%；五家客戶皆未具名。exact payload=library/raw/daily_20260911_avgo_concentration.md。go＝建立並寫入 AVGO/customer_concentration append-only observation（as_of=2026-08-02），再 reassess；不含入圖、不含 thesis mutation、不含估值、不含 live。依發行人自用 We believe／approximately 兩重限定詞且含通路歸屬推估，判為 judgment 類，維持 pq2。⚠ 不得把本筆的五家未具名客戶與同份 10-Q 中 AI XPV 的『our customer』（另案 [531]）互相推定。",
+      "n": 532,
+      "reason": null,
+      "ref_id": "manual:532",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Broadcom（AVGO）FY2026 Q3 客戶集中度 observation 提案",
+      "type": "manual"
     }
   ],
   "log": [
@@ -19588,6 +19613,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 531,
+  "next_n": 533,
   "schema_version": "1"
 }

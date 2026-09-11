@@ -31666,9 +31666,13 @@
       "first_seen": "2026-09-10T22:32:35.408693+00:00",
       "lead_id": "lead_721a96cd48f28b4c0aa3b0d96426c9b7",
       "published_at": "2026-09-10",
-      "refs": {},
+      "refs": {
+        "outcome": "AVGO FY2026 Q3 10-Q 產出 4 條 dated claim（AI XPV 平台／290 億美元 Backstop／420 億美元可轉換本票 facility／1,268.21 億美元無條件採購承諾）。圖中三者命中皆為 0。客戶集中度 top5 約 50% 另走 Engine C。",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm",
+        "research_action_id": "ra_9bd374a7410dd3a9ccd649c6d6123f4a"
+      },
       "source": "edgar:AVGO",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {
         "cpo": {
           "counter_only": false,
