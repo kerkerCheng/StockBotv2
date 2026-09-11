@@ -30412,13 +30412,15 @@
       "published_at": "2026-09-10T06:38:22.000Z",
       "raw_text": "Wow, HBM reportedly drove up AI accelerator/card prices by 20-50% in China.\n\nSo $SKHY, Samsung, $MU, should be happy to hear this:\n\n- Huawei has raised indicated pricing for the Ascend 950DT 20–50% above quotes from just 2 months ago\n\n- Cambricon's upcoming 690 is reportedly +20–30%\n\nReuters stated that HBM acquired through grey market channels in China can cost several times regular pricing. \n\nAs someone who is long memory, I'm happy about memory causing this much inflation.",
       "refs": {
+        "action_digest": "2739a76ba5964f8b1cff2158de28c9ab7453ea02d2df5d0dac95e3f475f83ddd",
+        "focus_company_id": "tech:hbm",
         "outcome": "推文轉述的三個數字都對得上 Reuters 原文，但推文的歸因（純記憶體超級週期）不完整：Reuters 給的是全球短缺＋中國出口管制灰市數倍溢價兩個效應疊加。產出 1 條 tech:hbm dated claim，明文禁止把中國售價漲幅當全球 HBM 價格代理。",
         "primary_url": "https://www.freemalaysiatoday.com/category/business/2026/09/10/china-s-ai-chipmakers-raise-prices-as-high-bandwidth-memory-shortage-bites",
         "research_action_id": "ra_0c7326fa93ceb6d40855b157f0909063",
         "trace_origin_entity": "Reuters（獨家，2026-09-10）；經 Free Malaysia Today 授權轉載取得逐字"
       },
       "source": "x:aleabitoreddit",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "Wow, HBM reportedly drove up AI accelerator/card prices by 20-50% in China. So $SKHY, Samsung, $MU, should be happy to hear this: - Huawei has raised indicated pricing for the Ascend 950DT 20–50% above quotes from just 2 months ago - Cambricon's upcoming 690 is reportedly +20–30% Reuters stated that HBM acquired through grey market channels in China can cost several times regular pricing. As someone who is long memory, I'm happy about memory causing this much inflation.",
       "triage": {
@@ -31693,12 +31695,14 @@
       "lead_id": "lead_721a96cd48f28b4c0aa3b0d96426c9b7",
       "published_at": "2026-09-10",
       "refs": {
+        "action_digest": "8fb51e4c51ef539df0f9e4b0d5d8bc343ec9e6b3f0b4398549ec28ae1d903028",
+        "focus_company_id": "co:broadcom",
         "outcome": "AVGO FY2026 Q3 10-Q 產出 4 條 dated claim（AI XPV 平台／290 億美元 Backstop／420 億美元可轉換本票 facility／1,268.21 億美元無條件採購承諾）。圖中三者命中皆為 0。客戶集中度 top5 約 50% 另走 Engine C。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm",
         "research_action_id": "ra_9bd374a7410dd3a9ccd649c6d6123f4a"
       },
       "source": "edgar:AVGO",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -62731,7 +62735,7 @@
         "trace_status": "original_obtained"
       },
       "source": "web:globenewswire",
-      "status": "action_prepared",
+      "status": "applied",
       "themes": {},
       "title": "GF 與 Monolithic Power Systems 簽長期製造協議（2026-09-09）：MPS 專有製程導入 GF 新加坡 300mm 廠，2027 年初量產；終端含汽車、工業機器人與 AI／雲的 smart power stage。無金額／產能／最低採購量",
       "triage": {

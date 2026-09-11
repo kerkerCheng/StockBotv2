@@ -4589,9 +4589,9 @@
     },
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
-      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
+      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
       "n": 279,
-      "reactivated_at": "2026-09-04T22:45:56.191164+00:00",
+      "reactivated_at": "2026-09-11T04:35:48.814119+00:00",
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
@@ -4601,14 +4601,7 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-09-09T09:47:21.388307+00:00",
-        "trigger": "技術指標觀測問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
@@ -8780,10 +8773,11 @@
       "added_at": "2026-09-10T11:18:18.506734+00:00",
       "hint": "go＝執行 `python -m alpha abstention IQE.L --add library/private/alpha/abstention_proposals/IQE.L_forward_pe.json`，把這一格從段5 工單拿掉並標 settled。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：內部 FY2026 EPS −£0.01143 與同期共識完全相同（口徑已核實 non_gaap），FY2027 共識仍為 −£0.00208。另有 GBp/GBP 100 倍單位風險，不宜在不適用的方法上再疊一層換算。｜revisit：FY2027 共識區間上緣已觸及 0，轉正時撤回本 abstention 並改寫 ValuationAssumption。",
       "n": 523,
-      "reason": null,
+      "reason": "IQE.L forward_earnings_multiple.target_pe 型別上不適用（FY2026／FY2027 共識 EPS 皆為負），已寫入 abstention ledger",
+      "receipt": "authority:alpha_abstention;ref:ab_ee3fd4a0bcebd6f8",
       "ref_id": "manual:523",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:36:29.889591+00:00",
       "source": "manual",
       "title": "IQE.L：FY2026／FY2027 共識 EPS 皆為負，forward_earnings_multiple 無校準倍數——提案 Abstention（valuation / target_pe）",
       "type": "manual"
@@ -8898,26 +8892,42 @@
     },
     {
       "added_at": "2026-09-10T23:24:35.480050+00:00",
+      "completion_authority": {
+        "action_digest": "ba2826ff6065b48d93c6c745172c01d7774e6465df2a395451881d99e5564efd",
+        "cohort_id": "dc_766316738ea5013cf930254fca598033",
+        "commit": "93bd381942a9814d419fa0b1bb4a0b9fbf18648d",
+        "company_id": "co:globalfoundries",
+        "verified_at": "2026-09-11T04:32:16.256183+00:00"
+      },
       "graph_impact": "+1 節點、0 邊、1 claims｜來源：GlobalFoundries and Monolithic Power Systems joint announcement（tier 2）",
       "hint": "核准 exact graph delta；Decision handoff：co:globalfoundries。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 530,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_21602c2e352aa346b9c106224bbc44c4;digest:ba2826ff6065b48d93c6c745172c01d7774e6465df2a395451881d99e5564efd;commit:93bd381942a9814d419fa0b1bb4a0b9fbf18648d;cohort:dc_766316738ea5013cf930254fca598033",
       "ref_id": "ra_21602c2e352aa346b9c106224bbc44c4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:32:16.256183+00:00",
       "source": "research_action",
       "title": "GF／MPS 長期製造協議：只納入有日期的協議主張",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-11T01:50:57.589085+00:00",
+      "completion_authority": {
+        "action_digest": "8fb51e4c51ef539df0f9e4b0d5d8bc343ec9e6b3f0b4398549ec28ae1d903028",
+        "cohort_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
+        "commit": "6b3a361159f1ebb43c9dd777e2766c1e70f69bbf",
+        "company_id": "co:broadcom",
+        "verified_at": "2026-09-11T04:33:11.341704+00:00"
+      },
       "graph_impact": "+1 節點、0 邊、4 claims｜來源：Broadcom Inc.（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:broadcom。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 531,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_9bd374a7410dd3a9ccd649c6d6123f4a;digest:8fb51e4c51ef539df0f9e4b0d5d8bc343ec9e6b3f0b4398549ec28ae1d903028;commit:6b3a361159f1ebb43c9dd777e2766c1e70f69bbf;cohort:dc_67f5e1588990f432e8e0ccce5711e62e",
       "ref_id": "ra_9bd374a7410dd3a9ccd649c6d6123f4a",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:33:11.341704+00:00",
       "source": "research_action",
       "title": "Broadcom AI XPV 平台與 290 億美元 Backstop：需求錨點改由供應商背書支撐",
       "type": "ra_admission"
@@ -8926,23 +8936,32 @@
       "added_at": "2026-09-11T01:55:07.834826+00:00",
       "hint": "研究已完成：AVGO FY2026 Q3 10-Q（期間至 2026-08-02）逐字揭露『top five end customers accounted for approximately 50% of our net revenue for the three fiscal quarters ended August 2, 2026』，同段另揭露通路商占營收 56%；五家客戶皆未具名。exact payload=library/raw/daily_20260911_avgo_concentration.md。go＝建立並寫入 AVGO/customer_concentration append-only observation（as_of=2026-08-02），再 reassess；不含入圖、不含 thesis mutation、不含估值、不含 live。依發行人自用 We believe／approximately 兩重限定詞且含通路歸屬推估，判為 judgment 類，維持 pq2。⚠ 不得把本筆的五家未具名客戶與同份 10-Q 中 AI XPV 的『our customer』（另案 [531]）互相推定。",
       "n": 532,
-      "reason": null,
+      "reason": "AVGO customer_concentration 已寫入 append-only ledger（提案 po_e75a78fb，經 pq2 [537] 核准落地）",
+      "receipt": "authority:engine_c_observation;ref:mo_28eefe6ab194b2872d8a5774edd2f4af",
       "ref_id": "manual:532",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:36:12.327586+00:00",
       "source": "manual",
       "title": "Broadcom（AVGO）FY2026 Q3 客戶集中度 observation 提案",
       "type": "manual"
     },
     {
       "added_at": "2026-09-11T01:59:47.044687+00:00",
+      "completion_authority": {
+        "action_digest": "2739a76ba5964f8b1cff2158de28c9ab7453ea02d2df5d0dac95e3f475f83ddd",
+        "cohort_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+        "commit": "cbbc7bac40f7c6aa7c3eaa12705ad7eab9a0b79a",
+        "company_id": "tech:hbm",
+        "verified_at": "2026-09-11T04:33:13.206386+00:00"
+      },
       "graph_impact": "+1 節點、0 邊、1 claims｜來源：Reuters（tier 2）",
       "hint": "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；先回 pq1 補 Decision handoff，不得先 apply。",
       "n": 533,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_0c7326fa93ceb6d40855b157f0909063;digest:2739a76ba5964f8b1cff2158de28c9ab7453ea02d2df5d0dac95e3f475f83ddd;commit:cbbc7bac40f7c6aa7c3eaa12705ad7eab9a0b79a;cohort:dc_bb19966e2aafab5e24f4fd74d7ed9443",
       "ref_id": "ra_0c7326fa93ceb6d40855b157f0909063",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:33:13.206386+00:00",
       "source": "research_action",
       "title": "HBM 稀缺傳導到下游售價：中國 AI 加速卡兩個月漲 20–50%（獨立第三方證據）",
       "type": "ra_admission"
@@ -8951,26 +8970,97 @@
       "added_at": "2026-09-11T02:03:28.973156+00:00",
       "hint": "研究已完成：Engine C 有 NVDA 與 LITE 的 committed_capex，沒有 AAOI，而 AAOI 是圖中產能最吃緊的名字。四份一手併成一筆：①FAB4/OMD3 無塵室工程合約約 US$94.1M、約 195,591 sqft ISO Class 6、目標完工 2027-01-10（8-K 2026-07-01）；②Pearland 園區開工新增約 400,000 sqft 供 800G/1.6T，金額未揭露（PR 2026-07-14）；③Houston Buildings 4/5 承租約 1,094,000 sqft、10 年期，合併購買選擇權約 US$146.57M（8-K 2026-09-01）；④行使購買選擇權買下 Blue Ridge Building 3，8.858 英畝＋約 153,928 sqft，US$26,783,472 現金、2026-09-04 交割（8-K 2026-09-10）。exact payload=library/raw/daily_20260911_aaoi_committed_capex.md。go＝建立並寫入 AAOI/committed_capex append-only observation（as_of=2026-09-10）；不含入圖、不含 thesis mutation、不含估值、不含 live。⚠ packet 內明訂三層不得加總（已付現金／已簽約未付／只有選擇權），Pearland 未揭露金額留空不推估；且不得主張既有 US$600M ATM 是為支應這些 capex——424B5 只寫 general corporate purposes，filing 沒把兩者連起來。",
       "n": 534,
-      "reason": null,
+      "reason": "AAOI committed_capex 已寫入 append-only ledger（提案 po_2cd7cf08，經 pq2 [536] 核准落地）",
+      "receipt": "authority:engine_c_observation;ref:mo_ab4a5eb0c7f4ff4ce7a6d3d04cefd08f",
       "ref_id": "manual:534",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:36:12.115712+00:00",
       "source": "manual",
       "title": "AAOI committed_capex observation 提案（四份一手，2026-07 至 09）",
       "type": "manual"
     },
     {
       "added_at": "2026-09-11T02:22:19.437556+00:00",
+      "completion_authority": {
+        "action_digest": "b1b26c22d0baacadc65906357b30217ff93aa6b3db447cab0875979f0c6fc149",
+        "cohort_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+        "commit": "7a70fc392f655060d78a4e3b5e922968e94a3506",
+        "company_id": "co:sk_hynix",
+        "verified_at": "2026-09-11T04:31:47.332387+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、0 claims｜來源：SK hynix（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:sk_hynix。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 535,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_13871bf23f59d79d8663428ee4665cb0;digest:b1b26c22d0baacadc65906357b30217ff93aa6b3db447cab0875979f0c6fc149;commit:7a70fc392f655060d78a4e3b5e922968e94a3506;cohort:dc_70872dbacf53703aada2f101e5e0cd1c",
       "ref_id": "ra_13871bf23f59d79d8663428ee4665cb0",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:31:47.332387+00:00",
       "source": "research_action",
       "title": "補上 SK hynix → HBM 的供應邊：圖說它量產 HBM4，卻沒有一條邊說它供應 HBM",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-09-10T00:00:00+00:00；來源=AAOI Forms 8-K filed 2026-07-01 (acc. 0001683168-26-005221), 2026-09-01 (acc. 00",
+      "n": 536,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_ab4a5eb0c7f4ff4ce7a6d3d04cefd08f;proposal:po_2cd7cf089fb5b846335b74a8aff9e107",
+      "ref_id": "po_2cd7cf089fb5b846335b74a8aff9e107",
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:35:54.457799+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：AAOI / committed_capex",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-08-02T00:00:00+00:00；來源=Broadcom Inc. Form 10-Q for the fiscal quarter ended August 2, 2026, filed 2026-",
+      "n": 537,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_28eefe6ab194b2872d8a5774edd2f4af;proposal:po_e75a78fb26c0c8f8d078967b18fc87f2",
+      "ref_id": "po_e75a78fb26c0c8f8d078967b18fc87f2",
+      "resolution": "go",
+      "resolved_at": "2026-09-11T04:35:55.314359+00:00",
+      "source": "engine_c",
+      "title": "Engine C 觀測：AVGO / customer_concentration",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 538,
+      "reason": null,
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:globalfoundries：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 539,
+      "reason": null,
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:sk_hynix：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-11T04:35:48.814119+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 540,
+      "reason": null,
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "unknown：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -19649,8 +19739,105 @@
       "ref_id": "dc_32872cf6a80c5f273b9b4c55a57ff229",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:31:47.332387+00:00",
+      "n": 535,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_13871bf23f59d79d8663428ee4665cb0;digest:b1b26c22d0baacadc65906357b30217ff93aa6b3db447cab0875979f0c6fc149;commit:7a70fc392f655060d78a4e3b5e922968e94a3506;cohort:dc_70872dbacf53703aada2f101e5e0cd1c",
+      "ref_id": "ra_13871bf23f59d79d8663428ee4665cb0",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:32:16.256183+00:00",
+      "n": 530,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_21602c2e352aa346b9c106224bbc44c4;digest:ba2826ff6065b48d93c6c745172c01d7774e6465df2a395451881d99e5564efd;commit:93bd381942a9814d419fa0b1bb4a0b9fbf18648d;cohort:dc_766316738ea5013cf930254fca598033",
+      "ref_id": "ra_21602c2e352aa346b9c106224bbc44c4",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:33:11.341704+00:00",
+      "n": 531,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_9bd374a7410dd3a9ccd649c6d6123f4a;digest:8fb51e4c51ef539df0f9e4b0d5d8bc343ec9e6b3f0b4398549ec28ae1d903028;commit:6b3a361159f1ebb43c9dd777e2766c1e70f69bbf;cohort:dc_67f5e1588990f432e8e0ccce5711e62e",
+      "ref_id": "ra_9bd374a7410dd3a9ccd649c6d6123f4a",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:33:13.206386+00:00",
+      "n": 533,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_0c7326fa93ceb6d40855b157f0909063;digest:2739a76ba5964f8b1cff2158de28c9ab7453ea02d2df5d0dac95e3f475f83ddd;commit:cbbc7bac40f7c6aa7c3eaa12705ad7eab9a0b79a;cohort:dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "ref_id": "ra_0c7326fa93ceb6d40855b157f0909063",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:35:48.814119+00:00",
+      "n": 279,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-09T09:47:21.388307+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-09-11T04:35:54.457799+00:00",
+      "n": 536,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_ab4a5eb0c7f4ff4ce7a6d3d04cefd08f;proposal:po_2cd7cf089fb5b846335b74a8aff9e107",
+      "ref_id": "po_2cd7cf089fb5b846335b74a8aff9e107",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:35:55.314359+00:00",
+      "n": 537,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_28eefe6ab194b2872d8a5774edd2f4af;proposal:po_e75a78fb26c0c8f8d078967b18fc87f2",
+      "ref_id": "po_e75a78fb26c0c8f8d078967b18fc87f2",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:36:12.115712+00:00",
+      "n": 534,
+      "reason": "AAOI committed_capex 已寫入 append-only ledger（提案 po_2cd7cf08，經 pq2 [536] 核准落地）",
+      "receipt": "authority:engine_c_observation;ref:mo_ab4a5eb0c7f4ff4ce7a6d3d04cefd08f",
+      "ref_id": "manual:534",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:36:12.327586+00:00",
+      "n": 532,
+      "reason": "AVGO customer_concentration 已寫入 append-only ledger（提案 po_e75a78fb，經 pq2 [537] 核准落地）",
+      "receipt": "authority:engine_c_observation;ref:mo_28eefe6ab194b2872d8a5774edd2f4af",
+      "ref_id": "manual:532",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T04:36:29.889591+00:00",
+      "n": 523,
+      "reason": "IQE.L forward_earnings_multiple.target_pe 型別上不適用（FY2026／FY2027 共識 EPS 皆為負），已寫入 abstention ledger",
+      "receipt": "authority:alpha_abstention;ref:ab_ee3fd4a0bcebd6f8",
+      "ref_id": "manual:523",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 536,
+  "next_n": 541,
   "schema_version": "1"
 }
