@@ -1,191 +1,191 @@
 {
-  "schema_version": 1,
-  "_doc": [
-    "一手取得路徑的登記表（2026-09-11 使用者定案）。",
-    "",
-    "存在理由：2026-09-11 一個 session 內三次把「我沒試」講成「拿不到」——",
-    "  ①『evidence_index 只有一條快照，寫了會是薄判斷』→ 深交所公告 API 三分鐘拿到 132 頁法定半年報；",
-    "  ②『卡在年報是 PDF』→ pypdf 與 pdfminer 本來就裝著；",
-    "  ③『非美股基期實績等於新增一個 ingestion 子系統』→ fetchers/mops.py 早就在 repo 裡。",
-    "三次都不是證據不夠，是**沒試**。而那些知識當時只活在對話裡，下一個 session 會再撞一次。",
-    "",
-    "所以規則不是『降低證據標準』，是：**轉述要用、但要標成轉述；不能因為只有轉述就留空白。**",
-    "階梯由上而下試，`tier_cap` 是該路徑能支撐的最高 evidence tier——它不改變 L8 的獨立性判準。",
-    "",
-    "⚠ `verified` 標的是「這條路今天實測跑得通」，不是「它應該跑得通」。",
-    "未驗證的路徑照樣列出來（讓缺口看得見），但 probe 會誠實回報它沒被驗證過。",
-    "",
-    "consumer：sourcing/routes.py（唯一 loader）與 engine_b/leads.py 的 park 檢查。"
-  ],
-  "routes": [
-    {
-      "key": "local_library",
-      "label": "先 grep 自家庫",
-      "rung": 1,
-      "applies_to": "always",
-      "tier_cap": 1,
-      "verified": true,
-      "how": "grep -ril <關鍵字> library/ extractions/",
-      "why": "L11 第 4 點：一手常常已 ingest 在手邊。跳過這一格會重抓已有的東西。"
-    },
-    {
-      "key": "sec_edgar",
-      "label": "SEC EDGAR",
-      "rung": 2,
-      "applies_to": "ticker_no_foreign_suffix",
-      "tier_cap": 1,
-      "verified": true,
-      "how": "python -m fetchers.edgar --ticker <T> --forms 10-K,10-Q,8-K（權威判定是 fetchers.edgar.get_cik；本表的適用性是離線近似）",
-      "why": "美股一手，20-F／6-K 的外國發行人也走這裡。⚠ **刻意用「沒有外國後綴」而不是 execution_venue**：後者只有 43/100 家有值（它是「能不能下單」不是「在哪申報」），AVGO 與 NVDA 都是 None。寧可多列一條——多列只花一次 probe，少列就是 2026-09-11 那種漏掉。",
-      "foreign_suffixes": [
-        ".SZ",
-        ".SS",
-        ".TW",
-        ".TWO",
-        ".KS",
-        ".T",
-        ".HK",
-        ".L",
-        ".AX",
-        ".ST",
-        ".PA",
-        ".DE",
-        ".V",
-        ".TO",
-        ".SI"
-      ]
-    },
-    {
-      "key": "szse",
-      "label": "深圳證券交易所公告",
-      "rung": 2,
-      "applies_to": "ticker_suffix",
-      "suffixes": [
-        ".SZ"
-      ],
-      "tier_cap": 1,
-      "verified": true,
-      "how": "POST https://www.szse.cn/api/disc/announcement/annList（json: seDate/stock/channelCode）→ attachPath → https://disc.static.szse.cn/download/<attachPath>",
-      "why": "2026-09-11 實測通過（002472 的 132 頁半年報）。⚠ CNINFO 那條回 HTML、被擋，不要再試。"
-    },
-    {
-      "key": "sse",
-      "label": "上海證券交易所公告",
-      "rung": 2,
-      "applies_to": "ticker_suffix",
-      "suffixes": [
-        ".SS"
-      ],
-      "tier_cap": 1,
-      "verified": false,
-      "how": "（未驗證）SSE 有對應的公告查詢端點，尚未實測；先試與 SZSE 同形的路徑",
-      "why": "688017.SS／688836.SS 需要它。**標成未驗證是為了讓缺口看得見**，不是藉口。"
-    },
-    {
-      "key": "mops",
-      "label": "公開資訊觀測站（台股）",
-      "rung": 2,
-      "applies_to": "ticker_suffix",
-      "suffixes": [
-        ".TW",
-        ".TWO"
-      ],
-      "tier_cap": 1,
-      "verified": true,
-      "how": "python -m fetchers.mops --co-id <代號> --kind consolidated_financial_statement --year <民國年>",
-      "why": "2026-09-11 實測通過（3081 Q2 財報，29 頁轉 26,720 字）。⚠ 財報在 mtype=A 區，年報在 F 區，kind 選錯會列到另一區。"
-    },
-    {
-      "key": "dart",
-      "label": "韓國 DART（金融監督院）",
-      "rung": 2,
-      "applies_to": "ticker_suffix",
-      "suffixes": [
-        ".KS",
-        ".KQ"
-      ],
-      "tier_cap": 1,
-      "verified": false,
-      "how": "（未驗證）dart.fss.or.kr 有開放 API（需申請 key）；也有無 key 的公告檢索頁",
-      "why": "005930.KS／012330.KS／000660.KS 需要它。列出來是為了讓缺口具名——『這條路還沒建』與『這檔拿不到資料』是兩回事，後者才是死路。"
-    },
-    {
-      "key": "edinet",
-      "label": "日本 EDINET",
-      "rung": 2,
-      "applies_to": "ticker_suffix",
-      "suffixes": [
-        ".T"
-      ],
-      "tier_cap": 1,
-      "verified": false,
-      "how": "（未驗證）disclosure.edinet-fsa.go.jp 有 JSON API（書類一覧・取得）",
-      "why": "5016.T／6268.T／6481.T／6594.T 需要它。同上，具名而非缺席。"
-    },
-    {
-      "key": "hkex",
-      "label": "香港交易所披露易",
-      "rung": 2,
-      "applies_to": "ticker_suffix",
-      "suffixes": [
-        ".HK"
-      ],
-      "tier_cap": 1,
-      "verified": false,
-      "how": "（未驗證）www1.hkexnews.hk 的公司公告檢索",
-      "why": "6680.HK 需要它。"
-    },
-    {
-      "key": "issuer_site",
-      "label": "發行人自家 newsroom／IR",
-      "rung": 3,
-      "applies_to": "always",
-      "tier_cap": 1,
-      "verified": true,
-      "how": "公司官網的 press/newsroom/investor 區；優先於任何聚合站",
-      "why": "SK hynix 的 HBM4 專稿就是這樣拿到的——比財報稿更貼題。"
-    },
-    {
-      "key": "alternate_primary",
-      "label": "替代一手（同一事實的另一份文件）",
-      "rung": 4,
-      "applies_to": "always",
-      "tier_cap": 1,
-      "verified": true,
-      "how": "換一份講同一件事的一手：專題稿 vs 財報稿、10-Q vs 8-K、年報 vs 法說",
-      "why": "2026-09-11：重複 URL 守衛擋下 SK hynix 財報稿，改用 HBM4 專稿就過了。**這一格最常被跳過**——撞牆時先問「同一個事實還有沒有別的文件」。"
-    },
-    {
-      "key": "authorized_syndication",
-      "label": "授權轉載／第三方轉錄",
-      "rung": 5,
-      "applies_to": "always",
-      "tier_cap": 2,
-      "verified": true,
-      "how": "Reuters 授權轉載站、法說逐字稿服務；必須標 tier_cap=2，不得據以提高 evidence tier",
-      "why": "有總比留空白好，但**標成轉述**。2026-09-11 反例：二手說減速器占 35%，法定半年報是 9.67%，差 3.6 倍。"
-    }
-  ],
-  "file_formats": {
-    "pdf": {
-      "verified": true,
-      "how": "pypdf 或 pdfminer（本機已安裝）；PdfReader(path).pages → extract_text()",
-      "why": "2026-09-11 我說過『卡在年報是 PDF』——那是沒查。兩個庫都在。⚠ poppler 沒裝，不要走那條。"
-    }
+ "schema_version": 1,
+ "_doc": [
+  "一手取得路徑的登記表（2026-09-11 使用者定案）。",
+  "",
+  "存在理由：2026-09-11 一個 session 內三次把「我沒試」講成「拿不到」——",
+  "  ①『evidence_index 只有一條快照，寫了會是薄判斷』→ 深交所公告 API 三分鐘拿到 132 頁法定半年報；",
+  "  ②『卡在年報是 PDF』→ pypdf 與 pdfminer 本來就裝著；",
+  "  ③『非美股基期實績等於新增一個 ingestion 子系統』→ fetchers/mops.py 早就在 repo 裡。",
+  "三次都不是證據不夠，是**沒試**。而那些知識當時只活在對話裡，下一個 session 會再撞一次。",
+  "",
+  "所以規則不是『降低證據標準』，是：**轉述要用、但要標成轉述；不能因為只有轉述就留空白。**",
+  "階梯由上而下試，`tier_cap` 是該路徑能支撐的最高 evidence tier——它不改變 L8 的獨立性判準。",
+  "",
+  "⚠ `verified` 標的是「這條路今天實測跑得通」，不是「它應該跑得通」。",
+  "未驗證的路徑照樣列出來（讓缺口看得見），但 probe 會誠實回報它沒被驗證過。",
+  "",
+  "consumer：sourcing/routes.py（唯一 loader）與 engine_b/leads.py 的 park 檢查。"
+ ],
+ "routes": [
+  {
+   "key": "local_library",
+   "label": "先 grep 自家庫",
+   "rung": 1,
+   "applies_to": "always",
+   "tier_cap": 1,
+   "verified": true,
+   "how": "grep -ril <關鍵字> library/ extractions/",
+   "why": "L11 第 4 點：一手常常已 ingest 在手邊。跳過這一格會重抓已有的東西。"
   },
-  "park_requires_receipt_when_trace_status_in": [
-    "lead_only_tier_4",
-    "isolated_tier_3",
-    "partial",
-    "awaiting_named_disclosure"
-  ],
-  "_park_rule": [
-    "上列四個 trace_status 都是「我沒拿到（足夠的）東西」，park 時必須附 source_routes_receipt。",
-    "終局型（original_obtained／contradicts／tier_1_2_honest_passthrough／not_pursued）不需要：",
-    "前三個代表拿到了，not_pursued 代表判定不研究——那是決定，不是取得失敗。"
-  ],
-  "_applicability_note": [
-    "applicable() 是**離線近似**，方向刻意偏向多列：漏一條路的代價（把「沒試」講成「拿不到」）",
-    "遠大於多列一條的代價（多跑一次 probe 發現不適用）。權威判定寫在各路徑的 how 裡。"
-  ]
+  {
+   "key": "sec_edgar",
+   "label": "SEC EDGAR",
+   "rung": 2,
+   "applies_to": "ticker_no_foreign_suffix",
+   "tier_cap": 1,
+   "verified": true,
+   "how": "python -m fetchers.edgar --ticker <T> --forms 10-K,10-Q,8-K（權威判定是 fetchers.edgar.get_cik；本表的適用性是離線近似）",
+   "why": "美股一手，20-F／6-K 的外國發行人也走這裡。⚠ **刻意用「沒有外國後綴」而不是 execution_venue**：後者只有 43/100 家有值（它是「能不能下單」不是「在哪申報」），AVGO 與 NVDA 都是 None。寧可多列一條——多列只花一次 probe，少列就是 2026-09-11 那種漏掉。",
+   "foreign_suffixes": [
+    ".SZ",
+    ".SS",
+    ".TW",
+    ".TWO",
+    ".KS",
+    ".T",
+    ".HK",
+    ".L",
+    ".AX",
+    ".ST",
+    ".PA",
+    ".DE",
+    ".V",
+    ".TO",
+    ".SI"
+   ]
+  },
+  {
+   "key": "szse",
+   "label": "深圳證券交易所公告",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".SZ"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "POST https://www.szse.cn/api/disc/announcement/annList（json: seDate/stock/channelCode）→ attachPath → https://disc.static.szse.cn/download/<attachPath>",
+   "why": "2026-09-11 實測通過（002472 的 132 頁半年報）。⚠ CNINFO 那條回 HTML、被擋，不要再試。"
+  },
+  {
+   "key": "sse",
+   "label": "上海證券交易所公告",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".SS"
+   ],
+   "tier_cap": 1,
+   "verified": false,
+   "how": "（未驗證）SSE 有對應的公告查詢端點，尚未實測；先試與 SZSE 同形的路徑",
+   "why": "688017.SS／688836.SS 需要它。**標成未驗證是為了讓缺口看得見**，不是藉口。"
+  },
+  {
+   "key": "mops",
+   "label": "公開資訊觀測站（台股）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".TW",
+    ".TWO"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "python -m fetchers.mops --co-id <代號> --kind consolidated_financial_statement --year <民國年>",
+   "why": "2026-09-11 實測通過（3081 Q2 財報，29 頁轉 26,720 字）。⚠ 財報在 mtype=A 區，年報在 F 區，kind 選錯會列到另一區。"
+  },
+  {
+   "key": "dart",
+   "label": "韓國 DART（金融監督院）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".KS",
+    ".KQ"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "① POST https://dart.fss.or.kr/dsab007/detailSearch.ax（form-urlencoded：textCrpNm=<한글 회사명>、startDate/endDate=YYYYMMDD、currentPage=1、maxResults=30、sort=date、series=desc；headers 需 Referer=https://dart.fss.or.kr/dsab007/main.do 與 X-Requested-With=XMLHttpRequest）→ 回 HTML 列表，從 openReportViewer('<rcpNo>') 取報告書編號、從 openCorpInfoNew('<corp_code>') 取公司代碼。② GET https://dart.fss.or.kr/dsaf001/main.do?rcpNo=<rcpNo> → 頁內 JS 有整份目錄樹，regex 抓 node*['text']/['eleId']/['offset']/['length'] 與 original.dcmNo。③ GET https://dart.fss.or.kr/report/viewer.do?rcpNo=&dcmNo=&eleId=&offset=&length=&dtd=dart4.xsd（需帶 ②的 Referer）→ 單節 HTML，utf-8 失敗再試 euc-kr。**不需要 API key。**常用節點名：「2-2. 연결 포괄손익계산서」「주석 4. 영업부문」（IFRS 8 主要客戶 ≥10% 揭露）「주석 30/27. 주당이익」（加權平均股數）「II-4. 매출 및 수주상황」（수주상황＝backlog 揭露或其否定）「주석 24. 금융수익 및 금융비용」。",
+   "why": "005930.KS／012330.KS／000660.KS 需要它。2026-09-11 實測通過：SK hynix 사업보고서(2025.12) rcpNo=20260317000635 與 반기보고서(2026.06) rcpNo=20260814003509，取到 FY2025 損益全表、加權平均稀釋股數、IFRS 8 主要客戶百分比與 수주상황 全節，並據以把 000660.KS 從 blocked 推到 ready。⚠ 這條路在被實測之前標了 false 十幾天，而 000660.KS 的基期觀測就因此只填得出三個數並註明『必須取得 DART 사업보고서』——『這條路還沒建』與『這檔拿不到資料』是兩回事，後者才是死路，而這次證明它不是。"
+  },
+  {
+   "key": "edinet",
+   "label": "日本 EDINET",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".T"
+   ],
+   "tier_cap": 1,
+   "verified": false,
+   "how": "（未驗證）disclosure.edinet-fsa.go.jp 有 JSON API（書類一覧・取得）",
+   "why": "5016.T／6268.T／6481.T／6594.T 需要它。同上，具名而非缺席。"
+  },
+  {
+   "key": "hkex",
+   "label": "香港交易所披露易",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".HK"
+   ],
+   "tier_cap": 1,
+   "verified": false,
+   "how": "（未驗證）www1.hkexnews.hk 的公司公告檢索",
+   "why": "6680.HK 需要它。"
+  },
+  {
+   "key": "issuer_site",
+   "label": "發行人自家 newsroom／IR",
+   "rung": 3,
+   "applies_to": "always",
+   "tier_cap": 1,
+   "verified": true,
+   "how": "公司官網的 press/newsroom/investor 區；優先於任何聚合站",
+   "why": "SK hynix 的 HBM4 專稿就是這樣拿到的——比財報稿更貼題。"
+  },
+  {
+   "key": "alternate_primary",
+   "label": "替代一手（同一事實的另一份文件）",
+   "rung": 4,
+   "applies_to": "always",
+   "tier_cap": 1,
+   "verified": true,
+   "how": "換一份講同一件事的一手：專題稿 vs 財報稿、10-Q vs 8-K、年報 vs 法說",
+   "why": "2026-09-11：重複 URL 守衛擋下 SK hynix 財報稿，改用 HBM4 專稿就過了。**這一格最常被跳過**——撞牆時先問「同一個事實還有沒有別的文件」。"
+  },
+  {
+   "key": "authorized_syndication",
+   "label": "授權轉載／第三方轉錄",
+   "rung": 5,
+   "applies_to": "always",
+   "tier_cap": 2,
+   "verified": true,
+   "how": "Reuters 授權轉載站、法說逐字稿服務；必須標 tier_cap=2，不得據以提高 evidence tier",
+   "why": "有總比留空白好，但**標成轉述**。2026-09-11 反例：二手說減速器占 35%，法定半年報是 9.67%，差 3.6 倍。"
+  }
+ ],
+ "file_formats": {
+  "pdf": {
+   "verified": true,
+   "how": "pypdf 或 pdfminer（本機已安裝）；PdfReader(path).pages → extract_text()",
+   "why": "2026-09-11 我說過『卡在年報是 PDF』——那是沒查。兩個庫都在。⚠ poppler 沒裝，不要走那條。"
+  }
+ },
+ "park_requires_receipt_when_trace_status_in": [
+  "lead_only_tier_4",
+  "isolated_tier_3",
+  "partial",
+  "awaiting_named_disclosure"
+ ],
+ "_park_rule": [
+  "上列四個 trace_status 都是「我沒拿到（足夠的）東西」，park 時必須附 source_routes_receipt。",
+  "終局型（original_obtained／contradicts／tier_1_2_honest_passthrough／not_pursued）不需要：",
+  "前三個代表拿到了，not_pursued 代表判定不研究——那是決定，不是取得失敗。"
+ ],
+ "_applicability_note": [
+  "applicable() 是**離線近似**，方向刻意偏向多列：漏一條路的代價（把「沒試」講成「拿不到」）",
+  "遠大於多列一條的代價（多跑一次 probe 發現不適用）。權威判定寫在各路徑的 how 裡。"
+ ]
 }

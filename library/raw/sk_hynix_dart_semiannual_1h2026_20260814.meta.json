@@ -1,0 +1,24 @@
+{
+  "doc_id": "sk_hynix_dart_semiannual_1h2026_20260814",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "company": "SK hynix Inc.",
+  "ticker": "000660.KS",
+  "form_type": "반기보고서 (Semi-annual Report, Korea FSC/DART)",
+  "filed_date": "2026-08-14",
+  "dart_rcp_no": "20260814003509",
+  "dart_corp_code": "00164779",
+  "period": "2026-01-01..2026-06-30",
+  "accounting_basis": "K-IFRS consolidated (reviewed, not audited)",
+  "truncated": false,
+  "original_chars": 7392,
+  "sections_extracted": [
+    "2-2. 연결 포괄손익계산서",
+    "주석 24. 금융수익 및 금융비용 (연결)",
+    "주석 27. 주당이익 (연결)",
+    "주석 4. 영업부문 (연결)",
+    "II-4. 매출 및 수주상황"
+  ],
+  "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260814003509",
+  "retrieval_route": "config/source_routes.json::dart"
+}

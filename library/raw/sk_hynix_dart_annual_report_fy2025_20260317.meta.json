@@ -1,0 +1,25 @@
+{
+  "doc_id": "sk_hynix_dart_annual_report_fy2025_20260317",
+  "source_type": "filing",
+  "evidence_tier": 1,
+  "company": "SK hynix Inc.",
+  "ticker": "000660.KS",
+  "form_type": "사업보고서 (Annual Business Report, Korea FSC/DART)",
+  "filed_date": "2026-03-17",
+  "dart_rcp_no": "20260317000635",
+  "dart_corp_code": "00164779",
+  "fiscal_year_end": "2025-12-31",
+  "accounting_basis": "K-IFRS consolidated (audited)",
+  "truncated": false,
+  "original_chars": 6469,
+  "sections_extracted": [
+    "2-2. 연결 포괄손익계산서",
+    "II-4. 매출 및 수주상황",
+    "주석 4. 영업부문 (연결)",
+    "주석 30. 주당이익 (연결)",
+    "I-2. 주요 제품 및 서비스",
+    "II-1. 사업의 개요"
+  ],
+  "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260317000635",
+  "retrieval_route": "config/source_routes.json::dart"
+}

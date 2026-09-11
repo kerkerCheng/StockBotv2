@@ -111,6 +111,23 @@ def main() -> int:
     if not args.source or not args.as_of:
         ap.error("manual observation 必須同時提供 --source 與 --as-of")
 
+    # 2026-09-04 起 gate 按 `verifiability` 分（AGENTS.md「四個人工 gate」）：`mechanical`
+    # 欄位不需 pq2。但本入口原本對所有欄位一律鑄提案，於是 mechanical 欄位走這裡會拿到一個
+    # 本來不該存在的 pq2 編號——判準改了而這條走廊沒改（L16-1(b)：分類有 SSOT，只是沒送到
+    # 消費端手上）。實測 2026-09-11：`fiscal_year_results`（mechanical）在此鑄出 po_0dd373d4，
+    # 必須手動 mark_dropped 才收得回去。這裡**不自己寫入**，只指回唯一的 mechanical 走廊：
+    # 那支腳本另有寫入端驗證（JSON＋至少一個數值），在這裡重做一份等於兩份會漂移的判準。
+    if not spec.requires_user_approval:
+        print(
+            f"✗ `{spec.field_name}` 是 verifiability={spec.verifiability} 欄位，**不需 pq2 核准**，"
+            "所以不從這裡鑄提案（那會多一個假的待辦編號）。\n"
+            "  改用：python scripts/record_mechanical_observation.py "
+            f"--ticker {args.ticker.upper()} --field {spec.field_name} "
+            "--value '<JSON>' --source-ref '<一手定位>' --as-of <YYYY-MM-DD> [--supersedes mo_*]",
+            file=sys.stderr,
+        )
+        return 3
+
     # 寫入 append-only ledger 需要使用者對 exact pq2 編號的明確核准。這裡只建立
     # content-addressed 提案；實際寫入由 `engine_b.todo complete-observation` 執行。
     record = pending_observations.propose(

@@ -48,6 +48,7 @@ def main() -> int:
     parser.add_argument("--source-ref", required=True, help="一手文件與定位，必填")
     parser.add_argument("--as-of", required=True, help="這筆事實屬於哪一天（財報期末）")
     parser.add_argument("--author", default="session")
+    parser.add_argument("--supersedes", help="更正既有觀測時填被取代的 mo_* ID。**不填就只是新增一筆**——讀取端只靠 recorded_at 排序猜哪一筆算數，而猜不是宣告（L17-3②：覆蓋還是聯集要講出來）。")
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
 
@@ -102,6 +103,7 @@ def main() -> int:
             source_ref=args.source_ref,
             as_of=args.as_of,
             author=args.author,
+            supersedes_id=args.supersedes,
         )
     except ValueError as exc:
         print(f"✗ {exc}", file=sys.stderr)

@@ -47,11 +47,31 @@ def test_every_ticker_has_at_least_the_always_routes() -> None:
 
 
 def test_unverified_routes_are_listed_not_hidden() -> None:
-    """未驗證的路徑要列出來讓缺口**具名**——『這條路還沒建』與『這檔拿不到』是兩回事。"""
+    """未驗證的路徑要列出來讓缺口**具名**——『這條路還沒建』與『這檔拿不到』是兩回事。
+
+    ⚠ 這條原本釘死 `{"dart", "edinet", "sse", "hkex"} <= unverified`，於是 2026-09-11
+    把 dart 實測跑通、順手把 verified 改成 true 之後它就變紅——**而那是進展不是回歸**。
+    釘現況的測試會自己腐壞（同 commit c067b51 的形狀）。改法：守的是 `render` 的行為
+    「未驗證不得被靜默隱藏」，而那件事與『今天哪幾條未驗證』無關，所以用**資料驅動**：
+    每一條 verified=False 的路徑都必須在 render 裡帶上未驗證標記。
+    """
     reg = routes.load()
-    unverified = {r.key for r in reg.routes if not r.verified}
-    assert {"dart", "edinet", "sse", "hkex"} <= unverified
-    rendered = "\n".join(routes.render(reg.applicable(ticker="000660.KS", venue=None)))
+    for route in reg.routes:
+        rendered = "\n".join(routes.render((route,)))
+        if route.verified:
+            assert "未驗證" not in rendered, f"{route.key} 已驗證卻被標成未驗證"
+        else:
+            assert "未驗證" in rendered, f"{route.key} 未驗證卻沒有標記——缺口被隱藏了"
+
+
+def test_unverified_marker_is_not_vacuous() -> None:
+    """上一條在「全部都已驗證」時會變成空轉，所以用合成 route 直接證明標記邏輯活著。"""
+    unverified = routes.Route(
+        key="fixture_unverified", label="合成路徑", rung=9, applies_to="always",
+        tier_cap=3, verified=False, how="（合成）", why="（合成）",
+    )
+    rendered = "\n".join(routes.render((unverified,)))
+    assert "fixture_unverified" in rendered
     assert "未驗證" in rendered
 
 
