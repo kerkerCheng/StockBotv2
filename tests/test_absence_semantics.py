@@ -117,8 +117,15 @@ def test_layer_and_subject_are_contracts_not_free_text() -> None:
     with pytest.raises(ContractViolation, match="沒有 subject"):
         abstention_record(company_id="co:x", ticker="X", layer="valuation",
                           subject="dcf.wacc", reason="a" * 30, revisit_when="b" * 20)
-    assert ABSTENTION_LAYERS == ("valuation",)
+    # 2026-09-11：加 research 層（使用者核准）。**這條刻意繼續數**——層數是 contract，
+    # 多一層就要多一段消費端語意，偷偷長出第三層必須變紅。
+    assert ABSTENTION_LAYERS == ("valuation", "research")
     assert set(ABSTENTION_SUBJECTS) == set(ABSTENTION_LAYERS)
+    # research 只開一個 subject：general 到資料支持的那一格為止（L17-4）
+    assert ABSTENTION_SUBJECTS["research"] == ("axis.catalyst",)
+    with pytest.raises(ContractViolation, match="沒有 subject"):
+        abstention_record(company_id="co:x", ticker="X", layer="research",
+                          subject="axis.structural", reason="a" * 30, revisit_when="b" * 20)
 
 
 def test_an_abstention_without_a_revisit_condition_is_rejected() -> None:
@@ -345,3 +352,66 @@ def test_blockers_and_blocker_details_must_have_the_same_length() -> None:
                          flags=(), blockers=("a", "b"), optional_unavailable=(), rule="r",
                          blocker_details=(AnalystBlocker(panel="headline", status="missing",
                                                          absence_kind=None, settled=False, reason=None),))
+
+
+# ---------------------------------------------------------------------------
+# 4. research 層（2026-09-11）：「已研究、結論是沒有可監看事件」
+# ---------------------------------------------------------------------------
+
+def _catalyst_abstention(created: date = date(2026, 9, 11)) -> Abstention:
+    return parse_abstention_record(abstention_record(
+        company_id="co:globalfoundries", ticker="GFS", layer="research", subject="axis.catalyst",
+        reason="bounded source-trace 找到的兩則具名事件都正確地不具入圖資格：一則是資本事件、"
+               "一則無金額無產能無最低採購量。沒有可監看的具名事件，不是還沒查。",
+        revisit_when="出現帶金額／產能／最低採購量的客戶端承諾，或 registry 內公司具名的長約公告",
+        created_at=datetime(created.year, created.month, created.day, tzinfo=timezone.utc)))
+
+
+def test_a_research_abstention_is_selected_like_any_other_layer() -> None:
+    """選取規則與估值層**同一套**——不為新層另寫一份（L16）。"""
+    rec = _catalyst_abstention()
+    kwargs = dict(period_end=None, as_of=None, today=date(2026, 9, 12))
+    assert select_abstention([rec], layer="research", subject="axis.catalyst", **kwargs) is rec
+    # 宣告日之前的視角看不到它——PIT 與估值層同一條規則
+    assert select_abstention([rec], layer="research", subject="axis.catalyst",
+                             period_end=None, as_of=date(2026, 9, 10),
+                             today=date(2026, 9, 12)) is None
+    # 別層／別 subject 拿不到它
+    assert select_abstention([rec], layer="valuation",
+                             subject="forward_earnings_multiple.target_pe", **kwargs) is None
+
+
+def test_a_settled_catalyst_axis_is_not_a_todo_but_readiness_stays_blocked() -> None:
+    """**settled 不讓 readiness 變好**（AGENTS「APP 呈現契約」）——它只回答「該不該去補」。"""
+    from briefing.analyst_view.contracts import AnalystPanel
+
+    def _panel(catalyst_kind: str | None) -> AnalystPanel:
+        return AnalystPanel(
+            key="research", title="研究現況", questions=("q6_change",), status="missing", optional=False,
+            source_sections=("catalysts",), source_statuses={"catalysts": "missing"},
+            source_absence_kinds={"catalysts": catalyst_kind}, lines=())
+
+    not_yet = _panel("not_yet_recorded")
+    assert not_yet.absence_is_settled is False, "沒宣告過就是待辦"
+
+    settled = _panel("deliberate_abstention")
+    assert settled.absence_is_settled is True
+    assert settled.status == "missing", "宣告之後那一格仍然缺席——abstention 型別上不可能帶內容"
+    blocker = AnalystBlocker(panel="research", status=settled.status,
+                             absence_kind=settled.absence_kind, settled=settled.absence_is_settled,
+                             reason=None)
+    assert blocker.settled is True and blocker.status == "missing"
+
+
+def test_the_catalyst_section_only_goes_settled_when_a_record_says_so() -> None:
+    """呈現層不得自己打標籤——`deliberate_abstention` 只能來自 append-only 紀錄。
+
+    這條會在有人把「沒有催化劑」直接寫成 settled 時變紅。
+    """
+    import inspect
+
+    from briefing.alpha_view import builder
+
+    src = inspect.getsource(builder)
+    marker = 'absence_kind=("deliberate_abstention" if catalyst_abstention is not None else None)'
+    assert marker in src, "catalysts 的 settled 必須綁在 select_abstention 的結果上"

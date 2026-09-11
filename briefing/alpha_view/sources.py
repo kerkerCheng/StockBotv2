@@ -214,6 +214,19 @@ def _fundamental_model(
     return model, None, records
 
 
+def _read_abstentions(ticker: str) -> list[Any]:
+    """`alpha/abstention/` 的 append-only ledger。**讀不到就是沒有**——
+
+    不得因為讀取失敗而把「刻意不主張」降級成「還沒寫」：那正是這本 ledger 要消除的兩義。
+    兩個消費端（估值層的 target_pe、研究層的 catalyst 軸）共用這一支，不各讀一份（L16）。
+    """
+    try:
+        records, _errors = abstention_ledger.read_abstention_records(str(ticker))
+        return list(records)
+    except Exception:  # noqa: BLE001
+        return []
+
+
 def _valuation_model(
     build: ContextBuild, fundamental_model: FundamentalModelResult | None, fundamental_reason: str | None,
     ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date,
@@ -234,10 +247,7 @@ def _valuation_model(
         return None, f"估值假設 ledger 讀取失敗：{type(exc).__name__}", records
     # 「刻意不主張目標倍數」是另一本 append-only ledger（`alpha/abstention/`）。讀不到就是沒有——
     # 不得因為讀取失敗而把「刻意」降級成「還沒寫」，所以失敗一樣 fail-soft 並保持 not_yet_recorded。
-    try:
-        abstentions, _abstention_errors = abstention_ledger.read_abstention_records(str(ticker))
-    except Exception:  # noqa: BLE001
-        abstentions = []
+    abstentions = _read_abstentions(str(ticker))
     price = _current_price(build, identity)
     balance = _balance_input(build)
     common = dict(
@@ -576,6 +586,7 @@ def fetch_alpha_investment_view(
         reverse=reverse_model, reverse_reason=reverse_reason,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
+        abstention_records=_read_abstentions(str(resolved_ticker)),
         metric_observations=metric_observations, change_detection=detection,
         refresh_notes=refresh_notes,
     )

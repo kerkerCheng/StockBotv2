@@ -37,12 +37,23 @@ from ..errors import ContractViolation
 RECORD_VERSION = "abstention/v1"
 
 #: 哪些層可以宣告「刻意不主張」。**contract 不是 taxonomy**——多一層就要多一段消費端語意。
-#: v1 只有估值：它是唯一實測到「刻意不寫」與「還沒寫」被壓成同一句話的地方。
-ABSTENTION_LAYERS: tuple[str, ...] = ("valuation",)
+#:
+#: - `valuation`（v1）：唯一實測到「刻意不寫」與「還沒寫」被壓成同一句話的地方。
+#: - `research`（2026-09-11 使用者核准）：研究軸。packet 的 `axis_prompts.catalyst.do_not`
+#:   明文要求「找不到具體事件時回 unknown，**不要編一個**」，而 `unknown` 讓 catalysts 段
+#:   `missing` → readiness `blocked`，於是**一個 session 越誠實，那一檔就越永久卡住**，
+#:   `closure-gate` 還會一輪一輪把它重新提出來。研究做對了，系統卻沒有地方放這個結論。
+#:   實測 GFS（2026-09-10）：bounded source-trace 找到的兩則 2026 年具名事件都**正確地**
+#:   不具入圖資格（政府機關不符 Company node schema／無金額無產能的製造協議）。
+#:
+#: ⚠ 加層的代價寫在這裡：**多一層就要多一段消費端語意**，所以 `research` 只開一個 subject
+#: （`axis.catalyst`），不是把五個軸一次打開——general 到資料支持的那一格為止（L17-4）。
+ABSTENTION_LAYERS: tuple[str, ...] = ("valuation", "research")
 
 #: 每一層可宣告的主題（method.parameter 形式，與 `METHOD_PARAMETERS` 對齊）。
 ABSTENTION_SUBJECTS: Mapping[str, tuple[str, ...]] = {
     "valuation": ("forward_earnings_multiple.target_pe",),
+    "research": ("axis.catalyst",),
 }
 
 #: 欄位名任何一段命中即 import 失敗——abstention 結構上不得攜帶任何數值主張。
