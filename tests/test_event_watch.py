@@ -199,6 +199,37 @@ def test_reactivate_keeps_lead_watch_waiting():
     assert w["consumed_entities"] == ["CO:AXT"]
 
 
+def test_reactivate_records_why_it_was_irrelevant_and_has_a_cli():
+    """假說型 watch 被無關 lead 以 entity 交集誤觸時的正解是 reactivate，不是 consume。
+
+    2026-09-09 實測 ew_0005／0007／0057 三個都是這型（COHR 8-K 是 RSU、AAOI 8-K 是租賃），
+    當時**沒有這個命令**，只能直接改 JSON——稽核因此只活在 transcript 裡。
+    """
+    data = _fresh()
+    w = ew.add_watch(
+        data, kind="fact_verification", hypothesis_ref="hy_1", fact="SOI.PA 產能",
+        expires="2027-01-01", entities=["co:soitec"],
+        created_at="2026-09-01T00:00:00+00:00",
+    )
+    ew.check_watches(data, leads={"l1": _lead(tier=1, entities=["co:soitec"])},
+                     today=date(2026, 9, 2))
+    assert w["status"] == "fired" and w["woken_by"]
+    ew.reactivate(data, w["watch_id"], note="觸發 lead 是 RSU 8-K，與產能無關")
+
+    assert w["status"] == "active"
+    assert w["woken_by"] is None, "回 active 後不得留著上一次的喚醒，否則看起來還在 fired"
+    assert len(w["reactivations"]) == 1
+    assert w["reactivations"][0]["note"] == "觸發 lead 是 RSU 8-K，與產能無關"
+    assert w["reactivations"][0]["woken_by"]["lead_id"] == "l1", "誰誤觸的要留著"
+    assert "l1" in w["consumed_leads"], "同一則不得再叫醒第二次"
+    # 建 watch 時寫的原始理由不得被稽核紀錄蓋掉（append 不是覆蓋）
+    assert w["note"] == ""
+
+    # CLI 入口存在——沒有它，這條路只能靠手改 JSON
+    with pytest.raises(SystemExit):
+        ew.main(["reactivate", "--help"])
+
+
 def test_primary_source_tier_has_single_ssot():
     """[321]：tier-1 判準不得再各寫一份（L16）。"""
     from engine_b import lead_refs, leads as leads_mod

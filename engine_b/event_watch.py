@@ -448,16 +448,30 @@ def consume_fired(data: dict[str, Any], watch_id: str) -> None:
     raise EventWatchError(f"沒有待消化的 fired watch：{watch_id}")
 
 
-def reactivate(data: dict[str, Any], watch_id: str) -> None:
-    """lead 型 watch 排回 pq1 後回到等待——同一份文件可能要等好幾輪才出現。
+def reactivate(data: dict[str, Any], watch_id: str, *, note: str | None = None) -> None:
+    """fired watch 對照後判定「與等待條件無關」→ 回 active 繼續等，不是 consume。
 
-    與 `consume_fired` 的差別：pq2／hypothesis 型喚醒一次就結束（人接手了），
-    lead 型的等待條件（「拿到那份原文」）在 pq1 重查未果時依然成立，所以回 active
-    繼續等，只是標的已進 consumed。到期仍由 expires 收斂。
+    與 `consume_fired` 的差別：`consume` 說的是「這個等待結束了」；`reactivate` 說的是
+    「觸發它的那則 lead 不是它在等的東西，等待條件依然成立」。兩者都把觸發 lead 留在
+    `consumed_leads` 裡（fire 時就寫好了），所以同一則不會再叫醒第二次；到期仍由
+    expires 收斂。
+
+    ⚠ 兩個用途都真實存在：①lead 型 watch 排回 pq1 後回到等待——同一份文件可能要等
+    好幾輪才出現；②假說型（`fact_verification`）被**無關的** tier-1 lead 以 entity
+    交集誤觸——2026-09-09 實測 ew_0005／0007／0057 三個都是（COHR 8-K 是 RSU、
+    AAOI 8-K 是租賃）。當時沒有這個命令，只能直接改 JSON。
+
+    `note` 進 `reactivations`（append，不覆蓋 `note` 那格建 watch 時寫的原始理由）——
+    「為什麼判定無關」是稽核要看的東西，不得只活在某個 session 的 transcript 裡。
     """
     for watch in data["watches"]:
         if watch["watch_id"] == watch_id and watch.get("status") == "fired":
             watch["status"] = "active"
+            entry: dict[str, Any] = {"at": _now(), "woken_by": watch.get("woken_by")}
+            if note:
+                entry["note"] = note
+            watch["reactivations"] = [*(watch.get("reactivations") or []), entry]
+            watch["woken_by"] = None
             return
     raise EventWatchError(f"沒有待消化的 fired watch：{watch_id}")
 
@@ -509,6 +523,12 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("counters")
     consume = sub.add_parser("consume", help="假設對照完成後收掉 fired watch")
     consume.add_argument("watch_id")
+    react = sub.add_parser(
+        "reactivate",
+        help="對照後判定觸發 lead 與等待條件無關 → 回 active 繼續等（不是 consume）",
+    )
+    react.add_argument("watch_id")
+    react.add_argument("--note", default="", help="為什麼判定無關——稽核留在 watch 上")
     sweep = sub.add_parser("sweep", help="列出本輪 T2 該查的 watch（agent 拿去 WebSearch）")
     sweep.add_argument("--mark-checked", action="store_true")
     add = sub.add_parser("add")
@@ -539,6 +559,11 @@ def main(argv: list[str] | None = None) -> int:
         consume_fired(data, args.watch_id)
         save_watches(data)
         print(f"✓ 已收 {args.watch_id}")
+        return 0
+    if args.cmd == "reactivate":
+        reactivate(data, args.watch_id, note=args.note or None)
+        save_watches(data)
+        print(f"✓ {args.watch_id} 回 active 繼續等（觸發 lead 已在 consumed_leads，不會再叫醒）")
         return 0
     if args.cmd == "counters":
         print(json.dumps(counters(data), ensure_ascii=False))
