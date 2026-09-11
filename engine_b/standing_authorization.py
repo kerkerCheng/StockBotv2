@@ -30,6 +30,20 @@ class StandingAuthorization:
     path: Path = DEFAULT_PATH
     schema_version: int = 1
     _skip_hints: Mapping[str, tuple[str, ...]] = field(default_factory=dict)
+    #: 開發改動的常規授權。**不以 pq2 item type 為 key**——開發項不鑄號，載體仍是 ROADMAP
+    #: （AGENTS.md 2026-08-31 未動）。與上面的 ITEM_TYPES 封閉性無關，兩者不可混用。
+    dev_change: Mapping[str, Any] = field(default_factory=dict)
+
+    def dev_change_conditions(self) -> tuple[str, ...]:
+        """全部成立才在常規授權範圍內（AND，不是 OR）。"""
+        return tuple(sorted((self.dev_change.get("authorized_when_all") or {})))
+
+    def dev_change_never(self) -> Mapping[str, str]:
+        """任一命中就不在範圍內——要另外問使用者。"""
+        return dict(self.dev_change.get("never") or {})
+
+    def dev_change_receipt_fields(self) -> tuple[str, ...]:
+        return tuple(self.dev_change.get("receipt_required") or ())
 
     def is_authorized(self, item_type: str) -> bool:
         return item_type in self.authorized
@@ -74,10 +88,27 @@ def load(path: Path | str | None = None, *, item_types: Mapping[str, Any] | None
         key: tuple(str(t) for t in (value.get("skip_when_hint_mentions") or ()))
         for key, value in authorized.items() if isinstance(value, dict)
     }
+    dev_change = payload.get("dev_change")
+    if dev_change is not None:
+        if not isinstance(dev_change, dict):
+            raise StandingAuthorizationError("dev_change 必須是 object")
+        for key in ("authorized_when_all", "never", "receipt_required"):
+            if key not in dev_change:
+                raise StandingAuthorizationError(
+                    f"dev_change 缺 {key!r}——三格缺一就無法判定一個改動在不在範圍內")
+        if not dev_change.get("authorized_when_all"):
+            raise StandingAuthorizationError(
+                "dev_change.authorized_when_all 不得為空——空集合代表「無條件授權」，"
+                "那不是常規授權而是放棄 gate")
+        overlap_dev = set(dev_change["authorized_when_all"]) & set(dev_change["never"])
+        if overlap_dev:
+            raise StandingAuthorizationError(
+                f"同一條件不得同時在 authorized_when_all 與 never：{sorted(overlap_dev)}")
     return StandingAuthorization(
         authorized={k: dict(v) for k, v in authorized.items()},
         never={k: str(v) for k, v in never.items()},
         path=target, _skip_hints=skip_hints,
+        dev_change=dict(dev_change or {}),
     )
 
 

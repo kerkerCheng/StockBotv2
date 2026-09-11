@@ -148,3 +148,59 @@ def test_standing_go_reports_single_failures_without_stopping(monkeypatch) -> No
     out = todo.standing_go(pool, _StoreStub(), brief_items=BRIEF)
     assert [row["n"] for row in out["failed"]] == [by["dc_go"]["n"]]
     assert [row["n"] for row in out["done"]] == [by["lead_free"]["n"]]
+
+
+# ---------------------------------------------------------------------------
+# 開發改動的常規授權（2026-09-11）——**不以 pq2 item type 為 key**
+# ---------------------------------------------------------------------------
+
+def test_dev_change_is_not_keyed_by_item_types() -> None:
+    """開發項不鑄號，所以 dev_change 不參與 ITEM_TYPES 封閉性檢查。
+
+    把它塞進 `authorized` 會直接違反封閉性（config 列了 ITEM_TYPES 沒有的類型），
+    那正是它必須另開一區的原因——carrier 仍是 ROADMAP（AGENTS.md 2026-08-31 未動）。
+    """
+    from engine_b.standing_authorization import load
+
+    auth = load()
+    assert "dev_change" not in auth.authorized
+    assert "dev_change" not in auth.never
+    assert auth.dev_change_conditions()          # 有內容
+    assert auth.dev_change_never()
+
+
+def test_dev_change_conditions_are_and_not_or() -> None:
+    """四個條件全部成立才在範圍內。空集合等於無條件授權，載入就該失敗。"""
+    import json
+
+    from engine_b.standing_authorization import StandingAuthorizationError, load
+
+    base = json.loads((_CONFIG := __import__("pathlib").Path(
+        "config/standing_authorization.json")).read_text(encoding="utf-8"))
+    assert set(base["dev_change"]["authorized_when_all"]) == {
+        "reversible", "no_authority_write", "has_verification", "fix_level_declared"}
+
+    import tempfile
+    import pathlib as _p
+
+    broken = dict(base)
+    broken["dev_change"] = dict(base["dev_change"], authorized_when_all={})
+    with tempfile.TemporaryDirectory() as d:
+        path = _p.Path(d) / "sa.json"
+        path.write_text(json.dumps(broken, ensure_ascii=False), encoding="utf-8")
+        try:
+            load(path)
+        except StandingAuthorizationError as exc:
+            assert "無條件授權" in str(exc)
+        else:
+            raise AssertionError("空的 authorized_when_all 必須拒絕載入")
+
+
+def test_dev_change_never_covers_the_four_authority_gates_and_self_widening() -> None:
+    """never 必須擋住 authority 寫入、不可逆、以及「改本檔」——授權範圍不得自我擴張。"""
+    from engine_b.standing_authorization import load
+
+    never = load().dev_change_never()
+    for key in ("authority_write", "irreversible", "this_config",
+                "agents_md_judgment", "roadmap_phase_step", "gate_widening"):
+        assert key in never, f"dev_change.never 少了 {key}"

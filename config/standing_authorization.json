@@ -19,13 +19,29 @@
     "decision_review": {
       "label": "決策缺口的 bounded research",
       "go_means": "advance_decision_review 全函數：有 work order → dispatch 回 pq1；無 work order → reassess；仍有實質 blocker → 以 assessment-gap 排入 pq1",
-      "excludes": ["入圖", "Engine C 判讀寫入", "thesis mutation", "live"]
+      "excludes": [
+        "入圖",
+        "Engine C 判讀寫入",
+        "thesis mutation",
+        "live"
+      ]
     },
     "source_trace_review": {
       "label": "追源派回 pq1",
       "go_means": "requeue_trace 回 pq1 做 bounded 追源",
-      "excludes": ["付費取得（訂閱、報告購買——另核准 exact 金額）", "接受 claim", "提高 evidence tier", "入圖"],
-      "skip_when_hint_mentions": ["付費", "訂閱", "購買", "paywall", "paid"]
+      "excludes": [
+        "付費取得（訂閱、報告購買——另核准 exact 金額）",
+        "接受 claim",
+        "提高 evidence tier",
+        "入圖"
+      ],
+      "skip_when_hint_mentions": [
+        "付費",
+        "訂閱",
+        "購買",
+        "paywall",
+        "paid"
+      ]
     }
   },
   "never": {
@@ -36,5 +52,40 @@
     "manual": "manual 型是使用者指示或系統提案（含 decompose 提案），逐項核准",
     "sheet_only_holding": "持股要不要研究是使用者的 scope 決定",
     "lead_research": "legacy，已移回 pq1，不再建立"
+  },
+  "dev_change": {
+    "_doc": [
+      "開發改動的常規授權（2026-09-11 使用者定案）。",
+      "",
+      "⚠ 這一區**不以 pq2 item type 為 key**，因為開發項不鑄號——載體仍是 docs/ROADMAP.md",
+      "（AGENTS.md 2026-08-31 定案，未動）。上面的 authorized／never 驗的是 ITEM_TYPES 封閉性，",
+      "與本區無關，兩者不可混用。",
+      "",
+      "判準沿用同一句：這個授權攔的是**注意力**還是 **authority**？攔 authority 的永遠不進來。",
+      "開發改動是事後告知＋可否決（收據行），不是事前請求核准——所以沒有編號可批。",
+      "",
+      "consumer：skills/development-flow/SKILL.md Step 3 與 skills/daily-brief/SKILL.md 的收據行。"
+    ],
+    "authorized_when_all": {
+      "reversible": "單一 commit 可 revert，且不依賴任何已發生的外部副作用",
+      "no_authority_write": "不寫圖、不寫 Engine C ledger、不動 thesis、不碰 live 或資本",
+      "has_verification": "答得出「哪個數字會變」並附可跑的查證命令（L14 第 5 點）",
+      "fix_level_declared": "已標修法層級（根除／顯形／個案）；標顯形或個案時寫出為什麼不做根除"
+    },
+    "never": {
+      "irreversible": "不可逆的改動——刪資料、改 append-only ledger、動已發布的 artifact",
+      "authority_write": "任何 authority 寫入：graph admission、Engine C 判讀、thesis mutation、live／資本",
+      "roadmap_phase_step": "改 ROADMAP 的 Phase／Step 定義——要先給五欄 amendment",
+      "agents_md_judgment": "改 AGENTS.md 的判準句——那是使用者的定案，不是實作細節",
+      "this_config": "改本檔（含本區）——授權範圍不得自我擴張",
+      "gate_widening": "放寬任何既有 gate 或閘門條件，即使看起來只是參數"
+    },
+    "receipt_required": [
+      "為什麼現在",
+      "會變的數字",
+      "修法層級",
+      "可逆",
+      "ROADMAP（有對應條目才填）"
+    ]
   }
 }

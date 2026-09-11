@@ -421,8 +421,12 @@ tier）；其他類型由撰寫者一句話回答「核准後我的圖／authori
 | **T1-b 邊界提案**（選項寫不出來） | 不做 | **決策區塊，當場問** | 進。但那是持久記錄，**不是代替問你** |
 | **T2 架構問題** | 不做 | zoom-out 七段 | 進 Phase／Step（要先給五欄 amendment） |
 
-⚠ **T1-a 目前一律當場問。** 讓它走常規授權（我決定＋你可否決）需要先改
-`config/standing_authorization.json`，那是授權範圍變更，**未經使用者明確核准前不得預設生效**。
+⚠ **T1-a 走常規授權已於 2026-09-11 由使用者核准生效。** 範圍由
+`config/standing_authorization.json` 的 `dev_change` 區塊定義（**不以 pq2 item type 為 key**——
+開發項不鑄號），四個條件**全部成立**才在範圍內：可逆、不寫任何 authority、
+答得出哪個數字會變、已標修法層級。`never` 任一命中就退回當場問：不可逆、authority 寫入、
+改 ROADMAP 的 Phase／Step、改 `AGENTS.md` 判準句、**改該 config 本身**（授權範圍不得自我擴張）、
+放寬任何既有 gate。唯一 loader 是 `engine_b/standing_authorization.py`。
 
 ⚠ **「記進 ROADMAP」不是處置。** 實測（2026-09-11 查證）：`docs/ROADMAP.md` 的開放 backlog
 在 2026-09-10 一天新增 16 條，隔天的 session 重新「發現」其中兩條，而其中四條正是當天
