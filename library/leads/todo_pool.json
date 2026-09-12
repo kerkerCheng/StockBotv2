@@ -9519,19 +9519,22 @@
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:mp_materials",
       "dispatch_baseline_decision_id": "pd_94cdd7044471637738787d7b5419f9eb",
+      "dispatch_receipt": "decision:pd_f5ca208df036aac7662c73a72441ee4f",
       "dispatch_ref": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "dispatch_scope": [
         "commercial_maturity_unknown",
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T06:14:56.340366+00:00",
       "dispatched_at": "2026-09-12T05:48:59.327363+00:00",
       "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 556,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_f5ca208df036aac7662c73a72441ee4f",
       "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T06:14:56.340366+00:00",
       "source": "decision_lab",
       "title": "co:mp_materials：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -20988,6 +20991,24 @@
       "reason": "pq1 completed",
       "receipt": "decision:pd_f6b40e7bbd98c15ecd99bcfc47b3446e",
       "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T06:14:56.340366+00:00",
+      "n": 556,
+      "reason": null,
+      "receipt": "decision:pd_f5ca208df036aac7662c73a72441ee4f",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T06:14:56.340366+00:00",
+      "n": 556,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_f5ca208df036aac7662c73a72441ee4f",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "type": "decision_review",
       "verb": "go"
     }
