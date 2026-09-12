@@ -9664,6 +9664,18 @@
       "source": "manual",
       "title": "3363.TWO（上詮）：內部 FY2026 EPS −1.29 是虧損、共識 0.205 的校準倍數 3,322x 超過 ledger 上限 500——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T18:16:52.812196+00:00",
+      "hint": "go＝執行 `python -m alpha abstention CRWV --add library/private/alpha/abstention_proposals/CRWV_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪已把 CRWV 從只有兩格的 xbrl_backfill 補到完整——基期觀測 mo_d1954c6c（FY2025 10-K ＋ 2026 Q1／Q2 10-Q 的逐季損益、資產負債表）、公司指引觀測 mo_b60a950e（2026-08-11 上修：營收 12.4–13.2B、adj. op income 960M–1.15B、capex 35–39B、年底 ARR 18.5–19.5B、backlog 104.2B）、六條 FY2026 假設、horizon、四軸判斷，以及一筆 ev_to_sales 估值假設（校準 6.7376x ＝ EV 86,909 百万 ÷ 共識營收 12,899 百万）全部寫好。唯一缺的就是這一格：本益比法對虧損無定義，而 FY2026 共識 −5.17535（19 位）、FY2027 −4.23612 都是負的，連校準倍數都不存在。｜放行後會變什麼：`briefing/alpha_view/sources.py` 的 P6 切換條件是「本益比法 method_not_applicable 或 deliberate_abstention ＋ ledger 有 ev_to_sales 假設」，兩者屆時都成立 → fair value 72.24、隱含報酬 −18.82%、readiness 由 blocked 變 ready。⚠ 但要記得那個 −18.82% 的槓桿：**淨負債 46,074 百万是市值 40,835 百万的 1.13 倍、佔 EV 的 53.0%**，所以 EV 倍數每動 10%，每股 fair value 動約 15.5 美元（現價的 17%）。｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 566,
+      "reason": null,
+      "ref_id": "CRWV",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "CRWV（CoreWeave）：FY2026／FY2027 共識 EPS 皆為負、內部 FY2026 GAAP EPS −4.71——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21177,6 +21189,6 @@
       "verb": "reassessed_closed"
     }
   ],
-  "next_n": 566,
+  "next_n": 567,
   "schema_version": "1"
 }
