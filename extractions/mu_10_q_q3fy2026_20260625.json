@@ -40,7 +40,10 @@
   "edges": [
     {
       "attributes": {
-        "qualification_status": "qualified"
+        "qualification_status": "qualified",
+        "sole_source": false,
+        "substitutability": 4,
+        "substitutability_rationale": "4／5＝難換但非唯一，**與 [535] 的 SK hynix→HBM 邊同一把尺**（同一個品類用不同刻度，排序就會變成刻度的函數而不是事實的函數）。sole_source=false 有圖內直接依據：co:sk_hynix 與 co:micron_technology 都有 supplies_to → tech:hbm 的邊，且兩者之間另有 COMPETES_WITH。撐住 4 而不是 3 的理由來自 Micron 自己的法定揭露（本 doc s3／s4）：近期簽訂的策略客戶協議是 take-or-pay 結構、含多年期特定數量的 binding commitments 與contractually enforceable volumes，分配至 remaining performance obligations 的交易價格約 50 億美元——**合約窗內可競逐的份額被綁住**，這正是切換阻力的直接證據，不是對稀缺性的推論。⚠ 反面留著：全球有三家合格供應商（Reuters 2026-09-10 具名 SK Hynix、Samsung、Micron，已由 pq2 [533] 入圖），若把「存在三家」看得比「切換阻力」重，3 也說得通。核准時可改——但**兩條邊要一起改**，不得只改一邊。"
       },
       "confidence": 0.9,
       "dst_id": "tech:hbm",
@@ -95,9 +98,10 @@
     "permission_basis": "U.S. SEC EDGAR filing, public domain government record.",
     "published_at": "2026-06-25",
     "publisher": "U.S. Securities and Exchange Commission (EDGAR)",
-    "retrieved_at": "2026-08-20",
+    "retrieved_at": "2026-09-11",
     "source_type": "filing",
     "storage_permission": "repo_full",
+    "supersedes_extraction_sha256": "ddb48d7b0b50231c595bd2310c159daa36bf367df8390799612124a7ba4788ad",
     "title": "Micron Technology Q3 FY2026 Form 10-Q (quarterly period ended May 28, 2026)",
     "url": "https://www.sec.gov/Archives/edgar/data/723125/000072312526000015/mu-20260528.htm"
   },

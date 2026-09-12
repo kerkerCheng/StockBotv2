@@ -4666,7 +4666,7 @@
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
       "company_id": "co:micron_technology",
-      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 279,
       "reactivated_at": "2026-09-11T04:35:48.814119+00:00",
       "reactivation_event": {
@@ -4678,7 +4678,14 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-12T00:02:18.826772+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      }
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
@@ -7918,7 +7925,7 @@
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
       "company_id": "co:soitec",
-      "deferred_at": "2026-09-04T14:28:00.390643+00:00",
+      "deferred_at": "2026-09-12T00:00:38.201191+00:00",
       "hint": "當前 missing_data：產能保留協議任一對手方具名(客戶端或法定文件)（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 461,
       "reason": null,
@@ -7928,7 +7935,13 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:soitec：殘餘缺口——產能保留協議任一對手方具名(客戶端或法定文件)",
-      "type": "decision_review"
+      "type": "decision_review",
+      "waiting_on": {
+        "reason": "使用者 2026-09-12 批次 pending。⚠ 依 AGENTS.md『等你決定與等事件必須分離』補上 trigger：原本只有 deferred_at 而沒有等待條件，會一直佔決策注意力。這一項等的是世界先產生新揭露，不是等我做研究。",
+        "set_at": "2026-09-12T00:00:38.201191+00:00",
+        "trigger": "Soitec 或其產能保留協議的任一對手方在法定文件／客戶端揭露裡首次具名（現況：協議存在但對手方全部未具名）",
+        "until": null
+      }
     },
     {
       "added_at": "2026-09-03T00:34:53.882999+00:00",
@@ -8071,10 +8084,11 @@
       "added_at": "2026-09-03T07:35:28.111051+00:00",
       "hint": "M1 研究遺留，2026-09-03 由 ROADMAP 遷入 pq2（它改變的是「我知道什麼」＝研究，不是系統行為）。供給側擴張正是 AXT v4 由偏多轉謹慎偏空的同一主軸——AXTI 的 disproof 第 6 條已被 JX（4 年最多 1,200 億日圓、產能拉到 FY2025 的 7–10 倍）與住友（180 億日圓、FY2028 達 FY2024 的 3.1 倍）觸發過一次。本項要問的是同一個供給側訊號在 CPO 光通訊整體是否成立。｜go＝bounded research（source-trace＋抽取），不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live｜完成條件：圖中出現可支持／反駁 oversupply 的 dated claim ≥1，或明確結案為「本輪無新證據」",
       "n": 469,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：dated claim 已取得並打包——Tower FY2025 20-F 逐字揭露兩年累計 US$920M 資本支出、主要擴 SiPho／SiGe，並在同一段自陳「不保證客戶需求會用到滿載或高利用率」，是發行人自己說出來的供給過剩風險。⚠ 兩個誠實的範圍限制：①完成條件寫的是「圖中出現」，而本項的 go 明文不含入圖，所以 claim 目前停在 prepared RA、入圖是另一個編號；②US$920M 是「兩年累計已啟動」且未按年度或按廠拆分，算不出 2027–29 年度新增產能——本輪只回答了 Tower 這一家，「集體擴產」未回答。",
+      "receipt": "authority:research_action;ref:ra_c6430178538adb82554b6c26c214de5b",
       "ref_id": "manual:469",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:54:16.880586+00:00",
       "source": "manual",
       "title": "TSEM／光通訊 2027–29 集體擴產 oversupply watch（RA ra_2bf1494b）",
       "type": "manual"
@@ -8083,10 +8097,11 @@
       "added_at": "2026-09-03T07:35:44.579213+00:00",
       "hint": "M1 研究遺留，2026-09-03 由 ROADMAP 遷入 pq2。現況 tier 3（產業報導轉述），依 L8（來源獨立性：供應商自報不能當獨立佐證）不得直接入圖。Tower（TSEM）目前在瓶頸排序第 9（supplies_to → prod:ph18da，替代難度 4/5、外部印證）與第 16（supplies_to → co:marvell_technology）。｜go＝bounded research（追客戶端一手揭露），不含入圖、不含 evidence tier 升級、不含 live｜兩種合法終局：①取得 MACOM／Semtech 端的一手揭露 → 升 tier 後另走入圖核准；②判定「對方結構上不會揭露供應商」→ 標為永久 tier 3 並停止重試（不得無限期掛著）",
       "n": 470,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：走終局②——判定對方結構上不會揭露供應商，標為永久 tier 3 並停止重試。依據：MACOM 與 Semtech 在 SEC 全文檢索裡 foundry 各命中 52／99 次、third-party foundries 13／110 次，卻對任何代工廠都是 0 命中（GlobalFoundries／TSMC／Taiwan Semiconductor／Tower 全部 0；Semtech 的 8 次 STMicroelectronics 已逐字核對為 LoRa 技術授權）。已先做 L11-5 的前置檢查（這類文件結構上會包含答案）。⚠ EE Times 那句「Tower TIA 份額 >50%、客戶含 MACOM」是記者轉述 Tower 的說法，origin 仍是 Tower，依 L8／L11-3 不升 tier。重開觸發條件三條寫在 trace 檔裡，不是無限期掛著。",
+      "receipt": "authority:source_trace;ref:macom_semtech_foundry_nondisclosure_2026_09_12",
       "ref_id": "manual:470",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:55:21.092133+00:00",
       "source": "manual",
       "title": "MACOM／Semtech 是否為 Tower Semiconductor 的 TIA 客戶——待客戶端揭露印證",
       "type": "manual"
@@ -8095,10 +8110,11 @@
       "added_at": "2026-09-03T07:35:44.803547+00:00",
       "hint": "M1 研究遺留，2026-09-03 由 ROADMAP 遷入 pq2。GFS 與 TSEM 兩家都已在圖中且都在瓶頸排序內（GFS 第 10/11/14/18/19，TSEM 第 9/16），訴訟結果會影響兩者的競爭關係邊，但目前只有二手轉述、沒有一手文件。｜go＝bounded research（source-trace：法院 PACER／公司 filing），不含入圖、不含 thesis mutation、不含 live｜兩種合法終局：①追到一手訴狀或法院文件；②確認公開管道不可得並記錄嘗試過的路由（trace_status＋trace_attempts_ref，不得只註記「找不到」）",
       "n": 471,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：終局①達成——一手來源是 Tower（被告）自己的 FY2025 20-F（accession 0001178913-26-002318，filed 2026-04-30）逐字：'In March 2026, GlobalFoundries filed three lawsuits against the Company in the U.S. International Trade Commission and the U.S. District Court for the Western District of Texas, alleging infringement of certain of its patents. The Company disputes these claims.'，並在 2026-07-14 的 6-K（0001178913-26-003477）前瞻性陳述清單再述。⚠ 尚未取得 ITC 337 調查編號、案號與涉案專利（那需要 PACER／ITC EDIS），RA 的缺口欄已明寫不主張已取得。⚠ 入圖是另一個編號（RA 已 prepare 待核准）。",
+      "receipt": "authority:research_action;ref:ra_c6430178538adb82554b6c26c214de5b",
       "ref_id": "manual:471",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:54:05.842723+00:00",
       "source": "manual",
       "title": "GlobalFoundries 對 Tower Semiconductor 的專利訴訟——追一手訴狀／法院文件",
       "type": "manual"
@@ -8769,6 +8785,11 @@
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
+      "source_cleared": {
+        "at": "2026-09-12T00:02:18.827154+00:00",
+        "reason": "來源本輪成功執行，但不再產出此項；很可能已完成",
+        "source_healthy": true
+      },
       "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
     },
@@ -8934,61 +8955,56 @@
       "added_at": "2026-09-10T11:18:18.702438+00:00",
       "hint": "go＝執行 `python -m alpha abstention POET --add library/private/alpha/abstention_proposals/POET_forward_pe.json`。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live。｜依據：FY2026 共識 EPS −0.23（high＝low＝−0.23，1 位分析師，區間寬度為零）、FY2027 −0.17，皆為負；Engine C 無 fiscal_year_results，P7-a 的 XBRL 補值已明確拒寫。**刻意不先補基期再宣告不適用**——補了也沒有可乘的倍數。｜drop＝你認為應改用別的 method，那我改走 ROADMAP。",
       "n": 524,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：POET valuation 層 Abstention（forward_earnings_multiple.target_pe）已寫入 library/private/alpha/abstentions/POET.jsonl；FY2026／FY2027 共識 EPS 皆為負且僅 1 位分析師，虧損年沒有可校準的市場倍數。fair value 仍缺席，改變的是缺席的理由。",
+      "receipt": "authority:alpha_abstention;ref:ab_42838d2eec25b735",
       "ref_id": "manual:524",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:46:50.971710+00:00",
       "source": "manual",
       "title": "POET：FY2026 共識 EPS −US$0.23 且僅 1 位分析師、基期實績亦缺——提案 Abstention（valuation / target_pe）",
       "type": "manual"
     },
     {
       "added_at": "2026-09-10T22:38:07.503328+00:00",
-      "awaiting_gate": {
-        "n": 528,
-        "set_at": "2026-09-10T23:22:52.300834+00:00"
-      },
       "company_id": "co:unitree",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_39fe85750b8794406c8832cb3a9b0aeb",
-      "dispatch_receipt": "research_packet:library/raw/daily_20260911_unitree_review.md",
+      "dispatch_receipt": "decision:pd_6b9438b9c4123d1cfabbf57684ddc709",
       "dispatch_ref": "wo_224ed049f342999f59654d8a8e130ae4",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-09-10T23:22:52.297969+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T00:03:10.210010+00:00",
       "dispatched_at": "2026-09-10T22:40:22.014741+00:00",
-      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "hint": "當前 missing_data：688836.SS 的價格序列進 Engine C（目前 valuation_payoff 只有 fx、沒有 marke；同期 EPS 共識（新上市、賣方覆蓋未建立）（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 525,
-      "reason": null,
+      "reason": "gate [528] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_6b9438b9c4123d1cfabbf57684ddc709",
       "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T00:03:10.210010+00:00",
       "source": "decision_lab",
-      "title": "co:unitree：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "title": "co:unitree：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
     },
     {
       "added_at": "2026-09-10T22:38:07.503328+00:00",
-      "awaiting_gate": {
-        "n": 529,
-        "set_at": "2026-09-10T23:22:54.433035+00:00"
-      },
       "company_id": "co:mp_materials",
       "dispatch_baseline_decision_id": "pd_50708c46ed0debcc287213b9ac816b47",
-      "dispatch_receipt": "research_packet:library/raw/daily_20260911_mp_review.md",
+      "dispatch_receipt": "decision:pd_a5e4891cd8ce6e1f17dd587991516c0b",
       "dispatch_ref": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
       "dispatch_scope": [
         "commercial_maturity_unknown",
         "source_reliability_corroboration_incomplete"
       ],
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-09-10T23:22:54.432951+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T00:03:19.099550+00:00",
       "dispatched_at": "2026-09-10T22:40:22.014741+00:00",
       "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 526,
-      "reason": null,
+      "reason": "gate [529] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_a5e4891cd8ce6e1f17dd587991516c0b",
       "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T00:03:19.099550+00:00",
       "source": "decision_lab",
       "title": "co:mp_materials：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -9021,10 +9037,11 @@
       "added_at": "2026-09-10T23:22:37.106906+00:00",
       "hint": "研究已完成：法定文件確認 2025 營收人民幣 16.99 億、扣非淨利 5.91 億、主營毛利率 60.13%，2026 Q1 營收 +68.49% 但扣非淨利 -52.55%；客戶端量產仍無獨立具名印證。完整 packet=library/raw/daily_20260911_unitree_review.md。go＝核准該 packet 的五軸 assessment、catalyst 與三條 disproof，完成 paper reassess；不含入圖、Engine C 寫入、thesis mutation、估值、live。",
       "n": 528,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：packet 的五軸 assessment＋catalyst＋三條 disproof 已寫入並通過引用驗證（五軸皆有合格引用）。⚠ packet 原文對 technical_causal_link 與 commercial_maturity 寫的是 guided，那不是 LEVELS 的合法值，已映射到 bounded_hypothesis（意義未改，敘述都是「公司披露支持、無獨立印證」）。殘餘 blocker 是 688836.SS 的行情資料缺口與 counter_path／runway，非本項授權範圍。",
+      "receipt": "authority:decision_lab_reassess;ref:pd_212f62387712ab92f73101a7d236377a",
       "ref_id": "manual:unitree-assessment-20260911",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:48:07.713800+00:00",
       "source": "manual",
       "title": "宇樹科技（688836.SH）五軸 assessment＋catalyst／disproof 提案",
       "type": "manual"
@@ -9033,10 +9050,11 @@
       "added_at": "2026-09-10T23:22:38.311594+00:00",
       "hint": "研究已完成：MP FY2025 10-K 揭露 Customer A/B/C 分占總營收 30%/23%/31%，合計 84%，均未具名；既有 [316] backlog 不重寫。exact payload=library/raw/daily_20260911_mp_review.md。go＝建立並寫入 MP/customer_concentration append-only observation，再 reassess；不含入圖、thesis mutation、估值、live。",
       "n": 529,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：MP FY2025 客戶集中度（10-K accession 0001801368-26-000008 的 Concentration of Customer Risk 逐字）已寫入 append-only ledger。既有 [316] backlog 未重寫。",
+      "receipt": "observation:mo_ca7ad8b4bd9c6caa23ee23bb2059bcaa;proposal:po_bde28cf811a4884af0ed8dab9358a0e8",
       "ref_id": "manual:mp-customer-concentration-20260911",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:46:19.365667+00:00",
       "source": "manual",
       "title": "MP Materials（MP）FY2025 客戶集中度 observation 提案",
       "type": "manual"
@@ -9268,10 +9286,11 @@
       "added_at": "2026-09-11T14:26:58.314071+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=GLOBALFOUNDRIES Inc. FY2025 Form 20-F（SEC EDGAR accession 0001709048-26-000022，f",
       "n": 543,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_118c456308e4c344a1a1acd49167dc5c;proposal:po_7e265c03041d6dc4c101c9394e358070",
       "ref_id": "po_7e265c03041d6dc4c101c9394e358070",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:45:42.755189+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：GFS / backlog",
       "type": "engine_c_observation"
@@ -9280,10 +9299,11 @@
       "added_at": "2026-09-11T14:26:58.314071+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2026-06-30T00:00:00+00:00；來源=SK hynix Inc. 반기보고서 (2026.06)，DART 접수 2026-08-14，rcpNo=20260814003509，corp_code=",
       "n": 544,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_a128a66aeba1ce0cbdf2470ef3757192;proposal:po_b5ef9a301334cb061acab3d390d00da6",
       "ref_id": "po_b5ef9a301334cb061acab3d390d00da6",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:45:43.681327+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：000660.KS / customer_concentration",
       "type": "engine_c_observation"
@@ -9292,10 +9312,11 @@
       "added_at": "2026-09-11T14:26:58.314071+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=SK hynix Inc. 사업보고서 (2025.12)，DART 접수 2026-03-17，rcpNo=20260317000635；「II. 사업의 내",
       "n": 545,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_11f01156f883e7621b6313ffcda2d602;proposal:po_bd0791f0aa5d0d0c185e1fa9e0001ed7",
       "ref_id": "po_bd0791f0aa5d0d0c185e1fa9e0001ed7",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:45:44.558392+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：000660.KS / backlog",
       "type": "engine_c_observation"
@@ -9304,10 +9325,11 @@
       "added_at": "2026-09-11T14:26:58.314071+00:00",
       "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=GLOBALFOUNDRIES Inc. FY2025 Form 20-F（SEC EDGAR accession 0001709048-26-000022，f",
       "n": 546,
-      "reason": null,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_c2d6179f41be7ef30ec5d1cadb9b3b33;proposal:po_f560a1cbd7f67449bba0f61cf7f0b12e",
       "ref_id": "po_f560a1cbd7f67449bba0f61cf7f0b12e",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:45:45.444249+00:00",
       "source": "engine_c",
       "title": "Engine C 觀測：GFS / customer_concentration",
       "type": "engine_c_observation"
@@ -9334,48 +9356,42 @@
     },
     {
       "added_at": "2026-09-11T14:26:58.314071+00:00",
-      "awaiting_gate": {
-        "n": 543,
-        "set_at": "2026-09-11T14:29:49.382610+00:00"
-      },
       "company_id": "co:globalfoundries",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_5f693cb399acccecfcadfcfd4be12d55",
-      "dispatch_receipt": "engine_c_proposal:po_7e265c03041d6dc4c101c9394e358070;po_f560a1cbd7f67449bba0f61cf7f0b12e",
+      "dispatch_receipt": "decision:pd_8d596beae7c2bb906fdd1f1b27f25843",
       "dispatch_ref": "wo_22c51df045b8d009abacdc177535d435",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-09-11T14:29:49.379139+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T00:03:28.023436+00:00",
       "dispatched_at": "2026-09-11T14:27:43.071598+00:00",
       "hint": "當前 missing_data：engine_c_customer：GFS customer_concentration observation（值已備；engine_c_backlog：GFS backlog observation——US$11B LTA 剩餘承諾＋客戶；LTA 的分年攤佈：$11B 沒有按年揭露，所以算不出「幾季能見度」，也算不出違約條款的保護力（共 3 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 548,
-      "reason": null,
+      "reason": "gate [543] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_8d596beae7c2bb906fdd1f1b27f25843",
       "ref_id": "dc_766316738ea5013cf930254fca598033",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T00:03:28.023436+00:00",
       "source": "decision_lab",
       "title": "co:globalfoundries：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
     },
     {
       "added_at": "2026-09-11T14:26:58.314071+00:00",
-      "awaiting_gate": {
-        "n": 545,
-        "set_at": "2026-09-11T14:29:52.138729+00:00"
-      },
       "company_id": "co:sk_hynix",
       "dispatch_attempt": 1,
       "dispatch_baseline_decision_id": "pd_e4505f534636a48d6786fcf9d5b96516",
-      "dispatch_receipt": "engine_c_proposal:po_bd0791f0aa5d0d0c185e1fa9e0001ed7;po_b5ef9a301334cb061acab3d390d00da6",
+      "dispatch_receipt": "decision:pd_ac45867fe38766bfe46f48ddea9a4741",
       "dispatch_ref": "wo_3e1a6d85c9d46a677cd4f8536a1a836d",
-      "dispatch_status": "awaiting_approval",
-      "dispatch_updated_at": "2026-09-11T14:29:52.135323+00:00",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T00:03:37.042017+00:00",
       "dispatched_at": "2026-09-11T14:27:43.071598+00:00",
       "hint": "當前 missing_data：engine_c_customer：000660.KS customer_concentration observati；engine_c_backlog：000660.KS backlog observation——內容是「結構性無 ord（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 549,
-      "reason": null,
+      "reason": "gate [545] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_ac45867fe38766bfe46f48ddea9a4741",
       "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T00:03:37.042017+00:00",
       "source": "decision_lab",
       "title": "co:sk_hynix：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -9384,10 +9400,11 @@
       "added_at": "2026-09-11T14:47:02.842832+00:00",
       "hint": "go＝執行 `python -m alpha abstention AAOI --add library/private/alpha/abstention_proposals/AAOI_forward_pe.json`。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live。｜依據：本輪已把基期補到最完整（mo_487f6ea8，8-K EX-99.1 印出的 GAAP 與 non-GAAP 全部）並寫好六條 FY2026 假設，橋算得出來、結果是內部 GAAP EPS −0.1006；共識 +0.68 是 non-GAAP 口徑（FY2025 year_ago_actual −0.26 ＝ 新聞稿 non-GAAP EPS，GAAP 是 −0.64），而公司**不公布 non-GAAP 營業利益**，橋無法在共識的口徑上重建。**這是 method／口徑不適用，不是缺料**——刻意不硬給一個 target_pe 生出負的 fair value。｜go 之後會變的數字：AAOI 的 headline `absence_kind` 由 `not_yet_recorded` 變 `deliberate_abstention`（settled）；readiness **仍然 blocked**（AGENTS.md：settled 不讓 readiness 變好），但段 5 的『到終局』會多一檔。｜drop＝你認為應改用別的 method（例如營收倍數），那我改走 ROADMAP 開發項。",
       "n": 550,
-      "reason": null,
+      "reason": "使用者 2026-09-12 批次 go：AAOI valuation 層 Abstention 已寫入 library/private/alpha/abstentions/AAOI.jsonl；內部 FY2026 GAAP EPS −0.1006 而共識 +0.68 是 non-GAAP，公司不公布 non-GAAP 營業利益，橋無法在共識口徑上重建。",
+      "receipt": "authority:alpha_abstention;ref:ab_9d7ab3e7cdcb5fcc",
       "ref_id": "abstention_proposal:AAOI_forward_pe",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-11T23:46:51.171236+00:00",
       "source": "manual",
       "title": "AAOI：內部 FY2026 GAAP EPS −0.10 而共識 +0.68 是 non-GAAP、公司不公布 non-GAAP 營業利益——提案 Abstention（valuation / target_pe）",
       "type": "manual"
@@ -9431,6 +9448,31 @@
         "trigger": "財務核驗清單欄位缺失或待人工填入",
         "until": null
       }
+    },
+    {
+      "added_at": "2026-09-12T00:02:18.827154+00:00",
+      "graph_impact": "+2 節點、1 邊、3 claims｜來源：Tower Semiconductor（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:tower_semiconductor。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 553,
+      "reason": null,
+      "ref_id": "ra_c6430178538adb82554b6c26c214de5b",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Tower FY2025 20-F：GFS 三案專利訴訟（[471]）＋US$920M SiPho 擴產與公司自陳的利用率風險（[469]）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-12T00:02:18.827154+00:00",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 554,
+      "reason": null,
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "unknown：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -20492,8 +20534,251 @@
       "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
       "type": "decision_review",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:45:42.755189+00:00",
+      "n": 543,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_118c456308e4c344a1a1acd49167dc5c;proposal:po_7e265c03041d6dc4c101c9394e358070",
+      "ref_id": "po_7e265c03041d6dc4c101c9394e358070",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:45:43.681327+00:00",
+      "n": 544,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_a128a66aeba1ce0cbdf2470ef3757192;proposal:po_b5ef9a301334cb061acab3d390d00da6",
+      "ref_id": "po_b5ef9a301334cb061acab3d390d00da6",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:45:44.558392+00:00",
+      "n": 545,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_11f01156f883e7621b6313ffcda2d602;proposal:po_bd0791f0aa5d0d0c185e1fa9e0001ed7",
+      "ref_id": "po_bd0791f0aa5d0d0c185e1fa9e0001ed7",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:45:45.444249+00:00",
+      "n": 546,
+      "reason": "使用者核准後寫入 Engine C ledger",
+      "receipt": "observation:mo_c2d6179f41be7ef30ec5d1cadb9b3b33;proposal:po_f560a1cbd7f67449bba0f61cf7f0b12e",
+      "ref_id": "po_f560a1cbd7f67449bba0f61cf7f0b12e",
+      "type": "engine_c_observation",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:46:19.365667+00:00",
+      "n": 529,
+      "reason": "使用者 2026-09-12 批次 go：MP FY2025 客戶集中度（10-K accession 0001801368-26-000008 的 Concentration of Customer Risk 逐字）已寫入 append-only ledger。既有 [316] backlog 未重寫。",
+      "receipt": "observation:mo_ca7ad8b4bd9c6caa23ee23bb2059bcaa;proposal:po_bde28cf811a4884af0ed8dab9358a0e8",
+      "ref_id": "manual:mp-customer-concentration-20260911",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:46:50.971710+00:00",
+      "n": 524,
+      "reason": "使用者 2026-09-12 批次 go：POET valuation 層 Abstention（forward_earnings_multiple.target_pe）已寫入 library/private/alpha/abstentions/POET.jsonl；FY2026／FY2027 共識 EPS 皆為負且僅 1 位分析師，虧損年沒有可校準的市場倍數。fair value 仍缺席，改變的是缺席的理由。",
+      "receipt": "authority:alpha_abstention;ref:ab_42838d2eec25b735",
+      "ref_id": "manual:524",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:46:51.171236+00:00",
+      "n": 550,
+      "reason": "使用者 2026-09-12 批次 go：AAOI valuation 層 Abstention 已寫入 library/private/alpha/abstentions/AAOI.jsonl；內部 FY2026 GAAP EPS −0.1006 而共識 +0.68 是 non-GAAP，公司不公布 non-GAAP 營業利益，橋無法在共識口徑上重建。",
+      "receipt": "authority:alpha_abstention;ref:ab_9d7ab3e7cdcb5fcc",
+      "ref_id": "abstention_proposal:AAOI_forward_pe",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:48:07.713800+00:00",
+      "n": 528,
+      "reason": "使用者 2026-09-12 批次 go：packet 的五軸 assessment＋catalyst＋三條 disproof 已寫入並通過引用驗證（五軸皆有合格引用）。⚠ packet 原文對 technical_causal_link 與 commercial_maturity 寫的是 guided，那不是 LEVELS 的合法值，已映射到 bounded_hypothesis（意義未改，敘述都是「公司披露支持、無獨立印證」）。殘餘 blocker 是 688836.SS 的行情資料缺口與 counter_path／runway，非本項授權範圍。",
+      "receipt": "authority:decision_lab_reassess;ref:pd_212f62387712ab92f73101a7d236377a",
+      "ref_id": "manual:unitree-assessment-20260911",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:54:05.842723+00:00",
+      "n": 471,
+      "reason": "使用者 2026-09-12 批次 go：終局①達成——一手來源是 Tower（被告）自己的 FY2025 20-F（accession 0001178913-26-002318，filed 2026-04-30）逐字：'In March 2026, GlobalFoundries filed three lawsuits against the Company in the U.S. International Trade Commission and the U.S. District Court for the Western District of Texas, alleging infringement of certain of its patents. The Company disputes these claims.'，並在 2026-07-14 的 6-K（0001178913-26-003477）前瞻性陳述清單再述。⚠ 尚未取得 ITC 337 調查編號、案號與涉案專利（那需要 PACER／ITC EDIS），RA 的缺口欄已明寫不主張已取得。⚠ 入圖是另一個編號（RA 已 prepare 待核准）。",
+      "receipt": "authority:research_action;ref:ra_c6430178538adb82554b6c26c214de5b",
+      "ref_id": "manual:471",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:54:16.880586+00:00",
+      "n": 469,
+      "reason": "使用者 2026-09-12 批次 go：dated claim 已取得並打包——Tower FY2025 20-F 逐字揭露兩年累計 US$920M 資本支出、主要擴 SiPho／SiGe，並在同一段自陳「不保證客戶需求會用到滿載或高利用率」，是發行人自己說出來的供給過剩風險。⚠ 兩個誠實的範圍限制：①完成條件寫的是「圖中出現」，而本項的 go 明文不含入圖，所以 claim 目前停在 prepared RA、入圖是另一個編號；②US$920M 是「兩年累計已啟動」且未按年度或按廠拆分，算不出 2027–29 年度新增產能——本輪只回答了 Tower 這一家，「集體擴產」未回答。",
+      "receipt": "authority:research_action;ref:ra_c6430178538adb82554b6c26c214de5b",
+      "ref_id": "manual:469",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:55:21.092133+00:00",
+      "n": 470,
+      "reason": "使用者 2026-09-12 批次 go：走終局②——判定對方結構上不會揭露供應商，標為永久 tier 3 並停止重試。依據：MACOM 與 Semtech 在 SEC 全文檢索裡 foundry 各命中 52／99 次、third-party foundries 13／110 次，卻對任何代工廠都是 0 命中（GlobalFoundries／TSMC／Taiwan Semiconductor／Tower 全部 0；Semtech 的 8 次 STMicroelectronics 已逐字核對為 LoRa 技術授權）。已先做 L11-5 的前置檢查（這類文件結構上會包含答案）。⚠ EE Times 那句「Tower TIA 份額 >50%、客戶含 MACOM」是記者轉述 Tower 的說法，origin 仍是 Tower，依 L8／L11-3 不升 tier。重開觸發條件三條寫在 trace 檔裡，不是無限期掛著。",
+      "receipt": "authority:source_trace;ref:macom_semtech_foundry_nondisclosure_2026_09_12",
+      "ref_id": "manual:470",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-11T23:56:41.171149+00:00",
+      "n": 279,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_06c6cad4d7fe6b2120f0d2d63c734c56",
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-11T23:58:09.219745+00:00",
+      "n": 512,
+      "reason": "go：僅 context 老化，已以 intent=research 重新凍結",
+      "receipt": "decision:pd_058f2de2b1ae6b0f1f4975cba3b50229",
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-12T00:00:38.201191+00:00",
+      "n": 461,
+      "reason": "使用者 2026-09-12 批次 pending。⚠ 依 AGENTS.md『等你決定與等事件必須分離』補上 trigger：原本只有 deferred_at 而沒有等待條件，會一直佔決策注意力。這一項等的是世界先產生新揭露，不是等我做研究。",
+      "receipt": null,
+      "ref_id": "dc_6e429d67c7b9e925a1b25874e9dcefd9",
+      "type": "decision_review",
+      "verb": "pending"
+    },
+    {
+      "at": "2026-09-12T00:02:18.827154+00:00",
+      "n": 512,
+      "reason": "來源本輪成功執行，但不再產出此項",
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "source_cleared"
+    },
+    {
+      "at": "2026-09-12T00:03:09.062544+00:00",
+      "n": 525,
+      "reason": "gate [528] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "gate-cleared:528",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-12T00:03:10.210010+00:00",
+      "n": 525,
+      "reason": "gate [528] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_6b9438b9c4123d1cfabbf57684ddc709",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T00:03:10.210010+00:00",
+      "n": 525,
+      "reason": "gate [528] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_6b9438b9c4123d1cfabbf57684ddc709",
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T00:03:17.960938+00:00",
+      "n": 526,
+      "reason": "gate [529] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "gate-cleared:529",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-12T00:03:19.099550+00:00",
+      "n": 526,
+      "reason": "gate [529] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_a5e4891cd8ce6e1f17dd587991516c0b",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T00:03:19.099550+00:00",
+      "n": 526,
+      "reason": "gate [529] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_a5e4891cd8ce6e1f17dd587991516c0b",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T00:03:26.882565+00:00",
+      "n": 548,
+      "reason": "gate [543] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "gate-cleared:543",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-12T00:03:28.023436+00:00",
+      "n": 548,
+      "reason": "gate [543] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_8d596beae7c2bb906fdd1f1b27f25843",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T00:03:28.023436+00:00",
+      "n": 548,
+      "reason": "gate [543] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_8d596beae7c2bb906fdd1f1b27f25843",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T00:03:35.892860+00:00",
+      "n": 549,
+      "reason": "gate [545] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "gate-cleared:545",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "pq1_researching"
+    },
+    {
+      "at": "2026-09-12T00:03:37.042017+00:00",
+      "n": 549,
+      "reason": "gate [545] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_ac45867fe38766bfe46f48ddea9a4741",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T00:03:37.042017+00:00",
+      "n": 549,
+      "reason": "gate [545] 已由使用者 go 並寫入 authority，缺口來源消失；reassess 取得新 decision receipt 後結案。這是已授權動作的收尾，不是新授權。",
+      "receipt": "decision:pd_ac45867fe38766bfe46f48ddea9a4741",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "go"
     }
   ],
-  "next_n": 553,
+  "next_n": 555,
   "schema_version": "1"
 }
