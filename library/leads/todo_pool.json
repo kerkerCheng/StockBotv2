@@ -9543,18 +9543,21 @@
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:sk_hynix",
       "dispatch_baseline_decision_id": "pd_26bd6fe5f4c1f88d02458afdaed829cf",
+      "dispatch_receipt": "decision:pd_4870b2b3edbd740a45991d73287c57c8",
       "dispatch_ref": "assessment_gap:dc_70872dbacf53703aada2f101e5e0cd1c",
       "dispatch_scope": [
         "commercial_maturity_unknown"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T06:16:30.425773+00:00",
       "dispatched_at": "2026-09-12T05:48:59.327363+00:00",
       "hint": "當前 missing_data：engine_c_customer：000660.KS customer_concentration observati；engine_c_backlog：000660.KS backlog observation——內容是「結構性無 ord（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 557,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_4870b2b3edbd740a45991d73287c57c8",
       "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T06:16:30.425773+00:00",
       "source": "decision_lab",
       "title": "co:sk_hynix：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -21009,6 +21012,24 @@
       "reason": "pq1 completed",
       "receipt": "decision:pd_f5ca208df036aac7662c73a72441ee4f",
       "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T06:16:30.425773+00:00",
+      "n": 557,
+      "reason": null,
+      "receipt": "decision:pd_4870b2b3edbd740a45991d73287c57c8",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T06:16:30.425773+00:00",
+      "n": 557,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_4870b2b3edbd740a45991d73287c57c8",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
       "type": "decision_review",
       "verb": "go"
     }
