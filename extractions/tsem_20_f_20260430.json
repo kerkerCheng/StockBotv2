@@ -1,0 +1,131 @@
+{
+  "claims": [
+    {
+      "confidence": 0.95,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade or retire if a subsequent Tower filing discloses dismissal, settlement, or an ITC determination; re-check each 20-F and each 6-K that repeats the forward-looking-statements list.",
+      "id": "tsem_20_f_20260430_cl1",
+      "source_ids": [
+        "tsem_20_f_20260430_s1"
+      ],
+      "statement": "GlobalFoundries filed three patent-infringement lawsuits against Tower Semiconductor in March 2026, in the U.S. International Trade Commission and the U.S. District Court for the Western District of Texas; Tower disputes the claims. Disclosed by Tower (the defendant) in its FY2025 Form 20-F and restated in its 2026-07-14 6-K forward-looking-statements list.",
+      "subject_id": "co:tower_semiconductor"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if a later filing raises the plan without the utilisation caveat AND reports sustained high utilisation, or if Tower discloses that the expansion is underwritten by pre-committed customer volumes; re-check each 20-F and the quarterly 6-K capacity commentary.",
+      "id": "tsem_20_f_20260430_cl2",
+      "source_ids": [
+        "tsem_20_f_20260430_s2",
+        "tsem_20_f_20260430_s3"
+      ],
+      "statement": "Tower Semiconductor initiated plans over the two years to FY2025 to invest an aggregate of US$920 million of capital expenditure mainly to expand silicon photonics (SiPho) and SiGe capacity, and states in the same paragraph that there is no assurance customer demand will require full or high utilisation of that machinery once installed and qualified — an issuer-disclosed oversupply risk in the SiPho segment.",
+      "subject_id": "co:tower_semiconductor"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Downgrade if a later filing moves either platform out of high-volume production or drops the 400G–1.6T positioning.",
+      "id": "tsem_20_f_20260430_cl3",
+      "source_ids": [
+        "tsem_20_f_20260430_s5"
+      ],
+      "statement": "Tower has two SiPho platforms in high-volume production — a 200mm platform (PH18) and a 300mm platform (PH45) — which it positions as leading SiPho platforms in the 400Gb/s to 1.6Tb/s market on AI-driven optical-interconnect growth.",
+      "subject_id": "co:tower_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:globalfoundries",
+      "id": "e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "tsem_20_f_20260430_s4"
+      ],
+      "src_id": "co:tower_semiconductor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "Tower",
+        "TSEM"
+      ],
+      "attributes": {
+        "ticker": "TSEM"
+      },
+      "confidence": 0.95,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tsem_20_f_20260430_s4",
+        "tsem_20_f_20260430_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "GF",
+        "GFS"
+      ],
+      "attributes": {
+        "ticker": "GFS"
+      },
+      "confidence": 0.9,
+      "id": "co:globalfoundries",
+      "name": "GlobalFoundries",
+      "role": "foundry",
+      "source_ids": [
+        "tsem_20_f_20260430_s4"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tsem_20_f_20260430",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "Public SEC EDGAR filing (Tower Semiconductor FY2025 Form 20-F, accession 0001178913-26-002318). Canonical URL retained; only research-relevant逐字 excerpts stored. 本機另有同一份的截斷全文 library/raw/tsem_20_f_20260430.txt（400,000/574,761 字元），本輪引用的五段在截斷版裡逐字可核對（已逐條驗證通過）。⚠ 本 document 刻意**不附 raw payload**：library/raw/tsem_20_f_20260430.txt 已存在（meta 記 evidence_tier 1、truncated true、574,761 原始字元），再附一段短 excerpt 會被 no-clobber 當成要覆寫那份全文。",
+    "published_at": "2026-04-30",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-09-12",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "Tower Semiconductor Ltd. FY2025 Form 20-F",
+    "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326002318/zk2635149.htm"
+  },
+  "sources": [
+    {
+      "id": "tsem_20_f_20260430_s1",
+      "locator": "Item 3.D Risk Factors — intellectual property。⚠ 同一事實在文件裡出現三次且**措辭有小差異**：此處逐字為 'the U.S. International Trade Commission and the U.S. District Court'；另兩處（Item 4.B 與 Item 8 Dividend Policy 前）寫成 'the U.S. International Trade Commission (ITC) and the United States District Court'，其中第三處在 'Texas' 後**沒有逗號**。本 source 只承載 Item 3.D 這一個變體的逐字。",
+      "quote": "In March 2026, GlobalFoundries filed three lawsuits against the Company in the U.S. International Trade Commission and the U.S. District Court for the Western District of Texas, alleging infringement of certain of its patents. The Company disputes these claims."
+    },
+    {
+      "id": "tsem_20_f_20260430_s2",
+      "locator": "Item 3.D Risk Factors — capacity expansion / capital expenditure plan",
+      "quote": "During the last two years, we have initiated plans to invest an aggregate of $920 million in capital expenditures (primarily machinery and facilities), mainly to expand our silicon photonics (SiPho) and silicon germanium (SiGe) capacity and capabilities, as well as to enhance our power, next-generation and other capacity."
+    },
+    {
+      "id": "tsem_20_f_20260430_s3",
+      "locator": "Item 3.D Risk Factors — 同一段緊接在資本支出金額之後的風險語句",
+      "quote": "there is no assurance that, by the time all such machinery is installed and qualified, customer demand will require the full or high utilization of such machinery tools."
+    },
+    {
+      "id": "tsem_20_f_20260430_s4",
+      "locator": "Item 4.B Business Overview — Competition",
+      "quote": "We compete most directly in the specialty segment with foundries such as GlobalFoundries (mainly in the RF space), Vanguard Semiconductor, DongBu, X-Fab, and Hua Hong Semiconductor."
+    },
+    {
+      "id": "tsem_20_f_20260430_s5",
+      "locator": "Item 4.B Business Overview — Silicon Photonics platform",
+      "quote": "We currently have in high-volume production, a 200mm platform (PH18) and a 300mm platform (PH45) that have benefited from AI-driven growth in optical interconnects, making them leading SiPho platforms in the 400Gb/s to 1.6Tb/s market."
+    }
+  ]
+}
