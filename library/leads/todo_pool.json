@@ -9575,6 +9575,18 @@
       "source": "decision_lab",
       "title": "co:unitree：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T07:08:58.003334+00:00",
+      "hint": "go＝執行 `python -m alpha abstention NOVT --add library/private/alpha/abstention_proposals/NOVT_research_catalyst.json`。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live。｜依據：本輪已把 NOVT 的基期補到最完整（mo_cbc0a07e，8-K EX-99.1 印出的 GAAP 與 non-GAAP 全部）、另記 FY2026 公司指引（mo_fcdc0571）、寫好六條 FY2026 假設與估值／horizon，四軸判斷也寫完——只有 catalyst 軸誠實回 unknown。逐類查過三種候選並排除：①FY2026 業績只是驗證一份 2026-08-05 已公開的指引（共識就落在那個區間、每股貼著下緣），是基期滾動不是重定價；②Riverpoint Medical 併購已完成且公司明說已納入指引，不是未來事件；③`tech:force_torque_sensor` 邊由 qualifying 轉 qualified **確實會**是重定價事件，但圖上無具名客戶、公開文件無任何時點——依 axis_prompts『找不到具體事件時回 unknown，不要編一個』不得寫成 catalyst。｜go 之後會變的數字：NOVT 的 research panel `absence_kind` 由 `not_yet_recorded` 變 `deliberate_abstention`（settled）；readiness **仍然 blocked**（AGENTS.md：settled 不讓 readiness 變好），但段 5 的『到終局』會多一檔（目前 25 → 26）。｜drop＝你認為該把那條邊的認證進度當成 catalyst 硬寫下去，或認為 NOVT 不值得留在段 5 佇列——後者請直接說，我改成把它移出工作集合並在 ROADMAP 記下理由。",
+      "n": 559,
+      "reason": null,
+      "ref_id": "abstention_proposal:NOVT_research_catalyst",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "NOVT：催化劑軸已研究、結論是沒有可監看事件（唯一可能的重定價是那條 qualifying 邊轉 qualified，但無時點）——提案 Abstention（research / axis.catalyst）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21034,6 +21046,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 559,
+  "next_n": 560,
   "schema_version": "1"
 }
