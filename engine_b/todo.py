@@ -270,8 +270,11 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
             raise TodoError("ra_admission receipt digest 必須是 64 位 sha256")
         if fields["commit"] != "not_required" and not _GIT_COMMIT_RE.fullmatch(fields["commit"]):
             raise TodoError("ra_admission receipt commit 必須是 40 位 Git SHA 或 not_required")
-        if not fields["cohort"].startswith("dc_"):
-            raise TodoError("ra_admission receipt 必須含 Decision cohort")
+        # `not_applicable` 的唯一合法來源是 handoff 自己回報主詞不是公司
+        # （decision cohort 是公司形狀的）。語意照 `commit:not_required` 的先例：
+        # **把缺席寫出來**，不假造一個 dc_ 讓稽核以為有 cohort 在追蹤。
+        if fields["cohort"] != "not_applicable" and not fields["cohort"].startswith("dc_"):
+            raise TodoError("ra_admission receipt 必須含 Decision cohort 或 not_applicable")
         completion = item.get("completion_authority") or {}
         if (
             completion.get("action_digest") != fields["digest"]
@@ -1613,7 +1616,12 @@ def complete_ra_admission(
         thesis=lead_context.get("title"),
     )
     cohort_id = str(handoff.get("cohort_id") or "")
-    if not cohort_id.startswith("dc_"):
+    if handoff.get("skipped") == "subject_is_not_a_company":
+        # 主詞不是公司 → 不該有 decision cohort，也不該因此結不了案。
+        # 入圖本身已經 durable，pq2 授權的就是入圖；cohort 是**後續追蹤**的載體，
+        # 而追蹤非公司節點需要自己的 lane（ROADMAP）。
+        cohort_id = "not_applicable"
+    elif not cohort_id.startswith("dc_"):
         raise TodoError("Decision handoff 未回傳有效 cohort receipt")
     receipt = (
         f"action:{action_id};digest:{digest};commit:{commit};cohort:{cohort_id}"
@@ -1725,7 +1733,11 @@ def sync(
                 existing.pop("deferred_at", None)
                 existing["resolved_at"] = stamp
                 existing["resolution"] = "system_internal"
-                existing["reason"] = (
+                # 抑制的理由**跟著 row 走**（L16）。先前這裡硬寫「blocker registry 判定
+                # 只剩 system_internal」，那句話套在別的抑制成因上就是假的（L11-1：
+                # 措辭精度本身就是一個 claim）。
+                suppression = dict(row.get("suppression") or {})
+                existing["reason"] = suppression.get("reason") or (
                     "blocker registry 判定只剩 system_internal；不需要使用者決定，"
                     "亦不冒充外部事件"
                 )
@@ -1736,7 +1748,7 @@ def sync(
                     "ref_id": existing["ref_id"],
                     "verb": "system_internal_retired",
                     "reason": existing["reason"],
-                    "receipt": "blocker-registry:system_internal",
+                    "receipt": suppression.get("receipt") or "blocker-registry:system_internal",
                     **({"prior_waiting_on": prior_waiting} if prior_waiting else {}),
                 })
                 system_internal_retired += 1
@@ -2657,6 +2669,38 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
                     else ""
                 ),
             }
+        # 完全沒有可識別主詞的 cohort 不鑄 pq2：`identity_unresolved` 的 next_step
+        # 寫「提供 exact company_id 或在 registry 登記」，但**連要登記誰都沒人知道**——
+        # 使用者得去翻 `decision_events` 才找得出當初那個 id。這不是使用者決定得了的事。
+        #
+        # 實測代價（2026-09-12）：`tech:hbm` 的自動追蹤 cohort 燒掉 [540]／[547]／[551]／
+        # [554] 四個編號；三次 `go` 全由常規授權自動放行、每次都以 park 收場——而 pq2 是
+        # 使用者**唯一**的授權介面。`AGENTS.md` 對這形狀有明文先例（`sheet_only`
+        # [18]-[33]→[46]-[60]）：**drop 只會換號重生，正確做法是修 collector 端分類。**
+        #
+        # ⚠ 判準是實測分出來的那一格，不是「看起來像沒身分」（L17-4：只 general 到
+        # 資料支持的地方）。9 個 `company_id IS NULL` 的 cohort 實測分成兩群：
+        #   8 筆未上市**公司** → `company_id_hint` 是 `co:*`（主詞在，只是還沒掛牌），
+        #     它們走 `research_ticker_unavailable`＝`awaiting_external`，一個編號用一次
+        #     就停住了——這條路徑**不得**碰到它們；
+        #   1 筆技術節點 → hint 是 None，因為 `capture_signal` 依 INV-1 把非公司 id 擋掉，
+        #     主詞沒留下任何痕跡。
+        # 所以三個欄位同時為空，才是「沒有主詞」。
+        if not item.get("sheet_only") and company in {"", "unknown", "unresolved"} \
+                and not company_hint and not ticker:
+            row["system_internal_only"] = True
+            row["suppression"] = {
+                "receipt": f"cohort-without-subject:{ref}",
+                "reason": (
+                    "這個 cohort 沒有任何可識別的主詞（company_id、hint、ticker 三者皆空），"
+                    "所以 identity_unresolved 的 next_step（登記 company_id）連使用者也執行不了"
+                    "——要登記誰都得先去翻 decision_events。追蹤非公司節點本身有價值，"
+                    "但它需要自己的 lane（不帶 identity／financial／live blocker），"
+                    "那是開發項，載體是 ROADMAP 不是 pq2。"
+                ),
+            }
+            rows.append(row)
+            continue
         # 純 system_internal 狀態不是 pq2，也不是外部事件。仍回傳給 sync，讓
         # 既有 stable item 留下 deterministic retirement audit；新狀態則不建 item。
         # material evidence 優先，不能因同時有 stale 診斷而被吞掉。

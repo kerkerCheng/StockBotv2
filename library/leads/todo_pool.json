@@ -9474,12 +9474,64 @@
       "added_at": "2026-09-12T00:02:18.827154+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 554,
-      "reason": null,
+      "reason": "這個 cohort 沒有任何可識別的主詞（company_id、hint、ticker 三者皆空），所以 identity_unresolved 的 next_step（登記 company_id）連使用者也執行不了——要登記誰都得先去翻 decision_events。追蹤非公司節點本身有價值，但它需要自己的 lane（不帶 identity／financial／live blocker），那是開發項，載體是 ROADMAP 不是 pq2。",
       "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "resolution": "system_internal",
+      "resolved_at": "2026-09-12T02:12:33.858455+00:00",
+      "source": "decision_lab",
+      "title": "unknown：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T02:12:33.858455+00:00",
+      "company_id": "co:globalfoundries",
+      "hint": "當前 missing_data：engine_c_customer：GFS customer_concentration observation（值已備；engine_c_backlog：GFS backlog observation——US$11B LTA 剩餘承諾＋客戶；LTA 的分年攤佈：$11B 沒有按年揭露，所以算不出「幾季能見度」，也算不出違約條款的保護力（共 3 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、financial_resilience_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 555,
+      "reason": null,
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
       "resolution": null,
       "resolved_at": null,
       "source": "decision_lab",
-      "title": "unknown：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "title": "co:globalfoundries：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T02:12:33.858455+00:00",
+      "company_id": "co:mp_materials",
+      "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 556,
+      "reason": null,
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:mp_materials：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T02:12:33.858455+00:00",
+      "company_id": "co:sk_hynix",
+      "hint": "當前 missing_data：engine_c_customer：000660.KS customer_concentration observati；engine_c_backlog：000660.KS backlog observation——內容是「結構性無 ord（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
+      "n": 557,
+      "reason": null,
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:sk_hynix：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T02:12:33.858455+00:00",
+      "company_id": "co:unitree",
+      "hint": "當前 missing_data：688836.SS 的價格序列進 Engine C（目前 valuation_payoff 只有 fx、沒有 marke；同期 EPS 共識（新上市、賣方覆蓋未建立）（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 558,
+      "reason": null,
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:unitree：補估值錨點：市值、分析師覆蓋與隱含假設，回答股價已經定價了什麼",
       "type": "decision_review"
     }
   ],
@@ -20794,8 +20846,17 @@
       "ref_id": "ra_ebcd479b6c6bf84b37c2f8f1b812d712",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-12T02:12:33.858455+00:00",
+      "n": 554,
+      "reason": "這個 cohort 沒有任何可識別的主詞（company_id、hint、ticker 三者皆空），所以 identity_unresolved 的 next_step（登記 company_id）連使用者也執行不了——要登記誰都得先去翻 decision_events。追蹤非公司節點本身有價值，但它需要自己的 lane（不帶 identity／financial／live blocker），那是開發項，載體是 ROADMAP 不是 pq2。",
+      "receipt": "cohort-without-subject:dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
+      "type": "decision_review",
+      "verb": "system_internal_retired"
     }
   ],
-  "next_n": 555,
+  "next_n": 559,
   "schema_version": "1"
 }

@@ -572,6 +572,32 @@ def ensure_shadow_for_company(
     """
     now = as_of or _now()
     target = str(company_id or "").strip()
+    # decision cohort 是**公司形狀**的：它的 blocker 集合問的是 ticker、財務、
+    # 部位與 live permission。給它一個非公司主詞（例如技術節點 `tech:hbm`），
+    # 每一個 blocker 都會成立而且永遠無法被滿足——`identity_unresolved` 的
+    # next_step 是「登記 company_id」，但技術節點永遠不會有 ticker、也不會掛牌。
+    #
+    # 實測代價（2026-09-12）：`tech:hbm` 這樣建出來的 cohort 燒掉四個 pq2 編號
+    # （[540]／[547]／[551]／[554]），每次 reassess 就換一個新號。
+    # ⚠ 更糟的是那個主詞連痕跡都不會留下：`capture_signal` 依 INV-1 把非公司 id
+    # 擋成 None，所以事後只能從 `decision_events` 的 raw_signal 反推出它是誰。
+    #
+    # 所以在這裡就拒絕，並且**明講拒絕了什麼**（INV-3：查不到了不是合法 lifecycle，
+    # 每個 filter 都要報得出 input／accepted／filtered／reasons）。
+    # ⚠ 追蹤非公司節點本身是有價值的（HBM 本來就是瓶頸），只是它需要自己的 lane；
+    # 這裡不假裝做得到，也不靜默丟掉。
+    if target and not target.startswith("co:"):
+        return {
+            "created": False,
+            "cohort_id": None,
+            "skipped": "subject_is_not_a_company",
+            "subject": target,
+            "reason": (
+                f"{target} 不是公司 id；decision cohort 的 blocker 集合是公司形狀的，"
+                "非公司主詞會拿到一組結構上無法滿足的 blocker，並每次 reassess 就消耗"
+                "一個 pq2 編號。要追蹤非公司節點請用 event_watch，或等專屬 lane。"
+            ),
+        }
     for summary in store.list_operational_cohorts(as_of=now):
         # `list_operational_cohorts` 回傳所有 cohort（名稱有誤導性），終態的必須跳過：
         # 否則對一個已 promoted／rejected／expired 的公司再次入圖，會把 handoff 指向
