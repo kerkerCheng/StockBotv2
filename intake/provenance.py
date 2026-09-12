@@ -381,8 +381,73 @@ def mark_graph_complete(
         "extraction_sha256": canonical_extraction_hash(extraction),
     }
     path = _graph_completion_path(doc_id, root)
+    archived_receipt = _supersede_completion_receipt(doc_id, receipt, root=root)
     _atomic_publish(path, json.dumps(receipt, sort_keys=True, separators=(",", ":")) + "\n")
+    if archived_receipt:
+        return {**receipt, "archived_previous_receipt": archived_receipt}
     return receipt
+
+
+def _superseded_extraction_archive(doc_id: str, old_hash: str, root: Path) -> Path | None:
+    """更正走廊確實走過的**機械證據**：舊版 extraction 已歸檔在 `superseded/`。
+
+    兩種 storage_permission 的歸檔位置不同，這裡兩邊都找——收據本身不記 permission，
+    而為了判斷去猜一份 permission 正是 L16 禁的（分類要跟著資料走，消費端不得自己猜）。
+    """
+    if not old_hash:
+        return None
+    for permission in ("repo_full", "local_only"):
+        extraction_path, _ = _target_paths(doc_id, permission, root)
+        archive = extraction_path.parent / "superseded" / f"{doc_id}.{old_hash[:8]}.json"
+        if archive.is_file():
+            return archive
+    return None
+
+
+def _supersede_completion_receipt(doc_id: str, receipt: dict, *, root: Path) -> str | None:
+    """入圖完成收據的更正走廊（2026-09-12）——`publish_provenance` 那條走廊的**對稱面**。
+
+    2026-09-11 給 extraction 開了具名更正走廊，但同一條 publish 路徑寫的第二個檔
+    （`library/private/intake_state/<doc_id>.json`）沒有配對的出口，它走
+    `_atomic_publish` 永不覆寫。後果是**走廊對它自己的目標案例完全不可用**：
+    凡是先前已經入圖過的 doc_id，更正一定卡在這裡——而那條走廊自己舉的例子
+    （已入圖的文件）正是這一類。
+
+    實測代價（2026-09-12，使用者已 go 的 pq2 [542]）：Neo4j 的邊寫成功了、
+    extraction 與 raw 都成功更正並歸檔，然後停在 intake_state 的 no-clobber，
+    RA 停在 `partial`，**使用者已經核准的編號因此關不掉**。
+
+    ⚠ 這**不是放寬 no-clobber**，是給它一條具名且可機械驗證的出口。
+    放行條件只有一個，而且它是既有補償控制的引用、不是新條件：
+    **現存收據指著的那一版 extraction，必須已經被歸檔保存**
+    （`extractions/superseded/<doc_id>.<hash8>.json` 存在）。那個檔只會由
+    `publish_provenance` 的 supersede 分支產生，所以它等於一張「更正走廊確實走過」的收條。
+    舊收據同樣歸檔保留——**兩份都留：竄改讓舊版消失，更正讓兩版並存且指得出來**。
+    """
+    path = _graph_completion_path(doc_id, root)
+    if not path.exists():
+        return None
+    try:
+        current = json.loads(path.read_text(encoding="utf-8"))
+        old_hash = str(current.get("extraction_sha256") or "").strip().lower()
+    except (OSError, ValueError):
+        # 讀不出來的收據不給走廊——fail closed，照舊讓 _atomic_publish 去撞 no-clobber。
+        return None
+    if not old_hash or old_hash == receipt["extraction_sha256"]:
+        # 同一版＝冪等，交給 _atomic_publish（內容相同時它本來就不報錯）。
+        return None
+    evidence = _superseded_extraction_archive(doc_id, old_hash, root)
+    if evidence is None:
+        raise ValueError(
+            f"completion receipt for {doc_id} points at extraction {old_hash[:8]}, "
+            "which is not archived under superseded/ — refusing to rewrite the receipt. "
+            "Publish the corrected extraction through publish_provenance first."
+        )
+    archive = path.parent / "superseded" / f"{doc_id}.{old_hash[:8]}.json"
+    if not archive.exists():
+        _atomic_publish(archive, path.read_text(encoding="utf-8"))
+    path.unlink()
+    return _relative(archive, root)
 
 
 def verify_graph_complete(doc_id: str, extraction: dict, *, root: Path = ROOT) -> dict:

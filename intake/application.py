@@ -347,18 +347,25 @@ def _load_extraction_impl(
         }
 
     driver = _driver()
+    graph_stage = "not_started"
     try:
         _check_graph_write_readiness(driver)
         with driver.session() as session:
             session.execute_write(lambda tx: load_to_graph(doc, tx))
+        # ⚠ 圖從這一行之後就已經變了。後面三步任何一步失敗，**檔案都不能復原**。
+        graph_stage = "merged"
         _verify_loaded_doc(driver, doc)
+        graph_stage = "verified"
         affected_edge_keys = {
             edge_key(edge["src_id"], edge["relation"], edge["dst_id"])
             for edge in doc.get("edges", [])
         }
         projection = project_edge_keys(driver, affected_edge_keys)
+        graph_stage = "projected"
         mark_graph_complete(doc_id, doc, root=root)
+        graph_stage = "receipt_written"
     except Exception as e:
+        mutated = graph_stage != "not_started"
         return {
             "status": "pending_graph",
             "doc_id": doc_id,
@@ -366,6 +373,18 @@ def _load_extraction_impl(
             "resolved_paths": provenance["paths"],
             "finalize_eligible": False,
             "warnings": warnings,
+            "graph_stage": graph_stage,
+            "graph_mutated": mutated,
+            # 先前這裡只寫「recovery 之後重跑」，而沒說 recovery 指什麼——
+            # 在圖已變更的情況下，「復原檔案」正是錯的那個動作。
+            "next_action": (
+                "Graph already holds this version; do NOT restore the extraction or raw "
+                "files. Fix the failing step and re-run the same action so files and graph "
+                "agree."
+                if mutated else
+                "Graph was not modified; the stored files are still the pre-apply version. "
+                "Fix the cause and re-run the same action."
+            ),
         }
     finally:
         driver.close()
@@ -373,6 +392,8 @@ def _load_extraction_impl(
     return {
         "status": "loaded_or_already_complete",
         "doc_id": doc_id,
+        "graph_stage": graph_stage,
+        "graph_mutated": True,
         "resolved_paths": provenance["paths"],
         "open_conflict_ids": projection["open_conflict_ids"],
         "stale_resolution_ids": projection["stale_resolution_ids"],
@@ -393,6 +414,25 @@ def _safe_error_message(value: object) -> str:
     message = message.replace("\r", " ").replace("\n", " ")
     return message[:2_000]
 
+#: 入圖走到哪一步的封閉字彙（2026-09-12）。**順序即進度**，索引大小有意義。
+#:
+#: 為什麼需要它：`load_to_graph` 之後還有三步（verify／projection／完成收據），
+#: 任何一步失敗都回同一個 `pending_graph`——可是 `merged` 之後**圖已經變了**，
+#: 而 `not_started` 時圖還是乾淨的。兩者的復原動作正好相反：
+#: 前者只能往前重跑（讓檔案追上圖），後者才可以把檔案復原。
+#:
+#: 實測代價（2026-09-12，pq2 [542]）：回傳只說 `completed_document_count: 0`，
+#: 執行者據此把 extraction 與 raw 復原成 apply 前的版本，**反而做出「圖=新、
+#: 檔案=舊」的不一致**；是後來去查那條邊的 `updated_at` 才發現圖早就變了。
+GRAPH_STAGES: tuple[str, ...] = (
+    "not_started",     # 還沒碰圖——檔案可以安全復原
+    "merged",          # MERGE 已提交；**從這裡起，復原檔案是錯的動作**
+    "verified",        # 已回查圖中確實有這份文件
+    "projected",       # 邊的 projection 已更新
+    "receipt_written", # intake_state 完成收據已寫入＝整段成功
+)
+
+
 def _safe_load_result(result: dict) -> dict:
     """Persist only bounded operational fields, never caller payloads."""
 
@@ -408,6 +448,10 @@ def _safe_load_result(result: dict) -> dict:
             "extraction_sha256",
             "counts",
             "warnings",
+            # L16：分類必須跟著 payload 走。這兩個欄位若不在白名單裡，
+            # 它們會在存進 action record 的那一刻被丟掉，下游只好自己猜。
+            "graph_stage",
+            "graph_mutated",
         )
         if key in result
     }
@@ -718,6 +762,10 @@ def _apply_research_action_impl(
                     "message": safe_result.get("error") or result.get("status"),
                 }
                 record = research_actions.save_action(record, root=root)
+                # ⚠ `completed_document_count: 0` 不等於「圖沒變」：MERGE 之後的
+                # 任何一步失敗都會走到這裡，而那時圖已經是新版了（2026-09-12 實測）。
+                # 這兩個欄位讓呼叫端不必去翻 execution.documents 才知道能不能復原檔案。
+                mutated = bool(safe_result.get("graph_mutated"))
                 return {
                     "status": "partial",
                     "action_id": action_id,
@@ -728,8 +776,17 @@ def _apply_research_action_impl(
                     ),
                     "document_count": len(record["execution"]["documents"]),
                     "failed_doc_id": document["doc_id"],
+                    "graph_mutated": mutated,
+                    "graph_stage": safe_result.get("graph_stage"),
                     "error": record["execution"]["last_error"],
-                    "next_action": "Retry the same action ID and digest after recovery.",
+                    "next_action": (
+                        "Graph already holds this version; do NOT restore the extraction or "
+                        "raw files. Fix the failing step and re-run the same action ID and "
+                        "digest."
+                        if mutated else
+                        "Graph was not modified. Retry the same action ID and digest after "
+                        "recovery."
+                    ),
                 }
 
             try:
