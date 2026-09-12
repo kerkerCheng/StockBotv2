@@ -50,6 +50,7 @@ from engine_b.writer_lock import (  # noqa: E402
     holder as _lock_holder,
     is_stale as _lock_is_stale,
     release as _lock_release,
+    run_finished_at as _daily_run_finished_at,
 )
 from scripts.publish_daily_state import COMMIT_SUBJECT as _PUBLISHER_SUBJECT  # noqa: E402
 
@@ -86,10 +87,29 @@ def cmd_check(args: argparse.Namespace) -> int:
     start, end = _window(schedule, now)
 
     reasons: list[str] = []
-    if start <= now < end:
+    # 「今天那輪 daily 已經收工」——窗與鎖都回答不了這件事（2026-09-12）。
+    # 窗是純時鐘算術，鎖只說「現在有沒有人在寫」；於是 daily 早就跑完之後窗仍然
+    # 擋著互動 session（實測擋掉約 1.5 小時，那段時間沒有任何 writer）。
+    #
+    # ⚠ 兩個條件缺一不可，缺了就是一把永久開著的門：
+    #   ① 標記必須是**今天**的（本地日期相同）——昨天的標記不能開今天的門；
+    #   ② 收工時刻必須**在窗開始之後**——凌晨手動跑一次的標記，不能拿來開 05:15
+    #      才開始的那個窗（那正是 daily 還沒跑的時段）。
+    # ⚠ 補償控制沿用既有那個、不另開放行條件：標記只放行**時間窗**這一條理由，
+    #   下面的 `scheduled` 鎖仍然獨立成立——「daily 延遲重跑」由鎖擋，標記不介入。
+    finished_at = _daily_run_finished_at()
+    finished_local = finished_at.astimezone(tz) if finished_at is not None else None
+    daily_done_today = (
+        finished_local is not None
+        and finished_local.date() == now.date()
+        and finished_local >= start
+    )
+    if start <= now < end and not daily_done_today:
         reasons.append(
             f"現在（{now:%H:%M} {schedule['timezone']}）落在 daily 避讓窗 "
             f"{start:%H:%M}–{end:%H:%M} 內"
+            + ("" if finished_local is None
+               else f"（最近一次收工 {finished_local:%m-%d %H:%M}，不算今天這輪）")
         )
 
     # 長時間 run 會不會跨進窗內——這是本檢查最有價值的一項：
@@ -124,6 +144,8 @@ def cmd_check(args: argparse.Namespace) -> int:
         "now_local": now.isoformat(),
         "timezone": str(schedule["timezone"]),
         "daily_window": [start.isoformat(), end.isoformat()],
+        "daily_run_finished_at": finished_local.isoformat() if finished_local else None,
+        "daily_done_today": daily_done_today,
         "planned_minutes": args.minutes,
         "head": _git("rev-parse", "HEAD"),
         "writer_lock": lock,

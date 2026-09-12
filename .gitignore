@@ -103,3 +103,6 @@ library/leads/action_drafts/
 library/leads/.writer_lock.json
 .pytest_tmp/
 !config/source_routes.json
+
+# Daily「這輪跑完了」標記（engine_b/writer_lock.py）——與鎖同性質的機器狀態。
+library/leads/.daily_run_finished.json

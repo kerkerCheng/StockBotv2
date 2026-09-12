@@ -236,13 +236,17 @@ def main() -> int:
     # release 是 no-op（不拆別人的鎖）。
     try:
         sys.path.insert(0, str(ROOT))
-        from engine_b.writer_lock import SCHEDULED_OWNER, release
+        from engine_b.writer_lock import SCHEDULED_OWNER, mark_run_finished, release
 
-        result["writer_lock_released"] = release(
-            os.environ.get("STOCKBOT_WRITER_OWNER") or SCHEDULED_OWNER
-        )
+        owner = os.environ.get("STOCKBOT_WRITER_OWNER") or SCHEDULED_OWNER
+        result["writer_lock_released"] = release(owner)
+        # 「這輪跑完了」的標記寫在**釋放鎖的同一點**，所以它不比鎖多信任任何東西
+        # （2026-09-12）。避讓窗靠它才分得出「daily 可能在跑」與「daily 早就收工」；
+        # 成敗記進 status 供人看，但不參與避讓判斷——窗防的是同時寫，不是失敗。
+        result["run_marker"] = mark_run_finished(status=result["status"], owner=owner)
     except Exception:
         result["writer_lock_released"] = None
+        result["run_marker"] = None
     print(json.dumps(result, ensure_ascii=False))
     return 0 if result["status"] in {"no_change", "pushed"} else 1
 

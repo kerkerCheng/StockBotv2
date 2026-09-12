@@ -14,7 +14,9 @@ from engine_b.writer_lock import (
     acquire,
     holder,
     is_stale,
+    mark_run_finished,
     release,
+    run_finished_at,
 )
 
 
@@ -81,3 +83,36 @@ def test_lock_path_is_inside_repo_and_gitignored() -> None:
     assert LOCK_PATH.is_relative_to(_ROOT)
     gitignore = (_ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "library/leads/.writer_lock.json" in gitignore
+
+
+# ---------------------------------------------------------------------------
+# 「這輪跑完了」標記（2026-09-12）——與鎖同性質、同一個原子寫檔路徑。
+
+
+def test_run_marker_roundtrips_and_stays_timezone_aware(tmp_path) -> None:
+    marker = tmp_path / ".daily_run_finished.json"
+    assert run_finished_at(marker) is None, "沒有標記＝還沒跑完"
+
+    payload = mark_run_finished(status="pushed", path=marker)
+    back = run_finished_at(marker)
+
+    assert payload["status"] == "pushed"
+    assert back is not None and back.tzinfo is not None, "naive 時間會在跨時區比較時靜默錯"
+
+
+def test_corrupt_run_marker_fails_closed(tmp_path) -> None:
+    """讀不出來就當成還沒跑完。一個解析不出時間的標記若被當成『跑完了』，
+    它就是一把永久開著的門——而門開著不會有任何東西叫。"""
+    marker = tmp_path / ".daily_run_finished.json"
+    marker.write_text("{not json", encoding="utf-8")
+
+    assert run_finished_at(marker) is None
+
+
+def test_run_marker_records_failed_runs_too(tmp_path) -> None:
+    """語意是『跑完了』不是『成功了』（L12）：避讓窗防的是同時寫，與成敗無關。
+    成敗留在 status 裡供人看，但不參與避讓判斷。"""
+    marker = tmp_path / ".daily_run_finished.json"
+    mark_run_finished(status="push_failed", path=marker)
+
+    assert run_finished_at(marker) is not None

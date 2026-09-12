@@ -165,3 +165,56 @@ def release(owner: str, *, path: Path | None = None) -> bool:
         return False
     p.unlink(missing_ok=True)
     return True
+
+
+# ---------------------------------------------------------------------------
+# Daily「今天這輪跑完了」標記（2026-09-12 使用者指示的 (a) 案）
+#
+# 為什麼需要第三個訊號：`writer_guard` 的避讓窗是**純時鐘算術**，鎖回答「現在有人
+# 在寫」，兩者都回答不了「**今天那輪跑完了沒**」。於是窗在 daily 早就收工之後仍然
+# 擋著互動 session——2026-09-12 實測擋掉約 1.5 小時，而那段時間沒有任何 writer。
+#
+# ⚠ 語意刻意寫成「**跑完了**」而不是「**成功了**」（L12：一個表示不要承載兩種語意）。
+# 避讓窗要防的是**同時寫**，跟那輪 daily 成功與否無關；失敗的輪次同樣已經不在寫了。
+# 成敗記在 `status` 欄位裡供人看，但**不參與**避讓判斷。
+#
+# 補償控制沿用既有的那個，不另開放行條件（`AGENTS.md`：放行與收緊必須同時發生）：
+# 標記只放行**時間窗**這一條理由，`scheduled` 鎖仍然獨立成立——所以「daily 延遲重跑」
+# 這個最危險的情境由鎖擋下，標記擋不住也不需要擋。
+RUN_MARKER_PATH = _ROOT / "library" / "leads" / ".daily_run_finished.json"
+
+
+def mark_run_finished(
+    *, status: str, owner: str = SCHEDULED_OWNER, path: Path | None = None
+) -> dict[str, Any]:
+    """記下「這輪 daily 已經跑完」。寫在 release 的同一點，所以它的準確度與鎖釋放
+    完全相同——不是另一個需要被信任的新機制。"""
+    payload = {
+        "finished_at": _now().isoformat(),
+        "status": str(status),
+        "owner": str(owner),
+        "pid": os.getpid(),
+        "hostname": socket.gethostname(),
+    }
+    _write_lock(payload, path or RUN_MARKER_PATH)
+    return payload
+
+
+def run_finished_at(path: Path | None = None) -> datetime | None:
+    """回傳這輪 daily 的收工時刻（UTC aware）；無標記或讀不出來 → None。
+
+    ⚠ **fail closed**：讀不到就當成「還沒跑完」，讓避讓窗照常成立。一個解析不出
+    時間的標記若被當成「跑完了」，它就變成一把永久開著的門。
+    ⚠ 這裡**不判斷日期**——本模組沒有 schedule 的 timezone，而讓兩個地方各自持有
+    一份時區知識正是 SSOT 分裂的起點（本次事故的根因就是時間有兩份）。
+    日期與窗的比對留給 `writer_guard`，它本來就讀 `config/daily_routine.json`。
+    """
+    p = path or RUN_MARKER_PATH
+    if not p.is_file():
+        return None
+    try:
+        data = json.loads(p.read_text(encoding="utf-8"))
+        moment = datetime.fromisoformat(str(data["finished_at"]))
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+    return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
