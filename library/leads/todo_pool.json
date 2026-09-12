@@ -9652,6 +9652,18 @@
       "source": "decision_lab",
       "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T15:21:16.328174+00:00",
+      "hint": "go＝執行 `python -m alpha abstention 3363.TWO --add library/private/alpha/abstention_proposals/3363.TWO_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪已把 3363.TWO 從零補到最完整——基期觀測 mo_c755e874（MOPS 202504_3363_AI1.pdf FY2025 合併財報 ＋ 202602_3363_AI1.pdf H1 2026 ＋ TPEx 月營收 11508）、六條 FY2026 假設、horizon、四軸判斷、以及一筆 ev_to_sales 估值假設 va_13eed39b（校準 31.2733x ＝ EV 733.1 億 ÷ 共識營收 23.4 億）全部寫好。唯一缺的就是這一格：本益比法對虧損無定義，而 3,322x 被 target_pe 的 500 上限擋下（那道上限攔對了東西）。｜放行後會變什麼：`briefing/alpha_view/sources.py` 的 P6 切換條件是「本益比法 method_not_applicable 或 deliberate_abstention ＋ ledger 有 ev_to_sales 假設」，兩者屆時都成立 → fair value 592.66、隱含報酬 −12.97%、readiness 由 blocked 變 ready。⚠ 但那個 −12.97% 只反映本估營收比共識低 14.5%，**完全沒有涵蓋真正的分歧**：市值 774 億是本估營收的 38.6 倍，市場付的是 FY2027 共識營收 ×3.93、EPS ×82.6，而本系統對那個階梯零一手證據（backlog 觀測逐字「無在手訂單揭露」）。｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 565,
+      "reason": null,
+      "ref_id": "3363.TWO",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "3363.TWO（上詮）：內部 FY2026 EPS −1.29 是虧損、共識 0.205 的校準倍數 3,322x 超過 ledger 上限 500——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21165,6 +21177,6 @@
       "verb": "reassessed_closed"
     }
   ],
-  "next_n": 565,
+  "next_n": 566,
   "schema_version": "1"
 }

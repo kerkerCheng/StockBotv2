@@ -144,7 +144,10 @@ def probe(ticker: str) -> None:
         readiness = payload.get("readiness") or {}
         print(f"# {ticker} readiness={readiness.get('state')}")
         for blocker in readiness.get("blocker_details") or []:
-            print(f"  - {blocker['panel']:<12} {blocker['absence_kind']:<22} {blocker['reason'][:120]}")
+            # reason／absence_kind 都可能是 null——「沒給理由」本身要看得見，不能讓 probe 掛掉（L12：缺席不得與 0 同形）。
+            kind = blocker.get("absence_kind") or "«absence_kind 為 null»"
+            reason = blocker.get("reason") or "«reason 為 null——產生缺席的那段程式沒宣告理由»"
+            print(f"  - {str(blocker.get('panel')):<12} {kind:<22} {reason[:120]}")
     else:
         print(f"# {ticker} 沒有 analyst view artifact")
 
