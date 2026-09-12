@@ -58,22 +58,40 @@ def _consensus_self_check(rows) -> None:
 
 
 def _snapshot_self_check(snap) -> None:
-    """營益率不可能大於毛利率——營業費用不會是負的。
+    """快照的 `operating_margin` 與 `gross_margin` **期間不同**，而沒有任何欄位宣告這件事。
 
-    2026-09-12 實測：73 份行情快照有 **3 份**違反（MU 80.37% vs 72.57%、SNDK 78.47% vs 71.47%、
-    000660.KS 76.33% vs 76.27%），**三家全是記憶體廠**。以 SNDK 對一手 10-K 核過：
-    毛利率 71.47% 正確（14,472 ÷ 20,248），但營益率應為 **61.19%**（12,389 ÷ 20,248），
-    provider 給的 78.47% 錯了 17 個百分點。
+    ## 確認過的機制（不是「資料錯了」）
 
-    ⚠ 它不進橋（橋用的是 Engine C 的人工觀測），但它**進 research packet 的 deterministic 區塊**，
-    也就是 session 在寫四軸判斷前會讀到的那一份。判斷裡若引用了它，錯誤就落進 append-only 的判斷檔。
+    yfinance 的 `grossMargins` 是年度／TTM，`operatingMargins` 是**最近一季**。
+    兩次獨立實測：
+    - 000660.KS（2026-09-11 的判斷檔已記）：快照 0.76328003 逐位等於 **Q2-2026 單季**營益率
+      （60,542,608 ÷ 79,318,746），而 TTM 實為 68.0%——差 8.3pp。
+    - SNDK（2026-09-12）：快照 0.78472 ≈ **Q4 FY2026 單季** GAAP 營益率 7,037 ÷ 8,965 = 0.78494，
+      而全年是 61.19%（12,389 ÷ 20,248）——差 17.3pp。同一份快照的 gross_margin 0.71474
+      則精確等於**全年**毛利 14,472 ÷ 20,248。
+
+    **兩個相鄰欄位、兩種期間、零宣告**——L12 的形狀（一個表示承載兩種語意）。
+
+    ## 為什麼不只在不等式成立時才警告
+
+    `operating_margin > gross_margin` 只在「最近一季特別好」時才成立（全庫 73 份只有 3 份，
+    且三家全是記憶體廠）。**其餘 70 份同樣有期間錯配，只是看不出來**——
+    只在看得出來時才警告，等於只擋住最無害的那一批。所以這裡對**每一檔**都印。
+
+    ⚠ 它不進橋（橋用 Engine C 的人工觀測），但**進 research packet 的 deterministic 區塊**，
+    也就是 session 寫四軸判斷前會讀到的那一份。
     """
     gross, operating = snap.get("gross_margin"), snap.get("operating_margin")
-    if gross is None or operating is None or operating <= gross:
+    if operating is None:
         return
-    print(f"   ⚠⚠ 營益率 {operating:.2%} **大於**毛利率 {gross:.2%}——營業費用不會是負的，"
-          "provider 這兩格至少有一格是錯的。寫判斷前先用 10-K／10-Q 的營業利益 ÷ 營收自己算一次；"
-          "**不要引用快照的 operating_margin**。")
+    impossible = gross is not None and operating > gross
+    flag = "⚠⚠" if impossible else "⚠"
+    print(f"   {flag} 快照的 operating_margin={operating:.4f} 是 **provider 的最近一季**，"
+          f"而 gross_margin={gross if gross is None else format(gross, '.4f')} 是**年度／TTM**——"
+          "兩欄期間不同且沒有欄位宣告。**寫判斷時營益率一律取法定文件自己算**，不要引用這一格。")
+    if impossible:
+        print("      （本檔連不等式都破了：營益率 > 毛利率，營業費用不會是負的——"
+              "那只是期間錯配在這一檔剛好看得出來，不是另一種錯。）")
 
 
 def probe(ticker: str) -> None:
