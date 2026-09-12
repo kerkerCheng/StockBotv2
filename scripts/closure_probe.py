@@ -137,6 +137,116 @@ def _share_count_check(conn, ticker: str, snapshot_shares) -> None:
           "所以快照錯的話**市值那一格也同樣錯**。")
 
 
+def _live_base(conn, ticker: str):
+    """該檔目前生效的 fiscal_year_results 觀測（已 supersede 的排掉）。"""
+    import json as _json
+    rows = conn.execute(
+        "SELECT observation_id, value, supersedes_id FROM manual_observations"
+        " WHERE ticker = ? AND field_name = 'fiscal_year_results' ORDER BY recorded_at", (ticker,)).fetchall()
+    if not rows:
+        return None
+    superseded = {r["supersedes_id"] for r in rows if r["supersedes_id"]}
+    live = [r for r in rows if r["observation_id"] not in superseded]
+    if not live:
+        return None
+    try:
+        return _json.loads(live[-1]["value"])
+    except (TypeError, ValueError):
+        return None
+
+
+def _consensus_base_check(conn, ticker: str, rows) -> None:
+    """共識的 `year_ago_actual` 應該等於我們自己記下來的基期實績——不等就代表口徑不同。
+
+    這一條與 `_consensus_self_check` 互補：那一條比的是**共識自己的兩列**
+    （0y 的估計 vs +1y 的 year_ago_actual），這一條比的是**共識 vs 一手財報**。
+
+    ## ⚠ 這裡不是 authority，只是提前看得到
+
+    營收那一側的判定權威是 **`alpha/fundamental/compare.py` 的 `unreconciled_base`**
+    （2026-09-07 Coverage Pilot 補），它已經會在 analyst view 裡印出同一句話。
+    本函式**不做新的判斷、也不得被當成第二個真相來源**（L16：分類要跟著資料走，
+    不是每個消費端各造一份）——它只把那個判定搬到**開工前**：
+    probe 的用途是「這一檔動手之前要先知道什麼」，而 `compare.py` 的版本要等到
+    基期觀測、六格假設、估值都寫完並 materialize 之後才看得到。
+    2026-09-13 實測 5016.T 就是這樣：先手動察覺 revenue_ttm 與共識基期差 2.06 倍，
+    寫完整條 bridge 之後才看到 analyst view 印出同一件事。
+
+    2026-09-13 實測 5016.T（ＪＸ金属）：provider 的 revenue `year_ago_actual` 是
+    **461,843,000,000**，逐位等於決算短信「(参考) 個別業績」的売上高 461,843 百万円，
+    而**連結**是 **884,638 百万円**——**兩條共識序列踩在不同的合併範圍上**
+    （同一份快照的 EPS year_ago_actual 112.94 則是連結的基本 EPS，是對的）。
+    provider 因此算出 revenue growth +130.58%，那是「連結預估 ÷ 個別實績」。
+
+    EPS 那一側刻意只印**資訊**不報警：本輪已知有兩種合法的不相等——
+    ①股票股利使 provider 依 IAS 33 追溯調整基期（3081.TWO：共識 4.20909 ＝ 財報稀釋 4.63 ÷ 1.10）；
+    ②共識是 non-GAAP 而財報是 GAAP。把它做成警報會誤報，而會誤報的防呆本身就是過度工程（L16-4）。
+    所以這裡只回答一個問題：**共識的基期對上的是基本、稀釋、還是都對不上？**
+
+    ## 誤報率（2026-09-13 全庫實測，40 檔有基期觀測）
+
+    - **revenue 報警 2 檔，兩檔都是真的**：5016.T（0.5221）與 6324.T（0.5614），
+      **兩檔都是日股、都是 provider 把「(参考) 個別業績」當成基期**。
+    - **TSM 不報警**：共識 TWD、基期觀測 USD，比值 31.37 只是匯率——加了幣別 guard。
+    - **eps 側一律不報警**：實測 20 檔對不上，絕大多數是已知且合法的 GAAP vs non-GAAP。
+      恆亮的警報等於零鑑別力（L14-4），所以那一側只印資訊。
+    """
+    base = _live_base(conn, ticker)
+    if base is None or not rows:
+        return
+    zero = [r for r in rows if r["relative_label"] == "0y"]
+    if not zero:
+        return
+    gaap = base.get("gaap") or base.get("non_gaap") or {}
+    printed = False
+    for row in zero:
+        actual = row["year_ago_actual"]
+        if not actual:
+            continue
+        if row["metric"] == "revenue":
+            filed = base.get("revenue")
+            if not filed:
+                continue
+            # 幣別不同就不可比——TSM 的共識是 TWD、基期觀測記的是 USD，比值 31.37 只是匯率。
+            # 這種情況不報警（它不是資料錯誤），但要印出來，否則「沒警報」會被誤讀成「已核對」。
+            cons_ccy, base_ccy = row["currency"], base.get("currency")
+            if cons_ccy and base_ccy and cons_ccy != base_ccy:
+                printed = True
+                print(f"   ·  共識 revenue 的幣別是 {cons_ccy}、基期觀測是 {base_ccy}——"
+                      "**本檢查跳過**（差異是匯率不是口徑）。要核對得先用同一條 FX 路徑換算。")
+                continue
+            ratio = actual / filed
+            if 0.97 <= ratio <= 1.03:
+                continue
+            printed = True
+            print(f"   !! 共識的 revenue year_ago_actual {actual:,.0f} vs 基期觀測的 {filed:,.0f}"
+                  f"（比值 {ratio:.4f}）——**營收沒有合法的口徑差異**，"
+                  "所以這不是 GAAP／non-GAAP，而是**合併範圍或年度對錯了**。"
+                  "⚠ 不要用 provider 的 growth 欄位（它是「估計 ÷ 這個錯的基期」）。")
+        elif row["metric"] == "eps":
+            b, d = gaap.get("basic_eps"), gaap.get("diluted_eps")
+            cands = [(lbl, v) for lbl, v in (("基本", b), ("稀釋", d)) if v]
+            if not cands:
+                continue
+            best = min(cands, key=lambda kv: abs(actual / kv[1] - 1))
+            gap = actual / best[1] - 1
+            printed = True
+            if abs(gap) <= 0.01:
+                print(f"   ·  共識的 eps year_ago_actual {actual} 對上基期的**{best[0]}**每股盈餘 {best[1]}"
+                      f"（差 {gap:+.2%}）——口徑已識別，後續比較用這一邊。")
+            else:
+                # 刻意**不報警**：全庫實測 20 檔落在這一支，而其中絕大多數是已知且合法的
+                # GAAP vs non-GAAP（TSLA 1.66 vs 1.08、ORCL、GXO、MSFT…）。
+                # 把它做成 `!!` 會讓警報恆亮，那就是 L14-4 的「恆亮＝零鑑別力」。
+                print(f"   ·  共識的 eps year_ago_actual {actual} 與基期的基本 {b}／稀釋 {d} 都不一致"
+                      f"（最接近的是{best[0]}，差 {gap:+.2%}）——**這一格是要你去識別口徑，不是錯誤**。"
+                      "三個候選：①股票股利使 provider 依 IAS 33 追溯調整基期（除以配股倍數試試）；"
+                      "②共識是 non-GAAP 而基期記的是 GAAP；③合併範圍不同。"
+                      "**在釐清之前，內部 EPS 與共識的差距不可讀成觀點差距。**")
+    if not printed:
+        return
+
+
 def probe(ticker: str) -> None:
     art = ARTIFACTS / f"{ticker}.json"
     if art.exists():
@@ -163,6 +273,7 @@ def probe(ticker: str) -> None:
     if not rows:
         print("   （無共識——沒有同期 EPS 共識的檔走不了本益比法）")
     _consensus_self_check(rows)
+    _consensus_base_check(conn, ticker, rows)
 
     print("\n## 行情快照")
     row = conn.execute(
