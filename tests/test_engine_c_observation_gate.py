@@ -187,3 +187,70 @@ def test_set_manual_field_cli_only_proposes(pending_root, capsys) -> None:
 
     assert "append_manual_observation" not in source
     assert "pending_observations.propose" in source
+
+
+# ── fiscal_year_results 的損益恆等式（interest_and_other_net 符號） ────────────
+
+
+def _fy(interest, *, basis="gaap"):
+    import json as _json
+
+    return _json.dumps({
+        "fiscal_year_end": "2026-06-28",
+        "currency": "USD",
+        "revenue": 23232690000.0,
+        basis: {
+            "operating_income": 8199795000.0,
+            "interest_and_other_net": interest,
+            "pretax_income": 8262473000.0,
+        },
+    })
+
+
+def test_pnl_identity_rejects_flipped_interest_sign() -> None:
+    # 實測來源：LRCX FY2026。損益表印的是收益 +62,678 千，照抄就會變成「費用」，
+    # 而橋算 pretax = operating_income − interest，內部 EPS 因此少 0.94%，沒有任何東西會報錯。
+    from engine_c.manual_observations import _require_pnl_sign_convention
+
+    with pytest.raises(ValueError, match="損益恆等式不成立"):
+        _require_pnl_sign_convention("fiscal_year_results", _fy(62678000.0))
+
+
+def test_pnl_identity_accepts_expense_positive_convention() -> None:
+    from engine_c.manual_observations import _require_pnl_sign_convention
+
+    _require_pnl_sign_convention("fiscal_year_results", _fy(-62678000.0))
+
+
+def test_pnl_identity_checks_non_gaap_block_too() -> None:
+    from engine_c.manual_observations import _require_pnl_sign_convention
+
+    with pytest.raises(ValueError, match="fiscal_year_results.non_gaap"):
+        _require_pnl_sign_convention("fiscal_year_results", _fy(62678000.0, basis="non_gaap"))
+
+
+def test_pnl_identity_skips_when_the_three_numbers_are_not_all_there() -> None:
+    # 多數既有紀錄只有 revenue 與 operating_income——沒有恆等式可驗時不得猜（也不得誤報）。
+    import json as _json
+
+    from engine_c.manual_observations import _require_pnl_sign_convention
+
+    _require_pnl_sign_convention("fiscal_year_results", _json.dumps(
+        {"revenue": 1.0, "gaap": {"operating_income": 2.0}}))
+
+
+def test_pnl_identity_tolerates_rounding() -> None:
+    import json as _json
+
+    from engine_c.manual_observations import _require_pnl_sign_convention
+
+    # 表上是四捨五入後的百萬，0.1% 的殘差必須放行。
+    _require_pnl_sign_convention("fiscal_year_results", _json.dumps(
+        {"gaap": {"operating_income": 1000.0, "interest_and_other_net": -50.0,
+                  "pretax_income": 1049.0}}))
+
+
+def test_pnl_identity_only_applies_to_fiscal_year_results() -> None:
+    from engine_c.manual_observations import _require_pnl_sign_convention
+
+    _require_pnl_sign_convention("segment_revenue_share", _fy(62678000.0))

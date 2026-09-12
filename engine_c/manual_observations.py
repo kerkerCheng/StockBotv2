@@ -130,6 +130,61 @@ def _require_machine_comparable_if_mechanical(field_name: str, value: str) -> No
         )
 
 
+#: 損益恆等式的相對容差。表上的數字是四捨五入後的百萬／千元，所以不能要求完全相等；
+#: 0.5% 足以吃掉捨入，又遠小於「符號搞反」造成的偏差（符號錯 ＝ 2×利息項）。
+_PNL_IDENTITY_TOLERANCE = 0.005
+
+
+def _require_pnl_sign_convention(field_name: str, value: str) -> None:
+    """`fiscal_year_results` 的 `interest_and_other_net` 必須用「正值＝費用」的符號。
+
+    ## 為什麼需要機械檢查而不是一句註解
+
+    同一個欄位名在兩個相鄰的 ledger 裡有相反的符號慣例：損益表**印出來**的
+    `Other income (expense), net` 正值是**收益**，而 `ASSUMPTION_DRIVERS` 的
+    `interest_and_other_net` 契約寫的是**正值＝費用**（橋算的是
+    `pretax = operating_income − interest_and_other_net`）。
+
+    2026-09-12 實測：LRCX 的基期觀測照抄損益表符號填 `+62,678,000`（實際是收益），
+    再沿用到假設，結果橋算出內部稀釋 EPS 9.38 而不是校準目標 9.469——**差 0.94%，
+    而且沒有任何東西會報錯**。只有先算出期望值再去對，才抓得到（L17：不會壞、不會
+    報錯、測試不會紅，只會安靜地偏）。
+
+    檢查方式是恆等式而不是符號規則本身：同一個 basis 區塊裡若三個數都在，就必須滿足
+    `operating_income − interest_and_other_net ≈ pretax_income`。符號填反時這條會差
+    兩倍的利息項，一定攔得到；而恆等式同時也攔得到單純抄錯數字。
+    """
+
+    try:
+        payload = json.loads(value)
+    except (TypeError, ValueError):
+        return  # JSON 合法性由 _require_machine_comparable_if_mechanical 負責
+    if field_name != "fiscal_year_results" or not isinstance(payload, Mapping):
+        return
+    for basis in ("gaap", "non_gaap"):
+        block = payload.get(basis)
+        if not isinstance(block, Mapping):
+            continue
+        try:
+            operating = float(block["operating_income"])
+            interest = float(block["interest_and_other_net"])
+            pretax = float(block["pretax_income"])
+        except (KeyError, TypeError, ValueError):
+            continue  # 三個數沒有到齊就沒有恆等式可驗——不猜
+        implied = operating - interest
+        scale = max(abs(pretax), abs(operating), 1.0)
+        if abs(implied - pretax) / scale <= _PNL_IDENTITY_TOLERANCE:
+            continue
+        raise ValueError(
+            f"fiscal_year_results.{basis} 的損益恆等式不成立："
+            f"operating_income({operating:,.0f}) − interest_and_other_net({interest:,.0f})"
+            f" = {implied:,.0f}，但 pretax_income 是 {pretax:,.0f}。"
+            "最常見的成因是 interest_and_other_net 的符號——本欄位與 ASSUMPTION_DRIVERS "
+            "同慣例：**正值＝費用**，所以損益表上印成收益的 "
+            f"`Other income (expense), net` 要寫成 {-interest:,.0f}。"
+        )
+
+
 def append_manual_observation(
     conn: Any,
     *,
@@ -156,6 +211,7 @@ def append_manual_observation(
     )):
         raise ValueError("manual observation requires value, provenance, as_of, and author")
     _require_machine_comparable_if_mechanical(str(fields["field_name"]), str(fields["value"]))
+    _require_pnl_sign_convention(str(fields["field_name"]), str(fields["value"]))
     fields["as_of"] = normalize_as_of(str(fields["as_of"]))
     sensitive = sensitive_payload_path(fields, "manual_observation")
     if sensitive is not None:

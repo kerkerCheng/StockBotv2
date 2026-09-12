@@ -84,10 +84,12 @@ def main() -> int:
         # 只跑寫入端的驗證（JSON＋數值），不落庫。
         from engine_c.manual_observations import (
             _require_machine_comparable_if_mechanical as _check,
+            _require_pnl_sign_convention as _check_signs,
         )
 
         try:
             _check(args.field, args.value)
+            _check_signs(args.field, args.value)
         except ValueError as exc:
             print(f"✗ {exc}", file=sys.stderr)
             return 4
