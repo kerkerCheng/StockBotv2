@@ -7708,6 +7708,174 @@
       "result": "ok",
       "run_at": "2026-09-11T21:34:34.431200+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:31.860633+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:33.346367+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:33.996128+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:34.374209+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:36.253486+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:36.926566+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:37.596160+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:38.279409+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:38.811594+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:39.534324+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:40.250902+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:40.801771+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:41.497171+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:42.226757+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:42.935178+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:43.703256+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:44.521143+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:45.222942+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:45.766497+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:46.477159+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:47.204291+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:47.908755+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:48.628422+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:49.166508+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:49.986830+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:50.695422+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:51.411865+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-12T21:33:52.122190+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -7761,12 +7929,21 @@
       "lead_id": "lead_000275f922a2d61a09af0e0fe9047318",
       "published_at": "2026-09-09",
       "refs": {
+        "action_digest": "a21c82b15aad3a433764b5caafeaefbfd6b395e7cd2880bcdce1ae2ae7b1317c",
+        "focus_company_id": "co:newphotonics",
         "onboard_candidate_names": [
           "NewPhotonics"
-        ]
+        ],
+        "primary_url": "https://www.einpresswire.com/article/939190081/newphotonics-expands-near-package-optics-pic-series-with-laser-integrated-serviceable-high-density-6-4t-optical-engine",
+        "research_action_id": "ra_4d463622148a957ede6e56395959f469",
+        "trace_attempts_ref": "issuer_press_release_plus_official_solutions_and_ECOC_pages",
+        "trace_origin_entity": "NewPhotonics",
+        "trace_origin_linkage": "same_issuer_origin_count_1_no_independent_confirmation",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "weekly:cpo",
-      "status": "triaged_go",
+      "status": "action_prepared",
       "themes": {},
       "title": "NewPhotonics NPC50506：Open-CPX 6.4T socketed NPO 光引擎把 laser 整合進可維修封裝，Q3 樣品／Q4 reference design",
       "triage": {
@@ -17796,10 +17973,19 @@
       "refs": {
         "onboard_candidate_names": [
           "GIGALIGHT"
-        ]
+        ],
+        "parked_reason": "issuer-only_self-report_cannot_establish_industry-wide_mass-production_barrier_and_new_company_onboarding_lacks_independent_source_roster",
+        "primary_url": "https://www.gigalight.com/news-events/news-10808.html",
+        "research_outcome": "parked_until_independent_confirmation_no_graph_proposal",
+        "trace_attempts_ref": "issuer_original_obtained_no_independent_customer_OIF_or_manufacturing_confirmation_found",
+        "trace_next_trigger": "independent_customer_OIF_or_manufacturing_source_confirms_socket_or_flip-chip_mass-production_barrier",
+        "trace_origin_entity": "GIGALIGHT",
+        "trace_origin_linkage": "same_issuer_origin_count_1",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
       },
       "source": "weekly:cpo",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "GIGALIGHT socket-based 1.6T NPO：工程樣品可出貨，但 Flip-Chip 熱膨脹與 socket 壓合一致性仍是百萬級量產障礙",
       "triage": {
@@ -31917,6 +32103,30 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2076281362248769713"
     },
+    "lead_707950f195e11dc62aa6ca7c29724d48": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-12T21:33:34.354384+00:00",
+      "lead_id": "lead_707950f195e11dc62aa6ca7c29724d48",
+      "media": [],
+      "published_at": "2026-09-12T08:56:06.000Z",
+      "raw_text": "I think there’s a gap to fill… \n\nSince I believe retail deserves the same research and early thematic ideas that institutions access first.\n\nI feel like everyone understandably gravitates institutional as they grow.\n\nBut helping retail has always been my priority. And that hasn’t changed even as I grew to 1M followers.\n\nI’m excited to see what we can cook up together soon chat.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "I think there’s a gap to fill… Since I believe retail deserves the same research and early thematic ideas that institutions access first. I feel like everyone understandably gravitates institutional as they grow. But helping retail has always been my priority. And that hasn’t changed even as I grew to 1M followers. I’m excited to see what we can cook up together soon chat.",
+      "triage": {
+        "decided_at": "2026-09-12T21:35:39.481226+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "未提及任何已追蹤公司、技術、交易對手、具體事件或可逐字查核數字；內容只是作者將持續服務散戶的泛敘事，關聯性與可引用性兩個硬指標皆未通過。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2098697148103631117"
+    },
     "lead_70a564244c8beb93470c9853a36df18a": {
       "entities": {
         "company_ids": [
@@ -33568,9 +33778,9 @@
       "refs": {
         "parked_reason": "逐字是『Sources say Leopold bought options in $AMD, $BE, $CRWV, and $DRAM』——**匿名消息來源轉述的選擇權部位**，原文自己都沒有具名來源。這是 tier-4：連可追的對象都沒有。即使為真也只是他人部位，不是供應關係、不是客戶端承諾、不是需求錨（同 lead_b0daa999 的理由）。且推主自己加註『Little surprising since option IV across the board is quite high』——連轉述者都不確定。不追源、不入庫。",
         "source_routes_receipt": "ticker=AMD;適用=5條;已走=無;未走=local_library(rung1),sec_edgar(rung2),issuer_site(rung3),alternate_primary(rung4),authorized_syndication(rung5)；結果=park/lead_only_tier_4；未宣告已走路徑（自動蓋章）",
-        "trace_attempts_ref": "2026-09-12 research-drain：型別判定即止；匿名來源的選擇權傳聞沒有可核對的一手文件存在",
+        "trace_attempts_ref": "2026-09-13_daily：匿名來源選擇權傳聞無可追一手文件；原貼文本身已取得，終局豁免watch",
         "trace_requires_user": "false",
-        "trace_status": "lead_only_tier_4"
+        "trace_status": "original_obtained"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -34290,6 +34500,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2093760498072485919"
+    },
+    "lead_7cb59780201726dd08b887d11cef3dea": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-09-12T21:33:45.766278+00:00",
+      "lead_id": "lead_7cb59780201726dd08b887d11cef3dea",
+      "published_at": "2026-09-11",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-09-11 [013860]",
+      "triage": {
+        "decided_at": "2026-09-12T21:33:45.766416+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326013860/xslF345X06/ownership.xml"
     },
     "lead_7cbdb434089074c62db83a4858cddc11": {
       "entities": {
@@ -64864,8 +65100,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2098470900823916940",
-      "updated_at": "2026-09-11T21:34:18.236772+00:00",
+      "since_id": "2098697148103631117",
+      "updated_at": "2026-09-12T21:33:34.374195+00:00",
       "user_id": "1940360837547565056"
     }
   }

@@ -9712,6 +9712,19 @@
       "source": "manual",
       "title": "Coherent OCS ramp_execution：三份自報 3→4→3，提案保留 unknown",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T21:54:06.040528+00:00",
+      "graph_impact": "+3 節點、2 邊、1 claims｜來源：NewPhotonics（tier 2）",
+      "hint": "核准 exact graph delta；Decision handoff：co:newphotonics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 570,
+      "reason": null,
+      "ref_id": "ra_4d463622148a957ede6e56395959f469",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "NewPhotonics NPC50506：6.4T socketed NPO 的 integrated-laser counter-path",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -21225,6 +21238,6 @@
       "verb": "reassessed_closed"
     }
   ],
-  "next_n": 570,
+  "next_n": 571,
   "schema_version": "1"
 }
