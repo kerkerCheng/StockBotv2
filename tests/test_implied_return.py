@@ -167,6 +167,15 @@ def test_missing_price_is_missing() -> None:
     gbp = replace(PRICE, unit="GBp")
     result3 = _return(_valued(price=gbp), price=gbp)
     assert result3.status == "missing" and "incompatible_unit" in (result3.reason or "")
+    # 收緊 10（2026-09-13）：單位不相容這一格**知道自己是哪一種缺席**，必須明示，
+    # 不得落到 `DEFAULT_ABSENCE_KIND["missing"]` 的 `not_yet_recorded`（＝還沒做）。
+    # 實測 6680.HK（金力永磁）：fair value 是 CNY（法定財報幣別）、報價是 HKD，
+    # headline panel 曾因此顯示成「還沒做」——而它其實已經做完了，缺的是 FX 路徑。
+    assert result3.absence_kind == "inputs_incompatible", (
+        "單位不相容 ≠ 還沒做：每個輸入都有值，不相容的是它們的身分（L16：分類要跟著資料走）")
+    # ⚠ 但它**不是** settled：readiness 不因此變好，改的是理由不是結論。
+    from alpha.absence import SETTLED_ABSENCE_KINDS
+    assert result3.absence_kind not in SETTLED_ABSENCE_KINDS
     with pytest.raises(ContractViolation, match="missing != zero"):
         replace(result, price_return=0.0)
 

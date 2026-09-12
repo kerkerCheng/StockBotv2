@@ -203,7 +203,15 @@ def build_implied_return(
                                    else "upstream_unavailable"))
     unit_status, unit_why = units_comparable(valuation.currency, price.unit)
     if unit_status != "comparable":
-        return _stop(f"{unit_status}：{unit_why}")
+        # 這一格知道自己是哪一種缺席，所以**明示**——`DEFAULT_ABSENCE_KIND["missing"]` 是
+        # `not_yet_recorded`（＝還沒做），而單位不相容明明是「每個輸入都有值但身分不合」。
+        # 讓它落到預設值會把「方法上不能相減」講成「去研究」，那正是 L16 要防的
+        # 分類沒跟著資料走（`alpha/absence.py` 的 DEFAULT_ABSENCE_KIND 註解也這樣要求）。
+        # 2026-09-13 實測 6680.HK（金力永磁）：fair value 是 CNY（法定財報幣別）、報價是 HKD，
+        # headline panel 因此顯示成 `not_yet_recorded`——而它其實已經做完了，缺的是 FX 路徑。
+        # ⚠ `inputs_incompatible` 不在 SETTLED_ABSENCE_KINDS，所以 readiness 仍然 blocked：
+        # 改的是理由，不是結論。
+        return _stop(f"{unit_status}：{unit_why}", absence_kind="inputs_incompatible")
     if price.value <= 0:
         return _stop("現價非正，相對報酬無定義")
     if valuation.value_date_semantics == VALUE_DATE_UNSPECIFIED:
