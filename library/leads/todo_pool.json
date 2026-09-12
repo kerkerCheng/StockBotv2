@@ -9271,13 +9271,21 @@
     },
     {
       "added_at": "2026-09-11T08:16:16.859922+00:00",
+      "completion_authority": {
+        "action_digest": "8bf228caed136f6b2b040351ab24029e16de087afe3abb3c24e899c3e5031c6a",
+        "cohort_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+        "commit": "9937b847ee4defd9402e2b72946e63ac74d0f7ca",
+        "company_id": "co:micron_technology",
+        "verified_at": "2026-09-12T02:00:55.449155+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、3 claims｜來源：Micron Technology, Inc.（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:micron_technology。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 542,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ebcd479b6c6bf84b37c2f8f1b812d712;digest:8bf228caed136f6b2b040351ab24029e16de087afe3abb3c24e899c3e5031c6a;commit:9937b847ee4defd9402e2b72946e63ac74d0f7ca;cohort:dc_b05cc1360e4bdf2a238787c23e7b227d",
       "ref_id": "ra_ebcd479b6c6bf84b37c2f8f1b812d712",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T02:00:55.449155+00:00",
       "source": "research_action",
       "title": "補 Micron→HBM 邊的 substitutability：修掉我自己造成的不對稱",
       "type": "ra_admission"
@@ -20776,6 +20784,15 @@
       "receipt": "decision:pd_ac45867fe38766bfe46f48ddea9a4741",
       "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
       "type": "decision_review",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T02:00:55.449155+00:00",
+      "n": 542,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_ebcd479b6c6bf84b37c2f8f1b812d712;digest:8bf228caed136f6b2b040351ab24029e16de087afe3abb3c24e899c3e5031c6a;commit:9937b847ee4defd9402e2b72946e63ac74d0f7ca;cohort:dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "ref_id": "ra_ebcd479b6c6bf84b37c2f8f1b812d712",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],
