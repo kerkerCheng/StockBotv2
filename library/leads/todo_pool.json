@@ -9676,6 +9676,18 @@
       "source": "manual",
       "title": "CRWV（CoreWeave）：FY2026／FY2027 共識 EPS 皆為負、內部 FY2026 GAAP EPS −4.71——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T19:02:26.053976+00:00",
+      "hint": "go＝執行 `python -m alpha abstention AEVA --add library/private/alpha/abstention_proposals/AEVA_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪已把 AEVA 從只有兩格的 xbrl_backfill 補到完整——基期觀測 mo_15eceeed（FY2025 10-K ＋ 2026 Q1／Q2 10-Q 逐季損益、2026-06-30 資產負債表、2026-02-26 與 2026-08-05 兩份 8-K EX-99.1）、**六個 FY2026 driver 全部寫入**（revenue_growth 0.364567、營益率變化量拆成三條 component ＝ 毛利率 +0.381379／研發強度 +0.773155／其他營業費用強度 +0.276297、interest_and_other_net 43,031,000、tax_rate −0.001133、nci_attribution 0、diluted_shares 66,700,000）→ **內部 FY2026 GAAP EPS −2.7294**；ev_to_sales 估值假設（校準 29.6601x）、horizon、四軸判斷全部寫好。⚠ 內部 EPS 與共識 −1.534 差 78%，但**共識是 non-GAAP 口徑**（公司自報 Q2 GAAP −1.23 vs non-GAAP −0.41），系統會正確判成口徑不可比——**不要讀成本估更悲觀**。｜⚠⚠ 這一格的理由比「共識 EPS 是負的」更根本：**AEVA 的 GAAP EPS 在結構上是自家股價的函數**。認股權證負債由 2025-12-31 的 29,711 千美元增到 2026-06-30 的 73,961（+44,250），而 H1 2026 由「營業利益 − 稅前」導出的非營業費用是 44,817——兩者幾乎相等。股價漲 → 權證負債漲 → GAAP 認列損失；同一機制在 2025 年製造過單季 +157,749 的費用（Q2）與 −140,722 的收益（Q3）。所以即使 EPS 哪天轉正，以它為分母的倍數仍然會自己咬自己的尾巴。｜放行後會變什麼：P6 切換條件成立 → fair value 12.10、隱含報酬 −22.02%、readiness 由 blocked 變 ready。⚠ 那個 −22.02% 幾乎純粹是一個看法：營收差 −23.75% × 0.927（本檔是淨現金公司，資產負債表壓縮而不是放大分歧）。⚠⚠ 而那個營收差整個押在一件事上：**本估 FY2026 營收 24,670 千美元（H1 實績 12,398 ＋ H2 沿用 Q2）vs 公司 2026-02-26 指引 30,000–36,000（中值 33,000）與共識 32,355**。半年只做了中值的 37.6%，要達中值 H2 必須比 H1 高 66%，而 Q1 6,262 → Q2 6,136 是持平略降；而且那份指引在 Q1 與 Q2 兩份新聞稿裡都沒有書面重申。⚠ 若你確認法說會確實重申 30–36（本輪只找到二手轉錄，未取得一手逐字），revenue_growth 要 supersede，隱含報酬會由 −22.02% 變 +1.85%。｜⚠ 另外兩件與核准無關但要知道的事：①2026-08-05 公司宣布**進入光連結**，與大客戶簽 NPO（Near-Packaged Optics）聯合開發協議供某 hyperscaler，公司自述 2027 下半年初期部署、2028 量產——不在 FY2026 的數字裡，但它把 Aeva 放進了本圖的主軸；②CFO 已於 2026-09-05 離任，永久接任者未定。｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 567,
+      "reason": null,
+      "ref_id": "AEVA",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "AEVA（Aeva Technologies）：FY2026／FY2027 共識 EPS 皆為負，且 GAAP EPS 在結構上是自家股價的函數（權證負債重估）——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21189,6 +21201,6 @@
       "verb": "reassessed_closed"
     }
   ],
-  "next_n": 567,
+  "next_n": 568,
   "schema_version": "1"
 }
