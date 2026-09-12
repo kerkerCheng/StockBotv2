@@ -9587,6 +9587,18 @@
       "source": "manual",
       "title": "NOVT：催化劑軸已研究、結論是沒有可監看事件（唯一可能的重定價是那條 qualifying 邊轉 qualified，但無時點）——提案 Abstention（research / axis.catalyst）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T07:27:01.858132+00:00",
+      "hint": "go＝執行 `python -m alpha abstention 012330.KS --add library/private/alpha/abstention_proposals/012330.KS_research_catalyst.json`。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live。｜依據：本輪已把摩比斯的基期由零補到完整（mo_99137474，DART 사업보고서 rcpNo=20260309001878 的「2-2. 연결 손익계산서」與「35. 주당이익」逐字）、寫好六條 FY2026 假設與估值／horizon、四軸判斷也寫完，只有 catalyst 軸誠實回 unknown。逐類查過三種候選並排除：①FY2026 사업보고서只是基期滾動；②Boston Dynamics 那條 designed_in 邊**沒有金額、沒有時點、沒有里程碑**，公開文件也沒有機器人數字；③권익법이익的變化是本檔最大變數（佔稅前 27.4%、兩年掉 24%），但沒有獨立時點、方向未定，已寫成 disproof condition——那是它正確的位置，不是 catalyst。｜go 之後會變的數字：012330.KS 的 research panel `absence_kind` 由 `not_yet_recorded` 變 `deliberate_abstention`（settled）；readiness **仍然 blocked**（settled 不讓 readiness 變好），但段 5 的『到終局』會多一檔。｜⚠ 附帶一個 scope 問題（不含在本 go 裡，供你順手決定）：摩比斯對本圖的曝險只有一條沒有金額的邊，而 61.1 조원的營收幾乎全是汽車模組——**要不要把它移出段 5 工作集合**是你的決定，不是我自己刪。要移的話請直接說，我會在 ROADMAP 記下理由而不是靜默跳過。｜drop＝你認為該把那條邊的進度當成 catalyst 硬寫下去。",
+      "n": 560,
+      "reason": null,
+      "ref_id": "abstention_proposal:012330.KS_research_catalyst",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "012330.KS：催化劑軸已研究、結論是沒有可監看事件（Boston Dynamics 那條邊沒有金額也沒有時點）——提案 Abstention（research / axis.catalyst）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21046,6 +21058,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 560,
+  "next_n": 561,
   "schema_version": "1"
 }
