@@ -33,6 +33,30 @@ def _conn() -> sqlite3.Connection:
     return conn
 
 
+def _consensus_self_check(rows) -> None:
+    """`0y 的估計` 應該等於 `+1y 的 year_ago_actual`——它們講的是同一個會計年度。
+
+    對不上就代表**這兩列不是同一串數字**。2026-09-12 實測 CDNS：0y EPS 4.80568（13 位分析師）
+    是 GAAP、+1y EPS 9.54363（25 位）是 non-GAAP，兩列相除會得到「一年成長 +98.6%」——
+    **完全是口徑切換的假象，而沒有任何欄位會報錯**。全庫 144 組 0y 列裡有 3 組是這個形狀
+    （CDNS 的 eps 69.4%、6680.HK 的 eps 20.5% 與 revenue 5.0%）。
+
+    ⚠ 這裡只報告、不判定口徑：要知道是 GAAP 還是 non-GAAP，得拿 `year_ago_actual` 去對
+    一手財報（`alpha.fundamental.compare.verify_consensus_basis` 做的就是那件事）。
+    """
+    by = {(r["metric"], r["relative_label"]): r for r in rows}
+    for metric in sorted({r["metric"] for r in rows}):
+        cur, nxt = by.get((metric, "0y")), by.get((metric, "+1y"))
+        if not cur or not nxt or cur["estimate_avg"] in (None, 0) or nxt["year_ago_actual"] is None:
+            continue
+        drift = abs(float(nxt["year_ago_actual"]) / float(cur["estimate_avg"]) - 1)
+        if drift > 0.02:
+            print(f"   ⚠⚠ {metric}：0y 估計 {cur['estimate_avg']}（{cur['analyst_count']} 位）"
+                  f" vs +1y 的 year_ago_actual {nxt['year_ago_actual']}（{nxt['analyst_count']} 位）"
+                  f" 差 {drift * 100:.1f}% —— **這兩列很可能不是同一串數字（口徑或樣本不同）**。"
+                  f"不得相除當成成長率；先拿 year_ago_actual 去對一手財報確認口徑。")
+
+
 def probe(ticker: str) -> None:
     art = ARTIFACTS / f"{ticker}.json"
     if art.exists():
@@ -55,6 +79,7 @@ def probe(ticker: str) -> None:
         print("  ", dict(row))
     if not rows:
         print("   （無共識——沒有同期 EPS 共識的檔走不了本益比法）")
+    _consensus_self_check(rows)
 
     print("\n## 行情快照")
     row = conn.execute(
