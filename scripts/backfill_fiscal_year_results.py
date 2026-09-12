@@ -90,6 +90,7 @@ def main() -> int:
     from fetchers.edgar_xbrl import (
         XbrlUnavailable,
         build_fiscal_year_results,
+        companyfacts_lag,
         fetch_companyfacts,
     )
 
@@ -117,6 +118,7 @@ def main() -> int:
 
     outcomes: Counter[str] = Counter()
     refused: list[tuple[str, str]] = []
+    stale: list[tuple[str, str]] = []
     written: list[tuple[str, str, float]] = []
 
     mode = "寫入" if args.write else "dry-run"
@@ -138,6 +140,14 @@ def main() -> int:
             outcomes["unavailable"] += 1
             print(f"- {ticker}：✗ {exc}")
             continue
+        _, _, lag_warning = companyfacts_lag(cik, facts)
+        if lag_warning:
+            # ⚠ 自己一種結局，**不併進 skipped_current**：那一格的意思是「沒有新事實」，
+            # 而這裡的意思是「來源看不到新事實」——兩者同形正是 L13-2 說的那種
+            # 成功與失敗共用一個訊號。不中止，但要讓它出現在結局分佈裡。
+            outcomes["stale_source"] += 1
+            stale.append((ticker, lag_warning))
+            print(f"- {ticker}：⚠ {lag_warning}")
         payload, source_ref, reason = build_fiscal_year_results(ticker, facts)
         if payload is None:
             outcomes["refused"] += 1
@@ -172,9 +182,16 @@ def main() -> int:
         print(f"- {ticker}：✓ {observation_id} FY{as_of}")
 
     print(f"\n## 結局分佈（每一檔都有具名結局，沒有靜默跳過）")
-    for key in ("written", "would_write", "skipped_current", "no_cik", "unavailable", "refused"):
+    for key in ("written", "would_write", "skipped_current", "no_cik", "unavailable", "refused",
+                "stale_source"):
         if outcomes[key]:
             print(f"- {key}：{outcomes[key]}")
+    if stale:
+        # ⚠ 它與上面那些**不互斥**：一檔可以同時 stale_source 與 skipped_current，
+        # 而那正是最危險的組合——「跳過」看起來像沒事，實際是來源看不到新東西。
+        print("\n## 來源過期明細（companyfacts 落後 EDGAR；不是「公司沒有新財報」）")
+        for ticker, reason in stale:
+            print(f"- {ticker}：{reason}")
     if refused:
         print("\n## 拒寫明細（留 null 並列出來，不猜、不補 0）")
         for ticker, reason in refused:

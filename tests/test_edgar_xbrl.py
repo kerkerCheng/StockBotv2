@@ -203,3 +203,55 @@ def test_unavailable_is_an_error_not_an_empty_result() -> None:
     assert issubclass(x.XbrlUnavailable, RuntimeError)
     with pytest.raises(x.XbrlUnavailable):
         x.fetch_companyfacts(9999999999, timeout=5.0, retries=0)
+
+
+# ---------------------------------------------------------------------------
+# 收緊 9：companyfacts 可能落後 EDGAR，而落後時取到的資料**完全合法**
+# ---------------------------------------------------------------------------
+
+
+def test_latest_filed_reads_the_newest_filing_date_across_namespaces() -> None:
+    facts = _facts(**{
+        "us-gaap": {"Revenues": {"USD": [_entry("2025-01-01", "2025-12-31", 1.0, filed="2026-02-01")]}},
+        "ifrs-full": {"Revenue": {"USD": [_entry("2025-01-01", "2025-12-31", 1.0, filed="2026-05-01")]}},
+    })
+    assert x.latest_filed(facts) == date(2026, 5, 1)
+
+
+def test_latest_filed_on_empty_facts_is_none_not_today() -> None:
+    assert x.latest_filed({"facts": {}}) is None
+
+
+def test_companyfacts_lag_warns_when_edgar_has_a_newer_periodic_report(monkeypatch) -> None:
+    """實測形狀（2026-09-12，CIK 813672）：快照停在 2026-05-01，EDGAR 已有 2026-07-29 的 10-Q。
+
+    少掉的那一季**不會讓任何欄位報錯**——這正是它要被做成一個會自己出現的警語的理由。
+    """
+    facts = _facts(**{"us-gaap": {"Revenues": {"USD": [
+        _entry("2025-01-01", "2025-12-31", 1.0, filed="2026-05-01")]}}})
+    monkeypatch.setattr("fetchers.edgar.get_filings",
+                        lambda cik, forms, n: [{"filed_date": "2026-07-29", "form_type": "10-Q"}])
+    snapshot, newest, warning = x.companyfacts_lag(813672, facts)
+    assert (snapshot, newest) == (date(2026, 5, 1), date(2026, 7, 29))
+    assert warning is not None and "89" in warning
+
+
+def test_companyfacts_lag_is_quiet_when_in_sync(monkeypatch) -> None:
+    facts = _facts(**{"us-gaap": {"Revenues": {"USD": [
+        _entry("2025-01-01", "2025-12-31", 1.0, filed="2026-07-31")]}}})
+    monkeypatch.setattr("fetchers.edgar.get_filings",
+                        lambda cik, forms, n: [{"filed_date": "2026-07-31", "form_type": "10-Q"}])
+    assert x.companyfacts_lag(320193, facts)[2] is None
+
+
+def test_companyfacts_lag_does_not_fabricate_a_warning_when_edgar_is_unreachable(monkeypatch) -> None:
+    """「對照不到」與「沒問題」不得同形，但也不得冒充成警告——這裡選擇不下判斷。"""
+    facts = _facts(**{"us-gaap": {"Revenues": {"USD": [
+        _entry("2025-01-01", "2025-12-31", 1.0, filed="2026-05-01")]}}})
+
+    def _boom(*_args, **_kwargs):
+        raise RuntimeError("network down")
+
+    monkeypatch.setattr("fetchers.edgar.get_filings", _boom)
+    snapshot, newest, warning = x.companyfacts_lag(813672, facts)
+    assert snapshot == date(2026, 5, 1) and newest is None and warning is None

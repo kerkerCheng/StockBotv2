@@ -88,13 +88,19 @@ def probe(ticker: str) -> None:
 
 def probe_xbrl(ticker: str) -> None:
     from fetchers.edgar import get_cik
-    from fetchers.edgar_xbrl import fetch_companyfacts
+    from fetchers.edgar_xbrl import companyfacts_lag, fetch_companyfacts
 
     cik = get_cik(ticker)
     if not cik:
         print(f"\n## XBRL：{ticker} 在 SEC ticker 對照表查不到 CIK（非美股或未登記）")
         return
     facts = fetch_companyfacts(cik)
+    snapshot, newest, warning = companyfacts_lag(cik, facts)
+    if warning:
+        print(f"\n⚠⚠ {warning}")
+        print("   → 少掉的那幾期要改用 10-Q／8-K EX-99.1 逐字取，不要以為 XBRL 就是全部。")
+    else:
+        print(f"\n## companyfacts 新鮮度：快照 {snapshot}／EDGAR 最新定期報告 {newest}——一致")
     us = (facts.get("facts") or {}).get("us-gaap") or {}
     tags = ("RevenueFromContractWithCustomerExcludingAssessedTax", "Revenues", "GrossProfit",
             "OperatingIncomeLoss", "NonoperatingIncomeExpense",

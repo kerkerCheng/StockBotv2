@@ -152,6 +152,59 @@ def fetch_companyfacts(cik: str | int, *, timeout: float = 30.0, retries: int = 
     raise XbrlUnavailable(f"companyfacts 取不到（CIK {cik}）：{type(last).__name__}: {last}")
 
 
+def latest_filed(facts: Mapping[str, Any]) -> date | None:
+    """companyfacts 這一份快照裡**最新的申報日**。
+
+    ## 為什麼需要它
+
+    companyfacts 不保證與 EDGAR 的 submissions index 同步。2026-09-12 實測：
+    CIK 813672（Cadence）的 companyfacts 最新申報日停在 **2025-05-01**，而
+    submissions 顯示 Q2 2026 的 10-Q 早在 **2026-07-29** 就已申報——差四個月，
+    **而且取到的資料完全合法、沒有任何欄位會報錯**（L17：不會壞、不會報錯、
+    測試不會紅，只會安靜地偏）。呼叫端若照常拿它去建「目標年度已報導的部分」，
+    會少掉整整一季而不自知。
+
+    這支只回答「這份快照看到哪一天」；**要不要當成過期是呼叫端的事**——因為
+    「最新申報日」本身不是缺陷，只有與 submissions index 對照之後才是
+    （L16：分類要跟著資料走到需要它的地方，不是在每個消費端各猜一份）。
+    """
+    newest: date | None = None
+    for namespace in (facts.get("facts") or {}).values():
+        for entry in namespace.values():
+            for items in (entry.get("units") or {}).values():
+                for item in items:
+                    filed = _as_date(item.get("filed"))
+                    if filed is not None and (newest is None or filed > newest):
+                        newest = filed
+    return newest
+
+
+def companyfacts_lag(cik: str | int, facts: Mapping[str, Any]) -> tuple[date | None, date | None, str | None]:
+    """把 companyfacts 的最新申報日與 EDGAR submissions 的最新 10-K／10-Q 對照。
+
+    回傳 `(companyfacts 最新申報日, submissions 最新定期報告申報日, 警語或 None)`。
+    **警語不是例外**：呼叫端要決定跳過、改用別的來源、還是照用並在 rationale 寫明。
+
+    ⚠ 這一支存在的理由是「偵測與消費要在同一個 change 裡」（L17-3③）：
+    `latest_filed` 只說快照看到哪天，單獨看不出異常；只有與 submissions 對照
+    才知道少了東西。2026-09-12 實測 CIK 813672（Cadence）差 **89 天**。
+    """
+    snapshot = latest_filed(facts)
+    try:
+        from .edgar import get_filings          # 區域匯入：避免模組載入期的循環相依
+        filings = get_filings(str(int(cik)).zfill(10), ["10-K", "10-Q"], 4)
+    except Exception:                            # noqa: BLE001
+        return snapshot, None, None              # 對照不到就不下判斷（「查不到」≠「沒問題」，但也不冒充警告）
+    filed = [d for d in (_as_date(f.get("filed_date")) for f in filings) if d is not None]
+    newest = max(filed) if filed else None
+    if snapshot is None or newest is None or newest <= snapshot:
+        return snapshot, newest, None
+    return snapshot, newest, (
+        f"companyfacts 落後 {(newest - snapshot).days} 天："
+        f"快照最新申報日 {snapshot.isoformat()}，但 EDGAR 已有 {newest.isoformat()} 的定期報告。"
+        "取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。")
+
+
 def _as_date(text: Any) -> date | None:
     try:
         return date.fromisoformat(str(text)[:10])
