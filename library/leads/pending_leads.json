@@ -33493,9 +33493,15 @@
       ],
       "published_at": "2026-09-11T15:16:06.000Z",
       "raw_text": "Looks like Situational Awareness is back:\n\nSources say Leopold bought options in $AMD, $BE, $CRWV, and $DRAM.\n\nAnd was active in other stocks such as $SKHY, and $SNDK.\n\nLittle surprising since option IV across the board is quite high. https://t.co/P2Pg5szbvO",
-      "refs": {},
+      "refs": {
+        "parked_reason": "逐字是『Sources say Leopold bought options in $AMD, $BE, $CRWV, and $DRAM』——**匿名消息來源轉述的選擇權部位**，原文自己都沒有具名來源。這是 tier-4：連可追的對象都沒有。即使為真也只是他人部位，不是供應關係、不是客戶端承諾、不是需求錨（同 lead_b0daa999 的理由）。且推主自己加註『Little surprising since option IV across the board is quite high』——連轉述者都不確定。不追源、不入庫。",
+        "source_routes_receipt": "ticker=AMD;適用=5條;已走=無;未走=local_library(rung1),sec_edgar(rung2),issuer_site(rung3),alternate_primary(rung4),authorized_syndication(rung5)；結果=park/lead_only_tier_4；未宣告已走路徑（自動蓋章）",
+        "trace_attempts_ref": "2026-09-12 research-drain：型別判定即止；匿名來源的選擇權傳聞沒有可核對的一手文件存在",
+        "trace_requires_user": "false",
+        "trace_status": "lead_only_tier_4"
+      },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Looks like Situational Awareness is back: Sources say Leopold bought options in $AMD, $BE, $CRWV, and $DRAM. And was active in other stocks such as $SKHY, and $SNDK. Little surprising since option IV across the board is quite high. https://t.co/P2Pg5szbvO",
       "triage": {
@@ -46464,8 +46470,8 @@
       "raw_text": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th:\n\n1. $SNDK - $5.674B \n2. $MU - $5.574B \n3. $BE -  $1.899B\n4. $TSM - $1.265B\n5. $NBIS - $1.232B\n6. $CRWV - $744.5M\n7. $CORZ - $665.6M\n8. $STM - $584.3M (new)\n9. $APLD - $469.0M\n10. $RIOT - $468.2M\n11. $SHAZ - $456.8M\n12. $IREN - $433.3M\n\nLess material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. \n\nSeems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030.  \n\nAs well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. \n\nSome of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes).\n\nWith core winners of everything such as $TSM (but less high-beta). \n\nThis looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap).  \n\nBut always cool to see what others are doing.",
       "refs": {
         "outcome": "倉位/情緒類(L4 市場認知,不進圖):Situational Awareness Q2 13F 記憶體重倉(SNDK/MU 前二,合計逾 11B 級)+BE/TSM/NBIS/CRWV;貼文金額本輪未對上 EDGAR(fund 實體名搜尋未命中),數字視為未驗證轉述;對 SNDK/MU 的擁擠度脈絡已記錄",
-        "parked_reason": "部位／情緒訊號，結構上不產生 graph delta——內部人交易與 13F 持股反映的是別人怎麼想，不是世界怎麼運作（本圖的 A1 只裝結構與證據）。13F-HR 與 Form 4 都是隨時可核的一手，因此不需要預先追源：真正需要擁擠度證據時（例如某 decision 要判斷市場擁擠度）再以 EDGAR 原檔核對即可。⚠ 另依 AGENTS.md，市場擁擠度屬時變觀測，且位置類指標不得參與排序或尺寸。",
-        "trace_attempts_ref": "2026-09-09 research-drain：判定為 sentiment/positioning 類，依規則不追源",
+        "parked_reason": "內容是某基金 2026Q2 13F 持股清單＋推主自己的組合對照。它**在結構上不可能產生瓶頸證據**：13F 說的是誰持有什麼，不是誰供應什麼、誰換不掉誰。依 A1（圖不含時變數字）持股與部位本來就不入圖；依 AGENTS.md 的已知失焦指標一節，『別人也買了』既不是需求錨也不是客戶端資本承諾。唯一可能有研究價值的句子是『$STM MCU 價格調漲』與『Taiyo Yuden MLCC』——但兩者都是推主的轉述，且都不在本圖的需求錨（AI capex／人形放量）上，要查也該由該公司自己的一手揭露起頭，不是由這則轉述起頭。trace_status=not_pursued 是終局：不是追不到，是**不值得追**。",
+        "trace_attempts_ref": "2026-09-12 research-drain：只做型別判定，未對 13F 原件追源（見 parked_reason 的理由）",
         "trace_next_trigger": "某個 decision 明確需要擁擠度或內部人訊號作為輸入時，以 EDGAR 13F-HR／Form 4 原檔核對——在那之前不投預算",
         "trace_requeue_trigger": "related_triaged_lead:lead_78c2a9a1bf04ad6abd7d0b786056e2b1",
         "trace_requeued_at": "2026-09-11T21:36:47.654045+00:00",
@@ -46503,7 +46509,7 @@
         "trace_trigger_watch_ref": "ew_0072_2026-09-03"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {},
       "title": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th: 1. $SNDK - $5.674B 2. $MU - $5.574B 3. $BE - $1.899B 4. $TSM - $1.265B 5. $NBIS - $1.232B 6. $CRWV - $744.5M 7. $CORZ - $665.6M 8. $STM - $584.3M (new) 9. $APLD - $469.0M 10. $RIOT - $468.2M 11. $SHAZ - $456.8M 12. $IREN - $433.3M Less material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. Seems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030. As well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. Some of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes). With core winners of everything such as $TSM (but less high-beta). This looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap). But always cool to see what others are doing.",
       "triage": {
@@ -58830,13 +58836,15 @@
       "raw_text": "Special thank you to awodias for the crowdsourced channel check all the way from CIOE 2026 Shenzhen!\n\n- Confirmed that $SIVE is actively engaged with Chinese pluggable makers\n\n- $SIVE has raised lasers prices given tight supply\n\n- 70mW lasers seem the most tight given association with 800g pluggables\n\nIt’s pretty cool that our little community reaches all the way around the world.\n\n(Also thank you if other people did channel checks and I missed it, this was the first one I saw)",
       "refs": {
         "gap": "Sivers 已漲價、與中國 pluggable makers 積極接洽、70mW 最緊三個核心 atom 仍只有社群 channel check",
-        "parked_reason": "可核驗部分已由既有 Sivers Q2 extraction 涵蓋；核心 channel check 仍未取得公司或客戶端原文，維持 partial。",
+        "parked_reason": "三個核心 atom（Sivers 已調漲雷射價格／與中國 pluggable makers 積極接洽／70mW 相對最緊）全部只有一則轉述社群 channel check 支撐，公司端與客戶端都無對應原文。2026-09-12 CIOE 結束後再查一次仍無新一手：公司 newsroom 為動態載入頁（WebFetch 讀不到內容，屬 access 限制不是 no_result），web search 只帶回 2026-09-03 的 Glasgow 產能擴充新聞稿，而那份**已經在庫**（extractions/sivers_glasgow_capacity_2026_09_03.json），不是新證據。價格與具名中國客戶這兩個 atom 在結構上不會出現在公司新聞稿裡——需要 ASP／價格調整揭露或客戶端具名才問得到答案（L11-5：先確認文件在結構上會不會包含答案）。",
         "primary_url": "https://www.sivers-semiconductors.com/2026/08/27/vickram-vathulyas-brev-till-aktieagarna-delarsrapport-q2-2026/",
         "research_outcome": "官方資料支持 Sivers 參展、pluggable engagement 與整體 CW laser 緊缺，但不支持調價／中國客戶／70mW 相對最緊；既有 Q2 extraction 已涵蓋可核驗部分，無新 RA。",
-        "trace_attempts_ref": "2026-09-10：查 Sivers CIOE／新聞稿與 Q2 原文；官方活動頁證實 9/9–9/11 參展，Q2 原文證實 pluggable 客戶取樣、70/100mW 對話與 CW laser 供應非常有限；未找到價格上調或中國客戶具名",
-        "trace_next_trigger": "Sivers、具名中國 pluggable 客戶或 CIOE 公開資料披露 laser ASP／價格調整、客戶 qualification，或按功率拆分的供需狀況",
+        "source_routes_receipt": "ticker=SIVE;適用=5條;已走=無;未走=local_library(rung1),sec_edgar(rung2),issuer_site(rung3),alternate_primary(rung4),authorized_syndication(rung5)；結果=park/partial；未宣告已走路徑（自動蓋章）",
+        "trace_attempts_ref": "2026-09-10：Sivers CIOE 活動頁＋Q2 原文（證實 9/9-9/11 參展、pluggable 客戶取樣、70/100mW 對話、CW laser 供應非常有限；未找到調價或中國客戶具名）｜2026-09-12：sivers-semiconductors.com/news/ WebFetch（動態載入，無內容）＋web search『Sivers CIOE 2026 laser price increase 70mW』（只帶回已入庫的 Glasgow 擴產 PR 與 semiconductor-today 2026-09-03 同一則）",
+        "trace_next_trigger": "Sivers 財報／新聞稿首次揭露雷射 ASP 或價格調整；或任一具名中國 pluggable 客戶（客戶端文件）；或按功率（70mW／100mW）拆分的供需揭露。三者任一出現即排回 pq1。",
         "trace_requeue_trigger": "related_triaged_lead:lead_0d2aef4d40bce116bc0d13a869fe2dcc",
         "trace_requeued_at": "2026-09-11T21:36:46.311449+00:00",
+        "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
           "SIVE",
@@ -58847,7 +58855,7 @@
         "trace_trigger_watch_ref": "ew_0085_2026-09-09"
       },
       "source": "x:aleabitoreddit",
-      "status": "triaged_go",
+      "status": "parked",
       "themes": {
         "sivers": {
           "counter_only": false,
