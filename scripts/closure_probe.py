@@ -57,6 +57,25 @@ def _consensus_self_check(rows) -> None:
                   f"不得相除當成成長率；先拿 year_ago_actual 去對一手財報確認口徑。")
 
 
+def _snapshot_self_check(snap) -> None:
+    """營益率不可能大於毛利率——營業費用不會是負的。
+
+    2026-09-12 實測：73 份行情快照有 **3 份**違反（MU 80.37% vs 72.57%、SNDK 78.47% vs 71.47%、
+    000660.KS 76.33% vs 76.27%），**三家全是記憶體廠**。以 SNDK 對一手 10-K 核過：
+    毛利率 71.47% 正確（14,472 ÷ 20,248），但營益率應為 **61.19%**（12,389 ÷ 20,248），
+    provider 給的 78.47% 錯了 17 個百分點。
+
+    ⚠ 它不進橋（橋用的是 Engine C 的人工觀測），但它**進 research packet 的 deterministic 區塊**，
+    也就是 session 在寫四軸判斷前會讀到的那一份。判斷裡若引用了它，錯誤就落進 append-only 的判斷檔。
+    """
+    gross, operating = snap.get("gross_margin"), snap.get("operating_margin")
+    if gross is None or operating is None or operating <= gross:
+        return
+    print(f"   ⚠⚠ 營益率 {operating:.2%} **大於**毛利率 {gross:.2%}——營業費用不會是負的，"
+          "provider 這兩格至少有一格是錯的。寫判斷前先用 10-K／10-Q 的營業利益 ÷ 營收自己算一次；"
+          "**不要引用快照的 operating_margin**。")
+
+
 def probe(ticker: str) -> None:
     art = ARTIFACTS / f"{ticker}.json"
     if art.exists():
@@ -91,6 +110,7 @@ def probe(ticker: str) -> None:
         keep = ("bar_date", "price", "price_kind", "currency", "market_cap", "shares_outstanding",
                 "gross_margin", "operating_margin", "revenue_ttm", "trailing_pe", "forward_pe")
         print("  ", {k: snap[k] for k in keep if k in snap})
+        _snapshot_self_check(snap)
 
     print("\n## Engine C 人工觀測")
     for row in conn.execute(
