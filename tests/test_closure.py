@@ -455,3 +455,94 @@ def test_noise_floor_still_wins_over_the_drift_bucket() -> None:
 
     assert [t for t, *_ in score.multiple_in_noise] == ["TSM"]
     assert score.multiple_drifted == ()
+
+
+# ── 第三種終局：awaiting_report（目標期間已結束、財報未公布） ────────────────
+#
+# 事發（2026-09-12 research-drain 實測）：MU 與 6594.T 寫不出 horizon——
+# `HorizonAssumption` 要求 horizon_end 在未來（INV-2），而共識的 `0y` 在財報公布前
+# 會一直指向**已經結束**的那一年。兩邊各自都對，是一個標籤承載兩種語意（L12）。
+# 先前的處置是每輪手打 `--skip`，也就是把一個機械可判的事實交給人記得。
+
+
+def test_awaiting_report_is_a_terminal_but_only_when_not_already_ready() -> None:
+    ended = "2026-08-28"
+    assert _row("MU", awaiting_report_since=ended).terminal == "awaiting_report"
+    # ready 與 settled 優先：等財報不得把一檔已經做完的降級
+    assert _row("A", readiness="ready", open_panels=(), awaiting_report_since=ended).terminal == "ready"
+    assert _row("B", open_panels=(), settled=("headline",),
+                awaiting_report_since=ended).terminal == "settled"
+
+
+def test_reading_nothing_is_not_a_terminal() -> None:
+    # 讀不到共識時 provider 留 None——寧可多排一檔，也不把「讀不到」靜默算成終局（INV-3）。
+    assert _row("X", awaiting_report_since=None).terminal is None
+    assert _row("Y", awaiting_report_since="").terminal is None
+
+
+def test_awaiting_report_leaves_the_queue_and_the_open_profile() -> None:
+    rows = [_row("MU", awaiting_report_since="2026-08-28"), _row("LRCX")]
+    assert [r.ticker for r in closure.rank_backlog(rows)] == ["LRCX"]
+    assert closure.open_profile(rows)["open_count"] == 1
+    gate = closure.closure_gate(rows)
+    assert gate.actionable == ("LRCX",)
+    # **不需要 --skip**：這正是本次修法要拿掉的那個人工動作
+    assert gate.skipped == ()
+
+
+def test_the_exit_exists_rolling_the_period_forward_puts_it_back_in_the_queue() -> None:
+    """出口寫在判定本身裡：財報公布 → 共識 0y 往前滾 → provider 算出未來期末 → 旗標消失。
+
+    這一條守的是 operational profile #8「只有入口沒有出口」——`settled` 是永久的，
+    本狀態不是，所以必須有一條測試證明它會自己回到佇列裡。
+    """
+    before = _row("MU", awaiting_report_since="2026-08-28")
+    after = _row("MU", awaiting_report_since=None)     # 期末滾到未來後 provider 給 None
+    assert before.terminal == "awaiting_report"
+    assert after.terminal is None
+    assert closure.closure_gate([after]).actionable == ("MU",)
+
+
+def test_summary_counts_the_three_terminals_separately() -> None:
+    rows = [_row("A", readiness="ready", open_panels=()),
+            _row("B", open_panels=(), settled=("headline",)),
+            _row("MU", awaiting_report_since="2026-08-28"),
+            _row("C")]
+    summary = closure.summarize(rows)
+    assert summary["ready"] == ["A"] and summary["settled"] == ["B"]
+    assert summary["awaiting_report"] == ["MU"]
+    assert summary["terminal_count"] == 3 and summary["open_count"] == 1
+    # 「等財報」不得被混進 ready 讀——render 必須把它單獨寫出來
+    line = closure.render_summary(summary)
+    assert "等財報 1" in line and "ready 1" in line
+
+
+def test_render_awaiting_report_prints_days_elapsed_not_a_threshold() -> None:
+    from datetime import date
+
+    summary = {"awaiting_report_detail": {"MU": "2026-08-28", "6594.T": "2026-03-31"}}
+    lines = closure.render_awaiting_report(summary, today=date(2026, 9, 12))
+    joined = "｜".join(lines)
+    # 165 天（申報延期）與 15 天（正常空窗）必須分得出來——**用天數，不用會誤報的閾值**
+    assert "已過 15 天" in joined and "已過 165 天" in joined
+    assert "逾期" not in joined and "異常" not in joined
+
+
+def test_render_awaiting_report_is_empty_when_nothing_is_waiting() -> None:
+    assert closure.render_awaiting_report({"awaiting_report_detail": {}}) == []
+
+
+def test_target_period_ends_takes_the_latest_snapshot_only() -> None:
+    class _Conn:
+        def execute(self, _sql):
+            return self
+
+        def fetchall(self):
+            return [
+                ("MU", "2026-09-11", "0y", "2026-08-28"),
+                ("MU", "2026-09-12", "0y", "2026-08-28"),
+                ("LRCX", "2026-09-12", "0y", "2027-06-28"),
+            ]
+
+    out = closure._target_period_ends(["MU", "LRCX", "NOPE"], _Conn())
+    assert out == {"MU": "2026-08-28", "LRCX": "2027-06-28", "NOPE": None}

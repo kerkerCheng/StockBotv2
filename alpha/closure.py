@@ -14,7 +14,13 @@
 |---|---|
 | `ready` | readiness 是 `ready`／`ready_with_flags` |
 | `settled` | readiness `blocked`，但每一個 blocker 都 `settled=true`（刻意不主張／方法不適用／能力不存在）——這是誠實的答案，不是失敗 |
-| （未到終局） | 至少一個 blocker 未 settled |
+| `awaiting_report` | 建模目標期間（共識 `0y`）**已經結束但財報還沒公布**——這一段期間裡這一檔在結構上服務不了（2026-09-12 補） |
+| （未到終局） | 至少一個 blocker 未 settled，且目標期間尚未結束 |
+
+⚠ **`awaiting_report` 與 `settled` 的差別是出口，不是嚴格程度。** `settled` 是「這已經是答案，
+不用動作」；`awaiting_report` 是「現在沒有人能動，但它會自己解開」——財報公布並被記成基期觀測後，
+共識的 `0y` 往前滾，旗標自動消失。**所以它不需要另外的到期日，出口寫在判定本身裡**（INV-2）。
+它也不是放寬：那幾檔的 readiness 一格都沒變好，變的只有「gate 要不要每輪再問你一次」。
 
 ⚠ 「掛在 pq2 編號上」在 v1 只**計數**不算終局：artifact 不帶 pq2 連結，要硬推會變成第二份對照表。
 
@@ -34,6 +40,8 @@
 不寫任何 authority、不重算任何判讀、不呼叫 LLM；讀不到某個來源就把那一欄留 `None` 並在 notes 說明，不補 0。
 """
 from __future__ import annotations
+
+from datetime import date
 
 from dataclasses import dataclass, field
 from typing import Any, Iterable, Mapping, Sequence
@@ -67,14 +75,36 @@ class BacklogRow:
     #: 這一檔在 pq2 有未結案且被使用者明示 defer 的項目。
     #: **它不是啟發法，是使用者的一句話**，所以排在四條研究判準之前。
     user_deferred: bool = False
+    #: 建模目標期間**已經結束、但財報還沒公布**時，這裡是那個期間的期末日（ISO）。
+    #: `None` ＝不在這個狀態（期末在未來，或讀不到共識）。
+    #: ⚠ 判定用到「今天」，所以它由 provider 算好帶進來——`alpha/closure.py` 保持無時鐘。
+    awaiting_report_since: str | None = None
     generated_at: str | None = None
 
     @property
     def terminal(self) -> str | None:
+        """三種終局，不是兩種。
+
+        `awaiting_report` 是 2026-09-12 補的第三種：目標期間（＝基期後一個會計年度，
+        也就是共識的 `0y`）**已經結束但財報還沒公布**。這一段期間裡這一檔在結構上就是
+        服務不了的——`HorizonAssumption` 契約要求 `horizon_end > created_at`（INV-2：
+        寫下時就已經過去的等待不是判斷），而目標期末已經在過去。
+
+        ⚠ 兩邊各自都對，錯的是把兩件事壓在同一個表示上：共識的 `0y` 標籤在財報公布前
+        會一直指向已結束的那一年（provider 的慣例），而 horizon 要求未來（契約）。
+        L12 的處方是**先分開再各自定規則**，不是放寬其中一邊——放寬 horizon 等於憑空
+        編一個期末，改用 `+1y` 當目標則會讓基期與目標之間跳過一個未公布年度。
+
+        ⚠ 它與 `settled` 的差別是**出口**：`settled` 是「這已經是答案」，本狀態是
+        「現在沒人能動，但它會自己解開」——財報公布並被記成基期觀測之後，`0y` 往前滾，
+        這個旗標就自動消失。所以它不需要另外的到期日；出口寫在判定本身裡。
+        """
         if self.readiness in READY_STATES:
             return "ready"
         if not self.open_panels and self.settled_panels:
             return "settled"
+        if self.awaiting_report_since:
+            return "awaiting_report"
         return None
 
 
@@ -150,6 +180,7 @@ def explain_pick(row: BacklogRow, ready_sectors: frozenset[str]) -> str:
 def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
     ready = [r for r in rows if r.terminal == "ready"]
     settled = [r for r in rows if r.terminal == "settled"]
+    awaiting = [r for r in rows if r.terminal == "awaiting_report"]
     ready_sectors = sectors_with_ready(rows)
     all_sectors = {r.sector for r in rows if r.sector}
     ranked = rank_backlog(rows)
@@ -158,7 +189,10 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
         "total": len(rows),
         "ready": sorted(r.ticker for r in ready),
         "settled": sorted(r.ticker for r in settled),
-        "terminal_count": len(ready) + len(settled),
+        "awaiting_report": sorted(r.ticker for r in awaiting),
+        "awaiting_report_detail": {r.ticker: r.awaiting_report_since for r in
+                                   sorted(awaiting, key=lambda x: x.ticker)},
+        "terminal_count": len(ready) + len(settled) + len(awaiting),
         "open_count": len(ranked),
         "sectors_with_ready": sorted(ready_sectors),
         "sectors_seen": sorted(all_sectors),
@@ -221,10 +255,37 @@ def render_open_profile(profile: Mapping[str, Any]) -> list[str]:
     return out
 
 
+def render_awaiting_report(summary: Mapping[str, Any], *, today: date | None = None) -> list[str]:
+    """等財報那幾檔：逐檔印目標期末與**已經過了幾天**。
+
+    ⚠ 刻意不設「逾期幾天算異常」的門檻——那會是一個憑空的數字（L14）。印出天數讓讀的人
+    自己判斷：正常的申報空窗是三到七週，而 6594.T 這種申報延期案會一路長出去，
+    那個差別在天數上一眼就看得出來，不需要一個會誤報的閾值。
+    """
+    detail = dict(summary.get("awaiting_report_detail") or {})
+    if not detail:
+        return []
+    ref = today or date.today()
+    out = []
+    for ticker in sorted(detail):
+        ended = detail[ticker]
+        try:
+            days = (ref - date.fromisoformat(str(ended)[:10])).days
+            out.append(f"{ticker}（目標期間 {ended} 結束，已過 {days} 天）")
+        except (TypeError, ValueError):
+            out.append(f"{ticker}（目標期間 {ended} 結束）")
+    return out
+
+
 def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> str:
     nxt = summary.get("next")
+    # ⚠ 三種終局分開印：把「等財報」混進 ready 會讓「到終局 N」被讀成「N 檔可以看」。
+    awaiting = list(summary.get("awaiting_report") or [])
+    parts = f"ready {len(summary['ready'])}／settled {len(summary['settled'])}"
+    if awaiting:
+        parts += f"／等財報 {len(awaiting)}"
     line = (
-        f"段5 每檔閉環：到終局 {summary['terminal_count']}（ready {len(summary['ready'])}／settled {len(summary['settled'])}）"
+        f"段5 每檔閉環：到終局 {summary['terminal_count']}（{parts}）"
         f"／未到終局 {summary['open_count']}｜有 ready 檔的產業 {len(summary['sectors_with_ready'])}／{len(summary['sectors_seen'])}"
     )
     if nxt:
@@ -319,6 +380,30 @@ def _consensus_flags(tickers: Iterable[str], conn: Any) -> dict[str, tuple[bool,
         # 兩者皆正才算正；任一為負就不算——虧損年不得被選成「可以做」。
         out[t] = (True, all(v > 0 for v in present) if present else None)
     return out
+
+
+def _target_period_ends(tickers: Iterable[str], conn: Any) -> dict[str, str | None]:
+    """ticker → 建模目標期間（共識 `0y`）的期末日 ISO；讀不到回 `None`。
+
+    ⚠ 為什麼用共識的 `0y` 而不是「基期觀測 +1 年」：兩者在資料上是同一個期間
+    （`alpha/fundamental/model.py` 的 `target = actuals.period.shifted(1)`），而 `0y`
+    就在 `_consensus_flags` 已經在讀的那張表裡。**新造一份期間推導就會是 L16 說的
+    「我需要一個分類，系統有，但我手上的介面沒帶」的第二份**。
+
+    ⚠ 讀不到一律回 `None`（不是「未結束」）：`None` 會讓 `awaiting_report_since` 留空、
+    該檔照舊算成未到終局——寧可多排一檔，也不要把「讀不到」靜默算成終局（INV-3）。
+    """
+    rows = conn.execute(
+        "SELECT ticker, snapshot_date, relative_label, fiscal_period_end "
+        "FROM consensus_estimates WHERE metric = 'eps' AND relative_label = '0y'"
+    ).fetchall()
+    latest: dict[str, tuple[str, str | None]] = {}
+    for ticker, snap, _label, period_end in rows:
+        t = str(ticker).upper()
+        snap = str(snap)
+        if t not in latest or snap > latest[t][0]:
+            latest[t] = (snap, str(period_end)[:10] if period_end else None)
+    return {t: latest.get(t.upper(), ("", None))[1] for t in tickers}
 
 
 def _sector_and_rank(ranking_payload: Mapping[str, Any], registry: Any) -> dict[str, tuple[str | None, int | None]]:

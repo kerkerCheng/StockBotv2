@@ -5,6 +5,7 @@
 """
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,7 @@ from alpha.closure import (
     _base_observation_tickers,
     _consensus_flags,
     _sector_and_rank,
+    _target_period_ends,
     deferred_tickers,
     row_from_artifact,
 )
@@ -53,6 +55,15 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Engine C 基期觀測讀不到：{type(exc).__name__}")
 
+    # 目標期間是不是已經結束（＝財報空窗）。**時鐘住這裡**，`alpha/closure.py` 保持純函式。
+    # 讀不到一律留 None——那會讓該檔照舊算成未到終局（寧可多排一檔，不把讀不到當終局，INV-3）。
+    target_ends: dict[str, str | None] = {}
+    if conn is not None:
+        try:
+            target_ends = _target_period_ends([r.ticker for r in rows], conn)
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"Engine C 目標期間讀不到，本輪不判「等財報」：{type(exc).__name__}")
+
     # 產業與名次：ranking state ＋ registry
     sector_rank: dict[str, tuple[str | None, int | None]] = {}
     try:
@@ -81,9 +92,17 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
     except Exception as exc:  # noqa: BLE001
         notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」：{type(exc).__name__}")
 
+    today = date.today()
     enriched: list[BacklogRow] = []
     for r in rows:
         has_c, pos = flags.get(r.ticker, (None, None))
+        end = target_ends.get(r.ticker)
+        awaiting: str | None = None
+        if end:
+            try:
+                awaiting = end if date.fromisoformat(end) <= today else None
+            except ValueError:
+                awaiting = None
         sector, rank = sector_rank.get(r.ticker.upper(), (None, None))
         enriched.append(BacklogRow(
             ticker=r.ticker, readiness=r.readiness, open_panels=r.open_panels, settled_panels=r.settled_panels,
@@ -91,6 +110,7 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
             sector=sector, bottleneck_rank=rank,
             has_base_observation=(None if base_obs is None else r.ticker.upper() in base_obs),
             user_deferred=r.ticker.upper() in deferred,
+            awaiting_report_since=awaiting,
             generated_at=r.generated_at,
         ))
     return enriched, notes

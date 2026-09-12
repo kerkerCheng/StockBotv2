@@ -286,7 +286,9 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     result = closure.closure_gate(rows, skip=args.skip or ())
     # P7-b：品質計數器掛在這裡而不是另開一支命令——skill 已經規定每輪必跑 closure-gate，
     # 掛上去計數器才會**自己出現**。另開一支就得靠人記得跑，而那正是 L14 說沒用的那種防呆。
-    terminal = {r.ticker for r in rows if r.terminal is not None}
+    # ⚠ 品質計數器只看 ready／settled：`awaiting_report` 那幾檔本來就還沒有估值，
+    # 混進來只會在「讀不到」那一欄長出假的計數（它量的是判斷品質，不是資料齊不齊）。
+    terminal = {r.ticker for r in rows if r.terminal in ("ready", "settled")}
     artifacts = {t: p for t, p, _f, _r in ArtifactStore(
         Path(args.dir) if args.dir else None).read_all() if p is not None and t in terminal}
     score = closure.score_quality(artifacts)
@@ -298,6 +300,7 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             "state": result.state, "open_count": result.open_count,
             "actionable": list(result.actionable), "skipped": list(result.skipped),
             "next": result.next_ticker, "reason": result.reason, "notes": notes,
+            "awaiting_report": closure.summarize(rows).get("awaiting_report_detail") or {},
             "quality": {"implied_positive": list(score.positive),
                         "implied_negative": list(score.negative),
                         "multiple_neutral": list(score.multiple_neutral),
@@ -314,6 +317,12 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             print(f"- 接下來十檔：{'、'.join(result.actionable[:10])}")
         if result.skipped:
             print(f"- 本輪顯式跳過（卡 pq2／卡世界）{len(result.skipped)} 檔：{'、'.join(result.skipped)}")
+        awaiting = closure.render_awaiting_report(closure.summarize(rows))
+        if awaiting:
+            # 它們已經是終局（第三種），所以不在 actionable 裡；印出來是為了讓「等世界」
+            # 不會變成「安靜消失」——INV-3：查不到了不是合法 lifecycle。
+            print(f"- 等財報公布（目標期間已結束、財報未出；會自己解開）{len(awaiting)} 檔："
+                  f"{'、'.join(awaiting)}")
         for note in notes:
             print(f"- 未讀到：{note}")
         print("# 品質計數器（到終局那幾檔；衝檔數最容易犧牲的就是這個）")
