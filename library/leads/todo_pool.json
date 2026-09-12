@@ -8781,9 +8781,10 @@
       "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
       "n": 512,
       "reason": null,
+      "receipt": null,
       "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "drop",
+      "resolved_at": "2026-09-12T05:44:57.914451+00:00",
       "source": "decision_lab",
       "source_cleared": {
         "at": "2026-09-12T00:02:18.827154+00:00",
@@ -9524,6 +9525,7 @@
     {
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:unitree",
+      "deferred_at": "2026-09-12T05:44:57.914499+00:00",
       "hint": "當前 missing_data：688836.SS 的價格序列進 Engine C（目前 valuation_payoff 只有 fx、沒有 marke；同期 EPS 共識（新上市、賣方覆蓋未建立）（共 2 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 558,
       "reason": null,
@@ -20855,6 +20857,24 @@
       "ref_id": "dc_bb19966e2aafab5e24f4fd74d7ed9443",
       "type": "decision_review",
       "verb": "system_internal_retired"
+    },
+    {
+      "at": "2026-09-12T05:44:57.914451+00:00",
+      "n": 512,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "type": "decision_review",
+      "verb": "drop"
+    },
+    {
+      "at": "2026-09-12T05:44:57.914499+00:00",
+      "n": 558,
+      "reason": null,
+      "receipt": null,
+      "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
   "next_n": 559,
