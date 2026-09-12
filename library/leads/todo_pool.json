@@ -9495,19 +9495,22 @@
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:globalfoundries",
       "dispatch_baseline_decision_id": "pd_31a994a3f07446e36e6618cc8da22b32",
+      "dispatch_receipt": "decision:pd_f6b40e7bbd98c15ecd99bcfc47b3446e",
       "dispatch_ref": "assessment_gap:dc_766316738ea5013cf930254fca598033",
       "dispatch_scope": [
         "commercial_maturity_unknown",
         "financial_resilience_corroboration_incomplete"
       ],
-      "dispatch_status": "queued",
+      "dispatch_status": "completed",
+      "dispatch_updated_at": "2026-09-12T06:10:32.525148+00:00",
       "dispatched_at": "2026-09-12T05:48:59.327363+00:00",
       "hint": "當前 missing_data：engine_c_customer：GFS customer_concentration observation（值已備；engine_c_backlog：GFS backlog observation——US$11B LTA 剩餘承諾＋客戶；LTA 的分年攤佈：$11B 沒有按年揭露，所以算不出「幾季能見度」，也算不出違約條款的保護力（共 3 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、financial_resilience_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 555,
-      "reason": null,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_f6b40e7bbd98c15ecd99bcfc47b3446e",
       "ref_id": "dc_766316738ea5013cf930254fca598033",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T06:10:32.525148+00:00",
       "source": "decision_lab",
       "title": "co:globalfoundries：補客戶端商業承諾：訂單、產能協議或預付款等付錢方向的證據",
       "type": "decision_review"
@@ -20968,6 +20971,24 @@
       "receipt": "action:ra_c6430178538adb82554b6c26c214de5b;digest:e4da9146242c75c38b59cbfc675dbfc21e36e3f91ca386dac92992958909e2dd;commit:4ad27a7d159a4b56e311fd5806e70e159e13392e;cohort:dc_2bd6137c75808ec4f28541111927d588",
       "ref_id": "ra_c6430178538adb82554b6c26c214de5b",
       "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-12T06:10:32.525148+00:00",
+      "n": 555,
+      "reason": null,
+      "receipt": "decision:pd_f6b40e7bbd98c15ecd99bcfc47b3446e",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "pq1_completed"
+    },
+    {
+      "at": "2026-09-12T06:10:32.525148+00:00",
+      "n": 555,
+      "reason": "pq1 completed",
+      "receipt": "decision:pd_f6b40e7bbd98c15ecd99bcfc47b3446e",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
       "verb": "go"
     }
   ],
