@@ -9460,13 +9460,21 @@
     },
     {
       "added_at": "2026-09-12T00:02:18.827154+00:00",
+      "completion_authority": {
+        "action_digest": "e4da9146242c75c38b59cbfc675dbfc21e36e3f91ca386dac92992958909e2dd",
+        "cohort_id": "dc_2bd6137c75808ec4f28541111927d588",
+        "commit": "4ad27a7d159a4b56e311fd5806e70e159e13392e",
+        "company_id": "co:tower_semiconductor",
+        "verified_at": "2026-09-12T06:00:39.583097+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、3 claims｜來源：Tower Semiconductor（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:tower_semiconductor。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 553,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c6430178538adb82554b6c26c214de5b;digest:e4da9146242c75c38b59cbfc675dbfc21e36e3f91ca386dac92992958909e2dd;commit:4ad27a7d159a4b56e311fd5806e70e159e13392e;cohort:dc_2bd6137c75808ec4f28541111927d588",
       "ref_id": "ra_c6430178538adb82554b6c26c214de5b",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-12T06:00:39.583097+00:00",
       "source": "research_action",
       "title": "Tower FY2025 20-F：GFS 三案專利訴訟（[471]）＋US$920M SiPho 擴產與公司自陳的利用率風險（[469]）",
       "type": "ra_admission"
@@ -20952,6 +20960,15 @@
       "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
       "type": "decision_review",
       "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-12T06:00:39.583097+00:00",
+      "n": 553,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_c6430178538adb82554b6c26c214de5b;digest:e4da9146242c75c38b59cbfc675dbfc21e36e3f91ca386dac92992958909e2dd;commit:4ad27a7d159a4b56e311fd5806e70e159e13392e;cohort:dc_2bd6137c75808ec4f28541111927d588",
+      "ref_id": "ra_c6430178538adb82554b6c26c214de5b",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
   "next_n": 559,
