@@ -154,6 +154,15 @@ class ReturnAttribution:
     #: 共識 EPS 帶著的換算殘差（見 `ExpectationComparison.fx_translation_delta`）。
     #: 它是**兩個桿共同的雜訊下限**：同一個換算差進到 eps_ratio 的分母、也進到
     #: market_multiple 的分母。任一個桿小於它，那個桿就在雜訊裡。
+    #: 目標倍數是怎麼決定的（`calibrated_to_market`／`independent`／`unclassified`）。
+    #: **這是分類的 SSOT，從 valuation ledger 原封帶過來的**，不在這一層重新推導。
+    #:
+    #: 為什麼要帶：`multiple_contribution` 同時承載兩種語意——「主張了折溢價」與
+    #: 「校準之後價格動了」。代數上，校準型的桿恆等於
+    #: `calibration_price / current_price − 1`（同分母消掉），也就是**它就是價格漂移**。
+    #: 實測（2026-09-12，13 本校準 ledger）逐檔對齊到小數第二位。少了這個欄位，
+    #: 下游只能拿門檻去猜，而猜錯的方向固定偏向「看起來需要更多研究」。
+    multiple_derivation: str | None = None
     fx_translation_delta: float | None = None
     #: 有殘差、且至少一個桿小於它時的一句話。**不改任何數字**，只讓讀者不會把雜訊讀成發現。
     noise_floor_note: str | None = None

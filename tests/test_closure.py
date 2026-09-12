@@ -244,11 +244,12 @@ def test_gate_states_are_a_closed_vocabulary() -> None:
 # ---------------------------------------------------------------------------
 
 def _artifact(implied: float | None, multiple: float | None = None,
-              status: str = "available") -> dict:
+              status: str = "available", derivation: str | None = None) -> dict:
     view: dict = {"headline": {"lines": [{"datum": {"value": {}}}]}}
     if multiple is not None:
         view["headline"]["lines"][0]["datum"]["value"] = {
-            "eps_contribution": 0.1, "multiple_contribution": multiple, "status": "available"}
+            "eps_contribution": 0.1, "multiple_contribution": multiple, "status": "available",
+            "multiple_derivation": derivation}
     return {
         "overview": {"implied_return": {"simple": {
             "status": status, "value": implied}}},
@@ -374,3 +375,83 @@ def test_consensus_flag_requires_both_periods_positive(tmp_path) -> None:
     # 0y 缺值時退回 +1y——方向一致地偏保守，不是把缺值當成負
     assert flags["ONLYFARX"] == (True, True)
     assert flags["NOPEX"] == (False, None)
+
+# ---------------------------------------------------------------------------
+# 「有折溢價主張」不得把價格漂移算成主張（2026-09-12）
+#
+# 事發：計數器印「倍數＝校準倍數 0 檔｜有折溢價主張 14 檔」，而 18 本 ledger 裡
+# 有 16 本的 `derivation` 是 `calibrated_to_market`（＝零折溢價，rationale 逐字寫著
+# 「目標倍數＝校準倍數」）。兩個數字互相否定。
+#
+# 原因是代數的：`multiple_contribution = target_multiple / market_multiple − 1`，
+# 而 `target_multiple` 是校準那天算出的定值、`market_multiple` 用最新一根 bar，
+# 同分母（同一個 consensus_eps）消掉之後它**恆等於** `校準價 / 現價 − 1`
+# ——也就是價格漂移，符號相反。實測 13 本逐檔對齊到小數第二位。
+#
+# 修法照 L12：先分開再各自定規則。分開後兩邊都比原本更嚴——「主張」只認 ledger
+# 宣告的 `independent`，「漂移」要的是重跑 valuation 而不是一份不存在的證據。
+
+
+def test_a_calibrated_multiple_that_drifted_is_not_a_priced_claim() -> None:
+    """ledger 說它是校準倍數，那桿非零就是校準價過期，不是主張。"""
+    score = closure.score_quality({
+        "DRIFTED": _artifact(-0.02, multiple=-0.021, derivation="calibrated_to_market"),
+        "CLAIMED": _artifact(-0.30, multiple=-0.20, derivation="independent"),
+    })
+
+    assert score.multiple_drifted == (("DRIFTED", -0.021),)
+    assert score.multiple_priced == (("CLAIMED", -0.20),)
+
+
+def test_classification_is_invariant_to_price_drift() -> None:
+    """驗收條件本體：ledger 一個字不改、只換一根行情，分檔結果不得改變。
+
+    ⚠ 這是**對的**驗收，而「計數器的數字變小」不是——調容差也能讓數字變小，
+    但調容差解不掉隔天又漂走。這裡用三個相差一個數量級的漂移量代表三天的行情。
+    """
+    buckets = []
+    for drift in (-0.006, -0.021, -0.065):          # 0.6%／2.1%／6.5% 的價格漂移
+        score = closure.score_quality({
+            "CAL": _artifact(-0.02, multiple=drift, derivation="calibrated_to_market"),
+            "IND": _artifact(-0.30, multiple=-0.20, derivation="independent"),
+        })
+        buckets.append((
+            [t for t, _ in score.multiple_drifted],
+            [t for t, _ in score.multiple_priced],
+        ))
+
+    assert buckets == [(["CAL"], ["IND"])] * 3, (
+        "校準型不論漂多少都該留在 drifted，independent 不論如何都該留在 priced"
+    )
+
+
+def test_an_undeclared_derivation_still_counts_as_a_claim() -> None:
+    """fail safe：沒宣告就當成主張（要人指得出證據），不當成漂移放過去。
+
+    ⚠ 方向刻意選嚴的那一邊——把未宣告當漂移會讓一筆真的折溢價主張靜默免除舉證，
+    而那正是 `AGENTS.md`「隱含報酬的兩個桿」要防的事。
+    """
+    score = closure.score_quality({"X": _artifact(-0.3, multiple=-0.2, derivation=None)})
+
+    assert score.multiple_priced == (("X", -0.2),)
+    assert score.multiple_drifted == ()
+
+
+def test_drift_line_tells_you_to_rerun_valuation_not_to_find_evidence() -> None:
+    """兩欄要的動作不同，呈現層必須說出來——否則分開了也沒用（L13：管子要接到消費端）。"""
+    lines = closure.render_quality(closure.score_quality({
+        "CAL": _artifact(-0.02, multiple=-0.021, derivation="calibrated_to_market")}))
+    drift_line = next(line for line in lines if "校準價已過期" in line)
+
+    assert "重跑一次 valuation" in drift_line
+    assert "別去找證據" in drift_line
+
+
+def test_noise_floor_still_wins_over_the_drift_bucket() -> None:
+    """換算殘差以下的桿是「讀不出來」，那比「漂移」更前面——順序不得被新分支改掉。"""
+    art = _artifact(-0.01, multiple=-0.005, derivation="calibrated_to_market")
+    art["view"]["headline"]["lines"][0]["datum"]["value"]["fx_translation_delta"] = 0.021
+    score = closure.score_quality({"TSM": art})
+
+    assert [t for t, *_ in score.multiple_in_noise] == ["TSM"]
+    assert score.multiple_drifted == ()

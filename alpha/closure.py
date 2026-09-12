@@ -431,6 +431,16 @@ class QualityScore:
     #: 倍數桿比它自己的換算殘差還小——**既不是校準也不是主張，是讀不出來**。
     #: 把它算進 `multiple_priced` 會送人去找一份不需要存在的證據（TSM +1.7% vs 殘差 2.11%）。
     multiple_in_noise: tuple[tuple[str, float, float], ...] = ()
+    #: `derivation=calibrated_to_market` 但桿已經非零——**這不是主張，是校準價過期了**。
+    #:
+    #: 代數上校準型的桿恆等於 `calibration_price / current_price − 1`（同分母消掉），
+    #: 所以它就是價格漂移、符號相反。實測（2026-09-12，13 本校準 ledger）逐檔對齊到
+    #: 小數第二位：AEHR −0.93%／漂移 +0.94%、GFS −2.12%／+2.17%、HIMX −6.45%／+6.89%…
+    #:
+    #: ⚠ 它要的動作與 `multiple_priced` **完全不同**：主張要的是「指得出證據」，
+    #: 漂移要的是「重跑一次 valuation」。混在一欄時只能取兩者的下限，也就是
+    #: 送人去替十幾檔找一份依定義不存在的折溢價證據。
+    multiple_drifted: tuple[tuple[str, float], ...] = ()
 
     @property
     def scored(self) -> int:
@@ -463,6 +473,7 @@ def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
     priced: list[tuple[str, float]] = []
     unreadable: list[str] = []
     multiple_in_noise: list[tuple[str, float, float]] = []
+    drifted: list[tuple[str, float]] = []
     for ticker in sorted(artifacts):
         payload = artifacts[ticker]
         simple = (((payload.get("overview") or {}).get("implied_return") or {}).get("simple") or {})
@@ -482,10 +493,16 @@ def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
             multiple_in_noise.append((ticker, float(contribution), float(residual)))
         elif abs(contribution) <= MULTIPLE_NEUTRAL_TOLERANCE:
             neutral.append(ticker)
+        elif (attribution or {}).get("multiple_derivation") == "calibrated_to_market":
+            # ledger 自己宣告這是校準倍數（零折溢價），而桿非零——那是**校準價過期**，
+            # 不是主張。判準讀 `derivation` 而不是數值門檻：門檻調不動這件事，
+            # 因為隔天開盤又會漂走（L16：分類有 SSOT 就不要在消費端重算一份）。
+            drifted.append((ticker, float(contribution)))
         else:
             priced.append((ticker, float(contribution)))
     return QualityScore(tuple(positive), tuple(negative), tuple(neutral),
-                        tuple(priced), tuple(unreadable), tuple(multiple_in_noise))
+                        tuple(priced), tuple(unreadable), tuple(multiple_in_noise),
+                        tuple(drifted))
 
 
 def render_quality(score: QualityScore) -> list[str]:
@@ -501,6 +518,13 @@ def render_quality(score: QualityScore) -> list[str]:
            + "、".join(f"{t} {c:+.1%}" for t, c in score.multiple_priced)
            + "（每一筆的 rationale 都必須指得出證據，AGENTS.md「隱含報酬的兩個桿」）"
            if score.multiple_priced else "｜有折溢價主張：0 檔"))
+    if score.multiple_drifted:
+        lines.append(
+            f"校準倍數但校準價已過期（**不是折溢價主張，別去找證據**）：{len(score.multiple_drifted)} 檔——"
+            + "、".join(f"{t} {c:+.1%}" for t, c in score.multiple_drifted)
+            + "。ledger 宣告 derivation=calibrated_to_market，桿卻非零；代數上它等於"
+            "（校準當天價 ÷ 現價 − 1），也就是價格漂移。要的動作是**重跑一次 valuation**，"
+            "不是補一份依定義不存在的折溢價證據。")
     if score.multiple_in_noise:
         lines.append(
             f"倍數桿落在換算殘差以下（讀不出來，不是校準也不是主張）：{len(score.multiple_in_noise)} 檔——"

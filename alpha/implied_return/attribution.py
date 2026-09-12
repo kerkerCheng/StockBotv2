@@ -148,6 +148,8 @@ def attribute_price_return(
     fx_delta = comparison.fx_translation_delta
     return ReturnAttribution(
         status="available", reason=None, absence_kind=None,
+        # 原封帶過來，不在這裡重新判斷（L16：分類要跟著資料走到需要它的地方）。
+        multiple_derivation=valuation.multiple_derivation,
         fx_translation_delta=fx_delta,
         noise_floor_note=noise_floor_note(
             fx_delta=fx_delta, eps_contribution=eps_contribution,
@@ -175,6 +177,7 @@ def attribution_payload(attribution: ReturnAttribution) -> dict[str, Any]:
         "consensus_captured_at": (attribution.consensus_captured_at.isoformat()
                                   if attribution.consensus_captured_at else None),
         "target_multiple": attribution.target_multiple,
+        "multiple_derivation": attribution.multiple_derivation,
         "market_multiple_on_consensus": attribution.market_multiple_on_consensus,
         "eps_ratio": attribution.eps_ratio,
         "multiple_ratio": attribution.multiple_ratio,
