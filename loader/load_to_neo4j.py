@@ -312,6 +312,48 @@ def load_source_doc(doc: dict, session) -> None:
     )
 
 
+#: 重載既有文件時**不得**被這次載入靜默覆蓋的節點欄位。
+#: `MERGE_NODE` 只有 `source_ids` 走聯集，其餘都是直接 SET——所以保留邏輯必須在這裡做完，
+#: Cypher 那端是照抄。三個欄位的語意不同：name 取既有、attributes 既有 key 優先、
+#: aliases 聯集（既有在前）。
+def preserve_existing_node_fields(
+    name: str,
+    aliases: list[str],
+    attrs: dict,
+    existing,
+) -> tuple[str, list[str], dict, list[str]]:
+    """把本次文件宣告的 name／aliases／attributes 與圖上既有值合併。
+
+    回 `(name, aliases, attrs, notes)`；`notes` 是要印給人看的保留紀錄（空＝沒有衝突）。
+    `existing` 為 None（節點還不存在）時原樣回傳。
+    """
+
+    if not existing:
+        return name, aliases, attrs, []
+    notes: list[str] = []
+    prior_name = existing["name"]
+    if prior_name and prior_name != name:
+        notes.append(f"name 保留既有 {prior_name!r}（本次文件寫 {name!r}）")
+        name = prior_name
+    prior_attrs = json.loads(existing["attrs"] or "{}")
+    clashed = {k: (prior_attrs[k], attrs[k]) for k in attrs
+               if k in prior_attrs and prior_attrs[k] != attrs[k]}
+    if clashed:
+        notes.append(f"attributes 保留既有 {clashed}")
+    # 既有 key 優先；本次文件只補上既有沒有的 key。
+    attrs = {**attrs, **prior_attrs}
+    # ⚠ aliases 是同一形狀的第三個欄位，2026-09-10 補 name／attributes 時漏了它
+    # （L17-3：對稱面沒做）。實測：co:tower_semiconductor 的 aliases 是
+    # ['TSEM','TowerJazz']，而 [553] 的 RA 宣告 ['Tower','TSEM']——直接 SET 會靜默
+    # 丟掉 'TowerJazz'，沒有任何東西會叫。聯集，既有在前。
+    prior_aliases = [str(a) for a in (existing["aliases"] or [])]
+    dropped = [a for a in prior_aliases if a not in aliases]
+    if dropped:
+        notes.append(f"aliases 保留既有 {dropped}（本次文件寫 {aliases!r}）")
+    aliases = prior_aliases + [a for a in aliases if a not in prior_aliases]
+    return name, aliases, attrs, notes
+
+
 def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False) -> None:
     ts = _now()
     doc_id = doc["source_doc"]["doc_id"]
@@ -351,29 +393,21 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
         # name，其中 tech:vcsel 被改成產品規格）。要改 name 有明確路徑——migration 或
         # 人工 SET——不該是載入的副作用。
         name = n["name"]
+        aliases = [str(a) for a in (n.get("aliases") or [])]
             # ⚠ 這裡**不能走 `_execute`**：它會 consume() 掉 Result，之後 iterate 會拋
         # ResultConsumedError。也不能用 .single()：測試的 fake session 直接回 list。
         # 兩個型別假設都踩過（2026-09-10，同一天各一次）——所以直接 session.run 後
         # 立刻取第一筆，list 與未消費的 Result 都適用。
         existing_rows = session.run(
-            "MATCH (n:Entity {id: $id}) RETURN n.name AS name, n.attributes AS attrs",
+            "MATCH (n:Entity {id: $id}) "
+            "RETURN n.name AS name, n.attributes AS attrs, n.aliases AS aliases",
             id=n["id"],
         )
         existing = next(iter(existing_rows), None)
-        if existing:
-            prior_name = existing["name"]
-            if prior_name and prior_name != name:
-                print(f"  [node-merge] {n['id']} name 保留既有 {prior_name!r}"
-                      f"（本次文件寫 {name!r}）", file=sys.stderr)
-                name = prior_name
-            prior_attrs = json.loads(existing["attrs"] or "{}")
-            clashed = {k: (prior_attrs[k], attrs[k]) for k in attrs
-                       if k in prior_attrs and prior_attrs[k] != attrs[k]}
-            if clashed:
-                print(f"  [node-merge] {n['id']} attributes 保留既有 {clashed}",
-                      file=sys.stderr)
-            # 既有 key 優先；本次文件只補上既有沒有的 key。
-            attrs = {**attrs, **prior_attrs}
+        name, aliases, attrs, notes = preserve_existing_node_fields(
+            name, aliases, attrs, existing)
+        for note in notes:
+            print(f"  [node-merge] {n['id']} {note}", file=sys.stderr)
 
         params = {
             "id": n["id"],
@@ -381,7 +415,7 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
             "name": name,
             "abstraction_level": n["abstraction_level"],
             "role": n.get("role"),
-            "aliases": n.get("aliases", []),
+            "aliases": aliases,
             "attributes_json": json.dumps(attrs, ensure_ascii=False),
             "confidence": n["confidence"],
             "updated_at": ts,

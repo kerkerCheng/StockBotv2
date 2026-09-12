@@ -8,6 +8,7 @@ from loader.load_to_neo4j import (
     DuplicateUrlError,
     check_duplicate_url,
     normalize_url,
+    preserve_existing_node_fields,
 )
 
 
@@ -101,3 +102,52 @@ def test_allow_dup_url_overrides_when_not_multi_section() -> None:
         {"doc_id": "doc_b", "url": _URL}, _FakeSession(existing), allow_dup_url=True
     )
     assert result == ["doc_a"]
+
+
+# ── preserve_existing_node_fields：重載既有文件不得靜默覆蓋 ────────────────────
+
+
+def _existing(name=None, attrs="{}", aliases=None):
+    return {"name": name, "attrs": attrs, "aliases": aliases}
+
+
+def test_new_node_keeps_declared_values() -> None:
+    name, aliases, attrs, notes = preserve_existing_node_fields(
+        "Tower Semiconductor", ["Tower", "TSEM"], {"ticker": "TSEM"}, None
+    )
+    assert (name, aliases, attrs, notes) == (
+        "Tower Semiconductor", ["Tower", "TSEM"], {"ticker": "TSEM"}, []
+    )
+
+
+def test_aliases_union_instead_of_overwrite() -> None:
+    # 真案例：[553] 的 RA 宣告 ['Tower','TSEM']，圖上是 ['TSEM','TowerJazz']。
+    # 直接 SET 會丟掉 'TowerJazz'，而沒有任何東西會叫。
+    _, aliases, _, notes = preserve_existing_node_fields(
+        "Tower Semiconductor",
+        ["Tower", "TSEM"],
+        {},
+        _existing(name="Tower Semiconductor", aliases=["TSEM", "TowerJazz"]),
+    )
+    assert aliases == ["TSEM", "TowerJazz", "Tower"]
+    assert any("aliases 保留既有" in note for note in notes)
+
+
+def test_aliases_union_is_quiet_when_nothing_would_be_dropped() -> None:
+    _, aliases, _, notes = preserve_existing_node_fields(
+        "GlobalFoundries", ["GF", "GFS"], {}, _existing(aliases=["GFS"])
+    )
+    assert aliases == ["GFS", "GF"]
+    assert notes == []
+
+
+def test_existing_name_and_attributes_win() -> None:
+    name, _, attrs, notes = preserve_existing_node_fields(
+        "VCSEL 940nm",
+        [],
+        {"ticker": "WRONG"},
+        _existing(name="VCSEL", attrs='{"ticker": "RIGHT"}'),
+    )
+    assert name == "VCSEL"
+    assert attrs["ticker"] == "RIGHT"
+    assert len(notes) == 2
