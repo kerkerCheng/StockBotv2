@@ -9601,6 +9601,57 @@
       "source": "manual",
       "title": "012330.KS：催化劑軸已研究、結論是沒有可監看事件（Boston Dynamics 那條邊沒有金額也沒有時點）——提案 Abstention（research / axis.catalyst）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T11:50:12.767039+00:00",
+      "hint": "核准後以 `todo complete-observation <編號>` 寫入 append-only ledger；as_of=2025-12-31T00:00:00+00:00；來源=GLOBALFOUNDRIES Inc. FY2025 Form 20-F（SEC EDGAR accession 0001709048-26-000022，f",
+      "n": 561,
+      "reason": null,
+      "ref_id": "po_e4efab421a4ed3dbbf7c3678571c047f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "engine_c",
+      "title": "Engine C 觀測：GFS / debt_maturity_and_covenants",
+      "type": "engine_c_observation"
+    },
+    {
+      "added_at": "2026-09-12T11:50:12.767039+00:00",
+      "company_id": "co:iqe",
+      "hint": "當前 missing_data：Tower／IQE 協議的金額、最低採購量、期限與排他性之一手揭露；客戶端或第三方對 IQE 為合格 InP epiwafer 供應者的獨立確認（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 562,
+      "reason": null,
+      "ref_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:iqe：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T11:50:12.767039+00:00",
+      "company_id": "co:marvell_technology",
+      "hint": "當前 missing_data：NVIDIA 自家 10-Q 對 Series A Preferred 投資的揭露逐字核對（externally_cor；Distributor A（44% 營收）不具名，終端需求被通路遮蔽，無法取得客戶端佐證（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 563,
+      "reason": "reassess-stale：新 decision pd_e16532782dd5bcf904e2752b01958475 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-12T11:50:21.358006+00:00",
+      "source": "decision_lab",
+      "title": "co:marvell_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-12T11:50:12.767039+00:00",
+      "company_id": "co:sivers_semiconductors",
+      "hint": "當前 missing_data：2026-08-27 重編與收入認列核對；獨立客戶端量產訂單（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 564,
+      "reason": "reassess-stale：新 decision pd_0ea4165fc0b50bf1a20bc8826f3a06d9 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-12T11:50:21.358006+00:00",
+      "source": "decision_lab",
+      "title": "co:sivers_semiconductors：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -21076,8 +21127,44 @@
       "ref_id": "abstention_proposal:012330.KS_research_catalyst",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-12T11:50:21.358006+00:00",
+      "n": 563,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_e16532782dd5bcf904e2752b01958475",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-12T11:50:21.358006+00:00",
+      "n": 563,
+      "reason": "reassess-stale：新 decision pd_e16532782dd5bcf904e2752b01958475 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_e16532782dd5bcf904e2752b01958475",
+      "ref_id": "dc_0fca807c963dc3b9888e0f83ba6d45a5",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-12T11:50:21.358006+00:00",
+      "n": 564,
+      "reason": "reassess-stale：僅 context 老化，以 intent=paper 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_0ea4165fc0b50bf1a20bc8826f3a06d9",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-12T11:50:21.358006+00:00",
+      "n": 564,
+      "reason": "reassess-stale：新 decision pd_0ea4165fc0b50bf1a20bc8826f3a06d9 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_0ea4165fc0b50bf1a20bc8826f3a06d9",
+      "ref_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
     }
   ],
-  "next_n": 561,
+  "next_n": 565,
   "schema_version": "1"
 }
