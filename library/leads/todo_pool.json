@@ -9486,6 +9486,14 @@
     {
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:globalfoundries",
+      "dispatch_baseline_decision_id": "pd_31a994a3f07446e36e6618cc8da22b32",
+      "dispatch_ref": "assessment_gap:dc_766316738ea5013cf930254fca598033",
+      "dispatch_scope": [
+        "commercial_maturity_unknown",
+        "financial_resilience_corroboration_incomplete"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-12T05:48:59.327363+00:00",
       "hint": "當前 missing_data：engine_c_customer：GFS customer_concentration observation（值已備；engine_c_backlog：GFS backlog observation——US$11B LTA 剩餘承諾＋客戶；LTA 的分年攤佈：$11B 沒有按年揭露，所以算不出「幾季能見度」，也算不出違約條款的保護力（共 3 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、financial_resilience_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 555,
       "reason": null,
@@ -9499,6 +9507,14 @@
     {
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:mp_materials",
+      "dispatch_baseline_decision_id": "pd_94cdd7044471637738787d7b5419f9eb",
+      "dispatch_ref": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "dispatch_scope": [
+        "commercial_maturity_unknown",
+        "source_reliability_corroboration_incomplete"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-12T05:48:59.327363+00:00",
       "hint": "當前 missing_data：customer_concentration/backlog 觀測提案與核准（10-K 素材已足）（共 1 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown、source_reliability_corroboration_incomplete。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 556,
       "reason": null,
@@ -9512,6 +9528,13 @@
     {
       "added_at": "2026-09-12T02:12:33.858455+00:00",
       "company_id": "co:sk_hynix",
+      "dispatch_baseline_decision_id": "pd_26bd6fe5f4c1f88d02458afdaed829cf",
+      "dispatch_ref": "assessment_gap:dc_70872dbacf53703aada2f101e5e0cd1c",
+      "dispatch_scope": [
+        "commercial_maturity_unknown"
+      ],
+      "dispatch_status": "queued",
+      "dispatched_at": "2026-09-12T05:48:59.327363+00:00",
       "hint": "當前 missing_data：engine_c_customer：000660.KS customer_concentration observati；engine_c_backlog：000660.KS backlog observation——內容是「結構性無 ord（共 2 項）｜go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍：commercial_maturity_unknown。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案",
       "n": 557,
       "reason": null,
@@ -20875,6 +20898,60 @@
       "ref_id": "dc_1322bfc1c743fa746b76e280c1b27b28",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-09-12T05:48:59.327363+00:00",
+      "n": 555,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_unknown、financial_resilience_corroboration_incomplete",
+      "receipt": "decision:pd_31a994a3f07446e36e6618cc8da22b32",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-12T05:48:59.327363+00:00",
+      "n": 555,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=queued_assessment_gap",
+      "receipt": "assessment_gap:dc_766316738ea5013cf930254fca598033",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-12T05:48:59.327363+00:00",
+      "n": 556,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_unknown、source_reliability_corroboration_incomplete",
+      "receipt": "decision:pd_94cdd7044471637738787d7b5419f9eb",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-12T05:48:59.327363+00:00",
+      "n": 556,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=queued_assessment_gap",
+      "receipt": "assessment_gap:dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-12T05:48:59.327363+00:00",
+      "n": 557,
+      "reason": "go：assessment 層缺口，排入 bounded pq1；commercial_maturity_unknown",
+      "receipt": "decision:pd_26bd6fe5f4c1f88d02458afdaed829cf",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "pq1_queued"
+    },
+    {
+      "at": "2026-09-12T05:48:59.327363+00:00",
+      "n": 557,
+      "reason": "常規授權（standing_authorization.json）：decision_review 的 go 只是注意力 gate；outcome=queued_assessment_gap",
+      "receipt": "assessment_gap:dc_70872dbacf53703aada2f101e5e0cd1c",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "standing_go"
     }
   ],
   "next_n": 559,
