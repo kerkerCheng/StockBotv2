@@ -197,6 +197,10 @@ def _consensus_base_check(conn, ticker: str, rows) -> None:
     zero = [r for r in rows if r["relative_label"] == "0y"]
     if not zero:
         return
+    # 兩個區塊都要看：有些檔的共識就是錨在 non_gaap 上（688017.SS 的 year_ago_actual 0.5534
+    # 逐位等於年報印出的**扣非**基本每股收益 0.5535，而基本是 0.6924）。只看 gaap 會把
+    # 「已經識別出口徑」誤報成「都對不上」——那正是這一段想避免的事。
+    blocks = [(lbl, base.get(key) or {}) for lbl, key in (("gaap", "gaap"), ("non_gaap", "non_gaap"))]
     gaap = base.get("gaap") or base.get("non_gaap") or {}
     printed = False
     for row in zero:
@@ -224,10 +228,14 @@ def _consensus_base_check(conn, ticker: str, rows) -> None:
                   "所以這不是 GAAP／non-GAAP，而是**合併範圍或年度對錯了**。"
                   "⚠ 不要用 provider 的 growth 欄位（它是「估計 ÷ 這個錯的基期」）。")
         elif row["metric"] == "eps":
-            b, d = gaap.get("basic_eps"), gaap.get("diluted_eps")
-            cands = [(lbl, v) for lbl, v in (("基本", b), ("稀釋", d)) if v]
+            cands = [(f"{blk}/{lbl}", v)
+                     for blk, block in blocks
+                     for lbl, v in (("基本", block.get("basic_eps")), ("稀釋", block.get("diluted_eps")))
+                     if v]
             if not cands:
                 continue
+            b = (base.get("gaap") or {}).get("basic_eps")
+            d = (base.get("gaap") or {}).get("diluted_eps")
             best = min(cands, key=lambda kv: abs(actual / kv[1] - 1))
             gap = actual / best[1] - 1
             printed = True
