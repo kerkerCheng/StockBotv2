@@ -94,6 +94,49 @@ def _snapshot_self_check(snap) -> None:
               "那只是期間錯配在這一檔剛好看得出來，不是另一種錯。）")
 
 
+def _share_count_check(conn, ticker: str, snapshot_shares) -> None:
+    """財報的稀釋加權平均股數與快照的流通在外股數差太多 ＝ 至少一邊是錯的。
+
+    兩者本來就不同（加權平均 vs 期末、稀釋 vs 流通），但差距應該在個位數百分比；
+    **差到 2 倍以上就不是口徑差異，是資料錯誤**。
+
+    2026-09-12 實測 3105.TWO（穩懋）：財報 H1 2026 的基本 EPS 3.56 與歸屬母公司淨利
+    1,510,391 仟元 → **424,267 仟股**，而快照的 shares_outstanding 是 **80,825,000**
+    ——差 **5.25 倍**。packet 的 market_cap 直接由 price x shares_outstanding 算，
+    所以那一格也跟著錯 5.25 倍（35.4B vs 實際約 185.6B 新台幣）。
+
+    容忍區刻意開到 [0.5, 2.0]：全庫 40 檔可比的只有 AXTI 落在 0.6700（現金增資使稀釋
+    加權平均低於期末流通股數，是**合理**差異）。先用 1.5 當上界時它會誤報一次——
+    **會誤報的防呆本身就是過度工程（L16-4），所以把界線放到誤報為 0 的地方**；
+    而 3105 的 5.25 倍離新界線仍有兩倍以上的餘裕，鑑別力沒有損失。
+    """
+    import json as _json
+    rows = conn.execute(
+        "SELECT observation_id, value, supersedes_id FROM manual_observations"
+        " WHERE ticker = ? AND field_name = 'fiscal_year_results' ORDER BY recorded_at", (ticker,)).fetchall()
+    if not rows or not snapshot_shares:
+        return
+    superseded = {r["supersedes_id"] for r in rows if r["supersedes_id"]}
+    live = [r for r in rows if r["observation_id"] not in superseded]
+    if not live:
+        return
+    try:
+        payload = _json.loads(live[-1]["value"])
+    except (TypeError, ValueError):
+        return
+    block = payload.get("gaap") or payload.get("non_gaap") or {}
+    filed = block.get("diluted_shares")
+    if not filed:
+        return
+    ratio = filed / snapshot_shares
+    if 0.5 <= ratio <= 2.0:
+        return
+    print(f"   !! 財報稀釋股數 {filed:,.0f} vs 快照流通股數 {snapshot_shares:,.0f}（比值 {ratio:.2f}）"
+          "——差到這個程度不是口徑差異，是**至少一邊錯了**。"
+          "EPS 分母一律用財報的加權平均；packet 的 market_cap = price x shares_outstanding，"
+          "所以快照錯的話**市值那一格也同樣錯**。")
+
+
 def probe(ticker: str) -> None:
     art = ARTIFACTS / f"{ticker}.json"
     if art.exists():
@@ -129,6 +172,8 @@ def probe(ticker: str) -> None:
                 "gross_margin", "operating_margin", "revenue_ttm", "trailing_pe", "forward_pe")
         print("  ", {k: snap[k] for k in keep if k in snap})
         _snapshot_self_check(snap)
+
+    _share_count_check(conn, ticker, (snap.get("shares_outstanding") if row is not None else None))
 
     print("\n## Engine C 人工觀測")
     for row in conn.execute(
