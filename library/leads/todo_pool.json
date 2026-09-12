@@ -9688,6 +9688,30 @@
       "source": "manual",
       "title": "AEVA（Aeva Technologies）：FY2026／FY2027 共識 EPS 皆為負，且 GAAP EPS 在結構上是自家股價的函數（權證負債重估）——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T20:11:56.849448+00:00",
+      "hint": "go＝核准 docs/reports/weekly_scan_2026-09-13_coherent_ocs_qualification.proposal.json，使用 loader/edge_resolution.py approve --replace-stale 寫入 current candidate-set resolution 並投影該 canonical attribute；不含 ramp_execution、其他 edge、thesis mutation 或 live。",
+      "n": 568,
+      "reason": null,
+      "ref_id": "edge_conflict:conflict_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098:e599ebce6a9bf2dd474e9245948dc349e1b342de0c1fbc0c5a2ea78b0a102ee6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Coherent OCS qualification_status：沿時間序維持 qualified（重批 stale resolution）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-12T20:11:58.043072+00:00",
+      "hint": "go＝核准 docs/reports/weekly_scan_2026-09-13_coherent_ocs_ramp_execution.proposal.json，使用 loader/edge_resolution.py approve 寫入 resolution 並將該 canonical attribute 投影為 unknown；不含 qualification_status、其他 edge、thesis mutation 或 live。",
+      "n": 569,
+      "reason": null,
+      "ref_id": "edge_conflict:conflict_8dde8f2e54b0f02a30173ea09419f952149dac99c5e0ba3e4bce75ff4e1458a6:84ea68f41fab9d3aea29efa459a9fe7f5d76369c216a89b1f29f5c65cd735526",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Coherent OCS ramp_execution：三份自報 3→4→3，提案保留 unknown",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21201,6 +21225,6 @@
       "verb": "reassessed_closed"
     }
   ],
-  "next_n": 568,
+  "next_n": 570,
   "schema_version": "1"
 }

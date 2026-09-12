@@ -1,0 +1,22 @@
+{
+  "conflict_id": "conflict_76dd421e889a8dd284dde2e45346fc4f1dd70393f95defabee2119a5caf1a098",
+  "edge_key": "edge:0e25fcc6381a52f5a51a303e8cc856dcc17ed07058d66d5e5251c44d8a8f224c",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "e599ebce6a9bf2dd474e9245948dc349e1b342de0c1fbc0c5a2ea78b0a102ee6",
+  "action": "choose_value",
+  "selected_value": "qualified",
+  "supporting_assertion_ids": [
+    "coherent_q3fy26_cpo_e17"
+  ],
+  "rejected_assertion_ids": [
+    "cohr_ocs_dlx_pr_2024_03_25_e1",
+    "coherent_q2fy26_cpo_e19",
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e14"
+  ],
+  "supporting_source_ids": [
+    "coherent_q3fy26_cpo_s15",
+    "coherent_q3fy26_cpo_s20"
+  ],
+  "rationale": "這是 stale resolution 的重新提案，不是改判。四份候選屬同一 Coherent OCS scope，並構成一致時間序：2024-03-25 產品 PR 為 qualifying；2026-02-04 Q2 法說仍為 qualifying；2026-03-17 OFC 簡報新增的候選也為 qualifying；2026-05-06 Q3 法說則描述已突破產能瓶頸並預期本季 OCS 營收隨產能爬坡成長，支持 qualified。新加入的是較早且同樣 qualifying 的證據，沒有推翻較晚狀態，因此維持 qualified。限制：Q3 原文描述的是產能突破與營收爬坡，qualified 仍是抽取者對 qualification_status 的判讀，不應據此提高 evidence tier。",
+  "resolved_confidence": 0.7
+}

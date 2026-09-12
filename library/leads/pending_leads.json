@@ -7752,6 +7752,42 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000171491026000003/xslF345X06/form4-07172026_120713.xml"
     },
+    "lead_000275f922a2d61a09af0e0fe9047318": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-12T20:09:25.070450+00:00",
+      "lead_id": "lead_000275f922a2d61a09af0e0fe9047318",
+      "published_at": "2026-09-09",
+      "refs": {
+        "onboard_candidate_names": [
+          "NewPhotonics"
+        ]
+      },
+      "source": "weekly:cpo",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "NewPhotonics NPC50506：Open-CPX 6.4T socketed NPO 光引擎把 laser 整合進可維修封裝，Q3 樣品／Q4 reference design",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-12T20:09:33.494668+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "若 integrated-laser serviceable NPO 能被獨立驗證，會改變 external-laser/CW DFB 路徑的瓶頸排序。"
+        },
+        "decided_at": "2026-09-12T20:09:33.494668+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "NewPhotonics 公司發布的 6.4T Open-CPX socketed NPO 光引擎具型號、整合雷射架構與 Q3/Q4 時程；它直接提供 external-laser 路徑的可引用 counter-path，若成立可能改變 CW DFB 外置光源的排序。來源仍是供應商自報，需後續 pq1 驗證。",
+        "tier": 2
+      },
+      "url": "https://www.einpresswire.com/article/939190081/newphotonics-expands-near-package-optics-pic-series-with-laser-integrated-serviceable-high-density-6-4t-optical-engine"
+    },
     "lead_001e17e6dd6bced9a0785c38eefc6c6a": {
       "entities": {
         "company_ids": [],
@@ -17748,6 +17784,42 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072007692684837039"
+    },
+    "lead_2cdf807d54bf8f6febf46cb966914c41": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-12T20:09:09.029478+00:00",
+      "lead_id": "lead_2cdf807d54bf8f6febf46cb966914c41",
+      "published_at": "2026-09-07",
+      "refs": {
+        "onboard_candidate_names": [
+          "GIGALIGHT"
+        ]
+      },
+      "source": "weekly:cpo",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "GIGALIGHT socket-based 1.6T NPO：工程樣品可出貨，但 Flip-Chip 熱膨脹與 socket 壓合一致性仍是百萬級量產障礙",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-12T20:09:18.411834+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "ranking",
+          "reason": "若量產障礙經客戶端或第三方確認，會改變 CPO/NPO 架構與先進封裝層的瓶頸排序。"
+        },
+        "decided_at": "2026-09-12T20:09:18.411834+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true,
+          "novelty": true
+        },
+        "reason": "GIGALIGHT 官方材料具體揭露 1.6T socket NPO 工程樣品、Flip-Chip 熱膨脹與 socket 壓合一致性的量產障礙；關聯 CPO/NPO 且具可逐字查核的反證價值，可能改變架構與製程瓶頸排序。",
+        "tier": 1
+      },
+      "url": "https://www.gigalight.com/news-events/news-10808.html"
     },
     "lead_2d6a14cf1d209934f5139ed7ed78c3e4": {
       "entities": {

@@ -1,0 +1,22 @@
+{
+  "conflict_id": "conflict_8dde8f2e54b0f02a30173ea09419f952149dac99c5e0ba3e4bce75ff4e1458a6",
+  "edge_key": "edge:0e25fcc6381a52f5a51a303e8cc856dcc17ed07058d66d5e5251c44d8a8f224c",
+  "attribute": "ramp_execution",
+  "candidate_set_hash": "84ea68f41fab9d3aea29efa459a9fe7f5d76369c216a89b1f29f5c65cd735526",
+  "action": "unknown",
+  "selected_value": null,
+  "supporting_assertion_ids": [
+    "coherent_q2fy26_cpo_e19",
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_e14",
+    "coherent_q3fy26_cpo_e17"
+  ],
+  "rejected_assertion_ids": [],
+  "supporting_source_ids": [
+    "coherent_q2fy26_cpo_s20",
+    "coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17_s2",
+    "coherent_q3fy26_cpo_s15",
+    "coherent_q3fy26_cpo_s20"
+  ],
+  "rationale": "三份候選都屬同一 Coherent OCS scope 與同一 origin_entity，但 ramp_execution 依時間為 2026-02-04 的 3、2026-03-17 的 4、2026-05-06 的 3，沒有單向 supersession，也沒有逐字證據說明 1–5 評分尺度或為何中間升到 4、之後又回到 3。較新與較高 confidence 都不能單獨決勝；在沒有獨立客戶端量產／良率／出貨資料前，將 canonical ramp_execution 留為 unknown，保留全部 EdgeAssertion，不改 qualification_status。",
+  "resolved_confidence": 0.9
+}
