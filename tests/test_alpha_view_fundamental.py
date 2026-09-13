@@ -236,3 +236,27 @@ def test_evidence_index_resolves_the_models_own_citations() -> None:
     assert engine_c_refs and engine_c_refs <= indexed        # graph:// 引用由 context 供應，fixture 不含
     # 沒有模型時 evidence index 不受影響
     assert "engine_c://manual_observation/mo_fy2026" not in {i.ref for i in _view().evidence.index}
+
+
+def test_reporting_currency_label_comes_from_the_filing_not_from_the_quote_currency() -> None:
+    """`reporting_currency（X）` 的 X 必須是**財報幣別**，不是報價幣別。
+
+    事發（2026-09-13，XFAB.PA）：這個標籤一直是用 registry 的 `market_currency` 組的，
+    而它掛的是法定財報幣別的數字（內部營收／營業利益／淨利／fair value）。
+    兩者相同的美股看不出來；不同的 5 檔全部標錯——最危險的是 **IQE.L（GBP 財報／GBp 報價）**，
+    把報表數字標成 minor unit 會差 100 倍，正是 `AGENTS.md`「報價單位 ≠ 結算幣別」那一條。
+
+    ⚠ 不得回退到 `market_currency`：答不出報表幣別就寫「未知」——
+    「不知道」與「等於報價幣別」是兩個 claim，後者舉證責任高得多（L11-5）。
+    """
+    model = _run()
+    assert model.base_actuals is not None
+    view = _view(fundamental_model=model,
+                 identity={"market_currency": "SEK", "market_quote_unit": "SEK"})
+
+    units = {item.unit for item in view.internal_fundamentals.items
+             if item.unit and item.unit.startswith("reporting_currency")}
+    assert units, "內部基本面沒有任何 reporting_currency 欄位——這個測試會變成恆真"
+    for unit in units:
+        assert model.base_actuals.currency in unit, f"{unit} 沒有用財報幣別"
+        assert "SEK" not in unit, "報價幣別漏進了報表幣別的標籤"

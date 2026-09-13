@@ -1368,6 +1368,19 @@ def build_alpha_investment_view(
     identity = dict(identity or {})
     quote_unit = identity.get("market_quote_unit")
     market_currency = identity.get("market_currency")
+    # ⚠ **報表幣別 ≠ 報價幣別**（`AGENTS.md`「報價單位 ≠ 結算幣別」）。
+    # 2026-09-13 實測：`reporting_currency（…）` 這個單位標籤一直是用 `market_currency` 組的，
+    # 而它掛的是**法定財報幣別**的數字（內部營收／營業利益／淨利／fair value）。
+    # 兩者相同的美股看不出來；不同的 5 檔全部標錯：XFAB.PA（USD 財報／EUR 報價）、
+    # HEXA-B.ST（EUR／SEK）、6680.HK（CNY／HKD）、XPEV（CNY／USD）、
+    # **IQE.L（GBP／GBp）——那是 minor unit，讀成報表幣別會差 100 倍**。
+    # 身分來源只能是財報自己：基期觀測宣告的 currency，其次是快照的 financial_currency。
+    # ⚠ **不得回退到 `market_currency`**——那正是這個 bug；答不出來就寫「未知」（L12 先分開再各自定規則）。
+    reporting_currency = (
+        (fundamental_model.base_actuals.currency
+         if fundamental_model is not None and fundamental_model.base_actuals is not None else None)
+        or getattr(context.fundamentals, "currency", None)
+    )
 
     # as-of 模式：Engine A／C 有時點投影，Decision Store 與 thesis 檔沒有。沒有投影的來源
     # 一律 `not_applicable` 並說明，不拿當前值冒充 T 時刻（INV-6）。builder 自己強制，
@@ -1507,22 +1520,22 @@ def build_alpha_investment_view(
 
     fund = _fundamental_parts(
         fundamental_model, fundamental_model_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
     valuation_section = _valuation_section(
         valuation, valuation_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
     implied_return_section = _implied_return_section(
         implied_return, implied_return_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
     entry_section = _entry_logic_section(
         entry, entry_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{market_currency or '未知'}；未正規化）",
+        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
 
@@ -1865,7 +1878,7 @@ def build_alpha_investment_view(
     m = context.market
     fund_as_of = _freshness_as_of(build, "fundamentals")
     market_as_of = m.bar_date or _freshness_as_of(build, "market")
-    reporting_unit = f"reporting_currency（{market_currency or '未知'}；未正規化）"
+    reporting_unit = f"reporting_currency（{reporting_currency or '未知'}；未正規化）"
     quote_price_unit = f"quote_unit（{quote_unit or '未知'}）"
     fundamentals_items = (
         _observation("price", "價格", m.price, authority=A_SNAP, unit=quote_price_unit,
