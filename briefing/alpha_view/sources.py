@@ -312,6 +312,7 @@ def _implied_return_model(
     build: ContextBuild, valuation: ValuationResult | None, valuation_reason: str | None,
     ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date, identity: Mapping[str, Any],
     fundamental_model: FundamentalModelResult | None = None,
+    fundamentals_provider: Any = None,
 ) -> tuple[ImpliedReturnResult | None, str | None, list[Any]]:
     """Base-case Implied Return v1（Step 2）的取數與執行。
 
@@ -328,10 +329,17 @@ def _implied_return_model(
         # 兩桿拆解（2026-09-09 P2）只讀 fundamental model 已算好的 EPS 比較；同一個物件，不另取共識。
         eps_comparison = (fundamental_model.comparisons.get("eps")
                           if fundamental_model is not None and fundamental_model.as_of == as_of else None)
+        # 匯率觀測（2026-09-13）：報表幣別 ≠ 報價幣別時的**可稽核**換算路徑。
+        # provider 沒有這個能力或 ledger 裡沒有觀測 → 空的 → 報酬層照舊 fail closed。
+        fetch_fx = getattr(fundamentals_provider, "fx_observations", None)
+        fx_rows: tuple = ()
+        if callable(fetch_fx):
+            fx_rows, _fx_reason = fetch_fx(ticker, as_of=as_of)
         result = build_implied_return(
             company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
             valuation=valuation, valuation_reason=valuation_reason, horizon_records=records, parse_errors=parse_errors,
             evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=_current_price(build, identity),
+            fx_observations=fx_rows,
             eps_comparison=eps_comparison,
         )
     except Exception as exc:  # noqa: BLE001 — 報酬失敗只讓該區 missing，不讓整份 view 失敗
@@ -505,6 +513,7 @@ def fetch_alpha_investment_view(
             build, valuation_model, valuation_reason, resolved_ticker, company_id, as_of=as_of, today=today,
             identity=identity,
             fundamental_model=fundamental_model,
+            fundamentals_provider=fundamentals_provider,
         )
         entry_model, entry_reason, entry_records = _entry_model(
             build, implied_return_model, implied_return_reason, resolved_ticker, company_id, as_of=as_of, today=today,

@@ -26,6 +26,7 @@ from typing import Any, Mapping, Sequence
 
 from ..contracts import EvidenceRef, content_digest
 from ..fundamental.contracts import AssumptionSelection, ExpectationComparison, FiscalPeriod
+from ..fx import convert_to_quote_unit
 from ..valuation.contracts import VALUE_DATE_SPOT, VALUE_DATE_UNSPECIFIED, CurrentPrice, ValuationResult
 from ..valuation.model import units_comparable
 from .assumptions import select_horizon_assumptions
@@ -102,6 +103,8 @@ def build_implied_return(
     horizon_records: Sequence[HorizonAssumption],
     evidence_index: Mapping[str, EvidenceRef],
     price: CurrentPrice,
+    #: 可用的匯率觀測（Engine C `fx_rate`）。空的就等於沒有換算路徑——照舊 fail closed。
+    fx_observations: Sequence[Any] = (),
     parse_errors: Sequence[str] = (),
     eps_comparison: ExpectationComparison | None = None,
 ) -> ImpliedReturnResult:
@@ -202,6 +205,38 @@ def build_implied_return(
                      absence_kind=(valuation.effective_absence_kind if valuation is not None
                                    else "upstream_unavailable"))
     unit_status, unit_why = units_comparable(valuation.currency, price.unit)
+    fx: Any = None
+    fair_value_in_quote: float | None = None
+    if unit_status != "comparable":
+        # 2026-09-13：先試那條**可稽核**的換算路徑（`alpha/fx.py`）。
+        # 同幣別不同尺度用 registry 的 factor（定義值，不需觀測）；真的跨幣別需要一筆帶日期的
+        # `fx_rate` 觀測。換不了就照舊 fail closed——**這裡沒有放寬任何東西，補上的是缺的那條路**。
+        fx, fx_reason = convert_to_quote_unit(
+            float(valuation.fair_value),                      # type: ignore[arg-type]
+            from_currency=valuation.currency, to_unit=price.unit,
+            bar_date=price.bar_date, observations=tuple(fx_observations))
+        if fx is not None:
+            fair_value_in_quote = fx.value
+            steps.append(ReturnStep(
+                key="fx_conversion", label=f"幣別換算（{fx.from_unit} → {fx.to_unit}）",
+                kind="derived", value=fx.factor, unit="ratio", basis="observation",
+                formula=fx.formula, observation_refs=fx.evidence_refs,
+                reason=("⚠ fair value 原本的幣別是 " + str(valuation.currency)
+                        + "——**那個身分沒有被改寫**；本步驟只多給一個以報價單位計的值。"
+                        + ("（同幣別不同尺度，registry 的定義值）" if fx.kind == "same_currency_scale"
+                           else f"（FX 觀測 as_of {fx.as_of}）"))))
+            steps.append(ReturnStep(
+                key="fair_value_in_quote_unit",
+                label=f"fair value（換算成報價單位 {fx.to_unit}）",
+                kind="derived", value=fx.value, unit=fx.to_unit, basis="deterministic",
+                formula=f"fair_value（{valuation.currency}）× {fx.factor:g}",
+                observation_refs=fx.evidence_refs,
+                reason=("⚠ **這是報酬層自己換算出來的值，不是估值層的 fair value**。"
+                        f"估值層的 fair value 仍然是 {valuation.fair_value:,.4f} {valuation.currency}"
+                        "——兩個數都留著，因為「這個數字原本是哪一種幣別」是它身分的一部分。")))
+            unit_status, unit_why = "comparable", None
+        else:
+            unit_why = f"{unit_why}｜⚠ 換算路徑也走不通：{fx_reason}"
     if unit_status != "comparable":
         # 這一格知道自己是哪一種缺席，所以**明示**——`DEFAULT_ABSENCE_KIND["missing"]` 是
         # `not_yet_recorded`（＝還沒做），而單位不相容明明是「每個輸入都有值但身分不合」。
@@ -230,7 +265,9 @@ def build_implied_return(
     # ---- 5. 確定性算術 -------------------------------------------------------------------------
     days = (horizon_end - horizon_start).days
     years = days / DAYS_PER_YEAR
-    price_return = _price_return(valuation.fair_value, price.value)          # type: ignore[arg-type]
+    # 換算過就用換算後的值——**兩邊必須是同一把尺**，而 fair value 原本的幣別仍留在 valuation 上。
+    fair_value_for_return = fair_value_in_quote if fair_value_in_quote is not None else valuation.fair_value
+    price_return = _price_return(fair_value_for_return, price.value)          # type: ignore[arg-type]
     annualized = _annualized(price_return, days) if days >= 1 else None
     dependency = combined_return_dependency(valuation.input_dependency, horizon)
     all_ids = tuple(valuation.assumption_ids) + (horizon.assumption_id,)

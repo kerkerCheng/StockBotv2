@@ -38,6 +38,8 @@ from ..identity import CompanyId, Ticker
 FISCAL_RESULTS_FIELD = "fiscal_year_results"
 #: 目標年度已報導的 YTD 實績（2026-09-13）。**不進橋**，只為了讓它的 ref 進 evidence index。
 INTERIM_RESULTS_FIELD = "interim_period_results"
+#: 匯率觀測（2026-09-13）。`as_of` ＝ 那個匯率屬於哪一天。
+FX_RATE_FIELD = "fx_rate"
 
 #: `fiscal_year_results` payload 裡**有對應欄位**的鍵。其餘一律原樣進 `author_notes`——
 #: **不得靜默丟棄作者寫下的東西**（INV-3）。這個集合是可測的，所以「新增欄位卻忘了接」
@@ -514,6 +516,39 @@ class EngineCFundamentalsProvider:
             except (KeyError, TypeError, ValueError, ContractViolation) as exc:
                 errors.append(f"{row['observation_id']}: {exc}")
         reason = ("interim_period_results 觀測無法解析：" + "；".join(errors[:2])) if errors and not out else None
+        return tuple(out), reason
+
+    def fx_observations(
+        self, ticker: Ticker | None, *, as_of: date | None = None
+    ) -> tuple[tuple[Any, ...], str | None]:
+        """這個標的可用的匯率觀測（`fx_rate`），最新在前。
+
+        ⚠ **它不是本系統的判斷**，是一個帶日期的公告數字；方向由 payload 的 `base`／`quote` 決定。
+        """
+        from ..fx import parse_fx_observation
+
+        if ticker is None:
+            return (), "未上市，無匯率觀測"
+        rows = self._ledger_rows(ticker, FX_RATE_FIELD, as_of)
+        if not rows:
+            return (), None
+        superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        out: list[Any] = []
+        errors: list[str] = []
+        for row in rows:
+            if row["observation_id"] in superseded:
+                continue
+            try:
+                payload = json.loads(row["value"])
+                stamp = _as_date(row.get("as_of"))
+                if stamp is None:
+                    raise ValueError("缺 as_of——匯率沒有日期就不能用（那等於用今天的匯率換過去的價）")
+                out.append(parse_fx_observation(
+                    payload, as_of=stamp,
+                    evidence=(self._ledger_ref(row, published_at=stamp), )))
+            except (KeyError, TypeError, ValueError, ContractViolation) as exc:
+                errors.append(f"{row['observation_id']}: {exc}")
+        reason = ("fx_rate 觀測無法解析：" + "；".join(errors[:2])) if errors and not out else None
         return tuple(out), reason
 
     def company_guidance(
