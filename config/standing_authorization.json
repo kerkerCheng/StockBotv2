@@ -70,7 +70,7 @@
       "reversible": "單一 commit 可 revert，且不依賴任何已發生的外部副作用",
       "no_authority_write": "不寫圖、不寫 Engine C ledger、不動 thesis、不碰 live 或資本",
       "has_verification": "答得出「哪個數字會變」並附可跑的查證命令（L14 第 5 點）",
-      "fix_level_declared": "已標修法層級（根除／顯形／個案）；標顯形或個案時寫出為什麼不做根除"
+      "fix_level_declared": "已標修法層級（根除／顯形／個案）；標顯形或個案時寫出為什麼不做根除。2026-09-13 起四問全答才算數——含③這是拿掉還是加一個機制（加的要寫為什麼不能用拿掉的方式達成）、④如果它是錯的最先壞掉的是哪一筆現有資料（**要真的去看那一筆並寫出結果**，這一格是動作不是聲明）"
     },
     "never": {
       "irreversible": "不可逆的改動——刪資料、改 append-only ledger、動已發布的 artifact",
