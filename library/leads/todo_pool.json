@@ -9776,6 +9776,18 @@
       "source": "manual",
       "title": "XPEV（XPeng）：本估 FY2026 每 ADS 虧損 −3.796、共識 −3.457 都是負的——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-13T04:36:35.210449+00:00",
+      "hint": "go＝執行 `python -m alpha abstention SIVE.ST --add library/private/alpha/abstention_proposals/SIVE.ST_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪首次替 SIVE.ST 寫基期觀測 mo_55381371（Q2 2026 半年報逐格，**FY2025 全部採重述後數字**——公司在該半年報更正一組前期錯誤並重述 2025 各季與全年），並補上六格 FY2026 假設、EV/Sales 估值 va_d65f128d（校準 33.454561x）、horizon ha_9f5d6855、四軸判斷（4/5）。｜⚠⚠ **共識在算術上已經被實績否定**：FY2026 共識每股虧損 −0.50 × 297,602 千股 ＝ 全年淨損 **148.8 百万**，而 **H1 2026 的實際淨損已經是 157.7 百万**——**共識隱含 H2 會有 +8.9 百万的淨利**。在 Q2 毛利率 **−36.6%**、H1 營業虧損 −158.4、且公司自己說『production ramp planned **second half of 2027**』的年度裡，那不是估計，是還沒更新的數字（eps 共識只有 **1 位分析師**）。｜放行後會變什麼：fair value **24.69 克朗**、隱含報酬 **−18.513%**、readiness 由 blocked 變 ready。｜⚠⚠ **但 −18.5% 嚴重低估這一檔的問題，而原因是方法本身**：EV/Sales 的目標倍數依 AGENTS.md 預設等於市場倍數，所以**「33.5 倍營收對一家 Q2 毛利率 −36.6% 的公司是否合理」這個問題被排除在 fair value 之外**。本估依規則不打折（沒有 re-rating 證據），但必須讓你看見這個對照：**Sivers 33.5x vs NBIS 16.7x（毛利率 74%）vs CRWV 7.4x vs IREN 6.8x vs XPEV 0.76x**。｜⚠ 三個同時發生的惡化（全部來自公司自己的半年報）：①營收在縮（Q2 53.8 vs 61.4，−12.4%；H1 115.6 vs 144.3，−19.9%，且 Q2 比 Q1 的 61.8 還低）；②毛利率 FY2025 +5.78% → H1 −4.50% → **Q2 −36.62%**；③管銷由 51.3 爆到 116.8（其中 **58.2 是股酬**，而 FY2025 全年只有 8.5）。**現金只剩 62.7 百万，而 H1 營業虧損是 158.4——H2 幾乎必然再增資，而本估的股數沒把它算進來。**｜⚠ 一個未解讀的異常：快照 analyst_target_mean 7.13（3 位）對現價 30.30 是 −76%，本輪不解讀只記錄。｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 575,
+      "reason": null,
+      "ref_id": "SIVE.ST",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "SIVE.ST（Sivers）：本估 FY2026 每股虧損 −0.963、共識 −0.50（1 位分析師，且全年隱含淨損比 H1 實績還小）——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21316,6 +21328,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 575,
+  "next_n": 576,
   "schema_version": "1"
 }
