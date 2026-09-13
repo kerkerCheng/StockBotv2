@@ -9728,6 +9728,18 @@
       "source": "research_action",
       "title": "NewPhotonics NPC50506：6.4T socketed NPO 的 integrated-laser counter-path",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-13T03:38:15.013379+00:00",
+      "hint": "go＝執行 `python -m alpha abstention XFAB.PA --add library/private/alpha/abstention_proposals/XFAB.PA_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪把 XFAB.PA 剩下的三格全補完了——匯率觀測 mo_5cbfdaa9（USD→EUR 0.861999，yfinance EURUSD=X 2026-09-11 收盤 1.160093 的倒數，補上 c25a6dd 的 FX 路徑所需）、EV/Sales 估值假設 va_7dbc97f4（校準 1.52975x ＝ EV 1,260.22 百萬美元 ÷ FY2026 共識營收 823.81 百萬美元，**校準恆等式已回代驗證：共識營收餵回公式得 7.256382 USD，與現價逐位相同**）、horizon ha_6305e67d。基期觀測、六格假設與四軸判斷是前一輪寫好的。唯一缺的就是這一格。｜為什麼 target_pe 不能硬寫：**兩側的分母都不能用**。本估 FY2026 每股盈餘 −0.1251 美元（稅前 +2,809 千美元 − 所得稅 19,146 千美元，其中約 11,000 是馬來西亞子公司遞延所得稅資產除列的非現金項目），本益比法對虧損無定義；共識那側雖是正的 +0.01879，但**它的區間下緣 −0.07153 本身就是負的**，校準倍數 386x 的敏感度發散——一個由 7 位分析師平均決定它是 386 倍還是無限大的倍數，不是估值。｜放行後會變什麼：P6 切換條件（本益比法 deliberate_abstention ＋ ledger 有 ev_to_sales 假設）兩者屆時都成立 → fair value **6.9235 美元／股（＝5.9681 歐元）**、隱含報酬 **−4.587%**、readiness 由 blocked 變 ready。｜⚠ 那個 −4.59% 怎麼來的要講清楚：倍數桿 0.00%（目標＝校準）、營收桿 −3.4503%（本估 795.38 vs 共識 823.81），再乘淨負債放大 **1.3295 倍**（EV 1,260.22 ÷ 市值 947.92）。**這是一家淨負債公司，營收差被放大而不是壓縮**（對比 3363.TWO 淨現金的 0.9469 倍）。⚠⚠ **而 EV/Sales 對這一檔完全不看獲利，那正是它的問題所在**：營收 YoY 只掉 7%、營業利益掉 90%（Q2 2,096 vs 21,693），營益率 1.9%。**1.53x 營收看起來便宜，是因為這個倍數把 1.9% 的營益率當成不存在。**｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 571,
+      "reason": null,
+      "ref_id": "XFAB.PA",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "XFAB.PA（X-FAB）：內部 FY2026 EPS −0.1251 是虧損、共識 +0.01879 的校準倍數 386x 發散——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21268,6 +21280,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 571,
+  "next_n": 572,
   "schema_version": "1"
 }
