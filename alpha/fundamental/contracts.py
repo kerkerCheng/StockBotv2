@@ -151,13 +151,29 @@ ASSUMPTION_DRIVERS: Mapping[str, DriverSpec] = {
     "revenue_growth": DriverSpec(
         "ratio", "segment_or_total",
         "基期營收成長率；scope 是分部名稱或 total（兩者不得並存）", lower=-1.0, upper=5.0),
+    # ⚠ 上下界 ±10.0 是**單位錯誤偵測**，不是經濟判斷（2026-09-13 放寬，原本是 ±1.0）。
+    # 事發：AEVA 的基期營益率是 **−705.77%**（研發是營收的 4.7 倍），本估 FY2026 −562.69%，
+    # 變化量 **+143.08pp**——寫成一條被 ±1.0 拒絕，寫成三條 component 卻全部通過，
+    # 因為那個界管的是**每一筆紀錄**不是總和（L12：一個表示兩種語意）。
+    # 真正的經濟不變量是「結果的營益率不能超過 100%」，而它只有在橋上加總後才知道，
+    # 所以檢查搬到 `bridge.py`（實測全庫 55 檔的結果營益率最高 0.7629，無一超過 1.0）。
+    # 這裡留 ±10.0 仍然攔得住典型的單位錯誤（把 25% 寫成 25 而不是 0.25）。
     "operating_margin_delta": DriverSpec(
         "ratio", "component",
         "相對基期營益率的變化量（小數，+0.025 ＝ +2.5 個百分點）；scope 是成分標籤（mix／utilization／pricing…），可多條相加",
-        lower=-1.0, upper=1.0),
+        lower=-10.0, upper=10.0),
     "interest_and_other_net": DriverSpec(
         "currency", "total", "利息與其他（收益）費用淨額，絕對金額（正值＝費用）"),
     "tax_rate": DriverSpec("ratio", "total", "有效稅率（小數）", lower=-1.0, upper=1.0),
+    # ⚠ **與 `tax_rate` 二擇一，不得並存**（`bridge.py` 會擋）。2026-09-13 新增。
+    # 事發：XFAB.PA 的 FY2026 稅前是 **+2,809 千美元**而所得稅 **19,146**
+    # （其中 11,000 是馬來西亞子公司遞延所得稅資產除列的非現金項目）→ 實效稅率 **681.6%**，
+    # 而 `tax_rate` 的界是 ±1.0（scope 是 `total`，不像營益率可以拆 component）。
+    # 「稅比稅前利益還大」在稅前接近零又有一次性稅務項目時是真實會發生的事，
+    # 而**它不是一個比率問題，是一個絕對金額問題**——所以給它一個絕對金額的格子，
+    # 形狀與 `interest_and_other_net` 一致（那一格本來就是絕對金額）。
+    "tax_expense_absolute": DriverSpec(
+        "currency", "total", "所得稅費用淨額，絕對金額（正值＝費用，負值＝稅務利益）；與 tax_rate 二擇一"),
     "nci_attribution": DriverSpec(
         "currency", "total", "歸屬母公司前的非控制權益調整，絕對金額（正值＝加回母公司）"),
     "diluted_shares": DriverSpec("shares", "total", "稀釋加權平均股數（絕對股數）", lower=0.0),

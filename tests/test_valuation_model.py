@@ -590,3 +590,38 @@ def test_ev_to_sales_refuses_to_subtract_net_debt_in_a_different_currency() -> N
     # 舊列沒有這一欄 → 放行，但這正是為什麼 migration 要把欄位補上（全擋會攔錯東西，L15-1）。
     silent = build_valuation(balance=BalanceSheetInput(**base, currency=None), **common)
     assert silent.status == "available"
+
+
+def test_abstention_is_recorded_even_when_an_upstream_absence_already_holds_the_reason() -> None:
+    """有 live Abstention 時 `settled_by` 一定填——即使缺席理由來自上游（POET 的形狀）。
+
+    ⚠ `absence_kind` **不**被改寫：它仍然是上游的原因。兩個事實同時可見才分得出
+    「要補上游」與「補了也不會有 fair value」（L12：先分開，再各自定規則）。
+    """
+    from datetime import date as _date
+
+    from alpha.abstention import Abstention
+
+    ab = Abstention(
+        abstention_id="ab_" + "a" * 16, company_id="co:coherent", ticker="COHR", layer="valuation",
+        subject="forward_earnings_multiple.target_pe", period_end=TARGET.end,
+        reason="虧損年沒有可校準的市場倍數；刻意不先補基期再宣告不適用",
+        revisit_when="FY2027 共識 EPS 轉正（目前 −0.23，1 位分析師），或出現可錨定的同業倍數",
+        author="user", created_at=CREATED,
+        evidence_refs=(SNAP,))
+    # 上游缺席（fundamental model 完全沒跑）＋ 有 Abstention。
+    result = build_valuation(
+        company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7),
+        fundamental=None, fundamental_reason="Engine C 無基期觀測", assumption_records=[],
+        evidence_index=_index(), price=PRICE, abstention_records=[ab])
+    assert result.status == "missing"
+    assert result.absence_kind == "upstream_unavailable"          # 上游的原因沒有被蓋掉
+    assert result.settled_by == ab.abstention_id                  # 但宣告看得見
+    assert "補上游也不會有 fair value" in (result.reason or "")
+    assert "目標期間未知" in (result.reason or "")                # 期間未核對要明說
+    # 沒有 Abstention 時不得憑空 settled。
+    plain = build_valuation(
+        company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7),
+        fundamental=None, fundamental_reason="Engine C 無基期觀測", assumption_records=[],
+        evidence_index=_index(), price=PRICE)
+    assert plain.settled_by is None and plain.absence_kind == "upstream_unavailable"

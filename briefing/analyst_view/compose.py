@@ -45,6 +45,11 @@ def _absence_kinds(**metas: Any) -> dict[str, str | None]:
     return {name: meta.effective_absence_kind for name, meta in metas.items()}
 
 
+def _settled_by(**metas: Any) -> dict[str, str | None]:
+    """每個來源 section 的 `settled_by`（`ab_*`）——同樣照抄，不推論（2026-09-13）。"""
+    return {name: getattr(meta, "settled_by", None) for name, meta in metas.items()}
+
+
 def _line(key: str, label: str, datum: Datum, role: str) -> AnalystLine:
     return AnalystLine(key=key, display_label=label, datum=datum, role=role)
 
@@ -170,12 +175,14 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
     statuses = {"implied_return": ir.meta.status, "valuation": va.meta.status}
     kinds = _absence_kinds(implied_return=ir.meta, valuation=va.meta)
+    settled = _settled_by(implied_return=ir.meta, valuation=va.meta)
     return AnalystPanel(
         key="headline", title="頭條：現價 → future target value → 隱含報酬",
         questions=("q4_implied_return",),
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("implied_return", "valuation", "refresh_status"),
-        source_statuses=statuses, source_absence_kinds=kinds, lines=numbers + context_lines,
+        source_statuses=statuses, source_absence_kinds=kinds, source_settled_by=settled,
+        lines=numbers + context_lines,
         attention=_attention(view, artifact_types=HEADLINE_ARTIFACTS),
         attention_scope="只列頭條這幾格自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",
         attention_total=len(_attention(view)),

@@ -194,6 +194,7 @@ def build_valuation(
     warnings: list[str] = []
     steps: list[ValuationStep] = []
     reason: str | None = None
+    settled_by: str | None = None
     #: 缺席語意（`alpha/absence.py`）。**每個把 `reason` 設起來的分支自己宣告它是哪一種缺席**——
     #: 消費端不得回頭 parse 這段散文（L16：分類要跟著資料走）。None ＝ 用 status 的預設。
     absence_kind: str | None = None
@@ -274,11 +275,41 @@ def build_valuation(
         declared = select_abstention(
             abstention_records, layer="valuation", subject=f"{method}.{parameter}",
             period_end=target.end if target is not None else None, as_of=as_of, today=today)
+        period_unverified = False
+        if declared is None and target is None:
+            # ⚠⚠ **目標期間本身不知道時，`select_abstention` 一定找不到**：它要求
+            # `r.period_end is None or r.period_end == period_end`，而這裡的 period_end 是 None。
+            # 而 target 來自 fundamental model 的目標期間——**它缺席正是「連基期觀測都沒有」的那一種**，
+            # 也就是最需要看見 Abstention 的情況（實測 POET：ledger 有 live 的 ab_42838d2e，
+            # 畫面卻只說「去補上游」，而那筆宣告的內文正好在警告不要去補）。
+            # 所以退一步：同 layer＋subject 有沒有 live 宣告？有就記下來，**並明說期間未核對**。
+            # 這是弱主張，不是放寬——readiness 照舊 blocked，改的只是「該不該去補」這個問題的答案。
+            for candidate in sorted({r.period_end for r in abstention_records if r.period_end}):
+                declared = select_abstention(
+                    abstention_records, layer="valuation", subject=f"{method}.{parameter}",
+                    period_end=candidate, as_of=as_of, today=today)
+                if declared is not None:
+                    period_unverified = True
+                    break
+        if declared is not None:
+            # 2026-09-13：**不論上游有沒有已經占住 `reason`，都把宣告記下來。**
+            # 先前只有 `reason is None` 時才處理，於是「連基期觀測都沒有」的標的（POET）
+            # 明明有 live Abstention，畫面卻只說「去補上游」——而那筆 Abstention 的內文正好
+            # 在警告不要去補。`settled_by` 與 `absence_kind` 正交，兩個都留（L12：先分開）。
+            settled_by = declared.abstention_id
         if declared is not None and reason is None:
             reason = (f"刻意不主張目標倍數（{method}.{parameter}）：{declared.reason}"
                       f"｜什麼會改寫它：{declared.revisit_when}"
                       f"｜宣告於 {declared.created_on.isoformat()}（{declared.abstention_id}）")
             absence_kind = "deliberate_abstention"
+        elif declared is not None:
+            # 上游的缺席理由留著（它是真的），但把「作者已宣告不必補」接在後面——
+            # 兩個事實同時可見，使用者才分得出「要補上游」與「補了也沒用」。
+            caveat = ("（⚠ 本次目標期間未知，無法核對宣告的期間是否相同——"
+                      f"該宣告針對 {declared.period_end}）" if period_unverified else "")
+            reason = (f"{reason}｜⚠ **但這一格已由 Abstention 宣告刻意不主張，補上游也不會有 fair value**"
+                      f"{caveat}：{declared.reason}｜什麼會改寫它：{declared.revisit_when}"
+                      f"｜宣告於 {declared.created_on.isoformat()}（{declared.abstention_id}）")
         elif reason is None:
             reason = ("沒有生效的估值假設（" + "；".join(f"{k}={v}" for k, v in selection.reasons.items()) + "）"
                       if selection.input_count else
@@ -462,6 +493,7 @@ def build_valuation(
         evidence=tuple({r.ref: r for r in model_evidence}.values()),
         value_date=value_date, value_date_semantics=value_date_semantics,
         absence_kind=None if fair_value is not None else absence_kind,
+        settled_by=None if fair_value is not None else settled_by,
     )
 
 

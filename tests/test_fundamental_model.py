@@ -423,8 +423,8 @@ def test_driver_vocabulary_is_closed_and_validated() -> None:
     with pytest.raises(ContractViolation, match="單位必須是"):
         parse_assumption_record(record)
     assert set(ASSUMPTION_DRIVERS) == {"revenue_growth", "operating_margin_delta",
-                                       "interest_and_other_net", "tax_rate", "nci_attribution",
-                                       "diluted_shares"}
+                                       "interest_and_other_net", "tax_rate", "tax_expense_absolute",
+                                       "nci_attribution", "diluted_shares"}
 
 
 def test_total_and_segment_growth_cannot_coexist() -> None:
@@ -671,3 +671,49 @@ def test_coverage_note_and_leftovers_survive_the_parser() -> None:
         period=FiscalPeriod(end=date(2026, 6, 30)), currency="USD", revenue=1.0e9,
         segment_revenue=None, gaap={"operating_income": 1.0e8}, non_gaap=None, evidence=(ACT_REF,))
     assert plain.coverage_note is None and dict(plain.author_notes) == {}
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-13：稅有兩種寫法（比率／絕對金額），而營益率的界管的是紀錄不是總和
+# ---------------------------------------------------------------------------
+
+def test_tax_expense_absolute_does_not_depend_on_pretax_and_excludes_tax_rate() -> None:
+    """稅前接近零時比率會爆掉（XFAB.PA 實效稅率 681.6%），絕對金額仍然有意義。"""
+    base = [a for a in _full_set() if a.driver != "tax_rate"]
+    abs_tax = _assumption("tax_expense_absolute", "total", 19_146_000.0)
+    result = build_bridge(_actuals(), base + [abs_tax], TARGET)
+    pretax = next(s for s in result.steps if s.key == "internal_pretax_income").value
+    assert pretax is not None
+    step = next(s for s in result.steps if s.key == "internal_income_taxes")
+    assert step.value == pytest.approx(19_146_000.0)          # 不乘稅前
+    assert "絕對金額" in (step.formula or "")
+    net = next(s for s in result.steps if s.key == "internal_net_income")
+    assert net.value == pytest.approx(pretax - 19_146_000.0)
+    assert result.metrics["eps"].value is not None             # 整條橋走得完
+
+
+def test_tax_rate_and_tax_expense_absolute_cannot_coexist() -> None:
+    """兩個都寫＝一格兩義：不挑一個、不相加，直接拒絕並說出要撤回哪一條（L12）。"""
+    both = _full_set() + [_assumption("tax_expense_absolute", "total", 19_146_000.0)]
+    result = build_bridge(_actuals(), both, TARGET)
+    step = next(s for s in result.steps if s.key == "internal_income_taxes")
+    assert step.value is None
+    assert "二擇一" in (step.reason or "") and "不得相加" in (step.reason or "")
+    assert result.metrics["eps"].value is None                 # 下游整條斷掉，不猜
+
+
+def test_operating_margin_delta_bound_is_a_unit_check_and_the_sum_is_checked_on_the_result() -> None:
+    """per-record 界放寬到 ±10（AEVA 的 +143pp 是真的），但**結果**營益率不得超過 100%。"""
+    from alpha.fundamental.contracts import ASSUMPTION_DRIVERS
+
+    spec = ASSUMPTION_DRIVERS["operating_margin_delta"]
+    assert (spec.lower, spec.upper) == (-10.0, 10.0)
+    # 一條 +1.43（AEVA 那個量級）現在寫得進去——不必為了通過驗證而拆成三條。
+    assert _assumption("operating_margin_delta", "total", 1.4308).value == pytest.approx(1.4308)
+    # 但加總後超過 100% 的組合會被擋，而且理由明說「是加總越界，不是界太嚴」。
+    deltas = [_assumption("operating_margin_delta", f"c{i}", 0.6) for i in range(3)]
+    others = [a for a in _full_set() if a.driver != "operating_margin_delta"]
+    result = build_bridge(_actuals(), others + deltas, TARGET)
+    step = next(s for s in result.steps if s.key == "internal_operating_margin")
+    assert step.value is None
+    assert "超過 100%" in (step.reason or "") and "加總**越界" in (step.reason or "")

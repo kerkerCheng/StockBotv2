@@ -321,6 +321,52 @@ class EngineCFundamentalsProvider:
                 if str(r.get("as_of") or "")[:10] <= cutoff
                 and str(r.get("recorded_at") or "")[:10] <= cutoff]
 
+    def _superseded_refs(
+        self, rows: Sequence[Mapping[str, Any]], live: Mapping[str, Any]
+    ) -> tuple[EvidenceRef, ...]:
+        """這一筆 live 觀測的**整條 supersession 祖先鏈**，每一筆都標明被誰取代。
+
+        ⚠⚠ 為什麼需要它（2026-09-13）：假設層是用 `engine_c://manual_observation/<id>` 這個
+        **字串**引用基期的。更正一筆基期觀測（append 新紀錄 ＋ `--supersedes`，L10 的正規做法）
+        之後，舊 id 就不再出現在 evidence index 裡——於是**每一條引用它的假設都變成
+        `unresolved_evidence`**，下游的表現是整檔一起消失，不是「這一條的證據過期了」。
+        實測（同日兩次，都是更正 coverage_note 這種**數字一字未改**的更正）：
+        AEVA 8 條 operating ＋ 1 條 valuation ＋ 1 條 horizon 共 **10 筆**要全部重寫；
+        4971.TWO 6 條 ＋ 估值 ＋ horizon。而**「更正成功」與「更正成功但打掉十筆假設」在寫入端
+        是同一個 `✓ 已寫入 mo_xxx`**（L13-2：成功與失敗在同一個訊號上同形）。
+
+        ⚠ **這不是讓舊引用「看起來還有效」**：ref 的 `quote` 前面會加上
+        「⚠ 已被 <新 id> 取代」，所以讀者看得到那條假設引用的是哪一版基期。
+        它換來的是：**更正基期不再夾帶「重寫十筆假設」的成本**，而那個成本會讓人選擇不更正
+        ——正好是 append-only 設計要防的事。
+        """
+        by_id = {str(r["observation_id"]): r for r in rows}
+        out: list[EvidenceRef] = []
+        seen = {str(live["observation_id"])}
+        current, successor = live, str(live["observation_id"])
+        while True:
+            parent_id = current.get("supersedes_id")
+            if not parent_id or str(parent_id) in seen:
+                break
+            parent = by_id.get(str(parent_id))
+            seen.add(str(parent_id))
+            if parent is None:
+                # 祖先不在本次查詢的視窗裡（as-of 過濾掉了）——照樣給一個可解析的 ref，
+                # 因為「解析不到」與「那一版在當時不存在」是兩件事（INV-3）。
+                out.append(EvidenceRef(
+                    ref=f"engine_c://manual_observation/{parent_id}",
+                    kind="engine_c_observation", origin_entity="issuer_filing",
+                    quote=f"⚠ 已被 {successor} 取代（superseded）；該版本不在本次 as-of 視窗內"))
+                break
+            ref = self._ledger_ref(parent, published_at=None)
+            out.append(EvidenceRef(
+                ref=ref.ref, kind=ref.kind, origin_entity=ref.origin_entity,
+                quote=f"⚠ 已被 {successor} 取代（superseded）：{(ref.quote or '')[:200]}",
+                published_at=ref.published_at, retrieved_at=ref.retrieved_at,
+                recorded_at=ref.recorded_at))
+            current, successor = parent, str(parent_id)
+        return tuple(out)
+
     def _ledger_ref(self, row: Mapping[str, Any], *, published_at: date | None) -> EvidenceRef:
         return EvidenceRef(
             ref=f"engine_c://manual_observation/{row['observation_id']}",
@@ -365,7 +411,7 @@ class EngineCFundamentalsProvider:
                     gaap=_numeric_block(payload.get("gaap")),
                     non_gaap=(_numeric_block(payload.get("non_gaap")) if payload.get("non_gaap") else None),
                     exit_quarter=(dict(payload["exit_quarter"]) if isinstance(payload.get("exit_quarter"), dict) else None),
-                    evidence=(ref,), source_filed_at=filed,
+                    evidence=(ref, *self._superseded_refs(rows, row)), source_filed_at=filed,
                     recorded_at=_as_datetime(row.get("recorded_at")),
                     observation_id=str(row["observation_id"]),
                     coverage_note=(str(payload["coverage_note"]).strip() or None

@@ -224,6 +224,7 @@ PLAIN_DRIVER_LABELS: Mapping[str, str] = {
     "operating_margin_delta": "營益率變化",
     "interest_and_other_net": "利息與其他淨額",
     "tax_rate": "有效稅率",
+    "tax_expense_absolute": "所得稅費用（金額）",
     "nci_attribution": "非控制權益調整",
     "diluted_shares": "稀釋股數",
 }
@@ -385,6 +386,8 @@ class AnalystPanel:
     source_statuses: Mapping[str, str]
     #: 每個來源 section 的缺席語意（`alpha/absence.py`；有內容的 section 是 None）。**抄，不推論。**
     source_absence_kinds: Mapping[str, str | None] = field(default_factory=dict)
+    #: 2026-09-13：每個來源 section 的 `settled_by`（`ab_*`）。**照抄，不推論。**
+    source_settled_by: Mapping[str, str | None] = field(default_factory=dict)
     lines: tuple[AnalystLine, ...] = ()
     weak_inputs: tuple[WeakInput, ...] = ()
     catalysts: tuple[CatalystItem, ...] = ()
@@ -432,8 +435,23 @@ class AnalystPanel:
         """這一格的缺席**已經是答案**（刻意不主張／方法不適用／本層沒有這個能力）。
 
         ⚠ 它**不**讓 readiness 變好——blocked 還是 blocked。它只回答「使用者看到這格該不該去補」。
+
+        ⚠⚠ **2026-09-13 補第二條路徑：`settled_by`。** 先前只看 `absence_kind`，於是
+        「有 Abstention 但缺席理由來自上游」的標的（POET）會被歸成「要去補上游」，
+        而那筆 Abstention 的內文正好在警告不要去補。兩個條件是 or：**任一成立就不是待辦**。
         """
+        if self.settled_by is not None:
+            return True
         return self.absence_kind in SETTLED_ABSENCE_KINDS
+
+    @property
+    def settled_by(self) -> str | None:
+        """哪一筆 `Abstention` 宣告了這一格不必補（照抄 section 的 `settled_by`，不推論）。"""
+        for name in self.source_sections:
+            declared = self.source_settled_by.get(name)
+            if declared:
+                return declared
+        return None
 
 
 @dataclass(frozen=True, slots=True)

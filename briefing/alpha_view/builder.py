@@ -705,6 +705,7 @@ def _valuation_section(
         status=section_status, basis="deterministic" if valuation.is_known else "none", authority=A_VALUATION,
         capability=CAP_DETERMINISTIC_FAIR_VALUE, reason=valuation.reason, as_of=reference_day,
         absence_kind=valuation.effective_absence_kind,
+        settled_by=valuation.settled_by,
         warnings=(VALUATION_EPISTEMIC_WARNING,
                   "fair value 不含現價：price-only 變化只動 gap，不動 fair value。",
                   "gap " + "；".join(GAP_IS_NOT), *valuation.warnings),

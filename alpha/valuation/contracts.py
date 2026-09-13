@@ -560,6 +560,17 @@ class ValuationResult:
     value_date_semantics: str = VALUE_DATE_UNSPECIFIED
     #: Step 5：fair value 缺席時**是哪一種缺席**（`alpha/absence.py` 的封閉字彙）。由 `build_valuation`
     #: 走到哪個分支自己宣告——消費端不得 parse `reason` 去猜（L16）。`available` 時必須是 None。
+    #: **已由 append-only `Abstention` 宣告「刻意不主張」的那筆紀錄 id**（2026-09-13）。
+    #: 與 `absence_kind` **正交**，刻意不合併：`absence_kind` 回答「這一格為什麼沒有值」，
+    #: 而它可能是上游的原因（POET＝連基期觀測都沒有）；`settled_by` 回答「作者有沒有已經
+    #: 決定這一格不必補」。
+    #: ⚠ 事發（2026-09-13 實測）：POET 的 ledger 裡有 live 的 `ab_42838d2eec25b735`，
+    #: 而 headline 的 `absence_kind` 是 `upstream_unavailable`、理由句寫「Engine C 無 POET 的
+    #: fiscal_year_results 觀測」——**而那筆 Abstention 的內文正好在警告不要去補那個上游**
+    #: （「補了也沒有可乘的倍數，那是為了讓流程好看而花的成本」）。
+    #: 於是呈現層在叫人做 authority 已經判定不值得做的事。修法是 L12 的標準形狀：
+    #: **先分開再各自定規則**，不是讓其中一個蓋掉另一個。
+    settled_by: str | None = None
     absence_kind: str | None = None
 
     def __post_init__(self) -> None:

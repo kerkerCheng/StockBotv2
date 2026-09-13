@@ -35,7 +35,13 @@ _SEGMENT_SUM_TOLERANCE = 0.005
 #: 必須與橋口徑一致，否則不得套用——non-GAAP 的 254M 所得稅套到 GAAP 基期是混算，不是估計。
 #: 營收成長與稀釋股數沒有口徑之分，不在此列。
 _BASIS_BEARING_DRIVERS: frozenset[str] = frozenset(
-    {"operating_margin_delta", "interest_and_other_net", "tax_rate", "nci_attribution"})
+    {"operating_margin_delta", "interest_and_other_net", "tax_rate", "tax_expense_absolute",
+     "nci_attribution"})
+
+#: 結果營益率的上限。**這是經濟不變量，不是參數**：營業利益不可能超過營收。
+#: 2026-09-13 從 `operating_margin_delta` 的 per-record 界搬到這裡——per-record 的界管不到總和，
+#: 而總和才是有意義的那個數（實測全庫 55 檔最高 0.7629，無一超過 1.0）。
+_MAX_OPERATING_MARGIN = 1.0
 
 
 @dataclass(frozen=True, slots=True)
@@ -211,6 +217,15 @@ def build_bridge(
             "沒有 operating_margin_delta 假設——沿用基期也必須是一條寫下來的假設（值可為 0）")
     else:
         margin = base_om + sum(d.value for d in deltas)
+        if margin > _MAX_OPERATING_MARGIN:
+            # 加總後才看得出來的單位錯誤（例：把 +25% 寫成 25）。per-record 的界攔不到這個，
+            # 因為它可以被拆成多條 component 分攤——所以檢查在這裡，而且檢查的是**結果**。
+            margin_reason = (
+                f"內部營益率 {margin:.2%} 超過 100%（基期 {base_om:.2%} ＋ "
+                f"{len(deltas)} 條 operating_margin_delta 合計 {margin - base_om:+.2%}）"
+                "——營業利益不可能超過營收，這個組合不是估計而是單位錯誤"
+                "（⚠ 每一條紀錄各自都在 ±10.0 的界內，是**加總**越界；要修的是那幾條假設，不是界）")
+            margin = None
     margin_formula = "base_operating_margin + Σ operating_margin_delta[scope]"
     if margin is not None:
         steps.append(BridgeStep(key="internal_operating_margin", label=f"內部營益率（{basis}）",
@@ -247,14 +262,34 @@ def build_bridge(
 
     # ---- 5. 稅 → 淨利 ------------------------------------------------------
     tax_rate = by_key.get(("tax_rate", TOTAL_SCOPE))
+    tax_abs = by_key.get(("tax_expense_absolute", TOTAL_SCOPE))
     if tax_rate is not None:
         steps.append(_assumption_step("tax_rate", "有效稅率假設", tax_rate))
-    tax = (pretax * tax_rate.value) if (pretax is not None and tax_rate is not None) else None
-    tax_ids = pretax_ids + ([tax_rate.assumption_id] if tax_rate else [])
-    tax_reason = (None if tax is not None else
-                  (_absent("tax_rate", "缺 tax_rate 假設") if tax_rate is None else pretax_reason))
+    if tax_abs is not None:
+        steps.append(_assumption_step("tax_expense_absolute", "所得稅費用假設（絕對金額）", tax_abs))
+    tax_formula = "internal_pretax_income × tax_rate"
+    if tax_rate is not None and tax_abs is not None:
+        # 兩個都寫＝一格兩義（L12）。不挑一個用，也不相加——直接拒絕並說出要刪哪一條。
+        tax, tax_ids = None, pretax_ids + [tax_rate.assumption_id, tax_abs.assumption_id]
+        tax_reason = ("同時有 tax_rate 與 tax_expense_absolute 假設——兩者二擇一，"
+                      "不得並存也不得相加（同一筆稅會被算兩次）。"
+                      "稅前接近零或有一次性稅務項目時用絕對金額，其餘用比率；"
+                      "要換就 append 一筆 retracted 撤回不要的那一條")
+    elif tax_abs is not None:
+        # 絕對金額優先於比率的理由不是偏好，是**它不依賴稅前**：稅前接近零時比率會爆掉
+        # （XFAB.PA FY2026 實效稅率 681.6%），而絕對金額仍然是一個有意義的數。
+        tax = tax_abs.value if pretax is not None else None
+        tax_ids = pretax_ids + [tax_abs.assumption_id]
+        tax_formula = "tax_expense_absolute（絕對金額，不乘稅前）"
+        tax_reason = None if tax is not None else pretax_reason
+    else:
+        tax = (pretax * tax_rate.value) if (pretax is not None and tax_rate is not None) else None
+        tax_ids = pretax_ids + ([tax_rate.assumption_id] if tax_rate else [])
+        tax_reason = (None if tax is not None else
+                      (_absent("tax_rate", "缺 tax_rate 假設（或 tax_expense_absolute——二擇一）")
+                       if tax_rate is None else pretax_reason))
     _emit(steps, "internal_income_taxes", f"內部所得稅（{basis}）", tax, "currency",
-          "internal_pretax_income × tax_rate", tax_ids, base_refs, tax_reason)
+          tax_formula, tax_ids, base_refs, tax_reason)
     net_income = (pretax - tax) if (pretax is not None and tax is not None) else None
     _emit(steps, "internal_net_income", f"內部淨利（{basis}，歸屬前）", net_income, "currency",
           "internal_pretax_income − internal_income_taxes", tax_ids, base_refs, tax_reason)

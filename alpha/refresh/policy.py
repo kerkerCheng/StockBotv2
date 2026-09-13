@@ -99,6 +99,9 @@ GUIDANCE_FIELD_DRIVERS: Mapping[str, str | None] = {
     "operating_margin": "operating_margin_delta",
     "operating_income": "operating_margin_delta",
     "tax_rate": "tax_rate",
+    # 2026-09-13：公司指引給的是「所得稅費用金額」時對應絕對金額那一格（與 tax_rate 二擇一）。
+    "tax_expense": "tax_expense_absolute",
+    "income_taxes": "tax_expense_absolute",
     "diluted_shares": "diluted_shares",
     "shares": "diluted_shares",
     "interest": "interest_and_other_net",

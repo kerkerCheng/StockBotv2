@@ -65,6 +65,27 @@ def _eps_with(
     return metric.value if metric is not None and metric.is_known else None
 
 
+#: 端點往自己的值收斂時最多試幾次（每次砍一半）。10 次已經把區間縮到千分之一以下。
+_ENDPOINT_RETRIES = 10
+
+
+def _feasible_endpoint(actuals, assumptions, target, assumption, endpoint: float):
+    """從 `endpoint` 往 `assumption.value` 收斂，找第一個橋算得出 EPS 的點。
+
+    回傳 `(找到的點, 該點的 EPS)`；找不到就 `(endpoint, None)`。
+    ⚠ 這不是「放寬」：它只縮小搜尋區間，所以若真解落在被縮掉的那一段，
+    下游會看到 `no_sign_change`（＝這個 driver 撐不起現價），而那是正確的結論。
+    """
+    x = float(endpoint)
+    anchor = float(assumption.value)
+    for _ in range(_ENDPOINT_RETRIES):
+        value = _eps_with(actuals, assumptions, target, assumption.assumption_id, x)
+        if value is not None:
+            return x, value
+        x = (x + anchor) / 2.0
+    return float(endpoint), None
+
+
 def _bounds(driver: str) -> tuple[float, float]:
     spec = ASSUMPTION_DRIVERS[driver]
     lower = spec.lower if spec.lower is not None else -_FALLBACK_SPAN
@@ -96,11 +117,16 @@ def solve_driver(
     # 端點：往兩邊各縮一點點，避開剛好落在邊界上時 `replace` 被 contract 拒絕。
     edge = (upper - lower) * 1e-9
     lo, hi = lower + edge, upper - edge
-    f_lo = _eps_with(actuals, assumptions, target, assumption.assumption_id, lo)
-    f_hi = _eps_with(actuals, assumptions, target, assumption.assumption_id, hi)
+    # ⚠ **driver 的合法界 ≠ 橋的可行域**（2026-09-13）。`operating_margin_delta` 的界在同日
+    # 放寬到 ±10（AEVA 的 +143pp 是真的），而橋另外擋「結果營益率超過 100%」——
+    # 於是 upper 端點本身可能算不出 EPS。這裡把端點**往我們自己的值收斂**直到橋算得出來，
+    # 而不是直接回 `bridge_failed`：界是契約，可行域是算術，兩者本來就不必相同。
+    lo, f_lo = _feasible_endpoint(actuals, assumptions, target, assumption, lo)
+    hi, f_hi = _feasible_endpoint(actuals, assumptions, target, assumption, hi)
     if f_lo is None or f_hi is None:
         return DriverSolution(implied_value=None, status="bridge_failed", **common,
-                              reason="區間端點的橋算不出 EPS，無法確定解在不在範圍內")
+                              reason="區間端點的橋算不出 EPS（已往我們自己的值收斂仍無解），"
+                                     "無法確定解在不在範圍內")
     if (f_lo - target_eps) * (f_hi - target_eps) > 0:
         return DriverSolution(
             implied_value=None, status="no_sign_change", **common,

@@ -242,6 +242,11 @@ class SectionMeta:
     warnings: tuple[str, ...] = ()
     #: Step 5：整個 section 缺內容時**是哪一種缺席**（`alpha/absence.py`）。與 `Datum` 同一套字彙。
     absence_kind: str | None = None
+    #: 2026-09-13：**這一格的缺席已經被一筆 append-only `Abstention` 宣告過**（帶 `ab_*` id）。
+    #: 與 `absence_kind` 正交——`absence_kind` 說「為什麼沒有值」（可能是上游的原因），
+    #: 它說「作者已經決定這一格不必補」。實測 POET：`absence_kind=upstream_unavailable`
+    #: 而 ledger 裡有 live 的 `ab_42838d2eec25b735`，於是畫面在叫人去做研究已判定不值得做的事。
+    settled_by: str | None = None
 
     @property
     def effective_absence_kind(self) -> str | None:
