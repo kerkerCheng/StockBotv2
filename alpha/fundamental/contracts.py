@@ -458,12 +458,21 @@ class FiscalYearActuals:
     #: 口徑」、000660.KS「非營業損益與稅率刻意未填，不得合併塞進 tax_rate（那會一格兩義）」。
     #: 寫下它的人已經做對了事，是管子只接了一頭（L13）。
     coverage_note: str | None = None
+    #: 損益表形狀（`INCOME_STATEMENT_SHAPES`）。`None` ＝ 未宣告 ＝ 預設的乘法鏈。
+    #: ⚠ 宣告成 `no_operating_income` 時，橋**不會**改用別的算法——它會誠實說「這條鏈不成立」。
+    income_statement_shape: str | None = None
     #: parser 沒有對應欄位的其餘鍵，**原樣保留**。
     #: ⚠ 這是「不得靜默丟棄」的那一半：列舉式解析每多一個新鍵就多一次無聲遺失，
     #: 而作者不會知道自己寫的東西沒人收到（INV-3：查不到了不是合法 lifecycle）。
     author_notes: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
+        if (self.income_statement_shape is not None
+                and self.income_statement_shape not in INCOME_STATEMENT_SHAPES):
+            raise ContractViolation(
+                f"income_statement_shape 未登記：{self.income_statement_shape!r}；"
+                f"已知 {INCOME_STATEMENT_SHAPES}——它有行為後果（橋會據此拒算），"
+                "不得自由填寫（L16-3）")
         _nonempty(self.currency, "FiscalYearActuals.currency")
         if _finite(self.revenue, "FiscalYearActuals.revenue") <= 0:
             raise ContractViolation("FiscalYearActuals.revenue 必須為正")
@@ -541,6 +550,21 @@ class GuidanceObservation:
     @property
     def refs(self) -> tuple[str, ...]:
         return tuple(r.ref for r in self.evidence)
+
+
+#: 損益表的**形狀**——橋是一條乘法鏈（`revenue × margin` → 營業利益 → 稅前 → EPS），
+#: 而那條鏈假設「這家公司的損益表上有 operating income 這一行」。
+#: 2026-09-13 實測 **APO（Apollo）** 與 **BX（Blackstone）**：SEC XBRL companyfacts 裡
+#: `OperatingIncomeLoss` 與 `GrossProfit` **兩個 tag 都不存在**（逐一確認）。
+#: 硬用「稅前 ÷ 營收」當營益率（APO FY2025 ＝ 6,677 ÷ 32,049 ＝ 20.83%）會得到一個
+#: **隨市場評價擺動、沒有任何人管理的比率**——L14 明文禁止讓未量測的機制決定數字。
+#:
+#: ⚠ **這個欄位不讓那一類變得可估**（那需要一條能表達 ANI／DE 的**加法鏈**，見 ROADMAP）。
+#: 它做的是把缺席的**種類**講對：由「缺 gaap.operating_income（去找）」
+#: 變成「這條鏈對這家公司不成立（補資料解不掉）」。
+#: **在有機械判準之前，這一格只能由寫基期的人宣告**——而那個宣告本身是 mechanical 的
+#: （「XBRL 裡有沒有這個 tag」任何人重查都得到同一個答案）。
+INCOME_STATEMENT_SHAPES: tuple[str, ...] = ("operating_margin_chain", "no_operating_income")
 
 
 @dataclass(frozen=True, slots=True)

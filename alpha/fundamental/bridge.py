@@ -260,7 +260,23 @@ def build_bridge(
     margin: float | None = None
     margin_ids = [d.assumption_id for d in deltas]
     margin_reason: str | None = None
-    if base_om is None:
+    if base_om is None and actuals.income_statement_shape == "no_operating_income":
+        # ⚠⚠ **這不是缺料，是這條鏈對這家公司不成立**（2026-09-13）。
+        # 實測 APO／BX：SEC XBRL companyfacts 裡 `OperatingIncomeLoss` 與 `GrossProfit`
+        # 兩個 tag 都不存在。硬用「稅前 ÷ 營收」當營益率會得到一個**隨市場評價擺動、
+        # 沒有任何人管理的比率**——L14 明文禁止讓未量測的機制決定數字。
+        # 缺席的**種類**因此不同：說「去補 operating_income」會送人去找一個不存在的東西。
+        margin_reason = (
+            f"基期觀測宣告 `income_statement_shape=no_operating_income`——"
+            f"這家公司的損益表上**沒有 operating income 這一行**（{basis} 區塊也因此沒有），"
+            "而橋是一條乘法鏈（營收 × 營益率 → 稅前 → EPS）。"
+            "**這不是缺料，補資料解不掉**：硬用「稅前 ÷ 營收」當營益率會得到一個隨市場評價"
+            "擺動、沒有任何人管理的比率。"
+            "要讓這一類可估需要的是**能表達 ANI／DE 的加法鏈**"
+            "（FRE ＝ 費用收入 − 費用相關支出；SRE ＝ 淨投資收益 − 資金成本；"
+            "ANI ＝ FRE ＋ SRE ＋ 本金投資收益 − 稅），而那條鏈還不存在（見 ROADMAP）。"
+            "**在那之前這一檔維持 blocked 是正確的，不是漏做。**")
+    elif base_om is None:
         margin_reason = f"基期觀測缺 {basis}.operating_income，算不出基期營益率"
     elif not deltas:
         margin_reason = _absent(

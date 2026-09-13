@@ -621,7 +621,10 @@ def test_opinion_bearing_drivers_exclude_the_mechanical_ones():
 #: 這份清單在**新增一個鍵而沒人接**時會讓下面那條測試變紅。
 _REAL_LEDGER_KEYS = (
     "accounting_basis", "consolidation_scope", "coverage_note", "critical_note", "currency",
-    "customer_concentration_note", "exit_quarter", "fiscal_year_end", "gaap", "key_note",
+    "customer_concentration_note", "exit_quarter", "fiscal_year_end", "gaap",
+    # 2026-09-13 新增的具名欄位（封閉字彙，有行為後果：橋會據此拒算）。
+    "income_statement_shape",
+    "key_note",
     "non_gaap", "prior_year", "revenue", "revenue_by_product_type", "segment_note",
     "segment_revenue", "source_filed_at", "unit_note", "xbrl_provenance",
 )
@@ -655,6 +658,7 @@ def test_every_key_the_author_wrote_reaches_a_field_or_author_notes() -> None:
     payload["fiscal_year_end"] = "2026-06-30"
     payload["currency"] = "USD"
     payload["source_filed_at"] = "2026-08-12"
+    payload["income_statement_shape"] = "no_operating_income"      # 封閉字彙，不能填佔位字串
 
     parsed = fund_provider._PARSED_FISCAL_KEYS
     leftovers = set(payload) - parsed
@@ -786,3 +790,31 @@ def test_bridge_basis_follows_verified_consensus_not_which_key_has_a_value() -> 
     gaap_only = replace(both, non_gaap=None)
     basis, why = _select_basis(gaap_only, "non_gaap")
     assert basis == "gaap" and "這個比較因此帶著口徑差" in (why or "")
+
+
+def test_no_operating_income_shape_says_the_chain_does_not_apply_not_that_data_is_missing() -> None:
+    """APO／BX 的形狀：沒有 operating income 這一行，而橋是一條乘法鏈（ROADMAP L215）。
+
+    ⚠ 這個欄位**不讓那一類變得可估**（那需要一條能表達 ANI／DE 的加法鏈）。
+    它做的是把缺席的**種類**講對：由「缺 gaap.operating_income（去找）」
+    變成「這條鏈對這家公司不成立（補資料解不掉）」——說前者會送人去找一個不存在的東西。
+    """
+    from alpha.errors import ContractViolation
+
+    plain = replace(_actuals(), gaap={"pretax_income": 6.677e9, "income_taxes": 1.276e9,
+                                      "net_income_attributable": 3.492e9, "basic_eps": 5.58},
+                    non_gaap=None)
+    missing = build_bridge(plain, _full_set(), TARGET)
+    step = next(s for s in missing.steps if s.key == "internal_operating_margin")
+    assert "缺 gaap.operating_income" in (step.reason or "")     # 未宣告 → 仍然是「缺料」
+
+    declared = replace(plain, income_statement_shape="no_operating_income")
+    result = build_bridge(declared, _full_set(), TARGET)
+    step = next(s for s in result.steps if s.key == "internal_operating_margin")
+    assert "沒有 operating income 這一行" in (step.reason or "")
+    assert "補資料解不掉" in (step.reason or "")
+    assert "維持 blocked 是正確的" in (step.reason or "")
+    assert result.metrics["eps"].value is None                   # 仍然不給數字——那是重點
+    # 字彙是封閉的（它有行為後果，L16-3）。
+    with pytest.raises(ContractViolation, match="income_statement_shape 未登記"):
+        replace(plain, income_statement_shape="fee_related_earnings")

@@ -45,6 +45,7 @@ INTERIM_RESULTS_FIELD = "interim_period_results"
 _PARSED_FISCAL_KEYS: frozenset[str] = frozenset({
     "fiscal_year_end", "currency", "revenue", "segment_revenue", "gaap",
     "non_gaap", "exit_quarter", "source_filed_at", "coverage_note",
+    "income_statement_shape",
 })
 GUIDANCE_FIELD = "company_guidance"
 
@@ -461,6 +462,8 @@ class EngineCFundamentalsProvider:
                     observation_id=str(row["observation_id"]),
                     coverage_note=(str(payload["coverage_note"]).strip() or None
                                    if payload.get("coverage_note") else None),
+                    income_statement_shape=(str(payload["income_statement_shape"])
+                                            if payload.get("income_statement_shape") else None),
                     author_notes=leftovers,
                 ), None
             except (KeyError, TypeError, ValueError, ContractViolation) as exc:
