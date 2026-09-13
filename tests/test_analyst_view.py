@@ -479,3 +479,31 @@ def test_markdown_escapes_external_text_and_stays_single_line_per_row() -> None:
         if line.startswith("|"):
             assert line.count("\n") == 0
     assert not re.search(r"\|\s*\|\s*\|\s*\|\s*\|\s*$", text)   # 沒有整列空白格
+
+
+def test_panel_reason_comes_from_the_section_that_caused_the_status() -> None:
+    """panel 的 reason 必須由**造成這個 status 的那一段**說出來，不是固定綁第一段。
+
+    事發（2026-09-13，HEXA-B.ST）：六格營運假設都寫好了、`earnings_bridge` 算成功，
+    但估值假設還沒寫 → `valuation` 缺席。`why` panel 的 status 取三段最差 ＝ `missing`，
+    而 reason 固定取 `earnings_bridge`（成功的那一段）＝ `None`。
+    使用者端於是看到「why：missing」沒有下文，而 `absence_kind` 明明宣告了 `not_yet_recorded`。
+
+    這是 `AGENTS.md` APP 呈現契約禁的形狀：**缺席由產生它的那段程式自己宣告**——
+    讓一個沒有缺席的 section 替別人的缺席發言，等於沒有宣告。
+    """
+    view = _view(fundamental_model=_run(index=_index()), today=TODAY)
+    analyst = build_analyst_view(view)
+
+    why = next(p for p in analyst.panels if p.key == "why")
+    assert why.source_statuses["earnings_bridge"] == "available"
+    assert why.status == "missing", "本 fixture 的前提是「一段成功、一段缺席」"
+    assert why.reason, "panel 缺席卻沒有理由——那正是這個測試要擋的"
+    assert why.reason == view.valuation.meta.reason, "理由必須出自造成 missing 的那一段"
+
+    # 每一個 panel 都適用同一條規則：reason 若存在，必須是某個 source section 自己說的。
+    for panel in analyst.panels:
+        if not panel.reason:
+            continue
+        said_by = {getattr(view, name).meta.reason for name in panel.source_statuses}
+        assert panel.reason in said_by, f"{panel.key} 的 reason 不是任何 source section 說的"

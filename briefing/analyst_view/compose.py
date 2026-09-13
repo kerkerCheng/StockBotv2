@@ -50,6 +50,26 @@ def _settled_by(**metas: Any) -> dict[str, str | None]:
     return {name: getattr(meta, "settled_by", None) for name, meta in metas.items()}
 
 
+def _worst_reason(status: str, **metas: Any) -> str | None:
+    """panel 的 reason 要來自**造成這個 status 的那一段**，不是固定綁某一段。
+
+    事發（2026-09-13，HEXA-B.ST）：`earnings_bridge` 算成功、`valuation` 缺 target multiple，
+    於是 `why` panel 的 status 是 `missing`（取三段最差）而 reason 取自 earnings_bridge ＝ `None`。
+    使用者端看到的是「why：missing」沒有下文，而 `absence_kind` 明明宣告了 `not_yet_recorded`。
+    ⚠ 這正是 `AGENTS.md` APP 呈現契約禁的形狀：**缺席由產生它的那段程式自己宣告**——
+    固定取第一段等於讓 A 段替 B 段的缺席發言，而 A 段根本沒有缺席。
+    ⚠ 這**不是**放寬：status 一個字都沒動，改的只是「這句話由誰說」（L12：先分開再各自定規則）。
+    fallback 保留舊行為（任一段有 reason 就用它），因為「沒有任何理由」與「理由在別段」不同。
+    """
+    for meta in metas.values():
+        if meta.status == status and meta.reason:
+            return meta.reason
+    for meta in metas.values():
+        if meta.reason:
+            return meta.reason
+    return None
+
+
 def _line(key: str, label: str, datum: Datum, role: str) -> AnalystLine:
     return AnalystLine(key=key, display_label=label, datum=datum, role=role)
 
@@ -191,7 +211,8 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
                  "accounting_basis": va.accounting_basis,
                  "refresh_overall": rs.overall, "refresh_counts": dict(rs.counts),
                  "capability": ir.meta.capability},
-        reason=ir.meta.reason,
+        reason=_worst_reason(worst_status(list(statuses.values())),
+                             implied_return=ir.meta, valuation=va.meta),
     )
 
 
@@ -234,7 +255,9 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
         context={"period": inf.period, "period_end": inf.period_end,
                  "base_period_end": inf.base_period_end, "accounting_basis": inf.accounting_basis,
                  "same_period_rule": "只有同期、同口徑、同幣別的共識才與內部相減；其他期間只呈現，不比較"},
-        reason=eg.meta.reason or inf.meta.reason,
+        reason=_worst_reason(worst_status(list(statuses.values())),
+                             expectation_gap=eg.meta, internal_fundamentals=inf.meta,
+                             consensus=cs.meta),
     )
 
 
@@ -267,7 +290,9 @@ def _why_panel(view: AlphaInvestmentView) -> AnalystPanel:
                  "assumption_selection": None if eb.selection is None else {
                      "input": eb.selection.input_count, "accepted": eb.selection.accepted_count,
                      "filtered": eb.selection.filtered_count, "reasons": dict(eb.selection.reasons)}},
-        reason=eb.meta.reason,
+        reason=_worst_reason(worst_status(list(statuses.values())),
+                             earnings_bridge=eb.meta, valuation=va.meta,
+                             implied_return=ir.meta),
     )
 
 
@@ -312,7 +337,9 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
                  "research_status": view.identity.lifecycle.research_status,
                  "thesis_lifecycle_status": view.identity.lifecycle.thesis_lifecycle_status,
                  "thesis_next_check": view.identity.lifecycle.thesis_next_check},
-        reason=vv.meta.reason,
+        reason=_worst_reason(worst_status(list(statuses.values())),
+                             variant_view=vv.meta, falsification=fs.meta,
+                             catalysts=ct.meta, refresh_status=rs.meta),
     )
 
 
