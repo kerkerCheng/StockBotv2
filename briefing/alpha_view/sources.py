@@ -23,7 +23,9 @@ from alpha.entry import (
 )
 from alpha.errors import AlphaError, ContractViolation, PointInTimeUnsupported
 from alpha.fundamental import FundamentalModelResult, build_fundamental_model
-from alpha.valuation.contracts import METHOD_EV_TO_SALES, BalanceSheetInput
+from alpha.valuation.contracts import (
+    METHOD_EV_TO_SALES, METHOD_FORWARD_EARNINGS_MULTIPLE, BalanceSheetInput,
+)
 from alpha.identity import CompanyId, Ticker
 from alpha.implied_return import ImpliedReturnResult, build_implied_return
 from alpha.models import compose_signal
@@ -264,18 +266,59 @@ def _valuation_model(
         assumption_records=records, parse_errors=parse_errors, abstention_records=abstentions,
         evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price, balance=balance,
     )
+    method, method_conflict = _select_method(records)
+    if method_conflict is not None:
+        return None, method_conflict, records
     try:
-        result = build_valuation(**common)
-        # 2026-09-09 P6：本益比法「方法不適用」（forward EPS 非正）**或**「刻意不主張目標倍數」（谷底年 EPS
-        # 無可錨定倍數、已由 append-only Abstention 宣告）、且 ledger 裡有 ev_to_sales 假設 → 改跑 EV/Sales。
-        # 「還沒寫 target_pe」（not_yet_recorded）**不**觸發：方法選擇是判斷，要由 abstention 明示，不能靠不寫。
-        # 沒有 EV/S 假設就保留本益比法的缺席理由；不自動補倍數。
-        if (not result.is_known and result.absence_kind in {"method_not_applicable", "deliberate_abstention"}
-                and _has_method_records(records, METHOD_EV_TO_SALES)):
-            result = build_valuation(method=METHOD_EV_TO_SALES, **common)
+        result = build_valuation(method=method, **common)
     except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗
         return None, f"valuation model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
     return result, None, records
+
+
+def _select_method(records: Sequence[Any]) -> tuple[str, str | None]:
+    """用哪個估值 method——**由 ledger 裡寫了哪一筆估值假設決定**（2026-09-13 起）。
+
+    ## 為什麼改成這樣（前一版是「先跑本益比法，撞牆再退回 EV/Sales」）
+
+    舊規則要求先產生一個「本益比法失敗」的證據才肯切換，而那個證據只有兩種來源：
+    ①已經寫了一筆 `target_pe` 然後被 `method_applicability` 擋掉（＝寫一筆自己不相信的假設）；
+    ②一筆 `Abstention`——而它是 **pq2**。於是**每一檔虧損股都要一個編號才能用對的方法估值**。
+    實測到 2026-09-13 為止已經連鑄 8 個，其中 7 個的內容完全由算術決定。
+
+    ⚠ 舊版的註解寫著「方法選擇是判斷，要由 abstention 明示，**不能靠不寫**」。
+    那句話防的是**從缺席推論**（not_yet_recorded → 自動改用別的方法），而那個顧慮是對的。
+    **但本規則不是從缺席推論，是從在場推論**：ledger 裡有一筆帶 rationale、帶 `derivation`、
+    寫進 append-only ledger 的 `ev_to_sales` 假設——**那就是「我選這個方法」的明示宣告本身**，
+    而且它本來就是舊切換條件的必要條件之一（`_has_method_records`）。
+    ⚠ 差別因此不是「放寬」而是「拿掉一道重複的閘門」：舊規則要求同一個判斷講兩次
+    （寫 ev_to_sales ＋ 再寫一筆 Abstention），新規則只要求講一次。
+
+    ## Abstention 沒有被削弱，它回到它自己那一件事
+
+    `Abstention` 原本同時承載兩種語意（L12）：①**宣告不主張**（→ `settled`，這一格不用再做）
+    ②**當方法開關**。②搬到 ledger 之後，①原封不動——POET 就是只有 ① 沒有 ②
+    （有 Abstention、沒有 `ev_to_sales`）：方法仍是本益比法、fair value 仍然缺席、仍然 `settled`。
+
+    ## 兩筆並存＝一格兩義，直接拒絕
+
+    與 `bridge.py` 對 `tax_rate` / `tax_expense_absolute` 的處理同一個形狀：
+    **不挑一個用，也不相加，直接拒絕並說出要撤回哪一條。** 實測 2026-09-13 全庫 58 檔，
+    並存的是 **0 檔**（49 檔只有 target_pe、9 檔只有 ev_to_sales），所以這條路徑今天不會被走到
+    ——它是為了讓「以後有人兩筆都寫」時**不會靜默選錯**，不是為了處理現況。
+    """
+    has_pe = _has_method_records(records, METHOD_FORWARD_EARNINGS_MULTIPLE)
+    has_ev = _has_method_records(records, METHOD_EV_TO_SALES)
+    if has_pe and has_ev:
+        return METHOD_FORWARD_EARNINGS_MULTIPLE, (
+            f"估值 ledger 同時有 {METHOD_FORWARD_EARNINGS_MULTIPLE} 與 {METHOD_EV_TO_SALES} 的生效假設"
+            "——兩者二擇一，不得並存也不得由程式代選（method 是判斷，不是預設值）。"
+            "要換方法就 append 一筆 retracted 撤回不要的那一條")
+    if has_ev:
+        return METHOD_EV_TO_SALES, None
+    # 兩者皆無時仍回本益比法：它的缺席理由（「尚未寫入任何估值假設（target_pe）」）
+    # 才是這種情況下該給使用者看的那一句，不是 EV/Sales 的。
+    return METHOD_FORWARD_EARNINGS_MULTIPLE, None
 
 
 def _has_method_records(records: Sequence[Any], method: str) -> bool:

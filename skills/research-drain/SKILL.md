@@ -133,7 +133,7 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
      `AGENTS.md`「隱含報酬的兩個桿」預設校準倍數，折價要指得出證據
    - 客戶端承諾、獨立來源 → source-trace，可能結成 RA packet（入圖仍是 pq2）
    - `provider_missing` → 換來源，否則提案 Abstention（pq2，因為它把這格從工單上拿掉）
-   - `method_not_applicable`（虧損）→ 留給 ROADMAP P6，不硬做
+   - **虧損檔（內部 EPS ≤ 0，本益比法無定義）→ 寫一筆 `ev_to_sales` 估值假設就走完，不需要 pq2**（2026-09-13 改）。估值 method **由 ledger 裡寫了哪一筆假設決定**，不再需要一筆 Abstention 當開關——**寫 ev_to_sales 本身就是「我選這個方法」的宣告**。⚠ 舊行為是每一檔虧損股都要鑄一個 pq2，實測連鑄 8 個、其中 7 個的內容由算術決定。⚠ `Abstention` 仍然只做它自己那件事：**宣告這一格不用再做**（→`settled`）——POET 就是那種（有 Abstention、沒有 ev_to_sales，fair value 仍然缺席且 settled）。⚠ **兩種假設不得並存**，並存時估值層直接拒絕並要你撤回一條。
    - 判讀型 Engine C 觀測（backlog、客戶集中）→ 打包觀測提案（pq2）；同類缺口跨多檔就打包成一批
    每消一格 `python -m webapp materialize <TICKER>` 一次，讓下一格的判斷讀到新狀態。
 4. **圖的覆蓋缺口** — 只有前三段清空後才做。這一段沒有既有排序，是唯一需要判斷的地方，

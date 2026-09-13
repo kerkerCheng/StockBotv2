@@ -491,9 +491,19 @@ def test_pe_path_is_unchanged_by_the_new_method() -> None:
     assert {s.key for s in result.steps}.isdisjoint({"net_debt", "diluted_shares"})
 
 
-def test_read_model_switches_to_ev_to_sales_only_when_pe_is_abstained_or_not_applicable(monkeypatch) -> None:
-    """2026-09-09 SOI.PA：本益比法被 append-only Abstention 宣告「刻意不主張」（谷底年 EPS 無可錨定倍數）且 ledger
-    有 EV/S 假設 → read model 改跑 EV/S。只是「還沒寫 target_pe」**不**切——方法選擇是判斷，要由 abstention 明示。"""
+def test_method_is_chosen_by_which_valuation_assumption_exists(monkeypatch) -> None:
+    """估值 method 由 **ledger 裡寫了哪一筆假設**決定（2026-09-13 起）。
+
+    ⚠ 本測試**刻意推翻**同名前身的後半段斷言。舊規則是「先跑本益比法、撞牆再退回 EV/Sales」，
+    而「撞牆」的證據只有兩種：寫一筆自己不相信的 `target_pe`，或一筆 **pq2 的 Abstention**
+    ——於是每一檔虧損股都要一個編號才能用對的方法估值（實測連鑄 8 個，7 個由算術決定）。
+
+    舊註解寫著「方法選擇是判斷，要由 abstention 明示，**不能靠不寫**」。那句話防的是
+    **從缺席推論**，而那個顧慮仍然成立、仍然被下面第三段釘著。
+    **新規則不是從缺席推論，是從在場推論**：ledger 裡一筆帶 rationale、帶 `derivation`、
+    寫進 append-only ledger 的 `ev_to_sales` 假設，本身就是「我選這個方法」的明示宣告
+    ——而它原本就是舊切換條件的必要條件之一。**差別是拿掉一道重複的閘門，不是放寬。**
+    """
     from alpha.abstention import abstention_record, parse_abstention_record
     from alpha.identity import CompanyId, Ticker
     from briefing.alpha_view import sources
@@ -515,11 +525,30 @@ def test_read_model_switches_to_ev_to_sales_only_when_pe_is_abstained_or_not_app
         build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
     assert reason is None and result is not None and result.method == "ev_to_sales"
 
+    # ② 有 ev_to_sales 假設但**沒有** Abstention → 一樣走 EV/Sales。
+    #    這就是本次修法：五檔（XFAB.PA／IREN／NBIS／XPEV／SIVE.ST）先前卡在這裡，
+    #    而它們卡住的唯一原因是「還沒有人替它們鑄那個 pq2」。
     monkeypatch.setattr(sources.abstention_ledger, "read_abstention_records", lambda t: ([], []))
-    untouched, _, _ = sources._valuation_model(  # noqa: SLF001
+    no_abstention, _, _ = sources._valuation_model(  # noqa: SLF001
         build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
-    assert untouched.method == "forward_earnings_multiple"
-    assert not untouched.is_known and untouched.absence_kind == "not_yet_recorded"
+    assert no_abstention.method == "ev_to_sales"
+
+    # ③ **從缺席推論仍然被禁止**：ledger 裡一筆估值假設都沒有時，method 維持本益比法，
+    #    缺席理由仍是 `not_yet_recorded`——不得因為「沒寫 target_pe」就自己改用別的方法。
+    monkeypatch.setattr(sources.valuation_ledger, "read_valuation_assumption_records", lambda t: ([], []))
+    empty, _, _ = sources._valuation_model(  # noqa: SLF001
+        build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
+    assert empty.method == "forward_earnings_multiple"
+    assert not empty.is_known and empty.absence_kind == "not_yet_recorded"
+
+    # ④ 收緊面：兩種假設並存 ＝ 一格兩義 → **拒絕**，並說出要撤回哪一條。
+    #    與 bridge.py 對 tax_rate／tax_expense_absolute 的處理同一個形狀：不挑一個用、不相加。
+    pe = _multiple(25.0)
+    monkeypatch.setattr(sources.valuation_ledger, "read_valuation_assumption_records", lambda t: ([pe, ev], []))
+    conflicted, conflict_reason, _ = sources._valuation_model(  # noqa: SLF001
+        build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
+    assert conflicted is None, "並存時不得由程式代選一個 method"
+    assert "二擇一" in conflict_reason and "撤回" in conflict_reason
 
 
 # ---------------------------------------------------------------------------
