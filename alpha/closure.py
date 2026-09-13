@@ -393,17 +393,34 @@ def _target_period_ends(tickers: Iterable[str], conn: Any) -> dict[str, str | No
     ⚠ 讀不到一律回 `None`（不是「未結束」）：`None` 會讓 `awaiting_report_since` 留空、
     該檔照舊算成未到終局——寧可多排一檔，也不要把「讀不到」靜默算成終局（INV-3）。
     """
+    #: `eps` 優先，`revenue` 只在**完全沒有 eps 列**時補位。
+    #: ⚠ 為什麼需要補位（2026-09-13）：零賣方 EPS 覆蓋的標的只有 revenue 列，
+    #: 於是它們**結構上永遠進不了 `awaiting_report`**——即使會計年度早就結束。
+    #: 實測 ENA.V（Enablence，會計年度 2026-06-30 結束、已過 75 天、零分析師覆蓋）
+    #: 被當成「還可以推進」排在工單上，而世界上沒有任何人能推進它：年報還沒公布。
+    #: ⚠ 補位是安全的，而且是量出來的不是猜的：全庫 71 檔同時有 eps 與 revenue 的 `0y` 列，
+    #: **兩者的 `fiscal_period_end` 不一致的有 0 檔**——它們本來就是同一個會計年度的兩個指標。
+    #: ⚠ **eps 永遠贏**：補位只在 eps 缺席時發生，所以既有 71 檔的行為逐位不變（L15-4）。
     rows = conn.execute(
-        "SELECT ticker, snapshot_date, relative_label, fiscal_period_end "
-        "FROM consensus_estimates WHERE metric = 'eps' AND relative_label = '0y'"
+        "SELECT ticker, snapshot_date, metric, fiscal_period_end "
+        "FROM consensus_estimates WHERE metric IN ('eps', 'revenue') AND relative_label = '0y'"
     ).fetchall()
-    latest: dict[str, tuple[str, str | None]] = {}
-    for ticker, snap, _label, period_end in rows:
-        t = str(ticker).upper()
+    latest: dict[tuple[str, str], tuple[str, str | None]] = {}
+    for ticker, snap, metric, period_end in rows:
+        key = (str(ticker).upper(), str(metric))
         snap = str(snap)
-        if t not in latest or snap > latest[t][0]:
-            latest[t] = (snap, str(period_end)[:10] if period_end else None)
-    return {t: latest.get(t.upper(), ("", None))[1] for t in tickers}
+        if key not in latest or snap > latest[key][0]:
+            latest[key] = (snap, str(period_end)[:10] if period_end else None)
+
+    def _pick(ticker: str) -> str | None:
+        t = ticker.upper()
+        for metric in ("eps", "revenue"):
+            hit = latest.get((t, metric))
+            if hit is not None and hit[1]:
+                return hit[1]
+        return None
+
+    return {t: _pick(t) for t in tickers}
 
 
 def _sector_and_rank(ranking_payload: Mapping[str, Any], registry: Any) -> dict[str, tuple[str | None, int | None]]:

@@ -540,14 +540,53 @@ def test_target_period_ends_takes_the_latest_snapshot_only() -> None:
             return self
 
         def fetchall(self):
+            # 第三欄是 metric（2026-09-13 起；先前是 relative_label，而查詢已固定 0y）
             return [
-                ("MU", "2026-09-11", "0y", "2026-08-28"),
-                ("MU", "2026-09-12", "0y", "2026-08-28"),
-                ("LRCX", "2026-09-12", "0y", "2027-06-28"),
+                ("MU", "2026-09-11", "eps", "2026-08-28"),
+                ("MU", "2026-09-12", "eps", "2026-08-28"),
+                ("LRCX", "2026-09-12", "eps", "2027-06-28"),
             ]
 
     out = closure._target_period_ends(["MU", "LRCX", "NOPE"], _Conn())
     assert out == {"MU": "2026-08-28", "LRCX": "2027-06-28", "NOPE": None}
+
+
+def test_target_period_ends_falls_back_to_revenue_only_when_eps_is_absent() -> None:
+    """零賣方 EPS 覆蓋的標的只有 revenue 列，不該因此永遠進不了 `awaiting_report`。
+
+    事發（2026-09-13）：ENA.V（Enablence，會計年度 2026-06-30 結束、已過 75 天、
+    `analyst_count=0`）在 `consensus_estimates` 裡**只有 revenue 的 0y 列、沒有 eps 列**，
+    而 `_target_period_ends` 只查 eps → 回 None → `awaiting_report_since` 留空
+    → 它被當成「還可以推進」排在段 5 工單上，**而世界上沒有任何人能推進它：年報還沒公布。**
+
+    補位是量出來的不是猜的：全庫 71 檔同時有 eps 與 revenue 的 0y 列，
+    **兩者的 `fiscal_period_end` 不一致的有 0 檔**。
+    ⚠ 但契約仍然是「eps 永遠贏」——本測試的第二段就是在釘這一條（L15-4：放寬識別、判準更嚴）。
+    """
+    class _Conn:
+        def __init__(self, rows):
+            self._rows = rows
+
+        def execute(self, _sql):
+            return self
+
+        def fetchall(self):
+            return self._rows
+
+    # ① 只有 revenue → 補位生效
+    out = closure._target_period_ends(
+        ["ENA.V"], _Conn([("ENA.V", "2026-09-12", "revenue", "2026-06-30")]))
+    assert out == {"ENA.V": "2026-06-30"}, "只有 revenue 列時仍該讀得到目標期末"
+
+    # ② 兩者都有且**不一致**時，eps 永遠贏——補位不得覆寫 eps
+    out = closure._target_period_ends(["X"], _Conn([
+        ("X", "2026-09-12", "revenue", "2099-01-01"),
+        ("X", "2026-09-12", "eps", "2026-03-31"),
+    ]))
+    assert out == {"X": "2026-03-31"}, "revenue 只是補位，不得蓋過 eps"
+
+    # ③ 兩者都沒有 → 仍是 None（不是「未結束」，寧可多排一檔）
+    assert closure._target_period_ends(["NOPE"], _Conn([])) == {"NOPE": None}
 
 
 # ---------------------------------------------------------------------------
