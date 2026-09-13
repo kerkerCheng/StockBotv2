@@ -75,17 +75,68 @@ def _assumption_step(key: str, label: str, item: OperatingAssumption) -> BridgeS
                       reason=item.rationale[:200])
 
 
+def _select_basis(actuals: FiscalYearActuals, consensus_basis: str | None) -> tuple[str, str | None]:
+    """橋要算哪一種口徑的內部 EPS。
+
+    ## 為什麼不能只看「基期有沒有 non_gaap 區塊」
+
+    舊規則是 `basis = non_gaap if 基期有 non_gaap.operating_income else gaap`，
+    而它**只認得 COHR 那個案例**（共識是 non-GAAP，基期也填了 non-GAAP）。
+    2026-09-12 撞到相反的一例：**CDNS 的 0y 共識是 GAAP**
+    （`year_ago_actual` 4.06 ＝ 10-K 的 GAAP 稀釋 EPS，13 位分析師），
+    若基期照實填 non_gaap 區塊，橋會算出 non-GAAP 的內部 EPS 再去對一串 GAAP 共識，
+    得到約 **+70% 的假差距**——而 `verify_consensus_basis` 其實**已經知道**共識是 GAAP，
+    只是那個結論沒有送到橋手上（L16：分類要跟著資料走，不是讓每個消費端各猜一份）。
+
+    ## 規則
+
+    1. 共識口徑已核實且基期有對應區塊（含 `operating_income`）→ **跟著共識**。
+    2. 共識口徑已核實但基期沒有那個區塊 → 退回可用的那一邊，並**把這件事寫進 warnings**
+       （它是真的缺料，不是選擇）。
+    3. 共識口徑未核實（`unverified`／`not_applicable`／None）→ 舊規則。
+       ⚠ **不 fail closed**：營收沒有口徑之分，而很多標的的共識就是無從核實；
+       在那些檔上要求核實會讓整條橋停掉，那是這個 gate 攔錯東西（L15-1）。
+    """
+    def usable(name: str) -> bool:
+        blk = actuals.block(name) or {}
+        return blk.get("operating_income") is not None
+
+    legacy = "non_gaap" if usable("non_gaap") else "gaap"
+    if consensus_basis not in ("gaap", "non_gaap"):
+        return legacy, None
+    if usable(consensus_basis):
+        if consensus_basis != legacy:
+            return consensus_basis, (
+                f"橋口徑跟著**已核實的共識口徑** {consensus_basis} 走（舊規則會選 {legacy}）"
+                "——內部 EPS 最後要對的就是那一串共識，口徑不同的比較是假差距")
+        return consensus_basis, None
+    other = "gaap" if consensus_basis == "non_gaap" else "non_gaap"
+    return (other if usable(other) else legacy), (
+        f"已核實的共識口徑是 {consensus_basis}，但基期觀測的 {consensus_basis} 區塊沒有 "
+        "operating_income——橋只能用另一邊算，**這個比較因此帶著口徑差，不是純預期差**")
+
+
 def build_bridge(
     actuals: FiscalYearActuals,
     assumptions: Sequence[OperatingAssumption],
     target: FiscalPeriod,
+    *,
+    consensus_basis: str | None = None,
 ) -> BridgeResult:
-    """把基期觀測與假設算成目標期間的內部估計。"""
+    """把基期觀測與假設算成目標期間的內部估計。
+
+    `consensus_basis`（2026-09-13 新增）＝**已核實的共識口徑**
+    （`alpha/fundamental/compare.py::verify_consensus_basis` 的結論，`gaap`／`non_gaap`）。
+    給了就照它選橋的口徑，因為內部 EPS 最後要去對的就是那一串共識。
+    不給（或給的口徑在基期裡沒有可用區塊）就退回舊規則。
+    """
     steps: list[BridgeStep] = []
     warnings: list[str] = []
     base_refs = actuals.refs
 
-    basis = "non_gaap" if (actuals.non_gaap and actuals.non_gaap.get("operating_income") is not None) else "gaap"
+    basis, basis_why = _select_basis(actuals, consensus_basis)
+    if basis_why:
+        warnings.append(basis_why)
     block = actuals.block(basis) or {}
 
     # 假設自帶的 accounting_basis 必須與橋口徑一致（或 not_applicable）。不符的不是「缺假設」，

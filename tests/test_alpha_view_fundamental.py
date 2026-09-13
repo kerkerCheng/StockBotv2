@@ -82,7 +82,11 @@ def test_numeric_gap_and_q4_coexist_and_are_labelled_differently() -> None:
 def test_incompatible_comparisons_render_as_not_applicable_never_as_numbers() -> None:
     from tests.test_fundamental_model import _consensus
 
-    model = _run(consensus=(_consensus("eps", 9.41634, year_ago=4.12),))   # 口徑核到 GAAP
+    # ⚠ 2026-09-13 起 `year_ago=4.12`（核到 GAAP）不再產生 incompatible——**橋會跟著共識改用 GAAP**
+    # （ROADMAP：橋的口徑選取要跟著已核實的共識口徑走）。要測「不可比一律顯示不適用」，
+    # 就得用一個**真的無從核實**的共識：`year_ago` 對不上基期的任何一個 EPS → `unverified`。
+    model = _run(consensus=(_consensus("eps", 9.41634, year_ago=7.77),))
+    assert model.consensus_bases[f"eps:{model.target_period.end.isoformat()}"] == "unverified"
     view = _view(fundamental_model=model)
     eps = next(d for d in view.expectation_gap.numeric_comparisons if d.key == "internal_vs_consensus_eps")
     assert eps.status == "not_applicable" and eps.value is None

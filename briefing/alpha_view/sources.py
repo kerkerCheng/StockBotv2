@@ -203,9 +203,17 @@ def _fundamental_model(
             actuals, actuals_reason = actuals_override, None
         consensus, _consensus_reason = fetch_consensus(ticker, as_of=as_of)
         guidance, _guidance_reason = fetch_guidance(ticker, as_of=as_of)
+        # 目標年度已報導的 YTD 實績（2026-09-13）。**不進橋**——讀它的唯一理由是讓它的
+        # evidence ref 進 index，於是假設的 `evidence_refs` 指得到它。provider 沒有這個
+        # 能力時回空（不是錯：這是 2026-09-13 之後才有的欄位）。
+        fetch_interim = getattr(fundamentals_provider, "interim_period_results", None)
+        interim: tuple = ()
+        if callable(fetch_interim):
+            interim, _interim_reason = fetch_interim(ticker, as_of=as_of)
         model = build_fundamental_model(
             company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
             actuals=actuals, actuals_reason=actuals_reason, consensus=consensus, guidance=guidance,
+            interim_results=interim,
             assumption_records=records, parse_errors=parse_errors,
             evidence_index={ref.ref: ref for ref in build.context.evidence_refs},
         )

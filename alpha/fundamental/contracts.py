@@ -543,6 +543,49 @@ class GuidanceObservation:
         return tuple(r.ref for r in self.evidence)
 
 
+@dataclass(frozen=True, slots=True)
+class InterimPeriodResults:
+    """**目標年度已經報導的那一部分**（Engine C `interim_period_results`，2026-09-13 新增）。
+
+    ## 它與 `FiscalYearActuals` 的分野是身分，不是內容
+
+    `FiscalYearActuals` 是「已結束的上一個會計年度」——橋的基期。
+    這一筆是「目標年度到目前為止已報導的 YTD」，而 **0y 共識就是那個目標年度**：
+    到 9 月多數美股已報導 2~3 季（2026-09-12 實測：AAPL 已報 9 個月、佔共識全年 EPS 的 **78%**；
+    AMD／ANET／CDNS 已報 H1，**48–72%**）。
+
+    ## 它刻意**不進橋**
+
+    橋的基期依定義是完整的上一個年度；把半年的數字餵進去會讓「成長率」失去對照物。
+    這一筆的用途是 **provenance**：讓假設的 `evidence_refs` 指得到
+    「我是看著已報導的 9 個月寫下這個成長率的」，而不是只指到基期觀測。
+    ⚠ 在這個型別存在之前，那些 YTD 實績只能寫進 `rationale` 的散文裡
+    ——**整個模型最硬的輸入沒有 authority 載體**。
+    """
+
+    period_start: date | None
+    period_end: date
+    periods_reported: int | None
+    currency: str
+    revenue: float | None
+    gaap: Mapping[str, float]
+    non_gaap: Mapping[str, float] | None
+    evidence: tuple[EvidenceRef, ...]
+    source_filed_at: date | None = None
+    observation_id: str | None = None
+
+    def __post_init__(self) -> None:
+        if not self.evidence:
+            raise ContractViolation("InterimPeriodResults 必須帶 evidence（INV-6）")
+
+    @property
+    def refs(self) -> tuple[str, ...]:
+        return tuple(r.ref for r in self.evidence)
+
+    def block(self, basis: str) -> Mapping[str, float] | None:
+        return self.gaap if basis == "gaap" else self.non_gaap
+
+
 # ---------------------------------------------------------------------------
 # 4. 模型輸出
 # ---------------------------------------------------------------------------

@@ -287,10 +287,18 @@ def test_unverified_or_mismatched_basis_yields_no_gap() -> None:
                              consensus_basis=basis, internal_currency="USD")
         assert cmp.status == "incompatible_basis", basis
         assert cmp.absolute_gap is None and cmp.relative_gap is None
-    # 經模型：year_ago 對到 GAAP → 口徑不合，不減
+    # ⚠⚠ **2026-09-13 起「經模型」的答案變了，而那正是 ROADMAP 那一列要修的東西。**
+    # 舊行為：橋只看「基期有沒有 non_gaap 區塊」→ 算出 non-GAAP 內部 EPS → 對上 GAAP 共識
+    # → `incompatible_basis`（＝資料齊全卻比不了）。實測 CDNS 若照實填 non_gaap 會產生
+    # 約 +70% 的假差距，而 `verify_consensus_basis` 其實已經知道共識是 GAAP。
+    # 新行為：**橋跟著已核實的共識口徑走**，所以內部 EPS 也是 GAAP，比較變成 comparable。
     gaap_consensus = _run(consensus=(_consensus("eps", 9.41634, year_ago=4.12),))
-    assert gaap_consensus.comparisons["eps"].status == "incompatible_basis"
     assert gaap_consensus.consensus_bases[f"eps:{TARGET.end.isoformat()}"] == "gaap"
+    assert gaap_consensus.accounting_basis == "gaap"          # 橋改用 GAAP
+    assert gaap_consensus.comparisons["eps"].status == "comparable"
+    assert gaap_consensus.comparisons["eps"].accounting_basis_internal == "gaap"
+    # 而「橋為什麼換口徑」必須看得見，不得靜默切換。
+    assert any("已核實的共識口徑" in w for w in gaap_consensus.warnings), gaap_consensus.warnings
 
 
 def test_comparable_gap_arithmetic_and_provenance() -> None:
@@ -755,3 +763,26 @@ def test_preferred_dividends_cannot_be_negative() -> None:
 
     with pytest.raises(ContractViolation, match="低於下限"):
         _assumption("preferred_dividends", "total", -324_000_000.0)
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-13：橋的口徑跟著已核實的共識走（ROADMAP L209）
+# ---------------------------------------------------------------------------
+
+def test_bridge_basis_follows_verified_consensus_not_which_key_has_a_value() -> None:
+    """`_select_basis` 的三條規則。舊規則只認得「哪個鍵有值」，而那只認得 COHR 那個案例。"""
+    from alpha.fundamental.bridge import _select_basis
+
+    both = _actuals()                                  # gaap 與 non_gaap 都有 operating_income
+    assert both.non_gaap and both.non_gaap.get("operating_income") is not None
+    # ①共識已核實且基期有那個區塊 → 跟著共識（而且要說出來，不得靜默切換）。
+    assert _select_basis(both, "gaap")[0] == "gaap"
+    assert "已核實的共識口徑" in (_select_basis(both, "gaap")[1] or "")
+    assert _select_basis(both, "non_gaap") == ("non_gaap", None)     # 與舊規則同，不必解釋
+    # ③共識未核實 → 舊規則（**不 fail closed**：營收沒有口徑之分，很多標的無從核實）。
+    for unknown in (None, "unverified", "not_applicable"):
+        assert _select_basis(both, unknown) == ("non_gaap", None)
+    # ②共識已核實但基期沒有那個區塊 → 退回可用的那一邊，並把「這個比較帶著口徑差」說出來。
+    gaap_only = replace(both, non_gaap=None)
+    basis, why = _select_basis(gaap_only, "non_gaap")
+    assert basis == "gaap" and "這個比較因此帶著口徑差" in (why or "")

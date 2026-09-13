@@ -137,3 +137,50 @@ def test_share_count_counter_lists_the_wrong_one_and_not_the_legitimate_one() ->
     assert "3105.TWO" in text and "AXTI" not in text
     # 沒有命中時也要印一行——否則「沒有問題」與「沒有跑」同形（L13-2）。
     assert "0 檔" in " ".join(render_share_count_mismatches(()))
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-13：目標年度已報導的 YTD 實績有 authority 載體了（ROADMAP L211）
+# ---------------------------------------------------------------------------
+
+def test_interim_period_results_is_readable_and_its_ref_can_be_cited() -> None:
+    """YTD 實績是整個模型最硬的輸入，先前只能寫進 rationale 的散文裡。
+
+    ⚠ 它**不進橋**（橋的基期依定義是完整的上一個年度）——讀它的唯一理由是讓它的
+    evidence ref 進 index，於是假設的 `evidence_refs` 指得到它。
+    """
+    conn = _conn()
+    payload = json.dumps({
+        "period_start": "2025-09-28", "period_end": "2026-06-27", "periods_reported": 3,
+        "currency": "USD", "revenue": 305_610_000_000.0,
+        "gaap": {"operating_income": 98_000_000_000.0, "diluted_eps": 5.31,
+                 "diluted_shares": 15_000_000_000.0},
+    }, ensure_ascii=False)
+    oid = "mo_" + "7" * 32
+    conn.execute(
+        "INSERT INTO manual_observations (observation_id, ticker, field_name, value, source_ref, "
+        "as_of, recorded_at, author, supersedes_id, payload_digest) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        (oid, "AAPL", "interim_period_results", payload, "10-Q accession x",
+         "2026-06-27T00:00:00+00:00", "2026-08-01T00:00:00+00:00", "session", None, "d2"))
+    conn.commit()
+    provider = EngineCFundamentalsProvider(conn=conn)
+    rows, reason = provider.interim_period_results(Ticker("AAPL"))
+    assert reason is None and len(rows) == 1
+    item = rows[0]
+    assert item.periods_reported == 3 and item.period_end == date(2026, 6, 27)
+    assert item.gaap["diluted_eps"] == pytest.approx(5.31)
+    assert item.refs == (f"engine_c://manual_observation/{oid}",)
+    # 沒有這個欄位的標的回空——那不是錯（多數標的的目標年度還沒報導）。
+    empty, reason2 = provider.interim_period_results(Ticker("NOSUCH"))
+    assert empty == () and reason2 is None
+
+
+def test_interim_period_results_is_a_mechanical_field_so_it_needs_no_pq2() -> None:
+    """它的每個數字都印在 10-Q／半年報的表上 → `mechanical` → 不需 pq2（判準沿用 L10）。"""
+    from engine_c.observation_fields import get_observation_field_registry
+
+    registry = get_observation_field_registry()
+    assert "interim_period_results" in registry.mechanical_field_names
+    # ⚠ 放行與收緊同時發生：`mechanical` 欄位的 value 被強制必須是可機械比對的 JSON 數值，
+    # 而它**不得**進 gate 五項（`gate_member=false`）。
+    assert "interim_period_results" not in registry.gate_field_names

@@ -93,6 +93,11 @@ def build_fundamental_model(
     actuals_reason: str | None,
     consensus: Sequence[ConsensusEstimate],
     guidance: Sequence[GuidanceObservation],
+    #: 目標年度已報導的 YTD 實績（2026-09-13）。**不進橋**——橋的基期依定義是完整的上一個年度。
+    #: 讀它的唯一理由是讓它的 evidence ref 進 index，於是假設的 `evidence_refs` 指得到它：
+    #: 在這個欄位存在之前，「已報導的 9 個月」只能寫進 rationale 的散文裡，
+    #: 而那是**整個模型最硬的輸入**（AAPL 佔共識全年 EPS 的 78%）。
+    interim_results: Sequence[Any] = (),
     assumption_records: Sequence[OperatingAssumption],
     evidence_index: Mapping[str, EvidenceRef],
     parse_errors: Sequence[str] = (),
@@ -125,6 +130,9 @@ def build_fundamental_model(
         warnings.append(f"{len(consensus) - len(usable_consensus)} 筆共識晚於 as_of"
                         "（captured_at 或 fetched_at 在 T 之後），排除")
     usable_guidance = tuple(g for g in guidance if g.issued_at is None or g.issued_at <= cutoff)
+    # PIT：期中實績的 period_end 晚於視角日就是 lookahead（同一條規則，不另寫一份）。
+    usable_interim = tuple(i for i in interim_results
+                           if getattr(i, "period_end", None) is None or i.period_end <= cutoff)
 
     # ---- 1. 目標期間 ---------------------------------------------------------
     target = target_period
@@ -137,7 +145,8 @@ def build_fundamental_model(
     index: dict[str, EvidenceRef] = dict(evidence_index)
     model_evidence: list[EvidenceRef] = []
     for source in ((actuals.evidence if actuals else ()),
-                   *(c.evidence for c in usable_consensus), *(g.evidence for g in usable_guidance)):
+                   *(c.evidence for c in usable_consensus), *(g.evidence for g in usable_guidance),
+                   *(i.evidence for i in usable_interim)):
         for ref in source:
             index.setdefault(ref.ref, ref)
             model_evidence.append(ref)
@@ -153,6 +162,21 @@ def build_fundamental_model(
             input_count=len(assumption_records) + len(parse_errors), accepted_count=0,
             reasons={"no_target_period": len(assumption_records) + len(parse_errors)})
 
+    # ---- 3.5 已核實的共識口徑（2026-09-13）---------------------------------
+    # ⚠ **順序刻意提前到橋之前**：橋要算哪一種口徑的內部 EPS，取決於它最後要對的那一串共識，
+    # 而 `verify_consensus_basis` 只需要 `actuals` 與共識本身——兩者這裡都有了。
+    # 先前它算在第 5 段（橋之後），於是「已經知道共識是 GAAP」這個結論送不到橋手上
+    # （L16：分類要跟著資料走）。
+    consensus_bases = {
+        f"{c.metric}:{c.period.end.isoformat()}": verify_consensus_basis(c, actuals)
+        for c in usable_consensus
+    }
+    target_eps_basis: str | None = None
+    if target is not None:
+        stem = consensus_bases.get(f"eps:{target.end.isoformat()}")
+        if stem in ("gaap", "non_gaap"):
+            target_eps_basis = stem
+
     # ---- 4. 橋 ---------------------------------------------------------------
     metrics: dict[str, ModeledMetric] = {}
     steps = ()
@@ -166,7 +190,7 @@ def build_fundamental_model(
                                           value=None, unit="currency", accounting_basis="not_applicable",
                                           reason=reason)
     else:
-        bridge = build_bridge(actuals, accepted, target)
+        bridge = build_bridge(actuals, accepted, target, consensus_basis=target_eps_basis)
         metrics = dict(bridge.metrics)
         steps = bridge.steps
         basis = bridge.accounting_basis
@@ -190,10 +214,7 @@ def build_fundamental_model(
                           if selection.input_count else "尚未寫入任何 OperatingAssumption")
 
     # ---- 5. 共識與比較 --------------------------------------------------------
-    consensus_bases = {
-        f"{c.metric}:{c.period.end.isoformat()}": verify_consensus_basis(c, actuals)
-        for c in usable_consensus
-    }
+    # `consensus_bases` 在 3.5 段已經算好——**這裡不重算**（兩份會開始漂，L16）。
     consensus_for_target: dict[str, ConsensusEstimate] = {}
     if target is not None:
         for item in usable_consensus:

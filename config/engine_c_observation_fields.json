@@ -215,6 +215,19 @@
       "verifiability": "mechanical"
     },
     {
+      "field_name": "interim_period_results",
+      "category": "profitability",
+      "label": "目標年度已報導的期中實績（YTD；GAAP／non-GAAP 損益項目與稀釋股數）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
+      "why": "`fiscal_year_results` 的設計前提是「目標期間完全在未來」，而可選的 `exit_quarter` 講的是**基期的最後一季**。但 0y 共識就是**當年度**——到 9 月多數美股已報導 2~3 季，而那些 YTD 實績是整個模型**最硬的輸入**（2026-09-12 實測四檔：AAPL 已報 9 個月、佔共識全年 EPS 的 78%；AMD／ANET／CDNS 已報 H1，48–72%）。在這個欄位存在之前，它們只能寫進 OperatingAssumption 的 `rationale` 散文裡，而 `evidence_refs` 只指得到基期觀測——**也就是最重要的證據沒有 authority 載體**。value 必須是 JSON 物件：`period_start`／`period_end`（YYYY-MM-DD，`period_end` 就是本筆的 as_of）、`periods_reported`（已報導幾個季度，整數）、`currency`、`revenue`（報表幣別絕對金額），以及 `gaap` 與可選 `non_gaap` 兩個子物件（欄位名與 `fiscal_year_results` 完全相同：operating_income／interest_and_other_net／pretax_income／income_taxes／net_income_attributable／diluted_eps／diluted_shares），可選 `source_filed_at`。⚠ **與 `fiscal_year_results` 的分野是身分不是內容**：那一筆是「已結束的上一個會計年度」，這一筆是「目標年度已經報導的那一部分」。兩者同時存在且**都不是推估**——推估走 OperatingAssumption、指引走 company_guidance（L12：一筆紀錄一種語意）。⚠ **它不進橋**：橋的基期依定義是完整的上一個年度。這一筆的用途是讓假設的 `evidence_refs` 指得到「我是看著已報導的 9 個月寫下這個成長率的」，並讓下一個 session 看得到同一份證據。 ｜verifiability=mechanical：每個數字都印在 10-Q／半年報／決算短信的表上，accession 不可變，任何人重讀都得到同一個數；value 是 JSON 數值物件，可被重導直接 diff。",
+      "verifiability": "mechanical"
+    },
+    {
       "field_name": "company_guidance",
       "category": "demand_and_orders",
       "label": "公司公開指引（Business Outlook 的區間數字）",

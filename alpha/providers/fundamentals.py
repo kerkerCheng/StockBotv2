@@ -36,6 +36,8 @@ from ..identity import CompanyId, Ticker
 
 #: Causal Fundamental Model 的兩個 Engine C 人工 ledger 欄位（`config/engine_c_observation_fields.json`）。
 FISCAL_RESULTS_FIELD = "fiscal_year_results"
+#: 目標年度已報導的 YTD 實績（2026-09-13）。**不進橋**，只為了讓它的 ref 進 evidence index。
+INTERIM_RESULTS_FIELD = "interim_period_results"
 
 #: `fiscal_year_results` payload 裡**有對應欄位**的鍵。其餘一律原樣進 `author_notes`——
 #: **不得靜默丟棄作者寫下的東西**（INV-3）。這個集合是可測的，所以「新增欄位卻忘了接」
@@ -464,6 +466,52 @@ class EngineCFundamentalsProvider:
             except (KeyError, TypeError, ValueError, ContractViolation) as exc:
                 errors.append(f"{row['observation_id']}: {exc}")
         return None, "fiscal_year_results 觀測無法解析：" + "；".join(errors[:2])
+
+    def interim_period_results(
+        self, ticker: Ticker | None, *, as_of: date | None = None
+    ) -> tuple[tuple[Any, ...], str | None]:
+        """目標年度已報導的 YTD 實績（`interim_period_results`），最新在前。
+
+        ⚠ **它不進橋**（橋的基期是完整的上一個年度）。讀它的唯一理由是讓它的 evidence ref
+        進到 index，於是假設的 `evidence_refs` 指得到它——**最硬的輸入要有 authority 載體**。
+        """
+        from ..fundamental.contracts import InterimPeriodResults
+
+        if ticker is None:
+            return (), "未上市，無期中財報"
+        rows = self._ledger_rows(ticker, INTERIM_RESULTS_FIELD, as_of)
+        if not rows:
+            return (), None                # 沒有不是錯——多數標的的目標年度還沒報導
+        superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        out: list[Any] = []
+        errors: list[str] = []
+        for row in rows:
+            if row["observation_id"] in superseded:
+                continue
+            try:
+                payload = json.loads(row["value"])
+                end = _as_date(payload.get("period_end")) or _as_date(row.get("as_of"))
+                if end is None:
+                    raise ValueError("缺 period_end")
+                filed = _as_date(payload.get("source_filed_at"))
+                out.append(InterimPeriodResults(
+                    period_start=_as_date(payload.get("period_start")),
+                    period_end=end,
+                    periods_reported=(int(payload["periods_reported"])
+                                      if payload.get("periods_reported") is not None else None),
+                    currency=str(payload.get("currency") or ""),
+                    revenue=_num(payload.get("revenue")),
+                    gaap=_numeric_block(payload.get("gaap")),
+                    non_gaap=(_numeric_block(payload.get("non_gaap")) if payload.get("non_gaap") else None),
+                    evidence=(self._ledger_ref(row, published_at=filed or end),
+                              *self._superseded_refs(rows, row)),
+                    source_filed_at=filed,
+                    observation_id=str(row["observation_id"]),
+                ))
+            except (KeyError, TypeError, ValueError, ContractViolation) as exc:
+                errors.append(f"{row['observation_id']}: {exc}")
+        reason = ("interim_period_results 觀測無法解析：" + "；".join(errors[:2])) if errors and not out else None
+        return tuple(out), reason
 
     def company_guidance(
         self, ticker: Ticker | None, *, as_of: date | None = None
