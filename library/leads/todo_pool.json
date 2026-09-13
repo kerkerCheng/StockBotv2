@@ -9752,6 +9752,18 @@
       "source": "manual",
       "title": "IREN（IREN Limited）：本估 FY2027 EPS −0.670、共識 −2.44、FY2028 −0.265 全為負——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-13T04:14:24.877070+00:00",
+      "hint": "go＝執行 `python -m alpha abstention NBIS --add library/private/alpha/abstention_proposals/NBIS_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪把 NBIS 從『只有基期與指引觀測』補完——六格 FY2026 假設、EV/Sales 估值 va_450fc4ee（校準 16.655715x）、horizon ha_d91e9785、四軸判斷（4/5，structural 因圖中無 substitutability 邊而 unknown）。基期 mo_c7b33b5b 與指引 mo_967ce2c1 是前一輪寫好的。｜⚠⚠ **本檔要 Abstention 的理由與其他虧損股不同，值得先看懂**：**本估的內部每股盈餘是正的（+0.690）**，所以擋下本益比法的不是我方而是市場那一側——共識 FY2026 **−2.518**（6 位）、FY2027 **−5.649**（7 位），**分母是負的，校準倍數在結構上不存在**。而那個 +0.690 **100% 來自 H1 2026 那筆 780.6 百万美元的持股重估**（Gain from revaluation of investment in equity securities，全部落在 Q1，Q2 為 0）；**扣掉它是 −2.584，與共識的 −2.518 只差 2.6%**。**也就是說：本估與市場在 NBIS 的盈餘上沒有任何分歧，差別只是一個算一次性收益、一個不算。** 把 +0.690 乘上任何倍數，等於把「別人的股價漲了」當成 NBIS 的盈餘能力。｜放行後會變什麼：P6 切換條件兩者屆時都成立 → fair value **181.29 美元**、隱含報酬 **−19.265%**、readiness 由 blocked 變 ready。拆解：倍數桿 0.00%、營收桿 −18.52%，× 淨負債放大 1.0402 倍（NBIS 的淨負債只佔市值 4%，所以幾乎是純營收差）。｜⚠ 那 −18.52% 是一個**三個月後就會揭曉的算術問題**：公司把 ARR 定義寫死為『該季最後一個月的 AI 雲端營收 × 12』，2026-06-30 的 ARR 30 億 → 6 月單月約 250 百万，而 Q2 整季月均只有 191.7（出場比月均高 30.4%）。本估把這個比率固定往前推得全年 2,724 百万；共識 3,343 百万隱含 H2 月均 394 ＝ **6 月出場速率的 1.57 倍**。**問題就是：6 月的 250／月，到 12 月會不會變成 394／月？** 下一個讀數是 Q3 股東信（約 2026-11）的 ARR——本估隱含 39 億，共識路徑需要往 58 億去。｜⚠ 誠實的限制：公司已逐字重申全年指引並上調 YE'26 產能指引，**但那些數字不在 6-K 的文字層裡**（股東信說會在法說會上給）。本估偏保守有一部分是拿不到那份指引，**那是資訊落差不是認知優勢**。｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 573,
+      "reason": null,
+      "ref_id": "NBIS",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "NBIS（Nebius）：內部 FY2026 EPS 其實是正的 +0.690，但那 100% 是 H1 的 7.806 億持股重估；共識 −2.518 沒有分母——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21292,6 +21304,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 573,
+  "next_n": 574,
   "schema_version": "1"
 }
