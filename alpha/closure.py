@@ -701,6 +701,119 @@ def render_duplicate_live_observations(
             "⚠ 今天取到的仍是「最新者勝出」那一筆——**那是排序的副作用，不是宣告**。"]
 
 
+#: 兩條共識矛盾規則各自的容忍帶。
+#: A（共識自己的兩列）：2%——`0y.estimate_avg` 與 `+1y.year_ago_actual` 講的是**同一個會計年度**，
+#: 理論上應該逐位相等，2% 只是容忍 provider 的四捨五入。
+#: B（共識 vs 我們的基期觀測）：3%——營收沒有合法的口徑差異，所以容忍帶只留給單位換算的殘差。
+CONSENSUS_SELF_TOLERANCE = 0.02
+CONSENSUS_BASE_TOLERANCE = 0.03
+
+
+def consensus_self_contradictions(
+    series: Mapping[str, Sequence[Mapping[str, Any]]]
+) -> tuple[tuple[str, str, float, float, float], ...]:
+    """規則 A：`0y.estimate_avg` 與 `+1y.year_ago_actual` 對不上 ＝ 兩列不是同一串數字。
+
+    ⚠ 實測 CDNS（2026-09-12）：0y EPS **4.80568**（13 位分析師，GAAP）
+    vs +1y 的 `year_ago_actual` **8.14245**（25 位，non-GAAP），差 **69.4%**。
+    兩列相除會得到「一年成長 +98.6%」——**完全是口徑切換的假象，而沒有任何欄位會報錯**。
+
+    回傳 `(ticker, metric, 0y 估計, +1y 的 year_ago_actual, 相對差)`。
+    """
+    out: list[tuple[str, str, float, float, float]] = []
+    for ticker in sorted(series):
+        rows = series[ticker]
+        by = {(str(r.get("metric")), str(r.get("relative_label"))): r for r in rows}
+        for metric in sorted({str(r.get("metric")) for r in rows}):
+            cur, nxt = by.get((metric, "0y")), by.get((metric, "+1y"))
+            if not cur or not nxt:
+                continue
+            estimate, prior = cur.get("estimate_avg"), nxt.get("year_ago_actual")
+            if not isinstance(estimate, (int, float)) or not estimate:
+                continue
+            if not isinstance(prior, (int, float)):
+                continue
+            drift = float(prior) / float(estimate) - 1.0
+            if abs(drift) > CONSENSUS_SELF_TOLERANCE:
+                out.append((ticker, metric, float(estimate), float(prior), drift))
+    return tuple(out)
+
+
+def consensus_base_contradictions(
+    series: Mapping[str, Sequence[Mapping[str, Any]]],
+    bases: Mapping[str, Mapping[str, Any]],
+) -> tuple[tuple[str, float, float, float], ...]:
+    """規則 B：共識的 `year_ago_actual` 與**我們自己的基期觀測**對不上（只看營收）。
+
+    ⚠ **判定權威不在這裡**，是 `alpha/fundamental/compare.py` 的 `unreconciled_base`
+    （2026-09-07 Coverage Pilot 補）。這一層只負責讓它**每輪自己出現**（L17-3③）。
+
+    ⚠⚠ **只看營收，刻意不看 EPS。** 實測 40 檔有基期觀測的標的，EPS 側有 **20 檔**對不上，
+    而絕大多數是已知且合法的 GAAP vs non-GAAP（或股票股利使 provider 依 IAS 33 追溯調整基期）。
+    **恆亮的警報等於零鑑別力（L14-4）**，所以 EPS 側不進計數器。
+    營收沒有合法的口徑差異——對不上就是**合併範圍或年度對錯了**。
+
+    ⚠ **幣別 guard 是必要的，不是保險**：TSM 的共識是 TWD、基期觀測記的是 USD，
+    比值 31.37 只是匯率。沒有 guard 它會多報一檔，而那一檔不是資料錯誤。
+
+    回傳 `(ticker, 共識的 year_ago_actual, 我們的基期營收, 比值)`。
+    """
+    out: list[tuple[str, float, float, float]] = []
+    for ticker in sorted(series):
+        base = bases.get(ticker)
+        if not isinstance(base, Mapping):
+            continue
+        filed = base.get("revenue")
+        if not isinstance(filed, (int, float)) or not filed:
+            continue
+        for row in series[ticker]:
+            if str(row.get("relative_label")) != "0y" or str(row.get("metric")) != "revenue":
+                continue
+            actual = row.get("year_ago_actual")
+            if not isinstance(actual, (int, float)) or not actual:
+                continue
+            cons_ccy, base_ccy = row.get("currency"), base.get("currency")
+            if cons_ccy and base_ccy and str(cons_ccy).upper() != str(base_ccy).upper():
+                continue                  # 幣別不同 → 差異是匯率不是口徑（TSM），不報
+            ratio = float(actual) / float(filed)
+            if abs(ratio - 1.0) <= CONSENSUS_BASE_TOLERANCE:
+                continue
+            out.append((ticker, float(actual), float(filed), ratio))
+    return tuple(out)
+
+
+def render_consensus_contradictions(
+    rule_a: Sequence[tuple[str, str, float, float, float]],
+    rule_b: Sequence[tuple[str, float, float, float]],
+) -> list[str]:
+    """常駐兩行（一條規則一行）。沒命中也印，否則「沒有問題」與「沒有跑」同形。"""
+    lines: list[str] = []
+    if rule_a:
+        lines.append(
+            f"⚠⚠ 共識序列自我矛盾（0y 估計 ≠ +1y 的 year_ago_actual）：{len(rule_a)} 組——"
+            + "、".join(f"{tk}/{m} {est:,.4g} vs {prior:,.4g}（{d:+.1%}）"
+                        for tk, m, est, prior, d in rule_a)
+            + "。**這兩列不是同一串數字**（口徑或樣本不同），"
+            "不得相除當成成長率；先拿 year_ago_actual 去對一手財報確認口徑。")
+    else:
+        lines.append(f"共識序列自我矛盾（0y 估計 ≠ +1y 的 year_ago_actual）：0 組"
+                     f"（容忍帶 {CONSENSUS_SELF_TOLERANCE:.0%}）")
+    if rule_b:
+        lines.append(
+            f"⚠⚠ 共識的基期對不上我們的基期觀測（只看營收）：{len(rule_b)} 檔——"
+            + "、".join(f"{tk} 共識 {a:,.0f} vs 我們 {f:,.0f}（比值 {r:.4f}）"
+                        for tk, a, f, r in rule_b)
+            + "。**營收沒有合法的口徑差異**，所以這不是 GAAP／non-GAAP，"
+            "而是**合併範圍或年度對錯了**（判定權威：`compare.py::unreconciled_base`）。"
+            "⚠ 不要用 provider 的 growth 欄位——它是「估計 ÷ 這個錯的基期」。"
+            "⚠ EPS 側刻意不進本計數器：實測 20 檔對不上，絕大多數是合法的 GAAP vs non-GAAP，"
+            "做成警報就是恆亮的零鑑別力（L14-4）。")
+    else:
+        lines.append(f"共識的基期對不上我們的基期觀測（只看營收）：0 檔"
+                     f"（容忍帶 {CONSENSUS_BASE_TOLERANCE:.0%}；幣別不同一律跳過）")
+    return lines
+
+
 def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
     """`{ticker: analyst view payload}` → 品質分布。讀不到就進 `unreadable`，**不當成 0**。"""
     positive: list[str] = []

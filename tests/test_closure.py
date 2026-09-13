@@ -4,6 +4,8 @@
 """
 from __future__ import annotations
 
+import pytest
+
 from alpha import closure
 from alpha.closure import BacklogRow
 
@@ -546,3 +548,62 @@ def test_target_period_ends_takes_the_latest_snapshot_only() -> None:
 
     out = closure._target_period_ends(["MU", "LRCX", "NOPE"], _Conn())
     assert out == {"MU": "2026-08-28", "LRCX": "2027-06-28", "NOPE": None}
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-13：共識矛盾的兩條規則（ROADMAP L210）
+# ---------------------------------------------------------------------------
+
+def test_consensus_self_contradiction_catches_basis_switch_between_the_two_rows() -> None:
+    """`0y.estimate_avg` 與 `+1y.year_ago_actual` 講同一個會計年度，對不上就不是同一串數字。"""
+    from alpha.closure import consensus_self_contradictions
+
+    series = {
+        # CDNS 的實際形狀：0y 是 GAAP（13 位）、+1y 的 year_ago_actual 是 non-GAAP（25 位）。
+        "CDNS": [{"metric": "eps", "relative_label": "0y", "estimate_avg": 4.80568,
+                  "year_ago_actual": 3.5, "analyst_count": 13, "currency": "USD"},
+                 {"metric": "eps", "relative_label": "+1y", "estimate_avg": 9.54363,
+                  "year_ago_actual": 8.14245, "analyst_count": 25, "currency": "USD"}],
+        # 對得上的標的不得進列（容忍帶只給四捨五入）。
+        "AAPL": [{"metric": "eps", "relative_label": "0y", "estimate_avg": 7.50,
+                  "year_ago_actual": 6.9, "analyst_count": 30, "currency": "USD"},
+                 {"metric": "eps", "relative_label": "+1y", "estimate_avg": 8.2,
+                  "year_ago_actual": 7.5049, "analyst_count": 30, "currency": "USD"}],
+    }
+    rows = consensus_self_contradictions(series)
+    assert [r[0] for r in rows] == ["CDNS"]
+    assert rows[0][1] == "eps" and rows[0][4] == pytest.approx(8.14245 / 4.80568 - 1, rel=1e-6)
+
+
+def test_consensus_base_contradiction_skips_currency_differences_and_ignores_eps() -> None:
+    """規則 B 只看營收，而且幣別不同一律跳過（TSM 的 31.37 是匯率不是口徑）。"""
+    from alpha.closure import consensus_base_contradictions
+
+    series = {
+        # 5016.T：provider 把決算短信的「(参考) 個別業績」當成基期。
+        "5016.T": [{"metric": "revenue", "relative_label": "0y", "estimate_avg": 9.0e11,
+                    "year_ago_actual": 461_843_000_000.0, "currency": "JPY"}],
+        # TSM：共識 TWD、基期觀測 USD——比值 31.37 只是匯率，**不得報**。
+        "TSM": [{"metric": "revenue", "relative_label": "0y", "estimate_avg": 4.0e12,
+                 "year_ago_actual": 2_894_308_000_000.0, "currency": "TWD"}],
+        # EPS 對不上也不得進列（實測 20 檔，絕大多數是合法的 GAAP vs non-GAAP）。
+        "INTC": [{"metric": "eps", "relative_label": "0y", "estimate_avg": 0.4,
+                  "year_ago_actual": 0.42, "currency": "USD"}],
+    }
+    bases = {
+        "5016.T": {"currency": "JPY", "revenue": 884_638_000_000.0},
+        "TSM": {"currency": "USD", "revenue": 92_264_000_000.0},
+        "INTC": {"currency": "USD", "revenue": 5.3e10, "gaap": {"basic_eps": 0.30}},
+    }
+    rows = consensus_base_contradictions(series, bases)
+    assert [r[0] for r in rows] == ["5016.T"]
+    assert rows[0][3] == pytest.approx(461_843 / 884_638, rel=1e-4)
+
+
+def test_consensus_counters_print_a_line_even_when_nothing_is_wrong() -> None:
+    """沒命中也要印——否則「沒有問題」與「沒有跑」同形（L13-2）。"""
+    from alpha.closure import render_consensus_contradictions
+
+    lines = render_consensus_contradictions((), ())
+    assert len(lines) == 2
+    assert all("0 " in line for line in lines)
