@@ -262,6 +262,60 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
+def _share_count_pairs(tickers) -> dict[str, tuple[float | None, float | None]]:
+    """`{ticker: (快照流通股數, 財報稀釋加權平均)}`——兩邊都由 provider 讀，本檔不算任何東西。"""
+    from alpha.contracts import Ticker
+    from alpha.providers.fundamentals import EngineCFundamentalsProvider
+
+    provider = EngineCFundamentalsProvider()
+    out: dict[str, tuple[float | None, float | None]] = {}
+    for raw in tickers:
+        ticker = Ticker(str(raw))
+        try:
+            snap, _fresh = provider.fundamentals(ticker)
+            actuals, _reason = provider.fiscal_year_results(ticker)
+        except Exception:                      # noqa: BLE001 — 讀不到一檔不該讓整支命令掛掉
+            continue
+        if actuals is None:
+            continue
+        block = actuals.gaap or actuals.non_gaap or {}
+        filed = block.get("diluted_shares") if isinstance(block, dict) else None
+        out[str(ticker)] = (snap.shares_outstanding, filed)
+    return out
+
+
+def _base_payloads(tickers) -> dict[str, dict]:
+    """`{ticker: 生效基期觀測的原始 payload}`——只讀，不解析成契約型別。
+
+    ⚠ 刻意讀原始 payload 而不是 `FiscalYearActuals`：這個檢查要看的是**作者寫下的那幾個數字
+    彼此對不對得上**，而契約層會把 `diluted_eps` 之類的欄位正規化過。
+    """
+    import json as _json
+    import sqlite3 as _sqlite3
+
+    private = Path(__file__).resolve().parents[1] / "library" / "private"
+    pointer = private / "runtime_pointer.json"
+    if not pointer.exists():
+        return {}
+    db = private / _json.loads(pointer.read_text(encoding="utf-8"))["engine_c"]
+    conn = _sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
+    conn.row_factory = _sqlite3.Row
+    wanted = {str(t) for t in tickers}
+    got = [dict(r) for r in conn.execute(
+        "SELECT ticker, observation_id, value, supersedes_id FROM manual_observations "
+        "WHERE field_name = 'fiscal_year_results' ORDER BY ticker, recorded_at")]
+    superseded = {r["supersedes_id"] for r in got if r["supersedes_id"]}
+    out: dict[str, dict] = {}
+    for row in got:
+        if row["observation_id"] in superseded or row["ticker"] not in wanted:
+            continue
+        try:
+            out[row["ticker"]] = _json.loads(row["value"])
+        except (TypeError, ValueError):
+            continue
+    return out
+
+
 def cmd_closure_gate(args: argparse.Namespace) -> int:
     """段 5 閉包成立嗎？**exit code 就是答案**：0＝閉包／1＝還有工作／2＝讀不到（fail closed）。
 
@@ -292,6 +346,12 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     artifacts = {t: p for t, p, _f, _r in ArtifactStore(
         Path(args.dir) if args.dir else None).read_all() if p is not None and t in terminal}
     score = closure.score_quality(artifacts)
+    # 快照股數 vs 財報股數（2026-09-13 ROADMAP 交付）。掛在這裡的理由與品質計數器同一條：
+    # skill 已規定每輪必跑 closure-gate，掛上去它才會**自己出現**（L17-3③：偵測要有消費端）。
+    # ⚠ 它看**全部**標的不只終局那幾檔——股數錯不錯與 readiness 無關。
+    share_pairs = _share_count_pairs([r.ticker for r in rows])
+    share_rows = closure.share_count_mismatches(share_pairs)
+    eps_rows = closure.base_eps_reconciliation_gaps(_base_payloads([r.ticker for r in rows]))
     # 未到終局那批卡在哪——與品質計數器同一個理由掛在這裡：每輪本來就會跑 closure-gate，
     # 掛上去它才會自己出現。它回答的不是「還剩幾檔」而是「剩下的檔寫得出有資訊的判斷嗎」。
     profile = closure.open_profile(rows, skip=args.skip or ())
@@ -306,7 +366,13 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                         "multiple_neutral": list(score.multiple_neutral),
                         "multiple_priced": [{"ticker": t, "contribution": c}
                                             for t, c in score.multiple_priced],
-                        "unreadable": list(score.unreadable)},
+                        "unreadable": list(score.unreadable),
+                        "share_count_mismatch": [
+                            {"ticker": tk, "snapshot_shares": s, "filed_shares": f, "ratio": r}
+                            for tk, s, f, r in share_rows],
+                        "base_eps_reconciliation": [
+                            {"ticker": tk, "basis": b, "reported": rep, "implied": imp,
+                             "relative_gap": rel} for tk, b, rep, imp, rel in eps_rows]},
             "open_profile": profile,
         }, ensure_ascii=False, indent=2))
     else:
@@ -327,6 +393,10 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             print(f"- 未讀到：{note}")
         print("# 品質計數器（到終局那幾檔；衝檔數最容易犧牲的就是這個）")
         for line in closure.render_quality(score):
+            print(f"- {line}")
+        for line in closure.render_share_count_mismatches(share_rows):
+            print(f"- {line}")
+        for line in closure.render_base_eps_reconciliation(eps_rows):
             print(f"- {line}")
         if result.actionable:
             # 條目數跟著 OPEN_PROFILE_FIELDS 走——寫死「三項」會在加第四項那天變成假的。

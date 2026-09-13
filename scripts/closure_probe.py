@@ -72,26 +72,23 @@ def _snapshot_self_check(snap) -> None:
 
     **兩個相鄰欄位、兩種期間、零宣告**——L12 的形狀（一個表示承載兩種語意）。
 
-    ## 為什麼不只在不等式成立時才警告
+    ## ✅ 2026-09-13：期間已經有欄位了，所以這裡由「警語」降成「照抄宣告」
 
-    `operating_margin > gross_margin` 只在「最近一季特別好」時才成立（全庫 73 份只有 3 份，
-    且三家全是記憶體廠）。**其餘 70 份同樣有期間錯配，只是看不出來**——
-    只在看得出來時才警告，等於只擋住最無害的那一批。所以這裡對**每一檔**都印。
-
-    ⚠ 它不進橋（橋用 Engine C 的人工觀測），但**進 research packet 的 deterministic 區塊**，
-    也就是 session 寫四軸判斷前會讀到的那一份。
+    `FundamentalsSnapshot.operating_margin_period`／`gross_margin_period` 現在會跟著值一起送到
+    每一個消費端（SSOT 是 `engine_c/etl_yfinance.py` 的兩個常數），research packet 的
+    `deterministic.fundamentals` 也帶著它們。**所以 probe 不必再每檔複述一段警語**——
+    它只在**不等式真的破了**的時候把那件事指出來（那是期間錯配剛好看得見的一小批）。
     """
     gross, operating = snap.get("gross_margin"), snap.get("operating_margin")
     if operating is None:
         return
-    impossible = gross is not None and operating > gross
-    flag = "⚠⚠" if impossible else "⚠"
-    print(f"   {flag} 快照的 operating_margin={operating:.4f} 是 **provider 的最近一季**，"
-          f"而 gross_margin={gross if gross is None else format(gross, '.4f')} 是**年度／TTM**——"
-          "兩欄期間不同且沒有欄位宣告。**寫判斷時營益率一律取法定文件自己算**，不要引用這一格。")
-    if impossible:
-        print("      （本檔連不等式都破了：營益率 > 毛利率，營業費用不會是負的——"
-              "那只是期間錯配在這一檔剛好看得出來，不是另一種錯。）")
+    print(f"   · 快照 operating_margin={operating:.4f}（期間：latest_quarter）、"
+          f"gross_margin={gross if gross is None else format(gross, '.4f')}（期間：annual_or_ttm）"
+          "——**兩欄期間不同，而現在 packet 會帶著期間欄位**（2026-09-13 起）。"
+          "寫判斷時營益率仍建議取法定文件自己算。")
+    if gross is not None and operating > gross:
+        print("      ⚠⚠ 本檔連不等式都破了：營益率 > 毛利率，營業費用不會是負的——"
+              "那是期間錯配在這一檔剛好看得出來，不是另一種錯。")
 
 
 def _share_count_check(conn, ticker: str, snapshot_shares) -> None:

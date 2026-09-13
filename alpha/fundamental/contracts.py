@@ -176,6 +176,21 @@ ASSUMPTION_DRIVERS: Mapping[str, DriverSpec] = {
         "currency", "total", "所得稅費用淨額，絕對金額（正值＝費用，負值＝稅務利益）；與 tax_rate 二擇一"),
     "nci_attribution": DriverSpec(
         "currency", "total", "歸屬母公司前的非控制權益調整，絕對金額（正值＝加回母公司）"),
+    # ⚠ 2026-09-13 新增。事發：ORCL 從 FY2027 Q1 起首次出現特別股股息（Q1 81M，去年同期 0），
+    # 而它與非控制權益（FY2026 222M）是**兩種完全不同的東西**——一個是資本結構的成本、
+    # 一個是少數股東的份額——卻被迫共用 `nci_attribution` 一格（當時記 −546M ＝ −222 − 324）。
+    # 不放進來的代價是 EPS 高估約 1.3%，而**沒有任何東西會報錯**（L17）。
+    "preferred_dividends": DriverSpec(
+        "currency", "total", "特別股股息，絕對金額（正值＝從歸屬母公司淨利中扣除）", lower=0.0),
+    # ⚠ 2026-09-13 新增。IAS 33 要求的**稀釋 EPS 分子調整**，與特別股股息是不同的東西。
+    # 事發：4979.TWO（華星光通）的財報稀釋 EPS 5.31 ＝ 772,606 ÷ 145,378，
+    # 分子比歸屬母公司淨利 764,245 多 **8,361**（＝轉換公司債之利息 15,167 −
+    # 透過損益按公允價值衡量之金融資產負債評價調整 6,806，附註 22 逐字）。
+    # 而該檔共識的 `year_ago_actual` 5.31 **就是稀釋口徑**，所以不加回時內部 EPS
+    # 與共識相比系統性低 1.1–1.2%。
+    "diluted_eps_numerator_adjustment": DriverSpec(
+        "currency", "total",
+        "稀釋 EPS 的分子調整（IAS 33），絕對金額（正值＝加回；例：可轉債利息扣除評價調整）"),
     "diluted_shares": DriverSpec("shares", "total", "稀釋加權平均股數（絕對股數）", lower=0.0),
 }
 

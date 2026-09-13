@@ -424,7 +424,8 @@ def test_driver_vocabulary_is_closed_and_validated() -> None:
         parse_assumption_record(record)
     assert set(ASSUMPTION_DRIVERS) == {"revenue_growth", "operating_margin_delta",
                                        "interest_and_other_net", "tax_rate", "tax_expense_absolute",
-                                       "nci_attribution", "diluted_shares"}
+                                       "nci_attribution", "preferred_dividends",
+                                       "diluted_eps_numerator_adjustment", "diluted_shares"}
 
 
 def test_total_and_segment_growth_cannot_coexist() -> None:
@@ -717,3 +718,40 @@ def test_operating_margin_delta_bound_is_a_unit_check_and_the_sum_is_checked_on_
     step = next(s for s in result.steps if s.key == "internal_operating_margin")
     assert step.value is None
     assert "超過 100%" in (step.reason or "") and "加總**越界" in (step.reason or "")
+
+
+def test_preferred_dividends_and_numerator_adjustment_are_separate_from_nci() -> None:
+    """稅後的分子有四種東西要進，而先前只有一格（ORCL 被迫把 −222 與 −324 合成 −546）。"""
+    base = _full_set()
+    plain = build_bridge(_actuals(), base, TARGET)
+    eps0 = plain.metrics["eps"].value
+    shares = next(a.value for a in base if a.driver == "diluted_shares")
+    assert eps0 is not None
+
+    pref = _assumption("preferred_dividends", "total", 324_000_000.0)
+    with_pref = build_bridge(_actuals(), base + [pref], TARGET)
+    # 特別股股息是**扣除**：每股少掉 324M ÷ 股數。
+    assert with_pref.metrics["eps"].value == pytest.approx(eps0 - 324_000_000.0 / shares)
+    step = next(s for s in with_pref.steps if s.key == "internal_net_income_attributable")
+    assert "− preferred_dividends" in (step.formula or "")
+
+    adj = _assumption("diluted_eps_numerator_adjustment", "total", 11_786_000.0)
+    with_adj = build_bridge(_actuals(), base + [adj], TARGET)
+    # IAS 33 的分子調整是**加回**——方向與特別股股息相反，所以不能共用一格。
+    assert with_adj.metrics["eps"].value == pytest.approx(eps0 + 11_786_000.0 / shares)
+    assert "+ diluted_eps_numerator_adjustment" in (
+        next(s for s in with_adj.steps if s.key == "internal_net_income_attributable").formula or "")
+
+    both = build_bridge(_actuals(), base + [pref, adj], TARGET)
+    assert both.metrics["eps"].value == pytest.approx(
+        eps0 - 324_000_000.0 / shares + 11_786_000.0 / shares)
+    # 沒寫這兩格的標的**一個數都不變**（既有 60 幾檔的 preferred_dividends 都是 0）。
+    assert plain.metrics["eps"].value == eps0
+
+
+def test_preferred_dividends_cannot_be_negative() -> None:
+    """特別股股息是扣除項，負值代表寫的人把方向搞反了（那應該用 nci_attribution）。"""
+    from alpha.errors import ContractViolation
+
+    with pytest.raises(ContractViolation, match="低於下限"):
+        _assumption("preferred_dividends", "total", -324_000_000.0)

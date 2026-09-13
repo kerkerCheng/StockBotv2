@@ -18,6 +18,9 @@ from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any, Mapping, Sequence
 
+from engine_c.etl_yfinance import (
+    SNAPSHOT_GROSS_MARGIN_PERIOD, SNAPSHOT_OPERATING_MARGIN_PERIOD,
+)
 from engine_c.estimates import (
     attach_forward_period, forward_eps_from, forward_period_candidates, revision_over,
 )
@@ -123,6 +126,11 @@ class EngineCFundamentalsProvider:
             FundamentalsSnapshot(
                 gross_margin=_num(row.get("gross_margin")),
                 operating_margin=_num(row.get("operating_margin")),
+                # 期間跟著值走（2026-09-13）：有值才有期間標籤，缺席就兩邊都缺席。
+                operating_margin_period=(SNAPSHOT_OPERATING_MARGIN_PERIOD
+                                         if _num(row.get("operating_margin")) is not None else None),
+                gross_margin_period=(SNAPSHOT_GROSS_MARGIN_PERIOD
+                                     if _num(row.get("gross_margin")) is not None else None),
                 revenue_ttm=_num(row.get("revenue_ttm")),
                 free_cash_flow_ttm=_num(row.get("free_cash_flow_ttm")),
                 cash_and_equivalents=_num(row.get("cash_and_equivalents")),
@@ -156,6 +164,8 @@ class EngineCFundamentalsProvider:
                 as_of=None, age_days=None, status="missing", reason="無快照")
         price = _num(row.get("price"))
         shares = _num(row.get("shares_outstanding"))
+        cap = (price * shares) if price and shares else None
+        cap_absence = self._share_count_absence(ticker, shares, as_of) if cap is not None else None
         return (
             MarketSnapshot(
                 price=price,
@@ -163,11 +173,44 @@ class EngineCFundamentalsProvider:
                 # **不得回填 snapshot_date 冒充行情交易日**（F-27）。
                 bar_date=_as_date(row.get("bar_date")),
                 price_kind=row.get("price_kind"),
-                market_cap=(price * shares) if price and shares else None,
+                market_cap=None if cap_absence else cap,
+                market_cap_absence_reason=cap_absence,
                 evidence=(self._ref(ticker, row, "market_series"),),
             ),
             _freshness(row, as_of),
         )
+
+    def _share_count_absence(
+        self, ticker: Ticker, snapshot_shares: float | None, as_of: date | None
+    ) -> str | None:
+        """快照股數與財報稀釋股數差太多時，**拒絕輸出市值**並回傳理由。
+
+        ⚠ 為什麼是拒絕而不是「照給但標記」（2026-09-13 使用者核准 ROADMAP 那一列時的選擇）：
+        `market_cap` 的唯一用途是拿去比較，而**一個錯 5.25 倍的市值在比較時不會露出任何破綻**
+        ——它看起來就是一個合理的數字。缺席會讓消費端停下來問為什麼；錯的值不會。
+        實測 3105.TWO：快照 80,825,000 vs 財報約 424,267 仟股。
+        ⚠ 容忍帶與 `closure-gate` 的常駐計數器**共用同一個常數**（不在兩處各寫一份，L16）。
+        """
+        from ..closure import SHARE_COUNT_TOLERANCE
+
+        if not snapshot_shares:
+            return None
+        actuals, _reason = self.fiscal_year_results(ticker, as_of=as_of)
+        if actuals is None:
+            return None                       # 沒有對照物就不判——那不是錯，是比不了
+        block = actuals.gaap or actuals.non_gaap or {}
+        filed = block.get("diluted_shares") if isinstance(block, Mapping) else None
+        if not filed:
+            return None
+        low, high = SHARE_COUNT_TOLERANCE
+        ratio = float(filed) / float(snapshot_shares)
+        if low <= ratio <= high:
+            return None
+        return (f"市值拒絕輸出：快照流通股數 {snapshot_shares:,.0f} 與財報稀釋加權平均 "
+                f"{filed:,.0f} 的比值是 {ratio:.2f}，超出容忍帶 [{low}, {high}]"
+                f"——差到這個程度不是口徑差異，是**至少一邊錯了**（觀測 {actuals.observation_id}）。"
+                "`market_cap = price × shares_outstanding` 會跟著錯同樣的倍數，"
+                "而一個錯 N 倍的市值在比較時看起來完全正常。**缺席不是 0，是拒答。**")
 
     def consensus(
         self, ticker: Ticker | None, *, as_of: date | None = None

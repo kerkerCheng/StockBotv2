@@ -226,6 +226,8 @@ PLAIN_DRIVER_LABELS: Mapping[str, str] = {
     "tax_rate": "有效稅率",
     "tax_expense_absolute": "所得稅費用（金額）",
     "nci_attribution": "非控制權益調整",
+    "preferred_dividends": "特別股股息",
+    "diluted_eps_numerator_adjustment": "稀釋 EPS 分子調整",
     "diluted_shares": "稀釋股數",
 }
 

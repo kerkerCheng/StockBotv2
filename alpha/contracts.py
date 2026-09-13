@@ -371,6 +371,14 @@ class ScarcityInputs:
 class FundamentalsSnapshot:
     gross_margin: float | None = None
     operating_margin: float | None = None
+    #: **這兩個利潤率各自是哪一段期間**（2026-09-13）。provider 不宣告的話，
+    #: 相鄰兩欄看起來同期而實際不是：`operating_margin` 是**最近一季**、
+    #: `gross_margin` 是**年度／TTM**（SSOT：`engine_c/etl_yfinance.py` 的兩個常數）。
+    #: ⚠ 事發（2026-09-12）：research packet 的 `deterministic.fundamentals` 是 session 寫四軸
+    #: 判斷前會讀到的那一份，而該輪九份判斷檔因此把單季寫成了 TTM（已逐檔更正）。
+    #: **有值就一定有期間**；值缺席時期間也缺席（不得留一個孤零零的期間標籤）。
+    operating_margin_period: str | None = None
+    gross_margin_period: str | None = None
     revenue_ttm: float | None = None
     free_cash_flow_ttm: float | None = None
     cash_and_equivalents: float | None = None
@@ -392,6 +400,13 @@ class MarketSnapshot:
     price_kind: str | None = None
     currency: str | None = None
     market_cap: float | None = None
+    #: **市值缺席時的理由**（2026-09-13）。`market_cap = price × shares_outstanding`，
+    #: 而快照股數錯了不會有任何東西報錯（倍數不受影響，只有「拿市值比較」時才現形）。
+    #: 實測 3105.TWO：快照 80,825,000 vs 財報約 424,267 仟股，**差 5.25 倍**，
+    #: packet 的 market_cap 也就差 5.25 倍。
+    #: ⚠ 現在超出容忍帶時 `market_cap` 直接缺席並在這裡寫出理由——
+    #: **靜默給一個錯 5 倍的數比缺席危險得多**（不補 0、不補錯的值）。
+    market_cap_absence_reason: str | None = None
     evidence: tuple[EvidenceRef, ...] = ()
 
 

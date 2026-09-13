@@ -112,6 +112,18 @@ def _bar_identity(info: dict) -> tuple[str | None, str | None]:
     return stamp.date().isoformat(), kind
 
 
+#: **yfinance 這兩個利潤率欄位的期間不同，而 provider 自己沒有宣告。**（2026-09-13 登記）
+#: 兩次獨立驗證（2026-09-12）：SNDK 快照 `operatingMargins` 0.78472 ≈ Q4 FY2026 單季 GAAP
+#: 營益率 7,037÷8,965＝0.78494，而同一份的 `grossMargins` 0.71474 **精確等於全年** 14,472÷20,248；
+#: 000660.KS 快照 0.76328003 逐位等於 2Q2026 單季，而 TTM 實為 68.0%（差 8.3pp）。
+#: ⚠ **受影響的是每一檔**——`operating_margin > gross_margin` 只在「最近一季特別好」時才看得出來
+#: （全庫只有 MU／SNDK／000660.KS 三檔，三家都是記憶體廠），其餘同樣錯配、只是看不出來。
+#: 這兩個常數是**宣告**，不是推論：它們描述的是 yfinance 欄位的定義，不是某一列資料的性質，
+#: 所以不放 DB 欄位（每列都一樣的值放進每一列只會讓人以為它可能不一樣）。
+SNAPSHOT_OPERATING_MARGIN_PERIOD = "latest_quarter"
+SNAPSHOT_GROSS_MARGIN_PERIOD = "annual_or_ttm"
+
+
 def fetch_snapshot(ticker: str) -> dict | None:
     """yfinance 抓一個 ticker 的當日快照。"""
     if yf is None:

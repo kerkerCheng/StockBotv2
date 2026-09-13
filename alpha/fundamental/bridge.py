@@ -36,7 +36,7 @@ _SEGMENT_SUM_TOLERANCE = 0.005
 #: 營收成長與稀釋股數沒有口徑之分，不在此列。
 _BASIS_BEARING_DRIVERS: frozenset[str] = frozenset(
     {"operating_margin_delta", "interest_and_other_net", "tax_rate", "tax_expense_absolute",
-     "nci_attribution"})
+     "nci_attribution", "preferred_dividends", "diluted_eps_numerator_adjustment"})
 
 #: 結果營益率的上限。**這是經濟不變量，不是參數**：營業利益不可能超過營收。
 #: 2026-09-13 從 `operating_margin_delta` 的 per-record 界搬到這裡——per-record 的界管不到總和，
@@ -298,16 +298,36 @@ def build_bridge(
     nci = by_key.get(("nci_attribution", TOTAL_SCOPE))
     if nci is not None:
         steps.append(_assumption_step("nci_attribution", "非控制權益調整假設", nci))
+    # 2026-09-13：稅後的分子有**四種**東西要進，先前只有一格（L12：一個表示承載多種語意）。
+    # ①NCI（加或扣）②特別股股息（扣）③稀釋 EPS 分子調整（IAS 33，加回）
+    # ④停業單位——④刻意**沒有** driver：它不是「調整」而是「另一段損益」，
+    # 硬塞進來會讓「繼續營業 EPS」與「含停業單位 EPS」在同一條鏈上分不開；
+    # 正確做法是基期整筆採繼續營業口徑（NBIS 2026-09-13 的處理），
+    # 而基期自己的 EPS 對帳不上時由 `closure-gate` 的常駐計數器指出來。
+    preferred = by_key.get(("preferred_dividends", TOTAL_SCOPE))
+    if preferred is not None:
+        steps.append(_assumption_step("preferred_dividends", "特別股股息假設", preferred))
+    numerator_adj = by_key.get(("diluted_eps_numerator_adjustment", TOTAL_SCOPE))
+    if numerator_adj is not None:
+        steps.append(_assumption_step("diluted_eps_numerator_adjustment",
+                                      "稀釋 EPS 分子調整假設（IAS 33）", numerator_adj))
     attributable = (net_income + nci.value) if (net_income is not None and nci is not None) else None
-    attributable_ids = tax_ids + ([nci.assumption_id] if nci else [])
+    if attributable is not None and preferred is not None:
+        attributable -= preferred.value
+    if attributable is not None and numerator_adj is not None:
+        attributable += numerator_adj.value
+    attributable_ids = tax_ids + ([nci.assumption_id] if nci else [])         + ([preferred.assumption_id] if preferred else [])         + ([numerator_adj.assumption_id] if numerator_adj else [])
     attributable_reason = (None if attributable is not None else
                            (_absent("nci_attribution", "缺 nci_attribution 假設")
                             if nci is None else tax_reason))
+    attributable_formula = ("internal_net_income + nci_attribution"
+                            + (" − preferred_dividends" if preferred is not None else "")
+                            + (" + diluted_eps_numerator_adjustment" if numerator_adj is not None else ""))
     _emit(steps, "internal_net_income_attributable", f"內部歸屬母公司淨利（{basis}）", attributable,
-          "currency", "internal_net_income + nci_attribution", attributable_ids, base_refs,
+          "currency", attributable_formula, attributable_ids, base_refs,
           attributable_reason)
     metrics["net_income"] = _metric("net_income", attributable, "currency",
-                                    "internal_net_income + nci_attribution", attributable_ids,
+                                    attributable_formula, attributable_ids,
                                     reason=attributable_reason)
 
     # ---- 7. 稀釋股數 → EPS -------------------------------------------------

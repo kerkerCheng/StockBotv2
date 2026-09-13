@@ -21,6 +21,8 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
+
+import pytest
 from datetime import date
 
 from alpha.contracts import Ticker
@@ -84,3 +86,54 @@ def test_a_single_observation_has_no_superseded_refs() -> None:
     actuals, reason = EngineCFundamentalsProvider(conn=conn).fiscal_year_results(Ticker("AEVA"))
     assert reason is None and actuals is not None
     assert [r.ref for r in actuals.evidence] == [f"engine_c://manual_observation/{OLD}"]
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-13：快照股數錯得離譜時，市值拒絕輸出（ROADMAP L222）
+# ---------------------------------------------------------------------------
+
+def test_market_cap_refuses_to_output_when_snapshot_shares_contradict_the_filing() -> None:
+    """`market_cap = price × shares`，而快照股數錯 5 倍時那個數看起來完全正常。
+
+    ⚠ 選「拒絕輸出」而不是「照給但標記」的理由：市值的唯一用途是拿去比較，
+    而一個錯 5.25 倍的市值在比較時不會露出任何破綻。缺席會讓消費端停下來問為什麼。
+    """
+    conn = _conn()
+    payload = json.dumps({
+        "fiscal_year_end": "2025-12-31", "currency": "TWD", "revenue": 1.0e10,
+        "gaap": {"operating_income": 1.0e9, "diluted_shares": 424_512_000.0},
+    }, ensure_ascii=False)
+    conn.execute(
+        "INSERT INTO manual_observations (observation_id, ticker, field_name, value, source_ref, "
+        "as_of, recorded_at, author, supersedes_id, payload_digest) VALUES (?,?,?,?,?,?,?,?,?,?)",
+        (OLD, "3105.TWO", "fiscal_year_results", payload, "年報", "2025-12-31T00:00:00+00:00",
+         "2026-09-12T00:00:00+00:00", "session", None, "d"))
+    conn.execute(
+        "INSERT INTO financial_snapshots (ticker, snapshot_date, price, shares_outstanding, "
+        "bar_date, fetched_at) VALUES (?,?,?,?,?,?)",
+        ("3105.TWO", "2026-09-11", 437.5, 80_825_000, "2026-09-11", "2026-09-11T00:00:00+00:00"))
+    conn.commit()
+    market, _fresh = EngineCFundamentalsProvider(conn=conn).market(Ticker("3105.TWO"))
+    assert market.price == 437.5
+    assert market.market_cap is None                          # 不是 0，是拒答
+    assert "5.25" in (market.market_cap_absence_reason or "")
+    assert "至少一邊錯了" in (market.market_cap_absence_reason or "")
+
+
+def test_share_count_counter_lists_the_wrong_one_and_not_the_legitimate_one() -> None:
+    """常駐計數器：3105.TWO（5.25）在列上，AXTI（0.67 的合法差異）不在。"""
+    from alpha.closure import SHARE_COUNT_TOLERANCE, render_share_count_mismatches, share_count_mismatches
+
+    rows = share_count_mismatches({
+        "3105.TWO": (80_825_000.0, 424_512_000.0),            # 錯 5.25 倍
+        "AXTI": (48_000_000.0, 32_160_000.0),                 # 0.67——現金增資，合法
+        "COHR": (155_000_000.0, 158_000_000.0),               # 1.02
+        "NOBASE": (10_000_000.0, None),                       # 沒有對照物 → 不判
+    })
+    assert [r[0] for r in rows] == ["3105.TWO"]
+    assert rows[0][3] == pytest.approx(5.25, rel=1e-3)
+    assert SHARE_COUNT_TOLERANCE == (0.5, 2.0)
+    text = " ".join(render_share_count_mismatches(rows))
+    assert "3105.TWO" in text and "AXTI" not in text
+    # 沒有命中時也要印一行——否則「沒有問題」與「沒有跑」同形（L13-2）。
+    assert "0 檔" in " ".join(render_share_count_mismatches(()))

@@ -550,6 +550,118 @@ def _find_attribution(payload: Any) -> Mapping[str, Any] | None:
     return None
 
 
+#: 快照流通股數 vs 財報稀釋加權平均的容忍帶。**兩者本來就不同**（加權平均 vs 期末、
+#: 稀釋 vs 流通），差距應該在個位數百分比；差到 2 倍以上就不是口徑差異，是至少一邊錯了。
+#: 界線刻意開到 [0.5, 2.0] 而不是 [0.67, 1.5]：全庫 40 檔可比的只有 AXTI 落在 0.67
+#: （現金增資使稀釋加權平均低於期末流通股數，**合理**）。
+#: **會誤報的防呆本身就是過度工程（L16-4）**，所以界線放到誤報為 0 的地方；
+#: 3105.TWO 的 5.25 倍離界線仍有兩倍餘裕，鑑別力沒有損失。
+SHARE_COUNT_TOLERANCE: tuple[float, float] = (0.5, 2.0)
+
+
+def share_count_mismatches(
+    pairs: Mapping[str, tuple[float | None, float | None]]
+) -> tuple[tuple[str, float, float, float], ...]:
+    """`{ticker: (快照流通股數, 財報稀釋股數)}` → 超出容忍帶的那幾檔（含比值）。
+
+    ⚠ 這是 2026-09-12 記下的那一列：`packet.deterministic.market.market_cap` ＝
+    `price × shares_outstanding`，而快照股數錯了**沒有任何東西會報錯**——
+    倍數（價 ÷ 每股盈餘）不受影響，所以錯誤只在「拿市值做比較」時才現形，
+    而那正是沒人會當場察覺的地方（L17：不會壞、不會報錯、測試不會紅）。
+    對照物一直都在：有 `fiscal_year_results` 觀測就有一個獨立來源的股數。
+
+    ⚠ **偵測要有常駐消費端才算做完**（L17-3③）。它掛在 `closure-gate` 的品質計數器上，
+    因為 skill 已規定每輪必跑那一支——掛上去它才會**自己出現**。
+    """
+    low, high = SHARE_COUNT_TOLERANCE
+    out: list[tuple[str, float, float, float]] = []
+    for ticker in sorted(pairs):
+        snapshot_shares, filed_shares = pairs[ticker]
+        if not snapshot_shares or not filed_shares:
+            continue
+        ratio = float(filed_shares) / float(snapshot_shares)
+        if low <= ratio <= high:
+            continue
+        out.append((ticker, float(snapshot_shares), float(filed_shares), ratio))
+    return tuple(out)
+
+
+def render_share_count_mismatches(rows: Sequence[tuple[str, float, float, float]]) -> list[str]:
+    """常駐一行。**沒有命中就誠實說 0**，不靜默消失（否則「沒有問題」與「沒有跑」同形）。"""
+    low, high = SHARE_COUNT_TOLERANCE
+    if not rows:
+        return [f"快照股數與財報對不上：0 檔（容忍帶 [{low}, {high}]；"
+                "有基期觀測的標的才比得了）"]
+    return [f"⚠⚠ 快照股數與財報對不上：{len(rows)} 檔——"
+            + "、".join(f"{t} 比值 {r:.2f}（快照 {s:,.0f} vs 財報 {f:,.0f}）"
+                        for t, s, f, r in rows)
+            + f"。容忍帶 [{low}, {high}]；超出就不是口徑差異，是**至少一邊錯了**。"
+            "EPS 分母一律用財報的加權平均；而 **packet 的 market_cap 在這幾檔會拒絕輸出數字**"
+            "（絕對不是靜默給錯的值）。"]
+
+
+#: 基期觀測自我對帳的門檻。**兩個條件都要成立**才算命中：
+#: 絕對差 > 0.01（財報印出的每股盈餘通常只到小數第二位，半步就是 0.005）
+#: **且** 相對差 > 1%。只用相對差會在 EPS 很小時全部誤報（實測 NBIS 0.04 的半步是 ±12.5%）；
+#: 只用絕對差會在 EPS 很大時放過真的問題。實測 64 檔 live 基期觀測：
+#: 只用相對差 1% → 9 檔命中，其中 8 檔純粹是四捨五入；兩個條件並用 → **1 檔**（CRWV）。
+#: **會誤報的防呆本身就是過度工程（L16-4）。**
+BASE_EPS_RECONCILE_ABS = 0.01
+BASE_EPS_RECONCILE_REL = 0.01
+
+
+def base_eps_reconciliation_gaps(
+    payloads: Mapping[str, Mapping[str, Any]]
+) -> tuple[tuple[str, str, float, float, float], ...]:
+    """基期觀測自己的 `diluted_eps` 與 `net_income_attributable ÷ diluted_shares` 對不對得上。
+
+    ⚠ **這一個檢查同時抓到四種東西**，而它們先前各自被發現、各自手動處理：
+    ①特別股股息（ORCL）②稀釋 EPS 分子調整（4979.TWO，IAS 33）
+    ③**停業單位**（NBIS：20-F 表頭 0.33 含 +72.7 百万停業單位，繼續營業是 0.04——**差 8.3 倍**）
+    ④其他參與分配證券（CRWV：−2.75 vs −2.6766，成因未查）。
+
+    前三種在橋上各有（或刻意沒有）自己的 driver；但**寫基期的人有沒有注意到**這件事
+    先前完全靠人。NBIS 那一筆若照抄表頭 0.33，整條橋會差一個量級而不會有任何東西報錯。
+
+    回傳 `(ticker, basis, 財報印的 EPS, 由淨利÷股數導出的 EPS, 相對差)`。
+    """
+    out: list[tuple[str, str, float, float, float]] = []
+    for ticker in sorted(payloads):
+        payload = payloads[ticker]
+        for basis in ("gaap", "non_gaap"):
+            block = payload.get(basis)
+            if not isinstance(block, Mapping):
+                continue
+            reported = block.get("diluted_eps")
+            net = block.get("net_income_attributable")
+            shares = block.get("diluted_shares")
+            if not (isinstance(reported, (int, float)) and reported
+                    and isinstance(net, (int, float)) and isinstance(shares, (int, float)) and shares):
+                continue
+            implied = float(net) / float(shares)
+            if abs(implied - float(reported)) <= BASE_EPS_RECONCILE_ABS:
+                continue
+            rel = implied / float(reported) - 1.0
+            if abs(rel) <= BASE_EPS_RECONCILE_REL:
+                continue
+            out.append((ticker, basis, float(reported), implied, rel))
+    return tuple(out)
+
+
+def render_base_eps_reconciliation(rows: Sequence[tuple[str, str, float, float, float]]) -> list[str]:
+    """常駐一行。沒命中也印，否則「沒有問題」與「沒有跑」同形（L13-2）。"""
+    if not rows:
+        return [f"基期觀測的 EPS 自我對帳：0 檔對不上"
+                f"（門檻：絕對差 > {BASE_EPS_RECONCILE_ABS} **且** 相對差 > {BASE_EPS_RECONCILE_REL:.0%}）"]
+    return [f"⚠ 基期觀測的 EPS 對不上自己的淨利÷股數：{len(rows)} 檔——"
+            + "、".join(f"{tk}/{b} 財報印 {rep:.4f} vs 導出 {imp:.4f}（{rel:+.2%}）"
+                        for tk, b, rep, imp, rel in rows)
+            + "。四種常見成因：**特別股股息／稀釋 EPS 分子調整（IAS 33）／停業單位／"
+            "其他參與分配證券**。前兩種橋上有 driver（`preferred_dividends`、"
+            "`diluted_eps_numerator_adjustment`）；**停業單位沒有 driver**，"
+            "基期要整筆改採繼續營業口徑（照抄表頭 EPS 會差一個量級）。"]
+
+
 def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
     """`{ticker: analyst view payload}` → 品質分布。讀不到就進 `unreadable`，**不當成 0**。"""
     positive: list[str] = []
