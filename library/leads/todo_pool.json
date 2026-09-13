@@ -9764,6 +9764,18 @@
       "source": "manual",
       "title": "NBIS（Nebius）：內部 FY2026 EPS 其實是正的 +0.690，但那 100% 是 H1 的 7.806 億持股重估；共識 −2.518 沒有分母——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-13T04:26:55.641349+00:00",
+      "hint": "go＝執行 `python -m alpha abstention XPEV --add library/private/alpha/abstention_proposals/XPEV_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪把 XPEV 從『基期只有兩格』補完——基期更正 mo_b2b678f6（取代 xbrl_backfill 的 mo_a0cbdd5d，FY2025 20-F accession 0001193125-26-157849 的 R4 逐格＋封面股數，兩格原數字未改）、匯率觀測 mo_7fe8989c（CNY→USD 0.14911797）、六格 FY2026 假設、EV/Sales 估值 va_6c251d03（校準 0.760062x）、horizon ha_9249a957、四軸判斷（4/5）。｜放行後會變什麼：fair value **65.80 元／ADS ＝ 9.81 美元**、隱含報酬 **−6.906%**、readiness 由 blocked 變 ready。**這是本輪所有標的裡隱含報酬最接近零的一檔**，而那不是因為資料好，是因為分歧本身就小：FY2026 四季裡兩季是實績、一季是公司指引，**只有 Q4 是本估**。｜⚠⚠ **但本檔真正值得你知道的不是那 −6.9%，是三個單位陷阱**：①報表 CNY／報價 USD；②**1 ADS ＝ 2 股 Class A 普通股**（20-F 封面逐字），整條橋必須在每 ADS 的單位上算；③**Engine C 快照的 shares_outstanding 782,239,490 ＝ Class A 普通股 1,561,047,400 ÷ 2，漏掉全部 348,708,257 股 Class B**——誤差只有 0.22%，所以它看起來像個正常的數，但**以它算的市值是 82.45 億美元，正確值是 100.66 億，低估 18.1%**。packet 的 ev_revenue 0.118 就是這三個陷阱疊在一起的結果；同幣別同股數重算是 0.760。⚠ 這也解釋了 closure-gate 的股數計數器先前為什麼對 XPEV 沉默：舊基期沒有 basic_shares，**沒有可比對的對象——最薄的基期恰好是最需要那道檢查的地方**（已寫進基期觀測，下一輪 gate 會自己叫）。｜⚠ 研究面一句話：**XPeng 進圖的理由（Physical AI／人形）在損益表上完全看不到**——FY2025 只有車輛 89.1% 與服務 10.9% 兩條營收線，沒有機器人分部，而 AI 的成本已在研發費用裡（Q2 29.1 億，YoY +32.1%）。交車量在 2026 年還是持平到衰退（Q1 YoY −33.3%、Q2 +0.1%、Q3 指引 −0.87%～+4.30%）。**不構成加碼候選。**｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 574,
+      "reason": null,
+      "ref_id": "XPEV",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "XPEV（XPeng）：本估 FY2026 每 ADS 虧損 −3.796、共識 −3.457 都是負的——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21304,6 +21316,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 574,
+  "next_n": 575,
   "schema_version": "1"
 }
