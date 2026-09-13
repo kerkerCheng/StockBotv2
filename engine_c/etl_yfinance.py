@@ -161,6 +161,11 @@ def fetch_snapshot(ticker: str) -> dict | None:
         "pe_trailing":          _sf(info.get("trailingPE")),
         "pe_forward":           _sf(info.get("forwardPE")),
         "price":                price,
+        # 2026-09-13：**資產負債表與營收欄位的幣別**，與 `price` 的報價幣別不是同一件事。
+        # ADR／跨市場掛牌（XPEV＝CNY 財報／USD 報價）兩者不同，而 EV／Sales 會把
+        # 內部營收減這裡的淨負債——混幣別相減會靜默算錯。讀不到就留 None，不猜。
+        "financial_currency":   (str(info.get("financialCurrency")).upper()
+                                 if info.get("financialCurrency") else None),
         "analyst_target_mean":  _sf(info.get("targetMeanPrice")),
         "analyst_target_high":  _sf(info.get("targetHighPrice")),
         "analyst_target_low":   _sf(info.get("targetLowPrice")),

@@ -281,6 +281,8 @@ def _balance_input(build: ContextBuild) -> BalanceSheetInput:
     missing_fields = [name for name in ("total_debt", "cash_and_equivalents") if getattr(snap, name, None) is None]
     return BalanceSheetInput(
         total_debt=snap.total_debt, cash_and_equivalents=snap.cash_and_equivalents,
+        # 報表幣別跟著這兩個金額走（2026-09-13）。⚠ 不是 `market.currency`——那是報價幣別。
+        currency=getattr(snap, "financial_currency", None),
         as_of=build.context.market.bar_date,
         evidence_refs=tuple(r.ref for r in snap.evidence),
         reason=(f"Engine C 快照缺 {'、'.join(missing_fields)}" if missing_fields else None),

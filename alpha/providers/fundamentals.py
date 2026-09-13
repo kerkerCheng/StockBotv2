@@ -134,6 +134,9 @@ class EngineCFundamentalsProvider:
                 # ⚠ 讀不到就是 `None`——**不得用整體毛利率或 revenue_ttm 近似**，
                 # 也不得回空 dict：`{}` 會被讀成「分部占比全是 0」。
                 segment_revenue_share=self._segment_revenue_share(ticker),
+                # 報表幣別（2026-09-13）。舊列是 NULL——照抄，不補值。
+                financial_currency=(str(row.get("financial_currency")).upper()
+                                    if row.get("financial_currency") else None),
                 evidence=(ref,),
             ),
             _freshness(row, as_of),

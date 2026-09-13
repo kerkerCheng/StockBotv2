@@ -116,6 +116,12 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             -- NULL 表示「這列早於本次修正，as-of 未知」——不得猜測補值。
             bar_date             TEXT,
             price_kind           TEXT,
+            -- 2026-09-13：**資產負債表欄位的幣別**（yfinance `info['financialCurrency']`）。
+            -- 它與報價幣別不是同一件事：ADR 與跨市場掛牌的標的（XPEV＝CNY 財報／USD 報價）
+            -- 兩者不同，而 `total_debt`／`cash_and_equivalents`／`revenue_ttm` 跟著報表幣別走。
+            -- 在這一欄存在之前，EV／Sales 的 `內部營收 − 淨負債` 可以靜默混幣別相減。
+            -- NULL 表示「這列早於本次修正，幣別未知」——**不得猜測補值**，消費端要把未宣告說出來。
+            financial_currency   TEXT,
             UNIQUE (ticker, snapshot_date)
         );
         CREATE TABLE IF NOT EXISTS manual_fields (
@@ -265,6 +271,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
         "revenue_estimate_next_fy",
         "revenue_estimate_next_fy_growth",
         "revenue_estimate_next_fy_analysts",
+        "financial_currency",
     ):
         snapshot.setdefault(key, None)
     if _use_postgres():
@@ -277,7 +284,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             analyst_target_mean, analyst_target_high, analyst_target_low,
             analyst_target_count, fetched_at, bar_date, price_kind,
             revenue_estimate_next_fy, revenue_estimate_next_fy_growth,
-            revenue_estimate_next_fy_analysts
+            revenue_estimate_next_fy_analysts, financial_currency
         ) VALUES (
             %(ticker)s, %(snapshot_date)s,
             %(gross_margin)s, %(operating_margin)s, %(revenue_ttm)s,
@@ -289,7 +296,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             %(analyst_target_low)s, %(analyst_target_count)s, %(fetched_at)s,
             %(bar_date)s, %(price_kind)s,
             %(revenue_estimate_next_fy)s, %(revenue_estimate_next_fy_growth)s,
-            %(revenue_estimate_next_fy_analysts)s
+            %(revenue_estimate_next_fy_analysts)s, %(financial_currency)s
         ) ON CONFLICT (ticker, snapshot_date) DO UPDATE SET
             gross_margin=EXCLUDED.gross_margin,
             operating_margin=EXCLUDED.operating_margin,
@@ -308,7 +315,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             bar_date=EXCLUDED.bar_date, price_kind=EXCLUDED.price_kind,
             revenue_estimate_next_fy=EXCLUDED.revenue_estimate_next_fy,
             revenue_estimate_next_fy_growth=EXCLUDED.revenue_estimate_next_fy_growth,
-            revenue_estimate_next_fy_analysts=EXCLUDED.revenue_estimate_next_fy_analysts
+            revenue_estimate_next_fy_analysts=EXCLUDED.revenue_estimate_next_fy_analysts,
+            financial_currency=EXCLUDED.financial_currency
         """
         with conn.cursor() as cur:
             cur.execute(sql, snapshot)
@@ -325,8 +333,8 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             analyst_target_mean, analyst_target_high, analyst_target_low,
             analyst_target_count, fetched_at, bar_date, price_kind,
             revenue_estimate_next_fy, revenue_estimate_next_fy_growth,
-            revenue_estimate_next_fy_analysts
-        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+            revenue_estimate_next_fy_analysts, financial_currency
+        ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
         """
         conn.execute(sql, (
             snapshot["ticker"], str(snapshot["snapshot_date"]),
@@ -342,6 +350,7 @@ def upsert_snapshot(conn, snap: dict, *, commit: bool = True) -> None:
             snapshot.get("revenue_estimate_next_fy"),
             snapshot.get("revenue_estimate_next_fy_growth"),
             snapshot.get("revenue_estimate_next_fy_analysts"),
+            snapshot.get("financial_currency"),
         ))
         if commit:
             conn.commit()

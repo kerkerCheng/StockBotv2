@@ -21,8 +21,8 @@ from ..errors import ContractViolation
 from ..fundamental.assumptions import select_assumptions
 from ..fundamental.contracts import AssumptionSelection, FiscalPeriod
 from .contracts import (
-    METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_PARAMETERS, VALUATION_DERIVATIONS,
-    ValuationAssumption,
+    METHOD_EV_TO_SALES, METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_PARAMETERS,
+    VALUATION_DERIVATIONS, ValuationAssumption,
 )
 
 #: v1＝2026-09-06 Step 1 的原始形狀；v2（Step 2，同日）多了 `value_date_convention`。**舊行不改寫**：
@@ -38,6 +38,9 @@ _ID_FIELDS_V2 = ("value_date_convention",)
 #: v3（2026-09-11）：`derivation`＝這個目標倍數是怎麼決定的。同樣只在有值且非 `unclassified`
 #: 時參與 id——舊紀錄與撤回紀錄的 id 一個位元都不變。
 _ID_FIELDS_V3 = ("derivation",)
+#: v4（2026-09-13）：`calibration_shares`＝校準市值時用的股數（只對 ev_to_sales 有意義）。
+#: 同樣**只在有值時**參與 id——既有三筆 ev_to_sales 紀錄的 id 一個位元都不變。
+_ID_FIELDS_V4 = ("calibration_shares",)
 
 
 def new_valuation_assumption_id(payload: Mapping[str, Any]) -> str:
@@ -46,6 +49,7 @@ def new_valuation_assumption_id(payload: Mapping[str, Any]) -> str:
     body.update({k: payload[k] for k in _ID_FIELDS_V2 if payload.get(k)})
     body.update({k: payload[k] for k in _ID_FIELDS_V3
                  if payload.get(k) and payload[k] != "unclassified"})
+    body.update({k: payload[k] for k in _ID_FIELDS_V4 if payload.get(k) is not None})
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "va_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -72,6 +76,7 @@ def valuation_assumption_record(
     review_conditions: Sequence[Mapping[str, Any]] = (),
     value_date_convention: str | None = None,
     derivation: str | None = None,
+    calibration_shares: float | None = None,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `ValuationAssumption` 驗證，驗不過就不產生）。
 
@@ -90,6 +95,18 @@ def valuation_assumption_record(
                 f"已知 {[d for d in VALUATION_DERIVATIONS if d != 'unclassified']}——"
                 "未宣告不會被當成 independent，因為那會把「抄市場」冒充成判斷")
         derivation = "unclassified"
+    if (method == METHOD_EV_TO_SALES and derivation == "calibrated_to_market"
+            and not retracted and calibration_shares is None):
+        # 補償控制（放行與收緊同時發生）：EV／Sales 的 fair value 分母由程式強制取模型的
+        # `diluted_shares[total]`，而校準倍數是寫的人自己算的。宣告「抄市場」就必須說出
+        # **抄的時候用的是哪個股數**——不填**不是**預設成「跟模型一樣」，那個方向的預設
+        # 正是 2026-09-13 在 CRWV 上造出 −17.47pp 假訊號的成因。
+        # ⚠ 這道檢查放在寫入端而不是 `ValuationAssumption.__post_init__`：後者同時是 parse
+        # 舊行的路徑，在那裡要求新欄位會讓既有 ledger 行整行讀不出來（L10）。
+        raise ContractViolation(
+            "ev_to_sales ＋ derivation=calibrated_to_market 必須明示 calibration_shares"
+            "（校準市值時用的股數）——fair value 的分母是模型的 diluted_shares[total]，"
+            "兩者不同時會在表達任何看法之前就製造偏差，而偏差恰好等於兩個股數的比")
     params = METHOD_PARAMETERS.get(method)
     if params is None or parameter not in params:
         raise ContractViolation(f"valuation method 未登記或 parameter 未登記：{method}.{parameter}"
@@ -132,6 +149,8 @@ def valuation_assumption_record(
     }
     if value_date_convention is not None:
         payload["value_date_convention"] = str(value_date_convention)
+    if calibration_shares is not None:
+        payload["calibration_shares"] = float(calibration_shares)
     if review_conditions:
         from ..refresh.contracts import ReviewCondition
 
@@ -184,6 +203,9 @@ def parse_valuation_assumption_record(raw: Mapping[str, Any]) -> ValuationAssump
         # 舊行沒有這個欄位 → `unclassified`（fail safe 到「不知道」，不是 `independent`）。
         derivation=str(raw.get("derivation") or "unclassified"),
         value_date_convention=(str(raw["value_date_convention"]) if raw.get("value_date_convention") else None),
+        # 舊行沒有這個欄位 → None（＝未宣告）。**不得預設成模型股數**：那個方向的預設
+        # 正是 2026-09-13 CRWV 那筆 −17.47pp 假訊號的成因。
+        calibration_shares=(float(raw["calibration_shares"]) if raw.get("calibration_shares") is not None else None),
     )
 
 

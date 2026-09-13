@@ -520,3 +520,73 @@ def test_read_model_switches_to_ev_to_sales_only_when_pe_is_abstained_or_not_app
         build, model, None, Ticker("COHR"), CompanyId("co:coherent"), **common)
     assert untouched.method == "forward_earnings_multiple"
     assert not untouched.is_known and untouched.absence_kind == "not_yet_recorded"
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-13：EV/Sales 的兩道身分閘門
+#   ①校準倍數用的股數必須等於 fair value 換算用的股數（ROADMAP：−17.5pp 假訊號）
+#   ②淨負債與內部營收必須同幣別（ROADMAP：financial_snapshots 原本沒有幣別欄）
+# ---------------------------------------------------------------------------
+
+def test_calibrated_ev_to_sales_requires_declaring_which_share_count_it_calibrated_on() -> None:
+    """`derivation=calibrated_to_market` 不填 `calibration_shares` → 寫入端就拒絕。
+
+    為什麼不能預設成「跟模型一樣」：那個方向的預設正是 2026-09-13 在 CRWV 上造出
+    −17.47pp 假訊號的成因（校準用快照股數 458,871,690、換算用模型股數 556,000,000）。
+    """
+    cons = "engine_c://consensus_estimate/COHR/revenue/2027-06-30"
+    with pytest.raises(ContractViolation) as err:
+        _ev_multiple(8.0, derivation="calibrated_to_market", refs=(EDGE, ACT_REF.ref),
+                     calibration_refs=[cons])
+    assert "calibration_shares" in str(err.value)
+    # 填了就過（同一筆其餘欄位不變）——證明擋的是「沒宣告」，不是「抄市場」本身。
+    ok = _ev_multiple(8.0, derivation="calibrated_to_market", refs=(EDGE, ACT_REF.ref),
+                      calibration_refs=[cons], calibration_shares=155_000_000.0)
+    assert ok.calibration_shares == pytest.approx(155_000_000.0)
+    # `independent` 不需要它——沒有校準就沒有這個恆等式。
+    assert _ev_multiple(8.0, derivation="independent").calibration_shares is None
+
+
+def test_calibration_share_count_mismatch_is_inputs_incompatible_not_a_number() -> None:
+    """校準股數 ≠ 模型股數 → 拒絕出數字，並把封閉形式的偏差寫在理由裡。"""
+    model = _run(index=_index())
+    shares = next(a.value for a in model.assumptions if a.driver == "diluted_shares")
+    cons = "engine_c://consensus_estimate/COHR/revenue/2027-06-30"
+    common = dict(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7),
+                  fundamental=model, fundamental_reason=None, evidence_index=_index(), price=PRICE,
+                  method="ev_to_sales", balance=_balance())
+    bad = build_valuation(assumption_records=[_ev_multiple(
+        8.0, derivation="calibrated_to_market", calibration_refs=[cons],
+        calibration_shares=shares * 0.83)], **common)
+    assert bad.status == "missing" and bad.absence_kind == "inputs_incompatible", bad.reason
+    assert "不是同一個數" in (bad.reason or "") and "現價 ×" in (bad.reason or "")
+    # 一致（含四捨五入容差內）→ 照算。
+    good = build_valuation(assumption_records=[_ev_multiple(
+        8.0, derivation="calibrated_to_market", calibration_refs=[cons],
+        calibration_shares=shares * 1.002)], **common)
+    assert good.status == "available" and good.fair_value is not None
+
+
+def test_ev_to_sales_refuses_to_subtract_net_debt_in_a_different_currency() -> None:
+    """淨負債與內部營收幣別不同 → `inputs_incompatible`；未宣告 → 照算但不冒充相同。"""
+    from alpha.valuation import BalanceSheetInput
+
+    model = _run(index=_index())
+    common = dict(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7),
+                  fundamental=model, fundamental_reason=None, assumption_records=[_ev_multiple(8.0)],
+                  evidence_index=_index(), price=PRICE, method="ev_to_sales")
+    base = dict(total_debt=3_540_000_000.0, cash_and_equivalents=1_990_000_000.0,
+                as_of=PRICE.bar_date, evidence_refs=(SNAP,))
+    internal_currency = model.base_actuals.currency
+    assert internal_currency == "USD"
+
+    mismatch = build_valuation(balance=BalanceSheetInput(**base, currency="CNY"), **common)
+    assert mismatch.status == "missing" and mismatch.absence_kind == "inputs_incompatible", mismatch.reason
+    assert "幣別不相容" in (mismatch.reason or "") and "本層不換算" in (mismatch.reason or "")
+
+    same = build_valuation(balance=BalanceSheetInput(**base, currency="usd"), **common)
+    assert same.status == "available" and same.fair_value is not None
+
+    # 舊列沒有這一欄 → 放行，但這正是為什麼 migration 要把欄位補上（全擋會攔錯東西，L15-1）。
+    silent = build_valuation(balance=BalanceSheetInput(**base, currency=None), **common)
+    assert silent.status == "available"

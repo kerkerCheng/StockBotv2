@@ -161,6 +161,13 @@ class BalanceSheetInput:
     as_of: date | None = None
     evidence_refs: tuple[str, ...] = ()
     reason: str | None = None
+    #: **這兩個金額是哪一種幣別**（2026-09-13）。yfinance 的資產負債表欄位跟著**報表幣別**走
+    #: （`info['financialCurrency']`），而 `price` 跟著**報價幣別**走——兩者對 ADR／跨市場掛牌
+    #: 的標的不同。`ev_to_sales` 的分子是內部營收（報表幣別）減這裡的淨負債，
+    #: **不同幣別相減會靜默算錯**，所以本欄位存在的唯一目的是讓 model 層能比對並拒絕。
+    #: ⚠ `None` ＝ 這一列快照早於本欄位（不得猜測補值）；model 層會把「未宣告」明白說出來，
+    #: 不當成「相同」。
+    currency: str | None = None
 
     @property
     def is_known(self) -> bool:
@@ -260,6 +267,18 @@ class ValuationAssumption:
     #: Step 2：這條倍數判斷算出來的 fair value 是哪一天的值（`VALUE_DATE_CONVENTIONS`）。**沒有預設**：
     #: 舊紀錄是 None（＝unspecified），要補語意就 append 一筆新紀錄 supersede 它。
     value_date_convention: str | None = None
+    #: **校準時用的股數**（2026-09-13）。只對 `ev_to_sales` ＋ `derivation=calibrated_to_market` 必填。
+    #:
+    #: 為什麼這一格必須存在：`ev_to_sales` 的 fair value 是
+    #: `(內部營收 × 倍數 − 淨負債) ÷ diluted_shares`，而 `diluted_shares` 由程式強制取
+    #: `diluted_shares[total]` 那個 OperatingAssumption。校準倍數則是 session 自己算的
+    #: `(價格 × 股數 ＋ 淨負債) ÷ 共識營收`——**如果那個「股數」不是同一個數，代數上會有一個
+    #: 封閉形式的偏差**：把共識營收原封不動餵回公式，得到的不是現價，而是
+    #: `現價 × (校準股數 ÷ 模型股數)`。
+    #: 2026-09-13 實測 CRWV：458,871,690 ÷ 556,000,000 → **在表達任何看法之前 fair value 就先低
+    #: 17.47%**，而原本那筆的隱含報酬 −18.82% 有 93% 是這個偏差。3363.TWO 同時量到 +0.88%（無害）。
+    #: 所以這一格不是 metadata，是**讓那個錯誤不可能發生**的輸入（modelue 側會比對並拒絕）。
+    calibration_shares: float | None = None
 
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "ValuationAssumption.assumption_id")
@@ -314,6 +333,21 @@ class ValuationAssumption:
                 raise ContractViolation(
                     "derivation=calibrated_to_market 必須引用校準用的那筆同期共識"
                     f"（{CONSENSUS_REF_PREFIX}...）——校準倍數的分母就是它，指不出來就無從查證")
+            # ⚠ `calibration_shares` 的**必填**檢查刻意不放在這裡，放在
+            # `valuation_assumption_record()`（寫入端）。理由與 `derivation` 相同也更重要：
+            # `__post_init__` 同時是 **parse 舊行**的路徑，在這裡要求新欄位會讓 2026-09-13
+            # 之前寫下的 ledger 行**整行讀不出來**——那是 append-only authority 的資料遺失，
+            # 不是收緊（L10：拿不回來的東西只能 append）。實測：先前放在這裡時，
+            # CRWV／AEVA／3363.TWO 三筆立刻從 ledger 消失，連 supersede 都指不到。
+            pass
+        if self.calibration_shares is not None:
+            shares = _finite(self.calibration_shares, "ValuationAssumption.calibration_shares")
+            if shares <= 0:
+                raise ContractViolation("calibration_shares 必須為正（它是股數，不是差額）")
+            if self.method != METHOD_EV_TO_SALES:
+                raise ContractViolation(
+                    f"calibration_shares 只對 {METHOD_EV_TO_SALES} 有意義（本益比法的分母是每股盈餘，"
+                    f"不經股數換算）；收到 method={self.method!r}")
         if self.provenance_semantics not in PROVENANCE_SEMANTICS:
             raise ContractViolation(f"provenance_semantics 未登記：{self.provenance_semantics!r}")
         for ref, role in self.dependency_roles.items():

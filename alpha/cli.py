@@ -323,6 +323,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
                     # v3：這個目標倍數是我們決定的，還是抄市場的。未宣告會被拒。
                     derivation=spec.get("derivation"),
                     value_date_convention=spec.get("value_date_convention"),
+                    calibration_shares=spec.get("calibration_shares"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 估值假設不合法：{exc}", file=sys.stderr)
@@ -342,6 +343,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
                 method=target.method, parameter=target.parameter, supersedes_id=target.assumption_id,
                 retracted=True, created_at=datetime.now(timezone.utc),
                 value_date_convention=target.value_date_convention,
+                calibration_shares=target.calibration_shares,
             )
         try:
             path = append_valuation_assumption_record(record)

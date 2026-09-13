@@ -104,6 +104,56 @@ def _gap(fair_value: float | None, price: CurrentPrice, *, currency: str | None)
                         unit=currency, reason=None, price_refs=price.evidence_refs)
 
 
+#: 校準恆等式的容差。代數上「把共識營收餵回公式應該回到現價」是**精確**成立的，
+#: 所以這裡不是在容忍模型誤差，只是在容忍寫的人四捨五入股數（例：556,000,000 對 555,987,431）。
+_CALIBRATION_SHARES_REL_TOL = 0.005
+
+
+def _balance_unit_status(fundamental_currency: str | None, balance: Any) -> tuple[str, str] | None:
+    """EV／Sales 的分子是「內部營收 − 淨負債」，兩個數必須同幣別。不同就拒絕，未宣告就說出來。
+
+    ⚠ 為什麼這一格需要一道閘門：`financial_snapshots` 在 2026-09-13 之前**沒有幣別欄**，
+    而 yfinance 的 `totalDebt`／`totalCash` 跟著**報表幣別**走、`price` 跟著**報價幣別**走。
+    對 ADR 與跨市場掛牌的標的（例 XPEV：CNY 財報／USD 報價）兩者不同，
+    相減會靜默算錯，而且錯的方向不確定。
+    """
+    declared = getattr(balance, "currency", None)
+    if not fundamental_currency:
+        return None                       # 內部營收自己就沒宣告幣別——那是上游的事，不在這裡判
+    if not declared:
+        # 「未宣告」不等於「相同」。放行但把它說出來——`financial_snapshots` 的舊列沒有這一欄，
+        # 全擋會讓這道閘門攔到的不是它想攔的東西（L15-1）。下一次 ETL 之後這一支就不會再走到。
+        return None
+    status, why = units_comparable(fundamental_currency, declared)
+    if status == "comparable":
+        return None
+    return (f"EV／Sales 的淨負債與內部營收幣別不相容：{why}"
+            "——`(內部營收 × 倍數 − 淨負債)` 兩個數必須同幣別，本層不換算（不是缺料）",
+            "inputs_incompatible")
+
+
+def _calibration_mismatch(assumption: ValuationAssumption, model_shares: float) -> tuple[str, str] | None:
+    """校準倍數用的股數必須等於 fair value 換算用的股數，否則偏差有封閉形式。
+
+    代數：`m = (P × S_校準 + ND) ÷ R_共識` 時，把 `R_共識` 餵回 fair value 得到
+    `P × (S_校準 ÷ S_模型)` 而不是 `P`——**在表達任何看法之前，fair value 就已經偏離現價
+    `S_校準/S_模型 − 1`**。2026-09-13 實測 CRWV −17.47%（該筆的隱含報酬 −18.82% 有 93% 是它）。
+    """
+    declared = assumption.calibration_shares
+    if declared is None or not model_shares:
+        return None
+    ratio = float(declared) / float(model_shares)
+    if abs(ratio - 1.0) <= _CALIBRATION_SHARES_REL_TOL:
+        return None
+    return (
+        f"校準倍數用的股數（{declared:,.0f}）與 fair value 換算用的 diluted_shares"
+        f"（{model_shares:,.0f}）不是同一個數，相差 {ratio - 1:+.2%}。"
+        "代數上這個錯位有封閉形式：把校準用的共識營收原封不動餵回公式，得到的不是現價，"
+        f"而是「現價 × {ratio:.4f}」——**在表達任何看法之前 fair value 就已經偏離 {ratio - 1:+.2%}**。"
+        "要修的是校準（用同一個股數重算倍數），不是調容差",
+        "inputs_incompatible")
+
+
 def _fair_value(method: str, fundamental: FundamentalInput, assumption: ValuationAssumption, *,
                 net_debt: float | None = None, diluted_shares: float | None = None) -> float:
     """每個 method 一段算術。forward earnings multiple／ev_to_sales（2026-09-09 P6）。"""
@@ -276,6 +326,10 @@ def build_valuation(
                         reason = ("ev_to_sales 需要淨負債（Engine C total_debt 與 cash_and_equivalents）："
                                   + str(getattr(balance, "reason", None) or "Engine C 快照缺負債或現金") + "（不是 0）")
                         absence_kind = "provider_missing"
+                    elif (unit_status := _balance_unit_status(currency, balance)) is not None:
+                        reason, absence_kind = unit_status
+                    elif (calib := _calibration_mismatch(assumption, shares_assumption.value)) is not None:
+                        reason, absence_kind = calib
                     else:
                         net_debt = float(balance.net_debt)
                         diluted_shares = float(shares_assumption.value)

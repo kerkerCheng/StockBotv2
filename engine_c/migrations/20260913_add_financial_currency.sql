@@ -1,0 +1,14 @@
+-- 2026-09-13：financial_snapshots 補上「這些金額是哪一種幣別」。
+--
+-- 為什麼需要它：yfinance 的 `totalDebt`／`totalCash`／`totalRevenue` 跟著**報表幣別**
+-- （`info['financialCurrency']`）走，而 `price` 跟著**報價幣別**走。對 ADR 與跨市場掛牌的
+-- 標的兩者不同（XPEV＝CNY 財報／USD 報價）。在這一欄存在之前，
+-- `alpha/valuation/model.py` 的 EV／Sales 公式
+-- `(內部營收 × 倍數 − 淨負債) ÷ 稀釋股數`
+-- 可以把「報表幣別的營收」減掉「另一種幣別的淨負債」而不報錯，
+-- 因為那個數字在整個系統裡從來沒有宣告過單位。
+--
+-- ⚠ 既有列一律留 NULL——**不得猜測補值**（L11-5：讀不到 ≠ 不存在）。
+-- 消費端（`BalanceSheetInput.currency`）把「未宣告」明白說出來，不當成「相同」；
+-- 下一次 daily ETL 會把在世的標的填上。
+ALTER TABLE financial_snapshots ADD COLUMN financial_currency TEXT;

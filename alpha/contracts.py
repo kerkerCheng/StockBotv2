@@ -377,6 +377,11 @@ class FundamentalsSnapshot:
     total_debt: float | None = None
     shares_outstanding: float | None = None
     segment_revenue_share: Mapping[str, float] | None = None
+    #: **本快照金額欄位的幣別**（2026-09-13）＝報表幣別，與 `MarketSnapshot.currency`
+    #: （報價幣別）不是同一件事。ADR 與跨市場掛牌的標的兩者不同，而 `total_debt`／
+    #: `cash_and_equivalents`／`revenue_ttm` 跟著報表幣別走。
+    #: ⚠ `None` ＝ 該列快照早於這個欄位；消費端必須把「未宣告」說出來，**不得當成相同**。
+    financial_currency: str | None = None
     evidence: tuple[EvidenceRef, ...] = ()
 
 
