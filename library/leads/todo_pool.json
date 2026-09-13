@@ -9788,6 +9788,18 @@
       "source": "manual",
       "title": "SIVE.ST（Sivers）：本估 FY2026 每股虧損 −0.963、共識 −0.50（1 位分析師，且全年隱含淨損比 H1 實績還小）——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-13T05:14:17.673355+00:00",
+      "hint": "decompose 提案（自動鑄號，核准逐題）｜系統：一架現役 MALE 級軍用無人機（例：MQ-9B SkyGuardian 等級的中空長航時機）｜需求錨：tech:aerospace_defense_platform｜為什麼是新錨：本輪兩家已建模公司的需求同時指向一個圖裡完全不存在的錨。①HEXA-B.ST：Q2 2026 有機成長 12%（公司自稱五年來最高），逐字歸因於『strong demand in aerospace & defence, general manufacturing and electronics』；EEMEA 有機 +23%『with growth in aerospace & defence』、北美 +20% 同樣由它驅動——**而 Hexagon 的本業是精密量測與定位，正是航太製造的瓶頸層**。②6268.T Nabtesco：其航空機器事業（飛控作動）是既有分部，而本輪已因重編改判卡世界。⚠ 機械判準兩條都成立：`config/sector_anchors.json` 的五組（AI 光互連／CPO、記憶體、機器人、稀土磁材、成熟／特殊製程）**沒有航太國防**；圖的最新匯出裡 `aerospace` 命中 **0 次**、`defence` 0 次、無任何相關 tech: 節點（124 個 tech 節點裡只有 tech:robotic_actuator 沾邊）。⚠ 為什麼這個錨值得拆：它的需求驅動是**國防預算與交付週期**，與 AI capex 及人形放量在時間軸與出資方上都不相關——**那正是本圖目前最缺的東西**（AGENTS.md：列出 N 檔不等於 N 個獨立機會；現有五組裡有四組共享 AI capex 或人形放量）。⚠ 選題仍由你決定，本項只是提案。｜廣度判準：需求錨 tech:aerospace_defense_platform 不在任何產業組、不在圖裡——是新錨｜點名來源：（無 lead；由 weekly／使用者提名）｜預估拆出 8 層｜go＝跑 skills/system-decompose 產出研究地圖（選題理由＝本提案），不含入圖、不含 onboard、不含提高 evidence tier、不含 live｜drop＝本系統不再重提，除非新 lead 再點名",
+      "n": 576,
+      "reason": null,
+      "ref_id": "decompose:male_mq_9b_skyguardian",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decompose_proposal",
+      "title": "decompose 提案：一架現役 MALE 級軍用無人機（例：MQ-9B SkyGuardian 等級的中空長航時機）（新需求錨 tech:aerospace_defense_platform）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21328,6 +21340,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 576,
+  "next_n": 577,
   "schema_version": "1"
 }
