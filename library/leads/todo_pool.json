@@ -9740,6 +9740,18 @@
       "source": "manual",
       "title": "XFAB.PA（X-FAB）：內部 FY2026 EPS −0.1251 是虧損、共識 +0.01879 的校準倍數 386x 發散——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-13T04:05:48.634919+00:00",
+      "hint": "go＝執行 `python -m alpha abstention IREN --add library/private/alpha/abstention_proposals/IREN_forward_pe.json`，把這一格從段5 工單拿掉並標 settled（deliberate_abstention）。不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含 live、不含撰寫任何 target_pe。｜依據：本輪把 IREN 從『基期只有兩格』補到完整——基期觀測 mo_c0bde51c（取代 xbrl_backfill 的 mo_aaee50dc，FY2026 10-K accession 0001878848-26-000052 的 R5／R3 逐格，兩格原數字未改）、六格 FY2027 假設、EV/Sales 估值 va_c9baba31（校準 6.815617x）、horizon ha_ef8974bc、四軸判斷（4/5，structural 因圖中無 substitutability 邊而 unknown）。唯一缺的就是這一格：本益比法對虧損無定義，而三個數字全為負（本估 −0.670、共識 FY2027 −2.44、FY2028 −0.265），連校準倍數都不存在。⚠ 共識那側本身也不可靠：eps 只有 2 位分析師、其 year_ago_actual −0.4726 對不上一手的 −2.22（unverified），而同一份快照的 revenue 共識有 14 位。｜放行後會變什麼：P6 切換條件兩者屆時都成立 → fair value **35.0277 美元**、隱含報酬 **−20.083%**、readiness 由 blocked 變 ready。｜⚠⚠ 那個 −20% 的性質必須先講清楚，否則會被誤讀：**它 100% 來自營收那一桿（−18.05%）× 淨負債放大 1.1126 倍，倍數桿是 0，而盈餘根本沒有進入 fair value。** 而營收那 −18.05% **不是需求判斷，是交付時程**：共識的 28.19 億需要 Horizon 2–4 在 2026 曆年 Q4 準時全部上線，而 10-K 自己寫著寬限期可延到 2027 曆年 Q2 初、且過去已因 NVIDIA 設備缺料延誤過 Horizon 1；本估取中點。⚠ **盈餘側我們明確沒有觀點**：本估 −0.670 對共識 −2.44 的差，**把 D&A 由 16 億換成 23 億就完全消失（−2.446）**——是一個折舊數字，不是洞察。｜⚠ 研究面值得你知道的一件事：IREN 是本輪唯一一檔『客戶把錢放在桌上』的標的——已簽約 **166 億美元**（RPO 51 億 ＋ 租賃合約 114 億，Microsoft 97 億／NVIDIA 34 億），客戶**已預付 18.43 億**（遞延收入，前一年只有 88.4 萬）。但那 114 億的租賃收入**到 FY2026 為止一塊錢都還沒認列**（10-K 逐字），FY2027 Q1 的 10-Q（約 2026-11）會是史上第一份。｜drop＝你認為應該改用別的 method 或乾脆不估，那我改走 ROADMAP。",
+      "n": 572,
+      "reason": null,
+      "ref_id": "IREN",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "IREN（IREN Limited）：本估 FY2027 EPS −0.670、共識 −2.44、FY2028 −0.265 全為負——提案 Abstention（valuation / target_pe），放行後自動改跑已寫好的 EV/Sales",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21280,6 +21292,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 572,
+  "next_n": 573,
   "schema_version": "1"
 }
