@@ -662,6 +662,45 @@ def render_base_eps_reconciliation(rows: Sequence[tuple[str, str, float, float, 
             "基期要整筆改採繼續營業口徑（照抄表頭 EPS 會差一個量級）。"]
 
 
+def duplicate_live_observations(
+    groups: Mapping[tuple[str, str, str], Sequence[str]]
+) -> tuple[tuple[str, str, str, tuple[str, ...]], ...]:
+    """同一個 `(ticker, field_name, as_of)` 有多於一筆「生效」觀測的那幾組。
+
+    ⚠ **這不是可以清掉的待辦，是一個資料模型的限制**：`manual_observations.supersedes_id` 是
+    **單值**欄位（而且帶 FK 指回自己），所以一筆新紀錄只能關掉一條 supersession 鏈。
+    典型長法是「`xbrl_backfill` 先寫一筆最小組合，之後有人寫完整版但沒有指向它」——
+    兩條互不相干的鏈**在現有 schema 下無法合併**。
+    2026-09-13 起寫入端會擋下新的（`engine_c/manual_observations.py::_reject_unlinked_duplicate`），
+    但既有的只能等 schema 決定（見 ROADMAP）。
+
+    ⚠ 今天不會取到錯的值：`alpha/providers/fundamentals.py` 用
+    `ORDER BY as_of DESC, recorded_at DESC` 取回、取第一筆可解析且未被 supersede 的——
+    等於「最新者勝出」，而最新的通常就是最完整的那一筆。
+    **但那是排序的副作用，不是宣告**，所以這個計數器要常駐。
+    """
+    out: list[tuple[str, str, str, tuple[str, ...]]] = []
+    for key in sorted(groups):
+        ids = tuple(str(i) for i in groups[key])
+        if len(ids) > 1:
+            out.append((key[0], key[1], key[2], ids))
+    return tuple(out)
+
+
+def render_duplicate_live_observations(
+    rows: Sequence[tuple[str, str, str, tuple[str, ...]]]
+) -> list[str]:
+    """常駐一行。沒命中也印（否則「沒有問題」與「沒有跑」同形）。"""
+    if not rows:
+        return ["同一期間有多筆生效觀測：0 組"]
+    fields = sorted({r[1] for r in rows})
+    return [f"⚠ 同一期間有多筆生效觀測：{len(rows)} 組（{len(fields)} 個欄位：{'、'.join(fields)}）——"
+            + "、".join(f"{tk}/{fn}@{ao}({len(ids)})" for tk, fn, ao, ids in rows)
+            + "。`supersedes_id` 是單值欄位且帶 FK，**兩條互不相干的鏈在現有 schema 下無法合併**；"
+            "2026-09-13 起寫入端會擋下新的，既有的要等 schema 決定（ROADMAP）。"
+            "⚠ 今天取到的仍是「最新者勝出」那一筆——**那是排序的副作用，不是宣告**。"]
+
+
 def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
     """`{ticker: analyst view payload}` → 品質分布。讀不到就進 `unreadable`，**不當成 0**。"""
     positive: list[str] = []

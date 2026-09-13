@@ -316,6 +316,33 @@ def _base_payloads(tickers) -> dict[str, dict]:
     return out
 
 
+def _live_observation_groups() -> dict[tuple[str, str, str], list[str]]:
+    """`{(ticker, field_name, as_of): [生效 observation_id]}`——**全庫**，不只段5 工單那幾檔。
+
+    ⚠ `as_of` 一定要在鍵裡：同一欄位的不同期間本來就該同時生效（實測漏掉它會把 14 組誤報成 21 組）。
+    """
+    import json as _json
+    import sqlite3 as _sqlite3
+    from collections import defaultdict
+
+    private = Path(__file__).resolve().parents[1] / "library" / "private"
+    pointer = private / "runtime_pointer.json"
+    if not pointer.exists():
+        return {}
+    db = private / _json.loads(pointer.read_text(encoding="utf-8"))["engine_c"]
+    conn = _sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
+    rows = conn.execute(
+        "SELECT ticker, field_name, substr(as_of, 1, 10), observation_id, supersedes_id "
+        "FROM manual_observations").fetchall()
+    superseded = {str(r[4]) for r in rows if r[4]}
+    groups: dict[tuple[str, str, str], list[str]] = defaultdict(list)
+    for ticker, field, as_of, oid, _sup in rows:
+        if str(oid) in superseded:
+            continue
+        groups[(str(ticker), str(field), str(as_of))].append(str(oid))
+    return dict(groups)
+
+
 def cmd_closure_gate(args: argparse.Namespace) -> int:
     """段 5 閉包成立嗎？**exit code 就是答案**：0＝閉包／1＝還有工作／2＝讀不到（fail closed）。
 
@@ -352,6 +379,7 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     share_pairs = _share_count_pairs([r.ticker for r in rows])
     share_rows = closure.share_count_mismatches(share_pairs)
     eps_rows = closure.base_eps_reconciliation_gaps(_base_payloads([r.ticker for r in rows]))
+    dup_rows = closure.duplicate_live_observations(_live_observation_groups())
     # 未到終局那批卡在哪——與品質計數器同一個理由掛在這裡：每輪本來就會跑 closure-gate，
     # 掛上去它才會自己出現。它回答的不是「還剩幾檔」而是「剩下的檔寫得出有資訊的判斷嗎」。
     profile = closure.open_profile(rows, skip=args.skip or ())
@@ -370,6 +398,9 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                         "share_count_mismatch": [
                             {"ticker": tk, "snapshot_shares": s, "filed_shares": f, "ratio": r}
                             for tk, s, f, r in share_rows],
+                        "duplicate_live_observations": [
+                            {"ticker": tk, "field": fn, "as_of": ao, "observation_ids": list(ids)}
+                            for tk, fn, ao, ids in dup_rows],
                         "base_eps_reconciliation": [
                             {"ticker": tk, "basis": b, "reported": rep, "implied": imp,
                              "relative_gap": rel} for tk, b, rep, imp, rel in eps_rows]},
@@ -397,6 +428,8 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
         for line in closure.render_share_count_mismatches(share_rows):
             print(f"- {line}")
         for line in closure.render_base_eps_reconciliation(eps_rows):
+            print(f"- {line}")
+        for line in closure.render_duplicate_live_observations(dup_rows):
             print(f"- {line}")
         if result.actionable:
             # 條目數跟著 OPEN_PROFILE_FIELDS 走——寫死「三項」會在加第四項那天變成假的。

@@ -185,6 +185,70 @@ def _require_pnl_sign_convention(field_name: str, value: str) -> None:
         )
 
 
+def live_observation_ids(conn: Any, ticker: str, field_name: str, as_of: str) -> list[str]:
+    """這個 (ticker, field_name, as_of) 目前有幾筆「生效」紀錄——`supersedes_id` 沒被指到的那些。
+
+    ⚠ **`as_of` 一定要在鍵裡**：同一個欄位的不同期間本來就該同時生效
+    （`fiscal_year_results` 的 FY2024 與 FY2025 是兩筆不同的事實，讀取端按 as_of 取最新）。
+    把它漏掉會把「不同期間」誤判成「重複」——2026-09-13 第一版就是這樣，
+    實測 21 組「重複」裡有 7 組其實只是不同期間。
+
+    ⚠ 為什麼會有多於一筆：`supersedes_id` 是**單值**欄位（而且帶 FK），所以一筆新紀錄只能
+    關掉一條 supersession 鏈。實際發生的模式是「先有一筆最小組合（例 `xbrl_backfill` 只寫
+    revenue 與 operating_income），之後有人寫一筆完整的但沒有指向它」——
+    於是同一個 (ticker, field) 有兩條互不相干的鏈，**資料模型上無法合併**。
+    2026-09-13 實測全庫（鍵含 as_of）：**14 組**有多於一筆生效，其中 `fiscal_year_results` **8 檔**
+    （`xbrl_backfill` 先寫最小組合、之後有人寫完整版但沒指向它），其餘 6 組散在 5 個欄位。
+    """
+    try:
+        rows = conn.execute(
+            "SELECT observation_id, supersedes_id FROM manual_observations "
+            "WHERE ticker = ? AND field_name = ? AND substr(as_of, 1, 10) = ?",
+            (ticker.upper().strip(), field_name.strip(), str(as_of)[:10]),
+        ).fetchall()
+    except Exception:                                  # noqa: BLE001 — 表還不存在時當成沒有
+        return []
+    items = [(str(r[0]), (str(r[1]) if r[1] else None)) for r in rows]
+    superseded = {sup for _oid, sup in items if sup}
+    return [oid for oid, _sup in items if oid not in superseded]
+
+
+def _reject_unlinked_duplicate(
+    conn: Any, ticker: str, field_name: str, as_of: str, supersedes_id: str | None,
+    allow_parallel: bool, *, observation_id: str,
+) -> None:
+    """已經有生效紀錄時，**新的一筆必須說出它跟舊的是什麼關係**（2026-09-13）。
+
+    三種合法關係，二擇一必須明示：
+    - `supersedes_id=<舊 id>`：這是更正，舊的不再生效。
+    - `allow_parallel=True`：這是**並存**的另一筆觀測（不同來源／不同口徑，兩筆都算數）。
+    - 舊的那一筆已經被 supersede（＝現在沒有生效紀錄）：直接寫。
+
+    ⚠ **不給預設**：先前「多寫一筆」永遠成功，而讀取端靠 `ORDER BY as_of DESC, recorded_at DESC`
+    取第一筆——**那是排序的副作用，不是宣告**（L17-3②：這個欄位是覆蓋還是聯集，
+    覆蓋掉的那份還有第二個地方留著嗎）。
+    """
+    if allow_parallel:
+        return
+    live = live_observation_ids(conn, ticker, field_name, as_of)
+    if not live:
+        return
+    if observation_id in live:
+        return                      # 同一筆重寫（content-addressed id 相同）＝冪等，不是重複
+    if supersedes_id and str(supersedes_id) in live:
+        return
+    raise ValueError(
+        f"{ticker} 的 {field_name} @ {str(as_of)[:10]} 已經有 {len(live)} 筆生效紀錄"
+        f"（{'、'.join(live)}），"
+        "而本次沒有說出新紀錄與它們的關係。"
+        "二擇一：①`--supersedes <舊 id>`（這是更正，舊的不再生效）；"
+        "②明示 `allow_parallel=True`（這是並存的另一筆觀測，兩筆都算數）。"
+        "⚠ **不給預設是刻意的**：`supersedes_id` 是單值欄位，"
+        "所以一旦長出兩條互不相干的鏈就**在資料模型上無法合併**，"
+        "而讀取端只能靠 ORDER BY 猜哪一筆算數——猜不是宣告。"
+        + (f"（本次給的 supersedes_id={supersedes_id} 不在生效清單裡）" if supersedes_id else ""))
+
+
 def append_manual_observation(
     conn: Any,
     *,
@@ -195,6 +259,7 @@ def append_manual_observation(
     as_of: str,
     author: str,
     supersedes_id: str | None = None,
+    allow_parallel: bool = False,
     commit: bool = True,
 ) -> str:
     fields = {
@@ -220,6 +285,11 @@ def append_manual_observation(
     payload = _canonical(fields)
     digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()
     observation_id = "mo_" + digest[:32]
+    # ⚠ 順序重要：guard 要在 id 算出來**之後**才問，因為「同一筆重寫」（content-addressed id
+    # 相同）是冪等操作而不是重複紀錄——`INSERT OR IGNORE` 本來就會忽略它。
+    _reject_unlinked_duplicate(conn, str(fields["ticker"]), str(fields["field_name"]),
+                               str(fields["as_of"]), supersedes_id, allow_parallel,
+                               observation_id=observation_id)
     try:
         values = (
             observation_id,
