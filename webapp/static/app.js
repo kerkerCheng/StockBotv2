@@ -1340,136 +1340,53 @@ function briefCard(payload, view) {
    這裡只決定畫在哪、標籤上下交錯避免重疊。 */
 function priceScale(v, ctx, sellSide) {
   const marks = [];
-  if (typeof v.price === 'number') marks.push({ label: '現價', value: v.price, kind: 'now', side: 'below' });
-  if (typeof v.base_target === 'number') marks.push({ label: '沒賭對', value: v.base_target, kind: 'base', side: 'above' });
-  if (typeof v.bet_target === 'number') marks.push({ label: '賭對', value: v.bet_target, kind: 'bet', side: 'above' });
-  if (typeof sellSide === 'number') marks.push({ label: '賣方平均目標價', value: sellSide, kind: 'street', side: 'above' });
-  if (ctx && typeof ctx.low === 'number') marks.push({ label: `區間低點 ${ctx.low_date || ''}`, value: ctx.low, kind: 'range', side: 'below' });
-  if (ctx && typeof ctx.high === 'number') marks.push({ label: `區間高點 ${ctx.high_date || ''}`, value: ctx.high, kind: 'range', side: 'below' });
+  if (typeof v.price === 'number') marks.push({ label: '現價', value: v.price, kind: 'now', sub: '' });
+  if (typeof v.base_target === 'number') marks.push({ label: '沒賭對的目標價', value: v.base_target, kind: 'base',
+    sub: typeof v.base_return === 'number' ? '從現價 ' + fmtPercent(v.base_return) : '' });
+  if (typeof v.bet_target === 'number') marks.push({ label: '賭對的目標價', value: v.bet_target, kind: 'bet',
+    sub: typeof v.payoff === 'number' ? '從現價 ' + fmtPercent(v.payoff) : '' });
+  if (typeof sellSide === 'number') marks.push({ label: '賣方平均目標價', value: sellSide, kind: 'street', sub: '不是我們的目標價' });
+  if (ctx && typeof ctx.low === 'number') marks.push({ label: '區間低點', value: ctx.low, kind: 'range', sub: ctx.low_date || '' });
+  if (ctx && typeof ctx.high === 'number') marks.push({ label: '區間高點', value: ctx.high, kind: 'range', sub: ctx.high_date || '' });
   const wrap = el('div', 'scale');
   if (marks.length < 2) return wrap;
   const nums = marks.map((m) => m.value);
   const lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
   const span = (hi - lo) || 1;
-  const W = 1000, H = 150, padX = 70, yAxis = 78;
+  // 尺上只放點與短數字（字級 30／1000，手機上約 11px、桌機約 19px）；名稱與日期放下面的圖例，字級是正常字級。
+  const W = 1000, H = 110, padX = 60, yAxis = 40;
   const x = (val) => padX + ((val - lo) / span) * (W - padX * 2);
   const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, class: 'scale-svg', role: 'img',
     'aria-label': '價格尺：現價、目標價與最近交易日區間' });
   svg.appendChild(svgEl('line', { x1: padX, x2: W - padX, y1: yAxis, y2: yAxis, class: 'scale-axis' }));
   if (ctx && typeof ctx.low === 'number' && typeof ctx.high === 'number') {
-    svg.appendChild(svgEl('rect', { x: x(ctx.low), y: yAxis - 6, width: Math.max(2, x(ctx.high) - x(ctx.low)), height: 12,
-      rx: 6, class: 'scale-band' }));
+    svg.appendChild(svgEl('rect', { x: x(ctx.low), y: yAxis - 7, width: Math.max(2, x(ctx.high) - x(ctx.low)), height: 14,
+      rx: 7, class: 'scale-band' }));
   }
-  // 同側的標籤交錯兩層避免疊字：層數＝同側比自己小的點有幾個（奇偶）。不排序——APP 不得對任何列 .sort。
-  ['above', 'below'].forEach((side) => {
-    const group = marks.filter((m) => m.side === side);
-    group.forEach((m) => {
-      const cx = x(m.value);
-      const level = group.filter((o) => o.value < m.value).length % 2;
-      const yLabel = side === 'above' ? (yAxis - 22 - level * 20) : (yAxis + 30 + level * 20);
-      svg.appendChild(svgEl('line', { x1: cx, x2: cx, y1: side === 'above' ? yLabel + 4 : yAxis, y2: side === 'above' ? yAxis : yLabel - 12, class: 'scale-stem' }));
-      svg.appendChild(svgEl('circle', { cx: cx, cy: yAxis, r: m.kind === 'range' ? 3.5 : 6, class: 'scale-pt pt-' + m.kind }));
-      svg.appendChild(svgEl('text', { x: cx, y: yLabel, 'text-anchor': 'middle', class: 'scale-text text-' + m.kind },
-        `${m.label} ${fmtQuantity(m.value, v.unit)}`));
-    });
+  marks.forEach((m) => {
+    const cx = x(m.value);
+    // 短數字交錯兩層避免疊字：層數＝比自己小的點有幾個（奇偶）。不排序——APP 不得對任何列 .sort。
+    const level = marks.filter((o) => o.value < m.value).length % 2;
+    const y = yAxis + 34 + level * 30;
+    svg.appendChild(svgEl('line', { x1: cx, x2: cx, y1: yAxis, y2: y - 24, class: 'scale-stem' }));
+    svg.appendChild(svgEl('circle', { cx: cx, cy: yAxis, r: m.kind === 'range' ? 5 : 9, class: 'scale-pt pt-' + m.kind }));
+    svg.appendChild(svgEl('text', { x: cx, y: y, 'text-anchor': 'middle', class: 'scale-text text-' + m.kind },
+      fmtQuantity(m.value, null)));
   });
   wrap.appendChild(svg);
-  const notes = [];
-  if (typeof v.base_return === 'number') notes.push('沒賭對 ' + fmtPercent(v.base_return));
-  if (typeof v.payoff === 'number') notes.push('賭對 ' + fmtPercent(v.payoff));
-  const tail = ctx ? `　區間＝最近 ${ctx.sessions} 個已收盤交易日（${ctx.first_date} 起），脈絡不是訊號。` : '';
-  wrap.appendChild(el('div', 'scale-note', (notes.length ? '從現價到目標價要漲跌多少：' + notes.join('　') : '') + tail));
-  return wrap;
-}
-
-/* 論證層（2026-09-15）：六段分析師報告體。每段＝一段句型組出的文字＋研究時寫的長文（逐字）＋圖裡的引文（誰說的、哪天）。
-   本畫面只排版；不摘要、不改寫、不算數。 */
-function argumentCard(view) {
-  const panel = view.argument;
-  const meta = plainPanel('argument', panel ? panel.title : '為什麼這樣想');
-  const node = el('section', 'panel argument-card');
-  node.appendChild(el('h2', null, meta.title));
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-  if (!panel) return node;
-  (panel.lines || []).filter((line) => line.role === 'paragraph').forEach((line) => {
-    const d = line.datum;
-    const sec = el('div', 'arg-section');
-    sec.appendChild(el('h3', null, line.display_label));
-    if (typeof d.value === 'string' && d.value) {
-      sec.appendChild(el('p', 'arg-text', d.value));
-    } else {
-      sec.appendChild(el('p', 'arg-text muted', '（' + (d.reason || '缺料') + '）'));
-    }
-    const deps = d.dependencies || {};
-    (deps.long_form || []).forEach((item) => {
-      const box = el('div', 'arg-long');
-      box.appendChild(el('div', 'arg-long-title', item.title || ''));
-      box.appendChild(el('div', 'arg-long-text', item.text || ''));
-      sec.appendChild(box);
-    });
-    if ((deps.citations || []).length) {
-      const list = el('ul', 'arg-cites');
-      deps.citations.forEach((c) => {
-        const li = el('li');
-        const who = el('span', 'cite-who', `${c.who || '？'}　${c.date || ''}`);
-        li.appendChild(who);
-        li.appendChild(document.createTextNode('　' + (c.statement || '')));
-        if (c.url) {
-          const a = el('a', 'cite-link', '原文 ↗');
-          a.href = c.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
-          if (c.title) a.title = c.title;
-          li.appendChild(document.createTextNode(' '));
-          li.appendChild(a);
-        } else if (c.title) {
-          li.title = c.title;
-        }
-        list.appendChild(li);
-      });
-      sec.appendChild(el('div', 'arg-long-title', '引文（圖裡的 claim，照抄）'));
-      sec.appendChild(list);
-    }
-    node.appendChild(sec);
+  const legend = el('div', 'scale-legend');
+  marks.forEach((m) => {
+    const row = el('div', 'scale-row');
+    row.appendChild(el('span', 'scale-key pt-' + m.kind));
+    row.appendChild(el('span', 'scale-name', m.label));
+    row.appendChild(el('span', 'scale-val', fmtQuantity(m.value, v.unit) || '—'));
+    row.appendChild(el('span', 'scale-sub', m.sub));
+    legend.appendChild(row);
   });
-  return node;
-}
-
-/* 基本數字列（2026-09-15 使用者回饋：基本數字不用全部藏進稽核）。
-   只放六格、每格白話標籤；全部照抄 headline／bet panel 既有的 Datum，不算、不造句。 */
-function numbersStrip(view) {
-  const head = lineMap(view.headline);
-  const bet = view.bet ? lineMap(view.bet) : {};
-  const node = el('section', 'panel numbers-strip');
-  node.appendChild(el('div', 'group-title', '基本數字'));
-  const numbers = el('div', 'headline-numbers');
-  const stance = viewStance(view);
-  const price = head.current_price && head.current_price.datum;
-  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
-  if (price && typeof price.value === 'number') {
-    numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
-      price.as_of ? `收盤 ${price.as_of}` : ''));
-  }
-  const base = head.fair_value && head.fair_value.datum;
-  const valueDate = head.value_date && head.value_date.datum;
-  if (base && typeof base.value === 'number') {
-    numbers.appendChild(numberBlock('沒賭對的目標價', fmtQuantity(base.value, base.dependencies ? base.dependencies.currency : null) || '—',
-      valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
-  }
-  appendReturnBlock(numbers, '沒賭對，要漲跌多少', head.price_return && head.price_return.datum,
-    head.annualized_price_return && head.annualized_price_return.datum, stance, '一年約 ');
-  const betTarget = bet.variant_fair_value && bet.variant_fair_value.datum;
-  if (betTarget && typeof betTarget.value === 'number') {
-    numbers.appendChild(numberBlock('賭對的目標價', fmtQuantity(betTarget.value, betTarget.dependencies ? betTarget.dependencies.currency : null) || '—', ''));
-    appendReturnBlock(numbers, '賭對，要漲跌多少', bet.payoff_return && bet.payoff_return.datum,
-      bet.annualized_payoff_return && bet.annualized_payoff_return.datum, null, '一年約 ');
-  }
-  const attribution = head.return_attribution && head.return_attribution.datum;
-  const market = attribution && attribution.value ? attribution.value.market_multiple_on_consensus : null;
-  const ours = attribution && attribution.value ? attribution.value.target_multiple : null;
-  if (typeof market === 'number' && typeof ours === 'number') {
-    numbers.appendChild(numberBlock('市場付的倍數 vs 我們給的', `${fmtNumber(market, 1)}x → ${fmtNumber(ours, 1)}x`, '以明年獲利計'));
-  }
-  if (numbers.childNodes.length) node.appendChild(numbers);
-  return node;
+  wrap.appendChild(legend);
+  wrap.appendChild(el('div', 'scale-note',
+    ctx ? `區間帶＝最近 ${ctx.sessions} 個已收盤交易日（${ctx.first_date} 起）的低點到高點；脈絡不是訊號。` : ''));
+  return wrap;
 }
 
 async function renderDetail(ticker) {
