@@ -1396,6 +1396,45 @@ function argumentCard(view) {
   return node;
 }
 
+/* 基本數字列（2026-09-15 使用者回饋：基本數字不用全部藏進稽核）。
+   只放六格、每格白話標籤；全部照抄 headline／bet panel 既有的 Datum，不算、不造句。 */
+function numbersStrip(view) {
+  const head = lineMap(view.headline);
+  const bet = view.bet ? lineMap(view.bet) : {};
+  const node = el('section', 'panel numbers-strip');
+  node.appendChild(el('div', 'group-title', '基本數字'));
+  const numbers = el('div', 'headline-numbers');
+  const stance = viewStance(view);
+  const price = head.current_price && head.current_price.datum;
+  const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
+  if (price && typeof price.value === 'number') {
+    numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
+      price.as_of ? `收盤 ${price.as_of}` : ''));
+  }
+  const base = head.fair_value && head.fair_value.datum;
+  const valueDate = head.value_date && head.value_date.datum;
+  if (base && typeof base.value === 'number') {
+    numbers.appendChild(numberBlock('沒賭對的目標價', fmtQuantity(base.value, base.dependencies ? base.dependencies.currency : null) || '—',
+      valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
+  }
+  appendReturnBlock(numbers, '沒賭對，要漲跌多少', head.price_return && head.price_return.datum,
+    head.annualized_price_return && head.annualized_price_return.datum, stance, '一年約 ');
+  const betTarget = bet.variant_fair_value && bet.variant_fair_value.datum;
+  if (betTarget && typeof betTarget.value === 'number') {
+    numbers.appendChild(numberBlock('賭對的目標價', fmtQuantity(betTarget.value, betTarget.dependencies ? betTarget.dependencies.currency : null) || '—', ''));
+    appendReturnBlock(numbers, '賭對，要漲跌多少', bet.payoff_return && bet.payoff_return.datum,
+      bet.annualized_payoff_return && bet.annualized_payoff_return.datum, null, '一年約 ');
+  }
+  const attribution = head.return_attribution && head.return_attribution.datum;
+  const market = attribution && attribution.value ? attribution.value.market_multiple_on_consensus : null;
+  const ours = attribution && attribution.value ? attribution.value.target_multiple : null;
+  if (typeof market === 'number' && typeof ours === 'number') {
+    numbers.appendChild(numberBlock('市場付的倍數 vs 我們給的', `${fmtNumber(market, 1)}x → ${fmtNumber(ours, 1)}x`, '以明年獲利計'));
+  }
+  if (numbers.childNodes.length) node.appendChild(numbers);
+  return node;
+}
+
 async function renderDetail(ticker) {
   markNav('stocks');
   let payload;
@@ -1438,6 +1477,7 @@ async function renderDetail(ticker) {
   // 原本的六張卡整組收進第一個展開，一個字不刪；再下一層才是第二個展開。
   // 三層（2026-09-15）：①短評 ②論證（可長文，直接攤開）＋走勢 ③查核區（一個展開；格只住這裡）
   app.appendChild(briefCard(payload, view));
+  app.appendChild(numbersStrip(view));
   app.appendChild(argumentCard(view));
   app.appendChild(priceCard(payload));
   const audit = el('section', 'panel');

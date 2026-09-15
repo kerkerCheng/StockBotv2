@@ -332,9 +332,13 @@ table.rank.compare td:first-child { color: var(--muted); }
 .reverse h3 { font-size: 14px; margin: 0 0 8px; }
 
 /* ---------- 投資人短評（2026-09-15） ---------- */
-.brief-card .story { display: grid; grid-template-columns: max-content 1fr; gap: .45rem .9rem; margin-top: .6rem; }
-.brief-card .story-label { font-weight: 600; white-space: nowrap; opacity: .8; }
-.brief-card .story-text { line-height: 1.55; }
+.brief-card .story { margin-top: .6rem; }
+.brief-card .story-row { display: grid; grid-template-columns: 9.5rem 1fr; gap: .2rem .9rem; padding: .45rem 0; border-top: 1px solid var(--border); }
+.brief-card .story-row:first-child { border-top: 0; }
+.brief-card .story-label { font-weight: 600; opacity: .8; line-height: 1.5; }
+.brief-card .story-text { line-height: 1.6; }
+@media (max-width: 640px) { .brief-card .story-row { grid-template-columns: 1fr; gap: .15rem; } }
+.numbers-strip .headline-numbers .num-value { font-size: 19px; }
 .brief-card .badge-light { margin-left: .5rem; }
 .card-brief { margin: .4rem 0 .2rem; font-size: .92rem; line-height: 1.45; opacity: .9; }
 .scale { margin-top: 1rem; }
