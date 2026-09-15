@@ -745,6 +745,38 @@ class Neo4jGraphResearchProvider:
         )
 
     # ---- coverage：provider 自己要能說出它看得到多少 ----------------------
+    def get_narrative_context(self, company_id: CompanyId, *, node_ids: Sequence[str] = ()) -> Mapping[str, Any]:
+        """論證層要的兩樣東西（2026-09-15）：**節點的人話名字**與**關於這家公司的 claim 引文**。
+
+        - `node_names`：`{id: name}`，給「這條鏈怎麼走」把 `tech:inp_6inch_fab` 印成 6-inch InP Fab。
+        - `claims`：每條 `Claim`（ABOUT 這家公司或 `node_ids` 裡的節點）的 statement、它引用的 SourceDoc
+          （誰說的、哪天、標題）。**照抄圖裡的字**，不摘要、不重寫；順序＝發表日由新到舊。
+        純讀；as-of 不在這裡篩（claim 的日期帶出去，消費端自己決定要不要看）。
+        """
+        wanted = [str(company_id), *[str(n) for n in node_ids]]
+        with self.driver.session() as session:
+            names = {str(r["id"]): str(r["name"]) for r in session.run(
+                "MATCH (n) WHERE n.id IN $ids AND n.name IS NOT NULL RETURN n.id AS id, n.name AS name", ids=wanted)}
+            rows = session.run(
+                "MATCH (c:Claim)-[:ABOUT]->(e) WHERE e.id IN $ids "
+                "OPTIONAL MATCH (c)-[:CITES]->(d:SourceDoc) "
+                "RETURN c.id AS id, c.statement AS statement, c.demand_proof_level AS level, "
+                "collect(DISTINCT e.id) AS about, d.id AS doc_id, d.title AS title, d.origin_entity AS origin, "
+                "d.published_at AS published_at, d.source_type AS source_type, d.evidence_tier AS tier",
+                ids=wanted)
+            claims = []
+            for r in rows:
+                if not r["statement"]:
+                    continue
+                claims.append({
+                    "claim_id": str(r["id"]), "statement": str(r["statement"]), "level": r["level"],
+                    "about": [str(a) for a in (r["about"] or [])], "doc_id": r["doc_id"], "title": r["title"],
+                    "origin": r["origin"], "published_at": _date_or_none(r["published_at"]),
+                    "source_type": r["source_type"], "tier": _tier_or_none(r["tier"]),
+                })
+        claims.sort(key=lambda c: (c["published_at"] is None, -(c["published_at"].toordinal() if c["published_at"] else 0)))
+        return {"node_names": names, "claims": claims}
+
     def coverage(self) -> Mapping[str, Any]:
         """`rank_bottlenecks` 自帶的覆蓋率摘要。
 

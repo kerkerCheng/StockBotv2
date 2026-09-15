@@ -48,9 +48,13 @@ from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from alpha.narrative import ABSENT, SLOT_LABELS, fill_brief, format_value, select_brief
-from briefing.analyst_view.contracts import PLAIN_REFRESH_OVERALL
+from alpha.narrative.argument import (
+    bet_paragraph, chain_paragraph, market_paragraph, numbers_paragraph, timeline_paragraph,
+)
+from briefing.analyst_view.contracts import PLAIN_DRIVER_LABELS, PLAIN_REFRESH_OVERALL
 
 from .contracts import (
+    CAP_ARGUMENT, ArgumentSection,
     CAP_INVESTOR_BRIEF, InvestorBriefSection,
     CAP_VARIANT_PAYOFF, PayoffScenarioSection,
     BASIS_LABEL, CAP_ANALYTICAL_ENTRY_THRESHOLD, CAP_AUTOMATIC_INVALIDATION, CAP_BASE_CASE_IMPLIED_RETURN,
@@ -1267,6 +1271,151 @@ def _investor_brief_section(
 
 
 # ---------------------------------------------------------------------------
+# Argument（2026-09-15）：論證層六段。算術與圖的敘述用封閉句型（alpha.narrative.argument）；判斷的長文照抄。
+# 本檔只**選取**既有 Datum 的值、格式化、組句；一個數都不算。
+# ---------------------------------------------------------------------------
+A_ARGUMENT = "alpha://narrative/argument"
+ARGUMENT_KEYS: tuple[tuple[str, str], ...] = (
+    ("chain", "這條鏈怎麼走"), ("numbers", "數字怎麼算出來"), ("market", "和市場差在哪"),
+    ("bet", "賭注"), ("risks", "風險與認錯條件"), ("timeline", "時間表"),
+)
+ARGUMENT_IS_NOT: tuple[str, ...] = (
+    "不是新的判斷：算術與圖的敘述是句型，判斷的長文逐字來自 session 寫的假設理由、賭注理由、風險與推翻條件",
+    "不是引文的替代：每段的 citations 是圖裡 claim 的 statement 與來源文件，不是本層改寫",
+)
+
+
+def _citations(narrative: Mapping[str, Any], about: Sequence[str], *, limit: int = 6) -> list[dict[str, Any]]:
+    """關於這幾個節點的 claim 引文（照抄 provider；由新到舊，取前幾條）。"""
+    wanted = {str(a) for a in about if a}
+    out = []
+    # 關於這家公司本身的 claim 排前面（`about` 的最後一個是公司 id），再依 provider 給的新→舊。
+    subject = str(about[-1]) if about else None
+    ordered = sorted(narrative.get("claims") or (), key=lambda c: 0 if subject and subject in (c.get("about") or ()) else 1)
+    for claim in ordered:
+        if wanted and not (set(claim.get("about") or ()) & wanted):
+            continue
+        out.append({"statement": claim.get("statement"), "who": claim.get("origin"), "date": claim.get("published_at"),
+                    "title": claim.get("title"), "doc_id": claim.get("doc_id"), "claim_id": claim.get("claim_id"),
+                    "level": claim.get("level")})
+        if len(out) >= limit:
+            break
+    return out
+
+
+def _step_value(bridge: EarningsBridgeSection, key: str) -> Any:
+    return next((d.value for d in bridge.steps if d.key == key), None)
+
+
+def _argument_section(*, company_label: str, company_id: str | None, structural: StructuralThesisSection, bridge: EarningsBridgeSection,
+                      internal: InternalFundamentalsSection, valuation: ValuationSection, ir: ImpliedReturnSection,
+                      payoff: PayoffScenarioSection, gap: ExpectationGapSection, variant: VariantViewSection,
+                      falsification: FalsificationSection, catalysts: CatalystSection, lifecycle: LifecycleFacts,
+                      narrative: Mapping[str, Any], reporting_currency: str | None, reference_day: date) -> ArgumentSection:
+    names = dict(narrative.get("node_names") or {})
+    # 公司名字：圖的 name 優先；registry 沒有 display name 時 identity 會給 `co:xxx（TICKER）`，那不是人話——退回 id 尾巴。
+    company_name = names.get(company_id or "") or (
+        company_label if "co:" not in company_label else (company_id or company_label).split(":", 1)[-1])
+    paragraphs: list[Datum] = []
+
+    def _para(key: str, text: str | None, *, citations: list[dict[str, Any]] = (), long_form: list[dict[str, Any]] = (),
+              basis: str = "deterministic", refs: Sequence[str] = (), why: str | None = None) -> None:
+        label = dict(ARGUMENT_KEYS)[key]
+        if not text:
+            paragraphs.append(missing(f"argument:{key}", label, why or "缺料，這一段寫不出來", authority=A_ARGUMENT))
+            return
+        paragraphs.append(Datum(key=f"argument:{key}", label=label, value=text, status="available", basis=basis,
+                                authority=A_ARGUMENT, as_of=reference_day, evidence_refs=tuple(refs),
+                                dependencies={"citations": list(citations), "long_form": list(long_form)}))
+
+    # 1. 鏈
+    anchor = next((d.value for d in structural.scarcity_inputs if d.key == "demand_anchor"), None)
+    edges = [{"relation": e.relation, "target": e.target, "evidence_class": e.evidence_class,
+              "sole_source": e.sole_source, "qualification_status": e.qualification_status}
+             for e in structural.edges if e.purpose == "actionable"]
+    chain_about = [str(e["target"]) for e in edges] + ([str(anchor)] if anchor else [])
+    _para("chain", chain_paragraph(company=company_name, anchor_id=anchor, edges=edges, names=names),
+          citations=_citations(narrative, chain_about + ([company_id] if company_id else [])), refs=[])
+
+    # 2. 數字
+    growth = [(d.key.split(":", 1)[1], d.value) for d in bridge.steps
+              if d.key.startswith("revenue_growth:") and isinstance(d.value, (int, float))]
+    margin_delta = next((d.value for d in bridge.steps if d.key.startswith("operating_margin_delta:")
+                         and isinstance(d.value, (int, float))), None)
+    eps_cmp = next((d.value for d in gap.numeric_comparisons if d.key.endswith("_eps") and isinstance(d.value, Mapping)), {})
+    sens = sorted(valuation.sensitivities, key=lambda d: abs(float((d.value or {}).get("fair_value_relative") or 0))
+                  if isinstance(d.value, Mapping) else 0, reverse=True)
+    top = None
+    if sens and isinstance(sens[0].value, Mapping):
+        parts = sens[0].key.split(":")
+        top = {**dict(sens[0].value), "driver": parts[1] if len(parts) > 1 else None}
+    long_form = [{"title": f"{PLAIN_DRIVER_LABELS.get(str((d.dependencies or {}).get('driver') or d.key.split(':')[1] if ':' in d.key else d.key), d.key)}"
+                           f"（{d.key.split(':')[-1]}）", "text": d.reason, "value": d.value, "unit": d.unit}
+                 for d in bridge.assumptions if d.reason]
+    _para("numbers", numbers_paragraph(
+        base_period=internal.base_period_end.isoformat()[:4] and f"FY{internal.base_period_end.year}" if internal.base_period_end else None,
+        target_period=internal.period, currency=reporting_currency,
+        base_revenue=_step_value(bridge, "base_revenue"), base_margin=_step_value(bridge, "base_operating_margin"),
+        growth=growth, margin_delta=margin_delta, internal_revenue=_step_value(bridge, "internal_revenue"),
+        internal_margin=_step_value(bridge, "internal_operating_margin"), internal_eps=_step_value(bridge, "internal_eps"),
+        consensus_eps=eps_cmp.get("consensus") if isinstance(eps_cmp, Mapping) else None,
+        top_sensitivity=top, driver_labels=PLAIN_DRIVER_LABELS), long_form=long_form,
+        refs=[r for d in bridge.assumptions for r in d.evidence_refs])
+
+    # 3. 市場
+    comparisons = []
+    for d in gap.numeric_comparisons:
+        if isinstance(d.value, Mapping) and isinstance(d.value.get("relative_gap"), (int, float)):
+            metric = d.key.rsplit("_", 1)[-1]
+            comparisons.append({"label": {"eps": "每股盈餘", "revenue": "營收", "margin": "營益率"}.get(metric, metric),
+                                "relative_gap": d.value["relative_gap"]})
+    attribution = ir.attribution.value if isinstance(ir.attribution.value, Mapping) else {}
+    val_assumption = next((d for d in valuation.assumptions if d.is_known), None)
+    reverse = gap.reverse_bridge.value if gap.reverse_bridge is not None and isinstance(gap.reverse_bridge.value, Mapping) else None
+    _para("market", market_paragraph(
+        comparisons=comparisons, market_multiple=attribution.get("market_multiple_on_consensus"),
+        our_multiple=val_assumption.value if val_assumption else None,
+        multiple_rationale=None, reverse=reverse, driver_labels=PLAIN_DRIVER_LABELS),
+        long_form=[{"title": "目標倍數的理由", "text": val_assumption.reason}] if val_assumption and val_assumption.reason else [],
+        why="還沒有內部預測或共識，沒有可比的東西")
+
+    # 4. 賭注
+    overrides = [{**(d.dependencies or {}), "value": d.value, "unit": d.unit} for d in payoff.overrides]
+    _para("bet", bet_paragraph(
+        has_bet=payoff.payoff_return.is_known or bool(payoff.overrides), overrides=overrides,
+        bet_target=payoff.variant_fair_value.value, price=ir.current_price.value, payoff=payoff.payoff_return.value,
+        eps_part=payoff.eps_contribution.value, multiple_part=payoff.multiple_contribution.value,
+        currency=(ir.current_price.dependencies or {}).get("quote_unit") if ir.current_price.dependencies else None,
+        driver_labels=PLAIN_DRIVER_LABELS),
+        long_form=[{"title": "賭注的理由", "text": d.reason} for d in payoff.overrides if d.reason], basis="session_judgment",
+        refs=[r for d in payoff.overrides for r in d.evidence_refs])
+
+    # 5. 風險與認錯（全部是 session 長文，照抄）
+    risk_text = None
+    risk_items = [{"title": "風險", "text": r} for r in variant.risks]
+    risk_items += [{"title": "認錯條件", "text": f"{c.condition}｜多久看一次：{c.check_frequency}｜觸發後：{c.action_within_48h}"}
+                   for c in falsification.conditions]
+    if risk_items:
+        risk_text = f"研究時寫下 {len(variant.risks)} 條風險與 {len(falsification.conditions)} 條認錯條件；全文在下方，一個字沒改。"
+    _para("risks", risk_text, long_form=risk_items, basis="session_judgment", why="還沒寫下風險或推翻條件")
+
+    # 6. 時間表
+    _para("timeline", timeline_paragraph(
+        checkpoints=[{"date": c.date, "what": c.what, "decides": c.decides} for c in catalysts.checkpoints],
+        catalysts=[{"expected_at": c.expected_at, "description": c.description} for c in catalysts.structured],
+        value_date=ir.value_date.value, horizon_end=ir.horizon.value, thesis_next_check=lifecycle.thesis_next_check),
+        basis="session_judgment")
+
+    known = [p for p in paragraphs if p.is_known]
+    status = "available" if len(known) == len(paragraphs) else ("partial" if known else "missing")
+    meta = SectionMeta(status=status, basis="session_judgment", authority=A_ARGUMENT, capability=CAP_ARGUMENT,
+                       reason=(None if status == "available" else "；".join(p.reason or p.key for p in paragraphs if not p.is_known)),
+                       as_of=reference_day,
+                       warnings=(("圖來源的 claim 引文取不到：" + str(narrative.get("error")),) if narrative.get("error") else ()))
+    return ArgumentSection(meta=meta, paragraphs=tuple(paragraphs), is_not=ARGUMENT_IS_NOT)
+
+
+# ---------------------------------------------------------------------------
 # Entry logic（Step 3）：只選取 `alpha.entry` 的輸出。**本檔沒有門檻價公式**——值、公式字串、依賴全部照抄
 # `EntryAssessmentResult`；builder 不折現任何數、不比較任何價格、不把 comparison 翻譯成 action。
 # ---------------------------------------------------------------------------
@@ -1685,6 +1834,7 @@ def build_alpha_investment_view(
     variant_absence_kind: str | None = None,
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
+    narrative_context: Mapping[str, Any] | None = None,
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。
 
@@ -2841,6 +2991,13 @@ def build_alpha_investment_view(
         warnings.append(ENTRY_EPISTEMIC_WARNING)
     if payoff_section.payoff_return.is_known:
         warnings.append(PAYOFF_EPISTEMIC_WARNING)
+    argument_section = _argument_section(
+        company_label=identity_section.company_label, company_id=identity_section.company_id,
+        structural=structural_section, bridge=earnings_bridge_section,
+        internal=internal_section, valuation=valuation_section, ir=implied_return_section, payoff=payoff_section,
+        gap=expectation_gap_section, variant=variant_section, falsification=falsification_section,
+        catalysts=catalyst_section, lifecycle=identity_section.lifecycle, narrative=dict(narrative_context or {}),
+        reporting_currency=reporting_currency, reference_day=reference_day)
     brief_section = _investor_brief_section(
         brief_records, brief_parse_errors, as_of=context.as_of, today=today, reference_day=reference_day,
         ir=implied_return_section, payoff=payoff_section, consensus=consensus_section, catalysts=catalyst_section,
@@ -2858,7 +3015,7 @@ def build_alpha_investment_view(
         implied_return=implied_return_section, downside=downside_section,
         entry_logic=entry_section, evidence=evidence_section,
         freshness=tuple(freshness_items), refresh_status=refresh_section, payoff_scenario=payoff_section,
-        investor_brief=brief_section, warnings=tuple(warnings),
+        investor_brief=brief_section, argument=argument_section, warnings=tuple(warnings),
     )
 
 

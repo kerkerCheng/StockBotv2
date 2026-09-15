@@ -1354,6 +1354,48 @@ function priceScale(v) {
   return wrap;
 }
 
+/* 論證層（2026-09-15）：六段分析師報告體。每段＝一段句型組出的文字＋研究時寫的長文（逐字）＋圖裡的引文（誰說的、哪天）。
+   本畫面只排版；不摘要、不改寫、不算數。 */
+function argumentCard(view) {
+  const panel = view.argument;
+  const meta = plainPanel('argument', panel ? panel.title : '為什麼這樣想');
+  const node = el('section', 'panel argument-card');
+  node.appendChild(el('h2', null, meta.title));
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+  if (!panel) return node;
+  (panel.lines || []).filter((line) => line.role === 'paragraph').forEach((line) => {
+    const d = line.datum;
+    const sec = el('div', 'arg-section');
+    sec.appendChild(el('h3', null, line.display_label));
+    if (typeof d.value === 'string' && d.value) {
+      sec.appendChild(el('p', 'arg-text', d.value));
+    } else {
+      sec.appendChild(el('p', 'arg-text muted', '（' + (d.reason || '缺料') + '）'));
+    }
+    const deps = d.dependencies || {};
+    (deps.long_form || []).forEach((item) => {
+      const box = el('div', 'arg-long');
+      box.appendChild(el('div', 'arg-long-title', item.title || ''));
+      box.appendChild(el('div', 'arg-long-text', item.text || ''));
+      sec.appendChild(box);
+    });
+    if ((deps.citations || []).length) {
+      const list = el('ul', 'arg-cites');
+      deps.citations.forEach((c) => {
+        const li = el('li');
+        li.appendChild(el('span', 'cite-who', `${c.who || '？'}　${c.date || ''}`));
+        li.appendChild(document.createTextNode('　' + (c.statement || '')));
+        if (c.title) li.title = c.title;
+        list.appendChild(li);
+      });
+      sec.appendChild(el('div', 'arg-long-title', '引文（圖裡的 claim，照抄）'));
+      sec.appendChild(list);
+    }
+    node.appendChild(sec);
+  });
+  return node;
+}
+
 async function renderDetail(ticker) {
   markNav('stocks');
   let payload;
@@ -1394,24 +1436,26 @@ async function renderDetail(ticker) {
 
   // 首屏只有短評（2026-09-15 使用者回饋：「一堆數字跟內部名詞堆起來的東西根本看不懂」）。
   // 原本的六張卡整組收進第一個展開，一個字不刪；再下一層才是第二個展開。
+  // 三層（2026-09-15）：①短評 ②論證（可長文，直接攤開）＋走勢 ③查核區（一個展開；格只住這裡）
   app.appendChild(briefCard(payload, view));
-  const why = el('section', 'panel');
-  why.appendChild(drill('為什麼這樣算（結論數字／走勢／卡在哪／最脆弱的地方／什麼會推翻／我們 vs 市場）', () => {
+  app.appendChild(argumentCard(view));
+  app.appendChild(priceCard(payload));
+  const audit = el('section', 'panel');
+  audit.appendChild(drill('稽核：每一格的來源、狀態、算式與警告（給查核用，不是給你讀的）', () => {
     const box = el('div', 'why-box');
     box.appendChild(conclusionCard(payload, view));
-    box.appendChild(priceCard(payload));
     [blockerCard(payload), fragileCard(view), disproofCard(view), versusMarketCard(view)]
       .forEach((card) => { if (card) box.appendChild(card); });
     return box;
   }));
-  app.appendChild(why);
+  app.appendChild(audit);
 
   // 完整細節：**一個展開，展開後就是全部**。先前這裡是七個 details，每個裡面還有第二層
   // details，摘要一律寫著「展開：某某（N 項）」——那是把東西收乾淨，然後叫人再點一次。
   const details = el('section', 'panel');
   details.appendChild(el('h2', null, '完整細節'));
   details.appendChild(el('p', 'note',
-    '上面那幾塊是摘要。這裡是同一份判讀的每一格：點一次就全部攤開，裡面沒有第二層展開，' +
+    '稽核用：同一份判讀的每一格。點一次就全部攤開，裡面沒有第二層展開，' +
     '也沒有任何一列會叫你「見下方展開」。'));
   details.appendChild(drill('展開完整細節（結論數字／我們與市場／假設與證據／研究現況／進場門檻／判讀狀態／新鮮度）',
     () => {

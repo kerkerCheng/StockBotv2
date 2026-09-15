@@ -834,6 +834,31 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
 **為什麼禁字表在型別層：** 首屏是投資人的；「白話別名」那次是把欄位翻成中文，欄位還在——這次是欄位不上首屏。
 **套件叫 `narrative` 不叫 `brief`：** `alpha/brief.py` 已是 daily brief 的渲染模組。
 
+### 6.12 個股頁三層：短評／論證／稽核（2026-09-15）
+
+**判準一句話：消費層的單位是句與段；格只住稽核層。**
+
+| 層 | 讀法 | 內容 | 誰產生文字 |
+|---|---|---|---|
+| ① 短評 | 20 秒 | 七句＋一把尺＋一顆燈（§6.11） | session 寫、authority 填數字 |
+| ② 論證 | 5 分鐘，可長文 | 六段：這條鏈怎麼走／數字怎麼算出來／和市場差在哪／賭注／風險與認錯條件／時間表；段後附研究時寫的長文（假設理由、賭注理由、風險、認錯條件，逐字）與圖裡的 claim 引文（statement、誰說的、哪天） | 算術與圖的敘述＝封閉句型（`alpha/narrative/argument.py`）；判斷＝session 長文照抄 |
+| ③ 稽核 | 不是給人讀的 | 原本的六張卡＋完整細節（每格的來源、狀態、算式、敏感度、refresh、限制、警告） | read model 的格 |
+
+```
+graph provider.get_narrative_context(company_id, node_ids)   ← 節點 name ＋ Claim.statement／SourceDoc（origin、published_at）
+        ▼
+builder._argument_section：只選取既有 Datum（bridge steps／comparisons／reverse／payoff／risks／disproofs／checkpoints）
+        │  → alpha.narrative.argument.*_paragraph（格式化與選詞，零算術）
+        ▼
+ArgumentSection（6 個 Datum：value＝段落；dependencies.long_form／citations）→ AnalystView.argument（optional）
+        ▼
+APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「完整細節」
+```
+
+**三條規則：** ①句型輸出掃同一張禁字表（`FORBIDDEN_TERMS`），「跳／邊／sub=5／tier」不出現，只講「誰說的、有沒有別人印證」；
+②只有公司自己說的連結合成一句並點名為「整條鏈最薄的地方」，有印證的逐條講；③缺料就一句話說缺什麼，不硬寫、不補。
+**還沒做：** 清單頁同構（R4）；`EvidenceRef.quote` 仍空——論證層直接查 Claim，不經 evidence index（R3 留待）。
+
 ## 7. Engine D（Decision Lab）runtime
 
 - Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許

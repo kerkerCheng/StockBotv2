@@ -380,7 +380,7 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     assert text == json.dumps(second, ensure_ascii=False, sort_keys=True)
     assert json.loads(text) == first                            # null 保留為 null
     assert first["schema_version"] == SCHEMA_VERSION
-    assert first["panel_order"] == list(("headline", "brief", "bet", "fundamental", "why", "research", "entry"))
+    assert first["panel_order"] == list(("headline", "brief", "argument", "bet", "fundamental", "why", "research", "entry"))
     assert set(first["questions"]) == set(QUESTIONS)
 
 

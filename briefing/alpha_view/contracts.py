@@ -139,6 +139,8 @@ CAP_ANALYTICAL_ENTRY_THRESHOLD = "analytical_entry_threshold_v1"
 CAP_VARIANT_PAYOFF = "variant_scenario_payoff_v1"
 #: 2026-09-15：投資人短評——七格前因後果，文字由 session 寫（append-only ledger）、數字由 authority 填。
 CAP_INVESTOR_BRIEF = "investor_brief_v1"
+#: 2026-09-15：論證層——六段分析師報告體。算術與圖的敘述由封閉句型組；判斷的長文照抄 session 寫的。
+CAP_ARGUMENT = "argument_layer_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -693,6 +695,21 @@ class InvestorBriefSection:
 
 
 @dataclass(frozen=True, slots=True)
+class ArgumentSection:
+    """論證層（2026-09-15）：六段——這條鏈怎麼走／數字怎麼算出來／和市場差在哪／賭注／風險與認錯條件／時間表。
+
+    - 每段一個 Datum：`value` 是段落文字；`dependencies["citations"]` 是這段引用到的 claim（statement、誰說的、哪天）；
+      `dependencies["long_form"]` 是 session 寫的長文（假設理由、賭注理由、風險、推翻條件）原文清單。
+    - 算術與圖的敘述由 `alpha.narrative.argument` 的封閉句型組；本 section 不算任何數。
+    - 任何一段缺料就 `missing`＋理由（不補、不硬寫）。
+    """
+
+    meta: SectionMeta
+    paragraphs: tuple[Datum, ...]
+    is_not: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class EntryLogicSection:
     """Entry Logic（Step 3）：**只消費** `alpha.entry.build_entry_assessment` 的輸出，builder 不含任何門檻價公式。
 
@@ -867,6 +884,7 @@ class AlphaInvestmentView:
     refresh_status: RefreshStatusSection
     payoff_scenario: PayoffScenarioSection
     investor_brief: InvestorBriefSection
+    argument: ArgumentSection
     warnings: tuple[str, ...] = ()
 
     #: 有 `meta` 的 section 名稱，`capability_map()` 依此列舉。
@@ -874,7 +892,7 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "implied_return",
-        "downside", "entry_logic", "evidence", "refresh_status", "payoff_scenario", "investor_brief",
+        "downside", "entry_logic", "evidence", "refresh_status", "payoff_scenario", "investor_brief", "argument",
     )
 
     def capability_map(self) -> dict[str, dict[str, str | None]]:
@@ -921,7 +939,7 @@ def _jsonable(obj: Any) -> Any:
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
     "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection", "CAP_VARIANT_PAYOFF", "PayoffScenarioSection",
-    "CAP_INVESTOR_BRIEF", "InvestorBriefSection",
+    "CAP_INVESTOR_BRIEF", "InvestorBriefSection", "CAP_ARGUMENT", "ArgumentSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
     "CAP_NARRATIVE_SCENARIOS", "ValuationSection",
     "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",

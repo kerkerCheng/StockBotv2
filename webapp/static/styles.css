@@ -347,3 +347,14 @@ table.rank.compare td:first-child { color: var(--muted); }
 .scale-label { font-size: .8rem; white-space: nowrap; }
 .scale-note { font-size: .85rem; opacity: .8; margin-top: .3rem; }
 .why-box > .panel { margin-top: .8rem; }
+
+/* ---------- 論證層（2026-09-15） ---------- */
+.argument-card .arg-section { margin-top: 1.1rem; }
+.argument-card h3 { margin: 0 0 .35rem; font-size: 1rem; }
+.argument-card .arg-text { line-height: 1.65; margin: 0 0 .5rem; }
+.argument-card .muted { opacity: .7; }
+.arg-long { border-left: 3px solid rgba(127,127,127,.35); padding: .3rem .7rem; margin: .4rem 0; }
+.arg-long-title { font-size: .82rem; font-weight: 600; opacity: .75; margin-bottom: .15rem; }
+.arg-long-text { line-height: 1.55; white-space: pre-wrap; }
+.arg-cites { margin: .3rem 0 0 1rem; padding: 0; font-size: .9rem; line-height: 1.5; }
+.arg-cites .cite-who { font-weight: 600; opacity: .8; }

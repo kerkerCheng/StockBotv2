@@ -144,7 +144,7 @@ def test_first_screen_is_the_brief_and_everything_else_is_behind_one_click() -> 
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert block.index("briefCard(") < block.index("drill(")
+    assert block.index("briefCard(") < block.index("argumentCard(") < block.index("drill(")
     # 首屏卡片不得自己算報酬；尺的三個數與兩個報酬都來自 materialize 端
     card = source.split("function briefCard", 1)[1].split("\nasync function renderDetail", 1)[0]
     for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):

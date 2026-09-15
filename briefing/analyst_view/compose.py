@@ -365,6 +365,24 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
+def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
+    """論證層（optional）：六段。**每一格都是 read model 的同一個 Datum**，本層不造句。"""
+    ag = view.argument
+    lines = tuple(_line(d.key, d.label, d, "paragraph") for d in ag.paragraphs)
+    return AnalystPanel(
+        key="argument", title="為什麼這樣想：鏈、數字、市場、賭注、風險、時間表（optional）",
+        questions=("q0_argument",),
+        status=ag.meta.status, optional=True,
+        source_sections=("argument",), source_statuses={"argument": ag.meta.status},
+        source_absence_kinds=_absence_kinds(argument=ag.meta),
+        lines=lines, notes=ag.is_not,
+        evidence=_evidence_for(view, ag.paragraphs),
+        context={"capability": ag.meta.capability, "available": ag.meta.status not in VALUELESS_STATUSES,
+                 "optional_rule": "論證層是投影：算術與圖的敘述由句型組、判斷的長文照抄；沒有它不影響判讀完不完整"},
+        reason=ag.meta.reason,
+    )
+
+
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
     """賭注（optional）：variant scenario 的 payoff。**每一格都是 read model 的同一個 Datum**，本層不算。"""
     ps = view.payoff_scenario
@@ -435,7 +453,7 @@ _READINESS_RULE = (
     "全部有內容（available／partial）＝ready；"
     "有內容但至少一段被標為 stale／review_required／not_applicable＝ready_with_flags；"
     "至少一段缺內容（missing／invalidated／not_modeled／insufficient_evidence）＝blocked。"
-    "**optional panel（brief／bet／entry）一律不參與**——沒有短評、沒有賭注、沒有 entry criterion 都不會讓 readiness 變差。"
+    "**optional panel（brief／argument／bet／entry）一律不參與**——沒有短評、沒有賭注、沒有 entry criterion 都不會讓 readiness 變差。"
 )
 
 
@@ -481,6 +499,7 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     everything += list(view.entry_logic.is_not)
     everything += list(view.payoff_scenario.is_not)
     everything += list(view.investor_brief.is_not)
+    everything += list(view.argument.is_not)
     everything += list(view.downside.not_to_be_confused_with)
     return tuple(dict.fromkeys(everything))
 
@@ -495,6 +514,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         "entry": _entry_panel(view),
         "bet": _bet_panel(view),
         "brief": _brief_panel(view),
+        "argument": _argument_panel(view),
     }
     rs = view.refresh_status
     ident = view.identity
@@ -505,6 +525,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         generated_on=ident.generated_on, research_context_digest=ident.research_context_digest,
         headline=panels["headline"], fundamental=panels["fundamental"], why=panels["why"],
         research=panels["research"], entry=panels["entry"], bet=panels["bet"], brief=panels["brief"],
+        argument=panels["argument"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),
                                change_detection=rs.change_detection,

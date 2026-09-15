@@ -257,6 +257,20 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     else:
         lines += [f"**Not set (optional)** — {markdown_text(brief.reason or '還沒寫短評')}", ""]
 
+    # ---- 論證層（optional）-----------------------------------------------
+    arg = view.argument
+    lines += [f"## 論證 — {QUESTIONS['q0_argument']}（optional）", ""]
+    for line in _by_role(arg, "paragraph"):
+        if line.datum.value:
+            lines.append(f"**{markdown_text(line.display_label)}**　{markdown_text(str(line.datum.value))}")
+            for item in (line.datum.dependencies or {}).get("long_form") or []:
+                lines.append(f"  - {markdown_text(str(item.get('title') or ''))}：{markdown_text(str(item.get('text') or ''))}")
+            for cite in (line.datum.dependencies or {}).get("citations") or []:
+                lines.append(f"  - 引文（{markdown_text(str(cite.get('who') or '?'))}，{markdown_text(str(cite.get('date') or '?'))}）：{markdown_text(str(cite.get('statement') or ''))}")
+        else:
+            lines.append(f"**{markdown_text(line.display_label)}**　（{markdown_text(line.datum.reason or '缺料')}）")
+        lines.append("")
+
     # ---- 賭注（optional；V0）---------------------------------------------
     bet = view.bet
     lines += [f"## 賭注 — {QUESTIONS['q7_payoff']}（optional）", ""]

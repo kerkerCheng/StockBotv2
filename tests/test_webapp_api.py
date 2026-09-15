@@ -318,9 +318,10 @@ def test_single_stock_page_leads_with_the_answer_then_the_price(client) -> None:
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
     # 2026-09-15：首屏只剩短評；結論／價格／卡在哪收進「為什麼這樣算」，再下一層才是完整細節
+    # 2026-09-15 三層：短評 → 論證 → 走勢 → 稽核（結論卡、卡在哪…）→ 完整細節
     order = [block.index(name) for name in
-             ("briefCard(", "為什麼這樣算", "conclusionCard(", "priceCard(", "blockerCard(", "完整細節")]
-    assert order == sorted(order), "順序必須是：短評 → 為什麼這樣算（結論 → 價格 → 卡在哪）→ 完整細節"
+             ("briefCard(", "argumentCard(", "priceCard(", "稽核", "conclusionCard(", "blockerCard(", "完整細節")]
+    assert order == sorted(order), "順序必須是：短評 → 論證 → 走勢 → 稽核（結論 → 卡在哪）→ 完整細節"
     # 細節一格都沒少：六個面板的 render 全都還在 details 裡
     for renderer in ("renderFundamental(view)", "renderWhy(view)", "renderResearch(view)",
                      "renderEntry(view)", "renderFreshness(payload)"):
@@ -392,8 +393,8 @@ def test_full_detail_has_exactly_one_level_of_expansion() -> None:
     assert panels.count("group(") >= 6, "面板內容應改用 group()——有標題但直接看得到"
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    # 2026-09-15 起兩個展開（「為什麼這樣算」與「完整細節」），但都在最外層——沒有巢狀
-    assert block.count("drill(") == 2, "單檔頁只准有兩個最外層展開（為什麼這樣算／完整細節）"
+    # 2026-09-15 起兩個展開（「稽核」與「完整細節」），都在最外層——沒有巢狀；論證層不折疊
+    assert block.count("drill(") == 2, "單檔頁只准有兩個最外層展開（稽核／完整細節）"
 
 
 # ---------------------------------------------------------------------------

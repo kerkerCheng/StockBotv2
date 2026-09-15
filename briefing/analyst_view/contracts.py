@@ -52,6 +52,8 @@ QUESTIONS: Mapping[str, str] = {
     "q7_payoff": "如果我們的賭注對了，值多少？",
     # 2026-09-15：投資人的第零問——用人話講一遍前因後果。optional：沒寫短評不代表研究不完整。
     "q0_story": "這是什麼賭注、為什麼、值多少、什麼時候知道？",
+    # 2026-09-15：論證層——把短評的七句展開成六段分析師報告體，附引文與長文。
+    "q0_argument": "為什麼這樣想？證據在哪？",
 }
 
 #: 核心 panel（決定 `readiness`）與 optional panel（**不**決定 readiness）。
@@ -60,7 +62,7 @@ QUESTIONS: Mapping[str, str] = {
 CORE_PANELS: tuple[str, ...] = ("headline", "fundamental", "why", "research")
 #: `bet`（V0，2026-09-15）：賭注（variant scenario 的 payoff）。與 entry 同為 optional——
 #: 沒有寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
-OPTIONAL_PANELS: tuple[str, ...] = ("brief", "bet", "entry")
+OPTIONAL_PANELS: tuple[str, ...] = ("brief", "argument", "bet", "entry")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -107,6 +109,7 @@ LINE_ROLES = frozenset({
     "bet",                     # optional：賭注（variant payoff）那一串數字
     "override",                # 賭注覆蓋的假設（每條帶 base 對照值）
     "brief",                   # optional：投資人短評的七句＋一把尺＋一顆燈
+    "paragraph",               # optional：論證層的六段
 })
 
 #: 「為什麼這一格被列進脆弱清單」的封閉字彙。**每一條都是宣告好的列入規則**，
@@ -152,6 +155,9 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
                  "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
     "entry": {"title": "進場門檻（選配）",
               "hint": "你自己設的要求報酬換算成的價格。沒設不代表這檔研究不完整"},
+    "argument": {"title": "為什麼這樣想",
+                 "hint": "六段：這條鏈怎麼走、數字怎麼算出來、和市場差在哪、賭注、風險與認錯條件、時間表。"
+                         "算術與圖的敘述由句型組；假設理由、賭注理由、風險、認錯條件是研究時寫的長文，逐字附在段後"},
     "brief": {"title": "這檔在賭什麼",
               "hint": "七句話講前因後果：什麼在放量、這家公司供什麼、為什麼卡在它、市場怎麼看、我們賭什麼、"
                       "對了／錯了會怎樣、什麼時候知道。文字是研究時寫的判斷，數字由系統填"},
@@ -580,8 +586,10 @@ class AnalystView:
     bet: AnalystPanel
     #: 2026-09-15：投資人短評 panel（optional）。APP 首屏只讀它；markdown 仍以 headline 開頭。
     brief: AnalystPanel
+    #: 2026-09-15：論證層 panel（optional）：短評展開成六段，附引文與長文。
+    argument: AnalystPanel
 
-    PANEL_ORDER = ("headline", "brief", "bet", "fundamental", "why", "research", "entry")
+    PANEL_ORDER = ("headline", "brief", "argument", "bet", "fundamental", "why", "research", "entry")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

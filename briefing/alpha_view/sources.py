@@ -566,6 +566,17 @@ def fetch_alpha_investment_view(
             identity=identity, sandbox_hurdle=sandbox_hurdle)
         reverse_model, reverse_reason = _reverse_bridge_model(
             fundamental_model, valuation_model, resolved_ticker, company_id, as_of=as_of)
+        # ---- 論證層（2026-09-15）：節點人話名字＋claim 引文。provider 沒這能力（測試用假 provider）就空。
+        narrative_context: Mapping[str, Any] = {}
+        fetch_narrative = getattr(graph_provider, "get_narrative_context", None)
+        if callable(fetch_narrative):
+            try:
+                node_ids = [str(e.get("target")) for e in build.context.graph.edges if e.get("target")]
+                if build.context.structural.demand_anchor:
+                    node_ids.append(str(build.context.structural.demand_anchor))
+                narrative_context = fetch_narrative(company_id, node_ids=node_ids)
+            except Exception as exc:  # noqa: BLE001 — 拿不到引文只讓論證層少引文，不讓 view 失敗
+                narrative_context = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
         # ---- V0（2026-09-15）賭注：variant scenario 走**同一條**鏈再跑一次 ---------------------------
         # 只在任一本 ledger 有未撤回的 variant 紀錄時才跑；沒有就明說「賭注還沒寫」（不是 0）。
         variant_fundamental = variant_valuation = variant_implied = None
@@ -681,6 +692,7 @@ def fetch_alpha_investment_view(
         variant_fundamental=variant_fundamental, variant_valuation=variant_valuation,
         variant_implied_return=variant_implied, variant_reason=variant_reason, variant_absence_kind=variant_kind,
         brief_records=brief_records, brief_parse_errors=brief_errors,
+        narrative_context=narrative_context,
     )
 
 

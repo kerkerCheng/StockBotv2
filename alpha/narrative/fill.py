@@ -26,6 +26,16 @@ def format_value(kind: str, value: Any, *, unit: str | None = None) -> str | Non
         return f"{int(value)}"
     if kind == "date":
         return value.isoformat() if isinstance(value, date) else str(value)[:10]
+    if kind == "money":
+        # 財報等級的金額：億／百萬，讀者要的是量級不是每一位數。
+        number = float(value)
+        if abs(number) >= 1e8:
+            text = f"{number / 1e8:,.1f} 億"
+        elif abs(number) >= 1e6:
+            text = f"{number / 1e6:,.0f} 百萬"
+        else:
+            text = f"{number:,.0f}"
+        return f"{text} {unit}" if unit else text
     if kind in ("price", "currency"):
         number = float(value)
         text = f"{number:,.0f}" if abs(number) >= 1000 else f"{number:,.2f}".rstrip("0").rstrip(".")
