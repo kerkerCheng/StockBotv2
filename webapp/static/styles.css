@@ -342,14 +342,20 @@ table.rank.compare td:first-child { color: var(--muted); }
 .brief-card .badge-light { margin-left: .5rem; }
 .card-brief { margin: .4rem 0 .2rem; font-size: .92rem; line-height: 1.45; opacity: .9; }
 .scale { margin-top: 1rem; }
-.scale-track { position: relative; height: 3.2rem; border-top: 2px solid currentColor; opacity: .85; margin: 1.6rem .4rem .2rem; }
-.scale-tick { position: absolute; top: -.55rem; transform: translateX(-50%); text-align: center; }
-.scale-dot { width: .8rem; height: .8rem; border-radius: 50%; margin: 0 auto .25rem; background: currentColor; }
-.tick-now .scale-dot { background: #d9480f; }
-.tick-base .scale-dot { background: #868e96; }
-.tick-bet .scale-dot { background: #1c7ed6; }
-.scale-label { font-size: .8rem; white-space: nowrap; }
+.scale-svg { width: 100%; height: auto; display: block; }
+.scale-axis { stroke: var(--border); stroke-width: 2; }
+.scale-band { fill: var(--dim); opacity: .18; }
+.scale-stem { stroke: var(--dim); stroke-width: 1; opacity: .6; }
+.scale-pt { fill: var(--dim); }
+.pt-now { fill: #d9480f; }
+.pt-base { fill: #868e96; }
+.pt-bet { fill: #1c7ed6; }
+.pt-street { fill: #7048e8; }
+.scale-text { font-size: 15px; fill: var(--fg, currentColor); }
+.text-range { fill: var(--dim); font-size: 13px; }
+.text-now { font-weight: 700; }
 .scale-note { font-size: .85rem; opacity: .8; margin-top: .3rem; }
+.cite-link { font-size: .85rem; margin-left: .2rem; }
 .why-box > .panel { margin-top: .8rem; }
 
 /* ---------- 論證層（2026-09-15） ---------- */

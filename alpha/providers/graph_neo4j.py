@@ -762,7 +762,7 @@ class Neo4jGraphResearchProvider:
                 "OPTIONAL MATCH (c)-[:CITES]->(d:SourceDoc) "
                 "RETURN c.id AS id, c.statement AS statement, c.demand_proof_level AS level, "
                 "collect(DISTINCT e.id) AS about, d.id AS doc_id, d.title AS title, d.origin_entity AS origin, "
-                "d.published_at AS published_at, d.source_type AS source_type, d.evidence_tier AS tier",
+                "d.published_at AS published_at, d.source_type AS source_type, d.evidence_tier AS tier, d.url AS url",
                 ids=wanted)
             claims = []
             for r in rows:
@@ -773,6 +773,7 @@ class Neo4jGraphResearchProvider:
                     "about": [str(a) for a in (r["about"] or [])], "doc_id": r["doc_id"], "title": r["title"],
                     "origin": r["origin"], "published_at": _date_or_none(r["published_at"]),
                     "source_type": r["source_type"], "tier": _tier_or_none(r["tier"]),
+                    "url": (str(r["url"]) if r["url"] else None),
                 })
         claims.sort(key=lambda c: (c["published_at"] is None, -(c["published_at"].toordinal() if c["published_at"] else 0)))
         return {"node_names": names, "claims": claims}

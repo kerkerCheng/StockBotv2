@@ -1297,7 +1297,7 @@ def _citations(narrative: Mapping[str, Any], about: Sequence[str], *, limit: int
             continue
         out.append({"statement": claim.get("statement"), "who": claim.get("origin"), "date": claim.get("published_at"),
                     "title": claim.get("title"), "doc_id": claim.get("doc_id"), "claim_id": claim.get("claim_id"),
-                    "level": claim.get("level")})
+                    "level": claim.get("level"), "url": claim.get("url")})
         if len(out) >= limit:
             break
     return out

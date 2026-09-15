@@ -1326,31 +1326,59 @@ function briefCard(payload, view) {
     node.appendChild(box);
   }
   const scale = lines.brief_scale && lines.brief_scale.datum;
-  if (scale && scale.value && typeof scale.value.price === 'number') node.appendChild(priceScale(scale.value));
+  if (scale && scale.value && typeof scale.value.price === 'number') {
+    const fundamental = view.fundamental ? lineMap(view.fundamental) : {};
+    const sellSide = fundamental.target_mean && fundamental.target_mean.datum;
+    node.appendChild(priceScale(scale.value, payload.price_context || null,
+      sellSide && typeof sellSide.value === 'number' ? sellSide.value : null));
+  }
   return node;
 }
 
-/* 一把尺：現價／沒賭對／賭對。純排版——三個數字都是 materialize 端已經算好的，這裡只決定畫在哪。 */
-function priceScale(v) {
-  const marks = [['現價', v.price, 'now'], ['沒賭對', v.base_target, 'base'], ['賭對', v.bet_target, 'bet']]
-    .filter((m) => typeof m[1] === 'number');
+/* 一把尺（2026-09-15 第二版）：區間帶＝最近 180 個交易日的低點到高點（脈絡，不是訊號），
+   上面放我們的兩個目標價與賣方平均目標價，下面放現價。純排版——每個數字都是 materialize 端已經有的，
+   這裡只決定畫在哪、標籤上下交錯避免重疊。 */
+function priceScale(v, ctx, sellSide) {
+  const marks = [];
+  if (typeof v.price === 'number') marks.push({ label: '現價', value: v.price, kind: 'now', side: 'below' });
+  if (typeof v.base_target === 'number') marks.push({ label: '沒賭對', value: v.base_target, kind: 'base', side: 'above' });
+  if (typeof v.bet_target === 'number') marks.push({ label: '賭對', value: v.bet_target, kind: 'bet', side: 'above' });
+  if (typeof sellSide === 'number') marks.push({ label: '賣方平均目標價', value: sellSide, kind: 'street', side: 'above' });
+  if (ctx && typeof ctx.low === 'number') marks.push({ label: `區間低點 ${ctx.low_date || ''}`, value: ctx.low, kind: 'range', side: 'below' });
+  if (ctx && typeof ctx.high === 'number') marks.push({ label: `區間高點 ${ctx.high_date || ''}`, value: ctx.high, kind: 'range', side: 'below' });
   const wrap = el('div', 'scale');
-  const nums = marks.map((m) => m[1]);
+  if (marks.length < 2) return wrap;
+  const nums = marks.map((m) => m.value);
   const lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
   const span = (hi - lo) || 1;
-  const track = el('div', 'scale-track');
-  marks.forEach((m) => {
-    const tick = el('div', 'scale-tick tick-' + m[2]);
-    tick.style.left = (((m[1] - lo) / span) * 84 + 8) + '%';
-    tick.appendChild(el('div', 'scale-dot'));
-    tick.appendChild(el('div', 'scale-label', m[0] + ' ' + fmtQuantity(m[1], v.unit)));
-    track.appendChild(tick);
+  const W = 1000, H = 150, padX = 70, yAxis = 78;
+  const x = (val) => padX + ((val - lo) / span) * (W - padX * 2);
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, class: 'scale-svg', role: 'img',
+    'aria-label': '價格尺：現價、目標價與最近交易日區間' });
+  svg.appendChild(svgEl('line', { x1: padX, x2: W - padX, y1: yAxis, y2: yAxis, class: 'scale-axis' }));
+  if (ctx && typeof ctx.low === 'number' && typeof ctx.high === 'number') {
+    svg.appendChild(svgEl('rect', { x: x(ctx.low), y: yAxis - 6, width: Math.max(2, x(ctx.high) - x(ctx.low)), height: 12,
+      rx: 6, class: 'scale-band' }));
+  }
+  // 同側的標籤依 x 排序後交錯兩層，避免疊字。
+  ['above', 'below'].forEach((side) => {
+    const group = marks.filter((m) => m.side === side).sort((a, b) => (a.value < b.value ? -1 : 1));
+    group.forEach((m, i) => {
+      const cx = x(m.value);
+      const level = i % 2;
+      const yLabel = side === 'above' ? (yAxis - 22 - level * 20) : (yAxis + 30 + level * 20);
+      svg.appendChild(svgEl('line', { x1: cx, x2: cx, y1: side === 'above' ? yLabel + 4 : yAxis, y2: side === 'above' ? yAxis : yLabel - 12, class: 'scale-stem' }));
+      svg.appendChild(svgEl('circle', { cx: cx, cy: yAxis, r: m.kind === 'range' ? 3.5 : 6, class: 'scale-pt pt-' + m.kind }));
+      svg.appendChild(svgEl('text', { x: cx, y: yLabel, 'text-anchor': 'middle', class: 'scale-text text-' + m.kind },
+        `${m.label} ${fmtQuantity(m.value, v.unit)}`));
+    });
   });
-  wrap.appendChild(track);
+  wrap.appendChild(svg);
   const notes = [];
-  if (typeof v.base_return === 'number') notes.push('沒賭對：' + fmtPercent(v.base_return));
-  if (typeof v.payoff === 'number') notes.push('賭對：' + fmtPercent(v.payoff));
-  if (notes.length) wrap.appendChild(el('div', 'scale-note', '從現價到目標價要漲跌多少　' + notes.join('　')));
+  if (typeof v.base_return === 'number') notes.push('沒賭對 ' + fmtPercent(v.base_return));
+  if (typeof v.payoff === 'number') notes.push('賭對 ' + fmtPercent(v.payoff));
+  const tail = ctx ? `　區間＝最近 ${ctx.sessions} 個已收盤交易日（${ctx.first_date} 起），脈絡不是訊號。` : '';
+  wrap.appendChild(el('div', 'scale-note', (notes.length ? '從現價到目標價要漲跌多少：' + notes.join('　') : '') + tail));
   return wrap;
 }
 
@@ -1383,9 +1411,18 @@ function argumentCard(view) {
       const list = el('ul', 'arg-cites');
       deps.citations.forEach((c) => {
         const li = el('li');
-        li.appendChild(el('span', 'cite-who', `${c.who || '？'}　${c.date || ''}`));
+        const who = el('span', 'cite-who', `${c.who || '？'}　${c.date || ''}`);
+        li.appendChild(who);
         li.appendChild(document.createTextNode('　' + (c.statement || '')));
-        if (c.title) li.title = c.title;
+        if (c.url) {
+          const a = el('a', 'cite-link', '原文 ↗');
+          a.href = c.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+          if (c.title) a.title = c.title;
+          li.appendChild(document.createTextNode(' '));
+          li.appendChild(a);
+        } else if (c.title) {
+          li.title = c.title;
+        }
         list.appendChild(li);
       });
       sec.appendChild(el('div', 'arg-long-title', '引文（圖裡的 claim，照抄）'));

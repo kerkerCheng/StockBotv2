@@ -151,6 +151,17 @@ def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _price_context(series: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:
+    rows = [r for r in series if isinstance(r.get("close"), (int, float)) and r.get("session_date")]
+    if not rows:
+        return None
+    low = min(rows, key=lambda r: r["close"])
+    high = max(rows, key=lambda r: r["close"])
+    return {"sessions": len(rows), "first_date": rows[0]["session_date"], "last_date": rows[-1]["session_date"],
+            "low": low["close"], "low_date": low["session_date"], "high": high["close"], "high_date": high["session_date"],
+            "note": "最近的已收盤交易日區間；脈絡不是訊號——不用它排序、不用它決定買多少"}
+
+
 def materialize_view(analyst_view_dict: Mapping[str, Any], *,
                      generated_at: datetime | None = None,
                      price_series: Sequence[Mapping[str, Any]] | None = None) -> dict[str, Any]:
@@ -177,6 +188,9 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "overview": build_overview(view),
         "view": view,
         "price_series": [dict(row) for row in (price_series or ())],
+        # 尺的脈絡（2026-09-15）：最近 N 個已收盤交易日的高低點與日期。**脈絡不是訊號**：不排序、不決定尺寸；
+        # 只是讓「現價在哪」有個參照。純選取（min／max 是挑點，不是模型）。
+        "price_context": _price_context(price_series or ()),
         "materializer": {
             "version": MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
