@@ -102,10 +102,11 @@ def _payoff_overview(bet_panel: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
+def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """清單卡片的投影。**純選取**——這裡沒有任何算術。"""
     headline = view["headline"]
     lines = _line_map(headline)
+    fundamental_lines = _line_map(view.get("fundamental") or {})
     price = lines.get("current_price") or {}
     fair_value = lines.get("fair_value") or {}
     readiness = view["readiness"]
@@ -132,6 +133,11 @@ def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
         "payoff": _payoff_overview(view.get("bet") or {}),
         # 2026-09-15 投資人短評：清單卡片要的第一句（賭什麼）與狀態燈。純選取。
         "brief": _brief_overview(view.get("brief") or {}),
+        # R4（2026-09-15）：清單卡片的尺縮圖要的兩樣：分析師平均目標價（Engine C 快照）與最近交易日區間。
+        "sell_side_target": _cell(fundamental_lines.get("target_mean")),
+        # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）
+        "ripeness": _cell(_line_map(view.get("research") or {}).get("catalyst_quantitative_link")),
+        "price_context": dict(price_context) if price_context else None,
         "readiness": {"state": readiness["state"],
                       "blocker_count": len(readiness.get("blockers") or []),
                       "flag_count": len(readiness.get("flags") or []),
@@ -185,7 +191,7 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
         "research_context_digest": view.get("research_context_digest"),
         "readiness": view["readiness"],
         "refresh": view["refresh"],
-        "overview": build_overview(view),
+        "overview": build_overview(view, price_context=_price_context(price_series or ())),
         "view": view,
         "price_series": [dict(row) for row in (price_series or ())],
         # 尺的脈絡（2026-09-15）：最近 N 個已收盤交易日的高低點與日期。**脈絡不是訊號**：不排序、不決定尺寸；

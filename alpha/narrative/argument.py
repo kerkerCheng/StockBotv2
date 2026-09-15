@@ -180,9 +180,11 @@ def timeline_paragraph(*, checkpoints: Sequence[Mapping[str, Any]], catalysts: S
     for cp in checkpoints:
         if cp.get("date"):
             items.append((format_value("date", cp["date"]) or "", f"{cp.get('what') or ''}（看的是：{cp.get('decides') or '未說明'}）"))
+    state_text = {"resolved": "（已裁決：事件過了、假設也重看過）", "due": "（到期，假設還沒重看）",
+                  "pending": "（未到）", "unlinked": ""}
     for ct in catalysts:
         when = format_value("date", ct.get("expected_at")) if ct.get("expected_at") else "日期未定"
-        items.append((when or "", str(ct.get("description") or "")))
+        items.append((when or "", str(ct.get("description") or "") + state_text.get(str(ct.get("state") or "unlinked"), "")))
     items.sort(key=lambda t: t[0])
     parts = [f"{when}：{what}" for when, what in items if what]
     text = "；".join(parts) + "。" if parts else "還沒有寫下任何裁決點。"

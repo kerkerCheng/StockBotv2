@@ -342,16 +342,7 @@ function renderCard(row) {
     fmtQuantity(price.value, price.quote_unit) || '—',
     price.as_of ? `bar ${price.as_of}` : (price.reason ? '無現價' : '')));
 
-  // 只有真的有 target 才顯示這一格——沒有就顯示「為什麼沒有」，不補任何倍數。
-  const target = row.future_target;
-  if (target.value !== null && target.value !== undefined) {
-    numbers.appendChild(numberBlock(
-      'Future target',
-      fmtQuantity(target.value, target.currency) || '—',
-      target.value_date && target.value_date.value ? `@ ${target.value_date.value}` : ''));
-  }
-
-  appendReturnBlock(numbers, '隱含報酬', row.implied_return.simple,
+  appendReturnBlock(numbers, '沒賭對，要漲跌多少', row.implied_return.simple,
                     row.implied_return.annualized, cardStance, '年化 ');
   // 賭注（V0）：有寫 variant 才顯示；沒寫就不留白也不補 0——那是「還沒寫賭注」，卡片上不需要一格。
   const payoff = row.payoff || {};
@@ -362,10 +353,20 @@ function renderCard(row) {
   }
   card.appendChild(numbers);
 
-  // 投資人短評的第一句（賭什麼）：有寫才印；沒寫不留白也不硬截 thesis。
+  // R4（2026-09-15）：卡片＝短評第一句＋尺的縮圖。尺上是現價／沒賭對／賭對／分析師平均／區間；全部照抄 overview。
   const brief = row.brief || {};
   if (brief.our_bet && typeof brief.our_bet.value === 'string') {
     card.appendChild(el('div', 'card-brief', brief.our_bet.value));
+  }
+  if (price && typeof price.value === 'number') {
+    const target = row.future_target || {};
+    const payoffTarget = (row.payoff || {}).variant_target || {};
+    const sell = row.sell_side_target || {};
+    card.appendChild(priceScale({
+      price: price.value, unit: price.quote_unit,
+      base_target: typeof target.value === 'number' ? target.value : null,
+      bet_target: typeof payoffTarget.value === 'number' ? payoffTarget.value : null,
+    }, row.price_context || null, typeof sell.value === 'number' ? sell.value : null, { compact: true }));
   }
   const attention = row.primary_attention;
   if (attention) {
@@ -1336,16 +1337,17 @@ function briefCard(payload, view) {
 }
 
 /* 一把尺（2026-09-15 第二版）：區間帶＝最近 180 個交易日的低點到高點（脈絡，不是訊號），
-   上面放我們的兩個目標價與賣方平均目標價，下面放現價。純排版——每個數字都是 materialize 端已經有的，
+   上面放我們的兩個目標價與分析師平均目標價，下面放現價。純排版——每個數字都是 materialize 端已經有的，
    這裡只決定畫在哪、標籤上下交錯避免重疊。 */
-function priceScale(v, ctx, sellSide) {
+function priceScale(v, ctx, sellSide, opts) {
+  const compact = !!(opts && opts.compact);
   const marks = [];
   if (typeof v.price === 'number') marks.push({ label: '現價', value: v.price, kind: 'now', sub: '' });
   if (typeof v.base_target === 'number') marks.push({ label: '沒賭對的目標價', value: v.base_target, kind: 'base',
     sub: typeof v.base_return === 'number' ? '從現價 ' + fmtPercent(v.base_return) : '' });
   if (typeof v.bet_target === 'number') marks.push({ label: '賭對的目標價', value: v.bet_target, kind: 'bet',
     sub: typeof v.payoff === 'number' ? '從現價 ' + fmtPercent(v.payoff) : '' });
-  if (typeof sellSide === 'number') marks.push({ label: '賣方平均目標價', value: sellSide, kind: 'street', sub: '不是我們的目標價' });
+  if (typeof sellSide === 'number') marks.push({ label: '分析師平均目標價', value: sellSide, kind: 'street', sub: '券商分析師的 12 個月目標價平均；不是我們的目標價' });
   if (ctx && typeof ctx.low === 'number') marks.push({ label: '區間低點', value: ctx.low, kind: 'range', sub: ctx.low_date || '' });
   if (ctx && typeof ctx.high === 'number') marks.push({ label: '區間高點', value: ctx.high, kind: 'range', sub: ctx.high_date || '' });
   const wrap = el('div', 'scale');
@@ -1354,7 +1356,7 @@ function priceScale(v, ctx, sellSide) {
   const lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
   const span = (hi - lo) || 1;
   // 尺上只放點與短數字（字級 30／1000，手機上約 11px、桌機約 19px）；名稱與日期放下面的圖例，字級是正常字級。
-  const W = 1000, H = 110, padX = 60, yAxis = 40;
+  const W = 1000, H = compact ? 96 : 110, padX = 60, yAxis = compact ? 30 : 40;
   const x = (val) => padX + ((val - lo) / span) * (W - padX * 2);
   const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, class: 'scale-svg', role: 'img',
     'aria-label': '價格尺：現價、目標價與最近交易日區間' });
@@ -1374,6 +1376,7 @@ function priceScale(v, ctx, sellSide) {
       fmtQuantity(m.value, null)));
   });
   wrap.appendChild(svg);
+  if (compact) return wrap;                       // 清單卡片：只要點與短數字，圖例住單檔頁
   const legend = el('div', 'scale-legend');
   marks.forEach((m) => {
     const row = el('div', 'scale-row');

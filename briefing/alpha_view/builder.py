@@ -1205,6 +1205,9 @@ def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, co
         "value_date": format_value("date", ir.value_date.value),
         "next_checkpoint_date": format_value("date", min(dates) if dates else None),
     }
+    ql = catalysts.quantitative_link.value if isinstance(catalysts.quantitative_link.value, Mapping) else None
+    counts = ql.get("counts") if ql else None
+    values["ripeness"] = (f"{counts['resolved']}／{counts['linked']}" if counts and counts.get("linked") else None)
     # 帶參數的 placeholder：base 假設值與賭注假設值（key 形狀分別是 assumption:driver:scope／override:driver[scope]）
     for datum in bridge.assumptions:
         parts = datum.key.split(":", 2)
@@ -1402,7 +1405,8 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
     # 6. 時間表
     _para("timeline", timeline_paragraph(
         checkpoints=[{"date": c.date, "what": c.what, "decides": c.decides} for c in catalysts.checkpoints],
-        catalysts=[{"expected_at": c.expected_at, "description": c.description} for c in catalysts.structured],
+        catalysts=[{"expected_at": c.expected_at, "description": c.description, "state": c.state}
+                   for c in catalysts.structured],
         value_date=ir.value_date.value, horizon_end=ir.horizon.value, thesis_next_check=lifecycle.thesis_next_check),
         basis="session_judgment")
 
@@ -2662,12 +2666,55 @@ def build_alpha_investment_view(
     # K. Catalyst（結構化催化劑／檢核點／散文／到期狀態；量化連結未建模）
     # =======================================================================
     q5 = session_scores["catalyst"]
+    # V1（2026-09-15）熟成度：一條催化劑「裁決了沒」是機械判定——事件日期已過，且它指名的每條假設在那之後
+    # 都有新的 ledger 紀錄（同 key 的 append）。不解析散文、不判真假。
+    ledger_records = [*assumption_records, *valuation_records]
+    by_id = {r.assumption_id: r for r in ledger_records}
+
+    def _catalyst_state(cat: Any) -> tuple[str, tuple[str, ...]]:
+        if not cat.resolves:
+            return "unlinked", ()
+        unknown = tuple(i for i in cat.resolves if i not in by_id)
+        if cat.expected_at is None or cat.expected_at > reference_day:
+            return "pending", unknown
+        for aid in cat.resolves:
+            target = by_id.get(aid)
+            if target is None:
+                continue
+            rejudged = any(r.key == target.key and r.scenario == getattr(target, "scenario", "base")
+                           and r.created_at.date() > cat.expected_at for r in ledger_records)
+            if not rejudged:
+                return "due", unknown
+        return "resolved", unknown
+
     structured = tuple(
         CatalystItem(kind=cat.kind, description=cat.description, expected_at=cat.expected_at,
                      date_confidence=cat.date_confidence, basis="session_judgment",
-                     evidence_refs=_refs(cat.evidence_refs))
+                     evidence_refs=_refs(cat.evidence_refs), resolves=tuple(cat.resolves),
+                     state=_catalyst_state(cat)[0], unresolved_ids=_catalyst_state(cat)[1])
         for cat in (signal.catalysts if signal else ())
     )
+    linked = [c for c in structured if c.state != "unlinked"]
+    ripeness_counts = {"total": len(structured), "linked": len(linked),
+                       "resolved": sum(1 for c in linked if c.state == "resolved"),
+                       "due": sum(1 for c in linked if c.state == "due"),
+                       "pending": sum(1 for c in linked if c.state == "pending")}
+    if linked:
+        quantitative_link_datum = Datum(
+            key="quantitative_link", label="催化劑 → 假設的連結與熟成度",
+            value={"counts": ripeness_counts,
+                   "links": [{"description": c.description, "expected_at": c.expected_at, "resolves": list(c.resolves),
+                              "state": c.state, "unresolved_ids": list(c.unresolved_ids)} for c in linked],
+                   "rule": "resolved＝事件日期已過且每條被指名的假設在那之後都有新紀錄；due＝已過但還沒重看；pending＝未到"},
+            status="available", basis="deterministic", authority=A_SESSION, as_of=reference_day,
+            method="機械計數：只看催化劑日期與 ledger 的 created_at；不解析散文、不判真假、不算它會讓 EPS 變多少",
+            reason=(f"{ripeness_counts['resolved']}/{ripeness_counts['linked']} 條已裁決"
+                    + (f"；{ripeness_counts['due']} 條到期待重看" if ripeness_counts['due'] else "")),
+            dependencies={"unlinked": ripeness_counts["total"] - ripeness_counts["linked"]})
+    else:
+        quantitative_link_datum = not_modeled(
+            "quantitative_link", "催化劑 → 假設的連結與熟成度",
+            "沒有任何催化劑指名它會裁決哪條假設（judgment 的 catalysts[].resolves）——有日期與散文，但算不進熟成度")
     checkpoint_items = tuple(
         CheckpointItem(date=cp["date"], what=str(cp.get("what") or ""), decides=str(cp.get("decides") or ""),
                        date_confidence=str(cp.get("date_confidence") or "estimated"),
@@ -2749,8 +2796,7 @@ def build_alpha_investment_view(
         catalyst_score=q5, structured=structured, checkpoints=checkpoint_items,
         narrative=narrative_catalyst, watch_state=watch_state_datum, expiry=expiry_datum,
         problems=problems,
-        quantitative_link=not_modeled("quantitative_link", "催化劑 → 盈餘／重定價的量化連結",
-                                      "runtime 只有日期、kind 與散文；沒有「這個事件會讓 EPS／倍數變多少」"),
+        quantitative_link=quantitative_link_datum,
     )
 
     # =======================================================================

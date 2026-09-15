@@ -145,7 +145,9 @@ JUDGMENT_SCHEMA: Mapping[str, Any] = {
     "risks": ["…"],
     "catalysts": [{"kind": "見 config/catalyst_kinds.json", "description": "…",
                    "expected_at": "YYYY-MM-DD 或 null",
-                   "date_confidence": "confirmed|estimated|unknown"}],
+                   "date_confidence": "confirmed|estimated|unknown",
+                   "resolves": "可選：這個事件會裁決哪幾條假設（ledger 的 oa_*／va_* id 清單）——"
+                               "有指名才算進熟成度；不指名不是錯，只是這條催化劑只有日期"}],
     "disproof_conditions": [{
         "condition": "什麼出現就推翻本 thesis",
         "check_frequency": "L7 必填：多久核查一次",
@@ -400,6 +402,7 @@ def compose_signal(
             description=str(c.get("description") or ""),
             expected_at=_date_or_none(c.get("expected_at")),
             date_confidence=str(c.get("date_confidence") or "unknown"),  # type: ignore[arg-type]
+            resolves=tuple(str(r) for r in (c.get("resolves") or [])),
         ) for c in (judgment.get("catalysts") or [])
     )
 

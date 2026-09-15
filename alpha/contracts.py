@@ -324,6 +324,9 @@ class Catalyst:
     expected_at: date | None = None
     date_confidence: Literal["confirmed", "estimated", "unknown"] = "unknown"
     evidence_refs: tuple[EvidenceRef, ...] = ()
+    #: V1（2026-09-15）：這個事件會**裁決哪幾條假設**（`oa_*`／`va_*` 的 assumption_id）。
+    #: 沒指名＝這個催化劑只是日期與散文，算不進熟成度。存在與否由 read model 對 ledger 核對，不在這裡猜。
+    resolves: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         from .vocabulary import catalyst_kinds, validate_kind
@@ -331,6 +334,9 @@ class Catalyst:
         _nonempty(self.kind, "Catalyst.kind")
         validate_kind(self.kind, catalyst_kinds(), "Catalyst.kind")
         _nonempty(self.description, "Catalyst.description")
+        for item in self.resolves:
+            if not isinstance(item, str) or not (item.startswith("oa_") or item.startswith("va_")):
+                raise ValueError(f"Catalyst.resolves 只能是假設 id（oa_*／va_*），收到 {item!r}")
 
 
 # ---------------------------------------------------------------------------

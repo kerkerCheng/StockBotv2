@@ -528,6 +528,11 @@ class CatalystItem:
     date_confidence: str
     basis: str                               # session_judgment
     evidence_refs: tuple[str, ...]
+    #: V1（2026-09-15）：裁決哪幾條假設；`state`＝pending（未到）／due（到期、還沒重看）／resolved（到期後
+    #: 所有被指名的假設都有更新的紀錄）／unlinked（沒指名）。**機械計數**：只看日期與 ledger 的 created_at。
+    resolves: tuple[str, ...] = ()
+    state: str = "unlinked"
+    unresolved_ids: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
