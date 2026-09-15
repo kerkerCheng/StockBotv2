@@ -320,8 +320,11 @@ def test_single_stock_page_leads_with_the_answer_then_the_price(client) -> None:
     # 2026-09-15：首屏只剩短評；結論／價格／卡在哪收進「為什麼這樣算」，再下一層才是完整細節
     # 2026-09-15 三層：短評 → 論證 → 走勢 → 稽核（結論卡、卡在哪…）→ 完整細節
     order = [block.index(name) for name in
-             ("briefCard(", "argumentCard(", "priceCard(", "稽核", "conclusionCard(", "blockerCard(", "完整細節")]
-    assert order == sorted(order), "順序必須是：短評 → 論證 → 走勢 → 稽核（結論 → 卡在哪）→ 完整細節"
+             ("briefCard(", "argumentCard(", "稽核", "conclusionCard(", "blockerCard(", "完整細節")]
+    assert order == sorted(order), "順序必須是：短評（含走勢）→ 論證 → 稽核（結論 → 卡在哪）→ 完整細節"
+    # 走勢圖住在第一個 block（短評卡）裡，不再是獨立的一段
+    brief_fn = source.split("function briefCard", 1)[1].split("\nfunction ", 1)[0]
+    assert "priceCard(payload)" in brief_fn and "priceCard(" not in block
     # 細節一格都沒少：六個面板的 render 全都還在 details 裡
     for renderer in ("renderFundamental(view)", "renderWhy(view)", "renderResearch(view)",
                      "renderEntry(view)", "renderFreshness(payload)"):

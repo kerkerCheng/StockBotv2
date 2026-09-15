@@ -1339,6 +1339,8 @@ function briefCard(payload, view) {
     node.appendChild(priceScale(scale.value, payload.price_context || null,
       sellSide && typeof sellSide.value === 'number' ? sellSide.value : null));
   }
+  // 2026-09-15 使用者回饋：走勢圖住第一個 block（尺下面）。它是脈絡不是訊號（priceCard 內文照舊）。
+  node.appendChild(priceCard(payload));
   return node;
 }
 
@@ -1532,7 +1534,6 @@ async function renderDetail(ticker) {
   app.appendChild(briefCard(payload, view));
   app.appendChild(numbersStrip(view));
   app.appendChild(argumentCard(view));
-  app.appendChild(priceCard(payload));
   const audit = el('section', 'panel');
   audit.appendChild(drill('稽核：每一格的來源、狀態、算式與警告（給查核用，不是給你讀的）', () => {
     const box = el('div', 'why-box');

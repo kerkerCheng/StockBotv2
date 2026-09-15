@@ -140,7 +140,7 @@ def test_app_has_three_tiers_in_order() -> None:
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert block.index("briefCard(") < block.index("argumentCard(") < block.index("priceCard(") < block.index("drill(")
+    assert block.index("briefCard(") < block.index("argumentCard(") < block.index("drill(")
     card = source.split("function argumentCard", 1)[1].split("\nasync function renderDetail", 1)[0]
     for token in ("fair_value /", "/ price", "value - ", "value / ", "Math.pow"):
         assert token not in card, token

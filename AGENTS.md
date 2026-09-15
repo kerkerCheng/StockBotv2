@@ -621,7 +621,8 @@ LLM 自己推出 ZR/ZR+ 節點。四個洞中 Gap 1–3 已於 2026-08-14 修復
 ### L7 — Thesis 生命週期：`disproof_condition` 是欄位，不是流程
 **Invariant：** 光是填 `disproof_condition` 不夠。**每條 disproof 必須附「核查頻率」與
 「觸發後 48 小時內要做什麼」**，否則是一個永遠不會響的火警警報。
-生命週期：`active`（定期核查，建議每季）→ `watch`（leading indicator 朝 disproof 移動）
+生命週期（2026-09-15 起多一個 `realized`：目標價已達，「對了」也要有出場觸發，與 disproof 對稱；由人提案，
+現價高於目標價只是提醒不是自動轉移；出口同 `review_required`）：`active`（定期核查，建議每季）→ `watch`（leading indicator 朝 disproof 移動）
 → `review_required`（條件已觸發，強制 review）→ `retired`（確認失效，出場並記錄推翻原因）
 或 `revised`（修正後重新 `active` 並更新 disproof）。
 **Implementation：** `thesis/lifecycle.json`＋`catalyst_watch.py`｜

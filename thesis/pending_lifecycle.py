@@ -29,10 +29,13 @@ PENDING_DIR = ROOT / "library" / "private" / "thesis_mutations"
 PROPOSAL_SCHEMA = "thesis-lifecycle-proposal/v1"
 
 # L7 的生命週期狀態機。開啟它等於改變 thesis 的語意，不是補字彙。
+# 2026-09-15（使用者定案）：多一個 `realized`——「對了」也要有出場觸發，與 disproof 對稱。
+# 進入條件由人提案（現價高於目標價只是提醒，不是自動轉移）；出口與 review_required 相同：retire 或 revise。
 ALLOWED_TRANSITIONS: dict[str, frozenset[str]] = {
-    "active": frozenset({"watch", "review_required"}),
-    "watch": frozenset({"active", "review_required"}),
+    "active": frozenset({"watch", "review_required", "realized"}),
+    "watch": frozenset({"active", "review_required", "realized"}),
     "review_required": frozenset({"retired", "revised"}),
+    "realized": frozenset({"retired", "revised"}),
     "revised": frozenset({"active"}),
     "retired": frozenset(),
 }

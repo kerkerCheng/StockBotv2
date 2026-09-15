@@ -24,6 +24,8 @@ from typing import Any, Mapping
 CADENCE = "cadence"
 CATALYST = "catalyst"
 REVIEW_REQUIRED = "review_required"
+#: 2026-09-15：thesis 兌現（目標價已達）。與 review_required 一樣恆視為到期——對了也要重看是收割還是上修。
+REALIZED = "realized"
 UNSCHEDULED = "unscheduled"
 
 
@@ -144,6 +146,8 @@ def is_due(entry: Mapping[str, Any], *, today: date | None = None) -> tuple[bool
     today = today or date.today()
     if entry.get("status") == REVIEW_REQUIRED:
         return True, REVIEW_REQUIRED
+    if entry.get("status") == REALIZED:
+        return True, f"{REALIZED}：目標價已達，重看是收割還是上修（不是自動賣出）"
     when, source, checkpoint = effective_next_check(entry, today=today)
     if when is None:
         # 沒有任何排程來源＝沒有出口。維持既有行為（視為到期）並讓原因說清楚。

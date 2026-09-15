@@ -866,6 +866,7 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 | 熟成度（V1） | `Catalyst.resolves` → builder 的 `catalyst_quantitative_link` | 催化劑指名它裁決哪幾條假設；state＝只看事件日期與 ledger created_at（resolved／due／pending／unlinked），不解析散文 |
 | 市場承認了嗎（V2） | `alpha/gap_closure.py` → `expectation_gap.gap_closure`／`consensus_series` | 共識自判斷日以來朝我們移了幾成；起點等於我們的值時 None 不是 0；量測不是訊號 |
 | 目標價比較（V2） | `implied_return.target_reached` | 現價 ≥ 目標價＝「高於」，同時涵蓋市場比我們樂觀與該收割；只表示該重看，不是賣出 |
+| 兌現出口（V2b） | `thesis/pending_lifecycle.py::ALLOWED_TRANSITIONS`＋`lifecycle_schedule.is_due` | `realized`：active／watch → realized → retired／revised；恆視為到期。進入由人提案（thesis mutation gate），`target_reached` 只提醒 |
 | 籃子（V3） | `webapp/basket.py` → state kind `basket` → `#/basket` | ranking 去重順序 × overview × positions 的 join；首選＝filter（有賭注、payoff 為正、裁決點在目標價日期前），INV-3 逐檔報理由 |
 
 ⚠ **首選是 filter 不是分數。** 排序權威仍是 `rank_bottlenecks()`；籃子只在那個順序上套三條可機械驗證的條件。沒有一檔通過就 `top_pick=null`＋理由計數——今天正是如此。

@@ -378,3 +378,6 @@ table.rank.compare td:first-child { color: var(--muted); }
 .arg-long-text { line-height: 1.55; white-space: pre-wrap; }
 .arg-cites { margin: .3rem 0 0 1rem; padding: 0; font-size: .9rem; line-height: 1.5; }
 .arg-cites .cite-who { font-weight: 600; opacity: .8; }
+
+/* 走勢圖住在短評卡裡：去掉內層 panel 的外框，只留標題與圖 */
+.brief-card > .panel { border: 0; padding: .6rem 0 0; margin: .6rem 0 0; box-shadow: none; background: transparent; }
