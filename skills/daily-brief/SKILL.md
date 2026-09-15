@@ -722,7 +722,7 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 ### Step 7 — 收尾同步
 
 - **更新 APP 讀的畫面**（2026-09-08；2026-09-09 起加 `--registry-listed`，APP 73 檔每天更新）：
-  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions`。
+  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --basket`。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
   只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。

@@ -309,6 +309,9 @@ rationale——這與 ROADMAP「沒有 differentiated evidence 時 EPS 收斂到
 
 **判別法：這個指標會隨我們多讀一份文件而單調上升嗎？** 會 → 它測的是研究量。
 
+**首選＝filter 不是分數（2026-09-15 使用者定案 D2）。** 籃子頁的「現在該加碼哪一檔」在排序權威的順序上套三條可機械驗證的條件
+（有賭注、payoff 為正、至少一條指名假設的催化劑落在目標價日期之前），INV-3 逐檔報 input／accepted／filtered／reasons；
+沒有一檔通過就沒有首選，**不得為了讓籃子非空而放寬條件**——讓它非空的路是研究（寫賭注與催化劑）。
 **唯一排序權威是 `query/bottleneck.py::rank_bottlenecks()`。** alpha 排序必須**消費**它，
 不得重算結構分，也不得繞過它自建第二套結構評分。（`axis_ceiling`／paper target 曾被誤當
 排序代理，它們是資本閘門不是選股判準；`research_status` 是研究完整度，也不得拿來排序。）

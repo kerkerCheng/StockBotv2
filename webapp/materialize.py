@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from .contracts import (
+    ArtifactUnavailable,
     ARTIFACT_SCHEMA_VERSION, STATE_SCHEMA_VERSIONS, canonical_digest, freshness_identity,
     state_freshness_identity,
 )
@@ -1115,6 +1116,26 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
     return target.write(payload), payload
 
 
+def materialize_basket(*, store: StateArtifactStore | None = None, analyst_store: ArtifactStore | None = None,
+                       generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """V3：籃子頁。**只讀三份已 materialize 的 artifact**（ranking／positions／每檔 overview），不連 DB、不跑模型。
+    ⚠ 要在 ranking／positions／單檔之後跑，否則 join 的是舊的。"""
+    from .basket import build_basket_artifact
+
+    target = store or StateArtifactStore()
+    ranking, _f = target.read("ranking")
+    try:
+        positions, _f2 = target.read("positions")
+    except ArtifactUnavailable:
+        positions = None
+    overviews: dict[str, Mapping[str, Any]] = {}
+    for ticker, payload, _fresh, _reason in (analyst_store or ArtifactStore()).read_all():
+        if payload is not None:
+            overviews[str(ticker)] = payload.get("overview") or {}
+    payload = build_basket_artifact(ranking=ranking, overviews=overviews, positions=positions, generated_at=generated_at)
+    return target.write(payload), payload
+
+
 def _outcome_series(limit: int = 180) -> dict[str, Any]:
     """等權聚合的時序。唯讀既有檔案；壞掉的行跳過但**不靜默丟掉整串**（INV-3）。"""
     path = (Path(__file__).resolve().parents[1] / "library" / "private" / "decision_lab"
@@ -1195,4 +1216,4 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "COVERAGE_MATERIALIZ
            "materialize_coverage", "materialize_many", "materialize_ranking", "materialize_view",
            "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
            "build_positions_artifact", "materialize_positions",
-           "redact_private_paths", "write_vocabularies"]
+           "redact_private_paths", "write_vocabularies", "materialize_basket"]

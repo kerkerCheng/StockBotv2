@@ -859,6 +859,18 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 ②只有公司自己說的連結合成一句並點名為「整條鏈最薄的地方」，有印證的逐條講；③缺料就一句話說缺什麼，不硬寫、不補。
 **還沒做：** 清單頁同構（R4）；`EvidenceRef.quote` 仍空——論證層直接查 Claim，不經 evidence index（R3 留待）。
 
+### 6.13 賭注 V1–V3：熟成度、市場承認、籃子（2026-09-15）
+
+| 件 | 住哪 | 一句話 |
+|---|---|---|
+| 熟成度（V1） | `Catalyst.resolves` → builder 的 `catalyst_quantitative_link` | 催化劑指名它裁決哪幾條假設；state＝只看事件日期與 ledger created_at（resolved／due／pending／unlinked），不解析散文 |
+| 市場承認了嗎（V2） | `alpha/gap_closure.py` → `expectation_gap.gap_closure`／`consensus_series` | 共識自判斷日以來朝我們移了幾成；起點等於我們的值時 None 不是 0；量測不是訊號 |
+| 目標價比較（V2） | `implied_return.target_reached` | 現價 ≥ 目標價＝「高於」，同時涵蓋市場比我們樂觀與該收割；只表示該重看，不是賣出 |
+| 籃子（V3） | `webapp/basket.py` → state kind `basket` → `#/basket` | ranking 去重順序 × overview × positions 的 join；首選＝filter（有賭注、payoff 為正、裁決點在目標價日期前），INV-3 逐檔報理由 |
+
+⚠ **首選是 filter 不是分數。** 排序權威仍是 `rank_bottlenecks()`；籃子只在那個順序上套三條可機械驗證的條件。沒有一檔通過就 `top_pick=null`＋理由計數——今天正是如此。
+⚠ **`basket` 必須在 ranking／positions／單檔之後 materialize**（它只讀那三份 artifact，不連 DB）；daily 收尾命令已加 `--basket` 在最後。
+
 ## 7. Engine D（Decision Lab）runtime
 
 - Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許

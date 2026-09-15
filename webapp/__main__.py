@@ -54,7 +54,7 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_beta, materialize_coverage, materialize_many, materialize_positions,
+        materialize_basket, materialize_beta, materialize_coverage, materialize_many, materialize_positions,
         materialize_ranking, materialize_watches, write_vocabularies,
     )
 
@@ -122,7 +122,8 @@ def cmd_materialize(args: argparse.Namespace) -> int:
 
     # 不給 ticker 且沒要求 ranking ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
-    state_only = bool(args.ranking or args.beta or args.coverage or args.watches or args.positions)
+    state_only = bool(args.ranking or args.beta or args.coverage or args.watches or args.positions
+                      or getattr(args, "basket", False))
     tickers = list(args.tickers) if args.tickers else ([] if state_only else store.tickers())
     if args.tracked:
         tracked = _tracked_tickers()
@@ -149,6 +150,19 @@ def cmd_materialize(args: argparse.Namespace) -> int:
                 size = path.stat().st_size
                 print(f"✓ {ticker} → {path.name}（{size:,} bytes）")
         print(f"字彙表 → {vocab_path.name}")
+    # 籃子（V3）最後跑：它 join 的是 ranking／positions／單檔三份 artifact，得在它們之後。
+    if getattr(args, "basket", False):
+        total += 1
+        try:
+            path, payload = materialize_basket(store=state_store, analyst_store=store)
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print(f"✗ basket：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            f = payload["filter"]
+            pick = payload["top_pick"]
+            print(f"✓ basket → {path.name}（{path.stat().st_size:,} bytes；{f['input']} 檔／通過 filter {f['accepted']}"
+                  f"／首選 {pick['ticker'] if pick else '無'}）")
     print(f"完成 {total - failed}/{total}；下一步：python -m webapp serve")
     return 1 if failed else 0
 
@@ -243,6 +257,10 @@ def cmd_status(args: argparse.Namespace) -> int:
         elif kind == "positions":
             extra = (f"｜逐檔 {len(payload['rows'])}"
                      f"／真實成交 {len(payload['live']['tickers'])} 檔")
+        elif kind == "basket":
+            pick = payload.get("top_pick")
+            extra = (f"｜{payload['filter']['input']} 檔／通過 filter {payload['filter']['accepted']}"
+                     f"／首選 {pick['ticker'] if pick else '無'}")
         print(f"- {kind}｜{freshness.state}（{freshness.age_hours:.1f}h）"
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
@@ -516,6 +534,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 事件監看：Event Watch registry ＋ 追源 backlog 的原值照抄")
     mat.add_argument("--positions", action="store_true",
                      help="另外（或只）materialize 部位與問責：outcome 腳本 collect() ＋ Decision Store 計數器")
+    mat.add_argument("--basket", action="store_true",
+                     help="另外（或只）materialize 籃子：ranking × 各檔 overview × positions 的 join（最後跑；不連 DB）")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與 ranking 都適用）")
     _dirs(mat)
     mat.set_defaults(func=cmd_materialize)

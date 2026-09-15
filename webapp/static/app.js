@@ -1575,6 +1575,88 @@ async function renderDetail(ticker) {
   window.scrollTo(0, 0);
 }
 
+/* ---------- 籃子（V3；ranking × 各檔 overview × positions 的 join；順序照抄、首選是 filter） ---------- */
+
+function pctCell(value) { return returnCell(value); }
+
+const BASKET_COLUMNS = [
+  { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
+  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id, company_label: row.company_label }, set) },
+  { title: '同一個賭注的群', cell: (row) => el('td', 'nowrap dim', row.sector || '—') },
+  { title: '賭什麼', cell: (row) => {
+      const c = el('td', 'wrap');
+      if (row.our_bet) c.textContent = row.our_bet;
+      else if (row.payoff_status === 'available') c.textContent = '（有賭注，還沒寫短評）';
+      else c.appendChild(el('span', 'dim', '還沒寫賭注'));
+      return c;
+    } },
+  { title: '賭對，漲跌', cell: (row) => pctCell(row.payoff) },
+  { title: '沒賭對，漲跌', cell: (row) => pctCell(row.base_return) },
+  { title: '裁決點', cell: (row) => {
+      const r = row.ripeness;
+      return el('td', 'nowrap', r && r.linked ? `已裁決 ${r.resolved}／${r.linked}` : '—');
+    } },
+  { title: '市場承認了嗎', cell: (row) => {
+      const c = el('td', 'nowrap');
+      if (typeof row.consensus_moved === 'number') c.textContent = `共識朝我們 ${fmtPercent(row.consensus_moved)}（${row.consensus_points} 次）`;
+      else c.textContent = '—';
+      return c;
+    } },
+  { title: '部位', cell: (row) => {
+      const c = el('td', 'nowrap');
+      if (row.position) c.textContent = `持有 ${fmtNumber(row.position.shares, 2)} 股（${fmtPercent(row.position.live_return)}）`;
+      else c.appendChild(el('span', 'dim', '未持有'));
+      return c;
+    } },
+  { title: 'filter', cell: (row) => {
+      const c = el('td', 'nowrap');
+      if (row.passes_filter) c.appendChild(el('span', 'badge badge-ready', '通過'));
+      else c.textContent = (row.filter_reasons || []).map((k) => ((BASKET_VOCAB && BASKET_VOCAB[k]) || k)).join('；');
+      return c;
+    } },
+];
+let BASKET_VOCAB = null;
+
+async function renderBasket() {
+  markNav('basket');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/basket`);
+  } catch (err) {
+    renderStateError(err, '讀不到籃子');
+    return;
+  }
+  BASKET_VOCAB = (payload.filter || {}).reason_labels || {};
+  const detailSet = new Set(payload.analyst_view_tickers || []);
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  app.appendChild(head);
+
+  // 首選（filter 的結果）或它為什麼缺席——兩者不同形。
+  const pick = el('section', 'panel callout');
+  if (payload.top_pick) {
+    const p = payload.top_pick;
+    pick.appendChild(el('h2', null, `首選：${p.ticker}（結構第 ${p.rank}）`));
+    if (p.our_bet) pick.appendChild(el('p', 'arg-text', p.our_bet));
+    pick.appendChild(el('p', 'note', `賭對漲跌 ${fmtPercent(p.payoff)}｜群：${p.sector || '—'}｜${p.note}`));
+  } else {
+    pick.appendChild(el('h2', null, '目前沒有首選'));
+    pick.appendChild(el('p', 'arg-text', payload.top_pick_absent_reason || ''));
+  }
+  const f = payload.filter || {};
+  pick.appendChild(el('p', 'note', `filter：${f.input} 檔進來、${f.accepted} 檔通過、${f.filtered} 檔被擋。${f.rule || ''}`));
+  app.appendChild(pick);
+
+  const sec = el('section', 'panel');
+  sec.appendChild(el('h2', null, `全部（${(payload.rows || []).length} 檔，順序＝瓶頸排序）`));
+  sec.appendChild(rankTable(payload.rows || [], BASKET_COLUMNS, detailSet));
+  (payload.correlation_notes || []).forEach((t) => sec.appendChild(el('p', 'warn', '▲ ' + t)));
+  app.appendChild(sec);
+  app.appendChild(stateFooter(payload, '這份籃子不是什麼'));
+}
+
 /* ---------- 瓶頸排序（跨標的 state；照抄 rank_bottlenecks 的輸出，不重排、不加權） ---------- */
 
 let RANK_VOCAB = null;
@@ -2833,7 +2915,8 @@ async function route() {
       VOCAB = meta.vocabularies || {};
     }
     // `ranking` 是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
-    if (target === 'ranking') await renderRanking();
+    if (target === 'basket') await renderBasket();
+    else if (target === 'ranking') await renderRanking();
     else if (target === 'beta') await renderBeta();
     else if (target === 'coverage') await renderCoverage();
     else if (target === 'watches') await renderWatches();

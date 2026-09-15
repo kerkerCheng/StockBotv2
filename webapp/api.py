@@ -99,6 +99,7 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/coverage",
             f"GET /api/{API_VERSION}/watches",
             f"GET /api/{API_VERSION}/positions",
+            f"GET /api/{API_VERSION}/basket",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -218,6 +219,14 @@ _STATE_NOTES = {
     "positions": ("跑 `python -m webapp materialize --positions`",
                   "「artifact 讀不到」與「還沒有任何真實部位」是兩件事——後者會以 200 ＋ live.rows=[] 回。"),
 }
+
+
+_STATE_NOTES["basket"] = ("python -m webapp materialize --basket",
+                          "「artifact 讀不到」與「沒有一檔通過 filter」是兩件事——後者會以 200 ＋ top_pick=null ＋理由回。")
+
+
+async def basket(request: Request) -> Response:
+    return await _serve_state(request, "basket")
 
 
 async def _serve_state(request: Request, kind: str) -> Response:
@@ -345,6 +354,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/coverage", coverage, methods=["GET"]),
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
         Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/basket", basket, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

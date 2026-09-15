@@ -916,6 +916,7 @@ python -m alpha assumptions COHR --add spec.json    # {"scenario":"variant","dri
 # 投資人短評（2026-09-15）：七格前因後果，文字 session 寫、數字 placeholder；範例 library/private/alpha/specs/cohr_brief.json
 python -m alpha brief COHR --add spec.json          # 七格缺一不可；禁字與未登記 placeholder 會被拒；之後 materialize 才會上首屏
 python -m alpha brief COHR --list
+python -m webapp materialize --basket              # 籃子（V3）：只讀 ranking／positions／單檔三份 artifact 做 join；要排在它們之後跑
 python -m alpha valuation COHR --list
 python -m alpha valuation COHR --retract va_xxx --rationale "..."
 # 2) 看結果（read model 第 13 節：方法／內部 EPS／假設／fair value／現價／gap／算式／敏感度／認識論分解／refresh state）
