@@ -18,8 +18,8 @@ from datetime import date, datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from ..errors import ContractViolation
-from ..fundamental.assumptions import select_assumptions
-from ..fundamental.contracts import AssumptionSelection, FiscalPeriod
+from ..fundamental.assumptions import select_assumptions, select_scenario_assumptions
+from ..fundamental.contracts import ASSUMPTION_SCENARIOS, BASE_SCENARIO, AssumptionSelection, FiscalPeriod
 from .contracts import (
     METHOD_EV_TO_SALES, METHOD_FORWARD_EARNINGS_MULTIPLE, METHOD_PARAMETERS,
     VALUATION_DERIVATIONS, ValuationAssumption,
@@ -41,6 +41,8 @@ _ID_FIELDS_V3 = ("derivation",)
 #: v4（2026-09-13）：`calibration_shares`＝校準市值時用的股數（只對 ev_to_sales 有意義）。
 #: 同樣**只在有值時**參與 id——既有三筆 ev_to_sales 紀錄的 id 一個位元都不變。
 _ID_FIELDS_V4 = ("calibration_shares",)
+#: v5（2026-09-15 V0）：`scenario`。**只在非 base 時參與 id**——既有紀錄的 id 一個位元都不變。
+_ID_FIELDS_V5 = ("scenario",)
 
 
 def new_valuation_assumption_id(payload: Mapping[str, Any]) -> str:
@@ -50,6 +52,8 @@ def new_valuation_assumption_id(payload: Mapping[str, Any]) -> str:
     body.update({k: payload[k] for k in _ID_FIELDS_V3
                  if payload.get(k) and payload[k] != "unclassified"})
     body.update({k: payload[k] for k in _ID_FIELDS_V4 if payload.get(k) is not None})
+    body.update({k: payload[k] for k in _ID_FIELDS_V5
+                 if payload.get(k) and payload[k] != BASE_SCENARIO})
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "va_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -77,8 +81,11 @@ def valuation_assumption_record(
     value_date_convention: str | None = None,
     derivation: str | None = None,
     calibration_shares: float | None = None,
+    scenario: str = BASE_SCENARIO,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `ValuationAssumption` 驗證，驗不過就不產生）。
+
+    `scenario`（V0，2026-09-15）：`base`（預設）或 `variant`（賭注的倍數；必須 independent＋有 supporting）。
 
     `evidence_refs` 是 **supporting** 證據；`calibration_refs`／`comparison_refs` 另列——
     同期共識、市場倍數、賣方目標價只能出現在後兩者（出現在 supporting 會被契約拒絕）。
@@ -146,7 +153,10 @@ def valuation_assumption_record(
         "supersedes_id": supersedes_id,
         "retracted": bool(retracted),
         "derivation": derivation,
+        "scenario": str(scenario),
     }
+    if scenario not in ASSUMPTION_SCENARIOS:
+        raise ContractViolation(f"scenario 未登記：{scenario!r}；已知 {ASSUMPTION_SCENARIOS}")
     if value_date_convention is not None:
         payload["value_date_convention"] = str(value_date_convention)
     if calibration_shares is not None:
@@ -206,6 +216,8 @@ def parse_valuation_assumption_record(raw: Mapping[str, Any]) -> ValuationAssump
         # 舊行沒有這個欄位 → None（＝未宣告）。**不得預設成模型股數**：那個方向的預設
         # 正是 2026-09-13 CRWV 那筆 −17.47pp 假訊號的成因。
         calibration_shares=(float(raw["calibration_shares"]) if raw.get("calibration_shares") is not None else None),
+        # 舊行沒有這個欄位 → `base`（scenario 存在之前，所有估值假設就是 base）。
+        scenario=str(raw.get("scenario") or BASE_SCENARIO),
     )
 
 
@@ -217,10 +229,12 @@ def select_valuation_assumptions(
     today: date,
     evidence_index: Mapping[str, Any],
     parse_errors: Sequence[str] = (),
+    scenario: str = BASE_SCENARIO,
 ) -> tuple[tuple[ValuationAssumption, ...], AssumptionSelection]:
-    """as-of → 期間 → retract／supersede → 證據解析。**與營運假設同一個選取器**。"""
-    accepted, selection = select_assumptions(
-        records, target=target, as_of=as_of, today=today,      # type: ignore[arg-type]
+    """as-of → 期間 → retract／supersede → 證據解析。**與營運假設同一個選取器**，
+    含 scenario overlay（variant 覆蓋同 key 的 base；沒有 variant 就等於 base）。"""
+    accepted, selection, _overrides = select_scenario_assumptions(
+        records, scenario=scenario, target=target, as_of=as_of, today=today,      # type: ignore[arg-type]
         evidence_index=evidence_index, parse_errors=parse_errors)
     return tuple(accepted), selection                           # type: ignore[return-value]
 

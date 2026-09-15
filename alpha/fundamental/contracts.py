@@ -276,6 +276,16 @@ OPINION_STANCES: tuple[str, ...] = (
     "no_opinion_bearing_assumptions",
 )
 
+#: 假設屬於哪一個 **scenario**（2026-09-15 V0「賭注」）。封閉字彙：
+#: - `base`：校準基準。依 2026-09-09 原則，沒有差異化證據時收斂到共識是健康的。
+#: - `variant`：**賭注**——「如果我們的差異看法對了」。它是 base 的 **overlay**：只寫有差異的
+#:   driver，其餘沿用 base 的生效假設；payoff ＝ variant fair value 對現價的隱含報酬。
+#: ⚠ 舊紀錄沒有這個欄位 → 讀成 `base`（在 scenario 存在之前，所有假設就是 base）。
+#: ⚠ 刻意**沒有** bull／bear／機率：variant 是一個條件句（「如果對了」），不是機率加權。
+ASSUMPTION_SCENARIOS: tuple[str, ...] = ("base", "variant")
+BASE_SCENARIO = "base"
+VARIANT_SCENARIO = "variant"
+
 
 def opinion_stance(assumptions: Sequence["OperatingAssumption"]) -> str:
     """一組 accepted 假設 → 這家公司這一期的 opinion stance。**純函式**。
@@ -333,6 +343,8 @@ class OperatingAssumption:
     review_conditions: tuple[Any, ...] = ()
     provenance_semantics: str = "legacy"
     derivation: str = "unclassified"
+    #: V0（2026-09-15）：這條假設屬於 base 還是 variant（賭注）。舊行讀成 `base`。
+    scenario: str = "base"
 
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "OperatingAssumption.assumption_id")
@@ -397,10 +409,28 @@ class OperatingAssumption:
                 raise ContractViolation(f"v2 假設每條 ref 都必須宣告角色；缺：{missing[:3]}")
             if not any(role == "supporting" for role in self.dependency_roles.values()):
                 raise ContractViolation("v2 假設至少要有一條 supporting evidence（calibration 不算支持）")
-        from ..refresh.contracts import ReviewCondition
-
-        if any(not isinstance(c, ReviewCondition) for c in self.review_conditions):
-            raise ContractViolation("review_conditions 每一項必須是 ReviewCondition")
+        if self.scenario not in ASSUMPTION_SCENARIOS:
+            raise ContractViolation(
+                f"scenario 未登記：{self.scenario!r}；已知 {ASSUMPTION_SCENARIOS}——"
+                "scenario 是封閉字彙，多一種就要多一條 payoff 算術")
+        if self.scenario == VARIANT_SCENARIO and not self.retracted:
+            # 賭注的三條型別層規則（V0，2026-09-15）——**放行與收緊同時發生**：
+            # ①只有核心 driver 能成為賭注：稅率／股數／NCI 的差異不是「看法」，是校準；
+            # ②它必須是我們自己的判斷——由共識反解或抄公司指引的東西結構上不可能與市場不同，
+            #   寫成 variant 就是把佔位冒充成賭注；
+            # ③它必須指得出至少一條 supporting 證據（calibration 不算），否則「如果對了」
+            #   沒有任何東西在支撐「對」。這三條讓「說不出賭注」這件事在型別層不可能發生。
+            if self.driver not in OPINION_BEARING_DRIVERS:
+                raise ContractViolation(
+                    f"variant 假設只能是核心 driver {sorted(OPINION_BEARING_DRIVERS)}；"
+                    f"收到 {self.driver!r}——稅率／股數／NCI 的差異是校準，不是賭注")
+            if self.derivation != "independent":
+                raise ContractViolation(
+                    f"variant 假設的 derivation 必須是 independent（收到 {self.derivation!r}）——"
+                    "由共識反解或採公司指引的值結構上不可能與市場不同，不能當賭注")
+            if not self.supporting_refs:
+                raise ContractViolation(
+                    "variant 假設至少要有一條 supporting evidence——「如果對了」必須指得出什麼在支撐「對」")
 
     @property
     def key(self) -> tuple[str, str]:
@@ -773,10 +803,19 @@ class FundamentalModelResult:
     digest: str = ""
     warnings: tuple[str, ...] = ()
     evidence: tuple[EvidenceRef, ...] = field(default_factory=tuple)
+    #: V0（2026-09-15）：這次模型執行是 base 還是 variant（賭注）。
+    scenario: str = BASE_SCENARIO
+    #: scenario=variant 時，**實際覆蓋了 base 的那幾條** variant 假設（其餘 `assumptions` 沿用 base）。
+    #: base 執行恆為空。它就是「賭注長什麼樣」的機器可讀形式。
+    overrides: tuple[OperatingAssumption, ...] = ()
 
     def __post_init__(self) -> None:
         if self.status not in ("available", "partial", "missing"):
             raise ContractViolation(f"FundamentalModelResult.status 未登記：{self.status!r}")
+        if self.scenario not in ASSUMPTION_SCENARIOS:
+            raise ContractViolation(f"FundamentalModelResult.scenario 未登記：{self.scenario!r}")
+        if self.scenario == BASE_SCENARIO and self.overrides:
+            raise ContractViolation("base 執行不得帶 overrides——覆蓋只在 variant 上有意義")
         if self.accounting_basis not in ACCOUNTING_BASES:
             raise ContractViolation(f"accounting_basis 未登記：{self.accounting_basis!r}")
         # 字彙一旦有行為後果就必須被強制（L16-3）：`consensus_bases` 的值決定
@@ -808,5 +847,6 @@ __all__ = [
     "ConsensusEstimate", "DriverSpec", "ExpectationComparison", "FiscalPeriod",
     "FiscalYearActuals", "FundamentalModelResult", "GuidanceObservation", "ModeledMetric",
     "OPINION_BEARING_DRIVERS", "OPINION_STANCES", "ASSUMPTION_DERIVATIONS",
+    "ASSUMPTION_SCENARIOS", "BASE_SCENARIO", "VARIANT_SCENARIO",
     "OperatingAssumption", "Sensitivity", "opinion_stance", "weakest_basis",
 ]

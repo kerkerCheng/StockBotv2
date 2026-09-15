@@ -22,8 +22,8 @@ from typing import Any, Mapping, Sequence
 
 from ..errors import ContractViolation
 from .contracts import (
-    ASSUMPTION_DERIVATIONS, ASSUMPTION_DRIVERS, TOTAL_SCOPE, AssumptionSelection, FiscalPeriod,
-    OperatingAssumption,
+    ASSUMPTION_DERIVATIONS, ASSUMPTION_DRIVERS, ASSUMPTION_SCENARIOS, BASE_SCENARIO, TOTAL_SCOPE,
+    AssumptionSelection, FiscalPeriod, OperatingAssumption,
 )
 
 #: v1＝2026-09-05 的原始形狀；v2（Step 0.5，2026-09-06）多了 `dependency_roles`／`review_conditions`／
@@ -39,6 +39,9 @@ _ID_FIELDS_V2 = ("dependency_roles", "review_conditions", "provenance_semantics"
 #: v3（2026-09-10）：`derivation`＝這個值是怎麼決定的。同樣**只在有值時**參與 id，
 #: 且 `unclassified` 視同沒值——舊紀錄與撤回紀錄的 id 一個位元都不變。
 _ID_FIELDS_V3 = ("derivation",)
+#: v4（2026-09-15 V0）：`scenario`＝base／variant。**只在非 base 時參與 id**——既有紀錄全是 base，
+#: 它們的 id 一個位元都不變；同一條假設寫成 variant 會得到不同的 id（它們本來就是兩筆）。
+_ID_FIELDS_V4 = ("scenario",)
 
 
 def new_assumption_id(payload: Mapping[str, Any]) -> str:
@@ -47,6 +50,8 @@ def new_assumption_id(payload: Mapping[str, Any]) -> str:
     body.update({k: payload[k] for k in _ID_FIELDS_V2 if payload.get(k)})
     body.update({k: payload[k] for k in _ID_FIELDS_V3
                  if payload.get(k) and payload[k] != "unclassified"})
+    body.update({k: payload[k] for k in _ID_FIELDS_V4
+                 if payload.get(k) and payload[k] != BASE_SCENARIO})
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "oa_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -73,8 +78,12 @@ def assumption_record(
     review_conditions: Sequence[Mapping[str, Any]] = (),
     legacy_roles: bool = False,
     derivation: str | None = None,
+    scenario: str = BASE_SCENARIO,
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `OperatingAssumption` 驗證，驗不過就不產生）。
+
+    `scenario`（V0，2026-09-15）：`base`（預設）或 `variant`（賭注的 overlay）。variant 的三條規則
+    （核心 driver／derivation=independent／至少一條 supporting）由 `OperatingAssumption` 型別層強制。
 
     `evidence_refs` 是 **supporting** 證據；`calibration_refs`／`comparison_refs` 另列
     （同期共識只能出現在這兩個，出現在 supporting 會被契約拒絕）。
@@ -127,7 +136,10 @@ def assumption_record(
         "supersedes_id": supersedes_id,
         "retracted": bool(retracted),
         "derivation": derivation,
+        "scenario": str(scenario),
     }
+    if scenario not in ASSUMPTION_SCENARIOS:
+        raise ContractViolation(f"scenario 未登記：{scenario!r}；已知 {ASSUMPTION_SCENARIOS}")
     if not legacy_roles:
         payload["dependency_roles"] = roles
         payload["provenance_semantics"] = "v2"
@@ -183,6 +195,8 @@ def parse_assumption_record(raw: Mapping[str, Any]) -> OperatingAssumption:
         provenance_semantics=semantics,
         # 舊行沒有這個欄位 → `unclassified`（fail safe 到「不知道」，不是 `independent`）。
         derivation=str(raw.get("derivation") or "unclassified"),
+        # 舊行沒有這個欄位 → `base`：scenario 存在之前，所有假設就是 base（不是猜，是定義）。
+        scenario=str(raw.get("scenario") or BASE_SCENARIO),
     )
 
 
@@ -258,7 +272,53 @@ def select_assumptions(
     return tuple(accepted), selection
 
 
+def select_scenario_assumptions(
+    records: Sequence[Any],
+    *,
+    scenario: str,
+    target: FiscalPeriod,
+    as_of: date | None,
+    today: date,
+    evidence_index: Mapping[str, Any],
+    parse_errors: Sequence[str] = (),
+) -> tuple[tuple[Any, ...], AssumptionSelection, tuple[Any, ...]]:
+    """某個 scenario 的生效假設＝**base 的生效假設，被同 key 的 variant 生效假設覆蓋**（overlay）。
+
+    回傳 `(accepted, selection, overrides)`：`overrides` 是實際覆蓋了 base 的那幾條 variant 假設
+    （base 執行恆為空）。base 與 variant **各自獨立選取**（各自 as-of／supersede／證據解析），
+    所以一條 variant 紀錄永遠不會 supersede 一條 base 紀錄——它們是同一本 ledger 上的兩條鏈。
+    duck-typed：營運假設與估值假設共用（兩者都露出 `scenario`／`key`）。
+    """
+    if scenario not in ASSUMPTION_SCENARIOS:
+        raise ContractViolation(f"scenario 未登記：{scenario!r}；已知 {ASSUMPTION_SCENARIOS}")
+    base_records = [r for r in records if getattr(r, "scenario", BASE_SCENARIO) == BASE_SCENARIO]
+    base_accepted, base_selection = select_assumptions(
+        base_records, target=target, as_of=as_of, today=today,
+        evidence_index=evidence_index, parse_errors=parse_errors)
+    if scenario == BASE_SCENARIO:
+        return base_accepted, base_selection, ()
+    variant_records = [r for r in records if getattr(r, "scenario", BASE_SCENARIO) == scenario]
+    variant_accepted, variant_selection = select_assumptions(
+        variant_records, target=target, as_of=as_of, today=today, evidence_index=evidence_index)
+    merged: dict[tuple[str, str], Any] = {a.key: a for a in base_accepted}
+    overridden = [merged[a.key].assumption_id for a in variant_accepted if a.key in merged]
+    merged.update({a.key: a for a in variant_accepted})
+    accepted = tuple(sorted(merged.values(), key=lambda r: (r.driver, r.scope)))
+    reasons: dict[str, int] = dict(base_selection.reasons)
+    for key, count in variant_selection.reasons.items():
+        reasons[key] = reasons.get(key, 0) + count
+    if overridden:
+        reasons["base_overridden_by_variant"] = len(overridden)
+    selection = AssumptionSelection(
+        input_count=base_selection.input_count + variant_selection.input_count,
+        accepted_count=len(accepted), reasons=reasons,
+        rejected=tuple(base_selection.rejected) + tuple(variant_selection.rejected)
+        + tuple((i, "base_overridden_by_variant") for i in overridden),
+    )
+    return accepted, selection, tuple(variant_accepted)
+
+
 __all__ = [
     "LEGACY_RECORD_VERSION", "RECORD_VERSION", "assumption_record", "new_assumption_id",
-    "parse_assumption_record", "select_assumptions",
+    "parse_assumption_record", "select_assumptions", "select_scenario_assumptions",
 ]

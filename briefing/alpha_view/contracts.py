@@ -133,6 +133,10 @@ CAP_BASE_CASE_IMPLIED_RETURN = "base_case_implied_return_v1"
 #: （門檻價／現價相對門檻價／算術比較／alignment 對齊與否）。它**不是** buy／sell、不是部位、不是資本許可；
 #: `meets_analytical_hurdle` 只是「現價 ≤ 門檻價」。沒有判準就是 missing，不補 10%／15%／20%。
 CAP_ANALYTICAL_ENTRY_THRESHOLD = "analytical_entry_threshold_v1"
+#: V0（2026-09-15）：**賭注**——variant scenario（base 的生效假設被同 key 的 variant 假設覆蓋）走同一條
+#: 橋／估值／報酬算術，得到「如果我們的差異看法對了」的 fair value 與對現價的隱含報酬（payoff）。
+#: 它**不是** bull case、不是機率加權、不是預測；每條 variant 假設都必須指得出 supporting 證據。
+CAP_VARIANT_PAYOFF = "variant_scenario_payoff_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -639,6 +643,36 @@ class ImpliedReturnSection:
 
 
 @dataclass(frozen=True, slots=True)
+class PayoffScenarioSection:
+    """賭注（V0，2026-09-15）：**只消費** variant scenario 那條鏈（fundamental／valuation／implied_return
+    各對 variant 跑一次，**同一套算術**）的輸出；builder 不算任何數。
+
+    - `overrides`：實際覆蓋了 base 的那幾條 variant 假設（營運＋估值），每條帶 `base_value` 供對照。
+    - `variant_fair_value`／`payoff_return`／`annualized_payoff_return`／兩桿拆解：照抄 variant 的 implied return。
+    - `base_fair_value`／`base_price_return`：照抄 base，讓兩個目標價並排——差額就是這個賭注的價值。
+    - 沒有任何 variant 紀錄 → 整段 `missing`＋`not_yet_recorded`（賭注還沒寫，不是 0）。
+    - `is_not`：不是機率加權、不是預測、不是尺寸、不是 base 的替代。
+    """
+
+    meta: SectionMeta
+    scenario: Datum                            # {"scenario": "variant", 覆蓋計數}
+    overrides: tuple[Datum, ...]
+    variant_internal_eps: Datum
+    variant_fair_value: Datum
+    value_date: Datum
+    payoff_return: Datum
+    annualized_payoff_return: Datum
+    eps_contribution: Datum
+    multiple_contribution: Datum
+    epistemics: Datum
+    base_fair_value: Datum
+    base_price_return: Datum
+    is_not: tuple[str, ...]
+    period: str | None = None
+    period_end: date | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class EntryLogicSection:
     """Entry Logic（Step 3）：**只消費** `alpha.entry.build_entry_assessment` 的輸出，builder 不含任何門檻價公式。
 
@@ -811,6 +845,7 @@ class AlphaInvestmentView:
     evidence: EvidenceSection
     freshness: tuple[FreshnessItem, ...]
     refresh_status: RefreshStatusSection
+    payoff_scenario: PayoffScenarioSection
     warnings: tuple[str, ...] = ()
 
     #: 有 `meta` 的 section 名稱，`capability_map()` 依此列舉。
@@ -818,7 +853,7 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "implied_return",
-        "downside", "entry_logic", "evidence", "refresh_status",
+        "downside", "entry_logic", "evidence", "refresh_status", "payoff_scenario",
     )
 
     def capability_map(self) -> dict[str, dict[str, str | None]]:
@@ -864,7 +899,7 @@ def _jsonable(obj: Any) -> Any:
 
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
-    "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection",
+    "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection", "CAP_VARIANT_PAYOFF", "PayoffScenarioSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
     "CAP_NARRATIVE_SCENARIOS", "ValuationSection",
     "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",

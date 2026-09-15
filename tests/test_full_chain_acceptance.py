@@ -166,7 +166,7 @@ def test_core_readiness_is_ready_and_entry_is_optional_not_a_blocker() -> None:
     assert a.readiness.state == "ready"
     assert a.readiness.blockers == ()
     assert a.entry.status == "missing"
-    assert a.readiness.optional_unavailable == ("entry：missing",)
+    assert a.readiness.optional_unavailable == ("bet：missing", "entry：missing")   # V0：bet 也是 optional
 
 
 # ---------------------------------------------------------------------------

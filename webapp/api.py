@@ -134,11 +134,15 @@ def _opinion_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         stance = (row.get("opinion_stance") or {}).get("value")
         counts[str(stance)] = counts.get(str(stance), 0) + 1
     with_view = sum(1 for r in items if _group_of(r) == "ready")
+    # V0（2026-09-15）：有寫賭注的檔數。**純計數**——payoff 由 materialize 端寫進 overview，這裡只數有值的。
+    with_bet = sum(1 for r in items
+                   if isinstance(((r.get("payoff") or {}).get("simple") or {}).get("value"), (int, float)))
     return {
         "by_stance": counts,
         "our_own_view": counts.get("independent", 0),
         "with_view": with_view,
-        "headline": f"有我們自己的看法 {counts.get('independent', 0)} 檔／已有判讀 {with_view} 檔",
+        "with_bet": with_bet,
+        "headline": f"有我們自己的看法 {counts.get('independent', 0)} 檔／已有判讀 {with_view} 檔／有賭注 {with_bet} 檔",
         "note": "`independent` 之外的都不是我們的獨立分析：consensus_inverted 是共識反解的佔位、"
                 "company_guidance 是採信公司、undeclared 是還沒宣告。",
     }

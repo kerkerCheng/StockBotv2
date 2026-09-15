@@ -777,6 +777,41 @@ renderer 都還在那個 details 裡。
 
 ---
 
+### 6.10 賭注：variant scenario → payoff（`scenario` overlay，2026-09-15 V0）
+
+**角色一句話：base 回答「市場把 base case 定價成怎樣」，賭注回答「如果我們的差異看法對了，值多少」。**
+兩者並排，差額就是這個賭注本身的價值。
+
+```
+OperatingAssumption／ValuationAssumption ledger（同一本 JSONL，多一個 scenario 欄位：base／variant）
+        │  select_scenario_assumptions：base 的生效假設 ← 同 key 的 variant 生效假設覆蓋（overlay）
+        ▼
+build_fundamental_model(scenario=variant) → build_valuation(scenario=variant) → build_implied_return
+        │  **同一條橋、同一套估值與報酬算術**——差別只在餵進去的假設集合
+        ▼
+PayoffScenarioSection（read model 第 13d 節）→ AnalystView.bet（optional panel）→ APP 結論卡「如果我們的賭注對了」
+```
+
+**四條規則（型別層強制，不是自律）：**
+1. **variant 只能是核心 driver**（`revenue_growth`／`operating_margin_delta`）且 `derivation=independent`：
+   由共識反解或抄公司指引的值結構上不可能與市場不同，寫成 variant 就是把佔位冒充成賭注。
+2. **至少一條 supporting 證據**（calibration 不算）。「如果對了」必須指得出什麼在支撐「對」。
+3. **overlay 不是取代**：base 與 variant 各自獨立選取（各自 as-of／supersede／證據解析），寫入端擋跨 scenario
+   的 supersede。既有紀錄沒有 `scenario` 欄位 → 讀成 base；`scenario` 只在非 base 時參與 content-addressed id，
+   所以**既有 ledger 的每一個 id 一個位元都不變**。
+4. **它是條件句，不是機率加權**：沒有 bull／bear、沒有機率；`PAYOFF_IS_NOT` 逐字寫在 section 裡。
+   沒寫賭注是 optional 缺席（`not_yet_recorded`），readiness 不變差，也不得補一個 bull case。
+
+**為什麼不做成第二本 ledger：** 賭注就是「同一條假設的另一個值」，它的身分（driver／scope／period）與 base 完全相同，
+差的只有值與證據；分成兩本會讓 as-of／supersede／證據解析長出兩份規則（L16）。Abstention 分開是因為它**結構上不能帶值**；
+variant 恰好相反，它就是一個值。
+
+**入口：** `python -m alpha assumptions <T> --add spec.json`（spec 帶 `"scenario": "variant"`；估值假設同）；
+`--list` 以 `〔variant〕` 標記。read model／analyst view／APP 自動長出賭注段，不需要另跑任何東西。
+
+**刻意不做（留給 V1–V4，見 ROADMAP）：** 催化劑連到 variant 假設、gap-closure 時序、`realized` 出口、
+籃子頁與 filter 式首選、variant 收斂納入 outcome。
+
 ## 7. Engine D（Decision Lab）runtime
 
 - Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許

@@ -252,7 +252,15 @@ broad unlevered beta 是主要候選；daily 3x 可投資但維持衛星定位�
 
 **因此資本表達層已整組移除：** `live_supported_range`、`axis_ceiling`、`paper_target`、
 probe cap 與四動作（`NO_ACTION`／`REVIEW`／`TRADE`／`HEDGE`）都不再產生。
-系統終點是**瓶頸度排序**，注意力狀態只剩 `MONITOR`／`REVIEW`。
+~~系統終點是**瓶頸度排序**，注意力狀態只剩 `MONITOR`／`REVIEW`。~~
+**修正（2026-09-15 使用者定案 D1）：籃子層的排序權威仍是瓶頸度排序，但個股頁的中心改為「賭注」**
+——base case（依 09-09 原則收斂到共識的校準基準）照印，旁邊必須答得出**「如果我們的差異看法對了，
+值多少、靠哪幾條假設、各自有什麼證據」**。載體是假設 ledger 的 `scenario=variant` overlay
+（只寫有差異的核心 driver，其餘沿用 base；同一條橋、同一套估值與報酬算術），payoff ＝ variant fair value
+對現價的隱含報酬。**它是條件句不是機率加權**：沒有 bull／bear、沒有機率；每條 variant 假設型別層強制
+independent ＋ 至少一條 supporting 證據（說不出證據的差異是偏差，不是賭注）。**沒寫賭注是 optional 缺席**，
+不讓 readiness 變差、不得補一個 bull case。舊句劃線不刪：安靜消失擋不住下次回填。
+查證：`python -c "import json;d=json.load(open('library/private/app/analyst_view/COHR.json',encoding='utf-8'));b=d['view']['bet'];print(b['status'],[l['key'] for l in b['lines'] if l['role']=='override'])"`
 **outcome 量測改為等權重報酬追蹤**：只記「哪天推薦了這檔、當時股價、之後報酬率」，
 不含部位大小或 NAV 佔比。
 

@@ -148,8 +148,11 @@ def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
 
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(
         encoding="utf-8")
-    # 1 個定義 + 3 個呼叫（列表卡片／頭條／白話頭條）
-    assert source.count("appendReturnBlock") == 4, "有 surface 沒有共用那段判斷"
+    # 1 個定義 + 4 個呼叫（列表卡片／頭條／白話頭條／賭注區塊）。
+    # V0（2026-09-15）：賭注區塊也共用同一段——variant 的 derivation 型別層強制 independent，
+    # 所以那一格傳的是明示的 null stance（沒有「共識反解」這種賭注），不是漏掉判斷。
+    assert source.count("appendReturnBlock") == 5, "有 surface 沒有共用那段判斷"
+    assert "betBlock(view)" in source
     # 列表卡片要看得到 stance，否則 ready 會被讀成「有結論」
     assert "stanceBadge(cardStance)" in source
     # 解釋的那句話要跟大數字在同一張卡

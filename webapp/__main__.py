@@ -211,7 +211,10 @@ def cmd_status(args: argparse.Namespace) -> int:
             "state_missing": missing,
         }, ensure_ascii=False, indent=2))
         return 0
-    print(f"# Materialized Analyst Views（{len(rows)} 份；目錄由 STOCKBOT_APP_ARTIFACT_DIR 決定）")
+    with_bet = sum(1 for _t, payload, _f, _r in rows
+                   if payload is not None and isinstance(
+                       ((payload.get("overview") or {}).get("payoff") or {}).get("simple", {}).get("value"), (int, float)))
+    print(f"# Materialized Analyst Views（{len(rows)} 份；有賭注 {with_bet} 檔；目錄由 STOCKBOT_APP_ARTIFACT_DIR 決定）")
     for ticker, payload, freshness, reason in rows:
         if payload is None or freshness is None:
             print(f"- ✗ {ticker}：{reason}")

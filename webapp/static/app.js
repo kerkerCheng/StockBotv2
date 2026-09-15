@@ -353,6 +353,13 @@ function renderCard(row) {
 
   appendReturnBlock(numbers, '隱含報酬', row.implied_return.simple,
                     row.implied_return.annualized, cardStance, '年化 ');
+  // 賭注（V0）：有寫 variant 才顯示；沒寫就不留白也不補 0——那是「還沒寫賭注」，卡片上不需要一格。
+  const payoff = row.payoff || {};
+  if (payoff.simple && typeof payoff.simple.value === 'number') {
+    numbers.appendChild(numberBlock('賭注對了', fmtPercent(payoff.simple.value),
+      payoff.annualized && typeof payoff.annualized.value === 'number'
+        ? '年化 ' + fmtPercent(payoff.annualized.value) : '', signClass(payoff.simple.value)));
+  }
   card.appendChild(numbers);
 
   const attention = row.primary_attention;
@@ -889,6 +896,88 @@ function conclusionCard(payload, view) {
     box.appendChild(el('span', 'src', '這句話由計算層自己組出，不是本畫面寫的'));
     node.appendChild(box);
   }
+  node.appendChild(betBlock(view));
+  return node;
+}
+
+/* 賭注（V0，2026-09-15）：「如果我們的差異看法對了，值多少」。
+   數字全部照抄 bet panel（variant 那條鏈的輸出）；本畫面不相減、不算年化、不補 bull case。
+   沒寫賭注時印一行「還沒寫」——缺席要現形，而且它是 optional，不影響判讀完不完整。 */
+function betBlock(view) {
+  const panel = view.bet;
+  const meta = plainPanel('bet', panel ? panel.title : '如果我們的賭注對了');
+  const node = el('div', 'bet');
+  node.appendChild(el('div', 'group-title', meta.title));
+  if (!panel) return node;
+  const lines = lineMap(panel);
+  const target = lines.variant_fair_value && lines.variant_fair_value.datum;
+  if (!target || typeof target.value !== 'number') {
+    const box = el('div', 'attention ' + (isSettled(panel.absence_kind) ? 'settled' : 'flags'));
+    const head = el('div', 'attention-head');
+    head.appendChild(document.createTextNode('還沒寫賭注　'));
+    const badge = absenceBadge(panel.absence_kind);
+    if (badge) head.appendChild(badge);
+    box.appendChild(head);
+    box.appendChild(el('div', 'attention-body', panel.reason || meta.hint));
+    node.appendChild(box);
+    return node;
+  }
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+  const numbers = el('div', 'headline-numbers');
+  const currency = target.dependencies ? target.dependencies.currency : null;
+  const valueDate = lines.payoff_value_date && lines.payoff_value_date.datum;
+  numbers.appendChild(numberBlock(plainLine('variant_fair_value'), fmtQuantity(target.value, currency) || '—',
+    valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
+  const ret = lines.payoff_return && lines.payoff_return.datum;
+  const ann = lines.annualized_payoff_return && lines.annualized_payoff_return.datum;
+  appendReturnBlock(numbers, plainLine('payoff_return'), ret, ann, null, '一年約 ');
+  const epsC = lines.payoff_eps_contribution && lines.payoff_eps_contribution.datum;
+  const mulC = lines.payoff_multiple_contribution && lines.payoff_multiple_contribution.datum;
+  if (epsC && typeof epsC.value === 'number' && mulC && typeof mulC.value === 'number') {
+    numbers.appendChild(numberBlock(plainLine('payoff_eps_contribution'), fmtPercent(epsC.value), '', signClass(epsC.value)));
+    numbers.appendChild(numberBlock(plainLine('payoff_multiple_contribution'), fmtPercent(mulC.value), '', signClass(mulC.value)));
+  }
+  const baseRet = lines.base_price_return_for_payoff && lines.base_price_return_for_payoff.datum;
+  if (baseRet && typeof baseRet.value === 'number') {
+    numbers.appendChild(numberBlock(plainLine('base_price_return_for_payoff'), fmtPercent(baseRet.value),
+      '同一條算術，只是假設用 base', signClass(baseRet.value)));
+  }
+  node.appendChild(numbers);
+  // 賭注覆蓋了哪幾條假設：base 值 → variant 值，各自的證據數。這就是「賭的是什麼」。
+  const overrides = (panel.lines || []).filter((line) => line.role === 'override');
+  if (overrides.length) {
+    const list = el('ul', 'weak');
+    overrides.forEach((line) => {
+      const d = line.datum;
+      const deps = d.dependencies || {};
+      const driverLabel = ((VOCAB && VOCAB.plain_driver_labels) || {})[deps.driver] || deps.driver || line.key;
+      const li = el('li');
+      const baseText = typeof deps.base_value === 'number' ? fmtQuantity(deps.base_value, d.unit) : '（base 沒有這一條）';
+      li.appendChild(document.createTextNode(
+        `${driverLabel}［${deps.scope || ''}］：base ${baseText} → 賭注 ${fmtQuantity(d.value, d.unit) || '—'}`));
+      li.appendChild(el('span', 'rule', `${(deps.supporting_refs || []).length} 條 supporting 證據`));
+      if (d.reason) li.appendChild(el('span', 'rule', truncate(d.reason, 160)));
+      list.appendChild(li);
+    });
+    node.appendChild(list);
+  }
+  const one = lines.payoff_one_sentence && lines.payoff_one_sentence.datum;
+  if (one && one.value && one.value.one_sentence) {
+    const box = el('div', 'onesentence', one.value.one_sentence);
+    box.appendChild(el('span', 'src', '這句話由計算層對 variant 自己組出，不是本畫面寫的'));
+    node.appendChild(box);
+  }
+  return node;
+}
+
+function renderBet(view) {
+  const panel = view.bet;
+  const node = panelShell(panel, '賭注的每一格（optional，不影響這份判讀完不完整）');
+  node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
+  node.appendChild(renderRows(panel.lines));
+  if (panel.notes && panel.notes.length) {
+    node.appendChild(group('賭注不是什麼', () => listOf(panel.notes)));
+  }
   return node;
 }
 
@@ -1256,6 +1345,7 @@ async function renderDetail(ticker) {
     () => {
       const box = el('div', 'full-detail');
       box.appendChild(renderHeadline(view));
+      box.appendChild(renderBet(view));
       box.appendChild(renderFundamental(view));
       box.appendChild(renderWhy(view));
       box.appendChild(renderResearch(view));

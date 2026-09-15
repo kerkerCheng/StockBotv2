@@ -75,6 +75,21 @@ def _cell(datum: Mapping[str, Any] | None) -> dict[str, Any]:
             "as_of": datum.get("as_of"), "reason": datum.get("reason")}
 
 
+def _payoff_overview(bet_panel: Mapping[str, Any]) -> dict[str, Any]:
+    """清單卡片要的賭注三格：目標價／payoff／年化，外加 panel 的 status 與缺席語意。純選取。"""
+    lines = _line_map(bet_panel)
+    target = lines.get("variant_fair_value") or {}
+    return {
+        "status": bet_panel.get("status"),
+        "absence_kind": bet_panel.get("absence_kind"),
+        "reason": bet_panel.get("reason"),
+        "override_count": (bet_panel.get("context") or {}).get("override_count"),
+        "variant_target": {**_cell(target), "currency": (target.get("dependencies") or {}).get("currency")},
+        "simple": _cell(lines.get("payoff_return")),
+        "annualized": _cell(lines.get("annualized_payoff_return")),
+    }
+
+
 def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
     """清單卡片的投影。**純選取**——這裡沒有任何算術。"""
     headline = view["headline"]
@@ -101,6 +116,8 @@ def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
                           "value_date": _cell(lines.get("value_date"))},
         "implied_return": {"simple": _cell(lines.get("price_return")),
                            "annualized": _cell(lines.get("annualized_price_return"))},
+        # V0（2026-09-15）賭注：照抄 bet panel（optional）。沒寫賭注就是 missing＋not_yet_recorded，不是 0。
+        "payoff": _payoff_overview(view.get("bet") or {}),
         "readiness": {"state": readiness["state"],
                       "blocker_count": len(readiness.get("blockers") or []),
                       "flag_count": len(readiness.get("flags") or []),

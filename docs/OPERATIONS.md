@@ -910,6 +910,9 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'valuation'
 ```powershell
 # 1) 明示估值假設（session 寫；evidence_refs＝supporting，必須解析到 alpha-card evidence index；共識／市場倍數只能放 calibration_refs）
 python -m alpha valuation COHR --add spec.json      # spec：period_end／value／basis／accounting_basis（gaap|non_gaap）／rationale／evidence_refs／calibration_refs／review_conditions
+# 賭注（V0，2026-09-15）：營運或估值假設的 spec 加 "scenario": "variant" 即成 overlay——只寫有差異的核心 driver，
+# 其餘沿用 base；型別層要求 derivation=independent ＋ 至少一條 supporting。範例：library/private/alpha/specs/cohr_variant_operating_margin.json
+python -m alpha assumptions COHR --add spec.json    # {"scenario":"variant","driver":"operating_margin_delta",...}；--list 以〔variant〕標記
 python -m alpha valuation COHR --list
 python -m alpha valuation COHR --retract va_xxx --rationale "..."
 # 2) 看結果（read model 第 13 節：方法／內部 EPS／假設／fair value／現價／gap／算式／敏感度／認識論分解／refresh state）

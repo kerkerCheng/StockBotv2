@@ -23,7 +23,7 @@ from typing import Any, Mapping, Sequence
 
 from ..contracts import EvidenceRef, content_digest
 from ..errors import ContractViolation
-from .assumptions import select_assumptions
+from .assumptions import select_scenario_assumptions
 from .bridge import build_bridge
 from .compare import (
     compare_metric,
@@ -33,7 +33,7 @@ from .compare import (
     verify_consensus_basis,
 )
 from .contracts import (
-    ASSUMPTION_DRIVERS, AssumptionSelection, ConsensusEstimate, ExpectationComparison,
+    ASSUMPTION_DRIVERS, BASE_SCENARIO, AssumptionSelection, ConsensusEstimate, ExpectationComparison,
     FiscalPeriod, FiscalYearActuals, FundamentalModelResult, GuidanceObservation, ModeledMetric,
     OperatingAssumption, Sensitivity,
 )
@@ -102,10 +102,16 @@ def build_fundamental_model(
     evidence_index: Mapping[str, EvidenceRef],
     parse_errors: Sequence[str] = (),
     target_period: FiscalPeriod | None = None,
+    scenario: str = BASE_SCENARIO,
 ) -> FundamentalModelResult:
-    """一次模型執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。"""
+    """一次模型執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。
+
+    `scenario`（V0，2026-09-15）：`base` 只看 base 假設；`variant` ＝ base 的生效假設被同 key 的
+    variant 假設覆蓋（overlay）。**同一條橋、同一套算術**——差別只在餵進去的假設集合。
+    """
     cutoff = as_of or today
     warnings: list[str] = []
+    overrides: tuple[OperatingAssumption, ...] = ()
 
     # ---- 0. PIT 自我核對：注入的觀測／共識不得晚於 T -------------------------
     if actuals is not None:
@@ -153,9 +159,12 @@ def build_fundamental_model(
 
     # ---- 3. 假設選取 ---------------------------------------------------------
     if target is not None:
-        accepted, selection = select_assumptions(
-            assumption_records, target=target, as_of=as_of, today=today,
+        accepted, selection, overrides = select_scenario_assumptions(
+            assumption_records, scenario=scenario, target=target, as_of=as_of, today=today,
             evidence_index=index, parse_errors=parse_errors)
+        if scenario != BASE_SCENARIO and not overrides:
+            warnings.append(f"scenario={scenario}：沒有任何生效的 {scenario} 假設覆蓋 base——"
+                            "這次執行與 base 完全相同（賭注的 EPS 側還沒寫）")
     else:
         accepted = ()
         selection = AssumptionSelection(
@@ -252,6 +261,7 @@ def build_fundamental_model(
 
     digest = content_digest({
         "company_id": company_id, "ticker": ticker, "as_of": as_of, "target": target,
+        "scenario": scenario,
         "base": actuals.period if actuals else None,
         "assumptions": [a.assumption_id for a in accepted],
         "consensus": [(c.metric, c.period.end, c.value, c.captured_at) for c in usable_consensus],
@@ -265,6 +275,7 @@ def build_fundamental_model(
         consensus=usable_consensus, guidance=usable_guidance, base_actuals=actuals,
         consensus_bases=consensus_bases, digest=digest, warnings=tuple(warnings),
         evidence=tuple({r.ref: r for r in model_evidence}.values()),
+        scenario=scenario, overrides=overrides,
     )
 
 

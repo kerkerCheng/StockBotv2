@@ -27,7 +27,7 @@ from .contracts import (
 )
 
 __all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards", "render_entry_logic_lines",
-           "render_implied_return_lines", "format_datum_value", "format_ratio", "format_scalar",
+           "render_implied_return_lines", "render_payoff_lines", "format_datum_value", "format_ratio", "format_scalar",
            "render_datum_line", "status_label"]
 
 _LEGEND = (
@@ -439,6 +439,9 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # 13a. Base-case implied return（Step 2；`python -m briefing implied-return` 單獨印這一節）
     lines += render_implied_return_lines(view)
 
+    # 13d. Payoff scenario（V0：賭注）
+    lines += render_payoff_lines(view)
+
     # 13b. Not modeled（下檔）
     for title, section in (("13b. 下檔", view.downside),):
         lines += _section(title, section.meta)
@@ -544,6 +547,27 @@ def render_implied_return_lines(view: AlphaInvestmentView) -> list[str]:
     lines.append(_datum_line(ir.epistemics))
     lines.append("implied return 不是什麼：")
     lines += [f"- {markdown_text(x)}" for x in ir.is_not]
+    lines.append("")
+    return lines
+
+
+def render_payoff_lines(view: AlphaInvestmentView) -> list[str]:
+    """第 13d 節（賭注／payoff）。只印 payoff_scenario section 的 Datum；本檔不含公式、不相減。"""
+    lines: list[str] = []
+    ps = view.payoff_scenario
+    lines += _section("13d. 賭注（variant scenario → payoff；「如果我們的差異看法對了」，不是機率加權）", ps.meta)
+    if ps.period:
+        lines.append(f"目標期間：{markdown_text(ps.period)}" + (f"（至 {ps.period_end.isoformat()}）" if ps.period_end else ""))
+    for datum in (ps.scenario, ps.variant_internal_eps, ps.variant_fair_value, ps.value_date, ps.payoff_return,
+                  ps.annualized_payoff_return, ps.eps_contribution, ps.multiple_contribution,
+                  ps.base_fair_value, ps.base_price_return):
+        lines.append(_datum_line(datum))
+    if ps.overrides:
+        lines.append("賭注覆蓋的假設（每條帶 base 對照值）：")
+        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in ps.overrides]
+    lines.append(_datum_line(ps.epistemics))
+    lines.append("payoff 不是什麼：")
+    lines += [f"- {markdown_text(x)}" for x in ps.is_not]
     lines.append("")
     return lines
 

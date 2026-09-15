@@ -68,6 +68,14 @@ def append_assumption_record(record: Mapping[str, Any], *, directory: Path | Non
         raise ContractViolation(f"假設 {parsed.assumption_id} 已在 ledger 中——同內容不得重複 append")
     if parsed.supersedes_id and not any(r.assumption_id == parsed.supersedes_id for r in existing):
         raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不在 ledger 中")
+    if parsed.supersedes_id:
+        # V0：base 與 variant 是兩條鏈。跨 scenario 的 supersede 會讓 variant「關掉」一條 base，
+        # 而 overlay 的語意是覆蓋不是取代——寫入端擋住，選取端才不必猜。
+        target = next(r for r in existing if r.assumption_id == parsed.supersedes_id)
+        if target.scenario != parsed.scenario:
+            raise ContractViolation(
+                f"supersedes_id {parsed.supersedes_id} 屬於 scenario={target.scenario!r}，"
+                f"本筆是 {parsed.scenario!r}——不得跨 scenario supersede（variant 是 overlay，不是取代）")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(dict(record), ensure_ascii=False, sort_keys=True) + "\n")

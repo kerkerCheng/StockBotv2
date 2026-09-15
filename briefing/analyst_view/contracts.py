@@ -48,13 +48,17 @@ QUESTIONS: Mapping[str, str] = {
     "q4_implied_return": "現價對我們的 future target 隱含什麼報酬？",
     "q5_fragile": "哪些假設最脆弱？",
     "q6_change": "什麼 evidence 會改變答案？",
+    # V0（2026-09-15）：投資人的第七問。它是 optional：沒寫賭注不代表研究不完整。
+    "q7_payoff": "如果我們的賭注對了，值多少？",
 }
 
 #: 核心 panel（決定 `readiness`）與 optional panel（**不**決定 readiness）。
 #: 主流程：Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return。
 #: Entry threshold 是 optional analytical capability，刻意不在 CORE_PANELS 裡。
 CORE_PANELS: tuple[str, ...] = ("headline", "fundamental", "why", "research")
-OPTIONAL_PANELS: tuple[str, ...] = ("entry",)
+#: `bet`（V0，2026-09-15）：賭注（variant scenario 的 payoff）。與 entry 同為 optional——
+#: 沒有寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
+OPTIONAL_PANELS: tuple[str, ...] = ("bet", "entry")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -98,6 +102,8 @@ LINE_ROLES = frozenset({
     "score",                   # Q1–Q5
     "lifecycle",               # thesis 狀態／到期／watch
     "entry",                   # optional entry threshold
+    "bet",                     # optional：賭注（variant payoff）那一串數字
+    "override",                # 賭注覆蓋的假設（每條帶 base 對照值）
 })
 
 #: 「為什麼這一格被列進脆弱清單」的封閉字彙。**每一條都是宣告好的列入規則**，
@@ -143,6 +149,9 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
                  "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
     "entry": {"title": "進場門檻（選配）",
               "hint": "你自己設的要求報酬換算成的價格。沒設不代表這檔研究不完整"},
+    "bet": {"title": "如果我們的賭注對了",
+            "hint": "只改我們有差異看法的那幾條假設，其餘沿用 base；算出來的是條件句，不是預測、不是機率加權。"
+                    "沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
 }
 
 #: 逐格標籤的白話版。沒列到的沿用 read model 的 `display_label`（那些多半本來就看得懂）。
@@ -170,6 +179,18 @@ PLAIN_LINE_LABELS: Mapping[str, str] = {
     "required_annualized_return": "要求的年化報酬",
     "entry_price": "換算出來的門檻價",
     "price_to_entry_gap": "現價離門檻價多遠",
+    # V0：賭注
+    "payoff_scenario": "賭注長什麼樣",
+    "variant_internal_eps": "賭注對了的每股盈餘",
+    "variant_fair_value": "賭注對了的目標價",
+    "payoff_value_date": "賭注目標價是哪一天的值",
+    "payoff_return": "從現價到賭注目標價，要漲跌多少",
+    "annualized_payoff_return": "換算成一年多少",
+    "payoff_eps_contribution": "其中：因為賭注的 EPS 比市場共識高或低",
+    "payoff_multiple_contribution": "其中：因為賭注的倍數比市場現在付的高或低",
+    "base_fair_value_for_payoff": "對照：base 目標價",
+    "base_price_return_for_payoff": "對照：base 隱含報酬",
+    "payoff_one_sentence": "一句話說明賭注的數字怎麼來的",
 }
 
 #: 缺席語意的短標籤（畫面寬度用）。完整說明仍是 `ABSENCE_KINDS`，兩者同一個家——
@@ -537,8 +558,11 @@ class AnalystView:
     refresh: RefreshSummary
     limits: tuple[str, ...]
     warnings: tuple[str, ...]
+    #: V0（2026-09-15）：賭注 panel（optional）。放在 headline 之後——投資人看完 base 的數字，
+    #: 下一個問題就是「如果我們對了呢」。沒寫賭注也必須有一個 missing 的 bet panel（缺席要現形）。
+    bet: AnalystPanel
 
-    PANEL_ORDER = ("headline", "fundamental", "why", "research", "entry")
+    PANEL_ORDER = ("headline", "bet", "fundamental", "why", "research", "entry")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

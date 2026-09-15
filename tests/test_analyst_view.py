@@ -174,8 +174,9 @@ def test_missing_entry_criterion_does_not_change_core_readiness() -> None:
     assert with_hurdle.readiness.state == without.readiness.state
     assert with_hurdle.readiness.flags == without.readiness.flags
     assert with_hurdle.readiness.blockers == without.readiness.blockers
-    assert without.readiness.optional_unavailable == ("entry：missing",)
-    assert with_hurdle.readiness.optional_unavailable == ()
+    # V0（2026-09-15）：bet 也是 optional；沒寫賭注時它與 entry 一樣只在 optional 欄現形
+    assert without.readiness.optional_unavailable == ("bet：missing", "entry：missing")
+    assert with_hurdle.readiness.optional_unavailable == ("bet：missing",)   # fixture 沒寫賭注
     # 核心四段的 status 一格不動
     assert ({p: getattr(with_hurdle, p).status for p in CORE_PANELS}
             == {p: getattr(without, p).status for p in CORE_PANELS})
@@ -379,7 +380,7 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     assert text == json.dumps(second, ensure_ascii=False, sort_keys=True)
     assert json.loads(text) == first                            # null 保留為 null
     assert first["schema_version"] == SCHEMA_VERSION
-    assert first["panel_order"] == list(("headline", "fundamental", "why", "research", "entry"))
+    assert first["panel_order"] == list(("headline", "bet", "fundamental", "why", "research", "entry"))
     assert set(first["questions"]) == set(QUESTIONS)
 
 

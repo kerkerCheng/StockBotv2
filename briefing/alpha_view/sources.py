@@ -179,7 +179,7 @@ def _causal_inputs(graph: Any, company_id: CompanyId, *, as_of: date | None, tod
 
 def _fundamental_model(
     build: ContextBuild, fundamentals_provider: Any, ticker: Ticker, company_id: CompanyId,
-    *, as_of: date | None, today: date, actuals_override: Any = None,
+    *, as_of: date | None, today: date, actuals_override: Any = None, scenario: str = "base",
 ) -> tuple[FundamentalModelResult | None, str | None, list[Any]]:
     """Causal Fundamental Model 的取數與執行（Phase 2）。
 
@@ -218,6 +218,7 @@ def _fundamental_model(
             interim_results=interim,
             assumption_records=records, parse_errors=parse_errors,
             evidence_index={ref.ref: ref for ref in build.context.evidence_refs},
+            scenario=scenario,
         )
     except Exception as exc:  # noqa: BLE001 — 模型失敗只讓該區 missing，不讓整份 view 失敗
         return None, f"fundamental model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
@@ -240,7 +241,7 @@ def _read_abstentions(ticker: str) -> list[Any]:
 def _valuation_model(
     build: ContextBuild, fundamental_model: FundamentalModelResult | None, fundamental_reason: str | None,
     ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date,
-    identity: Mapping[str, Any],
+    identity: Mapping[str, Any], scenario: str = "base",
 ) -> tuple[ValuationResult | None, str | None, list[Any]]:
     """Valuation Model v1（Step 1）的取數與執行。
 
@@ -265,6 +266,7 @@ def _valuation_model(
         fundamental=fundamental_model, fundamental_reason=fundamental_reason,
         assumption_records=records, parse_errors=parse_errors, abstention_records=abstentions,
         evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price, balance=balance,
+        scenario=scenario,
     )
     method, method_conflict = _select_method(records)
     if method_conflict is not None:
@@ -563,6 +565,25 @@ def fetch_alpha_investment_view(
             identity=identity, sandbox_hurdle=sandbox_hurdle)
         reverse_model, reverse_reason = _reverse_bridge_model(
             fundamental_model, valuation_model, resolved_ticker, company_id, as_of=as_of)
+        # ---- V0（2026-09-15）賭注：variant scenario 走**同一條**鏈再跑一次 ---------------------------
+        # 只在任一本 ledger 有未撤回的 variant 紀錄時才跑；沒有就明說「賭注還沒寫」（不是 0）。
+        variant_fundamental = variant_valuation = variant_implied = None
+        variant_reason: str | None = None
+        variant_kind: str | None = None
+        has_variant = any(getattr(r, "scenario", "base") == "variant" and not getattr(r, "retracted", False)
+                          for r in [*records, *valuation_records])
+        if has_variant:
+            variant_fundamental, v_f_reason, _ = _fundamental_model(
+                build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today, scenario="variant")
+            variant_valuation, v_v_reason, _ = _valuation_model(
+                build, variant_fundamental, v_f_reason, resolved_ticker, company_id, as_of=as_of, today=today,
+                identity=identity, scenario="variant")
+            variant_implied, variant_reason, _ = _implied_return_model(
+                build, variant_valuation, v_v_reason, resolved_ticker, company_id, as_of=as_of, today=today,
+                identity=identity, fundamental_model=variant_fundamental, fundamentals_provider=fundamentals_provider)
+        else:
+            variant_reason = "尚未寫入任何 variant 假設——賭注還沒寫（不是 0）"
+            variant_kind = "not_yet_recorded"
         # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
         refresh_changes = None
         metric_observations: list[Any] = []
@@ -651,6 +672,8 @@ def fetch_alpha_investment_view(
         abstention_records=_read_abstentions(str(resolved_ticker)),
         metric_observations=metric_observations, change_detection=detection,
         refresh_notes=refresh_notes,
+        variant_fundamental=variant_fundamental, variant_valuation=variant_valuation,
+        variant_implied_return=variant_implied, variant_reason=variant_reason, variant_absence_kind=variant_kind,
     )
 
 

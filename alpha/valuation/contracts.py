@@ -279,6 +279,8 @@ class ValuationAssumption:
     #: 17.47%**，而原本那筆的隱含報酬 −18.82% 有 93% 是這個偏差。3363.TWO 同時量到 +0.88%（無害）。
     #: 所以這一格不是 metadata，是**讓那個錯誤不可能發生**的輸入（modelue 側會比對並拒絕）。
     calibration_shares: float | None = None
+    #: V0（2026-09-15）：base 或 variant（賭注的 overlay）。舊行讀成 `base`。
+    scenario: str = "base"
 
     def __post_init__(self) -> None:
         _nonempty(self.assumption_id, "ValuationAssumption.assumption_id")
@@ -369,6 +371,19 @@ class ValuationAssumption:
 
         if any(not isinstance(c, ReviewCondition) for c in self.review_conditions):
             raise ContractViolation("review_conditions 每一項必須是 ReviewCondition")
+        from ..fundamental.contracts import ASSUMPTION_SCENARIOS, VARIANT_SCENARIO
+
+        if self.scenario not in ASSUMPTION_SCENARIOS:
+            raise ContractViolation(f"scenario 未登記：{self.scenario!r}；已知 {ASSUMPTION_SCENARIOS}")
+        if self.scenario == VARIANT_SCENARIO and not self.retracted:
+            # 賭注的倍數必須是我們自己的 re-rating 主張（2026-09-09 原則：說不出證據的折溢價是偏差）。
+            # 「抄市場」的倍數寫成 variant 沒有意義——它結構上等於 base 的校準值。
+            if self.derivation != "independent":
+                raise ContractViolation(
+                    f"variant 估值假設的 derivation 必須是 independent（收到 {self.derivation!r}）——"
+                    "抄市場的倍數不是賭注")
+            if not self.supporting_refs:
+                raise ContractViolation("variant 估值假設至少要有一條 supporting evidence（re-rating 的證據）")
 
     # ---- 與 OperatingAssumption 同形的介面（讓 select_assumptions／refresh 攤平器可以共用）----
     @property

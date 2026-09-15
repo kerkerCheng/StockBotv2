@@ -343,6 +343,39 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
+def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
+    """賭注（optional）：variant scenario 的 payoff。**每一格都是 read model 的同一個 Datum**，本層不算。"""
+    ps = view.payoff_scenario
+    lines = (
+        _line("payoff_scenario", ps.scenario.label, ps.scenario, "bet"),
+        _line("variant_internal_eps", ps.variant_internal_eps.label, ps.variant_internal_eps, "bet"),
+        _line("variant_fair_value", ps.variant_fair_value.label, ps.variant_fair_value, "bet"),
+        _line("payoff_value_date", ps.value_date.label, ps.value_date, "bet"),
+        _line("payoff_return", ps.payoff_return.label, ps.payoff_return, "bet"),
+        _line("annualized_payoff_return", ps.annualized_payoff_return.label, ps.annualized_payoff_return, "bet"),
+        _line("payoff_eps_contribution", ps.eps_contribution.label, ps.eps_contribution, "bet"),
+        _line("payoff_multiple_contribution", ps.multiple_contribution.label, ps.multiple_contribution, "bet"),
+        _line("base_fair_value_for_payoff", ps.base_fair_value.label, ps.base_fair_value, "bet"),
+        _line("base_price_return_for_payoff", ps.base_price_return.label, ps.base_price_return, "bet"),
+        _line("payoff_one_sentence", "一句話（authority 自組）", ps.epistemics, "bet"),
+    ) + _lines(ps.overrides, "override")
+    return AnalystPanel(
+        key="bet", title="賭注：如果我們的差異看法對了（optional）",
+        questions=("q7_payoff",),
+        status=ps.meta.status, optional=True,
+        source_sections=("payoff_scenario",), source_statuses={"payoff_scenario": ps.meta.status},
+        source_absence_kinds=_absence_kinds(payoff_scenario=ps.meta),
+        lines=lines, notes=ps.is_not,
+        evidence=_evidence_for(view, ps.overrides),
+        context={"capability": ps.meta.capability, "period": ps.period, "period_end": ps.period_end,
+                 "available": ps.meta.status not in VALUELESS_STATUSES,
+                 "override_count": len(ps.overrides),
+                 "optional_rule": "賭注是 optional：沒寫 variant 假設只表示「還沒寫賭注」，不代表這檔研究不完整，"
+                                  "也不得補一個 bull case；每條 variant 假設必須指得出 supporting 證據"},
+        reason=ps.meta.reason,
+    )
+
+
 def _entry_panel(view: AlphaInvestmentView) -> AnalystPanel:
     el = view.entry_logic
     lines = (
@@ -380,7 +413,7 @@ _READINESS_RULE = (
     "全部有內容（available／partial）＝ready；"
     "有內容但至少一段被標為 stale／review_required／not_applicable＝ready_with_flags；"
     "至少一段缺內容（missing／invalidated／not_modeled／insufficient_evidence）＝blocked。"
-    "**optional panel（entry）一律不參與**——沒有 entry criterion 不會讓 readiness 變差。"
+    "**optional panel（bet／entry）一律不參與**——沒有賭注、沒有 entry criterion 都不會讓 readiness 變差。"
 )
 
 
@@ -424,6 +457,7 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     everything += list(view.implied_return.is_not)
     everything += list(view.valuation.gap_is_not)
     everything += list(view.entry_logic.is_not)
+    everything += list(view.payoff_scenario.is_not)
     everything += list(view.downside.not_to_be_confused_with)
     return tuple(dict.fromkeys(everything))
 
@@ -436,6 +470,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         "why": _why_panel(view),
         "research": _research_panel(view),
         "entry": _entry_panel(view),
+        "bet": _bet_panel(view),
     }
     rs = view.refresh_status
     ident = view.identity
@@ -445,7 +480,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         as_of=ident.as_of, point_in_time_mode=ident.point_in_time_mode,
         generated_on=ident.generated_on, research_context_digest=ident.research_context_digest,
         headline=panels["headline"], fundamental=panels["fundamental"], why=panels["why"],
-        research=panels["research"], entry=panels["entry"],
+        research=panels["research"], entry=panels["entry"], bet=panels["bet"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),
                                change_detection=rs.change_detection,

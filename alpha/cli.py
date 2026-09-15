@@ -221,6 +221,8 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
                     # v3：這個值是怎麼決定的。spec 沒給就在 assumption_record 被拒——
                     # 未宣告不會被當成 independent（那會把佔位冒充成主張）。
                     derivation=spec.get("derivation"),
+                    # V0：base（預設）或 variant（賭注的 overlay；三條規則由型別層擋）。
+                    scenario=str(spec.get("scenario") or "base"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 假設不合法：{exc}", file=sys.stderr)
@@ -266,6 +268,7 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
     print(f"# {ticker} OperatingAssumption ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
     for r in records:
         mark = "（已撤回）" if r.retracted else ""
+        mark += "" if r.scenario == "base" else f"〔{r.scenario}〕"
         print(f"- {r.assumption_id} {r.period.label} {r.driver}[{r.scope}] = {r.value} {r.unit}"
               f" 〔{r.basis}｜{r.accounting_basis}〕 created {r.created_at.date()}{mark}")
         print(f"    {r.rationale[:160]}")
@@ -324,6 +327,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
                     derivation=spec.get("derivation"),
                     value_date_convention=spec.get("value_date_convention"),
                     calibration_shares=spec.get("calibration_shares"),
+                    scenario=str(spec.get("scenario") or "base"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 估值假設不合法：{exc}", file=sys.stderr)
@@ -370,6 +374,7 @@ def cmd_valuation(args: argparse.Namespace) -> int:
     print(f"# {ticker} ValuationAssumption ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
     for r in records:
         mark = "（已撤回）" if r.retracted else ""
+        mark += "" if r.scenario == "base" else f"〔{r.scenario}〕"
         print(f"- {r.assumption_id} {r.period.label} {r.method}.{r.parameter} = {r.value} {r.unit}"
               f" 〔{r.basis}｜{r.accounting_basis}〕 created {r.created_at.date()}{mark}")
         print(f"    {r.rationale[:160]}")

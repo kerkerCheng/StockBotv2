@@ -181,11 +181,16 @@ def build_valuation(
     method: str = "forward_earnings_multiple",
     abstention_records: Sequence[Abstention] = (),
     balance: Any = None,
+    scenario: str = "base",
 ) -> ValuationResult:
     """一次估值執行。任何一段缺料都以 `missing`＋理由現形，不讓整體失敗、也不補預設值。
 
     `balance`（`BalanceSheetInput`）只給 `ev_to_sales` 換每股用；本益比法不讀它。
+    `scenario`（V0）：variant 時，variant 的估值假設覆蓋同 key 的 base；沒有就沿用 base 的倍數。
     """
+    if fundamental is not None and fundamental.scenario != scenario:
+        raise ValueError(f"fundamental model 是 scenario={fundamental.scenario!r}，估值要求 {scenario!r}——"
+                         "賭注的倍數不得乘在 base 的 EPS 上（反之亦然）")
     if method not in VALUATION_METHODS:
         raise ValueError(f"valuation method 未登記：{method!r}；已知 {VALUATION_METHODS}")
     metric_name, _unit = METHOD_FUNDAMENTAL_INPUT[method]
@@ -243,7 +248,7 @@ def build_valuation(
     if target is not None:
         accepted, selection = select_valuation_assumptions(
             assumption_records, target=target, as_of=as_of, today=today,
-            evidence_index=index, parse_errors=parse_errors)
+            evidence_index=index, parse_errors=parse_errors, scenario=scenario)
     else:
         accepted = ()
         selection = AssumptionSelection(

@@ -216,19 +216,23 @@ def assumption_changes(
         return value.isoformat() if isinstance(value, date) else f"{value:g}"
 
     ordered = sorted(records, key=lambda r: (r.created_at, r.assumption_id))
-    latest_before: dict[tuple[str, str, date], str] = {}
+    # V0（2026-09-15）：scenario 進 key。variant 是 base 的 overlay，不是 base 的下一版——
+    # 少了這一格，一條新寫的 variant 會被當成「取代」同 key 的 base 假設，把 base 的成果誤標 superseded。
+    latest_before: dict[tuple[str, str, str, date], str] = {}
     out: list[ChangeEvent] = []
     for record in ordered:
-        key = (record.driver, record.scope, record.period.end)
+        scenario = str(getattr(record, "scenario", "base") or "base")
+        key = (scenario, record.driver, record.scope, record.period.end)
         predecessor = record.supersedes_id or latest_before.get(key)
         if record.created_at > since:
             kind = "撤回" if record.retracted else ("取代" if predecessor else "新增")
+            tag = "" if scenario == "base" else f"〔{scenario}〕"
             out.append(ChangeEvent(
                 change_type=change_type, ticker=ticker, company_id=company_id, authority=authority,
                 changed_ref=record.assumption_id, observed_at=record.created_at,
                 effective_at=record.period.end, new_version=_value_text(record.value),
                 old_version=None, material_fields=(record.driver, record.scope),
-                detail=f"{kind}假設 {record.driver}[{record.scope}] {record.period.label} = {_value_text(record.value)}（{record.basis}）",
+                detail=f"{kind}假設{tag} {record.driver}[{record.scope}] {record.period.label} = {_value_text(record.value)}（{record.basis}）",
                 related_refs=((predecessor,) if predecessor else ())))
         latest_before[key] = record.assumption_id
     return out

@@ -246,6 +246,21 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
 
     # ---- 基本面（Q1／Q2／Q3）---------------------------------------------
     fund = view.fundamental
+    # ---- 賭注（optional；V0）---------------------------------------------
+    bet = view.bet
+    lines += [f"## 賭注 — {QUESTIONS['q7_payoff']}（optional）", ""]
+    if bet.context.get("available"):
+        lines.append(
+            f"賭注目標價 **{_slot(bet, 'variant_fair_value')}** → **{_slot(bet, 'payoff_return')}** simple ／ "
+            f"**{_slot(bet, 'annualized_payoff_return')}** 年化｜其中 EPS 差異 **{_slot(bet, 'payoff_eps_contribution')}**"
+            f"／倍數差異 **{_slot(bet, 'payoff_multiple_contribution')}**"
+            f"｜對照 base：目標價 {_slot(bet, 'base_fair_value_for_payoff')}、報酬 {_slot(bet, 'base_price_return_for_payoff')}")
+        lines += ["", "賭注覆蓋的假設（每條帶 base 對照值）：", ""]
+        lines += _compact_table(_by_role(bet, "override"))
+    else:
+        lines += [f"**Not set (optional)** — {markdown_text(bet.reason or '尚未寫入任何 variant 假設')}", ""]
+    lines += [f"- {markdown_text(bet.context.get('optional_rule') or '')}", ""]
+
     lines += [f"## 1. {QUESTIONS['q1_internal']}（Internal forecast）", "",
               f"- {_context_line(fund.context, 'period', 'period_end', 'base_period_end', 'accounting_basis') or '目標期間未知'}",
               ""]
