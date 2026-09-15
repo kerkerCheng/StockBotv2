@@ -1360,12 +1360,12 @@ function priceScale(v, ctx, sellSide) {
     svg.appendChild(svgEl('rect', { x: x(ctx.low), y: yAxis - 6, width: Math.max(2, x(ctx.high) - x(ctx.low)), height: 12,
       rx: 6, class: 'scale-band' }));
   }
-  // 同側的標籤依 x 排序後交錯兩層，避免疊字。
+  // 同側的標籤交錯兩層避免疊字：層數＝同側比自己小的點有幾個（奇偶）。不排序——APP 不得對任何列 .sort。
   ['above', 'below'].forEach((side) => {
-    const group = marks.filter((m) => m.side === side).sort((a, b) => (a.value < b.value ? -1 : 1));
-    group.forEach((m, i) => {
+    const group = marks.filter((m) => m.side === side);
+    group.forEach((m) => {
       const cx = x(m.value);
-      const level = i % 2;
+      const level = group.filter((o) => o.value < m.value).length % 2;
       const yLabel = side === 'above' ? (yAxis - 22 - level * 20) : (yAxis + 30 + level * 20);
       svg.appendChild(svgEl('line', { x1: cx, x2: cx, y1: side === 'above' ? yLabel + 4 : yAxis, y2: side === 'above' ? yAxis : yLabel - 12, class: 'scale-stem' }));
       svg.appendChild(svgEl('circle', { cx: cx, cy: yAxis, r: m.kind === 'range' ? 3.5 : 6, class: 'scale-pt pt-' + m.kind }));
