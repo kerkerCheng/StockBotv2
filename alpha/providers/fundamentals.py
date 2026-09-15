@@ -293,6 +293,39 @@ class EngineCFundamentalsProvider:
         return shares or None
 
     # ---- Causal Fundamental Model 的三個唯讀入口（Phase 2，2026-09-05）------------
+    def fiscal_consensus_history(
+        self, ticker: Ticker | None, *, metric: str, period_end: date, as_of: date | None = None,
+    ) -> tuple[tuple[tuple[date, float, int | None], ...], str | None]:
+        """某一會計期間的共識**時序**（V2 gap closure）：每個抓取日一筆 `(bar_date, estimate_avg, analyst_count)`，
+        身分是 `fiscal_period_end`。同一天多筆取最晚 fetched。取不到回空 tuple ＋原因。"""
+        if ticker is None:
+            return (), "未上市，無共識資料"
+        cur = self._cursor()
+        sql = ("SELECT COALESCE(bar_date, snapshot_date) AS day, estimate_avg, analyst_count, fetched_at "
+               "FROM consensus_estimates WHERE ticker = ? AND metric = ? AND fiscal_period_end = ? "
+               "{cut} ORDER BY day ASC, fetched_at ASC")
+        params: list[Any] = [str(ticker), str(metric), period_end.isoformat()]
+        if as_of is not None:
+            sql = sql.format(cut="AND COALESCE(bar_date, snapshot_date) <= ? ")
+            params.append(as_of.isoformat())
+        else:
+            sql = sql.format(cut="")
+        try:
+            cur.execute(sql, params)
+            rows = [dict(r) for r in cur.fetchall()]
+        except Exception as exc:  # noqa: BLE001
+            return (), f"consensus_estimates 讀取失敗：{type(exc).__name__}"
+        by_day: dict[date, tuple[date, float, int | None]] = {}
+        for row in rows:
+            day = _as_date(row.get("day"))
+            value = _num(row.get("estimate_avg"))
+            if day is None or value is None:
+                continue
+            by_day[day] = (day, value, _int(row.get("analyst_count")))     # 同一天後 fetched 者覆蓋
+        if not by_day:
+            return (), "這個期間沒有共識抓取紀錄"
+        return tuple(by_day[d] for d in sorted(by_day)), None
+
     def fiscal_consensus(
         self, ticker: Ticker | None, *, as_of: date | None = None
     ) -> tuple[tuple[ConsensusEstimate, ...], str | None]:

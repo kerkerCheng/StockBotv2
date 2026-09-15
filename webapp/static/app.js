@@ -1309,6 +1309,12 @@ function briefCard(payload, view) {
     const badge = el('span', 'badge badge-light light-' + (light.value.state || 'unknown'), light.value.label);
     node.appendChild(badge);
   }
+  // V2：目標價到了（沒賭對／賭對）→ 一個徽章。到達＝該重看要不要收割，不是賣出指令。
+  const reached = view.headline && lineMap(view.headline).target_reached;
+  const rv = reached && reached.datum && reached.datum.value;
+  if (rv && rv.any_reached) {
+    node.appendChild(el('span', 'badge badge-flags', rv.bet_reached ? '現價高於賭對的目標價' : '現價高於沒賭對的目標價'));
+  }
   if (panel && panel.context && panel.context.available) {
     const story = el('div', 'story');
     (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0).forEach((line) => {

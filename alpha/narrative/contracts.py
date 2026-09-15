@@ -104,6 +104,7 @@ PLACEHOLDERS: Mapping[str, str] = {
     "value_date": "目標價是哪一天的值",
     "next_checkpoint_date": "最近的檢核點／催化劑日期",
     "ripeness": "熟成度：已裁決／有指名假設的催化劑數（V1；沒有連結時印「（尚無）」）",
+    "gap_closure": "市場承認了嗎：自判斷日以來共識每股盈餘的移動（V2）",
 }
 #: 帶參數的 placeholder：`{assumption:driver[scope]}`（base 值）／`{bet_assumption:driver[scope]}`（variant 值）。
 PARAM_PLACEHOLDER = re.compile(r"\{(assumption|bet_assumption):([a-z_]+)\[([^\]{}]+)\]\}")

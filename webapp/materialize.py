@@ -135,6 +135,9 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         "brief": _brief_overview(view.get("brief") or {}),
         # R4（2026-09-15）：清單卡片的尺縮圖要的兩樣：分析師平均目標價（Engine C 快照）與最近交易日區間。
         "sell_side_target": _cell(fundamental_lines.get("target_mean")),
+        # V2：市場承認了嗎／目標價到了沒（照抄）
+        "gap_closure": _cell(fundamental_lines.get("gap_closure")),
+        "target_reached": _cell(lines.get("target_reached")),
         # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）
         "ripeness": _cell(_line_map(view.get("research") or {}).get("catalyst_quantitative_link")),
         "price_context": dict(price_context) if price_context else None,

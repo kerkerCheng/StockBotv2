@@ -22,7 +22,7 @@ base-case implied return（2026-09-06 Step 2）與 entry logic（2026-09-06 Step
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace as _dc_replace
 from datetime import date
 from typing import Any, Mapping, Sequence
 
@@ -47,9 +47,10 @@ from alpha.valuation.contracts import ValuationAssumption, ValuationResult
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
+from alpha.gap_closure import consensus_progress, target_reached
 from alpha.narrative import ABSENT, SLOT_LABELS, fill_brief, format_value, select_brief
 from alpha.narrative.argument import (
-    bet_paragraph, chain_paragraph, market_paragraph, numbers_paragraph, timeline_paragraph,
+    bet_paragraph, chain_paragraph, closure_phrase, market_paragraph, numbers_paragraph, timeline_paragraph,
 )
 from briefing.analyst_view.contracts import PLAIN_DRIVER_LABELS, PLAIN_REFRESH_OVERALL
 
@@ -1173,7 +1174,8 @@ BRIEF_IS_NOT: tuple[str, ...] = (
 
 
 def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection,
-                  catalysts: CatalystSection, bridge: EarningsBridgeSection, today: date) -> dict[str, str | None]:
+                  catalysts: CatalystSection, bridge: EarningsBridgeSection, today: date,
+                  gap: ExpectationGapSection | None = None) -> dict[str, str | None]:
     """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。"""
     price = ir.current_price
     unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
@@ -1208,6 +1210,9 @@ def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, co
     ql = catalysts.quantitative_link.value if isinstance(catalysts.quantitative_link.value, Mapping) else None
     counts = ql.get("counts") if ql else None
     values["ripeness"] = (f"{counts['resolved']}／{counts['linked']}" if counts and counts.get("linked") else None)
+    closure_value = (gap.gap_closure.value if gap is not None and gap.gap_closure is not None
+                     and isinstance(gap.gap_closure.value, Mapping) else None)
+    values["gap_closure"] = closure_phrase(closure_value)
     # 帶參數的 placeholder：base 假設值與賭注假設值（key 形狀分別是 assumption:driver:scope／override:driver[scope]）
     for datum in bridge.assumptions:
         parts = datum.key.split(":", 2)
@@ -1227,7 +1232,7 @@ def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, co
 def _investor_brief_section(
     records: Sequence[Any], parse_errors: Sequence[str], *, as_of: date | None, today: date, reference_day: date,
     ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection, catalysts: CatalystSection,
-    bridge: EarningsBridgeSection, refresh_overall: str,
+    bridge: EarningsBridgeSection, refresh_overall: str, gap: ExpectationGapSection | None = None,
 ) -> InvestorBriefSection:
     price = ir.current_price
     unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
@@ -1252,7 +1257,7 @@ def _investor_brief_section(
         slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
                       for key, label in SLOT_LABELS.items())
         return InvestorBriefSection(meta=meta, slots=slots, scale=scale, status_light=light, brief_id=None, is_not=BRIEF_IS_NOT)
-    values = _brief_values(ir=ir, payoff=payoff, consensus=consensus, catalysts=catalysts, bridge=bridge, today=today)
+    values = _brief_values(ir=ir, payoff=payoff, consensus=consensus, catalysts=catalysts, bridge=bridge, today=today, gap=gap)
     filled, absent = fill_brief(brief, values)
     slots: list[Datum] = []
     for slot in brief.slots:
@@ -1375,10 +1380,11 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
     attribution = ir.attribution.value if isinstance(ir.attribution.value, Mapping) else {}
     val_assumption = next((d for d in valuation.assumptions if d.is_known), None)
     reverse = gap.reverse_bridge.value if gap.reverse_bridge is not None and isinstance(gap.reverse_bridge.value, Mapping) else None
+    closure = gap.gap_closure.value if gap.gap_closure is not None and isinstance(gap.gap_closure.value, Mapping) else None
     _para("market", market_paragraph(
         comparisons=comparisons, market_multiple=attribution.get("market_multiple_on_consensus"),
         our_multiple=val_assumption.value if val_assumption else None,
-        multiple_rationale=None, reverse=reverse, driver_labels=PLAIN_DRIVER_LABELS),
+        multiple_rationale=None, reverse=reverse, driver_labels=PLAIN_DRIVER_LABELS, closure=closure),
         long_form=[{"title": "目標倍數的理由", "text": val_assumption.reason}] if val_assumption and val_assumption.reason else [],
         why="還沒有內部預測或共識，沒有可比的東西")
 
@@ -1407,7 +1413,8 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
         checkpoints=[{"date": c.date, "what": c.what, "decides": c.decides} for c in catalysts.checkpoints],
         catalysts=[{"expected_at": c.expected_at, "description": c.description, "state": c.state}
                    for c in catalysts.structured],
-        value_date=ir.value_date.value, horizon_end=ir.horizon.value, thesis_next_check=lifecycle.thesis_next_check),
+        value_date=ir.value_date.value, horizon_end=ir.horizon.value, thesis_next_check=lifecycle.thesis_next_check,
+        reached=(ir.target_reached.value if ir.target_reached is not None and isinstance(ir.target_reached.value, Mapping) else None)),
         basis="session_judgment")
 
     known = [p for p in paragraphs if p.is_known]
@@ -1839,6 +1846,7 @@ def build_alpha_investment_view(
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
     narrative_context: Mapping[str, Any] | None = None,
+    consensus_history: Sequence[tuple[date, float, Any]] = (),
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。
 
@@ -2630,6 +2638,33 @@ def build_alpha_investment_view(
         gap_basis, gap_authority = "heuristic_proxy", A_IMPLIED
     else:
         gap_basis, gap_authority = "none", A_IMPLIED
+    # ---- V2 gap closure：共識朝我們移了幾成（起算日＝判斷日；量測不是訊號）------------------------
+    points = [(d, float(v)) for d, v, _n in consensus_history]
+    base_eps_value = (fundamental_model.metrics["eps"].value
+                      if fundamental_model is not None and fundamental_model.metrics.get("eps") is not None else None)
+    variant_eps_value = (variant_fundamental.metrics["eps"].value
+                         if variant_fundamental is not None and variant_fundamental.metrics.get("eps") is not None else None)
+    progress_base = consensus_progress(points, since=judged_on, our_value=base_eps_value)
+    progress_variant = consensus_progress(points, since=judged_on, our_value=variant_eps_value) if variant_eps_value is not None else None
+    if progress_base.get("status") == "available":
+        gap_closure_datum = Datum(
+            key="gap_closure", label="市場承認了嗎：自判斷日以來共識朝我們移了幾成",
+            value={"base": progress_base, "variant": progress_variant, "since": judged_on},
+            status="available", basis="deterministic", authority=A_CONSENSUS_FY, as_of=today,
+            method=progress_base["rule"],
+            reason=("量測不是訊號：只回答共識與我們的差距縮小了多少；不排序、不決定尺寸"
+                    + ("；判斷日未知，起點取序列第一筆" if judged_on is None else "")))
+    else:
+        gap_closure_datum = missing("gap_closure", "市場承認了嗎：自判斷日以來共識朝我們移了幾成",
+                                    progress_base.get("reason") or "沒有共識序列", authority=A_CONSENSUS_FY)
+    consensus_series_datum = (
+        Datum(key="consensus_series", label="目標期間共識 EPS 的抓取時序", status="available", basis="observation",
+              authority=A_CONSENSUS_FY, as_of=today, unit="currency_per_share",
+              value=[{"date": d, "value": v, "analyst_count": n} for d, v, n in consensus_history],
+              reason=f"{len(consensus_history)} 個抓取日；身分是 fiscal_period_end，不是 +1y 標籤")
+        if consensus_history else
+        missing("consensus_series", "目標期間共識 EPS 的抓取時序", "consensus_estimates 沒有這個期間的時序", authority=A_CONSENSUS_FY))
+
     expectation_gap_section = ExpectationGapSection(
         meta=SectionMeta(
             status=((q4.status if q4.status in ("stale", "review_required", "invalidated") else "partial")
@@ -2660,6 +2695,7 @@ def build_alpha_investment_view(
                                       multiple_derivation=(valuation.multiple_derivation
                                                            if valuation is not None else None)),
         multiple_derivation=_multiple_derivation_datum(valuation, reference_day=today),
+        gap_closure=gap_closure_datum, consensus_series=consensus_series_datum,
     )
 
     # =======================================================================
@@ -3037,6 +3073,15 @@ def build_alpha_investment_view(
         warnings.append(ENTRY_EPISTEMIC_WARNING)
     if payoff_section.payoff_return.is_known:
         warnings.append(PAYOFF_EPISTEMIC_WARNING)
+    reached = target_reached(price=implied_return_section.current_price.value,
+                             base_target=implied_return_section.fair_value.value,
+                             bet_target=payoff_section.variant_fair_value.value)
+    implied_return_section = _dc_replace(implied_return_section, target_reached=(
+        Datum(key="target_reached", label="目標價到了沒（到達＝該重看要不要收割）", value=reached, status="available",
+              basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day, method=reached["rule"],
+              reason="機械比較：現價 ≥ 目標價；它不是賣出指令，是 L7 出場的對稱面（對了也要有觸發）")
+        if reached.get("status") == "available" else
+        missing("target_reached", "目標價到了沒", reached.get("reason") or "無現價", authority=A_IMPLIED_RETURN)))
     argument_section = _argument_section(
         company_label=identity_section.company_label, company_id=identity_section.company_id,
         structural=structural_section, bridge=earnings_bridge_section,
@@ -3047,7 +3092,7 @@ def build_alpha_investment_view(
     brief_section = _investor_brief_section(
         brief_records, brief_parse_errors, as_of=context.as_of, today=today, reference_day=reference_day,
         ir=implied_return_section, payoff=payoff_section, consensus=consensus_section, catalysts=catalyst_section,
-        bridge=earnings_bridge_section, refresh_overall=refresh_section.overall)
+        bridge=earnings_bridge_section, refresh_overall=refresh_section.overall, gap=expectation_gap_section)
 
     return AlphaInvestmentView(
         schema_version=SCHEMA_VERSION,

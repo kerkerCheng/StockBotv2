@@ -566,6 +566,15 @@ def fetch_alpha_investment_view(
             identity=identity, sandbox_hurdle=sandbox_hurdle)
         reverse_model, reverse_reason = _reverse_bridge_model(
             fundamental_model, valuation_model, resolved_ticker, company_id, as_of=as_of)
+        # ---- V2（2026-09-15）gap closure：目標期間的共識 EPS 時序。provider 沒這能力就空。
+        consensus_history: tuple = ()
+        fetch_history = getattr(fundamentals_provider, "fiscal_consensus_history", None)
+        if callable(fetch_history) and fundamental_model is not None and fundamental_model.target_period is not None:
+            try:
+                consensus_history, _history_reason = fetch_history(
+                    resolved_ticker, metric="eps", period_end=fundamental_model.target_period.end, as_of=as_of)
+            except Exception:  # noqa: BLE001 — 拿不到時序只讓那一格 missing
+                consensus_history = ()
         # ---- 論證層（2026-09-15）：節點人話名字＋claim 引文。provider 沒這能力（測試用假 provider）就空。
         narrative_context: Mapping[str, Any] = {}
         fetch_narrative = getattr(graph_provider, "get_narrative_context", None)
@@ -693,6 +702,7 @@ def fetch_alpha_investment_view(
         variant_implied_return=variant_implied, variant_reason=variant_reason, variant_absence_kind=variant_kind,
         brief_records=brief_records, brief_parse_errors=brief_errors,
         narrative_context=narrative_context,
+        consensus_history=consensus_history,
     )
 
 

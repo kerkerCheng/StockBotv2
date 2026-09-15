@@ -107,9 +107,33 @@ def numbers_paragraph(*, base_period: str | None, target_period: str | None, cur
     return "".join(parts)
 
 
+def closure_phrase(closure: Mapping[str, Any] | None) -> str | None:
+    """「市場承認了嗎」一句：共識自判斷日以來的移動，對照我們的 base 與賭注。無資料回 None。"""
+    if not closure:
+        return None
+    base = closure.get("base") or {}
+    if base.get("status") != "available":
+        return None
+    start, now = base.get("start_value"), base.get("now_value")
+    text = f"自 {format_value('date', base.get('start_date'))} 以來，市場共識每股盈餘從 {format_value('price', start)} 到 {format_value('price', now)}"
+    if base.get("moved") == 0:
+        text += "，沒有動"
+    else:
+        frac = base.get("closed_fraction")
+        if isinstance(frac, (int, float)):
+            direction = "朝我們的看法移了" if frac > 0 else "反向移了"
+            text += f"，{direction} {abs(frac) * 100:.0f}%"
+    variant = closure.get("variant") or {}
+    frac_v = variant.get("closed_fraction") if variant else None
+    if isinstance(frac_v, (int, float)) and base.get("moved") != 0:
+        text += f"（對賭注而言是 {frac_v * 100:+.0f}%）"
+    return text + f"（{base.get('n_points')} 次抓取）。"
+
+
 def market_paragraph(*, comparisons: Sequence[Mapping[str, Any]], market_multiple: float | None,
                      our_multiple: float | None, multiple_rationale: str | None,
-                     reverse: Mapping[str, Any] | None, driver_labels: Mapping[str, str]) -> str:
+                     reverse: Mapping[str, Any] | None, driver_labels: Mapping[str, str],
+                     closure: Mapping[str, Any] | None = None) -> str:
     """「和市場差在哪」：逐指標一句、倍數一句、要撐起現價需要什麼一句。"""
     parts: list[str] = []
     said = 0
@@ -142,6 +166,9 @@ def market_paragraph(*, comparisons: Sequence[Mapping[str, Any]], market_multipl
                 needs.append(f"{who}要到 {format_value('ratio', implied)}")
         if needs:
             text += "要撐起現在的股價，其他假設不動的話，" + "，或者".join(needs[:2]) + "。"
+    phrase = closure_phrase(closure)
+    if phrase:
+        text += phrase
     return text
 
 
@@ -175,7 +202,8 @@ def bet_paragraph(*, has_bet: bool, overrides: Sequence[Mapping[str, Any]], bet_
 
 
 def timeline_paragraph(*, checkpoints: Sequence[Mapping[str, Any]], catalysts: Sequence[Mapping[str, Any]],
-                       value_date: Any, horizon_end: Any, thesis_next_check: Any) -> str:
+                       value_date: Any, horizon_end: Any, thesis_next_check: Any,
+                       reached: Mapping[str, Any] | None = None) -> str:
     items: list[tuple[str, str]] = []
     for cp in checkpoints:
         if cp.get("date"):
@@ -197,6 +225,10 @@ def timeline_paragraph(*, checkpoints: Sequence[Mapping[str, Any]], catalysts: S
         tail.append(f"這條判斷下次例行核查是 {format_value('date', thesis_next_check)}")
     if tail:
         text += "；".join(tail) + "。"
+    if reached and reached.get("any_reached"):
+        which = "賭對的目標價" if reached.get("bet_reached") else "沒賭對的目標價"
+        text += (f"⚠ 現價已高於{which}：要嘛市場比我們樂觀，要嘛該收割——已持有的該重看要收割還是上修，"
+                 "未持有的這不是進場點。不是自動賣出。")
     return text
 
 

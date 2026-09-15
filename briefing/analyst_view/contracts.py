@@ -203,6 +203,9 @@ PLAIN_LINE_LABELS: Mapping[str, str] = {
     "base_fair_value_for_payoff": "對照：base 目標價",
     "base_price_return_for_payoff": "對照：base 隱含報酬",
     "payoff_one_sentence": "一句話說明賭注的數字怎麼來的",
+    "gap_closure": "市場承認了嗎",
+    "consensus_series": "市場共識每股盈餘的歷史",
+    "target_reached": "目標價到了沒",
 }
 
 #: 缺席語意的短標籤（畫面寬度用）。完整說明仍是 `ABSENCE_KINDS`，兩者同一個家——

@@ -518,6 +518,9 @@ class ExpectationGapSection:
     #: 目標倍數是我們判斷的，還是抄市場現在付的（`VALUATION_DERIVATIONS`）。
     #: 與 `opinion_stance`（EPS 桿）並排：**兩根桿各有各的來源問題**。
     multiple_derivation: Datum | None = None
+    #: V2（2026-09-15）：共識朝我們移了幾成（base 與賭注各一組）＋共識時序本身。量測不是訊號。
+    gap_closure: Datum | None = None
+    consensus_series: Datum | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -649,6 +652,8 @@ class ImpliedReturnSection:
     attribution: Datum
     period: str | None = None
     period_end: date | None = None
+    #: V2（2026-09-15）：現價到了目標價沒（沒賭對／賭對各一個布林）。到達＝該重看要不要收割，不是賣出指令。
+    target_reached: Datum | None = None
 
 
 @dataclass(frozen=True, slots=True)

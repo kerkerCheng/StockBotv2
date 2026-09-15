@@ -192,7 +192,8 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
         # authority 自己組好的一句話住在 `epistemics.one_sentence`；consumer 只是把它挪到最前面呈現，
         # **不自己造句**——造句就是在 read model 之外生出第二種說法。
         _line("epistemics_one_sentence", "一句話（authority 自組）", ir.epistemics, "headline_context"),
-    )
+    ) + ((_line("target_reached", ir.target_reached.label, ir.target_reached, "headline_context"),)
+         if ir.target_reached is not None else ())
     statuses = {"implied_return": ir.meta.status, "valuation": va.meta.status}
     kinds = _absence_kinds(implied_return=ir.meta, valuation=va.meta)
     settled = _settled_by(implied_return=ir.meta, valuation=va.meta)
@@ -236,6 +237,10 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
         + ((_line("multiple_derivation", eg.multiple_derivation.label,
                   eg.multiple_derivation, "comparison"),)
            if eg.multiple_derivation is not None else ())
+        + ((_line("gap_closure", eg.gap_closure.label, eg.gap_closure, "comparison"),)
+           if eg.gap_closure is not None else ())
+        + ((_line("consensus_series", eg.consensus_series.label, eg.consensus_series, "market_context"),)
+           if eg.consensus_series is not None else ())
         + (_line("internal_vs_consensus", eg.internal_vs_consensus.label, eg.internal_vs_consensus, "comparison"),
            _line("internal_vs_price_implied", eg.internal_vs_price_implied.label,
                  eg.internal_vs_price_implied, "comparison"))
