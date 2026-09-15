@@ -4603,7 +4603,7 @@
     {
       "added_at": "2026-08-30T08:28:24.953849+00:00",
       "company_id": "co:broadcom",
-      "hint": "當前 missing_data：TH5/TH6 CPO 的具名部署客戶（hyperscaler 側揭露，結構上可能長期不可得）；Davisson 調變器類型第三方驗證（pq1 題進行中）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：execution_fx_missing、technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
+      "hint": "當前 missing_data：TH5/TH6 CPO 的具名部署客戶（hyperscaler 側揭露，結構上可能長期不可得）；Davisson 調變器類型第三方驗證（pq1 題進行中）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：execution_fx_missing、financial_stale_since_decision、technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
       "n": 276,
       "reactivated_at": "2026-08-31T11:29:12.846318+00:00",
       "reactivation_event": {
@@ -4619,8 +4619,8 @@
       "waiting_on": {
         "derived_from_blockers": true,
         "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-31T11:31:47.757152+00:00",
-        "trigger": "執行面 context 缺失／技術指標觀測問題",
+        "set_at": "2026-09-13T21:41:50.672523+00:00",
+        "trigger": "執行面 context 缺失／財務核驗清單欄位缺失或待人工填入／技術指標觀測問題",
         "until": null
       }
     },
@@ -9799,6 +9799,30 @@
       "resolved_at": null,
       "source": "decompose_proposal",
       "title": "decompose 提案：一架現役 MALE 級軍用無人機（例：MQ-9B SkyGuardian 等級的中空長航時機）（新需求錨 tech:aerospace_defense_platform）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-15T14:42:51.291728+00:00",
+      "hint": "blind-spot-audit 2026-09-15；research（改變我們知道什麼）；不入圖、不改 thesis，只產出 source-trace packet",
+      "n": 577,
+      "reason": null,
+      "ref_id": "graph://edge/co:coherent/supplies_to/co:nvidia",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "COHR：核實「NVIDIA CPO 外部光源唯一來源」——圖上 co:coherent→co:nvidia sole_source=true 只有供應商自報，而 NVIDIA blog／nonexclusive 協議與 co:lumentum→co:nvidia 同時存在；需客戶端或第三方逐字確認產品範圍（ELS 模組 vs 雷射晶片），否則降級為 verified_by_absence 並改寫首屏第三句",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-15T14:42:51.500431+00:00",
+      "hint": "blind-spot-audit 2026-09-15；research judgment（假設 ledger append）；倍數折價無 re-rating 證據時不得保留",
+      "n": 578,
+      "reason": null,
+      "ref_id": "library/private/app/analyst_view/COHR.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "COHR：賭注改寫提案——現行 variant 只覆蓋 FY27 營益率 +2pp（EPS 貢獻 +3.6%），與 thesis 主張的「六吋產能倍增後的 FY28 量×利潤率」不在同一年；需補內部 FY28 view（或把 value_date 移到 FY28 期末）並依 09-09 原則把目標倍數預設回市場倍數，重算兩欄貢獻",
       "type": "manual"
     }
   ],
@@ -21338,8 +21362,24 @@
       "ref_id": "AEVA",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-13T21:41:50.672926+00:00",
+      "n": 276,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-08-31T11:31:47.757152+00:00",
+        "trigger": "執行面 context 缺失／技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 內容改變，重新推導等待理由",
+      "receipt": null,
+      "ref_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
+      "type": "decision_review",
+      "verb": "waiting_reason_refreshed"
     }
   ],
-  "next_n": 577,
+  "next_n": 579,
   "schema_version": "1"
 }

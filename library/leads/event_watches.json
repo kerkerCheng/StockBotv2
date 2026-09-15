@@ -272,7 +272,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-12",
+        "last_checked": "2026-09-15",
         "query_hint": "取得 canonical Rosenblatt／B. Riley note，或 AAOI／Broadcom 官方量化 MRC／RNG 對 optical unit demand 的影響"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
@@ -657,23 +657,30 @@
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
       "status": "active",
-      "woken_by": {
-        "kind": "entity_filing_signal",
-        "lead_id": "lead_ec439978dbc1e212e509da1914aea41e",
-        "shared_entities": [
-          "AAOI",
-          "co:applied_optoelectronics"
-        ],
-        "at": "2026-09-10T22:35:01.238952+00:00",
-        "wake_lead": "lead_20eb32acaf78ffb751ee07966e185534"
-      },
+      "woken_by": null,
       "consumed_leads": [
         "lead_19c2d0ce3f563d028b0eefa4ff300ede",
         "lead_49085eb7b51c402c925cc29ab5e33cc6",
         "lead_55c8b7a797abe1ef2704c0ab958b1ca6",
         "lead_784638384b09744c90b7efc253f62704",
         "lead_bf15d126a1e462c989705e171e506c3c",
-        "lead_ec439978dbc1e212e509da1914aea41e"
+        "lead_ec439978dbc1e212e509da1914aea41e",
+        "lead_f53140b6836a9f38447827f29a676313"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-15T21:36:35.680079+00:00",
+          "woken_by": {
+            "kind": "entity_filing_signal",
+            "lead_id": "lead_f53140b6836a9f38447827f29a676313",
+            "shared_entities": [
+              "AAOI",
+              "co:applied_optoelectronics"
+            ],
+            "at": "2026-09-15T21:36:35.679767+00:00",
+            "wake_lead": "lead_20eb32acaf78ffb751ee07966e185534"
+          }
+        }
       ]
     },
     {
@@ -783,7 +790,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-11",
+        "last_checked": "2026-09-14",
         "query_hint": "NVDA 8-K 或 10-Q 揭露對 OpenAI／資料中心融資的擔保或承諾；或 OpenAI／SoftBank 側的正式公告"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -1349,7 +1356,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-12",
+        "last_checked": "2026-09-15",
         "query_hint": "FCC 正式發布 NPRM／Report and Order，或把中國光模組廠列入 Covered List。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -1491,7 +1498,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-09",
+        "last_checked": "2026-09-13",
         "query_hint": "取得 canonical investor-conference agenda／錄影／逐字稿，或 issuer 一手量化供應缺口與時程。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
@@ -1705,7 +1712,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-11",
+        "last_checked": "2026-09-14",
         "query_hint": "作者公開原始 dataset／方法論，或具名公司 filing 揭露可逐筆核對的 physical-AI／world-model 融資事件"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=lead_only_tier_4",
@@ -1975,7 +1982,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-09",
+        "last_checked": "2026-09-13",
         "query_hint": "Meta 官方具名揭露 excess compute 出售、對手方與容量，或取得 Wells Fargo canonical note。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -2814,11 +2821,13 @@
       "consumed_entities": [
         "BE",
         "CO:COREWEAVE",
+        "CO:IREN",
         "CO:MICRON_TECHNOLOGY",
         "CO:NEBIUS",
         "CO:SANDISK",
         "CO:TSMC",
         "CRWV",
+        "IREN",
         "MU",
         "NBIS",
         "SNDK",
@@ -2834,6 +2843,7 @@
       "woken_by": null,
       "consumed_leads": [
         "lead_05f01a6f616c2fd1ba2c5881d83ff17b",
+        "lead_11ef4ccbd71060a566e7fab5a8caec6c",
         "lead_78c2a9a1bf04ad6abd7d0b786056e2b1"
       ],
       "reactivations": [
@@ -2848,6 +2858,19 @@
               "co:coreweave"
             ],
             "at": "2026-09-11T21:36:47.663228+00:00",
+            "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97"
+          }
+        },
+        {
+          "at": "2026-09-13T21:37:21.358660+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_11ef4ccbd71060a566e7fab5a8caec6c",
+            "shared_entities": [
+              "IREN",
+              "co:iren"
+            ],
+            "at": "2026-09-13T21:37:21.358559+00:00",
             "wake_lead": "lead_b0daa9998b26ef6637edc45dc681bb97"
           }
         }
@@ -2911,7 +2934,10 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_f1cf205e2c5d75400f98dea3391b1e3b",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CCXI",
+        "CO:CHURCHILL_CAPITAL_XI"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
@@ -2919,7 +2945,25 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": null
+      "woken_by": null,
+      "consumed_leads": [
+        "lead_0f87443a5f08eda6c8e4966661287409"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-15T21:36:31.658417+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_0f87443a5f08eda6c8e4966661287409",
+            "shared_entities": [
+              "CCXI",
+              "co:churchill_capital_xi"
+            ],
+            "at": "2026-09-15T21:36:31.658338+00:00",
+            "wake_lead": "lead_f1cf205e2c5d75400f98dea3391b1e3b"
+          }
+        }
+      ]
     },
     {
       "watch_id": "ew_0075_2026-09-04",
@@ -3325,7 +3369,12 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_0d2aef4d40bce116bc0d13a869fe2dcc",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "AAOI",
+        "MU",
+        "NVDA",
+        "SNDK"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
@@ -3333,7 +3382,51 @@
       },
       "note": "daily-brief 2026-09-12：補上 park 後 unwatched lifecycle",
       "status": "active",
-      "woken_by": null
+      "woken_by": null,
+      "consumed_leads": [
+        "lead_335277d93cf38eede87f58d4e62bbc6e",
+        "lead_b4485e188cbf937c503c832edb7ff5f4",
+        "lead_f53140b6836a9f38447827f29a676313"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-13T21:37:07.131090+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_b4485e188cbf937c503c832edb7ff5f4",
+            "shared_entities": [
+              "MU",
+              "NVDA"
+            ],
+            "at": "2026-09-13T21:37:07.131046+00:00",
+            "wake_lead": "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+          }
+        },
+        {
+          "at": "2026-09-15T21:36:25.636039+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_335277d93cf38eede87f58d4e62bbc6e",
+            "shared_entities": [
+              "SNDK"
+            ],
+            "at": "2026-09-15T21:36:25.635987+00:00",
+            "wake_lead": "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+          }
+        },
+        {
+          "at": "2026-09-15T21:36:35.680091+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_f53140b6836a9f38447827f29a676313",
+            "shared_entities": [
+              "AAOI"
+            ],
+            "at": "2026-09-15T21:36:35.680023+00:00",
+            "wake_lead": "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+          }
+        }
+      ]
     },
     {
       "watch_id": "ew_0087_2026-09-11",
@@ -3381,6 +3474,89 @@
         "query_hint": "ナブテスコ 6268 訂正 2025年12月期 決算短信 持分法 TMT マシナリー／nabtesco.com/about/ir/library/settlement/ 出現訂正後的 FY2025 決算短信"
       },
       "note": "Nabtesco 於 2026-08-14 公告：因持分法適用關連会社 TMT マシナリー（出資 33%，非上市且不編合併財報，故過去只依其個別財報適用持分法）的子公司留保利益未被取込，當社持分相當額合計約 28 億日圓，決定**追溯重編 2021–2025 五個年度**。公司明文『2026 年 9 月末までに訂正・公表する予定』，對象含**2025 年 12 月期決算短信**與第 19–23 期有価証券報告書，且『各年度の影響額…現在精査を進めており、確定次第お知らせいたします』。⚠ 因此 6268.T 的段5 基期觀測本輪刻意不寫——現在寫等於記一個發行人已宣告會變的數。訂正版一出即可取 FY2025 基期並同時解 [494]（主要な販売先 的揭露就在被訂正的有報裡）。",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0089_2026-09-13",
+      "created_at": "2026-09-13T21:37:21.348783+00:00",
+      "expires": "2027-01-11",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "IREN",
+        "NBIS",
+        "NVDA",
+        "ORCL",
+        "co:iren",
+        "co:nebius",
+        "co:nvidia",
+        "co:oracle"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_11ef4ccbd71060a566e7fab5a8caec6c",
+      "consumed_entities": [
+        "CO:IREN",
+        "CO:NVIDIA",
+        "IREN",
+        "NVDA"
+      ],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Oracle 後續 IR、SEC filing 或官方 transcript 出現 GPU resale premium、renewal age 或 utilization breakdown 時重查"
+      },
+      "note": "park 時自動建立；trace_status=partial",
+      "status": "active",
+      "woken_by": null,
+      "consumed_leads": [
+        "lead_197f334da7415b4933bbe7ac3aae0cde"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-14T21:35:12.634455+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_197f334da7415b4933bbe7ac3aae0cde",
+            "shared_entities": [
+              "IREN",
+              "NVDA",
+              "co:iren",
+              "co:nvidia"
+            ],
+            "at": "2026-09-14T21:35:12.634405+00:00",
+            "wake_lead": "lead_11ef4ccbd71060a566e7fab5a8caec6c"
+          }
+        }
+      ]
+    },
+    {
+      "watch_id": "ew_0090_2026-09-15",
+      "created_at": "2026-09-15T21:36:27.640061+00:00",
+      "expires": "2027-01-13",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "MU",
+        "SKHY",
+        "co:micron_technology",
+        "co:sk_hynix"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_8a72e7d5db52030098113f91542e6abf",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": "Team Group 法說／新聞稿逐字揭露 2027 配額、DDR5 缺口或 2028–2029 訂單能見度"
+      },
+      "note": "park 時自動建立；trace_status=partial",
       "status": "active",
       "woken_by": null
     }

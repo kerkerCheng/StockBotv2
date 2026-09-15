@@ -7876,6 +7876,510 @@
       "result": "ok",
       "run_at": "2026-09-12T21:33:52.122190+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:48.201282+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:49.378884+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:50.015509+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:50.858076+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:53.025932+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:53.723316+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:54.406400+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:55.096742+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:55.768391+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:56.475148+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:57.144193+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:57.903063+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:58.577941+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:59.263532+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:33:59.947808+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:00.632445+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:01.319394+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:02.010992+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:02.725365+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:03.458759+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:03.983208+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:04.670334+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:05.229822+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:05.904003+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:06.588277+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:07.307805+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:07.810990+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-13T21:34:08.513077+00:00",
+      "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:39.652669+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:40.991283+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:41.730444+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:43.621002+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:46.412060+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:47.108395+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:47.908737+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:48.631867+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:49.321818+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:50.053258+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:50.779741+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:51.339517+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:52.208910+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:52.741175+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:53.467614+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:54.214872+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:54.984374+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:55.736756+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:56.456430+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:57.169056+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:57.887308+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:58.621865+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:59.329644+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:32:59.867256+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:33:00.572595+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-14T21:33:01.409868+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:33:01.920485+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-14T21:33:02.619968+00:00",
+      "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:21.615693+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:22.591117+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:23.181916+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 4,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:24.878937+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:27.463749+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:28.171955+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:28.842437+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:29.555648+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:30.061657+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:30.792762+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:31.491054+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:31.999977+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:32.707740+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:33.425683+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:34.106911+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:34.826758+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:35.519769+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:36.239028+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:36.754422+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:37.447129+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:37.961198+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:38.684691+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:39.204792+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:39.728777+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:40.415284+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:41.172152+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:41.867711+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-15T21:33:42.544544+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -11233,14 +11737,46 @@
       "published_at": "2026-09-11T07:03:16.000Z",
       "raw_text": "Yep, I'm personally high conviction on the AI trade (especially photonics/memory) despite macro.\n\n- $NVDA gave forecasts for $1.3T hyperscaler capex ($100B+ above BofA analyst expectations)\n\n- $SPCX Wells Fargo forecasts are ~$263B for 2027.\n\n- $127B spend in 2027 for Anthropic/OpenAI model training + inference from internal investor documents (WSJ). \n\n- Even the Pentagon (US gov) is looking to fund the AI buildout, with $5B potentially into Fluidstack. \n\nWhat sectors do I think capex flows hit the hardest?\n\nPhotonics + Memory. \n\nTrendforce for example est. DRAM and NAND to be 68% of hyperscaler capex in 2027. \n\nSo when all that memory procurement spend hits the balance sheets of $MU, $SNDK, Samsung, $SKHY with 70-80%+ margins. \n\nI don't think these companies care about short term macro scares. \n\nAnd when your leading memory companies are all allocating capacity for DDR5/HBM or high end memory, with little visibility on legacy memory supply coming online. \n\nWhat does that say about the durability of ESMT/Etron/Winbond and others?\n\nAnd when your optical content/GPU goes up for rubin ultra + $META / $GOOGL TPU v9, etc. Alongside TAM eg. $131.4 billion (+81% revision) for 2027 optical module forecasts. \n\nWho benefits from supplying all that lasers during a shortage other than $LITE / $SIVE / $AAOI / $COHR?\n\nI think the overwhelming fundamentals + growth of some of the AI sector companies will outperform macro.",
       "refs": {
-        "parked_reason": "已支持的是時變 capex／產品 observation；A1 不收時變數字，且未形成新的具名 customer-to-supplier edge",
-        "primary_url": "https://investor.nvidia.com/files/content_files/TRANSCRIPT_-NVIDIA-Corp-NVDA-US-Q2-2027-Earnings-Call-26-August-2026-5_00-PM-ET.pdf",
-        "research_outcome": "trace:partial_no_graph_delta",
-        "trace_attempts_ref": "NVIDIA FY27 Q2 transcript 支持 top-5 hyperscaler 2027 capex 約 1.3T；Sivers Q2 letter 支持 CW laser 供應受限與 70/100/200mW 產品；其餘 WF/WSJ/TrendForce/GS 數字未取得原文",
-        "trace_next_trigger": "WF、WSJ、TrendForce 或 Goldman 原始文件公開，或公司 filing 將總 capex 連到具名供應商承諾",
-        "trace_origin_entity": "NVIDIA;Sivers Semiconductors",
+        "original_claim_status": "一個可驗證 atom（2027 年 DRAM+NAND 佔 major CSP CapEx 68%）與 TrendForce 原文一致；其餘為多份預測與作者推論，未形成單一可入圖 A1 claim",
+        "parked_reason": "本輪新增確認 TrendForce 68% atom，但屬產業時變觀測；其餘關鍵數字仍未追到原始文件，沒有新 graph delta。",
+        "primary_url": "https://www.trendforce.com/presscenter/news/20260825-13198.html",
+        "research_outcome": "確認 68% 記憶支出預測與 2027 DRAM 緊、NAND 2H27 可能轉鬆；皆屬時變產業預測，不入圖、不建 RA",
+        "research_run": "daily-brief-2026-09-16",
+        "source_routes_receipt": "ticker=NVDA;適用=5條;已走=無;未走=local_library(rung1),sec_edgar(rung2),issuer_site(rung3),alternate_primary(rung4),authorized_syndication(rung5)；結果=park/partial；未宣告已走路徑（自動蓋章）",
+        "trace_attempts_ref": "NVIDIA 一手資料支持 2027 hyperscaler capex 約 1.3T；TrendForce 2026-08-25 公開稿逐字支持 2027 DRAM+NAND 占 CSP capex 68%；Sivers 文件支持 CW laser 供應受限。WF 263B、WSJ 127B、Pentagon 5B、Goldman 131.4B 未取得可逐字核對原文。",
+        "trace_next_trigger": "WF、WSJ、Pentagon 或 Goldman 原始文件公開，或具名客戶文件把總 capex 連到特定供應商承諾",
+        "trace_origin_entity": "NVIDIA;TrendForce;Sivers Semiconductors",
+        "trace_original_date": "2026-08-25/2026-09",
+        "trace_requeue_trigger": "related_triaged_lead:lead_335277d93cf38eede87f58d4e62bbc6e",
+        "trace_requeued_at": "2026-09-15T21:36:25.630832+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "AAOI",
+          "COHR",
+          "GOOGL",
+          "LITE",
+          "META",
+          "MU",
+          "NVDA",
+          "SIVE",
+          "SKHY",
+          "SNDK",
+          "SPCX",
+          "co:applied_optoelectronics",
+          "co:coherent",
+          "co:google",
+          "co:lumentum",
+          "co:meta",
+          "co:micron_technology",
+          "co:nvidia",
+          "co:sandisk",
+          "co:sivers_semiconductors",
+          "co:sk_hynix"
+        ],
+        "trace_trigger_event_ref": "lead:lead_335277d93cf38eede87f58d4e62bbc6e",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0086_2026-09-11"
       },
       "source": "x:aleabitoreddit",
       "status": "parked",
@@ -11272,19 +11808,67 @@
           "payment_direction": "customer_to_supplier",
           "reason": "查證 hyperscaler 資本支出與採購流向後，會改變光子與記憶體候選排序。"
         },
-        "decided_at": "2026-09-11T21:36:46.311449+00:00",
+        "decided_at": "2026-09-15T21:36:25.630832+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "具名 NVDA、MU、SNDK、Sivers、AAOI、Coherent 與 2027 hyperscaler capex／記憶體支出數字，關聯且可追一手；資本承諾方向可改變候選排序，先寬鬆放行。",
-        "related_trace_requeues": [
-          "lead_26bd4214b4b0434765071f14a7a955e4",
-          "lead_c349675fdb415bc16ec36afe3d5d91f2",
-          "lead_e6f2bbd1d5be38912659f700d625f4f8"
-        ],
+        "reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_335277d93cf38eede87f58d4e62bbc6e 與等待中的追源共用具名標的 SNDK；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-13T21:37:07.127977+00:00",
+          "superseded_reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_b4485e188cbf937c503c832edb7ff5f4 與等待中的追源共用具名標的 MU, NVDA；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_b4485e188cbf937c503c832edb7ff5f4",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-11T21:36:46.311449+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "capital_commitment",
+              "decision_impact": "ranking",
+              "payment_direction": "customer_to_supplier",
+              "reason": "查證 hyperscaler 資本支出與採購流向後，會改變光子與記憶體候選排序。"
+            },
+            "decided_at": "2026-09-11T21:36:46.311449+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "具名 NVDA、MU、SNDK、Sivers、AAOI、Coherent 與 2027 hyperscaler capex／記憶體支出數字，關聯且可追一手；資本承諾方向可改變候選排序，先寬鬆放行。",
+            "related_trace_requeues": [
+              "lead_26bd4214b4b0434765071f14a7a955e4",
+              "lead_c349675fdb415bc16ec36afe3d5d91f2",
+              "lead_e6f2bbd1d5be38912659f700d625f4f8"
+            ],
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-15T21:36:25.630832+00:00",
+          "superseded_reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_335277d93cf38eede87f58d4e62bbc6e 與等待中的追源共用具名標的 SNDK；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_335277d93cf38eede87f58d4e62bbc6e",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-11T21:36:46.311449+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "capital_commitment",
+              "decision_impact": "ranking",
+              "payment_direction": "customer_to_supplier",
+              "reason": "查證 hyperscaler 資本支出與採購流向後，會改變光子與記憶體候選排序。"
+            },
+            "decided_at": "2026-09-13T21:37:07.127977+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_b4485e188cbf937c503c832edb7ff5f4 與等待中的追源共用具名標的 MU, NVDA；事件觸發 bounded pq1 重查",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2098306366167535766"
     },
     "lead_0d354d118432139af93f2f07f5623ff2": {
@@ -11704,6 +12288,182 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026049171/xslF345X06/wk-form4_1784749057.xml"
     },
+    "lead_0f2145512ebd5e47fac0b65e7796be90": {
+      "entities": {
+        "company_ids": [],
+        "tickers": [
+          "ESMT"
+        ]
+      },
+      "first_seen": "2026-09-14T21:32:43.618231+00:00",
+      "lead_id": "lead_0f2145512ebd5e47fac0b65e7796be90",
+      "media": [
+        {
+          "cache": {
+            "bytes": 82189,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f2145512ebd5e47fac0b65e7796be90/3_2099411785275334656.jpg",
+            "sha256": "f62285bca05b06505298860a2a11840850048272e2d118125351a7bdfb767821"
+          },
+          "height": 560,
+          "media_key": "3_2099411785275334656",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSKb5UKa4AAKn85.jpg",
+          "width": 1080
+        },
+        {
+          "cache": {
+            "bytes": 87966,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f2145512ebd5e47fac0b65e7796be90/3_2099411785271115776.jpg",
+            "sha256": "8228754a81ec46fb710ecf096b617d671e26704884ab88584865c2f4985ee81d"
+          },
+          "height": 1584,
+          "media_key": "3_2099411785271115776",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSKb5UJagAAr4Z0.jpg",
+          "width": 1229
+        },
+        {
+          "cache": {
+            "bytes": 100704,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f2145512ebd5e47fac0b65e7796be90/3_2099411785266929664.jpg",
+            "sha256": "4b2bd88a702651a8517a73d5a9453b4cac8e3d4856ade51fa7d3c854d5ccbfdb"
+          },
+          "height": 695,
+          "media_key": "3_2099411785266929664",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSKb5UIaoAAyHy4.jpg",
+          "width": 1230
+        }
+      ],
+      "published_at": "2026-09-14T08:15:51.000Z",
+      "raw_text": "NOR flash “Severe Supply Shortage” with high density continued increases of 90-110% for H2.\n\nI wonder who sells both high density NOR and SLC NAND? *cough cough, $ESMT*\n\nFor H1 hikes:\nNOR: +100–120%\nSLC NAND: +130–150%\n\nFor H2 hikes:\nHigh-density NOR: 90-110% in H2\nSLC NAND: ~70–75%.\n\nObviously there’s others from Winbond / Macronix / Gigadevice, but my idea and position with ESMT is that it’s the largest beneficiary of the shortage relative to size. (they sell NOR: >256Mb)\n\nThe moderate bearish part is: \n\n“For mid- and low-capacity products of 128Mb and below, additional capacity from Chinese suppliers is gradually coming online. \n\nPrice increases for consumer-grade products are therefore expected to moderate”\n\nHowever, this update is overwhelmingly bullish for earnings of legacy memory players.\n\nLet the ASP hike games continue.",
+      "refs": {
+        "parked_reason": "tier1_material_mismatch",
+        "trace_attempts_ref": "TrendForce 2026-06-16 一手資料為高密度 NOR H2 +60–65% 以上、SLC NAND +70–75%，不支持社群文的 NOR +90–110%；ESMT 官網只確認產品曝險，不能推出最大受惠者",
+        "trace_requires_user": "false",
+        "trace_status": "contradicts"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "NOR flash “Severe Supply Shortage” with high density continued increases of 90-110% for H2. I wonder who sells both high density NOR and SLC NAND? *cough cough, $ESMT* For H1 hikes: NOR: +100–120% SLC NAND: +130–150% For H2 hikes: High-density NOR: 90-110% in H2 SLC NAND: ~70–75%. Obviously there’s others from Winbond / Macronix / Gigadevice, but my idea and position with ESMT is that it’s the largest beneficiary of the shortage relative to size. (they sell NOR: >256Mb) The moderate bearish part is: “For mid- and low-capacity products of 128Mb and below, additional capacity from Chinese suppliers is gradually coming online. Price increases for consumer-grade products are therefore expected to moderate” However, this update is overwhelmingly bullish for earnings of legacy memory players. Let the ASP hike games continue.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-14T21:35:12.952113+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若一手來源證實 ESMT 高密度產品曝險，可能使其進入可研究候選；若否定則不納入。"
+        },
+        "decided_at": "2026-09-14T21:35:12.952113+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯 ESMT／legacy memory，含 NOR 與 SLC NAND 的具體漲價幅度及競爭者名稱，可追回原始報告。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099411795131924487"
+    },
+    "lead_0f87443a5f08eda6c8e4966661287409": {
+      "entities": {
+        "company_ids": [
+          "co:churchill_capital_xi"
+        ],
+        "tickers": [
+          "CCXI"
+        ]
+      },
+      "first_seen": "2026-09-15T21:33:24.852014+00:00",
+      "lead_id": "lead_0f87443a5f08eda6c8e4966661287409",
+      "media": [
+        {
+          "cache": {
+            "bytes": 62816,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f87443a5f08eda6c8e4966661287409/3_2099830583472037888.jpg",
+            "sha256": "6bb98f42f696269e48e50f93e7342ce5d4346c7ecc2b1f55a02401f7ea8e8d91"
+          },
+          "height": 1358,
+          "media_key": "3_2099830583472037888",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSQYylBaIAANHkl.jpg",
+          "width": 1260
+        },
+        {
+          "cache": {
+            "bytes": 92700,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f87443a5f08eda6c8e4966661287409/3_2099830583459495936.jpg",
+            "sha256": "d2980626f6988a20fc0abecc37d70c99dd6f6b1f49f1271e142a4a58f271f199"
+          },
+          "height": 2048,
+          "media_key": "3_2099830583459495936",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSQYyk-awAAm0p4.jpg",
+          "width": 1108
+        },
+        {
+          "cache": {
+            "bytes": 115562,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_0f87443a5f08eda6c8e4966661287409/3_2099830583480442880.jpg",
+            "sha256": "06dcad2e1cf50faf8743906eff0bb419818c63a3e03cc40712b0c57cf104d094"
+          },
+          "height": 1627,
+          "media_key": "3_2099830583480442880",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSQYylDaYAAHMzu.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-09-15T12:00:00.000Z",
+      "raw_text": "$CCXI releases their Digit 5 next-generation humanoid.\n\nThoughts? https://t.co/r0Gb05cnd5 https://t.co/skypt5ahP0",
+      "refs": {
+        "parked_reason": "S-4 證實 Digit v5 預計 2026 年末初始發布、九座設施與逾 3 億美元承諾訂單，但同一發行人／同一交易的核心 claim 已由既有投資人簡報入圖；新增內容多為時變財務與交易條件，沒有不重複的 graph delta。",
+        "research_run": "daily-brief-2026-09-16",
+        "trace_attempts_ref": "CCXI S-4 accession 0001213900-26-097764；本機逐字稿 library/raw/ccxi_s_4_20260904.txt",
+        "trace_origin_entity": "Agility Robotics",
+        "trace_original_date": "2026-09-04",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CCXI",
+            "Digit",
+            "humanoid"
+          ]
+        }
+      },
+      "title": "$CCXI releases their Digit 5 next-generation humanoid. Thoughts? https://t.co/r0Gb05cnd5 https://t.co/skypt5ahP0",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-15T21:36:31.655340+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若公司一手證實產品與商業化位置，可能改變 humanoid 候選集合。"
+        },
+        "decided_at": "2026-09-15T21:36:31.655340+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "具名 CCXI 與 Digit 5 次世代人形機器人產品，關聯已追蹤 humanoid 主題且有可回追的產品事件；需追公司一手發布確認規格與成熟度。",
+        "related_trace_requeues": [
+          "lead_f1cf205e2c5d75400f98dea3391b1e3b"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099830591663513642"
+    },
     "lead_0ff868c1f91c2b054d93ad0fde8d30f6": {
       "entities": {
         "company_ids": [
@@ -12053,6 +12813,137 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326004397/f6k_063026.htm"
+    },
+    "lead_11ef4ccbd71060a566e7fab5a8caec6c": {
+      "entities": {
+        "company_ids": [
+          "co:oracle",
+          "co:nebius",
+          "co:iren",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "ORCL",
+          "NBIS",
+          "IREN",
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-13T21:33:50.857205+00:00",
+      "lead_id": "lead_11ef4ccbd71060a566e7fab5a8caec6c",
+      "media": [
+        {
+          "cache": {
+            "bytes": 72198,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_11ef4ccbd71060a566e7fab5a8caec6c/3_2099048348309422080.jpg",
+            "sha256": "cc0ec81148f7921eb997ad19a0f31507fce37621462536dd179bca35c05b70ae"
+          },
+          "height": 637,
+          "media_key": "3_2099048348309422080",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSFRWf9agAAnHrO.jpg",
+          "width": 1229
+        },
+        {
+          "cache": {
+            "bytes": 69446,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_11ef4ccbd71060a566e7fab5a8caec6c/3_2099048348309413888.jpg",
+            "sha256": "029314761a37c0c474581070bda8e6984159bfaf569112538f4259424dd9fea6"
+          },
+          "height": 559,
+          "media_key": "3_2099048348309413888",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSFRWf9aYAAKPv3.jpg",
+          "width": 1226
+        }
+      ],
+      "published_at": "2026-09-13T08:11:41.000Z",
+      "raw_text": "It’s the weekend but surprised I missed this from $ORCL earnings.\n\nImplications for $NBIS to $IREN are pretty positive since:\n\nOracle said all GPU capacity for renewal were resold +20% premium above previous contracts.\n\nMajority of the equipment was 4Y+ and older…\n\nSo another L for the Burry’s rapid GPU depreciation thesis.\n\nAnd W for $NVDA and the Neocloud party.",
+      "refs": {
+        "gap": "缺 Oracle canonical transcript 對 +20% 轉售溢價與設備年齡的逐字段落",
+        "original_claim_status": "Oracle 一手確認 35K GPUs 到期、49% 客戶續約 92% GPUs，其餘多數當季轉售，全球利用率 97.5%；未找到 +20% premium 與設備多為 4 年以上的 canonical 段落",
+        "parked_reason": "time_varying_financial_observation",
+        "primary_url": "https://blogs.oracle.com/ceo/from-the-q4-earnings-call",
+        "research_outcome": "支持舊 GPU 仍有轉售需求，但不足以驗證溢價與機齡，不能據此否證快速折舊 thesis，也不建 RA",
+        "source_routes_receipt": "ticker=ORCL;適用=5條;已走=alternate_primary,issuer_site;未走=local_library(rung1),sec_edgar(rung2),authorized_syndication(rung5)",
+        "trace_attempts_ref": "Oracle 官方 Q1 FY27 結果支持 AI 需求超過供給、已交付約 30 萬顆 GPU；20% 續約溢價逐字句只在第三方逐字稿找到，且屬時變商業觀測，不進 A1 圖",
+        "trace_next_trigger": "Oracle 後續 IR、SEC filing 或官方 transcript 出現 GPU resale premium、renewal age 或 utilization breakdown 時重查",
+        "trace_requeue_trigger": "related_triaged_lead:lead_197f334da7415b4933bbe7ac3aae0cde",
+        "trace_requeued_at": "2026-09-14T21:35:12.625122+00:00",
+        "trace_requires_user": "false",
+        "trace_status": "tier_1_2_honest_passthrough",
+        "trace_trigger_entities": [
+          "IREN",
+          "NBIS",
+          "NVDA",
+          "ORCL",
+          "co:iren",
+          "co:nebius",
+          "co:nvidia",
+          "co:oracle"
+        ],
+        "trace_trigger_event_ref": "lead:lead_197f334da7415b4933bbe7ac3aae0cde",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0089_2026-09-13"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "It’s the weekend but surprised I missed this from $ORCL earnings. Implications for $NBIS to $IREN are pretty positive since: Oracle said all GPU capacity for renewal were resold +20% premium above previous contracts. Majority of the equipment was 4Y+ and older… So another L for the Burry’s rapid GPU depreciation thesis. And W for $NVDA and the Neocloud party.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-13T21:37:21.348783+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "若一手成立會改變對 ORCL、NBIS、IREN GPU 資產經濟性與相對吸引力的排序；若不成立則不採用。"
+        },
+        "decided_at": "2026-09-14T21:35:12.625122+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "contradiction": true
+        },
+        "reason": "Event Watch ew_0089_2026-09-13 觸發：新 triage PASS lead lead_197f334da7415b4933bbe7ac3aae0cde 與等待中的追源共用具名標的 IREN, NVDA, co:iren, co:nvidia；事件觸發 bounded pq1 重查",
+        "tier": 3
+      },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-14T21:35:12.625122+00:00",
+          "superseded_reason": "Event Watch ew_0089_2026-09-13 觸發：新 triage PASS lead lead_197f334da7415b4933bbe7ac3aae0cde 與等待中的追源共用具名標的 IREN, NVDA, co:iren, co:nvidia；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_197f334da7415b4933bbe7ac3aae0cde",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-13T21:37:21.348783+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "ranking",
+              "reason": "若一手成立會改變對 ORCL、NBIS、IREN GPU 資產經濟性與相對吸引力的排序；若不成立則不採用。"
+            },
+            "decided_at": "2026-09-13T21:37:21.348783+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true
+            },
+            "reason": "具體指向 Oracle earnings，聲稱舊 GPU capacity 續約被以較舊合約高 20% 轉售且設備多為四年以上，能追回 ORCL 一手文件並直接檢驗快速折舊論的反證。",
+            "related_trace_requeues": [
+              "lead_b0daa9998b26ef6637edc45dc681bb97"
+            ],
+            "tier": 3
+          }
+        }
+      ],
+      "url": "https://x.com/aleabitoreddit/status/2099048356345696391"
     },
     "lead_12d182c33d678a3ec14ef956dd80765a": {
       "content_updated_at": "2026-09-10T22:32:33.427745+00:00",
@@ -13403,6 +14294,61 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1633978/000157046526000004/xslF345X06/form4-08192026_120815.xml"
+    },
+    "lead_197f334da7415b4933bbe7ac3aae0cde": {
+      "entities": {
+        "company_ids": [
+          "co:iren",
+          "co:nvidia",
+          "co:google"
+        ],
+        "tickers": [
+          "IREN",
+          "NVDA",
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-14T21:32:43.576684+00:00",
+      "lead_id": "lead_197f334da7415b4933bbe7ac3aae0cde",
+      "media": [],
+      "published_at": "2026-09-14T11:20:27.000Z",
+      "raw_text": "$IREN CEO on Anthropic call for frontier slowdown:\n\n“Even if models never improved from here…\n\njust rolling out what they can already do would take more compute than the world can build for years”\n\nI agree, and current narrative is reminiscent of the $NVDA DeepSeek selloff or the $GOOGL TurboQuant scare. \n\nGuess what happened? \n\nThese scares once or twice a year all turn out to be immaterial to the overall AI buildout.\n\nEspecially when we have contracted demand all the way into the 2030’s now from advanced packaging to memory procurement.",
+      "refs": {
+        "parked_reason": "management_opinion_no_authority_delta",
+        "trace_attempts_ref": "可追到 IREN 官方 X 的快取轉述，但內容是 CEO 對模型效能與算力需求的觀點，未形成可驗證的新結構事實或排序差異",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "$IREN CEO on Anthropic call for frontier slowdown: “Even if models never improved from here… just rolling out what they can already do would take more compute than the world can build for years” I agree, and current narrative is reminiscent of the $NVDA DeepSeek selloff or the $GOOGL TurboQuant scare. Guess what happened? These scares once or twice a year all turn out to be immaterial to the overall AI buildout. Especially when we have contracted demand all the way into the 2030’s now from advanced packaging to memory procurement.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-14T21:35:12.625122+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "查證成功或失敗都只改變既有 AI compute 需求判斷的信心，不改候選集合或排序。"
+        },
+        "decided_at": "2026-09-14T21:35:12.625122+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯 IREN／AI compute，且含可追查的 CEO 逐字引文；是否有獨立一手來源尚未確認，寬鬆放行追源。",
+        "related_trace_requeues": [
+          "lead_11ef4ccbd71060a566e7fab5a8caec6c"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099458250240618861"
     },
     "lead_19c2d0ce3f563d028b0eefa4ff300ede": {
       "content_updated_at": "2026-09-10T22:32:43.909964+00:00",
@@ -15539,18 +16485,21 @@
       "published_at": "2026-08-07T12:55:47.000Z",
       "raw_text": "Some more TLDR takeaways from $AAOI ER:\n\n- They also flagged DSP and TIA bottlenecks, which is a positive industry read through for names like $MXL, then $SMTC and $MTSI. \n\n- For revenue growth, they're expecting more than $500 million revenue Q4, which is absurd growth. \n\nFor reference:\nQ2: $191.9M\nQ3: ~$255M-$290M\nQ4: $500M+\nBy mid-2027: ~$1.41B quarterly revenue run-rate\n\nAlways impressed by the revenue ramp from some of these optical players.",
       "refs": {
-        "parked_reason": "AAOI 8-K 是房地產購置，未回答 DSP／TIA 供應商問題。",
+        "parked_reason": "可核對 atoms 已是時變財務指引；核心供應瓶頸與遠期營收數字仍只有二手摘要，不能入圖或提高 conviction。",
         "primary_url": "https://investors.ao-inc.com/news-releases/news-release-details/applied-optoelectronics-announces-second-quarter-2026-financial",
         "research_outcome": "AAOI 8-K 是房地產購置，未回答 DSP／TIA 供應商問題。",
-        "research_run": "daily:2026-08-22",
-        "trace_attempts_ref": "library/raw/daily_20260911_trace_outcomes.md",
-        "trace_next_trigger": "AAOI／MXL／SMTC／MTSI 一手文件具名披露 DSP 或 TIA 供應及交付",
+        "research_run": "daily-brief-2026-09-16",
+        "source_routes_receipt": "ticker=AAOI;適用=5條;已走=無;未走=local_library(rung1),sec_edgar(rung2),issuer_site(rung3),alternate_primary(rung4),authorized_syndication(rung5)；結果=park/partial；未宣告已走路徑（自動蓋章）",
+        "trace_attempts_ref": "AAOI 官方 Q2 2026 8-K／Exhibit 99.1 確認 Q2 營收 191.9M、Q3 指引 255M–290M、需求高於產能至 2027 年中；未在可逐字核對的一手文件找到 DSP／TIA 瓶頸、Q4 逾 500M 或 1.41B 季度 run-rate。",
+        "trace_next_trigger": "AAOI 公開 Q2 earnings call 逐字稿或後續 filing 明列 DSP／TIA 供應限制與 Q4／2027 revenue bridge",
+        "trace_origin_entity": "Applied Optoelectronics",
+        "trace_original_date": "2026-08-06",
         "trace_requeue_consumed_entities": [
           "AAOI",
           "CO:APPLIED_OPTOELECTRONICS"
         ],
-        "trace_requeue_trigger": "related_triaged_lead:lead_55c8b7a797abe1ef2704c0ab958b1ca6",
-        "trace_requeued_at": "2026-09-10T22:34:21.225236+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_f53140b6836a9f38447827f29a676313",
+        "trace_requeued_at": "2026-09-15T21:36:35.671608+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -15561,7 +16510,7 @@
           "co:applied_optoelectronics",
           "co:macom"
         ],
-        "trace_trigger_event_ref": "lead:lead_55c8b7a797abe1ef2704c0ab958b1ca6",
+        "trace_trigger_event_ref": "lead:lead_f53140b6836a9f38447827f29a676313",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0017_2026-08-31"
       },
@@ -15577,12 +16526,12 @@
           "decision_impact": "candidate_set",
           "reason": "AAOI 法說點名 DSP 與 TIA 瓶頸並牽出 MXL／SMTC／MTSI：可能新增候選"
         },
-        "decided_at": "2026-09-10T22:34:21.225236+00:00",
+        "decided_at": "2026-09-15T21:36:35.671608+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "Event Watch ew_0017_2026-08-31 觸發：新 triage PASS lead lead_55c8b7a797abe1ef2704c0ab958b1ca6 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0017_2026-08-31 觸發：新 triage PASS lead lead_f53140b6836a9f38447827f29a676313 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
         "tier": 4
       },
       "triage_history": [
@@ -15642,6 +16591,28 @@
               "novelty": true
             },
             "reason": "Event Watch ew_0017_2026-08-31 已觸發（entity_filing_signal；共用具名標的 AAOI, co:applied_optoelectronics；觸發 lead lead_49085eb7b51c402c925cc29ab5e33cc6）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 4
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-15T21:36:35.671608+00:00",
+          "superseded_reason": "Event Watch ew_0017_2026-08-31 觸發：新 triage PASS lead lead_f53140b6836a9f38447827f29a676313 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_f53140b6836a9f38447827f29a676313",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-08-21T16:05:59.208377+00:00",
+              "classified_by": "semantic_v1",
+              "content_type": "structural_fact",
+              "decision_impact": "candidate_set",
+              "reason": "AAOI 法說點名 DSP 與 TIA 瓶頸並牽出 MXL／SMTC／MTSI：可能新增候選"
+            },
+            "decided_at": "2026-09-10T22:34:21.225236+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0017_2026-08-31 觸發：新 triage PASS lead lead_55c8b7a797abe1ef2704c0ab958b1ca6 與等待中的追源共用具名標的 AAOI, co:applied_optoelectronics；事件觸發 bounded pq1 重查",
             "tier": 4
           }
         }
@@ -19365,6 +20336,80 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000651/xslF345X06/primary_doc.xml"
+    },
+    "lead_335277d93cf38eede87f58d4e62bbc6e": {
+      "entities": {
+        "company_ids": [
+          "co:sandisk",
+          "co:sk_hynix",
+          "co:coreweave",
+          "co:intel",
+          "co:amd"
+        ],
+        "tickers": [
+          "SNDK",
+          "DRAM",
+          "CRWD",
+          "SKHY",
+          "CRWV",
+          "BE",
+          "INTC",
+          "AMD"
+        ]
+      },
+      "first_seen": "2026-09-15T21:33:24.876411+00:00",
+      "lead_id": "lead_335277d93cf38eede87f58d4e62bbc6e",
+      "media": [],
+      "published_at": "2026-09-15T00:41:38.000Z",
+      "raw_text": "I've seen comments from Jim Cramer today supporting hedge funds that short Leopold's \"nonsense\" $SNDK / $DRAM / SK Hynix type calls.  \n\nAs well Cramer calling $CRWD a \"Must Buy\".   \n\nI'm not sure if Jim Cramer sees a $241B company  labelled \"Cybersecurity\" and thinks of it as safe... while ignoring all their fundamentals. \n\nBut with Crowdstrike, you have a ~145x FY2028 fwd P/E company, growing revenue 26% Y/Y. That Cramer thinks is a \"must buy\". \n\nAnd then you turn your eyes to the AI capex beneficiary theme that Leopold is long on. \n\nWith names like $SKHY / Samsung in $DRAM... Both FY2027 ~2.8-3x fwd P/E off analyst projections.  \n\n-> Samsung LTAs to 2031 (70% capacity) for durability...  -> Minimum price floor + no price ceiling type contracts from SK Hynix.  \n-> Memory shortage much tigher for the next year.  \n-> DRAM/NAND % of hyperscaler capex goes higher (est. 68% per Trendforce)  \n-> 2027 hyperscaler capex projections all hiked.  \n\nThen with $SNDK, 50% FCF margins, 80% gross margin projections into 2030.   \n\nOnly Situational Awareness position I'm in disagreement with is $CRWV due to debt interest eating FCF, but I can make a similar bullish argument with $BE, $INTC, $AMD, and others. \n\nNot quite sure about short-term, but over the medium run: \n\nIt's hard to not see Leopold's positions pulling an Inverse Cramer due to overwhelming fundamentals.",
+      "refs": {
+        "parked_reason": "主要是估值與情緒論述；唯一可驗證的 68% atom 已在另一工單確認，重複研究不會改變排序或 authority。",
+        "research_run": "daily-brief-2026-09-16",
+        "trace_attempts_ref": "逐 atom 檢查後，Cramer 評論屬情緒；FY2027 P/E、SNDK 2030 margin 與合約條款未附可核對原文。TrendForce 68% 已由獨立公開稿確認並在相關 composite lead 收斂。",
+        "trace_next_trigger": "Samsung／SK hynix／SanDisk filing 或正式合約揭露價格底線、LTA 容量占比或長期 margin",
+        "trace_origin_entity": "aleabitoreddit",
+        "trace_original_date": "2026-09-15",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued",
+        "trace_trigger_entities": [
+          "AMD",
+          "BE",
+          "CRWD",
+          "CRWV",
+          "DRAM",
+          "INTC",
+          "SKHY",
+          "SNDK",
+          "co:amd",
+          "co:coreweave",
+          "co:intel",
+          "co:sandisk",
+          "co:sk_hynix"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "I've seen comments from Jim Cramer today supporting hedge funds that short Leopold's \"nonsense\" $SNDK / $DRAM / SK Hynix type calls. As well Cramer calling $CRWD a \"Must Buy\". I'm not sure if Jim Cramer sees a $241B company labelled \"Cybersecurity\" and thinks of it as safe... while ignoring all their fundamentals. But with Crowdstrike, you have a ~145x FY2028 fwd P/E company, growing revenue 26% Y/Y. That Cramer thinks is a \"must buy\". And then you turn your eyes to the AI capex beneficiary theme that Leopold is long on. With names like $SKHY / Samsung in $DRAM... Both FY2027 ~2.8-3x fwd P/E off analyst projections. -> Samsung LTAs to 2031 (70% capacity) for durability... -> Minimum price floor + no price ceiling type contracts from SK Hynix. -> Memory shortage much tigher for the next year. -> DRAM/NAND % of hyperscaler capex goes higher (est. 68% per Trendforce) -> 2027 hyperscaler capex projections all hiked. Then with $SNDK, 50% FCF margins, 80% gross margin projections into 2030. Only Situational Awareness position I'm in disagreement with is $CRWV due to debt interest eating FCF, but I can make a similar bullish argument with $BE, $INTC, $AMD, and others. Not quite sure about short-term, but over the medium run: It's hard to not see Leopold's positions pulling an Inverse Cramer due to overwhelming fundamentals.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-15T21:36:25.630832+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "查證後主要增加或削弱既有記憶體供需看法的信心，不直接改候選集合或排序。"
+        },
+        "decided_at": "2026-09-15T21:36:25.630832+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯 DRAM、SNDK、Samsung、SK Hynix 與既有 AI capex 主題，含可逐字核對的估值、合約與 capex 數字；來源是投資人綜合觀點，核心事實仍需回追一手。",
+        "related_trace_requeues": [
+          "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099659874892386678"
     },
     "lead_337be0623060bf180b2b3ffe0f1971ae": {
       "entities": {
@@ -31864,6 +32909,32 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-langivare-bootstrap-europe-pakallar-konvertering-av-befintligt-konvertibelt-lan-773313b5"
     },
+    "lead_6f9518a0f009181f1cb0f5977d6d1824": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
+      "first_seen": "2026-09-14T21:33:01.409657+00:00",
+      "lead_id": "lead_6f9518a0f009181f1cb0f5977d6d1824",
+      "published_at": "2026-09-14",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "TSEM 4 filed 2026-09-14 [000839]",
+      "triage": {
+        "decided_at": "2026-09-14T21:33:01.409787+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000197640826000839/xslF345X06/primary_doc.xml"
+    },
     "lead_6fb8bec46249fc64d7301c1c9fd7be96": {
       "entities": {
         "company_ids": [],
@@ -34048,6 +35119,30 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000140569326000011/xslF345X06/wk-form4_1789059862.xml"
+    },
+    "lead_79e5365c8aa9c9b98cd68a35ab0315ca": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-15T21:33:24.873400+00:00",
+      "lead_id": "lead_79e5365c8aa9c9b98cd68a35ab0315ca",
+      "media": [],
+      "published_at": "2026-09-15T08:58:39.000Z",
+      "raw_text": "哇,中国的 AI 视频生成能力可能已经是世界第一了吧？字节跳动的 Seedance 也太强了, 强到让我开始担心…\n\n日本的动画师会不会很快就被 AI 取代？\n\n但想象一下你可以随时生成新的剧情,让故事一直延续下去, 想看多久就看多久\n\n这还挺酷的 https://t.co/oXCWNHlgjI",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "哇,中国的 AI 视频生成能力可能已经是世界第一了吧？字节跳动的 Seedance 也太强了, 强到让我开始担心… 日本的动画师会不会很快就被 AI 取代？ 但想象一下你可以随时生成新的剧情,让故事一直延续下去, 想看多久就看多久 这还挺酷的 https://t.co/oXCWNHlgjI",
+      "triage": {
+        "decided_at": "2026-09-15T21:36:33.665341+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "只有對 AI 影片生成與動畫取代的泛化感想，未具名已追蹤公司、供應鏈關係、資本承諾或可檢驗投資事件，關聯性不足。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099784954444210243"
     },
     "lead_7a036af49c326a6c32a50d4c0a5255a2": {
       "entities": {
@@ -38866,6 +39961,87 @@
         }
       ],
       "url": "https://x.com/aleabitoreddit/status/2077044786402660829"
+    },
+    "lead_8a72e7d5db52030098113f91542e6abf": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology",
+          "co:sk_hynix"
+        ],
+        "tickers": [
+          "MU",
+          "SKHY"
+        ]
+      },
+      "first_seen": "2026-09-15T21:33:24.874256+00:00",
+      "lead_id": "lead_8a72e7d5db52030098113f91542e6abf",
+      "media": [
+        {
+          "cache": {
+            "bytes": 70075,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_8a72e7d5db52030098113f91542e6abf/3_2099671206865825792.jpg",
+            "sha256": "529fe2d1652f80245cd69fcb39fb2de65793a79d7011eefb9474d5e546a2d2e3"
+          },
+          "height": 392,
+          "media_key": "3_2099671206865825792",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSOH1o5acAAfQUb.jpg",
+          "width": 1508
+        },
+        {
+          "cache": {
+            "bytes": 53330,
+            "content_type": "image/png",
+            "local_path": "library/private/lead_media/lead_8a72e7d5db52030098113f91542e6abf/3_2099671352026464256.png",
+            "sha256": "96e38b5b574afb357d4e9701a0dff3e3594f9077d7c49c6dc908d5e5b39ad117"
+          },
+          "height": 334,
+          "media_key": "3_2099671352026464256",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSOH-FqaAAA9Oxl.png",
+          "width": 1490
+        }
+      ],
+      "published_at": "2026-09-15T01:41:27.000Z",
+      "raw_text": "Some color on current memory environments for the $MU / $SKHY bros:\n\n\"There is zero risk of memory prices dropping\" per Team Group GM Gerry Chen. \n\n- Memory module makers have received notices warning of drastic cuts to their 2027 supply allocations. Some could receive 50% or less of their 2026 allocation.\n\n- Upstream manufacturers have reportedly sold out nearly all of their 2027–2028 capacity.\n\n- DDR5 supply, in particular, is projected to come in at less than 80% of previous expectations.\n\n- Chen expects prices to continue rising 20–30% quarter-over-quarter into 2027 (source Digitimes)\n\n- Chen's commentary on $MU is that even before their new MegaFab capacity comes online Q4 2027 at the earliest, orders for 2028 through 2029 are already fully booked. \n\nSo that there's virtually no relief in sight to current shortages.  \n\nSharply lower allocations, fully booked capacity into 2029, and future price hikes doesn't quite sound like the AI buildout is slowing down.",
+      "refs": {
+        "parked_reason": "20–30% 季增、配額砍半與 Micron 2028–2029 已滿載仍是二手轉述；不把供應商通路評論當作可入圖事實。",
+        "research_run": "daily-brief-2026-09-16",
+        "source_routes_receipt": "ticker=MU;適用=5條;已走=無;未走=local_library(rung1),sec_edgar(rung2),issuer_site(rung3),alternate_primary(rung4),authorized_syndication(rung5)；結果=park/partial；未宣告已走路徑（自動蓋章）",
+        "trace_attempts_ref": "X 轉述與附圖指向 DigiTimes 對 Team Group 總經理陳慶雲訪談；未取得 Team Group 一手聲明或完整 DigiTimes 原文，TrendForce 公開稿只獨立支持 2027 記憶體價格與供給偏緊。",
+        "trace_next_trigger": "Team Group 法說／新聞稿逐字揭露 2027 配額、DDR5 缺口或 2028–2029 訂單能見度",
+        "trace_origin_entity": "Team Group;DigiTimes",
+        "trace_original_date": "2026-09-15",
+        "trace_requires_user": "false",
+        "trace_status": "partial",
+        "trace_trigger_entities": [
+          "MU",
+          "SKHY",
+          "co:micron_technology",
+          "co:sk_hynix"
+        ],
+        "trace_trigger_kind": "related_entity_signal"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Some color on current memory environments for the $MU / $SKHY bros: \"There is zero risk of memory prices dropping\" per Team Group GM Gerry Chen. - Memory module makers have received notices warning of drastic cuts to their 2027 supply allocations. Some could receive 50% or less of their 2026 allocation. - Upstream manufacturers have reportedly sold out nearly all of their 2027–2028 capacity. - DDR5 supply, in particular, is projected to come in at less than 80% of previous expectations. - Chen expects prices to continue rising 20–30% quarter-over-quarter into 2027 (source Digitimes) - Chen's commentary on $MU is that even before their new MegaFab capacity comes online Q4 2027 at the earliest, orders for 2028 through 2029 are already fully booked. So that there's virtually no relief in sight to current shortages. Sharply lower allocations, fully booked capacity into 2029, and future price hikes doesn't quite sound like the AI buildout is slowing down.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-15T21:36:27.640061+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "結果會校準既有記憶體供需與價格假設的信心，未具體指向候選增刪。"
+        },
+        "decided_at": "2026-09-15T21:36:27.640061+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "具名 Team Group 總經理與 Digitimes，並有 2027 配額、DDR5 供應、季增價格及 Micron 訂單時點等可核對數字；可能提供獨立的記憶體供需反證或佐證。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099674926697545849"
     },
     "lead_8a772eedb46f9af575752521eed37f12": {
       "entities": {
@@ -46777,14 +47953,17 @@
       "published_at": "2026-09-02T09:54:21.000Z",
       "raw_text": "Just taking a look at Leopold's Situational Awareness Q2 13F latest holdings as of June 30th:\n\n1. $SNDK - $5.674B \n2. $MU - $5.574B \n3. $BE -  $1.899B\n4. $TSM - $1.265B\n5. $NBIS - $1.232B\n6. $CRWV - $744.5M\n7. $CORZ - $665.6M\n8. $STM - $584.3M (new)\n9. $APLD - $469.0M\n10. $RIOT - $468.2M\n11. $SHAZ - $456.8M\n12. $IREN - $433.3M\n\nLess material positions includeed $CLSK, $KEEL, sei-network:native, $WYFI, $BTDR, $TE, $HIVE, $VSH, and others. \n\nSeems like Situational Awareness concentrated around memory (Sandisk, Micron), that have low forward multiples but high visibility into 2030.  \n\nAs well as Anthropic/energy/power adjacent from colo/neoclouds + Bloom. \n\nSome of the bottlenecks like the MLCC trade, he couldn't see play out (Taiyo Yuden, etc). due to July's liqudation. And some are new like $STM (eg. MCU price hikes).\n\nWith core winners of everything such as $TSM (but less high-beta). \n\nThis looked similar to my H2 2026/early 2027 portfolio with Nebius, Micron, TSM, colo players and others as core focus. (I've heavily concentrated on upstream networking/legacy memory currently, with a lot of name overlap).  \n\nBut always cool to see what others are doing.",
       "refs": {
+        "original_claim_status": "SEC 13F-HR 截至 2026-06-30 的 26 筆持股與線索列出的主要部位金額相符",
         "outcome": "倉位/情緒類(L4 市場認知,不進圖):Situational Awareness Q2 13F 記憶體重倉(SNDK/MU 前二,合計逾 11B 級)+BE/TSM/NBIS/CRWV;貼文金額本輪未對上 EDGAR(fund 實體名搜尋未命中),數字視為未驗證轉述;對 SNDK/MU 的擁擠度脈絡已記錄",
-        "parked_reason": "內容是某基金 2026Q2 13F 持股清單＋推主自己的組合對照。它**在結構上不可能產生瓶頸證據**：13F 說的是誰持有什麼，不是誰供應什麼、誰換不掉誰。依 A1（圖不含時變數字）持股與部位本來就不入圖；依 AGENTS.md 的已知失焦指標一節，『別人也買了』既不是需求錨也不是客戶端資本承諾。唯一可能有研究價值的句子是『$STM MCU 價格調漲』與『Taiyo Yuden MLCC』——但兩者都是推主的轉述，且都不在本圖的需求錨（AI capex／人形放量）上，要查也該由該公司自己的一手揭露起頭，不是由這則轉述起頭。trace_status=not_pursued 是終局：不是追不到，是**不值得追**。",
+        "parked_reason": "trace 已取得 SEC 一手表格；資料屬時變持倉且無權威可寫入的結構 claim",
+        "primary_url": "https://www.sec.gov/Archives/edgar/data/2045724/000093583626000418/xslForm13F_X02/form13fInfoTable.xml",
+        "research_outcome": "13F 是時點持倉觀測與他人配置訊號，不是公司供應鏈或瓶頸 A1 證據；不入圖、不建 RA",
         "trace_attempts_ref": "2026-09-12 research-drain：只做型別判定，未對 13F 原件追源（見 parked_reason 的理由）",
         "trace_next_trigger": "某個 decision 明確需要擁擠度或內部人訊號作為輸入時，以 EDGAR 13F-HR／Form 4 原檔核對——在那之前不投預算",
-        "trace_requeue_trigger": "related_triaged_lead:lead_78c2a9a1bf04ad6abd7d0b786056e2b1",
-        "trace_requeued_at": "2026-09-11T21:36:47.654045+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_11ef4ccbd71060a566e7fab5a8caec6c",
+        "trace_requeued_at": "2026-09-13T21:37:21.348783+00:00",
         "trace_requires_user": "false",
-        "trace_status": "not_pursued",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "APLD",
           "BE",
@@ -46812,7 +47991,7 @@
           "co:sandisk",
           "co:tsmc"
         ],
-        "trace_trigger_event_ref": "lead:lead_78c2a9a1bf04ad6abd7d0b786056e2b1",
+        "trace_trigger_event_ref": "lead:lead_11ef4ccbd71060a566e7fab5a8caec6c",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0072_2026-09-03"
       },
@@ -46828,10 +48007,10 @@
           "decision_impact": "confidence_only",
           "reason": "查證只補市場資金定位信心，不改變候選集合或瓶頸排序。"
         },
-        "decided_at": "2026-09-11T21:36:47.654045+00:00",
+        "decided_at": "2026-09-13T21:37:21.348783+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "Event Watch ew_0072_2026-09-03 觸發：新 triage PASS lead lead_78c2a9a1bf04ad6abd7d0b786056e2b1 與等待中的追源共用具名標的 BE, CRWV, co:coreweave；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0072_2026-09-03 觸發：新 triage PASS lead lead_11ef4ccbd71060a566e7fab5a8caec6c 與等待中的追源共用具名標的 IREN, co:iren；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -46872,6 +48051,26 @@
             "decision": "go",
             "priority_flags": {},
             "reason": "Event Watch ew_0072_2026-09-03 已觸發（related_entity_signal；共用具名標的 TSM, co:tsmc；觸發 lead lead_19075d8c72a6e63c865ac7892028a08b）；由 consume-fired 排回 pq1 做 bounded 重查",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-13T21:37:21.348783+00:00",
+          "superseded_reason": "Event Watch ew_0072_2026-09-03 觸發：新 triage PASS lead lead_11ef4ccbd71060a566e7fab5a8caec6c 與等待中的追源共用具名標的 IREN, co:iren；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_11ef4ccbd71060a566e7fab5a8caec6c",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-02T22:35:26.960266+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "sentiment",
+              "decision_impact": "confidence_only",
+              "reason": "查證只補市場資金定位信心，不改變候選集合或瓶頸排序。"
+            },
+            "decided_at": "2026-09-11T21:36:47.654045+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "Event Watch ew_0072_2026-09-03 觸發：新 triage PASS lead lead_78c2a9a1bf04ad6abd7d0b786056e2b1 與等待中的追源共用具名標的 BE, CRWV, co:coreweave；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -47829,6 +49028,64 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-ab-evaluates-a-potential-dual-listing-of-its-shares-on-the-nasdaq-new-york-69346db5"
     },
+    "lead_b4485e188cbf937c503c832edb7ff5f4": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:broadcom",
+          "co:tsmc",
+          "co:micron_technology"
+        ],
+        "tickers": [
+          "NVDA",
+          "AVGO",
+          "TSM",
+          "MU"
+        ]
+      },
+      "first_seen": "2026-09-13T21:33:50.833083+00:00",
+      "lead_id": "lead_b4485e188cbf937c503c832edb7ff5f4",
+      "media": [],
+      "published_at": "2026-09-13T20:11:16.000Z",
+      "raw_text": "I assign essentially 0% probability that Anthropic or OpenAI will slow down frontier development in any meaningful way. \n\nAnd that majority of the \"regulation\" they try making is regulatory capture to slow down competition. \n\n1. Anthropic/OpenAI will not willingly hand over their lead to Gemini, xAI, Meta, or another frontier lab.\n\n-> Elon will want a slowdown to catch up with OpenAI. \n-> OpenAI will want a regulatory framework to slow down xAI + competition. \n\nEvery lab has an incentive to support rules that constrain competitors more than they constrain itself\n\n2. The US is not going to meaningfully slow frontier AI development while China continues advancing. (as seen with Trump's post today about rejecting AI slowdown). \n\nIt would be probably the most flagrant national security risk if China leapfrogged the US in capability. \n\nEspecially when both sides have called frontier AI capabilities \"cyber nuclear weapons\" \n\n3. China will not slow down frontier AI development. That is a given. \n\nIt will be theater if any of these parties agrees so publicly, because behind the scenes:\n\n-> They'll likely keep on progressing, whether it's OpenAI, the US Government, or China. \n\nIf they wanted to slow down, they could have done so themselves at any point in time: \n\nYet everyone is still fighting over the scarce resources to run AI as seen with memory procurement from Samsung going all the way to 2031. \n\nOr the $NVDA / $AVGO supply constrained 70-100%+ Y/Y growth protections.\n\nSo I suggest people unfollow the clowns on X that predict AI stocks from $NVDA to $TSM to $MU will crash for engagement. \n\nAll this does is cause retail to panic short term and hand over the keys to the kingdom over to others.",
+      "refs": {
+        "original_claim_status": "核心是作者對 AI 減速、監管動機與股價的主觀機率判斷；不可由文件直接證偽或抽取",
+        "parked_reason": "trace 判定無可形成 A1 evidence 的原子 claim，且不以投資意見提高 evidence tier 或改 thesis",
+        "research_outcome": "具體市場數字與既有公開材料重疊，沒有新增 named customer/supplier evidence；只保留 confidence-only lead",
+        "trace_status": "not_pursued"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "I assign essentially 0% probability that Anthropic or OpenAI will slow down frontier development in any meaningful way. And that majority of the \"regulation\" they try making is regulatory capture to slow down competition. 1. Anthropic/OpenAI will not willingly hand over their lead to Gemini, xAI, Meta, or another frontier lab. -> Elon will want a slowdown to catch up with OpenAI. -> OpenAI will want a regulatory framework to slow down xAI + competition. Every lab has an incentive to support rules that constrain competitors more than they constrain itself 2. The US is not going to meaningfully slow frontier AI development while China continues advancing. (as seen with Trump's post today about rejecting AI slowdown). It would be probably the most flagrant national security risk if China leapfrogged the US in capability. Especially when both sides have called frontier AI capabilities \"cyber nuclear weapons\" 3. China will not slow down frontier AI development. That is a given. It will be theater if any of these parties agrees so publicly, because behind the scenes: -> They'll likely keep on progressing, whether it's OpenAI, the US Government, or China. If they wanted to slow down, they could have done so themselves at any point in time: Yet everyone is still fighting over the scarce resources to run AI as seen with memory procurement from Samsung going all the way to 2031. Or the $NVDA / $AVGO supply constrained 70-100%+ Y/Y growth protections. So I suggest people unfollow the clowns on X that predict AI stocks from $NVDA to $TSM to $MU will crash for engagement. All this does is cause retail to panic short term and hand over the keys to the kingdom over to others.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-13T21:37:07.127977+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "sentiment",
+          "decision_impact": "confidence_only",
+          "reason": "查證支持或否定都只改變對既有 AI capex 延續判斷的信心，不直接改變候選集合或目前排序。"
+        },
+        "decided_at": "2026-09-13T21:37:07.127977+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "與 NVDA、AVGO、TSM、MU 及 AI 資源瓶頸直接相關，並含 Samsung 採購至 2031、供應受限成長保護等可追查數字；核心仍是作者對監管與行情的推論，寬鬆放行追源但不當作事實。",
+        "related_trace_requeues": [
+          "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+        ],
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099229447304122410"
+    },
     "lead_b48a6c9a349398a5d0d3ab8732a05d54": {
       "content_updated_at": "2026-07-29T13:46:45.021215+00:00",
       "entities": {
@@ -48308,6 +49565,70 @@
         "tier": 3
       },
       "url": "https://finance.yahoo.com/quote/AAOI/profile/"
+    },
+    "lead_b6f2963cd3db2f1e68b50db083f1150b": {
+      "entities": {
+        "company_ids": [],
+        "tickers": []
+      },
+      "first_seen": "2026-09-14T21:32:43.620245+00:00",
+      "lead_id": "lead_b6f2963cd3db2f1e68b50db083f1150b",
+      "media": [
+        {
+          "cache": {
+            "bytes": 199951,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_b6f2963cd3db2f1e68b50db083f1150b/3_2099392031584051200.jpg",
+            "sha256": "d6ba40647e558c6adc8f6e6e6741feafcd2a37be96930222f51bd6447f21e734"
+          },
+          "height": 1512,
+          "media_key": "3_2099392031584051200",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSKJ7f7aYAA9EhN.jpg",
+          "width": 1241
+        },
+        {
+          "cache": {
+            "bytes": 94136,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_b6f2963cd3db2f1e68b50db083f1150b/3_2099392031575711744.jpg",
+            "sha256": "6b2155837236897499eccfda2c356b40da7d5c65f99327cbd8923b35a2f3c767"
+          },
+          "height": 1407,
+          "media_key": "3_2099392031575711744",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSKJ7f5bIAApy0g.jpg",
+          "width": 1188
+        }
+      ],
+      "published_at": "2026-09-14T06:57:22.000Z",
+      "raw_text": "Man Ray: are you long Samsung?\n\nPatrick: Yup.\n\nMan Ray: Samsung has memory LTAs extending to 2031?\n\nPatrick: Yup.\n\nMan Ray: And it’s trading at ~2.8× 2027E P/E?\n\nPatrick: Yup.\n\nMan Ray: So you’re buying Samsung?\n\nPatrick: No, I’m selling on a 4% drop because X said memory will crash from AI slowdown",
+      "refs": {
+        "parked_reason": "duplicate_partial_claim",
+        "trace_attempts_ref": "搜尋已找到既有 lead_39827ad989b89377b6ba94049d50752e；Samsung 法說只支持目標以五年 rolling LTA 覆蓋 60–70% 產能，不支持「已保留到 2031」及社群文列出的對手方",
+        "trace_requires_user": "false",
+        "trace_status": "not_pursued"
+      },
+      "source": "x:aleabitoreddit",
+      "status": "parked",
+      "themes": {},
+      "title": "Man Ray: are you long Samsung? Patrick: Yup. Man Ray: Samsung has memory LTAs extending to 2031? Patrick: Yup. Man Ray: And it’s trading at ~2.8× 2027E P/E? Patrick: Yup. Man Ray: So you’re buying Samsung? Patrick: No, I’m selling on a 4% drop because X said memory will crash from AI slowdown",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-14T21:35:13.274053+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "unclear",
+          "reason": "若具名 LTA 一手成立，可能增加 Samsung 記憶體供應鏈候選；若只是戲謔轉述則不納入。"
+        },
+        "decided_at": "2026-09-14T21:35:13.274053+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "關聯 Samsung memory，含延伸至 2031 的 LTA 與估值數字，可追查但目前來源不明，寬鬆放行。",
+        "tier": 3
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099392042657038698"
     },
     "lead_b6f6f4eabd6f1712350e991a9da89f90": {
       "entities": {
@@ -57584,6 +58905,60 @@
       },
       "url": "https://www.sivers-semiconductors.com/press/stark-kursuppgang-medfor-omvardering-av-skuld-for-sociala-avgifter-under-q2-2026/"
     },
+    "lead_dfd7c92471bf84450e915be7dc005313": {
+      "entities": {
+        "company_ids": [
+          "co:tesla",
+          "co:google",
+          "co:axt",
+          "co:nvidia"
+        ],
+        "tickers": [
+          "TSLA",
+          "GOOGL",
+          "SPCX",
+          "AXTI",
+          "PLTR",
+          "LULU",
+          "NVDA",
+          "EQR"
+        ]
+      },
+      "first_seen": "2026-09-13T21:33:50.855609+00:00",
+      "lead_id": "lead_dfd7c92471bf84450e915be7dc005313",
+      "media": [],
+      "published_at": "2026-09-13T13:23:10.000Z",
+      "raw_text": "Tech people in real life: I have shares in “ $TSLA, $GOOGL, $SPCX. “\n\nPeople on my X feed/comments:\n\n- Leveraged Micron, Sk Hynix calls all the way from $1M to $28M down to $4M\n\n- calls on short dated tanker freight futures because $AXTI 3000% 1Y returns wasn’t enough.\n\n- Long $PLTR short $LULU because inverse Burry indicators\n\n- Long Swedish high beta CW laser suppliers for CPO because it reminds them of $NVDA bottlenecking EML\n\n- “AI is going to end human civilization” so this is a signal for longer AI capex duration + trade wars so long $EQR cause tungsten.\n\nGap between finance X and normal finance/tech people is also insane.\n\nI can’t help but feel proud that I’m partly to blame.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "NVDA"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "TSLA"
+          ]
+        }
+      },
+      "title": "Tech people in real life: I have shares in “ $TSLA, $GOOGL, $SPCX. “ People on my X feed/comments: - Leveraged Micron, Sk Hynix calls all the way from $1M to $28M down to $4M - calls on short dated tanker freight futures because $AXTI 3000% 1Y returns wasn’t enough. - Long $PLTR short $LULU because inverse Burry indicators - Long Swedish high beta CW laser suppliers for CPO because it reminds them of $NVDA bottlenecking EML - “AI is going to end human civilization” so this is a signal for longer AI capex duration + trade wars so long $EQR cause tungsten. Gap between finance X and normal finance/tech people is also insane. I can’t help but feel proud that I’m partly to blame.",
+      "triage": {
+        "decided_at": "2026-09-13T21:37:14.227153+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "雖提到 AXTI、NVDA 與 CW laser，但內容是社群交易風格與績效戲謔，沒有具名供應商、客戶事件或可追回的一手 claim；抽取無法形成可核對的研究單位。",
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2099126746390139042"
+    },
     "lead_dff5a2a6ef33a72e4cf07fda277f6bd2": {
       "entities": {
         "company_ids": [
@@ -62097,19 +63472,25 @@
       "lead_id": "lead_f1cf205e2c5d75400f98dea3391b1e3b",
       "published_at": "2026-09-04",
       "refs": {
-        "parked_reason": "公開 S-4 已構成 [200] 的外部事件命中，但本輪可用路由尚無法逐字讀取新 accession；既有 425 只支持超過 3 億美元訂單與具名部署，不能代替 S-4 的財務與 milestone 條款。",
+        "parked_reason": "等待的公開 S-4 已取得並逐字核對；逾 3 億美元承諾訂單與具名部署已在既有圖譜，S-4 新增的 PIPE、最低現金條件、損失與客戶集中度皆屬 A2／交易時變資料，不形成新 graph admission packet。",
         "primary_url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026097764/ea0297114-04.htm",
         "research_outcome": "public_s4_filed_full_text_not_yet_searchable_in_current_route",
-        "research_run": "daily-brief-2026-09-05",
-        "trace_attempts_ref": "SEC canonical S-4 URL from EDGAR harvest; SEC direct route temporarily blocked and web index has not ingested accession; older official 425 and Agility IR checked",
+        "research_run": "daily-brief-2026-09-16",
+        "trace_attempts_ref": "SEC S-4 accession 0001213900-26-097764；本機逐字稿 library/raw/ccxi_s_4_20260904.txt",
         "trace_next_trigger": "SEC S-4 full text becomes indexable or Agility investor relations publishes the filed prospectus",
+        "trace_origin_entity": "Churchill Capital XI;Agility Robotics",
+        "trace_original_date": "2026-09-04",
+        "trace_requeue_trigger": "related_triaged_lead:lead_0f87443a5f08eda6c8e4966661287409",
+        "trace_requeued_at": "2026-09-15T21:36:31.655340+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial",
+        "trace_status": "original_obtained",
         "trace_trigger_entities": [
           "CCXI",
           "co:churchill_capital_xi"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_0f87443a5f08eda6c8e4966661287409",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0074_2026-09-04"
       },
       "source": "edgar:CCXI",
       "status": "parked",
@@ -62131,12 +63512,34 @@
           "decision_impact": "candidate_set",
           "reason": "S-4 若含 Agility 經審計財務與交易條款，會改變機器人候選集合是否可評估。"
         },
-        "decided_at": "2026-09-04T22:38:34.138522+00:00",
+        "decided_at": "2026-09-15T21:36:31.655340+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "CCXI 官方 S-4 是 Agility Robotics 交易、身分與財務缺口的直接一手文件，具體且可引用；內容可能使機器人候選由私有追蹤轉為可完整評估。",
+        "reason": "Event Watch ew_0074_2026-09-04 觸發：新 triage PASS lead lead_0f87443a5f08eda6c8e4966661287409 與等待中的追源共用具名標的 CCXI, co:churchill_capital_xi；事件觸發 bounded pq1 重查",
         "tier": 1
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-15T21:36:31.655340+00:00",
+          "superseded_reason": "Event Watch ew_0074_2026-09-04 觸發：新 triage PASS lead lead_0f87443a5f08eda6c8e4966661287409 與等待中的追源共用具名標的 CCXI, co:churchill_capital_xi；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_0f87443a5f08eda6c8e4966661287409",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-04T22:38:34.138522+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "candidate_set",
+              "reason": "S-4 若含 Agility 經審計財務與交易條款，會改變機器人候選集合是否可評估。"
+            },
+            "decided_at": "2026-09-04T22:38:34.138522+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "CCXI 官方 S-4 是 Agility Robotics 交易、身分與財務缺口的直接一手文件，具體且可引用；內容可能使機器人候選由私有追蹤轉為可完整評估。",
+            "tier": 1
+          }
+        }
+      ],
       "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026097764/ea0297114-04.htm"
     },
     "lead_f1d18173b1d1d173650f0dae1545c692": {
@@ -62331,6 +63734,47 @@
         "tier": 4
       },
       "url": "https://www.thearmchairtrader.com/aim-market-roundup/bradda-head-iqe-kazera-global/?.tsrc=rss"
+    },
+    "lead_f3bd087fdef27ead605991c22211ba66": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
+      "first_seen": "2026-09-15T21:33:41.171957+00:00",
+      "lead_id": "lead_f3bd087fdef27ead605991c22211ba66",
+      "published_at": "2026-09-15",
+      "refs": {
+        "parked_reason": "公告僅說明 2026-09-21 至 09-23 參加 ECOC 並展示既有 SiPho／SiGe 平台與應用；沒有新客戶、訂單、qualification 或產能承諾，故不製造 graph delta。",
+        "research_run": "daily-brief-2026-09-16",
+        "trace_attempts_ref": "Tower 官方 Form 6-K 與 IR PDF 71b38a20-4516-4599-8c7b-7cf035b76757",
+        "trace_origin_entity": "Tower Semiconductor",
+        "trace_original_date": "2026-09-15",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:TSEM",
+      "status": "parked",
+      "themes": {},
+      "title": "TSEM 6-K filed 2026-09-15 [004500]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-15T21:36:29.653078+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "若揭露新營運或客戶資訊，可能改變 Tower 在現有候選中的相對排序。"
+        },
+        "decided_at": "2026-09-15T21:36:29.653078+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Tower Semiconductor 具名 SEC 6-K，屬可逐字核對的一手文件；內容可能改變既有晶圓代工標的的財務與營運判斷。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004500/zk2636113.htm"
     },
     "lead_f3cf03ef3623277171d343ff96e81a95": {
       "entities": {
@@ -62772,6 +64216,50 @@
         "tier": 4
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119765226000007/xslF345X06/wk-form4_1782767137.xml"
+    },
+    "lead_f53140b6836a9f38447827f29a676313": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-15T21:33:27.463541+00:00",
+      "lead_id": "lead_f53140b6836a9f38447827f29a676313",
+      "published_at": "2026-09-15",
+      "refs": {
+        "parked_reason": "原始 8-K 僅為寧波 38,311.8 平方公尺廠房十年租約與租金條款；屬時變財務／營運觀測，沒有新的結構邊或可獨立驗證的 thesis 反證，因此不入圖。",
+        "research_run": "daily-brief-2026-09-16",
+        "trace_attempts_ref": "SEC 8-K accession 0001683168-26-007160；本機逐字稿 library/raw/aaoi_8_k_20260915.txt",
+        "trace_origin_entity": "Applied Optoelectronics",
+        "trace_original_date": "2026-09-15",
+        "trace_requires_user": "false",
+        "trace_status": "original_obtained"
+      },
+      "source": "edgar:AAOI",
+      "status": "parked",
+      "themes": {},
+      "title": "AAOI 8-K filed 2026-09-15 [007160]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-15T21:36:35.671608+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "exit_condition",
+          "reason": "若 8-K 揭露重大營運變化，可能觸發或解除 AAOI 既有 disproof。"
+        },
+        "decided_at": "2026-09-15T21:36:35.671608+00:00",
+        "decision": "go",
+        "priority_flags": {},
+        "reason": "Applied Optoelectronics 具名 SEC 8-K，屬可逐字核對的一手文件；可能包含影響既有光通訊 thesis 的重大事件。",
+        "related_trace_requeues": [
+          "lead_20eb32acaf78ffb751ee07966e185534"
+        ],
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007160/aaoi_8k.htm"
     },
     "lead_f58ed857803307e89daf910eb18b6116": {
       "entities": {
@@ -65100,8 +66588,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2098697148103631117",
-      "updated_at": "2026-09-12T21:33:34.374195+00:00",
+      "since_id": "2099830591663513642",
+      "updated_at": "2026-09-15T21:33:24.878930+00:00",
       "user_id": "1940360837547565056"
     }
   }
