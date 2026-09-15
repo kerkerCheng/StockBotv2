@@ -812,6 +812,28 @@ variant 恰好相反，它就是一個值。
 **刻意不做（留給 V1–V4，見 ROADMAP）：** 催化劑連到 variant 假設、gap-closure 時序、`realized` 出口、
 籃子頁與 filter 式首選、variant 收斂納入 outcome。
 
+### 6.11 投資人短評（`alpha/narrative/`，2026-09-15）
+
+**角色一句話：首屏的單位是「句」不是「格」——七格前因後果，文字由 session 寫、數字由 authority 填。**
+
+```
+python -m alpha research <T>  → packet 多 brief_frame（七格提問＋placeholder 字彙＋禁字表）
+        │  session 寫七句（只寫文字與 {placeholder}，每格帶 evidence_refs）
+        ▼
+python -m alpha brief <T> --add spec.json  → library/private/alpha/briefs/<T>.jsonl（append-only，ib_*）
+        │  型別層：七格缺一不可／placeholder 封閉／禁字拒收／每格必帶引用
+        ▼
+read model InvestorBriefSection：fill_brief() 把既有 Datum 的值格式化填入 placeholder（缺值印「（尚無）」）
+        │  一把尺（現價／base 目標／賭注目標）＋一顆燈（refresh overall 白話）
+        ▼
+AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為什麼這樣算」，再下一層「完整細節」
+```
+
+**為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
+讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。
+**為什麼禁字表在型別層：** 首屏是投資人的；「白話別名」那次是把欄位翻成中文，欄位還在——這次是欄位不上首屏。
+**套件叫 `narrative` 不叫 `brief`：** `alpha/brief.py` 已是 daily brief 的渲染模組。
+
 ## 7. Engine D（Decision Lab）runtime
 
 - Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許

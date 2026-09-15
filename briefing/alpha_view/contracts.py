@@ -137,6 +137,8 @@ CAP_ANALYTICAL_ENTRY_THRESHOLD = "analytical_entry_threshold_v1"
 #: 橋／估值／報酬算術，得到「如果我們的差異看法對了」的 fair value 與對現價的隱含報酬（payoff）。
 #: 它**不是** bull case、不是機率加權、不是預測；每條 variant 假設都必須指得出 supporting 證據。
 CAP_VARIANT_PAYOFF = "variant_scenario_payoff_v1"
+#: 2026-09-15：投資人短評——七格前因後果，文字由 session 寫（append-only ledger）、數字由 authority 填。
+CAP_INVESTOR_BRIEF = "investor_brief_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -673,6 +675,24 @@ class PayoffScenarioSection:
 
 
 @dataclass(frozen=True, slots=True)
+class InvestorBriefSection:
+    """投資人短評（2026-09-15）：七格前因後果。**文字照抄 ledger、數字照抄既有 Datum**——本 section 不算任何數。
+
+    - `slots`：七格，每格的 `value` 是填好數字的句子；`dependencies` 帶原文、placeholder、缺值清單與引用。
+    - `scale`：一把尺——現價／base 目標價／賭注目標價（同單位），APP 畫圖用；值都是別的 section 已有的。
+    - `status_light`：refresh overall 的白話版（一個燈，不是一串狀態）。
+    - 沒有生效的短評 → `missing`＋`not_yet_recorded`（「還沒寫短評」，不拿 thesis 硬截）。
+    """
+
+    meta: SectionMeta
+    slots: tuple[Datum, ...]
+    scale: Datum
+    status_light: Datum
+    brief_id: str | None
+    is_not: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class EntryLogicSection:
     """Entry Logic（Step 3）：**只消費** `alpha.entry.build_entry_assessment` 的輸出，builder 不含任何門檻價公式。
 
@@ -846,6 +866,7 @@ class AlphaInvestmentView:
     freshness: tuple[FreshnessItem, ...]
     refresh_status: RefreshStatusSection
     payoff_scenario: PayoffScenarioSection
+    investor_brief: InvestorBriefSection
     warnings: tuple[str, ...] = ()
 
     #: 有 `meta` 的 section 名稱，`capability_map()` 依此列舉。
@@ -853,7 +874,7 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "implied_return",
-        "downside", "entry_logic", "evidence", "refresh_status", "payoff_scenario",
+        "downside", "entry_logic", "evidence", "refresh_status", "payoff_scenario", "investor_brief",
     )
 
     def capability_map(self) -> dict[str, dict[str, str | None]]:
@@ -900,6 +921,7 @@ def _jsonable(obj: Any) -> Any:
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
     "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection", "CAP_VARIANT_PAYOFF", "PayoffScenarioSection",
+    "CAP_INVESTOR_BRIEF", "InvestorBriefSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
     "CAP_NARRATIVE_SCENARIOS", "ValuationSection",
     "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",

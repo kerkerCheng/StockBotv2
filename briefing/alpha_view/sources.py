@@ -30,6 +30,7 @@ from alpha.identity import CompanyId, Ticker
 from alpha.implied_return import ImpliedReturnResult, build_implied_return
 from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
+from alpha.providers import briefs as brief_ledger
 from alpha.providers import entry_criteria as entry_ledger
 from alpha.providers import horizon_assumptions as horizon_ledger
 from alpha.providers import abstentions as abstention_ledger
@@ -651,6 +652,11 @@ def fetch_alpha_investment_view(
     except Exception as exc:  # noqa: BLE001
         checklist = {"engine_c_available": False, "note": f"checklist 讀取失敗：{type(exc).__name__}"}
 
+    try:
+        brief_records, brief_errors = brief_ledger.read_brief_records(str(resolved_ticker))
+    except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
+        brief_records, brief_errors = [], [f"短評 ledger 讀取失敗：{type(exc).__name__}"]
+
     return build_alpha_investment_view(
         build=build, signal=signal, signal_reason=signal_reason,
         dependency_paths=causal.get("dependency_paths", ()),
@@ -674,6 +680,7 @@ def fetch_alpha_investment_view(
         refresh_notes=refresh_notes,
         variant_fundamental=variant_fundamental, variant_valuation=variant_valuation,
         variant_implied_return=variant_implied, variant_reason=variant_reason, variant_absence_kind=variant_kind,
+        brief_records=brief_records, brief_parse_errors=brief_errors,
     )
 
 

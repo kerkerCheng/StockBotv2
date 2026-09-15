@@ -50,6 +50,8 @@ QUESTIONS: Mapping[str, str] = {
     "q6_change": "什麼 evidence 會改變答案？",
     # V0（2026-09-15）：投資人的第七問。它是 optional：沒寫賭注不代表研究不完整。
     "q7_payoff": "如果我們的賭注對了，值多少？",
+    # 2026-09-15：投資人的第零問——用人話講一遍前因後果。optional：沒寫短評不代表研究不完整。
+    "q0_story": "這是什麼賭注、為什麼、值多少、什麼時候知道？",
 }
 
 #: 核心 panel（決定 `readiness`）與 optional panel（**不**決定 readiness）。
@@ -58,7 +60,7 @@ QUESTIONS: Mapping[str, str] = {
 CORE_PANELS: tuple[str, ...] = ("headline", "fundamental", "why", "research")
 #: `bet`（V0，2026-09-15）：賭注（variant scenario 的 payoff）。與 entry 同為 optional——
 #: 沒有寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
-OPTIONAL_PANELS: tuple[str, ...] = ("bet", "entry")
+OPTIONAL_PANELS: tuple[str, ...] = ("brief", "bet", "entry")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -104,6 +106,7 @@ LINE_ROLES = frozenset({
     "entry",                   # optional entry threshold
     "bet",                     # optional：賭注（variant payoff）那一串數字
     "override",                # 賭注覆蓋的假設（每條帶 base 對照值）
+    "brief",                   # optional：投資人短評的七句＋一把尺＋一顆燈
 })
 
 #: 「為什麼這一格被列進脆弱清單」的封閉字彙。**每一條都是宣告好的列入規則**，
@@ -149,6 +152,9 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
                  "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
     "entry": {"title": "進場門檻（選配）",
               "hint": "你自己設的要求報酬換算成的價格。沒設不代表這檔研究不完整"},
+    "brief": {"title": "這檔在賭什麼",
+              "hint": "七句話講前因後果：什麼在放量、這家公司供什麼、為什麼卡在它、市場怎麼看、我們賭什麼、"
+                      "對了／錯了會怎樣、什麼時候知道。文字是研究時寫的判斷，數字由系統填"},
     "bet": {"title": "如果我們的賭注對了",
             "hint": "只改我們有差異看法的那幾條假設，其餘沿用 base；算出來的是條件句，不是預測、不是機率加權。"
                     "沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
@@ -234,6 +240,17 @@ PLAIN_MULTIPLE_DERIVATION: Mapping[str, Mapping[str, str]] = {
         "short": "未宣告",
         "reason": "2026-09-11 之前寫的舊紀錄，未宣告倍數來源；**不預設成我們的判斷**",
     },
+}
+
+#: refresh overall 的白話燈號（2026-09-15，投資人短評首屏的那一顆燈）。**不判斷好壞**，只講狀態。
+PLAIN_REFRESH_OVERALL: Mapping[str, str] = {
+    "current": "判斷是最新的",
+    "review_required": "有假設改過，判斷還沒重看",
+    "recalculate": "有數字要重算",
+    "invalidated": "有一條前提已被推翻",
+    "stale": "太久沒核查",
+    "superseded": "已被新判斷取代",
+    "missing": "還沒有判斷",
 }
 
 #: `OperatingAssumption.driver` 的白話標籤（2026-09-10）。反推表的每一列印的是 driver，
@@ -561,8 +578,10 @@ class AnalystView:
     #: V0（2026-09-15）：賭注 panel（optional）。放在 headline 之後——投資人看完 base 的數字，
     #: 下一個問題就是「如果我們對了呢」。沒寫賭注也必須有一個 missing 的 bet panel（缺席要現形）。
     bet: AnalystPanel
+    #: 2026-09-15：投資人短評 panel（optional）。APP 首屏只讀它；markdown 仍以 headline 開頭。
+    brief: AnalystPanel
 
-    PANEL_ORDER = ("headline", "bet", "fundamental", "why", "research", "entry")
+    PANEL_ORDER = ("headline", "brief", "bet", "fundamental", "why", "research", "entry")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

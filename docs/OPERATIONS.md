@@ -913,6 +913,9 @@ python -m alpha valuation COHR --add spec.json      # spec：period_end／value�
 # 賭注（V0，2026-09-15）：營運或估值假設的 spec 加 "scenario": "variant" 即成 overlay——只寫有差異的核心 driver，
 # 其餘沿用 base；型別層要求 derivation=independent ＋ 至少一條 supporting。範例：library/private/alpha/specs/cohr_variant_operating_margin.json
 python -m alpha assumptions COHR --add spec.json    # {"scenario":"variant","driver":"operating_margin_delta",...}；--list 以〔variant〕標記
+# 投資人短評（2026-09-15）：七格前因後果，文字 session 寫、數字 placeholder；範例 library/private/alpha/specs/cohr_brief.json
+python -m alpha brief COHR --add spec.json          # 七格缺一不可；禁字與未登記 placeholder 會被拒；之後 materialize 才會上首屏
+python -m alpha brief COHR --list
 python -m alpha valuation COHR --list
 python -m alpha valuation COHR --retract va_xxx --rationale "..."
 # 2) 看結果（read model 第 13 節：方法／內部 EPS／假設／fair value／現價／gap／算式／敏感度／認識論分解／refresh state）

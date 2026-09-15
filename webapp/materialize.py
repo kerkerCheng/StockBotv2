@@ -75,6 +75,18 @@ def _cell(datum: Mapping[str, Any] | None) -> dict[str, Any]:
             "as_of": datum.get("as_of"), "reason": datum.get("reason")}
 
 
+def _brief_overview(brief_panel: Mapping[str, Any]) -> dict[str, Any]:
+    lines = _line_map(brief_panel)
+    bet_line = lines.get("brief:our_bet") or {}
+    light = (lines.get("brief_status_light") or {}).get("value") or {}
+    return {
+        "status": brief_panel.get("status"),
+        "absence_kind": brief_panel.get("absence_kind"),
+        "our_bet": _cell(bet_line),
+        "status_light": light,
+    }
+
+
 def _payoff_overview(bet_panel: Mapping[str, Any]) -> dict[str, Any]:
     """清單卡片要的賭注三格：目標價／payoff／年化，外加 panel 的 status 與缺席語意。純選取。"""
     lines = _line_map(bet_panel)
@@ -118,6 +130,8 @@ def build_overview(view: Mapping[str, Any]) -> dict[str, Any]:
                            "annualized": _cell(lines.get("annualized_price_return"))},
         # V0（2026-09-15）賭注：照抄 bet panel（optional）。沒寫賭注就是 missing＋not_yet_recorded，不是 0。
         "payoff": _payoff_overview(view.get("bet") or {}),
+        # 2026-09-15 投資人短評：清單卡片要的第一句（賭什麼）與狀態燈。純選取。
+        "brief": _brief_overview(view.get("brief") or {}),
         "readiness": {"state": readiness["state"],
                       "blocker_count": len(readiness.get("blockers") or []),
                       "flag_count": len(readiness.get("flags") or []),

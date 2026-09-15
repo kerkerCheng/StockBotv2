@@ -471,6 +471,72 @@ def cmd_horizon(args: argparse.Namespace) -> int:
 
 
 
+def cmd_brief(args: argparse.Namespace) -> int:
+    """投資人短評 ledger 的讀寫入口（2026-09-15）。七格前因後果、文字 session 寫、數字 authority 填。
+
+    - `--list`：列出 ledger 全部紀錄。
+    - `--add spec.json`：append 一筆。spec：`{"slots": {"demand": {"text": …, "evidence_refs": […]}, …}, "note": …}`
+      七格缺一不可；placeholder 與禁字由型別層擋。
+    - `--retract <id>`：append 一筆撤回紀錄。
+    """
+    from datetime import datetime, timezone
+
+    from .narrative import brief_record
+    from .providers.briefs import append_brief_record, read_brief_records
+
+    try:
+        resolved_ticker, company_id = _resolve_company(args.ticker)
+    except AlphaError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 2
+    ticker = str(resolved_ticker)
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            try:
+                record = brief_record(
+                    company_id=str(company_id), ticker=ticker, slots=spec["slots"],
+                    supersedes_id=spec.get("supersedes_id"), author=str(spec.get("author") or "session"),
+                    context_digest=spec.get("context_digest"), note=str(spec.get("note") or ""),
+                    created_at=datetime.now(timezone.utc))
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ 短評不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            existing, _ = read_brief_records(ticker)
+            target = next((r for r in existing if r.brief_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = brief_record(
+                company_id=target.company_id, ticker=ticker,
+                slots=[{"key": s.key, "text": s.text, "evidence_refs": list(s.evidence_refs)} for s in target.slots],
+                supersedes_id=target.brief_id, retracted=True, author=target.author,
+                note=str(args.rationale or "retracted"), created_at=datetime.now(timezone.utc))
+        try:
+            path = append_brief_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['brief_id']} → {path}")
+        print(f"  下一步：python -m webapp materialize {ticker}（首屏會長出七句；引用解析不到的格會現形）")
+        return 0
+    records, errors = read_brief_records(ticker)
+    if args.format == "json":
+        print(json.dumps({"ticker": ticker, "records": [
+            {"brief_id": r.brief_id, "created_at": r.created_at.isoformat(), "retracted": r.retracted,
+             "supersedes_id": r.supersedes_id, "slots": [{"key": s.key, "text": s.text, "evidence_refs": list(s.evidence_refs)} for s in r.slots]}
+            for r in records], "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# {ticker} 投資人短評 ledger（{len(records)} 筆，解析失敗 {len(errors)}）")
+    for r in records:
+        mark = "（已撤回）" if r.retracted else ""
+        print(f"- {r.brief_id} created {r.created_at.date()}{mark}")
+        for s in r.slots:
+            print(f"    {s.key}：{s.text[:120]}")
+    return 0
+
+
 def cmd_abstention(args: argparse.Namespace) -> int:
     """Abstention ledger 的讀寫入口（Step 5：**「刻意不主張」是研究結論，不是待辦**）。
 
@@ -660,6 +726,15 @@ def build_parser() -> argparse.ArgumentParser:
     abstention.add_argument("--retract", help="append 一筆撤回紀錄（指定 abstention_id）")
     abstention.add_argument("--format", choices=("markdown", "json"), default="markdown")
     abstention.set_defaults(func=cmd_abstention)
+
+    brief = sub.add_parser("brief", help="投資人短評 ledger（七格前因後果；文字 session 寫、數字 authority 填）")
+    brief.add_argument("ticker")
+    brief.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    brief.add_argument("--add", help="append 一筆短評（JSON spec 檔路徑；七格缺一不可）")
+    brief.add_argument("--retract", help="append 一筆撤回紀錄（指定 brief_id）")
+    brief.add_argument("--rationale", help="撤回理由")
+    brief.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    brief.set_defaults(func=cmd_brief)
 
     valuation = sub.add_parser(
         "valuation", help="ValuationAssumption ledger：--list／--add spec.json／--retract <id>（Step 1）")

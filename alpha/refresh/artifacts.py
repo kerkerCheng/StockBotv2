@@ -157,10 +157,15 @@ def artifacts_from_model(
                      else None)
 
     seen: set[str] = set()
+    model_scenario = getattr(model, "scenario", "base")
     for record in (*model.assumptions, *assumption_records):
         if record.assumption_id in seen:
             continue
         seen.add(record.assumption_id)
+        # V0（2026-09-15）：variant 紀錄是另一條 scenario 的成果，不是 base 模型「沒選到」的假設——
+        # 列進來只會得到「未被模型選取（原因未知）」這種假缺席（rollover 測試實測）。跳過，不冒充。
+        if getattr(record, "scenario", "base") != model_scenario:
+            continue
         preset: str | None = None
         why: str | None = None
         if record.assumption_id not in accepted:

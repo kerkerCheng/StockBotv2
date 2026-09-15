@@ -362,6 +362,11 @@ function renderCard(row) {
   }
   card.appendChild(numbers);
 
+  // 投資人短評的第一句（賭什麼）：有寫才印；沒寫不留白也不硬截 thesis。
+  const brief = row.brief || {};
+  if (brief.our_bet && typeof brief.our_bet.value === 'string') {
+    card.appendChild(el('div', 'card-brief', brief.our_bet.value));
+  }
   const attention = row.primary_attention;
   if (attention) {
     const kind = attention.absence_kind;
@@ -1290,6 +1295,65 @@ function versusMarketCard(view) {
   return node;
 }
 
+/* 投資人短評（2026-09-15）：首屏只有這一張——七句前因後果、一把尺、一顆燈。
+   文字是研究 session 寫進 ledger 的判斷，數字由 materialize 端從既有 Datum 填入；本畫面只排版。 */
+function briefCard(payload, view) {
+  const panel = view.brief;
+  const meta = plainPanel('brief', panel ? panel.title : '這檔在賭什麼');
+  const node = el('section', 'panel callout brief-card');
+  node.appendChild(el('h2', null, meta.title));
+  const lines = panel ? lineMap(panel) : {};
+  const light = lines.brief_status_light && lines.brief_status_light.datum;
+  if (light && light.value && light.value.label) {
+    const badge = el('span', 'badge badge-light light-' + (light.value.state || 'unknown'), light.value.label);
+    node.appendChild(badge);
+  }
+  if (panel && panel.context && panel.context.available) {
+    const story = el('div', 'story');
+    (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0).forEach((line) => {
+      const row = el('div', 'story-row');
+      row.appendChild(el('div', 'story-label', plainLine(line.key, line.display_label)));
+      const text = el('div', 'story-text', String(line.datum.value || ''));
+      if (line.datum.status === 'partial' && line.datum.reason) text.title = line.datum.reason;
+      row.appendChild(text);
+      story.appendChild(row);
+    });
+    node.appendChild(story);
+  } else {
+    const box = el('div', 'attention flags');
+    box.appendChild(el('div', 'attention-head', '還沒寫短評'));
+    box.appendChild(el('div', 'attention-body', (panel && panel.reason) || meta.hint));
+    node.appendChild(box);
+  }
+  const scale = lines.brief_scale && lines.brief_scale.datum;
+  if (scale && scale.value && typeof scale.value.price === 'number') node.appendChild(priceScale(scale.value));
+  return node;
+}
+
+/* 一把尺：現價／沒賭對／賭對。純排版——三個數字都是 materialize 端已經算好的，這裡只決定畫在哪。 */
+function priceScale(v) {
+  const marks = [['現價', v.price, 'now'], ['沒賭對', v.base_target, 'base'], ['賭對', v.bet_target, 'bet']]
+    .filter((m) => typeof m[1] === 'number');
+  const wrap = el('div', 'scale');
+  const nums = marks.map((m) => m[1]);
+  const lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
+  const span = (hi - lo) || 1;
+  const track = el('div', 'scale-track');
+  marks.forEach((m) => {
+    const tick = el('div', 'scale-tick tick-' + m[2]);
+    tick.style.left = (((m[1] - lo) / span) * 84 + 8) + '%';
+    tick.appendChild(el('div', 'scale-dot'));
+    tick.appendChild(el('div', 'scale-label', m[0] + ' ' + fmtQuantity(m[1], v.unit)));
+    track.appendChild(tick);
+  });
+  wrap.appendChild(track);
+  const notes = [];
+  if (typeof v.base_return === 'number') notes.push('沒賭對：' + fmtPercent(v.base_return));
+  if (typeof v.payoff === 'number') notes.push('賭對：' + fmtPercent(v.payoff));
+  if (notes.length) wrap.appendChild(el('div', 'scale-note', '從現價到目標價要漲跌多少　' + notes.join('　')));
+  return wrap;
+}
+
 async function renderDetail(ticker) {
   markNav('stocks');
   let payload;
@@ -1328,11 +1392,19 @@ async function renderDetail(ticker) {
   head.appendChild(el('div', 'company', payload.company_label || ''));
   app.appendChild(head);
 
-  // 先給答案與價格，再給會改變行動的四塊，其餘收起來（2026-09-08 使用者回饋）
-  app.appendChild(conclusionCard(payload, view));
-  app.appendChild(priceCard(payload));
-  [blockerCard(payload), fragileCard(view), disproofCard(view), versusMarketCard(view)]
-    .forEach((card) => { if (card) app.appendChild(card); });
+  // 首屏只有短評（2026-09-15 使用者回饋：「一堆數字跟內部名詞堆起來的東西根本看不懂」）。
+  // 原本的六張卡整組收進第一個展開，一個字不刪；再下一層才是第二個展開。
+  app.appendChild(briefCard(payload, view));
+  const why = el('section', 'panel');
+  why.appendChild(drill('為什麼這樣算（結論數字／走勢／卡在哪／最脆弱的地方／什麼會推翻／我們 vs 市場）', () => {
+    const box = el('div', 'why-box');
+    box.appendChild(conclusionCard(payload, view));
+    box.appendChild(priceCard(payload));
+    [blockerCard(payload), fragileCard(view), disproofCard(view), versusMarketCard(view)]
+      .forEach((card) => { if (card) box.appendChild(card); });
+    return box;
+  }));
+  app.appendChild(why);
 
   // 完整細節：**一個展開，展開後就是全部**。先前這裡是七個 details，每個裡面還有第二層
   // details，摘要一律寫著「展開：某某（N 項）」——那是把東西收乾淨，然後叫人再點一次。

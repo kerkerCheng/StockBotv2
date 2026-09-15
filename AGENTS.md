@@ -353,6 +353,14 @@ rationale——這與 ROADMAP「沒有 differentiated evidence 時 EPS 收斂到
 認知，而「使用者剛才看到的是哪一版判斷」就再也答不出來。查證：
 `python -m pytest tests/test_webapp_request_path.py`（四種互相獨立的證明）。
 
+**首屏的單位是「句」不是「格」（2026-09-15 使用者定案）。** 個股頁第一屏只有投資人短評：七格前因後果
+（什麼在放量／這家公司供什麼／為什麼卡在它／市場怎麼看／我們賭什麼／對了或錯了會怎樣／什麼時候知道）
+＋一把尺（現價／沒賭對／賭對）＋一顆狀態燈；其餘所有數字與卡片收進展開。三條不可退讓：
+**文字由研究 session 寫進 append-only ledger（`alpha/narrative`）、數字由 authority 填 placeholder、
+首屏禁字表（session_judgment、隱含報酬、sole_source 之類的內部名詞）型別層拒收。** 沒寫短評印「還沒寫短評」，
+不拿 thesis 硬截——那些句子是分析師欄位。事發：V0 賭注上線後首屏約 30 個數字，使用者原話「一堆數字跟內部名詞
+堆起來的東西根本看不懂」。查證：`python -m alpha brief COHR --list`。
+
 **缺席不得被壓成一句「無資料」。** `absence_kind` 是與 `status` 正交的封閉字彙
 （`alpha/absence.py`），由**產生缺席的那段程式自己宣告**；呈現層一律不得 parse 理由句去猜（L16）。
 使用者必須分得出四件事：**還沒做**（去研究）／**刻意不主張**（這已經是答案，不用動作）／

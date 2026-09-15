@@ -442,6 +442,15 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # 13d. Payoff scenario（V0：賭注）
     lines += render_payoff_lines(view)
 
+    # 0. 投資人短評（給人讀的七句）
+    ib = view.investor_brief
+    lines += _section("13e. 投資人短評（七格前因後果；文字 session 寫、數字 authority 填）", ib.meta)
+    for datum in ib.slots:
+        lines.append(_datum_line(datum))
+    lines.append(_datum_line(ib.scale))
+    lines.append(_datum_line(ib.status_light))
+    lines.append("")
+
     # 13b. Not modeled（下檔）
     for title, section in (("13b. 下檔", view.downside),):
         lines += _section(title, section.meta)

@@ -317,9 +317,10 @@ def test_single_stock_page_leads_with_the_answer_then_the_price(client) -> None:
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
+    # 2026-09-15：首屏只剩短評；結論／價格／卡在哪收進「為什麼這樣算」，再下一層才是完整細節
     order = [block.index(name) for name in
-             ("conclusionCard(", "priceCard(", "blockerCard(", "完整細節")]
-    assert order == sorted(order), "順序必須是：結論 → 價格 → 卡在哪 → 完整細節"
+             ("briefCard(", "為什麼這樣算", "conclusionCard(", "priceCard(", "blockerCard(", "完整細節")]
+    assert order == sorted(order), "順序必須是：短評 → 為什麼這樣算（結論 → 價格 → 卡在哪）→ 完整細節"
     # 細節一格都沒少：六個面板的 render 全都還在 details 裡
     for renderer in ("renderFundamental(view)", "renderWhy(view)", "renderResearch(view)",
                      "renderEntry(view)", "renderFreshness(payload)"):
@@ -391,7 +392,8 @@ def test_full_detail_has_exactly_one_level_of_expansion() -> None:
     assert panels.count("group(") >= 6, "面板內容應改用 group()——有標題但直接看得到"
     block = source.split("async function renderDetail", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    assert block.count("drill(") == 1, "單檔頁只准有一個展開（就是「完整細節」那一個）"
+    # 2026-09-15 起兩個展開（「為什麼這樣算」與「完整細節」），但都在最外層——沒有巢狀
+    assert block.count("drill(") == 2, "單檔頁只准有兩個最外層展開（為什麼這樣算／完整細節）"
 
 
 # ---------------------------------------------------------------------------

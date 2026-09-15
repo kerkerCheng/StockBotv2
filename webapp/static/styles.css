@@ -330,3 +330,20 @@ table.rank.compare td:first-child { color: var(--muted); }
 /* 反推區塊：跟正向的比較表在同一張卡，但視覺上分開——它問的是反過來的問題。 */
 .reverse { margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border); }
 .reverse h3 { font-size: 14px; margin: 0 0 8px; }
+
+/* ---------- 投資人短評（2026-09-15） ---------- */
+.brief-card .story { display: grid; grid-template-columns: max-content 1fr; gap: .45rem .9rem; margin-top: .6rem; }
+.brief-card .story-label { font-weight: 600; white-space: nowrap; opacity: .8; }
+.brief-card .story-text { line-height: 1.55; }
+.brief-card .badge-light { margin-left: .5rem; }
+.card-brief { margin: .4rem 0 .2rem; font-size: .92rem; line-height: 1.45; opacity: .9; }
+.scale { margin-top: 1rem; }
+.scale-track { position: relative; height: 3.2rem; border-top: 2px solid currentColor; opacity: .85; margin: 1.6rem .4rem .2rem; }
+.scale-tick { position: absolute; top: -.55rem; transform: translateX(-50%); text-align: center; }
+.scale-dot { width: .8rem; height: .8rem; border-radius: 50%; margin: 0 auto .25rem; background: currentColor; }
+.tick-now .scale-dot { background: #d9480f; }
+.tick-base .scale-dot { background: #868e96; }
+.tick-bet .scale-dot { background: #1c7ed6; }
+.scale-label { font-size: .8rem; white-space: nowrap; }
+.scale-note { font-size: .85rem; opacity: .8; margin-top: .3rem; }
+.why-box > .panel { margin-top: .8rem; }

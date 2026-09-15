@@ -246,6 +246,17 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
 
     # ---- 基本面（Q1／Q2／Q3）---------------------------------------------
     fund = view.fundamental
+    # ---- 投資人短評（optional）-------------------------------------------
+    brief = view.brief
+    lines += [f"## 短評 — {QUESTIONS['q0_story']}（optional）", ""]
+    if brief.context.get("available"):
+        for line in _by_role(brief, "brief"):
+            if line.key.startswith("brief:"):
+                lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(str(line.datum.value))}")
+        lines.append("")
+    else:
+        lines += [f"**Not set (optional)** — {markdown_text(brief.reason or '還沒寫短評')}", ""]
+
     # ---- 賭注（optional；V0）---------------------------------------------
     bet = view.bet
     lines += [f"## 賭注 — {QUESTIONS['q7_payoff']}（optional）", ""]

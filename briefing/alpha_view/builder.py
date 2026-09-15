@@ -47,7 +47,11 @@ from alpha.valuation.contracts import ValuationAssumption, ValuationResult
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
+from alpha.narrative import ABSENT, SLOT_LABELS, fill_brief, format_value, select_brief
+from briefing.analyst_view.contracts import PLAIN_REFRESH_OVERALL
+
 from .contracts import (
+    CAP_INVESTOR_BRIEF, InvestorBriefSection,
     CAP_VARIANT_PAYOFF, PayoffScenarioSection,
     BASIS_LABEL, CAP_ANALYTICAL_ENTRY_THRESHOLD, CAP_AUTOMATIC_INVALIDATION, CAP_BASE_CASE_IMPLIED_RETURN,
     CAP_CATALYST_UNLINKED,
@@ -1152,6 +1156,117 @@ def _payoff_section(
 
 
 # ---------------------------------------------------------------------------
+# Investor brief（2026-09-15）：七格前因後果。文字照抄 ledger，數字**選取**既有 Datum 後格式化填入。
+# 本檔不算任何數：所有值都來自別的 section 已經算好的格；缺值印「（尚無）」並標 missing。
+# ---------------------------------------------------------------------------
+A_BRIEF = "alpha://brief/ledger"
+
+BRIEF_IS_NOT: tuple[str, ...] = (
+    "不是 thesis 的替代：thesis／五軸／disproof 照舊；短評是給人讀的投影，每一句都指得回它的引用",
+    "不是新的數字：它一個數都不產生，placeholder 全部由既有 Datum 填入；填不到的印「（尚無）」",
+    "不是 buy／sell：「現在不是加碼點」這類句子是 session 的判斷，不是系統的動作建議；買多少由使用者決定",
+)
+
+
+def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection,
+                  catalysts: CatalystSection, bridge: EarningsBridgeSection, today: date) -> dict[str, str | None]:
+    """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。"""
+    price = ir.current_price
+    unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
+    by_key = {d.key: d for d in consensus.items}
+    attribution = ir.attribution.value if isinstance(ir.attribution.value, Mapping) else {}
+    market_multiple = attribution.get("market_multiple_on_consensus")
+    if market_multiple is None and by_key.get("forward_pe") is not None:
+        market_multiple = by_key["forward_pe"].value
+    analyst_count = attribution.get("analyst_count")
+    if analyst_count is None and by_key.get("analyst_count") is not None:
+        analyst_count = by_key["analyst_count"].value
+    dates: list[date] = []
+    for item in catalysts.checkpoints:
+        if isinstance(item.date, date) and item.date >= today:
+            dates.append(item.date)
+    for item in catalysts.structured:
+        expected = getattr(item, "expected_at", None)
+        if isinstance(expected, date) and expected >= today:
+            dates.append(expected)
+    values: dict[str, str | None] = {
+        "price": format_value("price", price.value, unit=unit),
+        "base_target": format_value("price", ir.fair_value.value, unit=unit),
+        "bet_target": format_value("price", payoff.variant_fair_value.value, unit=unit),
+        "base_return": format_value("ratio", ir.price_return.value),
+        "payoff": format_value("ratio", payoff.payoff_return.value),
+        "sell_side_target": format_value("price", by_key["target_mean"].value if "target_mean" in by_key else None, unit=unit),
+        "market_multiple": format_value("multiple", market_multiple),
+        "analyst_count": format_value("count", analyst_count),
+        "value_date": format_value("date", ir.value_date.value),
+        "next_checkpoint_date": format_value("date", min(dates) if dates else None),
+    }
+    # 帶參數的 placeholder：base 假設值與賭注假設值（key 形狀分別是 assumption:driver:scope／override:driver[scope]）
+    for datum in bridge.assumptions:
+        parts = datum.key.split(":", 2)
+        if len(parts) == 3 and datum.is_known:
+            kind = "ratio" if datum.unit == "ratio" else ("count" if datum.unit == "shares" else "currency")
+            values[f"{{assumption:{parts[1]}[{parts[2]}]}}"] = format_value(kind, datum.value)
+    for datum in payoff.overrides:
+        deps = datum.dependencies or {}
+        if deps.get("driver") and datum.is_known:
+            kind = "ratio" if datum.unit == "ratio" else "currency"
+            values[f"{{bet_assumption:{deps['driver']}[{deps['scope']}]}}"] = format_value(kind, datum.value)
+            if deps.get("base_value") is not None:
+                values.setdefault(f"{{assumption:{deps['driver']}[{deps['scope']}]}}", format_value(kind, deps["base_value"]))
+    return values
+
+
+def _investor_brief_section(
+    records: Sequence[Any], parse_errors: Sequence[str], *, as_of: date | None, today: date, reference_day: date,
+    ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection, catalysts: CatalystSection,
+    bridge: EarningsBridgeSection, refresh_overall: str,
+) -> InvestorBriefSection:
+    price = ir.current_price
+    unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
+    scale_value = {"price": price.value, "base_target": ir.fair_value.value,
+                   "bet_target": payoff.variant_fair_value.value, "unit": unit,
+                   "base_return": ir.price_return.value, "payoff": payoff.payoff_return.value}
+    scale = (Datum(key="brief_scale", label="一把尺：現價／沒賭對／賭對", value=scale_value, status="available",
+                   basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day,
+                   reason="三個數都照抄 implied_return／payoff section；沒有的就是 null")
+             if price.value is not None else
+             missing("brief_scale", "一把尺：現價／沒賭對／賭對", price.reason or "無現價", authority=A_SNAP))
+    light = Datum(key="brief_status_light", label="狀態燈",
+                  value={"state": refresh_overall, "label": PLAIN_REFRESH_OVERALL.get(refresh_overall, refresh_overall)},
+                  status="available", basis="deterministic", authority=A_REFRESH, as_of=reference_day,
+                  reason="refresh overall 的白話版；不判斷好壞")
+    brief = select_brief([r for r in records], as_of=as_of, today=today)
+    if brief is None:
+        why = ("短評 ledger 有 " + str(len(parse_errors)) + " 行解析失敗" if parse_errors and not records else
+               "還沒寫投資人短評（不拿 thesis 硬截——那些句子是分析師欄位，不是給人讀的）")
+        meta = SectionMeta(status="missing", basis="none", authority=A_BRIEF, capability=CAP_INVESTOR_BRIEF,
+                           reason=why, as_of=reference_day, absence_kind="not_yet_recorded")
+        slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
+                      for key, label in SLOT_LABELS.items())
+        return InvestorBriefSection(meta=meta, slots=slots, scale=scale, status_light=light, brief_id=None, is_not=BRIEF_IS_NOT)
+    values = _brief_values(ir=ir, payoff=payoff, consensus=consensus, catalysts=catalysts, bridge=bridge, today=today)
+    filled, absent = fill_brief(brief, values)
+    slots: list[Datum] = []
+    for slot in brief.slots:
+        gaps = absent.get(slot.key, [])
+        slots.append(Datum(
+            key=f"brief:{slot.key}", label=SLOT_LABELS[slot.key], value=filled[slot.key],
+            status="partial" if gaps else "available", basis="session_judgment", authority=A_BRIEF,
+            as_of=brief.created_on, evidence_refs=tuple(slot.evidence_refs),
+            reason=(f"有 {len(gaps)} 個數字尚無：{'、'.join(gaps)}（印成{ABSENT}，不補 0）" if gaps else None),
+            dependencies={"raw_text": slot.text, "placeholders": list(slot.placeholders), "missing": gaps,
+                          "brief_id": brief.brief_id, "author": brief.author}))
+    status = "partial" if absent else "available"
+    meta = SectionMeta(status=status, basis="session_judgment", authority=A_BRIEF, capability=CAP_INVESTOR_BRIEF,
+                       reason=(f"{len(absent)} 格有數字尚無" if absent else None), as_of=reference_day,
+                       warnings=("短評文字是 session 判斷（append-only ledger），數字由既有 Datum 填入；"
+                                 "每一句的引用見各格 evidence_refs",))
+    return InvestorBriefSection(meta=meta, slots=tuple(slots), scale=scale, status_light=light,
+                                brief_id=brief.brief_id, is_not=BRIEF_IS_NOT)
+
+
+# ---------------------------------------------------------------------------
 # Entry logic（Step 3）：只選取 `alpha.entry` 的輸出。**本檔沒有門檻價公式**——值、公式字串、依賴全部照抄
 # `EntryAssessmentResult`；builder 不折現任何數、不比較任何價格、不把 comparison 翻譯成 action。
 # ---------------------------------------------------------------------------
@@ -1568,6 +1683,8 @@ def build_alpha_investment_view(
     variant_implied_return: ImpliedReturnResult | None = None,
     variant_reason: str | None = None,
     variant_absence_kind: str | None = None,
+    brief_records: Sequence[Any] = (),
+    brief_parse_errors: Sequence[str] = (),
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。
 
@@ -2724,6 +2841,10 @@ def build_alpha_investment_view(
         warnings.append(ENTRY_EPISTEMIC_WARNING)
     if payoff_section.payoff_return.is_known:
         warnings.append(PAYOFF_EPISTEMIC_WARNING)
+    brief_section = _investor_brief_section(
+        brief_records, brief_parse_errors, as_of=context.as_of, today=today, reference_day=reference_day,
+        ir=implied_return_section, payoff=payoff_section, consensus=consensus_section, catalysts=catalyst_section,
+        bridge=earnings_bridge_section, refresh_overall=refresh_section.overall)
 
     return AlphaInvestmentView(
         schema_version=SCHEMA_VERSION,
@@ -2737,7 +2858,7 @@ def build_alpha_investment_view(
         implied_return=implied_return_section, downside=downside_section,
         entry_logic=entry_section, evidence=evidence_section,
         freshness=tuple(freshness_items), refresh_status=refresh_section, payoff_scenario=payoff_section,
-        warnings=tuple(warnings),
+        investor_brief=brief_section, warnings=tuple(warnings),
     )
 
 

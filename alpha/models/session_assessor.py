@@ -121,6 +121,9 @@ class JudgmentPacket:
             "evidence_scope": self.evidence_scope,
             "axis_prompts": self.axis_prompts,
             "judgment_schema": self.schema,
+            # 2026-09-15：投資人短評的框架——七格前因後果、placeholder 字彙、禁字表。
+            # session 寫完用 `python -m alpha brief <T> --add spec.json`；引用同樣必須是 evidence_index 的 key。
+            "brief_frame": _brief_frame(),
             "notes": list(self.notes),
         }, ensure_ascii=False, indent=2, default=str)
 
@@ -192,6 +195,23 @@ def out_of_scope_hint(ref: str) -> str | None:
         if ref.startswith(prefix):
             return f"{ref} → {hint}"
     return None
+
+
+def _brief_frame() -> dict[str, Any]:
+    from alpha.narrative import BRIEF_FRAME, BRIEF_SLOTS, FORBIDDEN_TERMS, PLACEHOLDERS
+
+    return {
+        "_how_to_use": (
+            "七格照順序各寫一到兩句白話；數字一律用 placeholder（{price}／{bet_target}／{payoff}／"
+            "{assumption:driver[scope]}…），不得打字面值；每格 evidence_refs 必須是 evidence_index 的 key；"
+            "禁字表裡的內部名詞一出現就拒收。存檔：python -m alpha brief <T> --add spec.json"),
+        "slots": [{"key": k, "label": v, **BRIEF_FRAME[k]} for k, v in BRIEF_SLOTS],
+        "placeholders": dict(PLACEHOLDERS),
+        "param_placeholders": ["{assumption:driver[scope]}", "{bet_assumption:driver[scope]}"],
+        "forbidden_terms": list(FORBIDDEN_TERMS),
+        "spec_shape": {"slots": {"demand": {"text": "…{sell_side_target}…", "evidence_refs": ["graph://…"]}},
+                       "note": "可選"},
+    }
 
 
 def build_packet(build: Any) -> JudgmentPacket:

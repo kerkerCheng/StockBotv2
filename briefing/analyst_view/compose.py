@@ -343,6 +343,28 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
+def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
+    """投資人短評（optional）：七句＋一把尺＋一顆燈。**每一格都是 read model 的同一個 Datum**。"""
+    ib = view.investor_brief
+    lines = (tuple(_line(d.key, d.label, d, "brief") for d in ib.slots)
+             + (_line("brief_scale", ib.scale.label, ib.scale, "brief"),
+                _line("brief_status_light", ib.status_light.label, ib.status_light, "brief")))
+    return AnalystPanel(
+        key="brief", title="投資人短評：這檔在賭什麼（optional）",
+        questions=("q0_story",),
+        status=ib.meta.status, optional=True,
+        source_sections=("investor_brief",), source_statuses={"investor_brief": ib.meta.status},
+        source_absence_kinds=_absence_kinds(investor_brief=ib.meta),
+        lines=lines, notes=ib.is_not,
+        evidence=_evidence_for(view, ib.slots),
+        context={"capability": ib.meta.capability, "brief_id": ib.brief_id,
+                 "available": ib.meta.status not in VALUELESS_STATUSES,
+                 "optional_rule": "短評是 optional：沒寫只表示「還沒寫短評」，不代表這檔研究不完整；"
+                                  "文字是研究 session 的判斷（append-only），數字由既有 Datum 填入，不得手打"},
+        reason=ib.meta.reason,
+    )
+
+
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
     """賭注（optional）：variant scenario 的 payoff。**每一格都是 read model 的同一個 Datum**，本層不算。"""
     ps = view.payoff_scenario
@@ -413,7 +435,7 @@ _READINESS_RULE = (
     "全部有內容（available／partial）＝ready；"
     "有內容但至少一段被標為 stale／review_required／not_applicable＝ready_with_flags；"
     "至少一段缺內容（missing／invalidated／not_modeled／insufficient_evidence）＝blocked。"
-    "**optional panel（bet／entry）一律不參與**——沒有賭注、沒有 entry criterion 都不會讓 readiness 變差。"
+    "**optional panel（brief／bet／entry）一律不參與**——沒有短評、沒有賭注、沒有 entry criterion 都不會讓 readiness 變差。"
 )
 
 
@@ -458,6 +480,7 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     everything += list(view.valuation.gap_is_not)
     everything += list(view.entry_logic.is_not)
     everything += list(view.payoff_scenario.is_not)
+    everything += list(view.investor_brief.is_not)
     everything += list(view.downside.not_to_be_confused_with)
     return tuple(dict.fromkeys(everything))
 
@@ -471,6 +494,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         "research": _research_panel(view),
         "entry": _entry_panel(view),
         "bet": _bet_panel(view),
+        "brief": _brief_panel(view),
     }
     rs = view.refresh_status
     ident = view.identity
@@ -480,7 +504,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         as_of=ident.as_of, point_in_time_mode=ident.point_in_time_mode,
         generated_on=ident.generated_on, research_context_digest=ident.research_context_digest,
         headline=panels["headline"], fundamental=panels["fundamental"], why=panels["why"],
-        research=panels["research"], entry=panels["entry"], bet=panels["bet"],
+        research=panels["research"], entry=panels["entry"], bet=panels["bet"], brief=panels["brief"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),
                                change_detection=rs.change_detection,
