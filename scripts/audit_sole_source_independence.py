@@ -37,6 +37,7 @@ from dotenv import load_dotenv  # noqa: E402
 from neo4j import GraphDatabase  # noqa: E402
 
 from identity.registry import get_registry  # noqa: E402
+from query.bottleneck import company_id_for_origin  # noqa: E402
 
 WEAK = "weak"
 WEAK_CONFIDENCE_CAP = 0.5
@@ -52,38 +53,9 @@ def _attrs(raw) -> dict:
     return raw if isinstance(raw, dict) else {}
 
 
-def _company_id_for(origin: str | None, registry) -> str | None:
-    """把 SourceDoc 的 `origin_entity`（人類公司名，如 "Lumentum"）解析成 `co:*`。
-
-    ⚠ 解析失敗一律回 None 並讓該筆進 `unresolved_origins`，**不得當成「不同源」**。
-    那會讓供應商自報的邊悄悄通過檢查——正是 L8／L11 要防的 laundering
-    （L15：先解析身分、再查權限；解析時不得偏好「能通過的答案」）。
-
-    解析順序刻意由嚴到寬，且**兩個以上候選就不猜**（L15 的無歧義原則）。
-    """
-    if not origin:
-        return None
-    text = str(origin).strip()
-    if not text:
-        return None
-
-    by_ticker = registry.company_id_for_ticker(text)
-    if by_ticker:
-        return by_ticker
-
-    slug = "co:" + text.lower().replace(" ", "_").replace(".", "").replace(",", "")
-    if registry.has_company(slug):
-        return slug
-
-    # 正式名稱／別名比對；大小寫不敏感，但必須唯一命中。
-    needle = text.casefold()
-    hits = {
-        c.company_id
-        for c in registry.companies
-        if needle == str(getattr(c, "name", "") or "").casefold()
-        or needle in {str(a).casefold() for a in (getattr(c, "aliases", None) or ())}
-    }
-    return hits.pop() if len(hits) == 1 else None
+# origin → co:* 的解析只有一份（2026-09-16 收斂）：先前本檔自抄一份，與排序權威各自漂移
+# ——兩份都讀了 registry 沒有的 `name` 欄位（L16：同一分類兩份，後改的那份不會回頭更新前一份）。
+_company_id_for = company_id_for_origin
 
 
 def main() -> int:

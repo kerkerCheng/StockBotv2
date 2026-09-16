@@ -145,15 +145,70 @@ def is_entity_id(node_id: Any) -> bool:
     return ":" in str(node_id or "")
 
 
+#: 公司名稱尾端的法律型態 token（封閉清單）。**只在比對時去掉**，不改任何呈現。
+#: 比對前每個 token 先去掉非字母數字（"Inc." → "inc"、"Co.," → "co"、"S.A." → "sa"）。
+#: ⚠ general 到資料支持的那一格為止（L17-4）：2026-09-16 實測 69 個解析不到的 origin 字串裡，
+#: 約 20 個只差這些尾綴或尾端一段括號註解；再泛化（模糊比對、縮寫）就會開始誤中。
+_LEGAL_SUFFIX_TOKENS = frozenset({
+    "inc", "incorporated", "corp", "corporation", "co", "company", "ltd", "limited",
+    "llc", "plc", "ag", "ab", "sa", "nv", "gmbh", "kk", "holding", "holdings", "group",
+})
+_TRAILING_ANNOTATION = re.compile(r"\s*[（(][^（）()]*[）)]\s*$")
+
+
+def _strip_annotation(text: str) -> str:
+    """去掉 origin 尾端那一組括號註解：`Coherent（發行人官方新聞稿）` → `Coherent`。
+
+    括號裡是研究者寫給人看的脈絡（發行人／客戶端／轉載），不是發布者身分的一部分；
+    留著它會讓一份公司自家文件被當成解析不到的第三方（2026-09-16 實測 20 筆）。
+    只去尾端一組；名稱中段的括號不動。
+    """
+    return _TRAILING_ANNOTATION.sub("", str(text or "")).strip()
+
+
+def _core_name(text: str) -> str:
+    """比對用的核心名稱：casefold、去掉尾端的法律型態 token、去頭尾標點。
+
+    `Lumentum Holdings Inc.` 與 `Lumentum` 是同一家；`MACOM Technology Solutions Holdings, Inc.`
+    與 `MACOM Technology Solutions` 也是。呈現層不用它——`display_name` 印的仍是登記名稱。
+    """
+    tokens = str(text or "").casefold().split()
+    while tokens:
+        tail = re.sub(r"[^0-9a-z]", "", tokens[-1])
+        if not tail or tail in _LEGAL_SUFFIX_TOKENS:
+            tokens.pop()
+            continue
+        break
+    return " ".join(tokens).strip(" ,.;:-")
+
+
+def _name_variants(company) -> set[str]:
+    """一家公司可被比對的名稱：`display_name`、它的核心名稱、以及 registry 明列的 alias。
+
+    ⚠ 讀的是 registry 真有的欄位。2026-09-16 之前這裡讀 `name`，而 `CompanyIdentity`
+    從來沒有這個欄位（100 家 0 家有）——測試的假登記表有，所以測試全綠、production
+    一家都解析不到（L17：機制只認得當初那個案例）。
+    """
+    variants: set[str] = set()
+    display = getattr(company, "display_name", None)
+    if display:
+        variants.add(str(display))
+        variants.add(_core_name(display))
+    variants |= {str(a) for a in (getattr(company, "aliases", None) or ()) if str(a)}
+    return {v for v in variants if v}
+
+
 def company_id_for_origin(origin: str | None, registry) -> str | None:
     """把 SourceDoc 的 `origin_entity`（人類公司名）解析成 `co:*`。
 
     ⚠ 解析失敗一律回 None，**不得當成「不同源」**——那會讓供應商自報悄悄通過檢查，
     正是 L8／L11 要防的 laundering。順序由嚴到寬，兩個以上候選就不猜（L15）。
+    比對前先去掉尾端括號註解與法律型態尾綴（`_strip_annotation`／`_core_name`）；
+    去掉的只是格式，不是身分——`Foo Inc.` 與 `Foo Ltd.` 兩家並存時 `Foo` 仍回 None。
     """
     if not origin:
         return None
-    text = str(origin).strip()
+    text = _strip_annotation(str(origin).strip())
     if not text:
         return None
     by_ticker = registry.company_id_for_ticker(text)
@@ -162,12 +217,13 @@ def company_id_for_origin(origin: str | None, registry) -> str | None:
     slug = "co:" + text.lower().replace(" ", "_").replace(".", "").replace(",", "")
     if registry.has_company(slug):
         return slug
-    needle = text.casefold()
+    needle = _core_name(text)
+    if not needle:
+        return None
     hits = {
         c.company_id
         for c in registry.companies
-        if needle == str(getattr(c, "name", "") or "").casefold()
-        or needle in {str(a).casefold() for a in (getattr(c, "aliases", None) or ())}
+        if any(needle == _core_name(v) for v in _name_variants(c))
     }
     return hits.pop() if len(hits) == 1 else None
 
@@ -176,14 +232,13 @@ def _origin_mentions(origin: str, registry) -> set[str]:
     """origin 字串中被具名的 registry 公司集合（word-boundary、名稱長度 ≥4 防誤中）。
 
     供聯合公告偵測用：複合 origin（"IQE plc / Tower Semiconductor (joint announcement)"）
-    無法整串解析成單一公司，但其中的具名仍是確定性可比對的。
+    無法整串解析成單一公司，但其中的具名仍是確定性可比對的。核心名稱（去尾綴）也算具名：
+    `Tower Semiconductor Ltd.` 的登記名稱不會逐字出現在聯合公告的 origin 裡。
     """
     text = str(origin)
     hits: set[str] = set()
     for company in registry.companies:
-        names = [str(getattr(company, "name", "") or "")]
-        names += [str(a) for a in (getattr(company, "aliases", None) or ())]
-        for name in names:
+        for name in _name_variants(company):
             if len(name) < 4:
                 continue
             if re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", text, re.IGNORECASE):
@@ -202,7 +257,8 @@ def classify_evidence(
 
     `None` 同時可能是「真的第三方媒體」（schema §7 接受）與「沒解析出來的子公司／別名」
     （不接受）——兩者結論相反，不得壓成一個布林（L12）。解析失敗的 origin 再過一道
-    聯合公告偵測（字串內具名 ≥2 家 registry 公司且含 subject 以外者）才落 needs_review。
+    聯合公告偵測（字串內具名 ≥2 家 registry 公司且含 subject 以外者）才落 needs_review；
+    解析到主詞、但同一字串另具名他家 registry 公司者亦為 counterparty_joint（2026-09-16）。
     `filing_origins`：來自 source_type=='filing' 文件的 origin 集合（costly proxy）。
     """
     seen = {o for o in origins if o}
@@ -224,7 +280,12 @@ def classify_evidence(
             else:
                 _lift("needs_review")
         else:  # cid == subject：自報
-            if origin in filing_origins:
+            # ⚠ 解析得到主詞不代表字串裡只有主詞。「Sivers 官方 PR，內含 Ayar Labs CTO 具名引述」
+            # 這類複合 origin 以前因為解析失敗落在 needs_review；解析歸位後若直接判自報，
+            # 會把研究者刻意寫進 origin 的對手方具名抹掉（2026-09-16）。
+            if _origin_mentions(origin, registry) - {subject}:
+                _lift("counterparty_joint")
+            elif origin in filing_origins:
                 _lift("self_reported_costly")
     return best
 

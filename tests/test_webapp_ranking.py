@@ -38,13 +38,17 @@ _SECTOR_MAP = {
 
 
 class _LabelRegistry(_FakeRegistry):
-    """多一個 `company()`：display_name 只有 Coherent 有；AXT 只有 name；lumentum 不在 registry。"""
+    """多一個 `company()`：display_name 只有 Coherent 有；AXT 只有 name；lumentum 不在 registry。
+
+    ⚠ 這裡的 `name` 只用來測 `webapp/materialize.py` 標籤的 fallback 分支；真 registry 沒有
+    `name` 欄位（假登記表的公司物件自 2026-09-16 起只有 `display_name`，見 `_FakeRegistry`）。
+    """
 
     def company(self, company_id):
         for c in self._c:
             if c.company_id == company_id:
                 display = {"co:coherent": "Coherent Corp."}.get(company_id)
-                return types.SimpleNamespace(display_name=display, name=c.name)
+                return types.SimpleNamespace(display_name=display, name=c.display_name)
         return None
 
 

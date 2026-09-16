@@ -13,7 +13,8 @@
       "research_ticker": "AEVA",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Aeva Technologies, Inc."
     },
     {
       "company_id": "co:agility_robotics",
@@ -60,7 +61,8 @@
       "research_ticker": "AAOI",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Applied Optoelectronics, Inc."
     },
     {
       "company_id": "co:arista",
@@ -72,7 +74,8 @@
       "research_ticker": "AXTI",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "AXT, Inc."
     },
     {
       "company_id": "co:ayar_labs",
@@ -90,7 +93,8 @@
     {
       "company_id": "co:broadcom",
       "research_ticker": "AVGO",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Broadcom Inc."
     },
     {
       "company_id": "co:cadence",
@@ -146,19 +150,22 @@
       "research_ticker": "FN",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NYSE"
+      "execution_venue": "NYSE",
+      "display_name": "Fabrinet"
     },
     {
       "company_id": "co:foci",
       "research_ticker": "3363.TWO",
-      "market_currency": "TWD"
+      "market_currency": "TWD",
+      "display_name": "FOCI Fiber Optic Communications, Inc."
     },
     {
       "company_id": "co:globalfoundries",
       "research_ticker": "GFS",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "GlobalFoundries Inc."
     },
     {
       "company_id": "co:google",
@@ -190,7 +197,8 @@
       "research_ticker": "HIMX",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Himax Technologies, Inc."
     },
     {
       "company_id": "co:humanoid",
@@ -217,7 +225,8 @@
     {
       "company_id": "co:intelliepi",
       "research_ticker": "4971.TWO",
-      "market_currency": "TWD"
+      "market_currency": "TWD",
+      "display_name": "IntelliEPI"
     },
     {
       "company_id": "co:iqe",
@@ -254,7 +263,8 @@
       "research_ticker": "LRCX",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Lam Research Corporation"
     },
     {
       "company_id": "co:landmark_optoelectronics",
@@ -288,7 +298,8 @@
       "research_ticker": "LITE",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Lumentum Holdings Inc."
     },
     {
       "company_id": "co:lumilens",
@@ -312,28 +323,32 @@
       "research_ticker": "MTSI",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "MACOM Technology Solutions Holdings, Inc."
     },
     {
       "company_id": "co:marvell_technology",
       "research_ticker": "MRVL",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Marvell Technology, Inc."
     },
     {
       "company_id": "co:meta",
       "research_ticker": "META",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Meta Platforms, Inc."
     },
     {
       "company_id": "co:micron_technology",
       "research_ticker": "MU",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Micron Technology, Inc."
     },
     {
       "company_id": "co:microsoft",
@@ -358,7 +373,8 @@
       "research_ticker": "6268.T",
       "market_currency": "JPY",
       "execution_currency": "JPY",
-      "execution_venue": "TSE"
+      "execution_venue": "TSE",
+      "display_name": "Nabtesco Corporation"
     },
     {
       "company_id": "co:nava_thailand",
@@ -396,7 +412,8 @@
     {
       "company_id": "co:nvidia",
       "research_ticker": "NVDA",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "NVIDIA Corporation"
     },
     {
       "company_id": "co:o_net_technologies",
@@ -424,7 +441,8 @@
     {
       "company_id": "co:poet_technologies",
       "research_ticker": "POET",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "POET Technologies Inc."
     },
     {
       "company_id": "co:proterial",
@@ -466,7 +484,8 @@
       "execution_venue": "FRA",
       "aliases": [
         "SIVEF"
-      ]
+      ],
+      "display_name": "Sivers Semiconductors AB"
     },
     {
       "company_id": "co:sk_hynix",
@@ -476,7 +495,8 @@
       "execution_venue": "KRX",
       "aliases": [
         "SKHY"
-      ]
+      ],
+      "display_name": "SK hynix Inc."
     },
     {
       "company_id": "co:soitec",
@@ -522,12 +542,14 @@
       "research_ticker": "TSEM",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Tower Semiconductor Ltd."
     },
     {
       "company_id": "co:tsmc",
       "research_ticker": "TSM",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Taiwan Semiconductor Manufacturing Company Limited"
     },
     {
       "company_id": "co:umc",
@@ -544,7 +566,8 @@
     {
       "company_id": "co:vpec",
       "research_ticker": "2455.TW",
-      "market_currency": "TWD"
+      "market_currency": "TWD",
+      "display_name": "Visual Photonics Epitaxy"
     },
     {
       "company_id": "co:win_semiconductor",
