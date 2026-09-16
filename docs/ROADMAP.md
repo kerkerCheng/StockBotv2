@@ -73,8 +73,12 @@ authority，那是另一個 pq2 編號。判準全文見 [`AGENTS.md`](../AGENTS
 ## Phase 表（每項四欄：做什麼／為什麼／驗收哪個數字會變／前置）
 
 > 順序是決定紀錄的建議；Step 0 核准後才出 Step 1 的 PLAN_PROPOSAL，順序可在 plan 裡改，但要說明理由。
-> 每個 Step 交回 HUMAN SUMMARY ＋ 八欄；Verdict 不是 GO 或有待決問題就停——本路線圖屬 **Z3** 且動到判準句，
-> 是常規推進授權的例外 ④（[`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md) §5）。
+> 每個 Step 交回 HUMAN SUMMARY ＋ 八欄；~~Verdict 不是 GO 或有待決問題就停——本路線圖屬 **Z3** 且動到判準句，
+> 是常規推進授權的例外 ④（[`AGENT_WORKFLOW.md`](AGENT_WORKFLOW.md) §5）。~~
+> **2026-09-16 使用者定案（Phase 1 Step 1.0 交回後）：Verdict 為 GO 且沒有待使用者決定的問題時，直接合併 master 並接續下一個 Step，
+> 不逐 Step 請核准。** 仍要停：Verdict 非 GO、有待決問題、動到四個人工 gate／資本／append-only authority、要改 `AGENTS.md` 判準句
+> （後者仍須先給五欄 amendment）。四個人工 gate 不因此放寬：pq2 的圖寫入與 Engine C 判讀寫入仍逐筆核准。
+> Phase 1 核准的計畫與工單見 [`brainstorms/2026-09-16-alpha-edge-phase1-plan.md`](brainstorms/2026-09-16-alpha-edge-phase1-plan.md)。
 > 標記：▶ 進行中｜○ 未開工｜✅ 完成（回填實測 before → after）。研究項（pq2）不占本表，本表只追它的驗收數字。
 
 | Phase | 漏斗層 | 做什麼 | 為什麼 | 驗收（哪個數字會變） | 前置 |

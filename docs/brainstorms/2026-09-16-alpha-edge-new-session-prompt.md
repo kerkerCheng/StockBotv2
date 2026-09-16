@@ -4,9 +4,17 @@
 
 ---
 
-> **狀態（2026-09-16）：Step 0 已核准並合併進 master（branch `docs/alpha-edge-step0`）。**
-> 新 session 照下面順序讀完文件後，**直接從「Step 1 以後」開始**：先出 Phase 1 的 PLAN_PROPOSAL（Z3），停下等核准。
-> 不要重做 Step 0；去向清單在 `docs/refactor/alpha-edge-step0-migration.md`。
+> ~~**狀態（2026-09-16）：Step 0 已核准並合併進 master（branch `docs/alpha-edge-step0`）。**
+> 新 session 照下面順序讀完文件後，**直接從「Step 1 以後」開始**：先出 Phase 1 的 PLAN_PROPOSAL（Z3），停下等核准。~~
+>
+> **狀態（2026-09-16 21:30）：Step 0 已合併；Phase 1 PLAN 已核准（決策 A go／B 選 1／C 選 1／D 選 2，順序 1.0 → 1.1 → 1.2 → 1.3）；
+> Step 1.0「公司名稱解析歸位」已 GO 並合併 master（merge `d06f5bf`）。**
+> 新 session 照下面順序讀完文件後，再讀 **`docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`**（核准的計畫、工單、Step 1.0 殘餘、
+> MFN／RNS／MOPS 的探測事實），然後**直接從 Step 1.1 開工**（兩支抓取器＋路由登記＋三份 smoke 文件入圖）。
+> **常設授權（2026-09-16 使用者定案）：Step 的 Verdict 為 GO 且沒有待使用者決定的問題時，直接合併 master 並接續下一個 Step，
+> 不逐 Step 請核准。** 仍要停：Verdict 非 GO、有待決問題、動到四個人工 gate／資本／append-only authority、要改 `AGENTS.md` 判準句。
+> pq2 的圖寫入（`ra_admission`）與 Engine C 判讀寫入仍逐筆核准——研究段落收尾照常給批次指令。
+> 不要重做 Step 0（去向清單 `docs/refactor/alpha-edge-step0-migration.md`），也不要重做 Step 1.0。
 
 先做 Step 0 文件整併並交回 diff，未核准前不得動任何程式。
 
