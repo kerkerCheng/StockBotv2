@@ -18,11 +18,16 @@ from query.bottleneck import (
 
 
 class _FakeRegistry:
-    """只實作 bottleneck.py 用到的 registry surface。"""
+    """只實作 bottleneck.py 用到的 registry surface。
+
+    ⚠ 公司物件的形狀必須與真的 `CompanyIdentity` 一致：只有 `display_name` 與 `aliases`，
+    **沒有 `name`**。2026-09-16 事發：這裡曾給假公司一個 `name` 欄位，解析器就照著讀
+    `name`——測試全綠，production 100 家 0 家解析得到（L17：機制只認得當初那個案例）。
+    """
 
     class _C:
-        def __init__(self, cid, name, ticker):
-            self.company_id, self.name, self.research_ticker_ = cid, name, ticker
+        def __init__(self, cid, display_name, ticker):
+            self.company_id, self.display_name, self.research_ticker_ = cid, display_name, ticker
             self.aliases = ()
 
     def __init__(self):
@@ -315,3 +320,81 @@ def test_sort_key_priority_anchor_first_then_evidence_or_substitutability() -> N
     result = rank_bottlenecks(rows, _FakeRegistry())
     assert [r["company_id"] for r in result["rows"]] == ["co:axt", "co:coherent"]
     assert [r["company_id"] for r in result["structural_rows"]] == ["co:axt", "co:coherent"]
+
+
+class _NamedRegistry(_FakeRegistry):
+    """登記名稱是財報封面印的法律名稱（真 registry 的樣子），不是短名。"""
+
+    def __init__(self):
+        self._c = [
+            self._C("co:iqe", "IQE plc", "IQE.L"),
+            self._C("co:tower_semiconductor", "Tower Semiconductor Ltd.", "TSEM"),
+            self._C("co:coherent", "Coherent Corp.", "COHR"),
+            self._C("co:schaeffler", "Schaeffler AG", "SHA0.DE"),
+            self._C("co:macom", "MACOM Technology Solutions Holdings, Inc.", "MTSI"),
+        ]
+
+
+def test_origin_resolution_reads_the_registry_field_that_exists() -> None:
+    """2026-09-16 事發：解析讀 `name`，而 `CompanyIdentity` 只有 `display_name`——100 家 0 家
+    解析得到，IQE 的自家年報被當成解析不到的第三方。法律型態尾綴與尾端括號註解只是格式。"""
+    from query.bottleneck import company_id_for_origin
+
+    reg = _NamedRegistry()
+    assert company_id_for_origin("Tower Semiconductor Ltd.", reg) == "co:tower_semiconductor"
+    assert company_id_for_origin("Tower Semiconductor", reg) == "co:tower_semiconductor"
+    assert company_id_for_origin("MACOM Technology Solutions", reg) == "co:macom"
+    assert company_id_for_origin("MACOM Technology Solutions Inc.", reg) == "co:macom"
+    assert company_id_for_origin("Coherent（發行人官方新聞稿）", reg) == "co:coherent"
+    assert classify_evidence("co:coherent", ["Coherent（發行人官方新聞稿）"], reg) == "self_reported"
+    assert (
+        classify_evidence(
+            "co:coherent", ["Coherent（發行人官方新聞稿）"], reg,
+            filing_origins={"Coherent（發行人官方新聞稿）"},
+        )
+        == "self_reported_costly"
+    )
+
+
+def test_joint_announcement_is_detected_through_core_names() -> None:
+    """IQE×Tower 聯合公告的 origin 不會逐字印 `Tower Semiconductor Ltd.`；核心名稱要算具名。"""
+    reg = _NamedRegistry()
+    assert (
+        classify_evidence("co:iqe", ["IQE plc / Tower Semiconductor (joint announcement)"], reg)
+        == "counterparty_joint"
+    )
+    # 解析得到主詞、但同一字串另具名他家 → 仍是聯合，不得因為「解析成功」就降成自報
+    assert (
+        classify_evidence(
+            "co:coherent", ["Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"], reg
+        )
+        == "counterparty_joint"
+    )
+    # 只具名主詞自己（Hexagon 不在 registry）→ 仍待判定，不得升級
+    assert (
+        classify_evidence(
+            "co:schaeffler", ["Hexagon AB, with named Schaeffler management statements"], reg
+        )
+        == "needs_review"
+    )
+
+
+def test_ambiguous_core_name_does_not_guess() -> None:
+    """兩家的核心名稱相同時（`Foo Inc.`／`Foo Ltd.`），`Foo` 必須回 None——不猜（L15）。"""
+    from query.bottleneck import company_id_for_origin
+
+    reg = _FakeRegistry()
+    reg._c = [reg._C("co:foo_a", "Foo Inc.", "FOOA"), reg._C("co:foo_b", "Foo Ltd.", "FOOB")]
+    assert company_id_for_origin("Foo", reg) is None
+    assert classify_evidence("co:foo_a", ["Foo"], reg) == "needs_review"
+
+
+def test_single_stray_mention_cannot_lift_evidence() -> None:
+    """`Coherent Market Insights`（研究機構）含 registry 公司的核心名稱：不得解析成該公司，
+    單一具名也不得升級——升級要嘛靠解析到另一家、要嘛靠 ≥2 家具名。"""
+    from query.bottleneck import company_id_for_origin
+
+    reg = _NamedRegistry()
+    assert company_id_for_origin("Coherent Market Insights", reg) is None
+    assert classify_evidence("co:iqe", ["Coherent Market Insights"], reg) == "needs_review"
+    assert classify_evidence("co:coherent", ["Coherent Market Insights"], reg) == "needs_review"
