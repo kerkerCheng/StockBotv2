@@ -89,6 +89,42 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 - **L11-6 最先壞的那一筆：** `published_at` 的曆法與時區——MOPS 民國年（對照組 `mops_3363` 2026-05-07／`mops_4979` 2026-05-31）；
   MFN 瑞典文與英文兩則必須得到同一個日期；RNS 的 `published_at` 不得晚於 `retrieved_at`（`audit invariants` 的 PointInTime 會抓）。
 
+## 2c. Step 1.2 結果（2026-09-17，commit `3cbb0c0`；入圖待 [583][584][585] go）
+
+**驗收三項，兩項達標、一項是誠實的否定結果：**
+
+| 驗收 | 結果 |
+|---|---|
+| 八家「產品線營收占比」4 → 8 | **7/8**（新欄位 `product_line_revenue_share`，決策 D2 不覆寫 `segment_revenue_share`）。已寫：3081／2455／3363／4979／4971／IQE.L／SIVE.ST；**AEHR 缺**——10-K 全文抽取只得 XBRL 表頭（既知坑），產品別營收要走 XBRL companyfacts 或 EX-99 |
+| `substitutability` 覆蓋 80 → ≥86 | 本輪新增 **5 條**帶 sub 的 assertion（聯亞 3；全新 ×2、英特磊 ×2 皆 2），**入圖後才計入**——三個 packet 都卡在 pq2 |
+| 可投資排序出現 TW／TWO／ST ≥1 檔 | **❌ 0 檔**（實測仍 37 列、17 家、只有 IQE.L 一檔非美股）。**這是答案不是缺漏** |
+
+**為什麼 0 檔——四家台系磊晶廠全部低於門檻 4：** 聯亞 3、華星光 2（對照組未動）、全新 2、英特磊 2。
+判準不是自由心證：**各家在自家年報逐字互相具名指認對方是同層競爭者**（全新點名聯亞與 IQE、英特磊點名全新與 IQE、
+聯亞點名英特磊與 IQE），證據方向一致指向「多家並存的量產供應層」。聯亞判 3 而非 4 的關鍵是**四年長約的條款完全未揭露**
+——對照 IQE→Tower 判 4 的依據是雙向最低採購承諾逐字可讀。
+
+**本輪的三個 packet：**
+- **[583]** Tower Semiconductor 自家網域公告（`tower_iqe_inp_epiwafer_agreement_2026_06_15`）→ IQE→Tower 邊首次有客戶端自家文件背書，解 [562] 兩項 missing_data 之一（另一項「金額／量／期限」仍缺，需 Tower 20-F 重大合約附件）
+- **[584]** 全新＋英特磊各補兩條 supplies_to 邊；兩份年報以 supersede 走廊由手抓節錄升級為抓取器全文
+- **[585]** 聯亞 `tech:cw_dfb_laser` sub=3，附三條上下調 disproof
+
+**⚠ 本輪撞到並當下修掉的靜默缺陷（L17）：** MOPS 的 PDF 會吐出 **CJK 相容表意文字**（U+F900–U+FAFF），
+與正常字視覺完全相同但碼位不同（4971 年報 50 個、4979 年報 126 個）。逐字引用比對因此靜默失敗，
+而失敗長得像「年報沒寫這句」。`pdf_to_text` 已加 NFC 正規化＋兩條測試（空跑檢查通過），OPERATIONS 坑 4 → 坑 5。
+**既有入庫的 `mops_4979_annual_report_2025`（126 個）與 `intelliepi_4971_annual_report_fy2025_20260827`（2 個）仍含相容字元**，
+清理須走 supersede 走廊——列為 1.3 候選。
+
+**intake 走廊的結構事實（第一版嘗試撞到才知道）：** 同一份 PDF 若以新 doc_id 入圖會被 prepare 端的同 URL 守衛擋下
+（會造出兩份 SourceDoc、同一 origin_entity ＝ L8 的假交叉驗證）。正解是**沿用既有 doc_id 走 `supersedes_extraction_sha256`**，
+舊版歸檔、兩份都留；本輪三份年報都是這樣升級的。
+
+**未做完的（1.3 或下一輪接手）：**
+- 上詮 `co:foci→tech:fiber_attach_unit` 的 sub **刻意不填**：一手只有自述目標（「長期目標係成為 CPO 光纖陣列元件之主要及重要供應商」）與產能投資，沒有任何客戶端或第三方確認替代難度；Hunterbrook 是媒體，依決策 C1 維持待判定。缺的是 Himax 或 C 公司的具名確認。
+- Sivers 15 條邊仍全部未填 sub；Ayar Labs 自家文件仍缺（ayarlabs.com 對本機 UA 回 403）。
+- Aehr 補一條到需求錨的邊未做（`tech:cpo_full_stack_test` 實測走不到任何錨）。
+- **圖的結構缺口（本輪新發現，不是公司問題）：** `tech:photodiode`、`tech:pluggable_transceiver`、`tech:transceiver_1_6t`、`tech:cloud_transceiver`、`tech:inp_dfb_laser`、`tech:cpo_full_stack_test` 全部**走不到任何需求錨**（實測 shortestPath 回空）。補在這些節點下的供應商邊入圖後仍是排序不可見。
+
 ## 4. Step 1.2 工單（七家；2026-09-16 實測現況）
 
 | 公司 | 向下邊 | 卡點 | 要做的事 |

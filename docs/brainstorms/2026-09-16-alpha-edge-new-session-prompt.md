@@ -12,11 +12,14 @@
 > 新 session 照下面順序讀完文件後，再讀 **`docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`**（核准的計畫、工單、Step 1.0 殘餘、
 > MFN／RNS／MOPS 的探測事實），然後**直接從 Step 1.1 開工**（兩支抓取器＋路由登記＋三份 smoke 文件入圖）。~~
 >
-> **狀態（2026-09-17）：Step 1.1「兩支抓取器＋路由登記＋三份 smoke 文件」已 GO 並合併 master（branch `alpha-edge/phase1-step1.1`）；
-> 三份 smoke 文件的 RA 已 prepare 為 pq2 [579][580][581]，入圖待使用者批次 go。**
-> 新 session 照下面順序讀完文件後，再讀 **`docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`**（§2b Step 1.1 結果、§4 Step 1.2 工單），
-> 然後**直接從 Step 1.2 開工**（研究路徑 research-drain：七家補三格；先 `todo add` 鑄 manual 編號並以「使用者主動指示＝已授權」受理時 go resolve）。
-> [579][580][581] 若仍未 go，1.3 收尾不得標完成。
+> **狀態（2026-09-17）：Step 1.1 與 Step 1.2 都已做完並合併 master（commit `fa68b00`、`3cbb0c0`）。
+> 六個 pq2 編號等你批次 go：[579][580][581]（三條管道 smoke 文件入圖）、[583][584][585]（D8 補邊補格）。**
+> 新 session 照下面順序讀完文件後，再讀 **`docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`**
+> （§2b Step 1.1 結果、§2c Step 1.2 結果與未做完清單），然後**從 Step 1.3 收尾開工**。
+> ⚠ **1.3 的驗收行明訂：TW／TWO／ST 仍為 0 就不得標完成**——2026-09-17 實測確實是 0，且已查明原因是
+> 四家台系磊晶廠的 substitutability 全部低於門檻 4（各家年報互相具名指認為同層競爭者）。
+> 所以 1.3 只能標「研究已做、證據不足以進榜」並列缺哪份文件，**不得為了讓籃子非空而放寬門檻**。
+> 六個編號若仍未 go，1.3 不得標完成。
 > **常設授權（2026-09-16 使用者定案）：Step 的 Verdict 為 GO 且沒有待使用者決定的問題時，直接合併 master 並接續下一個 Step，
 > 不逐 Step 請核准。** 仍要停：Verdict 非 GO、有待決問題、動到四個人工 gate／資本／append-only authority、要改 `AGENTS.md` 判準句。
 > pq2 的圖寫入（`ra_admission`）與 Engine C 判讀寫入仍逐筆核准——研究段落收尾照常給批次指令。
