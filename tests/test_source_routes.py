@@ -147,3 +147,19 @@ def test_park_gate_vocabulary_is_validated_against_the_trace_status_registry(tmp
     path.write_text(json.dumps(bad, ensure_ascii=False), encoding="utf-8")
     with pytest.raises(Exception):
         routes.load(path)
+
+
+def test_nordic_and_london_listings_have_an_exchange_rung() -> None:
+    """Phase 1 Step 1.1（2026-09-16）：`.ST`／`.L` 先前只有四條 always 路徑、沒有交易所階，
+    於是 SIVE.ST 與 IQE.L 的追源永遠只能走 issuer_site——「這條路還沒建」與「這檔拿不到」
+    是兩回事，交易所階必須具名存在，且不互相串門（.ST 不該看到 rns，.L 不該看到 mfn）。
+    """
+    reg = routes.load()
+    stockholm = {r.key for r in reg.applicable(ticker="SIVE.ST", venue=None)}
+    london = {r.key for r in reg.applicable(ticker="IQE.L", venue=None)}
+    assert "mfn" in stockholm and "rns" not in stockholm and "sec_edgar" not in stockholm
+    assert "rns" in london and "mfn" not in london and "sec_edgar" not in london
+    for key in ("mfn", "rns"):
+        route = next(r for r in reg.routes if r.key == key)
+        assert route.rung == 2 and route.tier_cap == 1
+        assert "fetchers." + key in route.how       # how 必須指得出可執行的抓取器

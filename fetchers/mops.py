@@ -29,6 +29,7 @@ import argparse
 import io
 import re
 import sys
+from datetime import date
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -88,6 +89,24 @@ KIND_TIER: dict[str, int] = {
 }
 
 _TAG = re.compile(r"<[^>]+>")
+
+_ROC_UPLOAD_TIME = re.compile(r"^(\d{2,3})/(\d{2})/(\d{2})(?:\s+\d{2}:\d{2}:\d{2})?$")
+
+#: MOPS 是法定申報系統，列表的「上傳時間」就是公開可得的申報時戳。
+PUBLISHED_AT_METHOD = "filing_metadata"
+
+
+def roc_upload_time_to_iso_date(uploaded_at: str) -> str | None:
+    """MOPS 上傳時間 `115/08/12 17:18:12`（民國年）→ `2026-08-12`。
+
+    ⚠ 解析不到就回 None——**留 null 並列進報告**，不得用抓取日補（AGENTS.md 反向禁令：
+    ingest 日期冒充 published_at 會讓回測在每個歷史時點看到全部證據）。
+    對照組：`mops_3363_annual_report_2025` 的上傳時間 `115/05/07 16:56:26` 在圖裡是 2026-05-07。
+    """
+    match = _ROC_UPLOAD_TIME.match((uploaded_at or "").strip())
+    if not match:
+        return None
+    return f"{int(match.group(1)) + 1911:04d}-{match.group(2)}-{match.group(3)}"
 
 
 def _build_headers() -> dict[str, str]:
@@ -275,6 +294,10 @@ def fetch_company(
         content = fetch_document(co_id, filename, mtype=mtype)
         text, pages = pdf_to_text(content)
         doc_id = make_mops_doc_id(co_id, kind, filename, disambiguate=all_revisions)
+        published_at = roc_upload_time_to_iso_date(doc.get("uploaded_at", ""))
+        if not published_at:
+            print(f"[mops] ⚠ {filename} 的上傳時間 {doc.get('uploaded_at')!r} 解析不到，"
+                  "published_at 留 null（不用抓取日冒充）", file=sys.stderr)
         meta = {
             "doc_id": doc_id,
             "source_type": "filing",
@@ -285,6 +308,14 @@ def fetch_company(
             "data_year_roc": doc.get("data_year", ""),
             "detail": doc.get("detail", ""),
             "uploaded_at": doc.get("uploaded_at", ""),
+            "published_at": published_at,
+            "published_at_method": PUBLISHED_AT_METHOD if published_at else None,
+            "published_at_basis": (
+                f"MOPS t57sb01 列表「上傳時間」{doc.get('uploaded_at', '')}（民國年轉西元）"
+                if published_at else
+                "上傳時間欄解析不到——published_at 留 null，抽取時須另尋一手日期"
+            ),
+            "retrieved_at": date.today().isoformat(),
             "pages": pages,
             "chars": len(text),
             "truncated": False,

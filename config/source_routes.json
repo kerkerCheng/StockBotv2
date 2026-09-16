@@ -96,6 +96,32 @@
    "why": "2026-09-11 實測通過（3081 Q2 財報，29 頁轉 26,720 字）。⚠ 財報在 mtype=A 區，年報在 F 區，kind 選錯會列到另一區。"
   },
   {
+   "key": "mfn",
+   "label": "MFN（Nasdaq Stockholm／First North 法定揭露）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".ST"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "python -m fetchers.mfn --company <mfn-slug> --list --match <標題關鍵字>；再 python -m fetchers.mfn --url <公告頁> 抓正文＋附件 PDF（published_at 取公告頁 JSON-LD datePublished，UTC）",
+   "why": "2026-09-17 實測通過（Sivers Q2 2026 業績公告 mfn_sivers_semiconductors_6543505f ＋期中報告附件 _att1）。RSS https://mfn.se/all/a/<slug>.rss 已是 daily harvest 的 feed（mfn:sivers-semiconductors），但 lead 進池後從沒有可重用的抓取器。⚠ 瑞典文與英文各發一則、同一事件，預設只取英文版；期中報告本體是 mb.cision.com 的附件 PDF，只掛在公告頁不在 RSS；2026-09-15 探到 404 是 URL 被截斷，不是路由不通。"
+  },
+  {
+   "key": "rns",
+   "label": "RNS（倫敦證交所法定揭露，經 investegate 鏡像）",
+   "rung": 2,
+   "applies_to": "ticker_suffix",
+   "suffixes": [
+    ".L"
+   ],
+   "tier_cap": 1,
+   "verified": true,
+   "how": "python -m fetchers.rns --url https://www.investegate.co.uk/announcement/rns/<company>/<headline-slug>/<id>（published_at 取公告標頭日期）；列表 python -m fetchers.rns --company <company> --list",
+   "why": "2026-09-17 實測通過（IQE FY2025 年度業績 rns_iqe_9588930，50,894 字，going concern 段可逐字引用；清單 49 則）。iqep.com 的 SSL 鏈與 investis RSS 都壞過（crons/harvest_config.json 的 rejected_candidates），investegate 先前追源成功四次。⚠ 年報 PDF 的查核報告雙欄交錯，pdfplumber 也讀不出來——going concern 段要抓年度業績 RNS 全文（HTML），那才是 IQE going-concern 待辦卡住的真正原因。"
+  },
+  {
    "key": "dart",
    "label": "韓國 DART（金融監督院）",
    "rung": 2,

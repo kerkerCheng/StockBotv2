@@ -217,3 +217,53 @@ def test_list_distinguishes_empty_region_from_everything_filtered_out(
     assert mops.main(["--co-id", "3081", "--list", "--year", "115",
                       "--kind", "consolidated_financial_statement"]) == 1
     assert "這一區查無任何文件" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# meta 帶 published_at（2026-09-16，Phase 1 Step 1.1）
+# ---------------------------------------------------------------------------
+
+def test_published_at_is_the_mops_upload_time_converted_from_roc_calendar() -> None:
+    """對照組：`mops_3363_annual_report_2025` 上傳時間 115/05/07 16:56:26，圖裡 published_at=2026-05-07。
+
+    曆法是這個修法最先會壞的那一筆（L11-6）——民國年少加 1911、或把查詢年度當資料年度，
+    都會讓文件看起來早／晚一個世代。
+    """
+    from fetchers.mops import roc_upload_time_to_iso_date
+
+    assert roc_upload_time_to_iso_date("115/05/07 16:56:26") == "2026-05-07"
+    assert roc_upload_time_to_iso_date("115/08/12 17:18:12") == "2026-08-12"
+    assert roc_upload_time_to_iso_date("115/08/12") == "2026-08-12"
+
+
+def test_unparseable_upload_time_leaves_published_at_null_not_today() -> None:
+    """解析不到就是 None——不得用抓取日冒充（AGENTS 反向禁令）。"""
+    from fetchers.mops import roc_upload_time_to_iso_date
+
+    assert roc_upload_time_to_iso_date("") is None
+    assert roc_upload_time_to_iso_date("2026-08-12") is None
+    assert roc_upload_time_to_iso_date("garbage") is None
+
+
+def test_fetch_company_writes_published_at_into_meta(monkeypatch, tmp_path) -> None:
+    """驗收條件是「由抓取器產出、meta 帶 published_at」——所以要驗 meta 檔本身。"""
+    import json
+
+    from fetchers import mops
+
+    monkeypatch.setattr(mops, "list_documents", lambda *a, **k: [
+        {"co_id": "3081", "data_year": "115 年 第二季", "category": "財務報告",
+         "detail": "IFRSs個別財報", "filename": "202602_3081_AI2.pdf",
+         "size": "954,913", "uploaded_at": "115/08/12 17:18:12"}])
+    monkeypatch.setattr(mops, "fetch_document", lambda *a, **k: b"%PDF-fake")
+    monkeypatch.setattr(mops, "pdf_to_text", lambda content: ("財報全文", 29))
+
+    written = mops.fetch_company("3081", year="115", kind="separate_financial_statement",
+                                 out_dir=tmp_path)
+    assert [m["doc_id"] for m in written] == ["mops_3081_separate_financial_statement_202602"]
+    meta = json.loads((tmp_path / "mops_3081_separate_financial_statement_202602.meta.json")
+                      .read_text(encoding="utf-8"))
+    assert meta["published_at"] == "2026-08-12"
+    assert meta["published_at_method"] == "filing_metadata"
+    assert "115/08/12 17:18:12" in meta["published_at_basis"]
+    assert meta["retrieved_at"] >= meta["published_at"]     # 不可能在發表前抓到它

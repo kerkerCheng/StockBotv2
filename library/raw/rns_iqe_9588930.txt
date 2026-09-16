@@ -1,0 +1,2908 @@
+IQE PLC
+
+28 May 2026
+
+IQE plc
+
+Cardiff, UK
+
+28 May 2026
+
+Full Year 2025 Results
+
+- Improved H2 trading momentum carrying into 2026
+
+- Successful conclusion of Strategic Review and fundraise transforms
+
+Group's capital structure
+
+- IQE positioned for long-term sustainable growth
+
+IQE plc (AIM: IQE, "IQE" or the "Group"), the leading global supplier of compound semiconductor wafer products and advanced material solutions, today announces its results for the full year ended 31 December 2025.
+
+Jutta Meier, Chief Executive Officer of IQE, commented:
+
+"We were encouraged to see market conditions improve in the second half of the year. This reflected a positive trajectory in key sectors including photonics for AI and data centres, aerospace and defence, and wireless products for consumer electronics.
+
+"The £81m fundraise from key partners is a transformational investment for IQE, giving us the balance sheet strength to invest in our future growth, while maintaining our global asset base.
+
+"IQE is uniquely positioned as a critical enabler of the world's fastest-growing technology ecosystems. In particular, accelerating demand for our Indium Phosphide (InP) solutions supporting data centre and AI markets is expected to be a material growth driver throughout 2026 and beyond.
+
+"Taken together, a stronger IQE, coupled with favourable market conditions directly benefitting the business, gives me great confidence for the future."
+
+FY 2025 Financial Summary:
+
+FY 2025
+
+£'m
+
+FY 2024
+
+£'m
+
+Change
+
+(%)
+
+Revenue
+
+97.3
+
+118.0
+
+(17.6)
+
+Adjusted EBITDA1
+
+3.2
+
+8.1
+
+(60.1)
+
+Adjusted loss before tax
+
+(27.9)
+
+(22.3)
+
+Reported loss before tax
+
+(37.0)
+
+(36.9)
+
+Adjusted net cashflow from operations
+
+11.2
+
+6.1
+
+Reported net cashflow from operations
+
+8.1
+
+1.3
+
+Cash capital expenditure2
+
+(5.1)
+
+(11.4)
+
+Adjusted net debt3
+
+(31.5)
+
+(18.8)
+
+Cash and cash equivalents
+
+15.7
+
+4.7
+
+Reported Diluted EPS
+
+(3.77p)
+
+(3.96p)
+
+Adjusted Diluted EPS
+
+(2.82p)
+
+(2.46p)
+
+1. Adjusted EBITDA is earnings before interest, tax, depreciation, amortisation and certain non-cash charges, non-operational items and significant infrequent items set out in Note 4 in the financial statements section.
+
+2. Cash capital expenditure stated is Property, Plant and Equipment cash capex.
+
+3. Adjusted net debt is calculated as cash less borrowings but excluding lease liabilities and fair value gains/losses on derivative instruments.
+
+FY 2025 Financial Highlights:
+
+· Revenue for FY 2025 decreased at £97.3m (FY 2024: £118.0m).
+
+‒ Photonics revenue of £57.1m (FY 2024: £49.9m) increased 15% year-on-year driven by funding releases for certain US military and defence programmes in H2 2025 and continued growth in AI and data centre-related markets.
+
+‒ Wireless revenue of £40.1m (FY 2024: £67.3m) decreased 40% year-on-year reflecting uncertain macroeconomic conditions in the first half of the year and softness in mobile handset demand with some end customer requirements met from existing inventory.
+
+· Adjusted EBITDA of £3.2m (FY 2024: £8.1m), decreased 60% year-on-year, resulting in an adjusted EBITDA margin of 3% (FY 2024: 7%). This reduction reflects a lower revenue base and the underutilisation of manufacturing assets and capacity.
+
+· Reported net cashflow from operations of £8.1m (FY 2024: £1.3m) increased in the year, reflecting the impact of working capital movements.
+
+· Cash capital expenditure (PP&E) of £5.1m (FY 2024: £11.4m) to support the Group's strategic GaN-related capacity investment into the power electronics and advanced display (microLED) markets and other high growth sectors.
+
+· Cash and cash equivalents of £15.7m as at 31 December 2025, with adjusted net debt of £31.5m (FY 2024: £18.8m).
+
+2026 fundraise:
+
+Following the conclusion of the Strategic Review, IQE announced a fundraise of £81m, with the net proceeds to be used to repay the Group's existing Revolving Credit Facility with HSBC Bank, support the Group's working capital requirements and ongoing strategic investment. This significantly strengthens the Group's overall financial position.
+
+The fundraise included a £45m strategic investment from MACOM Technology Solutions Inc. ("MACOM") in the form of £30m of equity and £15m in new non-interest bearing convertible loan notes. Concurrently, IQE and MACOM also entered into long-term supply agreements.
+
+The remainder of the fundraise comprised a £23m redemption and reinvestment of convertible loan notes by existing noteholders, as well as a £13m Placing and Retail Offer.
+
+Following the completion of the fundraise and the repayment of the Group's Revolving Credit Facility with HSBC Bank, IQE will receive net cash inflows of £27.9m.
+
+Current trading and outlook:
+
+Trading in Q1 2026 was in line with management expectations, with strong demand across all core segments. In particular, IQE is seeing accelerated demand for the Group's InP solutions, which support optical photonics products for data centre and AI infrastructure, and expects this to be a material growth driver throughout FY 2026 and beyond.
+
+Alongside this, IQE is seeing ongoing strength in aerospace and defence markets, as well as VCSEL and wireless products supporting the consumer smartphone industry.
+
+Revenue for FY 2026 is expected to exceed 20% growth year-on-year, with strong order book visibility into H2. This is expected to result in a high-single digit to low double-digit adjusted EBITDA position.
+
+Business update:
+
+Connect
+
+Accelerated demand across customer base due to rapid growth in AI-driven hyperscale data centres, alongside mobile handsets, infrastructure and defence
+
+· Multiple Tier 1 InP photonics design wins position the Group for future volume production in next-generation optical interconnect markets for data centres.
+
+· Secured multiple development orders with leading global technology customers developing ultra-fast GaN-on-Si microLED solutions to address critical data centre network bottlenecks.
+
+· Continued strong demand for GaN RF products across terrestrial, satellite and defence radar platforms, driving further orders for mission-critical sensing applications.
+
+· Additionally, GaN RF infrastructure qualifications for use in high-power space communications networks, including satellite internet constellation platforms (Low Earth Orbit Satellites - LEOS), are progressing simultaneously.
+
+· Secured new design wins for 5G mobile handset power amplifier applications, with potential for adoption across multiple future device generations and platforms.
+
+Sense
+
+Strengthened position in advanced sensing platforms, with strong commercial and strategic momentum across mobile, automotive safety, infrared imaging and defence applications
+
+· Successfully qualified and commenced production ramp of second-generation 3D sensing VCSEL products for a leading global smartphone platform, reinforcing position in premium consumer devices.
+
+· Secured volume production orders for automotive-qualified VCSEL products with a leading global optical sensing solutions provider, supporting in-cabin driver safety monitoring systems.
+
+· Long-wavelength infrared (LWIR) products qualified for production at a Tier 1 customer, supporting demand ramp across autonomous vehicle, defence and advanced imaging applications.
+
+· Increasing demand for large-diameter (6 and 8-inch) GaSb-based epiwafers from defence customers enabling more cost-effective production of ultra-high resolution infrared sensors.
+
+Display
+
+Progressed technological capabilities and customer engagement in next-generation microLED display ecosystems targeting future consumer devices
+
+· Expanded partnership and renewed development supply agreement with a leading multinational consumer in advanced microLED AR/VR displays, with programmes progressing towards early-stage production.
+
+· Delivered 8-inch RGB (red, green and blue) epitaxy for silicon integration, expanding customer qualifications and supporting new consumer microLED display opportunities.
+
+· Launched advanced epitaxy capabilities through functional wafer-surface coatings, providing customers with a single step to integrate GaN microLEDs into silicon foundry manufacturing flows.
+
+Power
+
+Establishment of long-term strategic foundations and strengthening global supply chains in next-generation GaN power to meet rising demand across data centres, space and aerospace
+
+· Progressing qualification of GaN-on-Si power epitaxy for next-generation AI and hyperscale data centre power supply applications.
+
+· Development of GaN power devices for space and aerospace applications, including lighter, more efficient and radiation-resistant power management circuits.
+
+· Expanding foundry partner ecosystem to broaden geographic reach and strengthen supply chain flexibility.
+
+Operational updates:
+
+· Continued focus on fiscal discipline and tight controls over discretionary spending.
+
+· Ongoing portfolio optimisation to ensure existing asset base is fully focused on value creation across core customers and technologies.
+
+· Operational excellence driving yield improvements and manufacturing efficiencies.
+
+· Global site optimisation programme continuing with exit from Silicon site in South Wales completed in H2 2025, following cessation of manufacturing operations in Q1 2025.
+
+Board update:
+
+· As expected following completion of the Strategic Review, Mark Cubitt returned to the role of Non-executive Chair and Harmesh Suniara stepped down from the Board as representative of Lombard Odier, which does not intend to nominate an alternate representative.
+
+· IQE's Board has approved the appointment nominations of Robert Dennehy, MACOM Chief Operating Officer, and David O'Carroll, MACOM Vice President, as Non-executive Directors, subject to completion of customary Nomad due diligence.
+
+· IQE intends to appoint a permanent Chief Financial Officer in due course.
+
+Results presentation:
+
+IQE will present its FY 2025 Results via webcast at 9:00am today, 28 May 2026. If you would like to view this webcast, please register by using the below link and following the instructions:
+
+https://brrmedia.news/IQE_FY25
+
+Contacts:
+
+IQE plc
+
++44 (0) 29 2083 9400
+
+Jutta Meier
+
+Mark Cubitt
+
+Amy Barlow
+
+Peel Hunt (Nomad and Joint Broker)
+
++44 (0) 20 7418 8900
+
+Ben Cryer
+
+Kate Bannatyne
+
+Adam Telling
+
+Deutsche Numis (Joint Broker)
+
++44 (0) 20 7260 1000
+
+Hugo Rubinstein
+
+Iqra Amin
+
+Headland Consultancy (Financial PR)
++ 44 (0) 20 38054822
+
+Andy Rivett-Carnac: +44 (0) 7968 997 365
+
+Chloe Francklin: +44 (0)78 3497 4624
+
+GLOSSARY
+
+GaN - Gallium Nitride
+
+GaSb - Gallium Antimonide
+
+InP - Indium Phosphide
+
+ABOUT IQE
+
+http://iqep.com
+
+IQE is the leading global supplier of advanced compound semiconductor wafers and materials solutions that enable a diverse range of applications across:
+
+· Smart Connected Devices
+
+· Communications Infrastructure
+
+· Automotive and Industrial
+
+· Aerospace and Security
+
+As a scaled global epitaxy wafer manufacturer, IQE is uniquely positioned in this market which has high barriers to entry. IQE supplies the global market and is enabling customers to innovate at chip and OEM level. By leveraging the Group's intellectual property portfolio including know-how and patents, it produces epitaxy wafers of superior quality, yield and unit economics.
+
+IQE is headquartered in Cardiff UK, with employees across manufacturing locations in the UK, US and Taiwan, and is listed on the AIM Stock Exchange in London.
+
+Financial Statements
+
+Financial Summary
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Revenue
+
+97,300
+
+118,034
+
+Adjusted EBITDA (see below)
+
+3,237
+
+8,112
+
+Operating loss
+
+• Adjusted*
+
+(20,964)
+
+(18,357)
+
+• Reported
+
+(30,059)
+
+(32,958)
+
+Loss after tax
+
+• Adjusted*
+
+(27,439)
+
+(23,734)
+
+• Reported
+
+(36,695)
+
+(38,178)
+
+Net cash flow from operations
+
+Adjusted* (Note 4)
+
+11,180
+
+6,087
+
+Reported
+
+8,070
+
+1,282
+
+Free cash flow**
+
+Before adjusted* cash flows
+
+2,037
+
+(4,948)
+
+Reported
+
+(1,073)
+
+(9,753)
+
+Adjusted net (debt)/cash***
+
+(31,484)
+
+(18,800)
+
+Equity shareholders' funds
+
+89,694
+
+134,110
+
+Basic EPS - adjusted****
+
+(2.82p)
+
+(2.46p)
+
+Basic EPS - unadjusted
+
+(3.77p)
+
+(3.96p)
+
+Diluted EPS - adjusted****
+
+(2.82p)
+
+(2.46p)
+
+Diluted EPS - unadjusted
+
+(3.77p)
+
+(3.96p)
+
+* The adjusted performance measures for 2025 and 2024 are reconciled in Note 4.
+
+** Free cash flow is defined as net cash inflow of £11,155,000 (2024: outflow of £910,000) before cash inflows from financing activities of £15,821,000 (2024: £12,160,000) and net interest paid of £3,593,000 (2024: £3,317,000).
+
+*** Adjusted net (debt)/cash is defined as cash less borrowings but excluding lease liabilities and fair value gains/losses on derivative instruments.
+
+**** Adjusted EPS measures exclude the impact of certain non-cash charges, non-operational items and significant infrequent items that would distort period on period comparability (see Note 5).
+
+Consolidated income statement for the year ended 31 December 2025
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Revenue
+
+97,300
+
+118,034
+
+Cost of sales
+
+(95,948)
+
+(113,588)
+
+Gross profit
+
+1,352
+
+4,446
+
+Selling, general and administrative expenses
+
+(27,758)
+
+(29,982)
+
+Impairment loss on intangible assets
+
+(9,586)
+
+(3,772)
+
+Impairment loss on property, plant and equipment
+
+(402)
+
+(4,615)
+
+Impairment loss on right-of-use asset
+
+(245)
+
+(31)
+
+Gain on disposal of foreign operation
+
+8,167
+
+-
+
+Gain on remeasurement of right-of-use asset
+
+-
+
+202
+
+Impairment loss on trade receivables and contract assets
+
+(787)
+
+(3)
+
+(Loss)/profit on disposal of intangible assets and property, plant and equipment
+
+(800)
+
+797
+
+Operating loss
+
+(30,059)
+
+(32,958)
+
+Finance income
+
+294
+
+-
+
+Finance costs
+
+(7,269)
+
+(3,947)
+
+Adjusted loss before income tax
+
+(27,939)
+
+(22,304)
+
+Adjustments
+
+(9,095)
+
+(14,601)
+
+Loss before income tax
+
+(37,034)
+
+(36,905)
+
+Taxation
+
+339
+
+(1,273)
+
+Loss for the year
+
+(36,695)
+
+(38,178)
+
+Loss attributable to:
+
+Equity shareholders
+
+(36,695)
+
+(38,178)
+
+(36,695)
+
+(38,178)
+
+Loss per share attributable to owners of the parent during the year
+
+Basic loss per share
+
+(3.77p)
+
+(3.96p)
+
+Diluted loss per share
+
+(3.77p)
+
+(3.96p)
+
+Adjusted basic and diluted loss per share are presented in note 5.
+
+All items included in the loss for the year relate to continuing operations.
+
+Consolidated statement of comprehensive income for the year ended 31 December 2025
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Loss for the year
+
+(36,695)
+
+(38,178)
+
+Exchange differences on translation of foreign operations*
+
+(3,508)
+
+(826)
+
+Cumulative exchange differences on disposal of foreign operations**
+
+(8,167)
+
+-
+
+Total comprehensive expense for the year
+
+(48,370)
+
+(39,004)
+
+Total comprehensive expense attributable to:
+
+Equity shareholders
+
+(48,370)
+
+(39,004)
+
+(48,370)
+
+(39,004)
+
+* Items that may subsequently be reclassified to profit or loss.
+
+** During the year the Group liquidated it's Singapore entities, MBE Technology Pte Ltd and CSDC Private Ltd. On liquidation, the cumulative foreign exchange translation gain of £8,167,000 previously recognised in equity was reclassified to profit or loss in accordance with IAS 21.48(c). No proceeds were received on liquidation.
+
+Items in the statement above are disclosed net of tax.
+
+Consolidated balance sheet as at 31 December 2025
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Non-current assets
+
+Intangible assets
+
+17,244
+
+28,950
+
+Property, plant and equipment
+
+95,253
+
+113,674
+
+Right-of-use assets
+
+38,146
+
+42,210
+
+Deferred tax assets
+
+282
+
+-
+
+Total non-current assets
+
+150,925
+
+184,834
+
+Current assets
+
+Inventories
+
+18,665
+
+20,009
+
+Trade and other receivables
+
+28,093
+
+37,424
+
+Cash and cash equivalents
+
+15,653
+
+4,660
+
+Assets held for resale
+
+-
+
+120
+
+Total current assets
+
+62,411
+
+62,213
+
+Total assets
+
+213,336
+
+247,047
+
+Current liabilities
+
+Trade and other payables
+
+(29,345)
+
+(34,405)
+
+Current tax liabilities
+
+(27)
+
+(428)
+
+Bank borrowings
+
+(26,816)
+
+-
+
+Convertible loan notes
+
+(20,321)
+
+-
+
+Lease liabilities
+
+(4,691)
+
+(5,658)
+
+Provisions for other liabilities and charges
+
+(645)
+
+(774)
+
+Total current liabilities
+
+(81,845)
+
+(41,265)
+
+Non-current liabilities
+
+Trade and other payables
+
+(1,683)
+
+(2,035)
+
+Bank borrowings
+
+-
+
+(23,460)
+
+Lease liabilities
+
+(39,862)
+
+(44,872)
+
+Deferred tax liabilities
+
+-
+
+(774)
+
+Provisions for other liabilities and charges
+
+(252)
+
+(531)
+
+Total non-current liabilities
+
+(41,797)
+
+(71,672)
+
+Total liabilities
+
+(123,642)
+
+(112,937)
+
+Net assets
+
+89,694
+
+134,110
+
+Equity attributable to the shareholders of the parent
+
+Share capital
+
+9,783
+
+9,672
+
+Share premium
+
+155,972
+
+155,972
+
+Retained losses
+
+(122,339)
+
+(85,644)
+
+Exchange rate reserve
+
+19,946
+
+31,621
+
+Other reserves
+
+26,332
+
+22,489
+
+Total equity
+
+89,694
+
+134,110
+
+Consolidated statement of changes in equity for the year ended 31 December 2025
+
+Share
+
+capital
+
+£'000
+
+Share premium
+
+£'000
+
+Retained
+
+earnings / (losses)
+
+£'000
+
+Exchange Rate reserve
+
+£'000
+
+Other reserves
+
+£'000
+
+Total
+
+equity
+
+£'000
+
+At 1 January 2025
+
+9,672
+
+155,972
+
+(85,644)
+
+31,621
+
+22,489
+
+134,110
+
+Comprehensive expense
+
+Loss for the year
+
+-
+
+-
+
+(36,695)
+
+-
+
+-
+
+(36,695)
+
+Other comprehensive expense for the year
+
+-
+
+-
+
+-
+
+(11,675)
+
+-
+
+(11,675)
+
+Total comprehensive expense for the year
+
+-
+
+-
+
+(36,695)
+
+(11,675)
+
+-
+
+(48,370)
+
+Transactions with owners
+
+Share-based payments
+
+-
+
+-
+
+-
+
+-
+
+3,637
+
+3,637
+
+Proceeds from shares issued
+
+111
+
+-
+
+-
+
+-
+
+-
+
+111
+
+Equity component of convertible loan notes
+
+-
+
+-
+
+-
+
+-
+
+206
+
+206
+
+Total transactions with owners
+
+111
+
+-
+
+-
+
+-
+
+3,843
+
+3,954
+
+At 31 December 2025
+
+9,783
+
+155,972
+
+(122,339)
+
+19,946
+
+26,332
+
+89,694
+
+Share
+
+capital
+
+£'000
+
+Share premium
+
+£'000
+
+Retained earnings/
+
+(losses)
+
+£'000
+
+Exchange Rate
+
+reserve
+
+£'000
+
+Other reserves
+
+£'000
+
+Total
+
+equity
+
+£'000
+
+At 1 January 2024
+
+9,615
+
+155,844
+
+(47,466)
+
+32,447
+
+19,345
+
+169,785
+
+Comprehensive expense
+
+Loss for the year
+
+-
+
+-
+
+(38,178)
+
+-
+
+-
+
+(38,178)
+
+Other comprehensive expense for the year
+
+-
+
+-
+
+-
+
+(826)
+
+-
+
+(826)
+
+Total comprehensive expense for the year
+
+-
+
+-
+
+(38,178)
+
+(826)
+
+-
+
+(39,004)
+
+Transactions with owners
+
+Share-based payments
+
+-
+
+-
+
+-
+
+-
+
+3,177
+
+3,177
+
+Tax relating to share options
+
+-
+
+-
+
+-
+
+-
+
+(33)
+
+(33)
+
+Proceeds from shares issued
+
+57
+
+128
+
+-
+
+-
+
+-
+
+185
+
+Total transactions with owners
+
+57
+
+128
+
+-
+
+-
+
+3,144
+
+3,329
+
+At 31 December 2024
+
+9,672
+
+155,972
+
+(85,644)
+
+31,621
+
+22,489
+
+134,110
+
+Other reserves relate to share-based payments.
+
+Consolidated cash flow statement for the year ended 31 December 2025
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Cash flows from operating activities
+
+Adjusted cash inflow from operations
+
+11,180
+
+6,087
+
+Cash impact of adjustments
+
+(3,110)
+
+(4,805)
+
+Cash generated from operations
+
+8,070
+
+1,282
+
+Interest received
+
+294
+
+-
+
+Interest paid
+
+(3,887)
+
+(3,317)
+
+Income tax paid
+
+(754)
+
+(841)
+
+Net cash generated from/(used in) operating activities
+
+3,723
+
+(2,876)
+
+Cash flows from investing activities
+
+Purchase of property, plant and equipment
+
+(5,092)
+
+(11,359)
+
+Purchase of intangible assets
+
+(165)
+
+(1,609)
+
+Capitalised development expenditure
+
+(3,096)
+
+(1,877)
+
+Proceeds from disposal of property, plant and equipment and intangible assets
+
+114
+
+4,906
+
+Acquisition of subsidiary, net of cash received*
+
+(150)
+
+(255)
+
+Adjusted cash used in investing activities
+
+(8,503)
+
+(15,022)
+
+Cash impact of adjustments - proceeds from disposal of property, plant and equipment
+
+114
+
+4,828
+
+Net cash used in investing activities
+
+(8,389)
+
+(10,194)
+
+Cash flows from financing activities
+
+Proceeds from issuance of ordinary shares
+
+111
+
+185
+
+Issue of convertible loan notes
+
+18,000
+
+-
+
+Expenses associated with the issuance of convertible loan notes
+
+(715)
+
+-
+
+Proceeds from borrowings
+
+4,105
+
+19,493
+
+Repayment of borrowings
+
+-
+
+(4,048)
+
+Payment of lease liabilities
+
+(5,680)
+
+(3,470)
+
+Net cash generated from financing activities
+
+15,821
+
+12,160
+
+Net increase/(decrease) in cash and cash equivalents
+
+11,155
+
+(910)
+
+Cash and cash equivalents at 1 January
+
+4,660
+
+5,617
+
+Exchange losses on cash and cash equivalents
+
+(162)
+
+(47)
+
+Cash and cash equivalents at 31 December
+
+15,653
+
+4,660
+
+*Acquisition of subsidiary, net of cash received relates to deferred consideration paid in respect of the Group's acquisition of Compound Semiconductor Centre Limited in 2023.
+
+1. General information
+
+IQE plc ('the Company') and its subsidiaries (together 'the Group') develop, manufacture and sell advanced semiconductor materials. The Group has manufacturing facilities in Europe, United States of America and Asia and sells to customers located globally.
+
+IQE plc is a public limited company incorporated in the United Kingdom under the Companies Act 2006. The Company is domiciled in the United Kingdom and is quoted on the Alternative Investment Market (AIM). The address of the Company's registered office is Pascal Close, St Mellons, Cardiff, CF3 0LW.
+
+2. Material accounting policies
+
+The principal accounting policies applied in the preparation of these consolidated financial statements are set out below. These policies have been consistently applied to all years presented.
+
+2.1 Basis of preparation
+
+The financial statements have been prepared and approved by the Directors in accordance with UK adopted international accounting standards ('UK adopted IFRS'). The financial statements have been prepared under the historical cost convention except where fair value measurement is required by IFRS. The preparation of financial statements in conformity with IFRS requires the use of certain critical accounting estimates. It also requires management to exercise its judgement in the process of applying the Group's accounting policies.
+
+2.2 Going concern
+
+The Directors have prepared forecasts and cash flow projections for a period of at least 12 months from the date of approval of these financial statements. These forecasts include the impact of the Fundraising completed on 28 May 2026 (see Note 7). Whilst cash has not yet been received, the directors have assessed the risk of not receiving the cash as remote.
+
+Base case
+
+The Directors' base case is derived from the Group's latest Board-approved FY26 and H1 FY27 forecasts.
+
+The base case incorporates an expected improvement in market conditions and has been prepared using the following key assumptions:
+
+· the Fundraising will be used to repay existing CLNs and existing bank debt in Q2 FY26
+
+· revenue growth of at least 20% in FY26 and H1 FY27, consistent with guidance and current analyst consensus
+
+· a GBP: USD exchange rate of 1.34 applied throughout the forecast period
+
+· direct wafer product margin broadly consistent with 2025 actual performance
+
+· labour cost increases in line with market expectations and non-labour cost inflation consistent with the current environment; and
+
+· capital expenditure of mid-single digit £ millions in FY26 and H1 FY27.
+
+Under the base case scenario, the Group is expected to comply with its banking covenants before repayment of loans, then maintain sufficient liquidity to meet its liabilities as they fall due over the forecast period. Liquidity headroom is forecast to reduce from £11.7m in December 2025 to £6.1m in May 2026, prior to receipt of funds from the Fundraising, and to increase thereafter to a minimum of £34.0m.
+
+Severe but plausible downside
+
+The Directors have also considered a severe but plausible downside scenario. The severe but plausible downside case was prepared by applying the following downsides with no mitigating actions:
+
+· revenue is assumed 9% down on the base case for H1 2026, 20% down for H2 2026 and 24% down for H1 2027 resulting from a combination of delays in expected market recovery and the impact of greater forecasting uncertainty the further out into the future
+
+· in line with the revenue reduction in both years, there is a reflective reduction in variable operating costs for 2026 and H1 2027.
+
+Under the severe but plausible downside scenario, the Group is expected to comply with its banking covenants before repayment of loans, then maintain sufficient liquidity to meet its liabilities as they fall due over the forecast period. Liquidity headroom is forecast to reduce from £11.7m in December 2025 to £6.0m in May 2026, prior to receipt of funds from the Fundraising, before increasing following the Fundraising and subsequently declining to a minimum of £23.6m within the forecast period to June 2027.
+
+The Group is forecast to maintain a strong positive liquidity position throughout the 2026 and H1 2027 going concern assessment period, under both the base case and severe but plausible downside scenario. Accordingly, the Directors are satisfied that the Group and Company have adequate cash resources to continue in operational existence and to meet their liabilities as they fall due for a period of at least 12 months from the date of approval of these financial statements. The Directors therefore consider it appropriate to adopt the going concern basis of accounting in the preparation of the Group consolidated financial statements and the Company financial statements.
+
+2.3 Changes in accounting policy and disclosures
+
+a) New standards, amendments and interpretations
+
+The following new standards, amendments and interpretations have been adopted by the Group for
+
+the first time for the financial year beginning on 1 January 2025:
+
+· Amendment to IAS 21 'The Effects of Changes in Foreign Exchange Rates' which establishes how a spot exchange rate is estimated when a currency lacks exchangeability.
+
+The adoption of this amendment has not had a material impact on the financial statements of the Group or parent company.
+
+b) New standards, amendments and interpretations issued but not effective and not adopted early
+
+Several new standards, amendments to standards and interpretations which are set out below are effective for annual periods beginning after 1 January 2026 and have not been applied in preparing these consolidated financial statements:
+
+· Annual Improvements to IFRS Accounting Standards-Volume 11 which contains various improvement and enhancements to existing standards
+
+· IFRS 18 'Presentation and disclosure in financial statements' which includes new requirements for presentation and disclosure with a focus on the income statement
+
+· IFRS 19 'Subsidiaries without public accountability: disclosures' is a voluntary standard that contains a reduced disclosure framework for use by eligible subsidiaries that prepare financial statements applying IFRS Accounting Standards
+
+· Amendments to the Classification and Measurement of Financial Instruments (Amendments to IFRS 9 and IFRS 7) which provides further clarification and requirements for the recognition and derecognition criteria for financial assets and liabilities, the classification requirements for financial assets and disclosure requirements related to the amendments to the classification requirements
+
+· Amendments to contracts referencing nature-dependent Electricity (Amendments to IFRS 9 and IFRS 7) for power purchase agreements
+
+· Amendments to sale or contribution of assets between an investor and its associate or joint venture (Amendments to IFRS 10 and IAS 28)
+
+The Directors anticipate that at the time of this report none of the new standards, amendments to standards or interpretations are expected to have a material effect on the financial statements of the Group or parent company.
+
+2.4 Alternative performance measures
+
+Income Statement
+
+Alternative income statement performance measures are disclosed separately in the financial statements after several adjusted non-cash items, non-operational items and significant infrequent items that would distort period-on-period comparability, where it is deemed necessary by the Directors to do so to provide further understanding of the financial performance of the Group. Adjusted items are material items of income or expense that have been shown separately due to the significance of their nature or amount. The tax impact of adjusted items is calculated applying the relevant enacted tax rate for each adjusted item. Details of the adjusted items are included in Note 4.
+
+Balance Sheet
+
+Alternative balance sheet performance measures for net debt are disclosed separately in the financial statements after adjustments to exclude lease liabilities and fair value gains/losses on derivative instruments where it is deemed necessary by the Directors to do so to provide further understanding of the financial position, gearing and liquidity of the Group.
+
+Cash flow Statement
+
+Alternative cash flow statement performance measures are disclosed separately in the financial statements that reflect the cash impact of adjusted items included in alternative income statement performance measures. Adjusted items are material items of income or expense that have been shown separately due to the significance of their nature or amount. Details of the adjusted items are included in Note 4.
+
+3. Segmental analysis
+
+3.1 Description of segments and principal activities
+
+The Chief Operating Decision-Maker is defined as the Executive Leadership Team ('ELT'). The ELT consists of the Chief Executive Officer and Chief Financial Officer, Chief Technology and Operating Officer, Chief Revenue Officer and the Executive VP General Counsel, Company Secretary and Chief People Officer. The ELT consider the group's performance from a product perspective and have identified three primary reportable segments:
+
+• Wireless - this part of the business manufactures and sells compound semiconductor material for the wireless market which includes radio frequency devices that enable wireless communications.
+
+• Photonics - this part of the business manufactures and sells compound semiconductor material for the photonics market which includes applications that either transmit or sense light, both visible and infrared.
+
+• CMOS++ - this part of the business manufactured and sold advanced semiconductor materials related to silicon which included the combination of the advanced properties of compound semiconductors with those of lower-cost silicon technologies. The Group has continued to report the CMOS++ segment separately during 2025 due to the significance of the restructuring costs associated with the cessation of activities in this area and the closure of its silicon manufacturing site in South Wales. Starting in 2026, the Group will no longer report CMOS++.
+
+The ELT primarily use revenue and a measure of adjusted EBITDA to assess the performance of the operating segments. Measures of total assets and liabilities for each reportable segment are not reported to the ELT and therefore have not been disclosed.
+
+3.2 Adjusted EBITDA
+
+Adjusted EBITDA excludes the effects of significant non-cash, non-operational or significant and infrequent items of income and expenditure which may have an impact on the quality of earnings, such as restructuring costs, CEO and CFO recruitment costs, CEO severance costs and impairments where the impairment is the result of an isolated, non-recurring event. Adjusted EBITDA also excludes the effects of equity settled share-based payments.
+
+Finance costs are not allocated to segments because treasury and the cash position of the group is managed centrally.
+
+Revenue
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Wireless
+
+40,101
+
+67,295
+
+Photonics
+
+57,134
+
+49,876
+
+CMOS++
+
+65
+
+863
+
+Revenue
+
+97,300
+
+118,034
+
+Adjusted EBITDA
+
+Wireless
+
+6,565
+
+16,205
+
+Photonics
+
+8,398
+
+5,840
+
+CMOS++
+
+(122)
+
+(1,517)
+
+Central corporate costs
+
+(11,604)
+
+(12,416)
+
+Adjusted EBITDA
+
+3,237
+
+8,112
+
+Depreciation
+
+(19,613)
+
+(20,343)
+
+Amortisation
+
+(4,588)
+
+(6,390)
+
+Gain on remeasurement
+
+-
+
+202
+
+Profit on disposal of PPE
+
+-
+
+62
+
+Adjusted operating loss
+
+(20,964)
+
+(18,357)
+
+Wireless
+
+(3,016)
+
+6,520
+
+Photonics
+
+(5,410)
+
+(10,568)
+
+CMOS++
+
+(226)
+
+(1,663)
+
+Central corporate costs
+
+(12,312)
+
+(12,646)
+
+Adjusted items (see note 4)
+
+Wireless
+
+6,810
+
+(7,441)
+
+Photonics
+
+(9,209)
+
+(5,974)
+
+CMOS++
+
+(4,385)
+
+(669)
+
+Central corporate costs
+
+(2,311)
+
+(517)
+
+Operating loss
+
+(30,059)
+
+(32,958)
+
+Wireless
+
+3,794
+
+(921)
+
+Photonics
+
+(14,619)
+
+(16,542)
+
+CMOSS++
+
+(4,611)
+
+(2,332)
+
+Central corporate costs
+
+(14,623)
+
+(13,163)
+
+Finance income
+
+294
+
+-
+
+Finance costs
+
+(7,269)
+
+(3,947)
+
+Loss before tax
+
+(37,034)
+
+(36,905)
+
+Adjusted items include £10,233,000 (2024: £8,418,000) of non-cash impairment charges of which £nil (2024: £5,519,000) relates to the wireless segment, £7,984,000 (2024: £3,259,000) relates to the photonics segment and £2,249,000 (2024: £nil) relates to the CMOS++ segment.
+
+4. Adjusted performance measures ('APM')
+
+The Directors assess the operating performance of the Group based on both statutory and adjusted measures. Adjusted measures include adjusted earnings before interest, tax, depreciation, amortisation, impairment and profit/loss on disposal of PPE and intangibles (AEBITDA), AEBITDA margin, adjusted operating loss, adjusted loss before income tax and adjusted losses per share. These measures are collectively described as Adjusted Performance Measures (APMs). The Directors believe that APMs provide a useful comparison of business trends and performance and allow management and other stakeholders to better compare the performance of the Group between periods, excluding the effects of certain non-cash charges, non-operational items and significant infrequent items that would distort period on period comparability. The Group uses these APMs for internal planning, budgeting, reporting and assessment of the performance of the business. The term adjusted is not defined under IFRS and therefore the APMs may not be directly comparable with similarly titled measures used by other companies.
+
+Adjusted profit measures
+
+The following table summarises the statutory and adjusted profit and loss account measures for the year together with the adjustments made to each line item.
+
+Adjusted
+
+Results
+
+£'000
+
+Adjusted
+
+Items
+
+£'000
+
+2025
+
+Reported
+
+Results
+
+£'000
+
+Adjusted
+
+Results
+
+£'000
+
+Adjusted
+
+Items
+
+£'000
+
+2024
+
+Reported
+
+Results
+
+£'000
+
+Revenue
+
+97,300
+
+-
+
+97,300
+
+118,034
+
+-
+
+118,034
+
+Cost of sales
+
+(94,868)
+
+(1,080)
+
+(95,948)
+
+(112,543)
+
+(1,045)
+
+(113,588)
+
+Gross profit/(loss)
+
+2,432
+
+(1,080)
+
+1,352
+
+5,491
+
+(1,045)
+
+4,446
+
+SG&A
+
+(22,609)
+
+(5,149)
+
+(27,758)
+
+(24,109)
+
+(5,873)
+
+(29,982)
+
+Impairment of intangibles
+
+-
+
+(9,586)
+
+(9,586)
+
+-
+
+(3,772)
+
+(3,772)
+
+Impairment of PPE
+
+-
+
+(402)
+
+(402)
+
+-
+
+(4,615)
+
+(4,615)
+
+Impairment of right-of-use assets
+
+-
+
+(245)
+
+(245)
+
+-
+
+(31)
+
+(31)
+
+Gain on disposal of foreign operation
+
+-
+
+8,167
+
+8,167
+
+-
+
+-
+
+-
+
+Gain on remeasurement of right-of-use asset
+
+-
+
+-
+
+-
+
+202
+
+-
+
+202
+
+Impairment loss on trade receivables and contract assets
+
+(787)
+
+-
+
+(787)
+
+(3)
+
+-
+
+(3)
+
+(Loss)/profit on disposal of PPE and assets held for sale
+
+-
+
+(800)
+
+(800)
+
+62
+
+735
+
+797
+
+EBITDA
+
+3,237
+
+(6,229)
+
+(2,992)
+
+8,112
+
+(6,918)
+
+1,194
+
+Depreciation
+
+(19,613)
+
+-
+
+(19,613)
+
+(20,343)
+
+-
+
+(20,343)
+
+Amortisation
+
+(4,588)
+
+-
+
+(4,588)
+
+(6,390)
+
+-
+
+(6,390)
+
+Impairment of intangibles
+
+-
+
+(9,586)
+
+(9,586)
+
+-
+
+(3,772)
+
+(3,772)
+
+Impairment of PPE
+
+-
+
+(402)
+
+(402)
+
+-
+
+(4,615)
+
+(4,615)
+
+Impairment of right-of-use assets
+
+-
+
+(245)
+
+(245)
+
+-
+
+(31)
+
+(31)
+
+Gain on disposal of foreign operation
+
+-
+
+8,167
+
+8,167
+
+Gain on remeasurement of right-of-use asset
+
+-
+
+-
+
+-
+
+202
+
+-
+
+202
+
+(Loss)/profit on disposal of PPE and assets held for sale
+
+-
+
+(800)
+
+(800)
+
+62
+
+735
+
+797
+
+Operating loss
+
+(20,964)
+
+(9,095)
+
+(30,059)
+
+(18,357)
+
+(14,601)
+
+(32,958)
+
+Finance income
+
+294
+
+-
+
+294
+
+-
+
+-
+
+-
+
+Finance costs
+
+(7,269)
+
+-
+
+(7,269)
+
+(3,947)
+
+-
+
+(3,947)
+
+Loss before tax
+
+(27,939)
+
+(9,095)
+
+(37,034)
+
+(22,304)
+
+(14,601)
+
+(36,905)
+
+Taxation
+
+500
+
+(161)
+
+339
+
+(1,430)
+
+157
+
+(1,273)
+
+Loss for the period
+
+(27,439)
+
+(9,256)
+
+(36,695)
+
+(23,734)
+
+(14,444)
+
+(38,178)
+
+Loss per share attributable to owners of the parent company during the year
+
+Basic loss per share
+
+(2.82p)
+
+0.95p
+
+(3.77p)
+
+(2.46p)
+
+1.50p
+
+(3.96p)
+
+Diluted loss per share
+
+(2.82p)
+
+0.95p
+
+(3.77p)
+
+(2.46p)
+
+1.50p
+
+(3.96p)
+
+Adjustments to operating profit
+
+2025
+
+Cost of sales £'000
+
+SG&A
+
+£'000
+
+Impairments
+
+£'000
+
+Loss on disposal
+
+£'000
+
+Other gains
+
+£'000
+
+2025
+
+Adjusted
+
+Pre-Tax
+
+Items
+
+£'000
+
+Tax
+
+Impact
+
+£'000
+
+2025
+
+Adjusted
+
+Items
+
+£'000
+
+Share-based payments
+
+(1,080)
+
+(2,379)
+
+-
+
+-
+
+-
+
+(3,459)
+
+(161)
+
+(3,620)
+
+Share-based payments - CFO recruitment
+
+-
+
+(116)
+
+-
+
+-
+
+-
+
+(116)
+
+-
+
+(116)
+
+CEO severance
+
+-
+
+(21)
+
+-
+
+-
+
+-
+
+(21)
+
+-
+
+(21)
+
+Photonics CGU impairment
+
+-
+
+-
+
+(7,984)
+
+-
+
+-
+
+(7,984)
+
+-
+
+(7,984)
+
+Restructuring
+
+-
+
+(2,633)
+
+(2,249)
+
+(800)
+
+8,167
+
+2,485
+
+-
+
+2,485
+
+Total
+
+(1,080)
+
+(5,149)
+
+(10,233)
+
+(800)
+
+8,167
+
+(9,095)
+
+(161)
+
+(9,256)
+
+2024
+
+Cost of sales £'000
+
+SG&A
+
+£'000
+
+Impairments
+
+£'000
+
+Profit on disposal
+
+£'000
+
+2024
+
+Adjusted
+
+Pre-Tax
+
+Items
+
+£'000
+
+Tax
+
+Impact
+
+£'000
+
+2024
+
+Adjusted
+
+Items
+
+£'000
+
+Share-based payments
+
+(1,045)
+
+(1,929)
+
+-
+
+-
+
+(2,974)
+
+157
+
+(2,817)
+
+Share-based payments - CEO recruitment
+
+-
+
+(77)
+
+-
+
+-
+
+(77)
+
+-
+
+(77)
+
+Share-based payments - CFO recruitment
+
+-
+
+(123)
+
+-
+
+-
+
+(123)
+
+-
+
+(123)
+
+CEO recruitment
+
+-
+
+(307)
+
+-
+
+-
+
+(307)
+
+-
+
+(307)
+
+CEO severance
+
+-
+
+(416)
+
+-
+
+-
+
+(416)
+
+-
+
+(416)
+
+Wireless CGU impairment
+
+-
+
+-
+
+(3,066)
+
+-
+
+(3,066)
+
+-
+
+(3,066)
+
+Restructuring
+
+-
+
+(3,021)
+
+(5,352)
+
+735
+
+(7,638)
+
+-
+
+(7,638)
+
+Total
+
+(1,045)
+
+(5,873)
+
+(8,418)
+
+735
+
+(14,601)
+
+157
+
+(14,444)
+
+The nature of the adjusted items is as follows:
+
+Share-based payments
+
+The £3,459,000 (2024: 2,974,000) charge relates to share-based payments recorded in accordance with IFRS 2 'Share-based payment'. Share-based payments which arise each financial year are classified as an APM due to the non-cash charge being partially outside of the Group's control as it is based on factors such as share price volatility and interest rates which may be unrelated to the performance of the Group during the period in which the expense occurred.
+
+Chief Financial Officer recruitment
+
+The charge of £116,000 (2024: £123,000) relates to the share-based payment charge for new starter awards granted to the CFO, Jutta Meier, who is also now the Group CEO.
+
+Chief Executive Officer Severance
+
+The charge of £21,000 (2024: £416,000) relates to costs, primarily related to payments in lieu of notice, associated with the termination of the former CEO's employment.
+
+Photonics CGU impairment
+
+An impairment was identified in the year relating to the Photonics CGU determined based on value-in-use calculations. The non-cash impairment loss of £7,984,000 predominately relates to the Group's UK related photonics assets and has been allocated to goodwill and the relevant UK based intangible and tangible assets which has resulted in a non-cash intangible asset impairment charge of £7,337,000 (including £7,215,000 relating to goodwill), non-cash property, plant and equipment impairment charge of £402,000 and a non-cash right-of-use asset impairment of £245,000.
+
+Restructuring
+
+The credit of £2,485,000 (2024: £7,638,000 charge) relates to the consolidation of the Group's US, UK and Asian manufacturing operations and the restructuring of the Group's Executive Leadership Team.
+
+Group Restructuring
+
+· Group restructuring charges of £145,000 (2024: £266,000) consist of employee costs related to the restructuring of the Group's Executive Leadership Team.
+
+UK Restructuring
+
+· UK restructuring charges of £4,259,000 (2024: £1,584,000) relating to the consolidation of the Group's South Wales activities into its Newport manufacturing site consist of employee-related costs of £198,000 (2024: £447,000), site decommissioning costs of £1,012,000 (2024: £897,000), non-cash property, plant and equipment asset impairments of £nil (2024: £343,000), non-cash intangible development and patent cost impairments of £2,249,000 (2024: £nil) and loss on disposal of PPE of £800,000 (2024: £103,000 profit on disposal). As of 31 December 2025, cumulative restructuring charges of £5,483,000 (2024: £1,584,000) have been incurred.
+
+Asian Restructuring
+
+· Taiwanese restructuring charges of £1,244,000 (2024: £155,000) consist of £784,000 (2024: £155,000) legal and professional fees and £460,000 (2024: £nil) of employee costs related to the Group's Strategic Review and potential sale of its Taiwanese manufacturing operations. The Strategic Review completed in the post balance sheet period (see Note 7) and has not resulted in the sale of the Taiwanese operations. As of 31 December 2025, cumulative charges of £1,399,000 (2024: £155,000) linked to the restructuring and potential sale of the manufacturing operation have been incurred.
+
+· Singapore restructuring credit of £8,167,000 (2024: £19,000) relates to the gain on liquidation of the Singapore entities (MBE Technology Pte Ltd and CSDC Private Limited) within the year. The gain arises as a result of the cumulative foreign exchange translation gain of £8,167,000 previously recognised in equity being reclassified to profit or loss in accordance with IAS 21.48(c). No proceeds were received on liquidation. Prior year £19,000 relates to certain final cash receipts linked to the voluntary liquidation of the Group's Singapore subsidiaries, where manufacturing operations ceased in June 2022.
+
+US Restructuring
+
+· US restructuring charges of £nil (2024: £763,000) relating to the closure of the Group's manufacturing facility in Pennsylvania.
+
+· US restructuring charges of £34,000 (2024: £4,889,000) relating to the strategic re-positioning of the Group's Massachusetts and North Carolina manufacturing sites consist of non-cash property, plant and equipment asset impairments of £nil (2024: £2,002,000), non-cash intangible development cost impairments of £nil (2024: £2,887,000) and reactor decommissioning costs of £34,000 (2024: £nil).
+
+Wireless CGU impairment - prior period
+
+An impairment was identified in the prior year relating to the Wireless CGU determined based on value-in-use calculations. The non-cash impairment loss of £3,066,000 related to the Group's US related wireless assets and was allocated to the relevant US based intangible and tangible assets which resulted in a non-cash intangible asset impairment charge of £885,000 and a non-cash property, plant and equipment impairment charge of £2,181,000.
+
+Chief Executive Officer recruitment - prior period
+
+The charge of £nil (2024: £77,000) relates to the share-based payment charge for new starter awards granted to the former CEO upon recruitment. The charge of £nil (2024: £307,000) relates to costs associated with the cash element of the new starter award granted to the former CEO upon recruitment.
+
+Cash impact of adjusting items
+
+The cash impact of adjusting items is set out below:
+
+Cash Impact
+
+Cash from operations £'000
+
+Investing activities
+
+£'000
+
+2025
+
+Total
+
+£'000
+
+Cash from operations
+
+£'000
+
+Investing activities
+
+£'000
+
+2024
+
+Total
+
+£'000
+
+Reported cash flows
+
+8,070
+
+(8,389)
+
+(319)
+
+1,282
+
+(10,194)
+
+(8,912)
+
+Share-based payments - social security
+
+94
+
+-
+
+94
+
+123
+
+-
+
+123
+
+CEO severance
+
+240
+
+-
+
+240
+
+196
+
+-
+
+196
+
+Onerous contract
+
+240
+
+-
+
+240
+
+394
+
+-
+
+394
+
+Restructuring
+
+2,536
+
+(114)
+
+2,422
+
+4,092
+
+(4,828)
+
+(736)
+
+Total adjusted items
+
+3,110
+
+(114)
+
+2,996
+
+4,805
+
+(4,828)
+
+(23)
+
+Adjusted cash flows
+
+11,180
+
+(8,503)
+
+2,677
+
+6,087
+
+(15,022)
+
+(8,935)
+
+Onerous contract
+
+Onerous contract cash flows reflect royalty payments relating to the Group's cREO™ technology where development activity ceased in prior periods totals £240,000 (2024: £394,000).
+
+Restructuring
+
+Cash defrayed in the year from the restructuring of the Group's Executive Leadership Team and the consolidation of the Group's US, UK and Asian manufacturing operations totalled £2,422,000 (2024: £736,000 cash generated)
+
+Group Restructuring
+
+· Cash costs defrayed of £247,000 (2024: £64,000) consist of employee-related costs related to the restructuring of the Group's Executive Leadership Team following the departure of the former CEO.
+
+US Restructuring
+
+· Cash costs relating to the closure of the Group's manufacturing facility in Pennsylvania total £18,000 (2024: £2,820,000). Cash proceeds on disposal of the Pennsylvania site included in investing activities totals £nil (2024: £4,061,000) in the year.
+
+· Cash costs relating to the strategic re-positioning of the Group's Massachusetts and North Carolina manufacturing sites total £41,000 (2024: £nil). Cash proceeds on disposal of US reactors included in investing activities totals £114,000 (2024: £nil) in the year.
+
+UK Restructuring
+
+· Cash costs relating to the consolidation of the Group's South Wales activities into its Newport manufacturing site total £1,262,000 (2024: £1,072,000). Cash proceeds on disposal of property, plant and equipment is included in investing activities and totals £nil (2024: £767,000) in the year.
+
+Asian Restructuring
+
+· Cash costs relating to the Group's Strategic Review and potential sale of the Group's Taiwanese manufacturing operations total £968,000 (2024: £155,000). The Strategic Review completed in the post balance sheet period (see Note 7) and has not resulted in the sale of the Taiwanese operations.
+
+· Final cash receipts linked to the voluntary liquidation of the Group's Singapore subsidiaries, where manufacturing operations ceased in June 2022 total £nil (2024: £19,000).
+
+Adjustments to net debt
+
+Adjusted net debt
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Net debt
+
+(76,037)
+
+(69,330)
+
+Lease liabilities due after one year
+
+39,862
+
+44,872
+
+Lease liabilities due within one year
+
+4,691
+
+5,658
+
+Adjusted net debt
+
+(31,484)
+
+(18,800)
+
+5. Loss per share
+
+Basic loss per share is calculated by dividing the loss attributable to ordinary shareholders by the weighted average number of ordinary shares in issue during the year.
+
+Diluted loss per share is calculated by dividing the loss attributable to ordinary shareholders by the weighted average number of shares and the dilutive effect of 'in the money' share options in issue. Share options are classified as 'in the money' if their exercise price is lower than the average share price for the year. As required by IAS 33, this calculation assumes that the proceeds receivable from the exercise of 'in the money' options would be used to purchase shares in the open market to reduce the number of new shares that would need to be issued.
+
+The Directors also present an adjusted earnings per share measure which eliminates certain adjusted items. The Directors believe that the adjusted earnings per share measure provides a useful comparison of performance and allows management and other stakeholders to better compare the performance of the Group between the current and prior year, excluding the effects of certain non-cash charges, non-operational items and significant infrequent items that would distort period on period comparability. The adjustments are detailed in Note 4.
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Loss attributable to ordinary shareholders
+
+(36,695)
+
+(38,178)
+
+Adjustments to loss after tax (Note 4)
+
+9,256
+
+14,444
+
+Adjusted loss attributable to ordinary shareholders
+
+(27,439)
+
+(23,734)
+
+2025
+
+Number
+
+2024
+
+Number
+
+Weighted average number of ordinary shares
+
+972,928,093
+
+964,315,248
+
+Potentially dilutive share options
+
+14,929,308
+
+14,291,760
+
+Potentially dilutive convertible instruments
+
+123,866,839
+
+-
+
+Adjusted weighted average number of ordinary shares
+
+1,111,724,240
+
+978,607,008
+
+Adjusted basic loss per share
+
+(2.82p)
+
+(2.46p)
+
+Basic loss per share
+
+(3.77p)
+
+(3.96p)
+
+Adjusted diluted loss per share
+
+(2.82p)
+
+(2.46p)
+
+Diluted loss per share
+
+(3.77p)
+
+(3.96p)
+
+6. Cash generated from operations
+
+Group
+
+2025
+
+£'000
+
+2024
+
+£'000
+
+Loss before tax
+
+(37,034)
+
+(36,905)
+
+Finance income
+
+(294)
+
+-
+
+Finance costs
+
+7,269
+
+3,947
+
+Depreciation of property, plant and equipment
+
+16,021
+
+16,552
+
+Depreciation of right-of-use assets
+
+3,592
+
+3,791
+
+Amortisation of intangible assets
+
+4,588
+
+6,390
+
+Impairment of intangible assets
+
+9,586
+
+3,772
+
+Impairment of property, plant and equipment
+
+402
+
+4,615
+
+Impairment of right-of-use assets
+
+245
+
+31
+
+Gain on disposal of foreign operation
+
+(8,167)
+
+-
+
+Gain on remeasurement of right-of-use assets
+
+-
+
+(202)
+
+Inventory impairment (reversals)/write-downs
+
+(59)
+
+391
+
+Non-cash movement on trade receivable expected credit losses
+
+(8)
+
+3
+
+Impairment of contract assets
+
+795
+
+-
+
+Non-cash provision movements
+
+610
+
+288
+
+Loss/(profit) on disposal of fixed assets
+
+800
+
+(797)
+
+Share-based payments
+
+3,575
+
+3,174
+
+Cash inflow from operations before changes in working capital
+
+1,921
+
+5,050
+
+Decrease in inventories
+
+648
+
+3,677
+
+Decrease/(increase) in trade and other receivables
+
+6,949
+
+(608)
+
+Decrease in trade and other payables
+
+(472)
+
+(3,938)
+
+Decrease in provisions
+
+(976)
+
+(2,899)
+
+Cash inflow from operations
+
+8,070
+
+1,282
+
+7. Post balance sheet events
+
+Convertible loan note extension
+
+On 18 February 2026, the Group exercised its option contained in its convertible loan notes to extend the maturity of the instruments by 6 months to 13 September 2026.
+
+Fundraising
+
+On 28 May 2026, the Group completed a financing (the 'Fundraising') which raised gross proceeds of approximately £81,000,000.
+
+The Fundraising comprised a subscription for new ordinary shares by a strategic investor, MACOM Technology Solutions Holdings Inc, at an issue price of 19.8 pence per share raising approximately £30,000,000, a placing and retail offer of new ordinary shares at an issue price of 19.8 pence per share raising approximately £13,000,000, the issue of £15,000,000 new convertible loan notes (the 'New CLNs') to MACOM Technology Solutions Holdings Inc, and the restructuring of the Company's existing convertible loan notes (the 'Existing CLNs').
+
+Under the terms of the Fundraising, holders of the Existing CLNs agreed to the redemption of their holdings. Approximately £23 million of the amounts due on redemption was reinvested in new ordinary shares at the issue price, with the balance settled in cash.
+
+As the Fundraising was announced after the reporting date and the conditions did not exist at that date, it is treated as a non-adjusting event in accordance with IAS 10 Events after the Reporting Period. Accordingly, no adjustment has been made to the amounts recognised in these financial statements.
+
+Following completion, the Fundraising resulted in a significant net cash position for the Group with the net proceeds used to repay the Group's existing RCF bank debt, support the Group's working capital requirements and ongoing strategic investment, and significantly strengthen the Group's overall financial position.
+
+This information is provided by RNS, the news service of the London Stock Exchange. RNS is approved by the Financial Conduct Authority to act as a Primary Information Provider in the United Kingdom. Terms and conditions relating to the use and distribution of this information may apply. For further information, please contact rns@lseg.com or visit www.rns.com.
+
+RNS may use your IP address to confirm compliance with the terms and conditions, to analyse how you engage with the information contained in this communication, and to share such analysis on an anonymised basis with others as part of our commercial services. For further information about how RNS and the London Stock Exchange use the personal data you provide us, please see our Privacy Policy.
+
+END

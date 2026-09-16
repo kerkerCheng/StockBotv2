@@ -70,6 +70,24 @@ description: >
      C06／A01 這類代號**不得**對應到任何具名公司。
      fetcher 已封裝的四個坑（自己刻請先讀 `fetchers/mops.py` docstring）：兩段式下載、
      列表頁 big5、`year` 是民國查詢年度而非資料年度、同年度多份修訂會撞 doc_id。
+   - **瑞典（Nasdaq Stockholm／First North）：走 MFN 法定揭露，有現成 fetcher（2026-09-17）：**
+
+     ```bash
+     python -m fetchers.mfn --company sivers-semiconductors --list --match "Q2 2026"
+     python -m fetchers.mfn --url https://mfn.se/cis/a/sivers-semiconductors/<headline-slug>-<id>
+     ```
+
+     期中報告本體是公告頁附件 PDF（`{doc_id}_att1`），RSS 裡沒有；瑞典文與英文各發一則、同一事件，只取英文版；
+     `published_at` 只認 JSON-LD `datePublished`（UTC）。⚠ 探到 404 先看 URL 尾端有沒有 8 碼 id。
+   - **英國（LSE RNS）：走 investegate 鏡像，不走 iqep.com（SSL 鏈壞）／investis RSS（軟 404）（2026-09-17）：**
+
+     ```bash
+     python -m fetchers.rns --company IQE --list --match results
+     python -m fetchers.rns --url https://www.investegate.co.uk/announcement/rns/iqe--iqe/<headline-slug>/<id>
+     ```
+
+     `published_at` 取 RNS 本體 dateline（清單的日期＋時間一併記入 basis）；「Summary by AI」不是一手。站點 502 是
+     「暫時不可用」不是「不存在」。⚠ 年報 PDF 查核報告雙欄交錯讀不出來——going concern 附註抓年度業績 RNS 全文（HTML）。
    - **日股：有価証券報告書走 EDINET，受注残高與決算數字走決算短信（TDnet）。**
      ⚠ EDINET API v2 需 subscription key（未申請）；2026-08-28 實測改抓 TDnet 決算短信
      正本即取得受注残高與主要相手先販売実績，未被 key 擋住。公司 IR 網頁同樣是動態表格，
