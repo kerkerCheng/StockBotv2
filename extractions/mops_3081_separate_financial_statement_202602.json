@@ -1,0 +1,68 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "後續財報揭露第二個報導部門、或出現非磊晶片產品營收占比 ≥10%、或公司設立子公司改申報合併財報時更新本 claim；每季財報（MOPS mtype=A）核查一次，觸發後 48 小時內重評聯亞的瓶頸業務占比。",
+      "id": "mops_3081_separate_financial_statement_202602_cl1",
+      "source_ids": [
+        "mops_3081_separate_financial_statement_202602_s1",
+        "mops_3081_separate_financial_statement_202602_s3"
+      ],
+      "statement": "聯亞光電 115 年 Q2 個別財報附註十四載明：公司主要從事磊晶片單一產品之製造及銷售、歸屬為單一報導部門——營收 100% 來自磊晶片業務，沒有第二個報導部門。公司無子公司，MOPS 財報區只申報個別財報（114／115 年合併財報 0 份）。這是 D8「瓶頸業務占營收比例」在部門顆粒度的一手依據；產品線（CW DFB 雷射磊晶）占比不在財報附註，須另取股東會年報「主要產品之營業比重」表。",
+      "subject_id": "co:landmark_optoelectronics"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "聯亞光電",
+        "聯亞光電工業股份有限公司",
+        "LandMark Optoelectronics",
+        "3081.TWO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:landmark_optoelectronics",
+      "name": "LandMark Optoelectronics Corporation",
+      "role": "foundry",
+      "source_ids": [
+        "mops_3081_separate_financial_statement_202602_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3081_separate_financial_statement_202602",
+    "evidence_tier": 1,
+    "origin_entity": "LandMark Optoelectronics Corporation",
+    "permission_basis": "MOPS 公開資訊觀測站之法定申報文件（issuer 一手，公開下載）；全文由 fetchers/mops.py 自公開來源取得並存 library/raw，repo_full 是為了讓附註引文可逐字核對。",
+    "published_at": "2026-08-12",
+    "publisher": "MOPS 公開資訊觀測站",
+    "retrieved_at": "2026-09-17",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "聯亞光電（LandMark Optoelectronics, 3081.TWO）民國 115 年第二季個別財務報告暨會計師核閱報告（2026-08-12 董事會通過；MOPS 財報區 mtype=A）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=A&co_id=3081&filename=202602_3081_AI2.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3081_separate_financial_statement_202602_s1",
+      "locator": "財務報告附註 十四、部門資訊（p.29）",
+      "quote": "本公司主要為從事磊晶片單一產品製造及銷售，歸屬為單一報導部門"
+    },
+    {
+      "id": "mops_3081_separate_financial_statement_202602_s2",
+      "locator": "財務報告附註 二、通過財務報告之日期及程序（p.8）",
+      "quote": "本財務報告已於民國一一五年八月十二日經董事會通過發布。"
+    },
+    {
+      "id": "mops_3081_separate_financial_statement_202602_s3",
+      "locator": "封面（p.1）",
+      "quote": "聯亞光電工業股份有限公司 財務報告暨會計師核閱報告 民國一一五年及一一四年第二季"
+    }
+  ]
+}
