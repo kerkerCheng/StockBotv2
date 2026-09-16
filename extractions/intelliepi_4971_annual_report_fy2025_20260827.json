@@ -1,17 +1,229 @@
 {
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "Revise if a later edition of this table, or an equivalent third-party industry map, stops placing Coherent in the epitaxy layer, or if Coherent discloses that it has exited in-house epitaxy. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl1",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s3"
+      ],
+      "statement": "IntelliEPI's optical-communications industry structure table lists Coherent in BOTH the epitaxy layer (alongside IntelliEPI and IQE, foreign players) and the IDM layer (alongside Broadcom). Domestic epitaxy players are listed as VPEC, Epistar, LandMark and Forefront. This reconciles two sources that otherwise appear to conflict: Coherent's FY2026 10-K describes itself as vertically integrated and manufacturing lasers in-house, while LandMark's FY2025 annual report describes itself as an outsourced epitaxy partner for IDMs with no competitive overlap with their end markets. Both can hold, but the conclusion must be split by counterparty: for Coherent, LandMark is a same-layer competitor rather than an upstream supplier; Broadcom appears only in the IDM layer, so outsourced epitaxy remains structurally possible there.",
+      "subject_id": "co:intelliepi"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "Downgrade if any MOCVD house (IQE, VPEC or LandMark) ships qualified InP-based APD or IR detector epitaxy in volume, or if a customer discloses dual-sourcing such devices across MBE and MOCVD suppliers. 核查頻率：每年年報與同業產品發表；觸發後 48 小時內人工 review。",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl2",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s2",
+        "intelliepi_4971_annual_report_fy2025_20260827_s5"
+      ],
+      "statement": "IntelliEPI asserts that InP-based HBT/HEMT/APD devices and IR detectors can only be produced with MBE, because MOCVD lacks the ultra-thin layer thickness control, abrupt interface resolution and high doping concentration control required. If correct, this is a process-level constraint separating MBE and MOCVD epitaxy houses into non-substitutable pools for these specific device types, rather than a single undifferentiated epitaxy layer. NOTE: this is a supplier-side claim about the limits of a rival process; it has not been corroborated by a customer or third party.",
+      "subject_id": "co:intelliepi"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "Upgrade only if a customer-side filing or third-party source names the counterparty and confirms exclusivity; revise if IntelliEPI later discloses termination or non-exclusivity. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl3",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s4"
+      ],
+      "statement": "IntelliEPI states it has signed a long-term exclusive supply agreement for InP-based HBT with what it describes as the world's largest InP integrated device manufacturer, but does not name that counterparty and discloses no value, volume or term. The identity must not be inferred. Per L8 this is a supplier self-report of its own exclusivity and can rank no higher than verified_by_absence until a customer-side or third-party source confirms it.",
+      "subject_id": "co:intelliepi"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若客戶端或第三方文件顯示特定 VCSEL 規格只有 MBE 製程可達成（即 MOCVD 三家實際無法供應），則 sub 需上調；每年核查年報與客戶端揭露，觸發後 48 小時內重評此兩條邊。",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl4",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s6",
+        "intelliepi_4971_annual_report_fy2025_20260827_s5"
+      ],
+      "statement": "英特磊（IET-KY, 4971.TWO）自述為 VCSEL 與 PIN／APD 檢光二極體的**上游磊晶片**供應者（新增兩條 supplies_to 邊的依據）。既有 s5 引文同時記載它自稱唯一以量產型 MBE 開出 VCSEL 量產技術者，**但同一句逐字點名 IQE、全新光電、Sumika 三家以 MOCVD 生產同一產品**——製程獨特不等於產品不可替代，對買方仍有三家具名替代來源，故兩條邊皆判 sub=2。⚠ 年報明指該 VCSEL 應用於行動裝置，不是 AI 資料中心光互連。",
+      "subject_id": "co:intelliepi"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若後續年報顯示 InP 佔比回落至 40% 以下、或公司揭露 InP 產品組合已轉向光通訊 LD，本 claim 的兩個分句都需重寫；每年核查，觸發後 48 小時內更新 product_line_revenue_share 觀測與需求曝險判讀。",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl5",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s7"
+      ],
+      "statement": "英特磊的 InP 磊晶片佔營收比重由 FY2024 37.81% 升至 FY2025 49.56%，2026 年截至 3/31 為 54.52%——七家補格標的中**唯一由一手表格拆得出「單一材料系產品線過半」的一檔**。⚠ 但年報同段說明其 InP 主力是 HBT/HEMT/APD 與紅外偵測器（高頻、國防、量子運算低噪放大器），**不是 AI 資料中心光互連的 CW 雷射**，此高佔比不可讀成 AI 需求曝險。",
+      "subject_id": "co:intelliepi"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "若出現第三家專業 MBE 磊晶代工廠（含中國或日本新進者）、或客戶端文件顯示 MOCVD 已可達成上述規格，本 claim 失效；每年核查年報與產業報告，觸發後 48 小時內重評英特磊的製程護城河敘述。",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl6",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s8",
+        "intelliepi_4971_annual_report_fy2025_20260827_s2"
+      ],
+      "statement": "英特磊在產業概況段逐字宣稱「全球僅存兩家專業 MBE 磊晶代工廠，分別為 IQE 及 IntelliEPI」——這是 **MBE 製程層的雙寡占自述**。⚠ 依 L8 它是供應商自報，**不得單獨作為瓶頸性證據**；且它描述的是製程（MBE）而非產品，年報同時承認 MOCVD 三家可生產同一批產品，所以雙寡占成立的範圍只在「必須用 MBE 的規格」（InP HBT/HEMT/APD、IR 偵測器、10GHz 以上高頻），不及於 AI 資料中心的 CW DFB 雷射。",
+      "subject_id": "co:intelliepi"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:vpec",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s1"
+      ],
+      "src_id": "co:intelliepi"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "co:iqe",
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_e2",
+      "relation": "competes_with",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s1",
+        "intelliepi_4971_annual_report_fy2025_20260827_s5"
+      ],
+      "src_id": "co:intelliepi"
+    },
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 2
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:vcsel",
+      "id": "iet_vc1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s6",
+        "intelliepi_4971_annual_report_fy2025_20260827_s5"
+      ],
+      "src_id": "co:intelliepi"
+    },
+    {
+      "attributes": {
+        "sole_source": false,
+        "substitutability": 2
+      },
+      "confidence": 0.85,
+      "dst_id": "tech:photodiode",
+      "id": "iet_pd1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s6"
+      ],
+      "src_id": "co:intelliepi"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IET-KY",
+        "英特磊",
+        "InteliEpi",
+        "IntelliEPI Inc. (Cayman)",
+        "4971.TWO"
+      ],
+      "attributes": {},
+      "confidence": 0.95,
+      "id": "co:intelliepi",
+      "name": "IntelliEPI",
+      "role": "foundry",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Visual Photonics Epitaxy",
+        "全新光電",
+        "2455.TW"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:vpec",
+      "name": "VPEC",
+      "role": "foundry",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "IQE"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "material_base",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "VCSEL",
+        "200G VCSEL",
+        "400G VCSEL"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:vcsel",
+      "name": "VCSEL laser",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s6"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "photodiodes",
+        "detectors"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:photodiode",
+      "name": "Photodiode (InP-based)",
+      "source_ids": [
+        "intelliepi_4971_annual_report_fy2025_20260827_s6"
+      ],
+      "type": "TechNode"
+    }
+  ],
   "schema_version": "0.1",
   "source_doc": {
     "doc_id": "intelliepi_4971_annual_report_fy2025_20260827",
-    "title": "英特磊（IntelliEPI / IET-KY，4971）114 年度股東會年報（股東會後修訂本） — 光通訊產業分層與 MBE 競爭情形",
-    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4971&filename=2025_4971_20260623F11.pdf",
-    "origin_entity": "IntelliEPI",
-    "publisher": "Taiwan MOPS 公開資訊觀測站電子書",
-    "published_at": "2026-08-27",
-    "retrieved_at": "2026-08-28",
-    "source_type": "filing",
     "evidence_tier": 1,
-    "storage_permission": "repo_excerpt",
-    "permission_basis": "Public MOPS annual report; only the research-relevant excerpt is retained alongside the canonical carrier URL."
+    "origin_entity": "IntelliEPI",
+    "permission_basis": "MOPS 公開資訊觀測站之法定申報文件（issuer 一手，公開下載）；2026-09-17 由 fetchers/mops.py 取回**全文**取代原先 session 手抓的節錄，repo_full 是為了讓逐字引文可核對。",
+    "published_at": "2026-08-27",
+    "publisher": "Taiwan MOPS 公開資訊觀測站電子書",
+    "retrieved_at": "2026-09-17",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "supersedes_extraction_sha256": "e76bbbc4735b3700855135be10c156156ac24c3e59fbaacb4983bea300b8d8c1",
+    "title": "IntelliEPI Inc. (Cayman)（英特磊 IET-KY, 4971.TWO）一一四年度股東會年報（股東會後修訂本 F11，MOPS 全文）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=4971&filename=2025_4971_20260623F11.pdf"
   },
   "sources": [
     {
@@ -38,90 +250,21 @@
       "id": "intelliepi_4971_annual_report_fy2025_20260827_s5",
       "locator": "五、營運概況 — 競爭情形 (3)",
       "quote": "砷化鎵面射型雷射 VCSEL 使用於行動裝置，本公司為唯一一家使用量產型 MBE 機台成功開出面射型雷射 VCSEL 量產技術，擁有高均勻性與低殘留應力等優越性，其他同業如IQE、全新光電及Sumika 均使用 MOCVD 生產面射型雷射 VCSEL。"
-    }
-  ],
-  "nodes": [
-    {
-      "id": "co:intelliepi",
-      "type": "Company",
-      "name": "IntelliEPI",
-      "abstraction_level": "materials_substrate",
-      "role": "foundry",
-      "aliases": ["IET-KY", "英特磊", "InteliEpi", "IntelliEPI Inc. (Cayman)", "4971.TWO"],
-      "attributes": {},
-      "confidence": 0.95,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
     },
     {
-      "id": "co:vpec",
-      "type": "Company",
-      "name": "VPEC",
-      "abstraction_level": "materials_substrate",
-      "role": "foundry",
-      "aliases": ["Visual Photonics Epitaxy", "全新光電", "2455.TW"],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s6",
+      "locator": "二、（一）產業概況——光通訊產業分層",
+      "quote": "本公司乃專注於以砷化鎵 / 砷化鋁鎵 (GaAs/AlGaAs)及磷化銦 /砷化銦鎵 (InP/InGaAs)系列原料為主之光主動元件(面射型雷射，VCSEL)，與光被動元件(PIN 檢光二極體, APD 崩潰光電二極體)的上游磊晶片的研發設計及製造生產。"
     },
     {
-      "id": "co:iqe",
-      "type": "Company",
-      "name": "IQE plc",
-      "abstraction_level": "materials_substrate",
-      "role": "material_base",
-      "aliases": ["IQE"],
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
-    }
-  ],
-  "edges": [
-    {
-      "id": "intelliepi_4971_annual_report_fy2025_20260827_e1",
-      "src_id": "co:intelliepi",
-      "dst_id": "co:vpec",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1"]
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s7",
+      "locator": "二、主要產品之營業比重",
+      "quote": "磷化銦(InP) 磊晶片  271,204 37.81%  534,899 49.56%  181,105 54.52%"
     },
     {
-      "id": "intelliepi_4971_annual_report_fy2025_20260827_e2",
-      "src_id": "co:intelliepi",
-      "dst_id": "co:iqe",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s1", "intelliepi_4971_annual_report_fy2025_20260827_s5"]
-    }
-  ],
-  "claims": [
-    {
-      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl1",
-      "statement": "IntelliEPI's optical-communications industry structure table lists Coherent in BOTH the epitaxy layer (alongside IntelliEPI and IQE, foreign players) and the IDM layer (alongside Broadcom). Domestic epitaxy players are listed as VPEC, Epistar, LandMark and Forefront. This reconciles two sources that otherwise appear to conflict: Coherent's FY2026 10-K describes itself as vertically integrated and manufacturing lasers in-house, while LandMark's FY2025 annual report describes itself as an outsourced epitaxy partner for IDMs with no competitive overlap with their end markets. Both can hold, but the conclusion must be split by counterparty: for Coherent, LandMark is a same-layer competitor rather than an upstream supplier; Broadcom appears only in the IDM layer, so outsourced epitaxy remains structurally possible there.",
-      "subject_id": "co:intelliepi",
-      "demand_proof_level": "confirmed",
-      "disproof_condition": "Revise if a later edition of this table, or an equivalent third-party industry map, stops placing Coherent in the epitaxy layer, or if Coherent discloses that it has exited in-house epitaxy. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
-      "confidence": 0.85,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s3"]
-    },
-    {
-      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl2",
-      "statement": "IntelliEPI asserts that InP-based HBT/HEMT/APD devices and IR detectors can only be produced with MBE, because MOCVD lacks the ultra-thin layer thickness control, abrupt interface resolution and high doping concentration control required. If correct, this is a process-level constraint separating MBE and MOCVD epitaxy houses into non-substitutable pools for these specific device types, rather than a single undifferentiated epitaxy layer. NOTE: this is a supplier-side claim about the limits of a rival process; it has not been corroborated by a customer or third party.",
-      "subject_id": "co:intelliepi",
-      "demand_proof_level": "guided",
-      "disproof_condition": "Downgrade if any MOCVD house (IQE, VPEC or LandMark) ships qualified InP-based APD or IR detector epitaxy in volume, or if a customer discloses dual-sourcing such devices across MBE and MOCVD suppliers. 核查頻率：每年年報與同業產品發表；觸發後 48 小時內人工 review。",
-      "confidence": 0.6,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s2", "intelliepi_4971_annual_report_fy2025_20260827_s5"]
-    },
-    {
-      "id": "intelliepi_4971_annual_report_fy2025_20260827_cl3",
-      "statement": "IntelliEPI states it has signed a long-term exclusive supply agreement for InP-based HBT with what it describes as the world's largest InP integrated device manufacturer, but does not name that counterparty and discloses no value, volume or term. The identity must not be inferred. Per L8 this is a supplier self-report of its own exclusivity and can rank no higher than verified_by_absence until a customer-side or third-party source confirms it.",
-      "subject_id": "co:intelliepi",
-      "demand_proof_level": "speculative",
-      "disproof_condition": "Upgrade only if a customer-side filing or third-party source names the counterparty and confirms exclusivity; revise if IntelliEPI later discloses termination or non-exclusivity. 核查頻率：每年年報；觸發後 48 小時內人工 review。",
-      "confidence": 0.5,
-      "source_ids": ["intelliepi_4971_annual_report_fy2025_20260827_s4"]
+      "id": "intelliepi_4971_annual_report_fy2025_20260827_s8",
+      "locator": "（2）III-V族化合物半導體磊晶代工產業之現況與發展",
+      "quote": "以分子束磊晶法技術而言，全球僅存兩家專業 MBE 磊晶代工廠，分別為 IQE 及 IntelliEPI (本公司)。"
     }
   ]
 }
