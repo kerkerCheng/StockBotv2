@@ -1,0 +1,117 @@
+{
+  "claims": [
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Q4 2026 期中報告未提及 Beta builds 開始、或 H1 2027 未揭露 Jabil 量產訂單，本 claim 轉 watch；每季期中報告（MFN）核查，觸發後 48 小時內重評 Sivers→Jabil 邊的 commercial maturity。",
+      "id": "mfn_sivers_semiconductors_6543505f_att1_cl1",
+      "source_ids": [
+        "mfn_sivers_semiconductors_6543505f_att1_s1"
+      ],
+      "statement": "Sivers Q2 2026 期中報告（2026-08-27）：與 Jabil 的 AI 資料中心合作進入 Q4 2026 Beta builds，之後是客戶 qualification 週期，公司預期 H1 2027 收到量產訂單、H2 2027 ramp。這是 Sivers→Jabil 供應邊的時間軸里程碑（自報，非客戶端印證）。",
+      "subject_id": "co:sivers_semiconductors"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "若任一 pluggable 客戶端文件或第三方報告指出 CW 雷射供應充裕／多源，或 Sivers 後續報告不再提及供應受限，本 claim 降級；每季核查，觸發後 48 小時內重看 tech:cw_dfb_laser 的 substitutability 判定。",
+      "id": "mfn_sivers_semiconductors_6543505f_att1_cl2",
+      "source_ids": [
+        "mfn_sivers_semiconductors_6543505f_att1_s2"
+      ],
+      "statement": "Sivers 自述其 70mW／100mW CW 雷射與陣列已向多家 pluggable 客戶送樣並與其他客戶技術接洽，並稱「pluggables 仍非常受限於 CW 雷射供應」。這是供應商自報的市場緊缺陳述（L8：不得作為 Sivers 自身瓶頸性的獨立佐證），但與 4979 華星光年報所述 CW DFB 供應層多家並存的證據並列時，是 Step 1.2 判 Sivers→tech:cw_dfb_laser 可替代性的輸入之一。",
+      "subject_id": "co:sivers_semiconductors"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2027 年底前 Glasgow 擴建未完工、或公司改回 Fab-Lite／放棄 1:2 目標，本 claim 失效；每半年核查（Q2／Q4 報告），觸發後 48 小時內重評 Sivers 的產能依賴假設。",
+      "id": "mfn_sivers_semiconductors_6543505f_att1_cl3",
+      "source_ids": [
+        "mfn_sivers_semiconductors_6543505f_att1_s3",
+        "mfn_sivers_semiconductors_6543505f_att1_s4"
+      ],
+      "statement": "Sivers 宣布光子業務由 Fab-Lite 轉為 Hybrid Manufacturing Model：以本次募資擴建 Glasgow 產線（Phase 1 已啟動，2027 年底可用），並啟用另一策略性代工夥伴；長期模型是 InP 雷射內部：夥伴代工產能 1:2。這改變 Sivers 對上游代工（GlobalFoundries 等）的依賴結構，是 Step 1.2 判 Sivers→co:globalfoundries／prod:gf_scale 邊可替代性時要納入的結構事實。",
+      "subject_id": "co:sivers_semiconductors"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 2027 年報告中 ALL.SPACE 或 Tachyon 訂單被取消、延後超過兩季或金額下修，本 claim 轉 watch；每季核查，觸發後 48 小時內重評對應供應邊的 commercial maturity。",
+      "id": "mfn_sivers_semiconductors_6543505f_att1_cl4",
+      "source_ids": [
+        "mfn_sivers_semiconductors_6543505f_att1_s5",
+        "mfn_sivers_semiconductors_6543505f_att1_s6"
+      ],
+      "statement": "無線業務：ALL.SPACE 的 8.2 MUSD 量產訂單已在執行、供 2027 出貨，公司稱這是多年量產週期的開始；FWA：正依 Tachyon Networks 的初始 3 MUSD 量產訂單生產。兩者都是既有供應邊（→co:all_space、→co:tachyon_networks）從開發轉量產的自報里程碑。",
+      "subject_id": "co:sivers_semiconductors"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE",
+        "SIVE.ST",
+        "Sivers Semiconductors AB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "mfn_sivers_semiconductors_6543505f_att1_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mfn_sivers_semiconductors_6543505f_att1",
+    "evidence_tier": 1,
+    "origin_entity": "Sivers Semiconductors",
+    "permission_basis": "Nasdaq Stockholm 法定揭露（MFN :regulatory）之期中報告附件，issuer 自行公開發布；全文由 fetchers/mfn.py 自公開來源取得並存 library/raw，repo_full 是為了讓引文可逐字核對。",
+    "published_at": "2026-08-27",
+    "publisher": "MFN (Modular Finance) / Cision",
+    "retrieved_at": "2026-09-17",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "Sivers Semiconductors Interim Report Q2 2026（January–June 2026；MFN 法定公告 6543505f 的附件 PDF，22 頁）",
+    "url": "https://mb.cision.com/Main/11695/4388331/4236264.pdf"
+  },
+  "sources": [
+    {
+      "id": "mfn_sivers_semiconductors_6543505f_att1_s1",
+      "locator": "CEO letter — Continued Opportunity Pipeline Strength and Growing Production Orders（p.3）",
+      "quote": "and Jabil is moving to Beta builds in Q4 2026 ahead of anticipated production orders in H1 2027."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_6543505f_att1_s2",
+      "locator": "CEO letter — In AI datacenters（p.3）",
+      "quote": "Additionally, we have sampled several pluggable customers and technically engaged with several others, with our 70mW and 100mW CW lasers and arrays. Pluggables remain very constrained on CW laser supply, and our products and manufacturing capacity are being received very positively in the market."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_6543505f_att1_s3",
+      "locator": "CEO letter — Hybrid Manufacturing Model（p.4）",
+      "quote": "We have made a strategic decision to move from a Fab-Lite to a Hybrid Manufacturing Model for our Photonics business."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_6543505f_att1_s4",
+      "locator": "CEO letter — Hybrid Manufacturing Model（p.4）",
+      "quote": "Our long-term model is to have a 1:2 ratio of internal to partner foundry capacity on InP lasers."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_6543505f_att1_s5",
+      "locator": "CEO letter — In Wireless（p.4）",
+      "quote": "In Wireless, we are now executing to production orders ($8.2M) from ALL.SPACE for 2027, signaling the start of a multi-year production cycle."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_6543505f_att1_s6",
+      "locator": "CEO letter — In Fixed Wireless Access（p.4）",
+      "quote": "In Fixed Wireless Access (FWA), we are building product against Tachyon Networks’ initial production order ($3M)."
+    }
+  ]
+}
