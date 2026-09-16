@@ -1,0 +1,99 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 H1 2026 期中報告（2026-09-07 RNS 9757485）或後續 RNS 揭露 material uncertainty、covenant 違約、再融資需求，或 Fundraising 現金未如期到帳，本 claim 失效；每半年（期中／年度業績 RNS）核查一次，觸發後 48 小時內重評 IQE 的歸零旗標（going concern）。",
+      "id": "rns_iqe_9588930_cl1",
+      "source_ids": [
+        "rns_iqe_9588930_s1",
+        "rns_iqe_9588930_s2",
+        "rns_iqe_9588930_s5"
+      ],
+      "statement": "IQE FY2025 年度業績（2026-05-28 RNS）附註 2.2 Going concern：董事已編製至少 12 個月的預測（含 2026-05-28 完成、約 £81m 的 Fundraising），在基準與「嚴重但合理」下行情境下皆預期遵守銀行契約並維持強勁流動性，因此採 going concern 基礎編製；附註本文未載明任何 material uncertainty 陳述。這把 IQE going-concern 待辦的狀態由「一手不支持」改為「可逐字引用」（L11-1：material uncertainty 這類審計措辭以一手為準）。",
+      "subject_id": "co:iqe"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 H1 2026 期中報告下修 FY2026 成長指引至 20% 以下、或 InP 需求不再被列為主要動能，本 claim 轉 watch；每半年核查，觸發後 48 小時內重評 IQE 在 InP 磊晶片瓶頸的需求錨。",
+      "id": "rns_iqe_9588930_cl2",
+      "source_ids": [
+        "rns_iqe_9588930_s3"
+      ],
+      "statement": "IQE 管理層指引：2026 Q1 對 InP 解決方案（支援資料中心與 AI 基礎設施的光子產品）需求加速，預期為 FY2026 以後的重大成長動能；FY2026 營收預期成長逾 20%。這是 IQE 供應 InP 磊晶片給光互連客戶的需求側自報，客戶未具名。",
+      "subject_id": "co:iqe"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若後續 RNS 未在 12 個月內把任一 design win 轉為具名量產／供應協議、或客戶端文件指出改用其他磊晶供應商，本 claim 降級；每半年核查，觸發後 48 小時內重評 IQE 的 commercial maturity。",
+      "id": "rns_iqe_9588930_cl3",
+      "source_ids": [
+        "rns_iqe_9588930_s4"
+      ],
+      "statement": "IQE 稱已取得多個 Tier 1 客戶的 InP 光子 design wins，定位為次世代資料中心光互連的未來量產供應商——客戶未具名，不得對應到任何具名公司（既有具名邊：→co:tower_semiconductor、→co:macom 另有各自文件）。",
+      "subject_id": "co:iqe"
+    }
+  ],
+  "edges": [],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "IQE",
+        "IQE.L"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "rns_iqe_9588930_s3"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "rns_iqe_9588930",
+    "evidence_tier": 1,
+    "origin_entity": "IQE plc",
+    "permission_basis": "LSE RNS 法定公告（issuer 一手），investegate 公開鏡像；全文由 fetchers/rns.py 自公開來源取得並存 library/raw，repo_full 是為了讓附註 2.2 引文可逐字核對。",
+    "published_at": "2026-05-28",
+    "publisher": "RNS (London Stock Exchange) via investegate",
+    "retrieved_at": "2026-09-17",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "IQE plc FY 2025 Financial Results（RNS，2026-05-28，經 investegate 鏡像）——含財務報表附註 2.2 Going concern 與附註 7 Fundraising",
+    "url": "https://www.investegate.co.uk/announcement/rns/iqe--iqe/iqe-plc-fy-2025-financial-results/9588930"
+  },
+  "sources": [
+    {
+      "id": "rns_iqe_9588930_s1",
+      "locator": "Notes to the financial statements — 2.2 Going concern（結論段）",
+      "quote": "The Group is forecast to maintain a strong positive liquidity position throughout the 2026 and H1 2027 going concern assessment period, under both the base case and severe but plausible downside scenario. Accordingly, the Directors are satisfied that the Group and Company have adequate cash resources to continue in operational existence and to meet their liabilities as they fall due for a period of at least 12 months from the date of approval of these financial statements. The Directors therefore consider it appropriate to adopt the going concern basis of accounting in the preparation of the Group consolidated financial statements and the Company financial statements."
+    },
+    {
+      "id": "rns_iqe_9588930_s2",
+      "locator": "Notes to the financial statements — 2.2 Going concern（首段）",
+      "quote": "The Directors have prepared forecasts and cash flow projections for a period of at least 12 months from the date of approval of these financial statements. These forecasts include the impact of the Fundraising completed on 28 May 2026 (see Note 7). Whilst cash has not yet been received, the directors have assessed the risk of not receiving the cash as remote."
+    },
+    {
+      "id": "rns_iqe_9588930_s3",
+      "locator": "Current trading and outlook",
+      "quote": "Trading in Q1 2026 was in line with management expectations, with strong demand across all core segments. In particular, IQE is seeing accelerated demand for the Group's InP solutions, which support optical photonics products for data centre and AI infrastructure, and expects this to be a material growth driver throughout FY 2026 and beyond."
+    },
+    {
+      "id": "rns_iqe_9588930_s4",
+      "locator": "Business update — Connect",
+      "quote": "Multiple Tier 1 InP photonics design wins position the Group for future volume production in next-generation optical interconnect markets for data centres."
+    },
+    {
+      "id": "rns_iqe_9588930_s5",
+      "locator": "Notes — 7. Post balance sheet events — Fundraising",
+      "quote": "On 28 May 2026, the Group completed a financing (the 'Fundraising') which raised gross proceeds of approximately £81,000,000."
+    }
+  ]
+}
