@@ -1,0 +1,119 @@
+{
+  "claims": [
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 Tower 後續 20-F／6-K 或新聞稿揭露另一家 InP 磊晶供應者進入同一平台、或本協議提前終止、或 Tower 不再稱 IQE 為 key supplier，本印證失效；每半年核查 Tower 申報與新聞室一次，觸發後 48 小時內把此邊的 substitutability 退回待判定並重評 IQE 的瓶頸排序名次。",
+      "id": "tower_iqe_inp_epiwafer_agreement_2026_06_15_cl1",
+      "source_ids": [
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s1",
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s2",
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s3"
+      ],
+      "statement": "客戶端（Tower Semiconductor）在自家網域逐字確認 IQE 為其次世代矽光子平台的 InP 磊晶片供應者，並由 Tower 總裁具名稱 IQE 為 key supplier；供應條款含 Tower 首年最低採購承諾、IQE 對等供應承諾與後續最低量承諾。這把 IQE→Tower 邊的證據等級從 IQE 自報／聯合發布升級為**客戶端自家文件的獨立印證**（L8：sole_source 與供應地位的確認來源必須是客戶端或第三方）。",
+      "subject_id": "co:iqe"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若 400Gb/lane 原型未在 2027 年底前進入量產、或 Tower 揭露改用其他磊晶來源支援該世代，本 claim 轉 watch；每半年核查，觸發後 48 小時內重評 IQE 在 InP 磊晶瓶頸的時間軸假設。",
+      "id": "tower_iqe_inp_epiwafer_agreement_2026_06_15_cl2",
+      "source_ids": [
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s4",
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s2"
+      ],
+      "statement": "協議涵蓋 200Gb/lane pluggable transceiver 量產技術、次世代 400Gb/lane 調變器原型，以及資料中心光路交換器（optical-circuit-switch）等應用——由客戶端具名說出用途世代，界定了這條供應關係綁在哪一代產品上；同時 Tower 另以全球免權利金授權其 porous silicon 專利給 IQE，了結雙方全部訴訟。",
+      "subject_id": "co:iqe"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "designed_in",
+        "sole_source": false,
+        "substitutability": 4
+      },
+      "confidence": 0.9,
+      "dst_id": "co:tower_semiconductor",
+      "id": "twr1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s1",
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s2",
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s3"
+      ],
+      "src_id": "co:iqe"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "equipment_epitaxy",
+      "aliases": [
+        "IQE",
+        "IQE.L"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:iqe",
+      "name": "IQE plc",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "TSEM",
+        "Tower",
+        "Tower Semiconductor Ltd."
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:tower_semiconductor",
+      "name": "Tower Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "tower_iqe_inp_epiwafer_agreement_2026_06_15_s1"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "tower_iqe_inp_epiwafer_agreement_2026_06_15",
+    "evidence_tier": 1,
+    "origin_entity": "Tower Semiconductor",
+    "permission_basis": "Tower Semiconductor Ltd.（TSEM）在自家網域公開發布的新聞稿；全文保留供逐字核對，canonical URL 一併保存。",
+    "published_at": "2026-06-15",
+    "publisher": "Tower Semiconductor Ltd.",
+    "retrieved_at": "2026-09-17",
+    "source_type": "news",
+    "storage_permission": "repo_full",
+    "title": "IQE and Tower Semiconductor Announce Multi-year InP epiwafer Supply Agreement（Tower Semiconductor 官網發布本，2026-06-15）",
+    "url": "https://towersemi.com/2026/06/15/06152026/"
+  },
+  "sources": [
+    {
+      "id": "tower_iqe_inp_epiwafer_agreement_2026_06_15_s1",
+      "locator": "第二段（供應用途）",
+      "quote": "IQE's InP epiwafers will be used in several of Tower's advanced silicon photonics platforms for next-generation optical technologies, providing a high-quality supply base for Tower's product roadmap."
+    },
+    {
+      "id": "tower_iqe_inp_epiwafer_agreement_2026_06_15_s2",
+      "locator": "第二段末（供應條款）",
+      "quote": "The agreement provides for a minimum purchase commitment by Tower in the first year, a reciprocal supply commitment from IQE, and minimum volume commitments thereafter."
+    },
+    {
+      "id": "tower_iqe_inp_epiwafer_agreement_2026_06_15_s3",
+      "locator": "Dr. Marco Racanelli, President of Tower Semiconductor, commented",
+      "quote": "We are pleased to partner with IQE as a key supplier for our next-generation photonic technologies that add InP high-performance components to our high-volume, mature, silicon photonics platform."
+    },
+    {
+      "id": "tower_iqe_inp_epiwafer_agreement_2026_06_15_s4",
+      "locator": "第二段（技術世代與應用）",
+      "quote": "IQE and Tower's collaboration includes technology for the production of 200Gbs/lane for pluggable transceivers and the prototyping of next-generation 400Gb/lane modulators, as well as other critical applications including optical-circuit-switches for deployment in datacentres."
+    }
+  ]
+}
