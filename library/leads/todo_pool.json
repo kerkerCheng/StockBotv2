@@ -9827,39 +9827,63 @@
     },
     {
       "added_at": "2026-09-16T18:09:03.474188+00:00",
+      "completion_authority": {
+        "action_digest": "98e5d1052fece025ac9c321062846fe444973f77762a039ba999873f5629d049",
+        "cohort_id": "dc_f94148d8545de35cb2c5d048640b913e",
+        "commit": "17d4e381ac8e42094c90c239eb317e85c3e9bcd8",
+        "company_id": "co:landmark_optoelectronics",
+        "verified_at": "2026-09-16T23:54:35.640678+00:00"
+      },
       "graph_impact": "+1 節點、0 邊、1 claims｜來源：LandMark Optoelectronics Corporation（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:landmark_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 579,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_1acced705152034da9d07533b10cfa85;digest:98e5d1052fece025ac9c321062846fe444973f77762a039ba999873f5629d049;commit:17d4e381ac8e42094c90c239eb317e85c3e9bcd8;cohort:dc_f94148d8545de35cb2c5d048640b913e",
       "ref_id": "ra_1acced705152034da9d07533b10cfa85",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-16T23:54:35.640678+00:00",
       "source": "research_action",
       "title": "聯亞光電 115 年 Q2 個別財報入圖（MOPS 抓取器 smoke；單一報導部門＝磊晶片 100%）",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-16T18:09:03.474188+00:00",
+      "completion_authority": {
+        "action_digest": "cb12442717155879fff3cf51493e8e882597091fcd06acdb6b48f184b9829314",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "1d2ea9bcbbd2e19e6cbfa8064829a8e0225b0254",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-09-16T23:54:37.566807+00:00"
+      },
       "graph_impact": "+1 節點、0 邊、4 claims｜來源：Sivers Semiconductors（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 580,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_740dd1e52f824fe727e14dbe0ccb84f4;digest:cb12442717155879fff3cf51493e8e882597091fcd06acdb6b48f184b9829314;commit:1d2ea9bcbbd2e19e6cbfa8064829a8e0225b0254;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_740dd1e52f824fe727e14dbe0ccb84f4",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-16T23:54:37.566807+00:00",
       "source": "research_action",
       "title": "Sivers Q2 2026 期中報告入圖（MFN 抓取器 smoke；Jabil Beta build Q4 2026、Hybrid 製造模型、CW 雷射供應受限自述）",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-16T18:09:03.474188+00:00",
+      "completion_authority": {
+        "action_digest": "06b33ad047e6401565f92625654c72c65e1bfe54cf1b626a8152b81c03a2c74d",
+        "cohort_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+        "commit": "8599fc14775aa5a817912141c3781aeb95d543c1",
+        "company_id": "co:iqe",
+        "verified_at": "2026-09-16T23:54:39.373136+00:00"
+      },
       "graph_impact": "+1 節點、0 邊、3 claims｜來源：IQE plc（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 581,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f67b31b070ef0a600420e40a333409c6;digest:06b33ad047e6401565f92625654c72c65e1bfe54cf1b626a8152b81c03a2c74d;commit:8599fc14775aa5a817912141c3781aeb95d543c1;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "ref_id": "ra_f67b31b070ef0a600420e40a333409c6",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-16T23:54:39.373136+00:00",
       "source": "research_action",
       "title": "IQE FY2025 年度業績 RNS 入圖（RNS 抓取器 smoke；going concern 附註可逐字引用、無 material uncertainty 陳述）",
       "type": "ra_admission"
@@ -9879,39 +9903,63 @@
     },
     {
       "added_at": "2026-09-16T22:45:44.982524+00:00",
+      "completion_authority": {
+        "action_digest": "f27724c67f0dad42aa0011850c9a31105d63bb812e0417c5716307d7810d8511",
+        "cohort_id": "dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+        "commit": "f813e2a252ccfd5b445d3b48d95e91d199931740",
+        "company_id": "co:iqe",
+        "verified_at": "2026-09-16T23:54:41.197921+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、2 claims｜來源：Tower Semiconductor（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 583,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_3b3e8b7944ef1fbb4ce310611256c29f;digest:f27724c67f0dad42aa0011850c9a31105d63bb812e0417c5716307d7810d8511;commit:f813e2a252ccfd5b445d3b48d95e91d199931740;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
       "ref_id": "ra_3b3e8b7944ef1fbb4ce310611256c29f",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-16T23:54:41.197921+00:00",
       "source": "research_action",
       "title": "[562] 解：Tower 自家公告補 IQE→Tower 邊的客戶端外部印證（供應商自報 → 客戶端確認）",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-16T22:45:44.982524+00:00",
+      "completion_authority": {
+        "action_digest": "86a431f76bf904b412ea0cf159da1658da1f14ae55130690ad5efa12a83cec69",
+        "cohort_id": "dc_c31a4e9a5ccc17c5f6cd4930ad85bd37",
+        "commit": "158eb1565a1cb409dcd3b8e7eb7193640d09aade",
+        "company_id": "co:vpec",
+        "verified_at": "2026-09-16T23:54:43.008626+00:00"
+      },
       "graph_impact": "+11 節點、8 邊、12 claims｜來源：Visual Photonics Epitaxy（tier 1）、IntelliEPI（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:vpec。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 584,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_3fafac4bcdafc11a19a0509ab51518b7;digest:86a431f76bf904b412ea0cf159da1658da1f14ae55130690ad5efa12a83cec69;commit:158eb1565a1cb409dcd3b8e7eb7193640d09aade;cohort:dc_c31a4e9a5ccc17c5f6cd4930ad85bd37",
       "ref_id": "ra_3fafac4bcdafc11a19a0509ab51518b7",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-16T23:54:43.008626+00:00",
       "source": "research_action",
       "title": "D8 補邊：全新光電與英特磊各補兩條具名供應邊，兩份年報同時由手抓節錄升級為抓取器全文（誠實結果：sub 皆 2，仍不進排序）",
       "type": "ra_admission"
     },
     {
       "added_at": "2026-09-16T22:45:44.982524+00:00",
+      "completion_authority": {
+        "action_digest": "1015df20cd41bb8a4e086a2167858c1681640b8dd33dc3925c68785b58507fce",
+        "cohort_id": "dc_f94148d8545de35cb2c5d048640b913e",
+        "commit": "3703c1a9b2513c475418858b161b99e28e8bc3f9",
+        "company_id": "co:landmark_optoelectronics",
+        "verified_at": "2026-09-16T23:54:50.879062+00:00"
+      },
       "graph_impact": "+4 節點、3 邊、5 claims｜來源：LandMark Optoelectronics（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:landmark_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 585,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_aa7e9186ca68b569ce0dac835379d233;digest:1015df20cd41bb8a4e086a2167858c1681640b8dd33dc3925c68785b58507fce;commit:3703c1a9b2513c475418858b161b99e28e8bc3f9;cohort:dc_f94148d8545de35cb2c5d048640b913e",
       "ref_id": "ra_aa7e9186ca68b569ce0dac835379d233",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-16T23:54:50.879062+00:00",
       "source": "research_action",
       "title": "D8 補格：聯亞光電 tech:cw_dfb_laser 的 substitutability 判 3（誠實結果：低於門檻 4，排序仍無 TW／TWO 檔）",
       "type": "ra_admission"
@@ -21477,6 +21525,60 @@
       "receipt": "authority:plan_approval;ref:docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md#4",
       "ref_id": "manual:582",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-16T23:54:35.640678+00:00",
+      "n": 579,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_1acced705152034da9d07533b10cfa85;digest:98e5d1052fece025ac9c321062846fe444973f77762a039ba999873f5629d049;commit:17d4e381ac8e42094c90c239eb317e85c3e9bcd8;cohort:dc_f94148d8545de35cb2c5d048640b913e",
+      "ref_id": "ra_1acced705152034da9d07533b10cfa85",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-16T23:54:37.566807+00:00",
+      "n": 580,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_740dd1e52f824fe727e14dbe0ccb84f4;digest:cb12442717155879fff3cf51493e8e882597091fcd06acdb6b48f184b9829314;commit:1d2ea9bcbbd2e19e6cbfa8064829a8e0225b0254;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_740dd1e52f824fe727e14dbe0ccb84f4",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-16T23:54:39.373136+00:00",
+      "n": 581,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_f67b31b070ef0a600420e40a333409c6;digest:06b33ad047e6401565f92625654c72c65e1bfe54cf1b626a8152b81c03a2c74d;commit:8599fc14775aa5a817912141c3781aeb95d543c1;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "ref_id": "ra_f67b31b070ef0a600420e40a333409c6",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-16T23:54:41.197921+00:00",
+      "n": 583,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_3b3e8b7944ef1fbb4ce310611256c29f;digest:f27724c67f0dad42aa0011850c9a31105d63bb812e0417c5716307d7810d8511;commit:f813e2a252ccfd5b445d3b48d95e91d199931740;cohort:dc_6d08fd8f2b2c77b9f7734b464cfb8510",
+      "ref_id": "ra_3b3e8b7944ef1fbb4ce310611256c29f",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-16T23:54:43.008626+00:00",
+      "n": 584,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_3fafac4bcdafc11a19a0509ab51518b7;digest:86a431f76bf904b412ea0cf159da1658da1f14ae55130690ad5efa12a83cec69;commit:158eb1565a1cb409dcd3b8e7eb7193640d09aade;cohort:dc_c31a4e9a5ccc17c5f6cd4930ad85bd37",
+      "ref_id": "ra_3fafac4bcdafc11a19a0509ab51518b7",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-16T23:54:50.879062+00:00",
+      "n": 585,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_aa7e9186ca68b569ce0dac835379d233;digest:1015df20cd41bb8a4e086a2167858c1681640b8dd33dc3925c68785b58507fce;commit:3703c1a9b2513c475418858b161b99e28e8bc3f9;cohort:dc_f94148d8545de35cb2c5d048640b913e",
+      "ref_id": "ra_aa7e9186ca68b569ce0dac835379d233",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],

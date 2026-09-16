@@ -134,13 +134,58 @@ def _verify_action_receipts(record: dict, *, root: Path) -> None:
             raise PublicationError("graph_receipt_invalid", doc_id) from exc
 
 
+def _superseding_paths(record: dict, *, root: Path) -> set[str]:
+    """本 action 自己宣告要 supersede 的文件，其 extraction 與 raw 路徑。
+
+    ⚠ 只認**逐份宣告的** `supersedes_extraction_sha256`，不是「這個 doc_id 看起來像更正」。
+    宣告讀自已落地的 extraction 檔（`payload` 在 apply 後會被 compact 掉），而那份檔的內容
+    已由 `_verify_action_receipts` 比對過 `extraction_sha256`——**呼叫順序上它先跑**，
+    所以這裡讀到的宣告是被 hash 綁住的事實，不是可以事後改的自由欄位。
+    讀不到檔就當沒宣告（fail closed 回原本的嚴格判定）。
+    """
+    out: set[str] = set()
+    for manifest in record.get("document_manifest") or []:
+        if manifest.get("storage_permission") == "local_only":
+            continue                      # local_only 不進 Git，本來就不在 eligible
+        doc_id = validate_doc_id(manifest["doc_id"])
+        path = root / "extractions" / f"{doc_id}.json"
+        try:
+            extraction = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue                      # 讀不到就當它沒宣告——fail closed 回原本的嚴格判定
+        declared = str(
+            (extraction.get("source_doc") or {}).get("supersedes_extraction_sha256") or ""
+        ).strip()
+        if not declared:
+            continue
+        out.add(f"extractions/{doc_id}.json")
+        out.add(f"library/raw/{doc_id}.txt")
+    return out
+
+
 def _validate_action_worktree(record: dict, *, root: Path) -> list[str]:
     """Validate receipts and exact path readiness without staging anything."""
 
     _verify_action_receipts(record, root=root)
     eligible = _eligible_paths(record, root=root)
     statuses = _path_status(eligible, root=root)
-    modified = {path: status for path, status in statuses.items() if status != "??"}
+
+    # ⚠ **`status != "??"` 曾同時承載兩種語意**（L12，2026-09-17 實測撞上）：
+    # ①「別的 writer 動過這個檔」——必須擋；
+    # ②「supersede 走廊正常改寫既有檔」——**本來就會是 ` M`，擋它等於讓更正走廊永遠發不出去**。
+    # 兩者在 `git status` 上同形，所以下游只能二選一而兩邊都錯：放寬會讓外來修改混進 action commit，
+    # 收緊會讓 2026-09-11 立的更正走廊在 publish 這一站死掉（實測六個已核准的 RA 全卡住）。
+    # 修法是分開再各自定規則，不是調鬆：**只有本 action 在凍結 payload 裡逐份宣告過
+    # `supersedes_extraction_sha256` 的文件路徑**才允許 ` M`，其餘一律仍要求 `??`。
+    # 收緊面同時成立：那些路徑的內容已由 `_verify_action_receipts` 比對過
+    # `extraction_sha256`（hash 不符是 `document_receipt_hash_mismatch`），
+    # 所以「允許被改」不等於「不看改成什麼」。
+    superseding = _superseding_paths(record, root=root)
+    modified = {
+        path: status
+        for path, status in statuses.items()
+        if status != "??" and path not in superseding
+    }
     if modified:
         raise PublicationError("modified_tracked_action_path", repr(modified))
     for path in sorted(set(eligible) - set(statuses)):

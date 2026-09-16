@@ -478,3 +478,120 @@ def test_unpushed_out_of_band_commit_is_not_silently_accepted(
     assert result["reason"] == "unexplained_ahead_commit"
     stored = research_actions.read_action(action["action_id"], root=tmp_git_repo)
     assert stored["git"]["status"] == "pending"
+
+
+# ---------------------------------------------------------------------------
+# supersede 走廊 vs「別的 writer 動過」——同一個 git status 兩種語意（L12，2026-09-17）
+# ---------------------------------------------------------------------------
+
+
+def _create_superseding_action(repo: Path, action_name: str, doc_id: str, old_hash: str) -> dict:
+    """第二個 action：宣告 supersede 同一個 doc_id，於是它的 tracked 路徑一定是 ` M`。"""
+    extraction = _extraction(doc_id, "repo_full")
+    extraction["source_doc"]["supersedes_extraction_sha256"] = old_hash
+    extraction["source_doc"]["title"] = f"Document {doc_id} (corrected)"
+    documents = [{
+        "doc_id": doc_id,
+        "extraction": extraction,
+        "raw_payload": {"raw_text": f"raw {doc_id} corrected"},
+        "storage_permission": "repo_full",
+        "permission_basis": BASIS,
+        "validation_warnings": [],
+    }]
+    payload = {
+        "schema_version": research_actions.ACTION_PAYLOAD_SCHEMA,
+        "action_slug": action_name,
+        "report": _report(f"Action {action_name}"),
+        "documents": documents,
+    }
+    record = research_actions.create_action(payload, root=repo)
+    provenance = intake.publish_provenance(doc_id, extraction, documents[0]["raw_payload"], root=repo)
+    intake.mark_graph_complete(doc_id, extraction, root=repo)
+    record["execution"]["documents"][0] = {
+        "doc_id": doc_id,
+        "status": "complete",
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+        "result": {
+            "status": "loaded_or_already_complete",
+            "doc_id": doc_id,
+            "resolved_paths": provenance["paths"],
+            "open_conflict_ids": [],
+            "stale_resolution_ids": [],
+            "finalize_eligible": provenance["finalize_eligible"],
+            "extraction_sha256": intake.canonical_extraction_hash(extraction),
+        },
+    }
+    record["state"] = "partial"
+    record["execution"]["report"] = research_actions.publish_action_reports(record, root=repo)
+    record["state"] = "applied"
+    record["applied_at"] = datetime.now(timezone.utc).isoformat()
+    eligible = research_actions.eligible_action_paths(record)
+    record["git"]["eligible_paths"] = eligible
+    record["git"]["status"] = "pending" if eligible else "not_required"
+    record["final_result"] = {
+        "status": "applied",
+        "action_id": record["action_id"],
+        "action_digest": record["action_digest"],
+    }
+    record = research_actions.compact_applied_payload(record)
+    return research_actions.save_action(record, root=repo)
+
+
+def test_supersede_declaring_action_may_rewrite_its_own_tracked_paths(tmp_path) -> None:
+    """更正走廊產出的 ` M` 必須放行，否則 2026-09-11 立的走廊在 publish 這一站死掉。
+
+    事發（2026-09-17）：六個已由使用者核准的 RA 全部卡在 `modified_tracked_action_path`，
+    因為 supersede **本來就會改既有 tracked 檔**，而 preflight 把所有非 `??` 一律當成
+    「別的 writer 動過」。同一個 `git status` 承載兩種語意，下游只能二選一而兩邊都錯（L12）。
+
+    空跑檢查：把 `_superseding_paths` 的回傳改成 `set()` → 這條會紅。
+    """
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init", "-b", "master")
+    _git(repo, "config", "user.email", "t@example.com")
+    _git(repo, "config", "user.name", "t")
+    _ready_remote(repo, tmp_path / "remote.git")
+
+    first = _create_applied_action(repo, "alpha", "repo_full")
+    doc_id = first["document_manifest"][0]["doc_id"]
+    assert action_publisher.publish_pending_actions(root=repo)["status"] == "pushed"
+
+    old_hash = intake.canonical_extraction_hash(
+        json.loads((repo / "extractions" / f"{doc_id}.json").read_text(encoding="utf-8"))
+    )
+    _create_superseding_action(repo, "alpha_fix", doc_id, old_hash)
+
+    status = action_publisher._path_status(
+        [f"extractions/{doc_id}.json", f"library/raw/{doc_id}.txt"], root=repo
+    )
+    assert set(status.values()) == {" M"}, status      # 前提：它們確實是已修改的 tracked 檔
+
+    result = action_publisher.publish_pending_actions(root=repo)
+    assert result["status"] == "pushed", result
+    assert "(corrected)" in (repo / "extractions" / f"{doc_id}.json").read_text(encoding="utf-8")
+
+
+def test_modified_tracked_path_without_a_supersede_declaration_is_still_rejected(tmp_path) -> None:
+    """收緊面：沒有宣告 supersede 的文件，tracked 檔被改仍然擋——放行只給宣告過的那幾個路徑。"""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _git(repo, "init", "-b", "master")
+    _git(repo, "config", "user.email", "t@example.com")
+    _git(repo, "config", "user.name", "t")
+    _ready_remote(repo, tmp_path / "remote.git")
+
+    first = _create_applied_action(repo, "beta", "repo_full")
+    doc_id = first["document_manifest"][0]["doc_id"]
+    assert action_publisher.publish_pending_actions(root=repo)["status"] == "pushed"
+
+    # 第二個 action 用**新** doc_id；外來修改落在第一個 action 已發布的檔上
+    _create_applied_action(repo, "gamma", "repo_full")
+    (repo / "extractions" / f"{doc_id}.json").write_text(
+        json.dumps({"tampered": True}), encoding="utf-8"
+    )
+    # gamma 的路徑仍是 ?? ，但若有人把 beta 的檔列進 eligible 就該擋：直接驗判定函式
+    record = first
+    with pytest.raises(action_publisher.PublicationError) as exc:
+        action_publisher._validate_action_worktree(record, root=repo)
+    assert exc.value.code in {"modified_tracked_action_path", "document_receipt_hash_mismatch"}
