@@ -4,6 +4,10 @@
 
 ---
 
+> **狀態（2026-09-16）：Step 0 已核准並合併進 master（branch `docs/alpha-edge-step0`）。**
+> 新 session 照下面順序讀完文件後，**直接從「Step 1 以後」開始**：先出 Phase 1 的 PLAN_PROPOSAL（Z3），停下等核准。
+> 不要重做 Step 0；去向清單在 `docs/refactor/alpha-edge-step0-migration.md`。
+
 先做 Step 0 文件整併並交回 diff，未核准前不得動任何程式。
 
 **先讀（順序固定）：**
@@ -19,7 +23,7 @@
 - 被取代的呈現契約句子劃線加日期留原地或搬 archive 並留指向；不得靜默刪除。
 - 依 D13 加兩個 skill scope note 與 blind-spot-audit 的新 lens，然後跑 `python scripts/sync_agent_skills.py`。
 - 更新 `docs/ARCHITECTURE.md`、`docs/OPERATIONS.md`、`CONCEPTS.md` 中與新目標衝突的段落，同樣劃線不刪。
-- 驗收：AGENTS 字元數 < 34,836；`grep -c "^### L" AGENTS.md` 得 17；`python -m audit invariants` FAIL 0；`python -m pytest tests/test_codex_daily_permissions.py` 綠；每句移除的舊契約列出去向。
+- 驗收：~~AGENTS 字元數 < 34,836~~ AGENTS 字元數必須降且內容驗收全過（2026-09-16 使用者定案，實測 36,075 → 34,624）；`grep -c "^### L" AGENTS.md` 得 17；`python -m audit invariants` FAIL 0；`python -m pytest tests/test_codex_daily_permissions.py` 綠；每句移除的舊契約列出去向。
 - 產出：**diff 與去向清單**，在獨立 branch。停下等核准。
 
 **Step 1 以後（Step 0 核准後才出 plan，先出 PLAN_PROPOSAL 再實作）：** 建議順序，可在 plan 裡改，但要說明理由：

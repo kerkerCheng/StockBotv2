@@ -23,6 +23,10 @@ Codex local scheduled task
   → brief
 ```
 
+> ⚠ **2026-09-16 定案（D12，`docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md`）：Daily 將拆成心跳（零 LLM）／分類（便宜模型）／研究（只在互動 session）
+> 三層**，規格見 ARCHITECTURE §4.1。**落地前本節照舊。** 落地時同一 change 改本節、把 `config/daily_routine.json` 的
+> `drain_limit_per_run` 歸零、對齊 `.codex/rules` fixed entry 與 `tests/test_codex_daily_permissions.py`（sandbox impact review 五步）。
+
 排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布四個 leads state 檔：`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`——2026-09-02 由二擴四，impact review 結論見腳本 docstring；不得用 unattended 廣泛 Git 命令碰其他檔）。
 
 **追源證據隨引用一起發布（2026-09-04）：** 同一筆提交會帶上**被那份 state 指名引用、
@@ -133,6 +137,10 @@ Engine C 提案）→ 報告本輪產出與下一題。**所有 authority mutati
 5. `coverage_gaps` 的 🔴 未知供應層
 6. 缺五軸 assessment 的 cohort（如 `research_assessment_missing` 者）
 7. `single_origin_report` 單源 claim 補強
+
+> ⚠ 2026-09-16：D12 落地後研究只在互動 session 跑，本節就是**唯一**研究路徑（daily 的 drain 歸零）。
+> D8「補三格」（已在圖裡的邊緣公司的可替代性／外部印證／瓶頸業務占營收比例）依決定紀錄 §8 排到題源最前——
+> 落地隨 ROADMAP Phase 1，落地前題源順序照上表。
 
 **紅線：** ①台北 04:00（週日 weekly）與 06:30（daily）前後 30 分鐘內不動 working tree，
 排程結束後先讀 `git status --short` 再續跑；②每輪必留 receipt，違反 = 該輪視為未發生。
@@ -323,7 +331,8 @@ Analyst View 依**消費者問句**排列：頭條（現價 → future target va
 
 **讀 readiness：** `ready`／`ready_with_flags`／`blocked` **只看核心四段**；
 optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 readiness 變差
-（產品決策見 `docs/ROADMAP.md`「主流程的終點是 Implied Return」）。
+（產品決策見 `docs/archive/roadmap-pre-alpha-edge.md`「主流程的終點是 Implied Return」；2026-09-16 起該終點排定由
+多年反向橋取代，見 `docs/ROADMAP.md` Phase 7，落地前照舊）。
 架構見 `docs/ARCHITECTURE.md` §6.7。**互動專用，不進 unattended rule。**
 
 ### Sandbox impact review 結論（2026-09-09，研究閉環 P5：Daily 吃機械段）
@@ -432,6 +441,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' scripts\daily_beta_snapshot.py --format markdown --risk-view changes
 ```
 輸出明標 `policy_mode=paper_observation`、`capital_scope=shared_cash_pool`；不建立 choice／fill、不下單、不寫 Sheet、不把 undrawn loan 算資本。
+⚠ 2026-09-16 D6：beta 凍結開發，本命令維持、不再擴充；只保留「大盤比例」觀測。
 
 ### 記錄成交（手動下單後）
 
@@ -453,6 +463,8 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 
 事件紀錄在 tracked `library/trades/trade_log.jsonl`（append-only）。
 它是「發生了什麼」的稽核軌跡，**不是持股真相**——後者永遠只有 Sheet。
+2026-09-16 D14 再確認：**Sheet 是部位真相**（含貸款額度、投入標的與現金），Decision Store 只留可選 receipt；
+alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加 gate**。
 
 ### 入圖收尾
 ```powershell
@@ -1150,6 +1162,7 @@ weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同
   `python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
   排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired
   lifecycle ＋ non-terminal Decision cohorts 自動導出。
+  ⚠ 2026-09-16 D12：落地後 `drain_limit_per_run` 應為 **0**（研究只在互動 session 跑）；同一條查證命令印出 > 0 就是還沒落地。
 - **提醒去重：** lifecycle SessionStart hook 只提醒**尚未進池**的新到期項目；已存在的
   `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。分工全表見上方
   「SessionStart hook 的分工」。
@@ -1205,6 +1218,7 @@ topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式。
 是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我
 改寫**；`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，
 不是 current-state truth。
+⚠ 2026-09-16 D5／D12：weekly 與 daily 同一套三層；**帳號計分表在 weekly 算**並 materialize 進 APP（落地前無此段，ROADMAP Phase 3）。
 
 **Daily Brief outbound 通知（2026-08-04）：** 完成後可由 Codex 或本機 Claude Code 呼叫
 同一支 `scripts/publish_daily_brief.py`，outbound-only 送到 Discord private Forum

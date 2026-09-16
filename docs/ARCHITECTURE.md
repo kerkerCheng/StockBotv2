@@ -118,6 +118,10 @@ fetchers/edgar.py ──────↑              engine_c/etl_yfinance.py �
 - **fetchers：** `fetchers/edgar.py`（美股 SEC EDGAR）、`fetchers/mops.py`（台股）。
 - **daily harvest：** `crons/harvest_leads.py` 以 X API `since_id`＋EDGAR watch 抓
   metadata → triage PASS → routine 依 priority 自動 pq1 → prepared RA 才進 pq2。
+- **2026-09-16 定案、尚未交付（規格，不是現況；ROADMAP Phase 3／6）：** X 帳號登記表（封閉清單，tier
+  `probation`／`measured`／`trusted`，只影響 pq1 優先序）＋每則貼文自動蓋章（貼文時間＋當日收盤價＋具名實體）
+  ＋每週計分表五欄、materialize 進 APP（D5）；MOPS 重訊 watcher 與台股每月營收 datum；parked lead 超過 60 天
+  自動 `expired` 並計數、不刪（D15，INV-2）。推文永遠是 tier-4 lead，lead-intake 不變。
 - **每週審查：** `crons/weekly_scan_prompt.md`，只做 topic discovery ＋ lifecycle
   唯讀提醒 ＋ 健康審查；刻意與 daily 錯開。
 - **本機音訊追源：** `scripts/transcribe_audio.py`（`faster-whisper`），模型與逐字稿
@@ -129,6 +133,29 @@ fetchers/edgar.py ──────↑              engine_c/etl_yfinance.py �
 > ⚠ 這張圖裡的 `prepare_research_action`／`apply_research_action` 是 **MCP 的動詞**。
 > 它們之所以出現在架構圖裡是歷史因素（Research Action 的 domain 曾被關在
 > `mcp_server/` 裡），Phase 3 已把 domain 抽到 `intake/`。
+
+### 4.1 Daily 三層與心跳規格（2026-09-16 使用者定案 D12；ROADMAP Phase 2 交付前這裡是規格，不是現況）
+
+> **落地前的現況：** Daily 仍是上面那條「harvest → triage → pq1 drain → brief」的單一 Codex 排程。
+> 查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
+> 印出 > 0 就是還沒落地；落地後應為 0。
+
+| 層 | 誰跑 | LLM | 做什麼 |
+|---|---|---|---|
+| **心跳** | 純 Python 排程，從 state 檔組出，推到既有 Discord publisher | 零 | 固定五段，每段可以只有一行 |
+| **分類** | 便宜模型（signal-triage） | 每日硬上限 | 失敗不阻斷；印「未 triage N」 |
+| **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零；weekly 同一套，帳號計分表在 weekly 算 |
+
+心跳固定五段：
+1. **資料新鮮**：每個 harvest 來源 ok／fail、行情最新交易日、APP 今天是否 materialize。
+2. **變了什麼**：門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作）。
+3. **佇列**：新 lead N、待 triage N、pq1 可做 N、pq2 卡在你 N、expired N。
+4. **部位**：alpha 占淨值、全歸零少幾 %、追蹤表三個 power-law 統計量、幾檔共用同一需求錨。
+5. **帳號計分表變動**（weekly）：量測起始日與樣本數必印，讓「還沒量」看得見。
+
+硬規則：LLM 失敗心跳照發；「未 triage N」必印（L13：沒發生與沒看到不得同形）；writer lock 照留（harvest 仍寫共用檔）；
+不需要 agent 當 orchestrator 時，Codex sandbox 的 fixed entry 與 `tests/test_codex_daily_permissions.py` 要同一
+change 對齊（sandbox impact review 五步，見 OPERATIONS）。
 
 ---
 
@@ -163,6 +190,11 @@ alpha 排序必須**消費**它，不得重算結構分，也不得繞過它自�
 它輸出兩份用途不同的排序：`rows`（可行動，證據優先）回答「現在能投什麼」，
 `structural_rows`（純結構，不看證據）回答「該去補誰的證據」。
 
+> ⚠ **2026-09-16 轉向（決定紀錄 D0–D15，`docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md`）：** 目標改為邊緣小公司的 power-law 倍率。
+> 對本節的三個直接後果：①`rank_bottlenecks` 把未填 `substitutability` 的邊當 0 過濾（門檻 4），邊緣公司在可投資排序裡
+> 看不見——修法是**研究補三格**（ROADMAP Phase 1），不是改排序權威；②候選門檻改為覆蓋厚薄（D11，Phase 4 的 filter）；
+> ③§6.5–6.7 的 FY+1 主流程排定由多年反向橋取代（Phase 7）。各 Phase 交付前，本節其餘現況描述仍準確。
+
 ### 「哪些標的值得看」的四維度（`AlphaSignal` 五 score 的前身）
 
 1. **瓶頸地位** — `substitutability` 4–5、`sole_source`、距需求端跳數。
@@ -172,6 +204,8 @@ alpha 排序必須**消費**它，不得重算結構分，也不得繞過它自�
    性且最難偽造，任何以「替代難度」為主的排序都抓不到後者。
 4. **標的純度** — 瓶頸業務占該公司多少。同為 `sub=5`，AVGO 的 CPO 只是一塊業務，
    AXTI／POET 才有資訊落差。市值與 `analyst_count` 在 Engine C，**不在排序內**。
+   ⚠ 2026-09-16 D11：市值與 `analyst_count` 仍不進排序，但它們是**篩選層 filter 的輸入**（覆蓋厚薄＝候選門檻，
+   不限上市地；非英語 filing 是加分不是門檻）。filter 只過濾、不打分（ROADMAP Phase 4）。
 
 ### 排序驗證（Phase 6）
 
@@ -801,6 +835,8 @@ PayoffScenarioSection（read model 第 13d 節）→ AnalystView.bet（optional 
    所以**既有 ledger 的每一個 id 一個位元都不變**。
 4. **它是條件句，不是機率加權**：沒有 bull／bear、沒有機率；`PAYOFF_IS_NOT` 逐字寫在 section 裡。
    沒寫賭注是 optional 缺席（`not_yet_recorded`），readiness 不變差，也不得補一個 bull case。
+   ⚠ 2026-09-16 D2：多一個**對稱** overlay——「判斷錯了值多少」＝反證觸發後的假設套同一條橋（同一套算術、
+   同樣的型別層證據要求），與 variant 並排；它**仍不是 bear case、仍沒有機率**。落地是 ROADMAP Phase 5。
 
 **為什麼不做成第二本 ledger：** 賭注就是「同一條假設的另一個值」，它的身分（driver／scope／period）與 base 完全相同，
 差的只有值與證據；分成兩本會讓 as-of／supersede／證據解析長出兩份規則（L16）。Abstention 分開是因為它**結構上不能帶值**；
@@ -809,8 +845,9 @@ variant 恰好相反，它就是一個值。
 **入口：** `python -m alpha assumptions <T> --add spec.json`（spec 帶 `"scenario": "variant"`；估值假設同）；
 `--list` 以 `〔variant〕` 標記。read model／analyst view／APP 自動長出賭注段，不需要另跑任何東西。
 
-**刻意不做（留給 V1–V4，見 ROADMAP）：** 催化劑連到 variant 假設、gap-closure 時序、`realized` 出口、
-籃子頁與 filter 式首選、variant 收斂納入 outcome。
+~~**刻意不做（留給 V1–V4，見 ROADMAP）：** 催化劑連到 variant 假設、gap-closure 時序、`realized` 出口、
+籃子頁與 filter 式首選、variant 收斂納入 outcome。~~
+（V1–V3 已於 2026-09-15 交付，見 §6.13；V4「variant 收斂納入 outcome」併入 ROADMAP Phase 5 的量測項，2026-09-16。）
 
 ### 6.11 投資人短評（`alpha/narrative/`，2026-09-15）
 
@@ -870,6 +907,9 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 | 籃子（V3） | `webapp/basket.py` → state kind `basket` → `#/basket` | ranking 去重順序 × overview × positions 的 join；首選＝filter（有賭注、payoff 為正、裁決點在目標價日期前），INV-3 逐檔報理由 |
 
 ⚠ **首選是 filter 不是分數。** 排序權威仍是 `rank_bottlenecks()`；籃子只在那個順序上套三條可機械驗證的條件。沒有一檔通過就 `top_pick=null`＋理由計數——今天正是如此。
+⚠ 2026-09-16 D3：`realized` **降為提醒，不觸發出場**——出場只認反證；lifecycle 字彙不動，改的是它的後果（ROADMAP Phase 5）。
+⚠ 2026-09-16 D11：首選的三條條件排定換成漏斗條件（覆蓋家數上限、市值上限、瓶頸業務占營收下限、至少一條外部印證的瓶頸邊、
+入圖前 30 天漲幅上限、12 個月內指名假設的催化劑；ROADMAP Phase 4）；落地前沿用三條。籃子空就空，不得放寬。
 ⚠ **`basket` 必須在 ranking／positions／單檔之後 materialize**（它只讀那三份 artifact，不連 DB）；daily 收尾命令已加 `--basket` 在最後。
 
 ## 7. Engine D（Decision Lab）runtime
@@ -896,6 +936,9 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 `-m webapp materialize --beta` 每日更新、隨時可看，Daily 只印門檻跨越與狀態翻轉。
 **Daily 仍須在 APP 當天沒被 materialize 時把這件事印出來**——否則「看不到」與「沒發生」同形（L12）。
 
+⚠ **2026-09-16 D6：beta 凍結開發。** 本節只維護「大盤比例」觀測；欄位規格不再擴充，beta 個股呈現若擋路可拆，
+不為維持 beta 架構繞路。以下規則在凍結期間照舊有效。
+
 **輸入／輸出（`target-architecture.md` §9）：**
 
 | | `portfolio/` | `risk/` |
@@ -913,10 +956,14 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 「你一檔都沒買」，而事實是「我沒讀到你買了什麼」（L12）。
 `single_position_nav_cap_reference` 的欄位名自己說出它不是 gate——真正的硬擋在
 `store.record_live_choice`。
+⚠ 2026-09-16 D14：**部位真相是 Google Sheet**（貸款額度、投入標的、現金）；Decision Store 只留可選 receipt；
+alpha 原則上不用貸款資金是使用者自己的紀律，**系統不建 gate**（A5 不擴張）。
 
 - **目標配置比例** SSOT 只有 `config/target_allocation.json`：sleeve 層級六格，分母是
   **已投入的非現金部位**（不含現金；cash floor 是另一個 authority）。
   查證：`python -c "import json;d=json.load(open('config/target_allocation.json'));print(d['basis'], sorted(d['sleeves']))"`
+  ⚠ 2026-09-16 D1：**alpha 格改 `observed_only`**（只印不比），beta 五格目標保留——沒有目標時「誰跌深投誰」就回來。
+  落地前 config 六格都還有 `target`；查證：`python -c "import json;print(json.load(open('config/target_allocation.json'))['sleeves']['alpha'])"`。
 - **相對水位** 只用位置指標：52 週區間位置（主要）、距 52 週高點、距 SMA200，
   全部取自商品**自身**價格序列。⚠ **不得用動能指標表達水位**：RSI 量的是最近漲跌的
   單邊程度，與「站在自己區間哪裡」可以完全脫鉤，而且它正是 2026-08-01 測失敗的輸入，
