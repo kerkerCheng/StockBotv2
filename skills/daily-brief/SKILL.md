@@ -13,6 +13,11 @@ description: >
 
 # Daily Approval Brief Skill（v1.7）
 
+> ⚠ **Scope note（2026-09-16）：呈現契約重寫中，本檔任何句子與 `AGENTS.md` 衝突時以 `AGENTS.md` 為準。**
+> 使用者已定案 Daily 拆成**心跳**（零 LLM，Python 排程）／**分類**（便宜模型、每日硬上限）／**研究**（只在互動 session）
+> 三層（決定紀錄 [`2026-09-16-alpha-edge-discovery-requirements.md`](../../docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md) D12；規格 `docs/ARCHITECTURE.md` §4.1）。
+> 本 skill 隨該 Phase **同一個 change** 改寫；**在那之前本檔流程照舊執行**，不要在本檔補寫第二份判準。
+
 ## 定位一句話
 
 **每天一份 action-first brief；routine 先把 PASS 線索研究成 prepared RA，使用者只核准完整 pq2。**

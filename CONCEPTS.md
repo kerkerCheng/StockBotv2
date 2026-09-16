@@ -197,6 +197,9 @@ The prospective population of every signal that passed the Probe Gate, including
 ### Signal Source Registry（訊號來源登記表／Whitelist）
 The user-governed registry that decides which accounts may trigger automatic Signal and Shadow capture and receive scarce research attention. A source moves among `candidate`, `probation`, `active`, and `suspended` based on prospective claim accuracy, trace success, lead time, independence, correction behavior, and beta-adjusted outcomes. Registry status is an attention and automation permission, never evidence or funded-Paper eligibility: it cannot raise `evidence_tier`, replace source tracing, or directly loosen a position cap.
 *Avoid:* trusted-evidence list, influencer score, automatic credibility override
+⚠ 2026-09-16 D5：帳號登記表將以封閉三值 `probation`／`measured`／`trusted` **取代**本條的四態（ROADMAP Phase 3）；
+**落地前本條照舊**——`decision_lab/intake.py::_SOURCE_STATUSES` 今天仍是 `candidate`／`probation`／`active`／`suspended`，
+字彙的廢止與程式同一個 change 發生，不在文件先宣告。新制下 tier 只影響 pq1 優先序、不影響入池；升降是一季一次的 pq2 manual。
 
 ### Coverage Gate（研究覆蓋閘門）
 The readiness check run after a qualified signal has already been captured as a Probe with Shadow Observation. It asks whether enough company identity, source trace, causal context, counter-path, financial baseline, and falsifiable milestones exist to produce a defensible Confidence Envelope. Failure yields `coverage_pending / SHADOW ONLY / RESEARCH REQUIRED` and a system-supported funded range of zero; a user may still make a separately recorded manual override.
@@ -213,6 +216,8 @@ The append-only funded simulation context for Paper executions. `paper_portfolio
 ### Crowding Discount（擁擠折扣）
 A position-sizing rule that lowers the conviction tier by one level (15%→10%→8%→no position) when a thesis is already priced in — triggered by sell-side coverage count above a threshold or a forward multiple that already implies the thesis scenario. Exists because Lane Memo conviction measures evidence completeness, which correlates with consensus; without the discount, sizing systematically rewards the most-priced-in ideas. Uses third-party observable data (analyst coverage count, valuation multiples), deliberately not a self-assessed "variant perception strength" score — self-grading one's own non-consensus-ness has the same confirmation-bias shape as L8 self-reporting. Feeds and consumes the `consensus_coverage` observation slot in Engine C.
 *Avoid:* consensus penalty, anti-crowding factor
+⚠ 2026-09-16 D11：~~position-sizing rule（15%→10%→8%）~~——系統自 2026-08-28 起不給任何尺寸。擁擠度改以**覆蓋厚薄**
+（`analyst_count`、市值）當**篩選層的 filter 條件**（ROADMAP Phase 4）：它否決「值得看」，不折扣、不打分、不排序。
 
 ---
 
@@ -265,6 +270,8 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 ### Base-case Implied Return（Step 2）
 `alpha/implied_return/model.py::build_implied_return`：`price_return = fair_value / current_price − 1`；`holding_period_days = horizon_end − current_price.bar_date`；`annualized_price_return = (1 + price_return) ** (365.25 / days) − 1`。四個輸入缺一就 `missing`（現價含 bar_date、fair value 同單位、value-date 語意、生效 horizon）；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者。**它不是** probability-weighted expected return（沒有機率；名稱刻意用 implied）、不是 total return（`total_return_status` 恆 `not_modeled`）、不是 entry signal／required return／buy-sell；read model 第 13a 節 `implied_return` 每次列 `is_not`。COHR 2026-09-06：從 2026-09-04（281.86）到 2027-06-30，simple −20.7%、年化 −24.6%。
 *Avoid:* 叫它 expected return、把 price return 冒充 total return、拿它排序或給尺寸、horizon 缺就偷用一年
+⚠ 2026-09-16：FY+1 單格的 implied return 排定由**多年反向橋**（「五倍要什麼為真」）取代主流程地位（ROADMAP Phase 7）；
+落地前本條照舊，但不得拿 FY+1 的負數當「不值得看」的結論（`AGENTS.md` Alpha 呈現契約）。
 
 ### EntryCriterion（要求報酬判準）
 使用者對「這檔要求多少年化價格報酬」的**明示**宣告（`alpha/entry/contracts.py`，2026-09-06 Step 3）：`convention`（封閉字彙，v1 只有 `annualized_required_price_return`）、值（小數）、`basis`（**只有** `investor_policy`）、rationale、`reference_refs`、`created_at`、supersede／retract。id 前綴 `ec_`，住 `library/private/alpha/entry_criteria/<TICKER>.jsonl`。**它不是公司事實、不是研究對公司的判斷、也不是資本許可**——它回答「我的資本要求多少報酬」，主詞是投資人；在模型裡與現價同一種地位（注入的輸入）。**刻意沒有 `period`**（要求報酬不隨估值換年度失效），也**刻意不共用 `select_assumptions`**（判準的 provenance 不在公司的證據池裡）。
@@ -285,6 +292,7 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 ### Optional Analytical Capability（可選的分析能力）
 一種**不是主流程、也不是研究完整度 gate** 的能力。stock-level 主流程是 **Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return**，終點是 implied return；`EntryCriterion`／hurdle 屬 optional analytical capability——**沒有它不代表這檔研究不完整**，只表示「optional entry threshold unavailable」。系統**不得**為了讓自己有答案而要求使用者宣告一個固定的 10%／15%／20%。機會成本、風險調整後 hurdle 與跨標的比較留給未來的 Portfolio／Investor Policy 階段。
 *Avoid:* 把 optional 缺席算成 blocker、用預設 hurdle 讓畫面「完整」、把 entry threshold 當成主流程終點
+⚠ 2026-09-16：轉向後 entry criterion 降為「optional 中的 optional」，主流程終點排定改為多年反向橋（ROADMAP Phase 7）；落地前本條照舊。
 
 ### absence_kind（「沒有值」是哪一種沒有）
 與 `status` **正交**的第二個語意軸（`alpha/absence.py`，2026-09-07 Step 5）：`status` 回答「這一格能不能用」，`absence_kind` 回答「它**為什麼**沒有」。封閉字彙 11 種：`not_yet_recorded`（還沒做）／`deliberate_abstention`（**刻意不主張——這已經是答案**）／`method_not_applicable`（方法對這筆資料無定義，補資料解不掉）／`upstream_unavailable`（這一格沒問題，是上游缺）／`inputs_incompatible`（每格都有值但期間／口徑／單位身分不相容）／`provider_missing`／`capability_absent`（＝`not_modeled`）／`point_in_time_unavailable`／`insufficient_evidence`／`invalidated`／`not_applicable_unspecified`。**由知道自己走了哪個分支的那段程式明示**；沒明示就由 `DEFAULT_ABSENCE_KIND` 這張**查表**給預設。消費端一律不得 parse `reason` 去猜（L16）。⚠ `not_applicable` 的預設刻意是 `not_applicable_unspecified`——它今天同時被 PIT 與方法層使用，猜任一邊都是替 authority 造一個它沒說過的區別。`SETTLED_ABSENCE_KINDS`（前三種裡的刻意不主張／方法不適用／能力不存在）表示「不必去補」，但**不讓 readiness 變好**。
@@ -305,3 +313,77 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 ### status／basis（read model 的兩個語意軸）
 每一格（`Datum`）都帶兩個封閉字彙。**`status`** 回答「這格有沒有東西、為什麼沒有」：`available`／`partial`／`stale`（2026-09-06 起**只**表示時間／排程到期）／`review_required`／`invalidated`（有值但不得當 current，由 `alpha/refresh` 決定）／`missing`（有能力、這檔沒資料）／`insufficient_evidence`／`not_modeled`（**系統還沒有這個能力**）／`not_applicable`。⚠ 2026-09-05 起 `internal_fundamentals`／`earnings_bridge`／數值 gap **有能力了**：沒有假設或基期觀測是 `missing`，不再是 `not_modeled`；模型輸出另帶 `dependencies`（假設 id、觀測 ref、`input_dependency`、期間、口徑）。**`basis`** 回答「這是哪一種知識」：`deterministic`（既有規則算出，如 Q1）／`observation`（直接讀自 authority）／`heuristic_proxy`（如 trailing／forward PE − 1）／`session_judgment`（Q2–Q5、thesis、variant view）／`narrative`（bull／base／bear、Decision Store 散文）／`structural_inference`（圖上多跳推論）／`none`。型別層強制 **Missing != Zero**：沒有值的狀態不得帶值。
 *Avoid:* confidence（那是 session 自評）、data quality score、把 status 與 basis 壓成一個欄位
+
+---
+
+## Alpha Edge（2026-09-16 轉向後的詞彙）
+
+定義來自決定紀錄 `docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md`（D0–D15）。**機制交付前這些詞只存在於文件**；對應的 ROADMAP Phase 交付時回填查證命令。
+
+### 四層漏斗（Discovery funnel）
+alpha 流程的骨架，四層各答一題：**發現**（誰值得進佇列）／**篩選**（它是不是倍率候選）／**表達**（怎麼買、怎麼抱、怎麼砍）／
+**量測**（哪個管道與特徵產出贏家）。籃子層的排序權威仍是 `rank_bottlenecks()`；漏斗不重算分數，篩選只過濾。
+*Avoid:* pipeline stage 編號、把漏斗當成分數、把「篩選」讀成排序
+
+### 覆蓋厚薄（Coverage thickness）
+候選門檻（D11）：`analyst_count` 與市值，不限上市地；非英語 filing 是加分不是門檻。AXTI、AEHR、POET 與台股同一把尺。
+它是篩選層的 filter 輸入，不是折扣、不是分數。
+*Avoid:* 上市地門檻、流動性門檻、Crowding Discount（舊的尺寸折扣）
+
+### 帳號登記表（Account registry）
+X 來源的**封閉清單**（D5），tier 三值：`probation`（新帳號一律）／`measured`（樣本夠：≥20 則具名點名、跨 ≥5 檔）／`trusted`。
+tier 只影響 pq1 優先序，不影響入池；升降是一季一次的 pq2 manual。**推文永遠是 tier-4 lead**，登記表不是證據、不能升 `evidence_tier`。
+*Avoid:* whitelist 當證據、舊字彙 candidate／active／suspended、influencer score
+
+### 蓋章（Post stamp）
+每則被 harvest 的貼文自動附上**貼文時間＋當日收盤價＋具名實體**（D5）。沒有蓋章就算不出「點名後」的報酬；價格不得事後回填。
+*Avoid:* 用 ingest 時間冒充貼文時間（同 INV-6）
+
+### 帳號計分表（Account scorecard）
+每週對每個登記帳號算五欄（D5）：點名後 30／90 天對 QQQ **與 SOXX** 的超額報酬中位數、點名前 30 天漲幅、追源成功率、
+假設命中率、no-go 率。**必印量測起始日與樣本數**，並印三個已知偏差（倖存者、後見之明、2026 光互連單邊上漲）。
+它是量測，不是訊號：不參與排序、不給尺寸（`AGENTS.md`「技術訊號的地位」四條件）。
+*Avoid:* 拿它排序、拿它給尺寸、樣本不足時省略起始日
+
+### 回溯評分（Backfilled scoring）
+用既有 lead（`published_at`＋`entities`）配歷史價，今天就算出計分表的前兩欄，不等半年。付費補抓分三段停損（免費來源先判、
+付費探針 100～200 則、stop rule：20 則具名點名跨 ≥5 檔就停），`harvest_config` 另設每月 X 總花費上限。
+*Avoid:* 海測（抓滿 3,200 則）、把回溯結果當前瞻證據
+
+### 心跳（Heartbeat）
+Daily 三層中的第一層（D12）：**零 LLM**、純 Python 排程、固定五段（資料新鮮／變了什麼／佇列／部位／帳號計分表變動），
+推到既有 Discord publisher。LLM 失敗心跳照發；「未 triage N」必印。規格見 `docs/ARCHITECTURE.md` §4.1。
+*Avoid:* brief（心跳不做判斷）、把 pq2 核准搬進心跳（核准的載體仍是對話）
+
+### 分類層（Triage layer）
+Daily 三層中的第二層（D12）：便宜模型跑 signal-triage，每日硬上限，失敗不阻斷心跳。研究（第三層）只在互動 session 的
+research-drain 跑，daily 的 `drain_limit_per_run` 歸零。
+*Avoid:* 無人值守 drain、讓分類層寫任何 authority
+
+### 判斷錯了值多少（Downside overlay）
+與賭注（variant overlay）**對稱**的 scenario（D2）：反證觸發後的假設套**同一條橋**、同一套估值與報酬算術，得到「認錯時值多少」。
+它是條件句，不是 bear case、沒有機率加權；與「賭對了值多少」並排就是短評那把尺的兩端。
+*Avoid:* bear case、probability-weighted expected return、散文式下檔
+
+### 歸零旗標（Wipe-out flags）
+四盞紅黃綠燈（D2）：現金跑道／負債／稀釋／going concern。**只給燈不給數字**，屬量測（同總曝險倍數、追繳門檻那一類），
+不參與排序、不給尺寸。IQE.L 是第一個要測的案例（D7）。
+*Avoid:* 合成一個分數、把黃燈讀成「減碼」
+
+### alpha 全歸零淨值少幾 %（Alpha wipe-out share）
+系統給的第三件事（D2）：alpha sleeve 全部歸零時淨值少幾 %。純呈現、零門檻；尺寸仍由使用者決定。alpha 格自 D1 起只觀測不設目標。
+*Avoid:* 目標比例、建議尺寸
+
+### power-law 統計量（Power-law statistics）
+追蹤表的三個主統計量（D15）：**12／24 個月內達 2 倍的比例、最大單檔貢獻、籃子總報酬**；等權中位數保留但降為次要。
+住 `library/private/decision_lab/outcome_aggregate.json`，心跳第 4 段印出。
+*Avoid:* 只看等權中位數（量不到 power-law）、把它讀成勝率
+
+### 多年反向橋（Multi-year reverse bridge）
+表達層的目標儀器（Phase 7，最後做）：問「**五倍要什麼為真**」——從目標倍率反推每一年的營收／利潤率／稀釋要走到哪，
+沿用 `alpha/reverse` 一次只解一個 driver 的紀律。取代 FY+1 EPS × 目標倍數找 20% 錯價的主流程地位；隱含報酬兩桿原則不變。
+*Avoid:* bull case、DCF 之名行猜測之實、跳過兩桿拆解
+
+### Lead 到期（Lead expiry）
+parked 超過 **60 天**未動的 lead 自動標 `expired` 並計數、**不刪**（D15，INV-2：每個等待都必須有到期）。計數印在心跳第 3 段。
+*Avoid:* 靜默沉底、刪除、把 expired 讀成 no-go

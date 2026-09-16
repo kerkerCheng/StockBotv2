@@ -11,6 +11,11 @@ description: >
 
 # Alpha Status Skill（v1.1）
 
+> ⚠ **Scope note（2026-09-16）：呈現契約重寫中，本檔任何句子與 `AGENTS.md` 衝突時以 `AGENTS.md` 為準。**
+> 目標已改為邊緣小公司的 power-law 倍率（決定紀錄 [`2026-09-16-alpha-edge-discovery-requirements.md`](../../docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md)）：
+> 排序權威不變（仍消費 `rank_bottlenecks`），但首選將換成漏斗 filter 條件（D11）、追蹤表主統計量將換成三個 power-law
+> 統計量（D15）、alpha 格只觀測不設目標（D1）。本 skill 隨各 Phase 同一個 change 改寫；**在那之前四個 pane 照舊**。
+
 ## 定位一句話
 
 **把「該投什麼／該挖什麼／哪裡是空白／已投的怎麼樣」四題，一次答完並排出順序。**
