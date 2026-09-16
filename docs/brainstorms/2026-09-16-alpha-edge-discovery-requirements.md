@@ -67,7 +67,11 @@
 
 ## 5. Step 0（文件整併）的驗收（L14：哪個數字會變）
 
-- `AGENTS.md` 字元數 **< 現在的一半**（2026-09-16 實測 69,671）。
+- ~~`AGENTS.md` 字元數 **< 現在的一半**（2026-09-16 實測 69,671）。~~
+  **2026-09-16 使用者定案（Step 0 收尾，選 A）改為：字元數必須降，且內容驗收全過**（憲法／六條 invariant／
+  四個 gate／L1–L17／協作邊界一字不動；每句被移除的舊契約有去向）。理由：69,671 是 `wc -c` 的 bytes 不是字元
+  （真字元 36,075），而一字不動的段落合計約 19,800 字元已超過一半，「減半」在 D0 之下結構上不可達。
+  實測 36,075 → 34,624 字元；細節見 `docs/refactor/alpha-edge-step0-migration.md` §0。
 - L1–L17 **17 條全部在**（grep `### L1 ` … `### L17 `）。
 - `python -m audit invariants` **FAIL 0**。
 - `tests/test_codex_daily_permissions.py` 與所有讀 prompt／skill 字串的測試**綠**。
