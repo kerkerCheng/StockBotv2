@@ -196,6 +196,12 @@ def test_fetchers_directory_is_not_broadly_allowed() -> None:
     ):
         assert credential_bearing not in rules
 
+    # Phase 1 Step 1.1（2026-09-16）：mfn.py（瑞典 MFN）與 rns.py（英國 RNS）是互動式入口，
+    # 與 mops.py 同構但**刻意不進無人值守**——smoke 只跑過一次，還沒累積到
+    # 「daily 遇到 .ST／.L 標的就自動抓」的量測（INV-5）。放行是另一次 impact review 的事。
+    for interactive_only in ("fetchers\\mfn.py", "fetchers\\rns.py"):
+        assert interactive_only not in rules, interactive_only
+
 
 def test_project_memory_defines_common_sandbox_impact_review() -> None:
     """sandbox impact review 的**判準與程序**都必須被寫下來。

@@ -18,6 +18,11 @@
 - 若資訊不確定，寧可壓低 confidence，不要捏造
 ```
 
+⚠ **`source_doc.origin_entity` 只放發布者身分**（2026-09-16 Phase 1 Step 1.0 實測：20 筆 origin 被當註解欄用，括號裡寫
+發行人／客戶端／轉載，排序的證據分級因此解析不到主詞）。格式照 `prompts/extract_system.md`：發布組織的 display name
+（`"Sivers Semiconductors"`、`"IQE plc"`），不是 `co:*` id、不帶括號註解；「這是客戶端文件」「轉載自某站」這類脈絡寫進
+`title` 或 `permission_basis`。判準一句話：**origin_entity 回答「誰發的」，不回答「它是什麼」。**
+
 ---
 
 ## 法說會 Transcript（Earnings Call）

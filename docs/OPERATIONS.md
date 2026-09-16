@@ -663,7 +663,7 @@ brief 不可直接用 `Get-Content | --stdin` 管線傳送；`--brief-file` 會�
 
 ---
 
-## 非美股 filing 抓取（台股 MOPS／日股 TDnet）
+## 非美股 filing 抓取（台股 MOPS／瑞典 MFN／英國 RNS／日股 TDnet）
 
 ⚠ **要查分部附註（IFRS 8）就抓財報，不要抓股東會年報**（2026-09-04 實測）。
 MOPS 的 `t57sb01` 分兩區，`mtype` 決定查哪一區：
@@ -701,6 +701,10 @@ python -m fetchers.mops --co-id 4971 --kind annual_report --all-revisions
 
 輸出與 `edgar.py` 一致：`library/raw/{doc_id}.txt` ＋ `.meta.json`。
 年報「營運概況」含最近二年度占進（銷）貨總額 10% 以上之客戶——台股客戶集中度的一手來源。
+2026-09-17 起 meta 帶 `published_at`（MOPS 列表「上傳時間」民國轉西元，對照組 `mops_3363` 115/05/07 → 2026-05-07）、
+`published_at_method=filing_metadata`、`published_at_basis`、`retrieved_at`；上傳時間解析不到就留 null 並印出來，**不用抓取日冒充**。
+⚠ 沒有子公司的公司只申報「IFRSs個別財報」（實測聯亞 3081 的 114／115 年財報區合併財報 0 份）——`--kind consolidated_financial_statement`
+會得到「本公司未申報此類」，照訊息換 `separate_financial_statement`，那不是查無文件。
 
 **⚠ 不要改抓公司 IR 網站。** 多數台廠年報 PDF 連結是動態載入，靜態抓取只拿得到零散附件
 （2026-08-28 實測聯亞只取得「前十大股東關係表」，一度被誤判成「可抽文字為 0」）。
@@ -711,6 +715,43 @@ fetcher 已封裝的四個坑，自己刻之前先讀 `fetchers/mops.py` 的 doc
 ③ `--year` 是**民國查詢年度**而非資料年度，查 115 回的是 114 年度年報；
 ④ 同年度可能有多份修訂（原始版 F04 ／股東會後修訂本 F11），共用 doc_id 會**靜默覆蓋**，
 預設只取最新並印出略過訊息。
+
+**瑞典（Nasdaq Stockholm／First North）：`fetchers/mfn.py`**（互動式入口，**未加入任何 unattended routine**；2026-09-17 Phase 1 Step 1.1）。
+
+```bash
+python -m fetchers.mfn --company sivers-semiconductors --list --match "Q2 2026"     # RSS 視窗內的公告（REG＝法定）
+python -m fetchers.mfn --url https://mfn.se/cis/a/sivers-semiconductors/<headline-slug>-<id>   # 正文＋附件 PDF
+python -m fetchers.mfn --company sivers-semiconductors --match "reports q2 2026" --latest
+```
+
+輸出與 `mops.py` 一致；附件 PDF（期中報告本體）各自成 `{doc_id}_att{N}`。三個坑：①瑞典文與英文各發一則、同一事件，
+預設只取英文（`--lang all` 才兩則都抓）；②日期只認公告頁 JSON-LD `datePublished`（UTC，＝RSS pubDate），頁面的
+`publish-date` 是當地時間，沒有 datePublished 就拒寫；③附件不在 RSS 裡，只掛在公告頁「Bifogade filer」，且原始 HTML
+的 `<a>` 屬性跨行（第一次 smoke 就因此零附件）。⚠ 探到 404 先檢查 URL 是否被截斷（尾端要有 8 碼 id）。
+
+**英國（LSE RNS，經 investegate 鏡像）：`fetchers/rns.py`**（互動式入口，**未加入任何 unattended routine**）。
+
+```bash
+python -m fetchers.rns --company IQE --list --match results          # 清單走 /company/IQE/announcements（AJAX）
+python -m fetchers.rns --url https://www.investegate.co.uk/announcement/rns/iqe--iqe/<headline-slug>/<id>
+python -m fetchers.rns --company IQE --match "FY 2025 Financial Results" --latest
+```
+
+四個坑：①公司頁 HTML 裡零筆公告，清單是 AJAX；②日期不在 metadata（JSON-LD 只是 WebPage），一手日期是 RNS 本體開頭
+的 dateline（`IQE PLC / 28 May 2026`），清單另有日期＋時間，兩者都記進 `published_at_basis`；③「Summary by AI」不是一手，
+只取 `news-window` 內的 RNS 本體；④站點會整段時間回 502（2026-09-16 晚間半小時）——5xx／timeout 印「站點暫時不可用」
+並重試兩次，404 印「這則不存在」不重試，兩句話對應兩個下一步（等 vs 換 id）。
+⚠ IQE 年報 PDF 的查核報告雙欄交錯、pdfplumber 也讀不出來；going concern 附註要抓**年度業績 RNS 全文**
+（2026-05-28 `rns_iqe_9588930`，「2.2 Going concern」段完整可讀）——這才是該待辦卡住的真正原因。
+
+**Sandbox impact review（2026-09-17，Phase 1 Step 1.1，兩支新抓取器）：** ①path／side effect／capability——只連
+`mfn.se`、`mb.cision.com`、`investegate.co.uk`，無憑證、只寫 `library/raw/`、不碰 identity／ACL／private authority／`.git`；
+②本節、`docs/ARCHITECTURE.md` §4、`skills/source-trace/SKILL.md` 路由行同 change 更新；③**不新增 unattended rule**
+（fixed entry 維持二十條）——兩支都是互動式入口，smoke 只跑過一次，還沒累積到「daily 遇到 .ST／.L 就自動抓」的量測（INV-5）；
+④`tests/test_codex_daily_permissions.py::test_fetchers_directory_is_not_broadly_allowed` 明確斷言 `fetchers\mfn.py`／
+`fetchers\rns.py` **不在** allowlist；⑤端到端 smoke 以互動 session 跑（不是 scheduled task 的 sandbox——它們本來就不進排程）：
+`mops_3081_separate_financial_statement_202602`（29 頁）、`mfn_sivers_semiconductors_6543505f`（＋附件 `_att1`）、
+`rns_iqe_9588930`（50,894 字）三份落地，`published_at` 分別取 MOPS 上傳時間、JSON-LD datePublished、RNS dateline。
 
 **日股：** 有価証券報告書走 EDINET，受注残高與決算數字走決算短信（TDnet）。
 ⚠ EDINET API v2 需 subscription key（未申請）；2026-08-28 實測改抓 TDnet 決算短信正本

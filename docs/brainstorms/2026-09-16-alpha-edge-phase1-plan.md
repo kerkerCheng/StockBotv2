@@ -26,7 +26,7 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 | Step | 做什麼 | 驗收（哪個數字會變） | 前置 | Zoom／Review |
 |---|---|---|---|---|
 | **1.0** ✅ | 公司名稱解析歸位（見 §2） | 改判 39 條邊、待判定 90 → 53、解析不到 131 → 83、IQE 28 → 12、排序仍 37 列 | — | Z1／R1 |
-| **1.1** ○ | `fetchers/mfn.py`＋`fetchers/rns.py`（與 `mops.py` 同構；互動式入口，不進無人值守）、`config/source_routes.json` 登記 `.ST`／`.L` 兩階、三條管道各 smoke 一份文件入圖 | 由抓取器產出、meta 帶 `published_at`、經 RA 入圖的文件：MOPS 2 → 3、MFN 0 → 1、RNS 0 → 1；`.ST`／`.L` 各多一階路由且 smoke 後 `verified=true`（查證 `python -m sourcing.routes SIVE.ST`）；IQE going concern 段落由「一手不支持」變可逐字引用；`.codex/rules` fixed entry 仍 20 條且 permission test 明確斷言兩支新抓取器**不在** allowlist | 1.0 | Z1／R1 ×2；sandbox impact review 五步 |
+| **1.1** ✅（入圖待 [579][580][581] go） | `fetchers/mfn.py`＋`fetchers/rns.py`（與 `mops.py` 同構；互動式入口，不進無人值守）、`config/source_routes.json` 登記 `.ST`／`.L` 兩階、三條管道各 smoke 一份文件入圖 | 由抓取器產出、meta 帶 `published_at`、經 RA 入圖的文件：MOPS 2 → 3、MFN 0 → 1、RNS 0 → 1；`.ST`／`.L` 各多一階路由且 smoke 後 `verified=true`（查證 `python -m sourcing.routes SIVE.ST`）；IQE going concern 段落由「一手不支持」變可逐字引用；`.codex/rules` fixed entry 仍 20 條且 permission test 明確斷言兩支新抓取器**不在** allowlist | 1.0 | Z1／R1 ×2；sandbox impact review 五步 |
 | **1.2** ○ | 研究項（pq2）：七家補三格（§4 工單） | 可投資排序中 TW／TWO／ST 後綴檔數 0 → ≥1（目標 3；逐檔報進與不進的理由，INV-3）；`substitutability` 覆蓋 80 → ≥86／525；八家「產品線營收占比」4 → 8 | 1.1 的聯亞財報與 Sivers 期中報告；1.0 | 研究路徑（research-drain），不走 development-flow |
 | **1.3** ○ | 收尾：重跑排序、`python -m webapp materialize --ranking`、ROADMAP 回填 before → after、`audit invariants` FAIL 0、全套 pytest、push | Phase completion gate 八項；**TW／TWO／ST 仍為 0 就不得標完成**，只能標「研究已做、證據不足以進榜」並列缺哪份文件 | 1.2 | Z0／R0 |
 
@@ -45,6 +45,25 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
   - Sivers→`tech:cw_dfb_laser` 升到外部印證的來源是華星光的年報（競爭者）：現行契約不分客戶或競爭者，留給 Phase 4。
   - 20 筆 origin 被當註解欄用（括號寫發行人／客戶端／轉載）：1.1 改 `docs/extraction-instructions.md` 時說明 `origin_entity` 只放發布者身分，脈絡放 `title`／`permission_basis`。
   - registry 同時有 `co:openlight` 與 `co:openlight_photonics`，未動。解析器仍住排序模組（原則上該住 identity 層），只收斂成一份、沒搬家。
+
+## 2b. Step 1.1 結果（2026-09-17，branch `alpha-edge/phase1-step1.1`）
+
+- 交付：`fetchers/mfn.py`、`fetchers/rns.py`（與 `mops.py` 同構；`fetchers/utils.py` 加共用 `build_headers`／`html_to_text`）；`mops.py` meta 補
+  `published_at`（上傳時間民國轉西元）＋ method／basis／`retrieved_at`；`config/source_routes.json` 加 `mfn`（.ST）／`rns`（.L）兩條 rung2、smoke 後
+  `verified=true`；`tests/test_mfn_fetcher.py`（12）、`tests/test_rns_fetcher.py`（10）、mops／routes／permission 各加斷言；OPERATIONS／ARCHITECTURE／
+  source-trace skill／extraction-instructions 同步。全套 pytest 2,432＋45 passed；`audit invariants` FAIL 0。
+- Smoke 三份落地並 prepare 成 pq2：[579] `mops_3081_separate_financial_statement_202602`（29 頁／26,720 字）、[580] `mfn_sivers_semiconductors_6543505f_att1`
+  （22 頁／49,527 字，與手抓版 byte 數相同）、[581] `rns_iqe_9588930`（50,894 字，附註 2.2 Going concern 全段可讀）。**入圖計數（MOPS 2→3、MFN 0→1、RNS 0→1）在
+  使用者 go 後才變。**
+- 事實修正：§3 寫「聯亞 `--kind consolidated_financial_statement`」——實測聯亞無子公司，114／115 年財報區合併財報 0 份、只有 IFRSs 個別財報；
+  抓取器的 INV-3 訊息直接指出換 kind。§3 的 RNS 假設「日期只有文字形式」正確，但一手日期在 RNS 本體 dateline（`IQE PLC / 28 May 2026`），
+  頁面 JSON-LD 只是 WebPage；公司頁清單是 AJAX（`/company/IQE/announcements`）。investegate 於 2026-09-16 晚間連續 502 約半小時。
+- L11-6 那一筆：`mops_4979_annual_report_2025` 圖裡 `published_at=2026-05-31`，但 MOPS 上傳時間是 115/05/07（→2026-05-07）、年報刊印日 115/03/30——
+  三個都不一樣，圖裡那個來自兩份 extraction（`luxnet_4979_annual_report_fy2025.json`、`cw_dfb_substitutability_addendum_2026_08_29.json`）手填。
+  方向保守（比真實可得日晚，不是 lookahead），**未動**；列為 1.3 收尾的候選修正（改 extraction 後重載，A1 可重建）。
+- 殘餘：RA 的 `storage_permission` 走 `repo_full`＋`raw_text`＝抓取器全文——`repo_excerpt` 會合成「Source URL＋Excerpt」短文而與既存全文衝突，
+  這是 intake 與 fetcher 之間的既有整合縫，不在本 Step 修；`retrieved_at` mops 用本機日期、mfn／rns 用 UTC 日期（皆 ≥ published_at）。
+  聯亞 `display_name` 仍缺（財報封面只有中文；要英文版年報封面），併入 1.2。
 
 ## 3. Step 1.1 的實作事實（本輪已探測，不必重探）
 

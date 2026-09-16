@@ -9824,6 +9824,45 @@
       "source": "manual",
       "title": "COHR：賭注改寫提案——現行 variant 只覆蓋 FY27 營益率 +2pp（EPS 貢獻 +3.6%），與 thesis 主張的「六吋產能倍增後的 FY28 量×利潤率」不在同一年；需補內部 FY28 view（或把 value_date 移到 FY28 期末）並依 09-09 原則把目標倍數預設回市場倍數，重算兩欄貢獻",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-16T18:09:03.474188+00:00",
+      "graph_impact": "+1 節點、0 邊、1 claims｜來源：LandMark Optoelectronics Corporation（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:landmark_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 579,
+      "reason": null,
+      "ref_id": "ra_1acced705152034da9d07533b10cfa85",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "聯亞光電 115 年 Q2 個別財報入圖（MOPS 抓取器 smoke；單一報導部門＝磊晶片 100%）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-16T18:09:03.474188+00:00",
+      "graph_impact": "+1 節點、0 邊、4 claims｜來源：Sivers Semiconductors（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 580,
+      "reason": null,
+      "ref_id": "ra_740dd1e52f824fe727e14dbe0ccb84f4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "Sivers Q2 2026 期中報告入圖（MFN 抓取器 smoke；Jabil Beta build Q4 2026、Hybrid 製造模型、CW 雷射供應受限自述）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-16T18:09:03.474188+00:00",
+      "graph_impact": "+1 節點、0 邊、3 claims｜來源：IQE plc（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 581,
+      "reason": null,
+      "ref_id": "ra_f67b31b070ef0a600420e40a333409c6",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "IQE FY2025 年度業績 RNS 入圖（RNS 抓取器 smoke；going concern 附註可逐字引用、無 material uncertainty 陳述）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -21380,6 +21419,6 @@
       "verb": "waiting_reason_refreshed"
     }
   ],
-  "next_n": 579,
+  "next_n": 582,
   "schema_version": "1"
 }

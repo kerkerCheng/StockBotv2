@@ -108,14 +108,14 @@ canonical edge **沒有時間欄位**——唯一時間線索是 `CITES → Sour
 
 ```
 文件 → library/raw/ → extract.py → loader/validate.py → loader/load_to_neo4j.py → Neo4j
-fetchers/edgar.py ──────↑              engine_c/etl_yfinance.py → SQLite
+fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 線索 → source-trace → prepare_research_action（server-owned review packet）
      → 使用者明確核准 ID → apply_research_action（filesystem-first + resumable graph write）
      → 本機 session 執行 scripts/commit_pending_intake.py
 ```
 
 - **抽取與 DB 解耦：** `extract.py` 只輸出 DB 無關 JSON；loader 可替換（L3）。
-- **fetchers：** `fetchers/edgar.py`（美股 SEC EDGAR）、`fetchers/mops.py`（台股）。
+- **fetchers：** `fetchers/edgar.py`（美股 SEC EDGAR）、`fetchers/mops.py`（台股 MOPS）、`fetchers/mfn.py`（瑞典 MFN，Nasdaq Stockholm／First North）、`fetchers/rns.py`（英國 RNS，經 investegate 鏡像）。四支同構：只從公開來源把指定文件寫到 `library/raw/`，meta 帶 `published_at` 與其依據；**mfn／rns 是互動式入口，不進無人值守**（2026-09-17 Phase 1 Step 1.1；放行是另一次 impact review 的事）。
 - **daily harvest：** `crons/harvest_leads.py` 以 X API `since_id`＋EDGAR watch 抓
   metadata → triage PASS → routine 依 priority 自動 pq1 → prepared RA 才進 pq2。
 - **2026-09-16 定案、尚未交付（規格，不是現況；ROADMAP Phase 3／6）：** X 帳號登記表（封閉清單，tier
