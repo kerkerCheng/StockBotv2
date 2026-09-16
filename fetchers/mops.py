@@ -29,6 +29,7 @@ import argparse
 import io
 import re
 import sys
+import unicodedata
 from datetime import date
 from pathlib import Path
 
@@ -209,14 +210,25 @@ def fetch_document(co_id: str, filename: str, *, mtype: str = "F") -> bytes:
 
 
 def pdf_to_text(content: bytes) -> tuple[str, int]:
-    """抽 PDF 全文，回傳 (text, page_count)。"""
+    """抽 PDF 全文，回傳 (text, page_count)。輸出一律 NFC 正規化（坑 5）。
+
+    ⚠ **坑 5（2026-09-17）：MOPS 的 PDF 會吐出 CJK 相容表意文字（U+F900–U+FAFF）。**
+    它們與正常字**視覺完全相同**但碼位不同——實測 4971 年報 50 個、4979 年報 126 個，
+    「列」是 U+F99C 而不是 U+5217。後果是任何逐字引用比對、`grep`、入圖前的 quote 核對
+    都會**靜默失敗**：字看起來一模一樣，比對就是不過，於是被讀成「年報沒寫這句」。
+    成功與失敗在同一個訊號上同形（L13），而且它不會讓任何測試變紅。
+
+    NFC 是這裡的正確正規化：相容表意文字有 canonical decomposition，NFC 會映射回標準碼位，
+    **而全形數字與全形標點不受影響**。刻意不用 NFKC——它會把財報表格的全形數字改成半形，
+    那樣逐字引用就不再是逐字。
+    """
     try:
         from pypdf import PdfReader
     except ImportError as exc:  # pragma: no cover - 環境問題
         raise RuntimeError("需要 pypdf 套件: pip install pypdf") from exc
     reader = PdfReader(io.BytesIO(content))
     text = "\n".join((page.extract_text() or "") for page in reader.pages)
-    return text, len(reader.pages)
+    return unicodedata.normalize("NFC", text), len(reader.pages)
 
 
 def _form_code(filename: str) -> str:

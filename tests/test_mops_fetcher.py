@@ -267,3 +267,65 @@ def test_fetch_company_writes_published_at_into_meta(monkeypatch, tmp_path) -> N
     assert meta["published_at_method"] == "filing_metadata"
     assert "115/08/12 17:18:12" in meta["published_at_basis"]
     assert meta["retrieved_at"] >= meta["published_at"]     # 不可能在發表前抓到它
+
+
+# ---------------------------------------------------------------------------
+# 坑 5（2026-09-17）：PDF 吐出的 CJK 相容表意文字
+# ---------------------------------------------------------------------------
+
+def test_pdf_text_is_nfc_normalised_so_verbatim_quotes_can_be_matched(monkeypatch) -> None:
+    """MOPS 的 PDF 會吐出 U+F900–U+FAFF 的相容表意文字，**與正常字視覺完全相同**。
+
+    事發（2026-09-17）：拿年報原句去比對 raw 檔失敗，肉眼看兩邊一模一樣——
+    4971 年報的「系列原料」那個「列」是 U+F99C 而不是 U+5217（該檔共 50 個、4979 有 126 個）。
+    後果是逐字引用核對、`grep`、入圖前的 quote 驗證全部**靜默失敗**，
+    而失敗長得像「年報沒寫這句」——成功與失敗在同一個訊號上同形（L13）。
+
+    空跑檢查：把 `pdf_to_text` 的 `unicodedata.normalize` 拿掉 → 這條會紅。
+    """
+    from fetchers import mops
+
+    raw = "系\uf99c原料為主之光主動元件"          # U+F99C，看起來就是「列」
+
+    class _Page:
+        def extract_text(self):
+            return raw
+
+    class _Reader:
+        pages = [_Page()]
+
+        def __init__(self, *a, **k):
+            pass
+
+    monkeypatch.setattr("pypdf.PdfReader", _Reader)
+    text, pages = mops.pdf_to_text(b"%PDF-fake")
+
+    assert pages == 1
+    assert "系列原料為主之光主動元件" in text          # 正常碼位比對得到
+    assert "\uf99c" not in text
+    assert not [c for c in text if 0xF900 <= ord(c) <= 0xFAFF]
+
+
+def test_nfc_does_not_touch_fullwidth_digits_or_punctuation(monkeypatch) -> None:
+    """刻意用 NFC 而不是 NFKC：NFKC 會把財報表格的全形數字改成半形，
+
+    那會讓「逐字引用」不再逐字——比對得過，但引的已經不是原文了。
+    """
+    from fetchers import mops
+
+    raw = "營業比重（％）：９９．２１　合計１００．００"
+
+    class _Page:
+        def extract_text(self):
+            return raw
+
+    class _Reader:
+        pages = [_Page()]
+
+        def __init__(self, *a, **k):
+            pass
+
+    monkeypatch.setattr("pypdf.PdfReader", _Reader)
+    text, _ = mops.pdf_to_text(b"%PDF-fake")
+
+    assert text == raw

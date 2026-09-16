@@ -9863,6 +9863,58 @@
       "source": "research_action",
       "title": "IQE FY2025 年度業績 RNS 入圖（RNS 抓取器 smoke；going concern 附註可逐字引用、無 material uncertainty 陳述）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-16T18:17:41.580667+00:00",
+      "hint": "出自決定紀錄 D8 與 2026-09-16 Phase 1 PLAN 核准（§4 工單）；2026-09-17 啟動 prompt 指示接續 Step 1.2。使用者主動指示＝已授權：受理時即 go resolve，只為稽核鑄號。不含入圖（各 graph delta 另取 ra_admission 編號）、不含 Engine C 判讀寫入、不含 thesis、不含 live。",
+      "n": 582,
+      "reason": "使用者主動指示（2026-09-16 Phase 1 PLAN 核准＋2026-09-17 啟動 prompt：直接從 Step 1.2 開工）；鑄號只為稽核",
+      "receipt": "authority:plan_approval;ref:docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md#4",
+      "ref_id": "manual:582",
+      "resolution": "go",
+      "resolved_at": "2026-09-16T18:21:43.187991+00:00",
+      "source": "manual",
+      "title": "D8 補三格研究工程（七家）：可替代性 addendum、外部印證、產品線營收占比",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-16T22:45:44.982524+00:00",
+      "graph_impact": "+2 節點、1 邊、2 claims｜來源：Tower Semiconductor（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:iqe。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 583,
+      "reason": null,
+      "ref_id": "ra_3b3e8b7944ef1fbb4ce310611256c29f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[562] 解：Tower 自家公告補 IQE→Tower 邊的客戶端外部印證（供應商自報 → 客戶端確認）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-16T22:45:44.982524+00:00",
+      "graph_impact": "+11 節點、8 邊、12 claims｜來源：Visual Photonics Epitaxy（tier 1）、IntelliEPI（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:vpec。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 584,
+      "reason": null,
+      "ref_id": "ra_3fafac4bcdafc11a19a0509ab51518b7",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "D8 補邊：全新光電與英特磊各補兩條具名供應邊，兩份年報同時由手抓節錄升級為抓取器全文（誠實結果：sub 皆 2，仍不進排序）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-16T22:45:44.982524+00:00",
+      "graph_impact": "+4 節點、3 邊、5 claims｜來源：LandMark Optoelectronics（tier 1）",
+      "hint": "核准 exact graph delta；Decision handoff：co:landmark_optoelectronics。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 585,
+      "reason": null,
+      "ref_id": "ra_aa7e9186ca68b569ce0dac835379d233",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "D8 補格：聯亞光電 tech:cw_dfb_laser 的 substitutability 判 3（誠實結果：低於門檻 4，排序仍無 TW／TWO 檔）",
+      "type": "ra_admission"
     }
   ],
   "log": [
@@ -21417,8 +21469,17 @@
       "ref_id": "dc_67f5e1588990f432e8e0ccce5711e62e",
       "type": "decision_review",
       "verb": "waiting_reason_refreshed"
+    },
+    {
+      "at": "2026-09-16T18:21:43.187991+00:00",
+      "n": 582,
+      "reason": "使用者主動指示（2026-09-16 Phase 1 PLAN 核准＋2026-09-17 啟動 prompt：直接從 Step 1.2 開工）；鑄號只為稽核",
+      "receipt": "authority:plan_approval;ref:docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md#4",
+      "ref_id": "manual:582",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 582,
+  "next_n": 586,
   "schema_version": "1"
 }

@@ -709,12 +709,26 @@ python -m fetchers.mops --co-id 4971 --kind annual_report --all-revisions
 **⚠ 不要改抓公司 IR 網站。** 多數台廠年報 PDF 連結是動態載入，靜態抓取只拿得到零散附件
 （2026-08-28 實測聯亞只取得「前十大股東關係表」，一度被誤判成「可抽文字為 0」）。
 
-fetcher 已封裝的四個坑，自己刻之前先讀 `fetchers/mops.py` 的 docstring：
+fetcher 已封裝的**五個**坑，自己刻之前先讀 `fetchers/mops.py` 的 docstring：
 ① 兩段式下載（`step=9` 回的是 HTML，裡面才有帶時戳的一次性 PDF 路徑；直接猜
 `/pdf/{filename}` 一律 404）；② 列表頁是 **big5**，不設 encoding 會拿到亂碼；
 ③ `--year` 是**民國查詢年度**而非資料年度，查 115 回的是 114 年度年報；
 ④ 同年度可能有多份修訂（原始版 F04 ／股東會後修訂本 F11），共用 doc_id 會**靜默覆蓋**，
 預設只取最新並印出略過訊息。
+
+⑤ **PDF 會吐出 CJK 相容表意文字（U+F900–U+FAFF）**（2026-09-17 實測）。它們與正常字
+**視覺完全相同**但碼位不同——4971 年報 50 個、4979 年報 126 個，「系列原料」的「列」是
+U+F99C 而不是 U+5217。後果是逐字引用比對、`grep`、入圖前的 quote 核對**全部靜默失敗**，
+而失敗長得像「年報沒寫這句」。`pdf_to_text` 已對輸出做 **NFC** 正規化（相容表意文字有
+canonical decomposition，NFC 會映射回標準碼位；**刻意不用 NFKC**——它會把財報表格的全形
+數字改成半形，那樣「逐字引用」就不再逐字）。
+⚠ **既有入庫檔不會自己修好**：`mops_4979_annual_report_2025` 與
+`intelliepi_4971_annual_report_fy2025_20260827` 仍含相容字元（各 126／2 個），要清理必須
+重抓並走 `supersedes_extraction_sha256` 更正走廊。查證：
+
+```powershell
+& '.venv\Scripts\python.exe' -c "from pathlib import Path;import glob;print([(p,sum(1 for c in Path(p).read_text(encoding='utf-8') if 0xF900<=ord(c)<=0xFAFF)) for p in glob.glob('library/raw/*.txt') if any(0xF900<=ord(c)<=0xFAFF for c in Path(p).read_text(encoding='utf-8'))])"
+```
 
 **瑞典（Nasdaq Stockholm／First North）：`fetchers/mfn.py`**（互動式入口，**未加入任何 unattended routine**；2026-09-17 Phase 1 Step 1.1）。
 

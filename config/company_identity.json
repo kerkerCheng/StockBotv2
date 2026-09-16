@@ -271,7 +271,8 @@
       "research_ticker": "3081.TWO",
       "market_currency": "TWD",
       "execution_currency": "TWD",
-      "execution_venue": "TPEx"
+      "execution_venue": "TPEx",
+      "display_name": "LandMark Optoelectronics Corporation"
     },
     {
       "company_id": "co:leaderdrive",
@@ -308,7 +309,8 @@
     {
       "company_id": "co:luxnet",
       "research_ticker": "4979.TWO",
-      "market_currency": "TWD"
+      "market_currency": "TWD",
+      "display_name": "LuxNet Corporation"
     },
     {
       "company_id": "co:lynas",

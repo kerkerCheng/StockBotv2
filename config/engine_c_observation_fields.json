@@ -202,6 +202,19 @@
       "verifiability": "mechanical"
     },
     {
+      "field_name": "product_line_revenue_share",
+      "category": "profitability",
+      "label": "產品線營收占比（主要產品之營業比重；瓶頸業務佔公司多少）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_financial",
+        "engine_c_manual"
+      ],
+      "why": "2026-09-16 Phase 1 PLAN 決策 D（選 2）：D8「瓶頸業務占營收比例」記在**新欄位**，不覆寫既有的 segment_revenue_share（報導部門）。理由：多數邊緣公司只有一個報導部門（聯亞、華星光皆「單一報導部門」），部門占比永遠是 100%，答不了「CW 雷射磊晶／FAU 這條產品線佔公司多少」；台股股東會年報的「主要產品之營業比重」表、IFRS 8 的產品別營收拆分、瑞典／英國年報的 business-area net sales 才是這一格的一手。value 是 JSON 物件，鍵為一手表格印的產品線名稱（逐字）、值為佔總營收比例（0..1 小數）；另可帶 fiscal_period 與逐字出處。**哪一條產品線算「瓶頸業務」是 Phase 4 篩選層的判斷，不在本欄位**（本欄位只記表格）。｜verifiability=mechanical：數字印在年報／財報固定表格，任何人重讀都得到同一個數；免 pq2，寫入用 scripts/record_mechanical_observation.py。",
+      "verifiability": "mechanical"
+    },
+    {
       "field_name": "fiscal_year_results",
       "category": "profitability",
       "label": "會計年度已報告結果（GAAP／non-GAAP 損益項目、分部營收、稀釋股數）",
