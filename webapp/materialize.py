@@ -26,6 +26,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
+from .structure_readings import build_structure_readings_artifact
 from .contracts import (
     ArtifactUnavailable,
     ARTIFACT_SCHEMA_VERSION, STATE_SCHEMA_VERSIONS, canonical_digest, freshness_identity,
@@ -392,6 +393,14 @@ def build_ranking_artifact(result: Mapping[str, Any], *, registry: Any,
             "這是「排不出來」，不是「沒有標的值得看」；先看 coverage 與純結構表。"),
         "rows": rows,
         "structural_rows": structural,
+        # Q1（2026-09-17 使用者核准 A）：被門檻擋下的那些也要進 artifact，否則籃子層
+        # （純函式，只吃 artifact）讀不到第二個宇宙。**排序與門檻一字未動**——`rows` 逐位相同，
+        # 這裡只是把 rank_bottlenecks 已經算出來的 filtered_rows 照抄下來（INV-3 的可見面）。
+        # ⚠ 兩種理由不得混為一談：`substitutability_below_threshold`＝已研究、答案是否定的；
+        # `substitutability_unfilled`＝還沒有人研究過。下一步完全相反（前者問「還值得看嗎」，
+        # 後者去補研究），所以 reason 跟著每一列走。
+        "filtered_rows": [dict(r) for r in (result.get("filtered_rows") or ())],
+        "filter": dict(result.get("filter") or {}),
         "notes": {
             "two_rankings": list(TWO_RANKINGS_NOTE),
             "structural_table": STRUCTURAL_TABLE_NOTE,
@@ -1133,6 +1142,51 @@ def materialize_basket(*, store: StateArtifactStore | None = None, analyst_store
         if payload is not None:
             overviews[str(ticker)] = payload.get("overview") or {}
     payload = build_basket_artifact(ranking=ranking, overviews=overviews, positions=positions, generated_at=generated_at)
+    return target.write(payload), payload
+
+
+def materialize_structure_readings(*, store: StateArtifactStore | None = None,
+                                   as_of: date | None = None,
+                                   generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """每一份讀圖紀錄跟現在的圖還一不一致。**唯讀**：讀 ledger ＋ 查圖 ＋ 確定性比對。
+
+    ⚠ 一次把圖的邊載進來（`_load_edges`），對每個節點各建一次 `StructureView`——
+    不是每個節點各查一次圖。節點數會長，查詢次數不該跟著長。
+    """
+    from alpha.providers.structure_readings import known_nodes, read_reading_records
+    from alpha.structure_reading import needs_reread, reading_status, select_reading
+    from query.structure import _load_edges, build_structure
+
+    target = store or StateArtifactStore()
+    today = as_of or date.today()
+    nodes = known_nodes()
+    rows: list[dict[str, Any]] = []
+    parse_errors: list[str] = []
+    edges = _load_edges() if nodes else []
+    for node in nodes:
+        records, errors = read_reading_records(node)
+        parse_errors.extend(errors)
+        reading = select_reading(records, as_of=as_of, today=today)
+        if reading is None:
+            # 有檔案但沒有現行紀錄（全部被撤回）——**不是「沒有這個節點」**，照實列出（INV-3）。
+            rows.append({"node": node, "status": None, "reading_id": None,
+                         "reason": "ledger 有紀錄但目前沒有現行的那一筆（已全部撤回）"})
+            continue
+        view = build_structure(node, edges)
+        status = reading_status(reading, view.as_dict(), today=today)
+        rows.append({
+            "node": node,
+            "reading_id": reading.reading_id,
+            "kind": reading.kind,
+            "reading": reading.reading,
+            "tickers": list(reading.tickers),
+            "read_on": reading.created_on.isoformat(),
+            "expires": reading.expires.isoformat(),
+            **status,
+            "needs_reread": needs_reread(status),
+        })
+    payload = build_structure_readings_artifact(rows=rows, parse_errors=parse_errors,
+                                                generated_at=generated_at, as_of=as_of)
     return target.write(payload), payload
 
 

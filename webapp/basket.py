@@ -61,6 +61,34 @@ BET_LEDGER_RULE = ("籃子的每一列強制二選一：有賭注，或一筆 Ab
                    "兩者皆無時記成 unanswered 並計數（Q2，2026-09-17）。"
                    "⚠ 賭注的 Abstention 只認 layer=bet／subject=variant.overlay：估值層的 "
                    "`target_pe` abstention 說的是「本益比法沒有可校準的對象」，不是「沒有可辯護的賭注」。")
+#: 量的候選（Q1，2026-09-17 使用者核准 A）的 filter 理由。**封閉字彙，與護城河那組分開**：
+#: 兩個宇宙問的是不同的問題，用同一組理由會讓人以為它們可比。
+#:
+#: ⚠ 第一條**比護城河宇宙更嚴，不是放寬**：量的賭注賭的是「需求階躍時這家吃得到」，
+#: 所以要求**已經在出貨**；而 sub≥4 的護城河宇宙裡有 6 條是 `qualifying`／未填——
+#: 還沒出貨的護城河可以進 A，進不了 B。這證明擴大宇宙不是「為了讓籃子非空而放寬條件」。
+VOLUME_FILTER_REASONS: Mapping[str, str] = {
+    "not_shipping_yet": "還沒在出貨（qualification_status 不是 qualified／designed_in）——需求來了吃不到",
+    "no_demand_anchor": "走不到需求錨：沒有人在為它花錢",
+    "already_in_moat_basket": "這家已經在護城河籃子裡——對它而言這只是多幾條邊，不是多一家公司",
+    "no_bet": "還沒寫賭注（variant 假設）",
+    "bet_abstained": "已宣告刻意不主張賭注（append-only ledger 的研究結論，不是待辦）",
+}
+
+#: ⚠ **量的候選刻意沒有排序，也沒有首選。**
+#: `rank_bottlenecks()` 是唯一排序權威，而這些邊正是被它濾掉的——它們沒有名次。
+#: 它的排序鍵是為**護城河問題**設計的（substitutability 是第二鍵），套到「量」這個問題上
+#: 等於自建第二套評分（AGENTS 明禁）。所以這一頁只回答「哪幾家通過了可機械驗證的條件」，
+#: 依 ticker 列出，**那是字母序不是排名**。要有排序，得先有一個被量測過的判準（INV-5）。
+VOLUME_ORDER_NOTE = ("量的候選依 ticker 列出——**那是字母序，不是排名**。"
+                     "這些邊是被排序權威濾掉的，它們沒有名次；而它的排序鍵是為護城河問題設計的，"
+                     "套到「量」上就是自建第二套評分。要排序得先有一個被量測過的判準。")
+
+#: 今天還沒有資料源的兩條 D11 條件——**明說，不假裝**（INV-3）。
+VOLUME_MISSING_CRITERIA: tuple[str, ...] = (
+    "覆蓋厚薄（analyst_count、市值）：analyst view 的 overview 今天不帶這兩格，籃子是純函式（只吃 artifact）所以讀不到。要它得先讓 materialize 把 alpha_purity_snapshot 的輸出帶進 overview。",
+    "瓶頸業務占營收比例：住 Engine C 的 product_line_revenue_share（八家有值），同樣還沒進 overview。",
+)
 FILTER_RULE = ("結構順序不動；首選＝順序中第一個「有賭注、payoff 為正、至少一條指名假設的催化劑落在目標價日期之前」的。"
                "這是 filter 不是重算：沒有一檔通過就沒有首選。")
 
@@ -156,6 +184,50 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
     }
 
 
+#: 「已經在出貨」＝需求來了吃得到。字彙與圖的 `qualification_status` 同一組（L16：不另造一份）。
+SHIPPING_STATUSES: frozenset[str] = frozenset({"qualified", "designed_in"})
+
+
+def build_volume_row(filtered_row: Mapping[str, Any], overview: Mapping[str, Any] | None,
+                     live: Mapping[str, Any] | None, *, in_moat_basket: bool) -> dict[str, Any]:
+    """一條被門檻擋下、但已研究過的邊 → 量的候選列。**判定，不排序。**"""
+    ov = overview or {}
+    payoff = ov.get("payoff") or {}
+    payoff_value = _num(_cell_value(payoff.get("simple")))
+    abstained = str(payoff.get("absence_kind") or "") == "deliberate_abstention"
+    bet_state = "bet" if payoff_value is not None else ("abstained" if abstained else "unanswered")
+    reasons: list[str] = []
+    if str(filtered_row.get("qualification_status") or "") not in SHIPPING_STATUSES:
+        reasons.append("not_shipping_yet")
+    if not filtered_row.get("demand_anchor"):
+        reasons.append("no_demand_anchor")
+    if in_moat_basket:
+        reasons.append("already_in_moat_basket")
+    if payoff_value is None:
+        reasons.append("bet_abstained" if abstained else "no_bet")
+    return {
+        "ticker": filtered_row.get("ticker"),
+        "company_id": filtered_row.get("company_id"),
+        "company_label": ov.get("company_label") or filtered_row.get("company_id"),
+        "bottleneck": filtered_row.get("bottleneck"),
+        "relation": filtered_row.get("relation"),
+        "substitutability": filtered_row.get("substitutability"),
+        "threshold": filtered_row.get("threshold"),
+        "qualification_status": filtered_row.get("qualification_status"),
+        "evidence": filtered_row.get("evidence"),
+        "demand_anchor": filtered_row.get("demand_anchor"),
+        "demand_hops": filtered_row.get("demand_hops"),
+        "has_overview": overview is not None,
+        "our_bet": _cell_value((ov.get("brief") or {}).get("our_bet")),
+        "payoff": payoff_value,
+        "bet_state": bet_state,
+        "bet_absence_reason": (payoff.get("reason") if payoff_value is None else None),
+        "held": live is not None,
+        "filter_reasons": reasons,
+        "passes_filter": not reasons,
+    }
+
+
 def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str, Mapping[str, Any]],
                           positions: Mapping[str, Any] | None, generated_at: datetime | None = None) -> dict[str, Any]:
     """三份 artifact → `basket` state artifact。**純函式**：不重排、不加權、不算任何新數。"""
@@ -172,6 +244,28 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
         seen.add(str(ticker))
         rows.append(build_basket_row(rank_row, overviews.get(str(ticker)), live_by_ticker.get(str(ticker)),
                                      sector=sector_of.get(int(rank_row.get("rank") or 0))))
+    # 第二個宇宙（Q1）：被門檻擋下、但**已研究過**的那些（`below_threshold`）。
+    # `unfilled` 刻意不進來——那是研究缺口不是候選，它的去處是 pq1（zoom-out §7 Q1-A）。
+    moat_tickers = {str(r["ticker"]) for r in rows if r.get("ticker")}
+    volume_rows: list[dict[str, Any]] = []
+    volume_seen: set[str] = set()
+    for filtered_row in ranking.get("filtered_rows") or ():
+        if "substitutability_below_threshold" not in (filtered_row.get("reasons") or ()):
+            continue
+        ticker = filtered_row.get("ticker")
+        if not ticker or str(ticker) in volume_seen:
+            continue                                # 一家一列：這一頁的單位是公司不是邊
+        volume_seen.add(str(ticker))
+        volume_rows.append(build_volume_row(
+            filtered_row, overviews.get(str(ticker)), live_by_ticker.get(str(ticker)),
+            in_moat_basket=str(ticker) in moat_tickers))
+    volume_rows.sort(key=lambda r: str(r["ticker"]))   # 字母序；見 VOLUME_ORDER_NOTE
+    volume_accepted = [r for r in volume_rows if r["passes_filter"]]
+    volume_reason_counts = {key: sum(1 for r in volume_rows if key in r["filter_reasons"])
+                            for key in VOLUME_FILTER_REASONS}
+    volume_bet_counts = {state: sum(1 for r in volume_rows if r["bet_state"] == state)
+                         for state in BET_STATES}
+
     accepted = [r for r in rows if r["passes_filter"]]
     reason_counts = {key: sum(1 for r in rows if key in r["filter_reasons"]) for key in FILTER_REASONS}
     # 賭注帳：每個 state 都印，**0 也印**——「欠 0 個答案」與「這一格沒算」不得同形（INV-3）。
@@ -204,6 +298,21 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
                                        f"{FILTER_REASONS[k]} {v} 檔" for k, v in reason_counts.items() if v)),
         "filter": {"input": len(rows), "accepted": len(accepted), "filtered": len(rows) - len(accepted),
                    "reasons": reason_counts, "reason_labels": dict(FILTER_REASONS), "rule": FILTER_RULE},
+        # 量的候選（Q1）：**分開呈現、分開判定**，刻意不與護城河那份合併計數——
+        # 兩個宇宙問的是不同的問題，合起來的數字沒有意義。
+        "volume_rows": volume_rows,
+        "volume_filter": {
+            "input": len(volume_rows), "accepted": len(volume_accepted),
+            "filtered": len(volume_rows) - len(volume_accepted),
+            "reasons": volume_reason_counts, "reason_labels": dict(VOLUME_FILTER_REASONS),
+            "order_note": VOLUME_ORDER_NOTE,
+            "missing_criteria": list(VOLUME_MISSING_CRITERIA),
+            "universe_note": ("來源＝rank_bottlenecks 的 filtered_rows 中 substitutability_below_threshold 那些"
+                              "（已研究、答案是否定的）。substitutability_unfilled 不進來——"
+                              "那是研究缺口，去 pq1。門檻與排序一字未動。"),
+        },
+        "volume_bet_ledger": {**volume_bet_counts, "input": len(volume_rows),
+                              "owed": [r["ticker"] for r in volume_rows if r["bet_state"] == "unanswered"]},
         "bet_ledger": {**bet_counts, "input": len(rows),
                        "state_labels": dict(BET_STATES), "rule": BET_LEDGER_RULE,
                        "owed": [r["ticker"] for r in rows if r["bet_state"] == "unanswered"]},
@@ -221,10 +330,13 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
         # 認知狀態＝順序、每檔有沒有賭注／payoff 正負／通過 filter 與否；現價與報酬的小數變動不算。
         identity={"rows": [[r["ticker"], r["rank"], r["payoff_status"], r["bet_state"],
                             r["passes_filter"], r["filter_reasons"]] for r in rows],
+                  "volume": [[r["ticker"], r["bet_state"], r["passes_filter"]] for r in volume_rows],
                   "top_pick": top["ticker"] if top else None})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 
 
 __all__ = ["BASKET_THIS_IS_NOT", "BET_LEDGER_RULE", "BET_STATES", "FILTER_REASONS", "FILTER_RULE",
+           "SHIPPING_STATUSES", "VOLUME_FILTER_REASONS", "VOLUME_MISSING_CRITERIA", "VOLUME_ORDER_NOTE",
+           "build_volume_row",
            "build_basket_artifact", "build_basket_row"]

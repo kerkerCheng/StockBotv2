@@ -55,6 +55,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
         materialize_basket, materialize_beta, materialize_coverage, materialize_many, materialize_positions,
+        materialize_structure_readings,
         materialize_ranking, materialize_watches, write_vocabularies,
     )
 
@@ -123,7 +124,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     # 不給 ticker 且沒要求 ranking ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
     state_only = bool(args.ranking or args.beta or args.coverage or args.watches or args.positions
-                      or getattr(args, "basket", False))
+                      or getattr(args, "basket", False) or getattr(args, "structure_readings", False))
     tickers = list(args.tickers) if args.tickers else ([] if state_only else store.tickers())
     if args.tracked:
         tracked = _tracked_tickers()
@@ -163,6 +164,19 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             pick = payload["top_pick"]
             print(f"✓ basket → {path.name}（{path.stat().st_size:,} bytes；{f['input']} 檔／通過 filter {f['accepted']}"
                   f"／首選 {pick['ticker'] if pick else '無'}）")
+    # 結構讀圖：唯讀 ledger ＋ 查圖比對。與 basket 互不相干，所以**各自 fail-soft**。
+    if getattr(args, "structure_readings", False):
+        total += 1
+        try:
+            path, payload = materialize_structure_readings(store=state_store, as_of=as_of)
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print(f"✗ structure_readings：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            c = payload["counts"]
+            print(f"✓ structure_readings → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"現行 {c['current']}／stale {c['stale']}／低級 {c['stale_low']}／過期 {c['expired']}"
+                  f"；該重讀 {payload['needs_reread']['n']}）")
     print(f"完成 {total - failed}/{total}；下一步：python -m webapp serve")
     return 1 if failed else 0
 
@@ -536,6 +550,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 部位與問責：outcome 腳本 collect() ＋ Decision Store 計數器")
     mat.add_argument("--basket", action="store_true",
                      help="另外（或只）materialize 籃子：ranking × 各檔 overview × positions 的 join（最後跑；不連 DB）")
+    mat.add_argument("--structure-readings", action="store_true",
+                     help="另外（或只）materialize 結構讀圖：每一份讀圖跟現在的圖還一不一致（唯讀 ledger ＋ 確定性比對）")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與 ranking 都適用）")
     _dirs(mat)
     mat.set_defaults(func=cmd_materialize)

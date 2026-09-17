@@ -160,9 +160,9 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 
 心跳固定五段：
 1. **資料新鮮**：每個 harvest 來源 ok／fail、行情最新交易日、APP 今天是否 materialize。
-2. **變了什麼**：門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作）。
+2. **變了什麼**：門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作）、**結構讀圖 staleness**（2026-09-17 Q5：N 份現行／該重讀 M，含哪個節點、哪個角度變了；§6.14）。
 3. **佇列**：新 lead N、待 triage N、pq1 可做 N、pq2 卡在你 N、expired N。
-4. **部位**：alpha 占淨值、全歸零少幾 %、追蹤表三個 power-law 統計量、幾檔共用同一需求錨。
+4. **部位**：alpha 占淨值、全歸零少幾 %、追蹤表三個 power-law 統計量、幾檔共用同一需求錨、**兩個宇宙各自的賭注帳**（2026-09-17 Q2／Q1：有賭注／刻意不主張／**欠一個答案**，護城河籃子與量的候選**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義）。
 5. **帳號計分表變動**（weekly）：量測起始日與樣本數必印，讓「還沒量」看得見。
 
 硬規則：LLM 失敗心跳照發；「未 triage N」必印（L13：沒發生與沒看到不得同形）；writer lock 照留（harvest 仍寫共用檔）；
@@ -923,6 +923,51 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 ⚠ 2026-09-16 D11：首選的三條條件排定換成漏斗條件（覆蓋家數上限、市值上限、瓶頸業務占營收下限、至少一條外部印證的瓶頸邊、
 入圖前 30 天漲幅上限、12 個月內指名假設的催化劑；ROADMAP Phase 4）；落地前沿用三條。籃子空就空，不得放寬。
 ⚠ **`basket` 必須在 ranking／positions／單檔之後 materialize**（它只讀那三份 artifact，不連 DB）；daily 收尾命令已加 `--basket` 在最後。
+
+### 6.14 結構讀圖（`query/structure.py`＋`alpha/structure_reading/`，2026-09-17 Q4／Q5）
+
+**瓶頸性不是一條邊。** 圖給的是一堆單邊事實，賭注要的是一個結構判斷，中間原本是空的——
+「需求側繞不過、供給側誰都不獨佔」這種話要四條邊一起讀才讀得出來，而每次都要手打十幾條查詢。
+
+| 層 | 誰做 | 可不可以決定去留 |
+|---|---|---|
+| 圖（事實與 provenance） | 確定性 loader ＋ 人工 gate | — |
+| 排序（`rank_bottlenecks`） | 確定性，零 LLM | 可以（現行門檻），**不動** |
+| **結構讀圖** | `query.structure` 查（零 LLM）＋ 互動 session 讀 | **不可以**——只寫下讀到什麼，不濾、不排、不給尺寸 |
+| 賭注／Abstention | 人（或 LLM 起草、人確認） | 不可以 |
+
+**五個角度是封閉清單**（`ANGLES`）：需求側／供給側／下一層／反向路徑／需求錨可達性。
+清單來自 2026-09-17 那次真的問出答案的四次查詢，不是憑空設計——要加第六個角度前先問
+「它在哪一個實際案例裡改變過結論」，答不出來就不要加（L17-4）。
+
+**維護靠「存輸入，不存結論」**（`alpha/structure_reading/`，append-only ledger，主鍵是 node 不是 ticker）：
+紀錄的主體是**當時那五條查詢回什麼**，判讀只是附帶。存結論沒有用——它不會告訴你什麼時候不再成立。
+⚠ 比對的是**查詢結果集**而不是「我讀過哪幾條邊」：最危險的變化是「多了一條我當初沒讀到的邊」，
+存邊清單偵測不到，存結果集偵測得到。
+
+```
+query.structure <node>  ──result_digest──▶  ledger（sr_*：angles 快照 ＋ kind ＋ 憑什麼 ＋ expires）
+        ▲                                              │
+        └── webapp materialize --structure-readings ◀──┘   （確定性比對，零 LLM）
+                     │
+                     ├─▶ state artifact `structure_readings` ─▶ 心跳第 2 段「該重讀 N」
+                     └─▶ 佇列段 `stale_structure_readings` ─▶ research-drain（互動 session 重讀）
+```
+
+**分級（`staleness.py`）**：供給側增減／sub 變動＝`high`；下一層／反向路徑／需求錨＝`normal`；
+只有 evidence＝`low`（記錄，不進佇列）。⚠ **binary 的 stale 會恆亮，而恆亮＝零鑑別力（L14-4）。**
+`documents` 計數在更上游就被擋掉（`EdgeView.key()` 不含它）——它是研究量的函數，
+讓它觸發重讀等於讓「我們讀得多」自己製造工作。
+
+**staleness 直接接既有 disproof，不另立通知路徑**：對一個量的賭注來說，「供給側多了一家」
+本來就是它的 disproof 條件之一（賭的是產能一時補不上）。系統**只標記**；
+thesis 要不要改由人決定（thesis mutation 是四個人工 gate 之一）。
+
+⚠ **這套機制維護的是「讀圖跟圖還一不一致」，不是「讀圖對不對」。** 一份跟圖完全一致但判斷錯誤的
+讀圖，digest 永遠不會變——**那是設計如此，不是漏洞**；「對不對」要靠 outcome 量測。兩件事不得混為一談。
+
+⚠ **A/B 判準表刻意還沒機械化**：先讓它以文字形式產出幾十份、看它講得準不準，再談要不要寫成程式
+（INV-5：未量測的機制不得享有默認信任）。所以 `kind` 是**寫的人宣告的**，型別層只驗字彙。
 
 ## 7. Engine D（Decision Lab）runtime
 

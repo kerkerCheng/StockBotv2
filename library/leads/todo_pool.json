@@ -10102,6 +10102,18 @@
       "source": "research_action",
       "title": "[588] Sivers 補兩條邊的 substitutability：DWDM laser array 與 O-Net 皆判 2（誠實的否定結果）＋ Ayar Labs 缺口的性質變了",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-17T07:41:09.306332+00:00",
+      "hint": "Q5 機制已交付但 ledger 空的，心跳印「一份都還沒寫」。要寫的是 append-only authority，所以掛號等你授權。建議先寫兩個節點：tech:cw_dfb_laser（供給側六家 sub 全部 2-3，看起來是量的賭注）與 mat:inp_substrate（15 條需求側邊、圖說 sub=5 最卡，但供給側 3 條全部沒填 sub——那個缺口是 query.structure 一跑就冒出來的）。go 之後會變的數字：心跳第 2 段由「一份都還沒寫」→「結構讀圖 2 份／現行 2」，且從此每天自動比對圖有沒有變。做法：python -m query.structure <node> 讀五個角度 → python -m alpha structure-reading <node> --add spec.json。不做也不會壞：機制在那裡，只是沒有內容。",
+      "n": 595,
+      "reason": null,
+      "ref_id": "manual:595",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "寫第一批結構讀圖紀錄（Q5 的 ledger 今天是 0 筆）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21784,6 +21796,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 595,
+  "next_n": 596,
   "schema_version": "1"
 }

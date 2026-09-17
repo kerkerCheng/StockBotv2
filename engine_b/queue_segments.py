@@ -97,6 +97,14 @@ SEGMENTS: tuple[Segment, ...] = (
         "research", "research-drain 第三段（python -m query.coverage_gaps）",
     ),
     Segment(
+        "stale_structure_readings", 6, "結構讀圖與圖不再一致（分級後仍會改變 A/B 讀法的）",
+        "research", "research-drain：重跑 `python -m query.structure <node>` 後改寫讀圖紀錄",
+        "2026-09-17 Q5：偵測到 stale 只是 producer——沒有東西真的去重讀，計數器只會愈長愈大"
+        "（L13「已排入不等於已推進」、INV-4「producer 指得出 consumer」）。"
+        "⚠ 只收 `stale`／`expired`：`stale_low`（只有 evidence 變）不進佇列，"
+        "否則 binary 的 stale 會恆亮而恆亮＝零鑑別力（L14-4）。",
+    ),
+    Segment(
         "pollable_watches", 7, "stalled 且可主動輪詢的 watch（被動層不會再醒）",
         "research", "python -m engine_b.event_watch sweep（budget 見 config/event_watch.json）",
     ),
@@ -224,11 +232,13 @@ def observe(
     reassess_only_numbers: Iterable[int] = (),
     forward_view_backlog: int | None = None,
     coverage_gaps: int | None = None,
+    stale_structure_readings: int | None = None,
 ) -> dict[str, Any]:
     """由資料反推每一段有幾筆工作。
 
-    `forward_view_backlog`／`coverage_gaps` 由呼叫端注入（它們的 authority 不在 leads 目錄）；
-    給 `None` 表示「本次沒有讀到那個 authority」，輸出會照實寫 `None`，不寫 0（INV-3）。
+    `forward_view_backlog`／`coverage_gaps`／`stale_structure_readings` 由呼叫端注入
+    （它們的 authority 不在 leads 目錄）；給 `None` 表示「本次沒有讀到那個 authority」，
+    輸出會照實寫 `None`，不寫 0（INV-3）。
     """
     counts: dict[str, int | None] = {seg.key: 0 for seg in SEGMENTS}
     examples: dict[str, list[str]] = {seg.key: [] for seg in SEGMENTS}
@@ -274,6 +284,7 @@ def observe(
 
     counts["forward_view_backlog"] = forward_view_backlog
     counts["coverage_gaps"] = coverage_gaps
+    counts["stale_structure_readings"] = stale_structure_readings
 
     # gated 兩段由 todo_items 直接算得出來（不需要外部 authority），所以不走注入。
     from engine_b.todo import gate_pointer

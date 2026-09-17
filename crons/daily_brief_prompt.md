@@ -203,10 +203,15 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
    graph admission 仍是另一個 `ra_admission` pq2。
-8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions`，
-   把 APP 讀的五個畫面與 registry 全部上市公司（73 檔；`--registry-listed` 是 materialize 自己的宇宙，**不動** pq1 的
+8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --basket --structure-readings`，
+   把 APP 讀的畫面與 registry 全部上市公司（73 檔；`--registry-listed` 是 materialize 自己的宇宙，**不動** pq1 的
    tracked 導出）更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
    不手寫清單）。它只寫 ignored derived cache（`library/private/app/`），**不寫任何 authority、不入圖、不建 decision**，
+   ⚠ **`--basket` 是 2026-09-17 補上的**：籃子（V3，2026-09-15）比「APP materialize 納入 Daily」（2026-09-08）晚做，
+   當時沒有回頭補進這一行，於是它**只在互動 session 手動跑時才更新**——而心跳第 4 段的賭注帳讀的正是它，
+   計數器會停在某一天的值（L13-1：產出要出現在下游消費者手上）。它在 `cmd_materialize` 裡本來就排在最後跑。
+   `--structure-readings`（2026-09-17 Q5）是唯讀 ledger ＋ 查圖的確定性比對：它回答「哪幾份讀圖跟圖不再一致」，
+   **不重新推理**（重讀是研究，只在互動 session，D12），輸出同樣只進 ignored derived cache。
    `serve` 不在 rule 內、排程不啟動它。**失敗只記入健康段、不中止 Daily**：artifact 是 derived cache，
    舊的那份仍在，APP 自己會顯示 stale——這與 harvest 失敗必須中止整輪不同（那個會讓兩個 writer 撞上）。
    接著執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交

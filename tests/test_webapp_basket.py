@@ -91,3 +91,108 @@ def test_state_kind_is_registered_and_api_serves_it(tmp_path) -> None:
     got = client.get("/api/v1/basket")
     assert got.status_code == 200 and got.json()["top_pick"] is None and got.json()["rows"][0]["ticker"] == "LITE"
     assert client.post("/api/v1/basket").status_code == 405
+
+# ---------------------------------------------------------------------------
+# Q1（2026-09-17 使用者核准 A）：第二個宇宙——被門檻擋下、但已研究過的那些
+# ---------------------------------------------------------------------------
+
+def _filtered(ticker, *, sub=3, qual="qualified", anchor="tech:ai_switch",
+              reason="substitutability_below_threshold"):
+    return {"company_id": f"co:{ticker.lower()}", "ticker": ticker, "relation": "supplies_to",
+            "bottleneck": "tech:x", "substitutability": sub, "threshold": 4,
+            "qualification_status": qual, "evidence": "company_disclosure", "documents": 1,
+            "chain": [anchor] if anchor else [], "demand_anchor": anchor,
+            "demand_hops": 1 if anchor else None, "reasons": [reason]}
+
+
+def _ranking_with_filtered(rows, filtered):
+    payload = _ranking(rows)
+    payload["filtered_rows"] = filtered
+    payload["filter"] = {"input": len(rows) + len(filtered), "accepted": len(rows),
+                         "filtered": len(filtered), "reasons": {}, "reason_labels": {}}
+    return payload
+
+
+def test_the_moat_basket_is_untouched_by_the_second_universe() -> None:
+    """Q1 是**純加法**：`rows`／`filter`／`top_pick` 一個位元都不得因為多了第二個宇宙而變。"""
+    rows = [_row(1, "LITE"), _row(2, "COHR")]
+    before = build_basket_artifact(ranking=_ranking(rows), overviews={}, positions=None,
+                                   generated_at=datetime(2026, 9, 17, tzinfo=timezone.utc))
+    after = build_basket_artifact(
+        ranking=_ranking_with_filtered(rows, [_filtered("3081.TWO"), _filtered("SHA0.DE")]),
+        overviews={}, positions=None, generated_at=datetime(2026, 9, 17, tzinfo=timezone.utc))
+    assert after["rows"] == before["rows"]
+    assert after["filter"] == before["filter"]
+    assert after["top_pick"] == before["top_pick"]
+    assert after["bet_ledger"] == before["bet_ledger"]
+
+
+def test_only_researched_edges_enter_the_second_universe() -> None:
+    """`unfilled`（還沒有人研究過）不是候選，是研究缺口——它的去處是 pq1，不是籃子。"""
+    ranking = _ranking_with_filtered([_row(1, "LITE")], [
+        _filtered("3081.TWO"),
+        _filtered("NEVER.RESEARCHED", sub=None, reason="substitutability_unfilled"),
+    ])
+    out = build_basket_artifact(ranking=ranking, overviews={}, positions=None)
+    assert [r["ticker"] for r in out["volume_rows"]] == ["3081.TWO"]
+
+
+def test_one_company_one_row_even_with_many_edges() -> None:
+    ranking = _ranking_with_filtered([], [_filtered("LITE"), _filtered("LITE"), _filtered("GFS")])
+    out = build_basket_artifact(ranking=ranking, overviews={}, positions=None)
+    assert [r["ticker"] for r in out["volume_rows"]] == ["GFS", "LITE"]
+
+
+def test_volume_candidates_must_already_be_shipping() -> None:
+    """⚠ 這條**比護城河宇宙更嚴，不是放寬**：量的賭注要求需求來了吃得到。
+
+    sub>=4 的護城河宇宙收得下 `qualifying`／未填；量的宇宙收不下。
+    這就是「擴大宇宙不等於為了讓籃子非空而放寬條件」的機械證明。
+    """
+    ranking = _ranking_with_filtered([], [
+        _filtered("SHIP", qual="qualified"), _filtered("DESIGNED", qual="designed_in"),
+        _filtered("SAMPLING", qual="sampling"), _filtered("UNKNOWN", qual=None)])
+    out = build_basket_artifact(ranking=ranking, overviews={}, positions=None)
+    blocked = {r["ticker"]: r["filter_reasons"] for r in out["volume_rows"]}
+    assert "not_shipping_yet" not in blocked["SHIP"] and "not_shipping_yet" not in blocked["DESIGNED"]
+    assert "not_shipping_yet" in blocked["SAMPLING"] and "not_shipping_yet" in blocked["UNKNOWN"]
+
+
+def test_a_company_already_in_the_moat_basket_is_not_a_new_candidate() -> None:
+    """擴大宇宙對 GFS／LITE 是多幾條邊，不是多一家公司（2026-09-17 實測：12 家裡有 3 家是這種）。"""
+    ranking = _ranking_with_filtered([_row(1, "LITE")], [_filtered("LITE"), _filtered("3081.TWO")])
+    out = build_basket_artifact(ranking=ranking, overviews={}, positions=None)
+    by_ticker = {r["ticker"]: r for r in out["volume_rows"]}
+    assert "already_in_moat_basket" in by_ticker["LITE"]["filter_reasons"]
+    assert "already_in_moat_basket" not in by_ticker["3081.TWO"]["filter_reasons"]
+
+
+def test_volume_candidates_have_no_ranking_and_no_top_pick() -> None:
+    """這些邊是被排序權威濾掉的——它們沒有名次。自己排一個就是自建第二套評分（AGENTS 明禁）。"""
+    from webapp.basket import VOLUME_ORDER_NOTE
+
+    ranking = _ranking_with_filtered([], [_filtered("ZZZ"), _filtered("AAA")])
+    out = build_basket_artifact(ranking=ranking, overviews={}, positions=None)
+    assert [r["ticker"] for r in out["volume_rows"]] == ["AAA", "ZZZ"], "字母序"
+    assert "volume_top_pick" not in out, "量的候選刻意沒有首選"
+    assert all("rank" not in r for r in out["volume_rows"]), "沒有名次就不要假裝有"
+    assert out["volume_filter"]["order_note"] == VOLUME_ORDER_NOTE
+
+
+def test_missing_criteria_are_said_out_loud() -> None:
+    """D11 的覆蓋厚薄與瓶頸業務占營收今天沒有資料源——**明說，不假裝條件已經全上**（INV-3）。"""
+    out = build_basket_artifact(ranking=_ranking_with_filtered([], [_filtered("X")]),
+                                overviews={}, positions=None)
+    missing = out["volume_filter"]["missing_criteria"]
+    assert len(missing) == 2 and any("覆蓋厚薄" in m for m in missing)
+
+
+def test_the_bet_contract_applies_to_the_second_universe_too() -> None:
+    """Q2 的「有賭注 或 Abstention」對量的候選一樣成立——換個宇宙不換契約。"""
+    ranking = _ranking_with_filtered([], [_filtered("A"), _filtered("B")])
+    ov = {"payoff": {"status": "available", "absence_kind": None, "simple": {"value": 2.5}},
+          "brief": {"our_bet": {"value": None}}}
+    out = build_basket_artifact(ranking=ranking, overviews={"A": ov}, positions=None)
+    by_ticker = {r["ticker"]: r for r in out["volume_rows"]}
+    assert by_ticker["A"]["bet_state"] == "bet" and by_ticker["B"]["bet_state"] == "unanswered"
+    assert out["volume_bet_ledger"]["unanswered"] == 1 and out["volume_bet_ledger"]["owed"] == ["B"]

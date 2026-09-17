@@ -229,6 +229,15 @@ async def basket(request: Request) -> Response:
     return await _serve_state(request, "basket")
 
 
+_STATE_NOTES["structure_readings"] = (
+    "python -m webapp materialize --structure-readings",
+    "「artifact 讀不到」與「一份讀圖都還沒寫」是兩件事——後者會以 200 ＋ rows=[] 回。")
+
+
+async def structure_readings(request: Request) -> Response:
+    return await _serve_state(request, "structure_readings")
+
+
 async def _serve_state(request: Request, kind: str) -> Response:
     """跨標的 state artifact 的共用讀法：**照抄 materialize 當下的輸出**——不重排、不重算。"""
     remedy, note = _STATE_NOTES[kind]
@@ -355,6 +364,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
         Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
         Route(f"/api/{API_VERSION}/basket", basket, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/structure-readings", structure_readings, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

@@ -149,7 +149,7 @@ def test_main_always_exits_zero_even_when_everything_is_broken(
 
     monkeypatch.setattr(hb, "build_freshness", exploding)
     monkeypatch.setattr(hb, "build_changes", exploding)
-    monkeypatch.setattr(hb, "build_queue", lambda: exploding())
+    monkeypatch.setattr(hb, "build_queue", lambda **_kw: exploding())   # 2026-09-17：build_queue 也吃 state_dir 了
     monkeypatch.setattr(hb, "build_positions", exploding)
     assert hb.main([]) == 0
     out = capsys.readouterr().out
@@ -237,12 +237,45 @@ def test_bet_ledger_is_a_standing_counter_in_section_four(tmp_path: Path) -> Non
     assert "籃子 1 檔" in text
 
 
+def test_the_two_universes_are_counted_separately(tmp_path: Path) -> None:
+    """Q1：護城河與量的候選**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義。"""
+    from webapp.basket import build_basket_artifact
+    from webapp.store import StateArtifactStore
+
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    rank_row = {"rank": 1, "ticker": "LITE", "company_id": "co:lite", "company_label": "LITE",
+                "bottleneck": "tech:x", "relation": "supplies_to", "evidence": "externally_corroborated"}
+    filtered = {"company_id": "co:3081", "ticker": "3081.TWO", "relation": "supplies_to",
+                "bottleneck": "tech:y", "substitutability": 3, "threshold": 4,
+                "qualification_status": "qualified", "evidence": "company_disclosure",
+                "documents": 1, "chain": ["tech:ai_switch"], "demand_anchor": "tech:ai_switch",
+                "demand_hops": 1, "reasons": ["substitutability_below_threshold"]}
+    ranking = {"rows": [rank_row], "sectors": [], "filtered_rows": [filtered], "filter": {}}
+    StateArtifactStore(state_dir).write(build_basket_artifact(
+        ranking=ranking, overviews={}, positions=None))
+    text = "\n".join(hb.build_positions(state_dir=state_dir).lines)
+    assert "籃子 1 檔" in text and "量的候選 1 家" in text, text
+    assert text.count("欠一個答案") == 2, "兩個宇宙各自報自己的欠帳，不合併"
+
+
 def test_missing_basket_does_not_take_out_the_rest_of_section_four(broken_env: dict[str, Path]) -> None:
     """賭注帳讀不到時，它自己宣告缺席，**不把 alpha 占比與追蹤表一起帶走**。"""
     section = hb.build_positions(state_dir=broken_env["state_dir"])
     text = "\n".join(section.lines)
     assert "賭注帳：" in text and any(k in text for k in ABSENCE_KINDS)
     assert "power-law" in text, "後面的格子還在"
+
+
+def test_unreadable_leads_file_is_not_the_same_as_an_empty_log(broken_env: dict[str, Path]) -> None:
+    """「leads 檔讀不到」與「harvest 從來沒跑過」是兩件事（L12）——後者代表管線壞了。"""
+    section = hb.build_freshness(now=datetime(2026, 9, 17, tzinfo=timezone.utc),
+                                 state_dir=broken_env["state_dir"],
+                                 leads_path=broken_env["leads_path"])
+    text = "\n".join(section.lines)
+    assert "讀不到" in text and "upstream_unavailable" in text
+    assert "harvest_log 為空" not in text, "讀不到被冒充成「真的沒有紀錄」"
+    assert "行情" in text, "harvest 那一格壞掉不該把行情帶走"
 
 
 # ---------------------------------------------------------------------------

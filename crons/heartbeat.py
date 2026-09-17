@@ -152,8 +152,12 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
     section = Section(1, SECTION_TITLES[0])
 
     # (a) harvest：每個來源最後一輪的結果。harvest_log 是 append-only 的執行紀錄。
-    payload = _read_json(leads_path)
-    log = payload.get("harvest_log") or []
+    harvest_absence: Absence | None = None
+    try:
+        log = list((_read_json(leads_path) or {}).get("harvest_log") or [])
+    except (OSError, ValueError) as exc:
+        log = []
+        harvest_absence = Absence("upstream_unavailable", f"leads 檔讀不到：{type(exc).__name__}")
     latest: dict[str, Mapping[str, Any]] = {}
     for row in log:
         source = str(row.get("source") or "?")
@@ -165,6 +169,8 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         if bad:
             head += "：" + "、".join(bad)
         section.lines.append(f"{head}｜最後一輪 {_local_stamp(newest)}")
+    elif harvest_absence is not None:
+        section.lines.append(f"harvest 來源：{harvest_absence.reason}（{harvest_absence.kind}）")
     else:
         section.lines.append("harvest 來源：**沒有任何執行紀錄**（harvest_log 為空）")
 
@@ -240,7 +246,7 @@ def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
 # ---------------------------------------------------------------------------
 
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -> Section:
-    """門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作，D3）。"""
+    """門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作，D3）、結構讀圖 staleness。"""
     section = Section(2, SECTION_TITLES[1])
 
     watches, absence = _load_state(state_dir, "watches")
@@ -271,6 +277,32 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
         else:
             section.lines.append("現價過目標價：0 檔")
 
+    # 結構讀圖（Q5，2026-09-17）：讓它**不可能安靜腐壞**。心跳只讀已 materialize 的比對結果，
+    # 不查圖、不重新推理——重讀是研究，只在互動 session（D12）。
+    readings, readings_absence = _load_state(state_dir, "structure_readings")
+    if readings_absence is not None:
+        section.lines.append(f"結構讀圖：{readings_absence.reason}（{readings_absence.kind}）")
+    else:
+        counts = readings.get("counts") or {}
+        total = sum(int(v or 0) for v in counts.values())
+        if not total:
+            section.lines.append("結構讀圖：**一份都還沒寫**（`python -m alpha structure-reading <node> --add`）")
+        else:
+            reread = readings.get("needs_reread") or {}
+            line = (f"結構讀圖 {total} 份｜現行 {counts.get('current', 0)}"
+                    f"｜**該重讀 {reread.get('n', 0)}**（stale {counts.get('stale', 0)}"
+                    f"／過期 {counts.get('expired', 0)}；低級 {counts.get('stale_low', 0)} 不進佇列）")
+            nodes = reread.get("nodes") or []
+            if nodes:
+                line += "：" + "、".join(str(n) for n in nodes[:5]) + ("…" if len(nodes) > 5 else "")
+            section.lines.append(line)
+            triggers = readings.get("disproof_triggers") or {}
+            if triggers.get("n"):
+                section.lines.append(
+                    f"其中 **{triggers['n']} 份同時是 disproof 觸發**（供給側多一家／反向路徑變動）："
+                    + "、".join(str(n) for n in (triggers.get("nodes") or [])[:5])
+                    + "——thesis 要不要改由人決定，系統只標記")
+
     beta, beta_absence = _load_state(state_dir, "beta")
     if beta_absence is not None:
         section.lines.append(f"beta 門檻：{beta_absence.reason}（{beta_absence.kind}）")
@@ -285,7 +317,13 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
 
 
 def _thesis_line(*, now: datetime, thesis_path: Path) -> str:
-    payload = _read_json(thesis_path)
+    # ⚠ 2026-09-17：段 1 早就寫著「同一段裡的事互不相干，所以各自降級」，但那個保護只做在
+    # state artifact 上——tracked 檔讀不到時整段仍會被 _guard 帶走。對稱面沒做（L17-3）。
+    try:
+        payload = _read_json(thesis_path)
+    except (OSError, ValueError) as exc:
+        absence = Absence("upstream_unavailable", f"thesis lifecycle 讀不到：{type(exc).__name__}")
+        return f"thesis：{absence.reason}（{absence.kind}）"
     entries = payload.values() if isinstance(payload, Mapping) else list(payload)
     today = now.date()
     by_status: dict[str, list[str]] = {}
@@ -321,7 +359,7 @@ def _as_date(raw: Any) -> date | None:
 # 段 3｜佇列
 # ---------------------------------------------------------------------------
 
-def build_queue() -> Section:
+def build_queue(*, state_dir: Path | None = None) -> Section:
     """新 lead N、**待 triage N（必印）**、pq1 可做 N、pq2 卡在你 N、expired N。
 
     ⚠ 計數一律消費 `engine_b.queue_segments.observe()`——段序是那裡的封閉字彙，
@@ -340,9 +378,15 @@ def build_queue() -> Section:
     watches = event_watch.load_watches().get("watches") or []
     pool = todo_mod.load()
     todo_items = pool.get("items") or []
+    # 結構讀圖那一段的 authority 是已 materialize 的 artifact，不在 leads 目錄——照 observe 的
+    # 注入慣例給值；讀不到就給 None（「沒讀到」與「真的是 0」不得同形，INV-3）。
+    readings, readings_absence = _load_state(state_dir, "structure_readings")
+    stale_readings = None if readings_absence is not None else int(
+        (readings.get("needs_reread") or {}).get("n") or 0)
     observation = qs.observe(
         leads=leads, watches=watches, todo_items=todo_items,
         forward_view_backlog=None, coverage_gaps=None,
+        stale_structure_readings=stale_readings,
     )
     counts = {seg["key"]: seg["count"] for seg in observation["segments"]}
 
@@ -359,6 +403,10 @@ def build_queue() -> Section:
     pq1 = sum(counts[key] for key in pq1_keys if counts.get(key) is not None)
     unread = [key for key in pq1_keys if counts.get(key) is None]
     line = f"pq1 可做 {pq1}｜機械段待清 {observation['mechanical_total']}"
+    # 結構讀圖那一段的 consumer 是 research-drain（互動），不是 `engine_b.cli drain`，所以
+    # **不加進 pq1 的數**；但它確實是研究工作，只印在第 2 段會讓這裡的 0 被讀成「沒事做」。
+    if stale_readings:
+        line += f"｜＋結構讀圖待重讀 {stale_readings}（consumer：research-drain）"
     if unread:
         line += f"｜⚠ 未讀到 {len(unread)} 段：" + "、".join(unread)
     section.lines.append(line)
@@ -441,6 +489,17 @@ def build_positions(*, state_dir: Path | None) -> Section:
             if owed:
                 line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
             section.lines.append(line)
+        # 量的候選（Q1）：**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義。
+        volume = basket.get("volume_filter") or {}
+        volume_ledger = basket.get("volume_bet_ledger") or {}
+        if volume:
+            vline = (f"量的候選 {volume.get('input', '?')} 家（已研究、低於門檻）"
+                     f"｜通過條件 {volume.get('accepted', '?')}"
+                     f"｜**欠一個答案 {volume_ledger.get('unanswered', '?')}**")
+            owed = volume_ledger.get("owed") or []
+            if owed:
+                vline += "：" + "、".join(str(t) for t in owed[:6]) + ("…" if len(owed) > 6 else "")
+            section.lines.append(vline)
 
     ranking, rank_absence = _load_state(state_dir, "ranking")
     if rank_absence is not None:
@@ -532,7 +591,7 @@ def build_heartbeat(
                lambda: build_freshness(now=moment, state_dir=state_dir, leads_path=leads)),
         _guard(2, SECTION_TITLES[1],
                lambda: build_changes(now=moment, state_dir=state_dir, thesis_path=thesis)),
-        _guard(3, SECTION_TITLES[2], build_queue),
+        _guard(3, SECTION_TITLES[2], lambda: build_queue(state_dir=state_dir)),
         _guard(4, SECTION_TITLES[3], lambda: build_positions(state_dir=state_dir)),
         _guard(5, SECTION_TITLES[4], lambda: build_scorecard(weekly=weekly)),
     ]

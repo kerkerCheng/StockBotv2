@@ -1625,6 +1625,37 @@ const BASKET_COLUMNS = [
 ];
 let BASKET_VOCAB = null;
 
+/* 量的候選（Q1，2026-09-17）：被門檻擋下、但已研究過的那些。**另一個問題、另一組條件、沒有排序。** */
+const VOLUME_COLUMNS = [
+  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id, company_label: row.company_label }, set) },
+  { title: '卡在哪', cell: (row) => el('td', 'nowrap dim', row.bottleneck || '—') },
+  { title: '替代難度', cell: (row) => el('td', 'nowrap', `${row.substitutability ?? '—'}（門檻 ${row.threshold ?? '—'}）`) },
+  { title: '出貨了嗎', cell: (row) => {
+      const c = el('td', 'nowrap');
+      const shipping = row.qualification_status === 'qualified' || row.qualification_status === 'designed_in';
+      if (shipping) c.appendChild(el('span', 'badge badge-ready', row.qualification_status));
+      else c.appendChild(el('span', 'dim', row.qualification_status || '未填'));
+      return c;
+    } },
+  { title: '需求錨', cell: (row) => el('td', 'nowrap dim', row.demand_anchor || '（走不到）') },
+  { title: '賭什麼', cell: (row) => {
+      const c = el('td', 'wrap');
+      if (row.our_bet) c.textContent = row.our_bet;
+      else if (row.bet_state === 'bet') c.textContent = '（有賭注，還沒寫短評）';
+      else if (row.bet_state === 'abstained') c.appendChild(el('span', 'badge badge-settled', '刻意不主張'));
+      else c.appendChild(el('span', 'badge badge-blocked', '欠一個答案'));
+      return c;
+    } },
+  { title: 'filter', cell: (row) => {
+      const c = el('td', 'nowrap');
+      if (row.passes_filter) c.appendChild(el('span', 'badge badge-ready', '通過'));
+      else c.textContent = (row.filter_reasons || []).map((k) => ((VOLUME_VOCAB && VOLUME_VOCAB[k]) || k)).join('；');
+      return c;
+    } },
+];
+let VOLUME_VOCAB = null;
+
+
 async function renderBasket() {
   markNav('basket');
   let payload;
@@ -1670,6 +1701,26 @@ async function renderBasket() {
   sec.appendChild(rankTable(payload.rows || [], BASKET_COLUMNS, detailSet));
   (payload.correlation_notes || []).forEach((t) => sec.appendChild(el('p', 'warn', '▲ ' + t)));
   app.appendChild(sec);
+
+  // 第二個宇宙（Q1）：**分開呈現、分開判定**——另一個問題，不與上面那份比較、不合併計數。
+  const vf = payload.volume_filter;
+  if (vf) {
+    VOLUME_VOCAB = vf.reason_labels || {};
+    const vol = el('section', 'panel');
+    vol.appendChild(el('h2', null, `量的候選（${(payload.volume_rows || []).length} 家；已研究、低於門檻）`));
+    vol.appendChild(mdParagraph(vf.universe_note || '', 'note'));
+    vol.appendChild(mdParagraph(vf.order_note || '', 'note'));
+    vol.appendChild(el('p', 'note', `filter：${vf.input} 家進來、${vf.accepted} 家通過、${vf.filtered} 家被擋。`));
+    const vbl = payload.volume_bet_ledger;
+    if (vbl) {
+      vol.appendChild(mdParagraph(
+        `賭注帳：有賭注 ${vbl.bet}｜刻意不主張 ${vbl.abstained}｜**欠一個答案 ${vbl.unanswered}**`
+        + (vbl.owed && vbl.owed.length ? `（${vbl.owed.join('、')}）` : ''), 'note'));
+    }
+    vol.appendChild(rankTable(payload.volume_rows || [], VOLUME_COLUMNS, detailSet));
+    (vf.missing_criteria || []).forEach((t) => vol.appendChild(el('p', 'warn', '▲ 今天還沒有資料源：' + t)));
+    app.appendChild(vol);
+  }
   app.appendChild(stateFooter(payload, '這份籃子不是什麼'));
 }
 

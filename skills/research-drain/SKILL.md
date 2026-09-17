@@ -136,6 +136,17 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
    - **虧損檔（內部 EPS ≤ 0，本益比法無定義）→ 寫一筆 `ev_to_sales` 估值假設就走完，不需要 pq2**（2026-09-13 改）。估值 method **由 ledger 裡寫了哪一筆假設決定**，不再需要一筆 Abstention 當開關——**寫 ev_to_sales 本身就是「我選這個方法」的宣告**。⚠ 舊行為是每一檔虧損股都要鑄一個 pq2，實測連鑄 8 個、其中 7 個的內容由算術決定。⚠ `Abstention` 仍然只做它自己那件事：**宣告這一格不用再做**（→`settled`）——POET 就是那種（有 Abstention、沒有 ev_to_sales，fair value 仍然缺席且 settled）。⚠ **兩種假設不得並存**，並存時估值層直接拒絕並要你撤回一條。
    - 判讀型 Engine C 觀測（backlog、客戶集中）→ 打包觀測提案（pq2）；同類缺口跨多檔就打包成一批
    每消一格 `python -m webapp materialize <TICKER>` 一次，讓下一格的判斷讀到新狀態。
+3.5. **結構讀圖過期或與圖不一致**（2026-09-17 Q5，段 key `stale_structure_readings`）——排在覆蓋缺口之前，因為它是**已投入研究的維護**，而且其中一類直接影響現有賭注。
+   清單不是自己列的：`python -m webapp materialize --structure-readings` 之後讀
+   `library/private/app/state/structure_readings.json` 的 `needs_reread.nodes`，
+   或逐節點 `python -m alpha structure-reading <node> --check`。
+   做法：重跑 `python -m query.structure <node>` → 重讀五個角度 → 
+   `python -m alpha structure-reading <node> --add spec.json`（帶 `supersedes_id` 指向舊那筆）。
+   ⚠ **只做 `stale`／`expired`**：`stale_low`（只有 evidence 等級變）刻意不進佇列——
+   把它做進來會讓這一段恆亮，而恆亮＝零鑑別力（L14-4）。
+   ⚠ **變化若被標成 `disproof_trigger`**（供給側多一家／反向路徑變動），那是**既有 disproof 的觸發**：
+   依 L7 要在 48 小時內處置。但 **thesis 要不要改是四個人工 gate 之一**——把它鑄成 `thesis_mutation` 型 pq2 編號，**不要自己改 thesis**。
+
 4. **圖的覆蓋缺口** — 只有前三段清空後才做。這一段沒有既有排序，是唯一需要判斷的地方，
    判準見下。
 
@@ -257,7 +268,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 閉包的定義：**工作集合裡每一項都到達三種終局之一**——
 ①packet 已備（取得 pq2 編號等核准）；②誠實 park（帶 trace_status＋trigger）；
 ③已排入 pq1 佇列（留給 budget 化的排程輪）。工作集合＝前兩段佇列＋第三段的
-🔴／🟡 缺口＋一手文件已具名、但尚未做四維初判的 onboard 候選。
+🔴／🟡 缺口＋**該重讀的結構讀圖（段 3.5）**＋一手文件已具名、但尚未做四維初判的 onboard 候選。
 
 **這回答「會不會停不下來」：工作集合是有限清單，每項有終局，閉包必然可達**——
 不需要靠 loop 間隔或使用者插話來煞車。會讓它看起來無限的只有兩件事：
@@ -270,6 +281,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 & '.venv\Scripts\python.exe' -m engine_b.cli counts          # triaged_go 為 0
 & '.venv\Scripts\python.exe' -m engine_b.todo list           # 無 queued／researching 的 dispatch_status
 & '.venv\Scripts\python.exe' -m query.coverage_gaps          # 每個 🔴 都已有對應終局（packet／park／pq1）
+& '.venv\Scripts\python.exe' -m alpha structure-reading <node> --check   # 段 3.5：該重讀的都已重讀或掛號
 & '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段的數字；分不到段的狀態＝新工作沒有 consumer
 & '.venv\Scripts\python.exe' -m webapp closure-gate         # 段5：exit 0＝閉包／1＝還有工作／2＝讀不到
 ```

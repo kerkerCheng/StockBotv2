@@ -621,6 +621,122 @@ def cmd_abstention(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_structure_reading(args: argparse.Namespace) -> int:
+    """結構讀圖 ledger 的讀寫入口（Q5，2026-09-17）——**存輸入，不存結論**。
+
+    - `--list`（預設）：列出這個節點的全部紀錄（含已撤回者，稽核用）。
+    - `--check`：跟**現在的圖**比一次，印 status 與分級後的變化（唯讀，不寫任何東西）。
+    - `--add spec.json`：append 一筆。spec 必須明寫 `kind`／`reading`／`expires`；
+      可選 `tickers`／`author`／`supersedes_id`。
+      ⚠ **快照由本命令自己跑 `query.structure` 產生**，spec 不得夾帶——手組的快照偵測不了
+      「多了一條我當初沒讀到的邊」，而那正是這本 ledger 存在的理由。
+    - `--retract <id>`：append 一筆撤回紀錄。
+
+    ⚠ 它**不 gate 任何東西**：不濾候選、不改排序、不給尺寸。讀圖是寫賭注的輸入（L15-2）。
+    """
+    from datetime import date, datetime, timezone
+
+    from .providers.structure_readings import (
+        append_reading_record, fetch_structure_snapshot, read_reading_records,
+    )
+    from .structure_reading import (
+        READING_KINDS, needs_reread, reading_status, select_reading, structure_reading_record,
+    )
+
+    node = str(args.node)
+    records, errors = read_reading_records(node)
+
+    def _snapshot() -> dict:
+        # ⚠ 走 providers，不直接 import query：alpha/ 的契約與模型層不得依賴外部世界
+        # （`tests/test_layer_separation.py`；2026-09-17 它真的擋下過一次）。
+        return fetch_structure_snapshot(node)
+
+    if args.add or args.retract:
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            if "structure" in spec or "angles" in spec or "result_digest" in spec:
+                print("✗ spec 不得夾帶快照——快照必須由本命令現跑 query.structure 產生", file=sys.stderr)
+                return 2
+            try:
+                record = structure_reading_record(
+                    node=node, structure=_snapshot(),
+                    kind=str(spec["kind"]), reading=str(spec.get("reading") or ""),
+                    expires=date.fromisoformat(str(spec["expires"])[:10]),
+                    tickers=list(spec.get("tickers") or []),
+                    supersedes_id=spec.get("supersedes_id"),
+                    author=str(spec.get("author") or "user"), created_at=datetime.now(timezone.utc),
+                )
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ 讀圖紀錄不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            target = next((r for r in records if r.reading_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = structure_reading_record(
+                node=node, structure=_snapshot(), kind=target.kind, reading=target.reading,
+                expires=target.expires, tickers=list(target.tickers),
+                supersedes_id=target.reading_id, retracted=True,
+                author=target.author, created_at=datetime.now(timezone.utc),
+            )
+        try:
+            path = append_reading_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['reading_id']} → {path}")
+        print("  下一步：python -m webapp materialize --structure-readings"
+              "（心跳第 2 段才看得到它的 staleness）")
+        return 0
+
+    today = date.today()
+    current = select_reading(records, today=today)
+    status = None
+    if args.check:
+        if current is None:
+            print("✗ 沒有現行的讀圖紀錄可以比對", file=sys.stderr)
+            return 2
+        status = reading_status(current, _snapshot(), today=today)
+
+    if args.format == "json":
+        print(json.dumps({
+            "node": node,
+            "records": [{"reading_id": r.reading_id, "kind": r.kind, "reading": r.reading,
+                         "read_on": r.created_on.isoformat(), "expires": r.expires.isoformat(),
+                         "tickers": list(r.tickers), "retracted": r.retracted} for r in records],
+            "current": current.reading_id if current else None,
+            "status": status, "parse_errors": errors,
+            "kinds": dict(READING_KINDS),
+        }, ensure_ascii=False, indent=2))
+        return 0
+
+    print(f"# 結構讀圖 — {node}（{len(records)} 筆；解析失敗 {len(errors)} 行）")
+    if not records:
+        print("（空）——這個節點還沒有人寫過讀圖紀錄。"
+              f"先跑 `python -m query.structure {node}` 看五個角度，再 --add 一筆。")
+    for r in records:
+        mark = "（已撤回）" if r.retracted else ("（現行）" if current and r.reading_id == current.reading_id else "")
+        print(f"- `{r.reading_id}`{mark} {r.kind}｜讀於 {r.created_on.isoformat()}｜到期 {r.expires.isoformat()}"
+              f"｜關聯 {'、'.join(r.tickers) or '（未關聯標的）'}")
+        print(f"  - 讀成什麼：{READING_KINDS.get(r.kind, r.kind)}")
+        print(f"  - 憑什麼：{r.reading}")
+    for line in errors:
+        print(f"- ⚠ 解析失敗：{line}")
+    if status is not None:
+        print(f"\n## 跟現在的圖比（{status['status']}）")
+        print(f"- digest 變了：{status['digest_changed']}｜到期還有 {status['days_to_expiry']} 天"
+              f"｜該重讀：{needs_reread(status)}")
+        if status.get("reason"):
+            print(f"- ⚠ {status['reason']}")
+        for change in status["changes"]:
+            flag = "｜**同時是 disproof 觸發**" if change["disproof_trigger"] else ""
+            print(f"- [{change['grade']}] {change['angle']}／{change['kind']}：{change['detail']}{flag}")
+        if not status["changes"]:
+            print("- （沒有任何角度變動）")
+    return 0
+
+
 def cmd_entry_criterion(args: argparse.Namespace) -> int:
     """EntryCriterion ledger 的讀寫入口（Entry Logic v1，Step 3）。
 
@@ -717,6 +833,17 @@ def build_parser() -> argparse.ArgumentParser:
     criterion.add_argument("--rationale", help="撤回理由")
     criterion.add_argument("--format", choices=("markdown", "json"), default="markdown")
     criterion.set_defaults(func=cmd_entry_criterion)
+
+    reading = sub.add_parser(
+        "structure-reading",
+        help="結構讀圖 ledger：--list／--check／--add spec.json／--retract <id>（Q5；存輸入不存結論）")
+    reading.add_argument("node", help="圖節點 id，例如 tech:cw_dfb_laser（不是 ticker）")
+    reading.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    reading.add_argument("--check", action="store_true", help="跟現在的圖比一次並分級（唯讀）")
+    reading.add_argument("--add", help="append 一筆（JSON spec：kind／reading／expires 必填；快照由本命令現跑）")
+    reading.add_argument("--retract", help="append 一筆撤回紀錄（指定 reading_id）")
+    reading.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    reading.set_defaults(func=cmd_structure_reading)
 
     abstention = sub.add_parser(
         "abstention", help="Abstention ledger：--list／--add spec.json／--retract <id>（Step 5；「刻意不主張」）")

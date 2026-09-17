@@ -466,6 +466,7 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
 | `python -m webapp materialize --tracked --ranking --beta --coverage --watches --positions` | 寫 **ignored derived cache**（`library/private/app/{analyst_view,state}/*.json`，atomic）。**不寫任何 authority**：不入圖、不寫 Engine C、不建 decision、不 append 風險快照、不碰 `.git` 或任何 tracked 檔 | Neo4j bolt（本機）＋Engine C SQLite＋private ledger（唯讀）＋Google Sheet `spreadsheets.readonly`＋yfinance FX——**與既有 fixed entry `daily_beta_snapshot.py`／`decision_lab today` 完全同一組**，無新增網路主機或憑證 | **納入 Daily 收尾**（第十七個 fixed entry）。ticker 清單由 `engine_b.routine_config` 導出，與 pq1 drain 同一權威，不手寫 |
+| `python -m webapp materialize --structure-readings`（2026-09-17 Q5 新增的旗標，**不是新入口**） | 同上：只寫 `library/private/app/state/structure_readings.json`。**唯讀** append-only 讀圖 ledger 與圖，不寫 ledger、不重新推理、不排 pq1 | Neo4j bolt（本機）＋ private ledger（唯讀）——**既有 prefix `-m webapp materialize` 已涵蓋，fixed entry 數量不變**（查證：`pytest tests/test_codex_daily_permissions.py`） | **納入 Daily 收尾**同一行指令。重新推理不在這裡：那是研究，只在互動 session（D12） |
 | `python -m webapp serve` | **綁定本機 port**（listener surface） | 新增 listener；外部認證邊界在 Cloudflare Access 而非程式本身 | **仍不在 rule 內**。它由開機自啟的 `stockbot-graph-services.vbs` 長駐，排程不啟動它。放行整個 `-m webapp` 會把它一併帶進去 |
 | `python -m webapp status｜verify` | 唯讀 | 無 | **互動專用**，不在 rule 內（prefix 只到 `materialize`） |
 
@@ -546,6 +547,33 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 「為什麼缺席」。`Abstention` 在型別層不可能長出可裝數值的欄位。
 架構見 `docs/ARCHITECTURE.md` §6.8／§6.9。**互動專用，不進 unattended rule。**
 
+
+**結構讀圖（Structure Reading，2026-09-17 Q5）：「四條邊一起讀才讀得出來」的 append-only 紀錄。**
+
+```powershell
+& '.venv\Scripts\python.exe' -m query.structure tech:cw_dfb_laser          # 五個角度一次查出（零 LLM、零判斷）
+& '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser  # 列出讀圖紀錄
+& '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser --check   # 跟現在的圖比一次並分級（唯讀）
+& '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser --add spec.json
+& '.venv\Scripts\python.exe' -m webapp materialize --structure-readings   # 算 staleness，心跳第 2 段才看得到
+```
+
+```jsonc
+// spec.json（kind／reading／expires 必填；**快照不得夾帶**，由命令現跑 query.structure 產生）
+{"kind": "volume", "reading": "……為什麼讀成量的賭注而不是護城河賭注……",
+ "expires": "2026-12-16", "tickers": ["COHR", "LITE"]}
+```
+
+⚠ **存輸入，不存結論**：紀錄的主體是「當時那五條查詢回什麼」，判讀只是附帶——
+只有結果集比對得出「多了一條我當初沒讀到的邊」。`kind` 由寫的人宣告，**不由程式從 angles 推**
+（A/B 判準表刻意還沒機械化：先產出幾十份、看它準不準，INV-5）。
+
+⚠ **分級不是 binary**：供給側增減／sub 變動＝`high`（進 pq1 段 `stale_structure_readings`）；
+只有 evidence 變＝`low`（記錄，不進佇列）；**`documents` 計數根本到不了這一層**（`EdgeView.key()` 不含它）
+——binary 的 stale 會恆亮，而恆亮＝零鑑別力（L14-4）。
+
+⚠ 供給側多一家／反向路徑變動**同時是既有 disproof 的觸發**（量的賭注賭的正是「產能一時補不上」）。
+系統只標記；**thesis 要不要改由人決定**（thesis mutation 是四個人工 gate 之一）。
 
 ### Engine C
 ```powershell
