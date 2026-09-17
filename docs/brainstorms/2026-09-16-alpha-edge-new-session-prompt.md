@@ -11,7 +11,59 @@
 
 ## 開工指令（貼這一段）
 
-> ## ⚠ 2026-09-18 收尾狀態（先讀這塊，再讀下面的任務書）
+> ## ⚠ 2026-09-17（深夜）收尾狀態（先讀這塊，再讀下面的任務書）
+>
+> **⚠ 先更正一個會讓人算錯日子的東西：上一塊自稱「2026-09-18 收尾狀態」，但它是 09-17 晚上寫的。**
+> 本輪開工時實測系統時間是 **2026-09-17 20:53**，`schtasks` 的 `Next Run Time` 是 **2026-09-18 07:00**
+> ——**心跳的第一次真正自動觸發當時還沒發生**。Phase 2 的「連續 3 天」第一天是 09-18，
+> 最早 **2026-09-20** 驗得完（判斷與更早那一輪一致，只是日期被寫超前了一天）。
+> 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`。
+>
+> **這一輪做完的：Phase 3 ✅、Phase 6 ✅（兩個 Phase 都八項 completion gate 逐項核對過）＋[602] 入圖。**
+>
+> | | 交付 | before → after |
+> |---|---|---|
+> | **Phase 6** 台股月營收進 Engine C | `engine_c/monthly_revenue.py`＋`fetchers/mops_open_data.py`＋migration | 3081.TWO **0 → 24 個月**（7 檔台股共 175 列） |
+> | **Phase 6** MOPS 重訊 watcher | `harvest_mops`＋`mops_watch` config | harvest 來源 **29 → 36**；首跑抓到 3105.TWO 穩懋「訂購廠務工程」 |
+> | **Phase 6** 沒有到期的等待（A 案） | `leads.parked_without_expiry()`＋心跳第 3 段計數器 | 黑洞 **3 → 0** |
+> | **Phase 3** 驗收行改寫（A 案） | `Metric.revisit_after` | 90 天兩格由「沒有值」變成「沒有值＋**2026-09-27 會有**」 |
+> | **[602]** AXT↔JX competes_with 入圖 | `ra_22daa34b…`／commit `8c76bde` | `query.structure co:axt` 反向路徑 **1 → 2** |
+>
+> **⚠ 本輪最該記住的一件事：[602] 的提案診斷被 30 秒的 Cypher 否證，而那次查詢是在動手前跑的。**
+> 提案說「圖裡缺 AXT↔JX 的邊，所以 JX 的擴產證據不在 AXT 的 context slice 裡」——實測**最短路徑本來就是
+> 2 跳**（`co:axt → mat:inp_substrate → co:jx_advanced_metals`），早在 `_Q_COMPANY_CLAIMS` 的 `[*1..2]`
+> 母體內。真正擋住它的是 **`LIMIT`**：兩跳內共 **154 條 claim**，讀圖預設只印 **20** 條，排序鍵是
+> proof level ＋ confidence（**不是跳數、不是相關性**）。`claim_limit=20` → JX 出現 **0 次**；`=200` → **7 次**。
+> **補邊改不動那件事**（它只讓供應關係表多一列）。真正的病因是 F-20 的形狀（截斷集合被當全集），
+> **而且沒有任何東西會變紅**——已列 ROADMAP backlog 待 Z2。
+> 查證：`build_context(d, company_id='co:axt', claim_limit=20 vs 200)` 數 `JX Advanced Metals` 出現次數。
+>
+> **兩個當下修掉、也寫成測試的坑：**
+> ①**MOPS 歷史頁末尾那個數字是註冊地不是流水號**（`_0` 本國／`_1` 外國）——只抓 `_0` 時 4971.TWO（IET-KY）
+> 在 24 個月回補裡一筆都沒有，而當期 API 有它（L17：機制只認得我當初那個案例）。
+> ②**`.codex/rules` 是 Starlark、不吃 Python 的隱式字串串接**——寫成隱式時整份 allowlist 載入失敗、
+> 11 個 execpolicy 測試同時變紅（與 2026-09-10 那次同形，這次是測試先攔下來的）。
+>
+> **待使用者決定（本輪掛號）：**
+> **[603]** 圖裡的 `gsr_inp_substrate_market_2026_05_16_cl2` 逐字寫著「JX with no announced expansion plans」
+> ——而 JX 的擴產新聞稿（2026-06-16，官方，**早就入圖**）推翻了它。**兩組互相矛盾的 claim 同時活著**，
+> 而 09-17 那份 `mat:inp_substrate` 讀圖引用的就是過期那一條。go＝更正措辭（走 [602] 用過的 supersede 走廊）。
+>
+> **不需核准就能接著做的（依序建議）：**
+> ①**Phase 4 的 `constrained_by` 那一條**（開發項）：`query/bottleneck.py` 的 `UPSTREAM_RELATIONS` 不含它，
+> 所以 `tech:cpo_full_stack_test`／`tech:inp_dfb_laser` 走不到需求錨——但驗收行明訂**要先量「加了之後有幾列
+> 真的變了」再決定**（L14-3：先量測後放閘）。②Phase 5 的表達層（D2 對稱 overlay、歸零旗標、power-law 統計量）。
+> ⚠ **Phase 4 剩下的兩條機械條件（覆蓋厚薄、瓶頸業務占營收）仍然不該做**——實測會讓 0 家變 0 家。
+> ⚠ **binding constraint 一整輪沒有動過**：籃子 16 檔仍是 `bet` 2、`unanswered` 14。能讓籃子非空的還是只有
+> 兩條路，兩條都要人：替某一檔寫賭注，或寫一筆 Abstention。
+>
+> **月營收的消費端今天很窄，這點刻意沒有順手補**：它只到達心跳的新鮮度行與 CLI——
+> 你看得到「有沒有跟上」，**看不到「聯亞 8 月 YoY +180.90%」**。要不要讓它進 APP／隱含報酬橋，
+> 是呈現契約的決定（印哪些數字、會不會變成訊號），不在 Phase 6 驗收行裡。
+>
+> <details><summary>上一輪（2026-09-17 晚，原標題誤寫為 09-18）的收尾狀態</summary>
+>
+> ~~## ⚠ 2026-09-18 收尾狀態（先讀這塊，再讀下面的任務書）
 >
 > **這一輪做完的：** ①**AXTI 的 InP 賭注已寫下**（`bet_state` 由 `unanswered` → `bet`，籃子的 `bet` 由 1 → 2）；
 > ②**Phase 3 交付**（D5 帳號登記表＋計分表＋每月花費上限），ROADMAP 標 ▶ 不標 ✅。
@@ -95,6 +147,8 @@
 > Phase 4 剩下的兩條機械條件**仍然不該做**（實測會讓 0 家變 0 家，改不到 binding constraint）。
 > ⚠ **binding constraint 沒有變**：籃子 16 檔現在 `bet` 2、`unanswered` 14——
 > 能讓籃子非空的還是只有兩條路，兩條都要人：替某一檔寫賭注，或寫一筆 Abstention。
+>
+> </details>
 >
 > <details><summary>上一輪（2026-09-17 晚）的收尾狀態</summary>
 >
