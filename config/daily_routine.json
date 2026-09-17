@@ -17,13 +17,28 @@
     ],
     "timezone": "Asia/Taipei",
     "daily_local_time": "05:30",
+    "_heartbeat_doc": [
+      "心跳（crons/heartbeat.py）由**獨立的 Windows 工作排程**觸發，不經 Codex——",
+      "這樣 Codex 沒起來、LLM 壞掉、sandbox 擋住時，心跳照發（D12 硬規則）。",
+      "排在 daily 之後：daily 05:30 起跑、預估 60 分鐘，心跳 07:00 讀的才是今天的 state。",
+      "⚠ 這個時間同樣有兩個 SSOT（Windows 排程器 ＋ 本欄）。改時間必須同時改兩邊；",
+      "查證實際註冊值：schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V"
+    ],
+    "heartbeat_local_time": "07:00",
+    "heartbeat_task_name": "StockBotv2-Heartbeat",
     "weekly_local_time": "04:00",
     "weekly_weekday": "sunday",
     "expected_duration_minutes": 60,
     "guard_margin_minutes": 15
   },
   "pq1": {
-    "drain_limit_per_run": 5,
+    "_drain_doc": [
+      "0 ＝ **daily 不做研究**（2026-09-16 D12：研究只在互動 session 的 research-drain）。",
+      "它不是「無上限」——limit=0 時每一種工作都選不出來，由",
+      "tests/test_engine_b_cli.py::test_drain_limit_zero_selects_nothing_of_every_kind 證明。",
+      "要讓 daily 恢復做研究就填 1..20；合法範圍見 engine_b/routine_config.py。"
+    ],
+    "drain_limit_per_run": 0,
     "tracked_ticker_sources": {
       "thesis_lifecycle": true,
       "decision_cohorts": true,

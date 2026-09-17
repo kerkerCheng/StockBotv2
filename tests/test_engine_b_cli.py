@@ -338,6 +338,31 @@ def test_campaign_triage_passes_selected_and_filters_rest_atomically(
     assert receipt == {"campaign_id": "robotics", "filtered": 1, "passed": 1}
 
 
+
+def _routine_with_limit(tmp_path, limit: int = 5) -> str:
+    """給 drain 測試一份**自己的** `daily_routine.json`。
+
+    ⚠ 2026-09-17 實測：這四條 drain 測試原本不帶 `--routine-config`，於是隱含讀 production 的
+    `config/daily_routine.json`。Phase 2 Step 2.2 把 `drain_limit_per_run` 改成 0（D12：daily 不做研究）
+    之後它們立刻全紅——**它們測的是 drain 的排序與 fail-closed，不是當天的 production 預算**。
+    修法是讓測試自帶輸入，不是把 production 值改回去（那會讓 config 被測試綁架）。
+    """
+    import json as _json
+
+    path = tmp_path / "daily_routine_for_test.json"
+    path.write_text(_json.dumps({
+        "schema_version": "1",
+        "pq1": {
+            "drain_limit_per_run": limit,
+            "tracked_ticker_sources": {
+                "thesis_lifecycle": True,
+                "decision_cohorts": True,
+                "theme_core_companies": False,
+            },
+        },
+    }), encoding="utf-8")
+    return str(path)
+
 def test_drain_lists_triaged_go_and_researching_by_priority(tmp_path, capsys) -> None:
     path = tmp_path / "pending_leads.json"
     store = leads.empty_store()
@@ -356,7 +381,8 @@ def test_drain_lists_triaged_go_and_researching_by_priority(tmp_path, capsys) ->
     leads.triage(store, c, go=False, tier=4, reason="no")  # no-go 不該進 drain
     leads.save(store, path)
 
-    assert cli.main(["--leads", str(path), "drain", "--json"]) == 0
+    assert cli.main(["--leads", str(path), "drain", "--json",
+                     "--routine-config", _routine_with_limit(tmp_path)]) == 0
     out = json.loads(capsys.readouterr().out.strip())
     sources = [item["lead"]["source"] for item in out]
     assert "edgar:LITE" not in sources  # no-go 排除
@@ -375,7 +401,8 @@ def test_drain_resumes_researching_leads(tmp_path, capsys) -> None:
     leads.advance(store, lead_id, "researching")  # 中斷在 pq1 中途
     leads.save(store, path)
 
-    cli.main(["--leads", str(path), "drain", "--json"])
+    cli.main(["--leads", str(path), "drain", "--json",
+              "--routine-config", _routine_with_limit(tmp_path)])
     out = json.loads(capsys.readouterr().out.strip())
     # researching（中斷待續）仍要被 drain 撿回
     assert out[0]["lead"]["status"] == "researching"
@@ -401,6 +428,7 @@ def test_classification_health_and_drain_withhold_active_gap(tmp_path, capsys) -
 
     assert cli.main([
         "--leads", str(path), "drain", "--decision-work-orders", "skip", "--json",
+        "--routine-config", _routine_with_limit(tmp_path),
     ]) == 0
     rows = json.loads(capsys.readouterr().out)
     assert [row["lead"]["lead_id"] for row in rows if row["kind"] == "lead"] == [ready]
@@ -422,7 +450,8 @@ def test_default_drain_fails_closed_when_decision_store_is_unavailable(
 
     monkeypatch.setattr(decision_lab.bootstrap, "open_default_store", fail_open)
 
-    assert cli.main(["--leads", str(path), "drain"]) == 2
+    assert cli.main(["--leads", str(path), "drain",
+                     "--routine-config", _routine_with_limit(tmp_path)]) == 2
     assert "Decision pq1 無法讀取" in capsys.readouterr().err
 
 
@@ -550,3 +579,47 @@ def test_advance_and_annotate_parse_string_list_refs_identically(tmp_path) -> No
     assert leads.load(path)["leads"][lead_id]["refs"]["onboard_candidate_names"] == [
         "A Corp; Ltd", "B Corp",
     ]
+
+
+def test_drain_limit_zero_selects_nothing_of_every_kind(tmp_path, capsys, monkeypatch) -> None:
+    """**`drain_limit_per_run=0` ＝ daily 不做研究（D12），而不是「無上限」。**
+
+    這條取代了 `test_daily_routine_config.py` 原本「0 → ValueError」的斷言。
+    原斷言只擋得住有人把 0 寫進 config，擋不住任何一個把 limit 當「沒有上限」用的消費端；
+    這一條直接證明 limit=0 時**每一種工作都選不出來**——0 不可能是無上限。
+
+    空跑檢查：把 `_cmd_drain` 的 `if include_decisions and limit:` 改回 `if include_decisions:`，
+    或把 `lead_batch` 的切片改成無上限 → 這條會紅。
+    """
+    routine = tmp_path / "daily.json"
+    routine.write_text(json.dumps({
+        "schema_version": "1",
+        "pq1": {
+            "drain_limit_per_run": 0,
+            "tracked_ticker_sources": {
+                "thesis_lifecycle": True,
+                "decision_cohorts": True,
+                "theme_core_companies": False,
+            },
+        },
+    }), encoding="utf-8")
+
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    for i in range(5):
+        lead_id, _ = leads.register(store, source=f"edgar:T{i}", url=f"https://x.io/{i}")
+        leads.triage(
+            store, lead_id, go=True, tier=1, reason="強",
+            classification=PASS_CLASSIFICATION,
+        )
+    leads.save(store, path)
+
+    assert cli.main([
+        "--leads", str(path), "drain", "--json", "--routine-config", str(routine),
+    ]) == 0
+    out = json.loads(capsys.readouterr().out.strip())
+    selected = [
+        row for row in out
+        if row.get("kind") in ("lead", "decision_work_order", "assessment_gap_item")
+    ]
+    assert selected == [], f"limit=0 仍選出了 {len(selected)} 件工作：{selected}"

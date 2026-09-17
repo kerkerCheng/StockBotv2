@@ -367,7 +367,11 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         1 for l in store["leads"].values() if l.get("status") == "pending"
     )
     gap_jobs: list[dict] = []
-    if include_decisions:
+    # ⚠ `and limit`：assessment-gap 工單**也是研究**，所以 `drain_limit_per_run=0`
+    # （D12：daily 不做研究）必須把它一起關掉。先前只有 decision work order 與 lead
+    # 吃 limit，gap 工單不吃——那會讓「已關閉研究層」的 daily 仍然被派研究工作，
+    # 而且不會有任何東西變紅（L17：機制只認得當初那個案例）。
+    if include_decisions and limit:
         try:
             from engine_b import todo as _todo
 

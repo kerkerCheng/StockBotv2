@@ -20,8 +20,17 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     if not isinstance(pq1, dict):
         raise ValueError("daily routine config 缺少 pq1")
     limit = pq1.get("drain_limit_per_run")
-    if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 20:
-        raise ValueError("pq1.drain_limit_per_run 必須是 1..20 的整數")
+    # ⚠ **0 自 2026-09-17（Phase 2 Step 2.2／D12）起合法，意思是「daily 不做研究」。**
+    # 它原本被拒絕，理由是「0 會被讀成無上限」——那是一個表示承載兩種語意（L12）。
+    # 修法不是放寬也不是收緊，是**先分開再各自定規則**：
+    #   0        → 研究層關閉（研究只在互動 session；D12）
+    #   1..20    → daily 每輪最多做幾件研究
+    #   其餘     → 仍然拒絕（負數、布林、非整數、>20）
+    # 「0 不得被讀成無上限」這道保護沒有消失，只是從「拒絕這個值」換成**證明它選不出任何工作**
+    # ——見 `tests/test_engine_b_cli.py::test_drain_limit_zero_selects_nothing_of_every_kind`。
+    # 那比原本強：原本只擋住寫下 0，擋不住任何一個把 limit 當「沒有上限」用的消費端。
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 0 <= limit <= 20:
+        raise ValueError("pq1.drain_limit_per_run 必須是 0..20 的整數（0＝daily 不做研究）")
     sources = pq1.get("tracked_ticker_sources")
     if not isinstance(sources, dict):
         raise ValueError("pq1.tracked_ticker_sources 必須是 object")

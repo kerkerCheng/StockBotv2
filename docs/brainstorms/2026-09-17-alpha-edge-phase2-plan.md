@@ -38,7 +38,7 @@ Review: R1（六條 R2 trigger 都不命中：不動 authority mutation、不動
 | Step | 做什麼 | 驗收（哪個數字會變） | 動到 unattended surface？ | 待使用者決定？ |
 |---|---|---|---|---|
 | **2.1** ✅ | `crons/heartbeat.py`：零 LLM／零網路的純消費端，固定五段、缺席分型、失敗只降級不消失；`tests/test_heartbeat.py` | 見 §3 | **否**（沒有任何排程會叫它） | 否 |
-| **2.2** ○ | 切換載體：心跳接上排程、`config/daily_routine.json` 的 `drain_limit_per_run` 5 → 0、`crons/daily_brief_prompt.md` 研究段移出、`.codex/rules` fixed entry 與 `tests/test_codex_daily_permissions.py` 同 change 對齊、OPERATIONS／ARCHITECTURE 現況改寫 | `drain_limit_per_run` 由 5 → 0；連續 3 天心跳零 LLM 成功發出且每天印「未 triage N」 | **是**（sandbox impact review 五步） | **是——見 §5** |
+| **2.2** ✅（見 §3b） | 切換載體：心跳接上排程、`config/daily_routine.json` 的 `drain_limit_per_run` 5 → 0、`crons/daily_brief_prompt.md` 研究段移出、`.codex/rules` fixed entry 與 `tests/test_codex_daily_permissions.py` 同 change 對齊、OPERATIONS／ARCHITECTURE 現況改寫 | `drain_limit_per_run` 由 5 → 0；連續 3 天心跳零 LLM 成功發出且每天印「未 triage N」 | **是**（sandbox impact review 五步） | **是——見 §5** |
 | **2.3** ○ | 分類層：signal-triage 每日硬上限、失敗不阻斷、未 triage 計數進心跳段 3（段 3 已先做好，2.3 補的是「誰去跑 triage、跑幾則就停」） | 每日 triage 上限由「無」→ 明確值；LLM 失敗當天心跳仍發出且「未 triage N」非零 | 是 | 隨 2.2 的選擇而定 |
 
 ## 3. Step 2.1 交付與實測（2026-09-17）
@@ -111,7 +111,50 @@ Review: R1（六條 R2 trigger 都不命中：不動 authority mutation、不動
 它也不寫任何東西。真正會壞的是「它報的數字與 authority 不符」，所以上面那三條對照就是④的動作，
 三條全部逐位對上。
 
-## 4. Step 2.2 的預定內容（尚未動工）
+## 3b. Step 2.2 結果（2026-09-17）
+
+**交付四塊：**
+
+| 塊 | 內容 | 驗收（現跑） |
+|---|---|---|
+| 排程 | `crons/heartbeat_task.py`（無人值守進入點）＋ Windows 工作排程 `StockBotv2-Heartbeat`（每日 07:00，`LogonType Interactive`，免密碼免管理員） | `schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V` → `Status=Ready`、`Next Run Time=2026/9/18 07:00`；`schtasks /Run` 實跑 → `Last Result: 0`、publisher 回 `{"status":"sent","sent_parts":2,"total_parts":2}` |
+| 研究層移出 | `config/daily_routine.json` 的 `drain_limit_per_run` **5 → 0**；`engine_b/routine_config.py` 讓 0 合法並寫下語意；`engine_b/cli.py` 讓 `gap_jobs` 也吃 limit | `python -c "...['pq1']['drain_limit_per_run']"` → **0** |
+| allowlist 收緊 | `.codex/rules` **20 → 15** 條（移除 `fetchers\edgar.py`／`fetchers\mops.py`／`engine_b.cli drain`／`prepare_research_action.py --action-file`／`engine_b.todo work`） | `tests/test_codex_daily_permissions.py` 20 條全過，**且五條已加進 execpolicy 的負面 parametrize——由 Codex 自己的 parser 證明不再被允許**，不只是「檔案裡找不到那串字」 |
+| prompt | `crons/daily_brief_prompt.md` v1.7 → v1.8：檔頭三層分工表、fixed entry 列舉更新、步驟 5 整段停用並以 `<details>` 保留原文不刪 | 殘留的五個命令字串全部只出現在已停用區塊或說明句裡 |
+
+**⚠ 三個「動手才知道」的發現：**
+
+1. **`drain_limit_per_run` 的驗證器原本直接拒絕 0**（`必須是 1..20`），因為舊語意是「0＝無上限」。
+   那是一個表示承載兩種語意（L12）。修法**不是放寬也不是收緊，是先分開再各自定規則**：
+   0＝研究層關閉、1..20＝每輪上限、其餘仍拒絕。
+   ⚠ 關鍵是**原本那道保護沒有被刪，是被換成更強的**：原斷言（0→ValueError）只擋得住有人把 0 寫進 config，
+   擋不住任何一個把 limit 當「沒有上限」用的消費端；新的
+   `test_drain_limit_zero_selects_nothing_of_every_kind` 直接證明 limit=0 時每一種工作都選不出來。
+   **空跑檢查做過**：把 `lead_batch` 的切片改成無上限 → 該測試立刻紅。
+2. **`gap_jobs` 根本不吃 `limit`。** 只有 decision work order 與 lead 吃——所以即使
+   `drain_limit_per_run=0`，daily 仍然會被派 assessment-gap 研究工單，**而且不會有任何東西變紅**
+   （L17：機制只認得當初那個案例）。同一個 change 補上 `and limit`。
+3. **四條既有的 drain 測試隱含依賴 production 的 `config/daily_routine.json`。** 改成 0 之後它們全紅。
+   修法是**讓測試自帶輸入**（`_routine_with_limit()`），不是把 production 值改回去——
+   否則 config 被測試綁架，而那四條測的本來就是排序與 fail-closed，不是當天的預算值。
+
+**⚠ 第一版 wrapper 寫成 `.cmd`，實跑直接解析失敗：** `cmd.exe` 以 OEM codepage（本機 cp950）讀檔，
+而檔案是 UTF-8，中文註解被拆成無效指令（`'」這類狀態印出來。' is not recognized as...`）。
+改用 Python 進入點。**這不是風格偏好，是編碼事實**，已寫進 `heartbeat_task.py` 檔頭與 OPERATIONS。
+
+**修法層級（Step 3 的四問）：**
+①**根除**——研究從無人值守路徑整段移走之後，「研究失敗吃掉心跳」在結構上不可能再發生；
+心跳走的是另一條完全不經 Codex 的路。②**靠程式**：排程是 OS 的、limit=0 由驗證器與行為測試守、
+allowlist 由 Codex 自己的 parser 守。③**拿掉一個機制**（五條 rule ＋ daily 的整個研究段），
+只加了一個純新增、零 authority 的排程入口。④**如果它是錯的，最先壞掉的是哪一筆現有資料？**
+答案是**明天 05:30 的 daily**——所以「哪些步驟還會被呼叫」是逐條 grep 過的，而且
+**移除的每一條 rule 都對應到同一個 change 裡被停用的 prompt 步驟**，不是先收權限再看哪裡壞。
+
+**❌ 唯一未達的驗收：「連續 3 天心跳零 LLM 成功發出」。** 手動觸發成功不算數（L13-1：驗收條件是
+產出出現在下游消費者手上，而「下游」在這裡是每天 07:00 自己跑起來）。**最早 2026-09-20 才驗得完**，
+在那之前 **Phase 2 不標完成**。
+
+## 4. ~~Step 2.2 的預定內容（尚未動工）~~（2026-09-17 已交付，見 §3b；原文留作對照）
 
 - `config/daily_routine.json`：`pq1.drain_limit_per_run` 5 → 0（查證命令已在 OPERATIONS「Daily / pq1 / 待辦池的參數」）
 - `crons/daily_brief_prompt.md`：研究段（drain／prepare RA）移出 daily；心跳與分類兩層的執行契約寫清楚
@@ -121,7 +164,20 @@ Review: R1（六條 R2 trigger 都不命中：不動 authority mutation、不動
 - `tests/test_codex_daily_permissions.py`：同 change 對齊（fixed entry 條數的斷言住這裡，散文不寫死）
 - OPERATIONS「每日操作」流程圖與 ARCHITECTURE §4.1 的「落地前的現況」blockquote 改寫
 
-## 5. **五欄 amendment：要使用者決定的一件事**
+## 5. **五欄 amendment：要使用者決定的一件事——✅ 2026-09-17 使用者選 A**
+
+> **使用者原話：「心跳你能幫我用windows排程嗎？ 我不在電腦前面 或是有沒有其他方式 不然就走B」**
+> ——條件式的 A：做得到就 A，做不到才退 B。
+>
+> **先證明做得到，再承諾。** 實測順序：①`whoami` 非 admin；②用拋棄式工作測 `Register-ScheduledTask`
+> ——`LogonType Interactive` 不需要密碼、不需要管理員，`REGISTER_OK` 後立刻 `Unregister` 清掉；
+> ③確定可行才建真正的工作。**沒有先問「我可以建嗎」然後發現建不起來。**
+>
+> ⚠ 沒有第三種方式。`/schedule` 這類 cloud 排程跑的是 cloud agent，**讀不到本機的 Neo4j、Engine C
+> 與 private authority**，心跳的五段有四段在那裡取不到值——那不是心跳，是一份空表。
+> 開機常駐的 Python loop 比排程差（多一個長駐程序、崩了沒人知道）。所以只有 A 與 B。
+
+
 
 | 欄 | 內容 |
 |---|---|

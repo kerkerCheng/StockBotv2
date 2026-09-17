@@ -219,3 +219,90 @@ def test_one_broken_item_does_not_take_out_its_neighbours(
     assert "harvest 來源" in text, "APP 那一格壞掉把 harvest 一起帶走了"
     assert "行情" in text
     assert "upstream_unavailable" in text
+
+
+# ---------------------------------------------------------------------------
+# 無人值守進入點（crons/heartbeat_task.py）
+# ---------------------------------------------------------------------------
+
+def test_task_entrypoint_is_python_not_cmd() -> None:
+    """排程入口必須是 `.py`，**不得是 `.cmd`**。
+
+    2026-09-17 實測：第一版寫成批次檔，`cmd.exe` 以 OEM codepage（本機 cp950）讀 UTF-8 檔，
+    中文註解被拆成無效指令，整個 wrapper 解析失敗。這不是風格偏好，是編碼事實。
+    """
+    assert (ROOT / "crons" / "heartbeat_task.py").is_file()
+    assert not (ROOT / "crons" / "heartbeat_task.cmd").exists()
+
+
+def test_task_dry_run_writes_file_and_never_publishes(monkeypatch, tmp_path) -> None:
+    """`--dry-run` 只產檔，一次 publisher 都不叫——改東西之後的空跑檢查靠它。"""
+    from crons import heartbeat_task as task
+
+    monkeypatch.setattr(task, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(task, "LOG_PATH", tmp_path / "task.log")
+    published: list[list[str]] = []
+    real_run = task._run
+
+    def spy(argv, what):
+        if what == "publish":
+            published.append(argv)
+            return 0
+        return real_run(argv, what)
+
+    monkeypatch.setattr(task, "_run", spy)
+    assert task.main(["--dry-run"]) == 0
+    assert published == [], "dry-run 仍然發送了"
+    assert list(tmp_path.glob("heartbeat_*.md")), "dry-run 沒有產出檔案"
+
+
+def test_task_exits_zero_when_publisher_fails(monkeypatch, tmp_path) -> None:
+    """publisher 失敗是 best-effort，**不得阻斷**（AGENTS：通知不是 authority）。"""
+    from crons import heartbeat_task as task
+
+    monkeypatch.setattr(task, "OUT_DIR", tmp_path)
+    monkeypatch.setattr(task, "LOG_PATH", tmp_path / "task.log")
+    real_run = task._run
+
+    def spy(argv, what):
+        if what == "publish":
+            raise RuntimeError("discord down")
+        return real_run(argv, what)
+
+    monkeypatch.setattr(task, "_run", spy)
+    with pytest.raises(RuntimeError):
+        # spy 直接 raise 代表 `_run` 之外沒有保護——這裡先確認它真的會炸，
+        # 再驗 main 有沒有把它擋住（不擋住就是心跳會因為通知失敗而消失）。
+        spy(["x"], "publish")
+
+    def swallowing(argv, what):
+        if what == "publish":
+            return 3  # publisher 以非零收場
+        return real_run(argv, what)
+
+    monkeypatch.setattr(task, "_run", swallowing)
+    assert task.main([]) == 0
+
+
+def test_task_says_so_when_nothing_was_produced(monkeypatch, tmp_path) -> None:
+    """沒有產出就明說沒有東西可發——不得靜默結束（L13-2）。"""
+    from crons import heartbeat_task as task
+
+    monkeypatch.setattr(task, "OUT_DIR", tmp_path)
+    log = tmp_path / "task.log"
+    monkeypatch.setattr(task, "LOG_PATH", log)
+    monkeypatch.setattr(task, "_run", lambda argv, what: 1)  # heartbeat 什麼都沒寫出來
+    assert task.main([]) == 0
+    assert "沒有東西可發" in log.read_text(encoding="utf-8")
+
+
+def test_task_uses_the_existing_publisher_not_a_second_outbound_path() -> None:
+    """outbound surface 只有一個入口：既有的 `scripts/publish_daily_brief.py`。"""
+    from crons import heartbeat_task as task
+
+    assert task.PUBLISHER.name == "publish_daily_brief.py"
+    source = (ROOT / "crons" / "heartbeat_task.py").read_text(encoding="utf-8").lower()
+    # 第二條出口長什麼樣：自己送 HTTP、或繞過腳本直接 import publisher。兩種都不准。
+    for second_path in ("import requests", "import httpx", "urllib.request",
+                        "from notifications", "import notifications", "webhook_url"):
+        assert second_path not in source, second_path

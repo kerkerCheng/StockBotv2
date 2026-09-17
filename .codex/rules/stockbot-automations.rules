@@ -3,9 +3,15 @@
 # 是 Daily 唯一的 outside-sandbox 權限來源。首次呼叫就使用 exact rule，不先失敗再重跑；
 # 不放行任意 Python、PowerShell、shell、Git 或 working tree。
 #
-# ⚠ fetchers 目錄**不是**整包放行：只有 edgar.py 與 mops.py 兩支公開文件下載器在列。
-# 同目錄的 gsheets.py 會使用 Google service account 憑證，屬 credential-bearing surface，
-# 刻意不放行；要動它必須另做 impact review。
+# ⚠ **2026-09-17（Phase 2 Step 2.2／D12）：daily 的研究層關閉，五條只為研究而存在的 entry 一併移除**
+# ——`fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
+# `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`。
+# 研究改由互動 session 的 research-drain 做，daily 的 `drain_limit_per_run` 已為 0
+# （查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`）。
+# 這是**純收緊**：拿掉的每一條在 daily 都已經走不到，且對應的 prompt 步驟在同一個 change 移除。
+# ⚠ fetchers 目錄現在**一支都不在列**。edgar.py／mops.py 與 mfn.py／rns.py 一樣改為互動式入口；
+# 同目錄的 gsheets.py 使用 Google service account 憑證，屬 credential-bearing surface，
+# 要放行任何一支都必須重做一次 sandbox impact review。
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
     decision="allow",
@@ -25,18 +31,6 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "fetchers\\edgar.py"],
-    decision="allow",
-    justification="Daily pq1 source-trace 只從 SEC EDGAR 下載指定 ticker／form 的公開原始文件到本機 raw store。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "fetchers\\mops.py"],
-    decision="allow",
-    justification="Daily pq1 source-trace 的台股對應項：只從公開資訊觀測站（doc.twse.com.tw）下載指定代號的公開年報／財報到本機 raw store，與 edgar.py 同構。無憑證、不碰 Windows identity／ACL、不寫 private authority、不觸 .git。台股 issuer 的客戶集中度只在 MOPS 年報揭露，公司 IR 網頁為動態載入抓不到。",
-)
-
-prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\daily_beta_snapshot.py"],
     decision="allow",
     justification="Daily beta fixed entry 只刷新 Engine C technical observations、唯讀 Sheet 並產人工 review，不下單或寫 Sheet。",
@@ -49,12 +43,6 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.cli", "drain"],
-    decision="allow",
-    justification="Daily pq1 drain 需要唯讀 private Decision work orders、Google Sheet 持股與本機 Neo4j chokepoint context。",
-)
-
-prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\catalyst_watch.py"],
     decision="allow",
     justification="Daily catalyst watch 只讀 owner-only private Decision Store 與 tracked thesis lifecycle。",
@@ -64,12 +52,6 @@ prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "scripts\\outcome_if_settled_today.py"],
     decision="allow",
     justification="Daily Alpha Pane 4 只讀 private Decision Store 與最新已收盤行情，計算 live／shadow 報酬，不寫任何 authority。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\prepare_research_action.py", "--action-file"],
-    decision="allow",
-    justification="Daily pq1 只把已驗證 action draft 凍結到 ignored private staging；不寫 Neo4j、不 apply、不建立 live permission。",
 )
 
 prefix_rule(
@@ -94,12 +76,6 @@ prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "sync"],
     decision="allow",
     justification="Daily todo sync 只同步本機 approval authorities 到 stable todo pool。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "work"],
-    decision="allow",
-    justification="Daily 只 checkpoint 已由使用者 exact go 且已 dispatch 的 decision-review work order；不 dispatch、不 resolve、不 reassess，也不跨越 graph 或 live gate。",
 )
 
 prefix_rule(

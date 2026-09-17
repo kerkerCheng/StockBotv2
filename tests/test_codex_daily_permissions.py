@@ -21,22 +21,13 @@ ALLOWED_PREFIXES = (
     (r".venv\Scripts\python.exe", r"crons\harvest_leads.py"),
     (r".venv\Scripts\python.exe", r"engine_c\etl_yfinance.py"),
     (r".venv\Scripts\python.exe", r"scripts\alpha_purity_snapshot.py"),
-    (r".venv\Scripts\python.exe", r"fetchers\edgar.py"),
-    (r".venv\Scripts\python.exe", r"fetchers\mops.py"),
     (r".venv\Scripts\python.exe", r"scripts\daily_beta_snapshot.py"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "list"),
-    (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "drain"),
     (r".venv\Scripts\python.exe", r"scripts\catalyst_watch.py"),
     (r".venv\Scripts\python.exe", r"scripts\outcome_if_settled_today.py"),
-    (
-        r".venv\Scripts\python.exe",
-        r"scripts\prepare_research_action.py",
-        "--action-file",
-    ),
     (r".venv\Scripts\python.exe", r"scripts\publish_daily_state.py"),
     (r".venv\Scripts\python.exe", "-m", "decision_lab", "today"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "sync"),
-    (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "work"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "reassess-stale"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "standing-go"),
     (r".venv\Scripts\python.exe", "-m", "webapp", "materialize"),
@@ -78,14 +69,19 @@ def _execpolicy_check(*command: str) -> dict[str, object]:
 
 
 @pytest.mark.skipif(CODEX is None, reason="Codex CLI 未安裝")
-def test_all_twenty_rules_parse_and_allow_their_existing_prefixes() -> None:
+def test_every_rule_parses_and_allows_its_existing_prefix() -> None:
     """文字存在不代表 rule 能載入；用產品自己的 parser 驗完整檔與每條 prefix。
 
     2026-09-10 實際事故：permission contract test 全綠，但一段 Python 式隱式
     字串串接不是合法 Starlark，導致整份 allowlist 未載入，所有 fixed entry
     落入 Auto-review。這裡刻意不自製 parser，直接使用官方排錯入口。
+
+    ⚠ 原名寫死「twenty」，2026-09-17 收緊到 15 條時整個測試名就變成假的——
+    **數字不進名字**（AGENTS：清單會腐壞，判準不會）。條數的斷言住
+    `test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules`，
+    與 rules 檔對照；本條只驗「列出來的每一條都真的載入得起來」。
     """
-    assert len(ALLOWED_PREFIXES) == 20
+    assert ALLOWED_PREFIXES, "allowlist 不得為空——空集合與「每條都通過」同形"
     for prefix in ALLOWED_PREFIXES:
         result = _execpolicy_check(*prefix)
         assert result.get("decision") == "allow", prefix
@@ -100,6 +96,14 @@ def test_all_twenty_rules_parse_and_allow_their_existing_prefixes() -> None:
         (r".venv\Scripts\python.exe", r"scripts\record_mechanical_observation.py"),
         (r".venv\Scripts\python.exe", "-m", "webapp", "serve"),
         ("git", "push", "origin", "master"),
+        # 2026-09-17（Phase 2 Step 2.2／D12）收緊掉的五條：daily 的研究層關閉後
+        # 它們沒有任何無人值守呼叫端。**由產品自己的 parser 證明真的不再被允許**，
+        # 不只是「rules 檔裡找不到那串字」。
+        (r".venv\Scripts\python.exe", r"fetchers\edgar.py"),
+        (r".venv\Scripts\python.exe", r"fetchers\mops.py"),
+        (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "drain"),
+        (r".venv\Scripts\python.exe", r"scripts\prepare_research_action.py", "--action-file"),
+        (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "work"),
     ),
 )
 def test_adjacent_privileged_commands_remain_outside_the_allowlist(
@@ -114,22 +118,19 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    assert rules.count("prefix_rule(") == 20
+    # 2026-09-17（Phase 2 Step 2.2／D12）：20 → 15。daily 的研究層關閉，
+    # 五條只為研究而存在的 entry 一併移除；這是純收緊，對應的 prompt 步驟同一個 change 移除。
+    assert rules.count("prefix_rule(") == 15
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
         "scripts\\\\alpha_purity_snapshot.py",
-        "fetchers\\\\edgar.py",
-        "fetchers\\\\mops.py",
         "scripts\\\\daily_beta_snapshot.py",
         '"-m", "engine_b.cli", "list"',
-        '"-m", "engine_b.cli", "drain"',
         "scripts\\\\catalyst_watch.py",
         "scripts\\\\outcome_if_settled_today.py",
-        "scripts\\\\prepare_research_action.py",
         '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',
-        '"-m", "engine_b.todo", "work"',
         '"-m", "engine_b.todo", "reassess-stale"',
         '"-m", "engine_b.todo", "standing-go"',
         "scripts\\\\publish_daily_state.py",
@@ -137,7 +138,15 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '"-m", "webapp", "materialize"',
     ):
         assert fixed_entry in rules
-    assert '"scripts\\\\prepare_research_action.py", "--action-file"' in rules
+    # 研究層關閉後，這五條必須**不在** rules 裡——拿掉不是忘了寫，是刻意收緊。
+    for research_only_entry in (
+        "fetchers\\\\edgar.py",
+        "fetchers\\\\mops.py",
+        '\"-m\", \"engine_b.cli\", \"drain\"',
+        "scripts\\\\prepare_research_action.py",
+        '\"-m\", \"engine_b.todo\", \"work\"',
+    ):
+        assert research_only_entry not in rules, research_only_entry
     assert 'pattern=[".venv\\\\Scripts\\\\python.exe", "-m", "engine_b.todo"]' not in rules
     assert '"engine_b.todo", "dispatch"' not in rules
     assert '"engine_b.todo", "resolve"' not in rules
@@ -177,30 +186,26 @@ def test_webapp_serve_is_not_allowed_alongside_materialize() -> None:
 
 
 def test_fetchers_directory_is_not_broadly_allowed() -> None:
-    """fetchers/ 只放行兩支公開文件下載器，不是整包。
+    """fetchers/ **一支都不在無人值守的 allowlist 裡**，更不是整包放行。
 
-    edgar.py 與 mops.py 都是「從公開來源抓指定文件到本機 raw store」，無憑證、
-    不碰 identity/ACL、不寫 private authority。同目錄的 gsheets.py 則使用 Google
-    service account 憑證，屬 credential-bearing surface——放行整個 fetchers 目錄
-    會把它一併帶進去，那正是 AGENTS.md 說的「用 broad permission 掩蓋整合缺口」。
+    ⚠ 2026-09-17（Phase 2 Step 2.2／D12）由「只放行 edgar.py 與 mops.py 兩支」收緊成
+    「一支都不放行」：daily 的研究層關閉後，抓原文只發生在互動 session，
+    那兩支沒有任何無人值守的呼叫端了（`drain_limit_per_run` 已為 0）。
+    **原斷言沒有被刪，是被翻面**——它守的東西（fetchers 不得整包放行）現在由更強的形式守：
+    整個目錄一支都不在列，所以「放行整個目錄會把 gsheets.py 一併帶進去」這個風險在結構上消失。
+    gsheets.py 使用 Google service account 憑證，屬 credential-bearing surface；
+    要放行 fetchers 底下任何一支都必須重做一次 sandbox impact review。
     """
     rules = RULES.read_text(encoding="utf-8")
 
-    assert "fetchers\\\\edgar.py" in rules
-    assert "fetchers\\\\mops.py" in rules
+    for fetcher in ("edgar.py", "mops.py", "mfn.py", "rns.py", "gsheets.py", "utils.py"):
+        assert f"fetchers\\\\{fetcher}" not in rules, fetcher
 
-    for credential_bearing in (
-        "fetchers\\\\gsheets.py",
+    for broad in (
         'pattern=[".venv\\\\Scripts\\\\python.exe", "fetchers"]',
         'pattern=[".venv\\\\Scripts\\\\python.exe", "-m", "fetchers"]',
     ):
-        assert credential_bearing not in rules
-
-    # Phase 1 Step 1.1（2026-09-16）：mfn.py（瑞典 MFN）與 rns.py（英國 RNS）是互動式入口，
-    # 與 mops.py 同構但**刻意不進無人值守**——smoke 只跑過一次，還沒累積到
-    # 「daily 遇到 .ST／.L 標的就自動抓」的量測（INV-5）。放行是另一次 impact review 的事。
-    for interactive_only in ("fetchers\\mfn.py", "fetchers\\rns.py"):
-        assert interactive_only not in rules, interactive_only
+        assert broad not in rules, broad
 
 
 def test_project_memory_defines_common_sandbox_impact_review() -> None:

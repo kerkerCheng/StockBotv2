@@ -10,24 +10,34 @@
 
 ## 每日操作
 
-本機說「daily brief」或由 06:30 排程觸發 `$daily-brief`。流程：
+**2026-09-17（Phase 2 Step 2.2／D12）起，Daily 是三條獨立的路，不是一條。**
 
 ```
-Codex local scheduled task
-  → X／EDGAR harvest
-  → Engine C financial／beta technical ETL
-  → 單一 shared-cash-pool beta monitor
-  → triage
-  → priority pq1 best-effort drain
-  → prepared RA／today／lifecycle todo sync
-  → brief
+① 心跳   Windows 工作排程 StockBotv2-Heartbeat（每日 07:00，零 LLM、零網路）
+           → crons/heartbeat_task.py → crons/heartbeat.py --out → publish_daily_brief.py
+           **不經 Codex**：Codex 沒起來、LLM 壞掉、sandbox 擋住，心跳照發
+
+② 分類   Codex local scheduled task（05:30）
+           → X／EDGAR harvest → Engine C financial／beta technical ETL
+           → 單一 shared-cash-pool beta monitor → triage
+           → 機械段（consume-fired／todo sync／reassess-stale／standing-go／XBRL 補值）
+           → today／lifecycle todo sync → materialize → brief
+
+③ 研究   **只在互動 session** 的 `research-drain`
+           daily 的 drain_limit_per_run = 0；drain／fetchers／prepare RA 都已不在 allowlist
 ```
 
-> ⚠ **2026-09-16 定案（D12，`docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md`）：Daily 將拆成心跳（零 LLM）／分類（便宜模型）／研究（只在互動 session）
-> 三層**，規格見 ARCHITECTURE §4.1。**落地前本節照舊。** 落地時同一 change 改本節、把 `config/daily_routine.json` 的
-> `drain_limit_per_run` 歸零、對齊 `.codex/rules` fixed entry 與 `tests/test_codex_daily_permissions.py`（sandbox impact review 五步）。
->
-> **2026-09-17（Phase 2 Step 2.1）：心跳產生器已可手動跑，但排程還沒切**——上面那條流程仍是現況。
+~~本機說「daily brief」或由 06:30 排程觸發 `$daily-brief`。流程：Codex local scheduled task → X／EDGAR
+harvest → Engine C financial／beta technical ETL → 單一 shared-cash-pool beta monitor → triage →
+priority pq1 best-effort drain → prepared RA／today／lifecycle todo sync → brief~~
+（2026-09-17 拆成上面三條；研究段移出，排程時間 06:30 → 05:30 的更正見 `config/daily_routine.json`。）
+
+查證（三條都要對得上）：
+```powershell
+schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V      # Status=Ready、Next Run Time=明天 07:00
+& '.venv\Scripts\python.exe' -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"   # 0
+Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'prefix_rule\(' | Measure-Object | % Count   # 15
+```
 
 ### 心跳（`crons/heartbeat.py`）——零 LLM、零網路、固定五段
 
@@ -54,6 +64,78 @@ Codex local scheduled task
 `absence_kind`（封閉字彙來自 `alpha/absence.py`），其餘四段照印。
 查證：`python -m pytest tests/test_heartbeat.py -q`（其中
 `test_every_source_broken_still_renders_five_sections` 就是這條契約本身）。
+
+#### 排程（2026-09-17 Step 2.2 已註冊）
+
+無人值守的進入點是 **`crons/heartbeat_task.py`**（不是 `heartbeat.py`）：它產檔、再呼叫既有 publisher，
+永遠 exit 0。⚠ **第一版寫成 `.cmd` 直接解析失敗**——`cmd.exe` 以 OEM codepage（本機 cp950）讀檔，
+而檔案是 UTF-8，中文註解被拆成無效指令。Python 進入點沒有這個問題。
+
+```powershell
+# 空跑（只產檔、不發送）——改任何東西之後先跑這個
+& '.venv\Scripts\python.exe' crons\heartbeat_task.py --dry-run
+Get-Content library\private\heartbeat\heartbeat_task.log -Tail 10
+
+# 查排程現況
+schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V
+
+# 手動觸發一次（會真的發一則到 Discord）
+schtasks /Run /TN StockBotv2-Heartbeat
+
+# 重新註冊（改時間時用；不需要管理員、不需要密碼）
+$repo='C:\Users\Cheng\code\StockBotv2'
+$a=New-ScheduledTaskAction -Execute (Join-Path $repo '.venv\Scripts\python.exe') -Argument 'crons\heartbeat_task.py' -WorkingDirectory $repo
+$t=New-ScheduledTaskTrigger -Daily -At '07:00'
+$p=New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+$s=New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 10)
+Register-ScheduledTask -TaskName 'StockBotv2-Heartbeat' -Action $a -Trigger $t -Principal $p -Settings $s -Force
+
+# 停用／移除
+Disable-ScheduledTask -TaskName 'StockBotv2-Heartbeat'
+Unregister-ScheduledTask -TaskName 'StockBotv2-Heartbeat' -Confirm:$false
+```
+
+⚠ **`LogonType Interactive` ＝「只在使用者已登入時執行」。** 換成「不論是否登入都執行」要存密碼，
+那會在機器上多一份憑證——**刻意不做**。現行 Codex daily 本來就需要使用者已登入且 Codex App 運行，
+心跳的條件只會更寬鬆，不會更嚴。
+
+⚠ **這個時間有兩個 SSOT**（Windows 排程器 ＋ `config/daily_routine.json` 的 `heartbeat_local_time`），
+與 daily 的時間同一個毛病。改時間必須同時改兩邊，並以上面的 `schtasks /Query` 對照實際註冊值。
+
+⚠ **weekly 心跳（`--weekly`）刻意還沒註冊成第二個排程**：它今天唯一的額外內容是第 5 段的
+「帳號計分表還沒建（Phase 3）」一行。等 Phase 3 讓那一段真的有內容再建，
+否則是為零內容多開一個無人值守入口（L17-4：general 到資料支持的那一格為止）。
+
+### Sandbox impact review 結論（2026-09-17，Phase 2 Step 2.2：研究層移出 Daily）
+
+五步：
+
+1. **path＋side effect＋capability**：
+   - `crons/heartbeat_task.py`（**新的無人值守入口，但不在 Codex sandbox 裡**）：由 Windows 工作排程直接執行，
+     不經 Codex，所以 `.codex/rules` 對它不適用。它讀本機 authority 與 materialize 好的 state artifact，
+     寫 ignored 的 `library/private/heartbeat/`（Markdown ＋ log），再以 subprocess 呼叫**既有的**
+     `scripts/publish_daily_brief.py`。**無新增網路主機**（只有既有的 Discord webhook）、**無新增憑證**
+     （`.env` 既有）、不寫任何 authority、不碰 `.git` 或任何 tracked 檔。
+   - `crons/heartbeat.py` 本身：零網路、零 LLM，由測試在原始碼層強制
+     （`test_heartbeat_does_not_import_any_llm_or_network_surface`）。
+2. **canonical skill／prompt／本檔**：`crons/daily_brief_prompt.md` v1.7 → v1.8（檔頭三層分工表、
+   fixed entry 列舉、步驟 5 整段停用並以 `<details>` 保留原文）；`docs/ARCHITECTURE.md` §4.1；本節與上面的心跳節。
+3. **最窄 rule**：`.codex/rules` 由 20 條**減為 15** 條。移除的五條是研究層專用：
+   `fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
+   `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`。
+   **這一步是純收緊，沒有任何新增**——心跳不經 Codex，所以它一條 rule 都不需要。
+   ⚠ fetchers 目錄現在**一支都不在列**（原本 edgar／mops 在列）。
+4. **permission contract test**：`tests/test_codex_daily_permissions.py` 同 change 對齊——條數斷言 20 → 15、
+   五條從「必須存在」改成「必須不在」，並**加進 `test_adjacent_privileged_commands_remain_outside_the_allowlist`
+   的 parametrize，由 Codex 自己的 execpolicy parser 證明它們真的不再被允許**（不只是「rules 檔裡找不到那串字」）。
+   `test_fetchers_directory_is_not_broadly_allowed` 由「只放行兩支」翻面成「一支都不在列」。
+5. **smoke test**：`crons/heartbeat_task.py --dry-run` 產檔通過；**接著以 `schtasks /Run` 走真正的排程路徑
+   實跑一次**——`Last Result: 0`、publisher 回 `{"status": "sent", "sent_parts": 2, "total_parts": 2}`。
+   ⚠ 端到端驗收仍未完成：ROADMAP Phase 2 要的是**連續 3 天 07:00 自動發出**，那要等三天，
+   不得以「手動觸發成功」冒充（L13-1：驗收條件是產出出現在下游消費者手上）。
+
+不放寬：四個人工 gate 一個不動；心跳不寫任何 authority；研究搬到互動 session 之後**判準一字未改**
+（disproof 三件套、park 的四個欄位、只有 prepared RA 才進 pq2）——**搬走的是執行者，不是規則**。
 
 排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布四個 leads state 檔：`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`——2026-09-02 由二擴四，impact review 結論見腳本 docstring；不得用 unattended 廣泛 Git 命令碰其他檔）。
 
@@ -1245,7 +1327,10 @@ weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同
   `python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
   排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired
   lifecycle ＋ non-terminal Decision cohorts 自動導出。
-  ⚠ 2026-09-16 D12：落地後 `drain_limit_per_run` 應為 **0**（研究只在互動 session 跑）；同一條查證命令印出 > 0 就是還沒落地。
+  ✅ **2026-09-17（Phase 2 Step 2.2）已落地：`drain_limit_per_run` = 0**（研究只在互動 session 跑）。
+  同一條查證命令印出 > 0 就是有人改回去了。⚠ **0 不是「無上限」**——它原本被驗證器拒絕正是因為那個誤讀，
+  現在改由 `tests/test_engine_b_cli.py::test_drain_limit_zero_selects_nothing_of_every_kind` 證明
+  limit=0 時每一種工作都選不出來（比「拒絕寫下 0」強：那只擋得住 config，擋不住消費端）。
 - **提醒去重：** lifecycle SessionStart hook 只提醒**尚未進池**的新到期項目；已存在的
   `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。分工全表見上方
   「SessionStart hook 的分工」。

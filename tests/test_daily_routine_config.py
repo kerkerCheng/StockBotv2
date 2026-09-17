@@ -48,6 +48,34 @@ def test_config_fails_closed_on_incomplete_tracked_ticker_sources(tmp_path) -> N
 
 
 def test_config_rejects_unbounded_daily_drain(tmp_path) -> None:
+    """無上限仍然不合法——但**「無上限」現在是負數與 >20，不再是 0**。
+
+    ⚠ 2026-09-17（Phase 2 Step 2.2／D12）改了這一條的 0 那一格，理由寫在
+    `engine_b/routine_config.py` 的註解：0 原本被拒絕是因為「0 會被讀成無上限」，
+    而那是一個表示承載兩種語意（L12）。修法是先分開——0＝研究層關閉、1..20＝每輪上限、
+    其餘仍拒絕。**原斷言守的東西（0 不得被讀成無上限）沒有被刪，是被換成更強的那條**：
+    `tests/test_engine_b_cli.py::test_drain_limit_zero_selects_nothing_of_every_kind`
+    直接證明 limit=0 選不出任何一種工作——原斷言只擋得住寫下 0，擋不住任何一個
+    把 limit 當「沒有上限」用的消費端。
+    """
+    path = tmp_path / "daily.json"
+    for bad in (-1, 21, True, 2.5, "5"):
+        _write(path, {
+            "schema_version": "1",
+            "pq1": {
+                "drain_limit_per_run": bad,
+                "tracked_ticker_sources": {
+                    "thesis_lifecycle": True,
+                    "decision_cohorts": True,
+                },
+            },
+        })
+        with pytest.raises(ValueError, match=r"0\.\.20"):
+            routine_config.load_config(path)
+
+
+def test_zero_means_research_disabled_not_unbounded(tmp_path) -> None:
+    """0 合法且逐字讀得回來——D12：研究只在互動 session 做，daily 的研究層關閉。"""
     path = tmp_path / "daily.json"
     _write(path, {
         "schema_version": "1",
@@ -56,12 +84,12 @@ def test_config_rejects_unbounded_daily_drain(tmp_path) -> None:
             "tracked_ticker_sources": {
                 "thesis_lifecycle": True,
                 "decision_cohorts": True,
+                "theme_core_companies": False,
             },
         },
     })
 
-    with pytest.raises(ValueError, match="1..20"):
-        routine_config.load_config(path)
+    assert routine_config.load_config(path)["pq1"]["drain_limit_per_run"] == 0
 
 
 def test_tracked_tickers_merge_lifecycle_and_nonterminal_cohorts(tmp_path) -> None:

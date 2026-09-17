@@ -9963,6 +9963,73 @@
       "source": "research_action",
       "title": "D8 補格：聯亞光電 tech:cw_dfb_laser 的 substitutability 判 3（誠實結果：低於門檻 4，排序仍無 TW／TWO 檔）",
       "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-17T01:54:26.355829+00:00",
+      "deferred_at": "2026-09-17T01:55:27.472292+00:00",
+      "hint": "Phase 1 §2e 第 1 項；使用者 2026-09-17「六項照你建議」。一手只有上詮自述目標（「長期目標係成為 CPO 光纖陣列元件之主要及重要供應商」）與產能投資，沒有任何客戶端或第三方確認替代難度；Hunterbrook 是媒體，依 Phase 1 決策 C1 維持待判定。缺的是 Himax 或長約 C 公司的具名確認。go＝該文件出現後啟動 bounded research 並補 sub（addendum → 另一個 ra_admission 編號）；不含入圖、不含提高 evidence tier、不含 live。⚠ 這一項的性質是等世界先發生某事，不是等你決定——建議 pending --trigger。",
+      "n": 586,
+      "reason": null,
+      "ref_id": "manual:586",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "上詮 co:foci→tech:fiber_attach_unit 補 substitutability：等客戶端具名確認",
+      "type": "manual",
+      "waiting_on": {
+        "reason": "使用者 2026-09-17『六項照你建議』：本項建議即為 pending --trigger——bounded research 今天解不掉，缺的是世界先產生一份客戶端文件（AGENTS：人工判讀不等於外部事件，但這一項確實是等外部）",
+        "set_at": "2026-09-17T01:55:27.472292+00:00",
+        "trigger": "Himax 或上詮 CPO 光纖陣列長約對手方在客戶端／法定文件首次具名確認上詮為該元件供應商（現況：一手只有上詮自述目標與產能投資，媒體報導依 C1 維持待判定）",
+        "until": null
+      }
+    },
+    {
+      "added_at": "2026-09-17T01:54:45.245527+00:00",
+      "hint": "Phase 1 §2e 第 5 項；使用者 2026-09-17「六項照你建議」。⚠ 這條是 Step 1.3 收尾新發現，不在 Step 1.2 的七家工單裡——它沒進工單是因為工單由人手列，不是從門檻 filter 的 filtered 清單機械導出（L16）。現況：evidence 已是「外部印證」、demand chain 走得到需求錨，唯一缺的是 substitutability 沒填。門檻 4，填了若 >=4 就會出現在可投資排序，是目前所有台股裡最短的一條路。go＝bounded research 讀穩懋年報／法說與 Sivers 一手文件判 sub 並出 addendum；不含入圖（graph write 另鑄 ra_admission 編號）、不含提高 evidence tier、不含 live。⚠ 不得為了讓籃子非空而放寬門檻 4——判出多少就是多少。",
+      "n": 587,
+      "reason": null,
+      "ref_id": "manual:587",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "穩懋 co:win_semiconductor（3105.TWO）→co:sivers_semiconductors 補 substitutability：台股裡最接近進榜的一條",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T01:54:45.435567+00:00",
+      "hint": "Phase 1 §2e 第 2 項；使用者 2026-09-17「六項照你建議」。15 條向下邊裡 14 條 sub 未填（另一條 tech:cw_dfb_laser=2）。**prod:els_8ch_module 那條已經是外部印證（Enablence），只差 sub**，是這一組裡最短的路。另一個卡點是 Ayar Labs 自家文件仍缺（ayarlabs.com 對本機 UA 回 403），沒有它 tech:wdm_laser_16ch 那條回不到雙方聯合。go＝bounded research 挑 2–3 條關鍵邊補 sub 並出 addendum，同時再試一次 Ayar Labs 一手來源（換路由、非 UA 封鎖路徑）；不含入圖、不含提高 evidence tier、不含付費取得、不含 live。",
+      "n": 588,
+      "reason": null,
+      "ref_id": "manual:588",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Sivers 15 條邊仍全部未填 substitutability；prod:els_8ch_module 那條已外部印證只差一格",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T01:55:06.072291+00:00",
+      "hint": "Phase 1 §2e 第 3 項；使用者 2026-09-17「六項照你建議」。實測 tech:cpo_full_stack_test 走不到任何已登記的需求錨（shortestPath 回空），所以**先補邊再補格**——順序反了的話補完 sub 仍然排序不可見。要補的是 tech:cpo_full_stack_test → tech:cpo／tech:ai_switch 這條因果鏈，依據要一手（Aehr 自家 10-K／法說或客戶端文件逐字）。go＝bounded research 找一手依據並出 addendum extraction；不含入圖（另鑄 ra_admission）、不含提高 evidence tier、不含 live。⚠ 同時 AEHR 的 product_line_revenue_share 仍缺（10-K 全文抽取只得 XBRL 表頭，要走 XBRL companyfacts 或 EX-99）——順手一起補，那一格是 mechanical、免 pq2。",
+      "n": 589,
+      "reason": null,
+      "ref_id": "manual:589",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "Aehr co:aehr_test_systems 補一條 tech:cpo_full_stack_test → 需求錨的邊（補了 sub 也還是排序不可見）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T01:55:06.259924+00:00",
+      "hint": "Phase 1 §2e 第 6 項；使用者 2026-09-17「六項照你建議」。同一份文件上有兩個問題，**正解是一次 supersede 同時修掉**，不要分兩次改同一份 extraction。①圖裡 published_at=2026-05-31，但 MOPS 上傳日是 115/05/07（→2026-05-07）、年報刊印日 115/03/30；現值來自兩份 extraction 手填。方向保守（比真實可得日晚，不是 lookahead），所以不急但該修。②該份仍含 126 個 CJK 相容表意文字（U+F900–U+FAFF），與正常字視覺相同但碼位不同，會讓逐字引用比對靜默失敗——fetchers/mops.py 的 pdf_to_text 已加 NFC 正規化，但既有入庫的那份是修法之前抓的。go＝重抓／重跑 extraction 並以 supersedes_extraction_sha256 走廊升級，舊版歸檔兩份都留；不含新增 claim／邊、不含改 substitutability／sole_source／evidence_tier、不含 live。⚠ published_at 回填屬 AGENTS 明列的 mechanical 放行項；但本項同時改 extraction 內容，所以整包仍走 ra_admission 逐筆核准。",
+      "n": 590,
+      "reason": null,
+      "ref_id": "manual:590",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "mops_4979_annual_report_2025 一次 supersede 修兩個殘留：published_at 與 CJK 相容表意文字",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21580,8 +21647,17 @@
       "ref_id": "ra_aa7e9186ca68b569ce0dac835379d233",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-17T01:55:27.472292+00:00",
+      "n": 586,
+      "reason": "使用者 2026-09-17『六項照你建議』：本項建議即為 pending --trigger——bounded research 今天解不掉，缺的是世界先產生一份客戶端文件（AGENTS：人工判讀不等於外部事件，但這一項確實是等外部）",
+      "receipt": null,
+      "ref_id": "manual:586",
+      "type": "manual",
+      "verb": "pending"
     }
   ],
-  "next_n": 586,
+  "next_n": 591,
   "schema_version": "1"
 }

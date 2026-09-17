@@ -140,11 +140,17 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > 查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
 > 印出 > 0 就是還沒落地；落地後應為 0。
 >
-> **2026-09-17（Phase 2 Step 2.1）：心跳層的產生器已交付，但還沒有任何排程會叫它。**
-> `crons/heartbeat.py` 是零 LLM／零網路的純消費端，固定五段、失敗只降級不消失
-> （查證：`python crons/heartbeat.py` 與 `python -m pytest tests/test_heartbeat.py -q`）。
-> **切換載體（排程、`drain_limit_per_run` 歸零、`.codex/rules` 對齊）是 Step 2.2**，
-> 那一步要先由使用者決定心跳由誰觸發——在那之前，上面這條單一 Codex 排程仍是現況。
+> **2026-09-17（Phase 2 Step 2.1／2.2）：三層已落地，上面那條「落地前的現況」自此不再是現況。**
+> ①心跳＝`crons/heartbeat.py`（零 LLM、零網路、固定五段、失敗只降級不消失），無人值守進入點是
+> `crons/heartbeat_task.py`，由**獨立的 Windows 工作排程 `StockBotv2-Heartbeat`（每日 07:00）**觸發
+> ——**刻意不經 Codex**，這樣「LLM 失敗心跳照發」是結構上成立而不是靠運氣。
+> ②研究層移出：`drain_limit_per_run` 已為 **0**，`.codex/rules` 由 20 條收緊為 **15** 條
+> （移除 `fetchers\edgar.py`／`fetchers\mops.py`／`engine_b.cli drain`／
+> `prepare_research_action.py --action-file`／`engine_b.todo work` 五條研究層專用 entry）。
+> ③分類層仍在 Codex 排程（05:30）。
+> ⚠ **驗收尚未完成**：ROADMAP Phase 2 要「連續 3 天心跳零 LLM 成功發出」，手動觸發成功不算數（L13-1）。
+> 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`、
+> `python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`。
 
 | 層 | 誰跑 | LLM | 做什麼 |
 |---|---|---|---|

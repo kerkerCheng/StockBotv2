@@ -1,4 +1,18 @@
-# Daily Approval Brief — Codex 本機排程 Prompt（v1.7）
+# Daily Approval Brief — Codex 本機排程 Prompt（v1.8）
+
+> ## ⚠ 2026-09-17（Phase 2 Step 2.2／D12）：Daily 拆成三層，**本檔只負責中間那一層**
+>
+> | 層 | 誰跑 | 本檔管不管 |
+> |---|---|---|
+> | **心跳**（零 LLM、零網路、固定五段） | 獨立的 Windows 工作排程 `StockBotv2-Heartbeat`（每日 07:00）跑 `crons/heartbeat_task.py` | **不管**。它刻意不經 Codex——Codex 沒起來時心跳仍要照發 |
+> | **分類**（triage） | 本檔（Codex 排程） | 管 |
+> | **研究**（source-trace／extract／prepare RA） | **只在互動 session 的 `research-drain`** | **不管**。`drain_limit_per_run` 已為 0 |
+>
+> 隨之移除的五條 fixed entry：`fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
+> `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`
+> ——它們只為研究而存在，研究搬走後在本 routine 已經走不到。**撞到 `access_blocked` 不是權限壞了，
+> 是這件事不該在無人值守做**：把它留給互動 session，不得改用更寬的 rule。
+> 查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"` 應印 0。
 
 > 現行執行端是 Codex desktop 的 standalone local scheduled task，每日台北 06:30 直接在
 > `C:\Users\Cheng\code\StockBotv2` 的 `master` working tree 執行。電腦需保持開機、Codex App
@@ -22,14 +36,19 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `.codex/rules/stockbot-automations.rules` 的窄 fixed entry。下列連外命令第一次呼叫就用
    `require_escalated` 命中 exact outside-sandbox rule，不得先在 sandbox 製造可預期失敗再升權重重跑，也不得放行整個 PowerShell、
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
-   `fetchers\edgar.py`、`fetchers\mops.py`、`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
-   `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、`decision_lab today`、
-   `engine_b.todo sync`、`engine_b.todo work`、`engine_b.todo reassess-stale`、`engine_b.todo standing-go`、
+   `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、
+   `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`decision_lab today`、
+   `engine_b.todo sync`、`engine_b.todo reassess-stale`、`engine_b.todo standing-go`、
    `scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`、
-   `scripts\backfill_fiscal_year_results.py`（條數由 `tests/test_codex_daily_permissions.py` 斷言，
+   `scripts\backfill_fiscal_year_results.py`
+   （~~`fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
+   `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`~~ 已於 2026-09-17 隨研究層一起移除；
+   條數由 `tests/test_codex_daily_permissions.py` 斷言，
    **刻意不在散文裡寫死**——寫死的數字會腐壞，而它已經腐壞過一次：檔頭寫「十七個」時實際有十九條）。
-   這組 rule 是單一 authority，不是 primary＋fallback 兩套權限。`engine_b.todo work` 只 checkpoint 已由使用者
-   exact `go` 且已有 `dispatch_ref` 的 decision-review work order；不得用它代替 `dispatch`／`resolve`／`reassess`。
+   這組 rule 是單一 authority，不是 primary＋fallback 兩套權限。
+   ~~`engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
+   不得用它代替 `dispatch`／`resolve`／`reassess`。~~（2026-09-17：`engine_b.todo work` 已隨研究層移出
+   allowlist；那個 checkpoint 現在由互動 session 的 research-drain 做，判準一字未改。）
    若 exact rule 未匹配、升權限被拒或命令
    仍回 `access_blocked`，保留 failure 並 fail closed，不得改用更寬 rule 或手動重跑。權限正確後若仍發生
    暫時性 transport error，只讓該命令既有的 bounded、idempotent retry 跑完作最後一步；不得在 routine
@@ -121,7 +140,25 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    的 exact query 執行一次 WebSearch，最多列三個可能原因、對應 direct／indirect 曝險與「未經查證」
    標籤；不註冊 lead、不進 pq1／pq2、不寫任何 Engine authority。使用者要深挖時才另走
    `$lead-intake`／`$source-trace`。
-5. 先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
+5. **本步驟自 2026-09-17（D12）起不做。** 研究（drain、source-trace、extract、prepare RA）
+   已整段移到互動 session 的 `research-drain`；`drain_limit_per_run` 為 0，`engine_b.cli drain`
+   也已不在 allowlist。**不得呼叫它，也不得用任何更寬的 rule 代替。**
+   本 routine 在這一步只做一件事：**把「今天有幾件研究沒人做」印進 brief**——
+   未 triage N、pq1 可做 N、pq2 球在使用者手上 N（數字由 `engine_b.cli list`／`engine_b.todo list`
+   與心跳的段 3 給出，不需要 drain）。
+   ⚠ 「沒有人做研究」必須看得見，否則它會與「今天沒有研究可做」同形（L13-2）。
+
+
+   <details>
+   <summary>⚠ <b>已停用：2026-09-17 之前的研究段（保留原文供對照，不得執行）</b></summary>
+
+   > 這一整塊描述的是 daily 自己做研究的時代。研究已依 D12 整段移到互動 session 的
+   > `research-drain`，其中提到的 `engine_b.cli drain`、`fetchers\edgar.py`、`fetchers\mops.py`、
+   > `scripts\prepare_research_action.py`、`engine_b.todo work` 都**已不在 allowlist**。
+   > 逐字保留是因為 research-drain 沿用同一套判準（disproof 三件套、park 的四個欄位、
+   > 只有 prepared RA 才進 pq2）——**搬走的是執行者，不是規則**。
+
+   先組出不會因研究失敗而消失的心跳 snapshot，再 best-effort 執行
    `.venv\Scripts\python.exe -m engine_b.cli drain`（首次呼叫命中 exact rule）。每輪上限由 `config/daily_routine.json` 控制；
    使用者已 `go` 且有 dispatch receipt 的 Decision gap work order 優先；對選中的 work order，第一次 checkpoint
    `researching` 就以 `require_escalated` 呼叫 exact `.venv\Scripts\python.exe -m engine_b.todo work ...` rule，
@@ -148,6 +185,9 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    **不得早於催化劑本身**。若需入圖、Engine C manual observation、thesis
    revise／retire 或其他 authority mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2；不得拿舊
    assessment bare reassess。
+
+   </details>
+
 6. Graph admission、thesis retire／revise、Google Sheet 真實持倉值、`record-choice`／`record-fill` 永遠
    保留人工 gate；不得因 routine recommendation 推定使用者核准。本機 Codex／Claude Code 是可互換
    executor；任一方收到使用者對 exact pq2 item 的明確核准後都可完成全套 type-aware 動作，但權限與
