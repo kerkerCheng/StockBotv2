@@ -1,0 +1,117 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "上調至 4：穩懋、Sivers 或任一第三方在法定文件揭露（a）Sivers 對穩懋的最低採購承諾或產能保留條款，或（b）穩懋的 InP BH 邊射型雷射製程具客戶端具名確認的獨佔性。下調至 1：Sivers 揭露已把 DFB laser array 量產移轉給 O-Net、POET、自有 Glasgow 廠或 2026 Q2 法說提到的未具名新代工夥伴。核查頻率：每半年（穩懋年報刊印約每年 5 月、Sivers 半年報約每年 8 月各一次）。觸發後 48 小時內動作：重跑 `python -m query.bottleneck --top-n 60` 確認排序位次是否改變，並在該檔的 alpha brief 註記。⚠ 本判讀刻意不因『它是台股、我們希望籃子非空』而上調——籃子空就空，讓它非空的路是研究。",
+      "id": "mops_3105_annual_report_2025_cl1",
+      "source_ids": [
+        "mops_3105_annual_report_2025_s1",
+        "mops_3105_annual_report_2025_s2",
+        "mops_3105_annual_report_2025_s3"
+      ],
+      "statement": "穩懋對 Sivers 這條供應關係的 substitutability 判 2/5（研究判斷，低於瓶頸排序門檻 4）。三條逐字依據方向一致：①穩懋自述為「從事砷化鎵晶圓代工服務之公司」，光電部分逐字是「為雷射二極體(LD)及檢光二極體(PD)設計公司提供具彈性且大規模的產品製造服務」——這是 foundry-for-hire 定位，不是製程獨佔；②InP 相關雷射元件（100mW BH 邊射型雷射／InP PIN PD／InP 光積體電路）列在「114年度開發之新商品」，屬新開發而非長期量產製程；③客戶端 Sivers 2025 年報（已在圖中，origin_entity 不同）在同一句並列三家夥伴：『Collaborations with WIN Semiconductors, O-Net Technologies and POET enable scalable, high-volume production of DFB laser arrays, as well as external laser sources and light engines for AI data centers.』，且 Sivers 自有 Glasgow 廠。⚠ 三份文件都沒有任何獨家、最低採購量或產能保留條款。對照組：IQE→Tower 判 4 的依據是雙向最低採購承諾逐字可讀；聯亞判 3 的依據是四年長約存在但條款未揭露——本條連長約都沒有，故判 2 而非 3。不判 1 是因為化合物半導體代工的製程認證本身有切換成本，且穩懋是具名的策略夥伴（2025 年 3 月宣布）。",
+      "subject_id": "co:win_semiconductor"
+    },
+    {
+      "confidence": 0.9,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "若穩懋在後續年報、法說或重訊首次把光通訊／光電元件營收單獨列示，本條的『不可判定』即失效，改以該數字填入產品線營收占比。核查頻率：每年年報刊印時（約 5 月）。觸發後 48 小時內動作：以 scripts/record_mechanical_observation.py 寫入 3105.TWO 的 product_line_revenue_share（mechanical，免 pq2）。",
+      "id": "mops_3105_annual_report_2025_cl2",
+      "source_ids": [
+        "mops_3105_annual_report_2025_s4"
+      ],
+      "statement": "穩懋 114 年度營業比重只拆兩格：晶圓代工 15,928,576 千元（95.73%）、其他 709,958 千元（4.27%），合計 16,638,534 千元。⚠ 光通訊／InP 雷射沒有單獨列示——它被含在 95.73% 的「晶圓代工」裡，與 4G/5G/WiFi PA 的砷化鎵代工混在同一格。因此「瓶頸業務占穩懋營收多少」在現行法定揭露下**結構性不可判定**：這是揭露準則的限制，不是我們沒查（L11-5：『我找不到』與『它不存在』是兩個不同的 claim）。對 Phase 4 篩選層的「瓶頸業務占營收下限」那條機械條件，本檔必須明確標為不可判定，不得補 0。",
+      "subject_id": "co:win_semiconductor"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "substitutability": 2
+      },
+      "confidence": 0.8,
+      "dst_id": "co:sivers_semiconductors",
+      "id": "e_win3105_sivers_sub1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_3105_annual_report_2025_s1",
+        "mops_3105_annual_report_2025_s2",
+        "mops_3105_annual_report_2025_s3"
+      ],
+      "src_id": "co:win_semiconductor"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "WIN Semiconductors",
+        "3105.TWO",
+        "穩懋",
+        "穩懋半導體股份有限公司"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:win_semiconductor",
+      "name": "Win Semiconductor",
+      "role": "foundry",
+      "source_ids": [
+        "mops_3105_annual_report_2025_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE.ST"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "mops_3105_annual_report_2025_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3105_annual_report_2025",
+    "evidence_tier": 1,
+    "origin_entity": "穩懋半導體股份有限公司",
+    "permission_basis": "MOPS 公開資訊觀測站之法定申報文件（issuer 一手，公開下載），2026-09-17 由 fetchers/mops.py 取回全文；repo_full 是為了讓上面四段逐字引文可核對。",
+    "published_at": "2026-05-04",
+    "publisher": "公開資訊觀測站（MOPS）",
+    "retrieved_at": "2026-09-17",
+    "source_type": "filing",
+    "storage_permission": "repo_full",
+    "title": "穩懋半導體 3105 民國114年度股東會年報（MOPS 全文）——co:win_semiconductor→co:sivers_semiconductors substitutability addendum（[587] 授權研究）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3105&filename=2025_3105_20260525F04.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_3105_annual_report_2025_s1",
+      "locator": "肆、營運概況 一、業務內容 (一)業務範圍 1.公司所營業務之主要內容",
+      "quote": "穩懋為從事砷化鎵晶圓代工服務之公司，提供客戶最佳品質的三五族化合物半導體電路製程的晶圓代工服務。"
+    },
+    {
+      "id": "mops_3105_annual_report_2025_s2",
+      "locator": "肆、營運概況 一、業務內容 (一)業務範圍 3.公司目前之商品(服務)項目",
+      "quote": "為雷射二極體 (LD)及檢光二極體(PD)設計公司提供具彈性且大規模的產品製造服務，可提供合作夥伴客製化的磊晶/二次磊晶、光電元件製造、材料及元件特性分析及測試服務等。"
+    },
+    {
+      "id": "mops_3105_annual_report_2025_s3",
+      "locator": "肆、營運概況 一、業務內容 (一)業務範圍 4. 114年度開發之新商品",
+      "quote": "(8) 100毫瓦BH邊射型雷射元件應用於矽光通訊之CW雷射/外部光源"
+    },
+    {
+      "id": "mops_3105_annual_report_2025_s4",
+      "locator": "肆、營運概況 一、業務內容 (一)業務範圍 2.營業比重",
+      "quote": "晶圓代工 15,928,576 95.73%"
+    }
+  ]
+}
