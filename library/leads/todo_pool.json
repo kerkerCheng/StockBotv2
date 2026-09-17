@@ -10037,13 +10037,21 @@
     },
     {
       "added_at": "2026-09-17T02:39:23.780786+00:00",
+      "completion_authority": {
+        "action_digest": "d2fcf7a571d997cb547ccf2acdc092e59e6d6f1014b5fb540c1afcaaebca899a",
+        "cohort_id": "dc_68cf04ebd9843573116782bd733dfa5f",
+        "commit": "dd192e1ba538d3e4db840b91826c2dc38963f0df",
+        "company_id": "co:win_semiconductor",
+        "verified_at": "2026-09-17T03:26:08.679770+00:00"
+      },
       "graph_impact": "+2 節點、1 邊、2 claims｜來源：穩懋半導體股份有限公司（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:win_semiconductor。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 591,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_937c2ec5a9035763a8b2cbfce0f6faa9;digest:d2fcf7a571d997cb547ccf2acdc092e59e6d6f1014b5fb540c1afcaaebca899a;commit:dd192e1ba538d3e4db840b91826c2dc38963f0df;cohort:dc_68cf04ebd9843573116782bd733dfa5f",
       "ref_id": "ra_937c2ec5a9035763a8b2cbfce0f6faa9",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-17T03:26:08.679770+00:00",
       "source": "research_action",
       "title": "[587] 穩懋→Sivers 補 substitutability：判 2（誠實的否定結果——台股最短的那條路走完了，仍不進榜）",
       "type": "ra_admission"
@@ -10076,13 +10084,21 @@
     },
     {
       "added_at": "2026-09-17T02:50:11.649373+00:00",
+      "completion_authority": {
+        "action_digest": "404a31ba126744a95c2e136f31eab3881b8278b9d7b7d10883f2ea78ac821456",
+        "cohort_id": "dc_7dc03795699f2169e9c8adc6d3d10179",
+        "commit": "fe1b75b6b0555ae9c96fdd2afa227a349c0a93d0",
+        "company_id": "co:sivers_semiconductors",
+        "verified_at": "2026-09-17T03:26:15.935695+00:00"
+      },
       "graph_impact": "+16 節點、21 邊、7 claims｜來源：Sivers Semiconductors（tier 1）",
       "hint": "核准 exact graph delta；Decision handoff：co:sivers_semiconductors。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 594,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_005e518c0dd76e131360e95cbfc18346;digest:404a31ba126744a95c2e136f31eab3881b8278b9d7b7d10883f2ea78ac821456;commit:fe1b75b6b0555ae9c96fdd2afa227a349c0a93d0;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
       "ref_id": "ra_005e518c0dd76e131360e95cbfc18346",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-17T03:26:15.935695+00:00",
       "source": "research_action",
       "title": "[588] Sivers 補兩條邊的 substitutability：DWDM laser array 與 O-Net 皆判 2（誠實的否定結果）＋ Ayar Labs 缺口的性質變了",
       "type": "ra_admission"
@@ -21747,6 +21763,24 @@
       "receipt": "authority:engine_c_manual_observation;ref:mo_5a56be9daaef6ad94fd42bab4ee9093a",
       "ref_id": "manual:589",
       "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-17T03:26:08.679770+00:00",
+      "n": 591,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_937c2ec5a9035763a8b2cbfce0f6faa9;digest:d2fcf7a571d997cb547ccf2acdc092e59e6d6f1014b5fb540c1afcaaebca899a;commit:dd192e1ba538d3e4db840b91826c2dc38963f0df;cohort:dc_68cf04ebd9843573116782bd733dfa5f",
+      "ref_id": "ra_937c2ec5a9035763a8b2cbfce0f6faa9",
+      "type": "ra_admission",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-17T03:26:15.935695+00:00",
+      "n": 594,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_005e518c0dd76e131360e95cbfc18346;digest:404a31ba126744a95c2e136f31eab3881b8278b9d7b7d10883f2ea78ac821456;commit:fe1b75b6b0555ae9c96fdd2afa227a349c0a93d0;cohort:dc_7dc03795699f2169e9c8adc6d3d10179",
+      "ref_id": "ra_005e518c0dd76e131360e95cbfc18346",
+      "type": "ra_admission",
       "verb": "go"
     }
   ],
