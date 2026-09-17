@@ -10107,12 +10107,25 @@
       "added_at": "2026-09-17T07:41:09.306332+00:00",
       "hint": "Q5 機制已交付但 ledger 空的，心跳印「一份都還沒寫」。要寫的是 append-only authority，所以掛號等你授權。建議先寫兩個節點：tech:cw_dfb_laser（供給側六家 sub 全部 2-3，看起來是量的賭注）與 mat:inp_substrate（15 條需求側邊、圖說 sub=5 最卡，但供給側 3 條全部沒填 sub——那個缺口是 query.structure 一跑就冒出來的）。go 之後會變的數字：心跳第 2 段由「一份都還沒寫」→「結構讀圖 2 份／現行 2」，且從此每天自動比對圖有沒有變。做法：python -m query.structure <node> 讀五個角度 → python -m alpha structure-reading <node> --add spec.json。不做也不會壞：機制在那裡，只是沒有內容。",
       "n": 595,
-      "reason": null,
+      "reason": "2026-09-17 使用者 go。兩筆已寫入 library/private/alpha/structure_readings/：tech:cw_dfb_laser kind=volume（到期 2026-10-17，跟關聯檔中最短的 SIVE.ST 30 天核查頻率走）；mat:inp_substrate kind=undecided（到期 2026-12-16，跟 AXTI/COHR 的 90 天走）。心跳第 2 段已由「一份都還沒寫」→「結構讀圖 2 份｜現行 2｜該重讀 0」。⚠ 提案 hint 有一處寫錯、已在讀圖裡更正：cw_dfb_laser 供給側不是「六家全 2-3」，實測是 5／3／3／2／2／2（Coherent 5，但那條邊 evidence=self_reported，L8 不足以支撐 A 型判準）。inp_substrate 判 undecided 的缺口已鑄成 [596]。",
+      "receipt": "authority:structure_reading;ref:sr_a6762186c7e8eb23+sr_d6760bfe5d6e9164",
       "ref_id": "manual:595",
+      "resolution": "go",
+      "resolved_at": "2026-09-17T08:36:54.443976+00:00",
+      "source": "manual",
+      "title": "寫第一批結構讀圖紀錄（Q5 的 ledger 今天是 0 筆）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T08:36:03.528885+00:00",
+      "hint": "[595] 的讀圖把這個缺口變成一筆有到期的紀錄：整張圖說所有人都繞不過 InP 基板（15 條需求邊裡 7 條 sub=5、2 條 sub=4，且它是最底層、下一層 0 條），**但供給它的三家彼此可不可替代，一個值都沒有**，所以 A/B 判不出來（讀圖 sr_d6760bfe5d6e9164 記 undecided）。go 之後會變的數字：那筆讀圖可由 undecided 改寫成 moat 或 volume；query.structure 的供給側分布由「都沒填」變成有分布；可投資排序可能多幾列（AXTI 已在排序裡，5802.T 也在）。做法是 bounded research：AXT 10-K／住友電工有価証券報告書／JX Advanced Metals 上市文件裡的InP 基板產能、客戶集中與同業比較；依 L8 客戶端或第三方具名才算外部印證。⚠ 補完是圖寫入，仍要另一個 ra_admission 編號逐筆核准。⚠ 與 [552] 不同：那一筆是把 AXT 的自報升級成外部印證（evidence 軸），這一筆是可替代性（結構軸）。",
+      "n": 596,
+      "reason": null,
+      "ref_id": "manual:596",
       "resolution": null,
       "resolved_at": null,
       "source": "manual",
-      "title": "寫第一批結構讀圖紀錄（Q5 的 ledger 今天是 0 筆）",
+      "title": "mat:inp_substrate 供給側三條邊補 substitutability（AXT／住友電工／JX）",
       "type": "manual"
     }
   ],
@@ -21794,8 +21807,17 @@
       "ref_id": "ra_005e518c0dd76e131360e95cbfc18346",
       "type": "ra_admission",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-17T08:36:54.443976+00:00",
+      "n": 595,
+      "reason": "2026-09-17 使用者 go。兩筆已寫入 library/private/alpha/structure_readings/：tech:cw_dfb_laser kind=volume（到期 2026-10-17，跟關聯檔中最短的 SIVE.ST 30 天核查頻率走）；mat:inp_substrate kind=undecided（到期 2026-12-16，跟 AXTI/COHR 的 90 天走）。心跳第 2 段已由「一份都還沒寫」→「結構讀圖 2 份｜現行 2｜該重讀 0」。⚠ 提案 hint 有一處寫錯、已在讀圖裡更正：cw_dfb_laser 供給側不是「六家全 2-3」，實測是 5／3／3／2／2／2（Coherent 5，但那條邊 evidence=self_reported，L8 不足以支撐 A 型判準）。inp_substrate 判 undecided 的缺口已鑄成 [596]。",
+      "receipt": "authority:structure_reading;ref:sr_a6762186c7e8eb23+sr_d6760bfe5d6e9164",
+      "ref_id": "manual:595",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 596,
+  "next_n": 597,
   "schema_version": "1"
 }
