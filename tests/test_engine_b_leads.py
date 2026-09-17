@@ -858,3 +858,54 @@ def test_mops_watch_manual_list_is_a_floor_not_a_replacement() -> None:
     # 關閉 derivation 時只剩手動清單，手動清單永遠在。
     assert mops_watch_tickers({"tickers": ["9999.TWO"], "derive_from_registry": False},
                               registry_tickers=frozenset({"3081.TWO"})) == ["9999.TWO"]
+
+
+def test_parked_without_expiry_finds_the_holes_trace_backlog_cannot_see() -> None:
+    """INV-2 的黑洞：parked 但**沒有任何機制會讓它回來**（ROADMAP Phase 6，使用者核准 A）。
+
+    ⚠ 這不是 `trace_backlog` 的子集。`trace_backlog` 的入口條件是「有 trace_status 或
+    parked_reason 含 trace」——park 時沒留下追源標記的 lead 連進都進不去，於是它的
+    `wake_state=unwatched` 永遠數不到它們（2026-09-17 實測：真實池子裡 3 筆黑洞，
+    而 trace_backlog 回報 unwatched 0）。
+    """
+    from engine_b import event_watch as ew
+
+    store = leads.empty_store()
+
+    def _park(url: str, refs: dict | None = None) -> str:
+        lead_id, _ = leads.register(store, source="edgar:X", url=url, title="X 8-K")
+        leads.triage(store, lead_id, go=False, tier=1, reason="不追")
+        leads.advance(store, lead_id, "parked", ref=refs or None)
+        return lead_id
+
+    hole = _park("https://e/1")
+    with_pq2 = _park("https://e/2", {"pq2_ref": "601"})
+    terminal = _park("https://e/3", {"trace_status": "not_pursued",
+                                     "parked_reason": "trace 已終局"})
+    watched = _park("https://e/4")
+
+    watch_data = ew.load_watches()
+    ew.add_watch(watch_data, kind="related_entity_signal", wake_lead=watched,
+                 expires="2027-01-01", entities=["X"])
+    ew.save_watches(watch_data)
+
+    holes = {row["lead_id"] for row in leads.parked_without_expiry(store)}
+    assert hole in holes
+    assert with_pq2 not in holes, "有 pq2 編號＝球在待辦池，它自己有生命週期"
+    assert terminal not in holes, "terminal trace_status＝追源已有終局，不需要回來"
+    assert watched not in holes, "有 watch＝會被事件或到期喚醒"
+
+
+def test_parked_without_expiry_ignores_free_text_parked_reason() -> None:
+    """`parked_reason` 是自由文字，**不得決定去留**（L16-3）。
+
+    一筆寫著「只是治理公告、無 thesis 內容」的 lead 讀起來像終局，但機器讀不到散文。
+    要讓機器知道它是終局，正確做法是給它一個 terminal `trace_status`。
+    """
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="edgar:X", url="https://e/9", title="X 8-K")
+    leads.triage(store, lead_id, go=False, tier=1, reason="治理")
+    leads.advance(store, lead_id, "parked", ref={
+        "parked_reason": "governance_only_bylaw_quorum_no_supply_chain_or_thesis_content"})
+
+    assert {row["lead_id"] for row in leads.parked_without_expiry(store)} == {lead_id}

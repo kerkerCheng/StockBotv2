@@ -465,7 +465,8 @@ def build_queue(*, state_dir: Path | None = None) -> Section:
 
     section = Section(3, SECTION_TITLES[2])
 
-    leads = leads_mod.load().get("leads") or {}
+    leads_store = leads_mod.load()
+    leads = leads_store.get("leads") or {}
     watches = event_watch.load_watches().get("watches") or []
     pool = todo_mod.load()
     todo_items = pool.get("items") or []
@@ -513,7 +514,20 @@ def build_queue(*, state_dir: Path | None = None) -> Section:
     )
 
     expired = sum(1 for w in watches if str(w.get("status") or "") == "expired")
-    section.lines.append(f"到期歸檔 watch {expired}｜事件監看總數 {len(watches)}")
+    line = f"到期歸檔 watch {expired}｜事件監看總數 {len(watches)}"
+    # ROADMAP Phase 6（D15，2026-09-17 使用者核准 A 案）：**沒有到期的等待**要自己出現。
+    # 原提案是「parked 超過 60 天自動 expired」，實測推翻——479 筆 parked 裡 413 筆是
+    # terminal trace_status（那是歸檔不是等待），而真正沒有任何機制會回來的只有個位數。
+    # 所以落點不是新增一個 lead 狀態，是讓黑洞變成一個**會自己出現的計數器**（L14）。
+    try:
+        holes = leads_mod.parked_without_expiry(leads_store)
+    except Exception as exc:  # noqa: BLE001 — 這一格壞掉不該把整段帶走
+        line += f"｜⚠ 無到期的等待：盤點失敗（{type(exc).__name__}）"
+    else:
+        line += (f"｜⚠ **無到期的等待 {len(holes)}**（既沒有 watch、沒有 pq2 編號，"
+                 f"trace 也沒有終局）：" + "、".join(h["source"] for h in holes[:4])
+                 if holes else "｜無到期的等待 0")
+    section.lines.append(line)
 
     if observation["unmapped"]:
         section.lines.append(

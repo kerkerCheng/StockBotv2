@@ -422,3 +422,17 @@ def test_task_uses_the_existing_publisher_not_a_second_outbound_path() -> None:
     for second_path in ("import requests", "import httpx", "urllib.request",
                         "from notifications", "import notifications", "webhook_url"):
         assert second_path not in source, second_path
+
+
+def test_queue_section_surfaces_waits_without_an_expiry() -> None:
+    """心跳第 3 段必須把「沒有到期的等待」印出來（ROADMAP Phase 6，使用者核准 A）。
+
+    原提案是「parked 超過 60 天自動 expired」，實測推翻——479 筆 parked 裡 413 筆是
+    terminal trace_status（**那是歸檔不是等待**），真正沒有任何機制會回來的只有個位數。
+    所以落點不是新增一個 lead 狀態，是讓黑洞變成**會自己出現的計數器**（L14：真正的防呆
+    是常駐計數器，不是要人讀的段落）。
+    """
+    section = hb.build_queue()
+    text = "\n".join(section.lines)
+
+    assert "無到期的等待" in text, "這個計數器必須每天出現，0 也要印"

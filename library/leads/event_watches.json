@@ -3559,6 +3559,81 @@
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
       "woken_by": null
+    },
+    {
+      "watch_id": "ew_0091_2026-09-17",
+      "created_at": "2026-09-17T14:29:20.741945+00:00",
+      "expires": "2027-01-15",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AXTI",
+        "co:axt"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_f6d7fdd6bff7d38b4edf021c49835f5f",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "2026-09-17 ROADMAP Phase 6：park 當下沒有留下任何追源標記，既不在 trace_backlog 的視野裡、也沒有 watch——**補的是期限，不是判定它還值得追**。到期後由使用者決定續等或放棄。",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0092_2026-09-17",
+      "created_at": "2026-09-17T14:29:20.751658+00:00",
+      "expires": "2027-01-15",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AMD",
+        "co:amd"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_58cf007b302a50a1e3d05e7dfe6acef7",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "2026-09-17 ROADMAP Phase 6：park 當下沒有留下任何追源標記，既不在 trace_backlog 的視野裡、也沒有 watch——**補的是期限，不是判定它還值得追**。到期後由使用者決定續等或放棄。",
+      "status": "active",
+      "woken_by": null
+    },
+    {
+      "watch_id": "ew_0093_2026-09-17",
+      "created_at": "2026-09-17T14:29:20.762834+00:00",
+      "expires": "2027-01-15",
+      "kind": "related_entity_signal",
+      "until": null,
+      "entities": [
+        "AXTI",
+        "co:axt"
+      ],
+      "fact": "",
+      "fact_check_ref": "",
+      "wake_pq2": null,
+      "hypothesis_ref": "",
+      "wake_lead": "lead_44ce140c224422130eecf4bb9766219e",
+      "consumed_entities": [],
+      "poll": {
+        "eligible": false,
+        "last_checked": null,
+        "query_hint": ""
+      },
+      "note": "2026-09-17 ROADMAP Phase 6：park 當下沒有留下任何追源標記，既不在 trace_backlog 的視野裡、也沒有 watch——**補的是期限，不是判定它還值得追**。到期後由使用者決定續等或放棄。",
+      "status": "active",
+      "woken_by": null
     }
   ]
 }

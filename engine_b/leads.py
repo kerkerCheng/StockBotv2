@@ -705,6 +705,62 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda row: (not row["requires_user"], row["lead_id"]))
 
 
+def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """所有 parked lead 裡，**沒有任何機制會讓它回來**的那些（INV-2 的黑洞）。
+
+    ⚠ 這不是 `trace_backlog` 的子集，而是它看不到的那一塊。`trace_backlog` 的入口條件是
+    「有 `trace_status` 或 `parked_reason` 含 trace」——park 時**沒有留下任何追源標記**的
+    lead 連進都進不去，於是它的 `wake_state=unwatched` 永遠數不到它們。
+    `ensure_trace_watch` 的 docstring 逐字寫著「沒有具名標的就不假裝在等，由
+    wake_state=unwatched 現形」，而那條路對這一批是走不到的——**管子只接了一頭**（L13-1）。
+    事發（2026-09-17，ROADMAP Phase 6）：實測 479 筆 parked 裡有 4 筆屬於這一類，
+    而 `trace_backlog` 回報的 `unwatched` 是 0。
+
+    判準刻意**全部可機械驗證**，不讀任何自由文字（L16-3：自由字串不得決定去留）：
+
+    - 有非 consumed 的 Event Watch → 會被事件或到期喚醒；
+    - `refs.pq2_ref` 有值 → 球在待辦池那邊，pq2 編號自己有生命週期；
+    - terminal `trace_status` → 不需要回來（追源已有終局）；
+    - 以上皆無 → **黑洞**。
+
+    ⚠ `parked_reason` 刻意不採信：它是自由文字。一筆寫著「只是治理公告、無 thesis 內容」
+    的 lead 讀起來像終局，但機器讀不到——要讓機器知道它是終局，正確做法是給它一個
+    terminal `trace_status`，不是讓這個計數器去讀散文。
+    """
+
+    from engine_b import event_watch as ew_mod
+
+    watch_data = ew_mod.load_watches()
+    watched = {
+        str(watch.get("wake_lead") or "")
+        for watch in watch_data.get("watches", [])
+        if watch.get("wake_lead") and watch.get("status") != "consumed"
+    }
+    registry = get_trace_status_registry()
+    holes: list[dict[str, Any]] = []
+    for lead in store["leads"].values():
+        if lead.get("status") != "parked":
+            continue
+        lead_id = str(lead.get("lead_id") or "")
+        if lead_id in watched:
+            continue
+        refs = lead.get("refs") or {}
+        if str(refs.get("pq2_ref") or "").strip():
+            continue
+        trace_status = str(refs.get("trace_status") or "").strip()
+        if trace_status and registry.is_terminal(trace_status):
+            continue
+        title = " ".join(str(lead.get("title") or "").split())
+        holes.append({
+            "lead_id": lead_id,
+            "source": lead.get("source") or "",
+            "title": title[:197] + "..." if len(title) > 200 else title,
+            "first_seen": lead.get("first_seen"),
+            "trace_status": trace_status or None,
+        })
+    return sorted(holes, key=lambda row: (str(row["first_seen"]), row["lead_id"]))
+
+
 def requeue_trace(
     store: dict[str, Any],
     lead_id: str,
