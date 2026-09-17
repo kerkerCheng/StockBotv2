@@ -1,0 +1,292 @@
+"""`python -m query.structure <node>` — 把一個節點的五個結構角度一次查出來。
+
+## 為什麼需要它
+
+**瓶頸性不是一條邊。** 2026-09-17 實測：「CW DFB laser 是不是瓶頸」的答案是由四個不同角度的邊
+湊出來的，沒有任何一條邊自己說得出來——
+
+| 角度 | 實際的邊 | 值 | 單獨看會誤導成 |
+|---|---|---|---|
+| 需求側 | `tech:pluggable_transceiver` depends_on 它 | sub 4 | 「這是個大瓶頸」 |
+| 供給側 | 六家 supplies_to 它 | 4–5／3／3／2／2／2 | 「沒人卡住，不重要」 |
+| 下一層 | 它 depends_on `mat:inp_substrate` | sub 5 | — |
+| 反向 | `prod:blazar` competes_with 它 | — | — |
+
+四條放在一起才是答案：**技術繞不掉、但供應層競爭、而且更卡的在它下游**
+——那是「量的賭注」的形狀，不是「護城河」的形狀。
+
+而這件事今天**沒有任何 owner**：`rank_bottlenecks()` 一次只看一條邊（而且只看 `src` 為 `co:` 的
+向下邊，所以技術層那條 sub=4 結構上讀不到）。把四條邊讀在一起只在互動 session 裡臨時發生，
+做完就散。本模組把「來回查圖」從十幾次手打查詢變成一條命令。
+
+## 它明確不做的事
+
+- **零 LLM、零推理、零判斷。** 它只把五個角度的邊查出來排好——**A 還是 B 由人（或互動 session
+  的 LLM）讀完之後判斷**，不由本模組決定。
+- **不過濾、不排序、不給分數。** `rank_bottlenecks()` 仍是唯一排序權威；本模組不產生第二套排序。
+- **不寫任何 authority。** 純讀。
+
+## 維護：存輸入，不存結論
+
+`--json` 的輸出帶一個 `result_digest`，它是**五個角度的查詢結果**的指紋，不是「我讀過哪幾條邊」
+的清單。這個分別是刻意的：**最危險的變化是「多了一條我當初沒讀到的邊」**——
+例如有人替 CW laser 補上第七家供應商，供給側分布就變了、A/B 判讀可能翻轉。
+存「我讀過這四條」偵測不到它；存「這五條查詢當時回這個集合」偵測得到。
+
+所以 staleness 偵測是**零 LLM 的**：重跑一次、比 digest。只有真的變了才需要重新推理。
+
+⚠ **界線要講清楚**：這套機制維護的是「**讀圖結論跟圖還一不一致**」，
+**不是「讀圖結論對不對」**。對不對要靠 outcome 量測。一份跟圖完全一致但判斷錯誤的讀圖，
+這套機制永遠不會叫——那是設計如此，不是漏洞。
+
+用法：
+
+    python -m query.structure tech:cw_dfb_laser
+    python -m query.structure tech:cw_dfb_laser --json      # 給讀圖紀錄用，帶 result_digest
+    python -m query.structure tech:cw_dfb_laser --digest     # 只印 digest（給 staleness 比對）
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import os
+import sys
+from collections import Counter
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Iterable, Mapping
+
+ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from query.bottleneck import (  # noqa: E402
+    UPSTREAM_RELATIONS, CanonicalEdge, build_upward_index, collapse_assertions,
+    demand_chain, fetch_assertions,
+)
+
+#: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
+#: 真的問出答案的四次查詢，第五個是排序本來就有的可達性檢查。
+#: ⚠ 要加第六個角度前先問：它在哪一個實際案例裡改變過結論？答不出來就不要加（L17-4）。
+ANGLES: tuple[tuple[str, str], ...] = (
+    ("demand_side", "需求側：誰需要它、繞不繞得過"),
+    ("supply_side", "供給側：誰供它、有沒有人獨佔"),
+    ("next_layer", "下一層：它自己卡在誰身上"),
+    ("counter_path", "反向路徑：有沒有東西在取代它"),
+    ("anchor", "需求錨：走不走得到有人花錢的地方"),
+)
+
+#: 哪些 relation 算「需求側」——與 `build_upward_index` 同一組語意，但這裡是**看向這個節點**：
+#: `A depends_on N` ⇒ A 需要 N；`N is_component_of B` ⇒ B 需要 N。
+_DEMAND_INBOUND = ("depends_on",)
+_DEMAND_OUTBOUND = ("is_component_of", "enables")
+_COUNTER = ("competes_with", "constrained_by")
+
+
+@dataclass
+class EdgeView:
+    src: str
+    relation: str
+    dst: str
+    substitutability: int | None
+    sole_source: bool | None
+    qualification_status: str | None
+    evidence: str | None
+    documents: int
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "src": self.src, "relation": self.relation, "dst": self.dst,
+            "substitutability": self.substitutability, "sole_source": self.sole_source,
+            "qualification_status": self.qualification_status,
+            "evidence": self.evidence, "documents": self.documents,
+        }
+
+    def key(self) -> tuple:
+        """進 digest 的欄位——**值變了就算變**，不只是邊在不在。"""
+        return (self.src, self.relation, self.dst, self.substitutability,
+                self.sole_source, self.qualification_status, self.evidence)
+
+
+@dataclass
+class StructureView:
+    node: str
+    angles: dict[str, list[EdgeView]] = field(default_factory=dict)
+    anchor_chain: list[str] | None = None
+
+    def result_digest(self) -> str:
+        """五個角度**查詢結果**的指紋。
+
+        ⚠ 排序過才 hash——邊的回傳順序不保證穩定，不排序會讓 digest 每次都不同，
+        那會讓 staleness 偵測恆亮（L14-4「恆亮＝零鑑別力」）。
+        """
+        payload = {
+            name: sorted(str(e.key()) for e in self.angles.get(name, ()))
+            for name, _ in ANGLES if name != "anchor"
+        }
+        payload["anchor"] = list(self.anchor_chain or [])
+        blob = json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "node": self.node,
+            "angles": {
+                name: [e.as_dict() for e in self.angles.get(name, ())]
+                for name, _ in ANGLES if name != "anchor"
+            },
+            "anchor_chain": self.anchor_chain,
+            "result_digest": self.result_digest(),
+            "this_is_not": (
+                "這是五個角度的邊，不是判斷。A（護城河）還是 B（量）由讀的人決定；"
+                "本模組不過濾、不排序、不給分數、不寫任何 authority。"
+            ),
+        }
+
+
+def _view(edge: CanonicalEdge) -> EdgeView:
+    return EdgeView(
+        src=edge.src, relation=edge.relation, dst=edge.dst,
+        substitutability=edge.substitutability, sole_source=edge.sole_source,
+        qualification_status=edge.qualification_status,
+        evidence=edge.evidence, documents=edge.documents,
+    )
+
+
+def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
+    """把一個節點的五個角度查出來。**不判斷、不排序、不過濾。**"""
+    edges = list(edges)
+    view = StructureView(node=node)
+
+    view.angles["demand_side"] = [
+        _view(e) for e in edges
+        if (e.dst == node and e.relation in _DEMAND_INBOUND)
+        or (e.src == node and e.relation in _DEMAND_OUTBOUND)
+    ]
+    view.angles["supply_side"] = [
+        _view(e) for e in edges
+        if e.dst == node and e.relation == "supplies_to"
+    ]
+    view.angles["next_layer"] = [
+        _view(e) for e in edges
+        if e.src == node and e.relation == "depends_on"
+    ]
+    view.angles["counter_path"] = [
+        _view(e) for e in edges
+        if (e.dst == node or e.src == node) and e.relation in _COUNTER
+    ]
+    view.anchor_chain = demand_chain(node, build_upward_index(edges))
+    return view
+
+
+def _sub_distribution(rows: Iterable[EdgeView]) -> str:
+    """供給側的**分布**——單一最大值不是答案，分布才是。"""
+    values = [e.substitutability for e in rows]
+    filled = sorted((v for v in values if v is not None), reverse=True)
+    unfilled = sum(1 for v in values if v is None)
+    if not filled and not unfilled:
+        return "（無）"
+    parts = ["／".join(str(v) for v in filled) or "（都沒填）"]
+    if unfilled:
+        parts.append(f"另有 {unfilled} 條未填")
+    return "｜".join(parts)
+
+
+def render_markdown(view: StructureView) -> str:
+    out = [
+        f"# 結構讀圖：`{view.node}`",
+        "",
+        "> **零 LLM、零判斷。** 這是五個角度的邊，不是結論——"
+        "A（護城河）還是 B（量）由讀的人決定。",
+        "> ⚠ **單看任何一個角度都會誤導**：需求側高會讓你以為有護城河，"
+        "供給側分散會讓你以為不重要。要一起讀。",
+        "",
+        f"`result_digest`：`{view.result_digest()[:16]}…`"
+        "（五個角度的**查詢結果**指紋；重跑比對即可偵測 stale，零 LLM）",
+        "",
+    ]
+    for name, label in ANGLES:
+        if name == "anchor":
+            out.append(f"\n## {label}\n")
+            if view.anchor_chain:
+                out.append(f"✅ {' → '.join(view.anchor_chain)}"
+                           f"　（距需求端 {len(view.anchor_chain) - 1} 跳）")
+            else:
+                out.append("🔴 **走不到任何已登記的需求錨**"
+                           "——可能是鏈真的斷了，也可能是走訪清單沒收那個 relation。")
+            continue
+        rows = view.angles.get(name, [])
+        out.append(f"\n## {label}（{len(rows)} 條）\n")
+        if not rows:
+            out.append("（無）")
+            continue
+        if name == "supply_side":
+            out.append(f"**sub 分布：{_sub_distribution(rows)}**"
+                       "　← 有人明顯高於其他＝可能是 A；大家都低＝可能是 B\n")
+        out.append("| 邊 | sub | sole | 合格狀態 | 證據 | 文件 |")
+        out.append("|---|---|---|---|---|---|")
+        for e in sorted(rows, key=lambda r: -(r.substitutability or 0)):
+            out.append(
+                f"| `{e.src}` {e.relation} `{e.dst}` | {e.substitutability if e.substitutability is not None else '—'} "
+                f"| {'✓' if e.sole_source else ('✗' if e.sole_source is False else '—')} "
+                f"| {e.qualification_status or '—'} | {e.evidence or '—'} | {e.documents} |"
+            )
+    out.append(
+        "\n---\n\n⚠ **本工具維護的是「讀圖結論跟圖還一不一致」，不是「結論對不對」。**"
+        "\n對不對要靠 outcome 量測——一份跟圖完全一致但判斷錯誤的讀圖，digest 永遠不會變。"
+    )
+    return "\n".join(out)
+
+
+def _load_edges() -> list[CanonicalEdge]:
+    from dotenv import load_dotenv
+    from neo4j import GraphDatabase
+
+    load_dotenv()
+    password = os.environ.get("NEO4J_PASSWORD")
+    if not password:
+        raise SystemExit("請設 NEO4J_PASSWORD")
+    driver = GraphDatabase.driver(
+        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+        auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
+    )
+    try:
+        with driver.session() as session:
+            rows = fetch_assertions(session)
+    finally:
+        driver.close()
+    # ⚠ 共用 `collapse_assertions`，不自己收斂——否則結構讀圖與排序會對同一條邊
+    # 給出不同的值，而那是 L16 說的「每個消費端重造一份，重造品立刻開始偏離」。
+    return list(collapse_assertions(rows).values())
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="把一個節點的五個結構角度一次查出來（零 LLM、零判斷）")
+    parser.add_argument("node", help="節點 id，如 tech:cw_dfb_laser 或 co:coherent")
+    parser.add_argument("--json", action="store_true", help="機器可讀，帶 result_digest")
+    parser.add_argument("--digest", action="store_true", help="只印 result_digest（staleness 比對用）")
+    args = parser.parse_args(argv)
+
+    edges = _load_edges()
+    known = {e.src for e in edges} | {e.dst for e in edges}
+    if args.node not in known:
+        # ⚠ 「圖裡沒這個節點」與「這個節點沒有邊」是兩件事，要分得開（INV-3／L12）。
+        print(f"⚠ `{args.node}` 在圖的邊裡沒有出現過。"
+              f"\n  這可能是 ①節點 id 打錯（不要憑名字猜，唯一權威是 config/company_identity.json）"
+              f"\n  ②它真的還沒有任何邊——那是研究缺口，不是查詢失敗。", file=sys.stderr)
+        return 2
+
+    view = build_structure(args.node, edges)
+    if args.digest:
+        print(view.result_digest())
+    elif args.json:
+        print(json.dumps(view.as_dict(), ensure_ascii=False, indent=2))
+    else:
+        print(render_markdown(view))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
