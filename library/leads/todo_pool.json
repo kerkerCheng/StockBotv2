@@ -10153,6 +10153,7 @@
     {
       "added_at": "2026-09-17T08:59:53.580551+00:00",
       "company_id": "co:win_semiconductor",
+      "deferred_at": "2026-09-17T11:16:47.888648+00:00",
       "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
       "n": 598,
       "reason": null,
@@ -10180,10 +10181,11 @@
       "added_at": "2026-09-17T10:50:01.128725+00:00",
       "hint": "本輪已寫入 AXTI 的 variant 賭注（oa_56b08e724e0c146c 營收成長 0.9213／oa_e4022700b5209d7b 營益率 delta 0.4040，payoff −26.96%），但 thesis lifecycle 的 disproof_condition 還是舊的。依 L7（disproof 要附核查頻率＋觸發後 48h 動作），要補三條：①Q3 2026 財報營收 ≥ US$60M；②AXT 公告取得對美 InP 出口許可；③公司揭露 InP ASP 一手數字且證實大幅上漲。三條都寫在 variant 的 rationale 裡，但 thesis mutation 是四個人工 gate 之一，必須逐筆核准。",
       "n": 600,
-      "reason": null,
+      "reason": "使用者 2026-09-17 批次 go。交付：lane memo 新增第 7b 節（variant 對齊＋L7 三件套），lifecycle.json 的 axt_inp.note 記錄本次 mutation、last_checked → 2026-09-17。⚠ 提案時的前提部分錯誤：實測第 7 節已有六條 disproof，我要加的三條裡有兩條已經存在（對美出口許可＝第 4 條、ASP 揭露＝第 1 條），真正缺的只有一條——Q3 2026 營收 ≥ US$60M；原第 5 條問的是下界（低於 Q2 的 47.589M），而 variant 賭的是沒有大幅上行，中間那段 47.6M～60M 先前沒有任何條件在看。已補核查頻率（每季隨 Q3／Q4 財報）與觸發後 48h 動作。⚠ 誠實記下：這三條每季核查今天靠人，機器對照不到（metric_observations 只從 fiscal_year_results 攤平）。⚠ 第 7 節有幾條是 v3 偏多沿用、方向在 v4 謹慎偏空後可能已反，本次刻意不動——逐條重判是一次完整 thesis 重寫。",
+      "receipt": "authority:thesis_lifecycle; ref:axt_inp",
       "ref_id": "manual:600",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-17T11:16:25.706717+00:00",
       "source": "manual",
       "title": "AXTI thesis 的 disproof 更新為 variant 的三條可觀測條件",
       "type": "manual"
@@ -10192,12 +10194,25 @@
       "added_at": "2026-09-17T10:50:13.615879+00:00",
       "hint": "讀圖 sr_81832cb37d87ab1d（2026-09-17 判 volume）的第 ④ 條 disproof 是「任一家宣布大規模擴產計畫（JX 現在明說沒有）」。本輪讀 Q2 10-Q 發現：AXT 在 2026-04-22 完成次級發行 9,844,357 股 @US$64.25，淨額 US$600.1M，用途逐字是 'to financially support our subsidiary Tongmei in its efforts to increase its manufacturing capacity to produce indium phosphide substrates for export worldwide'，另與 Coherent 約定 2026-2028 擴充北京產能。⚠ 這不推翻 volume 判定（三家仍可替代、擴產要到 2027-2028），但它讓「產能補不上」這個賭注**有了明確的到期日**——而讀圖現在沒有記這件事。要 append 一筆新讀圖重新判讀，屬研究判斷。",
       "n": 601,
-      "reason": null,
+      "reason": "使用者 2026-09-17 批次 go。重看的結果比提案時知道的多得多：提案寫的是「AXT 自己已募 600M 擴產」，實測是**三家同時擴、而且自家 thesis 六週前就記了**——JX 四年最多 1,200 億日圓／產能 FY2025 的 7-10 倍（官方新聞稿，已入圖 jx_metals_inp_capacity_pr_2026_06_16）、住友 180 億日圓／FY2028 達 FY2024 的 3.1 倍、AXT 2026-2028 履約擴產＋US$600.1M 募資。thesis axt_inp 的 prior_disproof_trigger 逐字記著 2026-08-04「第 7 節第 6 條已觸發，且是兩家同時、規模遠大於預期」，並已據此 revise 成 v4、方向轉為謹慎偏空。⚠ 所以前一筆讀圖引用 GSR 的「JX Metals has no announced expansion plans」在寫下時已經錯了六週。⚠ 機制性原因（lane memo 第 3 節自己寫了）：JX 的證據已入圖但掛在 co:jx_advanced_metals，圖中缺 AXT↔JX 的 competes_with 邊，所以不在 context slice、query.structure 走不到——一份讀圖的可信度上限是它走得到的那些邊。已鑄 [602] 補那條邊（graph admission，待核准）。判定維持 volume（兩個判準都沒變），改變的是「一時補不上」有了具體期限 2026-2028，且 disproof ④ 已觸發並改寫、新增第 ⑥ 條（Coherent 垂直整合）。",
+      "receipt": "authority:structure_reading; ref:sr_88340b81269fa1c2",
       "ref_id": "manual:601",
+      "resolution": "go",
+      "resolved_at": "2026-09-17T11:16:41.140572+00:00",
+      "source": "manual",
+      "title": "mat:inp_substrate 讀圖的 disproof ④ 要重看——AXT 自己已募 600M 專款擴 InP 產能",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T11:15:43.411481+00:00",
+      "hint": "lane memo axt_inp 第 3 節在 2026-08-04 就寫著：JX 的 InP 擴產證據已入圖（doc_id jx_metals_inp_capacity_pr_2026_06_16，四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍，官方新聞稿 tier 2），但掛在 co:jx_advanced_metals 節點上，而圖中缺少 AXT↔JX 的 competes_with 邊（住友有、JX 沒有），因此不在 AXT 的 context slice 中、無法以 [E#] 引用，memo 已把補這條邊列為後續行動。六週後仍未補，後果實測到了：2026-09-17 的 mat:inp_substrate 讀圖因為 query.structure 走不到那個角度，改用外部 GSR 的『JX Metals has no announced expansion plans』，而那句話當時已經錯了六週（見 sr_88340b81269fa1c2）。⚠ 這是 graph admission，要逐筆核准。補邊之後 mat:inp_substrate 的讀圖應會自動偵測到 digest 變動並要求重讀——那正是 Q5 機制該起作用的地方。",
+      "n": 602,
+      "reason": null,
+      "ref_id": "manual:602",
       "resolution": null,
       "resolved_at": null,
       "source": "manual",
-      "title": "mat:inp_substrate 讀圖的 disproof ④ 要重看——AXT 自己已募 600M 專款擴 InP 產能",
+      "title": "補 co:axt --competes_with--> co:jx_advanced_metals 邊（讀圖走不到 JX 擴產的機制性原因）",
       "type": "manual"
     }
   ],
@@ -21915,8 +21930,35 @@
       "ref_id": "manual:599",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-17T11:16:25.706717+00:00",
+      "n": 600,
+      "reason": "使用者 2026-09-17 批次 go。交付：lane memo 新增第 7b 節（variant 對齊＋L7 三件套），lifecycle.json 的 axt_inp.note 記錄本次 mutation、last_checked → 2026-09-17。⚠ 提案時的前提部分錯誤：實測第 7 節已有六條 disproof，我要加的三條裡有兩條已經存在（對美出口許可＝第 4 條、ASP 揭露＝第 1 條），真正缺的只有一條——Q3 2026 營收 ≥ US$60M；原第 5 條問的是下界（低於 Q2 的 47.589M），而 variant 賭的是沒有大幅上行，中間那段 47.6M～60M 先前沒有任何條件在看。已補核查頻率（每季隨 Q3／Q4 財報）與觸發後 48h 動作。⚠ 誠實記下：這三條每季核查今天靠人，機器對照不到（metric_observations 只從 fiscal_year_results 攤平）。⚠ 第 7 節有幾條是 v3 偏多沿用、方向在 v4 謹慎偏空後可能已反，本次刻意不動——逐條重判是一次完整 thesis 重寫。",
+      "receipt": "authority:thesis_lifecycle; ref:axt_inp",
+      "ref_id": "manual:600",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-17T11:16:41.140572+00:00",
+      "n": 601,
+      "reason": "使用者 2026-09-17 批次 go。重看的結果比提案時知道的多得多：提案寫的是「AXT 自己已募 600M 擴產」，實測是**三家同時擴、而且自家 thesis 六週前就記了**——JX 四年最多 1,200 億日圓／產能 FY2025 的 7-10 倍（官方新聞稿，已入圖 jx_metals_inp_capacity_pr_2026_06_16）、住友 180 億日圓／FY2028 達 FY2024 的 3.1 倍、AXT 2026-2028 履約擴產＋US$600.1M 募資。thesis axt_inp 的 prior_disproof_trigger 逐字記著 2026-08-04「第 7 節第 6 條已觸發，且是兩家同時、規模遠大於預期」，並已據此 revise 成 v4、方向轉為謹慎偏空。⚠ 所以前一筆讀圖引用 GSR 的「JX Metals has no announced expansion plans」在寫下時已經錯了六週。⚠ 機制性原因（lane memo 第 3 節自己寫了）：JX 的證據已入圖但掛在 co:jx_advanced_metals，圖中缺 AXT↔JX 的 competes_with 邊，所以不在 context slice、query.structure 走不到——一份讀圖的可信度上限是它走得到的那些邊。已鑄 [602] 補那條邊（graph admission，待核准）。判定維持 volume（兩個判準都沒變），改變的是「一時補不上」有了具體期限 2026-2028，且 disproof ④ 已觸發並改寫、新增第 ⑥ 條（Coherent 垂直整合）。",
+      "receipt": "authority:structure_reading; ref:sr_88340b81269fa1c2",
+      "ref_id": "manual:601",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-17T11:16:47.888648+00:00",
+      "n": 598,
+      "reason": "使用者 2026-09-17 指示 pending。collector 自動鑄的 decision_review，不在本輪兩件事的線上——穩懋補獨立來源需要客戶端或第三方文件，屬 bounded research，等排到 pq1。",
+      "receipt": null,
+      "ref_id": "dc_68cf04ebd9843573116782bd733dfa5f",
+      "type": "decision_review",
+      "verb": "pending"
     }
   ],
-  "next_n": 602,
+  "next_n": 603,
   "schema_version": "1"
 }
