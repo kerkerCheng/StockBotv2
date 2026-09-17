@@ -209,6 +209,7 @@ ns.py` 不在 allowlist ✅；**1.2**（2026-09-17 全部現跑重量，不抄�
 | 舊表列（archive 的開放 backlog） | 舊標記 | 去向 |
 |---|---|---|
 | 賭注 V4：variant 收斂納入 outcome 量測 | ○ | **Phase 5**（量測） |
+| **`query/graph_context.py` 的 claim 截斷不說話——讀圖只看得到 154 條裡的 20 條，而截斷本身沒有任何訊號**（2026-09-17 實測發現） | 🔴 | **Z2 proposal**（改的是排序與呈現契約，不是補資料）。⚠ **這是 [602] 提案時以為的病因的真正病因**：診斷寫「圖中缺 AXT↔JX 的 `competes_with` 邊，所以 JX 的擴產證據不在 AXT 的 context slice 裡」——實測**最短路徑只有 2 跳**（`co:axt → mat:inp_substrate → co:jx_advanced_metals`），早就在 `_Q_COMPANY_CLAIMS` 的 `[*1..2]` 母體內；真正被擋住的是 `LIMIT`：`claim_limit=20` 時 JX 出現 **0 次**，`claim_limit=200` 時出現 **7 次**。排序鍵是 `demand_proof_level` + `confidence DESC`（**不是跳數也不是相關性**），JX 那三條 confidence 0.8／0.8／0.75 排在 0.90 那批後面就被切掉。**補一條邊改不動這件事**——它會讓供應關係表多一列，但 claim 的排名一位都不會動。形狀是 F-20（截斷集合被當全集），而且**沒有任何東西會變紅**。查證：`python -c "from query.graph_context import build_context; ...build_context(d, company_id='co:axt', claim_limit=20 vs 200)"` 數 `JX Advanced Metals` 出現次數 |
 | `review_conditions` 對照不到期中實績——`metric_observations` 只從 `fiscal_year_results` 攤平，而半年／季別的期中觀測在 `OBSERVATION_PERIOD_KINDS`（只有 `fiscal_year`／`fiscal_quarter`）下**表達不出來**（2026-09-17 寫 AXTI variant 時撞到） | 🔶 | **Z2 proposal**（動封閉字彙＝動 contract，依 L17-2 不是當下修）。⚠ 後果是具體的：AXTI variant 的每季核查條件只能靠人看 Q3／Q4 財報，機器對照要等 FY2026 年報（約 2027-02）——**一個會響但太晚響的火警**（L7）。 |
 | APP 的標的列表還不知道「等財報」這種終局——它會顯示成「還沒做」（2026-09-12） | ○ | 維持營運（當下修檔次，不占 Phase） |
 | AEVA／TSEM 已查證未揭露（2026-09-04） | ○ | 留 archive（資訊，不是工作） |
