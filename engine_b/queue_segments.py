@@ -17,7 +17,12 @@
 
 - `mechanical`：確定性命令、零 token（fired 重排、reassess、pq2 翻醒）。**不吃** pq1 的
   `drain_limit_per_run`。
-- `research`：要 web search／讀文件／寫判斷，共用 `drain_limit_per_run`，順序由
+- `research`：要 web search／讀文件／寫判斷。⚠ **2026-09-17 更正：只有 `engine_b.cli drain` 那條路徑
+  吃 `drain_limit_per_run`**（唯一執行點 `engine_b/cli.py::_cmd_drain`）。`pending_triage` 雖然也標
+  `research`，但它的 consumer 是 `engine_b.cli triage`，**完全不讀 routine_config**——所以 D12 把
+  `drain_limit_per_run` 歸零（daily 不做研究）**不會關掉分類層**，那正是三層拆分要的效果。
+  原句寫「共用 `drain_limit_per_run`」在 limit 歸零後就變成假的，留著會讓下一個讀者以為 triage 也停了。
+  順序由
   `engine_b/priority.py`（lead）與 Decision Store 的 work order 排序決定——本模組**不排序**，
   只回答「這一筆屬於哪一段、誰會來取」。
 
@@ -39,7 +44,8 @@ class Segment:
     key: str
     order: int
     label: str
-    #: "mechanical"（零 token，不吃 pq1 預算）或 "research"（共用 drain_limit_per_run）
+    #: "mechanical"（零 token，不吃 pq1 預算）或 "research"（要 token）。
+    #: ⚠ `research` **不等於**「吃 drain_limit_per_run」——見檔頭：只有 drain 那條路徑吃它。
     cost: str
     #: 誰會來取——命令字串或 skill 段落。**不得為空**：沒有 consumer 的段就是黑洞。
     consumer: str

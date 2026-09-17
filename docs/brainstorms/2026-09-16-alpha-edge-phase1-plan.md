@@ -181,6 +181,55 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 
 ⚠ **第 6 項兩個問題在同一份文件上，正解是一次 supersede 同時修掉**，不要分兩次改同一份 extraction。
 
+## 2f. §2e 六項的處置結果（2026-09-17，使用者「六項照你建議」＋批次 `587 588 589 590 go`）
+
+| # | 編號 | 結果 |
+|---|---|---|
+| 1 | **[586]** | 已設 `pending --trigger`：等 Himax 或長約對手方首次具名確認。不需要使用者動作 |
+| 2 | **[588] ✅** | Sivers 補兩條邊（`tech:dwdm_laser_array`、`co:o_net_technologies`）**皆判 2**，入圖待 **[594]** |
+| 3 | **[589] ✅** | ⚠ **前提是錯的**——要補的那條邊已經存在，見下 |
+| 4 | — | 併入 Phase 4，並把診斷更正為四種成因（見 ROADMAP Phase 4 那一列） |
+| 5 | **[587] ✅** | 穩懋補 substitutability **判 2**，入圖待 **[591]** |
+| 6 | **[590] ✅** | **不需要入圖核准**——見下 |
+
+**三個值得記的結果：**
+
+1. **[589] 的前提被實測推翻。** 工單說「先補邊再補格」，但圖裡**已經有**
+   `tech:cpo --constrained_by--> tech:cpo_full_stack_test`。真正的卡點是
+   `query/bottleneck.py` 的 `UPSTREAM_RELATIONS = ("enables", "is_component_of")` 不含 `constrained_by`，
+   所以 `build_upward_index` 跳過它。**那是開發項不是研究項**，而且本輪明確不得改排序邏輯。
+   ⚠ **刻意不用「再補一條 relation 不同但語意相同的邊」去繞過 traversal**——那是用資料操弄排序，比改程式更糟。
+   順手查另外五個節點，發現六個「走不到錨」其實是**四種成因**（constrained_by 未走訪／`enables` 一表兩義／
+   真的沒有需求方邊／鏈長），全部寫進 ROADMAP Phase 4。
+
+2. **[590] 比預期輕：不需要 `ra_admission`。** ①`published_at` 2026-05-31 → 2026-05-07 走既有機械路徑
+   （`scripts/backfill_source_dating.py --supersede`，AGENTS 明列既有 SourceDoc 的 `published_at` 回填屬 mechanical、免 pq2）；
+   舊值不對應任何一手日期，很可能是月精度 `2026-05` 被取成月底。
+   ⚠ 方向要明記：新值比舊值**早**三週，as-of 投影是**擴大**可見範圍不是縮小。
+   ②CJK 相容表意文字：實測**兩份 extraction 與圖裡本來就都是 0 個**，126 個只存在於 `library/raw` 全文；
+   重抓後全文經 NFC 與舊檔**逐字相同（88,393 字完全一致）**，證明只有相容字元被修掉、沒有任何內容位移。
+   ③新發現（不在該項範圍）：`mops_4979_annual_report_2025` 沒有 canonical extraction，
+   兩份其他檔名的 extraction 共用該 doc_id、且 url 是手造的 `mopsov.twse.com.tw` 路徑——
+   **刻意不順手修**，造 canonical extraction 有機會在圖裡產生第二份 SourceDoc（L8 假交叉驗證的形狀）。
+
+3. **Phase 1 的「八家產品線營收占比」由 7 補到 8／8，達標。** AEHR 的那一格不需要 XBRL companyfacts
+   ——`revenues by product category` 表本來就在 10-K 正文裡（`mo_5a56be9daaef6ad94fd42bab4ee9093a`）。
+   ⚠ 順帶發現：Engine C 既有的 `segment_revenue_share` 對 AEHR 存的是同一張表的同一組數字，
+   代表「報導部門」與「產品線」被當成同一件事。
+
+**⚠ 四項研究全部得到否定結果：穩懋 2、Sivers DWDM 2、Sivers→O-Net 2，加上先前的聯亞 3、華星光 2、全新 2、英特磊 2。
+七家台股加 Sivers，沒有一條邊達到門檻 4。** 共同形狀是同一個：**夥伴關係公告很多，契約條款一條都沒有**
+——而 IQE→Tower 判 4 的唯一依據就是雙向最低採購承諾逐字可讀。
+這不是門檻太嚴，是這批標的目前真的沒有那種證據。
+
+**Ayar Labs 缺口的性質改變了（[588] 最值得記的發現）：** 先前記為「ayarlabs.com 對本機 UA 回 403」，
+本輪換路徑重試後發現——**Ayar Labs 現行網站上查不到任何具名 Sivers 的頁面**（`/press-releases/` 404、
+`/news/` 八則公告無一提及、兩個搜尋索引還留著的舊 slug 一個重導一個回 JPEG、`/supernova/` 不具名任何供應商）。
+**不是 UA 被擋，是內容已從現行站台移除，重抓不會解決。**
+依 OPERATIONS「斷鏈要不要重新下載補檔，取決於來源可不可變」，公司 newsroom 頁不可重抓；
+**Wayback 快照算不算一手是一個要先決定的契約問題**，本輪刻意不做。
+
+
 ## 4. Step 1.2 工單（七家；2026-09-16 實測現況）
 
 | 公司 | 向下邊 | 卡點 | 要做的事 |
