@@ -10131,13 +10131,21 @@
     },
     {
       "added_at": "2026-09-17T08:59:53.580551+00:00",
+      "completion_authority": {
+        "action_digest": "49ee167e91d88264cfa013c4e51e029ffe655b4831dc5d9757691ac018e890ac",
+        "cohort_id": "dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+        "commit": "aadd483cd193862cecbbd33c7e4f0ba4becb4789",
+        "company_id": "co:axt",
+        "verified_at": "2026-09-17T09:09:00.948334+00:00"
+      },
       "graph_impact": "+4 節點、7 邊、2 claims｜來源：Global Semi Research（tier 3）",
       "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
       "n": 597,
-      "reason": null,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_260be128d8019a0f05a877def55c52c3;digest:49ee167e91d88264cfa013c4e51e029ffe655b4831dc5d9757691ac018e890ac;commit:aadd483cd193862cecbbd33c7e4f0ba4becb4789;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
       "ref_id": "ra_260be128d8019a0f05a877def55c52c3",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-17T09:09:00.948334+00:00",
       "source": "research_action",
       "title": "[596] InP 基板供給側三條邊補 substitutability：AXT／住友／JX 全部判 3（三家寡占但互為替代——誠實的否定結果，沒有一檔因此進榜）",
       "type": "ra_admission"
@@ -10154,6 +10162,18 @@
       "source": "decision_lab",
       "title": "co:win_semiconductor：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
       "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-17T09:09:59.343990+00:00",
+      "hint": "[597] 入圖後 Q5 的 staleness 機制自動把這筆讀圖標成 stale，三條 high 級變化逐條寫著 「co:axt／co:sumitomo_electric／co:jx_advanced_metals → mat:inp_substrate 的 substitutability：None → 3」。缺的那一格已經補上，所以 undecided 不再是誠實的答案。go 之後會變的數字：心跳第 2 段由「該重讀 1」→ 0；那筆讀圖由 undecided 改判 volume。判 volume 的依據已經在圖上：需求側 15 條裡 7 條 sub=5、2 條 sub=4（繞不過），供給側分布 3／3／3（大家都差不多，沒有人獨佔）——那正是量的賭注的形狀，不是護城河。⚠ 真正的張力要寫進新的 reading：三家可替代性都只有 3，但產能全部補不上（住友飽和、AXT 近滿載且被中國出口管制卡、JX 無擴產），6 吋 InP 均價已漲 250%。「可替代但補不上」正是 DRAM 2017／ABF 2021 那一類樣式。做法：python -m alpha structure-reading mat:inp_substrate --add spec.json（帶 supersedes_id sr_d6760bfe5d6e9164）。⚠ 這是 append-only authority，所以掛號等你授權。",
+      "n": 599,
+      "reason": null,
+      "ref_id": "manual:599",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "mat:inp_substrate 讀圖重讀：undecided → volume（[597] 入圖後已 stale）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21852,8 +21872,17 @@
       "ref_id": "manual:596",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-17T09:09:00.948334+00:00",
+      "n": 597,
+      "reason": "Research Action durable apply＋Decision Shadow handoff 完成",
+      "receipt": "action:ra_260be128d8019a0f05a877def55c52c3;digest:49ee167e91d88264cfa013c4e51e029ffe655b4831dc5d9757691ac018e890ac;commit:aadd483cd193862cecbbd33c7e4f0ba4becb4789;cohort:dc_ab4aa345d1c85b0f3c365a0ec71dad13",
+      "ref_id": "ra_260be128d8019a0f05a877def55c52c3",
+      "type": "ra_admission",
+      "verb": "go"
     }
   ],
-  "next_n": 599,
+  "next_n": 600,
   "schema_version": "1"
 }
