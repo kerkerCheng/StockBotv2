@@ -224,14 +224,78 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         line += f"｜降級 {len(degraded)} 檔" + ("：" + "、".join(degraded) if degraded else "")
         section.lines.append(line)
 
-    # (c) APP：今天沒被 materialize 必須印出來（L12；AGENTS「APP 先讀得到，Daily 才能不印」）。
-    # ⚠ 同一段裡的三件事互不相干，所以**各自降級**：APP 那一格壞掉不該把 harvest 與行情一起帶走。
+    # (c) 台股月營收：**刻意不進無人值守**（ROADMAP Phase 6）——它的歷史頁按年月永久可查，
+    # 漏抓隨時補得回來（L10），與「漏一天就永久漏」的重訊性質相反。所以它不需要排程，
+    # 需要的是**該補的時候自己說話**：心跳每天印最新月份與落後幾個月，讓它變成會自己
+    # 出現的計數器而不是要人記得的段落（L14）。
+    try:
+        section.lines.append(_monthly_revenue_line(now=now))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"月營收盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"台股月營收：{absence.reason}（{absence.kind}）")
+
+    # (d) APP：今天沒被 materialize 必須印出來（L12；AGENTS「APP 先讀得到，Daily 才能不印」）。
+    # ⚠ 同一段裡的四件事互不相干，所以**各自降級**：APP 那一格壞掉不該把 harvest 與行情一起帶走。
     try:
         section.lines.append(_app_freshness_line(now=now, state_dir=state_dir))
     except Exception as exc:  # noqa: BLE001
         absence = Absence("upstream_unavailable", f"APP artifact 盤點失敗：{type(exc).__name__}")
         section.lines.append(f"APP materialize：{absence.reason}（{absence.kind}）")
     return section
+
+
+def _monthly_revenue_line(*, now: datetime) -> str:
+    """台股月營收的新鮮度。零網路——只讀本機 Engine C。
+
+    `lag` 是相對**法定公告期限**算的，不是相對今天：某月的營收要到次月 10 日才全部公告，
+    所以「9 月 5 日還沒有 8 月營收」是正常的，「9 月 17 日還沒有」才是落後。
+    """
+
+    from engine_c.db import get_conn
+    from engine_c.monthly_revenue import (
+        disclosure_deadline,
+        monthly_revenue_series,
+        registry_taiwan_tickers,
+    )
+
+    tickers = registry_taiwan_tickers()
+    if not tickers:
+        return "台股月營收：registry 裡沒有台股（capability_absent）"
+    conn = get_conn()
+    try:
+        latest: dict[str, str] = {}
+        empty: list[str] = []
+        for ticker in tickers:
+            payload = monthly_revenue_series(conn, ticker, limit=1)
+            rows = payload.get("series") or []
+            if not rows:
+                empty.append(ticker)
+                continue
+            latest[ticker] = str(rows[0].get("data_month") or "")
+    finally:
+        conn.close()
+    if not latest:
+        return f"台股月營收 {len(tickers)} 檔｜**一筆都沒有**（跑 `python -m engine_c.monthly_revenue --backfill 24`）"
+    newest = max(latest.values())
+    oldest = min(latest.values())
+    today = now.astimezone().date().isoformat()
+    # 已經過了公告期限、卻還沒抓進來的月份數。0＝跟上了。
+    lag = 0
+    year, month = int(oldest[:4]), int(oldest[5:7])
+    while lag <= 24:  # 防呆：不可能落後兩年以上還沒被人發現
+        year, month = (year + 1, 1) if month == 12 else (year, month + 1)
+        deadline = disclosure_deadline(f"{year:04d}-{month:02d}")
+        if deadline is None or deadline > today:
+            break
+        lag += 1
+    line = f"台股月營收 {len(latest)}/{len(tickers)} 檔｜最新 {oldest}"
+    if newest != oldest:
+        line += f" ～ {newest}"
+    if empty:
+        line += f"｜**{len(empty)} 檔一筆都沒有**：" + "、".join(empty)
+    line += (f"｜⚠ 落後 {lag} 個月（跑 `python -m engine_c.monthly_revenue --sync`）"
+             if lag else "｜已跟上公告期限")
+    return line
 
 
 def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:

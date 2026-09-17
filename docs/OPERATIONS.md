@@ -950,10 +950,52 @@ fixed entry，與 `edgar.py` 同構：無憑證、不碰 Windows identity／ACL�
 **⚠ 非美股（25 檔）本支一律不碰**，記 `no_cik` 並列進報告。TWSE／EDINET／DART／KIND 各有各的
 格式，硬套會在 `source_ref` 上造假——那正是 L11 記過的坑。
 
-**⚠ `fetchers/` 不是整包放行。** 只有 `edgar.py` 與 `mops.py` 兩支公開文件下載器在列；
-同目錄的 `gsheets.py` 使用 Google service account 憑證，屬 credential-bearing surface，
-刻意排除。`tests/test_codex_daily_permissions.py::test_fetchers_directory_is_not_broadly_allowed`
-會擋下把整個目錄或 `-m fetchers` 放行的寫法。要動 `gsheets.py` 必須另做一次 impact review。
+**⚠ `fetchers/` ~~不是整包放行。只有 `edgar.py` 與 `mops.py` 兩支公開文件下載器在列~~
+（2026-09-17 Phase 2 Step 2.2 起改為**一支都不在列**）。** daily 的研究層關閉後，抓原文只
+發生在互動 session，那兩支沒有任何無人值守呼叫端。同目錄的 `gsheets.py` 使用 Google service
+account 憑證，屬 credential-bearing surface。
+`tests/test_codex_daily_permissions.py::test_fetchers_directory_is_not_broadly_allowed`
+會擋下把整個目錄、任一支或 `-m fetchers` 放行的寫法。要放行其中任何一支都必須另做一次
+impact review。
+
+### 台股月營收與重大訊息（Phase 6 / D15，2026-09-17 完成 sandbox impact review）
+
+**兩件事的性質相反，所以落點也相反**——這是本節唯一要記住的判準：
+
+| | 重大訊息 | 每月營收 |
+|---|---|---|
+| 來源只有多久 | **只有前一營業日那一批** | 歷史頁按年月**永久可查** |
+| 漏抓的後果 | **永久漏，補不回來** | 隨時 `--backfill` 補得回來（L10） |
+| 落點 | **進 daily harvest**（走既有 `crons\harvest_leads.py` entry） | **互動式入口**，不進無人值守 |
+| 該補時誰說話 | harvest 的 `fetch_failed` 現形在心跳第 1 段 | 心跳第 1 段印「落後 N 個月」 |
+
+```powershell
+# 月營收（互動式；每月 11 日後跑一次 --sync 就跟得上）
+& '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --ticker 3081.TWO
+& '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --sync
+& '.venv\Scripts\python.exe' -m engine_c.monthly_revenue --backfill 24
+
+# 抓取層（要看原始列或某個歷史月份時才用）
+& '.venv\Scripts\python.exe' -m fetchers.mops_open_data --revenue --market tpex --year 2026 --month 7
+& '.venv\Scripts\python.exe' -m fetchers.mops_open_data --announcements --ticker 3105.TWO
+```
+
+**sandbox impact review 五步：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 重訊在既有 `crons\harvest_leads.py` 底下新增三個**公開、無憑證**主機：`openapi.twse.com.tw`、`www.tpex.org.tw`、`mopsov.twse.com.tw`。只 `register` lead（進 pending 交下輪 triage），不自動 triage、不入圖、不寫 Engine C、不碰 `.git`。月營收寫 Engine C SQLite 的 `monthly_revenue_observations`（ignored private runtime），**但不在無人值守路徑上**。 |
+| **2 skill／prompt／本檔** | 不動 daily prompt（重訊走既有 harvest 步驟）；本節；`.codex/rules` 的 harvest justification 明寫新主機。 |
+| **3 最窄 rule** | **沒有新增任何 rule**（仍是 15 條）。重訊重用既有 entry；月營收刻意留互動式——要改成排程必須重做一次本 review。 |
+| **4 permission contract test** | `test_mops_watcher_reuses_the_harvest_entry_and_admits_its_new_hosts`（條數不變＋三個主機都寫在 justification 裡＋抓取器不得出現在 allowlist）、`test_monthly_revenue_stays_an_interactive_entry`、`test_heartbeat_monthly_revenue_line_reads_no_network`（心跳的零網路契約）。 |
+| **5 端到端 smoke** | 2026-09-17 實跑：7 檔台股各 24 個月月營收入庫（兩個來源在 2026-08 交叉一致、衝突 0）；重訊首跑抓到 3105.TWO 一則並正確解析出 `co:win_semiconductor`。 |
+
+⚠ **這一輪撞到的兩個坑，都寫成測試了：**
+① **歷史頁末尾那個數字是註冊地不是流水號**（`_0` 本國／`_1` 外國）——只抓 `_0` 時 4971.TWO（IET-KY）
+在 24 個月回補裡一筆都沒有，而當期 API 有它。
+② **`.codex/rules` 是 Starlark，不吃 Python 的隱式字串串接**——多行 justification 必須用 `+`
+串接。寫成隱式串接時整份 allowlist 載入失敗，11 個 execpolicy 測試同時變紅（與 2026-09-10
+那次同形，這次是測試先攔下來的）。
 
 ---
 

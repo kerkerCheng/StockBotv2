@@ -202,10 +202,12 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
             "ALTER TABLE financial_snapshots "
             "ADD COLUMN revenue_estimate_next_fy_analysts INTEGER")
     from engine_c.manual_observations import ensure_manual_observation_schema
+    from engine_c.monthly_revenue import ensure_monthly_revenue_schema
     from engine_c.technical import ensure_technical_schema
 
     ensure_manual_observation_schema(conn)
     ensure_technical_schema(conn)
+    ensure_monthly_revenue_schema(conn)
     conn.commit()
 
 

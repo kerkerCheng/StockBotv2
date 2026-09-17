@@ -198,7 +198,8 @@ def test_fetchers_directory_is_not_broadly_allowed() -> None:
     """
     rules = RULES.read_text(encoding="utf-8")
 
-    for fetcher in ("edgar.py", "mops.py", "mfn.py", "rns.py", "gsheets.py", "utils.py"):
+    for fetcher in ("edgar.py", "mops.py", "mops_open_data.py", "mfn.py", "rns.py",
+                    "gsheets.py", "utils.py"):
         assert f"fetchers\\\\{fetcher}" not in rules, fetcher
 
     for broad in (
@@ -370,3 +371,47 @@ def test_scorecard_rule_justification_admits_the_network_call() -> None:
     block = text[start:text.index(")", start)]
     assert "yfinance" in block, "webapp materialize 的 rule 沒有提到 --scorecard 會連 yfinance"
     assert "MAX_PRICED_SYMBOLS" in block, "rule 沒有記下對應的收緊"
+
+
+def test_mops_watcher_reuses_the_harvest_entry_and_admits_its_new_hosts() -> None:
+    """台股重訊 watcher（ROADMAP Phase 6 / D15）**沒有新增 fixed entry**。
+
+    它跑在既有的 `crons\harvest_leads.py` 底下，所以 allowlist 條數不變——但它確實
+    多連了三個公開的交易所主機，而 **justification 不寫出來就等於用一條舊理由掩蓋新
+    capability**（L15：放行與收緊必須同時發生；同輪的 scorecard 也是這樣更正的）。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+
+    assert rules.count("prefix_rule(") == 15, "重訊 watcher 不該新增任何 entry"
+    for host in ("openapi.twse.com.tw", "www.tpex.org.tw", "mopsov.twse.com.tw"):
+        assert host in rules, host
+    # 抓取器本身不是命令入口，不得偷偷出現在 allowlist 裡。
+    assert "mops_open_data" not in rules
+
+
+def test_monthly_revenue_stays_an_interactive_entry() -> None:
+    """月營收**刻意不進無人值守**：歷史頁按年月永久可查，漏抓補得回來（L10）。
+
+    ⚠ 這一條守的是「不要為了自動化而擴 allowlist」。它與重訊相反——重訊只有前一營業日，
+    漏一天就永久漏，所以那個才需要每天跑。要改成排程必須重做一次 sandbox impact review。
+    """
+    rules = RULES.read_text(encoding="utf-8")
+
+    for forbidden in (
+        "engine_c\\monthly_revenue.py",
+        '"-m", "engine_c.monthly_revenue"',
+    ):
+        assert forbidden not in rules, forbidden
+
+
+def test_heartbeat_monthly_revenue_line_reads_no_network() -> None:
+    """心跳第 1 段新增的月營收行必須維持心跳的零網路契約。
+
+    它只呼叫 `monthly_revenue_series`／`registry_taiwan_tickers`／`disclosure_deadline`
+    ——三個都只讀本機。`sync`／`backfill`（會連 MOPS）**不得**出現在心跳裡。
+    """
+    heartbeat = (ROOT / "crons" / "heartbeat.py").read_text(encoding="utf-8")
+
+    assert "_monthly_revenue_line" in heartbeat
+    for network_entry in ("sync_current", "backfill(", "fetch_monthly_revenue"):
+        assert network_entry not in heartbeat, network_entry

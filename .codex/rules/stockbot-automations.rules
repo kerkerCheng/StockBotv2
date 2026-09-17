@@ -15,7 +15,21 @@
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
     decision="allow",
-    justification="Daily harvest 需要連 X API 與 SEC EDGAR，憑證與 source_state 都留在本機。",
+    justification=(
+        "Daily harvest 需要連 X API 與 SEC EDGAR，憑證與 source_state 都留在本機。"
+        + "⚠ 2026-09-17 更正（ROADMAP Phase 6 / D15，台股重訊 watcher）：本 prefix 現在多連三個"
+        + "**公開、無憑證**的交易所端點——openapi.twse.com.tw、www.tpex.org.tw、mopsov.twse.com.tw。"
+        + "新增的是主機不只是請求量，所以在這裡明寫而不是留給讀者推斷。"
+        + "它們與公開資訊觀測站的 PDF 抓取器（已於同日退出本 allowlist）屬同一家族，"
+        + "同樣不帶憑證、不碰 Windows identity／ACL、不寫任何 authority、不觸 .git。"
+        + "重訊只 register lead（進 pending 交下輪 triage），**不自動 triage、不入圖、不寫 Engine C**；"
+        + "監看範圍由 crons/harvest_config.json 的 mops_watch 決定，tickers 是下限、"
+        + "derive_from_registry 併入 registry 裡的台股（load_config 拒收「兩者皆空」的設定，"
+        + "否則 watcher 會每天回報成功卻監看 0 檔）。"
+        + "⚠ **月營收刻意不在這條路徑上**：它的歷史頁按年月永久可查、漏抓補得回來（L10），"
+        + "所以維持互動式入口（engine_c 的月營收模組），**沒有新增第 16 條 entry**；"
+        + "該補的時候由心跳第 1 段自己說話（落後幾個月）。"
+    ),
 )
 
 prefix_rule(

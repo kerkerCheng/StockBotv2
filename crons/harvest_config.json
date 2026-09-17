@@ -92,5 +92,10 @@
       "4"
     ],
     "lookback_count": 8
+  },
+  "mops_watch": {
+    "note": "台股重大訊息 watcher（ROADMAP Phase 6 / D15，2026-09-17）。來源是 TWSE／TPEx 的 opendata t187ap04：**只有前一營業日那一批**（實測 2026-09-17 抓到的全部是 09-16 發言，上市 99 筆、上櫃 40 筆），漏抓一天就永久漏、補不回來——所以它的 fetch_failed 必須在心跳第 1 段被看見，不能靜默。tickers 是監看下限，derive_from_registry 併入 registry 裡的所有 .TW／.TWO（刻意不用 tracked universe：tracked 會因 thesis／cohort 讀不到而縮小，而重訊漏了就沒有第二次機會）。重訊沒有可構造的單則永久連結，所以一手內容存在 lead 的 raw_text（主旨＋說明逐字），URL 只當去重鍵。刻意**沒有** auto_no_go 清單：今天沒有任何資料支持哪一種條款該自動丟掉（L17-4：在沒有事實支撐的地方泛化會得到誤報的分類）。",
+    "tickers": [],
+    "derive_from_registry": true
   }
 }

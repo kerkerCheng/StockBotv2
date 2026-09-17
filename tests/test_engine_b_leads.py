@@ -788,3 +788,73 @@ def test_consume_fired_lead_watches_leaves_unrequeueable_lead_visible() -> None:
     assert len(result["skipped"]) == 1 and "trace backlog receipt" in result["skipped"][0]["reason"]
     assert watch_data["watches"][0]["status"] == "fired"
     assert store["leads"][lead_id]["status"] == "parked"
+
+
+def test_announcements_to_leads_keeps_the_primary_text_and_dedupes_per_announcement() -> None:
+    """MOPS 重訊沒有可構造的單則永久連結（ROADMAP Phase 6 / D15）。
+
+    所以兩件事必須同時成立：①去重鍵要能分開同一家公司同一天的兩則；
+    ②**一手內容必須自帶**（raw_text），追源不依賴那個 URL 點得開。
+    """
+    rows = [
+        {"company_code": "3105", "company_name": "穩懋", "spoke_date": "2026-09-16",
+         "spoke_time": "07:00:03", "subject": "本公司訂購廠務工程公告。",
+         "detail": "1.事實發生日：民國115年09月16日", "source_url": "https://example/api"},
+        {"company_code": "3105", "company_name": "穩懋", "spoke_date": "2026-09-16",
+         "spoke_time": "07:00:03", "subject": "另一則完全不同的重訊",
+         "detail": "", "source_url": "https://example/api"},
+    ]
+    out = harvest_leads.announcements_to_leads("3105.TWO", rows)
+
+    assert [item["source"] for item in out] == ["mops:3105.TWO"] * 2
+    # 同一秒的兩則不得撞成同一個 lead——主旨指紋在去重鍵裡。
+    assert out[0]["url"] != out[1]["url"]
+    assert out[0]["published_at"] == "2026-09-16"
+    # ticker 放在標題最前面，entity 解析才對得上（台股中文名對不上 registry 的 display_name）。
+    assert out[0]["title"].startswith("3105.TWO ")
+    assert "本公司訂購廠務工程公告。" in out[0]["raw_text"]
+    assert "民國115年09月16日" in out[0]["raw_text"]
+    # 註冊一次之後重跑不得長出第二筆。
+    store = leads.empty_store()
+    assert harvest_leads._register_all(store, "mops:3105.TWO", out, None) == 2
+    assert harvest_leads._register_all(store, "mops:3105.TWO", out, None) == 0
+
+
+def test_mops_watch_config_rejects_a_watcher_that_watches_nothing() -> None:
+    """tickers 空 ＋ derive_from_registry=false ＝ 每天回報成功卻監看 0 檔（L13-2）。"""
+    import json
+    from pathlib import Path
+
+    base = json.loads(harvest_leads.DEFAULT_CONFIG_PATH.read_text(encoding="utf-8"))
+    assert base["mops_watch"]["derive_from_registry"] is True
+
+    def _write(tmp: Path, mops: dict) -> Path:
+        payload = dict(base)
+        payload["mops_watch"] = mops
+        # X 段會另外要求 monthly_spend_cap_usd，這裡只驗 mops 那一段，沿用原檔即可。
+        path = tmp / "harvest_config.json"
+        path.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        return path
+
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as raw:
+        tmp = Path(raw)
+        ok = _write(tmp, {"tickers": [], "derive_from_registry": True})
+        assert harvest_leads.load_config(ok)["mops_watch"]["derive_from_registry"] is True
+
+        blind = _write(tmp, {"tickers": [], "derive_from_registry": False})
+        with pytest.raises(ValueError, match="監看 0 檔"):
+            harvest_leads.load_config(blind)
+
+
+def test_mops_watch_manual_list_is_a_floor_not_a_replacement() -> None:
+    """derivation 的上游讀不到時不得靜默縮小監看範圍（與 edgar_watch 同一個 fail-safe）。"""
+    from engine_b.routine_config import mops_watch_tickers
+
+    watch = {"tickers": ["9999.TWO"], "derive_from_registry": True}
+    merged = mops_watch_tickers(watch, registry_tickers=frozenset({"3081.TWO", "AAPL"}))
+    assert merged == ["3081.TWO", "9999.TWO"]      # 美股不進台股 watcher
+    # 關閉 derivation 時只剩手動清單，手動清單永遠在。
+    assert mops_watch_tickers({"tickers": ["9999.TWO"], "derive_from_registry": False},
+                              registry_tickers=frozenset({"3081.TWO"})) == ["9999.TWO"]

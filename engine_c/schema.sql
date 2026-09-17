@@ -139,3 +139,37 @@ CREATE INDEX IF NOT EXISTS idx_technical_benchmark_session
     ON technical_observations (benchmark_key, session_date DESC, fetched_at DESC);
 CREATE INDEX IF NOT EXISTS idx_technical_benchmark_fetched
     ON technical_observations (benchmark_key, fetched_at DESC);
+
+-- 台股每月營收（ROADMAP Phase 6 / D15）。單位是新台幣**千元**，寫在 unit_scale 欄上
+-- 而不是靠人記得；published_at 永遠 NULL（MOPS 的「出表日期」是產表日不是公告日），
+-- 為什麼是 NULL 由 published_at_basis 自己宣告。
+CREATE TABLE IF NOT EXISTS monthly_revenue_observations (
+    observation_id VARCHAR(64) PRIMARY KEY,
+    ticker VARCHAR(32) NOT NULL,
+    market VARCHAR(8) NOT NULL CHECK (market IN ('twse', 'tpex')),
+    company_code VARCHAR(16) NOT NULL,
+    company_name TEXT,
+    data_month VARCHAR(7) NOT NULL,
+    revenue_current BIGINT,
+    revenue_prev_month BIGINT,
+    revenue_year_ago BIGINT,
+    change_mom_pct NUMERIC(18,10),
+    change_yoy_pct NUMERIC(18,10),
+    cumulative_current BIGINT,
+    cumulative_year_ago BIGINT,
+    change_cumulative_pct NUMERIC(18,10),
+    note TEXT,
+    currency VARCHAR(8) NOT NULL,
+    unit_scale INTEGER NOT NULL CHECK (unit_scale > 0),
+    disclosure_deadline DATE NOT NULL,
+    published_at TIMESTAMPTZ,
+    published_at_basis VARCHAR(64) NOT NULL,
+    report_date DATE,
+    source TEXT NOT NULL,
+    fetched_at TIMESTAMPTZ NOT NULL,
+    payload_digest VARCHAR(64) NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_monthly_revenue_ticker_month
+    ON monthly_revenue_observations (ticker, data_month DESC, fetched_at DESC);

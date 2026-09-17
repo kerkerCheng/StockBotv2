@@ -14,6 +14,7 @@ parse_failed）；解析失敗 ≠ 無新文，brief 會據此提示 fallback。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -77,6 +78,18 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
         orphan = sorted(set(auto_no_go) - set(watch.get("forms") or []))
         if orphan:
             raise ValueError(f"edgar_watch.auto_no_go_forms 不在 forms 裡：{orphan}")
+    mops = data.get("mops_watch") or {}
+    if mops:
+        if not isinstance(mops.get("tickers"), list):
+            raise ValueError("mops_watch 必須有 tickers list")
+        if not isinstance(mops.get("derive_from_registry"), bool):
+            raise ValueError("mops_watch.derive_from_registry 必須是 boolean")
+        # 兩者同時是空的＝這個 watcher 存在但永遠監看 0 檔。那不是設定，是靜默停用
+        # （L13-2：「跑了但沒東西」與「根本沒跑」不得同形）。
+        if not mops["tickers"] and not mops["derive_from_registry"]:
+            raise ValueError(
+                "mops_watch 的 tickers 為空且 derive_from_registry=false——"
+                "那會讓 watcher 永遠監看 0 檔卻每天回報成功")
     x_section = data.get("x_accounts") or {}
     if x_section and not isinstance(x_section.get("handles"), list):
         raise ValueError("x_accounts 必須有 handles list")
@@ -671,10 +684,115 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
         print(f"[harvest] {source} ok: {new} new / {len(items)} filings")
 
 
+def _mops_watch_tickers(watch: dict) -> list[str]:
+    """手動清單 ∪ registry 裡的台股（見 routine_config.mops_watch_tickers）。"""
+    try:
+        from engine_b.routine_config import mops_watch_tickers
+
+        registry_tickers: frozenset[str] = frozenset()
+        if watch.get("derive_from_registry"):
+            from engine_c.monthly_revenue import registry_taiwan_tickers
+
+            registry_tickers = frozenset(registry_taiwan_tickers())
+        return mops_watch_tickers(watch, registry_tickers=registry_tickers)
+    except Exception as exc:  # noqa: BLE001 derivation 失敗不得讓既有監看歸零
+        print(f"[harvest] mops watch derivation failed, 退回手動清單: {exc}", file=sys.stderr)
+        return sorted({str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()})
+
+
+def announcements_to_leads(ticker: str, rows: list[dict]) -> list[dict]:
+    """MOPS 重大訊息 → lead dict list（純函式，只組 metadata）。
+
+    ⚠ **重訊沒有可構造的單則永久連結**，所以 URL 用 opendata endpoint 加上
+    「公司＋發言時刻＋主旨指紋」當去重鍵——它點進去會回整批 JSON，指得到來源但不精確
+    到單則。**真正的一手內容放在 `raw_text`**（主旨＋說明逐字），追源不依賴 URL 可達性。
+    """
+    out: list[dict] = []
+    for row in rows:
+        subject = str(row.get("subject") or "").strip()
+        detail = str(row.get("detail") or "").strip()
+        body = "\n\n".join(part for part in (subject, detail) if part)
+        stamp = "T".join(part for part in (
+            str(row.get("spoke_date") or ""), str(row.get("spoke_time") or "")) if part)
+        fingerprint = hashlib.sha256(
+            f"{row.get('company_code')}|{stamp}|{subject}".encode("utf-8")
+        ).hexdigest()[:12]
+        base = str(row.get("source_url") or "")
+        out.append({
+            "source": f"mops:{ticker.upper()}",
+            "url": f"{base}?co_id={row.get('company_code')}&spoke={stamp}&ref={fingerprint}",
+            # ticker 放在標題最前面：entity 解析走的是標題與內文比對，而台股的中文
+            # 公司名對不上 registry 的 display_name（L16：分類要跟著資料走到需要它的地方）。
+            "title": f"{ticker.upper()} {row.get('company_name') or ''} 重訊 "
+                     f"{row.get('spoke_date') or '?'}：{subject}".strip(),
+            "raw_text": body or None,
+            "published_at": row.get("spoke_date"),
+        })
+    return out
+
+
+def harvest_mops(config: dict, store: dict, *, seen_at: str | None = None) -> None:
+    """台股重大訊息 watcher（ROADMAP Phase 6 / D15）。
+
+    ⚠ **兩個 opendata endpoint 只有前一營業日那一批**：漏抓一天就是永久漏，補不回來。
+    所以單一 ticker 的解析失敗不得吃掉整批——每個 market 抓一次、分派到各 ticker，
+    fetch 失敗時該 market 的每一檔都記 `fetch_failed`，讓它在心跳第 1 段自己現形。
+    """
+    watch = config.get("mops_watch") or {}
+    tickers = _mops_watch_tickers(watch)
+    if not tickers:
+        return
+    try:
+        from fetchers.mops_open_data import (
+            MARKETS,
+            fetch_material_announcements,
+            market_for_ticker,
+            select_tickers,
+        )
+    except ImportError as exc:
+        for ticker in tickers:
+            leads.record_run(store, source=f"mops:{ticker.upper()}",
+                             result="fetch_failed", new=0, run_at=seen_at,
+                             failure_class="dependency_missing")
+        print(f"[harvest] mops unavailable: {exc}", file=sys.stderr)
+        return
+    by_market: dict[str, list[str]] = {market: [] for market in MARKETS}
+    for ticker in tickers:
+        market = market_for_ticker(ticker)
+        if market in by_market:
+            by_market[market].append(ticker)
+        else:
+            # 後綴解析不出市場：不猜（INV-1），但也不靜默丟掉（INV-3）。
+            leads.record_run(store, source=f"mops:{ticker.upper()}",
+                             result="parse_failed", new=0, run_at=seen_at,
+                             failure_class="unresolved_market")
+            print(f"[harvest] mops:{ticker} 認不出交易所後綴，跳過", file=sys.stderr)
+    for market, market_tickers in by_market.items():
+        if not market_tickers:
+            continue
+        try:
+            rows = fetch_material_announcements(market)
+        except Exception as exc:  # noqa: BLE001 網路／解析都算 fetch_failed
+            for ticker in market_tickers:
+                leads.record_run(store, source=f"mops:{ticker.upper()}",
+                                 result="fetch_failed", new=0, run_at=seen_at,
+                                 failure_class=classify_access_failure(exc))
+            print(f"[harvest] mops {market} fetch_failed: {exc}", file=sys.stderr)
+            continue
+        for ticker in market_tickers:
+            source = f"mops:{ticker.upper()}"
+            mine, _report = select_tickers(rows, [ticker])
+            items = announcements_to_leads(ticker, mine)
+            new = _register_all(store, source, items, seen_at)
+            leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
+            print(f"[harvest] {source} ok: {new} new / {len(items)} announcements")
+
+
 def run(config: dict, store: dict, *, seen_at: str | None = None) -> dict:
     harvest_feeds(config, store, seen_at=seen_at)
     harvest_x(config, store, seen_at=seen_at)
     harvest_edgar(config, store, seen_at=seen_at)
+    harvest_mops(config, store, seen_at=seen_at)
     return store
 
 

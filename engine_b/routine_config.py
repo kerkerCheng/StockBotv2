@@ -129,6 +129,30 @@ def edgar_watch_tickers(
     return sorted(manual | us_edgar_candidates(tracked))
 
 
+def mops_watch_tickers(
+    watch: Mapping[str, Any],
+    *,
+    registry_tickers: frozenset[str] = frozenset(),
+) -> list[str]:
+    """MOPS 重訊 watch 的實際監看清單（ROADMAP Phase 6）。
+
+    與 `edgar_watch_tickers` 同一個 fail-safe 語意：手動清單是**下限**，derivation 只補
+    「registry 有這家台股、卻沒人在看它的重訊」這一側的漂移。
+
+    ⚠ 這裡的 derivation 來源刻意是 **registry 而不是 tracked universe**：tracked 會因為
+    thesis lifecycle／cohort 讀不到而縮小，而**重訊漏抓一天就永久漏**（MOPS 的
+    opendata 只有前一營業日那一批），所以監看範圍不該跟著會縮的東西走。
+    """
+    manual = {str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()}
+    if not watch.get("derive_from_registry"):
+        return sorted(manual)
+    taiwan = {
+        ticker for ticker in registry_tickers
+        if str(ticker).strip().upper().endswith((".TW", ".TWO"))
+    }
+    return sorted(manual | taiwan)
+
+
 def cohort_tickers(rows: Iterable[Mapping[str, Any]]) -> frozenset[str]:
     terminal = {"promoted", "rejected", "expired"}
     return frozenset(
