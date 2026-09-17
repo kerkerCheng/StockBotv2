@@ -1,17 +1,208 @@
 {
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "A new InP substrate entrant reaches meaningful volume share, or updated third-party data shows materially different shares/concentration.",
+      "id": "gsr_inp_substrate_market_2026_05_16_cl1",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1",
+        "gsr_inp_substrate_market_2026_05_16_s2",
+        "gsr_inp_substrate_market_2026_05_16_s3",
+        "gsr_inp_substrate_market_2026_05_16_s4"
+      ],
+      "statement": "The InP substrate market is a three-player oligopoly (>90% combined): Sumitomo Electric ~42% (~800k wafers/yr capacity), AXT/Beijing Tongmei ~36% (~300k), JX Nippon Mining & Metals ~13% (~200k).",
+      "subject_id": "mat:inp_substrate"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Any of the three announces and executes a material capacity expansion, or demand falls enough that utilization drops.",
+      "id": "gsr_inp_substrate_market_2026_05_16_cl2",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s5",
+        "gsr_inp_substrate_market_2026_05_16_s6",
+        "gsr_inp_substrate_market_2026_05_16_s7"
+      ],
+      "statement": "Dated observation (as of 2026-05-16): all three InP substrate suppliers are effectively capacity-constrained — AXT near full utilization (~25-26k wafers/month), Sumitomo largely saturated, JX with no announced expansion plans — so incremental InP demand has no slack supply to absorb it.",
+      "subject_id": "mat:inp_substrate"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "mat:inp_substrate",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s3"
+      ],
+      "src_id": "co:axt"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "mat:inp_substrate",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s2"
+      ],
+      "src_id": "co:sumitomo_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "mat:inp_substrate",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s4"
+      ],
+      "src_id": "co:jx_advanced_metals"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "co:axt",
+      "id": "e4",
+      "relation": "competes_with",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1",
+        "gsr_inp_substrate_market_2026_05_16_s2"
+      ],
+      "src_id": "co:sumitomo_electric"
+    },
+    {
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "sub596_1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1",
+        "gsr_inp_substrate_market_2026_05_16_s3"
+      ],
+      "src_id": "co:axt"
+    },
+    {
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "sub596_2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1",
+        "gsr_inp_substrate_market_2026_05_16_s2"
+      ],
+      "src_id": "co:sumitomo_electric"
+    },
+    {
+      "attributes": {
+        "substitutability": 3
+      },
+      "confidence": 0.8,
+      "dst_id": "mat:inp_substrate",
+      "id": "sub596_3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1",
+        "gsr_inp_substrate_market_2026_05_16_s4"
+      ],
+      "src_id": "co:jx_advanced_metals"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "AXT Inc",
+        "AXTI",
+        "Beijing Tongmei"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "co:axt",
+      "name": "AXT",
+      "role": "material_base",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s3",
+        "gsr_inp_substrate_market_2026_05_16_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sumitomo Electric"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "co:sumitomo_electric",
+      "name": "Sumitomo Electric Industries",
+      "role": "material_base",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s2",
+        "gsr_inp_substrate_market_2026_05_16_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "JX Nippon Mining & Metals",
+        "JX Metals"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "co:jx_advanced_metals",
+      "name": "JX Advanced Metals",
+      "role": "material_base",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s4",
+        "gsr_inp_substrate_market_2026_05_16_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "InP",
+        "indium phosphide"
+      ],
+      "attributes": {
+        "concentration_score": 4,
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.55,
+      "id": "mat:inp_substrate",
+      "name": "Indium Phosphide (InP) substrate",
+      "role": null,
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1"
+      ],
+      "type": "Material"
+    }
+  ],
   "schema_version": "0.1",
   "source_doc": {
     "doc_id": "gsr_inp_substrate_market_2026_05_16",
-    "title": "Global Semi Research: China's Indium Phosphide Surge — InP substrate market structure",
-    "url": "https://globalsemiresearch.substack.com/p/chinas-indium-phosphide-surge",
+    "evidence_tier": 3,
     "origin_entity": "Global Semi Research",
-    "publisher": "Global Semi Research (Substack)",
-    "published_at": "2026-05-16",
-    "retrieved_at": "2026-07-17",
-    "storage_permission": "repo_excerpt",
     "permission_basis": "Independent analyst newsletter; only brief quotations for research are stored in library/raw and this extraction.",
+    "published_at": "2026-05-16",
+    "publisher": "Global Semi Research (Substack)",
+    "retrieved_at": "2026-07-17",
     "source_type": "industry_report",
-    "evidence_tier": 3
+    "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "41709e8f91f9e70b22423e85190d7176dcf3992cc1e64f3b4cedb352e98c5620",
+    "title": "Global Semi Research: China's Indium Phosphide Surge — InP substrate market structure",
+    "url": "https://globalsemiresearch.substack.com/p/chinas-indium-phosphide-surge"
   },
   "sources": [
     {
@@ -48,154 +239,6 @@
       "id": "gsr_inp_substrate_market_2026_05_16_s7",
       "locator": "Supplier profiles section",
       "quote": "JX Metals has no announced expansion plans."
-    }
-  ],
-  "nodes": [
-    {
-      "id": "co:axt",
-      "type": "Company",
-      "name": "AXT",
-      "abstraction_level": "materials_substrate",
-      "role": "material_base",
-      "aliases": [
-        "AXT Inc",
-        "AXTI",
-        "Beijing Tongmei"
-      ],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s3",
-        "gsr_inp_substrate_market_2026_05_16_s5"
-      ]
-    },
-    {
-      "id": "co:sumitomo_electric",
-      "type": "Company",
-      "name": "Sumitomo Electric Industries",
-      "abstraction_level": "materials_substrate",
-      "role": "material_base",
-      "aliases": [
-        "Sumitomo Electric"
-      ],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s2",
-        "gsr_inp_substrate_market_2026_05_16_s6"
-      ]
-    },
-    {
-      "id": "co:jx_advanced_metals",
-      "type": "Company",
-      "name": "JX Advanced Metals",
-      "abstraction_level": "materials_substrate",
-      "role": "material_base",
-      "aliases": [
-        "JX Nippon Mining & Metals",
-        "JX Metals"
-      ],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s4",
-        "gsr_inp_substrate_market_2026_05_16_s7"
-      ]
-    },
-    {
-      "id": "mat:inp_substrate",
-      "type": "Material",
-      "name": "Indium Phosphide (InP) substrate",
-      "abstraction_level": "materials_substrate",
-      "role": null,
-      "aliases": [
-        "InP",
-        "indium phosphide"
-      ],
-      "attributes": {
-        "ramp_difficulty_intrinsic": 5,
-        "concentration_score": 4
-      },
-      "confidence": 0.55,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s1"
-      ]
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "src_id": "co:axt",
-      "dst_id": "mat:inp_substrate",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.5,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s3"
-      ]
-    },
-    {
-      "id": "e2",
-      "src_id": "co:sumitomo_electric",
-      "dst_id": "mat:inp_substrate",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.5,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s2"
-      ]
-    },
-    {
-      "id": "e3",
-      "src_id": "co:jx_advanced_metals",
-      "dst_id": "mat:inp_substrate",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.5,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s4"
-      ]
-    },
-    {
-      "id": "e4",
-      "src_id": "co:sumitomo_electric",
-      "dst_id": "co:axt",
-      "relation": "competes_with",
-      "attributes": {},
-      "confidence": 0.5,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s1",
-        "gsr_inp_substrate_market_2026_05_16_s2"
-      ]
-    }
-  ],
-  "claims": [
-    {
-      "id": "gsr_inp_substrate_market_2026_05_16_cl1",
-      "statement": "The InP substrate market is a three-player oligopoly (>90% combined): Sumitomo Electric ~42% (~800k wafers/yr capacity), AXT/Beijing Tongmei ~36% (~300k), JX Nippon Mining & Metals ~13% (~200k).",
-      "subject_id": "mat:inp_substrate",
-      "demand_proof_level": "inferred",
-      "disproof_condition": "A new InP substrate entrant reaches meaningful volume share, or updated third-party data shows materially different shares/concentration.",
-      "confidence": 0.5,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s1",
-        "gsr_inp_substrate_market_2026_05_16_s2",
-        "gsr_inp_substrate_market_2026_05_16_s3",
-        "gsr_inp_substrate_market_2026_05_16_s4"
-      ]
-    },
-    {
-      "id": "gsr_inp_substrate_market_2026_05_16_cl2",
-      "statement": "Dated observation (as of 2026-05-16): all three InP substrate suppliers are effectively capacity-constrained — AXT near full utilization (~25-26k wafers/month), Sumitomo largely saturated, JX with no announced expansion plans — so incremental InP demand has no slack supply to absorb it.",
-      "subject_id": "mat:inp_substrate",
-      "demand_proof_level": "inferred",
-      "disproof_condition": "Any of the three announces and executes a material capacity expansion, or demand falls enough that utilization drops.",
-      "confidence": 0.5,
-      "source_ids": [
-        "gsr_inp_substrate_market_2026_05_16_s5",
-        "gsr_inp_substrate_market_2026_05_16_s6",
-        "gsr_inp_substrate_market_2026_05_16_s7"
-      ]
     }
   ]
 }
