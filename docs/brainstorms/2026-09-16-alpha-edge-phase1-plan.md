@@ -89,15 +89,15 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 - **L11-6 最先壞的那一筆：** `published_at` 的曆法與時區——MOPS 民國年（對照組 `mops_3363` 2026-05-07／`mops_4979` 2026-05-31）；
   MFN 瑞典文與英文兩則必須得到同一個日期；RNS 的 `published_at` 不得晚於 `retrieved_at`（`audit invariants` 的 PointInTime 會抓）。
 
-## 2c. Step 1.2 結果（2026-09-17，commit `3cbb0c0`；入圖待 [583][584][585] go）
+## 2c. Step 1.2 結果（2026-09-17，commit `3cbb0c0`；六個編號使用者已 go，全部入圖完成）
 
 **驗收三項，兩項達標、一項是誠實的否定結果：**
 
 | 驗收 | 結果 |
 |---|---|
 | 八家「產品線營收占比」4 → 8 | **7/8**（新欄位 `product_line_revenue_share`，決策 D2 不覆寫 `segment_revenue_share`）。已寫：3081／2455／3363／4979／4971／IQE.L／SIVE.ST；**AEHR 缺**——10-K 全文抽取只得 XBRL 表頭（既知坑），產品別營收要走 XBRL companyfacts 或 EX-99 |
-| `substitutability` 覆蓋 80 → ≥86 | 本輪新增 **5 條**帶 sub 的 assertion（聯亞 3；全新 ×2、英特磊 ×2 皆 2），**入圖後才計入**——三個 packet 都卡在 pq2 |
-| 可投資排序出現 TW／TWO／ST ≥1 檔 | **❌ 0 檔**（實測仍 37 列、17 家、只有 IQE.L 一檔非美股）。**這是答案不是缺漏** |
+| `substitutability` 覆蓋 80 → ≥86 | 本輪新增 **5 條**帶 sub 的 assertion（聯亞 3；全新 ×2、英特磊 ×2 皆 2），**已入圖**；canonical 邊 529 條、materialized 屬性 358 個（`python -m loader.edge_resolution project`）|
+| 可投資排序出現 TW／TWO／ST ≥1 檔 | **❌ 0 檔**——**入圖後複量仍是 37 列、17 家、只有 IQE.L 一檔非美股**。唯一的變化是 IQE.L 由第 12 升到 **第 9**（Tower 客戶端印證讓該邊的證據等級變成「外部印證」）。**這是答案不是缺漏** |
 
 **為什麼 0 檔——四家台系磊晶廠全部低於門檻 4：** 聯亞 3、華星光 2（對照組未動）、全新 2、英特磊 2。
 判準不是自由心證：**各家在自家年報逐字互相具名指認對方是同層競爭者**（全新點名聯亞與 IQE、英特磊點名全新與 IQE、
@@ -118,6 +118,16 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 **intake 走廊的結構事實（第一版嘗試撞到才知道）：** 同一份 PDF 若以新 doc_id 入圖會被 prepare 端的同 URL 守衛擋下
 （會造出兩份 SourceDoc、同一 origin_entity ＝ L8 的假交叉驗證）。正解是**沿用既有 doc_id 走 `supersedes_extraction_sha256`**，
 舊版歸檔、兩份都留；本輪三份年報都是這樣升級的。
+
+**入圖收尾（2026-09-17，使用者批次 `579 580 581 583 584 585 go`）：** 六筆全部 apply → commit → push → `todo complete-ra` 結案，
+各帶 `action/digest/commit/cohort` 完整 receipt。`audit invariants` FAIL 0｜PASS 13（檢查 4,087 筆）；
+`python -m webapp materialize --ranking` 已重算（可行動 37 條／純結構 37 條）。
+
+**⚠ 入圖途中撞到的第二個結構缺陷（已當下修，commit `4f92e06`）：** `commit_pending_intake.py` 對六筆全部回
+`modified_tracked_action_path`——supersede **本來就會改既有 tracked 檔**，而 publish 的 preflight 把所有非 `??` 一律當成
+「別的 writer 動過」。同一個 `git status` 承載兩種語意（L12），放寬會讓外來修改混進 action commit、收緊會讓 2026-09-11 立的
+更正走廊在 publish 這一站死掉。修法是分開：**只有逐份宣告過 `supersedes_extraction_sha256` 的文件路徑**可為 ` M`，
+且宣告讀自已被收據 hash 綁定的 extraction 檔，其餘路徑仍要求 `??`。兩條測試（放行面＋收緊面），空跑檢查通過。
 
 **未做完的（1.3 或下一輪接手）：**
 - 上詮 `co:foci→tech:fiber_attach_unit` 的 sub **刻意不填**：一手只有自述目標（「長期目標係成為 CPO 光纖陣列元件之主要及重要供應商」）與產能投資，沒有任何客戶端或第三方確認替代難度；Hunterbrook 是媒體，依決策 C1 維持待判定。缺的是 Himax 或 C 公司的具名確認。

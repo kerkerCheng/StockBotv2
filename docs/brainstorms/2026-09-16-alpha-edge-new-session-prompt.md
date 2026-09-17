@@ -12,8 +12,9 @@
 > 新 session 照下面順序讀完文件後，再讀 **`docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`**（核准的計畫、工單、Step 1.0 殘餘、
 > MFN／RNS／MOPS 的探測事實），然後**直接從 Step 1.1 開工**（兩支抓取器＋路由登記＋三份 smoke 文件入圖）。~~
 >
-> **狀態（2026-09-17）：Step 1.1 與 Step 1.2 都已做完並合併 master（commit `fa68b00`、`3cbb0c0`）。
-> 六個 pq2 編號等你批次 go：[579][580][581]（三條管道 smoke 文件入圖）、[583][584][585]（D8 補邊補格）。**
+> **狀態（2026-09-17）：Step 1.1 與 Step 1.2 都已做完並合併 master；六個 pq2 編號使用者已批次 go，
+> 全部 apply → push → `complete-ra` 結案（commit `fa68b00`、`3cbb0c0`、`4f92e06` 與六筆 intake commit）。
+> 待辦池目前沒有本 Phase 的未決編號。**
 > 新 session 照下面順序讀完文件後，再讀 **`docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`**
 > （§2b Step 1.1 結果、§2c Step 1.2 結果與未做完清單），然後**從 Step 1.3 收尾開工**。
 > ⚠ **1.3 的驗收行明訂：TW／TWO／ST 仍為 0 就不得標完成**——2026-09-17 實測確實是 0，且已查明原因是
