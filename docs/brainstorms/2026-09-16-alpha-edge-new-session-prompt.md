@@ -65,7 +65,26 @@
 > 變成「已研究、答案是否定的」，而這兩件事的下一步完全相反**。量的候選 12 → 15 家，
 > 但真正新出現的公司只有 5016.T（JX）一家。
 >
-> **等你決定的：** 這條線上沒有了。池裡的 [598]（穩懋補獨立來源）是 collector 自動鑄的，不在這條線上。
+> **下一輪的兩件事，使用者 2026-09-17 已明確核准「1 2 都做」，不必再請 `go`：**
+>
+> **① 寫 InP 那個賭注**（研究；binding constraint 一整天沒動過，就在這一格）。
+> **建議寫 AXTI**：純 InP 基板玩家（住友與 JX 都是大集團的一小塊）、已在籃子第 8、> **base 那條鏈已經完整**（8 筆 OperatingAssumption，readiness `ready_with_flags`），> 缺的就是 variant 那一筆——寫下去 `bet_state` 立刻由 `unanswered` 變 `bet`。
+> ⚠ **寫之前先讀這個數字**：AXTI 的 FY2026 共識營收成長是 **+146.8%（2.47 倍）、只有 5 位分析師**（`oa_a3a830fcb093bf2a` 的 rationale 逐字寫著「本輪所有標的中最激進的共識」）。**市場已經在定價需求會來了**——所以賭注不能是「AI 需求會爆」，那不是差異化觀點。要說出比共識更多的東西才算賭注：漲價能持續多久、出口許可什麼時候鬆、產能釋放的時點、或者反過來賭共識過高。**寫得出差異在哪，才寫得出 payoff。**
+> 命令：`python -m alpha assumptions AXTI --add spec.json`，spec 帶 `"scenario": "variant"`（不帶就是 base）。variant 是 **overlay**：只寫有差異的 driver，其餘沿用 base 的生效假設。
+> 寫完跑 `python -m webapp materialize AXTI --basket` 看 payoff 與 `bet_state`。
+> ⚠ 依 L7，賭注要配一條帶「核查頻率＋觸發後 48 小時動作」的 disproof；`mat:inp_substrate` 的讀圖 `sr_81832cb37d87ab1d` 已經寫好五條，其中三條是 `query.structure` 每天自動比對的，直接引用。
+> ⚠ 如果研究到一半發現寫不出可辯護的賭注——**那也是答案**：寫一筆 `bet/variant.overlay` 的 Abstention（`python -m alpha abstention AXTI --add spec.json`），`bet_state` 會變 `abstained`。**兩者都是終局，只有空白不是。**
+>
+> **② Phase 3（D5 帳號登記表與計分表）**（開發；ROADMAP Phase 3 那一列已定義到可直接執行）。
+> 它是漏斗最上游的「誰值得進佇列」，與寫賭注那條路互不阻塞。
+>
+> **順序建議：先 ①**（它是這條研究線的收口，而且一旦寫下賭注，籃子第一次會有第二個 `bet`）；
+> ①做完或誠實 park 之後接 ②。**兩件之間不需要回來問。**
+>
+> **仍要停下來的（不因這次授權放寬）：** 四個人工 gate（入圖／Engine C 判讀寫入／thesis mutation／live）、資本動作、要改 `AGENTS.md` 判準句或 ROADMAP 的 Phase 定義、Verdict 不是 GO。
+> 撞到就掛號、接著做下一件不需核准的事，收尾一次給批次指令。
+>
+> 池裡的 [598]（穩懋補獨立來源）是 collector 自動鑄的，不在這兩件事的線上。
 >
 > **兩個已知缺陷，刻意沒在本輪修（都動到既有契約，值得一個 Z2 proposal）：**
 > ①**writer lock 的 owner 程序死了仍卡到 TTL**——今早 daily 死掉的直接原因；鎖已記了 pid／hostname，
