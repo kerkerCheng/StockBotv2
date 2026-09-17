@@ -11,7 +11,49 @@
 
 ## 開工指令（貼這一段）
 
-> ## ⚠ 2026-09-17 收尾狀態（先讀這塊，再讀下面的任務書）
+> ## ⚠ 2026-09-17（晚）收尾狀態（先讀這塊，再讀下面的任務書）
+>
+> **這一輪做完的：** Q2 ✅｜Q5 ✅｜Q1 ✅（三件都已合併 master 並 push）。外加開工時修掉的一個
+> **真的壞掉的 daily**，與四個當下修的靜默缺陷。
+>
+> | | 決定 | 狀態 |
+> |---|---|---|
+> | **Q2** 籃子每列強制「有賭注 或 Abstention」 | A | ✅ 交付（commit `b43d28f`） |
+> | **Q5** 讀圖落地 append-only ＋ staleness 分級 ＋ 掛心跳與 pq1 | A | ✅ 交付（commit `527d61c`） |
+> | **Q1** 籃子宇宙擴到被門檻擋下的 26 條，分兩個分頁 | A | ✅ 交付（同上） |
+> | Q3 量的賭注的反向橋 | B：留 Phase 7 | — |
+> | **Q4** 結構讀圖（零 LLM 查詢） | A | ✅ 已交付 `python -m query.structure <node>` |
+>
+> **⚠ 開工第一件事（這一輪學到的）：先確認昨夜 daily 真的跑完了。**
+> 2026-09-17 早上那輪在第一步就 fail closed：**前一晚的互動 session 持有 writer lock 沒 release**
+> （acquire 在 `crons/harvest_leads.py`，release 在 `scripts/publish_daily_state.py`——互動側手跑
+> harvest 沒有對應的 release），daily 撞上它、依 runbook 整輪中止，於是 harvest 與 APP materialize
+> 整天沒跑。系統行為是**對的**（fail closed），壞的是沒被釋放的鎖。
+> 查證：`python scripts/writer_guard.py check`（`writer_lock` 應為 null）＋看心跳第 1 段。
+> ⚠ **手跑過 harvest 就要自己 `python scripts/writer_guard.py release`**——我在同一天又犯了一次。
+>
+> **最要緊的量測（Q1 與 Q2 互相印證，它決定下一步該做什麼）：**
+> 護城河籃子 16 檔 **15 檔卡在 `no_bet`**；擴大宇宙後的量的候選 12 家，真正新出現、已在出貨、
+> 有需求錨的只有 **2 家（3081.TWO 聯亞、SHA0.DE）**，而它們唯一被擋的理由**還是 `no_bet`**。
+> ⚠ **所以 Phase 4 剩下的兩條機械條件（覆蓋厚薄、瓶頸業務占營收）現在不該做**——
+> 實測加上它們會讓 0 家變 0 家，改不到 binding constraint（L14-5）。
+> **binding constraint 已經移到使用者那一側：有沒有人願意替這些檔寫下一個帶 disproof 的賭注。**
+>
+> **等你決定的：** pq2 **[595]** 寫第一批結構讀圖紀錄（Q5 的 ledger 今天 0 筆，心跳印「一份都還沒寫」）。
+>
+> **兩個已知缺陷，刻意沒在本輪修（都動到既有契約，值得一個 Z2 proposal）：**
+> ①**writer lock 的 owner 程序死了仍卡到 TTL**——今早 daily 死掉的直接原因；鎖已記了 pid／hostname，
+> 「同機器且 pid 不存在就可接手」是可機械驗證的補償控制，但它改的是一道安全機制的判準。
+> ②**`_read_abstentions` 讀取失敗回 `[]`**，而它自己的 docstring 寫著「不得因為讀取失敗而把
+> 『刻意不主張』降級成『還沒寫』」——實作與註解相反，且現在有三個消費端。
+>
+> ⚠ **Phase 2 尚未完成**：驗收要「連續 3 天心跳零 LLM 成功發出」，**最早 2026-09-20 才驗得完**。
+> 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 Last Run Time 與 Last Result）。
+> ⚠ 明天 07:00 是**第一次真正的自動觸發**（今天那次是 `schtasks /Run` 手動走排程路徑）。
+>
+> <details><summary>上一輪（2026-09-17 早）的收尾狀態</summary>
+>
+> ~~## ⚠ 2026-09-17 收尾狀態（先讀這塊，再讀下面的任務書）
 >
 > **這一輪做完的：** Phase 1 Step 1.3 收尾｜Phase 2 Step 2.1（心跳產生器）＋ 2.2（接上獨立 Windows 排程
 > `StockBotv2-Heartbeat` 每日 07:00、`drain_limit_per_run` 5→0、`.codex/rules` 20→15）｜
@@ -42,11 +84,20 @@
 >
 > ⚠ **Phase 2 尚未完成**：驗收要「連續 3 天心跳零 LLM 成功發出」，**最早 2026-09-20 才驗得完**。
 > 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 Last Run Time 與 Last Result）。
+> </details>
 
-**任務：Q2 →（Q5）→（Q1），三件都已核准。** Phase 1 四個 Step 與 Phase 2 的 Step 2.1／2.2 都已交付並合併 master。
-⚠ **Phase 1 刻意維持 ▶ 不標 ✅**（TW／TWO／ST 實測 0）；**Phase 2 也尚未完成**（等 9/20 的三天心跳驗收）。
-兩者都不必重做。
+~~**任務：Q2 →（Q5）→（Q1），三件都已核准。**~~（2026-09-17 晚全部交付，見上方收尾狀態）
 
+**下一輪的任務：使用者未指定時，先問一句「要不要開始寫賭注」，不要自己往 Phase 4 剩下的條件做。**
+理由是量測不是偏好：兩個宇宙加起來 28 檔候選，**26 檔卡在 `no_bet`**；
+Phase 4 剩下的兩條機械條件（覆蓋厚薄、瓶頸業務占營收）實測會讓 0 家變 0 家（L14-5：改不到 binding constraint）。
+**能讓籃子非空的只有兩條路，兩條都要人：**①替某一檔寫下帶 disproof 的賭注；
+②寫一筆 `bet/variant.overlay` 的 Abstention 說「這一檔今天沒有可辯護的賭注」——
+**兩者都是答案，只有空白不是**（Q2 的全部意義）。
+
+不需要使用者決定就能做的（依序）：**Phase 3（D5 帳號登記表與計分表）**——它是漏斗最上游的
+「誰值得進佇列」，與賭注那條路互不阻塞；Phase 6（台股月營收、MOPS 重訊 watcher、parked lead 到期）。
+⚠ Phase 2 的驗收（連續 3 天心跳）最早 2026-09-20，那是等時間不是等工作。
 **先讀（順序固定；這一輪需要的全部在這裡，沒有第七份）：**
 
 | # | 檔案 | 為什麼這一輪需要它 |
