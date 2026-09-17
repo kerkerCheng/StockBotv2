@@ -115,6 +115,19 @@
         "gsr_inp_substrate_market_2026_05_16_s4"
       ],
       "src_id": "co:jx_advanced_metals"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "co:jx_advanced_metals",
+      "id": "comp602gsr1",
+      "relation": "competes_with",
+      "source_ids": [
+        "gsr_inp_substrate_market_2026_05_16_s1",
+        "gsr_inp_substrate_market_2026_05_16_s3",
+        "gsr_inp_substrate_market_2026_05_16_s4"
+      ],
+      "src_id": "co:axt"
     }
   ],
   "nodes": [
@@ -194,13 +207,13 @@
     "doc_id": "gsr_inp_substrate_market_2026_05_16",
     "evidence_tier": 3,
     "origin_entity": "Global Semi Research",
-    "permission_basis": "Independent analyst newsletter; only brief quotations for research are stored in library/raw and this extraction.",
+    "permission_basis": "Independent analyst newsletter; only brief quotations for research are stored.",
     "published_at": "2026-05-16",
     "publisher": "Global Semi Research (Substack)",
     "retrieved_at": "2026-07-17",
     "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
-    "supersedes_extraction_sha256": "41709e8f91f9e70b22423e85190d7176dcf3992cc1e64f3b4cedb352e98c5620",
+    "supersedes_extraction_sha256": "6e82915e7008145c4ef420a7eaa9740c6bc5bd7cb4470681f1ec0ce1e8491474",
     "title": "Global Semi Research: China's Indium Phosphide Surge — InP substrate market structure",
     "url": "https://globalsemiresearch.substack.com/p/chinas-indium-phosphide-surge"
   },
