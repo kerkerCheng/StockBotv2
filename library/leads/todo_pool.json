@@ -10208,11 +10208,24 @@
       "hint": "lane memo axt_inp 第 3 節在 2026-08-04 就寫著：JX 的 InP 擴產證據已入圖（doc_id jx_metals_inp_capacity_pr_2026_06_16，四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍，官方新聞稿 tier 2），但掛在 co:jx_advanced_metals 節點上，而圖中缺少 AXT↔JX 的 competes_with 邊（住友有、JX 沒有），因此不在 AXT 的 context slice 中、無法以 [E#] 引用，memo 已把補這條邊列為後續行動。六週後仍未補，後果實測到了：2026-09-17 的 mat:inp_substrate 讀圖因為 query.structure 走不到那個角度，改用外部 GSR 的『JX Metals has no announced expansion plans』，而那句話當時已經錯了六週（見 sr_88340b81269fa1c2）。⚠ 這是 graph admission，要逐筆核准。補邊之後 mat:inp_substrate 的讀圖應會自動偵測到 digest 變動並要求重讀——那正是 Q5 機制該起作用的地方。",
       "n": 602,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:ra_22daa34b4e6ad50d8c01f5c26be879be｜digest 9fe4140e…｜commit 8c76bde｜co:axt --competes_with--> co:jx_advanced_metals 已入圖（兩份第三方來源：Reuters s3、GSR s1/s3/s4，各一份 EdgeAssertion）。before → after 實測：query.structure co:axt 反向路徑 1 → 2 條。⚠ 提案診斷被實測推翻：JX 的擴產證據本來就在 2 跳內（經 mat:inp_substrate），擋住它的是 context slice 的 claim LIMIT（154 條只印 20 條，排序鍵是 proof level＋confidence 非相關性）——補邊不改那件事，已列 ROADMAP backlog 待 Z2。",
       "ref_id": "manual:602",
+      "resolution": "go",
+      "resolved_at": "2026-09-17T14:19:58.182150+00:00",
+      "source": "manual",
+      "title": "補 co:axt --competes_with--> co:jx_advanced_metals 邊（讀圖走不到 JX 擴產的機制性原因）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T14:20:23.356290+00:00",
+      "hint": "2026-09-17 於 [602] 入圖時撞到。圖裡的 claim gsr_inp_substrate_market_2026_05_16_cl2 是一條 **dated observation（as of 2026-05-16）**，逐字寫著三家 InP 基板供應商都受限、其中『JX with no announced expansion plans』——而 JX Advanced Metals 已於 2026-06-16 宣布四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍，官方新聞稿 jx_metals_inp_capacity_pr_2026_06_16 **早就入圖**（3 條 confirmed claim，conf 0.8/0.8/0.75）。⚠ 也就是說圖裡同時存在互相矛盾的兩組 claim，而 dated observation 那一條寫下六週後就過期、至今仍活著。2026-09-17 的 mat:inp_substrate 讀圖就是引用了過期那一條。go＝核准把 cl2 的措辭更正為只保留 as-of 2026-05-16 仍成立的部分（AXT 近滿載、住友飽和），並移除或明確標記『JX 無擴產計畫』那一句；不含提高任何 evidence tier、不含新增邊、不含改 substitutability、不含 live。⚠ 執行時會撞到 ROADMAP 已記的『intake 沒有更正既有 extraction 的路徑』——本輪 [602] 走的是 supersede 走廊（supersedes_extraction_sha256），同一條走廊可用。drop＝你認為 dated observation 本來就該留著當歷史、由讀的人自己看日期。",
+      "n": 603,
+      "reason": null,
+      "ref_id": "gsr_inp_substrate_market_2026_05_16_cl2",
       "resolution": null,
       "resolved_at": null,
       "source": "manual",
-      "title": "補 co:axt --competes_with--> co:jx_advanced_metals 邊（讀圖走不到 JX 擴產的機制性原因）",
+      "title": "更正圖中已過期的 dated observation：gsr cl2 逐字寫『JX with no announced expansion plans』，而 JX 已於 2026-06-16 宣布擴產",
       "type": "manual"
     }
   ],
@@ -21957,8 +21970,17 @@
       "ref_id": "dc_68cf04ebd9843573116782bd733dfa5f",
       "type": "decision_review",
       "verb": "pending"
+    },
+    {
+      "at": "2026-09-17T14:19:58.182150+00:00",
+      "n": 602,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:ra_22daa34b4e6ad50d8c01f5c26be879be｜digest 9fe4140e…｜commit 8c76bde｜co:axt --competes_with--> co:jx_advanced_metals 已入圖（兩份第三方來源：Reuters s3、GSR s1/s3/s4，各一份 EdgeAssertion）。before → after 實測：query.structure co:axt 反向路徑 1 → 2 條。⚠ 提案診斷被實測推翻：JX 的擴產證據本來就在 2 跳內（經 mat:inp_substrate），擋住它的是 context slice 的 claim LIMIT（154 條只印 20 條，排序鍵是 proof level＋confidence 非相關性）——補邊不改那件事，已列 ROADMAP backlog 待 Z2。",
+      "ref_id": "manual:602",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 603,
+  "next_n": 604,
   "schema_version": "1"
 }
