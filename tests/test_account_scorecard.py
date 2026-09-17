@@ -258,3 +258,36 @@ def test_state_flag_list_covers_every_state_materializer() -> None:
 
     assert set(STATE_KINDS) == set(_STATE_FLAGS), (
         "state kind 與 CLI flag 對不起來——漏掉的那個不會壞，只會安靜地多做十分鐘的事（L17）")
+
+
+def test_time_bound_absence_carries_a_revisit_date_and_capability_absence_does_not() -> None:
+    """兩種缺席的下一步完全相反，所以不得在讀者眼裡同形（ROADMAP Phase 3 驗收行 A 案）。
+
+    `insufficient_sample`＝**等時間**，必須答得出「哪一天會有值」（INV-2：每個等待都要有到期）；
+    `capability_absent`＝**要建能力**，等到天荒地老也不會有值，所以刻意**沒有** `revisit_after`。
+    """
+    from datetime import date as _date, timedelta as _timedelta
+
+    called_on = _date(2026, 6, 29)
+    calls = [sc.NamedCall(lead_id="lead_x", source="x:acct", company_id="co:axt",
+                          symbol="AXTI", called_on=called_on, status="triaged_go",
+                          trace_status="original_obtained")]
+    payload = sc.score_account(
+        calls,
+        prices={},                       # 沒有價格序列不影響「持有期還沒走完」那條路徑
+        today=called_on + _timedelta(days=40),
+        no_go_rate=sc.Metric(value=0.5, n=2),
+        trace_metric=sc.Metric(value=0.5, n=2),
+    )
+
+    ninety = payload["excess_returns"]["excess_90d_vs_QQQ"]
+    assert ninety["value"] is None
+    assert ninety["absence_kind"] == "insufficient_sample"
+    # 最早那一則點名走完 90 天的那一天＝這一格該有第一個值的日子。
+    assert ninety["revisit_after"] == (called_on + _timedelta(days=90)).isoformat()
+
+    hypothesis = payload["hypothesis_hit_rate"]
+    assert hypothesis["value"] is None
+    assert hypothesis["absence_kind"] == "capability_absent"
+    assert "revisit_after" not in hypothesis, "要建能力的缺席不得假裝只是等時間"
+    assert "ROADMAP" in hypothesis["reason"], "capability_absent 必須指出要建什麼"

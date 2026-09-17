@@ -131,12 +131,17 @@ class Metric:
     n: int = 0
     absence_kind: str | None = None
     reason: str = ""
+    #: `insufficient_sample` 專用：**什麼時候該回來再看**。等時間的缺席必須有到期，
+    #: 否則它與「要建能力才會有」在讀者眼裡同形——而兩者的下一步完全相反（INV-2）。
+    revisit_after: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {"value": self.value, "n": self.n}
         if self.absence_kind:
             out["absence_kind"] = self.absence_kind
             out["reason"] = self.reason
+        if self.revisit_after:
+            out["revisit_after"] = self.revisit_after
         return out
 
 
@@ -222,6 +227,9 @@ def score_account(
     trace_metric: Metric,
 ) -> dict[str, Any]:
     """具名點名 → 五欄。價格序列由呼叫端注入（測試不打網路）。"""
+    # 等時間的缺席要算得出到期日，靠的是**最早那一則點名**：它走完 horizon 的那天，
+    # 這一格就該有第一個值。沒有任何點名時留 None（那時缺的不是時間，是樣本）。
+    first_call_day = min((call.called_on for call in calls), default=None)
     excess: dict[str, Metric] = {}
     horizon_reports: dict[str, dict[str, Any]] = {}
     for horizon in HORIZONS_DAYS:
@@ -254,10 +262,16 @@ def score_account(
             if values:
                 excess[key] = Metric(value=statistics.median(values), n=len(values))
             else:
+                horizon_not_elapsed = (
+                    report.reasons.get("horizon_not_elapsed") == report.input_count)
                 excess[key] = Metric(
                     n=0, absence_kind=ABSENCE_INSUFFICIENT,
+                    # 「持有期還沒走完」是**等時間**，而等時間必須有到期日：
+                    # 最早的那一則點名走完 horizon 的那天，就是這一格該有值的日子。
+                    revisit_after=((first_call_day + timedelta(days=horizon)).isoformat()
+                                   if horizon_not_elapsed and first_call_day else None),
                     reason=(f"{horizon} 天持有期在樣本裡一次都沒有走完"
-                            if report.reasons.get("horizon_not_elapsed") == report.input_count
+                            if horizon_not_elapsed
                             else "沒有任何一則點名同時有標的與基準的價格"))
 
     prior_report = FilterReport()
@@ -286,7 +300,9 @@ def score_account(
         "hypothesis_hit_rate": Metric(
             n=0, absence_kind=ABSENCE_CAPABILITY,
             reason=("需要 filing 裁決才算得出來，本系統今天沒有「這則點名的主張後來被哪份 filing 證實／推翻」"
-                    "的紀錄。⚠ 這一格不得填 0——「還沒建」與「命中率是 0」是兩件事。"),
+                    "的紀錄。⚠ 這一格不得填 0——「還沒建」與「命中率是 0」是兩件事。"
+                    "要有值得先建那份裁決紀錄（把 lead 的具名主張接到後續 filing 的逐字核對結果），"
+                    "那是一個獨立的 ROADMAP 項，不是等時間。"),
         ).as_dict(),
         "no_go_rate": no_go_rate.as_dict(),
     }
