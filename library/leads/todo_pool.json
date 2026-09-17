@@ -10175,6 +10175,30 @@
       "source": "manual",
       "title": "mat:inp_substrate 讀圖重讀：undecided → volume（[597] 入圖後已 stale）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T10:50:01.128725+00:00",
+      "hint": "本輪已寫入 AXTI 的 variant 賭注（oa_56b08e724e0c146c 營收成長 0.9213／oa_e4022700b5209d7b 營益率 delta 0.4040，payoff −26.96%），但 thesis lifecycle 的 disproof_condition 還是舊的。依 L7（disproof 要附核查頻率＋觸發後 48h 動作），要補三條：①Q3 2026 財報營收 ≥ US$60M；②AXT 公告取得對美 InP 出口許可；③公司揭露 InP ASP 一手數字且證實大幅上漲。三條都寫在 variant 的 rationale 裡，但 thesis mutation 是四個人工 gate 之一，必須逐筆核准。",
+      "n": 600,
+      "reason": null,
+      "ref_id": "manual:600",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "AXTI thesis 的 disproof 更新為 variant 的三條可觀測條件",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T10:50:13.615879+00:00",
+      "hint": "讀圖 sr_81832cb37d87ab1d（2026-09-17 判 volume）的第 ④ 條 disproof 是「任一家宣布大規模擴產計畫（JX 現在明說沒有）」。本輪讀 Q2 10-Q 發現：AXT 在 2026-04-22 完成次級發行 9,844,357 股 @US$64.25，淨額 US$600.1M，用途逐字是 'to financially support our subsidiary Tongmei in its efforts to increase its manufacturing capacity to produce indium phosphide substrates for export worldwide'，另與 Coherent 約定 2026-2028 擴充北京產能。⚠ 這不推翻 volume 判定（三家仍可替代、擴產要到 2027-2028），但它讓「產能補不上」這個賭注**有了明確的到期日**——而讀圖現在沒有記這件事。要 append 一筆新讀圖重新判讀，屬研究判斷。",
+      "n": 601,
+      "reason": null,
+      "ref_id": "manual:601",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "mat:inp_substrate 讀圖的 disproof ④ 要重看——AXT 自己已募 600M 專款擴 InP 產能",
+      "type": "manual"
     }
   ],
   "log": [
@@ -21893,6 +21917,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 600,
+  "next_n": 602,
   "schema_version": "1"
 }

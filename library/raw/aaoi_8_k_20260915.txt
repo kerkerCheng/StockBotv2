@@ -1,0 +1,436 @@
+Applied Optoelectronics, Inc. 10-Q 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ false 
+ 0001158114 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 0001158114 
+ 
+ 
+ 2026-09-10 
+ 2026-09-10 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ iso4217:USD 
+ 
+ 
+ xbrli:shares 
+ 
+ 
+ 
+ 
+ 
+ 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+
+ &#160; 
+
+ UNITED STATES 
+
+ SECURITIES AND
+EXCHANGE COMMISSION 
+
+ Washington, D.C.
+20549 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+
+ &#160; 
+
+ FORM 8-K 
+
+ &#160; 
+
+ CURRENT REPORT 
+
+ 
+
+ Pursuant to Section 13 or 15(d) of the Securities
+Exchange Act of 1934 
+
+ &#160; 
+
+ Date of Report (Date of earliest event reported):
+ September 10, 2026 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ Applied Optoelectronics, Inc. 
+
+ (Exact name of registrant as specified
+in its charter) 
+
+ &#160; 
+
+ 
+ 
+ Delaware 
+ 001-36083 
+ 76-0533927 
+ 
+ (State or other jurisdiction of incorporation) 
+ (Commission File Number) 
+ (I.R.S. Employer Identification No.) 
+ 
+
+ 
+
+ &#160; 
+
+ 13139
+Jess Pirtle Blvd. Sugar
+Land , Texas 77478 
+
+ (Address
+of principal executive offices and z ip code) 
+
+ &#160; 
+
+ ( 281 ) 295-1800 
+
+ (Registrant&#8217;s telephone number, including
+area code) 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ &#160; 
+
+ Check the appropriate box below if the
+Form 8-K filing is intended to simultaneously satisfy the filing obligation of the registrant under any of the following provisions
+(see General Instruction A.2. below): 
+
+ &#160; 
+
+ 
+ &#168; Written communications pursuant to Rule 425 under the Securities
+Act (17 CFR 230.425) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Soliciting material pursuant to Rule 14a-12 under the Exchange
+Act (17 CFR 240.14a-12) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Pre-commencement communications pursuant to Rule 14d-2(b) under
+the Exchange Act (17 CFR 240.14d-2(b)) 
+ 
+
+ &#160; 
+
+ 
+ &#168; Pre-commencement communications pursuant to Rule 13e-4(c) under
+the Exchange Act (17 CFR 240.13e-4(c)) 
+ 
+
+ &#160; 
+
+ Securities registered pursuant to Section 12(b) of the Act: 
+
+ &#160; 
+
+ 
+ 
+ Title
+ of each class 
+ Trading
+ Symbol(s) 
+ Name of each exchange on which registered 
+ 
+ Common
+ Stock, Par value $0.001 
+ AAOI 
+ NASDAQ
+ Global Market 
+ 
+ &#160; 
+
+ Indicate by check mark whether the registrant
+is an emerging growth company as defined in Rule 405 of the Securities Act of 1933 (&#167;230.405 of this chapter) or Rule 12b-2
+of the Securities Exchange Act of 1934 (&#167;240.12b-2 of this chapter). 
+
+ &#160; 
+
+ Emerging growth company
+ &#168; 
+
+ &#160; 
+
+ If
+an emerging growth company, indicate by check mark if the registrant has elected not to use the extended transition period for
+complying with any new or revised financial accounting standards provided pursuant to Section 13(a) of the Exchange Act. o 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; &#160; &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ 
+ 
+ Item 1.01 
+ 
+ Entry into a Material Definitive Agreement. 
+ 
+
+ &#160; 
+
+ On September 10, 2026, Global Technology, Inc.
+(&#8220;Global Technology&#8221;), a wholly owned subsidiary of Applied Optoelectronics, Inc., entered into a Factory Premises Lease Agreement
+(the &#8220;Lease Agreement&#8221;) with Ningbo Yiduofu Industrial Co., Ltd. (the &#8220;Lessor&#8221;), pursuant to which Global Technology
+will lease a building consisting of approximately 38,311.8 square meters, located at No.227 Kesheng Rd., Jishigang Town, Haishu District,
+Ningbo, China. (&#8220;Leased Property&#8221;). 
+
+ &#160; 
+
+ The lease term is for ten (10) years, commencing
+on September 16, 2026, and expiring on September 15, 2036. Global Technology is entitled to a three-month rent-free renovation period
+commencing upon the actual delivery of the Leased Property. The annual rent for the Leased Property is RMB 6,896,124. Beginning in the
+third lease year, the annual rent shall increase by three percent (3%) every three years.&#160; 
+
+ &#160; 
+
+ Under the terms of the Lease Agreement, Global
+Technology has the right, at its own expense, to make alterations, improvements, and modifications to the Leased Property as necessary
+to accommodate its production requirements. Except in the event of force majeure or a material breach by Global Technology of its obligations
+under the Lease Agreement, the Lessor may not terminate the lease prior to the expiration of the lease term. 
+
+ &#160; 
+
+ Global Technology holds additional rights under
+the Lease Agreement, including but not limited to: (i) the right of first refusal to purchase the Leased Property if the Lessor elects
+to sell the Leased Property; (ii) the right to require that the Lease Agreement remains valid and binding on any purchaser or transferee
+of the Leased Property ; and (iii) the right of first refusal to renew the lease under terms no less favorable than those offered to any
+prospective tenant. 
+
+ &#160; 
+
+ The foregoing description of the Lease Agreement
+does not purport to be a complete statement of the parties&#8217; rights and obligations under the Lease Agreement and is qualified in
+its entirety by reference to the full text of the Lease Agreement, an English translation of which is attached as Exhibit 10.1 to this
+Current Report on Form 8-K and incorporated by reference herein. 
+
+ &#160; 
+
+ 
+
+ 
+ 
+ Item 2.03 
+ 
+ Creation of a Direct Financial Obligation or an Obligation
+under an Off-Balance Sheet Arrangement of a Registrant.&#160; 
+ 
+ &#160; 
+
+ The information as set forth in Item 1.01 of this
+Current Report on Form 8-K is incorporated by reference into this Item 2.03. 
+
+ 
+
+ &#160; 
+
+ 
+ 
+ Item 9.01 
+ Financial Statements and Exhibits. 
+ 
+ &#160; 
+
+ (d) Exhibits 
+
+ &#160; 
+
+ 
+ 
+ Exhibit No. &#160; 
+ &#160; 
+ Description &#160; 
+ 
+ 10.1+ 
+ &#160; 
+ Translation of the Factory Premises Lease Agreement, dated On September 10, 2026, between Global Technology, Inc. and Ningbo Yiduofu Industrial Co., Ltd. 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ 104 
+ &#160; 
+ Cover Page Interactive Data File (the cover page tags are embedded within the&#160;Inline XBRL&#160;document). 
+ 
+ &#160; 
+
+ 
+
+ + Certain personally identifiable information has been omitted from
+this exhibit pursuant to Item 601(a)(6) of Regulation S-K. 
+
+ &#160; 
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 2 &#160; 
+ &#160; 
+ 
+
+ &#160; 
+
+ 
+
+ SIGNATURES 
+
+ &#160; 
+
+ &#160; 
+
+ Pursuant to the requirements of the Securities
+Exchange Act of 1934, the registrant has duly caused this report to be signed on its behalf by the undersigned hereunto duly authorized. 
+
+ &#160; 
+
+ 
+ 
+ Date: September 15, 2026 
+ APPLIED OPTOELECTRONICS, INC. 
+ &#160; 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ &#160; 
+ &#160; 
+ &#160; 
+ &#160; 
+ 
+ &#160; 
+ By: 
+ /s/ David C. Kuo 
+ &#160; 
+ 
+ &#160; 
+ Name 
+ David C. Kuo 
+ &#160; 
+ 
+ &#160; 
+ Title: 
+ Senior Vice President and Chief Legal Officer 
+ &#160; 
+ 
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ &#160; 
+
+ 
+
+ 
+ &#160; 3 &#160; 
+ 
+
+ &#160;

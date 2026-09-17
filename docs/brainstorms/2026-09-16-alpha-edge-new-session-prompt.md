@@ -11,7 +11,68 @@
 
 ## 開工指令（貼這一段）
 
-> ## ⚠ 2026-09-17（晚）收尾狀態（先讀這塊，再讀下面的任務書）
+> ## ⚠ 2026-09-18 收尾狀態（先讀這塊，再讀下面的任務書）
+>
+> **這一輪做完的：** ①**AXTI 的 InP 賭注已寫下**（`bet_state` 由 `unanswered` → `bet`，籃子的 `bet` 由 1 → 2）；
+> ②**Phase 3 交付**（D5 帳號登記表＋計分表＋每月花費上限），ROADMAP 標 ▶ 不標 ✅。
+>
+> **⚠ 寫賭注之前先撞到的事（比賭注本身重要）：base 的四格 carried_forward 全部被 Q2 10-Q 推翻，而且四格同向樂觀。**
+> base 六格寫於 2026-09-10，證據只有 FY2025 10-K——但 Q2 10-Q 在 **2026-08-13** 就 filed 了。
+> 稀釋股數 43,933 千股（實際 1H 加權 59,642／Q2 單季 63,474）、稅率 0（實際 1H 17.99%）、
+> NCI +1,942（實際是 **扣減** 2,037，方向相反）、非營業淨額全年 432（1H 已經 5,239）。
+> 第五格 `operating_margin_delta` 是**由共識 EPS 逆推**的，而逆推用了錯的股數——
+> **base 的 thesis 逐字寫著「共識要求營益率變成 +16.4%」，真正的數字是 +24.70%。**
+> 七筆已全部 append（五筆 supersede ＋ 兩筆 variant），另補一筆 `interim_period_results`
+> 當 authority 載體（mechanical，不需 pq2）。查證：`python -m alpha assumptions AXTI`。
+>
+> **賭注的內容（payoff 是負的，那是誠實的結果）：** 共識 FY2026 營收 218M 要求 2H 做 143.5M（Q3／Q4 各比 Q2 再 +50%），
+> 而 Q2 的 47.6M 是在**對美國出口許可還沒拿到**的情況下做出來的，10-K 逐字說美國是 InP 的主要營收來源，
+> Q2 10-Q 逐字說 'we cannot predict when a permit application will be reviewed and approved'。
+> variant 的情境是「2H 不出現新催化劑」：營收 +92.1%（vs 共識 +146.8%）、營益率 delta +40.4pp。
+> **每股約 US$47，對現價 US$64.30 是 −26.96%**（橋算的與手算一致）。`passes_filter` false、`filter_reasons` `payoff_not_positive`。
+> ⚠ **這不是「賭它跌」，是把共識沒寫出來的那個前提拿掉之後值多少。** 首屏短評七格已寫（`python -m alpha brief AXTI --list`）。
+>
+> ⚠ **差點寫錯的賭注：** 一開始傾向寫「漲價落到毛利」，但自家 Engine C 的 `gross_margin_trend` 觀測逐字擋下了——
+> ASP 貢獻**未經一手證實**（Nomura 報告仍是 tier-3 隔離），而一手數據支持的是稼動率解釋
+> （營收 +164.8% 對銷貨成本 +58.5%），且 AXT 毛利率是強週期序列（2022 Q3 已達 42.0%，四季內崩到 10.7%）。
+> **自家 ledger 擋下了一個本來會很好聽的故事。**
+>
+> **Phase 3 的實測（第一次量測就有結論）：**
+>
+> | | 全部點名 | 每檔只算最早一次 |
+> |---|---|---|
+> | 點名後 30 天 vs QQQ | −2.03%（n=617） | **−9.14%**（n=38） |
+> | 點名後 30 天 vs SOXX | +3.06%（n=617） | **+2.14%**（n=38） |
+> | 點名前 30 天漲幅 | −2.28% | **−5.61%** |
+>
+> **兩個基準給出相反符號**——只印 QQQ 會得到「這帳號沒用」，只印 SOXX 會得到「這帳號有 alpha」，兩個都是錯的。
+> 追源成功率 37.59%（n=439）、no-go 率 64.63%（n=492）。**點名前是負的＝不是追高。**
+> 90 天與假設命中率誠實宣告沒有值（`insufficient_sample`／`capability_absent`），**不填 0**。
+> 計畫與 sandbox review 五步見 [`2026-09-17-alpha-edge-phase3-plan.md`](2026-09-17-alpha-edge-phase3-plan.md)。
+>
+> **開工第一件事仍然是確認昨夜 daily 沒死**（`python scripts/writer_guard.py check` ＋心跳第 1 段）。
+> ⚠ 2026-09-17 實測：鎖是 null（已釋放），但 **daily 仍然沒跑成**（`daily_done_today` false），
+> harvest 最後一輪停在前一天，已由互動 session 補跑（0 筆新 lead，總計 1101）。
+> ⚠ **心跳排程的第一次真正自動觸發是 2026-09-18 07:00，不是 09-17**——
+> 任務的 Start Date 是 09-17，但當天 07:00 時它還沒註冊，`Last Run Time` 09:45 那次是 `schtasks /Run` 手動走排程路徑。
+> 所以 Phase 2 的「連續 3 天心跳」最早 **2026-09-20** 驗得完（09-18／19／20）。
+> 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 `Next Run Time` 與 `Last Result`）。
+>
+> **待使用者決定（本輪掛號，不自行推進）：**
+> **[600]** AXTI thesis 的 disproof 更新為 variant 的三條可觀測條件（**thesis mutation gate**）。
+> **[601]** `mat:inp_substrate` 讀圖的 disproof ④ 要重看——**AXT 自己已募 US$600.1M 專款擴 InP 產能**
+> （2026-04-22 交割，用途逐字寫明），讀圖沒記這件事。它不推翻 volume 判定，但讓「產能補不上」**有了到期日**。
+> 另有一個**要改 ROADMAP Phase 定義**的：Phase 3 驗收行寫「5 欄有值」，
+> 而決定紀錄 §6 自己逐字寫著「算不回來的：假設命中率」——**兩者自相矛盾**，修驗收行要先給五欄 amendment。
+>
+> **不需核准就能接著做的：** Phase 6（台股月營收、MOPS 重訊 watcher、parked lead 到期）；
+> Phase 4 剩下的兩條機械條件**仍然不該做**（實測會讓 0 家變 0 家，改不到 binding constraint）。
+> ⚠ **binding constraint 沒有變**：籃子 16 檔現在 `bet` 2、`unanswered` 14——
+> 能讓籃子非空的還是只有兩條路，兩條都要人：替某一檔寫賭注，或寫一筆 Abstention。
+>
+> <details><summary>上一輪（2026-09-17 晚）的收尾狀態</summary>
+>
+> ~~## ⚠ 2026-09-17（晚）收尾狀態（先讀這塊，再讀下面的任務書）
 >
 > **這一輪做完的：** Q2 ✅｜Q5 ✅｜Q1 ✅（三件都已合併 master 並 push）。外加開工時修掉的一個
 > **真的壞掉的 daily**，與四個當下修的靜默缺陷。
@@ -129,6 +190,7 @@
 >
 > ⚠ **Phase 2 尚未完成**：驗收要「連續 3 天心跳零 LLM 成功發出」，**最早 2026-09-20 才驗得完**。
 > 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 Last Run Time 與 Last Result）。
+> </details>
 > </details>
 
 ~~**任務：Q2 →（Q5）→（Q1），三件都已核准。**~~（2026-09-17 晚全部交付，見上方收尾狀態）
