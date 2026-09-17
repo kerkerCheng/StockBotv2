@@ -46,14 +46,25 @@ RECORD_VERSION = "abstention/v1"
 #:   實測 GFS（2026-09-10）：bounded source-trace 找到的兩則 2026 年具名事件都**正確地**
 #:   不具入圖資格（政府機關不符 Company node schema／無金額無產能的製造協議）。
 #:
+#: - `bet`（2026-09-17 Q2，使用者核准）：**賭注層**。籃子的每一列只有兩個誠實終局——
+#:   寫一個帶 disproof 的賭注，或宣告「目前沒有可辯護的賭注」。在此之前第二種沒有地方可寫，
+#:   於是它和「還沒有人寫」共用同一格 `no_bet`（L12 一表兩義），使用者分不出
+#:   「研究做完了、結論是不下注」與「沒人看過這一檔」。
+#:   ⚠ **不得用 `valuation` 那筆頂替**：2026-09-17 實測籃子 16 檔有 5 檔
+#:   （SOI.PA／IQE.L／MP／POET／6324.T）已宣告 `valuation/target_pe` abstention，
+#:   而它們的賭注格全部是 `not_yet_recorded`——「本益比法沒有可校準的對象」不等於
+#:   「沒有可辯護的賭注」（虧損年照樣可以寫「如果 X 為真它值 Y」）。把前者讀成後者，
+#:   等於用 `SETTLED_ABSENCE_KINDS` 把五筆待辦冒充成答案。
+#:
 #: ⚠ 加層的代價寫在這裡：**多一層就要多一段消費端語意**，所以 `research` 只開一個 subject
 #: （`axis.catalyst`），不是把五個軸一次打開——general 到資料支持的那一格為止（L17-4）。
-ABSTENTION_LAYERS: tuple[str, ...] = ("valuation", "research")
+ABSTENTION_LAYERS: tuple[str, ...] = ("valuation", "research", "bet")
 
 #: 每一層可宣告的主題（method.parameter 形式，與 `METHOD_PARAMETERS` 對齊）。
 ABSTENTION_SUBJECTS: Mapping[str, tuple[str, ...]] = {
     "valuation": ("forward_earnings_multiple.target_pe",),
     "research": ("axis.catalyst",),
+    "bet": ("variant.overlay",),
 }
 
 #: 欄位名任何一段命中即 import 失敗——abstention 結構上不得攜帶任何數值主張。

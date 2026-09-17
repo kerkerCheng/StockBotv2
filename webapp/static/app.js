@@ -1585,10 +1585,17 @@ const BASKET_COLUMNS = [
   { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id, company_label: row.company_label }, set) },
   { title: '同一個賭注的群', cell: (row) => el('td', 'nowrap dim', row.sector || '—') },
   { title: '賭什麼', cell: (row) => {
+      // Q2（2026-09-17）：三種狀態必須在畫面上分得出來——「刻意不主張」是研究結論（settled），
+      // 「欠一個答案」是待辦。壓成同一句「還沒寫賭注」等於把結論與待辦混成一格（L12）。
       const c = el('td', 'wrap');
       if (row.our_bet) c.textContent = row.our_bet;
-      else if (row.payoff_status === 'available') c.textContent = '（有賭注，還沒寫短評）';
-      else c.appendChild(el('span', 'dim', '還沒寫賭注'));
+      else if (row.bet_state === 'bet') c.textContent = '（有賭注，還沒寫短評）';
+      else if (row.bet_state === 'abstained') {
+        c.appendChild(el('span', 'badge badge-settled', '刻意不主張'));
+        if (row.bet_absence_reason) c.appendChild(el('div', 'note', row.bet_absence_reason));
+      } else {
+        c.appendChild(el('span', 'badge badge-blocked', '欠一個答案'));
+      }
       return c;
     } },
   { title: '賭對，漲跌', cell: (row) => pctCell(row.payoff) },
@@ -1648,6 +1655,14 @@ async function renderBasket() {
   }
   const f = payload.filter || {};
   pick.appendChild(el('p', 'note', `filter：${f.input} 檔進來、${f.accepted} 檔通過、${f.filtered} 檔被擋。${f.rule || ''}`));
+  // 賭注帳（Q2）：每一列強制二選一，欠帳會自己出現在首屏——不是要人翻表才看得到（L14）。
+  const bl = payload.bet_ledger;
+  if (bl) {
+    pick.appendChild(mdParagraph(
+      `賭注帳：有賭注 ${bl.bet}｜刻意不主張 ${bl.abstained}｜**欠一個答案 ${bl.unanswered}**`
+      + (bl.owed && bl.owed.length ? `（${bl.owed.join('、')}）` : ''), 'note'));
+    pick.appendChild(mdParagraph(bl.rule || '', 'note'));
+  }
   app.appendChild(pick);
 
   const sec = el('section', 'panel');

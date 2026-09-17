@@ -693,7 +693,7 @@ alpha/absence.py         封閉字彙 ABSENCE_KINDS（11 種）＋ DEFAULT_ABSEN
 三條型別層強制：①**結構上不可能攜帶數字**（`_assert_no_value_fields` 在 import 當下掃描欄位名，
 長出 `value`／`target_pe`／`multiple` 之類的欄位是 import 失敗）；②`reason` 與 `revisit_when` 都必填
 （沒有「什麼證據出現才會改寫」的 abstention 是永遠不會響的火警警報，L7）；③`layer`／`subject` 是封閉字彙
-（v1 只有 `valuation.forward_earnings_multiple.target_pe`），否則它會變成「任何一格都可以宣布自己是刻意留白」
+（~~v1 只有 `valuation.forward_earnings_multiple.target_pe`~~ **2026-09-17：這份清單已經腐壞過一次**——`research/axis.catalyst` 2026-09-11 加入時沒同步到這裡。清單的 SSOT 是 `ABSTENTION_SUBJECTS`，查證：`python -c "from alpha.abstention.contracts import ABSTENTION_SUBJECTS;print(dict(ABSTENTION_SUBJECTS))"`；**加一層的代價是要多一段消費端語意**，所以每層只開資料支持的那幾個 subject），否則它會變成「任何一格都可以宣布自己是刻意留白」
 的萬用擋箭牌。入口 `python -m alpha abstention <T> --list／--add spec.json／--retract <id>`。
 
 **它不是第二份 ValuationAssumption authority。** 後者擁有「目標倍數是幾」，前者只擁有「我們不主張」；

@@ -221,6 +221,66 @@ def test_one_broken_item_does_not_take_out_its_neighbours(
     assert "upstream_unavailable" in text
 
 
+def test_bet_ledger_is_a_standing_counter_in_section_four(tmp_path: Path) -> None:
+    """Q2 的欠帳必須**自己出現**在心跳裡，不是要人打開 APP 翻表才看得到（L14）。"""
+    from webapp.basket import build_basket_artifact
+    from webapp.store import StateArtifactStore
+
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    rank_row = {"rank": 1, "ticker": "X", "company_id": "co:x", "company_label": "X",
+                "bottleneck": "tech:x", "relation": "supplies_to", "evidence": "externally_corroborated"}
+    StateArtifactStore(state_dir).write(build_basket_artifact(
+        ranking={"rows": [rank_row], "sectors": []}, overviews={}, positions=None))
+    text = "\n".join(hb.build_positions(state_dir=state_dir).lines)
+    assert "欠一個答案 1" in text, text
+    assert "籃子 1 檔" in text
+
+
+def test_missing_basket_does_not_take_out_the_rest_of_section_four(broken_env: dict[str, Path]) -> None:
+    """賭注帳讀不到時，它自己宣告缺席，**不把 alpha 占比與追蹤表一起帶走**。"""
+    section = hb.build_positions(state_dir=broken_env["state_dir"])
+    text = "\n".join(section.lines)
+    assert "賭注帳：" in text and any(k in text for k in ABSENCE_KINDS)
+    assert "power-law" in text, "後面的格子還在"
+
+
+# ---------------------------------------------------------------------------
+# 時區：心跳整份是本地時區，authority 的時戳是 UTC（2026-09-17）
+# ---------------------------------------------------------------------------
+
+def test_harvest_stamp_is_rendered_in_local_time() -> None:
+    """log 存 UTC，心跳印本地——同一份文件混兩個時區會被讀成「昨天沒跑」（2026-09-17 實測）。"""
+    utc_stamp = "2026-09-16T21:33:42.544544+00:00"
+    shown = hb._local_stamp(utc_stamp)
+    expected = datetime.fromisoformat(utc_stamp).astimezone().strftime("%Y-%m-%d %H:%M")
+    assert shown == expected
+    assert shown != utc_stamp[:16], "直接截 ISO 字串＝印 UTC"
+    assert hb._local_stamp("不是時戳") == "不是時戳", "壞資料不得讓整段消失（INV-3）"
+
+
+def test_app_freshness_today_is_the_local_today(tmp_path: Path) -> None:
+    """「今天已 materialize」的今天＝**本地**今天。
+
+    心跳 07:00 台北跑時 UTC 還停在昨天 23:00；用 UTC 判會把「昨天下午做的」算成今天的，
+    於是 daily 死掉也看不出來——成功與失敗在同一個訊號上同形（L13-2）。
+    ⚠ 在 UTC±0 的機器上兩種實作等價，這條會退化成不鑑別（本機是 Asia/Taipei）。
+    """
+    from webapp.basket import build_basket_artifact
+    from webapp.store import StateArtifactStore
+
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    yesterday_pm = datetime(2026, 9, 17, 14, 44).astimezone()   # naive → 本地時區
+    StateArtifactStore(state_dir).write(build_basket_artifact(
+        ranking={"rows": [], "sectors": [], "as_of": None, "generated_at": None},
+        overviews={}, positions=None, generated_at=yesterday_pm))
+
+    line = hb._app_freshness_line(now=datetime(2026, 9, 18, 7, 0).astimezone(), state_dir=state_dir)
+    assert "今天已 materialize 0 份" in line, line
+    assert "不是今天的 1 份" in line, line
+
+
 # ---------------------------------------------------------------------------
 # 無人值守進入點（crons/heartbeat_task.py）
 # ---------------------------------------------------------------------------

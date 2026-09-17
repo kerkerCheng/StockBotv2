@@ -33,6 +33,7 @@ from alpha.providers import assumptions as assumption_ledger
 from alpha.providers import briefs as brief_ledger
 from alpha.providers import entry_criteria as entry_ledger
 from alpha.providers import horizon_assumptions as horizon_ledger
+from alpha.abstention.contracts import select_abstention
 from alpha.providers import abstentions as abstention_ledger
 from alpha.providers import valuation_assumptions as valuation_ledger
 from alpha.refresh import build_instant
@@ -237,6 +238,29 @@ def _read_abstentions(ticker: str) -> list[Any]:
         return list(records)
     except Exception:  # noqa: BLE001
         return []
+
+
+def variant_absence(
+    abstentions: Sequence[Any], *, as_of: date | None, today: date,
+) -> tuple[str, str]:
+    """沒有 variant 假設時，這是**哪一種**「沒有」。純函式：查 ledger，不推論（L16）。
+
+    Q2（2026-09-17 使用者核准）：籃子的每一列只有兩個誠實終局——寫一個帶 disproof 的賭注，
+    或宣告「目前沒有可辯護的賭注」。第二種在此之前沒有地方可寫，於是和「還沒有人寫」
+    共用同一句話（L12 一表兩義）；使用者因此分不出「研究做完了、結論是不下注」與
+    「沒人看過這一檔」。
+
+    ⚠ **只認 `bet/variant.overlay`**：估值層的 `target_pe` abstention 說的是
+    「本益比法沒有可校準的對象」，那不等於「沒有可辯護的賭注」——虧損年照樣可以寫
+    「如果 X 為真它值 Y」。2026-09-17 實測籃子 16 檔有 5 檔已宣告前者而賭注格仍是
+    `not_yet_recorded`；把前者讀成後者會把五筆待辦冒充成答案。
+    """
+    declared = select_abstention(
+        abstentions, layer="bet", subject="variant.overlay",
+        period_end=None, as_of=as_of, today=today)
+    if declared is not None:
+        return (f"刻意不主張賭注（{declared.abstention_id}）：{declared.reason}", "deliberate_abstention")
+    return ("尚未寫入任何 variant 假設——賭注還沒寫（不是 0）", "not_yet_recorded")
 
 
 def _valuation_model(
@@ -591,6 +615,7 @@ def fetch_alpha_investment_view(
         variant_fundamental = variant_valuation = variant_implied = None
         variant_reason: str | None = None
         variant_kind: str | None = None
+        abstention_records = _read_abstentions(str(resolved_ticker))
         has_variant = any(getattr(r, "scenario", "base") == "variant" and not getattr(r, "retracted", False)
                           for r in [*records, *valuation_records])
         if has_variant:
@@ -603,8 +628,11 @@ def fetch_alpha_investment_view(
                 build, variant_valuation, v_v_reason, resolved_ticker, company_id, as_of=as_of, today=today,
                 identity=identity, fundamental_model=variant_fundamental, fundamentals_provider=fundamentals_provider)
         else:
-            variant_reason = "尚未寫入任何 variant 假設——賭注還沒寫（不是 0）"
-            variant_kind = "not_yet_recorded"
+            # Q2（2026-09-17）：沒有 variant 假設有**兩個**意思，不是一個。
+            # 「還沒有人寫」與「已研究、結論是沒有可辯護的賭注」共用同一格，使用者分不出來；
+            # 後者在 `bet/variant.overlay` 這本 append-only ledger 裡是一筆明示紀錄（L16：
+            # 分類有 SSOT 就要跟著資料走到需要它的地方——這個檔案第 262 行早就在讀它了）。
+            variant_reason, variant_kind = variant_absence(abstention_records, as_of=as_of, today=today)
         # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
         refresh_changes = None
         metric_observations: list[Any] = []
@@ -695,7 +723,7 @@ def fetch_alpha_investment_view(
         reverse=reverse_model, reverse_reason=reverse_reason,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
-        abstention_records=_read_abstentions(str(resolved_ticker)),
+        abstention_records=abstention_records,
         metric_observations=metric_observations, change_detection=detection,
         refresh_notes=refresh_notes,
         variant_fundamental=variant_fundamental, variant_valuation=variant_valuation,

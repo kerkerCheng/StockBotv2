@@ -117,12 +117,18 @@ def test_layer_and_subject_are_contracts_not_free_text() -> None:
     with pytest.raises(ContractViolation, match="沒有 subject"):
         abstention_record(company_id="co:x", ticker="X", layer="valuation",
                           subject="dcf.wacc", reason="a" * 30, revisit_when="b" * 20)
-    # 2026-09-11：加 research 層（使用者核准）。**這條刻意繼續數**——層數是 contract，
-    # 多一層就要多一段消費端語意，偷偷長出第三層必須變紅。
-    assert ABSTENTION_LAYERS == ("valuation", "research")
+    # 2026-09-11：加 research 層（使用者核准）。2026-09-17：加 bet 層（Q2，使用者核准）。
+    # **這條刻意繼續數**——層數是 contract，多一層就要多一段消費端語意，偷偷長出新層必須變紅。
+    # ⚠ 它在 2026-09-17 真的擋下過一次：Q2 的 `bet` 層加進去時這條立刻紅，
+    # 逼著把消費端語意（籃子的 bet_state、心跳第 4 段的賭注帳）一起交出來才放行。
+    assert ABSTENTION_LAYERS == ("valuation", "research", "bet")
     assert set(ABSTENTION_SUBJECTS) == set(ABSTENTION_LAYERS)
-    # research 只開一個 subject：general 到資料支持的那一格為止（L17-4）
+    # 每層只開資料支持的那幾個 subject：general 到資料支持的那一格為止（L17-4）
     assert ABSTENTION_SUBJECTS["research"] == ("axis.catalyst",)
+    assert ABSTENTION_SUBJECTS["bet"] == ("variant.overlay",)
+    with pytest.raises(ContractViolation, match="沒有 subject"):
+        abstention_record(company_id="co:x", ticker="X", layer="bet",
+                          subject="variant.anything", reason="a" * 30, revisit_when="b" * 20)
     with pytest.raises(ContractViolation, match="沒有 subject"):
         abstention_record(company_id="co:x", ticker="X", layer="research",
                           subject="axis.structural", reason="a" * 30, revisit_when="b" * 20)

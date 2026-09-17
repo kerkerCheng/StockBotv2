@@ -530,6 +530,18 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m alpha abstention 6324.T --retract ab_xxxx     # append 一筆撤回
 ```
 
+**三層各有自己的 subject**（封閉字彙，寫錯直接拒收）：`valuation/forward_earnings_multiple.target_pe`、
+`research/axis.catalyst`、**`bet/variant.overlay`**（2026-09-17 Q2 新增：「目前沒有可辯護的賭注」）。
+⚠ **不得互相頂替**：估值層那筆說的是「本益比法沒有可校準的對象」，虧損年照樣可以寫
+「如果 X 為真它值 Y」——把它讀成賭注層的 abstention，等於把待辦冒充成答案。
+籃子頁與心跳第 4 段的「賭注帳」只認 `bet/variant.overlay`。
+
+```jsonc
+// spec.json 範例（賭注層；reason ≥ 20 字、revisit_when ≥ 10 字，型別層強制）
+{"company_id": "co:iqe", "ticker": "IQE.L", "layer": "bet", "subject": "variant.overlay",
+ "reason": "……為什麼今天寫不出可辯護的賭注……", "revisit_when": "……什麼證據出現才會重看……"}
+```
+
 ⚠ 它**不會產生任何數字**——宣告之後 fair value 仍然缺席、readiness 仍然 blocked，改變的只有
 「為什麼缺席」。`Abstention` 在型別層不可能長出可裝數值的欄位。
 架構見 `docs/ARCHITECTURE.md` §6.8／§6.9。**互動專用，不進 unattended rule。**

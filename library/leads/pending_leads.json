@@ -8380,6 +8380,174 @@
       "result": "ok",
       "run_at": "2026-09-15T21:33:42.544544+00:00",
       "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:42:49.716026+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:42:50.659423+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:42:51.318783+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "new": 3,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:01.064745+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:03.105368+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:03.789072+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:04.565805+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:05.258211+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:05.772613+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:06.480784+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:07.232265+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:07.971135+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:08.660778+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 8,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:09.367210+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:10.157257+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:10.836635+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:11.544765+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:12.266535+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:12.833841+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:13.548683+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:14.064181+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:14.769621+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:15.284311+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:15.829265+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:16.551478+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:17.377112+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:17.897642+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T06:43:18.416423+00:00",
+      "source": "edgar:TSM"
     }
   ],
   "leads": {
@@ -21811,6 +21979,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2079502019933732884"
     },
+    "lead_39cf68c9a562cd07f5ebe4857f2ba825": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.366602+00:00",
+      "lead_id": "lead_39cf68c9a562cd07f5ebe4857f2ba825",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393513]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.366687+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393513/xslF345X06/ownership.xml"
+    },
     "lead_3a42f692ec4e0421323aca7bbfd2538e": {
       "entities": {
         "company_ids": [],
@@ -24614,6 +24808,40 @@
         }
       ],
       "url": "https://www.foci-cpo.com/index.php?route=investor%2Fcontact"
+    },
+    "lead_465aacdf48d5764712ae48ad7feaf619": {
+      "entities": {
+        "company_ids": [
+          "co:coherent"
+        ],
+        "tickers": [
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:07.970895+00:00",
+      "lead_id": "lead_465aacdf48d5764712ae48ad7feaf619",
+      "published_at": "2026-09-15",
+      "refs": {},
+      "source": "edgar:COHR",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR"
+          ]
+        }
+      },
+      "title": "COHR 4 filed 2026-09-15 [001064]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:07.971042+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001064/xslF345X06/form4.xml"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
       "entities": {
@@ -28001,6 +28229,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2087397768314999183"
+    },
+    "lead_57bb0840644b7aeee0dc436c5e86f583": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.367123+00:00",
+      "lead_id": "lead_57bb0840644b7aeee0dc436c5e86f583",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393500]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.367205+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393500/xslF345X06/ownership.xml"
     },
     "lead_57cf81e3979adf60169cbebabc245435": {
       "entities": {
@@ -31840,6 +32094,50 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2083270545320386734"
     },
+    "lead_6a699965cb7d44a69753e8335c0b4bd3": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:01.063767+00:00",
+      "lead_id": "lead_6a699965cb7d44a69753e8335c0b4bd3",
+      "media": [
+        {
+          "cache": {
+            "bytes": 62996,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_6a699965cb7d44a69753e8335c0b4bd3/3_2099999505005576192.jpg",
+            "sha256": "a258401f4fe641c232bbc632a12cf6ee8a8c88caf055b44b1cf54b1befbdab53"
+          },
+          "height": 440,
+          "media_key": "3_2099999505005576192",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSSybGxagAAEnGl.jpg",
+          "width": 1260
+        }
+      ],
+      "published_at": "2026-09-15T23:11:14.000Z",
+      "raw_text": "Just as a pep-talk statistic ahead of Fed decisions tomorrow.\n\n50% of $NVDA employees are reportedly now worth over $25 Million.\n\nThey didn’t get to that number paperhanding shares ahead of every macro scare or rate hike. https://t.co/saulhxBF3g",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Just as a pep-talk statistic ahead of Fed decisions tomorrow. 50% of $NVDA employees are reportedly now worth over $25 Million. They didn’t get to that number paperhanding shares ahead of every macro scare or rate hike. https://t.co/saulhxBF3g",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2099999510898577543"
+    },
     "lead_6ac3699094b2106a3af12848febb87f3": {
       "entities": {
         "company_ids": [
@@ -33438,6 +33736,32 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000080/avgo-20260802.htm"
+    },
+    "lead_727eecb864125c5d30dbebdd5cde8506": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:12.833621+00:00",
+      "lead_id": "lead_727eecb864125c5d30dbebdd5cde8506",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-09-16 [014061]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:12.833749+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326014061/xslF345X06/ownership.xml"
     },
     "lead_728850e5cfe698ffcb164cb0ffb42279": {
       "entities": {
@@ -41446,6 +41770,69 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1040470/000104047026000255/xslF345X06/primary_01.xml"
     },
+    "lead_9258d25d3075f37fd55cfe9f83eb19ab": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia",
+          "co:lumentum",
+          "co:coherent"
+        ],
+        "tickers": [
+          "NVDA",
+          "LITE",
+          "COHR"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:01.020536+00:00",
+      "lead_id": "lead_9258d25d3075f37fd55cfe9f83eb19ab",
+      "media": [
+        {
+          "cache": {
+            "bytes": 148979,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_9258d25d3075f37fd55cfe9f83eb19ab/3_2100290478398996481.jpg",
+            "sha256": "1d9d7836b1241a6593cc4dc5ed54aff383177765d8b595f8da22451576c4f3f3"
+          },
+          "height": 959,
+          "media_key": "3_2100290478398996481",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSW7D_IbgAE9-0h.jpg",
+          "width": 1219
+        },
+        {
+          "cache": {
+            "bytes": 108197,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_9258d25d3075f37fd55cfe9f83eb19ab/3_2100290478415761408.jpg",
+            "sha256": "e10117a9f8efe42b3c81e74ef5e17b9269e22f5c254f852c12e1b32c10be6a51"
+          },
+          "height": 741,
+          "media_key": "3_2100290478415761408",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSW7D_MbUAAGf2f.jpg",
+          "width": 1251
+        }
+      ],
+      "published_at": "2026-09-16T18:27:28.000Z",
+      "raw_text": "Reminiscent of $NVDA w/ $LITE + $COHR:\n\nFoxconn is now considering joint investments to avoid upstream material shortages.\n\nFoxconn Interconnect Chairman identifies CW lasers and fiber as the biggest bottleneck in photonics.\n\nVery interesting to see these two themes reiterated across industry commentary.\n\nAlmost like a certain Anime character on X was right about CW laser bottlenecks.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "COHR",
+            "LITE",
+            "NVDA"
+          ]
+        }
+      },
+      "title": "Reminiscent of $NVDA w/ $LITE + $COHR: Foxconn is now considering joint investments to avoid upstream material shortages. Foxconn Interconnect Chairman identifies CW lasers and fiber as the biggest bottleneck in photonics. Very interesting to see these two themes reiterated across industry commentary. Almost like a certain Anime character on X was right about CW laser bottlenecks.",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2100290486569505223"
+    },
     "lead_928514b80dea6644f199f48c0803092d": {
       "content_updated_at": "2026-09-10T22:32:36.212394+00:00",
       "entities": {
@@ -41536,6 +41923,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2085823672569467005"
+    },
+    "lead_934e947c8a520616e354e1aefb3a8e19": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.366328+00:00",
+      "lead_id": "lead_934e947c8a520616e354e1aefb3a8e19",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393517]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.366471+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393517/xslF345X06/ownership.xml"
     },
     "lead_942c7773612e0a65939f173fb684615b": {
       "content_updated_at": "2026-09-10T22:32:44.455870+00:00",
@@ -43206,6 +43619,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2087280662802026931"
     },
+    "lead_9ab6a9767aa01eb8b4b1c15e0d7682aa": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.366494+00:00",
+      "lead_id": "lead_9ab6a9767aa01eb8b4b1c15e0d7682aa",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393515]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.366582+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393515/xslF345X06/ownership.xml"
+    },
     "lead_9adb031e86660441500e62d9adc0bafe": {
       "entities": {
         "company_ids": [
@@ -44529,6 +44968,32 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/6951/000162828026061408/xslF345X06/wk-form4_1789074224.xml"
+    },
+    "lead_a18f0b221c3ecb8cdb524ead178fb986": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.366807+00:00",
+      "lead_id": "lead_a18f0b221c3ecb8cdb524ead178fb986",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393509]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.366891+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393509/xslF345X06/ownership.xml"
     },
     "lead_a20546668cd334f92251bdb30f6373c2": {
       "entities": {
@@ -55100,6 +55565,40 @@
       },
       "url": "https://www.thearmchairtrader.com/uk-stock-market-news/iqe-grainger-theworks/?.tsrc=rss"
     },
+    "lead_cd29cfaa3aaf5b35a647fe3ac48f1c33": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:11.544539+00:00",
+      "lead_id": "lead_cd29cfaa3aaf5b35a647fe3ac48f1c33",
+      "published_at": "2026-09-15",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-09-15 [000011]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:11.544673+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000011/xslF345X06/form4-09152026_110904.xml"
+    },
     "lead_cd45be9f8f96a123f579b730130c9766": {
       "entities": {
         "company_ids": [],
@@ -56029,6 +56528,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2072941265956864451"
+    },
+    "lead_d0ffeae321cd459f9f998f1e4a1210ba": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.366705+00:00",
+      "lead_id": "lead_d0ffeae321cd459f9f998f1e4a1210ba",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393511]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.366789+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393511/xslF345X06/ownership.xml"
     },
     "lead_d10925b96c29176f352f2e8004869fe5": {
       "entities": {
@@ -58228,6 +58753,32 @@
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/change-in-the-total-number-of-shares-and-votes-in-sivers-semiconductors-ab-c4480cb7"
     },
+    "lead_dbb0cb2f5f818ef5e753b5df1ea8ba47": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.366919+00:00",
+      "lead_id": "lead_dbb0cb2f5f818ef5e753b5df1ea8ba47",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393506]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.367004+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393506/xslF345X06/ownership.xml"
+    },
     "lead_dbc94158a40139d8ae06d646603deb10": {
       "content_updated_at": "2026-07-29T13:46:42.901079+00:00",
       "entities": {
@@ -58410,6 +58961,89 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2084468063228060092"
+    },
+    "lead_dcbd8601110f01f98295301cfb4a5b42": {
+      "entities": {
+        "company_ids": [
+          "co:sivers_semiconductors",
+          "co:coherent",
+          "co:broadcom",
+          "co:lumentum",
+          "co:jabil"
+        ],
+        "tickers": [
+          "SIVE",
+          "COHR",
+          "AVGO",
+          "LITE",
+          "JBL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:01.061651+00:00",
+      "lead_id": "lead_dcbd8601110f01f98295301cfb4a5b42",
+      "media": [
+        {
+          "cache": {
+            "bytes": 55027,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_dcbd8601110f01f98295301cfb4a5b42/3_2100004749768843264.jpg",
+            "sha256": "f886c8534d4a53392893ed4d4d65070a9abdc9e9d7a4c55d0a0966e5c18c0ca3"
+          },
+          "height": 560,
+          "media_key": "3_2100004749768843264",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSS3MZCa4AAFiqU.jpg",
+          "width": 1407
+        },
+        {
+          "cache": {
+            "bytes": 153187,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_dcbd8601110f01f98295301cfb4a5b42/3_2100005007693369344.jpg",
+            "sha256": "d8e515e01359f4cb3c18af294cc534d76ca17ae05977f35954c8a0295d022c39"
+          },
+          "height": 771,
+          "media_key": "3_2100005007693369344",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSS3bZ4a0AAm3iw.jpg",
+          "width": 1329
+        }
+      ],
+      "published_at": "2026-09-15T23:47:15.000Z",
+      "raw_text": "$SIVE has its own piece in Digitimes btw, which is appreciated industry recognition outside of Sweden. \n\nI think Sivers 100M+ CW DFB laser capacity buildout forced the industry to revisit its models and generated considerably more coverage. \n\nBC it puts Sivers into T1 laser capacity convo w/ $COHR, Sumitomo, Furukawa, $AVGO, Landmark, and $LITE if it executes on its ramp. \n\nBut outside of that, CIOE 2026 channel checks were really meaningful since the community found Sivers is working with Chinese pluggable players + setting up an office locally. \n\nI'm getting dejavu to the time I pointed out $SIVE + $JBL at OFC for their 1.6T LRO, but nobody believed the link until there was an actual press release. \n\nAnyway, proud to see this little company growing up",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO",
+            "COHR",
+            "CW DFB laser",
+            "LITE"
+          ]
+        },
+        "robotics": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "JBL"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE",
+            "Sivers"
+          ]
+        }
+      },
+      "title": "$SIVE has its own piece in Digitimes btw, which is appreciated industry recognition outside of Sweden. I think Sivers 100M+ CW DFB laser capacity buildout forced the industry to revisit its models and generated considerably more coverage. BC it puts Sivers into T1 laser capacity convo w/ $COHR, Sumitomo, Furukawa, $AVGO, Landmark, and $LITE if it executes on its ramp. But outside of that, CIOE 2026 channel checks were really meaningful since the community found Sivers is working with Chinese pluggable players + setting up an office locally. I'm getting dejavu to the time I pointed out $SIVE + $JBL at OFC for their 1.6T LRO, but nobody believed the link until there was an actual press release. Anyway, proud to see this little company growing up",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2100008575229976995"
     },
     "lead_dcf4f840af40a235c36cfd6d98bb53db": {
       "entities": {
@@ -60633,6 +61267,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2072225122057142691"
     },
+    "lead_e764fffb03f4df49766dae84ba0c1a2d": {
+      "entities": {
+        "company_ids": [
+          "co:google"
+        ],
+        "tickers": [
+          "GOOGL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:09.367022+00:00",
+      "lead_id": "lead_e764fffb03f4df49766dae84ba0c1a2d",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:GOOGL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GOOGL 4 filed 2026-09-16 [393503]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:09.367105+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1652044/000119312526393503/xslF345X06/ownership.xml"
+    },
     "lead_e766f19b8dc748d744d0b4cc6dc21071": {
       "entities": {
         "company_ids": [
@@ -62436,6 +63096,58 @@
         "tier": 4
       },
       "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-sivers-board-completes-purchase-of-shares-as-approved-at-the-june-2026-agm-2300464a"
+    },
+    "lead_ed2715c7f1933e6a3ae88a76fba53118": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "MRVL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:14.063860+00:00",
+      "lead_id": "lead_ed2715c7f1933e6a3ae88a76fba53118",
+      "published_at": "2026-09-16",
+      "refs": {},
+      "source": "edgar:MRVL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "MRVL 4 filed 2026-09-16 [062334]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:14.063985+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026062334/xslF345X06/wk-form4_1789598794.xml"
+    },
+    "lead_ed82a88e0129e3e0d313966fb5a675d0": {
+      "entities": {
+        "company_ids": [
+          "co:marvell_technology"
+        ],
+        "tickers": [
+          "MRVL"
+        ]
+      },
+      "first_seen": "2026-09-17T06:43:14.064007+00:00",
+      "lead_id": "lead_ed82a88e0129e3e0d313966fb5a675d0",
+      "published_at": "2026-09-15",
+      "refs": {},
+      "source": "edgar:MRVL",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "MRVL 4 filed 2026-09-15 [062124]",
+      "triage": {
+        "decided_at": "2026-09-17T06:43:14.064094+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1835632/000162828026062124/xslF345X06/wk-form4_1789522603.xml"
     },
     "lead_edb7d8187be32344b2f90b0dfc7bcf11": {
       "entities": {
@@ -66588,8 +67300,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2099830591663513642",
-      "updated_at": "2026-09-15T21:33:24.878930+00:00",
+      "since_id": "2100290486569505223",
+      "updated_at": "2026-09-17T06:43:01.064733+00:00",
       "user_id": "1940360837547565056"
     }
   }

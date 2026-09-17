@@ -14,6 +14,15 @@
 INV-3：filter 逐檔報 input／accepted／filtered／reasons（封閉字彙 `FILTER_REASONS`）。沒有一檔通過就
 `top_pick=null` ＋ 各理由的計數——那是誠實的答案，不是壞掉。
 
+## 每一列強制「有賭注 或 Abstention」（Q2，2026-09-17 使用者核准）
+
+進了籃子就得回答「我們賭什麼」。答案只有兩種誠實形狀，`bet_state` 是那個答案的封閉字彙：
+`bet`（variant 已寫）／`abstained`（`bet/variant.overlay` ledger 有一筆明示紀錄）／
+`unanswered`（**兩者皆無——欠一個答案，不是一種狀態**）。三者逐列印、逐項計數（`bet_ledger`）。
+
+為什麼這是籃子層最要緊的一格：2026-09-17 實測 16 檔有 **15 檔** 卡在「沒人寫賭注」，
+**沒有一檔**是因為 substitutability 或證據強度被擋——開別的門、擴別的宇宙都不會讓籃子非空。
+
 ## 純函式
 
 `build_basket_artifact` 只吃三份已 materialize 的 artifact（ranking／positions／每檔 overview），不連 DB、
@@ -32,9 +41,26 @@ BASKET_MATERIALIZER_VERSION = "webapp-materialize-basket/1"
 #: filter 理由的封閉字彙（一檔可能同時有多個）。
 FILTER_REASONS: Mapping[str, str] = {
     "no_bet": "還沒寫賭注（variant 假設）",
+    "bet_abstained": "已宣告刻意不主張賭注（append-only ledger 的研究結論，不是待辦）",
     "payoff_not_positive": "賭注對了也不比現價高",
     "no_catalyst_in_horizon": "沒有指名假設、且落在目標價日期之前的催化劑",
 }
+
+#: 一列的**賭注終局**（Q2，2026-09-17 使用者核准）。封閉字彙，三個值但只有兩個是終局。
+#:
+#: 進了籃子就得回答「我們賭什麼」，答案只有兩種誠實形狀：寫一個帶 disproof 的賭注，
+#: 或在 `bet/variant.overlay` ledger 宣告「目前沒有可辯護的賭注 ＋ revisit_when」。
+#: **`unanswered` 不是第三種終局，是欠一個答案**——它被計數、被印出來，不會安靜地
+#: 混在「沒通過 filter」裡（2026-09-17 實測：16 檔有 15 檔卡在這裡，而那才是籃子空的原因）。
+BET_STATES: Mapping[str, str] = {
+    "bet": "有賭注：variant 假設已寫，payoff 算得出來",
+    "abstained": "刻意不主張：已研究，結論是目前沒有可辯護的賭注（append-only 紀錄，附 revisit_when）",
+    "unanswered": "**欠一個答案**：既沒有賭注，也沒有宣告不主張——不是狀態，是待辦",
+}
+BET_LEDGER_RULE = ("籃子的每一列強制二選一：有賭注，或一筆 Abstention。沒有第三種安靜狀態——"
+                   "兩者皆無時記成 unanswered 並計數（Q2，2026-09-17）。"
+                   "⚠ 賭注的 Abstention 只認 layer=bet／subject=variant.overlay：估值層的 "
+                   "`target_pe` abstention 說的是「本益比法沒有可校準的對象」，不是「沒有可辯護的賭注」。")
 FILTER_RULE = ("結構順序不動；首選＝順序中第一個「有賭注、payoff 為正、至少一條指名假設的催化劑落在目標價日期之前」的。"
                "這是 filter 不是重算：沒有一檔通過就沒有首選。")
 
@@ -84,9 +110,14 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
     reached = _cell_value(ov.get("target_reached")) or {}
     value_date = _cell_value(((ov.get("future_target") or {}).get("value_date")))
     payoff_value = _num(_cell_value(payoff.get("simple")))
+    # 賭注終局：有值＝有賭注；沒值時由**上游宣告的** absence_kind 決定是哪一種沒有——
+    # 呈現層不 parse 理由句去猜（L16）。`deliberate_abstention` 來自 bet ledger，
+    # 由 briefing/alpha_view/sources.py 在 variant 缺席分支查出後一路帶下來。
+    abstained = str(payoff.get("absence_kind") or "") == "deliberate_abstention"
+    bet_state = "bet" if payoff_value is not None else ("abstained" if abstained else "unanswered")
     reasons: list[str] = []
     if payoff_value is None:
-        reasons.append("no_bet")
+        reasons.append("bet_abstained" if abstained else "no_bet")
     elif payoff_value <= 0:
         reasons.append("payoff_not_positive")
     if not _catalyst_in_horizon(ripeness, value_date):
@@ -111,6 +142,8 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         "payoff": payoff_value,
         "payoff_status": payoff.get("status"),
         "payoff_absence_kind": payoff.get("absence_kind"),
+        "bet_state": bet_state,
+        "bet_absence_reason": (payoff.get("reason") if payoff_value is None else None),
         "ripeness": (ripeness or {}).get("counts") if isinstance(ripeness, Mapping) else None,
         "consensus_moved": base_closure.get("closed_fraction") if isinstance(base_closure, Mapping) else None,
         "consensus_points": base_closure.get("n_points") if isinstance(base_closure, Mapping) else None,
@@ -141,6 +174,8 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
                                      sector=sector_of.get(int(rank_row.get("rank") or 0))))
     accepted = [r for r in rows if r["passes_filter"]]
     reason_counts = {key: sum(1 for r in rows if key in r["filter_reasons"]) for key in FILTER_REASONS}
+    # 賭注帳：每個 state 都印，**0 也印**——「欠 0 個答案」與「這一格沒算」不得同形（INV-3）。
+    bet_counts = {state: sum(1 for r in rows if r["bet_state"] == state) for state in BET_STATES}
     top = accepted[0] if accepted else None
     groups: dict[str, list[str]] = {}
     for r in rows:
@@ -169,6 +204,9 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
                                        f"{FILTER_REASONS[k]} {v} 檔" for k, v in reason_counts.items() if v)),
         "filter": {"input": len(rows), "accepted": len(accepted), "filtered": len(rows) - len(accepted),
                    "reasons": reason_counts, "reason_labels": dict(FILTER_REASONS), "rule": FILTER_RULE},
+        "bet_ledger": {**bet_counts, "input": len(rows),
+                       "state_labels": dict(BET_STATES), "rule": BET_LEDGER_RULE,
+                       "owed": [r["ticker"] for r in rows if r["bet_state"] == "unanswered"]},
         "groups": [{"sector": k, "tickers": v} for k, v in groups.items()],
         "correlation_notes": list(ranking.get("correlation_notes") or ()),
         "this_is_not": list(BASKET_THIS_IS_NOT),
@@ -181,10 +219,12 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
     payload["freshness_identity"] = state_freshness_identity(
         kind="basket", as_of=payload["as_of"],
         # 認知狀態＝順序、每檔有沒有賭注／payoff 正負／通過 filter 與否；現價與報酬的小數變動不算。
-        identity={"rows": [[r["ticker"], r["rank"], r["payoff_status"], r["passes_filter"], r["filter_reasons"]] for r in rows],
+        identity={"rows": [[r["ticker"], r["rank"], r["payoff_status"], r["bet_state"],
+                            r["passes_filter"], r["filter_reasons"]] for r in rows],
                   "top_pick": top["ticker"] if top else None})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 
 
-__all__ = ["BASKET_THIS_IS_NOT", "FILTER_REASONS", "FILTER_RULE", "build_basket_artifact", "build_basket_row"]
+__all__ = ["BASKET_THIS_IS_NOT", "BET_LEDGER_RULE", "BET_STATES", "FILTER_REASONS", "FILTER_RULE",
+           "build_basket_artifact", "build_basket_row"]

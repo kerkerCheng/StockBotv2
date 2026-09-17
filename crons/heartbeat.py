@@ -134,6 +134,19 @@ def _read_json(path: Path) -> Any:
 # 段 1｜資料新鮮
 # ---------------------------------------------------------------------------
 
+def _local_stamp(raw: str) -> str:
+    """append-only log 的時戳存 UTC，但心跳整份是**本地時區**（標頭逐字寫著）。
+
+    ⚠ 2026-09-17 實測：這一行直接印 UTC，把台北 09-16 05:33 的 harvest 顯示成
+    `2026-09-15T21:33`，讀的人（包括下一個 session）會判成「前天沒跑」。
+    同一份文件裡混兩個時區＝一個表示兩種語意（L12）。
+    """
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "+00:00")).astimezone().strftime("%Y-%m-%d %H:%M")
+    except ValueError:
+        return raw[:19] or "未知"
+
+
 def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) -> Section:
     """harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
     section = Section(1, SECTION_TITLES[0])
@@ -151,7 +164,7 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         head = f"harvest 來源 {len(latest)} 個｜失敗 {len(bad)} 個"
         if bad:
             head += "：" + "、".join(bad)
-        section.lines.append(f"{head}｜最後一輪 {newest[:19] or '未知'}")
+        section.lines.append(f"{head}｜最後一輪 {_local_stamp(newest)}")
     else:
         section.lines.append("harvest 來源：**沒有任何執行紀錄**（harvest_log 為空）")
 
@@ -192,7 +205,10 @@ def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
     from webapp.store import StateArtifactStore
 
     store = StateArtifactStore(state_dir) if state_dir is not None else StateArtifactStore()
-    today = now.astimezone(timezone.utc).date()
+    # 「今天」＝**本地**日曆日：心跳 07:00 台北跑，UTC 還停在昨天 23:00。用 UTC 判會把
+    # 「昨天下午 materialize 的」算成今天的（2026-09-17 實測：明天 07:00 會把今天 14:44 那 6 份
+    # 報成 fresh），於是 daily 再死一次也看不出來——成功與失敗在同一個訊號上同形（L13-2）。
+    today = now.astimezone().date()
     fresh_today: list[str] = []
     stale: list[str] = []
     broken: list[str] = []
@@ -206,7 +222,7 @@ def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
         except ValueError:
             broken.append(f"{kind}（generated_at 不是合法時戳）")
             continue
-        (fresh_today if when.astimezone(timezone.utc).date() >= today else stale).append(kind)
+        (fresh_today if when.astimezone().date() >= today else stale).append(kind)
     missing = store.missing_kinds()
 
     parts = [f"APP artifact 今天已 materialize {len(fresh_today)} 份"]
@@ -373,7 +389,7 @@ def build_queue() -> Section:
 # ---------------------------------------------------------------------------
 
 def build_positions(*, state_dir: Path | None) -> Section:
-    """alpha 占淨值、追蹤表、幾檔共用同一需求錨；未交付的兩格明確宣告 `capability_absent`。"""
+    """alpha 占淨值、追蹤表、賭注帳、幾檔共用同一需求錨；未交付的兩格明確宣告 `capability_absent`。"""
     section = Section(4, SECTION_TITLES[3])
 
     beta, beta_absence = _load_state(state_dir, "beta")
@@ -407,6 +423,24 @@ def build_positions(*, state_dir: Path | None) -> Section:
             section.lines.append(
                 f"入圖前已漲（chasing）{health.get('chasing', '?')}/{health.get('paired', '?')} 檔"
             )
+
+    # 賭注帳（Q2，2026-09-17）：籃子的每一列強制「有賭注 或 Abstention」。欠帳必須是一個
+    # **會自己出現的常駐計數器**，不是要人打開 APP 翻表才看得到的東西（L14）。
+    basket, basket_absence = _load_state(state_dir, "basket")
+    if basket_absence is not None:
+        section.lines.append(f"賭注帳：{basket_absence.reason}（{basket_absence.kind}）")
+    else:
+        ledger = basket.get("bet_ledger") or {}
+        if not ledger:
+            section.lines.append("賭注帳：這份 basket artifact 沒有 bet_ledger（upstream_unavailable）")
+        else:
+            owed = ledger.get("owed") or []
+            line = (f"籃子 {ledger.get('input', '?')} 檔｜有賭注 {ledger.get('bet', '?')}"
+                    f"｜刻意不主張 {ledger.get('abstained', '?')}"
+                    f"｜**欠一個答案 {ledger.get('unanswered', '?')}**")
+            if owed:
+                line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
+            section.lines.append(line)
 
     ranking, rank_absence = _load_state(state_dir, "ranking")
     if rank_absence is not None:
