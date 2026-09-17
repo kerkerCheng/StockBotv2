@@ -35,11 +35,20 @@
 4. **決定 §2c「未做完清單」四件的去向**（併入 Phase 4 篩選層，或另立 pq2）。這四件需要使用者判斷，
    所以**交回 Step 1.3 結果時把它們列成待決問題，停下等使用者**——不要自己決定。
 
-**Step 1.3 完成後不要自行開始 Phase 2。** Phase 2 是 D12 心跳＋分類（改排程與 Codex fixed entry），
-動到 unattended surface，屬常規推進授權的例外，必須先出 PLAN_PROPOSAL 等核准。
+**Step 1.3 完成後，沒有待使用者決定的事就直接接著做 Phase 2，不要停下來問。**
+（2026-09-17 使用者定案，`AGENTS.md` 常規推進授權已擴大到 Phase 邊界：**Phase 做完不是停止理由**。）
+Phase 2 是 D12 心跳＋分類——改排程、`drain_limit_per_run` 歸零、Codex fixed entry 與 permission test
+同 change 對齊。它動到 unattended surface，所以**必出 `PLAN_PROPOSAL` 並同 change 做 sandbox impact
+review 五步**；但 **plan 是思考紀律不是核准請求**——plan 裡若沒有需要使用者選的問題（ROADMAP Phase 2
+那一列已定義到可直接執行），照出 plan 然後往下做。
+
+**真正要停下來等人的只有這些：** 四個人工 gate（graph admission／Engine C 判讀寫入／thesis mutation／
+live）、資本或任何 append-only authority、要改 `AGENTS.md` 判準句或 ROADMAP 的 Phase／Step 定義、
+需要 R2、Verdict 不是 `GO`、或 plan 裡真有要使用者選的問題。
+⚠ **撞到 pq2 就掛號繼續做下一件不需核准的事**，收尾一次給批次指令——**不得停在編號上等**。
 
 **不得做：** 部位尺寸、下單、連 broker、放寬四個人工 gate 或 L8、因籃子空而放寬篩選條件、
-把 last30days 串進無人值守管線、改 `rank_bottlenecks()` 的排序邏輯、擅自開始下一個 Phase。
+把 last30days 串進無人值守管線、改 `rank_bottlenecks()` 的排序邏輯。
 
 **收尾格式：** HUMAN SUMMARY（5–10 行）＋ 八欄 `STEP_RESULT`；有待使用者決定的事，
 決策區塊放最前面（格式見 `skills/daily-brief/SKILL.md`「待核准項目的內容密度」）。

@@ -416,13 +416,21 @@ outcome 追蹤是前置條件。
   `STEP_RESULT` 的「建議下一步」永遠只是建議——**不得因為上一個 Step 被核准就自行開工下一個**，
   也不得偷改 [`ROADMAP.md`](docs/ROADMAP.md) 後繼續跑（要改先給五欄 amendment 再等人）。
   這與「`go` ＝推進到下一個人工 gate」一致：**Step 邊界本身就是那個 gate**。
-  **常規推進授權（2026-09-08 使用者定案）：** 上面那條仍是預設，但使用者已常規授權一個例外——
-  **Verdict 為 `GO`、且 `Suggested next Step` 沒有任何待使用者決定的問題時，可直接接續下一個 Step**，
-  每個 Step 仍照常交回 `HUMAN SUMMARY` ＋八欄。**下列任一項成立時一律停下等人**，不因這條授權放寬：
-  ①Zoom 判為 **Z2／Z3**；②動到四個人工 gate 之一；③動到資本、live 或任何 append-only authority；
-  ④要改本檔的判準句，或改 [`ROADMAP.md`](docs/ROADMAP.md) 的 Phase／Step 定義（後者仍須先給五欄
-  amendment）；⑤需要 R2（第二份 token）；⑥Verdict 不是 `GO`。
+  **常規推進授權（2026-09-08 使用者定案；2026-09-17 擴大到 Phase 邊界）：** 上面那條仍是預設，
+  但使用者已常規授權一個例外——**Verdict 為 `GO`、且下一步沒有任何待使用者決定的問題時，
+  可直接接續下一個 Step；`Step` 與 `Phase` 的邊界一視同仁**，每個 Step 仍照常交回
+  `HUMAN SUMMARY` ＋八欄。**下列任一項成立時一律停下等人**，不因這條授權放寬：
+  ①Zoom 判為 **Z2／Z3** **且該 `PLAN_PROPOSAL` 裡確實有需要使用者選的問題**（方案唯一、或
+  ROADMAP 已定義到可直接執行時，**plan 照出但不停**——plan 是思考紀律，不是核准請求）；
+  ②動到四個人工 gate 之一；③動到資本、live 或任何 append-only authority；④要改本檔的判準句，
+  或改 [`ROADMAP.md`](docs/ROADMAP.md) 的 Phase／Step 定義（後者仍須先給五欄 amendment）；
+  ⑤需要 R2（第二份 token）；⑥Verdict 不是 `GO`。
   判準一句話：**這條授權買的是「不必為了說一聲而停」，不是「不必為了決定而停」。**
+  ⚠ **2026-09-17 使用者原話：「我想要的是沒有需要我核准的事情就繼續」。** 停的理由必須是
+  **「有東西要使用者決定」**，不是「到了某個邊界」——**Phase 做完不是停止理由，Z2 本身不是停止
+  理由，「想說一聲」更不是**。⚠ 反向同樣硬：**pq2 的 `ra_admission` 與 Engine C 判讀寫入照樣逐筆
+  核准**，撞到時把該項掛成編號**接著做下一件不需核准的事**（收尾一次給批次指令），
+  **不得停下來等那個編號**——停在編號上等，是「為了說一聲而停」的另一種寫法。
 
 - **Local-first（2026-07-26 定案）：** 未特別寫 `claude.ai`／cloud 時，文件中的「Claude」
   一律指**本機 Claude Code session**。**cloud session＋MCP 是備援**，不要求等權。
