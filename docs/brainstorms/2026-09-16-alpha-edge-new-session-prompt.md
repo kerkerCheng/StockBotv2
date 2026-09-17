@@ -11,6 +11,28 @@
 
 ## 開工指令（貼這一段）
 
+> ## ⚠ 2026-09-17 收尾狀態（先讀這塊，再讀下面的任務書）
+>
+> **這一輪做完的：** Phase 1 Step 1.3 收尾｜Phase 2 Step 2.1（心跳產生器）＋ 2.2（接上獨立 Windows 排程
+> `StockBotv2-Heartbeat` 每日 07:00、`drain_limit_per_run` 5→0、`.codex/rules` 20→15）｜
+> pq2 [587]–[590] 四項研究＋[591][594] 入圖｜`rank_bottlenecks()` 補上 INV-3 的 filtered 報表。
+>
+> **等使用者決定的五件（都不要自己做）：**
+> 1. **Q2（最優先）**：籃子每一列是否強制「有賭注 或 有 Abstention」，不准空白？
+>    ——實測 16 檔裡 **15 檔卡在 `no_bet`**，這是目前唯一真正在擋路的東西。
+> 2. Q1：籃子宇宙要不要擴到被門檻擋下、但已研究的那 26 條（「量的賭注」分頁）。
+> 3. Q3：量的賭注要不要現在建反向橋（建議留 Phase 7）。
+> 4. **Q4／Q5**：要不要做「結構讀圖」層、產出要不要落地成 append-only 紀錄。
+>    見 [`2026-09-17-structural-reading-layer.md`](2026-09-17-structural-reading-layer.md)。
+> 5. §2e 未做完清單裡 [586] 已設 pending（等外部文件），其餘已結案。
+>
+> **兩份必讀的新文件：**
+> [`2026-09-17-no-evidence-case-zoom-out.md`](2026-09-17-no-evidence-case-zoom-out.md)（為什麼籃子空的真正原因）
+> 與 [`2026-09-17-structural-reading-layer.md`](2026-09-17-structural-reading-layer.md)（瓶頸性不是一條邊）。
+>
+> ⚠ **Phase 2 尚未完成**：驗收要「連續 3 天心跳零 LLM 成功發出」，**最早 2026-09-20 才驗得完**。
+> 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 Last Run Time 與 Last Result）。
+
 **任務：Alpha Edge Phase 2「心跳＋分類（D12）」。** Phase 1 的四個 Step（1.0／1.1／1.2／1.3）全部交付並合併 master；
 六個 pq2 編號已由使用者批次 `go`、全部入圖並 `complete-ra` 結案。
 ⚠ **Phase 1 刻意維持 ▶ 不標 ✅**——驗收行明訂「可投資排序的 TW／TWO／ST 檔數仍為 0 就不得標完成」，2026-09-17 實測仍是 0；
