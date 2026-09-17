@@ -398,3 +398,82 @@ def test_single_stray_mention_cannot_lift_evidence() -> None:
     assert company_id_for_origin("Coherent Market Insights", reg) is None
     assert classify_evidence("co:iqe", ["Coherent Market Insights"], reg) == "needs_review"
     assert classify_evidence("co:coherent", ["Coherent Market Insights"], reg) == "needs_review"
+
+
+# ---------------------------------------------------------------------------
+# 門檻是一個 filter，所以它必須報得出 input／accepted／filtered／reasons（INV-3）
+# ---------------------------------------------------------------------------
+
+def _sub_edge(src, dst, sub, **extra):
+    row = {
+        "src": src, "relation": "supplies_to", "dst": dst,
+        "attributes": {"substitutability": sub} if sub is not None else {},
+        "confidence": 0.8, "origin": "Someone", "source_type": "filing",
+        "source_doc_id": f"doc_{src}_{dst}", "published_at": "2026-01-01",
+    }
+    row["attributes"].update(extra)
+    return row
+
+
+def test_threshold_reports_input_accepted_filtered_and_reasons() -> None:
+    """**先前這個門檻是靜默 `continue`**——被擋下的邊在任何下游層看到之前就消失了。
+
+    空跑檢查：把 `filtered.append(...)` 改回單純 `continue` → 這條會紅。
+    """
+    from query.bottleneck import rank_bottlenecks
+
+    rows = [
+        _sub_edge("co:axt", "tech:x", 5),         # 通過
+        _sub_edge("co:coherent", "tech:x", 2),    # 已研究、低於門檻
+        _sub_edge("co:nvidia", "tech:x", None),   # 沒填
+    ]
+    result = rank_bottlenecks(rows, _FakeRegistry())
+
+    report = result["filter"]
+    assert report["input"] == 3
+    assert report["accepted"] == 1
+    assert report["filtered"] == 2
+    # ⚠ 兩種理由**必須分得開**：一個要去補研究，一個已經有答案了（L12）。
+    assert report["reasons"] == {
+        "substitutability_unfilled": 1,
+        "substitutability_below_threshold": 1,
+    }
+    filtered = {r["company_id"]: r["reasons"][0] for r in result["filtered_rows"]}
+    assert filtered == {
+        "co:coherent": "substitutability_below_threshold",
+        "co:nvidia": "substitutability_unfilled",
+    }
+
+
+def test_exposing_filtered_rows_does_not_change_the_ranking() -> None:
+    """新增 `filtered_rows` 是**純加法**：`rows` 與 `structural_rows` 一字未動。
+
+    `rank_bottlenecks()` 仍是唯一排序權威（ROADMAP 硬約束 4）——本次只是不再靜默丟棄。
+    """
+    from query.bottleneck import rank_bottlenecks
+
+    rows = [_sub_edge("co:axt", "tech:x", 5), _sub_edge("co:coherent", "tech:x", 2)]
+    result = rank_bottlenecks(rows, _FakeRegistry())
+
+    assert [r["company_id"] for r in result["rows"]] == ["co:axt"]
+    assert [r["company_id"] for r in result["structural_rows"]] == ["co:axt"]
+    # 被擋下的那條**不得**混進任何一份排序裡
+    assert all(r["company_id"] != "co:coherent" for r in result["rows"])
+    assert all(r["company_id"] != "co:coherent" for r in result["structural_rows"])
+
+
+def test_filtered_rows_carry_enough_to_act_on() -> None:
+    """下游要能問「那它還值得看嗎」，所以被擋下的列必須帶得出身分、卡點與成熟度。"""
+    from query.bottleneck import rank_bottlenecks
+
+    result = rank_bottlenecks(
+        [_sub_edge("co:coherent", "tech:x", 3, qualification_status="qualified")],
+        _FakeRegistry(),
+    )
+    row = result["filtered_rows"][0]
+    for key in ("company_id", "ticker", "bottleneck", "substitutability",
+                "threshold", "qualification_status", "evidence", "reasons"):
+        assert key in row, key
+    assert row["ticker"] == "COHR"
+    assert row["threshold"] == 4
+    assert row["qualification_status"] == "qualified"

@@ -437,6 +437,40 @@ def demand_chain(
     return None
 
 
+#: 被門檻濾掉的理由（封閉字彙）。**「未填」與「填了但低於門檻」刻意分開**——
+#: 前者是我們還沒研究，後者是研究過而答案是否定的，兩者的下一步完全不同：
+#: 一個要去補研究，一個要去問「那這檔還值得看嗎、憑什麼」。壓成一句就同形了（L12）。
+FILTER_REASONS: Mapping[str, str] = {
+    "substitutability_unfilled": "還沒有人判過這條邊的可替代性——這是研究缺口，不是否定答案",
+    "substitutability_below_threshold": "已研究，但可替代性低於門檻——這是答案，不是缺漏",
+}
+
+
+def _filtered_row(edge, registry, upward, threshold: int) -> dict[str, Any]:
+    """一條被門檻擋下的邊，帶得出「是誰、卡在哪、為什麼被擋」。"""
+    reason = (
+        "substitutability_unfilled"
+        if edge.substitutability is None
+        else "substitutability_below_threshold"
+    )
+    chain = demand_chain(edge.src, upward)
+    return {
+        "company_id": edge.src,
+        "ticker": registry.research_ticker(edge.src),
+        "relation": edge.relation,
+        "bottleneck": edge.dst,
+        "substitutability": edge.substitutability,
+        "threshold": threshold,
+        "qualification_status": edge.qualification_status,
+        "evidence": edge.evidence,
+        "documents": edge.documents,
+        "chain": chain,
+        "demand_anchor": chain[0] if chain else None,
+        "demand_hops": (len(chain) - 1) if chain else None,
+        "reasons": [reason],
+    }
+
+
 def rank_bottlenecks(
     rows: Iterable[Mapping[str, Any]],
     registry,
@@ -454,12 +488,26 @@ def rank_bottlenecks(
 
     upward = build_upward_index(edges)
     scored = []
+    #: 被 `min_substitutability` 濾掉的邊，**逐條帶理由**（INV-3：每個 filter 都能報
+    #: input／accepted／filtered／reasons）。
+    #:
+    #: ⚠ 2026-09-17 之前這裡是 `continue` 直接丟掉，於是 185/222 條「公司→向下」邊
+    #: 在任何下游層看見它們之前就消失了——包括所有已研究但判 2–3 的邊緣小公司。
+    #: 那讓「這家公司不是瓶頸」與「我們還沒研究這家公司」在下游完全同形（L12），
+    #: 而籃子層因此**結構上不可能**對它們做任何別的判斷。
+    #:
+    #: **這不改變排序，也不改變 `rows` 的內容**：門檻仍是 4、順序一字未動、
+    #: `rank_bottlenecks()` 仍是唯一排序權威。多的只是「被濾掉的那些是誰、為什麼」。
+    filtered: list[dict[str, Any]] = []
     for edge in edges:
         if edge.relation not in DOWNSTREAM_RELATIONS:
             continue
         if not edge.src.startswith("co:"):
             continue
         if (edge.substitutability or 0) < min_substitutability:
+            filtered.append(
+                _filtered_row(edge, registry, upward, min_substitutability)
+            )
             continue
         # ⚠ 從**公司**往上走，不是從瓶頸節點。這一列問的是「這家公司的產出有沒有人
         # 在花錢買」，不是「這個材料有沒有人要」。首版從 `edge.dst` 走，於是
@@ -540,9 +588,27 @@ def rank_bottlenecks(
     )
 
     with_sub = [e for e in edges if e.substitutability is not None]
+    reason_counts: dict[str, int] = {}
+    for row in filtered:
+        for reason in row["reasons"]:
+            reason_counts[reason] = reason_counts.get(reason, 0) + 1
     return {
         "rows": scored,
         "structural_rows": structural,
+        # INV-3：門檻是一個 filter，所以它必須報得出 input／accepted／filtered／reasons。
+        # ⚠ 這是**新增的輸出**，不是新的排序：`rows` 與 `structural_rows` 一字未動。
+        "filtered_rows": filtered,
+        "filter": {
+            "input": len(scored) + len(filtered),
+            "accepted": len(scored),
+            "filtered": len(filtered),
+            "rule": (
+                f"公司→向下邊中 substitutability >= {min_substitutability} 才進排序。"
+                "門檻不動；本欄只讓被擋下的那些看得見（INV-3）。"
+            ),
+            "reasons": reason_counts,
+            "reason_labels": dict(FILTER_REASONS),
+        },
         "coverage": {
             "assertions": len(rows),
             "canonical_edges": len(canonical),
@@ -794,6 +860,8 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             )
         out.append("\n" + STRUCTURAL_TABLE_NOTE)
 
+    out.extend(render_filter_report(result))
+
     out.append("\n## 需求鏈（誰在花錢 → 這家公司）\n")
     for i, r in enumerate(result["rows"], 1):
         out.append(
@@ -804,6 +872,50 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         else:
             out.append("   " + NO_ANCHOR_CHAIN_NOTE)
     return "\n".join(out)
+
+
+def render_filter_report(result: Mapping[str, Any]) -> list[str]:
+    """門檻濾掉了誰——**INV-3 的可見面**。
+
+    ⚠ 沒有這一段的話，`rank_bottlenecks` 的 `filtered_rows` 就是一個沒有 consumer 的
+    producer（INV-4）。它存在的意義不是「多印幾行」，是讓兩件事分得開：
+    **「已研究，答案是否定的」**與**「還沒有人研究過」**——前者要問「那這檔還值得看嗎」，
+    後者要去補研究，下一步完全相反。
+    """
+    report = result.get("filter")
+    if not report:
+        return []
+    out = [
+        "\n## 門檻濾掉了誰（INV-3）\n",
+        f"`input {report['input']}｜accepted {report['accepted']}｜filtered {report['filtered']}`"
+        f"——{report['rule']}\n",
+    ]
+    labels = report.get("reason_labels") or {}
+    for reason, count in sorted(report.get("reasons", {}).items(), key=lambda kv: -kv[1]):
+        out.append(f"- **{reason}：{count} 條**——{labels.get(reason, '')}")
+
+    researched = [
+        r for r in result.get("filtered_rows", [])
+        if "substitutability_below_threshold" in r["reasons"]
+    ]
+    if researched:
+        by_company: dict[str, list[str]] = {}
+        for row in researched:
+            key = row["ticker"] or row["company_id"]
+            by_company.setdefault(key, []).append(
+                f"{row['bottleneck'].split(':')[-1]}({row['substitutability']})"
+            )
+        out.append(
+            "\n**已研究、答案是否定的**（這些不是研究缺口——要問的是「那它還值得看嗎、憑什麼」）：\n"
+        )
+        for key, items in sorted(by_company.items()):
+            out.append(f"- `{key}`：{'、'.join(items)}")
+    out.append(
+        "\n⚠ **本段不改變排序，門檻也沒有放寬**。它只是讓被擋下的那 "
+        f"{report['filtered']} 條看得見——先前它們在任何下游層看到之前就消失了，"
+        "於是「不是瓶頸」與「還沒研究」在下游完全同形（L12）。"
+    )
+    return out
 
 
 def load_sector_map(path: str = "config/sector_anchors.json") -> dict[str, Any]:
