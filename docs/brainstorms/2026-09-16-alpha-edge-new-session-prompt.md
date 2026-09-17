@@ -38,6 +38,13 @@
 > **而且沒有任何東西會變紅**——已列 ROADMAP backlog 待 Z2。
 > 查證：`build_context(d, company_id='co:axt', claim_limit=20 vs 200)` 數 `JX Advanced Metals` 出現次數。
 >
+> ⚠ **[602] hint 的第三個預期也沒發生，而那是機制對的表現不是壞掉：** hint 寫著「補完之後
+> `mat:inp_substrate` 的讀圖應會自動偵測 digest 變動並要求重讀」——實測**沒有觸發**（心跳第 2 段
+> 仍是「該重讀 0」）。原因是那條新邊的兩端都不是 `mat:inp_substrate`，**它不在那份讀圖的五個角度裡**，
+> 所以 digest 本來就不該變。現有的兩份讀圖是 `tech:cw_dfb_laser` 與 `mat:inp_substrate`，
+> **`co:axt` 自己沒有讀圖**——所以沒有任何讀圖會因為這條邊而 stale。
+> 判準：**staleness 偵測的範圍等於那份讀圖走得到的邊**，補一條它走不到的邊當然不會驚動它。
+>
 > **兩個當下修掉、也寫成測試的坑：**
 > ①**MOPS 歷史頁末尾那個數字是註冊地不是流水號**（`_0` 本國／`_1` 外國）——只抓 `_0` 時 4971.TWO（IET-KY）
 > 在 24 個月回補裡一筆都沒有，而當期 API 有它（L17：機制只認得我當初那個案例）。
