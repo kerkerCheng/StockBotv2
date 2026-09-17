@@ -43,20 +43,32 @@
 > ⚠ **Phase 2 尚未完成**：驗收要「連續 3 天心跳零 LLM 成功發出」，**最早 2026-09-20 才驗得完**。
 > 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 Last Run Time 與 Last Result）。
 
-**任務：Alpha Edge Phase 2「心跳＋分類（D12）」。** Phase 1 的四個 Step（1.0／1.1／1.2／1.3）全部交付並合併 master；
-六個 pq2 編號已由使用者批次 `go`、全部入圖並 `complete-ra` 結案。
-⚠ **Phase 1 刻意維持 ▶ 不標 ✅**——驗收行明訂「可投資排序的 TW／TWO／ST 檔數仍為 0 就不得標完成」，2026-09-17 實測仍是 0；
-完整依據與「缺哪一份文件」的逐檔表在 [`docs/ROADMAP.md`](../ROADMAP.md)「Phase 1 completion gate 逐項核對」。
-**Phase 1 不會再被重做**；下方原 Step 1.3 任務書已完成，留作歷程。
+**任務：Q2 →（Q5）→（Q1），三件都已核准。** Phase 1 四個 Step 與 Phase 2 的 Step 2.1／2.2 都已交付並合併 master。
+⚠ **Phase 1 刻意維持 ▶ 不標 ✅**（TW／TWO／ST 實測 0）；**Phase 2 也尚未完成**（等 9/20 的三天心跳驗收）。
+兩者都不必重做。
 
-**先讀（順序固定）：**
-1. `AGENTS.md`（憲法、六條 invariant、四個人工 gate、L1–L17：一字不動）
-2. `docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`
-   （§0 核准紀錄與常設授權、§2b Step 1.1 結果、**§2c Step 1.2 結果與未做完清單**、§1 的 Step 1.3 驗收行）
-3. `docs/ROADMAP.md`（Phase 1 那一列的驗收欄，與「每個 Phase 的 completion gate（八項）」）
-4. `docs/AGENT_WORKFLOW.md` ＋ `skills/development-flow/SKILL.md`（Phase 2 動到 unattended executable surface，
-   **必出 `PLAN_PROPOSAL` 並同 change 做 sandbox impact review 五步**）
-5. `docs/OPERATIONS.md` 的「Daily / pq1 / 待辦池的參數」節（Phase 2 驗收要量 `drain_limit_per_run`）
+**先讀（順序固定；這一輪需要的全部在這裡，沒有第七份）：**
+
+| # | 檔案 | 為什麼這一輪需要它 |
+|---|---|---|
+| 1 | `AGENTS.md` | 憲法、六條 invariant、四個人工 gate、L1–L17（一字不動）。⚠ 尤其「Alpha 呈現契約」與 L7（disproof 三件套）——Q2 直接動到它們 |
+| 2 | [`2026-09-17-no-evidence-case-zoom-out.md`](2026-09-17-no-evidence-case-zoom-out.md) | **Q2／Q1 的全部依據**。籃子為什麼空的量測、A／B 兩種賭注、三條「改掉 substitutability」為什麼都是錯的 |
+| 3 | [`2026-09-17-structural-reading-layer.md`](2026-09-17-structural-reading-layer.md) | **Q5 的完整設計**，§5b（存輸入不存結論）與 §6b（怎麼 trigger 重新推理）**照做即可，不要重新設計** |
+| 4 | [`docs/ROADMAP.md`](../ROADMAP.md) | **進度與驗收的唯一權威**。Phase 4 那一列（Q1／Q2 要改它的定義欄，需先給五欄 amendment）、Phase 2 那一列、completion gate 八項 |
+| 5 | [`2026-09-16-alpha-edge-discovery-requirements.md`](2026-09-16-alpha-edge-discovery-requirements.md) | **決定紀錄 D0–D15**（使用者原話）。⚠ Q2 動到 D2（賭注與「判斷錯了值多少」對稱）、D3（`realized` 只提醒）、D15（power-law 統計量） |
+| 6 | `docs/AGENT_WORKFLOW.md` ＋ `skills/development-flow/SKILL.md` | Zoom／Review 判定與八欄交付格式。Q2 改籃子契約，**至少 Z2** |
+
+**只在需要時才讀（不必一開始載入）：**
+
+| 檔案 | 什麼時候 |
+|---|---|
+| [`2026-09-16-alpha-edge-phase1-plan.md`](2026-09-16-alpha-edge-phase1-plan.md) | 要查 Phase 1 做過什麼、§2e／§2f 六項的處置結果 |
+| [`2026-09-17-alpha-edge-phase2-plan.md`](2026-09-17-alpha-edge-phase2-plan.md) | 要查心跳怎麼來的、Step 2.3（分類層）還沒做什麼 |
+| `docs/OPERATIONS.md` | 要實際跑操作時（「心跳」節、「Daily / pq1 / 待辦池的參數」節） |
+| `docs/ARCHITECTURE.md` §4.1／§8 | 要動 Daily 三層或 APP 呈現時 |
+
+⚠ **本輪不必讀的**：其餘 15 份 brainstorm 都是 2026-07～08 的舊題目（confidence 五軸、capital expression、
+event watch…），與 Alpha Edge 無關。**Alpha Edge 只有上面列的 6 份 brainstorm ＋ ROADMAP。**
 
 ~~**Step 1.3 要做的四件：**~~（2026-09-17 全部完成，見 ROADMAP 與計畫檔 §2d／§2e；以下留作歷程）
 
