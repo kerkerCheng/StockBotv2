@@ -26,9 +26,9 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 | Step | 做什麼 | 驗收（哪個數字會變） | 前置 | Zoom／Review |
 |---|---|---|---|---|
 | **1.0** ✅ | 公司名稱解析歸位（見 §2） | 改判 39 條邊、待判定 90 → 53、解析不到 131 → 83、IQE 28 → 12、排序仍 37 列 | — | Z1／R1 |
-| **1.1** ✅（入圖待 [579][580][581] go） | `fetchers/mfn.py`＋`fetchers/rns.py`（與 `mops.py` 同構；互動式入口，不進無人值守）、`config/source_routes.json` 登記 `.ST`／`.L` 兩階、三條管道各 smoke 一份文件入圖 | 由抓取器產出、meta 帶 `published_at`、經 RA 入圖的文件：MOPS 2 → 3、MFN 0 → 1、RNS 0 → 1；`.ST`／`.L` 各多一階路由且 smoke 後 `verified=true`（查證 `python -m sourcing.routes SIVE.ST`）；IQE going concern 段落由「一手不支持」變可逐字引用；`.codex/rules` fixed entry 仍 20 條且 permission test 明確斷言兩支新抓取器**不在** allowlist | 1.0 | Z1／R1 ×2；sandbox impact review 五步 |
-| **1.2** ○ | 研究項（pq2）：七家補三格（§4 工單） | 可投資排序中 TW／TWO／ST 後綴檔數 0 → ≥1（目標 3；逐檔報進與不進的理由，INV-3）；`substitutability` 覆蓋 80 → ≥86／525；八家「產品線營收占比」4 → 8 | 1.1 的聯亞財報與 Sivers 期中報告；1.0 | 研究路徑（research-drain），不走 development-flow |
-| **1.3** ○ | 收尾：重跑排序、`python -m webapp materialize --ranking`、ROADMAP 回填 before → after、`audit invariants` FAIL 0、全套 pytest、push | Phase completion gate 八項；**TW／TWO／ST 仍為 0 就不得標完成**，只能標「研究已做、證據不足以進榜」並列缺哪份文件 | 1.2 | Z0／R0 |
+| **1.1** ✅（[579][580][581] 已 go 入圖） | `fetchers/mfn.py`＋`fetchers/rns.py`（與 `mops.py` 同構；互動式入口，不進無人值守）、`config/source_routes.json` 登記 `.ST`／`.L` 兩階、三條管道各 smoke 一份文件入圖 | 由抓取器產出、meta 帶 `published_at`、經 RA 入圖的文件：MOPS 2 → 3、MFN 0 → 1、RNS 0 → 1；`.ST`／`.L` 各多一階路由且 smoke 後 `verified=true`（查證 `python -m sourcing.routes SIVE.ST`）；IQE going concern 段落由「一手不支持」變可逐字引用；`.codex/rules` fixed entry 仍 20 條且 permission test 明確斷言兩支新抓取器**不在** allowlist | 1.0 | Z1／R1 ×2；sandbox impact review 五步 |
+| **1.2** ✅（見 §2c） | 研究項（pq2）：七家補三格（§4 工單） | 可投資排序中 TW／TWO／ST 後綴檔數 0 → ≥1（目標 3；逐檔報進與不進的理由，INV-3）；`substitutability` 覆蓋 80 → ≥86／525；八家「產品線營收占比」4 → 8 | 1.1 的聯亞財報與 Sivers 期中報告；1.0 | 研究路徑（research-drain），不走 development-flow |
+| **1.3** ✅（見 §2d） | 收尾：重跑排序、`python -m webapp materialize --ranking`、ROADMAP 回填 before → after、`audit invariants` FAIL 0、全套 pytest、push | Phase completion gate 八項；**TW／TWO／ST 仍為 0 就不得標完成**，只能標「研究已做、證據不足以進榜」並列缺哪份文件 | 1.2 | Z0／R0 |
 
 ## 2. Step 1.0 結果（2026-09-16，commit `69c8388`，merge `d06f5bf`）
 
@@ -134,6 +134,52 @@ thesis mutation、live 仍逐筆核准——研究段落收尾照常給批次指
 - Sivers 15 條邊仍全部未填 sub；Ayar Labs 自家文件仍缺（ayarlabs.com 對本機 UA 回 403）。
 - Aehr 補一條到需求錨的邊未做（`tech:cpo_full_stack_test` 實測走不到任何錨）。
 - **圖的結構缺口（本輪新發現，不是公司問題）：** `tech:photodiode`、`tech:pluggable_transceiver`、`tech:transceiver_1_6t`、`tech:cloud_transceiver`、`tech:inp_dfb_laser`、`tech:cpo_full_stack_test` 全部**走不到任何需求錨**（實測 shortestPath 回空）。補在這些節點下的供應商邊入圖後仍是排序不可見。
+
+## 2d. Step 1.3 結果（2026-09-17；Z0／R0，只回填文件與核對，未動任何程式）
+
+**四件都做了：** ①ROADMAP Phase 1 驗收行回填 before → after（舊句劃線留原地）；②completion gate 八項逐項核對
+（結果寫進 ROADMAP「Phase 1 completion gate 逐項核對」，含每項的查證命令）；③Phase 1 **維持 ▶ 不標 ✅**；
+④未做完清單的去向交回使用者決定（見下）。**所有數字都是本輪現跑，沒有抄計畫檔。**
+
+**驗收三項的誠實結果：**
+
+| 驗收 | 目標 | 實測（2026-09-17） |
+|---|---|---|
+| 可投資排序出現 TW／TWO／ST | ≥1（目標 3） | **0，未達** |
+| `substitutability` 覆蓋 | 80 → ≥86 | **85／529，未達，差 1 條** |
+| 八家「產品線營收占比」 | 4 → 8 | **7**（AEHR 缺） |
+
+**⚠ 上一輪漏記的一筆：** §2c 只寫「新增 5 條帶 sub 的 assertion，已入圖」，沒有回頭對驗收門檻 ≥86——
+**5 條 ≠ 6 條，這一項是未達不是達標**。（L14：驗收條件是「現有資料有幾筆真的變了」，不是「這一步回傳成功」。）
+
+**completion gate 八項全部過，但兩個必須寫下來的觀察：**
+1. **§9 的「各 Phase 🔴 責任分配」表用的是舊 refactor 的 Phase 編號**（contracts／Portfolio-Risk／
+   vertical slice／Engine D 分解…），**與 Alpha Edge 的 Phase 0–7 沒有任何對應關係**。第 8 項只能改成
+   對照「本 Phase 實際動到哪些事故的形狀」（F-20 排序截斷、F-31 as-of 定日，兩筆在 §1 都已是 ✅）。
+2. **`historical-failure-matrix.md` §4 的「✅17／🟡9／🔴10」是已腐壞的快照**——2026-09-17 逐列重量是
+   **✅21／🟡8／🔴7**。ROADMAP 引用它的那句與該檔本身都已劃線改正並附一行可執行的計數命令。
+
+**收尾時新發現的一檔（不在 Step 1.2 的七家工單裡）：**
+**穩懋 `co:win_semiconductor`（3105.TWO）→ `co:sivers_semiconductors`，證據已是「外部印證」、`substitutability` 未填。**
+它是台股裡**證據等級最高而只差一格**的一條邊，卻從來沒進過工單——因為工單是從「D7 初始三檔＋圖裡已知的邊緣公司」
+手列的，不是從「門檻 filter 的 filtered 清單」機械導出的（L16：分類有 SSOT，但沒跟著資料送到需要它的地方）。
+
+**門檻 4 的 filter 逐檔報表（INV-3）：** `input 222｜accepted 37｜filtered 185`；filtered 的理由只有三種——
+`substitutability` 未填 **162**、`=3` **15**、`=2` **8**。**沒有一檔是因為走不到需求錨被濾掉。**
+逐檔的「缺哪一份文件」寫在 ROADMAP 的 completion gate 節，不在此重複。
+
+## 2e. 未做完清單（Step 1.2 的四件 ＋ Step 1.3 新增兩件）——**去向待使用者決定**
+
+| # | 項目 | 性質 | 兩個候選去向 |
+|---|---|---|---|
+| 1 | 上詮 `co:foci` 的 sub 刻意不填（缺 Himax 或 C 公司具名確認） | 研究（等外部文件） | 另立 pq2 `pending --trigger`／併 Phase 4 |
+| 2 | Sivers 15 條邊仍全部未填 sub；Ayar Labs 自家文件仍缺（403） | 研究 | 另立 pq2／併 Phase 4 |
+| 3 | Aehr 補一條 `tech:cpo_full_stack_test` → 需求錨的邊 | 研究（補邊） | 另立 pq2／併 Phase 4 |
+| 4 | 六個 tech 節點走不到任何需求錨（`photodiode`／`pluggable_transceiver`／`transceiver_1_6t`／`cloud_transceiver`／`inp_dfb_laser`／`cpo_full_stack_test`） | **圖的結構缺口**，不是公司問題 | 併 Phase 4 篩選層（需求側 vs 供給側正是它要分的）／另立開發項 |
+| 5 | **穩懋 3105.TWO 那條邊補 sub**（證據已外部印證，只差一格） | 研究 | 另立 pq2／併下一輪補格 |
+| 6 | **`mops_4979_annual_report_2025` 的兩個殘留**：圖中 `published_at=2026-05-31`，但 MOPS 上傳日是 2026-05-07（方向保守，非 lookahead）；同一份文件仍含 126 個 CJK 相容表意文字 | 資料更正（走 supersede 走廊，屬 `ra_admission`） | 另立 pq2／併下一輪 |
+
+⚠ **第 6 項兩個問題在同一份文件上，正解是一次 supersede 同時修掉**，不要分兩次改同一份 extraction。
 
 ## 4. Step 1.2 工單（七家；2026-09-16 實測現況）
 

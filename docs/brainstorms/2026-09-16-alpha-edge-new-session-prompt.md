@@ -11,18 +11,22 @@
 
 ## 開工指令（貼這一段）
 
-**任務：Alpha Edge Phase 1 的最後一步 Step 1.3「收尾」。** Step 1.0／1.1／1.2 都已完成並合併 master，
+**任務：Alpha Edge Phase 2「心跳＋分類（D12）」。** Phase 1 的四個 Step（1.0／1.1／1.2／1.3）全部交付並合併 master；
 六個 pq2 編號已由使用者批次 `go`、全部入圖並 `complete-ra` 結案。
+⚠ **Phase 1 刻意維持 ▶ 不標 ✅**——驗收行明訂「可投資排序的 TW／TWO／ST 檔數仍為 0 就不得標完成」，2026-09-17 實測仍是 0；
+完整依據與「缺哪一份文件」的逐檔表在 [`docs/ROADMAP.md`](../ROADMAP.md)「Phase 1 completion gate 逐項核對」。
+**Phase 1 不會再被重做**；下方原 Step 1.3 任務書已完成，留作歷程。
 
 **先讀（順序固定）：**
 1. `AGENTS.md`（憲法、六條 invariant、四個人工 gate、L1–L17：一字不動）
 2. `docs/brainstorms/2026-09-16-alpha-edge-phase1-plan.md`
    （§0 核准紀錄與常設授權、§2b Step 1.1 結果、**§2c Step 1.2 結果與未做完清單**、§1 的 Step 1.3 驗收行）
 3. `docs/ROADMAP.md`（Phase 1 那一列的驗收欄，與「每個 Phase 的 completion gate（八項）」）
-4. `docs/AGENT_WORKFLOW.md` ＋ `skills/development-flow/SKILL.md`（Step 1.3 判為 **Z0／R0**：只回填文件與核對，
-   不動程式；若途中發現需要動程式，先重判 Zoom）
+4. `docs/AGENT_WORKFLOW.md` ＋ `skills/development-flow/SKILL.md`（Phase 2 動到 unattended executable surface，
+   **必出 `PLAN_PROPOSAL` 並同 change 做 sandbox impact review 五步**）
+5. `docs/OPERATIONS.md` 的「Daily / pq1 / 待辦池的參數」節（Phase 2 驗收要量 `drain_limit_per_run`）
 
-**Step 1.3 要做的四件：**
+~~**Step 1.3 要做的四件：**~~（2026-09-17 全部完成，見 ROADMAP 與計畫檔 §2d／§2e；以下留作歷程）
 
 1. **ROADMAP Phase 1 驗收行回填 before → after 實測值。** 舊句劃線加日期留原地，不靜默刪除。
    四個 Step 的實測值都在計畫檔 §2／§2b／§2c，但**回填前先自己跑一次查證命令**，不要抄現成數字。
@@ -101,6 +105,9 @@ live）、資本或任何 append-only authority、要改 `AGENTS.md` 判準句�
 > 等使用者批次 go。**從 Step 1.3 收尾開工。**~~
 > （2026-09-17 使用者已批次 `go`，六筆全部 apply → push → `complete-ra` 結案；
 > 本檔正文於同日改寫為從 Step 1.3 開工，上列狀態行改置於此。）
+>
+> ~~**狀態（2026-09-17 晚）：** 從 Step 1.3 收尾開工。~~
+> （Step 1.3 同日完成：ROADMAP 驗收行回填、completion gate 八項逐項核對、Phase 1 維持 ▶ 不標 ✅、未做完清單擴為六項待使用者決定去向。**本檔正文改寫為從 Phase 2 開工。**）
 
 **2026-09-16 原版正文（Step 0 任務書）已完成並封存**——去向清單見
 [`docs/refactor/alpha-edge-step0-migration.md`](../refactor/alpha-edge-step0-migration.md)，
