@@ -8758,6 +8758,217 @@
       "result": "ok",
       "run_at": "2026-09-17T13:16:31.341320+00:00",
       "source": "mops:4979.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:31.648555+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:32.700695+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:33.359330+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "cost_usd": 0.005,
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:33.876178+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:35.614025+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:36.285829+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:36.980389+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:37.728268+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:38.261022+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:38.968356+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:39.638344+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:40.148638+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:40.884020+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:41.597458+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:42.297133+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:42.999754+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:43.709331+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:44.389763+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:44.917398+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:45.588023+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:46.103137+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:46.840423+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:47.564732+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:48.092527+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:48.789828+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:49.480476+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:49.986863+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:50.520442+00:00",
+      "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.080606+00:00",
+      "source": "mops:2301.TW"
+    },
+    {
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.083739+00:00",
+      "source": "mops:2455.TW"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.664834+00:00",
+      "source": "mops:3081.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.664931+00:00",
+      "source": "mops:3105.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.664954+00:00",
+      "source": "mops:3363.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.664971+00:00",
+      "source": "mops:4971.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-17T23:03:51.664987+00:00",
+      "source": "mops:4979.TWO"
     }
   ],
   "leads": {
@@ -12125,8 +12336,8 @@
         "trace_next_trigger": "WF、WSJ、Pentagon 或 Goldman 原始文件公開，或具名客戶文件把總 capex 連到特定供應商承諾",
         "trace_origin_entity": "NVIDIA;TrendForce;Sivers Semiconductors",
         "trace_original_date": "2026-08-25/2026-09",
-        "trace_requeue_trigger": "related_triaged_lead:lead_335277d93cf38eede87f58d4e62bbc6e",
-        "trace_requeued_at": "2026-09-15T21:36:25.630832+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_9258d25d3075f37fd55cfe9f83eb19ab",
+        "trace_requeued_at": "2026-09-17T23:06:48.733384+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -12152,12 +12363,12 @@
           "co:sivers_semiconductors",
           "co:sk_hynix"
         ],
-        "trace_trigger_event_ref": "lead:lead_335277d93cf38eede87f58d4e62bbc6e",
+        "trace_trigger_event_ref": "lead:lead_9258d25d3075f37fd55cfe9f83eb19ab",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0086_2026-09-11"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -12186,12 +12397,12 @@
           "payment_direction": "customer_to_supplier",
           "reason": "查證 hyperscaler 資本支出與採購流向後，會改變光子與記憶體候選排序。"
         },
-        "decided_at": "2026-09-15T21:36:25.630832+00:00",
+        "decided_at": "2026-09-17T23:06:48.733384+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_335277d93cf38eede87f58d4e62bbc6e 與等待中的追源共用具名標的 SNDK；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_9258d25d3075f37fd55cfe9f83eb19ab 與等待中的追源共用具名標的 COHR, LITE；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -12243,6 +12454,29 @@
               "novelty": true
             },
             "reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_b4485e188cbf937c503c832edb7ff5f4 與等待中的追源共用具名標的 MU, NVDA；事件觸發 bounded pq1 重查",
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-17T23:06:48.733384+00:00",
+          "superseded_reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_9258d25d3075f37fd55cfe9f83eb19ab 與等待中的追源共用具名標的 COHR, LITE；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_9258d25d3075f37fd55cfe9f83eb19ab",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-11T21:36:46.311449+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "capital_commitment",
+              "decision_impact": "ranking",
+              "payment_direction": "customer_to_supplier",
+              "reason": "查證 hyperscaler 資本支出與採購流向後，會改變光子與記憶體候選排序。"
+            },
+            "decided_at": "2026-09-15T21:36:25.630832+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "Event Watch ew_0086_2026-09-11 觸發：新 triage PASS lead lead_335277d93cf38eede87f58d4e62bbc6e 與等待中的追源共用具名標的 SNDK；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -13248,8 +13482,8 @@
         "source_routes_receipt": "ticker=ORCL;適用=5條;已走=alternate_primary,issuer_site;未走=local_library(rung1),sec_edgar(rung2),authorized_syndication(rung5)",
         "trace_attempts_ref": "Oracle 官方 Q1 FY27 結果支持 AI 需求超過供給、已交付約 30 萬顆 GPU；20% 續約溢價逐字句只在第三方逐字稿找到，且屬時變商業觀測，不進 A1 圖",
         "trace_next_trigger": "Oracle 後續 IR、SEC filing 或官方 transcript 出現 GPU resale premium、renewal age 或 utilization breakdown 時重查",
-        "trace_requeue_trigger": "related_triaged_lead:lead_197f334da7415b4933bbe7ac3aae0cde",
-        "trace_requeued_at": "2026-09-14T21:35:12.625122+00:00",
+        "trace_requeue_trigger": "related_triaged_lead:lead_59619da9f926613b2c4cea0a29063684",
+        "trace_requeued_at": "2026-09-17T23:06:50.040570+00:00",
         "trace_requires_user": "false",
         "trace_status": "tier_1_2_honest_passthrough",
         "trace_trigger_entities": [
@@ -13262,12 +13496,12 @@
           "co:nvidia",
           "co:oracle"
         ],
-        "trace_trigger_event_ref": "lead:lead_197f334da7415b4933bbe7ac3aae0cde",
+        "trace_trigger_event_ref": "lead:lead_59619da9f926613b2c4cea0a29063684",
         "trace_trigger_kind": "related_entity_signal",
         "trace_trigger_watch_ref": "ew_0089_2026-09-13"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -13286,12 +13520,12 @@
           "decision_impact": "ranking",
           "reason": "若一手成立會改變對 ORCL、NBIS、IREN GPU 資產經濟性與相對吸引力的排序；若不成立則不採用。"
         },
-        "decided_at": "2026-09-14T21:35:12.625122+00:00",
+        "decided_at": "2026-09-17T23:06:50.040570+00:00",
         "decision": "go",
         "priority_flags": {
           "contradiction": true
         },
-        "reason": "Event Watch ew_0089_2026-09-13 觸發：新 triage PASS lead lead_197f334da7415b4933bbe7ac3aae0cde 與等待中的追源共用具名標的 IREN, NVDA, co:iren, co:nvidia；事件觸發 bounded pq1 重查",
+        "reason": "Event Watch ew_0089_2026-09-13 觸發：新 triage PASS lead lead_59619da9f926613b2c4cea0a29063684 與等待中的追源共用具名標的 NBIS, co:nebius；事件觸發 bounded pq1 重查",
         "tier": 3
       },
       "triage_history": [
@@ -13317,6 +13551,28 @@
             "related_trace_requeues": [
               "lead_b0daa9998b26ef6637edc45dc681bb97"
             ],
+            "tier": 3
+          }
+        },
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-17T23:06:50.040570+00:00",
+          "superseded_reason": "Event Watch ew_0089_2026-09-13 觸發：新 triage PASS lead lead_59619da9f926613b2c4cea0a29063684 與等待中的追源共用具名標的 NBIS, co:nebius；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_59619da9f926613b2c4cea0a29063684",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-13T21:37:21.348783+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "ranking",
+              "reason": "若一手成立會改變對 ORCL、NBIS、IREN GPU 資產經濟性與相對吸引力的排序；若不成立則不採用。"
+            },
+            "decided_at": "2026-09-14T21:35:12.625122+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "contradiction": true
+            },
+            "reason": "Event Watch ew_0089_2026-09-13 觸發：新 triage PASS lead lead_197f334da7415b4933bbe7ac3aae0cde 與等待中的追源共用具名標的 IREN, NVDA, co:iren, co:nvidia；事件觸發 bounded pq1 重查",
             "tier": 3
           }
         }
@@ -22863,6 +23119,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074223485921243237"
     },
+    "lead_3be042d80c81283e1f186adc4bccd6ad": {
+      "entities": {
+        "company_ids": [
+          "co:applied_optoelectronics"
+        ],
+        "tickers": [
+          "AAOI"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:35.613812+00:00",
+      "lead_id": "lead_3be042d80c81283e1f186adc4bccd6ad",
+      "published_at": "2026-09-17",
+      "refs": {},
+      "source": "edgar:AAOI",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "AAOI 4 filed 2026-09-17 [007214]",
+      "triage": {
+        "decided_at": "2026-09-17T23:03:35.613944+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826007214/xslF345X06/ownership.xml"
+    },
     "lead_3d938a5a87a025e1e067c3561fc9672c": {
       "entities": {
         "company_ids": [
@@ -28910,6 +29192,61 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2084613071423893692"
     },
+    "lead_59619da9f926613b2c4cea0a29063684": {
+      "entities": {
+        "company_ids": [
+          "co:nebius"
+        ],
+        "tickers": [
+          "NBIS",
+          "PSMC"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:33.855399+00:00",
+      "lead_id": "lead_59619da9f926613b2c4cea0a29063684",
+      "media": [
+        {
+          "cache": {
+            "bytes": 43503,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_59619da9f926613b2c4cea0a29063684/3_2100524231251595264.jpg",
+            "sha256": "d9dd89755e759077a55f2216a40b664719058f985bc266df7542ad210f8bcd68"
+          },
+          "height": 583,
+          "media_key": "3_2100524231251595264",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSaPqMXaEAAe-XC.jpg",
+          "width": 2020
+        }
+      ],
+      "published_at": "2026-09-17T10:21:13.000Z",
+      "raw_text": "Just in case you're wondering why I'm so bullish on legacy memory...\n\nTheir hikes seem a lot extreme than $NBIS reported +17-21% GPU rentals today or Taiyo-Murata type MLCC hikes. \n\nPrice hikes projections expected for H2:\n\n- SLC NAND: +120-170% in H2 vs H1\n- High-capacity NOR: +90-110% in H2 vs H1\n- ~DDR3/DDR4: +50% Q3\n- DDR2: +35-40% in Q3\n- LPDDR: +20% or more in Q3\n- DDR1, older LPDDR and PSRAM: also rising\n\nAs a consolidated view... \n\nLot of these are stacked off existing hikes H1, (eg. 130-150% for H1 SLC NAND), so you get +406%-575% cumulative throughout 2026.\n\nWhich impacts blended net income overall more than upstream wafer COGS hikes (eg. +45% DRAM wafers from $PSMC)\n\nSo I'd expect Q3 earnings for a lot of the legacy memory fabless companies to cook",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "Just in case you're wondering why I'm so bullish on legacy memory... Their hikes seem a lot extreme than $NBIS reported +17-21% GPU rentals today or Taiyo-Murata type MLCC hikes. Price hikes projections expected for H2: - SLC NAND: +120-170% in H2 vs H1 - High-capacity NOR: +90-110% in H2 vs H1 - ~DDR3/DDR4: +50% Q3 - DDR2: +35-40% in Q3 - LPDDR: +20% or more in Q3 - DDR1, older LPDDR and PSRAM: also rising As a consolidated view... Lot of these are stacked off existing hikes H1, (eg. 130-150% for H1 SLC NAND), so you get +406%-575% cumulative throughout 2026. Which impacts blended net income overall more than upstream wafer COGS hikes (eg. +45% DRAM wafers from $PSMC) So I'd expect Q3 earnings for a lot of the legacy memory fabless companies to cook",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:50.040570+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "ranking",
+          "reason": "若漲價幅度與成本傳導獲一手支持，會改變 legacy memory 候選的相對排序。"
+        },
+        "decided_at": "2026-09-17T23:06:50.040570+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "列出 legacy memory 各品類 H2／Q3 漲價幅度與 PSMC wafer 成本等具體數字，可追回原始報告；對既有記憶體候選的盈利橋有直接查證價值。",
+        "related_trace_requeues": [
+          "lead_11ef4ccbd71060a566e7fab5a8caec6c"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2100530507549425704"
+    },
     "lead_59855c9e77cf0ab94e37eee4ba83a3a7": {
       "entities": {
         "company_ids": [],
@@ -31220,6 +31557,40 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2089355682286092748"
     },
+    "lead_65a49e66fcd56c13d1700dea7edfd6b6": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:38.260720+00:00",
+      "lead_id": "lead_65a49e66fcd56c13d1700dea7edfd6b6",
+      "published_at": "2026-09-17",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-09-17 [000084]",
+      "triage": {
+        "decided_at": "2026-09-17T23:03:38.260851+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000084/xslF345X06/wk-form4_1789683021.xml"
+    },
     "lead_65a9f0c0cc8a0740adfef70778234b50": {
       "entities": {
         "company_ids": [],
@@ -32192,10 +32563,27 @@
       "raw_text": "本公司訂購廠務工程公告。\n\n1.標的物之名稱及性質（如坐落台中市北區ＸＸ段ＸＸ小段土地）:\r\n廠務工程及設備。\r\n2.事實發生日:114/10/7~115/9/16\r\n3.董事會通過日期: 不適用\r\n4.其他核決日期:\r\n核決層級:依公司採購核決權限辦理\r\n民國115年9月16日\r\n5.交易單位數量（如ＸＸ平方公尺，折合ＸＸ坪）、每單位價格及交易總金額:\r\n交易數量：一批。\n交易總金額：NT$353,562,825元 (依上述事實發生日期間之累計訂單總金額)。\r\n6.交易相對人及其與公司之關係（交易相對人如屬自然人，且非公司之關\r\n係人者，得免揭露其姓名）:\r\n帆宣系統科技股份有限公司；與公司關係：無。\r\n7.交易相對人為關係人者，並應公告選定關係人為交易對象之原因及前次移轉之\r\n所有人、前次移轉之所有人與公司及交易相對人間相互之關係、前次移轉日期\r\n及移轉金額:\r\n不適用。\r\n8.交易標的最近五年內所有權人曾為公司之關係人者，尚應公告關係\r\n人之取得及處分日期、價格及交易當時與公司之關係:\r\n不適用。\r\n9.預計處分利益（或損失）（取得資產者不適用）（遞延者應列表說明\r\n認列情形）:\r\n不適用。\r\n10.交付或付款條件（含付款期間及金額）、契約限制條款及其他重要約定\r\n事項:\r\n依各別訂單條件付款。\r\n11.本次交易之決定方式（如招標、比價或議價）、價格決定之參考依據及\r\n決策單位:\r\n交易決定方式:詢價、比價或議價。\n價格決定之參考依據:依據廠商提供之報價單做議價。\n決策單位:依公司採購核決權限辦理\r\n12.專業估價者事務所或公司名稱及其估價金額:\r\n不適用。\r\n13.專業估價師姓名:\r\n不適用。\r\n14.專業估價師開業證書字號:\r\n不適用。\r\n15.估價報告是否為限定價格、特定價格或特殊價格:否或不適用\r\n16.是否尚未取得估價報告:否或不適用\r\n17.尚未取得估價報告之原因:\r\n不適用\r\n18.估價結果有重大差異時，其差異原因及會計師意見:\r\n不適用。\r\n19.會計師事務所名稱:\r\n不適用。\r\n20.會計師姓名:\r\n不適用。\r\n21.會計師開業證書字號:\r\n不適用。\r\n22.經紀人及經紀費用:\r\n無。\r\n23.取得或處分之具體目的或用途:\r\n供生產用。\r\n24.本次交易表示異議之董事之意見:\r\n不適用。\r\n25.本次交易為關係人交易:否\r\n26.監察人承認或審計委員會同意日期:\r\n不適用。\r\n27.本次交易係向關係人取得不動產或其使用權資產:否\r\n28.依「公開發行公司取得或處分資產處理準則」第十六條規定\r\n評估之價格:不適用\r\n29.依前項評估之價格較交易價格為低者，依同準則第十七條規\r\n定評估之價格:不適用\r\n30.前已就同一件事件發布重大訊息日期: 不適用\r\n31.其他敘明事項:\r\n無。",
       "refs": {},
       "source": "mops:3105.TWO",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {},
       "title": "3105.TWO 穩懋 重訊 2026-09-16：本公司訂購廠務工程公告。",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:50.371398+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "ranking",
+          "payment_direction": "unclear",
+          "reason": "若後續原文與既有產能脈絡對上，會影響穩懋在產能擴張候選中的排序；付款方向相對瓶頸供應鏈未能從公告安全判定。"
+        },
+        "decided_at": "2026-09-17T23:06:50.371398+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "穩懋 MOPS 一手公告具體揭露 NT,562,825 廠務工程與設備、交易對手帆宣及供生產用途；屬可機械核對的產能資本承諾。",
+        "tier": 1
+      },
       "url": "https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap04_O?co_id=3105&spoke=2026-09-16T15:27:14&ref=76879362e762"
     },
     "lead_6a56acb8a4aa5260483a3b14600db949": {
@@ -32355,7 +32743,7 @@
       "raw_text": "Just as a pep-talk statistic ahead of Fed decisions tomorrow.\n\n50% of $NVDA employees are reportedly now worth over $25 Million.\n\nThey didn’t get to that number paperhanding shares ahead of every macro scare or rate hike. https://t.co/saulhxBF3g",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_no_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -32366,7 +32754,13 @@
         }
       },
       "title": "Just as a pep-talk statistic ahead of Fed decisions tomorrow. 50% of $NVDA employees are reportedly now worth over $25 Million. They didn’t get to that number paperhanding shares ahead of every macro scare or rate hike. https://t.co/saulhxBF3g",
-      "triage": null,
+      "triage": {
+        "decided_at": "2026-09-17T23:06:49.715936+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "雖提 NVDA，但正文是 Fed 前的持股 pep talk；50% 員工身價超過 US 為未附可核對來源的統計，不能形成公司、供應鏈或反證 claim。",
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2099999510898577543"
     },
     "lead_6ac3699094b2106a3af12848febb87f3": {
@@ -38467,6 +38861,40 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2096890295128625153"
     },
+    "lead_82b6fae86ebd16627f980608c2ea659c": {
+      "entities": {
+        "company_ids": [
+          "co:broadcom"
+        ],
+        "tickers": [
+          "AVGO"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:38.260871+00:00",
+      "lead_id": "lead_82b6fae86ebd16627f980608c2ea659c",
+      "published_at": "2026-09-17",
+      "refs": {},
+      "source": "edgar:AVGO",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "AVGO"
+          ]
+        }
+      },
+      "title": "AVGO 4 filed 2026-09-17 [000082]",
+      "triage": {
+        "decided_at": "2026-09-17T23:03:38.260957+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1730168/000173016826000082/xslF345X06/wk-form4_1789682754.xml"
+    },
     "lead_830c264f2672720822ce495e715d1893": {
       "entities": {
         "company_ids": [
@@ -40628,6 +41056,41 @@
       },
       "url": "https://www.sivers-semiconductors.com/press/sivers-semiconductors-lender-bootstrap-europe-exercises-conversion-right-under-existing-convertible-loan/"
     },
+    "lead_8a8fac4dc7e8503159c5f60afc5ef37d": {
+      "entities": {
+        "company_ids": [
+          "co:tower_semiconductor"
+        ],
+        "tickers": [
+          "TSEM"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:49.480283+00:00",
+      "lead_id": "lead_8a8fac4dc7e8503159c5f60afc5ef37d",
+      "published_at": "2026-09-17",
+      "refs": {},
+      "source": "edgar:TSEM",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "TSEM 6-K filed 2026-09-17 [004535]",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:49.386152+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "confidence_only",
+          "reason": "目前只有 filing 存在本身；內容查明前，最多先提高或降低既有 Tower 判斷的信心。"
+        },
+        "decided_at": "2026-09-17T23:06:49.386152+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "Tower Semiconductor 官方 6-K，具名發行人、日期與 SEC 原文連結；摘要未揭露內容，先以低優先追文件判斷是否有結構事實。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/928876/000117891326004535/zk2636128.htm"
+    },
     "lead_8ae4bd1a71426bd5346bf5cd45cc94ba": {
       "entities": {
         "company_ids": [
@@ -40734,11 +41197,15 @@
         "trace_attempts_ref": "Sivers Q2 letter 支持 70/100/200mW 產品與 pluggable CW laser 供應受限；社群附圖在本次執行環境無法讀取，公開搜尋未取得 Innolight ASP 或 Sivers 提價的一手披露",
         "trace_next_trigger": "Innolight 或 Sivers 官方揭露 ASP／price increase，或可合法取得 CIOE 現場原始訪談",
         "trace_origin_entity": "Sivers Semiconductors",
+        "trace_requeue_trigger": "related_triaged_lead:lead_dcbd8601110f01f98295301cfb4a5b42",
+        "trace_requeued_at": "2026-09-17T23:06:49.055986+00:00",
         "trace_requires_user": "false",
-        "trace_status": "partial"
+        "trace_status": "partial",
+        "trace_trigger_event_ref": "lead:lead_dcbd8601110f01f98295301cfb4a5b42",
+        "trace_trigger_watch_ref": "ew_0087_2026-09-11"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {
         "sivers": {
           "counter_only": false,
@@ -40758,14 +41225,38 @@
           "decision_impact": "ranking",
           "reason": "若提價與 ASP 可由一手支持，會改變雷射供應商的獲利與排序判斷。"
         },
-        "decided_at": "2026-09-11T21:36:49.020767+00:00",
+        "decided_at": "2026-09-17T23:06:49.055986+00:00",
         "decision": "go",
         "priority_flags": {
           "novelty": true
         },
-        "reason": "具名 Sivers 與 Innolight，明列 70mW–200mW 雷射 ASP 上升與 Sivers 提價；關聯且可追 channel check／公司披露，可能改變雷射供應商排序。",
+        "reason": "Event Watch ew_0087_2026-09-11 觸發：新 triage PASS lead lead_dcbd8601110f01f98295301cfb4a5b42 與等待中的追源共用具名標的 SIVE；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-17T23:06:49.055986+00:00",
+          "superseded_reason": "Event Watch ew_0087_2026-09-11 觸發：新 triage PASS lead lead_dcbd8601110f01f98295301cfb4a5b42 與等待中的追源共用具名標的 SIVE；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_dcbd8601110f01f98295301cfb4a5b42",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-11T21:36:49.020767+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "ranking",
+              "reason": "若提價與 ASP 可由一手支持，會改變雷射供應商的獲利與排序判斷。"
+            },
+            "decided_at": "2026-09-11T21:36:49.020767+00:00",
+            "decision": "go",
+            "priority_flags": {
+              "novelty": true
+            },
+            "reason": "具名 Sivers 與 Innolight，明列 70mW–200mW 雷射 ASP 上升與 Sivers 提價；關聯且可追 channel check／公司披露，可能改變雷射供應商排序。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2098358633960726788"
     },
     "lead_8bc58fe64d264c626811c3af367356f4": {
@@ -42048,7 +42539,7 @@
       "raw_text": "Reminiscent of $NVDA w/ $LITE + $COHR:\n\nFoxconn is now considering joint investments to avoid upstream material shortages.\n\nFoxconn Interconnect Chairman identifies CW lasers and fiber as the biggest bottleneck in photonics.\n\nVery interesting to see these two themes reiterated across industry commentary.\n\nAlmost like a certain Anime character on X was right about CW laser bottlenecks.",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -42061,7 +42552,27 @@
         }
       },
       "title": "Reminiscent of $NVDA w/ $LITE + $COHR: Foxconn is now considering joint investments to avoid upstream material shortages. Foxconn Interconnect Chairman identifies CW lasers and fiber as the biggest bottleneck in photonics. Very interesting to see these two themes reiterated across industry commentary. Almost like a certain Anime character on X was right about CW laser bottlenecks.",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:48.733384+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "capital_commitment",
+          "decision_impact": "candidate_set",
+          "payment_direction": "customer_to_supplier",
+          "reason": "若追回 Foxconn 對特定上游供應商的共同投資或材料短缺原話，會新增或縮小 CW 雷射／光纖候選集合。"
+        },
+        "decided_at": "2026-09-17T23:06:48.733384+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "具名 Foxconn Interconnect 董事長、CW 雷射與光纖瓶頸，並有共同投資避免上游材料短缺的具體動作；X 只作 tier-4 lead，值得追回 Digitimes／董事長原話。",
+        "related_trace_requeues": [
+          "lead_0d2aef4d40bce116bc0d13a869fe2dcc"
+        ],
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2100290486569505223"
     },
     "lead_928514b80dea6644f199f48c0803092d": {
@@ -46634,6 +47145,42 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/707549/000131606526000012/xslF345X06/wk-form4_1784048170.xml"
+    },
+    "lead_a968cea74d09b4e4c4213e512e541a59": {
+      "entities": {
+        "company_ids": [
+          "co:vpec"
+        ],
+        "tickers": [
+          "2455.TW"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:51.080700+00:00",
+      "lead_id": "lead_a968cea74d09b4e4c4213e512e541a59",
+      "published_at": "2026-09-17",
+      "raw_text": "公告全新股份有限公司國內第二次無擔保轉換公司債(簡稱：全新二，代碼：24552)發行公司行使債券贖回權暨訂於115年11月18日終止櫃檯買賣等相關事宜。\n\n內容：依全新二發行及轉換辦法第十八條規定辦理。\n發行公司於115年10月19日至115年11月17日行使債券贖回權，贖回權價格為債券面額之100.0000%\n(一)、依本公司「國內第二次無擔保可轉換公司債發行及轉換辦法」第十八條第一項規定，本公司普通股收盤價連續三十個營業日超過當時轉換價格達百分之三十(含)時，本公司得於其後三十個營業日內，以掛號寄發一份三十日期滿之「債券收回通知書」(前述期間自本公司發信之日起算，並以該期間屆滿日為債券收回基準日，且前述期間不得為第九條之停止轉換期間)予債券持有人(以「債券收回通知書」寄發日前第五個營業日債券持有人名冊所載者為準，對於其後因買賣或其他原因始取得本轉換公司債之債券持有人，則以公告方式為之)，贖回價格訂為本債券面額，以現金收回其全部債券，並函請櫃檯買賣中心公告。本公司執行收回請求，應於債券收回基準日後五個營業日內，按債券面額以現金收回流通在外之本轉換公司債。\n(二)、依本公司「國內第二次無擔保可轉換公司債發行及轉換辦法」第十八條第三項規定，若債券持有人於「債券收回通知書」所載債券收回基準日前，未以書面回覆本公司股務代理機構(於送達時即生效力，採郵寄者以郵戳日為憑)者，本公司將於債券收回基準日後五個營業日內，按債券面額以現金收回流通在外之本轉換公司債。\n(三)、本公司國內第二次無擔保轉換公司債行使贖回權暨終止櫃檯買賣日之相關事宜如下：\n(1)、掛號寄發債券收回通知書日期：115年10月19日。\n(2)、通知及受理轉換公司債贖回期間：115年10月19日至115年11月17日。\n(3)、轉換公司債收回基準日：115年11月17日。\n(4)、轉換公司債終止櫃檯買賣日期：115年11月18日。\n(5)、債券收回價款及發放日期：按債券面額以現金收回，並統一於115年11月24日以匯款或郵寄支票方式支付予各申請人，匯費(郵資)自收回價金中直接扣除。\n(四)、債券收回手續暨應備文件\n(1)、轉換公司債帳簿劃撥轉換/贖回/賣回申請書(申請書可至各證券商取得，註明：贖回，並填妥持有人之匯款銀行帳號及加蓋集保帳戶印鑑）。\n(2)、證券存摺，向往來券商辦理債券收回手續，由往來券商向臺灣集中保管結算所股份有限公司(下稱集保公司）提出申請，集保公司於接受申請後送交本公司股務代理機構，於送達時即生效力，且不得申請撤回。\n(3)、債權人得自債券收回通知之始日115年10月19日之前一營業日（115年10月16日）起至屆滿日（115年11月17日）之前一營業日（115年11月16日）止，由債券持有人向往來券商辦理贖回手續。\n(五)、本公司股務代理機構:台新綜合證券股份有限公司股務代理部(地址：台北市建國北路一段96號B1，電話：02-25048125)。\n警語：請投資人注意，具有請求轉換資格者，如未於115年11月19日前以書面請求轉換，本公司將按面額計算以現金收回其全部債券。",
+      "refs": {},
+      "source": "mops:2455.TW",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "2455.TW 全新 重訊 2026-09-17：公告全新股份有限公司國內第二次無擔保轉換公司債(簡稱：全新二，代碼：24552)發行公司行使債券贖回權暨訂於115年11月18日終止櫃檯買賣等相關事宜。",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:50.697729+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "事件不改候選集合或結構排序，最多影響對全新稀釋／資本結構的信心。"
+        },
+        "decided_at": "2026-09-17T23:06:50.697729+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "全新 MOPS 一手公告具體揭露第二次無擔保轉債贖回與終止買賣日期；可核對但屬低優先資本結構事件。",
+        "tier": 1
+      },
+      "url": "https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=2455&spoke=2026-09-17T14:50:07&ref=9ee30113a1ed"
     },
     "lead_a9a12c2b8ad54e92dce8dc3afac2ecee": {
       "content_updated_at": "2026-09-10T22:32:40.765524+00:00",
@@ -55144,6 +55691,42 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2095460499769155944"
     },
+    "lead_ca8eda4d28642ac9f3e51a5b386cc8b0": {
+      "entities": {
+        "company_ids": [
+          "co:vpec"
+        ],
+        "tickers": [
+          "2455.TW"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:51.082241+00:00",
+      "lead_id": "lead_ca8eda4d28642ac9f3e51a5b386cc8b0",
+      "published_at": "2026-09-17",
+      "raw_text": "公告全新股份有限公司國內第三次無擔保轉換公司債(簡稱：全新三，代碼：24553)發行公司行使債券贖回權暨訂於115年11月18日終止櫃檯買賣等相關事宜。\n\n內容：依全新三發行及轉換辦法第十八條規定辦理。\n發行公司於115年10月19日至115年11月17日行使債券贖回權，贖回權價格為債券面額之100.0000%\n(一)、依本公司「國內第三次無擔保可轉換公司債發行及轉換辦法」第十八條第一項規定，本公司普通股收盤價連續三十個營業日超過當時轉換價格達百分之三十(含)時，本公司得於其後三十個營業日內，以掛號寄發一份三十日期滿之「債券收回通知書」(前述期間自本公司發信之日起算，並以該期間屆滿日為債券收回基準日，且前述期間不得為第九條之停止轉換期間)予債券持有人(以「債券收回通知書」寄發日前第五個營業日債券持有人名冊所載者為準，對於其後因買賣或其他原因始取得本轉換公司債之債券持有人，則以公告方式為之)，贖回價格訂為本債券面額，以現金收回其全部債券，並函請櫃檯買賣中心公告。本公司執行收回請求，應於債券收回基準日後五個營業日內，按債券面額以現金收回流通在外之本轉換公司債。\n(二)、依本公司「國內第三次無擔保可轉換公司債發行及轉換辦法」第十八條第三項規定，若債券持有人於「債券收回通知書」所載債券收回基準日前，未以書面回覆本公司股務代理機構(於送達時即生效力，採郵寄者以郵戳日為憑)者，本公司將於債券收回基準日後五個營業日內，按債券面額以現金收回流通在外之本轉換公司債。\n(三)、本公司國內第三次無擔保轉換公司債行使贖回權暨終止櫃檯買賣日之相關事宜如下：\n(1)、掛號寄發債券收回通知書日期：115年10月19日。\n(2)、通知及受理轉換公司債贖回期間：115年10月19日至115年11月17日。\n(3)、轉換公司債收回基準日：115年11月17日。\n(4)、轉換公司債終止櫃檯買賣日期：115年11月18日。\n(5)、債券收回價款及發放日期：按債券面額以現金收回，並統一於115年11月24日以匯款或郵寄支票方式支付予各申請人，匯費(郵資)自收回價金中直接扣除。\n(四)、債券收回手續暨應備文件\n(1)、轉換公司債帳簿劃撥轉換/贖回/賣回申請書(申請書可至各證券商取得，註明：贖回，並填妥持有人之匯款銀行帳號及加蓋集保帳戶印鑑）。\n(2)、證券存摺，向往來券商辦理債券收回手續，由往來券商向臺灣集中保管結算所股份有限公司(下稱集保公司）提出申請，集保公司於接受申請後送交本公司股務代理機構，於送達時即生效力，且不得申請撤回。\n(3)、債權人得自債券收回通知之始日115年10月19日之前一營業日（115年10月16日）起至屆滿日（115年11月17日）之前一營業日（115年11月16日）止，由債券持有人向往來券商辦理贖回手續。\n(五)、本公司股務代理機構:台新綜合證券股份有限公司股務代理部(地址：台北市建國北路一段96號B1，電話：02-25048125)。\n警語：請投資人注意，具有請求轉換資格者，如未於115年11月19日前以書面請求轉換，本公司將按面額計算以現金收回其全部債券。",
+      "refs": {},
+      "source": "mops:2455.TW",
+      "status": "triaged_go",
+      "themes": {},
+      "title": "2455.TW 全新 重訊 2026-09-17：公告全新股份有限公司國內第三次無擔保轉換公司債(簡稱：全新三，代碼：24553)發行公司行使債券贖回權暨訂於115年11月18日終止櫃檯買賣等相關事宜。",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:51.027517+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "financial_fact",
+          "decision_impact": "confidence_only",
+          "reason": "事件不改候選集合或結構排序，最多影響對全新稀釋／資本結構的信心。"
+        },
+        "decided_at": "2026-09-17T23:06:51.027517+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true
+        },
+        "reason": "全新 MOPS 一手公告具體揭露第三次無擔保轉債贖回與終止買賣日期；可核對但屬低優先資本結構事件。",
+        "tier": 1
+      },
+      "url": "https://openapi.twse.com.tw/v1/opendata/t187ap04_L?co_id=2455&spoke=2026-09-17T14:50:27&ref=3cdbf7076dfa"
+    },
     "lead_caa3e0209d61d6de504ac996be1f03fc": {
       "entities": {
         "company_ids": [
@@ -59244,7 +59827,7 @@
       "raw_text": "$SIVE has its own piece in Digitimes btw, which is appreciated industry recognition outside of Sweden. \n\nI think Sivers 100M+ CW DFB laser capacity buildout forced the industry to revisit its models and generated considerably more coverage. \n\nBC it puts Sivers into T1 laser capacity convo w/ $COHR, Sumitomo, Furukawa, $AVGO, Landmark, and $LITE if it executes on its ramp. \n\nBut outside of that, CIOE 2026 channel checks were really meaningful since the community found Sivers is working with Chinese pluggable players + setting up an office locally. \n\nI'm getting dejavu to the time I pointed out $SIVE + $JBL at OFC for their 1.6T LRO, but nobody believed the link until there was an actual press release. \n\nAnyway, proud to see this little company growing up",
       "refs": {},
       "source": "x:aleabitoreddit",
-      "status": "pending",
+      "status": "triaged_go",
       "themes": {
         "cpo": {
           "counter_only": false,
@@ -59273,7 +59856,26 @@
         }
       },
       "title": "$SIVE has its own piece in Digitimes btw, which is appreciated industry recognition outside of Sweden. I think Sivers 100M+ CW DFB laser capacity buildout forced the industry to revisit its models and generated considerably more coverage. BC it puts Sivers into T1 laser capacity convo w/ $COHR, Sumitomo, Furukawa, $AVGO, Landmark, and $LITE if it executes on its ramp. But outside of that, CIOE 2026 channel checks were really meaningful since the community found Sivers is working with Chinese pluggable players + setting up an office locally. I'm getting dejavu to the time I pointed out $SIVE + $JBL at OFC for their 1.6T LRO, but nobody believed the link until there was an actual press release. Anyway, proud to see this little company growing up",
-      "triage": null,
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-17T23:06:49.055986+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若 Digitimes／CIOE 原文支持 Sivers 的產能與中國客戶連結，會影響 CW laser 候選集合。"
+        },
+        "decided_at": "2026-09-17T23:06:49.055986+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "independent_source": true,
+          "novelty": true
+        },
+        "reason": "具名 Sivers、Digitimes、100M+ CW DFB 產能、中國 pluggable 客戶與本地辦公室等可追查主張；潛在第三方與客戶端來源值得追原文。",
+        "related_trace_requeues": [
+          "lead_8b32ad00a47303f2cc350a82eee95c10"
+        ],
+        "tier": 4
+      },
       "url": "https://x.com/aleabitoreddit/status/2100008575229976995"
     },
     "lead_dcf4f840af40a235c36cfd6d98bb53db": {
@@ -60742,6 +61344,32 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2077753660592033828"
+    },
+    "lead_e47598a2942dc6e15a4664129985d9b7": {
+      "entities": {
+        "company_ids": [
+          "co:meta"
+        ],
+        "tickers": [
+          "META"
+        ]
+      },
+      "first_seen": "2026-09-17T23:03:44.917196+00:00",
+      "lead_id": "lead_e47598a2942dc6e15a4664129985d9b7",
+      "published_at": "2026-09-17",
+      "refs": {},
+      "source": "edgar:META",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "META 4 filed 2026-09-17 [014140]",
+      "triage": {
+        "decided_at": "2026-09-17T23:03:44.917317+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1326801/000095010326014140/xslF345X06/ownership.xml"
     },
     "lead_e48d58c39e20202b653eecf6cff75adc": {
       "entities": {
@@ -67531,8 +68159,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2100290486569505223",
-      "updated_at": "2026-09-17T09:55:01.754381+00:00",
+      "since_id": "2100530507549425704",
+      "updated_at": "2026-09-17T23:03:33.876163+00:00",
       "user_id": "1940360837547565056"
     }
   }
