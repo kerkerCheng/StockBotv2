@@ -58,12 +58,38 @@
 > 所以 Phase 2 的「連續 3 天心跳」最早 **2026-09-20** 驗得完（09-18／19／20）。
 > 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`（看 `Next Run Time` 與 `Last Result`）。
 >
+> **[600][601] 已 go 並結案、[598] pending（2026-09-17）——而兩個編號的提案前提都被實測修正：**
+>
+> **[600]**：lane memo 第 7 節**已有六條 disproof**，我要補的三條裡兩條已經存在（對美出口許可＝第 4 條、
+> ASP 揭露＝第 1 條）。真正缺的只有一條：**Q3 2026 營收 ≥ US$60M**——原第 5 條問的是下界（低於 Q2 的 47.589M），
+> 而 variant 賭的是沒有大幅上行，**中間那段 47.6M～60M 先前沒有任何條件在看**。已補上並附 L7 三件套。
+>
+> **[601]**：提案說「AXT 自己募 600M 擴產」，實測是**三家同時擴，而且自家 thesis 六週前就記了**——
+> JX 四年最多 1,200 億日圓／產能 FY2025 的 **7–10 倍**（官方新聞稿，**已入圖** `jx_metals_inp_capacity_pr_2026_06_16`）、
+> 住友 180 億日圓／FY2028 達 FY2024 的 3.1 倍、AXT 2026-2028 履約擴產＋US$600.1M 募資。
+> thesis 的 `prior_disproof_trigger` 逐字記著 2026-08-04「第 7 節第 6 條已觸發，且是兩家同時、規模遠大於預期」，
+> 並已據此 revise 成 v4、方向轉為謹慎偏空。
+> **⚠ 所以 09-17 讀圖引用 GSR 的「JX Metals has no announced expansion plans」，在寫下時已經錯了六週。**
+>
+> **⚠⚠ 機制性原因，lane memo 第 3 節自己寫了（這是本輪最該記住的一句）：**
+> JX 的證據已入圖，但掛在 `co:jx_advanced_metals` 節點上，而**圖中缺少 AXT↔JX 的 `competes_with` 邊**
+> （住友有、JX 沒有），所以它不在 AXT 的 context slice 裡——`query.structure` 走的是邊，**沒有邊就沒有那個角度**。
+> memo 在 08-04 就把「補這條邊」列為後續行動，六週後還沒補。
+> **判準：一份讀圖的可信度，上限是它走得到的那些邊。**
+> 新讀圖 `sr_88340b81269fa1c2` 維持 `volume`（兩個判準都沒變），改的是**「一時補不上」有了具體期限 2026–2028**：
+> 短缺是真的，但**它的到期日已經被三家的資本支出買下來了**。
+>
 > **待使用者決定（本輪掛號，不自行推進）：**
-> **[600]** AXTI thesis 的 disproof 更新為 variant 的三條可觀測條件（**thesis mutation gate**）。
-> **[601]** `mat:inp_substrate` 讀圖的 disproof ④ 要重看——**AXT 自己已募 US$600.1M 專款擴 InP 產能**
-> （2026-04-22 交割，用途逐字寫明），讀圖沒記這件事。它不推翻 volume 判定，但讓「產能補不上」**有了到期日**。
+> **[602]** 補 `co:axt --competes_with--> co:jx_advanced_metals` 邊（**graph admission**）。
+> 補完之後 `mat:inp_substrate` 的讀圖應會自動偵測 digest 變動並要求重讀——那正是 Q5 機制該起作用的地方。
 > 另有一個**要改 ROADMAP Phase 定義**的：Phase 3 驗收行寫「5 欄有值」，
 > 而決定紀錄 §6 自己逐字寫著「算不回來的：假設命中率」——**兩者自相矛盾**，修驗收行要先給五欄 amendment。
+>
+> ~~**待使用者決定（上一輪掛號）：**~~
+> ~~**[600]** AXTI thesis 的 disproof 更新為 variant 的三條可觀測條件（**thesis mutation gate**）。~~（2026-09-17 go 結案）
+> ~~**[601]** `mat:inp_substrate` 讀圖的 disproof ④ 要重看——**AXT 自己已募 US$600.1M 專款擴 InP 產能**
+> （2026-04-22 交割，用途逐字寫明），讀圖沒記這件事。它不推翻 volume 判定，但讓「產能補不上」**有了到期日**。~~（2026-09-17 go 結案；實測發現的比提案更多，見上）
+> （ROADMAP Phase 3 驗收行的矛盾已移到上方，仍待決。）
 >
 > **不需核准就能接著做的：** Phase 6（台股月營收、MOPS 重訊 watcher、parked lead 到期）；
 > Phase 4 剩下的兩條機械條件**仍然不該做**（實測會讓 0 家變 0 家，改不到 binding constraint）。
