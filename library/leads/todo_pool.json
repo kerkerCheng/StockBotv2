@@ -10120,13 +10120,40 @@
       "added_at": "2026-09-17T08:36:03.528885+00:00",
       "hint": "[595] 的讀圖把這個缺口變成一筆有到期的紀錄：整張圖說所有人都繞不過 InP 基板（15 條需求邊裡 7 條 sub=5、2 條 sub=4，且它是最底層、下一層 0 條），**但供給它的三家彼此可不可替代，一個值都沒有**，所以 A/B 判不出來（讀圖 sr_d6760bfe5d6e9164 記 undecided）。go 之後會變的數字：那筆讀圖可由 undecided 改寫成 moat 或 volume；query.structure 的供給側分布由「都沒填」變成有分布；可投資排序可能多幾列（AXTI 已在排序裡，5802.T 也在）。做法是 bounded research：AXT 10-K／住友電工有価証券報告書／JX Advanced Metals 上市文件裡的InP 基板產能、客戶集中與同業比較；依 L8 客戶端或第三方具名才算外部印證。⚠ 補完是圖寫入，仍要另一個 ra_admission 編號逐筆核准。⚠ 與 [552] 不同：那一筆是把 AXT 的自報升級成外部印證（evidence 軸），這一筆是可替代性（結構軸）。",
       "n": 596,
-      "reason": null,
+      "reason": "2026-09-17 使用者 go。研究完成，產出 prepared RA（入圖是另一個 gate）。三條邊全部判 3（低於門檻 4）——**誠實的否定結果，可投資排序不會多出任何一家**。依據：GSR「三家控制 >90%」＋Reuters 獨立印證同一形狀＋圖裡本來就有 sumitomo competes_with axt＋AXT 自己在 10-K 逐字具名六家競爭者（與 Phase 1 台系磊晶廠同一形狀）。判 3 不判 4 的理由寫進 packet：圖裡既有的 axt→coherent=4／axt→lumentum=4／sumitomo→lumentum=4 問的是「特定客戶關係」（換供應商難），本次問的是「市場層級」（這個材料不是任何一家獨佔），嚴格低一級。產能飽和與中國出口管制是真的，但那是產能彈性與地緣風險，不是可替代性——不塞進這個欄位。",
+      "receipt": "authority:research_action;ref:ra_260be128d8019a0f05a877def55c52c3",
       "ref_id": "manual:596",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-17T08:58:26.934878+00:00",
       "source": "manual",
       "title": "mat:inp_substrate 供給側三條邊補 substitutability（AXT／住友電工／JX）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-17T08:59:53.580551+00:00",
+      "graph_impact": "+4 節點、7 邊、2 claims｜來源：Global Semi Research（tier 3）",
+      "hint": "核准 exact graph delta；Decision handoff：co:axt。RA 內其他公司只作 evidence／relationship context，不自動建 cohort。",
+      "n": 597,
+      "reason": null,
+      "ref_id": "ra_260be128d8019a0f05a877def55c52c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "research_action",
+      "title": "[596] InP 基板供給側三條邊補 substitutability：AXT／住友／JX 全部判 3（三家寡占但互為替代——誠實的否定結果，沒有一檔因此進榜）",
+      "type": "ra_admission"
+    },
+    {
+      "added_at": "2026-09-17T08:59:53.580551+00:00",
+      "company_id": "co:win_semiconductor",
+      "hint": "當前 missing_data：research_assessment_missing（共 1 項）｜coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess",
+      "n": 598,
+      "reason": null,
+      "ref_id": "dc_68cf04ebd9843573116782bd733dfa5f",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:win_semiconductor：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -21816,8 +21843,17 @@
       "ref_id": "manual:595",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-17T08:58:26.934878+00:00",
+      "n": 596,
+      "reason": "2026-09-17 使用者 go。研究完成，產出 prepared RA（入圖是另一個 gate）。三條邊全部判 3（低於門檻 4）——**誠實的否定結果，可投資排序不會多出任何一家**。依據：GSR「三家控制 >90%」＋Reuters 獨立印證同一形狀＋圖裡本來就有 sumitomo competes_with axt＋AXT 自己在 10-K 逐字具名六家競爭者（與 Phase 1 台系磊晶廠同一形狀）。判 3 不判 4 的理由寫進 packet：圖裡既有的 axt→coherent=4／axt→lumentum=4／sumitomo→lumentum=4 問的是「特定客戶關係」（換供應商難），本次問的是「市場層級」（這個材料不是任何一家獨佔），嚴格低一級。產能飽和與中國出口管制是真的，但那是產能彈性與地緣風險，不是可替代性——不塞進這個欄位。",
+      "receipt": "authority:research_action;ref:ra_260be128d8019a0f05a877def55c52c3",
+      "ref_id": "manual:596",
+      "type": "manual",
+      "verb": "go"
     }
   ],
-  "next_n": 597,
+  "next_n": 599,
   "schema_version": "1"
 }
