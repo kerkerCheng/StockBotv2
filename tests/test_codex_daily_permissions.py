@@ -339,3 +339,34 @@ def test_xbrl_backfill_can_only_write_one_mechanical_field() -> None:
     # 沒有任何 CLI 參數可以換掉欄位
     assert "--field" not in source
     assert validate_field_name("fiscal_year_results").verifiability == "mechanical"
+
+
+def test_scorecard_network_surface_has_a_hard_cap_in_code() -> None:
+    """`python -m webapp materialize` 是 prefix rule，所以 `--scorecard` 自動被無人值守放行。
+
+    放行與收緊必須同時發生（L15）：這裡斷言那道收緊**在程式裡**，不是只寫在 justification。
+    一個只存在於文字的上限，等於沒有上限。
+    """
+    from engine_b.account_scorecard import MAX_PRICED_SYMBOLS, build_scorecard
+    import inspect
+
+    assert isinstance(MAX_PRICED_SYMBOLS, int) and 0 < MAX_PRICED_SYMBOLS <= 500
+    source = inspect.getsource(build_scorecard)
+    assert "MAX_PRICED_SYMBOLS" in source, (
+        "取價上限沒有被 build_scorecard 用到——常數存在不等於閘門存在")
+
+
+def test_scorecard_rule_justification_admits_the_network_call() -> None:
+    """justification 不得宣稱這條 prefix「無新增網路主機」——`--scorecard` 會連 yfinance。
+
+    ⚠ 守的是**誠實**不是措辭：sandbox review 的價值來自 justification 為真，
+    一旦它與程式不符，下一個人會照著那句話推論而不去看程式。
+    """
+    from pathlib import Path
+
+    rules = Path(__file__).resolve().parent.parent / ".codex" / "rules" / "stockbot-automations.rules"
+    text = rules.read_text(encoding="utf-8")
+    start = text.index('"-m", "webapp", "materialize"')
+    block = text[start:text.index(")", start)]
+    assert "yfinance" in block, "webapp materialize 的 rule 沒有提到 --scorecard 會連 yfinance"
+    assert "MAX_PRICED_SYMBOLS" in block, "rule 沒有記下對應的收緊"

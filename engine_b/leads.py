@@ -51,7 +51,14 @@ ALLOWED_TRANSITIONS: dict[str, frozenset[str]] = {
 
 ALL_STATUSES: frozenset[str] = frozenset(ALLOWED_TRANSITIONS)
 
-HARVEST_RESULTS: frozenset[str] = frozenset({"ok", "fetch_failed", "parse_failed"})
+#: ⚠ `budget_exhausted` 刻意**不是** `fetch_failed`（2026-09-17，ROADMAP Phase 3）：
+#: 它是「我們自己決定不抓」，不是「抓不到」。塞進 fetch_failed 會讓
+#: `unresolved_harvest_failures` 把正常的預算保護當成待修復的故障，然後每天在健康段亮一次
+#: ——一個永遠亮著的警報等於零鑑別力（L14-4「恆亮」）。
+#: 它也**不是 ok**：ok 且 new=0 的意思是「抓了，沒有新東西」，而這裡根本沒抓
+#: （L13-2：成功與沒發生不得在同一個訊號上同形）。
+HARVEST_RESULTS: frozenset[str] = frozenset(
+    {"ok", "fetch_failed", "parse_failed", "budget_exhausted"})
 HARVEST_FAILURE_CLASSES: frozenset[str] = FAILURE_CLASSES
 
 
@@ -1044,9 +1051,15 @@ def record_run(
     new: int,
     run_at: str | None = None,
     failure_class: str | None = None,
+    cost_usd: float | None = None,
 ) -> None:
     """記一次 harvest run 結果。parse_failed／fetch_failed 都必須誠實入帳
-    （plan R4：解析失敗 ≠ 無新文）。"""
+    （plan R4：解析失敗 ≠ 無新文）。
+
+    `cost_usd`（2026-09-17，ROADMAP Phase 3）：這一輪付了多少錢。**只有付費來源會帶**，
+    免費來源留空——`0` 與「這條來源不花錢」是兩件事，壓成同一格就沒辦法回答
+    「這個月付費抓了多少」。月度上限靠它加總（`monthly_spend_usd`）。
+    """
     if result not in HARVEST_RESULTS:
         raise ValueError(f"未知 harvest result：{result}")
     if failure_class is not None and failure_class not in HARVEST_FAILURE_CLASSES:
@@ -1061,7 +1074,28 @@ def record_run(
     }
     if failure_class is not None:
         entry["failure_class"] = failure_class
+    if cost_usd is not None:
+        entry["cost_usd"] = round(float(cost_usd), 4)
     store["harvest_log"].append(entry)
+
+
+def monthly_spend_usd(store: dict[str, Any], *, month: str, prefix: str = "x:") -> float:
+    """某個月份（`YYYY-MM`）某類來源的付費總額。
+
+    ⚠ 只加總**確實帶了 `cost_usd`** 的紀錄。舊紀錄沒有這個欄位，它們算 0——
+    這會讓上限在剛上線時偏寬鬆，而那是正確的方向：寧可少擋，也不要拿一個猜出來的
+    歷史花費去擋住今天該抓的東西。
+    """
+    total = 0.0
+    for entry in store.get("harvest_log") or []:
+        if not str(entry.get("source") or "").startswith(prefix):
+            continue
+        if str(entry.get("run_at") or "")[:7] != month:
+            continue
+        value = entry.get("cost_usd")
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            total += float(value)
+    return round(total, 4)
 
 
 def unresolved_harvest_failures(store: dict[str, Any]) -> list[dict[str, Any]]:
@@ -1075,8 +1109,20 @@ def unresolved_harvest_failures(store: dict[str, Any]) -> list[dict[str, Any]]:
     return [
         latest[source]
         for source in sorted(latest)
-        if latest[source].get("result") != "ok"
+        # `budget_exhausted` 不是失敗（見 HARVEST_RESULTS 的註解）：它是預算保護生效，
+        # 要看的人是「這個月還能不能抓」，不是「這條來源壞了沒」。
+        if latest[source].get("result") not in ("ok", "budget_exhausted")
     ]
+
+
+def budget_halted_sources(store: dict[str, Any]) -> list[dict[str, Any]]:
+    """最近一輪因為預算上限而沒抓的來源。**心跳第 1 段要印它**——
+    否則「這個月不再抓了」會安靜地發生，而使用者以為系統還在看。"""
+    latest: dict[str, dict[str, Any]] = {}
+    for raw in store.get("harvest_log") or []:
+        if isinstance(raw, dict) and str(raw.get("source") or "").strip():
+            latest[str(raw["source"])] = dict(raw)
+    return [latest[s] for s in sorted(latest) if latest[s].get("result") == "budget_exhausted"]
 
 
 def status_counts(store: dict[str, Any]) -> dict[str, int]:

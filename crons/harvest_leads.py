@@ -87,6 +87,15 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
             raise ValueError("x_accounts.max_results 必須介於 5–100")
         if not 5 <= run_cap <= 1000:
             raise ValueError("x_accounts.max_posts_per_run 必須介於 5–1000")
+        # ROADMAP Phase 3（D5／§6）：每月 X 總花費上限。**必填**——未宣告不得預設無上限，
+        # 那正是「未量測的機制不得享有默認信任」在花錢這一側的樣子（INV-5）。
+        if "monthly_spend_cap_usd" not in x_section:
+            raise ValueError(
+                "x_accounts 必須宣告 monthly_spend_cap_usd（每月 X 總花費上限，美元）——"
+                "沒有上限的付費來源會安靜地一直花下去")
+        cap = float(x_section["monthly_spend_cap_usd"])
+        if not 0 < cap <= 1000:
+            raise ValueError("x_accounts.monthly_spend_cap_usd 必須介於 0–1000")
     return data
 
 
@@ -350,8 +359,20 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
         print(f"[harvest] x api: {exc}（請在 .env 設 X_BEARER_TOKEN）", file=sys.stderr)
         return
 
+    # ⚠ `seen_at` 可以是 None（呼叫端不傳時由 record_run 自己補時戳）——月份要自己算，不能假設它有值。
+    month = (seen_at or datetime.now(timezone.utc).isoformat())[:7]
+    spend_cap = float(section.get("monthly_spend_cap_usd", 0) or 0)
     for handle in handles:
         source = f"x:{handle}"
+        # ⚠ 每個 handle 抓之前都重算一次——同一輪裡前面的 handle 已經花掉的錢也要算進去，
+        # 否則「上限」只在下一輪才生效（L13-2：要驗那個會因為真的成功而改變的東西）。
+        spent = leads.monthly_spend_usd(store, month=month)
+        if spend_cap and spent >= spend_cap:
+            leads.record_run(store, source=source, result="budget_exhausted", new=0,
+                             run_at=seen_at)
+            print(f"[harvest] {source} 停止：本月 X 花費 ${spent:.2f} 已達上限 "
+                  f"${spend_cap:.2f}——不抓，也不推進 since_id", file=sys.stderr)
+            continue
         state = leads.get_source_state(store, source)
         try:
             user_id = state.get("user_id") or x_api.get_user_id(handle, token)
@@ -425,8 +446,9 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
                 "x_pagination_high_watermark",
             ):
                 live_state.pop(key, None)
-        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
         cost = len(posts) * 0.005
+        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at,
+                         cost_usd=cost)
         continuation = "；分頁待下輪續抓" if page.get("truncated") else ""
         print(
             f"[harvest] {source} ok: {new} new / {len(posts)} posts "

@@ -6,7 +6,7 @@ import json
 import math
 import re
 import unicodedata
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields as dataclass_fields
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Protocol
@@ -61,10 +61,22 @@ class SignalSourceRegistry:
 
     @classmethod
     def from_path(cls, path: Path = _DEFAULT_SOURCE_CONFIG) -> "SignalSourceRegistry":
+        """讀 `config/signal_sources.json`，**只取這一層需要的欄位**。
+
+        ⚠ 2026-09-17：原本是 `SourcePolicy(**item)`，於是 config 一加 additive 欄位
+        （D5 的 `tier`／`platform`／`handle`）整條 capture 路徑就 `TypeError`，26 個測試同時紅。
+        一份 config 本來就可以有多個 consumer：本層管的是 attention policy，
+        tier 那一層歸 `engine_b.signal_source_registry`（**封閉字彙的驗證在那裡做**，
+        所以這裡忽略未知欄位不會讓打錯的 tier 靜默沉底，L16-3）。
+        """
         payload = json.loads(path.read_text(encoding="utf-8"))
+        field_names = {f.name for f in dataclass_fields(SourcePolicy)}
         return cls(
             version=int(payload["version"]),
-            policies=tuple(SourcePolicy(**item) for item in payload["sources"]),
+            policies=tuple(
+                SourcePolicy(**{k: v for k, v in item.items() if k in field_names})
+                for item in payload["sources"]
+            ),
         )
 
     def snapshot(self, source_id: str) -> SourcePolicy:

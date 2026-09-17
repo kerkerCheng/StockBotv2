@@ -51,10 +51,19 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
     return ArtifactStore(analyst_dir), StateArtifactStore(resolve_state_dir(analyst_dir, explicit_state))
 
 
+#: 「只 materialize state artifact、不順手重跑每一檔」的旗標清單。
+#: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
+_STATE_FLAGS: tuple[str, ...] = (
+    "ranking", "beta", "coverage", "watches", "positions", "basket",
+    "structure_readings", "account_scorecard",
+)
+
+
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_basket, materialize_beta, materialize_coverage, materialize_many, materialize_positions,
+        materialize_account_scorecard, materialize_basket, materialize_beta, materialize_coverage,
+        materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_ranking, materialize_watches, write_vocabularies,
     )
@@ -123,8 +132,11 @@ def cmd_materialize(args: argparse.Namespace) -> int:
 
     # 不給 ticker 且沒要求 ranking ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
-    state_only = bool(args.ranking or args.beta or args.coverage or args.watches or args.positions
-                      or getattr(args, "basket", False) or getattr(args, "structure_readings", False))
+    # ⚠ 2026-09-17：這裡原本是一串手寫的 `or`，新增一個 state flag（`--scorecard`）就漏掉，
+    # 結果 `--scorecard` 被當成「沒指定專屬 flag」而重跑了全部 73 檔單檔（L17：機制只認得
+    # 當初那幾個 case，而且漏掉不會有東西壞掉——它只是安靜地多做了十分鐘的事）。
+    # 改成一份清單：新增 flag 時只要加在這裡，不必記得改判斷式。
+    state_only = any(getattr(args, flag, False) for flag in _STATE_FLAGS)
     tickers = list(args.tickers) if args.tickers else ([] if state_only else store.tickers())
     if args.tracked:
         tracked = _tracked_tickers()
@@ -164,6 +176,19 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             pick = payload["top_pick"]
             print(f"✓ basket → {path.name}（{path.stat().st_size:,} bytes；{f['input']} 檔／通過 filter {f['accepted']}"
                   f"／首選 {pick['ticker'] if pick else '無'}）")
+    # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
+    if getattr(args, "account_scorecard", False):
+        total += 1
+        try:
+            path, payload = materialize_account_scorecard(store=state_store)
+        except Exception as exc:  # noqa: BLE001
+            failed += 1
+            print(f"✗ account_scorecard：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            accounts = payload.get("accounts") or []
+            calls = sum(int(a.get("named_calls") or 0) for a in accounts)
+            print(f"✓ account_scorecard → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"{len(accounts)} 個帳號／{calls} 則具名點名）")
     # 結構讀圖：唯讀 ledger ＋ 查圖比對。與 basket 互不相干，所以**各自 fail-soft**。
     if getattr(args, "structure_readings", False):
         total += 1
@@ -550,6 +575,11 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 部位與問責：outcome 腳本 collect() ＋ Decision Store 計數器")
     mat.add_argument("--basket", action="store_true",
                      help="另外（或只）materialize 籃子：ranking × 各檔 overview × positions 的 join（最後跑；不連 DB）")
+    # dest 刻意與 state kind 同名（`account_scorecard`）——名字一致，`_STATE_FLAGS` 才比對得起來，
+    # 不必再維護一張 flag→kind 的映射表（而映射表正是下一個會忘記更新的東西）。
+    mat.add_argument("--scorecard", "--account-scorecard", dest="account_scorecard",
+                     action="store_true",
+                     help="另外（或只）materialize 帳號計分表：D5 五欄＋三個偏差（會抓價格，唯一連外的 materializer）")
     mat.add_argument("--structure-readings", action="store_true",
                      help="另外（或只）materialize 結構讀圖：每一份讀圖跟現在的圖還一不一致（唯讀 ledger ＋ 確定性比對）")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與 ranking 都適用）")

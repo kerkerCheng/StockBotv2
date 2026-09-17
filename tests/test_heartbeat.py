@@ -131,13 +131,36 @@ def test_unbuilt_capabilities_point_at_a_phase(broken_env: dict[str, Path]) -> N
     assert "Phase 5" in text
 
 
-def test_weekly_scorecard_is_not_applicable_on_daily() -> None:
-    daily = hb.build_scorecard(weekly=False)
-    weekly = hb.build_scorecard(weekly=True)
+def test_weekly_scorecard_is_not_applicable_on_daily(tmp_path) -> None:
+    """daily 不算計分表——那不是「還沒建」，是方法不適用，兩者不得同形。"""
+    daily = hb.build_scorecard(weekly=False, state_dir=tmp_path)
     assert daily.absence is not None and daily.absence.kind == "method_not_applicable"
-    assert weekly.absence is not None and weekly.absence.kind == "capability_absent"
-    # 交付時的義務先寫進輸出，免得之後有人交了一張沒有樣本數的表。
-    assert any("量測起始日" in line for line in weekly.lines)
+
+
+def test_weekly_scorecard_without_artifact_says_so_instead_of_rebuilding(tmp_path) -> None:
+    """心跳零網路：讀不到 artifact 就誠實說讀不到，**不偷偷重建**（計分表要抓價格）。"""
+    weekly = hb.build_scorecard(weekly=True, state_dir=tmp_path)
+    assert weekly.absence is not None and weekly.absence.kind == "upstream_unavailable"
+    assert any("materialize --scorecard" in line for line in weekly.lines), (
+        "讀不到的時候要說出「怎麼讓它有內容」，否則使用者只看到一句沒有值")
+
+
+def test_weekly_scorecard_prints_measurement_window_sample_size_and_biases(tmp_path) -> None:
+    """有內容時：量測起始日、樣本數、三個偏差**都要在輸出裡**（D5 的交付義務）。"""
+    from engine_b.account_scorecard import build_scorecard as build_card
+    from webapp.store import StateArtifactStore
+
+    card = build_card(price_loader=lambda *_: {})
+    StateArtifactStore(tmp_path).write(card)
+
+    weekly = hb.build_scorecard(weekly=True, state_dir=tmp_path)
+    assert weekly.absence is None, "artifact 在就不該有 absence"
+    text = chr(10).join(weekly.lines)
+    assert "量測" in text and "具名點名" in text
+    assert "倖存者" in text and "後見之明" in text and "單邊上漲" in text, (
+        "三個已知偏差是這張表的一部分，不是註腳")
+    # 沒有值的欄位要印出**為什麼**沒有值，不得印成 0。
+    assert "capability_absent" in text or "insufficient_sample" in text
 
 
 def test_main_always_exits_zero_even_when_everything_is_broken(

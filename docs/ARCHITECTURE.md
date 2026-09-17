@@ -163,7 +163,9 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 2. **變了什麼**：門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作）、**結構讀圖 staleness**（2026-09-17 Q5：N 份現行／該重讀 M，含哪個節點、哪個角度變了；§6.14）。
 3. **佇列**：新 lead N、待 triage N、pq1 可做 N、pq2 卡在你 N、expired N。
 4. **部位**：alpha 占淨值、全歸零少幾 %、追蹤表三個 power-law 統計量、幾檔共用同一需求錨、**兩個宇宙各自的賭注帳**（2026-09-17 Q2／Q1：有賭注／刻意不主張／**欠一個答案**，護城河籃子與量的候選**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義）。
-5. **帳號計分表變動**（weekly）：量測起始日與樣本數必印，讓「還沒量」看得見。
+5. **帳號計分表變動**（weekly）：量測起始日與樣本數必印，讓「還沒量」看得見（2026-09-17 Phase 3 交付：D5 五欄＋三個已知偏差；**心跳只讀 `state/account_scorecard.json`，不自己算**——計分表要抓價格，而心跳零網路。更新跑 `python -m webapp materialize --scorecard`；讀不到就誠實說讀不到，不偷偷重建）。
+   ⚠ **兩個基準必須都印**：2026-09-17 第一次量測，同一個帳號對 QQQ 是 −2.03%、對 SOXX 是 +3.06%——**相反符號**。只印一個會得到相反的結論，而兩個結論都是錯的。
+   ⚠ 第 1 段另加**本月 X 花費／上限**與預算停抓列（`budget_exhausted` 刻意不是 `fetch_failed`：它是保護生效不是故障，塞進失敗會讓健康段恆亮，而恆亮等於零鑑別力）。
 
 硬規則：LLM 失敗心跳照發；「未 triage N」必印（L13：沒發生與沒看到不得同形）；writer lock 照留（harvest 仍寫共用檔）；
 不需要 agent 當 orchestrator 時，Codex sandbox 的 fixed entry 與 `tests/test_codex_daily_permissions.py` 要同一

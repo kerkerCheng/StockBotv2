@@ -1145,6 +1145,25 @@ def materialize_basket(*, store: StateArtifactStore | None = None, analyst_store
     return target.write(payload), payload
 
 
+def materialize_account_scorecard(*, store: StateArtifactStore | None = None,
+                                  allow_network: bool = True,
+                                  generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """D5 帳號計分表（ROADMAP Phase 3）。
+
+    ⚠ **這是唯一會抓價格的 materializer**，所以它只能在 materialize 跑，不能在 request path
+    （APP 呈現契約：request path 不得抓外部資料）。心跳同理——心跳零網路，它只**讀**這份
+    artifact，算是在這裡算的。`allow_network=False` 時五欄裡與價格有關的會誠實回報沒有值。
+    """
+    from engine_b.account_scorecard import build_scorecard
+
+    loader = None if allow_network else (lambda *_: {})
+    payload = build_scorecard(price_loader=loader)
+    if generated_at is not None:
+        payload["generated_at"] = generated_at.isoformat()
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def materialize_structure_readings(*, store: StateArtifactStore | None = None,
                                    as_of: date | None = None,
                                    generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
@@ -1270,4 +1289,5 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "COVERAGE_MATERIALIZ
            "materialize_coverage", "materialize_many", "materialize_ranking", "materialize_view",
            "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
            "build_positions_artifact", "materialize_positions",
-           "redact_private_paths", "write_vocabularies", "materialize_basket"]
+           "redact_private_paths", "write_vocabularies", "materialize_basket",
+           "materialize_account_scorecard"]

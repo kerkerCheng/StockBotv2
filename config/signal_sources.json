@@ -5,7 +5,28 @@
       "source_id": "aleabitoreddit",
       "status": "active",
       "research_priority": 100,
-      "auto_capture": true
+      "auto_capture": true,
+      "platform": "x",
+      "handle": "aleabitoreddit",
+      "tier": "probation",
+      "tier_since": "2026-09-17",
+      "tier_rationale": "登記表建立時一律 probation（D5：新帳號一律 probation，信任為零）。⚠ 本帳號雖已有 495 則樣本，但**升等必須走一季一次的 pq2 manual**，不得由建表的 session 自行認定——那正是「量測先於信任」要防的事（INV-5）。計分表算得出來之後才具備升 measured 的討論條件。"
     }
+  ],
+  "schema_version": 2,
+  "_doc": [
+    "訊號來源（X 帳號等）登記表 — D5，2026-09-16 使用者定案；tier 欄位 2026-09-17 加入（ROADMAP Phase 3）。",
+    "",
+    "**這是封閉清單。** 帳號不在表上就不會被 harvest，也不會有計分。",
+    "`tier` 是三級封閉字彙，唯一 loader 是 engine_b/signal_source_registry.py（載入時驗封閉性）：",
+    "  probation — 新帳號一律從這裡開始，信任為零。只影響 pq1 優先序，不影響入池。",
+    "  measured  — 已有足夠樣本（≥20 則具名點名、跨 ≥5 檔）且計分表算得出五欄。",
+    "  trusted   — 計分表連續數季為正，且偏差已被檢視。",
+    "",
+    "⚠ **tier 升降是一季一次的 pq2 manual（D5）**——任何 session 都不得自行改這個欄位。",
+    "  改它要先鑄 pq2 編號、使用者 go，receipt 記在 tier_rationale。",
+    "⚠ **tier 不參與投資標的排序、不給尺寸**（AGENTS.md「技術訊號的地位」通則）：",
+    "  它只動 pq1 研究佇列的優先序，而那是注意力不是資本。",
+    "⚠ 推文永遠是 tier-4 lead（lead-intake 不變）——來源 tier 與 evidence tier 是兩件事，不得互相換算。"
   ]
 }

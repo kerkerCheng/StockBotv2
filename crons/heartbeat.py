@@ -147,6 +147,15 @@ def _local_stamp(raw: str) -> str:
         return raw[:19] or "未知"
 
 
+def _x_spend_cap() -> float:
+    """X 的每月花費上限。讀不到就回 0（＝不印上限），**不猜一個數字**。"""
+    try:
+        raw = _read_json(ROOT / "crons" / "harvest_config.json") or {}
+        return float((raw.get("x_accounts") or {}).get("monthly_spend_cap_usd") or 0)
+    except (OSError, ValueError, TypeError):
+        return 0.0
+
+
 def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) -> Section:
     """harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
     section = Section(1, SECTION_TITLES[0])
@@ -163,12 +172,30 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         source = str(row.get("source") or "?")
         latest[source] = row
     if latest:
-        bad = sorted(s for s, r in latest.items() if r.get("result") != "ok")
+        # ⚠ `budget_exhausted` 不算失敗——它是預算保護生效，不是來源壞掉（L12：兩種語意分開）。
+        # 但它**必須自己有一行**，否則「這個月不再抓了」會安靜發生而使用者以為系統還在看。
+        halted = sorted(s for s, r in latest.items() if r.get("result") == "budget_exhausted")
+        bad = sorted(s for s, r in latest.items()
+                     if r.get("result") not in ("ok", "budget_exhausted"))
         newest = max((str(r.get("run_at") or "") for r in latest.values()), default="")
         head = f"harvest 來源 {len(latest)} 個｜失敗 {len(bad)} 個"
         if bad:
             head += "：" + "、".join(bad)
         section.lines.append(f"{head}｜最後一輪 {_local_stamp(newest)}")
+        month = now.astimezone(timezone.utc).strftime("%Y-%m")
+        spend = sum(float(r.get("cost_usd") or 0)
+                    for r in log
+                    if str(r.get("source") or "").startswith("x:")
+                    and str(r.get("run_at") or "")[:7] == month)
+        cap = _x_spend_cap()
+        if halted:
+            section.lines.append(
+                f"⚠ **本月 X 花費 ${spend:.2f} 已達上限**"
+                + (f" ${cap:.2f}" if cap else "")
+                + f"，停抓 {len(halted)} 個來源：" + "、".join(halted)
+                + "（不是故障；解除上限前不會抓，也不會漏——since_id 沒有推進）")
+        elif cap:
+            section.lines.append(f"本月 X 花費 ${spend:.2f} / 上限 ${cap:.2f}")
     elif harvest_absence is not None:
         section.lines.append(f"harvest 來源：{harvest_absence.reason}（{harvest_absence.kind}）")
     else:
@@ -529,18 +556,52 @@ def build_positions(*, state_dir: Path | None) -> Section:
 # 段 5｜帳號計分表（weekly）
 # ---------------------------------------------------------------------------
 
-def build_scorecard(*, weekly: bool) -> Section:
+def build_scorecard(*, weekly: bool, state_dir: Path | None = None) -> Section:
+    """D5 帳號計分表。**只讀已 materialize 的 artifact**——心跳零網路，價格不在這裡抓。
+
+    要更新計分表跑 `python -m webapp materialize --scorecard`；心跳讀不到就誠實說讀不到，
+    **不偷偷重建**（APP 呈現契約的同一條紀律）。
+    """
     section = Section(5, SECTION_TITLES[4])
     if not weekly:
         section.absence = Absence("method_not_applicable", "計分表是 weekly 才算的，本輪是 daily")
         section.lines.append(f"{section.absence.reason}（{section.absence.kind}）")
         return section
-    section.absence = Absence("capability_absent", f"還沒建，去向：{PENDING_PHASE['account_scorecard']}")
-    section.lines.append(f"{section.absence.reason}（{section.absence.kind}）")
-    section.lines.append(
-        "⚠ 交付時必印**量測起始日與樣本數**，並印三個已知偏差（倖存者／後見之明／單邊上漲）"
-    )
+    card, absence = _load_state(state_dir, "account_scorecard")
+    if absence is not None or not card:
+        section.absence = absence or Absence(
+            "upstream_unavailable", "計分表 artifact 還沒 materialize 過")
+        section.lines.append(f"{section.absence.reason}（{section.absence.kind}）")
+        section.lines.append("→ 跑 `python -m webapp materialize --scorecard` 之後這一段才有內容")
+        return section
+    counts = card.get("tier_counts") or {}
+    section.lines.append("tier 分佈：" + "／".join(f"{k} {v}" for k, v in counts.items())
+                         + f"｜計分表 as-of {card.get('as_of')}")
+    for account in card.get("accounts") or []:
+        metrics = account.get("metrics") or {}
+        first = (account.get("metrics_first_call_per_symbol") or {}).get("excess_returns") or {}
+        section.lines.append(
+            f"**{account.get('harvest_key')}**｜tier `{account.get('tier')}`｜"
+            f"量測 {account.get('measurement_start')} → {account.get('measurement_end')}｜"
+            f"具名點名 {account.get('named_calls')} 則／{account.get('distinct_symbols')} 檔")
+        for key, cell in (metrics.get("excess_returns") or {}).items():
+            line = f"  {key}：{_score_cell(cell)}"
+            if key in first:
+                line += f"｜每檔只算最早一次：{_score_cell(first[key])}"
+            section.lines.append(line)
+        for label, key in (("點名前 30 天漲幅", "prior_30d_move"), ("追源成功率", "trace_success_rate"),
+                           ("假設命中率", "hypothesis_hit_rate"), ("no-go 率", "no_go_rate")):
+            section.lines.append(f"  {label}：{_score_cell(metrics.get(key) or {})}")
+    for bias in card.get("known_biases") or []:
+        section.lines.append(f"⚠ {bias}")
     return section
+
+
+def _score_cell(cell: Mapping[str, Any]) -> str:
+    """一格：有值印值與 n，沒值印**為什麼沒值**。兩者不得同形。"""
+    if cell.get("value") is None:
+        return f"沒有值（{cell.get('absence_kind')}）——{str(cell.get('reason') or '')[:70]}"
+    return f"{float(cell['value']) * 100:+.2f}%（n={cell.get('n')}）"
 
 
 # ---------------------------------------------------------------------------
@@ -593,7 +654,7 @@ def build_heartbeat(
                lambda: build_changes(now=moment, state_dir=state_dir, thesis_path=thesis)),
         _guard(3, SECTION_TITLES[2], lambda: build_queue(state_dir=state_dir)),
         _guard(4, SECTION_TITLES[3], lambda: build_positions(state_dir=state_dir)),
-        _guard(5, SECTION_TITLES[4], lambda: build_scorecard(weekly=weekly)),
+        _guard(5, SECTION_TITLES[4], lambda: build_scorecard(weekly=weekly, state_dir=state_dir)),
     ]
     assert len(sections) == len(SECTION_TITLES), "心跳必須固定五段"
     return sections

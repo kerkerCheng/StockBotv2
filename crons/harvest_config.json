@@ -1,7 +1,7 @@
 {
   "_note": "Daily Approval Loop harvest 來源設定（plan U1/R3）。可手動編輯。feeds=RSS 類；x_accounts=X API；edgar_watch=SEC filing 監看。watch 清單 v0 手動維護是刻意的（plan R3 future note）。",
   "x_accounts": {
-    "note": "X API v2 pay-per-use（約 $0.005/則、按回傳貼文數計費）。Daily 由 since_id＋exclude replies/retweets＋max_results page size＋max_posts_per_run 成本硬上限控制；超過單輪上限時保存 pagination checkpoint，下輪續抓，完成前不推進 since_id。具名探索 campaign 可用 bounded 30-day 分頁 backfill。note_tweet 全文與 media expansion 使用同一份貼文 response；圖片／影片預覽另存 ignored private cache，不做 OCR。需 .env 的 X_BEARER_TOKEN。加帳號只要往 handles 加，不必改程式。",
+    "note": "X API v2 pay-per-use（約 $0.005/則、按回傳貼文數計費）。Daily 由 since_id＋exclude replies/retweets＋max_results page size＋max_posts_per_run 成本硬上限控制；超過單輪上限時保存 pagination checkpoint，下輪續抓，完成前不推進 since_id。具名探索 campaign 可用 bounded 30-day 分頁 backfill。note_tweet 全文與 media expansion 使用同一份貼文 response；圖片／影片預覽另存 ignored private cache，不做 OCR。需 .env 的 X_BEARER_TOKEN。加帳號只要往 handles 加，不必改程式。 ⚠ 2026-09-17（ROADMAP Phase 3／D5 §6）新增 monthly_spend_cap_usd：每月 X 總花費上限（美元），**必填**，載入時驗證。每個 handle 開抓之前重算本月已花金額（harvest_log 的 cost_usd 加總），達到上限就記一筆 result=budget_exhausted 並跳過——不抓、也不推進 since_id，所以解除上限之後不會漏抓。budget_exhausted 刻意不是 fetch_failed（它不是故障，是保護生效），但心跳第 1 段會印出來，避免「這個月不再抓了」安靜發生。",
     "handles": [
       "aleabitoreddit"
     ],
@@ -11,7 +11,8 @@
     "max_posts_per_run": 200,
     "backfill_page_size": 100,
     "cache_media": true,
-    "media_max_bytes": 20971520
+    "media_max_bytes": 20971520,
+    "monthly_spend_cap_usd": 10
   },
   "_feeds_note": "2026-07-25：移除 aleabitoreddit substack feed——查證確認他的產出在 X 不在 Substack（該 feed 至今只有 1 篇 2026-05-19 舊文），已由上方 x_accounts 覆蓋；他若發長文也會在 X 貼連結。2026-08-11：補外國發行人 filing watcher——SIVE.ST／IQE.L 是 EDGAR 永遠不會有的外國發行人，先前完全無自動監測（§10.11 待做 #2）。每個 feed 都經 fetch＋parse_rss 實測，不憑印象填；下方 verified_* 記錄實測結果。⚠ MFN 只載 regulatory disclosure，純商業 PR（如 2026-04-15 Jabil 合作）不在其中，故 sivers 需兩個 feed 互補。⚠ 兩個 feed 都是瑞典文＋英文雙語各發一篇，同一事件會產生兩筆 lead（URL hash 不同），由 triage 過濾。",
   "feeds": [
