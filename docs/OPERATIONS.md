@@ -26,6 +26,34 @@ Codex local scheduled task
 > ⚠ **2026-09-16 定案（D12，`docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md`）：Daily 將拆成心跳（零 LLM）／分類（便宜模型）／研究（只在互動 session）
 > 三層**，規格見 ARCHITECTURE §4.1。**落地前本節照舊。** 落地時同一 change 改本節、把 `config/daily_routine.json` 的
 > `drain_limit_per_run` 歸零、對齊 `.codex/rules` fixed entry 與 `tests/test_codex_daily_permissions.py`（sandbox impact review 五步）。
+>
+> **2026-09-17（Phase 2 Step 2.1）：心跳產生器已可手動跑，但排程還沒切**——上面那條流程仍是現況。
+
+### 心跳（`crons/heartbeat.py`）——零 LLM、零網路、固定五段
+
+```powershell
+& '.venv\Scripts\python.exe' crons\heartbeat.py                    # Markdown 到 stdout
+& '.venv\Scripts\python.exe' crons\heartbeat.py --format json      # 機器可讀
+& '.venv\Scripts\python.exe' crons\heartbeat.py --weekly           # 第 5 段（帳號計分表）只在 weekly 有內容
+& '.venv\Scripts\python.exe' crons\heartbeat.py --out .\hb.md       # 寫 UTF-8 檔，交給既有 publisher
+```
+
+它**只讀**本機 authority（`pending_leads.json`／`todo_pool.json`／`event_watches.json`／
+`thesis/lifecycle.json`）與 `webapp` 已 materialize 的 state artifact，**不寫任何 authority、不連外、不呼叫任何模型**。
+要送到 Discord 仍走既有的 publisher（心跳自己不發送，也不新增任何 outbound surface）：
+
+```powershell
+& '.venv\Scripts\python.exe' crons\heartbeat.py --out <private.md>
+& '.venv\Scripts\python.exe' scripts\publish_daily_brief.py --brief-file <private.md> --summary "心跳"
+```
+
+⚠ **不要用管線把心跳的輸出餵給 publisher**：Windows PowerShell 5.1 的 `$OutputEncoding` 預設 ASCII，
+中文會在 Python 讀到之前就被換掉——這就是 `--out` 存在的理由（既有坑，見本檔「Daily Brief 通知」節）。
+
+**失敗模式刻意與眾不同：心跳永遠 exit 0。** 任何一段的資料源壞掉，那一段印出降級行並宣告
+`absence_kind`（封閉字彙來自 `alpha/absence.py`），其餘四段照印。
+查證：`python -m pytest tests/test_heartbeat.py -q`（其中
+`test_every_source_broken_still_renders_five_sections` 就是這條契約本身）。
 
 排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布四個 leads state 檔：`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`——2026-09-02 由二擴四，impact review 結論見腳本 docstring；不得用 unattended 廣泛 Git 命令碰其他檔）。
 

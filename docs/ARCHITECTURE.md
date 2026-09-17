@@ -139,6 +139,12 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > **落地前的現況：** Daily 仍是上面那條「harvest → triage → pq1 drain → brief」的單一 Codex 排程。
 > 查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
 > 印出 > 0 就是還沒落地；落地後應為 0。
+>
+> **2026-09-17（Phase 2 Step 2.1）：心跳層的產生器已交付，但還沒有任何排程會叫它。**
+> `crons/heartbeat.py` 是零 LLM／零網路的純消費端，固定五段、失敗只降級不消失
+> （查證：`python crons/heartbeat.py` 與 `python -m pytest tests/test_heartbeat.py -q`）。
+> **切換載體（排程、`drain_limit_per_run` 歸零、`.codex/rules` 對齊）是 Step 2.2**，
+> 那一步要先由使用者決定心跳由誰觸發——在那之前，上面這條單一 Codex 排程仍是現況。
 
 | 層 | 誰跑 | LLM | 做什麼 |
 |---|---|---|---|
