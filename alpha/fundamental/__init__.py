@@ -50,7 +50,7 @@ from .bridge import BRIDGE_VERSION, BridgeResult, build_bridge
 from .compare import compare_metric, verify_consensus_basis
 from .contracts import (
     ACCOUNTING_BASES, ASSUMPTION_BASES, ASSUMPTION_DRIVERS, ASSUMPTION_SCENARIOS, BASE_SCENARIO,
-    VARIANT_SCENARIO, COMPARISON_STATUSES,
+    VARIANT_SCENARIO, DOWNSIDE_SCENARIO, OVERLAY_SCENARIOS, SCENARIO_LABELS, COMPARISON_STATUSES,
     FISCAL_PERIOD_KINDS, MODEL_VERSION, PERIOD_MATCH_TOLERANCE_DAYS, TOTAL_SCOPE,
     AssumptionSelection, BridgeStep, ConsensusEstimate, DriverSpec, ExpectationComparison,
     FiscalPeriod, FiscalYearActuals, FundamentalModelResult, GuidanceObservation,
@@ -60,7 +60,8 @@ from .model import build_fundamental_model
 
 __all__ = [
     "ACCOUNTING_BASES", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "ASSUMPTION_SCENARIOS",
-    "BASE_SCENARIO", "VARIANT_SCENARIO", "select_scenario_assumptions", "BRIDGE_VERSION",
+    "BASE_SCENARIO", "VARIANT_SCENARIO", "DOWNSIDE_SCENARIO", "OVERLAY_SCENARIOS",
+    "SCENARIO_LABELS", "select_scenario_assumptions", "BRIDGE_VERSION",
     "COMPARISON_STATUSES", "FISCAL_PERIOD_KINDS", "MODEL_VERSION",
     "PERIOD_MATCH_TOLERANCE_DAYS", "TOTAL_SCOPE", "AssumptionSelection", "BridgeResult",
     "BridgeStep", "ConsensusEstimate", "DriverSpec", "ExpectationComparison", "FiscalPeriod",

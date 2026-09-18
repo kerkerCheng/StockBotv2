@@ -276,15 +276,36 @@ OPINION_STANCES: tuple[str, ...] = (
     "no_opinion_bearing_assumptions",
 )
 
-#: 假設屬於哪一個 **scenario**（2026-09-15 V0「賭注」）。封閉字彙：
+#: 假設屬於哪一個 **scenario**（2026-09-15 V0「賭注」；2026-09-18 D2 加 `downside`）。封閉字彙：
 #: - `base`：校準基準。依 2026-09-09 原則，沒有差異化證據時收斂到共識是健康的。
 #: - `variant`：**賭注**——「如果我們的差異看法對了」。它是 base 的 **overlay**：只寫有差異的
 #:   driver，其餘沿用 base 的生效假設；payoff ＝ variant fair value 對現價的隱含報酬。
+#: - `downside`：**判斷錯了值多少**（D2）——「如果反證成真」。與 `variant` **完全對稱**：
+#:   同一條橋、同一套估值與報酬算術、同樣的型別層證據要求，只是假設的值往另一邊。
 #: ⚠ 舊紀錄沒有這個欄位 → 讀成 `base`（在 scenario 存在之前，所有假設就是 base）。
-#: ⚠ 刻意**沒有** bull／bear／機率：variant 是一個條件句（「如果對了」），不是機率加權。
-ASSUMPTION_SCENARIOS: tuple[str, ...] = ("base", "variant")
+#: ⚠ 刻意**沒有** bull／bear／機率：三個 scenario 都是條件句，不是機率加權，
+#:   **`downside` 尤其不是 bear case**——擋住「隨便悲觀一點」的是下面那三條型別層規則
+#:   （核心 driver ＋ independent ＋ 至少一條 supporting 證據），不是命名。
+#: ⚠ **刻意不強制它指名某一條 disproof。** 反證住在 `AlphaSignal.disproof_conditions`（A3，可重算、
+#:   沒有穩定 id），從 append-only 的假設 ledger 指過去會造出一個會斷的跨 authority 引用，
+#:   而那正是 A3／A5 分離要防的。要求「指得出什麼在支撐這個值」的閘門由 `supporting_refs` 承擔——
+#:   它是同一件事的可機械驗證版本。
+ASSUMPTION_SCENARIOS: tuple[str, ...] = ("base", "variant", "downside")
 BASE_SCENARIO = "base"
 VARIANT_SCENARIO = "variant"
+DOWNSIDE_SCENARIO = "downside"
+
+#: 兩個 **overlay** scenario：只寫與 base 有差異的 driver，其餘沿用 base 的生效假設。
+#: 型別層規則對兩者完全相同——**對稱是 D2 的全部內容**，一邊鬆一邊緊就會變成
+#: 「賭注要證據、下檔隨便寫」，那就是 bear case 換個名字。
+OVERLAY_SCENARIOS: tuple[str, ...] = (VARIANT_SCENARIO, DOWNSIDE_SCENARIO)
+
+#: scenario → 面向使用者的短名。呈現層**不得自己造一份**（L16）。
+SCENARIO_LABELS: dict[str, str] = {
+    BASE_SCENARIO: "base（校準基準）",
+    VARIANT_SCENARIO: "賭對了",
+    DOWNSIDE_SCENARIO: "判斷錯了",
+}
 
 
 def opinion_stance(assumptions: Sequence["OperatingAssumption"]) -> str:
@@ -413,24 +434,28 @@ class OperatingAssumption:
             raise ContractViolation(
                 f"scenario 未登記：{self.scenario!r}；已知 {ASSUMPTION_SCENARIOS}——"
                 "scenario 是封閉字彙，多一種就要多一條 payoff 算術")
-        if self.scenario == VARIANT_SCENARIO and not self.retracted:
-            # 賭注的三條型別層規則（V0，2026-09-15）——**放行與收緊同時發生**：
-            # ①只有核心 driver 能成為賭注：稅率／股數／NCI 的差異不是「看法」，是校準；
+        if self.scenario in OVERLAY_SCENARIOS and not self.retracted:
+            # overlay 的三條型別層規則（V0，2026-09-15；2026-09-18 D2 起 `downside` 適用同一組）
+            # ——**放行與收緊同時發生**：
+            # ①只有核心 driver 能成為 overlay：稅率／股數／NCI 的差異不是「看法」，是校準；
             # ②它必須是我們自己的判斷——由共識反解或抄公司指引的東西結構上不可能與市場不同，
-            #   寫成 variant 就是把佔位冒充成賭注；
-            # ③它必須指得出至少一條 supporting 證據（calibration 不算），否則「如果對了」
-            #   沒有任何東西在支撐「對」。這三條讓「說不出賭注」這件事在型別層不可能發生。
+            #   寫成 overlay 就是把佔位冒充成一個主張；
+            # ③它必須指得出至少一條 supporting 證據（calibration 不算）。
+            # 這三條讓「說不出賭注」在型別層不可能發生；**對 `downside` 而言，第③條就是
+            # 「這不是 bear case」的那道閘門**——bear case 的毛病是隨便悲觀、指不出根據。
+            what = "賭注" if self.scenario == VARIANT_SCENARIO else "「判斷錯了」的假設"
             if self.driver not in OPINION_BEARING_DRIVERS:
                 raise ContractViolation(
-                    f"variant 假設只能是核心 driver {sorted(OPINION_BEARING_DRIVERS)}；"
-                    f"收到 {self.driver!r}——稅率／股數／NCI 的差異是校準，不是賭注")
+                    f"{self.scenario} 假設只能是核心 driver {sorted(OPINION_BEARING_DRIVERS)}；"
+                    f"收到 {self.driver!r}——稅率／股數／NCI 的差異是校準，不是{what}")
             if self.derivation != "independent":
                 raise ContractViolation(
-                    f"variant 假設的 derivation 必須是 independent（收到 {self.derivation!r}）——"
-                    "由共識反解或採公司指引的值結構上不可能與市場不同，不能當賭注")
+                    f"{self.scenario} 假設的 derivation 必須是 independent（收到 {self.derivation!r}）——"
+                    f"由共識反解或採公司指引的值結構上不可能與市場不同，不能當{what}")
             if not self.supporting_refs:
                 raise ContractViolation(
-                    "variant 假設至少要有一條 supporting evidence——「如果對了」必須指得出什麼在支撐「對」")
+                    f"{self.scenario} 假設至少要有一條 supporting evidence——"
+                    f"{what}必須指得出什麼在支撐它")
 
     @property
     def key(self) -> tuple[str, str]:
@@ -847,6 +872,7 @@ __all__ = [
     "ConsensusEstimate", "DriverSpec", "ExpectationComparison", "FiscalPeriod",
     "FiscalYearActuals", "FundamentalModelResult", "GuidanceObservation", "ModeledMetric",
     "OPINION_BEARING_DRIVERS", "OPINION_STANCES", "ASSUMPTION_DERIVATIONS",
-    "ASSUMPTION_SCENARIOS", "BASE_SCENARIO", "VARIANT_SCENARIO",
+    "ASSUMPTION_SCENARIOS", "BASE_SCENARIO", "VARIANT_SCENARIO", "DOWNSIDE_SCENARIO",
+    "OVERLAY_SCENARIOS", "SCENARIO_LABELS",
     "OperatingAssumption", "Sensitivity", "opinion_stance", "weakest_basis",
 ]

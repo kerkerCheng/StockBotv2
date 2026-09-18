@@ -114,7 +114,12 @@ def test_without_a_model_sections_are_missing_not_not_modeled() -> None:
     assert view.earnings_bridge.meta.status == "missing"
     assert view.expectation_gap.internal_vs_consensus.status == "missing"
     assert view.implied_return.meta.status == "missing"                  # Step 2：有能力了；沒資料是 missing
-    assert view.downside.meta.status == "not_modeled"                    # 真正沒能力的還是 not_modeled
+    # D2（2026-09-18）：下檔**已經建模**——它是 downside scenario 走同一條橋的結果。
+    # 所以這裡從 `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒有人寫）。
+    # ⚠ 這兩者的下一步完全不同，正是這條斷言要守的：`not_modeled` 沒有人該去補，
+    # `missing` 有——它會帶著 `not_yet_recorded` 出現在待辦裡。
+    assert view.downside.meta.status == "missing"
+    assert view.downside.meta.effective_absence_kind == "not_yet_recorded"
     assert view.consensus.fiscal_items == ()
 
 

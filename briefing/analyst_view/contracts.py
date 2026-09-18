@@ -203,6 +203,20 @@ PLAIN_LINE_LABELS: Mapping[str, str] = {
     "base_fair_value_for_payoff": "對照：base 目標價",
     "base_price_return_for_payoff": "對照：base 隱含報酬",
     "payoff_one_sentence": "一句話說明賭注的數字怎麼來的",
+    # D2（2026-09-18）：判斷錯了值多少——與賭注**逐格對稱**。
+    # ⚠ 白話名刻意都用「判斷錯了」而不是「下跌」：它是一個條件句（反證成真），
+    # 不是對股價的預測，也不是停損線。
+    "downside_scenario": "判斷錯了長什麼樣",
+    "downside_internal_eps": "判斷錯了的每股盈餘",
+    "downside_fair_value": "判斷錯了的目標價",
+    "downside_value_date": "判斷錯了的目標價是哪一天的值",
+    "downside_return": "從現價到那個價，要漲跌多少",
+    "annualized_downside_return": "換算成一年多少",
+    "downside_eps_contribution": "其中：因為那時的 EPS 比市場共識高或低",
+    "downside_multiple_contribution": "其中：因為那時的倍數比市場現在付的高或低",
+    "base_fair_value_for_downside": "對照：base 目標價",
+    "base_price_return_for_downside": "對照：base 隱含報酬",
+    "downside_one_sentence": "一句話說明下檔的數字怎麼來的",
     "gap_closure": "市場承認了嗎",
     "consensus_series": "市場共識每股盈餘的歷史",
     "target_reached": "目標價到了沒",
@@ -587,6 +601,8 @@ class AnalystView:
     #: V0（2026-09-15）：賭注 panel（optional）。放在 headline 之後——投資人看完 base 的數字，
     #: 下一個問題就是「如果我們對了呢」。沒寫賭注也必須有一個 missing 的 bet panel（缺席要現形）。
     bet: AnalystPanel
+    #: D2（2026-09-18）：與 `bet` 對稱的 optional panel。兩者並排就是短評那把尺的兩端。
+    downside: AnalystPanel
     #: 2026-09-15：投資人短評 panel（optional）。APP 首屏只讀它；markdown 仍以 headline 開頭。
     brief: AnalystPanel
     #: 2026-09-15：論證層 panel（optional）：短評展開成六段，附引文與長文。

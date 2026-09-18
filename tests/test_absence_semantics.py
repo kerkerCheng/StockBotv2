@@ -125,7 +125,10 @@ def test_layer_and_subject_are_contracts_not_free_text() -> None:
     assert set(ABSTENTION_SUBJECTS) == set(ABSTENTION_LAYERS)
     # 每層只開資料支持的那幾個 subject：general 到資料支持的那一格為止（L17-4）
     assert ABSTENTION_SUBJECTS["research"] == ("axis.catalyst",)
-    assert ABSTENTION_SUBJECTS["bet"] == ("variant.overlay",)
+    # D2（2026-09-18）：加 `downside.overlay`——「判斷錯了值多少」與賭注對稱，
+    # 兩個誠實終局也對稱。⚠ 這條斷言守的是**封閉性**，不是「只有一個」：
+    # 多一個 subject 就要多一段消費端語意（`downside_absence()`），不得隨手加自由字串。
+    assert ABSTENTION_SUBJECTS["bet"] == ("variant.overlay", "downside.overlay")
     with pytest.raises(ContractViolation, match="沒有 subject"):
         abstention_record(company_id="co:x", ticker="X", layer="bet",
                           subject="variant.anything", reason="a" * 30, revisit_when="b" * 20)

@@ -263,6 +263,23 @@ def variant_absence(
     return ("尚未寫入任何 variant 假設——賭注還沒寫（不是 0）", "not_yet_recorded")
 
 
+def downside_absence(
+    abstentions: Sequence[Any], *, as_of: date | None, today: date,
+) -> tuple[str, str]:
+    """沒有 downside 假設時，這是**哪一種**「沒有」。`variant_absence` 的對稱面（D2，2026-09-18）。
+
+    ⚠ **只認 `bet/downside.overlay`，不吃 `variant.overlay` 頂替**：宣告「目前沒有可辯護的
+    賭注」與宣告「說不出可辯護的下檔」是兩個不同的結論——前者是不下注，後者是連認錯的門檻
+    都畫不出來。互相頂替會把一筆待辦冒充成答案，那正是 Q2 在估值層踩過的形狀。
+    """
+    declared = select_abstention(
+        abstentions, layer="bet", subject="downside.overlay",
+        period_end=None, as_of=as_of, today=today)
+    if declared is not None:
+        return (f"刻意不主張下檔（{declared.abstention_id}）：{declared.reason}", "deliberate_abstention")
+    return ("尚未寫入任何 downside 假設——「判斷錯了值多少」還沒寫（不是 0）", "not_yet_recorded")
+
+
 def _valuation_model(
     build: ContextBuild, fundamental_model: FundamentalModelResult | None, fundamental_reason: str | None,
     ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date,
@@ -633,6 +650,27 @@ def fetch_alpha_investment_view(
             # 後者在 `bet/variant.overlay` 這本 append-only ledger 裡是一筆明示紀錄（L16：
             # 分類有 SSOT 就要跟著資料走到需要它的地方——這個檔案第 262 行早就在讀它了）。
             variant_reason, variant_kind = variant_absence(abstention_records, as_of=as_of, today=today)
+        # ---- D2（2026-09-18）「判斷錯了值多少」：downside scenario 走**同一條**鏈再跑一次 ----
+        # ⚠ 與 variant **完全同形**——同一個 `_fundamental_model`／`_valuation_model`／
+        # `_implied_return_model`，只換 scenario 名。一邊用同一條橋、另一邊自己算一套，
+        # 「賭對了值多少」與「判斷錯了值多少」就不可比，而那兩個數字並排才是短評那把尺。
+        downside_fundamental = downside_valuation = downside_implied = None
+        downside_reason: str | None = None
+        downside_kind: str | None = None
+        has_downside = any(getattr(r, "scenario", "base") == "downside" and not getattr(r, "retracted", False)
+                           for r in [*records, *valuation_records])
+        if has_downside:
+            downside_fundamental, d_f_reason, _ = _fundamental_model(
+                build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today, scenario="downside")
+            downside_valuation, d_v_reason, _ = _valuation_model(
+                build, downside_fundamental, d_f_reason, resolved_ticker, company_id, as_of=as_of, today=today,
+                identity=identity, scenario="downside")
+            downside_implied, downside_reason, _ = _implied_return_model(
+                build, downside_valuation, d_v_reason, resolved_ticker, company_id, as_of=as_of, today=today,
+                identity=identity, fundamental_model=downside_fundamental, fundamentals_provider=fundamentals_provider)
+        else:
+            # 兩種「沒有」也對稱：還沒寫 vs 已研究、結論是說不出可辯護的下檔（L12）。
+            downside_reason, downside_kind = downside_absence(abstention_records, as_of=as_of, today=today)
         # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
         refresh_changes = None
         metric_observations: list[Any] = []
@@ -728,6 +766,9 @@ def fetch_alpha_investment_view(
         refresh_notes=refresh_notes,
         variant_fundamental=variant_fundamental, variant_valuation=variant_valuation,
         variant_implied_return=variant_implied, variant_reason=variant_reason, variant_absence_kind=variant_kind,
+        downside_fundamental=downside_fundamental, downside_valuation=downside_valuation,
+        downside_implied_return=downside_implied, downside_reason=downside_reason,
+        downside_absence_kind=downside_kind,
         brief_records=brief_records, brief_parse_errors=brief_errors,
         narrative_context=narrative_context,
         consensus_history=consensus_history,

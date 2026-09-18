@@ -363,7 +363,12 @@ research-drain 跑，daily 的 `drain_limit_per_run` 歸零。
 ### 判斷錯了值多少（Downside overlay）
 與賭注（variant overlay）**對稱**的 scenario（D2）：反證觸發後的假設套**同一條橋**、同一套估值與報酬算術，得到「認錯時值多少」。
 它是條件句，不是 bear case、沒有機率加權；與「賭對了值多少」並排就是短評那把尺的兩端。
-*Avoid:* bear case、probability-weighted expected return、散文式下檔
+**2026-09-18 已交付**：`scenario="downside"`（`ASSUMPTION_SCENARIOS` 第三個值），寫入端沿用
+`python -m alpha assumptions <T> --add spec.json`；型別層規則與 variant **完全同一組**——只能是核心 driver、
+必須 `independent`、必須至少一條 supporting 證據。**第三條就是「這不是 bear case」的閘門**：
+bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩種（`bet/downside.overlay` 的 Abstention
+＝刻意不主張；沒有＝還沒寫），且 `variant.overlay` 的 Abstention **不得頂替**它。
+*Avoid:* bear case、probability-weighted expected return、散文式下檔、拿賭注的 abstention 當下檔的答案
 
 ### 歸零旗標（Wipe-out flags）
 四盞紅黃綠燈（D2）：現金跑道／負債／稀釋／going concern。**只給燈不給數字**，屬量測（同總曝險倍數、追繳門檻那一類），

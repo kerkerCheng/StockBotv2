@@ -395,7 +395,10 @@ def test_view_contains_no_position_fields() -> None:
     assert entry.meta.status == "missing"
     assert entry.entry_price.value is None and entry.hurdle_comparison.value is None
     assert "buy" in " ".join(entry.is_not).lower() and "position size" in " ".join(entry.is_not)
-    assert view.downside.meta.status == "not_modeled"
+    # D2（2026-09-18）：下檔**已經建模**（downside scenario 走同一條橋），所以它從
+    # `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒人寫）。
+    # ⚠ 兩者的下一步完全不同：`not_modeled` 沒有人該去補，`missing` 有。
+    assert view.downside.meta.status == "missing"
 
 
 def test_authorities_are_logical_uris_not_private_paths() -> None:
@@ -428,13 +431,17 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     assert view.fundamentals.meta.status == "missing"
     assert view.consensus.meta.status == "missing"
     assert view.implied_return.meta.status == "missing"                 # Step 2：有能力了；沒資料是 missing
-    assert view.downside.meta.status == "not_modeled"
+    # D2（2026-09-18）：下檔**已經建模**（downside scenario 走同一條橋），所以它從
+    # `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒人寫）。
+    # ⚠ 兩者的下一步完全不同：`not_modeled` 沒有人該去補，`missing` 有。
+    assert view.downside.meta.status == "missing"
     price = next(d for d in view.fundamentals.items if d.key == "price")
     assert price.value is None and price.status == "missing"
     cap = view.capability_map()
     assert cap["fundamentals"]["status"] == "missing"
     assert cap["implied_return"]["status"] == "missing"
-    assert cap["downside"]["status"] == "not_modeled"
+    # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
+    assert cap["downside"]["status"] == "missing"
     # internal fundamentals 自 2026-09-05 起是「有能力」：沒資料是 missing，不是 not_modeled
     assert cap["internal_fundamentals"]["status"] == "missing"
 
@@ -489,7 +496,8 @@ def test_to_dict_round_trips_json_and_keeps_nulls() -> None:
     back = json.loads(text)
     assert back["schema_version"] == "alpha-investment-view/v1"
     assert back["identity"]["ticker"] == "COHR"
-    assert back["capability_map"]["downside"]["status"] == "not_modeled"
+    # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
+    assert back["capability_map"]["downside"]["status"] == "missing"
     assert back["capability_map"]["implied_return"]["status"] == "missing"
     assert back["capability_map"]["entry_logic"]["status"] == "missing"
     nulls = [p for p, k, v in _walk(back) if k == "value" and v is None]
@@ -518,7 +526,10 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     assert card["market_implied_eps_growth"]["value"] == growth.value
     assert card["market_implied_eps_growth"]["basis"] == "heuristic_proxy"
     assert card["catalyst"]["state"] == "watch"
-    assert set(card["not_modeled"]) >= {"downside"}
+    # D2（2026-09-18）：`downside` 離開了 `not_modeled` 那一欄——它現在有能力，只是還沒人寫。
+    # ⚠ 這條斷言原本守的是「沒能力的東西必須出現在 not_modeled 清單」，那個判準不變；
+    # 變的是 downside 不再屬於那一類。所以改成驗它**不在**裡面，而不是刪掉這條檢查。
+    assert "downside" not in set(card["not_modeled"])
     assert "implied_return" not in card["not_modeled"]                 # Step 2：有能力了；沒資料是 missing
     assert "entry_logic" not in card["not_modeled"]                    # Step 3：有能力了；沒判準是 missing
     assert card["entry_logic"]["status"] == "missing" and card["entry_logic"]["entry_price"] is None

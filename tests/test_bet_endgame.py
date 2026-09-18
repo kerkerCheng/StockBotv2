@@ -84,7 +84,11 @@ def test_a_retracted_abstention_stops_counting(tmp_path: Path) -> None:
 
 
 def test_bet_layer_is_registered_as_a_closed_vocabulary() -> None:
-    assert ABSTENTION_SUBJECTS["bet"] == ("variant.overlay",)
+    # D2（2026-09-18）：加 `downside.overlay`——「判斷錯了值多少」與賭注對稱，
+    # 所以它的兩個誠實終局也對稱（寫一個帶證據的下檔，或宣告說不出可辯護的下檔）。
+    # ⚠ 這條斷言守的是**封閉性**：多一個 subject 就要多一段消費端語意
+    # （`downside_absence()`），不是可以隨手加的自由字串。
+    assert ABSTENTION_SUBJECTS["bet"] == ("variant.overlay", "downside.overlay")
     with pytest.raises(Exception):
         abstention_record(company_id="co:x", ticker="X", layer="bet", subject="variant.whatever",
                           reason="x" * 30, revisit_when="y" * 20)

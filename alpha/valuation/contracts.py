@@ -371,19 +371,26 @@ class ValuationAssumption:
 
         if any(not isinstance(c, ReviewCondition) for c in self.review_conditions):
             raise ContractViolation("review_conditions 每一項必須是 ReviewCondition")
-        from ..fundamental.contracts import ASSUMPTION_SCENARIOS, VARIANT_SCENARIO
+        from ..fundamental.contracts import (
+            ASSUMPTION_SCENARIOS, OVERLAY_SCENARIOS, VARIANT_SCENARIO,
+        )
 
         if self.scenario not in ASSUMPTION_SCENARIOS:
             raise ContractViolation(f"scenario 未登記：{self.scenario!r}；已知 {ASSUMPTION_SCENARIOS}")
-        if self.scenario == VARIANT_SCENARIO and not self.retracted:
-            # 賭注的倍數必須是我們自己的 re-rating 主張（2026-09-09 原則：說不出證據的折溢價是偏差）。
-            # 「抄市場」的倍數寫成 variant 沒有意義——它結構上等於 base 的校準值。
+        if self.scenario in OVERLAY_SCENARIOS and not self.retracted:
+            # overlay 的倍數必須是我們自己的 re-rating 主張（2026-09-09 原則：說不出證據的折溢價是偏差）。
+            # 「抄市場」的倍數寫成 overlay 沒有意義——它結構上等於 base 的校準值。
+            # ⚠ 2026-09-18 D2 起 `downside` 適用**同一組**規則：一邊要證據、另一邊隨便寫，
+            # 就是 bear case 換個名字。**倍數收縮也要指得出證據**（de-rating 也是一個主張）。
+            what = "賭注" if self.scenario == VARIANT_SCENARIO else "「判斷錯了」的倍數"
             if self.derivation != "independent":
                 raise ContractViolation(
-                    f"variant 估值假設的 derivation 必須是 independent（收到 {self.derivation!r}）——"
-                    "抄市場的倍數不是賭注")
+                    f"{self.scenario} 估值假設的 derivation 必須是 independent（收到 {self.derivation!r}）——"
+                    f"抄市場的倍數不是{what}")
             if not self.supporting_refs:
-                raise ContractViolation("variant 估值假設至少要有一條 supporting evidence（re-rating 的證據）")
+                raise ContractViolation(
+                    f"{self.scenario} 估值假設至少要有一條 supporting evidence"
+                    f"（{'re-rating' if self.scenario == VARIANT_SCENARIO else 'de-rating'} 的證據）")
 
     # ---- 與 OperatingAssumption 同形的介面（讓 select_assumptions／refresh 攤平器可以共用）----
     @property

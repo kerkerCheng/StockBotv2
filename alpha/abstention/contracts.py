@@ -58,13 +58,19 @@ RECORD_VERSION = "abstention/v1"
 #:
 #: ⚠ 加層的代價寫在這裡：**多一層就要多一段消費端語意**，所以 `research` 只開一個 subject
 #: （`axis.catalyst`），不是把五個軸一次打開——general 到資料支持的那一格為止（L17-4）。
+#:
+#: ⚠ 2026-09-18（D2）加 `bet/downside.overlay`：「判斷錯了值多少」與賭注**對稱**，
+#: 所以它的兩個誠實終局也對稱——寫一個帶證據的下檔假設，或宣告「目前說不出可辯護的下檔」。
+#: 消費端語意同步加在 `briefing/alpha_view/sources.py::downside_absence()`（與
+#: `variant_absence()` 並列）。**兩個 subject 刻意不互相頂替**：宣告「沒有可辯護的賭注」
+#: 不等於「說不出下檔」——前者是不下注，後者是連認錯的門檻都畫不出來。
 ABSTENTION_LAYERS: tuple[str, ...] = ("valuation", "research", "bet")
 
 #: 每一層可宣告的主題（method.parameter 形式，與 `METHOD_PARAMETERS` 對齊）。
 ABSTENTION_SUBJECTS: Mapping[str, tuple[str, ...]] = {
     "valuation": ("forward_earnings_multiple.target_pe",),
     "research": ("axis.catalyst",),
-    "bet": ("variant.overlay",),
+    "bet": ("variant.overlay", "downside.overlay"),
 }
 
 #: 欄位名任何一段命中即 import 失敗——abstention 結構上不得攜帶任何數值主張。

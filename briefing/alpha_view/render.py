@@ -451,13 +451,14 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines.append(_datum_line(ib.status_light))
     lines.append("")
 
-    # 13b. Not modeled（下檔）
-    for title, section in (("13b. 下檔", view.downside),):
-        lines += _section(title, section.meta)
-        lines += [_datum_line(d) for d in section.items]
-        lines.append("不要跟這些混淆：")
-        lines += [f"- {markdown_text(x)}" for x in section.not_to_be_confused_with]
-        lines.append("")
+    # 13b. 下檔——D2（2026-09-18）由「尚未建模」換成與 13d **對稱**的 overlay。
+    # 舊版印的是 `not_modeled` 的兩格（下檔幅度／最大回撤估計）＋「不要跟這些混淆」，
+    # 那句「系統不產生下檔估計」在 D2 定案後已經是假的。
+    lines += _overlay_lines(
+        view.downside,
+        title="13b. 判斷錯了值多少（downside scenario → 同一條橋；「如果反證成真」，不是 bear case）",
+        overrides_label="下檔覆蓋的假設（每條帶 base 對照值）：",
+        is_not_label="下檔不是什麼：")
 
     # 13c. Entry logic（Step 3；`python -m briefing entry` 單獨印這一節）
     lines += render_entry_logic_lines(view)
@@ -560,24 +561,37 @@ def render_implied_return_lines(view: AlphaInvestmentView) -> list[str]:
     return lines
 
 
-def render_payoff_lines(view: AlphaInvestmentView) -> list[str]:
-    """第 13d 節（賭注／payoff）。只印 payoff_scenario section 的 Datum；本檔不含公式、不相減。"""
+def _overlay_lines(ps, *, title: str, overrides_label: str, is_not_label: str) -> list[str]:
+    """一個 overlay scenario 的 markdown。**variant 與 downside 共用**（D2，2026-09-18）。
+
+    ⚠ 兩邊共用同一段渲染，是為了讓「賭對了值多少」與「判斷錯了值多少」**逐格對得起來**——
+    兩份各自手寫的渲染會在某次改動後悄悄長出不同的格，而使用者要並排讀它們。
+    """
     lines: list[str] = []
-    ps = view.payoff_scenario
-    lines += _section("13d. 賭注（variant scenario → payoff；「如果我們的差異看法對了」，不是機率加權）", ps.meta)
+    lines += _section(title, ps.meta)
     if ps.period:
         lines.append(f"目標期間：{markdown_text(ps.period)}" + (f"（至 {ps.period_end.isoformat()}）" if ps.period_end else ""))
-    for datum in (ps.scenario, ps.variant_internal_eps, ps.variant_fair_value, ps.value_date, ps.payoff_return,
+    for datum in (ps.scenario, ps.scenario_internal_eps, ps.scenario_fair_value, ps.value_date, ps.payoff_return,
                   ps.annualized_payoff_return, ps.eps_contribution, ps.multiple_contribution,
                   ps.base_fair_value, ps.base_price_return):
         lines.append(_datum_line(datum))
     if ps.overrides:
-        lines.append("賭注覆蓋的假設（每條帶 base 對照值）：")
+        lines.append(overrides_label)
         lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in ps.overrides]
     lines.append(_datum_line(ps.epistemics))
-    lines.append("payoff 不是什麼：")
+    lines.append(is_not_label)
     lines += [f"- {markdown_text(x)}" for x in ps.is_not]
     lines.append("")
+    return lines
+
+
+def render_payoff_lines(view: AlphaInvestmentView) -> list[str]:
+    """第 13d 節（賭注／payoff）。只印 payoff_scenario section 的 Datum；本檔不含公式、不相減。"""
+    return _overlay_lines(
+        view.payoff_scenario,
+        title="13d. 賭注（variant scenario → payoff；「如果我們的差異看法對了」，不是機率加權）",
+        overrides_label="賭注覆蓋的假設（每條帶 base 對照值）：",
+        is_not_label="payoff 不是什麼：")
     return lines
 
 
@@ -865,7 +879,8 @@ def render_alpha_cards(cards: Sequence[Mapping[str, Any]] | None, *, present: bo
         "- 「Fair value vs 現價」是內部 EPS × 明示目標倍數（session 判斷）算出的 fair value 與現價的相對差；"
         "**它不是 expected return、不是 upside forecast、不是進場訊號**（報酬語意住完整卡第 13a 節的 base-case implied return，"
         "那也只是 base case 從 bar_date 到明示 horizon 的隱含價格報酬，不是機率加權期望值）；沒有估值假設一律「未知」。",
-        "- 「尚未建模」列的是 downside 等系統還沒有的能力。",
+        "- 「尚未建模」列的是系統還沒有的能力。⚠ 下檔自 2026-09-18（D2）起**已經建模**："
+        "它是 downside scenario 走同一條橋的結果，與賭注對稱；沒寫就是 not_yet_recorded，不是 not_modeled。",
         "",
     ]
     return lines

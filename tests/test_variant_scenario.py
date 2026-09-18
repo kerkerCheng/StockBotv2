@@ -49,7 +49,10 @@ def _model(records, *, scenario: str = BASE_SCENARIO, index=None):
 # ---------------------------------------------------------------------------
 
 def test_scenario_vocabulary_is_closed_and_defaults_to_base() -> None:
-    assert ASSUMPTION_SCENARIOS == ("base", "variant")
+    # 2026-09-18（D2）：`downside`＝「判斷錯了值多少」，與 variant 對稱。
+    # 這條斷言守的是**封閉性**，不是「只有兩個」——新增一個 scenario 就必須同時
+    # 新增一條 payoff 算術與一組型別層規則，所以它必須在這裡被看見。
+    assert ASSUMPTION_SCENARIOS == ("base", "variant", "downside")
     legacy = parse_assumption_record({k: v for k, v in assumption_record(
         company_id="co:coherent", ticker="COHR", period_end=TARGET.end, driver="tax_rate", scope="total",
         value=0.19, basis="heuristic_proxy", rationale="x", evidence_refs=[GRAPH_REF.ref],
@@ -190,7 +193,7 @@ def test_read_model_without_variant_says_not_yet_recorded_and_bet_is_optional() 
     assert not any(b.startswith("bet") for b in analyst.readiness.blockers)
     # bet 的每一行都是 read model 的同一個 Datum（consumer 不造格）
     allowed = {id(getattr(ps, name)) for name in (
-        "scenario", "variant_internal_eps", "variant_fair_value", "value_date", "payoff_return",
+        "scenario", "scenario_internal_eps", "scenario_fair_value", "value_date", "payoff_return",
         "annualized_payoff_return", "eps_contribution", "multiple_contribution", "epistemics",
         "base_fair_value", "base_price_return")} | {id(d) for d in ps.overrides}
     assert all(id(line.datum) in allowed for line in analyst.bet.lines)
@@ -215,12 +218,15 @@ def test_read_model_with_variant_carries_payoff_and_overrides_with_base_values()
     var_ret = build_implied_return(company_id="co:coherent", ticker="COHR", as_of=None, today=IR_TODAY, valuation=var_val,
                                    valuation_reason=None, horizon_records=[_horizon()], evidence_index=_index(), price=PRICE,
                                    eps_comparison=var_model.comparisons.get("eps"))
+    from briefing.alpha_view.builder import _VARIANT_COPY
+
     section = _payoff_section(var_model, var_val, var_ret, None, base_fundamental=base_model, base_valuation=base_val,
-                              base_implied_return=base_ret, reference_day=IR_TODAY, reporting_unit="USD", absence_kind=None)
+                              base_implied_return=base_ret, reference_day=IR_TODAY, reporting_unit="USD", absence_kind=None,
+                              copy=_VARIANT_COPY)
     assert section.meta.status == "available"
     assert section.payoff_return.value == pytest.approx(var_ret.price_return)
     assert section.base_price_return.value == pytest.approx(base_ret.price_return)
-    assert section.variant_fair_value.value == pytest.approx(var_val.fair_value)
+    assert section.scenario_fair_value.value == pytest.approx(var_val.fair_value)
     assert len(section.overrides) == 1
     deps = section.overrides[0].dependencies
     assert deps["base_value"] == 0.025 and deps["scenario"] == "variant" and deps["layer"] == "operating"

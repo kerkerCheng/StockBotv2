@@ -31,7 +31,8 @@ from alpha.context import ContextBuild
 from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
 from alpha.entry.contracts import EntryAssessmentResult, EntryCriterion
 from alpha.fundamental.contracts import (
-    OPINION_BEARING_DRIVERS, FundamentalModelResult, OperatingAssumption,
+    DOWNSIDE_SCENARIO, OPINION_BEARING_DRIVERS, VARIANT_SCENARIO,
+    FundamentalModelResult, OperatingAssumption,
 )
 from briefing.analyst_view.contracts import PLAIN_MULTIPLE_DERIVATION, PLAIN_STANCE
 from alpha.implied_return.attribution import attribution_payload
@@ -57,7 +58,7 @@ from briefing.analyst_view.contracts import PLAIN_DRIVER_LABELS, PLAIN_REFRESH_O
 from .contracts import (
     CAP_ARGUMENT, ArgumentSection,
     CAP_INVESTOR_BRIEF, InvestorBriefSection,
-    CAP_VARIANT_PAYOFF, PayoffScenarioSection,
+    CAP_DOWNSIDE_OVERLAY, CAP_VARIANT_PAYOFF, PayoffScenarioSection,
     BASIS_LABEL, CAP_ANALYTICAL_ENTRY_THRESHOLD, CAP_AUTOMATIC_INVALIDATION, CAP_BASE_CASE_IMPLIED_RETURN,
     CAP_CATALYST_UNLINKED,
     CAP_DEPENDENCY_IMPACT, CAP_DETERMINISTIC_FAIR_VALUE, CAP_FINANCIAL_CAUSAL,
@@ -68,7 +69,7 @@ from .contracts import (
     DisproofItem, EarningsBridgeSection, EntryLogicSection, EventItem, EvidenceItem, EvidenceSection,
     EvidenceSelectionCounts, ExpectationGapSection, ExposureItem, FalsificationSection,
     FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem, ImpliedReturnSection,
-    InternalFundamentalsSection, LifecycleFacts, NotModeledSection, PathItem,
+    InternalFundamentalsSection, LifecycleFacts, PathItem,
     PriceImpliedSection, RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
     SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, ValuationSection, VariantViewSection,
     missing, not_modeled,
@@ -963,6 +964,9 @@ def _implied_return_section(
 # 本檔不算任何數：payoff、兩桿拆解、年化全部照抄 `alpha.implied_return` 對 variant 的執行。
 # ---------------------------------------------------------------------------
 A_PAYOFF = "alpha://scenario/variant"
+#: D2（2026-09-18）：下檔有自己的 authority URI。**不共用 `A_PAYOFF`**——
+#: 那會讓 read model 逐格宣稱下檔的數字來自 variant 那條鏈。
+A_DOWNSIDE = "alpha://scenario/downside"
 
 PAYOFF_IS_NOT: tuple[str, ...] = (
     "不是機率加權期望報酬：variant 是一個條件句（「如果我們的差異看法對了」），沒有 bull／bear 機率",
@@ -970,6 +974,40 @@ PAYOFF_IS_NOT: tuple[str, ...] = (
     "不是部位尺寸、不是 buy／sell：payoff 多大只回答「這個賭注值不值得看」，買多少、何時買由使用者決定",
     "不是 base case 的替代：base 照印；payoff 與 base 隱含報酬並排，差額就是這個賭注本身的價值",
 )
+DOWNSIDE_IS_NOT: tuple[str, ...] = (
+    "不是 bear case：它是一個條件句（「如果這條反證成真」），不是「悲觀一點會怎樣」；"
+    "每條 downside 假設都必須指得出 supporting 證據，說不出證據的悲觀是偏差不是審慎",
+    "不是機率加權期望報酬：沒有 bull／bear、沒有機率；它與賭注並排，不相加也不取平均",
+    "不是停損線、不是出場訊號：出場只認反證（D3）；這一格回答的是「認錯時值多少」，不是「什麼時候賣」",
+    "不是部位尺寸：知道下檔多深不等於系統算得出買多少——尺寸由使用者決定",
+)
+
+
+@dataclass(frozen=True, slots=True)
+class _OverlayCopy:
+    """一個 overlay scenario 的**文案與 key 前綴**。兩個 scenario 的差別只有這張表。
+
+    ⚠ `key_ns`／`value_ns` 兩個前綴不合併：variant 的既有 key 有兩種寫法
+    （`payoff_return` 但 `variant_fair_value`），而那些 key 已經在 APP、analyst view
+    與快照 fixture 裡了。合併成一個前綴會「順手」改掉 variant 的 key——本次改動的
+    驗收條件正是 **variant 的每一個 key 與每一句文案逐字不變**。
+    """
+
+    scenario: str          # ASSUMPTION_SCENARIOS 的值
+    authority: str         # ⚠ authority URI 也要跟著 scenario 走：一個 URI 同時宣稱
+                           #   自己是 variant 又裝著 downside 的值，就是 L12 一表兩義。
+                           #   事發（2026-09-18 端到端一跑就看到）：13b 段印著
+                           #   `authority：alpha://scenario/variant`，而那一整段是下檔。
+    key_ns: str            # payoff_* 這一族的前綴
+    value_ns: str          # *_internal_eps／*_fair_value 的前綴
+    if_true: str           # 「賭注對了」／「判斷錯了」
+    noun: str              # 「賭注」／「下檔」
+    capability: str
+    is_not: tuple[str, ...]
+    epistemic_warning: str
+    absent: str            # 完全沒有紀錄時的預設理由
+
+
 PAYOFF_EPISTEMIC_WARNING = (
     "payoff 是賭注的確定性函數，不是預測：variant 只覆蓋有差異看法的那幾條假設，其餘沿用 base；"
     "看 overrides 每條的 supporting 證據——說不出證據的差異是偏差，不是賭注"
@@ -996,52 +1034,80 @@ def _override_datum(item: Any, base_items: Sequence[Any], *, reporting_unit: str
                       "supporting_refs": list(item.supporting_refs)})
 
 
+DOWNSIDE_EPISTEMIC_WARNING = (
+    "下檔是 downside 假設的確定性函數，不是預測：它只覆蓋反證成真時會變的那幾條假設，其餘沿用 base；"
+    "看 overrides 每條的 supporting 證據——說不出證據的悲觀是偏差，不是下檔"
+)
+
+_VARIANT_COPY = _OverlayCopy(
+    scenario=VARIANT_SCENARIO, authority=A_PAYOFF, key_ns="payoff", value_ns="variant",
+    if_true="賭注對了", noun="賭注", capability=CAP_VARIANT_PAYOFF,
+    is_not=PAYOFF_IS_NOT, epistemic_warning=PAYOFF_EPISTEMIC_WARNING,
+    absent="尚未寫入任何 variant 假設——賭注還沒寫（不是 0）",
+)
+_DOWNSIDE_COPY = _OverlayCopy(
+    scenario=DOWNSIDE_SCENARIO, authority=A_DOWNSIDE, key_ns="downside", value_ns="downside",
+    if_true="判斷錯了", noun="下檔", capability=CAP_DOWNSIDE_OVERLAY,
+    is_not=DOWNSIDE_IS_NOT, epistemic_warning=DOWNSIDE_EPISTEMIC_WARNING,
+    absent="尚未寫入任何 downside 假設——「判斷錯了值多少」還沒寫（不是 0）",
+)
+
+
 def _payoff_section(
     fundamental: Any, valuation: Any, implied_return: Any, reason: str | None, *,
     base_fundamental: Any, base_valuation: Any, base_implied_return: Any,
     reference_day: date, reporting_unit: str, absence_kind: str | None,
+    copy: _OverlayCopy,
 ) -> PayoffScenarioSection:
+    """一個 overlay scenario 的 section。**variant 與 downside 走同一段程式碼**（D2 對稱）。
+
+    ⚠ 對稱不是美觀要求，是 D2 的全部內容：一邊用同一條橋、另一邊自己算一套，
+    「賭對了值多少」與「判斷錯了值多少」就不可比，而那兩個數字並排才是短評那把尺。
+    """
+    ns, vns, auth = copy.key_ns, copy.value_ns, copy.authority
+    it, noun = copy.if_true, copy.noun
+
     def _unit(unit: str) -> str:
         return reporting_unit if unit == "currency" else unit
 
     # ---- base 對照格：照抄 base 那條鏈，不重算 -------------------------------------------
     if base_implied_return is not None and base_implied_return.fair_value is not None:
-        base_fv = Datum(key="base_fair_value_for_payoff", label="對照：base 目標價（照抄 valuation）",
+        base_fv = Datum(key=f"base_fair_value_for_{ns}", label="對照：base 目標價（照抄 valuation）",
                         value=base_implied_return.fair_value, status="available", basis="deterministic",
                         authority=A_VALUATION, unit=_unit("currency_per_share"), as_of=base_implied_return.fair_value_as_of,
-                        reason="base 的 fair value；與賭注目標價並排看", dependencies={"currency": base_implied_return.fair_value_currency})
+                        reason=f"base 的 fair value；與{noun}目標價並排看", dependencies={"currency": base_implied_return.fair_value_currency})
     else:
-        base_fv = missing("base_fair_value_for_payoff", "對照：base 目標價",
+        base_fv = missing(f"base_fair_value_for_{ns}", "對照：base 目標價",
                           (base_implied_return.reason if base_implied_return is not None else "base 未執行") or "base fair value 缺席",
                           authority=A_VALUATION)
     if base_implied_return is not None and base_implied_return.is_known:
-        base_ret = Datum(key="base_price_return_for_payoff", label="對照：base 隱含價格報酬（simple）",
+        base_ret = Datum(key=f"base_price_return_for_{ns}", label="對照：base 隱含價格報酬（simple）",
                          value=base_implied_return.price_return, status="available", basis="deterministic",
                          authority=A_IMPLIED_RETURN, unit="ratio", as_of=base_implied_return.current_price.bar_date,
-                         reason="base 的隱含報酬；payoff 減去它就是這個賭注本身的價值（讀者自行對照，本層不相減）")
+                         reason=f"base 的隱含報酬；減去它就是這個{noun}本身的價值（讀者自行對照，本層不相減）")
     else:
-        base_ret = missing("base_price_return_for_payoff", "對照：base 隱含價格報酬",
+        base_ret = missing(f"base_price_return_for_{ns}", "對照：base 隱含價格報酬",
                            (base_implied_return.reason if base_implied_return is not None else "base 未執行") or "base 報酬缺席",
                            authority=A_IMPLIED_RETURN)
 
     if implied_return is None:
-        why = reason or "尚未寫入任何 variant 假設——賭注還沒寫（不是 0）"
+        why = reason or copy.absent
         kind = absence_kind or "not_yet_recorded"
-        meta = SectionMeta(status="missing", basis="none", authority=A_PAYOFF, capability=CAP_VARIANT_PAYOFF,
+        meta = SectionMeta(status="missing", basis="none", authority=auth, capability=copy.capability,
                            reason=why, as_of=reference_day, absence_kind=kind)
         return PayoffScenarioSection(
             meta=meta,
-            scenario=missing("payoff_scenario", "賭注長什麼樣（variant 覆蓋了哪幾條假設）", why, authority=A_PAYOFF, absence_kind=kind),
+            scenario=missing(f"{ns}_scenario", f"{noun}長什麼樣（{copy.scenario} 覆蓋了哪幾條假設）", why, authority=auth, absence_kind=kind),
             overrides=(),
-            variant_internal_eps=missing("variant_internal_eps", "賭注對了的內部 EPS", why, authority=A_BRIDGE, absence_kind=kind),
-            variant_fair_value=missing("variant_fair_value", "賭注對了的目標價", why, authority=A_VALUATION, absence_kind=kind),
-            value_date=missing("payoff_value_date", "賭注目標價是哪一天的值", why, authority=A_VALUATION_ASSUMPTIONS, absence_kind=kind),
-            payoff_return=missing("payoff_return", "賭注對了的隱含價格報酬（simple）", why, authority=A_PAYOFF, absence_kind=kind),
-            annualized_payoff_return=missing("annualized_payoff_return", "年化", why, authority=A_PAYOFF, absence_kind=kind),
-            eps_contribution=missing("payoff_eps_contribution", "其中：EPS 差異貢獻", why, authority=A_PAYOFF, absence_kind=kind),
-            multiple_contribution=missing("payoff_multiple_contribution", "其中：倍數差異貢獻", why, authority=A_PAYOFF, absence_kind=kind),
-            epistemics=missing("payoff_epistemics", "payoff 的認識論分解", why, authority=A_PAYOFF, absence_kind=kind),
-            base_fair_value=base_fv, base_price_return=base_ret, is_not=PAYOFF_IS_NOT,
+            scenario_internal_eps=missing(f"{vns}_internal_eps", f"{it}的內部 EPS", why, authority=A_BRIDGE, absence_kind=kind),
+            scenario_fair_value=missing(f"{vns}_fair_value", f"{it}的目標價", why, authority=A_VALUATION, absence_kind=kind),
+            value_date=missing(f"{ns}_value_date", f"{noun}目標價是哪一天的值", why, authority=A_VALUATION_ASSUMPTIONS, absence_kind=kind),
+            payoff_return=missing(f"{ns}_return", f"{it}的隱含價格報酬（simple）", why, authority=auth, absence_kind=kind),
+            annualized_payoff_return=missing(f"annualized_{ns}_return", "年化", why, authority=auth, absence_kind=kind),
+            eps_contribution=missing(f"{ns}_eps_contribution", "其中：EPS 差異貢獻", why, authority=auth, absence_kind=kind),
+            multiple_contribution=missing(f"{ns}_multiple_contribution", "其中：倍數差異貢獻", why, authority=auth, absence_kind=kind),
+            epistemics=missing(f"{ns}_epistemics", f"{noun}的認識論分解", why, authority=auth, absence_kind=kind),
+            base_fair_value=base_fv, base_price_return=base_ret, is_not=copy.is_not,
         )
 
     target = implied_return.target_period
@@ -1053,109 +1119,109 @@ def _payoff_section(
     if valuation is not None:
         base_vals = tuple(base_valuation.assumptions) if base_valuation is not None else ()
         overrides += [_override_datum(a, base_vals, reporting_unit=reporting_unit)
-                      for a in valuation.assumptions if getattr(a, "scenario", "base") == "variant"]
+                      for a in valuation.assumptions if getattr(a, "scenario", "base") == copy.scenario]
     n_ops = sum(1 for d in overrides if (d.dependencies or {}).get("layer") == "operating")
     n_vals = len(overrides) - n_ops
     scenario_datum = Datum(
-        key="payoff_scenario", label="賭注長什麼樣（variant 覆蓋了哪幾條假設）",
-        value={"scenario": "variant", "operating_overrides": n_ops, "valuation_overrides": n_vals,
+        key=f"{ns}_scenario", label=f"{noun}長什麼樣（{copy.scenario} 覆蓋了哪幾條假設）",
+        value={"scenario": copy.scenario, "operating_overrides": n_ops, "valuation_overrides": n_vals,
                "override_keys": [d.key for d in overrides]},
-        status="available", basis="deterministic", authority=A_PAYOFF, as_of=reference_day,
-        method="overlay：base 的生效假設被同 key 的 variant 假設覆蓋；其餘沿用 base；同一條橋、同一套估值與報酬算術",
-        reason=("EPS 側沒有任何覆蓋——賭注只在倍數上" if n_ops == 0 and n_vals else
-                "倍數沿用 base——賭注只在 EPS 側" if n_vals == 0 else None))
+        status="available", basis="deterministic", authority=auth, as_of=reference_day,
+        method=f"overlay：base 的生效假設被同 key 的 {copy.scenario} 假設覆蓋；其餘沿用 base；同一條橋、同一套估值與報酬算術",
+        reason=(f"EPS 側沒有任何覆蓋——{noun}只在倍數上" if n_ops == 0 and n_vals else
+                f"倍數沿用 base——{noun}只在 EPS 側" if n_vals == 0 else None))
 
     eps_metric = fundamental.metrics.get("eps") if fundamental is not None else None
     if eps_metric is not None and eps_metric.is_known:
         base_eps_metric = base_fundamental.metrics.get("eps") if base_fundamental is not None else None
-        eps_datum = Datum(key="variant_internal_eps", label=f"賭注對了的內部 EPS（{target.label if target else '?'}）",
+        eps_datum = Datum(key=f"{vns}_internal_eps", label=f"{it}的內部 EPS（{target.label if target else '?'}）",
                           value=eps_metric.value, status="available", basis="deterministic", authority=A_BRIDGE,
                           unit=_unit("currency_per_share"), as_of=reference_day,
-                          reason="variant 假設集合走同一條橋算出的 EPS",
+                          reason=f"{copy.scenario} 假設集合走同一條橋算出的 EPS",
                           dependencies={"accounting_basis": eps_metric.accounting_basis,
                                         "base_eps": (base_eps_metric.value if base_eps_metric is not None else None),
                                         "assumption_ids": [a.assumption_id for a in fundamental.assumptions]})
     else:
-        eps_datum = missing("variant_internal_eps", "賭注對了的內部 EPS",
-                            (eps_metric.reason if eps_metric is not None else None) or (fundamental.reason if fundamental else None) or "variant 橋缺席",
+        eps_datum = missing(f"{vns}_internal_eps", f"{it}的內部 EPS",
+                            (eps_metric.reason if eps_metric is not None else None) or (fundamental.reason if fundamental else None) or f"{copy.scenario} 橋缺席",
                             authority=A_BRIDGE)
 
     price = implied_return.current_price
     if implied_return.fair_value is not None:
-        fv_datum = Datum(key="variant_fair_value", label=f"賭注對了的目標價（{target.label if target else '?'}；照抄 variant valuation）",
+        fv_datum = Datum(key=f"{vns}_fair_value", label=f"{it}的目標價（{target.label if target else '?'}；照抄 {copy.scenario} valuation）",
                          value=implied_return.fair_value, status="available", basis="deterministic", authority=A_VALUATION,
                          unit=_unit("currency_per_share"), as_of=implied_return.fair_value_as_of,
-                         reason="variant 內部 EPS × variant（或沿用 base 的）目標倍數；不重算",
+                         reason=f"{copy.scenario} 內部 EPS × {copy.scenario}（或沿用 base 的）目標倍數；不重算",
                          dependencies={"currency": implied_return.fair_value_currency,
                                        "assumption_ids": [a for a in implied_return.assumption_ids if not a.startswith("ha_")]})
     else:
-        fv_datum = missing("variant_fair_value", "賭注對了的目標價", implied_return.reason or "variant fair value 缺席",
+        fv_datum = missing(f"{vns}_fair_value", f"{it}的目標價", implied_return.reason or f"{copy.scenario} fair value 缺席",
                            authority=A_VALUATION, absence_kind=implied_return.effective_absence_kind)
     if implied_return.value_date is not None:
-        vd_datum = Datum(key="payoff_value_date", label=f"賭注目標價是哪一天的值（{implied_return.value_date_semantics}）",
+        vd_datum = Datum(key=f"{ns}_value_date", label=f"{noun}目標價是哪一天的值（{implied_return.value_date_semantics}）",
                          value=implied_return.value_date, status="available", basis="session_judgment",
                          authority=A_VALUATION_ASSUMPTIONS, unit="date", as_of=reference_day,
                          reason="由估值假設的 value_date_convention 宣告（與 base 共用 horizon）")
     else:
-        vd_datum = missing("payoff_value_date", "賭注目標價是哪一天的值", "估值假設未宣告 value_date_convention",
+        vd_datum = missing(f"{ns}_value_date", f"{noun}目標價是哪一天的值", "估值假設未宣告 value_date_convention",
                            authority=A_VALUATION_ASSUMPTIONS)
     if implied_return.is_known:
         deps = {"input_dependency": implied_return.input_dependency, "assumption_ids": list(implied_return.assumption_ids),
                 "horizon_start": implied_return.horizon_start.isoformat(), "horizon_end": implied_return.horizon_end.isoformat(),
-                "holding_period_days": implied_return.holding_period_days, "scenario": "variant"}
-        ret_datum = Datum(key="payoff_return", label=f"賭注對了的隱含價格報酬（simple；{implied_return.horizon_start} → {implied_return.horizon_end}）",
-                          value=implied_return.price_return, status="available", basis="deterministic", authority=A_PAYOFF,
-                          method=f"{implied_return.formulas['price_return']}（variant fair value）", unit="ratio", as_of=price.bar_date,
+                "holding_period_days": implied_return.holding_period_days, "scenario": copy.scenario}
+        ret_datum = Datum(key=f"{ns}_return", label=f"{it}的隱含價格報酬（simple；{implied_return.horizon_start} → {implied_return.horizon_end}）",
+                          value=implied_return.price_return, status="available", basis="deterministic", authority=auth,
+                          method=f"{implied_return.formulas['price_return']}（{copy.scenario} fair value）", unit="ratio", as_of=price.bar_date,
                           evidence_refs=tuple(implied_return.observation_refs),
-                          reason=f"calculation=deterministic；input_dependency={implied_return.input_dependency}；" + PAYOFF_IS_NOT[0],
+                          reason=f"calculation=deterministic；input_dependency={implied_return.input_dependency}；" + copy.is_not[0],
                           dependencies=deps)
-        ann_datum = (Datum(key="annualized_payoff_return", label="年化（compound，365.25 天）", value=implied_return.annualized_price_return,
-                           status="available", basis="deterministic", authority=A_PAYOFF, method=implied_return.formulas["annualized_price_return"],
+        ann_datum = (Datum(key=f"annualized_{ns}_return", label="年化（compound，365.25 天）", value=implied_return.annualized_price_return,
+                           status="available", basis="deterministic", authority=auth, method=implied_return.formulas["annualized_price_return"],
                            unit="ratio", as_of=price.bar_date, reason=f"持有期間 {implied_return.holding_period_days} 天；年化只是換算", dependencies=deps)
                      if implied_return.annualized_price_return is not None else
-                     missing("annualized_payoff_return", "年化", "持有期間不足 1 天，不年化", authority=A_PAYOFF))
-        epi_datum = Datum(key="payoff_epistemics", label="payoff 的認識論分解（算術 vs 判斷）", value=dict(implied_return.epistemics),
-                          status="available", basis="deterministic", authority=A_PAYOFF, as_of=reference_day,
-                          method="照抄 variant implied return 的 epistemics；one_sentence 是機器組出的一句話，不是新判斷")
+                     missing(f"annualized_{ns}_return", "年化", "持有期間不足 1 天，不年化", authority=auth))
+        epi_datum = Datum(key=f"{ns}_epistemics", label=f"{noun}的認識論分解（算術 vs 判斷）", value=dict(implied_return.epistemics),
+                          status="available", basis="deterministic", authority=auth, as_of=reference_day,
+                          method=f"照抄 {copy.scenario} implied return 的 epistemics；one_sentence 是機器組出的一句話，不是新判斷")
     else:
         why = f"{implied_return.reason}（缺席不是 0）"
         kind = implied_return.effective_absence_kind
-        ret_datum = missing("payoff_return", "賭注對了的隱含價格報酬（simple）", why, authority=A_PAYOFF, absence_kind=kind)
-        ann_datum = missing("annualized_payoff_return", "年化", why, authority=A_PAYOFF, absence_kind=kind)
-        epi_datum = missing("payoff_epistemics", "payoff 的認識論分解", why, authority=A_PAYOFF, absence_kind=kind)
+        ret_datum = missing(f"{ns}_return", f"{it}的隱含價格報酬（simple）", why, authority=auth, absence_kind=kind)
+        ann_datum = missing(f"annualized_{ns}_return", "年化", why, authority=auth, absence_kind=kind)
+        epi_datum = missing(f"{ns}_epistemics", f"{noun}的認識論分解", why, authority=auth, absence_kind=kind)
     attribution = implied_return.attribution
     if attribution is not None and attribution.is_known:
         attr_deps = {"consensus_eps": attribution.consensus_eps, "internal_eps": attribution.internal_eps,
                      "target_multiple": attribution.target_multiple,
                      "market_multiple_on_consensus": attribution.market_multiple_on_consensus,
-                     "analyst_count": attribution.analyst_count, "scenario": "variant"}
-        eps_c = Datum(key="payoff_eps_contribution", label="其中：EPS 差異貢獻（賭注的 EPS vs 共識）", value=attribution.eps_contribution,
-                      status="available", basis="deterministic", authority=A_PAYOFF, method=attribution.formula, unit="ratio",
+                     "analyst_count": attribution.analyst_count, "scenario": copy.scenario}
+        eps_c = Datum(key=f"{ns}_eps_contribution", label=f"其中：EPS 差異貢獻（{noun}的 EPS vs 共識）", value=attribution.eps_contribution,
+                      status="available", basis="deterministic", authority=auth, method=attribution.formula, unit="ratio",
                       as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
-                      reason=f"variant EPS {attribution.internal_eps:g} ÷ 共識 EPS {attribution.consensus_eps:g} − 1", dependencies=attr_deps)
-        mul_c = Datum(key="payoff_multiple_contribution", label="其中：倍數差異貢獻（賭注的倍數 vs 市場對共識付的倍數）",
-                      value=attribution.multiple_contribution, status="available", basis="deterministic", authority=A_PAYOFF,
+                      reason=f"{copy.scenario} EPS {attribution.internal_eps:g} ÷ 共識 EPS {attribution.consensus_eps:g} − 1", dependencies=attr_deps)
+        mul_c = Datum(key=f"{ns}_multiple_contribution", label=f"其中：倍數差異貢獻（{noun}的倍數 vs 市場對共識付的倍數）",
+                      value=attribution.multiple_contribution, status="available", basis="deterministic", authority=auth,
                       method=attribution.formula, unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
                       reason=attribution.principle_note, dependencies=attr_deps)
     else:
         attr_why = (f"報酬缺席，沒有可拆的東西（{implied_return.reason or '未知'}）" if attribution is None
-                    else f"{attribution.reason}（缺席不是 0；payoff 本身不受影響）")
+                    else f"{attribution.reason}（缺席不是 0；{noun}本身不受影響）")
         attr_kind = implied_return.effective_absence_kind if attribution is None else attribution.absence_kind
-        eps_c = missing("payoff_eps_contribution", "其中：EPS 差異貢獻", attr_why, authority=A_PAYOFF, absence_kind=attr_kind)
-        mul_c = missing("payoff_multiple_contribution", "其中：倍數差異貢獻", attr_why, authority=A_PAYOFF, absence_kind=attr_kind)
+        eps_c = missing(f"{ns}_eps_contribution", "其中：EPS 差異貢獻", attr_why, authority=auth, absence_kind=attr_kind)
+        mul_c = missing(f"{ns}_multiple_contribution", "其中：倍數差異貢獻", attr_why, authority=auth, absence_kind=attr_kind)
 
     status = "available" if implied_return.is_known else "missing"
     meta = SectionMeta(
-        status=status, basis="deterministic" if implied_return.is_known else "none", authority=A_PAYOFF,
-        capability=CAP_VARIANT_PAYOFF, reason=implied_return.reason if not implied_return.is_known else None,
+        status=status, basis="deterministic" if implied_return.is_known else "none", authority=auth,
+        capability=copy.capability, reason=implied_return.reason if not implied_return.is_known else None,
         as_of=reference_day, absence_kind=(implied_return.effective_absence_kind if not implied_return.is_known else None),
-        warnings=(PAYOFF_EPISTEMIC_WARNING, "payoff " + "；".join(PAYOFF_IS_NOT), *implied_return.warnings),
+        warnings=(copy.epistemic_warning, f"{ns} " + "；".join(copy.is_not), *implied_return.warnings),
     )
     return PayoffScenarioSection(
-        meta=meta, scenario=scenario_datum, overrides=tuple(overrides), variant_internal_eps=eps_datum,
-        variant_fair_value=fv_datum, value_date=vd_datum, payoff_return=ret_datum, annualized_payoff_return=ann_datum,
+        meta=meta, scenario=scenario_datum, overrides=tuple(overrides), scenario_internal_eps=eps_datum,
+        scenario_fair_value=fv_datum, value_date=vd_datum, payoff_return=ret_datum, annualized_payoff_return=ann_datum,
         eps_contribution=eps_c, multiple_contribution=mul_c, epistemics=epi_datum,
-        base_fair_value=base_fv, base_price_return=base_ret, is_not=PAYOFF_IS_NOT,
+        base_fair_value=base_fv, base_price_return=base_ret, is_not=copy.is_not,
         period=target.label if target else None, period_end=target.end if target else None,
     )
 
@@ -1198,7 +1264,7 @@ def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, co
     values: dict[str, str | None] = {
         "price": format_value("price", price.value, unit=unit),
         "base_target": format_value("price", ir.fair_value.value, unit=unit),
-        "bet_target": format_value("price", payoff.variant_fair_value.value, unit=unit),
+        "bet_target": format_value("price", payoff.scenario_fair_value.value, unit=unit),
         "base_return": format_value("ratio", ir.price_return.value),
         "payoff": format_value("ratio", payoff.payoff_return.value),
         "sell_side_target": format_value("price", by_key["target_mean"].value if "target_mean" in by_key else None, unit=unit),
@@ -1233,17 +1299,23 @@ def _investor_brief_section(
     records: Sequence[Any], parse_errors: Sequence[str], *, as_of: date | None, today: date, reference_day: date,
     ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection, catalysts: CatalystSection,
     bridge: EarningsBridgeSection, refresh_overall: str, gap: ExpectationGapSection | None = None,
+    downside: PayoffScenarioSection | None = None,
 ) -> InvestorBriefSection:
     price = ir.current_price
     unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
+    # D2（2026-09-18）：那把尺**多一端**——「判斷錯了值多少」。
+    # ⚠ 缺席一律是 `None`，不是 0：沒寫下檔與「下檔是 0%」在圖上會畫成完全不同的兩件事，
+    # 而後者是一個沒有人做過的主張（L12）。
     scale_value = {"price": price.value, "base_target": ir.fair_value.value,
-                   "bet_target": payoff.variant_fair_value.value, "unit": unit,
-                   "base_return": ir.price_return.value, "payoff": payoff.payoff_return.value}
-    scale = (Datum(key="brief_scale", label="一把尺：現價／沒賭對／賭對", value=scale_value, status="available",
+                   "bet_target": payoff.scenario_fair_value.value, "unit": unit,
+                   "base_return": ir.price_return.value, "payoff": payoff.payoff_return.value,
+                   "downside_target": (downside.scenario_fair_value.value if downside is not None else None),
+                   "downside_return": (downside.payoff_return.value if downside is not None else None)}
+    scale = (Datum(key="brief_scale", label="一把尺：現價／沒賭對／賭對／判斷錯了", value=scale_value, status="available",
                    basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day,
-                   reason="三個數都照抄 implied_return／payoff section；沒有的就是 null")
+                   reason="每個數都照抄 implied_return／payoff／downside section；沒有的就是 null，不是 0")
              if price.value is not None else
-             missing("brief_scale", "一把尺：現價／沒賭對／賭對", price.reason or "無現價", authority=A_SNAP))
+             missing("brief_scale", "一把尺：現價／沒賭對／賭對／判斷錯了", price.reason or "無現價", authority=A_SNAP))
     light = Datum(key="brief_status_light", label="狀態燈",
                   value={"state": refresh_overall, "label": PLAIN_REFRESH_OVERALL.get(refresh_overall, refresh_overall)},
                   status="available", basis="deterministic", authority=A_REFRESH, as_of=reference_day,
@@ -1392,7 +1464,7 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
     overrides = [{**(d.dependencies or {}), "value": d.value, "unit": d.unit} for d in payoff.overrides]
     _para("bet", bet_paragraph(
         has_bet=payoff.payoff_return.is_known or bool(payoff.overrides), overrides=overrides,
-        bet_target=payoff.variant_fair_value.value, price=ir.current_price.value, payoff=payoff.payoff_return.value,
+        bet_target=payoff.scenario_fair_value.value, price=ir.current_price.value, payoff=payoff.payoff_return.value,
         eps_part=payoff.eps_contribution.value, multiple_part=payoff.multiple_contribution.value,
         currency=(ir.current_price.dependencies or {}).get("quote_unit") if ir.current_price.dependencies else None,
         driver_labels=PLAIN_DRIVER_LABELS),
@@ -1843,6 +1915,15 @@ def build_alpha_investment_view(
     variant_implied_return: ImpliedReturnResult | None = None,
     variant_reason: str | None = None,
     variant_absence_kind: str | None = None,
+    # D2（2026-09-18）：「判斷錯了值多少」——與 variant **同形**的五個參數。
+    # ⚠ 預設 `None` 在這裡是對的：它與 variant 一樣代表「這條鏈沒跑」，而
+    # `downside_reason`／`downside_absence_kind` 會把「為什麼沒跑」帶到 section 裡，
+    # 所以缺席不會被壓成一句「無資料」（L16：`absence_kind` 由產生缺席的那段自己宣告）。
+    downside_fundamental: FundamentalModelResult | None = None,
+    downside_valuation: ValuationResult | None = None,
+    downside_implied_return: ImpliedReturnResult | None = None,
+    downside_reason: str | None = None,
+    downside_absence_kind: str | None = None,
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
     narrative_context: Mapping[str, Any] | None = None,
@@ -2034,7 +2115,15 @@ def build_alpha_investment_view(
         base_fundamental=fundamental_model, base_valuation=valuation, base_implied_return=implied_return,
         reference_day=reference_day,
         reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
-        absence_kind=variant_absence_kind,
+        absence_kind=variant_absence_kind, copy=_VARIANT_COPY,
+    )
+    # D2：**同一個函式、同一套算術**，只換一張文案表。兩個 section 並排就是短評那把尺的兩端。
+    downside_section = _payoff_section(
+        downside_fundamental, downside_valuation, downside_implied_return, downside_reason,
+        base_fundamental=fundamental_model, base_valuation=valuation, base_implied_return=implied_return,
+        reference_day=reference_day,
+        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
+        absence_kind=downside_absence_kind, copy=_DOWNSIDE_COPY,
     )
 
     # ---- Evidence index：context ＋ 路徑／事件的引用，去重 -------------------
@@ -2930,21 +3019,15 @@ def build_alpha_investment_view(
     )
 
     # =======================================================================
-    # N. Downside（not_modeled）；implied return／entry logic 已於上方由 alpha.implied_return／alpha.entry 組裝
+    # N. Downside——2026-09-18（D2）起**已建模**：`downside_section` 在 payoff 旁邊就組好了，
+    #    走的是同一個 `_payoff_section`。implied return／entry logic 已於上方由
+    #    alpha.implied_return／alpha.entry 組裝。
     # =======================================================================
-    def _not_modeled_section(reason: str, items: Sequence[tuple[str, str]], confusions: Sequence[str]) -> NotModeledSection:
-        return NotModeledSection(
-            meta=SectionMeta(status="not_modeled", basis="none", reason=reason),
-            items=tuple(not_modeled(k, l, reason) for k, l in items),
-            not_to_be_confused_with=tuple(confusions),
-        )
-
-    downside_section = _not_modeled_section(
-        "系統不產生下檔估計：沒有 bear case 的數值、沒有最大回撤模型。",
-        (("downside", "下檔幅度"), ("max_drawdown_estimate", "最大回撤估計")),
-        ("scenarios.bear 是散文，不是下檔數字", "falsification 的條件是出場觸發，不是下檔幅度",
-         "entry_logic.entry_price 是門檻價不是下檔估計——現價高於它多少不是「會跌多少」"),
-    )
+    # ⚠ 這裡原本有一個區域函式 `_not_modeled_section(...)`，唯一的呼叫端就是下檔那一段
+    # （「系統不產生下檔估計：沒有 bear case 的數值、沒有最大回撤模型。」）。D2 定案後那句話
+    # 已經是假的，所以**連同那段程式碼一起移除**——留著一個沒有呼叫端的產生器，下一個人
+    # 會以為下檔還走它。`NotModeledSection` 型別本身留在 contracts 給真正沒有能力的東西用。
+    # 舊語意的去向：「不是 bear case」「不是出場訊號」進了 `DOWNSIDE_IS_NOT`，由 section 帶著走。
 
     # =======================================================================
     # O. Evidence / Provenance
@@ -3075,7 +3158,7 @@ def build_alpha_investment_view(
         warnings.append(PAYOFF_EPISTEMIC_WARNING)
     reached = target_reached(price=implied_return_section.current_price.value,
                              base_target=implied_return_section.fair_value.value,
-                             bet_target=payoff_section.variant_fair_value.value)
+                             bet_target=payoff_section.scenario_fair_value.value)
     implied_return_section = _dc_replace(implied_return_section, target_reached=(
         Datum(key="target_reached", label="目標價到了沒（到達＝該重看要不要收割）", value=reached, status="available",
               basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day, method=reached["rule"],
@@ -3092,7 +3175,8 @@ def build_alpha_investment_view(
     brief_section = _investor_brief_section(
         brief_records, brief_parse_errors, as_of=context.as_of, today=today, reference_day=reference_day,
         ir=implied_return_section, payoff=payoff_section, consensus=consensus_section, catalysts=catalyst_section,
-        bridge=earnings_bridge_section, refresh_overall=refresh_section.overall, gap=expectation_gap_section)
+        bridge=earnings_bridge_section, refresh_overall=refresh_section.overall, gap=expectation_gap_section,
+        downside=downside_section)
 
     return AlphaInvestmentView(
         schema_version=SCHEMA_VERSION,

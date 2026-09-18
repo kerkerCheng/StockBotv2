@@ -137,6 +137,9 @@ CAP_ANALYTICAL_ENTRY_THRESHOLD = "analytical_entry_threshold_v1"
 #: 橋／估值／報酬算術，得到「如果我們的差異看法對了」的 fair value 與對現價的隱含報酬（payoff）。
 #: 它**不是** bull case、不是機率加權、不是預測；每條 variant 假設都必須指得出 supporting 證據。
 CAP_VARIANT_PAYOFF = "variant_scenario_payoff_v1"
+#: 2026-09-18（D2）：「判斷錯了值多少」——反證成真時的假設套**同一條橋**。與賭注對稱：
+#: 同一個 section 型別、同一套算術、同樣的型別層證據要求，只有假設的值往另一邊。
+CAP_DOWNSIDE_OVERLAY = "downside_scenario_overlay_v1"
 #: 2026-09-15：投資人短評——七格前因後果，文字由 session 寫（append-only ledger）、數字由 authority 填。
 CAP_INVESTOR_BRIEF = "investor_brief_v1"
 #: 2026-09-15：論證層——六段分析師報告體。算術與圖的敘述由封閉句型組；判斷的長文照抄 session 寫的。
@@ -658,21 +661,31 @@ class ImpliedReturnSection:
 
 @dataclass(frozen=True, slots=True)
 class PayoffScenarioSection:
-    """賭注（V0，2026-09-15）：**只消費** variant scenario 那條鏈（fundamental／valuation／implied_return
-    各對 variant 跑一次，**同一套算術**）的輸出；builder 不算任何數。
+    """一個 **overlay scenario** 的結果：**只消費**該 scenario 那條鏈（fundamental／valuation／
+    implied_return 各對它跑一次，**同一套算術**）的輸出；builder 不算任何數。
 
-    - `overrides`：實際覆蓋了 base 的那幾條 variant 假設（營運＋估值），每條帶 `base_value` 供對照。
-    - `variant_fair_value`／`payoff_return`／`annualized_payoff_return`／兩桿拆解：照抄 variant 的 implied return。
-    - `base_fair_value`／`base_price_return`：照抄 base，讓兩個目標價並排——差額就是這個賭注的價值。
-    - 沒有任何 variant 紀錄 → 整段 `missing`＋`not_yet_recorded`（賭注還沒寫，不是 0）。
-    - `is_not`：不是機率加權、不是預測、不是尺寸、不是 base 的替代。
+    兩個 scenario 共用這一個型別（`scenario` Datum 說明是哪一個）：
+    - `variant`＝**賭注**「如果我們的差異看法對了」（V0，2026-09-15）
+    - `downside`＝**判斷錯了值多少**「如果反證成真」（D2，2026-09-18）
+
+    ⚠ **一個型別、兩個實例，不是一個實例承載兩種語意**：欄位名因此是中性的
+    （`scenario_fair_value` 而非 `variant_fair_value`），而每個實例的 `Datum.key` 各自帶
+    自己的前綴（`variant_fair_value`／`downside_fair_value`）。2026-09-18 之前欄位名寫死
+    `variant_*`，若直接拿來裝 downside 的值，序列化出去的 JSON key 就會宣稱那是 variant
+    的值——下游只能二選一而兩邊都錯（L12）。
+
+    - `overrides`：實際覆蓋了 base 的那幾條該 scenario 假設（營運＋估值），每條帶 `base_value` 供對照。
+    - `scenario_fair_value`／`payoff_return`／`annualized_payoff_return`／兩桿拆解：照抄該 scenario 的 implied return。
+    - `base_fair_value`／`base_price_return`：照抄 base，讓兩個目標價並排——差額就是這個 overlay 的價值。
+    - 沒有任何該 scenario 的紀錄 → 整段 `missing`＋`not_yet_recorded`（還沒寫，不是 0）。
+    - `is_not`：不是機率加權、不是預測、不是尺寸、不是 base 的替代。**downside 尤其不是 bear case。**
     """
 
     meta: SectionMeta
-    scenario: Datum                            # {"scenario": "variant", 覆蓋計數}
+    scenario: Datum                            # {"scenario": "variant"／"downside", 覆蓋計數}
     overrides: tuple[Datum, ...]
-    variant_internal_eps: Datum
-    variant_fair_value: Datum
+    scenario_internal_eps: Datum
+    scenario_fair_value: Datum
     value_date: Datum
     payoff_return: Datum
     annualized_payoff_return: Datum
@@ -753,7 +766,13 @@ class EntryLogicSection:
 
 @dataclass(frozen=True, slots=True)
 class NotModeledSection:
-    """downside 的形狀（entry_logic 自 2026-09-06 Step 3 起有自己的 section）：全 not_modeled，附「不是什麼」。"""
+    """「這個能力系統沒有」的形狀：全 `not_modeled`，附「不要跟什麼混淆」。
+
+    ⚠ 2026-09-18（D2）起 **`downside` 不再用它**——下檔已經建模，它是 `PayoffScenarioSection`。
+    本型別保留給真正沒有能力的東西；用它之前先問一次：**這是「沒有這個能力」還是
+    「有能力但這一檔還沒人寫」？** 後者要用 `missing`＋`not_yet_recorded`，因為兩者的
+    下一步完全不同——`not_modeled` 沒有人該去補，`missing` 有。
+    """
 
     meta: SectionMeta
     items: tuple[Datum, ...]
@@ -887,7 +906,10 @@ class AlphaInvestmentView:
     scenarios: ScenarioSection
     valuation: ValuationSection
     implied_return: ImpliedReturnSection
-    downside: NotModeledSection
+    #: D2（2026-09-18）：由 `NotModeledSection` 換成與賭注**對稱**的 overlay。
+    #: 舊語意「系統不產生下檔估計」已作廢——現在它是「反證成真時的假設套同一條橋」，
+    #: 仍然不是 bear case、沒有機率加權。
+    downside: PayoffScenarioSection
     entry_logic: EntryLogicSection
     evidence: EvidenceSection
     freshness: tuple[FreshnessItem, ...]
@@ -949,6 +971,7 @@ def _jsonable(obj: Any) -> Any:
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
     "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection", "CAP_VARIANT_PAYOFF", "PayoffScenarioSection",
+    "CAP_DOWNSIDE_OVERLAY",
     "CAP_INVESTOR_BRIEF", "InvestorBriefSection", "CAP_ARGUMENT", "ArgumentSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
     "CAP_NARRATIVE_SCENARIOS", "ValuationSection",

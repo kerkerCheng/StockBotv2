@@ -284,7 +284,7 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 | valuation | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／`value_date`／現價／gap 分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing`；估值假設未宣告時點語意時 `value_date`＝`missing` |
 | implied_return | **`alpha/implied_return`**（§6.5）：現價 ＋ fair value 時點語意 ＋ 明示 horizon | `deterministic`（capability `base_case_implied_return_v1`）；`price_return`／`annualized_price_return` 確定性、`horizon` 與 `value_date` 是判斷、`total_return`／`probability_weighted_return` **`not_modeled`**；四個輸入缺一＝`missing`；每次列 `is_not` |
 | entry_logic | **`alpha/entry`**（§6.6）：implied return ＋ **明示的要求報酬判準**（`investor_policy`） | `deterministic`（capability `analytical_entry_threshold_v1`）；`entry_price`／`price_to_entry_gap`／`hurdle_comparison` 確定性、`required_annualized_return` 是**投資人政策**（新 basis `investor_policy`）；沒有判準＝`missing`＋「缺投資門檻判斷，不是 ETL 缺口」；alignment 不對齊＝`review_required`；每次列 `is_not`（**不是 buy／sell、不是部位、不是資本許可**） |
-| downside | — | **`not_modeled`**，並列出「不要跟什麼混淆」（賣方目標價、市場隱含成長、排序名次、**fair value gap**、**implied return**、**entry price**） |
+| downside | alpha://assumptions（`scenario=downside`） | ~~**`not_modeled`**，並列出「不要跟什麼混淆」~~（2026-09-18 D2 交付）：與賭注**對稱**的 overlay——反證成真時的假設套同一條橋。沒寫是 `missing`＋`not_yet_recorded`（有能力、還沒人寫），**不再是 `not_modeled`**；「不是什麼」由 `DOWNSIDE_IS_NOT` 帶著走（不是 bear case／不是機率加權／不是停損線／不是尺寸） |
 | evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
 
 **as-of 視角的邊界（2026-09-05 Phase 1.1 定案）：** 三種來源三種處置，判準是「authority
@@ -850,7 +850,18 @@ PayoffScenarioSection（read model 第 13d 節）→ AnalystView.bet（optional 
 4. **它是條件句，不是機率加權**：沒有 bull／bear、沒有機率；`PAYOFF_IS_NOT` 逐字寫在 section 裡。
    沒寫賭注是 optional 缺席（`not_yet_recorded`），readiness 不變差，也不得補一個 bull case。
    ⚠ 2026-09-16 D2：多一個**對稱** overlay——「判斷錯了值多少」＝反證觸發後的假設套同一條橋（同一套算術、
-   同樣的型別層證據要求），與 variant 並排；它**仍不是 bear case、仍沒有機率**。落地是 ROADMAP Phase 5。
+   同樣的型別層證據要求），與 variant 並排；它**仍不是 bear case、仍沒有機率**。
+   **2026-09-18 已交付**：`ASSUMPTION_SCENARIOS` 加第三個值 `downside`，`OVERLAY_SCENARIOS`
+   ＝`(variant, downside)`，上面四條規則**逐條套用到兩者**（型別層的三條由
+   `OperatingAssumption`／`ValuationAssumption` 共同強制）。
+   落地點：`_payoff_section(copy=...)` 一個函式兩個實例、`_overlay_panel()` 一組 lines 兩個 panel、
+   read model 的 `downside` 由 `NotModeledSection` 換成 `PayoffScenarioSection`、
+   APP 結論卡與尺各多一端。⚠ **`PayoffScenarioSection` 的欄位名因此改成中性的
+   `scenario_internal_eps`／`scenario_fair_value`**——欄位名是結構、`Datum.key` 才是身分，
+   兩者脫鉤，所以 analyst view 的 line key（`variant_fair_value` 等）與 APP 一個字都沒動。
+   ⚠ **刻意不強制 downside 假設指名某一條 disproof**：反證住在 `AlphaSignal.disproof_conditions`
+   （A3，可重算、沒有穩定 id），從 append-only 的假設 ledger 指過去會造出一個會斷的跨 authority
+   引用。要求「指得出什麼在支撐這個值」的閘門由 `supporting_refs` 承擔——它是同一件事的可機械驗證版本。
 
 **為什麼不做成第二本 ledger：** 賭注就是「同一條假設的另一個值」，它的身分（driver／scope／period）與 base 完全相同，
 差的只有值與證據；分成兩本會讓 as-of／supersede／證據解析長出兩份規則（L16）。Abstention 分開是因為它**結構上不能帶值**；

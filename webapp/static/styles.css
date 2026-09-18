@@ -351,6 +351,9 @@ table.rank.compare td:first-child { color: var(--muted); }
 .pt-base { fill: #868e96; }
 .pt-bet { fill: #1c7ed6; }
 .pt-street { fill: #7048e8; }
+/* D2（2026-09-18）：尺的另一端。刻意用暖色而非紅色——它是「反證成真時值多少」的
+   條件句，不是警示燈；紅色會被讀成「該賣了」，而出場只認反證（D3）。 */
+.pt-downside { fill: #e8590c; }
 .scale-text { font-size: 30px; fill: var(--fg, currentColor); font-variant-numeric: tabular-nums; }
 .text-range { fill: var(--dim); font-size: 26px; }
 .text-now { font-weight: 700; }
@@ -359,6 +362,7 @@ table.rank.compare td:first-child { color: var(--muted); }
 .scale-key { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; background: var(--dim); }
 .scale-key.pt-now { background: #d9480f; } .scale-key.pt-base { background: #868e96; }
 .scale-key.pt-bet { background: #1c7ed6; } .scale-key.pt-street { background: #7048e8; }
+.scale-key.pt-downside { background: #e8590c; }
 .scale-name { font-size: .92rem; }
 .scale-val { font-weight: 600; font-variant-numeric: tabular-nums; }
 .scale-sub { color: var(--muted); font-size: .85rem; }

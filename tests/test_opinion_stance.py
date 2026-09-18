@@ -152,8 +152,16 @@ def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
     # V0（2026-09-15）：賭注區塊也共用同一段——variant 的 derivation 型別層強制 independent，
     # 所以那一格傳的是明示的 null stance（沒有「共識反解」這種賭注），不是漏掉判斷。
     # 2026-09-15 再加基本數字列（numbersStrip）：兩個報酬格都走同一段——1 定義 + 6 呼叫
-    assert source.count("appendReturnBlock") == 7, "有 surface 沒有共用那段判斷"
-    assert "betBlock(view)" in source and "numbersStrip(view)" in source
+    # D2（2026-09-18）：基本數字列多一處「判斷錯了，要漲跌多少」，7 → 8。
+    # ⚠ 計數本身不是判準——判準是「每個印隱含報酬的 surface 都走同一個 helper」。
+    # 這個數字變大只有在**新 surface 也用了 helper** 時才該更新；若哪天有人手寫一段
+    # 報酬渲染，計數不會變，而這條測試也抓不到它（已知限制，寫在這裡而不是假裝它守得住）。
+    assert source.count("appendReturnBlock") == 8, "有 surface 沒有共用那段判斷"
+    # D2（2026-09-18）：`betBlock` 參數化成「一個 overlay 區塊」，賭注與下檔各傳一份文案表。
+    # 兩邊都必須出現——少一邊就代表那一端的數字沒有畫面。
+    assert "betBlock(view, OVERLAY_BLOCKS.bet)" in source
+    assert "betBlock(view, OVERLAY_BLOCKS.downside)" in source
+    assert "numbersStrip(view)" in source
     # 列表卡片要看得到 stance，否則 ready 會被讀成「有結論」
     assert "stanceBadge(cardStance)" in source
     # 解釋的那句話要跟大數字在同一張卡
