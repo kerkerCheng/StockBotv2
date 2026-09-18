@@ -225,8 +225,8 @@
     },
     {
       "id": "amat_10_q_20260219_e2",
-      "src_id": "tech:semiconductor_manufacturing_equipment",
-      "dst_id": "tech:foundry_logic",
+      "src_id": "tech:foundry_logic",
+      "dst_id": "tech:semiconductor_manufacturing_equipment",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,
@@ -236,8 +236,8 @@
     },
     {
       "id": "amat_10_q_20260219_e3",
-      "src_id": "tech:semiconductor_manufacturing_equipment",
-      "dst_id": "tech:dram_technology",
+      "src_id": "tech:dram_technology",
+      "dst_id": "tech:semiconductor_manufacturing_equipment",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,
@@ -247,8 +247,8 @@
     },
     {
       "id": "amat_10_q_20260219_e4",
-      "src_id": "tech:semiconductor_manufacturing_equipment",
-      "dst_id": "tech:nand_technology",
+      "src_id": "tech:nand_technology",
+      "dst_id": "tech:semiconductor_manufacturing_equipment",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,

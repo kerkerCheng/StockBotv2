@@ -147,7 +147,7 @@
       "confidence": 0.8,
       "dst_id": "tech:chip_to_chip_optical",
       "id": "e9",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "poet_6_k_20260813_s9"
       ],
@@ -156,13 +156,13 @@
     {
       "attributes": {},
       "confidence": 0.8,
-      "dst_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:chip_to_chip_optical",
       "id": "e10",
       "relation": "enables",
       "source_ids": [
         "poet_6_k_20260813_s9"
       ],
-      "src_id": "tech:chip_to_chip_optical"
+      "src_id": "tech:ai_compute_buildout"
     }
   ],
   "nodes": [

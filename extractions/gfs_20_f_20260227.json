@@ -348,17 +348,6 @@
     {
       "attributes": {},
       "confidence": 0.9,
-      "dst_id": "co:globalfoundries",
-      "id": "gfs_20_f_20260227_e20",
-      "relation": "enables",
-      "source_ids": [
-        "gfs_20_f_20260227_s14"
-      ],
-      "src_id": "tech:semiconductor_manufacturing_equipment"
-    },
-    {
-      "attributes": {},
-      "confidence": 0.9,
       "dst_id": "tech:essential_chips_mature_node",
       "id": "gfs_20_f_20260227_e21",
       "relation": "is_component_of",

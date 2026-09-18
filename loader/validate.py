@@ -170,13 +170,11 @@ def validate(doc_path: str) -> list[str]:
     # ⚠ **例外清單就是那個常駐計數器**（L14：防呆要會自己出現，不是要人讀的段落）。
     # 它只能縮不能長：pq2 **[607]** 逐條重判完成後這裡應該清空，清空前新文件照擋。
     # 加一筆進來要改這個檔，所以它不會安靜長大。
-    _KNOWN_ENABLES_CONTRADICTIONS = {
-        # doc_id: 已知的矛盾對，等 [607] 重判後移除
-        "coherent_q2fy26_cpo": {("tech:ai_switch", "tech:cpo"), ("tech:cpo", "tech:ai_switch")},
-        "gfs_20_f_20260227": {
-            ("tech:semiconductor_manufacturing_equipment", "co:globalfoundries")
-        },
-    }
+    # ✅ **2026-09-18 已清空**：pq2 [607]／[608] 把那兩份的矛盾邊改掉之後，
+    # 全庫掃描命中 0 條。這個清單存在的意義就是走到這一格——**它只能縮不能長**，
+    # 現在它縮到零了，於是從今天起任何文件犯同樣的錯都是硬擋、沒有豁免。
+    # ⚠ 要再加一筆進來必須改這個檔，所以它不會安靜長大。
+    _KNOWN_ENABLES_CONTRADICTIONS: dict[str, set[tuple[str, str]]] = {}
     _doc_id = str((doc.get("source_doc") or {}).get("doc_id") or "")
     _grandfathered = _KNOWN_ENABLES_CONTRADICTIONS.get(_doc_id, frozenset())
     _triples = {

@@ -78,18 +78,27 @@ def test_the_legitimate_coexistence_is_not_flagged(tmp_path: Path) -> None:
     assert errs == [], f"合法共存不得被抓：{errs}"
 
 
-def test_known_existing_contradictions_are_warn_not_hard_fail() -> None:
-    """例外清單就是那個常駐計數器：它只能縮不能長，且新文件不受它保護。
+def test_the_grandfather_list_is_empty_and_the_corpus_is_clean() -> None:
+    """例外清單是個**常駐計數器**，它的出口是歸零——而 2026-09-18 它到了。
 
-    既有的 2 份必須降級成 WARN（否則任何人重跑 validate 都會被既有資料擋住），
-    但**同樣的錯出現在別的 doc_id 上時必須照擋**——這確保清單不是一張免死金牌。
+    設立時它有兩筆（`coherent_q2fy26_cpo` 的 `ai_switch ⇄ cpo` 雙向、
+    `gfs_20_f_20260227` 的 `sme enables globalfoundries` 與 `globalfoundries depends_on sme`
+    並存）。pq2 [607]／[608] 把那些邊改掉之後，全庫 239 份掃描命中 **0 條**。
+
+    ⚠ 本測試鎖兩件事：①清單確實空了——所以從今天起沒有任何文件享有豁免；
+    ②既有語料乾淨——**若有人日後又載進一條矛盾邊，這裡會紅**，而不是靜悄悄多一筆豁免。
     """
-    repo = Path(__file__).resolve().parent.parent
-    for doc_id in ("coherent_q2fy26_cpo", "gfs_20_f_20260227"):
-        path = repo / "extractions" / f"{doc_id}.json"
-        if not path.exists():           # 資料被重判掉之後這個測試自然不再適用
-            continue
-        errs = [e for e in validate(str(path)) if "因果相反" in e]
-        assert errs, f"{doc_id} 應該仍被偵測到（等 [607] 重判）"
-        assert all(e.startswith("WARN") for e in errs), f"{doc_id} 應降級成 WARN：{errs}"
-        assert all("[607]" in e for e in errs), "WARN 必須指得回那個編號，否則沒有出口"
+    from loader.validate import validate
+
+    from pathlib import Path as _P
+    import inspect
+    import loader.validate as _v
+
+    source = inspect.getsource(_v.validate)
+    assert "_KNOWN_ENABLES_CONTRADICTIONS: dict[str, set[tuple[str, str]]] = {}" in source, (
+        "例外清單不得再長出新條目——要加得先解釋為什麼那筆不能直接修掉")
+
+    root = _P(__file__).resolve().parent.parent / "extractions"
+    hits = [(f.name, e) for f in sorted(root.glob("*.json"))
+            for e in validate(str(f)) if "因果相反" in e]
+    assert hits == [], f"語料裡又出現 enables 方向矛盾：{hits[:3]}"

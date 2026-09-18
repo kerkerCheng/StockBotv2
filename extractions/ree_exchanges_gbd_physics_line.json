@@ -18,14 +18,14 @@
     {
       "attributes": {},
       "confidence": 0.85,
-      "dst_id": "mat:rare_earth_magnets",
+      "dst_id": "tech:grain_boundary_diffusion",
       "id": "e1",
-      "relation": "enables",
+      "relation": "depends_on",
       "source_ids": [
         "ree_exchanges_gbd_physics_line_s1",
         "ree_exchanges_gbd_physics_line_s2"
       ],
-      "src_id": "tech:grain_boundary_diffusion"
+      "src_id": "mat:rare_earth_magnets"
     }
   ],
   "nodes": [

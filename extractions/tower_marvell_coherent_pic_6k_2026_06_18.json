@@ -45,7 +45,7 @@
       "confidence": 0.75,
       "dst_id": "tech:dci_transceiver",
       "id": "e3",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "tower_marvell_coherent_pic_6k_2026_06_18_s3"
       ],

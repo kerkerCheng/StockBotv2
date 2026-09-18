@@ -81,7 +81,7 @@
       "confidence": 0.9,
       "dst_id": "tech:ocs",
       "id": "e4",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "google_apollo_ocs_2022_s8",
         "google_apollo_ocs_2022_s3"

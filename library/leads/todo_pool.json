@@ -10288,9 +10288,10 @@
       "hint": "來自 pq2 [607] 的重判結果，packet 全文在 library/private/alpha/enables_rejudge/packet.md，逐條判決在同目錄 classification.json。本號是三批裡風險最低的一批：**relation 型別完全不變**，只做刪除與方向翻轉。\n內容：①**刪 2 條**——`tech:cpo enables tech:ai_switch`（逐字證據全部在說反方向「CPO 的成長由 scale-up 帶動」，且 `tech:cpo is_component_of tech:ai_switch` 已在圖裡承載同一件事）、`tech:semiconductor_manufacturing_equipment enables co:globalfoundries`（逐字是 GF 20-F 自己寫的「Our operations... depend on our ability to obtain... manufacturing equipment」＝依賴，且 `co:globalfoundries depends_on tech:sme` 已在圖裡）。②**翻方向 10 條**（`A enables B` → `B enables A`，relation 不變）：prod:1_6t_dr4_transceiver／tech:chip_to_chip_optical → tech:ai_compute_buildout；tech:deposition_etch_clean → tech:dram_manufacturing、tech:nand；tech:semiconductor_manufacturing_equipment → tech:dram_technology、tech:foundry_logic、tech:nand；prod:amat_semiconductor_systems → tech:dram、tech:foundry_logic_advanced、tech:nand。這 10 條的逐字都是「客戶／市場的支出拉動設備需求」，方向與圖裡寫的相反（例：「Memory customers' spending... higher... due to increased customer investments in DRAM technology transitions」）。\n⚠ 節點 id 對映（入圖必須用圖裡的 id）：抽取檔的 tech:nand_flash／nand_production／nand_technology 在圖裡都是 tech:nand；dram_production 是 dram_manufacturing。\n排序影響（實測）：母體 222 → 224（+2 列）、**accepted 37 列 0 列變**。\n⚠ 本號**不**授權改 `query/bottleneck.py` 的走訪方向——那是開發項（ROADMAP Phase 4），而且必須等三批資料全部入圖之後才能做。只改程式不改資料會把「沒有需求邊」由 51 打到 67（實測）。",
       "n": 608,
       "reason": null,
+      "receipt": "authority:graph_migration;ref:loader/migrate_enables_rejudge_20260918.py",
       "ref_id": "manual:608",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-18T10:48:00.917533+00:00",
       "source": "manual",
       "title": "enables 重判入圖（一之二）：刪 2 條重複＋翻 10 條方向，relation 型別不變",
       "type": "manual"
@@ -10300,9 +10301,10 @@
       "hint": "來自 pq2 [607] 的重判結果，packet 全文在 library/private/alpha/enables_rejudge/packet.md，逐條判決在同目錄 classification.json。本號是三批裡唯一**改 relation 型別**的一批，所以與機械那批分開核准。\n內容：**17 條改型別**。①改成 `A is_component_of B`（14 條，逐字都是「A 是 B 裡的零件／投入」）：prod:aaoi_400mw_narrow_linewidth_pump_laser→tech:cpo（light source for CPO）、prod:els_8ch_module→tech:cpo、prod:gf_scale→tech:cpo、prod:poet_optical_engine→tech:chip_to_chip_optical、prod:quantum_x_photonics→tech:scale_out_cpo、tech:coherent_pic→tech:dci_transceiver、tech:optical_circulator→tech:ocs（「we employ circulators to realize bidirectional links through the OCS」）、tech:ndfeb_metal_alloy→mat:rare_earth_magnets（「NdFeB alloy flake, a key precursor product... material feedstock for magnet manufacturing」）、tech:narrow_linewidth_laser→tech:scale_across、tech:pump_laser→tech:scale_across、tech:tfln_platform→tech:pluggable_transceiver、tech:poet_optical_interposer→tech:light_source_chip_to_chip、prod:reliant_product_line→tech:non_leading_edge_fab、prod:digit→tech:logistics_tote_transfer。②改成 `B depends_on A`（3 條，逐字是「B 沒有 A 做不出來」）：tech:cpo_packaging_assembly→tech:scale_out_cpo、tech:wafer_level_photonic_integration→tech:poet_optical_interposer、tech:grain_boundary_diffusion→mat:rare_earth_magnets。\n⚠ **`depends_on` 會讓那條邊進入排序母體並開始需要 `substitutability`**（`is_component_of` 不會）。實測影響上界：母體 222 → 224、accepted 37 列 0 列變；這 3 條入圖後會以 `substitutability_unfilled` 出現在 filtered——**那是誠實的新研究缺口，不是退步**。\n⚠ 本號**不**授權改走訪方向（開發項，等三批資料全部入圖）。",
       "n": 609,
       "reason": null,
+      "receipt": "authority:graph_migration;ref:loader/migrate_enables_rejudge_20260918.py",
       "ref_id": "manual:609",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-18T10:48:01.096392+00:00",
       "source": "manual",
       "title": "enables 重判入圖（二之二）：17 條改 relation 型別（14 is_component_of＋3 depends_on）",
       "type": "manual"
@@ -10312,9 +10314,10 @@
       "hint": "來自 pq2 [606] 的查證結果，packet 全文在 library/private/alpha/enables_rejudge/packet_606.md。⚠ **[606] 原本的診斷 6 個節點「沒有人記錄過誰需要它」，查完之後一個都不成立**：3 個先前已由成因分類排除（走訪方向／上游斷點），剩下 3 個查一手後發現 2 個是既有資料本身錯了、1 個是問題答不出來。本號只入那 2 個更正。\n①**`tech:external_laser_source is_component_of tech:isolator` → 翻成 `tech:isolator is_component_of tech:external_laser_source`**。既有那條邊的逐字（coherent_ofc_march25）只是列舉 Coherent 做的兩樣東西：「The external laser source... that has our CW laser in it... We also... design and manufacture a significant fraction of the world's isolator」——**完全沒說哪個是哪個的元件，關係是抽取時從類別詞推出來的（L6-③ 幻覺型態）**。正確方向有 tier-1 逐字兩處（coherent_q3fy26_cpo）：「Within that external laser source, we provide all of the ingredients, not just the laser, but **the isolators**, the thermoelectric coolers」與「if you look at the external laser source... But **within that**... not just the laser, but **the isolators**」。實測影響：tech:isolator 由走不到錨變成 tech:ai_switch → tech:cpo → tech:external_laser_source → tech:isolator（3 跳），no_demand_edge 51 → 50。\n②**`tech:inp_eml` 併入 `tech:eml`（節點合併，2 條邊改指）**。兩個節點同一家公司來源、同 abstraction_level=device_chip、都 depends_on mat:inp_substrate、都由 co:coherent supplies_to；name 是「Indium Phosphide EML」vs「Electro-absorption Modulated Laser (EML)」，alias 是 ['InP EML','EML laser'] vs ['EML']——互相涵蓋。兩份抽取隔了一季，第二份沒認出第一份已建過（L6-② 跨文件命名空間分岔的變體）。⚠ **實測影響今天 0 變**：tech:eml 自己也走不到錨（上游 cloud_transceiver／cloud_transceiver_1_6t 正是被 enables 方向卡住的節點），要等 [608][609] 入圖並改完走訪方向才通。**本項價值是去掉重複節點，不得當成進展。**\n⚠ **不入圖的第三個**：co:lumilens 的一手（POET 6-K 與 Q2 MD&A，皆 SEC filing）只說 Lumilens 向 POET 下 $50M 採購單、五年可能 $500M+、用途寫「frontier AI infrastructure」，**沒有具名 Lumilens 的客戶**。依 L6-③ 不得從類別詞推具體實體，故不提案任何邊。⚠ 但值得單獨看：那張採購單是 POET 單季營收（$503,389）的約 99 倍，而對手方在公開資料上幾乎查不到——**Lumilens 是誰、錢從哪來、賣給誰，是一個投資判斷上的未解問題**，建議另立研究項。",
       "n": 610,
       "reason": null,
+      "receipt": "authority:graph_migration;ref:loader/migrate_enables_rejudge_20260918.py",
       "ref_id": "manual:610",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-18T10:48:01.302374+00:00",
       "source": "manual",
       "title": "[606] 查證入圖：isolator 方向翻轉＋inp_eml 併入 eml（原診斷 6 個全部不成立）",
       "type": "manual"
@@ -22166,6 +22169,33 @@
       "reason": null,
       "receipt": "authority:research_packet;ref:library/private/alpha/enables_rejudge/packet_606.md",
       "ref_id": "docs/ROADMAP.md#phase-4-成因③",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-18T10:48:00.917533+00:00",
+      "n": 608,
+      "reason": null,
+      "receipt": "authority:graph_migration;ref:loader/migrate_enables_rejudge_20260918.py",
+      "ref_id": "manual:608",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-18T10:48:01.096392+00:00",
+      "n": 609,
+      "reason": null,
+      "receipt": "authority:graph_migration;ref:loader/migrate_enables_rejudge_20260918.py",
+      "ref_id": "manual:609",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-18T10:48:01.302374+00:00",
+      "n": 610,
+      "reason": null,
+      "receipt": "authority:graph_migration;ref:loader/migrate_enables_rejudge_20260918.py",
+      "ref_id": "manual:610",
       "type": "manual",
       "verb": "go"
     }

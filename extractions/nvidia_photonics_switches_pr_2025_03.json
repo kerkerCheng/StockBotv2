@@ -43,7 +43,7 @@
       "confidence": 0.85,
       "dst_id": "tech:scale_out_cpo",
       "id": "e3",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "nvidia_photonics_switches_pr_2025_03_s2",
         "nvidia_photonics_switches_pr_2025_03_s3"

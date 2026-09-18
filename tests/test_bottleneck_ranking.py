@@ -556,35 +556,32 @@ def test_anchor_gap_causes_are_separable_and_never_collapse_into_one_reason() ->
     edges = list(
         collapse_assertions(
             [
-                # ③真的沒有需求方邊：只有人供它，沒有人記錄過誰需要它。
+                # 真的沒有需求方邊：只有人供它，沒有人記錄過誰需要它。
                 _row("co:axt", "supplies_to", "tech:lonely", conf=0.5),
-                # ②有 enables 指向它，但走訪方向與抽取定義相反，所以需求沒傳上來。
-                _row("co:axt", "supplies_to", "tech:enabled", conf=0.5),
-                _row("tech:buildout", "enables", "tech:enabled", conf=0.5),
-                # ④有人需要它，但那個人自己也走不到錨。
+                # 有人需要它，但那個人自己也走不到錨。
                 _row("co:axt", "supplies_to", "tech:deadend", conf=0.5),
                 _row("tech:orphan", "depends_on", "tech:deadend", conf=0.5),
                 # 對照組：走得到錨的不該進母體。
                 _row("co:axt", "supplies_to", "tech:reachable", conf=0.5),
                 _row("tech:reachable", "is_component_of", "tech:ai_switch", conf=0.5),
+                # 對照組二：有 enables 指向它就有上游——**這一種已經不可能再出現**
+                # （2026-09-18 資料歸位＋程式歸位後，`X enables N` ⇒ upward[N] += X）。
+                _row("co:axt", "supplies_to", "tech:enabled", conf=0.5),
+                _row("tech:ai_switch", "enables", "tech:enabled", conf=0.5),
             ]
         ).values()
     )
     gaps = classify_anchor_gaps(edges, build_upward_index(edges))
 
-    assert gaps["counts"] == {
-        "no_demand_edge": 1,
-        "enables_direction_unresolved": 1,
-        "upstream_dead_end": 1,
-    }
-    assert gaps["without_anchor"] == 3, "走得到錨的 tech:reachable 不得被算進來"
-    assert sum(gaps["counts"].values()) == gaps["without_anchor"], "三種成因必須互斥且窮盡"
+    assert gaps["counts"] == {"no_demand_edge": 1, "upstream_dead_end": 1}
+    assert gaps["without_anchor"] == 2, "走得到錨的兩個對照組不得被算進來"
+    assert sum(gaps["counts"].values()) == gaps["without_anchor"], "成因必須互斥且窮盡"
 
     where = {n["node"]: cause for cause, v in gaps["nodes"].items() for n in v}
     assert where["tech:lonely"] == "no_demand_edge"
-    assert where["tech:enabled"] == "enables_direction_unresolved"
     assert where["tech:deadend"] == "upstream_dead_end"
     assert "tech:reachable" not in where
+    assert "tech:enabled" not in where, "有 enables 指向它就走得到上游"
 
     # 封閉字彙：計數的 key 不得長出字彙以外的值。
     assert set(gaps["counts"]) <= set(ANCHOR_GAP_CAUSES)
@@ -647,3 +644,33 @@ def test_anchor_gap_section_prints_even_when_nothing_is_missing() -> None:
     )
     assert empty["anchor_gaps"]["population"] == 0
     assert "瓶頸節點走不到需求錨" not in render_markdown(empty)
+
+
+def test_enables_carries_demand_from_the_adopter_to_what_it_pulls_in() -> None:
+    """`A enables B` ⇒ **B 被 A 需要**，需求沿 dst → src 上傳。
+
+    抽取 prompt 的逐字定義是 `enables` — **A's adoption drives demand for B**，
+    而 2026-09-18 之前 `build_upward_index` 把它放在 `UPSTREAM_RELATIONS`
+    （`upward[src].add(dst)` ＝ A 被 B 需要）——**方向相反**。
+    圖裡兩種寫法並存，而程式實作了沒寫下來的那一種，於是**兩個錯互相抵銷、長期沒人發現**。
+
+    ⚠ 順序不可換，這條測試守的就是修完之後的那一半：資料先由 pq2 [607]／[608]／[609]
+    逐條對來源逐字重判改正（29 條），程式才翻方向。只翻程式不改資料，實測
+    `no_demand_edge` 會由 51 打到 67（把「誰需要它」的答案弄丟）。
+    """
+    from query.bottleneck import DEMAND_PULL_RELATIONS, UPSTREAM_RELATIONS
+
+    assert "enables" in DEMAND_PULL_RELATIONS
+    assert "enables" not in UPSTREAM_RELATIONS, "它與 is_component_of 方向相反，不得同表"
+
+    edges = list(
+        collapse_assertions([
+            _row("tech:ai_switch", "enables", "tech:cpo", conf=0.9),
+            _row("co:axt", "supplies_to", "tech:cpo", conf=0.9, attrs={"substitutability": 5}),
+        ]).values()
+    )
+    upward = build_upward_index(edges)
+    # dst → src：CPO 被 AI switch 需要（AI switch 的採用把 CPO 的需求拉過來）
+    assert upward["tech:cpo"] == {"tech:ai_switch"}
+    assert "tech:cpo" not in upward.get("tech:ai_switch", set())
+    assert demand_chain("co:axt", upward) == ["tech:ai_switch", "tech:cpo", "co:axt"]

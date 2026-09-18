@@ -178,7 +178,7 @@
       "id": "e5",
       "src_id": "prod:els_8ch_module",
       "dst_id": "tech:cpo",
-      "relation": "enables",
+      "relation": "is_component_of",
       "attributes": {},
       "confidence": 0.65,
       "source_ids": [

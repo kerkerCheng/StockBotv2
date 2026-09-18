@@ -633,7 +633,7 @@
       "id": "e17",
       "src_id": "tech:tfln_platform",
       "dst_id": "tech:pluggable_transceiver",
-      "relation": "enables",
+      "relation": "is_component_of",
       "attributes": {},
       "confidence": 0.85,
       "source_ids": [

@@ -43,10 +43,12 @@
     "tech:eml": {
       "name": "Electro-absorption Modulated Laser (EML)",
       "aliases": [
-        "tech:eml_laser"
+        "tech:eml_laser",
+        "tech:inp_eml"
       ],
-      "basis": "name_identical",
-      "note": "兩個 id 的 name 逐字相同。tech:inp_eml 是 InP 材質特指，不併。"
+      "basis": "semantic_reviewed",
+      "note": "兩個 id 的 name 逐字相同（tech:eml_laser，basis=name_identical）。⚠ 原註記逐字是「tech:inp_eml 是 InP 材質特指，不併」——**2026-09-18 推翻並取代**，原句保留在此不刪。推翻的依據是那條邊自己的逐字（V1 讓它第一次走得到）：同一份 Coherent OFC 文件在一句話裡用兩個詞指同一個東西——「we're showing a 400G full-length demo with an indium phosphide EML. That's our own EML designed and manufactured in-house.」；另一句是 Coherent 自己的分類「all of the different laser technology that we have, the EML, the CW and the VCSEL lasers」——只有一個 EML 類別。⚠ 原註記本身是 L18 的實例：它是從 id 名稱推出來的，而沒有人去讀那句話（當時也讀不到——逐字在載入時就被丟掉了）。兩個節點另外還有：同 abstraction_level=device_chip、都 depends_on mat:inp_substrate、都由 co:coherent supplies_to，且 tech:inp_eml 的 alias 含「EML laser」——與已併入的 tech:eml_laser 同名。使用者 2026-09-18 在看過上述逐字後核准（[610]）。",
+      "approval_receipt": "todo:610"
     },
     "tech:nand": {
       "name": "NAND Flash Memory fabrication",

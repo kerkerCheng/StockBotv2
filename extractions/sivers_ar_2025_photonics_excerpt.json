@@ -194,7 +194,7 @@
       "confidence": 0.85,
       "dst_id": "tech:pluggable_transceiver",
       "id": "e9",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "sivers_ar_2025_photonics_excerpt_s11"
       ],

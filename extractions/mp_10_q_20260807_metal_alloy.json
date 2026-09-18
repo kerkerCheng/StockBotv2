@@ -33,7 +33,7 @@
       "confidence": 0.85,
       "dst_id": "mat:rare_earth_magnets",
       "id": "e2",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "mp_10_q_20260807_metal_alloy_s1"
       ],

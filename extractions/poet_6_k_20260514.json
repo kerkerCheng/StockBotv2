@@ -133,21 +133,21 @@
     {
       "attributes": {},
       "confidence": 0.85,
-      "dst_id": "tech:poet_optical_interposer",
+      "dst_id": "tech:wafer_level_photonic_integration",
       "id": "e10",
-      "relation": "enables",
+      "relation": "depends_on",
       "source_ids": [
         "poet_6_k_20260514_s8",
         "poet_6_k_20260514_s6"
       ],
-      "src_id": "tech:wafer_level_photonic_integration"
+      "src_id": "tech:poet_optical_interposer"
     },
     {
       "attributes": {},
       "confidence": 0.75,
       "dst_id": "tech:light_source_chip_to_chip",
       "id": "e11",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "poet_6_k_20260514_s9"
       ],
@@ -156,13 +156,13 @@
     {
       "attributes": {},
       "confidence": 0.75,
-      "dst_id": "tech:ai_compute_buildout",
+      "dst_id": "prod:1_6t_dr4_transceiver",
       "id": "e12",
       "relation": "enables",
       "source_ids": [
         "poet_6_k_20260514_s5"
       ],
-      "src_id": "prod:1_6t_dr4_transceiver"
+      "src_id": "tech:ai_compute_buildout"
     }
   ],
   "nodes": [

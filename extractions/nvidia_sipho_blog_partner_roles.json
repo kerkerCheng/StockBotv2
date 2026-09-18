@@ -75,14 +75,14 @@
     {
       "attributes": {},
       "confidence": 0.85,
-      "dst_id": "tech:scale_out_cpo",
+      "dst_id": "tech:cpo_packaging_assembly",
       "id": "e5",
-      "relation": "enables",
+      "relation": "depends_on",
       "source_ids": [
         "nvidia_sipho_blog_partner_roles_s2",
         "nvidia_sipho_blog_partner_roles_s4"
       ],
-      "src_id": "tech:cpo_packaging_assembly"
+      "src_id": "tech:scale_out_cpo"
     },
     {
       "attributes": {},

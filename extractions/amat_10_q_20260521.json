@@ -247,8 +247,8 @@
     },
     {
       "id": "amat_10_q_20260521_e3",
-      "src_id": "prod:amat_semiconductor_systems",
-      "dst_id": "tech:foundry_logic_advanced",
+      "src_id": "tech:foundry_logic_advanced",
+      "dst_id": "prod:amat_semiconductor_systems",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,
@@ -259,8 +259,8 @@
     },
     {
       "id": "amat_10_q_20260521_e4",
-      "src_id": "prod:amat_semiconductor_systems",
-      "dst_id": "tech:dram",
+      "src_id": "tech:dram",
+      "dst_id": "prod:amat_semiconductor_systems",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,
@@ -271,8 +271,8 @@
     },
     {
       "id": "amat_10_q_20260521_e5",
-      "src_id": "prod:amat_semiconductor_systems",
-      "dst_id": "tech:nand_flash",
+      "src_id": "tech:nand_flash",
+      "dst_id": "prod:amat_semiconductor_systems",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,

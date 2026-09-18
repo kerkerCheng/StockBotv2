@@ -140,7 +140,7 @@
       "id": "e3",
       "src_id": "prod:gf_scale",
       "dst_id": "tech:cpo",
-      "relation": "enables",
+      "relation": "is_component_of",
       "attributes": {},
       "confidence": 0.65,
       "source_ids": [

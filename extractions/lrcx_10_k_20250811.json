@@ -301,7 +301,7 @@
       "id": "lrcx_10_k_20250811_e2",
       "src_id": "prod:reliant_product_line",
       "dst_id": "tech:non_leading_edge_fab",
-      "relation": "enables",
+      "relation": "is_component_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [
@@ -356,8 +356,8 @@
     },
     {
       "id": "lrcx_10_k_20250811_e7",
-      "src_id": "tech:deposition_etch_clean",
-      "dst_id": "tech:dram_production",
+      "src_id": "tech:dram_production",
+      "dst_id": "tech:deposition_etch_clean",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,
@@ -368,8 +368,8 @@
     },
     {
       "id": "lrcx_10_k_20250811_e8",
-      "src_id": "tech:deposition_etch_clean",
-      "dst_id": "tech:nand_production",
+      "src_id": "tech:nand_production",
+      "dst_id": "tech:deposition_etch_clean",
       "relation": "enables",
       "attributes": {},
       "confidence": 0.9,

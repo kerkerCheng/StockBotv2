@@ -62,8 +62,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from query.bottleneck import (  # noqa: E402
-    DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index, collapse_assertions,
-    demand_chain, fetch_assertions,
+    DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
+    collapse_assertions, demand_chain, fetch_assertions,
 )
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
@@ -84,8 +84,12 @@ ANGLES: tuple[tuple[str, str], ...] = (
 #: 這裡硬編 `("depends_on",)`，與 `build_upward_index` 的分支各一份，於是
 #: `constrained_by` 在兩處同時缺席——同一個分類有 SSOT 卻沒跟著資料走到需要它的地方（L16）。
 #: 實測影響：`tech:inp_dfb_laser` 的需求側原本看不到 `co:coherent`，而那條邊一直都在圖裡。
-_DEMAND_INBOUND = DEPENDENCY_RELATIONS
-_DEMAND_OUTBOUND = ("is_component_of", "enables")
+#: ⚠ `enables` 於 2026-09-18 由 outbound 改成 inbound：`X enables N` 逐字是
+#: 「X 的採用帶動對 N 的需求」⇒ **X 需要 N**，所以它看向 N 時是需求側的 inbound；
+#: 先前放在 outbound（`N enables X`）方向剛好相反。與 `query/bottleneck.py` 的
+#: `DEMAND_PULL_RELATIONS` 是同一個決定，兩邊都從那裡讀，不各寫一份（L16）。
+_DEMAND_INBOUND = tuple(DEPENDENCY_RELATIONS) + tuple(DEMAND_PULL_RELATIONS)
+_DEMAND_OUTBOUND = ("is_component_of",)
 _COUNTER = ("competes_with", "constrained_by")
 
 

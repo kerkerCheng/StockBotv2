@@ -42,7 +42,7 @@
       "confidence": 0.65,
       "dst_id": "tech:logistics_tote_transfer",
       "id": "gxo_agility_raas_deployment_2024_06_27_e3",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "gxo_agility_raas_deployment_2024_06_27_s3"
       ],

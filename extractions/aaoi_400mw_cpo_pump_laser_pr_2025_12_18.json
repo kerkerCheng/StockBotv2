@@ -36,7 +36,7 @@
       "confidence": 0.7,
       "dst_id": "tech:cpo",
       "id": "e2",
-      "relation": "enables",
+      "relation": "is_component_of",
       "source_ids": [
         "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s1",
         "aaoi_400mw_cpo_pump_laser_pr_2025_12_18_s2",

@@ -48,7 +48,20 @@ from typing import Any, Iterable, Mapping
 # 向下（找瓶頸）的邊型：只有這些的 substitutability 有意義。
 DOWNSTREAM_RELATIONS = ("depends_on", "supplies_to", "constrained_by")
 # 向上（找需求端）的邊型：這些邊的 substitutability 恆為 None，本來就不該有。
-UPSTREAM_RELATIONS = ("enables", "is_component_of")
+#
+# ⚠ **`enables` 於 2026-09-18 移出本表**（pq2 [607]／[608]／[609] 資料歸位之後）。
+# 抽取 prompt 的逐字定義是 `enables` — **A's adoption drives demand for B**
+# ⇒ B 被 A 需要，方向與本表（`upward[src].add(dst)` ＝ A 被 B 需要）**相反**。
+# 圖裡先前兩種寫法並存，而程式實作了沒寫下來的那一種，於是兩個錯互相抵銷、長期沒人發現。
+# 資料已逐條對來源逐字重判並改正（29 條），所以這裡才能改——**順序不可換**：
+# 只改程式不改資料，實測 `no_demand_edge` 會由 51 打到 67。
+UPSTREAM_RELATIONS = ("is_component_of",)
+
+#: 「A 的採用帶動 B 的需求」⇒ **B 被 A 需要**，需求沿 dst → src 往上傳，與
+#: `DEPENDENCY_RELATIONS` 同向。之所以自成一表而不併進去，是因為兩者的**證據性質不同**：
+#: `depends_on`／`constrained_by` 說的是「沒有它就不能運作」，`enables` 說的是
+#: 「它的採用把需求拉過來」——合併會讓兩種主張在下游分不開。
+DEMAND_PULL_RELATIONS = ("enables",)
 
 #: 「src 需要 dst」的邊型——**dst 是被需要的那一端**，所以需求要沿著 dst → src 往上傳。
 #:
@@ -430,7 +443,11 @@ def build_upward_index(edges: Iterable[CanonicalEdge]) -> dict[str, set[str]]:
             # 一條有方向的供需邊，兩邊問的問題不同。
             upward[e.src].add(e.dst)
         elif e.relation in UPSTREAM_RELATIONS:
+            # A is_component_of B ⇒ A 被 B 需要
             upward[e.src].add(e.dst)
+        elif e.relation in DEMAND_PULL_RELATIONS:
+            # A enables B ⇒ **B 被 A 需要**（抽取定義逐字：A's adoption drives demand for B）
+            upward[e.dst].add(e.src)
     return upward
 
 
@@ -497,17 +514,16 @@ FILTER_REASONS: Mapping[str, str] = {
 #: 它們的下一步完全不同——一個要先拆封閉字彙、一個是研究、一個要等前兩個解完。
 #: 壓成一句就同形了（L12），而同形的那一刻，「去補研究」與「去改程式」變成同一格。
 #:
-#: ⚠ **ROADMAP 記的第①種（`constrained_by` 沒有被走訪）刻意不在本字彙裡**，因為
-#: 它已於 2026-09-18 修掉，修掉之後**結構上不可能再被觀測到**：那些節點現在走得到
-#: 上游，根本不會進入本分類的母體。留一個恆為 0 的格子就是 L14-4 的「不會滅」——
-#: 那是牆不是閘門。它的迴歸由 `tests/test_bottleneck_ranking.py::
-#: test_constrained_by_carries_demand_upward_in_the_depends_on_direction` 守著。
+#: ⚠ **已經修掉的成因刻意不留空格子**——修掉之後它們**結構上不可能再被觀測到**
+#: （那些節點現在走得到上游，根本不進母體），留一個恆為 0 的格子就是 L14-4 的
+#: 「不會滅＝那是牆不是閘門」。目前已退場兩種，各由一條方向測試守著迴歸：
+#:   ①`constrained_by` 沒有被走訪（2026-09-18 修）→
+#:     `tests/test_bottleneck_ranking.py::test_constrained_by_carries_demand_upward_in_the_depends_on_direction`
+#:   ②`enables` 走訪方向與抽取定義相反（2026-09-18 資料歸位＋程式歸位後修）→
+#:     `::test_enables_carries_demand_from_the_adopter_to_what_it_pulls_in`
+#:     ⚠ 它退場的前提是**資料先改對**：29 條誤植的邊由 pq2 [607]／[608]／[609] 逐條重判改正，
+#:     之後才翻走訪方向。只翻程式不改資料，實測 `no_demand_edge` 會由 51 打到 67。
 ANCHOR_GAP_CAUSES: Mapping[str, str] = {
-    "enables_direction_unresolved": (
-        "圖裡**有**「X 的採用驅動對它的需求」這條 `enables` 邊，但走訪方向與抽取定義相反"
-        "（`prompts/extract_system.md` 逐字：`enables` — A's adoption drives demand for B），"
-        "所以需求沒有沿著它傳上來——**開發項，且要先把 `enables` 的兩種語意拆開**（L12）"
-    ),
     "no_demand_edge": (
         "圖裡**根本沒有人記錄過「誰需要它」**——沒有任何一條需求方邊指向它。"
         "**這是真研究缺口**（pq2 [606]：找一手文件回答「誰在買它、為了做什麼」）"
@@ -542,24 +558,12 @@ def classify_anchor_gaps(
     # 母體＝所有出現在「公司→向下」邊裡的瓶頸節點，也就是排序真的問過的那些。
     population = sorted({e.dst for e in edges if e.relation in DOWNSTREAM_RELATIONS})
 
-    # `X enables node`：抽取定義說這是「X 的採用驅動對 node 的需求」＝需求應由 X 往 node 傳，
-    # 而 `build_upward_index` 走的是反方向，所以它不會出現在 `upward[node]` 裡。
-    enabled_by: dict[str, list[str]] = defaultdict(list)
-    for e in edges:
-        if e.relation == "enables":
-            enabled_by[e.dst].append(e.src)
-
     by_cause: dict[str, list[dict[str, Any]]] = {k: [] for k in ANCHOR_GAP_CAUSES}
     for node in population:
         if demand_chain(node, upward, anchors=anchor_set):
             continue
         parents = sorted(upward.get(node) or ())
-        if parents:
-            cause, detail = "upstream_dead_end", parents
-        elif enabled_by.get(node):
-            cause, detail = "enables_direction_unresolved", sorted(enabled_by[node])
-        else:
-            cause, detail = "no_demand_edge", []
+        cause, detail = ("upstream_dead_end", parents) if parents else ("no_demand_edge", [])
         by_cause[cause].append({"node": node, "blocked_by": detail})
 
     return {
@@ -1018,9 +1022,8 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             "\n| 成因 | 幾個 | 節點型別 | 下一步屬於哪一類 | 例 |")
         out.append("|---|---|---|---|---|")
         _next_step = {
-            "enables_direction_unresolved": "開發（先拆 `enables` 的兩種語意）",
             "no_demand_edge": "研究（pq2 [606]）",
-            "upstream_dead_end": "等前兩種解完（結果不是原因）",
+            "upstream_dead_end": "等 `no_demand_edge` 解完（結果不是原因）",
         }
         for cause, count in sorted(
             gaps.get("counts", {}).items(), key=lambda kv: -kv[1]
