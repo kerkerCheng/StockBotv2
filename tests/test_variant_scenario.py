@@ -232,3 +232,39 @@ def test_read_model_with_variant_carries_payoff_and_overrides_with_base_values()
     assert deps["base_value"] == 0.025 and deps["scenario"] == "variant" and deps["layer"] == "operating"
     assert deps["supporting_refs"], "賭注假設必須帶 supporting 證據"
     assert section.eps_contribution.value is not None and section.multiple_contribution.value is not None
+
+
+def test_retract_keeps_the_scenario_of_the_record_it_retracts(monkeypatch, tmp_path, capsys) -> None:
+    """**撤回一條 variant／downside 假設，撤回紀錄必須沿用它的 scenario。**
+
+    事發（2026-09-19）：`alpha assumptions --retract` 的分支寫於只有 base 的時期，
+    加了 scenario 之後沒跟上——它不傳 `scenario`，於是一律預設 `base`，而型別層
+    **正確地**擋下跨 scenario supersede（「variant 是 overlay，不是取代」）。
+    合起來的效果是 **variant 與 downside 一旦寫錯就撤不回**，而 ledger 是 append-only，
+    沒有第二條路可以修正。
+
+    這是 L17 的形狀：機制只認得它當初那個案例；不會壞、不報錯，只是那條路不通。
+    ⚠ 空跑檢查：把 `cli.py` retract 分支的 `scenario=target.scenario` 拿掉 → 這條會紅。
+    """
+    import argparse as _argparse
+
+    from alpha import cli
+    _ns = _argparse.Namespace
+
+    target = _variant(value=0.045)
+    captured: list = []
+    monkeypatch.setattr("alpha.providers.assumptions.read_assumption_records",
+                        lambda ticker: ([target], None))
+    monkeypatch.setattr("alpha.providers.assumptions.append_assumption_record",
+                        lambda record: captured.append(record) or tmp_path / "x.jsonl")
+    monkeypatch.setattr(cli, "_resolve_company", lambda t: ("COHR", "co:coherent"))
+
+    args = _ns(ticker="COHR", add=None, retract=target.assumption_id,
+                              rationale="scope 寫錯", format="markdown", list=False)
+    assert cli.cmd_assumptions(args) == 0
+    assert captured, "撤回應該 append 一筆紀錄"
+    row = captured[0]
+    assert row["scenario"] == VARIANT_SCENARIO, (
+        "撤回紀錄的 scenario 必須等於被撤回那筆；預設成 base 會被型別層擋下，等於 variant 撤不回")
+    assert row["retracted"] is True
+    assert row["supersedes_id"] == target.assumption_id

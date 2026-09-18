@@ -241,6 +241,10 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
                 retracted=True, created_at=datetime.now(timezone.utc),
                 # 撤回紀錄沿用舊 refs、不補角色——它只是一個「撤回」標記，不是新的 provenance 主張。
                 legacy_roles=True,
+                # ⚠ 必須沿用被撤回那筆的 scenario。漏了它會預設成 base，而型別層正確地擋下
+                # 跨 scenario supersede，結果是 **variant／downside 一旦寫錯就撤不回**
+                # （2026-09-19 實測撞到）。這個分支寫於只有 base 的時期，scenario 加入後沒跟上。
+                scenario=target.scenario,
             )
         try:
             path = append_assumption_record(record)
