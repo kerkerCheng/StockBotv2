@@ -10391,6 +10391,18 @@
       "source": "manual",
       "title": "重複節點候選 28 對判讀完：4 對明確該併（含一對 canonical 選法要你決定）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T17:42:13.336021+00:00",
+      "hint": "go＝跑 skills/blind-spot-audit 對 LITE 的 variant／downside／催化劑做紅隊檢視（唯讀，不寫任何 authority）；不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含改假設 ledger、不含 live。⚠ 為什麼值得花這個號：①這是籃子史上第一個非空 top_pick，且產生它的賭注、下檔、催化劑 resolves 三樣都是同一個 session 當天寫的——缺少獨立視角；②同一個 session 在寫入過程中踩到一個會**對自己有利**的靜默缺陷（overlay 的 scope 與 base 不一致時不覆蓋而是疊加，產出假的 +50.3%，真值 +20.7%），是靠寫入前手算對照才發現的，而那不是可例行化的紀律（L18-4）；③LITE 是市值 $80.2B、26 位分析師覆蓋的大型股，**不是 D0／D11 說的邊緣小公司**——它通過 filter 只是因為 Phase 4 的市值／覆蓋門檻還沒交付。④重點檢視三處：base 的 derivation 是 company_guidance 時 variant 還剩多少意義（本輪只有 +0.5pp）；downside 只下修 EPS 一桿、目標倍數維持 45.21x 是否低估下檔；催化劑 2026-11-10 指名的兩條假設是否真的能裁決那一桿。⑤與既有 [578]（COHR 賭注年度錯位）是同一族問題，可一起看。drop＝接受首選現況、不做獨立複查。",
+      "n": 616,
+      "reason": null,
+      "ref_id": "manual:616",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "LITE：獨立複查系統第一個 top_pick——賭注、下檔與催化劑連結都由同一個 session（2026-09-19）寫入，需紅隊檢視",
+      "type": "manual"
     }
   ],
   "log": [
@@ -22360,6 +22372,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 616,
+  "next_n": 617,
   "schema_version": "1"
 }
