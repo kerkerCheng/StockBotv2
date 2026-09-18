@@ -122,6 +122,30 @@ def test_missing_anchor_is_said_out_loud() -> None:
     assert "走不到任何已登記的需求錨" in text
 
 
+def test_constrained_by_answers_demand_side_and_next_layer_not_only_counter_path() -> None:
+    """`constrained_by` 是 counter path，**但同時也是「誰需要它／它卡在誰身上」的答案**。
+
+    這三個角度問的是方向，`counter_path` 問的是證據性質——同一條邊同時是兩者的答案，
+    不是重複計算。事發（2026-09-18）：`_DEMAND_INBOUND` 與 `next_layer` 各自硬編
+    `depends_on`，於是圖裡逐字寫著「co:coherent 受限於 tech:inp_dfb_laser」的那條邊，
+    在 `tech:inp_dfb_laser` 的需求側是看不見的（L16：分類沒跟著資料走到消費端）。
+    """
+    rows = [
+        _row("co:coherent", "constrained_by", "tech:inp_dfb_laser", 5),
+        _row("co:macom", "supplies_to", "tech:inp_dfb_laser", 3),
+    ]
+    laser = build_structure("tech:inp_dfb_laser", _edges(rows))
+    demand = [(e.src, e.relation) for e in laser.angles["demand_side"]]
+    assert ("co:coherent", "constrained_by") in demand
+    # 同一條邊照樣留在反向路徑——兩個角度問的不是同一件事。
+    assert [e.relation for e in laser.angles["counter_path"]] == ["constrained_by"]
+
+    coherent = build_structure("co:coherent", _edges(rows))
+    assert [(e.relation, e.dst) for e in coherent.angles["next_layer"]] == [
+        ("constrained_by", "tech:inp_dfb_laser")
+    ]
+
+
 def test_shares_collapse_assertions_with_the_ranking() -> None:
     """**不自己收斂**：兩邊對同一條邊必須給同一個值，否則消費端會各自偏離（L16）。"""
     source = (ROOT / "query" / "structure.py").read_text(encoding="utf-8")

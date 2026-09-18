@@ -62,7 +62,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from query.bottleneck import (  # noqa: E402
-    UPSTREAM_RELATIONS, CanonicalEdge, build_upward_index, collapse_assertions,
+    DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index, collapse_assertions,
     demand_chain, fetch_assertions,
 )
 
@@ -79,7 +79,12 @@ ANGLES: tuple[tuple[str, str], ...] = (
 
 #: 哪些 relation 算「需求側」——與 `build_upward_index` 同一組語意，但這裡是**看向這個節點**：
 #: `A depends_on N` ⇒ A 需要 N；`N is_component_of B` ⇒ B 需要 N。
-_DEMAND_INBOUND = ("depends_on",)
+#:
+#: ⚠ inbound 那一族**直接消費 `DEPENDENCY_RELATIONS`，不自己列**。2026-09-18 之前
+#: 這裡硬編 `("depends_on",)`，與 `build_upward_index` 的分支各一份，於是
+#: `constrained_by` 在兩處同時缺席——同一個分類有 SSOT 卻沒跟著資料走到需要它的地方（L16）。
+#: 實測影響：`tech:inp_dfb_laser` 的需求側原本看不到 `co:coherent`，而那條邊一直都在圖裡。
+_DEMAND_INBOUND = DEPENDENCY_RELATIONS
 _DEMAND_OUTBOUND = ("is_component_of", "enables")
 _COUNTER = ("competes_with", "constrained_by")
 
@@ -168,9 +173,12 @@ def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
         _view(e) for e in edges
         if e.dst == node and e.relation == "supplies_to"
     ]
+    # 「它自己卡在誰身上」問的也是 `DEPENDENCY_RELATIONS`——`co:iqe --constrained_by-->
+    # mat:inp_substrate` 逐字就是這個角度的答案。2026-09-18 之前這裡是第三處硬編的
+    # `depends_on`（另兩處見 `_DEMAND_INBOUND` 與 `build_upward_index`）。
     view.angles["next_layer"] = [
         _view(e) for e in edges
-        if e.src == node and e.relation == "depends_on"
+        if e.src == node and e.relation in DEPENDENCY_RELATIONS
     ]
     view.angles["counter_path"] = [
         _view(e) for e in edges

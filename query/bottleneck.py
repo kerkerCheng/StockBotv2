@@ -50,6 +50,35 @@ DOWNSTREAM_RELATIONS = ("depends_on", "supplies_to", "constrained_by")
 # 向上（找需求端）的邊型：這些邊的 substitutability 恆為 None，本來就不該有。
 UPSTREAM_RELATIONS = ("enables", "is_component_of")
 
+#: 「src 需要 dst」的邊型——**dst 是被需要的那一端**，所以需求要沿著 dst → src 往上傳。
+#:
+#: ⚠ `constrained_by` 與 `depends_on` 的差別在**證據性質**，不在**方向**：
+#: 前者是 documented limitation／counter path、後者是 technical dependency
+#: （`prompts/extract_system.md` 的逐字定義），而「A 受限於 B」與「A 依賴 B」對
+#: 「誰需要誰」給的是同一個答案。另外兩處獨立登記處也都把 dst 當被需要的一端：
+#: `DOWNSTREAM_RELATIONS` 上面那一行、`schema/vocab.json` 的
+#: `sole_source_beneficiary_end`（`constrained_by: "dst"`，與 `depends_on` 同格）。
+#:
+#: 事發（2026-09-18 量測）：`build_upward_index` 原本只認 `depends_on`，於是
+#: `co:coherent --constrained_by--> tech:inp_dfb_laser` 與
+#: `tech:cpo --constrained_by--> tech:cpo_full_stack_test` 這兩條**圖裡已經有的邊**
+#: 走不到需求錨。ROADMAP 當時的提案是「把 `constrained_by` 加進 `UPSTREAM_RELATIONS`」
+#: ——**實測推翻：那個方向是反的**（`upward[src].add(dst)` ＝「A 被 B 需要」），
+#: 它會把 `co:iqe` 那條 accepted 列的鏈路從 5 節點靜默改成 4 節點，語意變成
+#: 「IQE 被 InP 基板需要」。放進本常數（dst → src）才與 `depends_on` 同形。
+#:
+#: 放閘當下的實測（L14-3 先量測後放閘）：**accepted 37 列排序位移 0 列**、
+#: accepted 鏈路改變 0 列、filtered 185 列中 **2 列**由「走不到錨」變成走得到
+#: （`co:aehr_test_systems → tech:cpo_full_stack_test`、`co:macom → tech:inp_dfb_laser`）。
+#: 今天不動任何排名，改變的是**那兩個研究工單值不值得做**：假設補上 `substitutability=4`，
+#: 放閘前 AEHR 落在無錨區第 37 名，放閘後是第 27 名（錨 `tech:ai_switch`、3 跳）。
+#:
+#: ⚠ **`enables` 刻意不進來。** 它的官方定義是「A's adoption drives demand for B」
+#: （需求驅動，方向與本常數相反），但圖裡也被當成元件使能用——那是 ROADMAP 記在案的
+#: 未解 L12（一表兩義），修法是先分開再各自定規則。在它有答案之前把整張方向表泛化出來，
+#: 得到的會是一格憑空填上的答案（L17-4：general 到資料支持的那一格為止）。
+DEPENDENCY_RELATIONS = ("depends_on", "constrained_by")
+
 # 進入排名的最低替代難度。3 以下不算瓶頸，只是普通供應關係。
 MIN_SUBSTITUTABILITY = 4
 
@@ -382,11 +411,15 @@ def build_upward_index(edges: Iterable[CanonicalEdge]) -> dict[str, set[str]]:
     向上與向下是不同邊型，這個不對稱是刻意的、不需要改 schema：
     `A depends_on B` ⇒ B 被 A 需要；`A is_component_of B` ⇒ A 被 B 需要；
     `A enables B` ⇒ A 被 B 需要。向上的邊沒有也不該有 `substitutability`。
+
+    ⚠ 「src 需要 dst」那一族的**唯一登記處是 `DEPENDENCY_RELATIONS`**，不要在這裡
+    直接寫 relation 名字——`query/structure.py` 的需求側判定讀的是同一份，
+    2026-09-18 之前兩邊各硬編一份 `depends_on`，於是 `constrained_by` 在兩處同時缺席（L16）。
     """
     upward: dict[str, set[str]] = defaultdict(set)
     for e in edges:
-        if e.relation == "depends_on":
-            # A depends_on B ⇒ B 被 A 需要
+        if e.relation in DEPENDENCY_RELATIONS:
+            # A depends_on／constrained_by B ⇒ B 被 A 需要
             upward[e.dst].add(e.src)
         elif e.relation == "supplies_to":
             # A supplies_to B ⇒ A 被 B 需要。

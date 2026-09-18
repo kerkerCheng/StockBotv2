@@ -341,7 +341,15 @@ class Neo4jGraphResearchProvider:
             if str(row.get("company_id")) != str(company_id):
                 continue
             relation = str(row.get("relation") or "")
-            is_upstream = relation in ("depends_on", "is_component_of")
+            # 「這家公司的上游曝險」問的就是 `DEPENDENCY_RELATIONS`（src 需要 dst）。
+            # 2026-09-18 之前這裡明列 `depends_on`，於是 `co:coherent --constrained_by-->
+            # tech:inp_dfb_laser` 被歸成**下游**曝險——方向是反的（L16：第四處硬編）。
+            # ⚠ `is_component_of` 保留但今天走不到：`rank_bottlenecks` 的 `rows` 只含
+            # `DOWNSTREAM_RELATIONS`，而它屬 `UPSTREAM_RELATIONS`。留著是為了不在本次
+            # 順手改掉一個與 constrained_by 無關的行為。
+            from query.bottleneck import DEPENDENCY_RELATIONS
+
+            is_upstream = relation in DEPENDENCY_RELATIONS or relation == "is_component_of"
             if (direction == "upstream") != is_upstream:
                 continue
             try:

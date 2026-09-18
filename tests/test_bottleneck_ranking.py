@@ -150,6 +150,68 @@ def test_supplies_to_carries_demand_upward() -> None:
     ]
 
 
+def test_constrained_by_carries_demand_upward_in_the_depends_on_direction() -> None:
+    """`A constrained_by B` ⇒ B 被 A 需要，方向與 `depends_on` 同。
+
+    事發（2026-09-18）：向上索引只認 `depends_on`，於是
+    `tech:cpo --constrained_by--> tech:cpo_full_stack_test` 這條**圖裡已經有的邊**
+    走不到需求錨——Aehr 那一列因此被當成「走不到有人花錢的地方」。
+    當時 ROADMAP 的提案是「把 `constrained_by` 加進 `UPSTREAM_RELATIONS`」，
+    而那個方向是反的；本測試鎖的是**方向**，不只是「有沒有被走訪」。
+    """
+    edges = list(
+        collapse_assertions(
+            [
+                _row("co:aehr", "supplies_to", "tech:cpo_full_stack_test", conf=0.5),
+                _row("tech:cpo", "constrained_by", "tech:cpo_full_stack_test", conf=0.5),
+                _row("tech:cpo", "is_component_of", "tech:ai_switch", conf=0.5),
+            ]
+        ).values()
+    )
+    upward = build_upward_index(edges)
+
+    # dst → src：測試層是誰在需要它 ＝ CPO。反過來寫會讓下面那條鏈走不通。
+    assert upward["tech:cpo_full_stack_test"] == {"tech:cpo"}
+    assert "tech:cpo_full_stack_test" not in upward.get("tech:cpo", set())
+    assert demand_chain("co:aehr", upward) == [
+        "tech:ai_switch",
+        "tech:cpo",
+        "tech:cpo_full_stack_test",
+        "co:aehr",
+    ]
+
+
+def test_dependency_relations_stay_consistent_with_the_other_two_direction_tables() -> None:
+    """方向表之間的三條不變式——下次新增 relation 時漏掉一邊，這裡要先紅。
+
+    ①「src 需要 dst」必然蘊含「dst 是 src 的向下瓶頸」，所以
+    `DEPENDENCY_RELATIONS` ⊆ `DOWNSTREAM_RELATIONS`；
+    ② 同一個 relation 不得同時列進兩個方向相反的表（那就是 L12 一表兩義）；
+    ③ `schema/vocab.json` 的 `sole_source_beneficiary_end` 是獨立的第三份登記處，
+    它對這一族的答案必須也是 `dst`——三份不一致時，先問哪一份錯了，不要各自改。
+    """
+    import json as _json
+    from pathlib import Path as _Path
+
+    from query.bottleneck import (
+        DEPENDENCY_RELATIONS,
+        DOWNSTREAM_RELATIONS,
+        UPSTREAM_RELATIONS,
+    )
+
+    assert set(DEPENDENCY_RELATIONS) <= set(DOWNSTREAM_RELATIONS)
+    assert not set(DEPENDENCY_RELATIONS) & set(UPSTREAM_RELATIONS)
+
+    vocab = _json.loads(
+        (_Path(__file__).resolve().parent.parent / "schema" / "vocab.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    beneficiary = vocab["sole_source_beneficiary_end"]
+    for relation in DEPENDENCY_RELATIONS:
+        assert beneficiary.get(relation) == "dst", relation
+
+
 def test_evidence_is_three_way_and_unresolved_origin_does_not_auto_pass() -> None:
     """`None` 同時是「真第三方」與「沒解析出的別名」，不得壓成布林（L12）。"""
     reg = _FakeRegistry()
