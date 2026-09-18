@@ -66,7 +66,19 @@ The caller injects `source_doc` (doc_id, title, source_type, evidence_tier) into
 `deploys`         — an operator/customer deploys a robot product in an operating workflow
 `offered_under`   — a product/service is commercially provided under a named model such as RaaS
 `competes_with`   — A and B compete for the same design win / market
-`enables`         — A's adoption drives demand for B
+`enables`         — A's adoption drives demand for B.
+                    ⚠ DIRECTION TRAP. `enables` points DOWNSTREAM-to-UPSTREAM in demand
+                    terms: A is the thing being bought/built out, B is what that pulls in.
+                    If A is an INPUT that makes B possible, this is NOT `enables` —
+                    use `depends_on` (B depends_on A) or `is_component_of` (A is_component_of B).
+                      ✅ `ai_compute_buildout enables cloud_transceiver`
+                         (the buildout pulls in transceivers)
+                      ❌ `deposition_etch_clean enables dram_manufacturing`
+                         (deposition is an input → write `dram_manufacturing depends_on
+                          deposition_etch_clean` instead)
+                    Never emit `A enables B` together with `B depends_on A`,
+                    `A is_component_of B`, or `B enables A` — those are causally opposite
+                    and `loader/validate.py` rejects the document.
 `depends_on`      — A cannot function without B (critical input)
 `invests_in`      — A has financial stake in B
 `licenses_to`     — A licenses IP to B

@@ -150,6 +150,59 @@ def validate(doc_path: str) -> list[str]:
                 )
                 break
 
+    # ── 4c. `enables` 的方向矛盾（2026-09-18）──
+    # `schema/vocab.json` 與 `prompts/extract_system.md` 對 `enables` 的定義只有一個：
+    # **A's adoption drives demand for B**（A 的採用帶動 B 的需求 ⇒ B 被 A 需要）。
+    # 所以下面兩種寫法與它因果相反，不可能同時為真：
+    #   `B depends_on A`      — B 沒有 A 就不能運作 ⇒ A 是 B 的必要投入
+    #   `A is_component_of B` — A 是 B 裡面的一個零件 ⇒ 同上
+    # 雙向 `enables` 同理：兩邊都說對方帶動自己的需求，走訪上等於沒有上下游。
+    #
+    # ⚠ **這是 ERROR 不是 WARN，而且只擋新文件。** 理由是它已經發生過而且沒有任何東西
+    # 說話：`coherent_q2fy26_cpo` 一份文件同時寫出 `ai_switch enables cpo` 與
+    # `cpo enables ai_switch`，而 `cpo is_component_of ai_switch` 早就在圖裡——
+    # 同一對節點三條邊、其中一條純重複，載入時零訊號（L13-2：沒發生與沒看到同形）。
+    # 實測鑑別力：239 份既有抽取只命中 2 份（0.8%），兩份都是真錯，0 誤傷
+    # ——合法共存的 `ai_switch enables cpo` ＋ `cpo is_component_of ai_switch`
+    # （CPO 是 AI switch 的零件，且 AI switch 帶動 CPO 需求，兩者相容）**沒有被抓**，
+    # 所以規則必須是**方向感知**的，不能只看「這兩個節點之間有兩條邊」。
+    #
+    # ⚠ **例外清單就是那個常駐計數器**（L14：防呆要會自己出現，不是要人讀的段落）。
+    # 它只能縮不能長：pq2 **[607]** 逐條重判完成後這裡應該清空，清空前新文件照擋。
+    # 加一筆進來要改這個檔，所以它不會安靜長大。
+    _KNOWN_ENABLES_CONTRADICTIONS = {
+        # doc_id: 已知的矛盾對，等 [607] 重判後移除
+        "coherent_q2fy26_cpo": {("tech:ai_switch", "tech:cpo"), ("tech:cpo", "tech:ai_switch")},
+        "gfs_20_f_20260227": {
+            ("tech:semiconductor_manufacturing_equipment", "co:globalfoundries")
+        },
+    }
+    _doc_id = str((doc.get("source_doc") or {}).get("doc_id") or "")
+    _grandfathered = _KNOWN_ENABLES_CONTRADICTIONS.get(_doc_id, frozenset())
+    _triples = {
+        (e.get("src_id"), e.get("relation"), e.get("dst_id")) for e in doc.get("edges", [])
+    }
+    for edge in doc.get("edges", []):
+        if edge.get("relation") != "enables":
+            continue
+        src, dst = edge.get("src_id"), edge.get("dst_id")
+        conflicts = []
+        if (dst, "depends_on", src) in _triples:
+            conflicts.append(f"{dst} depends_on {src}")
+        if (src, "is_component_of", dst) in _triples:
+            conflicts.append(f"{src} is_component_of {dst}")
+        if (dst, "enables", src) in _triples:
+            conflicts.append(f"{dst} enables {src}（雙向）")
+        if not conflicts:
+            continue
+        level = "WARN: [已知既有，等 pq2 [607]]" if (src, dst) in _grandfathered else "EDGE:"
+        errors.append(
+            f"{level} edge {edge.get('id')} `{src} enables {dst}` 與 "
+            f"{'、'.join(conflicts)} 因果相反——"
+            "`enables` 的唯一定義是「A 的採用帶動 B 的需求」；"
+            "若你要表達的是「A 是 B 的必要投入」，那是 `depends_on`／`is_component_of`，不是 `enables`"
+        )
+
     # ── 4b. co:* 身分解析（registry 是唯一權威）──
     # 類別詞被實體化成公司節點（co:nvidia_direct_customers_csp）與未具名實體
     # （co:unnamed_ai_research_deployment_co）都會在這裡現形。實測 106 份既有抽取、
