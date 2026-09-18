@@ -10347,6 +10347,42 @@
       "source": "manual",
       "title": "tech:external_laser_source is_component_of tech:cw_dfb_laser 方向相反——逐字說的是 ELS 裡面有 CW 雷射",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T15:56:07.867482+00:00",
+      "hint": "⚠ **這一項有你要選的問題，我沒有自行決定。** 完整 packet §3 在 library/private/alpha/is_component_of_rejudge/packet.md。\n\n【問題】92 條裡有 17 條不是抽取錯誤，是**封閉字彙缺一個 relation**：它們全都是「A 是 B 的一種」而不是「A 是 B 裡面的零件」。而 schema/vocab.json 的 relation 封閉字彙（14 個值）裡沒有任何一個表達得了 is-a。\n\n【被污染的節點】tech:cpo 5 條（glass_cpo／intel_glass_cpo／coupe／broadcom_3d_silicon_cpo／scale_up_cpo）、tech:deposition_etch_clean 4 條（Lam 的產品線分類表）、tech:ai_switch 4 條（jericho3／jericho4／tomahawk6／spectrum_x——它們本身就是交換器）、tech:logistics_tote_transfer／tech:scale_out_cpo／tech:non_leading_edge_fab／tech:dram 各 1 條。\n\n【為什麼不只是分類潔癖】query/structure.py 的「下一層：它自己卡在誰身上」把 A is_component_of B 讀成「B 卡在 A 身上」。對真零件正確，對這 17 條完全錯誤。實測全圖最核心的 tech:cpo（54 條邊）：**「它自己卡在誰身上」24 條裡有 5 條其實是「CPO 有哪些變體」**——讀這個角度判瓶頸的人，會把「CPO 的五種實作路線」誤讀成「CPO 的五個瓶頸」。\n\n【三個選項，請擇一】A＝刪掉這 17 條：乾淨、零字彙變更，但「glass CPO 是 CPO 的一種」這個事實從圖裡消失，下次抽取還會再造出來。B＝新增一個 relation（is_variant_of 或 is_a）：表達力對了、抽取端可照定義寫；但動封閉字彙（Z2），要同時決定它算不算 counter_path、進不進走訪清單、structure.py 的哪個角度收它。C＝保留現狀、只在讀路徑過濾：最小改動，但圖裡仍是兩種語意混在一個 relation 上（L12），每個新的消費端都要自己記得過濾。\n\n【我的建議是 B】理由：A 會讓同一批邊在下次抽取時重生（entity_aliases 的 _readme 記過同型教訓），而 C 正是 L12 說的「下游被迫二選一而兩邊都錯」。**但 B 動封閉字彙，依 L17-2 是 Z2，所以停在這裡等你決定。**",
+      "n": 613,
+      "reason": null,
+      "ref_id": "library/private/alpha/is_component_of_rejudge/packet.md",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "is_component_of 承載了第二種語意：17 條「A 是 B 的一種」，封閉字彙缺一個 relation（三選一）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T15:56:54.937459+00:00",
+      "hint": "使用者 2026-09-18 核准「① 做 is_component_of 重判」後執行；92 條全覆蓋，判決在 library/private/alpha/is_component_of_rejudge/classification.json，完整 packet 在同目錄 packet.md（§2）。graph admission，go 只授權本項這 8 條的 migration，**不含 17 條 taxonomy（[613]，有你要選的問題）、不含 18 條 flag_evidence（退回研究不動圖）、不含 thesis 變更、不含 live**。\n\n【判決分布】keep 49（53.3%）｜flag_evidence 18（19.6%）｜flag_taxonomy 17（18.5%）｜reverse 5｜delete 2｜retype_develops 1。合計有問題 43／92＝46.7%，與 enables 那次（37／82＝45%）幾乎一樣，但形狀不同：enables 錯在方向，本次錯在它被拿來表達另一種關係。\n\n【reverse 5 條】tech:cpo→tech:fiber_attach_unit、tech:cpo→tech:silicon_photonics_pic、tech:external_laser_source→tech:tec、tech:fiber_attach_unit→tech:microlens_array、tech:fiber_attach_unit→tech:pm_fiber。⚠ 其中三條共用同一段 Coherent 法說逐字，而那段話的結構是「CPO 需要 → fiber attach unit → 裡面有 microlens array 與 PM fiber」——三層關係全部被接反。\n\n【delete 2 條】tech:serdes→tech:ai_switch（逐字一個字都沒提 SerDes）、tech:scale_out_cpo→tech:cpo（逐字只提 scale-UP CPO，沒有 scale-out）。兩條都是 L6 Gap 4 型幻覺。\n\n【retype_develops 1 條】prod:reliant→co:lam_research：產品不是公司的零件，正確是 co:lam_research develops prod:reliant（端點與 relation 一起換）。\n\n【go 之後哪個數字會變】tech:cpo 的「下一層」24→22 條；tech:fiber_attach_unit 的「下一層」+2 條（microlens array 與 PM fiber 歸位到它底下）；tech:ai_switch 少一條假邊。可投資排序預期不變（is_component_of 不帶 substitutability，不參與排序門檻）——執行後會實測確認。\n\n【執行方式】沿用既有 migration 的四步（改抽取檔→scoped 重載→刪孤兒→重投影）。⚠ 這會是第三次撞到同型，依既有腳本檔頭自己寫下的註記，該把方向修正抽成資料檔而不是再擴一次常數清單。",
+      "n": 614,
+      "reason": null,
+      "ref_id": "library/private/alpha/is_component_of_rejudge/classification.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "is_component_of 重判：8 條方向／型別錯誤（reverse 5、delete 2、retype 1）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T15:59:50.299819+00:00",
+      "hint": "使用者 2026-09-18 核准「② 讀那 28 對候選」後執行；**28 對全部讀過兩端逐字**，逐對判讀在 library/private/alpha/is_component_of_rejudge/duplicate_candidates_review.md。graph admission，go 只授權本項這 4 組的 entity_aliases 登記＋存量 migration，**不含 B 組 5 對（證據不夠硬）、不含 C 組 13 對與 D 組 7 對（結論是不併）、不含 thesis 變更、不含 live**。\n\n【判決分布】A 明確該併 4 對｜B 傾向併但證據不夠硬 5 對｜C taxonomy／版本關係 13 對｜D 產品 vs 技術 7 對。**28 對裡只有 4 對該併（14%）**——其餘不是抽取錯誤，是純字串比對必然會提名的東西。\n\n【A 組四對，canonical 依機械選法取最短 id】①prod:blazar ← prod:poet_blazar（兩端都是 POET 的 Blazar 混合雷射，逐字直接指認）；②prod:reliant ← prod:reliant_product_line（**兩端逐字是同一份 10-K 的同一句話，一字不差**）；③tech:foundry_logic ← tech:foundry_logic_advanced（兩端逐字都是 AMAT 的 by-market 營收拆分，**與 [505] NAND 那次完全同型**）；④prod:optical_interposer ↔ tech:poet_optical_interposer（name 正規化後逐字相同，且共用同一段逐字）。\n\n⚠ **第④對的 canonical 選法要你決定**：機械選法（最短 id）會選 prod:optical_interposer，但 tech:poet_optical_interposer 的邊更多（6 vs 2）、逐字更多（3 vs 2），而它的逐字自稱是 platform（平台技術）不是單一產品——**前綴本身承載語意，而機械選法看不見它**。建議取 tech: 那一端，但那是偏離機械選法，需要你點頭。其餘三對照機械選法即可。\n\n【⚠ 本輪最該記住的：偵測器漏報了一對真重複】圖裡有三個 foundry/logic 節點，而 tech:foundry_logic_advanced 與 tech:leading_edge_logic_foundry **指的是同一件事**（先進節點的 foundry/logic）。但那一對**兩條規則都抓不到**（token 互不為子集、name 完全不同），它是被提名的另外兩對（都是 taxonomy）順帶帶出來的。這證實了偵測器 THIS_IS_NOT 第二條寫的限制是真的，而且有了具體案例。已列進 B 組。\n\n【⚠ 這份判讀有一半留不住】C 組 13 對＋D 組 7 對＝20 對的結論是「不併」，而那個結論今天沒有地方可寫（entity_aliases 只有 canonical 區塊）。**下一次跑偵測器，這 20 對會原封不動再出現一次**——那正是 ROADMAP 那條 backlog 的具體樣子。",
+      "n": 615,
+      "reason": null,
+      "ref_id": "library/private/alpha/is_component_of_rejudge/duplicate_candidates_review.md",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "重複節點候選 28 對判讀完：4 對明確該併（含一對 canonical 選法要你決定）",
+      "type": "manual"
     }
   ],
   "log": [
@@ -22244,6 +22280,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 613,
+  "next_n": 616,
   "schema_version": "1"
 }
