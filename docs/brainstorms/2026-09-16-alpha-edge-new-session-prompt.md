@@ -156,7 +156,7 @@
 | canonical 邊 **526**、materialized 屬性 **360**、`substitutability` 覆蓋 **86／526** | `python -m loader.edge_resolution project --dry-run` |
 | **圖裡逐字 `Source` 1,058 個（帶 quote 1,057）、`QUOTES` 邊 2,959**；Entity 697、Claim 409 | `python -m query.structure <node> --quotes` |
 | **證據等級真實分布**：外部印證 **217（41.3%）**／待判定 108／自報·filing 105／供應商自報 96（共 526 條） | `python -m query.structure mat:inp_substrate` 看「證據」欄 |
-| `audit invariants` FAIL 0／PASS 13（**4,189 筆**；筆數隨資料浮動，**驗收條件是 FAIL 0 不是筆數**） | `python -m audit invariants` |
+| `audit invariants` FAIL 0／PASS 13（**4,195 筆**；筆數隨資料浮動，**驗收條件是 FAIL 0 不是筆數**） | `python -m audit invariants` |
 | 全套 pytest **2,687 passed／1 skipped**（本輪 +13：V3 十一條、coverage degree 一條、證據欄一條） | `python -m pytest -q`（約 8 分鐘） |
 | 待辦池未結案 **37**；**pq2 球在你手上 20**；**結構讀圖待重讀 0**（本輪兩份都重讀了）；未 triage 0 | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
 | 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
