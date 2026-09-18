@@ -14,7 +14,7 @@
 
 ## 開工指令（貼這一段）
 
-> ## 現在的狀態（2026-09-18 收尾）
+> ## 現在的狀態（2026-09-18 第二輪收尾）
 >
 > **開工三件事（每次都跑，不要憑記憶）：**
 > ```
@@ -23,65 +23,51 @@
 > schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V     # Last Run Time / Last Result / Next Run Time
 > ```
 >
-> **Phase 狀態：Phase 1 ▶（研究已做、證據不足以進榜）｜Phase 2 ▶（等驗收）｜Phase 3 ✅｜Phase 4 ▶｜Phase 5 ○｜Phase 6 ✅｜Phase 7 ○。**
+> **Phase 狀態：Phase 1 ▶（研究已做、證據不足以進榜）｜Phase 2 ▶（等時間）｜Phase 3 ✅｜Phase 4 ▶（①已交付）｜Phase 5 ▶（D15 三量已交付）｜Phase 6 ✅｜Phase 7 ○。**
 >
-> **⚠ Phase 2 的「連續 3 天心跳」進度（每天實測一次）：第 1 天 ✅ 2026-09-18 07:00:01 自動觸發、
-> `Last Result 0`、publisher `sent` 2/2。第 2 天＝09-19、第 3 天＝09-20。**
-> 那是等時間不是等工作；在 3 天湊滿之前 Phase 2 不標完成。
+> **⚠ Phase 2 的「連續 3 天心跳」：第 1 天 ✅ 2026-09-18 07:00:01、`Last Result 0`、publisher sent 2/2。
+> 第 2 天＝09-19、第 3 天＝09-20。** 那是等時間不是等工作；3 天湊滿之前不標完成。
 > 查證：`library/private/heartbeat/heartbeat_task.log` 逐日一段。
 >
-> **這兩輪做完的（2026-09-17 深夜 ～ 09-18）：**
+> **本輪（2026-09-18 白天）做完的兩件，兩件都是「先量測再決定」：**
 >
 > | | 交付 | before → after |
 > |---|---|---|
-> | **Phase 6** 台股月營收進 Engine C | `engine_c/monthly_revenue.py`＋`fetchers/mops_open_data.py` | 3081.TWO **0 → 24 個月**（7 檔台股共 175 列） |
-> | **Phase 6** MOPS 重訊 watcher | `harvest_mops`＋`mops_watch` config | harvest 來源 **29 → 36**；**第一天自動跑就抓到 3 則**（見下） |
-> | **Phase 6** 沒有到期的等待 | `leads.parked_without_expiry()`＋心跳第 3 段計數器 | 黑洞 **3 → 0** |
-> | **Phase 3** 驗收行改寫（A 案） | `Metric.revisit_after` | 90 天兩格由「沒有值」變成「沒有值＋**2026-09-27 會有**」 |
-> | **[602]** AXT↔JX competes_with 入圖 | commit `8c76bde` | `query.structure co:axt` 反向路徑 **1 → 2** |
-> | **[603]** gsr cl2 的過期分句與已觸發 disproof | commit `19af823` | statement／disproof 就地標記，as-of 那句**逐字保留** |
+> | **Phase 4 ①** `constrained_by` 進需求走訪（commit `2140eca`） | 新增 `DEPENDENCY_RELATIONS`，四處硬編收斂成一份 | **排序 0 列變**；filtered 2 列由「走不到錨」變可達；讀圖 staleness 自己抓到 1 份該重讀 |
+> | **Phase 5 D15** 三個 power-law 統計量（commit `5088cfe`） | `power_law_aggregate()` ＋ 四個消費端 | 追蹤表第一次看得到「一檔扛全場」：**AXTI +2.29pp／其餘 21 檔 −2.27pp／曾達 2 倍 1-22** |
 >
-> **⚠ 這兩輪最該記住的三件事：**
+> **⚠ 本輪最該記住的三件事：**
 >
-> **① 兩個 pq2 的提案診斷都被實測推翻，而兩次查詢都在動手前跑。**
-> [602] 說「圖裡缺 AXT↔JX 的邊，所以 JX 的擴產證據不在 AXT 的 context slice 裡」——實測**最短路徑
-> 本來就是 2 跳**，擋住它的是 `LIMIT`（兩跳內 **154 條 claim**，讀圖只印 **20** 條，排序鍵是 proof level
-> ＋confidence，**不是相關性**；`claim_limit=20` → JX 出現 0 次、`=200` → 7 次）。**補邊改不動那件事。**
-> [603] 提案說「措辭過期」——實測是**那條 claim 自己的 disproof 在寫下一個月後就被觸發**
-> （條件逐字寫著「any of the three announces a material capacity expansion」，JX 2026-06-16 做了），
-> 而**觸發它的那份新聞稿就在同一張圖裡**，三個月沒有任何東西響過。
+> **① ROADMAP 寫的修法方向是錯的，而量測在動手前就抓到了。** 驗收行說「`constrained_by` 要不要進
+> `UPSTREAM_RELATIONS`」——實測那個分支是 `upward[src].add(dst)`＝「A 被 B 需要」，方向相反；照字面加
+> 會把 `co:iqe` 那條 accepted 列的鏈路靜默改成 4 節點，而想解的兩個節點一個都沒解到。**方向的判準不是
+> 自由心證**：`DOWNSTREAM_RELATIONS`、`vocab.json` 的 `sole_source_beneficiary_end`、8 條邊逐字，三份
+> 獨立登記處都把 dst 當被需要的一端。這是連續第三輪「提案診斷被實測推翻」。
 >
-> **② 兩個機制缺口已寫進 ROADMAP backlog（🔴，待 Z2），不要在不知情的情況下再撞一次：**
-> **(a)** `query/graph_context.py` 的 claim 截斷不說話——**409 條 claim 全部帶 `disproof_condition`，
-> 被標成 TRIGGERED 的只有 1 條**（就是本輪手動標的）；對照組是 Q5 的結構讀圖 staleness，
-> **同一族的機制、claim 這一側沒有**。
-> **(b)** 心跳排 07:00 而 daily 07:26 才結束，**心跳第 1 段每天報的都是「昨天」**
-> （實測：心跳說 APP 今天 materialize 0 份，20 分鐘後是 8 份）。修法不是把心跳延後——
-> 那會弱化它存在的全部理由（daily 死掉時心跳照發）。
+> **② 真實資料一跑就打爆首版設計，而假資料不會。** power-law 首版印「最大單檔佔籃子總報酬的比例」，
+> 真跑出來是 **15636%**（籃子總報酬 +0.02%，分母接近 0）。修法**不是設門檻**（那會引入憑空參數，INV-5），
+> 是改成恆等式 `籃子總報酬 ＝ 最大單檔 ＋ 其餘`——減法不可能爆。**寫完新統計量一定要用真資料跑一次。**
 >
-> **③ MOPS 重訊 watcher 第一天自動跑就抓到三則有研究價值的，已在 pq1 排隊：**
-> **3105.TWO 穩懋「訂購廠務工程」NT$353,562,825**（累計訂單，擴產資本支出的一手證據）；
-> **2455.TW 全新「二」「三」兩檔可轉債行使贖回權**——觸發條款逐字是「普通股收盤價**連續三十個
-> 營業日超過轉換價格達 30%**」，且贖回會逼 CB 轉普通股＝**稀釋**（核驗清單五項之一）。
-> 這是 Phase 6 的第一個真實產出，**不是靠人記得去看**。
+> **③ ROADMAP Phase 6 表裡「Aehr 要先補一條邊」那句已被推翻並就地劃線**：那條邊
+> （`tech:cpo --constrained_by--> tech:cpo_full_stack_test`）一直都在圖裡，缺的是 traversal。
+> 現在 Aehr 缺的只有 `substitutability`，補了就進榜（what-if 第 27 名，放閘前是無錨區第 37）。
 >
-> **待使用者決定：目前沒有。** [602][603] 都已結案。
+> **待使用者決定：目前沒有。**
 >
 > **不需核准就能接著做的（依序建議）：**
-> **① Phase 4 的 `constrained_by` 那一條**（開發項）：`query/bottleneck.py` 的 `UPSTREAM_RELATIONS`
-> 只有 `("enables", "is_component_of")`，不含 `constrained_by`，所以 `tech:cpo_full_stack_test`／
-> `tech:inp_dfb_laser` 走不到需求錨。⚠ **驗收行明訂要先量「加了之後有幾列真的變了」再決定放不放閘**
-> （L14-3：先量測後放閘）——那是一次唯讀量測，做完才知道值不值得動。
-> **② Phase 5 的表達層**（D2 對稱 overlay「判斷錯了值多少」、歸零旗標、三個 power-law 統計量）。
-> ⚠ **Phase 4 剩下的兩條機械條件（覆蓋厚薄、瓶頸業務占營收）仍然不該做**——實測會讓 0 家變 0 家。
+> **① Phase 5 剩下的三件**：D2 對稱 overlay（判斷錯了值多少＝反證觸發後的假設套同一條橋）、歸零旗標
+> （現金跑道／負債／稀釋／going concern，紅黃綠不給數字）、alpha 全歸零淨值少幾 %；外加 D3
+> 「`realized` 降為提醒不觸發出場」。
+> **② 重讀 `mat:inp_substrate` 的結構讀圖**（研究不是開發，互動 session 才能做，D12）——本輪的
+> `constrained_by` 放閘讓它的需求側從 15 條變 16 條，ledger 那份已標 `stale`。
+> 查證：`python -m query.structure mat:inp_substrate`、心跳第 2 段。
+> **③ Phase 4 剩下的三種成因**（②`enables` 一表兩義、③`tech:photodiode` 真的沒有需求方邊、④鏈長），
+> 以及 ROADMAP backlog 那三條（🔴 claim 截斷不說話、🔴 409 條 disproof 只有 1 條 TRIGGERED、🔶 心跳報昨天）。
 >
-> ⚠⚠ **binding constraint 連續四輪沒有動過：籃子 16 檔 `bet` 2、`abstained` 0、`unanswered` 14。**
-> 能讓籃子非空的只有兩條路，**兩條都要人**：①替某一檔寫下帶 disproof 的賭注；
-> ②寫一筆 `bet/variant.overlay` 的 Abstention。**兩者都是答案，只有空白不是。**
-> 上面那兩件開發項**都不會碰到它**——這點要對使用者說清楚，不要讓交付看起來像進展。
->
-> **月營收的消費端今天很窄，刻意沒補**：只到達心跳的新鮮度行與 CLI——你看得到「有沒有跟上」，
-> **看不到「聯亞 8 月 YoY +180.90%」**。要不要讓它進 APP／隱含報酬橋是呈現契約的決定。
+> ⚠⚠ **binding constraint 連續五輪沒有動過：籃子 16 檔 `bet` 2、`abstained` 0、`unanswered` 14。**
+> 能讓籃子非空的只有兩條路，**兩條都要人**：①替某一檔寫下帶 disproof 的賭注；②寫一筆
+> `bet/variant.overlay` 的 Abstention。**兩者都是答案，只有空白不是。**
+> 上面三件開發項**都不會碰到它**——這點要對使用者說清楚，不要讓交付看起來像進展。
 >
 > **仍要停下來等人的（不因常設授權放寬）：** 四個人工 gate（graph admission／Engine C 判讀寫入／
 > thesis mutation／live）、資本或任何 append-only authority、要改 `AGENTS.md` 判準句或 ROADMAP 的
@@ -115,9 +101,11 @@
 | 可投資排序 **37 列**；**TW／TWO／ST 仍 0 檔**（6 檔台股在「低於門檻」區） | `python -m query.bottleneck --top-n 60` |
 | canonical 邊 **530**、materialized 屬性 **363**；`substitutability` 覆蓋 **91/530（17%）** | `python -m loader.edge_resolution project --dry-run` |
 | `audit invariants` FAIL 0／PASS 13（**4,183 筆**） | `python -m audit invariants` |
-| 全套 pytest **2,620 passed／1 skipped** | `python -m pytest -q` |
+| 全套 pytest **2,627 passed／1 skipped**（2026-09-18 第二輪實測） | `python -m pytest -q` |
 | 待辦池未結案 **35** 項；**pq1 可做 11**（含 3 則 MOPS 重訊） | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
 | 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14**；量的候選 15 家通過 **0** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
+| 追蹤表 22 檔：籃子總報酬 **+0.02%**、最大單檔 **AXTI +2.29pp**、其餘 21 檔 **−2.27pp**、曾達 2 倍 **1/22**（現價仍達 **0**） | `python scripts/outcome_if_settled_today.py`（看「power-law 三量」段） |
+| 結構讀圖 ledger **2 個節點**，其中 **1 份該重讀**（`mat:inp_substrate`） | `python -m query.structure mat:inp_substrate`、心跳第 2 段 |
 | 7 檔台股各 **24 個月**月營收；3081.TWO 2026-08 **YoY +180.90%** | `python -m engine_c.monthly_revenue --ticker 3081.TWO` |
 | 無到期的等待 **0**；事件監看 93 | `python -c "from engine_b import leads;print(len(leads.parked_without_expiry(leads.load())))"` |
 
@@ -153,7 +141,8 @@ Push 是常規動作，session 收尾把 master push 到 origin；push 前 sanit
 | 2026-09-17 早 | Phase 1 Step 1.0／1.1／1.2（公司名稱解析、MFN／RNS 抓取器、D8 補三格） | …`fbc1b4f` |
 | 2026-09-17 晚 | Step 1.3 收尾｜Phase 2 心跳＋排程｜Q1／Q2／Q4／Q5（結構讀圖、籃子賭注契約） | `fbc1b4f`…`e6f07d0` |
 | 2026-09-17 深夜 | Phase 3（D5 計分表）｜AXTI InP 賭注寫下｜Phase 6 前兩項｜[602] 入圖 | `8eee2e1`…`65eec17` |
-| 2026-09-18 | Phase 3 驗收行改寫＋標 ✅｜Phase 6 第三項＋標 ✅｜[603] 入圖｜Phase 2 第 1 天 | `19af823`…（本輪） |
+| 2026-09-18 早 | Phase 3 驗收行改寫＋標 ✅｜Phase 6 第三項＋標 ✅｜[603] 入圖｜Phase 2 第 1 天 | `19af823`…`c1e4638` |
+| 2026-09-18 白天 | Phase 4 ①`constrained_by` 量測＋放閘｜Phase 5 D15 三個 power-law 統計量 | `2140eca`…`5088cfe` |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項。**
 Step 0 的去向清單見 [`docs/refactor/alpha-edge-step0-migration.md`](../refactor/alpha-edge-step0-migration.md)。
