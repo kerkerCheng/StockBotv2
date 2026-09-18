@@ -70,8 +70,21 @@ ALIAS = {
     "tech:dram_production": "tech:dram_manufacturing",
 }
 
-#: [610] 的第一件：方向相反的既有邊。
-ISOLATOR = ("tech:external_laser_source", "is_component_of", "tech:isolator")
+#: 方向相反的既有邊，逐條列。**第二次撞到同型時從單一常數改成清單**（L17-1／L17-2：
+#: 十行內、不動判決檔格式，所以是當下修而不是寫第三支腳本）。
+#: ⚠ **第三次再來就要把它抽成資料檔**——那時它已經是一個沒有 schema 的判決清單，
+#: 而這支腳本的名字（`enables_rejudge`）也已經與它承載的東西對不上了。
+DIRECTION_FIXES = (
+    # [610]（2026-09-18 核准）：原逐字只是列舉 Coherent 做的兩樣東西，完全沒說哪個是哪個的元件。
+    ("tech:external_laser_source", "is_component_of", "tech:isolator"),
+    # [612]（2026-09-18 核准）：同一份抽取檔（`coherent_ofc_march25.json` 的 e22）、同一段逐字 s13。
+    # 《The external laser source, which I'm sure you've all heard of, **that has our CW laser in it**》
+    # ——ELS 裡面有 CW 雷射，所以正確方向是 cw_dfb_laser is_component_of external_laser_source，
+    # 而那條邊圖上已經有了（`coherent_q3fy26_cpo` 的 e5，tier-1 法說 Q&A，證據更強）。
+    # 使用者核准時給了兩個選項（翻轉／刪除），這裡選**翻轉**：刪除會丟掉一段 tier-2 逐字，
+    # 而翻轉後它成為同一條 canonical edge 的第二份 provenance——保留證據沒有下行風險。
+    ("tech:external_laser_source", "is_component_of", "tech:cw_dfb_laser"),
+)
 
 #: [610] 的第二件走 registry，不在這裡列——`identity/entities.py` 是唯一登記處（L16）。
 MERGED_AWAY_NODE = "tech:inp_eml"
@@ -93,7 +106,7 @@ def _rewrite_edges(doc: dict, verdicts: dict) -> tuple[list[dict], list[str]]:
     removed: list[str] = []
     for e in doc.get("edges", []):
         src, rel, dst = e.get("src_id"), e.get("relation"), e.get("dst_id")
-        if (src, rel, dst) == ISOLATOR:
+        if (src, rel, dst) in DIRECTION_FIXES:
             e = dict(e, src_id=dst, dst_id=src)          # 翻方向，relation 不變
             kept.append(e)
             continue

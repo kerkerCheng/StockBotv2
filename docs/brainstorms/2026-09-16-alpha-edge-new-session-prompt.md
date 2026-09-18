@@ -63,7 +63,7 @@
 > | **修掉 V1 留下的回歸** | `coverage_gaps` 的 `degree` 把證據邊也算成結構邊 | 188 個節點 degree 虛增；`tech:scale_out_network` 的 `isolated` 標記**回來了** |
 > | **🔴 證據欄從未被賦值** | `query.structure` 的「證據」欄是 dataclass 預設值，全圖都印「供應商自報」 | **526 條裡 430 條（81.7%）印錯** → 真實分布外部印證 217（41.3%）／待判定 108／自報·filing 105／自報 96 |
 > | **兩份 stale 結構讀圖重讀** | `mat:inp_substrate`（第 5 筆）、`tech:cw_dfb_laser`（第 2 筆），兩份都**維持 volume** | 佇列段「結構讀圖待重讀」**2 → 0** |
-> | **兩個 pq2 掛號** | [611] 三個出口管制節點合併｜[612] 一條 `is_component_of` 方向相反 | 兩者都是**用新工具在例行工作中自己撞到的**，不是繞過工具 grep 出來的 |
+> | **[611][612] 核准後執行完畢** | 三個出口管制節點併成一個｜一條 `is_component_of` 翻轉方向 | 候選 **34 → 32**、沒人提過 **30 → 28**——**清單第一次真的變短**（L14-4「會滅」那一條的答案） |
 > | **ROADMAP 回填** | V1／V2 的交付紀錄**先前根本沒寫進 ROADMAP**（該行還寫著「停在這裡等人」） | 三個 V 的交付、量測與兩次被推翻都落在唯一權威上 |
 >
 > ### ⚠ 本輪最該記住的六件
@@ -93,24 +93,30 @@
 > ⚠ 但也量到 **V2 只做了一半**：`--quotes` 印得出「這條邊的逐字」，印不出「這一格的逐字」——要回答
 > 「`sub=3` 憑什麼」仍必須繞過工具直接查 EdgeAssertion（已進 ROADMAP）。
 >
-> ### 待使用者決定：兩個 pq2 編號（都是 graph admission，逐筆核准）
+> ### 待使用者決定：目前沒有
 >
-> **[611]** 三個美中出口管制節點指的是同一件事 → 合併為 `tech:us_export_controls`。三段逐字都是 tier-1 filing，
-> canonical 用機械選法（最短 id）。**影響面：coverage ⚪ 概念桶 3 → 1，不影響可投資排序。**
-> **[612]** `tech:external_laser_source is_component_of tech:cw_dfb_laser` **方向相反**——逐字原話是
-> 「The external laser source… **that has our CW laser in it**」，而正確方向的邊圖上已有、證據更強（tier 1 法說）。
-> **兩個選項擇一：翻轉方向，或刪除該條**（因為正確方向已存在）。
+> **[611][612] 已於 2026-09-18 核准並執行完畢**（V3 交付當天就走完第一趟全程：提名 → packet → 核准 → 入圖 → 清單變短）。
+> 候選 **34 → 32 對**、「沒人提過」**30 → 28**、節點 191 → 189；兩次入圖後排序都逐位不變。
 >
 > ### 不需核准就能接著做的（依序建議）
 >
-> **① 讀那 30 對「沒人提過」的候選**（`python -m query.duplicate_nodes`）——逐字已經並排印好，
+> **① 讀那 28 對「沒人提過」的候選**（`python -m query.duplicate_nodes`）——逐字已經並排印好，
 > 判「是同一個」就打包 pq2 `ra_admission`；判「不是」目前**沒有地方寫**（見下面那條 backlog）。
 > 先挑與 coverage 🔴／🟡 重疊的那 4 個，因為它們同時解掉一個誤報。
 > **② 替 AXTI 寫 `downside` 情境假設**——它有 15 筆 OperatingAssumption，`scenario` 全是
 > `base`／`variant`，**`downside` 0 筆**，所以「判斷錯了值多少」那條對稱橋在唯一走得最深的那檔上也是空的。
-> **③ 把 `is_component_of` 整個 relation 逐條對逐字重判**——[610] 與 [612] 是同一個節點、同一種錯的兩個實例，
+> **③ 把 `is_component_of` 整個 relation 逐條對逐字重判**——[610] 與 [612] 是**同一份抽取檔、同一段逐字**
+> （`coherent_ofc_march25.json` 的 e23 與 e22 共用 source `s13`）的兩個實例，
 > 而 `enables` 重判的 base rate 是 35%。**沒有理由相信這個 relation 更乾淨。**
-> **④ ROADMAP backlog 剩下的**：409 條 disproof 沒人比對（**Z2 有岔路**）、Phase 4 的成因③④、
+> ⚠ 已知還有第三件在同一段逐字上：e23（[610] 已翻正方向）的逐字《We also, I think you make -- design and
+> manufacture a significant fraction of the world's isolator》**只說 Coherent 做 isolator，沒說它是 ELS 的元件**
+> ——方向修對了，關係本身仍沒有逐字支撐。
+> **④ 驗一件可能已經過期的事（30 秒）**：pq2 [571]–[575] 五個 Abstention 提案鑄於 **2026-09-13**，
+> 而**同一天**的政策改動說「虧損檔寫一筆 `ev_to_sales` 估值假設就走完，**不需要 pq2**」。
+> 已查 ground truth：XFAB.PA 的 `ev_to_sales`（`va_7dbc97f4`）**已寫**、Abstention ledger **0 筆**。
+> 若五檔皆如此，它們是**被政策取消的類別**，該 drop 而不是執行。⚠ 但 `closure-gate` 仍把 XFAB.PA 列為
+> 「forward EPS 共識非正」卡住——**兩件事要對起來才能下結論**，本輪沒做完。
+> **⑤ ROADMAP backlog 剩下的**：409 條 disproof 沒人比對（**Z2 有岔路**）、Phase 4 的成因③④、
 > 心跳報昨天（維持營運）、歸零旗標第四盞（Z2 動 Engine C 字彙）、`review_conditions` 對照不到期中實績（Z2 動封閉字彙）。
 >
 > ⚠ **三條新的 backlog 都有「使用者要選的問題」，所以都停在提案階段**：
@@ -151,14 +157,14 @@
 |---|---|
 | 可投資排序 **37 列**；filter `input 221／accepted 37／filtered 184`；理由 `unfilled 155／below_threshold 29` | `python -m query.bottleneck --top-n 60` |
 | **瓶頸節點走不到需求錨 63／158**：`no_demand_edge` **57**、`upstream_dead_end` **6** | 同上，看「瓶頸節點走不到需求錨」段 |
-| **重複節點候選 34 對**｜同層 28｜涉及節點 49／191｜registry 提過 4｜**沒人提過 30** | `python -m query.duplicate_nodes` |
+| **重複節點候選 32 對**｜同層 25｜涉及節點 46／189｜registry 提過 4｜**沒人提過 28** | `python -m query.duplicate_nodes` |
 | 覆蓋掃描 **🔴 真缺口 4／🟡 建模待補 14**；**🔴 有 2 個同時是重複節點候選的一端** | `python -m webapp materialize --coverage` ＋ `python -m webapp status` |
 | canonical 邊 **526**、materialized 屬性 **360**、`substitutability` 覆蓋 **86／526** | `python -m loader.edge_resolution project --dry-run` |
 | **圖裡逐字 `Source` 1,058 個（帶 quote 1,057）、`QUOTES` 邊 2,959**；Entity 697、Claim 409 | `python -m query.structure <node> --quotes` |
 | **證據等級真實分布**：外部印證 **217（41.3%）**／待判定 108／自報·filing 105／供應商自報 96（共 526 條） | `python -m query.structure mat:inp_substrate` 看「證據」欄 |
-| `audit invariants` FAIL 0／PASS 13（**4,195 筆**；筆數隨資料浮動，**驗收條件是 FAIL 0 不是筆數**） | `python -m audit invariants` |
+| `audit invariants` FAIL 0／PASS 13（**4,193 筆**；筆數隨資料浮動，**驗收條件是 FAIL 0 不是筆數**） | `python -m audit invariants` |
 | 全套 pytest **2,687 passed／1 skipped**（本輪 +13：V3 十一條、coverage degree 一條、證據欄一條） | `python -m pytest -q`（約 8 分鐘） |
-| 待辦池未結案 **37**；**pq2 球在你手上 20**；**結構讀圖待重讀 0**（本輪兩份都重讀了）；未 triage 0 | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
+| 待辦池未結案 **35**；**pq2 球在你手上 18**；**結構讀圖待重讀 0**（本輪三份讀圖都寫了）；未 triage 0 | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
 | 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
 | 歸零旗標 16 檔 × 4 盞：紅 2（COHR、IQE.L）｜黃 8｜綠 20｜**灰 34**（灰不是綠） | 心跳第 4 段；或讀同檔 `wipeout_ledger` |
 | 追蹤表 22 檔｜量測起始 2026-07-21｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
@@ -197,7 +203,7 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | 2026-09-18 白天 | Phase 4 ①`constrained_by`｜Phase 5 D15 三量｜D2 對稱 overlay｜歸零旗標｜`demand_anchor` 讀法＋[606] | `2140eca`…`47862a3` |
 | 2026-09-18 下午 | Phase 4 成因分開｜`enables` 防呆＋[607]｜`graph_context` 截斷說話 | `ec47822`…`9032aff` |
 | 2026-09-18 晚 | L18 zoom-out＋沉澱｜V1 逐字入圖｜V2 `--quotes`｜`is_component_of` 盲區｜[606][607] 執行｜[608][609][610] migration | `7e6a3bd`…`53b059f` |
-| **2026-09-18 深夜** | **V3 重複節點偵測器（CLI＋APP＋佇列段＋research-drain consumer）｜coverage degree 回歸｜證據欄從未被賦值（430/526）｜兩份結構讀圖重讀（待重讀 2→0）｜[611][612] 掛號｜ROADMAP 回填 V1／V2／V3＋三條新 backlog** | `39a2ff0`… |
+| **2026-09-18 深夜** | **V3 重複節點偵測器（CLI＋APP＋佇列段＋research-drain consumer）｜coverage degree 回歸｜證據欄從未被賦值（430/526）｜三份結構讀圖（待重讀 2→0）｜[611][612] 鑄號→核准→入圖（候選 34→32、沒人提過 30→28）｜ROADMAP 回填 V1／V2／V3＋三條新 backlog** | `39a2ff0`… |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 

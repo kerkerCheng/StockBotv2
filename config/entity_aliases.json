@@ -70,6 +70,16 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:508",
       "note": "使用者 2026-09-10 核准（[508]）。⚠ **不得用 name_identical 登記**：兩者 name 現在相同，是 [506] 重載時 MERGE_NODE 覆蓋造成的（tech:ocs 原本是『Optical Circuit Switching (OCS)』，比對備份快照 20260910T053041Z 可驗）——拿自己遷移改出來的 name 當機械依據是循環論證。語意依據：兩者 abstraction_level 同為 network_systems，供應商重疊（都有 SUPPLIES_TO co:lumentum 與 co:coherent），指的是同一層光路交換。canonical 取最短 id ＝ tech:ocs，它也是證據較厚的一端（11 個 source／9 條邊 vs 3 個 source／4 條邊），且今天核准的 Coherent → OCS qualification_status=qualified 就掛在它身上。"
+    },
+    "tech:us_export_controls": {
+      "name": "U.S. Export Controls on Semiconductor Equipment",
+      "aliases": [
+        "tech:export_controls_china",
+        "tech:export_controls_us_china"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:611",
+      "note": "使用者 2026-09-18 核准（[611]，V3 重複節點偵測器的第一批產出）。三個 id 的 name 各不相同，但三段逐字都是 tier-1 一手 filing 且指向同一個政策現實——美國政府限制半導體技術／設備出口至中國：tech:export_controls_china 出自 Lam 10-Q（lrcx_10_q_20260423, Risk Factors）『changes in import/export regulations and tariffs, such as regulations imposed by the U.S. government restricting exports to China』；tech:us_export_controls 出自 AMAT 10-Q（amat_10_q_20260219, MD&A: China）『The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China』；tech:export_controls_us_china 出自 AMAT 10-K（amat_10_k_20251212, Risk Factors）『Export controls enacted by the United States government that restrict the sale of certain technologies to customers in China』。三者 abstraction_level 同為 end_demand，各自只有一條 depends_on 邊（①指向 co:lam_research，②③指向 co:applied_materials）。canonical 依機械選法取最短 id（tech:us_export_controls 23 字元 < tech:export_controls_china 26 < tech:export_controls_us_china 29），任何人重跑得到同一個。⚠ **本檔的 `name` 欄不被任何程式讀取**（`identity/entities.py` 的 `_validate` 不驗它、migration 也不寫它），所以這裡照抄 canonical 端在圖裡的現值，不在這裡宣稱圖會改名。⚠ 合併後圖裡這個節點的 name 會是『U.S. Export Controls on Semiconductor Equipment』——**三者中最不精確的一個**（漏了 China 也漏了 Technology），因為 `MERGE_NODE` 保留既有 name。**id 的選法是機械的，name 的選法不是**：把兩者綁在一起會讓「哪個 id 較短」決定「這個東西叫什麼」。改 name 是另一個 graph write，不在 [611] 的 exact action 內，未做。"
     }
   }
 }
