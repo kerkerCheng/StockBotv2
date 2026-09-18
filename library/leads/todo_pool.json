@@ -10268,6 +10268,18 @@
       "source": "manual",
       "title": "補需求方邊：6 個瓶頸節點沒有人記錄過「誰需要它」",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T07:03:35.480857+00:00",
+      "hint": "2026-09-18 量到的：`enables` 在圖裡承載兩種相反的意思，而抽取 prompt 只定義了其中一種。逐字定義是 `enables` — A's adoption drives demand for B（＝**B 被 A 需要**），但圖裡有一批邊是照「A 是 B 的必要投入」寫的（＝**A 被 B 需要**），方向相反。⚠ **證據不是推論**：同一份文件 `coherent_q2fy26_cpo` 同時產出了 `tech:ai_switch enables tech:cpo` 與 `tech:cpo enables tech:ai_switch`；而 `tech:cpo is_component_of tech:ai_switch` 本來就在圖裡——同一對節點三條邊，其中一條純重複。所以分類**不是節點的屬性、也不是文件的屬性，是每一條 assertion 自己的屬性**，必須逐條對來源逐字重判。\n研究動作：82 條 `enables` 逐條讀它自己的 source quote，判成三種去向之一——①真的是「A 的採用帶動 B 的需求」→ **留著不動**；②其實是「B 沒有 A 就不能運作」→ 提案改成 `B depends_on A`；③其實是「A 是 B 裡面的零件」→ 提案改成 `A is_component_of B`，**若同一對已有那條邊則是純重複，提案刪除**。整成 prepared RA（可多條合併成少數幾個 packet，不需 82 個編號）。\n⚠ **本號的 go 只授權「讀來源＋逐條重判＋整成 packet」，不含入圖**——每個 packet 要進圖仍需各自的 `ra_admission` 編號（AGENTS：研究 go 不含入圖）。\n⚠ **順序不可換**：本號（資料歸位）必須在「改 `enables` 走訪方向」（開發項，ROADMAP Phase 4）之前。實測先改程式會把 `no_demand_edge` 由 51 打到 67——被誤植的那些邊正是今天讓一批節點走得到上游的東西。\n已知起點（機械掃出來、0 誤傷）：`extractions/coherent_q2fy26_cpo.json` 的 `ai_switch ⇄ cpo` 雙向、`extractions/gfs_20_f_20260227.json` 的 `sme enables globalfoundries` 與 `globalfoundries depends_on sme` 並存、以及跨文件的 `cpo enables ai_switch` 與 `cpo is_component_of ai_switch` 重複。\n影響上界（實測）：改判後排序母體 222 → 224（+2 列），**accepted 37 列 0 列變**；全改成 `is_component_of` 則母體一列不變。所以這件事對排序幾乎沒有風險，它改的是研究缺口記帳的正確性。\n查證：`python -m query.bottleneck --top-n 60`（「瓶頸節點走不到需求錨」段的 `enables_direction_unresolved`，今天 17）。",
+      "n": 607,
+      "reason": null,
+      "ref_id": "manual:607",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "enables 逐條重判：圖裡兩種相反的意思壓在同一個 relation 上",
+      "type": "manual"
     }
   ],
   "log": [
@@ -22102,6 +22114,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 607,
+  "next_n": 608,
   "schema_version": "1"
 }
