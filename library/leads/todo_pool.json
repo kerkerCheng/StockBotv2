@@ -10396,10 +10396,11 @@
       "added_at": "2026-09-18T17:42:13.336021+00:00",
       "hint": "go＝跑 skills/blind-spot-audit 對 LITE 的 variant／downside／催化劑做紅隊檢視（唯讀，不寫任何 authority）；不含入圖、不含 Engine C 寫入、不含 thesis mutation、不含改假設 ledger、不含 live。⚠ 為什麼值得花這個號：①這是籃子史上第一個非空 top_pick，且產生它的賭注、下檔、催化劑 resolves 三樣都是同一個 session 當天寫的——缺少獨立視角；②同一個 session 在寫入過程中踩到一個會**對自己有利**的靜默缺陷（overlay 的 scope 與 base 不一致時不覆蓋而是疊加，產出假的 +50.3%，真值 +20.7%），是靠寫入前手算對照才發現的，而那不是可例行化的紀律（L18-4）；③LITE 是市值 $80.2B、26 位分析師覆蓋的大型股，**不是 D0／D11 說的邊緣小公司**——它通過 filter 只是因為 Phase 4 的市值／覆蓋門檻還沒交付。④重點檢視三處：base 的 derivation 是 company_guidance 時 variant 還剩多少意義（本輪只有 +0.5pp）；downside 只下修 EPS 一桿、目標倍數維持 45.21x 是否低估下檔；催化劑 2026-11-10 指名的兩條假設是否真的能裁決那一桿。⑤與既有 [578]（COHR 賭注年度錯位）是同一族問題，可一起看。drop＝接受首選現況、不做獨立複查。",
       "n": 616,
-      "reason": null,
+      "reason": "2026-09-19 使用者核准後當次執行完畢。blind-spot-audit 紅隊檢視 LITE。3 個 🔴：①目標倍數停在 2026-09-08 校準值而股價已跌 8.7%，同筆假設一邊宣告零溢價一邊印出 +9.6% 倍數貢獻——依 AGENTS.md 既有判準重新校準至 41.24x（va_fdc6703cf266cf1a supersede va_8e435096b30b3d53），下檔由 −1.3% 變 −10.0%、賭對由 +20.7% 變 +10.1%，LITE 仍是唯一通過 filter 的；②co:lumentum supplies_to tech:uhp_laser 的 sole_source=true 三條證據 origin_entity 全是 Lumentum 自己，圖裡另有 co:coherent 供同一 tech 的 tier-3 反證邊，逐字只支持 few can deliver——依 L8 應降級，需另案 pq2（未在本輪動圖）；③downside 營收退到共識下緣仍是 +86% 成長，而 10-K 載明多數客戶無合約性採購承諾、合約負債僅 US$15.4M，真正的下檔機制不在共識分布內。母體量測：11 檔 target_pe 有 4 檔宣告 calibrated_to_market 卻背離 >5%（AVGO／SOI.PA／5802.T／000660.KS）。詳見 ROADMAP 第六列。",
+      "receipt": "authority:valuation_assumption;ref:va_fdc6703cf266cf1a",
       "ref_id": "manual:616",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-18T19:47:39.780513+00:00",
       "source": "manual",
       "title": "LITE：獨立複查系統第一個 top_pick——賭注、下檔與催化劑連結都由同一個 session（2026-09-19）寫入，需紅隊檢視",
       "type": "manual"
@@ -22368,6 +22369,15 @@
       "reason": "使用者 2026-09-19 核准。已執行：`config/entity_aliases.json` 新增 4 組（全部 basis=semantic_reviewed、approval_receipt=todo:615）後重跑既有的泛化 migration（`loader/migrate_entity_alias_backfill.py`，吃 registry 的每一組，**沒有寫新腳本**）。\n\n【四組】prod:blazar ← prod:poet_blazar｜prod:reliant ← prod:reliant_product_line｜tech:foundry_logic ← tech:foundry_logic_advanced｜**tech:poet_optical_interposer ← prod:optical_interposer**。\n\n⚠ **第四組刻意偏離機械選法**（使用者未逐項指定，依 packet §A2 的建議執行，理由寫進 registry note 以便日後推翻）：機械選法會取最短 id `prod:optical_interposer`(24)，這裡取 `tech:poet_optical_interposer`(28)。三個理由：①它的逐字自稱是 platform 不是單一產品；②邊 6 vs 2、逐字 3 vs 2；③**前綴本身承載語意而機械選法看不見**。這是 [611] 那條判準的延伸——**id 的選法是機械的，name 的選法不是；現在多一句：前綴也不是**。\n\n【驗收】四個 alias 節點全部查不到（`query.structure` 回「沒有出現過」）；migration 重跑冪等（groups_to_migrate 空）；**重複節點候選 32 → 28 對、「沒人提過」28 → 23、圖中節點 189 → 185**；可投資排序 input 221／accepted 37／filtered 184 **逐位不變**。\n\n【B 組 5 對未動，仍等證據】其中最值得記的是 `tech:foundry_logic_advanced` ↔ `tech:leading_edge_logic_foundry`——它們才是真正的重複（都指「先進節點的 foundry/logic」），但**偵測器的兩條規則都抓不到**（token 互不為子集、name 完全不同），是被本次核准的那一對順帶帶出來的。本次已把 `foundry_logic_advanced` 併進 `foundry_logic`，所以那一對現在變成 `tech:foundry_logic` ↔ `tech:leading_edge_logic_foundry` 的子集關係，等下一輪判。",
       "receipt": "authority:graph_admission;ref:entity_aliases_4_groups_615",
       "ref_id": "library/private/alpha/is_component_of_rejudge/duplicate_candidates_review.md",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-18T19:47:39.780513+00:00",
+      "n": 616,
+      "reason": "2026-09-19 使用者核准後當次執行完畢。blind-spot-audit 紅隊檢視 LITE。3 個 🔴：①目標倍數停在 2026-09-08 校準值而股價已跌 8.7%，同筆假設一邊宣告零溢價一邊印出 +9.6% 倍數貢獻——依 AGENTS.md 既有判準重新校準至 41.24x（va_fdc6703cf266cf1a supersede va_8e435096b30b3d53），下檔由 −1.3% 變 −10.0%、賭對由 +20.7% 變 +10.1%，LITE 仍是唯一通過 filter 的；②co:lumentum supplies_to tech:uhp_laser 的 sole_source=true 三條證據 origin_entity 全是 Lumentum 自己，圖裡另有 co:coherent 供同一 tech 的 tier-3 反證邊，逐字只支持 few can deliver——依 L8 應降級，需另案 pq2（未在本輪動圖）；③downside 營收退到共識下緣仍是 +86% 成長，而 10-K 載明多數客戶無合約性採購承諾、合約負債僅 US$15.4M，真正的下檔機制不在共識分布內。母體量測：11 檔 target_pe 有 4 檔宣告 calibrated_to_market 卻背離 >5%（AVGO／SOI.PA／5802.T／000660.KS）。詳見 ROADMAP 第六列。",
+      "receipt": "authority:valuation_assumption;ref:va_fdc6703cf266cf1a",
+      "ref_id": "manual:616",
       "type": "manual",
       "verb": "go"
     }
