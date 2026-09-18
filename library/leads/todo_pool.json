@@ -10404,6 +10404,18 @@
       "source": "manual",
       "title": "LITE：獨立複查系統第一個 top_pick——賭注、下檔與催化劑連結都由同一個 session（2026-09-19）寫入，需紅隊檢視",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T19:51:06.029545+00:00",
+      "hint": "go＝跑 source-trace 找客戶端或第三方對『UHP CW 雷射僅 Lumentum 一家可供』的逐字確認；找不到就把該邊的 sole_source 降級為 verified_by_absence 並標 sole_source_evidence_quality=weak（graph admission，仍需你逐筆核准寫入）。不含提高任何 evidence tier、不含新增邊、不含改 Q1 結構分的算法、不含 live。⚠ 事實（2026-09-19 [616] 審查實測，python -m query.structure tech:uhp_laser --quotes 可重跑）：①該邊標 sole_source=✓、substitutability=5、designed_in，而三條證據的 origin_entity **全是 Lumentum 自己**（lumentum_q2fy26_cpo，tier 1 但屬自我報告）——依 L8，供應商自稱只能算 verified_by_absence（弱，≤0.5），要升到 verified_by_search 必須有客戶端或第三方；②**圖裡自己就有反證**：co:coherent supplies_to tech:uhp_laser 這條邊的逐字是『Lumentum announced its largest purchase order ever for the ELSFPs that drive CPO, and **Coherent announced a PO for its high-power laser for the same application**』（cignal_cpo_elsfp_1q26_2026_04_01，tier 3 第三方）——**同一個 tech 節點上同時掛著「獨家」與「另一家也在供」**；③支持獨家的逐字實際只說『the 400-milliwatt power level required is something **few can deliver**』——**few ≠ only one**，這是 L11-1 的措辭精度問題（sole_source 是一個具體 claim，不能用『少數人能做』去支持）。⚠ 為什麼重要：Q1 結構分 declared 0.98 有 sole_source 的貢獻，而 rank_bottlenecks 的排序決定 LITE 是籃子第 2 名、進而成為目前唯一的 top_pick。⚠ 與既有 [577]（COHR 的『NVIDIA CPO 外部光源唯一來源』同樣只有供應商自報）是**同一族問題**，建議一起處理。drop＝接受現況。",
+      "n": 617,
+      "reason": null,
+      "ref_id": "manual:617",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "LITE：co:lumentum→tech:uhp_laser 的 sole_source=true 只有供應商自報，而圖裡另有 co:coherent 供同一 tech 的第三方反證邊——依 L8 應降級",
+      "type": "manual"
     }
   ],
   "log": [
@@ -22382,6 +22394,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 617,
+  "next_n": 618,
   "schema_version": "1"
 }
