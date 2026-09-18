@@ -157,3 +157,57 @@ def test_shares_collapse_assertions_with_the_ranking() -> None:
     ]
     view = build_structure("tech:cw_dfb_laser", _edges(rows))
     assert view.angles["supply_side"][0].substitutability == 5
+
+
+def test_is_component_of_answers_the_next_layer_from_the_container_side() -> None:
+    """`A is_component_of B` ⇒ **B 卡在 A 身上**，所以它屬於 B 的「下一層」。
+
+    事發（2026-09-18）：這個角度原本只收 `N depends_on／constrained_by X`，
+    於是**全圖 68 條 `is_component_of` 在 dst 側 100% 看不見**——
+    `tech:isolator` 的五個角度全空、`tech:cpo` 的下一層只有 4 條（實際 21 條）。
+    與同日修掉的 `constrained_by` 同一族：角度的成員資格漏了一半，
+    而漏掉的那一半不會讓任何東西變紅（L17-3 的對稱面）。
+    """
+    edges = list(collapse_assertions([
+        _row("tech:els", "is_component_of", "tech:isolator"),
+        _row("tech:isolator", "depends_on", "mat:garnet"),
+    ]).values())
+
+    view = build_structure("tech:isolator", edges)
+    nxt = {(e.src, e.relation, e.dst) for e in view.angles["next_layer"]}
+    assert ("tech:els", "is_component_of", "tech:isolator") in nxt, "容器側要看得到它的零件"
+    assert ("tech:isolator", "depends_on", "mat:garnet") in nxt, "原本那一半不得被擠掉"
+
+    # 零件側的視角不變：對 A 而言這條邊仍是需求側（「有人需要我」）。
+    a = build_structure("tech:els", edges)
+    assert ("tech:els", "is_component_of", "tech:isolator") in {
+        (e.src, e.relation, e.dst) for e in a.angles["demand_side"]}
+    assert not a.angles["next_layer"]
+
+
+def test_quotes_reach_the_reader_and_absence_of_quotes_is_stated() -> None:
+    """⚠ 這個工具存在的意義取決於它印不印得出逐字（L18）。
+
+    2026-09-18 之前它的輸出裡**一個字都不是「當初那份文件實際寫的」**，
+    於是用它讀圖的人結構上不可能發現 `external_laser_source is_component_of isolator`
+    這種錯——那條邊的逐字只是列舉 Coherent 做的兩樣東西。
+    ⚠ 沒有逐字時也必須明說，否則「這條邊沒有逐字」與「我沒印逐字」同形（L13-2）。
+    """
+    edges = list(collapse_assertions([
+        _row("co:a", "supplies_to", "tech:x"),
+        _row("co:b", "supplies_to", "tech:x"),
+    ]).values())
+    view = build_structure("tech:x", edges)
+
+    quotes = {("co:a", "supplies_to", "tech:x"): [
+        {"quote": "A ships X in volume today.", "locator": "p.3",
+         "doc": "doc_a", "tier": 1, "origin": "A"}]}
+    text = render_markdown(view, quotes)
+    assert "A ships X in volume today." in text
+    assert "doc_a" in text and "tier 1" in text
+    assert "這條邊在圖裡沒有任何逐字" in text, "co:b 沒有逐字，必須明說"
+
+    # 不要逐字時，輸出不得混進逐字欄
+    plain = render_markdown(view)
+    assert "A ships X in volume today." not in plain
+    assert "這條邊在圖裡沒有任何逐字" not in plain

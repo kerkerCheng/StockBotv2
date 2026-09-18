@@ -520,7 +520,7 @@ outcome 追蹤是前置條件。
 > **格式：** 每條先給 **Learned invariant**（不變的那一句）、再給 **事發**（歷史記錄，
 > 帶日期，不因現況改變而更新）、最後標 **Implementation 可改？**
 >
-> **引用慣例：** 使用者記不住 L 編號。任何回覆或報告提到 L1–L16 時，該編號**第一次出現
+> **引用慣例：** 使用者記不住 L 編號。任何回覆或報告提到 L1–L18 時，該編號**第一次出現
 > 必須括號備註一句是哪條判準**，例如「L7（disproof 要附核查頻率＋48h 觸發動作）」。
 > 同一份輸出內重複出現同編號可不再備註。
 >
@@ -763,6 +763,35 @@ publisher 對「別人順手 commit 過」沒有表示、新增的兩個偵測�
 **六個沒有一個會讓測試變紅。** 逐案與判準見
 [`mechanism-built-for-one-case.md`](docs/solutions/architecture-patterns/mechanism-built-for-one-case.md)。
 **Implementation：** 各處｜**可改？NO**（判準）／**YES**（各處實作）。
+
+### L18 — 抽取之後逐字就退出系統，於是每個下游都只能相信 label
+**Invariant：**
+1. **任何「把原始證據換成一個標籤」的步驟，都必須讓那個標籤指得回原始證據。**
+   指不回去時，下游**結構上不可能**發現標籤錯了——而測試不會紅，因為測試問的是
+   「程式有沒有照標籤做」，不是「標籤對不對」。迴圈是封閉的：
+   **抽取時 LLM 給 label → 程式照 label 做 → 測試驗程式 → 回到 label**；
+   逐字是唯一在迴圈外的東西。
+2. **判別法：這個工具的輸出裡，有沒有任何一個字是「當初那份文件實際寫的」？**
+   沒有 → 用它的人挖不出這一類問題，不論他多想挖。
+3. **「請深入思考」型的 prompt 修法在這裡無效，兩個理由**：①它靠自律——L11-6
+   （落地前跑一條試圖讓結論變成假的命令）這條判準早就寫在本檔，事發當天照樣發生，
+   那是 L16 的形狀（判準有 SSOT 但沒跟著資料走到需要它的地方）；②**就算想挖也沒東西可挖**。
+   **根解是拿掉資訊落差，不是在落差上面加一層提醒**——加一張檢查清單也是加機制（L17-2／
+   development-flow Step 3 第③問）。
+4. **深挖若需要繞過自己的工具，它就不會例行發生。**
+5. ⚠ **推論：機械偵測器的用途是「自動生出那種問句」，不是自動修。**
+   事發當天真正觸發深挖的，是使用者問了一句「Sivers 的需求錨怎麼會是成熟製程」——
+   系統要能自己生出那種問句，否則它等著一個剛好起疑的人。
+**事發（2026-09-18）：** 重判一個 relation 的 82 條邊，**29 條要改（35%）、8 條逐字
+根本不支持任何關係（10%）**；同日另找到 `tech:inp_eml` 與 `tech:eml` 是重複節點、
+`external_laser_source is_component_of isolator` 方向相反且其逐字只是列舉兩樣產品。
+**全部靠直接讀 `extractions/*.json` 才發現**——因為 `loader/load_to_neo4j.py` 有六個
+`MERGE_*` 卻獨缺 sources，**1,105 段逐字（192,055 字元）在載入那一刻被丟掉**，
+而 `query/structure.py`／`query/bottleneck.py`／`query/graph_context.py` 提到 `quote`
+的次數是 **0**。完整量測與架構見
+[`2026-09-18-verbatim-never-reaches-the-decision.md`](docs/brainstorms/2026-09-18-verbatim-never-reaches-the-decision.md)。
+**Implementation：** loader 的 sources MERGE ＋ 讀路徑的 `--quotes`｜
+**可改？NO**（判準）／**YES**（實作）。
 
 ---
 

@@ -159,6 +159,43 @@ SET sd.title = $title,
 RETURN sd.id
 """
 
+#: 逐字證據（2026-09-18，V1 / L18）。
+#:
+#: ⚠ **先前這一段在載入那一刻被丟掉。** `quote` 在 `schema/intermediate_format.schema.json`
+#: 有定義、抽取端有產出、`loader/validate.py` 會檢查，但這個檔有六個 `MERGE_*` 卻獨缺
+#: sources——於是 **1,105 段逐字（192,055 字元）一段都沒進圖**，而
+#: `EdgeAssertion.source_ids` / `Claim.source_ids` 指向的是**圖裡不存在的 id**（懸空參照）。
+#:
+#: 後果不是少了一個欄位，是**下游結構上不可能發現 label 錯了**：抽取時 LLM 給 label →
+#: 程式照 label 做 → 測試驗「程式有沒有照 label 做」→ 回到 label。逐字是唯一在這個迴圈
+#: 外面的東西（L18）。實測代價：重判一個 relation 的 82 條邊，29 條要改、8 條逐字根本
+#: 不支持任何關係，**全部靠繞過工具直接讀 `extractions/*.json` 才發現**。
+#:
+#: ⚠ `Source` 是 **append-only 的證據**，不是可覆寫的投影：`quote`／`locator` 用
+#: `coalesce($x, s.x)` 保留既有值，重載一份既有文件不得把逐字洗掉（與 `published_at`
+#: 同一個理由，也是 L17 事發裡 `MERGE_NODE` 靜默覆蓋 `name` 的同一個坑）。
+MERGE_SOURCE = """
+MERGE (s:Source {id: $id})
+SET s.locator = coalesce($locator, s.locator),
+    s.quote = coalesce($quote, s.quote),
+    s.source_doc_id = $source_doc_id
+WITH s
+MATCH (sd:SourceDoc {id: $source_doc_id})
+MERGE (s)-[:FROM_DOC]->(sd)
+RETURN s.id
+"""
+
+#: 把 `source_ids` 從懸空字串變成真的走得到的邊。
+#: ⚠ **`source_ids` 這個欄位一個字都不動**——它是既有消費端讀的東西（`_fmt_sources` 等）。
+#: 這裡只是**新增**一條可走訪的邊；舊路徑照舊，新路徑才走得到逐字。
+LINK_QUOTES = """
+MATCH (n {id: $id})
+WITH n
+MATCH (s:Source) WHERE s.id IN $source_ids
+MERGE (n)-[:QUOTES]->(s)
+RETURN count(s) AS linked
+"""
+
 MERGE_EDGE_ASSERTION = """
 MERGE (ea:EdgeAssertion {id: $assertion_id})
 SET ea.local_id = $local_id,
@@ -311,6 +348,20 @@ def load_source_doc(doc: dict, session) -> None:
         section=source_doc.get("section"),
     )
 
+    # ── 逐字（V1 / L18）──
+    # ⚠ 必須在 SourceDoc 之後、在任何 `QUOTES` 邊之前：`MERGE_SOURCE` 要 MATCH 得到 SourceDoc。
+    for src in doc.get("sources", []):
+        if not src.get("id"):
+            continue
+        _execute(
+            session,
+            MERGE_SOURCE,
+            id=src["id"],
+            locator=src.get("locator"),
+            quote=src.get("quote"),
+            source_doc_id=source_doc["doc_id"],
+        )
+
 
 #: 重載既有文件時**不得**被這次載入靜默覆蓋的節點欄位。
 #: `MERGE_NODE` 只有 `source_ids` 走聯集，其餘都是直接 SET——所以保留邏輯必須在這裡做完，
@@ -432,6 +483,12 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
                 session,
                 f"MATCH (n:Entity {{id:$id}}) SET n:`{n['type']}`", id=n["id"]
             )
+        # 逐字（V1 / L18）：節點也帶 source_ids，所以節點也要接。
+        # ⚠ 首版只接了邊斷言與 claim、漏了節點——被 `tests/test_source_quotes.py::
+        # test_source_ids_stop_being_dangling_for_all_three_carriers` 當場抓到。
+        # 三種載體都帶 `source_ids`，只接兩種就是「機制只認得我當初那個案例」（L17-3 的對稱面），
+        # 而且不會有任何東西變紅。
+        _link_quotes(session, n["id"], n["source_ids"])
 
     # ── edges ──
     edge_keys_by_local_id: dict[str, str] = {}
@@ -469,6 +526,8 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
             source_doc_id=doc_id,
             updated_at=ts,
         )
+        # 逐字（V1 / L18）：把 source_ids 從懸空字串變成走得到的邊。
+        _link_quotes(session, evidence_id(doc_id, e["id"]), e["source_ids"])
 
     # ── claims ──
     for c in doc.get("claims", []):
@@ -498,6 +557,20 @@ def load(doc: dict, session, use_apoc: bool = False, allow_dup_url: bool = False
                 subject_node_id=c["subject_id"],
             )
             _execute(session, MERGE_NODE_CLAIM, **params)
+        _link_quotes(session, params["id"], c["source_ids"])
+
+
+def _link_quotes(session, node_id: str, source_ids) -> None:
+    """把一個 EdgeAssertion／Claim 接到它引用的逐字上（V1 / L18）。
+
+    ⚠ **`source_ids` 欄位本身一個字都不動**——既有消費端（`_fmt_sources` 等）照舊讀它。
+    這裡只新增一條 `[:QUOTES]` 邊，所以舊路徑逐位不變，新路徑才走得到逐字。
+    ⚠ 靜默跳過空 list：沒有 source_ids 的 assertion 本來就存在（那是另一個問題），
+    在這裡 fail 會把「沒有逐字」變成「載不進去」，兩件事不該同形。
+    """
+    if not source_ids:
+        return
+    _execute(session, LINK_QUOTES, id=node_id, source_ids=list(source_ids))
 
 
 def dry_run(doc: dict) -> None:

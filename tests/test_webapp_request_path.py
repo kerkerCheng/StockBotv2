@@ -166,10 +166,24 @@ def test_a_full_request_round_imports_no_model_module(served) -> None:
 # 證明 3：檔案系統快照（擋寫入與 cache-miss 自動重建）
 # ---------------------------------------------------------------------------
 
+#: SQLite 的暫存日誌檔——**不是 authority 內容，是 DB 引擎的草稿紙**。
+#: 它們存不存在只取決於「此刻有沒有連線開著」，而連線是別支測試開的。
+#:
+#: ⚠ 事發（2026-09-18）：全套跑時本檔的 private 快照比對會紅，診斷出來的「變化」是
+#: `engine_c/...db-wal` 與 `...db-shm` **消失**——前面某支測試的 SQLite 連線在這個視窗
+#: 被 checkpoint 掉。**request path 一個字都沒寫。** 一個把 DB 草稿紙讀成「authority 被碰了」
+#: 的檢查，攔下的不是它想攔的東西（L15-1：該修的是它問問題的方式）。
+#:
+#: ⚠ **這不會弱化守衛**：對 Engine C 的真實寫入會先落在 `-wal`，但那條路由**證明 2**
+#: （runtime 模組哨兵，`sqlite3` 在 `FORBIDDEN_RUNTIME_MODULES` 裡）擋著——
+#: 四種證明刻意不同源，本條放掉這個訊號不留下缺口。
+_VOLATILE_SUFFIXES = ("-wal", "-shm", "-journal")
+
+
 def _tree_digest(root: Path) -> str:
     parts = []
     for path in sorted(root.rglob("*")):
-        if path.is_file():
+        if path.is_file() and not path.name.endswith(_VOLATILE_SUFFIXES):
             parts.append(f"{path.relative_to(root)}:{hashlib.sha256(path.read_bytes()).hexdigest()}")
     return hashlib.sha256("|".join(parts).encode("utf-8")).hexdigest()
 

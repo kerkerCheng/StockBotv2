@@ -173,12 +173,19 @@ def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
         _view(e) for e in edges
         if e.dst == node and e.relation == "supplies_to"
     ]
-    # 「它自己卡在誰身上」問的也是 `DEPENDENCY_RELATIONS`——`co:iqe --constrained_by-->
-    # mat:inp_substrate` 逐字就是這個角度的答案。2026-09-18 之前這裡是第三處硬編的
-    # `depends_on`（另兩處見 `_DEMAND_INBOUND` 與 `build_upward_index`）。
+    # 「它自己卡在誰身上」有兩種寫法，兩種都要收：
+    #   ① `N depends_on／constrained_by X` ⇒ N 卡在 X（`DEPENDENCY_RELATIONS`）
+    #   ② `A is_component_of N`           ⇒ A 是 N 的零件 ⇒ N 卡在 A
+    # ⚠ 2026-09-18 之前只收①，於是**全圖 68 條 `is_component_of` 在 dst 側 100% 看不見**
+    # ——`tech:isolator` 的五個角度全空、`tech:cpo` 的下一層只有 4 條（實際 21 條）。
+    # 這與同日修掉的 `constrained_by` 是同一族：一個角度的成員資格漏了一半，
+    # 而漏掉的那一半不會讓任何東西變紅（L17-3 的對稱面）。
+    # 放閘前量過：digest 會變的節點 **35／282**，`tech:cw_dfb_laser` 的讀圖因此轉 stale
+    # ——那是 staleness 偵測正常運作，不是壞掉。
     view.angles["next_layer"] = [
         _view(e) for e in edges
-        if e.src == node and e.relation in DEPENDENCY_RELATIONS
+        if (e.src == node and e.relation in DEPENDENCY_RELATIONS)
+        or (e.dst == node and e.relation == "is_component_of")
     ]
     view.angles["counter_path"] = [
         _view(e) for e in edges
@@ -201,7 +208,8 @@ def _sub_distribution(rows: Iterable[EdgeView]) -> str:
     return "｜".join(parts)
 
 
-def render_markdown(view: StructureView) -> str:
+def render_markdown(view: StructureView,
+                    quotes: dict | None = None) -> str:
     out = [
         f"# 結構讀圖：`{view.node}`",
         "",
@@ -240,11 +248,74 @@ def render_markdown(view: StructureView) -> str:
                 f"| {'✓' if e.sole_source else ('✗' if e.sole_source is False else '—')} "
                 f"| {e.qualification_status or '—'} | {e.evidence or '—'} | {e.documents} |"
             )
+            if quotes is None:
+                continue
+            found = quotes.get((e.src, e.relation, e.dst)) or []
+            if not found:
+                # ⚠ 「沒有逐字」與「沒印逐字」不得同形（L13-2）。
+                out.append("|  |  |  |  |  | ⚠ **這條邊在圖裡沒有任何逐字** |")
+                continue
+            for q in found[:3]:
+                out.append(
+                    f"|  |  |  |  |  | «{q['quote'][:200]}»"
+                    f"<br>　`{q['doc']}`（tier {q['tier']}｜{q['origin']}）"
+                    f"{'｜' + q['locator'] if q['locator'] else ''} |"
+                )
     out.append(
         "\n---\n\n⚠ **本工具維護的是「讀圖結論跟圖還一不一致」，不是「結論對不對」。**"
         "\n對不對要靠 outcome 量測——一份跟圖完全一致但判斷錯誤的讀圖，digest 永遠不會變。"
     )
     return "\n".join(out)
+
+
+_Q_QUOTES = """
+MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source)
+WHERE ea.src_id = $node OR ea.dst_id = $node
+OPTIONAL MATCH (ea)-[:CITES]->(d:SourceDoc)
+RETURN ea.src_id AS src, ea.relation AS relation, ea.dst_id AS dst,
+       s.quote AS quote, s.locator AS locator,
+       d.id AS doc, d.evidence_tier AS tier, d.origin_entity AS origin
+"""
+
+
+def fetch_quotes(session, node: str) -> dict[tuple[str, str, str], list[dict[str, Any]]]:
+    """一條邊 →（它的逐字, 出處）。
+
+    ⚠ **這是本模組存在意義的補完，不是裝飾。** 2026-09-18 之前這個工具的輸出裡
+    **一個字都不是「當初那份文件實際寫的」**——於是用它讀圖的人，結構上不可能發現
+    `tech:external_laser_source is_component_of tech:isolator` 這種錯（那條邊的逐字
+    只是列舉 Coherent 做的兩樣東西，完全沒說哪個是哪個的元件）。
+    那天所有發現都是**繞過這個工具**、直接 `grep extractions/` 找到的——
+    而深挖若需要繞過自己的工具，它就不會例行發生（L18）。
+    """
+    out: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    for r in session.run(_Q_QUOTES, node=node):
+        if not r["quote"]:
+            continue
+        out.setdefault((r["src"], r["relation"], r["dst"]), []).append({
+            "quote": " ".join(str(r["quote"]).split()),
+            "locator": r["locator"],
+            "doc": r["doc"],
+            "tier": r["tier"],
+            "origin": r["origin"],
+        })
+    return out
+
+
+def _load_quotes(node: str) -> dict:
+    from dotenv import load_dotenv
+    from neo4j import GraphDatabase
+
+    load_dotenv()
+    driver = GraphDatabase.driver(
+        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
+        auth=(os.environ.get("NEO4J_USER", "neo4j"), os.environ["NEO4J_PASSWORD"]),
+    )
+    try:
+        with driver.session() as session:
+            return fetch_quotes(session, node)
+    finally:
+        driver.close()
 
 
 def _load_edges() -> list[CanonicalEdge]:
@@ -275,6 +346,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("node", help="節點 id，如 tech:cw_dfb_laser 或 co:coherent")
     parser.add_argument("--json", action="store_true", help="機器可讀，帶 result_digest")
     parser.add_argument("--digest", action="store_true", help="只印 result_digest（staleness 比對用）")
+    parser.add_argument("--quotes", action="store_true",
+                        help="每條邊附上它自己的逐字（V1/L18：不看逐字就只能相信 label）")
     args = parser.parse_args(argv)
 
     edges = _load_edges()
@@ -287,12 +360,15 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     view = build_structure(args.node, edges)
+    quotes = None
+    if args.quotes:
+        quotes = _load_quotes(args.node)
     if args.digest:
         print(view.result_digest())
     elif args.json:
         print(json.dumps(view.as_dict(), ensure_ascii=False, indent=2))
     else:
-        print(render_markdown(view))
+        print(render_markdown(view, quotes))
     return 0
 
 
