@@ -781,7 +781,7 @@
       "id": "e21",
       "src_id": "tech:broadcom_3d_silicon_cpo",
       "dst_id": "tech:cpo",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [
@@ -807,7 +807,7 @@
       "id": "e23",
       "src_id": "tech:coupe",
       "dst_id": "tech:cpo",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [
@@ -818,7 +818,7 @@
       "id": "e24",
       "src_id": "tech:glass_cpo",
       "dst_id": "tech:cpo",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.75,
       "source_ids": [
@@ -829,7 +829,7 @@
       "id": "e25",
       "src_id": "tech:intel_glass_cpo",
       "dst_id": "tech:cpo",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.75,
       "source_ids": [

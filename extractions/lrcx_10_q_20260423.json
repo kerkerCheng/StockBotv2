@@ -319,9 +319,9 @@
     },
     {
       "id": "lrcx_10_q_20260423_e6",
-      "src_id": "prod:reliant",
-      "dst_id": "co:lam_research",
-      "relation": "is_component_of",
+      "src_id": "co:lam_research",
+      "dst_id": "prod:reliant",
+      "relation": "develops",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [

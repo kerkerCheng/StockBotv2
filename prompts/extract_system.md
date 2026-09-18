@@ -62,6 +62,16 @@ The caller injects `source_doc` (doc_id, title, source_type, evidence_tier) into
 ### edge.relation
 `supplies_to`     — A provides components/materials to B
 `is_component_of` — A is a part inside B
+`is_variant_of`   — A is a KIND/generation/implementation of B, not a part inside it.
+                    ⚠ TYPE TRAP (added 2026-09-19 after re-judging all 92
+                    `is_component_of` edges: 17 of them were this instead).
+                    Ask: would removing A leave B incomplete? If yes → `is_component_of`.
+                    If A is one of several ways to BE a B → `is_variant_of`.
+                      ✅ `glass_cpo is_variant_of cpo` (glass is one route to CPO)
+                      ✅ `tomahawk6 is_variant_of ai_switch` (it IS a switch)
+                      ✅ `digit_v5 is_variant_of digit` (a generation)
+                      ❌ `cw_dfb_laser is_variant_of external_laser_source`
+                         (the laser sits INSIDE the module → `is_component_of`)
 `develops`        — a company develops a named product or platform
 `deploys`         — an operator/customer deploys a robot product in an operating workflow
 `offered_under`   — a product/service is commercially provided under a named model such as RaaS

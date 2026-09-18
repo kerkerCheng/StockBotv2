@@ -80,6 +80,42 @@
       "basis": "semantic_reviewed",
       "approval_receipt": "todo:611",
       "note": "使用者 2026-09-18 核准（[611]，V3 重複節點偵測器的第一批產出）。三個 id 的 name 各不相同，但三段逐字都是 tier-1 一手 filing 且指向同一個政策現實——美國政府限制半導體技術／設備出口至中國：tech:export_controls_china 出自 Lam 10-Q（lrcx_10_q_20260423, Risk Factors）『changes in import/export regulations and tariffs, such as regulations imposed by the U.S. government restricting exports to China』；tech:us_export_controls 出自 AMAT 10-Q（amat_10_q_20260219, MD&A: China）『The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China』；tech:export_controls_us_china 出自 AMAT 10-K（amat_10_k_20251212, Risk Factors）『Export controls enacted by the United States government that restrict the sale of certain technologies to customers in China』。三者 abstraction_level 同為 end_demand，各自只有一條 depends_on 邊（①指向 co:lam_research，②③指向 co:applied_materials）。canonical 依機械選法取最短 id（tech:us_export_controls 23 字元 < tech:export_controls_china 26 < tech:export_controls_us_china 29），任何人重跑得到同一個。⚠ **本檔的 `name` 欄不被任何程式讀取**（`identity/entities.py` 的 `_validate` 不驗它、migration 也不寫它），所以這裡照抄 canonical 端在圖裡的現值，不在這裡宣稱圖會改名。⚠ 合併後圖裡這個節點的 name 會是『U.S. Export Controls on Semiconductor Equipment』——**三者中最不精確的一個**（漏了 China 也漏了 Technology），因為 `MERGE_NODE` 保留既有 name。**id 的選法是機械的，name 的選法不是**：把兩者綁在一起會讓「哪個 id 較短」決定「這個東西叫什麼」。改 name 是另一個 graph write，不在 [611] 的 exact action 內，未做。"
+    },
+    "prod:blazar": {
+      "name": "POET Blazar hybrid laser ELS",
+      "aliases": [
+        "prod:poet_blazar"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:615",
+      "note": "使用者 2026-09-19 核准（[615]，V3 偵測器 28 對候選逐對判讀的 A 組）。兩端 name 是「POET Blazar hybrid laser ELS」與「Blazar hybrid laser」，逐字都在講 POET 的 Blazar：「The main event for live demos at OFC 2026 was ELS. The Blazar and Starlight ELS products were front and center in the booth」與「a component that significantly enhances the output power of POET's hybrid laser, the Blazar®」。canonical 依機械選法取最短 id。"
+    },
+    "prod:reliant": {
+      "name": "Reliant non-leading-edge equipment product line",
+      "aliases": [
+        "prod:reliant_product_line"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:615",
+      "note": "使用者 2026-09-19 核准（[615]）。**兩端的逐字是同一份 10-K 的同一句話，一字不差**：「within CSBG, our Reliant® product line offers new and refurbished non-leading edge products in deposition, etch and clean markets…」。canonical 依機械選法取最短 id。⚠ 連帶：`prod:reliant is_component_of co:lam_research` 的型別錯誤已在 [614] 改成 `co:lam_research develops prod:reliant`。"
+    },
+    "tech:foundry_logic": {
+      "name": "Foundry / Logic Semiconductor Manufacturing",
+      "aliases": [
+        "tech:foundry_logic_advanced"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:615",
+      "note": "使用者 2026-09-19 核准（[615]）。兩端逐字**都是 AMAT 的 by-market 營收拆分**（「Foundry, logic and other 67% … DRAM 29% … Flash memory (NAND) 4%」與「Foundry and logic customers' spending…」）。⚠ **與 [505] NAND 那次完全同型**：同一段 by-market 營收拆分句生出多個節點，而它們指的是同一個「設備商賣給這個市場」的概念。canonical 依機械選法取最短 id。⚠ **第三個同族節點 `tech:leading_edge_logic_foundry` 本次不併**：它與 `tech:foundry_logic_advanced` 才是真正的重複（都指「先進節點的 foundry/logic」），但**偵測器的兩條規則都抓不到那一對**（token 互不為子集、name 完全不同），它是被這一對順帶帶出來的。已列在 [615] 的 B 組等證據。"
+    },
+    "tech:poet_optical_interposer": {
+      "name": "POET Optical Interposer",
+      "aliases": [
+        "prod:optical_interposer"
+      ],
+      "basis": "semantic_reviewed",
+      "approval_receipt": "todo:615",
+      "note": "使用者 2026-09-19 核准（[615]）。name 正規化後逐字相同（POET Optical Interposer™ / POET Optical Interposer），且**兩端共用同一段逐字**：「POET's photonic integration solutions are based on the POET Optical Interposer™, a novel, patented platform that allows the seamless integration of electronic and photonic devices into a single chip」。\n⚠⚠ **這一組刻意偏離機械選法，理由寫在這裡以便日後推翻。** 機械選法（同組取最短 id）會選 `prod:optical_interposer`(24 字元) 而不是 `tech:poet_optical_interposer`(28)。取後者的理由有三：①它的逐字自稱是 **platform**（平台技術），不是單一產品；②它的邊更多（6 vs 2）、逐字更多（3 vs 2）；③**前綴本身承載語意**（`prod:` vs `tech:`），而機械選法看不見它。使用者 2026-09-19 未逐項指定，依 packet §A2 的建議執行。⚠ 這是 [611] 那條判準的延伸：**id 的選法是機械的，name 的選法不是**——現在多一句：**前綴也不是**。"
     }
   }
 }

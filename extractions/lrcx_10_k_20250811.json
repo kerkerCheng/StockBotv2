@@ -301,7 +301,7 @@
       "id": "lrcx_10_k_20250811_e2",
       "src_id": "prod:reliant_product_line",
       "dst_id": "tech:non_leading_edge_fab",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [
@@ -325,7 +325,7 @@
       "id": "lrcx_10_k_20250811_e4",
       "src_id": "prod:sabre_family",
       "dst_id": "tech:deposition_etch_clean",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [
@@ -336,7 +336,7 @@
       "id": "lrcx_10_k_20250811_e5",
       "src_id": "prod:altus_family",
       "dst_id": "tech:deposition_etch_clean",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [
@@ -347,7 +347,7 @@
       "id": "lrcx_10_k_20250811_e6",
       "src_id": "prod:vector_family",
       "dst_id": "tech:deposition_etch_clean",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [

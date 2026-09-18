@@ -38,6 +38,7 @@
   "relation": [
     "supplies_to",
     "is_component_of",
+    "is_variant_of",
     "develops",
     "deploys",
     "offered_under",
@@ -87,5 +88,11 @@
     "news",
     "social"
   ],
-  "evidence_tier": [1, 2, 3, 4]
+  "evidence_tier": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "_is_variant_of_comment": "2026-09-19 使用者核准（[613] 選項 B）新增。**A 是 B 的一種／一個世代／一個實作**，不是「A 在 B 裡面」——後者是 is_component_of。事發：92 條 is_component_of 逐條重判，17 條（18.5%）其實是這種關係，而字彙裡沒有可換的，於是它們全被寫成 is_component_of。後果不是分類潔癖：query/structure.py 把 `A is_component_of B` 讀成「B 卡在 A 身上」，所以全圖最核心的 tech:cpo，那個角度 24 條裡有 5 條其實是「CPO 有哪些變體」——讀它判瓶頸的人會把實作路線誤讀成瓶頸。⚠ **它刻意不進任何走訪清單**（counter_path_relation／sole_source_beneficiary_end／structure.py 的五個角度／bottleneck.py 的 UPSTREAM_RELATIONS 都不收）：變體不是替代路線、不是上游、不帶 sole_source 語意，而五個角度是封閉清單，加第六個要先答出「它在哪個實際案例裡改變過結論」（L17-4）。**加這個 relation 的目的是讓那 17 條從不該在的地方離開，不是給它們一個新位置。**"
 }

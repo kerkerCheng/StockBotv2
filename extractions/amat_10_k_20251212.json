@@ -425,7 +425,7 @@
       "id": "amat_10_k_20251212_e10",
       "src_id": "tech:hbm",
       "dst_id": "tech:dram",
-      "relation": "is_component_of",
+      "relation": "is_variant_of",
       "attributes": {},
       "confidence": 0.9,
       "source_ids": [

@@ -168,7 +168,7 @@ Canonical domain relationship 不直接 CITES，僅保留 `source_doc_ids` / `so
 - `role`(Company 在 stack 的角色):
   `leader | robot_oem | robot_operator | robot_component_supplier | bottleneck_supplier | disruptor | foundry | test | network | adjacent_silicon | material_base`
 - `relation`:
-  `supplies_to | is_component_of | develops | deploys | offered_under | competes_with | enables | depends_on | invests_in | licenses_to | about | acquired | partnership_with`
+  `supplies_to | is_component_of | is_variant_of | develops | deploys | offered_under | competes_with | enables | depends_on | invests_in | licenses_to | about | acquired | partnership_with`
 
 ---
 
