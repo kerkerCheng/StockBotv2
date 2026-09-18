@@ -738,6 +738,22 @@ def fetch_alpha_investment_view(
     except Exception as exc:  # noqa: BLE001
         checklist = {"engine_c_available": False, "note": f"checklist 讀取失敗：{type(exc).__name__}"}
 
+    # D2（2026-09-18）歸零旗標：取數在 Engine C、判色在 `alpha.wipeout`、型別在 builder。
+    # 取不到就帶著 reason 往下走——**燈滅與燈綠不得同形**（L12），所以這裡不回空 dict。
+    try:
+        from alpha.wipeout import wipeout_flags
+        from engine_c.checklist import get_wipeout_inputs
+
+        raw = get_wipeout_inputs(str(resolved_ticker))
+        if raw.get("status") == "ok":
+            wipeout = wipeout_flags(runway=raw.get("runway"), shares_series=raw.get("shares_series"),
+                                    going_concern=raw.get("going_concern"), today=today or date.today())
+            wipeout_reason = None
+        else:
+            wipeout, wipeout_reason = None, str(raw.get("reason") or "Engine C 觀測不可用")
+    except Exception as exc:  # noqa: BLE001
+        wipeout, wipeout_reason = None, f"歸零旗標取數失敗：{type(exc).__name__}"
+
     try:
         brief_records, brief_errors = brief_ledger.read_brief_records(str(resolved_ticker))
     except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
@@ -769,6 +785,7 @@ def fetch_alpha_investment_view(
         downside_fundamental=downside_fundamental, downside_valuation=downside_valuation,
         downside_implied_return=downside_implied, downside_reason=downside_reason,
         downside_absence_kind=downside_kind,
+        wipeout=wipeout, wipeout_reason=wipeout_reason,
         brief_records=brief_records, brief_parse_errors=brief_errors,
         narrative_context=narrative_context,
         consensus_history=consensus_history,

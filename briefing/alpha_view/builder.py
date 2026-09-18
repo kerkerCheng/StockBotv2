@@ -38,6 +38,7 @@ from briefing.analyst_view.contracts import PLAIN_MULTIPLE_DERIVATION, PLAIN_STA
 from alpha.implied_return.attribution import attribution_payload
 from alpha.implied_return.contracts import HorizonAssumption, ImpliedReturnResult
 from alpha.provider import SupplyExposure
+from alpha.wipeout import LANE_LABELS as WIPEOUT_LANE_LABELS, WIPEOUT_LANES, tally as wipeout_tally
 from alpha.refresh import (
     CONTEXT_DIGEST, CURRENT, INVALIDATED, MISSING, RECALCULATE, REVIEW_REQUIRED, STALE, SUPERSEDED,
     THESIS_ARTIFACT_ID, AffectedArtifact, ChangeEvent, MetricObservation, artifacts_from_context,
@@ -72,6 +73,7 @@ from .contracts import (
     InternalFundamentalsSection, LifecycleFacts, PathItem,
     PriceImpliedSection, RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
     SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, ValuationSection, VariantViewSection,
+    CAP_WIPEOUT_FLAGS, WipeoutFlagsSection,
     missing, not_modeled,
 )
 
@@ -981,6 +983,61 @@ DOWNSIDE_IS_NOT: tuple[str, ...] = (
     "不是停損線、不是出場訊號：出場只認反證（D3）；這一格回答的是「認錯時值多少」，不是「什麼時候賣」",
     "不是部位尺寸：知道下檔多深不等於系統算得出買多少——尺寸由使用者決定",
 )
+
+
+WIPEOUT_IS_NOT: tuple[str, ...] = (
+    "不是評分也不是排序鍵：四盞燈**不參與 `rank_bottlenecks`**、不決定尺寸——"
+    "它與總曝險倍數、追繳門檻同屬量測（AGENTS「須區分量測、訊號與脈絡」）",
+    "不是進出場訊號：黃燈不讀成「減碼」、紅燈不讀成「賣出」；出場只認反證（D3）",
+    "不是合成分數：四盞燈刻意不相加、不加權——加起來就必須決定誰比較重要，而那是沒有根據的",
+    "綠燈不是「查過都沒事」的保證：它只說**被量到的那一項**沒事；沒量到的一律是灰，不是綠",
+)
+
+A_WIPEOUT = "alpha://wipeout_flags/v1"
+
+
+def _wipeout_section(flags: Mapping[str, Mapping[str, Any]] | None, *, reason: str | None,
+                     reference_day: date) -> WipeoutFlagsSection:
+    """四盞燈 → 四個 `Datum`。**亮不亮由 `alpha.wipeout` 決定，這裡只轉型別。**
+
+    亮著的燈是 `available`；沒亮的是缺席＋上游宣告的 `absence_kind`——型別層因此讓
+    「這盞是綠的」與「這盞沒點亮」不可能同形（L12）。
+    """
+    if not flags:
+        why = reason or "沒有取到 Engine C 的財務觀測"
+        meta = SectionMeta(status="missing", basis="none", authority=A_WIPEOUT,
+                           capability=CAP_WIPEOUT_FLAGS, reason=why, as_of=reference_day,
+                           absence_kind="upstream_unavailable")
+        lanes = tuple(missing(f"wipeout_{lane}", f"歸零旗標：{WIPEOUT_LANE_LABELS[lane]}", why,
+                              authority=A_WIPEOUT, absence_kind="upstream_unavailable")
+                      for lane in WIPEOUT_LANES)
+        return WipeoutFlagsSection(meta=meta, lanes=lanes,
+                                   tally={"red": 0, "amber": 0, "green": 0, "unlit": len(WIPEOUT_LANES)},
+                                   is_not=WIPEOUT_IS_NOT)
+    lanes = []
+    for lane in WIPEOUT_LANES:
+        flag = dict(flags.get(lane) or {})
+        label = f"歸零旗標：{WIPEOUT_LANE_LABELS[lane]}"
+        if flag.get("colour"):
+            lanes.append(Datum(
+                key=f"wipeout_{lane}", label=label, value=flag, status="available",
+                basis="deterministic", authority=A_WIPEOUT, as_of=reference_day,
+                method="alpha.wipeout（符號比較＋兩個外部錨定常數；零憑空門檻）",
+                reason=flag.get("reason"),
+                dependencies={"rule": flag.get("rule"), "inputs": flag.get("inputs")}))
+        else:
+            lanes.append(missing(f"wipeout_{lane}", label, str(flag.get("reason") or "這盞燈沒點亮"),
+                                 authority=A_WIPEOUT, absence_kind=flag.get("absence_kind")))
+    counts = wipeout_tally(flags)
+    lit = counts["red"] + counts["amber"] + counts["green"]
+    meta = SectionMeta(
+        status=("available" if lit == len(WIPEOUT_LANES) else ("partial" if lit else "missing")),
+        basis=("deterministic" if lit else "none"), authority=A_WIPEOUT,
+        capability=CAP_WIPEOUT_FLAGS, as_of=reference_day,
+        absence_kind=(None if lit else "upstream_unavailable"),
+        reason=(None if lit == len(WIPEOUT_LANES) else f"{len(WIPEOUT_LANES) - lit} 盞沒點亮，逐盞說了是哪一種沒有"),
+        warnings=("燈只給顏色與一句話（D2「紅黃綠不給數字」）；算出它的數字在稽核層的 inputs",))
+    return WipeoutFlagsSection(meta=meta, lanes=tuple(lanes), tally=counts, is_not=WIPEOUT_IS_NOT)
 
 
 @dataclass(frozen=True, slots=True)
@@ -1924,6 +1981,10 @@ def build_alpha_investment_view(
     downside_implied_return: ImpliedReturnResult | None = None,
     downside_reason: str | None = None,
     downside_absence_kind: str | None = None,
+    #: D2（2026-09-18）：歸零旗標。`alpha.wipeout.wipeout_flags()` 的輸出，由取數層算好帶進來——
+    #: builder 不連 DB、不自己判色。
+    wipeout: Mapping[str, Mapping[str, Any]] | None = None,
+    wipeout_reason: str | None = None,
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
     narrative_context: Mapping[str, Any] | None = None,
@@ -3188,7 +3249,9 @@ def build_alpha_investment_view(
         expectation_gap=expectation_gap_section, catalysts=catalyst_section,
         falsification=falsification_section, scenarios=scenario_section, valuation=valuation_section,
         implied_return=implied_return_section, downside=downside_section,
-        entry_logic=entry_section, evidence=evidence_section,
+        entry_logic=entry_section,
+        wipeout_flags=_wipeout_section(wipeout, reason=wipeout_reason, reference_day=reference_day),
+        evidence=evidence_section,
         freshness=tuple(freshness_items), refresh_status=refresh_section, payoff_scenario=payoff_section,
         investor_brief=brief_section, argument=argument_section, warnings=tuple(warnings),
     )

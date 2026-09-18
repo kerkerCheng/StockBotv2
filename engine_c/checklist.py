@@ -301,6 +301,90 @@ def _fetch_runway_inputs(connection, ticker: str, *, is_pg: bool) -> dict | None
     return _parse_runway_inputs(row[0], row[1], row[2])
 
 
+def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
+    """歸零旗標（D2）要的三組**原始輸入**。這裡只取數，**一個顏色都不判**。
+
+    判色規則住 `alpha/wipeout.py`（純函式、可單測）；型別住 read model。三層分開的理由是
+    L15：解析與權限分工——Engine C 擁有觀測，規則層只讀它。
+
+    - `runway`：`decision_lab.derive_runway` 的輸出形狀。人工 `runway_inputs`（`mechanical`
+      欄位）優先於 yfinance 快照——yfinance 在財報後會暫時清空 `free_cash_flow_ttm`。
+    - `shares_series`：**同口徑**的在外流通股數序列（全部歷史，不截斷）。⚠ 刻意不混入
+      `fiscal_year_results` 的稀釋股數：那是另一個口徑（含潛在股份），相減沒有意義。
+    - `going_concern`：`litigation_and_audit_flags` 的逐字觀測（judgment 欄位）。
+    """
+    from datetime import date as _date
+
+    owned_connection = conn is None
+    connection = conn or _get_conn()
+    if connection is None:
+        return {"ticker": ticker, "status": "unavailable", "reason": "Engine C 資料庫不可用"}
+    try:
+        from decision_lab.context import derive_runway
+        from engine_c.db import _use_postgres
+
+        is_pg = _use_postgres()
+        base = get_probe_financial_baseline(ticker, conn=connection)
+        if base.get("status") == "unavailable":
+            return {"ticker": ticker, "status": "unavailable", "reason": "Engine C 快照讀取失敗"}
+        financial = {key: base.get(key) for key in _RUNWAY_INPUT_KEYS}
+        # `derive_runway` 要求 as_of 帶時區；快照存的是日期。補成當日 UTC 午夜，不改變語意。
+        financial["source"] = base.get("source")
+        financial["as_of"] = (f"{base['as_of']}T00:00:00+00:00" if base.get("as_of") else None)
+        manual = base.get("manual_runway")
+        if manual:
+            manual = dict(manual)
+            if manual.get("as_of") and len(str(manual["as_of"])) <= 10:
+                manual["as_of"] = f"{manual['as_of']}T00:00:00+00:00"
+        try:
+            runway = derive_runway(financial, manual_observation=manual)
+        except ValueError:
+            runway = {"status": "manual_required", "runway_months": None}
+        # 三個輸入**一律帶著走**：燈滅時稽核層仍要看得到是哪一個缺。
+        for key in _RUNWAY_INPUT_KEYS:
+            runway.setdefault(key, financial.get(key))
+        runway.setdefault("source", financial.get("source"))
+        runway.setdefault("as_of", financial.get("as_of"))
+
+        ph = "%s" if is_pg else "?"
+        shares_sql = (
+            "SELECT snapshot_date, shares_outstanding FROM financial_snapshots "
+            f"WHERE ticker = {ph} AND shares_outstanding IS NOT NULL ORDER BY snapshot_date"
+        )
+        gc_sql = (
+            "SELECT value, source_note, updated_at FROM manual_fields "
+            f"WHERE ticker = {ph} AND field_name = 'litigation_and_audit_flags'"
+        )
+        if is_pg:
+            with connection.cursor() as cursor:
+                cursor.execute(shares_sql, (ticker,))
+                share_rows = cursor.fetchall()
+                cursor.execute(gc_sql, (ticker,))
+                gc_row = cursor.fetchone()
+        else:
+            share_rows = connection.execute(shares_sql, (ticker,)).fetchall()
+            gc_row = connection.execute(gc_sql, (ticker,)).fetchone()
+
+        series = []
+        for row in share_rows:
+            try:
+                series.append((_date.fromisoformat(str(row[0])[:10]), float(row[1])))
+            except (TypeError, ValueError):
+                continue
+        going_concern = ({"value": gc_row[0], "source": gc_row[1], "as_of": str(gc_row[2])}
+                         if gc_row else None)
+        return {"ticker": ticker, "status": "ok", "runway": runway,
+                "shares_series": series, "going_concern": going_concern}
+    except Exception as exc:  # noqa: BLE001 — 取不到就誠實說取不到，不回一組看起來合理的空值
+        return {"ticker": ticker, "status": "unavailable", "reason": f"{type(exc).__name__}: {exc}"}
+    finally:
+        if owned_connection and connection is not None:
+            try:
+                connection.close()
+            except Exception:  # noqa: BLE001
+                pass
+
+
 def get_probe_financial_baseline(ticker: str, *, conn=None) -> dict:
     """回傳 runway 所需的 point-in-time raw scalars，不在 Engine C 算部位。"""
 

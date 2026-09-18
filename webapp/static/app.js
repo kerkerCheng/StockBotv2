@@ -906,6 +906,50 @@ function conclusionCard(payload, view) {
   // D2（2026-09-18）：那把尺的另一端。**永遠印**（沒寫就印「還沒寫」），
   // 否則「沒有下檔」與「下檔是 0」在畫面上同形。
   node.appendChild(betBlock(view, OVERLAY_BLOCKS.downside));
+  // D2（2026-09-18）：歸零旗標。接在下檔之後——下檔問「thesis 錯了值多少」，
+  // 它問「這家公司會不會直接歸零」。兩個不同的壞結局，畫面上刻意分開。
+  node.appendChild(wipeoutBlock(view));
+  return node;
+}
+
+/* 歸零旗標（D2，2026-09-18）：四盞燈。**只畫顏色與一句話**——算出顏色的數字住稽核區
+   （每盞燈的 dependencies.inputs），因為 D2 定案是「紅黃綠不給數字」。
+
+   ⚠ 顏色**照抄** `alpha.wipeout` 的判定；本畫面不從 inputs 重判一次色，也不把四盞合成一個分數。
+   ⚠ 灰燈與綠燈在畫面上必須一眼分得出來：灰＝這一項沒量到，不是「查過都沒事」。 */
+const WIPEOUT_COLOURS = { red: { mark: '🔴', word: '紅' }, amber: { mark: '🟡', word: '黃' },
+                          green: { mark: '🟢', word: '綠' } };
+
+function wipeoutBlock(view) {
+  const panel = view.wipeout;
+  const meta = plainPanel('wipeout', panel ? panel.title : '會不會歸零');
+  const node = el('div', 'bet');
+  node.appendChild(el('div', 'group-title', meta.title));
+  if (!panel) return node;
+  node.appendChild(el('div', 'panel-questions', meta.hint));
+  const tally = (panel.context && panel.context.tally) || {};
+  node.appendChild(el('div', 'rule',
+    `紅 ${tally.red || 0}｜黃 ${tally.amber || 0}｜綠 ${tally.green || 0}｜灰（沒量到）${tally.unlit || 0}`));
+  const list = el('ul', 'weak');
+  (panel.lines || []).filter((line) => line.role === 'wipeout').forEach((line) => {
+    const d = line.datum;
+    const value = (d && d.value) || {};
+    const colour = WIPEOUT_COLOURS[value.colour];
+    const li = el('li');
+    li.appendChild(document.createTextNode(
+      `${colour ? colour.mark + ' ' + colour.word : '⬜ 灰'}　${plainLine(line.key) || line.display_label}`));
+    const why = value.reason || d.reason;
+    if (why) li.appendChild(el('span', 'rule', why));
+    if (!colour) {
+      const badge = absenceBadge(d.absence_kind);
+      if (badge) li.appendChild(badge);
+    }
+    list.appendChild(li);
+  });
+  node.appendChild(list);
+  if (panel.context && panel.context.unlit_rule) {
+    node.appendChild(el('div', 'rule', panel.context.unlit_rule));
+  }
   return node;
 }
 

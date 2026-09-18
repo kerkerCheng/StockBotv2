@@ -123,12 +123,19 @@ def test_pq2_ball_in_user_court_uses_todo_ssot() -> None:
     assert any(f"pq2 球在你手上 {expected}" in line for line in section.lines), section.lines
 
 
-def test_unbuilt_capabilities_point_at_a_phase(broken_env: dict[str, Path]) -> None:
-    """還沒建的格子要說得出去哪裡找——只印「無資料」會讓「今天沒事」與「還沒建」同形。"""
+def test_missing_artifacts_say_which_kind_of_missing(broken_env: dict[str, Path]) -> None:
+    """讀不到 artifact 時，每一行都要說**是哪一種讀不到**，並給出讓它回來的指令。
+
+    ⚠ 本測試 2026-09-18 改寫：原本驗的是「還沒建的格子要指到某個 Phase」，而第 4 段
+    那兩格（D15 power-law 三量、D2 歸零旗標與 alpha 全歸零）當天都已交付——
+    **繼續要求它印 `capability_absent` 等於要求它說謊**。現在驗的是同一條判準的另一半：
+    「今天沒事」與「讀不到」不得同形（AGENTS：缺席不得被壓成一句「無資料」）。
+    """
     section = hb.build_positions(state_dir=broken_env["state_dir"])
     text = "\n".join(section.lines)
-    assert "capability_absent" in text
-    assert "Phase 5" in text
+    assert "upstream_unavailable" in text
+    assert "python -m webapp materialize" in text                  # 說得出怎麼讓它回來
+    assert "capability_absent" not in text, "已交付的能力不得被宣告成『還沒建』"
 
 
 def test_weekly_scorecard_is_not_applicable_on_daily(tmp_path) -> None:

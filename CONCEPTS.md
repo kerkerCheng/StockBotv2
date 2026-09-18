@@ -371,13 +371,21 @@ bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩�
 *Avoid:* bear case、probability-weighted expected return、散文式下檔、拿賭注的 abstention 當下檔的答案
 
 ### 歸零旗標（Wipe-out flags）
-四盞紅黃綠燈（D2）：現金跑道／負債／稀釋／going concern。**只給燈不給數字**，屬量測（同總曝險倍數、追繳門檻那一類），
-不參與排序、不給尺寸。IQE.L 是第一個要測的案例（D7）。
-*Avoid:* 合成一個分數、把黃燈讀成「減碼」
+四盞紅黃綠燈（D2）：現金跑道／負債／稀釋／going concern。**只給燈不給數字**（算出顏色的數字住稽核層），
+屬量測（同總曝險倍數、追繳門檻那一類），不參與排序、不給尺寸、不進籃子 filter。IQE.L 是第一個要測的案例（D7）。
+判色規則住 `alpha/wipeout.py`（純函式）：**零憑空門檻**，只有符號比較加兩個指得出出處的常數——12 個月
+（IFRS／UK going-concern 最短評估期）與 365 天（一個完整會計年度）。
+⚠ **第四態是灰，而灰不是綠**：綠燈只能由「量到了而且沒事」產生，由「沒量到」產生的綠是一個憑空的安心。
+每盞灰燈自己宣告是哪一種沒有（`absence_kind`），呈現層不得 parse 理由句去猜。
+查證：`python -m briefing alpha-card <TICKER>`（13f 段）、`python -m briefing analyst-view <TICKER>`、心跳第 4 段。
+*Avoid:* 合成一個分數、把黃燈讀成「減碼」、**把灰讀成綠**、拿燈擋掉候選
 
 ### alpha 全歸零淨值少幾 %（Alpha wipe-out share）
 系統給的第三件事（D2）：alpha sleeve 全部歸零時淨值少幾 %。純呈現、零門檻；尺寸仍由使用者決定。alpha 格自 D1 起只觀測不設目標。
-*Avoid:* 目標比例、建議尺寸
+它**就是 alpha 佔 NAV 的比例本身**（`beta` artifact 的 `risk.snapshot.alpha_total_weight`），不另算一份——
+⚠ 別和心跳同段的「alpha 占**已投入非現金**」混用：兩者分母不同（NAV 含現金）。印在心跳第 4 段。
+查證：`python -c "import json;d=json.load(open('library/private/app/state/beta.json',encoding='utf-8'));print(d['risk']['snapshot']['alpha_total_weight'])"`
+*Avoid:* 目標比例、建議尺寸、把它讀成上限
 
 ### power-law 統計量（Power-law statistics）
 追蹤表的三個主統計量（D15）：**12／24 個月內達 2 倍的比例、最大單檔貢獻、籃子總報酬**；等權中位數保留但降為次要。

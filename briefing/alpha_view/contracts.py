@@ -144,6 +144,9 @@ CAP_DOWNSIDE_OVERLAY = "downside_scenario_overlay_v1"
 CAP_INVESTOR_BRIEF = "investor_brief_v1"
 #: 2026-09-15：論證層——六段分析師報告體。算術與圖的敘述由封閉句型組；判斷的長文照抄 session 寫的。
 CAP_ARGUMENT = "argument_layer_v1"
+#: 2026-09-18（D2）：歸零旗標——四盞紅黃綠燈（現金跑道／負債／稀釋／going concern）。
+#: **量測不是訊號**：不參與排序、不決定尺寸。判色規則與「為什麼這盞不亮」住 `alpha/wipeout.py`。
+CAP_WIPEOUT_FLAGS = "wipeout_flags_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -780,6 +783,24 @@ class NotModeledSection:
 
 
 @dataclass(frozen=True, slots=True)
+class WipeoutFlagsSection:
+    """歸零旗標（D2，2026-09-18）：四盞紅黃綠燈——**這家公司會不會歸零**。
+
+    每盞燈一個 `Datum`，`value` 是 `{"colour", "reason", "rule", "inputs"}`；**燈不亮時
+    `status` 不是 available，而是帶 `absence_kind` 的缺席**——所以「這盞是綠的」與「這盞沒點亮」
+    在型別層就不可能同形（L12）。
+
+    `tally` 是紅／黃／綠／灰的計數（常駐計數器，L14）。**不參與排序、不決定尺寸**——
+    它與總曝險倍數、追繳門檻同屬「量測」，不是訊號（AGENTS「須區分量測、訊號與脈絡」）。
+    """
+
+    meta: SectionMeta
+    lanes: tuple[Datum, ...]
+    tally: Mapping[str, int]
+    is_not: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class EvidenceItem:
     ref: str
     kind: str
@@ -911,6 +932,9 @@ class AlphaInvestmentView:
     #: 仍然不是 bear case、沒有機率加權。
     downside: PayoffScenarioSection
     entry_logic: EntryLogicSection
+    #: D2（2026-09-18）：歸零旗標四盞燈。與 `downside` 是同一個問題的兩面——
+    #: 後者答「判斷錯了值多少」，它答「這家公司會不會直接歸零」。
+    wipeout_flags: WipeoutFlagsSection
     evidence: EvidenceSection
     freshness: tuple[FreshnessItem, ...]
     refresh_status: RefreshStatusSection
@@ -924,7 +948,8 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "implied_return",
-        "downside", "entry_logic", "evidence", "refresh_status", "payoff_scenario", "investor_brief", "argument",
+        "downside", "entry_logic", "wipeout_flags", "evidence", "refresh_status", "payoff_scenario",
+        "investor_brief", "argument",
     )
 
     def capability_map(self) -> dict[str, dict[str, str | None]]:

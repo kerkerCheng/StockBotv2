@@ -176,6 +176,9 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         "consensus_moved": base_closure.get("closed_fraction") if isinstance(base_closure, Mapping) else None,
         "consensus_points": base_closure.get("n_points") if isinstance(base_closure, Mapping) else None,
         "price_above_target": bool(reached.get("any_reached")) if isinstance(reached, Mapping) else None,
+        # D2（2026-09-18）：歸零旗標跟著列走。**不進 `filter_reasons`**——燈是量測不是篩選條件，
+        # 拿它擋掉候選就等於讓一個未經 outcome 驗證的指標決定去留（INV-5／L14）。
+        "wipeout": ov.get("wipeout"),
         "held": live is not None,
         "position": ({"shares": live.get("shares"), "entry_price": live.get("price"), "currency": live.get("currency"),
                       "executed_at": live.get("executed_at"), "live_return": live.get("live_return")} if live else None),
@@ -270,6 +273,20 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
     reason_counts = {key: sum(1 for r in rows if key in r["filter_reasons"]) for key in FILTER_REASONS}
     # 賭注帳：每個 state 都印，**0 也印**——「欠 0 個答案」與「這一格沒算」不得同形（INV-3）。
     bet_counts = {state: sum(1 for r in rows if r["bet_state"] == state) for state in BET_STATES}
+    # 歸零旗標帳（D2）：**盞數**與**有紅燈的檔數**分開算。合成一個數字就答不出
+    # 「是一檔亮四盞，還是四檔各亮一盞」——那是兩件完全不同的事。
+    wipe_lamp_counts = {colour: 0 for colour in ("red", "amber", "green", "unlit")}
+    wipe_red_tickers: list[str] = []
+    wipe_no_flags: list[str] = []
+    for r in rows:
+        tally = ((r.get("wipeout") or {}).get("tally")) or {}
+        if not tally:
+            wipe_no_flags.append(str(r["ticker"]))
+            continue
+        for colour in wipe_lamp_counts:
+            wipe_lamp_counts[colour] += int(tally.get(colour) or 0)
+        if int(tally.get("red") or 0):
+            wipe_red_tickers.append(str(r["ticker"]))
     top = accepted[0] if accepted else None
     groups: dict[str, list[str]] = {}
     for r in rows:
@@ -316,6 +333,14 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
         "bet_ledger": {**bet_counts, "input": len(rows),
                        "state_labels": dict(BET_STATES), "rule": BET_LEDGER_RULE,
                        "owed": [r["ticker"] for r in rows if r["bet_state"] == "unanswered"]},
+        # D2（2026-09-18）歸零旗標帳。**量測不是篩選**：它不參與 `filter`、不進 `top_pick` 的條件。
+        "wipeout_ledger": {
+            "companies": len(rows), "lamps": wipe_lamp_counts,
+            "red_tickers": wipe_red_tickers,
+            "no_flags_tickers": wipe_no_flags,
+            "rule": ("每檔四盞：現金跑道／負債／稀釋／going concern。**灰＝沒量到，不是綠**；"
+                     "燈不參與排序、不決定尺寸、不進 filter（AGENTS「須區分量測、訊號與脈絡」）"),
+        },
         "groups": [{"sector": k, "tickers": v} for k, v in groups.items()],
         "correlation_notes": list(ranking.get("correlation_notes") or ()),
         "this_is_not": list(BASKET_THIS_IS_NOT),

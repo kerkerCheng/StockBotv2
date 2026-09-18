@@ -29,8 +29,11 @@ PENDING_DIR = ROOT / "library" / "private" / "thesis_mutations"
 PROPOSAL_SCHEMA = "thesis-lifecycle-proposal/v1"
 
 # L7 的生命週期狀態機。開啟它等於改變 thesis 的語意，不是補字彙。
-# 2026-09-15（使用者定案）：多一個 `realized`——「對了」也要有出場觸發，與 disproof 對稱。
-# 進入條件由人提案（現價高於目標價只是提醒，不是自動轉移）；出口與 review_required 相同：retire 或 revise。
+# 2026-09-15（使用者定案）：多一個 `realized`——「對了」也要有一個觸發，與 disproof 對稱。
+# 2026-09-16（D3）把措辭收緊：**`realized` 是提醒，不觸發出場**。它觸發的是一次複查
+# （重看要收割還是上修），不是賣出——出場只認反證。進入條件由人提案（現價高於目標價
+# 只是提醒，不是自動轉移）；出口與 review_required 相同：retire 或 revise。
+# 守門測試：`tests/test_thesis_realized.py`（含「repo 裡不得有程式把 status 寫成 realized」）。
 ALLOWED_TRANSITIONS: dict[str, frozenset[str]] = {
     "active": frozenset({"watch", "review_required", "realized"}),
     "watch": frozenset({"active", "review_required", "realized"}),

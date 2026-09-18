@@ -65,7 +65,9 @@ CORE_PANELS: tuple[str, ...] = ("headline", "fundamental", "why", "research")
 #: `downside`（D2，2026-09-18）：判斷錯了值多少。與 `bet` 同為 optional——
 #: 沒寫下檔的檔 readiness 不變差，但它必須出現在 `optional_unavailable` 裡，
 #: 否則「還沒寫」這件事在畫面上沒有任何地方說得出口。
-OPTIONAL_PANELS: tuple[str, ...] = ("brief", "argument", "bet", "downside", "entry")
+#: `wipeout`（D2，2026-09-18）：歸零旗標四盞燈。optional——沒點亮的燈不讓 readiness 變差，
+#: 但必須出現在 `optional_unavailable` 裡，否則「這盞燈點不亮」在畫面上沒有地方說得出口。
+OPTIONAL_PANELS: tuple[str, ...] = ("brief", "argument", "bet", "downside", "wipeout", "entry")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -113,6 +115,7 @@ LINE_ROLES = frozenset({
     "override",                # 賭注覆蓋的假設（每條帶 base 對照值）
     "brief",                   # optional：投資人短評的七句＋一把尺＋一顆燈
     "paragraph",               # optional：論證層的六段
+    "wipeout",                 # optional：歸零旗標的一盞燈（D2；顏色＋一句話，數字在 dependencies）
 })
 
 #: 「為什麼這一格被列進脆弱清單」的封閉字彙。**每一條都是宣告好的列入規則**，
@@ -164,6 +167,10 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
     "brief": {"title": "這檔在賭什麼",
               "hint": "七句話講前因後果：什麼在放量、這家公司供什麼、為什麼卡在它、市場怎麼看、我們賭什麼、"
                       "對了／錯了會怎樣、什麼時候知道。文字是研究時寫的判斷，數字由系統填"},
+    "wipeout": {"title": "會不會歸零",
+                "hint": "四盞燈：現金跑道、負債、稀釋、going concern。**只給顏色不給數字**——"
+                        "算出顏色的數字在每盞燈自己的稽核格裡。灰燈不是綠燈：它表示這一項沒量到，"
+                        "而「沒查」不等於「沒事」"},
     "bet": {"title": "如果我們的賭注對了",
             "hint": "只改我們有差異看法的那幾條假設，其餘沿用 base；算出來的是條件句，不是預測、不是機率加權。"
                     "沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
@@ -606,6 +613,9 @@ class AnalystView:
     bet: AnalystPanel
     #: D2（2026-09-18）：與 `bet` 對稱的 optional panel。兩者並排就是短評那把尺的兩端。
     downside: AnalystPanel
+    #: D2（2026-09-18）：歸零旗標 panel（optional）。緊接在 `downside` 之後——
+    #: 「判斷錯了值多少」問的是 thesis 錯了會怎樣，這一個問的是公司本身會不會直接歸零。
+    wipeout: AnalystPanel
     #: 2026-09-15：投資人短評 panel（optional）。APP 首屏只讀它；markdown 仍以 headline 開頭。
     brief: AnalystPanel
     #: 2026-09-15：論證層 panel（optional）：短評展開成六段，附引文與長文。
@@ -616,7 +626,8 @@ class AnalystView:
     #: 事發（2026-09-18）：D2 的 panel 做好了但沒登記，於是 artifact 的 `absence_kind` 是 `None`
     #: （`to_dict` 只對 `PANEL_ORDER` 裡的 panel 寫出那個 property），readiness 也沒列它——
     #: 機制在、但分類沒跟著資料走到消費端（L16）。**materialize 一次就看得到，所以要驗 artifact。**
-    PANEL_ORDER = ("headline", "brief", "argument", "bet", "downside", "fundamental", "why", "research", "entry")
+    PANEL_ORDER = ("headline", "brief", "argument", "bet", "downside", "wipeout",
+                   "fundamental", "why", "research", "entry")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

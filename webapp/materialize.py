@@ -104,6 +104,30 @@ def _payoff_overview(bet_panel: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _wipeout_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
+    """歸零旗標的清單投影：四盞燈的顏色與一句話，外加紅黃綠灰計數。**純選取。**
+
+    ⚠ 顏色照抄 `alpha.wipeout` 經 read model 帶來的值；APP 端**不得**自己從 inputs 重判一次色
+    ——重造品會立刻開始偏離（L16）。算出顏色的數字刻意**不進**這個投影：清單卡片是消費層，
+    數字住稽核層（D2「紅黃綠不給數字」）。
+    """
+    lines = _line_map(panel)
+    lanes = []
+    for key, datum in lines.items():
+        if not str(key).startswith("wipeout_"):
+            continue
+        value = datum.get("value") if isinstance(datum.get("value"), Mapping) else {}
+        lanes.append({
+            "lane": str(key).removeprefix("wipeout_"),
+            "label": datum.get("display_label") or datum.get("label"),
+            "colour": (value or {}).get("colour"),
+            "reason": (value or {}).get("reason") or datum.get("reason"),
+            "absence_kind": datum.get("absence_kind"),
+        })
+    return {"status": panel.get("status"), "absence_kind": panel.get("absence_kind"),
+            "tally": (panel.get("context") or {}).get("tally"), "lanes": lanes}
+
+
 def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """清單卡片的投影。**純選取**——這裡沒有任何算術。"""
     headline = view["headline"]
@@ -140,6 +164,8 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         # V2：市場承認了嗎／目標價到了沒（照抄）
         "gap_closure": _cell(fundamental_lines.get("gap_closure")),
         "target_reached": _cell(lines.get("target_reached")),
+        # D2（2026-09-18）歸零旗標：四盞燈（顏色＋一句話）與紅黃綠灰計數。照抄 panel。
+        "wipeout": _wipeout_overview(view.get("wipeout") or {}),
         # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）
         "ripeness": _cell(_line_map(view.get("research") or {}).get("catalyst_quantitative_link")),
         "price_context": dict(price_context) if price_context else None,

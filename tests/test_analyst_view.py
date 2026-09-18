@@ -177,11 +177,14 @@ def test_missing_entry_criterion_does_not_change_core_readiness() -> None:
     # V0（2026-09-15）：bet 也是 optional；沒寫賭注時它與 entry 一樣只在 optional 欄現形
     # D2（2026-09-18）：`downside` 是第四個 optional panel，沒寫時要與 `bet` 一起現形——
     # 否則「還沒寫下檔」這件事在畫面上沒有任何地方說得出口。
+    # D2（2026-09-18 第二件）：`wipeout`（歸零旗標）是第五個 optional panel。fixture 沒帶
+    # Engine C 觀測，所以四盞燈全滅——它必須在 optional 欄現形，否則「這四盞燈點不亮」
+    # 在畫面上沒有任何地方說得出口。
     assert without.readiness.optional_unavailable == (
-        "brief：missing", "bet：missing", "downside：missing", "entry：missing")
-    # fixture 沒寫短評、賭注與下檔（D2 起 downside 也是 optional panel）
+        "brief：missing", "bet：missing", "downside：missing", "wipeout：missing", "entry：missing")
+    # fixture 沒寫短評、賭注、下檔，也沒有歸零旗標的輸入
     assert with_hurdle.readiness.optional_unavailable == (
-        "brief：missing", "bet：missing", "downside：missing")
+        "brief：missing", "bet：missing", "downside：missing", "wipeout：missing")
     # 核心四段的 status 一格不動
     assert ({p: getattr(with_hurdle, p).status for p in CORE_PANELS}
             == {p: getattr(without, p).status for p in CORE_PANELS})
@@ -386,8 +389,10 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     assert json.loads(text) == first                            # null 保留為 null
     assert first["schema_version"] == SCHEMA_VERSION
     # `downside` 緊接在 `bet` 後面：同一把尺的兩端，讀的人要並排看（D2，2026-09-18）。
+    # `wipeout` 再接在 `downside` 後面：下檔問「thesis 錯了值多少」，它問「公司會不會直接歸零」。
     assert first["panel_order"] == list(
-        ("headline", "brief", "argument", "bet", "downside", "fundamental", "why", "research", "entry"))
+        ("headline", "brief", "argument", "bet", "downside", "wipeout",
+         "fundamental", "why", "research", "entry"))
     assert set(first["questions"]) == set(QUESTIONS)
 
 

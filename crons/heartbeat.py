@@ -82,13 +82,15 @@ SECTION_TITLES: tuple[str, ...] = (
     "帳號計分表",
 )
 
-#: 尚未交付的能力各自指到哪個 Phase。寫在這裡是為了讓「還沒做」帶得出去向——
-#: 只印「無資料」會讓使用者分不出「今天沒事」與「這件事我們根本還沒建」（AGENTS：缺席不得被壓成一句）。
-PENDING_PHASE: Mapping[str, str] = {
-    "power_law_stats": "ROADMAP Phase 5（D15 三個 power-law 統計量）",
-    "zero_out_flags": "ROADMAP Phase 5（D2 歸零旗標與「alpha 全歸零淨值少幾 %」）",
-    "account_scorecard": "ROADMAP Phase 3（D5 帳號登記表與每週計分表）",
-}
+#: 「尚未交付的能力各自指到哪個 Phase」那張表**已經清空並移除**（2026-09-18）。
+#:
+#: 它原本有三筆，最後一筆是已交付的 Phase 3 計分表——也就是說它**一個 consumer 都沒有**，
+#: 而三筆裡有兩筆是已交付的能力還掛著「還沒建」。兩個毛病是同一個形狀：這種表不會壞、
+#: 不會報錯、測試不會紅（L17），所以只會安靜地每天印一句假話。
+#:
+#: ⚠ 下次真的有「還沒建的能力」要現形時，**把去向寫在印那一行的地方**，不要再回來建一張
+#: 集中表——集中表與它的使用點分開，正是上面那兩個毛病的來源（INV-4：producer 指得出 consumer）。
+#: 守門測試：`tests/test_wipeout_flags.py::test_heartbeat_does_not_claim_a_delivered_capability_is_still_missing`。
 
 
 @dataclass(frozen=True)
@@ -542,7 +544,11 @@ def build_queue(*, state_dir: Path | None = None) -> Section:
 # ---------------------------------------------------------------------------
 
 def build_positions(*, state_dir: Path | None) -> Section:
-    """alpha 占淨值、追蹤表、賭注帳、幾檔共用同一需求錨；未交付的兩格明確宣告 `capability_absent`。"""
+    """alpha 占淨值、追蹤表、power-law 三量、alpha 全歸零、歸零旗標帳、賭注帳、需求錨集中度。
+
+    2026-09-18 起這一段**沒有** `capability_absent` 了——D15（power-law 三量）與 D2（歸零旗標、
+    alpha 全歸零）都已交付。每一行改成「讀得到就印值、讀不到就說是哪一種讀不到」。
+    """
     section = Section(4, SECTION_TITLES[3])
 
     beta, beta_absence = _load_state(state_dir, "beta")
@@ -623,10 +629,66 @@ def build_positions(*, state_dir: Path | None) -> Section:
             f"——**N 檔不等於 N 個獨立機會**"
         )
 
-    for key in ("power_law_stats", "zero_out_flags"):
-        absence = Absence("capability_absent", f"還沒建，去向：{PENDING_PHASE[key]}")
-        label = {"power_law_stats": "三個 power-law 統計量", "zero_out_flags": "歸零旗標與 alpha 全歸零淨值少幾 %"}[key]
-        section.lines.append(f"{label}：{absence.reason}（{absence.kind}）")
+    # 三個 power-law 統計量（D15，2026-09-18 交付）。**平均值看不到的那件事**：
+    # 一檔扛全場時等權平均仍接近 0，所以這裡印的是恆等式的兩端，不是比例。
+    if pos_absence is not None:
+        section.lines.append(f"power-law 三量：{pos_absence.reason}（{pos_absence.kind}）")
+    else:
+        power = positions.get("power_law") or {}
+        if not power:
+            section.lines.append("power-law 三量：這份 positions artifact 沒有 power_law 鍵（upstream_unavailable）")
+        else:
+            top = power.get("top_contributor") or {}
+            m12 = (power.get("maturity") or {}).get("12m") or {}
+            # 分母 0 時 `share` 是 null 不是 0.0——「還沒有一檔滿一年」與「滿了但沒翻倍」是相反的結論。
+            matured = m12.get("matured") or 0
+            share = m12.get("share")
+            maturity_text = (f"12 個月內達 2 倍 {m12.get('reached_2x', 0)}/{matured}"
+                             f"（{_pct(share)}）" if matured else
+                             f"**還沒有一檔滿 12 個月**（最長持有 {power.get('max_days_held', '?')} 天）")
+            section.lines.append(
+                f"power-law：籃子總報酬 {_pct(power.get('basket_total_return'))}"
+                f"｜最大單檔 {top.get('ticker', '?')} {_pct(top.get('contribution'))}"
+                f"／其餘 {top.get('rest_n', '?')} 檔 {_pct(top.get('rest_contribution'))}"
+                f"｜曾達 2 倍 {power.get('reached_2x_ever', '?')}/{power.get('n', '?')}"
+                f"（現價仍達 {power.get('reached_2x_now', '?')}）｜{maturity_text}")
+
+    # alpha 全歸零淨值少幾 %（D2）。**純呈現、零門檻**：它就是 alpha 佔 NAV 的比例本身，
+    # 不是建議、不是上限。沒有 alpha 部位時它是 0，而那是一個真實的答案不是缺席。
+    if beta_absence is not None:
+        section.lines.append(f"alpha 全歸零：{beta_absence.reason}（{beta_absence.kind}）")
+    else:
+        snapshot = (beta.get("risk") or {}).get("snapshot") or {}
+        weight = snapshot.get("alpha_total_weight")
+        if weight is None:
+            section.lines.append("alpha 全歸零：風險快照沒有 alpha_total_weight（upstream_unavailable）")
+        else:
+            section.lines.append(
+                f"**alpha 全歸零淨值少 {_pct(weight)}**（alpha 佔 NAV 的比例本身；純呈現、零門檻，"
+                "尺寸仍由使用者決定）")
+
+    # 歸零旗標（D2）：**盞數與檔數分開**——「一檔亮四盞」與「四檔各亮一盞」是兩件事。
+    if basket_absence is not None:
+        section.lines.append(f"歸零旗標：{basket_absence.reason}（{basket_absence.kind}）")
+    else:
+        ledger = basket.get("wipeout_ledger") or {}
+        if not ledger:
+            section.lines.append("歸零旗標：這份 basket artifact 沒有 wipeout_ledger（upstream_unavailable）")
+        else:
+            lamps = ledger.get("lamps") or {}
+            line = (f"歸零旗標 {ledger.get('companies', '?')} 檔 × 4 盞："
+                    f"紅 {lamps.get('red', 0)}｜黃 {lamps.get('amber', 0)}｜綠 {lamps.get('green', 0)}"
+                    f"｜**灰（沒量到）{lamps.get('unlit', 0)}**——⚠ 灰不是綠")
+            red = ledger.get("red_tickers") or []
+            if red:
+                line += "；有紅燈：" + "、".join(str(x) for x in red[:8]) + ("…" if len(red) > 8 else "")
+            section.lines.append(line)
+            missing_flags = ledger.get("no_flags_tickers") or []
+            if missing_flags:
+                section.lines.append(
+                    f"歸零旗標算不出來的 {len(missing_flags)} 檔："
+                    + "、".join(str(x) for x in missing_flags[:8])
+                    + ("…" if len(missing_flags) > 8 else ""))
     return section
 
 

@@ -460,6 +460,21 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
         overrides_label="下檔覆蓋的假設（每條帶 base 對照值）：",
         is_not_label="下檔不是什麼：")
 
+    # 13f. 歸零旗標（D2，2026-09-18）。緊接在 13b 之後：13b 問「thesis 錯了值多少」，
+    # 這一節問「公司本身會不會直接歸零」——兩個不同的壞結局，不得合成一個數字。
+    wf = view.wipeout_flags
+    lines += _section("13f. 會不會歸零（四盞燈；只給顏色不給數字）", wf.meta)
+    lines.append(
+        f"- 盞數：紅 {wf.tally.get('red', 0)}｜黃 {wf.tally.get('amber', 0)}｜"
+        f"綠 {wf.tally.get('green', 0)}｜**灰（沒量到）{wf.tally.get('unlit', 0)}**"
+        "——⚠ 灰不是綠，它表示這一項沒量到")
+    for datum in wf.lanes:
+        lines.append(_datum_line(datum))
+    lines.append("")
+    lines += ["歸零旗標不是什麼："]
+    lines += [f"- {markdown_text(item)}" for item in wf.is_not]
+    lines.append("")
+
     # 13c. Entry logic（Step 3；`python -m briefing entry` 單獨印這一節）
     lines += render_entry_logic_lines(view)
 

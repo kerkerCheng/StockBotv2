@@ -456,6 +456,29 @@ def _downside_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
+def _wipeout_panel(view: AlphaInvestmentView) -> AnalystPanel:
+    """歸零旗標（optional，D2 2026-09-18）：四盞燈逐盞一行。
+
+    ⚠ 這個 panel **一個顏色都不判**——顏色、理由句、規則與輸入全部照抄 `alpha.wipeout`
+    經由 read model 帶過來的 `Datum`。呈現層自己判色就會立刻長出第二套規則（L16）。
+    """
+    wf = view.wipeout_flags
+    lines = _lines(wf.lanes, "wipeout")
+    return AnalystPanel(
+        key="wipeout", title="會不會歸零：四盞燈（optional）",
+        questions=("q7_payoff",),
+        status=wf.meta.status, optional=True,
+        source_sections=("wipeout_flags",), source_statuses={"wipeout_flags": wf.meta.status},
+        source_absence_kinds=_absence_kinds(wipeout_flags=wf.meta),
+        lines=lines, notes=wf.is_not,
+        context={"capability": wf.meta.capability, "tally": dict(wf.tally),
+                 "available": wf.meta.status not in VALUELESS_STATUSES,
+                 "unlit_rule": "灰燈＝這一項沒量到，**不是**綠燈；每盞灰燈自己說了是哪一種沒有"
+                               "（`absence_kind`），呈現層不得 parse 理由句去猜（L16）"},
+        reason=wf.meta.reason,
+    )
+
+
 def _entry_panel(view: AlphaInvestmentView) -> AnalystPanel:
     el = view.entry_logic
     lines = (
@@ -488,12 +511,17 @@ def _entry_panel(view: AlphaInvestmentView) -> AnalystPanel:
 # readiness ＋ 整份 view
 # ---------------------------------------------------------------------------
 
+# ⚠ 兩份清單都**讀 SSOT**，不手寫（L16：分類有 SSOT 時要讓它跟著資料走）。
+# 事發（2026-09-18）：這句話原本把 optional 逐字寫成「brief／argument／bet／entry」，
+# 而 `OPTIONAL_PANELS` 在 D2 那輪就已經多了 `downside`——**畫面上少印一個 panel 名，
+# 沒有任何東西會變紅**，它只是安靜地說了一句假話。
 _READINESS_RULE = (
-    "只看核心 panel（headline／fundamental／why／research）："
+    f"只看核心 panel（{'／'.join(CORE_PANELS)}）："
     "全部有內容（available／partial）＝ready；"
     "有內容但至少一段被標為 stale／review_required／not_applicable＝ready_with_flags；"
     "至少一段缺內容（missing／invalidated／not_modeled／insufficient_evidence）＝blocked。"
-    "**optional panel（brief／argument／bet／entry）一律不參與**——沒有短評、沒有賭注、沒有 entry criterion 都不會讓 readiness 變差。"
+    f"**optional panel（{'／'.join(OPTIONAL_PANELS)}）一律不參與**"
+    "——沒有短評、沒有賭注、沒有下檔、沒有歸零旗標、沒有 entry criterion 都不會讓 readiness 變差。"
 )
 
 
@@ -543,6 +571,8 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     # D2（2026-09-18）：`downside` 由 `NotModeledSection` 換成與賭注對稱的 overlay，
     # 所以「不是什麼」改從 `is_not` 取——`DOWNSIDE_IS_NOT` 第一句逐字就是「不是 bear case」。
     everything += list(view.downside.is_not)
+    # D2（2026-09-18）：歸零旗標的四條「不是什麼」——尤其「綠燈不是查過都沒事的保證」。
+    everything += list(view.wipeout_flags.is_not)
     return tuple(dict.fromkeys(everything))
 
 
@@ -556,6 +586,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         "entry": _entry_panel(view),
         "bet": _bet_panel(view),
         "downside": _downside_panel(view),
+        "wipeout": _wipeout_panel(view),
         "brief": _brief_panel(view),
         "argument": _argument_panel(view),
     }
@@ -568,7 +599,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         generated_on=ident.generated_on, research_context_digest=ident.research_context_digest,
         headline=panels["headline"], fundamental=panels["fundamental"], why=panels["why"],
         research=panels["research"], entry=panels["entry"], bet=panels["bet"],
-        downside=panels["downside"], brief=panels["brief"],
+        downside=panels["downside"], wipeout=panels["wipeout"], brief=panels["brief"],
         argument=panels["argument"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),

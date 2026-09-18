@@ -286,6 +286,21 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
         lines += [f"**Not set (optional)** — {markdown_text(bet.reason or '尚未寫入任何 variant 假設')}", ""]
     lines += [f"- {markdown_text(bet.context.get('optional_rule') or '')}", ""]
 
+    # ---- 會不會歸零（optional；D2 2026-09-18）-----------------------------
+    # 緊接在賭注之後：賭注問「對了值多少」，這一段問「這家公司會不會直接沒了」。
+    wipe = view.wipeout
+    tally = wipe.context.get("tally") or {}
+    lines += ["## 會不會歸零：四盞燈（optional）", "",
+              f"紅 **{tally.get('red', 0)}**｜黃 **{tally.get('amber', 0)}**｜綠 **{tally.get('green', 0)}**"
+              f"｜**灰（沒量到）{tally.get('unlit', 0)}**　——⚠ 灰不是綠", ""]
+    for line in _by_role(wipe, "wipeout"):
+        datum = line.datum
+        value = datum.value if isinstance(datum.value, dict) else {}
+        colour = {"red": "🔴 紅", "amber": "🟡 黃", "green": "🟢 綠"}.get(str(value.get("colour")), "⬜ 灰")
+        why = value.get("reason") or datum.reason or "—"
+        lines.append(f"- **{markdown_text(line.display_label)}**：{colour} — {markdown_text(str(why))}")
+    lines += ["", f"- {markdown_text(wipe.context.get('unlit_rule') or '')}", ""]
+
     lines += [f"## 1. {QUESTIONS['q1_internal']}（Internal forecast）", "",
               f"- {_context_line(fund.context, 'period', 'period_end', 'base_period_end', 'accounting_basis') or '目標期間未知'}",
               ""]
