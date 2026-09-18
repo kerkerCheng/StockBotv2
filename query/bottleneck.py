@@ -40,7 +40,7 @@ import calendar
 import json
 import os
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from datetime import date
 from typing import Any, Iterable, Mapping
@@ -485,6 +485,109 @@ FILTER_REASONS: Mapping[str, str] = {
 }
 
 
+#: 「**瓶頸節點自己**走不到需求錨」的成因（封閉字彙）。
+#:
+#: ⚠ **這不是 `FILTER_REASONS`，兩者問的不是同一件事。** `FILTER_REASONS` 講的是
+#: 「這條邊為什麼沒進排序」；本字彙講的是「這個**節點**接不接得到有人花錢的地方」。
+#: 排序用的 `demand_anchor` 是從**公司**側走的（見 `demand_chain` 的 docstring），
+#: 所以一條列可以同時「公司側有錨」而「瓶頸節點側沒有錨」——後者今天不影響排序，
+#: 也**刻意不該影響**（AGENTS：唯一排序權威是 `rank_bottlenecks`，不得自建第二套評分）。
+#:
+#: ⚠ **三種成因刻意不壓成一句「走不到錨」**（ROADMAP Phase 4 驗收條件逐字要求）：
+#: 它們的下一步完全不同——一個要先拆封閉字彙、一個是研究、一個要等前兩個解完。
+#: 壓成一句就同形了（L12），而同形的那一刻，「去補研究」與「去改程式」變成同一格。
+#:
+#: ⚠ **ROADMAP 記的第①種（`constrained_by` 沒有被走訪）刻意不在本字彙裡**，因為
+#: 它已於 2026-09-18 修掉，修掉之後**結構上不可能再被觀測到**：那些節點現在走得到
+#: 上游，根本不會進入本分類的母體。留一個恆為 0 的格子就是 L14-4 的「不會滅」——
+#: 那是牆不是閘門。它的迴歸由 `tests/test_bottleneck_ranking.py::
+#: test_constrained_by_carries_demand_upward_in_the_depends_on_direction` 守著。
+ANCHOR_GAP_CAUSES: Mapping[str, str] = {
+    "enables_direction_unresolved": (
+        "圖裡**有**「X 的採用驅動對它的需求」這條 `enables` 邊，但走訪方向與抽取定義相反"
+        "（`prompts/extract_system.md` 逐字：`enables` — A's adoption drives demand for B），"
+        "所以需求沒有沿著它傳上來——**開發項，且要先把 `enables` 的兩種語意拆開**（L12）"
+    ),
+    "no_demand_edge": (
+        "圖裡**根本沒有人記錄過「誰需要它」**——沒有任何一條需求方邊指向它。"
+        "**這是真研究缺口**（pq2 [606]：找一手文件回答「誰在買它、為了做什麼」）"
+    ),
+    "upstream_dead_end": (
+        "**有**人需要它，但那些人自己也走不到需求錨——鏈斷在上游而不是斷在它身上。"
+        "前兩種解掉之後這一種會自己縮小，所以它是結果不是原因"
+    ),
+}
+
+
+def classify_anchor_gaps(
+    edges: Iterable[CanonicalEdge],
+    upward: Mapping[str, set[str]],
+    anchors: Iterable[str] | None = None,
+) -> dict[str, Any]:
+    """哪些**瓶頸節點**自己走不到需求錨，以及各是哪一種成因。
+
+    ⚠ **純診斷，不參與排序、不產生尺寸、不改 `rows` 一個字。** 加這一段的理由是
+    ROADMAP Phase 4 的驗收條件逐字寫著「四種成因要分得開（不得壓成一句走不到錨）」，
+    而在此之前**沒有任何地方數過它們**——`demand_anchor` 只在表格裡呈現成一格「🔴 無」，
+    那是呈現不是計數（L14：會自己出現的常駐計數器，不是要人讀的段落）。
+    現況數字不寫在這裡（會腐壞）：跑 `python -m query.bottleneck --top-n 60` 看那一段。
+
+    ⚠ **走訪一律消費既有的 `build_upward_index`／`demand_chain`／`DEPENDENCY_RELATIONS`**，
+    本函式不自己判「誰需要誰」——否則就是 L16 說的「每個消費端重造一份，而重造品會
+    立刻開始偏離」。本函式唯一自己看的是 `enables` 的**存在**（不是方向）。
+    """
+    edges = list(edges)
+    anchor_set = set(anchors) if anchors is not None else set(load_demand_anchors())
+
+    # 母體＝所有出現在「公司→向下」邊裡的瓶頸節點，也就是排序真的問過的那些。
+    population = sorted({e.dst for e in edges if e.relation in DOWNSTREAM_RELATIONS})
+
+    # `X enables node`：抽取定義說這是「X 的採用驅動對 node 的需求」＝需求應由 X 往 node 傳，
+    # 而 `build_upward_index` 走的是反方向，所以它不會出現在 `upward[node]` 裡。
+    enabled_by: dict[str, list[str]] = defaultdict(list)
+    for e in edges:
+        if e.relation == "enables":
+            enabled_by[e.dst].append(e.src)
+
+    by_cause: dict[str, list[dict[str, Any]]] = {k: [] for k in ANCHOR_GAP_CAUSES}
+    for node in population:
+        if demand_chain(node, upward, anchors=anchor_set):
+            continue
+        parents = sorted(upward.get(node) or ())
+        if parents:
+            cause, detail = "upstream_dead_end", parents
+        elif enabled_by.get(node):
+            cause, detail = "enables_direction_unresolved", sorted(enabled_by[node])
+        else:
+            cause, detail = "no_demand_edge", []
+        by_cause[cause].append({"node": node, "blocked_by": detail})
+
+    return {
+        "population": len(population),
+        "without_anchor": sum(len(v) for v in by_cause.values()),
+        "counts": {k: len(v) for k, v in by_cause.items()},
+        # ⚠ **前綴分佈是刻意報出來的，不是裝飾。** `no_demand_edge` 裡有一批 `co:` 節點是
+        # **需求終點**（`co:apple`／`co:google`／`co:meta`——有人供應它們，而「誰需要 Apple」
+        # 不會有人去記，因為它賣給消費者，不在錨的字彙裡），對它們做研究永遠不會有答案；
+        # 另一批 `co:` 卻是真缺口（`co:ayar_labs`／`co:lumilens` 這種小供應商）。
+        # **今天沒有任何 SSOT 分得出這兩種**，所以這裡不發明一個過濾器去猜——在沒有事實
+        # 支撐的地方泛化，得到的是會誤報的分類（L17-4）。報出分佈讓讀的人自己看見它。
+        "by_id_prefix": {
+            cause: dict(
+                sorted(Counter(n["node"].split(":")[0] for n in v).items())
+            )
+            for cause, v in by_cause.items()
+        },
+        "nodes": by_cause,
+        "cause_labels": dict(ANCHOR_GAP_CAUSES),
+        "this_is_not": (
+            "這**不是**排序欄位，也不是 filter 理由。排序用的 `demand_anchor` 是從**公司**側走的，"
+            "問「這家公司的產出有沒有人在花錢買」；本段問的是「這個**瓶頸節點**接不接得到錢」。"
+            "兩者是不同問題，2026-09-18 實測過把排序改成後者會讓 accepted 列失去錨而變差。"
+        ),
+    }
+
+
 def _filtered_row(edge, registry, upward, threshold: int) -> dict[str, Any]:
     """一條被門檻擋下的邊，帶得出「是誰、卡在哪、為什麼被擋」。"""
     reason = (
@@ -648,6 +751,10 @@ def rank_bottlenecks(
             "reasons": reason_counts,
             "reason_labels": dict(FILTER_REASONS),
         },
+        # ⚠ **新增的診斷輸出，不是新的排序**：`rows`／`structural_rows`／`filtered_rows`
+        # 與 `filter` 一字未動。它回答的是 ROADMAP Phase 4 ②③④「瓶頸節點走不到錨」
+        # 的成因分佈，母體與排序母體相同但問的是另一個方向（見 `this_is_not`）。
+        "anchor_gaps": classify_anchor_gaps(edges, upward),
         "coverage": {
             "assertions": len(rows),
             "canonical_edges": len(canonical),
@@ -890,6 +997,56 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         "因為圖裡沒有人記錄過「誰需要它們」。**那個「瓶頸節點走不到錨」是研究缺口訊號**"
         "（同 ROADMAP Phase 4 成因③「真的沒有需求方邊」），不是一個該加進排序的欄位。"
     )
+
+    # ⚠ 條件是 `population` 不是 `without_anchor`：用後者會讓「**全部都走得到錨**」與
+    # 「**這段根本沒跑**」在輸出上同形，而那正是 L13-2 說的「成功與失敗在同一個訊號上」。
+    # 母體為 0 才是真的沒東西可算（圖空或查詢失敗），那時才不印。
+    gaps = result.get("anchor_gaps") or {}
+    if gaps.get("population"):
+        out.append(
+            f"\n## 瓶頸節點走不到需求錨：{gaps['without_anchor']}／{gaps['population']} 個"
+            "（診斷，**不影響上面的排序**）\n"
+        )
+        out.append(f"> {gaps['this_is_not']}")
+    if gaps.get("population") and not gaps.get("without_anchor"):
+        out.append(
+            "\n✅ **母體裡每一個瓶頸節點都走得到需求錨。**"
+            "（這一行會出現，就代表這個檢查真的跑過了——不是它消失了）"
+        )
+    elif gaps.get("population"):
+        out.append(
+            "\n| 成因 | 幾個 | 節點型別 | 下一步屬於哪一類 | 例 |")
+        out.append("|---|---|---|---|---|")
+        _next_step = {
+            "enables_direction_unresolved": "開發（先拆 `enables` 的兩種語意）",
+            "no_demand_edge": "研究（pq2 [606]）",
+            "upstream_dead_end": "等前兩種解完（結果不是原因）",
+        }
+        for cause, count in sorted(
+            gaps.get("counts", {}).items(), key=lambda kv: -kv[1]
+        ):
+            if not count:
+                continue
+            sample = [n["node"] for n in gaps["nodes"][cause][:3]]
+            prefixes = gaps.get("by_id_prefix", {}).get(cause, {})
+            out.append(
+                f"| `{cause}` | **{count}** "
+                f"| {'／'.join(f'{k} {v}' for k, v in prefixes.items()) or '—'} "
+                f"| {_next_step.get(cause, '—')} "
+                f"| {'、'.join(f'`{s}`' for s in sample)}… |"
+            )
+        out.append(
+            "\n> ⚠ **節點型別要看一眼**：`no_demand_edge` 裡的 `co:` 節點有兩種，"
+            "而**今天沒有任何登記處分得出它們**——`co:apple`／`co:google`／`co:meta` 是**需求終點**"
+            "（有人供應它們，但「誰需要 Apple」不會有人記，它賣給消費者、不在錨的字彙裡），"
+            "對它們做研究永遠不會有答案；`co:ayar_labs`／`co:lumilens` 這種小供應商才是真缺口。"
+            "**這裡刻意不猜**——在沒有事實支撐的地方泛化會得到會誤報的分類（L17-4）。"
+        )
+        for cause, count in sorted(
+            gaps.get("counts", {}).items(), key=lambda kv: -kv[1]
+        ):
+            if count:
+                out.append(f"> **`{cause}`** — {gaps['cause_labels'][cause]}")
 
     structural = result.get("structural_rows") or []
     if structural:

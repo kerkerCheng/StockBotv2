@@ -539,3 +539,111 @@ def test_filtered_rows_carry_enough_to_act_on() -> None:
     assert row["ticker"] == "COHR"
     assert row["threshold"] == 4
     assert row["qualification_status"] == "qualified"
+
+
+def test_anchor_gap_causes_are_separable_and_never_collapse_into_one_reason() -> None:
+    """ROADMAP Phase 4 的驗收條件逐字要求「四種成因要分得開（不得壓成一句走不到錨）」。
+
+    事發（2026-09-18 實測）：壓成一句的代價是具體的——pq2 [606] 點名的 6 個 accepted
+    瓶頸節點裡，**只有 3 個是真研究缺口**；`tech:ocs` 是 `enables` 走訪方向未解（開發項，
+    圖裡已經有兩條 `enables` 指向它），`tech:eml` 與 `prod:ph18da` 是上游斷點。
+    對那 3 個去找一手文件是白做的——**而在分類之前，這件事在報表上完全看不出來**。
+
+    本測試鎖三件事：三種成因互斥、合計等於走不到錨的總數、判準各自對得上自己的名字。
+    """
+    from query.bottleneck import ANCHOR_GAP_CAUSES, classify_anchor_gaps
+
+    edges = list(
+        collapse_assertions(
+            [
+                # ③真的沒有需求方邊：只有人供它，沒有人記錄過誰需要它。
+                _row("co:axt", "supplies_to", "tech:lonely", conf=0.5),
+                # ②有 enables 指向它，但走訪方向與抽取定義相反，所以需求沒傳上來。
+                _row("co:axt", "supplies_to", "tech:enabled", conf=0.5),
+                _row("tech:buildout", "enables", "tech:enabled", conf=0.5),
+                # ④有人需要它，但那個人自己也走不到錨。
+                _row("co:axt", "supplies_to", "tech:deadend", conf=0.5),
+                _row("tech:orphan", "depends_on", "tech:deadend", conf=0.5),
+                # 對照組：走得到錨的不該進母體。
+                _row("co:axt", "supplies_to", "tech:reachable", conf=0.5),
+                _row("tech:reachable", "is_component_of", "tech:ai_switch", conf=0.5),
+            ]
+        ).values()
+    )
+    gaps = classify_anchor_gaps(edges, build_upward_index(edges))
+
+    assert gaps["counts"] == {
+        "no_demand_edge": 1,
+        "enables_direction_unresolved": 1,
+        "upstream_dead_end": 1,
+    }
+    assert gaps["without_anchor"] == 3, "走得到錨的 tech:reachable 不得被算進來"
+    assert sum(gaps["counts"].values()) == gaps["without_anchor"], "三種成因必須互斥且窮盡"
+
+    where = {n["node"]: cause for cause, v in gaps["nodes"].items() for n in v}
+    assert where["tech:lonely"] == "no_demand_edge"
+    assert where["tech:enabled"] == "enables_direction_unresolved"
+    assert where["tech:deadend"] == "upstream_dead_end"
+    assert "tech:reachable" not in where
+
+    # 封閉字彙：計數的 key 不得長出字彙以外的值。
+    assert set(gaps["counts"]) <= set(ANCHOR_GAP_CAUSES)
+    assert set(gaps["nodes"]) <= set(ANCHOR_GAP_CAUSES)
+
+
+def test_anchor_gap_diagnosis_does_not_touch_the_ranking() -> None:
+    """診斷是**新增輸出**，不是新的排序。
+
+    AGENTS 明訂唯一排序權威是 `rank_bottlenecks()`，且「瓶頸節點接不接得到錢」與
+    「這家公司的產出有沒有人在花錢買」是兩個問題——2026-09-18 實測過把排序改成前者
+    會讓 accepted 列失去錨。本測試鎖住：加了診斷之後，排序輸出一個欄位都沒有動。
+    """
+    from query.bottleneck import classify_anchor_gaps
+
+    rows = [
+        _row("co:axt", "supplies_to", "co:coherent", conf=0.9, attrs={"substitutability": 5}),
+        _row("co:coherent", "is_component_of", "tech:ai_switch", conf=0.9),
+        _row("co:nvidia", "depends_on", "tech:lonely", conf=0.9, attrs={"substitutability": 4}),
+    ]
+    result = rank_bottlenecks(rows, _FakeRegistry())
+
+    assert "anchor_gaps" in result
+    # 排序本身：rows 的每一列都還帶著公司側的錨，診斷沒有把它換成節點側的。
+    for row in result["rows"]:
+        assert "anchor_gap" not in row, "診斷不得滲進排序列"
+    axt = [r for r in result["rows"] if r["company_id"] == "co:axt"]
+    assert axt and axt[0]["demand_anchor"] == "tech:ai_switch"
+
+    # 診斷自己算得出東西，但它的母體與排序列無關。
+    edges = list(collapse_assertions(rows).values())
+    standalone = classify_anchor_gaps(edges, build_upward_index(edges))
+    assert standalone["counts"] == result["anchor_gaps"]["counts"]
+
+
+def test_anchor_gap_section_prints_even_when_nothing_is_missing() -> None:
+    """「全部走得到錨」與「這段沒跑」不得同形（L13-2）。
+
+    R1 自查抓到的：條件原本寫 `if without_anchor:`，於是修好全部缺口的那一天，
+    整段會安靜消失——而那正好與「查詢壞了」「母體算錯了」長得一模一樣。
+    改成以 `population` 判斷，並在零缺口時**明講檢查跑過了**。
+    """
+    from query.bottleneck import render_markdown
+
+    rows = [
+        _row("co:axt", "supplies_to", "co:coherent", conf=0.9, attrs={"substitutability": 5}),
+        _row("co:coherent", "is_component_of", "tech:ai_switch", conf=0.9),
+    ]
+    result = rank_bottlenecks(rows, _FakeRegistry())
+    assert result["anchor_gaps"]["without_anchor"] == 0
+    assert result["anchor_gaps"]["population"] > 0
+
+    text = render_markdown(result)
+    assert "瓶頸節點走不到需求錨：0／" in text
+    assert "每一個瓶頸節點都走得到需求錨" in text
+
+    # 母體真的是 0（沒有任何向下邊）時才可以不印——那時是真的沒東西可算。
+    empty = rank_bottlenecks(
+        [_row("co:axt", "is_component_of", "tech:ai_switch", conf=0.9)], _FakeRegistry()
+    )
+    assert empty["anchor_gaps"]["population"] == 0
+    assert "瓶頸節點走不到需求錨" not in render_markdown(empty)

@@ -427,6 +427,11 @@ def build_ranking_artifact(result: Mapping[str, Any], *, registry: Any,
         # 後者去補研究），所以 reason 跟著每一列走。
         "filtered_rows": [dict(r) for r in (result.get("filtered_rows") or ())],
         "filter": dict(result.get("filter") or {}),
+        # ⚠ 與 `filter` 是**不同的問題**，所以是不同的鍵：`filter` 說「這條邊為什麼沒進排序」，
+        # 本欄說「這個**瓶頸節點**接不接得到有人花錢的地方」。三種成因刻意分開帶下來——
+        # 壓成一句「走不到錨」的實測代價是 pq2 [606] 點名的 6 個節點裡有 3 個根本不是研究缺口
+        # （ROADMAP Phase 4 ②③④）。⚠ 它**不參與排序**，`rows` 一字未動。
+        "anchor_gaps": dict(result.get("anchor_gaps") or {}),
         "notes": {
             "two_rankings": list(TWO_RANKINGS_NOTE),
             "structural_table": STRUCTURAL_TABLE_NOTE,
