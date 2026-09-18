@@ -36,6 +36,7 @@
 > | **Phase 5 歸零旗標**（D2） | `alpha/wipeout.py` 純函式判色 ＋ read model 的 `WipeoutFlagsSection` ＋ 四個消費端（alpha-card 13f／analyst-view／APP 個股頁／心跳第 4 段） | 籃子 16 檔 × 4 盞：**紅 2（COHR、IQE.L 的負債燈）｜黃 8｜綠 20｜灰 34**；先前是 0 盞 |
 > | **Phase 5 alpha 全歸零淨值**（D2） | 心跳第 4 段直接取 `risk.snapshot.alpha_total_weight`，不另算一份 | 由 `capability_absent` → **「alpha 全歸零淨值少 1.46%」** |
 > | **D3 驗證＋心跳的假宣告** | D3 早在 2026-09-15（`7e7012f`）就交付且有三條守門測試；順手移除心跳裡沒有 consumer 的 `PENDING_PHASE` 死表 | 心跳不再每天印「power-law 三量：還沒建」（它當天 09:31 就交付了） |
+> | **`demand_anchor` 的讀法**（commit `f21732b`） | 表頭改「公司側需求錨」＋表後讀法註；`demand_chain` docstring 原本自己寫著「從瓶頸標的往上走」而呼叫端傳的是公司 | **零行為變化**（排序、門檻、filter 一字未動）；量測順帶鑄出 pq2 **[606]** |
 >
 > **⚠ 本輪最該記住的四件事：**
 >
@@ -57,7 +58,16 @@
 > **394 個月**，而它自己年報的 base case 流動性 headroom 在 2026-05 掉到 £6.1m——**燈沒錯，錯的是它吃到的那個數**。
 > 修法是補一筆 H1 2026 的 `runway_inputs`（`mechanical` 欄位，**不需 pq2**），已列進 ROADMAP backlog。
 >
-> **待使用者決定：目前沒有。**
+> **⑤ 「看起來像 bug」的東西，量完之後多半不是 bug——但「名字誤導」要當場修。**
+> 使用者問「Sivers 的需求錨怎麼會是成熟製程」，實測：`demand_anchor` 是從**公司**往上走最短路徑，
+> 所以**同一家公司每一列都是同一個錨**。改成從瓶頸節點走？量過：accepted 37 列會有 **6 列直接失去錨**
+> （`tech:isolator`／`tech:eml`／`tech:ocs` 等圖裡沒人記錄過誰需要它們），filtered 185 列有 83 列。
+> **判準**：這不是 L12（一個表示兩種語意）——L12 的訊號是「放寬與收緊都能舉出災難」，而這裡只有一個
+> 方向能改且已被實測否決。它只有一個語意，是名字讓人讀成另一個。**所以修的是標籤不是邏輯。**
+> ⚠ 同一次量測順帶把 Phase 4 成因③ 的規模量出來了（6＋83 條），已鑄 **pq2 [606]**——
+> 它**不會自己變紅**（那些列照樣有公司側的錨），所以它需要一個編號而不是一個偵測器。
+>
+> **待使用者決定：目前沒有。** pq2 **[606]** 是本輪新鑄的研究項，等你排時間，不急著今天核准。
 >
 > **不需核准就能接著做的（依序建議）：**
 > **① 重讀 `mat:inp_substrate` 的結構讀圖**（研究不是開發，互動 session 才能做，D12）——上一輪的
@@ -108,7 +118,7 @@
 | canonical 邊 **530**、materialized 屬性 **363**；`substitutability` 覆蓋 **91/530（17%）** | `python -m loader.edge_resolution project --dry-run` |
 | `audit invariants` FAIL 0／PASS 13（**4,183 筆**） | `python -m audit invariants` |
 | 全套 pytest **2,652 passed／1 skipped**（含本輪新增的 16 條） | `python -m pytest -q` |
-| 待辦池未結案 **35** 項；**pq2 球在你手上 18**；pq1 可做 **11**；未 triage **0** | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
+| 待辦池未結案 **36** 項；**pq2 球在你手上 19**（含本輪新鑄的 [606]）；pq1 可做 **11**；未 triage **0** | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
 | 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14**；量的候選 15 家通過 **0** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
 | **歸零旗標 16 檔 × 4 盞：紅 2（COHR、IQE.L）｜黃 8｜綠 20｜灰 34** | 讀同檔的 `wipeout_ledger`；或 `python crons/heartbeat.py` 第 4 段 |
 | **alpha 全歸零淨值少 1.46%**（＝alpha 佔 NAV 比例本身；別與同段「占已投入非現金 1.57%」混用） | `python -c "import json;print(json.load(open('library/private/app/state/beta.json',encoding='utf-8'))['risk']['snapshot']['alpha_total_weight'])"` |
@@ -152,7 +162,7 @@ Push 是常規動作，session 收尾把 master push 到 origin；push 前 sanit
 | 2026-09-17 深夜 | Phase 3（D5 計分表）｜AXTI InP 賭注寫下｜Phase 6 前兩項｜[602] 入圖 | `8eee2e1`…`65eec17` |
 | 2026-09-18 早 | Phase 3 驗收行改寫＋標 ✅｜Phase 6 第三項＋標 ✅｜[603] 入圖｜Phase 2 第 1 天 | `19af823`…`c1e4638` |
 | 2026-09-18 白天 | Phase 4 ①`constrained_by` 量測＋放閘｜Phase 5 D15 三個 power-law 統計量｜Phase 5 D2 對稱 overlay | `2140eca`…`9e23bd4` |
-| 2026-09-18 下午 | Phase 5 歸零旗標四盞燈｜alpha 全歸零淨值｜D3 驗證＋移除心跳的 `PENDING_PHASE` 死表 | `a592ed8`… |
+| 2026-09-18 下午 | Phase 5 歸零旗標四盞燈｜alpha 全歸零淨值｜D3 驗證＋移除心跳的 `PENDING_PHASE` 死表｜`demand_anchor` 讀法修正＋[606] | `6fe30cf`…`f21732b` |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項。**
 Step 0 的去向清單見 [`docs/refactor/alpha-edge-step0-migration.md`](../refactor/alpha-edge-step0-migration.md)。
