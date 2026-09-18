@@ -1,4 +1,4 @@
-# 給新 session 的啟動 prompt（2026-09-18 收斂改寫；前四輪的逐字收尾狀態見文末歷程與 git history）
+# 給新 session 的啟動 prompt（2026-09-18 晚第五輪改寫；前四輪逐字狀態見文末歷程與 git history）
 
 > 用法：在新的 Claude Code session 貼「開工指令」那一段，或直接
 > `@docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`。
@@ -14,81 +14,101 @@
 
 ## 開工指令（貼這一段）
 
-> ## 現在的狀態（2026-09-18 第四輪收尾）
+> ## 現在的狀態（2026-09-18 晚，第五輪收尾）
 >
 > **開工三件事（每次都跑，不要憑記憶）：**
 > ```
-> date                                                    # 檔案裡的「今天」不可信
-> python scripts/writer_guard.py check                    # writer_lock 應為 null、daily_done_today
-> schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V     # Last Run Time / Last Result / Next Run Time
+> date                                                     # 檔案裡的「今天」不可信
+> python scripts/writer_guard.py check                     # writer_lock 應為 null、daily_done_today
+> schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V      # Last Run / Last Result / Next Run
 > ```
 >
-> **Phase 狀態：Phase 1 ▶（研究已做、證據不足以進榜）｜Phase 2 ▶（等時間）｜Phase 3 ✅｜Phase 4 ▶（①已交付）｜Phase 5 ▶（D15／D2 對稱 overlay／歸零旗標／alpha 全歸零／D3 全部已交付，剩第四盞燈與「賭注 V4」）｜Phase 6 ✅｜Phase 7 ○。**
+> ### ⚠ 常設授權：沒有需要我核准的事情就繼續做，不要停下來問
 >
-> **⚠ Phase 2 的「連續 3 天心跳」：第 1 天 ✅ 2026-09-18 07:00:01、`Last Result 0`、publisher sent 2/2。
+> 使用者原話（2026-09-17／09-18 兩次確認）：「**我想要的是沒有需要我核准的事情就繼續**」。
+> **停的理由必須是「有東西要使用者決定」，不是「到了某個邊界」**——Phase 做完不是停止理由、
+> Z2 本身不是停止理由、「想說一聲」更不是。撞到 pq2 就掛號、**接著做下一件不需核准的事**，
+> 收尾一次給批次指令，**不得停在編號上等**。
+>
+> **仍要停下等人（不因此放寬）：** 四個人工 gate（graph admission／Engine C 判讀寫入／
+> thesis mutation／live）、資本或任何 append-only authority、要改 `AGENTS.md` 判準句或
+> ROADMAP 的 Phase／Step 定義（後者先給五欄 amendment）、需要 R2、Verdict 不是 `GO`、
+> 或 plan 裡真有要使用者選的問題。
+>
+> ⚠ **還有一種必須停**：你要做的事與**既有的書面決定相反**時，先把那句話與你的反證擺給使用者看。
+> 2026-09-18 實測代價：[610] 的 packet 建議合併 `tech:inp_eml`，卻沒提 `config/entity_aliases.json`
+> 早就寫著「不併」——使用者是在資訊不完整的情況下核准的。**後來證明該合併，但那不是重點。**
+>
+> **收尾時**：更新本檔（`docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`），
+> **下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**——它是每一輪都要傳下去的東西。
+>
+> ### Phase 狀態
+>
+> **Phase 1 ▶（研究已做、證據不足以進榜）｜Phase 2 ▶（等時間）｜Phase 3 ✅｜
+> Phase 4 ▶（成因①②已交付，剩③`no_demand_edge` 57／④`upstream_dead_end` 6）｜
+> Phase 5 ▶（D15／D2 對稱 overlay／歸零旗標／alpha 全歸零／D3 已交付，剩第四盞燈與「賭注 V4」）｜
+> Phase 6 ✅｜Phase 7 ○。**
+> **另加一條跨 Phase 的新主線：L18 三層**（V1 ✅ 逐字入圖｜V2 ◐ 只做了 `query.structure --quotes`｜
+> V3 ○ 重複節點偵測器｜V4 ○ bet 輸入契約）。
+>
+> **⚠ Phase 2 的「連續 3 天心跳」：第 1 天 ✅ 2026-09-18 07:00:01 `Last Result 0`。
 > 第 2 天＝09-19、第 3 天＝09-20。** 那是等時間不是等工作；3 天湊滿之前不標完成。
-> 查證：`library/private/heartbeat/heartbeat_task.log` 逐日一段。
 >
-> **本輪（2026-09-18 下午）做完的三件：**
+> ### 本輪（2026-09-18 一整天）做完的
 >
 > | | 交付 | before → after |
 > |---|---|---|
-> | **Phase 5 歸零旗標**（D2） | `alpha/wipeout.py` 純函式判色 ＋ read model 的 `WipeoutFlagsSection` ＋ 四個消費端（alpha-card 13f／analyst-view／APP 個股頁／心跳第 4 段） | 籃子 16 檔 × 4 盞：**紅 2（COHR、IQE.L 的負債燈）｜黃 8｜綠 20｜灰 34**；先前是 0 盞 |
-> | **Phase 5 alpha 全歸零淨值**（D2） | 心跳第 4 段直接取 `risk.snapshot.alpha_total_weight`，不另算一份 | 由 `capability_absent` → **「alpha 全歸零淨值少 1.46%」** |
-> | **D3 驗證＋心跳的假宣告** | D3 早在 2026-09-15（`7e7012f`）就交付且有三條守門測試；順手移除心跳裡沒有 consumer 的 `PENDING_PHASE` 死表 | 心跳不再每天印「power-law 三量：還沒建」（它當天 09:31 就交付了） |
-> | **`demand_anchor` 的讀法**（commit `f21732b`） | 表頭改「公司側需求錨」＋表後讀法註；`demand_chain` docstring 原本自己寫著「從瓶頸標的往上走」而呼叫端傳的是公司 | **零行為變化**（排序、門檻、filter 一字未動）；量測順帶鑄出 pq2 **[606]** |
+> | **Phase 4 成因分開** | 封閉字彙 `ANCHOR_GAP_CAUSES` ＋ `classify_anchor_gaps()` | 「瓶頸節點走不到錨」**先前沒有任何地方數過** → 87／159 並拆成因 |
+> | **`graph_context` 截斷說話** | 六段全改走 `_fetch()`（第一趟原查詢取列、第二趟拿掉 LIMIT 只數總數） | **六段裡五段先前沉默** → 全印 `N／M`；資料列逐行相同 |
+> | **L18 寫進 `AGENTS.md`** | 抽取之後逐字退出系統 → 每個下游只能相信 label | `grep -c "^### L"` 17 → **18** |
+> | **V1 逐字入圖** | `loader` 新增 `MERGE_SOURCE` ＋ `[:QUOTES]`；`scripts/backfill_source_quotes.py` 回填 | 圖裡逐字 **0 → 1,057 段**；`source_ids` 命中 **0% → ~100%**；既有輸出**八項逐位不變** |
+> | **V2 `--quotes`** | `query.structure` 每條邊印得出它自己的逐字 | 該工具先前**一個字都不是文件實際寫的** |
+> | **`is_component_of` 盲區** | 它在 dst 側的五角度裡 **68／68 條看不見** | 全部看得見；`tech:cpo` 下一層 **4 → 21** |
+> | **[606][607] 研究執行** | 82 條 `enables` 逐條對來源逐字重判（覆蓋 82/82） | 判決 keep 47／改型別 17／翻向 10／退回研究 8／刪 2 |
+> | **[608][609][610] 入圖＋程式歸位** | migration 改 22 份抽取檔、29 改判＋4 移除、刪 30 條孤兒邊；`enables` 移出 `UPSTREAM_RELATIONS` | **走不到錨 87 → 63（−28%）**；`enables_direction_unresolved` **17 → 0**；**accepted 37 列逐位不變** |
 >
-> **⚠ 本輪最該記住的四件事：**
+> ### ⚠ 本輪最該記住的五件
 >
-> **① 真實資料第二次當場推翻首版設計，形狀與上一輪一模一樣。** 稀釋那盞的第一版用「窗內有沒有增加」
-> ×「燒不燒錢」判紅黃，一跑 16 檔就看到 **COHR +0.10%（54 天，員工股酬等級）與 LITE +15.30%** 拿到同一組
-> 規則的顏色，IQE.L 更是靠 **+0.0044%** 亮紅。那是 L12：`change > 0` 同時承載「雜訊」與「靠發股活著」。
-> **修法不是設量級門檻**（憑空參數，INV-5），是**把判不出來的那一半留白**——窗滿一個完整會計年度才判色。
-> 連續兩輪的教訓同一句：**寫完新統計量／新判準，一定要用真資料跑一次再說它對。**
+> **① 今天所有發現，都是繞過自己的工具、直接 `grep extractions/` 找到的。**
+> `loader` 有六個 `MERGE_*` 卻獨缺 sources，**1,105 段逐字在載入那一刻被丟掉**。
+> 迴圈是封閉的：抽取時 LLM 給 label → 程式照 label 做 → 測試驗「程式有沒有照 label 做」→ 回到 label。
+> **判準：深挖若需要繞過自己的工具，它就不會例行發生**（L18）。V1／V2 是這條的解法，**V3／V4 還沒做**。
 >
-> **② 綠燈只能由「量到了而且沒事」產生。** 這是整個機制唯一會造成實害的失敗點，所以灰**刻意不在**
-> `FLAG_COLOURS` 裡——它是「沒有顏色」＋一個 `absence_kind`，型別層因此讓「這盞是綠的」與「這盞沒點亮」
-> 不可能同形。64 盞裡有 34 盞是灰，**那是誠實的起點，不是壞掉**。
+> **② base rate 是 35%。** 只重判了一個 relation（82 條）就有 29 條要改、8 條逐字根本不支持任何關係。
+> **沒有理由相信別的 relation 更乾淨**——`is_component_of` 上已找到同型錯誤（isolator 那條）。
 >
-> **③ 每天印一句假話的機制不會有任何東西變紅。** 心跳的 `PENDING_PHASE`（「還沒建的能力指到哪個 Phase」）
-> 三筆裡兩筆已交付、最後一筆指向已完成的 Phase 3，**而且整張表一個 consumer 都沒有**（INV-4）。
-> 判準：**交付一項能力時，同一個 change 要把宣告它「還沒建」的那一行也改掉**——否則它只會安靜地偏。
+> **③ 順序不可換，這是實測不是推論。** 資料寫反的那批與程式寫反的那邊**互相抵銷**了。
+> 只改程式不改資料，`no_demand_edge` 會由 51 打到 **67**（更糟）；兩邊都修才是 87 → 63。
 >
-> **④ 燈把數字留在稽核層，所以可疑值一眼看得出來。** IQE.L 的現金跑道用 yfinance 的 FCF TTM 算出
-> **394 個月**，而它自己年報的 base case 流動性 headroom 在 2026-05 掉到 £6.1m——**燈沒錯，錯的是它吃到的那個數**。
-> 修法是補一筆 H1 2026 的 `runway_inputs`（`mechanical` 欄位，**不需 pq2**），已列進 ROADMAP backlog。
+> **④ 已修好的成因要退場，不要留恆為 0 的格子。** 今天退場兩個（`constrained_by`、`enables` 方向），
+> 各留一條**方向測試**守迴歸。同理 `loader/validate.py` 的例外清單已歸零——**從今天起沒有豁免**。
 >
-> **⑤ 「看起來像 bug」的東西，量完之後多半不是 bug——但「名字誤導」要當場修。**
-> 使用者問「Sivers 的需求錨怎麼會是成熟製程」，實測：`demand_anchor` 是從**公司**往上走最短路徑，
-> 所以**同一家公司每一列都是同一個錨**。改成從瓶頸節點走？量過：accepted 37 列會有 **6 列直接失去錨**
-> （`tech:isolator`／`tech:eml`／`tech:ocs` 等圖裡沒人記錄過誰需要它們），filtered 185 列有 83 列。
-> **判準**：這不是 L12（一個表示兩種語意）——L12 的訊號是「放寬與收緊都能舉出災難」，而這裡只有一個
-> 方向能改且已被實測否決。它只有一個語意，是名字讓人讀成另一個。**所以修的是標籤不是邏輯。**
-> ⚠ 同一次量測順帶把 Phase 4 成因③ 的規模量出來了（6＋83 條），已鑄 **pq2 [606]**——
-> 它**不會自己變紅**（那些列照樣有公司側的錨），所以它需要一個編號而不是一個偵測器。
+> **⑤ 兩次被自己的驗收測試抓到，兩次都值得。** ①`graph_context` 首版把 `LIMIT` 從 Cypher 拿掉改在
+> Python 端截，看似等價——實測 Neo4j 的 Top-N tie-break 不同，`co:axt` 的 20 條 claim **換了一批**；
+> ②V1 首版只接了邊斷言與 claim、**漏了節點**。**「只多一行字、不動任何一列」這種宣稱必須可否證。**
 >
-> **待使用者決定：目前沒有。** pq2 **[606]** 是本輪新鑄的研究項，等你排時間，不急著今天核准。
+> ### 待使用者決定：目前沒有
 >
-> **不需核准就能接著做的（依序建議）：**
-> **① 重讀 `mat:inp_substrate` 的結構讀圖**（研究不是開發，互動 session 才能做，D12）——上一輪的
-> `constrained_by` 放閘讓它的需求側從 15 條變 16 條，ledger 那份仍標 `stale`。
-> 查證：`python -m query.structure mat:inp_substrate`、心跳第 2 段。
-> **② Phase 4 剩下的三種成因**（②`enables` 一表兩義、③`tech:photodiode` 真的沒有需求方邊、④鏈長）。
-> **③ ROADMAP backlog 的三條 🔴／🔶**：claim 截斷不說話、409 條 disproof 只有 1 條 TRIGGERED、心跳報昨天；
-> 外加本輪新增的兩條（歸零旗標第四盞的結構化欄位、IQE.L 的 `runway_inputs`）。
-> ⚠ **「賭注 V4：variant 收斂納入 outcome 量測」在 backlog 裡沒有驗收條件**，依 ROADMAP 自己的規矩
-> （「沒有驗收條件的不准進佇列」，L14-1）要先補一行「這會讓哪個數字變」才排得進來。
+> ### 不需核准就能接著做的（依序建議）
 >
-> ⚠⚠ **binding constraint 連續六輪沒有動過：籃子 16 檔 `bet` 2、`abstained` 0、`unanswered` 14；
-> `downside` 假設 0 筆。** 本輪交付的四盞燈**一盞都不會動到它**——燈回答「這家公司會不會歸零」，
-> 不回答「我們賭它什麼」。能讓籃子非空的只有兩條路，**兩條都要人**：①替某一檔寫下帶 disproof 的賭注；
-> ②寫一筆 `bet/variant.overlay` 的 Abstention。**兩者都是答案，只有空白不是。**
-> 這點要對使用者說清楚，不要讓交付看起來像進展。
+> **① V3 重複節點偵測器**（L18 的 L2 層）——現在跑就有 **37 對候選、31 對同 `abstraction_level`、
+> 涉及 43／297 節點（14.5%）**，一個 30 行純字串比對。**只提名不合併**（合併仍逐筆 `ra_admission`）。
+> 它的用途是**讓系統自己生出「這裡看起來不對」的問句**——今天真正觸發深挖的是使用者問了一句。
+> **② 重讀兩份 stale 的結構讀圖**（`mat:inp_substrate`／`tech:cw_dfb_laser`）——走訪方向改了，
+> 它們的判讀基礎變了。研究，只在互動 session（D12）。查證：心跳第 2 段、`python -m alpha structure-reading <node> --check`。
+> **③ 替 AXTI 寫 `downside` 情境假設**——它有 15 筆 OperatingAssumption，`scenario` 全是
+> `base`／`variant`，**`downside` 0 筆**，所以「判斷錯了值多少」那條對稱橋在唯一走得最深的那檔上也是空的。
+> **④ ROADMAP backlog 剩下的**：409 條 disproof 沒人比對（**Z2 有岔路，見下**）、心跳報昨天（維持營運）、
+> 歸零旗標第四盞（Z2 動 Engine C 字彙）、`review_conditions` 對照不到期中實績（Z2 動封閉字彙）。
 >
-> **仍要停下來等人的（不因常設授權放寬）：** 四個人工 gate（graph admission／Engine C 判讀寫入／
-> thesis mutation／live）、資本或任何 append-only authority、要改 `AGENTS.md` 判準句或 ROADMAP 的
-> Phase／Step 定義（後者先給五欄 amendment）、需要 R2、Verdict 不是 `GO`、或 plan 裡真有要使用者選的問題。
-> ⚠ **撞到 pq2 就掛號、接著做下一件不需核准的事**，收尾一次給批次指令——**不得停在編號上等**。
+> ⚠ **409-disproof 那條的岔路已經量完、寫在 ROADMAP 裡**：零 LLM 訊號鑑別力 174/323＝53.9%，
+> 但它**抓到促成它的案例是因為錯的理由**，而且**沒有「清除」機制就是牆不是閘門**。
+> 真正要建的是一份 claim review ledger，不是偵測器——**那一步有使用者要選的問題，到那裡停。**
+>
+> ⚠⚠ **binding constraint 連續八輪沒動過：籃子 16 檔 `bet` 2／`abstained` 0／`unanswered` 14。**
+> 今天一整天做的全部是**讓圖說實話**——那是前提，**不是進展**。能讓籃子非空的只有兩條路，
+> 兩條都要人：①替某一檔寫下帶 disproof 的賭注；②寫一筆 `bet/variant.overlay` 的 Abstention。
+> **兩者都是答案，只有空白不是。** 不要讓交付看起來像進展。
 
 ---
 
@@ -96,59 +116,49 @@
 
 | # | 檔案 | 為什麼需要它 |
 |---|---|---|
-| 1 | `AGENTS.md` | 憲法、六條 invariant、四個人工 gate、L1–L17（一字不動）。⚠ 尤其「Alpha 呈現契約」與 L7（disproof 要附核查頻率＋觸發後 48h 動作） |
-| 2 | [`docs/ROADMAP.md`](../ROADMAP.md) | **進度與驗收的唯一權威**。Phase 表、completion gate 八項、舊 backlog（含本輪新增的兩條 🔴） |
-| 3 | [`2026-09-16-alpha-edge-discovery-requirements.md`](2026-09-16-alpha-edge-discovery-requirements.md) | **決定紀錄 D0–D15**（使用者原話） |
-| 4 | [`2026-09-17-no-evidence-case-zoom-out.md`](2026-09-17-no-evidence-case-zoom-out.md) | 籃子為什麼空的量測、A／B 兩種賭注、三條「改掉 substitutability」為什麼都是錯的 |
-| 5 | [`2026-09-17-structural-reading-layer.md`](2026-09-17-structural-reading-layer.md) | Q5 結構讀圖的完整設計（§5b 存輸入不存結論、§6b 怎麼 trigger 重新推理） |
+| 1 | `AGENTS.md` | 憲法、六條 invariant、四個人工 gate、**L1–L18**（一字不動）。⚠ 尤其「Alpha 呈現契約」、L7（disproof 要附核查頻率＋48h 動作）、**L18（逐字必須指得回原始證據）** |
+| 2 | [`docs/ROADMAP.md`](../ROADMAP.md) | **進度與驗收的唯一權威**。Phase 表、completion gate 八項、backlog |
+| 3 | [`2026-09-18-verbatim-never-reaches-the-decision.md`](2026-09-18-verbatim-never-reaches-the-decision.md) | **L18 的完整 zoom-out**：四個實測、為什麼 prompt 層修不動、L1/L2/L3 與 V1–V4 |
+| 4 | [`2026-09-16-alpha-edge-discovery-requirements.md`](2026-09-16-alpha-edge-discovery-requirements.md) | **決定紀錄 D0–D15**（使用者原話） |
+| 5 | [`2026-09-17-no-evidence-case-zoom-out.md`](2026-09-17-no-evidence-case-zoom-out.md) | 籃子為什麼空的量測、A／B 兩種賭注 |
 | 6 | `docs/AGENT_WORKFLOW.md` ＋ `skills/development-flow/SKILL.md` | Zoom／Review 判定與八欄交付格式 |
 
-**只在需要時才讀：** `docs/OPERATIONS.md`（要實際跑操作時）、`docs/ARCHITECTURE.md` §4.1／§8
-（要動 Daily 三層或 APP 呈現時）、各 Phase 的 plan 檔。
-
-⚠ **本輪不必讀的**：其餘 15 份 brainstorm 都是 2026-07～08 的舊題目，與 Alpha Edge 無關。
+**只在需要時才讀：** `docs/OPERATIONS.md`、`docs/ARCHITECTURE.md` §4.1／§8、各 Phase 的 plan 檔。
+⚠ **本輪不必讀的**：其餘 2026-07～08 的舊 brainstorm 與 Alpha Edge 無關。
 
 ---
 
 ## 現況與查證命令（引用前先跑）
 
-| 現況（2026-09-18 第四輪實測） | 查證命令 |
+| 現況（2026-09-18 22:09 實測） | 查證命令 |
 |---|---|
-| 可投資排序 **37 列**；**TW／TWO／ST 仍 0 檔**（6 檔台股在「低於門檻」區） | `python -m query.bottleneck --top-n 60` |
-| canonical 邊 **530**、materialized 屬性 **363**；`substitutability` 覆蓋 **91/530（17%）** | `python -m loader.edge_resolution project --dry-run` |
-| `audit invariants` FAIL 0／PASS 13（**4,183 筆**） | `python -m audit invariants` |
-| 全套 pytest **2,652 passed／1 skipped**（含本輪新增的 16 條） | `python -m pytest -q` |
-| 待辦池未結案 **36** 項；**pq2 球在你手上 19**（含本輪新鑄的 [606]）；pq1 可做 **11**；未 triage **0** | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
+| 可投資排序 **37 列**；filter `input 221／accepted 37／filtered 184`；理由 `unfilled 155／below_threshold 29` | `python -m query.bottleneck --top-n 60` |
+| **瓶頸節點走不到需求錨 63／158**：`no_demand_edge` **57**（co 16／mat 2／prod 4／tech 35）、`upstream_dead_end` **6** | 同上，看「瓶頸節點走不到需求錨」段 |
+| canonical 邊 **526**、materialized 屬性 **360**、`substitutability` 覆蓋 **86／526** | `python -m loader.edge_resolution project --dry-run` |
+| **圖裡逐字 `Source` 1,058 個（帶 quote 1,057）、`QUOTES` 邊 2,959**；Entity 697、Claim 409 | `MATCH (s:Source) RETURN count(s)`；或 `python -m query.structure <node> --quotes` |
+| `audit invariants` FAIL 0／PASS 13（**4,192 筆**） | `python -m audit invariants` |
+| 全套 pytest **2,674 passed／1 skipped** | `python -m pytest -q`（約 8 分鐘） |
+| 待辦池未結案 **35**；**pq2 球在你手上 18**；pq1 可做 **11**；**結構讀圖待重讀 2**；未 triage 0 | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
 | 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14**；量的候選 15 家通過 **0** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
-| **歸零旗標 16 檔 × 4 盞：紅 2（COHR、IQE.L）｜黃 8｜綠 20｜灰 34** | 讀同檔的 `wipeout_ledger`；或 `python crons/heartbeat.py` 第 4 段 |
-| **alpha 全歸零淨值少 1.46%**（＝alpha 佔 NAV 比例本身；別與同段「占已投入非現金 1.57%」混用） | `python -c "import json;print(json.load(open('library/private/app/state/beta.json',encoding='utf-8'))['risk']['snapshot']['alpha_total_weight'])"` |
-| 追蹤表 22 檔：籃子總報酬 **+0.03%**、最大單檔 **AXTI +2.29pp**、其餘 21 檔 **−2.26pp**、曾達 2 倍 **1/22**；**還沒有一檔滿 12 個月**（最長 57 天） | `python scripts/outcome_if_settled_today.py`（看「power-law 三量」段） |
-| 結構讀圖 ledger **2 個節點**，其中 **1 份該重讀**（`mat:inp_substrate`） | `python -m query.structure mat:inp_substrate`、心跳第 2 段 |
-| `downside` 假設 **0 筆**（每一檔的 13b 段都是「還沒寫」） | `python -m briefing alpha-card COHR`（13b 段）、`python -m alpha assumptions COHR --list` |
-| 7 檔台股各 **24 個月**月營收；3081.TWO 2026-08 **YoY +180.90%** | `python -m engine_c.monthly_revenue --ticker 3081.TWO` |
-| 無到期的等待 **0**；事件監看 93 | `python -c "from engine_b import leads;print(len(leads.parked_without_expiry(leads.load())))"` |
+| 歸零旗標 16 檔 × 4 盞：紅 2（COHR、IQE.L）｜黃 8｜綠 20｜**灰 34**（灰不是綠） | 心跳第 4 段；或讀同檔 `wipeout_ledger` |
+| 追蹤表 22 檔｜量測起始 2026-07-21｜**籃子總報酬 +3.17%**｜最大單檔 **AXTI 等權貢獻 +2.70%**／其餘 21 檔 +0.47%｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
+| `downside` 假設 **0 筆**（含 AXTI） | `python -m alpha assumptions AXTI --list`（看 `〔downside〕`） |
+| 心跳排程 Last Run **2026-09-18 07:00:01**／Result **0**／Next **09-19 07:00** | `schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V` |
 
 ---
 
 ## 不得做
 
 部位尺寸、下單、連 broker、放寬四個人工 gate 或 L8、**因籃子空而放寬篩選條件**、
-把 last30days 串進無人值守管線、改 `rank_bottlenecks()` 的排序邏輯（要改先量「幾列真的變了」）。
+把 last30days 串進無人值守管線、改 `rank_bottlenecks()` 的排序邏輯（要改先量「幾列真的變了」）、
+**跑 `scripts/backup_private.py run`**（Drive token 存在，那會上傳＝對外動作；要備份用
+`export_neo4j_payload()` 做純本機匯出）。
 
 ## 收尾格式
 
-決策／收據區塊（若有要使用者決定的事，放**最前面**）→ HUMAN SUMMARY（5–10 行）→ 八欄 `STEP_RESULT`。
-格式見 [`skills/development-flow/SKILL.md`](../../skills/development-flow/SKILL.md) Step 4.5／5
-與 [`skills/daily-brief/SKILL.md`](../../skills/daily-brief/SKILL.md)「待核准項目的內容密度」。
-**最後一行給可直接複製的批次指令。**
-
-## 常設授權（2026-09-16 定案，2026-09-17 擴大到 Phase 邊界）
-
-Step 的 Verdict 為 **GO** 且沒有待使用者決定的問題時，**直接合併 master 並接續下一個 Step 或 Phase**，
-不逐 Step 請核准。**Phase 做完不是停止理由，Z2 本身不是停止理由，「想說一聲」更不是。**
-使用者原話：「**我想要的是沒有需要我核准的事情就繼續**」。
-Push 是常規動作，session 收尾把 master push 到 origin；push 前 sanity check：
-`git ls-files library/private` 應為空。
+決策／收據區塊（若有要使用者決定的事，放**最前面**）→ HUMAN SUMMARY（5–10 行）→ 八欄 `STEP_RESULT`
+→ **最後一行給可直接複製的批次指令**。格式見 `skills/development-flow/SKILL.md` Step 4.5／5。
+Push 是常規動作；push 前 sanity check：`git ls-files library/private` 應為空。
 
 ---
 
@@ -157,20 +167,18 @@ Push 是常規動作，session 收尾把 master push 到 origin；push 前 sanit
 | 輪次 | 做完的 | commit 範圍 |
 |---|---|---|
 | 2026-09-16 | Step 0（呈現契約重寫）＋ Phase 1 計畫核准 | `d06f5bf` 前後 |
-| 2026-09-17 早 | Phase 1 Step 1.0／1.1／1.2（公司名稱解析、MFN／RNS 抓取器、D8 補三格） | …`fbc1b4f` |
-| 2026-09-17 晚 | Step 1.3 收尾｜Phase 2 心跳＋排程｜Q1／Q2／Q4／Q5（結構讀圖、籃子賭注契約） | `fbc1b4f`…`e6f07d0` |
-| 2026-09-17 深夜 | Phase 3（D5 計分表）｜AXTI InP 賭注寫下｜Phase 6 前兩項｜[602] 入圖 | `8eee2e1`…`65eec17` |
-| 2026-09-18 早 | Phase 3 驗收行改寫＋標 ✅｜Phase 6 第三項＋標 ✅｜[603] 入圖｜Phase 2 第 1 天 | `19af823`…`c1e4638` |
-| 2026-09-18 白天 | Phase 4 ①`constrained_by` 量測＋放閘｜Phase 5 D15 三個 power-law 統計量｜Phase 5 D2 對稱 overlay | `2140eca`…`9e23bd4` |
-| 2026-09-18 下午 | Phase 5 歸零旗標四盞燈｜alpha 全歸零淨值｜D3 驗證＋移除心跳的 `PENDING_PHASE` 死表｜`demand_anchor` 讀法修正＋[606] | `6fe30cf`…`f21732b` |
+| 2026-09-17 早 | Phase 1 Step 1.0／1.1／1.2 | …`fbc1b4f` |
+| 2026-09-17 晚 | Step 1.3｜Phase 2 心跳＋排程｜Q1／Q2／Q4／Q5（結構讀圖、籃子賭注契約） | `fbc1b4f`…`e6f07d0` |
+| 2026-09-17 深夜 | Phase 3（D5 計分表）｜AXTI InP 賭注｜Phase 6 前兩項｜[602] 入圖 | `8eee2e1`…`65eec17` |
+| 2026-09-18 早 | Phase 3／6 標 ✅｜[603] 入圖｜Phase 2 第 1 天 | `19af823`…`c1e4638` |
+| 2026-09-18 白天 | Phase 4 ①`constrained_by`｜Phase 5 D15 三量｜D2 對稱 overlay｜歸零旗標｜`demand_anchor` 讀法＋[606] | `2140eca`…`47862a3` |
+| 2026-09-18 下午 | Phase 4 成因分開｜`enables` 防呆＋[607]｜`graph_context` 截斷說話 | `ec47822`…`9032aff` |
+| **2026-09-18 晚** | **L18 zoom-out＋沉澱｜V1 逐字入圖｜V2 `--quotes`｜`is_component_of` 盲區｜[606][607] 執行｜[608][609][610] migration＋`enables` 程式歸位** | `7e6a3bd`…`53b059f` |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項。**
-Step 0 的去向清單見 [`docs/refactor/alpha-edge-step0-migration.md`](../refactor/alpha-edge-step0-migration.md)。
 
 ### Phase 1 的核心發現（仍然成立，不要重查）
 
 **補完格之後可投資排序仍然沒有任何台股，而那是答案不是資料缺漏。** 四家台系磊晶廠的
 `substitutability` 全部低於門檻 4——聯亞 3、華星光 2、全新 2、英特磊 2。判準不是自由心證：
-**各家在自家年報裡逐字互相具名指認對方是同層競爭者**（全新點名聯亞與 IQE、英特磊點名全新與 IQE、
-聯亞點名英特磊與 IQE）。證據方向一致指向「多家並存的量產供應層」。
-**不得為了讓籃子非空而放寬門檻 4。**
+**各家在自家年報裡逐字互相具名指認對方是同層競爭者**。**不得為了讓籃子非空而放寬門檻 4。**
