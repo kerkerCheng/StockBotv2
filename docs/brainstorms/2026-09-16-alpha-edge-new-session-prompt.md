@@ -1,4 +1,4 @@
-# 給新 session 的啟動 prompt（2026-09-18 晚第五輪改寫；前四輪逐字狀態見文末歷程與 git history）
+# 給新 session 的啟動 prompt（2026-09-18 深夜第六輪改寫；前五輪逐字狀態見文末歷程與 git history）
 
 > 用法：在新的 Claude Code session 貼「開工指令」那一段，或直接
 > `@docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`。
@@ -14,7 +14,7 @@
 
 ## 開工指令（貼這一段）
 
-> ## 現在的狀態（2026-09-18 晚，第五輪收尾）
+> ## 現在的狀態（2026-09-18 深夜，第六輪收尾）
 >
 > **開工三件事（每次都跑，不要憑記憶）：**
 > ```
@@ -48,66 +48,60 @@
 > Phase 4 ▶（成因①②已交付，剩③`no_demand_edge` 57／④`upstream_dead_end` 6）｜
 > Phase 5 ▶（D15／D2 對稱 overlay／歸零旗標／alpha 全歸零／D3 已交付，剩第四盞燈與「賭注 V4」）｜
 > Phase 6 ✅｜Phase 7 ○。**
-> **另加一條跨 Phase 的新主線：L18 三層**（V1 ✅ 逐字入圖｜V2 ◐ 只做了 `query.structure --quotes`｜
-> V3 ○ 重複節點偵測器｜V4 ○ bet 輸入契約）。
+> **跨 Phase 主線 L18 三層：V1 ✅ 逐字入圖｜V2 ✅ `query.structure --quotes`｜V3 ✅ 重複節點偵測器｜V4 ○ bet 輸入契約。**
 >
 > **⚠ Phase 2 的「連續 3 天心跳」：第 1 天 ✅ 2026-09-18 07:00:01 `Last Result 0`。
 > 第 2 天＝09-19、第 3 天＝09-20。** 那是等時間不是等工作；3 天湊滿之前不標完成。
 >
-> ### 本輪（2026-09-18 一整天）做完的
+> ### 本輪（2026-09-18 深夜）做完的
 >
 > | | 交付 | before → after |
 > |---|---|---|
-> | **Phase 4 成因分開** | 封閉字彙 `ANCHOR_GAP_CAUSES` ＋ `classify_anchor_gaps()` | 「瓶頸節點走不到錨」**先前沒有任何地方數過** → 87／159 並拆成因 |
-> | **`graph_context` 截斷說話** | 六段全改走 `_fetch()`（第一趟原查詢取列、第二趟拿掉 LIMIT 只數總數） | **六段裡五段先前沉默** → 全印 `N／M`；資料列逐行相同 |
-> | **L18 寫進 `AGENTS.md`** | 抽取之後逐字退出系統 → 每個下游只能相信 label | `grep -c "^### L"` 17 → **18** |
-> | **V1 逐字入圖** | `loader` 新增 `MERGE_SOURCE` ＋ `[:QUOTES]`；`scripts/backfill_source_quotes.py` 回填 | 圖裡逐字 **0 → 1,057 段**；`source_ids` 命中 **0% → ~100%**；既有輸出**八項逐位不變** |
-> | **V2 `--quotes`** | `query.structure` 每條邊印得出它自己的逐字 | 該工具先前**一個字都不是文件實際寫的** |
-> | **`is_component_of` 盲區** | 它在 dst 側的五角度裡 **68／68 條看不見** | 全部看得見；`tech:cpo` 下一層 **4 → 21** |
-> | **[606][607] 研究執行** | 82 條 `enables` 逐條對來源逐字重判（覆蓋 82/82） | 判決 keep 47／改型別 17／翻向 10／退回研究 8／刪 2 |
-> | **[608][609][610] 入圖＋程式歸位** | migration 改 22 份抽取檔、29 改判＋4 移除、刪 30 條孤兒邊；`enables` 移出 `UPSTREAM_RELATIONS` | **走不到錨 87 → 63（−28%）**；`enables_direction_unresolved` **17 → 0**；**accepted 37 列逐位不變** |
+> | **V3 重複節點偵測器** | `query/duplicate_nodes.py`：兩條純字串比對規則，每一對**帶兩端各自的逐字** | 「圖裡有沒有兩個節點在講同一件事」**先前沒有任何工具答得出來** → 34 對候選、逐字並排可讀 |
+> | **接進三個既有落點** | CLI／APP coverage 頁（artifact `duplicates` 鍵，schema `coverage/1`→`/2`）／`queue_segments` 新段 `duplicate_node_candidates` | 候選從 **0 個地方可見 → 3 個**；`webapp status` 也印 |
+> | **consumer 真的存在** | `skills/research-drain/SKILL.md` 第 4 段改寫：**先問「它是不是旁邊那個」，再問「誰供應它」** | 段的 consumer 欄不再是空話（守門測試會驗 skill 真的提到它） |
+> | **ROADMAP 回填** | V1／V2 的交付紀錄**先前根本沒寫進 ROADMAP**（該行還寫著「停在這裡等人」） | 三個 V 的交付、量測與兩次被推翻都落在唯一權威上 |
 >
-> ### ⚠ 本輪最該記住的五件
+> ### ⚠ 本輪最該記住的四件
 >
-> **① 今天所有發現，都是繞過自己的工具、直接 `grep extractions/` 找到的。**
-> `loader` 有六個 `MERGE_*` 卻獨缺 sources，**1,105 段逐字在載入那一刻被丟掉**。
-> 迴圈是封閉的：抽取時 LLM 給 label → 程式照 label 做 → 測試驗「程式有沒有照 label 做」→ 回到 label。
-> **判準：深挖若需要繞過自己的工具，它就不會例行發生**（L18）。V1／V2 是這條的解法，**V3／V4 還沒做**。
+> **① 「這會讓哪個數字變」這次答得出來，而且是實測：4 個 🔴 真缺口裡有 2 個同時是重複節點候選的一端**
+> （`tech:scale_up_cpo` ↔ `tech:cpo`、`tech:scale_across_components` ↔ `tech:scale_across`），
+> 🟡 建模待補 14 個裡另有 2 個。**這不代表那 2 個 🔴 是假的**——它代表派研究去挖之前先有一個可機械生成的問句。
 >
-> **② base rate 是 35%。** 只重判了一個 relation（82 條）就有 29 條要改、8 條逐字根本不支持任何關係。
-> **沒有理由相信別的 relation 更乾淨**——`is_component_of` 上已找到同型錯誤（isolator 那條）。
+> **② 第三條規則被真實資料當場推翻（第三次了，形狀同 D15 與稀釋那盞）。** 想抓
+> `dram_manufacturing`／`dram_production` 那型而寫的「同 token 數、只差一個 token」，一跑就讓**所有單 token id
+> 互相全配**（`prod:reliant` 配上 `mat:photoresist`）。改法是**明說自己抓不到那一型**，不是用會誤報的規則假裝抓得到。
 >
-> **③ 順序不可換，這是實測不是推論。** 資料寫反的那批與程式寫反的那邊**互相抵銷**了。
-> 只改程式不改資料，`no_demand_edge` 會由 51 打到 **67**（更糟）；兩邊都修才是 87 → 63。
+> **③ 首版用裸的 `in` 判 registry note，被本模組自己的測試抓到**——`tech:nand` 是 `tech:nand_flash` 的子字串。
+> 兩輪之內第三次「首版被自己的驗收測試抓到」。**這是好事，不是浪費**：沒有那條測試它會安靜地錯。
 >
-> **④ 已修好的成因要退場，不要留恆為 0 的格子。** 今天退場兩個（`constrained_by`、`enables` 方向），
-> 各留一條**方向測試**守迴歸。同理 `loader/validate.py` 的例外清單已歸零——**從今天起沒有豁免**。
->
-> **⑤ 兩次被自己的驗收測試抓到，兩次都值得。** ①`graph_context` 首版把 `LIMIT` 從 Cypher 拿掉改在
-> Python 端截，看似等價——實測 Neo4j 的 Top-N tie-break 不同，`co:axt` 的 20 條 claim **換了一批**；
-> ②V1 首版只接了邊斷言與 claim、**漏了節點**。**「只多一行字、不動任何一列」這種宣稱必須可否證。**
+> **④ `mentioned` 刻意不叫「已決定不併」。** registry 的 note 是自由文字，「刻意不併」與「留待研究判斷」
+> （兩者今天都真實存在）長得一模一樣——機械讀得出「有沒有提到這兩個 id」，讀不出它說了什麼。所以只端 note 逐字給人讀。
 >
 > ### 待使用者決定：目前沒有
 >
 > ### 不需核准就能接著做的（依序建議）
 >
-> **① V3 重複節點偵測器**（L18 的 L2 層）——現在跑就有 **37 對候選、31 對同 `abstraction_level`、
-> 涉及 43／297 節點（14.5%）**，一個 30 行純字串比對。**只提名不合併**（合併仍逐筆 `ra_admission`）。
-> 它的用途是**讓系統自己生出「這裡看起來不對」的問句**——今天真正觸發深挖的是使用者問了一句。
+> **① 讀那 30 對「沒人提過」的候選**（`python -m query.duplicate_nodes`）——逐字已經並排印好，
+> 判「是同一個」就打包 pq2 `ra_admission`；判「不是」目前**沒有地方寫**（見下面那條 backlog）。
+> 先挑與 coverage 🔴／🟡 重疊的那 4 個，因為它們同時解掉一個誤報。
 > **② 重讀兩份 stale 的結構讀圖**（`mat:inp_substrate`／`tech:cw_dfb_laser`）——走訪方向改了，
 > 它們的判讀基礎變了。研究，只在互動 session（D12）。查證：心跳第 2 段、`python -m alpha structure-reading <node> --check`。
 > **③ 替 AXTI 寫 `downside` 情境假設**——它有 15 筆 OperatingAssumption，`scenario` 全是
 > `base`／`variant`，**`downside` 0 筆**，所以「判斷錯了值多少」那條對稱橋在唯一走得最深的那檔上也是空的。
-> **④ ROADMAP backlog 剩下的**：409 條 disproof 沒人比對（**Z2 有岔路，見下**）、心跳報昨天（維持營運）、
-> 歸零旗標第四盞（Z2 動 Engine C 字彙）、`review_conditions` 對照不到期中實績（Z2 動封閉字彙）。
+> **④ ROADMAP backlog 剩下的**：409 條 disproof 沒人比對（**Z2 有岔路**）、Phase 4 的成因③④、
+> 心跳報昨天（維持營運）、歸零旗標第四盞（Z2 動 Engine C 字彙）、`review_conditions` 對照不到期中實績（Z2 動封閉字彙）。
 >
-> ⚠ **409-disproof 那條的岔路已經量完、寫在 ROADMAP 裡**：零 LLM 訊號鑑別力 174/323＝53.9%，
-> 但它**抓到促成它的案例是因為錯的理由**，而且**沒有「清除」機制就是牆不是閘門**。
-> 真正要建的是一份 claim review ledger，不是偵測器——**那一步有使用者要選的問題，到那裡停。**
+> ⚠ **兩條新的 backlog 都有「使用者要選的問題」，所以都停在提案階段**：
+> ①**「刻意不併」沒有結構化登記處**——`entity_aliases.json` 只有 `canonical`（＝「這兩個是同一個」），
+> 「不是同一個」沒地方寫，所以候選清單只會因為真的合併而變短。要選的是：不併算不算研究判斷？
+> 算 → 每否決一對都要鑄一個 pq2 號；不算 → 就是一個沒有 receipt 的宣告，而 registry 明寫那不是 canonical identity。
+> ②**409-disproof**：零 LLM 訊號鑑別力 174/323＝53.9%，但它抓到促成它的案例是**因為錯的理由**，
+> 而且沒有「清除」機制就是牆不是閘門。要建的是 claim review ledger，不是偵測器。
 >
-> ⚠⚠ **binding constraint 連續八輪沒動過：籃子 16 檔 `bet` 2／`abstained` 0／`unanswered` 14。**
-> 今天一整天做的全部是**讓圖說實話**——那是前提，**不是進展**。能讓籃子非空的只有兩條路，
-> 兩條都要人：①替某一檔寫下帶 disproof 的賭注；②寫一筆 `bet/variant.overlay` 的 Abstention。
+> ⚠⚠ **binding constraint 連續九輪沒動過：籃子 16 檔 `bet` 2／`abstained` 0／`unanswered` 14。**
+> V1／V2／V3 做的全部是**讓圖說實話**——那是前提，**不是進展**。能讓籃子非空的只有兩條路，兩條都要人：
+> ①替某一檔寫下帶 disproof 的賭注；②寫一筆 `bet/variant.overlay` 的 Abstention。
 > **兩者都是答案，只有空白不是。** 不要讓交付看起來像進展。
 
 ---
@@ -130,20 +124,24 @@
 
 ## 現況與查證命令（引用前先跑）
 
-| 現況（2026-09-18 22:09 實測） | 查證命令 |
+| 現況（2026-09-18 深夜實測） | 查證命令 |
 |---|---|
 | 可投資排序 **37 列**；filter `input 221／accepted 37／filtered 184`；理由 `unfilled 155／below_threshold 29` | `python -m query.bottleneck --top-n 60` |
-| **瓶頸節點走不到需求錨 63／158**：`no_demand_edge` **57**（co 16／mat 2／prod 4／tech 35）、`upstream_dead_end` **6** | 同上，看「瓶頸節點走不到需求錨」段 |
+| **瓶頸節點走不到需求錨 63／158**：`no_demand_edge` **57**、`upstream_dead_end` **6** | 同上，看「瓶頸節點走不到需求錨」段 |
+| **重複節點候選 34 對**｜同層 28｜涉及節點 49／191｜registry 提過 4｜**沒人提過 30** | `python -m query.duplicate_nodes` |
+| 覆蓋掃描 **🔴 真缺口 4／🟡 建模待補 14**；**🔴 有 2 個同時是重複節點候選的一端** | `python -m webapp materialize --coverage` ＋ `python -m webapp status` |
 | canonical 邊 **526**、materialized 屬性 **360**、`substitutability` 覆蓋 **86／526** | `python -m loader.edge_resolution project --dry-run` |
-| **圖裡逐字 `Source` 1,058 個（帶 quote 1,057）、`QUOTES` 邊 2,959**；Entity 697、Claim 409 | `MATCH (s:Source) RETURN count(s)`；或 `python -m query.structure <node> --quotes` |
-| `audit invariants` FAIL 0／PASS 13（**4,192 筆**） | `python -m audit invariants` |
-| 全套 pytest **2,674 passed／1 skipped** | `python -m pytest -q`（約 8 分鐘） |
+| **圖裡逐字 `Source` 1,058 個（帶 quote 1,057）、`QUOTES` 邊 2,959**；Entity 697、Claim 409 | `python -m query.structure <node> --quotes` |
+| `audit invariants` FAIL 0／PASS 13（**4,189 筆**；筆數隨資料浮動，**驗收條件是 FAIL 0 不是筆數**） | `python -m audit invariants` |
+| 全套 pytest **2,687 passed／1 skipped**（V3 新增 11 條） | `python -m pytest -q`（約 8 分鐘） |
 | 待辦池未結案 **35**；**pq2 球在你手上 18**；pq1 可做 **11**；**結構讀圖待重讀 2**；未 triage 0 | `python -m engine_b.todo list`／`python crons/heartbeat.py` |
-| 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14**；量的候選 15 家通過 **0** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
+| 籃子 16 檔：`bet` **2**｜`abstained` **0**｜`unanswered` **14** | 讀 `library/private/app/state/basket.json` 的 `bet_ledger` |
 | 歸零旗標 16 檔 × 4 盞：紅 2（COHR、IQE.L）｜黃 8｜綠 20｜**灰 34**（灰不是綠） | 心跳第 4 段；或讀同檔 `wipeout_ledger` |
-| 追蹤表 22 檔｜量測起始 2026-07-21｜**籃子總報酬 +3.17%**｜最大單檔 **AXTI 等權貢獻 +2.70%**／其餘 21 檔 +0.47%｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
+| 追蹤表 22 檔｜量測起始 2026-07-21｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
 | `downside` 假設 **0 筆**（含 AXTI） | `python -m alpha assumptions AXTI --list`（看 `〔downside〕`） |
 | 心跳排程 Last Run **2026-09-18 07:00:01**／Result **0**／Next **09-19 07:00** | `schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V` |
+
+⚠ **pytest 要用 `.venv\Scripts\python.exe`**，裸的 `python` 沒有 pytest（2026-09-18 踩到）。
 
 ---
 
@@ -153,6 +151,7 @@
 把 last30days 串進無人值守管線、改 `rank_bottlenecks()` 的排序邏輯（要改先量「幾列真的變了」）、
 **跑 `scripts/backup_private.py run`**（Drive token 存在，那會上傳＝對外動作；要備份用
 `export_neo4j_payload()` 做純本機匯出）。
+**⚠ 不得自行合併重複節點**——`query.duplicate_nodes` 只提名，合併是 graph admission（pq2 `ra_admission`）。
 
 ## 收尾格式
 
@@ -173,9 +172,10 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | 2026-09-18 早 | Phase 3／6 標 ✅｜[603] 入圖｜Phase 2 第 1 天 | `19af823`…`c1e4638` |
 | 2026-09-18 白天 | Phase 4 ①`constrained_by`｜Phase 5 D15 三量｜D2 對稱 overlay｜歸零旗標｜`demand_anchor` 讀法＋[606] | `2140eca`…`47862a3` |
 | 2026-09-18 下午 | Phase 4 成因分開｜`enables` 防呆＋[607]｜`graph_context` 截斷說話 | `ec47822`…`9032aff` |
-| **2026-09-18 晚** | **L18 zoom-out＋沉澱｜V1 逐字入圖｜V2 `--quotes`｜`is_component_of` 盲區｜[606][607] 執行｜[608][609][610] migration＋`enables` 程式歸位** | `7e6a3bd`…`53b059f` |
+| 2026-09-18 晚 | L18 zoom-out＋沉澱｜V1 逐字入圖｜V2 `--quotes`｜`is_component_of` 盲區｜[606][607] 執行｜[608][609][610] migration | `7e6a3bd`…`53b059f` |
+| **2026-09-18 深夜** | **V3 重複節點偵測器（CLI＋APP＋佇列段＋research-drain consumer）｜ROADMAP 回填 V1／V2／V3｜兩條新 backlog** | `990f13d`… |
 
-**不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項。**
+**不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
 ### Phase 1 的核心發現（仍然成立，不要重查）
 

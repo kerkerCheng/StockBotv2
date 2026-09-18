@@ -57,7 +57,7 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "ranking": "stockbot-app/ranking/1",
     "beta": "stockbot-app/beta/1",
-    "coverage": "stockbot-app/coverage/1",
+    "coverage": "stockbot-app/coverage/2",
     "watches": "stockbot-app/watches/1",
     "positions": "stockbot-app/positions/1",
     "basket": "stockbot-app/basket/1",

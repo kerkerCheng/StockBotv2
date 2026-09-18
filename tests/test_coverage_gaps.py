@@ -83,3 +83,19 @@ def test_context_columns_do_not_change_any_bucket() -> None:
     real, noise = split_research_gaps(rows)
     assert [r["node"] for r in real] == ["tech:a"]
     assert [r["node"] for r in noise] == ["prod:b"]
+
+
+def test_degree_never_counts_verbatim_as_a_structural_edge() -> None:
+    """`degree` 排除 `QUOTES`——證據邊不是結構邊（2026-09-18 V3 交付時抓到的回歸）。
+
+    V1 讓逐字進圖之後，裸的 `-[any_rel]-` 把證據邊也算進去：**188 個節點的 degree 全部虛增**，
+    其中 `tech:lta_framework` 與 `tech:scale_out_network` 結構邊是 0、各有 2 段逐字，於是
+    **失去了 `isolated` 標記**。後果不是數字難看——`isolated` 決定「下一步」印哪一句，而
+    「先確認它該掛在 stack 哪一層」與「誰供應它」是兩個不同的研究動作。
+
+    ⚠ 這條只驗 Cypher 文字（沒有 in-memory Neo4j）。它守的是「下一次有人新增一種
+    非結構關係時，會看到這句話」——而不是假裝驗過了行為。
+    """
+    from query.coverage_gaps import COVERAGE_CYPHER
+
+    assert "type(any_rel) <> 'QUOTES'" in COVERAGE_CYPHER

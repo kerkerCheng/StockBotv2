@@ -148,12 +148,26 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
    依 L7 要在 48 小時內處置。但 **thesis 要不要改是四個人工 gate 之一**——把它鑄成 `thesis_mutation` 型 pq2 編號，**不要自己改 thesis**。
 
 4. **圖的覆蓋缺口** — 只有前三段清空後才做。這一段沒有既有排序，是唯一需要判斷的地方，
-   判準見下。
+   判準見下。**這一段有兩題，先問後者**：①誰供應這個節點（`coverage_gaps`）；
+   ②這個節點是不是旁邊那個（`duplicate_nodes`，段 key `duplicate_node_candidates`）。
 
 ### 第 4 段（覆蓋缺口）的排序判準（唯一需要判斷之處）
 
 依序問，先滿足者先做：
 
+0. **它是不是重複節點？**（2026-09-18 V3，先問這一題）
+   ```powershell
+   & '.venv\Scripts\python.exe' -m query.duplicate_nodes
+   ```
+   **順序不可換**：重複節點正是 🔴 的誤報來源——一個已經有供應商的東西被攤成兩個節點之後，
+   其中孤立的那一個看起來像空白，於是研究被派去挖一個已經挖過的東西
+   （`config/entity_aliases.json` 的 `_readme` 逐字記過這個後果）。
+   **只做 `unmentioned` 那一桶**；`mentioned`（registry 的 note 提過的）先讀 note 說了什麼——
+   ⚠ note 是自由文字，「刻意不併」與「留待研究判斷」長得一模一樣，**機械分不出來，要人讀**。
+   ⚠ **判定「是同一個」是研究判斷，合併走 pq2 `ra_admission`**（`semantic_reviewed` 必須帶
+   `approval_receipt`），本段只到 packet 為止。
+   ⚠ **判斷依據是兩端各自的逐字，不是 id 與 name**——那兩者都是抽取時 LLM 取的，
+   用它們判重複等於用 label 驗 label（L18）。逐字已隨候選印出來，不必再去翻抽取檔。
 1. **答案會改變候選集合嗎？** 會 → 最先。`coverage_gaps` 的 🔴 研究缺口（零供應商節點）
    多半屬此。
 2. **是不是同一次沒做完的拆解殘骸？** 是 → 接著做。層的名字已經在那裡、只缺供應商，
@@ -268,7 +282,8 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 閉包的定義：**工作集合裡每一項都到達三種終局之一**——
 ①packet 已備（取得 pq2 編號等核准）；②誠實 park（帶 trace_status＋trigger）；
 ③已排入 pq1 佇列（留給 budget 化的排程輪）。工作集合＝前兩段佇列＋第三段的
-🔴／🟡 缺口＋**該重讀的結構讀圖（段 3.5）**＋一手文件已具名、但尚未做四維初判的 onboard 候選。
+🔴／🟡 缺口＋**沒人提過的重複節點候選**＋**該重讀的結構讀圖（段 3.5）**＋一手文件已具名、
+但尚未做四維初判的 onboard 候選。
 
 **這回答「會不會停不下來」：工作集合是有限清單，每項有終局，閉包必然可達**——
 不需要靠 loop 間隔或使用者插話來煞車。會讓它看起來無限的只有兩件事：
@@ -281,6 +296,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 & '.venv\Scripts\python.exe' -m engine_b.cli counts          # triaged_go 為 0
 & '.venv\Scripts\python.exe' -m engine_b.todo list           # 無 queued／researching 的 dispatch_status
 & '.venv\Scripts\python.exe' -m query.coverage_gaps          # 每個 🔴 都已有對應終局（packet／park／pq1）
+& '.venv\Scripts\python.exe' -m query.duplicate_nodes       # `unmentioned` 每一對都已有終局（packet／note／pq1）
 & '.venv\Scripts\python.exe' -m alpha structure-reading <node> --check   # 段 3.5：該重讀的都已重讀或掛號
 & '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段的數字；分不到段的狀態＝新工作沒有 consumer
 & '.venv\Scripts\python.exe' -m webapp closure-gate         # 段5：exit 0＝閉包／1＝還有工作／2＝讀不到

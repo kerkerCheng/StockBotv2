@@ -569,6 +569,9 @@ def check_queue_segments() -> AuditResult:
             reassess_only_numbers=reassess_ns or (),
             forward_view_backlog=forward,
             coverage_gaps=None,  # authority 在 Neo4j；由 query.coverage_gaps 另報，這裡不冒充
+            # 同理（2026-09-18 V3）：重複節點候選的 authority 也在 Neo4j。它的數字確實已經
+            # 在 coverage state artifact 裡，但那是 derived cache 不是 authority——audit 讀它
+            # 等於讓稽核的結論取決於「有沒有人 materialize 過」。
         )
         examined = len(leads_map) + len(watches) + len(items)
         findings = list(observation["unmapped"])

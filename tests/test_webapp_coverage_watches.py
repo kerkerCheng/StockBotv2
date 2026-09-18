@@ -49,17 +49,37 @@ def fake_scan():
     ]
 
 
+def fake_duplicates():
+    """重複節點候選的假資料——用真實抓到的那一對（逐字是同一句話）當樣本。"""
+    from query.duplicate_nodes import bucketize as dup_bucketize, pair_candidates
+
+    quote = "our Reliant® product line offers new and refurbished non-leading edge products"
+    rows = [
+        {"node": "prod:reliant", "name": "Reliant", "abstraction_level": "equipment_epitaxy",
+         "degree": 2, "quotes": [{"quote": quote, "locator": "10-K Business", "doc": "doc:1"}]},
+        {"node": "prod:reliant_product_line", "name": "Reliant Product Line",
+         "abstraction_level": "equipment_epitaxy", "degree": 3,
+         "quotes": [{"quote": quote, "locator": "10-K MD&A", "doc": "doc:1"}]},
+    ]
+    return dup_bucketize(pair_candidates(rows), {}), len(rows)
+
+
 def fake_coverage_payload(**kw):
+    buckets, total = fake_duplicates()
+    kw.setdefault("duplicate_buckets", buckets)
+    kw.setdefault("duplicate_node_total", total)
     return build_coverage_artifact(fake_scan(), **kw)
 
 
 def test_coverage_counts_and_buckets_are_the_scanner_output() -> None:
     rows = fake_scan()
-    payload = build_coverage_artifact(rows)
+    payload = fake_coverage_payload()
     buckets = bucketize(rows)
     assert payload["counts"] == {
         "nodes": 6, "research_gap": 3, "modelling_gap": 1, "covered": 1, "concept": 1,
         "research_gap_real": 2, "research_gap_product_noise": 1,
+        # 同一頁的第二題（V3）：重複節點候選，`unmentioned` 才是待辦。
+        "duplicate_unmentioned": 1, "duplicate_mentioned": 0,
     }
     assert [r["node"] for r in payload["modelling_gaps"]] == [r["node"] for r in buckets["modelling_gap"]]
     assert payload["title"] == COVERAGE_TITLE
@@ -85,7 +105,7 @@ def test_split_is_a_prefix_match_not_a_judgement() -> None:
 def test_fixed_text_has_one_home_and_the_markdown_prints_it() -> None:
     """限制文字與桶說明只有一份（L16）：markdown 與 artifact 同源。"""
     rows = fake_scan()
-    payload = build_coverage_artifact(rows)
+    payload = fake_coverage_payload()
     md = "\n".join(render_markdown(rows))
     assert payload["title"] in md
     assert payload["notes"]["buckets"] in md
@@ -103,12 +123,25 @@ def test_coverage_identity_tracks_which_nodes_are_blank_not_their_names() -> Non
     a = fake_coverage_payload()
     rows = fake_scan()
     rows[0] = dict(rows[0], name="Scale-up CPO（改名）")
-    b = build_coverage_artifact(rows)
+    buckets, total = fake_duplicates()
+    kw = {"duplicate_buckets": buckets, "duplicate_node_total": total}
+    b = build_coverage_artifact(rows, **kw)
     assert b["freshness_identity"] == a["freshness_identity"]
     assert b["content_digest"] != a["content_digest"]
     rows[0] = dict(rows[0], direct=["co:someone"], status="covered")
-    c = build_coverage_artifact(rows)
+    c = build_coverage_artifact(rows, **kw)
     assert c["freshness_identity"] != a["freshness_identity"]
+    # 重複節點候選也是認知狀態：多一對沒人看過的，identity 必須跟著變。
+    from query.duplicate_nodes import bucketize as dup_bucketize, pair_candidates
+
+    more = dup_bucketize(pair_candidates([
+        {"node": "tech:eml", "name": "EML", "abstraction_level": "device_chip",
+         "degree": 2, "quotes": []},
+        {"node": "tech:inp_eml", "name": "InP EML", "abstraction_level": "device_chip",
+         "degree": 1, "quotes": []},
+    ]), {})
+    d = build_coverage_artifact(fake_scan(), duplicate_buckets=more, duplicate_node_total=2)
+    assert d["freshness_identity"] != a["freshness_identity"]
 
 
 # ---------------------------------------------------------------------------

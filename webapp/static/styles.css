@@ -147,6 +147,14 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
 .weak li:last-child { border-bottom: none; }
 .weak .rule { color: var(--dim); font-size: 11px; display: block; margin-top: 3px; }
 
+/* 逐字（L18）：它不是註腳而是判斷依據，所以用引言排版而不是 .rule 的 11px 灰字——
+   讀的人要能直接比對兩端寫的是不是同一句話。 */
+.verbatim { margin: 4px 0 0 10px; padding: 2px 0 2px 10px; border-left: 2px solid var(--border);
+  color: var(--fg); font-size: 12px; line-height: 1.5; }
+.verbatim .src { color: var(--dim); font-size: 11px; }
+.pair-side { margin-top: 8px; }
+.pair-side:first-child { margin-top: 0; }
+
 details { margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
 details > summary {
   cursor: pointer; color: var(--accent); font-size: 13px; list-style: none;

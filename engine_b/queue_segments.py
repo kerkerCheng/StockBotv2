@@ -30,8 +30,9 @@
 
 - 不重排 lead（priority.py 是唯一權威）。
 - 不寫任何檔案；`observe()` 是純函式。
-- 不判定 forward view／coverage 缺口的**內容**——那兩段的計數由呼叫端注入
-  （它們的 authority 分別是 analyst view artifact 與 Neo4j），本模組只登記它們的 consumer。
+- 不判定 forward view／coverage 缺口／結構讀圖／重複節點候選的**內容**——那四段的計數
+  由呼叫端注入（authority 分別是 analyst view artifact、Neo4j、state artifact、Neo4j），
+  本模組只登記它們的 consumer。
 """
 from __future__ import annotations
 
@@ -95,6 +96,14 @@ SEGMENTS: tuple[Segment, ...] = (
     Segment(
         "coverage_gaps", 6, "圖的 🔴 研究缺口與 🟡 建模待補",
         "research", "research-drain 第三段（python -m query.coverage_gaps）",
+    ),
+    Segment(
+        "duplicate_node_candidates", 6, "名字重疊的重複節點候選（沒人提過的那些）",
+        "research", "research-drain 第三段：python -m query.duplicate_nodes（判定同一個 → pq2 ra_admission）",
+        "2026-09-18 V3：它與 coverage_gaps 是同一頁的兩題，但方向相反——後者問「誰供應這個節點」，"
+        "前者問「這個節點是不是旁邊那個」。重複節點正是 coverage 🔴 的誤報來源。"
+        "⚠ 只收 `unmentioned`（registry 從沒提過的）：registry 已經寫過 note 的那些不算待辦，"
+        "否則清單會恆亮而恆亮＝零鑑別力（L14-4）。合併仍逐筆 ra_admission，本段只提名。",
     ),
     Segment(
         "stale_structure_readings", 6, "結構讀圖與圖不再一致（分級後仍會改變 A/B 讀法的）",
@@ -233,10 +242,12 @@ def observe(
     forward_view_backlog: int | None = None,
     coverage_gaps: int | None = None,
     stale_structure_readings: int | None = None,
+    duplicate_node_candidates: int | None = None,
 ) -> dict[str, Any]:
     """由資料反推每一段有幾筆工作。
 
-    `forward_view_backlog`／`coverage_gaps`／`stale_structure_readings` 由呼叫端注入
+    `forward_view_backlog`／`coverage_gaps`／`stale_structure_readings`／
+    `duplicate_node_candidates` 由呼叫端注入
     （它們的 authority 不在 leads 目錄）；給 `None` 表示「本次沒有讀到那個 authority」，
     輸出會照實寫 `None`，不寫 0（INV-3）。
     """
@@ -285,6 +296,7 @@ def observe(
     counts["forward_view_backlog"] = forward_view_backlog
     counts["coverage_gaps"] = coverage_gaps
     counts["stale_structure_readings"] = stale_structure_readings
+    counts["duplicate_node_candidates"] = duplicate_node_candidates
 
     # gated 兩段由 todo_items 直接算得出來（不需要外部 authority），所以不走注入。
     from engine_b.todo import gate_pointer

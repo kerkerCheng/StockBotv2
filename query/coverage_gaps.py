@@ -54,12 +54,20 @@ WHERE NOT c.id IN direct_ids
   AND c <> n AND mid <> n AND mid <> c
 WITH n, direct_ids, collect(DISTINCT c.id) AS indirect_ids
 OPTIONAL MATCH (n)-[any_rel]-()
+WHERE type(any_rel) <> 'QUOTES'
 WITH n, direct_ids, indirect_ids, count(any_rel) AS degree
 RETURN n.id AS node, n.name AS name, direct_ids, indirect_ids,
        degree, n.abstraction_level AS abstraction_level
 ORDER BY size(direct_ids), size(indirect_ids), node
 """
 
+
+# ⚠ `degree` 必須排除 `QUOTES`（2026-09-18 V3 交付時發現的回歸）。V1 讓逐字進圖之後，
+# 裸的 `-[any_rel]-` 把證據邊也算成結構邊——**188 個節點的 degree 全部虛增**，其中
+# `tech:lta_framework` 與 `tech:scale_out_network` **失去了 `isolated` 標記**（結構邊 0、
+# 但各有 2 段逐字）。後果不是數字難看：`isolated` 決定「下一步」印哪一句，而
+# 「先確認它該掛在 stack 哪一層」與「誰供應它」是兩個不同的研究動作。
+# 這是 L17 的形狀——不會壞、不會報錯、測試不會紅，因為沒有任何東西被它逼著回來修。
 
 # ---------------------------------------------------------------------------
 # 呈現用的固定文字與分桶：**跟著資料走**（L16）。markdown（本檔）與 APP artifact

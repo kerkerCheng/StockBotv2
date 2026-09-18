@@ -289,7 +289,8 @@ def cmd_status(args: argparse.Namespace) -> int:
             extra = f"｜sleeve {len(payload['allocation']['sleeves'])} 格／商品 {len(payload['instruments'])} 檔"
         elif kind == "coverage":
             extra = (f"｜🔴 真缺口 {payload['counts']['research_gap_real']}"
-                     f"／🟡 建模待補 {payload['counts']['modelling_gap']}")
+                     f"／🟡 建模待補 {payload['counts']['modelling_gap']}"
+                     f"／重複節點候選 {payload['counts']['duplicate_unmentioned']}（沒人提過）")
         elif kind == "watches":
             extra = (f"｜在等 {payload['counters']['active']}"
                      f"／停滯 {payload['counters']['stalled']}")

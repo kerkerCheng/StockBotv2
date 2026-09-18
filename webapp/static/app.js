@@ -2680,6 +2680,50 @@ function nodeList(rows, opts) {
   return list;
 }
 
+/* 一對重複節點候選。**逐字是主角**：2026-09-18 之前圖裡只有 id 與 name，而兩者都是抽取時
+   LLM 取的——用它們判重複等於用 label 驗 label。所以每一端都要印得出它自己的逐字（L18）。 */
+function duplicateSide(side) {
+  const box = el('div', 'pair-side');
+  const head = el('div');
+  head.appendChild(el('code', null, side.node));
+  if (side.name) head.appendChild(el('span', 'dim', '　' + side.name));
+  box.appendChild(head);
+  box.appendChild(el('span', 'rule',
+    `${side.abstraction_level || '—'}｜邊 ${side.degree}｜逐字 ${side.quote_count} 段`));
+  (side.quotes || []).forEach((q) => {
+    const quote = el('div', 'verbatim', q.quote);
+    if (q.locator) quote.appendChild(el('div', 'src', q.locator));
+    box.appendChild(quote);
+  });
+  const hidden = (side.quote_count || 0) - (side.quotes || []).length;
+  if (hidden > 0) box.appendChild(el('span', 'rule', `…另有 ${hidden} 段逐字（python -m query.structure ${side.node} --quotes）`));
+  if (!side.quote_count) box.appendChild(el('span', 'rule', '⚠ 這個節點一段逐字都沒有——它可能是抽取副產品，不是實體'));
+  return box;
+}
+
+function duplicateList(rows, ruleLabels) {
+  const list = el('ul', 'weak');
+  (rows || []).forEach((row) => {
+    const li = el('li');
+    const head = el('div');
+    head.appendChild(el('code', null, row.pair[0]));
+    head.appendChild(el('span', 'dim', ' ↔ '));
+    head.appendChild(el('code', null, row.pair[1]));
+    li.appendChild(head);
+    li.appendChild(el('span', 'rule',
+      (row.rules || []).map((r) => (ruleLabels || {})[r] || r).join('＋')
+      + '｜' + (row.same_abstraction_level ? '同層' : '不同層')));
+    li.appendChild(duplicateSide(row.left));
+    li.appendChild(duplicateSide(row.right));
+    (row.registry_mentions || []).forEach((m) => {
+      li.appendChild(el('span', 'rule',
+        `📄 ${m.canonical}（${m.basis}／${m.approval_receipt || '無 receipt'}）：${m.note}`));
+    });
+    list.appendChild(li);
+  });
+  return list;
+}
+
 async function renderCoverage() {
   markNav('coverage');
   let payload;
@@ -2731,6 +2775,25 @@ async function renderCoverage() {
   sec2.appendChild(el('div', 'panel-questions', (payload.next_steps || {}).modelling_gap || ''));
   sec2.appendChild(nodeList(payload.modelling_gaps || []));
   app.appendChild(sec2);
+
+  const dup = payload.duplicates || {};
+  const secDup = el('section', 'panel');
+  secDup.appendChild(el('h2', null,
+    `${dup.title || '重複節點候選'}（${c.duplicate_unmentioned}）——先問「它是不是旁邊那個」`));
+  secDup.appendChild(kpiRow([
+    { label: '沒人提過', value: String(c.duplicate_unmentioned), sub: '這些要人看', cls: 'hero' },
+    { label: 'registry 提過', value: String(c.duplicate_mentioned), sub: '先讀 note 說了什麼' },
+    { label: '掃描節點', value: String(dup.node_total || 0), sub: '非公司實體（公司走 registry）' },
+  ]));
+  secDup.appendChild(duplicateList(dup.unmentioned, dup.rule_labels));
+  if ((dup.mentioned || []).length) {
+    secDup.appendChild(drill(`展開：registry 的 note 提過的 ${dup.mentioned.length} 對`,
+      () => duplicateList(dup.mentioned, dup.rule_labels)));
+  }
+  const dupNotes = el('ul', 'notes');
+  (dup.this_is_not || []).forEach((t) => dupNotes.appendChild(el('li', null, t.replace(/[`*]/g, ''))));
+  secDup.appendChild(dupNotes);
+  app.appendChild(secDup);
 
   const sec3 = el('section', 'panel');
   sec3.appendChild(el('h2', null, '其餘'));

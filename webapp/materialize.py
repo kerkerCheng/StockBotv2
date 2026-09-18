@@ -756,7 +756,7 @@ def materialize_beta(*, store: StateArtifactStore | None = None,
 # state artifact：`coverage`（圖的供給側覆蓋掃描；照抄 `query.coverage_gaps.scan()`）
 # ---------------------------------------------------------------------------
 
-COVERAGE_MATERIALIZER_VERSION = "webapp-materialize-coverage/1"
+COVERAGE_MATERIALIZER_VERSION = "webapp-materialize-coverage/2"
 
 COVERAGE_THIS_IS_NOT = (
     "不是「世界上還缺哪些瓶頸」——它只能從**圖裡既有的節點**往回看；圖裡沒有的瓶頸不會出現在這裡。",
@@ -765,12 +765,21 @@ COVERAGE_THIS_IS_NOT = (
     "不排序、不評分：這一頁沒有名次，補哪一個由使用者決定。",
     "`層` 與 `邊` 不是分類也不是分數：它們是節點自己的屬性與邊數，只用來讓「下一步做什麼」看得出差別。",
     "本 APP 不重算：每一格都是 materialize 當下 `python -m query.coverage_gaps` 的輸出照抄。",
+    "重複節點候選**不是缺口的一種**：它問的是「這個節點是不是旁邊那個」，"
+    "放在同一頁是因為重複節點正是 🔴 的誤報來源——一個已經有供應商的東西被攤成兩個節點之後，"
+    "其中孤立的那個看起來像空白。",
 )
 
 _COVERAGE_AUTHORITY = {
     "function": "query.coverage_gaps.scan",
     "command": "python -m query.coverage_gaps",
     "note": "唯一覆蓋掃描權威。本 artifact 照抄它的分桶結果：不重新分類、不補節點、不排序。",
+    # 同一頁的第二題有自己的 authority——混成一個會讓「誰算的」答不出來。
+    "duplicates": {
+        "function": "query.duplicate_nodes.pair_candidates",
+        "command": "python -m query.duplicate_nodes",
+        "note": "只提名不合併；合併走 pq2 ra_admission ＋ config/entity_aliases.json。",
+    },
 }
 
 
@@ -792,13 +801,43 @@ def _coverage_row(row: Mapping[str, Any], *, with_question: bool = False) -> dic
     return out
 
 
+def _duplicate_pair_row(pair: Mapping[str, Any]) -> dict[str, Any]:
+    """一對候選 → artifact 列。**逐字照抄**，因為那是這一區塊存在的全部理由（L18）。"""
+
+    def _side(view: Mapping[str, Any]) -> dict[str, Any]:
+        return {"node": view["node"], "name": view.get("name"),
+                "abstraction_level": view.get("abstraction_level"),
+                "degree": view.get("degree"), "quote_count": view.get("quote_count"),
+                "quotes": [dict(q) for q in view.get("quotes") or ()]}
+
+    return {
+        "pair": list(pair["pair"]),
+        "rules": list(pair["rules"]),
+        "same_abstraction_level": pair["same_abstraction_level"],
+        "left": _side(pair["left"]), "right": _side(pair["right"]),
+        "registry_mentions": [dict(m) for m in pair.get("registry_mentions") or ()],
+    }
+
+
 def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
+                            duplicate_buckets: Mapping[str, Sequence[Mapping[str, Any]]],
+                            duplicate_node_total: int,
                             generated_at: datetime | None = None) -> dict[str, Any]:
-    """`coverage_gaps.scan()` 的結果 → `coverage` state artifact。**純函式**：不連 DB、不重新分類。"""
+    """`coverage_gaps.scan()` 的結果 → `coverage` state artifact。**純函式**：不連 DB、不重新分類。
+
+    ⚠ `duplicate_buckets` 與 `duplicate_node_total` 是**必要參數而非預設 `None`**：預設值會讓
+    「呼叫端忘了傳」與「這次真的沒算」同形（D15 的 `power_law` 踩過同一個坑）。
+    """
     from query.coverage_gaps import (
         BUCKET_LABELS, BUCKET_NEXT_STEP, BUCKET_NOTE, COVERAGE_SCOPE_NOTE, COVERAGE_TITLE,
         ISOLATED_NOTE, LEVEL_NOTE, PRODUCT_NOISE_PREFIX, RESEARCH_GAP_SPLIT_NOTE,
         bucketize, split_research_gaps,
+    )
+    # 固定文字跟著判準走，不在 APP 抄第二份（L16）。
+    from query.duplicate_nodes import (
+        RULE_LABELS as DUPLICATE_RULE_LABELS,
+        THIS_IS_NOT as DUPLICATE_THIS_IS_NOT,
+        TITLE as DUPLICATE_TITLE,
     )
 
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -813,7 +852,10 @@ def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
         "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
         "authority": dict(_COVERAGE_AUTHORITY),
         "counts": {"nodes": len(rows), **{k: len(v) for k, v in buckets.items()},
-                   "research_gap_real": len(real_gaps), "research_gap_product_noise": len(product_noise)},
+                   "research_gap_real": len(real_gaps), "research_gap_product_noise": len(product_noise),
+                   # 重複節點候選：`unmentioned` 才是待辦（registry 提過的那些已經有人寫過話了）。
+                   "duplicate_unmentioned": len(duplicate_buckets["unmentioned"]),
+                   "duplicate_mentioned": len(duplicate_buckets["mentioned"])},
         "labels": dict(BUCKET_LABELS),
         "next_steps": dict(BUCKET_NEXT_STEP),
         "notes": {"buckets": BUCKET_NOTE, "research_gap_split": RESEARCH_GAP_SPLIT_NOTE,
@@ -826,6 +868,14 @@ def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
         "modelling_gaps": [_coverage_row(r) for r in buckets["modelling_gap"]],
         "covered": [_coverage_row(r) for r in buckets["covered"]],
         "concept": [_coverage_row(r) for r in buckets["concept"]],
+        "duplicates": {
+            "title": DUPLICATE_TITLE,
+            "node_total": duplicate_node_total,
+            "rule_labels": dict(DUPLICATE_RULE_LABELS),
+            "this_is_not": list(DUPLICATE_THIS_IS_NOT),
+            "unmentioned": [_duplicate_pair_row(p) for p in duplicate_buckets["unmentioned"]],
+            "mentioned": [_duplicate_pair_row(p) for p in duplicate_buckets["mentioned"]],
+        },
         "this_is_not": list(COVERAGE_THIS_IS_NOT),
         "materializer": {
             "version": COVERAGE_MATERIALIZER_VERSION,
@@ -840,7 +890,10 @@ def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
         identity={"research_gap": sorted(r["node"] for r in real_gaps),
                   "product_noise": sorted(r["node"] for r in product_noise),
                   "modelling_gap": sorted(r["node"] for r in buckets["modelling_gap"]),
-                  "covered": sorted(r["node"] for r in buckets["covered"])})
+                  "covered": sorted(r["node"] for r in buckets["covered"]),
+                  # 哪幾對還沒人看過＝認知狀態；逐字改字不算認知變了（與上面四桶同一條原則）。
+                  "duplicate_unmentioned": sorted(
+                      "|".join(p["pair"]) for p in duplicate_buckets["unmentioned"])})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 
@@ -851,7 +904,10 @@ def materialize_coverage(*, store: StateArtifactStore | None = None,
     from dotenv import load_dotenv
     from neo4j import GraphDatabase
 
+    from identity import entities
     from query.coverage_gaps import scan
+    from query.duplicate_nodes import bucketize, pair_candidates
+    from query.duplicate_nodes import scan as scan_duplicates
 
     load_dotenv()
     password = os.environ.get("NEO4J_PASSWORD")
@@ -864,9 +920,14 @@ def materialize_coverage(*, store: StateArtifactStore | None = None,
     try:
         with driver.session() as session:
             rows = scan(session)
+            # 同一個 session 掃兩題：兩個 authority、兩份 Cypher，但只連一次圖。
+            duplicate_rows = scan_duplicates(session)
     finally:
         driver.close()
-    payload = build_coverage_artifact(rows, generated_at=generated_at)
+    duplicate_buckets = bucketize(pair_candidates(duplicate_rows), entities.load())
+    payload = build_coverage_artifact(
+        rows, duplicate_buckets=duplicate_buckets,
+        duplicate_node_total=len(duplicate_rows), generated_at=generated_at)
     target = store or StateArtifactStore()
     return target.write(payload), payload
 
