@@ -66,13 +66,29 @@ def fake_health(**kw):
 _KEEP = object()
 
 
-def fake_positions_payload(*, results=None, health=_KEEP, live_rows=None, **kw):
+def fake_power_law():
+    """D15 三量的假資料：一檔扛起全部、其餘拖累，且分母還沒出現——真實資料今天的形狀。"""
+    return {
+        "n": 2, "peak_measured": 2, "measurement_start": "2026-07-21", "max_days_held": 57,
+        "maturity": {"12m": {"matured": 0, "reached_2x": 0, "share": None, "tickers": []},
+                     "24m": {"matured": 0, "reached_2x": 0, "share": None, "tickers": []}},
+        "reached_2x_ever": 1, "reached_2x_now": 0, "basket_total_return": 0.1665,
+        "top_contributor": {"ticker": "AXTI", "absolute_return": 0.5037, "peak_return": 1.2444,
+                            "contribution": 0.2519, "rest_contribution": -0.0854, "rest_n": 1},
+        "threshold": 1.0, "known_biases": ["觀察期短"],
+    }
+
+
+def fake_positions_payload(*, results=None, health=_KEEP, live_rows=None, power_law=_KEEP, **kw):
     rows = fake_results() if results is None else results
     return build_positions_artifact(
         rows, [{"ticker": "UNITREE", "cohort_id": "dc_x", "status": "unavailable"}],
         has_benchmark=True,
         aggregate={"n": 2, "absolute": 0.1665, "excess": 0.133, "benchmark": "QQQ",
                    "measured": 2, "total": len(rows)},
+        # `power_law` 在 builder 是**必要參數而非預設 None**（2026-09-18）：預設值會讓
+        # 「呼叫端忘了傳」與「這次真的沒算」同形（L12），而 artifact 是 APP 唯一讀得到的東西。
+        power_law=fake_power_law() if power_law is _KEEP else power_law,
         health=fake_health() if health is _KEEP else health,
         live_rows=fake_live_rows() if live_rows is None else live_rows,
         paper_only=["AXTI", "SIVE.ST"], counters=_COUNTERS, benchmarks=("QQQ", "SOXX"), **kw)

@@ -1008,6 +1008,7 @@ def _position_row(row: Mapping[str, Any], *, benchmark: str, reference: str) -> 
 def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                              unavailable: Sequence[Mapping[str, Any]], *,
                              has_benchmark: bool, aggregate: Mapping[str, Any],
+                             power_law: Mapping[str, Any] | None,
                              health: Mapping[str, Any] | None, live_rows: Sequence[Mapping[str, Any]],
                              paper_only: Sequence[str], counters: Mapping[str, Any],
                              benchmarks: tuple[str, str],
@@ -1042,6 +1043,11 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
         },
         "benchmarks": {"primary": primary, "reference": reference, "available": bool(has_benchmark)},
         "aggregate": dict(aggregate),
+        # D15 三量（2026-09-18）。**與 `aggregate` 並列不是取代**：等權絕對報酬回答
+        # 「排序整體準不準」，這三個回答「有沒有抓到那一檔」——power-law 的賭注是
+        # 小賠多檔一檔補回，平均值天生看不到它。`None` ＝ 這次沒算（舊呼叫端），
+        # 不是「算了但都是 0」（L12）。
+        "power_law": None if power_law is None else dict(power_law),
         # 時序（2026-09-11）。**照抄 `outcome_if_settled_today` 落的檔案，不重算**——
         # 沒有歷史就做不了樣本外驗證（ROADMAP §F：保存當時的 PIT view，事後對 actual 算誤差）。
         "aggregate_series": _outcome_series(),
@@ -1061,6 +1067,14 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                            "兩者語意不同：後者不含任何進場時點判斷，不構成選股能力的證據。",
             "aggregate": "等權重聚合是**推薦籃子**的量測基準：每檔等權，回答排序整體有沒有跑贏。"
                          "各檔錨點日不同，這是跨持有期的粗聚合，**不是回測**。",
+            "power_law": "D15 三量問的是**另一個問題**：有沒有抓到那一檔。"
+                         "`top_contributor` 與 `rest_contribution` 是恆等式的兩端"
+                         "（籃子總報酬 ＝ 最大單檔 ＋ 其餘），刻意不做除法——"
+                         "籃子總報酬接近 0 時比例會爆成幾萬 %。"
+                         "`maturity` 的分母是**已滿 12／24 個月的檔數**，分母 0 時 `share` 是 "
+                         "`null` 不是 0.0：「還沒有一檔滿一年」與「滿了但沒翻倍」是相反的結論。"
+                         "`reached_2x_ever` 用期間高點、`reached_2x_now` 用現價——"
+                         "D3 定案出場只認反證，所以抱著回吐是預期內的，兩個都要看得到。",
             "sample_validity": "**樣本效度先於數字**：錨點跨度短就不得視為 N 個獨立樣本——"
                                "反過來讀的話，一份有效 n 接近 1 的觀測會看起來像 N 個獨立驗證。",
             "judgment_anchor": "要讓這張表變成選股能力的證據，需要的不是等更久，"
@@ -1117,7 +1131,8 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
     live_rows, paper_only = outcome.live_lane_rows(results, outcome._live_fills())
     payload = build_positions_artifact(
         results, unavailable, has_benchmark=bool(benchmarks),
-        aggregate=outcome.equal_weight_aggregate(results), health=outcome.anchor_health(results),
+        aggregate=outcome.equal_weight_aggregate(results),
+        power_law=outcome.power_law_aggregate(results), health=outcome.anchor_health(results),
         live_rows=live_rows, paper_only=paper_only, counters=counters,
         benchmarks=(outcome.PRIMARY_BENCHMARK, outcome.REFERENCE_BENCHMARK),
         generated_at=generated_at)

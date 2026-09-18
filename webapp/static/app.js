@@ -2940,6 +2940,50 @@ async function renderPositions() {
   sec3.appendChild(mdParagraph(notes.aggregate || ''));
   app.appendChild(sec3);
 
+  /* ④b power-law 三量（D15，2026-09-18）。**與等權並列不是取代**：上面那格回答
+     「排序整體準不準」，這一格回答「有沒有抓到那一檔」——賭注是小賠多檔一檔補回，
+     平均值天生看不到它。`null` ＝ 這次沒算（舊 artifact），不是「都是 0」。 */
+  const pl = payload.power_law;
+  const sec3b = el('section', 'panel');
+  sec3b.appendChild(el('h2', null, '有沒有抓到那一檔（power-law 三量）'));
+  if (!pl || !pl.n) {
+    sec3b.appendChild(el('p', 'note',
+      '這份 artifact 還沒有 power-law 三量——跑一次 `python -m webapp materialize --positions` 產生。'));
+  } else {
+    const top = pl.top_contributor || {};
+    /* `fmtRatioPct` 對非數字回 `null`，直接字串相接會印出「+null」——artifact 是外部資料，
+       前端不得假設欄位一定是數字（既有的等權那格也是先檢查再接）。缺值印「—」。 */
+    const signed = (v, digits) => (typeof v === 'number' && isFinite(v)
+      ? (v > 0 ? '+' : '') + fmtRatioPct(v, digits) : '—');
+    const plRow = el('div', 'numbers');
+    plRow.appendChild(numberBlock('籃子總報酬', signed(pl.basket_total_return, 2),
+      `${pl.n} 檔等權（與上一格同一個數字）`, signClass(pl.basket_total_return)));
+    plRow.appendChild(numberBlock(`最大單檔　${top.ticker || '?'}`,
+      signed(top.contribution, 2),
+      `該檔 ${signed(top.absolute_return, 1)}`
+      + (typeof top.peak_return === 'number' ? `，期間高點 ${signed(top.peak_return, 1)}` : ''),
+      signClass(top.contribution)));
+    plRow.appendChild(numberBlock(`其餘 ${top.rest_n} 檔合計`,
+      signed(top.rest_contribution, 2),
+      '恆等式：總報酬 ＝ 最大單檔 ＋ 其餘（刻意不做除法）', signClass(top.rest_contribution)));
+    sec3b.appendChild(plRow);
+    sec3b.appendChild(el('p', 'note',
+      `曾達 2 倍 ${pl.reached_2x_ever}/${pl.peak_measured} 檔（現價仍在 2 倍以上 ${pl.reached_2x_now}）`
+      + `｜量測起始 ${pl.measurement_start || '?'}、最長已持有 ${pl.max_days_held} 天。`
+      + '　用期間高點算的那個是進行中的下界，只增不減。'));
+    const mat = pl.maturity || {};
+    const matText = ['12m', '24m'].map((k) => {
+      const m = mat[k] || {};
+      return m.matured
+        ? `${k}：${m.reached_2x}/${m.matured} 檔（${fmtRatioPct(m.share, 0) || '—'}）`
+        : `${k}：分母還沒出現（沒有一檔滿 ${k}）`;
+    }).join('｜');
+    sec3b.appendChild(el('p', 'note', `達 2 倍的比例　${matText}`));
+    (pl.known_biases || []).forEach((b) => sec3b.appendChild(mdParagraph('⚠ ' + b)));
+  }
+  sec3b.appendChild(mdParagraph(notes.power_law || ''));
+  app.appendChild(sec3b);
+
   // ⑤ 逐檔
   const sec4 = el('section', 'panel');
   sec4.appendChild(el('h2', null, `逐檔（${payload.rows.length}）`));

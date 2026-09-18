@@ -198,6 +198,92 @@ def test_outcome_aggregate_is_appended_not_overwritten(tmp_path, monkeypatch) ->
     assert len({r["date"] for r in rows}) == len(rows)
 
 
+def _oist():
+    """載入 `scripts/outcome_if_settled_today.py`（它不是 package，只能按路徑載）。"""
+    import importlib.util
+    from pathlib import Path as _P
+
+    root = _P(__file__).resolve().parents[1]
+    spec = importlib.util.spec_from_file_location(
+        "oist_power_law", root / "scripts" / "outcome_if_settled_today.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _pl_row(ticker, absolute, peak, held_days):
+    from datetime import date, timedelta
+
+    current = date(2026, 9, 18)
+    return {"ticker": ticker, "absolute_return": absolute, "peak_return": peak,
+            "anchor_date": current - timedelta(days=held_days), "current_date": current}
+
+
+def test_power_law_keeps_the_identity_instead_of_dividing_by_a_near_zero_basket() -> None:
+    """最大單檔與其餘是**恆等式的兩端**，不是比例——比例會在籃子報酬接近 0 時爆掉。
+
+    事發（2026-09-18 首版真實資料）：籃子總報酬 +0.02%、AXTI 等權貢獻 +2.29%，
+    「佔籃子總報酬的比例」印出 **15636%**。門檻式修法（小於 X% 就回 None）會引入一個
+    憑空的參數（INV-5），所以改成 `總報酬 ＝ 最大單檔 ＋ 其餘`：減法不可能爆。
+    """
+    module = _oist()
+    rows = [_pl_row("AXTI", 0.5037, 1.2444, 52), _pl_row("MEH", -0.024, 0.01, 50)]
+    power = module.power_law_aggregate(rows)
+
+    top = power["top_contributor"]
+    assert top["ticker"] == "AXTI"
+    assert "share_of_basket" not in top, "比例欄不得復活——它會除以接近 0 的分母"
+    assert abs(top["contribution"] + top["rest_contribution"]
+               - power["basket_total_return"]) < 1e-12
+    assert top["rest_n"] == len(rows) - 1
+
+
+def test_power_law_reports_the_missing_denominator_not_a_fake_zero_percent() -> None:
+    """「沒有一檔滿 12 個月」與「滿了但沒有一檔翻倍」是相反的結論，不得同形（L12）。"""
+    module = _oist()
+    young = module.power_law_aggregate([_pl_row("AXTI", 0.5, 1.3, 52)])
+    assert young["maturity"]["12m"] == {"matured": 0, "reached_2x": 0,
+                                        "share": None, "tickers": []}
+    assert young["maturity"]["12m"]["share"] is None, "分母 0 時不得回 0.0"
+
+    old = module.power_law_aggregate([_pl_row("AXTI", 0.5, 1.3, 400),
+                                      _pl_row("MEH", 0.1, 0.2, 400)])
+    assert old["maturity"]["12m"]["matured"] == 2
+    assert old["maturity"]["12m"]["reached_2x"] == 1
+    assert old["maturity"]["12m"]["share"] == 0.5
+    assert old["maturity"]["12m"]["tickers"] == ["AXTI"]
+    assert old["maturity"]["24m"]["matured"] == 0, "400 天不到 24 個月"
+
+
+def test_power_law_separates_peak_from_current_because_holding_through_a_giveback_is_expected() -> None:
+    """D3 定案「目標價到了只提醒、出場只認反證」——抱著回吐是預期內的行為。
+
+    只印期末會系統性低估「有沒有抓到倍數」，只印高點會高估「現在手上有什麼」。
+    """
+    module = _oist()
+    power = module.power_law_aggregate([_pl_row("AXTI", 0.5037, 1.2444, 52)])
+    assert power["reached_2x_ever"] == 1      # 期間高點 +124% 達過 2 倍
+    assert power["reached_2x_now"] == 0       # 現價 +50% 沒有
+    assert power["measurement_start"] == "2026-07-28"
+    assert power["max_days_held"] == 52
+
+
+def test_power_law_render_never_prints_a_hardcoded_current_state() -> None:
+    """尾句必須由資料決定——「分母還沒出現」在有檔滿一年的那天要自己改口。"""
+    from alpha.brief import _render_power_law_line
+
+    module = _oist()
+    young = _render_power_law_line(module.power_law_aggregate([_pl_row("A", 0.5, 1.3, 52)]))
+    assert young and "分母都還沒出現" in young[0]
+
+    matured = _render_power_law_line(module.power_law_aggregate(
+        [_pl_row("A", 1.5, 2.0, 400), _pl_row("B", 0.1, 0.2, 400)]))
+    assert matured and "分母都還沒出現" not in matured[0]
+    assert "12m 分母 2 檔" in matured[0]
+
+    assert _render_power_law_line(None) == [], "沒有這一欄就整行不印，不印 0"
+
+
 def test_positions_artifact_carries_the_series_and_never_recomputes_it() -> None:
     """APP 端照抄檔案，不自己算聚合——那是 `outcome_if_settled_today` 的職責。"""
     import inspect

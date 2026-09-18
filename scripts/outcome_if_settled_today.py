@@ -199,6 +199,22 @@ def _provider_series(ticker: str, start: date) -> dict[date, float]:
     return {ts.date(): float(close) for ts, close in hist.items() if close == close}
 
 
+def _peak_since(series: dict[date, float], anchor: date | None) -> tuple[float | None, date | None]:
+    """錨點日（含）之後的最高收盤，與它出現的那一天。
+
+    power-law 量測要問的是「**有沒有抓到倍數**」，而 D3 定案「目標價到了只提醒、
+    出場只認反證」——所以標的可能一路抱著，用期末價會系統性低估「抓到過幾倍」。
+    期末與期間高點是**兩個不同的問題**，兩個都要有答案，不得壓成一個數字（L12）。
+    """
+    if not anchor:
+        return None, None
+    after = [(d, v) for d, v in series.items() if d >= anchor and v > 0]
+    if not after:
+        return None, None
+    best = max(after, key=lambda kv: kv[1])
+    return best[1], best[0]
+
+
 def _pre_anchor_return(series: dict[date, float], anchor: date) -> float | None:
     """錨點前 PRE_ANCHOR_DAYS 日的漲跌幅。
 
@@ -314,6 +330,13 @@ def collect(*, no_benchmark: bool = False) -> tuple[list[dict], list[dict], dict
                 row["note"].append("Shadow 錨點價格非正數 → 不計算")
             else:
                 row["absolute_return"] = current_val / anchor_val - 1.0
+                # 期間高點與 `absolute_return` 用**同一個分母**（Shadow 錨點，authority），
+                # 否則「曾達 2 倍、現在剩 1.3 倍」這句話的兩個數字不可比。
+                peak_raw, peak_date = _peak_since(series, anchor_date)
+                peak_val, peak_ccy = _to_settlement(peak_raw, quote_unit)
+                if peak_val is not None and peak_ccy == anchor_ccy:
+                    row["peak_return"] = peak_val / anchor_val - 1.0
+                    row["peak_date"] = peak_date
                 row["anchor_raw"] = shadow["price"]
                 row["anchor_ccy"] = anchor_ccy
                 row["anchor_source"] = (
@@ -392,6 +415,161 @@ def equal_weight_aggregate(results: list[dict]) -> dict:
         "measured": len(abs_returns),
         "total": len(results),
     }
+
+
+#: 「達 2 倍」的門檻。power-law 的目標是 2 到 10 倍（AGENTS「目標是倍率不是錯價」），
+#: 2 倍是這條分佈的入場券，不是目標價。
+DOUBLE_THRESHOLD = 1.0  # 報酬率 +100% ＝ 2 倍
+
+#: 「滿 N 個月」用日曆日算，不用交易日——D15 問的是「12／24 個月內」，那是行事曆語意。
+MATURITY_DAYS = {"12m": 365, "24m": 730}
+
+
+def power_law_aggregate(results: list[dict]) -> dict:
+    """D15 的三個 power-law 統計量：**12／24 個月內達 2 倍的比例、最大單檔貢獻、籃子總報酬**。
+
+    ⚠ 純函式，與 `equal_weight_aggregate` 並列；markdown、`outcome_aggregate.json`
+    與 APP artifact 讀同一份（第二份實作會立刻開始偏離，L16）。
+
+    ## 三個統計量各自的判準（寫出來才能被反駁）
+
+    1. **達 2 倍的比例**：分母是**已滿 12／24 個月的檔數**，不是全部追蹤檔數。
+       今天分母幾乎必然是 0——最早的錨點是 2026-07-21，整份追蹤表的歷史比一季還短。
+       **回 `None` 而不是 0.0**：「沒有一檔滿 12 個月」與「滿了但沒有一檔翻倍」是兩個
+       完全不同的結論，壓成同一個 0 就再也分不出來（L12）。同時另印
+       `reached_2x_ever`／`reached_2x_now`（**不受成熟度限制**）——它回答「到今天為止
+       有沒有任何一檔翻過倍」，是進行中的觀測，會隨時間只增不減，**因此系統性低估**。
+    2. **最大單檔貢獻**：等權下單檔對籃子報酬的貢獻 ＝ `r_i / n`。power-law 的整個賭注
+       是「一檔補回多檔」，所以要看得到那一檔是誰、它扛了多少。⚠ **這裡刻意不做除法。**
+       首版印的是「佔籃子總報酬的比例」，2026-09-18 真實資料一跑就爆成 **15636%**
+       ——籃子總報酬 +0.02%，分母接近 0。門檻式的修法（小於 X% 就回 None）會引入一個
+       憑空的參數（INV-5：未量測的機制不得享有默認信任），所以改用恆等式：
+       `basket_total ＝ top_contribution ＋ rest_contribution`。減法不可能爆，而且
+       **更直接說出 power-law 的那件事**——那一檔扛了多少、其餘幾檔合計拖了多少。
+    3. **籃子總報酬**：等權組合的報酬率，**就是 `equal_weight_aggregate()['absolute']`**
+       ——D15 列的三個統計量裡這一個本來就在，這裡不另算一份，只把它放進同一個信封，
+       讓三個數字一起被讀。
+
+    ## 兩個刻意分開的數字
+
+    `reached_2x_ever`（期間高點曾達）與 `reached_2x_now`（現價仍達）**兩個都印**：
+    D3 定案「目標價到了只提醒、出場只認反證」，所以抱著回吐是預期內的行為，
+    只印期末會系統性低估「有沒有抓到倍數」，只印高點則會高估「現在手上有什麼」。
+    """
+    measured = [r for r in results if r.get("absolute_return") is not None]
+    n = len(measured)
+    with_peak = [r for r in measured if r.get("peak_return") is not None]
+
+    def _held_days(row: dict) -> int | None:
+        a, c = row.get("anchor_date"), row.get("current_date")
+        return (c - a).days if a and c else None
+
+    held = [d for d in (_held_days(r) for r in measured) if d is not None]
+    anchors = [r["anchor_date"] for r in measured if r.get("anchor_date")]
+
+    maturity: dict[str, dict] = {}
+    for label, days in MATURITY_DAYS.items():
+        mature = [r for r in measured
+                  if (_held_days(r) or 0) >= days and r.get("peak_return") is not None]
+        hits = [r for r in mature if r["peak_return"] >= DOUBLE_THRESHOLD]
+        maturity[label] = {
+            "matured": len(mature),
+            "reached_2x": len(hits),
+            # 分母 0 → None，不是 0.0（見 docstring 第 1 點）
+            "share": (len(hits) / len(mature)) if mature else None,
+            "tickers": sorted(r["ticker"] for r in hits if r.get("ticker")),
+        }
+
+    basket_total = (sum(r["absolute_return"] for r in measured) / n) if n else None
+    top = max(measured, key=lambda r: r["absolute_return"]) if n else None
+    top_contribution = (top["absolute_return"] / n) if top else None
+    # 恆等式而非比例：rest ＝ 籃子總報酬 − 最大單檔貢獻（見 docstring 第 2 點）。
+    rest_contribution = (
+        basket_total - top_contribution
+        if basket_total is not None and top_contribution is not None else None
+    )
+
+    return {
+        "n": n,
+        "peak_measured": len(with_peak),
+        "measurement_start": min(anchors).isoformat() if anchors else None,
+        "max_days_held": max(held) if held else None,
+        "maturity": maturity,
+        "reached_2x_ever": sum(1 for r in with_peak if r["peak_return"] >= DOUBLE_THRESHOLD),
+        "reached_2x_now": sum(1 for r in measured
+                              if r["absolute_return"] >= DOUBLE_THRESHOLD),
+        "basket_total_return": basket_total,
+        "top_contributor": None if top is None else {
+            "ticker": top.get("ticker"),
+            "absolute_return": top["absolute_return"],
+            "peak_return": top.get("peak_return"),
+            "contribution": top_contribution,
+            "rest_contribution": rest_contribution,
+            "rest_n": (n - 1) if n else 0,
+        },
+        "threshold": DOUBLE_THRESHOLD,
+        # 三個已知偏差，跟著數字走（AGENTS：計分表必印量測起始日與樣本數，並印三個已知偏差）。
+        "known_biases": [
+            "未滿 12／24 個月的檔數不進 `maturity` 的分母——分母小的時候那個比例是雜訊，"
+            "不是結論；`reached_2x_ever` 則是進行中的下界，只增不減，**系統性低估**。",
+            "各檔錨點日不同，這是跨持有期的粗聚合、不是回測；錨點跨度短時有效 n 遠小於檔數。",
+            "錨點是入圖日，不含任何進場時點判斷——這張表量的是「排序有沒有選到會漲的」，"
+            "不是「我們買得準不準」。",
+        ],
+    }
+
+
+def render_power_law(power: dict) -> list[str]:
+    """D15 三個統計量的人類可讀版。**量測起始日與樣本數永遠先印**，偏差跟著數字走。
+
+    ⚠ 不得只印「達 2 倍 0%」。今天的真相是「**沒有一檔滿 12 個月**」，那與「滿了但
+    沒有一檔翻倍」是相反的結論；分母為 0 時印的是「還沒有分母」，不是一個假的 0%。
+    """
+    if not power.get("n"):
+        return []
+    out: list[str] = []
+    start = power.get("measurement_start") or "?"
+    days = power.get("max_days_held")
+    out.append(
+        chr(10) + f"**power-law 三量（D15）｜量測起始 {start}｜樣本 {power['n']} 檔｜"
+        f"最長已持有 {days if days is not None else '?'} 天**"
+    )
+    total = power.get("basket_total_return")
+    # ⚠ 這幾個數字用兩位小數，不用共用的 `_pct`：籃子總報酬接近 0 時（今天 +0.02%）
+    # 一位小數會印成 `+0.0%`，而恆等式「總報酬 ＝ 最大單檔 ＋ 其餘」會看起來不成立。
+    def pct2(v):
+        return f"{v:+.2%}" if isinstance(v, (int, float)) else "—"
+    out.append(f"- 籃子總報酬（等權）：{pct2(total)}　←與上一行的等權絕對是同一個數字")
+    top = power.get("top_contributor")
+    if top:
+        peak = top.get("peak_return")
+        peak_text = f"（期間高點 {_pct(peak)}）" if isinstance(peak, (int, float)) else ""
+        out.append(
+            f"- 最大單檔貢獻：{top.get('ticker') or '?'} {_pct(top.get('absolute_return'))}"
+            f"{peak_text} → 等權貢獻 {pct2(top.get('contribution'))}"
+        )
+        out.append(
+            f"  其餘 {top.get('rest_n')} 檔合計 {pct2(top.get('rest_contribution'))}"
+            "　←恆等式：籃子總報酬 ＝ 最大單檔 ＋ 其餘，沒有除法所以不會爆"
+        )
+    for label in ("12m", "24m"):
+        m = power["maturity"][label]
+        if m["matured"]:
+            names = ("：" + "／".join(m["tickers"])) if m["tickers"] else ""
+            out.append(f"- {label} 內達 2 倍：{m['reached_2x']}/{m['matured']} "
+                       f"（{m['share']:.0%}）{names}")
+        else:
+            out.append(f"- {label} 內達 2 倍：**尚無一檔滿 {label}**——"
+                       "這不是 0%，是分母還沒出現")
+    measured = power.get("peak_measured")
+    out.append(
+        f"- 到今天為止曾達 2 倍：{power['reached_2x_ever']}/{measured} 檔"
+        f"（現價仍在 2 倍以上：{power['reached_2x_now']}）"
+        "　←進行中的下界，只增不減，**系統性低估**"
+    )
+    for bias in power.get("known_biases", []):
+        out.append(f"  ⚠ {bias}")
+    return out
 
 
 def live_lane_rows(results: list[dict], fills: dict[str, list[dict]]) -> tuple[list[dict], list[str]]:
@@ -496,15 +674,19 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
             line += f"｜超額({PRIMARY_BENCHMARK}) {_pct(aggregate['excess'])}"
         line += "**——各檔錨點日不同，粗聚合非回測；前/後段對照待排序快照累積"
         print(line)
+        power = power_law_aggregate(results)
+        for text in render_power_law(power):
+            print(text)
         _persist_aggregate(n=aggregate["n"], ew_abs=aggregate["absolute"],
-                           ew_excess=aggregate["excess"])
+                           ew_excess=aggregate["excess"], power=power)
 
     _append_ranking_snapshot()
     _render_live_lane(results, _live_fills())
     _render_chase_check(results)
 
 
-def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None) -> None:
+def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None,
+                       power: dict | None = None) -> None:
     """把最新聚合值落成狀態檔 **＋ append 一筆時序**（2026-09-11 補時序）。
 
     ⚠ **為什麼要兩個檔**：`.json` 是 brief 首屏的最新值（既有消費端，形狀不動）；
@@ -526,6 +708,10 @@ def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None) -> Non
         "equal_weight_excess": ew_excess,
         "benchmark": PRIMARY_BENCHMARK,
     }
+    # D15：三個 power-law 統計量與等權值放同一個信封。**既有四個欄位一字不動**——
+    # brief 首屏與 APP 都在讀它們，改名或改語意會讓既有消費端靜默偏掉。
+    if power is not None:
+        payload["power_law"] = power
     out = Path("library/private/decision_lab/outcome_aggregate.json")
     try:
         out.parent.mkdir(parents=True, exist_ok=True)

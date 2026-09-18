@@ -203,6 +203,47 @@ def render_position_events(events: Sequence[Mapping[str, Any]] | None) -> list[s
     return lines
 
 
+def _render_power_law_line(power: Mapping[str, Any] | None) -> list[str]:
+    """D15 三量的首屏一行：**一檔扛了多少、其餘幾檔合計多少、有沒有翻過倍**。
+
+    ⚠ 等權絕對報酬回答「排序整體準不準」，這一行回答**完全不同的問題**——
+    「有沒有抓到那一檔」。power-law 的賭注是小賠多檔一檔補回，所以平均值天生
+    看不到它想看的東西（AGENTS「目標是倍率不是錯價」）。兩行並存不是重複。
+
+    ⚠ **沒有 `power_law` 就整行不印**，不印 0：`outcome_aggregate.json` 是舊版
+    腳本落下的（那時還沒有這三個數字）與「跑了但一檔都沒翻倍」是兩件事（L12）。
+    """
+    if not isinstance(power, Mapping) or not power.get("n"):
+        return []
+    top = power.get("top_contributor") or {}
+    rest = top.get("rest_contribution")
+    contribution = top.get("contribution")
+    if not isinstance(contribution, (int, float)) or not isinstance(rest, (int, float)):
+        return []
+    days = power.get("max_days_held")
+    # ⚠ 尾句由資料決定，**不寫死「分母還沒出現」**——那是會腐壞的現況句
+    # （AGENTS「現況數字會過期，判準不會」）。有檔滿 12 個月的那天，它要自己改口。
+    maturity = power.get("maturity") or {}
+    matured = [label for label in ("12m", "24m")
+               if (maturity.get(label) or {}).get("matured")]
+    if matured:
+        tail = "　←" + "；".join(
+            f"{label} 分母 {maturity[label]['matured']} 檔、達 2 倍 {maturity[label]['reached_2x']}"
+            for label in matured
+        )
+    else:
+        tail = "　←12／24 個月的分母都還沒出現，這是進行中的下界"
+    return [
+        f"- power-law：最大單檔 {markdown_text(str(top.get('ticker') or '?'))} "
+        f"貢獻 {contribution:+.2%}，其餘 {top.get('rest_n')} 檔合計 {rest:+.2%}；"
+        f"曾達 2 倍 {power.get('reached_2x_ever')}/{power.get('peak_measured')} 檔"
+        f"（現價仍在 2 倍以上 {power.get('reached_2x_now')}）"
+        f"｜量測起始 {markdown_text(str(power.get('measurement_start') or '?'))}、"
+        f"最長已持有 {days if days is not None else '?'} 天"
+        + tail
+    ]
+
+
 def render_outcome_aggregate(
     aggregate: Mapping[str, Any] | None, *, measured_key_present: bool
 ) -> list[str]:
@@ -218,12 +259,14 @@ def render_outcome_aggregate(
             if isinstance(excess, (int, float))
             else ""
         )
-        return [
+        lines = [
             f"- 排序品質：推薦籃等權 {aggregate.get('n')} 檔 絕對 "
             f"{aggregate.get('equal_weight_absolute'):+.1%}{excess_text}"
             f"（量測日 {markdown_text(aggregate.get('date') or '?')}；粗聚合非回測，"
             "前/後段對照待快照累積）"
         ]
+        lines += _render_power_law_line(aggregate.get("power_law"))
+        return lines
     if measured_key_present:
         return ["- 排序品質：尚無量測——跑 `scripts/outcome_if_settled_today.py` 產生"]
     return []
