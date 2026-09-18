@@ -62,7 +62,10 @@ QUESTIONS: Mapping[str, str] = {
 CORE_PANELS: tuple[str, ...] = ("headline", "fundamental", "why", "research")
 #: `bet`（V0，2026-09-15）：賭注（variant scenario 的 payoff）。與 entry 同為 optional——
 #: 沒有寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
-OPTIONAL_PANELS: tuple[str, ...] = ("brief", "argument", "bet", "entry")
+#: `downside`（D2，2026-09-18）：判斷錯了值多少。與 `bet` 同為 optional——
+#: 沒寫下檔的檔 readiness 不變差，但它必須出現在 `optional_unavailable` 裡，
+#: 否則「還沒寫」這件事在畫面上沒有任何地方說得出口。
+OPTIONAL_PANELS: tuple[str, ...] = ("brief", "argument", "bet", "downside", "entry")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -608,7 +611,12 @@ class AnalystView:
     #: 2026-09-15：論證層 panel（optional）：短評展開成六段，附引文與長文。
     argument: AnalystPanel
 
-    PANEL_ORDER = ("headline", "brief", "argument", "bet", "fundamental", "why", "research", "entry")
+    #: ⚠ 新增 panel 必須同時登記在這裡與 `OPTIONAL_PANELS`／`CORE_PANELS`——**兩份都是封閉清單**。
+    #: `downside` 緊接在 `bet` 後面：它們是同一把尺的兩端，讀的人要並排看。
+    #: 事發（2026-09-18）：D2 的 panel 做好了但沒登記，於是 artifact 的 `absence_kind` 是 `None`
+    #: （`to_dict` 只對 `PANEL_ORDER` 裡的 panel 寫出那個 property），readiness 也沒列它——
+    #: 機制在、但分類沒跟著資料走到消費端（L16）。**materialize 一次就看得到，所以要驗 artifact。**
+    PANEL_ORDER = ("headline", "brief", "argument", "bet", "downside", "fundamental", "why", "research", "entry")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

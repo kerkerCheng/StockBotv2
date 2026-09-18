@@ -175,8 +175,13 @@ def test_missing_entry_criterion_does_not_change_core_readiness() -> None:
     assert with_hurdle.readiness.flags == without.readiness.flags
     assert with_hurdle.readiness.blockers == without.readiness.blockers
     # V0（2026-09-15）：bet 也是 optional；沒寫賭注時它與 entry 一樣只在 optional 欄現形
-    assert without.readiness.optional_unavailable == ("brief：missing", "bet：missing", "entry：missing")
-    assert with_hurdle.readiness.optional_unavailable == ("brief：missing", "bet：missing")   # fixture 沒寫短評與賭注
+    # D2（2026-09-18）：`downside` 是第四個 optional panel，沒寫時要與 `bet` 一起現形——
+    # 否則「還沒寫下檔」這件事在畫面上沒有任何地方說得出口。
+    assert without.readiness.optional_unavailable == (
+        "brief：missing", "bet：missing", "downside：missing", "entry：missing")
+    # fixture 沒寫短評、賭注與下檔（D2 起 downside 也是 optional panel）
+    assert with_hurdle.readiness.optional_unavailable == (
+        "brief：missing", "bet：missing", "downside：missing")
     # 核心四段的 status 一格不動
     assert ({p: getattr(with_hurdle, p).status for p in CORE_PANELS}
             == {p: getattr(without, p).status for p in CORE_PANELS})
@@ -380,7 +385,9 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     assert text == json.dumps(second, ensure_ascii=False, sort_keys=True)
     assert json.loads(text) == first                            # null 保留為 null
     assert first["schema_version"] == SCHEMA_VERSION
-    assert first["panel_order"] == list(("headline", "brief", "argument", "bet", "fundamental", "why", "research", "entry"))
+    # `downside` 緊接在 `bet` 後面：同一把尺的兩端，讀的人要並排看（D2，2026-09-18）。
+    assert first["panel_order"] == list(
+        ("headline", "brief", "argument", "bet", "downside", "fundamental", "why", "research", "entry"))
     assert set(first["questions"]) == set(QUESTIONS)
 
 
