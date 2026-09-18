@@ -440,7 +440,13 @@ def demand_chain(
     anchors: Iterable[str] | None = None,
     max_depth: int = 8,
 ) -> list[str] | None:
-    """從瓶頸標的往上走到**明確登記的需求錨點**，回傳最短的一條鏈；走不到回 None。
+    """從 `target` 往上走到**明確登記的需求錨點**，回傳最短的一條鏈；走不到回 None。
+
+    ⚠ **`target` 傳誰，決定了這條鏈在回答哪個問題。** `rank_bottlenecks` 一律傳**公司**
+    （`edge.src`），所以輸出的 `demand_anchor` 是「這家公司的產出有沒有人在花錢買」，
+    **同一家公司的每一列都相同**；傳瓶頸節點（`edge.dst`）問的是另一件事。
+    2026-09-18 實測過換成 dst 的後果：accepted 列有一批會失去錨（圖裡沒有人記錄過誰需要那些節點），
+    排序因此變差。這個欄位的名字容易被讀成後者——讀法已寫進 `render_markdown` 的表後註。
 
     用 BFS 取最短路徑而非 DFS 取最長：最短路徑是「這個瓶頸離錢最近有幾層」，
     可解釋；最長路徑在有環的圖上只是亂走（首版的教訓，見 DEMAND_ANCHORS 註解）。
@@ -862,7 +868,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         out.append("\n（無符合門檻的瓶頸邊）")
         return "\n".join(out)
 
-    out.append("\n| # | 標的 | 卡在哪 | 替代難度 | 證據 | 合格狀態 | 文件 | 需求錨點 |")
+    out.append("\n| # | 標的 | 卡在哪 | 替代難度 | 證據 | 合格狀態 | 文件 | 公司側需求錨 |")
     out.append("|---|---|---|---|---|---|---|---|")
     for i, r in enumerate(result["rows"], 1):
         ticker = r["ticker"] or "—"
@@ -873,6 +879,17 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             f"| {r['qualification_status'] or '—'} | {r['documents']} "
             f"| {r['demand_anchor'] or '🔴 無'} |"
         )
+
+    # ⚠ 這一欄的讀法必須跟著表走，否則每個讀者都會重造一份自己的理解（L16 的形狀）。
+    out.append(
+        "\n> **「公司側需求錨」是從標的公司往上走最短路徑找到的，不是從「卡在哪」那個節點走。**"
+        "所以**同一家公司的每一列都是同一個錨**——它回答「這家公司的產出有沒有人在花錢買」，"
+        "不回答「這條邊的瓶頸節點接不接得到錢」。"
+        "\n> ⚠ 改成從瓶頸節點走**已經量過是錯的**（2026-09-18）：accepted 列中有一批"
+        "（`tech:isolator`、`tech:eml`、`tech:ocs` 等）會**直接失去錨**而掉到排序末端，"
+        "因為圖裡沒有人記錄過「誰需要它們」。**那個「瓶頸節點走不到錨」是研究缺口訊號**"
+        "（同 ROADMAP Phase 4 成因③「真的沒有需求方邊」），不是一個該加進排序的欄位。"
+    )
 
     structural = result.get("structural_rows") or []
     if structural:
