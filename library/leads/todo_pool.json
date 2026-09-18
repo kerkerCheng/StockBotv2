@@ -10321,6 +10321,30 @@
       "source": "manual",
       "title": "[606] 查證入圖：isolator 方向翻轉＋inp_eml 併入 eml（原診斷 6 個全部不成立）",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T14:52:02.437883+00:00",
+      "hint": "V3 重複節點偵測器 2026-09-18 首跑產出；research judgment（graph admission），**go 只授權本項的 entity_aliases 登記＋存量 migration，不含其餘 29 對候選、不含任何 thesis 變更、不含 live**。\n\n【三個節點與各自逐字】三段都是 tier-1 一手 filing：\n① tech:export_controls_china『US export controls restricting semiconductor equipment exports to China』——Lam 10-Q（lrcx_10_q_20260423，Risk Factors）：《changes in import/export regulations and tariffs, such as regulations imposed by the U.S. government restricting exports to China》\n② tech:us_export_controls『U.S. Export Controls on Semiconductor Equipment』——AMAT 10-Q（amat_10_q_20260219，MD&A: China）：《The United States government has implemented export regulations for U.S. semiconductor technology sold or provided to customers in China, which have limited our ability to provide certain products and services》\n③ tech:export_controls_us_china『US Export Controls on Semiconductor Technology to China』——AMAT 10-K（amat_10_k_20251212，Risk Factors）：《Export controls enacted by the United States government that restrict the sale of certain technologies to customers in China》\n\n【判定】三段逐字講的是同一個政策現實（美國政府限制半導體技術／設備出口至中國）；三者 abstraction_level 同為 end_demand，且各自只有一條 depends_on 邊（②③都指向 co:applied_materials、①指向 co:lam_research）。三個 name 各不相同，因此 basis 必須是 semantic_reviewed，**必須帶 approval_receipt 指向本編號**（identity/entities.py 的強制）。\n\n【canonical 選法是機械的】同組取最短 id：tech:us_export_controls（23 字元）< tech:export_controls_china（26）< tech:export_controls_us_china（29）。任何人重跑得到同一個。⚠ 副作用：canonical 的 name 是三者中最不精確的一個（漏了 China），核准時可一併指定改用②或③的 name。\n\n【exact action】(a) config/entity_aliases.json 新增 canonical tech:us_export_controls，aliases=[tech:export_controls_china, tech:export_controls_us_china]，basis=semantic_reviewed，approval_receipt=todo:<本編號>；(b) 存量 migration：兩個 alias 節點的邊與 source_ids 搬到 canonical 後刪除節點（做法同 [506]）。\n\n【影響面（已實測）】coverage 的 ⚪ 概念節點桶 3 → 1；**不影響可投資排序**——三者都是概念節點，rank_bottlenecks 不讀它們。重複節點候選由 34 對降為 31 對。\n\n【為什麼是這一對先】30 對候選裡多數的正確結論是『不併』（10 對是 tech:cpo 這個 hub 的變體、2 對是「產品 vs 技術」），而『不併』今天沒有地方可寫（見 ROADMAP 同日新增的 backlog）。這一組是少數結論為『併』、且風險最低（概念節點、不動排序）的。",
+      "n": 611,
+      "reason": null,
+      "ref_id": "config/entity_aliases.json",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "三個美中出口管制節點指的是同一件事：合併為 tech:us_export_controls（V3 偵測器的第一批產出）",
+      "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T15:04:07.704574+00:00",
+      "hint": "重讀 tech:cw_dfb_laser 結構讀圖時用 --quotes 撞到（2026-09-18）；graph admission，**go 只授權翻轉這一條邊的方向，不含其餘 is_component_of 邊的重判、不含 thesis 變更**。\n\n【逐字（tier 2，Coherent CTO 於 OFC 的公開談話，doc coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17）】《The external laser source, which I'm sure you've all heard of, **that has our CW laser in it**》——ELS **裡面有** CW 雷射，所以正確方向是 tech:cw_dfb_laser is_component_of tech:external_laser_source。\n\n【圖上已有反方向那條，而且它的逐字更強】tech:cw_dfb_laser is_component_of tech:external_laser_source（tier 1，Coherent Q3 FY26 法說 Q&A）：《if you look at the external laser source, we can provide that module. But within that, almost all those key optical ingredients we have in-house as well, **not just the laser**, but the isolators》。**兩條方向相反的邊同時存在於圖上**，而正確的那條證據等級更高（tier 1 法說 vs tier 2 會議談話）。\n\n【與 [610] 完全同型】上一輪找到的 tech:external_laser_source is_component_of tech:isolator 方向相反，是同一個節點、同一個 relation、同一種錯。**這次是用新修好的工具在例行重讀時自己撞到的，不是繞過工具 grep extractions/ 找到的**——那正是 V1（逐字入圖）＋V2（--quotes）要達成的效果（L18-4）。\n\n【exact action】把該 EdgeAssertion 的 src_id／dst_id 對調（或刪除該條，因為正確方向的邊已存在且證據更強——**兩個選項請擇一**）。⚠ 影響面：tech:cw_dfb_laser 的『下一層』角度由 4 條變 3 條；該節點的結構讀圖（sr_a6762186c7e8eb23 系列）會再次 stale。\n\n【順帶記一筆不鑄號的觀察】同一個角度裡 mat:inp_substrate is_component_of tech:cw_dfb_laser 的兩段逐字講的是 InP 產能與六吋線出貨（《InP wafer fab capacity remains at a premium and is fully allocated》），**沒有一段說『InP 基板是 CW DFB 雷射的元件』**。那個關係在物理上正確，但它的逐字不支持它——屬 L18 的『label 碰巧對』型，不影響判讀，故不鑄號，只記在同日的結構讀圖裡。",
+      "n": 612,
+      "reason": null,
+      "ref_id": "graph://edge/tech:external_laser_source/is_component_of/tech:cw_dfb_laser",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "manual",
+      "title": "tech:external_laser_source is_component_of tech:cw_dfb_laser 方向相反——逐字說的是 ELS 裡面有 CW 雷射",
+      "type": "manual"
     }
   ],
   "log": [
@@ -22200,6 +22224,6 @@
       "verb": "go"
     }
   ],
-  "next_n": 611,
+  "next_n": 613,
   "schema_version": "1"
 }

@@ -61,9 +61,10 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from identity.registry import get_registry  # noqa: E402
 from query.bottleneck import (  # noqa: E402
     DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
-    collapse_assertions, demand_chain, fetch_assertions,
+    classify_evidence, collapse_assertions, demand_chain, fetch_assertions,
 )
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
@@ -341,7 +342,21 @@ def _load_edges() -> list[CanonicalEdge]:
         driver.close()
     # ⚠ 共用 `collapse_assertions`，不自己收斂——否則結構讀圖與排序會對同一條邊
     # 給出不同的值，而那是 L16 說的「每個消費端重造一份，重造品立刻開始偏離」。
-    return list(collapse_assertions(rows).values())
+    edges = list(collapse_assertions(rows).values())
+    # ⚠ **上面那句註解說的事情，先前正發生在 `evidence` 這一欄上**（2026-09-18 實測）：
+    # `CanonicalEdge.evidence` 的 `"self_reported"` 是 **dataclass 預設值**，而賦值只寫在
+    # `rank_bottlenecks()` 裡——本模組不經過它，於是這張表的「證據」欄在**全圖每一條邊**
+    # 上都印「供應商自報」。實測 526 條 canonical 邊裡 **430 條（81.7%）被印錯**，
+    # 真實分布是外部印證 217（41.3%）／待判定 108／自報·filing 105／供應商自報 96。
+    # 後果不是欄位難看：讀五個角度判 A（護城河）還是 B（量）的人，看到的是「所有證據都是
+    # 供應商自報」——**預設值偽裝成觀測**，而且「還沒算」與「算出來就是自報」同形（L12）。
+    # 修法是**去用既有的唯一 owner**，不是在這裡重造一套判定（L16）。
+    registry = get_registry()
+    for edge in edges:
+        edge.evidence = classify_evidence(
+            edge.src, edge.origins, registry, filing_origins=edge.filing_origins
+        )
+    return edges
 
 
 def main(argv: list[str] | None = None) -> int:

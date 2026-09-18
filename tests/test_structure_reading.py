@@ -146,6 +146,25 @@ def test_constrained_by_answers_demand_side_and_next_layer_not_only_counter_path
     ]
 
 
+def test_evidence_column_is_computed_not_a_dataclass_default() -> None:
+    """證據欄必須真的算過——**預設值偽裝成觀測**是這一欄先前的實況（2026-09-18 實測）。
+
+    `CanonicalEdge.evidence` 的 `"self_reported"` 是 dataclass 預設值，而賦值只寫在
+    `rank_bottlenecks()` 裡；本模組不經過它，於是這張表的「證據」欄在**全圖每一條邊**上
+    都印「供應商自報」——526 條 canonical 邊裡 **430 條（81.7%）印錯**，真實分布是
+    外部印證 217（41.3%）／待判定 108／自報·filing 105／供應商自報 96。
+
+    讀五個角度判 A 還是 B 的人會以為所有證據都是自報，而「還沒算」與「算出來就是自報」
+    在畫面上完全同形（L12）。這條測試守的是：修法是**去用既有的唯一 owner**
+    （`classify_evidence`），不是在這裡重造一套判定（L16）。
+    """
+    source = (ROOT / "query" / "structure.py").read_text(encoding="utf-8")
+    assert "classify_evidence" in source, "證據欄必須走排序那邊的唯一 owner"
+    # 不得自己重造判定：這些是 classify_evidence 內部的字彙，出現在這裡就代表抄了第二份
+    for token in ("externally_corroborated", "counterparty_joint", "EVIDENCE_RANK"):
+        assert token not in source, f"不得在本模組重造證據判定（{token}）"
+
+
 def test_shares_collapse_assertions_with_the_ranking() -> None:
     """**不自己收斂**：兩邊對同一條邊必須給同一個值，否則消費端會各自偏離（L16）。"""
     source = (ROOT / "query" / "structure.py").read_text(encoding="utf-8")
