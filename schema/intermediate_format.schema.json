@@ -282,6 +282,7 @@
             "enum": [
               "supplies_to",
               "is_component_of",
+              "is_variant_of",
               "develops",
               "deploys",
               "offered_under",
