@@ -10259,7 +10259,7 @@
     },
     {
       "added_at": "2026-09-18T05:08:38.576835+00:00",
-      "hint": "2026-09-18 量到的：accepted 37 列中有 6 條邊的**瓶頸節點**（dst）走不到任何需求錨——tech:isolator、tech:eml、tech:ocs、tech:inp_eml、prod:ph18da、co:lumilens。圖裡只有「誰供應它」，沒有「誰需要它」。與 ROADMAP Phase 4 成因③（tech:photodiode）同一個形狀，只是從邊的另一端數出來的。⚠ 這不影響今天的排序（demand_anchor 是從公司側走的，那 6 列照樣有錨），所以它不會自己變紅——這也是為什麼要鑄號。研究動作：對每個節點找一手文件回答「誰在買它、為了做什麼」，能回答的補一條需求方邊（enables／is_component_of／depends_on，方向見 query/bottleneck.py 的 DEPENDENCY_RELATIONS 註解）；回答不了的就記下來，那本身是結論。filtered 185 列另有 83 條同樣情形，先做 accepted 這 6 個。查證：.pytest_tmp 的量測法＝對每條 accepted 邊比較 demand_chain(edge.src) 與 demand_chain(edge.dst)",
+      "hint": "2026-09-18 量到的：accepted 37 列中有 6 條邊的**瓶頸節點**（dst）走不到任何需求錨——tech:isolator、tech:eml、tech:ocs、tech:inp_eml、prod:ph18da、co:lumilens。圖裡只有「誰供應它」，沒有「誰需要它」。與 ROADMAP Phase 4 成因③（tech:photodiode）同一個形狀，只是從邊的另一端數出來的。⚠ 這不影響今天的排序（demand_anchor 是從公司側走的，那 6 列照樣有錨），所以它不會自己變紅——這也是為什麼要鑄號。研究動作：對每個節點找一手文件回答「誰在買它、為了做什麼」，答得出來的整成 prepared RA（需求方邊：enables／is_component_of／depends_on，方向見 query/bottleneck.py 的 DEPENDENCY_RELATIONS 註解）；答不出來的就記下來，那本身是結論。⚠ **本號的 go 只授權「找文件＋整成 packet」，不含入圖**——每一條邊要進圖仍需各自的 ra_admission 編號（AGENTS：研究 go 不含入圖）。filtered 185 列另有 83 條同樣情形，先做 accepted 這 6 個。查證：.pytest_tmp 的量測法＝對每條 accepted 邊比較 demand_chain(edge.src) 與 demand_chain(edge.dst)",
       "n": 606,
       "reason": null,
       "ref_id": "docs/ROADMAP.md#phase-4-成因③",
