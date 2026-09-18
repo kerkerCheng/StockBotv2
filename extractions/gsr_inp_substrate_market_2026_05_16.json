@@ -17,14 +17,14 @@
     {
       "confidence": 0.5,
       "demand_proof_level": "inferred",
-      "disproof_condition": "Any of the three announces and executes a material capacity expansion, or demand falls enough that utilization drops.",
+      "disproof_condition": "TRIGGERED 2026-06-16 (recorded 2026-09-18, pq2 [603]) — JX announced a material capacity expansion (JPY 120bn / 7-10x FY2025 capacity), which is exactly the first limb of this condition. Action within 48h of this marking: treat this claim as a historical dated observation only; any current-state statement about InP supply tightness must be re-derived from the three suppliers' own latest disclosures, not from this row. Re-check frequency:每季，或任一供應商再發布產能公告時。 Remaining open limb (announce → **execute**): the announced capacity lands 2026-2028, so the question is no longer whether supply expands but when it arrives — re-check at each of the three suppliers' quarterly reports.",
       "id": "gsr_inp_substrate_market_2026_05_16_cl2",
       "source_ids": [
         "gsr_inp_substrate_market_2026_05_16_s5",
         "gsr_inp_substrate_market_2026_05_16_s6",
         "gsr_inp_substrate_market_2026_05_16_s7"
       ],
-      "statement": "Dated observation (as of 2026-05-16): all three InP substrate suppliers are effectively capacity-constrained — AXT near full utilization (~25-26k wafers/month), Sumitomo largely saturated, JX with no announced expansion plans — so incremental InP demand has no slack supply to absorb it.",
+      "statement": "Dated observation (as of 2026-05-16): all three InP substrate suppliers are effectively capacity-constrained — AXT near full utilization (~25-26k wafers/month), Sumitomo largely saturated, JX with no announced expansion plans — so incremental InP demand has no slack supply to absorb it. ⚠ DISPROOF TRIGGERED — marked 2026-09-18 (pq2 [603]). This observation's own disproof condition ('any of the three announces and executes a material capacity expansion') fired **one month after the as-of date**: JX Advanced Metals decided on 2026-06-16 to invest up to JPY 120 billion over four years and to raise InP substrate capacity to 7-10x its FY2025 level (issuer press release, already in this graph as `jx_metals_inp_capacity_pr_2026_06_16`, tier 2). The clause 'JX with no announced expansion plans' is therefore **false as of 2026-06-16 onward**. The as-of sentence is left verbatim because it was true on 2026-05-16 and its source quote says exactly that — but it **must not be cited as the current state of supply**, which is what happened in a 2026-09-17 structural reading. AXT and Sumitomo expansion commitments are recorded elsewhere and are not restated here; re-check them before citing this claim at all.",
       "subject_id": "mat:inp_substrate"
     }
   ],
@@ -213,7 +213,7 @@
     "retrieved_at": "2026-07-17",
     "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
-    "supersedes_extraction_sha256": "6e82915e7008145c4ef420a7eaa9740c6bc5bd7cb4470681f1ec0ce1e8491474",
+    "supersedes_extraction_sha256": "856e82be36b73777595ad8d681cd1d758042c7d5fe2cec3d397de2744b8d2fb6",
     "title": "Global Semi Research: China's Indium Phosphide Surge — InP substrate market structure",
     "url": "https://globalsemiresearch.substack.com/p/chinas-indium-phosphide-surge"
   },
