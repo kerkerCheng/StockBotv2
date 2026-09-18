@@ -10223,9 +10223,10 @@
       "hint": "2026-09-17 於 [602] 入圖時撞到。圖裡的 claim gsr_inp_substrate_market_2026_05_16_cl2 是一條 **dated observation（as of 2026-05-16）**，逐字寫著三家 InP 基板供應商都受限、其中『JX with no announced expansion plans』——而 JX Advanced Metals 已於 2026-06-16 宣布四年最多 1,200 億日圓、產能拉到 FY2025 的 7-10 倍，官方新聞稿 jx_metals_inp_capacity_pr_2026_06_16 **早就入圖**（3 條 confirmed claim，conf 0.8/0.8/0.75）。⚠ 也就是說圖裡同時存在互相矛盾的兩組 claim，而 dated observation 那一條寫下六週後就過期、至今仍活著。2026-09-17 的 mat:inp_substrate 讀圖就是引用了過期那一條。go＝核准把 cl2 的措辭更正為只保留 as-of 2026-05-16 仍成立的部分（AXT 近滿載、住友飽和），並移除或明確標記『JX 無擴產計畫』那一句；不含提高任何 evidence tier、不含新增邊、不含改 substitutability、不含 live。⚠ 執行時會撞到 ROADMAP 已記的『intake 沒有更正既有 extraction 的路徑』——本輪 [602] 走的是 supersede 走廊（supersedes_extraction_sha256），同一條走廊可用。drop＝你認為 dated observation 本來就該留著當歷史、由讀的人自己看日期。",
       "n": 603,
       "reason": null,
+      "receipt": "authority:graph_admission;ref:ra_3bd5cd06d552b34c44ce422ac00b8903｜digest cfd60596…｜commit 19af823｜gsr cl2 的 statement 與 disproof_condition 已更正（走 supersede 走廊，as-of 那句逐字保留）。⚠ 實測發現比提案更嚴重：cl2 的 disproof_condition 逐字寫著『Any of the three announces and executes a material capacity expansion』——那正是 2026-06-16 JX 做的事，**條件成立了三個月而沒有任何東西響過**（L7：不會響的火警）。confidence／demand_proof_level／evidence_tier 皆未動，不新增任何邊或 claim。⚠ 機制性原因（disproof_condition 是純文字欄位、沒有東西在定期比對它與圖中新證據）是開發項，已寫進 ROADMAP。",
       "ref_id": "gsr_inp_substrate_market_2026_05_16_cl2",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-18T00:14:31.111291+00:00",
       "source": "manual",
       "title": "更正圖中已過期的 dated observation：gsr cl2 逐字寫『JX with no announced expansion plans』，而 JX 已於 2026-06-16 宣布擴產",
       "type": "manual"
@@ -22078,6 +22079,15 @@
       "ref_id": "dc_c31a4e9a5ccc17c5f6cd4930ad85bd37",
       "type": "decision_review",
       "verb": "standing_go"
+    },
+    {
+      "at": "2026-09-18T00:14:31.111291+00:00",
+      "n": 603,
+      "reason": null,
+      "receipt": "authority:graph_admission;ref:ra_3bd5cd06d552b34c44ce422ac00b8903｜digest cfd60596…｜commit 19af823｜gsr cl2 的 statement 與 disproof_condition 已更正（走 supersede 走廊，as-of 那句逐字保留）。⚠ 實測發現比提案更嚴重：cl2 的 disproof_condition 逐字寫著『Any of the three announces and executes a material capacity expansion』——那正是 2026-06-16 JX 做的事，**條件成立了三個月而沒有任何東西響過**（L7：不會響的火警）。confidence／demand_proof_level／evidence_tier 皆未動，不新增任何邊或 claim。⚠ 機制性原因（disproof_condition 是純文字欄位、沒有東西在定期比對它與圖中新證據）是開發項，已寫進 ROADMAP。",
+      "ref_id": "gsr_inp_substrate_market_2026_05_16_cl2",
+      "type": "manual",
+      "verb": "go"
     }
   ],
   "next_n": 606,
