@@ -228,7 +228,8 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         reasons.append("bet_abstained" if abstained else "no_bet")
     elif payoff_value <= 0:
         reasons.append("payoff_not_positive")
-    catalyst_reason = _catalyst_reason(ripeness, _cell_value(ov.get("catalyst_shape")), value_date)
+    catalyst_shape = _cell_value(ov.get("catalyst_shape"))
+    catalyst_reason = _catalyst_reason(ripeness, catalyst_shape, value_date)
     if catalyst_reason is not None:
         reasons.append(catalyst_reason)
     base_closure = (closure.get("base") or {}) if isinstance(closure, Mapping) else {}
@@ -254,6 +255,9 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         "bet_state": bet_state,
         "bet_absence_reason": (payoff.get("reason") if payoff_value is None else None),
         "ripeness": (ripeness or {}).get("counts") if isinstance(ripeness, Mapping) else None,
+        # 催化劑那一格的形狀（七缺陷之 1）：跟著列走，否則 APP 只看得到理由字串、
+        # 看不到「幾條、幾條有日期、最早那條是哪天」——而那正是決定要不要去補的資訊。
+        "catalyst_shape": catalyst_shape,
         "consensus_moved": base_closure.get("closed_fraction") if isinstance(base_closure, Mapping) else None,
         "consensus_points": base_closure.get("n_points") if isinstance(base_closure, Mapping) else None,
         "price_above_target": bool(reached.get("any_reached")) if isinstance(reached, Mapping) else None,
