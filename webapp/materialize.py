@@ -1251,7 +1251,25 @@ def materialize_basket(*, store: StateArtifactStore | None = None, analyst_store
     for ticker, payload, _fresh, _reason in (analyst_store or ArtifactStore()).read_all():
         if payload is not None:
             overviews[str(ticker)] = payload.get("overview") or {}
-    payload = build_basket_artifact(ranking=ranking, overviews=overviews, positions=positions, generated_at=generated_at)
+    # Phase 4a（2026-09-19）：D11 兩條機械條件的取數在這裡做，**不在純函式裡**。
+    # ⚠ 正規化要打 FX——materialize 一輪只跑一次，而且它**不是 request path**
+    # （APP 呈現契約禁的是 request path 抓外部）。取數失敗時 `screen` 留空，
+    # 那兩條就**完全不套**（不是當成通過）。
+    screen: dict[str, Any] = {}
+    thresholds: dict[str, Any] | None = None
+    try:
+        from alpha.providers.market_normalization import screen_inputs
+
+        config_path = Path(__file__).resolve().parents[1] / "config" / "alpha_screen.json"
+        thresholds = json.loads(config_path.read_text(encoding="utf-8"))
+        screen = dict(screen_inputs([str(r.get("ticker")) for r in (ranking.get("rows") or ())
+                                     if r.get("ticker")]))
+    except Exception as exc:  # noqa: BLE001 — 取數失敗只讓那兩條不套，不讓 basket 失敗
+        screen, thresholds = {}, None
+        print(f"  ⚠ D11 兩條未套用：{type(exc).__name__}: {str(exc)[:120]}")
+    payload = build_basket_artifact(ranking=ranking, overviews=overviews, positions=positions,
+                                    generated_at=generated_at, screen=screen,
+                                    screen_thresholds=thresholds)
     return target.write(payload), payload
 
 

@@ -50,6 +50,15 @@ FILTER_REASONS: Mapping[str, str] = {
     # 它問「一個可選欄位填了沒」，而不是「這個賭注有沒有裁決點」（L15-1）。
     # ⚠ **四個理由全部仍然 filtered**——拆開不是放寬（AGENTS.md 明文禁止為了非空放寬條件），
     # 拆開是為了讓「我們沒填」與「它真的不合格」不再長得一樣。
+    # D11 的兩條機械條件（Phase 4a，2026-09-19 使用者核准 amendment 後接進 filter）。
+    # ⚠ **這兩條不依賴估值儀器**——那正是 amendment 把 Phase 4 拆成 4a／4b 的理由：
+    # 六條裡只有「payoff 為正」需要算得出 payoff，而實測 D11 通過的 5 檔有 4 檔算不出。
+    # ⚠ 缺值**各自成一類**，不併進「超標」也不靜默放行（INV-3）：
+    # 「它太大」與「我們不知道它多大」是兩個結論。
+    "market_cap_above_max": "市值高於上限（**正規化為 USD 後**比較；未正規化會差到 100 倍）",
+    "analyst_count_above_max": "賣方覆蓋家數高於上限——覆蓋厚的不是邊緣小公司",
+    "market_cap_unknown": "市值取不到或無法正規化——**不得靜默放行，也不得靜默擋掉**",
+    "analyst_count_unknown": "覆蓋家數取不到",
     "catalyst_missing_resolves": ("催化劑有日期、也落在目標價日期之前，**只差沒填 `resolves`**"
                                   "（指不出它會裁決哪一條假設）——這是我們的待辦，不是標的的缺點"),
     "catalyst_undated": "有催化劑散文但**沒有日期**——排不進射程，也無從判斷是否來得及",
@@ -208,8 +217,34 @@ def _bet_state(payoff_value: float | None, *, abstained: bool, stance: Any) -> s
     return "unanswered"
 
 
+def _screen_reasons(entry: Mapping[str, Any] | None, thresholds: Mapping[str, Any] | None) -> list[str]:
+    """D11 兩條機械條件 → filter 理由（Phase 4a）。**沒有 screen 就一條都不套。**
+
+    ⚠ 「沒傳 screen」與「screen 說它超標」是兩件事：前者代表這一輪沒有量這兩條，
+    後者代表量過而且不合格。把前者當成通過會讓一次取數失敗靜默放行整個籃子（INV-3）。
+    """
+    if entry is None or not thresholds:
+        return []
+    reasons: list[str] = []
+    cap = entry.get("market_cap_usd")
+    cap_max = thresholds.get("market_cap_max_usd")
+    if cap is None:
+        reasons.append("market_cap_unknown")
+    elif cap_max is not None and float(cap) > float(cap_max):
+        reasons.append("market_cap_above_max")
+    count = entry.get("analyst_count")
+    count_max = thresholds.get("analyst_count_max")
+    if count is None:
+        reasons.append("analyst_count_unknown")
+    elif count_max is not None and int(count) > int(count_max):
+        reasons.append("analyst_count_above_max")
+    return reasons
+
+
 def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | None,
-                     live: Mapping[str, Any] | None, *, sector: str | None) -> dict[str, Any]:
+                     live: Mapping[str, Any] | None, *, sector: str | None,
+                     screen: Mapping[str, Any] | None = None,
+                     screen_thresholds: Mapping[str, Any] | None = None) -> dict[str, Any]:
     ov = overview or {}
     payoff = ov.get("payoff") or {}
     ripeness = _cell_value(ov.get("ripeness"))
@@ -232,6 +267,7 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
     catalyst_reason = _catalyst_reason(ripeness, catalyst_shape, value_date)
     if catalyst_reason is not None:
         reasons.append(catalyst_reason)
+    reasons.extend(_screen_reasons(screen, screen_thresholds))
     base_closure = (closure.get("base") or {}) if isinstance(closure, Mapping) else {}
     return {
         "rank": rank_row.get("rank"),
@@ -258,6 +294,11 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         # 催化劑那一格的形狀（七缺陷之 1）：跟著列走，否則 APP 只看得到理由字串、
         # 看不到「幾條、幾條有日期、最早那條是哪天」——而那正是決定要不要去補的資訊。
         "catalyst_shape": catalyst_shape,
+        # D11 兩條（Phase 4a）：**值跟著列走**，否則 APP 只看得到「超標」三個字，
+        # 看不到它多大、覆蓋幾家——而那正是判斷要不要重看門檻的資訊。
+        "market_cap_usd": (screen or {}).get("market_cap_usd"),
+        "market_cap_absence": (screen or {}).get("market_cap_absence"),
+        "analyst_count": (screen or {}).get("analyst_count"),
         "consensus_moved": base_closure.get("closed_fraction") if isinstance(base_closure, Mapping) else None,
         "consensus_points": base_closure.get("n_points") if isinstance(base_closure, Mapping) else None,
         "price_above_target": bool(reached.get("any_reached")) if isinstance(reached, Mapping) else None,
@@ -317,8 +358,16 @@ def build_volume_row(filtered_row: Mapping[str, Any], overview: Mapping[str, Any
 
 
 def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str, Mapping[str, Any]],
-                          positions: Mapping[str, Any] | None, generated_at: datetime | None = None) -> dict[str, Any]:
-    """三份 artifact → `basket` state artifact。**純函式**：不重排、不加權、不算任何新數。"""
+                          positions: Mapping[str, Any] | None, generated_at: datetime | None = None,
+                          screen: Mapping[str, Mapping[str, Any]] | None = None,
+                          screen_thresholds: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """三份 artifact → `basket` state artifact。**純函式**：不重排、不加權、不算任何新數。
+
+    `screen`（Phase 4a，2026-09-19）＝每檔的市值（**已正規化為 USD**）與覆蓋家數，
+    由呼叫端取好傳入。⚠ **刻意不在這裡取數**：正規化要打 FX，而本函式是純函式、
+    也是 `tests/test_webapp_basket.py` 用假資料驗的那一支。
+    沒傳就**完全不套這兩條**（不是「當成通過」）——判定與取數分開，一如 overviews／positions。
+    """
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     sector_of = _sector_by_rank(ranking)
     live_by_ticker = {str(r.get("ticker")): r for r in ((positions or {}).get("live") or {}).get("rows") or ()
@@ -331,7 +380,9 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
             continue                                    # 同一檔只留最前名次；順序＝排序權威的順序
         seen.add(str(ticker))
         rows.append(build_basket_row(rank_row, overviews.get(str(ticker)), live_by_ticker.get(str(ticker)),
-                                     sector=sector_of.get(int(rank_row.get("rank") or 0))))
+                                     sector=sector_of.get(int(rank_row.get("rank") or 0)),
+                                     screen=(screen or {}).get(str(ticker)),
+                                     screen_thresholds=screen_thresholds))
     # 第二個宇宙（Q1）：被門檻擋下、但**已研究過**的那些（`below_threshold`）。
     # `unfilled` 刻意不進來——那是研究缺口不是候選，它的去處是 pq1（zoom-out §7 Q1-A）。
     moat_tickers = {str(r["ticker"]) for r in rows if r.get("ticker")}
