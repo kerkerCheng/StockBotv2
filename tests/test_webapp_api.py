@@ -413,7 +413,11 @@ def test_list_is_grouped_but_the_order_inside_a_group_is_untouched(client) -> No
     但組內順序必須一個字都沒動，否則它就變成第二套投資排序了。
     """
     body = client.get("/api/v1/stocks").json()
-    assert [g["key"] for g in body["groups"]] == ["ready", "settled", "not_started"]
+    # ⚠ `awaiting_report`（2026-09-19 補的第三種終局）排在 `not_started` **之前**：
+    # 它已經是終局（目標期間結束、財報未出，會自己解開），不是待辦。
+    # 先前它被歸進「還沒做」，而兩者的下一步完全相反（L12）。
+    assert [g["key"] for g in body["groups"]] == [
+        "ready", "settled", "awaiting_report", "not_started"]
     for group in body["groups"]:
         tickers = [r["ticker"] for r in body["stocks"] if r["group"] == group["key"]]
         assert tickers == sorted(tickers), f"{group['key']} 組內順序被動過了"

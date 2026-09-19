@@ -119,14 +119,25 @@ async def meta(request: Request) -> Response:
 _GROUP_LABELS: dict[str, str] = {
     "ready": "已有判讀",
     "settled": "刻意不主張",
+    # 第三種終局（2026-09-19）。⚠ 它**不是待辦**：目標期間已結束、財報還沒公布，
+    # 這段期間沒有人推進得了它，而財報一出它自己就解開（出口寫在判定本身裡）。
+    # 先前它被歸進「還沒做」——兩者的下一步完全相反，而使用者會照著標籤去排工作（L12）。
+    "awaiting_report": "等財報公布（會自己解開）",
     "not_started": "還沒做",
 }
 _GROUP_ORDER: dict[str, int] = {k: i for i, k in enumerate(_GROUP_LABELS)}
 
 
 def _group_of(row: Mapping[str, Any]) -> str:
+    """⚠ 認得的終局種類必須與 `alpha.closure.BacklogRow.terminal` 一致。
+
+    2026-09-19 實測代價：這裡先前只認 `ready`／`settled`，於是 `awaiting_report` 的
+    4 檔（6594.T／ENA.V／JBL／MU）在 APP 被標成「還沒做」，而同一批資料在
+    `python -m webapp status` 印著「等財報公布（會自己解開）4 檔」——
+    **同一個分類、兩條路徑、兩個答案**。
+    """
     terminal = row.get("closure_terminal")
-    return str(terminal) if terminal in ("ready", "settled") else "not_started"
+    return str(terminal) if terminal in ("ready", "settled", "awaiting_report") else "not_started"
 
 
 def _opinion_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:

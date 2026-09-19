@@ -10,9 +10,13 @@
 
 ## 每日操作
 
-**2026-09-17（Phase 2 Step 2.2／D12）起，Daily 是三條獨立的路，不是一條。**
+**2026-09-17（Phase 2 Step 2.2／D12）起，Daily 是三條獨立的路，不是一條**（2026-09-19 前面再加一條零 LLM 的 FX 同步）。
 
 ```
+⓪ FX     Windows 工作排程 StockBotv2-FxSync（每日 06:55，零 LLM）
+           → scripts/sync_fx_observations.py（只寫 `fx_rate` 這一個 mechanical 欄位）
+           **不經 Codex**，理由同心跳；排在心跳之前，所以心跳當天讀得到最新狀態
+
 ① 心跳   Windows 工作排程 StockBotv2-Heartbeat（每日 07:00，零 LLM、零網路）
            → crons/heartbeat_task.py → crons/heartbeat.py --out → publish_daily_brief.py
            **不經 Codex**：Codex 沒起來、LLM 壞掉、sandbox 擋住，心跳照發
@@ -32,8 +36,9 @@ harvest → Engine C financial／beta technical ETL → 單一 shared-cash-pool 
 priority pq1 best-effort drain → prepared RA／today／lifecycle todo sync → brief~~
 （2026-09-17 拆成上面三條；研究段移出，排程時間 06:30 → 05:30 的更正見 `config/daily_routine.json`。）
 
-查證（三條都要對得上）：
+查證（四條都要對得上）：
 ```powershell
+schtasks /Query /TN StockBotv2-FxSync /FO LIST /V         # Status=Ready、Next Run Time=明天 06:55
 schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V      # Status=Ready、Next Run Time=明天 07:00
 & '.venv\Scripts\python.exe' -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"   # 0
 Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'prefix_rule\(' | Measure-Object | % Count   # 15
@@ -964,6 +969,41 @@ account 憑證，屬 credential-bearing surface。
 `tests/test_codex_daily_permissions.py::test_fetchers_directory_is_not_broadly_allowed`
 會擋下把整個目錄、任一支或 `-m fetchers` 放行的寫法。要放行其中任何一支都必須另做一次
 impact review。
+
+### FX 觀測同步（2026-09-19 完成 sandbox impact review）
+
+`scripts\sync_fx_observations.py` 由**獨立 Windows 排程** `StockBotv2-FxSync` 每日 06:55 觸發
+（排在心跳 07:00 之前，所以心跳當天讀得到最新狀態）。
+
+**它要消掉的失敗模式：** 消費端只接受與現價 `bar_date` 相差 ±3 天內的匯率觀測
+（`alpha/fx.py::FX_AS_OF_TOLERANCE_DAYS`），而 2026-09-13 手抄的四筆每一筆的 `_note` 自己就寫著
+「現價 bar_date 換了就要補新的一筆」——**沒有任何東西在補它**。實測 2026-09-19：過期 8 天，
+6680.HK／HEXA-B.ST／XFAB.PA／XPEV 四檔的隱含報酬全部算不出來，而**它不會壞、不會報錯、測試不會紅**。
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 網路只連 yfinance（`{base}{quote}=X` 日線），**與現價同一個 provider**——匯率用不同來源會讓「fair value 與現價是不是同一把尺」多一個無從核對的差。寫 Engine C SQLite 的 `manual_observations`（ignored private runtime）。不碰 `.git`、不碰 tracked 檔、不碰 Google Sheet、不連 Neo4j。 |
+| **2 skill／prompt／本檔** | 本節；心跳段 1 已有常駐的 FX 新鮮度那一行（容忍窗 import `alpha.fx` 的 SSOT，不重寫那個 3）。 |
+| **3 最窄 rule** | **不需要**——它跑在獨立 Windows 排程裡，不經 Codex，與心跳同一個理由（Codex 沒起來時它照跑）。`tests/test_fx_sync.py` 鎖「rules 的 `pattern=[...]` 不得出現 `sync_fx_observations`」。 |
+| **4 permission contract test** | `tests/test_fx_sync.py` 5 條：registry 閘門會擋｜沒有任何 CLI 旗標換得掉欄位／作者／標的｜幣別對從 ledger 導出（**測行為不掃原始碼字串**）｜不在 Codex rules｜每一組都落在 written／skipped／failed（INV-3）。 |
+| **5 端到端 smoke** | `schtasks /Run /TN StockBotv2-FxSync` 走真正的排程路徑實跑，`Last Result 0`；四筆寫入後四檔 readiness `blocked → ready`。 |
+
+**⚠ 這支能進無人值守的唯一理由是它只寫得了一個欄位，而那道閘門在腳本裡。**
+`fx_rate` 在 `engine_c/observation_fields.py` 是 `verifiability='mechanical'`，依 2026-09-04 定案
+**不需要 pq2**；但「只寫 mechanical」不能靠 `FIELD` 這個常數沒被改過——腳本啟動時查 registry，
+非 mechanical 或 `requires_user_approval` 一律 `exit 3`，**沒有任何 CLI 參數可以換掉欄位**。
+放行與收緊必須同時發生（L15）。
+
+**⚠ 幣別對從既有觀測導出，不手寫清單**（L16）：今天資料支持的就是已經有人建立過的那幾組。
+**新標的的第一筆仍然是人工**——那時心跳段 1 會說「FX 觀測 N 檔」而那一檔不在裡面。
+刻意不去猜「哪些標的可能需要匯率」（那要跑整條 view，而且會猜錯）。
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\sync_fx_observations.py --dry-run   # 只印會寫什麼
+& '.venv\Scripts\python.exe' scripts\sync_fx_observations.py             # 同步
+schtasks /Query /TN StockBotv2-FxSync /FO LIST /V                          # Status=Ready、Last Result=0
+```
+
 
 ### 台股月營收與重大訊息（Phase 6 / D15，2026-09-17 完成 sandbox impact review）
 

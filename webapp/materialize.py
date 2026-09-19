@@ -179,16 +179,35 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         "primary_attention": primary,
         "accounting_basis": (headline.get("context") or {}).get("accounting_basis"),
         "period": (headline.get("context") or {}).get("period"),
+        # 目標期末（2026-09-19）。`period` 那個標籤（"FY2026"）**承載不了它**：
+        # 6594.T 與 6268.T 同樣是 FY2026，會計年度結束日卻差三個月——而「財報空窗」
+        # 判的正是那一天。先前 `closure_terminal` 因此結構上回不出第三種終局。
+        "period_end": (headline.get("context") or {}).get("period_end"),
         "refresh_overall": view["refresh"]["overall"],
         # 我們有沒有形成自己的觀點。**照抄 fundamental panel 的宣告**，這裡不重算、不推論。
         # 它與 readiness 正交：一份 ready 的判讀完全可以是 `consensus_inverted`（每一格都有
         # 數字，而每個數字都是共識反解出來的）——列表頁必須分得出這兩件事。
         "opinion_stance": _cell(_line_map(view.get("fundamental") or {}).get("opinion_stance")),
-        # 這一檔到終局了沒（ready／settled／None）。**照抄 `alpha.closure` 的判定**——
-        # 它已經是這個分類的 SSOT（drain 選題與 `webapp status` 都消費它），
-        # 在 APP 端再寫一份「什麼叫做完」的規則就是 L16 記過的重造品。
-        "closure_terminal": row_from_artifact(str(view["ticker"]), view).terminal,
+        # 這一檔到終局了沒（ready／settled／**awaiting_report**／None）。
+        # **照抄 `alpha.closure` 的判定**——它已經是這個分類的 SSOT（drain 選題與
+        # `webapp status` 都消費它），在 APP 端再寫一份「什麼叫做完」的規則就是 L16 記過的重造品。
+        # ⚠ **`today` 必須傳**：不傳就回不出第三種終局，而「等財報（會自己解開）」會被
+        # 下游歸進「還沒做」——兩者的下一步完全相反。PIT 模式下用 artifact 自己的 as_of，
+        # 不用牆上的今天（INV-6）。
+        "closure_terminal": row_from_artifact(
+            str(view["ticker"]), view,
+            today=(_as_date(view.get("as_of")) or date.today())).terminal,
     }
+
+
+def _as_date(value: Any) -> date | None:
+    """artifact 的 `as_of` 是 ISO 字串或 None（PIT 模式才有值）。解析不了就回 None。"""
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
 
 
 def _price_context(series: Sequence[Mapping[str, Any]]) -> dict[str, Any] | None:

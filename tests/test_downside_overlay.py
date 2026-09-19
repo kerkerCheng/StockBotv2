@@ -219,3 +219,48 @@ def test_downside_runs_the_same_bridge_and_lands_below_base() -> None:
         eps_comparison=down_model.comparisons.get("eps"))
     assert result.is_known
     assert result.price_return == pytest.approx(valuation.fair_value / PRICE.value - 1)
+
+
+def test_written_but_rejected_never_looks_like_not_yet_written() -> None:
+    """**「還沒寫」與「寫了但一條都沒生效」是相反的結論，不得共用一句話**（L12）。
+
+    事發 2026-09-19（[631] 寫 COHR 的 downside 時親身踩到）：那筆假設引用了
+    `graph://edge/co:sumitomo_electric/supplies_to/co:nvidia`——那條邊確實存在且
+    externally_corroborated，但**不在 COHR 的 ResearchContext 內**（context 以本檔為中心建），
+    於是整筆被判 `unresolved_evidence` 拒用。`downside` section 仍然 `status=available`、
+    數字逐位等於 base、`overrides` 空——**看起來就像「還沒寫」**。
+    被拒的理由 `selection.rejected` 一直都在，只是沒有人把它講出來（L16）。
+    """
+    from alpha.fundamental import build_fundamental_model
+    from tests.test_fundamental_model import CONSENSUS, TODAY, _actuals, _full_set
+    from tests.test_valuation_model import _index
+
+    def _model(records):
+        return build_fundamental_model(
+            company_id="co:coherent", ticker="COHR", as_of=None, today=TODAY, actuals=_actuals(),
+            actuals_reason=None, consensus=CONSENSUS, guidance=(), assumption_records=records,
+            evidence_index=_index(), scenario=DOWNSIDE_SCENARIO)
+
+    base = _full_set()
+
+    # (a) 真的沒寫 → 那句話要說「還沒寫」
+    nothing = _model(base)
+    assert nothing.overrides == ()
+    said_nothing = "｜".join(nothing.warnings)
+    assert "還沒寫" in said_nothing
+
+    # (b) 寫了，但引用一個不在 evidence_index 裡的 ref → **不得**說「還沒寫」
+    ghost = _downside(value=-0.06, refs=("graph://edge/co:ghost/supplies_to/co:nobody",))
+    rejected = _model([*base, ghost])
+    assert rejected.overrides == (), "前提：這一筆確實沒生效"
+    said_rejected = "｜".join(rejected.warnings)
+    # ⚠ 這裡**不能**斷言「還沒寫」這三個字不出現——文案本身含一句否定（「這不是『還沒寫』」），
+    # 用 `not in` 會把正確的訊息判成錯的。要驗的是**它下了哪個結論**，不是它有沒有提到那個詞。
+    assert "寫了而沒被採用" in said_rejected, said_rejected
+    assert "寫了而沒被採用" not in said_nothing, said_nothing
+    # 被拒的那一筆與它的理由都要講出來，否則寫的人無從知道是哪個字錯了
+    assert ghost.assumption_id in said_rejected, said_rejected
+    assert "unresolved_evidence" in said_rejected, said_rejected
+
+    # (c) 兩句話不得是同一句
+    assert said_nothing != said_rejected

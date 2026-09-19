@@ -163,8 +163,27 @@ def build_fundamental_model(
             assumption_records, scenario=scenario, target=target, as_of=as_of, today=today,
             evidence_index=index, parse_errors=parse_errors)
         if scenario != BASE_SCENARIO and not overrides:
-            warnings.append(f"scenario={scenario}：沒有任何生效的 {scenario} 假設覆蓋 base——"
-                            "這次執行與 base 完全相同（賭注的 EPS 側還沒寫）")
+            # ⚠ **「還沒寫」與「寫了但一條都沒生效」是兩個相反的結論，不得共用一句話**（L12）。
+            # 2026-09-19 實測代價：COHR 的 downside 引用了一條不在本檔 ResearchContext 內的邊
+            # （`co:sumitomo_electric` 的邊——context 以本檔為中心建），整筆被判 `unresolved_evidence`
+            # 而拒用；`downside` section 仍然 status=available、數字逐位等於 base、overrides 空，
+            # 於是它看起來就像「還沒寫」。**寫的人會以為自己沒寫，而實際上是引用錯了一個字。**
+            # 被拒的原因 `selection.rejected` 一直都在，只是沒有人把它講出來（L16）。
+            written = [r for r in assumption_records
+                       if str(getattr(r, "scenario", BASE_SCENARIO)) == scenario
+                       and not getattr(r, "retracted", False)
+                       and getattr(getattr(r, "period", None), "end", None) == target.end]
+            if written:
+                ids = {getattr(r, "assumption_id", None) for r in written}
+                why = "；".join(f"{i}（{reason}）" for i, reason in selection.rejected if i in ids)
+                warnings.append(
+                    f"scenario={scenario}：ledger 裡有 {len(written)} 條未撤回的 {scenario} 假設落在"
+                    f" {target.label}，但**沒有一條生效覆蓋 base**——這不是「還沒寫」，是寫了而沒被採用。"
+                    + (f"被拒原因：{why}" if why
+                       else "selection 沒有給出拒用理由——請對照 base 的 scope 是否一致（未命中 base 的 overlay 會被寫入端拒收）"))
+            else:
+                warnings.append(f"scenario={scenario}：沒有任何生效的 {scenario} 假設覆蓋 base——"
+                                f"這次執行與 base 完全相同（{target.label} 的 {scenario} 假設還沒寫）")
     else:
         accepted = ()
         selection = AssumptionSelection(

@@ -112,16 +112,60 @@ class BacklogRow:
 # 純函式：終局／排序／摘要
 # ---------------------------------------------------------------------------
 
-def row_from_artifact(ticker: str, payload: Mapping[str, Any]) -> BacklogRow:
-    """從一份 analyst view artifact 抄出工單列（不推論、不 parse 散文）。"""
+def target_period_end_in_artifact(payload: Mapping[str, Any]) -> str | None:
+    """artifact 自己帶的建模目標期末（ISO）；沒有就 `None`。**不推導、不 parse 散文**。
+
+    ⚠ **它與共識 `0y` 的期末是同一個數**，這是量出來的不是假設的：2026-09-19 對 73 檔
+    逐檔比對 `headline.context.period_end` 與 `_target_period_ends()`（共識 `0y`），
+    **73/73 相同、0 例外、兩邊都沒有的 0 檔**。兩者本來就同源
+    （`alpha/fundamental/model.py` 的 `target = actuals.period.shifted(1)`）。
+    """
+    # ⚠ **這個函式的兩個呼叫端餵進來的形狀不同**，而它必須兩種都認得：
+    #   `collect_backlog`  → 完整 artifact：`payload["view"]["headline"]`
+    #   `webapp.materialize._overview` → analyst view 本身：`payload["headline"]`
+    # 2026-09-19 第一版只認得前者，於是 materialize 寫進 `closure_terminal` 的仍然
+    # 回不出第三種終局——**而 `period_end` 那一格明明已經在 artifact 裡了**。
+    # 這正是 L17-1：機制只認得寫它的人當時手上那個案例，而且它不會壞、不會報錯。
+    nested = payload.get("view")
+    headline = (nested or {}).get("headline") if isinstance(nested, Mapping) else None
+    if not isinstance(headline, Mapping):
+        headline = payload.get("headline")
+    context = (headline or {}).get("context") if isinstance(headline, Mapping) else None
+    raw = (context or {}).get("period_end") if isinstance(context, Mapping) else None
+    return str(raw)[:10] if raw else None
+
+
+def row_from_artifact(ticker: str, payload: Mapping[str, Any], *,
+                      today: date | None = None) -> BacklogRow:
+    """從一份 analyst view artifact 抄出工單列（不推論、不 parse 散文）。
+
+    ⚠ **`today` 給了才判得出第三種終局**（`awaiting_report`）。不給就留 `None`——
+    那不是「未結束」，是「沒問過時鐘」，該檔會照舊算成未到終局（寧可多排一檔，INV-3）。
+
+    事發 2026-09-19：這個函式先前**結構上只可能回兩種終局**，因為它拿不到目標期末；
+    而 `webapp/materialize.py` 那一行的註解逐字寫著「ready／settled／None」
+    ——**把缺陷寫成了規格**。後果是 `webapp status` 說「等財報 4 檔（會自己解開）」，
+    而同一批資料在 APP 被 `_group_of` 歸進「還沒做」。同一個分類、兩條路徑、兩個答案（L16）。
+    修法不是讓 APP 自己算一份，是**把它缺的那一格送到它手上**——而那一格
+    （`headline.context.period_end`）artifact 裡本來就有。
+    """
     readiness = payload.get("readiness") or {}
     details = readiness.get("blocker_details") or []
     open_panels = tuple(str(d["panel"]) for d in details if not d.get("settled"))
     settled_panels = tuple(str(d["panel"]) for d in details if d.get("settled"))
     kinds = {str(d["panel"]): str(d.get("absence_kind") or "") for d in details}
+    awaiting: str | None = None
+    if today is not None:
+        end = target_period_end_in_artifact(payload)
+        if end:
+            try:
+                awaiting = end if date.fromisoformat(end) <= today else None
+            except ValueError:
+                awaiting = None
     return BacklogRow(
         ticker=ticker, readiness=str(readiness.get("state") or "blocked"),
         open_panels=open_panels, settled_panels=settled_panels, absence_kinds=kinds,
+        awaiting_report_since=awaiting,
         generated_at=str(payload.get("generated_at") or "") or None,
     )
 

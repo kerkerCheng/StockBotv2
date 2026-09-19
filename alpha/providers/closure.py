@@ -14,7 +14,6 @@ from alpha.closure import (
     _base_observation_tickers,
     _consensus_flags,
     _sector_and_rank,
-    _target_period_ends,
     deferred_tickers,
     row_from_artifact,
 )
@@ -32,7 +31,7 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         if payload is None:
             notes.append(f"{ticker} artifact 壞掉：{reason}")
             continue
-        rows.append(row_from_artifact(ticker, payload))
+        rows.append(row_from_artifact(ticker, payload, today=date.today()))
     if not rows:
         return [], notes + ["尚無 materialized analyst view（python -m webapp materialize --registry-listed）"]
 
@@ -55,14 +54,11 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         except Exception as exc:  # noqa: BLE001
             notes.append(f"Engine C 基期觀測讀不到：{type(exc).__name__}")
 
-    # 目標期間是不是已經結束（＝財報空窗）。**時鐘住這裡**，`alpha/closure.py` 保持純函式。
-    # 讀不到一律留 None——那會讓該檔照舊算成未到終局（寧可多排一檔，不把讀不到當終局，INV-3）。
-    target_ends: dict[str, str | None] = {}
-    if conn is not None:
-        try:
-            target_ends = _target_period_ends([r.ticker for r in rows], conn)
-        except Exception as exc:  # noqa: BLE001
-            notes.append(f"Engine C 目標期間讀不到，本輪不判「等財報」：{type(exc).__name__}")
+    # 目標期間是不是已經結束（＝財報空窗）**現在由 `row_from_artifact` 自己判**（2026-09-19）：
+    # artifact 的 `headline.context.period_end` 就是那一格，而它與共識 `0y` 的期末實測
+    # **73/73 相同、0 例外**。先前這裡另查一次 Engine C，等於同一個分類有兩份實作——
+    # 而 APP 端拿不到這一份，於是「等財報」在 APP 變成「還沒做」（L16）。
+    # ⚠ **時鐘仍然住在這一層**：`row_from_artifact` 只在收到 `today` 時才判，純函式不看時鐘。
 
     # 產業與名次：ranking state ＋ registry
     sector_rank: dict[str, tuple[str | None, int | None]] = {}
@@ -92,17 +88,10 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
     except Exception as exc:  # noqa: BLE001
         notes.append(f"pq2 待辦池讀不到，本輪不套「使用者已 defer」：{type(exc).__name__}")
 
-    today = date.today()
     enriched: list[BacklogRow] = []
     for r in rows:
         has_c, pos = flags.get(r.ticker, (None, None))
-        end = target_ends.get(r.ticker)
-        awaiting: str | None = None
-        if end:
-            try:
-                awaiting = end if date.fromisoformat(end) <= today else None
-            except ValueError:
-                awaiting = None
+        awaiting = r.awaiting_report_since      # 已由 row_from_artifact 判好，這裡只照抄
         sector, rank = sector_rank.get(r.ticker.upper(), (None, None))
         enriched.append(BacklogRow(
             ticker=r.ticker, readiness=r.readiness, open_panels=r.open_panels, settled_panels=r.settled_panels,

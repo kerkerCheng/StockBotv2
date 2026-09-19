@@ -4,6 +4,8 @@
 """
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 
 from alpha import closure
@@ -646,3 +648,70 @@ def test_consensus_counters_print_a_line_even_when_nothing_is_wrong() -> None:
     lines = render_consensus_contradictions((), ())
     assert len(lines) == 2
     assert all("0 " in line for line in lines)
+
+
+# ---------------------------------------------------------------------------
+# 第三種終局要走到 APP（2026-09-19）
+# ---------------------------------------------------------------------------
+
+def _closure_shape(*, period_end: str, nested: bool, readiness: str = "blocked") -> dict:
+    """兩個呼叫端餵進來的形狀不同，測試要能各造一份。"""
+    headline = {"context": {"period_end": period_end, "period": "FY2026"}}
+    body = {"readiness": {"state": readiness, "blocker_details": [
+        {"panel": "research", "settled": False, "absence_kind": "not_yet_recorded"}]}}
+    if nested:
+        return {**body, "view": {"headline": headline}}
+    return {**body, **{"headline": headline}}
+
+
+def test_row_from_artifact_reads_period_end_from_both_shapes() -> None:
+    """**同一個函式，兩個呼叫端，兩種形狀**——只認得一種會靜默少一種終局。
+
+    事發 2026-09-19：第一版只認得 `payload["view"]["headline"]`（`collect_backlog` 那條），
+    於是 `webapp.materialize._overview`（餵的是 analyst view 本身）寫進 artifact 的
+    `closure_terminal` 仍然回不出 `awaiting_report`——**而 `period_end` 那一格明明已經在裡面**。
+    它不會壞、不會報錯、測試不會紅（L17-1）。
+    """
+    for nested in (True, False):
+        payload = _closure_shape(period_end="2026-06-30", nested=nested)
+        assert closure.target_period_end_in_artifact(payload) == "2026-06-30", nested
+        row = closure.row_from_artifact("X", payload, today=date(2026, 9, 19))
+        assert row.terminal == "awaiting_report", nested
+
+
+def test_the_pure_function_never_looks_at_the_clock_on_its_own() -> None:
+    """沒給 `today` 就不判第三種——那不是「未結束」，是「沒問過時鐘」（時鐘住 provider 層）。"""
+    payload = _closure_shape(period_end="2026-06-30", nested=True)
+    assert closure.row_from_artifact("X", payload).awaiting_report_since is None
+    assert closure.row_from_artifact("X", payload).terminal is None
+    # 期末還沒到就不是 awaiting，即使問了時鐘
+    future = _closure_shape(period_end="2027-06-30", nested=True)
+    assert closure.row_from_artifact("X", future, today=date(2026, 9, 19)).terminal is None
+    # 讀不到 period_end 一律留空（寧可多排一檔，不把讀不到當終局，INV-3）
+    assert closure.target_period_end_in_artifact({"view": {}}) is None
+    assert closure.row_from_artifact("X", {"view": {}}, today=date(2026, 9, 19)).terminal is None
+
+
+def test_app_knows_every_terminal_kind_the_ssot_knows() -> None:
+    """APP 認得的終局種類必須與 `BacklogRow.terminal` 會回的一致。
+
+    先前 `_group_of` 只認 `ready`／`settled`，於是「等財報（會自己解開）」被歸進
+    「還沒做」——兩者的下一步完全相反，而使用者會照著標籤排工作（L12）。
+    ⚠ 這一條是**對照**而不是重述：它從 `terminal` 的實際分支取值，
+    所以未來多一種終局而 APP 沒跟上時，紅的是這一條而不是使用者。
+    """
+    from webapp.api import _GROUP_LABELS, _group_of
+
+    kinds = {closure.BacklogRow(ticker="a", readiness="ready", open_panels=(), settled_panels=(),
+                                absence_kinds={}).terminal,
+             closure.BacklogRow(ticker="b", readiness="blocked", open_panels=(),
+                                settled_panels=("research",), absence_kinds={}).terminal,
+             closure.BacklogRow(ticker="c", readiness="blocked", open_panels=("why",),
+                                settled_panels=(), absence_kinds={},
+                                awaiting_report_since="2026-06-30").terminal}
+    assert kinds == {"ready", "settled", "awaiting_report"}
+    for kind in kinds:
+        assert kind in _GROUP_LABELS, f"APP 不認得終局 {kind}"
+        assert _group_of({"closure_terminal": kind}) == kind
+    # 未到終局仍然落在「還沒做」
+    assert _group_of({"closure_terminal": None}) == "not_started"
