@@ -1,6 +1,6 @@
 # 抽取 review — `coherent_q3fy26_cpo.json`
 
-- **reviewer：** Claude Code session 2026-09-19（pq2 **[577] 研究**；⚠ **寫入尚未核准**）
+- **reviewer：** Claude Code session 2026-09-19（pq2 [577] 研究／[627] 寫入核准）
 - **判準依據：** AGENTS.md L8②（`sole_source` 需客戶端或第三方印證）／L11-1（措辭精度本身
   就是一個 claim）／L18（label 必須指得回逐字）。
 - ⚠ **本 `.json` 在 `.gitignore` 內**（Seeking Alpha transcript 衍生，`storage_permission:
@@ -9,14 +9,18 @@
 
 > `loader/validate.py` 對本項回報通過——它驗的是 schema 形狀，不是 claim 是否有原文支持（L15）。
 
-## 狀態：**提案中，圖未改**（2026-09-19）
+## 狀態：**已寫入**（2026-09-19，pq2 [627] 核准）
 
-[577] 的 `go` 邊界逐字是「只產出 source-trace packet。不入圖、不改 thesis、不動 live」。
-本輪**只做了追源**，圖上 `sole_source` 仍是 `true`。完整 packet：
-`library/private/alpha/sole_source_rejudge/coherent_nvidia.json`（⚠ 該檔在 `.gitignore` 內）。
-**寫入已另鑄 pq2 編號請求核准**（見文末）。
+追源在 [577] 完成（packet：`library/private/alpha/sole_source_rejudge/coherent_nvidia.json`，
+⚠ 該檔在 `.gitignore` 內），寫入在 [627]。三步都跑過：
+抽取層改判 → `python -m loader.load_to_neo4j <檔> --allow-dup-url` → `python -m loader.edge_resolution project`。
+查證：`python -m query.structure co:nvidia` 的供給側，COHR 那列 `sole` 欄現在是 ✗。
 
-## 提案：邊 `e10`（`co:coherent -supplies_to-> co:nvidia`）的 `sole_source`：`true` → `false`
+**L14 量測：** `python -m query.bottleneck --top-n 60` 中
+`co:coherent supplies_to co:nvidia` 由 **#2 → #5**（與 [626] 的 LITE 同型位移，也是 #2→#5）。
+籃子不變（通過 1、首選 LITE）。
+
+## 修正：邊 `e10`（`co:coherent -supplies_to-> co:nvidia`）的 `sole_source`：`true` → `false`
 
 兩段逐字留在 `sources` 一字不動；問題在 label 不是引文：
 
@@ -64,6 +68,16 @@ fab」「the most advanced 6-inch indium phosphide line in the world」——那
 **唯一來源**，而且圖裡已由 `co:coherent depends_on tech:inp_6inch_fab`（排序 #4）承載。
 推測原判讀把這種「世界唯一一條」的語氣挪到了供應關係上。
 
-## 待核准編號
+## 同時做的與另鑄的
 
-- **[627]**（graph write）：把上述 `sole_source: true → false` 寫入，並改寫 COHR 首屏第三句。
+- **首屏第三句已改寫**（[627] 範圍內）：原文「目前只有它一家被 NVIDIA 設計進去」→
+  改成「它不是 NVIDIA 唯一的外部光源供應商——NVIDIA 自己的技術部落格把三家並列…」
+  （brief `ib_37dfb9b27153eba8`）。第六句一併做了最小事實更正：它列的兩個錯誤訊號其中一條
+  （「出現第二家拿到 NVIDIA 外部光源訂單的供應商」）**已經成真**，留著一句被自己的追源推翻的話，
+  比改它更違反誠實。
+- **[628] 已執行**：`co:sumitomo_electric supplies_to co:nvidia` 補進圖
+  （同一份 partner blog 的 `_s5` 逐字，先前只在抽取檔裡、沒有被生成任何邊）。
+- ⚠ **[629] 待核准（thesis mutation，四個人工 gate 之一）**：COHR 的
+  `disproof_conditions[1]` 逐字就是「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商」，
+  其 48 小時動作是「把該邊的 sole_source 降級並重跑 Q1；**需重新評估整條 thesis**」——
+  **前半已在 [627] 做完，後半要人核准。**
