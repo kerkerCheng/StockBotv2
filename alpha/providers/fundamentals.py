@@ -171,6 +171,11 @@ class EngineCFundamentalsProvider:
         shares = _num(row.get("shares_outstanding"))
         cap = (price * shares) if price and shares else None
         cap_absence = self._share_count_absence(ticker, shares, as_of) if cap is not None else None
+        quote_unit, settlement, unit_absence = self._quote_unit(ticker)
+        # 單位解析不了 → 市值缺席，理由和股數那側對稱（L17-3③：機制的對稱面）。
+        # ⚠ 順序刻意：股數的理由優先，因為它是「至少一邊錯了」，比「不知道單位」更嚴重。
+        if cap is not None and cap_absence is None and unit_absence is not None:
+            cap_absence = unit_absence
         return (
             MarketSnapshot(
                 price=price,
@@ -178,12 +183,46 @@ class EngineCFundamentalsProvider:
                 # **不得回填 snapshot_date 冒充行情交易日**（F-27）。
                 bar_date=_as_date(row.get("bar_date")),
                 price_kind=row.get("price_kind"),
+                quote_unit=quote_unit,
+                settlement_currency=settlement,
                 market_cap=None if cap_absence else cap,
                 market_cap_absence_reason=cap_absence,
                 evidence=(self._ref(ticker, row, "market_series"),),
             ),
             _freshness(row, as_of),
         )
+
+    def _quote_unit(self, ticker: Ticker) -> tuple[str | None, str | None, str | None]:
+        """→ (報價單位, ISO 結算幣別, 缺席理由)。**registry 是唯一權威，不從 ticker 猜。**
+
+        ⚠ 為什麼是把 registry 已有的分類**帶到 packet 上**，而不是在這裡重算（L16）：
+        `identity/registry.py` 早就把 `market_currency` 拆成 `market_quote_unit`（報價單位，
+        可能是 `GBp` 這種 minor unit）與 `market_currency`（ISO 結算幣別）兩個欄位，
+        但 packet 從來沒帶過任何一個——實測 2026-09-19，16/16 檔的單位欄是 `None`，
+        於是下游拿到的是**裸數字**：IQE.L 56.8B（GBp）與 LITE 83.5B（USD）並排比較，
+        而真實市值只有 0.57B GBP。**錯的方向最糟**：D11 的市值上限會把最像「邊緣小公司」
+        的那一檔當成超大型股擋掉。
+
+        ⚠ **這裡刻意不換算成 USD**：那需要 FX，而 FX 要打外部——放在 provider 裡就等於
+        每次 materialize 都打外部。正規化的責任在需要跨標的比較的那一層
+        （`scripts/alpha_screen_check.py` 已實作）。本函式只負責**讓單位跟著值走**。
+        """
+        from identity.registry import get_registry
+
+        registry = get_registry()
+        company_id = registry.company_id_for_ticker(str(ticker))
+        if not company_id:
+            return None, None, (f"市值拒絕輸出：registry 解析不到 {ticker} 的 company_id，"
+                                "無從判斷報價單位（INV-1：ticker 不是 identity，不猜）。")
+        company = registry.company(company_id)
+        unit = getattr(company, "market_quote_unit", None)
+        settlement = getattr(company, "market_currency", None)
+        if not unit or not settlement:
+            return unit, settlement, (
+                f"市值拒絕輸出：registry 的 {company_id} 沒有可解析的 `market_currency`，"
+                "不知道 price 是以什麼單位報價的。**未登記且非 ISO 形式一律 fail closed**"
+                "——把 GBp 當成 GBP 會讓市值差 100 倍，而那個錯誤在比較時看起來完全正常。")
+        return unit, settlement, None
 
     def _share_count_absence(
         self, ticker: Ticker, snapshot_shares: float | None, as_of: date | None

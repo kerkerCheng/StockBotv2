@@ -46,7 +46,6 @@ if str(_ROOT) not in sys.path:
 CONFIG = _ROOT / "config" / "alpha_screen.json"
 BASKET = _ROOT / "library" / "private" / "app" / "state" / "basket.json"
 ENGINE_C = _ROOT / "library" / "private" / "engine_c" / "stockbot-engine-c-private-v1-458db5270ee2.db"
-IDENTITY = _ROOT / "config" / "company_identity.json"
 
 #: 封閉字彙。缺值**自成一類**，不併進「超標」也不靜默放行（INV-3）。
 REASONS = {
@@ -55,16 +54,6 @@ REASONS = {
     "market_cap_unknown": "市值取不到或無法正規化——不得靜默放行，也不得靜默擋掉",
     "analyst_count_unknown": "覆蓋家數取不到",
 }
-
-
-def _market_currency(company_id: str) -> str | None:
-    payload = json.loads(IDENTITY.read_text(encoding="utf-8"))
-    companies = payload.get("companies") or payload
-    records = companies if isinstance(companies, list) else list(companies.values())
-    for record in records:
-        if str(record.get("company_id")) == str(company_id):
-            return record.get("market_currency")
-    return None
 
 
 def _to_usd(amount: float, currency: str, cache: dict[str, float | None]) -> float | None:
@@ -81,30 +70,36 @@ def _to_usd(amount: float, currency: str, cache: dict[str, float | None]) -> flo
 
 def normalized_market_cap(ticker: str, conn: sqlite3.Connection,
                           cache: dict[str, float | None]) -> tuple[float | None, str | None]:
-    """→ (市值 USD, 缺席理由)。**拿不到就回 None＋理由，絕不回 0**。"""
+    """→ (市值 USD, 缺席理由)。**拿不到就回 None＋理由，絕不回 0**。
+
+    ⚠ 報價單位與結算幣別**一律問 registry，不自己 parse `company_identity.json`**
+    （2026-09-19）：`identity/registry.py` 早就把 `market_currency` 拆成
+    `market_quote_unit`（`GBp`）與 `market_currency`（`GBP`）兩個欄位，本檔原本重造了一份
+    ——而重造品會立刻開始偏離（L16）。同一份分類現在也跟著 packet 走
+    （`MarketSnapshot.quote_unit`／`settlement_currency`）。
+    """
     from identity.currency import resolve_quote_unit
     from identity.registry import get_registry
 
-    company_id = get_registry().company_id_for_ticker(ticker)
+    registry = get_registry()
+    company_id = registry.company_id_for_ticker(ticker)
     if not company_id:
         return None, "registry 解析不到 company_id"
-    raw_currency = _market_currency(company_id)
-    if not raw_currency:
-        return None, "registry 沒有 market_currency，無法判斷報價單位"
+    company = registry.company(company_id)
+    raw_unit = getattr(company, "market_quote_unit", None)
+    settlement = getattr(company, "market_currency", None)
+    if not raw_unit or not settlement:
+        return None, "registry 沒有可解析的 market_currency，無法判斷報價單位（fail closed）"
     row = conn.execute(
         "SELECT price, shares_outstanding FROM financial_snapshots "
         "WHERE ticker=? ORDER BY snapshot_date DESC LIMIT 1", (ticker,)).fetchone()
     if not row or not row["price"] or not row["shares_outstanding"]:
         return None, "快照缺 price 或 shares_outstanding"
-    unit = resolve_quote_unit(raw_currency)
+    unit = resolve_quote_unit(raw_unit)
     if unit is None:
-        return None, f"報價單位 {raw_currency!r} 未登記於 currency_units.json（fail closed）"
+        return None, f"報價單位 {raw_unit!r} 未登記於 currency_units.json（fail closed）"
     # ①報價單位 → 結算幣別（GBp→GBP 等 minor unit 差 100 倍）
     price = unit.to_settlement(row["price"]) if unit.is_minor_unit else row["price"]
-    settlement = unit.settlement_currency if hasattr(unit, "settlement_currency") else raw_currency
-    if unit.is_minor_unit and settlement == raw_currency:
-        from identity.currency import settlement_currency as _settle
-        settlement = _settle(raw_currency) or raw_currency
     # ②結算幣別 → USD
     usd = _to_usd(price * row["shares_outstanding"], str(settlement), cache)
     if usd is None:

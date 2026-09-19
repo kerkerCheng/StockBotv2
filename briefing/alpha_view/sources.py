@@ -389,7 +389,9 @@ def _current_price(build: ContextBuild, identity: Mapping[str, Any]) -> CurrentP
     market = build.context.market
     return CurrentPrice(
         value=market.price, bar_date=market.bar_date,
-        unit=(market.currency or identity.get("market_quote_unit") or identity.get("market_currency")),
+        # 2026-09-19：`market.quote_unit` 開始真的有值（舊欄位 `market.currency`
+        # 實測 16/16 從未被賦值，所以這條 fallback 鏈一直只走 identity 那一段）。
+        unit=(market.quote_unit or identity.get("market_quote_unit") or identity.get("market_currency")),
         evidence_refs=tuple(r.ref for r in market.evidence),
         reason=None if market.price is not None else "Engine C 無現價快照",
     )

@@ -391,8 +391,8 @@ class FundamentalsSnapshot:
     total_debt: float | None = None
     shares_outstanding: float | None = None
     segment_revenue_share: Mapping[str, float] | None = None
-    #: **本快照金額欄位的幣別**（2026-09-13）＝報表幣別，與 `MarketSnapshot.currency`
-    #: （報價幣別）不是同一件事。ADR 與跨市場掛牌的標的兩者不同，而 `total_debt`／
+    #: **本快照金額欄位的幣別**（2026-09-13）＝報表幣別，與 `MarketSnapshot.quote_unit`
+    #: （報價單位）不是同一件事。ADR 與跨市場掛牌的標的兩者不同，而 `total_debt`／
     #: `cash_and_equivalents`／`revenue_ttm` 跟著報表幣別走。
     #: ⚠ `None` ＝ 該列快照早於這個欄位；消費端必須把「未宣告」說出來，**不得當成相同**。
     financial_currency: str | None = None
@@ -404,7 +404,20 @@ class MarketSnapshot:
     price: float | None = None
     bar_date: date | None = None
     price_kind: str | None = None
-    currency: str | None = None
+    #: **`price` 與 `market_cap` 的計價單位**（2026-09-19）——交易所**報價單位**，
+    #: 可能是 minor unit（LSE 的 `GBp`、TASE 的 `ILA`、JSE 的 `ZAc`），與結算幣別差 100 倍。
+    #: ⚠ 舊欄位叫 `currency`，它同時被讀成報價單位與結算幣別（L12 一表兩義的教科書實例，
+    #: 2026-08-05 就因此讓 LSE 標的行情永遠 quarantine），而且**實測 16/16 從未被賦值**。
+    #: 先分開再各自定規則：本欄是單位，`settlement_currency` 才是 ISO-4217 幣別。
+    quote_unit: str | None = None
+    #: **ISO-4217 結算幣別**（`GBp` → `GBP`）。跨標的比較必須先用它換算，
+    #: 而換算需要 FX——**本 provider 刻意不做**（會變成 materialize 打外部）。
+    #: 正規化的責任在需要比較的那一層（例：`scripts/alpha_screen_check.py`）。
+    settlement_currency: str | None = None
+    #: ⚠ **以 `quote_unit` 計，不是 USD、也不一定是 ISO 幣別。**
+    #: 沒有 `quote_unit` 就**不得拿來跨標的比較**——IQE.L 裸值 56.8B（GBp）
+    #: 換算後只有 0.57B（GBP），任何「市值上限 10B」的門檻都會把它當成超大型股擋掉，
+    #: 而那正是 D11 最想找的那一類（2026-09-19 實測）。
     market_cap: float | None = None
     #: **市值缺席時的理由**（2026-09-13）。`market_cap = price × shares_outstanding`，
     #: 而快照股數錯了不會有任何東西報錯（倍數不受影響，只有「拿市值比較」時才現形）。

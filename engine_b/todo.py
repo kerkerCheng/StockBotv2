@@ -3363,12 +3363,24 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if not outcome["failed"] else 1
 
     if args.command == "add":
+        before_next_n = int(pool["next_n"])
+        was = {it["n"]: (it["title"], it.get("hint") or "") for it in pool["items"]}
         item = upsert(
             pool, item_type="manual",
             ref_id=args.ref or f"manual:{pool['next_n']}",
             title=args.title, hint=args.hint, source="manual",
         )
         save(pool, args.pool)
+        if int(pool["next_n"]) == before_next_n:
+            # upsert 是冪等的（同 type+ref_id 未 resolve 就更新原項），但那代表**沒有鑄新號**，
+            # 而且原本的 title／hint 已被覆蓋。不說出來的話，呼叫者會以為自己拿到了新編號。
+            old_title, old_hint = was.get(item["n"], ("", ""))
+            print(f"⚠ 未鑄新號：(manual, {item['ref_id']}) 已在池中且未 resolve，改成更新既有 [{item['n']}]。")
+            if old_title and old_title != item["title"]:
+                print(f"  ↳ 原 title 已被覆蓋：{old_title}")
+            if args.hint and old_hint and old_hint != (item.get("hint") or ""):
+                print(f"  ↳ 原 hint 已被覆蓋：{old_hint}")
+            print("  ↳ 要另鑄一個編號，請換一個 --ref。")
         print(f"✓ 已加入 [{item['n']}] {item['title']}")
         return 0
     return 0
