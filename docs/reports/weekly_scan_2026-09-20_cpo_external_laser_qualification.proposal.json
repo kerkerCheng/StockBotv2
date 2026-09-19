@@ -1,0 +1,13 @@
+{
+  "conflict_id": "conflict_5ab59501e4ec32d0a8c03919979d12ac697a48dd0f03397e6d9cd2dc52eab093",
+  "edge_key": "edge:9a77a192f8ddb9bc39c3a2b0a516630dd61d5eedfb266846dc43d38e9ba346bf",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "e6c4cc245e42b4aee488e988a2157f6d96de08091a2917852172011661aa5236",
+  "action": "unknown",
+  "selected_value": null,
+  "supporting_assertion_ids": [],
+  "rejected_assertion_ids": [],
+  "supporting_source_ids": [],
+  "rationale": "這是已核准 unknown resolution 因 candidate set 更新而 stale 的重新提案，不是改判。tech:cpo→tech:external_laser_source 是品類層依賴邊；Lumentum 的 qualifying 與 Sivers 的 sampling 各自描述不同供應商、不同產品計畫與不同時間點，並非同一 canonical qualification 事實的前後狀態。供應商自報的狀態應留在各公司邊，品類邊沒有單一正確 qualification_status。新增 Sivers 候選使舊 resolution hash 失效，但不改變 scope 錯位，因此維持 unknown，不投影 canonical 值。",
+  "resolved_confidence": 0.0
+}
