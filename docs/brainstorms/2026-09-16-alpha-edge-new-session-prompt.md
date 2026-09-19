@@ -1,4 +1,4 @@
-# 給新 session 的啟動 prompt（2026-09-19 第七輪改寫；前六輪逐字狀態見文末歷程與 git history）
+# 給新 session 的啟動 prompt（2026-09-19 第八輪改寫；前七輪逐字狀態見文末歷程與 git history）
 
 > 用法：在新的 Claude Code session 貼「開工指令」那一段，或直接
 > `@docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`。
@@ -97,14 +97,24 @@
 > 市值取不到時 D11 怎麼判（INV-3：不得靜默 filtered，也不得靜默放行）？
 > 現在的 consumer 只是量測腳本 `scripts/alpha_screen_check.py`，**`webapp/basket.py` 的 top_pick 判定完全未改**。
 >
+> **②b ⚠ 一個待你決定的小問題（[626] 收尾留下的）：** `sole_source_verification` 這個屬性名
+> **在 `extractions/`／`schema/`／`prompts/`／`config/` 全都不存在**，而 `schema/graph_schema.md` §7
+> 把 `verified_by_absence` 定義成 **`sole_source=true` 時的驗證模式（弱主張）**——跟 `false` 並存會反轉
+> 語意（變成「我們驗證過它不是獨家」，但實際上我們是**找到了正面反證**，比 absence 強）。所以 [626]
+> hint 的第三個子項**沒有執行**，前兩項已完成。三條路：①不要這個欄位（現況已足夠：`sole_source=false`
+> ＋`sole_source_evidence_quality=weak`）；②改記在 `.review.md`（已寫）；③真要入圖就先進
+> `schema/vocab.json` 封閉字彙（L16-3：有行為後果的字彙必須被強制）。
+>
 > **③ 七個缺陷挑一個**。建議順序 3 → 6 → 1（3 與 6 都會靜默產生**對自己有利**的假數字）。
 >
 > ### ⚠ 已經做完、不要重做
 >
 > - 不要重新校準 LITE 的 base（FY2027 共識只動 +0.13%，`review_required` 是缺陷 2 的假警報）。
 > - 不要重寫 LITE 的 variant／downside／短評／催化劑 resolves（四格都有值）。
-> - 不要重做 LITE 的 sole_source 追源（[617] 已完成，判決檔在
->   `library/private/alpha/sole_source_rejudge/lumentum_uhp_laser.json`，寫入等 **[626]** 核准）。
+> - 不要重做 LITE 的 sole_source 追源，**也不要再重判這條邊**：[617] 研究與 [626] 寫入都已在
+>   2026-09-19 完成——`co:lumentum supplies_to tech:uhp_laser` 的 `sole_source` 現在是 **`false`**
+>   （判決檔 `library/private/alpha/sole_source_rejudge/lumentum_uhp_laser.json`；判讀紀錄在
+>   `extractions/lumentum_q{2,3}fy26_cpo.review.md`，⚠ **那兩份 `.json` 本身在 `.gitignore` 內**）。
 > - 不要把「Lumentum is sold out through 2028」寫進假設（tier 3 二手，未追到一手）。
 >
 > ### ⚠ 不要做的
@@ -135,11 +145,12 @@
 | **D11 門檻套用：input 16／accepted 5／filtered 11（缺值 0）**；通過的 5 檔有 **4 檔儀器算不出 payoff** | `python scripts/alpha_screen_check.py` |
 | 籃子（**尚未套 D11**）16 檔通過 1、首選 LITE；`no_bet` 13｜`payoff_not_positive` 2｜`no_catalyst_in_horizon` 14 | 讀 `library/private/app/state/basket.json` 的 `filter` 與 `top_pick` |
 | 門檻值：市值 ≤ US$10B、覆蓋 ≤ 12（**兩條必須 AND**：TSM 的 analyst_count 只有 13 而市值 2.25 兆） | `python -c "import json;d=json.load(open('config/alpha_screen.json'));print(d['market_cap_max_usd'],d['analyst_count_max'])"` |
+| `co:lumentum supplies_to tech:uhp_laser`：`sole_source` **`false`**（[626] 2026-09-19 寫入）｜`sole_source_evidence_quality=weak`｜`substitutability=5` 與 `qualification_status=designed_in` **未動** | `python -m query.structure tech:uhp_laser`——供給側該列 `sole` 欄應為 ✗ |
 | LITE（**倍數校準後**）：base +4.4%｜賭對了 +5.7%；首屏七句已寫。⚠ 舊的 +19.3%／+20.7%／−1.3% 是倍數陳舊 11 天的假象 | `python -m briefing alpha-card LITE`／`python -m alpha brief LITE --list` |
 | **已宣告不主張目標倍數的 5 檔**（寫了賭注也算不出 payoff）：SOI.PA／IQE.L／MP／POET／6324.T | `ls library/private/alpha/abstentions/` |
 | `Catalyst.resolves` 填寫率：judgments/ **62 檔 104 條，填 0 條**（LITE 的 2 條寫在 judgment 檔內） | 見 ROADMAP backlog 該列的查證命令 |
 | AXTI：base 68.91（+1.7%）｜賭注對了 46.97（−30.7%）｜**判斷錯了 35.15（−48.1%）** | `python -m briefing alpha-card AXTI` |
-| 可投資排序 **37 列**；filter `input 221／accepted 37／filtered 184` | `python -m query.bottleneck --top-n 60` |
+| 可投資排序 **37 列**；filter `input 221／accepted 37／filtered 184`。⚠ [626] 後 `LITE→tech:uhp_laser` 由 **#2 掉到 #5**（COHR 三列上來），basket 列序 2→3，**`top_pick` 仍是 LITE** | `python -m query.bottleneck --top-n 60` |
 | **重複節點候選 28 對**｜涉及節點 39／185｜**沒人提過 23** | `python -m query.duplicate_nodes` |
 | relation 分布：`supplies_to` 302｜`enables` 78｜`is_component_of` **73**｜`depends_on` 63｜`develops` 57｜**`is_variant_of` 17**（2026-09-19 新增） | Cypher `MATCH (ea:EdgeAssertion) RETURN ea.relation, count(*)` |
 | `tech:cpo` 的「它自己卡在誰身上」**20 條**（[613][614] 之前是 24，中途一度 25） | `python -m query.structure tech:cpo` |
@@ -181,6 +192,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 早** | **`is_component_of` 全重判 92 條｜新增 `is_variant_of` relation（[613] B）｜[614] 8 條修正｜[615] 4 對合併｜28 對候選判讀｜AXTI downside｜[571]–[575] drop** | `fec9db6`… |
 | **2026-09-19 深夜** | **催化劑那格量到底（`resolves` 0/104）｜LITE 做到底：variant＋downside＋resolves＋首屏七句｜`top_pick` 首次非空＝LITE｜修好 `--retract` 撤不回 overlay 的 bug＋守門測試｜五個系統性缺陷進 backlog** | 本輪 |
 | **2026-09-19 上午** | **[616] 紅隊審查撈到倍數陳舊（賭注不對稱是假象）｜[617] sole_source 追源找到 AAOI 圖外反證→鑄 [626]｜D11 兩條門檻落地 `config/alpha_screen.json`＋量測 consumer｜量到「通過的 5 檔有 4 檔儀器算不出 payoff」** | 本輪 |
+
+| **2026-09-19 中午** | **[626] 寫入：`co:lumentum→tech:uhp_laser` 的 `sole_source` true→false（改在抽取層＋重載＋重投影）｜量到排序位移 #2→#5｜補上兩份 `.review.md` 讓 gitignore 掉的抽取檔仍留得下判讀紀錄** | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 

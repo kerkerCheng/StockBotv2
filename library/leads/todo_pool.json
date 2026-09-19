@@ -10519,10 +10519,11 @@
       "added_at": "2026-09-19T00:54:57.406470+00:00",
       "hint": "go＝依 library/private/alpha/sole_source_rejudge/lumentum_uhp_laser.json 的 proposed 區塊寫入圖：sole_source true→false、補 sole_source_evidence_quality=weak、sole_source_verification=verified_by_absence。**不含**改 substitutability（維持 5）、不含改 qualification_status（維持 designed_in）、不含動其他邊、不含提高任何 evidence tier、不含 thesis mutation、不含 live。⚠ 這是 graph admission，逐筆核准。【[617] 的研究結論，三條互相獨立的反證】①L8：支持 sole_source 的三條證據 origin_entity **全是 Lumentum 自己**（lumentum_q2fy26_cpo）——供應商自稱只能算 verified_by_absence；②L11-1：支持獨家的逐字只說『the 400-milliwatt power level required is something **few can deliver**』——few ≠ only one；③**圖內就有反證**：co:coherent supplies_to tech:uhp_laser 的 tier-3 逐字寫著『Coherent announced a PO for its high-power laser for **the same application**』；④**圖外新證據（本輪 source-trace 找到）**：AAOI 官方新聞稿 2025-12-18『AOI Introduces New Ultra High-Power Semiconductor Laser to Support Silicon Photonics and CPO』，逐字 400mW narrow-linewidth pump laser、over 400mW at 50°C——**直接命中 Lumentum 獨家論據所依賴的那個 400mW 門檻**。【誠實的界線】AAOI 那份的 boundary 逐字載明『does not name a customer, disclose a design win, or confirm commercial revenue』，樣品階段、量產是 2026 guidance——所以它證明**產品存在**，不證明**取得設計導入**。因此本案**只動 sole_source，不動 qualification_status 與 substitutability**。【本輪未找到】任何客戶端或第三方逐字確認『UHP CW 雷射僅 Lumentum 一家可供』；已搜 library/raw 全部 .txt 的七組字樣。【下游】Q1 結構分 0.98/0.85 有 sole_source 的貢獻，降級後排序會動；但**不要預期 LITE 因此掉出籃子**——同日落地的 D11 門檻已因市值 83.5B／覆蓋 25 把它擋在倍率候選外，兩件事獨立。【同族】與 [577]（COHR 的 NVIDIA 唯一來源同樣只有供應商自報）建議一起核准。drop＝維持 sole_source=true。",
       "n": 626,
-      "reason": null,
+      "reason": "使用者 2026-09-19 核准。co:lumentum supplies_to tech:uhp_laser 的 sole_source true->false，改在判讀所在的抽取層（library/resolutions/ 承載不了：approve 要求 live conflict 且 selected_value 必須是既有候選，而三條 assertion 全為 true）。改 extractions/lumentum_q2fy26_cpo.json e9 與 lumentum_q3fy26_cpo.json e5，sources[].quote 一字未動；重載＋edge_resolution project 完成。canonical 現為 sole_source=false、sole_source_evidence_quality=weak（原已 weak，來自 nvda_lumentum_partnership_pr_2026_03_02_cov14_1，本次未動）、substitutability=5 與 qualification_status=designed_in 皆未動。備份 backups/20260919-sole-source-626/neo4j_export.json（2641 nodes/5954 rels）。audit invariants FAIL 0/PASS 13。下游實測 rank_bottlenecks 該列 #2->#5、basket 列序 2->3、top_pick 仍 LITE。判讀紀錄進 Git：extractions/lumentum_q{2,3}fy26_cpo.review.md（.json 本身在 .gitignore 內）。⚠ hint 第三項 sole_source_verification=verified_by_absence 未執行，已擺回使用者決定（該屬性名全專案不存在；schema §7 定義它是 sole_source=true 的驗證模式，與 false 並存會反轉語意）。",
+      "receipt": "authority:graph_migration;ref:extractions/lumentum_q2fy26_cpo.review.md",
       "ref_id": "manual:626",
-      "resolution": null,
-      "resolved_at": null,
+      "resolution": "go",
+      "resolved_at": "2026-09-19T01:34:19.360046+00:00",
       "source": "manual",
       "title": "核准把 co:lumentum→tech:uhp_laser 的 sole_source 由 true 降為 false＋標 weak／verified_by_absence（[617] 研究已完成，判決檔已寫好）",
       "type": "manual"
@@ -22615,6 +22616,15 @@
       "reason": "2026-09-19 使用者核准後當次執行完畢。source-trace 結論：**找不到任何客戶端或第三方逐字確認『UHP CW 雷射僅 Lumentum 一家可供』**（已搜 library/raw 全部 .txt 的 only supplier／sole supplier／only source／single source／only company／few can deliver／only vendor 七組字樣）。反之找到三條互相獨立的反證：①支持 sole_source 的三條證據 origin_entity 全是 Lumentum 自己（L8）；②支持獨家的逐字只說 few can deliver，few ≠ only one（L11-1）；③圖內 co:coherent supplies_to tech:uhp_laser 的 tier-3 逐字說 Coherent 也有 PO for the same application；④圖外新找到 AAOI 官方新聞稿 2025-12-18 的 400mW UHP CPO 雷射，直接命中 Lumentum 獨家論據所依賴的 400mW 門檻。判決檔 library/private/alpha/sole_source_rejudge/lumentum_uhp_laser.json。⚠ 寫入圖是 graph admission，未自行執行——已鑄 [626] 請求逐筆核准。誠實界線：AAOI 那份 boundary 載明未具名客戶、未揭露 design win、樣品階段，故只動 sole_source，不動 qualification_status 與 substitutability。",
       "receipt": "authority:source_trace;ref:lumentum_uhp_laser",
       "ref_id": "manual:617",
+      "type": "manual",
+      "verb": "go"
+    },
+    {
+      "at": "2026-09-19T01:34:19.360046+00:00",
+      "n": 626,
+      "reason": "使用者 2026-09-19 核准。co:lumentum supplies_to tech:uhp_laser 的 sole_source true->false，改在判讀所在的抽取層（library/resolutions/ 承載不了：approve 要求 live conflict 且 selected_value 必須是既有候選，而三條 assertion 全為 true）。改 extractions/lumentum_q2fy26_cpo.json e9 與 lumentum_q3fy26_cpo.json e5，sources[].quote 一字未動；重載＋edge_resolution project 完成。canonical 現為 sole_source=false、sole_source_evidence_quality=weak（原已 weak，來自 nvda_lumentum_partnership_pr_2026_03_02_cov14_1，本次未動）、substitutability=5 與 qualification_status=designed_in 皆未動。備份 backups/20260919-sole-source-626/neo4j_export.json（2641 nodes/5954 rels）。audit invariants FAIL 0/PASS 13。下游實測 rank_bottlenecks 該列 #2->#5、basket 列序 2->3、top_pick 仍 LITE。判讀紀錄進 Git：extractions/lumentum_q{2,3}fy26_cpo.review.md（.json 本身在 .gitignore 內）。⚠ hint 第三項 sole_source_verification=verified_by_absence 未執行，已擺回使用者決定（該屬性名全專案不存在；schema §7 定義它是 sole_source=true 的驗證模式，與 false 並存會反轉語意）。",
+      "receipt": "authority:graph_migration;ref:extractions/lumentum_q2fy26_cpo.review.md",
+      "ref_id": "manual:626",
       "type": "manual",
       "verb": "go"
     }
