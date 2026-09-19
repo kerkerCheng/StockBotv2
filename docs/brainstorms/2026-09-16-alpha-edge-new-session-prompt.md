@@ -46,12 +46,16 @@
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
 >
-> ### ▶ 這一輪的第一件事：**[630]**（Phase 7 往下走的 binding constraint）
+> ### ▶ 這一輪的第一件事：**Step 7.3——讓多年橋出現在畫面上**
 >
-> 上一輪（2026-09-19）採納了 amendment（**Phase 4 拆成 4a／4b、Phase 7 提前**）並做到
-> Phase 7 Step 7.2 機制＋Phase 4a 前兩條。**卡住的不是機制，是研究**：
-> 62 個 judgment 檔填了 `multiple_horizon`（倍率在哪一年實現）的是 **0 個**。
-> [630] 就是請求核准填第一檔（COHR）。在它之前，多年橋算不出任何一檔。
+> [630] 已核准並執行：**COHR 的第一條多年橋跑通了**（FY2030，距基期 4 年）：
+> **2 倍需要 Datacenter & Communications 分部四年累積成長 4.65 倍**；**3 倍以上所有 driver
+> 拉到極限都做不到**。⚠ 這是系統第一次說出**可以去查證**的話。
+>
+> **但它今天只能由腳本跑**：`build_fundamental_model` 的 target 永遠是基期+1，
+> 現有 view 路徑**到不了 FY2030**。要讓它進 alpha-card／APP 需要一個「多年視角」入口，
+> **而那不得污染 FY+1 的主 view**（refresh 已證明兩者分得開：FY2030 的假設被正確標成
+> 「不是目前目標期間；本視角不評估」）。
 >
 > ⚠ **籃子現在是空的（通過 0、首選無），而那是合法結果**——Phase 4a 接上市值與覆蓋
 > 兩條門檻後，LITE 以 **83.5B／25 位覆蓋**被擋掉。它從來就不是「邊緣小公司」。
@@ -144,7 +148,7 @@
 |---|---|
 | **籃子 16 檔通過 0、首選無**（Phase 4a 接上兩條門檻後）；`market_cap_above_max` 10｜`analyst_count_above_max` 9｜`no_bet` 13｜`payoff_not_positive` 2｜催化劑四種形狀 `undated 6`／`missing_resolves 3`／`no_catalyst_recorded 4`／`after_value_date 1` | 讀 `library/private/app/state/basket.json` 的 `filter` 與 `top_pick_absent_reason` |
 | **「N 倍要什麼為真」四級階梯**（Phase 7 Step 7.1）：AXTI **2x 可達**、3x 以上做不到；LITE／COHR 連 2x 都有 driver 做不到 | 讀 view 的 `expectation_gap.reverse_bridge.value['return_ladder']` |
-| **`multiple_horizon`（倍率在哪一年實現）填寫率 0／62**——機制已交付，卡在研究（[630]） | `python -c "import json,pathlib;print(sum(1 for p in pathlib.Path('library/private/alpha/judgments').glob('*.json') if json.loads(p.read_text(encoding='utf-8')).get('multiple_horizon')))"` |
+| **`multiple_horizon` 填寫率 1 檔（COHR＝2030-06-30，一手：10-Q「through 2030」）**；其餘 62 檔仍是 0 | `python -c "import json,pathlib;print(sum(1 for p in pathlib.Path('library/private/alpha/judgments').glob('*.json') if json.loads(p.read_text(encoding='utf-8')).get('multiple_horizon')))"` |
 | 賭注帳：籃子 `bet 3｜abstained 0｜opinion_in_base 3｜unanswered 10`；量的候選 `opinion_in_base 8｜unanswered 4` | 讀同一份 artifact 的 `bet_ledger`／`volume_bet_ledger`，或 `python crons/heartbeat.py` 第 4 段 |
 | **目標倍數背離：全 ledger 生效 `target_pe` 49 筆｜`drift_exceeds 13`／`within_band 32`／`not_applicable 2`／`cannot_compare 2`**（門檻 5%） | `python scripts/target_pe_drift_check.py`（心跳段 2 也每天印一行） |
 | **packet 的市值現在帶著單位走**：16/16 檔有 `quote_unit`（其中 6 檔非 USD），市值缺席 0 檔 | `python -m pytest tests/test_market_quote_unit.py -q`（4 條） |
@@ -158,7 +162,7 @@
 | `Catalyst.resolves` 填寫率：judgments/ **62 檔 104 條，填 0 條**（沒有改必填，刻意） | ROADMAP 該列的查證命令 |
 | 可投資排序 **37 列**；⚠ **沒有任何 `.TW`／`.TWO`／`.ST`**——Phase 1 的驗收行卡在這裡（是答案不是缺漏） | `python -m query.bottleneck --top-n 60` |
 | `audit invariants` FAIL 0／PASS 13／共 4,239 筆 | `python -m audit invariants` |
-| 待辦池：**pq2 球在你手上 17**（[577][627][628][629] 已結案；新鑄 [630]） | `python -m engine_b.todo list` |
+| 待辦池：**pq2 球在你手上 16**（[577][627][628][629][630] 全部結案） | `python -m engine_b.todo list` |
 | 追蹤表 22 檔｜量測起始 2026-07-21｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
 | 心跳排程每日 07:00｜Last Result 0 | `schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V` |
 
@@ -201,6 +205,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 收尾** | **[627][628] 執行（COHR sole_source 降為 false、Sumitomo 邊補進圖）｜[629] 鑄號（COHR 的 disproof 已觸發）｜三題全部落地：①不要 `sole_source_verification`（記進 schema §7）②L11-6 前置做完＋五欄 amendment 提出 ③refresh 按年度過濾已實作（LITE／AXTI 假警報清掉）｜Phase 2 第 2 天回填** | 本輪 |
 
 | **2026-09-19 深夜** | **amendment 採納生效（Phase 4 拆 4a／4b、Phase 7 提前）｜Step 7.1 倍率參數化（AXTI 2x 可達是三檔唯一）｜Step 7.2 機制（`multiple_horizon`＋`span_years`；兩個量測在動手前改變了做法）｜Phase 4a 前兩條接進 filter（籃子誠實變空）｜[629] 執行、[630] 鑄號** | 本輪 |
+
+| **2026-09-19 收尾** | **[630] 執行：COHR 倍率射程＝FY2030（一手逐字 through 2030）＋七條錨點假設（carried_forward，不是預測）｜第一條多年橋跑通：2 倍需要資料中心分部四年累積成長 4.65 倍｜順帶分開一個承載兩種語意的 rollover 斷言** | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
