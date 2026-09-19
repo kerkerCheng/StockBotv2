@@ -8969,6 +8969,217 @@
       "result": "ok",
       "run_at": "2026-09-17T23:03:51.664987+00:00",
       "source": "mops:4979.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:24.375784+00:00",
+      "source": "mfn:sivers-semiconductors"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:25.536361+00:00",
+      "source": "sivers:press"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:26.167188+00:00",
+      "source": "yahoo:iqe-l"
+    },
+    {
+      "cost_usd": 0.01,
+      "new": 2,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:26.838921+00:00",
+      "source": "x:aleabitoreddit"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:28.634082+00:00",
+      "source": "edgar:AAOI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:29.384814+00:00",
+      "source": "edgar:AEHR"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:30.093261+00:00",
+      "source": "edgar:AEVA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:30.599299+00:00",
+      "source": "edgar:AMAT"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:31.114963+00:00",
+      "source": "edgar:AVGO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:31.645749+00:00",
+      "source": "edgar:AXTI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:32.323419+00:00",
+      "source": "edgar:CCXI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:32.833608+00:00",
+      "source": "edgar:COHR"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:33.540572+00:00",
+      "source": "edgar:GFS"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:34.240760+00:00",
+      "source": "edgar:GOOGL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:35.019415+00:00",
+      "source": "edgar:HIMX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:35.703852+00:00",
+      "source": "edgar:JBL"
+    },
+    {
+      "new": 1,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:36.412994+00:00",
+      "source": "edgar:LITE"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:37.095735+00:00",
+      "source": "edgar:LRCX"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:37.776364+00:00",
+      "source": "edgar:META"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:38.486138+00:00",
+      "source": "edgar:MP"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:39.002143+00:00",
+      "source": "edgar:MRVL"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:39.688373+00:00",
+      "source": "edgar:MTSI"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:40.404457+00:00",
+      "source": "edgar:MU"
+    },
+    {
+      "new": 5,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:40.917796+00:00",
+      "source": "edgar:NVDA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:41.592730+00:00",
+      "source": "edgar:POET"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:42.276855+00:00",
+      "source": "edgar:TSEM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:42.783796+00:00",
+      "source": "edgar:TSLA"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:43.460919+00:00",
+      "source": "edgar:TSM"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.023377+00:00",
+      "source": "mops:2301.TW"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.023412+00:00",
+      "source": "mops:2455.TW"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.599536+00:00",
+      "source": "mops:3081.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.599562+00:00",
+      "source": "mops:3105.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.599576+00:00",
+      "source": "mops:3363.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.599590+00:00",
+      "source": "mops:4971.TWO"
+    },
+    {
+      "new": 0,
+      "result": "ok",
+      "run_at": "2026-09-18T21:33:44.599602+00:00",
+      "source": "mops:4979.TWO"
     }
   ],
   "leads": {
@@ -14239,6 +14450,40 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2074063175293809150"
     },
+    "lead_16951eafbd63fd60fdc13de1496ec568": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:40.917676+00:00",
+      "lead_id": "lead_16951eafbd63fd60fdc13de1496ec568",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-18 [000012]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:40.917757+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000119764926000012/xslF345X06/wk-form4_1789765856.xml"
+    },
     "lead_16bea92fbfb5a038e7dbe2edafba4f3f": {
       "entities": {
         "company_ids": [
@@ -17370,6 +17615,86 @@
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1709048/000170904826000147/xslF345X06/wk-form4_1782496850.xml"
     },
+    "lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3": {
+      "entities": {
+        "company_ids": [
+          "co:micron_technology",
+          "co:sk_hynix",
+          "co:nvidia",
+          "co:applied_optoelectronics",
+          "co:sivers_semiconductors"
+        ],
+        "tickers": [
+          "MU",
+          "SKHY",
+          "NVDA",
+          "SMTC",
+          "AAOI",
+          "SIVE"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:26.808336+00:00",
+      "lead_id": "lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3",
+      "media": [
+        {
+          "cache": {
+            "bytes": 26999,
+            "content_type": "image/jpeg",
+            "local_path": "library/private/lead_media/lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3/3_2100929006803771392.jpg",
+            "sha256": "a66afbe88060ef79de7c365995b7a442ae2dc9bc19782b21c502898ab93145aa"
+          },
+          "height": 101,
+          "media_key": "3_2100929006803771392",
+          "type": "photo",
+          "url": "https://pbs.twimg.com/media/HSf_zOzaYAAoGXb.jpg",
+          "width": 477
+        }
+      ],
+      "published_at": "2026-09-18T13:20:27.000Z",
+      "raw_text": "So on optical vs. photonics... Memory like $MU / $SKHY is in it's current supercycle.  \n\n-> RBC channel checks for example projects 80-100% HBM ASP hikes for 2027.\n\n-> Per $NVDA ER, Hyperscaler capex goes up in 2027. Then you have 68% of hyperscaler capex per Trendforce going to DRAM/NAND. \n\n-> 50-70% for next 3-5 years already allocated toward LTAs. \n\nSo supercycle is here... demand visibility is high and the price hikes are still ongoing. \n\nAs photonics like $SMTC to $AAOI, I expect to cook heavily in 2027 since we're already seeing widespread optical shortages in 2026. \n\nPlus, you're going from $67.7B in 2026 (per GS) to $131.4B TAM in 2027 for optical modules...\n\nWhich impacts the DSPs/TIAs/lasers/fiber suppliers  before CPO scale up really takes off in 2028. \n\nI don't think we'll ever see the same scale of memory price hikes, but I do think there's a lot room for more for  MC growth in optical supply chains (given smaller starting point eg. $1B CW laser supplier vs $1T memory maker).\n\nBut still there's room for price hikes on laser content (eg. $15–$20 for 4 70 mW lasers per GS note) since starting point is really cheap... and one component, like cheap InP substrates can break hundreds of billions worth of supply chains downstream. \n\nWe're already seeing laser price hikes tho from CIOE channel checks confirmed by both Innolight / $SIVE from the Serenity's follower channel checks. \n\nSo entering uncharted territory. \n\nTLDR: Messy thought but, memory has near term earnings power, midst of current supercycle. \n\nThe next \"memory\" ASP hikes I'm seeing is clearly legacy memory (DDR2/DDR3/SLC NAND) from cascading bottlenecks. It just looks to be an extension of the memory theme. \n\nMaybe MLCC looks similar in terms of earlier cycles. \n\nIf we were to track supercycle impact on the supply chain in the space...\n\nI'm confident next thematic one looks to be photonics entering 2027.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "triaged_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "InP",
+            "NVDA"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "So on optical vs. photonics... Memory like $MU / $SKHY is in it's current supercycle. -> RBC channel checks for example projects 80-100% HBM ASP hikes for 2027. -> Per $NVDA ER, Hyperscaler capex goes up in 2027. Then you have 68% of hyperscaler capex per Trendforce going to DRAM/NAND. -> 50-70% for next 3-5 years already allocated toward LTAs. So supercycle is here... demand visibility is high and the price hikes are still ongoing. As photonics like $SMTC to $AAOI, I expect to cook heavily in 2027 since we're already seeing widespread optical shortages in 2026. Plus, you're going from $67.7B in 2026 (per GS) to $131.4B TAM in 2027 for optical modules... Which impacts the DSPs/TIAs/lasers/fiber suppliers before CPO scale up really takes off in 2028. I don't think we'll ever see the same scale of memory price hikes, but I do think there's a lot room for more for MC growth in optical supply chains (given smaller starting point eg. $1B CW laser supplier vs $1T memory maker). But still there's room for price hikes on laser content (eg. $15–$20 for 4 70 mW lasers per GS note) since starting point is really cheap... and one component, like cheap InP substrates can break hundreds of billions worth of supply chains downstream. We're already seeing laser price hikes tho from CIOE channel checks confirmed by both Innolight / $SIVE from the Serenity's follower channel checks. So entering uncharted territory. TLDR: Messy thought but, memory has near term earnings power, midst of current supercycle. The next \"memory\" ASP hikes I'm seeing is clearly legacy memory (DDR2/DDR3/SLC NAND) from cascading bottlenecks. It just looks to be an extension of the memory theme. Maybe MLCC looks similar in terms of earlier cycles. If we were to track supercycle impact on the supply chain in the space... I'm confident next thematic one looks to be photonics entering 2027.",
+      "triage": {
+        "classification": {
+          "classified_at": "2026-09-18T21:35:42.603876+00:00",
+          "classified_by": "triage_semantic_v1",
+          "content_type": "structural_fact",
+          "decision_impact": "candidate_set",
+          "reason": "若一手確認光學供應鏈自 2027 起由元件短缺與價格上升主導，可能新增或刪除倍率候選。"
+        },
+        "decided_at": "2026-09-18T21:35:42.603876+00:00",
+        "decision": "go",
+        "priority_flags": {
+          "novelty": true
+        },
+        "reason": "關聯 AI 光互連、InP 基板與具名供應鏈；含 2027 HBM ASP、capex、LTA 比例與光模組 TAM 等可追查數字。來源是社群複合轉述，需追一手；可能擴充候選集合，寬鬆放行。",
+        "related_trace_requeues": [
+          "lead_8a72e7d5db52030098113f91542e6abf"
+        ],
+        "tier": 4
+      },
+      "url": "https://x.com/aleabitoreddit/status/2100938001077674262"
+    },
     "lead_23266eefeeeca2a94da6e8d021cdb915": {
       "entities": {
         "company_ids": [
@@ -18523,6 +18848,73 @@
         "tier": 3
       },
       "url": "https://www.proactiveinvestors.co.uk/companies/news/1093024/iqe-completes-fundraising-and-reports-wider-losses-but-improved-trading-1093024.html?.tsrc=rss"
+    },
+    "lead_27bf534a1a4ab041b7e4f1f255494a2a": {
+      "entities": {
+        "company_ids": [
+          "co:intel",
+          "co:sandisk",
+          "co:micron_technology",
+          "co:globalfoundries",
+          "co:marvell_technology",
+          "co:sivers_semiconductors",
+          "co:nvidia",
+          "co:nebius",
+          "co:coreweave",
+          "co:iren",
+          "co:applied_optoelectronics",
+          "co:tower_semiconductor",
+          "co:amd"
+        ],
+        "tickers": [
+          "INTC",
+          "SNDK",
+          "MU",
+          "GFS",
+          "MRVL",
+          "SIVE",
+          "CIEN",
+          "NVDA",
+          "NBIS",
+          "CRWV",
+          "IREN",
+          "AMZN",
+          "GNRC",
+          "AAOI",
+          "QCOM",
+          "TSEM",
+          "ARM",
+          "AMD"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:26.831467+00:00",
+      "lead_id": "lead_27bf534a1a4ab041b7e4f1f255494a2a",
+      "media": [],
+      "published_at": "2026-09-17T23:56:29.000Z",
+      "raw_text": "TLDRs of things I found interesting this week: \n\n- $INTC CEO says some memory prices have risen 5-7× and warns the shortage will worsen in 2027. \n\n$SNDK / $MU / Samsung bros will be happy to hear this... (from the AI Infra Summit 2026 in Santa Clara)\n\n- $GFS + $MRVL sign extended SiGe capacity agreement for pluggable/NPO/CPO. \"Expected to add significant capacity to support Marvell’s growing requirements.\"\n\nI like to keep an eye out on Globalfoundries related updates given $SIVE is their reference laser for SCALE.  \n\n-  $CIEN expects roughly 30% annual revenue growth, 50% adj. gross margin, 20% FCF margin, through FY2029.\n\nThe company says component availability, not demand, is limiting growth... Seems common across $NVDA to upstream suppliers that supply is the limiting factor for revenue growth.  \n\n- Winbond acquires Infineon's NOR Flash and F-RAM business for $1.12 billion. \n\nVery surprised Infineon sold considering NOR Flash ASP + importance just keep going up and up and up, but good for Winbond consolidation. \n\n- Samsung reportedly expands outsourcing of DDR5-module and SSD assembly. \n\nI think some local Taiwan reports flag Transcend and Apacer as possible beneficiaries. The report specifically identifies Dreamtech, Hanyang Digitech and SFA Semicon. \n\nI've noticed other Korean firms entering new Samsung Electronics contracts for likely legacy memory modules maybe like ~1-2m ago.. So think some media commentary probably missed this too. Maybe too small for them to notice? \n\n- $NBIS raises AI cloud prices for the 2nd time in three months (~17-21%), bullish read through for other Neoclouds like $CRWV to $IREN earnings.\n\n-  $AMZN signs $2.4B agreement with $GNRC for generator deliveries throughout 2027-2028... and received warrants tied to as much as $8B of aggregate purchases\n\nGood to keep an eye out on who Amazon signs these warrant agreements with (eg. Alchip, $AAOI, $QCOM, $MRVL, etc) and what type of infra procurement they want. \n\n- $TSEM and NewPhotonics begin volume shipments of laser integrated optical engines.\n\nNot familiar with newphotonics, so not going to leave much commentary here. But will do some research today. \n\n- Goldman Sachs reportedly sees the ABF deficit expanding from 14% to 51%. Forecast shortages are 14% in 2H26, 34% in 2027 and 51% in 2028... \n\nMore substrate bottleneck stuff, not surprising regarding demand imbalances. \n\n- Crusoe raises $3.9B at a $30.9B valuation. \n\nOkay this valuation is better than Instinct raising at a bubble $10B valuation off 100k users...  \n\n- Japan and the U.S. reportedly discuss a $12.9–19.3B $GFS run fab. \n\nThat's like half of Globalfoundries marketcap lol. Not much details here. \n\n- $ARM CEO Rene Haas said he is confident that they can secure enough supply to meet $2B in customer demand (for their AGI CPU).\n\nThere's probably a lot more demand, probably supply constrained growth as usual so good $ARM signaled confidence in securing allocations. \n\n- Supply chain sources said Kioxia has about 50% of its LTA capacity tied up, while SK Hynix/Samsung reserve about 70% of capacity for LTAs for 3-5 years. \n\nNot sure how people are bearish on memory.... \n\nI don't like posting updates one-by-one like a news reporter, so hope this saves some time of stuff I like looking at. \n\nOn a side note was surprised markets from $AMD to $INTC rallied today after rate hikes. Think high-beta overshot the selloff the most.",
+      "refs": {},
+      "source": "x:aleabitoreddit",
+      "status": "pending",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "CPO",
+            "NVDA"
+          ]
+        },
+        "sivers": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "SIVE"
+          ]
+        }
+      },
+      "title": "TLDRs of things I found interesting this week: - $INTC CEO says some memory prices have risen 5-7× and warns the shortage will worsen in 2027. $SNDK / $MU / Samsung bros will be happy to hear this... (from the AI Infra Summit 2026 in Santa Clara) - $GFS + $MRVL sign extended SiGe capacity agreement for pluggable/NPO/CPO. \"Expected to add significant capacity to support Marvell’s growing requirements.\" I like to keep an eye out on Globalfoundries related updates given $SIVE is their reference laser for SCALE. - $CIEN expects roughly 30% annual revenue growth, 50% adj. gross margin, 20% FCF margin, through FY2029. The company says component availability, not demand, is limiting growth... Seems common across $NVDA to upstream suppliers that supply is the limiting factor for revenue growth. - Winbond acquires Infineon's NOR Flash and F-RAM business for $1.12 billion. Very surprised Infineon sold considering NOR Flash ASP + importance just keep going up and up and up, but good for Winbond consolidation. - Samsung reportedly expands outsourcing of DDR5-module and SSD assembly. I think some local Taiwan reports flag Transcend and Apacer as possible beneficiaries. The report specifically identifies Dreamtech, Hanyang Digitech and SFA Semicon. I've noticed other Korean firms entering new Samsung Electronics contracts for likely legacy memory modules maybe like ~1-2m ago.. So think some media commentary probably missed this too. Maybe too small for them to notice? - $NBIS raises AI cloud prices for the 2nd time in three months (~17-21%), bullish read through for other Neoclouds like $CRWV to $IREN earnings. - $AMZN signs $2.4B agreement with $GNRC for generator deliveries throughout 2027-2028... and received warrants tied to as much as $8B of aggregate purchases Good to keep an eye out on who Amazon signs these warrant agreements with (eg. Alchip, $AAOI, $QCOM, $MRVL, etc) and what type of infra procurement they want. - $TSEM and NewPhotonics begin volume shipments of laser integrated optical engines. Not familiar with newphotonics, so not going to leave much commentary here. But will do some research today. - Goldman Sachs reportedly sees the ABF deficit expanding from 14% to 51%. Forecast shortages are 14% in 2H26, 34% in 2027 and 51% in 2028... More substrate bottleneck stuff, not surprising regarding demand imbalances. - Crusoe raises $3.9B at a $30.9B valuation. Okay this valuation is better than Instinct raising at a bubble $10B valuation off 100k users... - Japan and the U.S. reportedly discuss a $12.9–19.3B $GFS run fab. That's like half of Globalfoundries marketcap lol. Not much details here. - $ARM CEO Rene Haas said he is confident that they can secure enough supply to meet $2B in customer demand (for their AGI CPU). There's probably a lot more demand, probably supply constrained growth as usual so good $ARM signaled confidence in securing allocations. - Supply chain sources said Kioxia has about 50% of its LTA capacity tied up, while SK Hynix/Samsung reserve about 70% of capacity for LTAs for 3-5 years. Not sure how people are bearish on memory.... I don't like posting updates one-by-one like a news reporter, so hope this saves some time of stuff I like looking at. On a side note was surprised markets from $AMD to $INTC rallied today after rate hikes. Think high-beta overshot the selloff the most.",
+      "triage": null,
+      "url": "https://x.com/aleabitoreddit/status/2100735673561174047"
     },
     "lead_27df1c1cee4ff9a145687be99ae312f9": {
       "entities": {
@@ -25334,6 +25726,40 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/820318/000089914026001064/xslF345X06/form4.xml"
+    },
+    "lead_465cf60d23ebcd8d166cc0fa45517986": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:40.917371+00:00",
+      "lead_id": "lead_465cf60d23ebcd8d166cc0fa45517986",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-18 [000012]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:40.917459+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000169684126000012/xslF345X06/wk-form4_1789766007.xml"
     },
     "lead_46944fdf1d1e34e38f5a9e32bc1c3fc8": {
       "entities": {
@@ -34065,6 +34491,40 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2075548289697792305"
     },
+    "lead_7061deb28b9fb173b47166ac96794c2e": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:40.917222+00:00",
+      "lead_id": "lead_7061deb28b9fb173b47166ac96794c2e",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-18 [000010]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:40.917349+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000128385426000010/xslF345X06/wk-form4_1789766082.xml"
+    },
     "lead_70685d4e83abf0f1405809b368db1069": {
       "entities": {
         "company_ids": [],
@@ -34120,6 +34580,40 @@
         "tier": 4
       },
       "url": "https://x.com/aleabitoreddit/status/2098697148103631117"
+    },
+    "lead_708653f1eded5778e187a015e7110fcc": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:40.917576+00:00",
+      "lead_id": "lead_708653f1eded5778e187a015e7110fcc",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-18 [000007]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:40.917659+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000124382126000007/xslF345X06/wk-form4_1789766132.xml"
     },
     "lead_70a564244c8beb93470c9853a36df18a": {
       "entities": {
@@ -39053,6 +39547,32 @@
       },
       "url": "https://x.com/aleabitoreddit/status/2077414086959112629"
     },
+    "lead_8402c4c59bc7019568e5723ecdaae455": {
+      "entities": {
+        "company_ids": [
+          "co:globalfoundries"
+        ],
+        "tickers": [
+          "GFS"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:33.540362+00:00",
+      "lead_id": "lead_8402c4c59bc7019568e5723ecdaae455",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:GFS",
+      "status": "triaged_no_go",
+      "themes": {},
+      "title": "GFS 4 filed 2026-09-18 [062750]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:33.540492+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1709048/000162828026062750/xslF345X06/wk-form4_1789763847.xml"
+    },
     "lead_8449bc608af931881de4f3306385d5ab": {
       "entities": {
         "company_ids": [
@@ -40996,6 +41516,8 @@
         "trace_next_trigger": "Team Group 法說／新聞稿逐字揭露 2027 配額、DDR5 缺口或 2028–2029 訂單能見度",
         "trace_origin_entity": "Team Group;DigiTimes",
         "trace_original_date": "2026-09-15",
+        "trace_requeue_trigger": "related_triaged_lead:lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3",
+        "trace_requeued_at": "2026-09-18T21:35:42.603876+00:00",
         "trace_requires_user": "false",
         "trace_status": "partial",
         "trace_trigger_entities": [
@@ -41004,10 +41526,12 @@
           "co:micron_technology",
           "co:sk_hynix"
         ],
-        "trace_trigger_kind": "related_entity_signal"
+        "trace_trigger_event_ref": "lead:lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3",
+        "trace_trigger_kind": "related_entity_signal",
+        "trace_trigger_watch_ref": "ew_0090_2026-09-15"
       },
       "source": "x:aleabitoreddit",
-      "status": "parked",
+      "status": "triaged_go",
       "themes": {},
       "title": "Some color on current memory environments for the $MU / $SKHY bros: \"There is zero risk of memory prices dropping\" per Team Group GM Gerry Chen. - Memory module makers have received notices warning of drastic cuts to their 2027 supply allocations. Some could receive 50% or less of their 2026 allocation. - Upstream manufacturers have reportedly sold out nearly all of their 2027–2028 capacity. - DDR5 supply, in particular, is projected to come in at less than 80% of previous expectations. - Chen expects prices to continue rising 20–30% quarter-over-quarter into 2027 (source Digitimes) - Chen's commentary on $MU is that even before their new MegaFab capacity comes online Q4 2027 at the earliest, orders for 2028 through 2029 are already fully booked. So that there's virtually no relief in sight to current shortages. Sharply lower allocations, fully booked capacity into 2029, and future price hikes doesn't quite sound like the AI buildout is slowing down.",
       "triage": {
@@ -41018,12 +41542,34 @@
           "decision_impact": "confidence_only",
           "reason": "結果會校準既有記憶體供需與價格假設的信心，未具體指向候選增刪。"
         },
-        "decided_at": "2026-09-15T21:36:27.640061+00:00",
+        "decided_at": "2026-09-18T21:35:42.603876+00:00",
         "decision": "go",
         "priority_flags": {},
-        "reason": "具名 Team Group 總經理與 Digitimes，並有 2027 配額、DDR5 供應、季增價格及 Micron 訂單時點等可核對數字；可能提供獨立的記憶體供需反證或佐證。",
+        "reason": "Event Watch ew_0090_2026-09-15 觸發：新 triage PASS lead lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3 與等待中的追源共用具名標的 MU, SKHY, co:micron_technology, co:sk_hynix；事件觸發 bounded pq1 重查",
         "tier": 3
       },
+      "triage_history": [
+        {
+          "status": "parked",
+          "superseded_at": "2026-09-18T21:35:42.603876+00:00",
+          "superseded_reason": "Event Watch ew_0090_2026-09-15 觸發：新 triage PASS lead lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3 與等待中的追源共用具名標的 MU, SKHY, co:micron_technology, co:sk_hynix；事件觸發 bounded pq1 重查",
+          "trace_trigger": "related_triaged_lead:lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3",
+          "triage": {
+            "classification": {
+              "classified_at": "2026-09-15T21:36:27.640061+00:00",
+              "classified_by": "triage_semantic_v1",
+              "content_type": "financial_fact",
+              "decision_impact": "confidence_only",
+              "reason": "結果會校準既有記憶體供需與價格假設的信心，未具體指向候選增刪。"
+            },
+            "decided_at": "2026-09-15T21:36:27.640061+00:00",
+            "decision": "go",
+            "priority_flags": {},
+            "reason": "具名 Team Group 總經理與 Digitimes，並有 2027 配額、DDR5 供應、季增價格及 Micron 訂單時點等可核對數字；可能提供獨立的記憶體供需反證或佐證。",
+            "tier": 3
+          }
+        }
+      ],
       "url": "https://x.com/aleabitoreddit/status/2099674926697545849"
     },
     "lead_8a772eedb46f9af575752521eed37f12": {
@@ -62288,6 +62834,40 @@
       ],
       "url": "https://x.com/aleabitoreddit/status/2085649654059016387"
     },
+    "lead_e79289c49c21aab18e15f4acb1728161": {
+      "entities": {
+        "company_ids": [
+          "co:lumentum"
+        ],
+        "tickers": [
+          "LITE"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:36.412785+00:00",
+      "lead_id": "lead_e79289c49c21aab18e15f4acb1728161",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:LITE",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "LITE"
+          ]
+        }
+      },
+      "title": "LITE 4 filed 2026-09-18 [000012]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:36.412914+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1633978/000148955026000012/xslF345X06/form4-09182026_080946.xml"
+    },
     "lead_e7aa38c464cef9d7581ebaa76406ba66": {
       "entities": {
         "company_ids": [],
@@ -64132,6 +64712,40 @@
         "tier": 1
       },
       "url": "https://www.sec.gov/Archives/edgar/data/1158114/000168316826005948/xslF345X06/ownership.xml"
+    },
+    "lead_ee9dd6096dafe683d223628b7c776495": {
+      "entities": {
+        "company_ids": [
+          "co:nvidia"
+        ],
+        "tickers": [
+          "NVDA"
+        ]
+      },
+      "first_seen": "2026-09-18T21:33:40.917476+00:00",
+      "lead_id": "lead_ee9dd6096dafe683d223628b7c776495",
+      "published_at": "2026-09-18",
+      "refs": {},
+      "source": "edgar:NVDA",
+      "status": "triaged_no_go",
+      "themes": {
+        "cpo": {
+          "counter_only": false,
+          "counter_terms": [],
+          "terms": [
+            "NVDA"
+          ]
+        }
+      },
+      "title": "NVDA 4 filed 2026-09-18 [000014]",
+      "triage": {
+        "decided_at": "2026-09-18T21:33:40.917559+00:00",
+        "decision": "no_go",
+        "priority_flags": {},
+        "reason": "harvest 端自動 no_go：Form 4 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead：applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。大額自主市場買賣若要當 disproof 證據，走 requeue-campaign 明確叫回。",
+        "tier": 1
+      },
+      "url": "https://www.sec.gov/Archives/edgar/data/1045810/000158867026000014/xslF345X06/wk-form4_1789765959.xml"
     },
     "lead_eea44f3ae623397f4f337620ce0e1c41": {
       "content_updated_at": "2026-09-10T22:32:36.920827+00:00",
@@ -68159,8 +68773,8 @@
   "schema_version": "2",
   "source_state": {
     "x:aleabitoreddit": {
-      "since_id": "2100530507549425704",
-      "updated_at": "2026-09-17T23:03:33.876163+00:00",
+      "since_id": "2100938001077674262",
+      "updated_at": "2026-09-18T21:33:26.838913+00:00",
       "user_id": "1940360837547565056"
     }
   }

@@ -4666,9 +4666,9 @@
     {
       "added_at": "2026-08-30T09:00:00.875798+00:00",
       "company_id": "co:micron_technology",
-      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜沒有需要你決定的 blocker，但仍帶等世界的項目：technical_causal_link_corroboration_incomplete。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件",
+      "hint": "當前 missing_data：HBM 市占的第三方量化（TrendForce 級，tier 3 需標明）；NVDA 供應承諾中 Micron 份額（issuer 不拆分，可能長期不可得）（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
       "n": 279,
-      "reactivated_at": "2026-09-11T04:35:48.814119+00:00",
+      "reactivated_at": "2026-09-18T21:42:03.156320+00:00",
       "reactivation_event": {
         "type": "decision_blocker_mode_changed"
       },
@@ -4678,14 +4678,7 @@
       "resolved_at": null,
       "source": "decision_lab",
       "title": "co:micron_technology：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
-      "type": "decision_review",
-      "waiting_on": {
-        "derived_from_blockers": true,
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-09-12T00:02:18.826772+00:00",
-        "trigger": "技術指標觀測問題",
-        "until": null
-      }
+      "type": "decision_review"
     },
     {
       "added_at": "2026-08-30T09:03:48.249782+00:00",
@@ -10416,6 +10409,110 @@
       "source": "manual",
       "title": "LITE：co:lumentum→tech:uhp_laser 的 sole_source=true 只有供應商自報，而圖裡另有 co:coherent 供同一 tech 的第三方反證邊——依 L8 應降級",
       "type": "manual"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:applied_optoelectronics",
+      "hint": "當前 missing_data：獨立客戶端 800G／1.6T 量產與訂單驗證（hyperscaler 結構性不揭露，可能長期不可得）；Digicomm 作為獨家代理商的終端客戶組成與 sell-through 數據；400mW pump laser 的客戶端 sampling 回饋或 design-win 佐證（共 3 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 618,
+      "reason": "reassess-stale：新 decision pd_84e9b0012bba49dbe70092b676e8447b 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-18T21:42:16.924446+00:00",
+      "source": "decision_lab",
+      "title": "co:applied_optoelectronics：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:foci",
+      "hint": "當前 missing_data：上詮法說會對『獨供兩代』的可稽核逐字（年報未揭露，替代 TSMC 具名的主要路徑）；客戶端（Coherent／Lumentum／Broadcom）filing 對 FAU 供應商的具名；⚠ TSMC 具名已改判為結構性可能不可得——不建議再投入 pq1 預算於此路徑（共 3 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 619,
+      "reason": null,
+      "ref_id": "dc_6b92df56a6d186eb7464479dfb9c48c3",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:foci：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:globalfoundries",
+      "hint": "當前 missing_data：客戶端或第三方對 GF 在成熟製程／RF-SOI／矽光的市占量化（目前所有市占敘述都出自 GF 自己）；20-F Note 32 的 Customer A／B／C 身分——只給代號，不得推定（GF/MPS 公告不能用來反推 ；GF/MPS 長期製造協議的經濟規模：金額、最低採購量、排他性、量產交付時點（該 RA 自己的缺口欄已註明）（共 3 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 620,
+      "reason": "reassess-stale：新 decision pd_858c1cc7861aecadb5235b7f9d70c9e8 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-18T21:42:16.924446+00:00",
+      "source": "decision_lab",
+      "title": "co:globalfoundries：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:himax",
+      "hint": "當前 missing_data：TSMC 或任一 CPO 客戶對微透鏡陣列供應商的具名陳述（結構性可能長期不可得——TSMC 公開談瓶頸時亦不具名）；Himax 自家對 COUPE／WLO 供應關係的正式揭露（20-F FY2025 未提）（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 621,
+      "reason": null,
+      "ref_id": "dc_7bd7922b16d32044b3f75d2edb19342d",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:himax：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:poet_technologies",
+      "hint": "當前 missing_data：Lumilens 訂單的實際出貨與收款驗證（PO ≠ 營收）；Marvell 保密爭議的後續（訴訟或和解揭露）（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 622,
+      "reason": null,
+      "ref_id": "dc_9d464eeb94b7b0108104db1774bbbdd4",
+      "resolution": null,
+      "resolved_at": null,
+      "source": "decision_lab",
+      "title": "co:poet_technologies：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:sk_hynix",
+      "hint": "當前 missing_data：客戶端或第三方對 SK hynix 為 HBM 合格／主力供應者的具名印證（NVIDIA、AMD 或 hyperscal；IFRS 8 主要客戶（가）／（나）的身分——法定文件只給代號與百分比，不給名字，不得推定就是 NVIDIA（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 623,
+      "reason": "reassess-stale：新 decision pd_08c9e5a0639a1ffbf71a90e645a86d96 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-18T21:42:16.924446+00:00",
+      "source": "decision_lab",
+      "title": "co:sk_hynix：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:mp_materials",
+      "hint": "當前 missing_data：磁體營收（非精礦/氧化物）的實際放量軌跡（Independence 廠季度出貨）；人形客戶（非 EV/消費電子）的具名承諾——目前 Apple/GM 都不是機器人需求（共 2 項）｜留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 624,
+      "reason": "reassess-stale：新 decision pd_d2b34cf9c757c13ff8339435f1bce6a0 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-18T21:42:16.924446+00:00",
+      "source": "decision_lab",
+      "title": "co:mp_materials：補 counter-path：什麼會讓這條因果鏈斷掉（第二供應源、客戶自製、技術替代）",
+      "type": "decision_review"
+    },
+    {
+      "added_at": "2026-09-18T21:42:03.156320+00:00",
+      "company_id": "co:lynas",
+      "hint": "留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker——所以 reassess-stale 與 standing-go 都不會自動處理它。go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；不含入圖、Engine C 寫入與 live",
+      "n": 625,
+      "reason": "reassess-stale：新 decision pd_3d36568037d5aa226da6fd2385dccdf1 的 attention=MONITOR，不再需要使用者決定",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "resolution": "reassessed",
+      "resolved_at": "2026-09-18T21:42:16.924446+00:00",
+      "source": "decision_lab",
+      "title": "co:lynas：補獨立來源：找客戶端或第三方文件，把供應商自報升級成外部印證",
+      "type": "decision_review"
     }
   ],
   "log": [
@@ -22392,8 +22489,114 @@
       "ref_id": "manual:616",
       "type": "manual",
       "verb": "go"
+    },
+    {
+      "at": "2026-09-18T21:42:03.156320+00:00",
+      "n": 279,
+      "prior_waiting_on": {
+        "derived_from_blockers": true,
+        "reason": "所有 blocker 都不需要使用者決定",
+        "set_at": "2026-09-12T00:02:18.826772+00:00",
+        "trigger": "技術指標觀測問題",
+        "until": null
+      },
+      "reason": "blocker 已不再全屬等待事件，恢復人工複查",
+      "receipt": null,
+      "ref_id": "dc_b05cc1360e4bdf2a238787c23e7b227d",
+      "type": "decision_review",
+      "verb": "event_reactivated"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 618,
+      "reason": "reassess-stale：僅 context 老化，以 intent=paper 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_84e9b0012bba49dbe70092b676e8447b",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 618,
+      "reason": "reassess-stale：新 decision pd_84e9b0012bba49dbe70092b676e8447b 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_84e9b0012bba49dbe70092b676e8447b",
+      "ref_id": "dc_a94362af0d6a7398f02bdeb4f0fb893c",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 620,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_858c1cc7861aecadb5235b7f9d70c9e8",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 620,
+      "reason": "reassess-stale：新 decision pd_858c1cc7861aecadb5235b7f9d70c9e8 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_858c1cc7861aecadb5235b7f9d70c9e8",
+      "ref_id": "dc_766316738ea5013cf930254fca598033",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 623,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_08c9e5a0639a1ffbf71a90e645a86d96",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 623,
+      "reason": "reassess-stale：新 decision pd_08c9e5a0639a1ffbf71a90e645a86d96 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_08c9e5a0639a1ffbf71a90e645a86d96",
+      "ref_id": "dc_70872dbacf53703aada2f101e5e0cd1c",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 624,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_d2b34cf9c757c13ff8339435f1bce6a0",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 624,
+      "reason": "reassess-stale：新 decision pd_d2b34cf9c757c13ff8339435f1bce6a0 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_d2b34cf9c757c13ff8339435f1bce6a0",
+      "ref_id": "dc_21d81aa11dd2fe85c747b1c759fd01ed",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 625,
+      "reason": "reassess-stale：僅 context 老化，以 intent=research 重新凍結（attention=MONITOR）",
+      "receipt": "decision:pd_3d36568037d5aa226da6fd2385dccdf1",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "pq1_reassessed"
+    },
+    {
+      "at": "2026-09-18T21:42:16.924446+00:00",
+      "n": 625,
+      "reason": "reassess-stale：新 decision pd_3d36568037d5aa226da6fd2385dccdf1 的 attention=MONITOR，不再需要使用者決定",
+      "receipt": "decision:pd_3d36568037d5aa226da6fd2385dccdf1",
+      "ref_id": "dc_48446dbceb85d4b785634e3c4ca5d669",
+      "type": "decision_review",
+      "verb": "reassessed_closed"
     }
   ],
-  "next_n": 618,
+  "next_n": 626,
   "schema_version": "1"
 }

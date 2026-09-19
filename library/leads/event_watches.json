@@ -272,7 +272,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-15",
+        "last_checked": "2026-09-18",
         "query_hint": "取得 canonical Rosenblatt／B. Riley note，或 AAOI／Broadcom 官方量化 MRC／RNG 對 optical unit demand 的影響"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=partial",
@@ -1356,7 +1356,7 @@
       ],
       "poll": {
         "eligible": true,
-        "last_checked": "2026-09-15",
+        "last_checked": "2026-09-18",
         "query_hint": "FCC 正式發布 NPRM／Report and Order，或把中國光模組廠列入 Covered List。"
       },
       "note": "[321] 由 trace backlog 遷移；trace_status=isolated_tier_3",
@@ -3615,7 +3615,12 @@
       "wake_pq2": null,
       "hypothesis_ref": "",
       "wake_lead": "lead_8a72e7d5db52030098113f91542e6abf",
-      "consumed_entities": [],
+      "consumed_entities": [
+        "CO:MICRON_TECHNOLOGY",
+        "CO:SK_HYNIX",
+        "MU",
+        "SKHY"
+      ],
       "poll": {
         "eligible": false,
         "last_checked": null,
@@ -3623,7 +3628,27 @@
       },
       "note": "park 時自動建立；trace_status=partial",
       "status": "active",
-      "woken_by": null
+      "woken_by": null,
+      "consumed_leads": [
+        "lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3"
+      ],
+      "reactivations": [
+        {
+          "at": "2026-09-18T21:35:42.607279+00:00",
+          "woken_by": {
+            "kind": "related_entity_signal",
+            "lead_id": "lead_22db1b0302c9bb2ad4a2a41dcdd8b0c3",
+            "shared_entities": [
+              "MU",
+              "SKHY",
+              "co:micron_technology",
+              "co:sk_hynix"
+            ],
+            "at": "2026-09-18T21:35:42.607223+00:00",
+            "wake_lead": "lead_8a72e7d5db52030098113f91542e6abf"
+          }
+        }
+      ]
     },
     {
       "watch_id": "ew_0091_2026-09-17",
