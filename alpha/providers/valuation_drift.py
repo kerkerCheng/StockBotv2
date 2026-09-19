@@ -32,6 +32,10 @@ AGENTS.md（2026-09-09 定案）：**沒有 re-rating 證據時，目標倍數�
 3. **刻意主張折溢價的不該被叫醒**（L11-6：最先壞掉的是哪一筆）。`derivation` 不是
    `calibrated_to_market` 的那些（實測 COHR −25.8%、LYC.AX −13.4%）背離是**有意的**。
 
+⚠ 第 2 道不是新判準，是**把既有的判準帶到這一層**（L16）：`python -m webapp status` 對
+6680.HK 早就印著 `headline=inputs_incompatible`——**headline 層已經 fail closed，估值假設層沒有**。
+同一個問題在一層擋住、在另一層照算，正是 L12 的形狀。
+
 三道都過不了時回 `not_applicable`／`cannot_compare` **並帶理由**，不靜默跳過（INV-3）。
 
 ## 為什麼是 5%
