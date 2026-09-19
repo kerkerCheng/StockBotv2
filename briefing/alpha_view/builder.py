@@ -1298,7 +1298,8 @@ BRIEF_IS_NOT: tuple[str, ...] = (
 
 def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection,
                   catalysts: CatalystSection, bridge: EarningsBridgeSection, today: date,
-                  gap: ExpectationGapSection | None = None) -> dict[str, str | None]:
+                  gap: ExpectationGapSection | None = None,
+                  downside: PayoffScenarioSection | None = None) -> dict[str, str | None]:
     """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。"""
     price = ir.current_price
     unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
@@ -1324,6 +1325,10 @@ def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, co
         "bet_target": format_value("price", payoff.scenario_fair_value.value, unit=unit),
         "base_return": format_value("ratio", ir.price_return.value),
         "payoff": format_value("ratio", payoff.payoff_return.value),
+        # D2 的另一端（2026-09-19）：值早就存在於 `scale_value`，只是沒跟著資料走到首屏那一格（L16）。
+        # ⚠ 沒有 downside scenario 時是 `None` → `fill_brief` 印「（尚無）」並標 partial，**不補 0**。
+        "downside_target": format_value("price", downside.scenario_fair_value.value if downside is not None else None, unit=unit),
+        "downside_return": format_value("ratio", downside.payoff_return.value if downside is not None else None),
         "sell_side_target": format_value("price", by_key["target_mean"].value if "target_mean" in by_key else None, unit=unit),
         "market_multiple": format_value("multiple", market_multiple),
         "analyst_count": format_value("count", analyst_count),
@@ -1386,7 +1391,8 @@ def _investor_brief_section(
         slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
                       for key, label in SLOT_LABELS.items())
         return InvestorBriefSection(meta=meta, slots=slots, scale=scale, status_light=light, brief_id=None, is_not=BRIEF_IS_NOT)
-    values = _brief_values(ir=ir, payoff=payoff, consensus=consensus, catalysts=catalysts, bridge=bridge, today=today, gap=gap)
+    values = _brief_values(ir=ir, payoff=payoff, consensus=consensus, catalysts=catalysts, bridge=bridge,
+                           today=today, gap=gap, downside=downside)
     filled, absent = fill_brief(brief, values)
     slots: list[Datum] = []
     for slot in brief.slots:

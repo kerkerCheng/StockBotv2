@@ -80,9 +80,17 @@ BRIEF_FRAME: Mapping[str, Mapping[str, str]] = {
                   "⚠ 假設值用 {bet_assumption:driver[scope]}／{assumption:driver[scope]}，不得打字面值。",
     },
     "if_right_if_wrong": {
-        "question": "如果對了值多少？錯的訊號是什麼？",
-        "look_at": "{bet_target}、{payoff}、{price}、disproof 條件",
-        "do_not": "⚠ 目標價與報酬一律 placeholder。⚠ 錯的訊號要是可觀測的條件，不是『情況變差』。",
+        "question": "如果對了值多少？如果判斷錯了值多少？錯的訊號是什麼？",
+        "look_at": "{bet_target}、{payoff}、{downside_target}、{downside_return}、{price}、disproof 條件",
+        "do_not": "⚠ 目標價與報酬一律 placeholder。⚠ 錯的訊號要是可觀測的條件，不是『情況變差』。"
+                  "⚠ **對了與錯了要對稱**（D2，2026-09-16）：只寫上檔的那一半不算寫完——"
+                  "首屏是使用者唯一會讀的那一屏，對稱在這裡斷掉等於沒有對稱。"
+                  "⚠ 沒有 downside scenario 時**不要硬寫**：那兩個 placeholder 會印「（尚無）」並標 partial，"
+                  "而「還沒做」與「做了，結論是跌幅有限」是兩件不同的事（缺席不得被壓成一句無資料）。"
+                  "⚠ **不得在 placeholder 旁邊寫一句依賴那個數字大小的結論**"
+                  "（「兩邊差不多大」「極不對稱」「跌不下去」）：數字由 authority 每天重填，那句話不會——"
+                  "2026-09-19 實測，寫的當下用的是 +10.1%／−10.0%，填出來是 +5.7%／−13.6%，**當場就是錯的**。"
+                  "要講不對稱就講「兩邊一起看」，把大小留給數字自己說。",
     },
     "when": {
         "question": "什麼時候知道？（最近的裁決點）",
@@ -98,6 +106,8 @@ PLACEHOLDERS: Mapping[str, str] = {
     "bet_target": "賭注目標價（variant fair value）",
     "base_return": "base 隱含價格報酬（simple）",
     "payoff": "賭注對了的隱含價格報酬（simple）",
+    "downside_target": "判斷錯了的目標價（downside scenario fair value）",
+    "downside_return": "判斷錯了的隱含價格報酬（simple）",
     "sell_side_target": "賣方目標價均值（Engine C 快照）",
     "market_multiple": "市場對共識付的倍數",
     "analyst_count": "分析師人數",
