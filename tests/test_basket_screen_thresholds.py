@@ -58,3 +58,34 @@ def test_no_screen_means_the_conditions_are_simply_not_applied() -> None:
     """
     assert _screen_reasons(None, THRESHOLDS) == []
     assert _screen_reasons(_entry(83.5e9, 25), None) == []      # 沒有門檻也一樣
+
+
+# ---------------------------------------------------------------------------
+# D11 第四條：至少一條外部印證的瓶頸邊（Phase 4a）
+# ---------------------------------------------------------------------------
+
+def test_at_least_one_externally_corroborated_edge() -> None:
+    """⚠ 驗的是**語意**（「至少一條」看全部的列），不是今天的結果。
+
+    2026-09-19 實測 16 檔用單列判與用全列判**完全相同**——因為排序把證據強的排前面。
+    那是排序的副作用不是保證，所以測試照語意寫：**只要有任何一條外部印證就通過**。
+    """
+    from webapp.basket import EXTERNALLY_CORROBORATED, FILTER_REASONS, build_basket_row
+
+    assert "no_externally_corroborated_edge" in FILTER_REASONS
+    assert EXTERNALLY_CORROBORATED == "externally_corroborated"
+
+    def _reasons(seen):
+        row = build_basket_row({"ticker": "T", "rank": 1}, None, None, sector=None,
+                               evidence_seen=seen)
+        return row["filter_reasons"]
+
+    # 最前那列自報、別的列有印證 → **通過**（這正是「至少一條」的意思）
+    assert "no_externally_corroborated_edge" not in _reasons({"self_reported", "externally_corroborated"})
+    # 每一條都只有自報 → 擋下
+    assert "no_externally_corroborated_edge" in _reasons({"self_reported_costly"})
+    # ⚠ self_reported_costly 不算外部印證：付出代價只提高可信度，仍是當事人陳述（L8）
+    assert "no_externally_corroborated_edge" in _reasons({"self_reported_costly", "self_reported"})
+    assert "no_externally_corroborated_edge" in _reasons({"needs_review"})
+    # 沒傳 → **不套這一條**（不是當成不合格）
+    assert "no_externally_corroborated_edge" not in _reasons(None)

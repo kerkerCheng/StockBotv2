@@ -59,6 +59,13 @@ FILTER_REASONS: Mapping[str, str] = {
     "analyst_count_above_max": "賣方覆蓋家數高於上限——覆蓋厚的不是邊緣小公司",
     "market_cap_unknown": "市值取不到或無法正規化——**不得靜默放行，也不得靜默擋掉**",
     "analyst_count_unknown": "覆蓋家數取不到",
+    # D11 第四條（Phase 4a，2026-09-19）：**至少一條外部印證的瓶頸邊**。
+    # ⚠ 看的是該公司在排序裡的**所有**邊，不只籃子留下的那一列——「至少一條」的意思就是這個。
+    # ⚠ `self_reported_costly`（自報但付出代價，例如寫進 filing）**不算外部印證**：
+    # L8 要的是「客戶端或第三方」，而付出代價只提高可信度，不改變它仍是當事人陳述。
+    "no_externally_corroborated_edge": (
+        "這家公司在排序裡的**每一條**瓶頸邊都只有自報或待判定——"
+        "沒有任何一條有客戶端／第三方印證（L8）"),
     "catalyst_missing_resolves": ("催化劑有日期、也落在目標價日期之前，**只差沒填 `resolves`**"
                                   "（指不出它會裁決哪一條假設）——這是我們的待辦，不是標的的缺點"),
     "catalyst_undated": "有催化劑散文但**沒有日期**——排不進射程，也無從判斷是否來得及",
@@ -217,6 +224,32 @@ def _bet_state(payoff_value: float | None, *, abstained: bool, stance: Any) -> s
     return "unanswered"
 
 
+#: 「外部印證」的唯一值。⚠ 封閉字彙照抄排序權威的 `evidence`，**不另造一份**（L16）。
+EXTERNALLY_CORROBORATED = "externally_corroborated"
+
+
+def _evidence_by_ticker(ranking: Mapping[str, Any]) -> dict[str, set[str]]:
+    """每家公司在排序裡出現過的所有 `evidence` 值。
+
+    ⚠ **要看全部的列，不是籃子留下的那一列**：籃子每家只留最前名次，
+    而 D11 問的是「**至少一條**外部印證的瓶頸邊」——用單列判會把「第 2 條有印證」
+    誤判成沒有。
+
+    ⚠⚠ **2026-09-19 實測：今天這 16 檔用單列判，結果與用全列完全相同（0 檔不同）。**
+    原因是排序本來就把證據強的排前面，所以最前那列通常就是最強的那條。
+    **那是排序的副作用，不是保證**——排序規則一改、或某家公司的最強證據落在低名次時就會分岔。
+    所以這裡照語意寫（「至少一條」就是看全部），**不照今天的巧合寫**。
+    （⚠ 本段第一版寫了「實測 AVGO／COHR／LITE 都是最前那列自報」——**那句話是沒查證就寫的，
+    而且是錯的**。查一次是 30 秒的事，L11-6。）
+    """
+    out: dict[str, set[str]] = {}
+    for row in ranking.get("rows") or ():
+        ticker = str(row.get("ticker") or "")
+        if ticker:
+            out.setdefault(ticker, set()).add(str(row.get("evidence") or ""))
+    return out
+
+
 def _screen_reasons(entry: Mapping[str, Any] | None, thresholds: Mapping[str, Any] | None) -> list[str]:
     """D11 兩條機械條件 → filter 理由（Phase 4a）。**沒有 screen 就一條都不套。**
 
@@ -244,7 +277,8 @@ def _screen_reasons(entry: Mapping[str, Any] | None, thresholds: Mapping[str, An
 def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | None,
                      live: Mapping[str, Any] | None, *, sector: str | None,
                      screen: Mapping[str, Any] | None = None,
-                     screen_thresholds: Mapping[str, Any] | None = None) -> dict[str, Any]:
+                     screen_thresholds: Mapping[str, Any] | None = None,
+                     evidence_seen: set[str] | None = None) -> dict[str, Any]:
     ov = overview or {}
     payoff = ov.get("payoff") or {}
     ripeness = _cell_value(ov.get("ripeness"))
@@ -268,6 +302,10 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
     if catalyst_reason is not None:
         reasons.append(catalyst_reason)
     reasons.extend(_screen_reasons(screen, screen_thresholds))
+    # D11 第四條：該公司的**所有**邊裡有沒有一條外部印證的。
+    # `evidence_seen is None`＝呼叫端沒傳（例如純函式測試）→ **不套這一條**，不是當成不合格。
+    if evidence_seen is not None and EXTERNALLY_CORROBORATED not in evidence_seen:
+        reasons.append("no_externally_corroborated_edge")
     base_closure = (closure.get("base") or {}) if isinstance(closure, Mapping) else {}
     return {
         "rank": rank_row.get("rank"),
@@ -279,6 +317,9 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         "relation": rank_row.get("relation"),
         "evidence": rank_row.get("evidence"),
         "evidence_label": rank_row.get("evidence_label"),
+        # 該公司在排序裡出現過的所有 evidence 值——**值跟著列走**，否則看不到
+        # 「它是每一條都自報，還是只有這一條」（D11 第四條問的是後者）。
+        "evidence_seen": sorted(evidence_seen) if evidence_seen else None,
         "has_overview": overview is not None,
         "readiness": (ov.get("readiness") or {}).get("state"),
         "opinion_stance": stance,
@@ -370,6 +411,7 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
     """
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     sector_of = _sector_by_rank(ranking)
+    evidence_by_ticker = _evidence_by_ticker(ranking)
     live_by_ticker = {str(r.get("ticker")): r for r in ((positions or {}).get("live") or {}).get("rows") or ()
                       if r.get("ticker")}
     rows: list[dict[str, Any]] = []
@@ -382,7 +424,8 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
         rows.append(build_basket_row(rank_row, overviews.get(str(ticker)), live_by_ticker.get(str(ticker)),
                                      sector=sector_of.get(int(rank_row.get("rank") or 0)),
                                      screen=(screen or {}).get(str(ticker)),
-                                     screen_thresholds=screen_thresholds))
+                                     screen_thresholds=screen_thresholds,
+                                     evidence_seen=evidence_by_ticker.get(str(ticker))))
     # 第二個宇宙（Q1）：被門檻擋下、但**已研究過**的那些（`below_threshold`）。
     # `unfilled` 刻意不進來——那是研究缺口不是候選，它的去處是 pq1（zoom-out §7 Q1-A）。
     moat_tickers = {str(r["ticker"]) for r in rows if r.get("ticker")}
@@ -502,6 +545,7 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
 
 
 __all__ = ["BASKET_THIS_IS_NOT", "BET_LEDGER_RULE", "BET_STATES", "CATALYST_REASONS",
+           "EXTERNALLY_CORROBORATED",
            "FILTER_REASONS", "FILTER_RULE",
            "OPINION_IN_BASE_STANCES",
            "SHIPPING_STATUSES", "VOLUME_FILTER_REASONS", "VOLUME_MISSING_CRITERIA", "VOLUME_ORDER_NOTE",
