@@ -46,15 +46,18 @@
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
 >
-> ### ▶ 這一輪的第一件事：**Phase 4a 的最後兩條**（兩條都卡在「要用的分類不存在」）
+> ### ▶ 這一輪的第一件事：**填更多檔的 `multiple_horizon`**（唯一還在動的槓桿）
 >
-> - **入圖前 30 天漲幅上限**：`loader` 不記載入時間，`SourceDoc` 只有 `published_at`／
->   `retrieved_at`，追蹤表的 `anchor_date` 是**決策日**。兩個選項見 ROADMAP Phase 4a 那一列
->   ——**要使用者選**，因為 (a) 代理與 (b) 真時間戳量的是不同的東西。
-> - **瓶頸業務占營收下限**：`segment_revenue_share` 15／16 有值，但**缺「哪個分部對應哪條瓶頸邊」
->   的對應關係**——那是實質設計不是接線。
+> 多年橋整條鏈已經通了（CLI／artifact／API／APP 頁面／心跳計數器），但 **62 檔裡只有 COHR 一檔
+> 寫下了「倍率在哪一年實現」**。心跳每天會印「還沒寫下目標年度 15」。
+> ⚠ **填它是 judgment 走 pq2**——要有那一檔自己的一手依據（COHR 用的是 10-Q 逐字
+> 「support future production volumes **through 2030**」）。沒有依據就不要填。
 >
-> ### ▶ 已完成（不要重做）：Step 7.3——多年橋有自己的入口
+> ⚠ **Phase 4a 的最後兩條已經量完，結論都是「今天不該接」**（不是待辦，是已結案的判斷）：
+> 入圖日那條缺的是資料歷史長度（圖只有 69 天）、瓶頸業務占比那條缺的是那個數字本身。
+> 逐項實測見 ROADMAP Phase 4a 那一列與 `python scripts/alpha_screen_check.py`。
+>
+> ### ▶ 已完成（不要重做）：Phase 7 的 7.1–7.4
 >
 > [630] 已核准並執行：**COHR 的第一條多年橋跑通了**（FY2030，距基期 4 年）：
 > **2 倍需要 Datacenter & Communications 分部四年累積成長 4.65 倍**；**3 倍以上所有 driver
@@ -157,7 +160,8 @@
 | **籃子 16 檔通過 0、首選無**（Phase 4a 接上兩條門檻後）；`market_cap_above_max` 10｜`analyst_count_above_max` 9｜`no_bet` 13｜`payoff_not_positive` 2｜催化劑四種形狀 `undated 6`／`missing_resolves 3`／`no_catalyst_recorded 4`／`after_value_date 1` | 讀 `library/private/app/state/basket.json` 的 `filter` 與 `top_pick_absent_reason` |
 | **「N 倍要什麼為真」四級階梯**（Phase 7 Step 7.1）：AXTI **2x 可達**、3x 以上做不到；LITE／COHR 連 2x 都有 driver 做不到 | 讀 view 的 `expectation_gap.reverse_bridge.value['return_ladder']` |
 | **`multiple_horizon` 填寫率 1 檔（COHR＝2030-06-30）**；`python -m briefing multi-year COHR` 印得出 FY2030 四級階梯，LITE 誠實回「還沒有人寫下來」 |
-| **Phase 4a 已接三條**（市值、覆蓋家數、至少一條外部印證的邊）；籃子 **通過 0**；`no_externally_corroborated_edge` 7 檔 | 讀 `basket.json` 的 `filter.reasons` | `python -c "import json,pathlib;print(sum(1 for p in pathlib.Path('library/private/alpha/judgments').glob('*.json') if json.loads(p.read_text(encoding='utf-8')).get('multiple_horizon')))"` |
+| **Phase 4a 已接三條**（市值、覆蓋家數、至少一條外部印證的邊）；籃子 **通過 0**；`no_externally_corroborated_edge` 7 檔。**另兩條量完確認不接** | 讀 `basket.json` 的 `filter.reasons`；`python scripts/alpha_screen_check.py` |
+| **多年視角整條鏈已通**：`multi_year` state kind｜`--multi-year`｜`/api/v1/multi-year`｜APP「要幾倍」頁｜心跳段 4 一行。**16 檔算得出 1** | `python -m webapp status`（應列出 `multi_year｜fresh`）｜`python -m briefing multi-year COHR` | `python -c "import json,pathlib;print(sum(1 for p in pathlib.Path('library/private/alpha/judgments').glob('*.json') if json.loads(p.read_text(encoding='utf-8')).get('multiple_horizon')))"` |
 | 賭注帳：籃子 `bet 3｜abstained 0｜opinion_in_base 3｜unanswered 10`；量的候選 `opinion_in_base 8｜unanswered 4` | 讀同一份 artifact 的 `bet_ledger`／`volume_bet_ledger`，或 `python crons/heartbeat.py` 第 4 段 |
 | **目標倍數背離：全 ledger 生效 `target_pe` 49 筆｜`drift_exceeds 13`／`within_band 32`／`not_applicable 2`／`cannot_compare 2`**（門檻 5%） | `python scripts/target_pe_drift_check.py`（心跳段 2 也每天印一行） |
 | **packet 的市值現在帶著單位走**：16/16 檔有 `quote_unit`（其中 6 檔非 USD），市值缺席 0 檔 | `python -m pytest tests/test_market_quote_unit.py -q`（4 條） |
@@ -218,6 +222,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 收尾** | **[630] 執行：COHR 倍率射程＝FY2030（一手逐字 through 2030）＋七條錨點假設（carried_forward，不是預測）｜第一條多年橋跑通：2 倍需要資料中心分部四年累積成長 4.65 倍｜順帶分開一個承載兩種語意的 rollover 斷言** | 本輪 |
 
 | **2026-09-19 夜** | **Step 7.3（`briefing multi-year` CLI）｜Phase 4a 第三條（至少一條外部印證的邊，7 檔被擋）｜查出「入圖日」這個欄位從來不存在** | 本輪 |
+
+| **2026-09-19 深夜 2** | **Phase 4a 第三條（外部印證的邊，7 檔被擋）｜另兩條量完確認不接（入圖日缺歷史長度、瓶頸占比缺那個數字）｜`loader` 加 `admitted_at`（`ON CREATE SET`，既有 691 節點永遠 null）｜Step 7.4 多年視角進 APP（artifact＋API＋頁面＋心跳）** | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
