@@ -47,51 +47,69 @@
 >
 > ---
 >
-> ## ⚠⚠ 先讀這一段：籃子第一次有了首選，而它不是目標標的
+> ## ⚠⚠ 先讀這一段：篩選門檻已落地，而它量出了一個會決定下一個 Phase 的數字
 >
-> **2026-09-19：`top_pick` 由 null 變成 LITE（16 檔通過 1）。這是系統第一次回答「現在要加碼哪一檔」。**
+> **2026-09-19：D11 的兩條機械門檻已落地 `config/alpha_screen.json`（市值 ≤ US$10B、覆蓋 ≤ 12）。**
+> 套下去的結果是決定性的：
 >
 > ```
-> LITE 一把尺：現價 893.61｜沒賭對 1,065.76（+19.3%）｜賭對了 1,078.72（+20.7%）｜判斷錯了 881.63（−1.3%）
+> input 16／accepted 5／filtered 11（缺值 0）
+> 通過：IQE.L 0.76B/3｜POET 1.35B/1｜6324.T 3.74B/9｜AXTI 4.59B/5｜SOI.PA 5.80B/6
+> ⚠ 通過的 5 檔裡，4 檔已宣告「刻意不主張目標倍數」——儀器算不出 payoff。
+>    唯一算得出的 AXTI，payoff 為負。
+> ⚠ 被擋下的 11 檔裡，只有 1 檔有同樣的 abstention。
 > ```
 >
-> **⚠ 但使用者要先決定一件事：LITE 是市值 $80.2B、26 位分析師覆蓋的大型股，不是 D0／D11 說的「邊緣小公司」。**
-> 它會成為首選，是因為 **Phase 4 的市值／覆蓋門檻還沒交付**——filter 目前只問「有賭注、payoff 為正、
-> 有催化劑」。三條它都過，而且過得誠實（沒有放寬任何條件）。**這正好證明 Phase 4 是現在最該做的一格。**
+> **80% vs 9%。儀器的盲區正好是目標區。**
+> 意思是：**Phase 4 做完，籃子必然是空的——而空的原因不是「沒有好公司」，是我們的估值儀器
+> 對這一類公司不適用。** 這是 AGENTS.md 早就寫下那句話的實測版（「現行主流程是給高覆蓋大型股的
+> 儀器，對不上目標」），也是「多年反向橋」該不該從最後一個 Phase 提前的關鍵證據。
 >
-> ⚠ 另一件必須誠實說的：**LITE 的賭注只有 +0.5pp**（base 40.0% → variant 40.5%，都在公司指引區間內）。
-> 因為 base 的 `derivation` 是 `company_guidance`——「我們的差異看法」內容就是「相信公司的指引」，
-> 那個看法已整個住在 base 裡。**這不是研究不足，是結構性的。**
+> ⚠ **這不鬆動「籃子空就空」**：不得為了非空放寬 D11，也不得硬寫一個沒有倍數可乘的 target_pe。
 >
-> ### 上一輪（09-19）撞出的五個系統性缺陷——全部已記 ROADMAP backlog，動手前先讀那五列
+> ### LITE 的狀態（上一輪的 top_pick，兩件事互相獨立）
 >
-> 1. **`Catalyst.resolves` 從未被填**：新格式 62 個判斷檔、104 條催化劑，填寫數 **0**。
->    催化劑那格 15/16 亮著不是「沒有催化劑」，是一個**可選欄位**沒人填（Z2）。
-> 2. **`review_required` 拿 +1y 的共識去判定校準在 0y 的 base**：15/15 檔 base 都在 0y，
->    每次 rollover 全部假警報；LITE 的 +1y 覆蓋由 22 人崩到 1 人還被讀成「共識上修 +19.2%」（Z2）。
-> 3. **overlay 的 `scope` 與 base 不一致時不覆蓋而是疊加**：不報錯、測試不紅，
->    本輪實測產出假的 **+50.3%**（真值 +20.7%）。⚠ **錯誤方向對自己有利**，靠手算對照才發現（Z2）。
-> 4. **首屏結構上講不出「判斷錯了值多少」**：`PLACEHOLDERS` 沒有 downside 端，D2 的對稱只做了一半（Z2）。
-> 5. **4 檔 base 已含觀點卻被標「還沒寫賭注」**（LITE／SOI.PA／LYC.AX／6324.T）。
+> ```
+> 倍數校準後：現價 930.91｜沒賭對 +4.4%｜賭對了 +5.7%｜判斷錯了 更低
+> ```
+> ⚠ 原本印的「+20.7%／−1.3% 極不對稱好賭注」**是倍數陳舊 11 天造成的假象**（[616] 紅隊審查撈到）。
+> 校準到當時市價後是 +10.1%／−10.0%，**幾乎完全對稱**；隔數小時股價再漲 4.2%，又變成 +5.7%。
+> ⚠ **而 D11 門檻會直接把 LITE 擋掉**（市值 83.5B／覆蓋 25）——它從來就不是「邊緣小公司」。
 >
-> ### 這一輪建議做的（依序；前兩件不需核准）
+> ### 上一輪撞出的七個系統性缺陷——全部已記 ROADMAP backlog，動手前先讀那七列
 >
-> **① Phase 4 的 D11 機械條件**（覆蓋家數上限、市值上限…）。理由見上：籃子現在的首選是大型股，
-> 而那正是 Phase 4 要擋的。⚠ 改判準前先量「現有 16 檔有幾檔的判定真的變了」（L14）。
-> **② 上面五個缺陷挑一個做**。建議順序 3 → 1 → 2（3 會靜默產生對自己有利的假數字，最危險）。
-> **③ 第四檔做到底。** ⚠ 選檔前先跑一次「儀器可用 ∩ 催化劑條件」的交集：
-> 本輪實測 5 檔已宣告不主張目標倍數（SOI.PA／IQE.L／MP／POET／6324.T），**它們寫了賭注也算不出 payoff**。
+> 1. **`Catalyst.resolves` 從未被填**（62 檔 104 條，填 0 條）
+> 2. **`review_required` 拿 +1y 判定校準在 0y 的 base**（15/15 檔 base 都在 0y）
+> 3. **overlay 的 `scope` 與 base 不一致時不覆蓋而是疊加**——不報錯、測試不紅，實測產出假的 +50.3%
+> 4. **首屏講不出「判斷錯了值多少」**（`PLACEHOLDERS` 沒有 downside 端）
+> 5. **4 檔 base 已含觀點卻被標「還沒寫賭注」**
+> 6. **目標倍數是會腐壞的快照**——實測 4 小時腐壞 4%；11 檔有 4 檔宣告零折溢價卻背離 >5%
+> 7. **packet 的 `market_cap` 是未正規化裸數字**（IQE.L 54.8B → 正規化 0.76B）
+>
+> ### 這一輪建議做的
+>
+> **① 先決定：多年反向橋要不要提前？** ⚠ 這需要使用者決定（動 ROADMAP 的 Phase 排序，要先給五欄
+> amendment）。上面的 80% vs 9% 是支持提前的證據；反面理由是樣本只有 16 檔、4 筆 abstention。
+> ⚠ **L11-6：先逐筆重讀那 4 筆 Abstention 的 `reason` 與 `revisit_when`**——若其中任一筆其實不該
+> abstain，80% 就會掉下來。**不要拿這個數字直接去改 Phase 排序。**
+>
+> **② 把 D11 正式接進籃子 filter**（不需核准，但要先答兩個問題）：FX 要不要在每次 materialize 打外部？
+> 市值取不到時 D11 怎麼判（INV-3：不得靜默 filtered，也不得靜默放行）？
+> 現在的 consumer 只是量測腳本 `scripts/alpha_screen_check.py`，**`webapp/basket.py` 的 top_pick 判定完全未改**。
+>
+> **③ 七個缺陷挑一個**。建議順序 3 → 6 → 1（3 與 6 都會靜默產生**對自己有利**的假數字）。
 >
 > ### ⚠ 已經做完、不要重做
 >
-> - **不要重新校準 LITE 的 base**：FY2027 共識實測只動 +0.13%，`review_required` 是缺陷 2 的假警報。
-> - **不要重寫 LITE 的 variant／downside／短評／催化劑 resolves**（四格都已有值，2026-09-19 寫入）。
-> - **不要把 `Lumentum is sold out through 2028` 寫進假設**——它是 tier 3 二手（Reuters 引 SemiAnalysis），
->   本輪刻意未採用。**要動營收那一桿，先把它追到一手**（那會讓 LITE 的賭注從 +0.5pp 變大）。
+> - 不要重新校準 LITE 的 base（FY2027 共識只動 +0.13%，`review_required` 是缺陷 2 的假警報）。
+> - 不要重寫 LITE 的 variant／downside／短評／催化劑 resolves（四格都有值）。
+> - 不要重做 LITE 的 sole_source 追源（[617] 已完成，判決檔在
+>   `library/private/alpha/sole_source_rejudge/lumentum_uhp_laser.json`，寫入等 **[626]** 核准）。
+> - 不要把「Lumentum is sold out through 2028」寫進假設（tier 3 二手，未追到一手）。
 >
 > ### ⚠ 不要做的
 >
-> - **不要換一個全新的標的池**——問題不在磊晶，在於研究到底的樣本只有三個。
+> - **不要換一個全新的標的池**——問題不在標的池，在儀器。
 > - **不要為了讓籃子非空而放寬篩選條件**（`AGENTS.md` 明文禁止）。
 > - 不要重做 Phase 0／1／2／3／6，也不要重做 V1／V2／V3。
 
@@ -114,8 +132,10 @@
 
 | 現況（2026-09-19 實測） | 查證命令 |
 |---|---|
-| **籃子 16 檔通過 1，首選 LITE**：`no_bet` 13｜`payoff_not_positive` 2｜`no_catalyst_in_horizon` **14** | 讀 `library/private/app/state/basket.json` 的 `filter` 與 `top_pick` |
-| LITE：base 1,065.76（+19.3%）｜賭對了 1,078.72（+20.7%）｜**判斷錯了 881.63（−1.3%）**；首屏七句已寫 | `python -m briefing alpha-card LITE`／`python -m alpha brief LITE --list` |
+| **D11 門檻套用：input 16／accepted 5／filtered 11（缺值 0）**；通過的 5 檔有 **4 檔儀器算不出 payoff** | `python scripts/alpha_screen_check.py` |
+| 籃子（**尚未套 D11**）16 檔通過 1、首選 LITE；`no_bet` 13｜`payoff_not_positive` 2｜`no_catalyst_in_horizon` 14 | 讀 `library/private/app/state/basket.json` 的 `filter` 與 `top_pick` |
+| 門檻值：市值 ≤ US$10B、覆蓋 ≤ 12（**兩條必須 AND**：TSM 的 analyst_count 只有 13 而市值 2.25 兆） | `python -c "import json;d=json.load(open('config/alpha_screen.json'));print(d['market_cap_max_usd'],d['analyst_count_max'])"` |
+| LITE（**倍數校準後**）：base +4.4%｜賭對了 +5.7%；首屏七句已寫。⚠ 舊的 +19.3%／+20.7%／−1.3% 是倍數陳舊 11 天的假象 | `python -m briefing alpha-card LITE`／`python -m alpha brief LITE --list` |
 | **已宣告不主張目標倍數的 5 檔**（寫了賭注也算不出 payoff）：SOI.PA／IQE.L／MP／POET／6324.T | `ls library/private/alpha/abstentions/` |
 | `Catalyst.resolves` 填寫率：judgments/ **62 檔 104 條，填 0 條**（LITE 的 2 條寫在 judgment 檔內） | 見 ROADMAP backlog 該列的查證命令 |
 | AXTI：base 68.91（+1.7%）｜賭注對了 46.97（−30.7%）｜**判斷錯了 35.15（−48.1%）** | `python -m briefing alpha-card AXTI` |
@@ -160,6 +180,7 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | 2026-09-18 深夜 | **V3 重複節點偵測器**｜證據欄從未被賦值（430／526）｜[611][612] | `39a2ff0`…`1de7652` |
 | **2026-09-19 早** | **`is_component_of` 全重判 92 條｜新增 `is_variant_of` relation（[613] B）｜[614] 8 條修正｜[615] 4 對合併｜28 對候選判讀｜AXTI downside｜[571]–[575] drop** | `fec9db6`… |
 | **2026-09-19 深夜** | **催化劑那格量到底（`resolves` 0/104）｜LITE 做到底：variant＋downside＋resolves＋首屏七句｜`top_pick` 首次非空＝LITE｜修好 `--retract` 撤不回 overlay 的 bug＋守門測試｜五個系統性缺陷進 backlog** | 本輪 |
+| **2026-09-19 上午** | **[616] 紅隊審查撈到倍數陳舊（賭注不對稱是假象）｜[617] sole_source 追源找到 AAOI 圖外反證→鑄 [626]｜D11 兩條門檻落地 `config/alpha_screen.json`＋量測 consumer｜量到「通過的 5 檔有 4 檔儀器算不出 payoff」** | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
