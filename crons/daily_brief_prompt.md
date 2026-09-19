@@ -78,8 +78,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      主力逐檔表是每日心跳：即使所有 sleeve 都「到位（區間內、無偏好）」、今天沒有任何配置缺口，
      也必須保留。每列明示商品自身的「最新完整交易日 `YYYY-MM-DD`：1日 ±X%」；stale／
      quarantined 時改列 TWSE 等官方 reference 日期、當日漲跌與降級原因，不得把最近收盤寫成即時行情。
-   - `.venv\Scripts\python.exe -m engine_b.cli list --status pending --by-priority`，再對今日新增 pending leads
-     套 `skills/signal-triage/SKILL.md`，用本機 CLI 原子寫回 triage＋classification。PASS 命令必須帶
+   - `.venv\Scripts\python.exe -m engine_b.cli list --status pending --by-priority --triage-batch`，再對本批 pending leads
+     套 `skills/signal-triage/SKILL.md`，用本機 CLI 原子寫回 triage＋classification。
+     ⚠ **`--triage-batch` 是分類層的每日硬上限**（Phase 2 Step 2.3，2026-09-19；值在
+     `config/daily_routine.json` 的 `triage.daily_limit`）。**cap 由該命令自己執行，不是你去數**——
+     它只回上限內的筆數，並印出「還有 N 則沒進本批」。**不得為了清完佇列而改用不帶旗標的版本**：
+     沒進本批的留給明天或互動 session，而心跳的「未 triage N」會讓它一直看得見。PASS 命令必須帶
      `--content-type`＋`--decision-impact`，`capital_commitment` 另帶 `--payment-direction`；不得只把分類塞進
      `--reason` 自由文字。FILTER 不寫 classification。完成後執行
      `.venv\Scripts\python.exe -m engine_b.cli classification-health`；非零時逐筆列出 active gap，這些 lead

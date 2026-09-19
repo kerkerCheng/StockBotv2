@@ -557,10 +557,22 @@ def build_queue(*, state_dir: Path | None = None) -> Section:
     counts = {seg["key"]: seg["count"] for seg in observation["segments"]}
 
     pending_triage = counts.get("pending_triage")
+    # 分類層的每日硬上限（Step 2.3，2026-09-19）。**跟著未 triage 數一起印**——
+    # 只看「未 triage 41」看不出它是「今天暴量」還是「積了三天」，而那兩件事的下一步不同。
+    try:
+        from engine_b.routine_config import triage_daily_limit
+
+        limit: int | None = triage_daily_limit()
+    except Exception:  # noqa: BLE001 — 讀不到上限不讓整段消失
+        limit = None
+    over = (isinstance(pending_triage, int) and isinstance(limit, int)
+            and limit > 0 and pending_triage > limit)
     # **0 也要印**：沒有待 triage 與沒有人跑 triage 在數字上長得一樣，所以這一行是無條件的。
     section.lines.append(
         f"**未 triage {pending_triage if pending_triage is not None else '未讀到'}**"
         f"｜新 harvest lead 需要分流（零＝真的沒有，不是沒跑）"
+        + (f"｜分類層每日上限 {limit}" if isinstance(limit, int) else "｜分類層上限未讀到")
+        + ("　←**超過上限，今天清不完**" if over else "")
     )
 
     # ⚠ `None` 是「本次沒讀到那個 authority」，不是 0——把它加成 0 會讓「沒讀到」與「真的沒有」

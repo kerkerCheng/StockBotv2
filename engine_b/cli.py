@@ -172,6 +172,24 @@ def _cmd_list(args: argparse.Namespace) -> int:
     else:
         rows.sort(key=lambda l: (l.get("published_at") or "", l["lead_id"]), reverse=True)
         scores = {}
+    # 分類層的每日硬上限（Phase 2 Step 2.3，2026-09-19）。
+    # ⚠ **cap 在這裡執行，不在 prompt 裡**：把數字寫進 prompt 讓 LLM 自己數，
+    # 等於讓被管的人管自己（L15：語意交給語言處理，**權限永遠 deterministic**）。
+    # ⚠ **截斷必須說話**（INV-3）：「本批 30 則」與「總共只有 30 則」是兩件事，
+    # 不印跳過數的話，暴量那天看起來會跟平常一模一樣。
+    skipped = 0
+    if getattr(args, "triage_batch", False):
+        from .routine_config import triage_daily_limit
+
+        limit = triage_daily_limit()
+        total = len(rows)
+        rows = rows[:limit]
+        skipped = total - len(rows)
+        note = (f"（分類層每日上限 {limit}：本批 {len(rows)} 則"
+                + (f"，**還有 {skipped} 則沒進本批**，明天或互動 session 再處理）" if skipped
+                   else "，未達上限）"))
+        # json 模式印到 stderr，不污染 stdout 的 JSON（呼叫端可能直接 pipe 給 jq）
+        print(note, file=sys.stderr if args.json else sys.stdout)
     if args.json:
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
@@ -819,6 +837,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     p_list = sub.add_parser("list", help="列出 leads")
     p_list.add_argument("--status", help="只列某狀態（pending／triaged_go…）")
+    p_list.add_argument("--triage-batch", dest="triage_batch", action="store_true",
+                        help="套用分類層每日硬上限（config/daily_routine.json 的 triage.daily_limit）"
+                             "並印出還有幾則沒進本批；cap 由本命令執行，不靠 prompt 自律")
     p_list.add_argument("--by-priority", dest="by_priority", action="store_true",
                         help="依 priority 排序並顯示分數")
     p_list.add_argument("--tracked", help="逗號分隔的已追蹤 ticker（thesis 影響度）")

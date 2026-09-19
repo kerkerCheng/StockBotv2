@@ -31,6 +31,18 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     # 那比原本強：原本只擋住寫下 0，擋不住任何一個把 limit 當「沒有上限」用的消費端。
     if isinstance(limit, bool) or not isinstance(limit, int) or not 0 <= limit <= 20:
         raise ValueError("pq1.drain_limit_per_run 必須是 0..20 的整數（0＝daily 不做研究）")
+    # 分類層（D12 三層的中間那層）的每日硬上限（Phase 2 Step 2.3，2026-09-19）。
+    # ⚠ **缺 `triage` 整段是合法的**：它是後加的，舊 config 仍要能載入——
+    # 消費端拿不到就用 `DEFAULT_TRIAGE_LIMIT`。但**寫了就要合法**，
+    # 打錯的數字比沒有更危險（它看起來像有 cap）。
+    triage = payload.get("triage")
+    if triage is not None:
+        if not isinstance(triage, dict):
+            raise ValueError("daily routine config 的 triage 必須是 object")
+        limit = triage.get("daily_limit")
+        # 0 ＝ daily 不做分類（與 pq1.drain_limit_per_run 的 0 同形，理由見上）。
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 0 <= limit <= 200:
+            raise ValueError("triage.daily_limit 必須是 0..200 的整數（0＝daily 不做分類）")
     sources = pq1.get("tracked_ticker_sources")
     if not isinstance(sources, dict):
         raise ValueError("pq1.tracked_ticker_sources 必須是 object")
@@ -38,6 +50,30 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
         if not isinstance(sources.get(key), bool):
             raise ValueError(f"tracked_ticker_sources.{key} 必須是 boolean")
     return payload
+
+
+#: 分類層每日上限的預設值——**config 沒寫 `triage` 整段時用它**。
+#: ⚠ 刻意不是「無上限」：拿不到設定時退回無上限，等於在最不確定的時候拆掉煞車。
+DEFAULT_TRIAGE_LIMIT = 30
+
+
+def triage_daily_limit(path: Path = DEFAULT_CONFIG) -> int:
+    """分類層每輪最多 triage 幾則。讀不到設定檔或沒寫 `triage` 就回 `DEFAULT_TRIAGE_LIMIT`。
+
+    ⚠ **讀不到不等於沒有上限**（見上）。config 寫了但不合法時 `load_config` 會 raise，
+    那是對的——打錯的數字比沒有更危險，因為它看起來像有 cap。
+    """
+    try:
+        payload = load_config(path)
+    except (OSError, ValueError):
+        return DEFAULT_TRIAGE_LIMIT
+    triage = payload.get("triage")
+    if not isinstance(triage, dict):
+        return DEFAULT_TRIAGE_LIMIT
+    limit = triage.get("daily_limit")
+    if isinstance(limit, bool) or not isinstance(limit, int):
+        return DEFAULT_TRIAGE_LIMIT
+    return limit
 
 
 def lifecycle_tickers(path: Path = DEFAULT_LIFECYCLE) -> frozenset[str]:
