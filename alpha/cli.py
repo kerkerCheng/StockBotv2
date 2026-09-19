@@ -247,7 +247,8 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
                 scenario=target.scenario,
             )
         try:
-            path = append_assumption_record(record)
+            path = append_assumption_record(
+                record, allow_new_scope=bool(getattr(args, "allow_new_scope", False)))
         except AlphaError as exc:
             print(f"✗ {exc}", file=sys.stderr)
             return 2
@@ -892,6 +893,10 @@ def build_parser() -> argparse.ArgumentParser:
     assumptions.add_argument("ticker")
     assumptions.add_argument("--list", action="store_true", help="（預設）列出 ledger")
     assumptions.add_argument("--add", help="append 一筆假設（JSON spec 檔路徑）")
+    assumptions.add_argument(
+        "--allow-new-scope", action="store_true",
+        help="放行『overlay 引入 base 沒有的 scope』。⚠ 預設拒收：未命中 base 的 overlay "
+             "不會覆蓋而是與 base 同時生效（數值相加），而打錯 scope 與真的要新切分在資料上同形")
     assumptions.add_argument("--retract", help="append 一筆撤回紀錄（指定 assumption_id）")
     assumptions.add_argument("--rationale", help="撤回理由")
     assumptions.add_argument("--format", choices=("markdown", "json"), default="markdown")

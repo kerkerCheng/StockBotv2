@@ -200,6 +200,31 @@ def parse_assumption_record(raw: Mapping[str, Any]) -> OperatingAssumption:
     )
 
 
+def live_base_keys(
+    records: Sequence[OperatingAssumption], *, period: FiscalPeriod,
+) -> dict[tuple[str, str], OperatingAssumption]:
+    """同一期間的 base 鏈上，目前生效的 `(driver, scope)` → 紀錄。
+
+    語意與 `select_assumptions` 的 supersede／retract 部分相同（同 key 較新者勝出；最新一筆是
+    撤回就代表這個 key 沒有生效假設，撤回不讓舊值復活），但**刻意少做兩件事**：
+
+    - **不看 as-of**：寫入端問的是「這個 scope 是不是 base 認得的切分」，那是 ledger 的結構
+      問題，不是時點問題。
+    - **不解析 `evidence_refs`**：寫入端沒有 evidence_index。故意比 runtime 寬一格——寧可
+      放行一條 runtime 自己會拒用的 overlay，也不要因為證據暫時解析不到就擋住合法寫入；
+      放行的那一格仍由 runtime 的 INV-3 計數接住。
+    """
+    ordered = sorted(
+        (r for r in records
+         if r.scenario == BASE_SCENARIO and r.period.same_as(period)),
+        key=lambda r: (r.created_at, r.assumption_id),
+    )
+    latest: dict[tuple[str, str], OperatingAssumption] = {}
+    for record in ordered:
+        latest[record.key] = record
+    return {key: record for key, record in latest.items() if not record.retracted}
+
+
 def select_assumptions(
     records: Sequence[OperatingAssumption],
     *,
@@ -319,6 +344,7 @@ def select_scenario_assumptions(
 
 
 __all__ = [
-    "LEGACY_RECORD_VERSION", "RECORD_VERSION", "assumption_record", "new_assumption_id",
-    "parse_assumption_record", "select_assumptions", "select_scenario_assumptions",
+    "LEGACY_RECORD_VERSION", "RECORD_VERSION", "assumption_record", "live_base_keys",
+    "new_assumption_id", "parse_assumption_record", "select_assumptions",
+    "select_scenario_assumptions",
 ]

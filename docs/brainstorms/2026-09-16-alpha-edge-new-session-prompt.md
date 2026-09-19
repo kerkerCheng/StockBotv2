@@ -80,7 +80,7 @@
 >
 > 1. **`Catalyst.resolves` 從未被填**（62 檔 104 條，填 0 條）
 > 2. **`review_required` 拿 +1y 判定校準在 0y 的 base**（15/15 檔 base 都在 0y）
-> 3. **overlay 的 `scope` 與 base 不一致時不覆蓋而是疊加**——不報錯、測試不紅，實測產出假的 +50.3%
+> 3. ~~**overlay 的 `scope` 與 base 不一致時不覆蓋而是疊加**~~ **✅ 2026-09-19 已修**（寫入端拒收＋`--allow-new-scope`；12 條 overlay 重放擋下 2 條、零誤擋；`tests/test_overlay_scope_gate.py`）
 > 4. **首屏講不出「判斷錯了值多少」**（`PLACEHOLDERS` 沒有 downside 端）
 > 5. **4 檔 base 已含觀點卻被標「還沒寫賭注」**
 > 6. **目標倍數是會腐壞的快照**——實測 4 小時腐壞 4%；11 檔有 4 檔宣告零折溢價卻背離 >5%
@@ -97,7 +97,7 @@
 > 市值取不到時 D11 怎麼判（INV-3：不得靜默 filtered，也不得靜默放行）？
 > 現在的 consumer 只是量測腳本 `scripts/alpha_screen_check.py`，**`webapp/basket.py` 的 top_pick 判定完全未改**。
 >
-> **②b ⚠ 一個待你決定的小問題（[626] 收尾留下的）：** `sole_source_verification` 這個屬性名
+> **②b ⚠ 待你決定（[626] 收尾留下的）：** `sole_source_verification` 這個屬性名
 > **在 `extractions/`／`schema/`／`prompts/`／`config/` 全都不存在**，而 `schema/graph_schema.md` §7
 > 把 `verified_by_absence` 定義成 **`sole_source=true` 時的驗證模式（弱主張）**——跟 `false` 並存會反轉
 > 語意（變成「我們驗證過它不是獨家」，但實際上我們是**找到了正面反證**，比 absence 強）。所以 [626]
@@ -105,7 +105,7 @@
 > ＋`sole_source_evidence_quality=weak`）；②改記在 `.review.md`（已寫）；③真要入圖就先進
 > `schema/vocab.json` 封閉字彙（L16-3：有行為後果的字彙必須被強制）。
 >
-> **③ 七個缺陷挑一個**。建議順序 3 → 6 → 1（3 與 6 都會靜默產生**對自己有利**的假數字）。
+> **③ 七個缺陷挑一個**。~~建議順序 3 → 6 → 1~~ **3 已修（2026-09-19）；下一個建議 6 → 1**（6 同樣會靜默產生**對自己有利**的假數字：目標倍數是會腐壞的快照，沒有任何機制在盯它與市場倍數的背離）。
 >
 > ### ⚠ 已經做完、不要重做
 >
@@ -193,6 +193,7 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 深夜** | **催化劑那格量到底（`resolves` 0/104）｜LITE 做到底：variant＋downside＋resolves＋首屏七句｜`top_pick` 首次非空＝LITE｜修好 `--retract` 撤不回 overlay 的 bug＋守門測試｜五個系統性缺陷進 backlog** | 本輪 |
 | **2026-09-19 上午** | **[616] 紅隊審查撈到倍數陳舊（賭注不對稱是假象）｜[617] sole_source 追源找到 AAOI 圖外反證→鑄 [626]｜D11 兩條門檻落地 `config/alpha_screen.json`＋量測 consumer｜量到「通過的 5 檔有 4 檔儀器算不出 payoff」** | 本輪 |
 
+| **2026-09-19 下午** | **七缺陷之 3 修掉：overlay scope 未命中 base 時寫入端拒收（使用者核准方案 (a)）＋`live_base_keys` helper＋`--allow-new-scope`＋8 條守門測試；先做 ROADMAP ⑤ 的 L11-6 量測（合法新 scope 0 條）才動手** | 本輪 |
 | **2026-09-19 中午** | **[626] 寫入：`co:lumentum→tech:uhp_laser` 的 `sole_source` true→false（改在抽取層＋重載＋重投影）｜量到排序位移 #2→#5｜補上兩份 `.review.md` 讓 gitignore 掉的抽取檔仍留得下判讀紀錄** | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**

@@ -20,8 +20,8 @@ from typing import Any, Mapping
 from shared.redaction import sensitive_payload_path
 
 from ..errors import ContractViolation
-from ..fundamental.assumptions import parse_assumption_record
-from ..fundamental.contracts import OperatingAssumption
+from ..fundamental.assumptions import live_base_keys, parse_assumption_record
+from ..fundamental.contracts import BASE_SCENARIO, OperatingAssumption
 
 _ROOT = Path(__file__).resolve().parents[2]
 ASSUMPTION_DIR = _ROOT / "library" / "private" / "alpha" / "assumptions"
@@ -51,12 +51,20 @@ def read_assumption_records(
     return records, errors
 
 
-def append_assumption_record(record: Mapping[str, Any], *, directory: Path | None = None) -> Path:
+def append_assumption_record(
+    record: Mapping[str, Any], *, directory: Path | None = None,
+    allow_new_scope: bool = False,
+) -> Path:
     """append 一筆（已由 `assumption_record()` 驗證過的）紀錄。
 
     - 同 `assumption_id` 已存在 → 拒絕（content-addressed，重複 append 是呼叫端錯誤）。
     - 帶 secret 的 payload → 拒絕（與 Engine C ledger 同一道 redaction）。
+    - overlay 的 `(driver, scope)` 未命中任何生效 base 假設 → 拒絕（見下）。
     - 只 append，永不改寫既有行。
+
+    `allow_new_scope=True` 才放行「引入 base 沒有的切分」那條 overlay。預設拒收是因為
+    **那個情況與打錯 scope 在資料上長得一模一樣**，而兩者的後果天差地別：打錯時 overlay
+    不會覆蓋 base，兩條假設會同時生效、數值相加。
     """
     parsed = parse_assumption_record(record)              # 寫入前再驗一次
     sensitive = sensitive_payload_path(dict(record), "assumption")
@@ -76,6 +84,23 @@ def append_assumption_record(record: Mapping[str, Any], *, directory: Path | Non
             raise ContractViolation(
                 f"supersedes_id {parsed.supersedes_id} 屬於 scenario={target.scenario!r}，"
                 f"本筆是 {parsed.scenario!r}——不得跨 scenario supersede（variant 是 overlay，不是取代）")
+    if parsed.scenario != BASE_SCENARIO and not parsed.retracted and not allow_new_scope:
+        # 缺陷（2026-09-19 實測）：overlay 的覆蓋鍵是 `(driver, scope)`。scope 打錯時它不會
+        # 覆蓋 base，而是**被當成第三條假設一起生效**——LITE 的營益率因此變成
+        # 29.8＋10.2＋10.7＝50.7%，產出假的隱含報酬 +50.3%（真值 +20.7%）。
+        # ⚠ 這個錯誤的方向永遠是「對自己有利」（多疊一個正的 delta），而且不報錯、測試不紅。
+        # ⚠ **retracted 的 overlay 必須跳過這道檢查**：撤回紀錄沿用被撤回那筆的 driver/scope，
+        #   擋住它等於「寫錯的 overlay 永遠撤不回」——正是 2026-09-19 才修好的那個 bug。
+        base_keys = live_base_keys(existing, period=parsed.period)
+        if parsed.key not in base_keys:
+            same_driver = sorted(scope for driver, scope in base_keys if driver == parsed.driver)
+            hint = (f"該 driver 在 base 的 scope 是 {same_driver}" if same_driver
+                    else f"base 在 {parsed.period.label} 沒有任何 {parsed.driver!r} 假設")
+            raise ContractViolation(
+                f"{parsed.scenario} 假設 {parsed.driver}[{parsed.scope}] 未命中任何生效 base 假設"
+                f"——overlay 的覆蓋鍵是 (driver, scope)，未命中不會覆蓋而是**與 base 同時生效**"
+                f"（數值相加）。{hint}。"
+                f"確實要引入 base 沒有的新切分才傳 allow_new_scope=True（CLI：--allow-new-scope）")
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(dict(record), ensure_ascii=False, sort_keys=True) + "\n")

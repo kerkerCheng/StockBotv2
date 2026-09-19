@@ -255,8 +255,10 @@ def test_retract_keeps_the_scenario_of_the_record_it_retracts(monkeypatch, tmp_p
     captured: list = []
     monkeypatch.setattr("alpha.providers.assumptions.read_assumption_records",
                         lambda ticker: ([target], None))
+    # stub 的簽名要跟著真實簽名走（2026-09-19 多了 allow_new_scope）——否則這條會因為
+    # 「stub 對不上」而紅，看起來像 retract 壞了，其實不是。
     monkeypatch.setattr("alpha.providers.assumptions.append_assumption_record",
-                        lambda record: captured.append(record) or tmp_path / "x.jsonl")
+                        lambda record, **kw: captured.append(record) or tmp_path / "x.jsonl")
     monkeypatch.setattr(cli, "_resolve_company", lambda t: ("COHR", "co:coherent"))
 
     args = _ns(ticker="COHR", add=None, retract=target.assumption_id,
