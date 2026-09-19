@@ -611,7 +611,8 @@ def build_positions(*, state_dir: Path | None) -> Section:
             owed = ledger.get("owed") or []
             line = (f"籃子 {ledger.get('input', '?')} 檔｜有賭注 {ledger.get('bet', '?')}"
                     f"｜刻意不主張 {ledger.get('abstained', '?')}"
-                    f"｜**欠一個答案 {ledger.get('unanswered', '?')}**")
+                    f"｜**欠一個答案 {ledger.get('unanswered', '?')}**"
+                    f"｜觀點已在 base、待決定 overlay {ledger.get('opinion_in_base', '?')}")
             if owed:
                 line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
             section.lines.append(line)
@@ -621,7 +622,8 @@ def build_positions(*, state_dir: Path | None) -> Section:
         if volume:
             vline = (f"量的候選 {volume.get('input', '?')} 家（已研究、低於門檻）"
                      f"｜通過條件 {volume.get('accepted', '?')}"
-                     f"｜**欠一個答案 {volume_ledger.get('unanswered', '?')}**")
+                     f"｜**欠一個答案 {volume_ledger.get('unanswered', '?')}**"
+                     f"｜觀點已在 base、待決定 overlay {volume_ledger.get('opinion_in_base', '?')}")
             owed = volume_ledger.get("owed") or []
             if owed:
                 vline += "：" + "、".join(str(t) for t in owed[:6]) + ("…" if len(owed) > 6 else "")

@@ -55,10 +55,28 @@ FILTER_REASONS: Mapping[str, str] = {
 BET_STATES: Mapping[str, str] = {
     "bet": "有賭注：variant 假設已寫，payoff 算得出來",
     "abstained": "刻意不主張：已研究，結論是目前沒有可辯護的賭注（append-only 紀錄，附 revisit_when）",
+    "opinion_in_base": ("**觀點已在 base 裡，還沒決定 overlay**：base 的 derivation 是 "
+                        "`independent`／`company_guidance`，差異看法整個住在 base，"
+                        "於是 overlay 只剩那個來源本身的寬度——仍欠一個答案，但欠的不是「有沒有人看過」"),
     "unanswered": "**欠一個答案**：既沒有賭注，也沒有宣告不主張——不是狀態，是待辦",
 }
+
+#: `opinion_in_base` 的判準（2026-09-19，七缺陷之 5）。**只有這兩種 stance**，且必須同時
+#: 沒有 payoff、沒有 abstention——`opinion_stance` 本身是既有純函式，這裡只消費不重算（L16）。
+#:
+#: ⚠ **不得因此自動把它算成有賭注**：COHR 是 `independent` **且**寫得出 variant（錨在指引上緣），
+#: 證明「base 有觀點」與「寫得出 overlay」可以並存。所以這一格分的是**欠的是什麼**，
+#: 不是**欠不欠**——`opinion_in_base` 與 `unanswered` 一樣不是終局，兩者都還欠一個答案。
+#:
+#: 事發（2026-09-19 實測）：LITE 的 base derivation 是 `company_guidance`，「我們的差異看法」
+#: 內容就是「相信公司的指引」，variant overlay 只剩指引區間本身的寬度（實測賭注空間 +0.5pp）。
+#: 硬要把格子填滿，寫出來的會是「隨便樂觀一點」，正是 `ASSUMPTION_SCENARIOS` 註解要擋的 bull case。
+OPINION_IN_BASE_STANCES: frozenset[str] = frozenset({"independent", "company_guidance"})
 BET_LEDGER_RULE = ("籃子的每一列強制二選一：有賭注，或一筆 Abstention。沒有第三種安靜狀態——"
                    "兩者皆無時記成 unanswered 並計數（Q2，2026-09-17）。"
+                   "⚠ 2026-09-19 起「欠一個答案」拆成兩格：`unanswered`（沒人看過）與 "
+                   "`opinion_in_base`（base 的 derivation 已是 independent／company_guidance，"
+                   "差異看法住在 base、overlay 還沒決定）。**兩者都不是終局，欠的東西不同。**"
                    "⚠ 賭注的 Abstention 只認 layer=bet／subject=variant.overlay：估值層的 "
                    "`target_pe` abstention 說的是「本益比法沒有可校準的對象」，不是「沒有可辯護的賭注」。")
 #: 量的候選（Q1，2026-09-17 使用者核准 A）的 filter 理由。**封閉字彙，與護城河那組分開**：
@@ -129,6 +147,18 @@ def _catalyst_in_horizon(ripeness: Mapping[str, Any] | None, value_date: str | N
     return False
 
 
+def _bet_state(payoff_value: float | None, *, abstained: bool, stance: Any) -> str:
+    """賭注終局的四分之一格。**純選取，不重算 stance**（`opinion_stance` 的 SSOT 在
+    `alpha/fundamental/contracts.py`，這裡只消費它被帶到 overview 上的那個值）。"""
+    if payoff_value is not None:
+        return "bet"
+    if abstained:
+        return "abstained"
+    if str(stance or "") in OPINION_IN_BASE_STANCES:
+        return "opinion_in_base"
+    return "unanswered"
+
+
 def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | None,
                      live: Mapping[str, Any] | None, *, sector: str | None) -> dict[str, Any]:
     ov = overview or {}
@@ -142,7 +172,8 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
     # 呈現層不 parse 理由句去猜（L16）。`deliberate_abstention` 來自 bet ledger，
     # 由 briefing/alpha_view/sources.py 在 variant 缺席分支查出後一路帶下來。
     abstained = str(payoff.get("absence_kind") or "") == "deliberate_abstention"
-    bet_state = "bet" if payoff_value is not None else ("abstained" if abstained else "unanswered")
+    stance = _cell_value(ov.get("opinion_stance"))
+    bet_state = _bet_state(payoff_value, abstained=abstained, stance=stance)
     reasons: list[str] = []
     if payoff_value is None:
         reasons.append("bet_abstained" if abstained else "no_bet")
@@ -163,7 +194,7 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         "evidence_label": rank_row.get("evidence_label"),
         "has_overview": overview is not None,
         "readiness": (ov.get("readiness") or {}).get("state"),
-        "opinion_stance": _cell_value(ov.get("opinion_stance")),
+        "opinion_stance": stance,
         "our_bet": _cell_value((ov.get("brief") or {}).get("our_bet")),
         "price": ov.get("price"),
         "base_return": _cell_value((ov.get("implied_return") or {}).get("simple")),
@@ -198,7 +229,7 @@ def build_volume_row(filtered_row: Mapping[str, Any], overview: Mapping[str, Any
     payoff = ov.get("payoff") or {}
     payoff_value = _num(_cell_value(payoff.get("simple")))
     abstained = str(payoff.get("absence_kind") or "") == "deliberate_abstention"
-    bet_state = "bet" if payoff_value is not None else ("abstained" if abstained else "unanswered")
+    bet_state = _bet_state(payoff_value, abstained=abstained, stance=_cell_value(ov.get("opinion_stance")))
     reasons: list[str] = []
     if str(filtered_row.get("qualification_status") or "") not in SHIPPING_STATUSES:
         reasons.append("not_shipping_yet")
@@ -329,10 +360,14 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
                               "那是研究缺口，去 pq1。門檻與排序一字未動。"),
         },
         "volume_bet_ledger": {**volume_bet_counts, "input": len(volume_rows),
-                              "owed": [r["ticker"] for r in volume_rows if r["bet_state"] == "unanswered"]},
+                              "owed": [r["ticker"] for r in volume_rows if r["bet_state"] == "unanswered"],
+                              "owed_opinion_in_base": [r["ticker"] for r in volume_rows
+                                                       if r["bet_state"] == "opinion_in_base"]},
         "bet_ledger": {**bet_counts, "input": len(rows),
                        "state_labels": dict(BET_STATES), "rule": BET_LEDGER_RULE,
-                       "owed": [r["ticker"] for r in rows if r["bet_state"] == "unanswered"]},
+                       "owed": [r["ticker"] for r in rows if r["bet_state"] == "unanswered"],
+                       "owed_opinion_in_base": [r["ticker"] for r in rows
+                                                if r["bet_state"] == "opinion_in_base"]},
         # D2（2026-09-18）歸零旗標帳。**量測不是篩選**：它不參與 `filter`、不進 `top_pick` 的條件。
         "wipeout_ledger": {
             "companies": len(rows), "lamps": wipe_lamp_counts,
@@ -362,6 +397,7 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
 
 
 __all__ = ["BASKET_THIS_IS_NOT", "BET_LEDGER_RULE", "BET_STATES", "FILTER_REASONS", "FILTER_RULE",
+           "OPINION_IN_BASE_STANCES",
            "SHIPPING_STATUSES", "VOLUME_FILTER_REASONS", "VOLUME_MISSING_CRITERIA", "VOLUME_ORDER_NOTE",
            "build_volume_row",
            "build_basket_artifact", "build_basket_row"]
