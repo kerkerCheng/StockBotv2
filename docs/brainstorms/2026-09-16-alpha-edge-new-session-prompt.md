@@ -1,4 +1,4 @@
-# 給新 session 的啟動 prompt（2026-09-19 第十輪改寫；前九輪逐字狀態見文末歷程與 git history）
+# 給新 session 的啟動 prompt（2026-09-19 第十一輪改寫；前十輪逐字狀態見文末歷程與 git history）
 
 > 用法：在新的 Claude Code session 貼「開工指令」那一段，或直接
 > `@docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`。
@@ -54,11 +54,28 @@
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
 >
-> ### ▶ 這一輪的第一件事：**Phase 5 剩的兩項**（不需核准，直接做）
+> ### ▶ 這一輪的第一件事：**先看四個要你決定的**（前一輪把不需核准的都做完了）
 >
-> ①**賭注 V4：variant 收斂納入 outcome 量測**（舊 backlog 指向 Phase 5）；
-> ②**readiness 語意**：誠實回 `unknown` 的軸讓該檔結構上永遠到不了段 5 終局（2026-09-10 記）。
-> 做完接著往下走，**不要為了回報而停**。
+> 前一輪（2026-09-19 傍晚）把 Phase 5 剩的兩項都交付了，然後撞到一個誠實的結論：
+> **剩下的 binding constraint 幾乎都在研究端，或在「要花錢／要改既有書面決定」那一側。**
+> 四個待決，都附了推薦與反證：
+>
+> 1. **[631] COHR 寫下 downside overlay**——Phase 5 八項 gate 全過，**卡在驗收行的最後一格**：
+>    驗收行逐字是「COHR 與三檔初始標的各有這些格」，而 downside **只有 AXTI／LITE 兩檔**，
+>    COHR 沒有（實測 71 檔 `not_yet_recorded`）。材料已到位——COHR 的 thesis 自 [629] 起是
+>    `review_required`（disproof[1] 已觸發），而**重新評估本身還沒做**。**推薦 `go`。**
+> 2. **FX 觀測要不要自動化**（ROADMAP backlog 🔴）——4 檔跨幣別標的的隱含報酬因為匯率觀測
+>    過期 8 天而算不出來，**而沒有任何東西在補它**。⚠ 它與 `alpha/fx.py` 契約決定 1 的
+>    **字面相反**，所以必須你決定；反證已寫在那一列（被反駁的是「provider 快照」那個實作形式，
+>    不是自動化本身）。偵測已做成心跳常駐計數器（那是不需核准的那一半）。
+> 3. **`closure_terminal` 兩個方案**（ROADMAP backlog 🟡）——APP 把 4 檔「等財報」標成「還沒做」。
+>    (a) 讓 artifact 帶目標期末、判準只留一份（動 schema 與兩個 owner）；
+>    (b) 只改 `_group_of` 與那行註解，承認這一格算不出第三種（便宜，但 APP 仍看不到第三種終局）。
+> 4. **Phase 2 Step 2.3（分類層）用哪個便宜模型、每日上限多少**——它會每天自動花錢，參數是你的決定。
+>    ⚠ **先看量測再決定要不要做**：近 16 天每日新 lead 平均約 15 則（2–26），而今天「未 triage」只有 **1**
+>    ——L14-5 的問句「這會讓哪個數字變」目前答案很小。
+>
+> **這四個之外沒有需要核准的事就直接做，不要為了回報而停。**
 >
 > ### 還有一個槓桿，但它要核准：填更多檔的 `multiple_horizon`
 >
@@ -143,7 +160,8 @@
 >   **重新評估本身還沒做**，是一個開著的研究缺口。
 > - **[630] 已執行**：COHR 的 `multiple_horizon` = 2030-06-30（一手：10-Q 逐字
 >   「support future production volumes through 2030」）＋ FY2030 七條錨點假設。
-> - **pq2 球在你手上 16 項**，全部是既有的（`python -m engine_b.todo list`）。
+> - **[631] 是新鑄的**（2026-09-19 傍晚）：COHR 的 downside overlay，Phase 5 驗收行的最後一格。
+> - **pq2 球在你手上 18 項**（含 [631]），其餘是既有的（`python -m engine_b.todo list`）。
 >
 > ### ⚠ 已經做完、不要重做
 >
@@ -154,6 +172,15 @@
 >   瓶頸業務占比缺那個數字本身）。不要再去「補」那兩條——它們不是待辦。
 > - **Phase 7 的 7.1–7.4 全部交付**（倍率參數化／`multiple_horizon`＋`span_years`／
 >   `briefing multi-year` CLI／進 APP）。
+> - **Phase 5 的 V4（賭注收斂）與 readiness 語意兩項都交付了**，八項 completion gate 逐項核對也做完了
+>   （ROADMAP 有專節）。⚠ **Phase 5 仍不標 ✅**，卡的是驗收行不是機制——見 [631]。
+> - **不要重新量「未到終局幾檔」而用 `row_from_artifact`**：它**結構上回不出第三種終局**
+>   （`awaiting_report` 需要目標期末日，artifact 只存 `period` 標籤）。權威路徑是
+>   `alpha.providers.closure.collect_backlog`：ready 52／settled 7／awaiting_report 4／未到終局 10。
+> - **不要再查「daily 今天為什麼沒收乾淨」的前半段**：已經收斂到一個點——
+>   `daily_run_finished_at` 沒更新 ⇒ 是**排程被中斷**不是收尾缺 release；
+>   而 harvest 05:33 跑完 35 筆、state 05:47–05:52 寫出，**中斷在 finalize 之前**。
+>   下一次只需確認「是不是同樣斷在 finalize 前」。
 > - 不要重新校準 LITE 的 base、不要重寫 LITE／AXTI 的 variant／downside／短評。
 > - 不要重做 `co:lumentum supplies_to tech:uhp_laser` 的 sole_source 判讀（[617]／[626] 已完成）。
 > - 不要把「Lumentum is sold out through 2028」寫進假設（tier 3 二手，未追到一手）。
@@ -201,7 +228,11 @@
 | `Catalyst.resolves` 填寫率：judgments/ **62 檔 104 條，填 0 條**（沒有改必填，刻意） | ROADMAP 該列的查證命令 |
 | 可投資排序 **37 列**；⚠ **沒有任何 `.TW`／`.TWO`／`.ST`**——Phase 1 的驗收行卡在這裡（是答案不是缺漏） | `python -m query.bottleneck --top-n 60` |
 | `audit invariants` FAIL 0／PASS 13／共 4,239 筆 | `python -m audit invariants` |
-| 待辦池：**pq2 球在你手上 16**（[577][627][628][629][630] 全部結案） | `python -m engine_b.todo list` |
+| 待辦池：**pq2 球在你手上 18**（[577][627][628][629][630] 全部結案；**[631] 新鑄**） | `python -m engine_b.todo list` |
+| **賭注收斂（V4，2026-09-19 新增）**：有賭注 3 檔｜朝我們 0｜反向 0｜共識沒動 2｜賭注寫下後還沒有共識抓取 1｜已觀測 1–3 天。⚠ **COHR 與 AXTI 的共識 13 天一個數都沒動**（9.41634／0.868） | `python scripts/outcome_if_settled_today.py`（找「賭注收斂」那段）｜讀 `outcome_aggregate.json` 的 `bet_convergence`｜心跳段 4 |
+| **FX 觀測過期，4 檔的隱含報酬算不出來**：最新 as_of 2026-09-11，容忍 ±3 天；6680.HK／HEXA-B.ST／XFAB.PA／XPEV。**沒有任何東西在補它** | `python crons/heartbeat.py`（段 1 的 FX 那行） |
+| 段 5 終局：**ready 52／settled 7／awaiting_report 4／未到終局 10**（其中 6 檔還沒研究、4 檔是上面那條 FX） | `python -c "from alpha.providers.closure import collect_backlog;import collections;print(collections.Counter(r.terminal for r in collect_backlog()[0]))"` |
+| 賭注／下檔的覆蓋：**payoff 3 檔｜downside 2 檔（COHR 沒有）｜歸零旗標 73/73** | 讀 `library/private/app/analyst_view/*.json` 的 `overview.payoff`／`overview.downside`／`overview.wipeout` |
 | 追蹤表 22 檔｜量測起始 2026-07-21｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
 | 心跳排程每日 07:00｜Last Result 0 | `schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V` |
 
@@ -250,6 +281,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 夜** | **Step 7.3（`briefing multi-year` CLI）｜Phase 4a 第三條（至少一條外部印證的邊，7 檔被擋）｜查出「入圖日」這個欄位從來不存在** | 本輪 |
 
 | **2026-09-19 深夜 2** | **Phase 4a 第三條（外部印證的邊，7 檔被擋）｜另兩條量完確認不接（入圖日缺歷史長度、瓶頸占比缺那個數字）｜`loader` 加 `admitted_at`（`ON CREATE SET`，既有 691 節點永遠 null）｜Step 7.4 多年視角進 APP（artifact＋API＋頁面＋心跳）** | 本輪 |
+
+| **2026-09-19 傍晚** | **Phase 5 剩的兩項都交付＋八項 completion gate 逐項核對**：**V4 賭注收斂**——量測前先發現起算日錯了兩層（63 個 judgment 檔只有 14 個有 `_produced_at`；賭注那條線用判斷日當起點，而三檔沒有一檔同日，LITE 的 +1.26% 來自賭注寫下前四天）；`gap_at_start` 攤開分母（5802.T −7175.7）；四個消費端接上。**readiness 語意**——跑查證命令才知道它已經解了（由 research 層 settled **0 → 2**，且那 2 檔到終局的唯一原因就是它）。**Phase 5 不標 ✅**：驗收行卡在 COHR 沒有 downside，鑄 [631]。順帶：FX 觀測過期偵測進心跳（🔴 自動化要決定）、`closure_terminal` 回不出第三種終局（🟡 兩方案）、daily 中斷點收窄到 finalize 之前。全量 **2,771 passed／0 failed**；`audit invariants` FAIL 0／4,242 筆 | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
