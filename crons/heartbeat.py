@@ -396,6 +396,11 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
                     + "、".join(str(n) for n in (triggers.get("nodes") or [])[:5])
                     + "——thesis 要不要改由人決定，系統只標記")
 
+    # 目標倍數背離（2026-09-19）：判準不會腐壞，被存下來的那個**數字**會。
+    # ⚠ 這一格讀的是本機 ledger ＋ Engine C 快照，**零網路、零 LLM、不重新校準**；
+    # 它只是把兩個既有數字相除後比一個門檻——與段 1 的月營收行同一種計算。
+    section.lines.append(_target_multiple_drift_line())
+
     beta, beta_absence = _load_state(state_dir, "beta")
     if beta_absence is not None:
         section.lines.append(f"beta 門檻：{beta_absence.reason}（{beta_absence.kind}）")
@@ -407,6 +412,16 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
             line += "：" + "、".join(str(w) for w in warnings)
         section.lines.append(line)
     return section
+
+
+def _target_multiple_drift_line() -> str:
+    """目標倍數與今天的市場倍數背離幾檔。**這一格壞掉不得把整段帶走**（L17-3③ 的對稱面）。"""
+    try:
+        from alpha.valuation.drift import heartbeat_line, scan
+
+        return heartbeat_line(scan())
+    except Exception as exc:  # noqa: BLE001 — 讀不到 ledger／DB 是降級，不是心跳失敗
+        return f"目標倍數背離：讀不到（{type(exc).__name__}）（upstream_missing）"
 
 
 def _thesis_line(*, now: datetime, thesis_path: Path) -> str:
