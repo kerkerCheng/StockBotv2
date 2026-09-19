@@ -253,8 +253,15 @@ def test_a_fiscal_rollover_does_not_let_old_period_numbers_pose_as_current() -> 
     a = analyst(scenario="fiscal_rollover", as_of=None)
     s = states(v)
 
-    assert all(state == "superseded"
-               for key, state in s.items() if key.startswith("operating_assumption:"))
+    # ⚠ 2026-09-19：原本寫的是「**全部**都必須 superseded」，而那在 ledger 只有一個目標年度時
+    # 才等價於這條測試真正要守的東西。Phase 7 Step 7.2 之後 COHR 的 ledger 多了一組 FY2030
+    # 錨點假設，它們在 rollover 後是 `missing`（「針對 FY2030，不是目前目標期間；本視角不評估」）
+    # ——**那不是「冒充當期」，是正確地不評估**。一個斷言承載了兩種語意（L12），這裡先分開：
+    assumption_states = {state for key, state in s.items() if key.startswith("operating_assumption:")}
+    assert assumption_states <= {"superseded", "missing"}, (
+        f"rollover 後假設只能是 superseded（上一期）或 missing（別的目標期間）；"
+        f"出現 {assumption_states - {'superseded', 'missing'}} 就代表有數字冒充當期")
+    assert "superseded" in assumption_states, "上一個目標期間的假設必須確實被 supersede，否則這條是空跑"
     assert s["valuation_assumption:va_07dcbc388c814a91"] == "superseded"
     assert s["horizon_assumption:ha_586fe0ff9658a2d4"] == "superseded"
     assert s["fundamental_model:fundamental_model"] == "review_required"
