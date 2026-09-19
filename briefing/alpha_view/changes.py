@@ -86,14 +86,50 @@ def _rel_change(old: float | None, new: float | None) -> float | None:
 # 各來源
 # ---------------------------------------------------------------------------
 
+def single_analyst_view(count: Any, low: Any, high: Any) -> str | None:
+    """**「一個人的看法不是共識」**——是的話回理由，不是回 None（2026-09-19，七缺陷之 2）。
+
+    這個判準系統裡早就有，只是沒機械化：POET 的 Abstention `ab_42838d2eec25b735` 逐字寫著
+    「**僅 1 位分析師，high＝low，區間寬度為零——那不是共識，是一個人的看法**」，
+    而 packet 的 `valuation_market_implied.method` 也已對 rollover fail closed。
+    **同一個問題，估值層 fail closed、refresh 層照報**（L12 一表兩義；L16 分類沒跟著資料走）。
+
+    事發（2026-09-19）：LITE 的 +1y（FY2028）由 33.3012 → 39.70（+19.2%），**同時 `analyst_count`
+    由 22 崩到 1、`low`＝`high`＝39.70**；而 thesis 真正校準的 FY2027 只動了 +0.13%。
+    **base 完全沒有被推翻，訊號卻說它需要重做。**
+
+    實測 16 檔有 2 檔命中（LITE +1y、POET 兩年都是）＝12.5%——**有鑑別力、不恆亮**（L14-4）。
+    """
+    number = _num(count)
+    if number is not None and number <= 1:
+        return f"僅 {number:.0f} 位分析師"
+    lo, hi = _num(low), _num(high)
+    if lo is not None and hi is not None and lo == hi:
+        return "估計區間寬度為零（high＝low）"
+    return None
+
+
 def market_and_consensus_changes(
     rows: Sequence[Mapping[str, Any]], *, ticker: str, company_id: str | None, since: datetime,
+    forward_coverage: Any = None,
 ) -> tuple[list[ChangeEvent], list[str]]:
-    """逐日快照：價格變 → market_price；forward EPS（price/pe_forward）或目標價變 → consensus。"""
+    """逐日快照：價格變 → market_price；forward EPS（price/pe_forward）或目標價變 → consensus。
+
+    ⚠ `forward_eps_from(price, pe_forward)` 推出來的是 **+1y**，而實測 15/15 有假設的檔
+    **base 全部校準在 0y**——所以每次 forward year rollover（每年必然發生一次），每一檔都會
+    收到一個**與自己 base 無關的年度**觸發的複查要求。`forward_coverage` 傳入那個年度的共識
+    覆蓋，覆蓋崩塌時這個代理量**不發事件、改發 note**：它量到的是覆蓋變了，不是共識變了。
+    """
     from engine_c.estimates import forward_eps_from
 
     events: list[ChangeEvent] = []
     notes: list[str] = []
+    coverage_reason = (
+        single_analyst_view(getattr(forward_coverage, "analyst_count", None),
+                            getattr(forward_coverage, "low", None),
+                            getattr(forward_coverage, "high", None))
+        if forward_coverage is not None else None
+    )
     ref = f"engine_c://financial_snapshot/{ticker}"
     prev: Mapping[str, Any] | None = None
     for row in rows:
@@ -111,11 +147,21 @@ def market_and_consensus_changes(
             new_eps = forward_eps_from(row.get("price"), row.get("pe_forward"))
             rel = _rel_change(old_eps, new_eps)
             if rel is not None and rel >= CONSENSUS_NOISE_FLOOR_REL:
-                events.append(ChangeEvent(
-                    change_type=CONSENSUS, ticker=ticker, company_id=company_id, authority=A_SNAP,
-                    changed_ref=ref, observed_at=observed, effective_at=bar,
-                    old_version=f"{old_eps:.4g}", new_version=f"{new_eps:.4g}", material_fields=("forward_eps",),
-                    detail=f"forward EPS（price/pe_forward）{old_eps:.4g} → {new_eps:.4g}（{rel:+.1%}）"))
+                if coverage_reason is not None:
+                    # 覆蓋崩塌：量到的是「誰還在看」變了，不是「他們怎麼看」變了。
+                    # 比照本檔既有的「首次出現＝資料覆蓋變了，不是共識變了——不發事件」。
+                    notes.append(
+                        f"forward EPS（price/pe_forward，**+1y**）{old_eps:.4g} → {new_eps:.4g}（{rel:+.1%}）"
+                        f"**未發事件**：該年度{coverage_reason}——那不是共識，是一個人的看法。"
+                        "⚠ base 假設校準在 0y，這個代理量是 +1y 的，兩者本來就不是同一年")
+                else:
+                    events.append(ChangeEvent(
+                        change_type=CONSENSUS, ticker=ticker, company_id=company_id, authority=A_SNAP,
+                        changed_ref=ref, observed_at=observed, effective_at=bar,
+                        old_version=f"{old_eps:.4g}", new_version=f"{new_eps:.4g}",
+                        material_fields=("forward_eps",),
+                        detail=(f"forward EPS（price/pe_forward，**+1y** 代理量）{old_eps:.4g} → "
+                                f"{new_eps:.4g}（{rel:+.1%}）")))
             old_t, new_t = _num(prev.get("analyst_target_mean")), _num(row.get("analyst_target_mean"))
             rel_t = _rel_change(old_t, new_t)
             if rel_t is not None and rel_t >= CONSENSUS_NOISE_FLOOR_REL:
@@ -148,12 +194,22 @@ def fiscal_consensus_changes(
             continue
         rel = _rel_change(prior.value, item.value)
         if rel is not None and rel >= CONSENSUS_NOISE_FLOOR_REL and observed > since:
+            coverage_reason = single_analyst_view(item.analyst_count, item.low, item.high)
+            if coverage_reason is not None:
+                notes.append(
+                    f"{item.period.label} {item.metric} 共識 {prior.value:.6g} → {item.value:.6g}"
+                    f"（{rel:+.1%}）**未發事件**：{coverage_reason}"
+                    f"（覆蓋 {prior.analyst_count} → {item.analyst_count} 人）"
+                    "——那不是共識，是一個人的看法")
+                continue
             events.append(ChangeEvent(
                 change_type=CONSENSUS, ticker=ticker, company_id=company_id, authority=A_CONS_FY,
                 changed_ref=item.refs[0] if item.refs else f"engine_c://consensus_estimate/{ticker}/{item.metric}/{item.period.end}",
                 observed_at=observed, effective_at=item.captured_at,
                 old_version=f"{prior.value:.6g}", new_version=f"{item.value:.6g}", material_fields=(item.metric,),
-                detail=f"{item.period.label} {item.metric} 共識 {prior.value:.6g} → {item.value:.6g}（{rel:+.1%}）"))
+                detail=(f"{item.period.label}（{item.relative_label or '年度未標'}）{item.metric} 共識 "
+                        f"{prior.value:.6g} → {item.value:.6g}（{rel:+.1%}；覆蓋 "
+                        f"{prior.analyst_count} → {item.analyst_count} 人）")))
     return events, notes
 
 
@@ -378,28 +434,36 @@ def detect_changes(
     t = ticker_obj if ticker_obj is not None else ticker
     window_start = since.date() - timedelta(days=10)      # 多抓幾天讓第一筆有前一筆可比
 
+    # ⚠ 順序刻意：先取會計年度別共識，因為 `price/pe_forward` 那個代理量要靠它的 `analyst_count`
+    # 才知道自己量到的是「共識變了」還是「覆蓋崩了」（2026-09-19，七缺陷之 2）。
+    fy_fn = getattr(fundamentals_provider, "fiscal_consensus", None)
+    forward_coverage: Any = None
+    new_rows: Sequence[Any] = ()
+    if callable(fy_fn):
+        try:
+            old_rows, _r1 = fy_fn(t, as_of=since.date())
+            new_rows, _r2 = fy_fn(t, as_of=as_of)
+            forward_coverage = next(
+                (c for c in new_rows if c.metric == "eps" and c.relative_label == "+1y"), None)
+            got, more = fiscal_consensus_changes(old_rows, new_rows, ticker=ticker, company_id=company_id, since=since)
+            events += got
+            notes += more
+        except Exception as exc:  # noqa: BLE001
+            notes.append(f"FY 別共識變化偵測失敗：{type(exc).__name__}")
+
     series_fn = getattr(fundamentals_provider, "snapshot_series", None)
     if callable(series_fn):
         try:
             rows = series_fn(t, since=window_start, as_of=as_of)
-            got, more = market_and_consensus_changes(rows, ticker=ticker, company_id=company_id, since=since)
+            got, more = market_and_consensus_changes(
+                rows, ticker=ticker, company_id=company_id, since=since,
+                forward_coverage=forward_coverage)
             events += got
             notes += more
         except Exception as exc:  # noqa: BLE001
             notes.append(f"行情／共識變化偵測失敗：{type(exc).__name__}")
     else:
         notes.append("provider 沒有 snapshot_series——行情／共識變化未偵測")
-
-    fy_fn = getattr(fundamentals_provider, "fiscal_consensus", None)
-    if callable(fy_fn):
-        try:
-            old_rows, _r1 = fy_fn(t, as_of=since.date())
-            new_rows, _r2 = fy_fn(t, as_of=as_of)
-            got, more = fiscal_consensus_changes(old_rows, new_rows, ticker=ticker, company_id=company_id, since=since)
-            events += got
-            notes += more
-        except Exception as exc:  # noqa: BLE001
-            notes.append(f"FY 別共識變化偵測失敗：{type(exc).__name__}")
 
     hist_fn = getattr(fundamentals_provider, "observation_history", None)
     if callable(hist_fn):
@@ -451,5 +515,6 @@ def baseline_since(judged_on: date | None, records: Sequence[Any]) -> datetime:
 __all__ = [
     "WATCHES_PATH", "assumption_changes", "baseline_since", "detect_changes", "fiscal_consensus_changes",
     "ledger_changes", "lifecycle_due_changes", "load_watches", "market_and_consensus_changes",
+    "single_analyst_view",
     "metric_observations", "structural_changes", "watch_changes",
 ]
