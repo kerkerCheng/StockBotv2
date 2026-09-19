@@ -706,6 +706,10 @@ class AlphaSignal:
 
     direction: Literal["long", "short", "neutral"]
     confidence: float
+    #: **多久會被驗證**（「2-4 quarters」）。⚠ 它**不是**「倍率在哪一年實現」——
+    #: 2026-09-19 實測 63 檔全部落在「1 quarter」到「4-8 quarters」，最長兩年，
+    #: 而 COHR 的 thesis 講的是 FY28。**兩件事被讀成同一件**（L12）：
+    #: 前者測的是催化劑的節奏，後者測的是倍率的射程。要後者請讀 `multiple_horizon`。
     expected_horizon: str
 
     thesis: str
@@ -717,6 +721,16 @@ class AlphaSignal:
     disproof_conditions: tuple[DisproofCondition, ...]
     catalysts: tuple[Catalyst, ...] = ()
     risks: tuple[str, ...] = ()
+    #: **這個 thesis 主張的倍率在哪一年實現**（`YYYY-MM-DD` 會計年度結束日；2026-09-19，
+    #: Phase 7 Step 7.2，使用者核准 (b)+(ii)：複合跳＋終點年份跟著各檔自己的 thesis）。
+    #:
+    #: ⚠ **`None` ＝ 還沒有人寫下來，不是「沒有多年主張」。** 實測 63 檔的 judgment
+    #: **一個年份都沒有**——連 COHR 的散文裡都找不到「FY28」，那句話只存在於 `AGENTS.md`。
+    #: 所以缺席時多年橋**誠實 missing**：不套統一年期、不從 `expected_horizon` 換算
+    #: （那會把「多久被驗證」偷換成「多久兌現」）。
+    #: ⚠ 填它是 **judgment 不是 mechanical**（散文裡沒有年份，任何人重讀得不到同一個數），
+    #: 所以走 pq2 核准。
+    multiple_horizon: date | None = None
 
     evidence_quality: EvidenceQuality | None = None
     evidence_refs: tuple[EvidenceRef, ...] = ()

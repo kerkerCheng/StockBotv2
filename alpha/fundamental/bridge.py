@@ -51,6 +51,15 @@ class BridgeResult:
     metrics: Mapping[str, ModeledMetric]
     warnings: tuple[str, ...]
     version: str = BRIDGE_VERSION
+    #: **目標期間距基期幾年**（2026-09-19，Phase 7 Step 7.2）。
+    #:
+    #: ⚠ 橋在算術上**一直**支援跨年——`revenue = base × (1 + growth)` 是一次乘法，
+    #: 不管目標是明年還是五年後。危險就在這裡：`revenue_growth=0.5` 在 `span_years=1`
+    #: 時是「成長 50%」，在 `span_years=5` 時是「**五年累積**成長 50%」，
+    #: 而在 2026-09-19 之前**沒有任何地方說出這件事**（L12：一個表示兩種語意）。
+    #: 至今所有假設的 span 都是 1，所以這個兩義從來沒有現形過——
+    #: 而 Phase 7 的多年橋會讓它立刻變成一個每天都在誤導的數字。
+    span_years: int | None = None
 
 
 def _by_key(assumptions: Sequence[OperatingAssumption]) -> dict[tuple[str, str], OperatingAssumption]:
@@ -184,6 +193,13 @@ def build_bridge(
         raise ContractViolation(
             "revenue_growth 同時有 total 與分部 scope——兩者不得並存，請撤回其中一組")
 
+    span_years = (target.end.year - actuals.period.end.year) if (target.end and actuals.period.end) else None
+    if span_years is not None and span_years > 1:
+        warnings.append(
+            f"⚠ 目標期間 {target.label} 距基期 {actuals.period.label} 有 **{span_years} 年**——"
+            f"所有成長率與變化量假設都是**跨 {span_years} 年的累積值，不是年增率**。"
+            "橋只做一次乘法（base × (1+growth)），它不會、也不該替你把年化換算成累積。"
+            "⚠ 讀這張表的人必須知道這件事，否則 `revenue_growth=0.5` 會被讀成「一年成長五成」。")
     steps.append(BridgeStep(key="base_revenue", label=f"基期營收（{actuals.period.label}）",
                             kind="observation", value=actuals.revenue, unit="currency",
                             basis="observation", observation_refs=base_refs))
@@ -419,7 +435,7 @@ def build_bridge(
                              reason=eps_reason)
 
     return BridgeResult(accounting_basis=basis, steps=tuple(steps), metrics=metrics,
-                        warnings=tuple(warnings))
+                        warnings=tuple(warnings), span_years=span_years)
 
 
 def _emit(steps: list[BridgeStep], key: str, label: str, value: float | None, unit: str,
