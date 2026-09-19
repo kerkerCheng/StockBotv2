@@ -194,8 +194,13 @@ def _multiple_derivation_datum(valuation: ValuationResult | None, *, reference_d
 
 
 def _reverse_datum(reverse: Any, reason: str | None, *, reference_day: date,
-                   multiple_derivation: str | None = None) -> Datum:
-    """Reverse Bridge → 一格 Datum。**照抄**，不重算、不排序、不挑掉解不出來的那些（INV-3）。"""
+                   ladder: Sequence[Any] = (), multiple_derivation: str | None = None) -> Datum:
+    """Reverse Bridge → 一格 Datum。**照抄**，不重算、不排序、不挑掉解不出來的那些（INV-3）。
+
+    `ladder`（Phase 7 Step 7.1）＝同一條橋在不同倍率下的答案。**每一級都照抄**，
+    包括「即使拉到極限也做不到」那些——⚠ 問「五倍要什麼為真」時，
+    **`no_sign_change` 才是答案**，把它挑掉等於把結論丟掉。
+    """
     if reverse is None:
         return missing("reverse_bridge", "現價隱含的營運假設",
                        reason or "本次未執行 reverse bridge", authority=A_COMPARE)
@@ -213,6 +218,18 @@ def _reverse_datum(reverse: Any, reason: str | None, *, reference_day: date,
              "implied_value": s.implied_value, "gap": s.gap, "status": s.status,
              "reason": s.reason, "assumption_id": s.assumption_id}
             for s in reverse.solutions
+        ],
+        # 「N 倍要什麼為真」：每一級一列，**不挑掉解不出來的**（INV-3）。
+        "return_ladder": [
+            {"multiple": r.target_return_multiple, "required_eps": r.required_eps,
+             "required_gap": r.required_gap, "status": r.status,
+             "unreachable": [s.driver for s in r.unreachable_drivers],
+             "solutions": [
+                 {"driver": s.driver, "scope": s.scope, "our_value": s.our_value,
+                  "implied_value": s.implied_value, "status": s.status}
+                 for s in r.solutions
+             ]}
+            for r in (ladder or ())
         ],
     }
     if reverse.status == "missing":
@@ -1965,6 +1982,8 @@ def build_alpha_investment_view(
     entry_reason: str | None = None,
     entry_records: Sequence[EntryCriterion] = (),
     reverse: Any = None,
+    #: Phase 7 Step 7.1（2026-09-19）：同一條橋、同一組輸入，**只換起點價格**問「N 倍要什麼為真」。
+    reverse_ladder: Sequence[Any] = (),
     reverse_reason: str | None = None,
     today: date | None = None,
     refresh_changes: Sequence[ChangeEvent] | None = None,
@@ -2847,7 +2866,7 @@ def build_alpha_investment_view(
                                               "不是內部基本面 vs 價格隱含基本面"),
         numeric_comparisons=fund.comparisons,
         opinion_stance=fund.opinion_stance,
-        reverse_bridge=_reverse_datum(reverse, reverse_reason, reference_day=today,
+        reverse_bridge=_reverse_datum(reverse, reverse_reason, ladder=reverse_ladder, reference_day=today,
                                       multiple_derivation=(valuation.multiple_derivation
                                                            if valuation is not None else None)),
         multiple_derivation=_multiple_derivation_datum(valuation, reference_day=today),

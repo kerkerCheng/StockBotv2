@@ -40,6 +40,13 @@ SOLVE_STATUSES: tuple[str, ...] = (
     "solved", "already_equal", "no_sign_change", "bridge_failed", "missing_inputs",
 )
 
+#: **要問的倍率清單**（Phase 7 Step 7.1，2026-09-19）。
+#:
+#: ⚠ 這是**問句**不是**門檻**：AGENTS.md「刻意不寫死比值」禁的是 gate 的比值
+#: （「payoff 必須 > X%」那一類），不是「我們要問幾倍」。目標區間是 2–10 倍（D0），
+#: 所以四個問句剛好是那個區間的兩端與中間。**加一個倍率不改變任何判定，只多問一句。**
+RETURN_MULTIPLE_LADDER: tuple[float, ...] = (2.0, 3.0, 5.0, 10.0)
+
 #: 整份反解的狀態。
 REVERSE_STATUSES: tuple[str, ...] = ("available", "partial", "missing")
 
@@ -91,16 +98,26 @@ class ReverseBridgeResult:
     status: str
     current_price: float | None
     target_multiple: float | None
+    #: **倍率＝1 時的值，語意永遠是「市場隱含」**（現價 ÷ 目標倍數）。
+    #: ⚠ 問「五倍要什麼為真」時**不得讀這一格**——那是 `required_eps`。
+    #: 兩格分開是因為一個表示不該承載兩種語意（L12）：倍率 1 問的是「市場在想什麼」，
+    #: 倍率 5 問的是「要漲五倍需要什麼」，**那是兩個不同的問題，只是共用同一條橋**。
     market_implied_eps: float | None
     our_eps: float | None
     consensus_eps: float | None
+    #: **這次反解問的是幾倍**（2026-09-19，Phase 7 Step 7.1）。`1.0`＝原本的「市場隱含」問法。
+    #: ⚠ 刻意**不寫死**任何比值（AGENTS.md「刻意不寫死比值」）：它是參數，一次可以問多個。
+    target_return_multiple: float = 1.0
+    #: **要讓股價達到 `現價 × 倍率`，在目標倍數下所需的 EPS。** 倍率 1 時等於 `market_implied_eps`。
+    required_eps: float | None = None
     solutions: tuple[DriverSolution, ...] = ()
     reason: str | None = None
     warnings: tuple[str, ...] = ()
     method: str = (
-        "market_implied_eps ＝ 現價 ÷ 目標倍數；每個 driver 各解一次，**其餘假設固定成我們的**"
+        "required_eps ＝ 現價 × 倍率 ÷ 目標倍數；每個 driver 各解一次，**其餘假設固定成我們的**"
         "——所以每個值都是條件解，不是唯一解（共識只給總量，分項本來就欠定）。"
         "求根用二分法，區間就是該 driver 在 ASSUMPTION_DRIVERS 裡宣告的合法上下限。"
+        "⚠ 倍率＝1 時 required_eps 就是市場隱含 EPS，這條路徑的行為與 2026-09-19 之前完全相同。"
     )
 
     def __post_init__(self) -> None:
@@ -112,10 +129,31 @@ class ReverseBridgeResult:
 
     @property
     def eps_gap(self) -> float | None:
-        """市場隱含 EPS 比我們的高多少（相對）。正值＝市場比我們樂觀。"""
+        """市場隱含 EPS 比我們的高多少（相對）。正值＝市場比我們樂觀。
+
+        ⚠ 這一格**永遠用 `market_implied_eps`**（倍率 1），不跟著 `target_return_multiple` 走：
+        「市場比我們樂觀多少」與「要漲 N 倍還差多少」是兩個問題（L12）。後者看 `required_gap`。
+        """
         if self.market_implied_eps is None or not self.our_eps:
             return None
         return self.market_implied_eps / self.our_eps - 1.0
+
+    @property
+    def required_gap(self) -> float | None:
+        """要達到那個倍率，EPS 得比我們現在的假設高多少（相對）。"""
+        if self.required_eps is None or not self.our_eps:
+            return None
+        return self.required_eps / self.our_eps - 1.0
+
+    @property
+    def unreachable_drivers(self) -> tuple[DriverSolution, ...]:
+        """**即使把這個 driver 拉到合法極限也達不到**的那些（`no_sign_change`）。
+
+        ⚠ 這是 Phase 7 真正想要的輸出：問「五倍要什麼為真」時，
+        **回答「這一格即使拉到極限也做不到」比回答「需要成長 340%」有用得多**——
+        前者是一個結論，後者只是一個數字。
+        """
+        return tuple(s for s in self.solutions if s.status == "no_sign_change")
 
 
 __all__ = ["EQUAL_REL_TOL", "REVERSE_STATUSES", "SOLVE_STATUSES", "DriverSolution",

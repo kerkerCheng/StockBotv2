@@ -159,14 +159,31 @@ def build_reverse_bridge(
     target_multiple: float | None,
     our_eps: float | None,
     consensus_eps: float | None,
+    target_return_multiple: float = 1.0,
 ) -> ReverseBridgeResult:
-    """一次反解。任何一段缺料都以 `missing`＋理由現形，不補預設值。"""
+    """一次反解。任何一段缺料都以 `missing`＋理由現形，不補預設值。
+
+    `target_return_multiple`（2026-09-19，Phase 7 Step 7.1）＝**這次問的是幾倍**。
+    `1.0` 是原本的問法（「市場隱含的假設是多少」）；`5.0` 問的是「**五倍要什麼為真**」。
+    兩者共用同一條橋、同一套二分法、同一組合法上下限——**差別只有起點價格**。
+
+    ⚠ 之所以能這麼小：`build_reverse_bridge` 本來就走一次真正的 `build_bridge`，
+    所以任何一步的缺席與口徑衝突會用跟正向完全一樣的規則現形；不單調時回 `no_sign_change`
+    而不是猜一個值。**問五倍時那個 `no_sign_change` 正是我們要的答案**——
+    「即使把這個 driver 拉到極限也撐不起五倍」是結論，不是缺料。
+    """
+    if not target_return_multiple or target_return_multiple <= 0:
+        raise ContractViolation(
+            f"target_return_multiple 必須是正數（收到 {target_return_multiple!r}）——"
+            "「零倍」與「負倍」沒有定義，不得靠預設值把它變成 1")
     common = dict(company_id=company_id, ticker=ticker, as_of=as_of, target_period=target_period,
                   current_price=current_price, target_multiple=target_multiple,
-                  our_eps=our_eps, consensus_eps=consensus_eps)
+                  our_eps=our_eps, consensus_eps=consensus_eps,
+                  target_return_multiple=float(target_return_multiple))
 
     def _no(reason: str) -> ReverseBridgeResult:
-        return ReverseBridgeResult(status="missing", market_implied_eps=None, reason=reason, **common)
+        return ReverseBridgeResult(status="missing", market_implied_eps=None, required_eps=None,
+                                   reason=reason, **common)
 
     if current_price is None:
         return _no("沒有現價——反解的起點就是價格（不是 0）")
@@ -178,17 +195,18 @@ def build_reverse_bridge(
     if actuals is None or target_period is None:
         return _no("沒有基期觀測或目標期間——沒有橋就無從反解")
 
-    market_implied_eps = current_price / target_multiple
+    market_implied_eps = current_price / target_multiple            # 永遠是倍率 1 的那個問題
+    required_eps = current_price * target_return_multiple / target_multiple
     live = [a for a in assumptions
             if a.driver in OPINION_BEARING_DRIVERS and not a.retracted]
     if not live:
         return ReverseBridgeResult(
-            status="missing", market_implied_eps=market_implied_eps,
+            status="missing", market_implied_eps=market_implied_eps, required_eps=required_eps,
             reason="沒有任何營收／營益率假設可以反解——這一檔還沒開始做", **common)
 
     solutions = tuple(
         solve_driver(actuals, list(assumptions), target_period,
-                     assumption=item, target_eps=market_implied_eps)
+                     assumption=item, target_eps=required_eps)
         for item in live
     )
     solved = [s for s in solutions if s.status in ("solved", "already_equal")]
@@ -200,6 +218,7 @@ def build_reverse_bridge(
         status, reason = "partial", (
             f"{len(solutions) - len(solved)}／{len(solutions)} 個 driver 解不出來，逐項有理由")
     return ReverseBridgeResult(status=status, market_implied_eps=market_implied_eps,
+                               required_eps=required_eps,
                                solutions=solutions, reason=reason, **common)
 
 

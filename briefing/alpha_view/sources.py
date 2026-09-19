@@ -445,7 +445,7 @@ def _reverse_bridge_model(
     現價、目標倍數、基期、假設一律沿用正向那條鏈的同一個物件；本檔不另取任何數，也不
     自己算倍數。**沒有目標倍數就誠實 missing**——補市場倍數會讓答案恆等於共識。
     """
-    from alpha.reverse import build_reverse_bridge
+    from alpha.reverse import RETURN_MULTIPLE_LADDER, build_reverse_bridge
     from alpha.valuation.contracts import METHOD_FORWARD_EARNINGS_MULTIPLE
 
     if fundamental_model is None:
@@ -470,9 +470,26 @@ def _reverse_bridge_model(
             our_eps=(eps_metric.value if eps_metric is not None and eps_metric.is_known else None),
             consensus_eps=(eps_comparison.consensus if eps_comparison is not None else None),
         )
+        # Phase 7 Step 7.1（2026-09-19）：同一條橋、同一組輸入，**只換起點價格**，
+        # 順便問「N 倍要什麼為真」。⚠ 這幾個倍率是**要問的問題清單，不是門檻**——
+        # AGENTS.md 禁止寫死的是 gate 的比值（「payoff 必須 > X%」），不是問句本身。
+        ladder = tuple(
+            build_reverse_bridge(
+                company_id=str(company_id), ticker=str(ticker), as_of=as_of,
+                target_period=fundamental_model.target_period,
+                actuals=fundamental_model.base_actuals,
+                assumptions=fundamental_model.assumptions,
+                current_price=(valuation.current_price.value if valuation.current_price else None),
+                target_multiple=multiple,
+                our_eps=(eps_metric.value if eps_metric is not None and eps_metric.is_known else None),
+                consensus_eps=(eps_comparison.consensus if eps_comparison is not None else None),
+                target_return_multiple=m,
+            )
+            for m in RETURN_MULTIPLE_LADDER
+        )
     except Exception as exc:  # noqa: BLE001 — 反解失敗只讓該區 missing，不讓整份 view 失敗
         return None, f"reverse bridge 執行失敗：{type(exc).__name__}: {str(exc)[:160]}"
-    return result, None
+    return (result, ladder), None
 
 
 def _entry_model(
@@ -607,7 +624,7 @@ def fetch_alpha_investment_view(
         entry_model, entry_reason, entry_records = _entry_model(
             build, implied_return_model, implied_return_reason, resolved_ticker, company_id, as_of=as_of, today=today,
             identity=identity, sandbox_hurdle=sandbox_hurdle)
-        reverse_model, reverse_reason = _reverse_bridge_model(
+        reverse_pair, reverse_reason = _reverse_bridge_model(
             fundamental_model, valuation_model, resolved_ticker, company_id, as_of=as_of)
         # ---- V2（2026-09-15）gap closure：目標期間的共識 EPS 時序。provider 沒這能力就空。
         consensus_history: tuple = ()
@@ -776,7 +793,9 @@ def fetch_alpha_investment_view(
         valuation=valuation_model, valuation_reason=valuation_reason, valuation_records=valuation_records,
         implied_return=implied_return_model, implied_return_reason=implied_return_reason, horizon_records=horizon_records,
         entry=entry_model, entry_reason=entry_reason, entry_records=entry_records,
-        reverse=reverse_model, reverse_reason=reverse_reason,
+        reverse=(reverse_pair[0] if reverse_pair else None),
+        reverse_ladder=(reverse_pair[1] if reverse_pair else ()),
+        reverse_reason=reverse_reason,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
         abstention_records=abstention_records,
