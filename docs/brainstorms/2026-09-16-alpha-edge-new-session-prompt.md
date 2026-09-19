@@ -1,4 +1,4 @@
-# 給新 session 的啟動 prompt（2026-09-19 第八輪改寫；前七輪逐字狀態見文末歷程與 git history）
+# 給新 session 的啟動 prompt（2026-09-19 第九輪改寫；前八輪逐字狀態見文末歷程與 git history）
 
 > 用法：在新的 Claude Code session 貼「開工指令」那一段，或直接
 > `@docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`。
@@ -28,8 +28,9 @@
 >
 > ### ⚠ 常設授權：沒有需要我核准的事情就繼續做，不要停下來問
 >
-> 使用者原話（2026-09-17／09-18／09-19 三次確認）：「**我想要的是沒有需要我核准的事情就繼續**」、
-> 「**沒有需要我核准的就繼續走完**」。
+> 使用者原話（2026-09-17／09-18／09-19 共**四次**確認）：「**我想要的是沒有需要我核准的事情就繼續**」、
+> 「**沒有需要我核准的就繼續走完**」、「**一樣不需要我核准的就繼續做到完**」（2026-09-19 傍晚，
+> 與本檔的 `577 go` 同一句）。
 > **停的理由必須是「有東西要使用者決定」，不是「到了某個邊界」**——Phase 做完不是停止理由、
 > Z2 本身不是停止理由、「想說一聲」更不是。撞到 pq2 就掛號、**接著做下一件不需核准的事**，
 > 收尾一次給批次指令，**不得停在編號上等**。
@@ -44,6 +45,31 @@
 > 早就寫著「不併」——使用者是在資訊不完整的情況下核准的。**後來證明該合併，但那不是重點。**
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
+>
+> ### ▶ 這一輪的第一件事：**[577] go**（使用者 2026-09-19 已核准）
+>
+> **[577] COHR：核實「NVIDIA CPO 外部光源唯一來源」。** 圖上 `co:coherent supplies_to co:nvidia`
+> 的 `sole_source=true` 只有供應商自報，而 NVIDIA blog／nonexclusive 協議與
+> `co:lumentum supplies_to co:nvidia` **同時存在**。要的是客戶端或第三方逐字確認**產品範圍**
+> （ELS 模組 vs 雷射晶片是兩件事）。
+>
+> ⚠ **`go` 的邊界（照 hint 逐字）：只產出 source-trace packet。不入圖、不改 thesis、不動 live。**
+> 這正是 [617]→[626] 的形狀：**研究 `go` 不含寫入 `go`**。若追源結論是該降級，**要鑄一個新的
+> pq2 編號**請求核准，不得順手寫進圖。
+>
+> **[626] 已經替你把走廊鋪好了**（同型案件，2026-09-19 完成，逐字判準見
+> `extractions/lumentum_q2fy26_cpo.review.md`）：
+> 1. **`library/resolutions/` 承載不了這種重判**——`approve` 要求有 live conflict，且
+>    `selected_value` 必須是既有候選值；所有 assertion 都說 `true` 時 `false` 根本不是候選。
+> 2. **改在判讀所在的那一層（抽取檔的 `attributes`）**，`sources[].quote` 一個字都不動；
+>    然後 `python -m loader.load_to_neo4j <檔> --allow-dup-url` ＋
+>    `python -m loader.edge_resolution project`。⚠ **load 不含投影，兩步都要跑**。
+> 3. **判讀紀錄寫進 `extractions/<doc_id>.review.md`**（`.review.md` 是 tracked 的，
+>    而部分 transcript 抽取檔在 `.gitignore` 內）。
+> 4. 收尾量 L14：`python -m query.bottleneck --top-n 60` 的位移＋`python -m webapp materialize
+>    --ranking --structure-readings --basket`。
+>
+> **做完 [577] 之後不要停**——照上面的常設授權接著做下一件不需核准的事（建議見「這一輪建議做的」③）。
 >
 > ---
 >
@@ -105,7 +131,16 @@
 > ＋`sole_source_evidence_quality=weak`）；②改記在 `.review.md`（已寫）；③真要入圖就先進
 > `schema/vocab.json` 封閉字彙（L16-3：有行為後果的字彙必須被強制）。
 >
-> **③ 七個缺陷挑一個**。~~建議順序 3 → 6 → 1~~ **3 已修（2026-09-19）；下一個建議 6 → 1**（6 同樣會靜默產生**對自己有利**的假數字：目標倍數是會腐壞的快照，沒有任何機制在盯它與市場倍數的背離）。
+> **③ [577] 做完之後接著做（不需核准）：七個缺陷挑一個。** ~~原建議順序 3 → 6 → 1~~
+> **3 已修（2026-09-19）；下一個建議 6，再來 1。**
+>
+> - **缺陷 6（建議先做）＝目標倍數是會腐壞的快照。** 與剛修掉的 3 同型：**靜默產生對自己有利的
+>   假數字**，而且已有實測——[616] 量到 11 檔有 4 檔宣告「零折溢價」卻與今日市場倍數背離 >5%，
+>   LITE 自己則是 4 小時腐壞 4%。判準（「沒有 re-rating 證據時目標倍數＝校準用的市場倍數」）
+>   不會腐壞，腐壞的是那個被存下來的數——**沒有任何機制在盯兩者背離**。
+>   ⚠ L11-6 先做那一步：**先去看那 4 檔背離 >5% 的是誰、背離多少**，再決定修法形狀。
+> - **缺陷 1＝催化劑那格 15/16 亮著，成因是 `Catalyst.resolves` 這個「可選」欄位從未被填過**
+>   （62 檔 104 條，填 0 條）。⚠ 它動到 `FILTER_REASONS` 封閉字彙，是 Z2。
 >
 > ### ⚠ 已經做完、不要重做
 >
@@ -155,6 +190,7 @@
 | relation 分布：`supplies_to` 302｜`enables` 78｜`is_component_of` **73**｜`depends_on` 63｜`develops` 57｜**`is_variant_of` 17**（2026-09-19 新增） | Cypher `MATCH (ea:EdgeAssertion) RETURN ea.relation, count(*)` |
 | `tech:cpo` 的「它自己卡在誰身上」**20 條**（[613][614] 之前是 24，中途一度 25） | `python -m query.structure tech:cpo` |
 | 圖裡逐字 `Source` 1,058 個、`QUOTES` 邊 2,959 | `python -m query.structure <node> --quotes` |
+| overlay 的 `scope` 未命中 base 時**寫入端拒收**（2026-09-19 落地）；`--allow-new-scope` 才放行新切分；**撤回紀錄明文跳過**該檢查 | `.venv\Scripts\python.exe -m pytest tests/test_overlay_scope_gate.py -q`（8 條） |
 | `audit invariants` FAIL 0／PASS 13（筆數隨資料浮動，**驗收條件是 FAIL 0 不是筆數**） | `python -m audit invariants` |
 | 待辦池：**pq2 球在你手上 13**；結構讀圖待重讀 0 | `python -m engine_b.todo list` |
 | 歸零旗標 16 檔 × 4 盞：紅 2（COHR、IQE.L）｜灰 34（灰不是綠） | 心跳第 4 段 |
@@ -193,6 +229,7 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 深夜** | **催化劑那格量到底（`resolves` 0/104）｜LITE 做到底：variant＋downside＋resolves＋首屏七句｜`top_pick` 首次非空＝LITE｜修好 `--retract` 撤不回 overlay 的 bug＋守門測試｜五個系統性缺陷進 backlog** | 本輪 |
 | **2026-09-19 上午** | **[616] 紅隊審查撈到倍數陳舊（賭注不對稱是假象）｜[617] sole_source 追源找到 AAOI 圖外反證→鑄 [626]｜D11 兩條門檻落地 `config/alpha_screen.json`＋量測 consumer｜量到「通過的 5 檔有 4 檔儀器算不出 payoff」** | 本輪 |
 
+| **2026-09-19 傍晚** | **收尾：把 `577 go` 與常設授權寫進本檔開工指令（使用者指示「一樣不需要我核准的就繼續做到完」）** | 本輪 |
 | **2026-09-19 下午** | **七缺陷之 3 修掉：overlay scope 未命中 base 時寫入端拒收（使用者核准方案 (a)）＋`live_base_keys` helper＋`--allow-new-scope`＋8 條守門測試；先做 ROADMAP ⑤ 的 L11-6 量測（合法新 scope 0 條）才動手** | 本輪 |
 | **2026-09-19 中午** | **[626] 寫入：`co:lumentum→tech:uhp_laser` 的 `sole_source` true→false（改在抽取層＋重載＋重投影）｜量到排序位移 #2→#5｜補上兩份 `.review.md` 讓 gitignore 掉的抽取檔仍留得下判讀紀錄** | 本輪 |
 
