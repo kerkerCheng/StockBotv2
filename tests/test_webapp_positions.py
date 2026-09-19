@@ -79,7 +79,30 @@ def fake_power_law():
     }
 
 
-def fake_positions_payload(*, results=None, health=_KEEP, live_rows=None, power_law=_KEEP, **kw):
+def fake_bet_convergence():
+    """V4 賭注收斂的最小真實形狀（2026-09-19）：三種 state 各一，`no_bet` 只進計數不進 rows。"""
+    return {
+        "scanned": 22, "n_bets": 3, "measurable": 2,
+        "toward_us": 1, "away_from_us": 0, "unchanged": 1, "direction_undefined": 0,
+        "not_yet_observable": 1, "no_bet": 19,
+        "shortest_window_days": 1, "longest_window_days": 3, "longest_days_waiting": 0,
+        "rows": [
+            {"ticker": "COHR", "bet_since": "2026-09-15", "state": "toward_us",
+             "moved": 0.02, "gap_at_start": 0.34, "closed_fraction": 0.058, "n_points": 4,
+             "start_date": "2026-09-15", "now_date": "2026-09-18", "window_days": 3},
+            {"ticker": "AXTI", "bet_since": "2026-09-17", "state": "unchanged",
+             "moved": 0.0, "gap_at_start": -0.27, "closed_fraction": -0.0, "n_points": 2,
+             "start_date": "2026-09-17", "now_date": "2026-09-18", "window_days": 1},
+            {"ticker": "LITE", "bet_since": "2026-09-19", "state": "not_yet_observable",
+             "reason": "起算日 2026-09-19 之後尚無共識抓取", "days_waiting": 0},
+        ],
+        "rule": "起算日＝賭注寫下那天（不是判斷日）",
+        "known_biases": ["觀測窗短時「共識沒動」幾乎是必然", "n_bets 是個位數", "同向不等於同因"],
+    }
+
+
+def fake_positions_payload(*, results=None, health=_KEEP, live_rows=None, power_law=_KEEP,
+                           bet_convergence=_KEEP, **kw):
     rows = fake_results() if results is None else results
     return build_positions_artifact(
         rows, [{"ticker": "UNITREE", "cohort_id": "dc_x", "status": "unavailable"}],
@@ -89,6 +112,8 @@ def fake_positions_payload(*, results=None, health=_KEEP, live_rows=None, power_
         # `power_law` 在 builder 是**必要參數而非預設 None**（2026-09-18）：預設值會讓
         # 「呼叫端忘了傳」與「這次真的沒算」同形（L12），而 artifact 是 APP 唯一讀得到的東西。
         power_law=fake_power_law() if power_law is _KEEP else power_law,
+        # V4 同理：也是必要參數，理由與 `power_law` 那一行同一條。
+        bet_convergence=fake_bet_convergence() if bet_convergence is _KEEP else bet_convergence,
         health=fake_health() if health is _KEEP else health,
         live_rows=fake_live_rows() if live_rows is None else live_rows,
         paper_only=["AXTI", "SIVE.ST"], counters=_COUNTERS, benchmarks=("QQQ", "SOXX"), **kw)

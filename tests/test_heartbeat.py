@@ -443,3 +443,38 @@ def test_queue_section_surfaces_waits_without_an_expiry() -> None:
     text = "\n".join(section.lines)
 
     assert "無到期的等待" in text, "這個計數器必須每天出現，0 也要印"
+
+
+def test_fx_staleness_is_a_standing_counter_and_reuses_the_single_tolerance() -> None:
+    """跨幣別標的會在 FX 觀測過窗那天安靜地失去隱含報酬——這件事必須每天自己說話。
+
+    2026-09-19 實測：四筆 `fx_rate` 觀測全是 09-11 手抄的，到 09-19 已過期 8 天，
+    而 6680.HK／HEXA-B.ST／XFAB.PA／XPEV 的首屏就這樣退回 `inputs_incompatible`，
+    **沒有任何地方印出原因**。心跳這行不修它（補觀測是寫 append-only authority），
+    只讓它現形（L18-5：偵測器的用途是自動生出那個問句）。
+    """
+    from datetime import datetime, timezone
+
+    from alpha.fx import FX_AS_OF_TOLERANCE_DAYS
+
+    line = hb._fx_freshness_line(now=datetime.now(timezone.utc))
+    assert line.startswith("FX 觀測")
+    # 容忍窗只有一份 SSOT——這行必須印出 alpha/fx.py 的那個值，不得自己寫一個
+    assert f"±{FX_AS_OF_TOLERANCE_DAYS} 天" in line
+    # 過窗與在窗內是兩句不同的話，不得都印成「有 N 筆」
+    assert ("已過窗" in line) or ("全部在窗內" in line)
+
+
+def test_fx_line_failure_does_not_take_out_the_rest_of_section_one(
+    monkeypatch: pytest.MonkeyPatch, broken_env: dict[str, Path],
+) -> None:
+    """同段裡的幾件事互不相干，FX 那格壞掉不得把 harvest 與行情一起帶走。"""
+    def _boom(**_kw):
+        raise RuntimeError("engine c down")
+
+    monkeypatch.setattr(hb, "_fx_freshness_line", _boom)
+    section = hb.build_freshness(now=datetime.now(timezone.utc),
+                                 state_dir=broken_env["state_dir"], leads_path=broken_env["leads_path"])
+    text = "\n".join(section.lines)
+    assert "FX 觀測" in text and "upstream_unavailable" in text
+    assert len(section.lines) > 1, text

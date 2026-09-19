@@ -3205,6 +3205,56 @@ async function renderPositions() {
   sec3b.appendChild(mdParagraph(notes.power_law || ''));
   app.appendChild(sec3b);
 
+  /* ④c 賭注收斂（V4，2026-09-19）。**第三個維度**：上面兩格都以股價為錨點，而本圖標的
+     同漲同跌；共識修正不受 beta 污染，也不需要賣出就能驗證。
+     ⚠ 「共識沒動」與「賭注寫下後還沒有共識抓取」是相反的結論，這裡分成兩格印。 */
+  const bc = payload.bet_convergence;
+  const sec3c = el('section', 'panel');
+  sec3c.appendChild(el('h2', null, '市場承認了嗎（賭注收斂）'));
+  if (!bc) {
+    sec3c.appendChild(el('p', 'note',
+      '這份 artifact 還沒有賭注收斂——跑一次 `python -m webapp materialize --positions` 產生。'));
+  } else if (!bc.n_bets) {
+    sec3c.appendChild(el('p', 'note',
+      `還沒有任何一檔寫下賭注（掃過 ${bc.scanned == null ? '?' : bc.scanned} 檔）`
+      + '——這不是 0%，是還沒有分子也沒有分母。'));
+  } else {
+    const bcRow = el('div', 'numbers');
+    bcRow.appendChild(numberBlock('朝我們移動', String(bc.toward_us),
+      `有賭注 ${bc.n_bets} 檔、量得到 ${bc.measurable} 檔`, bc.toward_us > 0 ? 'pos' : null));
+    bcRow.appendChild(numberBlock('反向移動', String(bc.away_from_us),
+      '共識往我們的反方向走', bc.away_from_us > 0 ? 'neg' : null));
+    bcRow.appendChild(numberBlock('共識沒動', String(bc.unchanged),
+      bc.shortest_window_days == null ? '市場看過了、沒改'
+        : `已觀測 ${bc.shortest_window_days}–${bc.longest_window_days} 天`));
+    bcRow.appendChild(numberBlock('還沒輪到市場說話', String(bc.not_yet_observable),
+      '賭注寫下後還沒有共識抓取　←這不是「沒動」'));
+    sec3c.appendChild(bcRow);
+    const bcList = el('ul', 'notes');
+    (bc.rows || []).forEach((r) => {
+      const since = r.bet_since || '?';
+      if (r.state === 'not_yet_observable') {
+        bcList.appendChild(el('li', null,
+          `${r.ticker}：賭注 ${since} 寫下，之後還沒有共識抓取`
+          + (typeof r.days_waiting === 'number' ? `（已等 ${r.days_waiting} 天）` : '')));
+        return;
+      }
+      /* 分母（起點差距）跟著比例一起印：它極小時比例會被放大到不可讀，
+         只看「移了 −7175%」的人會以為共識大幅反向跑掉。 */
+      bcList.appendChild(el('li', null,
+        `${r.ticker}：自 ${since} 起 ${r.n_points} 次抓取，共識朝我們移了 ${signedPct(r.closed_fraction, 1)}`
+        + `（起點差距 ${typeof r.gap_at_start === 'number' ? r.gap_at_start.toFixed(4) : '—'}）`
+        + `　[${r.state}]`));
+    });
+    sec3c.appendChild(bcList);
+    if (bc.no_bet) {
+      sec3c.appendChild(el('p', 'note', `另有 ${bc.no_bet} 檔沒有寫下賭注（只進計數，不進上面的清單）。`));
+    }
+    (bc.known_biases || []).forEach((b) => sec3c.appendChild(mdParagraph('⚠ ' + b)));
+  }
+  sec3c.appendChild(mdParagraph(notes.bet_convergence || ''));
+  app.appendChild(sec3c);
+
   // ⑤ 逐檔
   const sec4 = el('section', 'panel');
   sec4.appendChild(el('h2', null, `逐檔（${payload.rows.length}）`));

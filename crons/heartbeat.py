@@ -236,6 +236,17 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         absence = Absence("upstream_unavailable", f"月營收盤點失敗：{type(exc).__name__}")
         section.lines.append(f"台股月營收：{absence.reason}（{absence.kind}）")
 
+    # (c2) FX 觀測新鮮度（2026-09-19）。**它是一個已知會過期、而且沒有人在補的東西**：
+    # 四筆 fx_rate 觀測的 `_note` 逐字寫著「現價 bar_date 換了就要補新的一筆」，
+    # 消費端只接受 ±3 天內（`alpha.fx.FX_AS_OF_TOLERANCE_DAYS`）——於是跨幣別標的會在
+    # 觀測過期那天安靜地從「隱含報酬算得出來」退回「算不出來」，而**沒有任何地方印出這件事**。
+    # 這裡不修它（補觀測是寫 append-only authority，要人核准），只讓它每天自己說話（L18-5）。
+    try:
+        section.lines.append(_fx_freshness_line(now=now))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"FX 觀測盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"FX 觀測：{absence.reason}（{absence.kind}）")
+
     # (d) APP：今天沒被 materialize 必須印出來（L12；AGENTS「APP 先讀得到，Daily 才能不印」）。
     # ⚠ 同一段裡的四件事互不相干，所以**各自降級**：APP 那一格壞掉不該把 harvest 與行情一起帶走。
     try:
@@ -244,6 +255,52 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         absence = Absence("upstream_unavailable", f"APP artifact 盤點失敗：{type(exc).__name__}")
         section.lines.append(f"APP materialize：{absence.reason}（{absence.kind}）")
     return section
+
+
+def _fx_freshness_line(*, now: datetime) -> str:
+    """跨幣別換算用的 FX 觀測還在不在容忍窗內。零網路——只讀本機 Engine C。
+
+    容忍窗的 SSOT 是 `alpha.fx.FX_AS_OF_TOLERANCE_DAYS`，**這裡不重寫那個 3**
+    （重寫一份就會開始各自漂移，L16）。
+
+    ⚠ 容忍窗比的是**現價 bar_date**，這裡用今天當參考——所以這行偏保守：它可能在
+    bar_date 還沒推進時就先喊過期。保守的方向是對的（它只會讓人早點去看），
+    但**這行不是判定，判定在 `alpha/fx.py`**，兩者不得互相冒充。
+    """
+    from alpha.fx import FX_AS_OF_TOLERANCE_DAYS
+    from engine_c.db import get_conn
+
+    conn = get_conn()
+    try:
+        rows = [tuple(r) for r in conn.execute(
+            "SELECT ticker, as_of FROM manual_observations WHERE field_name = 'fx_rate'")]
+    finally:
+        conn.close()
+    if not rows:
+        return "FX 觀測：一筆都沒有（capability_absent）——跨幣別標的的隱含報酬全部算不出來"
+    today = now.astimezone().date()
+    latest: dict[str, date] = {}
+    for ticker, as_of in rows:
+        try:
+            when = datetime.fromisoformat(str(as_of).replace("Z", "+00:00")).date()
+        except ValueError:
+            continue
+        key = str(ticker)
+        if key not in latest or when > latest[key]:
+            latest[key] = when
+    if not latest:
+        return "FX 觀測：有列但 as_of 全部不是合法時戳（upstream_unavailable）"
+    stale = sorted(t for t, when in latest.items() if (today - when).days > FX_AS_OF_TOLERANCE_DAYS)
+    newest = max(latest.values())
+    line = (f"FX 觀測 {len(latest)} 檔｜最新 as_of {newest.isoformat()}"
+            f"（{(today - newest).days} 天前，容忍 ±{FX_AS_OF_TOLERANCE_DAYS} 天）")
+    if stale:
+        line += (f"｜⚠ **{len(stale)} 檔已過窗，隱含報酬算不出來**："
+                 + "、".join(stale)
+                 + "——補一筆 `fx_rate` mechanical 觀測即可（寫 Engine C 要核准）")
+    else:
+        line += "｜全部在窗內"
+    return line
 
 
 def _monthly_revenue_line(*, now: datetime) -> str:
@@ -684,6 +741,31 @@ def build_positions(*, state_dir: Path | None) -> Section:
                 f"／其餘 {top.get('rest_n', '?')} 檔 {_pct(top.get('rest_contribution'))}"
                 f"｜曾達 2 倍 {power.get('reached_2x_ever', '?')}/{power.get('n', '?')}"
                 f"（現價仍達 {power.get('reached_2x_now', '?')}）｜{maturity_text}")
+
+    # 賭注收斂（V4，2026-09-19）：**不依賴賣出的驗證序列**。等權報酬與 power-law 都以股價
+    # 為錨點，而本圖標的同漲同跌；共識修正不受 beta 污染，也不需要賣出就能驗證。
+    # ⚠ 這裡只**讀** artifact，不算任何東西。
+    if pos_absence is not None:
+        section.lines.append(f"賭注收斂：{pos_absence.reason}（{pos_absence.kind}）")
+    else:
+        conv = positions.get("bet_convergence") or {}
+        if not conv:
+            section.lines.append("賭注收斂：這份 positions artifact 沒有 bet_convergence 鍵（upstream_unavailable）")
+        elif not conv.get("n_bets"):
+            # 「還沒有人下注」與「下了注但共識沒動」是相反的結論，不得印成同一個 0%（L12）。
+            section.lines.append(
+                f"賭注收斂：**還沒有任何一檔寫下賭注**（掃過 {conv.get('scanned', '?')} 檔）"
+                "——這不是 0%，是還沒有分子也沒有分母")
+        else:
+            lo, hi = conv.get("shortest_window_days"), conv.get("longest_window_days")
+            window_text = (f"｜已觀測 {lo}–{hi} 天" if lo is not None else "")
+            waiting = conv.get("not_yet_observable") or 0
+            waiting_text = (f"｜**賭注寫下後還沒有共識抓取 {waiting}**" if waiting else "")
+            section.lines.append(
+                f"賭注收斂（共識朝我們移動了嗎）：有賭注 {conv.get('n_bets', '?')} 檔"
+                f"｜朝我們 {conv.get('toward_us', '?')}｜反向 {conv.get('away_from_us', '?')}"
+                f"｜共識沒動 {conv.get('unchanged', '?')}{waiting_text}{window_text}"
+                "　←窗短時「沒動」幾乎是必然，不是市場否定了我們")
 
     # alpha 全歸零淨值少幾 %（D2）。**純呈現、零門檻**：它就是 alpha 佔 NAV 的比例本身，
     # 不是建議、不是上限。沒有 alpha 部位時它是 0，而那是一個真實的答案不是缺席。

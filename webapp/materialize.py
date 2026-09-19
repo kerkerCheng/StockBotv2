@@ -1104,6 +1104,7 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                              unavailable: Sequence[Mapping[str, Any]], *,
                              has_benchmark: bool, aggregate: Mapping[str, Any],
                              power_law: Mapping[str, Any] | None,
+                             bet_convergence: Mapping[str, Any] | None,
                              health: Mapping[str, Any] | None, live_rows: Sequence[Mapping[str, Any]],
                              paper_only: Sequence[str], counters: Mapping[str, Any],
                              benchmarks: tuple[str, str],
@@ -1143,6 +1144,11 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
         # 小賠多檔一檔補回，平均值天生看不到它。`None` ＝ 這次沒算（舊呼叫端），
         # 不是「算了但都是 0」（L12）。
         "power_law": None if power_law is None else dict(power_law),
+        # V4 賭注收斂（2026-09-19）。**第三個維度，不取代前兩個**：等權絕對問「排序整體準不準」、
+        # power-law 問「有沒有抓到那一檔」，這一個問「**共識朝我們移動了嗎**」——而它不需要
+        # 賣出就能驗證，也不受同漲同跌的 beta 污染（AGENTS「N 檔不等於 N 個獨立機會」）。
+        # `None` ＝ 這次沒算，不是「算了但都是 0」（同 `power_law` 的取捨）。
+        "bet_convergence": None if bet_convergence is None else dict(bet_convergence),
         # 時序（2026-09-11）。**照抄 `outcome_if_settled_today` 落的檔案，不重算**——
         # 沒有歷史就做不了樣本外驗證（ROADMAP §F：保存當時的 PIT view，事後對 actual 算誤差）。
         "aggregate_series": _outcome_series(),
@@ -1170,6 +1176,12 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                          "`null` 不是 0.0：「還沒有一檔滿一年」與「滿了但沒翻倍」是相反的結論。"
                          "`reached_2x_ever` 用期間高點、`reached_2x_now` 用現價——"
                          "D3 定案出場只認反證，所以抱著回吐是預期內的，兩個都要看得到。",
+            "bet_convergence": "V4 問的是**不依賴賣出的驗證**：自我們寫下賭注那天起，共識朝我們移動了嗎。"
+                               "起算日是**賭注寫下日**不是判斷日（賭注多半晚於判斷好幾天，用判斷日會把"
+                               "賭注還不存在那段期間的共識變動算成朝我們移動）。"
+                               "`unchanged`（市場看過沒改）與 `not_yet_observable`（還沒輪到市場說話）"
+                               "是相反的結論，不得合併；`window_days` 短時「沒動」幾乎是必然。"
+                               "⚠ 同向不等於同因——共識可能因為我們沒想到的理由朝同一個方向動。",
             "sample_validity": "**樣本效度先於數字**：錨點跨度短就不得視為 N 個獨立樣本——"
                                "反過來讀的話，一份有效 n 接近 1 的觀測會看起來像 N 個獨立驗證。",
             "judgment_anchor": "要讓這張表變成選股能力的證據，需要的不是等更久，"
@@ -1227,7 +1239,9 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
     payload = build_positions_artifact(
         results, unavailable, has_benchmark=bool(benchmarks),
         aggregate=outcome.equal_weight_aggregate(results),
-        power_law=outcome.power_law_aggregate(results), health=outcome.anchor_health(results),
+        power_law=outcome.power_law_aggregate(results),
+        bet_convergence=outcome._jsonable(outcome.collect_bet_convergence()),
+        health=outcome.anchor_health(results),
         live_rows=live_rows, paper_only=paper_only, counters=counters,
         benchmarks=(outcome.PRIMARY_BENCHMARK, outcome.REFERENCE_BENCHMARK),
         generated_at=generated_at)

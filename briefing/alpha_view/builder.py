@@ -49,7 +49,7 @@ from alpha.valuation.contracts import ValuationAssumption, ValuationResult
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
-from alpha.gap_closure import consensus_progress, target_reached
+from alpha.gap_closure import bet_recorded_on, consensus_progress, target_reached
 from alpha.narrative import ABSENT, SLOT_LABELS, fill_brief, format_value, select_brief
 from alpha.narrative.argument import (
     bet_paragraph, chain_paragraph, closure_phrase, market_paragraph, numbers_paragraph, timeline_paragraph,
@@ -2813,22 +2813,39 @@ def build_alpha_investment_view(
         gap_basis, gap_authority = "heuristic_proxy", A_IMPLIED
     else:
         gap_basis, gap_authority = "none", A_IMPLIED
-    # ---- V2 gap closure：共識朝我們移了幾成（起算日＝判斷日；量測不是訊號）------------------------
+    # ---- V2 gap closure：共識朝我們移了幾成（量測不是訊號）------------------------------------
+    # ⚠ **base 與 variant 的起算日不是同一天**（V4，2026-09-19）。base 的起點是判斷日；
+    # 賭注的起點是**賭注寫下那天**——variant overlay 多半晚於 base 判斷好幾天（實測 COHR 判斷
+    # 09-07／賭注 09-15、LITE 09-09／09-18、AXTI 09-10／09-17，三檔**沒有一檔同日**）。
+    # 用判斷日當賭注的起點，會把「賭注當時還不存在」那段期間的共識變動算成「朝我們的賭注移動」，
+    # 那是拿現在的主張去解釋過去的資料（INV-6）。實測代價：LITE 的 variant closed_fraction
+    # 先前是 +1.26%，而那一次共識上修發生在 2026-09-14，比賭注寫下日早四天。
     points = [(d, float(v)) for d, v, _n in consensus_history]
     base_eps_value = (fundamental_model.metrics["eps"].value
                       if fundamental_model is not None and fundamental_model.metrics.get("eps") is not None else None)
     variant_eps_value = (variant_fundamental.metrics["eps"].value
                          if variant_fundamental is not None and variant_fundamental.metrics.get("eps") is not None else None)
+    bet_since = bet_recorded_on(variant_fundamental)
     progress_base = consensus_progress(points, since=judged_on, our_value=base_eps_value)
-    progress_variant = consensus_progress(points, since=judged_on, our_value=variant_eps_value) if variant_eps_value is not None else None
+    if variant_eps_value is None:
+        progress_variant = None
+    elif bet_since is None:
+        # 答不出「賭注哪天寫下的」就明確拒絕，**不拿判斷日頂替**（INV-6：不得靜默回傳當前值）。
+        progress_variant = {"status": "missing", "n_points": len(points),
+                            "reason": "賭注假設沒有建立時點，起算日不明——不以判斷日代替"}
+    else:
+        progress_variant = consensus_progress(points, since=bet_since, our_value=variant_eps_value)
     if progress_base.get("status") == "available":
         gap_closure_datum = Datum(
             key="gap_closure", label="市場承認了嗎：自判斷日以來共識朝我們移了幾成",
-            value={"base": progress_base, "variant": progress_variant, "since": judged_on},
+            value={"base": progress_base, "variant": progress_variant,
+                   "since": judged_on, "bet_since": bet_since},
             status="available", basis="deterministic", authority=A_CONSENSUS_FY, as_of=today,
             method=progress_base["rule"],
             reason=("量測不是訊號：只回答共識與我們的差距縮小了多少；不排序、不決定尺寸"
-                    + ("；判斷日未知，起點取序列第一筆" if judged_on is None else "")))
+                    + ("；判斷日未知，起點取序列第一筆" if judged_on is None else "")
+                    + (f"；賭注那條線自 {bet_since.isoformat()} 起算（賭注寫下日，不是判斷日）"
+                       if bet_since is not None else "")))
     else:
         gap_closure_datum = missing("gap_closure", "市場承認了嗎：自判斷日以來共識朝我們移了幾成",
                                     progress_base.get("reason") or "沒有共識序列", authority=A_CONSENSUS_FY)

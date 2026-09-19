@@ -572,6 +572,114 @@ def render_power_law(power: dict) -> list[str]:
     return out
 
 
+def _jsonable(value):
+    """把聚合結果裡的 `date` 轉成 ISO 字串。**只轉型別，不改結構**。
+
+    ⚠ 不用 `json.dumps(default=str)`：那會把任何不可序列化的東西都變成它的 `repr`，
+    於是一個本來該爆的錯誤（例如不小心塞進一個模型物件）會靜默變成一串垃圾字元。
+    """
+    if isinstance(value, dict):
+        return {k: _jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable(v) for v in value]
+    if isinstance(value, date):
+        return value.isoformat()
+    return value
+
+
+def collect_bet_convergence() -> dict:
+    """V4（2026-09-19）：從已 materialize 的 analyst view 讀各檔賭注收斂，聚合成一份。
+
+    ⚠ **讀 artifact，不重跑模型。** 這支腳本本來就不連 Neo4j；而賭注收斂是判讀的一部分，
+    APP 呈現契約逐字禁止在讀取路徑重算（「LLM changes cognition; APP reads cognition」）。
+    artifact 沒 materialize 過就回空——**「還沒 materialize」與「沒有賭注」不得同形**（L13-2）。
+    """
+    from alpha.gap_closure import bet_convergence
+
+    directory = ROOT / "library" / "private" / "app" / "analyst_view"
+    if not directory.is_dir():
+        return {"n_bets": 0, "rows": [], "artifact_state": "no_artifact_dir"}
+    entries: list[tuple[str, dict]] = []
+    stale: list[str] = []
+    for path in sorted(directory.glob("*.json")):
+        if path.name.endswith(".meta.json"):
+            continue
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        ticker = str(payload.get("ticker") or path.stem)
+        closure = ((payload.get("overview") or {}).get("gap_closure") or {})
+        value = closure.get("value")
+        if not isinstance(value, dict):
+            continue
+        if "bet_since" not in value:
+            # 這份 artifact 是 V4 之前產的：它的 variant 起算日還是判斷日（錯的起點）。
+            # 靜默把它當成「沒有賭注」會讓一個**過期的 artifact** 長得像一個**誠實的空集合**。
+            stale.append(ticker)
+            continue
+        entries.append((ticker, _dates_in_closure(value)))
+    out = bet_convergence(entries, today=date.today())
+    out["artifact_state"] = "stale_schema" if stale and not entries else "ok"
+    out["stale_artifacts"] = stale
+    return out
+
+
+def _dates_in_closure(value: dict) -> dict:
+    """artifact 裡的日期是 ISO 字串；純函式吃的是 `date`。只轉日期，其餘原樣。"""
+    converted = dict(value)
+    converted["bet_since"] = _as_date(value.get("bet_since"))
+    for key in ("base", "variant"):
+        leg = value.get(key)
+        if isinstance(leg, dict):
+            leg = dict(leg)
+            for field in ("start_date", "now_date"):
+                if leg.get(field) is not None:
+                    leg[field] = _as_date(leg.get(field))
+            converted[key] = leg
+    return converted
+
+
+def render_bet_convergence(conv: dict) -> list[str]:
+    """V4 的人類可讀版。**沒有賭注時印「還沒有人下注」，不印 0%。**"""
+    if not conv or not conv.get("n_bets"):
+        if conv.get("stale_artifacts"):
+            return [chr(10) + "**賭注收斂（V4）｜artifact 是 V4 之前產的**——"
+                    f"{len(conv['stale_artifacts'])} 檔需要重跑 `python -m webapp materialize` 才量得到"]
+        return [chr(10) + "**賭注收斂（V4）｜還沒有任何一檔寫下賭注**——這不是 0%，是還沒有分子也沒有分母"]
+    out = [chr(10) + f"**賭注收斂（V4）｜掃描 {conv.get('scanned', '?')} 檔｜有賭注 {conv['n_bets']} 檔｜"
+           f"量得到 {conv['measurable']} 檔**　←共識朝我們移動了嗎（不依賴賣出的驗證）"]
+    lo, hi = conv.get("shortest_window_days"), conv.get("longest_window_days")
+    if lo is not None:
+        out.append(f"- 已觀測窗：{lo}–{hi} 天　←窗短時「沒動」幾乎是必然，不是市場否定了我們")
+    waiting = conv.get("longest_days_waiting")
+    if waiting is not None:
+        out.append(f"- 最久還沒等到第一次共識抓取：{waiting} 天　←這個數字不與上一行合併")
+    out.append(f"- 朝我們移動 {conv['toward_us']}｜反向 {conv['away_from_us']}｜"
+               f"共識沒動 {conv['unchanged']}｜**賭注寫下後還沒有共識抓取 {conv['not_yet_observable']}**"
+               f"　←最後一格不是「沒動」（另有 {conv.get('no_bet', 0)} 檔沒寫賭注）")
+    for row in conv.get("rows", []):
+        state = row.get("state")
+        since = row.get("bet_since")
+        since_text = since.isoformat() if hasattr(since, "isoformat") else (since or "?")
+        if state == "not_yet_observable":
+            waited = row.get("days_waiting")
+            waited_text = f"（已等 {waited} 天）" if isinstance(waited, int) else ""
+            out.append(f"  - {row['ticker']}：賭注 {since_text} 寫下，之後還沒有共識抓取{waited_text}")
+            continue
+        frac = row.get("closed_fraction")
+        frac_text = f"{frac:+.1%}" if isinstance(frac, (int, float)) else "—"
+        out.append(
+            f"  - {row['ticker']}：自 {since_text} 起 {row.get('n_points')} 次抓取，"
+            f"共識移動 {row.get('moved'):+.4g}（起點差距 {row.get('gap_at_start'):+.4g}）"
+            f" → {frac_text}　[{state}]"
+            if isinstance(row.get("moved"), (int, float)) and isinstance(row.get("gap_at_start"), (int, float))
+            else f"  - {row['ticker']}：{state}")
+    for bias in conv.get("known_biases", []):
+        out.append(f"  ⚠ {bias}")
+    return out
+
+
 def live_lane_rows(results: list[dict], fills: dict[str, list[dict]]) -> tuple[list[dict], list[str]]:
     """真實成交 vs 只有 paper。回傳 (逐筆 fill 列, 只有 paper 的 ticker)。
 
@@ -668,6 +776,9 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     # 這是跨持有期的粗聚合，明標不是回測；前段 vs 後段對照需排序歷史快照
     #（本腳本已開始 append，見 _append_ranking_snapshot），累積後才能算。
     aggregate = equal_weight_aggregate(results)
+    # V4 的分母是「寫了賭注的檔」，與追蹤表的分母無關——所以它在 `if` 外面算也在外面印。
+    # 追蹤表空的時候賭注收斂仍然有話可說（反之亦然），綁在一起會讓其中一邊靜默消失。
+    convergence = collect_bet_convergence()
     if aggregate["n"]:
         line = f"\n**等權重聚合（{aggregate['n']} 檔）：絕對 {_pct(aggregate['absolute'])}"
         if aggregate["excess"] is not None:
@@ -678,7 +789,9 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
         for text in render_power_law(power):
             print(text)
         _persist_aggregate(n=aggregate["n"], ew_abs=aggregate["absolute"],
-                           ew_excess=aggregate["excess"], power=power)
+                           ew_excess=aggregate["excess"], power=power, convergence=convergence)
+    for text in render_bet_convergence(convergence):
+        print(text)
 
     _append_ranking_snapshot()
     _render_live_lane(results, _live_fills())
@@ -686,7 +799,7 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
 
 
 def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None,
-                       power: dict | None = None) -> None:
+                       power: dict | None = None, convergence: dict | None = None) -> None:
     """把最新聚合值落成狀態檔 **＋ append 一筆時序**（2026-09-11 補時序）。
 
     ⚠ **為什麼要兩個檔**：`.json` 是 brief 首屏的最新值（既有消費端，形狀不動）；
@@ -712,6 +825,10 @@ def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None,
     # brief 首屏與 APP 都在讀它們，改名或改語意會讓既有消費端靜默偏掉。
     if power is not None:
         payload["power_law"] = power
+    # V4：賭注收斂與 power-law 放同一個信封，**既有欄位一字不動**。它是第二個量測維度——
+    # power-law 問「排序有沒有選到會漲的」（依賴股價），V4 問「共識有沒有朝我們移動」（不依賴賣出）。
+    if convergence is not None:
+        payload["bet_convergence"] = _jsonable(convergence)
     out = Path("library/private/decision_lab/outcome_aggregate.json")
     try:
         out.parent.mkdir(parents=True, exist_ok=True)
