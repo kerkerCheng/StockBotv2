@@ -1750,6 +1750,70 @@ const VOLUME_COLUMNS = [
 let VOLUME_VOCAB = null;
 
 
+// Phase 7 Step 7.4（2026-09-19）：「要幾倍，哪一格得為真」。
+// ⚠ 這一頁**只讀已 materialize 的 artifact**，一個數都不算——多年橋是金融模型，
+// 而 APP 呈現契約禁止 request path 跑模型。要更新就跑 `python -m webapp materialize --multi-year`。
+async function renderMultiYear() {
+  markNav('multi-year');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/multi-year`);
+  } catch (err) {
+    renderStateError(err, '讀不到多年視角');
+    return;
+  }
+  app.textContent = '';
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  app.appendChild(head);
+
+  const intro = el('section', 'panel callout');
+  intro.appendChild(el('p', 'arg-text', payload.this_is_not || ''));
+  const counts = payload.counts || {};
+  intro.appendChild(el('p', 'note',
+    `${counts.input || 0} 檔｜算得出 ${counts.available || 0}｜還沒寫下目標年度 ${counts.no_horizon || 0}`));
+  app.appendChild(intro);
+
+  (payload.rows || []).forEach((row) => {
+    const card = el('section', 'panel');
+    card.appendChild(el('h2', null, row.ticker));
+    if (row.status !== 'available') {
+      // ⚠ 「還沒有人寫下來」與「這一檔沒有多年主張」是兩件事——理由逐字印出來，不壓成一句。
+      card.appendChild(el('p', 'note', row.reason || '算不出來'));
+      app.appendChild(card);
+      return;
+    }
+    card.appendChild(el('p', 'note',
+      `目標年度 ${row.horizon}｜基期 ${row.base_period}｜距離 ${row.span_years} 年`
+      + `｜現價 ${row.current_price}｜目標倍數 ${row.target_multiple}x`));
+    if (row.multiple_source) card.appendChild(el('p', 'note', row.multiple_source));
+    (row.bridge_warnings || []).forEach((w) => card.appendChild(el('p', 'note', w)));
+    const table = el('table', 'rank compare');
+    const thead = el('thead');
+    const hr = el('tr');
+    ['倍率', '需要 EPS', '比錨點高', '解得出來的', '拉到極限也做不到'].forEach((label) => {
+      hr.appendChild(el('th', null, label));
+    });
+    thead.appendChild(hr);
+    table.appendChild(thead);
+    const tbody = el('tbody');
+    (row.ladder || []).forEach((step) => {
+      const tr = el('tr');
+      tr.appendChild(el('td', null, `${step.multiple}x`));
+      tr.appendChild(el('td', null, step.required_eps == null ? '—' : step.required_eps.toFixed(2)));
+      tr.appendChild(el('td', null, signedPct(step.required_gap, 0)));
+      const solved = (step.solutions || []).filter((s) => s.status === 'solved')
+        .map((s) => `${s.driver}[${s.scope}] = ${s.implied_value == null ? '—' : s.implied_value.toPrecision(4)}`);
+      tr.appendChild(el('td', null, solved.length ? solved.join('；') : '—'));
+      tr.appendChild(el('td', null, (step.unreachable || []).join('、') || '—'));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    card.appendChild(table);
+    app.appendChild(card);
+  });
+}
+
 async function renderBasket() {
   markNav('basket');
   let payload;
@@ -3184,6 +3248,7 @@ async function route() {
     }
     // `ranking` 是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
     if (target === 'basket') await renderBasket();
+    else if (target === 'multi-year') await renderMultiYear();
     else if (target === 'ranking') await renderRanking();
     else if (target === 'beta') await renderBeta();
     else if (target === 'coverage') await renderCoverage();

@@ -63,6 +63,10 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "basket": "stockbot-app/basket/1",
     "structure_readings": "stockbot-app/structure_readings/1",
     "account_scorecard": "stockbot-app/account_scorecard/1",
+    # Phase 7 Step 7.4（2026-09-19）：「要幾倍，哪一格得為真」。
+    # ⚠ 它**必須**是 materialize 出來的 artifact，不能在 request path 算——
+    # 多年橋是金融模型，而 APP 呈現契約明文禁止 request path 跑模型。
+    "multi_year": "stockbot-app/multi_year/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 

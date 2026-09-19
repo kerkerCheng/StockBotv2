@@ -617,6 +617,21 @@ def build_positions(*, state_dir: Path | None) -> Section:
                 line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
             section.lines.append(line)
         # 量的候選（Q1）：**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義。
+        # 多年視角（Phase 7 Step 7.4）：**常駐計數器**——「還有幾檔沒寫下目標年度」是待辦，
+        # 而待辦要會自己出現，不是等人去翻（L14）。⚠ 心跳只**讀** artifact，不算橋。
+        multi, multi_absence = _load_state(state_dir, "multi_year")
+        if multi_absence is not None:
+            section.lines.append(f"要幾倍：{multi_absence.reason}（{multi_absence.kind}）")
+        else:
+            counts = multi.get("counts") or {}
+            owed = [r.get("ticker") for r in (multi.get("rows") or ())
+                    if r.get("status") != "available"]
+            line = (f"要幾倍（多年視角）{counts.get('input', '?')} 檔｜算得出 {counts.get('available', '?')}"
+                    f"｜**還沒寫下目標年度 {counts.get('no_horizon', '?')}**")
+            if owed:
+                line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
+            section.lines.append(line)
+
         volume = basket.get("volume_filter") or {}
         volume_ledger = basket.get("volume_bet_ledger") or {}
         if volume:

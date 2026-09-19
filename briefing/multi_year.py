@@ -205,4 +205,95 @@ def render_multi_year(view: MultiYearView) -> str:
     return "\n".join(out)
 
 
-__all__ = ["NO_HORIZON_REASON", "MultiYearView", "build_multi_year_view", "render_multi_year"]
+__all__ = ["NO_HORIZON_REASON", "MultiYearView", "build_multi_year_artifact",
+           "build_multi_year_view", "render_multi_year"]
+
+
+def build_multi_year_artifact(
+    tickers: Sequence[str], *, generated_at: Any = None,
+) -> dict[str, Any]:
+    """所有標的的多年階梯 → `multi_year` state artifact（Phase 7 Step 7.4，2026-09-19）。
+
+    ⚠ **它必須是 materialize 出來的，不能在 request path 算**：多年橋是金融模型，
+    而 APP 呈現契約明文禁止 request path 跑模型（`tests/test_webapp_request_path.py`）。
+
+    ⚠ **每一檔都進 rows，包括算不出來的**——「還沒有人寫下 `multiple_horizon`」
+    與「artifact 讀不到」是兩件事，也與「這一檔沒有多年主張」是兩件事（INV-3）。
+    """
+    from datetime import datetime, timezone
+
+    stamp = (generated_at or datetime.now(timezone.utc))
+    rows: list[dict[str, Any]] = []
+    for ticker in tickers:
+        try:
+            view = build_multi_year_view(ticker)
+        except Exception as exc:  # noqa: BLE001 — 單檔失敗不讓整份 artifact 失敗
+            rows.append({"ticker": ticker, "status": "missing",
+                         "reason": f"{type(exc).__name__}: {str(exc)[:160]}"})
+            continue
+        rows.append({
+            "ticker": view.ticker, "company_id": view.company_id,
+            "horizon": view.horizon.isoformat() if view.horizon else None,
+            "status": view.status, "reason": view.reason,
+            "base_period": view.base_period.label if view.base_period else None,
+            "span_years": view.span_years, "target_multiple": view.target_multiple,
+            "multiple_source": view.multiple_source, "current_price": view.current_price,
+            "anchor_eps": view.anchor_eps,
+            "bridge_warnings": [w for w in view.bridge_warnings if "累積值" in w],
+            "ladder": [
+                {"multiple": r.target_return_multiple, "required_eps": r.required_eps,
+                 "required_gap": r.required_gap, "status": r.status,
+                 "unreachable": [s.driver for s in r.unreachable_drivers],
+                 "solutions": [{"driver": s.driver, "scope": s.scope,
+                                "our_value": s.our_value, "implied_value": s.implied_value,
+                                "status": s.status} for s in r.solutions]}
+                for r in view.ladder
+            ],
+        })
+    counts = {
+        "input": len(rows),
+        "available": sum(1 for r in rows if r["status"] == "available"),
+        "no_horizon": sum(1 for r in rows if r["status"] != "available"),
+    }
+    payload: dict[str, Any] = {
+        "kind": "multi_year",
+        "schema_version": "stockbot-app/multi_year/1",
+        "title": "要幾倍，哪一格得為真",
+        "generated_at": stamp.isoformat(),
+        "as_of": stamp.date().isoformat(),
+        # 多年橋**沒有 as-of 投影**：它問的是「從今天的基期出發，要 N 倍需要什麼」，
+        # 那個問題本身沒有歷史視角。不假裝有。
+        "point_in_time": {"as_of": None, "mode": "current"},
+        "authority": {
+            "function": "briefing.multi_year.build_multi_year_artifact",
+            "command": "python -m webapp materialize --multi-year",
+            "note": ("目標年度來自各檔 judgment 的 `multiple_horizon`（judgment，走 pq2）；"
+                     "假設來自 private ledger；倍數沿用 FY+1 的 target_pe 並逐檔標明。"
+                     "**這不是預測**——它問「要 N 倍，某個 driver 得是多少」。"),
+        },
+        "materializer": {
+            "version": "multi-year/1",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+        "return_multiples": list(RETURN_MULTIPLE_LADDER),
+        "counts": counts,
+        "rows": rows,
+        "this_is_not": (
+            "這不是預測，也不是目標價。「需要 EPS 25.39」的意思是「**要兩倍的話** EPS 得是那個數」，"
+            "而那個數合不合理由人判斷。⚠「拉到極限也做不到」是結論不是缺料，"
+            "但它的強度取決於 `ASSUMPTION_DRIVERS` 宣告的上下限。"
+        ),
+    }
+    from webapp.contracts import canonical_digest, state_freshness_identity
+
+    # 認知狀態＝每一檔的「目標年度、算不算得出來、每一級的結論」。
+    # ⚠ `required_eps` 的小數變動**不算**認知變化——它每天跟著股價動，
+    # 但「2 倍需要營收成長 4.65 倍、3 倍以上做不到」這個結論不會（同 account_scorecard 的取捨）。
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="multi_year", as_of=payload["as_of"],
+        identity={"rows": [[r["ticker"], r.get("horizon"), r["status"],
+                            [[x["multiple"], x["status"], sorted(x["unreachable"])]
+                             for x in (r.get("ladder") or ())]]
+                           for r in rows]})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload

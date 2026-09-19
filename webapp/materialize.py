@@ -1292,6 +1292,31 @@ def materialize_account_scorecard(*, store: StateArtifactStore | None = None,
     return target.write(payload), payload
 
 
+def materialize_multi_year(*, store: StateArtifactStore | None = None,
+                           tickers: Sequence[str] | None = None,
+                           generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """Phase 7 Step 7.4：「要幾倍，哪一格得為真」→ state artifact。
+
+    ⚠ **這一份必須在 materialize 算，不能在 request path 算**：多年橋是金融模型，
+    而 APP 呈現契約明文禁止 request path 跑模型（`tests/test_webapp_request_path.py`）。
+
+    標的來源＝籃子那一份（已 materialize），**不另造一份宇宙**（L16）。
+    籃子讀不到就退回 analyst_view 目錄裡已有的每一檔。
+    """
+    from briefing.multi_year import build_multi_year_artifact
+
+    target = store or StateArtifactStore()
+    names = list(tickers or ())
+    if not names:
+        try:
+            basket, _f = target.read("basket")
+            names = [str(r.get("ticker")) for r in (basket.get("rows") or ()) if r.get("ticker")]
+        except ArtifactUnavailable:
+            names = [str(t) for t, _p, _fr, _r in ArtifactStore().read_all()]
+    payload = build_multi_year_artifact(names, generated_at=generated_at)
+    return target.write(payload), payload
+
+
 def materialize_structure_readings(*, store: StateArtifactStore | None = None,
                                    as_of: date | None = None,
                                    generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
@@ -1418,4 +1443,4 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "COVERAGE_MATERIALIZ
            "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
            "build_positions_artifact", "materialize_positions",
            "redact_private_paths", "write_vocabularies", "materialize_basket",
-           "materialize_account_scorecard"]
+           "materialize_account_scorecard", "materialize_multi_year"]
