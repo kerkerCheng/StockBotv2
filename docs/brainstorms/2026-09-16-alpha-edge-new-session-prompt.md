@@ -54,7 +54,7 @@
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
 >
-> ### ▶ 這一輪的第一件事：**出 Phase 7 剩餘的 plan（含五欄 amendment），然後停一次**
+> ### ▶ 這一輪的第一件事：**Phase 7 剩餘的 PLAN_PROPOSAL ＋ 五欄 amendment 已於 2026-09-19 深夜交出，等核准**
 >
 > **Phase 0–7 之中，只剩 Phase 7 的後半與依賴它的 Phase 4b 沒做。**
 > Phase 5 已於 2026-09-19 標 ✅（八項 gate 全過；驗收行使用者定案取「**有賭注的檔都要有對稱的下檔**」，
@@ -63,10 +63,22 @@
 > Phase 7 的目標逐字是「**多年反向橋取代 FY+1 主流程；entry criterion 降級**」。
 > 7.1–7.4 已交付（倍率參數化／`multiple_horizon`＋`span_years`／`briefing multi-year` CLI／進 APP），
 > **但「取代」還沒發生**——多年橋今天是**並列的另一條路**，主 view 的 target 仍永遠是基期+1。
-> ⚠ **剩下的部分還沒拆成 Step**，而拆 Step 要先給五欄 amendment（`AGENTS.md`）——
-> 所以這一輪的正確產出是**一份 PLAN_PROPOSAL ＋ 五欄 amendment**，交回來等一次核准。
-> 那份 plan 至少要回答：①「取代」是換掉還是並存後改預設？②`entry criterion 降級`降到哪？
-> ③Phase 4b 的驗收（「多年橋算得出倍率與它的前提鏈，且每一格配 disproof」）怎麼機械驗證？
+>
+> **plan 的三個答案（量測後才寫的，不是設計偏好）：**
+> - ①**「取代」＝換掉「誰來回答『賭對了值多少』」，不是把兩條鏈合併。** 有 `multiple_horizon` 就由多年橋回答，
+>   沒有就維持 FY+1 並**說出它是哪一種**（兩種形狀不得同形，INV-3）。理由沿用 Step 7.3 已寫下的那句：
+>   FY+1 要對共識、多年橋沒有共識可對，**混進同一欄會讓兩個問題共用一個答案格**。
+> - ②**`entry criterion 降級`已經是現況，不是待辦。** 實測 **73/73 檔 `view.entry` 全部 `missing`、算得出門檻價 0 檔**，
+>   artifact 裡逐字寫著 EntryCriterion「不是必填資料，也不是 research completeness gate」。
+>   ⚠ 真正在做進場判準的是 **`payoff_not_positive`（籃子 filter）與首屏那句「今天不是加碼點」**，而那個**不叫**
+>   entry criterion——這是 L12（一個名字承載兩種語意）。amendment 要把這半句改寫成它實際指的東西。
+> - ③**Phase 4b 驗收的機械化**：見 amendment 的 Step 7.7（`scripts/multi_year_check.py`，三格逐檔報 INV-3）。
+>
+> ⚠⚠ **plan 最重要的一個量測（它決定了做事順序）：今天把機制做完，現有資料會變 0 筆。**
+> `payoff_not_positive` 只有 **2 檔**——**COHR** 同時被 `market_cap_above_max`（62.1B）＋`analyst_count_above_max`（22）
+> 擋著，換成多年橋也出不來；**AXTI** 市值與覆蓋**都通過**、只剩 `payoff_not_positive`＋`catalyst_undated`，
+> 而 Step 7.1 實測「**AXTI 是三檔裡唯一 2x 機械可達的**」——**但 AXTI 沒有 `multiple_horizon`**。
+> **所以 binding constraint 在研究端**（L14-1），已鑄 **[633]** 請求核准填 AXTI。**先填再做機制，順序不要顛倒。**
 >
 > **出 plan 之前與之後，不需核准的事照做完**（下面兩件都是）：
 >
@@ -173,7 +185,18 @@
 > - **[630] 已執行**：COHR 的 `multiple_horizon` = 2030-06-30（一手：10-Q 逐字
 >   「support future production volumes through 2030」）＋ FY2030 七條錨點假設。
 > - **[631] 已執行**（2026-09-19）：COHR 的 downside overlay，一手依據是 Q1 FY2027 指引區間**下緣**（variant 用的是同一個區間的上緣）。
-> - **pq2 球在你手上 17 項**，全部是既有的（`python -m engine_b.todo list`）。
+> - **[632] 已執行**（2026-09-19 深夜）：SIVE.ST 的 `entity_filing_signal` watch＝**`ew_0094_2026-09-19`**（expires 2027-03-31，
+>   綁 pq2 [632]）。⚠ **[632] 刻意留在池中轉「等事件」而不是 resolve**——喚醒只對「未 resolve 且帶 `waiting_on`」的項目
+>   生效（`engine_b/todo.py::_check_event_watches`），resolve 掉就等於醒了也沒人接。
+>   ⚠ **誤觸是常態不是故障**：管道實測 `mfn:sivers-semiconductors`＋`sivers:press` 的 **tier-1 且 go 共 17 筆／近 5 週**，
+>   其中含「股數變動」這類無關公告。判準已寫進 watch 的 `note`，無關的走 `event_watch reactivate` 繼續等。
+> - **[633] 已鑄號、等核准**（2026-09-19 深夜）：AXTI 的 `multiple_horizon`＝**2028-12-31** ＋ FY2028 錨點假設。
+>   一手是 **10-Q 逐字**（`library/raw/axti_10_q_20260813.txt` 行 2961）：「initial term of **three (3) years**」＋
+>   「capacity … **in 2026 through 2028**」，兩條獨立證據指向同一年。**span 3 年**（基期 FY2025）。
+>   ⚠ 刻意**不用**那兩份 8-K 檔——它們是濃縮摘要（其一自標 "Research excerpt"），不是 filing 原文（L18）。
+> - **pq2 球在你手上 17 項**（[632] 移出成等事件、[633] 移入，淨值不變）。查證：`python -m engine_b.todo list`。
+>   ⚠ **`standing-go` 實測候選 0 項**——17 項沒有一項能自動推進（在等世界／使用者明示 pending／`evidence_delta` 無 blocker），
+>   所以「掃一次挑能動的做掉」這件事**機械上的答案是 0**，不是還沒掃。
 >
 > ### ⚠ 已經做完、不要重做
 >
@@ -231,7 +254,7 @@
 | **「N 倍要什麼為真」四級階梯**（Phase 7 Step 7.1）：AXTI **2x 可達**、3x 以上做不到；LITE／COHR 連 2x 都有 driver 做不到 | 讀 view 的 `expectation_gap.reverse_bridge.value['return_ladder']` |
 | **`multiple_horizon` 填寫率 1 檔（COHR＝2030-06-30）**；`python -m briefing multi-year COHR` 印得出 FY2030 四級階梯，LITE 誠實回「還沒有人寫下來」 |
 | **Phase 4a 已接三條**（市值、覆蓋家數、至少一條外部印證的邊）；籃子 **通過 0**；`no_externally_corroborated_edge` 7 檔。**另兩條量完確認不接** | 讀 `basket.json` 的 `filter.reasons`；`python scripts/alpha_screen_check.py` |
-| **多年視角整條鏈已通**：`multi_year` state kind｜`--multi-year`｜`/api/v1/multi-year`｜APP「要幾倍」頁｜心跳段 4 一行。**16 檔算得出 1** | `python -m webapp status`（應列出 `multi_year｜fresh`）｜`python -m briefing multi-year COHR` | `python -c "import json,pathlib;print(sum(1 for p in pathlib.Path('library/private/alpha/judgments').glob('*.json') if json.loads(p.read_text(encoding='utf-8')).get('multiple_horizon')))"` |
+| **多年視角整條鏈已通**：`multi_year` state kind｜`--multi-year`｜`/api/v1/multi-year`｜APP「要幾倍」頁｜心跳段 4 一行。**16 檔算得出 1** | `python -m webapp status`（應列出 `multi_year｜fresh`）｜`python -m briefing multi-year COHR`｜填寫率：`python crons/heartbeat.py` 段 4 的「還沒寫下目標年度 N」（常駐計數器，不必自己數）<br>⚠ **2026-09-19 修正：原本這一格放的那條 `glob('library/private/alpha/judgments/*.json')` 命令會回 0，是錯的。** COHR 的判斷檔住在 `library/private/alpha/cohr_judgment.json`，不在 `judgments/` 目錄；定位判斷檔的 SSOT 是 `briefing.alpha_view.sources.locate_judgment()`，繞過它自己 glob 目錄就會漏。要一行驗證請用：`python -c "import json;from briefing.alpha_view.sources import locate_judgment;rows=json.load(open('library/private/app/state/multi_year.json',encoding='utf-8'))['rows'];print(sum(1 for r in rows if (p:=locate_judgment(r['ticker'])) and json.loads(p.read_text(encoding='utf-8')).get('multiple_horizon')),'/',len(rows))"` |
 | 賭注帳：籃子 `bet 3｜abstained 0｜opinion_in_base 3｜unanswered 10`；量的候選 `opinion_in_base 8｜unanswered 4` | 讀同一份 artifact 的 `bet_ledger`／`volume_bet_ledger`，或 `python crons/heartbeat.py` 第 4 段 |
 | **目標倍數背離：全 ledger 生效 `target_pe` 49 筆｜`drift_exceeds 13`／`within_band 32`／`not_applicable 2`／`cannot_compare 2`**（門檻 5%） | `python scripts/target_pe_drift_check.py`（心跳段 2 也每天印一行） |
 | **packet 的市值現在帶著單位走**：16/16 檔有 `quote_unit`（其中 6 檔非 USD），市值缺席 0 檔 | `python -m pytest tests/test_market_quote_unit.py -q`（4 條） |
@@ -304,6 +327,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 深夜 3** | **四個待決一次清掉（使用者「631 go 開發項都照你建議做」）**：**[631]** COHR 下檔——一手依據是 Q1 FY2027 指引區間**下緣**，而 variant 用的是**同一個區間的上緣**；三個 scenario 正好是那個區間的三個點（下緣 −0.00058／中點 +0.0221→base 0.025／上緣 +0.0437→variant 0.045）；首屏那把尺四個數到齊（317.36／223.60／243.97／**197.54**）。**FX 自動化**——`StockBotv2-FxSync` 每日 06:55，四檔 `blocked → ready`，未到終局 **10 → 6**。**第三種終局進 APP**——等價性 73/73 量過後把 `collect_backlog` 那份查詢移除，判準只留一份。⚠ 三個交付各踩到一次自己的坑並當場修：L15（引用不在 context 內 → 整筆靜默拒用）、L17-1（同一函式兩個呼叫端兩種形狀）、測試名稱撞到既有 fixture。全量 **2,780 passed／0 failed**；`audit invariants` FAIL 0／4,244 筆 | 本輪 |
 
 | **2026-09-19 收尾 2** | **Phase 5 結案標 ✅**：驗收行的讀法使用者定案取「有賭注的檔都要有對稱的下檔」（原話「走後者吧」），判準是**成對**不是固定名單——實測 payoff 與 downside 都是 AXTI／COHR／LITE，兩組**完全相同**。⚠ 另一個讀法（COHR＋另外三檔＝4 檔，缺 SIVE.ST）已明確排除：SIVE.ST 連賭注都還沒寫，要它有下檔等於要求「沒下注也要說認錯值多少」 | 本輪 |
+
+| **2026-09-19 深夜 4** | **[632] 執行（SIVE.ST 的 `entity_filing_signal` watch `ew_0094`，轉等事件不 resolve）｜[633] 鑄號（AXTI 的 `multiple_horizon`＝FY2028，一手 10-Q 逐字）｜Phase 7 剩餘的 PLAN_PROPOSAL ＋五欄 amendment 交出等核准**。三個量測改變了 plan 的形狀：①**`entry criterion 降級`已是現況**——73/73 檔 `view.entry` 全 `missing`、門檻價 0 檔，真正在擋的是 `payoff_not_positive` 而它不叫 entry criterion（L12）；②**今天把機制做完現有資料變 0 筆**——`payoff_not_positive` 那 2 檔裡 COHR 另被市值＋覆蓋擋死、AXTI 沒有 `multiple_horizon`，binding constraint 在研究端（L14-1）；③`standing-go` 候選 **0 項**。順帶當下修一個會安靜回錯數字的查證命令（原命令 glob `judgments/` 漏掉住在 `cohr_judgment.json` 的 COHR，回 0 而真值是 1；SSOT 是 `locate_judgment()`） | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
