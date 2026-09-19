@@ -62,6 +62,41 @@ from alpha.providers.market_normalization import (  # noqa: E402
     ENGINE_C_DB as _ENGINE_C_DB, analyst_count, normalized_market_cap,
 )
 
+def bottleneck_share_upper_bounds() -> list[tuple[str, float | None]]:
+    """D11 第五條「瓶頸業務占營收下限」的**鑑別力量測**（2026-09-19，Phase 4a）。
+
+    ⚠ **這一條至今沒有接進 filter，而這支函式就是不接的理由。**
+
+    系統沒有「瓶頸業務占營收」這個數字——大部分公司不揭露到那個顆粒度。
+    能拿到的最細是 `segment_revenue_share`（分部占比），而**分部占比是真值的上界**：
+    瓶頸業務一定包含在某個分部裡，所以「瓶頸業務占比 ≤ 最大分部占比」。
+    上界低於門檻 → **確定不合格**；上界高於門檻 → **什麼都不能說**
+    （TSM 的 HPC 分部 57.6% 裡，矽光子晶粒只是極小一塊）。
+
+    **2026-09-19 實測 15／16 檔有分部資料，用上界法的鑑別力：**
+    門檻 20% → 擋 0 檔｜30% → 0 檔｜40% → 2 檔｜50% → 2 檔｜60% → 8 檔。
+    合理門檻（20–40%）下**擋 0–2 檔＝恆滅，零鑑別力**（L14-4：清除率近 0 的不是閘門）。
+    而把門檻拉到 60% 才擋得動時，被擋的是 TSM／AVGO／SOI.PA 這些**分部切得比較細**的公司
+    ——**那不是 D11 想擋的東西**（它想擋的是「瓶頸業務只佔 3%」那種）。
+
+    **所以這條規則要生效，缺的不是對應表，是「瓶頸業務的營收」這個數字本身。**
+    """
+    import sqlite3
+
+    from alpha.contracts import Ticker
+    from alpha.providers.fundamentals import EngineCFundamentalsProvider
+
+    del sqlite3
+    provider = EngineCFundamentalsProvider()
+    tickers = [r["ticker"] for r in json.loads(BASKET.read_text(encoding="utf-8"))["rows"]]
+    out: list[tuple[str, float | None]] = []
+    for ticker in tickers:
+        snapshot, _freshness = provider.fundamentals(Ticker(ticker))
+        shares = getattr(snapshot, "segment_revenue_share", None)
+        out.append((ticker, max(shares.values()) if shares else None))
+    return out
+
+
 def screen() -> dict[str, Any]:
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     cap_max = float(config["market_cap_max_usd"])
@@ -117,7 +152,18 @@ def main() -> int:
         verdict = "✅ 通過" if row["passes"] else "｜".join(row["reasons"])
         print(f"{row['ticker']:<11}{cap:<16}{str(row['analyst_count']):<7}{verdict}")
     print("\n理由計數：", json.dumps(result["reasons"], ensure_ascii=False))
-    print("⚠ 這是量測，不是 filter——`webapp/basket.py` 的 top_pick 判定完全未改（先量測，後放閘）。")
+    print("\n## D11 第五條（瓶頸業務占營收下限）的鑑別力——**這是它至今沒接進 filter 的理由**")
+    bounds = bottleneck_share_upper_bounds()
+    values = [v for _t, v in bounds if v is not None]
+    print(f"分部資料 {len(values)}／{len(bounds)} 檔｜用『最大分部占比』當上界（真值一定 ≤ 它）")
+    for threshold in (0.2, 0.3, 0.4, 0.5, 0.6):
+        blocked = sum(1 for v in values if v < threshold)
+        note = "　← 恆滅，零鑑別力" if blocked <= 2 else ""
+        print(f"  門檻 {threshold:.0%} → 確定不合格 {blocked}／{len(values)} 檔{note}")
+    print("⚠ 上界高於門檻時**什麼都不能說**：TSM 的 HPC 分部 57.6% 裡矽光子晶粒只是極小一塊。")
+    print("⚠ 這一條缺的不是對應表，是**「瓶頸業務的營收」這個數字本身**——大部分公司不揭露。")
+    print("\n⚠ 市值與覆蓋家數兩條**已於 2026-09-19 接進 `webapp/basket.py` 的 filter**；"
+          "本檔仍是它們的量測與重構驗證基準。")
     return 0
 
 

@@ -87,8 +87,22 @@ def _node_labels(node_type: str) -> list[str]:
     return ["Entity", node_type]
 
 
+# `admitted_at`＝**這個節點第一次進圖的時間**（2026-09-19，D11「入圖前 30 天漲幅上限」的前置）。
+#
+# ⚠ **用 `ON CREATE SET`，不是 `coalesce`：既有節點永遠不會有這個值，那是刻意的。**
+# 我們不知道它們何時入圖，而回填一個「下次載入的時間」會製造一個看起來精確的假日期
+# （L11-5：留 null 比猜一個日期誠實）。所以 2026-09-19 之前入圖的節點這一格永遠是 null，
+# **那不是 bug**。
+#
+# ⚠⚠ **有了這個欄位不等於那條 filter 可以接。** 同日實測：整個圖的 SourceDoc 只有
+# 69 天歷史（2026-07-10 ～ 09-17）、33 個不同日期，而且 38% 擠在 08-30～09-02 四天
+# （批次補文件）。在入圖日有足夠分散度之前，「入圖前 30 天漲幅」對每一檔算出來的
+# 幾乎是同一段行情——**恆亮或恆滅，零鑑別力**（L14-4）。
+# **接 filter 的前置條件是可機械驗證的**：`admitted_at` 非 null 的公司數，
+# 以及它們的日期跨度。跨度還在幾週量級時不得接。
 MERGE_NODE = """
 MERGE (n:Entity {id: $id})
+ON CREATE SET n.admitted_at = $updated_at
 SET n.type = $type,
     n.name = $name,
     n.abstraction_level = $abstraction_level,
@@ -108,6 +122,7 @@ RETURN node.id
 # 不依賴 APOC 的後備版(label 與 source_ids 聯集用 Python/Cypher 純表達式處理)
 MERGE_NODE_NOAPOC = """
 MERGE (n:Entity {id: $id})
+ON CREATE SET n.admitted_at = $updated_at
 SET n.type = $type,
     n.name = $name,
     n.abstraction_level = $abstraction_level,
