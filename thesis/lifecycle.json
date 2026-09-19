@@ -37,11 +37,27 @@
       }
     ],
     "check_interval_days": 90,
-    "last_checked": "2026-07-17",
+    "last_checked": "2026-09-19",
     "memo": "thesis/coherent_cpo_v2_lane_memo.md",
+    "mutations": [
+      {
+        "at": "2026-09-19T05:44:40.354150+00:00",
+        "author": "session",
+        "evidence_refs": [
+          "graph://edge/co:coherent/supplies_to/co:nvidia",
+          "graph://source/cohr_10_q_20260506",
+          "graph://source/nvda_lumentum_partnership_pr_2026_03_02",
+          "graph://source/nvidia_sipho_blog_partner_roles"
+        ],
+        "from": "active",
+        "proposal_id": "tm_22e3402849969072a39e129099112d5e",
+        "rationale": "disproof_conditions[1] 已觸發（pq2 [629]，使用者 2026-09-19 核准）。條件逐字：「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商（客戶端或第三方揭露）」；其 action_within_48h 逐字：「把該邊的 sole_source 降級並重跑 Q1；structural_score 會自動下降，需重新評估整條 thesis」。【觸發證據，三條互相獨立】①客戶端具名：NVIDIA 自己的 silicon photonics partner blog 把 ELS 供應商逐字列成「Lumentum, Sumitomo, and Coherent」三家，角色句「These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine」（nvidia_sipho_blog_partner_roles _s5，origin_entity=NVIDIA，tier 2）。②同日同規模的第二份協議：NVIDIA 與 Lumentum 的新聞稿逐字「The nonexclusive agreement includes an NVIDIA multibillion purchase commitment」，投資額同為 20 億美元。③Coherent 自己的 10-Q（tier 1 法定文件）逐字「The non-exclusive agreement」。【48h 動作的前半已執行】pq2 [627] 已把 co:coherent supplies_to co:nvidia 的 sole_source 由 true 改為 false（改在抽取層、sources[].quote 一字未動，重載＋重投影）；實測 rank_bottlenecks 該列由 #2 → #5。本筆是後半：把 thesis 轉入 review_required 等待重新評估。【刻意不做】不在本筆一併改寫 thesis 內容或 variant——那是重新評估的產出，不是轉狀態的副作用。首屏第三句與第六句已於 [627] 更新（brief ib_37dfb9b27153eba8）。",
+        "to": "review_required"
+      }
+    ],
     "next_check": "2026-10-15",
     "note": "memo 於 2026-07-17 conflict-resolved 重生成（commit 6ec70c7）；12 月另有六吋 InP 產能倍增檢核點",
-    "status": "active",
+    "status": "review_required",
     "ticker": "COHR"
   },
   "sivers": {
