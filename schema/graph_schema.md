@@ -224,6 +224,20 @@ Canonical relationship 的 `source_ids` / `source_doc_ids` 在 APOC 與非 APOC
 
 **鐵律：** 供應商自己的法說會說「我們是唯一供應商」不算 `verified_by_search`；需要**客戶端或第三方**來源印證。若某條 `sole_source=true` 的邊，其所有 source_ids 的 `origin_entity` 全是同一家供應商 → 自動標 `sole_source_evidence_quality: weak`（L8）。
 
+### ⚠ 刻意不新增 `sole_source_verification` 欄位（2026-09-19 使用者定案）
+
+上面兩個值是 **`sole_source=true` 時的驗證模式**，不是一個獨立欄位。
+[626]／[627] 兩次降級的 hint 都建議「降級為 `verified_by_absence`」，**那個措辭會反轉語意**：
+與 `sole_source=false` 並存時它讀起來變成「我們驗證過它不是獨家」，
+而實情是**我們找到了正面反證**（客戶端逐字列出多家供應商），**比 absence 強得多**。
+
+**降級後的正確表達只有兩欄，都已存在：** `sole_source=false` ＋
+`sole_source_evidence_quality=weak`。**判讀理由寫進 `extractions/<doc_id>.review.md`**
+（tracked，即使抽取檔本身在 `.gitignore` 內也留得下來）。
+
+⚠ 下次再有人想加這個欄位：它有行為後果，所以要先進 `schema/vocab.json` 的封閉字彙才可能成立
+（L16-3）；但在那之前要先回答「`false` 時的『驗證模式』到底指什麼」——今天沒有人答得出來。
+
 ---
 
 ## 8. 不進圖的東西（時變觀測，歸引擎 C 的 SQLite）

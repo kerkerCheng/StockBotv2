@@ -160,6 +160,7 @@ def market_and_consensus_changes(
                         changed_ref=ref, observed_at=observed, effective_at=bar,
                         old_version=f"{old_eps:.4g}", new_version=f"{new_eps:.4g}",
                         material_fields=("forward_eps",),
+                        fiscal_relative_label="+1y",      # `pe_forward` 對應的就是 forward year
                         detail=(f"forward EPS（price/pe_forward，**+1y** 代理量）{old_eps:.4g} → "
                                 f"{new_eps:.4g}（{rel:+.1%}）")))
             old_t, new_t = _num(prev.get("analyst_target_mean")), _num(row.get("analyst_target_mean"))
@@ -207,6 +208,7 @@ def fiscal_consensus_changes(
                 changed_ref=item.refs[0] if item.refs else f"engine_c://consensus_estimate/{ticker}/{item.metric}/{item.period.end}",
                 observed_at=observed, effective_at=item.captured_at,
                 old_version=f"{prior.value:.6g}", new_version=f"{item.value:.6g}", material_fields=(item.metric,),
+                fiscal_relative_label=item.relative_label,
                 detail=(f"{item.period.label}（{item.relative_label or '年度未標'}）{item.metric} 共識 "
                         f"{prior.value:.6g} → {item.value:.6g}（{rel:+.1%}；覆蓋 "
                         f"{prior.analyst_count} → {item.analyst_count} 人）")))

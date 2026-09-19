@@ -63,6 +63,29 @@ class _Hit:
         self.observed_at, self.dependency_ref = observed_at, dependency_ref
 
 
+#: 假設校準的那一個會計年度。實測 15/15 有假設的檔 base 全部在這一格。
+BASE_FISCAL_LABEL = "0y"
+
+
+def _is_off_year_consensus(event: ChangeEvent) -> bool:
+    """這筆共識變動是不是**別的會計年度**的（2026-09-19，七缺陷之 2 的後半）。
+
+    事發：`THESIS_POLICY[consensus] = review_required` 不看年度，而 `price/pe_forward` 推出來的
+    代理量是 `+1y`——於是每次 forward year rollover（每年必然發生一次），**每一檔**都會收到一個
+    與自己 base 無關的年度觸發的複查要求。實測 16 檔有 2 檔正在收這種通知，而其中一檔（AXTI）
+    是已研究到底的兩檔之一——**假警報正落在最該信任的那兩份判讀上**。
+
+    ⚠ `None`＝拿不到年度 → **照舊觸發**（fail open）。少報一個真變動比靜默吞掉更糟。
+    ⚠ 只對 `consensus` 生效；`financial_actual`／`company_guidance`／`graph_edge` 一律不受影響。
+    ⚠ **這不是把跨年度的訊號拿掉**：被降級的事件仍然計數、仍然逐條進 notes。COHR 的 thesis
+    講 FY28 而模型只有 FY27 一格——那個缺口的解是多年橋（Phase 7），不是讓一個對每一檔都會亮的
+    訊號一直響（L14-4：恆亮＝零鑑別力）。
+    """
+    return (event.change_type == CONSENSUS
+            and event.fiscal_relative_label is not None
+            and event.fiscal_relative_label != BASE_FISCAL_LABEL)
+
+
 def _is_retraction(event: ChangeEvent) -> bool:
     fields = {f.lower() for f in event.material_fields}
     return any(marker in fields for marker in _RETRACTED_MARKERS)
@@ -335,11 +358,24 @@ def resolve_refresh(
 
     excluded_changes: dict[str, int] = {}
     accepted: list[ChangeEvent] = []
+    off_year: list[ChangeEvent] = []
     for event in changes:
         if event.observed_at > cutoff:
             excluded_changes["observed_after_as_of"] = excluded_changes.get("observed_after_as_of", 0) + 1
             continue
+        if _is_off_year_consensus(event):
+            excluded_changes["consensus_other_fiscal_year"] = (
+                excluded_changes.get("consensus_other_fiscal_year", 0) + 1)
+            off_year.append(event)
+            continue
         accepted.append(event)
+    for event in off_year:
+        # ⚠ **不是靜默丟棄**：它進 `excluded_changes` 的計數，也逐條進 notes（INV-3）。
+        # 降級不是「這件事不重要」，是「它不是**這一份 base 判斷**的複查依據」。
+        notes.append(
+            f"共識變動 {event.detail or event.changed_ref} 屬 {event.fiscal_relative_label}，"
+            f"而本檔的判斷校準在 {BASE_FISCAL_LABEL}——**印出來但不觸發複查**。"
+            "跨年度的故事要由多年橋承接（ROADMAP Phase 7），不是靠一個對每一檔都會亮的訊號補。")
 
     excluded_artifacts: dict[str, int] = {}
     visible: list[ArtifactDependency] = []

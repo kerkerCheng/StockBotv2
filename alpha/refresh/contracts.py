@@ -209,6 +209,12 @@ class ChangeEvent:
     target_artifact: str | None = None
     #: `disproof_signal` 專用：條件宣告的觸發後 state。
     on_trigger: str | None = None
+    #: **這個共識變動是哪一個會計年度的**（`0y`／`+1y`／…；2026-09-19，七缺陷之 2 的後半）。
+    #: 實測 15/15 有假設的檔**base 全部校準在 0y**，而 `price/pe_forward` 推出來的代理量是 `+1y`
+    #: ——於是每次 forward year rollover（每年必然發生一次），每一檔都會收到一個**與自己 base
+    #: 無關的年度**觸發的複查要求。`None`＝拿不到年度，此時**照舊觸發**（fail open：
+    #: 少報一個真變動比靜默吞掉更糟）。只有 `consensus` 類會讀它。
+    fiscal_relative_label: str | None = None
 
     def __post_init__(self) -> None:
         _check(self.change_type, CHANGE_TYPES, "ChangeEvent.change_type")

@@ -46,11 +46,12 @@
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
 >
-> ### ▶ 這一輪的第一件事：**先看使用者的三個待決題**（見下方「等你決定的三題」）
+> ### ▶ 這一輪的第一件事：**讀 ROADMAP 的五欄 amendment，決定 Phase 7 要不要提前**
 >
-> 上一輪（2026-09-19）把 **[577] 與七個系統性缺陷全部做完**了，中途鑄了三個待核准編號。
-> 如果使用者這一輪沒有指定題目，**先把那三題問清楚**（它們各自會改變接下來做什麼），
-> 再照常設授權往下做「不需核准的事」。
+> 上一輪（2026-09-19）把 [577]、[627]、[628]、**七個系統性缺陷**與**三個待決題**全部做完了。
+> 唯一還擺在使用者面前的是 **Phase 排序的五欄 amendment**（Phase 4 拆成 4a／4b、多年反向橋提前）
+> ——那是改 ROADMAP 的 Phase 定義，**常設授權的例外④，必須等人**。
+> 另有 **[629]**（COHR 的 disproof 已觸發，thesis mutation）待核准。
 >
 > ---
 >
@@ -79,38 +80,31 @@
 > ```
 > 量的候選那 15 家先前**12 家全被說成「沒人看過」，實際上三分之二的 base 已經有觀點**。
 >
-> ### 等你決定的三題（都不是我可以自己決定的）
+> ### 三題已答（2026-09-19，使用者「三題找你推薦」後全部落地）
 >
-> **① `sole_source_verification` 這個欄位要不要存在？**（[626] 收尾留下，上一輪沒動）
-> 它在 `extractions/`／`schema/`／`prompts/`／`config/` 全都不存在，而 `schema/graph_schema.md` §7
-> 把 `verified_by_absence` 定義成 **`sole_source=true` 時的驗證模式（弱主張）**——跟 `false` 並存會
-> 反轉語意。三條路：①**不要這個欄位**（推薦；現況 `sole_source=false`＋`sole_source_evidence_quality=weak`
-> 已足夠）；②改記在 `.review.md`（已寫）；③真要入圖就先進 `schema/vocab.json` 封閉字彙。
+> **① `sole_source_verification` 欄位 → 不要。** 決定已寫進 `schema/graph_schema.md` §7
+> （降級後的正確表達只有 `sole_source=false` ＋ `sole_source_evidence_quality=weak` 兩欄，
+> 判讀理由寫 `.review.md`）。⚠ 下次再有人想加它，先回答「`false` 時的『驗證模式』指什麼」。
 >
-> **② 「多年反向橋」要不要提前？** 動 ROADMAP 的 Phase 排序要先給五欄 amendment。
-> 支持提前的證據：D11 門檻通過的 5 檔有 4 檔「儀器算不出 payoff」（80%），被擋下的 11 檔只有 1 檔（9%）。
-> ⚠ **L11-6 先做**：逐筆重讀那 4 筆 Abstention 的 `reason` 與 `revisit_when`——若其中任一筆其實不該
-> abstain，80% 就會掉下來。**不要拿這個數字直接去改 Phase 排序。**
+> **② 多年反向橋要不要提前 → L11-6 前置已做完，amendment 已提出，等使用者決定。**
+> 逐筆重讀那 4 筆 Abstention：**四筆全部該 abstain，80% 站得住**。而且比那個統計更有力的是
+> `revisit_when` 那一欄——四筆有三筆逐字指名「估值層新增 **mid-cycle／multi-year method**」或
+> 「虧損期 method」；全 ledger 11 檔宣告不主張目標倍數，理由同型。**研究層早就把需求規格寫好了。**
 >
-> **③ refresh 事件要不要按年度過濾？**（七缺陷之 2 只做了一半）
-> 事件現在**標明**了年度（`FY2028（+1y）… 覆蓋 21 → 21 人`），但 `THESIS_POLICY` 仍把**任何**
-> `consensus` 事件變成 `review_required`，不看年度。要讓「只有 base 校準年度的變動才觸發」必須給
-> `ChangeEvent` 加年度維度（動 `alpha/refresh/contracts.py`＋`policy.py`，多個 owner）。
-> ⚠ **L11-6：最先壞掉的是 COHR**——AGENTS.md 明文寫著它「thesis 講 FY28，模型只有 FY27 一格」，
-> `+1y` 一律不觸發會讓跨年度 thesis 結構上收不到訊號。兩個選項：
-> **(a)** 只有 base 年度觸發 `review_required`、其他年度降級成 note；
-> **(b)** 兩個年度各自成事件、都觸發但在 UI 分開呈現（**現況等於 (b) 的前半**）。
+> **③ refresh 按年度過濾 → 選 (a)，已落地。** `consensus` 類事件若年度明確不是 `0y` 就不觸發複查，
+> 但**計數＋逐條進 notes**（不是靜默丟棄）。`None` 照舊觸發（fail open）；只對 `consensus` 生效。
+> 實測 LITE 與 AXTI 的 thesis 由 `review_required` → `current`，**2/16 檔的假警報清掉而訊號沒消失**。
+> 選 (a) 而不是 (b) 的理由是 L14-4：COHR 講 FY28 的缺口要靠多年橋補，不是靠一個對 15/16 檔都會亮的訊號。
 >
-> ### 三個待核准編號（上一輪鑄的；撞到就掛號，沒停下來等）
+> ### 編號狀態
 >
-> - **[627] COHR sole_source 降級寫入**：`co:coherent→co:nvidia` 的 `sole_source` true→false ＋改寫首屏第三句。
->   追源已完成（packet 在 `library/private/alpha/sole_source_rejudge/coherent_nvidia.json`，
->   判讀紀錄在 tracked 的 `extractions/coherent_q3fy26_cpo.review.md`）。
->   **證據比 [626] 更強**：Coherent 自己的 10-Q 逐字寫著「**The non-exclusive agreement**」，
->   而 NVIDIA 的 partner blog 把 ELS 供應商逐字列成「**Lumentum, Sumitomo, and Coherent**」三家。
-> - **[628] 圖缺口**：上一條的逐字已經在圖裡，但 `co:sumitomo_electric→co:nvidia` 這條邊從來沒被生出來
->   （L18 的另一面：逐字在，label 沒生）。
-> - **[577] 已 resolve**（研究完成，receipt 是那份 packet）。
+> - **[577]／[627]／[628] 都已 resolve。** [627] 實測：`rank_bottlenecks` 該列 **#2 → #5**，
+>   籃子不變（通過 1、首選 LITE）；COHR 首屏第三句已改寫（brief `ib_37dfb9b27153eba8`）。
+>   [628]：`co:nvidia` 供給側 **3 條 → 4 條**，新那條 `attributes` 刻意留空（逐字不支持任何主張）。
+> - ⚠ **[629] 待核准（thesis mutation，四個人工 gate 之一）**：執行 [627] 時撞到——COHR 的
+>   `disproof_conditions[1]` 逐字就是「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商」，
+>   它的 48 小時動作是「把該邊的 `sole_source` 降級並重跑 Q1；**需重新評估整條 thesis**」。
+>   **前半就是 [627] 剛做完的事。** 首屏第六句已一併做事實更正，但 thesis 層未動。
 >
 > ### ⚠ 已經做完、不要重做
 >
@@ -151,14 +145,15 @@
 | **packet 的市值現在帶著單位走**：16/16 檔有 `quote_unit`（其中 6 檔非 USD），市值缺席 0 檔 | `python -m pytest tests/test_market_quote_unit.py -q`（4 條） |
 | D11 門檻套用：input 16／accepted 5／filtered 11（缺值 0）；通過的 5 檔有 **4 檔儀器算不出 payoff** | `python scripts/alpha_screen_check.py` |
 | 門檻值：市值 ≤ US$10B、覆蓋 ≤ 12（**兩條必須 AND**） | `python -c "import json;d=json.load(open('config/alpha_screen.json'));print(d['market_cap_max_usd'],d['analyst_count_max'])"` |
-| `co:coherent supplies_to co:nvidia`：`sole_source` **仍是 `true`**（[627] 待核准才會改） | `python -m query.structure co:nvidia`——供給側 COHR 那列 `sole` 欄目前是 ✓ |
+| `co:coherent supplies_to co:nvidia`：`sole_source` **`false`**（[627] 2026-09-19 寫入）；`co:nvidia` 供給側 **4 條**（含新增的 Sumitomo） | `python -m query.structure co:nvidia`——COHR 那列 `sole` 欄應為 ✗ |
+| **refresh 不再對別的會計年度的共識變動強制複查**：LITE／AXTI 的 thesis 由 `review_required` → `current`，事件改印在 notes | `python -m briefing refresh LITE`（找「印出來但不觸發複查」那一行） |
 | `co:lumentum supplies_to tech:uhp_laser`：`sole_source` **`false`**（[626] 已寫入） | `python -m query.structure tech:uhp_laser` |
 | LITE：base +4.4%｜賭對了 +5.7%｜**判斷錯了 804.21（−13.6%）**；AXTI **判斷錯了 35.15（−49.8%）**；兩檔首屏都印得出下檔 | `python -m briefing alpha-card LITE`／`AXTI` |
 | **有短評的檔 3 筆**（LITE／AXTI／COHR）；COHR 沒有 downside scenario，首屏刻意不寫下檔句 | `python -m alpha brief COHR --list` |
 | `Catalyst.resolves` 填寫率：judgments/ **62 檔 104 條，填 0 條**（沒有改必填，刻意） | ROADMAP 該列的查證命令 |
-| 可投資排序 **37 列**；filter `input 221／accepted 37／filtered 184` | `python -m query.bottleneck --top-n 60` |
+| 可投資排序 **37 列**；⚠ **沒有任何 `.TW`／`.TWO`／`.ST`**——Phase 1 的驗收行卡在這裡（是答案不是缺漏） | `python -m query.bottleneck --top-n 60` |
 | `audit invariants` FAIL 0／PASS 13／共 4,239 筆 | `python -m audit invariants` |
-| 待辦池：**pq2 球在你手上 18**（含新鑄的 [627][628]） | `python -m engine_b.todo list` |
+| 待辦池：**pq2 球在你手上 17**（[577][627][628] 已結案；新鑄 [629]） | `python -m engine_b.todo list` |
 | 追蹤表 22 檔｜量測起始 2026-07-21｜**還沒有一檔滿 12 個月**（最長 59 天） | `python scripts/outcome_if_settled_today.py` |
 | 心跳排程每日 07:00｜Last Result 0 | `schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V` |
 
@@ -197,6 +192,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | 2026-09-19 中午 | [626] 寫入：`co:lumentum→tech:uhp_laser` 的 `sole_source` true→false｜排序位移 #2→#5 | … |
 | 2026-09-19 下午 | 七缺陷之 3：overlay scope 未命中 base 時寫入端拒收＋8 條守門測試 | … |
 | **2026-09-19 這一輪** | **[577] 追源完成（鑄 [627][628]）＋七個缺陷剩下的六個全部交付**：7 報價單位跟著市值走｜6 目標倍數背離偵測＋心跳常駐計數器｜2 覆蓋崩塌不再發假警報｜4 首屏講得出「判斷錯了值多少」｜5 「欠一個答案」拆成兩格｜1 催化劑四種形狀分開。**全量測試 2,727 passed／0 failed；`audit invariants` FAIL 0** | `8919afc`…本輪 |
+
+| **2026-09-19 收尾** | **[627][628] 執行（COHR sole_source 降為 false、Sumitomo 邊補進圖）｜[629] 鑄號（COHR 的 disproof 已觸發）｜三題全部落地：①不要 `sole_source_verification`（記進 schema §7）②L11-6 前置做完＋五欄 amendment 提出 ③refresh 按年度過濾已實作（LITE／AXTI 假警報清掉）｜Phase 2 第 2 天回填** | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
