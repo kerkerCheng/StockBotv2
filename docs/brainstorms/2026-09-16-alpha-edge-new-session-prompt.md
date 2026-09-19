@@ -280,7 +280,8 @@
 | `co:lumentum supplies_to tech:uhp_laser`：`sole_source` **`false`**（[626] 已寫入） | `python -m query.structure tech:uhp_laser` |
 | LITE：base +4.4%｜賭對了 +5.7%｜**判斷錯了 804.21（−13.6%）**；AXTI **判斷錯了 35.15（−49.8%）**；兩檔首屏都印得出下檔 | `python -m briefing alpha-card LITE`／`AXTI` |
 | **有短評的檔 3 筆**（LITE／AXTI／COHR）；COHR 沒有 downside scenario，首屏刻意不寫下檔句 | `python -m alpha brief COHR --list` |
-| `Catalyst.resolves` 填寫率：judgments/ **62 檔 104 條，填 0 條**（沒有改必填，刻意） | ROADMAP 該列的查證命令 |
+| **⚠ 這一列的舊數字（「104 條填 0 條」）已腐壞。2026-09-19 實測：`Catalyst.resolves` **106 條填 4 條**（LITE 2＋COHR 2——正是研究最深的兩檔，session 當下手上剛好有 `assumption_id`）。沒有改必填，仍是刻意 | 見下一列的量測命令 |
+| **🔵 同日新發現（強）：`disproof_conditions` 的連結率不是 0，是 95%——但只活在散文裡。** 判斷檔 63 檔，**63/63 都有 disproof、63/63 L7 三件套全齊**，而且 **60 檔（95%）的散文逐字指名了它會推翻哪個 driver**（例 AXTI：「supersede `revenue_growth` 與 `operating_margin_delta` 兩筆假設」）。⚠⚠ **所以 Phase 4b 驗收行「每一格配 disproof」機械上驗不了，不是因為研究層沒做——它做了 95%——是因為那個連結沒有欄位。** ⚠ 但**不要**把它跟 `Catalyst.resolves` 套同一個修法：催化劑散文指名 driver 只有 **26%**（28/106），**兩者不是同一種東西**（disproof 天然在講「什麼會推翻哪個假設」，催化劑天然在講「什麼時候發生什麼事」）。這條假說原本是「`resolves` 填不起來是介面問題」，**被那個 26% 部分否證了**，記在這裡免得下次又推一次 | `python - <<'PY'` 掃 `library/private/alpha/judgments/*.json` ＋ `*_judgment.json` 的 `disproof_conditions`／`catalysts`，比對散文含不含 `ASSUMPTION_DRIVERS` 的名字 |
 | 可投資排序 **37 列**；⚠ **沒有任何 `.TW`／`.TWO`／`.ST`**——Phase 1 的驗收行卡在這裡（是答案不是缺漏） | `python -m query.bottleneck --top-n 60` |
 | `audit invariants` FAIL 0／PASS 13／共 4,239 筆 | `python -m audit invariants` |
 | 待辦池：**pq2 球在你手上 17**（[577][627][628][629][630][631] 全部結案） | `python -m engine_b.todo list` |
