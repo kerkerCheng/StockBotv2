@@ -12,7 +12,7 @@ import sqlite3
 
 import pytest
 
-from alpha.valuation.drift import DRIFT_THRESHOLD, live_target_pe_records, scan
+from alpha.providers.valuation_drift import DRIFT_THRESHOLD, live_target_pe_records, scan
 from engine_c.db import _ensure_sqlite_schema
 
 

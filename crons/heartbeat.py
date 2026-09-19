@@ -417,7 +417,7 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
 def _target_multiple_drift_line() -> str:
     """目標倍數與今天的市場倍數背離幾檔。**這一格壞掉不得把整段帶走**（L17-3③ 的對稱面）。"""
     try:
-        from alpha.valuation.drift import heartbeat_line, scan
+        from alpha.providers.valuation_drift import heartbeat_line, scan
 
         return heartbeat_line(scan())
     except Exception as exc:  # noqa: BLE001 — 讀不到 ledger／DB 是降級，不是心跳失敗

@@ -1,5 +1,8 @@
 """目標倍數 vs 今天的市場倍數：**誰在盯這兩者背離**（2026-09-19，七缺陷之 6）。
 
+⚠ 住在 `providers/` 而不是 `valuation/`：它讀 ledger 檔與 Engine C sqlite，是 I/O。
+`alpha/valuation/` 是純邏輯層，`tests/test_valuation_model.py` 會擋 `sqlite3` 這類 import。
+
 ## 為什麼需要這個模組
 
 AGENTS.md（2026-09-09 定案）：**沒有 re-rating 證據時，目標倍數預設等於校準用的市場倍數**。

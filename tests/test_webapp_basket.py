@@ -50,7 +50,7 @@ def test_rows_follow_the_ranking_order_deduplicated_and_never_rescored() -> None
     assert [r["ticker"] for r in out["rows"]] == ["LITE", "COHR", "MP"]
     assert [r["rank"] for r in out["rows"]] == [1, 2, 3]
     assert [r["sector"] for r in out["rows"]] == ["AI 光互連", "AI 光互連", "稀土"]
-    assert all(r["has_overview"] is False and r["filter_reasons"] == ["no_bet", "no_catalyst_in_horizon"] for r in out["rows"])
+    assert all(r["has_overview"] is False and r["filter_reasons"] == ["no_bet", "no_catalyst_recorded"] for r in out["rows"])
     assert out["top_pick"] is None and "還沒寫賭注（variant 假設） 3 檔" in out["top_pick_absent_reason"]
     validate_state_artifact("basket", out)
 
@@ -65,14 +65,15 @@ def test_top_pick_is_the_first_in_structural_order_that_passes_all_three_rules()
     }
     out = build_basket_artifact(ranking=ranking, overviews=overviews, positions={"live": {"rows": [{"ticker": "COHR", "shares": 10, "price": 316.23, "currency": "USD", "executed_at": "2026-08-18", "live_return": -0.157}]}})
     by = {r["ticker"]: r for r in out["rows"]}
-    assert by["LITE"]["filter_reasons"] == ["no_catalyst_in_horizon"]
+    assert by["LITE"]["filter_reasons"] == ["no_catalyst_recorded"]        # links=() 且沒有 shape＝一條都沒記
     assert by["COHR"]["filter_reasons"] == ["payoff_not_positive"] and by["COHR"]["held"] and by["COHR"]["position"]["shares"] == 10
-    assert by["MP"]["filter_reasons"] == ["no_catalyst_in_horizon"]
+    assert by["MP"]["filter_reasons"] == ["catalyst_after_value_date"]     # 有指名假設，但日期晚於目標價日
     assert by["AXTI"]["passes_filter"] and by["AXTI"]["consensus_moved"] == 0.4
     assert out["top_pick"]["ticker"] == "AXTI" and out["top_pick"]["rank"] == 4
     f = out["filter"]
     assert f == {**f, "input": 4, "accepted": 1, "filtered": 3}
-    assert set(f["reasons"]) == set(FILTER_REASONS) and f["reasons"]["no_catalyst_in_horizon"] == 2
+    assert set(f["reasons"]) == set(FILTER_REASONS)
+    assert f["reasons"]["no_catalyst_recorded"] == 1 and f["reasons"]["catalyst_after_value_date"] == 1
     assert "不是買進指令" in out["top_pick"]["note"]
 
 

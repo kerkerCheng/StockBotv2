@@ -5,7 +5,7 @@
 市場倍數**。腐壞的是那個被存進 ledger 的**數字**——而先前沒有任何機制在盯兩者背離。
 
 ⚠ 本檔**只讀不寫**：不改任何 ledger、不重新校準、不動 thesis。
-完整判準與三道 fail closed 見 `alpha/valuation/drift.py` 的 docstring。
+完整判準與三道 fail closed 見 `alpha/providers/valuation_drift.py` 的 docstring。
 
 用法：
     python scripts/target_pe_drift_check.py
@@ -23,7 +23,7 @@ _ROOT = Path(__file__).resolve().parents[1]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from alpha.valuation.drift import heartbeat_line, scan  # noqa: E402
+from alpha.providers.valuation_drift import heartbeat_line, scan  # noqa: E402
 
 
 def main() -> int:

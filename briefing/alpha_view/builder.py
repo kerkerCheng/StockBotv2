@@ -2907,6 +2907,26 @@ def build_alpha_investment_view(
         quantitative_link_datum = not_modeled(
             "quantitative_link", "催化劑 → 假設的連結與熟成度",
             "沒有任何催化劑指名它會裁決哪條假設（judgment 的 catalysts[].resolves）——有日期與散文，但算不進熟成度")
+    # 催化劑那一格**為什麼沒進熟成度**的機械計數（2026-09-19，七缺陷之 1）。
+    # ⚠ 這一格永遠 available：`quantitative_link` 在沒有 linked 催化劑時是 `not_modeled`，
+    # 而型別層禁止無值狀態帶值——於是「有催化劑但沒填 resolves」「有 resolves 但日期晚」
+    # 「根本沒有催化劑」在下游長得一模一樣，全部變成一句「沒有指名假設的催化劑」（L12）。
+    # 形狀由**產生它的這一段**宣告，呈現層不得 parse 理由句去猜（L16）。
+    unlinked_items = [c for c in structured if c.state == "unlinked"]
+    unlinked_dates = sorted(str(c.expected_at) for c in unlinked_items if c.expected_at is not None)
+    catalyst_shape_datum = Datum(
+        key="catalyst_shape", label="催化劑那一格的形狀（為什麼沒進熟成度）",
+        value={"total": len(structured), "linked": len(linked),
+               "unlinked": len(unlinked_items),
+               "unlinked_dated": len(unlinked_dates),
+               "unlinked_undated": len(unlinked_items) - len(unlinked_dates),
+               "earliest_unlinked_date": (unlinked_dates[0] if unlinked_dates else None),
+               "rule": ("unlinked＝`catalysts[].resolves` 沒填（有散文、可能也有日期，"
+                        "但指不出它會裁決哪一條假設）。**這是資料沒填，不是系統沒能力**——"
+                        "2026-09-19 實測 62 個判斷檔、104 條催化劑，填寫數 0。")},
+        status="available", basis="deterministic", authority=A_SESSION, as_of=reference_day,
+        method="機械計數：只數 catalysts[] 的條數、有沒有 resolves、有沒有日期；不解析散文")
+
     checkpoint_items = tuple(
         CheckpointItem(date=cp["date"], what=str(cp.get("what") or ""), decides=str(cp.get("decides") or ""),
                        date_confidence=str(cp.get("date_confidence") or "estimated"),
@@ -2989,6 +3009,7 @@ def build_alpha_investment_view(
         narrative=narrative_catalyst, watch_state=watch_state_datum, expiry=expiry_datum,
         problems=problems,
         quantitative_link=quantitative_link_datum,
+        shape=catalyst_shape_datum,
     )
 
     # =======================================================================

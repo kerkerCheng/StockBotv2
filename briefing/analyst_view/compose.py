@@ -320,7 +320,8 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
                  fs.automatic_invalidation, "lifecycle"),
            _line("catalyst_watch_state", ct.watch_state.label, ct.watch_state, "lifecycle"),
            _line("catalyst_expiry", ct.expiry.label, ct.expiry, "lifecycle"),
-           _line("catalyst_quantitative_link", ct.quantitative_link.label, ct.quantitative_link, "lifecycle"))
+           _line("catalyst_quantitative_link", ct.quantitative_link.label, ct.quantitative_link, "lifecycle"),
+           _line("catalyst_shape", ct.shape.label, ct.shape, "lifecycle"))
     )
     statuses = {"variant_view": vv.meta.status, "falsification": fs.meta.status,
                 "catalysts": ct.meta.status, "refresh_status": rs.meta.status}

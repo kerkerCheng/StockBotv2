@@ -43,8 +43,24 @@ FILTER_REASONS: Mapping[str, str] = {
     "no_bet": "還沒寫賭注（variant 假設）",
     "bet_abstained": "已宣告刻意不主張賭注（append-only ledger 的研究結論，不是待辦）",
     "payoff_not_positive": "賭注對了也不比現價高",
-    "no_catalyst_in_horizon": "沒有指名假設、且落在目標價日期之前的催化劑",
+    # ⚠ 舊的 `no_catalyst_in_horizon` 已於 2026-09-19 拆成下面四個（七缺陷之 1）。
+    # 它同時承載四件事，而**其中三件是資料沒填、只有一件是判準真的在運作**——
+    # 實測 16 檔亮 15 檔（93.75%）、清除率 0，那不是 gate，那是牆（L14-4）。
+    # gate 的意圖沒有錯（沒有裁決點的賭注不知道何時認錯，與 L7 同源），錯的是它問的問題：
+    # 它問「一個可選欄位填了沒」，而不是「這個賭注有沒有裁決點」（L15-1）。
+    # ⚠ **四個理由全部仍然 filtered**——拆開不是放寬（AGENTS.md 明文禁止為了非空放寬條件），
+    # 拆開是為了讓「我們沒填」與「它真的不合格」不再長得一樣。
+    "catalyst_missing_resolves": ("催化劑有日期、也落在目標價日期之前，**只差沒填 `resolves`**"
+                                  "（指不出它會裁決哪一條假設）——這是我們的待辦，不是標的的缺點"),
+    "catalyst_undated": "有催化劑散文但**沒有日期**——排不進射程，也無從判斷是否來得及",
+    "catalyst_after_value_date": "有指名假設的催化劑，但**日期晚於目標價日期**——判準正確運作的那一種",
+    "no_catalyst_recorded": "**根本沒有記錄任何催化劑**（或沒有判斷檔）",
 }
+
+#: 催化劑四種形狀的判準順序（2026-09-19）。**順序即優先序**，第一個命中的就是理由。
+CATALYST_REASONS: tuple[str, ...] = (
+    "no_catalyst_recorded", "catalyst_missing_resolves", "catalyst_undated", "catalyst_after_value_date",
+)
 
 #: 一列的**賭注終局**（Q2，2026-09-17 使用者核准）。封閉字彙，三個值但只有兩個是終局。
 #:
@@ -108,7 +124,9 @@ VOLUME_MISSING_CRITERIA: tuple[str, ...] = (
     "瓶頸業務占營收比例：住 Engine C 的 product_line_revenue_share（八家有值），同樣還沒進 overview。",
 )
 FILTER_RULE = ("結構順序不動；首選＝順序中第一個「有賭注、payoff 為正、至少一條指名假設的催化劑落在目標價日期之前」的。"
-               "這是 filter 不是重算：沒有一檔通過就沒有首選。")
+               "這是 filter 不是重算：沒有一檔通過就沒有首選。"
+               "⚠ 2026-09-19 起催化劑那一條的**理由**拆成四種形狀（`CATALYST_REASONS`）——"
+               "**條件一字未放寬**，拆開只是讓「我們沒填 `resolves`」與「它的催化劑真的太晚」不再長得一樣。")
 
 BASKET_THIS_IS_NOT: tuple[str, ...] = (
     "不是新的排序：列的順序照抄 rank_bottlenecks() 的可行動排序（同一檔只留最前名次）；本頁不重排、不加權。",
@@ -147,6 +165,37 @@ def _catalyst_in_horizon(ripeness: Mapping[str, Any] | None, value_date: str | N
     return False
 
 
+def _catalyst_reason(ripeness: Mapping[str, Any] | None, shape: Mapping[str, Any] | None,
+                     value_date: str | None) -> str | None:
+    """催化劑那一格擋不擋、**因為哪一種「沒有」**。通過就回 `None`。
+
+    四種形狀（2026-09-19 實測 16 檔：A 4／B 6／C 1／D 4）先前全部被壓成一句
+    「沒有指名假設、且落在目標價日期之前的催化劑」——**其中只有 C 是判準真的在運作**。
+    形狀本身由 producer 宣告（`catalyst_shape`），這裡只做順序判定，不 parse 理由句（L16）。
+    """
+    if _catalyst_in_horizon(ripeness, value_date):
+        return None
+    counts = shape if isinstance(shape, Mapping) else {}
+    if ((ripeness or {}).get("links") or ()):
+        # 有指名假設的催化劑，但上面那一關沒過 → 沒有一條落在射程內。
+        # ⚠ 這一支刻意**不依賴 `catalyst_shape`**：舊 artifact 還沒有那一格，
+        # 而「有 linked 但太晚」是唯一一種**判準真的在運作**的形狀，不能因為缺一格就降級成「根本沒有」。
+        return "catalyst_after_value_date"
+    total = int(counts.get("total") or 0)
+    if not total:
+        return "no_catalyst_recorded"
+    if int(counts.get("linked") or 0) == 0:
+        # 有催化劑但一條都沒填 resolves：再分「有日期」與「沒日期」。
+        if int(counts.get("unlinked_dated") or 0):
+            earliest = str(counts.get("earliest_unlinked_date") or "")[:10]
+            if value_date is None or (earliest and earliest <= str(value_date)[:10]):
+                return "catalyst_missing_resolves"
+            return "catalyst_after_value_date"
+        return "catalyst_undated"
+    # 有 linked 的，但沒有一條落在射程內——判準正確運作的那一種。
+    return "catalyst_after_value_date"
+
+
 def _bet_state(payoff_value: float | None, *, abstained: bool, stance: Any) -> str:
     """賭注終局的四分之一格。**純選取，不重算 stance**（`opinion_stance` 的 SSOT 在
     `alpha/fundamental/contracts.py`，這裡只消費它被帶到 overview 上的那個值）。"""
@@ -179,8 +228,9 @@ def build_basket_row(rank_row: Mapping[str, Any], overview: Mapping[str, Any] | 
         reasons.append("bet_abstained" if abstained else "no_bet")
     elif payoff_value <= 0:
         reasons.append("payoff_not_positive")
-    if not _catalyst_in_horizon(ripeness, value_date):
-        reasons.append("no_catalyst_in_horizon")
+    catalyst_reason = _catalyst_reason(ripeness, _cell_value(ov.get("catalyst_shape")), value_date)
+    if catalyst_reason is not None:
+        reasons.append(catalyst_reason)
     base_closure = (closure.get("base") or {}) if isinstance(closure, Mapping) else {}
     return {
         "rank": rank_row.get("rank"),
@@ -396,7 +446,8 @@ def build_basket_artifact(*, ranking: Mapping[str, Any], overviews: Mapping[str,
     return payload
 
 
-__all__ = ["BASKET_THIS_IS_NOT", "BET_LEDGER_RULE", "BET_STATES", "FILTER_REASONS", "FILTER_RULE",
+__all__ = ["BASKET_THIS_IS_NOT", "BET_LEDGER_RULE", "BET_STATES", "CATALYST_REASONS",
+           "FILTER_REASONS", "FILTER_RULE",
            "OPINION_IN_BASE_STANCES",
            "SHIPPING_STATUSES", "VOLUME_FILTER_REASONS", "VOLUME_MISSING_CRITERIA", "VOLUME_ORDER_NOTE",
            "build_volume_row",

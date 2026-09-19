@@ -168,6 +168,9 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         "wipeout": _wipeout_overview(view.get("wipeout") or {}),
         # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）
         "ripeness": _cell(_line_map(view.get("research") or {}).get("catalyst_quantitative_link")),
+        # 催化劑那一格的形狀（七缺陷之 1）：`ripeness` 在沒有 linked 催化劑時整格無值，
+        # 於是四種不同的「沒有」變成同一句話。這一格永遠有值，由 producer 宣告。
+        "catalyst_shape": _cell(_line_map(view.get("research") or {}).get("catalyst_shape")),
         "price_context": dict(price_context) if price_context else None,
         "readiness": {"state": readiness["state"],
                       "blocker_count": len(readiness.get("blockers") or []),

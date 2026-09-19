@@ -564,6 +564,11 @@ class CatalystSection:
     expiry: Datum
     problems: tuple[str, ...]
     quantitative_link: Datum                 # not_modeled：催化劑 → 盈餘／重定價未量化
+    #: 催化劑那一格**為什麼沒進熟成度**的機械計數（2026-09-19，七缺陷之 1）。
+    #: `quantitative_link` 在沒有任何 linked 催化劑時是 `not_modeled`，而型別層禁止
+    #: 無值狀態帶值——於是「有催化劑但沒填 resolves」「有 resolves 但日期晚」「根本沒有催化劑」
+    #: 三件事在下游長得一模一樣（L12）。這一格**永遠 available**，由 producer 宣告形狀。
+    shape: Datum
 
 
 @dataclass(frozen=True, slots=True)

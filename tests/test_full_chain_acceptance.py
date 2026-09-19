@@ -401,7 +401,9 @@ def test_a_quote_unit_mismatch_refuses_the_gap_instead_of_dividing_two_units() -
 
     def market(ticker, *, as_of=None):
         snapshot, freshness = real_market(ticker, as_of=as_of)
-        return replace(snapshot, currency="GBp"), freshness
+        # 2026-09-19：欄位由 `currency`（一表兩義）拆成 `quote_unit`＋`settlement_currency`。
+        # 這裡刻意只動報價單位——結算幣別仍是 USD，**那正是「兩個單位」的定義**。
+        return replace(snapshot, quote_unit="GBp"), freshness
 
     v = _fresh_view(fundamentals_provider=_Shim(real, market=market))
     assert isinstance(v.implied_return.current_price.value, (int, float))
