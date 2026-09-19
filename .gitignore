@@ -25,6 +25,7 @@ config/*.json
 !config/authority_tokens.json
 !config/lead_ref_keys.json
 !config/currency_units.json
+!config/alpha_screen.json
 !config/lead_classification.json
 !config/lead_trace_status.json
 !config/target_allocation.json

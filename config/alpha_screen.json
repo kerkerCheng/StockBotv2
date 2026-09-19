@@ -1,0 +1,18 @@
+{
+  "_doc": "Alpha 篩選層的機械門檻（ROADMAP Phase 4 / D11）。目標是邊緣小公司的 power-law 倍率（2–10 倍），不是大型股的 20% 錯價——所以候選門檻是『覆蓋厚薄與規模』，不是上市地（AGENTS.md D11）。⚠ 這裡是研究篩選，不是資本政策；資本的 numeric SSOT 仍是 investment_policy.json 與 beta_policy.json。⚠ 門檻是 filter 不是分數：它只在 rank_bottlenecks() 的既有順序上過濾，不重算任何結構分、不排序、不給部位尺寸。",
+  "version": 1,
+  "effective_from": "2026-09-19",
+
+  "market_cap_max_usd": 10000000000,
+  "analyst_count_max": 12,
+
+  "_why_market_cap_10b": "10B × 10 倍 = 100B，在 AI 供應鏈裡是已被走過的路（COHR 本輪實測由約 5B 到 62B ＝ 約 12 倍）。超過 10B 要再 10 倍就得擠進兆元俱樂部，歷史上極罕見——那不是本系統要找的東西。實測分佈（2026-09-19，16 檔正規化後 USD 十億）：IQE.L 0.76｜POET 1.35｜6324.T 3.74｜AXTI 4.59｜SOI.PA 5.80｜MP 8.42｜LYC.AX 10.29｜TSEM 25.27｜GFS 26.66｜5802.T 41.38｜COHR 62.15｜LITE 83.50｜000660.KS 951｜MU 1147｜AVGO 1707｜TSM 2254。10B 落在 LYC.AX(10.29) 與 MP(8.42) 之間的自然斷點上。",
+
+  "_why_analyst_12": "AGENTS.md D11：候選門檻是覆蓋厚薄。實測覆蓋分佈（0y analyst_count）排序為 1,3,5,6,7,9,11,13,13,15,19,22,25,35,38,46——12 落在 11 與 13 之間的斷點。⚠ 覆蓋單獨不足以擋住大型股：實測 TSM 的 analyst_count 只有 13（provider 資料不全）而市值 2.25 兆，所以兩條必須是 AND，不得擇一。",
+
+  "_market_cap_normalization": "⚠ 市值必須先正規化才可跨標的比較，否則這個門檻會系統性擋掉它最想找的那一類。兩步，缺一不可：①報價單位 → 結算幣別（registry 的 market_currency ＋ identity/currency.py 的 resolve_quote_unit/to_settlement；LSE 報 GBp、TASE 報 ILA 等 minor unit 差 100 倍）；②結算幣別 → USD（engine_c.market_data.get_fx_snapshot，pair 格式是 'GBP/USD' 不是 'GBPUSD'）。實測代價：IQE.L 未正規化時是 54.8B（會被當成超大型股擋掉），正規化後是 0.76B（籃子裡最小的一檔）。",
+
+  "_absence_policy": "市值或覆蓋無法取得時**不得靜默放行、也不得靜默 filtered**（INV-3）。缺值一律計入 filter 報表的獨立理由，讓它現形。",
+
+  "_not_this": "這兩個數字不參與排序、不調整部位尺寸、不改 rank_bottlenecks() 的排序鍵。它們只回答『這一檔算不算倍率候選』。⚠ 籃子因此變空是合法結果——AGENTS.md 明文：籃子空就空，不得為了非空放寬條件。"
+}
