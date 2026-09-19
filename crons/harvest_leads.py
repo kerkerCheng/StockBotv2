@@ -902,7 +902,7 @@ def main() -> int:
 
         lock_owner = os.environ.get("STOCKBOT_WRITER_OWNER") or SCHEDULED_OWNER
         try:
-            acquire(lock_owner, purpose="daily harvest → state publisher")
+            acquire(lock_owner, purpose="daily harvest → local state finalizer")
         except WriterLockHeld as exc:
             print(
                 json.dumps(

@@ -137,12 +137,14 @@ Unregister-ScheduledTask -TaskName 'StockBotv2-Heartbeat' -Confirm:$false
 不放寬：四個人工 gate 一個不動；心跳不寫任何 authority；研究搬到互動 session 之後**判準一字未改**
 （disproof 三件套、park 的四個欄位、只有 prepared RA 才進 pq2）——**搬走的是執行者，不是規則**。
 
-排程收尾只跑 `scripts/publish_daily_state.py`（窄 state publisher，只發布四個 leads state 檔：`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`——2026-09-02 由二擴四，impact review 結論見腳本 docstring；不得用 unattended 廣泛 Git 命令碰其他檔）。
+排程收尾跑 `scripts/finalize_daily_state.py`：驗證四份本機 state、釋放自己的 writer lock、
+寫收工標記。它不碰 Git、不連網，因此留在 workspace-write 且不占 unattended allowlist。
+四份 state（`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`）
+由 `.gitignore` 明確排除並納入 private backup。
 
-**追源證據隨引用一起發布（2026-09-04）：** 同一筆提交會帶上**被那份 state 指名引用、
-且確實存在**的 `library/raw/` 原文。集合由 state 推導（`_referenced_evidence`），
-**不是把 `library/raw/` 加進 pathset**——state 沒提到的下載內容一律留在本機；
-上限 20 份，超過 fail closed（`guard_evidence_volume`）。
+**追源證據隨引用一起備份（2026-09-19）：** `engine_b_state.zip` 同時收進**被 state 指名引用、
+且確實存在**的 `library/raw/` 原文。集合由 state 推導，**不是把 `library/raw/` 整目錄打包**；
+缺檔、路徑穿越或 private 路徑一律 fail closed，restore 驗證會重算同一集合。
 事發：`audit invariants` 實測 3 筆 `trace_attempts_ref` 有 2 筆指向已不存在的檔案——
 引用推上 origin、被引用的檔案留在本機，之後就沒了。
 查證：`python -m audit invariants --only Orphans`。
@@ -208,7 +210,8 @@ python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 
 
 - **排程側**：`crons/harvest_leads.py` 一般 harvest 開跑 acquire `scheduled`（TTL 90 分，
   依 2026-09-02 量測 daily 中位 19 分／p90 30 分／最長 43 分取兩倍餘裕）；
-  `scripts/publish_daily_state.py` 收尾 release（結果附 `writer_lock_released`）。
+  `scripts/finalize_daily_state.py` 收尾 release（結果附 `writer_lock_released`）；state 驗證失敗
+  仍釋放自己的鎖並留下 `state_invalid` 收工標記，避免錯誤路徑把鎖留到 TTL。
   互動 session 持鎖時 harvest exit 3＋stderr `writer_lock_held`，**整輪 Daily 中止**
   （見 `crons/daily_brief_prompt.md`），不得跳過 harvest 續跑會寫共用檔的命令。
 - **互動側**：長時間寫入前 `python scripts/writer_guard.py acquire --minutes N --purpose "…"`，
@@ -217,10 +220,11 @@ python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 
   `STOCKBOT_WRITER_OWNER=interactive` 表明身分，避免與自己持有的鎖互撞。
 - **stale-tolerant**：鎖過期或損毀即可被接手（新鎖記 `superseded` 供稽核）；
   崩潰的 session 最多卡別人一個 TTL。不得手動拆別人的**未過期**鎖。
-- **Sandbox impact review 結論（2026-09-02）：** 鎖檔是 repo 內一般檔案（workspace-write
-  已涵蓋），無 identity／ACL／網路／credential 副作用；未新增 CLI 命令、未動
-  `.codex/rules` 16 條 allowlist——acquire／release 嵌在既有 fixed entry
-  （harvest／state publisher）內部。契約斷言見 `tests/test_writer_lock.py`。
+- **Sandbox impact review 結論（2026-09-19）：** 鎖檔是 repo 內一般檔案（workspace-write
+  已涵蓋），無 identity／ACL／網路／credential 副作用；allowlist 15 → 14，刪掉的是會
+  push public Git 的 state publisher。acquire 嵌在 harvest fixed entry，release 由
+  workspace-write 的本機 finalizer 執行。契約斷言見 `tests/test_writer_lock.py` 與
+  `tests/test_daily_state_finalizer.py`。
 
 **Routine 分工：**
 - daily（`crons/daily_brief_prompt.md`）＝harvest ＋ ETL ＋ beta monitor ＋ triage ＋ today ＋ 統一 pq2 brief
@@ -299,7 +303,7 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 ### Private authority 備份（本機＋Google Drive 異地）
 
 ```powershell
-python scripts/backup_private.py run             # 完整備份：SQLite 快照＋Neo4j 匯出＋files.zip＋Drive 上傳
+python scripts/backup_private.py run             # 完整備份：SQLite＋Neo4j＋private files＋Engine B state＋Drive
 python scripts/backup_private.py run --no-drive  # 只做本機備份
 python scripts/backup_private.py verify-restore  # restore 到暫存＋checksum／integrity 驗證
 python scripts/backup_private.py upload          # auth 修好後補上傳最新一份本機備份
@@ -307,9 +311,10 @@ python scripts/backup_private.py status          # 印出 last_backup.json
 python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授權（換 client 或 token 失效時重跑）
 ```
 
-- **備份對象**是「今天重新取一次拿不回來」的三塊（L10 判準）：Decision Store、Engine C
-  authority（`runtime_pointer.json` 指向）、Neo4j 全圖邏輯匯出；其餘 private 檔案打包
-  `files.zip`。排除 `models/`（可重下載）、`lead_media/`、`gdrive_oauth/`（金鑰不出境）。
+- **備份對象**是「今天重新取一次拿不回來」的 authority（L10 判準）：Decision Store、Engine C
+  authority（`runtime_pointer.json` 指向）、Neo4j 全圖，以及四份 Engine B 本機 state。
+  其餘 private 檔案進 `files.zip`；Engine B state 與其指名的 raw provenance 進
+  `engine_b_state.zip`。排除 `models/`（可重下載）、`lead_media/`、`gdrive_oauth/`（金鑰不出境）。
 - **本機**留 `library/private/backups/`（rotation 3 份，manifest 全 checksum）；**Drive**
   留 `StockBotv2-backups` 資料夾（rotation 8 份，超出移垃圾桶 30 天可救）。
 - **Drive 憑證是 OAuth user credentials**：`library/private/gdrive_oauth/client_secret.json`
@@ -370,7 +375,8 @@ live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「�
 & '.venv\Scripts\python.exe' -m engine_b.cli decompose-propose --system "<一台實體>" --anchor <tech:x> --why "<為什麼是新錨>" [--lead <id>] [--dry-run]   # 新需求錨才鑄 pq2；drop 過不重生；open ≤2
 ```
 
-Leads authority 是 tracked `library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。
+Leads authority 是本機、Git ignored 且納入 private backup 的
+`library/leads/pending_leads.json`；狀態機與 API 見 `engine_b/leads.py`。
 PASS 的 `content_type`／`decision_impact`／`payment_direction` 只認
 `config/lead_classification.json`。classification 與 triage 在同一次 atomic save 落盤；
 trace requeue 沿用最近合法 receipt。`classification-health` 只檢查 active
@@ -755,7 +761,7 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的二十個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、SEC EDGAR pq1 fetch、MOPS 台股 pq1 fetch、Beta snapshot、pending priority list、pq1 drain、catalyst watch、Alpha outcome snapshot、Research Action prepare、decision today、todo sync、todo reassess-stale、todo standing-go、已核准 work order checkpoint、state publisher、Discord publisher、APP materialize、基期實績 XBRL 補值，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。`engine_b.todo work` 只可推進已有 `dispatch_ref` 的 USER-GO work order，不授權 dispatch／resolve／reassess。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在、而且整份檔載入得起來**——重啟不能修復漏寫的 rule，**也不能修復語法錯誤**。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一升權來源是 `.codex/rules/stockbot-automations.rules` 的十四個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、Beta snapshot、pending priority list、catalyst watch、Alpha outcome snapshot、decision today、todo sync、todo reassess-stale、todo standing-go、Discord publisher、APP materialize、基期實績 XBRL 補值，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。state finalizer 只碰 workspace 內本機檔案，刻意不進 rules。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在、而且整份檔載入得起來**——重啟不能修復漏寫的 rule，**也不能修復語法錯誤**。
 
 ⚠ **文字存在不等於 rule 生效（2026-09-10 事故）。** 一段 Python 式的隱式字串串接不是合法 Starlark，整份 allowlist 因此**完全沒有載入**，二十條 fixed entry 全部落回 Auto-review；而本檔各節慣用的 `Select-String`「字串在不在檔裡」查證**全部是綠的**，因為它們驗的是文字不是載入。唯一算數的查證是拿產品自己的 parser 跑一次（decision 應為 `allow`；整份檔壞掉時它會直接報 parse error）：
 
@@ -764,12 +770,12 @@ codex execpolicy check --rules .codex\rules\stockbot-automations.rules `
   -- .venv\Scripts\python.exe -m engine_b.todo standing-go
 ```
 
-`tests/test_codex_daily_permissions.py` 已把**二十條 prefix 全部**與五個相鄰禁止動詞接上這支 parser（`ALLOWED_PREFIXES` 是 fixed entry 數量的唯一權威）。⚠ 它只在真的找不到 Codex CLI 時 skip——**恆 skip 的測試與恆綠的測試同形**，所以 `_codex_binary()` 除了 PATH 也會問 app bundle 的安裝點。
+`tests/test_codex_daily_permissions.py` 已把**十四條 prefix 全部**與相鄰禁止動詞接上這支 parser（`ALLOWED_PREFIXES` 是 fixed entry 數量的唯一權威）。⚠ 它只在真的找不到 Codex CLI 時 skip——**恆 skip 的測試與恆綠的測試同形**，所以 `_codex_binary()` 除了 PATH 也會問 app bundle 的安裝點。
 
 **Triage classification surface impact（2026-08-27）：** `engine_b.cli triage` 新增的分類參數只會
-atomic 寫 tracked `library/leads/pending_leads.json`；`classification-health` 只讀同檔並以 exit 2
+atomic 寫本機 `library/leads/pending_leads.json`；`classification-health` 只讀同檔並以 exit 2
 回報 active 缺口；互動 migration `scripts/backfill_lead_classification.py --from-json ... --apply`
-也只寫同一 tracked authority。三者都不讀 credential／private authority、不呼叫 OS security API、
+也只寫同一本機 authority。三者都不讀 credential／private authority、不呼叫 OS security API、
 不連網、不碰 `.git`，所以留在 `workspace-write` sandbox，**不新增 unattended rule**。既有
 `engine_b.cli drain` 仍只用原 fixed entry 讀 Decision／Sheet／Neo4j context；新增的
 `withheld_unclassified_lead` 是本機 validation，沒有新增 capability 或副作用。
@@ -1071,14 +1077,13 @@ push 是常規動作——session 收尾（邏輯 commits 完成後）把 master
 不需逐次人工確認。私有隔離依 `.gitignore`（`library/private/`、`.env`）；
 **push 前 sanity check：`git ls-files library/private` 應為空。**
 
-本機 daily scheduled task 只可經 `scripts/publish_daily_state.py` 發布四個 leads state
-檔（`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`；
-2026-09-02 由二擴四——watch／假設本就是 daily 的正當產出物，留本機未提交會讓兩個
-writer 的變更混在同一份 diff）；**不得用 unattended 廣泛 Git 命令碰其他檔。**
+四個 leads state 檔不再屬於 push 範圍；它們固定留在原本本機路徑、由 writer lock 保護，
+並隨 private backup 進 `engine_b_state.zip`。Daily 不得以 unattended Git 命令發布它們；
+一般 session push 前以 `git check-ignore` 與 `git ls-files` 確認 ignored／untracked。
 
 ## Codex sandbox：判準的落點
 
-> ⚠ **排錯順序、16 條 fixed entry 與 retry 邊界的完整內容已經在本檔上方**
+> ⚠ **排錯順序、14 條 fixed entry 與 retry 邊界的完整內容已經在本檔上方**
 > （「Sandbox／private authority 排錯」與 harvest 那一節）。**不要在這裡再抄一份**——
 > 2026-09-04 從 `AGENTS.md` 搬入時就差點造出第二份清單，而「清單會腐壞，判準不會」
 > 正是這次搬移要消除的違規。

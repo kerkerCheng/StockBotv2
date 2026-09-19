@@ -1,11 +1,11 @@
-"""Narrow MCP leads surface：讓 chat 驅動 pending leads 狀態（plan U2/R8）。
+"""Narrow MCP leads surface：讓 chat 驅動本機 pending leads 狀態（plan U2/R8）。
 
 get_pending_leads（唯讀 priority 佇列）＋ record_lead_decision（triage/advance，
-寫後由本機 MCP server 窄 pathset commit+push，cloud 每天讀到最新）。
+寫回同一份本機 authority；不再透過 public Git 同步）。
 
 不變式：leads 狀態只是**注意力 metadata**，永不影響 evidence tier、decision 或
 圖。這裡的寫入只碰 leads.json，圖 admission 走 apply_research_action、provenance
-帳本走本機 publisher。
+帳本走各自的 authority writer。
 """
 from __future__ import annotations
 
@@ -78,14 +78,11 @@ def record_lead_decision_core(
     leads_path: Path | str | None = None,
     loader: Callable[[Any], dict] | None = None,
     saver: Callable[[dict, Any], None] | None = None,
-    committer: Callable[..., dict] | None = None,
-    repo_root: Path | str | None = None,
 ) -> dict[str, Any]:
-    """triage 或 advance 一則 lead，寫檔後窄 pathset commit+push。
+    """triage 或 advance 一則 lead，atomic 寫回本機 authority。
 
     op="triage"（PASS 另需 content_type／decision_impact；capital_commitment 需
     payment_direction）｜op="advance"（用 to_status/ref）。
-    committer 可注入供測試（預設 leads_git.commit_and_push_leads）。
     """
     path = leads_path or leads.DEFAULT_LEADS_PATH
     load = loader or leads.load
@@ -131,16 +128,10 @@ def record_lead_decision_core(
 
     save(store, path)
 
-    commit = committer
-    if commit is None:
-        from mcp_server import leads_git
-
-        commit = leads_git.commit_and_push_leads
-    root = repo_root or Path(__file__).resolve().parent.parent
-    git_result = commit(root, message=f"chore(leads): {op} {lead_id[:16]} (via MCP)")
     return {
         "status": "recorded",
         "lead_id": lead_id,
         "new_status": lead["status"],
-        "sync": git_result,
+        # 保留 response key 相容性，但明確表示現在只寫 local authority。
+        "sync": {"status": "local_authority", "committed": False, "pushed": False},
     }

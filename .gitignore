@@ -106,6 +106,11 @@ library/private/
 backups/
 backups_verify_tmp/
 library/leads/action_drafts/
+# Engine B 可變 authority：固定留在本機，由 private backup 涵蓋；永不再發布到 public Git。
+library/leads/pending_leads.json
+library/leads/todo_pool.json
+library/leads/event_watches.json
+library/leads/hypotheses.json
 # Session-local advisory writer lock（engine_b/writer_lock.py）——機器狀態不是資料。
 library/leads/.writer_lock.json
 .pytest_tmp/

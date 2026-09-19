@@ -44,7 +44,9 @@ def test_references_closed_loop_and_no_github() -> None:
     assert "自動建 Shadow" in text
     assert "GitHub" in text  # 明文說不用 GitHub UI
     assert "record_lead_decision" in text  # 遠端 fallback 仍走 MCP
-    assert "scripts\\publish_daily_state.py" in text
+    assert "scripts\\finalize_daily_state.py" in text
+    assert "publish_daily_state.py" not in text
+    assert "不碰 Git、不連網" in text
 
 
 def test_does_not_hardcode_probe_policy_numbers() -> None:

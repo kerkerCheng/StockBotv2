@@ -120,6 +120,26 @@ def test_backup_rotation_keeps_configured_verified_count(tmp_path: Path) -> None
     assert len(list((private / "backups").iterdir())) == 3
 
 
+def test_backup_rotation_preserves_non_backup_migration_directory(tmp_path: Path) -> None:
+    repo, private = _private(tmp_path)
+    source = private / "decision_lab" / "decision_lab.db"
+    _db(source, "value")
+    migration = private / "backups" / "migrate_611"
+    migration.mkdir(parents=True)
+    (migration / "neo4j_export.json").write_text("{}", encoding="utf-8")
+
+    backup = create_private_backup(
+        sources={"decision_lab": source},
+        backup_id="20260721T120000Z",
+        private_root=private,
+        repo_root=repo,
+        retention=1,
+    )
+
+    assert backup.is_dir()
+    assert (migration / "neo4j_export.json").is_file()
+
+
 def test_multi_target_restore_rolls_back_all_targets_on_replace_failure(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

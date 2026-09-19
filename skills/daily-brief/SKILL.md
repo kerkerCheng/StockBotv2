@@ -78,8 +78,8 @@ fixed entry 包含
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
 `decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`engine_b.todo reassess-stale`、
-`engine_b.todo standing-go`、`scripts\publish_daily_state.py` 與
-`scripts\publish_daily_brief.py`、`-m webapp materialize`；十九條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`engine_b.todo standing-go`、`scripts\publish_daily_brief.py` 與
+`-m webapp materialize`；十四條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
 `engine_b.cli consume-fired` 刻意**不在列**：它只讀寫 repo 內 JSON，在 sandbox 內就能跑（與 `event_watch sweep` 同先例）。
 ⚠ `fetchers/` 不是整包放行：只有 `edgar.py` 與 `mops.py` 在列，`gsheets.py` 帶 Google 憑證故排除。
 `engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
@@ -731,10 +731,12 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
   只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。
-- **本機 scheduled task**：執行 `& '.venv\Scripts\python.exe' scripts\publish_daily_state.py`；它只准提交
-  `pending_leads.json` 與 `todo_pool.json`，guard 失敗不得改用廣泛 Git 命令繞過。
+- **本機 scheduled task**：在 workspace-write 內執行
+  `& '.venv\Scripts\python.exe' scripts\finalize_daily_state.py`；它驗證四份本機 state、
+  釋放自己的 writer lock 並寫收工標記，**不碰 Git、不連網**。驗證失敗仍釋放自己的鎖，
+  並把 `state_invalid` 放進健康段；四份 state 由 private backup 涵蓋。
 - **入圖帳本**：有實際 apply 才另外跑 `scripts/commit_pending_intake.py`。
-- **遠端 chat fallback**：`record_lead_decision` 仍由本機 MCP server 窄 pathset commit+push leads.json。
+- **遠端 chat adapter**：`record_lead_decision` 只寫同一份本機 leads authority，不再經 public Git 同步。
 
 ### Step 8 — provider-neutral 單向通知（best effort）
 

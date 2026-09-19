@@ -93,7 +93,7 @@ x:aleabitoreddit｜tier probation｜量測 2026-06-29 → 2026-09-16
 
 | 步 | 結論 |
 |---|---|
-| **1 path／side effect／capability** | 讀 `library/leads/pending_leads.json`（tracked，唯讀）＋ `config/signal_sources.json`；寫 `library/private/app/state/account_scorecard.json`（ignored derived cache）。**網路：yfinance 歷史收盤**——主機與 `engine_c/etl_yfinance.py`、`scripts/daily_beta_snapshot.py` 相同，兩支都已在 allowlist、同樣無憑證。不碰 `.git`、不碰 tracked 檔、不寫任何 authority、不入圖、不動 tier。 |
+| **1 path／side effect／capability** | 讀 `library/leads/pending_leads.json`（本機 authority，唯讀）＋ `config/signal_sources.json`；寫 `library/private/app/state/account_scorecard.json`（ignored derived cache）。**網路：yfinance 歷史收盤**——主機與 `engine_c/etl_yfinance.py`、`scripts/daily_beta_snapshot.py` 相同，兩支都已在 allowlist、同樣無憑證。不碰 `.git`、不寫任何 authority、不入圖、不動 tier。 |
 | **2 skill／prompt／本檔** | **刻意不改 daily／weekly prompt**——計分表維持互動觸發（見下）。ROADMAP Phase 3 那一列回填；本檔。 |
 | **3 最窄 rule** | **不新增 rule。** 既有 prefix 已涵蓋，但 justification 已更正：明寫 `--scorecard` 會連 yfinance、新增的是請求量不是主機，並記下對應的收緊。 |
 | **4 permission contract test** | `test_scorecard_network_surface_has_a_hard_cap_in_code`（斷言 `MAX_PRICED_SYMBOLS` 存在**且真的被 `build_scorecard` 用到**——常數存在不等於閘門存在）＋ `test_scorecard_rule_justification_admits_the_network_call`（斷言 justification 沒有宣稱它不連網）。 |

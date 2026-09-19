@@ -123,7 +123,8 @@ mutation、**任何 `go` 都不含 live**。
 **所有真正需要使用者決策的事只有一個編號空間**——prepared RA 入圖核准、決策複查、
 thesis 到期、Sheet-only 持股、手動 authority。Raw／triaged leads 留在 pq1 由 routine
 自動研究，不占 pq2 編號；否則同一題會在研究前與入圖前問兩次。
-編號首次進池後直到 resolve 才釋放；狀態存 tracked `library/leads/todo_pool.json`。
+編號首次進池後直到 resolve 才釋放；狀態存本機、Git ignored 且納入 private backup 的
+`library/leads/todo_pool.json`。
 
 **授權載體唯一（2026-08-30 使用者定案，取代所有口頭授權）：** 任何需要核准的**研究與
 authority 動作**——研究工程、終局 cohort 的重建、sub 補值這類 graph-write 研究——

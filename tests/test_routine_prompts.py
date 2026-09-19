@@ -30,12 +30,14 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         "decision_lab today",
         "engine_b.todo sync",
         "engine_b.todo work",
-        "scripts\\publish_daily_state.py",
+        "scripts\\finalize_daily_state.py",
         "query.coverage_gaps",
     ):
         assert token in text
     assert "master" in text
     assert "不要建立 branch" in text
+    assert "publish_daily_state.py" not in text
+    assert "不碰 Git、不連網" in text
 
 
 def test_daily_prompt_uses_fixed_entries_on_first_call_and_never_replays_permission_failures() -> None:

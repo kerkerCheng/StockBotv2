@@ -9,14 +9,18 @@ import importlib.util
 import json
 import os
 import sys
+import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from briefing.render import render_today_markdown  # noqa: E402
 from briefing.sources import load_backup_status as _backup_status_payload  # noqa: E402
+from engine_b.state_files import STATE_PATHS, StateFileError  # noqa: E402
 
 
 def _load_entrypoint():
@@ -183,3 +187,76 @@ def test_files_zip_members_exclude_recoverable_and_live(tmp_path):
         )
     }
     assert members == {"decision_lab/assessment_x.json", "runtime_pointer.json"}
+
+
+def _seed_engine_b_state(root: Path, *, raw_ref: str | None = None) -> None:
+    payloads = {
+        STATE_PATHS[0]: {
+            "schema_version": "2",
+            "leads": ({"lead_x": {"trace_attempts_ref": raw_ref}} if raw_ref else {}),
+        },
+        STATE_PATHS[1]: {"schema_version": "1", "items": [], "log": [], "next_n": 1},
+        STATE_PATHS[2]: {"schema_version": 1, "watches": []},
+        STATE_PATHS[3]: {"schema_version": 1, "hypotheses": []},
+    }
+    for relative, payload in payloads.items():
+        path = root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def test_engine_b_archive_contains_exact_state_and_referenced_evidence(tmp_path):
+    entrypoint = _load_entrypoint()
+    raw_ref = "library/raw/source.txt"
+    _seed_engine_b_state(tmp_path, raw_ref=raw_ref)
+    raw = tmp_path / raw_ref
+    raw.parent.mkdir(parents=True, exist_ok=True)
+    raw.write_text("source", encoding="utf-8")
+    archive_path = tmp_path / "engine_b_state.zip"
+
+    count = entrypoint.build_engine_b_state_zip(archive_path, repo_root=tmp_path)
+
+    with zipfile.ZipFile(archive_path) as archive:
+        assert set(archive.namelist()) == {*STATE_PATHS, raw_ref}
+    assert count == len(STATE_PATHS) + 1
+    restore = tmp_path / "restore"
+    restore.mkdir()
+    assert entrypoint.verify_engine_b_state_zip(
+        archive_path, restore_root=restore
+    ) == count
+    assert (restore / raw_ref).read_text(encoding="utf-8") == "source"
+
+
+def test_engine_b_archive_fails_on_missing_referenced_evidence(tmp_path):
+    entrypoint = _load_entrypoint()
+    _seed_engine_b_state(tmp_path, raw_ref="library/raw/missing.txt")
+
+    with pytest.raises(StateFileError, match="引用不存在"):
+        entrypoint.build_engine_b_state_zip(
+            tmp_path / "engine_b_state.zip", repo_root=tmp_path
+        )
+
+
+def test_engine_b_archive_rejects_private_or_traversal_reference(tmp_path):
+    entrypoint = _load_entrypoint()
+    _seed_engine_b_state(tmp_path, raw_ref="library/raw/../private/secret.txt")
+
+    with pytest.raises(StateFileError, match="不安全"):
+        entrypoint.build_engine_b_state_zip(
+            tmp_path / "engine_b_state.zip", repo_root=tmp_path
+        )
+
+
+def test_engine_b_archive_never_includes_private_reference(tmp_path):
+    entrypoint = _load_entrypoint()
+    private_ref = "library/private/secret.txt"
+    _seed_engine_b_state(tmp_path, raw_ref=private_ref)
+    secret = tmp_path / private_ref
+    secret.parent.mkdir(parents=True, exist_ok=True)
+    secret.write_text("secret", encoding="utf-8")
+    archive_path = tmp_path / "engine_b_state.zip"
+
+    entrypoint.build_engine_b_state_zip(archive_path, repo_root=tmp_path)
+
+    with zipfile.ZipFile(archive_path) as archive:
+        assert set(archive.namelist()) == set(STATE_PATHS)

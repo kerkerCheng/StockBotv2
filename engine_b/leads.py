@@ -1198,7 +1198,7 @@ def classification_gaps(store: dict[str, Any]) -> list[dict[str, Any]]:
     """列出 active pq1 lead 的缺漏／非法 classification receipt。
 
     ``unknown`` 仍是歷史相容 sentinel，但 active queue 不得靠它排序。這個 health
-    surface 只讀 tracked leads authority，不讀 Neo4j、Sheet 或 private runtime。
+    surface 只讀本機 leads authority，不讀 Neo4j、Sheet 或 private runtime。
     """
 
     from engine_b import priority

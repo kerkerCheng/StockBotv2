@@ -9,8 +9,9 @@
 
 - 鎖檔 `library/leads/.writer_lock.json`（gitignored；與被保護的共用檔同目錄）。
 - **排程側**嵌在既有入口內：`crons/harvest_leads.py` 開跑 acquire(`scheduled`)、
-  `scripts/publish_daily_state.py` 收尾 release——**不新增 CLI 命令、不動
-  `.codex/rules` 的 16 條 allowlist**（sandbox impact review 結論：鎖檔是 repo 內
+  `scripts/finalize_daily_state.py` 收尾 release。finalizer 只讀寫 repo 內 state／鎖檔，
+  留在 workspace-write，不需要 `.codex/rules` escalation（sandbox impact review 結論：
+  鎖檔是 repo 內
   一般檔案，workspace-write 已涵蓋，無 identity／ACL／網路／credential 副作用）。
 - **互動側**走 `scripts/writer_guard.py acquire／release`；`check` 同時看時間窗
   與本鎖——鎖補上時間窗防不了的延遲開跑，時間窗補上「排程要跑但還沒 acquire」

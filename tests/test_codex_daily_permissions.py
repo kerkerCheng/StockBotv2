@@ -25,7 +25,6 @@ ALLOWED_PREFIXES = (
     (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "list"),
     (r".venv\Scripts\python.exe", r"scripts\catalyst_watch.py"),
     (r".venv\Scripts\python.exe", r"scripts\outcome_if_settled_today.py"),
-    (r".venv\Scripts\python.exe", r"scripts\publish_daily_state.py"),
     (r".venv\Scripts\python.exe", "-m", "decision_lab", "today"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "sync"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "reassess-stale"),
@@ -92,6 +91,7 @@ def test_every_rule_parses_and_allows_its_existing_prefix() -> None:
     "command",
     (
         (r".venv\Scripts\python.exe", r"scripts\publish_daily_state_backup.py"),
+        (r".venv\Scripts\python.exe", r"scripts\finalize_daily_state.py"),
         (r".venv\Scripts\python.exe", r"scripts\publish_daily_brief_backup.py"),
         (r".venv\Scripts\python.exe", r"scripts\record_mechanical_observation.py"),
         (r".venv\Scripts\python.exe", "-m", "webapp", "serve"),
@@ -118,9 +118,8 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
-    # 2026-09-17（Phase 2 Step 2.2／D12）：20 → 15。daily 的研究層關閉，
-    # 五條只為研究而存在的 entry 一併移除；這是純收緊，對應的 prompt 步驟同一個 change 移除。
-    assert rules.count("prefix_rule(") == 15
+    # 2026-09-19：state finalizer 留在 workspace-write，移除 public Git publisher rule，15 → 14。
+    assert rules.count("prefix_rule(") == 14
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
@@ -133,11 +132,12 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '"-m", "engine_b.todo", "sync"',
         '"-m", "engine_b.todo", "reassess-stale"',
         '"-m", "engine_b.todo", "standing-go"',
-        "scripts\\\\publish_daily_state.py",
         "scripts\\\\publish_daily_brief.py",
         '"-m", "webapp", "materialize"',
     ):
         assert fixed_entry in rules
+    assert "publish_daily_state" not in rules
+    assert "finalize_daily_state" not in rules, "本機 finalizer 不需要 escalation"
     # 研究層關閉後，這五條必須**不在** rules 裡——拿掉不是忘了寫，是刻意收緊。
     for research_only_entry in (
         "fetchers\\\\edgar.py",
@@ -382,7 +382,7 @@ def test_mops_watcher_reuses_the_harvest_entry_and_admits_its_new_hosts() -> Non
     """
     rules = RULES.read_text(encoding="utf-8")
 
-    assert rules.count("prefix_rule(") == 15, "重訊 watcher 不該新增任何 entry"
+    assert rules.count("prefix_rule(") == 14, "重訊 watcher 不該新增任何 entry"
     for host in ("openapi.twse.com.tw", "www.tpex.org.tw", "mopsov.twse.com.tw"):
         assert host in rules, host
     # 抓取器本身不是命令入口，不得偷偷出現在 allowlist 裡。

@@ -58,17 +58,10 @@ check 通過後**取鎖再開跑**（2026-09-02 起雙向互斥：排程 harvest
 
 鎖有 TTL，session 崩潰最多卡排程一個 TTL；loop 模式每輪醒來重新 acquire（同 owner 是續期）。
 
-把回傳的 `head` 記下來，之後每個里程碑用它比對：
-
-```powershell
-& '.venv\Scripts\python.exe' scripts\writer_guard.py verify --since <開跑時的 HEAD>
-```
-
-exit 2 代表期間排程側提交過共用檔——**立刻重讀 `todo_pool.json`／`pending_leads.json`
-再繼續，不得沿用記憶中的狀態**。
-
-⚠ **這是單向避讓不是互斥鎖**：只有互動側會檢查。真正的雙向鎖要動 daily 的 sandbox
-allowlist（見 ROADMAP）。單向仍然有效，因為 daily 有界且時間可預測——讓開就不會撞。
+writer lock 是雙向互斥：排程 harvest 也會 acquire `scheduled`，互動側持有
+`interactive` 時它會 fail closed。state 已退出 Git，因此不再用 HEAD／publisher commit
+間接猜另一個 writer；里程碑續跑時重新確認自己仍持有 lock，並重讀
+`todo_pool.json`／`pending_leads.json`，不得只沿用記憶中的狀態。
 
 接著**先清機械段，再讀狀態**（2026-09-09 起；段序定義見 `engine_b/queue_segments.py`）：
 

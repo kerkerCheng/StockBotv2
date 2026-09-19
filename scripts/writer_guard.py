@@ -5,18 +5,16 @@ writer，不能重疊。」但在 2026-08-31 之前，這條規則的執行力**
 06:30 這個時間只存在於散文與 OS 排程器設定，程式看不到，於是程式也不可能自己避開。
 repo 內 `filelock`／`flock`／pidfile 全部 0 命中，沒有任何互斥機制。
 
-兩側寫的是同一組檔：`library/leads/pending_leads.json`、`todo_pool.json`、
-`event_watches.json`，外加 git commit／push。重疊時最危險的不是報錯，是**靜默的
+兩側寫的是同一組本機 authority 檔：`library/leads/pending_leads.json`、
+`todo_pool.json`、`event_watches.json`、`hypotheses.json`。重疊時最危險的不是報錯，是**靜默的
 lost update**——daily 剛 harvest 進來的 lead 被互動 session 用舊記憶體狀態覆蓋掉，
 沒有任何東西會叫。
 
-⚠ **這是單向避讓，不是互斥鎖。** 只有互動側會呼叫本檢查；daily 那側要加同樣的檢查
-必須動它的 sandbox allowlist（見 ROADMAP）。單向仍然有效，因為 daily 有界且時間可預測——
-互動 session 讓開就不會撞。
+時間窗是提早避讓；真正的雙向互斥由兩側共用 writer lock 執行。state 不再進 Git，
+所以「期間是否出現 publisher commit」已不是有效訊號，也不再提供 verify 子命令。
 
 用法：
     python scripts/writer_guard.py check      # 現在可否開始長時間寫入（exit 2＝不可）
-    python scripts/writer_guard.py verify --since <HEAD-sha>   # 期間有沒有別的 writer 動過
 """
 
 from __future__ import annotations
@@ -32,16 +30,6 @@ from zoneinfo import ZoneInfo
 ROOT = Path(__file__).resolve().parent.parent
 CONFIG = ROOT / "config" / "daily_routine.json"
 
-# 兩側都會寫的 authority 檔。verify 只看 git 是否動過它們——
-# 逐檔 hash 對 CLI 這種短命行程沒有意義，真正的危險窗口是整段 run。
-SHARED_PATHS = (
-    "library/leads/pending_leads.json",
-    "library/leads/todo_pool.json",
-    "library/leads/event_watches.json",
-)
-
-# 從 publisher 匯入而非各寫一份：兩邊分開維護時，改了一邊而忘了另一邊不會有任何
-# 東西報錯——guard 只會安靜地停止辨認排程（L16：分類要跟著資料走，不要重造）。
 sys.path.insert(0, str(ROOT))
 from engine_b.writer_lock import (  # noqa: E402
     INTERACTIVE_OWNER,
@@ -52,7 +40,6 @@ from engine_b.writer_lock import (  # noqa: E402
     release as _lock_release,
     run_finished_at as _daily_run_finished_at,
 )
-from scripts.publish_daily_state import COMMIT_SUBJECT as _PUBLISHER_SUBJECT  # noqa: E402
 
 
 def _load_schedule() -> dict:
@@ -155,42 +142,6 @@ def cmd_check(args: argparse.Namespace) -> int:
     return 0 if payload["safe"] else 2
 
 
-def cmd_verify(args: argparse.Namespace) -> int:
-    """期間有沒有**別人**動過共用 authority 檔。"""
-    head = _git("rev-parse", "HEAD")
-    moved = head != args.since
-    foreign: list[str] = []
-    if moved:
-        log = _git(
-            "log", "--format=%H%x1f%s", f"{args.since}..{head}", "--", *SHARED_PATHS
-        )
-        for line in filter(None, log.splitlines()):
-            sha, _, subject = line.partition("\x1f")
-            # ⚠ 必須比對**完整** subject，不能只看 `chore(daily):` 前綴。
-            # 2026-08-31 實測：互動 session 也用這個房規慣例寫 pool sync
-            # （"chore(daily): sync pool after [230] 結案…"），只比 prefix 會把自己的
-            # commit 判成排程——L12 的形狀：一個訊號承載兩種語意。
-            # 會誤報的 guard 一週內就會被忽略，那比沒有 guard 更糟。
-            if subject == _PUBLISHER_SUBJECT:
-                foreign.append(f"{sha[:7]} {subject}")
-
-    payload = {
-        "clean": not foreign,
-        "since": args.since,
-        "head": head,
-        "head_moved": moved,
-        "foreign_commits": foreign,
-        "hint": (
-            "偵測到排程的 state publisher 在期間提交過共用檔——"
-            "重新讀 todo_pool.json／pending_leads.json 再繼續，不要沿用記憶中的狀態"
-            if foreign
-            else "期間沒有排程側的共用檔提交"
-        ),
-    }
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
-    return 0 if payload["clean"] else 2
-
-
 def cmd_acquire(args: argparse.Namespace) -> int:
     """互動 session 取得 writer lock（排程 harvest 撞到會 fail closed 讓開）。"""
     try:
@@ -228,10 +179,6 @@ def main(argv: list[str] | None = None) -> int:
         help="預計這段 run 會跑多久（分鐘）；用來判斷會不會跨進避讓窗",
     )
     check.set_defaults(func=cmd_check)
-
-    verify = sub.add_parser("verify", help="期間有沒有別的 writer 動過共用檔")
-    verify.add_argument("--since", required=True, help="開跑時的 HEAD sha")
-    verify.set_defaults(func=cmd_verify)
 
     acq = sub.add_parser("acquire", help="互動 session 取得 writer lock")
     acq.add_argument("--minutes", type=float, default=90, help="TTL（分鐘）")

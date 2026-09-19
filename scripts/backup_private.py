@@ -5,6 +5,8 @@
 - Engine C：``library/private/runtime_pointer.json`` 指向的 SQLite（一致性快照）
 - Neo4j 圖：邏輯匯出（全部 nodes＋relationships JSON，附 counts 自我驗證）
 - 其餘 private 檔案：打包 ``files.zip``（assessments、source_trace、research_actions…）
+- Engine B 本機 state：四份 JSON＋它們指名的 raw provenance，打包
+  ``engine_b_state.zip``（不再以 public Git 當備份）
 
 明確排除（拿得回來、暫存、或刻意不出境）：
 - ``models/``（可重新下載）、``lead_media/``（ROADMAP 分類為可回復）
@@ -44,6 +46,13 @@ from shared.private_backup import (  # noqa: E402
     BackupError,
     create_private_backup,
     restore_private_backup,
+)
+from engine_b.state_files import (  # noqa: E402
+    STATE_PATHS,
+    StateFileError,
+    backup_members,
+    raw_evidence_refs,
+    validate_state_files,
 )
 
 PRIVATE = ROOT / "library" / "private"
@@ -190,6 +199,48 @@ def build_files_zip(destination: Path, live_dbs: set[Path]) -> int:
     if count == 0:
         raise BackupError("files.zip 沒收到任何檔案——排除清單或 private root 有問題")
     return count
+
+
+def build_engine_b_state_zip(
+    destination: Path, *, repo_root: Path = ROOT
+) -> int:
+    """封存完整 Engine B 本機 authority 與它指名的 raw provenance。"""
+    members = backup_members(repo_root)
+    with zipfile.ZipFile(destination, "w", zipfile.ZIP_DEFLATED) as archive:
+        for relative in members:
+            archive.write(repo_root / relative, relative)
+    return len(members)
+
+
+def verify_engine_b_state_zip(path: Path, *, restore_root: Path) -> int:
+    """CRC、成員集合、JSON schema 與 provenance 引用四層 restore 驗證。"""
+    with zipfile.ZipFile(path) as archive:
+        bad = archive.testzip()
+        if bad is not None:
+            raise BackupError(f"engine_b_state.zip CRC 失敗：{bad}")
+        names = archive.namelist()
+        if len(names) != len(set(names)):
+            raise BackupError("engine_b_state.zip 有重複成員")
+        if not set(STATE_PATHS).issubset(names):
+            raise BackupError("engine_b_state.zip 缺少必要 state")
+        try:
+            pending = json.loads(archive.read(STATE_PATHS[0]).decode("utf-8"))
+            if not isinstance(pending, dict):
+                raise ValueError("pending leads 頂層不是 object")
+            expected = {*STATE_PATHS, *raw_evidence_refs(pending)}
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError, StateFileError) as exc:
+            raise BackupError("engine_b_state.zip 的 pending leads 無法驗證") from exc
+        if set(names) != expected:
+            raise BackupError("engine_b_state.zip 成員集合與 state 引用不一致")
+        archive.extractall(restore_root)
+    try:
+        validate_state_files(restore_root)
+        restored_refs = set(backup_members(restore_root))
+    except StateFileError as exc:
+        raise BackupError("engine_b_state.zip restore 後驗證失敗") from exc
+    if restored_refs != expected:
+        raise BackupError("engine_b_state.zip restore 後成員集合不一致")
+    return len(expected)
 
 
 def _append_manifest_entries(backup_dir: Path, filenames: list[str]) -> None:
@@ -378,13 +429,21 @@ def run_backup(*, drive: bool = True) -> int:
     graph = export_neo4j_payload()
 
     backup_id = _utc_now().strftime("%Y%m%dT%H%M%SZ")
-    backup_dir = create_private_backup(
-        sources={"decision_lab": decision_db, "engine_c": engine_c_db},
-        backup_id=backup_id,
-        private_root=PRIVATE,
-        repo_root=ROOT,
-        retention=LOCAL_RETENTION,
-    )
+    try:
+        backup_dir = create_private_backup(
+            sources={"decision_lab": decision_db, "engine_c": engine_c_db},
+            backup_id=backup_id,
+            private_root=PRIVATE,
+            repo_root=ROOT,
+            retention=LOCAL_RETENTION,
+        )
+    except BaseException:
+        # shared helper 可能在 SQLite manifest 寫完後、rotation 驗證時失敗；
+        # 精確清掉本輪剛命名的半成品，不能讓它冒充完整 private backup。
+        partial = BACKUPS / backup_id
+        if partial.is_dir():
+            shutil.rmtree(partial, ignore_errors=True)
+        raise
     try:
         export_path = backup_dir / "neo4j_export.json"
         export_path.write_text(
@@ -396,7 +455,11 @@ def run_backup(*, drive: bool = True) -> int:
         member_count = build_files_zip(
             files_zip, live_dbs={decision_db.resolve(), engine_c_db.resolve()}
         )
-        _append_manifest_entries(backup_dir, ["neo4j_export.json", "files.zip"])
+        engine_b_zip = backup_dir / "engine_b_state.zip"
+        engine_b_member_count = build_engine_b_state_zip(engine_b_zip)
+        _append_manifest_entries(
+            backup_dir, ["neo4j_export.json", "files.zip", "engine_b_state.zip"]
+        )
     except BaseException:
         shutil.rmtree(backup_dir, ignore_errors=True)
         raise
@@ -416,10 +479,17 @@ def run_backup(*, drive: bool = True) -> int:
         "backup_dir": str(backup_dir.relative_to(PRIVATE).as_posix()),
         "artifacts": {
             name: {"sha256": _sha256(backup_dir / name), "bytes": (backup_dir / name).stat().st_size}
-            for name in ("decision_lab.db", "engine_c.db", "neo4j_export.json", "files.zip")
+            for name in (
+                "decision_lab.db",
+                "engine_c.db",
+                "neo4j_export.json",
+                "files.zip",
+                "engine_b_state.zip",
+            )
         },
         "neo4j": {"nodes": nodes, "relationships": rels},
         "files_zip_members": member_count,
+        "engine_b_state_members": engine_b_member_count,
         "drive": drive_result,
         # 「至少驗證過一次 restore」的紀錄跨 run 保留；當前備份是否驗過另看 backup_id。
         "restore_verification": previous.get("restore_verification"),
@@ -428,7 +498,8 @@ def run_backup(*, drive: bool = True) -> int:
 
     print(f"本機備份完成：{backup_dir}")
     print(f"  decision_lab.db＋engine_c.db（SQLite 快照）＋neo4j_export.json"
-          f"（{nodes} nodes／{rels} rels）＋files.zip（{member_count} 檔）")
+          f"（{nodes} nodes／{rels} rels）＋files.zip（{member_count} 檔）"
+          f"＋engine_b_state.zip（{engine_b_member_count} 檔）")
     drive_status = drive_result.get("status")
     if drive_status == "uploaded":
         print(f"Drive 上傳完成：{drive_result.get('name')}（file_id={drive_result.get('file_id')}）")
@@ -491,7 +562,8 @@ def run_verify_restore() -> int:
     """把最新備份 restore 到暫存位置並驗證。驗證面：
     ① restore 路徑本身會重驗 manifest 全部 checksum（含 neo4j export 與 files.zip）；
     ② restore 出來的 SQLite 過 integrity_check（restore 內建）＋逐表筆數與備份一致；
-    ③ files.zip 全成員 CRC；④ neo4j export counts 自我一致。"""
+    ③ files.zip 全成員 CRC；④ Engine B state archive restore 後 schema／引用一致；
+    ⑤ neo4j export counts 自我一致。"""
     status = _load_status()
     backup_rel = status.get("backup_dir")
     if not backup_rel:
@@ -522,6 +594,12 @@ def run_verify_restore() -> int:
             if bad is not None:
                 raise BackupError(f"files.zip CRC 失敗：{bad}")
             print(f"  files.zip：{len(archive.namelist())} 成員 CRC ok")
+        engine_b_restore = VERIFY_TMP / "engine_b_state"
+        engine_b_restore.mkdir()
+        engine_b_members = verify_engine_b_state_zip(
+            backup_dir / "engine_b_state.zip", restore_root=engine_b_restore
+        )
+        print(f"  engine_b_state.zip：{engine_b_members} 成員 restore＋引用驗證 ok")
         nodes, rels = verify_neo4j_export(backup_dir / "neo4j_export.json")
         print(f"  neo4j_export.json：{nodes} nodes／{rels} rels counts 一致")
     finally:

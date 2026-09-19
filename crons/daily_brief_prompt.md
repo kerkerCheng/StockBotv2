@@ -39,7 +39,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、
    `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`decision_lab today`、
    `engine_b.todo sync`、`engine_b.todo reassess-stale`、`engine_b.todo standing-go`、
-   `scripts\publish_daily_state.py`、`scripts\publish_daily_brief.py`、`-m webapp materialize`、
+   `scripts\publish_daily_brief.py`、`-m webapp materialize`、
    `scripts\backfill_fiscal_year_results.py`
    （~~`fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
    `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`~~ 已於 2026-09-17 隨研究層一起移除；
@@ -60,7 +60,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      （`library/leads/.writer_lock.json`，嵌在既有命令內、非新 entry）。若 exit 3 且 stderr 出現
      `writer_lock_held`＝互動 session 正在寫共用檔——**整輪 Daily 立即中止並保留該結構化 failure**，
      不得跳過 harvest 繼續執行後續會寫 `pending_leads.json`／`todo_pool.json` 的命令（那會繞過鎖）。
-     鎖有 90 分鐘 TTL，過期自動可接手；收尾的 `publish_daily_state.py` 會釋放。
+     鎖有 90 分鐘 TTL，過期自動可接手；收尾的 `finalize_daily_state.py` 會釋放。
    - `.venv\Scripts\python.exe -m engine_b.cli harvest-health`（列出最新仍未恢復的來源失敗）
    - `.venv\Scripts\python.exe engine_c\etl_yfinance.py`（35 檔 Engine C daily snapshot）
    - `.venv\Scripts\python.exe scripts\daily_beta_snapshot.py --format markdown --risk-view changes`（固定 ETF／權值股 technical refresh
@@ -214,9 +214,10 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    **不重新推理**（重讀是研究，只在互動 session，D12），輸出同樣只進 ignored derived cache。
    `serve` 不在 rule 內、排程不啟動它。**失敗只記入健康段、不中止 Daily**：artifact 是 derived cache，
    舊的那份仍在，APP 自己會顯示 stale——這與 harvest 失敗必須中止整輪不同（那個會讓兩個 writer 撞上）。
-   接著執行 `.venv\Scripts\python.exe scripts\publish_daily_state.py`。這支固定 publisher 只准提交
-   `library/leads/pending_leads.json` 與 `library/leads/todo_pool.json`；若 guard 拒絕，保留檔案並在 brief
-   回報，不要改用廣泛 `git add/commit/push` 繞過。
+   接著在 workspace-write 內執行 `.venv\Scripts\python.exe scripts\finalize_daily_state.py`。
+   它只驗證四份本機 state、釋放自己的 writer lock 並寫收工標記，**不碰 Git、不連網**；
+   驗證失敗仍須釋放自己的鎖，並在 brief 健康段回報 `state_invalid`。四份 state 由
+   `scripts/backup_private.py` 的 private backup 涵蓋，不得再以任何 unattended Git 命令發布。
 9. Daily Brief 的**最終完整 Markdown 已組成後**，先以 UTF-8 寫入 ignored private brief file，再呼叫
    `.venv\Scripts\python.exe scripts\publish_daily_brief.py --brief-file <private-brief.md> --summary "<摘要>"`，必要時附
    `--claude-share-url`、`--claude-session-id`、`--codex-thread-id`。這是 Codex／本機 Claude Code 共用的

@@ -67,7 +67,7 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 | `get_financial_checklist` | 讀 | 查 Engine C 五項財務清單、最新客觀 analyst coverage 與當前 `policy_version` 的即時 view；不暴露 SQL、不持久化 crowding 分類 |
 | `get_decision_brief` | 讀 | 「今天需要動作嗎」——回 `decision_lab today` 的 redacted public DTO（九欄 action-first）。Decision Store 是本機 private runtime、永不進 git，這是手機／雲端看決策佇列的唯一視窗；純讀，不 freeze／不建 decision／不下單，runtime 未就緒回明確 `unavailable`、不洩私有路徑 |
 | `get_pending_leads` | 讀 | 今日 pending leads 佇列（priority 排序）＋狀態計數＋最近 harvest_log。`tracked_tickers` 算 thesis 影響度。leads 只是注意力 metadata |
-| `record_lead_decision` | **寫（窄 Git）** | triage／advance 一則 lead（go/no-go/park/researching/applied…）；PASS 必須連同 `content_type`／`decision_impact`（capital commitment 另含 `payment_direction`）原子寫入 classification，拒絕只藏在 reason 的分類；寫入後本機 MCP server 對 **只有** `library/leads/pending_leads.json` scoped commit+push（cloud 每天讀到最新）。**只動注意力 metadata——不入圖、不改 evidence tier、不建 decision**；pathspec 寫死、commit 後驗證只碰此檔 |
+| `record_lead_decision` | **寫（本機 state）** | triage／advance 一則 lead（go/no-go/park/researching/applied…）；PASS 必須連同 `content_type`／`decision_impact`（capital commitment 另含 `payment_direction`）原子寫入 classification，拒絕只藏在 reason 的分類。只寫本機 `pending_leads.json`，**不再 commit／push public Git**；不入圖、不改 evidence tier、不建 decision |
 | `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 Research Action 協定 |
 | `get_source_trace_manual` | 讀 | 回傳 `skills/source-trace/SKILL.md` 原文。手機／網頁收到推文、轉述、截圖或未驗證消息時先讀，依市場路由追原文；tier 3–4 未果只留 lead，不進抽取／寫圖 |
 | `load_extraction` | **寫** | legacy weekly/local primitive：一份文件一呼叫。驗 permission/schema/canonical hash，filesystem-first no-clobber 保存 extraction/raw，再冪等寫圖與重投影 conflicts；手機 ad hoc flow 不直接使用 |
@@ -75,7 +75,7 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 | `get_research_action_status` | 讀 | 空 ID 回 recent actionable 摘要；完整 ID 回 frozen review + recovery state；永不回 raw/extraction body |
 | `apply_research_action` | **寫** | 以 ID + 完整 digest 套用使用者核准的 immutable action；逐文件 checkpoint、partial retry、permission-sensitive report；永不跑 Git |
 
-**Connector 權限設定：** 八個 read tools、`prepare_research_action` 與 `record_lead_decision`（低風險、窄 pathset）可設「允許」；`apply_research_action` 與 legacy `load_extraction` 保持「**Needs approval**」。工具權限不會自動繼承，新增／重建／Refresh connector 時逐一檢查。Claude mobile/web 可用同一 remote MCP；ChatGPT web 只有在帳號方案具 full MCP write 權限時能完成 apply。OpenAI 官方目前把 custom MCP apps 限在 web，ChatGPT mobile 不是手機入口。
+**Connector 權限設定：** 八個 read tools、`prepare_research_action` 與 `record_lead_decision`（只寫本機注意力 state）可設「允許」；`apply_research_action` 與 legacy `load_extraction` 保持「**Needs approval**」。工具權限不會自動繼承，新增／重建／Refresh connector 時逐一檢查。Claude mobile/web 可用同一 remote MCP；ChatGPT web 只有在帳號方案具 full MCP write 權限時能完成 apply。OpenAI 官方目前把 custom MCP apps 限在 web，ChatGPT mobile 不是手機入口。
 
 ---
 
@@ -88,7 +88,7 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 5. **驗證與 no-clobber 閘門**——prepare/apply 共用 schema/permission/URL/canonical hash gate；內容衝突不碰圖、不覆寫檔案
 6. **容量、生命週期與敏感資料邊界**——單 action 5 MiB／10 文件、最多 50 個非終態 action／100 MiB staging、ready 30 天過期；status list 不回 report prose，所有 status 都不回 raw/extraction body
 7. **人工核准 + idempotent checkpoint**——`apply_research_action` 設 Needs-approval；每份圖完成後留下 exact extraction hash receipt，response loss／partial failure 用同 ID + digest 續跑
-8. **遠端 Git 僅一個窄例外（leads.json）**——圖 provenance 帳本的 finalize／commit／push 仍只在本機 publisher（驗 master、空 index、ancestry、action trailer 與 exact pathset）。**唯一例外是 `record_lead_decision`**：寫 leads 狀態後對 `library/leads/pending_leads.json`（pathspec 寫死、commit 後驗證只碰此檔）scoped commit+push，讓 cloud 每天同步注意力狀態。這是刻意的「低風險 attention metadata 走 MCP、高風險 provenance 留本機」分野；最壞情況只污染 watchlist 狀態，無圖／決策／碼衝擊，Git credential 仍留本機（MCP 只觸發）
+8. **遠端工具沒有 Git 能力**——`record_lead_decision` 只寫本機 leads authority；Engine B state 由 private backup 保護。圖 provenance 的 finalize／commit／push 仍只在明確的本機互動流程，MCP 不持有也不觸發 Git credential
 9. **本機綁定**——MCP server 只綁 127.0.0.1，唯一入口是 tunnel
 
 > **殘餘安全邊界：** digest 是 integrity，不是 authentication；Needs approval 是 client UX，不是 server auth。持有完整 MCP bearer URL 的直接呼叫者仍位於既有 graph-write 信任邊界內，可準備／載入錯誤資料，但拿不到 Git 能力。OAuth 2.1、短效且 audience-bound token 仍是後續安全升級；現階段先以最小 Neo4j 權限、路徑 token、action quota 與無 remote Git 壓低 blast radius。

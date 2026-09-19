@@ -329,8 +329,8 @@ def check_orphans() -> AuditResult:
     """指標活著、被指的東西死了——而**沒有任何東西會叫**。
 
     2026-09-04 實測抓到的第一筆真實問題：daily 的 pq1 追源把證據寫進
-    `library/raw/`、把路徑寫進 leads state，但 `publish_daily_state.py` 的
-    pathset 只有四個 leads JSON。於是引用推上 origin、檔案留在本機，之後就沒了
+    `library/raw/`、把路徑寫進 leads state；若備份只收四個 leads JSON，引用仍活著、
+    被引用的檔案卻會留在備份外，之後就可能消失
     （3 筆 `trace_attempts_ref` 有 2 筆指向已不存在的檔案）。
     兩筆皆為 SEC `/Archives/` 不可變歸檔，已重抓還原並與 lead 的
     `research_outcome` 逐字核對；publisher 端的結構修法見 `_referenced_evidence`。

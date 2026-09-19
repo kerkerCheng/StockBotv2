@@ -726,7 +726,7 @@ class CompanyImpact:
   │  ───────────────────────────────────────────────────  │
   │  mcp_server/  @mcp.tool 包裝層 (222 行)                 │
   │  mcp_server/  leads_tools / decision_tools /           │
-  │               engine_c_tools / leads_git  (411 行)      │
+  │               engine_c_tools  (leads_git 已移除)         │
   │  cloudflared tunnel · connector 設定 · mobile UX         │
   └───────────────────────┬──────────────────────────────┘
                           │  只准這個方向
@@ -774,7 +774,7 @@ class CompanyImpact:
 | `leads_tools.py` | 147 | **KEEP_AS_ADAPTER** | |
 | `engine_c_tools.py` | 112 | **KEEP_AS_ADAPTER** | |
 | `decision_tools.py` | 88 | **KEEP_AS_ADAPTER** | ⚠ `engine_b/todo.py` 目前 import 它 → 必須改指向 `decision_lab.brief` 本身 |
-| `leads_git.py` | 64 | **LEGACY_BUT_HARMLESS**（原始理由已失效） | 它存在的理由是「讓 cloud routine 讀 pushed leads」，而 cloud routine 已於 2026-07-26 移回本機。**保留但標記；若手機入口停用即 OBSOLETE** |
+| `leads_git.py` | 0 | **REMOVED（2026-09-19）** | cloud routine 已移回本機；手機入口只寫本機 state，不再觸發 public Git push |
 | `docs/remote-access-architecture.md`（152 行） | — | **LEGACY_BUT_HARMLESS** | 保留為 adapter 文件，開頭加一句「本檔描述 optional peripheral，不是核心架構」 |
 | Cloudflare tunnel／startup vbs／connector 權限設定 | — | **DEFER** | 純 ops，寫在 OPERATIONS |
 | `skills/daily-brief` 的 5 處 MCP 提及 | — | **LEGACY_BUT_HARMLESS** | 都已標明「cloud＋MCP 是備援」，措辭正確 |

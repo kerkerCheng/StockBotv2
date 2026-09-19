@@ -125,6 +125,10 @@ def create_private_backup(
         resolved = validate_private_destination(
             candidate.resolve(), private_root=private, repo_root=repo_root.resolve()
         )
+        # `backups/` 也容納一次性 migration exports；沒有 manifest 的相鄰目錄
+        # 不是本模組建立的 backup，不驗、不 rotate、更不能因它讓正式備份停擺。
+        if not (resolved / "manifest.json").is_file():
+            continue
         verified = _verified_manifest(resolved)
         verified_backups.append((str(verified["created_at"]), resolved))
     verified_backups.sort(key=lambda item: (item[0], item[1].name))

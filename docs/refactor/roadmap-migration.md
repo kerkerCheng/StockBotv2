@@ -119,7 +119,7 @@ private authority 備份
 | 項 | 判定 | 備註 |
 |---|---|---|
 | `decision_lab today` footer `live_choices=0` 與 outcome 的 1 筆不一致 | **KEEP** | L12 一表兩義。**Phase 3 拆 brief 時順手修**——不要單獨開工 |
-| `event_watches.json`／`hypotheses.json` 不在 state publisher pathset | **KEEP** | 需 sandbox impact review。與重構無關，獨立處理 |
+| Engine B 四份 state 的 public Git publisher | **REMOVED（2026-09-19）** | 四份 state 全部改為本機 authority＋private backup；finalizer 無 Git／網路能力 |
 | `current_holdings` 裸 `except Exception` 壓平三種失敗 | **KEEP** | L12。Phase 3 拆 `engine_d_runtime/adapters.py` 時一併修 |
 | `checkpoint_decision_review` completed 路徑非原子 | **KEEP** | 已有實測踩坑紀錄（[166]）。與重構無關，獨立處理 |
 | Engine D cohort 重複（claim-keyed vs company-keyed） | **KEEP** | append-only，不回溯清理；只加建立時警告 |
@@ -253,7 +253,7 @@ GF 對 Tower 專利訴訟未追源。
 | `mcp_server/` 的 79% domain code（3,165 行） | 未在 roadmap | **EXTRACT_FROM_CORE**（新增項） | `current-architecture.md` §12.1 實測。**新增到 Phase 3 的範圍** |
 | `Core → mcp_server` 的 5 個反向依賴 | 未在 roadmap | **EXTRACT_FROM_CORE**（新增項） | `engine_b/todo.py` 等；驗收＝該 import 計數 5 → 0 |
 | remote Decision MCP（「Engine D 仍未包含」） | archive | **OPTIONAL_ADAPTER / DEFER** | 遠端能看建議、不能替使用者接受 choice——這條邊界不變，但不排程 |
-| `record_lead_decision` 的窄 Git 例外（`leads_git.py`） | archive（已交付） | **LEGACY_BUT_HARMLESS**（原始理由已失效） | 它存在是為了讓 cloud routine 讀 pushed leads，**而 cloud routine 已於 2026-07-26 移回本機** |
+| `record_lead_decision` 的窄 Git 例外（`leads_git.py`） | archive（已交付） | **REMOVED（2026-09-19）** | cloud routine 已移回本機；state 改由 private backup 保護，不再發布到 public Git |
 | cloud session ＋ MCP 作為 daily／weekly 備援 | `AGENTS.md`／skills | **DEFER** | daily／weekly prompt 已逐字禁用 MCP；備援定位保留但不投資 |
 | 雲端 egress 白名單 | `docs/OPERATIONS.md` | **DEFER** | 只影響日後 cloud fallback |
 | ChatGPT full-MCP write 方案／connector refresh | `docs/remote-access-architecture.md` | **OBSOLETE（作為設計約束）** | 第三方平台限制，不得影響 core |

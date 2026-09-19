@@ -331,22 +331,22 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_layer_separation.py::test_nothing_imports_audit",
         guards="audit 讀遍所有層，被任何層 import 就形成環",
     ),
-    # --- daily publisher 追源證據（2026-09-04）---------------------------
+    # --- Engine B private backup 追源證據（2026-09-19）-------------------
     Mutation(
-        name="publisher 帶走 state 沒有引用的檔案",
-        path="scripts/publish_daily_state.py",
-        old="            if (repo / ref).is_file():\n                found.add(ref)",
-        new="            found.add(ref)",
-        test="tests/test_daily_state_publisher.py::test_only_existing_files_enter_the_derived_set",
-        guards="只帶被 state 指名且**確實存在**的檔案，不是整目錄放行",
+        name="backup 忽略 state 指向的缺檔",
+        path="engine_b/state_files.py",
+        old="        if not (repo / ref).is_file():",
+        new="        if False:",
+        test="tests/test_backup_entrypoint.py::test_engine_b_archive_fails_on_missing_referenced_evidence",
+        guards="被 state 指名的 provenance 缺檔必須 fail closed，不能產生看似完整的備份",
     ),
     Mutation(
-        name="publisher 放行 library/private 引用",
-        path="scripts/publish_daily_state.py",
-        old="            if not ref.startswith(EVIDENCE_PREFIX) or len(ref.split()) != 1:",
-        new="            if not ref.startswith(\"library/\") or len(ref.split()) != 1:",
-        test="tests/test_daily_state_publisher.py::test_private_and_traversal_references_are_never_shipped",
-        guards="private authority 刻意不進 Git——無人值守排程尤其不得碰",
+        name="Engine B archive 誤收整個 library 引用",
+        path="engine_b/state_files.py",
+        old="            if not ref.startswith(EVIDENCE_PREFIX):",
+        new="            if not ref.startswith(\"library/\"):",
+        test="tests/test_backup_entrypoint.py::test_engine_b_archive_never_includes_private_reference",
+        guards="Engine B archive 只收 raw provenance，不得把 library/private 內容混入第二份封裝",
     ),
     # --- Phase 3 shim 清空與槓桿硬擋收回（2026-09-04）-------------------
     Mutation(

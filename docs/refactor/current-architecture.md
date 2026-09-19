@@ -106,9 +106,9 @@ point-in-time 需求獨立成 `ResearchContext`，Engine D 才減得下來。
 | Authority | 儲存 | 可變性 | 現況筆數（2026-09-03） | 唯一寫入路徑 |
 |---|---|---|---|---|
 | **Engine A 知識圖譜** | Neo4j（local） | 可重建（extraction 檔是 ground truth） | Entity 297（TechNode 134／Company 92／Product 52／Material 12／Person 4／Standard 3）／Claim 372／EdgeAssertion 662／SourceDoc 200／canonical domain edge 529（`CITES` 1,034、`ABOUT` 293 另計） | `loader/load_to_neo4j.py`、MCP `apply_research_action` |
-| **Engine B leads** | `library/leads/pending_leads.json`（tracked） | 狀態機 | pending 1／triaged_go 5／action_prepared 3／parked 401／applied 73／triaged_no_go 485 | `engine_b.cli`、MCP `record_lead_decision` |
-| **Engine B pq2 池** | `library/leads/todo_pool.json`（tracked） | append-only log ＋ 可變狀態 | 見 `python -m engine_b.todo list` | `engine_b.todo` |
-| **Event Watch** | `library/leads/event_watches.json`（tracked） | 狀態機 | 見 `engine_b.event_watch counters` | `engine_b.event_watch` |
+| **Engine B leads** | `library/leads/pending_leads.json`（本機、Git ignored、private backup） | 狀態機 | pending 1／triaged_go 5／action_prepared 3／parked 401／applied 73／triaged_no_go 485 | `engine_b.cli`、MCP `record_lead_decision` |
+| **Engine B pq2 池** | `library/leads/todo_pool.json`（本機、Git ignored、private backup） | append-only log ＋ 可變狀態 | 見 `python -m engine_b.todo list` | `engine_b.todo` |
+| **Event Watch／Hypotheses** | `library/leads/{event_watches,hypotheses}.json`（本機、Git ignored、private backup） | 狀態機 | 見 `engine_b.event_watch counters` | `engine_b.event_watch`／`engine_b.hypotheses` |
 | **Engine C ETL projection** | private SQLite | **可重建** | financial_snapshots 1,858（73 ticker，2026-07-08 → 09-03）／technical 1,000／consensus 1,855 | `engine_c/etl_*.py` |
 | **Engine C 人工觀測 ledger** | 同上 | **append-only，Git 救不回** | manual_observations 85（backlog 32／customer_concentration 29／runway_inputs 7／…） | `engine_c/manual_observations.py` |
 | **Engine D Decision Store** | private SQLite，schema v9 | **append-only，Git 救不回** | cohort 41／system_decisions 268／context_bundles 268／coverage_assessments 268／work_orders 142／shadow 41／outcome 12（已量測 2）／live_choices 1／live_fills 1／paper_events 9／cohort_thesis 1 | `decision_lab/store.py` |
@@ -482,7 +482,7 @@ Event Watch（統一 registry）／RA `expires_at`／thesis `next_check`／catal
 | `leads_tools.py` | 147 | 4% | remote adapter |
 | `engine_c_tools.py` | 112 | 3% | remote adapter |
 | `decision_tools.py` | 88 | 2% | remote adapter |
-| `leads_git.py` | 64 | 2% | 窄 Git 例外（見 12.4） |
+| `leads_git.py` | 0 | 0% | **2026-09-19 已刪除**：Engine B state 不再發布到 public Git |
 | **小計：真正的 transport／adapter** | **633** | **16%** | |
 
 查證：
@@ -520,12 +520,13 @@ EOF
 `AGENTS.md` 也已寫下 **Local-first 方針（2026-07-26 使用者定案）**。
 **因此「MCP 是 peripheral」不是這次的新決定，是把既成事實寫進架構。**
 
-### 12.4 已經失效的理由（`leads_git.py`）
+### 12.4 已移除的失效理由（`leads_git.py`）
 
 `leads_git.py` 的存在理由逐字是：「本機 MCP server 把 leads.json commit+push，
 讓 **cloud routine** 每天讀 pushed clone 看到最新狀態」。
 **而 cloud routine 已於 2026-07-26 移回本機。** 這條窄 Git 例外的原始理由已不成立；
-它現在只服務手機 chat 入口。→ 分類見 `target-architecture.md` §14。
+2026-09-19 已刪除。手機 chat 入口仍可寫本機 authority，但不再取得 Git capability；
+state 的耐久性改由 private backup＋restore verification 承擔。
 
 ### 12.5 哪些「看起來像 domain rule」其實是 transport 問題
 

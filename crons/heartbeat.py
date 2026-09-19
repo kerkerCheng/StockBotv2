@@ -37,7 +37,7 @@ D12（2026-09-16 使用者定案）把 Daily 拆成三層——心跳／分類�
   且 Windows PowerShell 的 UTF-8 管線有坑，所以這裡只寫檔、由呼叫端帶 `--brief-file`）。
 - **不重算任何排序或判讀。** 段 3 的佇列計數消費 `engine_b.queue_segments.observe()` 與
   `engine_b.todo.actionable_items()`；段 1／2／4 消費 `webapp` 已 materialize 的 state artifact，
-  外加兩份 tracked authority（`pending_leads.json` 的 `harvest_log`、`thesis/lifecycle.json`）。
+  外加本機 leads authority（`pending_leads.json` 的 `harvest_log`）與 tracked thesis lifecycle。
   **心跳不是第二個 current-state authority**，它是純消費端。
 - **不 import `audit/`。** 那是 composition root，站在所有層之上；`crons` 是 core package，
   反向 import 會讓依賴方向倒過來（`tests/test_layer_separation.py::test_nothing_imports_audit`）。

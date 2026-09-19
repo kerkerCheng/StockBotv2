@@ -201,12 +201,12 @@ def record_lead_decision(
     to_status: str = "",
     ref: str = "",
 ) -> str:
-    """記錄一則 lead 的 triage／advance 決定，寫後由本機窄 pathset commit+push。
+    """記錄一則 lead 的 triage／advance 決定，atomic 寫回本機 authority。
 
     op="triage"（PASS 用 go／tier／reason／三個 priority flag，並必填
     content_type／decision_impact；capital_commitment 另填 payment_direction）｜op="advance"（用
     to_status／ref，如 park、researching、applied）。寫入後本機 MCP server 把
-    **只有** `library/leads/pending_leads.json` commit+push，cloud 每天讀到最新。
+    **只寫** `library/leads/pending_leads.json`，不取得 Git／網路能力。
 
     **邊界：** 只動注意力 metadata——不入圖、不改 evidence tier、不建 decision。
     圖 admission 走 apply_research_action；此工具永不 commit 圖／碼／extraction。

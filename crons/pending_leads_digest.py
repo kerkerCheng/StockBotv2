@@ -5,7 +5,7 @@
 安靜原則：沒有 pending／triaged_go 就不輸出，不打擾。gh/檔案缺失都優雅跳過，
 不能讓 session 開不起來。
 
-計數只讀本機 library/leads/pending_leads.json（tracked，本機 authority）；
+計數只讀本機 library/leads/pending_leads.json（Git ignored、納入 private backup 的 authority）；
 不 harvest、不寫入。完整 brief 由使用者說「daily brief」或 /daily-brief 觸發。
 """
 from __future__ import annotations
