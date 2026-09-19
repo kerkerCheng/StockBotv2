@@ -77,10 +77,12 @@
 > **2 倍需要 Datacenter & Communications 分部四年累積成長 4.65 倍**；**3 倍以上所有 driver
 > 拉到極限都做不到**。⚠ 這是系統第一次說出**可以去查證**的話。
 >
-> **但它今天只能由腳本跑**：`build_fundamental_model` 的 target 永遠是基期+1，
-> 現有 view 路徑**到不了 FY2030**。要讓它進 alpha-card／APP 需要一個「多年視角」入口，
-> **而那不得污染 FY+1 的主 view**（refresh 已證明兩者分得開：FY2030 的假設被正確標成
-> 「不是目前目標期間；本視角不評估」）。
+> **整條鏈已經通到 APP**（Step 7.4）：`python -m briefing multi-year <T>`｜
+> `python -m webapp materialize --multi-year`｜`GET /api/v1/multi-year`｜導覽列「要幾倍」｜
+> 心跳段 4 每天印「還沒寫下目標年度 N」。
+> ⚠ 它**必須**是 materialize 出來的——多年橋是金融模型，APP 契約禁止 request path 跑模型。
+> ⚠ 它**沒有污染 FY+1 主 view**：`build_fundamental_model` 的 target 永遠是基期+1，
+> FY2030 的假設被 refresh 正確標成「不是目前目標期間；本視角不評估」。
 >
 > ⚠ **籃子現在是空的（通過 0、首選無），而那是合法結果**——Phase 4a 接上市值與覆蓋
 > 兩條門檻後，LITE 以 **83.5B／25 位覆蓋**被擋掉。它從來就不是「邊緣小公司」。
@@ -92,9 +94,10 @@
 > **2026-09-19 實測（改完之後重新量的，不是舊數字）：**
 >
 > ```
-> 籃子 16 檔｜通過 filter 1（LITE）｜首選 LITE
+> 籃子 16 檔｜通過 filter 0｜首選 無     ← Phase 4a 接上三條門檻之後
+> market_cap_above_max 10｜analyst_count_above_max 9｜no_externally_corroborated_edge 7
 > no_bet 13｜payoff_not_positive 2
-> 催化劑那一格（本輪由一句話拆成四種形狀）：
+> 催化劑那一格（拆成四種形狀）：
 >   catalyst_undated 6｜catalyst_missing_resolves 3｜no_catalyst_recorded 4｜catalyst_after_value_date 1
 > ```
 >
@@ -118,10 +121,11 @@
 > （降級後的正確表達只有 `sole_source=false` ＋ `sole_source_evidence_quality=weak` 兩欄，
 > 判讀理由寫 `.review.md`）。⚠ 下次再有人想加它，先回答「`false` 時的『驗證模式』指什麼」。
 >
-> **② 多年反向橋要不要提前 → L11-6 前置已做完，amendment 已提出，等使用者決定。**
-> 逐筆重讀那 4 筆 Abstention：**四筆全部該 abstain，80% 站得住**。而且比那個統計更有力的是
-> `revisit_when` 那一欄——四筆有三筆逐字指名「估值層新增 **mid-cycle／multi-year method**」或
-> 「虧損期 method」；全 ledger 11 檔宣告不主張目標倍數，理由同型。**研究層早就把需求規格寫好了。**
+> **② 多年反向橋要不要提前 → 使用者 2026-09-19 採納，amendment 已生效並做到 Step 7.4。**
+> L11-6 前置的結論：逐筆重讀那 4 筆 Abstention，**四筆全部該 abstain，80% 站得住**；
+> 而比那個統計更有力的是 `revisit_when`——四筆有三筆逐字指名「估值層新增
+> **mid-cycle／multi-year method**」或「虧損期 method」，全 ledger 11 檔理由同型。
+> **研究層早就把需求規格寫好了。** Phase 表已改：Phase 4 拆成 4a／4b、Phase 7 提前。
 >
 > **③ refresh 按年度過濾 → 選 (a)，已落地。** `consensus` 類事件若年度明確不是 `0y` 就不觸發複查，
 > 但**計數＋逐條進 notes**（不是靜默丟棄）。`None` 照舊觸發（fail open）；只對 `consensus` 生效。
@@ -133,15 +137,23 @@
 > - **[577]／[627]／[628] 都已 resolve。** [627] 實測：`rank_bottlenecks` 該列 **#2 → #5**，
 >   籃子不變（通過 1、首選 LITE）；COHR 首屏第三句已改寫（brief `ib_37dfb9b27153eba8`）。
 >   [628]：`co:nvidia` 供給側 **3 條 → 4 條**，新那條 `attributes` 刻意留空（逐字不支持任何主張）。
-> - ⚠ **[629] 待核准（thesis mutation，四個人工 gate 之一）**：執行 [627] 時撞到——COHR 的
->   `disproof_conditions[1]` 逐字就是「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商」，
->   它的 48 小時動作是「把該邊的 `sole_source` 降級並重跑 Q1；**需重新評估整條 thesis**」。
->   **前半就是 [627] 剛做完的事。** 首屏第六句已一併做事實更正，但 thesis 層未動。
+> - **[629] 已執行**：COHR 的 thesis `active` → **`review_required`**（disproof[1]「出現第二家
+>   取得 NVIDIA CPO 外部光源 design win 的供應商」已觸發；48h 動作的前半就是 [627]）。
+>   ⚠ **thesis 內容與 variant 刻意未動**——那是重新評估的產出，不是轉狀態的副作用。
+>   **重新評估本身還沒做**，是一個開著的研究缺口。
+> - **[630] 已執行**：COHR 的 `multiple_horizon` = 2030-06-30（一手：10-Q 逐字
+>   「support future production volumes through 2030」）＋ FY2030 七條錨點假設。
+> - **pq2 球在你手上 16 項**，全部是既有的（`python -m engine_b.todo list`）。
 >
 > ### ⚠ 已經做完、不要重做
 >
 > - **七個系統性缺陷全部交付**（1／2／4／5／6／7 於 2026-09-19，3 於同日稍早）。逐項的
 >   before → after 數字寫在 ROADMAP 那七列裡，**要引用先去讀那一列**。
+> - **Phase 4a 已結案**：三條接進 filter（市值／覆蓋家數／至少一條外部印證的邊）、
+>   一條本來就在（催化劑）、**兩條量完確認今天不該接**（入圖日缺資料歷史長度、
+>   瓶頸業務占比缺那個數字本身）。不要再去「補」那兩條——它們不是待辦。
+> - **Phase 7 的 7.1–7.4 全部交付**（倍率參數化／`multiple_horizon`＋`span_years`／
+>   `briefing multi-year` CLI／進 APP）。
 > - 不要重新校準 LITE 的 base、不要重寫 LITE／AXTI 的 variant／downside／短評。
 > - 不要重做 `co:lumentum supplies_to tech:uhp_laser` 的 sole_source 判讀（[617]／[626] 已完成）。
 > - 不要把「Lumentum is sold out through 2028」寫進假設（tier 3 二手，未追到一手）。
