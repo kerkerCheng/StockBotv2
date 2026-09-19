@@ -59,26 +59,33 @@ class MultiYearView:
     ladder: tuple[ReverseBridgeResult, ...] = ()
 
 
-def _horizon_from_judgment(ticker: str) -> tuple[date | None, str | None]:
-    """從 session 判斷檔讀 `multiple_horizon`。**讀不到就是沒有**，不猜。"""
+def _horizon_from_judgment(ticker: str) -> tuple[date | None, str | None, str]:
+    """從 session 判斷檔讀 `multiple_horizon`。**讀不到就是沒有**，不猜。
+
+    回 `(horizon, reason, kind)`。⚠ **`kind` 由這裡宣告，呼叫端不得 parse 理由句去猜**
+    （L16：分類有 SSOT 就要跟著資料走到需要它的地方）。2026-09-19 實測到的代價：
+    16 檔裡 14 檔非 available，counts 卻只有一格 `no_horizon`，於是「還沒有人寫下來」
+    （13 檔，我們的待辦）與「連判斷檔都沒有」（1 檔，更前面的缺口）被壓成同一個數字，
+    而心跳、APP、CLI 三個消費端都把它印成「還沒寫下目標年度」——**其中一檔並不是**。
+    """
     import json
 
     from .alpha_view.sources import locate_judgment
 
     path = locate_judgment(ticker)
     if path is None:
-        return None, "找不到 session 判斷檔——多年橋要先知道這個 thesis 在講哪一年"
+        return None, "找不到 session 判斷檔——多年橋要先知道這個 thesis 在講哪一年", "no_judgment"
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
-        return None, f"判斷檔無法讀取：{type(exc).__name__}"
+        return None, f"判斷檔無法讀取：{type(exc).__name__}", "judgment_unreadable"
     value = raw.get("multiple_horizon")
     if not value:
-        return None, NO_HORIZON_REASON
+        return None, NO_HORIZON_REASON, "no_horizon"
     try:
-        return date.fromisoformat(str(value)[:10]), None
+        return date.fromisoformat(str(value)[:10]), None, "available"
     except ValueError:
-        return None, f"`multiple_horizon` 不是合法日期：{value!r}"
+        return None, f"`multiple_horizon` 不是合法日期：{value!r}", "horizon_invalid"
 
 
 def _live(records: Sequence[Any], *, period_end: date) -> list[Any]:
@@ -100,9 +107,10 @@ def build_multi_year_view(
     ticker = str(resolved)
     common = dict(ticker=ticker, company_id=str(company_id))
 
-    horizon, why = _horizon_from_judgment(ticker)
+    horizon, why, kind = _horizon_from_judgment(ticker)
     if horizon is None:
-        return MultiYearView(horizon=None, status="missing", reason=why, **common)
+        # status 直接用宣告出來的 kind——**不另外壓成 "missing"**，否則下游又要 parse 理由句。
+        return MultiYearView(horizon=None, status=kind, reason=why, **common)
 
     prov = provider or EngineCFundamentalsProvider()
     actuals, actuals_reason = prov.fiscal_year_results(Ticker(ticker))
@@ -147,6 +155,28 @@ def build_multi_year_view(
                     "沒有生效的 target_pe——反解問的是「在我們的倍數下 EPS 要多少」，"
                     "沒有倍數就沒有那個問題（**不補市場倍數**，那會讓答案恆等於共識）"), **common)
 
+    # ⚠ 虧損基期：錨點 EPS ≤ 0 時，反解在算術上仍然有答案，但**那個答案的語意不是
+    # 「這個結構允不允許 N 倍」**——它只是「從一個負數漲到一個正數要多少」。兩者在
+    # 今天的輸出裡長得一模一樣（L12：一個表示承載兩種語意，而下游被迫二選一）。
+    # 實測（2026-09-19，[633] 寫入 AXTI 的 FY2028 錨點當天）：AXT FY2025 非 GAAP 營益率
+    # −21.2%，`carried_forward`（成長歸 0）＝沿用那個虧損 → 錨點 EPS −0.0789，於是四級
+    # 階梯全部印「拉到極限也做不到」——**與同一檔 FY+1 反向橋的「2x available」方向相反**。
+    # 那不是結構結論，是儀器在虧損期失效。改用封閉字彙裡既有的 `method_not_applicable`
+    # 現形（AGENTS.md：使用者必須分得出還沒做／刻意不主張／**方法不適用**／上游缺料）。
+    # ⚠ 這不是放寬 gate：被擋的檔數一個沒少，只是「做不到」與「量不了」不再同形。
+    # 研究層早就指名過這個缺口——Abstention ledger 有三筆逐字寫著要「虧損期 method」。
+    if anchor_eps is not None and anchor_eps <= 0:
+        return MultiYearView(
+            horizon=horizon, status="method_not_applicable", base_period=actuals.period,
+            span_years=bridge.span_years, target_multiple=multiple, multiple_source=source,
+            current_price=price, anchor_eps=anchor_eps, bridge_warnings=bridge.warnings,
+            reason=(f"錨點 EPS 是 {anchor_eps:,.4f}（≤ 0）——**基期在虧損，而錨點取的是"
+                    "「沿用基期」**，所以這一年的錨點也是負的。反解此時問的是「從負數漲到"
+                    "正數要多少」，**那不是「這個結構允不允許 N 倍」**。⚠ 不印階梯：印出來"
+                    "每一級都會是「拉到極限也做不到」，而那句話會被讀成結構結論。"
+                    "**要讓這一檔算得出來，需要的是一個虧損期適用的錨點方法**（例如 mid-cycle "
+                    "利潤率），不是改倍率也不是放寬 driver 上下限"), **common)
+
     ladder = tuple(
         build_reverse_bridge(
             company_id=str(company_id), ticker=ticker, as_of=None,
@@ -171,9 +201,16 @@ def render_multi_year(view: MultiYearView) -> str:
                "不共用的是「要對誰」——FY+1 對共識，多年對倍率。")
     out.append("")
     if view.status != "available":
-        out.append(f"**算不出來**：{view.reason}")
+        # ⚠ 「算不出來」與「這個方法不適用」是兩件事，不得同形（AGENTS.md 的四種缺席）。
+        # 前者是缺料（補了就算得出來）；後者是**已經算了、而且知道答案沒有意義**。
+        head = ("**這個方法在這一檔不適用**" if view.status == "method_not_applicable"
+                else "**算不出來**")
+        out.append(f"{head}：{view.reason}")
         if view.horizon:
-            out.append(f"（目標年度：{view.horizon.isoformat()}）")
+            out.append(f"（目標年度：{view.horizon.isoformat()}"
+                       + (f"｜基期 {view.base_period.label}｜距離 {view.span_years} 年"
+                          if view.base_period and view.span_years is not None else "")
+                       + "）")
         return "\n".join(out)
 
     out.append(f"- 目標年度 **{view.horizon.isoformat()}**｜基期 {view.base_period.label}"
@@ -250,10 +287,21 @@ def build_multi_year_artifact(
                 for r in view.ladder
             ],
         })
+    # ⚠ 五格**互斥且窮盡**（INV-3）：available ＋ no_horizon ＋ no_judgment ＋
+    # method_not_applicable ＋ other_missing == input。2026-09-19 之前只有
+    # `no_horizon` 一格而它其實是「所有非 available」，於是三個消費端都把
+    # 「連判斷檔都沒有」與「錨點是負的」一起印成「還沒寫下目標年度」——**都不是**。
+    # 判準一句話：**這一格是「我們還沒做」，還是「做了而方法不適用」？** 兩者不得同形。
+    _known = {"available", "no_horizon", "no_judgment", "method_not_applicable"}
     counts = {
         "input": len(rows),
         "available": sum(1 for r in rows if r["status"] == "available"),
-        "no_horizon": sum(1 for r in rows if r["status"] != "available"),
+        "no_horizon": sum(1 for r in rows if r["status"] == "no_horizon"),
+        "no_judgment": sum(1 for r in rows if r["status"] == "no_judgment"),
+        "method_not_applicable": sum(1 for r in rows if r["status"] == "method_not_applicable"),
+        # 其餘缺料（沒基期觀測／沒那一年的假設／沒現價／沒 target_pe／判斷檔壞了／日期非法）。
+        # 這一格**不是垃圾桶**：它每長大一次就代表有一種缺席還沒有自己的名字。
+        "other_missing": sum(1 for r in rows if r["status"] not in _known),
     }
     payload: dict[str, Any] = {
         "kind": "multi_year",

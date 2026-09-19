@@ -693,12 +693,25 @@ def build_positions(*, state_dir: Path | None) -> Section:
             section.lines.append(f"要幾倍：{multi_absence.reason}（{multi_absence.kind}）")
         else:
             counts = multi.get("counts") or {}
+            # ⚠ 只把「**我們還沒寫**」的列進待辦清單——`method_not_applicable`（方法在這一檔
+            # 不適用，例如基期虧損）與 `no_judgment`（連判斷檔都沒有）不是「還沒寫目標年度」，
+            # 混進同一個數字會讓人去做一件補不了的事（2026-09-19 實測：16 檔裡各有 1 檔）。
             owed = [r.get("ticker") for r in (multi.get("rows") or ())
-                    if r.get("status") != "available"]
+                    if r.get("status") == "no_horizon"]
             line = (f"要幾倍（多年視角）{counts.get('input', '?')} 檔｜算得出 {counts.get('available', '?')}"
                     f"｜**還沒寫下目標年度 {counts.get('no_horizon', '?')}**")
             if owed:
                 line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
+            # 另外兩種缺席各自現形，**不併進上面那個數字**（INV-3）。
+            extra = [(f"方法不適用 {counts.get('method_not_applicable', 0)}"
+                      if counts.get("method_not_applicable") else ""),
+                     (f"沒有判斷檔 {counts.get('no_judgment', 0)}"
+                      if counts.get("no_judgment") else ""),
+                     (f"其他缺料 {counts.get('other_missing', 0)}"
+                      if counts.get("other_missing") else "")]
+            extra = [e for e in extra if e]
+            if extra:
+                line += "｜" + "、".join(extra)
             section.lines.append(line)
 
         volume = basket.get("volume_filter") or {}

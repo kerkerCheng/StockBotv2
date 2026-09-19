@@ -1770,8 +1770,17 @@ async function renderMultiYear() {
   const intro = el('section', 'panel callout');
   intro.appendChild(el('p', 'arg-text', payload.this_is_not || ''));
   const counts = payload.counts || {};
+  // ⚠ 四種缺席各自現形，不併成一個「還沒寫」（INV-3）：「我們還沒寫目標年度」是待辦，
+  // 「方法不適用」是已經算過而且知道答案沒有意義，兩者要做的事完全不同。
+  const absences = [
+    counts.no_horizon ? `還沒寫下目標年度 ${counts.no_horizon}` : '',
+    counts.method_not_applicable ? `方法不適用 ${counts.method_not_applicable}` : '',
+    counts.no_judgment ? `沒有判斷檔 ${counts.no_judgment}` : '',
+    counts.other_missing ? `其他缺料 ${counts.other_missing}` : '',
+  ].filter(Boolean);
   intro.appendChild(el('p', 'note',
-    `${counts.input || 0} 檔｜算得出 ${counts.available || 0}｜還沒寫下目標年度 ${counts.no_horizon || 0}`));
+    `${counts.input || 0} 檔｜算得出 ${counts.available || 0}`
+    + (absences.length ? `｜${absences.join('｜')}` : '')));
   app.appendChild(intro);
 
   (payload.rows || []).forEach((row) => {

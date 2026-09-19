@@ -202,7 +202,10 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             counts = payload.get("counts") or {}
             print(f"✓ multi_year → {path.name}（{path.stat().st_size:,} bytes；"
                   f"{counts.get('input', 0)} 檔／算得出 {counts.get('available', 0)}"
-                  f"／還沒寫下目標年度 {counts.get('no_horizon', 0)}）")
+                  f"／還沒寫下目標年度 {counts.get('no_horizon', 0)}"
+                  f"／方法不適用 {counts.get('method_not_applicable', 0)}"
+                  f"／沒有判斷檔 {counts.get('no_judgment', 0)}"
+                  f"／其他缺料 {counts.get('other_missing', 0)}）")
     # 結構讀圖：唯讀 ledger ＋ 查圖比對。與 basket 互不相干，所以**各自 fail-soft**。
     if getattr(args, "structure_readings", False):
         total += 1
