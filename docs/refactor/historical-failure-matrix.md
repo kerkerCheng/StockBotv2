@@ -28,6 +28,48 @@
 
 ---
 
+## ⚠ 2026-09-20 重驗（總檢驗第一步）
+
+**為什麼要重驗：** 這份矩陣是八項 completion gate 第 8 項的對象，也就是「整體驗收」的起點。
+但 2026-09-20 抽驗時發現它**自己已經腐壞**——標 🔴「無保護」的那幾筆，多數早就有保護了。
+**拿一份腐壞的清單去驗收，會把已解的當待辦、也可能把真紅的漏掉。**
+
+### 7 筆 🔴 的重驗：**6 筆已解、1 筆部分解**
+
+| 編號 | 原記錄 | 2026-09-20 實測 | 結論 |
+|---|---|---|---|
+| **F-03** | TSMC cohort 恆 `market_missing`／`fx_missing`，真因是 registry | `co:tsmc` 的 `research_ticker`＝`TSM`、`market_currency`＝`USD` 都在；`resolve_company('TSM')` 正常回 `co:tsmc` | ✅ **已解** |
+| **F-07** | `--terminal-status revised` 成功回傳後編號原封不動重生 | `action_card.py` 有 `revised_decision_stale` → `reassess_revised_epoch`，理由逐字「舊 epoch 的 decision 不再代表目前判斷」。**但「編號不再重生」沒有直接驗到** | 🟡 **部分解**，仍需一條守門測試 |
+| **F-09** | filing watcher 78 筆 new 全躺在 `pending`，管子只接一頭 | 心跳段 3 每天印「**未 triage N**｜零＝真的沒有，不是沒跑」（Phase 2 交付）；今日 pending **1**、go 572、no_go 549 | ✅ **已解**（常駐計數器讓堆積自己現形） |
+| **F-10** | `build_ranking_view` 交付時 production 呼叫端 **0** | 實測 **6 個** production 呼叫端 | ✅ **已解** |
+| **F-26** | 沒有一條通用的「gate 觸發率／清除率」稽核 | `audit invariants` 的 **`GateDiscrimination`** 正是那條：量過三條 lane 64 個 gate 的觸發率、24 個樣本夠的也量得出清除率 | ✅ **已解** |
+| **F-32** | footer 的 `live_choices=0` 與 outcome 的 1 筆 live fill 互相矛盾（標「**仍開**」「**現在就是紅的**」） | 實測 `positions.json` 的 counters：`live_choices: 1`、`live_fills: 1`——**兩個 surface 已一致** | ✅ **已解** |
+| **F-33** | `current_holdings` 用裸 `except Exception` 把三種狀況壓成一個 | 仍有 `except Exception`，但**已不是裸的**：記 log（含 `exc_info`）、回傳 `failure`（例外類型）與 `failure_kind`（credentials／transport／unknown 三態），且「Sheet 真的沒持股」單獨走 `status: available, rows: []` | ✅ **已解**（三種狀況已分開） |
+
+### 8 筆 🟡 抽驗 5 筆：**3 筆已解、2 筆仍部分**
+
+| 編號 | 2026-09-20 實測 | 結論 |
+|---|---|---|
+| **F-01** | 未命中時的訊息逐字：「registry 找不到 `research_ticker='ZZZZ'`。⚠ **「找不到」與「不存在」是兩個 claim**——請先確認它是否需要 onboard」 | ✅ **已解**（正是原記錄說「沒有保護」的那一項） |
+| **F-11** | `GO_AUTHORIZATION` 實測 **3 個** production 消費端（原記錄「消費端 0」） | ✅ **已解** |
+| **F-22** | `_resolve_reference` 已抽成單一函式，註解逐字「重用同一支，避免診斷和實際判準各講一套」 | ✅ **已解**（L15 的修法已落地） |
+| **F-27** | `snapshot_date`／`bar_date` 已於 2026-08-14 拆開，**但 `bar_date` 覆蓋只有 1,101/1,858（59%）**——⚠ 這個數字本身寫在程式註解裡，也可能已腐壞 | 🟡 **部分解** |
+| **F-36** | 判準（「引用自家文件的現況陳述前先跑查證命令」）有在用——ROADMAP 現有 5 處附查證命令——但**沒有機械保護** | 🟡 **判準在用，無 executable protection** |
+
+**未重驗：** F-05、F-06、F-08（🟡），以及 21 筆 ✅（它們宣稱的 20 個保護測試檔**全部存在**，
+且 2026-09-20 全量 2,810 passed，所以先當可信）。
+
+### 重驗後的分佈
+
+```
+原記錄：✅21 ／ 🟡8 ／ 🔴7
+重驗後：✅30 ／ 🟡5 ／ 🔴0        （🔴 歸零；🟡 剩 F-07、F-27、F-36 ＋ 未驗的 F-05、F-06、F-08）
+```
+
+⚠ **真正還缺 executable protection 的只剩三筆**（F-07 的「編號不重生」、F-27 的 `bar_date` 覆蓋、
+F-36 的「引用前先查證」），而 **F-36 那一條本質上防不了**——它是自律問題，
+做一個會誤報的 linter 來防它本身就是過度工程（L16-4）。
+
 ## 1. 事故矩陣
 
 ### 1.1 F-IDENT — Identity 不一致
