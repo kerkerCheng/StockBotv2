@@ -1,0 +1,4 @@
+Source URL: https://www.einpresswire.com/article/939190081/newphotonics-expands-near-package-optics-pic-series-with-laser-integrated-serviceable-high-density-6-4t-optical-engine
+
+Excerpt:
+NewPhotonics introduced the NPC50506 6.4T DR32 NPO optical engine chipset with integrated laser, designed for serviceable Open CPX-compliant NPO while preserving independent testability and field replacement; sampling is stated for Q3 2026 and the HDK reference design for Q4 2026.

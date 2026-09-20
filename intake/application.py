@@ -115,7 +115,8 @@ def _check_graph_write_readiness(driver) -> None:
         legacy = session.run(
             """
             MATCH ()-[r]->()
-            WHERE NOT type(r) IN ['CITES', 'ABOUT'] AND r.edge_key IS NULL
+            WHERE NOT type(r) IN ['CITES', 'ABOUT', 'QUOTES', 'FROM_DOC']
+              AND r.edge_key IS NULL
             RETURN count(r) AS count
             """
         ).single()["count"]
@@ -131,6 +132,20 @@ def _check_graph_write_readiness(driver) -> None:
         raise RuntimeError(
             f"graph schema is not ready: expected {GRAPH_SCHEMA_VERSION}, got {version!r}"
         )
+    # ⚠⚠ `QUOTES`／`FROM_DOC` 於 2026-09-20 加入排除清單——**它們是逐字層的走訪關係，
+    # 不是 canonical knowledge edge，本來就沒有 `edge_key` 的概念**（與 `CITES`／`ABOUT` 同性質：
+    # `(Source)-[:FROM_DOC]->(SourceDoc)`、`(n)-[:QUOTES]->(Source)`，見 loader/load_to_neo4j.py）。
+    #
+    # 事發：V1（逐字入圖，2026-09-18）把 1,105 段逐字載進圖，產生 QUOTES 2,968 ＋ FROM_DOC 1,058
+    # ＝ **4,026 筆被誤判成 legacy**，於是這個 gate 對**所有** RA 一律回
+    # `partial: graph reconciliation is incomplete`——**入圖閘門從那天起全面卡死**。
+    # 2026-09-20 執行 pq2 [570] 時才撞到：它是 09-12 prepare 的，V1 之後沒有人 apply 過 RA，
+    # 所以中間兩天沒有任何東西會叫。與 2026-09-04 的 `legacy=1` 是同一個閘門、不同的成因
+    # （那次是重複節點，見 loader/migrate_entity_dedup_20260904.py）。
+    #
+    # ⚠ 這不是放寬 gate：`unprojected`（有 edge_key 卻沒投影）與 `orphaned_evidence` 一字未動，
+    # legacy 仍然會抓真正未投影的 canonical 關係。改的是**分類錯誤**——把逐字層關係算成
+    # 未投影的知識邊。
     if unprojected or legacy or orphaned:
         raise RuntimeError(
             "graph reconciliation is incomplete: "

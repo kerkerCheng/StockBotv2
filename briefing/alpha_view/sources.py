@@ -366,8 +366,24 @@ def _select_method(records: Sequence[Any]) -> tuple[str, str | None]:
 
 
 def _has_method_records(records: Sequence[Any], method: str) -> bool:
-    """ledger 裡有沒有這個 method 的未撤回估值假設（選取仍由 build_valuation 依 as-of／期間決定）。"""
-    return any(getattr(r, "method", None) == method and not getattr(r, "retracted", False) for r in records)
+    """ledger 裡有沒有這個 method 的**生效**估值假設（選取仍由 build_valuation 依 as-of／期間決定）。
+
+    ⚠⚠ **「生效」必須同時排除被 supersede 的**（2026-09-20 修）。撤回的寫法是
+    **append 一筆 `retracted=True` 的新紀錄去 supersede 舊筆**（append-only ledger，
+    舊筆原地不動、`retracted` 永遠是 `False`）——所以只看每筆自己的 `retracted`
+    等於**完全看不到撤回**。
+
+    實測（pq2 [637] 執行當天）：AXTI 依核准 append 了 `target_ev_to_sales` 並 `--retract`
+    了 `target_pe`，而 `_select_method` 仍回報「兩種 method 並存」並拒絕選——**撤回無效**。
+    這條路先前沒被走過：9 檔 ev_to_sales 都是一開始就只有那一種，AXTI 是第一檔真的做
+    「本益比法 → EV／Sales」切換的。
+    """
+    superseded = {getattr(r, "supersedes_id", None) for r in records
+                  if getattr(r, "supersedes_id", None)}
+    return any(getattr(r, "method", None) == method
+               and not getattr(r, "retracted", False)
+               and getattr(r, "assumption_id", None) not in superseded
+               for r in records)
 
 
 def _balance_input(build: ContextBuild) -> BalanceSheetInput:

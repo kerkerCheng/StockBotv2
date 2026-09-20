@@ -1,0 +1,126 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Q3 樣品或 Q4 HDK 未交付、沒有客戶 qualification，或系統測試顯示 integrated-laser socket 架構仍需外置光源或無法 field-replace，則下修或移除此 counter-path claim。",
+      "id": "newphotonics_npc50506_2026_09_09_cl1",
+      "source_ids": [
+        "newphotonics_npc50506_2026_09_09_s1",
+        "newphotonics_npc50506_2026_09_09_s2",
+        "newphotonics_npc50506_2026_09_09_s3",
+        "newphotonics_npc50506_2026_09_09_s4"
+      ],
+      "statement": "NewPhotonics 自報 NPC50506 以 integrated laser 與 serviceable socketed Open CPX 架構形成不依賴 external light source 的 6.4T NPO 產品路徑；目前仍為 samples／reference-design 階段，未有具名客戶或量產證據。",
+      "subject_id": "prod:newphotonics_npc50506"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "prod:newphotonics_npc50506",
+      "id": "newphotonics_npc50506_2026_09_09_e1",
+      "relation": "develops",
+      "source_ids": [
+        "newphotonics_npc50506_2026_09_09_s1"
+      ],
+      "src_id": "co:newphotonics"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:near_package_optics",
+      "id": "newphotonics_npc50506_2026_09_09_e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "newphotonics_npc50506_2026_09_09_s1",
+        "newphotonics_npc50506_2026_09_09_s2"
+      ],
+      "src_id": "prod:newphotonics_npc50506"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "co:newphotonics",
+      "name": "NewPhotonics",
+      "role": "disruptor",
+      "source_ids": [
+        "newphotonics_npc50506_2026_09_09_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "NPC50506"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "prod:newphotonics_npc50506",
+      "name": "NPC50506 6.4T DR32 NPO optical engine chipset",
+      "role": null,
+      "source_ids": [
+        "newphotonics_npc50506_2026_09_09_s1",
+        "newphotonics_npc50506_2026_09_09_s2"
+      ],
+      "type": "Product"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "NPO"
+      ],
+      "attributes": {},
+      "confidence": 0.75,
+      "id": "tech:near_package_optics",
+      "name": "Near-Package Optics",
+      "role": null,
+      "source_ids": [
+        "newphotonics_npc50506_2026_09_09_s1",
+        "newphotonics_npc50506_2026_09_09_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "newphotonics_npc50506_2026_09_09",
+    "evidence_tier": 2,
+    "origin_entity": "NewPhotonics",
+    "permission_basis": "Public issuer announcement distributed through EIN Presswire; retain canonical URL and research-relevant excerpts only.",
+    "published_at": "2026-09-09",
+    "publisher": "NewPhotonics via EIN Presswire",
+    "retrieved_at": "2026-09-13",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "NewPhotonics Expands Near-Package Optics PIC Series with Laser Integrated, Serviceable High-Density 6.4T Optical Engine",
+    "url": "https://www.einpresswire.com/article/939190081/newphotonics-expands-near-package-optics-pic-series-with-laser-integrated-serviceable-high-density-6-4t-optical-engine"
+  },
+  "sources": [
+    {
+      "id": "newphotonics_npc50506_2026_09_09_s1",
+      "locator": "opening paragraph",
+      "quote": "NewPhotonics Ltd. ... today introduced the NPC50506 6.4T DR32 NPO optical engine chipset with integrated laser."
+    },
+    {
+      "id": "newphotonics_npc50506_2026_09_09_s2",
+      "locator": "architecture paragraph",
+      "quote": "Designed for serviceable Open CPX-compliant near-packaged optics, the compact engine moves optical conversion closer to the switch or XPU while preserving independent testability and field replacement."
+    },
+    {
+      "id": "newphotonics_npc50506_2026_09_09_s3",
+      "locator": "product-family paragraph",
+      "quote": "the NPC50506 introduces a compact form factor, high-density 6.4T optical engine with integrated laser to eliminate the complex system design of alternate solutions that use an external light source."
+    },
+    {
+      "id": "newphotonics_npc50506_2026_09_09_s4",
+      "locator": "availability paragraph",
+      "quote": "NPC50506 will sample in Q3 2026, and the HDK reference design will be available in Q4 2026."
+    }
+  ]
+}
