@@ -454,7 +454,19 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         return 0
     _print_segment_counters(pending_count, fired)
     if not decision_jobs and not gap_jobs and not lead_batch and not classification_gaps:
-        print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
+        # ⚠⚠ **「上限為 0」與「真的沒有」不得同形**（L12／L13-2，2026-09-20 實測）。
+        # Phase 2（D12）把 `drain_limit_per_run` 歸零讓 daily 不做研究，而本行原本一律印
+        # 「佇列已空」——實測當天 `drain` 說空、`drain --limit 20` 卻列出 **14 件**。
+        # 那句假話正好擋住 research-drain skill，因為該 skill 逐字規定「順序只認 drain 的輸出」。
+        # ⚠ 這不是放寬限制：limit 照舊生效、一件都不會多做；只是把「為什麼沒有」說出來。
+        if not limit:
+            waiting = sum(1 for l in store["leads"].values()
+                          if l.get("status") in ("triaged_go", "researching"))
+            print(f"（研究層已關閉：`drain_limit_per_run=0`（D12：daily 不做研究）。"
+                  f"**這不是「沒有東西」**——待研究 lead 實際有 {waiting} 條。"
+                  f"互動 session 要做研究請用 `--limit <N>` 覆寫。）")
+        else:
+            print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
         _print_withheld(withheld_jobs)
         return 0
     if decision_jobs or lead_batch or gap_jobs:

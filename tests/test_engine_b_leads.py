@@ -909,3 +909,38 @@ def test_parked_without_expiry_ignores_free_text_parked_reason() -> None:
         "parked_reason": "governance_only_bylaw_quorum_no_supply_chain_or_thesis_content"})
 
     assert {row["lead_id"] for row in leads.parked_without_expiry(store)} == {lead_id}
+
+
+def test_one_broken_parked_lead_does_not_block_the_whole_triage(monkeypatch, tmp_path, capsys) -> None:
+    """⚠⚠ **一筆壞掉的舊 parked lead 不得阻斷整條分類層**（2026-09-20 實測）。
+
+    事發：triage 一條**全新的** pending lead 時整個命令失敗，錯誤是
+    「lead 沒有 trace backlog receipt」——而**壞掉的不是被 triage 的那一條**，
+    是一條 entity 有交集的舊 parked lead（全庫當時有 4 條缺 `trace_status`，
+    都是 2026-07 的資料，早於 [321] 把 trace 併入 event_watch registry）。
+
+    後果有三層，每一層都比上一層難發現：
+    ①分類層是 daily 排程在跑的，所以一筆舊髒資料可以擋住**每天**的分流；
+    ②錯誤訊息指向的是**別條 lead**，看的人會去檢查錯的東西；
+    ③triage 失敗時新 lead 留在 `pending`，而「沒有新 lead」與「triage 壞了」同形。
+
+    修法：skip 那一筆**並印警告**（INV-3：不得靜默），triage 本身照常完成。
+    ⚠ 這不是放寬——被跳過的 watch 會 `reactivate` 回 active，等 receipt 補上再叫醒。
+    """
+    store = leads.empty_store()
+    fresh, _ = leads.register(store, source="x:test", url="https://x.io/fresh")
+    store["leads"][fresh]["entities"] = {"tickers": ["AMD"], "company_ids": ["co:amd"]}
+    broken, _ = leads.register(store, source="x:test", url="https://x.io/broken")
+    leads.triage(store, broken, go=True, tier=4, reason="先讓它成為 parked",
+                 classification={"content_type": "sentiment",
+                                 "decision_impact": "confidence_only", "reason": "x"})
+    store["leads"][broken]["status"] = "parked"
+    store["leads"][broken]["entities"] = {"tickers": ["AMD"], "company_ids": ["co:amd"]}
+    store["leads"][broken]["refs"] = {}          # ← 缺 trace_status，就是那個壞形狀
+
+    # triage 新 lead 必須成功，不得因為那一筆而整個失敗。
+    leads.triage(store, fresh, go=True, tier=4, reason="新 lead 照常分流",
+                 classification={"content_type": "structural_fact",
+                                 "decision_impact": "candidate_set", "reason": "x"})
+    assert store["leads"][fresh]["status"] == "triaged_go"
+    assert store["leads"][broken]["status"] == "parked", "壞掉那筆不該被硬拉回來"

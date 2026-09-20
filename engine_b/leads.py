@@ -9,6 +9,8 @@ metadata，升格入圖仍走 lead-intake／source-trace／Research Action 核�
 """
 from __future__ import annotations
 
+import sys as _sys
+
 import hashlib
 import json
 import os
@@ -959,6 +961,8 @@ def _requeue_related_trace_backlog(
         return []
 
     requeued: list[str] = []
+    #: 重排失敗而被跳過的（缺 trace receipt 的舊 parked lead）。**不得靜默丟掉**（INV-3）。
+    skipped: list[dict[str, str]] = []
     # --- 主路徑：Event Watch registry ---
     watch_data = ew.load_watches()
     covered: set[str] = {
@@ -982,17 +986,36 @@ def _requeue_related_trace_backlog(
                 touched = True
                 continue
             shared = watch.get("woken_by", {}).get("shared_entities") or []
-            requeue_trace(
-                store,
-                lead_id,
-                trigger=f"related_triaged_lead:{event_lead_id}",
-                reason=(
-                    f"Event Watch {watch['watch_id']} 觸發：新 triage PASS lead "
-                    f"{event_lead_id} 與等待中的追源共用具名標的 {', '.join(shared)}"
-                    "；事件觸發 bounded pq1 重查"
-                ),
-                requeued_at=event_at,
-            )
+            try:
+                requeue_trace(
+                    store,
+                    lead_id,
+                    trigger=f"related_triaged_lead:{event_lead_id}",
+                    reason=(
+                        f"Event Watch {watch['watch_id']} 觸發：新 triage PASS lead "
+                        f"{event_lead_id} 與等待中的追源共用具名標的 {', '.join(shared)}"
+                        "；事件觸發 bounded pq1 重查"
+                    ),
+                    requeued_at=event_at,
+                )
+            except LeadStateError as exc:
+                # ⚠⚠ **一筆壞掉的 parked lead 不得阻斷整個 triage**（2026-09-20 實測）。
+                # 事發：triage 一條全新的 pending lead 時整個命令失敗，錯誤是
+                # 「lead 沒有 trace backlog receipt」——**那條壞掉的不是被 triage 的那條**，
+                # 是一條 entity 有交集的**舊 parked lead**（全庫實測 4 條缺 receipt）。
+                # 分類層是 daily 排程在跑的，所以這等於一筆舊髒資料可以擋住每天的分流，
+                # 而且錯誤訊息指向的是別條 lead——看的人會去檢查錯的東西。
+                # ⚠ 改成 skip **並且計數**（INV-3：不得靜默）：跳過的進 `skipped` 回給呼叫端，
+                # 由 `classification-health` 之類的常駐檢查現形，而不是讓它安靜消失。
+                skipped.append({"lead_id": lead_id, "watch_id": watch["watch_id"],
+                                "reason": str(exc)})
+                # 不靜默：daily 的 stderr 會進 heartbeat_task.log，所以這行有消費端。
+                print(f"警告：跳過重排 {lead_id}（{exc}）——該 parked lead 缺 trace receipt，"
+                      "triage 本身照常完成", file=_sys.stderr)
+                ew.reactivate(watch_data, watch["watch_id"],
+                              note=f"重排失敗（{exc}）——待修 trace receipt 後再叫醒")
+                touched = True
+                continue
             # 稽核欄位：哪個事件把它叫醒的、由哪個 watch 判定。消化標記已移進 watch，
             # 但「誰觸發的」仍留在 lead 上——它是這筆 lead 的歷史，不是等待條件。
             candidate.setdefault("refs", {}).update({
@@ -1010,6 +1033,9 @@ def _requeue_related_trace_backlog(
     # 沒有 fallback 路徑。[321] 遷移後實測「未被 registry 涵蓋的 backlog」為 0 筆，
     # 留一份平行實作只會讓兩邊再度偏離（L16：重造品會開始偏離，而偏離不報錯）。
     # 未涵蓋的 lead 由 trace_backlog 以 wake_state=unwatched 現形，交人處置。
+    # ⚠ `skipped` 刻意不併進回傳值（那會動 contract 與所有呼叫端）——它已在發生當下
+    # 印到 stderr，而 daily 的 stderr 進 heartbeat_task.log。要讓它有常駐計數器是
+    # 另一件事（開發項），不在這次的修復範圍：這次只保證**一筆壞資料不再擋住整個分類層**。
     return sorted(requeued)
 
 

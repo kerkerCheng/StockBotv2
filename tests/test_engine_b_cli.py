@@ -623,3 +623,43 @@ def test_drain_limit_zero_selects_nothing_of_every_kind(tmp_path, capsys, monkey
         if row.get("kind") in ("lead", "decision_work_order", "assessment_gap_item")
     ]
     assert selected == [], f"limit=0 仍選出了 {len(selected)} 件工作：{selected}"
+
+
+def test_drain_does_not_call_a_closed_research_layer_an_empty_queue(tmp_path, capsys) -> None:
+    """⚠⚠ **「上限為 0」與「真的沒有」不得同形**（L12／L13-2）。
+
+    事發（2026-09-20）：Phase 2（D12）把 `drain_limit_per_run` 歸零讓 daily 不做研究，
+    而 drain 一律印「（pq1 佇列已空——無 dispatched work order 或可研究 lead）」。
+    當天實測 `drain` 說空、`drain --limit 20` 卻列出 **14 件**——**那句話是假的**。
+
+    代價是具體的：`skills/research-drain/SKILL.md` 逐字規定「順序**只認**
+    `engine_b.cli drain` 的輸出」，所以一句假的「已空」會讓整條研究流程靜默停住，
+    而且**不會有任何東西變紅**——正是 L13-2 說的「成功與失敗在同一個訊號上同形」。
+
+    ⚠ 這條測試鎖的是**說法**不是**限制**：limit 照舊生效，一件都不會多做。
+    """
+    path = tmp_path / "pending_leads.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="edgar:COHR", url="https://x.io/closed")
+    leads.triage(store, lead_id, go=True, tier=1, reason="強", classification=PASS_CLASSIFICATION)
+    leads.save(store, path)
+
+    assert cli.main(["--leads", str(path), "drain",
+                     "--routine-config", _routine_with_limit(tmp_path, limit=0)]) == 0
+    out = capsys.readouterr().out
+    assert "佇列已空" not in out, "研究層被關掉時說「佇列已空」是假的——那條 lead 還在"
+    assert "drain_limit_per_run=0" in out, "要說出為什麼沒有，不是只說沒有"
+    assert "1 條" in out, "要印出實際待研究條數，否則讀的人無從分辨兩種情況"
+    assert "--limit" in out, "要告訴互動 session 怎麼覆寫"
+
+
+def test_drain_still_says_empty_when_the_queue_is_genuinely_empty(tmp_path, capsys) -> None:
+    """**這個機制必須會滅**（L14-4）：真的空的時候照舊說空，否則它就變成恆亮的噪音。"""
+    path = tmp_path / "pending_leads.json"
+    leads.save(leads.empty_store(), path)
+
+    assert cli.main(["--leads", str(path), "drain",
+                     "--routine-config", _routine_with_limit(tmp_path, limit=5)]) == 0
+    out = capsys.readouterr().out
+    assert "佇列已空" in out
+    assert "drain_limit_per_run=0" not in out
