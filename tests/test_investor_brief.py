@@ -127,7 +127,15 @@ def test_read_model_without_brief_is_missing_and_panel_is_optional() -> None:
     assert analyst.brief.optional and analyst.brief.status == "missing"
     assert "brief：missing" in analyst.readiness.optional_unavailable
     assert not any(b.startswith("brief") for b in analyst.readiness.blockers)
+    # ⚠ 這條斷言的用途是「**brief panel 不得憑空多出不屬於 read model 的行**」，
+    # 2026-09-20 加 `multiple_question` 時它正確地抓到了改動。多的那一格仍然必須
+    # 來自同一個 read model（不是前端自己算的），所以加進 allowed 而不是放寬斷言。
+    # ⚠ 這個 fixture 沒有 `multiple_horizon`，所以 `multiple_question` 應該是 None
+    # ——「沒寫倍率射程就不印那一句」是刻意的（71/73 檔都沒寫，逐檔印是噪音）。
+    assert ib.multiple_question is None, "沒寫倍率射程時首屏不該多一行"
     allowed = {id(d) for d in ib.slots} | {id(ib.scale), id(ib.status_light)}
+    if ib.multiple_question is not None:
+        allowed.add(id(ib.multiple_question))
     assert all(id(line.datum) in allowed for line in analyst.brief.lines)
 
 

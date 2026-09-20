@@ -1415,6 +1415,23 @@ function briefCard(payload, view) {
     node.appendChild(priceScale(scale.value, payload.price_context || null,
       sellSide && typeof sellSide.value === 'number' ? sellSide.value : null));
   }
+  // 2026-09-20（Phase 7 選項 a）：那把尺**不動**，另外加一句「要翻倍需要什麼為真」。
+  // ⚠ 只在這一檔寫下了倍率射程時才有這一行——沒寫就不印（不是印「還沒寫」；71/73 檔都沒寫，
+  // 逐檔印是噪音，全體缺口由心跳段 4 的常駐計數器負責）。
+  // ⚠ 它回答的是**另一個問題**：那把尺問「明年值多少」，這一句問「這個結構允不允許翻倍」。
+  const mq = lines.brief_multiple_question && lines.brief_multiple_question.datum;
+  if (mq) {
+    const box = el('div', 'attention');
+    box.appendChild(el('div', 'attention-head', '要翻倍需要什麼為真'));
+    const sentence = mq.value && mq.value.sentence;
+    if (sentence) {
+      box.appendChild(el('div', 'attention-body', String(sentence)));
+    } else {
+      // 缺席也要說得出是哪一種（方法不適用 ≠ 還沒做）——理由由產生它的那段程式宣告。
+      box.appendChild(el('div', 'attention-body', mq.reason || '算不出來'));
+    }
+    node.appendChild(box);
+  }
   // 2026-09-15 使用者回饋：走勢圖住第一個 block（尺下面）。它是脈絡不是訊號（priceCard 內文照舊）。
   node.appendChild(priceCard(payload));
   return node;

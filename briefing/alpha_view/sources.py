@@ -778,8 +778,20 @@ def fetch_alpha_investment_view(
     except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
         brief_records, brief_errors = [], [f"短評 ledger 讀取失敗：{type(exc).__name__}"]
 
+    # 多年視角（2026-09-20，Phase 7 選項 a）：**在這裡取料，不在 builder 裡**。
+    # ⚠ 它會跑金融模型，所以只能在 materialize 路徑上；APP 呈現契約禁止 request path 跑模型
+    # （`tests/test_webapp_request_path.py` 守著）。沒寫 `multiple_horizon` 的檔在
+    # `_horizon_from_judgment` 就返回，不建階梯，所以 71/73 檔的成本接近 0。
+    try:
+        from briefing.multi_year import build_multi_year_view
+
+        multi_year_view = build_multi_year_view(str(resolved_ticker))
+    except Exception:  # noqa: BLE001 — 單檔失敗不該讓整份 view 掛掉；缺口由 multi_year artifact 報
+        multi_year_view = None
+
     return build_alpha_investment_view(
         build=build, signal=signal, signal_reason=signal_reason,
+        multi_year_view=multi_year_view,
         dependency_paths=causal.get("dependency_paths", ()),
         substitution_paths=causal.get("substitution_paths", ()),
         supply_exposure=causal.get("supply_exposure", ()),

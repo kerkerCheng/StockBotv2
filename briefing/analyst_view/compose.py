@@ -350,11 +350,19 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
 
 
 def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """投資人短評（optional）：七句＋一把尺＋一顆燈。**每一格都是 read model 的同一個 Datum**。"""
+    """投資人短評（optional）：七句＋一把尺＋一顆燈＋（有寫倍率射程時）一句「要翻倍需要什麼為真」。
+
+    **每一格都是 read model 的同一個 Datum**。2026-09-20 起多一句：它**只在這一檔寫下了
+    `multiple_horizon` 時才存在**——沒寫就沒有那一行（不是印「還沒寫」；71/73 檔都沒寫，
+    逐檔印是噪音，全體缺口由心跳段 4 的常駐計數器負責）。
+    """
     ib = view.investor_brief
     lines = (tuple(_line(d.key, d.label, d, "brief") for d in ib.slots)
              + (_line("brief_scale", ib.scale.label, ib.scale, "brief"),
-                _line("brief_status_light", ib.status_light.label, ib.status_light, "brief")))
+                _line("brief_status_light", ib.status_light.label, ib.status_light, "brief"))
+             + ((_line("brief_multiple_question", ib.multiple_question.label,
+                       ib.multiple_question, "brief"),)
+                if ib.multiple_question is not None else ()))
     return AnalystPanel(
         key="brief", title="投資人短評：這檔在賭什麼（optional）",
         questions=("q0_story",),

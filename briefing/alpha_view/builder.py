@@ -1374,8 +1374,99 @@ def _brief_values(*, ir: ImpliedReturnSection, payoff: PayoffScenarioSection, co
     return values
 
 
+def _multiple_sentence(view: Any) -> str:
+    """把四級階梯壓成**一句人話**（首屏的單位是句不是格）。
+
+    ⚠ **措辭精度本身就是一個 claim**（L11-1）。`revenue_growth = 4.651` 的語意是
+    橋的 `base × (1 + growth)`——也就是**成長 465%、變成 5.65 倍**，
+    **不是「成長 4.65 倍」**。後者會被讀成「變成 4.65 倍」，差了整整一倍的量級。
+    （2026-09-20 發現：ROADMAP 與啟動 prompt 多處就是用那個會誤導的寫法。）
+    """
+    def _driver_phrase(text: str) -> str:
+        name, _, rest = text.partition(" = ")
+        try:
+            value = float(rest)
+        except ValueError:
+            return text
+        if name.startswith("revenue_growth"):
+            scope = name[name.find("[") + 1:name.rfind("]")] if "[" in name else "總營收"
+            return f"{scope}營收得成長 {value * 100:,.0f}%（變成 {1 + value:,.2f} 倍）"
+        if name.startswith("operating_margin_delta"):
+            return f"營益率得再加 {value * 100:,.1f} 個百分點"
+        return f"{name} 得是 {value:,.4g}"
+
+    reachable, unreachable = [], []
+    for step in view.ladder:
+        solved = [s for s in step.solutions if s.status == "solved"]
+        if solved:
+            phrases = "；".join(_driver_phrase(f"{s.driver}[{s.scope}] = {s.implied_value}")
+                                for s in solved)
+            reachable.append(f"**{step.target_return_multiple:g} 倍**要 {phrases}")
+        else:
+            unreachable.append(f"{step.target_return_multiple:g}")
+    head = (f"到 {view.horizon.isoformat()}（距基期 {view.span_years} 年）："
+            if view.horizon and view.span_years is not None else "")
+    parts = []
+    if reachable:
+        parts.append("；".join(reachable))
+    if unreachable:
+        parts.append(f"**{'／'.join(unreachable)} 倍：所有 driver 拉到極限都做不到**")
+    body = "。".join(parts) if parts else "四級階梯都算不出來"
+    return head + body + "。⚠ 這不是預測，是「要 N 倍，哪一格得為真」——合不合理由你判斷。"
+
+
+def _multiple_question(view: Any | None, *, reference_day: date) -> Datum | None:
+    """首屏的「要翻倍需要什麼為真」（2026-09-20，Phase 7 選項 a）。
+
+    **這是純函式**：`view` 是已經算好的 `MultiYearView`，由呼叫端注入——
+    與 `payoff`／`downside`／`fundamental_model` 等 section 完全一致。
+    ⚠ 第一版寫成讓 builder 自己 `build_multi_year_view(ticker)`，於是 builder 開始讀
+    檔案系統並跑金融模型；守門測試當場抓到（一個本來不碰真實資料的 fixture 算出了
+    COHR 的 FY2030）。**builder 是組裝器不是取料器**，那條界線不該為了少傳一個參數而破。
+
+    **只在這一檔寫下了 `multiple_horizon` 時才回 Datum**；沒寫回 `None`＝首屏不印那一句。
+    逐檔印「還沒寫」是噪音（71/73 都沒寫），全體缺口由心跳段 4 的常駐計數器負責。
+
+    ⚠ **不替使用者下結論**：只說「要 N 倍，哪個 driver 得是多少」與「哪幾級做不到」，
+    不說那合不合理——那是人要判斷的（`RETURN_MULTIPLE_LADDER` 的問句本來就不是門檻）。
+    """
+    if view is None:
+        return None
+    if getattr(view, "status", None) in ("no_horizon", "no_judgment") or view.horizon is None:
+        return None                                    # 還沒寫倍率射程 → 首屏不印這一句
+    if view.status == "method_not_applicable":
+        # ⚠ 缺席**不得帶值**（契約擋在型別層：缺席與 0 不得同形）。這一格是「已經算過、
+        # 而且知道答案沒有意義」，與「還沒做」不同——所以 absence_kind 宣告成
+        # `method_not_applicable`，由產生缺席的這裡自己宣告，呈現層不 parse 理由句（L16）。
+        return missing("brief_multiple_question", "要翻倍需要什麼為真",
+                       view.reason or "估值方法在這一檔不適用",
+                       authority=A_IMPLIED_RETURN, absence_kind="method_not_applicable")
+    if view.status != "available":
+        # 有寫倍率射程、但其他環節缺料（沒現價／沒倍數／沒那一年的假設）——這一種**要說**，
+        # 因為「已經寫了卻算不出來」是我們自己的缺口，與「還沒寫」是兩件事（INV-3）。
+        return missing("brief_multiple_question", "要翻倍需要什麼為真",
+                       view.reason or "多年視角算不出來", authority=A_IMPLIED_RETURN)
+    steps = []
+    for result in view.ladder:
+        solved = [f"{s.driver}[{s.scope}] = {s.implied_value:.4g}"
+                  for s in result.solutions if s.status == "solved"]
+        steps.append({"multiple": result.target_return_multiple, "status": result.status,
+                      "solved": solved,
+                      "unreachable": sorted({s.driver for s in result.unreachable_drivers})})
+    return Datum(
+        key="brief_multiple_question", label="要翻倍需要什麼為真",
+        value={"horizon": view.horizon.isoformat(), "span_years": view.span_years,
+               "applicable": True, "basis": view.basis, "metric_label": view.metric_label,
+               # 首屏印的是這一句；`steps` 留給稽核層，兩者由同一份資料產生。
+               "sentence": _multiple_sentence(view), "steps": steps},
+        status="available", basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day,
+        reason=(f"目標年度 {view.horizon.isoformat()}，距基期 {view.span_years} 年；"
+                "**這不是預測**，是「要 N 倍，某個 driver 得是多少」，合不合理由人判斷"))
+
+
 def _investor_brief_section(
-    records: Sequence[Any], parse_errors: Sequence[str], *, as_of: date | None, today: date, reference_day: date,
+    records: Sequence[Any], parse_errors: Sequence[str], *, multi_year_view: Any | None,
+    as_of: date | None, today: date, reference_day: date,
     ir: ImpliedReturnSection, payoff: PayoffScenarioSection, consensus: ConsensusSection, catalysts: CatalystSection,
     bridge: EarningsBridgeSection, refresh_overall: str, gap: ExpectationGapSection | None = None,
     downside: PayoffScenarioSection | None = None,
@@ -1399,6 +1490,7 @@ def _investor_brief_section(
                   value={"state": refresh_overall, "label": PLAIN_REFRESH_OVERALL.get(refresh_overall, refresh_overall)},
                   status="available", basis="deterministic", authority=A_REFRESH, as_of=reference_day,
                   reason="refresh overall 的白話版；不判斷好壞")
+    multiple_q = _multiple_question(multi_year_view, reference_day=reference_day)
     brief = select_brief([r for r in records], as_of=as_of, today=today)
     if brief is None:
         why = ("短評 ledger 有 " + str(len(parse_errors)) + " 行解析失敗" if parse_errors and not records else
@@ -1407,7 +1499,8 @@ def _investor_brief_section(
                            reason=why, as_of=reference_day, absence_kind="not_yet_recorded")
         slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
                       for key, label in SLOT_LABELS.items())
-        return InvestorBriefSection(meta=meta, slots=slots, scale=scale, status_light=light, brief_id=None, is_not=BRIEF_IS_NOT)
+        return InvestorBriefSection(meta=meta, slots=slots, scale=scale, status_light=light,
+                                    brief_id=None, is_not=BRIEF_IS_NOT, multiple_question=multiple_q)
     values = _brief_values(ir=ir, payoff=payoff, consensus=consensus, catalysts=catalysts, bridge=bridge,
                            today=today, gap=gap, downside=downside)
     filled, absent = fill_brief(brief, values)
@@ -1427,7 +1520,8 @@ def _investor_brief_section(
                        warnings=("短評文字是 session 判斷（append-only ledger），數字由既有 Datum 填入；"
                                  "每一句的引用見各格 evidence_refs",))
     return InvestorBriefSection(meta=meta, slots=tuple(slots), scale=scale, status_light=light,
-                                brief_id=brief.brief_id, is_not=BRIEF_IS_NOT)
+                                brief_id=brief.brief_id, is_not=BRIEF_IS_NOT,
+                                multiple_question=multiple_q)
 
 
 # ---------------------------------------------------------------------------
@@ -1971,6 +2065,8 @@ def build_alpha_investment_view(
     checklist: Mapping[str, Any] | None = None,
     identity: Mapping[str, Any] | None = None,
     fundamental_model: FundamentalModelResult | None = None,
+    #: 已經算好的 `MultiYearView`（2026-09-20）。**builder 不自己算**——它是組裝器。
+    multi_year_view: Any | None = None,
     fundamental_model_reason: str | None = None,
     valuation: ValuationResult | None = None,
     valuation_reason: str | None = None,
@@ -3297,7 +3393,8 @@ def build_alpha_investment_view(
         catalysts=catalyst_section, lifecycle=identity_section.lifecycle, narrative=dict(narrative_context or {}),
         reporting_currency=reporting_currency, reference_day=reference_day)
     brief_section = _investor_brief_section(
-        brief_records, brief_parse_errors, as_of=context.as_of, today=today, reference_day=reference_day,
+        brief_records, brief_parse_errors, multi_year_view=multi_year_view,
+        as_of=context.as_of, today=today, reference_day=reference_day,
         ir=implied_return_section, payoff=payoff_section, consensus=consensus_section, catalysts=catalyst_section,
         bridge=earnings_bridge_section, refresh_overall=refresh_section.overall, gap=expectation_gap_section,
         downside=downside_section)
