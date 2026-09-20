@@ -54,31 +54,33 @@
 >
 > **收尾時**：更新本檔，**下一份 prompt 必須原樣帶著上面這整個「常設授權」小節**。
 >
-> ### ▶ 這一輪的第一件事：**回答一個估值方法論問題——虧損期的錨點要怎麼取**
+> ### ▶ 這一輪的第一件事：**填 `multiple_horizon`（研究工作，逐檔要一手依據）**
 >
-> **Phase 0–7 之中，只剩 Phase 7 的後半與依賴它的 Phase 4b 沒做。**
-> Phase 5 已於 2026-09-19 標 ✅（八項 gate 全過；驗收行使用者定案取「**有賭注的檔都要有對稱的下檔**」，
-> 今天 payoff 與 downside 都是 AXTI／COHR／LITE，3/3）。
+> **Phase 0／2／3／5／6 已 ✅；只剩 Phase 1、4a／4b、7 是 ▶，而三個都卡在研究端不是機制端。**
+> Phase 2 已於 2026-09-20 結案（連續 3 天心跳自動觸發全綠、每天印「未 triage N」4／1／1、
+> `drain_limit_per_run`=0；「零 LLM」是逐字查過的，不是照抄設計意圖）。
 >
-> Phase 7 的目標逐字是「**多年反向橋取代 FY+1 主流程；entry criterion 降級**」。
-> 7.1–7.4 已交付（倍率參數化／`multiple_horizon`＋`span_years`／`briefing multi-year` CLI／進 APP），
-> **但「取代」還沒發生**——多年橋今天是**並列的另一條路**，主 view 的 target 仍永遠是基期+1。
+> **Phase 7 的機制端 2026-09-20 全部做完了**（7.1–7.4 ＋ EV／Sales ＋ `invalidates` ＋ 驗收腳本），
+> 而「取代」那一步**今天不能做**，理由是量出來的：
 >
-> **🔴 卡住的那一題（2026-09-19 深夜，實作中撞到的，不是設計偏好）：**
-> **多年橋的錨點方法（`carried_forward`＝沿用基期）在虧損期失效，而目標區幾乎全是虧損期。**
-> 實測：市值 ≤ US$10B（D11 門檻內，**真正的目標區**）只有 6 檔——**虧損 4**（SOI.PA −6.17、AXTI −0.41、
-> IQE.L −0.0282、POET −0.68）、**無 `diluted_eps` 1**（MP）、**獲利 1**（6324.T）。
-> 市值 > 10B 那 10 檔多半獲利，**但它們本來就不是目標**。
-> ⚠⚠ **多年橋繼承了它要取代的那個毛病，只是換了年份。**
-> 事發：AXTI 錨點 EPS **−0.0789**，四級階梯全印「拉到極限也做不到」——**與同檔 FY+1 反向橋的
-> 「2x available」方向相反**。已改成 `method_not_applicable` 誠實現形（不印階梯），但**那只是止血**。
-> **要使用者決定的是：虧損期的錨點取哪一種**（mid-cycle 利潤率？同業 peer 利潤率？營收倍數？）。
-> Abstention ledger 有三筆逐字指名過它（「虧損期 method」「mid-cycle／multi-year method」）。
+> ```
+> 多年橋 16 檔｜算得出 1（COHR）｜還沒寫目標年度 13｜方法不適用 1（AXTI）｜沒有判斷檔 1（MU）
+> Phase 4b 驗收   input 16｜accepted 0｜filtered 16   ← scripts/multi_year_check.py
+> 目標區（≤US$10B）6 檔：虧損 4｜無 diluted_eps 1｜獲利 1
+> ```
 >
-> ⚠ **在那之前「把籃子 filter 的 `payoff_not_positive` 換成倍率可行性」不能做**：換過去會對 16 檔
-> **全部**亮起 → L14-4 的**恆亮＝零鑑別力，是牆不是閘門**；L14-3 也逐字禁止先放閘後量測。
+> 把籃子的 `payoff_not_positive` 換成倍率可行性，今天會對 **16 檔全部**亮起＝L14-4 的恆亮，
+> **是牆不是閘門**（L14-3 也逐字禁止先放閘後量測）。**binding constraint 是 `multiple_horizon` 填寫率**，
+> 而填它是 judgment 走 pq2、每檔要那一檔自己的一手依據（COHR 用 10-Q「through 2030」、
+> AXTI 用 10-Q「initial term of three (3) years」＋「in 2026 through 2028」）。
 >
-> **plan 的三個答案（已定案，2026-09-19；使用者「是正解就做完」）：**
+> ⚠⚠ **2026-09-20 最貴的一課，寫在這裡免得重犯：**
+> 前一輪量到「AXTI 是唯一會鬆動的那一檔，先填它」——**[633] 核准、也確實填了**，
+> 然後才發現它的錨點 EPS 是負的（基期虧損 × `carried_forward`），新儀器對它同樣給不出答案。
+> **「先填再做機制」是對的（L14-1），但「填完就能用」是我自己多加的假設，而它沒有被量過。**
+> 教訓操作化：**量出 binding constraint 之後，再問一次「解開它之後，下一格會不會立刻又卡住」。**
+>
+> **三個答案已全部落地（2026-09-20；使用者「照你建議」）——不要重做：**
 > - ①**「取代」＝拆成兩格，不是在同一格換填充物**（L12 的標準修法）。payoff（FY+1）**保留不動**，
 >   倍率可行性是**新的一格**，沒填 `multiple_horizon` 就誠實 missing——**兩種形狀不得同形**（INV-3）。
 >   理由沿用 Step 7.3 自己寫過的那句：FY+1 要對共識、多年橋沒有共識可對，**混進同一欄會讓兩個問題共用一個答案格**；
@@ -209,7 +211,16 @@
 >   一手是 **10-Q 逐字**（`library/raw/axti_10_q_20260813.txt` 行 2961）：「initial term of **three (3) years**」＋
 >   「capacity … **in 2026 through 2028**」，兩條獨立證據指向同一年。**span 3 年**（基期 FY2025）。
 >   ⚠ 刻意**不用**那兩份 8-K 檔——它們是濃縮摘要（其一自標 "Research excerpt"），不是 filing 原文（L18）。
-> - **pq2 球在你手上 17 項**（[632] 移出成等事件、[633] 移入，淨值不變）。查證：`python -m engine_b.todo list`。
+> - **[633] 已執行**（2026-09-20）：AXTI `multiple_horizon`=2028-12-31 ＋ FY2028 六條錨點假設。
+>   L11-6 承諾兌現：`briefing refresh AXTI` 實測 FY+1 view **0 筆變動**。
+>   ⚠ 但它**算不出階梯**（錨點 EPS −0.0789）——那正是下面 [637] 要解的。
+> - **[637] 待核准**：AXTI 改走 EV／Sales（append `target_ev_to_sales` ＋ 撤回 `target_pe`）。
+>   ⚠ 值要你決定：市場現值 `ev_revenue`=**32.681**，照 AGENTS.md「沒有 re-rating 證據就等於市場倍數」
+>   我建議照取，但誠實說出代價——32.7x sales 沿用到 FY2028 等於假設四年後市場仍付同樣倍數。
+> - **[638] 待核准**：COHR 的 disproof 補 `invalidates`。**它是 Phase 4b 驗收行第一檔會通過的**
+>   （前提鏈已完整，只差沒有 disproof 指名 `revenue_growth`）。
+> - **[634][635][636] 是 daily 2026-09-20 鑄的**：兩個 edge_resolution 提案 ＋ coherent_cpo thesis lifecycle。
+> - **pq2 球在你手上 21 項**。查證：`python -m engine_b.todo list`。
 >   ⚠ **`standing-go` 實測候選 0 項**——17 項沒有一項能自動推進（在等世界／使用者明示 pending／`evidence_delta` 無 blocker），
 >   所以「掃一次挑能動的做掉」這件事**機械上的答案是 0**，不是還沒掃。
 >
@@ -347,6 +358,8 @@ Push 是常規動作；push 前 sanity check：`git ls-files library/private` �
 | **2026-09-19 深夜 4** | **[632] 執行（SIVE.ST 的 `entity_filing_signal` watch `ew_0094`，轉等事件不 resolve）｜[633] 鑄號（AXTI 的 `multiple_horizon`＝FY2028，一手 10-Q 逐字）｜Phase 7 剩餘的 PLAN_PROPOSAL ＋五欄 amendment 交出等核准**。三個量測改變了 plan 的形狀：①**`entry criterion 降級`已是現況**——73/73 檔 `view.entry` 全 `missing`、門檻價 0 檔，真正在擋的是 `payoff_not_positive` 而它不叫 entry criterion（L12）；②**今天把機制做完現有資料變 0 筆**——`payoff_not_positive` 那 2 檔裡 COHR 另被市值＋覆蓋擋死、AXTI 沒有 `multiple_horizon`，binding constraint 在研究端（L14-1）；③`standing-go` 候選 **0 項**。順帶當下修一個會安靜回錯數字的查證命令（原命令 glob `judgments/` 漏掉住在 `cohr_judgment.json` 的 COHR，回 0 而真值是 1；SSOT 是 `locate_judgment()`） | 本輪 |
 
 | **2026-09-19 深夜 5** | **[633] 執行（AXTI 的 `multiple_horizon`＝FY2028，一手 10-Q 逐字）＋ 撞到一個推翻下一步的發現**：AXT 基期虧損（FY2025 非 GAAP EPS −0.41），`carried_forward` 錨點因此為負（−0.0789），四級階梯全印「拉到極限也做不到」——**與同檔 FY+1 反向橋的「2x available」方向相反**。已改成 `method_not_applicable` 不印階梯，`counts` 由兩格拆成**五格互斥窮盡**（原本那一格被心跳／APP／CLI 一致印成「還沒寫下目標年度」，而其中兩檔不是那個意思）。**接著量出真正的 binding constraint：目標區（≤US$10B）6 檔裡 5 檔是虧損或無 EPS**——**多年橋繼承了它要取代的那個毛病，只是換了年份**。因此「把 filter 換成倍率可行性」**沒有做**：今天換過去會對 16 檔全部亮起＝L14-4 的恆亮，是牆不是閘門。全量 **2,790 passed／1 skipped**；`audit invariants` FAIL 0／4,253 筆。⚠ L11-6 承諾已兌現：FY2028 六條假設對 FY+1 view **0 筆變動** | 本輪 |
+
+| **2026-09-20** | **問題一（虧損期錨點）＋問題二（disproof 連結）全部落地，然後量完三個橋契約舊帳，Phase 2 結案 ✅**。**問題一**：實作前先驗證「營收倍數會不會變套套邏輯」，途中發現**系統早就有完整的 EV／Sales**（`METHOD_EV_TO_SALES`＋`target_ev_to_sales`＋公式，9 檔 ledger 在用），而 `method_applicability()` 逐字寫著「虧損公司改用 ev_to_sales」——**多年橋卻硬編 `parameter == "target_pe"` 看不見它**（L16）。所以是接上去不是發明。新增 `driver_does_not_affect_metric`（營益率對營收的影響是零＝結構上無關，不是「撐不起」；併進 `no_sign_change` 會恆亮）。**問題二**：`DisproofCondition.invalidates` 用 driver 名稱不用 `assumption_id`——實測 **60/63 檔（95%）的散文已經逐字指名了 driver**，而 `Catalyst.resolves`（要 id）只有 4/106。⚠ 一個假說被自己的量測否證：催化劑散文指名率只有 26%，所以「`resolves` 填不起來純粹是介面問題」**不成立**，兩者不是同一種東西。**三個舊帳**：#1 revenue 單一口徑**量完確認不接**（實例數 0，且與 `closure.py` 規則 B 的判準直接矛盾，證據站規則 B）；#2 重複生效**部分接**（`fiscal_year_results` 分流：同幣別取最完整並說出來、**異幣別 fail closed**——TSM 的 USD 與 TWD 差 **31 倍**；⚠ 只修了 5 個欄位中的 1 個，另 4 個根因是 schema 的 `supersedes_id` 單值限制）；#3 共識核實**是會亮也會滅的偵測器**，原描述「結構性不可用」量不到支持。全量 **2,810 passed**；`audit invariants` FAIL 0／4,271 筆 | 本輪 |
 
 **不要重做 Step 0，也不要重做 Phase 1／2／3／6 已交付的任何一項，也不要重做 V1／V2／V3。**
 
