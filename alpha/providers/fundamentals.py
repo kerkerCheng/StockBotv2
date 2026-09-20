@@ -507,10 +507,49 @@ class EngineCFundamentalsProvider:
             return None, (f"Engine C 截至 {as_of.isoformat()} 無 {ticker} 的 fiscal_year_results 觀測" if as_of
                           else f"Engine C 無 {ticker} 的 fiscal_year_results 觀測（scripts/record_mechanical_observation.py）")
         superseded = {r.get("supersedes_id") for r in rows if r.get("supersedes_id")}
+        # ⚠ **同一年度有兩筆以上生效時不得靜默選第一筆**（2026-09-20）。
+        # 實測（8 檔）分兩種形狀，而它們的正確處理相反——壓成一條規則兩邊都會錯（L12）：
+        #   ①**同幣別的骨架 vs 補完**（6 檔）：08:26 批次先寫只有 revenue 的骨架，10:xx 補上
+        #     EPS，而後寫那筆**沒有設 `supersedes_id`**。取「比較完整」的那一筆就是對的。
+        #   ②**異幣別並存**（TSM：USD 121,423,000,000 與 TWD 3,809,054,000,000，差 31 倍）。
+        #     這一種**沒有任何自動規則選得對**——選錯不是誤差，是量級錯誤（AGENTS.md：
+        #     報價單位 ≠ 結算幣別，價格會差 100 倍）。所以它必須 fail closed。
+        # 根因兩者相同（後寫的沒 supersede），但修資料要 append correction 到 append-only
+        # ledger ＝ A2 authority，得人核准；這裡只負責**不要靜默挑一個**。
+        live_rows = [r for r in rows if r["observation_id"] not in superseded]
+        conflict_note: str | None = None
+        if len(live_rows) > 1:
+            by_currency: dict[str, int] = {}
+            for r in live_rows:
+                try:
+                    by_currency[str(json.loads(r["value"]).get("currency") or "?")] = 1 +                         by_currency.get(str(json.loads(r["value"]).get("currency") or "?"), 0)
+                except (TypeError, ValueError):
+                    by_currency["?"] = by_currency.get("?", 0) + 1
+            if len(by_currency) > 1:
+                ids = "、".join(r["observation_id"][:20] for r in live_rows)
+                return None, (
+                    f"{ticker} 同一年度有 {len(live_rows)} 筆生效的 fiscal_year_results，"
+                    f"而且**幣別不一致**（{'／'.join(f'{k}×{v}' for k, v in sorted(by_currency.items()))}）"
+                    f"：{ids}。**沒有任何自動規則選得對**——選錯不是誤差是量級錯誤"
+                    "（報價單位 ≠ 結算幣別）。請 append 一筆 correction record 讓後者 supersede 前者"
+                    "（Engine C 是 append-only，兩筆都留在 ledger 裡），這一格就會自己恢復")
+            # 同幣別：取**比較完整**的那一筆（有 gaap／non_gaap 區塊者優先，再同則取較晚 filed）。
+            # ⚠ 用明確規則取代「排序碰巧」——今天取第一筆剛好都對，但那是運氣不是保證。
+            def _completeness(r: dict) -> tuple[int, str]:
+                try:
+                    payload = json.loads(r["value"])
+                except (TypeError, ValueError):
+                    return (-1, "")
+                score = sum(1 for k in ("gaap", "non_gaap", "segment_revenue", "exit_quarter")
+                            if payload.get(k))
+                return (score, str(payload.get("source_filed_at") or ""))
+            live_rows.sort(key=_completeness, reverse=True)
+            conflict_note = (
+                f"⚠ 同一年度有 {len(live_rows)} 筆生效觀測（幣別一致）；已取欄位最完整的 "
+                f"{live_rows[0]['observation_id'][:20]}。**根因是後寫那筆沒有設 supersedes_id**"
+                "——要清乾淨請 append correction record，不是改這裡的排序")
         errors: list[str] = []
-        for row in rows:
-            if row["observation_id"] in superseded:
-                continue
+        for row in live_rows:
             try:
                 payload = json.loads(row["value"])
                 end = _as_date(payload.get("fiscal_year_end")) or _as_date(row.get("as_of"))
@@ -534,8 +573,9 @@ class EngineCFundamentalsProvider:
                     evidence=(ref, *self._superseded_refs(rows, row)), source_filed_at=filed,
                     recorded_at=_as_datetime(row.get("recorded_at")),
                     observation_id=str(row["observation_id"]),
-                    coverage_note=(str(payload["coverage_note"]).strip() or None
-                                   if payload.get("coverage_note") else None),
+                    coverage_note=("；".join(x for x in (
+                        (str(payload["coverage_note"]).strip() if payload.get("coverage_note") else None),
+                        conflict_note) if x) or None),
                     income_statement_shape=(str(payload["income_statement_shape"])
                                             if payload.get("income_statement_shape") else None),
                     author_notes=leftovers,
