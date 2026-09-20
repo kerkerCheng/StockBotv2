@@ -155,6 +155,11 @@ JUDGMENT_SCHEMA: Mapping[str, Any] = {
         "condition": "什麼出現就推翻本 thesis",
         "check_frequency": "L7 必填：多久核查一次",
         "action_within_48h": "L7 必填：觸發後 48 小時內做什麼",
+        "invalidates": "可選但強烈建議：這條反證成立會推翻哪幾個 driver 的假設，"
+                       "**用 driver 名稱**（如 revenue_growth 或 "
+                       "revenue_growth[Datacenter & Communications]），不是 assumption_id。"
+                       "⚠ 你多半已經在 action_within_48h 裡寫了（實測 95% 的既有判斷檔都有）"
+                       "——這一格只是把它放到程式讀得到的地方",
     }],
 }
 
@@ -397,6 +402,9 @@ def compose_signal(
             condition=str(d.get("condition") or ""),
             check_frequency=str(d.get("check_frequency") or ""),
             action_within_48h=str(d.get("action_within_48h") or ""),
+            # ⚠ 空的＝還沒有人寫，不是「不推翻任何假設」。型別層驗封閉字彙，這裡不猜、
+            # 也**不從散文自動抽取**——那是判斷（「這條真的在講這個 driver 嗎」），走 pq2。
+            invalidates=tuple(str(x).strip() for x in (d.get("invalidates") or ()) if str(x).strip()),
         ) for d in (judgment.get("disproof_conditions") or [])
     )
     catalysts = tuple(

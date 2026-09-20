@@ -33,7 +33,11 @@ def test_an_empty_universe_is_still_a_valid_artifact() -> None:
     assert payload["rows"] == []
     assert payload["counts"] == {"input": 0, "available": 0, "no_horizon": 0,
                                  "no_judgment": 0, "method_not_applicable": 0,
-                                 "other_missing": 0}
+                                 "other_missing": 0,
+                                 # 走哪一條估值方法的分佈（2026-09-20）。⚠ 它**不是**一個
+                                 # 缺席 bucket，不參與互斥窮盡的加總。
+                                 "by_basis": {"forward_earnings_multiple": 0,
+                                              "ev_to_sales": 0}}
 
 
 def test_an_unresolvable_ticker_becomes_a_row_not_an_exception() -> None:

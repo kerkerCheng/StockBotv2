@@ -304,6 +304,21 @@ class DisproofCondition:
     check_frequency: str
     action_within_48h: str
     evidence_refs: tuple[EvidenceRef, ...] = ()
+    #: **這條反證一旦成立，會推翻哪幾個 driver 的假設**（2026-09-20）。
+    #:
+    #: 值是 driver 名稱，可選帶 scope：`"revenue_growth"` 或
+    #: `"revenue_growth[Datacenter & Communications]"`。
+    #:
+    #: ⚠ **為什麼是 driver 名稱而不是 `assumption_id`**（與 `Catalyst.resolves` 刻意不同）：
+    #: ①2026-09-20 實測，63 個判斷檔裡 **60 檔（95%）的 disproof 散文已經逐字指名了 driver**
+    #: （例 AXTI：「supersede `revenue_growth` 與 `operating_margin_delta` 兩筆假設」），
+    #: 而 `Catalyst.resolves`（要 `oa_*` 雜湊）只有 4/106——**內容早就在，缺的是欄位**；
+    #: ②`assumption_id` 會被 supersede 換掉，driver 名稱不會，所以連結不會因為改一次假設就斷。
+    #: 解析到「當下生效的那一筆假設」是 deterministic 的查表，交給讀模型（L15：解析與權限分開）。
+    #:
+    #: ⚠ 空的＝**還沒有人寫**，不是「這條反證不推翻任何假設」。不設必填（沿用 `resolves`
+    #: 的先例）：必填會讓 63 個既有判斷檔一次全部變成非法，而它們的內容其實是好的。
+    invalidates: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         _nonempty(self.condition, "DisproofCondition.condition")
@@ -312,6 +327,17 @@ class DisproofCondition:
             self.action_within_48h,
             "DisproofCondition.action_within_48h（L7 觸發後 48 小時內做什麼）",
         )
+        # lazy import：`alpha.fundamental.contracts` 反過來 import 本模組，top-level 會循環。
+        # ⚠ 封閉字彙必須被強制（L16-3）：自由字串卻決定去留，打錯不報錯、只是靜默沉底。
+        from .fundamental.contracts import ASSUMPTION_DRIVERS
+
+        for item in self.invalidates:
+            name = str(item).split("[", 1)[0].strip()
+            if name not in ASSUMPTION_DRIVERS:
+                raise ContractViolation(
+                    f"DisproofCondition.invalidates 只能是已登記的 driver，收到 {item!r}；"
+                    f"已知 {sorted(ASSUMPTION_DRIVERS)}。"
+                    "⚠ 這裡刻意不接受 assumption_id——id 會被 supersede 換掉，連結會斷")
 
 
 @dataclass(frozen=True, slots=True)

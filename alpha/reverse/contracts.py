@@ -36,8 +36,14 @@ from ..fundamental.contracts import FiscalPeriod
 #:   拉到極限也撐不起（或壓不到）現價**。這是強結論，不是缺料。
 #: - `bridge_failed`：擾動後橋算不出 EPS（缺其他假設、口徑衝突）。
 #: - `missing_inputs`：沒有基期／目標倍數／現價／這個 driver 的假設。
+#: - `driver_does_not_affect_metric`：把這個 driver 推到合法區間的**兩端，目標指標一動也不動**
+#:   ——它對這個估值方法**在結構上無關**，不是「撐不起」。2026-09-20 起 EV／Sales 反解會用到：
+#:   營益率、稅率、利息對 `revenue` 的影響是零，若併進 `no_sign_change` 就會讀成
+#:   「連營益率拉到極限都撐不起營收目標」——那句話沒有意義，而且它會**恆亮**（L14-4：
+#:   恆亮＝零鑑別力）。兩者不得同形（L12）。
 SOLVE_STATUSES: tuple[str, ...] = (
     "solved", "already_equal", "no_sign_change", "bridge_failed", "missing_inputs",
+    "driver_does_not_affect_metric",
 )
 
 #: **要問的倍率清單**（Phase 7 Step 7.1，2026-09-19）。
@@ -113,6 +119,16 @@ class ReverseBridgeResult:
     solutions: tuple[DriverSolution, ...] = ()
     reason: str | None = None
     warnings: tuple[str, ...] = ()
+    #: **這次反解走的是哪一個估值方法**（2026-09-20）。`forward_earnings_multiple`＝本益比法，
+    #: 目標指標是 EPS；`ev_to_sales`＝EV／Sales，目標指標是**總營收**。
+    #: ⚠⚠ `market_implied_eps`／`required_eps`／`our_eps` 三格的**名字沒有跟著改**——改名要動
+    #: 十幾個消費端，而兩種 basis 在同一次反解裡**互斥**（不是同時存在），所以它是「同一個角色
+    #: 的兩種實現」而不是 L12 的「一格兩義」。**但名字會騙人，所以呈現層一律走 `metric_label`
+    #: 與 `required_metric`，不得直接把 `required_eps` 印成「需要 EPS」。**
+    basis: str = "forward_earnings_multiple"
+    #: EV／Sales 換每股用的兩個輸入（照抄 `alpha/valuation/model.py` 的同一條公式，不另立一套）。
+    net_debt: float | None = None
+    diluted_shares: float | None = None
     method: str = (
         "required_eps ＝ 現價 × 倍率 ÷ 目標倍數；每個 driver 各解一次，**其餘假設固定成我們的**"
         "——所以每個值都是條件解，不是唯一解（共識只給總量，分項本來就欠定）。"
@@ -126,6 +142,16 @@ class ReverseBridgeResult:
                 f"ReverseBridgeResult.status 未登記：{self.status!r}；已知 {REVERSE_STATUSES}")
         if self.status != "available" and not self.reason:
             raise ContractViolation(f"status={self.status} 必須說出為什麼")
+
+    @property
+    def metric_label(self) -> str:
+        """目標指標的人話名字。**呈現層用這個，不要寫死「EPS」**（2026-09-20）。"""
+        return "營收" if self.basis == "ev_to_sales" else "EPS"
+
+    @property
+    def required_metric(self) -> float | None:
+        """`required_eps` 的 basis-中性別名——EV／Sales 下它裝的是**總營收**不是 EPS。"""
+        return self.required_eps
 
     @property
     def eps_gap(self) -> float | None:
