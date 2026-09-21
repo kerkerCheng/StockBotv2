@@ -1,0 +1,180 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "如果到 Open CPX 相容模組進入量產出貨時（以客戶具名 qualification 或公開出貨揭露為準），所有已知設計仍是 ELM、且沒有任何具名 ILM 產品達到 qualified/designed_in，則『規格允許』並不構成經濟上的替代，本 counter-path 應降級。核查頻率：每季（OFC／ECOC 展會與 Coherent／Lumentum 法說）。觸發後 48 小時內：把 tech:module_integrated_laser_source competes_with tech:external_laser_source 的 confidence 下修，並在 COHR thesis 記一筆 structural_score 的重算需求。",
+      "id": "opencpx_msa_spec_v1_0_2026_09_16_cl1",
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s1",
+        "opencpx_msa_spec_v1_0_2026_09_16_s2",
+        "opencpx_msa_spec_v1_0_2026_09_16_s3",
+        "opencpx_msa_spec_v1_0_2026_09_16_s4"
+      ],
+      "statement": "Open CPX Specification 1.0 defines the Internal-Laser Module (ILM), which uses a module-integrated laser source, as a first-class CPX module type with its own normative product codes (CPX-T1I / CPX-T2I) that intermates with the same Type-1/Type-2 sockets as the External-Laser Module; the specification nowhere requires an external laser source — every ELS obligation in it is scoped to 'For CPX ELMs'.",
+      "subject_id": "tech:external_laser_source"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:external_laser_source",
+      "id": "e1",
+      "relation": "competes_with",
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s1",
+        "opencpx_msa_spec_v1_0_2026_09_16_s2"
+      ],
+      "src_id": "tech:module_integrated_laser_source"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:internal_laser_module",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s1"
+      ],
+      "src_id": "tech:module_integrated_laser_source"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:cpo",
+      "id": "e3",
+      "relation": "is_variant_of",
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s1",
+        "opencpx_msa_spec_v1_0_2026_09_16_s5"
+      ],
+      "src_id": "tech:internal_laser_module"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "Open CPX"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "std:open_cpx",
+      "name": "Open CPX Socketed CPO MSA",
+      "role": null,
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s5"
+      ],
+      "type": "Standard"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "ILM",
+        "Internal-Laser CPX module",
+        "Type-1-ILM",
+        "Type-2-ILM"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:internal_laser_module",
+      "name": "Internal-Laser Module (ILM)",
+      "role": null,
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s1",
+        "opencpx_msa_spec_v1_0_2026_09_16_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "module-integrated laser source",
+        "internal laser source"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:module_integrated_laser_source",
+      "name": "Module-Integrated Laser Source",
+      "role": null,
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s1"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "ELS",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:external_laser_source",
+      "name": "External Laser Source",
+      "role": null,
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s2",
+        "opencpx_msa_spec_v1_0_2026_09_16_s4"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "NPO"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "opencpx_msa_spec_v1_0_2026_09_16_s5"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "opencpx_msa_spec_v1_0_2026_09_16",
+    "evidence_tier": 1,
+    "origin_entity": "Open CPX MSA",
+    "permission_basis": "Publicly downloadable MSA specification, retrievable without registration or payment from the issuing body's own website; retain canonical URL and research-relevant verbatim excerpts only.",
+    "published_at": "2026-09-16",
+    "source_type": "industry_report",
+    "storage_permission": "repo_excerpt",
+    "title": "Open CPX MSA — Specification for Co-packaged and Near-Package Connector and Optics Module, Rev 1.0",
+    "url": "https://www.opencpxmsa.org/wp-content/uploads/OpenCPX-Specification-v1.0.pdf"
+  },
+  "sources": [
+    {
+      "id": "opencpx_msa_spec_v1_0_2026_09_16_s1",
+      "locator": "Section 4 Functional Specification, p.16",
+      "quote": "Figure 4-2 gives a functional description of an Internal-Laser Module (ILM) using a module-integrated laser source. Both ELM and ILM can intermate with Type-1 or Type-2 CPX sockets."
+    },
+    {
+      "id": "opencpx_msa_spec_v1_0_2026_09_16_s2",
+      "locator": "Section 4 Functional Specification, p.16",
+      "quote": "Figure 4-1 gives a functional description of a CPX External-Laser Module (ELM) using an external laser source (ELS), e.g., an External Laser Small Form Factor Pluggable (ELSFP)."
+    },
+    {
+      "id": "opencpx_msa_spec_v1_0_2026_09_16_s3",
+      "locator": "Section 5.12 CPX Module Label, p.35",
+      "quote": "The label identifier must start with the following codes: Type-1-ELM: CPX-T1E-{Nch}-{xxx} Type-2-ELM: CPX-T2E-{Nch}-{xxx} Type-1-ILM: CPX-T1I-{Nch}-{xxx} Type-2-ILM: CPX-T2I-{Nch}-{xxx}"
+    },
+    {
+      "id": "opencpx_msa_spec_v1_0_2026_09_16_s4",
+      "locator": "Section 4 Functional Specification, p.17",
+      "quote": "A module-integrated micro-controller (uC) shall provide a module management interface via CMIS as well as control pins… For CPX ELMs, the uC shall also provide interfacing to its associated ELS."
+    },
+    {
+      "id": "opencpx_msa_spec_v1_0_2026_09_16_s5",
+      "locator": "Abstract, p.1",
+      "quote": "This document provides a common specification for systems manufacturers, system integrators, and suppliers of connectors and modules regarding co-packaged and near-package optics modules…"
+    }
+  ]
+}
