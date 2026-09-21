@@ -9,7 +9,7 @@
         "nextfinancial_joint_problem_2026_06_02_rv_reducer_s1",
         "nextfinancial_joint_problem_2026_06_02_rv_reducer_s2"
       ],
-      "statement": "Nabtesco is credited with ~60% of the RV-reducer market for medium-to-large industrial robot joints (third-party estimate), but Zhejiang Shuanghuan Driveline has moved into RV reducers and already supplies Optimus and Unitree — a validated Chinese alternative in the adjacent humanoid segment. Substitutability judged 3/5: dominant share but replacement paths demonstrably exist and are being exercised.",
+      "statement": "Nabtesco is credited with around 60% of the RV-reducer market for medium-to-large industrial robot joints (third-party estimate, tier-3). The same tier-3 newsletter reports that Zhejiang Shuanghuan Driveline, an automotive-gear maker, has moved into RV and harmonic reducers. ⚠ 2026-09-21 依 pq2 [541] 降級：本 claim **不再主張** Shuanghuan 已供貨給任何具名整機廠，也**不再把它稱為已獲驗證的替代方案**。一手為浙江双环传动 2026 年半年度報告（深交所 2026-08-26 揭露，132 頁 143,047 字元，pypdf 全文核對）：全文「人形」0 次、「RV减速」0 次、「谐波」0 次，公司自述用途為「工業機器人」；未具名任何客戶（應收帳款前五名合計 16.41% 且未列名）；「減速器及其他」H1 2026 占營收 9.67%（人民幣 4.40 億／45.59 億），而二手普遍引用的是「16 億、約 35%」，差約 3.6 倍。⚠ 被推翻的是「已獲驗證」與「已供貨給<具名整機廠>」這兩個措辭，**不是**「双环供應 RV 減速器」本身（分產品表證實該業務存在）——L11-1：措辭精度本身就是一個 claim。⚠ 原逐字 s1／s2 一字未動；改的是我們自己的主張。⚠ 邊 e_sub1 的 substitutability 3/5 未在本次更動（[541] 未授權），但其「replacement paths are being exercised」這半條依據已被一手削弱，需另行重判。",
       "subject_id": "e_sub1"
     }
   ],

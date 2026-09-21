@@ -443,7 +443,6 @@
       "dst_id": "tech:external_laser_source",
       "relation": "depends_on",
       "attributes": {
-        "substitutability": 5,
         "sole_source": false,
         "qualification_status": "sampling"
       },

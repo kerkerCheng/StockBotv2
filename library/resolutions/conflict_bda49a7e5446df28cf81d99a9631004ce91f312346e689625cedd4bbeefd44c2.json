@@ -1,14 +1,14 @@
 {
   "schema_version": "1",
-  "resolution_id": "resolution_bda49a7e5446df28cf81d99a9631004ce91f312346e689625cedd4bbeefd44c2_77e8d21a2584",
+  "resolution_id": "resolution_bda49a7e5446df28cf81d99a9631004ce91f312346e689625cedd4bbeefd44c2_2b84eb43e548",
   "conflict_id": "conflict_bda49a7e5446df28cf81d99a9631004ce91f312346e689625cedd4bbeefd44c2",
   "edge_key": "edge:15d7af33e42502ce404ed699c4f17c1e284456f025964460a1d7f71a960681e8",
   "attribute": "qualification_status",
-  "candidate_set_hash": "77e8d21a25844c19c239d6e980ec6480f05f0abf9b773d3317499b6e28bafff7",
+  "candidate_set_hash": "2b84eb43e54814e2830d8d1ccf09a5bf294349c00764e62c433040eae53be4af",
   "action": "choose_value",
   "selected_value": "qualifying",
   "supporting_assertion_ids": [
-    "sivers_ar_2025_photonics_excerpt_e14"
+    "sivers_ar_2025_photonics_excerpt_e6"
   ],
   "rejected_assertion_ids": [
     "aleabitoreddit_sivers_cpo_customer_map_e3"
@@ -17,8 +17,8 @@
     "sivers_ar_2025_photonics_excerpt_s7",
     "sivers_ar_2025_photonics_excerpt_s15"
   ],
-  "rationale": "此邊（WIN→Sivers）上 Sivers 年報是「客戶端」文件（tier 1）：明言與 WIN 的合作已為量產需求佈局（qualifying）。aleabitoreddit 是 tier 3 轉述，其自身 note 即承認 qualification 狀態未確立，其 none 不是反證而是資訊不足。依證據階序取 qualifying。",
+  "rationale": "這是已核准 resolution 因 current extraction assertion ID 更新而 stale 的重新提案，不是改判。兩個候選指向同一 WIN Semiconductor→Sivers 合作 scope。Sivers 2025 年報逐字寫明與 WIN 的 partnership 已使其具備滿足預期量產需求的位置，且 collaborations with WIN、O-Net、POET enable scalable, high-volume production；這支持 qualifying。aleabitoreddit 的 tier-3 轉述只說 partnership announced with high-volume supplier，將 qualification_status 標成 none 是資訊不足，不是反證。現行 source entry 的舊 quote 欄為 null，但 locator 明示原始 extraction 遺失且 frozen raw 全文保留；本輪已回讀 library/raw/sivers_ar_2025_photonics_excerpt.txt 的對應連續文字，沒有補猜，也不提高 evidence tier。",
   "resolved_confidence": 0.7,
   "approved_by": "Cheng",
-  "approved_at": "2026-07-18T07:14:08+08:00"
+  "approved_at": "2026-09-21T09:28:46+08:00"
 }
