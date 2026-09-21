@@ -26,6 +26,24 @@
 > schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V      # Last Run / Last Result / Next Run
 > ```
 >
+> ### 🔴 開工必做：確認入圖閘門還活著
+>
+> **2026-09-20 實測：入圖閘門壞了兩天，而沒有任何東西會叫。**
+> `apply_research_action` 對**所有** RA 一律回 `partial: graph reconciliation is incomplete:
+> unprojected=0, legacy=4026`。根因是 V1（逐字入圖，09-18）產生的 `QUOTES` 2,968 ＋
+> `FROM_DOC` 1,058 被誤判成「未投影的 canonical edge」——它們是走訪關係，本來就沒有
+> `edge_key`（與已排除的 `CITES`／`ABOUT` 同性質）。
+>
+> **兩天沒人發現，因為中間沒有人 apply 過 RA。** 這類故障的形狀是固定的：
+> **gate 壞掉時「沒有東西通過」與「沒有東西要通過」完全同形**（L13-2）。
+>
+> 程式已修（`intake/application.py` 的排除清單 ＋ `tests/test_intake_reconciliation.py`），
+> 但 **MCP server 是獨立行程，要重啟才吃得到**。開工時若有 `ra_admission` 要做，先跑：
+> ```
+> python -c "import neo4j;from loader.edge_resolution import _driver;d=_driver();s=d.session(default_access_mode=neo4j.READ_ACCESS);print('legacy =',s.run(\"MATCH ()-[r]->() WHERE NOT type(r) IN ['CITES','ABOUT','QUOTES','FROM_DOC'] AND r.edge_key IS NULL RETURN count(r) AS n\").single()['n']);d.close()"
+> ```
+> 本機算出 0 但 apply 仍回 4026 ＝ **MCP server 還沒重啟**，不是資料又壞了。
+
 > ### ⚠ 常設授權：沒有需要我核准的事情就繼續做，不要停下來問
 >
 > 使用者原話（2026-09-17／09-18／09-19 共**四次**確認）：「**我想要的是沒有需要我核准的事情就繼續**」、
