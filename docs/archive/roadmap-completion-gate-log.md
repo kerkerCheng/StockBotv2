@@ -137,3 +137,27 @@ Phase 3 是八項全過**且**驗收行（改寫後）逐條達標。
 
 
 
+
+---
+
+## Phase 4b — 逐項核對（2026-09-21）
+
+**驗收行（2026-09-20 修訂版）：** 「有賭注的檔，其賭注所依賴的 driver 有反證在盯」。
+**當時實測：** `python scripts/multi_year_check.py` → `input 16｜accepted 2｜filtered 14`，
+filtered 的 14 檔理由 **100% 是 `no_ladder`**、`no_disproof_link` **0**。
+before → after 是 `accepted 0 → 2`、`no_disproof_link 2 → 0`（pq2 [641] 交付）。
+
+| # | 項目 | 結果 | 依據（**這些是 2026-09-21 的實測值，不隨現況更新**） |
+|---|---|---|---|
+| 1 | Historical regression suite pass | **過** | `python -m pytest tests/ -q` → **2823 passed, 1 skipped**（509s） |
+| 2 | Runtime invariant audit pass | **過** | `python -m audit invariants` → 13 項全 PASS、共 4,289 筆。⚠ 過程中 QueueLiveness 曾 FAIL 一次並**正確抓到真問題**：[598] 的工單等的 [646] 已 go、gate 消失而工單還掛著——那正是 INV-4 要攔的東西，補完 [598] 後歸零 |
+| 3 | No unexplained semantic diff | **過** | 本 Phase 只有兩處語意變動，各自有 before → after：①`DisproofCondition.invalidates` 由「只活在散文裡」變成程式讀得到（COHR／AXTI 各一條）；②COHR 目標倍數 `independent 25x → calibrated_to_market 33.703116`（pq2 [578]，倍數貢獻 −25.82% → 0）。⚠ ②連帶讓①剛寫的 COHR 門檻過期（所需 4 年 CAGR 54.2% → 42.5%），已在同一 session 改成**讀 artifact 自我校準**的版本——**寫死的數字會在某天靜默變成假的** |
+| 4 | **No new dual authority** | **過** | `invalidates` 只住在 session 判斷檔（`library/private/alpha/judgments/<TICKER>.json` 與 `cohr_judgment.json`），由 `scripts/multi_year_check.py` 與 `briefing/alpha_view/sources.py` 唯讀消費；**沒有建立第二張表、沒有快取**。目標倍數仍只有 `library/private/alpha/valuation/<TICKER>.jsonl` 一個 append-only ledger |
+| 5 | No silent-drop path | **過** | `scripts/multi_year_check.py` 逐條印 input／accepted／filtered／reasons，且**理由不合併**（14 筆 `no_ladder` 各自印出 `no_horizon`／`no_judgment`）。逐檔表把 16 檔全部列出來，沒有一檔消失 |
+| 6 | Point-in-time tests pass | **過** | `python -m audit invariants --only PointInTime` → SourceDoc `published_at` 205/218（94.0%）、EdgeAssertion 可定日 664/681（97.5%）；13 份未定日逐份列名並計出各自擋住幾條邊 |
+| 7 | All migrated lifecycle objects reachable | **過** | 本 Phase 沒有 migration。audit 的 Lifecycle／Expiry／QueueLiveness／QueueSegments 全 PASS；池中本 Phase 的編號（[638][641]）全部帶 receipt 結案 |
+| 8 | **critical historical failure 已有 executable protection** | **過** | 本 Phase 動到的形狀是 **L7**（disproof 是欄位不是流程——填了卻沒有後續流程等於永遠不會響的火警）與 **L14**（未量測的機制不得享有默認信任）。可執行保護有兩層，兩層都當場驗過會紅：①`alpha/contracts.py::DisproofCondition.__post_init__` 對 L7 三件套缺一即拒收（實測傳空 `check_frequency` → `必須是非空字串`）；②`invalidates` 是**封閉字彙**，打錯一個字母就拒收（實測 `revenue_growht` → `ContractViolation: 只能是已登記的 driver`）。③常駐計數器是 `scripts/multi_year_check.py` 本身——它每次都把 `no_disproof_link` 的檔名印出來，**不需要有人記得去查** |
+
+**結論：八項全過，驗收行也達標 → Phase 4b 標 ✅。**
+**不等 LITE** 的五欄理由寫在 `ROADMAP.md` 的〈4b 為什麼不等 LITE〉：LITE 的 reason 是
+`no_horizon`（判斷檔沒寫 `multiple_horizon`），那是 Phase 7 驗收行逐字在講的東西，不是 4b 的。
