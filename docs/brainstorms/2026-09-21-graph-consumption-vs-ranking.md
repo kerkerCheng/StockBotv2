@@ -264,10 +264,24 @@ grep -rl "MOCVD" extractions/*.json
 2. **說「`AGENTS.md` 明文：humanoid 的機會在零組件不在整機」** —— `grep` 回傳空。
    那句話在 **`ROADMAP.md` 的「研究主題範圍」**，而那是正確的位置。
 
+3. **說「[558] co:unitree 的 blocker 已經腐壞」** —— 理由是 Engine C 有 688836.SS 的
+   17 筆 `financial_snapshots`、56 筆 `consensus_estimates`。**實際跑 reassess 之後仍是
+   `valuation_payoff_unknown`**，而 decision 自己的理由逐字說得很清楚：
+   「凍結 context 裡這一軸只有 `yfinance://fx/CNYUSD=X`（fx authority）——**沒有 market
+   價格序列**，所以連校準倍數都算不出來」。
+   **「Engine C 有資料」≠「凍結 context 的那一軸有 authority」**，而我把兩者當成同一件事。
+
+   ```bash
+   python -m decision_lab reassess dc_1322bfc1c743fa746b76e280c1b27b28 --intent research --format markdown
+   ```
+
 另有一次**過度推廣**：從 AXTI 一個樣本推出「目標價恆等於現價」的恆等式，
 被自己的驗證命令抓到（SIVE 的 −20.4% 是反例），已降級為「值域受限」。
 
-**三次的共同形狀：錯誤朝「有洞察力的結論」偏**——與 ROADMAP「已撤回的診斷」那節記載的形狀相同。
+**四次的共同形狀：錯誤朝「有洞察力的結論」偏**——與 ROADMAP「已撤回的診斷」那節記載的形狀相同。
+⚠ 其中第 3 次與那一次過度推廣，**都是被一條可執行命令當場抓到的**；
+另外兩次（引用錯檔案、引用過期快照）**只因為使用者起疑才被發現**。
+這個對比本身就是 L18-5 的證據：**有可執行檢查的診斷活不過幾分鐘，沒有的全靠當下願不願意多查一步。**
 
 ---
 
@@ -275,6 +289,14 @@ grep -rl "MOCVD" extractions/*.json
 
 1. **Unitree 的需求錨走不到**，是圖漏建，還是圖正確反映了 ROADMAP「humanoid 的機會在零組件不在整機」？
    **兩者在圖上完全同形**——這是 `absence_kind` 該管而沒管的事。Unitree 要不要當候選看？
+
+   ⚠ **2026-09-21 補充（已查）：** 池子裡本來就有 **[558] co:unitree**（`decision_review`，
+   ref `dc_1322bfc1c743fa746b76e280c1b27b28`，當日 01:27 defer）。當日重跑 reassess，
+   結論**未變**：`valuation_payoff_unknown`，理由是凍結 context 的那一軸只有 fx authority、
+   **沒有 market 價格序列**（公司 2026-08-19 才上市，交易歷史不足）。
+   **所以它不是被忽略，是卡在一個真實的上游缺口。**
+   但這**不回答**需求錨那題——需求錨走不到與估值軸缺 authority 是兩件事，
+   **而目前沒有任何東西在追前者**。
 2. 走訪清單要不要收 `enables`／`develops`／`partnership_with`？
    （代價：會讓所有讀圖變 stale，而 staleness 目前分不出「圖變了」vs「走訪清單變了」）
 3. 財務層的地位——ROADMAP Phase 4b 正在把 `payoff_not_positive` 接進籃子當 gate，
