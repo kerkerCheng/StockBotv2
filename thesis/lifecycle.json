@@ -37,7 +37,7 @@
       }
     ],
     "check_interval_days": 90,
-    "last_checked": "2026-09-19",
+    "last_checked": "2026-09-21",
     "memo": "thesis/coherent_cpo_v2_lane_memo.md",
     "mutations": [
       {
@@ -53,11 +53,28 @@
         "proposal_id": "tm_22e3402849969072a39e129099112d5e",
         "rationale": "disproof_conditions[1] 已觸發（pq2 [629]，使用者 2026-09-19 核准）。條件逐字：「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商（客戶端或第三方揭露）」；其 action_within_48h 逐字：「把該邊的 sole_source 降級並重跑 Q1；structural_score 會自動下降，需重新評估整條 thesis」。【觸發證據，三條互相獨立】①客戶端具名：NVIDIA 自己的 silicon photonics partner blog 把 ELS 供應商逐字列成「Lumentum, Sumitomo, and Coherent」三家，角色句「These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine」（nvidia_sipho_blog_partner_roles _s5，origin_entity=NVIDIA，tier 2）。②同日同規模的第二份協議：NVIDIA 與 Lumentum 的新聞稿逐字「The nonexclusive agreement includes an NVIDIA multibillion purchase commitment」，投資額同為 20 億美元。③Coherent 自己的 10-Q（tier 1 法定文件）逐字「The non-exclusive agreement」。【48h 動作的前半已執行】pq2 [627] 已把 co:coherent supplies_to co:nvidia 的 sole_source 由 true 改為 false（改在抽取層、sources[].quote 一字未動，重載＋重投影）；實測 rank_bottlenecks 該列由 #2 → #5。本筆是後半：把 thesis 轉入 review_required 等待重新評估。【刻意不做】不在本筆一併改寫 thesis 內容或 variant——那是重新評估的產出，不是轉狀態的副作用。首屏第三句與第六句已於 [627] 更新（brief ib_37dfb9b27153eba8）。",
         "to": "review_required"
+      },
+      {
+        "at": "2026-09-21T03:43:46.795726+00:00",
+        "author": "session 2026-09-21（pq2 [636] 本機複查）",
+        "evidence_refs": [
+          "action://ra_b6d9a051e12b4f08e4116e1f6b2cb6d4",
+          "graph://edge/co:coherent/supplies_to/co:nvidia",
+          "graph://source/cohr_10_q_20260506",
+          "graph://source/nvda_lumentum_partnership_pr_2026_03_02",
+          "graph://source/nvidia_sipho_blog_partner_roles",
+          "query://bottleneck/rank_bottlenecks@2026-09-21",
+          "todo://pq2/641"
+        ],
+        "from": "review_required",
+        "proposal_id": "tm_19715e6780f4be9ad63dcd26be6de49c",
+        "rationale": "【[636] 本機複查結論：revise，不 retire】\n\n複查觸發於 disproof_conditions[1]（「出現第二家取得 NVIDIA CPO 外部光源 design win 的供應商」），\n2026-09-19 以 [629] 判定已觸發並轉入 review_required；48h 動作的前半（把 sole_source 降級）已由 [627] 執行。\n本筆是後半：重新評估整條 thesis。\n\n【被推翻的部分——memo §1 variant 的「唯一」框架】\nNVIDIA 自家 silicon photonics partner blog 在 header『Lumentum, Sumitomo, and Coherent』之下逐字寫\n「These vendors provide ELS assembly, optical alignment, and test with the silicon photonics engine」\n（nvidia_sipho_blog_partner_roles_s5，origin_entity=NVIDIA，客戶端）；同日 NVIDIA–Lumentum 新聞稿逐字\n「The nonexclusive agreement includes an NVIDIA multibillion purchase commitment and future capacity access\nrights for advanced laser components」，投資額同為 20 億美元（nvda_lumentum_partnership_pr_2026_03_02_s1/s2）；\nCoherent 自己的 10-Q（tier-1 法定文件）也逐字寫「The non-exclusive agreement」。\n→ memo §1 的「圖中唯一有客戶端文件證實深度綁定的 CPO 雷射供應商」在「唯一」這個字上已被客戶端文件否證。\n查證：圖中 `co:coherent supplies_to co:nvidia` 目前 `sole_source=false`、`substitutability=5` 但\nresolved_confidence 僅 0.6（2026-07-18 使用者裁決時即註明「全為供應商自報」）。\n\n【新增的第二個反向壓力——品類層】\n[642] 的 Open CPX MSA Specification Rev 1.0（發證機構，非賣方，tier 1）逐字\n「Both ELM and ILM can intermate with Type-1 or Type-2 CPX sockets」，整合雷射模組 ILM 有自己的正規化產品碼；\n[643] 另實測 `tech:cpo depends_on tech:external_laser_source` 的 substitutability=5 沒有任何一段逐字在講\n可替代性，且走的是無人工閘門的 auto 路徑。兩者都還在等核准，但方向一致：\n**外部光源作為「品類」的不可替代程度被高估了。**\n\n【沒有被推翻、而且是排序真正吃的部分】\n2026-09-21 實測 `python -m query.bottleneck`：COHR 仍在 #2／#3／#5／#7。其中 #2\n`co:coherent depends_on mat:inp_substrate`（5/5、外部印證、qualified）與 #3\n`co:coherent depends_on tech:inp_6inch_fab`（5/5、外部印證、qualified）**都不是 ELS 那條邊，也不是 NVIDIA 那條邊**\n——它們是 InP 垂直整合與六吋產能的位置。memo §4 認定的主瓶頸（高功率 CW DFB 雷射＋六吋 InP 產線）沒有被本輪任何證據動到。\nNVIDIA 的 multibillion 採購承諾與 capacity rights 也仍然成立——**非獨家不等於不存在**（L11-1：措辭精度本身是一個 claim）。\n\n【所以 revise 要改什麼（核准後執行，不在本筆一併做）】\n1. §1 variant：把「唯一供應商溢價」換成「三家具名 ELS 供應商之下，InP 垂直整合的成本與產能位置＋份額」；\n   隱含報酬的兩欄拆解不得因此保留無證據的倍數折價（2026-09-09 原則）。\n2. §6：新增 ILM／Open CPX 這條品類層 counter-path，並註明它是「規格允許」不是「有人做得出來」\n   （規格對 ILM 與 ELM 的熱／功耗規範對稱，但無任何具名 ILM 客戶或出貨）。\n3. §4：把 sole_source 那段改寫為已否證，保留 substitutability=5 但標明 resolved_confidence 0.6 全為自報。\n4. disproof：[641] 已於 2026-09-21 新增一條盯 `revenue_growth[Datacenter & Communications]` 的反證\n   （連兩季分部年增率 <35%；2 倍路徑需 4 年 CAGR 54.2%），revise 時併入 memo §6／§7。\n\n【刻意不做】不 retire。retire 是終局、要復活必須重建 thesis；而本輪否證的是一個措辭與一個品類層程度判斷，\n不是需求鏈本身。也不在本筆改寫 memo 內容或 variant——那是 revise 核准後的產出，不是轉狀態的副作用（沿用 [629] 的分工）。",
+        "to": "revised"
       }
     ],
-    "next_check": "2026-10-15",
+    "next_check": "2026-12-01",
     "note": "memo 於 2026-07-17 conflict-resolved 重生成（commit 6ec70c7）；12 月另有六吋 InP 產能倍增檢核點",
-    "status": "review_required",
+    "status": "revised",
     "ticker": "COHR"
   },
   "sivers": {
