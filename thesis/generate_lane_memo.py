@@ -15,7 +15,8 @@ generate_lane_memo.py — 渲染 Directional Lane Memo。**session-in-the-loop�
   2. 有 --ticker 就跑 Engine C 財務核驗清單 gate ＋ 市場數據快照
   3. 讀 prompts/lane_memo_system.md 當 system prompt
   4. `--scaffold` 產出提示 → session 寫 envelope → `--envelope-file` 吃回來
-  5. 驗證 ＋ evidence gate ＋ output_type header（[Watchlist Candidate]／[Research Note]）
+  5. 驗證 ＋ evidence gate ＋ 四個 gate 布林寫進 header（Watchlist 三級模板已於
+     2026-09-02 除役，memo 不再宣稱自己屬於哪一層）
 
 用法：
     python thesis/generate_lane_memo.py --ticker COHR --company-id co:coherent         --scaffold thesis/cohr.prompt.md
@@ -175,20 +176,20 @@ def _build_gate_context(ticker: str | None, override_gate: bool,
                          override_reason: str | None) -> tuple[str, bool]:
     """
     回傳 (gate_context_md, gate_pass)。
-    gate_context_md 注入 user message；gate_pass 決定 output_type header。
+    gate_context_md 注入 user message；gate_pass 寫進 header 的 checklist_pass。
     """
     if override_gate:
         reason = override_reason or "(未填理由)"
         return (
-            f"## Watchlist Gate 狀態\n⚠ Gate 已手動覆蓋（override-gate）\n理由：{reason}\n",
+            f"## 財務核驗五項狀態\n⚠ Gate 已手動覆蓋（override-gate）\n理由：{reason}\n",
             True,
         )
 
     if not ticker:
         return (
-            "## Watchlist Gate 狀態\n"
+            "## 財務核驗五項狀態\n"
             "⚠ 未指定 ticker，跳過財務核驗清單（產業全圖模式）。\n"
-            "若需 Watchlist 升格，請用 --ticker <TICKER> 重新生成。\n",
+            "要跑這五項請用 --ticker <TICKER> 重新生成。\n",
             False,
         )
 
@@ -198,7 +199,7 @@ def _build_gate_context(ticker: str | None, override_gate: bool,
         return format_checklist(result) + "\n", result.get("gate_pass", False)
     except Exception as e:
         return (
-            f"## Watchlist Gate 狀態\n⚠ 財務清單查詢失敗：{e}\n",
+            f"## 財務核驗五項狀態\n⚠ 財務清單查詢失敗：{e}\n",
             False,
         )
 
@@ -458,16 +459,16 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
     evidence_gate = evaluate_evidence_gates(validation, inventory)
 
     evidence_pass = validation["ok"] and evidence_gate["promotion_pass"]
-    if evidence_pass and gate_pass and l9_pass:
-        output_type = "Watchlist Candidate"
-    elif evidence_pass and override_gate:
-        output_type = "Watchlist Candidate (override)"
-    else:
-        output_type = "Research Note"
+    # ⚠ `output_type` 已移除（2026-09-21）。它是三級模板的遺物——那個階梯 2026-09-02
+    # 就除役了（docs/ARCHITECTURE.md §9：「升格標記在生產碼中沒有任何下游消費端」），
+    # 而它的值本來就完全由下面四個布林推導得出，是重複表示（L12）。
+    # 拿掉它不損失任何資訊：四個布林逐一說出是哪一道 gate 沒過。
+    gates_all_pass = evidence_pass and ((gate_pass and l9_pass) or override_gate)
 
-    # ── 5. Write output and auditable evidence sidecar ────────────────────────
+    # ── 5. Write output and auditable evidence sidecar ──────────────────────
     header = (
-        f"<!-- output_type: [{output_type}] | ticker: {resolved_ticker or 'n/a'} "
+        f"<!-- ticker: {resolved_ticker or 'n/a'} "
+        f"| gates_all_pass: {gates_all_pass} "
         f"| checklist_pass: {gate_pass} | l9_pass: {l9_pass} "
         f"| evidence_manifest_pass: {validation['ok']} "
         f"| evidence_gate_pass: {evidence_gate['promotion_pass']} -->\n\n"
@@ -480,7 +481,7 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
         manifest_errors = "\n".join(f"- {error}" for error in validation["errors"])
         memo_text += (
             "\n\n## Evidence Manifest Errors\n"
-            "本稿無法驗證引用鏈，因此只能保存為 Research Note。\n"
+            "本稿無法驗證引用鏈——下列錯誤修掉之前，這份 memo 的引用不可採信。\n"
             f"{manifest_errors}"
         )
     notes = gate_notes_markdown(evidence_gate)
@@ -498,10 +499,13 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
         default=str,
     )
     sidecar = {
-        "schema_version": "1.0",
+        # 1.1（2026-09-21）：移除 `output_type`（三級模板遺物，零讀取端），
+        # 改記四個 gate 布林的合取。唯一讀 sidecar 的是 query/health_audit.py，
+        # 它只取 evidence_items，不碰這一格。
+        "schema_version": "1.1",
         "memo_path": out.name,
         "memo_sha256": hashlib.sha256(full_output.encode("utf-8")).hexdigest(),
-        "output_type": output_type,
+        "gates_all_pass": gates_all_pass,
         "ticker": resolved_ticker,
         "company_id": company_id,
         "context_inventory_sha256": hashlib.sha256(
@@ -525,8 +529,8 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
     }
     sidecar_path = _atomic_write_pair(out, full_output, sidecar)
     print(f"[generate_lane_memo] wrote {out} and {sidecar_path}", file=sys.stderr)
-    promotion_label = "可升格 Watchlist" if output_type.startswith("Watchlist") else "仍為 Research Note（見 gate 狀態）"
-    print(f"\n[{output_type}] — {promotion_label}", file=sys.stderr)
+    verdict = "四道 gate 全過" if gates_all_pass else "有 gate 未過（見 header 的四個布林）"
+    print(f"\n[Lane Memo] — {verdict}", file=sys.stderr)
     return 0
 
 
@@ -541,7 +545,7 @@ def main() -> int:
     ap.add_argument("--company-id",
                     help="Neo4j 公司 node id（如 co:coherent）。用於 graph context 過濾。")
     ap.add_argument("--override-gate", action="store_true",
-                    help="強制跳過 Watchlist gate（輸出仍標記覆蓋記錄）。")
+                    help="強制跳過財務核驗五項（輸出仍標記覆蓋記錄）。")
     ap.add_argument("--override-reason", default=None,
                     help="override-gate 時說明跳過理由。")
     ap.add_argument(

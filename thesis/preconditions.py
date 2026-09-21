@@ -342,7 +342,8 @@ def format_gate(result: dict) -> str:
     lines = ["## L9 前置條件 Gate（投資諮詢開放條件）"]
 
     all_pass = result.get("gate_pass", False)
-    label = "✅ 全部通過 → 可標記 [Investment Note]" if all_pass else "⚠ 未全通過 → 輸出維持 [Research Note]"
+    # 三級模板已於 2026-09-02 除役，這裡只陳述 gate 狀態，不再指向任何層級。
+    label = "✅ L9 三前置條件全部通過" if all_pass else "⚠ L9 前置條件未全通過（逐項見下）"
     lines.append(label)
     lines.append("")
 

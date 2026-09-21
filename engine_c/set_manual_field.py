@@ -6,7 +6,7 @@ set_manual_field.py — 手動填入 Engine C 的人工觀測欄位。
 欄位不夠，而是同一概念被寫成不同名字造成同義詞漂移。要新增就先改那個 config。
 
 欄位分兩種：
-  - `gate_member=true` 的五項＝L9 前置條件 #3 的財務核驗清單，是 Watchlist 升格 gate；
+  - `gate_member=true` 的五項＝L9 前置條件 #3 的財務核驗清單，是 `gate_pass` 的成員；
     其中 customer_concentration 與 backlog 必須人工從一手 filing 填。
   - `gate_member=false` 的擴充欄位（或有請求權、covenant、通路結構、監管依賴…）
     不影響 gate_pass，但會進 Engine D 的 reference index，可被對應的 Confidence 軸引用。

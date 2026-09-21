@@ -41,7 +41,7 @@ description: >
 Neo4j 圖                  SQLite 財務數據
 query/graph_context.py    engine_c/checklist.py
     ↓                        ↓
-供應鏈結構 + 主張 + 來源   財務快照 + Watchlist Gate
+供應鏈結構 + 主張 + 來源   財務快照 + 財務核驗五項
     ↓                        ↓
          合成回答（agent）
 ```
@@ -152,7 +152,7 @@ python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --o
 ```
 需要 `.env` 的 `ANTHROPIC_API_KEY`。日常對話不需要跑這條路線。
 
-**格式：** 完整 Lane Memo 文件（存 `thesis/`）+ 升格 Watchlist 所需缺口清單
+**格式：** 完整 Lane Memo 文件（存 `thesis/`）+ 四道 gate 的缺口清單
 
 ---
 
@@ -256,11 +256,13 @@ Conviction 評估：[分數 / 理由]
 
 本系統是**研究工具，不是投資顧問**：
 
-- **Lane Memo**：方向性備忘，說「thesis 是否成立」，不說「買多少」
-- **Watchlist**：thesis 通過 + 財務核驗後升格，說「值得深研」，不說「何時買」
-- **Underwrite Sheet**：具體標的深挖，仍需使用者自行決策部位大小
+- **Lane Memo**：方向性備忘，說「thesis 是否成立」，不說「買多少」。**它是隨叫隨到的一頁式視圖，不是流程的一站，不 gate 任何事**（`docs/ARCHITECTURE.md` §9）
+- **Decision cohort**：研究的終點層級。它回答「這一檔現在缺哪一格、注意力是 MONITOR 還是 REVIEW」
+- **買多少、何時買**：永遠是使用者自己判斷並手動下單，系統不給部位尺寸
 
-升格到 Watchlist 的三個前置條件（L9）：
+> ⚠ **2026-09-02 起沒有「Watchlist／Underwrite」這兩層了**（實測：升格標記在生產碼中沒有任何下游消費端）。若你在別處讀到「升格 Watchlist」，那是還沒清乾淨的遺物——**判準以 `ARCHITECTURE.md` §9 為準**。
+
+L9 三個前置條件（仍然有效，只是它們不再通往任何「層」）：
 1. Lane Memo 評分通過（`thesis/scoring_rubric.md`）
 2. `variant_perception` 已明確寫出（股價隱含假設 X → 本 thesis 認為 Y → 催化劑 Z）
 3. 財務核驗清單 5 項完成（`engine_c/checklist.py`）

@@ -178,7 +178,8 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 - **variant perception(必填):** 用「**當前股價/估值隱含假設 X → 本 thesis 認為 Y → 催化劑 Z**」格式,
   從 forward P/E / EV-Sales 反推,**不是**「多數人沒注意到」。缺這段不能升格(估值數字現缺 → 標 TODO,等引擎C)。
 - **`disproof_condition` + 核查頻率 + 觸發後 48h 動作**(L7,缺這兩個欄位等於沒裝火警)。
-> Lane Memo 是方向備忘,**不是可操作投資建議**。升格 Watchlist 需另過財務核驗 5 項(L9),那是 gate 不是本流程。
+> Lane Memo 是方向備忘,**不是可操作投資建議**。財務核驗 5 項(L9)是另一道 gate,不在本流程內。
+> ⚠ 2026-09-21 改寫:原文寫「升格 Watchlist」,而三級階梯已於 2026-09-02 除役(`docs/ARCHITECTURE.md` §9)。
 
 ### Step 7 — 回到同一條 Engine D workflow
 

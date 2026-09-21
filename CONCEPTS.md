@@ -132,11 +132,11 @@ The durable, provider-neutral unit of remote-intake approval and provenance. A s
 *Avoid:* per-document intake, ingestion batch
 
 ### Financial Snapshot
-A point-in-time record of market and financial metrics for a single ticker, stored in the `financial_snapshots` table. One row per `(ticker, snapshot_date)` pair. Fields include price, forward P/E, trailing P/E, EV/Revenue, gross margin, shares outstanding, and analyst target price. The primary input to the Watchlist Gate. Private companies and non-US stocks without available data are represented by absent rows, not null rows.
+A point-in-time record of market and financial metrics for a single ticker, stored in the `financial_snapshots` table. One row per `(ticker, snapshot_date)` pair. Fields include price, forward P/E, trailing P/E, EV/Revenue, gross margin, shares outstanding, and analyst target price. The primary input to the five-item financial checklist. Private companies and non-US stocks without available data are represented by absent rows, not null rows.
 
-### Watchlist Gate
-The five-item financial checklist that a Lane Memo must pass before a thesis can be upgraded from Research Note to Watchlist Candidate. Items: gross margin trend, customer concentration, backlog/revenue visibility, dilution (share count trend), and valuation pressure. The gate is evaluated by `engine_c/checklist.py` and injected into Lane Memo generation. Items sourced automatically from Financial Snapshots where available; customer concentration and backlog require manual entry. A failing gate does not block research but blocks the Watchlist upgrade.
-*Avoid:* financial gate, checklist gate
+### 財務核驗五項（five-item financial checklist）
+The five-item financial checklist evaluated by `engine_c/checklist.py`. Items: gross margin trend, customer concentration, backlog/revenue visibility, dilution (share count trend), and valuation pressure. Items sourced automatically from Financial Snapshots where available; **customer concentration and backlog require manual entry — measured 2026-09-21, those two are the only items that have ever blocked anything** (6 cohorts; the other three blocked none). A failing checklist does not block research; it surfaces as `financial_<item>_manual_required` coverage blockers on the Decision cohort via `decision_lab/coverage.py`.
+*Avoid:* **Watchlist Gate**（除役用語——三級階梯 Lane Memo → Watchlist → Underwrite Sheet 已於 2026-09-02 廢止，見 `docs/ARCHITECTURE.md` §9；這五項本身沒有廢止，廢止的是它通往的那個「層」）, financial gate, checklist gate
 
 ---
 

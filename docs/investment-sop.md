@@ -24,7 +24,8 @@ Probe 是研究探針，不等於模擬投資；Shadow 是零資本觀測，提�
 
 ## 進場條件（全部滿足才進場）
 
-1. Lane Memo 輸出標籤為 `[Watchlist Candidate]`，非 `[Research Note]`
+1. Lane Memo 的引用鏈驗證與 evidence gate 都通過（header 的 `evidence_manifest_pass` 與 `evidence_gate_pass` 皆為 true）
+   > ⚠ 本條 2026-09-21 改寫。原文是「輸出標籤為 `[Watchlist Candidate]`」——**那個標籤指向的三級階梯（Lane Memo → Watchlist → Underwrite Sheet）已於 2026-09-02 除役**（`docs/ARCHITECTURE.md` §9：「升格標記在生產碼中沒有任何下游消費端」），終點層級是 Decision cohort。實測那個標籤零讀取端，而 `thesis/preconditions.py` 對本檔只檢查四個段落標題在不在，**所以這條進場條件錯了也不會有東西壞掉**。改成直接寫它真正要求的那兩道 gate；第 3、5 條本來就已經寫了另外兩道。
 2. Variant Perception 已明確填寫：「市場現在信 X，本 thesis 認為 Y，催化劑 Z」（不能空白或泛泛而談）
 3. 5 項財務核驗清單全部 `ok` 或 `manual_reviewed`（不能有 `missing`）：
    - 客戶集中度 — 前三大客戶合計佔收入是否超過 50%？

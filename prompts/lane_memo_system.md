@@ -127,5 +127,5 @@ evidence item 也必須至少被 Markdown 引用一次。不要自行寫報告�
 
 Lane Memo 是**方向備忘錄，不是可操作的投資建議**。
 輸出中不得包含具體買賣建議、目標價、持倉大小建議。
-財務核驗（客戶集中度 / 毛利率 / backlog / 稀釋 / 估值壓力）是 Watchlist 升格的 gate，
+財務核驗（客戶集中度 / 毛利率 / backlog / 稀釋 / 估值壓力）是 Decision cohort 的 coverage gate，
 不是本備忘錄要完成的工作。

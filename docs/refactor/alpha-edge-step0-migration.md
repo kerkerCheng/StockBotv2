@@ -186,6 +186,7 @@ ROADMAP Phase 0 標 ✅。
 
 ⚠ 既有但與**本次轉向無關**的 stale 詞條（`CONCEPTS.md` 的 Confidence Envelope／Action Card 仍描述 2026-08-28 已移除的資本表達層、
 Watchlist Gate 描述已除役的升格）**刻意未動**——那是另一筆清理，不混進 Step 0 的 diff。
+⚠ **2026-09-21 已做完那一筆清理**：production code 字串、LLM system prompt、會被載入的 skill 與判準檔（`CONCEPTS.md`／`investment-sop.md`／`scoring_rubric.md`／`closed-vocabulary-registry.md`／`ARCHITECTURE.md` §2）全部改掉，`output_type` 欄位移除。**已產出的歷史 memo 與其 sidecar 刻意不動**——那是當時的產出，改它等於竄改紀錄。
 
 ## 4. Skills（D13）
 

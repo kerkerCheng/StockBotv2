@@ -73,7 +73,8 @@ python thesis/generate_lane_memo.py --company-id co:sivers_semiconductors \
 **期望行為：**
 - 跳過 L8 gate，繼續執行
 - 輸出 header 含 `gate_override: L8 文件尚未入庫，先做初步 dry-run`
-- 輸出 `[Research Note]` 或 `[Watchlist Candidate (override)]`（不是乾淨的 Watchlist Candidate）
+- memo header 的 `gates_all_pass` 為 false，或雖為 true 但另帶 `gate_override` 記錄
+  （2026-09-21：`output_type` 已移除，三級階梯 2026-09-02 除役）
 
 ---
 
@@ -105,7 +106,7 @@ Coherent 的 CPO thesis 還成立嗎？
 - 先執行 `query/graph_context.py --company-id co:coherent`
 - 按「供應鏈位置 → 瓶頸性 → 來源品質 → 財務錨點」四維度評估
 - L8 偏誤檢查：所有 source 全是 Coherent 自己 → 加 ⚠ 警告
-- 說明「若要入圖 Watchlist，需要哪類獨立文件」
+- 說明「要把這條主張升到外部印證，需要哪類獨立文件」
 
 ---
 
@@ -232,7 +233,7 @@ Coherent 的 CPO thesis 還成立嗎？
 - 顯示當前持倉（股數、平均成本、bucket）
 - 顯示 ai_theme bucket 使用率
 - 根據 thesis conviction 給倉位建議
-- **若 L8 gate 尚未過（Coherent 只有自己的文件）：明確說不能給 Watchlist 建議**
+- **若 L8 gate 尚未過（Coherent 只有自己的文件）：明確說這條只能當佐證、不能當獨立確認**
 
 ---
 

@@ -2,7 +2,7 @@
 
 契約一：gate 凍結——`gate_member=true` 僅限 L9 前置條件 #3 的五項，且必須與
 `engine_c/checklist.py` 實際產出的 items 完全一致。新增欄位若誤設 gate_member=true，
-會讓所有既有標的的 Watchlist 升格 gate 退化，這個測試就是那道剎車。
+會讓所有既有標的的 `gate_pass` 退化，這個測試就是那道剎車。
 
 契約二：拒絕未登記欄位——防同義詞漂移（contingent_claims vs
 contingent_liquidity_claims 被當成兩個欄位，使查詢與引用都失效）。
@@ -324,7 +324,7 @@ def test_no_gate_member_is_also_mechanical() -> None:
     """⚠ 五項 gate 欄位一律要 pq2——放寬不得從財務核驗清單開缺口。
 
     `gate_member` 管的是 L9 前置條件 #3，`verifiability` 管的是要不要人工核准，
-    兩者是不同的軸。但**交集必須是空的**：一個進入 Watchlist 升格 gate 的欄位
+    兩者是不同的軸。但**交集必須是空的**：一個進入 `gate_pass` 的欄位
     若能不經核准寫入，那道 gate 就等於沒有。
     """
     registry = get_observation_field_registry()

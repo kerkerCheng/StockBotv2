@@ -1,6 +1,9 @@
 # Directional Lane Memo — 評分標準 (Scoring Rubric)
 
-> 用途：人工評分 thesis，判斷是否可升格至 Watchlist，或需退回補充資料。
+> 用途：人工評分 thesis，判斷它夠不夠格進入 Decision cohort 追蹤，或需退回補充資料。
+> ⚠ 2026-09-21 改寫：原文寫「升格至 Watchlist」，而 Lane Memo → Watchlist → Underwrite
+> 三級階梯已於 2026-09-02 除役（`docs/ARCHITECTURE.md` §9）。**評分本身沒有廢止**，
+> 廢止的是它通往的那個「層」——`thesis/preconditions.py::_check_second_slice` 仍然在用它。
 > 滿分：30 分（6 個維度 × 各 1-5 分）
 
 ---
@@ -93,7 +96,7 @@ Thesis 是否明確說出「市場現在信 X，本 thesis 認為 Y，催化劑 
 | 2 | Variant perception 缺席，thesis 與賣方共識完全一致 |
 | 1 | 不僅缺少差異，且主要論點已在廣泛報導中出現 |
 
-**失敗閾值：< 2 → 標記為「研究素材」，不升格 Watchlist**
+**失敗閾值：< 2 → 標記為「研究素材」，不建立 Decision cohort**
 
 ---
 
@@ -103,7 +106,7 @@ Thesis 是否明確說出「市場現在信 X，本 thesis 認為 Y，催化劑 
 |---|---|
 | **退回 U2（補充資料）** | 可信度 < 3 **或** 可證偽性 < 3 |
 | **標記為「研究素材」（不升格）** | 市場差異度 < 2（即便其他分數高） |
-| **可進入 Watchlist 升格流程** | 總分 ≥ 22/30 **且** 可信度 ≥ 3 **且** 可證偽性 ≥ 3 **且** 市場差異度 ≥ 2 |
+| **可建立 Decision cohort 追蹤** | 總分 ≥ 22/30 **且** 可信度 ≥ 3 **且** 可證偽性 ≥ 3 **且** 市場差異度 ≥ 2 |
 | **升格前必做** | 財務核驗清單 5 項全部完成（客戶集中度 / 毛利率趨勢 / backlog / 稀釋 / 估值壓力）|
 
 ---
@@ -133,5 +136,5 @@ Thesis 是否明確說出「市場現在信 X，本 thesis 認為 Y，催化劑 
 [pass / 退回 U2 / 研究素材]
 
 ### 後續行動
-[下一步：補充文件 / 啟動 Engine C / 開始 Watchlist 財務核驗]
+[下一步：補充文件 / 啟動 Engine C / 跑財務核驗五項]
 ```

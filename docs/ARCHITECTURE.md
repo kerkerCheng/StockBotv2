@@ -73,7 +73,7 @@ Engine D（decision_lab/）— 凍結 context、記錄 live choice、outcome att
 
 - **Neo4j 知識圖譜（Engine A）：** 供應鏈結構、技術關係、來源可追溯的主張。
   Property graph，不是 tree。選型理由見 `AGENTS.md` L1。
-- **SQLite / Postgres（Engine C）：** 財務快照、Watchlist Gate。零安裝預設 SQLite；
+- **SQLite / Postgres（Engine C）：** 財務快照、財務核驗五項（舊稱 Watchlist Gate，該層已於 2026-09-02 除役，見 §9；五項本身仍有效）。零安裝預設 SQLite；
   設 `POSTGRES_HOST`／`POSTGRES_DSN` 切 Postgres。SQLite authority 在 ignored
   `library/private/engine_c/`，由 `library/private/runtime_pointer.json` 指向。
   ETL projection 可由 tracked schema 重建；**同庫的 append-only manual observation

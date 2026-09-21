@@ -1,9 +1,11 @@
 """
-checklist.py — 5 項財務核驗清單查詢（Watchlist Gate 用）。
+checklist.py — 5 項財務核驗清單查詢。
+⚠ 舊稱「Watchlist Gate」已停用：三級階梯 2026-09-02 除役（docs/ARCHITECTURE.md §9），
+   但**這五項沒有廢止**——它經 decision_lab/coverage.py 變成 Decision cohort 的 blocker。
 
 get_checklist(ticker) -> dict
   回傳 5 項各自的狀態（ok / manual_required / missing）與數值，
-  供 thesis/generate_lane_memo.py 的 Watchlist Gate 使用。
+  供 thesis/generate_lane_memo.py 的財務核驗段落使用。
 
 後端：SQLite（預設）或 Postgres（設 POSTGRES_HOST/DSN）。
 """
@@ -243,7 +245,7 @@ def get_checklist(ticker: str) -> dict:
         "valuation_pressure":     val_item,
     }
     # gate_pass 只掃 items（凍結的五項 L9 gate）。擴充欄位刻意不參與，否則新增一個
-    # 欄位就會讓所有既有標的的 Watchlist 升格 gate 退化。
+    # 欄位就會讓所有既有標的的 gate_pass 退化。
     gate_pass = all(v["status"] in ("ok", "manual_reviewed") for v in items.values())
 
     return {
@@ -481,7 +483,14 @@ def format_checklist(result: dict) -> str:
             extra = "  " + ", ".join(parts) if parts else ""
         lines.append(f"{icon} {item['label']}{extra}")
 
-    gate = "✓ Gate 通過 → 可升格 Watchlist" if result.get("gate_pass") else "✗ Gate 未通過 → [Research Note]"
+    # ⚠ 這行只說「五項齊不齊」，**不說升格**：Watchlist／Underwrite 三級模板已於
+    # 2026-09-02 除役（docs/ARCHITECTURE.md §9），終點層級是 Decision cohort。
+    # 五項本身仍然有效——它經 decision_lab/coverage.py 變成 cohort blocker。
+    gate = (
+        "✓ 財務核驗五項齊備"
+        if result.get("gate_pass")
+        else "✗ 財務核驗五項未齊備（上方標 ⚠ 的就是缺口）"
+    )
     lines.append(f"\n**{gate}**")
     return "\n".join(lines)
 

@@ -303,7 +303,8 @@ def build_action_card(
         portfolio_action = "none"
         single_name_action = "handoff_to_formal_lane"
         reason = "Probe 已升格；這份 Probe 研究判斷已交棒。"
-        next_action = "使用 formal Watchlist／Underwrite 規則重新評估。"
+        # 三級階梯 2026-09-02 除役；接手的是 Decision cohort，不是「formal lane」。
+        next_action = "已交棒給 Decision cohort，以該 cohort 的 coverage 與五軸重新評估。"
     elif revised_decision_stale:
         attention = "REVIEW"
         urgency = "prompt"
