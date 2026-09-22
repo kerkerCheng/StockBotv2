@@ -244,8 +244,9 @@ def test_watches_identity_ignores_last_checked() -> None:
 def test_both_kinds_are_registered_and_validate() -> None:
     # ⚠ 這一串刻意硬編：新增 state kind 就該讓這個測試紅一次，逼人確認
     # 「它的 CLI flag 加了嗎、materializer 有嗎、心跳／APP 讀得到嗎」。
-    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches", "positions", "basket",
-                           "structure_readings", "account_scorecard", "multi_year")
+    # 2026-09-22 Step 0a.2：basket／multi_year 退役，9 → 7。
+    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches", "positions",
+                           "structure_readings", "account_scorecard")
     for kind, payload in (("coverage", fake_coverage_payload()), ("watches", fake_watches_payload())):
         assert validate_state_artifact(kind, payload) is payload
         with pytest.raises(ArtifactUnavailable, match="content_digest"):

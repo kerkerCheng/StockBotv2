@@ -192,7 +192,12 @@ def test_heartbeat_does_not_claim_a_delivered_capability_is_still_missing() -> N
     # 而且它們真的有被印出來（不是刪掉了事）。
     assert "power-law：籃子總報酬" in positions
     assert "alpha 全歸零淨值少" in positions
-    assert "歸零旗標 " in positions
+    # ⚠ 2026-09-22（Step 0a.2）：四盞燈的**彙總**原本由籃子 artifact 產生，籃子退役後
+    # 彙總暫停到 Phase 3 候選板接手。它印的是 `upstream_unavailable`（上游缺席）而**不是**
+    # `capability_absent`（能力還沒建）——後者才是本條測試要擋的那句假話，因為逐檔那盞燈
+    # 確實已交付且仍亮在個股頁的 wipeout 面板上。
+    assert "歸零旗標彙總" in positions
+    assert "逐檔那盞燈仍在個股頁" in positions
     # 那張沒有 consumer 的集中表已經移除（INV-4：producer 指得出 consumer）。
     assert "PENDING_PHASE: Mapping" not in source
 

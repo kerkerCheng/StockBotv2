@@ -45,8 +45,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | Step | 內容 | 狀態 | commit |
 |---|---|---|---|
 | 0.0 | 基準快照 | ✅ | d6e3fca |
-| 0a.1 | 排程與規則停跑 | ✅ | |
-| 0a.2 | 心跳與 APP 入口停跑 | ○ | |
+| 0a.1 | 排程與規則停跑 | ✅ | 36f59f9 |
+| 0a.2 | 心跳與 APP 入口停跑 | ✅ | |
 | 0a.3 | 研究 skill 改句 | ○ | |
 | 0a.4 | 池子收集端停鑄 | ○ | |
 | 0b.1 | 個股頁樞紐重寫、斷 import | ○ | |
@@ -63,6 +63,21 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 從那裡開始，走 development-flow（Z1 以上 R1）。沒有需要我核准的事就一直做到 Phase 0 結案；撞到六條停止條件才停。
 每個 Step 一個 commit 並更新進度表，GO 就 push。每個 Step 交回 HUMAN SUMMARY 與八欄。
 ```
+
+## 0.6 執行偏差紀錄（執行者填；每筆寫「plan 原文怎麼寫／實際怎麼做／為什麼」）
+
+plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 plan」。下面每一筆都已回頭修過本 plan 的對應段落。
+
+| # | Step | plan 原文 | 實際 | 為什麼 |
+|---|---|---|---|---|
+| 1 | 0.0 | 只列五條基準命令 | 另存**個股頁文字 digest**（新增唯讀腳本 `scripts/analyst_view_text_digest.py`）、心跳基準、測試檔數、排程狀態 | 結案 gate 3 與 R2 檢查 7 要求「materialize 前後文字不變」，沒有固定配方就證不出來。只 hash 敘事文字，不 hash 數字與時戳——把會隨刷新而動的算進去，gate 永遠紅＝永遠被忽略 |
+| 2 | 0a.1 | 「standing_authorization **移除** `decision_review` 類別」 | 從 `authorized` **搬到 `never`** | `ITEM_TYPES` 封閉性驗證要求每種都明寫在其中一邊（`engine_b/standing_authorization.py` 載入時驗）；整格刪掉會讓 config 拒絕載入 |
+| 3 | 0a.1 | 「`queue_segments` 移除 reassess-stale 段」 | 同時改 `audit/checks.py` | 它是那個段唯一的資料注入端（`reassess_only_numbers`）。先斷 producer 再刪段，否則稽核會把它算成 `unmapped` 而 INV-4 變紅 |
+| 4 | 0a.1 | 0a 的檔案清單沒有 `engine_b/cli.py` | **未動**，留給批 3 | `_chokepoint()` 仍以 `rank_bottlenecks` 的**成員**（不是順序）餵 pq1 優先序。批 3 的 L11-6 註記寫「0a.1 應已移除」，**那句話不成立**——該檔在批 3 才改讀結構表 |
+| 5 | 0a.2 | 只列 `webapp/__main__.py` materialize 清單、`api.py` 路由、`index.html` nav | 另外把兩個 kind 從 `webapp/contracts.py` 的**封閉字彙** de-register | 不 de-register 的話心跳段 1 會一直唸「不是今天的 N 份：basket、multi_year」——那正是 0a 要移除的注意力噪音；ROADMAP 驗收③也要求 `webapp status` 不列它們。代價實測只有 7 個測試檔／14 條測試，全部已處理 |
+| 6 | 0a.2 | 「段 2 的『現價過目標價』與**籃子行**」 | 段 2 改一行；**段 4 改兩行** | 實測籃子／量的候選／要幾倍／歸零旗標彙總四行都在**段 4**，不在段 2（見基準報告 §8） |
+| 7 | 0a.2 | 未提歸零旗標 | 彙總暫停並印 `upstream_unavailable` 明示缺席；**逐檔那盞燈未動** | 歸零旗標是**活的量測**（`AGENTS.md`「量測、訊號、脈絡三分」），但它唯一的 producer 是籃子 artifact。逐檔的燈住在個股頁 `wipeout` 面板（0b.1 明列為核心面板），所以停的只有彙總，且它自己說得出停在哪裡 |
+| 8 | 0a.2 | 未提 `webapp/static/app.js` | **未動**，留給批 1／批 3 | nav 已移除兩個入口，但 `renderBasket`／`renderMultiYear` 與 router 分支仍在。手動打 `#/basket` 會拿到 API 錯誤而不是崩潰 |
 
 ## 0. 不可越線（違反即 NO_GO）
 
@@ -102,7 +117,7 @@ EOF
 | # | 改哪裡 | 怎麼改 | 怎麼驗 |
 |---|---|---|---|
 | 0a.1 排程與規則 | `crons/daily_brief_prompt.md`、`crons/weekly_scan_prompt.md`、`engine_b/queue_segments.py`、`.codex/rules/*`、`config/standing_authorization.json` | prompt 拿掉 decision_lab `today`／reassess／籃子／首選段；`queue_segments` 移除 reassess-stale 段與任何以 `rank_bottlenecks` 順序餵的段；`.codex/rules` 移除 `decision_lab today` 與 reassess-stale 兩條 fixed entry（**五步 review**，`tests/test_codex_daily_permissions.py` 同 commit）；standing_authorization 移除 `decision_review` 類別（`engine_b/standing_authorization.py` 載入時驗封閉性，`tests/test_standing_authorization.py` 同 commit） | `python -m engine_b.cli counts` 佇列段少 reassess；`pytest tests/test_codex_daily_permissions.py tests/test_standing_authorization.py tests/test_routine_prompts.py` 綠 |
-| 0a.2 心跳與 APP 入口 | `crons/heartbeat.py` 段 2；`webapp/__main__.py` materialize 清單；`webapp/api.py` 路由；`webapp/static/index.html` nav | 段 2 的「現價過目標價」與籃子行換成一行 `候選狀態板未落地（not_yet_recorded）`（**五段永遠出現**）；materialize 清單移除 `multi_year`、`basket`；`/api/v1/multi-year` 與 basket 路由移除；nav 移除「要幾倍」「籃子」（籃子 Phase 3 以候選板回來） | `python -m webapp status` 沒有 `multi_year`、`basket`；`pytest tests/test_heartbeat.py tests/test_webapp_request_path.py` 綠（heartbeat 測試裡斷言籃子行的斷言跟機制退役，列進八欄） |
+| 0a.2 心跳與 APP 入口 | `crons/heartbeat.py` 段 2 **與段 4**；`webapp/contracts.py` 封閉字彙；`webapp/__main__.py` materialize 清單；`webapp/api.py` 路由；`webapp/static/index.html` nav（**實際落地見 §0.6 第 5–8 筆**）| 段 2 的「現價過目標價」與籃子行換成一行 `候選狀態板未落地（not_yet_recorded）`（**五段永遠出現**）；materialize 清單移除 `multi_year`、`basket`；`/api/v1/multi-year` 與 basket 路由移除；nav 移除「要幾倍」「籃子」（籃子 Phase 3 以候選板回來） | `python -m webapp status` 沒有 `multi_year`、`basket`；`pytest tests/test_heartbeat.py tests/test_webapp_request_path.py` 綠（heartbeat 測試裡斷言籃子行的斷言跟機制退役，列進八欄） |
 | 0a.3 研究 skill | `skills/daily-brief/SKILL.md`、`skills/research-drain/SKILL.md`、`skills/alpha-status/SKILL.md`、`skills/investment-research/SKILL.md`、`skills/blind-spot-audit/SKILL.md`、`skills/system-decompose/SKILL.md` | 拿掉或改寫首選、籃子、payoff、隱含報酬、目標價、排序驅動研究、decision_review 的句子；alpha-status 的「現在該投什麼」改答「候選狀態板（Phase 3 前印未落地）」；跑 `python scripts/sync_agent_skills.py` | `python scripts/retired_mechanism_grep.py` 的 skills 列 → 0；`pytest tests/test_daily_brief_skill.py tests/test_agent_workflow.py` 綠（skill 測試裡斷言退役段落的斷言跟機制走） |
 | 0a.4 池子收集端 | `engine_b/todo.py` | `collect_all(include_decisions=False)` 成為唯一路徑：移除 `collect_from_decisions` 的呼叫；`ITEM_TYPES` 與 `GO_AUTHORIZATION` 裡的 `decision_review`、`sheet_only_holding` **改成 legacy 標記**（照 `lead_research` 的寫法，不刪 key：池裡歷史項目仍是這兩個 type，讀取要認得，且 `tests/test_engine_b_todo.py` 斷言兩個 dict 鍵一致） | 跑一次 collect 後 `todo list` 沒有新鑄的 decision_review；`pytest tests/test_engine_b_todo.py` 綠 |
 

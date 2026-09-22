@@ -213,8 +213,11 @@ def test_empty_ranking_is_honest_not_silent() -> None:
 # ---------------------------------------------------------------------------
 
 def test_state_kinds_are_a_closed_vocabulary() -> None:
-    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches", "positions", "basket",
-                           "structure_readings", "account_scorecard", "multi_year")
+    # 2026-09-22（Phase 0 Step 0a.2）：`basket` 與 `multi_year` 兩個 kind 退役，9 → 7。
+    # 這是**封閉字彙**的相等斷言，所以「有人把它加回來」與「有人新增一個沒登記的 kind」
+    # 都會在這裡變紅——不必另外寫一條「不得出現」的斷言。
+    assert STATE_KINDS == ("ranking", "beta", "coverage", "watches", "positions",
+                           "structure_readings", "account_scorecard")
     assert STATE_SCHEMA_VERSIONS["ranking"] == "stockbot-app/ranking/1"
 
 
@@ -276,8 +279,8 @@ def test_state_store_round_trip(tmp_path) -> None:
     got, fresh = store.read("ranking")
     assert got == payload and fresh.state == "fresh"
     assert store.kinds() == ["ranking"]
-    assert store.missing_kinds() == ["beta", "coverage", "watches", "positions", "basket", "structure_readings",
-            "account_scorecard", "multi_year"]
+    assert store.missing_kinds() == ["beta", "coverage", "watches", "positions",
+                                     "structure_readings", "account_scorecard"]
     with pytest.raises(ArtifactUnavailable, match="未登記"):
         store.read("cashflow")
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
@@ -289,8 +292,8 @@ def test_state_store_round_trip(tmp_path) -> None:
 def test_state_store_reports_missing_and_broken_separately(tmp_path) -> None:
     store = StateArtifactStore(tmp_path)
     assert store.kinds() == []
-    assert store.missing_kinds() == ["ranking", "beta", "coverage", "watches", "positions", "basket",
-            "structure_readings", "account_scorecard", "multi_year"]
+    assert store.missing_kinds() == ["ranking", "beta", "coverage", "watches", "positions",
+                                     "structure_readings", "account_scorecard"]
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("ranking")
     (tmp_path / "ranking.json").write_text('{"kind": "ranking", "rows": [', encoding="utf-8")
@@ -368,8 +371,8 @@ def test_status_and_verify_commands_include_state(tmp_path, capsys) -> None:
     assert main(["status", "--dir", str(tmp_path), "--format", "json"]) == 0
     doc = json.loads(capsys.readouterr().out)
     assert [s["kind"] for s in doc["state"]] == ["ranking"]
-    assert doc["state_missing"] == ["beta", "coverage", "watches", "positions", "basket", "structure_readings",
-            "account_scorecard", "multi_year"]
+    assert doc["state_missing"] == ["beta", "coverage", "watches", "positions",
+                                   "structure_readings", "account_scorecard"]
 
 
 # ---------------------------------------------------------------------------

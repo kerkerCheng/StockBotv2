@@ -99,8 +99,6 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/coverage",
             f"GET /api/{API_VERSION}/watches",
             f"GET /api/{API_VERSION}/positions",
-            f"GET /api/{API_VERSION}/basket",
-            f"GET /api/{API_VERSION}/multi-year",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -233,22 +231,9 @@ _STATE_NOTES = {
 }
 
 
-_STATE_NOTES["basket"] = ("python -m webapp materialize --basket",
-                          "「artifact 讀不到」與「沒有一檔通過 filter」是兩件事——後者會以 200 ＋ top_pick=null ＋理由回。")
-
-
-async def basket(request: Request) -> Response:
-    return await _serve_state(request, "basket")
-
-
-_STATE_NOTES["multi_year"] = (
-    "python -m webapp materialize --multi-year",
-    "「artifact 讀不到」與「還沒有人寫下任何一檔的 multiple_horizon」是兩件事"
-    "——後者會以 200 ＋ rows 裡逐檔 status=missing ＋理由回。")
-
-
-async def multi_year(request: Request) -> Response:
-    return await _serve_state(request, "multi_year")
+# ⚠ 2026-09-22（Phase 0 Step 0a.2）：`/basket` 與 `/multi-year` 兩個路由退役——兩個 state kind
+# 已從封閉字彙移除（ROADMAP Phase 0／G1、G3），serve 它們只會回「未登記的 state kind」。
+# 候選狀態板（Phase 3）接手時會是一個新路由，不是把這兩個改名回來。
 
 
 _STATE_NOTES["structure_readings"] = (
@@ -385,8 +370,6 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/coverage", coverage, methods=["GET"]),
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
         Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
-        Route(f"/api/{API_VERSION}/basket", basket, methods=["GET"]),
-        Route(f"/api/{API_VERSION}/multi-year", multi_year, methods=["GET"]),
         Route(f"/api/{API_VERSION}/structure-readings", structure_readings, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),

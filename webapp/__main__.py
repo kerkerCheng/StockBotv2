@@ -54,16 +54,15 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 #: 「只 materialize state artifact、不順手重跑每一檔」的旗標清單。
 #: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
 _STATE_FLAGS: tuple[str, ...] = (
-    "ranking", "beta", "coverage", "watches", "positions", "basket",
-    "structure_readings", "account_scorecard", "multi_year",
+    "ranking", "beta", "coverage", "watches", "positions",
+    "structure_readings", "account_scorecard",
 )
 
 
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_account_scorecard, materialize_basket, materialize_beta, materialize_coverage,
-        materialize_multi_year,
+        materialize_account_scorecard, materialize_beta, materialize_coverage,
         materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_ranking, materialize_watches, write_vocabularies,
@@ -164,19 +163,6 @@ def cmd_materialize(args: argparse.Namespace) -> int:
                 size = path.stat().st_size
                 print(f"✓ {ticker} → {path.name}（{size:,} bytes）")
         print(f"字彙表 → {vocab_path.name}")
-    # 籃子（V3）最後跑：它 join 的是 ranking／positions／單檔三份 artifact，得在它們之後。
-    if getattr(args, "basket", False):
-        total += 1
-        try:
-            path, payload = materialize_basket(store=state_store, analyst_store=store)
-        except Exception as exc:  # noqa: BLE001
-            failed += 1
-            print(f"✗ basket：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
-        else:
-            f = payload["filter"]
-            pick = payload["top_pick"]
-            print(f"✓ basket → {path.name}（{path.stat().st_size:,} bytes；{f['input']} 檔／通過 filter {f['accepted']}"
-                  f"／首選 {pick['ticker'] if pick else '無'}）")
     # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
     if getattr(args, "account_scorecard", False):
         total += 1
@@ -190,23 +176,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             calls = sum(int(a.get("named_calls") or 0) for a in accounts)
             print(f"✓ account_scorecard → {path.name}（{path.stat().st_size:,} bytes；"
                   f"{len(accounts)} 個帳號／{calls} 則具名點名）")
-    # 多年視角（Phase 7 Step 7.4）：要在 basket 之後跑——它的標的宇宙就是籃子那一份。
-    if getattr(args, "multi_year", False):
-        total += 1
-        try:
-            path, payload = materialize_multi_year(store=state_store)
-        except Exception as exc:  # noqa: BLE001
-            failed += 1
-            print(f"✗ multi_year：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
-        else:
-            counts = payload.get("counts") or {}
-            print(f"✓ multi_year → {path.name}（{path.stat().st_size:,} bytes；"
-                  f"{counts.get('input', 0)} 檔／算得出 {counts.get('available', 0)}"
-                  f"／還沒寫下目標年度 {counts.get('no_horizon', 0)}"
-                  f"／方法不適用 {counts.get('method_not_applicable', 0)}"
-                  f"／沒有判斷檔 {counts.get('no_judgment', 0)}"
-                  f"／其他缺料 {counts.get('other_missing', 0)}）")
-    # 結構讀圖：唯讀 ledger ＋ 查圖比對。與 basket 互不相干，所以**各自 fail-soft**。
+    # 結構讀圖：唯讀 ledger ＋ 查圖比對。與其他 state materializer 互不相干，所以**各自 fail-soft**。
     if getattr(args, "structure_readings", False):
         total += 1
         try:
@@ -314,10 +284,6 @@ def cmd_status(args: argparse.Namespace) -> int:
         elif kind == "positions":
             extra = (f"｜逐檔 {len(payload['rows'])}"
                      f"／真實成交 {len(payload['live']['tickers'])} 檔")
-        elif kind == "basket":
-            pick = payload.get("top_pick")
-            extra = (f"｜{payload['filter']['input']} 檔／通過 filter {payload['filter']['accepted']}"
-                     f"／首選 {pick['ticker'] if pick else '無'}")
         print(f"- {kind}｜{freshness.state}（{freshness.age_hours:.1f}h）"
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
@@ -591,12 +557,8 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 事件監看：Event Watch registry ＋ 追源 backlog 的原值照抄")
     mat.add_argument("--positions", action="store_true",
                      help="另外（或只）materialize 部位與問責：outcome 腳本 collect() ＋ Decision Store 計數器")
-    mat.add_argument("--basket", action="store_true",
-                     help="另外（或只）materialize 籃子：ranking × 各檔 overview × positions 的 join（最後跑；不連 DB）")
     # dest 刻意與 state kind 同名（`account_scorecard`）——名字一致，`_STATE_FLAGS` 才比對得起來，
     # 不必再維護一張 flag→kind 的映射表（而映射表正是下一個會忘記更新的東西）。
-    mat.add_argument("--multi-year", dest="multi_year", action="store_true",
-                     help="另外（或只）materialize 多年視角：要幾倍、哪一格得為真（Phase 7；要在 --basket 之後）")
     mat.add_argument("--scorecard", "--account-scorecard", dest="account_scorecard",
                      action="store_true",
                      help="另外（或只）materialize 帳號計分表：D5 五欄＋三個偏差（會抓價格，唯一連外的 materializer）")

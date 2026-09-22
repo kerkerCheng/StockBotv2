@@ -1,5 +1,9 @@
 """籃子頁（V3，2026-09-15）：`webapp/basket.py` 純 join ＋ filter 式首選。
 
+⚠ **2026-09-22（Phase 0 Step 0a.2）：state kind 與 API 路由已退役**，所以
+`test_state_kind_is_registered_and_api_serves_it` 跟著機制一起移除（它守的就是那個 kind
+有沒有登記、那個路由服不服務）。builder 本身留到 0b 批 3 才刪，本檔其餘測試在那之前仍然有效。
+
 守的是四件事：
 1. **順序照抄**：列＝ranking 可行動排序去重，一個位元不重排；沒有任何加權。
 2. **首選是 filter 不是分數**：三條規則；沒有一檔通過就 top_pick=null ＋ 理由計數（INV-3：input／accepted／filtered／reasons）。
@@ -52,7 +56,8 @@ def test_rows_follow_the_ranking_order_deduplicated_and_never_rescored() -> None
     assert [r["sector"] for r in out["rows"]] == ["AI 光互連", "AI 光互連", "稀土"]
     assert all(r["has_overview"] is False and r["filter_reasons"] == ["no_bet", "no_catalyst_recorded"] for r in out["rows"])
     assert out["top_pick"] is None and "還沒寫賭注（variant 假設） 3 檔" in out["top_pick_absent_reason"]
-    validate_state_artifact("basket", out)
+    # ⚠ 2026-09-22（Step 0a.2）：`basket` state kind 已從封閉字彙移除，所以這裡不再
+    # validate_state_artifact——builder 本身留到 0b 批 3 才刪，在那之前仍受本檔其餘測試保護。
 
 
 def test_top_pick_is_the_first_in_structural_order_that_passes_all_three_rules() -> None:
@@ -76,26 +81,6 @@ def test_top_pick_is_the_first_in_structural_order_that_passes_all_three_rules()
     assert f["reasons"]["no_catalyst_recorded"] == 1 and f["reasons"]["catalyst_after_value_date"] == 1
     assert "不是買進指令" in out["top_pick"]["note"]
 
-
-def test_state_kind_is_registered_and_api_serves_it(tmp_path) -> None:
-    assert "basket" in STATE_KINDS
-    from starlette.testclient import TestClient
-
-    from webapp.api import create_app
-    from webapp.store import StateArtifactStore
-
-    state_dir = tmp_path / "state"
-    store = StateArtifactStore(state_dir)
-    ranking = _ranking([_row(1, "LITE")])
-    store.write(build_basket_artifact(ranking=ranking, overviews={}, positions=None))
-    client = TestClient(create_app(tmp_path, state_dir))
-    got = client.get("/api/v1/basket")
-    assert got.status_code == 200 and got.json()["top_pick"] is None and got.json()["rows"][0]["ticker"] == "LITE"
-    assert client.post("/api/v1/basket").status_code == 405
-
-# ---------------------------------------------------------------------------
-# Q1（2026-09-17 使用者核准 A）：第二個宇宙——被門檻擋下、但已研究過的那些
-# ---------------------------------------------------------------------------
 
 def _filtered(ticker, *, sub=3, qual="qualified", anchor="tech:ai_switch",
               reason="substitutability_below_threshold"):

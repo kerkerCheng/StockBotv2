@@ -53,20 +53,21 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 
 #: **state artifact**（跨標的的單一 JSON，不是 per-ticker）的 kind → schema 版本。
 #: 這是**封閉字彙**：新 kind 必須先在這裡登記，store 才認得（`STATE_KINDS` 由此導出，
-#: 不另抄一份）。目前只有 `ranking`；coverage／positions／beta／watches 依 ROADMAP 逐一加。
+#: 不另抄一份）。
+#: ⚠ 2026-09-22（Phase 0 Step 0a.2）：`basket`（籃子 filter／首選）與 `multi_year`（要幾倍）
+#: 兩個 kind 退役，9 → 7（ROADMAP Phase 0／G1、G3）。**de-register 就是「入口移除」**：
+#: store 從此拒收這兩種，`webapp status` 也不再列它們。產生它們的模組（`webapp/basket.py`、
+#: `briefing/multi_year.py`）留到 0b 才刪——先斷 import，再刪模組。
+#: 磁碟上既有的兩份 artifact 不刪（`library/private/` 是 ignored derived cache，plan 不碰它），
+#: 只是從今天起沒有人讀得到它們。
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "ranking": "stockbot-app/ranking/1",
     "beta": "stockbot-app/beta/1",
     "coverage": "stockbot-app/coverage/2",
     "watches": "stockbot-app/watches/1",
     "positions": "stockbot-app/positions/1",
-    "basket": "stockbot-app/basket/1",
     "structure_readings": "stockbot-app/structure_readings/1",
     "account_scorecard": "stockbot-app/account_scorecard/1",
-    # Phase 7 Step 7.4（2026-09-19）：「要幾倍，哪一格得為真」。
-    # ⚠ 它**必須**是 materialize 出來的 artifact，不能在 request path 算——
-    # 多年橋是金融模型，而 APP 呈現契約明文禁止 request path 跑模型。
-    "multi_year": "stockbot-app/multi_year/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 

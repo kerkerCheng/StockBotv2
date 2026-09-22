@@ -15,10 +15,6 @@ from briefing.multi_year import build_multi_year_artifact
 from webapp.contracts import STATE_KINDS, STATE_REQUIRED_FIELDS
 
 
-def test_the_kind_is_registered() -> None:
-    assert "multi_year" in STATE_KINDS
-
-
 def test_the_artifact_answers_every_required_question() -> None:
     payload = build_multi_year_artifact([], generated_at=datetime(2026, 9, 19, tzinfo=timezone.utc))
     for field in STATE_REQUIRED_FIELDS:

@@ -395,6 +395,19 @@ def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
 # 段 2｜變了什麼
 # ---------------------------------------------------------------------------
 
+#: 候選狀態板（Phase 3）還沒落地時，心跳用這一句宣告缺席。**kind 由產生缺席的程式自己宣告**
+#: （L16），不由 renderer 猜；`not_yet_recorded` 是刻意的選擇——它**不是** settled，所以這一格
+#: 會一直算成待辦、一直印出來，直到 Phase 3 真的把候選板做出來（L14：常駐計數器）。
+_CANDIDATE_BOARD_ABSENCE = Absence(
+    "not_yet_recorded",
+    "籃子 filter、目標價與多年視角已於 Phase 0 退役；接手的候選狀態板要到 Phase 3 才落地")
+
+#: 歸零旗標的**彙總**計數暫停（逐檔的燈沒停，見個股頁 wipeout 面板）。
+_WIPEOUT_ROLLUP_ABSENCE = Absence(
+    "upstream_unavailable",
+    "四盞燈的彙總原本由籃子 artifact 產生，籃子已退役；Phase 3 候選板接手前沒有上游")
+
+
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -> Section:
     """門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作，D3）、結構讀圖 staleness。"""
     section = Section(2, SECTION_TITLES[1])
@@ -413,19 +426,12 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
     # thesis 生命週期：非 active 的就是「有東西變了」（L7 的五態）。
     section.lines.append(_thesis_line(now=now, thesis_path=thesis_path))
 
-    basket, basket_absence = _load_state(state_dir, "basket")
-    if basket_absence is not None:
-        section.lines.append(f"現價過目標價：{basket_absence.reason}（{basket_absence.kind}）")
-    else:
-        rows = basket.get("rows") or []
-        above = [str(r.get("company_label") or r.get("company_id")) for r in rows if r.get("price_above_target")]
-        if above:
-            section.lines.append(
-                "現價已高於目標價（**提醒不是動作**，D3：`realized` 不觸發出場）："
-                + "、".join(sorted(above))
-            )
-        else:
-            section.lines.append("現價過目標價：0 檔")
+    # ⚠ 2026-09-22（Phase 0 Step 0a.2）：原本這裡印「現價已高於目標價」，讀的是籃子 artifact
+    # 的 `price_above_target`。目標價與籃子 filter 一起退役（ROADMAP Phase 0／G3），接手的是
+    # Phase 3 的候選狀態板。**這一行不得整段消失**：拿掉的內容換成一行缺席宣告，因為五段永遠
+    # 出現，而「這一格沒有了」與「這一格是 0」是相反的結論（INV-3）。
+    section.lines.append(
+        f"候選狀態板未落地（{_CANDIDATE_BOARD_ABSENCE.kind}）：{_CANDIDATE_BOARD_ABSENCE.reason}")
 
     # 結構讀圖（Q5，2026-09-17）：讓它**不可能安靜腐壞**。心跳只讀已 materialize 的比對結果，
     # 不查圖、不重新推理——重讀是研究，只在互動 session（D12）。
@@ -667,64 +673,18 @@ def build_positions(*, state_dir: Path | None) -> Section:
                 f"入圖前已漲（chasing）{health.get('chasing', '?')}/{health.get('paired', '?')} 檔"
             )
 
-    # 賭注帳（Q2，2026-09-17）：籃子的每一列強制「有賭注 或 Abstention」。欠帳必須是一個
-    # **會自己出現的常駐計數器**，不是要人打開 APP 翻表才看得到的東西（L14）。
-    basket, basket_absence = _load_state(state_dir, "basket")
-    if basket_absence is not None:
-        section.lines.append(f"賭注帳：{basket_absence.reason}（{basket_absence.kind}）")
-    else:
-        ledger = basket.get("bet_ledger") or {}
-        if not ledger:
-            section.lines.append("賭注帳：這份 basket artifact 沒有 bet_ledger（upstream_unavailable）")
-        else:
-            owed = ledger.get("owed") or []
-            line = (f"籃子 {ledger.get('input', '?')} 檔｜有賭注 {ledger.get('bet', '?')}"
-                    f"｜刻意不主張 {ledger.get('abstained', '?')}"
-                    f"｜**欠一個答案 {ledger.get('unanswered', '?')}**"
-                    f"｜觀點已在 base、待決定 overlay {ledger.get('opinion_in_base', '?')}")
-            if owed:
-                line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
-            section.lines.append(line)
-        # 量的候選（Q1）：**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義。
-        # 多年視角（Phase 7 Step 7.4）：**常駐計數器**——「還有幾檔沒寫下目標年度」是待辦，
-        # 而待辦要會自己出現，不是等人去翻（L14）。⚠ 心跳只**讀** artifact，不算橋。
-        multi, multi_absence = _load_state(state_dir, "multi_year")
-        if multi_absence is not None:
-            section.lines.append(f"要幾倍：{multi_absence.reason}（{multi_absence.kind}）")
-        else:
-            counts = multi.get("counts") or {}
-            # ⚠ 只把「**我們還沒寫**」的列進待辦清單——`method_not_applicable`（方法在這一檔
-            # 不適用，例如基期虧損）與 `no_judgment`（連判斷檔都沒有）不是「還沒寫目標年度」，
-            # 混進同一個數字會讓人去做一件補不了的事（2026-09-19 實測：16 檔裡各有 1 檔）。
-            owed = [r.get("ticker") for r in (multi.get("rows") or ())
-                    if r.get("status") == "no_horizon"]
-            line = (f"要幾倍（多年視角）{counts.get('input', '?')} 檔｜算得出 {counts.get('available', '?')}"
-                    f"｜**還沒寫下目標年度 {counts.get('no_horizon', '?')}**")
-            if owed:
-                line += "：" + "、".join(str(t) for t in owed[:8]) + ("…" if len(owed) > 8 else "")
-            # 另外兩種缺席各自現形，**不併進上面那個數字**（INV-3）。
-            extra = [(f"方法不適用 {counts.get('method_not_applicable', 0)}"
-                      if counts.get("method_not_applicable") else ""),
-                     (f"沒有判斷檔 {counts.get('no_judgment', 0)}"
-                      if counts.get("no_judgment") else ""),
-                     (f"其他缺料 {counts.get('other_missing', 0)}"
-                      if counts.get("other_missing") else "")]
-            extra = [e for e in extra if e]
-            if extra:
-                line += "｜" + "、".join(extra)
-            section.lines.append(line)
-
-        volume = basket.get("volume_filter") or {}
-        volume_ledger = basket.get("volume_bet_ledger") or {}
-        if volume:
-            vline = (f"量的候選 {volume.get('input', '?')} 家（已研究、低於門檻）"
-                     f"｜通過條件 {volume.get('accepted', '?')}"
-                     f"｜**欠一個答案 {volume_ledger.get('unanswered', '?')}**"
-                     f"｜觀點已在 base、待決定 overlay {volume_ledger.get('opinion_in_base', '?')}")
-            owed = volume_ledger.get("owed") or []
-            if owed:
-                vline += "：" + "、".join(str(t) for t in owed[:6]) + ("…" if len(owed) > 6 else "")
-            section.lines.append(vline)
+    # ⚠ 2026-09-22（Phase 0 Step 0a.2）：這裡原本有四行，全部讀籃子／多年視角 artifact——
+    # 賭注帳（Q2）、量的候選（Q1）、要幾倍（Step 7.4）、歸零旗標彙總。前三個機制退役
+    # （ROADMAP Phase 0／G3），第四個是**活的量測**但它唯一的 producer 是籃子 artifact，
+    # 所以彙總跟著暫停到 Phase 3 候選板接手；**逐檔那盞燈沒有停**，它住在個股頁的
+    # `wipeout` 面板（0b.1 明列為核心面板），APP 首屏照亮。
+    # 兩行都是明示缺席而不是整段消失：不印，與印 0，導向相反的行動（INV-3、L14）。
+    section.lines.append(
+        f"賭注帳／量的候選／要幾倍：{_CANDIDATE_BOARD_ABSENCE.reason}"
+        f"（{_CANDIDATE_BOARD_ABSENCE.kind}）")
+    section.lines.append(
+        f"歸零旗標彙總：{_WIPEOUT_ROLLUP_ABSENCE.reason}（{_WIPEOUT_ROLLUP_ABSENCE.kind}）"
+        "　←逐檔那盞燈仍在個股頁，停的只有這個彙總計數")
 
     ranking, rank_absence = _load_state(state_dir, "ranking")
     if rank_absence is not None:
@@ -806,28 +766,6 @@ def build_positions(*, state_dir: Path | None) -> Section:
                 f"**alpha 全歸零淨值少 {_pct(weight)}**（alpha 佔 NAV 的比例本身；純呈現、零門檻，"
                 "尺寸仍由使用者決定）")
 
-    # 歸零旗標（D2）：**盞數與檔數分開**——「一檔亮四盞」與「四檔各亮一盞」是兩件事。
-    if basket_absence is not None:
-        section.lines.append(f"歸零旗標：{basket_absence.reason}（{basket_absence.kind}）")
-    else:
-        ledger = basket.get("wipeout_ledger") or {}
-        if not ledger:
-            section.lines.append("歸零旗標：這份 basket artifact 沒有 wipeout_ledger（upstream_unavailable）")
-        else:
-            lamps = ledger.get("lamps") or {}
-            line = (f"歸零旗標 {ledger.get('companies', '?')} 檔 × 4 盞："
-                    f"紅 {lamps.get('red', 0)}｜黃 {lamps.get('amber', 0)}｜綠 {lamps.get('green', 0)}"
-                    f"｜**灰（沒量到）{lamps.get('unlit', 0)}**——⚠ 灰不是綠")
-            red = ledger.get("red_tickers") or []
-            if red:
-                line += "；有紅燈：" + "、".join(str(x) for x in red[:8]) + ("…" if len(red) > 8 else "")
-            section.lines.append(line)
-            missing_flags = ledger.get("no_flags_tickers") or []
-            if missing_flags:
-                section.lines.append(
-                    f"歸零旗標算不出來的 {len(missing_flags)} 檔："
-                    + "、".join(str(x) for x in missing_flags[:8])
-                    + ("…" if len(missing_flags) > 8 else ""))
     return section
 
 

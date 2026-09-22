@@ -251,50 +251,36 @@ def test_one_broken_item_does_not_take_out_its_neighbours(
     assert "upstream_unavailable" in text
 
 
-def test_bet_ledger_is_a_standing_counter_in_section_four(tmp_path: Path) -> None:
-    """Q2 的欠帳必須**自己出現**在心跳裡，不是要人打開 APP 翻表才看得到（L14）。"""
-    from webapp.basket import build_basket_artifact
-    from webapp.store import StateArtifactStore
+def test_one_broken_state_artifact_does_not_take_out_the_rest_of_section_four(
+        broken_env: dict[str, Path]) -> None:
+    """一份 artifact 讀不到時，它自己宣告缺席，**不把整段帶走**。
 
-    state_dir = tmp_path / "state"
-    state_dir.mkdir()
-    rank_row = {"rank": 1, "ticker": "X", "company_id": "co:x", "company_label": "X",
-                "bottleneck": "tech:x", "relation": "supplies_to", "evidence": "externally_corroborated"}
-    StateArtifactStore(state_dir).write(build_basket_artifact(
-        ranking={"rows": [rank_row], "sectors": []}, overviews={}, positions=None))
-    text = "\n".join(hb.build_positions(state_dir=state_dir).lines)
-    assert "欠一個答案 1" in text, text
-    assert "籃子 1 檔" in text
-
-
-def test_the_two_universes_are_counted_separately(tmp_path: Path) -> None:
-    """Q1：護城河與量的候選**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義。"""
-    from webapp.basket import build_basket_artifact
-    from webapp.store import StateArtifactStore
-
-    state_dir = tmp_path / "state"
-    state_dir.mkdir()
-    rank_row = {"rank": 1, "ticker": "LITE", "company_id": "co:lite", "company_label": "LITE",
-                "bottleneck": "tech:x", "relation": "supplies_to", "evidence": "externally_corroborated"}
-    filtered = {"company_id": "co:3081", "ticker": "3081.TWO", "relation": "supplies_to",
-                "bottleneck": "tech:y", "substitutability": 3, "threshold": 4,
-                "qualification_status": "qualified", "evidence": "company_disclosure",
-                "documents": 1, "chain": ["tech:ai_switch"], "demand_anchor": "tech:ai_switch",
-                "demand_hops": 1, "reasons": ["substitutability_below_threshold"]}
-    ranking = {"rows": [rank_row], "sectors": [], "filtered_rows": [filtered], "filter": {}}
-    StateArtifactStore(state_dir).write(build_basket_artifact(
-        ranking=ranking, overviews={}, positions=None))
-    text = "\n".join(hb.build_positions(state_dir=state_dir).lines)
-    assert "籃子 1 檔" in text and "量的候選 1 家" in text, text
-    assert text.count("欠一個答案") == 2, "兩個宇宙各自報自己的欠帳，不合併"
-
-
-def test_missing_basket_does_not_take_out_the_rest_of_section_four(broken_env: dict[str, Path]) -> None:
-    """賭注帳讀不到時，它自己宣告缺席，**不把 alpha 占比與追蹤表一起帶走**。"""
+    ⚠ 2026-09-22（Step 0a.2）：原本的主詞是「賭注帳」（讀籃子 artifact），籃子退役後
+    改用仍在消費的 positions／beta 當主詞。守的判準一字未改：缺席要具名、後面的格子還在。
+    """
     section = hb.build_positions(state_dir=broken_env["state_dir"])
     text = "\n".join(section.lines)
-    assert "賭注帳：" in text and any(k in text for k in ABSENCE_KINDS)
-    assert "power-law" in text, "後面的格子還在"
+    assert "追蹤表：" in text and any(k in text for k in ABSENCE_KINDS)
+    assert "可投資排序" in text or "需求錨集中度" in text, "後面的格子還在"
+
+
+def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Path) -> None:
+    """Step 0a.2：拿掉的內容換成**明示缺席**，不是整段消失（INV-3、L14）。
+
+    這一條是「停跑真的生效了」的可證偽斷言：段 2 與段 4 各有一行指名候選狀態板還沒落地，
+    段 4 另有一行指名歸零旗標的彙總停在哪裡、逐檔的燈沒停。少任何一行都會紅。
+    """
+    state_dir = tmp_path / "state"
+    state_dir.mkdir()
+    changes = "\n".join(hb.build_changes(
+        now=datetime(2026, 9, 22, tzinfo=timezone.utc), state_dir=state_dir,
+        thesis_path=tmp_path / "nope.json").lines)
+    positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
+    assert "候選狀態板未落地（not_yet_recorded）" in changes, changes
+    assert "not_yet_recorded" in positions, positions
+    assert "歸零旗標彙總" in positions and "逐檔那盞燈仍在個股頁" in positions, positions
+    # 目標價那一行真的不見了（退役的是機制，不是只換了措辭）。
+    assert "現價已高於目標價" not in changes
 
 
 def test_unreadable_leads_file_is_not_the_same_as_an_empty_log(broken_env: dict[str, Path]) -> None:
@@ -329,15 +315,26 @@ def test_app_freshness_today_is_the_local_today(tmp_path: Path) -> None:
     於是 daily 死掉也看不出來——成功與失敗在同一個訊號上同形（L13-2）。
     ⚠ 在 UTC±0 的機器上兩種實作等價，這條會退化成不鑑別（本機是 Asia/Taipei）。
     """
-    from webapp.basket import build_basket_artifact
     from webapp.store import StateArtifactStore
 
     state_dir = tmp_path / "state"
     state_dir.mkdir()
     yesterday_pm = datetime(2026, 9, 17, 14, 44).astimezone()   # naive → 本地時區
-    StateArtifactStore(state_dir).write(build_basket_artifact(
-        ranking={"rows": [], "sectors": [], "as_of": None, "generated_at": None},
-        overviews={}, positions=None, generated_at=yesterday_pm))
+    # ⚠ 2026-09-22（Step 0a.2）：原本借籃子 artifact 當道具，籃子 kind 退役後改用 ranking。
+    # **本條測的是「今天」是哪個時區的今天，與是哪一種 artifact 無關。**
+    # 手搭一份最小但形狀正確的 ranking artifact（`content_digest` 由 canonical_digest 算，
+    # 不然 store 讀回來會 fail closed）。**本條測的是「今天」是哪個時區的今天**，不是 ranking 的內容。
+    from webapp.contracts import STATE_SCHEMA_VERSIONS, canonical_digest
+
+    payload = {
+        "schema_version": STATE_SCHEMA_VERSIONS["ranking"], "kind": "ranking",
+        "generated_at": yesterday_pm.isoformat(), "as_of": None,
+        "point_in_time": {"as_of": None, "mode": "current"},
+        "authority": {"source": "test"}, "freshness_identity": "test",
+        "materializer": {"version": "test"}, "rows": [], "structural_rows": [],
+    }
+    payload["content_digest"] = canonical_digest(payload)
+    StateArtifactStore(state_dir).write(payload)
 
     line = hb._app_freshness_line(now=datetime(2026, 9, 18, 7, 0).astimezone(), state_dir=state_dir)
     assert "今天已 materialize 0 份" in line, line
