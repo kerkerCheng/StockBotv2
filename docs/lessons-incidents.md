@@ -372,3 +372,39 @@ publisher 對「別人順手 commit 過」沒有表示、新增的兩個偵測�
   ③把「是加還是減」變成一個沒有模糊空間的事實題，④把它變成一條要跑的命令；
   這與本條開頭那句是同一件事：**欄位比美德可靠**。
 
+
+---
+
+# 已撤回的技術診斷（自 ROADMAP 逐字搬入，2026-09-22）
+
+## 清單
+
+> **這一節不是自責，是一份檢查清單。** 每一筆都是「已經寫進 commit／ROADMAP／程式註解，
+> 事後被推翻」的技術診斷——不是待辦、不是 bug，是**曾經看起來完全正確的錯誤結論**。
+>
+> **共同形狀：錯誤有方向性——全都朝「產生一個有洞察力的結論」偏**，而且每一個都能用專案
+> 自己的 lesson 語言包裝（L12 一表兩義、L15 gate 攔錯東西）。
+> **模式匹配是提出假說，不是確認假說。** 一個現象能被套進某條 L，只代表它值得查。
+>
+> **用法：** 宣稱「找到根因了」之前，先跑一條**試圖讓自己的結論變成假的**命令
+> （不是驗證它為真——那是確認偏誤）。專案對每個 thesis 都強制 `disproof_condition`，
+> 這一節是把同一個要求套到自己的技術診斷上。
+
+| 日期 | 被推翻的診斷 | 一條就能否證它的命令 |
+|---|---|---|
+| 2026-08-19 | COHR「Engine C 的 `bar_date` 是憑空生成的、`price` 對不上任何收盤」 | `date(2026,8,17).strftime('%A')` → `Monday`。**一本日曆就能否證** |
+| 2026-08-19 | 待辦池 `decision_review` 不退場是因為「空 `blockers` 被判成非純系統」 | `python -m decision_lab card <decision_id>` → `card.blockers` 有 **7 個碼**，不是空的 |
+| 2026-08-19 | 「`execution_fx_stale_since_decision` 未登記，掉進泛用 prefix」 | 讀 `config/decision_blockers.json` 的 `_matching`（**最長**匹配，不是第一個）。真相是它早就以 exact prefix 登記 |
+| 2026-08-19 | 「`live_choices` 仍為 0 筆，live 路徑從未被走過」——**直接引用自家文件** | `select count(*) from live_choices` → **1** |
+| 2026-08-19 | 「`commercial_maturity` 積壓缺的是有人去讀年報附註」 | 逐一看 7 個積壓的 `missing_data` → 6 個是 `research_assessment_missing`。**靠讀年報能下降的是 0 個** |
+| 2026-08-28 | 「COHR live reassess 失敗的根因是 `--as-of` 沒給」 | 修好 marker 後**不給 as-of 再跑一次** → marker 沒出現。真因在 `adapters.py::current_holdings` 另一處吞例外 |
+| 2026-08-28 | 「`co:lumentum` 有兩個 cohort，重複偵測有漏」 | `sed -n '869,876p' decision_lab/store.py` → 註解逐字記著已檢查過這個確切案例。回空集合是正確行為 |
+| 2026-08-28 | 「U2 把 `weakest_axis` 改成 level 排序是**零行為變化**的純重構」 | 改完直接 `pytest tests/test_probe_sizing.py` → `[missing_ref]` 立刻紅 |
+
+**有可執行檢查的診斷活不過幾分鐘；沒有的全靠當下願不願意多查一步。**
+（實測：U2「零行為變化」被測試抓到用了 3 分鐘；靠運氣發現的兩筆活到下一輪。）
+所以落地前不是把診斷寫得更清楚，是**把診斷寫成一條會紅的檢查再落地**。
+
+⚠ **這一節自己的 disproof：** 若之後仍發生「診斷已落地才被推翻」，代表它沒生效。
+屆時該做的是把否證步驟綁進會自己執行的東西（測試、hook、commit 前檢查），
+**不是把這張表寫得更長**。
