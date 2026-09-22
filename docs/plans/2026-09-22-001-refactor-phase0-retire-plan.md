@@ -49,7 +49,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0a.2 | 心跳與 APP 入口停跑 | ✅ | b65c1a1 |
 | 0a.3 | 研究 skill 改句 | ✅ | 4c78df4 |
 | 0a.4 | 池子收集端停鑄 | ✅ | 20f21a4 |
-| 0b.1 | 個股頁樞紐重寫、斷 import | ○ | |
+| 0b.1 | 個股頁樞紐重寫、斷 import | ⛔ **停在 §0.8** | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
@@ -84,6 +84,50 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 8c | 0a.3 | 未提 `tests/test_skill_decision_contract.py`、`tests/test_daily_brief_skill.py` | 兩檔的斷言翻面（4 條） | 原本要求兩個研究 skill **必須**出現 Engine D 四支命令、daily-brief **必須**出現 `decision_lab today`。機制退役後那些斷言會逼人把退役的命令寫回去 |
 | 8d | 0a.3 | — | 第一版把 daily-brief 的 `--disproof`／`--expiry` 整段**誤刪**（開放式切片吃過頭），已 `git checkout` 還原後改用精確邊界重做 | 反證／催化劑／到期三件套是 L7 與 `AGENTS.md` 的判準、Phase 1 的主角，**不是 Engine D 的東西**。它只是承載欄位從 CLI 旗標換成 ledger 欄位 |
 | 8 | 0a.2 | 未提 `webapp/static/app.js` | **未動**，留給批 1／批 3 | nav 已移除兩個入口，但 `renderBasket`／`renderMultiYear` 與 router 分支仍在。手動打 `#/basket` 會拿到 API 錯誤而不是崩潰 |
+
+## 0.8 ⛔ SCOPE_ESCALATION（0b.1 停在這裡，等使用者決定）
+
+**這正是 §6「撞到就停」預測的那一格，而且 plan 與 ROADMAP 在這裡互相矛盾。**
+
+```
+SCOPE_ESCALATION
+Original zoom: Z2（0b.1，plan 已核准的 PLAN_PROPOSAL）
+Observed issue: `why` 面板 100% 由估值鏈組成，但 plan 與 ROADMAP 都要它留在**核心**面板
+Recommended zoom: 使用者一個決定即可回到 Z2（不需要重新規劃整批）
+Why local patch is insufficient: 核心面板缺內容＝blocked。保留 `why` 而刪掉它的資料源，
+  會讓 73/73 檔全部變成 blocked——而 0b.1 自己的驗收寫的是「blocked 檔數不因 fundamental 缺席而增加」
+```
+
+### 事實（實測，不是推論）
+
+| 量到的 | 數字 |
+|---|---|
+| `why` 面板的 line 來源 | **1,910 行全部**是 `assumption` 510／`sensitivity` 343／`trace` 911／`epistemics` 146——**零行敘事** |
+| 組裝它的程式 | `briefing/analyst_view/compose.py::_why_panel`，輸入只有 `view.earnings_bridge`、`view.valuation`、`view.implied_return` 三者（批 2 全刪） |
+| 現行核心面板 | `CORE_PANELS = ("headline", "fundamental", "why", "research")` |
+| ROADMAP 要的核心面板 | headline、短評（`brief`）、`why`、`research`、讀圖（Phase 2）、歸零旗標（`wipeout`）；`fundamental` 降選配 |
+| 若照做 | `why` 永久 `missing` → **73/73 檔 blocked** |
+| `argument` 面板現況 | **73/73 檔都有內容**（合計 438 段；available 63／partial 10），但目前標 `optional=True`。它的標題就是「為什麼這樣想：鏈、數字、市場、賭注、風險、時間表」 |
+
+查證：`python scripts/analyst_view_text_digest.py --per-panel`、`grep -n "_why_panel" -A 30 briefing/analyst_view/compose.py`。
+
+### 三個選項（請選一個；我不自行決定，因為它改的是消費契約）
+
+| | 做什麼 | 代價 | 我的建議 |
+|---|---|---|---|
+| **A** | **`argument` 升為核心、`why` 退役**。論證層＝`argument`（憑什麼）＋`research`（什麼會推翻它）＋`downside`（反證連 watch）＋`bet`（純文字） | 要改 ROADMAP 那一行「論證層留 why」與 gate 3 的「why 文字不變」 | ✅ **建議這個。** 73/73 檔今天就有內容，零檔變 blocked；而「憑什麼」本來就是 `argument` 在回答的問題，`why` 回答的是「估值怎麼算」——那個問題整個退役了 |
+| **B** | `why` 留在核心，但內容改讀敘事 ledger | 敘事 ledger today **沒有** assumption／sensitivity 這種分格資料，所以 `why` 會是空的或與 `argument` 重複；等於 A 但多一層改名 | ✗ |
+| **C** | `why` 留在核心並印明示缺席，直到 Phase 2 讀圖接手 | 73/73 檔 blocked 兩個 Phase；gate 3 的「why 文字不變」必失敗 | ✗ |
+
+**不論選哪個都要同時改的：** ROADMAP 個股頁那一列的「論證 → 留 why」、plan 批 1 的驗收句、
+結案 gate 3 與 R2 檢查 7 的「`view.why` 文字 digest ＝ baseline」。
+
+### 在這個決定之前，0b.1 的哪些部分可以先做？
+
+**刻意不先做。** 0b.1 的檔案清單（`builder.py`／`sources.py`／`contracts.py`／`render.py`／
+`compose.py`／`webapp/*`／`app.js`）與 readiness 規則改寫是同一批；`why` 的去向決定
+`CORE_PANELS`、`_readiness()`、型別層與那 8 個測試檔怎麼改。先動一半會讓下一個 session
+接到一個半改的樞紐，而樞紐正是這批最難接手的東西。
 
 ## 0.7 ⚠ 待使用者裁決：「殭屍 grep 五區歸零」這條驗收做不到（0a.3 發現）
 
