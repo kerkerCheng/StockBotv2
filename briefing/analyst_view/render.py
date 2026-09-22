@@ -17,7 +17,7 @@ from briefing.alpha_view.contracts import BASIS_LABEL, CatalystItem, CheckpointI
 from briefing.alpha_view.render import format_datum_value, render_datum_line, status_label
 from shared.markdown import markdown_text
 
-from .contracts import QUESTIONS, AnalystLine, AnalystPanel, AnalystView, WeakInput
+from .contracts import QUESTIONS, AnalystLine, AnalystPanel, AnalystView
 
 __all__ = ["render_analyst_view_markdown"]
 
@@ -122,17 +122,6 @@ def _attention_lines(items: Sequence[RefreshItem], *, header: str | None = "需�
     return out
 
 
-def _weak_table(weak: Sequence[WeakInput]) -> list[str]:
-    if not weak:
-        return ["（沒有任何輸入被列入——這通常代表上游還沒有假設，不是「假設都很穩」。）", ""]
-    out = ["| 輸入 | 目前值 | 知識種類 | 為什麼被列進來 |", "|---|---|---|---|"]
-    for item in weak:
-        out.append(f"| {markdown_text(item.display_label)} | {_value_cell(item.datum)} | "
-                   f"{_tag_cell(item.datum)} | {markdown_text(item.why)} |")
-    out.append("")
-    return out
-
-
 def _evidence_table(items: Sequence[EvidenceItem]) -> list[str]:
     if not items:
         return ["（這幾格沒有掛任何 evidence ref。）", ""]
@@ -224,18 +213,11 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     ]
 
     # ---- 頭條 ------------------------------------------------------------
-    lines += [f"## 頭條 — {QUESTIONS['q4_implied_return']}", ""]
-    lines.append(
-        f"**{_slot(head, 'current_price')}**（{_slot(head, 'value_date')} 的目標值："
-        f"**{_slot(head, 'fair_value')}**）→ horizon **{_slot(head, 'horizon')}** → "
-        f"**{_slot(head, 'price_return')}** simple ／ **{_slot(head, 'annualized_price_return')}** 年化"
-        f"｜其中 EPS 差異 **{_slot(head, 'eps_contribution')}**／倍數差異 **{_slot(head, 'multiple_contribution')}**"
-    )
-    sentence = _one_sentence(_line_by_key(head, "epistemics_one_sentence"))
-    if sentence:
-        lines += ["", f"> {markdown_text(sentence)}",
-                  ">", "> （這句話由 `alpha://implied_return/model` 自己組出，consumer 只是把它放到最前面。）"]
-    lines += ["", f"- {_context_line(head.context, 'period', 'period_end', 'accounting_basis') or '目標期間未知'}",
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：頭條原本是「現價 →（目標值）→ horizon → simple／年化報酬
+    # ＋兩桿拆解」，那正是 AGENTS「首屏拿掉尺」指的那把尺。現在只印現價。
+    lines += ["## 現在多少錢", ""]
+    lines.append(f"**{_slot(head, 'current_price')}**")
+    lines += ["", f"- {_context_line(head.context, 'quote_unit') or '報價單位未知'}",
               f"- 狀態：**{markdown_text(head.status)}**"
               f"（來源 {markdown_text('、'.join(f'{k}={v}' for k, v in head.source_statuses.items()))}）"
               + (f"｜{markdown_text(head.reason)}" if head.reason else ""), ""]
@@ -273,17 +255,14 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
 
     # ---- 賭注（optional；V0）---------------------------------------------
     bet = view.bet
-    lines += [f"## 賭注 — {QUESTIONS['q7_payoff']}（optional）", ""]
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：賭注由四個價格改成**一句話**（讀 `our_bet`）。
+    lines += ["## 賭注：我們賭什麼（optional）", ""]
     if bet.context.get("available"):
-        lines.append(
-            f"賭注目標價 **{_slot(bet, 'variant_fair_value')}** → **{_slot(bet, 'payoff_return')}** simple ／ "
-            f"**{_slot(bet, 'annualized_payoff_return')}** 年化｜其中 EPS 差異 **{_slot(bet, 'payoff_eps_contribution')}**"
-            f"／倍數差異 **{_slot(bet, 'payoff_multiple_contribution')}**"
-            f"｜對照 base：目標價 {_slot(bet, 'base_fair_value_for_payoff')}、報酬 {_slot(bet, 'base_price_return_for_payoff')}")
-        lines += ["", "賭注覆蓋的假設（每條帶 base 對照值）：", ""]
-        lines += _compact_table(_by_role(bet, "override"))
+        for line in _by_role(bet, "bet"):
+            lines.append(f"{markdown_text(str(line.datum.value))}")
+        lines.append("")
     else:
-        lines += [f"**Not set (optional)** — {markdown_text(bet.reason or '尚未寫入任何 variant 假設')}", ""]
+        lines += [f"**Not set (optional)** — {markdown_text(bet.reason or '還沒寫短評裡的 our_bet')}", ""]
     lines += [f"- {markdown_text(bet.context.get('optional_rule') or '')}", ""]
 
     # ---- 會不會歸零（optional；D2 2026-09-18）-----------------------------
@@ -318,32 +297,10 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
               + (f"｜{markdown_text(fund.reason)}" if fund.reason else "")]
     lines += [f"- 註：{markdown_text(note)}" for note in fund.notes] + [""]
 
-    # ---- 怎麼算到這裡 ＋ 最脆弱的假設 ------------------------------------
-    why = view.why
-    lines += [f"## 4. 怎麼算到這裡｜{QUESTIONS['q5_fragile']}", "",
-              "### 4.1 最脆弱的輸入", "",
-              "> 列入規則是**宣告好的**（見下表最後一欄），不是本層對脆弱程度的新判斷；"
-              "敏感度是估值層既有的確定性微擾，不是機率、也不是 attribution model。", ""]
-    lines += _weak_table(why.weak_inputs)
-    lines += ["### 4.2 生效的假設（它們不是事實）", ""]
-    lines += _compact_table(_by_role(why, "assumption"))
-    lines += ["### 4.3 既有敏感度（每條假設動一格，fair value 動多少）", ""]
-    lines.append(f"> 排序：{markdown_text(why.context.get('sensitivity_order') or '—')}")
-    lines.append("")
-    lines += _compact_table(_by_role(why, "sensitivity"), reason_column=False)
-    lines += ["### 4.4 算式（每一格都指得出上一格）", ""]
-    for line in _by_role(why, "trace"):
-        lines.append(render_datum_line(line.datum))
-    lines.append("")
-    lines += ["### 4.5 多少是算術、多少是判斷", ""]
-    for line in _by_role(why, "epistemics"):
-        lines.append(render_datum_line(line.datum))
-    lines.append("")
-    lines += ["### 4.6 這幾格引用到的證據", ""]
-    lines += _evidence_table(why.evidence)
-    lines += [f"- 註：{markdown_text(note)}" for note in why.notes] + [""]
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本這裡是「## 4. 怎麼算到這裡｜哪些假設最脆弱」，
+    # 四個子節（最脆弱的輸入／生效的假設／既有敏感度／算式）全部讀估值鏈。`why` panel 已退役，
+    # 這一節一併移除。**「什麼會推翻它」沒有退役**，它在下一節（research panel）。
 
-    # ---- 什麼會改變答案 --------------------------------------------------
     research = view.research
     lines += [f"## 5. {QUESTIONS['q6_change']}", "",
               f"- 研究判斷：{'有' if research.context.get('has_signal') else '**無**'}"
@@ -373,20 +330,9 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
         lines += [f"- {markdown_text(note)}" for note in research.notes] + [""]
 
     # ---- Entry（optional）------------------------------------------------
-    entry = view.entry
-    lines += [f"## {markdown_text(entry.title)}", ""]
-    if entry.context.get("available"):
-        lines += _compact_table(_by_role(entry, "entry"))
-    else:
-        lines += [f"**Not set (optional)** — {markdown_text(entry.reason or '尚未宣告要求報酬判準')}", "",
-                  "上游照抄值仍然看得見（要先知道現在隱含幾 %，才知道自己該不該宣告 hurdle）：", ""]
-        lines += _compact_table(_by_role(entry, "entry"), reason_column=False)
-    lines += [f"- {markdown_text(entry.context.get('optional_rule') or '')}",
-              "- 要宣告判準：`python -m alpha entry-criterion <TICKER> --add <spec.json>`；"
-              "只想試算不落地：`python -m briefing entry <TICKER> --sandbox-hurdle 0.15`。", ""]
-    lines += ["- **Entry 不是什麼：**"] + [f"  - {markdown_text(x)}" for x in entry.notes] + [""]
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`entry`（進場門檻）panel 退役，這一節一併移除。
+    # 73 檔全 missing、從未用過；**進場靠判斷，出場靠 disproof**。
 
-    # ---- 邊界與警告 ------------------------------------------------------
     lines += ["## 這份判讀不是什麼", ""]
     lines += [f"- {markdown_text(x)}" for x in view.limits] + [""]
     lines += ["## ⚠ 警告", ""]

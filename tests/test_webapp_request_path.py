@@ -228,7 +228,9 @@ def test_stale_artifact_is_served_not_rebuilt(served, monkeypatch) -> None:
     before = _tree_digest(directory)
     body = client.get("/api/v1/stocks/READY").json()
     assert body["freshness"]["state"] == "stale"
-    assert body["overview"]["future_target"]["value"] == 100.0     # 照樣回內容
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`overview.future_target` 退役（那把尺）。
+    # **本條要守的是「stale 照樣回內容、但不重建」**，所以改問一個仍在的鍵。
+    assert body["overview"]["price"]["value"] is not None            # 照樣回內容
     assert _tree_digest(directory) == before                        # 但沒有重建
 
 
@@ -268,7 +270,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
             socket.create_connection(("127.0.0.1", 9))
 
         body = client.get("/api/v1/stocks/READY").json()
-        assert body["overview"]["implied_return"]["simple"]["value"] == -0.2
+        # ⚠ 2026-09-23（Step 0b.1）：`overview.implied_return` 退役；改問仍在的現價。
+        assert body["overview"]["price"]["value"] is not None
         assert client.get("/api/v1/stocks").json()["count"] == 3
         assert client.get("/api/v1/ranking").json()["kind"] == "ranking"
         assert client.get("/api/v1/beta").json()["kind"] == "beta"

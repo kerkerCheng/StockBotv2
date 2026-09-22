@@ -191,12 +191,12 @@ def test_read_model_without_variant_says_not_yet_recorded_and_bet_is_optional() 
     assert analyst.bet.optional and analyst.bet.status == "missing"
     assert "bet：missing" in analyst.readiness.optional_unavailable
     assert not any(b.startswith("bet") for b in analyst.readiness.blockers)
-    # bet 的每一行都是 read model 的同一個 Datum（consumer 不造格）
-    allowed = {id(getattr(ps, name)) for name in (
-        "scenario", "scenario_internal_eps", "scenario_fair_value", "value_date", "payoff_return",
-        "annualized_payoff_return", "eps_contribution", "multiple_contribution", "epistemics",
-        "base_fair_value", "base_price_return")} | {id(d) for d in ps.overrides}
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`bet` panel 由**四個價格改成純文字**（讀短評的 `our_bet`）。
+    # 原本這裡驗它的 11 格每一格都是 payoff_scenario 的同一個 Datum；那 11 格隨四價尺退役。
+    # **「consumer 不造格」沒有放寬**——現在唯一那一行必須是短評 slot 的同一個 Datum。
+    allowed = {id(d) for d in view.investor_brief.slots}
     assert all(id(line.datum) in allowed for line in analyst.bet.lines)
+    assert all(line.role == "bet" for line in analyst.bet.lines)
 
 
 def test_read_model_with_variant_carries_payoff_and_overrides_with_base_values() -> None:

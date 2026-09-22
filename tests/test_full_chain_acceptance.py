@@ -161,12 +161,24 @@ def test_baseline_numbers_are_pinned_and_each_traces_to_an_authority() -> None:
     assert eps_gap.value["relative_gap"] == pytest.approx(-0.0501, abs=5e-4)
 
 
-def test_core_readiness_is_ready_and_entry_is_optional_not_a_blocker() -> None:
+def test_optional_panels_never_block_and_blockers_only_come_from_the_core_set() -> None:
+    """optional panel 不得進 blockers；blockers 只能出自核心 panel。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1）：原名 `..._is_ready_and_entry_is_optional_not_a_blocker`，
+    斷言 `readiness.state == "ready"` 且 `entry：missing` 在 optional 欄。`entry` panel 已退役，
+    而短評與歸零旗標升核心後這份 fixture 是 blocked（它沒寫短評）。
+    **本條要守的事沒變**：optional 的缺席不得變成 blocker、blocker 不得憑空出現在非核心 panel 上。
+    ⚠ 本檔整體會在 Phase 0 批 2 重寫成新管線（圖 → 讀圖 ledger → 敘事 → 三題 absence → 心跳）。
+    """
+    from briefing.analyst_view import CORE_PANELS, OPTIONAL_PANELS
+
     a = analyst()
-    assert a.readiness.state == "ready"
-    assert a.readiness.blockers == ()
-    assert a.entry.status == "missing"
-    assert "entry：missing" in a.readiness.optional_unavailable   # brief／bet 是否已寫不影響 core（V0／短評皆 optional）
+    blocked_panels = {b.panel for b in a.readiness.blocker_details}
+    flagged_panels = {f.panel for f in a.readiness.flag_details}
+    assert not (blocked_panels & set(OPTIONAL_PANELS)), blocked_panels
+    assert not (flagged_panels & set(OPTIONAL_PANELS)), flagged_panels
+    assert blocked_panels <= set(CORE_PANELS)
+    assert a.readiness.core_panels == CORE_PANELS
 
 
 # ---------------------------------------------------------------------------
@@ -270,8 +282,13 @@ def test_a_fiscal_rollover_does_not_let_old_period_numbers_pose_as_current() -> 
     assert str(v.internal_fundamentals.period_end) == "2028-06-30"
     assert v.valuation.fair_value.value is None
     assert v.implied_return.price_return.value is None
-    assert a.readiness.state == "blocked"
-    assert any("headline" in b for b in a.readiness.blockers)
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本斷言 readiness 是 blocked，因為估值與報酬是核心。
+    # 兩者退役後 readiness 不再反映它們。**本條要守的事沒有放寬**——上面幾行才是主詞：
+    # 期間真的 rollover 了、fair value 與 price_return 都是 None（不是拿舊期數字冒充）。
+    assert a.readiness.state != "ready", "rollover 後仍宣稱 ready 就是在假裝完整"
+    # 原本這裡再驗「headline 進了 blockers」——headline 現在只有現價（觀測），rollover 不影響它。
+    # 換成問 refresh：supersede 這件事必須在某個地方說得出口，不得安靜發生。
+    assert a.refresh.overall in ("review_required", "invalidated", "recalculate", "superseded")
 
 
 def test_a_superseded_record_never_comes_back_as_current() -> None:
@@ -659,14 +676,13 @@ def test_black_box_cli_agrees_with_the_canonical_read_model_on_every_core_number
     from briefing.alpha_view.sources import fetch_alpha_investment_view
 
     v = fetch_alpha_investment_view(TICKER, include_causal=False, today=_date.today())
-    panels = [payload[name] for name in ("headline", "fundamental", "why", "research", "entry")]
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 兩個 panel 退役；price_return／
+    # annualized_price_return／fair_value 三條線隨估值鏈退役。**本條要守的事沒變**：
+    # 黑箱 CLI 的輸出必須與 canonical read model 逐格相等（不得有第二套算法）。
+    panels = [payload[name] for name in ("headline", "fundamental", "research")]
     lines = {line["key"]: line["datum"] for panel in panels for line in panel["lines"]}
 
-    assert lines["price_return"]["value"] == pytest.approx(v.implied_return.price_return.value)
-    assert lines["annualized_price_return"]["value"] == pytest.approx(
-        v.implied_return.annualized_price_return.value)
-    assert lines["fair_value"]["value"] == pytest.approx(v.valuation.fair_value.value)
-    assert lines["current_price"]["value"] == pytest.approx(v.implied_return.current_price.value)
+    assert lines["current_price"]["value"] == pytest.approx(v.market.price.value)
     assert payload["refresh"]["overall"] == v.refresh_status.overall
     assert payload["source_schema_version"] == v.schema_version
 

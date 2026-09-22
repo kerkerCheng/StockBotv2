@@ -2,9 +2,15 @@
 
 ## 這一支做什麼
 
-`AlphaInvestmentView` 依資料結構排列（第 5 節共識、第 8 節橋、第 13 節估值、13a 報酬…）；
-本模組把同一批 `Datum` **重新分組、重新排序、換上面向讀者的標籤**，讓打開一檔股票的人依序
-讀到六個問句的答案。
+`AlphaInvestmentView` 依資料結構排列；本模組把同一批 `Datum` **重新分組、重新排序、
+換上面向讀者的標籤**，讓打開一檔股票的人依序讀到消費者問句的答案。
+
+⚠ **2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 兩個 panel 退役、`headline` 換主詞。**
+`why` 只吃估值鏈三個 section（1,910 行全是 assumption／sensitivity／trace／epistemics，零行敘事），
+它問的「怎麼算到這裡」已隨估值鏈退役；`entry` 73 檔全 missing，從未用過。
+`headline` 原本是「現價 → future target value → 隱含報酬」，**那正是 AGENTS 說要拿掉的那把尺**
+——現在它只答「現在多少錢」（現價＋價格脈絡，73/73 檔有值），不答「划不划算」。
+在答「憑什麼」的是 `argument`，所以它與短評、歸零旗標一起升為核心面板。
 
 ## 這一支絕不做的事（`tests/test_analyst_view.py` 守著）
 
@@ -25,7 +31,7 @@ from briefing.alpha_view.contracts import (
 
 from .contracts import (
     BLOCKED, CORE_PANELS, OPTIONAL_PANELS, READY, READY_WITH_FLAGS, SCHEMA_VERSION, AnalystBlocker,
-    AnalystLine, AnalystPanel, AnalystReadiness, AnalystView, RefreshSummary, WeakInput,
+    AnalystLine, AnalystPanel, AnalystReadiness, AnalystView, RefreshSummary,
     readiness_class, worst_status,
 )
 
@@ -33,10 +39,11 @@ from .contracts import (
 #: （`missing` 在這裡代表「這個視角下還沒建立」，由各 panel 自己的 status 表達，不重複告警）。
 ATTENTION_STATES = ("recalculate", "review_required", "invalidated", "stale")
 
-#: 直接餵進頭條那一串數字的成果種類——headline panel 只列這些的 attention，避免把整份 refresh 倒進頭條。
-HEADLINE_ARTIFACTS = (
-    "implied_return", "fair_value", "fair_value_gap", "horizon_assumption", "valuation_assumption",
-)
+#: 直接餵進頭條那一格的成果種類——headline panel 只列這些的 attention，避免把整份 refresh 倒進頭條。
+#: ⚠ 2026-09-23（Step 0b.1）：原本是 implied_return／fair_value／fair_value_gap／
+#: horizon_assumption／valuation_assumption 五種，全部隨估值鏈退役。headline 現在只有現價，
+#: 它的新鮮度由 `market` 成果表達。
+HEADLINE_ARTIFACTS = ("market",)
 
 
 
@@ -88,28 +95,6 @@ def _attention(view: AlphaInvestmentView, *, artifact_types: Sequence[str] | Non
     return tuple(items)
 
 
-def _sensitivity_magnitude(datum: Datum) -> float:
-    """排序鍵：既有敏感度的 |相對變動|。**只讀，不算**——沒有可讀的數就排在最後（不是 0，是「不參與排序」）。"""
-    value = datum.value
-    if isinstance(value, Mapping):
-        for field_name in ("fair_value_relative", "delta_fair_value", "delta_eps"):
-            candidate = value.get(field_name)
-            if isinstance(candidate, (int, float)) and not isinstance(candidate, bool):
-                return abs(float(candidate))
-    return float("-inf")
-
-
-def _ordered_sensitivities(data: Sequence[Datum]) -> tuple[Datum, ...]:
-    """依既有 |相對變動| 由大到小。排序不改變任何數字，也不是新的 attribution model。"""
-    return tuple(sorted(data, key=_sensitivity_magnitude, reverse=True))
-
-
-def _assumption_id(datum: Datum) -> str | None:
-    deps = datum.dependencies or {}
-    value = deps.get("assumption_id")
-    return str(value) if value else None
-
-
 def _evidence_for(view: AlphaInvestmentView, data: Iterable[Datum]) -> tuple[EvidenceItem, ...]:
     """這些格引用到的證據（依 evidence index 的原順序）。純查表，不重新評級。"""
     wanted: set[str] = set()
@@ -122,98 +107,43 @@ def _evidence_for(view: AlphaInvestmentView, data: Iterable[Datum]) -> tuple[Evi
 # 脆弱輸入：每一條都由一條**宣告好的列入規則**挑進來（見 `WEAK_INPUT_RULES`）
 # ---------------------------------------------------------------------------
 
-def _weak_inputs(view: AlphaInvestmentView, assumptions: Sequence[Datum],
-                 sensitivities: Sequence[Datum]) -> tuple[WeakInput, ...]:
-    out: list[WeakInput] = []
-    seen: set[str] = set()
-
-    def add(datum: Datum, rule: str, label: str | None = None) -> None:
-        if datum.key in seen:
-            return
-        seen.add(datum.key)
-        out.append(WeakInput(key=datum.key, display_label=label or datum.label, datum=datum, rule=rule))
-
-    # 1) 既有敏感度中 |Δ| 最大的那一條 → 指回它所敏感的那條假設（指不回去就指自己）
-    if sensitivities and _sensitivity_magnitude(sensitivities[0]) > float("-inf"):
-        top = sensitivities[0]
-        target_id = _assumption_id(top)
-        target = next((a for a in assumptions if _assumption_id(a) == target_id), None) if target_id else None
-        add(target or top, "largest_modeled_sensitivity")
-
-    # 2) refresh 已標記需要動作的成果 → 對應的假設格
-    flagged = {i.artifact_id for i in view.refresh_status.items if i.state in ATTENTION_STATES}
-    for datum in assumptions:
-        if _assumption_id(datum) in flagged:
-            add(datum, "refresh_flagged")
-
-    # 3)／4) 知識種類本身就弱的輸入（先粗略代理，再 session 判斷）
-    for basis, rule in (("heuristic_proxy", "heuristic_proxy_input"),
-                        ("session_judgment", "session_judgment_input")):
-        for datum in assumptions:
-            if datum.basis == basis:
-                add(datum, rule)
-
-    # 5) AlphaSignal 已算出的最弱軸／6) 未知軸——不是本層重算，是抄 `signal.weakest_axis` 與各軸 status
-    weakest = view.identity.signal.weakest_axis
-    for score in view.variant_view.scores:
-        if weakest and score.key == f"{weakest}_score":
-            add(score, "weakest_known_axis")
-    for score in view.variant_view.scores:
-        if not score.is_known:
-            add(score, "unknown_axis")
-    return tuple(out)
-
-
-# ---------------------------------------------------------------------------
-# 五個 panel
-# ---------------------------------------------------------------------------
-
 def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    ir, va, rs = view.implied_return, view.valuation, view.refresh_status
-    numbers = (
-        _line("current_price", "現價", ir.current_price, "headline_number"),
-        _line("fair_value", "Future target value（fair value）", ir.fair_value, "headline_number"),
-        _line("value_date", "target value 是哪一天的值", ir.value_date, "headline_number"),
-        _line("horizon", "Horizon（判斷：何時實現）", ir.horizon, "headline_number"),
-        _line("price_return", "隱含價格報酬（simple）", ir.price_return, "headline_number"),
-        _line("annualized_price_return", "隱含價格報酬（年化）", ir.annualized_price_return, "headline_number"),
-        # 2026-09-09 P2：兩桿拆解跟在總報酬旁邊——使用者要一眼分得出「負的是因為我們 EPS 比共識低，
-        # 還是因為我們的倍數比市場低」。拆不出來就 missing，不影響前面幾格。
-        _line("eps_contribution", "其中：EPS 差異貢獻（我們 vs 共識）", ir.eps_contribution, "headline_number"),
-        _line("multiple_contribution", "其中：倍數差異貢獻（我們 vs 市場倍數）", ir.multiple_contribution, "headline_number"),
-    )
-    context_lines = (
-        _line("return_attribution", "兩桿拆解整包（恆等式、市場倍數、原則提醒）", ir.attribution, "headline_context"),
-        _line("return_convention", "報酬語意", ir.return_convention, "headline_context"),
-        _line("horizon_window", "Horizon 區間", ir.horizon_window, "headline_context"),
-        _line("fair_value_gap", "Fair value 與現價的差（不是報酬）", va.fair_value_gap, "headline_context"),
-        _line("total_return", "總報酬（含股利）", ir.total_return, "headline_context"),
-        _line("probability_weighted_return", "機率加權期望報酬", ir.probability_weighted_return, "headline_context"),
-        # authority 自己組好的一句話住在 `epistemics.one_sentence`；consumer 只是把它挪到最前面呈現，
-        # **不自己造句**——造句就是在 read model 之外生出第二種說法。
-        _line("epistemics_one_sentence", "一句話（authority 自組）", ir.epistemics, "headline_context"),
-    ) + ((_line("target_reached", ir.target_reached.label, ir.target_reached, "headline_context"),)
-         if ir.target_reached is not None else ())
-    statuses = {"implied_return": ir.meta.status, "valuation": va.meta.status}
-    kinds = _absence_kinds(implied_return=ir.meta, valuation=va.meta)
-    settled = _settled_by(implied_return=ir.meta, valuation=va.meta)
+    """現在多少錢（核心）：現價與價格脈絡。**沒有目標價、沒有隱含報酬。**
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1）：這個 panel 原本是「現價 → future target value → 隱含報酬」
+    共 8 格數字加 7 格脈絡，全部來自 `implied_return` 與 `valuation` 兩個 section。
+    **那就是 AGENTS「首屏拿掉尺」指的那把尺**（現價／沒賭對／賭對／判斷錯了）。
+    現在它只持有一個 `Datum`：現價。它是 A2 觀測（Engine C 快照），不是判斷、不是模型輸出。
+
+    「已定價嗎」這個問題沒有消失，它換了答法：財務三題的第二題，主參照是自己的歷史百分位、
+    主題籃子只當脈絡、**不設門檻**（Phase 3 落地）。在那之前這個 panel 不假裝回答它。
+    """
+    price = view.market.price
+    rs = view.refresh_status
+    lines = (_line("current_price", "現價", price, "headline_number"),)
+    # status 直接取現價那一格自己的：它有值就 available，沒值就照它自己的缺席語意。
+    # **不取 section 的 meta**——估值 section 的 status 反映的是估值算不算得出來，那與現價無關。
+    # status 照抄 market section 的 meta——**不自己判**（測試逐 panel 驗這條）。
+    status = view.market.meta.status
     return AnalystPanel(
-        key="headline", title="頭條：現價 → future target value → 隱含報酬",
-        questions=("q4_implied_return",),
-        status=worst_status(list(statuses.values())), optional=False,
-        source_sections=("implied_return", "valuation", "refresh_status"),
-        source_statuses=statuses, source_absence_kinds=kinds, source_settled_by=settled,
-        lines=numbers + context_lines,
+        key="headline", title="現在多少錢：現價與價格脈絡",
+        questions=(),
+        status=status, optional=False,
+        source_sections=("market",),
+        source_statuses={"market": status},
+        source_absence_kinds=_absence_kinds(market=view.market.meta),
+        lines=lines,
         attention=_attention(view, artifact_types=HEADLINE_ARTIFACTS),
-        attention_scope="只列頭條這幾格自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",
+        attention_scope="只列現價自己的成果（" + "、".join(HEADLINE_ARTIFACTS) + "）",
         attention_total=len(_attention(view)),
-        notes=ir.is_not,
-        context={"period": ir.period, "period_end": ir.period_end,
-                 "accounting_basis": va.accounting_basis,
-                 "refresh_overall": rs.overall, "refresh_counts": dict(rs.counts),
-                 "capability": ir.meta.capability},
-        reason=_worst_reason(worst_status(list(statuses.values())),
-                             implied_return=ir.meta, valuation=va.meta),
+        notes=(
+            "這一格是 A2 觀測（Engine C 現價快照），不是判斷。",
+            "**沒有目標價、沒有隱含報酬、沒有那把尺**——2026-09-23 Phase 0 退役；"
+            "「已定價嗎」由財務三題回答（Phase 3），主參照是自己的歷史、不設門檻。",
+        ),
+        context={"quote_unit": (price.dependencies or {}).get("quote_unit") if price.dependencies else None,
+                 "refresh_overall": rs.overall, "refresh_counts": dict(rs.counts)},
+        reason=price.reason,
     )
 
 
@@ -249,9 +179,11 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
                 "expectation_gap": eg.meta.status}
     kinds = _absence_kinds(internal_fundamentals=inf.meta, consensus=cs.meta, expectation_gap=eg.meta)
     return AnalystPanel(
-        key="fundamental", title="基本面：我們預測什麼／市場預測什麼／差異在哪",
+        key="fundamental", title="基本面：我們預測什麼／市場預測什麼／差異在哪（選配）",
         questions=("q1_internal", "q2_market", "q3_gap"),
-        status=worst_status(list(statuses.values())), optional=False,
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1）：由核心**降為選配**（ROADMAP 稽核區：原始數字）。
+        # 它回答的是「數字長什麼樣」，不是「判讀完不完整」。
+        status=worst_status(list(statuses.values())), optional=True,
         source_sections=("internal_fundamentals", "consensus", "expectation_gap"),
         source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
         # ⚠ 共識段的 warnings 也要進來：「forward 是相對標籤不是會計年度身分」這條警告
@@ -263,41 +195,6 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
         reason=_worst_reason(worst_status(list(statuses.values())),
                              expectation_gap=eg.meta, internal_fundamentals=inf.meta,
                              consensus=cs.meta),
-    )
-
-
-def _why_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    eb, va, ir = view.earnings_bridge, view.valuation, view.implied_return
-    assumptions = tuple(eb.assumptions) + tuple(va.assumptions) + (ir.horizon,)
-    sensitivities = _ordered_sensitivities(va.sensitivities)
-    lines = (
-        _lines(assumptions, "assumption")
-        + _lines(sensitivities, "sensitivity")
-        + _lines(va.trace, "trace", prefix="valuation:")
-        + _lines(ir.trace, "trace", prefix="implied_return:")
-        + (_line("valuation_epistemics", "估值：多少是算術、多少是判斷", va.epistemics, "epistemics"),
-           _line("implied_return_epistemics", "報酬：多少是算術、多少是判斷", ir.epistemics, "epistemics"))
-    )
-    statuses = {"earnings_bridge": eb.meta.status, "valuation": va.meta.status,
-                "implied_return": ir.meta.status}
-    kinds = _absence_kinds(earnings_bridge=eb.meta, valuation=va.meta, implied_return=ir.meta)
-    return AnalystPanel(
-        key="why", title="怎麼算到這裡：假設、敏感度、算式、證據",
-        questions=("q5_fragile",),
-        status=worst_status(list(statuses.values())), optional=False,
-        source_sections=("earnings_bridge", "valuation", "implied_return"),
-        source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
-        weak_inputs=_weak_inputs(view, assumptions, sensitivities),
-        evidence=_evidence_for(view, assumptions + (ir.current_price, ir.fair_value, ir.price_return)),
-        notes=va.meta.warnings + ir.meta.warnings,
-        context={"period": va.period, "accounting_basis": va.accounting_basis,
-                 "sensitivity_order": "依既有 |相對變動| 由大到小；排序不改變任何數字，也不是新的 attribution model",
-                 "assumption_selection": None if eb.selection is None else {
-                     "input": eb.selection.input_count, "accepted": eb.selection.accepted_count,
-                     "filtered": eb.selection.filtered_count, "reasons": dict(eb.selection.reasons)}},
-        reason=_worst_reason(worst_status(list(statuses.values())),
-                             earnings_bridge=eb.meta, valuation=va.meta,
-                             implied_return=ir.meta),
     )
 
 
@@ -364,9 +261,14 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
                        ib.multiple_question, "brief"),)
                 if ib.multiple_question is not None else ()))
     return AnalystPanel(
-        key="brief", title="投資人短評：這檔在賭什麼（optional）",
+        key="brief", title="投資人短評：這檔在賭什麼",
         questions=("q0_story",),
-        status=ib.meta.status, optional=True,
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1）：升為**核心**（ROADMAP「首屏的單位是句不是格」）。
+        # 實測 70/73 檔還沒寫短評，所以升核心會讓 blocked 由 18 變 70——**那是真實 backlog
+        # 不是規則錯**：新方向下沒有短評的檔就是沒有產出（AGENTS「產出若無法讓人分辨做了什麼
+        # 與沒做，它就不算產出」）。缺席語意是 `not_yet_recorded`（不是 settled），所以它會一直
+        # 出現在 forward_view_backlog 裡直到有人寫。
+        status=ib.meta.status, optional=False,
         source_sections=("investor_brief",), source_statuses={"investor_brief": ib.meta.status},
         source_absence_kinds=_absence_kinds(investor_brief=ib.meta),
         lines=lines, notes=ib.is_not,
@@ -384,9 +286,11 @@ def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
     ag = view.argument
     lines = tuple(_line(d.key, d.label, d, "paragraph") for d in ag.paragraphs)
     return AnalystPanel(
-        key="argument", title="為什麼這樣想：鏈、數字、市場、賭注、風險、時間表（optional）",
+        key="argument", title="為什麼這樣想：鏈、賭注、風險與認錯條件、時間表",
         questions=("q0_argument",),
-        status=ag.meta.status, optional=True,
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1）：由 optional 升為**核心**。它是在答「憑什麼」的面板，
+        # 73/73 檔都有內容（實測 438 段）；原本站在核心位的 `why` 答的是「估值怎麼算」，已退役。
+        status=ag.meta.status, optional=False,
         source_sections=("argument",), source_statuses={"argument": ag.meta.status},
         source_absence_kinds=_absence_kinds(argument=ag.meta),
         lines=lines, notes=ag.is_not,
@@ -420,23 +324,38 @@ def _overlay_panel(ps, *, role: str, key_ns: str, value_ns: str) -> tuple:
 
 
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """賭注（optional）：variant scenario 的 payoff。**每一格都是 read model 的同一個 Datum**，本層不算。"""
-    ps = view.payoff_scenario
-    lines = _overlay_panel(ps, role="bet", key_ns="payoff", value_ns="variant")
+    """賭注（optional）：**純文字**。2026-09-23（Phase 0 Step 0b.1）由四個價格改成一句話。
+
+    原本這裡是 11 格數字（賭注目標價、報酬、年化、EPS 貢獻、倍數貢獻、base 對照…）＋ overrides。
+    ROADMAP「個股頁」對照表把它們列進「拿掉」：`bet` 的四個價格退役，改成
+    **型別、騎層或插槽、什麼必須為真**——那是文字，不是價格。
+
+    今天能照抄的文字只有短評裡的 `our_bet`（研究 session 寫進 append-only ledger 的那一句）。
+    「騎層或插槽」要等 Phase 2 的讀圖 kind 才有主詞，所以**現在不假裝有**：沒寫 `our_bet`
+    就是 `not_yet_recorded`，不是 0、不是空白。**本層一個字都不造**（`our_bet` 是同一個 Datum）。
+    """
+    ib = view.investor_brief
+    our_bet = next((d for d in ib.slots if d.key.endswith("our_bet")), None)
+    lines = (_line("our_bet", "我們賭什麼（研究 session 寫下的那一句）", our_bet, "bet"),) if our_bet else ()
+    status = ("available" if (our_bet is not None and our_bet.is_known)
+              else ((our_bet.status if our_bet is not None else None) or "missing"))
     return AnalystPanel(
-        key="bet", title="賭注：如果我們的差異看法對了（optional）",
-        questions=("q7_payoff",),
-        status=ps.meta.status, optional=True,
-        source_sections=("payoff_scenario",), source_statuses={"payoff_scenario": ps.meta.status},
-        source_absence_kinds=_absence_kinds(payoff_scenario=ps.meta),
-        lines=lines, notes=ps.is_not,
-        evidence=_evidence_for(view, ps.overrides),
-        context={"capability": ps.meta.capability, "period": ps.period, "period_end": ps.period_end,
-                 "available": ps.meta.status not in VALUELESS_STATUSES,
-                 "override_count": len(ps.overrides),
-                 "optional_rule": "賭注是 optional：沒寫 variant 假設只表示「還沒寫賭注」，不代表這檔研究不完整，"
-                                  "也不得補一個 bull case；每條 variant 假設必須指得出 supporting 證據"},
-        reason=ps.meta.reason,
+        key="bet", title="賭注：我們賭什麼（純文字，optional）",
+        questions=(),
+        status=status, optional=True,
+        source_sections=("investor_brief",),
+        source_statuses={"investor_brief": status},
+        source_absence_kinds={"investor_brief": (our_bet.absence_kind if our_bet is not None else "not_yet_recorded")},
+        lines=lines,
+        notes=(
+            "**沒有價格、沒有報酬、沒有機率加權**——四個價格已於 2026-09-23 Phase 0 退役。",
+            "「騎哪一層或哪一個插槽」「什麼必須為真」要等 Phase 2 的讀圖落地才有主詞；"
+            "在那之前這裡只有研究 session 寫下的那一句。",
+        ),
+        context={"available": status not in VALUELESS_STATUSES,
+                 "optional_rule": "沒寫賭注只表示「還沒寫」，不代表這檔研究不完整；"
+                                  "文字是研究判斷（append-only ledger），本層照抄不造句"},
+        reason=(our_bet.reason if our_bet is not None else "短評裡沒有 our_bet 這一格"),
     )
 
 
@@ -450,7 +369,9 @@ def _downside_panel(view: AlphaInvestmentView) -> AnalystPanel:
     lines = _overlay_panel(ds, role="bet", key_ns="downside", value_ns="downside")
     return AnalystPanel(
         key="downside", title="判斷錯了值多少：如果反證成真（optional）",
-        questions=("q7_payoff",),
+        # ⚠ 2026-09-23（Step 0b.1）：`q7_payoff`（賭注對了值多少）隨四價尺退役，這裡不再掛問句。
+        # 四價渲染本身在 Phase 0 批 4 移除；panel 留（ROADMAP 論證層「留 downside」）。
+        questions=(),
         status=ds.meta.status, optional=True,
         source_sections=("downside",), source_statuses={"downside": ds.meta.status},
         source_absence_kinds=_absence_kinds(downside=ds.meta),
@@ -474,9 +395,11 @@ def _wipeout_panel(view: AlphaInvestmentView) -> AnalystPanel:
     wf = view.wipeout_flags
     lines = _lines(wf.lanes, "wipeout")
     return AnalystPanel(
-        key="wipeout", title="會不會歸零：四盞燈（optional）",
-        questions=("q7_payoff",),
-        status=wf.meta.status, optional=True,
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1）：升為**核心**。AGENTS「量測、訊號、脈絡三分」把歸零旗標
+        # 列為**量測**，而量測缺席不該被讀成「沒事」——灰燈不是綠燈。實測 3/73 檔還點不亮。
+        key="wipeout", title="會不會歸零：四盞燈",
+        questions=(),
+        status=wf.meta.status, optional=False,
         source_sections=("wipeout_flags",), source_statuses={"wipeout_flags": wf.meta.status},
         source_absence_kinds=_absence_kinds(wipeout_flags=wf.meta),
         lines=lines, notes=wf.is_not,
@@ -485,34 +408,6 @@ def _wipeout_panel(view: AlphaInvestmentView) -> AnalystPanel:
                  "unlit_rule": "灰燈＝這一項沒量到，**不是**綠燈；每盞灰燈自己說了是哪一種沒有"
                                "（`absence_kind`），呈現層不得 parse 理由句去猜（L16）"},
         reason=wf.meta.reason,
-    )
-
-
-def _entry_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    el = view.entry_logic
-    lines = (
-        _line("criterion", "要求報酬判準（investor policy）", el.criterion, "entry"),
-        _line("required_annualized_return", "要求年化報酬", el.required_annualized_return, "entry"),
-        _line("entry_price", "Analytical entry threshold（門檻價）", el.entry_price, "entry"),
-        _line("price_to_entry_gap", "現價相對門檻價", el.price_to_entry_gap, "entry"),
-        _line("hurdle_comparison", "算術比較", el.hurdle_comparison, "entry"),
-        _line("assessment", "這次評估能不能當 clean 讀", el.assessment, "entry"),
-        _line("current_annualized_implied_return", "目前年化隱含報酬（照抄頭條）",
-              el.current_annualized_implied_return, "entry"),
-    )
-    return AnalystPanel(
-        key="entry", title="Entry threshold（optional）",
-        questions=("q4_implied_return",),
-        status=el.meta.status, optional=True,
-        source_sections=("entry_logic",), source_statuses={"entry_logic": el.meta.status},
-        source_absence_kinds=_absence_kinds(entry_logic=el.meta),
-        lines=lines, notes=el.is_not,
-        context={"capability": el.meta.capability,
-                 "available": el.meta.status not in VALUELESS_STATUSES,
-                 "optional_rule": "EntryCriterion 不是必填資料，也不是 research completeness gate："
-                                  "沒有 hurdle 只表示 optional entry threshold unavailable，"
-                                  "不代表這檔研究不完整，也不得補 10%／15%／20%"},
-        reason=el.meta.reason,
     )
 
 
@@ -530,7 +425,9 @@ _READINESS_RULE = (
     "有內容但至少一段被標為 stale／review_required／not_applicable＝ready_with_flags；"
     "至少一段缺內容（missing／invalidated／not_modeled／insufficient_evidence）＝blocked。"
     f"**optional panel（{'／'.join(OPTIONAL_PANELS)}）一律不參與**"
-    "——沒有短評、沒有賭注、沒有下檔、沒有歸零旗標、沒有 entry criterion 都不會讓 readiness 變差。"
+    "——沒有賭注、沒有下檔、沒有稽核區的基本面數字都不會讓 readiness 變差。"
+    "⚠ 2026-09-23（Phase 0 Step 0b.1）：**短評與歸零旗標改為核心**，所以它們缺席會讓 readiness 變差"
+    "——那是刻意的：新方向下沒寫短評的檔就是沒有產出，沒量到的燈不是綠燈。"
 )
 
 
@@ -590,9 +487,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
     panels = {
         "headline": _headline_panel(view),
         "fundamental": _fundamental_panel(view),
-        "why": _why_panel(view),
         "research": _research_panel(view),
-        "entry": _entry_panel(view),
         "bet": _bet_panel(view),
         "downside": _downside_panel(view),
         "wipeout": _wipeout_panel(view),
@@ -606,8 +501,8 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         ticker=ident.ticker, company_id=ident.company_id, company_label=ident.company_label,
         as_of=ident.as_of, point_in_time_mode=ident.point_in_time_mode,
         generated_on=ident.generated_on, research_context_digest=ident.research_context_digest,
-        headline=panels["headline"], fundamental=panels["fundamental"], why=panels["why"],
-        research=panels["research"], entry=panels["entry"], bet=panels["bet"],
+        headline=panels["headline"], fundamental=panels["fundamental"],
+        research=panels["research"], bet=panels["bet"],
         downside=panels["downside"], wipeout=panels["wipeout"], brief=panels["brief"],
         argument=panels["argument"],
         readiness=_readiness(panels),

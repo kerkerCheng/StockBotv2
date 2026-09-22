@@ -145,9 +145,10 @@ def _opinion_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         stance = (row.get("opinion_stance") or {}).get("value")
         counts[str(stance)] = counts.get(str(stance), 0) + 1
     with_view = sum(1 for r in items if _group_of(r) == "ready")
-    # V0（2026-09-15）：有寫賭注的檔數。**純計數**——payoff 由 materialize 端寫進 overview，這裡只數有值的。
+    # V0（2026-09-15）：有寫賭注的檔數。**純計數**——這裡只數有值的，不重算。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`overview.payoff` 退役（四價尺），改數有寫下 `our_bet` 的檔。
     with_bet = sum(1 for r in items
-                   if isinstance(((r.get("payoff") or {}).get("simple") or {}).get("value"), (int, float)))
+                   if isinstance(((r.get("brief") or {}).get("our_bet") or {}).get("value"), str))
     return {
         "by_stance": counts,
         "our_own_view": counts.get("independent", 0),

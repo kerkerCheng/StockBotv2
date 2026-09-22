@@ -4,7 +4,9 @@
 1. **文字由 session 寫、數字由 authority 填**：placeholder 字彙封閉、未知的 `{…}` 拒收、缺值印「（尚無）」不補 0。
 2. **禁字表**：內部名詞出現在任何一格就拒收；七格缺一不可；每格必帶引用。
 3. **append-only 語意**：as-of 選取、最新者勝出、撤回就沒有。
-4. **消費端**：沒寫短評 → section missing＋not_yet_recorded、brief panel optional 不影響 readiness；
+4. **消費端**：沒寫短評 → section missing＋not_yet_recorded。⚠ 2026-09-23（Phase 0 Step 0b.1）：
+   brief panel 由 optional **升為核心**（ROADMAP「首屏的單位是句不是格」），所以沒寫短評**會**讓
+   readiness 變差——那是刻意的：新方向下沒寫短評的檔就是沒有產出。實測 70/73 檔還沒寫。
    APP 首屏只有短評卡，其餘收進「為什麼這樣算」。
 """
 from __future__ import annotations
@@ -114,7 +116,7 @@ def test_select_is_point_in_time_and_retraction_leaves_nothing() -> None:
 # 4. 消費端：缺席現形、optional、首屏只有短評
 # ---------------------------------------------------------------------------
 
-def test_read_model_without_brief_is_missing_and_panel_is_optional() -> None:
+def test_read_model_without_brief_is_missing_and_blocks_readiness() -> None:
     from briefing.analyst_view import build_analyst_view
     from tests.test_analyst_view import _full_view
 
@@ -124,9 +126,12 @@ def test_read_model_without_brief_is_missing_and_panel_is_optional() -> None:
     assert ib.brief_id is None and len(ib.slots) == 7 and all(d.value is None for d in ib.slots)
     assert ib.status_light.value["label"], "沒短評也要有燈"
     analyst = build_analyst_view(view)
-    assert analyst.brief.optional and analyst.brief.status == "missing"
-    assert "brief：missing" in analyst.readiness.optional_unavailable
-    assert not any(b.startswith("brief") for b in analyst.readiness.blockers)
+    # ⚠ 2026-09-23 Step 0b.1：brief 升核心。缺席語意仍是 `not_yet_recorded`（不是 settled），
+    # 所以它會一直出現在 blockers 裡直到有人寫——這正是那個「會自己出現的計數器」（L14）。
+    assert analyst.brief.optional is False and analyst.brief.status == "missing"
+    assert any(b.startswith("brief：missing") for b in analyst.readiness.blockers)
+    assert analyst.brief.absence_kind == "not_yet_recorded"
+    assert "brief" not in "｜".join(analyst.readiness.optional_unavailable)
     # ⚠ 這條斷言的用途是「**brief panel 不得憑空多出不屬於 read model 的行**」，
     # 2026-09-20 加 `multiple_question` 時它正確地抓到了改動。多的那一格仍然必須
     # 來自同一個 read model（不是前端自己算的），所以加進 allowed 而不是放寬斷言。

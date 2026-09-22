@@ -2,12 +2,14 @@
 
 ## 這一層是什麼
 
-`AlphaInvestmentView`（canonical read model，18 個 section）回答「系統對這家公司知道什麼」，
-但它是**依資料結構排列**的：估值住第 13 節、報酬住 13a、共識住第 5 節、假設住第 8 節。
-使用者打開一檔股票時要在很短時間內看懂五件事——**我們相信什麼、跟市場差在哪、怎麼算到這裡、
-最弱的假設是什麼、什麼事會讓結論需要重看**——那五件事橫跨上述所有 section。
+`AlphaInvestmentView`（canonical read model）回答「系統對這家公司知道什麼」，
+但它是**依資料結構排列**的：共識住第 5 節、敘事住短評與論證那幾節。
+使用者打開一檔股票時要在很短時間內看懂的是——**我們在賭什麼、憑什麼、什麼會推翻它、
+現在多少錢、會不會歸零**——那幾件事橫跨上述所有 section。
 
-Analyst View 就是把同一份 view **依消費者問句重新投影**成四個核心 panel ＋ 一個 optional panel。
+Analyst View 就是把同一份 view **依消費者問句重新投影**成核心 panel 與 optional panel。
+⚠ 2026-09-23（Phase 0）：原文寫「五件事」的第二、三件是「跟市場差在哪、怎麼算到這裡」，
+那是估值鏈的問句，已隨它退役。
 
 ## 硬邊界（`tests/test_analyst_view.py` 逐條守著）
 
@@ -22,9 +24,11 @@ Analyst View 就是把同一份 view **依消費者問句重新投影**成四個
    （`AnalystView.to_dict()`）；不得在讀取時重寫 thesis。
 5. **沒有 authority write。** 不碰 ledger、不建 decision、不改 thesis、不寫任何檔案
    （CLI 的 `-o` 是使用者指定的輸出，不是 authority）。
-6. **Entry 是 optional capability，不是研究完整度 gate。** 主流程終點是 implied return；
-   沒有 `EntryCriterion` 時只表示「optional entry threshold unavailable」，
-   **不得讓 `readiness` 變差、不得把股票標成研究不完整、不得補 10%／15%／20%**。
+6. **2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 兩個 panel 退役。**
+   `why`（「怎麼算到這裡：假設、敏感度、算式、證據」）只吃估值鏈三個 section，它問的問題
+   已被 G3 退役；`entry`（進場門檻）73 檔全 missing，從未用過。**進場靠判斷，出場靠 disproof**，
+   系統不再有「門檻價」這個概念，也不再有「主流程終點是 implied return」這句話。
+   在答「憑什麼」的是 `argument`（73 檔都有內容），所以它升為核心。
 """
 from __future__ import annotations
 
@@ -45,11 +49,12 @@ QUESTIONS: Mapping[str, str] = {
     "q1_internal": "我們預測什麼？",
     "q2_market": "市場預測什麼？",
     "q3_gap": "差異在哪？",
-    "q4_implied_return": "現價對我們的 future target 隱含什麼報酬？",
-    "q5_fragile": "哪些假設最脆弱？",
     "q6_change": "什麼 evidence 會改變答案？",
-    # V0（2026-09-15）：投資人的第七問。它是 optional：沒寫賭注不代表研究不完整。
-    "q7_payoff": "如果我們的賭注對了，值多少？",
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：三個問句退役。
+    #   `q4_implied_return`（現價對 future target 隱含什麼報酬）與 `q7_payoff`（賭注對了值多少）
+    #   是估值鏈與四價尺的問句；`q5_fragile`（哪些假設最脆弱）是 `why` 面板的問句，
+    #   而 `why` 已退役——「最脆弱」原本指的是估值假設的敏感度，那個模型不在了。
+    #   風險與認錯條件由 `argument` 的 risks 段與 `research` 面板回答，**它們不是同一個問題**。
     # 2026-09-15：投資人的第零問——用人話講一遍前因後果。optional：沒寫短評不代表研究不完整。
     "q0_story": "這是什麼賭注、為什麼、值多少、什麼時候知道？",
     # 2026-09-15：論證層——把短評的七句展開成六段分析師報告體，附引文與長文。
@@ -57,17 +62,20 @@ QUESTIONS: Mapping[str, str] = {
 }
 
 #: 核心 panel（決定 `readiness`）與 optional panel（**不**決定 readiness）。
-#: 主流程：Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return。
-#: Entry threshold 是 optional analytical capability，刻意不在 CORE_PANELS 裡。
-CORE_PANELS: tuple[str, ...] = ("headline", "fundamental", "why", "research")
-#: `bet`（V0，2026-09-15）：賭注（variant scenario 的 payoff）。與 entry 同為 optional——
-#: 沒有寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
-#: `downside`（D2，2026-09-18）：判斷錯了值多少。與 `bet` 同為 optional——
-#: 沒寫下檔的檔 readiness 不變差，但它必須出現在 `optional_unavailable` 裡，
-#: 否則「還沒寫」這件事在畫面上沒有任何地方說得出口。
-#: `wipeout`（D2，2026-09-18）：歸零旗標四盞燈。optional——沒點亮的燈不讓 readiness 變差，
-#: 但必須出現在 `optional_unavailable` 裡，否則「這盞燈點不亮」在畫面上沒有地方說得出口。
-OPTIONAL_PANELS: tuple[str, ...] = ("brief", "argument", "bet", "downside", "wipeout", "entry")
+#:
+#: ⚠ **2026-09-23（Phase 0 Step 0b.1）換過一次**（ROADMAP「個股頁」對照表＋使用者定案 A）：
+#:   舊：`("headline", "fundamental", "why", "research")`，主流程是
+#:       Evidence → Internal Forecast → Valuation → Horizon → Implied Return。
+#:   新：短評與論證是核心，估值鏈整條退役。`fundamental` **降為選配**（它是稽核區的原始數字，
+#:       不是判讀完整度的條件）；`why` 退役；`wipeout`（歸零旗標）升核心——AGENTS「歸零旗標是燈不是數字」
+#:       把它列為量測，而量測缺席不該被讀成「沒事」。
+#:   讀圖面板 Phase 2 才加，所以現在不在列（`brief` 的 70/73 missing 是真實 backlog，不是規則錯）。
+CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "wipeout")
+#: `fundamental`：稽核區的原始數字（內部預測／共識／落差）。2026-09-23 由核心降選配。
+#: `bet`：賭注。2026-09-23 起是**純文字**（讀 `our_bet`），不再是四個價格。optional——
+#: 沒寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
+#: `downside`（D2，2026-09-18）：判斷錯了值多少。四價渲染在 Phase 0 批 4 退役，panel 留。
+OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "downside")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -103,15 +111,13 @@ LINE_ROLES = frozenset({
     "market_context",          # 非期間身分的市場觀測（分析師人數、目標價、PE…）
     "market_proxy",            # 價格隱含的粗略代理
     "comparison",              # 內部 vs 共識的數值落差
-    "assumption",              # 生效的假設（營運／估值／horizon）
-    "sensitivity",             # 既有敏感度（估值層算好的，不是本層新建的 attribution）
-    "trace",                   # 算式的每一格
-    "epistemics",              # 「多少是算術、多少是判斷」的分解
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`assumption`／`sensitivity`／`trace`／`epistemics`
+    # 四個 role 退役——它們**只由 `why` 面板產生**，而 `why` 已退役。`entry` 同理。
+    # 留著沒有 producer 的 role 等於留一份會讓下個讀者以為還在用的字彙（L16）。
     "thesis",                  # 研究判斷本身
     "score",                   # Q1–Q5
     "lifecycle",               # thesis 狀態／到期／watch
-    "entry",                   # optional entry threshold
-    "bet",                     # optional：賭注（variant payoff）那一串數字
+    "bet",                     # optional：賭注（2026-09-23 起是純文字，不是四個價格）
     "override",                # 賭注覆蓋的假設（每條帶 base 對照值）
     "brief",                   # optional：投資人短評的七句＋一把尺＋一顆燈
     "paragraph",               # optional：論證層的六段
@@ -151,19 +157,18 @@ WEAK_INPUT_RULES: Mapping[str, str] = {
 #: `externally_corroborated`）。翻譯**不得宣稱 authority 沒有的東西**——同 `accounting_basis` 那條：
 #: 「獨家供應」可以，因為那就是 `sole_source` 的意思；但不得順手加上「所以很安全」。
 PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
-    "headline": {"title": "結論：現在的價格划不划算",
-                 "hint": "現價、我們算出的未來目標價、以及兩者之間要漲跌多少"},
-    "fundamental": {"title": "我們和市場，預期差在哪",
-                    "hint": "同一個會計期間、同一種口徑才拿來比；不可比的一律標「不可比」"},
-    "why": {"title": "這個結論最脆弱的地方",
-            "hint": "哪幾個假設最經不起挑戰——它們錯了，上面的數字就跟著錯"},
+    "headline": {"title": "現在多少錢",
+                 "hint": "現價與價格脈絡（52 週高低、最新交易日、幣別）。**這裡沒有目標價、沒有隱含報酬**"
+                         "——那把尺已於 2026-09-23 退役；「已定價嗎」由財務三題回答（Phase 3）"},
+    "fundamental": {"title": "我們和市場，預期差在哪（選配）",
+                    "hint": "同一個會計期間、同一種口徑才拿來比；不可比的一律標「不可比」。"
+                            "2026-09-23 起是稽核區的原始數字，不是判讀完整度的條件"},
     "research": {"title": "什麼會推翻它",
                  "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
-    "entry": {"title": "進場門檻（選配）",
-              "hint": "你自己設的要求報酬換算成的價格。沒設不代表這檔研究不完整"},
     "argument": {"title": "為什麼這樣想",
-                 "hint": "六段：這條鏈怎麼走、數字怎麼算出來、和市場差在哪、賭注、風險與認錯條件、時間表。"
-                         "算術與圖的敘述由句型組；假設理由、賭注理由、風險、認錯條件是研究時寫的長文，逐字附在段後"},
+                 "hint": "四段：這條鏈怎麼走、賭注、風險與認錯條件、時間表。圖的敘述由句型組；"
+                         "賭注理由、風險、認錯條件是研究時寫的長文，逐字附在段後。"
+                         "⚠ 2026-09-23 少了「數字怎麼算出來」與「和市場差在哪」兩段——它們讀的是估值鏈"},
     "brief": {"title": "這檔在賭什麼",
               "hint": "七句話講前因後果：什麼在放量、這家公司供什麼、為什麼卡在它、市場怎麼看、我們賭什麼、"
                       "對了／錯了會怎樣、什麼時候知道。文字是研究時寫的判斷，數字由系統填"},
@@ -199,8 +204,7 @@ PLAIN_LINE_LABELS: Mapping[str, str] = {
     "expected_horizon": "預期多久見分曉",
     "criterion": "你要求的報酬",
     "required_annualized_return": "要求的年化報酬",
-    "entry_price": "換算出來的門檻價",
-    "price_to_entry_gap": "現價離門檻價多遠",
+    # ⚠ 2026-09-23（Step 0b.1）：`entry_price`／`price_to_entry_gap` 兩個 label 隨 entry 面板退役。
     # V0：賭注
     "payoff_scenario": "賭注長什麼樣",
     "variant_internal_eps": "賭注對了的每股盈餘",
@@ -601,9 +605,7 @@ class AnalystView:
     research_context_digest: str | None
     headline: AnalystPanel
     fundamental: AnalystPanel
-    why: AnalystPanel
     research: AnalystPanel
-    entry: AnalystPanel
     readiness: AnalystReadiness
     refresh: RefreshSummary
     limits: tuple[str, ...]
@@ -626,8 +628,10 @@ class AnalystView:
     #: 事發（2026-09-18）：D2 的 panel 做好了但沒登記，於是 artifact 的 `absence_kind` 是 `None`
     #: （`to_dict` 只對 `PANEL_ORDER` 裡的 panel 寫出那個 property），readiness 也沒列它——
     #: 機制在、但分類沒跟著資料走到消費端（L16）。**materialize 一次就看得到，所以要驗 artifact。**
-    PANEL_ORDER = ("headline", "brief", "argument", "bet", "downside", "wipeout",
-                   "fundamental", "why", "research", "entry")
+    #: ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 已從這份清單移除（兩個 panel 退役）。
+    #: 順序即閱讀順序：短評 → 論證 → 賭注／下檔 → 歸零旗標 → 現價 → 稽核區的原始數字 → 什麼會推翻它。
+    PANEL_ORDER = ("brief", "argument", "bet", "downside", "wipeout",
+                   "headline", "fundamental", "research")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

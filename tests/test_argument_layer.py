@@ -4,7 +4,9 @@
 1. **句型輸出不含內部名詞**（與短評同一張禁字表），且不算數：輸入什麼值就印什麼值。
 2. **鏈的段落**：有印證的逐條講、只有公司自己說的合成一句並點名為最薄處；節點印人話名字。
 3. **缺料就說缺料**：沒有基期就一句話，不硬寫；沒有賭注就說還沒寫。
-4. **consumer**：argument panel optional、每一行是 read model 的同一個 Datum；APP 三層順序。
+4. **consumer**：每一行是 read model 的同一個 Datum；APP 三層順序。
+   ⚠ 2026-09-23（Phase 0 Step 0b.1）：argument panel 由 optional **升為核心**——它是在答
+   「憑什麼」的面板（73/73 檔都有內容），原本站核心位的 `why` 答的是「估值怎麼算」，已退役。
 """
 from __future__ import annotations
 
@@ -105,7 +107,7 @@ def test_money_formatting_is_presentation_only() -> None:
     assert format_value("money", 950.0) == "950"
 
 
-def test_argument_section_is_built_from_the_fixture_and_panel_is_optional() -> None:
+def test_argument_section_is_built_from_the_fixture_and_panel_is_core() -> None:
     from briefing.analyst_view import build_analyst_view
     from tests.test_analyst_view import _full_view
 
@@ -117,7 +119,8 @@ def test_argument_section_is_built_from_the_fixture_and_panel_is_optional() -> N
         if p.is_known:
             _clean(str(p.value))
     analyst = build_analyst_view(view)
-    assert analyst.argument.optional
+    # ⚠ 2026-09-23 Step 0b.1：由 optional 升核心（使用者定案 A）。
+    assert analyst.argument.optional is False
     assert not any(b.startswith("argument") for b in analyst.readiness.blockers)
     allowed = {id(p) for p in ag.paragraphs}
     assert all(id(line.datum) in allowed for line in analyst.argument.lines)

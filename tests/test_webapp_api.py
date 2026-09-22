@@ -54,8 +54,11 @@ def test_list_returns_the_fields_the_card_needs(client) -> None:
     row = next(r for r in body["stocks"] if r["ticker"] == "READY")
     assert row["price"]["value"] == 281.86
     assert row["price"]["quote_unit"] == "USD"
-    assert row["future_target"]["value"] == 223.6034
-    assert row["implied_return"]["simple"]["value"] == -0.2
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`future_target`／`implied_return` 兩個鍵退役（那把尺）。
+    # 卡片現在要的是：現價、短評那一句、readiness。**不得有退役的鍵殘留。**
+    for retired in ("future_target", "implied_return", "payoff", "sell_side_target", "target_reached"):
+        assert retired not in row, retired
+    assert "brief" in row and "our_bet" in row["brief"]
     assert row["readiness"]["state"] == "ready"
     assert row["generated_at"] and row["freshness"]["state"] in {"fresh", "stale"}
 
@@ -63,7 +66,9 @@ def test_list_returns_the_fields_the_card_needs(client) -> None:
 def test_list_never_flattens_the_four_absences_into_one_word(client) -> None:
     """四檔各自的缺席理由必須互相可分辨——這是整個 Step 5 語意債的驗收條件。"""
     body = client.get("/api/v1/stocks").json()
-    kinds = {r["ticker"]: r["future_target"]["absence_kind"] for r in body["stocks"]}
+    # ⚠ 2026-09-23（Step 0b.1）：`future_target` 退役。四種缺席語意的載體改成 `primary_attention`
+    # ——**同一個主張**（四種缺席不得被壓成一句 unavailable），只是換了它現在住的那一格。
+    kinds = {r["ticker"]: (r["primary_attention"] or {}).get("absence_kind") for r in body["stocks"]}
     assert kinds["ABSTAIN"] == "deliberate_abstention"
     assert kinds["NOTAPPLIC"] == "method_not_applicable"
     assert kinds["UPSTREAM"] == "upstream_unavailable"
@@ -87,9 +92,11 @@ def test_settled_absence_does_not_make_readiness_better(client) -> None:
 def test_missing_is_never_rendered_as_zero(client) -> None:
     for ticker in ("ABSTAIN", "NOTAPPLIC", "UPSTREAM"):
         row = client.get(f"/api/v1/stocks/{ticker}").json()["overview"]
-        assert row["future_target"]["value"] is None
-        assert row["implied_return"]["simple"]["value"] is None
-        assert row["implied_return"]["annualized"]["value"] is None
+        # ⚠ 2026-09-23（Step 0b.1）：三個退役的鍵不得以 0 復活，也不得以空 dict 殘留。
+        for retired in ("future_target", "implied_return", "payoff", "target_reached"):
+            assert retired not in row, retired
+        # 缺席仍然要說得出是哪一種（Missing != Zero 的正面斷言）。
+        assert (row["primary_attention"] or {}).get("absence_kind")
 
 
 def test_quote_units_are_carried_not_normalised(client) -> None:
@@ -326,8 +333,9 @@ def test_single_stock_page_leads_with_the_answer_then_the_price(client) -> None:
     brief_fn = source.split("function briefCard", 1)[1].split("\nfunction ", 1)[0]
     assert "priceCard(payload)" in brief_fn and "priceCard(" not in block
     # 細節一格都沒少：六個面板的 render 全都還在 details 裡
-    for renderer in ("renderFundamental(view)", "renderWhy(view)", "renderResearch(view)",
-                     "renderEntry(view)", "renderFreshness(payload)"):
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`renderWhy`／`renderEntry` 隨兩個 panel 退役。
+    for renderer in ("renderFundamental(view)", "renderResearch(view)",
+                     "renderFreshness(payload)"):
         assert renderer in block, f"完整細節少了 {renderer}"
 
 

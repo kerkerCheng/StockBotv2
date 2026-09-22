@@ -602,6 +602,22 @@ class ScenarioSection:
 
 
 @dataclass(frozen=True, slots=True)
+class MarketSection:
+    """現價（A2 觀測）。**2026-09-23（Phase 0 Step 0b.1）新增：把現價從估值鏈裡搬出來。**
+
+    事發：現價原本只住在 `ValuationSection.current_price`／`ImpliedReturnSection.current_price`／
+    `EntryLogicSection.current_price` 三個地方——**全部是退役的 section**。於是「這一檔現在多少錢」
+    這個純觀測會跟著估值模型一起消失，而它與估值一點關係都沒有（它是 Engine C 的收盤快照）。
+
+    這一節只有一格，且**沒有任何算術**：值、報價單位、bar 日期、證據全部照抄 Engine C 快照。
+    `meta.status` 由「有沒有價」決定，不由估值算不算得出來決定——這是本次搬家的整個重點。
+    """
+
+    meta: SectionMeta                          # available／missing
+    price: Datum
+
+
+@dataclass(frozen=True, slots=True)
 class ValuationSection:
     """估值（Step 1）：**只消費** `alpha.valuation.build_valuation` 的輸出，builder 不含任何估值公式。
 
@@ -952,6 +968,9 @@ class AlphaInvestmentView:
     catalysts: CatalystSection
     falsification: FalsificationSection
     scenarios: ScenarioSection
+    #: 2026-09-23（Phase 0 Step 0b.1）：現價自己的家。**排在估值之前**——它是估值的輸入，
+    #: 不是估值的產物；估值退役後它必須還在（個股頁的「現在多少錢」讀它）。
+    market: MarketSection
     valuation: ValuationSection
     implied_return: ImpliedReturnSection
     #: D2（2026-09-18）：由 `NotModeledSection` 換成與賭注**對稱**的 overlay。
@@ -974,7 +993,7 @@ class AlphaInvestmentView:
     SECTIONS_WITH_META = (
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
-        "expectation_gap", "catalysts", "falsification", "scenarios", "valuation", "implied_return",
+        "expectation_gap", "catalysts", "falsification", "scenarios", "market", "valuation", "implied_return",
         "downside", "entry_logic", "wipeout_flags", "evidence", "refresh_status", "payoff_scenario",
         "investor_brief", "argument",
     )
@@ -1026,7 +1045,7 @@ __all__ = [
     "CAP_DOWNSIDE_OVERLAY",
     "CAP_INVESTOR_BRIEF", "InvestorBriefSection", "CAP_ARGUMENT", "ArgumentSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
-    "CAP_NARRATIVE_SCENARIOS", "ValuationSection",
+    "CAP_NARRATIVE_SCENARIOS", "MarketSection", "ValuationSection",
     "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",
     "CAP_QUANTITATIVE_SCENARIOS", "CAP_STRUCTURAL_CAUSAL", "CAP_STRUCTURED_DISPROOF",
     "CatalystItem", "CatalystSection", "CausalPathSection", "CheckpointItem",

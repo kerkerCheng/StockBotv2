@@ -162,22 +162,28 @@ def test_overview_copies_values_verbatim_and_never_converts_units() -> None:
     # GBp（便士）與 GBP（英鎊）差 100 倍。overview **原樣帶著兩個單位**，不換算、不合併。
     assert overview["price"]["value"] == 47.518
     assert overview["price"]["quote_unit"] == "GBp"
-    assert overview["future_target"]["value"] == 0.05
-    assert overview["future_target"]["currency"] == "GBP"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`future_target` 退役（那把尺）。**判準一字未改**
+    # ——GBp 與 GBP 差 100 倍，overview 原樣帶單位不換算；現在唯一帶單位的那一格是現價。
+    for retired in ("future_target", "implied_return", "payoff", "sell_side_target", "target_reached"):
+        assert retired not in overview, retired
 
 
 def test_overview_absence_keeps_none_not_zero() -> None:
     overview = build_overview(fake_view(fair_value=None, readiness_state="blocked"))
-    assert overview["future_target"]["value"] is None
-    assert overview["implied_return"]["simple"]["value"] is None
-    assert overview["future_target"]["status"] == "missing"
+    # ⚠ 2026-09-23（Step 0b.1）：那三個鍵退役。**Missing != Zero 沒有放寬**——改問仍在的兩格：
+    # 缺席要說得出是哪一種，且不得被補成 0。
+    assert overview["readiness"]["state"] == "blocked"
+    assert overview["gap_closure"]["value"] is None
+    assert overview["price"]["value"] is not None, "現價是觀測，它不該跟著上游缺席消失"
+    for retired in ("future_target", "implied_return", "payoff", "target_reached"):
+        assert retired not in overview, retired
 
 
 def test_overview_carries_the_absence_kind_so_the_ui_never_parses_prose() -> None:
     overview = build_overview(fake_view(
         fair_value=None, absence_kind="deliberate_abstention", readiness_state="blocked",
         blockers=["headline：missing"], reason="刻意不主張目標倍數：無法錨定"))
-    assert overview["future_target"]["absence_kind"] == "deliberate_abstention"
+    # ⚠ 2026-09-23（Step 0b.1）：`future_target` 退役；`primary_attention` 是缺席語意的載體。
     assert overview["primary_attention"]["absence_kind"] == "deliberate_abstention"
     assert overview["primary_attention"]["settled"] is True
 
@@ -187,9 +193,9 @@ def test_overview_contains_no_arithmetic_on_the_numbers() -> None:
     view = fake_view(price=50.0, fair_value=100.0)
     overview = build_overview(view)
     lines = {line["key"]: line["datum"] for line in view["headline"]["lines"]}
+    # ⚠ 2026-09-23（Step 0b.1）：兩個鍵退役。**「overview 不自己算」沒有放寬**——
+    # 現價這一格仍必須是 headline line 的**同一個物件**（`is` 相等，不是數值相等）。
     assert overview["price"]["value"] is lines["current_price"]["value"]
-    assert overview["future_target"]["value"] is lines["fair_value"]["value"]
-    assert overview["implied_return"]["simple"]["value"] is lines["price_return"]["value"]
 
 
 # ---------------------------------------------------------------------------

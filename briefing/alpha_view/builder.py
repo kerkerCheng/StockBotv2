@@ -70,7 +70,7 @@ from .contracts import (
     DisproofItem, EarningsBridgeSection, EntryLogicSection, EventItem, EvidenceItem, EvidenceSection,
     EvidenceSelectionCounts, ExpectationGapSection, ExposureItem, FalsificationSection,
     FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem, ImpliedReturnSection,
-    InternalFundamentalsSection, LifecycleFacts, PathItem,
+    InternalFundamentalsSection, LifecycleFacts, MarketSection, PathItem,
     PriceImpliedSection, RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
     SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, ValuationSection, VariantViewSection,
     CAP_WIPEOUT_FLAGS, WipeoutFlagsSection,
@@ -560,6 +560,38 @@ VALUATION_EPISTEMIC_WARNING = (
     "fair value 是判斷的確定性函數，不是事實：內部 EPS 的每條營運假設與目標倍數都是 session 判斷／heuristic——"
     "看 fair_value.dependencies.input_dependency 與 epistemics；不得把公式算出來的價格讀成觀測。"
 )
+
+
+def _market_section(build: Any, *, reference_day: date) -> "MarketSection":
+    """現價 section（2026-09-23 Phase 0 Step 0b.1 新增）。
+
+    **直接讀 `build.context.market`**，與 `sources._current_price` 同一個來源，
+    **不經過估值鏈**——這一節存在的整個理由就是「估值退役後現價還在」。
+    這裡沒有任何算術：值、報價單位、bar 日期、證據全部照抄。
+    """
+    market = getattr(build.context, "market", None)
+    value = getattr(market, "price", None) if market is not None else None
+    unit = getattr(market, "quote_unit", None) if market is not None else None
+    bar_date = getattr(market, "bar_date", None) if market is not None else None
+    refs = tuple(r.ref for r in (getattr(market, "evidence", ()) or ())) if market is not None else ()
+    if value is None:
+        why = "Engine C 無現價快照"
+        return MarketSection(
+            meta=SectionMeta(status="missing", basis="none", authority=A_SNAP,
+                             capability="engine_c_market_snapshot", reason=why, as_of=reference_day),
+            price=missing("current_price", "現價（Engine C）", why, authority=A_SNAP),
+        )
+    return MarketSection(
+        meta=SectionMeta(status="available", basis="observation", authority=A_SNAP,
+                         capability="engine_c_market_snapshot", reason=None, as_of=reference_day),
+        price=Datum(
+            key="current_price", label="現價（Engine C）", value=value, status="available",
+            basis="observation", authority=A_SNAP, unit=unit or "currency_per_share",
+            as_of=bar_date or reference_day, evidence_refs=refs,
+            dependencies={"quote_unit": unit, "bar_date": bar_date.isoformat() if bar_date else None},
+            reason=None,
+        ),
+    )
 
 
 def _valuation_section(
@@ -2277,6 +2309,7 @@ def build_alpha_investment_view(
         reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
         refresh=refresh_by_key,
     )
+    market_section = _market_section(build, reference_day=reference_day)
     valuation_section = _valuation_section(
         valuation, valuation_reason, reference_day=reference_day,
         reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
@@ -3407,7 +3440,8 @@ def build_alpha_investment_view(
         price_implied_expectations=price_implied_section,
         internal_fundamentals=internal_section, earnings_bridge=earnings_bridge_section,
         expectation_gap=expectation_gap_section, catalysts=catalyst_section,
-        falsification=falsification_section, scenarios=scenario_section, valuation=valuation_section,
+        falsification=falsification_section, scenarios=scenario_section,
+        market=market_section, valuation=valuation_section,
         implied_return=implied_return_section, downside=downside_section,
         entry_logic=entry_section,
         wipeout_flags=_wipeout_section(wipeout, reason=wipeout_reason, reference_day=reference_day),

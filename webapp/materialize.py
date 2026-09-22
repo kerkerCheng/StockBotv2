@@ -89,21 +89,6 @@ def _brief_overview(brief_panel: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def _payoff_overview(bet_panel: Mapping[str, Any]) -> dict[str, Any]:
-    """清單卡片要的賭注三格：目標價／payoff／年化，外加 panel 的 status 與缺席語意。純選取。"""
-    lines = _line_map(bet_panel)
-    target = lines.get("variant_fair_value") or {}
-    return {
-        "status": bet_panel.get("status"),
-        "absence_kind": bet_panel.get("absence_kind"),
-        "reason": bet_panel.get("reason"),
-        "override_count": (bet_panel.get("context") or {}).get("override_count"),
-        "variant_target": {**_cell(target), "currency": (target.get("dependencies") or {}).get("currency")},
-        "simple": _cell(lines.get("payoff_return")),
-        "annualized": _cell(lines.get("annualized_payoff_return")),
-    }
-
-
 def _wipeout_overview(panel: Mapping[str, Any]) -> dict[str, Any]:
     """歸零旗標的清單投影：四盞燈的顏色與一句話，外加紅黃綠灰計數。**純選取。**
 
@@ -134,7 +119,6 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
     lines = _line_map(headline)
     fundamental_lines = _line_map(view.get("fundamental") or {})
     price = lines.get("current_price") or {}
-    fair_value = lines.get("fair_value") or {}
     readiness = view["readiness"]
     blockers = list(readiness.get("blocker_details") or [])
     flags = list(readiness.get("flag_details") or [])
@@ -150,20 +134,15 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         "generated_on": view.get("generated_on"),
         "price": {**_cell(price),
                   "quote_unit": (price.get("dependencies") or {}).get("quote_unit")},
-        "future_target": {**_cell(fair_value),
-                          "currency": (fair_value.get("dependencies") or {}).get("currency"),
-                          "value_date": _cell(lines.get("value_date"))},
-        "implied_return": {"simple": _cell(lines.get("price_return")),
-                           "annualized": _cell(lines.get("annualized_price_return"))},
-        # V0（2026-09-15）賭注：照抄 bet panel（optional）。沒寫賭注就是 missing＋not_yet_recorded，不是 0。
-        "payoff": _payoff_overview(view.get("bet") or {}),
+        # ⚠ **2026-09-23（Phase 0 Step 0b.1）：五個鍵退役**——`future_target`、`implied_return`、
+        # `payoff`、`sell_side_target`、`target_reached`。它們就是 ROADMAP 首屏那一列要拿掉的
+        # 「那把尺」（現價／沒賭對／賭對／判斷錯了）與它的兩端。**不是搬家，是退役**：
+        # 「已定價嗎」改由財務三題回答（Phase 3），主參照是自己的歷史、不設門檻。
+        # 現價（`price`）留著——它是 A2 觀測，不是模型輸出。
         # 2026-09-15 投資人短評：清單卡片要的第一句（賭什麼）與狀態燈。純選取。
         "brief": _brief_overview(view.get("brief") or {}),
-        # R4（2026-09-15）：清單卡片的尺縮圖要的兩樣：分析師平均目標價（Engine C 快照）與最近交易日區間。
-        "sell_side_target": _cell(fundamental_lines.get("target_mean")),
-        # V2：市場承認了嗎／目標價到了沒（照抄）
+        # V2：市場承認了嗎（照抄）。⚠ `target_reached` 已於 2026-09-23 隨目標價退役。
         "gap_closure": _cell(fundamental_lines.get("gap_closure")),
-        "target_reached": _cell(lines.get("target_reached")),
         # D2（2026-09-18）歸零旗標：四盞燈（顏色＋一句話）與紅黃綠灰計數。照抄 panel。
         "wipeout": _wipeout_overview(view.get("wipeout") or {}),
         # V1：熟成度計數（照抄 research panel 的 catalyst_quantitative_link）

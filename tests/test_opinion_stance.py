@@ -156,7 +156,9 @@ def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
     # ⚠ 計數本身不是判準——判準是「每個印隱含報酬的 surface 都走同一個 helper」。
     # 這個數字變大只有在**新 surface 也用了 helper** 時才該更新；若哪天有人手寫一段
     # 報酬渲染，計數不會變，而這條測試也抓不到它（已知限制，寫在這裡而不是假裝它守得住）。
-    assert source.count("appendReturnBlock") == 8, "有 surface 沒有共用那段判斷"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：列表卡片的「沒賭對，要漲跌多少」與「賭注對了」兩格
+    # 隨那把尺退役，所以呼叫數 8 → 7。**判準一字未改**：每個仍在印報酬的 surface 都走同一段判斷。
+    assert source.count("appendReturnBlock") == 7, "有 surface 沒有共用那段判斷"
     # D2（2026-09-18）：`betBlock` 參數化成「一個 overlay 區塊」，賭注與下檔各傳一份文案表。
     # 兩邊都必須出現——少一邊就代表那一端的數字沒有畫面。
     assert "betBlock(view, OVERLAY_BLOCKS.bet)" in source

@@ -342,31 +342,20 @@ function renderCard(row) {
     fmtQuantity(price.value, price.quote_unit) || '—',
     price.as_of ? `bar ${price.as_of}` : (price.reason ? '無現價' : '')));
 
-  appendReturnBlock(numbers, '沒賭對，要漲跌多少', row.implied_return.simple,
-                    row.implied_return.annualized, cardStance, '年化 ');
-  // 賭注（V0）：有寫 variant 才顯示；沒寫就不留白也不補 0——那是「還沒寫賭注」，卡片上不需要一格。
-  const payoff = row.payoff || {};
-  if (payoff.simple && typeof payoff.simple.value === 'number') {
-    numbers.appendChild(numberBlock('賭注對了', fmtPercent(payoff.simple.value),
-      payoff.annualized && typeof payoff.annualized.value === 'number'
-        ? '年化 ' + fmtPercent(payoff.annualized.value) : '', signClass(payoff.simple.value)));
-  }
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1）：卡片上的「沒賭對，要漲跌多少」與「賭注對了」兩格退役
+  // ——它們是 overview.implied_return／payoff，也就是 ROADMAP 首屏那一列要拿掉的那把尺。
+  // 卡片剩下的數字只有現價（A2 觀測）。「已定價嗎」改由財務三題回答（Phase 3）。
   card.appendChild(numbers);
 
-  // R4（2026-09-15）：卡片＝短評第一句＋尺的縮圖。尺上是現價／沒賭對／賭對／分析師平均／區間；全部照抄 overview。
+  // 卡片＝短評第一句。⚠ 2026-09-23（Phase 0 Step 0b.1）：**尺的縮圖整塊退役**
+  // （尺上原本是現價／沒賭對／賭對／分析師平均／區間）。首屏的單位是句不是格（AGENTS「APP」），
+  // 所以卡片上留下來的是那句話，不是那把尺。
   const brief = row.brief || {};
   if (brief.our_bet && typeof brief.our_bet.value === 'string') {
     card.appendChild(el('div', 'card-brief', brief.our_bet.value));
-  }
-  if (price && typeof price.value === 'number') {
-    const target = row.future_target || {};
-    const payoffTarget = (row.payoff || {}).variant_target || {};
-    const sell = row.sell_side_target || {};
-    card.appendChild(priceScale({
-      price: price.value, unit: price.quote_unit,
-      base_target: typeof target.value === 'number' ? target.value : null,
-      bet_target: typeof payoffTarget.value === 'number' ? payoffTarget.value : null,
-    }, row.price_context || null, typeof sell.value === 'number' ? sell.value : null, { compact: true }));
+  } else {
+    // 缺席要現形：沒寫短評不是空白（INV-3）。70/73 檔今天都在這一支。
+    card.appendChild(el('div', 'card-brief absent', '還沒寫短評'));
   }
   const attention = row.primary_attention;
   if (attention) {
@@ -670,50 +659,6 @@ function renderFundamental(view) {
   return node;
 }
 
-function renderWhy(view) {
-  const panel = view.why;
-  const node = panelShell(panel, '假設、敏感度、算式、證據');
-  if (panel.weak_inputs && panel.weak_inputs.length) {
-    node.appendChild(el('div', 'group-title', '最脆弱的輸入（依宣告好的列入規則，不是新判斷）'));
-    const list = el('ul', 'weak');
-    panel.weak_inputs.forEach((item) => {
-      const li = el('li');
-      const text = valueText(item.datum);
-      li.appendChild(document.createTextNode(item.display_label + (text ? '：' + text : '')));
-      const rule = (VOCAB && VOCAB.weak_input_rules && VOCAB.weak_input_rules[item.rule]) || item.rule;
-      li.appendChild(el('span', 'rule', `列入規則 ${item.rule}｜${rule}`));
-      if (item.datum.reason) li.appendChild(el('span', 'rule', truncate(item.datum.reason, 260)));
-      list.appendChild(li);
-    });
-    node.appendChild(list);
-  }
-  const byRole = [
-    ['assumption', '生效的假設'],
-    ['sensitivity', '敏感度（估值層已算好，本畫面只排序）'],
-    ['trace', '算式逐格'],
-    ['epistemics', '算術 vs 判斷的分解'],
-  ];
-  byRole.forEach(([role, title]) => {
-    const rows = (panel.lines || []).filter((line) => line.role === role);
-    if (!rows.length) return;
-    node.appendChild(group(`${title}（${rows.length} 項）`, () => renderRows(rows)));
-  });
-  if (panel.evidence && panel.evidence.length) {
-    node.appendChild(group(`證據來源（${panel.evidence.length} 條）`, () => {
-      const box = el('div', 'rows');
-      panel.evidence.forEach((item) => {
-        const row = el('div', 'row');
-        row.appendChild(el('div', 'row-label', item.ref));
-        row.appendChild(el('div', 'row-value', item.tier || item.kind || ''));
-        if (item.label || item.note) row.appendChild(el('div', 'row-reason', item.label || item.note));
-        box.appendChild(row);
-      });
-      return box;
-    }));
-  }
-  return node;
-}
-
 function renderResearch(view) {
   const panel = view.research;
   const node = panelShell(panel, '研究現況與五軸判斷');
@@ -751,14 +696,6 @@ function renderResearch(view) {
     node.appendChild(group(`需要重看的研究成果（${panel.attention.length}）`, () => listOf(
       panel.attention.map((a) => `${a.artifact_type}：${a.state}｜${(a.reasons || []).join('；')}`))));
   }
-  return node;
-}
-
-function renderEntry(view) {
-  const panel = view.entry;
-  const node = panelShell(panel, '進場門檻（選配，不影響這份判讀完不完整）');
-  node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
-  node.appendChild(renderRows(panel.lines));
   return node;
 }
 
@@ -1114,33 +1051,6 @@ function blockerCard(payload) {
   return node;
 }
 
-function fragileCard(view) {
-  const panel = view.why;
-  const weak = (panel.weak_inputs || []).slice(0, 3);
-  if (!weak.length) return null;
-  const meta = plainPanel('why', panel.title);
-  const node = el('section', 'panel');
-  node.appendChild(el('h2', null, meta.title));
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-  const list = el('ul', 'weak');
-  weak.forEach((item) => {
-    const li = el('li');
-    const text = valueText(item.datum);
-    li.appendChild(document.createTextNode(
-      plainLine(item.datum.key || '', item.display_label) + (text ? '：' + text : '')));
-    const rule = (VOCAB && VOCAB.weak_input_rules && VOCAB.weak_input_rules[item.rule]) || item.rule;
-    li.appendChild(el('span', 'rule', rule));
-    if (item.datum.reason) li.appendChild(el('span', 'rule', truncate(item.datum.reason, 130)));
-    list.appendChild(li);
-  });
-  node.appendChild(list);
-  node.appendChild(el('p', 'note',
-    (panel.weak_inputs.length > weak.length
-      ? `另有 ${panel.weak_inputs.length - weak.length} 條較次要的，` : '這裡的理由是摘要，')
-    + '完整原文在下方「完整細節」裡，一個字沒少。'));
-  return node;
-}
-
 function disproofCard(view) {
   const panel = view.research;
   const disproofs = panel.disproofs || [];
@@ -1385,12 +1295,8 @@ function briefCard(payload, view) {
     const badge = el('span', 'badge badge-light light-' + (light.value.state || 'unknown'), light.value.label);
     node.appendChild(badge);
   }
-  // V2：目標價到了（沒賭對／賭對）→ 一個徽章。到達＝該重看要不要收割，不是賣出指令。
-  const reached = view.headline && lineMap(view.headline).target_reached;
-  const rv = reached && reached.datum && reached.datum.value;
-  if (rv && rv.any_reached) {
-    node.appendChild(el('span', 'badge badge-flags', rv.bet_reached ? '現價高於賭對的目標價' : '現價高於沒賭對的目標價'));
-  }
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1）：「目標價到了」那個徽章退役（`target_reached` 隨目標價退役）。
+  // AGENTS D3 的判準沒有退役——`realized` 只提醒、不觸發出場；它現在的家是心跳段 2 的候選狀態板。
   if (panel && panel.context && panel.context.available) {
     const story = el('div', 'story');
     (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0).forEach((line) => {
@@ -1408,97 +1314,20 @@ function briefCard(payload, view) {
     box.appendChild(el('div', 'attention-body', (panel && panel.reason) || meta.hint));
     node.appendChild(box);
   }
-  const scale = lines.brief_scale && lines.brief_scale.datum;
-  if (scale && scale.value && typeof scale.value.price === 'number') {
-    const fundamental = view.fundamental ? lineMap(view.fundamental) : {};
-    const sellSide = fundamental.target_mean && fundamental.target_mean.datum;
-    node.appendChild(priceScale(scale.value, payload.price_context || null,
-      sellSide && typeof sellSide.value === 'number' ? sellSide.value : null));
-  }
-  // 2026-09-20（Phase 7 選項 a）：那把尺**不動**，另外加一句「要翻倍需要什麼為真」。
-  // ⚠ 只在這一檔寫下了倍率射程時才有這一行——沒寫就不印（不是印「還沒寫」；71/73 檔都沒寫，
-  // 逐檔印是噪音，全體缺口由心跳段 4 的常駐計數器負責）。
-  // ⚠ 它回答的是**另一個問題**：那把尺問「明年值多少」，這一句問「這個結構允不允許翻倍」。
-  const mq = lines.brief_multiple_question && lines.brief_multiple_question.datum;
-  if (mq) {
-    const box = el('div', 'attention');
-    box.appendChild(el('div', 'attention-head', '要翻倍需要什麼為真'));
-    const sentence = mq.value && mq.value.sentence;
-    if (sentence) {
-      box.appendChild(el('div', 'attention-body', String(sentence)));
-    } else {
-      // 缺席也要說得出是哪一種（方法不適用 ≠ 還沒做）——理由由產生它的那段程式宣告。
-      box.appendChild(el('div', 'attention-body', mq.reason || '算不出來'));
-    }
-    node.appendChild(box);
-  }
-  // 2026-09-15 使用者回饋：走勢圖住第一個 block（尺下面）。它是脈絡不是訊號（priceCard 內文照舊）。
+  // ⚠ **2026-09-23（Phase 0 Step 0b.1）：首屏那把尺與「要翻倍需要什麼為真」計算框整塊退役。**
+  // ROADMAP「個股頁」對照表把它們列進「拿掉」：尺上是現價／沒賭對／賭對／判斷錯了，
+  // 計算框問的是「這個結構允不允許翻倍」——兩者都建在估值鏈與多年反向橋上。
+  // 接手的是末行候選狀態與財務三題三個字（Phase 3）；在那之前首屏只有句子、燈與走勢圖。
+  // 走勢圖留下來：它是**脈絡**不是訊號（AGENTS「量測、訊號、脈絡三分」）。
   node.appendChild(priceCard(payload));
   return node;
 }
 
-/* 一把尺（2026-09-15 第二版）：區間帶＝最近 180 個交易日的低點到高點（脈絡，不是訊號），
-   上面放我們的兩個目標價與分析師平均目標價，下面放現價。純排版——每個數字都是 materialize 端已經有的，
-   這裡只決定畫在哪、標籤上下交錯避免重疊。 */
-function priceScale(v, ctx, sellSide, opts) {
-  const compact = !!(opts && opts.compact);
-  const marks = [];
-  if (typeof v.price === 'number') marks.push({ label: '現價', value: v.price, kind: 'now', sub: '' });
-  if (typeof v.base_target === 'number') marks.push({ label: '沒賭對的目標價', value: v.base_target, kind: 'base',
-    sub: typeof v.base_return === 'number' ? '從現價 ' + fmtPercent(v.base_return) : '' });
-  if (typeof v.bet_target === 'number') marks.push({ label: '賭對的目標價', value: v.bet_target, kind: 'bet',
-    sub: typeof v.payoff === 'number' ? '從現價 ' + fmtPercent(v.payoff) : '' });
-  /* D2（2026-09-18）：尺的另一端。**沒寫就不畫**——`null` 不會被讀成 0，
-     而畫一個 0% 的下檔等於替使用者做了一個沒有人做過的主張。 */
-  if (typeof v.downside_target === 'number') marks.push({ label: '判斷錯了的目標價', value: v.downside_target, kind: 'downside',
-    sub: typeof v.downside_return === 'number' ? '從現價 ' + fmtPercent(v.downside_return) : '' });
-  if (typeof sellSide === 'number') marks.push({ label: '分析師平均目標價', value: sellSide, kind: 'street', sub: '券商分析師的 12 個月目標價平均；不是我們的目標價' });
-  if (ctx && typeof ctx.low === 'number') marks.push({ label: '區間低點', value: ctx.low, kind: 'range', sub: ctx.low_date || '' });
-  if (ctx && typeof ctx.high === 'number') marks.push({ label: '區間高點', value: ctx.high, kind: 'range', sub: ctx.high_date || '' });
-  const wrap = el('div', 'scale');
-  if (marks.length < 2) return wrap;
-  const nums = marks.map((m) => m.value);
-  const lo = Math.min.apply(null, nums), hi = Math.max.apply(null, nums);
-  const span = (hi - lo) || 1;
-  // 尺上只放點與短數字（字級 30／1000，手機上約 11px、桌機約 19px）；名稱與日期放下面的圖例，字級是正常字級。
-  const W = 1000, H = compact ? 96 : 110, padX = 60, yAxis = compact ? 30 : 40;
-  const x = (val) => padX + ((val - lo) / span) * (W - padX * 2);
-  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, class: 'scale-svg', role: 'img',
-    'aria-label': '價格尺：現價、目標價與最近交易日區間' });
-  svg.appendChild(svgEl('line', { x1: padX, x2: W - padX, y1: yAxis, y2: yAxis, class: 'scale-axis' }));
-  if (ctx && typeof ctx.low === 'number' && typeof ctx.high === 'number') {
-    svg.appendChild(svgEl('rect', { x: x(ctx.low), y: yAxis - 7, width: Math.max(2, x(ctx.high) - x(ctx.low)), height: 14,
-      rx: 7, class: 'scale-band' }));
-  }
-  marks.forEach((m) => {
-    const cx = x(m.value);
-    // 短數字交錯兩層避免疊字：層數＝比自己小的點有幾個（奇偶）。不排序——APP 不得對任何列 .sort。
-    const level = marks.filter((o) => o.value < m.value).length % 2;
-    const y = yAxis + 34 + level * 30;
-    svg.appendChild(svgEl('line', { x1: cx, x2: cx, y1: yAxis, y2: y - 24, class: 'scale-stem' }));
-    svg.appendChild(svgEl('circle', { cx: cx, cy: yAxis, r: m.kind === 'range' ? 5 : 9, class: 'scale-pt pt-' + m.kind }));
-    svg.appendChild(svgEl('text', { x: cx, y: y, 'text-anchor': 'middle', class: 'scale-text text-' + m.kind },
-      fmtQuantity(m.value, null)));
-  });
-  wrap.appendChild(svg);
-  if (compact) return wrap;                       // 清單卡片：只要點與短數字，圖例住單檔頁
-  const legend = el('div', 'scale-legend');
-  marks.forEach((m) => {
-    const row = el('div', 'scale-row');
-    row.appendChild(el('span', 'scale-key pt-' + m.kind));
-    row.appendChild(el('span', 'scale-name', m.label));
-    row.appendChild(el('span', 'scale-val', fmtQuantity(m.value, v.unit) || '—'));
-    row.appendChild(el('span', 'scale-sub', m.sub));
-    legend.appendChild(row);
-  });
-  wrap.appendChild(legend);
-  wrap.appendChild(el('div', 'scale-note',
-    ctx ? `區間帶＝最近 ${ctx.sessions} 個已收盤交易日（${ctx.first_date} 起）的低點到高點；脈絡不是訊號。` : ''));
-  return wrap;
-}
+/* ⚠ **2026-09-23（Phase 0 Step 0b.1）：`priceScale`（那把尺）整個函式退役。**
+   它畫的是現價／沒賭對的目標價／賭對的目標價／判斷錯了的目標價／分析師平均，而
+   ROADMAP「個股頁」對照表把整把尺列進「拿掉」。走勢圖（`priceCard`）留著——它是脈絡不是訊號。
+   接手首屏的是句子、燈、候選狀態與財務三題（Phase 3）。 */
 
-/* 論證層（2026-09-15）：六段分析師報告體。每段＝一段句型組出的文字＋研究時寫的長文（逐字）＋圖裡的引文（誰說的、哪天）。
-   本畫面只排版；不摘要、不改寫、不算數。 */
 function argumentCard(view) {
   const panel = view.argument;
   const meta = plainPanel('argument', panel ? panel.title : '為什麼這樣想');
@@ -1647,7 +1476,9 @@ async function renderDetail(ticker) {
   audit.appendChild(drill('稽核：每一格的來源、狀態、算式與警告（給查核用，不是給你讀的）', () => {
     const box = el('div', 'why-box');
     box.appendChild(conclusionCard(payload, view));
-    [blockerCard(payload), fragileCard(view), disproofCard(view), versusMarketCard(view)]
+    // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`fragileCard`（最脆弱的假設）隨 `why` panel 退役
+    // ——它列的是估值假設的敏感度，那個模型不在了。風險與認錯條件在 disproofCard。
+    [blockerCard(payload), disproofCard(view), versusMarketCard(view)]
       .forEach((card) => { if (card) box.appendChild(card); });
     return box;
   }));
@@ -1660,7 +1491,7 @@ async function renderDetail(ticker) {
   details.appendChild(el('p', 'note',
     '稽核用：同一份判讀的每一格。點一次就全部攤開，裡面沒有第二層展開，' +
     '也沒有任何一列會叫你「見下方展開」。'));
-  details.appendChild(drill('展開完整細節（結論數字／我們與市場／假設與證據／研究現況／進場門檻／判讀狀態／新鮮度）',
+  details.appendChild(drill('展開完整細節（現價／賭注／下檔／我們與市場／研究現況／判讀狀態／新鮮度）',
     () => {
       const box = el('div', 'full-detail');
       box.appendChild(renderHeadline(view));
@@ -1668,9 +1499,8 @@ async function renderDetail(ticker) {
       const dsNode = renderDownside(view);
       if (dsNode) box.appendChild(dsNode);
       box.appendChild(renderFundamental(view));
-      box.appendChild(renderWhy(view));
+      // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`renderWhy` 與 `renderEntry` 隨兩個 panel 退役。
       box.appendChild(renderResearch(view));
-      box.appendChild(renderEntry(view));
       box.appendChild(renderReadiness(payload));
       box.appendChild(renderFreshness(payload));
       const limits = el('section', 'panel');

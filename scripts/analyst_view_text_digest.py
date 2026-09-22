@@ -1,7 +1,8 @@
 """個股頁**文字** digest：讓「只拿掉面板、不改文字」變成可機械比對的一句話。
 
 用途只有一個：Phase 0（`docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md`）的
-結案 gate 3 與 R2 檢查 7 要求「materialize 前後，73 檔的 brief／why／research 面板**文字**不變」。
+結案 gate 3 與 R2 檢查 7 要求「materialize 前後，73 檔的 brief／argument／research 面板**文字**不變」
+（2026-09-23 起： 退役、 升核心）。
 沒有一個固定配方的話，前後兩次比對會各自寫一段 snippet，於是「不變」永遠證不出來。
 
 **只 hash 敘事文字**，不 hash 數字、時戳、digest、依賴 payload——因為那些本來就會隨資料刷新而動，
@@ -27,7 +28,9 @@ if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
 #: 要比對的面板。Phase 0 只承諾這三個面板的文字不動（其餘面板本來就會被拿掉）。
-PANELS = ("brief", "why", "research")
+#: ⚠ 2026-09-23（Phase 0 Step 0b.1，使用者定案 A）：`why` 退役、`argument` 升核心，所以比對的
+#: 第二格由 `why` 換成 `argument`。gate 3 的措辭同步改成「argument 少掉的只能是估值來源的段」。
+PANELS = ("brief", "argument", "research")
 
 #: `datum` 底下唯一算文字的鍵。其餘（as_of、authority、dependencies、basis…）是 metadata，
 #: 會隨刷新而變，不屬於「文字」。
@@ -88,7 +91,7 @@ def artifact_texts(doc: dict) -> dict[str, list[str]]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="個股頁 brief／why／research 的文字 digest（唯讀）")
+    parser = argparse.ArgumentParser(description="個股頁 brief／argument／research 的文字 digest（唯讀）")
     parser.add_argument("--dir", type=Path, default=None, help="analyst view artifact 目錄")
     parser.add_argument("--per-panel", action="store_true", help="逐面板一行")
     args = parser.parse_args(argv)

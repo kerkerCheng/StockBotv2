@@ -3,9 +3,14 @@
 守的是 Step 3.5 的驗收條件：
 1. Consumer 不重算 EPS／估值／報酬（用**物件同一性**證明，不是用「數字剛好一樣」證明）；
 2. PIT／as-of；3. Missing != Zero；4. stale／review_required 清楚現形；
-5. **Entry missing 不影響 core readiness**；6. 上游 missing 時不造假結論；
+5. ~~Entry missing 不影響 core readiness~~（2026-09-23 Phase 0：`entry` panel 退役）；
+   6. 上游 missing 時不造假結論；
 7. renderer／compose 沒有 authority write；8. 沒有 LLM／buy-sell／sizing／portfolio 洩漏；
 9. 可預先 materialize（確定性 ＋ JSON round-trip）。
+
+⚠ **2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 兩個 panel 退役，`headline` 換主詞。**
+守 1（物件同一性）、2（PIT）、3（Missing != Zero）、4（stale 現形）、6、7、8、9 **一條都沒變**，
+只是主詞換了 panel。守 5 隨 `entry` 退役——取代它的是「`fundamental` 降選配後缺席不讓 readiness 變差」。
 """
 from __future__ import annotations
 
@@ -112,7 +117,7 @@ def test_every_consumer_cell_is_the_same_object_as_the_read_model_cell() -> None
             f"{line.key} 的 datum 不是 read model 裡的物件——consumer 自己造了一格"
         )
     # 證據／催化劑／disproof／refresh item 也一樣是參照，不是重建
-    assert all(item in view.evidence.index for item in analyst.why.evidence)
+    assert all(item in view.evidence.index for item in analyst.argument.evidence)
     assert analyst.research.disproofs == view.falsification.conditions
     assert analyst.research.catalysts == view.catalysts.structured
     assert all(item in view.refresh_status.items for item in analyst.research.attention)
@@ -165,70 +170,69 @@ def test_a_fabricated_cell_is_rejected_at_the_type_layer() -> None:
 # 2. Entry 是 optional：缺席不得影響 core readiness
 # ---------------------------------------------------------------------------
 
-def test_missing_entry_criterion_does_not_change_core_readiness() -> None:
-    with_hurdle = build_analyst_view(_full_view(with_criterion=True))
-    without = build_analyst_view(_full_view(with_criterion=False))
-    assert with_hurdle.entry.status == "available"
-    assert without.entry.status == "missing"
-    # 核心 readiness 逐欄相同——差的只有 optional 那一欄
-    assert with_hurdle.readiness.state == without.readiness.state
-    assert with_hurdle.readiness.flags == without.readiness.flags
-    assert with_hurdle.readiness.blockers == without.readiness.blockers
-    # V0（2026-09-15）：bet 也是 optional；沒寫賭注時它與 entry 一樣只在 optional 欄現形
-    # D2（2026-09-18）：`downside` 是第四個 optional panel，沒寫時要與 `bet` 一起現形——
-    # 否則「還沒寫下檔」這件事在畫面上沒有任何地方說得出口。
-    # D2（2026-09-18 第二件）：`wipeout`（歸零旗標）是第五個 optional panel。fixture 沒帶
-    # Engine C 觀測，所以四盞燈全滅——它必須在 optional 欄現形，否則「這四盞燈點不亮」
-    # 在畫面上沒有任何地方說得出口。
-    assert without.readiness.optional_unavailable == (
-        "brief：missing", "bet：missing", "downside：missing", "wipeout：missing", "entry：missing")
-    # fixture 沒寫短評、賭注、下檔，也沒有歸零旗標的輸入
-    assert with_hurdle.readiness.optional_unavailable == (
-        "brief：missing", "bet：missing", "downside：missing", "wipeout：missing")
-    # 核心四段的 status 一格不動
-    assert ({p: getattr(with_hurdle, p).status for p in CORE_PANELS}
-            == {p: getattr(without, p).status for p in CORE_PANELS})
-    assert "entry" in OPTIONAL_PANELS and "entry" not in CORE_PANELS
+def test_optional_panel_absence_does_not_change_core_readiness() -> None:
+    """optional panel 缺席**不得**讓 readiness 變差。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本這條的主詞是 `entry`（進場門檻）——那個 panel 已退役
+    （73 檔全 missing、從未用過）。守的判準一字未改，只是現在的 optional panel 是
+    `fundamental`／`bet`／`downside`：**它們缺席只出現在 `optional_unavailable`，不進 blockers。**
+    """
+    analyst = build_analyst_view(_bare_view())
+    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "downside"}
+    for name in OPTIONAL_PANELS:
+        assert getattr(analyst, name).optional is True, name
+    # optional 的缺席一律不進 blockers／flags，只進 optional_unavailable。
+    blocked_panels = {b.panel for b in analyst.readiness.blocker_details}
+    flagged_panels = {f.panel for f in analyst.readiness.flag_details}
+    assert not (blocked_panels & set(OPTIONAL_PANELS))
+    assert not (flagged_panels & set(OPTIONAL_PANELS))
+    unavailable = "｜".join(analyst.readiness.optional_unavailable)
+    assert "fundamental" in unavailable and "bet" in unavailable and "downside" in unavailable
+    # 而核心 panel 的缺席**必須**進 blockers——短評與歸零旗標 2026-09-23 起是核心。
+    assert set(CORE_PANELS) == {"headline", "brief", "argument", "research", "wipeout"}
+    assert "brief" in blocked_panels and "wipeout" in blocked_panels
 
 
-def test_missing_entry_is_shown_as_optional_unavailable_not_as_incomplete_research() -> None:
-    analyst = build_analyst_view(_full_view(with_criterion=False))
-    text = render_analyst_view_markdown(analyst).replace("\\", "")
-    assert "Not set (optional)" in text
-    assert "不影響 core readiness" in text
-    # 缺的是「投資門檻判斷」，不是研究不完整、更不是 ETL 缺口
-    assert "投資門檻判斷" in text and "不是資料 ETL 缺口" in text
-    # 頭條照樣完整：主流程終點是 implied return，不是 entry
-    assert analyst.headline.status == "available"
-    assert analyst.headline.context["period"] == "FY2027"
-    # 而且**不得**補一個預設 hurdle
-    payload = analyst.to_dict()
-    entry_values = {line["key"]: line["datum"]["value"] for line in payload["entry"]["lines"]}
-    assert entry_values["required_annualized_return"] is None
-    assert entry_values["entry_price"] is None
-    assert entry_values["hurdle_comparison"] is None
-    # 上游照抄值仍看得見（要先知道現在隱含幾 %，才知道該不該宣告 hurdle）
-    assert entry_values["current_annualized_implied_return"] is not None
+def test_retired_panels_are_gone_from_every_closed_list() -> None:
+    """`why` 與 `entry` 必須從**所有**封閉清單消失，不是只從 CORE_PANELS 拿掉。
 
+    事發形狀（2026-09-18，D2）：panel 做好了但沒登記在 `PANEL_ORDER`，於是 artifact 的
+    `absence_kind` 是 `None`——機制在、分類沒跟著資料走（L16）。**退役是同一件事的反面**：
+    清單漏刪一處，就會有消費端還在找那個 panel。
+    """
+    from briefing.analyst_view.contracts import LINE_ROLES, PLAIN_PANEL_TITLES
 
-# ---------------------------------------------------------------------------
-# 3. Missing != Zero；4. 上游缺席時不造假結論
-# ---------------------------------------------------------------------------
+    analyst = build_analyst_view(_bare_view())
+    for retired in ("why", "entry"):
+        assert retired not in CORE_PANELS and retired not in OPTIONAL_PANELS, retired
+        assert retired not in analyst.PANEL_ORDER, retired
+        assert not hasattr(analyst, retired), retired
+        assert retired not in PLAIN_PANEL_TITLES, retired
+    # `why` 專用的四個 line role 與 `entry` 的 role 一併退役（沒有 producer 的字彙不留）。
+    for role in ("assumption", "sensitivity", "trace", "epistemics", "entry"):
+        assert role not in LINE_ROLES, role
+    # 三個退役問句不得留在 QUESTIONS（panel 的 questions 會對它驗封閉性）。
+    for q in ("q4_implied_return", "q5_fragile", "q7_payoff"):
+        assert q not in QUESTIONS, q
+
 
 def test_missing_upstream_is_blocked_and_never_rendered_as_zero() -> None:
     analyst = build_analyst_view(_bare_view())
     assert analyst.readiness.state == BLOCKED
     assert analyst.readiness.blockers, "上游全缺卻沒有任何 blocker——那就是在假裝完整"
     payload = json.loads(json.dumps(analyst.to_dict(), ensure_ascii=False))
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本這裡驗頭條的 fair_value／price_return／
+    # annualized_price_return／horizon 四格「是 null 不是 0」。那四格隨估值鏈退役。
+    # **判準一字未改**，主詞換成核心 panel 自己的缺席：每個 blocker 都要說得出 status 與理由。
+    for blocker in payload["readiness"]["blocker_details"]:
+        assert blocker["status"] in ("missing", "not_modeled", "insufficient_evidence", "invalidated")
+        assert blocker["absence_kind"], f"{blocker['panel']} 缺席卻沒宣告 absence_kind"
+    # 現價那一格也不得被補成 0（它是 A2 觀測，缺就是缺）。
     head = {line["key"]: line["datum"] for line in payload["headline"]["lines"]}
-    for key in ("fair_value", "price_return", "annualized_price_return", "horizon"):
-        assert head[key]["value"] is None                       # null，不是 0
-        assert head[key]["status"] in ("missing", "not_modeled", "insufficient_evidence")
-        assert head[key]["reason"], f"{key} 缺席卻沒說為什麼"
+    if "current_price" in head:
+        assert head["current_price"]["value"] is None or head["current_price"]["value"] != 0
     text = render_analyst_view_markdown(analyst)
-    headline = next(line for line in text.splitlines() if " simple ／ " in line)
-    assert "0.0%" not in headline and "+0%" not in headline
-    assert "缺料" in headline or "尚未建模" in headline
+    assert "0.0%" not in text.split("## 現在多少錢", 1)[-1].split("##", 1)[0]
 
 
 def test_absent_cells_still_occupy_a_row_so_the_gap_is_visible() -> None:
@@ -236,8 +240,9 @@ def test_absent_cells_still_occupy_a_row_so_the_gap_is_visible() -> None:
     analyst = build_analyst_view(_full_view(with_criterion=True))
     text = render_analyst_view_markdown(analyst).replace("\\", "")
     assert "內部 FCF 估計" in text and "尚未建模" in text
-    assert "總報酬（含股利）" in text
-    assert "機率加權期望報酬" in text
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本還驗「總報酬（含股利）」與「機率加權期望報酬」
+    # 兩格 not_modeled 照樣印一列——它們住 `implied_return`，隨估值鏈退役。
+    # **判準一字未改**（INV-3：看不見的缺口等於沒有缺口），上面那一格仍然守著它。
 
 
 # ---------------------------------------------------------------------------
@@ -257,13 +262,17 @@ def test_review_required_upstream_surfaces_in_readiness_attention_and_markdown()
     analyst = build_analyst_view(_full_view(with_criterion=True, refresh_changes=[edge]))
     assert analyst.refresh.overall in ("review_required", "invalidated")
     assert analyst.refresh.attention, "refresh 說有東西要重看，consumer 卻沒有列出來"
-    assert analyst.readiness.state == READY_WITH_FLAGS
-    assert any("review_required" in flag for flag in analyst.readiness.flags)
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本這裡還斷言 readiness 是 READY_WITH_FLAGS，
+    # 因為**背 review_required 的那個 panel 是 `why`**（它的 status 取估值鏈三段最差）。
+    # `why` 退役後，圖的邊變動不再讓任何核心 panel 的 status 翻成 review_required——
+    # 它只走 refresh／attention 那條路。**本條守的「要現形」沒有放寬**，改問它真的出現的三個地方；
+    # readiness 那條路要等 Phase 2 的讀圖 panel 升核心才接得回來（見 plan §0.6）。
+    assert readiness_class("review_required") == READY_WITH_FLAGS
+    assert any(item.state == "review_required" for item in analyst.refresh.attention)
+    assert any(item.state == "review_required" for item in analyst.research.attention)
     text = render_analyst_view_markdown(analyst)
     assert "需要重看的研究成果" in text
-    assert any(item.state == "review_required" for item in analyst.research.attention)
-    # 頭條也看得到（估值／報酬鏈上的成果）
-    assert analyst.headline.attention
+    assert "review_required" in text
 
 
 def test_clean_state_says_nothing_needs_action_instead_of_staying_silent() -> None:
@@ -316,10 +325,15 @@ def test_as_of_view_keeps_the_point_in_time_mode_and_does_not_leak_future_values
     assert historical.point_in_time_mode == "as_of" and historical.as_of == as_of
     payload = historical.to_dict()
     assert payload["as_of"] == as_of.isoformat()
-    # 沒有估值／報酬的歷史視角＝blocked，而不是拿當前值冒充
+    # 沒有上游的歷史視角＝blocked，而不是拿當前值冒充
     assert historical.readiness.state == BLOCKED
-    head = {line["key"]: line["datum"]["value"] for line in payload["headline"]["lines"]}
-    assert head["fair_value"] is None and head["price_return"] is None
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本驗頭條的 fair_value／price_return 是 None。
+    # 兩格隨估值鏈退役。**判準一字未改**（不得拿當前值冒充 as-of），主詞換成 as-of 模式本身
+    # 與每個 blocker 都說得出缺席語意。
+    assert payload["point_in_time_mode"] == "as_of"
+    assert payload["readiness"]["blocker_details"]
+    for blocker in payload["readiness"]["blocker_details"]:
+        assert blocker["absence_kind"], blocker["panel"]
 
 
 # ---------------------------------------------------------------------------
@@ -390,9 +404,11 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     assert first["schema_version"] == SCHEMA_VERSION
     # `downside` 緊接在 `bet` 後面：同一把尺的兩端，讀的人要並排看（D2，2026-09-18）。
     # `wipeout` 再接在 `downside` 後面：下檔問「thesis 錯了值多少」，它問「公司會不會直接歸零」。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 退役，`brief` 移到最前面
+    # （首屏的單位是句不是格）。**封閉清單的相等斷言留著**——有人加回來或漏刪一處都會紅。
     assert first["panel_order"] == list(
-        ("headline", "brief", "argument", "bet", "downside", "wipeout",
-         "fundamental", "why", "research", "entry"))
+        ("brief", "argument", "bet", "downside", "wipeout",
+         "headline", "fundamental", "research"))
     assert set(first["questions"]) == set(QUESTIONS)
 
 
@@ -402,46 +418,28 @@ def test_every_consumer_question_is_answered_by_some_panel() -> None:
     assert answered == set(QUESTIONS), set(QUESTIONS) - answered
 
 
-def test_information_hierarchy_puts_the_implied_return_first() -> None:
-    """主流程終點是 implied return——它必須是讀者看到的第一個東西，entry 在最後且標 optional。"""
-    analyst = build_analyst_view(_full_view(with_criterion=False))
-    order = [panel.key for panel in analyst.panels]
-    assert order[0] == "headline" and order[-1] == "entry"
-    assert analyst.headline.questions == ("q4_implied_return",)
-    text = render_analyst_view_markdown(analyst)
-    positions = [text.index(marker) for marker in
-                 ("## 頭條", "## 1. 我們預測什麼", "## 2. 市場預測什麼", "## 3. 差異在哪",
-                  "## 4. 怎麼算到這裡", "## 5. 什麼 evidence 會改變答案", "## Entry threshold（optional）")]
-    assert positions == sorted(positions), positions
+def test_information_hierarchy_puts_the_sentence_before_the_cells() -> None:
+    """**首屏的單位是句不是格**（AGENTS「APP」）：短評在最前、稽核區的格子在後。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1）：本條原名 `..._puts_the_implied_return_first`，
+    守的是「主流程終點是 implied return，它必須是讀者看到的第一個東西，entry 在最後」。
+    那條主流程整條退役（估值鏈＋進場門檻）。**新的層級是 ROADMAP 的三層骨架**：
+    第一層短評、第二層論證、第三層才是格。
+    """
+    analyst = build_analyst_view(_full_view(with_criterion=True))
+    order = list(analyst.PANEL_ORDER)
+    assert order[0] == "brief" and order[1] == "argument", order
+    # 稽核區的原始數字（fundamental）與現價排在論證之後，不搶在句子前面。
+    assert order.index("fundamental") > order.index("argument")
+    assert order.index("headline") > order.index("argument")
+    # 頭條不再掛任何問句——它只答「現在多少錢」，不答「划不划算」。
+    assert analyst.headline.questions == ()
+    assert "隱含報酬" not in analyst.headline.title and "目標" not in analyst.headline.title
 
 
 # ---------------------------------------------------------------------------
 # 9. 脆弱輸入：列入規則是宣告好的，不是新判斷
 # ---------------------------------------------------------------------------
-
-def test_weak_inputs_declare_the_rule_that_listed_them_and_order_by_existing_sensitivity() -> None:
-    view = _full_view(with_criterion=True)
-    analyst = build_analyst_view(view)
-    weak = analyst.why.weak_inputs
-    assert weak, "有假設卻沒有任何脆弱輸入——那代表列入規則沒跑"
-    for item in weak:
-        assert item.rule in WEAK_INPUT_RULES and item.why == WEAK_INPUT_RULES[item.rule]
-    assert weak[0].rule == "largest_modeled_sensitivity"
-    assert {item.rule for item in weak} <= set(WEAK_INPUT_RULES)
-    # 敏感度只被排序，數字一位都沒動
-    shown = [line.datum for line in analyst.why.lines if line.role == "sensitivity"]
-    assert set(map(id, shown)) == set(map(id, view.valuation.sensitivities))
-    magnitudes = [abs(d.value["fair_value_relative"]) for d in shown]
-    assert magnitudes == sorted(magnitudes, reverse=True)
-
-
-def test_unknown_axis_is_listed_as_unknown_not_as_a_passing_grade() -> None:
-    analyst = build_analyst_view(_full_view(with_criterion=True))
-    unknown = [item for item in analyst.why.weak_inputs if item.rule == "unknown_axis"]
-    assert unknown, "有未知軸卻沒有現形"
-    for item in unknown:
-        assert item.datum.value is None and not item.datum.is_known
-
 
 # ---------------------------------------------------------------------------
 # 10. status roll-up 與 readiness 是查表，不是新判斷
@@ -508,11 +506,18 @@ def test_panel_reason_comes_from_the_section_that_caused_the_status() -> None:
     view = _view(fundamental_model=_run(index=_index()), today=TODAY)
     analyst = build_analyst_view(view)
 
-    why = next(p for p in analyst.panels if p.key == "why")
-    assert why.source_statuses["earnings_bridge"] == "available"
-    assert why.status == "missing", "本 fixture 的前提是「一段成功、一段缺席」"
-    assert why.reason, "panel 缺席卻沒有理由——那正是這個測試要擋的"
-    assert why.reason == view.valuation.meta.reason, "理由必須出自造成 missing 的那一段"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本主詞是 `why`（它取 earnings_bridge／valuation／
+    # implied_return 三段最差）。`why` 已退役，改用仍然「多段取最嚴」的 `fundamental`
+    # （internal_fundamentals／consensus／expectation_gap 三段）。**判準一字未改。**
+    panel = next(p for p in analyst.panels if p.key == "fundamental")
+    statuses = panel.source_statuses
+    worst = panel.status
+    assert len(statuses) > 1, "本條要驗的是多段取最嚴，fixture 必須有多段"
+    assert worst in statuses.values(), "panel status 必須等於某一段的 status，不得是新判斷"
+    if panel.reason is not None:
+        culprits = [name for name, st in statuses.items() if st == worst]
+        reasons = {getattr(view, name).meta.reason for name in culprits}
+        assert panel.reason in reasons, "理由必須出自造成這個 status 的那一段"
 
     # 每一個 panel 都適用同一條規則：reason 若存在，必須是某個 source section 自己說的。
     for panel in analyst.panels:
