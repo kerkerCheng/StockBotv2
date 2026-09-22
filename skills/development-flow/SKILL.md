@@ -156,6 +156,8 @@ phase closure 且下一階段高度依賴／implementer 自認判斷不了 fix �
 
 ⚠ **提出 ≠ 自行 spawn。** subagent 委派預設關閉、每次明確 opt-in（`AGENTS.md`「協作與邊界」）。
 說明「為什麼這題值得第二份 token」，然後等使用者決定。
+**例外：Phase 結案的 R2 已常規 opt-in**（`AGENTS.md`「協作與邊界」，2026-09-22）——執行者可直接發 `WORK_REQUEST` 給乾淨 context 的 reviewer；
+執行環境不能 spawn 時，把 `WORK_REQUEST` 原文交回，由使用者貼給新 session。
 
 真的要委派時，`WORK_REQUEST` 只給下列內容，**不給自己的推理過程**：
 

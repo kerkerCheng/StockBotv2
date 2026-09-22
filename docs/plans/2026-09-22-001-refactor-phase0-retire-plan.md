@@ -200,6 +200,32 @@ EOF
 
 結案後同 commit：ROADMAP Phase 0 標 ✅、ARCHITECTURE §8.2 的「建議區間已移除、煞車仍在」列改指 `record_trade.py`。
 
+### 結案 R2（使用者已常規 opt-in；執行者不必再問）
+
+九項 gate 由執行者自報之後，**發下面這份 `WORK_REQUEST` 給乾淨 context 的 reviewer**（能 spawn 就 spawn；不能就原文交回由使用者貼給新 session）。
+reviewer 只讀不寫，回 `REVIEW`（verdict `GO`／`NO_GO` ＋ findings）；`NO_GO` → `AWAITING_HUMAN`，執行者不得自動修。
+
+```
+WORK_REQUEST（R2，Phase 0 結案）
+Target: master 最新 commit；docs/reports/…-phase0-baseline.md 與 …-phase0-closeout.md
+Claimed acceptance: Phase 0 九項 gate 全過（見 closeout 報告）
+Do not trust: 上面那行是待驗證的宣稱，不是事實
+Task: 直接讀 repo，自己跑下列檢查，逐項 ✅／❌ 附實際輸出，回 REVIEW（含 verdict）
+  1. python scripts/retired_mechanism_grep.py → code／static／skills／tests／config 五區全部 0；livedocs 命中逐句列出並判斷是否為禁止句
+  2. python -m webapp status | tail -10 → 沒有 basket、multi_year；kind 數與 closeout 一致
+  3. python -m engine_b.todo list → 未結案 2，皆 manual
+  4. python -m pytest -q → 全綠；測試檔數差 ＝ closeout 列出的刪除清單，逐檔核對「守的是哪個退役機制」是否成立
+  5. python -m audit invariants → 全綠
+  6. library/private/decision_lab/*.db 的 sha256 與 live_choices 筆數 ＝ baseline 報告
+  7. library/private/app/analyst_view/COHR.json：overview 沒有 payoff／implied_return／future_target／sell_side_target／target_reached 鍵；
+     overview.brief.our_bet 與 view.why／research 的文字 digest ＝ baseline（只拿掉面板，不改文字）
+  8. python -m crons.heartbeat --out <temp> → 五段標題都在；段 2 含「候選狀態板未落地」且 absence_kind 為 not_yet_recorded
+  9. grep -rn "record_live_choice(" 呼叫端 ＝ 0（舊店無寫入端）；scripts/record_trade.py 的兩個新測試存在且綠
+Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis、不動 Sheet
+```
+
+使用者留下的只有三件：讀 reviewer 的 verdict；reviewer 對「刪除的測試守什麼」有疑慮時裁決；三個月後決定紀錄 §10 的四條否證。
+
 ## 6. 已知陷阱
 
 - **`ITEM_TYPES` 是封閉字彙且有測試綁鍵一致**（`tests/test_engine_b_todo.py`）：退役 kind 用 legacy 標記，不刪 key。

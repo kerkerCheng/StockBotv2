@@ -216,6 +216,8 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **專案記憶唯一權威：本檔**；`CLAUDE.md` 只 `@AGENTS.md`。研究 skill 唯一權威：`skills/<name>/SKILL.md`。
 - **開發流程唯一權威：** AGENT_WORKFLOW（模型）＋ development-flow skill（執行）。先 scope triage（Z0–Z3）再定 review 距離（R0–R2）；
   **R2 是唯一花第二份 token 的路徑，六條 trigger 之外不啟動且要人工 opt-in。**
+  **Phase 結案的 R2 使用者已常規 opt-in（2026-09-22）：** 由乾淨 context 的 reviewer 跑該 Phase 的驗收命令、比對基準報告、回 verdict；
+  reviewer 唯讀，不 commit、不寫任何 authority；NO_GO 回 AWAITING_HUMAN，不自動修。
 - **`GO` 只關閉本 Step，不開啟下一個 Step**；不得偷改 ROADMAP 後繼續跑（要改先給五欄 amendment）。
   **常規推進授權（2026-09-08；09-17 擴大到 Phase 邊界）：** Verdict 為 `GO` 且下一步沒有任何待使用者決定的問題時可直接接續。
   **下列任一成立一律停下：** ①Z2／Z3 且 plan 裡確實有要使用者選的問題；②動到四個人工 gate；③動到資本、live 或 append-only authority；
