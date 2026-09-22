@@ -1,5 +1,7 @@
 # 盲點審查報告：下一階段 Operating Model（三個工作流＋跨代理狀態）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > 狀態：Workstream A 的 Phase I Daily Beta Technical Monitor 與 Phase II-A household capital authority
 > 已於 2026-07-28 完成；退休貸款政策亦已收斂為 zero-code manual contract，**不另開 Phase II-B engine**。
 > Workstream B、通用 Daily runner 重構、ETF 完整 look-through、Sheet writer 與本機 single-writer guard 仍是

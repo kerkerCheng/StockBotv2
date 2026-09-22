@@ -7,6 +7,8 @@ status: direction-frozen（使用者已選定方向；實作未開始）
 
 # Alpha live：尺寸由使用者定，Engine D 只做歸因
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > **起因（2026-08-18）：** 「繼續探討 alpha 池子擴大後該怎麼實踐 live 的策略」。
 >
 > **本檔刻意短。** `2026-08-02-confidence-axes` 膨脹到 61KB 的成因是每輪加章節而不更新數字；

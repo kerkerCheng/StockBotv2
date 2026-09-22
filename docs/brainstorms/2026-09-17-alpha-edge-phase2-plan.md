@@ -1,5 +1,7 @@
 # Alpha Edge Phase 2 計畫（PLAN_PROPOSAL，2026-09-17）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > **性質：** ROADMAP Phase 2「心跳＋分類（D12）」的 **Z2** PLAN_PROPOSAL。
 > 規格來源是 [`ARCHITECTURE.md`](../ARCHITECTURE.md) §4.1 與決定紀錄 D12。
 > **進度的唯一權威是 [`docs/ROADMAP.md`](../ROADMAP.md) 的 Phase 表**；本檔的現況數字會腐壞，引用前先跑查證命令。

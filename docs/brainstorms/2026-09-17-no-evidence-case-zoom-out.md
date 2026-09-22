@@ -1,5 +1,7 @@
 # Zoom out：沒有證據的 case，對 5 倍目標該怎麼對應（2026-09-17）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > **緣起（使用者原話）：** 「我們再 zoom out 看一次，這種沒有證據的 case，以我們的 alpha 五倍目標該怎麼對應？
 > 請跳脫我們實作的內容，追求正確的做法，做進來。」
 >

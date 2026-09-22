@@ -1,5 +1,7 @@
 # 研究注意力的分配（2026-08-21）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > **本檔是方向與需求記錄，不是政策。** 判準要升格成規則，必須先實作並量到數字變化，
 > 再寫進 `AGENTS.md`（L14：先量測後放閘；`AGENTS.md` 每個 session 完整載入，
 > 未實作的政策會花掉未來每一次執行的 context）。

@@ -1,5 +1,7 @@
 # 產業別分排序（brainstorm，2026-08-31）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > 使用者原話：「我看我們現在有碰到稀土了，我們現在有哪些產業別，是不是要分產業別做排序？
 > 這樣才有機會看到光通訊以外的東西？」
 > 狀態更新（2026-08-31，[305]）：✅ **A 案已實作**——`bottleneck --by-sector`（demand anchor

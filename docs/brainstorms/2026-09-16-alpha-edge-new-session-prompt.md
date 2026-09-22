@@ -1,5 +1,7 @@
 # 給新 session 的啟動 prompt（2026-09-19 第十三輪改寫；前十二輪逐字狀態見文末歷程與 git history）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > 用法：在新的 Claude Code session 貼「開工指令」那一段，或直接
 > `@docs/brainstorms/2026-09-16-alpha-edge-new-session-prompt.md`。
 >

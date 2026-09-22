@@ -6,6 +6,8 @@ planned_in: docs/plans/2026-07-15-008-feat-unified-workplan-plan.md
 
 # 追源深度升級（Source Trace Upgrade）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 ## Summary
 
 建一本共用的「追源手冊」repo skill，把 CLAUDE.md 來源登記表的路由知識變成機器可執行的追源鏈；圖的三個入口（雲端週掃、本機 lead-intake、claude.ai chat）照同一本手冊執行。社群轉發類訊號追不到原文即隔離不入圖；追源未果項目開 Issue 由既有 session digest 浮現；單一 `origin_entity` 主張以圖查詢導出待印證清單。

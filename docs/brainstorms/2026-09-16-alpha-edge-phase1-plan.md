@@ -1,5 +1,7 @@
 # Alpha Edge Phase 1 計畫（PLAN_PROPOSAL 核准版，2026-09-16）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > **性質：** ROADMAP Phase 1「讓邊緣公司浮上排序」的 Z3 PLAN_PROPOSAL，使用者 2026-09-16 核准；
 > 本檔是**計畫與工單的紀錄**，讓下一個 session 不必重推。**進度的唯一權威仍是 [`docs/ROADMAP.md`](../ROADMAP.md) 的 Phase 表**
 > （本檔的現況數字是當時實測，會腐壞；引用前先跑查證命令）。決定紀錄 D0–D15 在

@@ -7,6 +7,8 @@ status: direction-frozen（方向已定案；實作未開始）
 
 # 資本表達層的方向定案（2026-08-13）
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > **起因：** 使用者問「AXTI／LITE／COHR／SIVE 兩週漲 30%，是什麼讓我們沒有認為它當時的
 > 價值可以入場？我們的系統缺了什麼？」以及後續三個追問：「我們到底有幾條決策規則？」、
 > 「取最小值是 argument 太多還是實作缺陷？」、「你怎麼判斷一個 blocker 是真的有用的？」

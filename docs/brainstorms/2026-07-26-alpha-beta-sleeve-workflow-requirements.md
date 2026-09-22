@@ -1,5 +1,7 @@
 # 盲點審查報告：Beta 地基＋Alpha 衛星的 Daily Decision Workflow
 
+> ⚠ **已封存（2026-09-22）：不要再讀。** 本檔的決定已被 [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 整併或取代，只為歷史稽核保留；分類與理由見 [`README.md`](README.md)。
+
 > 狀態：Phase I Daily Beta Technical Monitor 已於 2026-07-28 實作為 `paper_observation`；不含自動調倉、
 > household capital authority 或 Google Sheet 寫回。正式規格與驗收見
 > [`../plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md`](../plans/2026-07-28-001-feat-daily-beta-technical-monitor-plan.md)。

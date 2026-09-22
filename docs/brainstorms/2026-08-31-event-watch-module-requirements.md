@@ -1,5 +1,7 @@
 # Event Watch 模組（brainstorm，2026-08-31）
 
+> ℹ **設計來源仍有效（2026-09-22 確認）：** [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) 擴充本檔，實作前要讀；衝突時以決定紀錄為準。
+
 > 使用者定調：①等待事件整理成一塊 module；②**觸發不經使用者**——agent 自己發現、自己
 > 喚醒；③沒有確定日期的事件可以主動輪詢（web search），但**輪詢力度必須可調**——
 > token 少的時候調低照樣運作，不會卡住。
