@@ -393,10 +393,9 @@ def test_view_contains_no_position_fields() -> None:
     # 從未用過）。**「一格 action／部位欄位都不得長出來」沒有放寬**——上面的 token 掃描走過整份
     # `to_dict()`，那是這條測試真正的主詞；退役後連那個 section 都不存在了。
     assert not hasattr(view, "entry_logic"), "退役的 section 不得復活"
-    # D2（2026-09-18）：下檔**已經建模**（downside scenario 走同一條橋），所以它從
-    # `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒人寫）。
-    # ⚠ 兩者的下一步完全不同：`not_modeled` 沒有人該去補，`missing` 有。
-    assert view.downside.meta.status == "missing"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` section 隨 E 組（四價 overlay）退役。
+    # 反證那一端沒有退役——它在 research 面板的 disproofs（Phase 3 會讓每條連到一個 watch）。
+    assert not hasattr(view, "downside"), "退役的 section 不得復活"
 
 
 def test_authorities_are_logical_uris_not_private_paths() -> None:
@@ -429,17 +428,16 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     assert view.fundamentals.meta.status == "missing"
     assert view.consensus.meta.status == "missing"
     assert view.implied_return.meta.status == "missing"                 # Step 2：有能力了；沒資料是 missing
-    # D2（2026-09-18）：下檔**已經建模**（downside scenario 走同一條橋），所以它從
-    # `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒人寫）。
-    # ⚠ 兩者的下一步完全不同：`not_modeled` 沒有人該去補，`missing` 有。
-    assert view.downside.meta.status == "missing"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` section 隨 E 組（四價 overlay）退役。
+    # 反證那一端沒有退役——它在 research 面板的 disproofs（Phase 3 會讓每條連到一個 watch）。
+    assert not hasattr(view, "downside"), "退役的 section 不得復活"
     price = next(d for d in view.fundamentals.items if d.key == "price")
     assert price.value is None and price.status == "missing"
     cap = view.capability_map()
     assert cap["fundamentals"]["status"] == "missing"
     assert cap["implied_return"]["status"] == "missing"
     # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
-    assert cap["downside"]["status"] == "missing"
+    assert "downside" not in cap, "退役的 section 不得留在 capability_map"
     # internal fundamentals 自 2026-09-05 起是「有能力」：沒資料是 missing，不是 not_modeled
     assert cap["internal_fundamentals"]["status"] == "missing"
 
@@ -495,7 +493,7 @@ def test_to_dict_round_trips_json_and_keeps_nulls() -> None:
     assert back["schema_version"] == "alpha-investment-view/v1"
     assert back["identity"]["ticker"] == "COHR"
     # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
-    assert back["capability_map"]["downside"]["status"] == "missing"
+    assert "downside" not in back["capability_map"]
     assert back["capability_map"]["implied_return"]["status"] == "missing"
     assert "entry_logic" not in back["capability_map"], "退役的 section 不得留在 capability_map"
     nulls = [p for p, k, v in _walk(back) if k == "value" and v is None]

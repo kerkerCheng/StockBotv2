@@ -839,11 +839,10 @@ function conclusionCard(payload, view) {
     box.appendChild(el('span', 'src', '這句話由計算層自己組出，不是本畫面寫的'));
     node.appendChild(box);
   }
-  node.appendChild(betBlock(view, OVERLAY_BLOCKS.bet));
-  // D2（2026-09-18）：那把尺的另一端。**永遠印**（沒寫就印「還沒寫」），
-  // 否則「沒有下檔」與「下檔是 0」在畫面上同形。
-  node.appendChild(betBlock(view, OVERLAY_BLOCKS.downside));
-  // D2（2026-09-18）：歸零旗標。接在下檔之後——下檔問「thesis 錯了值多少」，
+  // ⚠ **2026-09-23（Phase 0 Step 0b.1b）：賭注／下檔的四價區塊退役（E 組）。**
+  // 「賭對了值多少／判斷錯了值多少」那四個價格是估值鏈跑兩次算出來的；`bet` 面板已於 0b.1a
+  // 改成純文字（讀短評的 `our_bet`）。反證那一端沒有退役——它在 research 面板的 disproofs。
+  // D2（2026-09-18）：歸零旗標。
   // 它問「這家公司會不會直接歸零」。兩個不同的壞結局，畫面上刻意分開。
   node.appendChild(wipeoutBlock(view));
   return node;
@@ -896,98 +895,8 @@ function wipeoutBlock(view) {
 
    ⚠ 兩邊共用這一個函式，是為了讓兩組數字**逐格對得起來**——使用者要並排讀它們，
    而兩份各自手寫的區塊會在某次改動後悄悄長出不同的格。 */
-const OVERLAY_BLOCKS = {
-  bet: { panelKey: 'bet', cls: 'bet', fallbackTitle: '如果我們的賭注對了', empty: '還沒寫賭注　',
-         fv: 'variant_fair_value', vd: 'payoff_value_date', ret: 'payoff_return',
-         ann: 'annualized_payoff_return', epsC: 'payoff_eps_contribution',
-         mulC: 'payoff_multiple_contribution', baseRet: 'base_price_return_for_payoff',
-         one: 'payoff_one_sentence', overrideWord: '賭注', oneSrc: 'variant' },
-  downside: { panelKey: 'downside', cls: 'bet', fallbackTitle: '如果反證成真', empty: '還沒寫「判斷錯了值多少」　',
-              fv: 'downside_fair_value', vd: 'downside_value_date', ret: 'downside_return',
-              ann: 'annualized_downside_return', epsC: 'downside_eps_contribution',
-              mulC: 'downside_multiple_contribution', baseRet: 'base_price_return_for_downside',
-              one: 'downside_one_sentence', overrideWord: '下檔', oneSrc: 'downside' },
-};
-
-function betBlock(view, cfg) {
-  const k = cfg || OVERLAY_BLOCKS.bet;
-  const panel = view[k.panelKey];
-  const meta = plainPanel(k.panelKey, panel ? panel.title : k.fallbackTitle);
-  const node = el('div', k.cls);
-  node.appendChild(el('div', 'group-title', meta.title));
-  if (!panel) return node;
-  const lines = lineMap(panel);
-  const target = lines[k.fv] && lines[k.fv].datum;
-  if (!target || typeof target.value !== 'number') {
-    const box = el('div', 'attention ' + (isSettled(panel.absence_kind) ? 'settled' : 'flags'));
-    const head = el('div', 'attention-head');
-    head.appendChild(document.createTextNode(k.empty));
-    const badge = absenceBadge(panel.absence_kind);
-    if (badge) head.appendChild(badge);
-    box.appendChild(head);
-    box.appendChild(el('div', 'attention-body', panel.reason || meta.hint));
-    node.appendChild(box);
-    return node;
-  }
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-  const numbers = el('div', 'headline-numbers');
-  const currency = target.dependencies ? target.dependencies.currency : null;
-  const valueDate = lines[k.vd] && lines[k.vd].datum;
-  numbers.appendChild(numberBlock(plainLine(k.fv), fmtQuantity(target.value, currency) || '—',
-    valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
-  const ret = lines[k.ret] && lines[k.ret].datum;
-  const ann = lines[k.ann] && lines[k.ann].datum;
-  appendReturnBlock(numbers, plainLine(k.ret), ret, ann, null, '一年約 ');
-  const epsC = lines[k.epsC] && lines[k.epsC].datum;
-  const mulC = lines[k.mulC] && lines[k.mulC].datum;
-  if (epsC && typeof epsC.value === 'number' && mulC && typeof mulC.value === 'number') {
-    numbers.appendChild(numberBlock(plainLine(k.epsC), fmtPercent(epsC.value), '', signClass(epsC.value)));
-    numbers.appendChild(numberBlock(plainLine(k.mulC), fmtPercent(mulC.value), '', signClass(mulC.value)));
-  }
-  const baseRet = lines[k.baseRet] && lines[k.baseRet].datum;
-  if (baseRet && typeof baseRet.value === 'number') {
-    numbers.appendChild(numberBlock(plainLine(k.baseRet), fmtPercent(baseRet.value),
-      '同一條算術，只是假設用 base', signClass(baseRet.value)));
-  }
-  node.appendChild(numbers);
-  // 賭注覆蓋了哪幾條假設：base 值 → variant 值，各自的證據數。這就是「賭的是什麼」。
-  const overrides = (panel.lines || []).filter((line) => line.role === 'override');
-  if (overrides.length) {
-    const list = el('ul', 'weak');
-    overrides.forEach((line) => {
-      const d = line.datum;
-      const deps = d.dependencies || {};
-      const driverLabel = ((VOCAB && VOCAB.plain_driver_labels) || {})[deps.driver] || deps.driver || line.key;
-      const li = el('li');
-      const baseText = typeof deps.base_value === 'number' ? fmtQuantity(deps.base_value, d.unit) : '（base 沒有這一條）';
-      li.appendChild(document.createTextNode(
-        `${driverLabel}［${deps.scope || ''}］：base ${baseText} → ${k.overrideWord} ${fmtQuantity(d.value, d.unit) || '—'}`));
-      li.appendChild(el('span', 'rule', `${(deps.supporting_refs || []).length} 條 supporting 證據`));
-      if (d.reason) li.appendChild(el('span', 'rule', truncate(d.reason, 160)));
-      list.appendChild(li);
-    });
-    node.appendChild(list);
-  }
-  const one = lines[k.one] && lines[k.one].datum;
-  if (one && one.value && one.value.one_sentence) {
-    const box = el('div', 'onesentence', one.value.one_sentence);
-    box.appendChild(el('span', 'src', `這句話由計算層對 ${k.oneSrc} 自己組出，不是本畫面寫的`));
-    node.appendChild(box);
-  }
-  return node;
-}
-
-function renderDownside(view) {
-  const panel = view.downside;
-  if (!panel) return null;
-  const node = panelShell(panel, '判斷錯了值多少的每一格（optional，不影響這份判讀完不完整）');
-  node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
-  node.appendChild(renderRows(panel.lines));
-  if (panel.notes && panel.notes.length) {
-    node.appendChild(group('下檔不是什麼', () => listOf(panel.notes)));
-  }
-  return node;
-}
+/* ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`OVERLAY_BLOCKS` 與 `betBlock`（四價區塊）隨 E 組退役。 */
+/* ⚠ 2026-09-23（Step 0b.1b）：`renderDownside` 隨 downside panel 退役。 */
 
 function renderBet(view) {
   const panel = view.bet;
@@ -1400,24 +1309,9 @@ function numbersStrip(view) {
   }
   appendReturnBlock(numbers, '沒賭對，要漲跌多少', head.price_return && head.price_return.datum,
     head.annualized_price_return && head.annualized_price_return.datum, stance, '一年約 ');
-  const betTarget = bet.variant_fair_value && bet.variant_fair_value.datum;
-  if (betTarget && typeof betTarget.value === 'number') {
-    numbers.appendChild(numberBlock('賭對的目標價', fmtQuantity(betTarget.value, betTarget.dependencies ? betTarget.dependencies.currency : null) || '—', ''));
-    appendReturnBlock(numbers, '賭對，要漲跌多少', bet.payoff_return && bet.payoff_return.datum,
-      bet.annualized_payoff_return && bet.annualized_payoff_return.datum, null, '一年約 ');
-  }
-  /* D2（2026-09-18）：那把尺的另一端。**與賭對那兩格對稱**——同一條橋、同一套算術，
-     所以兩邊可以並排讀。沒寫 downside 假設就整組不出現（與賭注同規則），
-     ⚠ 不得補一個 bear case 佔位。 */
-  const down = view.downside ? lineMap(view.downside) : {};
-  const downTarget = down.downside_fair_value && down.downside_fair_value.datum;
-  if (downTarget && typeof downTarget.value === 'number') {
-    numbers.appendChild(numberBlock('判斷錯了的目標價',
-      fmtQuantity(downTarget.value, downTarget.dependencies ? downTarget.dependencies.currency : null) || '—',
-      '反證成真時，套同一條橋'));
-    appendReturnBlock(numbers, '判斷錯了，要漲跌多少', down.downside_return && down.downside_return.datum,
-      down.annualized_downside_return && down.annualized_downside_return.datum, null, '一年約 ');
-  }
+  /* ⚠ **2026-09-23（Phase 0 Step 0b.1b）：「賭對的目標價／賭對要漲跌多少／判斷錯了的目標價／
+     判斷錯了要漲跌多少」四格退役（E 組）。** 它們是估值鏈跑兩次算出來的四個價格；
+     `bet` 面板已於 0b.1a 改成純文字（讀短評的 `our_bet`）。 */
   const attribution = head.return_attribution && head.return_attribution.datum;
   const market = attribution && attribution.value ? attribution.value.market_multiple_on_consensus : null;
   const ours = attribution && attribution.value ? attribution.value.target_multiple : null;
@@ -1496,8 +1390,6 @@ async function renderDetail(ticker) {
       const box = el('div', 'full-detail');
       box.appendChild(renderHeadline(view));
       box.appendChild(renderBet(view));
-      const dsNode = renderDownside(view);
-      if (dsNode) box.appendChild(dsNode);
       box.appendChild(renderFundamental(view));
       // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`renderWhy` 與 `renderEntry` 隨兩個 panel 退役。
       box.appendChild(renderResearch(view));

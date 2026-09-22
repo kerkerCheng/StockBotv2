@@ -680,47 +680,15 @@ class ImpliedReturnSection:
     period: str | None = None
     period_end: date | None = None
     #: V2（2026-09-15）：現價到了目標價沒（沒賭對／賭對各一個布林）。到達＝該重看要不要收割，不是賣出指令。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`target_reached` **不再被計算**（兩個目標價隨 E 組與
+    # 估值鏈退役）。欄位保留預設 `None`——它的讀取端隨 `ImpliedReturnSection` 一起在 C／H 組移除，
+    # 現在拿掉欄位只會讓每個讀者各自炸開，而那不是同一件事（先停跑，再刪型別）。
     target_reached: Datum | None = None
 
 
-@dataclass(frozen=True, slots=True)
-class PayoffScenarioSection:
-    """一個 **overlay scenario** 的結果：**只消費**該 scenario 那條鏈（fundamental／valuation／
-    implied_return 各對它跑一次，**同一套算術**）的輸出；builder 不算任何數。
-
-    兩個 scenario 共用這一個型別（`scenario` Datum 說明是哪一個）：
-    - `variant`＝**賭注**「如果我們的差異看法對了」（V0，2026-09-15）
-    - `downside`＝**判斷錯了值多少**「如果反證成真」（D2，2026-09-18）
-
-    ⚠ **一個型別、兩個實例，不是一個實例承載兩種語意**：欄位名因此是中性的
-    （`scenario_fair_value` 而非 `variant_fair_value`），而每個實例的 `Datum.key` 各自帶
-    自己的前綴（`variant_fair_value`／`downside_fair_value`）。2026-09-18 之前欄位名寫死
-    `variant_*`，若直接拿來裝 downside 的值，序列化出去的 JSON key 就會宣稱那是 variant
-    的值——下游只能二選一而兩邊都錯（L12）。
-
-    - `overrides`：實際覆蓋了 base 的那幾條該 scenario 假設（營運＋估值），每條帶 `base_value` 供對照。
-    - `scenario_fair_value`／`payoff_return`／`annualized_payoff_return`／兩桿拆解：照抄該 scenario 的 implied return。
-    - `base_fair_value`／`base_price_return`：照抄 base，讓兩個目標價並排——差額就是這個 overlay 的價值。
-    - 沒有任何該 scenario 的紀錄 → 整段 `missing`＋`not_yet_recorded`（還沒寫，不是 0）。
-    - `is_not`：不是機率加權、不是預測、不是尺寸、不是 base 的替代。**downside 尤其不是 bear case。**
-    """
-
-    meta: SectionMeta
-    scenario: Datum                            # {"scenario": "variant"／"downside", 覆蓋計數}
-    overrides: tuple[Datum, ...]
-    scenario_internal_eps: Datum
-    scenario_fair_value: Datum
-    value_date: Datum
-    payoff_return: Datum
-    annualized_payoff_return: Datum
-    eps_contribution: Datum
-    multiple_contribution: Datum
-    epistemics: Datum
-    base_fair_value: Datum
-    base_price_return: Datum
-    is_not: tuple[str, ...]
-    period: str | None = None
-    period_end: date | None = None
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`PayoffScenarioSection` 退役（E 組）。**
+# 它是賭注／下檔的四個價格（目標價、報酬、EPS 貢獻、倍數貢獻）＋ overrides。
+# `bet` 面板已於 0b.1a 改成純文字（讀短評的 `our_bet`）；ledger 資料留著（L10）。
 
 
 @dataclass(frozen=True, slots=True)
@@ -927,14 +895,12 @@ class AlphaInvestmentView:
     #: D2（2026-09-18）：由 `NotModeledSection` 換成與賭注**對稱**的 overlay。
     #: 舊語意「系統不產生下檔估計」已作廢——現在它是「反證成真時的假設套同一條橋」，
     #: 仍然不是 bear case、沒有機率加權。
-    downside: PayoffScenarioSection
     #: D2（2026-09-18）：歸零旗標四盞燈。與 `downside` 是同一個問題的兩面——
     #: 後者答「判斷錯了值多少」，它答「這家公司會不會直接歸零」。
     wipeout_flags: WipeoutFlagsSection
     evidence: EvidenceSection
     freshness: tuple[FreshnessItem, ...]
     refresh_status: RefreshStatusSection
-    payoff_scenario: PayoffScenarioSection
     investor_brief: InvestorBriefSection
     argument: ArgumentSection
     warnings: tuple[str, ...] = ()
@@ -944,7 +910,7 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "market", "valuation", "implied_return",
-        "downside", "wipeout_flags", "evidence", "refresh_status", "payoff_scenario",
+        "wipeout_flags", "evidence", "refresh_status",
         "investor_brief", "argument",
     )
 
@@ -991,7 +957,7 @@ def _jsonable(obj: Any) -> Any:
 
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
-    "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection", "CAP_VARIANT_PAYOFF", "PayoffScenarioSection",
+    "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection",
     "CAP_DOWNSIDE_OVERLAY",
     "CAP_INVESTOR_BRIEF", "InvestorBriefSection", "CAP_ARGUMENT", "ArgumentSection",
     "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",

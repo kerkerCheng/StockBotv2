@@ -113,8 +113,7 @@ def test_renderer_is_deterministic_and_covers_every_section() -> None:
                     "## 4. 財務觀測", "## 5. 共識", "## 6. 價格隱含預期", "## 7. 內部基本面",
                     "## 8. Earnings bridge", "## 9. Expectation gap", "## 10. 催化劑",
                     "## 11. 證偽條件", "## 12. 情境", "## 13. 估值", "## 13a. Base-case implied return",
-                    # D2（2026-09-18）：13b 由「下檔（尚未建模）」換成與 13d 對稱的 overlay。
-                    "## 13b. 判斷錯了值多少",
+                        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 13b／13d 兩節退役。
                     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「## 13c. 進場邏輯」隨 F 組退役。
                     "## 14. 證據與 provenance", "## 15. Refresh／dependency status",
                     "## 16. 新鮮度總表"):

@@ -178,7 +178,8 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
     `fundamental`／`bet`／`downside`：**它們缺席只出現在 `optional_unavailable`，不進 blockers。**
     """
     analyst = build_analyst_view(_bare_view())
-    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "downside"}
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` panel 退役。
+    assert set(OPTIONAL_PANELS) == {"fundamental", "bet"}
     for name in OPTIONAL_PANELS:
         assert getattr(analyst, name).optional is True, name
     # optional 的缺席一律不進 blockers／flags，只進 optional_unavailable。
@@ -187,7 +188,7 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
     assert not (blocked_panels & set(OPTIONAL_PANELS))
     assert not (flagged_panels & set(OPTIONAL_PANELS))
     unavailable = "｜".join(analyst.readiness.optional_unavailable)
-    assert "fundamental" in unavailable and "bet" in unavailable and "downside" in unavailable
+    assert "fundamental" in unavailable and "bet" in unavailable
     # 而核心 panel 的缺席**必須**進 blockers——短評與歸零旗標 2026-09-23 起是核心。
     assert set(CORE_PANELS) == {"headline", "brief", "argument", "research", "wipeout"}
     assert "brief" in blocked_panels and "wipeout" in blocked_panels
@@ -406,8 +407,9 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     # `wipeout` 再接在 `downside` 後面：下檔問「thesis 錯了值多少」，它問「公司會不會直接歸零」。
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 退役，`brief` 移到最前面
     # （首屏的單位是句不是格）。**封閉清單的相等斷言留著**——有人加回來或漏刪一處都會紅。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` 退出 PANEL_ORDER。
     assert first["panel_order"] == list(
-        ("brief", "argument", "bet", "downside", "wipeout",
+        ("brief", "argument", "bet", "wipeout",
          "headline", "fundamental", "research"))
     assert set(first["questions"]) == set(QUESTIONS)
 

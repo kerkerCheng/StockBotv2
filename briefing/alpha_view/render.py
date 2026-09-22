@@ -440,7 +440,6 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines += render_implied_return_lines(view)
 
     # 13d. Payoff scenario（V0：賭注）
-    lines += render_payoff_lines(view)
 
     # 0. 投資人短評（給人讀的七句）
     ib = view.investor_brief
@@ -452,14 +451,9 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     # ⚠ 印**句子**不印 raw dict：首屏的單位是句不是格；`steps` 留在 artifact 給稽核層。
     lines.append("")
 
-    # 13b. 下檔——D2（2026-09-18）由「尚未建模」換成與 13d **對稱**的 overlay。
-    # 舊版印的是 `not_modeled` 的兩格（下檔幅度／最大回撤估計）＋「不要跟這些混淆」，
-    # 那句「系統不產生下檔估計」在 D2 定案後已經是假的。
-    lines += _overlay_lines(
-        view.downside,
-        title="13b. 判斷錯了值多少（downside scenario → 同一條橋；「如果反證成真」，不是 bear case）",
-        overrides_label="下檔覆蓋的假設（每條帶 base 對照值）：",
-        is_not_label="下檔不是什麼：")
+    # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：13b「判斷錯了值多少」整節退役（E 組）。**
+    # 它與 13d（賭注）是同一個 overlay 的兩端，四個價格都是估值鏈跑兩次算出來的。
+    # 反證那一端沒有退役——它在第 5 節（什麼會推翻它）。
 
     # 13f. 歸零旗標（D2，2026-09-18）。緊接在 13b 之後：13b 問「thesis 錯了值多少」，
     # 這一節問「公司本身會不會直接歸零」——兩個不同的壞結局，不得合成一個數字。
@@ -576,41 +570,7 @@ def render_implied_return_lines(view: AlphaInvestmentView) -> list[str]:
     return lines
 
 
-def _overlay_lines(ps, *, title: str, overrides_label: str, is_not_label: str) -> list[str]:
-    """一個 overlay scenario 的 markdown。**variant 與 downside 共用**（D2，2026-09-18）。
-
-    ⚠ 兩邊共用同一段渲染，是為了讓「賭對了值多少」與「判斷錯了值多少」**逐格對得起來**——
-    兩份各自手寫的渲染會在某次改動後悄悄長出不同的格，而使用者要並排讀它們。
-    """
-    lines: list[str] = []
-    lines += _section(title, ps.meta)
-    if ps.period:
-        lines.append(f"目標期間：{markdown_text(ps.period)}" + (f"（至 {ps.period_end.isoformat()}）" if ps.period_end else ""))
-    for datum in (ps.scenario, ps.scenario_internal_eps, ps.scenario_fair_value, ps.value_date, ps.payoff_return,
-                  ps.annualized_payoff_return, ps.eps_contribution, ps.multiple_contribution,
-                  ps.base_fair_value, ps.base_price_return):
-        lines.append(_datum_line(datum))
-    if ps.overrides:
-        lines.append(overrides_label)
-        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in ps.overrides]
-    lines.append(_datum_line(ps.epistemics))
-    lines.append(is_not_label)
-    lines += [f"- {markdown_text(x)}" for x in ps.is_not]
-    lines.append("")
-    return lines
-
-
-def render_payoff_lines(view: AlphaInvestmentView) -> list[str]:
-    """第 13d 節（賭注／payoff）。只印 payoff_scenario section 的 Datum；本檔不含公式、不相減。"""
-    return _overlay_lines(
-        view.payoff_scenario,
-        title="13d. 賭注（variant scenario → payoff；「如果我們的差異看法對了」，不是機率加權）",
-        overrides_label="賭注覆蓋的假設（每條帶 base 對照值）：",
-        is_not_label="payoff 不是什麼：")
-    return lines
-
-
-# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`render_entry_logic_lines`（第 13c 節）隨 F 組退役。
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`_overlay_lines`（賭注／下檔共用的四價段）隨 E 組退役。
 
 
 def render_refresh_status_lines(view: AlphaInvestmentView) -> list[str]:

@@ -52,8 +52,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0b.1a | 個股頁消費層：why／entry 退役、argument 升核心、尺與四價下架 | ✅ | e38c7ee |
 | 0b.1b-D | D 組整組退役：多年反向橋＋要幾倍＋那把尺 | ✅ | 2fb7960 |
 | 0b.1b-C | C／H 組：估值鏈與隱含報酬 | ○ | |
-| 0b.1b-F | F 組整組退役：entry criterion（進場門檻） | ✅ | |
-| 0b.1b-E | E 組：賭注四價 overlay | ○ | |
+| 0b.1b-F | F 組整組退役：entry criterion（進場門檻） | ✅ | c1d0331 |
+| 0b.1b-E | E 組整組退役：賭注四價 overlay（含 downside、target_reached） | ✅ | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |

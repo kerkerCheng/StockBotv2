@@ -158,11 +158,12 @@ def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
     # 報酬渲染，計數不會變，而這條測試也抓不到它（已知限制，寫在這裡而不是假裝它守得住）。
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：列表卡片的「沒賭對，要漲跌多少」與「賭注對了」兩格
     # 隨那把尺退役，所以呼叫數 8 → 7。**判準一字未改**：每個仍在印報酬的 surface 都走同一段判斷。
-    assert source.count("appendReturnBlock") == 7, "有 surface 沒有共用那段判斷"
-    # D2（2026-09-18）：`betBlock` 參數化成「一個 overlay 區塊」，賭注與下檔各傳一份文案表。
-    # 兩邊都必須出現——少一邊就代表那一端的數字沒有畫面。
-    assert "betBlock(view, OVERLAY_BLOCKS.bet)" in source
-    assert "betBlock(view, OVERLAY_BLOCKS.downside)" in source
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 賭注／下檔那幾格退役，呼叫數 7 → 4。判準一字未改。
+    assert source.count("appendReturnBlock") == 4, "有 surface 沒有共用那段判斷"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `betBlock`／`OVERLAY_BLOCKS` 整組退役，所以那兩條斷言翻面成「必須不在」
+    # ——有人把四價區塊加回來就會紅。
+    assert "OVERLAY_BLOCKS" not in source.replace("`OVERLAY_BLOCKS`", "")
+    assert "betBlock(view" not in source
     assert "numbersStrip(view)" in source
     # 列表卡片要看得到 stance，否則 ready 會被讀成「有結論」
     assert "stanceBadge(cardStance)" in source

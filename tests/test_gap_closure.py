@@ -67,4 +67,5 @@ def test_read_model_carries_gap_closure_and_target_reached_datums() -> None:
     eg = view.expectation_gap
     assert eg.gap_closure is not None and eg.consensus_series is not None
     assert eg.gap_closure.status == "missing"            # fixture 沒有共識時序 → missing，不是 0
-    assert view.implied_return.target_reached is not None
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `target_reached` 不再被計算（欄位保留 None，讀取端隨 C／H 組移除）。
+    assert view.implied_return.target_reached is None

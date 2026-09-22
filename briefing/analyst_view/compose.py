@@ -298,26 +298,7 @@ def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
-def _overlay_panel(ps, *, role: str, key_ns: str, value_ns: str) -> tuple:
-    """一個 overlay scenario 的 lines。**賭注與下檔共用**（D2，2026-09-18）。
-
-    ⚠ line 的 **key 前綴**（`payoff_*`／`variant_*` vs `downside_*`）是這一行的身分，
-    APP 與 `PLAIN_LINE` 都以它為準；section 的**欄位名**在 2026-09-18 改成中性的
-    `scenario_*`（一個型別、兩個 scenario）。兩者刻意脫鉤——否則改欄位名就會改到 APP 的 key。
-    """
-    return (
-        _line(f"{key_ns}_scenario", ps.scenario.label, ps.scenario, role),
-        _line(f"{value_ns}_internal_eps", ps.scenario_internal_eps.label, ps.scenario_internal_eps, role),
-        _line(f"{value_ns}_fair_value", ps.scenario_fair_value.label, ps.scenario_fair_value, role),
-        _line(f"{key_ns}_value_date", ps.value_date.label, ps.value_date, role),
-        _line(f"{key_ns}_return", ps.payoff_return.label, ps.payoff_return, role),
-        _line(f"annualized_{key_ns}_return", ps.annualized_payoff_return.label, ps.annualized_payoff_return, role),
-        _line(f"{key_ns}_eps_contribution", ps.eps_contribution.label, ps.eps_contribution, role),
-        _line(f"{key_ns}_multiple_contribution", ps.multiple_contribution.label, ps.multiple_contribution, role),
-        _line(f"base_fair_value_for_{key_ns}", ps.base_fair_value.label, ps.base_fair_value, role),
-        _line(f"base_price_return_for_{key_ns}", ps.base_price_return.label, ps.base_price_return, role),
-        _line(f"{key_ns}_one_sentence", "一句話（authority 自組）", ps.epistemics, role),
-    ) + _lines(ps.overrides, "override")
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`_overlay_panel`（賭注／下檔共用的四價 lines）隨 E 組退役。
 
 
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
@@ -356,31 +337,9 @@ def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
-def _downside_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """判斷錯了值多少（optional，D2 2026-09-18）：downside scenario 走**同一條橋**的結果。
-
-    ⚠ 它與 `bet` 逐格對稱、共用 `_overlay_panel`。兩份各自手寫的 panel 會在某次改動後
-    悄悄長出不同的格，而使用者要把這兩個數字並排讀——那正是短評那把尺的兩端。
-    """
-    ds = view.downside
-    lines = _overlay_panel(ds, role="bet", key_ns="downside", value_ns="downside")
-    return AnalystPanel(
-        key="downside", title="判斷錯了值多少：如果反證成真（optional）",
-        # ⚠ 2026-09-23（Step 0b.1）：`q7_payoff`（賭注對了值多少）隨四價尺退役，這裡不再掛問句。
-        # 四價渲染本身在 Phase 0 批 4 移除；panel 留（ROADMAP 論證層「留 downside」）。
-        questions=(),
-        status=ds.meta.status, optional=True,
-        source_sections=("downside",), source_statuses={"downside": ds.meta.status},
-        source_absence_kinds=_absence_kinds(downside=ds.meta),
-        lines=lines, notes=ds.is_not,
-        evidence=_evidence_for(view, ds.overrides),
-        context={"capability": ds.meta.capability, "period": ds.period, "period_end": ds.period_end,
-                 "available": ds.meta.status not in VALUELESS_STATUSES,
-                 "override_count": len(ds.overrides),
-                 "optional_rule": "下檔是 optional：沒寫 downside 假設只表示「還沒寫」，不代表這檔研究不完整，"
-                                  "也**不得補一個 bear case**；每條 downside 假設必須指得出 supporting 證據"},
-        reason=ds.meta.reason,
-    )
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`_downside_panel` 退役（E 組）。**
+# 「判斷錯了值多少」原本是四個價格。反證那一端沒有退役——它在 `research` 面板的 disproofs，
+# 而 Phase 3 會讓每條反證連到一個 watch。
 
 
 def _wipeout_panel(view: AlphaInvestmentView) -> AnalystPanel:
@@ -468,12 +427,10 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     everything += list(view.implied_return.is_not)
     everything += list(view.valuation.gap_is_not)
     # ⚠ 2026-09-23（Step 0b.1b）：`entry_logic.is_not` 隨 F 組退役。
-    everything += list(view.payoff_scenario.is_not)
     everything += list(view.investor_brief.is_not)
     everything += list(view.argument.is_not)
-    # D2（2026-09-18）：`downside` 由 `NotModeledSection` 換成與賭注對稱的 overlay，
+    # ⚠ 2026-09-23（Step 0b.1b）：`downside` panel 隨 E 組退役。
     # 所以「不是什麼」改從 `is_not` 取——`DOWNSIDE_IS_NOT` 第一句逐字就是「不是 bear case」。
-    everything += list(view.downside.is_not)
     # D2（2026-09-18）：歸零旗標的四條「不是什麼」——尤其「綠燈不是查過都沒事的保證」。
     everything += list(view.wipeout_flags.is_not)
     return tuple(dict.fromkeys(everything))
@@ -486,7 +443,6 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         "fundamental": _fundamental_panel(view),
         "research": _research_panel(view),
         "bet": _bet_panel(view),
-        "downside": _downside_panel(view),
         "wipeout": _wipeout_panel(view),
         "brief": _brief_panel(view),
         "argument": _argument_panel(view),
@@ -500,7 +456,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         generated_on=ident.generated_on, research_context_digest=ident.research_context_digest,
         headline=panels["headline"], fundamental=panels["fundamental"],
         research=panels["research"], bet=panels["bet"],
-        downside=panels["downside"], wipeout=panels["wipeout"], brief=panels["brief"],
+        wipeout=panels["wipeout"], brief=panels["brief"],
         argument=panels["argument"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),

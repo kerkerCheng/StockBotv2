@@ -118,8 +118,8 @@ def test_without_a_model_sections_are_missing_not_not_modeled() -> None:
     # 所以這裡從 `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒有人寫）。
     # ⚠ 這兩者的下一步完全不同，正是這條斷言要守的：`not_modeled` 沒有人該去補，
     # `missing` 有——它會帶著 `not_yet_recorded` 出現在待辦裡。
-    assert view.downside.meta.status == "missing"
-    assert view.downside.meta.effective_absence_kind == "not_yet_recorded"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。
+    assert not hasattr(view, "downside"), "退役的 section 不得復活"
     assert view.consensus.fiscal_items == ()
 
 

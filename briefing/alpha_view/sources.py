@@ -560,50 +560,13 @@ def fetch_alpha_investment_view(
                 narrative_context = fetch_narrative(company_id, node_ids=node_ids)
             except Exception as exc:  # noqa: BLE001 — 拿不到引文只讓論證層少引文，不讓 view 失敗
                 narrative_context = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
-        # ---- V0（2026-09-15）賭注：variant scenario 走**同一條**鏈再跑一次 ---------------------------
-        # 只在任一本 ledger 有未撤回的 variant 紀錄時才跑；沒有就明說「賭注還沒寫」（不是 0）。
-        variant_fundamental = variant_valuation = variant_implied = None
-        variant_reason: str | None = None
-        variant_kind: str | None = None
+        # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）整組退役。**
+        # 原本這裡把整條估值鏈**再跑兩次**（variant／downside），算出「賭對了值多少／判斷錯了值多少」
+        # 那四個價格。ROADMAP「個股頁」對照表把 `bet` 的四個價格列進「拿掉」；`bet` 面板已於 0b.1a
+        # 改成純文字（讀短評的 `our_bet`）。
+        # ⚠ **`bet/variant.overlay` 這本 append-only ledger 的資料留著**（L10：拿不回來的只能 append）
+        # ——退役的是「拿它算四個價格」這件事，不是那些紀錄。Abstention（刻意不主張）同樣留著。
         abstention_records = _read_abstentions(str(resolved_ticker))
-        has_variant = any(getattr(r, "scenario", "base") == "variant" and not getattr(r, "retracted", False)
-                          for r in [*records, *valuation_records])
-        if has_variant:
-            variant_fundamental, v_f_reason, _ = _fundamental_model(
-                build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today, scenario="variant")
-            variant_valuation, v_v_reason, _ = _valuation_model(
-                build, variant_fundamental, v_f_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-                identity=identity, scenario="variant")
-            variant_implied, variant_reason, _ = _implied_return_model(
-                build, variant_valuation, v_v_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-                identity=identity, fundamental_model=variant_fundamental, fundamentals_provider=fundamentals_provider)
-        else:
-            # Q2（2026-09-17）：沒有 variant 假設有**兩個**意思，不是一個。
-            # 「還沒有人寫」與「已研究、結論是沒有可辯護的賭注」共用同一格，使用者分不出來；
-            # 後者在 `bet/variant.overlay` 這本 append-only ledger 裡是一筆明示紀錄（L16：
-            # 分類有 SSOT 就要跟著資料走到需要它的地方——這個檔案第 262 行早就在讀它了）。
-            variant_reason, variant_kind = variant_absence(abstention_records, as_of=as_of, today=today)
-        # ---- D2（2026-09-18）「判斷錯了值多少」：downside scenario 走**同一條**鏈再跑一次 ----
-        # ⚠ 與 variant **完全同形**——同一個 `_fundamental_model`／`_valuation_model`／
-        # `_implied_return_model`，只換 scenario 名。一邊用同一條橋、另一邊自己算一套，
-        # 「賭對了值多少」與「判斷錯了值多少」就不可比，而那兩個數字並排才是短評那把尺。
-        downside_fundamental = downside_valuation = downside_implied = None
-        downside_reason: str | None = None
-        downside_kind: str | None = None
-        has_downside = any(getattr(r, "scenario", "base") == "downside" and not getattr(r, "retracted", False)
-                           for r in [*records, *valuation_records])
-        if has_downside:
-            downside_fundamental, d_f_reason, _ = _fundamental_model(
-                build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today, scenario="downside")
-            downside_valuation, d_v_reason, _ = _valuation_model(
-                build, downside_fundamental, d_f_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-                identity=identity, scenario="downside")
-            downside_implied, downside_reason, _ = _implied_return_model(
-                build, downside_valuation, d_v_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-                identity=identity, fundamental_model=downside_fundamental, fundamentals_provider=fundamentals_provider)
-        else:
-            # 兩種「沒有」也對稱：還沒寫 vs 已研究、結論是說不出可辯護的下檔（L12）。
-            downside_reason, downside_kind = downside_absence(abstention_records, as_of=as_of, today=today)
         # ---- Refresh：由 authority 時序導出 ChangeEvent（只偵測，不判 impact）---------------------
         refresh_changes = None
         metric_observations: list[Any] = []
@@ -715,11 +678,6 @@ def fetch_alpha_investment_view(
         abstention_records=abstention_records,
         metric_observations=metric_observations, change_detection=detection,
         refresh_notes=refresh_notes,
-        variant_fundamental=variant_fundamental, variant_valuation=variant_valuation,
-        variant_implied_return=variant_implied, variant_reason=variant_reason, variant_absence_kind=variant_kind,
-        downside_fundamental=downside_fundamental, downside_valuation=downside_valuation,
-        downside_implied_return=downside_implied, downside_reason=downside_reason,
-        downside_absence_kind=downside_kind,
         wipeout=wipeout, wipeout_reason=wipeout_reason,
         brief_records=brief_records, brief_parse_errors=brief_errors,
         narrative_context=narrative_context,

@@ -113,8 +113,10 @@ def test_argument_section_is_built_from_the_fixture_and_panel_is_core() -> None:
 
     view = _full_view(with_criterion=False)
     ag = view.argument
-    assert len(ag.paragraphs) == 6 and [p.key for p in ag.paragraphs] == [
-        "argument:chain", "argument:numbers", "argument:market", "argument:bet", "argument:risks", "argument:timeline"]
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 論證層的「賭注」段（四個價格組句）退役，六段變五段。
+    # 「數字」「和市場差在哪」兩段讀的是估值鏈，隨 C／H 組退役（尚未執行）。
+    assert len(ag.paragraphs) == 5 and [p.key for p in ag.paragraphs] == [
+        "argument:chain", "argument:numbers", "argument:market", "argument:risks", "argument:timeline"]
     for p in ag.paragraphs:
         if p.is_known:
             _clean(str(p.value))

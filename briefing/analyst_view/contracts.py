@@ -75,7 +75,8 @@ CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "wi
 #: `bet`：賭注。2026-09-23 起是**純文字**（讀 `our_bet`），不再是四個價格。optional——
 #: 沒寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
 #: `downside`（D2，2026-09-18）：判斷錯了值多少。四價渲染在 Phase 0 批 4 退役，panel 留。
-OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "downside")
+#: ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` panel 隨 E 組（四價 overlay）退役。
+OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -614,7 +615,6 @@ class AnalystView:
     #: 下一個問題就是「如果我們對了呢」。沒寫賭注也必須有一個 missing 的 bet panel（缺席要現形）。
     bet: AnalystPanel
     #: D2（2026-09-18）：與 `bet` 對稱的 optional panel。兩者並排就是短評那把尺的兩端。
-    downside: AnalystPanel
     #: D2（2026-09-18）：歸零旗標 panel（optional）。緊接在 `downside` 之後——
     #: 「判斷錯了值多少」問的是 thesis 錯了會怎樣，這一個問的是公司本身會不會直接歸零。
     wipeout: AnalystPanel
@@ -630,7 +630,7 @@ class AnalystView:
     #: 機制在、但分類沒跟著資料走到消費端（L16）。**materialize 一次就看得到，所以要驗 artifact。**
     #: ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 已從這份清單移除（兩個 panel 退役）。
     #: 順序即閱讀順序：短評 → 論證 → 賭注／下檔 → 歸零旗標 → 現價 → 稽核區的原始數字 → 什麼會推翻它。
-    PANEL_ORDER = ("brief", "argument", "bet", "downside", "wipeout",
+    PANEL_ORDER = ("brief", "argument", "bet", "wipeout",
                    "headline", "fundamental", "research")
 
     @property
