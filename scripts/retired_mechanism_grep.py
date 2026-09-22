@@ -60,8 +60,7 @@ def _verdict(idx):
                 key=(p.replace(os.sep,'/'),letter); hits.add(key)
                 if key not in KEEP: unlisted.append((letter,area,key[0],n))
     stale=[k for k in KEEP if k not in hits]
-    print("
-## 驗收（差集；Phase 0 結案要三個數字都是 0）")
+    print("\n## 驗收（差集；Phase 0 結案要三個數字都是 0）")
     print(f"  未列 keep-list 的命中（檔，組）數：{len(unlisted)}")
     for letter,area,p,n in sorted(unlisted): print(f"    {letter} {area} {p} ({n})")
     print(f"  已列但不再命中（腐壞條目）數：{len(stale)}")
