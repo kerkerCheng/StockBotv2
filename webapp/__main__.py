@@ -441,7 +441,7 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     terminal = {r.ticker for r in rows if r.terminal in ("ready", "settled")}
     artifacts = {t: p for t, p, _f, _r in ArtifactStore(
         Path(args.dir) if args.dir else None).read_all() if p is not None and t in terminal}
-    score = closure.score_quality(artifacts)
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：估值品質計數器退役（C／H 組）。
     # 快照股數 vs 財報股數（2026-09-13 ROADMAP 交付）。掛在這裡的理由與品質計數器同一條：
     # skill 已規定每輪必跑 closure-gate，掛上去它才會**自己出現**（L17-3③：偵測要有消費端）。
     # ⚠ 它看**全部**標的不只終局那幾檔——股數錯不錯與 readiness 無關。
@@ -462,13 +462,10 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             "actionable": list(result.actionable), "skipped": list(result.skipped),
             "next": result.next_ticker, "reason": result.reason, "notes": notes,
             "awaiting_report": closure.summarize(rows).get("awaiting_report_detail") or {},
-            "quality": {"implied_positive": list(score.positive),
-                        "implied_negative": list(score.negative),
-                        "multiple_neutral": list(score.multiple_neutral),
-                        "multiple_priced": [{"ticker": t, "contribution": c}
-                                            for t, c in score.multiple_priced],
-                        "unreadable": list(score.unreadable),
-                        "share_count_mismatch": [
+            # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`quality` 的前五個鍵（隱含報酬正負／倍數
+            # 校準／折溢價主張／讀不到）隨估值品質計數器退役。其餘檢查（股數、共識矛盾、
+            # 重複觀測）與估值無關，照舊。
+            "quality": {"share_count_mismatch": [
                             {"ticker": tk, "snapshot_shares": s, "filed_shares": f, "ratio": r}
                             for tk, s, f, r in share_rows],
                         "consensus_self_contradiction": [
@@ -502,9 +499,6 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                   f"{'、'.join(awaiting)}")
         for note in notes:
             print(f"- 未讀到：{note}")
-        print("# 品質計數器（到終局那幾檔；衝檔數最容易犧牲的就是這個）")
-        for line in closure.render_quality(score):
-            print(f"- {line}")
         for line in closure.render_share_count_mismatches(share_rows):
             print(f"- {line}")
         for line in closure.render_base_eps_reconciliation(eps_rows):

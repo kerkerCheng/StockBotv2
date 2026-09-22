@@ -247,59 +247,11 @@ def test_gate_states_are_a_closed_vocabulary() -> None:
 # 品質計數器（P7-b）——守的是「衝檔數不會讓品質靜默退化」
 # ---------------------------------------------------------------------------
 
-def _artifact(implied: float | None, multiple: float | None = None,
-              status: str = "available", derivation: str | None = None) -> dict:
-    view: dict = {"headline": {"lines": [{"datum": {"value": {}}}]}}
-    if multiple is not None:
-        view["headline"]["lines"][0]["datum"]["value"] = {
-            "eps_contribution": 0.1, "multiple_contribution": multiple, "status": "available",
-            "multiple_derivation": derivation}
-    return {
-        "overview": {"implied_return": {"simple": {
-            "status": status, "value": implied}}},
-        "view": view,
-    }
-
-
-def test_quality_splits_implied_return_by_sign() -> None:
-    score = closure.score_quality({
-        "AAA": _artifact(0.09), "BBB": _artifact(-0.20), "CCC": _artifact(-0.05)})
-    assert score.positive == ("AAA",) and score.negative == ("BBB", "CCC")
-    assert score.scored == 3
-
-
-def test_quality_separates_neutral_multiple_from_a_priced_one() -> None:
-    """`AGENTS.md`「隱含報酬的兩個桿」：沒有 re-rating 證據時目標倍數＝校準倍數。"""
-    score = closure.score_quality({
-        "NEUTRAL": _artifact(0.05, multiple=-0.001),
-        "PRICED": _artifact(-0.30, multiple=-0.20)})
-    assert score.multiple_neutral == ("NEUTRAL",)
-    assert score.multiple_priced == (("PRICED", -0.20),)
-
-
-def test_quality_unreadable_is_not_counted_as_zero() -> None:
-    """讀不到 ≠ 隱含報酬是 0。混進來會讓分布看起來比實際好（INV-3）。"""
-    score = closure.score_quality({
-        "OK": _artifact(0.05), "GONE": _artifact(None, status="missing")})
-    assert score.unreadable == ("GONE",)
-    assert score.scored == 1 and "GONE" not in score.positive + score.negative
-
-
-def test_quality_warns_only_when_everything_is_negative() -> None:
-    """全負時要能分辨「方法偏空」與「市場太貴」——那正是 ROADMAP 研究閉環 P0 的 goal。"""
-    all_negative = closure.render_quality(closure.score_quality({
-        "A": _artifact(-0.1, multiple=-0.2), "B": _artifact(-0.2, multiple=-0.2),
-        "C": _artifact(-0.3, multiple=-0.2)}))
-    assert any("方法偏空" in line and "市場太貴" in line for line in all_negative)
-
-    mixed = closure.render_quality(closure.score_quality({
-        "A": _artifact(0.1), "B": _artifact(-0.2), "C": _artifact(-0.3)}))
-    assert not any("方法偏空" in line for line in mixed)
-
-
-def test_quality_says_nothing_rather_than_printing_a_fake_zero() -> None:
-    lines = closure.render_quality(closure.score_quality({}))
-    assert len(lines) == 1 and "尚無可評分" in lines[0]
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：估值品質計數器整組退役（C／H 組）。**
+# 原本這裡有五條測試守「隱含報酬正負分布／倍數校準 vs 折溢價主張／讀不到不算 0／全負才警告／
+# 沒有可評分的檔就誠實說沒有」，外加 `_artifact` 這個測資工廠與漂移那一條。
+# 它們守的機制（`score_quality`／`render_quality`）讀 `overview.implied_return` 與兩桿拆解，
+# 整條估值鏈退役。**接手的是 Phase 5 的量測**；在它落地前「衝檔數沒犧牲品質」沒有機械證據。
 
 
 def test_attribution_is_found_structurally_not_by_a_hardcoded_path() -> None:
@@ -396,77 +348,8 @@ def test_consensus_flag_requires_both_periods_positive(tmp_path) -> None:
 # 宣告的 `independent`，「漂移」要的是重跑 valuation 而不是一份不存在的證據。
 
 
-def test_a_calibrated_multiple_that_drifted_is_not_a_priced_claim() -> None:
-    """ledger 說它是校準倍數，那桿非零就是校準價過期，不是主張。"""
-    score = closure.score_quality({
-        "DRIFTED": _artifact(-0.02, multiple=-0.021, derivation="calibrated_to_market"),
-        "CLAIMED": _artifact(-0.30, multiple=-0.20, derivation="independent"),
-    })
-
-    assert score.multiple_drifted == (("DRIFTED", -0.021),)
-    assert score.multiple_priced == (("CLAIMED", -0.20),)
-
-
-def test_classification_is_invariant_to_price_drift() -> None:
-    """驗收條件本體：ledger 一個字不改、只換一根行情，分檔結果不得改變。
-
-    ⚠ 這是**對的**驗收，而「計數器的數字變小」不是——調容差也能讓數字變小，
-    但調容差解不掉隔天又漂走。這裡用三個相差一個數量級的漂移量代表三天的行情。
-    """
-    buckets = []
-    for drift in (-0.006, -0.021, -0.065):          # 0.6%／2.1%／6.5% 的價格漂移
-        score = closure.score_quality({
-            "CAL": _artifact(-0.02, multiple=drift, derivation="calibrated_to_market"),
-            "IND": _artifact(-0.30, multiple=-0.20, derivation="independent"),
-        })
-        buckets.append((
-            [t for t, _ in score.multiple_drifted],
-            [t for t, _ in score.multiple_priced],
-        ))
-
-    assert buckets == [(["CAL"], ["IND"])] * 3, (
-        "校準型不論漂多少都該留在 drifted，independent 不論如何都該留在 priced"
-    )
-
-
-def test_an_undeclared_derivation_still_counts_as_a_claim() -> None:
-    """fail safe：沒宣告就當成主張（要人指得出證據），不當成漂移放過去。
-
-    ⚠ 方向刻意選嚴的那一邊——把未宣告當漂移會讓一筆真的折溢價主張靜默免除舉證，
-    而那正是 `AGENTS.md`「隱含報酬的兩個桿」要防的事。
-    """
-    score = closure.score_quality({"X": _artifact(-0.3, multiple=-0.2, derivation=None)})
-
-    assert score.multiple_priced == (("X", -0.2),)
-    assert score.multiple_drifted == ()
-
-
-def test_drift_line_tells_you_to_rerun_valuation_not_to_find_evidence() -> None:
-    """兩欄要的動作不同，呈現層必須說出來——否則分開了也沒用（L13：管子要接到消費端）。"""
-    lines = closure.render_quality(closure.score_quality({
-        "CAL": _artifact(-0.02, multiple=-0.021, derivation="calibrated_to_market")}))
-    drift_line = next(line for line in lines if "校準價已過期" in line)
-
-    assert "重跑一次 valuation" in drift_line
-    assert "別去找證據" in drift_line
-
-
-def test_noise_floor_still_wins_over_the_drift_bucket() -> None:
-    """換算殘差以下的桿是「讀不出來」，那比「漂移」更前面——順序不得被新分支改掉。"""
-    art = _artifact(-0.01, multiple=-0.005, derivation="calibrated_to_market")
-    art["view"]["headline"]["lines"][0]["datum"]["value"]["fx_translation_delta"] = 0.021
-    score = closure.score_quality({"TSM": art})
-
-    assert [t for t, *_ in score.multiple_in_noise] == ["TSM"]
-    assert score.multiple_drifted == ()
-
-
-# ── 第三種終局：awaiting_report（目標期間已結束、財報未公布） ────────────────
-#
-# 事發（2026-09-12 research-drain 實測）：MU 與 6594.T 寫不出 horizon——
-# `HorizonAssumption` 要求 horizon_end 在未來（INV-2），而共識的 `0y` 在財報公布前
-# 會一直指向**已經結束**的那一年。兩邊各自都對，是一個標籤承載兩種語意（L12）。
-# 先前的處置是每輪手打 `--skip`，也就是把一個機械可判的事實交給人記得。
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：另外四條（校準倍數漂移 vs 折溢價主張、對價格漂移不變、
+# 未宣告 derivation 仍算主張、噪音地板勝過漂移桶）同樣只有在有兩桿拆解時才有主詞，一併退役。
 
 
 def test_awaiting_report_is_a_terminal_but_only_when_not_already_ready() -> None:

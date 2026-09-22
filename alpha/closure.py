@@ -915,41 +915,10 @@ def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
                         tuple(drifted))
 
 
-def render_quality(score: QualityScore) -> list[str]:
-    """成績單三行。**沒有到終局的檔就誠實說沒有**，不印 0/0 假裝有量測。"""
-    if not score.scored and not score.unreadable:
-        return ["品質計數器：尚無可評分的檔（沒有隱含報酬就沒有兩桿可看）"]
-    lines = [f"隱含報酬分布：正 {len(score.positive)}／負 {len(score.negative)}"
-             + (f"（讀不到 {len(score.unreadable)}：{'、'.join(score.unreadable)}）"
-                if score.unreadable else "")]
-    lines.append(
-        f"倍數＝校準倍數（未主張折溢價）：{len(score.multiple_neutral)} 檔"
-        + (f"｜有折溢價主張：{len(score.multiple_priced)} 檔——"
-           + "、".join(f"{t} {c:+.1%}" for t, c in score.multiple_priced)
-           + "（每一筆的 rationale 都必須指得出證據，AGENTS.md「隱含報酬的兩個桿」）"
-           if score.multiple_priced else "｜有折溢價主張：0 檔"))
-    if score.multiple_drifted:
-        lines.append(
-            f"校準倍數但校準價已過期（**不是折溢價主張，別去找證據**）：{len(score.multiple_drifted)} 檔——"
-            + "、".join(f"{t} {c:+.1%}" for t, c in score.multiple_drifted)
-            + "。ledger 宣告 derivation=calibrated_to_market，桿卻非零；代數上它等於"
-            "（校準當天價 ÷ 現價 − 1），也就是價格漂移。要的動作是**重跑一次 valuation**，"
-            "不是補一份依定義不存在的折溢價證據。")
-    if score.multiple_in_noise:
-        lines.append(
-            f"倍數桿落在換算殘差以下（讀不出來，不是校準也不是主張）：{len(score.multiple_in_noise)} 檔——"
-            + "、".join(f"{t} {c:+.1%}（殘差 {r:+.1%}）" for t, c, r in score.multiple_in_noise)
-            + "。要拿到有意義的數字得用同一條 FX 路徑重算共識，不是調容差。")
-    if score.negative and not score.positive and score.scored >= 3:
-        lines.append(
-            "⚠ 全部為負：倍數貢獻接近 0 ＝**市場太貴**；負值大半來自倍數折價 ＝**方法偏空**。"
-            "在分得出這兩者之前，不要把「全負」讀成結論（ROADMAP 研究閉環 P0 的 goal）。")
-    return lines
-
 __all__ = [
-    "GATE_STATES", "MULTIPLE_NEUTRAL_TOLERANCE", "NEXT_PICK_RULE", "READY_STATES",
+    "GATE_STATES", "NEXT_PICK_RULE", "READY_STATES",
     "deferred_tickers",
-    "BacklogRow", "GateResult", "QualityScore", "closure_gate", "explain_pick",
-    "rank_backlog", "render_quality", "render_summary", "row_from_artifact",
-    "score_quality", "sectors_with_ready", "summarize",
+    "BacklogRow", "GateResult", "closure_gate", "explain_pick",
+    "rank_backlog", "render_summary", "row_from_artifact",
+    "sectors_with_ready", "summarize",
 ]
