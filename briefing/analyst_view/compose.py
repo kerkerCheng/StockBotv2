@@ -162,8 +162,6 @@ def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
         + _lines(eg.numeric_comparisons, "comparison")
         + ((_line("opinion_stance", eg.opinion_stance.label, eg.opinion_stance, "comparison"),)
            if eg.opinion_stance is not None else ())
-        + ((_line("reverse_bridge", eg.reverse_bridge.label, eg.reverse_bridge, "comparison"),)
-           if eg.reverse_bridge is not None else ())
         + ((_line("multiple_derivation", eg.multiple_derivation.label,
                   eg.multiple_derivation, "comparison"),)
            if eg.multiple_derivation is not None else ())
@@ -254,12 +252,11 @@ def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
     逐檔印是噪音，全體缺口由心跳段 4 的常駐計數器負責）。
     """
     ib = view.investor_brief
+    # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`brief_scale`（那把尺）與 `brief_multiple_question`
+    # （要翻倍需要什麼為真）兩行退役。** 尺上是現價／沒賭對／賭對／判斷錯了，ROADMAP 首屏那一列
+    # 明文「拿掉」；要翻倍那一句讀多年反向橋（D 組）。首屏剩下的是七句話與一顆狀態燈。
     lines = (tuple(_line(d.key, d.label, d, "brief") for d in ib.slots)
-             + (_line("brief_scale", ib.scale.label, ib.scale, "brief"),
-                _line("brief_status_light", ib.status_light.label, ib.status_light, "brief"))
-             + ((_line("brief_multiple_question", ib.multiple_question.label,
-                       ib.multiple_question, "brief"),)
-                if ib.multiple_question is not None else ()))
+             + (_line("brief_status_light", ib.status_light.label, ib.status_light, "brief"),))
     return AnalystPanel(
         key="brief", title="投資人短評：這檔在賭什麼",
         questions=("q0_story",),

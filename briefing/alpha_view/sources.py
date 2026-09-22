@@ -452,62 +452,6 @@ def _implied_return_model(
     return result, None, records
 
 
-def _reverse_bridge_model(
-    fundamental_model: FundamentalModelResult | None, valuation: ValuationResult | None,
-    ticker: Ticker, company_id: CompanyId, *, as_of: date | None,
-):
-    """Reverse Bridge（2026-09-10）的取數與執行——**全部輸入都是已經跑好的東西**。
-
-    現價、目標倍數、基期、假設一律沿用正向那條鏈的同一個物件；本檔不另取任何數，也不
-    自己算倍數。**沒有目標倍數就誠實 missing**——補市場倍數會讓答案恆等於共識。
-    """
-    from alpha.reverse import RETURN_MULTIPLE_LADDER, build_reverse_bridge
-    from alpha.valuation.contracts import METHOD_FORWARD_EARNINGS_MULTIPLE
-
-    if fundamental_model is None:
-        return None, "沒有 fundamental model——沒有橋就無從反解"
-    if valuation is None:
-        return None, "沒有 valuation——反解要用的是我們自己的目標倍數"
-    if valuation.method != METHOD_FORWARD_EARNINGS_MULTIPLE:
-        return None, (f"反解 v1 只支援本益比法；本檔用的是 {valuation.method}——"
-                      "EV/Sales 的反解是另一條算術（營收 → EV → 每股），不共用這一條")
-    multiple = next((a.value for a in valuation.assumptions
-                     if a.parameter == "target_pe" and not a.retracted), None)
-    eps_comparison = fundamental_model.comparisons.get("eps")
-    eps_metric = fundamental_model.metrics.get("eps")
-    try:
-        result = build_reverse_bridge(
-            company_id=str(company_id), ticker=str(ticker), as_of=as_of,
-            target_period=fundamental_model.target_period,
-            actuals=fundamental_model.base_actuals,
-            assumptions=fundamental_model.assumptions,
-            current_price=(valuation.current_price.value if valuation.current_price else None),
-            target_multiple=multiple,
-            our_eps=(eps_metric.value if eps_metric is not None and eps_metric.is_known else None),
-            consensus_eps=(eps_comparison.consensus if eps_comparison is not None else None),
-        )
-        # Phase 7 Step 7.1（2026-09-19）：同一條橋、同一組輸入，**只換起點價格**，
-        # 順便問「N 倍要什麼為真」。⚠ 這幾個倍率是**要問的問題清單，不是門檻**——
-        # AGENTS.md 禁止寫死的是 gate 的比值（「payoff 必須 > X%」），不是問句本身。
-        ladder = tuple(
-            build_reverse_bridge(
-                company_id=str(company_id), ticker=str(ticker), as_of=as_of,
-                target_period=fundamental_model.target_period,
-                actuals=fundamental_model.base_actuals,
-                assumptions=fundamental_model.assumptions,
-                current_price=(valuation.current_price.value if valuation.current_price else None),
-                target_multiple=multiple,
-                our_eps=(eps_metric.value if eps_metric is not None and eps_metric.is_known else None),
-                consensus_eps=(eps_comparison.consensus if eps_comparison is not None else None),
-                target_return_multiple=m,
-            )
-            for m in RETURN_MULTIPLE_LADDER
-        )
-    except Exception as exc:  # noqa: BLE001 — 反解失敗只讓該區 missing，不讓整份 view 失敗
-        return None, f"reverse bridge 執行失敗：{type(exc).__name__}: {str(exc)[:160]}"
-    return (result, ladder), None
-
-
 def _entry_model(
     build: ContextBuild, implied_return: ImpliedReturnResult | None, implied_return_reason: str | None,
     ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date, identity: Mapping[str, Any],
@@ -640,8 +584,6 @@ def fetch_alpha_investment_view(
         entry_model, entry_reason, entry_records = _entry_model(
             build, implied_return_model, implied_return_reason, resolved_ticker, company_id, as_of=as_of, today=today,
             identity=identity, sandbox_hurdle=sandbox_hurdle)
-        reverse_pair, reverse_reason = _reverse_bridge_model(
-            fundamental_model, valuation_model, resolved_ticker, company_id, as_of=as_of)
         # ---- V2（2026-09-15）gap closure：目標期間的共識 EPS 時序。provider 沒這能力就空。
         consensus_history: tuple = ()
         fetch_history = getattr(fundamentals_provider, "fiscal_consensus_history", None)
@@ -794,20 +736,12 @@ def fetch_alpha_investment_view(
     except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
         brief_records, brief_errors = [], [f"短評 ledger 讀取失敗：{type(exc).__name__}"]
 
-    # 多年視角（2026-09-20，Phase 7 選項 a）：**在這裡取料，不在 builder 裡**。
-    # ⚠ 它會跑金融模型，所以只能在 materialize 路徑上；APP 呈現契約禁止 request path 跑模型
-    # （`tests/test_webapp_request_path.py` 守著）。沒寫 `multiple_horizon` 的檔在
-    # `_horizon_from_judgment` 就返回，不建階梯，所以 71/73 檔的成本接近 0。
-    try:
-        from briefing.multi_year import build_multi_year_view
-
-        multi_year_view = build_multi_year_view(str(resolved_ticker))
-    except Exception:  # noqa: BLE001 — 單檔失敗不該讓整份 view 掛掉；缺口由 multi_year artifact 報
-        multi_year_view = None
+    # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：多年視角（要幾倍、哪一格得為真）整組退役。**
+    # 它跑的是多年反向橋（`alpha/reverse` ＋ `briefing/multi_year`），ROADMAP Phase 0／D 組。
+    # 接手「這個結構允不允許翻倍」的是讀圖（Phase 2）與財務三題（Phase 3），不是另一條橋。
 
     return build_alpha_investment_view(
         build=build, signal=signal, signal_reason=signal_reason,
-        multi_year_view=multi_year_view,
         dependency_paths=causal.get("dependency_paths", ()),
         substitution_paths=causal.get("substitution_paths", ()),
         supply_exposure=causal.get("supply_exposure", ()),
@@ -821,9 +755,6 @@ def fetch_alpha_investment_view(
         valuation=valuation_model, valuation_reason=valuation_reason, valuation_records=valuation_records,
         implied_return=implied_return_model, implied_return_reason=implied_return_reason, horizon_records=horizon_records,
         entry=entry_model, entry_reason=entry_reason, entry_records=entry_records,
-        reverse=(reverse_pair[0] if reverse_pair else None),
-        reverse_ladder=(reverse_pair[1] if reverse_pair else ()),
-        reverse_reason=reverse_reason,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
         abstention_records=abstention_records,

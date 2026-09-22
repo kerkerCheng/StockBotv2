@@ -50,7 +50,10 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0a.3 | 研究 skill 改句 | ✅ | 4c78df4 |
 | 0a.4 | 池子收集端停鑄 | ✅ | 20f21a4 |
 | 0b.1a | 個股頁消費層：why／entry 退役、argument 升核心、尺與四價下架 | ✅ | e38c7ee |
-| 0b.1b | 斷 import：builder／sources 不再 import 退役模組 | ○ | |
+| 0b.1b-D | D 組整組退役：多年反向橋＋要幾倍＋那把尺 | ✅ | |
+| 0b.1b-C | C／H 組：估值鏈與隱含報酬 | ○ | |
+| 0b.1b-F | F 組：entry criterion | ○ | |
+| 0b.1b-E | E 組：賭注四價 overlay | ○ | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
@@ -78,7 +81,8 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 5 | 0a.2 | 只列 `webapp/__main__.py` materialize 清單、`api.py` 路由、`index.html` nav | 另外把兩個 kind 從 `webapp/contracts.py` 的**封閉字彙** de-register | 不 de-register 的話心跳段 1 會一直唸「不是今天的 N 份：basket、multi_year」——那正是 0a 要移除的注意力噪音；ROADMAP 驗收③也要求 `webapp status` 不列它們。代價實測只有 7 個測試檔／14 條測試，全部已處理 |
 | 6 | 0a.2 | 「段 2 的『現價過目標價』與**籃子行**」 | 段 2 改一行；**段 4 改兩行** | 實測籃子／量的候選／要幾倍／歸零旗標彙總四行都在**段 4**，不在段 2（見基準報告 §8） |
 | 7 | 0a.2 | 未提歸零旗標 | 彙總暫停並印 `upstream_unavailable` 明示缺席；**逐檔那盞燈未動** | 歸零旗標是**活的量測**（`AGENTS.md`「量測、訊號、脈絡三分」），但它唯一的 producer 是籃子 artifact。逐檔的燈住在個股頁 `wipeout` 面板（0b.1 明列為核心面板），所以停的只有彙總，且它自己說得出停在哪裡 |
-| 11 | 0b.1 | 「批 1 一個 commit」 | 拆成 **0b.1a（消費層）** 與 **0b.1b（斷 import）** 兩個 commit | 這一批涉及約 24,000 行、20 個檔，`builder.py` 一檔 3,570 行。拆成兩段讓每一段都能保持全測試綠、也讓 diff 讀得完；批 1 的驗收（importer 地圖、materialize 73 檔、blocked 歸屬、三個測試檔）在 0b.1b 結束時整批驗一次 |
+| 17 | 0b.1b | 「批 1 全部斷 import → 批 2 全部刪模組」 | **改成逐組**（D → C/H → F → E），每組的「斷 import ＋ 刪模組 ＋ 刪測試」放同一個 commit | plan 的順序保證是「先斷 import 再刪模組」，逐組做**完全保留**那個保證（組內仍是先斷後刪），但每個 commit 都能全測試綠。原順序會讓中間狀態紅燈跨 session——而紅燈的 suite 沒有鑑別力（下次真的壞掉時看不出差別，L13）|
+| 11 | 0b.1 | 「批 1 一個 commit」 | 拆成 **0b.1a（消費層）** 與 **0b.1b（斷 import，逐組）** 兩個以上 commit | 這一批涉及約 24,000 行、20 個檔，`builder.py` 一檔 3,570 行。拆成兩段讓每一段都能保持全測試綠、也讓 diff 讀得完；批 1 的驗收（importer 地圖、materialize 73 檔、blocked 歸屬、三個測試檔）在 0b.1b 結束時整批驗一次 |
 | 12 | 0b.1a | 未提 `MarketSection` | **新增** `briefing/alpha_view/contracts.py` 的 `market` section ＋ builder 的 `_market_section` | 現價原本只住在 `ValuationSection`／`ImpliedReturnSection`／`EntryLogicSection` 三個**全部要退役**的 section 裡。它是 A2 觀測（Engine C 收盤快照），與估值無關，卻會跟著模型一起消失。新 section 只有一格、零算術，直接讀 `build.context.market`——與 `sources._current_price` 同一個來源 |
 | 13 | 0b.1a | ROADMAP 核心面板列 `headline` | `headline` **留在核心但換主詞**：由「現價 → future target → 隱含報酬」改成「現在多少錢」（只有現價） | 原本的 headline 就是 AGENTS「首屏拿掉尺」指的那把尺，8 格數字全來自估值鏈。留著它又刪掉資料源會讓 73/73 blocked（與 `why` 同一個形狀）。實測現價 73/73 檔 available，所以換主詞後零檔因它 blocked |
 | 14 | 0b.1a | 未提 `brief`／`wipeout` 升核心的代價 | 照 ROADMAP 做，並**量出代價**：blocked 由 18 → 70 | 成因歸屬實測：**brief 70 檔、wipeout 3 檔、research 12 檔，fundamental 0 檔**。批 1 的驗收句「blocked 檔數不因 fundamental 缺席而增加」因此成立——fundamental 由核心降選配，只會讓 blocked 變少。⚠ 70/73 是真實 backlog（沒寫短評就是沒有產出），但它同時讓 `forward_view_backlog` 由 11 變成約 70，**下一個 Phase 要注意這個佇列的主詞已經換成「去寫短評」** |

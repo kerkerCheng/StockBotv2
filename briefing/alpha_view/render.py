@@ -447,18 +447,9 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines += _section("13e. 投資人短評（七格前因後果；文字 session 寫、數字 authority 填）", ib.meta)
     for datum in ib.slots:
         lines.append(_datum_line(datum))
-    lines.append(_datum_line(ib.scale))
     lines.append(_datum_line(ib.status_light))
     # 2026-09-20：有寫倍率射程才多這一句（選項 a——那把尺不動，另外加一句）。
     # ⚠ 印**句子**不印 raw dict：首屏的單位是句不是格；`steps` 留在 artifact 給稽核層。
-    if ib.multiple_question is not None:
-        mq = ib.multiple_question
-        sentence = (mq.value or {}).get("sentence") if isinstance(mq.value, Mapping) else None
-        if sentence:
-            lines.append(f"- {mq.label}：{markdown_text(str(sentence))}"
-                         f" 〔確定性規則｜`{mq.authority}`｜as-of {mq.as_of}〕")
-        else:
-            lines.append(_datum_line(mq))
     lines.append("")
 
     # 13b. 下檔——D2（2026-09-18）由「尚未建模」換成與 13d **對稱**的 overlay。

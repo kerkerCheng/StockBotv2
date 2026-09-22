@@ -728,39 +728,17 @@ class InvestorBriefSection:
     """投資人短評（2026-09-15）：七格前因後果。**文字照抄 ledger、數字照抄既有 Datum**——本 section 不算任何數。
 
     - `slots`：七格，每格的 `value` 是填好數字的句子；`dependencies` 帶原文、placeholder、缺值清單與引用。
-    - `scale`：一把尺——現價／base 目標價／賭注目標價（同單位），APP 畫圖用；值都是別的 section 已有的。
+    - ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`scale`（一把尺）欄位退役；`multiple_question` 同批退役。
     - `status_light`：refresh overall 的白話版（一個燈，不是一串狀態）。
-    - `multiple_question`（2026-09-20）：**要翻倍需要什麼為真**——只在這一檔寫下了倍率射程
-      （`multiple_horizon`）時才有值。
-    - 沒有生效的短評 → `missing`＋`not_yet_recorded`（「還沒寫短評」，不拿 thesis 硬截）。
-
-    ## 為什麼多年視角是**另外一句**，不是換掉那把尺（2026-09-20 使用者定案，選項 a）
-
-    Phase 7 原本寫「首屏的『賭對了值多少』**由多年視角回答**」，落地時比對形狀才發現換不掉：
-    **那把尺要的是四個價格**（COHR：317.36／223.60／243.97／197.54），
-    **而多年橋產生的是「要 2 倍，資料中心分部得四年累積成長 4.65 倍」**——不是價格。
-
-    ⚠ 但原本要修的錯位是真的，而且比那句話更精確：**錯的不是數字，是結論的期間**。
-    系統算出 payoff −23.1%（**FY2027**），研究者據此在首屏寫「所以今天不是加碼點」，
-    而同一份 thesis 講的是 **FY2030** 的六吋產能倍增。
-    **一句 FY2027 的結論，被掛在一個 FY2030 的主張下面。**
-
-    所以兩句並存、各答各的——與 Step 7.1 當初分開 `market_implied_eps`（市場在想什麼）
-    與 `required_eps`（要漲 N 倍需要什麼）是同一個理由（L12：一個表示不承載兩種語意）。
-
-    ⚠ **沒寫倍率射程就不印這一句**（不是印「還沒寫」）：71/73 檔都沒寫，逐檔印是噪音；
-    **全體的缺口由心跳段 4 的常駐計數器負責**（「還沒寫下目標年度 N」）。
-    首屏印這一檔的事，心跳印全體的帳——分工不重疊。
+    - ⚠ `multiple_question` 已於 2026-09-23（Phase 0 Step 0b.1b）隨多年反向橋退役。
     """
 
     meta: SectionMeta
     slots: tuple[Datum, ...]
-    scale: Datum
     status_light: Datum
     brief_id: str | None
     is_not: tuple[str, ...]
     #: 要翻倍需要什麼為真（2026-09-20）。`None`＝這一檔還沒寫下倍率射程，**刻意不印**。
-    multiple_question: Datum | None = None
 
 
 @dataclass(frozen=True, slots=True)

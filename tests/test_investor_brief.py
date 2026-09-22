@@ -133,14 +133,13 @@ def test_read_model_without_brief_is_missing_and_blocks_readiness() -> None:
     assert analyst.brief.absence_kind == "not_yet_recorded"
     assert "brief" not in "｜".join(analyst.readiness.optional_unavailable)
     # ⚠ 這條斷言的用途是「**brief panel 不得憑空多出不屬於 read model 的行**」，
-    # 2026-09-20 加 `multiple_question` 時它正確地抓到了改動。多的那一格仍然必須
-    # 來自同一個 read model（不是前端自己算的），所以加進 allowed 而不是放寬斷言。
-    # ⚠ 這個 fixture 沒有 `multiple_horizon`，所以 `multiple_question` 應該是 None
-    # ——「沒寫倍率射程就不印那一句」是刻意的（71/73 檔都沒寫，逐檔印是噪音）。
-    assert ib.multiple_question is None, "沒寫倍率射程時首屏不該多一行"
-    allowed = {id(d) for d in ib.slots} | {id(ib.scale), id(ib.status_light)}
-    if ib.multiple_question is not None:
-        allowed.add(id(ib.multiple_question))
+    # 2026-09-20 加 `multiple_question` 時它正確地抓到了改動。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`multiple_question`（要翻倍需要什麼為真）隨多年反向橋
+    # 退役、`scale`（那把尺）隨首屏那把尺退役。**判準一字未改**——首屏剩下的每一行仍然必須是
+    # read model 的同一個物件，所以 allowed 跟著少兩格，而不是放寬成「不檢查」。
+    assert not hasattr(ib, "multiple_question"), "退役的欄位不得復活"
+    assert not hasattr(ib, "scale"), "那把尺不得復活"
+    allowed = {id(d) for d in ib.slots} | {id(ib.status_light)}
     assert all(id(line.datum) in allowed for line in analyst.brief.lines)
 
 

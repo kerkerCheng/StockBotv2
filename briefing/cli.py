@@ -15,46 +15,9 @@ from datetime import date
 from pathlib import Path
 
 
-def cmd_multi_year(args: argparse.Namespace) -> int:
-    """多年視角（Phase 7 Step 7.3）：要幾倍，哪一格得為真。
-
-    ⚠ **與 alpha-card 是兩條路**：主 view 的目標期間永遠是基期+1（那條鏈要對共識），
-    多年橋沒有共識可對，所以不混進同一張表。兩者共用同一條橋與同一套二分法。
-    """
-    import json as _json
-
-    from alpha.errors import AlphaError
-
-    from .multi_year import build_multi_year_view, render_multi_year
-
-    try:
-        view = build_multi_year_view(args.ticker)
-    except AlphaError as exc:
-        print(f"✗ {exc}", file=sys.stderr)
-        return 2
-    if args.format == "json":
-        from dataclasses import asdict
-
-        payload = asdict(view)
-        payload["ladder"] = [
-            {"multiple": r.target_return_multiple, "required_eps": r.required_eps,
-             "required_gap": r.required_gap, "status": r.status,
-             "unreachable": [s.driver for s in r.unreachable_drivers],
-             "solutions": [{"driver": s.driver, "scope": s.scope, "our_value": s.our_value,
-                            "implied_value": s.implied_value, "status": s.status,
-                            "reason": s.reason} for s in r.solutions]}
-            for r in view.ladder
-        ]
-        text = _json.dumps(payload, ensure_ascii=False, indent=1, default=str)
-    else:
-        text = render_multi_year(view)
-    if args.out:
-        Path(args.out).write_text(text, encoding="utf-8")
-        print(f"✓ {args.out}")
-    else:
-        print(text)
-    return 0 if view.status == "available" else 1
-
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_multi_year` 與 `multi-year` 子命令已移除。**
+# 多年反向橋（要幾倍、哪一格得為真）整條在 Phase 0 退役（ROADMAP Phase 0／D 組）。
+# 接手「這個結構允不允許翻倍」的是讀圖（Phase 2）與財務三題（Phase 3），**不是另一條橋**。
 
 def cmd_alpha_card(args: argparse.Namespace) -> int:
     from alpha.errors import AlphaError, PointInTimeUnsupported
@@ -317,12 +280,6 @@ def build_parser() -> argparse.ArgumentParser:
     card.add_argument("--no-causal", action="store_true", help="略過依賴／替代路徑與結構事件（較快）")
     card.add_argument("-o", "--out", help="輸出路徑")
     card.set_defaults(func=cmd_alpha_card)
-    multi = sub.add_parser("multi-year",
-                           help="多年視角（Phase 7）：要幾倍，哪一格得為真——與 FY+1 主 view 是兩條路")
-    multi.add_argument("ticker")
-    multi.add_argument("--format", choices=("markdown", "json"), default="markdown")
-    multi.add_argument("-o", "--out", help="輸出路徑")
-    multi.set_defaults(func=cmd_multi_year)
     refresh = sub.add_parser("refresh", help="單一公司的 Refresh／Invalidation Report（什麼變了、影響誰、要做什麼）")
     refresh.add_argument("ticker")
     refresh.add_argument("--as-of", help="YYYY-MM-DD：只看 T 之前已知的變化與成果")
