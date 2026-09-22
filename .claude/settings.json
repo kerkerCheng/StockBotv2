@@ -12,6 +12,11 @@
             "type": "command",
             "command": "python crons/pending_leads_digest.py 2>/dev/null || true",
             "statusMessage": "Checking pending leads..."
+          },
+          {
+            "type": "command",
+            "command": "python crons/phase_status_hint.py 2>/dev/null || true",
+            "statusMessage": "Checking phase status..."
           }
         ]
       }

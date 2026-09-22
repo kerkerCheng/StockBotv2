@@ -46,7 +46,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0c | 池子 17 筆 drop | ○ | |
 | 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅ | ○ | |
 
-**開工／續工指令（貼給執行模型）：**
+**開工／續工指令：貼 `/phase-run` 即可**（skill 會照下面這段做；不能用 skill 時貼這段原文）：
 
 ```
 讀 docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md，依 §0.5 的進度表與 git log 找到第一個未完成的 Step，

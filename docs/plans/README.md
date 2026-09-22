@@ -13,7 +13,7 @@
 
 **分工：便宜模型執行 plan；plan 由強模型（fable）與使用者一起寫。** 執行者跑到 Phase 結案、R2 GO 之後，
 若下一個 Phase 在下表沒有 plan 檔，就停在 `AWAITING_HUMAN`，HUMAN SUMMARY 的「下一步」印出下面這段指令，
-並在 closeout 報告附「本 Phase 執行中發現、下一 Phase 要決定的問題清單」。使用者切到 fable 開新 session 貼這段：
+並在 closeout 報告附「本 Phase 執行中發現、下一 Phase 要決定的問題清單」。使用者切到 fable 開新 session 貼 **`/phase-plan`**（skill 會照下面這段做；不能用 skill 時貼這段原文）：
 
 ```
 讀 docs/ROADMAP.md 的 Phase <N> 那一列、docs/brainstorms/2026-09-22-graph-first-direction-decision.md、
