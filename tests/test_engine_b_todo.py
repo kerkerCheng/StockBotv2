@@ -353,8 +353,16 @@ def test_explicit_external_waiting_overrides_prior_awaiting_approval() -> None:
     assert todo.actionable_items(pool) == []
 
 
+#: ⚠ 2026-09-22（Phase 0 Step 0a.4）：本組測試原本以 `decision_review` ＋ `"decisions"` 來源
+#: 當測資。那個 type 已改 legacy 標記、collector 已從 `SOURCE_COLLECTORS` 移除，所以它**永遠
+#: 不會出現在 `healthy`**，拿它當測資會讓 `_mark_source_cleared` 恆不觸發＝這組測試恆綠。
+#: **被測的機制沒有退役**（「來源成功執行但不再產出這一項」仍適用於所有活的 type），
+#: 所以改主詞為 `source_trace_review` ＋ `"source_trace"`，判準一字未改。
+_CLEARED_SOURCE = "source_trace"
+
+
 def _decision_row(ref_id: str = "dc_1") -> dict:
-    return {"type": "decision_review", "ref_id": ref_id, "title": "REVIEW — co:x"}
+    return {"type": "source_trace_review", "ref_id": ref_id, "title": "追源 — co:x"}
 
 
 def test_source_that_stops_producing_a_row_marks_it_as_done_candidate() -> None:
@@ -368,10 +376,10 @@ def test_source_that_stops_producing_a_row_marks_it_as_done_candidate() -> None:
     """
 
     pool = todo.empty_pool()
-    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    todo.sync(pool, [_decision_row()], healthy_sources={_CLEARED_SOURCE})
     assert not todo.get(pool, 1).get("source_cleared")
 
-    result = todo.sync(pool, [], healthy_sources={"decisions"})
+    result = todo.sync(pool, [], healthy_sources={_CLEARED_SOURCE})
 
     assert result["source_cleared"] == 1
     assert todo.get(pool, 1)["source_cleared"]["source_healthy"] is True
@@ -383,7 +391,7 @@ def test_source_that_stops_producing_a_row_marks_it_as_done_candidate() -> None:
 def test_in_flight_work_order_is_never_marked_source_cleared() -> None:
     """awaiting exact gate 比 collector 缺席更有權威，不得提示使用者 drop。"""
     pool = todo.empty_pool()
-    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    todo.sync(pool, [_decision_row()], healthy_sources={_CLEARED_SOURCE})
     item = todo.get(pool, 1)
     item["dispatch_status"] = "awaiting_approval"
     item["dispatch_receipt"] = "observation-proposal:po_1"
@@ -393,7 +401,7 @@ def test_in_flight_work_order_is_never_marked_source_cleared() -> None:
         "reason": "stale marker",
     }
 
-    result = todo.sync(pool, [], healthy_sources={"decisions"})
+    result = todo.sync(pool, [], healthy_sources={_CLEARED_SOURCE})
 
     assert result["source_cleared"] == 0
     assert result["source_returned"] == 1
@@ -409,7 +417,7 @@ def test_unhealthy_source_never_marks_anything_even_with_zero_rows() -> None:
 
     pool = todo.empty_pool()
     todo.sync(pool, [_decision_row("dc_1"), _decision_row("dc_2")],
-              healthy_sources={"decisions"})
+              healthy_sources={_CLEARED_SOURCE})
 
     result = todo.sync(pool, [], healthy_sources=set())  # collector 全掛
 
@@ -428,7 +436,7 @@ def test_healthy_source_does_not_clear_another_sources_items() -> None:
         healthy_sources={"decisions", "lifecycle"},
     )
 
-    result = todo.sync(pool, [], healthy_sources={"decisions"})
+    result = todo.sync(pool, [], healthy_sources={_CLEARED_SOURCE})
 
     assert result["source_cleared"] == 1
     assert todo.get(pool, 1)["source_cleared"]        # decision_review 被標記
@@ -439,11 +447,11 @@ def test_returning_row_revokes_the_done_candidate_mark() -> None:
     """新證據把 decision 推回 REVIEW 時，標記要撤銷而不是留著誤導。"""
 
     pool = todo.empty_pool()
-    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
-    todo.sync(pool, [], healthy_sources={"decisions"})
+    todo.sync(pool, [_decision_row()], healthy_sources={_CLEARED_SOURCE})
+    todo.sync(pool, [], healthy_sources={_CLEARED_SOURCE})
     assert todo.get(pool, 1)["source_cleared"]
 
-    result = todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
+    result = todo.sync(pool, [_decision_row()], healthy_sources={_CLEARED_SOURCE})
 
     assert result["source_returned"] == 1
     assert "source_cleared" not in todo.get(pool, 1)
@@ -452,8 +460,8 @@ def test_returning_row_revokes_the_done_candidate_mark() -> None:
 
 def test_done_candidates_render_in_their_own_section_with_drop_hint() -> None:
     pool = todo.empty_pool()
-    todo.sync(pool, [_decision_row()], healthy_sources={"decisions"})
-    todo.sync(pool, [], healthy_sources={"decisions"})
+    todo.sync(pool, [_decision_row()], healthy_sources={_CLEARED_SOURCE})
+    todo.sync(pool, [], healthy_sources={_CLEARED_SOURCE})
 
     rendered = todo._render(pool)
 
@@ -1151,7 +1159,7 @@ def test_sync_retires_existing_pure_system_internal_item_without_new_pq2() -> No
             "trigger": "市場資料問題",
             "until": None,
         },
-    }], healthy_sources={"decisions"})
+    }], healthy_sources={_CLEARED_SOURCE})
 
     result = todo.sync(pool, [{
         "type": "decision_review",
@@ -1159,7 +1167,7 @@ def test_sync_retires_existing_pure_system_internal_item_without_new_pq2() -> No
         "title": "REVIEW — co:meta",
         "source": "decision_lab",
         "system_internal_only": True,
-    }], healthy_sources={"decisions"})
+    }], healthy_sources={_CLEARED_SOURCE})
 
     assert result["system_internal_retired"] == 1
     assert todo.active_items(pool) == []
@@ -1173,7 +1181,7 @@ def test_sync_retires_existing_pure_system_internal_item_without_new_pq2() -> No
         "title": "REVIEW — co:meta",
         "source": "decision_lab",
         "system_internal_only": True,
-    }], healthy_sources={"decisions"})
+    }], healthy_sources={_CLEARED_SOURCE})
     assert result["added"] == 0
     assert todo.active_items(fresh) == []
 
@@ -1624,11 +1632,16 @@ def test_every_item_type_declares_its_go_authorization_boundary() -> None:
 def test_collected_rows_carry_the_go_boundary_so_consumers_need_not_recall_it() -> None:
     """授權邊界掛在 row 上，brief 不必自己查——漏掉時的預設是「沒有邊界」。"""
     rows = todo._attach_go_authorization(
-        [{"type": "decision_review"}, {"type": "ra_admission"}]
+        [{"type": "source_trace_review"}, {"type": "ra_admission"}]
     )
 
-    assert rows[0]["go_authorizes"].startswith("bounded research")
+    # ⚠ 2026-09-22 Step 0a.4：原本用 `decision_review`（現為 legacy 標記）。改用追源型，
+    # 它的邊界句仍是活的；同時補一條斷言鎖住「legacy 的兩個 kind 不得長回授權語意」。
+    assert rows[0]["go_authorizes"].startswith("bounded 追源")
     assert "入圖" in rows[0]["go_excludes"]
+    for legacy in ("decision_review", "sheet_only_holding", "lead_research"):
+        legacy_row = todo._attach_go_authorization([{"type": legacy}])[0]
+        assert "legacy" in legacy_row["go_authorizes"], legacy
     assert "graph admission" in rows[1]["go_authorizes"]
     assert "live" in rows[1]["go_excludes"]
 

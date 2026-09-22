@@ -47,8 +47,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0.0 | 基準快照 | ✅ | d6e3fca |
 | 0a.1 | 排程與規則停跑 | ✅ | 36f59f9 |
 | 0a.2 | 心跳與 APP 入口停跑 | ✅ | b65c1a1 |
-| 0a.3 | 研究 skill 改句 | ✅ | |
-| 0a.4 | 池子收集端停鑄 | ○ | |
+| 0a.3 | 研究 skill 改句 | ✅ | 4c78df4 |
+| 0a.4 | 池子收集端停鑄 | ✅ | |
 | 0b.1 | 個股頁樞紐重寫、斷 import | ○ | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
@@ -77,6 +77,8 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 5 | 0a.2 | 只列 `webapp/__main__.py` materialize 清單、`api.py` 路由、`index.html` nav | 另外把兩個 kind 從 `webapp/contracts.py` 的**封閉字彙** de-register | 不 de-register 的話心跳段 1 會一直唸「不是今天的 N 份：basket、multi_year」——那正是 0a 要移除的注意力噪音；ROADMAP 驗收③也要求 `webapp status` 不列它們。代價實測只有 7 個測試檔／14 條測試，全部已處理 |
 | 6 | 0a.2 | 「段 2 的『現價過目標價』與**籃子行**」 | 段 2 改一行；**段 4 改兩行** | 實測籃子／量的候選／要幾倍／歸零旗標彙總四行都在**段 4**，不在段 2（見基準報告 §8） |
 | 7 | 0a.2 | 未提歸零旗標 | 彙總暫停並印 `upstream_unavailable` 明示缺席；**逐檔那盞燈未動** | 歸零旗標是**活的量測**（`AGENTS.md`「量測、訊號、脈絡三分」），但它唯一的 producer 是籃子 artifact。逐檔的燈住在個股頁 `wipeout` 面板（0b.1 明列為核心面板），所以停的只有彙總，且它自己說得出停在哪裡 |
+| 9 | 0a.4 | 「移除 `collect_from_decisions` 的呼叫」 | 從 `SOURCE_COLLECTORS` 登記表移除 `("decisions", …)`，並**刪掉 `include_decisions` 參數與 `--no-decisions` 旗標** | 留一個預設 `True` 的開關等於留一道旁門：傳個參數就把退役的 collector 叫回來（L15：權限要 deterministic）。同時從 `SOURCE_ITEM_TYPES` 移除 decisions 那一列，讓兩個 legacy kind 與 `manual` 同形——缺席不代表完成 |
+| 10 | 0a.4 | 未提 `engine_b/cli.py::_cmd_drain` 的 `include_decisions` | **未動**，留給批 3／4 | 它從 Decision Store 讀 work order 餵 pq1。**無人值守那條路已經走不到**：daily 的 `drain_limit_per_run=0`，兩個區塊都是 `if include_decisions and limit:`，`limit` 為 0 直接短路；互動那條路的指示已在 0a.3 從 skill 移除。所以「停跑」已達成，刪除留給批次 |
 | 8a | 0a.3 | 檔案清單列 6 個 skill | 改了 **7 個**（多 `skills/lead-intake/SKILL.md`） | 它有 7 處 `decision_lab`／`reassess` 的**可執行呼叫**（Fast Path 的 `evaluate-signal`、Step 7 整節、接點表）。不改它，退役的命令會繼續被 agent 照著跑 |
 | 8b | 0a.3 | 驗收寫「`retired_mechanism_grep.py` 的 skills 列 → 0」 | **做不到，且不應該做**：7 個 skill 檔仍有約 44 處命中，**全部是退役註記或 `AGENTS.md` 自己要求的措辭** | 見下方 §0.7。D、F、H 三組的 skills 已歸零 |
 | 8c | 0a.3 | 未提 `tests/test_skill_decision_contract.py`、`tests/test_daily_brief_skill.py` | 兩檔的斷言翻面（4 條） | 原本要求兩個研究 skill **必須**出現 Engine D 四支命令、daily-brief **必須**出現 `decision_lab today`。機制退役後那些斷言會逼人把退役的命令寫回去 |

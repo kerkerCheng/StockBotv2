@@ -31,13 +31,17 @@ _ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_POOL_PATH = _ROOT / "library" / "leads" / "todo_pool.json"
 
 # 項目類型 → 該類型的 `go` 代表什麼動作（type-aware dispatch 的權威對照）。
+# ⚠ **2026-09-22（Phase 0 Step 0a.4）：`decision_review` 與 `sheet_only_holding` 改成 legacy 標記。**
+# 兩個 kind **不刪 key**——池裡的歷史項目仍是這兩個 type，讀取端必須認得（否則舊項目會變成
+# 「查不到了」，而那不是合法 lifecycle，INV-3）；`GO_AUTHORIZATION` 的鍵也由測試斷言與這裡一致。
+# 停的是**鑄號**：`SOURCE_COLLECTORS` 不再登記 decisions collector，所以不會再有新項目進來。
 ITEM_TYPES: dict[str, str] = {
     "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
     "ra_admission": "核准入圖（apply_research_action）",
-    "decision_review": "REVIEW 有兩種成因，逐項 hint 才是準的：有 blocker → go 派回 pq1；無 blocker → 改跑 reassess",
+    "decision_review": "（legacy）機制退役（Phase 0／G12），不再建立新項目",
     "source_trace_review": "核准人工 authority 後做 bounded 追源；go 只 dispatch 回 pq1",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
-    "sheet_only_holding": "評估這筆 Sheet 持股（evaluate-signal 或 onboard）",
+    "sheet_only_holding": "（legacy）機制退役（Phase 0），不再建立新項目；Sheet 有而敘事沒有的持股改列候選板「已持有、缺敘事」（Phase 3）",
     "engine_c_observation": "核准把人工觀測寫入 Engine C append-only ledger",
     "thesis_mutation": "核准 thesis lifecycle 變更（revise／retire／watch）",
     "manual": "依 hint 執行",
@@ -55,10 +59,10 @@ ITEM_TYPES: dict[str, str] = {
 GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
     "lead_research": ("（legacy）不再建立新項目", "任何 authority mutation"),
     "ra_admission": ("exact graph admission（apply_research_action）", "thesis mutation 與 live"),
-    "decision_review": ("bounded research（派回 pq1）", "入圖、Engine C 寫入與 live"),
+    "decision_review": ("（legacy）不再建立新項目", "任何 authority mutation"),
     "source_trace_review": ("bounded 追源（dispatch 回 pq1）", "提高 evidence tier 與入圖"),
     "thesis_lifecycle": ("本機複查該 thesis", "自動改 lifecycle 或入圖"),
-    "sheet_only_holding": ("evaluate-signal／onboard 建 cohort", "任何部位動作"),
+    "sheet_only_holding": ("（legacy）不再建立新項目", "任何部位動作"),
     "engine_c_observation": ("寫入 Engine C append-only ledger", "入圖與 thesis mutation"),
     "thesis_mutation": ("該筆 thesis lifecycle 變更", "入圖與 live"),
     "manual": ("依 hint 執行的 exact 動作", "hint 未載明的任何動作"),
@@ -2735,8 +2739,8 @@ def _collect_decision_rows() -> list[dict[str, Any]]:
     return rows
 
 
-def collect_all(*, include_decisions: bool = True) -> list[dict[str, Any]]:
-    return collect_all_with_health(include_decisions=include_decisions).rows
+def collect_all() -> list[dict[str, Any]]:
+    return collect_all_with_health().rows
 
 
 def _attach_go_authorization(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -2757,7 +2761,8 @@ SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
     "research_actions": frozenset({"ra_admission"}),
     "source_trace": frozenset({"source_trace_review"}),
     "lifecycle": frozenset({"thesis_lifecycle"}),
-    "decisions": frozenset({"decision_review", "sheet_only_holding"}),
+    # ⚠ 2026-09-22（Step 0a.4）：`"decisions": {"decision_review", "sheet_only_holding"}` 已移除。
+    # 兩個 legacy kind 從此**沒有 collector**——與 `manual` 同形：缺席不代表完成（見上方 docstring）。
     "engine_c_observations": frozenset({"engine_c_observation"}),
     "thesis_mutations": frozenset({"thesis_mutation"}),
 }
@@ -2786,23 +2791,31 @@ class SourceCollection:
 #
 # 以「屬性名」而非函式物件登記，是為了讓 monkeypatch 能生效：collector 在
 # 呼叫當下才由模組 globals 解析。
+# ⚠ **2026-09-22（Phase 0 Step 0a.4）：`("decisions", "_collect_decision_rows")` 已從登記表移除。**
+# 這一行就是「池子停止鑄 decision_review／sheet_only_holding 號」的唯一開關：collector 不在
+# 登記表上就不會被呼叫，也永遠不會進 `healthy`——於是 `_mark_source_cleared` 一筆都不判定
+# （它只看 healthy 列出的來源），**池裡既有的 17 筆歷史項目不會被自動標記或結案**。
+# 它們在 Step 0c 由使用者授權的批次 `drop` 關閉，理由「機制退役」。
 SOURCE_COLLECTORS: tuple[tuple[str, str], ...] = (
     ("research_actions", "_collect_research_action_rows"),
     ("source_trace", "_collect_source_trace_rows"),
     ("lifecycle", "_collect_lifecycle_rows"),
     ("engine_c_observations", "_collect_engine_c_observation_rows"),
     ("thesis_mutations", "_collect_thesis_mutation_rows"),
-    ("decisions", "_collect_decision_rows"),
 )
 
 
-def collect_all_with_health(*, include_decisions: bool = True) -> SourceCollection:
+def collect_all_with_health() -> SourceCollection:
+    """⚠ 2026-09-22（Step 0a.4）：`include_decisions` 參數已移除。
+
+    原本它預設 `True`，呼叫端要主動關掉才不鑄 decision 型號。現在**只有一條路**——
+    登記表上沒有 decisions collector，所以沒有開關可以把它打開（L15：權限要 deterministic，
+    不留一個「傳個參數就回來了」的旁門）。
+    """
     rows: list[dict[str, Any]] = []
     healthy: set[str] = set()
     sources: list[tuple[str, Any]] = [
-        (name, globals()[attr])
-        for name, attr in SOURCE_COLLECTORS
-        if include_decisions or name != "decisions"
+        (name, globals()[attr]) for name, attr in SOURCE_COLLECTORS
     ]
     for name, collector in sources:
         try:
@@ -2977,8 +2990,8 @@ def main(argv: list[str] | None = None) -> int:
     p_list.add_argument("--json", action="store_true")
 
     p_sync = sub.add_parser("sync", help="從各來源同步後列出")
-    p_sync.add_argument("--no-decisions", action="store_true",
-                        help="跳過 Engine D 決策佇列（免外部連線）")
+    # ⚠ 2026-09-22（Step 0a.4）：`--no-decisions` 已移除——decisions collector 不在登記表上，
+    # 沒有東西可以跳過，留著一個沒有作用的旗標會讓讀者以為預設是「有跑」。
     p_sync.add_argument("--json", action="store_true")
 
     p_stale = sub.add_parser(
@@ -3081,7 +3094,7 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "sync":
         retired = retire_legacy_pq1_items(pool)
-        collected = collect_all_with_health(include_decisions=not args.no_decisions)
+        collected = collect_all_with_health()
         result = sync(
             pool, collected.rows, healthy_sources=collected.healthy
         )
