@@ -33,9 +33,18 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 
 **同一 working tree 只讓一個 writer 寫入：** 執行本 plan 期間**暫停 Codex daily／weekly 排程**（它們與 0a.1、0a.2 改的是同一批檔），Phase 0 結案後再開。
 
+> **排程狀態（2026-09-22 15:28 實測，Step 0.0 記錄）：** 本機唯二的排程 writer `StockBotv2-Heartbeat`
+> 與 `StockBotv2-FxSync` 下次觸發都是 **2026-09-23 早上**；今天是星期二，Codex weekly（週日）不跑，
+> daily（台北 06:30）同樣是明天。**今天沒有第二個 writer，所以未停排程也不衝突。**
+> ⚠ **時限 2026-09-23 06:30**：Phase 0 若跨到明天早上，續工的第一件事是先暫停排程再動手。
+> 查證與細節見 [基準報告 §0](../reports/2026-09-22-phase0-baseline.md)。
+
+**進度表的 commit 欄：** 一個 Step 的 commit 短碼在它自己的 commit 裡算不出來（填進去就會改變雜湊），
+所以**由下一個 Step 的 commit 補填**；`○ → ✅` 本身在該 Step 的 commit 裡完成。
+
 | Step | 內容 | 狀態 | commit |
 |---|---|---|---|
-| 0.0 | 基準快照 | ○ | |
+| 0.0 | 基準快照 | ✅ | |
 | 0a.1 | 排程與規則停跑 | ○ | |
 | 0a.2 | 心跳與 APP 入口停跑 | ○ | |
 | 0a.3 | 研究 skill 改句 | ○ | |
