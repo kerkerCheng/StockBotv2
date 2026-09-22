@@ -20,6 +20,40 @@ derived_from: docs/ROADMAP.md（Phase 0）、docs/brainstorms/2026-09-22-graph-f
 
 ---
 
+## 0.5 核准狀態、續工方式、進度表
+
+**本 plan 是使用者 2026-09-22 已核准的 PLAN_PROPOSAL。** 0b 的 Z2 不再停等核准；`AGENTS.md`「常規推進授權」照用：
+Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Step，Step 與 Phase 邊界一視同仁**，做到 Phase 0 結案為止。
+只有六條停止條件之一成立才停（其中本 Phase 會撞到的只有：§6「撞到就停」的切不開情況、Verdict 不是 GO、需要 R2）。
+0c 的 pq2 批次 drop 已授權（見 §4），不再回頭請求。
+
+**每個 Step 一個 commit，訊息第一行寫 Step 編號；Step 為 GO 就 push。** 這是續工的唯一依據：新 session 先看下面進度表與 `git log --oneline -20`，
+從第一個未 ✅ 的 Step 接續，不重做已 ✅ 的。進度表由執行者在每個 Step 的 commit 裡更新（把 ○ 改 ✅ 並填 commit 短碼）。
+
+**同一 working tree 只讓一個 writer 寫入：** 執行本 plan 期間**暫停 Codex daily／weekly 排程**（它們與 0a.1、0a.2 改的是同一批檔），Phase 0 結案後再開。
+
+| Step | 內容 | 狀態 | commit |
+|---|---|---|---|
+| 0.0 | 基準快照 | ○ | |
+| 0a.1 | 排程與規則停跑 | ○ | |
+| 0a.2 | 心跳與 APP 入口停跑 | ○ | |
+| 0a.3 | 研究 skill 改句 | ○ | |
+| 0a.4 | 池子收集端停鑄 | ○ | |
+| 0b.1 | 個股頁樞紐重寫、斷 import | ○ | |
+| 0b.2 | 刪估值鏈 | ○ | |
+| 0b.3 | 排序與籃子 | ○ | |
+| 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
+| 0c | 池子 17 筆 drop | ○ | |
+| 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅ | ○ | |
+
+**開工／續工指令（貼給執行模型）：**
+
+```
+讀 docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md，依 §0.5 的進度表與 git log 找到第一個未完成的 Step，
+從那裡開始，走 development-flow（Z1 以上 R1）。沒有需要我核准的事就一直做到 Phase 0 結案；撞到六條停止條件才停。
+每個 Step 一個 commit 並更新進度表，GO 就 push。每個 Step 交回 HUMAN SUMMARY 與八欄。
+```
+
 ## 0. 不可越線（違反即 NO_GO）
 
 1. **不碰資料 authority：** 不碰 Neo4j、Engine C ledger、thesis lifecycle、Google Sheet、`library/private/`、`library/trades/`。
