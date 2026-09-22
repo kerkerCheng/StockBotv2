@@ -53,7 +53,9 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0b.1b-D | D 組整組退役：多年反向橋＋要幾倍＋那把尺 | ✅ | 2fb7960 |
 | 0b.1b-C | C／H 組：估值鏈與隱含報酬 | ○ | |
 | 0b.1b-F | F 組整組退役：entry criterion（進場門檻） | ✅ | c1d0331 |
-| 0b.1b-E | E 組整組退役：賭注四價 overlay（含 downside、target_reached） | ✅ | |
+| 0b.1b-E | E 組整組退役：賭注四價 overlay（含 downside、target_reached） | ✅ | bd34a63 |
+| 0b.1b-C/H（1/2） | 估值品質計數器（closure 三個數＋webapp 消費端） | ✅ | 3be1756 |
+| 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section（見 §0.9） | ○ | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
@@ -171,6 +173,60 @@ ROADMAP 驗收①與本 plan gate 8、R2 檢查 1 已同步。精確到（檔，
 | **proposed change** | 驗收改成「**命中但不在 keep-list 上的檔 = 0**」：在 `scripts/retired_mechanism_grep.py` 加一份 `KEEP` 清單（檔 → 為什麼留，逐檔一句），腳本多印一個數字「未列入 keep-list 的命中檔數」。**那一個數字才是 gate，而它可以是 0。** 誰新增一個命中的檔就會讓它非零 |
 | **why** | 保住原本的意圖（沒有殭屍**機制**），拿掉不可能達成的部分（沒有殭屍**字串**）。keep-list 逐檔寫理由，讓「為什麼留」可被質疑；季度重跑時看的是同一個數字 |
 | **impact** | 只動 `scripts/retired_mechanism_grep.py`（＋ROADMAP 那兩行驗收文字）。不動任何 authority、不放寬任何 gate。**執行者不自改**——批 2／3／4 的 grep 驗收會照實報告命中數與分類，結案 gate 8 等本 amendment 定案 |
+
+## 0.9 續工：C／H 2/2（樞紐）的精確落點
+
+**這是 Phase 0 剩下最大的一塊，也是唯一還沒動的樞紐。** 前面四組（D／F／E／C-H 1/2）已把它的
+外圍消費端全部斷乾淨，所以現在的 importer 地圖只剩 8 個檔（實測，2026-09-23）：
+
+| 退役模組 | 活 importer |
+|---|---|
+| `alpha/valuation` | `alpha/cli.py`、`alpha/providers/valuation_assumptions.py`、`alpha/refresh/artifacts.py`、`briefing/alpha_view/{builder,sources}.py`、`scripts/verify_test_nonvacuity.py` |
+| `alpha/implied_return` | 同上 ＋ `alpha/closure.py` 已斷、`alpha/providers/horizon_assumptions.py` |
+| `alpha/fundamental` 的**模型**半邊 | 只剩 `briefing/alpha_view/sources.py`（`build_fundamental_model`）|
+
+`alpha/providers/{valuation_assumptions,horizon_assumptions}.py` 本身只服務退役模型，**視為退役模組**
+（與 0b.1b-F 處理 `entry_criteria.py` 同一條）；ledger 檔案留在 `library/private/alpha/`（L10）。
+
+### 要從 read model 拆掉的 section（6 個；現有 21 段）
+
+| Section | 為什麼退役 | 注意 |
+|---|---|---|
+| `price_implied_expectations` | 價格隱含的 proxy（`market_implied_eps_growth`），C 組 regex 命中 | `reverse_dcf` 是 `not_modeled`，一起走 |
+| `internal_fundamentals` | 我們的 FY+1 預測，來自 `alpha/fundamental` 模型 | 它與下面兩個同出於 `_fundamental_parts()` |
+| `earnings_bridge` | FY+1 因果橋 | 同上 |
+| `valuation` | 估值鏈本體 | `CurrentPrice` 已於 0b.1a 搬進 `market` section，**不要跟著刪** |
+| `implied_return` | 隱含報酬 | `target_reached` 欄位已停算（E 組），這裡連欄位一起走 |
+| `scenarios` 的 `target_valuation` 一格 | 照抄 `valuation.fair_value` | ⚠ **section 本身留**：bull／base／bear 是 session 散文，不在 C／H regex 內 |
+
+### 三個切不開但可分開的地方（動手前先讀）
+
+1. **`expectation_gap_section`（builder 約 2392 行）同時服務活與退役**：
+   活的是 `gap_closure`（市場承認了嗎：共識 EPS 自判斷日以來的移動）與 `consensus_series`；
+   退役的是 `numeric_comparisons`（內部 vs 共識）、`opinion_stance`、`multiple_derivation`、`proxies`。
+   **可分開**（`gap_closure` 只需要判斷日與共識時序，不需要我們的模型），所以不是 §6 的停點。
+2. **`fundamental` analyst panel（已於 0b.1a 降為選配）** 會失去 internal／comparison 兩組 line，
+   留下 consensus／market_context。ROADMAP 稽核區「留 fundamental 原始數字」指的就是後者。
+3. **短評的 `{assumption:driver[scope]}` placeholder** 由 `bridge.assumptions` 填。橋退役後它會與
+   E 組拿掉的 `{bet_assumption:…}` 一樣印「（尚無）」。**placeholder 不得從封閉字彙移除**
+   （append-only 短評紀錄引用它，L10；三本既有短評都用了）。
+
+### 已知會紅的測試檔（逐檔列，改主詞不刪判準）
+
+`test_alpha_investment_view`、`test_alpha_view_fundamental`、`test_alpha_view_render`、
+`test_alpha_view_refresh`、`test_alpha_view_brief`、`test_alpha_view_as_of_cohr`、
+`test_full_chain_acceptance`（批 2 要**重寫**成新管線，不是刪）、`test_absence_semantics`、
+`test_gap_closure`、`test_opinion_stance`、`test_sole_source_tristate`、`test_estimate_revision`、
+`test_coverage_pilot_generalization`。
+**整檔退役的**：`test_valuation_model`、`test_implied_return`、`test_fundamental_model`。
+
+### 做法（前四組實測有效，照用）
+
+**逐組：斷 import → 刪模組 → 刪測試，同一個 commit，每個 commit 全測試綠。**
+⚠ **區塊切除（按「下一個 def」切）在這個檔上已經誤刪五次同區的活程式**
+（`_FundamentalParts`、`_SESSION_LEVEL_LABEL`、`WIPEOUT_IS_NOT`／`A_WIPEOUT`／`_wipeout_section`、
+`A_BRIEF`／`BRIEF_IS_NOT`）。每次都由測試當場抓到並逐字還原，但**切之前先 `awk` 列出該區間內
+所有頂層定義**會比事後修便宜。
 
 ## 0. 不可越線（違反即 NO_GO）
 
