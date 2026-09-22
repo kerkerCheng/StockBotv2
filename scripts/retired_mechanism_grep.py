@@ -27,7 +27,9 @@ def files():
             for dp,dn,fn in os.walk(r):
                 if skip.search(dp): continue
                 for f in fn:
-                    if f.endswith(('.py','.md','.js','.html','.json','.toml','.txt')): yield area,os.path.join(dp,f)
+                    fp=os.path.join(dp,f)
+                    if skip.search(fp): continue
+                    if f.endswith(('.py','.md','.js','.html','.json','.toml','.txt')): yield area,fp
 idx=collections.defaultdict(lambda:collections.defaultdict(dict))
 for area,p in files():
     if area=='code' and p.startswith('webapp'+os.sep+'static'): area='static'
