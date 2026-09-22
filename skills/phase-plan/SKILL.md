@@ -20,6 +20,7 @@ description: >
    與它列的「下一 Phase 要決定的問題」；`docs/brainstorms/README.md` 標「設計來源仍有效」的檔，若本 Phase 擴充它們就讀。
 3. **先 brainstorm，不先寫。** 把要使用者決定的判斷點列成一張清單，每點三行：選項、我的建議、理由一句。**一次問完，等答案。**
    ROADMAP 已定義到可直接執行的不問（那是思考紀律不是核准請求）。
+   **判斷點清單必含一題：本 Phase 執行期間六條 trigger 命中的 R2 要不要常規 opt-in**（答案寫進新 plan 的 §0.5；AGENTS 只常規 opt-in 結案的 R2）。
 4. 定案後寫 `docs/plans/<日期>-<序號>-<type>-phase<N>-<slug>-plan.md`，骨架照
    [`2026-09-22-001-refactor-phase0-retire-plan.md`](../../docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md)：
    frontmatter（`status: active`）、§0.5 核准狀態＋進度表＋開工指令、不可越線、Steps（改哪裡／怎麼改／怎麼驗）、

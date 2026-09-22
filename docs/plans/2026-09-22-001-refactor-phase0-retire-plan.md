@@ -26,6 +26,7 @@ derived_from: docs/ROADMAP.md（Phase 0）、docs/brainstorms/2026-09-22-graph-f
 Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Step，Step 與 Phase 邊界一視同仁**，做到 Phase 0 結案為止。
 只有六條停止條件之一成立才停（其中本 Phase 會撞到的只有：§6「撞到就停」的切不開情況、Verdict 不是 GO、需要 R2）。
 0c 的 pq2 批次 drop 已授權（見 §4），不再回頭請求。
+**本 Phase 執行期間六條 trigger 命中的 R2 一律常規 opt-in（使用者 2026-09-22 定案）**：0b.4 動到成交路徑硬擋時直接發 `WORK_REQUEST`，不停下來問。
 
 **每個 Step 一個 commit，訊息第一行寫 Step 編號；Step 為 GO 就 push。** 這是續工的唯一依據：新 session 先看下面進度表與 `git log --oneline -20`，
 從第一個未 ✅ 的 Step 接續，不重做已 ✅ 的。進度表由執行者在每個 Step 的 commit 裡更新（把 ○ 改 ✅ 並填 commit 短碼）。
