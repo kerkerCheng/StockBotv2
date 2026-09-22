@@ -69,7 +69,6 @@ writer lock 是雙向互斥：排程 harvest 也會 acquire `scheduled`，互動
 git status --short
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired          # 段 1：fired 的追源 watch 排回 pq1（零 token）
 & '.venv\Scripts\python.exe' -m engine_b.todo sync                  # 段 1 的 pq2 型翻醒＋同步待辦池
-& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run  # 段 2：只因 context 過期而 REVIEW 的，reassess 後結案
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go --run     # 段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go
 & '.venv\Scripts\python.exe' -m engine_b.cli counts
 & '.venv\Scripts\python.exe' -m engine_b.todo list
@@ -122,11 +121,13 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
    **深度優先**：第 N 檔未到終局不開第 N+1 檔，除非它卡在 pq2 或世界。終局三種：ready／
    剩餘 blocker 全部 settled／全部掛在 pq2 編號上。每一格的路（判準機械，見 `alpha/absence.py`）：
    - `not_yet_recorded`／`upstream_unavailable` 的基期實績、指引 → 抓一手財報寫 mechanical 觀測（不碰 gate）
-   - 營運假設、倍數、horizon、判斷檔 → session 判斷寫 ledger，evidence_refs 必須解析得到；倍數依
-     `AGENTS.md`「隱含報酬的兩個桿」預設校準倍數，折價要指得出證據
+   - ⚠ **2026-09-22（Phase 0）：營運假設、倍數、horizon 這三格隨估值鏈退役**（ROADMAP Phase 0／G3）。
+     判斷檔仍寫 ledger（敘事、短評、反證），evidence_refs 必須解析得到；**不再有校準倍數與折溢價主張**。
    - 客戶端承諾、獨立來源 → source-trace，可能結成 RA packet（入圖仍是 pq2）
    - `provider_missing` → 換來源，否則提案 Abstention（pq2，因為它把這格從工單上拿掉）
-   - **虧損檔（內部 EPS ≤ 0，本益比法無定義）→ 寫一筆 `ev_to_sales` 估值假設就走完，不需要 pq2**（2026-09-13 改）。估值 method **由 ledger 裡寫了哪一筆假設決定**，不再需要一筆 Abstention 當開關——**寫 ev_to_sales 本身就是「我選這個方法」的宣告**。⚠ 舊行為是每一檔虧損股都要鑄一個 pq2，實測連鑄 8 個、其中 7 個的內容由算術決定。⚠ `Abstention` 仍然只做它自己那件事：**宣告這一格不用再做**（→`settled`）——POET 就是那種（有 Abstention、沒有 ev_to_sales，fair value 仍然缺席且 settled）。⚠ **兩種假設不得並存**，並存時估值層直接拒絕並要你撤回一條。
+   - ⚠ **2026-09-22（Phase 0）：虧損檔選估值方法（`ev_to_sales` vs 本益比）那一條退役**
+     ——整個估值層不再存在。`Abstention` 保留它自己那件事：**宣告這一格不用再做**（→`settled`），
+     它是 append-only 紀錄，不是呈現層的標籤。
    - 判讀型 Engine C 觀測（backlog、客戶集中）→ 打包觀測提案（pq2）；同類缺口跨多檔就打包成一批
    每消一格 `python -m webapp materialize <TICKER>` 一次，讓下一格的判斷讀到新狀態。
 3.5. **結構讀圖過期或與圖不一致**（2026-09-17 Q5，段 key `stale_structure_readings`）——排在覆蓋缺口之前，因為它是**已投入研究的維護**，而且其中一類直接影響現有賭注。
@@ -171,40 +172,16 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 
 ---
 
-## Step 1.5 — 工單：寫 assessment **之前**先查該軸接受什麼
+## Step 1.5 — ~~寫 assessment 之前先查該軸接受什麼~~（2026-09-22 退役）
 
-```powershell
-& '.venv\Scripts\python.exe' -m decision_lab references <cohort_id> [--assessment <file>]
-```
+原本這一步跑 `decision_lab references <cohort_id>`，查每個信心軸接受哪些 authority
+（`financial_resilience` 只吃 `engine_c_financial`／`engine_c_manual`、`valuation_payoff` 只吃
+`engine_c_valuation`／`fx`／`market`…），並分辨「引用對不上」與「證據不足」這兩種完全不同的失敗。
 
-**這一步不是可選的。** 每個信心軸只接受特定 authority，寫錯了會得到
-`assessment_context_mismatch`——而那個碼看起來像「證據不足」，實際上是「引用對不上」，
-兩者的處置完全相反。
-
-它會直接告訴你三件事：
-- 每軸**接受哪些 authority**（例：`financial_resilience` 只吃 `engine_c_financial`／
-  `engine_c_manual`，**不收 `market`**；`valuation_payoff` 只吃 `engine_c_valuation`／
-  `fx`／`market`，**不收 `engine_c_financial`**）
-- 這份 frozen context 裡**有哪些 key 可以引用**（整串複製，字面必須完全一致）
-- 帶 `--assessment` 時逐條標出哪個 ref 不合格、為什麼
-
-⚠ **最重要的是它會分辨兩種完全不同的失敗：**
-
-| 工具說什麼 | 意義 | 處置 |
-|---|---|---|
-| `✗ 解析不到任何 key` | 引用寫錯（常見：把散文當 ref） | 改成 index 裡的 key |
-| `✗ authority 是 X，這一軸不接受` | 引用了對的東西給錯的軸 | 換一個該軸吃的 ref |
-| **`這一軸沒有任何合格引用`** | **上游根本沒產出該 authority** | **改引用救不了**——需要補上游資料，多半是 Engine C 人工觀測（使用者 gate） |
-
-第三種是研究做不完的：2026-08-31 實測 Schaeffler／Himax／Lynas 三個 cohort 的
-`commercial_maturity` 全部零合格引用，因為它只吃 `engine_c_backlog`／`engine_c_customer`，
-而那兩筆是財務核驗清單上的人工待填項。**這種軸誠實留 `unknown` 並把缺口寫進
-`missing_data`，不得硬塞其他 ref**——那就是讓引用去尋找能通過的權威（L15 的
-authority laundering）。
-
-**效率提示：** 同一個 authority 缺口常跨多個 cohort。逐張工單各撞一次是浪費——
-先把幾張的 `references` 一起查完，把同類缺口打包成一批 Engine C 觀測提案給使用者
-一次核准，比逐張跑有效得多。
+**五軸、Coverage 分數與 assessment JSON 整組在 Phase 0 退役**（ROADMAP Phase 0／G12）。
+**那條判準本身沒有退役，只是換了主詞**：寫任何判斷時，`evidence_refs` 必須解析得到，
+而「我找不到」與「它不存在」是兩個 claim（L11-5）。今天檢查它的地方是敘事 ledger 自己的
+ref 解析，不是一支前置查詢命令。
 
 ## Step 2 — 每一條的終局只有兩種，沒有第三種
 
@@ -222,8 +199,8 @@ Samsung 兩例都 park 成 scope 問題丟回給使用者，但契約早就允�
 **不得為了讓每條都有產出而製造空 Research Action。** park 必須附
 `parked_reason`、`trace_status`（封閉字彙）、`trace_next_trigger`、`trace_requires_user`。
 
-工單（decision gap）另有第三種終局：研究完成後可 `reassess` 產生新 decision receipt，
-再以 `todo work <n> --to completed --receipt decision:<id>` 結案。
+⚠ **2026-09-22（Phase 0）：工單（decision gap）原本的第三種終局「研究完成後重新評估、
+以新 decision receipt 結案」已退役**（ROADMAP Phase 0／G12）。終局回到兩種：packet 或誠實 park。
 
 ---
 
@@ -239,7 +216,7 @@ Samsung 兩例都 park 成 scope 問題丟回給使用者，但契約早就允�
 - **付費取得**（訂閱、報告購買）——必須另列 exact 金額與方案
 
 **這些不是停止，是繼續：** 產出入圖包、park 線索、跑工單、註冊新研究題目、
-確定性維護（凍結 context 過期 → `reassess`）。撞到硬 gate 時，把該項掛成 pq2 編號後
+確定性維護（fired watch 重排、pq2 型翻醒）。撞到硬 gate 時，把該項掛成 pq2 編號後
 **接著做下一條**，不要停下來等。
 
 **真正該停下來問的只有一種：需要使用者做 scope 決定**（例：「要不要把記憶體軸擴到
@@ -284,7 +261,6 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.event_watch counters   # fired_unconsumed 只剩假設對照型（lead 型與 pq2 型為 0）
-& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale    # 候選 0
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go       # 候選 0（常規授權類別都已排入 pq1）
 & '.venv\Scripts\python.exe' -m engine_b.cli counts          # triaged_go 為 0
 & '.venv\Scripts\python.exe' -m engine_b.todo list           # 無 queued／researching 的 dispatch_status
@@ -336,15 +312,14 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 成績單（Step 6）固定加三個數：到終局檔數（ready＋settled）、有 ready 檔的產業數、
 下一檔與它還缺的格。覆蓋缺口可能因為新節點入圖而增加，**增加不代表退步**，代表發現了新的層。
 
-**另外三個品質數由 `closure-gate` 自己印出來，照抄進成績單**（2026-09-10 起）：
-隱含報酬正負分布｜倍數＝校準倍數的檔數｜有折溢價主張的檔與各自的貢獻。
+⚠ **2026-09-22（Phase 0）：原本 `closure-gate` 還印三個估值品質數**（隱含報酬正負分布｜
+倍數＝校準倍數的檔數｜有折溢價主張的檔與貢獻）。**整條估值鏈退役**（ROADMAP Phase 0／G3），
+三個數一併退役。
 
-⚠ **這三個數是「衝檔數沒有犧牲品質」的唯一證據。** 68 檔的 blocker 完全同形，意味著最省事的
-做法是套同一份模板——而模板化的判斷在 readiness 上看起來跟真的一模一樣（ready 就是 ready）。
-它們掛在 closure-gate 上而不是另開一支命令，是因為每輪本來就要跑它：**計數器要自己出現，
-不能靠人記得去查**（L14）。有折溢價主張的每一筆都必須指得出證據（`AGENTS.md`「隱含報酬的
-兩個桿」）；全負時要先分辨「倍數貢獻接近 0 ＝市場太貴」與「負值大半來自倍數折價 ＝方法偏空」，
-**在分得出這兩者之前不要把「全負」讀成結論**。
+⚠ **它們要防的那件事沒有退役：** 68 檔的 blocker 完全同形，意味著最省事的做法是套同一份模板
+——而模板化的判斷在 readiness 上看起來跟真的一模一樣（ready 就是 ready）。
+接手這個角色的是 Phase 5 的量測（追蹤表三個 power-law 統計量＋來源標籤跟著 lead 走到 outcome）。
+**在它落地之前，「衝檔數沒有犧牲品質」沒有機械證據**——不得假裝有（L14-2：gate 本身也要驗）。
 
 ⚠ **token 用完不是停止條件，是中斷。** 中斷時必須：
 ① 所有 in-flight lead 都 checkpoint 在合法狀態（不留 `researching` 懸空）；

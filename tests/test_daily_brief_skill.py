@@ -29,7 +29,6 @@ def test_references_batch_verbs_and_operational_commands() -> None:
         "-m engine_b.cli",
         "-m engine_b.todo sync",
         "-m engine_b.todo work",
-        "-m decision_lab today",
         "drain",  # pq1 priority drain
         "classification-health",
         "--content-type",
@@ -177,15 +176,26 @@ def test_uses_persistent_todo_numbers_and_does_not_blindly_dispatch_batch() -> N
     assert "權限與完成狀態綁 action type＋receipt，不綁 provider" in text
 
 
-def test_decision_review_go_dispatches_gap_pq1_before_reassess() -> None:
-    text = _text()
-    assert "engine_b.todo dispatch" in text
-    assert "不得立刻拿舊" in text and "bare reassess" in text
-    assert "--to awaiting_approval" in text or "awaiting_approval" in text
-    assert "decision:<new_decision_id>" in text
-    assert "只 checkpoint 已由使用者 exact `go`" in text
-    assert "不授權 `dispatch`／`resolve`／`reassess`" in text
+def test_source_trace_go_dispatches_pq1_and_the_decision_review_path_is_gone() -> None:
+    """`source_trace_review` 的 `go` 仍是 dispatch 回 pq1；**`decision_review` 那條路已退役**。
 
+    ⚠ 2026-09-22（Phase 0 Step 0a.3）：原本這條測試守的是
+    「decision review 的 go 先 dispatch 成 gap pq1、不得拿舊 assessment 直接重新評估、
+    最後以新 decision receipt 結案」。**整條 Engine D 研究側在 Phase 0 退役**
+    （ROADMAP Phase 0／G12），所以斷言翻面：活的那半保留，退役的那半改成「必須不在」。
+    """
+    text = _text()
+    # 活的：追源型的 go 仍走同一組命令，work order 的 checkpoint 紀律一字未改
+    assert "engine_b.todo dispatch" in text
+    assert "engine_b.todo work" in text
+    assert "awaiting_approval" in text
+    assert "只 checkpoint 已由使用者 exact `go`" in text
+    # 退役的：不得再有「以新 decision receipt 結案」那條路
+    assert "decision:<new_decision_id>" not in text
+    assert "--intent paper" not in text
+    # 而反證／催化劑／到期三件套**沒有**跟著退役——它是 L7 的判準，Phase 1 的主角
+    assert "反證是必填，不是選填" in text
+    assert "可觀測、有門檻" in text and "48 小時動作" in text
 
 def test_every_alpha_pane_still_has_a_home_after_daily_stopped_embedding_them() -> None:
     """四個 pane **不得因為 Daily 不再嵌入就消失**——每一個都要指得出新家。
@@ -198,7 +208,9 @@ def test_every_alpha_pane_still_has_a_home_after_daily_stopped_embedding_them() 
     alpha = ALPHA_STATUS.read_text(encoding="utf-8")
 
     # ① alpha-status 仍是四 pane 的完整權威——判準只有一份，沒有被稀釋
-    for pane in ("## Pane 1 — 現在要投哪一檔", "## Pane 2 — 該去補誰的證據",
+    # 2026-09-22 Step 0a.3：pane 1 由「現在要投哪一檔」改為「結構長什麼樣 ＋ 候選狀態」
+    # ——跨檔排序與首選退役（G1／L19）。**四個 pane 仍然都在**，這條測試守的是那件事。
+    for pane in ("## Pane 1 — 結構長什麼樣 ＋ 候選狀態", "## Pane 2 — 該去補誰的證據",
                  "## Pane 3 — 哪裡還是空白", "## Pane 4 — 部位與問責"):
         assert pane in alpha, f"alpha-status 少了 {pane}"
     assert "本 skill 仍是「完整四 pane」的權威" in alpha

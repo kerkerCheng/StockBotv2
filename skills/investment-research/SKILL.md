@@ -48,14 +48,9 @@ query/graph_context.py    engine_c/checklist.py
 
 **指令參考：**
 ```powershell
-# 一條 Signal 到 zero-size／funded（依 intent）Action Card
-python -m decision_lab evaluate-signal "<Signal>" --ticker <TICKER> --intent research --format markdown
-
-# 重新讀取 authorities 並建立新 decision（不改寫舊 decision）
-python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent paper --format markdown
-
-# 今天是否需要動作（純讀、on-demand）
-python -m decision_lab today --format markdown
+# ⚠ 2026-09-22（Phase 0）：Engine D 研究側的三支命令（evaluate-signal／重新評估／今日動作）
+# 已退役（ROADMAP Phase 0／G12）。沒有替代命令——「今天有什麼」改由零 LLM 的心跳回答：
+python -m crons.heartbeat
 
 # 取公司子圖 context（2 跳供應鏈）
 python query/graph_context.py --company-id co:<ticker_lower>
@@ -99,11 +94,12 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 - 「我應該評估哪些公司？」
 
 **流程：**
-0. 若使用者提供新 Signal，先呼叫 `evaluate-signal ... --intent research` 做 wide capture；若問題是
-   「我現在是否該動作」，先呼叫 `python -m decision_lab today --format json`，再對相關 decision 呼叫
-   `python -m decision_lab card <decision_id>`。以 structured result 的
-   `action / urgency / weakest_link / paper / live / blockers / next_action` 為決策主幹；本 skill
-   只補研究解釋，不重算部位、不同 lane 的 Gate 或 freshness。
+0. 若使用者提供新 Signal，走 [`skills/lead-intake`](../lead-intake/SKILL.md) 登記成 lead；
+   若問題是「我現在是否該動作」，跑 `python -m crons.heartbeat` 讀段 2（變了什麼）與段 4（部位）。
+   ⚠ 2026-09-22（Phase 0）：原本這一步呼叫 Engine D 的 `evaluate-signal`／`today`／`card`，
+   並以 `action / urgency / weakest_link / paper / live / blockers / next_action` 當決策主幹。
+   **那整組欄位隨 Engine D 研究側退役**——系統不再輸出 `action` 或 `urgency`，
+   也不再給部位尺寸。**進場靠判斷，出場靠 disproof。**
 1. 執行 `python query/graph_context.py --company-id co:<ticker>` 取子圖
 2. 執行 `python engine_c/checklist.py <TICKER>` 取財務快照
 3. 評估以下四個維度（這是研究 agent 的判斷，不是自動化）：
@@ -113,13 +109,14 @@ python thesis/generate_lane_memo.py --company-id co:<ticker_lower>
 | **供應鏈位置** | 這家公司在哪個 abstraction_level？role 是什麼？有幾條邊？ |
 | **瓶頸性** | `sole_source` 有多少？`substitutability` 分布？替代路徑存在嗎？ |
 | **來源品質** | 最強主張是 tier 幾？origin_entity 有幾個？有無 L8 偏誤？ |
-| **財務錨點** | 毛利率趨勢？EV/Revenue？估值隱含什麼假設？ |
+| **財務錨點** | 毛利率趨勢？三題：會死嗎（歸零旗標）／已定價嗎（自己的歷史百分位）／出現在數字裡了嗎？ |
 
 4. 套 L8 偏誤檢查：若所有關鍵主張的 source_ids 都是同一家公司的文件 → 主動警告
 5. 回答要包含：現在知道什麼 / 還不確定什麼 / 什麼資訊能改變看法
-6. 若研究結果要進入 Decision Lab，產生五軸 assessment JSON；每個非 `unknown` 軸只能引用這次
-   bounded graph／Engine C／market context 的 stable refs。呼叫 `reassess` 讓 Python 驗 refs、freeze、
-   Coverage、Confidence／sizing 與 audit trail；skill 不自行算 ceiling、supported range 或 paper target。
+6. ⚠ **2026-09-22（Phase 0）：原本第 6 步是產生五軸 assessment JSON 交給 Decision Lab
+   重算 Coverage／Confidence／sizing。整條退役**（ROADMAP Phase 0／G12）。研究結論的去處是：
+   要入圖走 `ra_admission`（pq2 核准）、構成方向寫 Lane Memo（含 `disproof_condition` 三件套）、
+   兩者都不到就 park 並留 `trace_*` 欄位。**系統不給尺寸，也不再算任何 ceiling。**
 
 **格式：** 結構化評估（位置 → 瓶頸 → 來源品質 → 財務） + 信心度 + 知識缺口
 
@@ -211,11 +208,11 @@ python thesis/generate_lane_memo.py --company-id co:<slug> --ticker <TICKER> --o
 **觸發：** 使用者問「我該投多少」、「這檔值不值得加倉」、「我的 AI bucket 還有空間嗎」。
 
 **流程：**
-0. Probe／既有持股的「現在是否動作」先跑 `python -m decision_lab today --format json`，再讀相關
-   Action Card；兩者都是純讀。新 Signal 用 `evaluate-signal`，新 evidence／price／FX／holdings／policy
-   用 `reassess`。只有使用者明確指定 `paper`／`live` intent 才評估相應 lane；live 仍須使用者明確
-   `record-choice`、自行下單，再用 `record-fill` 回報，任何一步都不得由 recommendation 推定。
-   只有已正式升格的部位才走下列 formal policy 流程。
+0. ⚠ **2026-09-22（Phase 0）：Engine D 的 `today`／`card`／`evaluate-signal`／重新評估
+   與 `record-choice`／`record-fill` 已退役**（ROADMAP Phase 0／G12：舊店凍結唯讀）。
+   既有持股的現況讀 `python -m crons.heartbeat` 段 4；**成交紀錄改由 `scripts/record_trade.py`
+   寫 Sheet 與 trade_log**，5% 單筆與 ETF 槓桿 cap 的硬擋在那條路上（批 4 落地），
+   `--override --reason` 才放行並留收據。**系統不給尺寸、不下單、不連 broker，永遠人工。**
 1. 執行 `python fetchers/gsheets.py --ticker <TICKER>` 取持倉資料
 2. 執行 `python fetchers/gsheets.py --summary` 取 ai_theme bucket 使用率
 3. 查 Engine C 估值數據：`python engine_c/checklist.py <TICKER>`
@@ -282,8 +279,10 @@ L9 三個前置條件（仍然有效，只是它們不再通往任何「層」�
 
 ## 與既有系統的接點
 
-- Engine D operational workflow：`python -m decision_lab evaluate-signal`／`reassess`／`today`／`card`
-- Explicit live facts：`python -m decision_lab record-choice`／`record-fill`（不連 broker、不寫 Sheet）
+- ~~Engine D operational workflow／explicit live facts~~：整組已於 2026-09-22（Phase 0）退役；
+  舊店只剩唯讀歷史（`python -m decision_lab history`／`status`）
+- 每日現況（零 LLM 五段）：`python -m crons.heartbeat`
+- 成交紀錄與硬擋：`scripts/record_trade.py`（寫 Sheet 與 `library/trades/trade_log.jsonl`）
 - 取圖 context：`query/graph_context.py`
 - 財務快照：`engine_c/etl_yfinance.py`、`engine_c/checklist.py`
 - Lane Memo 生成：`thesis/generate_lane_memo.py`

@@ -20,16 +20,12 @@ description: >
 讀輸入後立刻給：
 ```
 
-同時，先用同一條 Engine D operational workflow 保存 Signal、Shadow 與 prospective cohort：
-
-```powershell
-python -m decision_lab evaluate-signal "<原始 Signal>" --source-url "<URL>" --ticker <TICKER> --intent research --format json
-```
-
-URL／ticker 不確定時可省略；workflow 會保留 unresolved／missing 狀態並產 work order，不可猜值。
-這一步不代表 evidence admission、不寫 Engine A，也不建立 funded paper。記下回傳的 public
-`decision_id`／`cohort_id`；不要自行準備 `context_digest`、Coverage ID、holdings digest 或 idempotency key。
-後續 Coverage／Confidence／sizing／Action Card 仍只走這條 application workflow，不在本 skill 複製公式。
+⚠ **2026-09-22（Phase 0 Step 0a.3）：這裡原本要先跑一次 Engine D workflow**
+（`decision_lab evaluate-signal`）保存 Signal／Shadow／prospective cohort。**那條路已退役**
+（ROADMAP Phase 0／G12：decision_lab 研究側退役、舊店凍結唯讀）。
+現在分類完就直接走下面的流程：登記 lead → 拆原子 claim → 驗證 → 分層處置。
+**沒有東西取代它，因為它本來不產生任何 authority**——它產生的是編號與 coverage 分數，
+而那些正是 Phase 0 要拿掉的中間層。
 訊號類型：[產品/技術消息 | 供應鏈異動 | 法說/財報 | 市場情緒/猜測]
 關聯圖內公司：[列出或「無」]
 初始 tier：[1-4]
@@ -175,34 +171,31 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 若這批線索構成一個方向,用 `query/graph_context.py` 取 context → `thesis/generate_lane_memo.py`
 (system prompt:`prompts/lane_memo_system.md`)產出 Lane Memo 草稿。必含:
 - 一句 thesis / 需求驅動 / stack 摘要 / 主瓶頸 / 最強證據 / 什麼會推翻它 / 接下來盯什麼
-- **variant perception(必填):** 用「**當前股價/估值隱含假設 X → 本 thesis 認為 Y → 催化劑 Z**」格式,
-  從 forward P/E / EV-Sales 反推,**不是**「多數人沒注意到」。缺這段不能升格(估值數字現缺 → 標 TODO,等引擎C)。
+- **與市場的差異（2026-09-22 起不再必填）:** 原本要求用「當前股價／估值隱含假設 X → 本 thesis 認為 Y
+  → 催化劑 Z」，從 forward P/E／EV-Sales 反推。**反推那一步隨估值鏈退役**（ROADMAP Phase 0）。
+  接手的是財務三題的第二題「已定價嗎」——主參照是**自己的歷史**、主題籃子只當脈絡、**不設門檻**
+  （`AGENTS.md`「財務只回答三個是非題」）。三題要到 Phase 3 才落地，在那之前這一格寫得出來就寫、
+  寫不出來就留白並說明，**不得回頭長一個估值模型出來**。
 - **`disproof_condition` + 核查頻率 + 觸發後 48h 動作**(L7,缺這兩個欄位等於沒裝火警)。
 > Lane Memo 是方向備忘,**不是可操作投資建議**。財務核驗 5 項(L9)是另一道 gate,不在本流程內。
 > ⚠ 2026-09-21 改寫:原文寫「升格 Watchlist」,而三級階梯已於 2026-09-02 除役(`docs/ARCHITECTURE.md` §9)。
 
-### Step 7 — 回到同一條 Engine D workflow
+### Step 7 — ~~回到同一條 Engine D workflow~~（2026-09-22 退役）
 
-研究完成後，把五軸的語意判斷與「本次 bounded context 內實際存在」的 stable evidence refs 寫成
-assessment JSON；skill 只判斷 level／reason／missing data，不計算 Confidence ceiling 或部位。接著執行：
+原本這一步要把五軸判斷寫成 assessment JSON、跑 `decision_lab reassess`，由 workflow 重算 Coverage
+與 sizing 並產 Action Card。**整條 Engine D 研究側已於 Phase 0 退役**（ROADMAP Phase 0／G12）：
+五軸、Coverage 分數、Confidence ceiling、sizing 全部不再存在，系統也不再給部位尺寸。
 
-```powershell
-python -m decision_lab reassess <decision_id> --assessment <assessment.json> --intent paper --format markdown
-```
+**接在 Step 6 之後的是人，不是另一個命令。** 研究結論的去處只有三個，全部已在上面的步驟裡：
 
-`paper` 是預設（2026-08-08 定案）：它是模擬帳本，不碰真錢、不寫 Google Sheet、不建 live
-permission。先前預設 `research` 的後果是 paper lane 從不被 request，帳本永遠是空的，因而
-無法回答「系統的判斷準不準」。只有標的正處於使用者設定的 hold 期間才用 `--intent research`；
-評估 live 時改 `--intent live`，另需當次 `--confirm-holdings`。Workflow 會重讀 authorities、freeze 新 context、驗 refs、跑既有 Coverage／sizing，
-舊 decision 不會被修改。缺圖、COHR `manual_required`、price／FX／Sheet 缺口都照 Card blocker 處理，
-不得在 skill 內補零值、替代 ref 或自行提高 evidence tier。
-
----
+1. 要入圖 → Step 5 的 `prepare_research_action`，`ra_admission` 進 pq2 等使用者核准；
+2. 構成方向 → Step 6 的 Lane Memo 草稿（含 `disproof_condition` 三件套）；
+3. 兩者都不到 → park 並帶 `trace_status`／`trace_attempts_ref`／`trace_next_trigger`／`trace_requires_user`。
 
 ## 與既有系統的接點(檔案對照)
-- Signal → Shadow → Action Card：`python -m decision_lab evaluate-signal ...`／`reassess ...`
-- Decision Lab Action Card：`python -m decision_lab card <decision_id>`（純讀，不產生交易）
-- 今日 action brief：`python -m decision_lab today --format markdown`（純讀、on-demand）
+- ~~Signal → Shadow → Action Card／今日 action brief~~：整組 Engine D 研究側命令已於
+  2026-09-22（Phase 0）退役；舊店只剩唯讀歷史（`python -m decision_lab history`／`status`）
+- 每日現況：`python -m crons.heartbeat`（零 LLM 五段）；需要判斷時才進互動 session
 - 原文落地:`library/raw/`
 - 中介格式:`schema/intermediate_format.schema.json`、字彙:`schema/vocab.json`
 - 抽取參考:`prompts/extract_system.md`(L6 Gap4 幻覺規則在此)、`extract.py`

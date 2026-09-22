@@ -77,15 +77,18 @@ fixed entry 包含
 `scripts\alpha_purity_snapshot.py`、
 `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
 `scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
-`decision_lab today`、`engine_b.todo sync`、`engine_b.todo work`、`engine_b.todo reassess-stale`、
+`engine_b.todo sync`、`engine_b.todo work`、
 `engine_b.todo standing-go`、`scripts\publish_daily_brief.py` 與
-`-m webapp materialize`；十四條 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+`-m webapp materialize`；那組 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
+**條數不寫死在這裡**（寫死的數字會腐壞，而它腐壞過一次）——查證：`pytest tests/test_codex_daily_permissions.py`。
+⚠ 2026-09-22（Phase 0 Step 0a.1）：`decision_lab today` 與 `engine_b.todo reassess-stale`
+兩條已隨 decision_lab 研究側退役移除，14 → 12。
 `engine_b.cli consume-fired` 刻意**不在列**：它只讀寫 repo 內 JSON，在 sandbox 內就能跑（與 `event_watch sweep` 同先例）。
 ⚠ `fetchers/` 不是整包放行：只有 `edgar.py` 與 `mops.py` 在列，`gsheets.py` 帶 Google 憑證故排除。
-`engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 decision-review work order；
-它不授權 `dispatch`／`resolve`／`reassess`，也不放寬 graph admission 或 live gate。
+`engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 work order；
+它不授權 `dispatch`／`resolve`，也不放寬 graph admission 或 live gate。
 `query.bottleneck`、`query.coverage_gaps`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
-apply／reassess／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
+apply／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
 若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，
 不得改用第二條更寬 rule、手動重跑或改寫成「零筆」／`no_result`。權限正確後若仍發生暫時性 transport error，
 只允許該命令**既有的 bounded、idempotent retry 作最後一步**（例如 TWSE bounded retry、Discord 每段最多
@@ -157,9 +160,11 @@ PASS classification 的封閉字彙與判準只認 `skills/signal-triage/SKILL.m
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired          # 段 1：fired 的追源 watch 排回 pq1（sandbox 內）
 & '.venv\Scripts\python.exe' -m engine_b.todo sync                  # 段 1 的 pq2 型翻醒（既有）
-& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run  # 段 2：純 system_internal blocker 的 REVIEW → reassess 結案（exact rule）
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go --run     # 段 2b：常規授權類別直接下使用者本來會下的 go（exact rule）
 ```
+
+⚠ 2026-09-22（Phase 0 Step 0a.1）：原本這裡有第三支 `engine_b.todo reassess-stale --run`（段 2）。
+段 2 隨 decision_lab 研究側退役，**佇列段序的封閉字彙已移除那一段**，所以它既不是機械段也不再有 rule。
 
 三支的輸出數字進 brief 首屏的「今日自動清了 N」計數器（見模板）；skipped 逐筆列理由。**判斷類（forward view、
 decision gap 研究）不在 daily 自動做**——LLM 無人值守寫判斷檔的 allowlist 縮不到安全範圍，那是 research-drain 的事。
@@ -188,39 +193,30 @@ checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
 ```
 
-Decision review 的 `go` 只授權 bounded gap research，先留下跨 session receipt，**不得立刻拿舊
-assessment bare reassess**：
+`source_trace_review` 的 `go` 只授權 bounded 追源，先留下跨 session receipt：
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.todo dispatch <todo_n>
 & '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to researching --receipt <研究起始ref>
 ```
 
-若只需讀既有 authorities／生成五軸 assessment，可完成研究後執行 `reassess`，再用新
-decision receipt 結案：
+⚠ **2026-09-22（Phase 0）：`decision_review` 型的 `go` 已退役。** 原本這裡還有一條路——
+把五軸 assessment 交給 Engine D 重新評估、以新 decision receipt 結案。
+**整條 Engine D 研究側在 Phase 0 退役**（ROADMAP Phase 0／G12：舊店凍結唯讀、收據改跟著成交事件走），
+池子裡未結案的 17 筆在 Step 0c 一次 drop，理由「機制退役」。
+**沒有替代流程**：研究的載體是 pq1 lead 與 `source_trace_review`，入圖仍走 `ra_admission`。
 
-```powershell
-& '.venv\Scripts\python.exe' -m decision_lab reassess <baseline_decision_id> --assessment <assessment.json> --catalyst "<可驗證催化劑>" --disproof "<可證偽條件>" --expiry <ISO-8601> --intent paper
-& '.venv\Scripts\python.exe' -m engine_b.todo work <todo_n> --to completed --receipt decision:<new_decision_id>
-```
+⚠ **2026-09-22（Phase 0）：`intent`（paper／research／live）與 `research_status`
+（`READY`／`INCOMPLETE`／`DATA_NEEDED`）整組退役**（ROADMAP Phase 0／G12）。
+「系統的判斷準不準」改由**追蹤表的等權報酬與三個 power-law 統計量**回答
+（`AGENTS.md`「量測」；基準含主題等權籃子），不再有 paper lane、不再有模擬部位。
 
-**`--intent paper` 是預設（2026-08-08 使用者定案；2026-08-28 語意改變）。** intent 不再產生
-任何模擬部位——資本表達層已整組移除。它現在只決定**要求哪些 lane 的資料完整度**，進而影響
-`research_status`（`READY`／`INCOMPLETE`／`DATA_NEEDED`）。
+**下面三段沒有退役，而且它們是 Phase 1 的主角**：反證、催化劑、到期是 `AGENTS.md`
+與 L7 的判準（每份 thesis／claim 必帶 `disproof_condition` 三件套），只是承載它的欄位
+從 Engine D 的 CLI 旗標換成 thesis／敘事 ledger 自己的欄位。判準一字未改。
 
-⚠ intent **不會**壓低研究完整度。`execution_intent_research_only` 這類碼在
-`config/decision_blockers.json` 是 `diagnostic` 級，自 2026-08-29 起不再有改判權
-（判準改用 `fatal_blockers`），所以 `research` intent 一樣可以是 `READY`。
-維持 `--intent paper` 為預設是為了讓同一 cohort 的評估條件不因呼叫端習慣而跳動。
-
-「系統的判斷準不準」由等權重報酬回答，錨點是 Shadow observation（只有價格與時點，不含部位），
-與 intent 無關。
-
-只有在**明確不想留下模擬部位**時才用 `--intent research`（例如 thesis 正處於使用者設定的
-hold 期間）。
-
-**`--disproof` 是必填，不是選填。** 它只是一句話、不依賴任何外部證據，卻是系統第一大
-blocker（實測 9 個 cohort 有 4 個卡在 `disproof_missing`）。研究迴圈產 packet、產 work order，
+**反證是必填，不是選填。** 它只是一句話、不依賴任何外部證據，卻曾是系統第一大
+blocker（實測 9 個 cohort 有 4 個卡在缺反證）。研究迴圈產 packet、產 work order，
 就是不產那句話——這是產出規格缺一欄，不是證據不足。合格的證偽條件必須**可觀測、有門檻、
 有日期**，並依 L7 附上核查頻率與觸發後 48 小時動作：
 
@@ -233,14 +229,14 @@ blocker（實測 9 個 cohort 有 4 個卡在 `disproof_missing`）。研究迴�
 證偽條件由 agent 起草，但**必須隨 packet 進 pq2 由使用者確認**：讓「想證明 thesis 成立」的
 同一個 agent 自己決定自己的證偽門檻，是 L8 形狀的自我報告偏誤，會寫出一個永遠不會響的警報。
 
-**`--expiry` 必須由催化劑的預期時點決定，不是固定期間。** `catalyst / disproof / expiry` 是
+**到期必須由催化劑的預期時點決定，不是固定期間。** 催化劑／反證／到期 是
 一組：「我預期 X 在 T 之前發生；沒發生就代表時序假設錯了。」硬規則是 **expiry 不得早於
 催化劑的預期時點**——實測 co:axt 的 expiry 是 2026-08-09 而催化劑是 2026-11 初的 Q3 10-Q，
 催化劑根本不可能在有效期內發生，這種設定保證產生一次假到期。催化劑有明確日期時取
 「該日 ＋1～2 週緩衝」；沒有明確日期時取「下一個可能揭露的時點」，通常是下一次財報。
 
 若結果需要 Engine A 入圖、Engine C manual observation、thesis revise／retire 或其他 authority mutation，
-先 checkpoint `awaiting_approval` 並把完整 packet 放回 pq2；人工 gate 完成且取得 receipt 後才 reassess。
+先 checkpoint `awaiting_approval` 並把完整 packet 放回 pq2；人工 gate 完成且取得 receipt 後才續作。
 
 pq1 是唯一昂貴階段（web search + 讀文件 + 抽 claim）——priority 決定貴的 token 先花在哪。被 5 小時
 限制/中斷後**重跑 drain 從剩下的接**（靠 lead status checkpoint）。有可核准的 graph delta 才 prepare；
@@ -300,25 +296,26 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 ### Step 4 — 今日決策佇列、部位與到期 thesis
 
 ```powershell
-& '.venv\Scripts\python.exe' -m decision_lab today --format markdown
 & '.venv\Scripts\python.exe' scripts\catalyst_watch.py
 & '.venv\Scripts\python.exe' scripts\outcome_if_settled_today.py
 ```
 
-⚠ **2026-09-08 起，瓶頸排序、產業分組、覆蓋缺口與標的純度不再由 Daily 印出**——它們住 APP
-（`#/ranking`、`#/coverage`），由收尾的 `-m webapp materialize` 每天更新。Daily 仍需要排序資料，
-但只用來算「較昨變動」：`decision_lab today` 的輸出已含兩份排序，與
-`library/private/decision_lab/ranking_order_snapshots.jsonl` 的前一筆比對即可。因此
-`query.bottleneck`／`--by-sector`／`alpha_purity_snapshot`／`query.coverage_gaps` 四支從 Daily
-的命令清單移除；它們仍是 [`skills/alpha-status`](../alpha-status/SKILL.md) 的入口，隨叫隨到。
+⚠ **2026-09-08 起，覆蓋缺口與標的純度不再由 Daily 印出**——它們住 APP（`#/coverage`），
+由收尾的 `-m webapp materialize` 每天更新。`query.bottleneck`／`alpha_purity_snapshot`／
+`query.coverage_gaps` 從 Daily 的命令清單移除；它們仍是
+[`skills/alpha-status`](../alpha-status/SKILL.md) 的入口，隨叫隨到。
 
-⚠ **這不推翻 2026-08-19 的教訓，正好相反。** 當時的問題是 `rank_bottlenecks()` 早就把
-COHR→NVIDIA 排在第 1，但 brief 沒有消費端，於是使用者問「推薦哪一檔」時 agent 只能答
-「無法推薦」——**做了正確的工作，產出沒有消費端**（L13）。今天它有兩個消費端：APP 的
-`#/ranking`（完整、隨時可看）與 Daily 的「較昨變動」（只講今天不一樣的地方）。
-**要把一段內容移出 Daily，唯一合法的前提是它在別處已經讀得到**；反過來做就是 L13 重演。
+⚠ **2026-09-22（Phase 0／G1）：跨檔排序整組退役，「較昨變動」的排序基準也一併退役。**
+原本 Daily 用 `decision_lab today` 已含的兩份排序與 `ranking_order_snapshots.jsonl` 的前一筆
+比對出「首選換人／前五進出」。**排序不再是任何佇列或頁面的輸入**（ROADMAP 硬約束 4），
+所以這裡沒有替代基準——**不得改用別的排序來源補回來**。結構表只做稽核。
 
-第一支是決策佇列與常駐計數器的唯一權威，也提供部位與問責那一段的資料。第二支是**賣出側**：
+⚠ **2026-08-19 的教訓仍然成立，只是主詞換了。** 當時的問題是：正確的工作做完了，
+產出卻沒有消費端，於是使用者問什麼都答不出來（L13）。**要把一段內容移出 Daily，唯一合法的
+前提是它在別處已經讀得到**——這條規則一字未改，順序仍是「APP 先讀得到，Daily 才能不印」。
+差別在今天被移走的是**排序本身**，而它不是搬家，是退役：接手的是讀圖與候選狀態板（Phase 2、3）。
+
+第一支是**賣出側**：
 把每筆 decision 已經必填的 `disproof`／`catalyst`／`expiry` 從卡片上的散文變成每天被檢查的狀態。
 L7 的原話是「欄位有填但沒有後續流程，等於貼了一個永遠不會響的火警警報」——這一支就是那個缺掉的
 流程。它是**條件檢查不是訊號**（只回答「你自己寫下的條件今天到了沒」，不預測任何東西），因此不受
@@ -328,12 +325,11 @@ L7 的原話是「欄位有填但沒有後續流程，等於貼了一個永遠�
 其實是編的」提醒，比沒有提醒危險。報表末尾必須顯示「N/M 檔有結構化催化劑日期」——其餘檔的
 `expiry 早於催化劑` 錯誤測不到，**沒抓到問題不等於沒有問題**（L13）。
 
-第三支唯讀提供真實 fill、最新已收盤價與 point-in-time 報酬，不 close、不寫 authority；它也負責
-append 當日的排序快照（同日去重），那是「較昨變動」的基準。
+第二支唯讀提供真實 fill、最新已收盤價與 point-in-time 報酬，不 close、不寫 authority。
+⚠ 2026-09-22：它原本還 append 當日的**排序**快照當「較昨變動」的基準，那一段隨排序退役。
 
-`decision_lab today` 自 2026-09-05 起在排序之後多一區 **「Alpha Card 摘要」**（可行動排序前 5 檔
-各壓成一列）。**Daily 不再印它**——單檔的完整判讀在 APP 的單檔頁面，比一列摘要完整得多；需要
-終端機版本時用 `& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER>`。
+單檔的完整判讀在 APP 的單檔頁面；需要終端機版本時用
+`& '.venv\Scripts\python.exe' -m briefing alpha-card <TICKER>`。
 
 
 ### Step 5 — 同步統一待辦池並組 brief（繁中、exception-first、**穩定編號**）
@@ -477,12 +473,14 @@ tier）；其他類型由撰寫者一句話回答「核准後我的圖／authori
 
 **pq1 排序標籤必附圖例**（2026-08-31 使用者定案）：brief 出現 `候選集合·財務事實` 這類
 複合標籤時，同一節開頭固定放一行圖例，不得假設使用者記得字彙表：
-`標籤讀法：前段＝答案回來會改什麼（出場條件>候選集合>排序>只是信心），後段＝材料是什麼（資本承諾/結構事實/財務事實/內部人/情緒）`。
+`標籤讀法：前段＝答案回來會改什麼（出場條件>候選集合>只是信心），後段＝材料是什麼（資本承諾/結構事實/財務事實/內部人/情緒）`。
+⚠ 2026-09-22（Phase 0／G1）：`排序` 那一值隨跨檔排序退役。封閉字彙本身在批 3 更新——
+**在那之前讀到它就當 `只是信心`，不得據它排序**。
 字彙 SSOT 仍是 `config/lead_classification.json`，圖例措辭與其 label 同步。
 
 **區塊依「現在能不能決定」分，不依類型分（2026-08-31 使用者定案）：** 四段固定為
-「建議 go／建議 drop／你之前說晚點再決定的／不用動」；`ra_admission`／`decision_review`／
-`source_trace_review` 這些是系統的分類軸，不再拿來當使用者可見的段落標題。同一段內
+「建議 go／建議 drop／你之前說晚點再決定的／不用動」；`ra_admission`／`source_trace_review`
+這些是系統的分類軸，不再拿來當使用者可見的段落標題。同一段內
 若有多種類型，用每項自己的「授權範圍」行區分。
 
 ⚠ **第三段不得摺疊，也不得併進「不用動」。** 分段依據是 `waiting_on` 是否為空——
@@ -598,26 +596,26 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 ## 現況：都在 APP，Daily 只講變動（無 pq2 編號）
 
-今日自動清了 N（fired 重排 a／reassess 結案 b／常規授權 go c），機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R（拒寫逐筆列理由）｜每檔閉環：到終局 T／未到終局 U，下一檔 X
+今日自動清了 N（fired 重排 a／常規授權 go c），機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R（拒寫逐筆列理由）｜每檔閉環：到終局 T／未到終局 U，下一檔 X
 <2026-09-09 P5 固定第一行（L14 常駐計數器）：數字照抄三支機械段命令與 `webapp status` 的「每檔閉環」行；沒跑成寫「未跑：<原因>」，不得印 0>
 
 四個持久畫面由收尾的 `-m webapp materialize` 每天更新；**本段只印計數與較昨變動，完整內容一律不重印**。
 
 | 畫面 | 今天 | 較昨 |
 |---|---|---|
-| 瓶頸排序 `#/ranking` | 可行動 N 條；首選 <公司（ticker）→ 瓶頸> | 首選未變／前五無進出 |
+| 結構表 `#/ranking` | N 條（**只印條數；不印首選、不印名次**——2026-09-22 排序退役） | — |
 | 資產配置 `#/beta` | 6 sleeve：低於 N／高於 N／到位 N | 無門檻跨越 |
 | 研究缺口 `#/coverage` | 🔴 真缺口 N／🟡 建模待補 N | ±0 |
 | 在等什麼 `#/watches` | 在等 N／停滯 N／fired 未消化 N／追源需處置 N | fired +1 |
 
 必填規則：
 
-- **有變動才展開，各一行寫清楚「什麼變了」**：首選換人、sleeve 進出容忍區間、風控門檻被跨過、
+- **有變動才展開，各一行寫清楚「什麼變了」**：sleeve 進出容忍區間、風控門檻被跨過、
   缺口節點增減、watch 由 active 轉 fired／stalled。沒變就只留計數。
-  排序的較昨基準是 `library/private/decision_lab/ranking_order_snapshots.jsonl`（每日 append、同日去重）。
+  ⚠ **「首選換人」已不是變動項**——沒有首選了（2026-09-22 Phase 0／G1）。結構表那一列沒有較昨基準。
 - ⚠ **APP 若沒被 materialize（收尾那一步失敗），本段必須改印「APP 未更新：<原因>」**，
   不得照印昨天的計數——否則「看不到」與「沒發生」又同形了（L12）。
-- 排序的完整讀法與已知限制、Beta 的逐檔心跳與目標配置表、兩條相關性警告、缺口清單與 watch 清單
+- 結構表的完整讀法與已知限制、Beta 的逐檔心跳與目標配置表、兩條相關性警告、缺口清單與 watch 清單
   **都住 APP，Daily 不再複述**（2026-09-08 使用者定案；契約見 `AGENTS.md`「Beta 呈現契約」與
   「APP 呈現契約」）。要看完整版本：開 APP，或呼叫 `$alpha-status`（它仍是四 pane 的完整權威）。
 
@@ -681,18 +679,18 @@ dispatch 或同時寫同一 working tree。
 ```
 
 依編號對應的**項目類型** dispatch（type-aware；動詞不新增任何權限語意）。`todo batch` 不會代做
-pq1／apply／reassess；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先完成或 checkpoint 對應動作，
+pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先完成或 checkpoint 對應動作，
 再由 type-specific completion command（或附該類型要求的 receipt）結案，不能先 resolve 再假裝已執行：
 
-| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | Decision review | 到期 thesis |
-|------|-------------|---------------------|-------------------|-----------------|-------------|
-| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下）＋入圖後自動建 Shadow | `todo dispatch` 排入 gap pq1；不先 resolve、不 bare reassess | 引導複查；authority mutation 仍另核准 |
-| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 略過本次補缺口 | 標記已看、不複查 |
-| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 | 同左 |
+| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | 到期 thesis |
+|------|-------------|---------------------|-------------------|-------------|
+| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准 |
+| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 標記已看、不複查 |
+| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 |
 
-`decision_review go` 的原 pq2 項目在研究期間維持 active，但標成 queued／researching／awaiting_approval，
-brief 不得再次請使用者 go。只有 `parked` outcome receipt，或補缺口後產生的**新 decision receipt**，才能
-結案；舊 baseline decision 不算完成 receipt。
+⚠ **2026-09-22（Phase 0）：表上原本有 `Decision review` 一欄，已退役**（ROADMAP Phase 0／G12）。
+`ra_admission go` 那一格原本還寫「入圖後自動建 Shadow」——Shadow 是 Engine D 的東西，也一併退役；
+入圖之後沒有任何自動建立的第二個物件。
 
 `source_trace_review go` 也使用 `todo dispatch <n>`：原 pq2 在 queued／researching 期間保持 active 但不重複
 詢問。只有 prepared action receipt，或誠實的 `trace:<trace_status>` parked receipt 才能結案；前者若需入圖，
@@ -727,7 +725,8 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 ### Step 7 — 收尾同步
 
 - **更新 APP 讀的畫面**（2026-09-08；2026-09-09 起加 `--registry-listed`，APP 73 檔每天更新）：
-  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --basket`。
+  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --structure-readings`。
+  ⚠ 2026-09-22（Step 0a.2）：`--basket` 已移除（籃子 filter 退役，候選狀態板 Phase 3 接手）。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
   只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。

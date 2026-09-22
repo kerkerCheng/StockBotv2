@@ -46,8 +46,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 |---|---|---|---|
 | 0.0 | 基準快照 | ✅ | d6e3fca |
 | 0a.1 | 排程與規則停跑 | ✅ | 36f59f9 |
-| 0a.2 | 心跳與 APP 入口停跑 | ✅ | |
-| 0a.3 | 研究 skill 改句 | ○ | |
+| 0a.2 | 心跳與 APP 入口停跑 | ✅ | b65c1a1 |
+| 0a.3 | 研究 skill 改句 | ✅ | |
 | 0a.4 | 池子收集端停鑄 | ○ | |
 | 0b.1 | 個股頁樞紐重寫、斷 import | ○ | |
 | 0b.2 | 刪估值鏈 | ○ | |
@@ -77,7 +77,34 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 5 | 0a.2 | 只列 `webapp/__main__.py` materialize 清單、`api.py` 路由、`index.html` nav | 另外把兩個 kind 從 `webapp/contracts.py` 的**封閉字彙** de-register | 不 de-register 的話心跳段 1 會一直唸「不是今天的 N 份：basket、multi_year」——那正是 0a 要移除的注意力噪音；ROADMAP 驗收③也要求 `webapp status` 不列它們。代價實測只有 7 個測試檔／14 條測試，全部已處理 |
 | 6 | 0a.2 | 「段 2 的『現價過目標價』與**籃子行**」 | 段 2 改一行；**段 4 改兩行** | 實測籃子／量的候選／要幾倍／歸零旗標彙總四行都在**段 4**，不在段 2（見基準報告 §8） |
 | 7 | 0a.2 | 未提歸零旗標 | 彙總暫停並印 `upstream_unavailable` 明示缺席；**逐檔那盞燈未動** | 歸零旗標是**活的量測**（`AGENTS.md`「量測、訊號、脈絡三分」），但它唯一的 producer 是籃子 artifact。逐檔的燈住在個股頁 `wipeout` 面板（0b.1 明列為核心面板），所以停的只有彙總，且它自己說得出停在哪裡 |
+| 8a | 0a.3 | 檔案清單列 6 個 skill | 改了 **7 個**（多 `skills/lead-intake/SKILL.md`） | 它有 7 處 `decision_lab`／`reassess` 的**可執行呼叫**（Fast Path 的 `evaluate-signal`、Step 7 整節、接點表）。不改它，退役的命令會繼續被 agent 照著跑 |
+| 8b | 0a.3 | 驗收寫「`retired_mechanism_grep.py` 的 skills 列 → 0」 | **做不到，且不應該做**：7 個 skill 檔仍有約 44 處命中，**全部是退役註記或 `AGENTS.md` 自己要求的措辭** | 見下方 §0.7。D、F、H 三組的 skills 已歸零 |
+| 8c | 0a.3 | 未提 `tests/test_skill_decision_contract.py`、`tests/test_daily_brief_skill.py` | 兩檔的斷言翻面（4 條） | 原本要求兩個研究 skill **必須**出現 Engine D 四支命令、daily-brief **必須**出現 `decision_lab today`。機制退役後那些斷言會逼人把退役的命令寫回去 |
+| 8d | 0a.3 | — | 第一版把 daily-brief 的 `--disproof`／`--expiry` 整段**誤刪**（開放式切片吃過頭），已 `git checkout` 還原後改用精確邊界重做 | 反證／催化劑／到期三件套是 L7 與 `AGENTS.md` 的判準、Phase 1 的主角，**不是 Engine D 的東西**。它只是承載欄位從 CLI 旗標換成 ledger 欄位 |
 | 8 | 0a.2 | 未提 `webapp/static/app.js` | **未動**，留給批 1／批 3 | nav 已移除兩個入口，但 `renderBasket`／`renderMultiYear` 與 router 分支仍在。手動打 `#/basket` 會拿到 API 錯誤而不是崩潰 |
+
+## 0.7 ⚠ 待使用者裁決：「殭屍 grep 五區歸零」這條驗收做不到（0a.3 發現）
+
+**ROADMAP Phase 0 驗收①與本 plan 結案 gate 8 寫的是「八組 regex 在 code／skills／tests／config／static 命中 0」。
+這條在字面上無法達成，而且其中兩處是因為 `AGENTS.md` 自己要求那個措辭。** 五類證據（實測數字）：
+
+| # | 情形 | 實例與命中數 | 為什麼不能歸零 |
+|---|---|---|---|
+| 1 | plan／ROADMAP 明寫「留」的檔仍命中自己那一組 | `decision_lab/store.py` G 組 11｜`tests/test_private_backup_restore.py` G 組 23｜`engine_c/estimates.py` H 組 15（`pe_forward`）｜`alpha/providers/fundamentals.py` H 組 12｜`config/alpha_screen.json` B 組 3｜`query/bottleneck.py` A 組 25 | 它們**依設計留下來**。ROADMAP 硬約束 2 要求舊 Decision Store 凍結唯讀（schema 不動、資料不刪），所以 `decision_lab` 這個字必然還在 |
+| 2 | legacy 封閉字彙 key | `engine_b/todo.py` G 組 150｜`tests/test_engine_b_todo.py` G 組 166 | 0a.4 明文要求 `decision_review` **不刪 key**（池裡歷史項目仍是這個 type），且測試斷言兩個 dict 鍵一致 |
+| 3 | `AGENTS.md` 強制要求寫出退役 | 各檔的「X 已退役」註記 | `AGENTS.md`（Beta 節）：「舊語意已明文**廢止**——**安靜消失擋不住下次回填，所以廢止必須寫出來**」。要歸零就得把退役註記全部刪掉，那正是它禁止的事 |
+| 4 | **`AGENTS.md` 自己的句子命中退役 regex** | E 組 `賭對了值\|判斷錯了值`：`AGENTS.md`「系統只負責……**賭對了值多少、判斷錯了值多少**」｜B 組 `籃子`：「已定價」主參照是自己的歷史、**主題籃子**只當脈絡 | **同一串字同時是退役的四價尺與現行的判準句。** 要歸零就得改 `AGENTS.md` 的判準句 |
+| 5 | 退役守門斷言本身 | `tests/test_queue_segments.py` 等翻面斷言 | 「有人把它加回來會變紅」需要在斷言裡指名它。已盡量改成封閉字彙**相等**斷言（不指名）來減少，但無法全免 |
+
+**提案（五欄 amendment；`AGENTS.md`「不得偷改 ROADMAP 後繼續跑」，所以只提案不自改）：**
+
+| 欄 | 內容 |
+|---|---|
+| **原 roadmap** | Phase 0 驗收①＋結案 gate 8：「八組 regex 在 code／skills／tests／config／static 命中 **0**」 |
+| **新觀察** | 五類反例（上表），其中第 4 類要歸零就得改 `AGENTS.md` 的判準句，第 1、2 類要歸零就得違反 ROADMAP 硬約束 2 與 0a.4 |
+| **proposed change** | 驗收改成「**命中但不在 keep-list 上的檔 = 0**」：在 `scripts/retired_mechanism_grep.py` 加一份 `KEEP` 清單（檔 → 為什麼留，逐檔一句），腳本多印一個數字「未列入 keep-list 的命中檔數」。**那一個數字才是 gate，而它可以是 0。** 誰新增一個命中的檔就會讓它非零 |
+| **why** | 保住原本的意圖（沒有殭屍**機制**），拿掉不可能達成的部分（沒有殭屍**字串**）。keep-list 逐檔寫理由，讓「為什麼留」可被質疑；季度重跑時看的是同一個數字 |
+| **impact** | 只動 `scripts/retired_mechanism_grep.py`（＋ROADMAP 那兩行驗收文字）。不動任何 authority、不放寬任何 gate。**執行者不自改**——批 2／3／4 的 grep 驗收會照實報告命中數與分類，結案 gate 8 等本 amendment 定案 |
 
 ## 0. 不可越線（違反即 NO_GO）
 
