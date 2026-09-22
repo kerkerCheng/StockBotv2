@@ -25,9 +25,7 @@ ALLOWED_PREFIXES = (
     (r".venv\Scripts\python.exe", "-m", "engine_b.cli", "list"),
     (r".venv\Scripts\python.exe", r"scripts\catalyst_watch.py"),
     (r".venv\Scripts\python.exe", r"scripts\outcome_if_settled_today.py"),
-    (r".venv\Scripts\python.exe", "-m", "decision_lab", "today"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "sync"),
-    (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "reassess-stale"),
     (r".venv\Scripts\python.exe", "-m", "engine_b.todo", "standing-go"),
     (r".venv\Scripts\python.exe", "-m", "webapp", "materialize"),
     (r".venv\Scripts\python.exe", r"scripts\publish_daily_brief.py"),
@@ -119,7 +117,9 @@ def test_project_does_not_define_an_ignored_permission_profile() -> None:
 def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> None:
     rules = RULES.read_text(encoding="utf-8")
     # 2026-09-19：state finalizer 留在 workspace-write，移除 public Git publisher rule，15 → 14。
-    assert rules.count("prefix_rule(") == 14
+    # 2026-09-22（Phase 0 Step 0a.1）：decision_lab 研究側退役，`decision_lab today` 與
+    # `engine_b.todo reassess-stale` 兩條一併移除，14 → 12。純收緊，沒有任何新增。
+    assert rules.count("prefix_rule(") == 12
     for fixed_entry in (
         "crons\\\\harvest_leads.py",
         "engine_c\\\\etl_yfinance.py",
@@ -128,9 +128,7 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '"-m", "engine_b.cli", "list"',
         "scripts\\\\catalyst_watch.py",
         "scripts\\\\outcome_if_settled_today.py",
-        '"-m", "decision_lab", "today"',
         '"-m", "engine_b.todo", "sync"',
-        '"-m", "engine_b.todo", "reassess-stale"',
         '"-m", "engine_b.todo", "standing-go"',
         "scripts\\\\publish_daily_brief.py",
         '"-m", "webapp", "materialize"',
@@ -147,6 +145,15 @@ def test_all_privileged_daily_entries_have_narrow_outside_sandbox_rules() -> Non
         '\"-m\", \"engine_b.todo\", \"work\"',
     ):
         assert research_only_entry not in rules, research_only_entry
+    # 2026-09-22（Phase 0 Step 0a.1）：decision_lab 研究側退役的兩條同樣翻面成「必須不在」。
+    # ⚠ 問的是「有沒有這樣一條 rule」而不是「檔案裡有沒有這串字」——檔頭的退役註記刻意
+    # 提到它們的名字，若用字串存在與否來驗，退役與沒退役會同形（L13）。
+    patterns_text = "\n".join(re.findall(r"pattern=\[(.*?)\]", rules, re.S))
+    for retired_entry in (
+        '"decision_lab", "today"',
+        '"engine_b.todo", "reassess-stale"',
+    ):
+        assert retired_entry not in patterns_text, retired_entry
     assert 'pattern=[".venv\\\\Scripts\\\\python.exe", "-m", "engine_b.todo"]' not in rules
     assert '"engine_b.todo", "dispatch"' not in rules
     assert '"engine_b.todo", "resolve"' not in rules
@@ -249,28 +256,31 @@ def test_mechanical_queue_segments_are_split_by_capability_not_by_convenience() 
     - `engine_b.cli consume-fired` 只讀寫 repo 內 `pending_leads.json`／`event_watches.json`（同目錄 tempfile
       原子替換），無網路無憑證——**留在 workspace-write sandbox，不得出現在 rule pattern**（與 event_watch
       sweep 同一條先例；放進去就是 broad permission 掩蓋整合缺口）。
-    - `engine_b.todo reassess-stale`／`standing-go` 會跑 reassess（Neo4j／Engine C／Sheet readonly），
-      需要 exact rule；**相鄰的 dispatch／resolve 仍不放行**——使用者的 go／drop 動詞不進無人值守。
+    - `engine_b.todo standing-go` 需要 exact rule（Neo4j／Engine C／Sheet readonly）；
+      **相鄰的 dispatch／resolve 仍不放行**——使用者的 go／drop 動詞不進無人值守。
+      ⚠ 2026-09-22（Phase 0 Step 0a.1）：`reassess-stale` 已隨 decision_lab 研究側退役，
+      不再是機械段，也不再有 rule——所以這條測試從三支變兩支。
     - daily prompt 必須帶這三步與 `--registry-listed`（APP 73 檔每天更新），否則 rule 放了沒人用（L13）。
     """
     rules = RULES.read_text(encoding="utf-8")
     patterns = re.findall(r"pattern=\[(.*?)\]", rules, re.S)
     assert not [p for p in patterns if "consume-fired" in p], "consume-fired 不需要 escalation"
-    assert '"engine_b.todo", "reassess-stale"' in rules and '"engine_b.todo", "standing-go"' in rules
+    assert '"engine_b.todo", "standing-go"' in rules
     assert '"engine_b.todo", "dispatch"' not in rules and '"engine_b.todo", "resolve"' not in rules
 
     prompt = (ROOT / "crons" / "daily_brief_prompt.md").read_text(encoding="utf-8")
     for token in (
         "engine_b.cli consume-fired",
-        "engine_b.todo reassess-stale --run",
         "engine_b.todo standing-go --run",
         "--registry-listed",
         "今日自動清了",
     ):
         assert token in prompt, f"daily prompt 缺 {token}"
     skill = (ROOT / "skills" / "daily-brief" / "SKILL.md").read_text(encoding="utf-8")
-    for token in ("consume-fired", "reassess-stale --run", "standing-go --run", "--registry-listed"):
+    for token in ("consume-fired", "standing-go --run", "--registry-listed"):
         assert token in skill, f"daily-brief skill 缺 {token}"
+    # daily prompt 不得再有可執行的 reassess-stale 步驟（skill 端在 Step 0a.3 一併清掉）。
+    assert "engine_b.todo reassess-stale --run" not in prompt
 
 
 def test_event_watch_sweep_is_in_sandbox_not_escalated() -> None:
@@ -382,7 +392,7 @@ def test_mops_watcher_reuses_the_harvest_entry_and_admits_its_new_hosts() -> Non
     """
     rules = RULES.read_text(encoding="utf-8")
 
-    assert rules.count("prefix_rule(") == 14, "重訊 watcher 不該新增任何 entry"
+    assert rules.count("prefix_rule(") == 12, "重訊 watcher 不該新增任何 entry"
     for host in ("openapi.twse.com.tw", "www.tpex.org.tw", "mopsov.twse.com.tw"):
         assert host in rules, host
     # 抓取器本身不是命令入口，不得偷偷出現在 allowlist 裡。

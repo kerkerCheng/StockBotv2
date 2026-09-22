@@ -16,13 +16,16 @@ def test_registry_is_closed_and_every_segment_names_a_consumer() -> None:
     for seg in qs.SEGMENTS:
         assert seg.consumer.strip(), seg.key
         assert seg.cost in {"mechanical", "research"}, seg.key
-    # 使用者定案的六段（fired 重排／reassess／已核准工單／triaged_go／forward view／覆蓋缺口）
-    # 都在，外加前面的 pending 分流與後面的主動輪詢。
+    # 使用者定案的段（fired 重排／已核准工單／triaged_go／forward view／覆蓋缺口）都在，
+    # 外加前面的 pending 分流與後面的主動輪詢。
     for required in (
-        "fired_lead_requeue", "reassess_stale", "approved_work_orders",
+        "fired_lead_requeue", "approved_work_orders",
         "triaged_go_leads", "forward_view_backlog", "coverage_gaps",
     ):
         assert required in qs.SEGMENT_BY_KEY
+    # 2026-09-22（Phase 0 Step 0a.1）：`reassess_stale` 隨 decision_lab 研究側退役。
+    # 斷言翻面，不是刪掉——這樣「有人把它加回來」會變紅（ROADMAP Phase 0 驗收①）。
+    assert "reassess_stale" not in qs.SEGMENT_BY_KEY
 
 
 def test_a_segment_without_consumer_is_rejected_at_registry_level() -> None:
@@ -70,14 +73,17 @@ def test_active_watch_is_work_only_when_pollable() -> None:
     assert qs.classify_watch({"status": "zombie"}) == "unmapped:watch:zombie"
 
 
-def test_todo_item_is_work_only_when_dispatched_or_reassess_only() -> None:
+def test_todo_item_is_work_only_when_dispatched() -> None:
     assert qs.classify_todo({"n": 1, "dispatch_status": "queued"}) == "approved_work_orders"
     assert qs.classify_todo({"n": 1, "dispatch_status": "researching"}) == "approved_work_orders"
     assert qs.classify_todo({"n": 1, "dispatch_status": "awaiting_approval"}) is None
     assert qs.classify_todo({"n": 1}) is None
-    assert qs.classify_todo({"n": 1}, reassess_only=True) == "reassess_stale"
-    assert qs.classify_todo({"n": 1, "resolved_at": "2026-09-09"}, reassess_only=True) is None
+    assert qs.classify_todo({"n": 1, "resolved_at": "2026-09-09"}) is None
     assert qs.classify_todo({"n": 1, "dispatch_status": "teleported"}) == "unmapped:todo:teleported"
+    # 2026-09-22（Step 0a.1）：`reassess_only` 參數隨 reassess 段退役，呼叫端傳它要炸開，
+    # 不得靜默被吃掉（否則舊呼叫端會以為自己還在餵那一段）。
+    with pytest.raises(TypeError):
+        qs.classify_todo({"n": 1}, reassess_only=True)  # type: ignore[call-arg]
 
 
 def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
@@ -97,7 +103,6 @@ def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
             {"n": 6},
             {"n": 7},
         ],
-        reassess_only_numbers=[6],
         forward_view_backlog=None,
         coverage_gaps=20,
     )
@@ -108,11 +113,11 @@ def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
     assert by_key["fired_pq2_wake"] == 1
     assert by_key["pollable_watches"] == 1
     assert by_key["approved_work_orders"] == 1
-    assert by_key["reassess_stale"] == 1
+    assert "reassess_stale" not in by_key
     assert by_key["forward_view_backlog"] is None      # 沒讀到 ≠ 0
     assert by_key["coverage_gaps"] == 20
     assert obs["unmapped"] == []
-    assert obs["mechanical_total"] == 3               # fired lead＋fired pq2＋reassess
+    assert obs["mechanical_total"] == 2               # fired lead＋fired pq2
     rendered = qs.render(obs)
     assert "未讀到" in rendered and "coverage" in rendered
 

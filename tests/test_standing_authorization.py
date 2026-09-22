@@ -2,6 +2,11 @@
 
 守三件事：①封閉性——每種 pq2 類型都必須被明確分到 authorized 或 never；②四個 authority gate 的類型
 永遠在 never；③standing_go 只對「使用者本來會下 go」的項目動手：pending 的、等世界的、付費的都不碰。
+
+⚠ **2026-09-22（Phase 0 Step 0a.1）：`decision_review` 從 authorized 搬到 never**——decision_lab
+研究側整批退役（ROADMAP Phase 0／G3、G12）。本檔的斷言跟著**翻面**而不是刪掉：現在守的是
+「standing-go 不再對 decision_review 動手」，所以有人把它加回 authorized 會變紅。
+`authorized` 只剩 `source_trace_review` 一種。
 """
 from __future__ import annotations
 
@@ -20,8 +25,12 @@ def test_shipped_config_is_closed_over_item_types_and_never_lists_the_gates() ->
     assert not (set(auth.authorized) & set(auth.never))
     for gate_type in ("ra_admission", "engine_c_observation", "thesis_mutation"):
         assert gate_type in auth.never and not auth.is_authorized(gate_type)
-    assert auth.is_authorized("decision_review") and auth.is_authorized("source_trace_review")
+    assert auth.is_authorized("source_trace_review")
     assert "付費" in auth.skip_hint_tokens("source_trace_review")
+    # 2026-09-22 Step 0a.1：退役後唯一的 authorized 類型就是追源派回 pq1。
+    assert set(auth.authorized) == {"source_trace_review"}
+    assert not auth.is_authorized("decision_review")
+    assert "退役" in (auth.why_never("decision_review") or "")
 
 
 def test_loader_rejects_unclassified_or_overlapping_types(tmp_path: Path) -> None:
@@ -33,7 +42,9 @@ def test_loader_rejects_unclassified_or_overlapping_types(tmp_path: Path) -> Non
     with pytest.raises(sa.StandingAuthorizationError, match="未分類"):
         sa.load(p)
     overlap = dict(base)
-    overlap["never"] = {**base["never"], "decision_review": "x"}
+    # 用一個**現在確實在 authorized 裡**的 key 來製造交集；拿已經在 never 的 decision_review
+    # 來試會驗不到任何東西（它本來就在那邊）。
+    overlap["never"] = {**base["never"], "source_trace_review": "x"}
     p.write_text(json.dumps(overlap), encoding="utf-8")
     with pytest.raises(sa.StandingAuthorizationError, match="同時"):
         sa.load(p)
@@ -85,23 +96,22 @@ def test_candidates_exclude_pending_waiting_inflight_paid_and_never_types() -> N
     by = {it["ref_id"]: it for it in todo.active_items(pool)}
     candidates, skipped = todo.standing_go_candidates(
         pool, authorization=sa.load(), store=_StoreStub(), brief_items=BRIEF)
-    assert [it["ref_id"] for it in candidates] == ["dc_go", "lead_free"]
-    reasons_by_ref = {todo.get(pool, row["n"])["ref_id"]: row["reason"] for row in skipped}
-    assert "go 只會多 append" in reasons_by_ref["dc_stale_only"]        # L14：go 不會讓數字變 → 不下
-    # 有 work order 的即使沒有 user_decision blocker 也算（→ dispatch）
+    # 2026-09-22 Step 0a.1：decision_review 已是 never 類型——**一個都不進候選**，
+    # 連「有 work order」「有 user_decision blocker」那兩條放行路徑也不再走得到。
+    assert [it["ref_id"] for it in candidates] == ["lead_free"]
     with_wo, _ = todo.standing_go_candidates(
-        pool, authorization=sa.load(), store=_StoreStub({"dc_stale_only": {"work_order_id": "wo_1"}}), brief_items=BRIEF)
-    assert "dc_stale_only" in [it["ref_id"] for it in with_wo]
-    # brief 讀不到 → decision_review 全部跳過（fail closed），source_trace 不受影響
-    none_brief, skipped_nb = todo.standing_go_candidates(pool, authorization=sa.load(), store=_StoreStub(), brief_items=None)
+        pool, authorization=sa.load(),
+        store=_StoreStub({"dc_stale_only": {"work_order_id": "wo_1"}}), brief_items=BRIEF)
+    assert [it["ref_id"] for it in with_wo] == ["lead_free"]
+    # brief 讀不到也不影響：唯一的 authorized 類型不看 brief。
+    none_brief, _ = todo.standing_go_candidates(
+        pool, authorization=sa.load(), store=_StoreStub(), brief_items=None)
     assert [it["ref_id"] for it in none_brief] == ["lead_free"]
-    assert any("fail closed" in row["reason"] for row in skipped_nb)
     reasons = {row["n"]: row["reason"] for row in skipped}
-    assert "pending" in reasons[by["dc_deferred"]["n"]]
-    assert "等世界" in reasons[by["dc_waiting"]["n"]]
     assert "付費" in reasons[by["lead_paid"]["n"]]
-    assert by["dc_inflight"]["n"] not in reasons            # in-flight 直接略過，不是「跳過」
-    assert by["ra_x"]["n"] not in reasons and by["m1"]["n"] not in reasons
+    # never 類型不進 skipped——它們本來就不是候選，不是「被跳過」（與 ra_admission／manual 同形）。
+    for ref in ("dc_go", "dc_deferred", "dc_waiting", "dc_inflight", "dc_stale_only", "ra_x", "m1"):
+        assert by[ref]["n"] not in reasons, ref
 
 
 def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) -> None:
@@ -110,7 +120,6 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
 
     def fake_advance(p, n, *, store, at=None):
         calls.append(("decision", n))
-        todo.get(p, n)["dispatch_ref"] = f"assessment_gap:{todo.get(p, n)['ref_id']}"
         return {"outcome": "queued_assessment_gap"}
 
     def fake_dispatch(p, n, *, leads_path, at=None):
@@ -125,10 +134,12 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
     assert dry["dry_run"] and calls == []
 
     out = todo.standing_go(pool, _StoreStub(), at="2026-09-09T00:00:00+00:00", brief_items=BRIEF)
-    assert [(c[0]) for c in calls] == ["decision", "trace"]
-    assert [row["outcome"] for row in out["done"]] == ["queued_assessment_gap", "dispatched"]
+    # 2026-09-22 Step 0a.1：只剩追源那一條路；`advance_decision_review` **一次都不該被呼叫**
+    # ——這是「退役真的生效了」的那個可證偽斷言，不是「rules 檔裡找不到某串字」。
+    assert [(c[0]) for c in calls] == ["trace"]
+    assert [row["outcome"] for row in out["done"]] == ["dispatched"]
     logs = [e for e in pool["log"] if e["verb"] == "standing_go"]
-    assert {e["n"] for e in logs} == {by["dc_go"]["n"], by["lead_free"]["n"]}
+    assert {e["n"] for e in logs} == {by["lead_free"]["n"]}
     assert all("standing_authorization.json" in e["reason"] for e in logs)
     assert all(e["receipt"] for e in logs)
     # 沒動到 never 類型與使用者明示 pending 的項目
@@ -137,17 +148,25 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
 
 
 def test_standing_go_reports_single_failures_without_stopping(monkeypatch) -> None:
+    """一筆失敗不得讓其餘停下。
+
+    ⚠ 2026-09-22 Step 0a.1：原本的失敗源是 `advance_decision_review`（decision_review 退役後
+    永遠不會被呼叫，拿它當失敗源這條測試就恆綠＝零鑑別力）。改用兩筆追源項，其中一筆炸。
+    """
     pool, by = _pool()
+    todo.sync(pool, [{"type": "source_trace_review", "ref_id": "lead_free2",
+                      "title": "J 追原文", "hint": "go 只排入 bounded pq1"}])
+    by = {it["ref_id"]: it for it in todo.active_items(pool)}
 
-    def boom(p, n, *, store, at=None):
-        raise RuntimeError("store 壞了")
+    def dispatch(p, n, *, leads_path, at=None):
+        if todo.get(p, n)["ref_id"] == "lead_free":
+            raise RuntimeError("leads 檔壞了")
+        return {"item": todo.get(p, n)}
 
-    monkeypatch.setattr(todo, "advance_decision_review", boom)
-    monkeypatch.setattr(todo, "dispatch_source_trace_review",
-                        lambda p, n, *, leads_path, at=None: {"item": todo.get(p, n)})
+    monkeypatch.setattr(todo, "dispatch_source_trace_review", dispatch)
     out = todo.standing_go(pool, _StoreStub(), brief_items=BRIEF)
-    assert [row["n"] for row in out["failed"]] == [by["dc_go"]["n"]]
-    assert [row["n"] for row in out["done"]] == [by["lead_free"]["n"]]
+    assert [row["n"] for row in out["failed"]] == [by["lead_free"]["n"]]
+    assert [row["n"] for row in out["done"]] == [by["lead_free2"]["n"]]
 
 
 # ---------------------------------------------------------------------------

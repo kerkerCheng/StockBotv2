@@ -527,24 +527,6 @@ def _forward_view_backlog() -> tuple[int | None, str | None]:
     return count, None
 
 
-def _reassess_only_numbers(items: list[dict]) -> tuple[list[int] | None, str | None]:
-    """段 2（reassess_stale）的成員編號；Decision Store 不可用時回 `(None, 原因)`。"""
-    try:
-        from decision_lab.bootstrap import open_default_store
-        from engine_b import todo
-
-        store = open_default_store()
-    except Exception as exc:  # noqa: BLE001
-        return None, f"Decision Store 不可用：{type(exc).__name__}"
-    try:
-        pool = {"items": items, "log": []}
-        return [int(it["n"]) for it in todo.reassess_only_items(pool, store)], None
-    except Exception as exc:  # noqa: BLE001
-        return None, f"reassess_only_items 失敗：{type(exc).__name__}: {exc}"
-    finally:
-        store.close()
-
-
 def check_queue_segments() -> AuditResult:
     """佇列裡每一種「有工作」的狀態，都必須對得到一個登記了 consumer 的段。
 
@@ -560,13 +542,14 @@ def check_queue_segments() -> AuditResult:
         leads_map = sources.leads()
         watches = sources.event_watches()
         items = sources.todo_items()
-        reassess_ns, reassess_note = _reassess_only_numbers(items)
         forward, forward_note = _forward_view_backlog()
+        # ⚠ 2026-09-22（Phase 0 Step 0a.1）：原本這裡還會開 Decision Store 算「只需 reassess」
+        # 的 pq2 編號餵段 2。reassess 隨 decision_lab 研究側退役，段 2 已從封閉字彙移除，
+        # 所以這裡連 Decision Store 都不必開——稽核不再依賴一個凍結中的 authority。
         observation = qs.observe(
             leads=leads_map,
             watches=watches,
             todo_items=items,
-            reassess_only_numbers=reassess_ns or (),
             forward_view_backlog=forward,
             coverage_gaps=None,  # authority 在 Neo4j；由 query.coverage_gaps 另報，這裡不冒充
             # 同理（2026-09-18 V3）：重複節點候選的 authority 也在 Neo4j。它的數字確實已經
@@ -575,7 +558,7 @@ def check_queue_segments() -> AuditResult:
         )
         examined = len(leads_map) + len(watches) + len(items)
         findings = list(observation["unmapped"])
-        notes = [n for n in (reassess_note, forward_note) if n]
+        notes = [n for n in (forward_note,) if n]
         counts = "；".join(
             f"{seg['key']}={'未讀到' if seg['count'] is None else seg['count']}"
             for seg in observation["segments"]

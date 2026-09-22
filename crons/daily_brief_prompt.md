@@ -37,12 +37,14 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `require_escalated` 命中 exact outside-sandbox rule，不得先在 sandbox 製造可預期失敗再升權重重跑，也不得放行整個 PowerShell、
    Python、Git 或 working tree。fixed entry 是 `crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、
    `scripts\daily_beta_snapshot.py`、`engine_b.cli list`、
-   `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、`decision_lab today`、
-   `engine_b.todo sync`、`engine_b.todo reassess-stale`、`engine_b.todo standing-go`、
+   `scripts\catalyst_watch.py`、`scripts\alpha_purity_snapshot.py`、`scripts\outcome_if_settled_today.py`、
+   `engine_b.todo sync`、`engine_b.todo standing-go`、
    `scripts\publish_daily_brief.py`、`-m webapp materialize`、
    `scripts\backfill_fiscal_year_results.py`
    （~~`fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
    `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`~~ 已於 2026-09-17 隨研究層一起移除；
+   ~~`decision_lab today`、`engine_b.todo reassess-stale`~~ 已於 2026-09-22 隨 decision_lab 研究側退役移除
+   （Phase 0 Step 0a.1；ROADMAP Phase 0／G3、G12）；
    條數由 `tests/test_codex_daily_permissions.py` 斷言，
    **刻意不在散文裡寫死**——寫死的數字會腐壞，而它已經腐壞過一次：檔頭寫「十七個」時實際有十九條）。
    這組 rule 是單一 authority，不是 primary＋fallback 兩套權限。
@@ -97,18 +99,17 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
      (b) 根本沒有可追的 claim（原文即該貼文本身）→ 改 `trace_status=original_obtained` 豁免重排；
      (c) 真的需要人工 access／付費／改優先權 → 設 `trace_requires_user=true` 進 pq2。
      不得原樣留著——那是安靜沉底，而漏掉時沒有人會發現。
-   - `.venv\Scripts\python.exe -m decision_lab today --format markdown`
    - `.venv\Scripts\python.exe scripts\catalyst_watch.py`
-   - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（部位與問責；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority；同時 append 當日排序快照，那是「較昨變動」的基準）
+   - `.venv\Scripts\python.exe scripts\outcome_if_settled_today.py`（部位與問責；唯讀真實 fill、最新已收盤價與報酬，不 close 或寫 authority。⚠ 2026-09-22 Step 0a.1：它原本還 append 當日**排序**快照當「較昨變動」的基準，那條已隨排序退役——不要再讀 `ranking_order_snapshots.jsonl`。）
    ⚠ **2026-09-08 起不再跑 `query.bottleneck`／`--by-sector`／`alpha_purity_snapshot`／`query.coverage_gaps`**：
-     排序與覆蓋缺口的完整內容住 APP（收尾 materialize 每天更新），Daily 只用 `decision_lab today` 已含的兩份排序
-     與 `ranking_order_snapshots.jsonl` 的前一筆比對出「較昨變動」。它們仍是 `$alpha-status` 的入口，隨叫隨到。
+     覆蓋缺口的完整內容住 APP（收尾 materialize 每天更新）。它們仍是 `$alpha-status` 的入口，隨叫隨到。
+     ⚠ **2026-09-22（Step 0a.1）：排序不再是任何佇列或頁面的輸入**（ROADMAP 硬約束 4／G1）——
+     `decision_lab today` 的兩份排序與 `ranking_order_snapshots.jsonl` 的「較昨變動」一併退役，
+     不得改用別的排序來源補回來。結構表只做稽核（Phase 0 批 3 落地）。
    - `.venv\Scripts\python.exe -m engine_b.cli consume-fired`（佇列段 1：把 fired 的追源 watch 排回 pq1。只讀寫 repo 內
      `pending_leads.json`／`event_watches.json`，無網路無憑證，**在 sandbox 內、不需 escalation**。輸出 JSON 的
      requeued／reactivated／consumed／skipped 四個數記進健康段；skipped 非零逐筆列理由。）
    - `.venv\Scripts\python.exe -m engine_b.todo sync`
-   - `.venv\Scripts\python.exe -m engine_b.todo reassess-stale --run`（佇列段 2；首次呼叫命中 exact rule。只對
-     「純 system_internal blocker」的 decision_review reassess；結案數與仍 REVIEW 數記進健康段。）
    - `.venv\Scripts\python.exe -m engine_b.todo standing-go --run`（佇列段 2b；首次呼叫命中 exact rule。對
      `config/standing_authorization.json` 的 authorized 類型執行使用者本來會下的 go；pending／等世界／付費的一律
      跳過並逐筆列理由。**這些編號從此不再進「需要你動作」，改在「系統在做」印計數。**）
@@ -207,13 +208,13 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
    graph admission 仍是另一個 `ra_admission` pq2。
-8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --basket --structure-readings`，
+8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --structure-readings`，
    把 APP 讀的畫面與 registry 全部上市公司（73 檔；`--registry-listed` 是 materialize 自己的宇宙，**不動** pq1 的
    tracked 導出）更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
    不手寫清單）。它只寫 ignored derived cache（`library/private/app/`），**不寫任何 authority、不入圖、不建 decision**，
-   ⚠ **`--basket` 是 2026-09-17 補上的**：籃子（V3，2026-09-15）比「APP materialize 納入 Daily」（2026-09-08）晚做，
-   當時沒有回頭補進這一行，於是它**只在互動 session 手動跑時才更新**——而心跳第 4 段的賭注帳讀的正是它，
-   計數器會停在某一天的值（L13-1：產出要出現在下游消費者手上）。它在 `cmd_materialize` 裡本來就排在最後跑。
+   ⚠ **`--basket` 已於 2026-09-22（Phase 0 Step 0a.1）從這一行移除**：籃子 filter（V3，2026-09-15）退役，
+   候選狀態板要到 Phase 3 才落地（ROADMAP Phase 0／G3）。心跳第 4 段的賭注帳原本讀它，改印
+   `候選狀態板未落地（not_yet_recorded）`——**是一行缺席宣告，不是整段消失**（Step 0a.2）。
    `--structure-readings`（2026-09-17 Q5）是唯讀 ledger ＋ 查圖的確定性比對：它回答「哪幾份讀圖跟圖不再一致」，
    **不重新推理**（重讀是研究，只在互動 session，D12），輸出同樣只進 ignored derived cache。
    `serve` 不在 rule 內、排程不啟動它。**失敗只記入健康段、不中止 Daily**：artifact 是 derived cache，
@@ -288,16 +289,16 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 同發行人同類文件（如一批 Form 4）彙總一行列數量與唯一例外，不逐筆點名。>
 
 ## 現況：都在 APP，只講變動（無 pq2 編號）
-<固定加一行機械段計數器（2026-09-09 P5，L14 常駐計數器）：「今日自動清了 N（fired 重排 a／reassess 結案 b／常規授權 go c），
-機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R；每檔閉環：到終局 T／未到終局 U，下一檔 X」——數字照抄 consume-fired／reassess-stale／standing-go／backfill_fiscal_year_results 的輸出與
+<固定加一行機械段計數器（2026-09-09 P5，L14 常駐計數器）：「今日自動清了 N（fired 重排 a／常規授權 go c），
+機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R；每檔閉環：到終局 T／未到終局 U，下一檔 X」——數字照抄 consume-fired／standing-go／backfill_fiscal_year_results 的輸出與
 `webapp status` 的「每檔閉環」行。任何一支沒跑成就寫「未跑：<原因>」，不得印 0。>
 <四個畫面由收尾的 materialize 更新；本段只印計數與較昨變動，完整內容不重印。
-一張四列小表：瓶頸排序 `#/ranking`（可行動 N 條、首選是誰）｜資產配置 `#/beta`（低於／高於／到位各 N）｜
+一張四列小表：結構表 `#/ranking`（N 條；**只印條數，不印首選、不印名次**——排序已退役，2026-09-22 Step 0a.1／G1）｜資產配置 `#/beta`（低於／高於／到位各 N）｜
 研究缺口 `#/coverage`（🔴 真缺口 N／🟡 N）｜在等什麼 `#/watches`（在等 N／停滯 N／fired 未消化 N／追源需處置 N）。
-**有變動才展開**：首選換人、sleeve 進出容忍區間、風控門檻跨越、缺口節點增減、watch 轉 fired／stalled，
-各一行寫清楚什麼變了；排序的較昨基準是 `ranking_order_snapshots.jsonl`。
+**有變動才展開**：sleeve 進出容忍區間、風控門檻跨越、缺口節點增減、watch 轉 fired／stalled，
+各一行寫清楚什麼變了。**「首選換人」已不是變動項**——沒有首選了。
 ⚠ 收尾 materialize 失敗時本段改印「APP 未更新：<原因>」，不得照印昨天的計數。
-排序完整讀法、Beta 逐檔心跳與目標配置表、兩條相關性警告、缺口與 watch 清單都住 APP，不再複述。>
+結構表完整讀法、Beta 逐檔心跳與目標配置表、兩條相關性警告、缺口與 watch 清單都住 APP，不再複述。>
 
 ## 部位與問責：只印變動（無 pq2 編號）
 <完整內容住 APP `#/positions`；Daily 只印今天不一樣的：新增 fill、disproof 觸發、計數器分子變動、live 樣本數變化。

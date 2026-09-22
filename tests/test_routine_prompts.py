@@ -27,7 +27,6 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
         "scripts\\catalyst_watch.py",
         "scripts\\outcome_if_settled_today.py",
         "scripts\\prepare_research_action.py",
-        "decision_lab today",
         "engine_b.todo sync",
         "engine_b.todo work",
         "scripts\\finalize_daily_state.py",
@@ -38,6 +37,18 @@ def test_daily_prompt_uses_local_authorities_and_repo_venv() -> None:
     assert "不要建立 branch" in text
     assert "publish_daily_state.py" not in text
     assert "不碰 Git、不連網" in text
+    # 2026-09-22（Phase 0 Step 0a.1）：decision_lab 研究側退役。**問可執行的步驟行，
+    # 不問字串存在**——檔頭的退役註記刻意寫出它們的名字，改用字串比對會讓退役與
+    # 沒退役同形（L13：成功與失敗不得在同一訊號上同形）。
+    assert "-m decision_lab today" not in text
+    assert "engine_b.todo reassess-stale --run" not in text
+    # ⚠ 同一個陷阱：退役註記本身寫得出 `--basket` 三個字，所以要問的是**那一行 materialize
+    # 指令**帶不帶它，不是整份檔案有沒有出現過。
+    materialize_lines = [ln for ln in text.splitlines() if "-m webapp materialize" in ln]
+    assert materialize_lines, "daily prompt 必須有 materialize 收尾"
+    for line in materialize_lines:
+        assert "--basket" not in line, "籃子 filter 已退役，materialize 不得再帶它"
+        assert "--multi-year" not in line
 
 
 def test_daily_prompt_uses_fixed_entries_on_first_call_and_never_replays_permission_failures() -> None:

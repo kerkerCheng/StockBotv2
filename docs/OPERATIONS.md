@@ -142,6 +142,18 @@ Unregister-ScheduledTask -TaskName 'StockBotv2-Heartbeat' -Confirm:$false
 不放寬：四個人工 gate 一個不動；心跳不寫任何 authority；研究搬到互動 session 之後**判準一字未改**
 （disproof 三件套、park 的四個欄位、只有 prepared RA 才進 pq2）——**搬走的是執行者，不是規則**。
 
+### Sandbox impact review 結論（2026-09-22，Phase 0 Step 0a.1：decision_lab 研究側停跑）
+
+**純收緊，零新增。** 五步：
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 沒有任何新增的 path、side effect 或 capability。移除的兩條 entry 原本各自的 surface：`-m decision_lab today`（讀 Google Sheet／Neo4j／private Decision Store，產 decision brief）與 `-m engine_b.todo reassess-stale`（同一組資源，對 `decision_review` append 新 decision）。兩者的機制都退役（ROADMAP Phase 0／G3、G12），移除後**無任何無人值守呼叫端**。 |
+| **2 canonical skill／prompt／本檔** | `crons/daily_brief_prompt.md` 同 commit 移除兩個步驟、fixed entry 列舉與機械段計數器的 `reassess 結案 b` 欄；`crons/weekly_scan_prompt.md` 的 `today` 改指心跳；本節。`skills/daily-brief/SKILL.md` 等研究 skill 在 Step 0a.3 一併改。 |
+| **3 最窄 rule** | `.codex/rules` 由 14 條**減為 12** 條。**沒有新增、沒有放寬任何既有 pattern。** `standing-go` 那條的 surface 同時變窄：`config/standing_authorization.json` 的 `authorized` 從兩種（`decision_review`＋`source_trace_review`）減為一種，`decision_review` 移到 `never`（不是刪掉——ITEM_TYPES 封閉性要求每種都明寫在其中一邊）。 |
+| **4 permission contract test** | `tests/test_codex_daily_permissions.py` 同 commit：條數斷言 14 → 12（兩處），兩條從「必須存在」**翻面成必須不在**，且比對的是 `pattern=[...]` 內容而不是整份檔案的字串——檔頭的退役註記刻意寫出它們的名字，用字串存在與否來驗會讓「退役」與「沒退役」同形（L13）。`tests/test_standing_authorization.py` 的斷言同樣翻面：`set(authorized) == {"source_trace_review"}`，且 `advance_decision_review` 在 `standing_go` 裡一次都不得被呼叫。 |
+| **5 端到端 smoke** | `python -m audit invariants --only QueueSegments` 綠且輸出不再有 `reassess_stale` 段；`python -m engine_b.cli counts` 正常；`python scripts/analyst_view_text_digest.py` 與全測試（2823 passed／1 skipped，與 Step 0.0 基準同數）未動。⚠ **未跑真正的排程路徑**：daily 由 Codex desktop 觸發，下一次是 2026-09-23 06:30——這一條要等那一輪才算驗完（L13-1：驗收是產出出現在下游消費者手上）。 |
+
 排程收尾跑 `scripts/finalize_daily_state.py`：驗證四份本機 state、釋放自己的 writer lock、
 寫收工標記。它不碰 Git、不連網，因此留在 workspace-write 且不占 unattended allowlist。
 四份 state（`pending_leads.json`＋`todo_pool.json`＋`event_watches.json`＋`hypotheses.json`）

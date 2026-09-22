@@ -15,8 +15,9 @@
 
 ## 兩種成本，不共用同一個預算
 
-- `mechanical`：確定性命令、零 token（fired 重排、reassess、pq2 翻醒）。**不吃** pq1 的
-  `drain_limit_per_run`。
+- `mechanical`：確定性命令、零 token（fired 重排、pq2 翻醒、gated 指認）。**不吃** pq1 的
+  `drain_limit_per_run`。⚠ 2026-09-22（Phase 0 Step 0a.1）：`reassess` 已不在這一類——
+  decision_lab 研究側退役，段序不再登記它。
 - `research`：要 web search／讀文件／寫判斷。⚠ **2026-09-17 更正：只有 `engine_b.cli drain` 那條路徑
   吃 `drain_limit_per_run`**（唯一執行點 `engine_b/cli.py::_cmd_drain`）。`pending_triage` 雖然也標
   `research`，但它的 consumer 是 `engine_b.cli triage`，**完全不讀 routine_config**——所以 D12 把
@@ -75,11 +76,10 @@ SEGMENTS: tuple[Segment, ...] = (
         "research", "research-drain 段 0b：對照後 `python -m engine_b.event_watch consume <watch_id>`",
         "刻意不自動 consume：對照是研究動作，收據要留在假設層（engine_b/hypotheses.py）。",
     ),
-    Segment(
-        "reassess_stale", 2, "decision_review 只因凍結 context 過期而 REVIEW（無 work order、無需人決定的 blocker）",
-        "mechanical", "python -m engine_b.todo reassess-stale --run",
-        "它是確定性維護不是研究：reassess 只重新凍結 context，不改任何 authority。",
-    ),
+    # ⚠ 段 2（`reassess_stale`）**已於 2026-09-22 Phase 0 Step 0a.1 退役**：decision_lab 研究側
+    # 整批退役（ROADMAP Phase 0／G3、G12），所以「只因凍結 context 過期而 REVIEW」這種工作
+    # 不會再產生。**它不是安靜消失**——同一個 change 一併拿掉 `.codex/rules` 的 fixed entry、
+    # daily prompt 的那一步與 `audit/checks.py` 的注入，所以沒有任何 producer 還在製造它。
     Segment(
         "approved_work_orders", 3, "使用者已 go 的 decision work order（queued／researching）",
         "research", "python -m engine_b.cli drain（[USER-GO] 列）",
@@ -215,8 +215,12 @@ def classify_watch(watch: Mapping[str, Any]) -> str | None:
     return None
 
 
-def classify_todo(item: Mapping[str, Any], *, reassess_only: bool = False) -> str | None:
-    """pq2 項目只有兩種算 pq1 工作：已 dispatch 的 work order、以及只需 reassess 的。"""
+def classify_todo(item: Mapping[str, Any]) -> str | None:
+    """pq2 項目只有一種算 pq1 工作：已 dispatch 的 work order。
+
+    ⚠ 2026-09-22（Step 0a.1）：原本還有第二種（只需 reassess 的 decision_review）。
+    reassess 隨 decision_lab 研究側退役，所以這裡少一個分支、`observe()` 少一個參數。
+    """
     if item.get("resolved_at"):
         return None
     dispatch = item.get("dispatch_status")
@@ -224,8 +228,6 @@ def classify_todo(item: Mapping[str, Any], *, reassess_only: bool = False) -> st
         return f"unmapped:todo:{dispatch}"
     if dispatch in {"queued", "researching"}:
         return "approved_work_orders"
-    if reassess_only:
-        return "reassess_stale"
     return None
 
 
@@ -238,7 +240,6 @@ def observe(
     leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[str, Any]] = (),
     watches: Iterable[Mapping[str, Any]] = (),
     todo_items: Iterable[Mapping[str, Any]] = (),
-    reassess_only_numbers: Iterable[int] = (),
     forward_view_backlog: int | None = None,
     coverage_gaps: int | None = None,
     stale_structure_readings: int | None = None,
@@ -278,12 +279,11 @@ def observe(
         if len(examples[key]) < 3:
             examples[key].append(str(watch.get("watch_id", "?")))
 
-    reassess = {int(n) for n in reassess_only_numbers}
     # ⚠ 固化：`todo_items` 是 Iterable，下面要走訪兩次（分段計數 ＋ gated 判定）。
     # 傳 generator 進來時第二次會是空的，而空集合不會報錯——只會安靜地少報（L13-2）。
     todo_rows = list(todo_items)
     for item in todo_rows:
-        key = classify_todo(item, reassess_only=int(item.get("n", -1)) in reassess)
+        key = classify_todo(item)
         if key is None:
             continue
         if key.startswith("unmapped:"):

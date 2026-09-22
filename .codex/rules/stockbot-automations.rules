@@ -9,6 +9,10 @@
 # 研究改由互動 session 的 research-drain 做，daily 的 `drain_limit_per_run` 已為 0
 # （查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`）。
 # 這是**純收緊**：拿掉的每一條在 daily 都已經走不到，且對應的 prompt 步驟在同一個 change 移除。
+# ⚠ **2026-09-22（Phase 0 Step 0a.1）：decision_lab 研究側退役，兩條 entry 一併移除**
+# ——`-m decision_lab today` 與 `-m engine_b.todo reassess-stale`。
+# 同樣是**純收緊**：兩者在 daily prompt 的步驟同一個 change 移除，standing-go 的 authorized
+# 類型只剩 source_trace_review，所以沒有任何無人值守呼叫端還走得到它們。
 # ⚠ fetchers 目錄現在**一支都不在列**。edgar.py／mops.py 與 mfn.py／rns.py 一樣改為互動式入口；
 # 同目錄的 gsheets.py 使用 Google service account 憑證，屬 credential-bearing surface，
 # 要放行任何一支都必須重做一次 sandbox impact review。
@@ -69,33 +73,21 @@ prefix_rule(
 )
 
 prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "decision_lab", "today"],
-    decision="allow",
-    justification="Daily decision brief 只讀 Google Sheet、Neo4j 與 private Decision authorities。",
-)
-
-prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "sync"],
     decision="allow",
     justification="Daily todo sync 只同步本機 approval authorities 到 stable todo pool。",
 )
 
 prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "reassess-stale"],
-    decision="allow",
-    justification="研究閉環 P5（2026-09-09）佇列段 2：對「只因凍結 context 過期而 REVIEW、blocker 純 system_internal」的 decision_review 執行 reassess（decision_lab.workflow.reassess，append 新 decision、舊筆不動），新 decision 不再 REVIEW 才以 decision receipt 結案。需要 Neo4j／Engine C／Google Sheet（readonly）同一組本機資源，無新增主機或憑證。候選判定重用 blocker registry 的 resolution_mode，不猜；帶 user_decision 或 awaiting_external blocker 的一律不碰。不 dispatch、不 resolve 使用者項、不入圖、不動 live。",
-)
-
-prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "standing-go"],
     decision="allow",
-    justification="研究閉環 P5（2026-09-09）佇列段 2b：對 config/standing_authorization.json 列為 authorized 的 pq2 類型（decision_review、source_trace_review）執行使用者本來會下的 go——同一個 advance_decision_review／dispatch_source_trace_review，只是按鍵的人從使用者換成 config；receipt 與 gate 完全相同。config 載入時驗封閉性（每種類型必須明寫 authorized 或 never，四個 gate 類型永遠 never）；使用者明示 pending、在等世界、hint 提及付費的一律跳過。不入圖、不寫 Engine C 判讀、不動 thesis、不動 live。",
+    justification="研究閉環 P5（2026-09-09）佇列段 2b：對 config/standing_authorization.json 列為 authorized 的 pq2 類型執行使用者本來會下的 go——⚠ 2026-09-22（Phase 0 Step 0a.1）起 authorized **只剩 source_trace_review**（decision_review 隨 decision_lab 研究側退役，已移到 never），所以這條 rule 的 surface 比原本更窄：同一個 dispatch_source_trace_review，只是按鍵的人從使用者換成 config；receipt 與 gate 完全相同。config 載入時驗封閉性（每種類型必須明寫 authorized 或 never，四個 gate 類型永遠 never）；使用者明示 pending、在等世界、hint 提及付費的一律跳過。不入圖、不寫 Engine C 判讀、不動 thesis、不動 live。",
 )
 
 prefix_rule(
     pattern=[".venv\\Scripts\\python.exe", "-m", "webapp", "materialize"],
     decision="allow",
-    justification="Daily 收尾把 APP 讀的判讀重算一次並寫進 ignored derived cache（library/private/app/）。讀 Neo4j、Engine C SQLite、private ledger 與 Google Sheet（readonly）——與 daily_beta_snapshot.py／decision_lab today 同一組本機資源，無憑證；⚠ 2026-09-17 更正：`--scorecard`（D5 帳號計分表）**會連 yfinance 取歷史收盤**，所以「無新增網路主機」這句話對本 prefix 已不再成立——主機與 engine_c/etl_yfinance.py 與 scripts/daily_beta_snapshot.py 相同（兩支都已在本 allowlist、同樣無憑證），新增的是請求量而不是主機。對應的收緊同一個 change 落地：engine_b.account_scorecard.MAX_PRICED_SYMBOLS=200 是硬上限，超過就截斷並在 artifact 的 price_budget 與 filter reasons 裡現形（L15：放行與收緊必須同時發生）；不寫任何 authority、不入圖、不建 decision、不碰 .git 或 tracked 檔。⚠ 只放行 materialize 子命令：同一個模組的 serve 會綁定本機 port（新增 listener surface），刻意不在列——那是開機自啟的長駐服務，不是排程動作。",
+    justification="Daily 收尾把 APP 讀的判讀重算一次並寫進 ignored derived cache（library/private/app/）。讀 Neo4j、Engine C SQLite、private ledger 與 Google Sheet（readonly）——與 daily_beta_snapshot.py／catalyst_watch.py 同一組本機資源，無憑證（原本這裡對照的是 decision_lab today，它已於 2026-09-22 Step 0a.1 退出本 allowlist——對照組必須指得到還在列上的 entry，否則這句話驗不了）；⚠ 2026-09-17 更正：`--scorecard`（D5 帳號計分表）**會連 yfinance 取歷史收盤**，所以「無新增網路主機」這句話對本 prefix 已不再成立——主機與 engine_c/etl_yfinance.py 與 scripts/daily_beta_snapshot.py 相同（兩支都已在本 allowlist、同樣無憑證），新增的是請求量而不是主機。對應的收緊同一個 change 落地：engine_b.account_scorecard.MAX_PRICED_SYMBOLS=200 是硬上限，超過就截斷並在 artifact 的 price_budget 與 filter reasons 裡現形（L15：放行與收緊必須同時發生）；不寫任何 authority、不入圖、不建 decision、不碰 .git 或 tracked 檔。⚠ 只放行 materialize 子命令：同一個模組的 serve 會綁定本機 port（新增 listener surface），刻意不在列——那是開機自啟的長駐服務，不是排程動作。",
 )
 
 prefix_rule(

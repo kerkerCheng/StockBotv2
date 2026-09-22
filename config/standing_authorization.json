@@ -12,20 +12,13 @@
     "consumer：`python -m engine_b.todo standing-go --run`（互動／research-drain 段 2b）。daily 無人值守",
     "採用前要先過 sandbox impact review（ROADMAP 研究閉環 P5）。",
     "",
+    "⚠ 2026-09-22（Phase 0 Step 0a.1）：`decision_review` 已從 authorized 移到 never——decision_lab",
+    "研究側整批退役（G3／G12），那個 `go` 沒有東西可以推進了。authorized 現在只剩 source_trace_review。",
+    "",
     "兩種例外一律不動：使用者明示 `pending`（deferred_at）與在等世界（waiting_on）——常規授權買的是",
     "注意力，不是替使用者改決定、也不是替世界發生事情。"
   ],
   "authorized": {
-    "decision_review": {
-      "label": "決策缺口的 bounded research",
-      "go_means": "advance_decision_review 全函數：有 work order → dispatch 回 pq1；無 work order → reassess；仍有實質 blocker → 以 assessment-gap 排入 pq1",
-      "excludes": [
-        "入圖",
-        "Engine C 判讀寫入",
-        "thesis mutation",
-        "live"
-      ]
-    },
     "source_trace_review": {
       "label": "追源派回 pq1",
       "go_means": "requeue_trace 回 pq1 做 bounded 追源",
@@ -45,6 +38,7 @@
     }
   },
   "never": {
+    "decision_review": "機制退役（ROADMAP Phase 0 Step 0a.1，2026-09-22 使用者定案 G3／G12）——池裡的歷史項目仍是這個 type，讀取要認得，但它不再有常規授權：沒有任何東西會替使用者按這個 go。它從 authorized 搬到這裡而不是整格刪掉，因為 ITEM_TYPES 的封閉性驗證要求每一種都明寫在 authorized 或 never 其中之一",
     "ra_admission": "graph admission 是四個 authority gate 之一",
     "engine_c_observation": "Engine C 判讀寫入是 authority gate",
     "thesis_mutation": "thesis mutation 是 authority gate",

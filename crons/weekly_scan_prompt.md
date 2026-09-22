@@ -18,7 +18,7 @@ Weekly 只做三件事：
 2. **系統健康審查**：直接跑本機完整 health audit；可確定性修復的維護問題先修再複查。
 3. **Lifecycle 唯讀提醒**：`retired`／`revised` 與正式核查結論仍由使用者決定。
 
-Daily 負責已知來源的 X／EDGAR harvest、triage、Engine C refresh、today 與統一 pq2 brief；Weekly
+Daily 負責已知來源的 X／EDGAR harvest、triage、Engine C refresh、心跳與統一 pq2 brief；Weekly
 不重做 daily backlog，也不另建第二套編號。
 
 ## 執行流程
