@@ -34,7 +34,6 @@ from briefing.analyst_view.contracts import (
     BLOCKED, READY, READY_WITH_FLAGS, WEAK_INPUT_RULES, readiness_class, worst_status,
 )
 from tests.test_alpha_investment_view import _view
-from tests.test_entry_logic import _criterion, _entry
 from tests.test_fundamental_model import _run
 from tests.test_implied_return import TODAY, _return, _valued
 from tests.test_valuation_model import _index
@@ -47,15 +46,16 @@ PKG = ROOT / "briefing" / "analyst_view"
 # fixtures：一份「上游齊備」的 view（含估值／報酬），entry 可有可無
 # ---------------------------------------------------------------------------
 
-def _full_view(*, with_criterion: bool, **kwargs: Any) -> AlphaInvestmentView:
+def _full_view(*, with_criterion: bool = True, **kwargs: Any) -> AlphaInvestmentView:
+    """⚠ 2026-09-23（Phase 0 Step 0b.1b）：`with_criterion` 已無作用（`entry` panel 與整個
+    `alpha.entry` 在 F 組退役）。參數保留是為了不動幾十個呼叫端；它不再改變回傳的 view。
+    """
     model = _run(index=_index())
     valuation = _valued(model)
     implied = _return(valuation)
-    criteria = [_criterion()] if with_criterion else []
-    entry = _entry(implied, criteria)
     return _view(fundamental_model=model, valuation=valuation,
                  valuation_records=list(valuation.assumptions), implied_return=implied,
-                 horizon_records=[implied.horizon], entry=entry, entry_records=criteria,
+                 horizon_records=[implied.horizon],
                  today=TODAY, **kwargs)
 
 
@@ -125,7 +125,7 @@ def test_every_consumer_cell_is_the_same_object_as_the_read_model_cell() -> None
 
 def test_consumer_carries_no_formula_and_no_numeric_literal_of_its_own() -> None:
     """沒有公式常數（365.25／0.15／100）、沒有 float 字面值、不 import 任何 alpha 模型模組。"""
-    model_modules = ("alpha.entry", "alpha.entry.model", "alpha.valuation", "alpha.valuation.model",
+    model_modules = ("alpha.valuation", "alpha.valuation.model",
                      "alpha.implied_return", "alpha.implied_return.model", "alpha.fundamental",
                      "alpha.refresh", "alpha.refresh.resolver")
     for name in ("contracts.py", "compose.py", "render.py"):

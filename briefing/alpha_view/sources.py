@@ -17,10 +17,6 @@ from typing import Any, Iterable, Mapping, Sequence
 
 from alpha.context import ContextBuild, build_research_context
 from alpha.contracts import AlphaSignal
-from alpha.entry import (
-    CRITERION_BASIS_INVESTOR_POLICY, EntryAssessmentResult, build_entry_assessment, entry_criterion_record,
-    parse_entry_criterion_record,
-)
 from alpha.errors import AlphaError, ContractViolation, PointInTimeUnsupported
 from alpha.fundamental import FundamentalModelResult, build_fundamental_model
 from alpha.valuation.contracts import (
@@ -31,7 +27,6 @@ from alpha.implied_return import ImpliedReturnResult, build_implied_return
 from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
 from alpha.providers import briefs as brief_ledger
-from alpha.providers import entry_criteria as entry_ledger
 from alpha.providers import horizon_assumptions as horizon_ledger
 from alpha.abstention.contracts import select_abstention
 from alpha.providers import abstentions as abstention_ledger
@@ -452,43 +447,6 @@ def _implied_return_model(
     return result, None, records
 
 
-def _entry_model(
-    build: ContextBuild, implied_return: ImpliedReturnResult | None, implied_return_reason: str | None,
-    ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date, identity: Mapping[str, Any],
-    sandbox_hurdle: float | None = None,
-) -> tuple[EntryAssessmentResult | None, str | None, list[Any]]:
-    """Entry Logic v1（Step 3）的取數與執行。
-
-    - 要求報酬判準由 private ledger（`alpha/providers/entry_criteria.py`）讀出；implied return 是已經跑好的結果。
-      本檔不算任何數字——算術在 `alpha.entry`。任何一段失敗都 fail-soft，原因交給 builder。
-    - `sandbox_hurdle`：**非持久**驗算——只在記憶體疊一筆 `author=sandbox` 的判準交給模型，**不寫 ledger、不進
-      變更偵測**（ledger 的 append 入口也拒收 sandbox）。回傳的第三個值仍是 ledger 裡的真紀錄。
-    """
-    records: list[Any] = []
-    try:
-        records, parse_errors = entry_ledger.read_entry_criterion_records(str(ticker))
-    except Exception as exc:  # noqa: BLE001
-        return None, f"entry criterion ledger 讀取失敗：{type(exc).__name__}", records
-    model_records = list(records)
-    if sandbox_hurdle is not None:
-        try:
-            sandbox = parse_entry_criterion_record(entry_criterion_record(
-                company_id=str(company_id), ticker=str(ticker), value=float(sandbox_hurdle),
-                basis=CRITERION_BASIS_INVESTOR_POLICY, rationale="sandbox 驗算（非持久；未寫入 ledger，不是使用者宣告的政策）",
-                author="sandbox", created_at=build_instant(as_of or today)))
-        except ContractViolation as exc:
-            return None, f"sandbox hurdle 不合法：{exc}", records
-        model_records.append(sandbox)
-    try:
-        result = build_entry_assessment(
-            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
-            implied_return=implied_return, implied_return_reason=implied_return_reason,
-            criterion_records=model_records, parse_errors=parse_errors, price=_current_price(build, identity),
-        )
-    except Exception as exc:  # noqa: BLE001 — entry 失敗只讓該區 missing，不讓整份 view 失敗
-        return None, f"entry model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
-    return result, None, records
-
 
 def _ranking_position(graph: Any, company_id: CompanyId, *, as_of: date | None) -> Mapping[str, Any] | None:
     try:
@@ -522,7 +480,7 @@ def fetch_alpha_investment_view(
 
     Step 0.5：預設跑 authority 變更偵測（`changes.detect_changes`）並把 `ChangeEvent` 交給 builder；
     `scenario` 指定時在真實 state 上疊一件假想變化（`scenarios.py`），refresh section 標 `scenario`。
-    Step 3：`sandbox_hurdle` 只在記憶體疊一筆非持久的 entry criterion 驗算，不寫任何 authority。
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`sandbox_hurdle` 隨 F 組（entry criterion）退役，已無作用。
     """
     if scenario is not None and scenario not in SCENARIOS:
         raise AlphaError(f"未知情境 {scenario!r}；已知 {SCENARIOS}")
@@ -581,9 +539,7 @@ def fetch_alpha_investment_view(
             fundamental_model=fundamental_model,
             fundamentals_provider=fundamentals_provider,
         )
-        entry_model, entry_reason, entry_records = _entry_model(
-            build, implied_return_model, implied_return_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-            identity=identity, sandbox_hurdle=sandbox_hurdle)
+        entry_records: list = []                      # F 組退役（2026-09-23）：沒有 entry ledger 了
         # ---- V2（2026-09-15）gap closure：目標期間的共識 EPS 時序。provider 沒這能力就空。
         consensus_history: tuple = ()
         fetch_history = getattr(fundamentals_provider, "fiscal_consensus_history", None)
@@ -754,7 +710,6 @@ def fetch_alpha_investment_view(
         fundamental_model=fundamental_model, fundamental_model_reason=fundamental_reason,
         valuation=valuation_model, valuation_reason=valuation_reason, valuation_records=valuation_records,
         implied_return=implied_return_model, implied_return_reason=implied_return_reason, horizon_records=horizon_records,
-        entry=entry_model, entry_reason=entry_reason, entry_records=entry_records,
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
         abstention_records=abstention_records,

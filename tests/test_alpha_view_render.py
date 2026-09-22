@@ -115,7 +115,8 @@ def test_renderer_is_deterministic_and_covers_every_section() -> None:
                     "## 11. 證偽條件", "## 12. 情境", "## 13. 估值", "## 13a. Base-case implied return",
                     # D2（2026-09-18）：13b 由「下檔（尚未建模）」換成與 13d 對稱的 overlay。
                     "## 13b. 判斷錯了值多少",
-                    "## 13c. 進場邏輯", "## 14. 證據與 provenance", "## 15. Refresh／dependency status",
+                    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「## 13c. 進場邏輯」隨 F 組退役。
+                    "## 14. 證據與 provenance", "## 15. Refresh／dependency status",
                     "## 16. 新鮮度總表"):
         assert heading in first, heading
 

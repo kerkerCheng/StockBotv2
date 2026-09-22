@@ -26,7 +26,7 @@ from .contracts import (
     StructuralEdgeItem,
 )
 
-__all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards", "render_entry_logic_lines",
+__all__ = ["render_alpha_investment_view_markdown", "render_alpha_cards",
            "render_implied_return_lines", "render_payoff_lines", "format_datum_value", "format_ratio", "format_scalar",
            "render_datum_line", "status_label"]
 
@@ -477,7 +477,6 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines.append("")
 
     # 13c. Entry logic（Step 3；`python -m briefing entry` 單獨印這一節）
-    lines += render_entry_logic_lines(view)
 
     # 14. Evidence
     ev = view.evidence
@@ -611,31 +610,7 @@ def render_payoff_lines(view: AlphaInvestmentView) -> list[str]:
     return lines
 
 
-def render_entry_logic_lines(view: AlphaInvestmentView) -> list[str]:
-    """第 13c 節（entry logic）。只印 entry_logic section 的 Datum；公式字串來自 `alpha.entry`，本檔不含公式、
-    不比較任何價格、不把 comparison 翻譯成 action。"""
-    lines: list[str] = []
-    el = view.entry_logic
-    lines += _section("13c. 進場邏輯（implied return ＋ 明示的要求報酬判準 → analytical entry threshold；不是 buy／sell）", el.meta)
-    if el.period:
-        lines.append(f"目標期間：{markdown_text(el.period)}" + (f"（至 {el.period_end.isoformat()}）" if el.period_end else ""))
-    for datum in (el.convention, el.criterion, el.required_annualized_return, el.current_price, el.fair_value, el.value_date,
-                  el.horizon_window, el.current_annualized_implied_return, el.entry_price, el.price_to_entry_gap,
-                  el.hurdle_comparison, el.assessment):
-        lines.append(_datum_line(datum))
-    if el.selection is not None:
-        sel = el.selection
-        lines.append(
-            f"entry criterion 選取：input {sel.input_count}／accepted {sel.accepted_count}／filtered {sel.filtered_count}"
-            f"（{_mapping_text(sel.reasons, None) or '無過濾'}）")
-    if el.trace:
-        lines.append("算式（每格標 criterion_input／return_input／price_input／derived）：")
-        lines += ["  " + _datum_line(d).replace("\n  - ", "\n    - ") for d in el.trace]
-    lines.append(_datum_line(el.epistemics))
-    lines.append("entry logic 不是什麼：")
-    lines += [f"- {markdown_text(x)}" for x in el.is_not]
-    lines.append("")
-    return lines
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`render_entry_logic_lines`（第 13c 節）隨 F 組退役。
 
 
 def render_refresh_status_lines(view: AlphaInvestmentView) -> list[str]:

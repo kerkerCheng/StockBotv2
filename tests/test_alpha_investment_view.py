@@ -389,12 +389,10 @@ def test_view_contains_no_position_fields() -> None:
         if parts & banned:
             offenders.append(path)
     assert not offenders, f"read model 出現部位欄位：{offenders}"
-    # entry logic 自 2026-09-06 Step 3 起**有能力**（門檻價），所以沒判準時是 missing 不是 not_modeled；
-    # 但它仍然一格 action／部位欄位都不得長出來——上面的 token 掃描已經走過整份 to_dict()。
-    entry = view.entry_logic
-    assert entry.meta.status == "missing"
-    assert entry.entry_price.value is None and entry.hurdle_comparison.value is None
-    assert "buy" in " ".join(entry.is_not).lower() and "position size" in " ".join(entry.is_not)
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`entry_logic` section 隨 F 組退役（73 檔全 missing、
+    # 從未用過）。**「一格 action／部位欄位都不得長出來」沒有放寬**——上面的 token 掃描走過整份
+    # `to_dict()`，那是這條測試真正的主詞；退役後連那個 section 都不存在了。
+    assert not hasattr(view, "entry_logic"), "退役的 section 不得復活"
     # D2（2026-09-18）：下檔**已經建模**（downside scenario 走同一條橋），所以它從
     # `not_modeled`（沒這個能力）變成 `missing`（有能力、這一檔還沒人寫）。
     # ⚠ 兩者的下一步完全不同：`not_modeled` 沒有人該去補，`missing` 有。
@@ -499,7 +497,7 @@ def test_to_dict_round_trips_json_and_keeps_nulls() -> None:
     # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
     assert back["capability_map"]["downside"]["status"] == "missing"
     assert back["capability_map"]["implied_return"]["status"] == "missing"
-    assert back["capability_map"]["entry_logic"]["status"] == "missing"
+    assert "entry_logic" not in back["capability_map"], "退役的 section 不得留在 capability_map"
     nulls = [p for p, k, v in _walk(back) if k == "value" and v is None]
     assert nulls, "read model 裡沒有任何 null——代表缺席被填掉了"
 
@@ -531,11 +529,10 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     # 變的是 downside 不再屬於那一類。所以改成驗它**不在**裡面，而不是刪掉這條檢查。
     assert "downside" not in set(card["not_modeled"])
     assert "implied_return" not in card["not_modeled"]                 # Step 2：有能力了；沒資料是 missing
-    assert "entry_logic" not in card["not_modeled"]                    # Step 3：有能力了；沒判準是 missing
-    assert card["entry_logic"]["status"] == "missing" and card["entry_logic"]["entry_price"] is None
-    # 本 fixture 根本沒注入 entry model，理由就該這樣說；「缺的是投資門檻判斷」那個理由由 tests/test_entry_logic.py 守
-    assert "未執行 entry model" in (card["entry_logic"]["reason"] or "")
-    assert card["entry_logic"]["hurdle_comparison"] is None and card["entry_logic"]["assessment"] is None
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`entry_logic` 隨 F 組退役，卡片上整格消失。
+    # **「沒能力的東西必須出現在 not_modeled 清單」那個判準不變**——變的是它不再是任何一類。
+    assert "entry_logic" not in card, "退役的 section 不得留在卡片上"
+    assert "entry_logic" not in set(card["not_modeled"])
     assert card["implied_return"]["status"] == "missing" and card["implied_return"]["price_return"] is None
     assert "internal_fundamentals" not in card["not_modeled"]          # 有能力了；沒資料是 missing
     assert card["internal_fundamentals_status"] == "missing"

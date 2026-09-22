@@ -56,7 +56,8 @@ SERVE_IMPORT_ALLOWLIST = {
 FORBIDDEN_RUNTIME_MODULES = (
     "anthropic", "openai", "neo4j", "yfinance", "requests", "psycopg2", "sqlite3",
     "alpha.valuation.model", "alpha.implied_return.model", "alpha.fundamental.model",
-    "alpha.entry.model", "alpha.models.session_assessor", "alpha.refresh.resolver",
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`alpha.entry.model` 已刪除（F 組退役），從清單移除。
+    "alpha.models.session_assessor", "alpha.refresh.resolver",
     "alpha.context", "alpha.providers.graph_neo4j", "alpha.providers.fundamentals",
     "briefing.alpha_view.builder", "briefing.alpha_view.sources", "briefing.analyst_view.compose",
     "webapp.materialize", "engine_c", "decision_lab", "fetchers",

@@ -756,36 +756,9 @@ class ArgumentSection:
     is_not: tuple[str, ...]
 
 
-@dataclass(frozen=True, slots=True)
-class EntryLogicSection:
-    """Entry Logic（Step 3）：**只消費** `alpha.entry.build_entry_assessment` 的輸出，builder 不含任何門檻價公式。
-
-    - `criterion`／`required_annualized_return` 是投資人政策（`ec_*`，basis `investor_policy`）——不是觀測、不是
-      session 對公司的判斷；沒有宣告就是 `missing`（理由明寫「缺的是投資門檻判斷」），不補預設。
-    - `entry_price`／`price_to_entry_gap`／`hurdle_comparison` 是確定性算術；`assessment` 說這次評估能不能當 clean 讀
-      （alignment 不對齊 → `review_required`，算術照列但 meta 不得是 available）。
-    - `is_not`：這格明列它不是什麼（buy／sell、size、allocation、order、permission、ranking）。
-    """
-
-    meta: SectionMeta                          # available／missing／review_required／invalidated／stale
-    convention: Datum
-    criterion: Datum                           # 生效的 entry criterion（ec_*）
-    required_annualized_return: Datum
-    current_price: Datum
-    fair_value: Datum
-    value_date: Datum
-    horizon_window: Datum
-    current_annualized_implied_return: Datum
-    entry_price: Datum
-    price_to_entry_gap: Datum                  # {relative, absolute}
-    hurdle_comparison: Datum                   # meets_analytical_hurdle／above_analytical_entry
-    assessment: Datum                          # {state: clean／review_required, alignment, reason}
-    trace: tuple[Datum, ...]
-    epistemics: Datum
-    selection: "EvidenceSelectionCounts | None"
-    is_not: tuple[str, ...]
-    period: str | None = None
-    period_end: date | None = None
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`EntryLogicSection` 退役（F 組）。**
+# 進場門檻（要求報酬 → 門檻價 → 現價比較）73 檔全 missing、從未用過。
+# **進場靠判斷，出場靠 disproof**——系統不再有「門檻價」這個概念。
 
 
 @dataclass(frozen=True, slots=True)
@@ -955,7 +928,6 @@ class AlphaInvestmentView:
     #: 舊語意「系統不產生下檔估計」已作廢——現在它是「反證成真時的假設套同一條橋」，
     #: 仍然不是 bear case、沒有機率加權。
     downside: PayoffScenarioSection
-    entry_logic: EntryLogicSection
     #: D2（2026-09-18）：歸零旗標四盞燈。與 `downside` 是同一個問題的兩面——
     #: 後者答「判斷錯了值多少」，它答「這家公司會不會直接歸零」。
     wipeout_flags: WipeoutFlagsSection
@@ -972,7 +944,7 @@ class AlphaInvestmentView:
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
         "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
         "expectation_gap", "catalysts", "falsification", "scenarios", "market", "valuation", "implied_return",
-        "downside", "entry_logic", "wipeout_flags", "evidence", "refresh_status", "payoff_scenario",
+        "downside", "wipeout_flags", "evidence", "refresh_status", "payoff_scenario",
         "investor_brief", "argument",
     )
 

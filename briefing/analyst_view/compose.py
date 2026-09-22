@@ -467,7 +467,7 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     everything: list[str] = list(fixed)
     everything += list(view.implied_return.is_not)
     everything += list(view.valuation.gap_is_not)
-    everything += list(view.entry_logic.is_not)
+    # ⚠ 2026-09-23（Step 0b.1b）：`entry_logic.is_not` 隨 F 組退役。
     everything += list(view.payoff_scenario.is_not)
     everything += list(view.investor_brief.is_not)
     everything += list(view.argument.is_not)
