@@ -226,6 +226,13 @@ Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis
 
 使用者留下的只有三件：讀 reviewer 的 verdict；reviewer 對「刪除的測試守什麼」有疑慮時裁決；三個月後決定紀錄 §10 的四條否證。
 
+### 結案之後：停，不要開 Phase 1
+
+R2 回 GO 後：ROADMAP Phase 0 標 ✅、`docs/plans/README.md` 對照表本列改 completed，commit、push。
+然後 **`AWAITING_HUMAN`**：Phase 1 還沒有 plan，不得自行開工。HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`
+「每個 Phase 開工前要有一份 plan」那段指令，並在 closeout 報告附「本 Phase 執行中發現、Phase 1 要決定的問題」清單
+（例如：語意條件 kind 的欄位、watch_decision 的 go 語意、哪些反證先登記）。這是本 plan 唯一刻意的停點。
+
 ## 6. 已知陷阱
 
 - **`ITEM_TYPES` 是封閉字彙且有測試綁鍵一致**（`tests/test_engine_b_todo.py`）：退役 kind 用 legacy 標記，不刪 key。

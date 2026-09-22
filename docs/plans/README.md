@@ -9,6 +9,31 @@
 - `completed` — 產出已落地，僅留作歷史紀錄。
 - `superseded` — 被後續 plan 取代（見該檔 `superseded_by`），不要再依它開工。
 
+## 每個 Phase 開工前要有一份 plan（2026-09-22 起）
+
+**分工：便宜模型執行 plan；plan 由強模型（fable）與使用者一起寫。** 執行者跑到 Phase 結案、R2 GO 之後，
+若下一個 Phase 在下表沒有 plan 檔，就停在 `AWAITING_HUMAN`，HUMAN SUMMARY 的「下一步」印出下面這段指令，
+並在 closeout 報告附「本 Phase 執行中發現、下一 Phase 要決定的問題清單」。使用者切到 fable 開新 session 貼這段：
+
+```
+讀 docs/ROADMAP.md 的 Phase <N> 那一列、docs/brainstorms/2026-09-22-graph-first-direction-decision.md、
+上一個 Phase 的 closeout 報告（docs/reports/）與它列的待決問題。先 brainstorm：把要我決定的判斷點列出來問我，
+不要先寫。定案後照 docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md 的骨架
+（核准狀態與進度表、不可越線、Steps 各附改哪裡／怎麼驗、驗收數的是哪一層、已知陷阱、結案 R2 的 WORK_REQUEST）
+寫 docs/plans/<日期>-<序號>-<type>-phase<N>-<slug>-plan.md，登記到本檔對照表，commit、push。
+```
+
+| Phase | plan 檔 | 狀態 |
+|---|---|---|
+| 0 拆 | [2026-09-22-001](2026-09-22-001-refactor-phase0-retire-plan.md) | active |
+| 1 等待與心跳 | 尚無 | — |
+| 2 讀圖兩種 kind 加走圖 | 尚無 | — |
+| 3 候選狀態加三題 | 尚無 | — |
+| 4 層中心來源 | 尚無 | — |
+| 5 量測 | 尚無 | — |
+
+---
+
 | Plan | 主題 | 狀態 |
 |------|------|------|
 | [001 (2026-06-07)](2026-06-07-001-feat-cpo-vertical-slice-plan.md) | CPO 垂直切片 — 基礎建設 + extract 管線 | completed |

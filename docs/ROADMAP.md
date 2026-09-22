@@ -97,6 +97,8 @@ Readiness 規則同步換：核心面板改為 headline、短評、why、researc
 | **4 層中心來源** ○ | 抽取入口的選源規則：層文件優先（客戶 filing 供應商名單、產業報告、規格書、teardown）；onboarding packet 必含「這份文件列舉了哪一層的供應商集合」；走圖的「單供應商但繞不過」問句餵 lead-intake 當研究題；`substitutability` 的 `auto` 投影補可稽核性（逐字必含可替代性語言，否則標 `unsupported`） | 圖是公司中心（65% 單供應商）；65% 量到的是我們讀了誰的文件（G4） | ①單供應商節點比例 65% → 下降（Cypher 同決定紀錄 §1.1）；②供應商集合 ≥3 家且逐字撐住的層數 10 → 上升；③`auto` 投影的 sub 中逐字不含可替代性語言的比例（2026-09-21 量 103/136）→ 下降 | 2 |
 | **5 量測** ○ | 量測層從 trade_log 加收據重建（舊 Decision Store 的 outcome 只當歷史）；主題等權籃子定義（append-only、附理由與日期）；追蹤表加籃子基準與三個 power-law 統計量；圖預測對錯表（讀圖斷言 vs 後續證據）；帳號計分表接籃子超額 | 報酬是慢迴路，圖的預測是快迴路（G9） | ①追蹤表印籃子超額；②圖預測表有第一筆對／錯；③計分表印量測起始日與樣本數 | 3 |
 
+**每個 Phase 開工前要有 plan；沒有就停。** Phase 與 plan 檔的對照、以及「開 plan session」要貼的指令住 [`plans/README.md`](plans/README.md)。
+
 ### 研究並行（不是 Phase，但 Phase 3 的驗收靠它）
 
 便宜模型蓋 Phase 1 到 3 期間，**互動 session 用強模型寫讀圖與敘事**：從既有 8 份讀圖與 3 份 thesis 的公司開始（InP 層、CW DFB 層、Sivers 的 Ayar 插槽），每份敘事末行寫候選狀態。研究走 pq1／pq2，不占本表。
