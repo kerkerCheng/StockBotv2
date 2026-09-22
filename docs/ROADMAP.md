@@ -2,7 +2,7 @@
 
 > **本檔只放 active future work：Phase 與四欄（做什麼／為什麼／驗收／前置）。**
 > 判準與邊界住 [`AGENTS.md`](../AGENTS.md)；程序住 [`OPERATIONS.md`](OPERATIONS.md)；
-> 決定紀錄住 [`brainstorms/2026-09-22-graph-first-direction-decision.md`](brainstorms/2026-09-22-graph-first-direction-decision.md)（G1–G11）。
+> 決定紀錄住 [`brainstorms/2026-09-22-graph-first-direction-decision.md`](brainstorms/2026-09-22-graph-first-direction-decision.md)（G1–G12）。
 > 前一版（Alpha Edge Phase 0–7、amendment、backlog）逐字封存於
 > [`archive/roadmap-alpha-edge-2026-09-22.md`](archive/roadmap-alpha-edge-2026-09-22.md)。
 >
@@ -90,12 +90,12 @@ Readiness 規則同步換：核心面板改為 headline、短評、why、researc
 
 | Phase | 做什麼 | 為什麼 | 驗收（數的是哪一層的東西） | 前置 |
 |---|---|---|---|---|
-| **0 拆** ○ | **0a 停跑**：排程與 APP 不再呼叫估值、反向橋、賭注四價、decision_lab 鑄號與 reassess；排序不再餵籃子與 pq1；multi_year kind 退役；heartbeat 段 2 不印目標價；三個研究 skill 的首選／籃子／payoff 句同 commit 改；sandbox 規則的兩條退役入口移除。**0b 刪除**：依下方退役清單刪模組、測試、config、文件段；decision_lab 切成 A5 留、研究側刪。**0c 池子**：17 筆未結案 decision_review 一次批次 `drop`，理由「機制退役」，receipt 註明語境；`standing_authorization.json` 移除 `decision_review` 類別 | 立刻減少注意力噪音，並移除 Goodhart 誘因；停跑而不刪會讓 blocker 與 missing 繼續長回來 | ①**殭屍 grep 歸零**：退役清單的八組 regex 在 code／skills／tests／config／static 命中 0（docs/archive 與 lessons-incidents 除外）；②新鑄 pq2 中 `source=decision_lab` 為 0（查 `todo_pool.json` 的 `added_at` 在 Phase 0 結案日之後）；③`python -m webapp status` 沒有 `multi_year`、`basket` kind；④心跳五段照印且段 2 印「候選狀態板未落地（not_yet_recorded）」 | 無 |
-| **1 等待與心跳** ○ | Event Watch 加 `semantic_condition` kind（條件原文、實體／層、資料流、到期、wake target）；thesis／讀圖／敘事寫反證時自動 `register`；411 條舊反證只登記被讀圖或敘事引用的；心跳段 2 印較昨 diff（昨天快照落地）＋ watch 今日醒／到期／標旗 ＋ 反證在盯／未盯 ＋ 未檢 N；AI 分類層對 T0 實體比對命中的新文件問「是否觸及條件」，每日硬上限，只標旗；`entity_filing_signal` 加 wake target `reread_layer`（客戶節點出新文件 → 該層讀圖標 stale） | 出場只認反證，反證沒人盯之前其他都是空的；registry 已存在且沒漏，缺的只是語意條件（決定紀錄 §1.5） | ①watch 中 `semantic_condition` 筆數 0 → ≥ 現有 3 thesis ＋ 8 讀圖的反證數；②心跳出現第一次真實的「今日醒 ≥1」；③AI 層關閉時心跳印「未檢 N」且 N>0；④到期的 watch 出現在 pq2 為 `user_decision`，不消失 | 0a |
+| **0 拆** ○ | **0a 停跑**：排程與 APP 不再呼叫估值、反向橋、賭注四價、decision_lab 鑄號與 reassess；排序不再餵籃子與 pq1；multi_year kind 退役；heartbeat 段 2 不印目標價；三個研究 skill 的首選／籃子／payoff 句同 commit 改；sandbox 規則的兩條退役入口移除。**0b 刪除**：依下方退役清單刪模組、測試、config、文件段；decision_lab 舊店凍結唯讀、研究側刪（見下表）；5% 單筆與 ETF 槓桿 cap 的硬擋搬進 `scripts/record_trade.py`，寫 Sheet 前查、超過 fail closed、override 須附理由；`sheet_only_holding` kind 退役（Sheet 有、敘事沒有的持股改列候選板「已持有、缺敘事」）；OPERATIONS 的 decision_lab 命令段、ARCHITECTURE §8.2、CONCEPTS 同 commit 更新。**0c 池子**：17 筆未結案 decision_review 一次批次 `drop`，理由「機制退役」，receipt 註明語境；`standing_authorization.json` 移除 `decision_review` 類別 | 立刻減少注意力噪音，並移除 Goodhart 誘因；停跑而不刪會讓 blocker 與 missing 繼續長回來 | ①**殭屍 grep 歸零**：退役清單的八組 regex 在 code／skills／tests／config／static 命中 0（docs/archive 與 lessons-incidents 除外）；②新鑄 pq2 中 `source=decision_lab` 為 0（查 `todo_pool.json` 的 `added_at` 在 Phase 0 結案日之後）；③`python -m webapp status` 沒有 `multi_year`、`basket` kind；④心跳五段照印且段 2 印「候選狀態板未落地（not_yet_recorded）」；⑤Decision Store 檔案 sha256 前後相同、`live_choices` 仍為 1；⑥`record_trade.py` dry-run 對超過 5% 的成交 fail closed（新增測試） | 無 |
+| **1 等待與心跳** ○ | Event Watch 加 `semantic_condition` kind（條件原文、實體／層、資料流、到期、wake target）；thesis／讀圖／敘事寫反證時自動 `register`；411 條舊反證只登記被讀圖或敘事引用的；心跳段 2 印較昨 diff（昨天快照落地）＋ watch 今日醒／到期／標旗 ＋ 反證在盯／未盯 ＋ 未檢 N；AI 分類層對 T0 實體比對命中的新文件問「是否觸及條件」，每日硬上限，只標旗；`entity_filing_signal` 加 wake target `reread_layer`（客戶節點出新文件 → 該層讀圖標 stale）；watch 到期鑄 pq2 新 kind `watch_decision`（`GO_AUTHORIZATION` 必宣告：go＝現在啟動研究、不含任何 authority；`pending --until`＝續等、`drop`＝放棄） | 出場只認反證，反證沒人盯之前其他都是空的；registry 已存在且沒漏，缺的只是語意條件（決定紀錄 §1.5） | ①watch 中 `semantic_condition` 筆數 0 → ≥ 現有 3 thesis ＋ 8 讀圖的反證數；②心跳出現第一次真實的「今日醒 ≥1」；③AI 層關閉時心跳印「未檢 N」且 N>0；④到期的 watch 出現在 pq2 為 `user_decision`，不消失 | 0a |
 | **2 讀圖兩種 kind ＋ 走圖** ○ | `READING_KINDS` 加 `socket`；`query.structure` 支援插槽五角度（客戶產品節點：還有誰供、各自 qualification_status、客戶端逐字、上游、反向路徑）；staleness digest 含 `qualification_status`；讀圖輸出必含逐字（L18）；走圖問句產生器：封閉字彙的問句型別（需求側繞不過但只有一家且全自報、走不到錨、讀圖過期、lead 點名但不在圖、重複節點候選），輸出研究佇列段 `graph_holes`，優先序＝lead 時間＋使用者點名；coverage 頁改為走圖頁；structure_readings 給一頁；瓶頸排序頁改結構表 | 讀圖是新中心；粒度題靠兩種讀圖解，不靠選唯一正確的層（G5）；研究方向由圖報洞與 lead 驅動，不由分數（G2） | ①ledger 出現第一份 `socket` 讀圖（研究並行寫）；②`graph_holes` 段每日印計數，且每型問句觸發率 <50%（不恆亮，L14-4）；③走圖頁與讀圖頁在 `webapp status` 列得出 kind | 0a |
-| **3 候選狀態 ＋ 三題** ○ | narrative ledger 加 `candidate_state`（五值封閉字彙）；缺 X／等回落必帶 `watch_id`，不要必帶 reason；三題各接資料源與「無法量」出口：會死嗎＝歸零旗標補稀釋與 going concern 兩盞；已定價嗎＝自家 EV/S（虧損期 P/S）三年百分位、主題籃子中位數、30／90 天相對漲幅三行只印不判；出現在數字裡了嗎＝分部營收或月營收的結構變化；APP 稽核區印三題三行、首屏印候選狀態與三個字；籃子頁改候選狀態板；positions 連「已持有」；heartbeat 印各狀態檔數與最老滯留天數；readiness 核心面板換 | 沒有排序後的對稱風險是永遠不收斂（G6）；財務只回答三題（G3） | ①有敘事的檔 100% 有候選狀態；②「缺 X」100% 指向活的 watch；③三題每題對每檔有值或有 `absence_kind`；④歸零旗標四盞有值的檔數（今天稀釋與 GC 是 0/73） | 1、2 |
+| **3 候選狀態 ＋ 三題** ○ | narrative ledger 加 `candidate_state`（五值封閉字彙）；缺 X／等回落必帶 `watch_id`，不要必帶 reason；三題各接資料源與「無法量」出口：會死嗎＝歸零旗標補稀釋與 going concern 兩盞；已定價嗎＝自家 EV/S（虧損期 P/S）三年百分位、主題籃子中位數、30／90 天相對漲幅三行只印不判；出現在數字裡了嗎＝分部營收或月營收的結構變化；APP 稽核區印三題三行、首屏印候選狀態與三個字；籃子頁改候選狀態板；positions 連「已持有」；heartbeat 印各狀態檔數與最老滯留天數；readiness 核心面板換；`record_trade.py --receipt`：成交事件內嵌敘事 digest、讀圖 digest、候選狀態、三題答案、在盯的 watch id、使用者一句理由，缺收據 fail closed | 沒有排序後的對稱風險是永遠不收斂（G6）；財務只回答三題（G3） | ①有敘事的檔 100% 有候選狀態；②「缺 X」100% 指向活的 watch；③三題每題對每檔有值或有 `absence_kind`；④歸零旗標四盞有值的檔數（今天稀釋與 GC 是 0/73）；⑤新成交事件 100% 帶收據 | 1、2 |
 | **4 層中心來源** ○ | 抽取入口的選源規則：層文件優先（客戶 filing 供應商名單、產業報告、規格書、teardown）；onboarding packet 必含「這份文件列舉了哪一層的供應商集合」；走圖的「單供應商但繞不過」問句餵 lead-intake 當研究題；`substitutability` 的 `auto` 投影補可稽核性（逐字必含可替代性語言，否則標 `unsupported`） | 圖是公司中心（65% 單供應商）；65% 量到的是我們讀了誰的文件（G4） | ①單供應商節點比例 65% → 下降（Cypher 同決定紀錄 §1.1）；②供應商集合 ≥3 家且逐字撐住的層數 10 → 上升；③`auto` 投影的 sub 中逐字不含可替代性語言的比例（2026-09-21 量 103/136）→ 下降 | 2 |
-| **5 量測** ○ | 主題等權籃子定義（append-only、附理由與日期）；追蹤表加籃子基準與三個 power-law 統計量；圖預測對錯表（讀圖斷言 vs 後續證據）；帳號計分表接籃子超額 | 報酬是慢迴路，圖的預測是快迴路（G9） | ①追蹤表印籃子超額；②圖預測表有第一筆對／錯；③計分表印量測起始日與樣本數 | 3 |
+| **5 量測** ○ | 量測層從 trade_log 加收據重建（舊 Decision Store 的 outcome 只當歷史）；主題等權籃子定義（append-only、附理由與日期）；追蹤表加籃子基準與三個 power-law 統計量；圖預測對錯表（讀圖斷言 vs 後續證據）；帳號計分表接籃子超額 | 報酬是慢迴路，圖的預測是快迴路（G9） | ①追蹤表印籃子超額；②圖預測表有第一筆對／錯；③計分表印量測起始日與樣本數 | 3 |
 
 ### 研究並行（不是 Phase，但 Phase 3 的驗收靠它）
 
@@ -117,16 +117,18 @@ Readiness 規則同步換：核心面板改為 headline、短評、why、researc
 | D 多年反向橋／要幾倍 | `alpha\.reverse\|build_reverse_bridge\|multi_year\|multiple_horizon\|要幾倍\|倍率射程\|要翻倍需要什麼為真\|RETURN_MULTIPLE_LADDER` | 18（`briefing/multi_year.py`、`alpha/reverse/`、`webapp/materialize.py`、`alpha/models/session_assessor.py`…） | `app.js`、`index.html` nav | 0 | 10 | — | `alpha/reverse`、`briefing/multi_year.py`、`scripts/multi_year_check.py`、`materialize_multi_year`、`/api/v1/multi-year`、nav 刪；判斷檔的 `multiple_horizon` 欄位資料留（ledger append-only）但不再消費 |
 | E 賭注四價／variant overlay | `variant\.overlay\|variant_overlay\|payoff\b\|沒賭對\|賭對了值\|判斷錯了值\|bet_state` | 26（`webapp/basket.py`、`briefing/alpha_view/builder.py`、`alpha/narrative/argument.py`…） | `app.js` 29 處 | 1 | 24 | `decision_blockers.json`、`engine_c_observation_fields.json` | payoff 計算刪；`bet/variant.overlay` ledger **資料留**（append-only），`bet` 面板改純文字讀 `our_bet`；`sizing.py`／`test_probe_sizing.py` 刪（資本表達層 08-28 已移除，殘留） |
 | F entry criterion | `EntryCriterion\|entry_criterion\|alpha\.entry` | 17（`alpha/entry/`、`alpha/providers/entry_criteria.py`、`alpha/cli.py`…） | — | 1 | 3 | — | 整個刪（73 檔全 missing，從未用過） |
-| G decision_lab 鑄號／reassess | `decision_lab\|decision_review\|reassess\|DecisionContext\|assessment_gap` | 67（`engine_b/todo.py` 150 處、`decision_lab/cli.py`、`brief.py`、`workflow.py`、`engine_b/queue_segments.py`、`crons/daily_brief_prompt.md`…） | — | 5 | 63 | `decision_blockers.json`、`authority_tokens.json`、`standing_authorization.json` | **切開**：見下表。`engine_b/todo.py` 的 decision_lab collector 刪；`queue_segments` 的 reassess 段刪；`.codex/rules` 的 `decision_lab today` 與 reassess-stale 兩條 fixed entry 移除（sandbox impact review 五步）；MCP `get_decision_brief` 工具退役（查證：`mcp_server/` 內 grep） |
+| G decision_lab 鑄號／reassess | `decision_lab\|decision_review\|reassess\|DecisionContext\|assessment_gap` | 67（`engine_b/todo.py` 150 處、`decision_lab/cli.py`、`brief.py`、`workflow.py`、`engine_b/queue_segments.py`、`crons/daily_brief_prompt.md`…） | — | 5 | 63 | `decision_blockers.json`、`authority_tokens.json`、`standing_authorization.json` | **凍結**：見下表。`engine_b/todo.py` 的 decision_lab collector 刪；`queue_segments` 的 reassess 段刪；`.codex/rules` 的 `decision_lab today` 與 reassess-stale 兩條 fixed entry 移除（sandbox impact review 五步）；MCP `get_decision_brief` 工具退役（查證：`mcp_server/` 內 grep） |
 | H 估值模型 | `alpha\.valuation\|alpha\.fundamental\|FundamentalsSnapshot\|ValuationMethod\|pe_forward` | 27（`engine_c/estimates.py`、`alpha/providers/fundamentals.py`、`scripts/alpha_expectation_gap.py`…） | — | 0 | 29 | — | `alpha/fundamental`（FY+1 因果橋）刪；`alpha/providers/fundamentals.py` **留**改為只供三題與稽核區原始數字；`engine_c/estimates.py` 留（資料層）；`scripts/alpha_expectation_gap.py` 刪 |
 
-### decision_lab 切分（A5 append-only，Git 救不回；動之前必讀 historical-failure-matrix）
+### decision_lab 凍結（G12；A5 append-only，Git 救不回；動之前必讀 historical-failure-matrix）
 
-| 留（A5 authority） | 刪（研究側） |
-|---|---|
-| `store.py`（`DecisionStore`、`live_choices`、cohort／event record、七天凍結快照時效）、`execution.py`（`record_live_choice` 與三碼硬擋）、`context.py` 中 live choice 需要的凍結 context、`schema.sql`、`models.py`、`references.py`、`adapters/`（holdings 讀取）、`outcomes.py`（結算） | `brief.py`（決策 brief）、`workflow.py`（reassess）、`coverage.py`／`coverage_queries.py`（自動 blocker）、`intake.py`、`action_card.py`、`sizing.py`、`bootstrap.py` 中只服務研究側的部分、`cli.py` 的 `today`／`reassess`／`card` 子命令 |
+**為什麼是凍結不是切一半：** live 收據掛在 `live_choices.decision_id → system_decisions → context_bundles ＋ coverage_assessments`，也就是退役中的 cohort→context→coverage 鏈；研究側刪掉後舊店沒有寫入入口。實際在用的 `scripts/record_trade.py` 寫 Sheet 與 trade_log，**不查 5% 上限、不寫收據**，歷來 `live_choices` 只有 1 筆。所以煞車與收據搬到成交路徑，舊店凍結成歷史檔案館。
 
-驗收（A5 不受傷）：`select count(*) from live_choices` 前後相同；`python -m audit invariants` 全綠；`tests/test_private_backup_restore.py` 綠。
+| 留（唯讀歷史） | 刪 | 搬 |
+|---|---|---|
+| `store.py`（只保留查詢；寫入方法無呼叫端，docstring 標 frozen 2026-09-22）、`schema.sql`、`models.py`、`bootstrap.py`（備份還原測試要用）、`adapters/`（portfolio／risk 讀 Sheet 持股）、`cli.py` 的唯讀 history／status 子命令 | `execution.py`、`outcomes.py`、`sizing.py`、`context.py`、`coverage.py`、`coverage_queries.py`、`intake.py`、`workflow.py`、`workflow_ports.py`、`brief.py`、`action_card.py`、`references.py`、`cli.py` 的 `today`／`reassess`／`card` | `_assert_user_sized_within_capital_caps` → `risk/`，由 `record_trade.py` 在 `--apply` 前呼叫（NAV 讀 Sheet） |
+
+驗收（A5 不受傷）：Decision Store 檔案 sha256 前後相同；`select count(*) from live_choices` 仍為 1；`python -m audit invariants` 全綠；`tests/test_private_backup_restore.py` 綠；`record_trade.py` dry-run 超 5% fail closed。
 
 ### 測試跟機制走（硬約束 9 修訂）
 
@@ -140,7 +142,7 @@ Readiness 規則同步換：核心面板改為 headline、短評、why、researc
 ## 硬約束（沿用 2026-09-16，2026-09-22 修訂三條）
 
 1. **不重建 Neo4j。** 資產是 EdgeAssertion 的 provenance。
-2. **Decision Store schema 不動、A5 不刪**（L10）。decision_lab 只切研究側。
+2. **舊 Decision Store 凍結唯讀：schema 不動、資料不刪、不再寫入**（L10）。新收據住 `library/trades/trade_log.jsonl` 的成交事件內；硬擋住 `record_trade.py`（G12）。
 3. **四個人工 gate 不放寬；L8 不放寬。**
 4. ~~`rank_bottlenecks()` 仍是唯一排序權威~~ → **排序不再是任何佇列或頁面的輸入**；結構表只做稽核（G1）。
 5. **系統不給 alpha 部位尺寸、不下單、不連 broker。**

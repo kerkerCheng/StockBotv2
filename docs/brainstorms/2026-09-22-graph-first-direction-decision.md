@@ -136,7 +136,7 @@ registry 只認三種機械條件（實體被提到、日期到、財務數字�
 **圖到人之間沒有任何一段算分數。** 今天圖到人之間有十層（排序、結構讀圖、籃子 filter、thesis、估值、多年橋、賭注 overlay、
 decision_lab、歸零旗標、敘事、APP 三層）；新管線剩四層（走圖、讀圖、敘事、三題）。
 
-## 3. 決定（G1–G11，使用者 2026-09-22 定案）
+## 3. 決定（G1–G12，使用者 2026-09-22 定案）
 
 | # | 決定 | 理由 | 取代了什麼 |
 |---|---|---|---|
@@ -150,6 +150,7 @@ decision_lab、歸零旗標、敘事、APP 三層）；新管線剩四層（走�
 | **G8** | **反證核對從 backlog 升為新 ROADMAP 前幾個 Phase。** 411 條舊反證不全登記，只登記被候選讀圖或敘事引用到的；心跳印「反證在盯 N／未盯 M」。 | 出場只認反證，反證核對就是承重牆 | backlog 一行 |
 | **G9** | **量測加主題等權籃子當基準；並量圖自己的預測當快迴路**（讀圖說「只有一家」，半年後客戶 filing 列出第二家＝讀圖錯）。 | power-law 統計量要二三十筆跑一兩年；主題整體漲三倍時一檔兩倍是輸 | 只對 QQQ／SOXX |
 | **G10** | **`AGENTS.md` 只寫目標與邊界，不寫手段；ROADMAP 驗收數字只准數圖、讀圖、敘事、等待 registry、追蹤表裡的東西。** 兩條都可機械查（見第 8 節）。 | 1.4 | 手段句與驗收數字綁排序 |
+| **G12** | **舊 Decision Store 凍結唯讀；收據跟著成交走（2026-09-22 使用者定案）。** `scripts/record_trade.py` 的成交事件內嵌敘事 digest、讀圖 digest、候選狀態、三題答案、在盯的 watch id、使用者一句理由；5% 單筆與 ETF 槓桿 cap 的硬擋搬到寫 Sheet 之前，超過 fail closed、override 須附理由。decision_lab 目錄只剩唯讀查詢、schema、models、bootstrap、adapters。 | live 收據掛在退役中的 cohort→context→coverage 鏈上，研究側刪掉後舊店沒有寫入入口；實際在用的 Sheet 路徑沒有硬擋也不寫收據，歷來 live_choices 只有 1 筆——煞車要住在真的有人走的路上 | decision_lab「切一半」；「Decision Store 只留可選 receipt」 |
 | **G11** | **Lesson 判準句保留；不合時宜的敘述改寫；事發故事可搬出自動載入；真改不動、衝突太大者可刪，但每筆刪除必附理由列在 triage 表供審。** | 使用者原話 | 「lesson 一條都不刪」的絕對版 |
 
 ## 4. 三題的正解
@@ -196,12 +197,12 @@ decision_lab、歸零旗標、敘事、APP 三層）；新管線剩四層（走�
 
 ## 7. 拿掉／留下／停跑
 
-| 拿掉（含文件裡的句子） | 留下（不變） | 停跑（code 留） |
+| 拿掉（含文件裡的句子） | 留下（不變） | 刪除（git 歷史即封存） |
 |---|---|---|
 | 排序當唯一權威、首選義務 | 圖、逐字、provenance、入圖 gate | FY+1 估值與隱含報酬 |
 | 籃子在排序上套漏斗六條 | 四個人工 gate、五條分離、六 invariant | 多年反向橋當主流程 |
 | payoff／隱含報酬當 gate | 結構讀圖 ledger 與 staleness | 賭注四個價格 |
-| decision_lab 自動鑄 pq2 | thesis／disproof 三件套（L7） | decision_lab 凍結 context 路徑 |
+| decision_lab 自動鑄 pq2、sheet_only_holding | thesis／disproof 三件套（L7） | decision_lab 研究側（舊店凍結唯讀） |
 | 驗收數字綁「幾檔通過 filter」 | 歸零旗標（三題之一） | |
 | | Sheet 是部位真相、不給尺寸、不下單 | |
 | | Event Watch registry、心跳三層 | |

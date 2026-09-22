@@ -2,13 +2,15 @@
 
 **不是 linter、不進 CI 或 hook**（L16-4）：Phase 0 結案時跑一次，之後每季跑一次。
 八組 regex 對應 ROADMAP「Phase 0 退役清單」；驗收＝code／static／skills／tests／config 全部命中 0。
-排除 docs/archive、docs/lessons-incidents.md、library/。docs 那一列只供參考，不計入驗收。
+排除 docs/archive、docs/lessons-incidents.md、library/。`livedocs`（OPERATIONS／ARCHITECTURE／CONCEPTS）的命中要在 STEP_RESULT 逐句列出，
+禁止句（「不做 X」「X 已退役」）可留；`docs` 那一列只供參考，不計入驗收。
 
     python scripts/retired_mechanism_grep.py
 """
 import os,re,io,collections
 AREAS={'code':['alpha','briefing','webapp','engine_b','engine_c','decision_lab','thesis','query','crons','scripts','mcp_server','shared','portfolio','risk','loader','identity','audit'],
-       'skills':['skills'],'tests':['tests'],'docs':['docs','CONCEPTS.md','README.md'],'config':['config','.codex','.claude/settings.json','.agents'],'static':['webapp/static']}
+       'skills':['skills'],'tests':['tests'],'docs':['docs','CONCEPTS.md','README.md'],'config':['config','.codex','.claude/settings.json','.agents'],'static':['webapp/static'],
+       'livedocs':['docs/OPERATIONS.md','docs/ARCHITECTURE.md','CONCEPTS.md']}
 GROUPS={
  'A 排序當驅動／首選':r'rank_bottlenecks|top_pick|首選|可行動排序|actionable_rows|structural_rows',
  'B 籃子 filter':r'basket|籃子|FILTER_REASONS|payoff_not_positive|market_cap_above_max|analyst_count_above_max',
@@ -40,7 +42,7 @@ for area,p in files():
         if n: idx[g][area][p]=n
 for g in GROUPS:
     print(f"\n## {g}")
-    for area in ('code','static','skills','crons','tests','config','docs'):
+    for area in ('code','static','skills','crons','tests','config','livedocs','docs'):
         d=idx[g].get(area,{})
         if not d: continue
         top=sorted(d.items(),key=lambda x:-x[1])[:8]

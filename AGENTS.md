@@ -16,7 +16,7 @@
 新題材由使用者選，經 decompose 進入。
 
 **方向（2026-09-22 定案）：圖是中心。** 把圖建成層中心、讀懂它、由個股敘事消費讀圖；財務只回答三個是非題。
-**圖到人之間沒有任何一段算分數。** 決定紀錄（G1–G11）：
+**圖到人之間沒有任何一段算分數。** 決定紀錄（G1–G12）：
 [`docs/brainstorms/2026-09-22-graph-first-direction-decision.md`](docs/brainstorms/2026-09-22-graph-first-direction-decision.md)。
 brainstorm 檔讀哪些、不讀哪些見 [`docs/brainstorms/README.md`](docs/brainstorms/README.md)。
 
@@ -134,12 +134,12 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **Numeric SSOT** 是 `config/investment_policy.json`、`config/beta_policy.json`、`config/target_allocation.json`（後者是錨點不是 gate）。
   只有 **ETF 槓桿 cap 與 5% 單筆上限**是硬擋，其餘曝險只記錄／警告。系統不自動下單；使用者可走 prepared `live_override` 留 receipt。
 - **alpha 格只觀測、不設目標（2026-09-16）**；beta 五格目標保留（沒有目標時「誰跌深投誰」就回來）。alpha 的比例只印不比。
-- **系統給的建議區間已移除，煞車仍在：** 每筆非零 live 選擇仍擋三碼硬擋，外加凍結快照七天時效與「部位量不到就 fail closed」。
+- **系統給的建議區間已移除，煞車仍在，而且必須住在真的有人走的路上：** 每一筆非零 live 成交紀錄寫入前都要過 5% 單筆與 ETF 槓桿 cap，超過 fail closed；override 須附理由並留收據。
 - **共同可投資現金池只有一條：`Portfolio CASH − cash floor`**，Alpha／Beta 共用；cash floor 不承擔 sleeve allocation，其 authority 失效時 fail closed。
 - **兩個槓桿指標不得混用：** `nominal_weight`（投入槓桿 ETF 的資金占 NAV）與 `effective_weight`（乘上倍數後的曝險）；面向使用者不得寫成模糊的「名目槓桿」。
 - **Capital Authority：** 私人 Sheet 只保留 `cash_floor` 與 `credit_facility`；credential scope 只有 readonly；**未動用額度不算 NAV／cash／allocation**；
   每次提款、標的與 tranche 都是 explicit manual review，「高信心」不構成 machine permission。
-- **部位真相是 Google Sheet（2026-09-16）**；Decision Store 只留可選 receipt。alpha 原則上不用貸款資金是使用者自己的紀律，**系統不建 gate**。
+- **部位真相是 Google Sheet（2026-09-16）**；「當時憑什麼決定」的收據跟著成交事件走，舊 Decision Store 凍結唯讀（2026-09-22）。alpha 原則上不用貸款資金是使用者自己的紀律，**系統不建 gate**。
 - **曝險邊界：** `bucket=CASH` 計入 NAV 不計曝險；未知非現金持股按 unlevered direct issuer ＋ alpha exposure 誠實降級，不因缺 mapping 阻擋；
   issuer look-through 覆蓋恆為 `partial`，人類輸出一律寫「已知至少 X%」。既有 frozen decision 不回寫。
 - **退休貸款資本目標（2026-07-28）：** 使用者約 30 歲、退休約 60 歲；可長抱至到期的貸款資本以約 30 年後淨終值最大化為方向，

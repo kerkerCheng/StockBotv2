@@ -8,7 +8,7 @@
 
 | 檔 | 用途 |
 |---|---|
-| [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) | 方向決定紀錄 G1–G11；AGENTS.md、development-flow、ROADMAP、實作 plan 全部從它導出 |
+| [`2026-09-22-graph-first-direction-decision.md`](2026-09-22-graph-first-direction-decision.md) | 方向決定紀錄 G1–G12；AGENTS.md、development-flow、ROADMAP、實作 plan 全部從它導出 |
 
 ## 設計來源仍有效（實作前要讀；衝突時以決定紀錄為準）
 
