@@ -131,30 +131,11 @@ human checkpoint：agent 說明「為什麼這題值得第二份 token」，使�
 `STEP_RESULT` 裡的「建議下一步」永遠只是建議。這與 `AGENTS.md`「`go` 的語意＝推進到下一個人工
 gate」一致：Step 邊界本身就是那個 gate。
 
-### 常規推進授權（2026-09-08 使用者定案；2026-09-17 擴大到 Phase 邊界）
+### 常規推進授權
 
-預設仍是上面那條，但使用者已常規授權一個例外：**Verdict 為 `GO`、且下一步沒有任何待他決定的
-問題時，agent 可直接接續下一個 Step——`Step` 與 `Phase` 的邊界一視同仁**，每個 Step 仍照常交回
-`HUMAN SUMMARY` ＋八欄。
-
-⚠ **2026-09-17 使用者原話：「我想要的是沒有需要我核准的事情就繼續」。** 停的理由必須是
-**「有東西要使用者決定」**，不是「到了某個邊界」——**Phase 做完不是停止理由**。
-反向同樣硬：撞到 pq2 gate 時掛號後**接著做下一件不需核准的事**，不得停在那個編號上等。
-
-**六條停止條件（任一成立就回 AWAITING_HUMAN，不因這條授權放寬）：**
-
-1. Zoom 判為 **Z2／Z3**（跨模組責任、contract／語意改動、architecture boundary）
-   **且該 `PLAN_PROPOSAL` 裡確實有需要使用者選的問題**——方案唯一、或 `ROADMAP.md` 已定義到
-   可直接執行時，**plan 照出但不停**（plan 是思考紀律，不是核准請求）
-2. 動到四個人工 gate 之一（graph admission／Engine C 判讀寫入／thesis mutation／live choice-fill）
-3. 動到資本、live，或任何 append-only authority
-4. 要改 `AGENTS.md` 的判準句，或改 `ROADMAP.md` 的 Phase／Step 定義（後者仍須先給五欄 amendment）
-5. 需要 R2（第二份 token）
-6. Verdict 不是 `GO`（`CONDITIONAL_GO`／`NO_GO`／`HUMAN_REQUIRED` 都要停）
-
-**判準一句話：這條授權買的是「不必為了說一聲而停」，不是「不必為了決定而停」。**
-⚠ 它**不放寬**任何 gate，也不改變 `GO` 的語意——`GO` 依然只關閉本 Step；改變的只是
-「關閉之後要不要停在原地等一句話」。
+使用者已常規授權：**Verdict 為 `GO`、且下一步沒有任何待他決定的問題時，agent 可直接接續下一個 Step，`Step` 與 `Phase` 邊界一視同仁**。
+授權本文與**六條停止條件只住 `AGENTS.md`「協作與邊界」**（它是使用者給的授權，家在 AGENTS；本檔與 development-flow 都只指向，不抄）。
+判準一句話：**這條授權買的是「不必為了說一聲而停」，不是「不必為了決定而停」。** 它不放寬任何 gate，也不改變 `GO` 的語意。
 
 ### 先給人看的 `HUMAN SUMMARY`（在 `STEP_RESULT` 之前）
 

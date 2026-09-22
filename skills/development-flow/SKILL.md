@@ -36,7 +36,7 @@ description: >
 把 pq1 的工作提早鑄成 pq2，會讓同一題在研究前與入圖前被問兩次——那正是統一編號空間要消除的事。
 
 例：「補某條邊的 substitutability」＝研究——**追源與抽取在 pq1 自動跑**，只有最後那筆
-graph-write 提案才鑄 pq2 編號等核准；「改 `rank_bottlenecks` 的排序鍵」＝開發（本 skill）。
+graph-write 提案才鑄 pq2 編號等核准；「改走圖的問句、改心跳印哪些計數器」＝開發（本 skill）。
 
 ⚠ **「先討論、不實作」不是豁免，是 Z2／Z3 的正常路徑。** 判準一句話沒有「討論」這個例外：
 只要 `go` 之後改變的是系統怎麼運作，就先做 INTAKE；Zoom 判出 Z2／Z3 時，規定產出**就是**討論
@@ -110,38 +110,21 @@ Why local patch is insufficient:
   ⚠ 這不是新原則，是把 L14 已有的那句話推廣：**「真正的防呆是會自己出現的常駐計數器，
   不是要人讀的段落」**——同一個判準對「修法」也成立，只是先前只寫在計數器那個情境裡。
 
-  事發（2026-09-11）：同一輪裡我提了兩個修法，使用者問一句「這些都是真修、不是
-  workaround？」之後自查，**兩個都是補丁**：①「lead 的 pq2 gate 已消失沒有偵測」我提
-  加一個偵測（顯形），而根除是讓結案時自動推進來源 lead——孤兒從「看得見」變成
-  「不可能發生」；②追源路徑我提一張要自己勾的 checklist（自律），而根除是可執行的
-  route resolver，park 要附**它的** receipt 而不是我的自陳。
-  **兩次自查都只因為使用者問了才發生**——所以它必須是欄位，不是美德。
 
   ⚠ **③的成本論證：加一個機制的代價是永久的。** 它之後每一筆資料都要經過它、每個讀者都要
   知道它存在，而它錯了不會有任何東西變紅。所以「為什麼不能用拿掉的方式達成」不是修辭問句
   ——它**逼著先去找現在有哪一道閘門是重複的**，而那條路通常就在旁邊。
-  事發（2026-09-13）：提案是「把虧損股的 Abstention 納入常規授權清單」——那是**加一層授權**，
-  編號照鑄照 resolve，要求宣告的那個機制一個字沒動。被逼著回答③之後找到的根解是**拿掉**：
-  估值方法本來就由 ledger 裡寫了哪一筆假設決定，那道「必須先鑄一個編號才能切換」的閘門是重複的。
-  同一輪的第三個提案「新增一個共識口徑字彙值」也是加機制，而且是把機械檢查換成人工宣告
-  ——那正是 L15（先解析身分再查權限）要防的 authority laundering。
 
   ⚠ **④是 `AGENTS.md` L11-6（落地前跑一條試圖讓結論變成假的命令）的主詞擴大**：原本管的是
   「自己的技術診斷」，2026-09-13 起同樣管「自己提的修法」。
   **前三問都是反思，只有④是動作。**
-  事發（2026-09-13）：提案「同幣別就不該套匯率容差」，前三問全部給它高分（讓失敗結構上不可能、
-  靠程式、而且是收緊）。實作完 materialize 才發現四檔全部失去容差——**包含兩個真案例**，
-  因為那兩家的基期觀測也記成美元。**而④在提案當下 30 秒就問得出來**：最先壞的就是那兩筆，
-  去看一眼它們的基期幣別即可。整個實作與還原都不必發生。
 
-  **逐題對照本輪三個提案：**①被③攔下（加授權 vs 拿掉重複閘門）；②只有④攔得到；
-  ③被②與③同時攔下（人工宣告＝自律、且是加機制）。
-  ⚠ **①③原本就在兩問的射程內**——兩問不是攔不到，是**答題者可以誠實地答錯**。
-  ③把「是加還是減」變成一個沒有模糊空間的事實題，④把它變成一條要跑的命令；
-  這與本條開頭那句是同一件事：**欄位比美德可靠**。
+  **欄位比美德可靠。**
 
 - **改變行為的改動，動手前先答出「這會讓哪個 baseline 數字變？」**（L14 第 5 點）答不出來就先進 ROADMAP，不做。
   維持營運型（管線壞了、腳本報錯）直接修，但**它不算進展**。
+- **驗收數字只准數圖、讀圖、敘事、等待 registry、追蹤表裡的東西**（`AGENTS.md` G10／L14-1，2026-09-22）。
+  「幾檔通過某個 filter」不是驗收，寫了就是 NO_GO——那正是 2026-09-15 起把研究導向補格子過 filter 的那條鏈（L19）。
 - 動 `python -m <module>` 命令字串、或新增任何 unattended routine 會跑到的入口 → 同一個 change 內完成
   **sandbox impact review 五步**（`docs/OPERATIONS.md`），並確認 `.codex/rules` 的 fixed entry 數量是否該變。
 - 新增 `config/*.json` → 同一個 change 補 `.gitignore` 的 `!config/<name>.json`。
@@ -159,6 +142,7 @@ Review Level 由 `INTAKE` 決定，但**實際做了哪一級要寫進 STEP_RESU
 ### R1 — 同一 agent 的對抗回合
 
 **明確切換心態：從「這個實作為什麼是對的」切到「我要找出它為什麼是錯的」。**
+**執行者是便宜模型時，Z1 以上預設 R1，不是 R0**（2026-09-22）——自查弱就用流程補。
 先挑一個 profile（下方兩個 profile 只挑需要的，不要每次全跑），再加這六項通檢：
 
 hidden assumptions｜affected behavior｜**unaffected behavior**｜fail-closed behavior｜
@@ -272,7 +256,7 @@ Current Phase:
 Current Step:         
 Zoom / Review:        （實際用了哪一級；與 INTAKE 不同時要說明為什麼）
 Verdict:              GO / CONDITIONAL_GO / NO_GO / HUMAN_REQUIRED
-Acceptance status:    逐條 success criteria ✅／❌，附查證命令
+Acceptance status:    逐條 success criteria ✅／❌，附查證命令；每個數字註明數的是哪一層（圖／讀圖／敘事／registry／追蹤表），數 filter 通過檔數 → NO_GO
 Blocking findings:    
 Non-blocking debt:    
 Suggested next Step:  ＋它的 success criteria（**只是建議**）
@@ -286,14 +270,8 @@ Suggested next Step:  ＋它的 success criteria（**只是建議**）
 
 ## 硬禁止（違反即視為未完成）
 
-1. **GO 只關閉本 Step，不開啟下一個 Step。** 但 2026-09-08 起使用者已常規授權：**Verdict 為 GO
-   且下一步沒有待他決定的問題時，可直接接續**（六條停止條件見 `AGENT_WORKFLOW.md` §5：Z2／Z3
-   **且 plan 裡真有待決問題**、四個人工 gate、資本／live／append-only authority、改 `AGENTS.md`
-   判準句或 ROADMAP Step 定義、需要 R2、Verdict 不是 GO）。
-   **買的是「不必為了說一聲而停」，不是「不必為了決定而停」。**
-   ⚠ **2026-09-17 擴大：`Step` 與 `Phase` 的邊界一視同仁——Phase 做完不是停止理由**
-   （使用者原話：「我想要的是沒有需要我核准的事情就繼續」）。撞到 pq2 gate 時掛號後接著做
-   下一件不需核准的事，**不得停在那個編號上等**。
+1. **GO 只關閉本 Step，不開啟下一個 Step。** 常規推進授權與六條停止條件**只住 `AGENTS.md`「協作與邊界」**，本檔不再抄一份。
+   判準一句：**買的是「不必為了說一聲而停」，不是「不必為了決定而停」**；撞到 pq2 gate 掛號後接著做下一件不需核准的事。
 2. **不得偷改 `ROADMAP.md` 並繼續跑。** 要改先給五欄 amendment（原 roadmap／新觀察／proposed change／why／impact）→ `AWAITING_HUMAN`。
 3. **NO_GO 之後不自動 repair loop。** 顯示 findings → `AWAITING_HUMAN`，由使用者選修／挑戰／改 scope／park／放棄。
 4. **不自行 spawn subagent。** 每次委派都要明確 opt-in；回傳是 review packet 不是 authority。
