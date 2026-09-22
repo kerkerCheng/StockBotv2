@@ -1079,6 +1079,28 @@ TDnet 五種寫法，用 regex 驗會攔掉合法的法國 URD 引用（L15 記�
 ⚠ `loader/load_to_neo4j.py` 的 `MERGE_SOURCE_DOC` 用 `coalesce`，否則抽取 JSON 沒帶日期時
 會把回填洗成 null，而**不會有任何東西報錯**。
 
+## 8.2 由 `AGENTS.md` 搬來的現況陳述與查證（2026-09-22）
+
+`AGENTS.md` 自 2026-09-22 起只寫目標與邊界，**指名函數、表、門檻值或 Phase 的句子一律住這裡**
+（決定紀錄 G10：`docs/brainstorms/2026-09-22-graph-first-direction-decision.md`）。下列每一項在 AGENTS 都還有對應的判準句；這裡是它的落點與查證。
+
+| 判準（住 AGENTS） | 落點／現況／查證 |
+|---|---|
+| 常規授權類別是封閉字彙 | SSOT `config/standing_authorization.json`；唯一 loader `engine_b/standing_authorization.py`（載入時驗封閉性）；consumer `engine_b.todo standing-go`（Daily 每天跑）。現行類別：`decision_review` 的 bounded gap research、`source_trace_review` 的派回 pq1（付費取得除外） |
+| pq2 編號空間唯一 | 狀態存 `library/leads/todo_pool.json`（Git ignored、納入 private backup）；鑄 `manual` 型編號用 `todo add` |
+| 「等你決定」與「等事件」分離 | `config/decision_blockers.json` 的 `resolution_mode`（`user_decision`／`awaiting_external`／`system_internal`）；使用者可用 `pending --until/--trigger` 指定等待條件，優先於自動推導。G7 之後所有等待住 Event Watch registry（`library/leads/event_watches.json`）；「語意條件」kind 待 ROADMAP 交付 |
+| 建議區間已移除、煞車仍在 | `live_supported_range` 已隨 U7 移除；`store.record_live_choice` 對每一筆非零 live 選擇仍擋三碼，外加凍結快照七天時效與「部位量不到就 fail closed」 |
+| alpha 格只觀測不設目標 | 查證：`python -c "import json;print(json.load(open('config/target_allocation.json'))['sleeves']['alpha'])"` 應看到 `observed_only` |
+| 資本表達層已移除 | 查證：`python -c "import json;p=json.load(open('config/investment_policy.json'));print(sorted(p['probe_lane']), p['single_position_nav_cap'])"`——`probe_lane` 不該有 `axis_ceilings` 等尺寸 cap；`single_position_nav_cap` 應仍是 0.05 |
+| mechanical／judgment 兩處現行畫法 | Engine C 人工 ledger 按 `verifiability` 分（§8.1）；圖的 metadata 回填只放行既有 SourceDoc 的 `published_at`／`retrieved_at`——新的 claim／邊、`substitutability`／`sole_source`／`evidence_tier` 仍是 pq2 |
+| `accounting_basis` 標籤不宣稱 authority 沒有的東西 | 只分「as reported vs 公司調整後」，字彙不改（L10），label 一律不含準則名稱 |
+| 首屏的單位是句不是格 | 查證：`python -m alpha brief COHR --list` |
+| 兩個 outcome 數字不得混用 | 等權報酬追蹤 `library/private/decision_lab/outcome_aggregate.json`（時序在同目錄 `.jsonl`）回答「追蹤了幾檔、跑了多久」；`measured_outcomes`（`library/private/app/state/positions.json` 的 `counters`）回答「正式結算過幾筆」 |
+| beta 定投擇時已關 | 拔除 commit `6aa31de`；查證：`python -c "import json;print(sorted(json.load(open('config/beta_policy.json'))))"` 不應出現 `signal` |
+| 部位真相是 Sheet | 下單由使用者透過 session 記進 Sheet：`scripts/record_trade.py` |
+| APP 預設只綁 127.0.0.1 | 綁其他介面必須明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1` |
+| 報價單位 ≠ 結算幣別 | 唯一正規化入口 `identity/currency.py` |
+
 ---
 
 ## 9. 報告產出：cohort 是研究終點
