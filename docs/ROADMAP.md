@@ -75,10 +75,11 @@
 | 層 | 留 | 拿掉 | 加 |
 |---|---|---|---|
 | 首屏 | 短評七格（`our_bet` 文字）、歸零旗標那顆燈 | 那把尺（現價／沒賭對／賭對／判斷錯了）、「要翻倍需要什麼為真」計算框 | 末行候選狀態；三題三個字 |
-| 論證 | why、research、argument、downside | `bet` 的四個價格、`entry`（73 檔全 missing） | `bet` 改純文字（型別、騎層或插槽、什麼必須為真）；downside 每條反證連到 watch；讀圖判讀一段 |
+| 論證 | argument（「為什麼這樣想：鏈、數字、市場、賭注、風險、時間表」，73 檔都有內容）、research、downside | `why`（「怎麼算到這裡：假設、敏感度、算式、證據」——只吃估值鏈三個輸入，問的問題已被 G3 退役；2026-09-23 執行者實測後由使用者定案退役）、`bet` 的四個價格、`entry`（73 檔全 missing） | `bet` 改純文字（型別、騎層或插槽、什麼必須為真）；downside 每條反證連到 watch；讀圖判讀一段 |
 | 稽核區 | fundamental 原始數字、limits、absence 分型 | q4 隱含報酬、q7 payoff | 三題各三行數字與資料源；讀圖逐字 |
 
-Readiness 規則同步換：核心面板改為 headline、短評、why、research、讀圖、歸零旗標；fundamental 降為選配。
+Readiness 規則同步換：核心面板改為 headline、短評、argument、research、讀圖、歸零旗標；`why` 退役、fundamental 降為選配。
+⚠ argument 的「數字」「賭注」段今天也讀估值鏈，刪除後要確認沒有任何一檔的 argument 變空（否則升核心後又 blocked）。
 
 ---
 
@@ -90,7 +91,7 @@ Readiness 規則同步換：核心面板改為 headline、短評、why、researc
 
 | Phase | 做什麼 | 為什麼 | 驗收（數的是哪一層的東西） | 前置 |
 |---|---|---|---|---|
-| **0 拆** ○ | **0a 停跑**：排程與 APP 不再呼叫估值、反向橋、賭注四價、decision_lab 鑄號與 reassess；排序不再餵籃子與 pq1；multi_year kind 退役；heartbeat 段 2 不印目標價；三個研究 skill 的首選／籃子／payoff 句同 commit 改；sandbox 規則的兩條退役入口移除。**0b 刪除**：依下方退役清單刪模組、測試、config、文件段；decision_lab 舊店凍結唯讀、研究側刪（見下表）；5% 單筆與 ETF 槓桿 cap 的硬擋搬進 `scripts/record_trade.py`，寫 Sheet 前查、超過 fail closed、override 須附理由；`sheet_only_holding` kind 退役（Sheet 有、敘事沒有的持股改列候選板「已持有、缺敘事」）；OPERATIONS 的 decision_lab 命令段、ARCHITECTURE §8.2、CONCEPTS 同 commit 更新。**0c 池子**：17 筆未結案 decision_review 一次批次 `drop`，理由「機制退役」，receipt 註明語境；`standing_authorization.json` 移除 `decision_review` 類別 | 立刻減少注意力噪音，並移除 Goodhart 誘因；停跑而不刪會讓 blocker 與 missing 繼續長回來 | ①**殭屍 grep 歸零**：退役清單的八組 regex 在 code／skills／tests／config／static 命中 0（docs/archive 與 lessons-incidents 除外）；②新鑄 pq2 中 `source=decision_lab` 為 0（查 `todo_pool.json` 的 `added_at` 在 Phase 0 結案日之後）；③`python -m webapp status` 沒有 `multi_year`、`basket` kind；④心跳五段照印且段 2 印「候選狀態板未落地（not_yet_recorded）」；⑤Decision Store 檔案 sha256 前後相同、`live_choices` 仍為 1；⑥`record_trade.py` dry-run 對超過 5% 的成交 fail closed（新增測試） | 無 |
+| **0 拆** ○ | **0a 停跑**：排程與 APP 不再呼叫估值、反向橋、賭注四價、decision_lab 鑄號與 reassess；排序不再餵籃子與 pq1；multi_year kind 退役；heartbeat 段 2 不印目標價；三個研究 skill 的首選／籃子／payoff 句同 commit 改；sandbox 規則的兩條退役入口移除。**0b 刪除**：依下方退役清單刪模組、測試、config、文件段；decision_lab 舊店凍結唯讀、研究側刪（見下表）；5% 單筆與 ETF 槓桿 cap 的硬擋搬進 `scripts/record_trade.py`，寫 Sheet 前查、超過 fail closed、override 須附理由；`sheet_only_holding` kind 退役（Sheet 有、敘事沒有的持股改列候選板「已持有、缺敘事」）；OPERATIONS 的 decision_lab 命令段、ARCHITECTURE §8.2、CONCEPTS 同 commit 更新。**0c 池子**：17 筆未結案 decision_review 一次批次 `drop`，理由「機制退役」，receipt 註明語境；`standing_authorization.json` 移除 `decision_review` 類別 | 立刻減少注意力噪音，並移除 Goodhart 誘因；停跑而不刪會讓 blocker 與 missing 繼續長回來 | ①**殭屍 grep 差集歸零**：退役清單的八組 regex 在 code／skills／tests／config／static 的命中，**扣掉腳本 keep-list（逐（檔，組）附理由，理由限五類：留下的檔、legacy key、廢止註記、禁止句、守門斷言）之後為 0**，且 keep-list 沒有「已列但不再命中」的腐壞條目；②新鑄 pq2 中 `source=decision_lab` 為 0（查 `todo_pool.json` 的 `added_at` 在 Phase 0 結案日之後）；③`python -m webapp status` 沒有 `multi_year`、`basket` kind；④心跳五段照印且段 2 印「候選狀態板未落地（not_yet_recorded）」；⑤Decision Store 檔案 sha256 前後相同、`live_choices` 仍為 1；⑥`record_trade.py` dry-run 對超過 5% 的成交 fail closed（新增測試） | 無 |
 | **1 等待與心跳** ○ | Event Watch 加 `semantic_condition` kind（條件原文、實體／層、資料流、到期、wake target）；thesis／讀圖／敘事寫反證時自動 `register`；411 條舊反證只登記被讀圖或敘事引用的；心跳段 2 印較昨 diff（昨天快照落地）＋ watch 今日醒／到期／標旗 ＋ 反證在盯／未盯 ＋ 未檢 N；AI 分類層對 T0 實體比對命中的新文件問「是否觸及條件」，每日硬上限，只標旗；`entity_filing_signal` 加 wake target `reread_layer`（客戶節點出新文件 → 該層讀圖標 stale）；watch 到期鑄 pq2 新 kind `watch_decision`（`GO_AUTHORIZATION` 必宣告：go＝現在啟動研究、不含任何 authority；`pending --until`＝續等、`drop`＝放棄） | 出場只認反證，反證沒人盯之前其他都是空的；registry 已存在且沒漏，缺的只是語意條件（決定紀錄 §1.5） | ①watch 中 `semantic_condition` 筆數 0 → ≥ 現有 3 thesis ＋ 8 讀圖的反證數；②心跳出現第一次真實的「今日醒 ≥1」；③AI 層關閉時心跳印「未檢 N」且 N>0；④到期的 watch 出現在 pq2 為 `user_decision`，不消失 | 0a |
 | **2 讀圖兩種 kind ＋ 走圖** ○ | `READING_KINDS` 加 `socket`；`query.structure` 支援插槽五角度（客戶產品節點：還有誰供、各自 qualification_status、客戶端逐字、上游、反向路徑）；staleness digest 含 `qualification_status`；讀圖輸出必含逐字（L18）；走圖問句產生器：封閉字彙的問句型別（需求側繞不過但只有一家且全自報、走不到錨、讀圖過期、lead 點名但不在圖、重複節點候選），輸出研究佇列段 `graph_holes`，優先序＝lead 時間＋使用者點名；coverage 頁改為走圖頁；structure_readings 給一頁；瓶頸排序頁改結構表 | 讀圖是新中心；粒度題靠兩種讀圖解，不靠選唯一正確的層（G5）；研究方向由圖報洞與 lead 驅動，不由分數（G2） | ①ledger 出現第一份 `socket` 讀圖（研究並行寫）；②`graph_holes` 段每日印計數，且每型問句觸發率 <50%（不恆亮，L14-4）；③走圖頁與讀圖頁在 `webapp status` 列得出 kind | 0a |
 | **3 候選狀態 ＋ 三題** ○ | narrative ledger 加 `candidate_state`（五值封閉字彙）；缺 X／等回落必帶 `watch_id`，不要必帶 reason；三題各接資料源與「無法量」出口：會死嗎＝歸零旗標補稀釋與 going concern 兩盞；已定價嗎＝自家 EV/S（虧損期 P/S）三年百分位、主題籃子中位數、30／90 天相對漲幅三行只印不判；出現在數字裡了嗎＝分部營收或月營收的結構變化；APP 稽核區印三題三行、首屏印候選狀態與三個字；籃子頁改候選狀態板；positions 連「已持有」；heartbeat 印各狀態檔數與最老滯留天數；readiness 核心面板換；`record_trade.py --receipt`：成交事件內嵌敘事 digest、讀圖 digest、候選狀態、三題答案、在盯的 watch id、使用者一句理由，缺收據 fail closed | 沒有排序後的對稱風險是永遠不收斂（G6）；財務只回答三題（G3） | ①有敘事的檔 100% 有候選狀態；②「缺 X」100% 指向活的 watch；③三題每題對每檔有值或有 `absence_kind`；④歸零旗標四盞有值的檔數（今天稀釋與 GC 是 0/73）；⑤新成交事件 100% 帶收據 | 1、2 |
@@ -110,6 +111,9 @@ Readiness 規則同步換：核心面板改為 headline、短評、why、researc
 > 數字是**檔案數**（同一檔可能命中多組）。盤點腳本的八組 regex 就是驗收用的殭屍 grep；
 > 範圍：`alpha briefing webapp engine_b engine_c decision_lab thesis query crons scripts mcp_server shared portfolio risk loader identity audit skills tests config .codex webapp/static`，
 > 排除 `docs/archive`、`docs/lessons-incidents.md`、`library/`。**不做成常駐 linter**（L16-4）；Phase 0 結案時跑一次，之後每季跑一次。
+> **驗收是差集不是絕對零**（2026-09-23 執行者實測後定案）：合法的提及有五類——留下的檔名（如 `decision_lab/store.py`）、讀歷史用的 legacy key（如 `decision_review`）、
+> 廢止註記、禁止句、守門斷言——逐（檔，組）列進腳本的 keep-list 並附一句理由；驗收數字是「命中但不在 keep-list 的（檔，組）數」。
+> 它抓的是「沒有殭屍機制」，字串只是 proxy；keep-list 讓 proxy 的誤報變成可被質疑的一行字，而不是縮窄 regex（那會變第二份要維護的退役清單）。
 
 | 組 | regex | 程式 | 畫面 | skill | 測試 | config | 處置 |
 |---|---|---|---|---|---|---|---|

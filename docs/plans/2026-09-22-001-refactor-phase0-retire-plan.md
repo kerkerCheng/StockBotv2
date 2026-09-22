@@ -49,7 +49,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0a.2 | 心跳與 APP 入口停跑 | ✅ | b65c1a1 |
 | 0a.3 | 研究 skill 改句 | ✅ | 4c78df4 |
 | 0a.4 | 池子收集端停鑄 | ✅ | 20f21a4 |
-| 0b.1 | 個股頁樞紐重寫、斷 import | ⛔ **停在 §0.8** | |
+| 0b.1 | 個股頁樞紐重寫、斷 import | ○（§0.7／§0.8 已裁決，接著做） | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
@@ -85,7 +85,11 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 8d | 0a.3 | — | 第一版把 daily-brief 的 `--disproof`／`--expiry` 整段**誤刪**（開放式切片吃過頭），已 `git checkout` 還原後改用精確邊界重做 | 反證／催化劑／到期三件套是 L7 與 `AGENTS.md` 的判準、Phase 1 的主角，**不是 Engine D 的東西**。它只是承載欄位從 CLI 旗標換成 ledger 欄位 |
 | 8 | 0a.2 | 未提 `webapp/static/app.js` | **未動**，留給批 1／批 3 | nav 已移除兩個入口，但 `renderBasket`／`renderMultiYear` 與 router 分支仍在。手動打 `#/basket` 會拿到 API 錯誤而不是崩潰 |
 
-## 0.8 ⛔ SCOPE_ESCALATION（0b.1 停在這裡，等使用者決定）
+## 0.8 ✅ 已裁決（2026-09-23）：**A——`argument` 升核心、`why` 退役**（原 escalation 紀錄留存於下）
+
+使用者定案 A。ROADMAP 消費層對照表、批 1 的做法與驗收、結案 gate 3、R2 檢查 7 已同步改為 argument（commit 見 git log）。
+升核心前多一個檢查：列出各檔 argument 行數的前後對照，確認刪掉估值來源段後沒有任何一檔變空。
+
 
 **這正是 §6「撞到就停」預測的那一格，而且 plan 與 ROADMAP 在這裡互相矛盾。**
 
@@ -129,7 +133,12 @@ Why local patch is insufficient: 核心面板缺內容＝blocked。保留 `why` 
 `CORE_PANELS`、`_readiness()`、型別層與那 8 個測試檔怎麼改。先動一半會讓下一個 session
 接到一個半改的樞紐，而樞紐正是這批最難接手的東西。
 
-## 0.7 ⚠ 待使用者裁決：「殭屍 grep 五區歸零」這條驗收做不到（0a.3 發現）
+## 0.7 ✅ 已裁決（2026-09-23）：**差集 keep-list**（原紀錄留存於下）
+
+使用者定案：保留八組 regex，腳本加 `KEEP`（鍵是（檔，組字母）、值是「類別: 理由」，類別限 kept_file／legacy_key／retirement_note／boundary_sentence／guard_assertion 五類），
+驗收改為腳本印出的三個數字都是 0：未列 keep-list 的命中、已列但不再命中、理由類別不合法。`scripts/retired_mechanism_grep.py` 已加支援（KEEP 目前為空，由你逐條填）；
+ROADMAP 驗收①與本 plan gate 8、R2 檢查 1 已同步。精確到（檔，組）而不是只到檔，是為了讓一個因 G 組留下的檔若多出 C 組引用仍會被抓到。
+
 
 **ROADMAP Phase 0 驗收①與本 plan 結案 gate 8 寫的是「八組 regex 在 code／skills／tests／config／static 命中 0」。
 這條在字面上無法達成，而且其中兩處是因為 `AGENTS.md` 自己要求那個措辭。** 五類證據（實測數字）：
@@ -225,8 +234,9 @@ EOF
   `webapp/{api,materialize,__main__}.py`、`webapp/static/{app.js,index.html}`。
 - 做：依 ROADMAP「消費層對照表／個股頁」——首屏拿掉尺（現價／沒賭對／賭對／判斷錯了）與「要翻倍需要什麼為真」計算框；
   論證層 `bet` 改純文字（讀 `our_bet`）、`entry` 面板刪；稽核區拿掉 q4 隱含報酬、q7 payoff；`overview` 拿掉 `implied_return`、`payoff`、
-  `future_target`、`sell_side_target`、`target_reached`；readiness 核心面板改為 headline、短評、why、research、歸零旗標（讀圖面板 Phase 2 加）、
-  fundamental 降為選配。`alpha/fundamental` 的 `FundamentalsSnapshot` 等資料契約搬進 `alpha/contracts.py` 或留在 `alpha/fundamental/contracts.py`，
+  `future_target`、`sell_side_target`、`target_reached`；readiness 核心面板改為 headline、短評、**argument**、research、歸零旗標（讀圖面板 Phase 2 加）、
+  fundamental 降為選配；**`why` 面板退役**（它只吃估值鏈三個輸入，問的問題已被 G3 退役；`argument` 才是在答「憑什麼」的面板，73 檔都有內容——2026-09-23 使用者定案 A）。
+  升核心前先確認：argument 的「數字」「賭注」段刪掉估值鏈來源後，**沒有任何一檔的 argument 變空**（列出各檔 argument 行數的前後對照）。`alpha/fundamental` 的 `FundamentalsSnapshot` 等資料契約搬進 `alpha/contracts.py` 或留在 `alpha/fundamental/contracts.py`，
   模型檔（因果橋）留到批 2 刪。`alpha/cli.py` 拿掉 valuation／implied／entry／reverse 子命令。
 - 驗收：**importer 地圖重算後，退役模組只被退役模組自己與測試 import**；`python -m webapp materialize` 全 73 檔成功；
   `python -m webapp status` 的 blocked 檔數不因 fundamental 缺席而增加（readiness 規則換了）；`pytest tests/test_webapp_request_path.py tests/test_analyst_view.py tests/test_absence_semantics.py` 綠（斷言尺與 q4／q7 的測試跟機制走，逐一列出）。
@@ -288,12 +298,12 @@ EOF
 
 1. `pytest -q` 全綠，測試數與 0.0 基準的差＝刪除的測試檔（逐檔列在八欄）。
 2. `python -m audit invariants` 綠。
-3. 語意 diff：`python -m webapp materialize` 前後，73 檔的 `brief`／`why`／`research` 面板內容不變（只拿掉面板，不改文字）。
+3. 語意 diff：`python -m webapp materialize` 前後，73 檔的 `brief`／`argument`／`research` 面板文字不變（只拿掉面板與估值段，不改文字；argument 少掉的只能是估值來源的段）。
 4. 無新 dual authority：收據只住 trade_log，舊店無寫入呼叫端（grep `record_live_choice(` 呼叫端 = 0）。
 5. 無 silent drop：心跳五段照印；被拿掉的段落印 `not_yet_recorded` 不是空白。
 6. Point-in-time 測試綠。
 7. lifecycle 可達：pq2 未結案 2；watches 95 筆仍在。
-8. Executable protection：`scripts/retired_mechanism_grep.py` 五個驗收區（code／static／skills／tests／config）全 0，輸出存進 `docs/reports/…-phase0-closeout.md`。
+8. Executable protection：`scripts/retired_mechanism_grep.py` 印出的「未列 keep-list 的命中（檔，組）數」為 0，且「已列但不再命中」為 0；keep-list 每條理由屬五類之一；輸出存進 `docs/reports/…-phase0-closeout.md`。
 9. **驗收數的是機制存在與否**（kind 數、命中數、sha256、pq2 數），沒有一個是「幾檔通過某個 filter」。
 
 結案後同 commit：ROADMAP Phase 0 標 ✅、ARCHITECTURE §8.2 的「建議區間已移除、煞車仍在」列改指 `record_trade.py`。
@@ -309,14 +319,15 @@ Target: master 最新 commit；docs/reports/…-phase0-baseline.md 與 …-phase
 Claimed acceptance: Phase 0 九項 gate 全過（見 closeout 報告）
 Do not trust: 上面那行是待驗證的宣稱，不是事實
 Task: 直接讀 repo，自己跑下列檢查，逐項 ✅／❌ 附實際輸出，回 REVIEW（含 verdict）
-  1. python scripts/retired_mechanism_grep.py → code／static／skills／tests／config 五區全部 0；livedocs 命中逐句列出並判斷是否為禁止句
+  1. python scripts/retired_mechanism_grep.py → 「未列 keep-list 的命中（檔，組）」＝0、「已列但不再命中」＝0；逐條審 keep-list 理由是否屬五類且成立，
+     kept_file 類的檔另 grep 確認它沒有活的呼叫端指向退役程式；livedocs 命中逐句列出並判斷是否為禁止句
   2. python -m webapp status | tail -10 → 沒有 basket、multi_year；kind 數與 closeout 一致
   3. python -m engine_b.todo list → 未結案 2，皆 manual
   4. python -m pytest -q → 全綠；測試檔數差 ＝ closeout 列出的刪除清單，逐檔核對「守的是哪個退役機制」是否成立
   5. python -m audit invariants → 全綠
   6. library/private/decision_lab/*.db 的 sha256 與 live_choices 筆數 ＝ baseline 報告
   7. library/private/app/analyst_view/COHR.json：overview 沒有 payoff／implied_return／future_target／sell_side_target／target_reached 鍵；
-     overview.brief.our_bet 與 view.why／research 的文字 digest ＝ baseline（只拿掉面板，不改文字）
+     overview.brief.our_bet 與 view.argument／research 的文字 digest ＝ baseline（只拿掉面板與估值段，不改文字）
   8. python -m crons.heartbeat --out <temp> → 五段標題都在；段 2 含「候選狀態板未落地」且 absence_kind 為 not_yet_recorded
   9. grep -rn "record_live_choice(" 呼叫端 ＝ 0（舊店無寫入端）；scripts/record_trade.py 的兩個新測試存在且綠
 Boundaries: 不改 code、不 commit、不核准 pq2、不入圖、不動 thesis、不動 Sheet
