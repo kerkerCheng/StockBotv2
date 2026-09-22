@@ -49,11 +49,12 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0a.2 | 心跳與 APP 入口停跑 | ✅ | b65c1a1 |
 | 0a.3 | 研究 skill 改句 | ✅ | 4c78df4 |
 | 0a.4 | 池子收集端停鑄 | ✅ | 20f21a4 |
-| 0b.1 | 個股頁樞紐重寫、斷 import | ○（§0.7／§0.8 已裁決，接著做） | |
+| 0b.1a | 個股頁消費層：why／entry 退役、argument 升核心、尺與四價下架 | ✅ | e38c7ee |
+| 0b.1b | 斷 import：builder／sources 不再 import 退役模組 | ○ | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
-| 0c | 池子 17 筆 drop | ✅ | |（**先於 0b 執行**：兩者無相依，0b.1 撞到 §6「切不開」要停，先把獨立的 Step 收掉）|
+| 0c | 池子 17 筆 drop | ✅ | cd275e3 |（**先於 0b 執行**：兩者無相依，0b.1 撞到 §6「切不開」要停，先把獨立的 Step 收掉）|
 | 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅ | ○ | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（skill 會照下面這段做；不能用 skill 時貼這段原文）：
@@ -77,6 +78,12 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 5 | 0a.2 | 只列 `webapp/__main__.py` materialize 清單、`api.py` 路由、`index.html` nav | 另外把兩個 kind 從 `webapp/contracts.py` 的**封閉字彙** de-register | 不 de-register 的話心跳段 1 會一直唸「不是今天的 N 份：basket、multi_year」——那正是 0a 要移除的注意力噪音；ROADMAP 驗收③也要求 `webapp status` 不列它們。代價實測只有 7 個測試檔／14 條測試，全部已處理 |
 | 6 | 0a.2 | 「段 2 的『現價過目標價』與**籃子行**」 | 段 2 改一行；**段 4 改兩行** | 實測籃子／量的候選／要幾倍／歸零旗標彙總四行都在**段 4**，不在段 2（見基準報告 §8） |
 | 7 | 0a.2 | 未提歸零旗標 | 彙總暫停並印 `upstream_unavailable` 明示缺席；**逐檔那盞燈未動** | 歸零旗標是**活的量測**（`AGENTS.md`「量測、訊號、脈絡三分」），但它唯一的 producer 是籃子 artifact。逐檔的燈住在個股頁 `wipeout` 面板（0b.1 明列為核心面板），所以停的只有彙總，且它自己說得出停在哪裡 |
+| 11 | 0b.1 | 「批 1 一個 commit」 | 拆成 **0b.1a（消費層）** 與 **0b.1b（斷 import）** 兩個 commit | 這一批涉及約 24,000 行、20 個檔，`builder.py` 一檔 3,570 行。拆成兩段讓每一段都能保持全測試綠、也讓 diff 讀得完；批 1 的驗收（importer 地圖、materialize 73 檔、blocked 歸屬、三個測試檔）在 0b.1b 結束時整批驗一次 |
+| 12 | 0b.1a | 未提 `MarketSection` | **新增** `briefing/alpha_view/contracts.py` 的 `market` section ＋ builder 的 `_market_section` | 現價原本只住在 `ValuationSection`／`ImpliedReturnSection`／`EntryLogicSection` 三個**全部要退役**的 section 裡。它是 A2 觀測（Engine C 收盤快照），與估值無關，卻會跟著模型一起消失。新 section 只有一格、零算術，直接讀 `build.context.market`——與 `sources._current_price` 同一個來源 |
+| 13 | 0b.1a | ROADMAP 核心面板列 `headline` | `headline` **留在核心但換主詞**：由「現價 → future target → 隱含報酬」改成「現在多少錢」（只有現價） | 原本的 headline 就是 AGENTS「首屏拿掉尺」指的那把尺，8 格數字全來自估值鏈。留著它又刪掉資料源會讓 73/73 blocked（與 `why` 同一個形狀）。實測現價 73/73 檔 available，所以換主詞後零檔因它 blocked |
+| 14 | 0b.1a | 未提 `brief`／`wipeout` 升核心的代價 | 照 ROADMAP 做，並**量出代價**：blocked 由 18 → 70 | 成因歸屬實測：**brief 70 檔、wipeout 3 檔、research 12 檔，fundamental 0 檔**。批 1 的驗收句「blocked 檔數不因 fundamental 缺席而增加」因此成立——fundamental 由核心降選配，只會讓 blocked 變少。⚠ 70/73 是真實 backlog（沒寫短評就是沒有產出），但它同時讓 `forward_view_backlog` 由 11 變成約 70，**下一個 Phase 要注意這個佇列的主詞已經換成「去寫短評」** |
+| 15 | 0b.1a | gate 3「argument 文字不變」 | **已用機械方式證明**：把兩個 panel 的標題換回舊字串後，73/73 檔的 `brief` 與 `argument` digest 與改版前**逐字相等**；`research` 與 `our_bet` 本來就 0 檔變動 | 標題改了是刻意的（panel 的角色換了）。除標題外一個字沒動。⚠ `argument` 的 `numbers`／`market` 兩段**還沒拿掉**（它們讀估值鏈），那是 0b.1b 的事；拿掉後 argument 由 6 段變 4 段，實測沒有任何一檔會變空（chain 73／timeline 73／bet 73／risks 63） |
+| 16 | 0b.1a | — | `review_required` 不再讓任何核心 panel 的 status 變差 | 背它的那個 panel 是 `why`（status 取估值鏈三段最差）。退役後它只走 refresh／attention 那條路（測試已改問那三個地方）。**Phase 2 讀圖 panel 升核心時要把這條路接回來** |
 | 9 | 0a.4 | 「移除 `collect_from_decisions` 的呼叫」 | 從 `SOURCE_COLLECTORS` 登記表移除 `("decisions", …)`，並**刪掉 `include_decisions` 參數與 `--no-decisions` 旗標** | 留一個預設 `True` 的開關等於留一道旁門：傳個參數就把退役的 collector 叫回來（L15：權限要 deterministic）。同時從 `SOURCE_ITEM_TYPES` 移除 decisions 那一列，讓兩個 legacy kind 與 `manual` 同形——缺席不代表完成 |
 | 10 | 0a.4 | 未提 `engine_b/cli.py::_cmd_drain` 的 `include_decisions` | **未動**，留給批 3／4 | 它從 Decision Store 讀 work order 餵 pq1。**無人值守那條路已經走不到**：daily 的 `drain_limit_per_run=0`，兩個區塊都是 `if include_decisions and limit:`，`limit` 為 0 直接短路；互動那條路的指示已在 0a.3 從 skill 移除。所以「停跑」已達成，刪除留給批次 |
 | 8a | 0a.3 | 檔案清單列 6 個 skill | 改了 **7 個**（多 `skills/lead-intake/SKILL.md`） | 它有 7 處 `decision_lab`／`reassess` 的**可執行呼叫**（Fast Path 的 `evaluate-signal`、Step 7 整節、接點表）。不改它，退役的命令會繼續被 agent 照著跑 |
