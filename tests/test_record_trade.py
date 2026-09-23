@@ -134,3 +134,139 @@ def test_writer_checks_current_value_before_writing() -> None:
     writer = source.split("def write_portfolio_cells(")[1].split("\ndef ")[0]
     assert "expected" in writer
     assert "raise ValueError" in writer, "現值不符必須中止而非覆蓋"
+
+
+# ---------------------------------------------------------------------------
+# 兩道資本硬擋（2026-09-23，Phase 0 Step 0b.4／G12）：煞車搬到真的有人走的路上
+# ---------------------------------------------------------------------------
+
+def _sheet_rows(nav: float = 100_000.0, **positions: float) -> list[dict]:
+    rows = []
+    invested = 0.0
+    for ticker, value in positions.items():
+        rows.append({"ticker": ticker, "bucket": "ALPHA", "market_value_base": value,
+                     "nav_base": nav, "base_currency": "USD", "currency": "USD", "shares": 10.0})
+        invested += value
+    rows.append({"ticker": "CASH", "bucket": "CASH", "market_value_base": nav - invested,
+                 "nav_base": nav, "base_currency": "USD", "currency": "USD", "shares": 0.0})
+    return rows
+
+
+def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0):
+    """把 Sheet 的三個入口換成假的：定位格、持股列、寫入（寫入被叫到就記下來）。"""
+    from fetchers import gsheets
+
+    calls: dict[str, list] = {"writes": []}
+
+    def locate(requests):
+        cells = [
+            {"a1": "B2", "current": str(held_shares)},
+            {"a1": "C2", "current": "100"},
+        ]
+        if len(requests) == 3:
+            cells.append({"a1": "D5", "current": "50000"})
+        return cells
+
+    def write(writes):
+        calls["writes"].append(writes)
+        return {"written": [w["a1"] for w in writes]}
+
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells", locate)
+    monkeypatch.setattr(gsheets, "write_portfolio_cells", write)
+    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False: rows)
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    return module, calls
+
+
+_BUY = ["--symbol", "AXTI", "--side", "buy", "--shares", "10", "--price", "200",
+        "--executed-at", "2026-09-23T14:00:00-04:00", "--broker", "IB"]
+
+
+def test_dry_run_over_five_percent_fails_closed_without_touching_sheet_or_log(
+    monkeypatch, tmp_path, capsys
+) -> None:
+    """已持 4.5% 再買 2%：dry-run 就必須擋（不是等到 --apply），Sheet 與 trade_log 都不動。"""
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=4_500.0))
+    assert module.main(_BUY) == module.EXIT_HARD_CAP
+    assert module.main(_BUY + ["--apply"]) == module.EXIT_HARD_CAP
+    assert calls["writes"] == [], "被擋下的成交不得寫 Sheet"
+    assert not module.TRADE_LOG.exists(), "被擋下的成交不得寫事件紀錄"
+    out = capsys.readouterr()
+    assert "硬擋擋下" in out.out and "single_position" not in out.err
+    assert "--override --reason" in out.err
+
+
+def test_override_without_reason_is_rejected_before_any_sheet_access(monkeypatch, tmp_path) -> None:
+    from fetchers import gsheets
+
+    def boom(*a, **k):
+        raise AssertionError("不該碰 Sheet")
+
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells", boom)
+    monkeypatch.setattr(gsheets, "fetch_portfolio", boom)
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    assert module.main(_BUY + ["--override"]) == 2
+    assert module.main(_BUY + ["--override", "--reason", "   "]) == 2
+    assert not module.TRADE_LOG.exists()
+
+
+def test_override_with_reason_writes_the_verdict_and_reason_as_a_receipt(
+    monkeypatch, tmp_path
+) -> None:
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=4_500.0))
+    assert module.main(_BUY + ["--apply", "--override", "--reason", "分批建倉第二批，已知超 5%"]) == 0
+    assert len(calls["writes"]) == 1
+    entry = json.loads(module.TRADE_LOG.read_text(encoding="utf-8").splitlines()[0])
+    assert entry["override_reason"] == "分批建倉第二批，已知超 5%"
+    assert entry["hard_cap_check"]["status"] == "blocked"
+    assert entry["hard_cap_check"]["breaches"] == ["single_position_nav_cap_reached"]
+
+
+def test_buy_under_the_cap_records_a_pass_verdict(monkeypatch, tmp_path) -> None:
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=1_000.0))
+    assert module.main(_BUY + ["--apply"]) == 0
+    entry = json.loads(module.TRADE_LOG.read_text(encoding="utf-8").splitlines()[0])
+    assert entry["hard_cap_check"]["status"] == "pass"
+    assert "override_reason" not in entry
+
+
+def test_unreadable_holdings_is_unmeasurable_and_fails_closed(monkeypatch, tmp_path) -> None:
+    """Missing != Zero：持股列讀不到不是「持有 0%」，是量不到 → 擋。"""
+    from fetchers import gsheets
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=[])
+
+    def fail(*, strict_operational=False):
+        raise RuntimeError("sheet down")
+
+    monkeypatch.setattr(gsheets, "fetch_portfolio", fail)
+    assert module.main(_BUY + ["--apply"]) == module.EXIT_HARD_CAP
+    assert calls["writes"] == []
+
+
+def test_foreign_currency_buy_needs_fx_to_base(monkeypatch, tmp_path) -> None:
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0))
+    twd = ["--symbol", "3105.TWO", "--side", "buy", "--shares", "1000", "--price", "100",
+           "--currency", "TWD", "--cash-column", "none",
+           "--executed-at", "2026-09-23T09:05:00+08:00", "--broker", "FUBON"]
+    assert module.main(twd) == module.EXIT_HARD_CAP, "沒有匯率就量不到"
+    assert module.main(twd + ["--fx-to-base", "0.03125"]) == 0, "100,000 TWD ≈ 3,125 USD = 3.1% < 5%"
+
+
+def test_sell_is_never_blocked_by_the_caps(monkeypatch, tmp_path) -> None:
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=9_000.0))
+    sell = ["--symbol", "AXTI", "--side", "sell", "--shares", "5", "--price", "200",
+            "--executed-at", "2026-09-23T14:00:00-04:00", "--broker", "IB", "--apply"]
+    assert module.main(sell) == 0
+    entry = json.loads(module.TRADE_LOG.read_text(encoding="utf-8").splitlines()[0])
+    assert entry["hard_cap_check"]["status"] == "not_applicable"
+
+
+def test_record_trade_is_the_only_writer_that_enforces_the_caps() -> None:
+    """煞車必須住在真的有人走的路上：寫 Sheet 的唯一入口在寫入前呼叫 risk.hard_caps。"""
+    source = (ROOT / "scripts" / "record_trade.py").read_text(encoding="utf-8")
+    before_write = source.split("write_portfolio_cells(writes)")[0]
+    assert "check_trade_hard_caps" in before_write
+    assert "EXIT_HARD_CAP" in before_write

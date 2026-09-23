@@ -10,6 +10,11 @@
 3. **預設 dry-run。** 要實際寫入必須加 `--apply`，且會先印出完整 diff。
 4. **事件紀錄與持股狀態分開。** `library/trades/trade_log.jsonl` 是 append-only
    事件流（發生了什麼），不是持股真相（現在有多少）——後者永遠只有 Sheet。
+5. **兩道資本硬擋住在這裡（2026-09-23，Phase 0 Step 0b.4／G12）。** 每一筆買進在寫 Sheet
+   或 trade_log 之前都過 `risk/hard_caps.py`：5% 單筆 NAV 上限（alpha）與 ETF 槓桿 cap
+   （nominal／effective）。超過或**量不到**一律 fail closed（dry-run 也擋）；
+   `--override --reason "<理由>"` 才放行，且事件紀錄寫 `override_reason` 與整份 verdict 當收據。
+   賣出不檢查（不增加曝險）。成交幣別 ≠ NAV 基準幣別時要給 `--fx-to-base`，否則量不到。
 
 用法：
     python scripts/record_trade.py --symbol QQQ --side buy --shares 10 \\
@@ -30,6 +35,9 @@ _ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT))
 
 TRADE_LOG = _ROOT / "library" / "trades" / "trade_log.jsonl"
+
+#: 硬擋擋下時的 exit code（與 2＝輸入／持股不合法區分，讓呼叫端與測試分得出「被煞車擋」）。
+EXIT_HARD_CAP = 3
 
 
 def _now() -> str:
@@ -89,11 +97,84 @@ def build_parser() -> argparse.ArgumentParser:
         help="只記事件、不碰 Sheet。用於「已手動更新過 Sheet」的成交——"
         "腳本無法自行判斷這件事，必須由使用者明確聲明。",
     )
+    ap.add_argument(
+        "--fx-to-base",
+        type=float,
+        default=None,
+        help="成交幣別對 NAV 基準幣別的匯率（1 成交幣 = X 基準幣）；幣別不同且未提供時硬擋量不到、fail closed",
+    )
+    ap.add_argument(
+        "--override",
+        action="store_true",
+        help="硬擋擋下時仍放行；必須同時給 --reason，理由與整份 verdict 會寫進事件紀錄當收據",
+    )
+    ap.add_argument("--reason", default="", help="override 的理由（--override 必填）")
     return ap
+
+
+def _hard_cap_verdict(args: argparse.Namespace):
+    """買進前過兩道硬擋；讀 Sheet 持股列（readonly scope）。回 `HardCapVerdict`。"""
+    from fetchers.gsheets import fetch_portfolio
+    from risk.hard_caps import check_trade_hard_caps, gross_in_base_currency
+
+    if args.side != "buy":
+        return check_trade_hard_caps(None, symbol=args.symbol, side=args.side, gross_base=None)
+    try:
+        rows = list(fetch_portfolio(strict_operational=True))
+    except Exception as exc:  # noqa: BLE001 — 讀不到就是量不到，交給 verdict fail closed
+        return check_trade_hard_caps(
+            None, symbol=args.symbol, side=args.side, gross_base=None,
+            gross_reason=f"持股列讀取失敗：{type(exc).__name__}",
+        )
+    base_currency = next(
+        (str(r.get("base_currency") or "").strip().upper() for r in rows if r.get("base_currency")),
+        None,
+    )
+    gross_base, gross_reason = gross_in_base_currency(
+        gross=round(args.shares * args.price, 2),
+        trade_currency=args.currency,
+        base_currency=base_currency,
+        fx_to_base=args.fx_to_base,
+    )
+    return check_trade_hard_caps(
+        rows,
+        symbol=args.symbol,
+        side=args.side,
+        gross_base=gross_base,
+        gross_reason=gross_reason,
+        already_in_sheet=bool(args.log_only),
+    )
+
+
+def _print_verdict(verdict) -> None:
+    label = {
+        "pass": "✓ 硬擋通過",
+        "not_applicable": "－ 硬擋不適用",
+        "blocked": "✗ 硬擋擋下",
+        "unmeasurable": "✗ 硬擋量不到（fail closed）",
+    }[verdict.status]
+    print(f"\n{label}（5% 單筆 NAV 上限／ETF 槓桿 cap；規則見 risk/hard_caps.py）")
+    for reason in verdict.reasons:
+        print(f"  · {reason}")
+    measures = verdict.measures
+    if "post_trade_weight" in measures:
+        print(f"  · 成交後占 NAV {measures['post_trade_weight']:.2%}"
+              f"（上限 {measures['single_position_nav_cap']:.0%}）")
+    if "post_trade_nominal_weight" in measures:
+        print(f"  · nominal_weight {measures['post_trade_nominal_weight']:.2%}"
+              f"（cap {measures['leveraged_nominal_cap']:.0%}）；"
+              f"effective_weight {measures['post_trade_effective_weight']:.2%}"
+              f"（cap {measures['leveraged_effective_cap']:.0%}）")
 
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
+    if args.override and not args.reason.strip():
+        print("✗ --override 必須附 --reason「<理由>」；沒有理由的放行不留收據，拒絕", file=sys.stderr)
+        return 2
+    if args.reason.strip() and not args.override:
+        print("✗ --reason 只在 --override 時有意義；沒有 override 的成交不需要理由", file=sys.stderr)
+        return 2
     from fetchers.gsheets import locate_portfolio_cells, write_portfolio_cells
 
     gross = round(args.shares * args.price, 2)
@@ -154,6 +235,18 @@ def main(argv: list[str] | None = None) -> int:
     else:
         print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
 
+    # 兩道硬擋：dry-run 也擋（讓人在 --apply 之前就看到會被擋），override 留收據。
+    verdict = _hard_cap_verdict(args)
+    _print_verdict(verdict)
+    receipt: dict = {"hard_cap_check": verdict.to_dict()}
+    if not verdict.allows:
+        if not args.override:
+            print("\n✗ 未寫入。要放行請加 --override --reason「<理由>」（理由與 verdict 會寫進事件紀錄）。",
+                  file=sys.stderr)
+            return EXIT_HARD_CAP
+        receipt["override_reason"] = args.reason.strip()
+        print(f"\n⚠ override 放行：{args.reason.strip()}（將寫進事件紀錄）")
+
     if _already_recorded(trade_id):
         print("\n⚠ 這筆成交已在 trade_log.jsonl 中；重複執行不會再寫事件紀錄。")
 
@@ -172,6 +265,7 @@ def main(argv: list[str] | None = None) -> int:
                 "recorded_at": _now(),
                 "sheet_writes": [],
                 "sheet_update": "manual_by_user",
+                **receipt,
             }
         )
         print(f"\n✓ 事件已記於 {TRADE_LOG.relative_to(_ROOT)}；"
@@ -202,6 +296,7 @@ def main(argv: list[str] | None = None) -> int:
                 "note": args.note,
                 "recorded_at": _now(),
                 "sheet_writes": result["written"],
+                **receipt,
             }
         )
     print(f"\n✓ 已寫入 {len(result['written'])} 格，事件已記於 {TRADE_LOG.relative_to(_ROOT)}")
