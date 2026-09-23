@@ -117,11 +117,11 @@ The set of `parked` leads whose source tracing did not reach a verbatim primary 
 *Avoid:* park list, unresolved leads
 
 ### PQ1（研究佇列 / pq1）
-Daily Approval Loop 的**昂貴研究階段**，包含兩種 bounded job：（1）priority 排序的 `triaged_go` lead，跑 source-trace + extraction；（2）使用者對 `decision_review` 明確 `go` 後 dispatch 的 Engine D gap work order。後者優先使用本輪 budget；未經 go 的 proposed work order 不可被 routine 自動研究。兩者都靠持久狀態 checkpoint 做到跨 session 續跑。需要 Engine A／Engine C／thesis authority mutation 的結果只產完整核准 packet，**不在 pq1 自行寫入**；純唯讀研究補齊 assessment 後才可 research-intent reassess。
+Daily Approval Loop 的**昂貴研究階段**：priority 排序的 `triaged_go` lead，跑 source-trace + extraction（bounded job）。（2026-09-23 前另有使用者對 `decision_review` 明確 `go` 後 dispatch 的 Engine D gap research；已隨研究側退役。）
 *Avoid:* research stage（過泛）、auto-ingest
 
 ### PQ2（入圖核准佇列 / pq2）
-Daily Approval Loop 的**統一人工決策池**：prepared Research Action 入圖、Decision gap research admission、到期 thesis、Sheet-only 持股與 manual authority 都使用同一組穩定編號與對話式批次語法（`1 3 go 4 drop 5 6 pending`）。`go` 是 type-aware：對 prepared RA 才代表 apply 入圖；對 decision review 只代表 dispatch 到 pq1，不等於接受舊 decision 或 live 資本。Graph admission、thesis revise／retire、manual authority 與 live choice/fill 各自的人工 gate 不因共用編號而合併或放寬。
+Daily Approval Loop 的**統一人工決策池**：prepared Research Action 入圖、到期 thesis、Engine C 人工觀測、thesis mutation、追源派回與 manual authority 都使用同一組穩定編號與對話式批次語法（`1 3 go 4 drop 5 6 pending`）。`go` 是 type-aware：對 prepared RA 才代表 apply 入圖；對追源只代表派回 pq1。（`decision_review`／`sheet_only_holding` 兩種 legacy 型已於 2026-09-23 退役，歷史項目只能 drop。）
 *Avoid:* PR checkbox approval、auto-admission
 
 ### Graph MCP Gateway
@@ -135,12 +135,16 @@ The durable, provider-neutral unit of remote-intake approval and provenance. A s
 A point-in-time record of market and financial metrics for a single ticker, stored in the `financial_snapshots` table. One row per `(ticker, snapshot_date)` pair. Fields include price, forward P/E, trailing P/E, EV/Revenue, gross margin, shares outstanding, and analyst target price. The primary input to the five-item financial checklist. Private companies and non-US stocks without available data are represented by absent rows, not null rows.
 
 ### 財務核驗五項（five-item financial checklist）
-The five-item financial checklist evaluated by `engine_c/checklist.py`. Items: gross margin trend, customer concentration, backlog/revenue visibility, dilution (share count trend), and valuation pressure. Items sourced automatically from Financial Snapshots where available; **customer concentration and backlog require manual entry — measured 2026-09-21, those two are the only items that have ever blocked anything** (6 cohorts; the other three blocked none). A failing checklist does not block research; it surfaces as `financial_<item>_manual_required` coverage blockers on the Decision cohort via `decision_lab/coverage.py`.
+The five-item financial checklist evaluated by `engine_c/checklist.py`. Items: gross margin trend, customer concentration, backlog/revenue visibility, dilution (share count trend), and valuation pressure. Items sourced automatically from Financial Snapshots where available; **customer concentration and backlog require manual entry — measured 2026-09-21, those two are the only items that have ever blocked anything** (6 cohorts; the other three blocked none). A failing checklist does not block research; it surfaces as `financial_<item>_manual_required` coverage blockers on the Decision cohort via Engine D coverage（2026-09-23 已退役）.
 *Avoid:* **Watchlist Gate**（除役用語——三級階梯 Lane Memo → Watchlist → Underwrite Sheet 已於 2026-09-02 廢止，見 `docs/ARCHITECTURE.md` §9；這五項本身沒有廢止，廢止的是它通往的那個「層」）, financial gate, checklist gate
 
 ---
 
 ## Decision & Accountability (Engine D)
+
+> ⚠ **2026-09-23（Phase 0 Step 0b.4）：Engine D 研究側整組退役、舊 Decision Store 凍結唯讀。** 本區與下方「Investment Process」的詞條留作讀凍結歷史
+> （`python -m decision_lab history`）用；活的量測只剩 Portfolio Risk Snapshot 與 Issuer Look-through（住 `risk/`）。A5 現行落點：
+> `library/trades/trade_log.jsonl`（`scripts/record_trade.py`）與 `risk/hard_caps.py`。
 
 ### Engine D — Decision & Accountability Engine（Decision Lab）
 The decision layer that consumes Engine B Signals, Engine A evidence/causal context, Engine C observations, versioned policy, and confirmed live holdings to produce bounded capital permission, Action Cards, prospective paper decisions, explicit user-choice facts, and outcome attribution.
@@ -155,7 +159,7 @@ The content-addressed, immutable bundle of normalized values, source references,
 Later changes in Engine A/B/C do not rewrite an existing decision context; a new assessment freezes a new bundle. This preserves what the system knew at decision time without creating parallel current-state authorities.
 
 ### Portfolio Risk Snapshot（投組風險快照）
-Engine D 由當下 Google Sheet holdings、Capital Authority、versioned beta／investment policy 衍生的 point-in-time telemetry。它分開保存 daily-reset ETF 的 nominal／effective 槓桿、已提款貸款槓桿、兩者合計、alpha 總量與已知 issuer 曝險；`library/private/decision_lab/portfolio_risk_snapshots.jsonl` 只作 append-only 變化偵測與 weekly 趨勢，不取代 Sheet、Capital Authority 或 frozen decision context。Daily 只顯示門檻跨越／狀態翻轉；Weekly 可顯示完整快照。
+`risk/snapshot.py`（原文寫 Engine D；研究側已退役）由當下 Google Sheet holdings、Capital Authority、versioned beta／investment policy 衍生的 point-in-time telemetry。它分開保存 daily-reset ETF 的 nominal／effective 槓桿、已提款貸款槓桿、兩者合計、alpha 總量與已知 issuer 曝險；`library/private/decision_lab/portfolio_risk_snapshots.jsonl` 只作 append-only 變化偵測與 weekly 趨勢，不取代 Sheet、Capital Authority 或 frozen decision context。Daily 只顯示門檻跨越／狀態翻轉；Weekly 可顯示完整快照。
 *Avoid:* portfolio authority, holdings ledger, daily report archive
 
 ### Issuer Look-through（發行人穿透）
@@ -165,6 +169,10 @@ Engine D 由當下 Google Sheet holdings、Capital Authority、versioned beta／
 ---
 
 ## Investment Process
+
+> ⚠ 2026-09-23（Phase 0 Step 0b.4）：Probe／Shadow Observation／Execution Mode／Confidence Envelope／Action Card／Decision Cohort／Coverage Gate／
+> MVRP／Prospective Paper Portfolio／Crowding Discount 所描述的機制已隨 Engine D 研究側退役，詞條留作讀凍結歷史。
+> Signal Source Registry 仍活（`engine_b/signal_source_registry.py`）。
 
 ### Probe（研究探針）
 A time-bounded research state for testing an investable claim before it qualifies as a Formal Position. Every signal that passes the lightweight Probe Gate receives a Shadow Observation; a funded Paper execution requires the Coverage Gate, paper-lane market/FX freshness, and a positive paper supported position. A Live execution is optional and always manually approved and placed by the user. Probe is not a synonym for simulated trading: research status, research readiness, Observation Mode, and Execution Mode are orthogonal. A `coverage_pending` Probe remains valid for shadow observation but has a system-supported funded range of zero until its Minimum Viable Research Packet passes the Coverage Gate. A Probe ends as `promoted`, `rejected`, or `expired`; `revised` opens a new lifecycle epoch. Unresolved but still testable claims may remain active until their claim-specific expiry, but may not be repeatedly added to on the same unchanged narrative.
@@ -198,7 +206,7 @@ The prospective population of every signal that passed the Probe Gate, including
 The user-governed registry that decides which accounts may trigger automatic Signal and Shadow capture and receive scarce research attention. A source moves among `candidate`, `probation`, `active`, and `suspended` based on prospective claim accuracy, trace success, lead time, independence, correction behavior, and beta-adjusted outcomes. Registry status is an attention and automation permission, never evidence or funded-Paper eligibility: it cannot raise `evidence_tier`, replace source tracing, or directly loosen a position cap.
 *Avoid:* trusted-evidence list, influencer score, automatic credibility override
 ⚠ 2026-09-16 D5：帳號登記表將以封閉三值 `probation`／`measured`／`trusted` **取代**本條的四態（ROADMAP Phase 3）；
-**落地前本條照舊**——`decision_lab/intake.py::_SOURCE_STATUSES` 今天仍是 `candidate`／`probation`／`active`／`suspended`，
+**落地前本條照舊**——`engine_b/signal_source_registry.py::STATUSES`（2026-09-23 起是 SSOT，原借自 decision_lab.intake） 今天仍是 `candidate`／`probation`／`active`／`suspended`，
 字彙的廢止與程式同一個 change 發生，不在文件先宣告。新制下 tier 只影響 pq1 優先序、不影響入池；升降是一季一次的 pq2 manual。
 
 ### Coverage Gate（研究覆蓋閘門）
@@ -224,7 +232,7 @@ A position-sizing rule that lowers the conviction tier by one level (15%→10%�
 ## Read Model（呈現無關的組裝層）
 
 ### Alpha Investment View（Alpha Card 的 backend contract）
-StockBot 對**一家公司**目前投資理解的 canonical、machine-readable 表示（`briefing/alpha_view/`，2026-09-05）。它把 Engine A 結構事實與 Q1、`AlphaSignal` 的 session 判斷、Engine C 觀測與共識、價格隱含 proxy、Engine D 公開的 catalyst／disproof／lifecycle、thesis 檢核點與全部 `EvidenceRef` **選取、正規化、語意標註、組裝、序列化**成一份 DTO；Daily Brief 的「Alpha Card 摘要」、`python -m briefing alpha-card` 與未來 Web／API 消費同一份。它是 read model 不是 authority：不重算、不重排、不含部位、不留檔。`capability_map()` 一眼列出每個 section 是 available／partial／stale／missing／not_modeled。
+StockBot 對**一家公司**目前投資理解的 canonical、machine-readable 表示（`briefing/alpha_view/`，2026-09-05）。它把 Engine A 結構事實與 Q1、`AlphaSignal` 的 session 判斷、Engine C 觀測與共識、Engine D 凍結歷史的 catalyst／disproof／lifecycle、thesis 檢核點與全部 `EvidenceRef` **選取、正規化、語意標註、組裝、序列化**成一份 DTO；Daily Brief 的「Alpha Card 摘要」、`python -m briefing alpha-card` 與未來 Web／API 消費同一份。它是 read model 不是 authority：不重算、不重排、不含部位、不留檔。`capability_map()` 一眼列出每個 section 是 available／partial／stale／missing／not_modeled。
 *Avoid:* Alpha dashboard、scorecard、AlphaSignal DTO、position view
 
 ### Operating Assumption（明示營運假設）
@@ -232,10 +240,12 @@ StockBot 對某個未來 driver 的**明示**假設（`alpha/fundamental/contrac
 *Avoid:* forecast（那是橋算出來的輸出）、guidance（那是公司說了什麼，住 Engine C `company_guidance`）、把假設存成 Python 常數或測試 fixture
 
 ### Financial Bridge（確定性財務橋）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 把基期觀測（Engine C `fiscal_year_results`）與明示假設算成目標期間的內部數字（`alpha/fundamental/bridge.py`，`fundamental-bridge/v1`）：分部營收 × (1 + 成長) → 營收；基期營益率 + Σ 變化 → 營益率；→ 營業利益 − 利息其他 → 稅前 × (1 − 稅率) → 淨利 + NCI 調整 → ÷ 稀釋股數 → EPS。每格是 observation／assumption／derived 三種之一，帶公式、假設 id 與觀測 ref；每個輸出 `calculation=deterministic` 且 `input_dependency`＝最弱輸入假設的知識種類。**缺任何一條假設就是 missing，不補 0。**
 *Avoid:* model（太泛）、DCF／估值（下一階段）、把 derived 的數讀成事實
 
 ### Expectation Comparison（內部 vs 共識的數值 gap）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。 `compare.py` 的口徑核實（`verify_consensus_basis`）與基期對帳仍活，數值 gap 已退。
 `alpha/fundamental/compare.py`：內部估計與 Engine C `consensus_estimates` 的同一指標、**同一會計期間、同一口徑（GAAP／non-GAAP）、同幣別**才給 `absolute_gap`／`relative_gap`；否則 `incompatible_period`／`incompatible_basis`／`incompatible_unit`／`internal_missing`／`consensus_missing`，**沒有數字**。EPS 共識的口徑靠 `year_ago_actual` 與一手財報稀釋 EPS 機械核對，核不出來是 `unverified`。它與 Q4（session 的 ordinal 判斷）並存、分開標示，**不是** Q4。
 *Avoid:* 把 `price/pe_forward` 導出的 EPS-like 值當共識、把相對標籤 `+1y` 當會計年度身分、拿它排序
 
@@ -252,37 +262,44 @@ StockBot 對某個未來 driver 的**明示**假設（`alpha/fundamental/contrac
 *Avoid:* 只靠「ref 還解析得到」判假設仍成立、改寫舊 ledger 行補角色
 
 ### ValuationAssumption（估值假設）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 StockBot 對某個估值參數的**明示**判斷（`alpha/valuation/contracts.py`，2026-09-06 Step 1）：公司、目標會計期間、`method`（封閉字彙，v1 只有 `forward_earnings_multiple`）、`parameter`（`target_pe`）、值（倍）、`basis`、`accounting_basis`（**必填** gaap／non_gaap——倍數套在哪種 EPS 上是身分）、rationale、`evidence_refs`＋`dependency_roles`（同期共識與市場倍數只能是 calibration）、`created_at`、supersede／retract、`review_conditions`。與 `OperatingAssumption` 同一套 epistemic system（同 basis 字彙、同角色、同 append-only／as-of、同一支選取器），id 前綴 `va_`，住 `library/private/alpha/valuation/<TICKER>.jsonl`。**它不是橋的 driver**：倍數不是財務橋的算術。
 *Avoid:* 把倍數塞進 `ASSUMPTION_DRIVERS`、程式或 LLM 補 default multiple、拿 unverified 口徑的 EPS 乘
 
 ### Fair Value／Fair-value Gap（Step 1）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 `alpha/valuation/model.py::build_valuation`：`fair_value = internal_eps[target_period] × target_pe`（同期、同口徑才乘；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者）；`gap = fair_value − current_price`／`fair_value / current_price − 1`（同單位才算；報價單位 ≠ 結算幣別，本層不換算）；`implied_multiple_at_price = current_price / internal_eps`——給定內部 EPS，**整個 gap ＝ target_pe / implied_multiple − 1**。fair value **不含現價**（price-only 變化只動 gap）。**gap 不是** expected return／upside forecast／entry signal／buy-sell（horizon 與報酬語意是 Step 2）；read model 每次列 `gap_is_not`。
 *Avoid:* 把 gap 叫 upside 或預期報酬、拿 gap 排序或給尺寸、把 fair value 讀成觀測
 
 ### Value-date convention（fair value 是哪一天的值）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 `ValuationAssumption.value_date_convention`（2026-09-06 Step 2；封閉字彙）：`spot`＝fair value 是估值視角日的值（「今天就該以 target_pe × 目標期間 EPS 交易」）；`target_period_end`＝fair value 是目標會計期間結束日的值（「到 FY 期末，市場會以 target_pe 定價那一年的 EPS」）。**沒有預設**：舊紀錄讀成 `unspecified`，fair value 照算但報酬層拒算。`ValuationResult.value_date`／`value_date_semantics` 依 `VALUE_DATE_FORMULA` 導出。它是估值判斷的一部分，不是觀測——兩種讀法算術相同、報酬語意不同，所以必須明示。
 *Avoid:* 由 renderer 或文字註解猜時點、程式補預設、把 spot 的 gap 讀成「今天就該漲跌到那裡」的即時錯價主張而不說
 
 ### HorizonAssumption（horizon 判斷）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`alpha/implied_return/contracts.py`，2026-09-06 Step 2）：公司、服務的目標會計期間、`horizon_end`（明示日期，不是「12 個月」）、`basis`、rationale、`evidence_refs`＋`dependency_roles`、`created_at`、supersede／retract、`review_conditions`。與營運／估值假設同一套 epistemic system、同一支選取器；id 前綴 `ha_`，住 `library/private/alpha/horizon/<TICKER>.jsonl`。寫下時已過去的 horizon 契約拒收；到期（`horizon_end`）由 refresh 標 `stale`（INV-2）。
 *Avoid:* hardcode 12 個月／下一會計年度、renderer 預設、horizon 過期後仍當 current
 
 ### Base-case Implied Return（Step 2）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 `alpha/implied_return/model.py::build_implied_return`：`price_return = fair_value / current_price − 1`；`holding_period_days = horizon_end − current_price.bar_date`；`annualized_price_return = (1 + price_return) ** (365.25 / days) − 1`。四個輸入缺一就 `missing`（現價含 bar_date、fair value 同單位、value-date 語意、生效 horizon）；`calculation=deterministic`、`input_dependency`＝所有輸入判斷中最弱者。**它不是** probability-weighted expected return（沒有機率；名稱刻意用 implied）、不是 total return（`total_return_status` 恆 `not_modeled`）、不是 entry signal／required return／buy-sell；read model 第 13a 節 `implied_return` 每次列 `is_not`。COHR 2026-09-06：從 2026-09-04（281.86）到 2027-06-30，simple −20.7%、年化 −24.6%。
 *Avoid:* 叫它 expected return、把 price return 冒充 total return、拿它排序或給尺寸、horizon 缺就偷用一年
 ⚠ 2026-09-16：FY+1 單格的 implied return 排定由**多年反向橋**（「五倍要什麼為真」）取代主流程地位（ROADMAP Phase 7）；
 落地前本條照舊，但不得拿 FY+1 的負數當「不值得看」的結論（`AGENTS.md` Alpha 呈現契約）。
 
 ### EntryCriterion（要求報酬判準）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 使用者對「這檔要求多少年化價格報酬」的**明示**宣告（`alpha/entry/contracts.py`，2026-09-06 Step 3）：`convention`（封閉字彙，v1 只有 `annualized_required_price_return`）、值（小數）、`basis`（**只有** `investor_policy`）、rationale、`reference_refs`、`created_at`、supersede／retract。id 前綴 `ec_`，住 `library/private/alpha/entry_criteria/<TICKER>.jsonl`。**它不是公司事實、不是研究對公司的判斷、也不是資本許可**——它回答「我的資本要求多少報酬」，主詞是投資人；在模型裡與現價同一種地位（注入的輸入）。**刻意沒有 `period`**（要求報酬不隨估值換年度失效），也**刻意不共用 `select_assumptions`**（判準的 provenance 不在公司的證據池裡）。
 *Avoid:* 讓程式或 LLM 補 10%／15%／20%、把 basis 開放成 `session_judgment`（那會讓 hurdle 變成對公司的判斷）、把 sandbox 驗算值寫進 ledger
 
 ### Analytical Entry Threshold（Step 3）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。
 `alpha/entry/model.py::build_entry_assessment`：`entry_price = fair_value / (1 + annualized_hurdle) ** (holding_period_days / 365.25)`；`price_to_entry_gap = current_price / entry_price − 1`；`hurdle_comparison = current_price <= entry_price ? meets_analytical_hurdle : above_analytical_entry`（等號歸 meets——門檻價的定義就是「恰好滿足」）。兩個輸入缺一就 `missing`，且理由分開：判準缺席寫「**缺投資門檻判斷**，不是資料 ETL 缺口」。`assessment` 是 `clean`／`review_required`——`value_date` 與 `horizon_end` 不一致時算術照列但**不得冒充 clean**。**它不是** buy／sell／hold、不是 position size／capital allocation／order、不是 portfolio permission（型別在 import 當下就掃描這些欄位名）；read model 第 13c 節 `entry_logic` 每次列 `is_not`。COHR 2026-09-06：ledger 0 筆判準 → missing；以 sandbox 15% 驗算 → 門檻價 199.43 vs 現價 281.86，`above_analytical_entry`。
 *Avoid:* 把 `meets_analytical_hurdle` 讀成「該買」、拿門檻價當下檔估計、拿它跨標的排序、缺判準就補一個常見值
 
 ### Analyst View（Step 3.5 的消費端投影）
-把 `AlphaInvestmentView` **依消費者問句重新投影**的呈現 DTO（`briefing/analyst_view/`，2026-09-07 Step 3.5）。read model 依資料結構排列（估值第 13 節、報酬 13a、共識第 5 節、假設第 8 節）；Analyst View 依六個問句排列——**我們預測什麼／市場預測什麼／差異在哪／現價隱含什麼報酬／哪些假設最脆弱／什麼 evidence 會改變答案**——成四個核心 panel（headline／fundamental／why／research）＋一個 optional panel（entry）。**它只組裝、排序、label**：每一行持有 read model 裡**同一個 `Datum` 物件的參照**（`is` 相等），所以「consumer 重算了 EPS／估值／報酬」在型別層就不可能發生；全模組沒有公式、沒有 float 字面值，唯一的數值動作是排序鍵 `abs(既有敏感度)`。純函式、確定性、可預先 materialize 成 JSON 讓 APP 直接讀（`python -m briefing analyst-view <TICKER> [--as-of] [--format json]`）。
+把 `AlphaInvestmentView` **依消費者問句重新投影**的呈現 DTO（`briefing/analyst_view/`，2026-09-07 Step 3.5）。read model 依資料結構排列（共識、假設、結構、反證各一節；估值第 13 節與報酬 13a 已於 2026-09-23 退役）；Analyst View 依六個問句排列——**我們預測什麼／市場預測什麼／差異在哪／現價隱含什麼報酬／哪些假設最脆弱／什麼 evidence 會改變答案**——成四個核心 panel（headline／fundamental／why／research）＋一個 optional panel（entry）。**它只組裝、排序、label**：每一行持有 read model 裡**同一個 `Datum` 物件的參照**（`is` 相等），所以「consumer 重算了 EPS／估值／報酬」在型別層就不可能發生；全模組沒有公式、沒有 float 字面值，唯一的數值動作是排序鍵 `abs(既有敏感度)`。純函式、確定性、可預先 materialize 成 JSON 讓 APP 直接讀（`python -m briefing analyst-view <TICKER> [--as-of] [--format json]`）。
 *Avoid:* 第二份研究 authority、runtime 用 LLM 重寫 thesis、在 consumer 補一格 read model 沒有的數字、把它叫 dashboard 或 recommendation
 
 ### Core Readiness（核心 panel 讀不讀得成一份判讀）
@@ -290,6 +307,7 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 *Avoid:* research_status（那是 Engine D 的覆蓋度）、把 readiness 當作可不可以買的信號、讓 optional 缺席拉低它
 
 ### Optional Analytical Capability（可選的分析能力）
+⚠ **已退役（2026-09-23，Phase 0）**：以下為歷史定義，模型與 section 已刪；相關 ledger 資料留（L10）。 主流程「Evidence → … → Implied Return」整條已退；財務只回答三題（Phase 3）。
 一種**不是主流程、也不是研究完整度 gate** 的能力。stock-level 主流程是 **Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return**，終點是 implied return；`EntryCriterion`／hurdle 屬 optional analytical capability——**沒有它不代表這檔研究不完整**，只表示「optional entry threshold unavailable」。系統**不得**為了讓自己有答案而要求使用者宣告一個固定的 10%／15%／20%。機會成本、風險調整後 hurdle 與跨標的比較留給未來的 Portfolio／Investor Policy 階段。
 *Avoid:* 把 optional 缺席算成 blocker、用預設 hurdle 讓畫面「完整」、把 entry threshold 當成主流程終點
 ⚠ 2026-09-16：轉向後 entry criterion 降為「optional 中的 optional」，主流程終點排定改為多年反向橋（ROADMAP Phase 7）；落地前本條照舊。
@@ -299,7 +317,7 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 *Avoid:* 把它當成新的 status、用它讓 blocked 變 ready、在呈現層 parse 理由句推導它
 
 ### Abstention（刻意不主張）
-「對某一層的某個主題，現在沒有可辯護的假設，所以刻意不 assert」的 **append-only 紀錄**（`alpha/abstention/`，`library/private/alpha/abstentions/<TICKER>.jsonl`，2026-09-07 Step 5）。它**不是**第二份 `ValuationAssumption` authority——後者擁有「目標倍數是幾」，它**結構上不可能擁有任何數字**（`_assert_no_value_fields` 在 import 當下掃描欄位名，長出 `value`／`target_pe`／`multiple` 是 import 失敗）。`reason` 與 `revisit_when` 都必填：沒有「什麼證據出現才會改寫」的 abstention 是一個永遠不會響的火警警報（L7）。`layer`／`subject` 是封閉字彙（v1 只有 `valuation.forward_earnings_multiple.target_pe`），否則它會變成「任何一格都可以宣布自己是刻意留白」的萬用擋箭牌。宣告之後 fair value **仍然缺席**、readiness **仍然 blocked**——改變的只有那句「為什麼」。
+「對某一層的某個主題，現在沒有可辯護的假設，所以刻意不 assert」的 **append-only 紀錄**（`alpha/abstention/`，`library/private/alpha/abstentions/<TICKER>.jsonl`，2026-09-07 Step 5）。它**不是**第二份 `ValuationAssumption`（估值假設 ledger，2026-09-23 隨估值鏈退役、資料留）authority——後者擁有「目標倍數是幾」，它**結構上不可能擁有任何數字**（`_assert_no_value_fields` 在 import 當下掃描欄位名，長出 `value`／`target_pe`／`multiple` 是 import 失敗）。`reason` 與 `revisit_when` 都必填：沒有「什麼證據出現才會改寫」的 abstention 是一個永遠不會響的火警警報（L7）。`layer`／`subject` 是封閉字彙（v1 只有 `valuation.forward_earnings_multiple.target_pe`），否則它會變成「任何一格都可以宣布自己是刻意留白」的萬用擋箭牌。宣告之後 fair value **仍然缺席**、readiness **仍然 blocked**——改變的只有那句「為什麼」。
 *Avoid:* 用它填一個 fair value、沒有 revisit 條件就宣告、把它當成 thesis 的替代品
 
 ### Materialized Analyst View（APP 讀的那份 artifact）
@@ -322,7 +340,7 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 
 ### 四層漏斗（Discovery funnel）
 alpha 流程的骨架，四層各答一題：**發現**（誰值得進佇列）／**篩選**（它是不是倍率候選）／**表達**（怎麼買、怎麼抱、怎麼砍）／
-**量測**（哪個管道與特徵產出贏家）。籃子層的排序權威仍是 `rank_bottlenecks()`；漏斗不重算分數，篩選只過濾。
+**量測**（哪個管道與特徵產出贏家）。跨檔排序與籃子 filter 已於 2026-09-22／23 Phase 0 退役（G1）；漏斗不重算分數，篩選只過濾。
 *Avoid:* pipeline stage 編號、把漏斗當成分數、把「篩選」讀成排序
 
 ### 覆蓋厚薄（Coverage thickness）
@@ -361,6 +379,7 @@ research-drain 跑，daily 的 `drain_limit_per_run` 歸零。
 *Avoid:* 無人值守 drain、讓分類層寫任何 authority
 
 ### 判斷錯了值多少（Downside overlay）
+⚠ **已退役（2026-09-23，Phase 0 E 組）**：四價（賭對了值多少／判斷錯了值多少）的算術與首屏那把尺已刪；`bet/downside.overlay` 的 Abstention 字彙與 `scenario="downside"` 的 ledger 資料留。反證那一端沒有退役——它住 research 面板的 disproofs，Phase 1 接 watch registry。
 與賭注（variant overlay）**對稱**的 scenario（D2）：反證觸發後的假設套**同一條橋**、同一套估值與報酬算術，得到「認錯時值多少」。
 它是條件句，不是 bear case、沒有機率加權；與「賭對了值多少」並排就是短評那把尺的兩端。
 **2026-09-18 已交付**：`scenario="downside"`（`ASSUMPTION_SCENARIOS` 第三個值），寫入端沿用
@@ -393,6 +412,7 @@ bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩�
 *Avoid:* 只看等權中位數（量不到 power-law）、把它讀成勝率
 
 ### 多年反向橋（Multi-year reverse bridge）
+⚠ **已退役（2026-09-23，Phase 0 D 組）**：`alpha/reverse` 與 `briefing/multi_year` 已刪、`multi_year` kind 退役；判斷檔的 `multiple_horizon` 資料留但不再消費。
 表達層的目標儀器（Phase 7，最後做）：問「**五倍要什麼為真**」——從目標倍率反推每一年的營收／利潤率／稀釋要走到哪，
 沿用 `alpha/reverse` 一次只解一個 driver 的紀律。取代 FY+1 EPS × 目標倍數找 20% 錯價的主流程地位；隱含報酬兩桿原則不變。
 *Avoid:* bull case、DCF 之名行猜測之實、跳過兩桿拆解

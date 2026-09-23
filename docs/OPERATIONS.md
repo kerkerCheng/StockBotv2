@@ -24,7 +24,7 @@
 ② 分類   Codex local scheduled task（05:30）
            → X／EDGAR harvest → Engine C financial／beta technical ETL
            → 單一 shared-cash-pool beta monitor → triage
-           → 機械段（consume-fired／todo sync／reassess-stale／standing-go／XBRL 補值）
+           → 機械段（consume-fired／todo sync／standing-go／XBRL 補值；reassess-stale 已於 2026-09-22 退役）
            → today／lifecycle todo sync → materialize → brief
 
 ③ 研究   **只在互動 session** 的 `research-drain`
@@ -263,7 +263,7 @@ Engine C 提案）→ 報告本輪產出與下一題。**所有 authority mutati
 **題源優先序（確定性，不自創）：**
 1. 使用者點名的題（含 decompose 積壓題——選題永遠是使用者的）
 2. `trace-backlog` 觸發條件已命中的 parked lead
-3. 瓶頸排序 `structural_rows` 前段的證據缺口（self_reported → 客戶端印證）
+3. 結構表（`query.bottleneck structure_table`）上仍是 self_reported 的邊（→ 客戶端印證）；跨檔排序已於 2026-09-23 退役（G1）
 4. L8 不足公司的第三 origin 狩獵（`_check_source_diversity` < 3 者）
 5. `coverage_gaps` 的 🔴 未知供應層
 6. 缺五軸 assessment 的 cohort（如 `research_assessment_missing` 者）
@@ -306,12 +306,11 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 & '.venv\Scripts\python.exe' -m engine_b.todo sync          # 同步後列出（＝「待辦事項統整」）
 & '.venv\Scripts\python.exe' -m engine_b.todo resolve <n> --verb go|drop|pending [--reason ...] [--receipt ...]
 & '.venv\Scripts\python.exe' -m engine_b.todo resolve <n> --verb pending --until 2026-08-27 --trigger "Q2 財報"
-& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <n>  # decision_review → pq1 job
+& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <n>  # source_trace_review → pq1 job（decision_review 已於 2026-09-23 退役，legacy 只能 drop）
 & '.venv\Scripts\python.exe' -m engine_b.todo work <n> --to researching|completed|parked --receipt ...
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-ra <n> --digest <sha256> [--company-id ...]
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-observation <n>       # Engine C 人工觀測寫入
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-thesis-mutation <n>   # thesis lifecycle 變更
-& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale [--run]      # 佇列段 2：只因凍結 context 過期而 REVIEW 的 decision_review（機械、零 token；不加 --run 只列）
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go [--run]         # 佇列段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go；pending／等世界／付費的不碰
 ```
 
@@ -343,38 +342,9 @@ python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授�
 - 「最後一次備份：N 天前」常駐在 daily brief 首屏（資料源 `backups/last_backup.json`）；
   從未備份、狀態檔壞掉、超過 7 天、Drive 未上傳都會 🔴 現形。
 
-**`decision_review` 的 `go` 是全函數（2026-08-26 起）——你只要下 `go`，不必分辨它屬於哪一類。**
-`engine_b.todo.advance_decision_review` 依實際狀態自動選路；下面三條是它內部做的事，
-**列出來是為了讓輸出可讀，不是要你自己選**：
-
-| 狀態 | `go` 實際做什麼 |
-|---|---|
-| 有 research work order | dispatch 回 pq1（`outcome=dispatched`） |
-| 無 work order、無 `user_decision` blocker | 以原 intent reassess，下次 sync 自動結案（`outcome=reassessed`） |
-| 無 work order、仍有 `user_decision` blocker | 先 reassess，再以 `assessment_gap:<cohort>` 排入 pq1 並印出研究範圍（`outcome=queued_assessment_gap`） |
-
-⚠ **四個 authority gate 不受影響**：graph admission、Engine C ledger 寫入、thesis mutation、
-live 資本仍各走 `complete-*` 與 exact 人工核准。`go` 只自動化「研究要不要開始」這件可逆的事。
-
-⚠ `assessment_gap:` 的 dispatch **沒有** Decision Store work order（work order 只在
-`coverage_pending` 時建立，而 `assessment_blockers` 是 sizing 階段才算出來的），
-`checkpoint_decision_review` 會跳過 work-order transition，但 terminal 仍須 receipt。
-慣例同 `source_trace_review` 的 `lead:<id>` ref。
-
-歷史：改成全函數之前，`go` 只覆蓋第一種情況，其餘一律拒絕——實測 9 個 REVIEW 有 **4 個**
-會死在這裡（本機 Codex 與 Claude Code 各自獨立撞到）。兩條內部路徑是：
-
-- **coverage 有 blocker** → `dispatch <n>` 派回 pq1 做 bounded research，完成後 `work <n> --to ...` checkpoint。
-- **coverage 無 blocker、REVIEW 來自凍結 context 過期** → 直接
-  `python -m decision_lab reassess <cohort_id> --intent <原 intent>` 產生新 decision，**下一次 `todo sync`
-  會自己把該編號結掉**，不需要任何 verb。
-
-⚠ **`--intent` 沿用該 cohort 上一筆 decision 的值**，讓評估條件不因呼叫端習慣而跳動。
-（原本還有一個更強的理由：對先前是 `paper` 的 cohort 跑 `--intent research` 會讓研究完整度
-由 `READY` 退成 `DATA_NEEDED`，純由參數造成。**那個陷阱已於 2026-08-29 從源頭修掉**——
-`sizing.py` 改用嚴重度分類，diagnostic 級的 `execution_intent_research_only` 不再有改判權。）
-查證：
-`select json_extract(payload_json,'$.request.execution_intent') from system_decisions where cohort_id=? order by rowid desc limit 1`。
+> ⚠ **`decision_review` 的 `go`（全函數：dispatch／reassess／assessment-gap）已於 2026-09-23（Phase 0 Step 0b.4） 隨 decision_lab 研究側退役**：
+> `decision_review`／`sheet_only_holding` 是 legacy 型，`go` 一律被拒，歷史項目只能 drop。原文（含三條內部路徑與 `--intent` 註記）
+> 逐字封存於 [`archive/2026-09-23-phase0-retired-sections.md`](archive/2026-09-23-phase0-retired-sections.md)。
 
 ### Leads
 ```powershell
@@ -411,21 +381,20 @@ trace requeue 沿用最近合法 receipt。`classification-health` 只檢查 act
 
 `onboard-candidates` 列出**已通過 triage 的 lead 中點名、但 registry 沒有的標的**，
 補上 pq2 六個 collector 都不負責的缺口（已有 cohort 但缺 ticker 的走
-`decision_lab.brief.identity_registration_pending`，完全沒登記的先前無任何浮現路徑）。
+Engine D 的 identity_registration_pending——已於 2026-09-23（Phase 0 Step 0b.4） 隨研究側退役，完全沒登記的先前無任何浮現路徑）。
 cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex 抓不到，
 由研究者在 `onboard_candidate_names` 標註（L15：語意由 LLM 解析，registry 判權限）。
 **它只回答「誰一直出現卻不在圖裡」，不回答該不該 onboard**——後者仍走
 `skills/company-onboard` 並由使用者決定。
 
-### Engine D 決策
+### Engine D（舊 Decision Store，frozen 2026-09-22）
 ```powershell
-& '.venv\Scripts\python.exe' -m decision_lab evaluate-signal "<Signal>" --ticker <T> --intent research --format markdown
-& '.venv\Scripts\python.exe' -m decision_lab reassess <decision_id|cohort_id> --assessment <a.json> --intent research --format markdown
-& '.venv\Scripts\python.exe' -m decision_lab today --format markdown
-& '.venv\Scripts\python.exe' -m decision_lab card <decision_id>
+& '.venv\Scripts\python.exe' -m decision_lab status              # 表筆數、schema 版本、檔案 sha256（唯讀，mode=ro）
+& '.venv\Scripts\python.exe' -m decision_lab history --decisions # 歷史 live 選擇／成交回報與各 cohort 最後一筆 decision（唯讀）
 ```
 
-只有使用者明確要求才用 `--intent paper`／`live`；live 另加 `--confirm-holdings`。決策命令只在本機執行；遠端 chat 看決策才用 MCP 唯讀 `get_decision_brief`。
+研究側命令（evaluate-signal／reassess／today／card／references／record-choice／record-fill）已於 2026-09-23（Phase 0 Step 0b.4） 退役，
+舊店只剩上面兩個唯讀窗；成交紀錄與資本硬擋見「記錄成交」；MCP 的 `get_decision_brief` 同批退役。原命令段封存於 archive。
 
 ### Alpha Card（canonical read model，2026-09-05）
 
@@ -434,22 +403,19 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --format json -o card.json
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --no-causal          # 略過路徑／結構事件（較快）
 & '.venv\Scripts\python.exe' -m briefing alpha-card COHR --as-of 2026-06-30   # as-of 視角（Engine A 投影＋Engine C 時序）
-& '.venv\Scripts\python.exe' -m briefing valuation COHR                      # 只印第 13 節：fair value／現價／gap／refresh state（Step 1）
-& '.venv\Scripts\python.exe' -m briefing implied-return COHR                 # 只印第 13a 節：現價／fair value 時點／horizon／隱含報酬／refresh state（Step 2）
-& '.venv\Scripts\python.exe' -m briefing entry COHR                         # 只印第 13c 節：判準／門檻價／現價相對門檻價／assessment（Step 3；不是 buy／sell）
 ```
 
 純讀：不 freeze context、不建 decision、不寫任何 authority。session 判斷檔預設找
 `library/private/alpha/judgments/<TICKER>.json`（也接受舊的 `<ticker>_judgment.json`）；
 判斷是對舊 context 做的時仍呈現但整段標 **stale**，`--strict-judgment` 改成視為無判斷。
-`decision_lab today` 的「Alpha Card 摘要」區消費**同一份** view（可行動排序前 5 檔各一列）。
+（`decision_lab today` 的「Alpha Card 摘要」區已於 2026-09-23（Phase 0 Step 0b.4） 隨研究側退役；APP 個股頁與 `analyst-view` 消費同一份 view。）
 架構與 authority map 見 `docs/ARCHITECTURE.md` §6.1。**互動專用，不進 unattended rule。**
 
 ### Analyst View（消費端投影，2026-09-07 Step 3.5）
 
 **要「看懂一檔股票」時用這個，不是 `alpha-card`。** `alpha-card` 依資料結構排列（18 個 section），
-Analyst View 依**消費者問句**排列：頭條（現價 → future target value → 隱含報酬）→ 我們預測什麼 →
-市場預測什麼 → 差異在哪 → 怎麼算到這裡／最脆弱的假設 → 什麼會改變答案 → optional entry threshold。
+Analyst View 依**消費者問句**排列：現在多少錢（只有現價）→ 短評 → 論證（鏈／時間表／風險）→ 研究（反證與檢核點）→ 歸零旗標 → 稽核區。
+（2026-09-23（Phase 0 Step 0b.4）：原本的頭條尺「現價 → future target → 隱含報酬」與預測／差異／entry threshold 各段隨估值鏈退役。）
 
 ```powershell
 & '.venv\Scripts\python.exe' -m briefing analyst-view COHR                  # 完整判讀畫面（Markdown）
@@ -468,27 +434,16 @@ optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 
 多年反向橋取代，見 `docs/ROADMAP.md` Phase 7，落地前照舊）。
 架構見 `docs/ARCHITECTURE.md` §6.7。**互動專用，不進 unattended rule。**
 
-### Sandbox impact review 結論（2026-09-09，研究閉環 P5：Daily 吃機械段）
-
-五步：
-
-1. **path＋side effect＋capability**：
-   - `-m engine_b.cli consume-fired`：讀寫 `library/leads/pending_leads.json`／`event_watches.json`（同目錄 tempfile 原子替換）。無網路、無憑證、無 identity／ACL、無 private authority → **sandbox 內，不需 rule**（同 `event_watch sweep` 先例）。
-   - `-m engine_b.todo reassess-stale --run`：讀 brief（Neo4j／Engine C／Sheet readonly）判候選；對候選跑 `decision_lab.workflow.reassess`（append 新 decision 到 private Decision Store，舊筆不動）；寫 `todo_pool.json`。→ **exact rule**。
-   - `-m engine_b.todo standing-go --run`：同上資源；對 authorized 類型執行 `advance_decision_review`／`dispatch_source_trace_review`（與使用者 `go` 同一段程式）；寫 `todo_pool.json`、`pending_leads.json`、Decision Store work order。→ **exact rule**。
-   - `-m webapp materialize --registry-listed`：既有 rule 的 prefix 已涵蓋（多一個旗標、同一組資源、多 43 檔 Neo4j／SQLite 讀取，寫 ignored derived cache）。
-2. **canonical skill／prompt／本檔**：`crons/daily_brief_prompt.md` 步驟 3 加三支、步驟 8 加旗標、brief 加「今日自動清了」計數器；`skills/daily-brief/SKILL.md` Step 3／Step 7／模板同步；本節。
-3. **最窄 rule**：`.codex/rules/stockbot-automations.rules` 由 17 條增為 **19** 條（`engine_b.todo reassess-stale`、`engine_b.todo standing-go`）。**相鄰不放行**：`engine_b.todo dispatch`／`resolve`（使用者動詞）、`engine_b.cli consume-fired`（不需要）、`-m engine_b.todo`（整包）。
-4. **permission contract test**：`tests/test_codex_daily_permissions.py::test_mechanical_queue_segments_are_split_by_capability_not_by_convenience` 斷言三件事：consume-fired 不得出現在任何 pattern、兩條新 rule 存在、dispatch／resolve 仍不在；並斷言 prompt／skill 帶三支命令與 `--registry-listed`。
-5. **smoke test**：三支命令以 exact 字串在本機各跑一次（2026-09-09：consume-fired requeued 0／reactivated 0；reassess-stale 候選 0；standing-go 候選 0——都是首跑清完後的穩態）。⚠ Codex sandbox 本身無法從互動 session 觸發：**真正的端到端驗收是下一次 06:30 排程的 brief 首屏出現「今日自動清了 N」那一行**——出現＝管子兩頭接上；沒出現＝rule 未載入或 prompt 沒跑到，依「Sandbox／private authority 排錯」處理。
-
-不放寬：四個人工 gate 一個不動；`standing-go` 只對 config 明列的注意力 gate 類型動作，使用者明示 pending 與在等世界的一律跳過；付費永遠 exact 核准。
+### Sandbox impact review 結論（2026-09-09，研究閉環 P5：Daily 吃機械段）——已封存
+三支命令中 `engine_b.todo reassess-stale` 已於 2026-09-22（Step 0a.1）退役；`standing-go` 自 2026-09-23（Phase 0 Step 0b.4） 起不再開 Decision Store
+（只對 `source_trace_review` 派回 pq1）；`consume-fired` 不變。原 review 表逐字封存於 archive；rules 條數的現況由
+`tests/test_codex_daily_permissions.py` 斷言。
 
 ### Sandbox impact review 結論（2026-09-08，APP materialize 納入 Daily 收尾）
 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
-| `python -m webapp materialize --tracked --ranking --beta --coverage --watches --positions` | 寫 **ignored derived cache**（`library/private/app/{analyst_view,state}/*.json`，atomic）。**不寫任何 authority**：不入圖、不寫 Engine C、不建 decision、不 append 風險快照、不碰 `.git` 或任何 tracked 檔 | Neo4j bolt（本機）＋Engine C SQLite＋private ledger（唯讀）＋Google Sheet `spreadsheets.readonly`＋yfinance FX——**與既有 fixed entry `daily_beta_snapshot.py`／`decision_lab today` 完全同一組**，無新增網路主機或憑證 | **納入 Daily 收尾**（第十七個 fixed entry）。ticker 清單由 `engine_b.routine_config` 導出，與 pq1 drain 同一權威，不手寫 |
+| `python -m webapp materialize --tracked --structure-table --beta --coverage --watches --positions` | 寫 **ignored derived cache**（`library/private/app/{analyst_view,state}/*.json`，atomic）。**不寫任何 authority**：不入圖、不寫 Engine C、不建 decision、不 append 風險快照、不碰 `.git` 或任何 tracked 檔 | Neo4j bolt（本機）＋Engine C SQLite＋private ledger（唯讀）＋Google Sheet `spreadsheets.readonly`＋yfinance FX——**與既有 fixed entry `daily_beta_snapshot.py`／`decision_lab today` 完全同一組**，無新增網路主機或憑證 | **納入 Daily 收尾**（第十七個 fixed entry）。ticker 清單由 `engine_b.routine_config` 導出，與 pq1 drain 同一權威，不手寫 |
 | `python -m webapp materialize --structure-readings`（2026-09-17 Q5 新增的旗標，**不是新入口**） | 同上：只寫 `library/private/app/state/structure_readings.json`。**唯讀** append-only 讀圖 ledger 與圖，不寫 ledger、不重新推理、不排 pq1 | Neo4j bolt（本機）＋ private ledger（唯讀）——**既有 prefix `-m webapp materialize` 已涵蓋，fixed entry 數量不變**（查證：`pytest tests/test_codex_daily_permissions.py`） | **納入 Daily 收尾**同一行指令。重新推理不在這裡：那是研究，只在互動 session（D12） |
 | `python -m webapp serve` | **綁定本機 port**（listener surface） | 新增 listener；外部認證邊界在 Cloudflare Access 而非程式本身 | **仍不在 rule 內**。它由開機自啟的 `stockbot-graph-services.vbs` 長駐，排程不啟動它。放行整個 `-m webapp` 會把它一併帶進去 |
 | `python -m webapp status｜verify` | 唯讀 | 無 | **互動專用**，不在 rule 內（prefix 只到 `materialize`） |
@@ -520,8 +475,8 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m webapp materialize COHR LYC.AX 6324.T IQE.L
 & '.venv\Scripts\python.exe' -m webapp materialize            # 不給 ticker ＝ 重跑目錄裡已有的每一檔
 & '.venv\Scripts\python.exe' -m webapp materialize COHR --as-of 2026-09-05   # PIT 視角
-& '.venv\Scripts\python.exe' -m webapp materialize --ranking                 # 跨標的瓶頸排序（state artifact；照抄 rank_bottlenecks，2026-09-08）
-& '.venv\Scripts\python.exe' -m webapp materialize --ranking --as-of 2026-09-05   # as-of 視角的排序；被排除的 assertion 計數帶在 artifact 內
+& '.venv\Scripts\python.exe' -m webapp materialize --structure-table         # 結構表（state artifact；照抄 structure_table，不排序、不設門檻，2026-09-23）
+& '.venv\Scripts\python.exe' -m webapp materialize --structure-table --as-of 2026-09-05   # as-of 視角的結構表；被排除的 assertion 計數帶在 artifact 內
 & '.venv\Scripts\python.exe' -m webapp materialize --beta                    # 資產配置（state artifact；daily_beta_snapshot --no-refresh --no-record-risk 照抄，2026-09-08）
 & '.venv\Scripts\python.exe' -m webapp materialize --coverage --watches      # 研究缺口＋在等什麼（唯讀照抄；2026-09-08）
 & '.venv\Scripts\python.exe' -m query.duplicate_nodes                        # 重複節點候選（唯讀；只提名不合併，2026-09-18 V3）
@@ -559,7 +514,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 `research/axis.catalyst`、**`bet/variant.overlay`**（2026-09-17 Q2 新增：「目前沒有可辯護的賭注」）。
 ⚠ **不得互相頂替**：估值層那筆說的是「本益比法沒有可校準的對象」，虧損年照樣可以寫
 「如果 X 為真它值 Y」——把它讀成賭注層的 abstention，等於把待辦冒充成答案。
-籃子頁與心跳第 4 段的「賭注帳」只認 `bet/variant.overlay`。
+（籃子頁與心跳第 4 段的「賭注帳」已於 2026-09-22／23 退役；`bet/variant.overlay` 這本 ledger 的資料留著，L10。）
 
 ```jsonc
 // spec.json 範例（賭注層；reason ≥ 20 字、revisit_when ≥ 10 字，型別層強制）
@@ -655,15 +610,14 @@ alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加
 ### 佇列段序（2026-09-09）
 
 「有工作存在」的每一種狀態都必須指得出 consumer；段序是封閉字彙，住
-`engine_b/queue_segments.py`（段 0 pending 分流 → 段 1 fired 消化 → 段 2 reassess 維護 → 段 3
+`engine_b/queue_segments.py`（段 0 pending 分流 → 段 1 fired 消化 → ~~段 2 reassess 維護~~（2026-09-22 退役） → 段 3
 已核准工單 → 段 4 triaged_go → 段 5 forward view backlog → 段 6 覆蓋缺口 → 段 7 主動輪詢）。
-機械段（fired 重排、pq2 翻醒、reassess）**不吃** `drain_limit_per_run`；研究段共用它。
+機械段（fired 重排、pq2 翻醒）**不吃** `drain_limit_per_run`；研究段共用它。
 
 ```powershell
 & '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段幾筆；分不到段的狀態 FAIL（＝新工作類型沒有 consumer）
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired             # 段 1
 & '.venv\Scripts\python.exe' -m engine_b.todo sync                     # 段 1 的 pq2 型（順便同步待辦池）
-& '.venv\Scripts\python.exe' -m engine_b.todo reassess-stale --run     # 段 2
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go --run        # 段 2b（常規授權；互動限定，daily 採用歸 P5）
 & '.venv\Scripts\python.exe' -m engine_b.cli drain                     # 段 3–4（首行印段 0–1 計數器＋段 5 一行）
 & '.venv\Scripts\python.exe' -m webapp status                          # 段 5 的完整版：每檔閉環（到終局幾檔、下一檔是誰、為什麼）
@@ -778,7 +732,7 @@ Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_valu
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
 
-Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一升權來源是 `.codex/rules/stockbot-automations.rules` 的十四個窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、Beta snapshot、pending priority list、catalyst watch、Alpha outcome snapshot、decision today、todo sync、todo reassess-stale、todo standing-go、Discord publisher、APP materialize、基期實績 XBRL 補值，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。state finalizer 只碰 workspace 內本機檔案，刻意不進 rules。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在、而且整份檔載入得起來**——重啟不能修復漏寫的 rule，**也不能修復語法錯誤**。
+Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一升權來源是 `.codex/rules/stockbot-automations.rules` 的十四個（2026-09-22 Step 0a.1 起 12 個）窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、Beta snapshot、pending priority list、catalyst watch、Alpha outcome snapshot、decision today、todo sync、todo ~~reassess-stale~~（2026-09-22 退役）、todo standing-go、Discord publisher、APP materialize、基期實績 XBRL 補值，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。state finalizer 只碰 workspace 內本機檔案，刻意不進 rules。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在、而且整份檔載入得起來**——重啟不能修復漏寫的 rule，**也不能修復語法錯誤**。
 
 ⚠ **文字存在不等於 rule 生效（2026-09-10 事故）。** 一段 Python 式的隱式字串串接不是合法 Starlark，整份 allowlist 因此**完全沒有載入**，二十條 fixed entry 全部落回 Auto-review；而本檔各節慣用的 `Select-String`「字串在不在檔裡」查證**全部是綠的**，因為它們驗的是文字不是載入。唯一算數的查證是拿產品自己的 parser 跑一次（decision 應為 `allow`；整份檔壞掉時它會直接報 parse error）：
 
@@ -990,7 +944,7 @@ impact review。
 **它要消掉的失敗模式：** 消費端只接受與現價 `bar_date` 相差 ±3 天內的匯率觀測
 （`alpha/fx.py::FX_AS_OF_TOLERANCE_DAYS`），而 2026-09-13 手抄的四筆每一筆的 `_note` 自己就寫著
 「現價 bar_date 換了就要補新的一筆」——**沒有任何東西在補它**。實測 2026-09-19：過期 8 天，
-6680.HK／HEXA-B.ST／XFAB.PA／XPEV 四檔的隱含報酬全部算不出來，而**它不會壞、不會報錯、測試不會紅**。
+6680.HK／HEXA-B.ST／XFAB.PA／XPEV 四檔（當時的）隱含報酬全部算不出來，而**它不會壞、不會報錯、測試不會紅**（估值鏈已於 2026-09-23 退役；FX 觀測的鮮度契約仍在，心跳照印）。
 
 | 步 | 結論 |
 |---|---|
@@ -1173,34 +1127,23 @@ Select-String -Path .codex\rules\stockbot-automations.rules `
 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
-| `python -m briefing alpha-card` | 唯讀；讀 Neo4j＋Engine C SQLite＋Decision Store（`mode=ro` sqlite，不開可寫 store）＋thesis JSON | 與 `decision_lab today` 相同的本機資源，無新增網路主機、憑證或 identity／ACL 呼叫 | **互動專用**。新 CLI 名稱，不進 unattended rule |
-| `python -m decision_lab today`（既有 fixed entry） | 新增「Alpha Card 摘要」區：對排序前 5 檔組卡；整批共用一個 Neo4j provider（排序只算一次）與一個 Engine C provider，Decision Store 走唯讀連線 | **無新增 capability**——三者 `today` 原本就讀（ranking、`_read_financial`、store）；全程 fail-soft，讀不到只讓該區寫「未提供」 | 命令字串未變、rule 未動。實測 `today` 全程 104 秒（含 Sheet 與 Neo4j），Alpha Card 區單獨計時見 [`archive/roadmap-backlog-log.md`](archive/roadmap-backlog-log.md)（2026-09-20 自 ROADMAP 搬出） |
+| `python -m briefing alpha-card` | 唯讀；讀 Neo4j＋Engine C SQLite＋Decision Store（`mode=ro` sqlite，不開可寫 store）＋thesis JSON | 與（已退役的）`decision_lab today` 相同的本機資源，無新增網路主機、憑證或 identity／ACL 呼叫 | **互動專用**。新 CLI 名稱，不進 unattended rule |
+| ~~`python -m decision_lab today`~~（當時的 fixed entry；2026-09-23 隨研究側退役） | 新增「Alpha Card 摘要」區：對排序前 5 檔組卡；整批共用一個 Neo4j provider（排序只算一次）與一個 Engine C provider，Decision Store 走唯讀連線 | **無新增 capability**——三者 `today` 原本就讀（ranking、`_read_financial`、store）；全程 fail-soft，讀不到只讓該區寫「未提供」 | 命令字串未變、rule 未動。實測 `today` 全程 104 秒（含 Sheet 與 Neo4j），Alpha Card 區單獨計時見 [`archive/roadmap-backlog-log.md`](archive/roadmap-backlog-log.md)（2026-09-20 自 ROADMAP 搬出） |
 
 查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
 ```powershell
 Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'briefing'
 ```
 
-### Sandbox impact review 結論（2026-09-05，Causal Fundamental Model）
-
-| 入口 | side effect | OS／network capability | 判定 |
-|---|---|---|---|
-| `engine_c\etl_yfinance.py`（既有 fixed entry） | 同一次 `yf.Ticker` 多讀 `earnings_estimate`／`revenue_estimate` 兩個屬性，寫入新表 `consensus_estimates`（同一 SQLite authority） | **無新增**：同一網路主機（yfinance）、同一 DB、同一命令字串；解析不出會計行事曆的期間只印 WARN 不寫列 | rule 未動、fixed entry 數量未變 |
-| `python -m alpha assumptions <T> --add/--retract` | append `library/private/alpha/assumptions/<T>.jsonl`（研究判斷，A3） | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule（假設是 session 的判斷，排程不得自己寫） |
-| `scripts/record_mechanical_observation.py --field fiscal_year_results／company_guidance` | 既有 mechanical 走廊，兩個新登記欄位 | 無新增 | 既有判定不變（mechanical 不需 pq2，但仍是互動寫入） |
-| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要 | 多讀 `consensus_estimates`＋兩個 ledger 欄位＋假設 ledger，執行純函式模型 | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
-
-查證（新入口不該出現在 rules）：
-```powershell
-Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'assumptions|record_mechanical'
-```
+### Sandbox impact review 結論（2026-09-05，Causal Fundamental Model）——已封存
+FY+1 因果橋模型已於 2026-09-23（Step 0b.1b-C/H 2/2）退役；基期實績／指引的 mechanical 觀測與假設 ledger 仍活（見下方「Causal Fundamental Model：怎麼跑」）。原 review 表封存於 archive。
 
 ### Sandbox impact review 結論（2026-09-06，Research Refresh／Dependency Invalidation v1）
 
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
 | `python -m briefing refresh <T> [--scenario …]` | 唯讀：Engine C 快照時序（`snapshot_series`）＋兩個 ledger 欄位的歷史列（`observation_history`）＋假設 ledger＋`library/leads/event_watches.json`＋`thesis/lifecycle.json`＋圖投影差集；情境只在記憶體疊事件，**不寫任何 authority** | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
-| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多跑一次變更偵測（同上的唯讀來源）＋純函式 resolver；多一個 `refresh_status` section 與精簡卡 `refresh` 欄 | 無新增（同一 Engine C 連線、本機檔案）；每檔多一次 `get_structural_changes_since` 投影（記憶體快取） | 命令字串未變 |
+| `python -m briefing alpha-card`／~~`decision_lab today`~~ 的 Alpha Card 摘要（既有） | 多跑一次變更偵測（同上的唯讀來源）＋純函式 resolver；多一個 `refresh_status` section 與精簡卡 `refresh` 欄 | 無新增（同一 Engine C 連線、本機檔案）；每檔多一次 `get_structural_changes_since` 投影（記憶體快取） | 命令字串未變 |
 | `python -m alpha assumptions <T> --add`（既有） | spec 多三個可選欄位 `calibration_refs`／`comparison_refs`／`review_conditions`；仍只 append private ledger | 無新增 | 既有判定不變（互動專用） |
 | `python -m engine_b.event_watch add --wake-hypothesis oa_*`（既有） | `hypothesis_ref` 可指向假設 id；fired 後由 refresh 引擎標 review_required | 無新增 | 既有判定不變 |
 
@@ -1209,137 +1152,10 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'assumption
 Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'refresh'
 ```
 
-### Sandbox impact review 結論（2026-09-06，Valuation Model v1／Step 1）
-
-| 入口 | side effect | OS／network capability | 判定 |
-|---|---|---|---|
-| `python -m alpha valuation <T> --list／--add／--retract` | append `library/private/alpha/valuation/<T>.jsonl`（估值判斷，A3）；`--list` 唯讀 | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule（估值假設是 session 的判斷，排程不得自己寫） |
-| `python -m briefing valuation <T> [--scenario …] [--as-of]` | 唯讀：與 `alpha-card` 相同的來源＋估值 ledger；情境只在記憶體疊事件，**不寫任何 authority** | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
-| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多讀估值 ledger＋跑純函式 `build_valuation`；多一個 `valuation` section、精簡卡 `valuation` 欄與卡表一欄 | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
-
-查證（新入口不該出現在 rules）：
-```powershell
-Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'valuation'
-```
-
-### Valuation Model：怎麼跑（互動）
-
-```powershell
-# 1) 明示估值假設（session 寫；evidence_refs＝supporting，必須解析到 alpha-card evidence index；共識／市場倍數只能放 calibration_refs）
-python -m alpha valuation COHR --add spec.json      # spec：period_end／value／basis／accounting_basis（gaap|non_gaap）／rationale／evidence_refs／calibration_refs／review_conditions
-# 賭注（V0，2026-09-15）：營運或估值假設的 spec 加 "scenario": "variant" 即成 overlay——只寫有差異的核心 driver，
-# 其餘沿用 base；型別層要求 derivation=independent ＋ 至少一條 supporting。範例：library/private/alpha/specs/cohr_variant_operating_margin.json
-python -m alpha assumptions COHR --add spec.json    # {"scenario":"variant","driver":"operating_margin_delta",...}；--list 以〔variant〕標記
-# 投資人短評（2026-09-15）：七格前因後果，文字 session 寫、數字 placeholder；範例 library/private/alpha/specs/cohr_brief.json
-python -m alpha brief COHR --add spec.json          # 七格缺一不可；禁字與未登記 placeholder 會被拒；之後 materialize 才會上首屏
-python -m alpha brief COHR --list
-python -m webapp materialize --basket              # 籃子（V3）：只讀 ranking／positions／單檔三份 artifact 做 join；要排在它們之後跑
-python -m alpha valuation COHR --list
-python -m alpha valuation COHR --retract va_xxx --rationale "..."
-# 2) 看結果（read model 第 13 節：方法／內部 EPS／假設／fair value／現價／gap／算式／敏感度／認識論分解／refresh state）
-python -m briefing valuation COHR
-python -m briefing valuation COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);print(v['meta']['status'], v['fair_value']['value'], v['fair_value_gap']['value'])"
-# 3) 情境與歷史視角
-python -m briefing valuation COHR --scenario price_only      # fair value current、gap recalculate
-python -m briefing valuation COHR --scenario graph_edge      # 引用該邊的估值／營運假設 review_required → fair value review_required
-python -m briefing valuation COHR --as-of 2026-09-05         # 估值假設寫於 09-06 → created_after_as_of → missing
-```
-
-⚠ 沒有生效的估值假設就是 `missing`（不補 default）；口徑／期間與內部 EPS 不合是 `missing`＋「不合」理由；gap **不是**
-expected return／upside／entry signal（型別沒有那些欄位，section 每次列 `gap_is_not`）。
-
-**虧損公司（forward EPS 非正）改用 `ev_to_sales`（2026-09-09 P6，使用者定案）：** 同一個形狀——內部指標 × 明示倍數——
-內部指標換成目標期間總營收，`fair_value = (internal_revenue × target_ev_to_sales − net_debt) / diluted_shares`；
-淨負債取 Engine C 最新快照（`total_debt − cash_and_equivalents`，**現況近似**，公式字串會寫明），稀釋股數取 fundamental
-model 生效的 `diluted_shares[total]` 假設。任一缺就 missing，不補 0。read model 自動選方法：本益比法回
-`method_not_applicable` 且 ledger 有 `ev_to_sales` 假設才改跑；沒有假設就維持「方法不適用」並在理由裡說該寫哪一筆。
-```powershell
-# spec：period_end／value／basis／rationale／evidence_refs／calibration_refs，method 與 parameter 明寫，accounting_basis 固定 not_applicable
-python -m alpha valuation AEVA --add spec.json     # {"method":"ev_to_sales","parameter":"target_ev_to_sales","accounting_basis":"not_applicable","value_date_convention":"target_period_end",...}
-python -m briefing valuation AEVA                  # method=ev_to_sales；步驟多 net_debt／diluted_shares 兩格
-```
-兩桿拆解（EPS vs 倍數）對 EV/S 無定義，`eps_contribution`／`multiple_contribution` 會 missing 並說明原因。
-
-### Sandbox impact review 結論（2026-09-06，Base-case Implied Return v1／Step 2）
-
-| 入口 | side effect | OS／network capability | 判定 |
-|---|---|---|---|
-| `python -m alpha horizon <T> --list／--add／--retract` | append `library/private/alpha/horizon/<T>.jsonl`（horizon 判斷，A3）；`--list` 唯讀 | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule（horizon 是 session 的判斷，排程不得自己寫、不得補 12 個月） |
-| `python -m alpha valuation <T> --add`（既有） | spec 多一個可選欄位 `value_date_convention`（spot／target_period_end）；仍只 append private ledger | 無新增 | 既有判定不變（互動專用） |
-| `python -m briefing implied-return <T> [--scenario …] [--as-of]` | 唯讀：與 `alpha-card` 相同的來源＋估值／horizon ledger；情境只在記憶體疊事件，**不寫任何 authority** | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
-| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多讀 horizon ledger＋跑純函式 `build_implied_return`；`expected_return` section 改名 `implied_return`、估值 section 多 `value_date` 格、精簡卡多 `implied_return` 欄；**卡表欄位不變** | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
-
-查證（新入口不該出現在 rules）：
-```powershell
-Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'horizon|implied'
-```
-
-### Base-case Implied Return：怎麼跑（互動）
-
-```powershell
-# 0) 先確認估值假設有宣告時點語意（沒有就 append 一筆 supersede：spec 加 "value_date_convention": "target_period_end" 或 "spot"）
-python -m alpha valuation COHR --list --format json | python -c "import json,sys;print([(r['assumption_id'], r['value_date_convention']) for r in json.load(sys.stdin)['records']])"
-# 1) 明示 horizon 判斷（session 寫；period_end＝估值目標期間結束日、horizon_end＝明示實現日期；evidence_refs 必須解析到 alpha-card evidence index）
-python -m alpha horizon COHR --add spec.json        # spec：period_end／horizon_end／basis／rationale／evidence_refs／calibration_refs／review_conditions
-python -m alpha horizon COHR --list
-python -m alpha horizon COHR --retract ha_xxx --rationale "..."
-# 2) 看結果（read model 第 13a 節：現價／fair value／value_date／horizon／區間／simple／年化／total return／認識論分解／refresh state）
-python -m briefing implied-return COHR
-python -m briefing implied-return COHR --format json | python -c "import json,sys;r=json.load(sys.stdin);print(r['meta']['status'], r['price_return']['value'], r['annualized_price_return']['value'], r['horizon_window']['value'])"
-# 3) 情境與歷史視角
-python -m briefing implied-return COHR --scenario price_only    # 只有 implied_return recalculate；fair value／horizon current
-python -m briefing implied-return COHR --scenario graph_edge    # 估值假設 review_required → fair value／implied_return review_required
-python -m briefing implied-return COHR --as-of 2026-09-05       # 估值假設 v2 與 horizon 皆寫於 09-06 → created_after_as_of → missing
-```
-
-⚠ 四個輸入缺一就是 `missing`（現價含 bar_date、fair value 同單位、fair value 的 value-date 語意、生效的 horizon 判斷），**不補 12 個月、
-不補下一會計年度**；horizon 到期即 stale，要新的判斷。它是 **base-case 隱含價格報酬**：不是機率加權期望報酬（沒有機率）、不是 total
-return（沒有股利預測）、不是 entry signal（型別沒有那些欄位，section 每次列 `is_not`）。
-
-**兩桿拆解（2026-09-09）：** 同一份輸出多三格 `eps_contribution`／`multiple_contribution`／`return_attribution`
-（`alpha/implied_return/attribution.py`；恆等式 `(1+R) = (內部 EPS／共識 EPS) × (目標倍數／市場對共識付的倍數)`）。
-拆不出來（沒有同期同口徑的 EPS 共識）就 `missing`＋`absence_kind`，**報酬本身不受影響**。讀法：負的報酬先看是哪一桿——
-EPS 桿是圖該產生的東西；倍數桿依 `AGENTS.md`「隱含報酬的兩個桿」要指得出 re-rating 證據。
-```powershell
-python -m briefing analyst-view COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);h={l['key']:l['datum']['value'] for l in v['headline']['lines']};print(h['price_return'], h['eps_contribution'], h['multiple_contribution'])"
-```
-
-### Sandbox impact review 結論（2026-09-06，Entry Logic v1／Step 3）
-
-| 入口 | side effect | OS／network capability | 判定 |
-|---|---|---|---|
-| `python -m alpha entry-criterion <T> --list／--add／--retract` | append `library/private/alpha/entry_criteria/<T>.jsonl`（**投資人政策**，不是研究判斷）；`--list` 唯讀 | 本機檔案；private 目錄 | **互動專用**，不進 unattended rule。⚠ 這是全系統唯一會寫這個 ledger 的入口，且只由使用者執行——**排程不得替使用者決定要求幾 % 報酬** |
-| `python -m briefing entry <T> [--sandbox-hurdle] [--scenario …] [--as-of]` | 唯讀：與 `alpha-card` 相同的來源＋估值／horizon／判準 ledger；`--sandbox-hurdle` 只在記憶體疊一筆 `author=sandbox` 的判準，**不寫任何 authority**（ledger 的 append 入口明文拒收 sandbox） | 與 `alpha-card` 相同的本機資源；無新增網路主機、憑證或 identity／ACL | **互動專用**。新 CLI 名稱，不進 unattended rule |
-| `python -m briefing alpha-card`／`decision_lab today` 的 Alpha Card 摘要（既有） | 多讀判準 ledger＋跑純函式 `build_entry_assessment`；`entry_logic` 插座由 `NotModeledSection` 換成 `EntryLogicSection`、精簡卡多 `entry_logic` 欄；**卡表欄位不變** | 無新增（同一 Engine C 連線、本機檔案） | 命令字串未變 |
-
-查證（新入口不該出現在 rules；十六條 fixed entry 數量未變）：
-```powershell
-Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'entry-criterion|briefing entry|hurdle'
-```
-
-### Entry Logic：怎麼跑（互動）
-
-```powershell
-# 0) 先看有沒有判準（沒有就是 missing——那是「投資門檻尚未宣告」，不是資料缺口）
-python -m alpha entry-criterion COHR --list
-# 1) 非持久驗算：只在記憶體疊一筆 hurdle 看門檻價會落在哪，**不寫任何 authority**
-python -m briefing entry COHR --sandbox-hurdle 0.15
-# 2) 真的要宣告成政策才寫 ledger（spec：value／basis＝investor_policy／rationale＋可選 reference_refs／supersedes_id）
-python -m alpha entry-criterion COHR --add spec.json
-python -m alpha entry-criterion COHR --retract ec_xxx --rationale "..."
-# 3) 看結果（read model 第 13c 節：判準／要求報酬／現價／fair value／horizon／年化隱含／門檻價／gap／comparison／assessment）
-python -m briefing entry COHR
-python -m briefing entry COHR --format json | python -c "import json,sys;r=json.load(sys.stdin);print(r['meta']['status'], r['entry_price']['value'], r['hurdle_comparison']['value'])"
-# 4) 情境與歷史視角
-python -m briefing entry COHR --sandbox-hurdle 0.15 --scenario price_only   # entry_assessment recalculate；判準 current
-python -m briefing entry COHR --sandbox-hurdle 0.15 --scenario graph_edge   # 上游 review 傳播；判準仍 current
-python -m briefing entry COHR --as-of 2026-09-05                            # 上游缺 → missing
-```
-
-⚠ 它是 **analytical entry threshold**：`meets_analytical_hurdle` 只表示「現價 ≤ 門檻價」這個算術事實，
-**不是 buy／sell、不是部位尺寸、不是資本許可**（型別裡沒有那些欄位，section 每次列 `is_not`）。
-沒有明示判準就是 `missing`，**不補 10%／15%／20%**；`value_date` 與 `horizon_end` 不一致時算術照列但
-`assessment=review_required`，不得當成 clean 的門檻價。
+### Valuation Model／Base-case Implied Return／Entry Logic（2026-09-06 Step 1–3）——已退役、已封存
+三者（`alpha/valuation`、`alpha/implied_return`、`alpha/entry` 與 `briefing valuation／implied-return／entry` 三個子命令）
+已於 2026-09-23（Phase 0 Step 0b.1b C／F／H 組）整組退役；估值假設／horizon／entry 判準三本 ledger 的檔案留在
+`library/private/alpha/`（L10），不再消費。六個小節（三份 sandbox review ＋ 三份「怎麼跑」）逐字封存於 archive。
 
 ### Sandbox impact review 結論（2026-09-07，Web App／API／Abstention ledger／Step 5）
 
@@ -1423,12 +1239,11 @@ python engine_c/etl_yfinance.py COHR
 python -m alpha assumptions COHR --add spec.json      # spec：period_end／driver／scope／value／basis／rationale／evidence_refs
 python -m alpha assumptions COHR --list
 python -m alpha assumptions COHR --retract oa_xxx --rationale "..."
-# 4) 看結果（第 7／8／9 節；--as-of 走 PIT）
+# 4) 看結果：共識 section 直接讀 Engine C；FY+1 橋與 expectation_gap.internal_vs_consensus 已於 2026-09-23 退役
 python -m briefing alpha-card COHR
-python -m briefing alpha-card COHR --format json | python -c "import json,sys;v=json.load(sys.stdin);print(v['expectation_gap']['internal_vs_consensus'])"
 ```
 
-⚠ 假設解析不到證據會被拒用並在 `earnings_bridge.selection.reasons` 計數（`unresolved_evidence`），
+⚠ 假設解析不到證據會被拒用並在 refresh 的假設 artifact 標 `invalidated`（`earnings_bridge` 已於 2026-09-23 退役），
 不會靜默生效；缺任何一條 driver 就是 `missing`，不補 0。driver 是封閉字彙
 （`alpha/fundamental/contracts.py::ASSUMPTION_DRIVERS`）。
 
@@ -1481,11 +1296,8 @@ weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同
   `coverage=uncovered`。前兩類判 `MONITOR` ＋空 blockers，仍在 daily brief 現形但不占
   pq2 編號。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`。
   beta universe 的 SSOT 只有 `config/beta_policy.json`。
-- **Decision gap dispatch：** `decision_review go` 的語意是把最新 decision 綁定的
-  proposed work order checkpoint 成 pq1 `queued`，**不是**立刻沿用舊 assessment 做 bare
-  `reassess`。原 pq2 項目在 queued／researching／awaiting_approval 期間保持 active 但
-  不重複詢問；只有研究未果的 parked receipt，或補缺口後產生的**新 decision receipt**
-  才能 resolve。Decision gap jobs 優先占用同一個 daily pq1 budget。
+- ~~**Decision gap dispatch**~~：2026-09-23（Phase 0 Step 0b.4） 退役——`decision_review` 的 go／dispatch／reassess 整組隨 decision_lab 研究側退役，
+  legacy 項目只能 drop；pq1 budget 只給 lead。
 - **事件監控：** issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 −4% 才產 ephemeral
   `event_search_requests`；daily agent 只做一次 WebSearch，輸出可能原因＋曝險並標
   未經查證，**不建 lead／decision、不進 pq1/pq2、不寫 Engine A**。需要深挖才另走

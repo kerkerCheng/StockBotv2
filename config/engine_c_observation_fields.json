@@ -2,7 +2,7 @@
   "_comment": "Engine C 人工觀測欄位對照表（階層式：category → field_name）。照 schema/vocab.json 的先例——表的形狀鎖死、字彙留鬆：新增一類財務事實只要在此加一項，不改 Python。engine_c/observation_fields.py 是唯一 loader，set_manual_field 會拒絕未登記的 field_name 以防同義詞漂移。",
   "version": 1,
   "_gate_contract": "gate_member=true 的五項就是 L9 前置條件 #3 的財務核驗清單，thesis/preconditions.py 依賴它；這五項是凍結契約，新增欄位一律 gate_member=false，否則會讓所有既有標的的 gate_pass 退化。凍結的是五項的組成，不是取值優先序：auto_source 欄位若存在同名人工觀測，一律以人工觀測為準（checklist._prefer_manual），自動值整包留在 auto_item 供對照。理由是自動值只看得到當期快照，shares_outstanding 每天相同會讓稀釋永遠算成 +0.0%，與財報加權平均股數矛盾（AXT Q2 2026 實為 +45.2%）——gate 不得用已知錯誤的數字通過。",
-  "_authority_contract": "authorities 是 Engine D 的 reference index token，決定哪個 Confidence 軸可以引用此欄位（對照 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）：engine_c_financial→financial_resilience；engine_c_manual→financial_resilience；engine_c_customer→commercial_maturity；engine_c_backlog→commercial_maturity；engine_c_valuation→valuation_payoff。",
+  "_authority_contract": "authorities 是 reference index token（字彙 SSOT：config/authority_tokens.json）。⚠ 2026-09-23（Phase 0 Step 0b.4）：消費它的 Engine D 五軸（decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）已退役，token 留給 Phase 3 三題的引用；原對照關係留作歷史說明：engine_c_financial→financial_resilience；engine_c_manual→financial_resilience；engine_c_customer→commercial_maturity；engine_c_backlog→commercial_maturity；engine_c_valuation→valuation_payoff。",
   "categories": {
     "demand_and_orders": {
       "label": "需求與訂單",
@@ -134,7 +134,7 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。decision_lab 的 derive_runway 早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。 ｜verifiability=mechanical：現金／總債／自由現金流三個數字直接抄自報表，本來就規定 value 必須是含三個數值的 JSON 物件；它同時有 auto_source，人工值存在只是因為 yfinance 在財報後會暫時清空。",
+      "why": "yfinance 在財報後常暫時清空 free_cash_flow_ttm，runway 因此變成 manual_required 並讓 coverage gate 歸零。shared.runway.derive_runway（原 decision_lab）早就接受並驗證 manual_runway（含 timestamp future／stale 檢查），卻沒有任何地方提供它——這個欄位就是那條缺掉的走廊。value 必須是 JSON 物件，含 cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值，單位與 financial_snapshots 一致（報表原幣別絕對金額），可另帶 note 說明取自哪一段一手文件；三者缺一即視為未提供，不做部分推導。 ｜verifiability=mechanical：現金／總債／自由現金流三個數字直接抄自報表，本來就規定 value 必須是含三個數值的 JSON 物件；它同時有 auto_source，人工值存在只是因為 yfinance 在財報後會暫時清空。",
       "verifiability": "mechanical"
     },
     {
@@ -263,7 +263,7 @@
         "engine_c_financial",
         "engine_c_manual"
       ],
-      "why": "`alpha/valuation/model.py::units_comparable` 在 fair value 的幣別與報價單位不同時回 `incompatible_unit`，報酬層據此 fail closed（**本層不換算**）。那個設計是對的（IQE.L 的 GBp／GBP 差 100 倍就是代價），但它缺一條**可稽核**的換算路徑：2026-09-13 實測 **6680.HK**（法定財報與共識 CNY、報價 HKD）與 **HEXA-B.ST**（EUR／SEK）把基期、六格假設、估值、horizon、四軸判斷**全部寫完，卻連一個隱含報酬都印不出來**。value 必須是 JSON 物件：`base`（報表幣別，ISO-4217）、`quote`（報價幣別）、`rate`（**一單位 base 換得幾單位 quote**——方向寫在欄位名裡，反了會差一個倒數而不會報錯），可選 `source`（例：HKMA 每日中間價／PBoC 中間價／ECB 參考匯率）。本筆的 `as_of` 就是**那個匯率屬於哪一天**，而消費端只接受與現價 `bar_date` 相差 ±3 天以內的觀測（`alpha/fx.py::FX_AS_OF_TOLERANCE_DAYS`）。⚠ **同幣別不同尺度不要寫這裡**（GBP→GBp）：`identity/currency.py` 的 registry 已經握著精確的 factor，那是定義不是市場價。⚠ **不放 horizon 期末的匯率**——那等於預測匯率，是另一種判斷（走 OperatingAssumption 都不對）。 ｜verifiability=mechanical：公告匯率是一個帶日期的公開數字，指得出來源（央行／交易所每日公告）就任何人重查都得到同一個數；value 是 JSON 數值物件，可被重導直接 diff。",
+      "why": "（歷史脈絡；估值鏈已於 2026-09-23 退役）原 `alpha/valuation/model.py::units_comparable` 在 fair value 的幣別與報價單位不同時回 `incompatible_unit`，報酬層據此 fail closed（**本層不換算**）。那個設計是對的（IQE.L 的 GBp／GBP 差 100 倍就是代價），但它缺一條**可稽核**的換算路徑：2026-09-13 實測 **6680.HK**（法定財報與共識 CNY、報價 HKD）與 **HEXA-B.ST**（EUR／SEK）把基期、六格假設、估值、horizon、四軸判斷**全部寫完，卻連一個隱含報酬都印不出來**。value 必須是 JSON 物件：`base`（報表幣別，ISO-4217）、`quote`（報價幣別）、`rate`（**一單位 base 換得幾單位 quote**——方向寫在欄位名裡，反了會差一個倒數而不會報錯），可選 `source`（例：HKMA 每日中間價／PBoC 中間價／ECB 參考匯率）。本筆的 `as_of` 就是**那個匯率屬於哪一天**，而消費端只接受與現價 `bar_date` 相差 ±3 天以內的觀測（`alpha/fx.py::FX_AS_OF_TOLERANCE_DAYS`）。⚠ **同幣別不同尺度不要寫這裡**（GBP→GBp）：`identity/currency.py` 的 registry 已經握著精確的 factor，那是定義不是市場價。⚠ **不放 horizon 期末的匯率**——那等於預測匯率，是另一種判斷（走 OperatingAssumption 都不對）。 ｜verifiability=mechanical：公告匯率是一個帶日期的公開數字，指得出來源（央行／交易所每日公告）就任何人重查都得到同一個數；value 是 JSON 數值物件，可被重導直接 diff。",
       "verifiability": "mechanical"
     }
   ],

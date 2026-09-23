@@ -61,9 +61,9 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0b.1b-E | E 組整組退役：賭注四價 overlay（含 downside、target_reached） | ✅ | bd34a63 |
 | 0b.1b-C/H（1/2） | 估值品質計數器（closure 三個數＋webapp 消費端） | ✅ | 3be1756 |
 | 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section、刪 `alpha/valuation`／`alpha/implied_return`／`alpha/fundamental` 模型半邊（§0.9；偏差 §0.6 #18–27） | ✅ | 1ed420e |
-| 0b.2 | 刪估值鏈（收尾：expectation_gap 腳本、`multiple_horizon` 讀寫；偏差 §0.6 #28–31） | ✅ | |
-| 0b.3 | 排序與籃子：`rank_bottlenecks` → `structure_table`、state kind `ranking` → `structure_table`、籃子模組刪（偏差 §0.6 #32–#41；續工落點 §0.10） | ✅ | |
-| 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
+| 0b.2 | 刪估值鏈（收尾：expectation_gap 腳本、`multiple_horizon` 讀寫；偏差 §0.6 #28–31） | ✅ | d796e2f |
+| 0b.3 | 排序與籃子：`rank_bottlenecks` → `structure_table`、state kind `ranking` → `structure_table`、籃子模組刪（偏差 §0.6 #32–#41；續工落點 §0.10） | ✅ | 7db4e1f |
+| 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件（三個 commit：1/3 硬擋 8d62c11、2/3 研究側 27007f9、3/3 config／活文件／keep-list；偏差 §0.6 #42–#57） | ✅ | 8d62c11＋27007f9＋3/3 |
 | 0c | 池子 17 筆 drop | ✅ | cd275e3 |（**先於 0b 執行**：兩者無相依，0b.1 撞到 §6「切不開」要停，先把獨立的 Step 收掉）|
 | 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅ | ○ | |
 
@@ -139,6 +139,9 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 52 | 0b.4（2/3） | plan 未提 `engine_b/cli.py drain` 的 `--decision-work-orders` 與 Decision work order／assessment-gap 兩種工作 | 旗標與兩種工作刪，drain 只剩 lead；`alpha research --emit-assessment` 刪；`scripts/backfill_shadows.py` 刪（寫 shadow 到舊店） | 三者都只服務退役的 Engine D 研究側；`.codex/rules` 條數 12 不變（drain 早於 09-17 移出 allowlist），sandbox 五步見八欄 |
 | 53 | 0b.4（2/3） | 「MCP `get_decision_brief` 工具退役」 | 工具、import、`docs/remote-access-architecture.md` 表、`test_graph_mcp_manual` 12→11 都改；**跑著的 MCP process（2026-08-27 起）仍是舊 tool surface，要使用者重啟**（OPERATIONS「改完 mcp_server 一定要重啟」） | 重啟本機常駐服務是使用者的動作，執行者不代做 |
 | 54 | 0b.4（2/3） | 刪測試清單：`test_decision_lab_e2e`、`test_action_card`、`test_operational_workflow`、`test_layer_separation`（若只驗研究側） | 實際退 **28 檔**（含 `test_cohort_without_subject`——守的是 decision collector「無主詞 cohort 不鑄號」的抑制路徑，collector 刪了它自然紅；`test_layer_separation` **留**並改主詞：拿掉 engine_d_runtime、補一條「凍結後 decision_lab 不得碰 engine_c／fetchers／neo4j」）；另 11 檔改主詞、`tests/test_config_tracking.py` 登記表三列搬「已移除」段 | 逐檔守什麼寫在 2/3 的八欄 Blocking findings；全部是退役機制的測試（硬約束 9），活判準沒有刪斷言 |
+| 55 | 0b.4（3/3） | 「活文件：OPERATIONS 的 decision_lab 命令段、ARCHITECTURE §8.2 與 §7／§9、CONCEPTS 詞條同 commit 更新」 | 覆蓋**八組**（§0.10 #2）：整節退役的 9 段（OPERATIONS 5：decision_review 全函數、Engine D 命令、2026-09-09／09-05 兩份 sandbox review、Valuation／Implied／Entry 六小節；ARCHITECTURE 4：§6.2、§6.4–6.6、§6.10、§6.13）**逐字封存**到 `docs/archive/2026-09-23-phase0-retired-sections.md`，原位留 stub；散句改退役註記；§7 改寫成 frozen；§8.2「煞車仍在」列改指 `record_trade.py`；CONCEPTS 的 Engine D／Investment Process 加區塊 banner，10 個 read-model 詞條與判斷錯了值多少／多年反向橋各加「已退役」行 | AGENTS「被本檔取代的舊章逐字封存於 docs/archive」；活文件剩餘命中逐句列在 3/3 八欄，只剩退役註記、禁止句與 regex 過度匹配（`calibrat` 命中活的假設 ledger ref 角色、`籃子總報酬` 是 AGENTS 量測用語） |
+| 56 | 0b.4（3/3） | 「驗收：殭屍 grep 的 E、G 兩組命中 0」（已 amend 為 keep-list 差集） | keep-list 由 53 條（A／B）補到 **288 條**（C 49、D 15、E 36、F 5、G 95、H 40，扣 app.js 重複列）；三個數字 0／0／0 | 每條理由屬五類之一並指得回 plan §0.6 或 ROADMAP 的「留」；結案 R2 逐條審 |
+| 57 | 0b.4（3/3） | 「`config/decision_blockers.json`、`config/engine_c_observation_fields.json` 裡只服務 payoff／估值的 blocker 碼與欄位移除」 | 只移除 `sheet_only_holding` 一條（它的 producer 是已刪的 decision collector）；其餘碼（catalyst_missing、market_stale、assessment_context_mismatch…）**不刪**，只把 next_step 的散文改成「歷史 payload 才會出現此碼、reassess 已退役」；`_comment` 標明本檔從此只服務讀凍結歷史。`engine_c_observation_fields.json` 只改三段散文（_authority_contract、runway why、fx_rate why），欄位一個不刪；`authority_tokens.json` 的 `_frozen_mapping_note` 改寫 | 這些碼凍在舊店的 decision payload 裡，registry 是讀它們的唯一說明權威（L10：拿不回來的只能 append）；刪碼會讓 audit 把歷史 payload 判成未登記。欄位字彙沒有一個是「只服務 payoff」的——實測 grep 到的是 why 散文 |
 
 ## 0.8 ✅ 已裁決（2026-09-23）：**A——`argument` 升核心、`why` 退役**（原 escalation 紀錄留存於下）
 
@@ -272,7 +275,7 @@ ROADMAP 驗收①與本 plan gate 8、R2 檢查 1 已同步。精確到（檔，
 
 ## 0.10 續工落點（2026-09-23 晚，0b.3 結案後寫；下一個 Step 是 0b.4）與 plan 審閱
 
-**交接狀態：** 進度表 0.0～0b.3、0c 全 ✅（0b.3 的 commit 短碼由下一個執行者從 `git log` 補進進度表）。剩 **0b.4** 與**結案**。
+**交接狀態（2026-09-23 晚更新）：** 進度表 0.0～0b.4、0c 全 ✅。剩**結案**（九項 gate ＋ closeout 報告 ＋ R2 WORK_REQUEST）。
 **排程時限：** `StockBotv2-Heartbeat` 07:00／`StockBotv2-FxSync` 06:55 今日已跑完（LastResult 0），下次 **2026-09-24 早上**；
 Codex daily 06:30 明早會跑——daily prompt 已改成 `--structure-table`，心跳讀 `structure_table` kind（0b.3 已 materialize）。
 **0b.4 若在 2026-09-24 06:30 之後才開工，第一件事是先暫停 Codex daily／weekly 排程再動手（§0.5）。**

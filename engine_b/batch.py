@@ -5,7 +5,7 @@ dispatch 有 deterministic 依據（不靠 agent 自由心證解析數字）。�
 耦合——number→item 的對映由 skill 在該次 brief 的上下文持有。
 
 verbs（封閉集合）：go／drop／pending／skip。type-aware dispatch（go 對 lead＝
-研究、對 prepared action＝apply、對到期 thesis＝reassess…）由 skill 決定。
+研究、對 prepared action＝apply、對追源＝派回 pq1…）由 skill 決定。
 """
 from __future__ import annotations
 

@@ -1,5 +1,5 @@
 {
-  "_comment": "Blocker 字彙登記表。Blocker code 是散落在 coverage.py／sizing.py／adapters.py 產生、又被 brief／todo 消費的承重字串；本檔是它們唯一的說明權威。這是讀側分類層——只描述既有 code 的意義，不改變任何 code 的產生方式，因此不影響已凍結的 decision payload。",
+  "_comment": "Blocker 字彙登記表。⚠ 2026-09-23（Phase 0 Step 0b.4）：產生這些 code 的 Engine D 研究側（coverage.py／sizing.py／adapters.py）已退役、舊 Decision Store 凍結唯讀；本檔從此只服務**讀凍結歷史**（audit、個股頁 research 面板的 legacy 欄位）與 resolution_mode 的分類語意，code 不再新增。`sheet_only_holding` 條目已隨該 kind 退役移除。這是讀側分類層——只描述既有 code 的意義，不改變任何 code 的產生方式，因此不影響已凍結的 decision payload。",
   "version": 5,
   "_resolution_modes": {
     "user_decision": "使用者現在就能做出決定推進它。應留在決策佇列。",
@@ -62,7 +62,7 @@
       "category": "identity",
       "severity": "sizing",
       "resolution_mode": "user_decision",
-      "next_step": "注意名稱誤導：圖中可能有該公司，只是 identity 未綁定就會丟掉 company_id（見 decision_lab/context.py 的 core_fields）。先確認是「圖裡真的沒有」還是「identity 未綁定」。"
+      "next_step": "注意名稱誤導：圖中可能有該公司，只是 identity 未綁定就會丟掉 company_id（原 Engine D context 的 core_fields；研究側已退役，歷史 payload 才會出現此碼）。先確認是「圖裡真的沒有」還是「identity 未綁定」。"
     },
     {
       "code": "unresolved_identity",
@@ -142,7 +142,7 @@
       "category": "assessment",
       "severity": "sizing",
       "resolution_mode": "user_decision",
-      "next_step": "reassess 時以 --catalyst 提供。"
+      "next_step": "歷史 payload 才會出現此碼（reassess 已於 2026-09-23 退役）；催化劑改由敘事 ledger 與 watch registry（Phase 1）承載。"
     },
     {
       "code": "disproof_missing",
@@ -150,7 +150,7 @@
       "category": "assessment",
       "severity": "fatal",
       "resolution_mode": "user_decision",
-      "next_step": "reassess 時以 --disproof 提供；可證偽性是一等公民（L7）。"
+      "next_step": "歷史 payload 才會出現此碼（reassess 已於 2026-09-23 退役）；反證改由敘事 ledger 與 watch registry（Phase 1）承載，可證偽性是一等公民（L7）。"
     },
     {
       "code": "expiry_invalid",
@@ -266,14 +266,6 @@
       "next_step": "非同幣計價需 FX；缺失一律 fail closed。"
     },
     {
-      "code": "sheet_only_holding",
-      "label": "Sheet 有持股但無任何機制負責",
-      "category": "holdings",
-      "severity": "diagnostic",
-      "resolution_mode": "user_decision",
-      "next_step": "改覆蓋分類（config/holdings_coverage.json 或 beta policy）或建立 cohort；直接 drop 無效，sync 會重新推導。"
-    },
-    {
       "code": "single_position_nav_cap_reached",
       "label": "已達單筆部位 NAV 上限（investment policy 硬擋）",
       "category": "policy_cap",
@@ -333,7 +325,7 @@
       "category": "assessment",
       "severity": "diagnostic",
       "resolution_mode": "user_decision",
-      "next_step": "evidence_refs 必須落在該軸接受的 authority（見 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）；例如財務軸不接受 Engine A 文件當 ref。"
+      "next_step": "evidence_refs 必須落在該軸接受的 authority（原 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES；五軸 sizing 已於 2026-09-23 退役，歷史 payload 才會出現此碼）；例如財務軸不接受 Engine A 文件當 ref。"
     },
     {
       "prefix": "financial_checklist_",
@@ -387,7 +379,7 @@
       "category": "staleness",
       "severity": "sizing",
       "resolution_mode": "system_internal",
-      "next_step": "重新 reassess 即取得新 context；舊 decision 依契約不回寫。"
+      "next_step": "歷史 payload 才會出現此碼（reassess 已於 2026-09-23 退役）；舊 decision 依契約不回寫。"
     },
     {
       "prefix": "execution_fx_stale_since_decision",
@@ -395,7 +387,7 @@
       "category": "staleness",
       "severity": "sizing",
       "resolution_mode": "system_internal",
-      "next_step": "重新 reassess 即可。"
+      "next_step": "歷史 payload 才會出現此碼（reassess 已於 2026-09-23 退役）。"
     },
     {
       "code": "market_stale_since_decision",
@@ -403,7 +395,7 @@
       "category": "staleness",
       "severity": "fatal",
       "resolution_mode": "system_internal",
-      "next_step": "這是 point-in-time decision 的自然老化，不需要使用者決定；有 material evidence 或正式 reassess 時重凍 context。"
+      "next_step": "這是 point-in-time decision 的自然老化，不需要使用者決定；（歷史）有 material evidence 或正式 reassess 時重凍 context；reassess 已於 2026-09-23 退役。"
     },
     {
       "code": "execution_market_stale_since_decision",
@@ -521,7 +513,7 @@
       "category": "market",
       "severity": "sizing",
       "resolution_mode": "system_internal",
-      "next_step": "過期不等於錯；valuation_payoff 軸的證據自然變弱，由 axis_ceiling 承擔。"
+      "next_step": "過期不等於錯；（歷史）valuation_payoff 軸的證據自然變弱——五軸與 axis_ceiling 已退役，此碼只在歷史 payload 出現。"
     },
     {
       "code": "market_adv_invalid",

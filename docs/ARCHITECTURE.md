@@ -23,7 +23,7 @@
 | **A2 財務觀測** | 帶時戳的財務／市場／共識觀測 | ETL（可重建）＋ append-only 人工 ledger | 混合 | Engine C（`engine_c/`） |
 | **A3 研究判斷／Alpha** | 「我們相信什麼、憑什麼、什麼會推翻它」 | 研究流程（session 提議 → schema 驗證） | **可重算** | `alpha/`（Phase 1–6 建立） |
 | **A4 Portfolio／Risk** | 目前曝險、目標配置、硬上限 | policy config ＋ Google Sheet（外部 authority） | 可重算 | `portfolio/`＋`risk/` |
-| **A5 資本決策／問責** | 「當時憑什麼決定、使用者選了什麼、後來對不對」 | 明確的人工動作 | **append-only，Git 救不回** | Engine D（`decision_lab/`） |
+| **A5 資本決策／問責** | 「當時憑什麼決定、使用者選了什麼、後來對不對」 | 明確的人工動作 | **append-only，Git 救不回** | `library/trades/trade_log.jsonl`（成交事件內嵌收據，`scripts/record_trade.py` 寫；硬擋 `risk/hard_caps.py`）；舊 Decision Store（`decision_lab/`）frozen 2026-09-22，唯讀歷史 |
 
 ### 四引擎的「不負責什麼」（這一欄比引擎命名有價值）
 
@@ -55,7 +55,7 @@ AlphaSignal — research view only，**不含部位**
    ▼
 Portfolio（portfolio/）— view → target exposure ▸ Risk（risk/）— hard limits
    ▼
-Engine D（decision_lab/）— 凍結 context、記錄 live choice、outcome attribution
+trade_log（library/trades/）— 成交收據；risk/hard_caps.py — 寫入前的兩道硬擋｜舊 Engine D（decision_lab/）frozen 2026-09-22，唯讀歷史
 ```
 
 **依賴方向只准 peripheral → core。** `alpha/` 的契約與模型層零外部相依
@@ -83,7 +83,7 @@ Engine D（decision_lab/）— 凍結 context、記錄 live choice、outcome att
 
 ### Point-in-time：兩種凍結，不可混用
 
-| | `ResearchContext`（A3） | `DecisionContext`（A5） |
+| | `ResearchContext`（A3） | `DecisionContext`（A5；**frozen 2026-09-22**，只剩歷史，新收據住 trade_log） |
 |---|---|---|
 | 凍結什麼 | 該次研究實際使用的 A1／A2 slice | 該次決策實際使用的全部 context ＋ policy version |
 | 可否重算 | **可以**（研究可以重跑） | **不可以**（append-only，舊 decision 永遠引用原 digest） |
@@ -95,7 +95,7 @@ Engine D（decision_lab/）— 凍結 context、記錄 live choice、outcome att
 
 canonical edge **沒有時間欄位**——唯一時間線索是 `CITES → SourceDoc.published_at`。
 投影靠它做：`query/bottleneck.py::project_assertions_as_of` 依「引用的文件在 `as_of`
-之前發表過沒有」篩 assertion，**再**交給 `rank_bottlenecks`。
+之前發表過沒有」篩 assertion，**再**交給 `structure_table`（原 `rank_bottlenecks`，跨檔排序已於 2026-09-23 退役）。
 
 ⚠ **順序不可顛倒。** 先排序再砍列會留下用未來文件算出的 `substitutability` 與
 `evidence`——列是對的、值是偷看來的，那是 lookahead 最難察覺的形式。
@@ -126,7 +126,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
   唯讀提醒 ＋ 健康審查；刻意與 daily 錯開。
 - **本機音訊追源：** `scripts/transcribe_audio.py`（`faster-whisper`），模型與逐字稿
   只存 ignored `library/private/`。ASR 只提供 timestamp locator。
-- **遠端存取：** 本機 MCP server ＋ Cloudflare Tunnel ＋ connector，十二工具 surface。
+- **遠端存取：** 本機 MCP server ＋ Cloudflare Tunnel ＋ connector，十一工具 surface（`get_decision_brief` 於 2026-09-23（Phase 0 Step 0b.4） 退役）。
   完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
 - **各類來源的抽取 instruction：** [`extraction-instructions.md`](extraction-instructions.md)。
 
@@ -199,15 +199,14 @@ change 對齊（sandbox impact review 五步，見 OPERATIONS）。
 **`source_reliability` 不是第六個維度，是套在所有維度上的上限**
 （`alpha/evidence_quality.py`）：「你憑什麼相信前面那些答案」不是投資問題。
 
-**排序權威：** 結構排序的唯一權威是 `query/bottleneck.py::rank_bottlenecks()`；
-alpha 排序必須**消費**它，不得重算結構分，也不得繞過它自建第二套結構評分。
-它輸出兩份用途不同的排序：`rows`（可行動，證據優先）回答「現在能投什麼」，
-`structural_rows`（純結構，不看證據）回答「該去補誰的證據」。
+**結構表：** 結構事實的唯一權威是 `query/bottleneck.py::structure_table()`（2026-09-23 Phase 0 Step 0b.3 起；
+前身 `rank_bottlenecks()` 已退役、名稱不留 alias）。它只做稽核——逐邊 rows（證據等級、sub、sole_source、qualification、
+自報／外部印證、走不走得到錨）、`anchor_gaps`、INV-3 的 filtered reasons——**不排序、不設門檻、不給首選**（G1）。
+alpha 不得自建第二套結構評分；「下一個研究誰」由圖報洞與 lead 驅動，不由分數。
 
-> ⚠ **2026-09-16 轉向（決定紀錄 D0–D15，`docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md`）：** 目標改為邊緣小公司的 power-law 倍率。
-> 對本節的三個直接後果：①`rank_bottlenecks` 把未填 `substitutability` 的邊當 0 過濾（門檻 4），邊緣公司在可投資排序裡
-> 看不見——修法是**研究補三格**（ROADMAP Phase 1），不是改排序權威；②候選門檻改為覆蓋厚薄（D11，Phase 4 的 filter）；
-> ③§6.5–6.7 的 FY+1 主流程排定由多年反向橋取代（Phase 7）。各 Phase 交付前，本節其餘現況描述仍準確。
+> ⚠ **2026-09-16 轉向（D0–D15）→ 2026-09-22 圖是中心（G1–G12）：** 目標是邊緣小公司的 power-law 倍率。
+> 對本節的後果：①排序不再是任何佇列或頁面的輸入（Phase 0 已落地，硬約束 4）；②候選門檻改為覆蓋厚薄（Phase 3 候選狀態板）；
+> ③§6.2／6.4–6.6 的 FY+1 主流程與多年反向橋一併退役，財務只回答三題（Phase 3）。
 
 ### 「哪些標的值得看」的四維度（`AlphaSignal` 五 score 的前身）
 
@@ -270,21 +269,21 @@ thesis/lifecycle.json＋catalyst_calendar.json、engine_c.checklist ────
 
 | Section | 來源 authority | basis／capability（今天） |
 |---|---|---|
-| structural_thesis | `rank_bottlenecks()`（經 provider）＋`alpha.context.structural_score` | Q1 `deterministic`；邊屬性 `observation` |
+| structural_thesis | `structure_table()`（經 provider；原 `rank_bottlenecks()`，2026-09-23）＋`alpha.context.structural_score` | Q1 `deterministic`；邊屬性 `observation` |
 | causal_paths | `GraphResearchProvider` 的路徑／`propagate`／`get_structural_changes_since` | `structural_inference`，capability＝**`structural_causal_model`**（不是 financial） |
 | fundamentals | Engine C `financial_snapshots`＋manual ledger（segment）＋`checklist` | `observation` |
 | consensus | Engine C `financial_snapshots`＋`engine_c.estimates`＋**`consensus_estimates`**（FY-identified EPS／營收，`fiscal_items`） | `observation`，status **`partial`**（快照欄位＋0y／+1y 兩個會計年度；缺第三年起、目標價高低、逐位分布） |
-| price_implied_expectations | `alpha.context._implied_valuation` | **`heuristic_proxy`**（trailing/forward PE − 1）；隱含利潤率與 reverse DCF `not_modeled` |
-| internal_fundamentals | **`alpha/fundamental`**（§6.2）：假設 ledger → 確定性橋 | `deterministic`（capability `financial_causal_model`）；每格 `dependencies.input_dependency` 帶最弱輸入假設的知識種類。**沒有假設或沒有基期觀測＝`missing`**（有能力、沒資料），不再是 `not_modeled` |
-| earnings_bridge | 同上 | 每格 observation／assumption／derived 各自標 basis；`assumptions`／`sensitivities`／`selection` 隨附 |
-| expectation_gap | Q4（session）＋估計修正 vs 股價（`engine_c.estimates`）＋**`alpha/fundamental/compare`**（`numeric_comparisons`） | Q4 `session_judgment`（ordinal）**與**數值 gap `deterministic`（capability `numeric_internal_vs_consensus`）並存、分開標；數值 gap 只在同期、同口徑、同幣別時有值，否則 `not_applicable`／`missing` |
+| ~~price_implied_expectations~~（2026-09-23 退役） | `alpha.context._implied_valuation` | **`heuristic_proxy`**（trailing/forward PE − 1）；隱含利潤率與 reverse DCF `not_modeled` |
+| ~~internal_fundamentals~~（2026-09-23 退役） | **`alpha/fundamental`**（§6.2）：假設 ledger → 確定性橋 | `deterministic`（capability `financial_causal_model`）；每格 `dependencies.input_dependency` 帶最弱輸入假設的知識種類。**沒有假設或沒有基期觀測＝`missing`**（有能力、沒資料），不再是 `not_modeled` |
+| ~~earnings_bridge~~（2026-09-23 退役） | 同上 | 每格 observation／assumption／derived 各自標 basis；`assumptions`／`sensitivities`／`selection` 隨附 |
+| expectation_gap（2026-09-23 起只剩 `gap_closure`／`consensus_series`；`numeric_comparisons`／`opinion_stance` 退役） | Q4（session）＋估計修正 vs 股價（`engine_c.estimates`）＋**`alpha/fundamental/compare`**（`numeric_comparisons`） | Q4 `session_judgment`（ordinal）**與**數值 gap `deterministic`（capability `numeric_internal_vs_consensus`）並存、分開標；數值 gap 只在同期、同口徑、同幣別時有值，否則 `not_applicable`／`missing` |
 | catalysts | AlphaSignal.catalysts＋thesis checkpoints＋Engine D 散文＋`shared.catalyst_state` | `partial`，capability＝`structured_dates_without_repricing_link` |
 | falsification | AlphaSignal.disproof_conditions（L7 三件套）＋Engine D 散文＋thesis lifecycle | capability＝`structured_conditions_with_expiry_watch`；自動失效引擎 `not_modeled` |
-| scenarios | AlphaSignal bull／base／bear | **`narrative`**；機率 `not_modeled`；`target_valuation` 自 2026-09-06 起照抄 valuation 的單點 fair value（逐情境仍無） |
-| valuation | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／`value_date`／現價／gap 分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing`；估值假設未宣告時點語意時 `value_date`＝`missing` |
-| implied_return | **`alpha/implied_return`**（§6.5）：現價 ＋ fair value 時點語意 ＋ 明示 horizon | `deterministic`（capability `base_case_implied_return_v1`）；`price_return`／`annualized_price_return` 確定性、`horizon` 與 `value_date` 是判斷、`total_return`／`probability_weighted_return` **`not_modeled`**；四個輸入缺一＝`missing`；每次列 `is_not` |
-| entry_logic | **`alpha/entry`**（§6.6）：implied return ＋ **明示的要求報酬判準**（`investor_policy`） | `deterministic`（capability `analytical_entry_threshold_v1`）；`entry_price`／`price_to_entry_gap`／`hurdle_comparison` 確定性、`required_annualized_return` 是**投資人政策**（新 basis `investor_policy`）；沒有判準＝`missing`＋「缺投資門檻判斷，不是 ETL 缺口」；alignment 不對齊＝`review_required`；每次列 `is_not`（**不是 buy／sell、不是部位、不是資本許可**） |
-| downside | alpha://assumptions（`scenario=downside`） | ~~**`not_modeled`**，並列出「不要跟什麼混淆」~~（2026-09-18 D2 交付）：與賭注**對稱**的 overlay——反證成真時的假設套同一條橋。沒寫是 `missing`＋`not_yet_recorded`（有能力、還沒人寫），**不再是 `not_modeled`**；「不是什麼」由 `DOWNSIDE_IS_NOT` 帶著走（不是 bear case／不是機率加權／不是停損線／不是尺寸） |
+| scenarios（`target_valuation` 一格已於 2026-09-23 退役） | AlphaSignal bull／base／bear | **`narrative`**；機率 `not_modeled`；`target_valuation` 自 2026-09-06 起照抄 valuation 的單點 fair value（逐情境仍無） |
+| ~~valuation~~（2026-09-23 退役） | **`alpha/valuation`**（§6.4）：內部 EPS × 明示目標倍數 | `deterministic`（capability `deterministic_fair_value_v1`）；fair value／`value_date`／現價／gap 分開，gap 附 `gap_is_not`；沒有估值假設或內部 EPS＝`missing`；估值假設未宣告時點語意時 `value_date`＝`missing` |
+| ~~implied_return~~（2026-09-23 退役） | **`alpha/implied_return`**（§6.5）：現價 ＋ fair value 時點語意 ＋ 明示 horizon | `deterministic`（capability `base_case_implied_return_v1`）；`price_return`／`annualized_price_return` 確定性、`horizon` 與 `value_date` 是判斷、`total_return`／`probability_weighted_return` **`not_modeled`**；四個輸入缺一＝`missing`；每次列 `is_not` |
+| ~~entry_logic~~（2026-09-23 退役） | **`alpha/entry`**（§6.6）：implied return ＋ **明示的要求報酬判準**（`investor_policy`） | `deterministic`（capability `analytical_entry_threshold_v1`）；`entry_price`／`price_to_entry_gap`／`hurdle_comparison` 確定性、`required_annualized_return` 是**投資人政策**（新 basis `investor_policy`）；沒有判準＝`missing`＋「缺投資門檻判斷，不是 ETL 缺口」；alignment 不對齊＝`review_required`；每次列 `is_not`（**不是 buy／sell、不是部位、不是資本許可**） |
+| ~~downside~~（2026-09-23 退役） | alpha://assumptions（`scenario=downside`） | ~~**`not_modeled`**，並列出「不要跟什麼混淆」~~（2026-09-18 D2 交付）：與賭注**對稱**的 overlay——反證成真時的假設套同一條橋。沒寫是 `missing`＋`not_yet_recorded`（有能力、還沒人寫），**不再是 `not_modeled`**；「不是什麼」由 `DOWNSIDE_IS_NOT` 帶著走（不是 bear case／不是機率加權／不是停損線／不是尺寸） |
 | evidence | 全部 `EvidenceRef` 的索引＋as-of 篩選計數＋L8 品質摘要 | `observation` |
 
 **as-of 視角的邊界（2026-09-05 Phase 1.1 定案）：** 三種來源三種處置，判準是「authority
@@ -304,52 +303,15 @@ allow_stale_context=True)` 是唯讀 view 的明確 opt-in——舊判斷仍呈�
 
 view 的 `capability_map()` 就是「知道什麼／還不知道什麼」的常駐計數器。
 
-### 6.2 Causal Fundamental Model（`alpha/fundamental/`，2026-09-05 Phase 2 v1）
+### 6.2 Causal Fundamental Model（`alpha/fundamental/`）——模型半邊已退役（2026-09-23，Phase 0 Step 0b.1b-C/H 2/2）
 
-**角色一句話：根據我們知道的，我們對這門生意明確假設了什麼，那些假設推得出什麼數字，
-跟同期共識差多少。** 它回答的是「StockBot 的內部預測」，**不是**估值、預期報酬或進場邏輯
-（那三者仍 `not_modeled`）。
-
-```
-Engine A 證據 ─┐                                  Engine C（A2，唯讀）
-               ├─► OperatingAssumption[]（A3，private append-only ledger）   fiscal_year_results（基期）
-session 判斷 ──┘        │ select_assumptions(as_of)                          company_guidance（指引，證據）
-                        ▼                                                    consensus_estimates（FY 別共識）
-                 build_bridge（確定性算術）◄──────────────────────────────── 基期觀測
-                        ▼
-                 ModeledMetric[]（revenue／operating_margin／operating_income／net_income／eps）
-                        ▼ verify_consensus_basis ＋ compare_metric
-                 ExpectationComparison[]（只在同期、同口徑、同幣別時有數字）
-                        ▼
-                 briefing/alpha_view（只選取）→ internal_fundamentals／earnings_bridge／expectation_gap
-```
-
-**誰擁有什麼（authority 分工，不得混）：**
-
-| 東西 | 擁有者 | 住哪 |
-|---|---|---|
-| 假設（值、basis、rationale、evidence、created_at） | A3 研究判斷，session 明示 | `library/private/alpha/assumptions/<TICKER>.jsonl`（append-only；`python -m alpha assumptions`） |
-| 算術（revenue → margin → EPS） | A3，`alpha/fundamental/bridge.py` | 純函式，版本 `fundamental-bridge/v1` |
-| 基期實際、指引、FY 別共識 | A2 Engine C | `manual_observations`（`fiscal_year_results`／`company_guidance`，mechanical）、`consensus_estimates`（ETL） |
-| 口徑核實與比較 | A3，`alpha/fundamental/compare.py` | 純函式 |
-| 組裝 | `briefing/alpha_view`（read model） | 不算任何數字 |
-
-**認識論分界（本模型最重要的一條）：** 「FY27 D&C 營收成長 +60%」是 session 判斷；
-「FY27 分部營收 ＝ 基期 × (1 + 成長)」是確定性算術。每個輸出都同時帶
-`calculation="deterministic"` 與 `input_dependency`（最弱輸入假設的知識種類）；LLM 不得直接
-吐 EPS，只能寫假設。缺任何一條假設就是 `missing`，不補 0 成長、0% 利潤率。
-
-**會計期間與口徑是身分：** `FiscalPeriod.end` 才是身分，`FY2027` 只是結束年命名慣例；
-provider 的 `0y`／`+1y` 在 ETL 抓取當下解析成絕對日期（`shared/fiscal.py`）。EPS 共識的
-GAAP／non-GAAP 口徑不靠慣例，靠 `year_ago_actual` 與一手財報稀釋 EPS 機械核對（COHR：5.61 ＝
-non-GAAP，≠ GAAP 4.12）；核不出來就 `unverified`，不得相減。
-
-**PIT 三道門：** 假設 `created_at <= T`、觀測 `recorded_at <= T`、共識 `captured_at <= T`；
-builder 另核對 model 的 `as_of` 與 context 相符，不符拒收。歷史時點沒有假設就是 `missing`，
-不偷用現在的假設重建過去的 gap。
-
-**刻意不做（下一階段）：** DCF／reverse DCF、目標價、預期報酬、下檔、進場價、opportunity
-ranking、毛利率／營業費用拆分、FCF、季度期間。`rank_bottlenecks()` 仍是唯一排序權威。
+FY+1 因果橋（`bridge.py`／`model.py`：分部營收 × 假設 → 內部 EPS → 與共識的數值 gap）整組退役；`read model` 的
+`internal_fundamentals`／`earnings_bridge` 兩個 section 與 `expectation_gap.numeric_comparisons` 一起拿掉。
+**留下的是資料契約與 ledger 邏輯**（plan §0.6 #18／#28）：`contracts.py`（會計期間、假設紀錄、Engine C 觀測與共識型別）、
+`assumptions.py`（`library/private/alpha/assumptions/` ledger 的解析／選取／supersede）、`compare.py`（共識口徑核實
+`verify_consensus_basis` 與基期對帳）。read model 的 `consensus` section 直接讀 Engine C（`sources._engine_c_financials`），
+模型原本的 PIT 自我核對逐條搬過去；refresh 的假設 artifact 由 `artifacts_from_assumptions` 登記。
+原節逐字封存於 [`archive/2026-09-23-phase0-retired-sections.md`](archive/2026-09-23-phase0-retired-sections.md)。
 
 ### 6.3 Research Refresh／Dependency Invalidation（`alpha/refresh/`，2026-09-06 Step 0.5 v1）
 
@@ -417,188 +379,14 @@ new_actual|fiscal_rollover|disproof] [--as-of]`；完整卡第 15 節；精簡�
 `evidence`／`graph_claim` class 有契約但沒有 runtime 偵測來源（圖不記錄撤回）；ResearchContext 未持久化，所以
 digest 殘餘差異只能整批標 `context_digest`；行情 as-of 仍以 `bar_date` 篩（判斷基線用 `fetched_at`）。
 
-### 6.4 Valuation Model（`alpha/valuation/`，2026-09-06 Phase 2 Step 1 v1）
+### 6.4–6.6 Valuation Model／Base-case Implied Return／Entry Logic——已退役（2026-09-23，Phase 0 Step 0b.1b C／F／H 組）
 
-**角色一句話：根據我們自己的內部 EPS 與我們自己明示的目標倍數，這門生意值多少；跟現價差多少。**
-它回答的是「StockBot 的 fair value」，**不是**預期報酬、horizon、進場價、買賣、機率加權情境（Step 2 以後）。
-
-```
-alpha/fundamental（內部 FY 目標期間 EPS，含 input_dependency）─┐
-ValuationAssumption[]（A3，private append-only ledger）─ select(as_of) ─┼─► build_valuation ─► ValuationResult
-Engine C 現價（A2，唯讀；`build.context.market`）──────────────────────┘        │
-                                                                    fair_value ＝ internal_eps × target_pe（不含現價）
-                                                                    gap ＝ fair_value vs current_price（同單位才算）
-                                                                    ▼
-                                                  briefing/alpha_view（只選取）→ valuation section／精簡卡 valuation 欄
-```
-
-**方法選擇（audit 2026-09-06，用資料證明）：** 內部可靠的 forward metric 只有 FY 目標期間的稀釋 EPS（橋 v1）；沒有內部
-FCF、D&A、EBITDA、資本支出、營運資金，`financial_snapshots` 的 `total_debt`／`cash` 也沒有會計年度身分——所以 EV/EBITDA、
-FCF／DCF、reverse DCF **沒有資料可餵，不為完整硬做**。v1 唯一 method＝`forward_earnings_multiple`（parameter `target_pe`），
-method／parameter 是封閉字彙（`alpha/valuation/contracts.py::METHOD_PARAMETERS`），多一個 method 就要多一段算術。
-
-**誰擁有什麼：**
-
-| 東西 | 擁有者 | 住哪 |
-|---|---|---|
-| 估值假設（method／parameter／值／basis／rationale／證據角色／created_at／supersede／retract／review_conditions） | A3 研究判斷，session 明示 | `library/private/alpha/valuation/<TICKER>.jsonl`（append-only；`python -m alpha valuation`） |
-| fair value 算術＋gap | A3，`alpha/valuation/model.py` | 純函式，版本 `valuation-model/v1`；公式字串唯一定義處 `FAIR_VALUE_FORMULA`／`GAP_FORMULA` |
-| 內部 EPS | `alpha/fundamental`（§6.2） | 估值層**照抄** `ModeledMetric`，不重算 |
-| 現價 | A2 Engine C | `build.context.market`（已依 as-of 過濾）；報價單位取自 registry |
-| 組裝 | `briefing/alpha_view`（valuation section） | 不含任何估值公式（`tests/test_valuation_model.py` 以竄改＋import／token 掃描守著） |
-
-**與 `OperatingAssumption` 同一套 epistemic system（刻意）：** 同一組 `basis` 字彙、同一組 ref 角色（supporting／calibration／
-comparison；**同期共識與市場倍數只能是 calibration**）、同一種 append-only／as-of／supersede 語意，**連選取器都是同一支**
-（`select_assumptions` duck-typed）。差別只有三處：id 前綴 `va_`、`driver` 換成 `method`＋`parameter`、`accounting_basis`
-必填且只能 gaap／non_gaap。它**不是**橋的 driver——倍數不是財務橋的一段算術，所以住自己的型別與 ledger。
-
-**四條規則：** ① **沒有 hidden default**：ledger 沒生效倍數→`missing`；內部 EPS 缺→`missing`；不補、不由 LLM 補。
-② **同期、同口徑才乘**：估值假設的 period／accounting_basis 必須與內部 EPS 相同，不合是「口徑不合」不是「缺假設」。
-③ **price 不進 fair value**：現價只進 gap；依賴層 fair value 的 refs 不含現價 ref，policy 表 `fair_value` 沒有
-`market_price`，所以 price-only 變化只讓 gap `recalculate`。④ **gap 不是 expected return**：型別沒有 horizon／報酬欄位，
-read model 每次都列 `gap_is_not` 四條。
-
-**Refresh 整合（沿用 `alpha/refresh`，不另建 freshness）：** 新 change class `valuation_assumption`（policy 表對 Q1–Q5
-一格都不動）；新 artifact type `valuation_assumption`（判斷型，規則同營運假設）／`fair_value`／`fair_value_gap`
-（確定性）；傳播沿 `assumption_ids` 一層，上游可以是 `oa_*` 或 `va_*`。實跑 COHR：內部 EPS 假設被取代→fair value
-`recalculate`；估值假設被取代→`recalculate`；估值假設的 supporting edge 變了→假設 `review_required`→fair value／gap
-`review_required`（`propagated_from` 指名）；price-only→fair value `current`、gap `recalculate`。
-
-**PIT：** 估值假設 `created_at <= T`；內部 EPS 沿用 fundamental 的三道門；fundamental 的 `as_of` 與估值視角不符一律拒用
-（INV-6）。實跑 COHR `--as-of 2026-09-05`：EPS 8.94 在、估值假設（09-06）`created_after_as_of`→`missing`；
-`--as-of 2026-08-15`：無基期觀測→`missing`，JSON 內無任何 `va_*` id。
-
-**認識論（回答「fair value 裡多少是算術、多少是判斷」）：** 算術＝橋＋乘法＋基期實際值（Engine C mechanical 觀測）；
-判斷＝內部 EPS 底下的 7 條營運假設（COHR：3 session_judgment＋4 heuristic_proxy）＋1 條估值假設（session_judgment）。
-給定內部 EPS，**整個 gap 就是 `target_pe / implied_multiple_at_price − 1`**——即「我們的倍數 vs 市場對我們 EPS 付的倍數」；
-EPS 的判斷藏在 implied multiple 與市場對共識 EPS 付的倍數之差裡。`ValuationResult.epistemics` 把這個分解機器可讀化。
-
-**刻意不做（Step 2 以後）：** entry logic、buy／sell、portfolio、機率加權情境、逐情境目標估值、
-多 method（EV/EBITDA／DCF 要先有內部現金流）、跨標的比較、consumer UI。**horizon 與報酬語意自 2026-09-06 起住 §6.5。**
-
-### 6.5 Base-case Implied Return（`alpha/implied_return/`，2026-09-06 Phase 2 Step 2 v1）
-
-**角色一句話：從哪一天（現價的 bar_date）到哪一天（明示的 horizon_end），在什麼假設下（內部 EPS 的營運假設＋目標倍數＋
-value-date 語意＋realization horizon），現價走到 fair value 的 base-case 隱含價格報酬是多少。**
-名稱刻意用 **implied** 不用 expected：「expected」在統計上是機率加權期望值，本層沒有任何機率。
-
-```
-alpha/valuation（fair value、value_date、input_dependency）─┐
-HorizonAssumption[]（A3，private append-only ledger）─ select(as_of) ─┼─► build_implied_return ─► ImpliedReturnResult
-Engine C 現價（A2，唯讀；含 bar_date）─────────────────────────────┘        price_return ＝ fair_value / current_price − 1
-                                                                        days ＝ horizon_end − bar_date
-                                                                        annualized ＝ (1 + r) ** (365.25 / days) − 1
-                                                                        ▼
-                                                     briefing/alpha_view（只選取）→ implied_return section／精簡卡 implied_return 欄
-```
-
-**先回答 Step 1 沒回答的問題：223.60 是哪一天的值？** v1 估值契約只有 `target_period`（EPS 屬於哪一年）與 `as_of`（知識視角），
-**答不出**「今天的 fair value（A）」還是「未來某日的 target value（B）」——兩種讀法算術相同、報酬語意完全不同。修法是最小擴充：
-`ValuationAssumption.value_date_convention`（封閉字彙 `spot`／`target_period_end`，**沒有預設**；舊紀錄讀成 `unspecified`，
-content-addressed id 不變）→ `ValuationResult.value_date`／`value_date_semantics`（`VALUE_DATE_FORMULA` 唯一定義處）。
-fair value 的算術一格不動；**時點未宣告時報酬層拒算**（不猜）。COHR 的 25x 宣告為 `target_period_end`：223.60 是 2027-06-30 的值。
-
-**誰擁有什麼：**
-
-| 東西 | 擁有者 | 住哪 |
-|---|---|---|
-| horizon 判斷（目標期間／`horizon_end`／basis／rationale／證據角色／created_at／supersede／retract／review_conditions） | A3 研究判斷，session 明示 | `library/private/alpha/horizon/<TICKER>.jsonl`（append-only；`python -m alpha horizon`） |
-| value-date 語意 | A3，估值假設宣告 | `ValuationAssumption.value_date_convention`（§6.4 ledger） |
-| 報酬算術＋年化 | A3，`alpha/implied_return/model.py` | 純函式，版本 `implied-return-model/v1`；公式字串唯一定義處 `PRICE_RETURN_FORMULA`／`ANNUALIZED_RETURN_FORMULA`／`HOLDING_PERIOD_FORMULA` |
-| fair value | `alpha/valuation`（§6.4） | 報酬層**照抄**，不重算 |
-| 現價 | A2 Engine C | 與估值層共用同一個 `CurrentPrice`（`bar_date` 是 horizon 起點） |
-| 組裝 | `briefing/alpha_view`（implied_return section） | 不含任何報酬公式（`tests/test_implied_return.py` 以竄改＋import／token 掃描守著） |
-
-**與營運／估值假設同一套 epistemic system（刻意）：** `HorizonAssumption` 用同一組 `basis` 字彙、同一組 ref 角色、同一種
-append-only／as-of／supersede 語意、**同一支選取器**；id 前綴 `ha_`；`period` 是它服務的估值目標期間（估值換期間，horizon 就是
-`other_period`，不沿用）；`horizon_end` 是明示日期，不是「12 個月」這種相對量；寫下時已過去的 horizon 契約拒收（INV-2）。
-
-**五條規則：** ① **四個輸入缺一就 `missing`**：現價（含 bar_date）、fair value（同單位）、value-date 語意、生效 horizon；沒有 hidden
-default。② **horizon 已過就不是報酬**（`horizon_end <= bar_date` → missing＋「需要新的 horizon 判斷」）。③ **只有 price return**：
-`total_return_status` 恆 `not_modeled`（無股利／分配預測能力），不得冒充。④ **沒有機率**：型別裡沒有 probability-weighted 欄位。
-⑤ **算術確定、輸入是判斷**：`calculation=deterministic`；`input_dependency`＝fair value 的輸入依賴與 horizon basis 中最弱者。
-另有 `alignment`（`aligned`／`horizon_after_value_date`／`horizon_before_value_date`／`spot_value_realized_over_horizon`）只現形不阻擋。
-
-**Refresh 整合（沿用 `alpha/refresh`）：** 新 change class `horizon_assumption`（Q1–Q5 與假設層一格不動）；新 artifact
-`horizon_assumption`（判斷型，帶 `expires_at=horizon_end`——`ArtifactDependency.expires_at` 是本步新增的絕對到期欄位，到期即
-`stale`）／`implied_return`（確定性；policy `{market_price, financial_actual}`；依賴＝fair value 的依賴＋現價 ref＋horizon）。
-傳播上游泛化到 `ASSUMPTION_ARTIFACT_TYPES`（`oa_*`／`va_*`／`ha_*`）。實跑 COHR：price-only→只有 implied_return `recalculate`；
-估值假設 review→implied_return `review_required`（`propagated_from` 指名）；horizon 被取代→`recalculate`；到期→horizon `stale`
-→報酬 `stale`；無關的圖變化→`current`。
-
-**PIT：** horizon `created_at <= T`；估值的 `as_of` 與報酬視角不符一律拒用（INV-6）；horizon 起點是現價的 `bar_date`（≤ T）。
-實跑 COHR `--as-of 2026-09-05`：估值假設 v2 與 horizon 皆 `created_after_as_of` → `missing`，JSON 無 `ha_*`。
-
-**認識論：** 算術＝報酬／年化／持有期間／估值／橋；判斷＝營運假設＋估值假設（含 value-date 語意）＋horizon；觀測＝現價＋基期實際值。
-`ImpliedReturnResult.epistemics.one_sentence` 把「從哪天、到哪天、在什麼假設下」機器組成一句話。
-
-**刻意不做（v1 限制）：** buy-sell／portfolio／consumer UI／機率加權情境／Valuation v2（historical normalized
-multiple、peer multiple、growth durability、margin／ROIC quality、cycle position——backlog 不遺失）／total return／跨標的比較。
-**Entry Logic 自 2026-09-06 起住 §6.6。**
-
-### 6.6 Entry Logic（`alpha/entry/`，2026-09-06 Phase 2 Step 3 v1）
-
-**角色一句話：已知現價、fair value（含時點語意）、明示 horizon 與**明示的要求報酬判準**，回答
-「什麼價格以下才滿足這個報酬門檻」，以及現價相對那個門檻價在哪裡。**
-它**不是** buy／sell、不是部位尺寸、不是資本許可——名稱刻意叫 **analytical entry threshold**。
-
-```
-alpha/implied_return（現價、fair value、value_date、horizon、年化隱含報酬）─┐
-EntryCriterion[]（投資人政策 ledger）── select(as_of) ────────────────────┼─► build_entry_assessment ─► EntryAssessmentResult
-                                                                            │   entry_price ＝ fair_value / (1 + h) ** (days / 365.25)
-                                                                            │   gap ＝ current_price / entry_price − 1
-                                                                            ▼   comparison ＝ current_price <= entry_price ? meets : above
-                                              briefing/alpha_view（只選取）→ entry_logic section（第 13c 節）／精簡卡 entry_logic 欄
-```
-
-**先回答「hurdle 是誰的？」（動工前的 authority 盤點，2026-09-06）：** required return **不是公司事實**
-（A1／A2 不擁有它）、**不是研究對公司的信念**（A3 的內容是「我們相信這家公司會怎樣」，不含「我要求幾 %」）、
-**也不是資本決策**（A5 是「當時憑什麼決定、使用者選了什麼」，append-only 且 live 100% 人工——宣告一個 hurdle
-不授權任何資本、不建立任何決策紀錄）。它回答的是「**我的資本**要求多少報酬才值得」，主詞是投資人。
-結論：新增第三種知識種類 **`investor_policy`**，在本層與 A2 現價同一種地位——**注入的輸入**，只讀、不猜、
-不補預設、不自動改。**沒有把 capital permission 偷塞進 Alpha。**
-
-| 東西 | 擁有者 | 住哪 |
-|---|---|---|
-| 要求報酬判準（`convention`／值／`basis`／rationale／`reference_refs`／`created_at`／supersede／retract） | **投資人政策**（使用者明示） | `library/private/alpha/entry_criteria/<TICKER>.jsonl`（append-only；`python -m alpha entry-criterion`） |
-| 門檻價／gap／comparison 算術 | A3 確定性導出，`alpha/entry/model.py` | 純函式，版本 `entry-model/v1`；公式字串唯一定義處 `ENTRY_PRICE_FORMULA`／`PRICE_TO_ENTRY_GAP_FORMULA`／`HURDLE_COMPARISON_RULE` |
-| fair value／horizon／年化隱含報酬 | `alpha/implied_return`（§6.5） | 本層**照抄**，不重算 |
-| 「該不該買、買多少」 | **使用者**（成為資本動作時才是 A5） | 本層型別裡**沒有那個欄位** |
-
-**六條規則：** ① **兩個輸入缺一就 `missing`**：可用的 implied return、生效的判準；兩者的理由**分開寫**——
-判準缺席是「**缺投資門檻判斷**，不是資料 ETL 缺口」，**不 invent 10%／15%／20%**。② **判準是注入的輸入**：
-`basis` 封閉字彙只有 `investor_policy`（開放它就等於讓 hurdle 變成「對公司的判斷」）；`criterion_basis` 與
-研究側的 `input_dependency` **分兩格**，不混。③ **判準刻意沒有 `period`**——要求報酬不隨估值換會計年度而失效；
-也**刻意不共用 `select_assumptions`**（那支以會計期間為身分並要求證據解析到公司 evidence index，而投資人的
-機會成本本來就不在那裡；硬套會製造「換了年度 hurdle 就 other_period」的假失效）。④ **alignment 不對齊不得
-冒充 clean**：`aligned`／`spot`（明示）→ `clean`；`horizon_before/after_value_date` → 算術照列但
-`assessment=review_required`＋理由，型別層擋住「不對齊卻標 clean」。⑤ **只有算術比較，沒有 action**：
-`meets_analytical_hurdle` 就是 `current_price <= entry_price`（等號歸 meets——門檻價的定義就是「恰好滿足」）。
-⑥ **型別層在 import 當下擋住資本語意**：`_assert_no_capital_fields` 掃描 `FORBIDDEN_POSITION_TOKENS` ＋
-buy／sell／order／action／trade／permission，長出那種欄位是 import 失敗不是 lint 警告。
-
-**Refresh 整合（沿用 `alpha/refresh`）：** 新 change class `entry_criterion`（Q1–Q5、假設層、fair value、
-implied return **一格不動**——投資人政策變了不代表對公司的看法變了）；新 artifact `entry_criterion`（判斷型，
-**`refs` 為空**：判準沒有 supporting evidence，所以結構事件／共識／指引都不會動它）／`entry_assessment`
-（確定性；policy `{market_price, financial_actual}`；依賴＝implied return 的依賴＋criterion）。
-實跑 COHR：price-only→`entry_assessment` `recalculate`、判準 `current`；graph_edge／consensus／new_actual／
-disproof→上游 review 傳播成 `review_required`，**判準始終 `current`**；horizon 到期→整條 `stale`。
-⚠ **criterion 同時列在 `refs` 與 `assumption_ids`，但今天只有 refs 那條會發動**（突變實測）：判準不可能變成
-`review_required`／`invalidated`，第二輪傳播對它是 no-op——`assumption_ids` 留著是為了依賴宣告完整，
-**不是一道已量測的守衛**（L14 同樣適用於自己寫的守衛）。
-
-**PIT：** 判準 `created_at <= T`；上游 implied return 的 `as_of` 與本層視角不符一律拒用（INV-6）。
-實跑 COHR `--as-of 2026-09-05`／`2026-08-15`：上游缺 → `missing`；`--as-of 2026-09-06` → available。
-
-**Sandbox 驗算：** `python -m briefing entry <T> --sandbox-hurdle 0.15` 只在**記憶體**疊一筆 `author=sandbox`
-的判準（`persisted=false`、warning 標明），**不寫任何 authority、不進變更偵測**；ledger 的 append 入口
-明文拒收 `author=sandbox`——**demo 好看不是寫入 authority 的理由**。
-
-**刻意不做（v1 限制）：** buy／sell／hold、position size／capital allocation／order、portfolio permission、
-多 convention（total return hurdle、IRR、風險調整後門檻都要先有各自的算術與資料）、跨標的比較、
-判準的到期語意（今天沒有 `expires_at`）；Analyst Consumer 已於 Step 3.5 交付（§6.7），APP／API 仍未做。
-
----
+`alpha/valuation`（內部 EPS × 目標倍數 → fair value）、`alpha/implied_return`（現價 → fair value 的隱含報酬與兩桿歸因）、
+`alpha/entry`（要求報酬判準 → 門檻價）與 read model 的 `valuation`／`implied_return`／`entry_logic` section、
+Analyst View 的頭條那把尺、q4／q7 兩個問句、`briefing valuation／implied-return／entry` 三個子命令整組退役（G3：財務只回答三題，
+不得長回估值模型）。三本 ledger（估值假設／horizon／entry 判準）的檔案留在 `library/private/alpha/`（L10），不再消費；
+`CurrentPrice` 搬進 `market` section（現價是 A2 觀測，與估值無關）。**「已定價嗎」由 Phase 3 財務三題回答**，主參照是
+自己的歷史、不設門檻。三節原文逐字封存於 [`archive/2026-09-23-phase0-retired-sections.md`](archive/2026-09-23-phase0-retired-sections.md)。
 
 ### 6.7 Analyst Consumer（`briefing/analyst_view/`，2026-09-07 Phase 2 Step 3.5 v1）
 
@@ -617,7 +405,7 @@ Portfolio／Investor Policy 階段。
 AlphaInvestmentView（§6.1 canonical read model；18 個 section，依資料結構排列）
         │  build_analyst_view（純函式；只組裝／排序／label）
         ▼
-AnalystView ── headline   （Q4 現價 → future target value → 隱含報酬｜refresh／review state）
+AnalystView ── headline   （現在多少錢：只有現價｜refresh／review state；2026-09-23 起無目標價、無隱含報酬）
             ├─ fundamental（Q1 內部 revenue／EPS｜Q2 同期共識｜Q3 數值 gap｜口徑與會計期間）
             ├─ why        （Q5 生效假設＋basis｜脆弱輸入｜既有敏感度｜算式｜證據）
             ├─ research   （Q6 Q1–Q5／thesis／催化劑／disproof／missing・stale・review_required）
@@ -647,8 +435,8 @@ AnalystView ── headline   （Q4 現價 → future target value → 隱含報
 `readiness` ∈ `ready`／`ready_with_flags`／`blocked`，**只看核心四段**，判準逐字寫在 `readiness.rule`。
 **optional panel 不參與**——`tests/test_analyst_view.py` 逐欄比對「有判準 vs 沒判準」兩份投影的 readiness。
 
-**頭條那一句話不是 consumer 造的。** `implied_return.epistemics.one_sentence` 由
-`alpha://implied_return/model` 自己組出，consumer 只是把它挪到最前面並註明出處——造句就是在 read model
+**頭條那一句話不是 consumer 造的。** （2026-09-23 前）`implied_return.epistemics.one_sentence` 由
+`alpha://implied_return/model` 自己組出，consumer 只是把它挪到最前面並註明出處；估值鏈退役後頭條只剩現價，判準不變——造句就是在 read model
 之外生出第二種說法。
 
 **PIT／materialize：** `--as-of` 直接透傳到 `fetch_alpha_investment_view`；投影本身是純函式，
@@ -698,7 +486,7 @@ alpha/absence.py         封閉字彙 ABSENCE_KINDS（11 種）＋ DEFAULT_ABSEN
 （~~v1 只有 `valuation.forward_earnings_multiple.target_pe`~~ **2026-09-17：這份清單已經腐壞過一次**——`research/axis.catalyst` 2026-09-11 加入時沒同步到這裡。清單的 SSOT 是 `ABSTENTION_SUBJECTS`，查證：`python -c "from alpha.abstention.contracts import ABSTENTION_SUBJECTS;print(dict(ABSTENTION_SUBJECTS))"`；**加一層的代價是要多一段消費端語意**，所以每層只開資料支持的那幾個 subject），否則它會變成「任何一格都可以宣布自己是刻意留白」
 的萬用擋箭牌。入口 `python -m alpha abstention <T> --list／--add spec.json／--retract <id>`。
 
-**它不是第二份 ValuationAssumption authority。** 後者擁有「目標倍數是幾」，前者只擁有「我們不主張」；
+**它不是第二份 ValuationAssumption authority**（估值假設 ledger 已於 2026-09-23 隨估值鏈退役，資料留）。後者曾擁有「目標倍數是幾」，前者只擁有「我們不主張」；
 宣告之後 `fair_value` 仍然是 `None`、readiness 仍然 `blocked`，改變的只有那句「為什麼」。
 
 **accounting basis 的呈現別名（`ACCOUNTING_BASIS_DISPLAY`）** 解的是同一天記下的另一筆語意債：
@@ -758,14 +546,11 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
-目前有 `ranking`／`beta`／`coverage`／`watches`）。`python -m webapp materialize --ranking` 走與 `python -m query.bottleneck` **同一條路**
-（同一個 driver、`fetch_assertions`、registry），把 `rank_bottlenecks()` 的兩份排序**照抄**成 artifact——
-不重排、不加權、不自建第二套結構評分；**每列每格與 CLI 輸出逐格相等**是驗收條件（`tests/test_webapp_ranking.py`）。
-已知限制、兩份排序的說明、落差判準（可行動名次比純結構低 ≥ 2）與空產業組都從 `query.bottleneck` 的常數／函式取，
-markdown 與 artifact 同源（L16）。`freshness_identity` 只含順序與每列的結構／證據欄位——`documents` 多一份
-不算認知變了（L12）。`GET /api/v1/ranking` 與單檔同一套紀律：讀不到 503 ＋ remedy；排不出任何一列是
-200 ＋ `top_pick=null` ＋ 理由，兩者不同形；四種 request-path 證明已涵蓋這條路由。
-**APP 顯示排序但不重算排序**：唯一排序權威仍是 `rank_bottlenecks()`。
+2026-09-23 起是 `structure_table`／`beta`／`coverage`／`watches`／`positions`／`structure_readings`／`account_scorecard`；
+`ranking`／`basket`／`multi_year` 已於 Phase 0 退役，查證 `python -m webapp status`）。`python -m webapp materialize --structure-table`
+走與 `python -m query.bottleneck` **同一條路**（同一個 driver、`fetch_assertions`、registry），把 `structure_table()` 的逐邊事實
+**照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。
+（2026-09-08 至 09-23 之間這裡是 `ranking` kind：兩份排序＋`top_pick`；隨 G1 退役，見 plan §0.6 #40。）
 
 **`beta` kind（2026-09-08 B2）：** `python -m webapp materialize --beta` 以 `--no-refresh --no-record-risk` 純讀呼叫
 `scripts/daily_beta_snapshot.run()`（同一個 `portfolio.allocation.build_beta_monitor`），**不重抓行情、不 append 風險快照**；
@@ -814,65 +599,23 @@ renderer 都還在那個 details 裡。
 不畫任何均線或動能指標（`tests/test_webapp_api.py` 掃這段程式碼）；`freshness_identity` 不含它——
 價格動了不算認知變了。抓失敗只是沒有折線，不讓整份 artifact 失敗。
 **UI 只改資訊階層，不產生任何新的 summary judgment**：頭條那句話取自
-`implied_return.epistemics.one_sentence`（authority 自組）並註明出處；
+（2026-09-23 前）`implied_return.epistemics.one_sentence`（authority 自組）並註明出處——估值鏈退役後頭條只剩現價；
 缺席語意的中文說明來自 `/api/v1/meta` 的字彙表，前端不維護第二份對照表。
 
 **技術棧沿用既有的**：`starlette` ＋ `uvicorn` 已隨 `mcp>=1.28` 安裝，**本次沒有新增任何套件**，
 也沒有前端建置工具鏈。部署重用既有 Cloudflare Tunnel（見 `deploy/cloudflare/README.md`）。
 
-**刻意不做：** runtime chatbot／LLM、broker、買賣、部位尺寸、Portfolio 排序、跨標的排序的**重算**（`/ranking` 只照抄 `rank_bottlenecks()`）、
+**刻意不做：** runtime chatbot／LLM、broker、買賣、部位尺寸、Portfolio 排序、跨標的排序（2026-09-23 起 `/structure-table` 只照抄 `structure_table()`，不排序）、
 任何寫入端點、原生 App。
 
 ---
 
-### 6.10 賭注：variant scenario → payoff（`scenario` overlay，2026-09-15 V0）
+### 6.10 賭注：variant scenario → payoff——四價已退役（2026-09-23，Phase 0 Step 0b.1b-E）
 
-**角色一句話：base 回答「市場把 base case 定價成怎樣」，賭注回答「如果我們的差異看法對了，值多少」。**
-兩者並排，差額就是這個賭注本身的價值。
-
-```
-OperatingAssumption／ValuationAssumption ledger（同一本 JSONL，多一個 scenario 欄位：base／variant）
-        │  select_scenario_assumptions：base 的生效假設 ← 同 key 的 variant 生效假設覆蓋（overlay）
-        ▼
-build_fundamental_model(scenario=variant) → build_valuation(scenario=variant) → build_implied_return
-        │  **同一條橋、同一套估值與報酬算術**——差別只在餵進去的假設集合
-        ▼
-PayoffScenarioSection（read model 第 13d 節）→ AnalystView.bet（optional panel）→ APP 結論卡「如果我們的賭注對了」
-```
-
-**四條規則（型別層強制，不是自律）：**
-1. **variant 只能是核心 driver**（`revenue_growth`／`operating_margin_delta`）且 `derivation=independent`：
-   由共識反解或抄公司指引的值結構上不可能與市場不同，寫成 variant 就是把佔位冒充成賭注。
-2. **至少一條 supporting 證據**（calibration 不算）。「如果對了」必須指得出什麼在支撐「對」。
-3. **overlay 不是取代**：base 與 variant 各自獨立選取（各自 as-of／supersede／證據解析），寫入端擋跨 scenario
-   的 supersede。既有紀錄沒有 `scenario` 欄位 → 讀成 base；`scenario` 只在非 base 時參與 content-addressed id，
-   所以**既有 ledger 的每一個 id 一個位元都不變**。
-4. **它是條件句，不是機率加權**：沒有 bull／bear、沒有機率；`PAYOFF_IS_NOT` 逐字寫在 section 裡。
-   沒寫賭注是 optional 缺席（`not_yet_recorded`），readiness 不變差，也不得補一個 bull case。
-   ⚠ 2026-09-16 D2：多一個**對稱** overlay——「判斷錯了值多少」＝反證觸發後的假設套同一條橋（同一套算術、
-   同樣的型別層證據要求），與 variant 並排；它**仍不是 bear case、仍沒有機率**。
-   **2026-09-18 已交付**：`ASSUMPTION_SCENARIOS` 加第三個值 `downside`，`OVERLAY_SCENARIOS`
-   ＝`(variant, downside)`，上面四條規則**逐條套用到兩者**（型別層的三條由
-   `OperatingAssumption`／`ValuationAssumption` 共同強制）。
-   落地點：`_payoff_section(copy=...)` 一個函式兩個實例、`_overlay_panel()` 一組 lines 兩個 panel、
-   read model 的 `downside` 由 `NotModeledSection` 換成 `PayoffScenarioSection`、
-   APP 結論卡與尺各多一端。⚠ **`PayoffScenarioSection` 的欄位名因此改成中性的
-   `scenario_internal_eps`／`scenario_fair_value`**——欄位名是結構、`Datum.key` 才是身分，
-   兩者脫鉤，所以 analyst view 的 line key（`variant_fair_value` 等）與 APP 一個字都沒動。
-   ⚠ **刻意不強制 downside 假設指名某一條 disproof**：反證住在 `AlphaSignal.disproof_conditions`
-   （A3，可重算、沒有穩定 id），從 append-only 的假設 ledger 指過去會造出一個會斷的跨 authority
-   引用。要求「指得出什麼在支撐這個值」的閘門由 `supporting_refs` 承擔——它是同一件事的可機械驗證版本。
-
-**為什麼不做成第二本 ledger：** 賭注就是「同一條假設的另一個值」，它的身分（driver／scope／period）與 base 完全相同，
-差的只有值與證據；分成兩本會讓 as-of／supersede／證據解析長出兩份規則（L16）。Abstention 分開是因為它**結構上不能帶值**；
-variant 恰好相反，它就是一個值。
-
-**入口：** `python -m alpha assumptions <T> --add spec.json`（spec 帶 `"scenario": "variant"`；估值假設同）；
-`--list` 以 `〔variant〕` 標記。read model／analyst view／APP 自動長出賭注段，不需要另跑任何東西。
-
-~~**刻意不做（留給 V1–V4，見 ROADMAP）：** 催化劑連到 variant 假設、gap-closure 時序、`realized` 出口、
-籃子頁與 filter 式首選、variant 收斂納入 outcome。~~
-（V1–V3 已於 2026-09-15 交付，見 §6.13；V4「variant 收斂納入 outcome」併入 ROADMAP Phase 5 的量測項，2026-09-16。）
+「如果對了值多少／判斷錯了值多少」的算術（variant／downside overlay 各跑一次估值鏈得四個價格）與首屏那把尺整組退役；
+`bet/variant.overlay`、`bet/downside.overlay` 的 Abstention 字彙與 ledger 資料留（L10），`bet` 面板改純文字讀 `our_bet`。
+反證那一端沒有退役——它住 `research` 面板的 disproofs，Phase 1 接 watch registry。原節逐字封存於
+[`archive/2026-09-23-phase0-retired-sections.md`](archive/2026-09-23-phase0-retired-sections.md)。
 
 ### 6.11 投資人短評（`alpha/narrative/`，2026-09-15）
 
@@ -909,7 +652,7 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
 ```
 graph provider.get_narrative_context(company_id, node_ids)   ← 節點 name ＋ Claim.statement／SourceDoc（origin、published_at）
         ▼
-builder._argument_section：只選取既有 Datum（bridge steps／comparisons／reverse／payoff／risks／disproofs／checkpoints）
+builder._argument_section：只選取既有 Datum（chain／risks／disproofs／checkpoints；bridge／comparisons／reverse／payoff 四類已於 2026-09-23 退役）
         │  → alpha.narrative.argument.*_paragraph（格式化與選詞，零算術）
         ▼
 ArgumentSection（6 個 Datum：value＝段落；dependencies.long_form／citations）→ AnalystView.argument（optional）
@@ -921,21 +664,18 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 ②只有公司自己說的連結合成一句並點名為「整條鏈最薄的地方」，有印證的逐條講；③缺料就一句話說缺什麼，不硬寫、不補。
 **還沒做：** 清單頁同構（R4）；`EvidenceRef.quote` 仍空——論證層直接查 Claim，不經 evidence index（R3 留待）。
 
-### 6.13 賭注 V1–V3：熟成度、市場承認、籃子（2026-09-15）
+### 6.13 賭注 V1–V2：熟成度、市場承認（2026-09-15；籃子與目標價比較已於 Phase 0 退役）
+
 
 | 件 | 住哪 | 一句話 |
 |---|---|---|
 | 熟成度（V1） | `Catalyst.resolves` → builder 的 `catalyst_quantitative_link` | 催化劑指名它裁決哪幾條假設；state＝只看事件日期與 ledger created_at（resolved／due／pending／unlinked），不解析散文 |
-| 市場承認了嗎（V2） | `alpha/gap_closure.py` → `expectation_gap.gap_closure`／`consensus_series` | 共識自判斷日以來朝我們移了幾成；起點等於我們的值時 None 不是 0；量測不是訊號 |
-| 目標價比較（V2） | `implied_return.target_reached` | 現價 ≥ 目標價＝「高於」，同時涵蓋市場比我們樂觀與該收割；只表示該重看，不是賣出 |
+| 市場承認了嗎（V2） | `alpha/gap_closure.py` → `expectation_gap.gap_closure`／`consensus_series` | 共識自判斷日以來朝我們移了幾成；起點等於我們的值時 None 不是 0；量測不是訊號。⚠ 2026-09-23：「朝我們移了幾成」的分母（內部 EPS）已退役，`closed_fraction` 恆 `None`（不是 0）；只量共識自判斷日以來的移動 |
+| ~~目標價比較（V2）~~ | ~~`implied_return.target_reached`~~ | 2026-09-23 隨估值鏈退役（C 組） |
 | 兌現出口（V2b） | `thesis/pending_lifecycle.py::ALLOWED_TRANSITIONS`＋`lifecycle_schedule.is_due` | `realized`：active／watch → realized → retired／revised；恆視為到期。進入由人提案（thesis mutation gate），`target_reached` 只提醒 |
-| 籃子（V3） | `webapp/basket.py` → state kind `basket` → `#/basket` | ranking 去重順序 × overview × positions 的 join；首選＝filter（有賭注、payoff 為正、裁決點在目標價日期前），INV-3 逐檔報理由 |
+| ~~籃子（V3）~~ | ~~`webapp/basket.py`~~ | 2026-09-22／23 Phase 0 退役（G1）；Phase 3 以候選狀態板回來 |
 
-⚠ **首選是 filter 不是分數。** 排序權威仍是 `rank_bottlenecks()`；籃子只在那個順序上套三條可機械驗證的條件。沒有一檔通過就 `top_pick=null`＋理由計數——今天正是如此。
 ⚠ 2026-09-16 D3：`realized` **降為提醒，不觸發出場**——出場只認反證；lifecycle 字彙不動，改的是它的後果（ROADMAP Phase 5）。
-⚠ 2026-09-16 D11：首選的三條條件排定換成漏斗條件（覆蓋家數上限、市值上限、瓶頸業務占營收下限、至少一條外部印證的瓶頸邊、
-入圖前 30 天漲幅上限、12 個月內指名假設的催化劑；ROADMAP Phase 4）；落地前沿用三條。籃子空就空，不得放寬。
-⚠ **`basket` 必須在 ranking／positions／單檔之後 materialize**（它只讀那三份 artifact，不連 DB）；daily 收尾命令已加 `--basket` 在最後。
 
 ### 6.14 結構讀圖（`query/structure.py`＋`alpha/structure_reading/`，2026-09-17 Q4／Q5）
 
@@ -945,7 +685,7 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 | 層 | 誰做 | 可不可以決定去留 |
 |---|---|---|
 | 圖（事實與 provenance） | 確定性 loader ＋ 人工 gate | — |
-| 排序（`rank_bottlenecks`） | 確定性，零 LLM | 可以（現行門檻），**不動** |
+| 結構表（`structure_table`；跨檔排序已於 2026-09-23 退役） | 確定性，零 LLM | 不排序、不設門檻、不給首選 |
 | **結構讀圖** | `query.structure` 查（零 LLM）＋ 互動 session 讀 | **不可以**——只寫下讀到什麼，不濾、不排、不給尺寸 |
 | 賭注／Abstention | 人（或 LLM 起草、人確認） | 不可以 |
 
@@ -982,16 +722,16 @@ thesis 要不要改由人決定（thesis mutation 是四個人工 gate 之一）
 ⚠ **A/B 判準表刻意還沒機械化**：先讓它以文字形式產出幾十份、看它講得準不準，再談要不要寫成程式
 （INV-5：未量測的機制不得享有默認信任）。所以 `kind` 是**寫的人宣告的**，型別層只驗字彙。
 
-## 7. Engine D（Decision Lab）runtime
+## 7. Engine D（Decision Lab）——frozen 2026-09-22（G12）
 
-- Decision facts 存於 ignored `library/private/decision_lab/`；第一筆真實事件後只允許
-  backup／restore 與 append-only correction，**不做破壞性 reset**。
-- U7 之前的 `paper_events`／`live_supported_range`／`axis_ceiling` 欄位仍在歷史紀錄中
-  可讀，但**不再增長也不回寫**。
-- 資本表達層已於 2026-08-28 整組移除（`live_supported_range`／`axis_ceiling`／
-  `paper_target`／probe cap／四動作）；注意力狀態只剩 `MONITOR`／`REVIEW`。
-  真正的風控（5% 單筆、ETF 槓桿 cap、七天時效）全部保留——拿掉的是憑空的建議尺寸，
-  不是煞車。
+- 研究側（signal intake → context 凍結 → coverage → decision → action card → live choice／fill）於 2026-09-23（Phase 0 Step 0b.4） 整組退役。
+  留下：`decision_lab/store.py`（寫入方法無呼叫端；`record_live_choice`／`record_live_fill` 直接拒絕）、`coverage_queries.py`
+  （`mode=ro` 純讀，個股頁 research 面板與 `scripts/catalyst_watch.py` 讀凍結歷史）、`cli.py`（`status`／`history` 唯讀）、
+  `bootstrap.py`／`models.py`／`schema.sql`／`adapters/holdings.py`（備份還原與 store 的相依）。
+- Decision facts 存於 ignored `library/private/decision_lab/`；只允許 backup／restore，**不再寫入、不做破壞性 reset**。
+  歷史唯一一筆 live choice（2026-08-18 COHR 10 股）留作稽核。查證：`python -m decision_lab status`（sha256 對 Phase 0 基準）。
+- A5 的現行落點：成交事件內嵌收據住 `library/trades/trade_log.jsonl`（`scripts/record_trade.py`）；資本硬擋住 `risk/hard_caps.py`（§8.2）。
+  U7（2026-08-28）拆掉的是憑空的建議尺寸，不是煞車；Phase 0 把煞車搬到真的有人走的路上。
 
 ---
 
@@ -1019,7 +759,7 @@ thesis 要不要改由人決定（thesis mutation 是四個人工 gate 之一）
 
 `portfolio/alpha_exposure.py` 是 alpha 那一側的接點（Phase 7）：把 `AlphaSignal[]` join
 到持股，回答「**這些候選我現在持有多少**」。它輸出的每個數字都是已經發生的事實，
-**不是建議**；候選順序原樣沿用傳入順序（排序權威在 `rank_bottlenecks`，不在這一層）。
+**不是建議**；候選順序原樣沿用傳入順序（本層不排序；跨檔排序已於 2026-09-23 退役）。
 ⚠ 它刻意以 duck typing 接受 signal，**不 import `alpha/`**——保持
 `portfolio/ → alpha/` 沒有相依。
 ⚠ 持股讀不到時**整份降級並帶出 `blockers`，不逐檔輸出 0.0%**：那會讓使用者看到
@@ -1086,10 +826,10 @@ TDnet 五種寫法，用 regex 驗會攔掉合法的法國 URD 引用（L15 記�
 
 | 判準（住 AGENTS） | 落點／現況／查證 |
 |---|---|
-| 常規授權類別是封閉字彙 | SSOT `config/standing_authorization.json`；唯一 loader `engine_b/standing_authorization.py`（載入時驗封閉性）；consumer `engine_b.todo standing-go`（Daily 每天跑）。現行類別：`decision_review` 的 bounded gap research、`source_trace_review` 的派回 pq1（付費取得除外） |
+| 常規授權類別是封閉字彙 | SSOT `config/standing_authorization.json`；唯一 loader `engine_b/standing_authorization.py`（載入時驗封閉性）；consumer `engine_b.todo standing-go`（Daily 每天跑）。現行類別：只剩 `source_trace_review` 的派回 pq1（付費取得除外）；`decision_review` 自 2026-09-22 列 `never`（機制退役） |
 | pq2 編號空間唯一 | 狀態存 `library/leads/todo_pool.json`（Git ignored、納入 private backup）；鑄 `manual` 型編號用 `todo add` |
 | 「等你決定」與「等事件」分離 | `config/decision_blockers.json` 的 `resolution_mode`（`user_decision`／`awaiting_external`／`system_internal`）；使用者可用 `pending --until/--trigger` 指定等待條件，優先於自動推導。G7 之後所有等待住 Event Watch registry（`library/leads/event_watches.json`）；「語意條件」kind 待 ROADMAP 交付 |
-| 建議區間已移除、煞車仍在 | `live_supported_range` 已隨 U7 移除；`store.record_live_choice` 對每一筆非零 live 選擇仍擋三碼，外加凍結快照七天時效與「部位量不到就 fail closed」 |
+| 建議區間已移除、煞車仍在 | `live_supported_range` 已隨 U7 移除；煞車自 2026-09-23 住成交路徑：`scripts/record_trade.py` 每一筆買進在寫 Sheet／trade_log 前過 `risk/hard_caps.py`（5% 單筆 NAV 上限只管 alpha；ETF 槓桿 nominal／effective cap；NAV／匯率量不到就 fail closed；dry-run 也擋；`--override --reason` 放行並把理由與 verdict 寫進事件紀錄）。舊店 `record_live_choice` 已凍結拒絕。查證：`python -m pytest -q tests/test_hard_caps.py tests/test_record_trade.py` |
 | alpha 格只觀測不設目標 | 查證：`python -c "import json;print(json.load(open('config/target_allocation.json'))['sleeves']['alpha'])"` 應看到 `observed_only` |
 | 資本表達層已移除 | 查證：`python -c "import json;p=json.load(open('config/investment_policy.json'));print(sorted(p['probe_lane']), p['single_position_nav_cap'])"`——`probe_lane` 不該有 `axis_ceilings` 等尺寸 cap；`single_position_nav_cap` 應仍是 0.05 |
 | mechanical／judgment 兩處現行畫法 | Engine C 人工 ledger 按 `verifiability` 分（§8.1）；圖的 metadata 回填只放行既有 SourceDoc 的 `published_at`／`retrieved_at`——新的 claim／邊、`substitutability`／`sole_source`／`evidence_tier` 仍是 pq2 |

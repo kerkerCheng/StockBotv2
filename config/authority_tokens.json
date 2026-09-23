@@ -3,7 +3,7 @@
   "version": 1,
   "_history": "2026-07-31 之前這份字彙有三份寫死的副本（engine_c/observation_fields.py 的 KNOWN_AUTHORITIES、decision_lab/context.py 的 _GRAPH_AUTHORITIES/_ENGINE_C_AUTHORITIES、decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）。當時以為 decision_lab 不得反向依賴 Engine C 所以無法合併，但 decision_lab 本來就直接讀 config/（beta_policy、decision_blockers、holdings_coverage、signal_sources），分層限制擋的是 runtime authority 依賴而非共用 config。三份副本漂移的後果是靜默的：token 被白名單過濾掉→軸悄悄 fallback→Confidence 歸零而無任何錯誤訊息。",
   "_payload_whitelist": "payload 只能自報所屬 owner 群組內的 token。Engine A 的 evidence payload 不得自稱帶有 Engine C 的財務 authority，反之亦然；這道白名單防的是 over-claim。",
-  "_frozen_mapping_note": "軸→token 的對照 (decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES) 刻意維持寫死，因為它是評分骨架且已凍進所有既有 decision payload，熱改會削弱『舊 decision 永遠引用原 digest』的稽核契約。測試只斷言它用到的 token 都是本檔的子集。",
+  "_frozen_mapping_note": "⚠ 2026-09-23（Phase 0 Step 0b.4）：軸→token 的對照（原 decision_lab/sizing.py 的 AXIS_REFERENCE_AUTHORITIES）隨 Engine D 五軸退役；它已凍進舊 Decision Store 的歷史 payload，讀歷史時以那份 payload 為準。本檔現在只服務 Engine C 觀測欄位的 authorities 字彙（engine_c/observation_fields.py 的 KNOWN_AUTHORITIES）。",
   "tokens": [
     {
       "token": "graph_entity",
