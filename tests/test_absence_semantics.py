@@ -27,7 +27,6 @@ from alpha.abstention.contracts import (
 )
 from alpha.errors import ContractViolation
 from alpha.providers.abstentions import append_abstention_record, read_abstention_records
-from alpha.valuation.contracts import method_applicability
 from briefing.alpha_view.contracts import Datum, SectionMeta, ViewContractViolation, missing
 from briefing.analyst_view.contracts import (
     ACCOUNTING_BASIS_DISPLAY, AnalystBlocker, accounting_basis_display,
@@ -219,102 +218,14 @@ def test_display_projection_leaks_no_path(tmp_path) -> None:
 # 3. 模型層自己宣告分支（method not applicable 是既有能力，這裡確認它有 kind）
 # ---------------------------------------------------------------------------
 
-def test_method_applicability_is_still_a_separate_semantic_from_missing_data() -> None:
-    assert method_applicability("forward_earnings_multiple", None) is None      # 缺料走別條路
-    assert method_applicability("forward_earnings_multiple", 1.0) is None
-    reason = method_applicability("forward_earnings_multiple", -0.02)
-    assert reason and "方法不適用" in reason
-
-
-def test_valuation_declares_deliberate_abstention_instead_of_not_yet_recorded() -> None:
-    """端到端（純邏輯，不連 DB）：ledger 有 abstention → 缺席語意改變，**fair value 仍然缺席**。"""
-    from alpha.fundamental.contracts import AssumptionSelection
-    from alpha.valuation.contracts import CurrentPrice
-    from alpha.valuation.model import build_valuation
-
-    price = CurrentPrice(value=5970.0, bar_date=date(2026, 9, 7), unit="JPY",
-                         evidence_refs=("engine_c://financial_snapshot/X",))
-    common = dict(company_id="co:x", ticker="X", as_of=None, today=date(2026, 9, 7),
-                  fundamental=None, fundamental_reason=None, assumption_records=[],
-                  evidence_index={}, price=price)
-
-    plain = build_valuation(**common)
-    assert plain.fair_value is None
-    assert plain.effective_absence_kind == "upstream_unavailable"
-
-    declared = parse_abstention_record(_record())
-    with_abstention = build_valuation(**common, abstention_records=[declared])
-    # 上游本來就缺 → 缺席理由仍是上游，**不因為有 abstention 就改口**
-    assert with_abstention.effective_absence_kind == "upstream_unavailable"
-
-
-def test_abstention_changes_why_but_never_produces_a_number() -> None:
-    """內部 EPS 齊全、只差目標倍數時：有 abstention → `deliberate_abstention`；沒有 → `not_yet_recorded`。
-
-    **兩種情況的 `fair_value` 都是 None。** abstention 改變的只有那句「為什麼沒有」。
-    """
-    from alpha.valuation.model import build_valuation
-    from tests.test_fundamental_model import ACT_REF, INDEX, _run
-    from tests.test_valuation_model import PRICE
-
-    index = {**INDEX, ACT_REF.ref: ACT_REF}
-    model = _run(index=index)
-    common = dict(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 7),
-                  fundamental=model, fundamental_reason=None, assumption_records=[],
-                  evidence_index=index, price=PRICE)
-
-    plain = build_valuation(**common)
-    assert plain.fair_value is None
-    assert plain.effective_absence_kind == "not_yet_recorded"
-    assert "尚未寫入任何估值假設" in (plain.reason or "")
-
-    declared = parse_abstention_record(_record(
-        ticker="COHR", company_id="co:coherent", period_end=model.target_period.end))
-    abstained = build_valuation(**common, abstention_records=[declared])
-    assert abstained.fair_value is None                 # ← 沒有偷偷長出一個數字
-    assert abstained.effective_absence_kind == "deliberate_abstention"
-    assert "刻意不主張目標倍數" in abstained.reason
-    assert "什麼會改寫它" in abstained.reason           # revisit 條件必須跟著出現在使用者眼前
-    assert declared.abstention_id in abstained.reason   # 可稽核回那一筆紀錄
-
-
-def test_a_retracted_abstention_falls_back_to_not_yet_recorded() -> None:
-    """撤回之後語意必須回到「還沒寫」——否則撤回就是一個不會生效的動作（L13-2）。"""
-    from alpha.valuation.model import build_valuation
-    from tests.test_fundamental_model import ACT_REF, INDEX, _run
-    from tests.test_valuation_model import PRICE
-
-    index = {**INDEX, ACT_REF.ref: ACT_REF}
-    model = _run(index=index)
-    first = parse_abstention_record(_record(ticker="COHR", company_id="co:coherent",
-                                            period_end=model.target_period.end))
-    retraction = parse_abstention_record(_record(
-        ticker="COHR", company_id="co:coherent", period_end=model.target_period.end,
-        supersedes_id=first.abstention_id, retracted=True,
-        created_at=datetime(2026, 9, 8, tzinfo=timezone.utc)))
-    result = build_valuation(
-        company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 9),
-        fundamental=model, fundamental_reason=None, assumption_records=[],
-        evidence_index=index, price=PRICE, abstention_records=[first, retraction])
-    assert result.effective_absence_kind == "not_yet_recorded"
-
-
-def test_available_valuation_never_carries_an_absence_kind() -> None:
-    from alpha.valuation.contracts import CurrentPrice, FairValueGap, ValuationResult
-    from alpha.fundamental.contracts import AssumptionSelection
-
-    with pytest.raises(ContractViolation, match="有 fair value 就沒有缺席語意"):
-        ValuationResult(
-            company_id="co:x", ticker="X", as_of=None, method="forward_earnings_multiple",
-            status="available", reason=None, target_period=None, accounting_basis="gaap",
-            fundamental_input=None, assumptions=(),
-            selection=AssumptionSelection(input_count=0, accepted_count=0, reasons={}),
-            fair_value=10.0, currency="USD", formula="f", input_dependency="session_judgment",
-            steps=(), current_price=CurrentPrice(value=1.0, bar_date=date(2026, 9, 7), unit="USD",
-                                                 evidence_refs=()),
-            gap=FairValueGap(status="comparable", absolute_gap=9.0, relative_gap=9.0,
-                             implied_multiple_at_price=None, unit="USD", reason=None),
-            absence_kind="not_yet_recorded")
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：估值層的五條端到端測試退役——
+# `test_method_applicability_is_still_a_separate_semantic_from_missing_data`、
+# `test_valuation_declares_deliberate_abstention_instead_of_not_yet_recorded`、
+# `test_abstention_changes_why_but_never_produces_a_number`、`test_a_retracted_abstention_falls_back_to_not_yet_recorded`、
+# `test_available_valuation_never_carries_an_absence_kind`。它們守「模型層自己宣告走了哪個分支」，
+# 主詞是 `alpha.valuation.build_valuation`（整組退役）。**判準沒有退役**：
+# `test_a_settled_catalyst_axis_is_not_a_todo_but_readiness_stays_blocked` 在研究層的 catalyst 軸上守同一件事，
+# 而「刻意不主張 → deliberate_abstention」的消費端今天只剩那一個。
 
 
 # ---------------------------------------------------------------------------

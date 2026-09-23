@@ -549,67 +549,11 @@ def closure_gate(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> Gat
 # 品質計數器（P7-b，2026-09-10）——**衝檔數最容易犧牲的東西，要自己出現**
 # ---------------------------------------------------------------------------
 #
-# 68 檔的 blocker 完全同形，意味著最省事的做法是套同一份模板；而模板化的判斷在 readiness
-# 上看起來跟真的一模一樣（ready 就是 ready）。所以「品質沒被犧牲」不能靠自律，要有數字。
-#
-# 印的三個數直接對應 `AGENTS.md`「隱含報酬的兩個桿」：
-#   - **沒有 re-rating 證據時目標倍數預設等於校準倍數** → `multiple_contribution` 應該 ≈ 0
-#   - 折價或溢價必須指得出證據 → 非零的那幾檔要點名，讓人回頭看 rationale
-#   - 正負分布 → 這正是 ROADMAP 研究閉環 P0 的 goal：**「全部是負的，是方法偏空還是市場太貴」**
-#     只有在這張表上答得出來。倍數貢獻接近 0 而報酬仍為負 ＝ 市場太貴；
-#     負值大半來自倍數折價 ＝ 方法偏空。
-
-#: `multiple_contribution` 小於這個絕對值就視為「目標倍數＝校準倍數」（沒有主張折溢價）。
-#: **不在這裡定義**——唯一 SSOT 是 `alpha/implied_return/contracts.py`，卡片散文與本計數器
-#: 必須用同一個數（2026-09-11：先前是兩份，TSM +1.7% 同時被寫成「一致」與「有折溢價主張」）。
-from alpha.implied_return.contracts import MULTIPLE_NEUTRAL_TOLERANCE  # noqa: E402
-
-
-@dataclass(frozen=True, slots=True)
-class QualityScore:
-    """已到終局那幾檔的品質分布。**不打分、不排序**——只把數字放到看得見的地方。"""
-
-    positive: tuple[str, ...]
-    negative: tuple[str, ...]
-    multiple_neutral: tuple[str, ...]
-    multiple_priced: tuple[tuple[str, float], ...]
-    unreadable: tuple[str, ...]
-    #: 倍數桿比它自己的換算殘差還小——**既不是校準也不是主張，是讀不出來**。
-    #: 把它算進 `multiple_priced` 會送人去找一份不需要存在的證據（TSM +1.7% vs 殘差 2.11%）。
-    multiple_in_noise: tuple[tuple[str, float, float], ...] = ()
-    #: `derivation=calibrated_to_market` 但桿已經非零——**這不是主張，是校準價過期了**。
-    #:
-    #: 代數上校準型的桿恆等於 `calibration_price / current_price − 1`（同分母消掉），
-    #: 所以它就是價格漂移、符號相反。實測（2026-09-12，13 本校準 ledger）逐檔對齊到
-    #: 小數第二位：AEHR −0.93%／漂移 +0.94%、GFS −2.12%／+2.17%、HIMX −6.45%／+6.89%…
-    #:
-    #: ⚠ 它要的動作與 `multiple_priced` **完全不同**：主張要的是「指得出證據」，
-    #: 漂移要的是「重跑一次 valuation」。混在一欄時只能取兩者的下限，也就是
-    #: 送人去替十幾檔找一份依定義不存在的折溢價證據。
-    multiple_drifted: tuple[tuple[str, float], ...] = ()
-
-    @property
-    def scored(self) -> int:
-        return len(self.positive) + len(self.negative)
-
-
-def _find_attribution(payload: Any) -> Mapping[str, Any] | None:
-    """在 artifact 裡找兩欄拆解。刻意用結構搜尋而不是寫死路徑——它住在
-    `view.headline.lines[*].datum.value`，而那個索引會隨呈現層調整而變。"""
-    if isinstance(payload, Mapping):
-        if "eps_contribution" in payload and "multiple_contribution" in payload:
-            return payload
-        for value in payload.values():
-            found = _find_attribution(value)
-            if found is not None:
-                return found
-    elif isinstance(payload, (list, tuple)):
-        for item in payload:
-            found = _find_attribution(item)
-            if found is not None:
-                return found
-    return None
-
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：估值那一半（`QualityScore`／`_find_attribution`／
+# `score_quality`——隱含報酬正負分布、倍數校準 vs 折溢價主張、校準價漂移）整組退役；它們讀的
+# `overview.implied_return` 與兩桿拆解已隨估值鏈消失。**它們要防的事沒有退役**（模板化判斷在 readiness
+# 上看起來跟真的一模一樣），接手的是 Phase 5 的量測。留下的計數器全部讀 Engine C 觀測（A2）：
+# 股數對不上、基期 EPS 對不上帳、重複觀測、共識矛盾。
 
 #: 快照流通股數 vs 財報稀釋加權平均的容忍帶。**兩者本來就不同**（加權平均 vs 期末、
 #: 稀釋 vs 流通），差距應該在個位數百分比；差到 2 倍以上就不是口徑差異，是至少一邊錯了。
@@ -873,46 +817,6 @@ def render_consensus_contradictions(
         lines.append(f"共識的基期對不上我們的基期觀測（只看營收）：0 檔"
                      f"（容忍帶 {CONSENSUS_BASE_TOLERANCE:.0%}；幣別不同一律跳過）")
     return lines
-
-
-def score_quality(artifacts: Mapping[str, Mapping[str, Any]]) -> QualityScore:
-    """`{ticker: analyst view payload}` → 品質分布。讀不到就進 `unreadable`，**不當成 0**。"""
-    positive: list[str] = []
-    negative: list[str] = []
-    neutral: list[str] = []
-    priced: list[tuple[str, float]] = []
-    unreadable: list[str] = []
-    multiple_in_noise: list[tuple[str, float, float]] = []
-    drifted: list[tuple[str, float]] = []
-    for ticker in sorted(artifacts):
-        payload = artifacts[ticker]
-        simple = (((payload.get("overview") or {}).get("implied_return") or {}).get("simple") or {})
-        value = simple.get("value") if simple.get("status") == "available" else None
-        if not isinstance(value, (int, float)):
-            unreadable.append(ticker)
-            continue
-        (positive if value > 0 else negative).append(ticker)
-        attribution = _find_attribution(payload.get("view"))
-        contribution = (attribution or {}).get("multiple_contribution")
-        if not isinstance(contribution, (int, float)):
-            continue
-        # 換算殘差是這個桿的雜訊下限：桿小於它 ＝ 我們沒有主張任何東西，也沒有確認校準。
-        # 三分而不是二分——二分時它只能被歸進其中一邊，而兩邊都是錯的（L12）。
-        residual = (attribution or {}).get("fx_translation_delta")
-        if isinstance(residual, (int, float)) and abs(contribution) < abs(residual):
-            multiple_in_noise.append((ticker, float(contribution), float(residual)))
-        elif abs(contribution) <= MULTIPLE_NEUTRAL_TOLERANCE:
-            neutral.append(ticker)
-        elif (attribution or {}).get("multiple_derivation") == "calibrated_to_market":
-            # ledger 自己宣告這是校準倍數（零折溢價），而桿非零——那是**校準價過期**，
-            # 不是主張。判準讀 `derivation` 而不是數值門檻：門檻調不動這件事，
-            # 因為隔天開盤又會漂走（L16：分類有 SSOT 就不要在消費端重算一份）。
-            drifted.append((ticker, float(contribution)))
-        else:
-            priced.append((ticker, float(contribution)))
-    return QualityScore(tuple(positive), tuple(negative), tuple(neutral),
-                        tuple(priced), tuple(unreadable), tuple(multiple_in_noise),
-                        tuple(drifted))
 
 
 __all__ = [

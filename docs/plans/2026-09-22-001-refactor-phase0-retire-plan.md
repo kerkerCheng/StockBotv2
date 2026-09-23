@@ -38,6 +38,11 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 > daily（台北 06:30）同樣是明天。**今天沒有第二個 writer，所以未停排程也不衝突。**
 > ⚠ **時限 2026-09-23 06:30**：Phase 0 若跨到明天早上，續工的第一件事是先暫停排程再動手。
 > 查證與細節見 [基準報告 §0](../reports/2026-09-22-phase0-baseline.md)。
+>
+> **續工實測（2026-09-23 07:39，C／H 2/2 開工前）：** `StockBotv2-FxSync` 06:55、`StockBotv2-Heartbeat` 07:00 今早都已跑完
+> （LastResult 0），下次 **2026-09-24 早上**；Codex daily 06:30 沒留下任何 commit 或 tracked 變更（`git status` 乾淨，
+> `library/` 只有心跳／FX 的觀測輸出）。**今天仍沒有第二個 writer。** ⚠ 新時限 **2026-09-24 06:30**。
+> 查證：`Get-ScheduledTask | ? {$_.TaskName -match 'StockBot'} | Get-ScheduledTaskInfo`、`git log --since=2026-09-23`。
 
 **進度表的 commit 欄：** 一個 Step 的 commit 短碼在它自己的 commit 裡算不出來（填進去就會改變雜湊），
 所以**由下一個 Step 的 commit 補填**；`○ → ✅` 本身在該 Step 的 commit 裡完成。
@@ -51,11 +56,11 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0a.4 | 池子收集端停鑄 | ✅ | 20f21a4 |
 | 0b.1a | 個股頁消費層：why／entry 退役、argument 升核心、尺與四價下架 | ✅ | e38c7ee |
 | 0b.1b-D | D 組整組退役：多年反向橋＋要幾倍＋那把尺 | ✅ | 2fb7960 |
-| 0b.1b-C | C／H 組：估值鏈與隱含報酬 | ○ | |
+| 0b.1b-C | C／H 組：估值鏈與隱含報酬（兩段，見下） | ✅ | 3be1756＋2/2 |
 | 0b.1b-F | F 組整組退役：entry criterion（進場門檻） | ✅ | c1d0331 |
 | 0b.1b-E | E 組整組退役：賭注四價 overlay（含 downside、target_reached） | ✅ | bd34a63 |
 | 0b.1b-C/H（1/2） | 估值品質計數器（closure 三個數＋webapp 消費端） | ✅ | 3be1756 |
-| 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section（見 §0.9） | ○ | |
+| 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section、刪 `alpha/valuation`／`alpha/implied_return`／`alpha/fundamental` 模型半邊（§0.9；偏差 §0.6 #18–27） | ✅ | |
 | 0b.2 | 刪估值鏈 | ○ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
@@ -97,6 +102,16 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 8c | 0a.3 | 未提 `tests/test_skill_decision_contract.py`、`tests/test_daily_brief_skill.py` | 兩檔的斷言翻面（4 條） | 原本要求兩個研究 skill **必須**出現 Engine D 四支命令、daily-brief **必須**出現 `decision_lab today`。機制退役後那些斷言會逼人把退役的命令寫回去 |
 | 8d | 0a.3 | — | 第一版把 daily-brief 的 `--disproof`／`--expiry` 整段**誤刪**（開放式切片吃過頭），已 `git checkout` 還原後改用精確邊界重做 | 反證／催化劑／到期三件套是 L7 與 `AGENTS.md` 的判準、Phase 1 的主角，**不是 Engine D 的東西**。它只是承載欄位從 CLI 旗標換成 ledger 欄位 |
 | 8 | 0a.2 | 未提 `webapp/static/app.js` | **未動**，留給批 1／批 3 | nav 已移除兩個入口，但 `renderBasket`／`renderMultiYear` 與 router 分支仍在。手動打 `#/basket` 會拿到 API 錯誤而不是崩潰 |
+| 18 | 0b.1b-C/H 2/2 | §0.9「`alpha/fundamental` 的模型半邊只剩 `sources.py` 的 `build_fundamental_model`」 | 模型裡還藏著一條活路：**會計年度別共識**（`ConsensusSection.fiscal_items`）與它的**口徑核實**（`consensus_bases`）是在模型裡算的。搬成取數層直接讀 Engine C（`sources._engine_c_financials`），模型原本的 PIT 自我核對（基期 `recorded_at`／共識 `captured_at`＋`fetched_at` ≤ T）逐條搬過去；`compare.py` 留下 `verify_consensus_basis`／`reconcile_consensus_base`，刪 `compare_metric` | ROADMAP H 列明寫 Engine C `consensus_estimates` 資料**留**（三題「已定價」要用）；不搬就會跟橋一起消失，而 PIT 檢查一起消失是 INV-6 破口 |
+| 19 | 0b.1b-C/H 2/2 | §0.9「`gap_closure` 可分開（只需判斷日與共識時序）」 | 可分開，但「朝我們移了幾成」的**分母是內部 EPS**——沒有了。改成只量共識自判斷日以來的移動：`our_value=None`、`closed_fraction` 恆 `None`（不是 0），標籤與理由改寫；`target_reached`／`bet_recorded_on` 一併退役 | 分母消失就不得假裝有比例（Missing != Zero）；量測本身（共識移了多少）仍成立，Phase 3「已定價嗎」接手 |
+| 20 | 0b.1b-C/H 2/2 | plan 未提 `alpha/providers/valuation_drift.py`、`scripts/target_pe_drift_check.py` 與心跳「目標倍數背離 N 檔」那一行 | 隨 C 組退役（它讀估值假設 ledger 的 `target_pe` 對市場倍數）；心跳那一行換成 `not_yet_recorded` 缺席宣告「已定價嗎（財務三題）未落地」，**不整段消失**；FX 觀測兩行的主詞由「隱含報酬算不出來」改成「換算依據過期」 | 目標倍數是 C 組 regex；五段永遠出現、拿掉的內容換成缺席宣告（0a.2 同一做法，INV-3） |
+| 21 | 0b.1b-C/H 2/2 | plan 未提 refresh 的假設 artifact 是**由模型**登記的（`artifacts_from_model`） | 改成 `artifacts_from_assumptions`：builder 自己跑 `alpha.fundamental.assumptions.select_assumptions`（ledger 邏輯，留下的那一半），拒收原因決定終局——as-of 之後寫的 → missing、其他期間 → missing（基期那一年 → superseded）、被取代／撤回 → superseded、**證據解析不到 → invalidated**——四條判準一條不少；證據索引＝context ＋ 基期觀測／共識／指引／期中實績的 ref（取數層供應）。只登記 base 鏈（overlay 紀錄與退役前一樣不進 refresh）。不再登記 `modeled_metric`／`expectation_comparison`／`fundamental_model`；`artifacts_from_valuation`／`_implied_return` 刪 | 假設的 `review_conditions` 與 Event Watch 的 disproof 目標（`oa_*`）要有 artifact 可掛，否則「假設被推翻」無處現形（INV-3）。第一版漏接證據解析那一條，實測 TSM 的 invalidated 消失、LITE 冒出 30 條 overlay 的「等待中」——materialize 前後對照抓到的（L13） |
+| 22 | 0b.1b-C/H 2/2 | plan 未提 opinion stance（「我們有沒有形成自己的觀點」）與 APP 第一屏的 stance 計數器 | 整組退役：`OPINION_STANCES`／`opinion_stance()`／`PLAIN_STANCE`／`PLAIN_MULTIPLE_DERIVATION`／`PLAIN_DRIVER_LABELS`／`overview.opinion_stance`／app.js 的 stance 徽章與橫幅；第一屏計數器改成 `view_counters`（已有判讀／有賭注），**不消失** | stance 是 FY+1 模型對估值假設 `derivation` 的聚合（H 組）；常駐計數器不得消失（L14）。`OPINION_BEARING_DRIVERS` 留：它是 overlay 假設紀錄的型別驗證字彙（L10） |
+| 23 | 0b.1b-C/H 2/2 | `scenarios.py` 的 `fiscal_rollover` | 退役（定義是「重跑模型」）；其餘六個情境改吃共識清單／生效假設／基期結束日／目標期間，不再吃 `FundamentalModelResult` | 沒有模型可重跑；`--scenario` 的 choices 同步 |
+| 24 | 0b.1b-C/H 2/2 | 「`test_fundamental_model` 整檔退役」 | 45 條測試退役，但它的**資料夾具**（基期觀測／假設／共識）被 7 個存活測試檔引用 → 搬到 `tests/fixtures_fundamental.py`（不以 `test_` 開頭，pytest 不收集） | 存活測試守的是 refresh、口徑核實、共識 section、overlay ledger 閘門，需要同一組夾具；`_run()` 不搬（沒有東西可跑） |
+| 25 | 0b.1b-C/H 2/2 | `test_full_chain_acceptance`「批 2 重寫成新管線」 | 本步先做一半：16 條估值鏈測試退役、12 條改主詞（refresh 矩陣改成 axis／assumption key、PIT 改驗假設不漏、黑箱 CLI 改比現價與共識格）；整檔重寫仍留給 0b.2 | 這一步要全綠（含 Neo4j 在線的整合測試）；新管線要的讀圖 ledger／三題 absence 還沒有 |
+| 26 | 0b.1b-C/H 2/2 | 短評 placeholder | `base_target`／`base_return`／`value_date` 與帶參數的 `{assumption:…}` 四個 placeholder 的來源退役，值改 `None` → 印「（尚無）」並標 partial；`sell_side_target`（賣方目標價均值，A2）照填；**placeholder 字彙一個不刪** | append-only 短評紀錄引用它們（L10）；與 E 組處理 `{bet_*}` 同一條 |
+| 27 | 0b.1b-C/H 2/2 | 「argument 少掉的只能是估值來源的段」 | 「數字怎麼算出來」「和市場差在哪」兩段退役（E 組已拿掉「賭注」），六段變三段；句型 `numbers_paragraph`／`market_paragraph`／`bet_paragraph` 刪；`timeline_paragraph` 不再收 value_date／horizon_end／reached | ROADMAP 第 82 行的驗收條件；實測見本 Step 八欄（各檔段數前後對照） |
 
 ## 0.8 ✅ 已裁決（2026-09-23）：**A——`argument` 升核心、`why` 退役**（原 escalation 紀錄留存於下）
 
@@ -174,7 +189,7 @@ ROADMAP 驗收①與本 plan gate 8、R2 檢查 1 已同步。精確到（檔，
 | **why** | 保住原本的意圖（沒有殭屍**機制**），拿掉不可能達成的部分（沒有殭屍**字串**）。keep-list 逐檔寫理由，讓「為什麼留」可被質疑；季度重跑時看的是同一個數字 |
 | **impact** | 只動 `scripts/retired_mechanism_grep.py`（＋ROADMAP 那兩行驗收文字）。不動任何 authority、不放寬任何 gate。**執行者不自改**——批 2／3／4 的 grep 驗收會照實報告命中數與分類，結案 gate 8 等本 amendment 定案 |
 
-## 0.9 續工：C／H 2/2（樞紐）的精確落點
+## 0.9 ✅ 已完成（2026-09-23）：C／H 2/2（樞紐）的落點（實作偏差見 §0.6 #18–27；以下為開工前的地圖，留作紀錄）
 
 **這是 Phase 0 剩下最大的一塊，也是唯一還沒動的樞紐。** 前面四組（D／F／E／C-H 1/2）已把它的
 外圍消費端全部斷乾淨，所以現在的 importer 地圖只剩 8 個檔（實測，2026-09-23）：

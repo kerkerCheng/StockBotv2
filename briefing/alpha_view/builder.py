@@ -16,61 +16,49 @@
 downside／probability-weighted expected return／total return 今天 runtime 上**沒有任何程式路徑產生**。
 這些格仍然存在於 view 裡，好讓下一階段有明確的插座，但值一律 `None`、status 一律 `not_modeled`——
 **不得**拿 Q3 分數、分析師目標價、fair value gap、implied return 或 bull/base 散文冒充。
-internal fundamentals／earnings bridge／numeric gap（2026-09-05）、valuation（2026-09-06 Step 1）、
-base-case implied return（2026-09-06 Step 2）與 entry logic（2026-09-06 Step 3）**有能力了**：沒資料是
-`missing`，不再是 `not_modeled`——entry logic 沒有判準時的 `missing` 理由明寫「缺的是投資門檻判斷」。
+⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：估值鏈整條退役。** internal fundamentals／earnings bridge／
+numeric gap（FY+1 因果橋）、valuation（fair value）、implied return（隱含報酬）、price-implied proxy 六個
+section 與它們的模型一起拿掉；本檔不再 import `alpha.valuation`／`alpha.implied_return`／`alpha.fundamental` 的模型半邊。
+留下的財務數字只有 Engine C 的觀測與共識（A2），與 Phase 3 三題要用的會計年度別共識。
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace as _dc_replace
+from dataclasses import dataclass
 from datetime import date
 from typing import Any, Mapping, Sequence
 
 from alpha.causal import CausalPath, CompanyImpact, StructuralEvent
 from alpha.context import ContextBuild
 from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
-from alpha.fundamental.contracts import (
-    DOWNSIDE_SCENARIO, OPINION_BEARING_DRIVERS, VARIANT_SCENARIO,
-    FundamentalModelResult, OperatingAssumption,
-)
-from briefing.analyst_view.contracts import PLAIN_MULTIPLE_DERIVATION, PLAIN_STANCE
-from alpha.implied_return.attribution import attribution_payload
-from alpha.implied_return.contracts import HorizonAssumption, ImpliedReturnResult
+from alpha.fundamental.assumptions import select_assumptions
 from alpha.provider import SupplyExposure
 from alpha.wipeout import LANE_LABELS as WIPEOUT_LANE_LABELS, WIPEOUT_LANES, tally as wipeout_tally
 from alpha.refresh import (
     CONTEXT_DIGEST, CURRENT, INVALIDATED, MISSING, RECALCULATE, REVIEW_REQUIRED, STALE, SUPERSEDED,
-    THESIS_ARTIFACT_ID, AffectedArtifact, ChangeEvent, MetricObservation, artifacts_from_context,
-    artifacts_from_implied_return, artifacts_from_model, artifacts_from_signal,
-    artifacts_from_valuation, build_instant, resolve_refresh,
+    THESIS_ARTIFACT_ID, AffectedArtifact, ChangeEvent, MetricObservation, artifacts_from_assumptions,
+    artifacts_from_context, artifacts_from_signal, build_instant, resolve_refresh,
 )
-from alpha.valuation.contracts import ValuationAssumption, ValuationResult
 from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
-from alpha.gap_closure import bet_recorded_on, consensus_progress, target_reached
+from alpha.gap_closure import consensus_progress
 from alpha.narrative import ABSENT, SLOT_LABELS, fill_brief, format_value, select_brief
-from alpha.narrative.argument import (
-    bet_paragraph, chain_paragraph, closure_phrase, market_paragraph, numbers_paragraph, timeline_paragraph,
-)
-from briefing.analyst_view.contracts import PLAIN_DRIVER_LABELS, PLAIN_REFRESH_OVERALL
+from alpha.narrative.argument import chain_paragraph, closure_phrase, timeline_paragraph
+from briefing.analyst_view.contracts import PLAIN_REFRESH_OVERALL
 
 from .contracts import (
     CAP_ARGUMENT, ArgumentSection,
     CAP_INVESTOR_BRIEF, InvestorBriefSection,
-    BASIS_LABEL, CAP_ANALYTICAL_ENTRY_THRESHOLD, CAP_AUTOMATIC_INVALIDATION, CAP_BASE_CASE_IMPLIED_RETURN,
-    CAP_CATALYST_UNLINKED,
-    CAP_DEPENDENCY_IMPACT, CAP_DETERMINISTIC_FAIR_VALUE, CAP_FINANCIAL_CAUSAL,
-    CAP_NARRATIVE_SCENARIOS, CAP_NUMERIC_EXPECTATION_GAP, CAP_QUANTITATIVE_SCENARIOS,
-    CAP_STRUCTURAL_CAUSAL,
+    CAP_AUTOMATIC_INVALIDATION, CAP_CATALYST_UNLINKED,
+    CAP_DEPENDENCY_IMPACT, CAP_NARRATIVE_SCENARIOS, CAP_QUANTITATIVE_SCENARIOS, CAP_STRUCTURAL_CAUSAL,
     CAP_STRUCTURED_DISPROOF, SCHEMA_VERSION, STATUS_LABEL, AlphaInvestmentView, CatalystItem,
     CatalystSection, CausalPathSection, ChangeItem, CheckpointItem, ConsensusSection, Datum,
-    DisproofItem, EarningsBridgeSection, EventItem, EvidenceItem, EvidenceSection,
+    DisproofItem, EventItem, EvidenceItem, EvidenceSection,
     EvidenceSelectionCounts, ExpectationGapSection, ExposureItem, FalsificationSection,
-    FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem, ImpliedReturnSection,
-    InternalFundamentalsSection, LifecycleFacts, MarketSection, PathItem,
-    PriceImpliedSection, RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
-    SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, ValuationSection, VariantViewSection,
+    FreshnessItem, FundamentalsSection, IdentitySection, ImpactItem,
+    LifecycleFacts, MarketSection, PathItem,
+    RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
+    SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, VariantViewSection,
     CAP_WIPEOUT_FLAGS, WipeoutFlagsSection,
     missing, not_modeled,
 )
@@ -83,7 +71,6 @@ A_GRAPH = "engine_a://graph_research_provider"
 A_Q1 = "alpha://context/structural_score"
 A_SESSION = "alpha://session_assessor"
 A_EVQ = "alpha://evidence_quality"
-A_IMPLIED = "alpha://context/implied_valuation"
 A_SNAP = "engine_c://financial_snapshots"
 A_LEDGER = "engine_c://manual_observations"
 A_CHECKLIST = "engine_c://checklist"
@@ -95,7 +82,6 @@ A_LIFECYCLE = "decision_lab://probe_lifecycle"
 A_THESIS_FILE = "thesis://lifecycle.json"
 A_CATALYST_STATE = "shared://catalyst_state.assess_entry"
 # Causal Fundamental Model（Phase 2，2026-09-05）：假設、橋、比較各自是 authority，read model 只選取。
-A_ASSUMPTIONS = "alpha://fundamental/assumptions"
 A_REFRESH = "alpha://refresh/resolver"
 
 #: refresh state → Datum status。`current`／`recalculate` 在 read model 裡都是「有、可用」（確定性成果每次
@@ -119,8 +105,6 @@ def _refresh_deps(artifact: AffectedArtifact | None) -> dict[str, Any]:
             "refresh_changed_refs": list(artifact.changed_refs),
             "refresh_required_action": artifact.required_action,
             "refresh_propagated_from": list(artifact.propagated_from)}
-A_BRIDGE = "alpha://fundamental/bridge"
-A_COMPARE = "alpha://fundamental/compare"
 A_CONSENSUS_FY = "engine_c://consensus_estimates"
 
 #: 本圖標的高度集中的固定提醒（`AGENTS.md` Alpha 呈現契約：每次都講，不因一樣而省略）。
@@ -135,383 +119,57 @@ CORRELATION_WARNING = (
     "⚠ 這是對**這份圖的組成**的提醒，不是對本檔所屬產業的斷言。"
 )
 JUDGMENT_WARNING = "本 view 內的排序與分數是研究判斷，不是回測或統計勝率；系統不給部位尺寸。"
-NEXT_PHASE_NOTE = (
-    "Causal Fundamental Model（alpha/fundamental，2026-09-05 落地）：Graph Evidence → Explicit "
-    "Operating Assumptions（private ledger，session 明示）→ deterministic Revenue／Margin Bridge → "
-    "Internal Fundamental View → Same-period Consensus（Engine C consensus_estimates）→ Numeric "
-    "Expectation Gap。沒有假設或沒有基期觀測的公司是 missing（有能力、沒資料）；"
-    "估值（Step 1，2026-09-06）已落地於 valuation section（internal EPS × explicit target multiple）；"
-    "base-case 隱含報酬（Step 2，2026-09-06）已落地於 implied_return section（現價＋fair value 時點語意＋明示 horizon）；"
-    "⚠ 進場邏輯（entry_logic section）已於 2026-09-23 Phase 0 退役——進場靠判斷，出場靠 disproof。（舊說明："
-    "不是 buy／sell）；機率加權期望報酬／總報酬／下檔仍 not_modeled。"
-)
-FUNDAMENTAL_EPISTEMIC_WARNING = (
-    "每個內部數字的 calculation 是 deterministic，但輸入假設是 session 判斷／heuristic——"
-    "看各格 dependencies.input_dependency；不得把公式算出來的數讀成事實。"
-)
-
-_INTERNAL_METRIC_LABELS: tuple[tuple[str, str, str], ...] = (
-    ("revenue", "內部營收估計", "currency"),
-    ("operating_margin", "內部營益率估計", "ratio"),
-    ("operating_income", "內部營業利益估計", "currency"),
-    ("net_income", "內部歸屬母公司淨利估計", "currency"),
-    ("eps", "內部稀釋 EPS 估計", "currency_per_share"),
-)
-_COMPARISON_LABELS: Mapping[str, str] = {
-    "revenue": "內部營收 vs 共識營收（同期）",
-    "eps": "內部 EPS vs 共識 EPS（同期同口徑）",
-    "operating_margin": "內部營益率 vs 共識營益率",
-}
-#: ⚠ 這張表必須涵蓋 `alpha.fundamental.contracts.COMPARISON_STATUSES` 的每一個值——它是直接
-#: 索引（不是 `.get`），漏一個就是整個 fundamental section 在那檔標的上爆掉。
-#: `tests/test_coverage_pilot_generalization.py` 斷言兩者一致（L16：字彙有 SSOT 就不要在下游自己記）。
-_COMPARISON_STATUS_TO_DATUM: Mapping[str, str] = {
-    "comparable": "available", "internal_missing": "missing", "consensus_missing": "missing",
-    "incompatible_period": "not_applicable", "incompatible_basis": "not_applicable",
-    "incompatible_unit": "not_applicable", "unreconciled_base": "not_applicable",
-}
 _CONSENSUS_METRIC_LABEL: Mapping[str, str] = {"eps": "EPS", "revenue": "營收"}
 
 
-def _multiple_derivation_datum(valuation: ValuationResult | None, *, reference_day: date) -> Datum:
-    """目標倍數的來源 → 一格 Datum。**由估值層宣告**，呈現層不 parse rationale 去猜（L16）。"""
-    if valuation is None:
-        return missing("multiple_derivation", "目標倍數是怎麼決定的",
-                       "沒有 valuation", authority=A_COMPARE)
-    kind = valuation.multiple_derivation
-    return Datum(
-        key="multiple_derivation", label="目標倍數是怎麼決定的", value=kind,
-        status="available", basis="deterministic", authority=A_COMPARE, as_of=reference_day,
-        method="由 ValuationAssumption.derivation 聚合；任一條 independent 即 independent，"
-               "未宣告永遠不算 independent",
-        reason=PLAIN_MULTIPLE_DERIVATION.get(kind, {}).get("reason", kind),
-        dependencies={"method": valuation.method,
-                      "by_assumption": {a.assumption_id: a.derivation
-                                        for a in valuation.assumptions if not a.retracted}},
-    )
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：FY+1 因果橋整組退役。**
+# 原本這裡是 NEXT_PHASE_NOTE／FUNDAMENTAL_EPISTEMIC_WARNING／_INTERNAL_METRIC_LABELS／
+# _COMPARISON_LABELS／_COMPARISON_STATUS_TO_DATUM／_multiple_derivation_datum／_FundamentalParts／
+# _fundamental_parts（約 350 行）：把 `FundamentalModelResult` 選取成 internal_fundamentals／
+# earnings_bridge／numeric_comparisons／opinion_stance 四組 Datum。模型（`alpha/fundamental/{model,bridge}.py`）
+# 已刪；假設 ledger 的資料留著（L10）但沒有任何東西再拿它算數字。
+# **留下的只有會計年度別共識**（Engine C `consensus_estimates`，A2）——ROADMAP：三題「已定價」要用。
 
 
+def _fiscal_consensus_items(consensus: Sequence[Any], bases: Mapping[str, str] | None, *,
+                            reporting_unit: str) -> tuple[Datum, ...]:
+    """會計年度別共識 → 逐筆 Datum。**純選取，一個數都不算。**
 
-# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`_reverse_datum`（現價隱含的營運假設 → 一格 Datum）
-# 已隨多年反向橋退役（ROADMAP Phase 0／D 組）。
-
-
-@dataclass(frozen=True, slots=True)
-class _FundamentalParts:
-    """`_fundamental_parts()` 的產物：模型輸出被**選取**成各 section 要用的 Datum。"""
-
-    internal_section: InternalFundamentalsSection
-    bridge_meta: SectionMeta
-    bridge_steps: tuple[Datum, ...]
-    bridge_assumptions: tuple[Datum, ...]
-    bridge_sensitivities: tuple[Datum, ...]
-    bridge_selection: EvidenceSelectionCounts | None
-    bridge_period: str | None
-    comparisons: tuple[Datum, ...]
-    internal_vs_consensus: Datum
-    #: **不放進 comparisons**：它不是一筆「內部 vs 共識」的數值比較，混進去會讓
-    #: 「所有比較都缺席」這種斷言被一格永遠 available 的東西破壞（L12：一個集合兩種語意）。
-    opinion_stance: Datum
-    financial_causal: Datum
-    fiscal_items: tuple[Datum, ...]
-    has_numeric_gap: bool
-    warnings: tuple[str, ...]
-
-
-def _fundamental_parts(
-    model: FundamentalModelResult | None, reason: str | None, *,
-    reference_day: date, reporting_unit: str,
-    refresh: Mapping[str, AffectedArtifact] | None = None,
-) -> _FundamentalParts:
-    """把 `FundamentalModelResult` 選取成 Datum。**不算任何數字**——值、公式、依賴全部照抄。"""
-    def _unit(unit: str) -> str:
-        return reporting_unit if unit == "currency" else unit
-
-    fixed_not_modeled = (
-        not_modeled("internal_gross_margin", "內部毛利率估計", "bridge v1 直接建模營益率，不拆毛利率／營業費用"),
-        not_modeled("internal_fcf", "內部 FCF 估計", "bridge v1 沒有現金流量表（capex／營運資金）"),
-    )
-    if model is None:
-        absent = reason or "本次未執行 fundamental model（呼叫端未注入）"
-        internal_items = tuple(missing(f"internal_{k}", l, absent, authority=A_BRIDGE)
-                               for k, l, _u in _INTERNAL_METRIC_LABELS) + fixed_not_modeled
-        meta = SectionMeta(status="missing", basis="none", authority=A_BRIDGE,
-                           capability=CAP_FINANCIAL_CAUSAL, reason=absent, as_of=reference_day)
-        absent_cmp = tuple(missing(f"internal_vs_consensus_{m}", l, absent, authority=A_COMPARE)
-                           for m, l in _COMPARISON_LABELS.items())
-        return _FundamentalParts(
-            internal_section=InternalFundamentalsSection(meta=meta, items=internal_items,
-                                                         plug_in_note=NEXT_PHASE_NOTE),
-            bridge_meta=SectionMeta(status="missing", basis="none", authority=A_BRIDGE,
-                                    capability=CAP_FINANCIAL_CAUSAL, reason=absent, as_of=reference_day),
-            bridge_steps=(), bridge_assumptions=(), bridge_sensitivities=(), bridge_selection=None,
-            bridge_period=None, comparisons=absent_cmp,
-            internal_vs_consensus=missing("internal_vs_consensus", "內部估計 vs 共識（數值）", absent,
-                                          authority=A_COMPARE),
-            opinion_stance=missing("opinion_stance", "我們有沒有形成自己的觀點", absent,
-                                   authority=A_COMPARE),
-            financial_causal=missing("financial_causal_model",
-                                     "財務因果模型（operating assumptions → revenue／margin／EPS）",
-                                     absent, authority=A_BRIDGE),
-            fiscal_items=(), has_numeric_gap=False, warnings=(),
-        )
-
-    target = model.target_period
-    # ---- 內部估計 ------------------------------------------------------------
-    internal_items: list[Datum] = []
-    for key, label, unit in _INTERNAL_METRIC_LABELS:
-        metric = model.metrics.get(key)
-        if metric is None or not metric.is_known:
-            why = (metric.reason if metric and metric.reason else model.reason or "模型無此輸出")
-            internal_items.append(missing(f"internal_{key}", label, f"{why}（缺席不是 0）",
-                                          authority=A_BRIDGE))
-            continue
-        # refresh：數字算法確定，但它依賴的假設若被動搖，這一格不得再當 current（傳播來的 state 現形）。
-        refreshed = (refresh or {}).get(f"modeled_metric:{key}")
-        refresh_note = (f"；refresh={refreshed.state}：{refreshed.reasons[0]}"
-                        if refreshed is not None and refreshed.state != CURRENT else "")
-        internal_items.append(Datum(
-            key=f"internal_{key}", label=label, value=metric.value, status=_refresh_status(refreshed),
-            basis="deterministic", authority=A_BRIDGE,
-            method=f"{metric.formula}（{model.bridge_version}）", unit=_unit(unit),
-            as_of=reference_day, evidence_refs=tuple(metric.observation_refs),
-            reason=(f"calculation=deterministic；input_dependency={metric.input_dependency}"
-                    f"（{BASIS_LABEL.get(str(metric.input_dependency), metric.input_dependency)}）" + refresh_note),
-            dependencies={
-                "period": metric.period.label, "fiscal_period_end": metric.period.end.isoformat(),
-                "accounting_basis": metric.accounting_basis,
-                "input_dependency": metric.input_dependency,
-                "assumption_ids": list(metric.assumption_ids),
-                "observation_refs": list(metric.observation_refs),
-                **_refresh_deps(refreshed),
-            },
-        ))
-    internal_items.extend(fixed_not_modeled)
-    section_basis = "deterministic" if model.status != "missing" else "none"
-    # 基期作者寫下的話要送到**會去寫假設的那個人**手上（L16：分類跟著資料走到消費端）。
-    # 它逐字轉述、不改寫——那是一手紀錄，不是我們的判斷；`warnings` 會經 compose 進到
-    # fundamental panel 的 notes，也就是寫假設前會讀到的那一格。
-    base = model.base_actuals
-    author_warnings: list[str] = []
-    if base is not None and base.coverage_note:
-        author_warnings.append(f"⚠ 基期觀測作者註記（逐字，{base.observation_id or '無 id'}）：{base.coverage_note}")
-    for key, value in sorted((base.author_notes or {}).items() if base is not None else ()):
-        if isinstance(value, str) and value.strip():
-            author_warnings.append(f"⚠ 基期觀測 `{key}`（逐字）：{value.strip()}")
-    internal_meta = SectionMeta(
-        status=model.status, basis=section_basis, authority=A_BRIDGE,
-        capability=CAP_FINANCIAL_CAUSAL, reason=model.reason, as_of=reference_day,
-        warnings=(FUNDAMENTAL_EPISTEMIC_WARNING,
-                  f"口徑：{model.accounting_basis}；與共識比較只在同期、同口徑時成立。",
-                  *author_warnings,
-                  *model.warnings),
-    )
-    internal_section = InternalFundamentalsSection(
-        meta=internal_meta, items=tuple(internal_items), plug_in_note=NEXT_PHASE_NOTE,
-        period=target.label if target else None, period_end=target.end if target else None,
-        base_period_end=model.base_period.end if model.base_period else None,
-        accounting_basis=model.accounting_basis,
-    )
-
-    # ---- 橋 --------------------------------------------------------------------
-    steps: list[Datum] = []
-    for step in model.steps:
-        if step.value is None:
-            steps.append(missing(step.key, step.label, step.reason or "上游缺料（不是 0）",
-                                 authority=A_BRIDGE if step.kind == "derived" else
-                                 (A_ASSUMPTIONS if step.kind == "assumption" else A_LEDGER)))
-            continue
-        authority = {"observation": A_LEDGER, "assumption": A_ASSUMPTIONS, "derived": A_BRIDGE}[step.kind]
-        steps.append(Datum(
-            key=step.key, label=step.label, value=step.value, status="available", basis=step.basis,
-            authority=authority, method=step.formula, unit=_unit(step.unit), as_of=reference_day,
-            evidence_refs=tuple(step.observation_refs), reason=step.reason,
-            dependencies={"kind": step.kind, "assumption_ids": list(step.assumption_ids),
-                          "scope": step.scope},
-        ))
-    assumptions: list[Datum] = []
-    for a in model.assumptions:
-        refreshed = (refresh or {}).get(f"operating_assumption:{a.assumption_id}")
-        assumptions.append(Datum(
-            key=f"assumption:{a.driver}:{a.scope}", label=f"假設 {a.driver}[{a.scope}]",
-            value=a.value, status=_refresh_status(refreshed), basis=a.basis, authority=A_ASSUMPTIONS,
-            unit=_unit(a.unit), as_of=a.created_on, evidence_refs=tuple(a.evidence_refs),
-            reason=a.rationale,
-            dependencies={"assumption_id": a.assumption_id, "period": a.period.label,
-                          "fiscal_period_end": a.period.end.isoformat(),
-                          "created_at": a.created_at.isoformat(), "author": a.author,
-                          "accounting_basis": a.accounting_basis, "supersedes_id": a.supersedes_id,
-                          # Step 0.5：supporting／calibration 分開、legacy 標記、machine-readable 條件
-                          "provenance_semantics": a.provenance_semantics,
-                          "dependency_roles": {r: a.role_of(r) for r in a.evidence_refs},
-                          "review_conditions": [c.to_dict() for c in a.review_conditions],
-                          # 「60% 是判斷不是觀測」：basis 已說；這個旗標讓 consumer 不必讀 basis 也知道
-                          # 支持證據一變就該重看（heuristic／judgment 都是）。
-                          "requires_review_on_support_change": a.basis != "observation",
-                          **_refresh_deps(refreshed)},
-        ))
-    sensitivities: list[Datum] = []
-    for s in model.sensitivities:
-        bump_text = f"+{s.bump:.2f}" if s.bump_unit == "absolute_ratio" else f"×{1 + s.bump:.2f}"
-        sensitivities.append(Datum(
-            key=f"sensitivity:{s.driver}:{s.scope}", label=f"敏感度 {s.driver}[{s.scope}] {bump_text}",
-            value={"delta_revenue": s.delta_revenue, "delta_operating_income": s.delta_operating_income,
-                   "delta_eps": s.delta_eps, "eps_relative": s.eps_relative,
-                   "bump": s.bump, "bump_unit": s.bump_unit},
-            status="available", basis="deterministic", authority=A_BRIDGE,
-            method="重跑 bridge，只動這一條假設；不是機率、不是情境", as_of=reference_day,
-            dependencies={"assumption_id": s.assumption_id},
-        ))
-    selection = EvidenceSelectionCounts(
-        input_count=model.selection.input_count, accepted_count=model.selection.accepted_count,
-        filtered_count=model.selection.filtered_count, reasons=dict(model.selection.reasons),
-    )
-    bridge_meta = SectionMeta(
-        status=model.status, basis=section_basis, authority=A_BRIDGE,
-        capability=CAP_FINANCIAL_CAUSAL, reason=model.reason, as_of=reference_day,
-        warnings=("橋的每一格：observation＝基期觀測、assumption＝明示假設（各自標知識種類）、"
-                  "derived＝確定性算術；缺任何一條假設就是 missing，不補 0。",
-                  FUNDAMENTAL_EPISTEMIC_WARNING),
-    )
-
-    # ---- 比較 ------------------------------------------------------------------
-    comparisons: list[Datum] = []
-    comparable: dict[str, Any] = {}
-    for metric, label in _COMPARISON_LABELS.items():
-        cmp = model.comparisons.get(metric)
-        key = f"internal_vs_consensus_{metric}"
-        if cmp is None:
-            comparisons.append(missing(key, label, "模型未比較此指標", authority=A_COMPARE))
-            continue
-        status = _COMPARISON_STATUS_TO_DATUM[cmp.status]
-        if cmp.status != "comparable":
-            comparisons.append(Datum(key=key, label=label, value=None, status=status, basis="none",
-                                     authority=A_COMPARE, reason=f"{cmp.status}：{cmp.reason}"))
-            continue
-        payload = {
-            "internal": cmp.internal, "consensus": cmp.consensus,
-            "absolute_gap": cmp.absolute_gap, "relative_gap": cmp.relative_gap,
-            "period": cmp.internal_period.label if cmp.internal_period else None,
-            "fiscal_period_end": cmp.internal_period.end.isoformat() if cmp.internal_period else None,
-            "analyst_count": cmp.analyst_count,
-            "consensus_captured_at": cmp.consensus_captured_at.isoformat() if cmp.consensus_captured_at else None,
-            "accounting_basis": cmp.accounting_basis_internal,
-        }
-        comparable[metric] = payload
-        refreshed = (refresh or {}).get(f"expectation_comparison:{metric}")
-        comparisons.append(Datum(
-            key=key, label=label, value=payload, status=_refresh_status(refreshed), basis="deterministic",
-            authority=A_COMPARE, unit=_unit(cmp.unit or ""), as_of=cmp.consensus_captured_at,
-            method="absolute = internal − consensus；relative = internal／consensus − 1（同期、同口徑、同幣別才算）",
-            evidence_refs=tuple(cmp.observation_refs) + tuple(cmp.consensus_refs), reason=cmp.reason,
-            dependencies={"assumption_ids": list(cmp.assumption_ids), "status": cmp.status,
-                          "accounting_basis_consensus": cmp.accounting_basis_consensus,
-                          **_refresh_deps(refreshed)},
-        ))
-    if comparable:
-        summary = Datum(
-            key="internal_vs_consensus", label="內部估計 vs 共識（數值）",
-            value={m: {"relative_gap": p["relative_gap"], "absolute_gap": p["absolute_gap"],
-                       "period": p["period"]} for m, p in comparable.items()},
-            status="available" if len(comparable) == len(_COMPARISON_LABELS) else "partial",
-            basis="deterministic", authority=A_COMPARE, as_of=reference_day,
-            method="逐指標見 numeric_comparisons；未列的指標是不可比或缺料",
-            reason="它是內部假設推出的數字與共識的差，不是 Q4；Q4 仍是 session 的 ordinal 判斷",
-        )
-    else:
-        reasons = "；".join(f"{d.key.removeprefix('internal_vs_consensus_')}={d.reason}" for d in comparisons)
-        summary = Datum(key="internal_vs_consensus", label="內部估計 vs 共識（數值）", value=None,
-                        status=("not_applicable" if all(d.status == "not_applicable" for d in comparisons)
-                                else "missing"),
-                        basis="none", authority=A_COMPARE, reason=reasons)
-
-    # ---- 我們有沒有形成自己的觀點（2026-09-10）---------------------------------
-    # ⚠ 這一格**由模型層宣告**，呈現層不得 parse rationale 去猜（APP 呈現契約；L16）。
-    # 它與 status／readiness 正交：`available` 的模型完全可以是 `consensus_inverted`——
-    # 每一格都有數字，而每一個數字都是共識反解出來的，於是「我們比市場 −0.0%」不攜帶資訊。
-    stance = model.stance
-    stance_detail = {a.driver: {"scope": a.scope, "derivation": a.derivation,
-                                "assumption_id": a.assumption_id}
-                     for a in model.assumptions if a.driver in OPINION_BEARING_DRIVERS}
-    stance_datum = Datum(
-        key="opinion_stance", label="我們有沒有形成自己的觀點", value=stance,
-        status="available", basis="deterministic", authority=A_COMPARE, as_of=reference_day,
-        method="由核心 driver（revenue_growth／operating_margin_delta）的 derivation 聚合；"
-               "任一條 independent 即 independent，未宣告永遠不算 independent",
-        reason=PLAIN_STANCE.get(stance, {}).get("reason", stance),
-        dependencies={"by_driver": stance_detail,
-                      "opinion_bearing_drivers": sorted(OPINION_BEARING_DRIVERS)},
-    )
-
-    # ---- 因果 section 的財務橋一格 -----------------------------------------------
-    if model.status != "missing":
-        financial_causal = Datum(
-            key="financial_causal_model", label="財務因果模型（operating assumptions → revenue／margin／EPS）",
-            value={"period": target.label if target else None, "status": model.status,
-                   "accounting_basis": model.accounting_basis, "bridge_version": model.bridge_version,
-                   "metrics_known": [m for m, v in model.metrics.items() if v.is_known]},
-            status="available" if model.status == "available" else "partial",
-            basis="deterministic", authority=A_BRIDGE, as_of=reference_day,
-            reason="橋住 earnings_bridge section；結構事件 → 假設的連結靠假設的 evidence_refs 指回圖上證據",
-        )
-    else:
-        financial_causal = missing("financial_causal_model",
-                                   "財務因果模型（operating assumptions → revenue／margin／EPS）",
-                                   model.reason or "缺基期或缺假設", authority=A_BRIDGE)
-
-    # ---- 會計年度別共識 --------------------------------------------------------
-    fiscal_items: list[Datum] = []
-    for c in model.consensus:
-        basis = model.consensus_bases.get(f"{c.metric}:{c.period.end.isoformat()}", "unverified")
+    這一段原本住在 `_fundamental_parts()` 裡，跟著 FY+1 因果橋一起產出；橋退役後把它獨立出來。
+    `bases` 是每筆共識的會計口徑核實結果（`alpha.fundamental.compare.verify_consensus_basis`：
+    provider 的去年實際值與一手財報稀釋 EPS 機械比對），key＝`f"{metric}:{period_end}"`；
+    沒核實出來就是 `unverified`——它是資料層的宣告，不是判斷。
+    """
+    items: list[Datum] = []
+    for c in consensus:
+        basis = (bases or {}).get(f"{c.metric}:{c.period.end.isoformat()}", "unverified")
         metric_label = _CONSENSUS_METRIC_LABEL.get(c.metric, c.metric)
         if c.value is None:
-            fiscal_items.append(missing(f"consensus_{c.metric}_{c.period.label}",
-                                        f"{c.period.label} {metric_label} 共識", "provider 該期無估計值",
-                                        authority=A_CONSENSUS_FY))
+            items.append(missing(f"consensus_{c.metric}_{c.period.label}",
+                                 f"{c.period.label} {metric_label} 共識", "provider 該期無估計值",
+                                 authority=A_CONSENSUS_FY))
             continue
-        fiscal_items.append(Datum(
+        items.append(Datum(
             key=f"consensus_{c.metric}_{c.period.label}",
             label=f"{c.period.label} {metric_label} 共識（至 {c.period.end.isoformat()}）",
             value={"avg": c.value, "low": c.low, "high": c.high, "analyst_count": c.analyst_count,
                    "year_ago_actual": c.year_ago_actual, "growth": c.growth, "currency": c.currency,
                    "relative_label": c.relative_label, "accounting_basis": basis},
             status="available", basis="observation", authority=A_CONSENSUS_FY,
-            unit=_unit("currency_per_share" if c.metric == "eps" else "currency"),
+            unit=("currency_per_share" if c.metric == "eps" else reporting_unit),
             as_of=c.captured_at, evidence_refs=c.refs,
             method=f"{c.source}；provider 相對標籤 {c.relative_label} 於抓取日解析成 fiscal_period_end",
-            reason=(f"口徑 {basis}：EPS 以 year_ago_actual 與一手財報稀釋 EPS 核對；unverified 不得與內部相減"
+            reason=(f"口徑 {basis}：EPS 以 year_ago_actual 與一手財報稀釋 EPS 核對"
                     if c.metric == "eps" else "營收無口徑之分"),
         ))
-
-    return _FundamentalParts(
-        internal_section=internal_section, bridge_meta=bridge_meta, bridge_steps=tuple(steps),
-        bridge_assumptions=tuple(assumptions), bridge_sensitivities=tuple(sensitivities),
-        bridge_selection=selection, bridge_period=target.label if target else None,
-        comparisons=tuple(comparisons), internal_vs_consensus=summary,
-        opinion_stance=stance_datum,
-        financial_causal=financial_causal, fiscal_items=tuple(fiscal_items),
-        has_numeric_gap=bool(comparable), warnings=tuple(model.warnings),
-    )
+    return tuple(items)
 
 
 # ---------------------------------------------------------------------------
-# 估值（Step 1）：只選取 `alpha.valuation` 的輸出。**本檔沒有 fair value 公式**——
-# 值、公式字串、依賴全部照抄 `ValuationResult`；builder 不乘任何數。
+# 現價（A2 觀測）。⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：這裡原本是估值 section
+# （A_VALUATION／GAP_IS_NOT／VALUATION_EPISTEMIC_WARNING／`_valuation_section`，約 200 行，
+# 只選取 `alpha.valuation.build_valuation` 的輸出）。fair value 整條退役；現價自己的家是 `_market_section`。
 # ---------------------------------------------------------------------------
-A_VALUATION = "alpha://valuation/model"
-A_VALUATION_ASSUMPTIONS = "alpha://valuation/assumptions"
-
-#: gap 不是什麼——每次都列，讀者不必靠記憶區分（AGENTS：不含欄逐項寫出最相鄰的未授權語意）。
-GAP_IS_NOT: tuple[str, ...] = (
-    "不是 expected return（沒有 horizon、沒有報酬語意——那些住 implied_return section，且那也只是 base-case 隱含報酬）",
-    "不是 upside／downside forecast（沒有機率、沒有情境加權）",
-    "不是 entry signal、不是 buy／sell、不是 required return 或 entry price",
-    "不是 opportunity ranking——它是一檔的 fair value 與現價之差，不跨標的比較",
-)
-VALUATION_EPISTEMIC_WARNING = (
-    "fair value 是判斷的確定性函數，不是事實：內部 EPS 的每條營運假設與目標倍數都是 session 判斷／heuristic——"
-    "看 fair_value.dependencies.input_dependency 與 epistemics；不得把公式算出來的價格讀成觀測。"
-)
 
 
 def _market_section(build: Any, *, reference_day: date) -> "MarketSection":
@@ -546,419 +204,9 @@ def _market_section(build: Any, *, reference_day: date) -> "MarketSection":
     )
 
 
-def _valuation_section(
-    valuation: Any, reason: str | None, *, reference_day: date, reporting_unit: str,
-    refresh: Mapping[str, AffectedArtifact],
-) -> ValuationSection:
-    def _unit(unit: str) -> str:
-        return reporting_unit if unit == "currency" else unit
-
-    def _absent_section(why: str, *, status: str = "missing") -> ValuationSection:
-        meta = SectionMeta(status=status, basis="none", authority=A_VALUATION,
-                           capability=CAP_DETERMINISTIC_FAIR_VALUE, reason=why, as_of=reference_day)
-        return ValuationSection(
-            meta=meta,
-            method=missing("valuation_method", "估值方法", why, authority=A_VALUATION),
-            fundamental_input=missing("valuation_fundamental_input", "估值消費的內部指標", why, authority=A_VALUATION),
-            assumptions=(), fair_value=missing("fair_value", "Fair value", why, authority=A_VALUATION),
-            current_price=missing("current_price", "現價（Engine C）", why, authority=A_SNAP),
-            fair_value_gap=missing("fair_value_gap", "Fair value vs 現價（gap）", why, authority=A_VALUATION),
-            trace=(), sensitivities=(),
-            epistemics=missing("valuation_epistemics", "fair value 的認識論分解", why, authority=A_VALUATION),
-            selection=None, gap_is_not=GAP_IS_NOT,
-            value_date=missing("value_date", "fair value 是哪一天的值（value_date）", why, authority=A_VALUATION),
-        )
-
-    if valuation is None:
-        return _absent_section(reason or "本次未執行 valuation model（呼叫端未注入）")
-
-    target = valuation.target_period
-    fv_refresh = refresh.get("fair_value:fair_value")
-    gap_refresh = refresh.get("fair_value_gap:fair_value_gap")
-    fi = valuation.fundamental_input
-    fundamental_datum = (
-        Datum(key="valuation_fundamental_input", label=f"估值消費的內部指標：{fi.metric}（{fi.period.label}，{fi.accounting_basis}）",
-              value=fi.value, status="available", basis="deterministic", authority=A_BRIDGE,
-              method=fi.formula, unit=_unit(fi.unit or "currency_per_share"), as_of=reference_day,
-              evidence_refs=tuple(fi.observation_refs),
-              reason=f"照抄 internal_fundamentals.internal_{fi.metric}；calculation=deterministic；input_dependency={fi.input_dependency}",
-              dependencies={"period": fi.period.label, "fiscal_period_end": fi.period.end.isoformat(),
-                            "accounting_basis": fi.accounting_basis, "input_dependency": fi.input_dependency,
-                            "assumption_ids": list(fi.assumption_ids), "currency": fi.currency})
-        if fi is not None and fi.is_known else
-        missing("valuation_fundamental_input", "估值消費的內部指標",
-                (fi.reason if fi and fi.reason else valuation.reason or "內部指標缺席") + "（不是 0）", authority=A_BRIDGE)
-    )
-    assumption_data: list[Datum] = []
-    for a in valuation.assumptions:
-        refreshed = refresh.get(f"valuation_assumption:{a.assumption_id}")
-        assumption_data.append(Datum(
-            key=f"valuation_assumption:{a.method}:{a.parameter}", label=f"估值假設 {a.parameter}（{a.method}）",
-            value=a.value, status=_refresh_status(refreshed), basis=a.basis, authority=A_VALUATION_ASSUMPTIONS,
-            unit=a.unit, as_of=a.created_on, evidence_refs=tuple(a.evidence_refs), reason=a.rationale,
-            dependencies={"assumption_id": a.assumption_id, "period": a.period.label,
-                          "fiscal_period_end": a.period.end.isoformat(), "accounting_basis": a.accounting_basis,
-                          "created_at": a.created_at.isoformat(), "author": a.author,
-                          "supersedes_id": a.supersedes_id, "provenance_semantics": a.provenance_semantics,
-                          "dependency_roles": {r: a.role_of(r) for r in a.evidence_refs},
-                          "review_conditions": [c.to_dict() for c in a.review_conditions],
-                          "requires_review_on_support_change": a.basis != "observation",
-                          **_refresh_deps(refreshed)}))
-    method_datum = Datum(
-        key="valuation_method", label="估值方法", value=valuation.method, status="available", basis="deterministic",
-        authority=A_VALUATION, method=valuation.model_version, as_of=reference_day,
-        reason=("forward_earnings_multiple＝內部 EPS × 目標本益比（盈餘為正）；ev_to_sales（2026-09-09 P6）＝"
-                "(內部營收 × 目標 EV/Sales − 淨負債快照) / 稀釋股數（forward EPS 非正時、且 ledger 有該假設才用）。"
-                "無內部 FCF／EBITDA，所以 EV/EBITDA、DCF、reverse DCF 仍沒有資料可餵——不為完整硬做"))
-    if valuation.is_known:
-        fv_note = (f"；refresh={fv_refresh.state}：{fv_refresh.reasons[0]}"
-                   if fv_refresh is not None and fv_refresh.state != CURRENT else "")
-        fair_value_datum = Datum(
-            key="fair_value", label=f"Fair value（{target.label if target else '?'}，{valuation.accounting_basis}）",
-            value=valuation.fair_value, status=_refresh_status(fv_refresh), basis="deterministic",
-            authority=A_VALUATION, method=f"{valuation.formula}（{valuation.model_version}）",
-            unit=_unit("currency_per_share"), as_of=reference_day,
-            evidence_refs=tuple(fi.observation_refs) if fi else (),
-            reason=(f"calculation=deterministic；input_dependency={valuation.input_dependency}"
-                    f"（{BASIS_LABEL.get(str(valuation.input_dependency), valuation.input_dependency)}）" + fv_note),
-            dependencies={"period": target.label if target else None,
-                          "fiscal_period_end": target.end.isoformat() if target else None,
-                          "accounting_basis": valuation.accounting_basis, "currency": valuation.currency,
-                          "input_dependency": valuation.input_dependency,
-                          "assumption_ids": list(valuation.assumption_ids),
-                          "observation_refs": list(fi.observation_refs) if fi else [],
-                          "price_in_formula": False, **_refresh_deps(fv_refresh)})
-    else:
-        fair_value_datum = missing("fair_value", "Fair value", f"{valuation.reason}（缺席不是 0）",
-                                   authority=A_VALUATION, absence_kind=valuation.effective_absence_kind)
-    # Step 2：fair value 是哪一天的值——抄估值層的 value_date／value_date_semantics，不猜。
-    if valuation.is_known and valuation.value_date is not None:
-        value_date_datum = Datum(
-            key="value_date", label=f"fair value 是哪一天的值（value_date；{valuation.value_date_semantics}）",
-            value=valuation.value_date, status="available", basis="session_judgment", authority=A_VALUATION_ASSUMPTIONS,
-            method=valuation.value_date_formula, unit="date", as_of=reference_day,
-            reason="由生效估值假設的 value_date_convention 宣告；它是判斷的一部分，不是觀測",
-            dependencies={"value_date_semantics": valuation.value_date_semantics,
-                          "assumption_ids": [a.assumption_id for a in valuation.assumptions]})
-    else:
-        value_date_datum = missing(
-            "value_date", "fair value 是哪一天的值（value_date）",
-            ("估值假設未宣告 value_date_convention——時點語意 unspecified（不猜；報酬層拒算）"
-             if valuation.is_known else f"{valuation.reason}（fair value 缺席）"),
-            authority=A_VALUATION_ASSUMPTIONS,
-            absence_kind=None if valuation.is_known else "upstream_unavailable")
-    price = valuation.current_price
-    current_price_datum = (
-        Datum(key="current_price", label="現價（Engine C）", value=price.value, status="available", basis="observation",
-              authority=A_SNAP, unit=f"quote_unit（{price.unit or '未知'}）", as_of=price.bar_date,
-              evidence_refs=tuple(price.evidence_refs), reason="估值層只讀現價；它不進 fair value，只進 gap",
-              # 報價單位以**欄位**帶著走，不要讓消費端去 parse `unit` 那句中文。
-              # GBp（便士）與 GBP（英鎊）差 100 倍，而字串解析正是 2026-09-07 那個 100 倍陷阱的近親（L16）。
-              dependencies={"quote_unit": price.unit})
-        if price.is_known else
-        missing("current_price", "現價（Engine C）", price.reason or "無現價", authority=A_SNAP))
-    gap = valuation.gap
-    if gap.is_known:
-        gap_note = (f"；refresh={gap_refresh.state}：{gap_refresh.reasons[0]}"
-                    if gap_refresh is not None and gap_refresh.state != CURRENT else "")
-        gap_datum = Datum(
-            key="fair_value_gap", label="Fair value vs 現價（gap；不是 expected return）",
-            value={"absolute_gap": gap.absolute_gap, "relative_gap": gap.relative_gap,
-                   "implied_multiple_at_price": gap.implied_multiple_at_price,
-                   "fair_value": valuation.fair_value, "current_price": price.value, "unit": gap.unit},
-            status=_refresh_status(gap_refresh), basis="deterministic", authority=A_VALUATION,
-            method=valuation.gap_formula, unit=_unit("currency_per_share"), as_of=price.bar_date,
-            evidence_refs=tuple(gap.price_refs) + (tuple(fi.observation_refs) if fi else ()),
-            reason="它是 fair value 與現價的差，" + "；".join(GAP_IS_NOT[:2]) + gap_note,
-            dependencies={"assumption_ids": list(valuation.assumption_ids), "status": gap.status,
-                          "implied_multiple_formula": valuation.implied_multiple_formula, **_refresh_deps(gap_refresh)})
-    else:
-        gap_status = "not_applicable" if gap.status in ("incompatible_unit", "unverified_unit") else "missing"
-        # gap 缺席的原因分兩種：**單位不可比**（報價單位 ≠ 結算幣別，兩個數不同尺度）
-        # 與**上游沒有 fair value**。前者是 inputs_incompatible，後者繼承估值層的 kind——
-        # 「刻意不主張」與「還沒寫」的區別必須一路傳到 gap 這一格，不能在這裡被抹平。
-        gap_kind = ("inputs_incompatible" if gap_status == "not_applicable"
-                    else (valuation.effective_absence_kind if not valuation.is_known else "upstream_unavailable"))
-        gap_datum = Datum(key="fair_value_gap", label="Fair value vs 現價（gap；不是 expected return）", value=None,
-                          status=gap_status, basis="none", authority=A_VALUATION, reason=f"{gap.status}：{gap.reason}",
-                          absence_kind=gap_kind)
-    trace: list[Datum] = []
-    for step in valuation.steps:
-        authority = {"fundamental_input": A_BRIDGE, "assumption": A_VALUATION_ASSUMPTIONS, "derived": A_VALUATION}[step.kind]
-        if step.value is None:
-            trace.append(missing(f"valuation_step:{step.key}", step.label, step.reason or "上游缺料（不是 0）", authority=authority))
-            continue
-        trace.append(Datum(
-            key=f"valuation_step:{step.key}", label=step.label, value=step.value, status="available", basis=step.basis,
-            authority=authority, method=step.formula, unit=_unit(step.unit), as_of=reference_day,
-            evidence_refs=tuple(step.observation_refs), reason=step.reason,
-            dependencies={"kind": step.kind, "assumption_ids": list(step.assumption_ids),
-                          "input_dependency": step.input_dependency}))
-    sens: list[Datum] = []
-    for s in valuation.sensitivities:
-        bump_text = f"+{s.bump:.2f}" if s.bump_unit == "absolute_ratio" else f"×{1 + s.bump:.2f}"
-        sens.append(Datum(
-            key=f"fair_value_sensitivity:{s.driver}:{s.scope}", label=f"fair value 敏感度 {s.driver}[{s.scope}] {bump_text}",
-            value={"delta_fair_value": s.delta_fair_value, "fair_value_relative": s.fair_value_relative,
-                   "bump": s.bump, "bump_unit": s.bump_unit},
-            status="available", basis="deterministic", authority=A_VALUATION,
-            method="只動這一條判斷重算 fair value；確定性微擾，不是機率、不是情境", as_of=reference_day,
-            dependencies={"assumption_id": s.assumption_id}))
-    epistemics_datum = (
-        Datum(key="valuation_epistemics", label="fair value 的認識論分解（算術 vs 判斷）", value=dict(valuation.epistemics),
-              status="available", basis="deterministic", authority=A_VALUATION, as_of=reference_day,
-              method="純計數與選取：列出哪些是確定性算術、哪些輸入是判斷（按 basis 計數）；不是新判斷")
-        if valuation.epistemics else
-        missing("valuation_epistemics", "fair value 的認識論分解（算術 vs 判斷）", "fair value 缺席，無可分解",
-                authority=A_VALUATION, absence_kind="upstream_unavailable"))
-    selection = EvidenceSelectionCounts(
-        input_count=valuation.selection.input_count, accepted_count=valuation.selection.accepted_count,
-        filtered_count=valuation.selection.filtered_count, reasons=dict(valuation.selection.reasons))
-    section_status = fair_value_datum.status if valuation.is_known else "missing"
-    meta = SectionMeta(
-        status=section_status, basis="deterministic" if valuation.is_known else "none", authority=A_VALUATION,
-        capability=CAP_DETERMINISTIC_FAIR_VALUE, reason=valuation.reason, as_of=reference_day,
-        absence_kind=valuation.effective_absence_kind,
-        settled_by=valuation.settled_by,
-        warnings=(VALUATION_EPISTEMIC_WARNING,
-                  "fair value 不含現價：price-only 變化只動 gap，不動 fair value。",
-                  "gap " + "；".join(GAP_IS_NOT), *valuation.warnings),
-    )
-    return ValuationSection(
-        meta=meta, method=method_datum, fundamental_input=fundamental_datum, assumptions=tuple(assumption_data),
-        fair_value=fair_value_datum, current_price=current_price_datum, fair_value_gap=gap_datum,
-        trace=tuple(trace), sensitivities=tuple(sens), epistemics=epistemics_datum, selection=selection,
-        gap_is_not=GAP_IS_NOT, value_date=value_date_datum,
-        period=target.label if target else None, period_end=target.end if target else None,
-        accounting_basis=valuation.accounting_basis,
-    )
-
-
-# ---------------------------------------------------------------------------
-# Base-case implied return（Step 2）：只選取 `alpha.implied_return` 的輸出。**本檔沒有報酬公式**——
-# 值、公式字串、依賴全部照抄 `ImpliedReturnResult`；builder 不除任何數、不算任何年化。
-# ---------------------------------------------------------------------------
-A_IMPLIED_RETURN = "alpha://implied_return/model"
-A_HORIZON_ASSUMPTIONS = "alpha://implied_return/horizon"
-
-#: implied return 不是什麼——每次都列，讀者不必靠記憶區分。
-RETURN_IS_NOT: tuple[str, ...] = (
-    "不是 probability-weighted expected return（沒有 bull／base／bear 機率；名稱刻意用 implied）",
-    "不是 total return（沒有股利／分配預測；只有價格報酬）",
-    "不是 required return、不是 entry price（進場門檻已於 2026-09-23 Phase 0 退役）、不是 buy／sell、不是 actionable-now",
-    "不是 opportunity ranking、不是回測或統計勝率——它是一檔在 base case 下從 bar_date 到 horizon_end 的隱含價格報酬",
-)
-RETURN_EPISTEMIC_WARNING = (
-    "implied return 是判斷的確定性函數，不是預測：內部 EPS 的營運假設、目標倍數、value-date 語意、horizon 全是 session "
-    "判斷——看 price_return.dependencies.input_dependency 與 epistemics；不得把公式算出來的報酬讀成期望值。"
-)
-
-
-def _implied_return_section(
-    result: Any, reason: str | None, *, reference_day: date, reporting_unit: str,
-    refresh: Mapping[str, AffectedArtifact],
-) -> ImpliedReturnSection:
-    def _unit(unit: str) -> str:
-        return reporting_unit if unit == "currency" else unit
-
-    fixed = (
-        not_modeled("total_return", "總報酬（含股利／分配）", "本層沒有股利／分配預測能力——不是 0，也不是 price_return 的別名"),
-        not_modeled("probability_weighted_return", "機率加權期望報酬", "沒有 bull／base／bear 機率；本 section 只有 base case 的隱含報酬"),
-    )
-
-    def _absent(why: str, *, status: str = "missing") -> ImpliedReturnSection:
-        meta = SectionMeta(status=status, basis="none", authority=A_IMPLIED_RETURN,
-                           capability=CAP_BASE_CASE_IMPLIED_RETURN, reason=why, as_of=reference_day)
-        return ImpliedReturnSection(
-            meta=meta,
-            return_convention=missing("return_convention", "報酬種類", why, authority=A_IMPLIED_RETURN),
-            current_price=missing("current_price", "現價（Engine C）", why, authority=A_SNAP),
-            fair_value=missing("fair_value", "Fair value（照抄 valuation）", why, authority=A_VALUATION),
-            value_date=missing("value_date", "fair value 是哪一天的值", why, authority=A_VALUATION_ASSUMPTIONS),
-            horizon=missing("horizon", "Horizon 判斷（fair value 何時被市場定價到）", why, authority=A_HORIZON_ASSUMPTIONS),
-            horizon_window=missing("horizon_window", "Horizon 區間（起／迄／天數）", why, authority=A_IMPLIED_RETURN),
-            price_return=missing("base_case_implied_price_return", "Base-case 隱含價格報酬（simple）", why, authority=A_IMPLIED_RETURN),
-            annualized_price_return=missing("annualized_price_return", "年化隱含價格報酬", why, authority=A_IMPLIED_RETURN),
-            total_return=fixed[0], probability_weighted_return=fixed[1], trace=(),
-            epistemics=missing("return_epistemics", "implied return 的認識論分解", why, authority=A_IMPLIED_RETURN),
-            selection=None, is_not=RETURN_IS_NOT,
-            eps_contribution=missing("eps_contribution", "其中：EPS 差異貢獻", why, authority=A_IMPLIED_RETURN),
-            multiple_contribution=missing("multiple_contribution", "其中：倍數差異貢獻", why, authority=A_IMPLIED_RETURN),
-            attribution=missing("return_attribution", "兩桿拆解（EPS 差異 × 倍數差異）", why, authority=A_IMPLIED_RETURN),
-        )
-
-    if result is None:
-        return _absent(reason or "本次未執行 implied return model（呼叫端未注入）")
-
-    ret_refresh = refresh.get("implied_return:implied_return")
-    target = result.target_period
-    price = result.current_price
-    current_price_datum = (
-        Datum(key="current_price", label="現價（Engine C；horizon 起點）", value=price.value, status="available",
-              basis="observation", authority=A_SNAP, unit=f"quote_unit（{price.unit or '未知'}）", as_of=price.bar_date,
-              evidence_refs=tuple(price.evidence_refs), reason="報酬從這個價格所屬的 bar_date 起算",
-              dependencies={"quote_unit": price.unit})
-        if price.is_known else missing("current_price", "現價（Engine C）", price.reason or "無現價", authority=A_SNAP))
-    fair_value_datum = (
-        Datum(key="fair_value", label=f"Fair value（{target.label if target else '?'}；照抄 valuation）", value=result.fair_value,
-              status="available", basis="deterministic", authority=A_VALUATION, unit=_unit("currency_per_share"),
-              as_of=result.fair_value_as_of, reason="照抄 valuation.fair_value，不重算",
-              dependencies={"currency": result.fair_value_currency,
-                            "assumption_ids": [a for a in result.assumption_ids if not a.startswith("ha_")]})
-        if result.fair_value is not None else
-        missing("fair_value", "Fair value（照抄 valuation）", result.reason or "fair value 缺席",
-                authority=A_VALUATION, absence_kind=result.effective_absence_kind))
-    value_date_datum = (
-        Datum(key="value_date", label=f"fair value 是哪一天的值（{result.value_date_semantics}）", value=result.value_date,
-              status="available", basis="session_judgment", authority=A_VALUATION_ASSUMPTIONS, unit="date",
-              as_of=reference_day, reason="由估值假設的 value_date_convention 宣告（判斷，不是觀測）",
-              dependencies={"value_date_semantics": result.value_date_semantics})
-        if result.value_date is not None else
-        missing("value_date", "fair value 是哪一天的值",
-                "估值假設未宣告 value_date_convention——時點語意 unspecified，不猜" if result.fair_value is not None
-                else "fair value 缺席", authority=A_VALUATION_ASSUMPTIONS,
-                absence_kind=None if result.fair_value is not None else "upstream_unavailable"))
-    h = result.horizon
-    if h is not None:
-        h_refresh = refresh.get(f"horizon_assumption:{h.assumption_id}")
-        horizon_datum = Datum(
-            key="horizon", label=f"Horizon 判斷：{h.period.label} fair value 於此日前實現", value=h.horizon_end,
-            status=_refresh_status(h_refresh), basis=h.basis, authority=A_HORIZON_ASSUMPTIONS, unit="date",
-            as_of=h.created_on, evidence_refs=tuple(h.evidence_refs), reason=h.rationale,
-            dependencies={"assumption_id": h.assumption_id, "period": h.period.label,
-                          "fiscal_period_end": h.period.end.isoformat(), "created_at": h.created_at.isoformat(),
-                          "author": h.author, "supersedes_id": h.supersedes_id,
-                          "provenance_semantics": h.provenance_semantics,
-                          "dependency_roles": {r: h.role_of(r) for r in h.evidence_refs},
-                          "review_conditions": [c.to_dict() for c in h.review_conditions],
-                          "requires_review_on_support_change": h.basis != "observation",
-                          **_refresh_deps(h_refresh)})
-    else:
-        horizon_datum = missing("horizon", "Horizon 判斷（fair value 何時被市場定價到）",
-                                result.reason or "沒有生效的 horizon 判斷", authority=A_HORIZON_ASSUMPTIONS)
-    if result.is_known:
-        note = (f"；refresh={ret_refresh.state}：{ret_refresh.reasons[0]}"
-                if ret_refresh is not None and ret_refresh.state != CURRENT else "")
-        deps = {"input_dependency": result.input_dependency, "assumption_ids": list(result.assumption_ids),
-                "observation_refs": list(result.observation_refs), "horizon_start": result.horizon_start.isoformat(),
-                "horizon_end": result.horizon_end.isoformat(), "holding_period_days": result.holding_period_days,
-                "value_date": result.value_date.isoformat() if result.value_date else None,
-                "value_date_semantics": result.value_date_semantics, "alignment": result.alignment,
-                "return_convention": result.return_convention, **_refresh_deps(ret_refresh)}
-        window_datum = Datum(
-            key="horizon_window", label="Horizon 區間（起＝現價 bar_date／迄＝horizon_end）",
-            value={"horizon_start": result.horizon_start, "horizon_end": result.horizon_end,
-                   "holding_period_days": result.holding_period_days, "holding_period_years": result.holding_period_years,
-                   "alignment": result.alignment},
-            status=_refresh_status(ret_refresh), basis="deterministic", authority=A_IMPLIED_RETURN,
-            method=result.formulas["holding_period"], as_of=reference_day,
-            dependencies={"horizon_assumption_id": h.assumption_id if h else None, "alignment": result.alignment})
-        price_return_datum = Datum(
-            key="base_case_implied_price_return", label=f"Base-case 隱含價格報酬（simple；{result.horizon_start} → {result.horizon_end}）",
-            value=result.price_return, status=_refresh_status(ret_refresh), basis="deterministic", authority=A_IMPLIED_RETURN,
-            method=f"{result.formulas['price_return']}（{result.model_version}）", unit="ratio", as_of=price.bar_date,
-            evidence_refs=tuple(result.observation_refs),
-            reason=(f"calculation=deterministic；input_dependency={result.input_dependency}"
-                    f"（{BASIS_LABEL.get(str(result.input_dependency), result.input_dependency)}）；" + "；".join(RETURN_IS_NOT[:2]) + note),
-            dependencies=deps)
-        annualized_datum = (
-            Datum(key="annualized_price_return", label="年化隱含價格報酬（compound，365.25 天）", value=result.annualized_price_return,
-                  status=_refresh_status(ret_refresh), basis="deterministic", authority=A_IMPLIED_RETURN,
-                  method=result.formulas["annualized_price_return"], unit="ratio", as_of=price.bar_date,
-                  reason=f"持有期間 {result.holding_period_days} 天；年化只是換算，不是另一個判斷", dependencies=deps)
-            if result.annualized_price_return is not None else
-            missing("annualized_price_return", "年化隱含價格報酬", "持有期間不足 1 天，不年化", authority=A_IMPLIED_RETURN))
-        epistemics_datum = Datum(
-            key="return_epistemics", label="implied return 的認識論分解（算術 vs 判斷）", value=dict(result.epistemics),
-            status="available", basis="deterministic", authority=A_IMPLIED_RETURN, as_of=reference_day,
-            method="純計數與選取：列出哪些是確定性算術、哪些輸入是判斷；one_sentence 是機器組出的一句話，不是新判斷")
-    else:
-        why = f"{result.reason}（缺席不是 0）"
-        # 缺席語意由報酬層宣告（它自己知道是上游 deliberate_abstention 還是 horizon 還沒寫）；
-        # 呈現端不得從 `why` 這段散文回推（L16）。
-        kind = result.effective_absence_kind
-        window_datum = missing("horizon_window", "Horizon 區間（起／迄／天數）", why, authority=A_IMPLIED_RETURN, absence_kind=kind)
-        price_return_datum = missing("base_case_implied_price_return", "Base-case 隱含價格報酬（simple）", why,
-                                     authority=A_IMPLIED_RETURN, absence_kind=kind)
-        annualized_datum = missing("annualized_price_return", "年化隱含價格報酬", why, authority=A_IMPLIED_RETURN, absence_kind=kind)
-        epistemics_datum = missing("return_epistemics", "implied return 的認識論分解", why, authority=A_IMPLIED_RETURN, absence_kind=kind)
-    convention_datum = Datum(
-        key="return_convention", label="報酬種類", value=result.return_convention, status="available", basis="deterministic",
-        authority=A_IMPLIED_RETURN, method=result.model_version, as_of=reference_day,
-        reason="base case 的隱含價格報酬；total return 與機率加權期望報酬各自 not_modeled")
-    trace: list[Datum] = []
-    for step in result.steps:
-        authority = {"price_input": A_SNAP, "valuation_input": A_VALUATION, "horizon_input": A_HORIZON_ASSUMPTIONS,
-                     "derived": A_IMPLIED_RETURN}[step.kind]
-        if step.value is None:
-            trace.append(missing(f"return_step:{step.key}", step.label, step.reason or "上游缺料（不是 0）", authority=authority))
-            continue
-        trace.append(Datum(
-            key=f"return_step:{step.key}", label=step.label, value=step.value, status="available", basis=step.basis,
-            authority=authority, method=step.formula, unit=_unit(step.unit), as_of=reference_day,
-            evidence_refs=tuple(step.observation_refs), reason=step.reason,
-            dependencies={"kind": step.kind, "assumption_ids": list(step.assumption_ids),
-                          "input_dependency": step.input_dependency}))
-    selection = EvidenceSelectionCounts(
-        input_count=result.horizon_selection.input_count, accepted_count=result.horizon_selection.accepted_count,
-        filtered_count=result.horizon_selection.filtered_count, reasons=dict(result.horizon_selection.reasons))
-    # ---- 兩桿拆解（2026-09-09 P2）：照抄 result.attribution，不算任何數 ----------------------------
-    attribution = result.attribution
-    if attribution is not None and attribution.is_known:
-        attr_deps = {"consensus_eps": attribution.consensus_eps, "internal_eps": attribution.internal_eps,
-                     "target_multiple": attribution.target_multiple,
-                     "market_multiple_on_consensus": attribution.market_multiple_on_consensus,
-                     "analyst_count": attribution.analyst_count, "input_dependency": result.input_dependency,
-                     "fx_translation_delta": attribution.fx_translation_delta}
-        # 雜訊下限跟著**兩個桿自己的那一行**走，不是只寫在 fundamental panel（L16：分類要
-        # 送到消費端手上）。讀者看的是這兩行，而 +1.7% 配 ±2.1% 殘差不能讀成發現。
-        floor = attribution.noise_floor_note
-        eps_reason = f"內部 EPS {attribution.internal_eps:g} ÷ 共識 EPS {attribution.consensus_eps:g} − 1"
-        eps_datum = Datum(
-            key="eps_contribution", label="其中：EPS 差異貢獻（我們的 EPS vs 共識）", value=attribution.eps_contribution,
-            status="available", basis="deterministic", authority=A_IMPLIED_RETURN, method=attribution.formula,
-            unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
-            reason=f"{eps_reason}｜{floor}" if floor else eps_reason, dependencies=attr_deps)
-        multiple_datum = Datum(
-            key="multiple_contribution", label="其中：倍數差異貢獻（我們的倍數 vs 市場對共識付的倍數）",
-            value=attribution.multiple_contribution, status="available", basis="deterministic", authority=A_IMPLIED_RETURN,
-            method=attribution.formula, unit="ratio", as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
-            reason=(f"{attribution.principle_note}｜{floor}" if floor else attribution.principle_note),
-            dependencies=attr_deps)
-        attribution_datum = Datum(
-            key="return_attribution", label="兩桿拆解（EPS 差異 × 倍數差異；恆等式）", value=attribution_payload(attribution),
-            status="available", basis="deterministic", authority=A_IMPLIED_RETURN, method=attribution.formula,
-            as_of=reference_day, evidence_refs=tuple(attribution.consensus_refs),
-            reason="price_return 的確定性恆等分解；判斷都在輸入（內部 EPS 的假設、目標倍數），拆解本身不是新判斷")
-    else:
-        if attribution is None:
-            attr_why = f"報酬缺席，沒有可拆的東西（{result.reason or '未知'}）"
-            attr_kind = result.effective_absence_kind
-        else:
-            attr_why = f"{attribution.reason}（缺席不是 0；報酬本身不受影響）"
-            attr_kind = attribution.absence_kind
-        eps_datum = missing("eps_contribution", "其中：EPS 差異貢獻", attr_why, authority=A_IMPLIED_RETURN, absence_kind=attr_kind)
-        multiple_datum = missing("multiple_contribution", "其中：倍數差異貢獻", attr_why, authority=A_IMPLIED_RETURN, absence_kind=attr_kind)
-        attribution_datum = missing("return_attribution", "兩桿拆解（EPS 差異 × 倍數差異）", attr_why,
-                                    authority=A_IMPLIED_RETURN, absence_kind=attr_kind)
-
-    section_status = price_return_datum.status if result.is_known else "missing"
-    meta = SectionMeta(
-        status=section_status, basis="deterministic" if result.is_known else "none", authority=A_IMPLIED_RETURN,
-        capability=CAP_BASE_CASE_IMPLIED_RETURN, reason=result.reason, as_of=reference_day,
-        absence_kind=result.effective_absence_kind,
-        warnings=(RETURN_EPISTEMIC_WARNING,
-                  "四個輸入缺一就 missing：現價（含 bar_date）、fair value（同單位）、fair value 的時點語意、生效的 horizon 判斷；不補 12 個月。",
-                  "implied return " + "；".join(RETURN_IS_NOT), *result.warnings),
-    )
-    return ImpliedReturnSection(
-        meta=meta, return_convention=convention_datum, current_price=current_price_datum, fair_value=fair_value_datum,
-        value_date=value_date_datum, horizon=horizon_datum, horizon_window=window_datum, price_return=price_return_datum,
-        annualized_price_return=annualized_datum, total_return=fixed[0], probability_weighted_return=fixed[1],
-        trace=tuple(trace), epistemics=epistemics_datum, selection=selection, is_not=RETURN_IS_NOT,
-        eps_contribution=eps_datum, multiple_contribution=multiple_datum, attribution=attribution_datum,
-        period=target.label if target else None, period_end=target.end if target else None,
-    )
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`_valuation_section` 與 base-case implied return
+# 整組退役**（A_IMPLIED_RETURN／A_HORIZON_ASSUMPTIONS／RETURN_IS_NOT／RETURN_EPISTEMIC_WARNING／
+# `_implied_return_section`，約 420 行）。「已定價嗎」由財務三題回答（Phase 3），主參照是自己的歷史、不設門檻。
 
 
 # ---------------------------------------------------------------------------
@@ -1046,20 +294,20 @@ BRIEF_IS_NOT: tuple[str, ...] = (
 )
 
 
-def _brief_values(*, ir: ImpliedReturnSection, consensus: ConsensusSection,
-                  catalysts: CatalystSection, bridge: EarningsBridgeSection, today: date,
+def _brief_values(*, price: Datum, consensus: ConsensusSection,
+                  catalysts: CatalystSection, today: date,
                   gap: ExpectationGapSection | None = None) -> dict[str, str | None]:
-    """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。"""
-    price = ir.current_price
+    """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`base_target`／`base_return`／`value_date` 的來源
+    （implied return）與帶參數的 `{assumption:driver[scope]}`（橋的生效假設）隨估值鏈退役。
+    **placeholder 本身留在 `PLACEHOLDERS`／`PARAM_PLACEHOLDER` 封閉字彙裡**（append-only 短評紀錄
+    引用它們，L10），值改為 `None` → `fill_brief` 印「（尚無）」並把那一格標 partial，**不補 0**。
+    """
     unit = (price.dependencies or {}).get("quote_unit") if price.dependencies else None
     by_key = {d.key: d for d in consensus.items}
-    attribution = ir.attribution.value if isinstance(ir.attribution.value, Mapping) else {}
-    market_multiple = attribution.get("market_multiple_on_consensus")
-    if market_multiple is None and by_key.get("forward_pe") is not None:
-        market_multiple = by_key["forward_pe"].value
-    analyst_count = attribution.get("analyst_count")
-    if analyst_count is None and by_key.get("analyst_count") is not None:
-        analyst_count = by_key["analyst_count"].value
+    market_multiple = by_key["forward_pe"].value if by_key.get("forward_pe") is not None else None
+    analyst_count = by_key["analyst_count"].value if by_key.get("analyst_count") is not None else None
     dates: list[date] = []
     for item in catalysts.checkpoints:
         if isinstance(item.date, date) and item.date >= today:
@@ -1070,18 +318,12 @@ def _brief_values(*, ir: ImpliedReturnSection, consensus: ConsensusSection,
             dates.append(expected)
     values: dict[str, str | None] = {
         "price": format_value("price", price.value, unit=unit),
-        "base_target": format_value("price", ir.fair_value.value, unit=unit),
-        # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：四個 placeholder 的來源退役**——
-        # `bet_target`／`payoff`／`downside_target`／`downside_return` 是 E 組的四個價格。
-        # **placeholder 本身留在 `PLACEHOLDERS` 封閉字彙裡**（append-only 短評紀錄引用它們，L10），
-        # 值改為 `None` → `fill_brief` 印「（尚無）」並把那一格標成 partial，**不補 0**。
-        # 實測：三本既有短評（AXTI／COHR／LITE）都引用了其中幾個，所以它們的句子會出現「（尚無）」
-        # ——那是誠實的缺席宣告，不是靜默改寫（紀錄一個字都沒動）。Phase 3 的財務三題接手那些數字。
-        "base_return": format_value("ratio", ir.price_return.value),
+        "base_target": None,
+        "base_return": None,
         "sell_side_target": format_value("price", by_key["target_mean"].value if "target_mean" in by_key else None, unit=unit),
         "market_multiple": format_value("multiple", market_multiple),
         "analyst_count": format_value("count", analyst_count),
-        "value_date": format_value("date", ir.value_date.value),
+        "value_date": None,
         "next_checkpoint_date": format_value("date", min(dates) if dates else None),
     }
     ql = catalysts.quantitative_link.value if isinstance(catalysts.quantitative_link.value, Mapping) else None
@@ -1090,65 +332,14 @@ def _brief_values(*, ir: ImpliedReturnSection, consensus: ConsensusSection,
     closure_value = (gap.gap_closure.value if gap is not None and gap.gap_closure is not None
                      and isinstance(gap.gap_closure.value, Mapping) else None)
     values["gap_closure"] = closure_phrase(closure_value)
-    # 帶參數的 placeholder：base 假設值與賭注假設值（key 形狀分別是 assumption:driver:scope／override:driver[scope]）
-    for datum in bridge.assumptions:
-        parts = datum.key.split(":", 2)
-        if len(parts) == 3 and datum.is_known:
-            kind = "ratio" if datum.unit == "ratio" else ("count" if datum.unit == "shares" else "currency")
-            values[f"{{assumption:{parts[1]}[{parts[2]}]}}"] = format_value(kind, datum.value)
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`{bet_assumption:driver[scope]}` 的填值來源
-    # （`payoff.overrides`）隨 E 組退役。**帶參數的 placeholder 本身留在契約裡**
-    # （`PARAM_PLACEHOLDER`，append-only 短評紀錄引用它），填不到就印「（尚無）」並標 partial。
     return values
-
-
-def _multiple_sentence(view: Any) -> str:
-    """把四級階梯壓成**一句人話**（首屏的單位是句不是格）。
-
-    ⚠ **措辭精度本身就是一個 claim**（L11-1）。`revenue_growth = 4.651` 的語意是
-    橋的 `base × (1 + growth)`——也就是**成長 465%、變成 5.65 倍**，
-    **不是「成長 4.65 倍」**。後者會被讀成「變成 4.65 倍」，差了整整一倍的量級。
-    （2026-09-20 發現：ROADMAP 與啟動 prompt 多處就是用那個會誤導的寫法。）
-    """
-    def _driver_phrase(text: str) -> str:
-        name, _, rest = text.partition(" = ")
-        try:
-            value = float(rest)
-        except ValueError:
-            return text
-        if name.startswith("revenue_growth"):
-            scope = name[name.find("[") + 1:name.rfind("]")] if "[" in name else "總營收"
-            return f"{scope}營收得成長 {value * 100:,.0f}%（變成 {1 + value:,.2f} 倍）"
-        if name.startswith("operating_margin_delta"):
-            return f"營益率得再加 {value * 100:,.1f} 個百分點"
-        return f"{name} 得是 {value:,.4g}"
-
-    reachable, unreachable = [], []
-    for step in view.ladder:
-        solved = [s for s in step.solutions if s.status == "solved"]
-        if solved:
-            phrases = "；".join(_driver_phrase(f"{s.driver}[{s.scope}] = {s.implied_value}")
-                                for s in solved)
-            reachable.append(f"**{step.target_return_multiple:g} 倍**要 {phrases}")
-        else:
-            unreachable.append(f"{step.target_return_multiple:g}")
-    head = (f"到 {view.horizon.isoformat()}（距基期 {view.span_years} 年）："
-            if view.horizon and view.span_years is not None else "")
-    parts = []
-    if reachable:
-        parts.append("；".join(reachable))
-    if unreachable:
-        parts.append(f"**{'／'.join(unreachable)} 倍：所有 driver 拉到極限都做不到**")
-    body = "。".join(parts) if parts else "四級階梯都算不出來"
-    return head + body + "。⚠ 這不是預測，是「要 N 倍，哪一格得為真」——合不合理由你判斷。"
-
 
 
 def _investor_brief_section(
     records: Sequence[Any], parse_errors: Sequence[str], *,
     as_of: date | None, today: date, reference_day: date,
-    ir: ImpliedReturnSection, consensus: ConsensusSection, catalysts: CatalystSection,
-    bridge: EarningsBridgeSection, refresh_overall: str, gap: ExpectationGapSection | None = None,
+    price: Datum, consensus: ConsensusSection, catalysts: CatalystSection,
+    refresh_overall: str, gap: ExpectationGapSection | None = None,
 ) -> InvestorBriefSection:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：那把尺（現價／沒賭對／賭對／判斷錯了）整格退役。**
     # ROADMAP「個股頁／首屏」那一列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
@@ -1167,8 +358,7 @@ def _investor_brief_section(
                       for key, label in SLOT_LABELS.items())
         return InvestorBriefSection(meta=meta, slots=slots, status_light=light,
                                     brief_id=None, is_not=BRIEF_IS_NOT)
-    values = _brief_values(ir=ir, consensus=consensus, catalysts=catalysts, bridge=bridge,
-                           today=today, gap=gap)
+    values = _brief_values(price=price, consensus=consensus, catalysts=catalysts, today=today, gap=gap)
     filled, absent = fill_brief(brief, values)
     slots: list[Datum] = []
     for slot in brief.slots:
@@ -1191,13 +381,14 @@ def _investor_brief_section(
 
 
 # ---------------------------------------------------------------------------
-# Argument（2026-09-15）：論證層六段。算術與圖的敘述用封閉句型（alpha.narrative.argument）；判斷的長文照抄。
+# Argument（2026-09-15）：論證層。算術與圖的敘述用封閉句型（alpha.narrative.argument）；判斷的長文照抄。
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「數字怎麼算出來」「和市場差在哪」（C／H 組）與「賭注」（E 組）
+# 三段退役——它們讀的是估值鏈。剩三段：鏈、風險與認錯條件、時間表。
 # 本檔只**選取**既有 Datum 的值、格式化、組句；一個數都不算。
 # ---------------------------------------------------------------------------
 A_ARGUMENT = "alpha://narrative/argument"
 ARGUMENT_KEYS: tuple[tuple[str, str], ...] = (
-    ("chain", "這條鏈怎麼走"), ("numbers", "數字怎麼算出來"), ("market", "和市場差在哪"),
-    ("bet", "賭注"), ("risks", "風險與認錯條件"), ("timeline", "時間表"),
+    ("chain", "這條鏈怎麼走"), ("risks", "風險與認錯條件"), ("timeline", "時間表"),
 )
 ARGUMENT_IS_NOT: tuple[str, ...] = (
     "不是新的判斷：算術與圖的敘述是句型，判斷的長文逐字來自 session 寫的假設理由、賭注理由、風險與推翻條件",
@@ -1223,13 +414,8 @@ def _citations(narrative: Mapping[str, Any], about: Sequence[str], *, limit: int
     return out
 
 
-def _step_value(bridge: EarningsBridgeSection, key: str) -> Any:
-    return next((d.value for d in bridge.steps if d.key == key), None)
-
-
-def _argument_section(*, company_label: str, company_id: str | None, structural: StructuralThesisSection, bridge: EarningsBridgeSection,
-                      internal: InternalFundamentalsSection, valuation: ValuationSection, ir: ImpliedReturnSection,
-                      gap: ExpectationGapSection, variant: VariantViewSection,
+def _argument_section(*, company_label: str, company_id: str | None, structural: StructuralThesisSection,
+                      variant: VariantViewSection,
                       falsification: FalsificationSection, catalysts: CatalystSection, lifecycle: LifecycleFacts,
                       narrative: Mapping[str, Any], reporting_currency: str | None, reference_day: date) -> ArgumentSection:
     names = dict(narrative.get("node_names") or {})
@@ -1257,48 +443,9 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
     _para("chain", chain_paragraph(company=company_name, anchor_id=anchor, edges=edges, names=names),
           citations=_citations(narrative, chain_about + ([company_id] if company_id else [])), refs=[])
 
-    # 2. 數字
-    growth = [(d.key.split(":", 1)[1], d.value) for d in bridge.steps
-              if d.key.startswith("revenue_growth:") and isinstance(d.value, (int, float))]
-    margin_delta = next((d.value for d in bridge.steps if d.key.startswith("operating_margin_delta:")
-                         and isinstance(d.value, (int, float))), None)
-    eps_cmp = next((d.value for d in gap.numeric_comparisons if d.key.endswith("_eps") and isinstance(d.value, Mapping)), {})
-    sens = sorted(valuation.sensitivities, key=lambda d: abs(float((d.value or {}).get("fair_value_relative") or 0))
-                  if isinstance(d.value, Mapping) else 0, reverse=True)
-    top = None
-    if sens and isinstance(sens[0].value, Mapping):
-        parts = sens[0].key.split(":")
-        top = {**dict(sens[0].value), "driver": parts[1] if len(parts) > 1 else None}
-    long_form = [{"title": f"{PLAIN_DRIVER_LABELS.get(str((d.dependencies or {}).get('driver') or d.key.split(':')[1] if ':' in d.key else d.key), d.key)}"
-                           f"（{d.key.split(':')[-1]}）", "text": d.reason, "value": d.value, "unit": d.unit}
-                 for d in bridge.assumptions if d.reason]
-    _para("numbers", numbers_paragraph(
-        base_period=internal.base_period_end.isoformat()[:4] and f"FY{internal.base_period_end.year}" if internal.base_period_end else None,
-        target_period=internal.period, currency=reporting_currency,
-        base_revenue=_step_value(bridge, "base_revenue"), base_margin=_step_value(bridge, "base_operating_margin"),
-        growth=growth, margin_delta=margin_delta, internal_revenue=_step_value(bridge, "internal_revenue"),
-        internal_margin=_step_value(bridge, "internal_operating_margin"), internal_eps=_step_value(bridge, "internal_eps"),
-        consensus_eps=eps_cmp.get("consensus") if isinstance(eps_cmp, Mapping) else None,
-        top_sensitivity=top, driver_labels=PLAIN_DRIVER_LABELS), long_form=long_form,
-        refs=[r for d in bridge.assumptions for r in d.evidence_refs])
-
-    # 3. 市場
-    comparisons = []
-    for d in gap.numeric_comparisons:
-        if isinstance(d.value, Mapping) and isinstance(d.value.get("relative_gap"), (int, float)):
-            metric = d.key.rsplit("_", 1)[-1]
-            comparisons.append({"label": {"eps": "每股盈餘", "revenue": "營收", "margin": "營益率"}.get(metric, metric),
-                                "relative_gap": d.value["relative_gap"]})
-    attribution = ir.attribution.value if isinstance(ir.attribution.value, Mapping) else {}
-    val_assumption = next((d for d in valuation.assumptions if d.is_known), None)
-    reverse = gap.reverse_bridge.value if gap.reverse_bridge is not None and isinstance(gap.reverse_bridge.value, Mapping) else None
-    closure = gap.gap_closure.value if gap.gap_closure is not None and isinstance(gap.gap_closure.value, Mapping) else None
-    _para("market", market_paragraph(
-        comparisons=comparisons, market_multiple=attribution.get("market_multiple_on_consensus"),
-        our_multiple=val_assumption.value if val_assumption else None,
-        multiple_rationale=None, reverse=reverse, driver_labels=PLAIN_DRIVER_LABELS, closure=closure),
-        long_form=[{"title": "目標倍數的理由", "text": val_assumption.reason}] if val_assumption and val_assumption.reason else [],
-        why="還沒有內部預測或共識，沒有可比的東西")
+    # ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：「數字怎麼算出來」與「和市場差在哪」兩段退役。**
+    # 前者由橋的 steps／假設／敏感度組句，後者由內部 vs 共識的數值比較、目標倍數與反向橋組句——
+    # 全部是估值鏈的輸出。實測拿掉後 73/73 檔的 argument 都還有內容（鏈 73／時間表 73／風險 63）。
 
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：論證層的「賭注」段退役（E 組）。**
     # 它由四個價格組句（賭注目標價／payoff／EPS 貢獻／倍數貢獻）。`bet` **面板**已於 0b.1a
@@ -1319,8 +466,7 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
         checkpoints=[{"date": c.date, "what": c.what, "decides": c.decides} for c in catalysts.checkpoints],
         catalysts=[{"expected_at": c.expected_at, "description": c.description, "state": c.state}
                    for c in catalysts.structured],
-        value_date=ir.value_date.value, horizon_end=ir.horizon.value, thesis_next_check=lifecycle.thesis_next_check,
-        reached=(ir.target_reached.value if ir.target_reached is not None and isinstance(ir.target_reached.value, Mapping) else None)),
+        thesis_next_check=lifecycle.thesis_next_check),
         basis="session_judgment")
 
     known = [p for p in paragraphs if p.is_known]
@@ -1523,40 +669,24 @@ def build_alpha_investment_view(
     thesis_lifecycle: Mapping[str, Any] | None = None,
     checklist: Mapping[str, Any] | None = None,
     identity: Mapping[str, Any] | None = None,
-    fundamental_model: FundamentalModelResult | None = None,
-    #: 已經算好的 `MultiYearView`（2026-09-20）。**builder 不自己算**——它是組裝器。
-    fundamental_model_reason: str | None = None,
-    valuation: ValuationResult | None = None,
-    valuation_reason: str | None = None,
-    valuation_records: Sequence[ValuationAssumption] = (),
-    implied_return: ImpliedReturnResult | None = None,
-    implied_return_reason: str | None = None,
-    horizon_records: Sequence[HorizonAssumption] = (),
-    entry: EntryAssessmentResult | None = None,
-    entry_reason: str | None = None,
-    entry_records: Sequence[EntryCriterion] = (),
-    #: Phase 7 Step 7.1（2026-09-19）：同一條橋、同一組輸入，**只換起點價格**問「N 倍要什麼為真」。
+    #: 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：估值鏈退役後，builder 收的財務輸入只剩 Engine C 的
+    #: 基期觀測（報表幣別的身分來源）與會計年度別共識（三題「已定價」要用）。**沒有任何模型輸出進來。**
+    base_actuals: Any | None = None,
+    fiscal_consensus: Sequence[Any] = (),
+    consensus_bases: Mapping[str, str] | None = None,
+    #: 取數層取不到（provider 沒能力／讀取失敗／PIT 拒用）的原因——沒有列時要印出來，不得靜默（INV-3）。
+    financials_reason: str | None = None,
+    #: 基期觀測／共識／指引／期中實績的 evidence ref——只用來讓假設的引用解析得到，並進卡片的 evidence index。
+    financial_evidence: Sequence[Any] = (),
+    #: 目標期間（最近已報導年度的下一年）。只用來選取假設（as-of／期間／supersede／證據解析）——不推任何數字。
+    target_period: Any | None = None,
     today: date | None = None,
     refresh_changes: Sequence[ChangeEvent] | None = None,
-    assumption_records: Sequence[OperatingAssumption] = (),
+    assumption_records: Sequence[Any] = (),
     abstention_records: Sequence[Any] = (),
     metric_observations: Sequence[MetricObservation] = (),
     change_detection: str | None = None,
     refresh_notes: Sequence[str] = (),
-    variant_fundamental: FundamentalModelResult | None = None,
-    variant_valuation: ValuationResult | None = None,
-    variant_implied_return: ImpliedReturnResult | None = None,
-    variant_reason: str | None = None,
-    variant_absence_kind: str | None = None,
-    # D2（2026-09-18）：「判斷錯了值多少」——與 variant **同形**的五個參數。
-    # ⚠ 預設 `None` 在這裡是對的：它與 variant 一樣代表「這條鏈沒跑」，而
-    # `downside_reason`／`downside_absence_kind` 會把「為什麼沒跑」帶到 section 裡，
-    # 所以缺席不會被壓成一句「無資料」（L16：`absence_kind` 由產生缺席的那段自己宣告）。
-    downside_fundamental: FundamentalModelResult | None = None,
-    downside_valuation: ValuationResult | None = None,
-    downside_implied_return: ImpliedReturnResult | None = None,
-    downside_reason: str | None = None,
-    downside_absence_kind: str | None = None,
     #: D2（2026-09-18）：歸零旗標。`alpha.wipeout.wipeout_flags()` 的輸出，由取數層算好帶進來——
     #: builder 不連 DB、不自己判色。
     wipeout: Mapping[str, Mapping[str, Any]] | None = None,
@@ -1568,7 +698,8 @@ def build_alpha_investment_view(
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。
 
-    `variant_*`（V0，2026-09-15）：賭注那條鏈的三個模型輸出；沒有 variant 紀錄時全 None ＋ reason。
+    `assumption_records`（營運假設 ledger，A3）今天只餵兩個地方：催化劑熟成度（`resolves` 指名的假設
+    有沒有重看過）與 refresh 的假設 artifact——**沒有任何模型再拿它算數字**（2026-09-23 Phase 0）。
     """
     today = today or date.today()
     context = build.context
@@ -1586,8 +717,7 @@ def build_alpha_investment_view(
     # 身分來源只能是財報自己：基期觀測宣告的 currency，其次是快照的 financial_currency。
     # ⚠ **不得回退到 `market_currency`**——那正是這個 bug；答不出來就寫「未知」（L12 先分開再各自定規則）。
     reporting_currency = (
-        (fundamental_model.base_actuals.currency
-         if fundamental_model is not None and fundamental_model.base_actuals is not None else None)
+        (getattr(base_actuals, "currency", None) if base_actuals is not None else None)
         or getattr(context.fundamentals, "currency", None)
     )
 
@@ -1619,25 +749,6 @@ def build_alpha_investment_view(
         # thesis/lifecycle.json 與 catalyst_calendar.json 是當前狀態檔，沒有歷史。
         thesis_lifecycle = None
         catalyst_checkpoints = ()
-        # fundamental model 自己帶 as_of（假設 created_at／觀測 recorded_at／共識 captured_at 都
-        # 依它過濾）；標記不符就是呼叫端拿別的時點跑的，拒收（INV-6）。
-        if fundamental_model is not None and fundamental_model.as_of != context.as_of:
-            fundamental_model_reason = (
-                f"as-of {as_of_iso} 模式：傳入的 fundamental model 以 as_of="
-                f"{fundamental_model.as_of} 執行，與 context 不符，拒收（INV-6）")
-            fundamental_model = None
-        if valuation is not None and valuation.as_of != context.as_of:
-            valuation_reason = (f"as-of {as_of_iso} 模式：傳入的 valuation 以 as_of={valuation.as_of} 執行，"
-                                "與 context 不符，拒收（INV-6）")
-            valuation = None
-        if implied_return is not None and implied_return.as_of != context.as_of:
-            implied_return_reason = (f"as-of {as_of_iso} 模式：傳入的 implied return 以 as_of={implied_return.as_of} 執行，"
-                                     "與 context 不符，拒收（INV-6）")
-            implied_return = None
-        if entry is not None and entry.as_of != context.as_of:
-            entry_reason = (f"as-of {as_of_iso} 模式：傳入的 entry assessment 以 as_of={entry.as_of} 執行，"
-                            "與 context 不符，拒收（INV-6）")
-            entry = None
     #: 沒有時點語意的來源在 as-of 下是 not_applicable；authority 回答「T 時刻沒有」則是 missing。
     thesis_absent_status = "not_applicable" if as_of_mode else "missing"
     decision_absent_status = "not_applicable" if (as_of_mode and decision_refused) else "missing"
@@ -1684,14 +795,25 @@ def build_alpha_investment_view(
     judged_at = build_instant(judged_on) if judged_on else None
     artifacts = artifacts_from_signal(signal, judged_at=judged_at,
                                       structural_trace=build.structural_trace, build_at=build_at)
-    artifacts += artifacts_from_model(fundamental_model, build_at=build_at,
-                                      assumption_records=assumption_records)
-    artifacts += artifacts_from_valuation(
-        valuation, build_at=build_at, assumption_records=valuation_records,
-        base_period_end=(fundamental_model.base_period.end if fundamental_model and fundamental_model.base_period else None))
-    artifacts += artifacts_from_implied_return(
-        implied_return, build_at=build_at, horizon_records=horizon_records,
-        base_period_end=(fundamental_model.base_period.end if fundamental_model and fundamental_model.base_period else None))
+    # ---- 假設 ledger 的選取語意（as-of／期間／supersede／證據解析）：這是 ledger 的判準，不是模型的 ----
+    # 模型退役前它跑在 `build_fundamental_model` 裡；拒收原因決定假設 artifact 的終局（unresolved_evidence →
+    # invalidated、other_period／created_after_as_of → missing、superseded／retracted → superseded）。
+    # 沒有目標期間（沒有基期觀測也沒有共識）就不選取，只依 ledger 時序判撤回／取代。
+    # ⚠ 只登記 base 鏈：variant／downside overlay 紀錄（E 組退役後只剩 ledger 資料）不進 refresh——退役前
+    # 也只登記模型那一條 scenario（base），overlay 進來會把同一條件重複印成「等待中」好幾次。
+    base_records = [r for r in assumption_records if str(getattr(r, "scenario", "base") or "base") == "base"]
+    assumption_rejections: dict[str, str] = {}
+    if target_period is not None and base_records:
+        evidence_index: dict[str, Any] = {ref.ref: ref for ref in context.evidence_refs}
+        for ref in financial_evidence:
+            evidence_index.setdefault(ref.ref, ref)
+        _accepted, assumption_selection = select_assumptions(
+            base_records, target=target_period, as_of=context.as_of, today=today,
+            evidence_index=evidence_index)
+        assumption_rejections = dict(assumption_selection.rejected)
+    artifacts += artifacts_from_assumptions(
+        base_records, build_at=build_at, rejection=assumption_rejections,
+        base_period_end=(getattr(getattr(base_actuals, "period", None), "end", None) if base_actuals is not None else None))
     artifacts += artifacts_from_context(context, build_at=build_at)
     detection = change_detection or ("not_run" if refresh_changes is None else "authority_time_series")
     changes = list(refresh_changes or ())
@@ -1726,22 +848,8 @@ def build_alpha_investment_view(
                 stale_reason = None
     judgment_not_current = judgment_status != "available"
 
-    fund = _fundamental_parts(
-        fundamental_model, fundamental_model_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
-        refresh=refresh_by_key,
-    )
     market_section = _market_section(build, reference_day=reference_day)
-    valuation_section = _valuation_section(
-        valuation, valuation_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
-        refresh=refresh_by_key,
-    )
-    implied_return_section = _implied_return_section(
-        implied_return, implied_return_reason, reference_day=reference_day,
-        reporting_unit=f"reporting_currency（{reporting_currency or '未知'}；未正規化）",
-        refresh=refresh_by_key,
-    )
+    reporting_unit = f"reporting_currency（{reporting_currency or '未知'}；未正規化）"
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`payoff_section` 與 `downside_section` 隨 E 組退役。
 
     # ---- Evidence index：context ＋ 路徑／事件的引用，去重 -------------------
@@ -1768,16 +876,9 @@ def build_alpha_investment_view(
             evidence_pool.setdefault(ref.ref, ref)
     # Phase 2 驗收（2026-09-06）抓到：假設引用的 engine_c://manual_observation／consensus_estimate
     # 在模型端解析得到，卡片自己的 evidence index 卻沒有——讀者拿著卡片對不回引用。
-    # 模型的 evidence 已在 as-of 下過濾（recorded_at／captured_at ≤ T），放進來不會漏未來。
-    if fundamental_model is not None:
-        for ref in fundamental_model.evidence:
-            evidence_pool.setdefault(ref.ref, ref)
-    if valuation is not None:
-        for ref in valuation.evidence:
-            evidence_pool.setdefault(ref.ref, ref)
-    if implied_return is not None:
-        for ref in implied_return.evidence:
-            evidence_pool.setdefault(ref.ref, ref)
+    # 2026-09-23 起模型沒了，基期觀測與會計年度別共識的 evidence 直接進來（取數層已在 as-of 下過濾）。
+    for ref in financial_evidence:
+        evidence_pool.setdefault(ref.ref, ref)
 
     fund_fresh = _freshness_status(build, "fundamentals")
     market_fresh = _freshness_status(build, "market")
@@ -2073,7 +1174,6 @@ def build_alpha_investment_view(
         dependency_paths=tuple(_path_item(p) for p in dependency_paths),
         substitution_paths=tuple(_path_item(p) for p in substitution_paths),
         impacts_on_company=impact_items, structural_events=event_items,
-        financial_causal_model=fund.financial_causal,
     )
 
     # =======================================================================
@@ -2083,7 +1183,6 @@ def build_alpha_investment_view(
     m = context.market
     fund_as_of = _freshness_as_of(build, "fundamentals")
     market_as_of = m.bar_date or _freshness_as_of(build, "market")
-    reporting_unit = f"reporting_currency（{reporting_currency or '未知'}；未正規化）"
     quote_price_unit = f"quote_unit（{quote_unit or '未知'}）"
     fundamentals_items = (
         _observation("price", "價格", m.price, authority=A_SNAP, unit=quote_price_unit,
@@ -2208,7 +1307,7 @@ def build_alpha_investment_view(
         _observation("revenue_estimate_next_fy_growth", "下一會計年度營收共識成長",
                      c.revenue_estimate_next_fy_growth, authority=A_SNAP, unit="ratio",
                      as_of=cons_as_of, freshness=cons_fresh, evidence_refs=consensus_refs,
-                     method="營收成長，與 market_implied_eps_growth（EPS 成長）分母不同，不得相減"),
+                     method="營收成長；⚠ 不是 EPS 成長，分母不同，不得相減成 gap"),
         _observation("estimate_revision_30d", "forward EPS 30 個觀測修正幅度",
                      c.estimate_revision_30d, authority=A_ESTIMATES, unit="ratio",
                      as_of=cons_as_of, freshness=cons_fresh, evidence_refs=consensus_refs,
@@ -2218,8 +1317,9 @@ def build_alpha_investment_view(
                                     "身分不明／不相同（rollover）——算不出來不是沒修正"),
     )
     cons_has_snapshot = cons_fresh in ("available", "stale")
+    fiscal_items = _fiscal_consensus_items(fiscal_consensus, consensus_bases, reporting_unit=reporting_unit)
     fiscal_periods = sorted({d.dependencies.get("period") if d.dependencies else d.key.rsplit("_", 1)[-1]
-                             for d in fund.fiscal_items})
+                             for d in fiscal_items})
     consensus_section = ConsensusSection(
         meta=SectionMeta(
             status=("stale" if cons_fresh == "stale" else "partial") if cons_has_snapshot else "missing",
@@ -2227,9 +1327,11 @@ def build_alpha_investment_view(
             authority=A_SNAP, as_of=cons_as_of, freshness=cons_fresh,
             reason=("Engine C 無這檔的共識快照" if not cons_has_snapshot else
                     "快照欄位覆蓋到 next-FY 營收共識、forward／trailing PE、EV/營收、目標價均值與導出 forward EPS；"
-                    + (f"會計年度別 EPS／營收共識（fiscal_items）覆蓋 {'、'.join(fiscal_periods)}" if fund.fiscal_items
-                       else "會計年度別 EPS／營收共識（consensus_estimates）尚無列")),
-            warnings=("這不是 multi-year consensus earnings model：fiscal_items 只到 provider 的 0y／+1y 兩個年度，"
+                    + (f"會計年度別 EPS／營收共識（fiscal_items）覆蓋 {'、'.join(fiscal_periods)}" if fiscal_items
+                       else ("會計年度別 EPS／營收共識（consensus_estimates）尚無列"
+                             + (f"（{financials_reason}）" if financials_reason else "")))),
+            warnings=((f"Engine C 會計年度別資料：{financials_reason}",) if financials_reason else ())
+            + ("這不是 multi-year consensus earnings model：fiscal_items 只到 provider 的 0y／+1y 兩個年度，"
                       "沒有目標價高低區間、沒有逐位分析師分布；修正歷史只有由 price/pe_forward 導出的序列。",
                       "快照裡的 forward_eps 是 price/pe_forward 導出、revenue_estimate_next_fy 是相對標籤 +1y——"
                       "兩者都不是會計年度身分明確的共識；同期比較只用 fiscal_items。")
@@ -2243,143 +1345,33 @@ def build_alpha_investment_view(
                        "derived forward EPS）＋ fiscal_items（FY-identified EPS／revenue avg／low／high／n／year_ago，"
                        "只到 0y 與 +1y）；缺 multi-year EPS（第三年起）、target high/low、per-analyst distribution、"
                        "margin consensus"),
-        fiscal_items=fund.fiscal_items,
+        fiscal_items=fiscal_items,
     )
 
     # =======================================================================
-    # G. Price-Implied Expectations（heuristic proxy，不是 reverse DCF）
-    # =======================================================================
-    v = context.valuation
-    implied_reason = None
-    if v.market_implied_growth is None:
-        if c.trailing_pe is None:
-            implied_reason = "pe_trailing_missing：無 trailing PE（多半在虧損），比值不成立"
-        elif c.forward_pe is None:
-            implied_reason = "pe_forward_missing：無 forward PE"
-        elif c.forward_pe <= 0 or c.trailing_pe <= 0:
-            implied_reason = "pe_forward_nonpositive：分析師預估下一年度仍虧損，比值無意義"
-        else:
-            implied_reason = "alpha.context 未算出（原因見 valuation.method）"
-    price_implied_items = (
-        (Datum(key="market_implied_eps_growth", label="市場隱含 EPS 成長（粗略代理）",
-               value=v.market_implied_growth,
-               status="stale" if cons_fresh == "stale" else "available",
-               basis="heuristic_proxy", authority=A_IMPLIED, unit="ratio", as_of=cons_as_of,
-               method=v.method, evidence_refs=_refs(v.evidence),
-               reason="trailing_pe/forward_pe − 1，假設倍數不變——那正是要質疑的東西；"
-                      "它是 EPS 成長，不是營收成長，不得與共識營收成長相減")
-         if v.market_implied_growth is not None else
-         Datum(key="market_implied_eps_growth", label="市場隱含 EPS 成長（粗略代理）",
-               value=None, status="not_applicable" if implied_reason and "nonpositive" in implied_reason else "missing",
-               basis="none", authority=A_IMPLIED, reason=implied_reason)),
-        not_modeled("market_implied_margin", "市場隱含利潤率",
-                    "需要 segment／margin bridge；alpha.context 恆填 None（不是 0%）"),
-        (Datum(key="estimate_revision_vs_price", label="估計修正 vs 股價變動（Q4 原料）",
-               value=dict(estimate_revision), status="stale" if cons_fresh == "stale" else "available",
-               basis="deterministic", authority=A_ESTIMATES, unit="ratio", as_of=cons_as_of,
-               method="engine_c.estimates.revision_over：forward EPS 變動與股價變動分開；estimate_vs_price 正值＝估計跑在股價前面",
-               evidence_refs=consensus_refs,
-               reason="這是 expectation gap 的**原料**，不是 gap 本身")
-         if estimate_revision and estimate_revision.get("comparable") else
-         # ⚠ 不可比不是缺料：序列在、股價變動也算得出來，但兩端不是同一個會計年度的估計。
-         # 用 not_applicable ＋ 原文理由，讓「換了一把尺」不會被讀成「分析師上修」（2026-09-07）。
-         Datum(key="estimate_revision_vs_price", label="估計修正 vs 股價變動（Q4 原料）",
-               value=None, status="not_applicable", basis="none", authority=A_ESTIMATES,
-               reason=f"不可比：{estimate_revision.get('not_comparable_reason')}"
-                      f"（同窗口股價 {estimate_revision.get('price_change', 0):+.1%}）"
-                      "。⚠ forward year rollover 不是 analyst estimate revision，不得當 Q4 正向證據")
-         if estimate_revision else
-         missing("estimate_revision_vs_price", "估計修正 vs 股價變動（Q4 原料）",
-                 "序列太短、起點為 0 或跨越正負號，或本次未取", authority=A_ESTIMATES)),
-    )
-    has_implied = any(d.is_known for d in price_implied_items)
-    price_implied_section = PriceImpliedSection(
-        meta=SectionMeta(
-            status="partial" if has_implied else "missing",
-            basis="heuristic_proxy" if has_implied else "none",
-            authority=A_IMPLIED, as_of=cons_as_of, freshness=cons_fresh,
-            reason="只有 PE 比值導出的 EPS 成長 proxy；隱含利潤率與 reverse DCF 尚未建模",
-            warnings=("method quality＝heuristic／proxy。不得稱為 reverse DCF、不得當成 modeled expectations。",),
-        ),
-        items=price_implied_items,
-        reverse_dcf=not_modeled("reverse_dcf", "Reverse DCF（價格隱含的成長／利潤率／折現率解）",
-                                "runtime 上不存在任何 DCF 或反解程式路徑"),
-    )
-
-    # =======================================================================
-    # H. Internal Fundamental View（alpha/fundamental 的輸出；read model 只選取）
-    # =======================================================================
-    internal_section = fund.internal_section
-
-    # =======================================================================
-    # I. Earnings Bridge（每一格：基期觀測／明示假設／確定性 derived；缺假設＝missing）
-    # =======================================================================
-    earnings_bridge_section = EarningsBridgeSection(
-        meta=fund.bridge_meta,
-        steps=fund.bridge_steps,
-        assumptions=fund.bridge_assumptions,
-        sensitivities=fund.bridge_sensitivities,
-        selection=fund.bridge_selection,
-        period=fund.bridge_period,
-        inputs_available=(
-            segment,
-            Datum(key="structural_events_count", label="可用結構事件數（180 天內）",
-                  value=len(event_items), status="available", basis="deterministic",
-                  authority=A_GRAPH, unit="count", method="get_structural_changes_since"),
-            Datum(key="dependency_paths_count", label="可用依賴路徑數", value=len(dependency_paths),
-                  status="available", basis="deterministic", authority=A_GRAPH, unit="count"),
-        ),
-    )
-
-    # =======================================================================
-    # J. Expectation Gap（區分 session 判斷／proxy／尚未建模的數值 gap）
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：G（price-implied proxy）、H（internal fundamentals）、
+    #   I（earnings bridge）三個 section 整組退役；J 只剩 session 判斷（Q4）與共識時序的量測。
+    # J. Expectation Gap（session 判斷 ＋ 量測；沒有任何數值 gap）
     # =======================================================================
     q4 = session_scores["expectation_gap"]
-    gap_proxies = (price_implied_items[2], price_implied_items[0])
-    gap_has = q4.is_known or any(d.is_known for d in gap_proxies) or fund.has_numeric_gap
-    if q4.is_known:
-        gap_basis, gap_authority = "session_judgment", A_SESSION
-    elif fund.has_numeric_gap:
-        gap_basis, gap_authority = "deterministic", A_COMPARE
-    elif gap_has:
-        gap_basis, gap_authority = "heuristic_proxy", A_IMPLIED
-    else:
-        gap_basis, gap_authority = "none", A_IMPLIED
-    # ---- V2 gap closure：共識朝我們移了幾成（量測不是訊號）------------------------------------
-    # ⚠ **base 與 variant 的起算日不是同一天**（V4，2026-09-19）。base 的起點是判斷日；
-    # 賭注的起點是**賭注寫下那天**——variant overlay 多半晚於 base 判斷好幾天（實測 COHR 判斷
-    # 09-07／賭注 09-15、LITE 09-09／09-18、AXTI 09-10／09-17，三檔**沒有一檔同日**）。
-    # 用判斷日當賭注的起點，會把「賭注當時還不存在」那段期間的共識變動算成「朝我們的賭注移動」，
-    # 那是拿現在的主張去解釋過去的資料（INV-6）。實測代價：LITE 的 variant closed_fraction
-    # 先前是 +1.26%，而那一次共識上修發生在 2026-09-14，比賭注寫下日早四天。
+    # ---- V2 gap closure：共識自判斷日以來的移動（量測不是訊號）--------------------------------
+    # ⚠ 2026-09-23：內部 EPS 隨 FY+1 因果橋退役，所以 `our_value=None`——沒有「朝我們移了幾成」的分母，
+    # `closed_fraction` 是 None（不是 0）；量到的只有共識本身從起點到現值的移動。賭注那條線（variant）
+    # 已於 E 組退役，恆 None。
     points = [(d, float(v)) for d, v, _n in consensus_history]
-    base_eps_value = (fundamental_model.metrics["eps"].value
-                      if fundamental_model is not None and fundamental_model.metrics.get("eps") is not None else None)
-    variant_eps_value = (variant_fundamental.metrics["eps"].value
-                         if variant_fundamental is not None and variant_fundamental.metrics.get("eps") is not None else None)
-    bet_since = bet_recorded_on(variant_fundamental)
-    progress_base = consensus_progress(points, since=judged_on, our_value=base_eps_value)
-    if variant_eps_value is None:
-        progress_variant = None
-    elif bet_since is None:
-        # 答不出「賭注哪天寫下的」就明確拒絕，**不拿判斷日頂替**（INV-6：不得靜默回傳當前值）。
-        progress_variant = {"status": "missing", "n_points": len(points),
-                            "reason": "賭注假設沒有建立時點，起算日不明——不以判斷日代替"}
-    else:
-        progress_variant = consensus_progress(points, since=bet_since, our_value=variant_eps_value)
+    progress_base = consensus_progress(points, since=judged_on, our_value=None)
     if progress_base.get("status") == "available":
         gap_closure_datum = Datum(
-            key="gap_closure", label="市場承認了嗎：自判斷日以來共識朝我們移了幾成",
-            value={"base": progress_base, "variant": progress_variant,
-                   "since": judged_on, "bet_since": bet_since},
+            key="gap_closure", label="市場承認了嗎：自判斷日以來共識 EPS 移了多少",
+            value={"base": progress_base, "variant": None, "since": judged_on, "bet_since": None},
             status="available", basis="deterministic", authority=A_CONSENSUS_FY, as_of=today,
             method=progress_base["rule"],
-            reason=("量測不是訊號：只回答共識與我們的差距縮小了多少；不排序、不決定尺寸"
-                    + ("；判斷日未知，起點取序列第一筆" if judged_on is None else "")
-                    + (f"；賭注那條線自 {bet_since.isoformat()} 起算（賭注寫下日，不是判斷日）"
-                       if bet_since is not None else "")))
+            reason=("量測不是訊號：只回答共識自判斷日以來移了多少；不排序、不決定尺寸。"
+                    "⚠ 2026-09-23 Phase 0：內部 EPS 已退役，所以沒有「朝我們移了幾成」的比例"
+                    "（closed_fraction 為 None，不是 0）；「已定價嗎」由財務三題接手（Phase 3）"
+                    + ("；判斷日未知，起點取序列第一筆" if judged_on is None else "")))
     else:
-        gap_closure_datum = missing("gap_closure", "市場承認了嗎：自判斷日以來共識朝我們移了幾成",
+        gap_closure_datum = missing("gap_closure", "市場承認了嗎：自判斷日以來共識 EPS 移了多少",
                                     progress_base.get("reason") or "沒有共識序列", authority=A_CONSENSUS_FY)
     consensus_series_datum = (
         Datum(key="consensus_series", label="目標期間共識 EPS 的抓取時序", status="available", basis="observation",
@@ -2389,37 +1381,23 @@ def build_alpha_investment_view(
         if consensus_history else
         missing("consensus_series", "目標期間共識 EPS 的抓取時序", "consensus_estimates 沒有這個期間的時序", authority=A_CONSENSUS_FY))
 
+    gap_has = q4.is_known or gap_closure_datum.is_known
     expectation_gap_section = ExpectationGapSection(
         meta=SectionMeta(
             status=((q4.status if q4.status in ("stale", "review_required", "invalidated") else "partial")
                     if gap_has else "missing"),
-            basis=gap_basis, authority=gap_authority,
-            capability=CAP_NUMERIC_EXPECTATION_GAP if fund.has_numeric_gap else None,
-            reason=(("Q4 是 session 的 ordinal 判斷；numeric_comparisons 是內部假設推出的數字與同期共識的差——"
-                     "兩者並存、各自標示，數值 gap 不取代 Q4" if fund.has_numeric_gap else
-                     "Q4 是 session 的 ordinal 判斷；數值 gap 見 internal_vs_consensus 的缺席原因；"
-                     "internal-vs-price-implied 尚未建模")
-                    if gap_has else "無 session 判斷、無 proxy 原料、無數值 gap"),
+            basis=("session_judgment" if q4.is_known else ("deterministic" if gap_closure_datum.is_known else "none")),
+            authority=(A_SESSION if q4.is_known else A_CONSENSUS_FY),
+            capability=None,
+            reason=("Q4 是 session 的 ordinal 判斷；gap_closure 是共識時序的量測——兩者並存、各自標示。"
+                    "⚠ 內部 vs 共識的數值 gap 已於 2026-09-23 Phase 0 隨 FY+1 因果橋退役"
+                    if gap_has else "無 session 判斷、無共識時序"),
             warnings=(
-                "Q4 的 ordinal 等級不是 internal EPS − consensus EPS；numeric_comparisons 才是那個差，且它的輸入是假設。",
-                "market_implied_eps_growth（EPS）與 revenue_estimate_next_fy_growth（營收）分母不同，不得相減成 gap。",
-                "estimate_revision_vs_price 是原料：正值只代表估計跑在股價前面，不是可行動的 gap。",
-                "數值 gap 只在同一會計期間、同一口徑（GAAP／non-GAAP）、同幣別時才算；不合就標 not_applicable，不硬減。",
+                "Q4 的 ordinal 等級不是 internal EPS − consensus EPS——那個數值差已退役，本 section 沒有任何數值 gap。",
+                "gap_closure 是量測不是訊號：正值只代表共識上修，不是可行動的 gap。",
             ),
         ),
-        session_judgment=q4, proxies=gap_proxies,
-        internal_vs_consensus=fund.internal_vs_consensus,
-        internal_vs_price_implied=not_modeled("internal_vs_price_implied", "內部估計 vs 價格隱含（數值）",
-                                              "價格隱含側只有 PE 比值 proxy，沒有 reverse DCF（價格隱含的成長／利潤率解）；"
-                                              "fair value 與現價的差住 valuation section，它是 fair_value − price，"
-                                              "不是內部基本面 vs 價格隱含基本面"),
-        numeric_comparisons=fund.comparisons,
-        opinion_stance=fund.opinion_stance,
-        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`reverse_bridge`（現價隱含的營運假設）退役——
-        # 它是多年反向橋的正向那一格，整條橋在 D 組退役。欄位保留 `None`（契約預設），
-        # 不改 section 形狀；**缺席由這一行宣告，不是靜默消失**。
-        multiple_derivation=_multiple_derivation_datum(valuation, reference_day=today),
-        gap_closure=gap_closure_datum, consensus_series=consensus_series_datum,
+        session_judgment=q4, gap_closure=gap_closure_datum, consensus_series=consensus_series_datum,
     )
 
     # =======================================================================
@@ -2428,7 +1406,7 @@ def build_alpha_investment_view(
     q5 = session_scores["catalyst"]
     # V1（2026-09-15）熟成度：一條催化劑「裁決了沒」是機械判定——事件日期已過，且它指名的每條假設在那之後
     # 都有新的 ledger 紀錄（同 key 的 append）。不解析散文、不判真假。
-    ledger_records = [*assumption_records, *valuation_records]
+    ledger_records = list(assumption_records)
     by_id = {r.assumption_id: r for r in ledger_records}
 
     def _catalyst_state(cat: Any) -> tuple[str, tuple[str, ...]]:
@@ -2661,17 +1639,7 @@ def build_alpha_investment_view(
         base=_scenario("base_case", "Base case（散文）", signal.base_case if signal else None),
         bear=_scenario("bear_case", "Bear case（散文）", signal.bear_case if signal else None),
         probabilities=not_modeled("scenario_probabilities", "情境機率", "沒有任何機率加權"),
-        # Step 1：單點 fair value 有了（valuation section）；**逐情境**的目標估值仍然沒有。
-        target_valuation=(
-            Datum(key="target_valuation", label="目標估值（單點 fair value；非逐情境）",
-                  value=valuation_section.fair_value.value, status=valuation_section.fair_value.status,
-                  basis="deterministic", authority=A_VALUATION, unit=valuation_section.fair_value.unit,
-                  as_of=reference_day, method=valuation_section.fair_value.method,
-                  reason="照抄 valuation.fair_value；bull／base／bear 各自的目標估值與機率加權仍未建模")
-            if valuation_section.fair_value.is_known else
-            Datum(key="target_valuation", label="目標估值（單點 fair value；非逐情境）", value=None,
-                  status=valuation_section.fair_value.status, basis="none", authority=A_VALUATION,
-                  reason=f"valuation section：{valuation_section.fair_value.reason}；逐情境目標估值仍未建模")),
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`target_valuation`（照抄 valuation.fair_value）隨估值鏈退役。
     )
 
     # =======================================================================
@@ -2801,29 +1769,20 @@ def build_alpha_investment_view(
     warnings.extend(identity_warnings)
     if problems:
         warnings.append("Decision Store 的 catalyst／disproof／expiry 設定不完整：" + "；".join(problems))
-    if fund.has_numeric_gap:
-        warnings.append(FUNDAMENTAL_EPISTEMIC_WARNING)
-    warnings.extend(f"fundamental model：{w}" for w in fund.warnings)
-    if valuation_section.fair_value.is_known:
-        warnings.append(VALUATION_EPISTEMIC_WARNING)
-    if implied_return_section.price_return.is_known:
-        warnings.append(RETURN_EPISTEMIC_WARNING)
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`target_reached`（目標價到了沒）退役。**
     # 它比的是現價 vs base／賭注目標價，兩個目標價都隨估值鏈與 E 組退役。
     # **AGENTS D3 的判準沒有退役**（`realized` 只提醒、不觸發出場）——它現在的家是候選狀態
     # 「已定價等回落」（Phase 3 的五值封閉字彙），而不是一個由目標價算出來的布林。
     argument_section = _argument_section(
         company_label=identity_section.company_label, company_id=identity_section.company_id,
-        structural=structural_section, bridge=earnings_bridge_section,
-        internal=internal_section, valuation=valuation_section, ir=implied_return_section,
-        gap=expectation_gap_section, variant=variant_section, falsification=falsification_section,
+        structural=structural_section, variant=variant_section, falsification=falsification_section,
         catalysts=catalyst_section, lifecycle=identity_section.lifecycle, narrative=dict(narrative_context or {}),
         reporting_currency=reporting_currency, reference_day=reference_day)
     brief_section = _investor_brief_section(
         brief_records, brief_parse_errors,
         as_of=context.as_of, today=today, reference_day=reference_day,
-        ir=implied_return_section, consensus=consensus_section, catalysts=catalyst_section,
-        bridge=earnings_bridge_section, refresh_overall=refresh_section.overall, gap=expectation_gap_section,
+        price=market_section.price, consensus=consensus_section, catalysts=catalyst_section,
+        refresh_overall=refresh_section.overall, gap=expectation_gap_section,
         )
 
     return AlphaInvestmentView(
@@ -2831,12 +1790,9 @@ def build_alpha_investment_view(
         identity=identity_section, variant_view=variant_section,
         structural_thesis=structural_section, causal_paths=causal_section,
         fundamentals=fundamentals_section, consensus=consensus_section,
-        price_implied_expectations=price_implied_section,
-        internal_fundamentals=internal_section, earnings_bridge=earnings_bridge_section,
         expectation_gap=expectation_gap_section, catalysts=catalyst_section,
         falsification=falsification_section, scenarios=scenario_section,
-        market=market_section, valuation=valuation_section,
-        implied_return=implied_return_section,
+        market=market_section,
         wipeout_flags=_wipeout_section(wipeout, reason=wipeout_reason, reference_day=reference_day),
         evidence=evidence_section,
         freshness=tuple(freshness_items), refresh_status=refresh_section,
@@ -2866,22 +1822,13 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
         return d.value if d.is_known else None
 
     q = {d.key.removesuffix("_score"): _score_summary(d) for d in view.variant_view.scores}
-    implied = next(d for d in view.price_implied_expectations.items
-                   if d.key == "market_implied_eps_growth")
     cons_growth = next(d for d in view.consensus.items if d.key == "revenue_estimate_next_fy_growth")
     analysts = next(d for d in view.consensus.items if d.key == "analyst_count")
     watch = view.catalysts.watch_state
     next_cp = view.catalysts.checkpoints[0] if view.catalysts.checkpoints else None
     not_modeled_keys = [name for name, cap in view.capability_map().items() if cap["status"] == "not_modeled"]
-    comparisons = {d.key.removeprefix("internal_vs_consensus_"): d
-                   for d in view.expectation_gap.numeric_comparisons}
-    internal_vs_consensus = {
-        metric: ({"status": d.status, "relative_gap": (d.value or {}).get("relative_gap") if d.is_known else None,
-                  "period": (d.value or {}).get("period") if d.is_known else None,
-                  "reason": None if d.is_known else d.reason}
-                 if d is not None else None)
-        for metric, d in ((m, comparisons.get(m)) for m in ("eps", "revenue"))
-    }
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`market_implied_eps_growth`／`internal_vs_consensus`／
+    # `valuation`／`implied_return`／`internal_fundamentals_status` 五格隨估值鏈退役，卡片上整格移除。
     return {
         "ticker": view.identity.ticker,
         "company_id": view.identity.company_id,
@@ -2893,10 +1840,6 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
             "context_matches": view.identity.signal.context_matches,
             "weakest_axis": view.identity.signal.weakest_axis,
             "reason": view.identity.signal.reason,
-        },
-        "market_implied_eps_growth": {
-            "value": _val(implied), "status": implied.status, "basis": implied.basis,
-            "reason": implied.reason if not implied.is_known else None,
         },
         "consensus_revenue_growth": {
             "value": _val(cons_growth), "status": cons_growth.status, "basis": cons_growth.basis,
@@ -2934,36 +1877,6 @@ def compact_card(view: AlphaInvestmentView) -> dict[str, Any]:
                           for i in view.refresh_status.items
                           if i.state in ("review_required", "invalidated", "recalculate", "stale")][:6],
         },
-        # 內部假設推出的數字 vs 同期共識；None＝不可比／缺料（原因在 reason），不是 0
-        "internal_vs_consensus": internal_vs_consensus,
-        # Step 1：估值摘要——只抄 valuation section；gap 不是 expected return（renderer 不得改稱）
-        "valuation": {
-            "status": view.valuation.meta.status,
-            "method": _val(view.valuation.method),
-            "fair_value": _val(view.valuation.fair_value),
-            "current_price": _val(view.valuation.current_price),
-            "relative_gap": ((view.valuation.fair_value_gap.value or {}).get("relative_gap")
-                             if view.valuation.fair_value_gap.is_known else None),
-            "gap_status": view.valuation.fair_value_gap.status,
-            "period": view.valuation.period,
-            "reason": None if view.valuation.fair_value.is_known else view.valuation.fair_value.reason,
-        },
-        # Step 2：base-case implied return 摘要——只抄 implied_return section；**不是 expected return**
-        "implied_return": {
-            "status": view.implied_return.meta.status,
-            "price_return": _val(view.implied_return.price_return),
-            "annualized_price_return": _val(view.implied_return.annualized_price_return),
-            "horizon_start": ((view.implied_return.horizon_window.value or {}).get("horizon_start").isoformat()
-                              if view.implied_return.horizon_window.is_known else None),
-            "horizon_end": ((view.implied_return.horizon_window.value or {}).get("horizon_end").isoformat()
-                            if view.implied_return.horizon_window.is_known else None),
-            "value_date_semantics": ((view.implied_return.value_date.dependencies or {}).get("value_date_semantics")
-                                     if view.implied_return.value_date.is_known else None),
-            "total_return_status": view.implied_return.total_return.status,
-            "reason": None if view.implied_return.price_return.is_known else view.implied_return.price_return.reason,
-        },
-        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：entry logic 摘要隨 F 組退役，卡片上整格移除。
-        "internal_fundamentals_status": view.internal_fundamentals.meta.status,
         "not_modeled": not_modeled_keys,
         "warnings": list(view.warnings),
     }
@@ -2978,5 +1891,4 @@ def _score_summary(datum: Datum) -> dict[str, Any]:
 
 
 __all__ = ["DecisionFacts", "build_alpha_investment_view", "compact_card",
-           "CORRELATION_WARNING", "FUNDAMENTAL_EPISTEMIC_WARNING", "JUDGMENT_WARNING",
-           "NEXT_PHASE_NOTE", "RETURN_IS_NOT"]
+           "CORRELATION_WARNING", "JUDGMENT_WARNING"]

@@ -18,157 +18,20 @@
 """
 from __future__ import annotations
 
-from alpha.fundamental.contracts import (
-    ASSUMPTION_DERIVATIONS, OPINION_BEARING_DRIVERS, OPINION_STANCES, opinion_stance,
-)
-from briefing.analyst_view.contracts import PLAIN_STANCE
+from alpha.fundamental.contracts import ASSUMPTION_DERIVATIONS, OPINION_BEARING_DRIVERS
+
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：opinion stance 整組退役。**
+# 原本這裡有三層共 11 條測試：模型層的聚合規則（`opinion_stance()`）、措辭層（`PLAIN_STANCE`）、
+# 出門（vocab 檔、app.js 不硬編第二份、每個印隱含報酬的 surface 都走 `appendReturnBlock`）。
+# stance 是 FY+1 模型對估值假設 `derivation` 的聚合，隱含報酬是估值鏈的終點——兩者都退役。
+# 「有沒有自己的觀點」這個問題沒有消失，它的新家是讀圖與敘事（Phase 2），不再由估值假設的來源推得。
+# 留下的一條守 ledger 紀錄身分的封閉字彙（`derivation`／核心 driver）——那是 append-only 紀錄的一部分（L10）。
 
 
-class _Fake:
-    """只帶 stance 需要的三個欄位——刻意不用真的 OperatingAssumption，避免測試綁死建構細節。"""
-
-    def __init__(self, driver: str, derivation: str, retracted: bool = False) -> None:
-        self.driver, self.derivation, self.retracted = driver, derivation, retracted
-
-
-# ---------------------------------------------------------------------------
-# 1. 模型層：聚合規則
-# ---------------------------------------------------------------------------
-
-def test_any_independent_core_driver_means_we_have_a_view() -> None:
-    assert opinion_stance([_Fake("revenue_growth", "independent"),
-                           _Fake("operating_margin_delta", "consensus_inverted")]) == "independent"
-
-
-def test_all_inverted_core_drivers_is_not_an_opinion() -> None:
-    assert opinion_stance([_Fake("revenue_growth", "consensus_inverted"),
-                           _Fake("operating_margin_delta", "consensus_inverted")]) == "consensus_inverted"
-
-
-def test_mechanical_drivers_never_decide_the_stance() -> None:
-    """沿用基期實績的 tax／shares／NCI／interest 不參與。
-
-    把它們算進來，每一家公司都會被判成沒有觀點——一個恆亮的判準等於零鑑別力（L14-4）。
-    反過來也一樣：它們也不能讓一家沒做研究的公司看起來像有觀點。
-    """
-    mechanical = [_Fake("tax_rate", "carried_forward"), _Fake("diluted_shares", "carried_forward"),
-                  _Fake("nci_attribution", "carried_forward"),
-                  _Fake("interest_and_other_net", "carried_forward")]
-    assert opinion_stance(mechanical) == "no_opinion_bearing_assumptions"
-    assert opinion_stance(mechanical + [_Fake("revenue_growth", "consensus_inverted")]) \
-        == "consensus_inverted"
-
-
-def test_guidance_outranks_inverted_because_it_can_actually_differ_from_consensus() -> None:
-    """優先序是「哪一種結構上可能產生預期差」，不是「哪個聽起來比較強」。
-
-    實測（2026-09-10，LITE）：營收取共識成長、營益率取公司 Q1 指引持平外推而共識沒這樣做——
-    那一條假設貢獻了 +8.92% 的 EPS 差異。若把 `consensus_inverted` 排在前面，這一檔會被
-    標成「還沒形成觀點」，而它其實有一個明確的立場：相信公司，不相信分析師。
-    """
-    assert opinion_stance([_Fake("revenue_growth", "consensus_inverted"),
-                           _Fake("operating_margin_delta", "company_guidance")]) == "company_guidance"
-    # 但 independent 仍然最優先——自己的分析勝過採信別人。
-    assert opinion_stance([_Fake("revenue_growth", "company_guidance"),
-                           _Fake("operating_margin_delta", "independent")]) == "independent"
-
-
-def test_unclassified_never_becomes_independent() -> None:
-    """fail safe 的方向是「不知道」，不是「我們自己想的」——反過來會把佔位冒充成主張。"""
-    assert opinion_stance([_Fake("revenue_growth", "unclassified")]) == "undeclared"
-    assert opinion_stance([_Fake("revenue_growth", "unclassified"),
-                           _Fake("operating_margin_delta", "consensus_inverted")]) == "consensus_inverted"
-
-
-def test_retracted_assumptions_do_not_count() -> None:
-    assert opinion_stance([_Fake("revenue_growth", "independent", retracted=True)]) \
-        == "no_opinion_bearing_assumptions"
-
-
-# ---------------------------------------------------------------------------
-# 2. 措辭層：只有一份
-# ---------------------------------------------------------------------------
-
-def test_plain_wording_covers_every_stance_and_no_extras() -> None:
-    """新增一個 stance 而忘了寫措辭，使用者會看到一個內部代號——這就是那道剎車。"""
-    assert set(PLAIN_STANCE) == set(OPINION_STANCES)
-    for stance, entry in PLAIN_STANCE.items():
-        assert entry["short"] and entry["reason"], stance
-        assert stance not in entry["short"], f"{stance} 的短標籤不該是內部代號本身"
-
-
-def test_derivation_and_stance_vocabularies_stay_closed() -> None:
+def test_derivation_and_core_driver_vocabularies_stay_closed() -> None:
     assert "unclassified" in ASSUMPTION_DERIVATIONS       # 舊紀錄的 fail safe 必須存在
     assert "independent" in ASSUMPTION_DERIVATIONS
     assert OPINION_BEARING_DRIVERS == {"revenue_growth", "operating_margin_delta"}
-
-
-# ---------------------------------------------------------------------------
-# 3. 出門：字彙隨 materialize 走到 APP，前端不維護第二份
-# ---------------------------------------------------------------------------
-
-def test_stance_wording_ships_with_the_vocabulary_file(tmp_path) -> None:
-    import json
-
-    from webapp.materialize import write_vocabularies
-    from webapp.store import ArtifactStore
-
-    path = write_vocabularies(ArtifactStore(tmp_path))
-    payload = json.loads(path.read_text(encoding="utf-8"))
-    assert set(payload["plain_stance"]) == set(OPINION_STANCES)
-
-
-def test_frontend_does_not_hardcode_a_second_stance_table() -> None:
-    """app.js 必須從 VOCAB 讀措辭。硬編一份對照表就是 L16 記過的重造品。"""
-    from pathlib import Path
-
-    source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(
-        encoding="utf-8")
-    assert "VOCAB.plain_stance" in source
-    # 代號出現在分支邏輯是正常的（`stance === 'consensus_inverted'` 決定那一欄印不印數字）；
-    # **不正常的是措辭**——一旦前端寫死一句中文，字彙改了它就開始偏離。
-    # ⚠ 刻意**只檢查長句**。第一版連 short 一起檢查，結果「未宣告」這種常見詞在 app.js
-    # 別處誤報——而 L16-4 明文：做一個會誤報的防呆來防止過度工程，本身就是過度工程。
-    # 長句夠長到不可能巧合，短標籤不夠。
-    for entry in PLAIN_STANCE.values():
-        assert entry["reason"][:14] not in source, f"app.js 不該硬編措辭：{entry['reason'][:14]}"
-
-
-def test_every_surface_that_prints_implied_return_consults_the_stance() -> None:
-    """三個 surface 印同一個大數字，必須共用同一段判斷。
-
-    事發（2026-09-10）：第一版只改了詳情頁「我們比市場」那一欄，而使用者最先看到的是
-    **列表卡片與頭條的隱含報酬**——那兩處照樣印 `0.0%`。使用者的原話是「002472 明明
-    missing 還是 0.0%」「5802.T AXTI ready without any comment」。
-
-    這是 L13：驗收條件必須寫成「產出出現在下游消費者手上」，而當時驗的是 artifact 裡的
-    欄位對不對——那一層早就對了。
-    """
-    from pathlib import Path
-
-    source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(
-        encoding="utf-8")
-    # 1 個定義 + 4 個呼叫（列表卡片／頭條／白話頭條／賭注區塊）。
-    # V0（2026-09-15）：賭注區塊也共用同一段——variant 的 derivation 型別層強制 independent，
-    # 所以那一格傳的是明示的 null stance（沒有「共識反解」這種賭注），不是漏掉判斷。
-    # 2026-09-15 再加基本數字列（numbersStrip）：兩個報酬格都走同一段——1 定義 + 6 呼叫
-    # D2（2026-09-18）：基本數字列多一處「判斷錯了，要漲跌多少」，7 → 8。
-    # ⚠ 計數本身不是判準——判準是「每個印隱含報酬的 surface 都走同一個 helper」。
-    # 這個數字變大只有在**新 surface 也用了 helper** 時才該更新；若哪天有人手寫一段
-    # 報酬渲染，計數不會變，而這條測試也抓不到它（已知限制，寫在這裡而不是假裝它守得住）。
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：列表卡片的「沒賭對，要漲跌多少」與「賭注對了」兩格
-    # 隨那把尺退役，所以呼叫數 8 → 7。**判準一字未改**：每個仍在印報酬的 surface 都走同一段判斷。
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 賭注／下檔那幾格退役，呼叫數 7 → 4。判準一字未改。
-    assert source.count("appendReturnBlock") == 4, "有 surface 沒有共用那段判斷"
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `betBlock`／`OVERLAY_BLOCKS` 整組退役，所以那兩條斷言翻面成「必須不在」
-    # ——有人把四價區塊加回來就會紅。
-    assert "OVERLAY_BLOCKS" not in source.replace("`OVERLAY_BLOCKS`", "")
-    assert "betBlock(view" not in source
-    assert "numbersStrip(view)" in source
-    # 列表卡片要看得到 stance，否則 ready 會被讀成「有結論」
-    assert "stanceBadge(cardStance)" in source
-    # 解釋的那句話要跟大數字在同一張卡
-    assert "stanceBanner(headStance)" in source
 
 
 # ---------------------------------------------------------------------------

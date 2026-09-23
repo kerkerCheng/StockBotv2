@@ -1,9 +1,8 @@
-"""內部估計 vs 共識——**只在 apples-to-apples 時給數字**。
+"""共識的**口徑核實**與**基期對帳**——資料層的機械比對，不是判斷。
 
-五個不可比的情形各自有名字，不合併成一個 `unavailable`：期間不同（`incompatible_period`）、
-口徑不同或未核實（`incompatible_basis`）、單位／幣別不同（`incompatible_unit`）、
-共識與基期對不上帳（`unreconciled_base`）、任一邊沒值（`internal_missing`／`consensus_missing`）。
-**不合就不減。**
+⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`compare_metric`（內部估計 vs 共識的數值 gap）與
+`describe_basis_mismatch` 隨 FY+1 因果橋退役——沒有內部估計就沒有東西可減。留下的三個函式只讀
+Engine C 的共識與基期觀測（A2）：這筆共識 EPS 是法定口徑還是調整後、這串共識量的是不是我們基期量的那個東西。
 
 ## 共識口徑的核實（L11：自己要引用的事實套同一套追源紀律）
 
@@ -33,9 +32,7 @@ import math
 
 from .contracts import (
     ConsensusEstimate,
-    ExpectationComparison,
     FiscalYearActuals,
-    ModeledMetric,
     consensus_basis_stem,
 )
 
@@ -94,8 +91,8 @@ def verify_consensus_basis(estimate: ConsensusEstimate, base: FiscalYearActuals 
       （容差放寬後這條更重要，它是「寬容不會選錯」的唯一保證）。
     - **同號**：`_close` 走相對比，異號時 |ratio−1| ≥ 1 > 3%，自動排除。
 
-    ⚠ 回 `*_fx_tolerated` 的那一筆**帶著一個已知的換算誤差**，
-    `compare_metric` 會把它寫進 reason，呈現層不得把它壓回 `gaap`／`non_gaap` 講。
+    ⚠ 回 `*_fx_tolerated` 的那一筆**帶著一個已知的換算誤差**（`fx_tolerated_delta`），
+    呈現層不得把它壓回 `gaap`／`non_gaap` 講。
     """
     if estimate.metric != "eps":
         return "not_applicable"
@@ -137,39 +134,6 @@ def fx_tolerated_delta(estimate: ConsensusEstimate, base: FiscalYearActuals | No
     return float(estimate.year_ago_actual) / float(value) - 1.0
 
 
-def describe_basis_mismatch(
-    estimate: ConsensusEstimate, base: FiscalYearActuals | None
-) -> str | None:
-    """`unverified` 時把**兩個數字**寫出來，讓讀者自己看得出差多少。
-
-    事發（2026-09-09 SOI.PA）：理由句只說「provider 未宣告且無法用去年實際值核實」，
-    於是「差 2%」與「差 40%」長得一模一樣。而那兩種差距的處置完全相反——前者多半是
-    換算匯率（TSM 實測：provider 10.65 用年均價、20-F 印的 10.43 用年末 NT$31.37），
-    後者才是真的會計口徑不同。
-
-    ⚠ 本函式**只描述，不分類**：它不宣稱差距的成因是匯率還是口徑。把
-    `incompatible_basis` 拆成兩個訊號是 ROADMAP「`incompatible_basis` 兩義」那一條的事，
-    需要先決定「願意接受多少換算差」——那是使用者的判斷，不是這裡能猜的。
-    """
-    if estimate.metric != "eps" or base is None or estimate.year_ago_actual is None:
-        return None
-    if not base.period.same_as(estimate.period.shifted(-1)):
-        return None
-    provider = float(estimate.year_ago_actual)
-    parts: list[str] = []
-    for name, block in (("gaap", base.gaap), ("non_gaap", base.non_gaap)):
-        value = (block or {}).get("diluted_eps")
-        if value is None:
-            continue
-        delta = (provider / float(value) - 1.0) if float(value) else None
-        parts.append(f"一手 {name} {float(value):,.4g}"
-                     + (f"（差 {delta:+.1%}）" if delta is not None else ""))
-    if not parts:
-        return None
-    return (f"provider 去年實際 {provider:,.4g} vs " + "／".join(parts)
-            + "——差距大小自己看：換算匯率差通常在個位數 %，會計口徑差不會")
-
-
 def reconcile_consensus_base(
     estimate: ConsensusEstimate, base: FiscalYearActuals | None
 ) -> str | None:
@@ -197,84 +161,5 @@ def reconcile_consensus_base(
               "重編、幣別或口徑不同）。不猜、不換算，本期營收不比較")
 
 
-def compare_metric(
-    metric: str,
-    internal: ModeledMetric | None,
-    consensus: ConsensusEstimate | None,
-    *,
-    consensus_basis: str,
-    internal_currency: str | None,
-    base_reconciliation: str | None = None,
-    basis_detail: str | None = None,
-    fx_delta: float | None = None,
-) -> ExpectationComparison:
-    """一個指標的比較。回傳物件的 `status != comparable` 時**沒有任何 gap 數字**。"""
-    unit = _METRIC_UNIT.get(metric)
-    common = dict(
-        metric=metric, unit=unit,
-        internal_period=internal.period if internal else None,
-        consensus_period=consensus.period if consensus else None,
-        internal=internal.value if internal else None,
-        consensus=consensus.value if consensus else None,
-        accounting_basis_internal=internal.accounting_basis if internal else None,
-        accounting_basis_consensus=(consensus_basis if consensus else None),
-        analyst_count=consensus.analyst_count if consensus else None,
-        consensus_captured_at=consensus.captured_at if consensus else None,
-        assumption_ids=tuple(internal.assumption_ids) if internal else (),
-        observation_refs=tuple(internal.observation_refs) if internal else (),
-        consensus_refs=consensus.refs if consensus else (),
-        fx_translation_delta=(
-            fx_delta if (consensus is not None
-                         and str(consensus_basis).endswith("_fx_tolerated")) else None),
-    )
-
-    def _no(status: str, reason: str) -> ExpectationComparison:
-        return ExpectationComparison(status=status, absolute_gap=None, relative_gap=None,
-                                     reason=reason, **common)
-
-    if internal is None or internal.value is None:
-        return _no("internal_missing",
-                   (internal.reason if internal and internal.reason else "內部估計不存在") + "（不是 0）")
-    if consensus is None or consensus.value is None:
-        return _no("consensus_missing", "Engine C 無這個指標的同期共識（不是 0）")
-    if not internal.period.same_as(consensus.period):
-        return _no("incompatible_period",
-                   f"內部 {internal.period.label}（至 {internal.period.end}）vs 共識 "
-                   f"{consensus.period.label}（至 {consensus.period.end}）——不同會計期間不得相減")
-    if base_reconciliation is not None:
-        return _no("unreconciled_base", base_reconciliation)
-    fx_note: str | None = None
-    if metric == "eps":
-        stem = consensus_basis_stem(consensus_basis)
-        if stem not in ("gaap", "non_gaap"):
-            return _no("incompatible_basis",
-                       f"共識口徑 {consensus_basis}：provider 未宣告且無法用去年實際值核實，"
-                       f"不得與內部 {internal.accounting_basis} 相減"
-                       + (f"｜{basis_detail}" if basis_detail else ""))
-        if internal.accounting_basis != stem:
-            return _no("incompatible_basis",
-                       f"內部 {internal.accounting_basis} vs 共識 {stem}——口徑不同不得相減")
-        if consensus_basis != stem:
-            # 口徑認出來了，但 provider 與一手的換算率不同。比較成立，**殘差必須跟著走**——
-            # 它與 gap 同量級時，讀者要看得出這個 gap 有多少是匯率而不是預期差。
-            fx_note = (
-                f"⚠ 共識口徑經**換算容差**認定為 {stem}（不是逐字相等）"
-                + (f"：provider 的去年實際值較一手高 {fx_delta:+.1%}" if fx_delta is not None else "")
-                + f"，容差上限 {_FX_TOLERATED_REL_TOL:.0%}。"
-                "同一個換算差會原樣進到下面的 gap——**gap 小於這個殘差時不具意義**。"
-                "要消掉它得用同一條 FX 路徑重算共識，不是調容差。"
-            )
-    if consensus.currency and internal_currency and consensus.currency.upper() != internal_currency.upper():
-        return _no("incompatible_unit",
-                   f"幣別不同：內部 {internal_currency} vs 共識 {consensus.currency}")
-    absolute = internal.value - consensus.value
-    relative = (internal.value / consensus.value - 1.0) if consensus.value > 0 else None
-    reason = None if relative is not None else "共識非正，相對 gap 無定義（只給絕對 gap）"
-    if fx_note:
-        reason = f"{reason}｜{fx_note}" if reason else fx_note
-    return ExpectationComparison(status="comparable", absolute_gap=absolute, relative_gap=relative,
-                                 reason=reason, **common)
-
-
-__all__ = ["compare_metric", "describe_basis_mismatch", "fx_tolerated_delta",
+__all__ = ["fx_tolerated_delta",
            "reconcile_consensus_base", "verify_consensus_basis"]

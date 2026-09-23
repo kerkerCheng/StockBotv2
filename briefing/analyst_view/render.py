@@ -170,14 +170,6 @@ def _context_line(context: Mapping[str, Any], *keys: str) -> str:
     return "｜".join(parts)
 
 
-def _one_sentence(line: AnalystLine | None) -> str | None:
-    """authority 自己組出的一句話（`epistemics.one_sentence`）。**只取，不改寫、不自己造句。**"""
-    if line is None or not line.datum.is_known or not isinstance(line.datum.value, Mapping):
-        return None
-    text = line.datum.value.get("one_sentence")
-    return str(text) if text else None
-
-
 # ---------------------------------------------------------------------------
 # 完整畫面
 # ---------------------------------------------------------------------------
@@ -280,18 +272,14 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
         lines.append(f"- **{markdown_text(line.display_label)}**：{colour} — {markdown_text(str(why))}")
     lines += ["", f"- {markdown_text(wipe.context.get('unlit_rule') or '')}", ""]
 
-    lines += [f"## 1. {QUESTIONS['q1_internal']}（Internal forecast）", "",
-              f"- {_context_line(fund.context, 'period', 'period_end', 'base_period_end', 'accounting_basis') or '目標期間未知'}",
-              ""]
-    lines += _compact_table(_by_role(fund, "internal"))
-    lines += [f"## 2. {QUESTIONS['q2_market']}", ""]
-    lines += ["**同期、同口徑的共識**（只有這些能與內部相減）：", ""]
-    lines += _compact_table(_by_role(fund, "consensus_same_period")) or ["（無同期共識。）", ""]
-    lines += ["其他期間的共識與市場觀測（**只呈現，不與內部相減**）：", ""]
-    lines += _compact_table(_by_role(fund, "consensus_other_period", "market_context", "market_proxy"),
-                            reason_column=False)
-    lines += [f"## 3. {QUESTIONS['q3_gap']}", ""]
-    lines += _compact_table(_by_role(fund, "comparison"))
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：「## 1. 我們預測什麼」與「## 3. 差異在哪」隨
+    # FY+1 因果橋退役；「## 2. 市場預測什麼」留著——那是 Engine C 的原始數字。
+    lines += [f"## 2. {QUESTIONS['q2_market']}", "",
+              f"- 會計年度別共識覆蓋：{markdown_text('、'.join(fund.context.get('consensus_periods') or []) or '無')}", ""]
+    lines += ["**會計年度別共識**（身分是 fiscal_period_end；只呈現，不與任何內部預測相減）：", ""]
+    lines += _compact_table(_by_role(fund, "consensus_fiscal")) or ["（無會計年度別共識。）", ""]
+    lines += ["市場脈絡與共識時序：", ""]
+    lines += _compact_table(_by_role(fund, "market_context"), reason_column=False)
     lines += [f"- 狀態：**{markdown_text(fund.status)}**"
               f"（來源 {markdown_text('、'.join(f'{k}={v}' for k, v in fund.source_statuses.items()))}）"
               + (f"｜{markdown_text(fund.reason)}" if fund.reason else "")]

@@ -17,9 +17,7 @@ from pathlib import Path
 import pytest
 
 from alpha.narrative import FORBIDDEN_TERMS, format_value
-from alpha.narrative.argument import (
-    EVIDENCE_CLASS_PLAIN, bet_paragraph, chain_paragraph, market_paragraph, numbers_paragraph, timeline_paragraph,
-)
+from alpha.narrative.argument import EVIDENCE_CLASS_PLAIN, chain_paragraph, timeline_paragraph
 
 ROOT = Path(__file__).resolve().parents[1]
 NAMES = {"tech:ai_switch": "Data-center switch", "co:nvidia": "NVIDIA", "tech:inp_6inch_fab": "6-inch InP Fab",
@@ -56,49 +54,19 @@ def test_chain_paragraph_names_nodes_and_isolates_the_thin_links() -> None:
     assert chain_paragraph(company="X", anchor_id=None, edges=[], names={}) == "圖裡還沒有 X 的供應鏈連結，所以說不出它在哪條鏈上。"
 
 
-def test_numbers_paragraph_prints_the_given_values_in_human_units() -> None:
-    text = numbers_paragraph(
-        base_period="FY2026", target_period="FY2027", currency="USD", base_revenue=7_118_200_000.0, base_margin=0.2047,
-        growth=[("Datacenter & Communications", 0.6), ("Industrial", -0.03)], margin_delta=0.025,
-        internal_revenue=10_227_652_000.0, internal_margin=0.2297, internal_eps=8.944, consensus_eps=9.416,
-        top_sensitivity={"driver": "operating_margin_delta", "delta_fair_value": 10.18, "fair_value_relative": 0.0456,
-                         "bump_unit": "absolute_ratio"}, driver_labels=LABELS)
-    _clean(text)
-    assert "71.2 億 USD" in text and "20.5%" in text and "「Industrial」業務成長 −3.0%" in text
-    assert "每股盈餘 8.94；市場共識 9.42" in text
-    assert "最敏感的是營益率變化：每差 1 個百分點，目標價差約 10.18 USD（4.6%）" in text
-    assert numbers_paragraph(base_period=None, target_period=None, currency=None, base_revenue=None, base_margin=None,
-                             growth=[], margin_delta=None, internal_revenue=None, internal_margin=None, internal_eps=None,
-                             consensus_eps=None, top_sensitivity=None, driver_labels=LABELS) == "還沒有上一個年度的實際數字，所以算不出明年的獲利。"
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`test_numbers_paragraph_prints_the_given_values_in_human_units` 與
+# `test_market_and_bet_paragraphs_speak_in_percentage_points_not_driver_names` 退役——三個句型
+# （數字怎麼算出來／和市場差在哪／賭注）的輸入全是估值鏈，句型與測試一起退役。
 
 
-def test_market_and_bet_paragraphs_speak_in_percentage_points_not_driver_names() -> None:
-    market = market_paragraph(
-        comparisons=[{"label": "每股盈餘", "relative_gap": -0.05}], market_multiple=28.3, our_multiple=25.0,
-        multiple_rationale=None,
-        reverse={"solutions": [{"driver": "operating_margin_delta", "scope": "mix_and_utilization", "implied_value": 0.067, "status": "solved"}]},
-        driver_labels=LABELS)
-    _clean(market)
-    assert "每股盈餘我們比市場低 5.0%" in market and "市場對明年獲利付 28.3 倍，我們給 25.0 倍" in market
-    assert "營益率要多提高 6.7 個百分點" in market and "mix_and_utilization" not in market
-    bet = bet_paragraph(has_bet=True, overrides=[{"driver": "operating_margin_delta", "scope": "mix_and_utilization",
-                                                  "base_value": 0.025, "value": 0.045, "unit": "ratio"}],
-                        bet_target=243.97, price=266.5, payoff=-0.0845, eps_part=0.036, multiple_part=-0.117,
-                        currency="USD", driver_labels=LABELS)
-    _clean(bet)
-    assert "從 2.5 個百分點 改成 4.5 個百分點" in bet and "是 −8.5%" in bet and "獲利面貢獻 +3.6%" in bet
-    assert bet_paragraph(has_bet=False, overrides=[], bet_target=None, price=None, payoff=None, eps_part=None,
-                         multiple_part=None, currency=None, driver_labels=LABELS).startswith("還沒寫下賭注")
-
-
-def test_timeline_paragraph_sorts_by_date_and_states_the_value_date() -> None:
+def test_timeline_paragraph_sorts_by_date_and_states_the_next_check() -> None:
     text = timeline_paragraph(
         checkpoints=[{"date": date(2026, 12, 1), "what": "六吋產能檢核", "decides": "倍增是否如期"}],
         catalysts=[{"expected_at": date(2026, 11, 18), "description": "Q3 財報"}],
-        value_date=date(2027, 6, 30), horizon_end=date(2027, 6, 30), thesis_next_check=date(2026, 10, 15))
+        thesis_next_check=date(2026, 10, 15))
     _clean(text)
     assert text.index("2026-11-18") < text.index("2026-12-01")
-    assert "目標價指的是 2027-06-30 那一天的值" in text and "下次例行核查是 2026-10-15" in text
+    assert "下次例行核查是 2026-10-15" in text and "目標價" not in text
 
 
 def test_money_formatting_is_presentation_only() -> None:
@@ -113,10 +81,10 @@ def test_argument_section_is_built_from_the_fixture_and_panel_is_core() -> None:
 
     view = _full_view(with_criterion=False)
     ag = view.argument
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 論證層的「賭注」段（四個價格組句）退役，六段變五段。
-    # 「數字」「和市場差在哪」兩段讀的是估值鏈，隨 C／H 組退役（尚未執行）。
-    assert len(ag.paragraphs) == 5 and [p.key for p in ag.paragraphs] == [
-        "argument:chain", "argument:numbers", "argument:market", "argument:risks", "argument:timeline"]
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「賭注」段隨 E 組、「數字」「和市場差在哪」兩段隨 C／H 組退役。
+    # 論證層剩三段：鏈、風險與認錯條件、時間表。
+    assert len(ag.paragraphs) == 3 and [p.key for p in ag.paragraphs] == [
+        "argument:chain", "argument:risks", "argument:timeline"]
     for p in ag.paragraphs:
         if p.is_known:
             _clean(str(p.value))

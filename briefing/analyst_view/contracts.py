@@ -46,9 +46,9 @@ SCHEMA_VERSION = "analyst-view/1"
 #: 消費者的六個問句。panel 用 `questions` 指出自己回答哪幾個——這是**閱讀順序**的宣告，
 #: 不是新的分類法：每個問句的答案都已經在 `AlphaInvestmentView` 裡，只是散在不同 section。
 QUESTIONS: Mapping[str, str] = {
-    "q1_internal": "我們預測什麼？",
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`q1_internal`（我們預測什麼）與 `q3_gap`（差異在哪）退役
+    #   ——它們的答案是 FY+1 因果橋與內部 vs 共識的數值 gap。「市場預測什麼」留著：那是 Engine C 的原始數字。
     "q2_market": "市場預測什麼？",
-    "q3_gap": "差異在哪？",
     "q6_change": "什麼 evidence 會改變答案？",
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：三個問句退役。
     #   `q4_implied_return`（現價對 future target 隱含什麼報酬）與 `q7_payoff`（賭注對了值多少）
@@ -104,24 +104,21 @@ _READINESS_CLASS: Mapping[str, str] = {
 
 #: 一行呈現在 panel 裡扮演什麼角色（封閉字彙；renderer 依此分組，不依值分組）。
 LINE_ROLES = frozenset({
-    "headline_number",         # 頭條那一串數字的其中一格
-    "headline_context",        # 頭條的語意脈絡（convention／horizon window／gap）
-    "internal",                # 我們的預測
-    "consensus_same_period",   # 同期、可比的市場預測
-    "consensus_other_period",  # 其他期間的市場預測（**不可與內部相減**）
-    "market_context",          # 非期間身分的市場觀測（分析師人數、目標價、PE…）
-    "market_proxy",            # 價格隱含的粗略代理
-    "comparison",              # 內部 vs 共識的數值落差
+    "headline_number",         # 頭條那一格：現價
+    "consensus_fiscal",        # 會計年度別共識（身分是 fiscal_period_end；只呈現，不與任何內部預測相減）
+    "market_context",          # 非期間身分的市場觀測（分析師人數、目標價、PE…）與共識時序的量測
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`assumption`／`sensitivity`／`trace`／`epistemics`
     # 四個 role 退役——它們**只由 `why` 面板產生**，而 `why` 已退役。`entry` 同理。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`internal`（我們的預測）、`consensus_same_period`／
+    # `consensus_other_period`（相對於內部預測期間的分類）、`comparison`（內部 vs 共識）、`market_proxy`
+    # （PE 比值 proxy）、`headline_context`（隱含報酬的語意脈絡）退役；`override`（賭注覆蓋的假設）隨 E 組退役。
     # 留著沒有 producer 的 role 等於留一份會讓下個讀者以為還在用的字彙（L16）。
     "thesis",                  # 研究判斷本身
     "score",                   # Q1–Q5
     "lifecycle",               # thesis 狀態／到期／watch
     "bet",                     # optional：賭注（2026-09-23 起是純文字，不是四個價格）
-    "override",                # 賭注覆蓋的假設（每條帶 base 對照值）
-    "brief",                   # optional：投資人短評的七句＋一把尺＋一顆燈
-    "paragraph",               # optional：論證層的六段
+    "brief",                   # optional：投資人短評的七句＋一顆燈
+    "paragraph",               # optional：論證層的三段
     "wipeout",                 # optional：歸零旗標的一盞燈（D2；顏色＋一句話，數字在 dependencies）
 })
 
@@ -161,15 +158,16 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
     "headline": {"title": "現在多少錢",
                  "hint": "現價與價格脈絡（52 週高低、最新交易日、幣別）。**這裡沒有目標價、沒有隱含報酬**"
                          "——那把尺已於 2026-09-23 退役；「已定價嗎」由財務三題回答（Phase 3）"},
-    "fundamental": {"title": "我們和市場，預期差在哪（選配）",
-                    "hint": "同一個會計期間、同一種口徑才拿來比；不可比的一律標「不可比」。"
-                            "2026-09-23 起是稽核區的原始數字，不是判讀完整度的條件"},
+    "fundamental": {"title": "市場預測什麼（原始數字，選配）",
+                    "hint": "會計年度別共識與市場觀測，身分是 fiscal_period_end。"
+                            "2026-09-23 起沒有內部預測、沒有「我們比市場」——那條鏈退役了；"
+                            "這裡是稽核區的原始數字，不是判讀完整度的條件"},
     "research": {"title": "什麼會推翻它",
                  "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
     "argument": {"title": "為什麼這樣想",
-                 "hint": "四段：這條鏈怎麼走、賭注、風險與認錯條件、時間表。圖的敘述由句型組；"
-                         "賭注理由、風險、認錯條件是研究時寫的長文，逐字附在段後。"
-                         "⚠ 2026-09-23 少了「數字怎麼算出來」與「和市場差在哪」兩段——它們讀的是估值鏈"},
+                 "hint": "三段：這條鏈怎麼走、風險與認錯條件、時間表。圖的敘述由句型組；"
+                         "風險、認錯條件是研究時寫的長文，逐字附在段後。"
+                         "⚠ 2026-09-23 少了「數字怎麼算出來」「和市場差在哪」（讀估值鏈）與「賭注」（讀四價）三段"},
     "brief": {"title": "這檔在賭什麼",
               "hint": "七句話講前因後果：什麼在放量、這家公司供什麼、為什麼卡在它、市場怎麼看、我們賭什麼、"
                       "對了／錯了會怎樣、什麼時候知道。文字是研究時寫的判斷，數字由系統填"},
@@ -177,64 +175,25 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
                 "hint": "四盞燈：現金跑道、負債、稀釋、going concern。**只給顏色不給數字**——"
                         "算出顏色的數字在每盞燈自己的稽核格裡。灰燈不是綠燈：它表示這一項沒量到，"
                         "而「沒查」不等於「沒事」"},
-    "bet": {"title": "如果我們的賭注對了",
-            "hint": "只改我們有差異看法的那幾條假設，其餘沿用 base；算出來的是條件句，不是預測、不是機率加權。"
-                    "沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
+    "bet": {"title": "我們賭什麼",
+            "hint": "研究 session 寫下的那一句（短評的 our_bet）。沒有價格、沒有報酬、沒有機率加權——"
+                    "四個價格已於 2026-09-23 退役。沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
 }
 
 #: 逐格標籤的白話版。沒列到的沿用 read model 的 `display_label`（那些多半本來就看得懂）。
 PLAIN_LINE_LABELS: Mapping[str, str] = {
     "current_price": "現在股價",
-    "fair_value": "我們算出的未來目標價",
-    "value_date": "目標價是哪一天的值",
-    "horizon": "多久之後",
-    "price_return": "從現價到目標價，要漲跌多少",
-    "annualized_price_return": "換算成一年多少",
-    "eps_contribution": "其中：因為我們估的 EPS 比市場共識高或低",
-    "multiple_contribution": "其中：因為我們給的倍數比市場現在付的高或低",
-    "return_attribution": "兩個桿怎麼合成總報酬",
-    "epistemics_one_sentence": "一句話說明這個數字怎麼來的",
-    "internal_revenue": "我們估的營收",
-    "internal_operating_margin": "我們估的營益率",
-    "internal_eps": "我們估的每股盈餘",
-    "internal_gross_margin": "我們估的毛利率",
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：估值鏈（fair_value／value_date／horizon／price_return／年化／
+    # 兩桿拆解／epistemics／internal_*）、進場門檻（criterion／required_annualized_return，F 組）、
+    # 賭注與下檔的四價（payoff_*／variant_*／downside_*，E 組）、目標價到了沒（target_reached）
+    # 的白話標籤全部退役——沒有 producer 的標籤不留（L16）。
     "thesis": "我們的看法",
     "variant_view": "我們和市場看法差在哪",
     "direction": "看多還看空",
     "confidence": "信心程度",
     "expected_horizon": "預期多久見分曉",
-    "criterion": "你要求的報酬",
-    "required_annualized_return": "要求的年化報酬",
-    # ⚠ 2026-09-23（Step 0b.1）：`entry_price`／`price_to_entry_gap` 兩個 label 隨 entry 面板退役。
-    # V0：賭注
-    "payoff_scenario": "賭注長什麼樣",
-    "variant_internal_eps": "賭注對了的每股盈餘",
-    "variant_fair_value": "賭注對了的目標價",
-    "payoff_value_date": "賭注目標價是哪一天的值",
-    "payoff_return": "從現價到賭注目標價，要漲跌多少",
-    "annualized_payoff_return": "換算成一年多少",
-    "payoff_eps_contribution": "其中：因為賭注的 EPS 比市場共識高或低",
-    "payoff_multiple_contribution": "其中：因為賭注的倍數比市場現在付的高或低",
-    "base_fair_value_for_payoff": "對照：base 目標價",
-    "base_price_return_for_payoff": "對照：base 隱含報酬",
-    "payoff_one_sentence": "一句話說明賭注的數字怎麼來的",
-    # D2（2026-09-18）：判斷錯了值多少——與賭注**逐格對稱**。
-    # ⚠ 白話名刻意都用「判斷錯了」而不是「下跌」：它是一個條件句（反證成真），
-    # 不是對股價的預測，也不是停損線。
-    "downside_scenario": "判斷錯了長什麼樣",
-    "downside_internal_eps": "判斷錯了的每股盈餘",
-    "downside_fair_value": "判斷錯了的目標價",
-    "downside_value_date": "判斷錯了的目標價是哪一天的值",
-    "downside_return": "從現價到那個價，要漲跌多少",
-    "annualized_downside_return": "換算成一年多少",
-    "downside_eps_contribution": "其中：因為那時的 EPS 比市場共識高或低",
-    "downside_multiple_contribution": "其中：因為那時的倍數比市場現在付的高或低",
-    "base_fair_value_for_downside": "對照：base 目標價",
-    "base_price_return_for_downside": "對照：base 隱含報酬",
-    "downside_one_sentence": "一句話說明下檔的數字怎麼來的",
     "gap_closure": "市場承認了嗎",
     "consensus_series": "市場共識每股盈餘的歷史",
-    "target_reached": "目標價到了沒",
 }
 
 #: 缺席語意的短標籤（畫面寬度用）。完整說明仍是 `ABSENCE_KINDS`，兩者同一個家——
@@ -261,24 +220,8 @@ PLAIN_READINESS: Mapping[str, Mapping[str, str]] = {
     "blocked": {"label": "有一段讀不成", "note": "看下面「卡在哪」——它會說是還沒做、刻意不做，還是缺上游"},
 }
 
-#: 目標倍數的來源（2026-09-11）。與 `PLAIN_STANCE`（EPS 桿）是同一個病的兩半：
-#: 一個是判斷、一個是抄市場，而畫面上 COHR 的 25x 與 TSM 的 25.71x 長得一模一樣。
-PLAIN_MULTIPLE_DERIVATION: Mapping[str, Mapping[str, str]] = {
-    "independent": {
-        "short": "我們判斷的倍數",
-        "reason": "目標倍數是我們自己決定的——它會貢獻隱含報酬，所以它需要指得出 re-rating 證據",
-    },
-    "calibrated_to_market": {
-        "short": "＝市場現在付的倍數",
-        "reason": "目標倍數直接取市場現在付的倍數（現價 ÷ 同期共識），零折溢價——"
-                  "**倍數這根桿因此不貢獻任何報酬**，隱含報酬全部來自 EPS 差異。"
-                  "這是刻意的：沒有 re-rating 證據時不該憑感覺給折溢價",
-    },
-    "unclassified": {
-        "short": "未宣告",
-        "reason": "2026-09-11 之前寫的舊紀錄，未宣告倍數來源；**不預設成我們的判斷**",
-    },
-}
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`PLAIN_MULTIPLE_DERIVATION`（目標倍數的來源）退役——
+# 它是估值假設的 `derivation` 白話層，估值鏈整條退役。
 
 #: refresh overall 的白話燈號（2026-09-15，投資人短評首屏的那一顆燈）。**不判斷好壞**，只講狀態。
 PLAIN_REFRESH_OVERALL: Mapping[str, str] = {
@@ -291,55 +234,9 @@ PLAIN_REFRESH_OVERALL: Mapping[str, str] = {
     "missing": "還沒有判斷",
 }
 
-#: `OperatingAssumption.driver` 的白話標籤（2026-09-10）。反推表的每一列印的是 driver，
-#: 而 `PLAIN_LINE_LABELS` 的 key 是 line key 不是 driver——混用會讓使用者看到 `revenue_growth`。
-#: ⚠ 這不是重造 `ASSUMPTION_DRIVERS`（那裡的 description 是給寫假設的人看的長句，
-#: 含 scope 規則）；這裡只有短標籤，且 `tests` 守著 key 集合完全相同。
-PLAIN_DRIVER_LABELS: Mapping[str, str] = {
-    "revenue_growth": "營收成長",
-    "operating_margin_delta": "營益率變化",
-    "interest_and_other_net": "利息與其他淨額",
-    "tax_rate": "有效稅率",
-    "tax_expense_absolute": "所得稅費用（金額）",
-    "nci_attribution": "非控制權益調整",
-    "preferred_dividends": "特別股股息",
-    "diluted_eps_numerator_adjustment": "稀釋 EPS 分子調整",
-    "diluted_shares": "稀釋股數",
-}
-
-#: opinion stance 的白話措辭層（2026-09-10）。**short 與 reason 只有這一份**——
-#: builder 寫進 datum.reason 的長句、APP badge 的短標籤、meta API 的字彙表全部取自這裡。
-#: 分成兩份就會有一份開始偏離（L16），所以 `tests` 守著它的 key 集合＝`OPINION_STANCES`。
-#:
-#: ⚠ 措辭必須答出「這是不是要我做事」，不能只是重述分類名。使用者看到的不該是
-#: 「consensus_inverted」，而是「我們還沒形成觀點，這裡的 0 不是判斷」。
-PLAIN_STANCE: Mapping[str, Mapping[str, str]] = {
-    "independent": {
-        "short": "有我們自己的看法",
-        "reason": "核心假設裡至少有一條是我們自己決定的——這一格的預期差有內容可讀",
-    },
-    "consensus_inverted": {
-        "short": "還沒形成觀點",
-        "reason": "核心假設全部由同期共識反解得出：我們**尚未形成獨立觀點**。此時「我們比市場」"
-                  "必然接近 0，那是代數上的必然，不是判斷結果——要讓這一格有內容，"
-                  "需要的是研究，不是重算",
-    },
-    "company_guidance": {
-        "short": "採信公司指引",
-        "reason": "核心假設取自公司自家指引，不是我們的獨立分析——但它**可以**與共識不同"
-                  "（而且常常不同），所以這一格的預期差是有內容的：那個內容是"
-                  "「我們選擇相信公司，而不是相信分析師」",
-    },
-    "undeclared": {
-        "short": "未宣告",
-        "reason": "核心假設是 2026-09-10 之前寫的舊紀錄，未宣告推導方式；"
-                  "**不預設成獨立觀點**（那會把佔位冒充成主張）",
-    },
-    "no_opinion_bearing_assumptions": {
-        "short": "還沒開始",
-        "reason": "還沒有任何營收／營益率假設——這一檔還沒開始做",
-    },
-}
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`PLAIN_DRIVER_LABELS`（driver 白話標籤，只服務論證層的
+# 「數字怎麼算出來」與反推表）與 `PLAIN_STANCE`（我們有沒有形成自己的觀點——FY+1 模型對假設 `derivation`
+# 的聚合）退役。「有沒有自己的觀點」這個問題沒有消失，它的新家是讀圖與敘事（Phase 2），不再由估值假設的來源推得。
 
 #: 圖表用的一句話。價格是**脈絡不是訊號**：不排序、不決定尺寸、不產生任何建議。
 PRICE_SERIES_NOTE = (
@@ -674,9 +571,6 @@ __all__ = [
     "PLAIN_LINE_LABELS",
     "PLAIN_PANEL_TITLES",
     "PLAIN_READINESS",
-    "PLAIN_DRIVER_LABELS",
-    "PLAIN_MULTIPLE_DERIVATION",
-    "PLAIN_STANCE",
     "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",
     "AnalystLine", "AnalystPanel", "AnalystReadiness", "AnalystView", "AnalystViewContractViolation",

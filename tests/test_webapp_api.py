@@ -375,20 +375,20 @@ def test_no_row_ever_defers_to_an_expansion_that_does_not_exist() -> None:
     assert "plainLine(line.key, line.display_label)" in rows
 
 
-def test_versus_market_is_a_real_comparison_table() -> None:
-    """「我們和市場差在哪」必須是一張看得懂的表，不是三列「見下方展開」。
-
-    先前這張卡用 `renderRows` 印 `comparison` 那三列，而那三列的值全是結構化物件——
-    於是整張卡等於空的。現在是四欄：項目／我們估／市場共識／我們比市場。
+def test_versus_market_card_prints_only_what_the_market_says() -> None:
+    """⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原名 `test_versus_market_is_a_real_comparison_table`，
+    守「我們估／市場共識／我們比市場」四欄表——內部預測與相減隨 FY+1 因果橋退役，表跟著退役。
+    現在這張卡只印市場說了什麼：會計年度別共識（role `consensus_fiscal`，每格由 `structuredText`
+    翻成人話，不留「見下方展開」）＋賣方目標價與倍數。**不得再長出「我們估」「我們比市場」那兩欄。**
     """
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     block = source.split("function versusMarketCard(view)", 1)[1]
     block = re.split(r"\n(?:async )?function ", block, maxsplit=1)[0]
-    for token in ("COMPARE_ROWS", "'我們估'", "'市場共識'", "'我們比市場'"):
-        assert token in block, f"比較表少了 {token}"
-    assert "renderRows(" not in block, "比較表不得退回 renderRows——那正是空表的來源"
-    # 市場沒有共識的那一列不留白也不寫 0：印缺席徽章＋理由
-    assert "absenceBadge(gap.absence_kind)" in block
+    for token in ("'consensus_fiscal'", "target_mean", "forward_pe", "不是我們的目標價"):
+        assert token in block, f"市場卡少了 {token}"
+    for retired in ("COMPARE_ROWS", "'我們估'", "'我們比市場'", "reverseBridgeBlock", "opinion_stance"):
+        assert retired not in block, f"退役的比較表不得復活：{retired}"
+    assert "const COMPARE_ROWS" not in source and "function reverseBridgeBlock" not in source
 
 
 def test_full_detail_has_exactly_one_level_of_expansion() -> None:
@@ -444,33 +444,30 @@ def test_group_is_copied_from_closure_not_re_derived_in_the_app(client) -> None:
         assert row["group"] == expected, row["ticker"]
 
 
-def test_opinion_counter_is_always_on_the_first_screen(client) -> None:
-    """「有幾檔的判讀是我們自己的」必須自己出現。
+def test_view_counter_is_always_on_the_first_screen(client) -> None:
+    """常駐計數器必須自己出現（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。
 
-    寫在文件裡的檢查點六天內被同一個形狀繞過兩次（L12 → L13），所以 L14 的結論是：
-    真正的防呆是會自己出現的常駐計數器，不是要人讀的段落。
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原名 `test_opinion_counter_is_always_on_the_first_screen`，
+    印的是「有我們自己的看法 N 檔」（stance 分布）。stance 是 FY+1 模型對估值假設 derivation 的聚合，
+    隨估值鏈退役；計數器本身不消失——剩「已有判讀／有賭注」兩個數，仍是純計數。
     """
     body = client.get("/api/v1/stocks").json()
-    counters = body["opinion_counters"]
-    assert "our_own_view" in counters and "with_view" in counters
-    assert counters["headline"]
-    # 純計數：by_stance 的總和必須等於清單長度，一檔都不能被吃掉（INV-3）。
-    assert sum(counters["by_stance"].values()) == len(body["stocks"])
+    assert "opinion_counters" not in body, "退役的 stance 計數器不得復活"
+    counters = body["view_counters"]
+    assert "with_view" in counters and "with_bet" in counters
+    assert counters["headline"] and "已有判讀" in counters["headline"]
+    assert "by_stance" not in counters and "our_own_view" not in counters
+    # 純計數：已有判讀＝ready 那一組的檔數，一檔都不能被吃掉或憑空多出（INV-3）。
+    assert counters["with_view"] == sum(1 for r in body["stocks"] if r["group"] == "ready")
 
 
-def test_counters_do_not_invent_a_view_for_stocks_that_have_none(tmp_path) -> None:
-    """沒有 stance 的檔案算進 `None` 那一格，**不算進 our_own_view**。
-
-    「我沒讀到你有觀點」與「你沒有觀點」導向同一個行動（去研究），但都不等於「你有觀點」
-    ——fail safe 的方向只有一個。
-    """
+def test_counters_do_not_invent_a_bet_for_stocks_that_have_none(tmp_path) -> None:
+    """沒寫 `our_bet` 的檔不算進 `with_bet`——「我沒讀到你的賭注」不等於「你有賭注」。"""
     store = ArtifactStore(tmp_path)
-    store.write(materialize_view(fake_view("AAA", stance="independent")))
-    store.write(materialize_view(fake_view("BBB", stance="consensus_inverted")))
-    store.write(materialize_view(fake_view("CCC")))            # 沒有 fundamental 判讀
+    store.write(materialize_view(fake_view("AAA")))
+    store.write(materialize_view(fake_view("BBB")))
     write_vocabularies(store)
     body = TestClient(create_app(tmp_path)).get("/api/v1/stocks").json()
-    counters = body["opinion_counters"]
-    assert counters["our_own_view"] == 1
-    assert counters["by_stance"]["consensus_inverted"] == 1
-    assert counters["by_stance"]["None"] == 1
+    counters = body["view_counters"]
+    assert counters["with_bet"] == 0
+    assert counters["with_view"] <= len(body["stocks"])

@@ -16,8 +16,8 @@ RefreshReport → AffectedArtifact[]（state＋理由＋變了哪個依賴＋下
 from __future__ import annotations
 
 from .artifacts import (
-    AXIS_LABEL, THESIS_ARTIFACT_ID, artifacts_from_context, artifacts_from_implied_return,
-    artifacts_from_model, artifacts_from_signal, artifacts_from_valuation, build_instant, end_of_day, start_of_day,
+    AXIS_LABEL, THESIS_ARTIFACT_ID, artifacts_from_assumptions, artifacts_from_context,
+    artifacts_from_signal, build_instant, end_of_day, start_of_day,
 )
 from .contracts import (
     ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_ENTRY_ASSESSMENT, ARTIFACT_ENTRY_CRITERION,
@@ -42,7 +42,7 @@ from .resolver import resolve_refresh
 __all__ = [
     "ARTIFACT_ASSUMPTION", "ARTIFACT_AXIS", "ARTIFACT_COMPARISON", "ARTIFACT_FAIR_VALUE", "ARTIFACT_FAIR_VALUE_GAP",
     "ARTIFACT_ENTRY_ASSESSMENT", "ARTIFACT_ENTRY_CRITERION", "ENTRY_CRITERION",
-    "ARTIFACT_HORIZON_ASSUMPTION", "ARTIFACT_IMPLIED_RETURN", "HORIZON_ASSUMPTION", "artifacts_from_implied_return",
+    "ARTIFACT_HORIZON_ASSUMPTION", "ARTIFACT_IMPLIED_RETURN", "HORIZON_ASSUMPTION",
     "ARTIFACT_MARKET_IMPLIED", "ARTIFACT_METRIC", "ARTIFACT_MODEL", "ARTIFACT_THESIS", "ARTIFACT_TYPES",
     "ARTIFACT_VALUATION_ASSUMPTION", "ASSUMPTION_ARTIFACT_TYPES", "VALUATION_ASSUMPTION", "AXIS_LABEL",
     "AXIS_POLICY", "CHANGE_TYPES", "COMPANY_GUIDANCE", "CONSENSUS", "CONSENSUS_NOISE_FLOOR_REL",
@@ -54,7 +54,7 @@ __all__ = [
     "ROLE_INPUT", "ROLE_LEGACY", "ROLE_OBSERVATION", "ROLE_SUPPORTING", "STALE", "SUPERSEDED",
     "THESIS_ARTIFACT_ID", "THESIS_REVIEW_DUE", "AffectedArtifact", "ArtifactDependency",
     "ChangeEvent", "MetricObservation", "RefreshReport", "ReviewCondition",
-    "artifacts_from_context", "artifacts_from_model", "artifacts_from_signal", "artifacts_from_valuation",
+    "artifacts_from_assumptions", "artifacts_from_context", "artifacts_from_signal",
     "build_instant", "end_of_day",
     "frequency_to_days", "guidance_driver", "merge_states", "resolve_refresh", "start_of_day",
 ]

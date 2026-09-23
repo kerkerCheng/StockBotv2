@@ -25,19 +25,13 @@
 from __future__ import annotations
 
 from datetime import date, datetime, time, timezone
-from typing import Sequence
+from typing import Mapping, Sequence
 
 from ..contracts import AXES, AlphaSignal, ComponentTrace, ResearchContext
-from ..fundamental.contracts import (
-    FiscalPeriod, FundamentalModelResult, OperatingAssumption,
-)
-from ..implied_return.contracts import HorizonAssumption, ImpliedReturnResult
-from ..valuation.contracts import ValuationAssumption, ValuationResult
+from ..fundamental.contracts import FiscalPeriod, OperatingAssumption
 from .contracts import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_COMPARISON, ARTIFACT_ENTRY_ASSESSMENT, ARTIFACT_ENTRY_CRITERION,
-    ARTIFACT_FAIR_VALUE, ARTIFACT_FAIR_VALUE_GAP, ARTIFACT_HORIZON_ASSUMPTION, ARTIFACT_IMPLIED_RETURN,
-    ARTIFACT_MARKET_IMPLIED, ARTIFACT_METRIC, ARTIFACT_MODEL, ARTIFACT_THESIS, ARTIFACT_VALUATION_ASSUMPTION,
-    INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT, MISSING, ROLE_CALIBRATION, ROLE_COMPARISON, ROLE_INPUT,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_MARKET_IMPLIED, ARTIFACT_THESIS,
+    INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT, MISSING, ROLE_CALIBRATION, ROLE_COMPARISON,
     ROLE_LEGACY, ROLE_OBSERVATION, ROLE_SUPPORTING, SUPERSEDED, ArtifactDependency,
 )
 from .policy import frequency_to_days
@@ -124,7 +118,7 @@ def artifacts_from_signal(
 # 假設（含被取代／撤回／其他期間的歷史紀錄）＋ 模型輸出 ＋ 數值 gap
 # ---------------------------------------------------------------------------
 
-def _assumption_refs(record: OperatingAssumption | ValuationAssumption | HorizonAssumption) -> dict[str, str]:
+def _assumption_refs(record: OperatingAssumption) -> dict[str, str]:
     roles: dict[str, str] = {}
     for ref in record.evidence_refs:
         role = record.role_of(ref)
@@ -139,53 +133,65 @@ def _assumption_label(record: OperatingAssumption) -> str:
     return f"假設 {record.driver}[{record.scope}] {record.period.label}"
 
 
-def artifacts_from_model(
-    model: FundamentalModelResult | None,
-    *,
-    build_at: datetime,
-    assumption_records: Sequence[OperatingAssumption] = (),
+def artifacts_from_assumptions(
+    records: Sequence[OperatingAssumption], *, build_at: datetime,
+    rejection: Mapping[str, str] | None = None, base_period_end: date | None = None,
 ) -> list[ArtifactDependency]:
-    """生效假設＋歷史假設（superseded／retracted／other_period 各自帶終局 state）＋模型輸出。"""
-    out: list[ArtifactDependency] = []
-    if model is None:
-        return out
-    accepted = {a.assumption_id: a for a in model.assumptions}
-    rejection = {aid: reason for aid, reason in model.selection.rejected}
-    base_end = model.base_period.end if model.base_period else None
-    base_recorded = (model.base_actuals.recorded_at if model.base_actuals and model.base_actuals.recorded_at
-                     else None)
+    """營運假設 ledger → 假設 artifact（每條各自帶終局 state）。
 
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：這裡原本是 `artifacts_from_model`——假設 artifact 之外還
+    登記模型輸出（`modeled_metric`／`expectation_comparison`／`fundamental_model`），以及
+    `artifacts_from_valuation`／`artifacts_from_implied_return`（估值假設、fair value、gap、horizon、隱含報酬）。
+    模型與估值鏈退役後，**refresh 只剩假設這一層判斷型成果**：它們的 review_conditions 與 Event Watch 的
+    disproof 目標（`oa_*`）仍然要有 artifact 可掛，否則「假設被推翻」會無處現形（INV-3）。
+
+    終局 state 由 `select_assumptions` 的拒收原因（`rejection`：assumption_id → reason）決定——那是 ledger 的
+    判準（as-of／期間／supersede／證據解析），與退役前 `artifacts_from_model` 用的是同一套：
+    - retracted／superseded* → superseded；unresolved_evidence → invalidated（前提不成立，不得當 current）；
+    - other_period → 若正是基期那一年 → superseded（已有實際值），否則 missing（不是目前目標期間）；
+    - created_after_as_of → missing（INV-6）；沒有 `rejection`（呼叫端沒有目標期間）時只依 ledger 時序判撤回／取代。
+    """
+    rejection = dict(rejection or {})
+    out: list[ArtifactDependency] = []
+    ordered = sorted(records, key=lambda r: (r.created_at, r.assumption_id))
+    latest: dict[tuple[str, str, str, date], str] = {}
+    for record in ordered:
+        if record.retracted:
+            continue
+        scenario = str(getattr(record, "scenario", "base") or "base")
+        latest[(scenario, record.driver, record.scope, record.period.end)] = record.assumption_id
+    # 登記順序＝退役前的順序：生效假設（按 driver／scope）先、歷史紀錄後——resolver 的「等待中」註記
+    # 依登記順序印，順序變了 research 面板的文字 digest 就會變（gate 3 逐字比對）。
+    if rejection:
+        accepted = sorted((r for r in ordered if r.assumption_id not in rejection and not r.retracted),
+                          key=lambda r: (r.driver, r.scope))
+        accepted_ids = {r.assumption_id for r in accepted}
+        ordered = [*accepted, *(r for r in ordered if r.assumption_id not in accepted_ids)]
     seen: set[str] = set()
-    model_scenario = getattr(model, "scenario", "base")
-    for record in (*model.assumptions, *assumption_records):
+    for record in ordered:
         if record.assumption_id in seen:
             continue
         seen.add(record.assumption_id)
-        # V0（2026-09-15）：variant 紀錄是另一條 scenario 的成果，不是 base 模型「沒選到」的假設——
-        # 列進來只會得到「未被模型選取（原因未知）」這種假缺席（rollover 測試實測）。跳過，不冒充。
-        if getattr(record, "scenario", "base") != model_scenario:
-            continue
+        scenario = str(getattr(record, "scenario", "base") or "base")
         preset: str | None = None
         why: str | None = None
-        if record.assumption_id not in accepted:
-            reason = rejection.get(record.assumption_id, "")
-            if record.retracted:
-                preset, why = SUPERSEDED, "已撤回（retracted）——歷史紀錄"
-            elif reason.startswith("superseded"):
-                preset, why = SUPERSEDED, f"已被較新的同 key 紀錄取代（{reason}）——歷史紀錄"
-            elif reason.startswith("unresolved_evidence"):
-                preset, why = INVALIDATED, f"supporting evidence 解析不到（{reason}）——前提不成立，不得當 current"
-            elif reason == "other_period":
-                if base_end is not None and record.period.same_as(FiscalPeriod(end=base_end)):
-                    preset, why = SUPERSEDED, (
-                        f"{record.period.label} 已有實際值（基期已推進到 {record.period.label}）——"
-                        "這條是歷史預測，不沿用到新目標期間")
-                else:
-                    preset, why = MISSING, f"針對 {record.period.label}，不是目前目標期間；本視角不評估"
-            elif reason == "created_after_as_of":
-                preset, why = MISSING, "as-of 之後才建立——在此時點不存在（INV-6）"
+        reason = rejection.get(record.assumption_id, "")
+        if record.retracted:
+            preset, why = SUPERSEDED, "已撤回（retracted）——歷史紀錄"
+        elif reason.startswith("superseded"):
+            preset, why = SUPERSEDED, f"已被較新的同 key 紀錄取代（{reason}）——歷史紀錄"
+        elif reason.startswith("unresolved_evidence"):
+            preset, why = INVALIDATED, f"supporting evidence 解析不到（{reason}）——前提不成立，不得當 current"
+        elif reason == "other_period":
+            if base_period_end is not None and record.period.same_as(FiscalPeriod(end=base_period_end)):
+                preset, why = SUPERSEDED, (f"{record.period.label} 已有實際值（基期已推進到 {record.period.label}）——"
+                                          "這條是歷史預測，不沿用到新目標期間")
             else:
-                preset, why = MISSING, f"未被模型選取（{reason or '原因未知'}）"
+                preset, why = MISSING, f"針對 {record.period.label}，不是目前目標期間；本視角不評估"
+        elif reason == "created_after_as_of":
+            preset, why = MISSING, "as-of 之後才建立——在此時點不存在（INV-6）"
+        elif not rejection and latest.get((scenario, record.driver, record.scope, record.period.end)) != record.assumption_id:
+            preset, why = SUPERSEDED, "已被較新的同 key 紀錄取代——歷史紀錄"
         out.append(ArtifactDependency(
             artifact_type=ARTIFACT_ASSUMPTION, artifact_id=record.assumption_id,
             label=_assumption_label(record), kind=KIND_JUDGMENT, established_at=record.created_at,
@@ -195,187 +201,7 @@ def artifacts_from_model(
             preset_state=preset, preset_reason=why,
             extras={"provenance_semantics": record.provenance_semantics, "value": record.value},
         ))
-
-    for name, metric in model.metrics.items():
-        if not metric.is_known:
-            continue
-        refs = {r: ROLE_OBSERVATION for r in metric.observation_refs}
-        refs.update({a: ROLE_INPUT for a in metric.assumption_ids})
-        out.append(ArtifactDependency(
-            artifact_type=ARTIFACT_METRIC, artifact_id=name,
-            label=f"內部 {name}（{metric.period.label}）", kind=KIND_DETERMINISTIC,
-            established_at=build_at, refs=refs, assumption_ids=tuple(metric.assumption_ids),
-            basis=metric.input_dependency, period_end=metric.period.end,
-        ))
-    for name, cmp in model.comparisons.items():
-        if cmp.status != "comparable":
-            continue
-        refs = {r: ROLE_OBSERVATION for r in cmp.observation_refs}
-        refs.update({r: ROLE_COMPARISON for r in cmp.consensus_refs})
-        refs.update({a: ROLE_INPUT for a in cmp.assumption_ids})
-        out.append(ArtifactDependency(
-            artifact_type=ARTIFACT_COMPARISON, artifact_id=name,
-            label=f"內部 vs 共識 {name}（數值 gap）", kind=KIND_DETERMINISTIC,
-            established_at=build_at, refs=refs, assumption_ids=tuple(cmp.assumption_ids),
-            period_end=(cmp.internal_period.end if cmp.internal_period else None),
-        ))
-    if model.base_period is not None:
-        out.append(ArtifactDependency(
-            artifact_type=ARTIFACT_MODEL, artifact_id="fundamental_model",
-            label=f"Causal Fundamental Model（基期 {model.base_period.label} → 目標 "
-                  f"{model.target_period.label if model.target_period else '?'}）",
-            kind=KIND_DETERMINISTIC, established_at=build_at,
-            refs={r.ref: ROLE_OBSERVATION for r in (model.base_actuals.evidence if model.base_actuals else ())},
-            assumption_ids=tuple(a.assumption_id for a in model.assumptions),
-            period_end=(model.target_period.end if model.target_period else None),
-            extras={"base_period_end": base_end, "base_recorded_at": base_recorded,
-                    "status": model.status},
-        ))
     return out
-
-
-# ---------------------------------------------------------------------------
-# 估值（Step 1）：估值假設（判斷型）＋ fair value（確定性，不含現價）＋ gap（確定性，含現價）
-# ---------------------------------------------------------------------------
-
-def _historical_state(record, *, accepted: set[str], rejection: dict[str, str],
-                      base_end: date | None, target_end: date | None) -> tuple[str | None, str | None]:
-    """未被選取的 ledger 紀錄各自的終局 state（與 `artifacts_from_model` 同一套判準）。"""
-    if record.assumption_id in accepted:
-        return None, None
-    reason = rejection.get(record.assumption_id, "")
-    if record.retracted:
-        return SUPERSEDED, "已撤回（retracted）——歷史紀錄"
-    if reason.startswith("superseded"):
-        return SUPERSEDED, f"已被較新的同 key 紀錄取代（{reason}）——歷史紀錄"
-    if reason.startswith("unresolved_evidence"):
-        return INVALIDATED, f"supporting evidence 解析不到（{reason}）——前提不成立，不得當 current"
-    if reason == "other_period":
-        if base_end is not None and record.period.same_as(FiscalPeriod(end=base_end)):
-            return SUPERSEDED, f"{record.period.label} 已有實際值——這條是歷史判斷，不沿用到新目標期間"
-        return MISSING, f"針對 {record.period.label}，不是目前目標期間（{target_end}）；本視角不評估"
-    if reason == "created_after_as_of":
-        return MISSING, "as-of 之後才建立——在此時點不存在（INV-6）"
-    return MISSING, f"未被模型選取（{reason or '原因未知'}）"
-
-
-def artifacts_from_valuation(
-    valuation: ValuationResult | None,
-    *,
-    build_at: datetime,
-    assumption_records: Sequence[ValuationAssumption] = (),
-    base_period_end: date | None = None,
-) -> list[ArtifactDependency]:
-    """估值假設（含歷史紀錄）＋ fair value ＋ gap。
-
-    fair value 的 refs **刻意不含現價的 ref**：它只依賴內部 EPS 與估值假設，所以 price-only 變化
-    不會讓它 recalculate；gap 才帶現價 ref。這是「price 不進 fair value」在依賴層的形狀。
-    """
-    out: list[ArtifactDependency] = []
-    if valuation is None:
-        return out
-    accepted = {a.assumption_id for a in valuation.assumptions}
-    rejection = {aid: reason for aid, reason in valuation.selection.rejected}
-    target_end = valuation.target_period.end if valuation.target_period else None
-    seen: set[str] = set()
-    for record in (*valuation.assumptions, *assumption_records):
-        if record.assumption_id in seen:
-            continue
-        seen.add(record.assumption_id)
-        preset, why = _historical_state(record, accepted=accepted, rejection=rejection,
-                                        base_end=base_period_end, target_end=target_end)
-        out.append(ArtifactDependency(
-            artifact_type=ARTIFACT_VALUATION_ASSUMPTION, artifact_id=record.assumption_id,
-            label=f"估值假設 {record.driver} {record.period.label}（{record.accounting_basis}）",
-            kind=KIND_JUDGMENT, established_at=record.created_at, refs=_assumption_refs(record),
-            basis=record.basis, driver=record.driver, scope=record.scope, period_end=record.period.end,
-            review_conditions=tuple(record.review_conditions), preset_state=preset, preset_reason=why,
-            extras={"provenance_semantics": record.provenance_semantics, "value": record.value,
-                    "method": record.method, "parameter": record.parameter},
-        ))
-    if not valuation.is_known:
-        return out
-    fundamental = valuation.fundamental_input
-    fv_refs: dict[str, str] = {r: ROLE_OBSERVATION for r in (fundamental.observation_refs if fundamental else ())}
-    fv_refs.update({a: ROLE_INPUT for a in valuation.assumption_ids})
-    out.append(ArtifactDependency(
-        artifact_type=ARTIFACT_FAIR_VALUE, artifact_id="fair_value",
-        label=f"Fair value（{valuation.method}，{valuation.target_period.label if valuation.target_period else '?'}）",
-        kind=KIND_DETERMINISTIC, established_at=build_at, refs=fv_refs,
-        assumption_ids=tuple(valuation.assumption_ids), basis=valuation.input_dependency,
-        period_end=target_end, extras={"method": valuation.method},
-    ))
-    if valuation.gap.is_known:
-        gap_refs = dict(fv_refs)
-        gap_refs.update({r: ROLE_OBSERVATION for r in valuation.current_price.evidence_refs})
-        out.append(ArtifactDependency(
-            artifact_type=ARTIFACT_FAIR_VALUE_GAP, artifact_id="fair_value_gap",
-            label="Fair value vs 現價（gap；不是 expected return）", kind=KIND_DETERMINISTIC,
-            established_at=build_at, refs=gap_refs, assumption_ids=tuple(valuation.assumption_ids),
-            basis=valuation.input_dependency, period_end=target_end,
-        ))
-    return out
-
-
-# ---------------------------------------------------------------------------
-# 報酬（Step 2）：horizon 假設（判斷型，帶絕對到期）＋ implied return（確定性，含現價與 horizon）
-# ---------------------------------------------------------------------------
-
-def artifacts_from_implied_return(
-    result: ImpliedReturnResult | None,
-    *,
-    build_at: datetime,
-    horizon_records: Sequence[HorizonAssumption] = (),
-    base_period_end: date | None = None,
-) -> list[ArtifactDependency]:
-    """horizon 假設（含歷史紀錄）＋ implied return。
-
-    horizon 假設帶 `expires_at=horizon_end`：到那天就 stale（INV-2：每個等待都必須有到期）。
-    implied return 的依賴＝fair value 的依賴（營運＋估值假設、基期觀測）＋現價 ref＋horizon 假設——
-    所以 price-only → recalculate；估值假設 review → 傳播成 review；horizon 被取代 → recalculate；
-    無關的圖變化（沒命中任何 supporting ref）→ current。
-    """
-    out: list[ArtifactDependency] = []
-    if result is None:
-        return out
-    accepted = {result.horizon.assumption_id} if result.horizon is not None else set()
-    rejection = {aid: reason for aid, reason in result.horizon_selection.rejected}
-    target_end = result.target_period.end if result.target_period else None
-    seen: set[str] = set()
-    for record in (*((result.horizon,) if result.horizon is not None else ()), *horizon_records):
-        if record.assumption_id in seen:
-            continue
-        seen.add(record.assumption_id)
-        preset, why = _historical_state(record, accepted=accepted, rejection=rejection,
-                                        base_end=base_period_end, target_end=target_end)
-        out.append(ArtifactDependency(
-            artifact_type=ARTIFACT_HORIZON_ASSUMPTION, artifact_id=record.assumption_id,
-            label=f"Horizon 判斷 {record.period.label} fair value 於 {record.horizon_end} 前實現",
-            kind=KIND_JUDGMENT, established_at=record.created_at, refs=_assumption_refs(record),
-            basis=record.basis, driver=record.driver, scope=record.scope, period_end=record.period.end,
-            review_conditions=tuple(record.review_conditions), preset_state=preset, preset_reason=why,
-            expires_at=(record.horizon_end if preset is None else None),
-            extras={"provenance_semantics": record.provenance_semantics, "horizon_end": record.horizon_end.isoformat()},
-        ))
-    if not result.is_known:
-        return out
-    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs}
-    refs.update({a: ROLE_INPUT for a in result.assumption_ids})
-    out.append(ArtifactDependency(
-        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id="implied_return",
-        label=(f"Base-case implied return（{result.target_period.label if result.target_period else '?'}；"
-               f"{result.horizon_start} → {result.horizon_end}；不是 expected return）"),
-        kind=KIND_DETERMINISTIC, established_at=build_at, refs=refs,
-        assumption_ids=tuple(result.assumption_ids), basis=result.input_dependency, period_end=target_end,
-        extras={"return_convention": result.return_convention, "horizon_end": result.horizon_end.isoformat() if result.horizon_end else None},
-    ))
-    return out
-
-
-# ---------------------------------------------------------------------------
-# Entry（Step 3）：entry criterion（投資人政策紀錄）＋ entry assessment（確定性，含現價／研究假設／criterion）
-# ---------------------------------------------------------------------------
-
 
 
 def artifacts_from_context(context: ResearchContext, *, build_at: datetime) -> list[ArtifactDependency]:
@@ -398,7 +224,6 @@ def artifacts_from_context(context: ResearchContext, *, build_at: datetime) -> l
 
 
 __all__ = [
-    "AXIS_LABEL", "THESIS_ARTIFACT_ID", "artifacts_from_context",
-    "artifacts_from_implied_return", "artifacts_from_model", "artifacts_from_signal", "artifacts_from_valuation",
-    "build_instant", "end_of_day", "start_of_day",
+    "AXIS_LABEL", "THESIS_ARTIFACT_ID", "artifacts_from_assumptions", "artifacts_from_context",
+    "artifacts_from_signal", "build_instant", "end_of_day", "start_of_day",
 ]

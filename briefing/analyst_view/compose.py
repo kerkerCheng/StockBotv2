@@ -148,51 +148,39 @@ def _headline_panel(view: AlphaInvestmentView) -> AnalystPanel:
 
 
 def _fundamental_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    inf, cs, eg = view.internal_fundamentals, view.consensus, view.expectation_gap
-    same_period_suffix = f"_{inf.period}" if inf.period else None
-    same, other = [], []
-    for datum in cs.fiscal_items:
-        (same if same_period_suffix and datum.key.endswith(same_period_suffix) else other).append(datum)
+    """市場預測什麼（選配）：會計年度別共識與市場觀測的**原始數字**。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：這個 panel 原本是「我們預測什麼／市場預測什麼／差異在哪」
+    三問——internal／comparison／market_proxy 三組 line 與 opinion_stance／multiple_derivation 兩格全部讀
+    FY+1 因果橋與估值鏈，整組退役。留下的是稽核區的原始數字：共識（身分是 fiscal_period_end）、市場脈絡
+    （分析師人數、目標價、PE）、共識時序的量測。**沒有內部預測，所以也沒有「同期可比」這個分類。**
+    """
+    cs, eg = view.consensus, view.expectation_gap
     lines = (
-        _lines(inf.items, "internal")
-        + _lines(same, "consensus_same_period")
-        + _lines(other, "consensus_other_period")
+        _lines(cs.fiscal_items, "consensus_fiscal")
         + _lines(cs.items, "market_context")
-        + _lines(eg.proxies, "market_proxy")
-        + _lines(eg.numeric_comparisons, "comparison")
-        + ((_line("opinion_stance", eg.opinion_stance.label, eg.opinion_stance, "comparison"),)
-           if eg.opinion_stance is not None else ())
-        + ((_line("multiple_derivation", eg.multiple_derivation.label,
-                  eg.multiple_derivation, "comparison"),)
-           if eg.multiple_derivation is not None else ())
-        + ((_line("gap_closure", eg.gap_closure.label, eg.gap_closure, "comparison"),)
+        + ((_line("gap_closure", eg.gap_closure.label, eg.gap_closure, "market_context"),)
            if eg.gap_closure is not None else ())
         + ((_line("consensus_series", eg.consensus_series.label, eg.consensus_series, "market_context"),)
            if eg.consensus_series is not None else ())
-        + (_line("internal_vs_consensus", eg.internal_vs_consensus.label, eg.internal_vs_consensus, "comparison"),
-           _line("internal_vs_price_implied", eg.internal_vs_price_implied.label,
-                 eg.internal_vs_price_implied, "comparison"))
     )
-    statuses = {"internal_fundamentals": inf.meta.status, "consensus": cs.meta.status,
-                "expectation_gap": eg.meta.status}
-    kinds = _absence_kinds(internal_fundamentals=inf.meta, consensus=cs.meta, expectation_gap=eg.meta)
+    statuses = {"consensus": cs.meta.status, "expectation_gap": eg.meta.status}
+    kinds = _absence_kinds(consensus=cs.meta, expectation_gap=eg.meta)
+    periods = sorted({str((d.dependencies or {}).get("period") or d.key.rsplit("_", 1)[-1]) for d in cs.fiscal_items})
     return AnalystPanel(
-        key="fundamental", title="基本面：我們預測什麼／市場預測什麼／差異在哪（選配）",
-        questions=("q1_internal", "q2_market", "q3_gap"),
+        key="fundamental", title="基本面：市場預測什麼（原始數字，選配）",
+        questions=("q2_market",),
         # ⚠ 2026-09-23（Phase 0 Step 0b.1）：由核心**降為選配**（ROADMAP 稽核區：原始數字）。
-        # 它回答的是「數字長什麼樣」，不是「判讀完不完整」。
         status=worst_status(list(statuses.values())), optional=True,
-        source_sections=("internal_fundamentals", "consensus", "expectation_gap"),
+        source_sections=("consensus", "expectation_gap"),
         source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
         # ⚠ 共識段的 warnings 也要進來：「forward 是相對標籤不是會計年度身分」這條警告
         # 正是 2026-09-07 rollover 污染事故的判準，藏在 section 裡等於沒有（INV-3）。
-        notes=(cs.coverage_note,) + inf.meta.warnings + cs.meta.warnings,
-        context={"period": inf.period, "period_end": inf.period_end,
-                 "base_period_end": inf.base_period_end, "accounting_basis": inf.accounting_basis,
-                 "same_period_rule": "只有同期、同口徑、同幣別的共識才與內部相減；其他期間只呈現，不比較"},
-        reason=_worst_reason(worst_status(list(statuses.values())),
-                             expectation_gap=eg.meta, internal_fundamentals=inf.meta,
-                             consensus=cs.meta),
+        notes=(cs.coverage_note,) + cs.meta.warnings + eg.meta.warnings,
+        context={"consensus_periods": periods,
+                 "rule": "會計年度別共識的身分是 fiscal_period_end（不是 +1y 標籤）。本面板只呈現原始數字；"
+                         "內部預測與「我們比市場」已於 2026-09-23 Phase 0 退役，這裡沒有任何相減"},
+        reason=_worst_reason(worst_status(list(statuses.values())), expectation_gap=eg.meta, consensus=cs.meta),
     )
 
 
@@ -419,14 +407,13 @@ def _readiness(panels: Mapping[str, AnalystPanel]) -> AnalystReadiness:
 def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     """「這份判讀不是什麼」——全部抄自各 authority 已經寫好的 `is_not`／`gap_is_not`，去重保序。"""
     fixed = (
-        "不是 buy／sell：系統的終點是隱含報酬與（optional 的）門檻價，不是動作。",
+        "不是 buy／sell：系統不給動作；進場靠判斷，出場靠 disproof（隱含報酬與門檻價已於 2026-09-23 退役）。",
         "不是部位尺寸或配置：買多少、什麼時候買由使用者自行判斷並手動下單。",
         "不是跨標的機會排序：本畫面只看一檔；瓶頸排序的唯一權威是 rank_bottlenecks。",
     )
     everything: list[str] = list(fixed)
-    everything += list(view.implied_return.is_not)
-    everything += list(view.valuation.gap_is_not)
-    # ⚠ 2026-09-23（Step 0b.1b）：`entry_logic.is_not` 隨 F 組退役。
+    # ⚠ 2026-09-23（Step 0b.1b）：`implied_return.is_not`／`valuation.gap_is_not`（C／H 組）與
+    # `entry_logic.is_not`（F 組）隨各自的 section 退役。
     everything += list(view.investor_brief.is_not)
     everything += list(view.argument.is_not)
     # ⚠ 2026-09-23（Step 0b.1b）：`downside` panel 隨 E 組退役。

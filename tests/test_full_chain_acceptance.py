@@ -3,9 +3,13 @@
 問的不是「這條鏈算得出數字嗎」，而是：**故意把它弄壞的時候，它會 fail closed，
 還是會產出一個看起來合理但語意錯誤的結果？**
 
-```
-Evidence → Research → Fundamental → Valuation → Horizon → Implied Return → Analyst View
-```
+⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：估值鏈整條退役。** 原本這條鏈是
+`Evidence → Research → Fundamental → Valuation → Horizon → Implied Return → Analyst View`；
+Fundamental（FY+1 因果橋）、Valuation、Horizon、Implied Return 四節都不在了。本檔 28 條裡 16 條釘的是
+那四節的數字與依賴（fair value 223.6034、隱含報酬 −20.7%、兩桿歸因、horizon 對齊、估值／horizon ledger
+缺席、報價單位在 gap 上的拒絕、fiscal rollover 情境），隨機制退役。留下的 12 條守的判準一字未改：
+refresh 只影響該影響的、PIT 不漏未來、缺料要說原因、舊判斷標不一致、黑箱 CLI 與 canonical read model 逐格相等。
+**本檔會在 Phase 0 批 2（0b.2）重寫成新管線**（圖 → 讀圖 ledger → 敘事 → 三題 absence → 心跳）。
 
 ## 三條寫法紀律
 
@@ -14,8 +18,7 @@ Evidence → Research → Fundamental → Valuation → Horizon → Implied Retu
    不在測試裡重新宣告誰依賴誰——那會變成一份會與程式漂移的影子圖。
 2. **斷言寫成「該動的動了 **且** 不該動的沒動」。** 只斷言前者的話，一個把所有東西
    都標成 `review_required` 的實作會全綠——那正是 Step 0 抓到的 over-invalidation。
-3. **Entry 是 optional，不是 completion gate**（Step 3 的立場）：任何 readiness 斷言
-   都不得因為沒有 hurdle 而變成 blocked。
+3. **optional panel 不是 completion gate**：任何 readiness 斷言都不得因為稽核區的原始數字缺席而變成 blocked。
 
 整合測試：需要本機 Neo4j＋Engine C＋Decision Store。沒有 runtime 就 skip，
 **skip 會在報表上現形**（不是靜默通過）。
@@ -28,7 +31,7 @@ import os
 import socket
 import subprocess
 import sys
-from dataclasses import dataclass, replace
+from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
 from typing import Any
@@ -76,23 +79,13 @@ def _coherent_today(as_of: date | None) -> date | None:
 
     2026-09-11 實測：`today=TODAY` 配 `as_of=None` 是兩個互相矛盾的視角——ledger 讀的是
     「現在」，而 `today` 停在 09-07，於是 09-10／09-11 才 append 的假設被判成「此時點尚未
-    成立」，連帶把依賴它們的 D&C 成長、target_pe、horizon 三筆判成 `invalidated`，
-    `rollover_actuals` 也因 revenue 未知而整個不發生（實測 `period_end` 停在 2027-06-30）。
-    每 append 一筆假設就再腐壞一次，所以這裡**不是把日期往後挪**，是讓那個混合視角在本檔
-    結構上不可能被表達出來。
+    成立」。這裡**不是把日期往後挪**，是讓那個混合視角在本檔結構上不可能被表達出來。
     """
     return TODAY if as_of is not None else None
 
 
 def view(**kwargs: Any):
-    """預設 `as_of=TODAY`（PIT 投影），不是 `today=TODAY` 配當前資料。
-
-    2026-09-09 實測：原本只釘 `today`，價格與 ledger 卻取**當前**——COHR 的 D&C 假設 09-08 re-append
-    後，`today=09-07` 的選取把新紀錄（created 09-08）與被 supersede 的舊紀錄都排除，整條鏈缺席，
-    17 條紅了兩天。「釘的是一個 authority 都沒有合法更新時的樣子」本來就該用 as-of 表達：
-    as_of=09-07 的投影還原出完全相同的基準數字（223.6034／−0.2067／−0.2464），期望值一個都不用改。
-    要看當前視角的 case 自己傳 `as_of=None`。
-    """
+    """預設 `as_of=TODAY`（PIT 投影），不是 `today=TODAY` 配當前資料。要看當前視角的 case 自己傳 `as_of=None`。"""
     from briefing.alpha_view.sources import fetch_alpha_investment_view
 
     kwargs.setdefault("as_of", TODAY)
@@ -139,37 +132,21 @@ def test_baseline_numbers_are_pinned_and_each_traces_to_an_authority() -> None:
 
     釘的是「一個 authority 都沒有合法更新」時的樣子。每一格同時斷言它的**來源**，
     因為一個對的數字配一個錯的來源，下一次就會用錯的來源去解釋它。
+    ⚠ 2026-09-23：fair value／隱含報酬／內部 EPS／數值 gap 四組數字隨估值鏈退役；剩下的兩格是 A2 觀測。
     """
     v = view()
-    va, ir = v.valuation, v.implied_return
-
-    assert va.fair_value.value == pytest.approx(223.6034, abs=5e-4)
-    assert va.fair_value.authority == "alpha://valuation/model"
-    assert ir.current_price.value == pytest.approx(281.86, abs=1e-6)
-    assert str(ir.value_date.value) == "2027-06-30"
-    assert str(ir.horizon.value) == "2027-06-30"
-    assert ir.price_return.value == pytest.approx(-0.2067, abs=5e-4)
-    assert ir.annualized_price_return.value == pytest.approx(-0.2464, abs=5e-4)
-    assert ir.price_return.authority == "alpha://implied_return/model"
-
-    internal = {d.key: d for d in v.internal_fundamentals.items}
-    assert internal["internal_eps"].value == pytest.approx(8.9441, abs=5e-4)
-    assert internal["internal_eps"].authority == "alpha://fundamental/bridge"
-
-    eps_gap = next(d for d in v.expectation_gap.numeric_comparisons if d.key.endswith("_eps"))
-    assert eps_gap.value["consensus"] == pytest.approx(9.4163, abs=5e-4)
-    assert eps_gap.value["relative_gap"] == pytest.approx(-0.0501, abs=5e-4)
+    assert v.market.price.value == pytest.approx(281.86, abs=1e-6)
+    assert v.market.price.authority == "engine_c://financial_snapshots"
+    fiscal = {d.key: d for d in v.consensus.fiscal_items}
+    assert fiscal["consensus_eps_FY2027"].value["avg"] == pytest.approx(9.4163, abs=5e-4)
+    assert fiscal["consensus_eps_FY2027"].authority == "engine_c://consensus_estimates"
+    assert fiscal["consensus_eps_FY2027"].value["accounting_basis"] == "non_gaap"   # 由 8-K 的 5.61 核實
+    for retired in ("valuation", "implied_return", "internal_fundamentals", "earnings_bridge", "price_implied_expectations"):
+        assert not hasattr(v, retired), f"退役的 section 不得復活：{retired}"
 
 
 def test_optional_panels_never_block_and_blockers_only_come_from_the_core_set() -> None:
-    """optional panel 不得進 blockers；blockers 只能出自核心 panel。
-
-    ⚠ 2026-09-23（Phase 0 Step 0b.1）：原名 `..._is_ready_and_entry_is_optional_not_a_blocker`，
-    斷言 `readiness.state == "ready"` 且 `entry：missing` 在 optional 欄。`entry` panel 已退役，
-    而短評與歸零旗標升核心後這份 fixture 是 blocked（它沒寫短評）。
-    **本條要守的事沒變**：optional 的缺席不得變成 blocker、blocker 不得憑空出現在非核心 panel 上。
-    ⚠ 本檔整體會在 Phase 0 批 2 重寫成新管線（圖 → 讀圖 ledger → 敘事 → 三題 absence → 心跳）。
-    """
+    """optional panel 不得進 blockers；blockers 只能出自核心 panel。"""
     from briefing.analyst_view import CORE_PANELS, OPTIONAL_PANELS
 
     a = analyst()
@@ -184,9 +161,11 @@ def test_optional_panels_never_block_and_blockers_only_come_from_the_core_set() 
 # ---------------------------------------------------------------------------
 # 1. Refresh 依賴矩陣：**只影響該影響的**
 #
-# 每一列是 changed_input → 必須被影響的 ／ 必須沒被影響的。
 # 「必須沒被影響」那一欄才是這張表的價值：少了它，一個把所有東西都標
 # review_required 的實作會全綠（Step 0 實測到的 over-invalidation）。
+# ⚠ 2026-09-23：fair_value／implied_return／modeled_metric／expectation_comparison／
+# fundamental_model 那些 key 隨估值鏈退役；`fiscal_rollover` 情境退役（它重跑模型）。
+# key 以 `*` 結尾＝前綴比對（例如 disproof 情境動的是「某一條」假設，哪一條由 ledger 決定）。
 # ---------------------------------------------------------------------------
 
 @dataclass(frozen=True)
@@ -199,29 +178,31 @@ class Row:
 
 MATRIX: tuple[Row, ...] = (
     Row("price_only", "Engine C 現價（bar_date 前進）",
-        affected=("fair_value_gap:fair_value_gap", "implied_return:implied_return",
-                  "market_implied:market_implied_eps_growth"),
-        unaffected=("fair_value:fair_value", "axis:expectation_gap", "axis:value_capture",
-                    "thesis:session_judgment", "valuation_assumption:va_07dcbc388c814a91",
-                    "horizon_assumption:ha_586fe0ff9658a2d4")),
+        affected=("market_implied:market_implied_eps_growth",),
+        unaffected=("axis:expectation_gap", "axis:value_capture", "thesis:session_judgment",
+                    "operating_assumption:*")),
     Row("consensus_revision", "同期 FY2027 EPS 共識上修",
-        affected=("expectation_comparison:eps", "axis:expectation_gap", "thesis:session_judgment"),
-        unaffected=("axis:value_capture", "axis:structural", "modeled_metric:eps",
-                    "fundamental_model:fundamental_model")),
+        affected=("axis:expectation_gap", "thesis:session_judgment"),
+        unaffected=("axis:value_capture", "axis:structural")),
     Row("graph_edge", "結構邊 substitutability／sole_source 改變",
         affected=("axis:structural",),
-        unaffected=("horizon_assumption:ha_586fe0ff9658a2d4",)),
+        unaffected=("market_implied:market_implied_eps_growth",)),
     Row("new_guidance", "新一季指引（營收／毛利率／稅率）",
-        affected=("axis:value_capture", "axis:expectation_gap",
-                  "fundamental_model:fundamental_model"),
-        unaffected=("axis:structural", "horizon_assumption:ha_586fe0ff9658a2d4")),
+        affected=("axis:value_capture", "axis:expectation_gap"),
+        unaffected=("axis:structural",)),
     Row("new_actual", "新一季實際值",
-        affected=("modeled_metric:revenue", "fair_value:fair_value", "implied_return:implied_return"),
+        affected=("axis:value_capture",),
         unaffected=("axis:structural", "axis:expectation_gap")),
-    Row("disproof", "disproof 訊號觸發",
-        affected=("fair_value:fair_value", "implied_return:implied_return"),
+    Row("disproof", "disproof 訊號觸發（指名一條假設）",
+        affected=("operating_assumption:*",),
         unaffected=("axis:structural",)),
 )
+
+
+def _hits(key: str, changed: dict[str, tuple[str, str]]) -> list[str]:
+    if key.endswith("*"):
+        return [k for k in changed if k.startswith(key[:-1])]
+    return [key] if key in changed else []
 
 
 @pytest.mark.parametrize("row", MATRIX, ids=lambda r: r.scenario)
@@ -231,14 +212,14 @@ def test_each_change_touches_only_what_it_should(row: Row) -> None:
     changed = moved(base, after)
 
     for key in row.affected:
-        assert key in changed, (
+        assert _hits(key, changed), (
             f"{row.scenario}（{row.changed_input}）沒有影響到 {key}——"
             f"依賴斷了，或 policy 表漏了一格。實際變動：{sorted(changed)}")
     for key in row.unaffected:
-        assert key not in changed, (
+        hits = _hits(key, changed)
+        assert not hits, (
             f"{row.scenario}（{row.changed_input}）不該影響 {key}，"
-            f"卻把它從 {changed[key][0]} 改成 {changed[key][1]}——"
-            "over-invalidation 會讓「需要重看」失去意義")
+            f"卻動了 {[(k, changed[k]) for k in hits]}——over-invalidation 會讓「需要重看」失去意義")
 
 
 def test_price_alone_never_stales_a_research_judgment() -> None:
@@ -248,84 +229,43 @@ def test_price_alone_never_stales_a_research_judgment() -> None:
     比誠實說「價格不觸發複查」更危險（L14：未量測的機制不得享有默認信任）。
     """
     changed = moved(states(view()), states(view(scenario="price_only")))
-    judgmental = [k for k in changed
-                  if k.startswith(("axis:", "thesis:", "operating_assumption:",
-                                   "valuation_assumption:", "horizon_assumption:"))]
+    judgmental = [k for k in changed if k.startswith(("axis:", "thesis:", "operating_assumption:"))]
     assert judgmental == [], f"價格變動動到了判斷型成果：{judgmental}"
 
 
-def test_a_fiscal_rollover_does_not_let_old_period_numbers_pose_as_current() -> None:
-    """會計期間推進：舊年度的假設全部 `superseded`，而**新年度沒有假設**。
-
-    這是最容易產出「看起來合理但語意錯誤」的一格——把 FY2027 的假設沿用到 FY2028，
-    數字照樣算得出來，而且長得很正常。正確行為是整條鏈 fail closed。
-    """
-    # rollover 情境把 today 推到目標期末之後，與 PIT 釘點互斥——這兩條走當前視角（as_of=None）
-    v = view(scenario="fiscal_rollover", as_of=None)
-    a = analyst(scenario="fiscal_rollover", as_of=None)
-    s = states(v)
-
-    # ⚠ 2026-09-19：原本寫的是「**全部**都必須 superseded」，而那在 ledger 只有一個目標年度時
-    # 才等價於這條測試真正要守的東西。Phase 7 Step 7.2 之後 COHR 的 ledger 多了一組 FY2030
-    # 錨點假設，它們在 rollover 後是 `missing`（「針對 FY2030，不是目前目標期間；本視角不評估」）
-    # ——**那不是「冒充當期」，是正確地不評估**。一個斷言承載了兩種語意（L12），這裡先分開：
-    assumption_states = {state for key, state in s.items() if key.startswith("operating_assumption:")}
-    assert assumption_states <= {"superseded", "missing"}, (
-        f"rollover 後假設只能是 superseded（上一期）或 missing（別的目標期間）；"
-        f"出現 {assumption_states - {'superseded', 'missing'}} 就代表有數字冒充當期")
-    assert "superseded" in assumption_states, "上一個目標期間的假設必須確實被 supersede，否則這條是空跑"
-    assert s["valuation_assumption:va_07dcbc388c814a91"] == "superseded"
-    assert s["horizon_assumption:ha_586fe0ff9658a2d4"] == "superseded"
-    assert s["fundamental_model:fundamental_model"] == "review_required"
-
-    # 目標期間已經前進，而所有下游都缺席——不得留下一個 FY2027 的數字冒充 FY2028
-    assert str(v.internal_fundamentals.period_end) == "2028-06-30"
-    assert v.valuation.fair_value.value is None
-    assert v.implied_return.price_return.value is None
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本斷言 readiness 是 blocked，因為估值與報酬是核心。
-    # 兩者退役後 readiness 不再反映它們。**本條要守的事沒有放寬**——上面幾行才是主詞：
-    # 期間真的 rollover 了、fair value 與 price_return 都是 None（不是拿舊期數字冒充）。
-    assert a.readiness.state != "ready", "rollover 後仍宣稱 ready 就是在假裝完整"
-    # 原本這裡再驗「headline 進了 blockers」——headline 現在只有現價（觀測），rollover 不影響它。
-    # 換成問 refresh：supersede 這件事必須在某個地方說得出口，不得安靜發生。
-    assert a.refresh.overall in ("review_required", "invalidated", "recalculate", "superseded")
-
-
 def test_a_superseded_record_never_comes_back_as_current() -> None:
-    """ledger 裡有被 supersede 的紀錄。它只能是歷史，不得參與任何當前計算。"""
+    """ledger 裡有被 supersede 的紀錄。它只能是歷史，不得參與任何當前計算，且要說出它是歷史。"""
     v = view()
     s = states(v)
-    superseded = [k.split(":", 1)[1] for k, state in s.items() if state == "superseded"]
+    superseded = {k: i for k, i in ((f"{i.artifact_type}:{i.artifact_id}", i) for i in v.refresh_status.items)
+                  if s[k] == "superseded"}
     assert superseded, "ledger 裡應有被 supersede 的紀錄——沒有的話這條是空跑"
-
-    effective = {str((d.dependencies or {}).get("assumption_id"))
-                 for d in v.valuation.assumptions}
-    for record_id in superseded:
-        assert record_id not in effective, f"{record_id} 已被 supersede 卻仍在生效清單裡"
-    # 被篩掉的那一筆必須**被計數並說明理由**，不是靜默消失（INV-3）
-    assert v.valuation.selection.filtered_count >= 1
-    assert "superseded" in v.valuation.selection.reasons
+    for key, item in superseded.items():
+        assert item.reasons and "歷史紀錄" in item.reasons[0], key
+    live = [k for k, state in s.items() if k.startswith("operating_assumption:") and state == "current"]
+    assert live, "生效的假設一條都沒有——ledger 的當前狀態沒有進 refresh"
+    assert not (set(live) & set(superseded))
 
 
 # ---------------------------------------------------------------------------
 # 2. Point-in-time：T 時刻不存在的東西不得出現在 T 的畫面上
 # ---------------------------------------------------------------------------
 
-def test_an_as_of_before_the_ledgers_existed_leaks_no_judgment_and_no_number() -> None:
-    """as-of 2026-08-01：FY2026 財報（08-12）與三本 ledger（09-05 起）都還不存在。
+def test_an_as_of_before_the_ledgers_existed_leaks_no_judgment_and_no_assumption() -> None:
+    """as-of 2026-08-01：FY2026 財報（08-12）與假設 ledger（09-05 起）都還不存在。
 
-    正確行為不是「用今天的假設回算 8 月的 fair value」，是**整段缺席並說出為什麼**。
+    正確行為不是「用今天的假設回算 8 月的東西」，是**整段缺席並說出為什麼**。
     """
     as_of = date(2026, 8, 1)
     v = view(as_of=as_of)
     a = analyst(as_of=as_of)
 
     assert a.point_in_time_mode == "as_of" and a.as_of == as_of
-    assert v.valuation.fair_value.value is None
-    assert v.implied_return.price_return.value is None
-    assert v.implied_return.horizon.value is None
-    for datum in (v.valuation.fair_value, v.implied_return.price_return):
-        assert datum.reason, "缺席必須帶原因——沉默的缺席與「值是 0」同形"
+    assert not [i for i in v.refresh_status.items if i.artifact_type == "operating_assumption"], \
+        "09-05 才寫的假設出現在 08-01 的視角上（lookahead）"
+    # 08-01 的 ResearchContext 還沒有 09-04 判斷檔引用的那批證據，判斷因契約驗證被拒——不管走哪一條路，
+    # 歷史卡上都不得出現那份判斷。
+    assert v.identity.signal.has_signal is False and v.identity.signal.reason
 
 
 def test_no_evidence_in_an_as_of_view_was_published_after_the_cutoff() -> None:
@@ -336,17 +276,8 @@ def test_no_evidence_in_an_as_of_view_was_published_after_the_cutoff() -> None:
     assert late == [], f"as-of {as_of} 的證據索引漏出未來：{late[:3]}"
 
 
-def test_the_return_starts_from_the_price_bar_date_not_from_the_etl_date() -> None:
-    """`bar_date`（行情交易日）≠ `snapshot_date`（ETL 執行日）。混用會讓報酬差幾天。"""
-    v = view()
-    window = v.implied_return.horizon_window.value
-    assert str(window["horizon_start"]) == "2026-09-04"
-    assert str(window["horizon_start"]) != TODAY.isoformat()
-    assert window["holding_period_days"] == (date(2027, 6, 30) - date(2026, 9, 4)).days
-
-
 # ---------------------------------------------------------------------------
-# 3. 上游缺失：任何一段缺料都不得靠舊的 derived value 繼續輸出乾淨的隱含報酬
+# 3. 上游缺失：任何一段缺料都要說出原因，不得靠舊的 derived value 繼續輸出乾淨的畫面
 # ---------------------------------------------------------------------------
 
 class _Shim:
@@ -382,111 +313,48 @@ def _real_fundamentals():
     return EngineCFundamentalsProvider()
 
 
-def test_missing_base_actuals_blocks_the_whole_chain_and_says_why() -> None:
+def test_missing_base_actuals_leaves_consensus_visible_and_names_the_reason() -> None:
     shim = _Shim(_real_fundamentals(),
                  fiscal_year_results=lambda *a, **k: (None, "測試：基期觀測不存在"))
     v = _fresh_view(fundamentals_provider=shim)
-
-    assert v.valuation.fair_value.value is None
-    assert v.implied_return.price_return.value is None
-    assert (v.internal_fundamentals.meta.reason or "") or (v.valuation.fair_value.reason or "")
-    # 共識仍然看得到——上游缺的是我們自己的預測，不是市場的
+    # 共識仍然看得到——上游缺的是基期觀測，不是市場的數字；但口徑因此核實不出來，且原因要現形
     assert any(d.is_known for d in v.consensus.fiscal_items)
+    eps_items = [d for d in v.consensus.fiscal_items if d.is_known and d.key.startswith("consensus_eps_")]
+    assert eps_items and all(d.value["accounting_basis"] == "unverified" for d in eps_items)   # 沒有一手 EPS 可核
+    assert any("基期觀測不存在" in w for w in v.consensus.meta.warnings)
 
 
-def test_missing_consensus_fails_closed_all_the_way_down_and_names_the_reason() -> None:
-    """同期共識整段消失 → 數值 gap 消失，**而且整條內部預測也跟著缺席**。
-
-    ⚠ 第二句是實測結果，不是原本的預期：D&C 成長假設把共識 ref 標成 `calibration`
-    （「知道市場隱含 +65% 所以選 +60%」，刻意不當 supporting），但只要**任何一條宣告的
-    ref 解析不到**，`select_assumptions` 就拒收整筆——於是內部營收→EPS→fair value 全部
-    缺席。方向是 fail closed（正確的那一邊），但顆粒度值得記一筆：
-    「supporting 解析不到」與「calibration 解析不到」目前是同一個判準。
-    收緊或放寬都要先量（L14／L15），本次只**釘住現況並說出它**，不動它。
-    """
+def test_missing_consensus_fails_closed_and_names_the_reason() -> None:
     shim = _Shim(_real_fundamentals(), fiscal_consensus=lambda *a, **k: ((), "測試：無同期共識"))
     v = _fresh_view(fundamentals_provider=shim)
-
-    internal = {d.key: d for d in v.internal_fundamentals.items}
-    assert not v.expectation_gap.internal_vs_consensus.is_known
-    assert all(not d.is_known for d in v.expectation_gap.numeric_comparisons)
-    assert internal["internal_eps"].value is None
-    assert v.valuation.fair_value.value is None
-    assert v.implied_return.price_return.value is None
-    # 缺席必須帶原因，而且是**逐項計數過的**原因（INV-3：不得靜默丟棄）
-    assert "沒有成長假設" in (v.internal_fundamentals.meta.reason or "")
-    assert v.valuation.fair_value.reason and "不是 0" in v.valuation.fair_value.reason
+    assert v.consensus.fiscal_items == ()
+    assert "無同期共識" in (v.consensus.meta.reason or "")
+    # （共識時序走 provider 的另一個方法 `fiscal_consensus_history`，本 shim 沒動它——這裡只驗會計年度別那一格。）
 
 
-def test_a_quote_unit_mismatch_refuses_the_gap_instead_of_dividing_two_units() -> None:
-    """報價單位 ≠ 結算幣別。硬算會差 100 倍，而那個數字看起來完全正常。"""
-    real = _real_fundamentals()
-    real_market = real.market
-
-    def market(ticker, *, as_of=None):
-        snapshot, freshness = real_market(ticker, as_of=as_of)
-        # 2026-09-19：欄位由 `currency`（一表兩義）拆成 `quote_unit`＋`settlement_currency`。
-        # 這裡刻意只動報價單位——結算幣別仍是 USD，**那正是「兩個單位」的定義**。
-        return replace(snapshot, quote_unit="GBp"), freshness
-
-    v = _fresh_view(fundamentals_provider=_Shim(real, market=market))
-    assert isinstance(v.implied_return.current_price.value, (int, float))
-    assert v.valuation.fair_value_gap.value is None, "單位不相容仍算出 gap＝差 100 倍的數字"
-    assert v.implied_return.price_return.value is None
-
-
-@pytest.mark.parametrize("dir_attr,module,layer", [
-    ("ASSUMPTION_DIR", "alpha.providers.assumptions", "fundamental"),
-    ("VALUATION_DIR", "alpha.providers.valuation_assumptions", "valuation"),
-    ("HORIZON_DIR", "alpha.providers.horizon_assumptions", "horizon"),
-])
-def test_a_missing_private_ledger_fails_closed_at_its_own_layer(
-        monkeypatch, tmp_path, dir_attr, module, layer) -> None:
-    """private authority 檔不見了 → 該層缺席，**下游一律跟著缺席**。
-
-    ⚠ 這一組守的是 durability 的下半段：備份還沒跑、檔案沒了、或還原到舊版本時，
-    系統不得靠上一次算好的 derived value 繼續輸出一個乾淨的隱含報酬。
-    """
+def test_a_missing_private_ledger_fails_closed_at_its_own_layer(monkeypatch, tmp_path) -> None:
+    """假設 ledger 檔不見了 → refresh 裡沒有任何假設 artifact，**不得**靠上一次的東西繼續輸出。"""
     import importlib
 
-    monkeypatch.setattr(importlib.import_module(module), dir_attr, tmp_path)
+    monkeypatch.setattr(importlib.import_module("alpha.providers.assumptions"), "ASSUMPTION_DIR", tmp_path)
     v = _fresh_view()
-
-    if layer == "fundamental":
-        internal = {d.key: d for d in v.internal_fundamentals.items}
-        assert internal["internal_eps"].value is None
-    if layer in ("fundamental", "valuation"):
-        assert v.valuation.fair_value.value is None
-    else:
-        assert v.valuation.fair_value.value == pytest.approx(223.6034, abs=5e-4)
-        assert v.implied_return.horizon.value is None
-    assert v.implied_return.price_return.value is None, f"{layer} 缺席仍算得出隱含報酬"
-    assert v.implied_return.price_return.reason, "缺席必須帶原因"
+    assert not [i for i in v.refresh_status.items if i.artifact_type == "operating_assumption"]
 
 
-def test_a_malformed_ledger_line_is_counted_not_silently_dropped(monkeypatch, tmp_path) -> None:
-    """半寫入／截斷的一行必須被**計數**。靜默丟棄會讓 fair value 用少一條假設算出來。"""
-    import importlib
+def test_a_malformed_ledger_line_is_counted_not_silently_dropped(tmp_path) -> None:
+    """半寫入／截斷的一行必須被**計數**。靜默丟棄會讓下游少一條假設而不自知（INV-3）。"""
+    from alpha.providers import assumptions as ledger
 
-    from alpha.providers import valuation_assumptions as ledger
-
-    real = ROOT / "library" / "private" / "alpha" / "valuation" / f"{TICKER}.jsonl"
+    real = ROOT / "library" / "private" / "alpha" / "assumptions" / f"{TICKER}.jsonl"
     lines = [line for line in real.read_text(encoding="utf-8").splitlines() if line.strip()]
     broken = tmp_path / f"{TICKER}.jsonl"
-    truncated = '{"assumption_id": "va_trunc", "ticke'
+    truncated = '{"assumption_id": "oa_trunc", "ticke'
     broken.write_text("\n".join([*lines, truncated]) + "\n", encoding="utf-8")
 
-    records, errors = ledger.read_valuation_assumption_records(TICKER, directory=tmp_path)
+    records, errors = ledger.read_assumption_records(TICKER, directory=tmp_path)
     assert len(records) == len(lines)
     assert len(errors) == 1
-    assert "va_trunc" not in " ".join(r.assumption_id for r in records)
-
-    monkeypatch.setattr(importlib.import_module("alpha.providers.valuation_assumptions"),
-                        "VALUATION_DIR", tmp_path)
-    v = _fresh_view()
-    assert v.valuation.fair_value.value == pytest.approx(223.6034, abs=5e-4), \
-        "好的行仍要算得出來——壞一行不得讓整層消失"
-    assert v.valuation.selection.input_count > v.valuation.selection.accepted_count
+    assert "oa_trunc" not in " ".join(r.assumption_id for r in records)
 
 
 def test_a_missing_or_corrupt_judgment_file_never_falls_back_to_an_older_one(tmp_path) -> None:
@@ -502,8 +370,9 @@ def test_a_missing_or_corrupt_judgment_file_never_falls_back_to_an_older_one(tmp
                                         v.falsification.meta.reason, *v.warnings))
     assert any(token in reasons for token in ("判斷檔", "無法讀取", "契約")), reasons
 
-    # 但**確定性那一段不受影響**——判斷壞了不代表財報數字壞了
-    assert v.valuation.fair_value.value == pytest.approx(223.6034, abs=5e-4)
+    # 但**觀測那一段不受影響**——判斷壞了不代表現價與共識壞了
+    assert v.market.price.value == pytest.approx(281.86, abs=1e-6)
+    assert any(d.is_known for d in v.consensus.fiscal_items)
 
 
 def test_a_stale_judgment_is_shown_as_mismatched_not_as_current() -> None:
@@ -523,81 +392,24 @@ def test_a_stale_judgment_is_shown_as_mismatched_not_as_current() -> None:
 # 4. 語意陷阱：算得出來，但不得被說成別的東西
 # ---------------------------------------------------------------------------
 
-def test_the_ordinal_q4_is_never_derived_from_the_numeric_gap() -> None:
-    """Q4（ordinal，session）與 numeric gap（−5.0%，確定性）是**兩個 authority**。
-
-    不得：用 −5% 自動映射 Q4 分數／用 Q4 取代 numeric comparison／因為方向相符就併成一格。
-    """
+def test_the_ordinal_q4_is_a_session_judgment_with_no_numeric_gap_beside_it() -> None:
+    """Q4（ordinal，session）是一個 authority。⚠ 2026-09-23：numeric gap（−5.0%，確定性）退役——
+    read model 裡不再有任何「內部 vs 共識」的數字可以被拿來映射 Q4 或取代它。"""
     v = view()
     q4 = v.expectation_gap.session_judgment
-    gap = next(d for d in v.expectation_gap.numeric_comparisons if d.key.endswith("_eps"))
-
     assert q4.basis == "session_judgment"
-    assert gap.basis == "deterministic" and gap.authority == "alpha://fundamental/compare"
-    assert q4.authority != gap.authority
     assert q4.value["effective"] == pytest.approx(0.25, abs=1e-9)
-    assert gap.value["relative_gap"] == pytest.approx(-0.0501, abs=5e-4)
-    # 兩者並存、各自標示；section reason 必須明說數值 gap 不取代 Q4
-    assert "不取代" in (v.expectation_gap.meta.reason or "")
-    assert q4.value["effective"] != pytest.approx(abs(gap.value["relative_gap"]), abs=1e-6)
+    assert not hasattr(v.expectation_gap, "numeric_comparisons")
+    assert "數值 gap" in (v.expectation_gap.meta.reason or "") and "退役" in (v.expectation_gap.meta.reason or "")
 
 
-def test_the_implied_return_is_attributed_to_the_multiple_not_to_an_earnings_view() -> None:
-    """−20.7% 主要來自 target PE 25x，不是「我們預期 earnings 比市場差 20.7%」。
-
-    consumer／epistemics 必須自己講得出這個歸因；講不出來，讀者只會照字面讀成盈餘觀點。
-    """
-    v = view()
-    share = str((v.valuation.epistemics.value or {}).get("multiple_share_of_gap") or "")
-    assert "target_pe" in share and "implied_multiple_at_price" in share
-
-    gap = v.valuation.fair_value_gap.value
-    from_multiple = 25.0 / gap["implied_multiple_at_price"] - 1.0
-    assert from_multiple == pytest.approx(gap["relative_gap"], abs=5e-4), \
-        "給定內部 EPS，整個 gap 就是倍數之差——這條紅了代表歸因說法與算術對不上"
-
-    eps_gap = next(d for d in v.expectation_gap.numeric_comparisons if d.key.endswith("_eps"))
-    assert abs(eps_gap.value["relative_gap"]) < abs(gap["relative_gap"]) / 3, \
-        "盈餘觀點只解釋得了一小部分，不得被說成整個 gap"
-
-
-def test_the_view_never_calls_the_implied_return_an_expected_earnings_shortfall() -> None:
+def test_the_view_never_prints_an_earnings_shortfall_or_an_implied_return() -> None:
     from briefing.analyst_view import render_analyst_view_markdown
 
     text = render_analyst_view_markdown(analyst()).replace("\\", "")
-    for phrase in ("預期 earnings 比市場差", "預期盈餘比市場低"):
-        assert phrase not in text, f"畫面上出現了會被讀成盈餘觀點的措辭：{phrase}"
-    assert "不是 probability-weighted expected return" in text
-    assert "不是 total return" in text
-
-
-def test_the_thesis_claim_and_the_modeled_expression_are_both_visible() -> None:
-    """variant view 說「未被定價的是 margin／FCF 轉換」，而內部模型：
-
-    * 營益率與（條件式）共識隱含只差約 0.27pp；
-    * FCF 是 `not_modeled`。
-
-    系統必須**同時**呈現這個張力：既不自動改 thesis，也不得把文字 thesis 冒充成
-    modeled expectation gap。
-    """
-    v = view()
-    assert v.variant_view.meta.basis == "session_judgment"
-    internal = {d.key: d for d in v.internal_fundamentals.items}
-    assert internal["internal_fcf"].status == "not_modeled"
-    assert internal["internal_fcf"].value is None
-
-    margin_cmp = [d for d in v.expectation_gap.numeric_comparisons if "margin" in d.key]
-    assert margin_cmp and all(not d.is_known for d in margin_cmp), \
-        "營益率沒有共識可比——必須是明說的缺料，不得被 thesis 的文字補上"
-
-
-def test_the_horizon_is_aligned_with_the_declared_value_date() -> None:
-    """`aligned` 是一個**被宣告的判斷**，不是預設值。不對齊時算術可展示，但不得 clean。"""
-    v = view()
-    window = v.implied_return.horizon_window.value
-    assert window["alignment"] == "aligned"
-    assert str(window["horizon_end"]) == str(v.implied_return.value_date.value)
-    assert v.implied_return.value_date.basis == "session_judgment"
+    for phrase in ("預期 earnings 比市場差", "預期盈餘比市場低", "Base-case 隱含價格報酬", "隱含價格報酬（simple）"):
+        assert phrase not in text, f"畫面上出現了退役的措辭：{phrase}"
+    assert "不是 buy／sell" in text
 
 
 def test_review_required_and_stale_are_never_rendered_as_clean() -> None:
@@ -614,12 +426,13 @@ def test_review_required_and_stale_are_never_rendered_as_clean() -> None:
 def test_a_scoped_no_attention_claim_states_its_scope_and_what_lies_outside() -> None:
     """「需要重看的研究成果：無」是一句斷言，它的**範圍**必須跟著印。
 
-    2026-09-07 實測（`--scenario fiscal_rollover`）：畫面上方 `overall=review_required`，
-    頭條卻寫「無」——兩句互相否定（L12：一個表示兩種語意）。
+    2026-09-07 實測：畫面上方 `overall=review_required`，頭條卻寫「無」——兩句互相否定
+    （L12：一個表示兩種語意）。⚠ 2026-09-23：原本用 `fiscal_rollover` 情境，它隨模型退役；
+    `consensus_revision` 一樣是「頭條乾淨、別處不乾淨」的形狀。
     """
     from briefing.analyst_view import render_analyst_view_markdown
 
-    a = analyst(scenario="fiscal_rollover", as_of=None)      # rollover 與 PIT 釘點互斥，走當前視角
+    a = analyst(scenario="consensus_revision")
     text = render_analyst_view_markdown(a)
     assert a.headline.attention == () and a.headline.attention_total, \
         "這個情境應該是「頭條乾淨、別處不乾淨」——否則本條是空跑"
@@ -632,21 +445,12 @@ def test_a_forward_year_rollover_is_never_reported_as_an_analyst_revision() -> N
 
     2026-08-13 COHR 的導出 forward EPS 一天跳 +62.3%（FY2027 → FY2028）。
     30 個觀測的窗口跨過了它，於是 `estimate_revision_30d` 報 +68.3%——
-    那不是分析師上修。現有 contract 分不出來時一律 `not_comparable`，**不猜**。
+    那不是分析師上修。現有 contract 分不出來時一律 `not_comparable`，**不猜**，而且要在共識段警告。
     """
     v = view()
     revision = next(d for d in v.consensus.items if d.key == "estimate_revision_30d")
     assert revision.value is None and not revision.is_known
-
-    datum = next(d for d in v.price_implied_expectations.items
-                 if d.key == "estimate_revision_vs_price")
-    assert datum.status == "not_applicable" and datum.value is None
-    assert "rollover" in (datum.reason or "")
-
-    proxy = next(d for d in v.price_implied_expectations.items
-                 if d.key == "market_implied_eps_growth")
-    assert "forward 會計年度=" in (proxy.method or ""), \
-        "proxy 必須說出它的 forward 指哪一個會計年度——否則換尺時讀者看不見"
+    assert any("rollover" in w for w in v.consensus.meta.warnings), "換尺這件事必須在共識段說出來"
 
 
 # ---------------------------------------------------------------------------
@@ -669,20 +473,19 @@ def _cli_json() -> dict:
 
 def test_black_box_cli_agrees_with_the_canonical_read_model_on_every_core_number() -> None:
     payload = _cli_json()
-    # 子行程那一端沒有 --today，用的是真實今天；比對側必須用同一個時鐘——否則日曆一過 TODAY，
-    # refresh（有到期日的判斷）就在兩側分歧（2026-09-08 實測：CLI review_required vs 凍結側 current）。
     from datetime import date as _date
 
     from briefing.alpha_view.sources import fetch_alpha_investment_view
 
     v = fetch_alpha_investment_view(TICKER, include_causal=False, today=_date.today())
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 兩個 panel 退役；price_return／
-    # annualized_price_return／fair_value 三條線隨估值鏈退役。**本條要守的事沒變**：
-    # 黑箱 CLI 的輸出必須與 canonical read model 逐格相等（不得有第二套算法）。
     panels = [payload[name] for name in ("headline", "fundamental", "research")]
     lines = {line["key"]: line["datum"] for panel in panels for line in panel["lines"]}
 
     assert lines["current_price"]["value"] == pytest.approx(v.market.price.value)
+    fiscal = {d.key: d for d in v.consensus.fiscal_items}
+    for key, datum in fiscal.items():
+        assert key in lines, f"黑箱輸出少了共識格 {key}"
+        assert lines[key]["value"]["avg"] == pytest.approx(datum.value["avg"])
     assert payload["refresh"]["overall"] == v.refresh_status.overall
     assert payload["source_schema_version"] == v.schema_version
 
@@ -698,11 +501,7 @@ def test_black_box_output_shows_no_zero_where_something_is_merely_absent() -> No
 
 
 def test_black_box_output_carries_no_position_sizing_or_buy_sell_field() -> None:
-    """比對**欄位名**不是全文。
-
-    全文比對會誤報——畫面上刻意寫著「不是 portfolio permission」這種否定句，
-    而一個會誤報的防呆本身就是 L16 明文禁止的東西。
-    """
+    """比對**欄位名**不是全文。"""
     from alpha.contracts import FORBIDDEN_POSITION_TOKENS
 
     banned = set(FORBIDDEN_POSITION_TOKENS) | {"target_weight", "supported_range", "nav_pct"}

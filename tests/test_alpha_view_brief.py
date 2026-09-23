@@ -30,8 +30,6 @@ def _card(ticker: str = "COHR") -> dict:
                                 "session_level": None, "reason": "unknown"}},
         "signal": {"has_signal": True, "context_matches": False, "weakest_axis": "expectation_gap",
                    "reason": "舊 context"},
-        "market_implied_eps_growth": {"value": 2.39, "status": "available", "basis": "heuristic_proxy",
-                                      "reason": None},
         "consensus_revenue_growth": {"value": 0.382, "status": "available", "basis": "observation",
                                      "analyst_count": 22},
         "catalyst": {"state": "watch", "state_label": "🟢 監控中", "days_to_expiry": 176,
@@ -62,7 +60,8 @@ def test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct(tmp_path
         text = render_today_markdown(loaded)
         assert "Alpha Card 摘要" in text
         assert "co:coherent（COHR）（判斷過期⌛）" in text
-        assert "+239.0%（proxy）" in text
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「市場隱含 EPS 成長」那一欄（+239.0%（proxy））隨 PE 比值 proxy 退役。
+        assert "proxy" not in text
         assert "python -m briefing alpha-card" in text
     finally:
         store.close()

@@ -254,13 +254,8 @@ def test_gate_states_are_a_closed_vocabulary() -> None:
 # 整條估值鏈退役。**接手的是 Phase 5 的量測**；在它落地前「衝檔數沒犧牲品質」沒有機械證據。
 
 
-def test_attribution_is_found_structurally_not_by_a_hardcoded_path() -> None:
-    """兩欄拆解住在 `view.headline.lines[*].datum.value`，那個索引會隨呈現層調整而變。"""
-    deep = {"overview": {"implied_return": {"simple": {"status": "available", "value": -0.1}}},
-            "view": {"a": {"b": [{"c": [{"eps_contribution": 0.0,
-                                         "multiple_contribution": -0.3}]}]}}}
-    score = closure.score_quality({"DEEP": deep})
-    assert score.multiple_priced == (("DEEP", -0.3),)
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組 2/2）：`test_attribution_is_found_structurally_not_by_a_hardcoded_path`
+# 退役——`score_quality`／`_find_attribution`（兩桿拆解的結構搜尋）隨估值鏈的最後一截退役。
 
 
 # ---------------------------------------------------------------------------

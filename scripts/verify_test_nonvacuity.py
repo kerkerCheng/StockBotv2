@@ -52,6 +52,25 @@ class Mutation:
 
 MUTATIONS: tuple[Mutation, ...] = (
     Mutation(
+        name="as_of 之後寫的假設被當成存在",
+        path="alpha/fundamental/assumptions.py",
+        old="        if record.created_on > cutoff:",
+        new="        if False:",
+        test="tests/test_refresh_engine.py::test_assumptions_created_after_as_of_do_not_exist_at_that_time",
+        guards="INV-6：歷史時點不得偷用現在的假設（2026-09-23 起由 builder 跑 select_assumptions，守衛搬到 refresh 測試）",
+    ),
+    Mutation(
+        name="解析不到證據的假設照樣生效",
+        path="alpha/fundamental/assumptions.py",
+        old="        if unresolved:",
+        new="        if False and unresolved:",
+        test="tests/test_refresh_engine.py::test_retracted_supporting_evidence_invalidates_dependents",
+        guards="L15／L8：假設的引用必須解析到 ResearchContext／Engine C 的證據，否則拒用並在 refresh 標 invalidated",
+    ),
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：指向 alpha/valuation、alpha/implied_return、
+    # alpha/fundamental/{model,bridge}.py、alpha/entry（F 組）的突變，以及守 test_valuation_model／
+    # test_implied_return／test_fundamental_model／test_entry_logic 的突變，共 40 條隨機制退役。
+    Mutation(
         name="AlphaSignal 長出部位欄位",
         path="alpha/contracts.py",
         old="    direction: Literal[\"long\", \"short\", \"neutral\"]\n    confidence: float\n    expected_horizon: str",
@@ -887,91 +906,12 @@ MUTATIONS: tuple[Mutation, ...] = (
     ),
     # ---- Alpha Investment Read Model（briefing/alpha_view，2026-09-05）------------------
     Mutation(
-        name="read model 把缺料的內部 EPS 填成 0",
-        path="briefing/alpha_view/builder.py",
-        old="        internal_items = tuple(missing(f\"internal_{k}\", l, absent, authority=A_BRIDGE)\n"
-            "                               for k, l, _u in _INTERNAL_METRIC_LABELS) + fixed_not_modeled",
-        new="        internal_items = tuple(Datum(key=f\"internal_{k}\", label=l, value=0.0, status=\"available\", "
-            "basis=\"deterministic\")\n"
-            "                               for k, l, _u in _INTERNAL_METRIC_LABELS) + fixed_not_modeled",
-        test="tests/test_alpha_investment_view.py::test_missing_internal_eps_is_not_serialized_as_zero",
-        guards="Missing != Zero：internal EPS 沒有模型輸出必須是 missing＋null，不是 0",
-    ),
-    # ---- Phase 2 Causal Fundamental Model（2026-09-05）--------------------------------
-    Mutation(
-        name="橋把缺席的分部成長假設當成零成長",
-        path="alpha/fundamental/bridge.py",
-        old="                missing_segments.append(name)",
-        new="                running += base",
-        test="tests/test_fundamental_model.py::test_missing_segment_assumption_makes_revenue_missing_not_zero_growth",
-        guards="Missing != Zero：少一條分部假設是 missing，不是 0% 成長",
-    ),
-    Mutation(
-        name="比較跨會計期間硬減",
-        path="alpha/fundamental/compare.py",
-        old="    if not internal.period.same_as(consensus.period):\n        return _no(\"incompatible_period\",",
-        new="    if False:\n        return _no(\"incompatible_period\",",
-        test="tests/test_fundamental_model.py::test_fy27_internal_is_not_compared_with_fy26_or_fy28_consensus",
-        guards="同一指標、不同會計期間不得相減——期間是身分",
-    ),
-    # ⚠ 第一版突變拿掉的是「unverified 不得相減」那道檢查，結果測試仍綠——因為下一道
-    # 「口徑不同不得相減」把 unverified≠non_gaap 也擋住了（兩道檢查刻意重疊，第一道只是
-    # 給更準確的原因）。空跑不是斷言沒守住，是突變選錯了門；改突變第二道，它才是承重牆。
-    Mutation(
-        name="內部與共識口徑不同也照樣相減",
-        path="alpha/fundamental/compare.py",
-        old="        if internal.accounting_basis != consensus_basis:",
-        new="        if False:",
-        test="tests/test_fundamental_model.py::test_unverified_or_mismatched_basis_yields_no_gap",
-        guards="GAAP vs non-GAAP 不得硬減；口徑靠一手數字核實不靠慣例（L11：自己引用的事實也要追源）",
-    ),
-    Mutation(
-        name="as_of 之後寫的假設被當成存在",
-        path="alpha/fundamental/assumptions.py",
-        old="        if record.created_on > cutoff:",
-        new="        if False:",
-        test="tests/test_fundamental_model.py::test_assumptions_created_after_as_of_are_invisible",
-        guards="INV-6：歷史時點不得偷用現在的假設重建過去的 gap",
-    ),
-    Mutation(
-        name="解析不到證據的假設照樣生效",
-        path="alpha/fundamental/assumptions.py",
-        old="        if unresolved:",
-        new="        if False and unresolved:",
-        test="tests/test_fundamental_model.py::test_unresolved_evidence_rejects_assumption_and_counts",
-        guards="L15／L8：假設的引用必須解析到 ResearchContext／Engine C 的證據，否則拒用並計數",
-    ),
-    Mutation(
         name="ETL 把沒有估計值的共識寫成 0",
         path="engine_c/etl_yfinance.py",
         old="            avg = _sf(row.get(\"avg\"))\n            if avg is None:\n                continue",
         new="            avg = _sf(row.get(\"avg\")) or 0.0",
         test="tests/test_engine_c_consensus_estimates.py::test_missing_estimate_writes_no_row_not_zero",
         guards="L12：「沒有共識」與「共識是 0」不得同形",
-    ),
-    Mutation(
-        name="模型接受寫入時間晚於 as_of 的基期觀測",
-        path="alpha/fundamental/model.py",
-        old="        if actuals.recorded_at is not None and actuals.recorded_at.date() > cutoff:",
-        new="        if False:",
-        test="tests/test_fundamental_model.py::test_actuals_recorded_after_as_of_are_refused",
-        guards="INV-6：T 時刻還沒寫進 ledger 的觀測，在 T 就是不知道",
-    ),
-    Mutation(
-        name="builder 在 as-of 模式下接受用別的時點跑的 model",
-        path="briefing/alpha_view/builder.py",
-        old="        if fundamental_model is not None and fundamental_model.as_of != context.as_of:",
-        new="        if False:",
-        test="tests/test_alpha_view_fundamental.py::test_builder_refuses_a_model_run_at_a_different_as_of",
-        guards="INV-6：呼叫端拿當前假設跑的 model 不得混進歷史卡",
-    ),
-    Mutation(
-        name="read model 把 PE 比值 proxy 標成 deterministic model",
-        path="briefing/alpha_view/builder.py",
-        old="               basis=\"heuristic_proxy\", authority=A_IMPLIED, unit=\"ratio\", as_of=cons_as_of,",
-        new="               basis=\"deterministic\", authority=A_IMPLIED, unit=\"ratio\", as_of=cons_as_of,",
-        test="tests/test_alpha_investment_view.py::test_price_implied_growth_is_marked_heuristic_proxy",
-        guards="trailing/forward PE − 1 是 heuristic proxy，不得被讀成 reverse DCF／modeled",
     ),
     Mutation(
         name="read model 把散文情境宣稱成量化情境模型",
@@ -985,18 +925,9 @@ MUTATIONS: tuple[Mutation, ...] = (
         name="read model 把 structural causal 宣稱成 financial causal",
         path="briefing/alpha_view/builder.py",
         old="            authority=A_GRAPH, capability=CAP_STRUCTURAL_CAUSAL,",
-        new="            authority=A_GRAPH, capability=CAP_FINANCIAL_CAUSAL,",
+        new="            authority=A_GRAPH, capability=\"financial_causal_model\",",
         test="tests/test_alpha_investment_view.py::test_causal_section_is_structural_not_financial",
         guards="沒有 revenue／margin／EPS bridge 之前，因果 section 只能是 structural_causal_model",
-    ),
-    Mutation(
-        name="read model 在沒有 horizon／估值時把賣方目標價灌進 implied_return",
-        path="briefing/alpha_view/builder.py",
-        old="            price_return=missing(\"base_case_implied_price_return\", \"Base-case 隱含價格報酬（simple）\", why, authority=A_IMPLIED_RETURN),",
-        new="            price_return=Datum(key=\"base_case_implied_price_return\", label=\"Base-case 隱含價格報酬（simple）\", value=0.47, "
-            "status=\"available\", basis=\"observation\", authority=A_IMPLIED_RETURN),",
-        test="tests/test_alpha_investment_view.py::test_analyst_target_is_not_expected_return",
-        guards="analyst target != StockBot implied return；報酬缺席時 implied_return 區不得出現任何數值",
     ),
     Mutation(
         name="Datum 契約不再擋「缺席卻帶值」",
@@ -1134,14 +1065,6 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="Step 0 抓到的 interest 118.1M 沿用全年值：heuristic_proxy 不得在新 actual 到來後仍當 current",
     ),
     Mutation(
-        name="會計期間推進只印 generic missing",
-        path="alpha/fundamental/model.py",
-        old="            if rolled and selection.reasons.get(\"other_period\"):",
-        new="            if False:",
-        test="tests/test_refresh_engine.py::test_fiscal_rollover_is_named_and_old_assumptions_are_not_reused",
-        guards="FISCAL_PERIOD_ROLLOVER 必須有名字：new fiscal base／target advanced／new assumptions required",
-    ),
-    Mutation(
         name="FY 別共識第一次出現就發 consensus 事件",
         path="briefing/alpha_view/changes.py",
         old="        if prior is None:\n            if observed > since:",
@@ -1165,234 +1088,6 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_alpha_view_brief.py::test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct",
         guards="L12：「沒注入」與「沒有候選」不得同形",
     ),
-    Mutation(
-        name="估值：ledger 沒生效倍數時偷補一個 default multiple",
-        path="alpha/valuation/model.py",
-        old="    assumption: ValuationAssumption | None = chosen[0] if chosen else None",
-        new="    assumption: ValuationAssumption | None = (chosen[0] if chosen else\n"
-            "                                             (replace(assumption_records[0], value=20.0) if assumption_records else None))",
-        test="tests/test_valuation_model.py::test_missing_multiple_is_missing_not_a_default",
-        guards="沒有 hidden default multiple：ledger 沒有生效假設就是 missing，不得由程式補",
-    ),
-    Mutation(
-        name="估值：price-only 變化讓 fair value 也 recalculate",
-        path="alpha/refresh/policy.py",
-        old="    \"fair_value\": frozenset({FINANCIAL_ACTUAL}),",
-        new="    \"fair_value\": frozenset({FINANCIAL_ACTUAL, MARKET_PRICE}),",
-        test="tests/test_valuation_model.py::test_refresh_states_propagate_through_fair_value_and_gap",
-        guards="price 不進 fair value：價格只動 gap（Step 1 refresh 契約）",
-    ),
-    Mutation(
-        name="估值：builder 自己把 EPS × 倍數算一遍",
-        path="briefing/alpha_view/builder.py",
-        old="            value=valuation.fair_value, status=_refresh_status(fv_refresh), basis=\"deterministic\",",
-        new="            value=(fi.value * valuation.assumptions[0].value if (fi and valuation.assumptions) else valuation.fair_value),\n"
-            "            status=_refresh_status(fv_refresh), basis=\"deterministic\",",
-        test="tests/test_valuation_model.py::test_builder_and_renderer_copy_fair_value_without_computing_it",
-        guards="briefing/alpha_view 只消費 canonical result，不含估值公式",
-    ),
-    Mutation(
-        name="估值：GAAP 倍數套在 non-GAAP EPS 上",
-        path="alpha/valuation/model.py",
-        old="            elif assumption.accounting_basis != fundamental_input.accounting_basis:",
-        new="            elif False and assumption.accounting_basis != fundamental_input.accounting_basis:",
-        test="tests/test_valuation_model.py::test_basis_and_period_mismatch_never_multiply",
-        guards="口徑是身分：GAAP／non-GAAP 不得混算",
-    ),
-    Mutation(
-        name="估值：拿別的 as-of 視角跑出的 fundamental model 算 fair value",
-        path="alpha/valuation/model.py",
-        old="        if fundamental.as_of != as_of:",
-        new="        if False and fundamental.as_of != as_of:",
-        test="tests/test_valuation_model.py::test_historical_as_of_does_not_see_future_valuation_assumptions",
-        guards="INV-6：估值視角與內部基本面視角必須同一個 T",
-    ),
-    Mutation(
-        name="估值：refresh 傳播只認營運假設，估值假設 review 不傳到 fair value",
-        path="alpha/refresh/resolver.py",
-        old="            upstream = next((resolved[f\"{t}:{aid}\"] for t in sorted(ASSUMPTION_ARTIFACT_TYPES)\n"
-            "                             if f\"{t}:{aid}\" in resolved), None)",
-        new="            upstream = resolved.get(f\"{ARTIFACT_ASSUMPTION}:{aid}\")",
-        test="tests/test_valuation_model.py::test_refresh_states_propagate_through_fair_value_and_gap",
-        guards="supporting evidence 變了 → 估值假設 review_required → fair value 不得假裝 current",
-    ),
-    # ---- Phase 2 Step 2：Base-case Implied Return v1（2026-09-06）------------------------------------------
-    Mutation(
-        name="報酬：估值假設未宣告 value_date_convention 時偷猜成 target_period_end",
-        path="alpha/valuation/model.py",
-        old="        elif convention == VALUE_DATE_SPOT:\n"
-            "            value_date, value_date_semantics = cutoff, VALUE_DATE_SPOT\n"
-            "        else:",
-        new="        elif convention == VALUE_DATE_SPOT:\n"
-            "            value_date, value_date_semantics = cutoff, VALUE_DATE_SPOT\n"
-            "        elif target is not None:\n"
-            "            value_date, value_date_semantics = target.end, VALUE_DATE_TARGET_PERIOD_END\n"
-            "        else:",
-        test="tests/test_implied_return.py::test_value_date_semantics_unspecified_makes_return_missing_even_with_fair_value_and_horizon",
-        guards="223.60 是哪一天的值必須由估值判斷宣告；未宣告＝unspecified，不得由程式猜",
-    ),
-    Mutation(
-        name="報酬：時點語意 unspecified 也照算報酬",
-        path="alpha/implied_return/model.py",
-        old="    if valuation.value_date_semantics == VALUE_DATE_UNSPECIFIED:",
-        new="    if False and valuation.value_date_semantics == VALUE_DATE_UNSPECIFIED:",
-        test="tests/test_implied_return.py::test_value_date_semantics_unspecified_makes_return_missing_even_with_fair_value_and_horizon",
-        guards="沒有 value-date 就沒有「從哪天到哪天」；報酬層拒算，不猜",
-    ),
-    Mutation(
-        name="報酬：年化改成線性（simple × 365.25／days）",
-        path="alpha/implied_return/model.py",
-        old="    return (1.0 + price_return) ** (DAYS_PER_YEAR / days) - 1.0",
-        new="    return price_return * DAYS_PER_YEAR / days",
-        test="tests/test_implied_return.py::test_annualization_math_is_compound_over_365_25_days",
-        guards="年化 convention 是 compound（365.25 天），公式字串與算術必須一致",
-    ),
-    Mutation(
-        name="報酬：builder 自己把 fair value / 現價 − 1 算一遍",
-        path="briefing/alpha_view/builder.py",
-        old="            value=result.price_return, status=_refresh_status(ret_refresh), basis=\"deterministic\", authority=A_IMPLIED_RETURN,",
-        new="            value=((result.fair_value / result.current_price.value - 1) if (result.fair_value and result.current_price.value) else result.price_return),\n"
-            "            status=_refresh_status(ret_refresh), basis=\"deterministic\", authority=A_IMPLIED_RETURN,",
-        test="tests/test_implied_return.py::test_builder_and_renderer_copy_the_return_without_computing_it",
-        guards="briefing/alpha_view 只消費 canonical result，不含報酬公式",
-    ),
-    Mutation(
-        name="報酬：implied return 的依賴不含現價 ref（price-only 變化不 recalculate）",
-        path="alpha/refresh/artifacts.py",
-        old="    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs}\n"
-            "    refs.update({a: ROLE_INPUT for a in result.assumption_ids})\n"
-            "    out.append(ArtifactDependency(\n"
-            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
-        new="    refs: dict[str, str] = {r: ROLE_OBSERVATION for r in result.observation_refs if not r.startswith(\"engine_c://financial_snapshot/\")}\n"
-            "    refs.update({a: ROLE_INPUT for a in result.assumption_ids})\n"
-            "    out.append(ArtifactDependency(\n"
-            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
-        test="tests/test_implied_return.py::test_price_only_change_recalculates_the_return_and_nothing_judgmental",
-        guards="現價是報酬的確定性輸入：價格變了報酬必須 recalculate",
-    ),
-    Mutation(
-        name="報酬：implied return 的依賴不宣告輸入假設（horizon 被取代時報酬仍 current）",
-        path="alpha/refresh/artifacts.py",
-        old="    refs.update({a: ROLE_INPUT for a in result.assumption_ids})\n"
-            "    out.append(ArtifactDependency(\n"
-            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
-        new="    refs.update({a: ROLE_INPUT for a in result.assumption_ids if not a.startswith(\"ha_\")})\n"
-            "    out.append(ArtifactDependency(\n"
-            "        artifact_type=ARTIFACT_IMPLIED_RETURN, artifact_id=\"implied_return\",",
-        test="tests/test_implied_return.py::test_horizon_supersede_recalculates_the_return_and_expiry_makes_it_stale",
-        guards="horizon 判斷 supersede → implied return recalculate（Step 2 refresh 契約）",
-    ),
-    Mutation(
-        name="報酬：horizon 到期不排程 stale（INV-2）",
-        path="alpha/refresh/resolver.py",
-        old="            if expiry <= cutoff:",
-        new="            if False and expiry <= cutoff:",
-        test="tests/test_implied_return.py::test_horizon_supersede_recalculates_the_return_and_expiry_makes_it_stale",
-        guards="INV-2：每個等待都必須有到期；horizon_end 到了 horizon 就 stale、報酬跟著 stale",
-    ),
-    Mutation(
-        name="報酬：as-of 視角選 horizon 時不看 as_of（偷看未來的 horizon）",
-        path="alpha/implied_return/model.py",
-        old="            horizon_records, target=target, as_of=as_of, today=today, evidence_index=index, parse_errors=parse_errors)",
-        new="            horizon_records, target=target, as_of=None, today=today, evidence_index=index, parse_errors=parse_errors)",
-        test="tests/test_implied_return.py::test_historical_view_does_not_leak_future_horizon_or_valuation",
-        guards="INV-6：T 時刻不存在的 horizon 判斷不得參與 T 的報酬",
-    ),
-    # ---- Phase 2 Step 3：Entry Logic v1（2026-09-06）------------------------------------------------
-    Mutation(
-        name="進場：沒有判準就補一個 15% 的預設 hurdle",
-        path="alpha/entry/model.py",
-        old="    criterion: EntryCriterion | None = accepted[0] if accepted else None\n    if criterion is None:",
-        new="    criterion: EntryCriterion | None = accepted[0] if accepted else None\n"
-            "    if criterion is None:\n"
-            "        from datetime import datetime as _dt, timezone as _tz\n"
-            "        from .criteria import entry_criterion_record as _rec, parse_entry_criterion_record as _parse\n"
-            "        criterion = _parse(_rec(company_id=company_id, ticker=ticker, value=0.15,\n"
-            "                                basis='investor_policy', rationale='default',\n"
-            "                                created_at=_dt(2020, 1, 1, tzinfo=_tz.utc)))\n"
-            "    if False:",
-        test="tests/test_entry_logic.py::test_no_criterion_is_missing_and_names_the_missing_judgment_not_an_etl_gap",
-        guards="沒有明示 hurdle 一律 missing——不得 invent 10%／15%／20%（缺的是投資門檻判斷，不是 ETL）",
-    ),
-    Mutation(
-        name="進場：門檻價不折現（直接拿 fair value 當門檻價）",
-        path="alpha/entry/model.py",
-        old="    return fair_value / (1.0 + hurdle) ** (days / DAYS_PER_YEAR)",
-        new="    return fair_value",
-        test="tests/test_entry_logic.py::test_higher_hurdle_monotonically_lowers_the_entry_price",
-        guards="hurdle 變高 → 門檻價單調下降；折現公式與公式字串必須一致",
-    ),
-    Mutation(
-        name="進場：現價等於門檻價時判成 above（等號歸錯邊）",
-        path="alpha/entry/model.py",
-        old="    return COMPARISON_MEETS if price <= entry_price else COMPARISON_ABOVE",
-        new="    return COMPARISON_MEETS if price < entry_price else COMPARISON_ABOVE",
-        test="tests/test_entry_logic.py::test_price_above_below_and_exactly_at_the_entry_price",
-        guards="`current_price <= entry_price` 的等號歸 meets——門檻價的定義就是「恰好滿足」",
-    ),
-    Mutation(
-        name="進場：alignment 不對齊也標 clean",
-        path="alpha/entry/model.py",
-        old="    if alignment in CLEAN_ALIGNMENTS:",
-        new="    if True or alignment in CLEAN_ALIGNMENTS:",
-        test="tests/test_entry_logic.py::test_alignment_mismatch_is_not_a_clean_entry_result",
-        guards="value_date 與 horizon_end 不一致時只能 review_required，不得冒充 clean actionable result",
-    ),
-    Mutation(
-        name="進場：判準的 basis 開放成任何研究 basis（hurdle 變成對公司的判斷）",
-        path="alpha/entry/contracts.py",
-        old="CRITERION_BASES: tuple[str, ...] = (CRITERION_BASIS_INVESTOR_POLICY,)",
-        new="CRITERION_BASES: tuple[str, ...] = (CRITERION_BASIS_INVESTOR_POLICY, \"session_judgment\")",
-        test="tests/test_entry_logic.py::test_missing_is_never_zero_and_the_same_inputs_give_the_same_result",
-        guards="hurdle 是投資人政策，不是研究對公司的判斷——basis 是封閉字彙",
-    ),
-    Mutation(
-        name="進場：契約允許 action 欄位（buy／sell 洩漏進型別）",
-        path="alpha/entry/contracts.py",
-        old="def _assert_no_capital_fields(cls: type) -> None:\n    for f in fields(cls):",
-        new="def _assert_no_capital_fields(cls: type) -> None:\n    for f in []:",
-        test="tests/test_entry_logic.py::test_no_buy_sell_sizing_or_portfolio_authority_leaks_anywhere",
-        guards="Entry Logic 只輸出 analytical threshold；部位／action 欄位在 import 當下就該炸",
-    ),
-    Mutation(
-        name="進場：entry assessment 的 refs 不宣告 criterion",
-        path="alpha/refresh/artifacts.py",
-        old="    refs[result.criterion.criterion_id] = ROLE_INPUT",
-        new="    refs.pop(result.criterion.criterion_id, None)",
-        test="tests/test_entry_logic.py::test_price_only_change_recalculates_the_entry_assessment_deterministically",
-        guards="門檻價依賴 criterion，依賴宣告是契約（refs 那一半）",
-    ),
-    # ⚠ 刻意**沒有**「assumption_ids 不含 criterion」這條突變：實測（2026-09-06）它砍掉後測試仍然綠，因為
-    # criterion 的變化一律由 refs 路徑命中，而第二輪傳播（上游 state → 下游）對 criterion **今天走不到**——
-    # 判準沒有 supporting evidence，所以它只會是 current（被選中）或 missing／superseded（沒被選中，此時
-    # assessment 本身就是 missing）。與其留一個測不到卻看起來有守的斷言，不如把這件事寫在
-    # `artifacts_from_entry` 的註解裡（L14：未量測的機制不得享有默認信任，包括我自己寫的守衛）。
-    Mutation(
-        name="進場：builder 自己把 fair value 折現算一遍門檻價",
-        path="briefing/alpha_view/builder.py",
-        old="            value=result.entry_price, status=base_status, basis=\"deterministic\", authority=A_ENTRY,",
-        new="            value=(result.fair_value / (1 + result.required_annualized_return) ** (result.holding_period_days / 365.25)),\n"
-            "            status=base_status, basis=\"deterministic\", authority=A_ENTRY,",
-        test="tests/test_entry_logic.py::test_builder_and_renderer_copy_the_threshold_without_computing_it",
-        guards="briefing/alpha_view 只消費 canonical result，不含門檻價公式",
-    ),
-    Mutation(
-        name="進場：as-of 視角選判準時不看 as_of（偷看未來的 hurdle）",
-        path="alpha/entry/model.py",
-        old="    accepted, selection = select_entry_criteria(criterion_records, as_of=as_of, today=today, parse_errors=parse_errors)",
-        new="    accepted, selection = select_entry_criteria(criterion_records, as_of=None, today=today, parse_errors=parse_errors)",
-        test="tests/test_entry_logic.py::test_historical_view_does_not_leak_a_future_criterion",
-        guards="INV-6：T 時刻不存在的判準不得參與 T 的門檻價",
-    ),
-    Mutation(
-        name="進場：sandbox 判準可以寫進 ledger",
-        path="alpha/providers/entry_criteria.py",
-        old="    if parsed.author.lower() == \"sandbox\":",
-        new="    if False and parsed.author.lower() == \"sandbox\":",
-        test="tests/test_entry_logic.py::test_the_hurdle_is_investor_policy_not_a_research_judgment",
-        guards="驗算用的非持久 hurdle 不得變成使用者宣告的政策（demo 好看不是寫入 authority 的理由）",
-    ),
-    # ---- Step 3.5 Analyst Consumer ----------------------------------------
     Mutation(
         name="消費端：自己複製一份 Datum（值一樣、物件不同）",
         path="briefing/analyst_view/compose.py",
@@ -1541,44 +1236,12 @@ MUTATIONS: tuple[Mutation, ...] = (
     ),
     # ---- Coverage Pilot（2026-09-07）：離開 COHR 之後才現形的六個缺陷 ------------
     Mutation(
-        name="報價單位判準折疊大小寫（GBp ≡ GBP）",
-        path="alpha/valuation/model.py",
-        old="    left = resolve_quote_unit(fair_value_currency)\n    right = resolve_quote_unit(price_unit)",
-        new="    left = resolve_quote_unit(fair_value_currency.upper())\n    right = resolve_quote_unit(price_unit.upper())",
-        test="tests/test_coverage_pilot_generalization.py",
-        guards="GBp（便士）與 GBP（英鎊）差 100 倍——這道 gate 唯一要擋的就是這個 case，而 .upper() 剛好只放行它",
-    ),
-    Mutation(
-        name="本益比法套在虧損公司上",
-        path="alpha/valuation/contracts.py",
-        old="    if method == METHOD_FORWARD_EARNINGS_MULTIPLE and fundamental_value <= 0:",
-        new="    if method == METHOD_FORWARD_EARNINGS_MULTIPLE and fundamental_value <= -1e30:",
-        test="tests/test_coverage_pilot_generalization.py",
-        guards="負 EPS × 目標倍數 ＝ 負的 fair value 與 <−100% 的隱含報酬；做多部位不可能跌超過 100%",
-    ),
-    Mutation(
         name="共識營收不與基期對帳",
         path="alpha/fundamental/compare.py",
         old="    if estimate.metric != \"revenue\":\n        return None",
         new="    if estimate.metric != \"__never_matches__\":\n        return None",
         test="tests/test_coverage_pilot_generalization.py",
         guards="6324.T 的共識營收 year_ago 是單體、EPS 是連結，差 −43.9%——year_ago_actual 是唯一能機械檢查合併範圍的把手",
-    ),
-    Mutation(
-        name="市場付的倍數又被綁回 fair value",
-        path="alpha/valuation/model.py",
-        old="    if (price.is_known and price.value and fundamental_input is not None",
-        new="    if (gap.is_known and price.is_known and price.value and fundamental_input is not None",
-        test="tests/test_coverage_pilot_generalization.py::test_market_multiple_on_internal_eps_is_available_without_a_target_multiple",
-        guards="price ÷ 內部 EPS 是純算術，不需要目標倍數——而沒有目標倍數時正是最需要看它的時候（6324.T：126x）",
-    ),
-    Mutation(
-        name="負 EPS 也算市場付的倍數",
-        path="alpha/valuation/model.py",
-        old="            and fundamental_input.value is not None and fundamental_input.value > 0",
-        new="            and fundamental_input.value is not None and fundamental_input.value != 0",
-        test="tests/test_coverage_pilot_generalization.py::test_negative_internal_eps_fails_closed_at_the_valuation_layer",
-        guards="盈餘為負時 price/eps 是負的本益比（實測 −14,093x），與負的 fair value 同一種無意義",
     ),
     Mutation(
         name="口徑判定的絕對容忍在便士級把兩個候選一起放進來",
@@ -1630,14 +1293,6 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="abstention 只說「我們不主張」；能裝數字就等於開了一條繞過 ValuationAssumption 的估值後門",
     ),
     Mutation(
-        name="估值層不宣告自己走了哪個缺席分支",
-        path="alpha/valuation/model.py",
-        old='            absence_kind = "deliberate_abstention"',
-        new='            absence_kind = None',
-        test="tests/test_absence_semantics.py::test_abstention_changes_why_but_never_produces_a_number",
-        guards="缺席語意必須由知道自己走了哪個分支的那段程式宣告，否則消費端只能回頭 parse 散文（L16）",
-    ),
-    Mutation(
         name="撤回 abstention 之後語意沒有回復",
         path="alpha/abstention/contracts.py",
         old="    return None if latest.retracted else latest",
@@ -1681,7 +1336,7 @@ MUTATIONS: tuple[Mutation, ...] = (
         name="serve 端 import 了會重跑模型的東西",
         path="webapp/api.py",
         old="from .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours",
-        new="from alpha.valuation.model import build_valuation\nfrom .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours",
+        new="from briefing.alpha_view.sources import fetch_alpha_investment_view\nfrom .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours",
         test="tests/test_webapp_request_path.py",
         guards="「點一下不重跑研究」的第一道證明是 import allowlist——它一鬆，其餘三道證明都可能被繞過",
     ),

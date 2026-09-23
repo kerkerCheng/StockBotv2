@@ -18,27 +18,18 @@ from typing import Any, Iterable, Mapping, Sequence
 from alpha.context import ContextBuild, build_research_context
 from alpha.contracts import AlphaSignal
 from alpha.errors import AlphaError, ContractViolation, PointInTimeUnsupported
-from alpha.fundamental import FundamentalModelResult, build_fundamental_model
-from alpha.valuation.contracts import (
-    METHOD_EV_TO_SALES, METHOD_FORWARD_EARNINGS_MULTIPLE, BalanceSheetInput,
-)
+from alpha.fundamental.compare import verify_consensus_basis
 from alpha.identity import CompanyId, Ticker
-from alpha.implied_return import ImpliedReturnResult, build_implied_return
 from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
 from alpha.providers import briefs as brief_ledger
-from alpha.providers import horizon_assumptions as horizon_ledger
-from alpha.abstention.contracts import select_abstention
 from alpha.providers import abstentions as abstention_ledger
-from alpha.providers import valuation_assumptions as valuation_ledger
-from alpha.refresh import build_instant
-from alpha.valuation import CurrentPrice, ValuationResult, build_valuation
 from identity.registry import get_registry
 
 from .builder import DecisionFacts, build_alpha_investment_view, compact_card
 from .changes import baseline_since, detect_changes, load_watches
 from .contracts import AlphaInvestmentView
-from .scenarios import SCENARIOS, rollover_actuals, scenario_changes
+from .scenarios import SCENARIOS, scenario_changes
 
 _ROOT = Path(__file__).resolve().parents[2]
 #: session 判斷檔的約定位置（private，不進 Git）。先找專用目錄，再找舊命名。
@@ -174,52 +165,77 @@ def _causal_inputs(graph: Any, company_id: CompanyId, *, as_of: date | None, tod
     return out
 
 
-def _fundamental_model(
-    build: ContextBuild, fundamentals_provider: Any, ticker: Ticker, company_id: CompanyId,
-    *, as_of: date | None, today: date, actuals_override: Any = None, scenario: str = "base",
-) -> tuple[FundamentalModelResult | None, str | None, list[Any]]:
-    """Causal Fundamental Model 的取數與執行（Phase 2）。
+def _engine_c_financials(
+    fundamentals_provider: Any, ticker: Ticker, *, as_of: date | None, today: date,
+) -> dict[str, Any]:
+    """Engine C 的基期觀測（`fiscal_year_results`）與會計年度別共識（`fiscal_consensus`）——**只取數，不算數**。
 
-    - 觀測（`fiscal_year_results`）、指引（`company_guidance`）、會計年度別共識
-      （`consensus_estimates`）全部由 Engine C provider 唯讀取出；假設由 private ledger
-      （`alpha/providers/assumptions.py`）讀出。本檔不算任何數字——算術在 `alpha.fundamental`。
-    - provider 沒有這三個方法（測試用的假 provider）→ `(None, 原因)`，read model 標 missing。
-    - 任何一段失敗都 fail-soft，原因交給 builder。
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：這裡原本是 `_fundamental_model()`——讀假設 ledger、
+    取觀測／共識／指引，然後跑 `build_fundamental_model`（FY+1 因果橋）。橋退役了，**資料留**：
+    基期觀測是報表幣別的身分來源（不得回退到報價幣別），共識是三題「已定價」要用的東西。
+    模型原本做的 PIT 自我核對（INV-6）搬到這裡，一條不少：
+    - 基期觀測的 `recorded_at` 晚於 T、或會計年度在 T 之後才結束 → 拒用；
+    - 共識的 `captured_at`（bar_date）與 `fetched_at` 任一晚於 T → 排除並計數。
+    口徑核實（`verify_consensus_basis`）是資料層的機械比對，不是判斷。
+    provider 沒有這兩個方法（測試用的假 provider）→ 全空＋原因，read model 標 missing。
     """
+    out: dict[str, Any] = {"actuals": None, "consensus": (), "bases": {}, "target_period": None, "reason": None,
+                           "evidence": ()}
     fetch_results = getattr(fundamentals_provider, "fiscal_year_results", None)
     fetch_consensus = getattr(fundamentals_provider, "fiscal_consensus", None)
     fetch_guidance = getattr(fundamentals_provider, "company_guidance", None)
-    records: list[Any] = []
-    try:
-        records, parse_errors = assumption_ledger.read_assumption_records(str(ticker))
-    except Exception as exc:  # noqa: BLE001
-        return None, f"假設 ledger 讀取失敗：{type(exc).__name__}", records
-    if not all(callable(f) for f in (fetch_results, fetch_consensus, fetch_guidance)):
-        return None, "fundamentals provider 沒有 fiscal_year_results／fiscal_consensus／company_guidance 能力", records
+    fetch_interim = getattr(fundamentals_provider, "interim_period_results", None)
+    if not (callable(fetch_results) and callable(fetch_consensus)):
+        out["reason"] = "fundamentals provider 沒有 fiscal_year_results／fiscal_consensus 能力"
+        return out
+    cutoff = as_of or today
+    notes: list[str] = []
     try:
         actuals, actuals_reason = fetch_results(ticker, as_of=as_of)
-        if actuals_override is not None:
-            actuals, actuals_reason = actuals_override, None
-        consensus, _consensus_reason = fetch_consensus(ticker, as_of=as_of)
-        guidance, _guidance_reason = fetch_guidance(ticker, as_of=as_of)
-        # 目標年度已報導的 YTD 實績（2026-09-13）。**不進橋**——讀它的唯一理由是讓它的
-        # evidence ref 進 index，於是假設的 `evidence_refs` 指得到它。provider 沒有這個
-        # 能力時回空（不是錯：這是 2026-09-13 之後才有的欄位）。
-        fetch_interim = getattr(fundamentals_provider, "interim_period_results", None)
-        interim: tuple = ()
-        if callable(fetch_interim):
-            interim, _interim_reason = fetch_interim(ticker, as_of=as_of)
-        model = build_fundamental_model(
-            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
-            actuals=actuals, actuals_reason=actuals_reason, consensus=consensus, guidance=guidance,
-            interim_results=interim,
-            assumption_records=records, parse_errors=parse_errors,
-            evidence_index={ref.ref: ref for ref in build.context.evidence_refs},
-            scenario=scenario,
-        )
-    except Exception as exc:  # noqa: BLE001 — 模型失敗只讓該區 missing，不讓整份 view 失敗
-        return None, f"fundamental model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
-    return model, None, records
+        consensus, consensus_reason = fetch_consensus(ticker, as_of=as_of)
+        # 指引與目標年度已報導的 YTD 實績：**不進任何數字**，只讓假設的 `evidence_refs` 解析得到
+        # （假設常引用它們；解析不到會被判 unresolved_evidence）。provider 沒這能力就空。
+        guidance = fetch_guidance(ticker, as_of=as_of)[0] if callable(fetch_guidance) else ()
+        interim = fetch_interim(ticker, as_of=as_of)[0] if callable(fetch_interim) else ()
+    except Exception as exc:  # noqa: BLE001 — 取不到只讓那幾格 missing，不讓整份 view 失敗
+        out["reason"] = f"Engine C 會計年度別資料讀取失敗：{type(exc).__name__}: {str(exc)[:120]}"
+        return out
+    if actuals is not None:
+        if actuals.recorded_at is not None and actuals.recorded_at.date() > cutoff:
+            actuals, actuals_reason = None, "基期觀測寫入時間晚於 as_of（lookahead，拒用；INV-6）"
+        elif actuals.period.end > cutoff:
+            actuals, actuals_reason = None, "基期會計年度在 as_of 之後才結束（lookahead，拒用；INV-6）"
+
+    def _known_by_cutoff(item: Any) -> bool:
+        captured = getattr(item, "captured_at", None)
+        fetched = getattr(item, "fetched_at", None)
+        if captured is not None and captured > cutoff:
+            return False
+        if fetched is not None and fetched.date() > cutoff:
+            return False
+        return True
+
+    usable = tuple(c for c in (consensus or ()) if _known_by_cutoff(c))
+    usable_guidance = tuple(g for g in (guidance or ()) if getattr(g, "issued_at", None) is None or g.issued_at <= cutoff)
+    usable_interim = tuple(i for i in (interim or ())
+                           if getattr(i, "period_end", None) is None or i.period_end <= cutoff)
+    if len(usable) != len(consensus or ()):
+        notes.append(f"{len(consensus) - len(usable)} 筆共識晚於 as_of（captured_at 或 fetched_at 在 T 之後），排除")
+    # 「目標期間」＝最近一個已報導年度的下一年（與退役前的模型同一條規則：`actuals.period.shifted(1)`）；
+    # 沒有基期觀測就取共識裡最早的那一期。它只用來挑共識時序（gap_closure），不推任何數字。
+    target = actuals.period.shifted(1) if actuals is not None else (
+        min((c.period for c in usable), key=lambda per: per.end) if usable else None)
+    evidence: list[Any] = []
+    for source in ((actuals.evidence if actuals is not None else ()), *(c.evidence for c in usable),
+                   *(getattr(g, "evidence", ()) for g in usable_guidance),
+                   *(getattr(i, "evidence", ()) for i in usable_interim)):
+        evidence.extend(source)
+    out.update(
+        actuals=actuals, consensus=usable, target_period=target, evidence=tuple(evidence),
+        bases={f"{c.metric}:{c.period.end.isoformat()}": verify_consensus_basis(c, actuals) for c in usable},
+        reason=("；".join([*notes, *(r for r in (actuals_reason, consensus_reason) if r)]) or None),
+    )
+    return out
 
 
 def _read_abstentions(ticker: str) -> list[Any]:
@@ -235,217 +251,10 @@ def _read_abstentions(ticker: str) -> list[Any]:
         return []
 
 
-def variant_absence(
-    abstentions: Sequence[Any], *, as_of: date | None, today: date,
-) -> tuple[str, str]:
-    """沒有 variant 假設時，這是**哪一種**「沒有」。純函式：查 ledger，不推論（L16）。
-
-    Q2（2026-09-17 使用者核准）：籃子的每一列只有兩個誠實終局——寫一個帶 disproof 的賭注，
-    或宣告「目前沒有可辯護的賭注」。第二種在此之前沒有地方可寫，於是和「還沒有人寫」
-    共用同一句話（L12 一表兩義）；使用者因此分不出「研究做完了、結論是不下注」與
-    「沒人看過這一檔」。
-
-    ⚠ **只認 `bet/variant.overlay`**：估值層的 `target_pe` abstention 說的是
-    「本益比法沒有可校準的對象」，那不等於「沒有可辯護的賭注」——虧損年照樣可以寫
-    「如果 X 為真它值 Y」。2026-09-17 實測籃子 16 檔有 5 檔已宣告前者而賭注格仍是
-    `not_yet_recorded`；把前者讀成後者會把五筆待辦冒充成答案。
-    """
-    declared = select_abstention(
-        abstentions, layer="bet", subject="variant.overlay",
-        period_end=None, as_of=as_of, today=today)
-    if declared is not None:
-        return (f"刻意不主張賭注（{declared.abstention_id}）：{declared.reason}", "deliberate_abstention")
-    return ("尚未寫入任何 variant 假設——賭注還沒寫（不是 0）", "not_yet_recorded")
-
-
-def downside_absence(
-    abstentions: Sequence[Any], *, as_of: date | None, today: date,
-) -> tuple[str, str]:
-    """沒有 downside 假設時，這是**哪一種**「沒有」。`variant_absence` 的對稱面（D2，2026-09-18）。
-
-    ⚠ **只認 `bet/downside.overlay`，不吃 `variant.overlay` 頂替**：宣告「目前沒有可辯護的
-    賭注」與宣告「說不出可辯護的下檔」是兩個不同的結論——前者是不下注，後者是連認錯的門檻
-    都畫不出來。互相頂替會把一筆待辦冒充成答案，那正是 Q2 在估值層踩過的形狀。
-    """
-    declared = select_abstention(
-        abstentions, layer="bet", subject="downside.overlay",
-        period_end=None, as_of=as_of, today=today)
-    if declared is not None:
-        return (f"刻意不主張下檔（{declared.abstention_id}）：{declared.reason}", "deliberate_abstention")
-    return ("尚未寫入任何 downside 假設——「判斷錯了值多少」還沒寫（不是 0）", "not_yet_recorded")
-
-
-def _valuation_model(
-    build: ContextBuild, fundamental_model: FundamentalModelResult | None, fundamental_reason: str | None,
-    ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date,
-    identity: Mapping[str, Any], scenario: str = "base",
-) -> tuple[ValuationResult | None, str | None, list[Any]]:
-    """Valuation Model v1（Step 1）的取數與執行。
-
-    - 估值假設由 private ledger（`alpha/providers/valuation_assumptions.py`）讀出；
-      內部 EPS 是已經跑好的 fundamental model；現價是 `build.context.market`（Engine C，已依 as-of 過濾）。
-    - 本檔不算任何數字——算術在 `alpha.valuation`。任何一段失敗都 fail-soft，原因交給 builder。
-    - 現價的報價單位取自 registry（`market_quote_unit`／`market_currency`）；不知道就留 None，
-      估值層會拒絕算 gap（報價單位 ≠ 結算幣別，不猜）。
-    """
-    records: list[Any] = []
-    try:
-        records, parse_errors = valuation_ledger.read_valuation_assumption_records(str(ticker))
-    except Exception as exc:  # noqa: BLE001
-        return None, f"估值假設 ledger 讀取失敗：{type(exc).__name__}", records
-    # 「刻意不主張目標倍數」是另一本 append-only ledger（`alpha/abstention/`）。讀不到就是沒有——
-    # 不得因為讀取失敗而把「刻意」降級成「還沒寫」，所以失敗一樣 fail-soft 並保持 not_yet_recorded。
-    abstentions = _read_abstentions(str(ticker))
-    price = _current_price(build, identity)
-    balance = _balance_input(build)
-    common = dict(
-        company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
-        fundamental=fundamental_model, fundamental_reason=fundamental_reason,
-        assumption_records=records, parse_errors=parse_errors, abstention_records=abstentions,
-        evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=price, balance=balance,
-        scenario=scenario,
-    )
-    method, method_conflict = _select_method(records)
-    if method_conflict is not None:
-        return None, method_conflict, records
-    try:
-        result = build_valuation(method=method, **common)
-    except Exception as exc:  # noqa: BLE001 — 估值失敗只讓該區 missing，不讓整份 view 失敗
-        return None, f"valuation model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
-    return result, None, records
-
-
-def _select_method(records: Sequence[Any]) -> tuple[str, str | None]:
-    """用哪個估值 method——**由 ledger 裡寫了哪一筆估值假設決定**（2026-09-13 起）。
-
-    ## 為什麼改成這樣（前一版是「先跑本益比法，撞牆再退回 EV/Sales」）
-
-    舊規則要求先產生一個「本益比法失敗」的證據才肯切換，而那個證據只有兩種來源：
-    ①已經寫了一筆 `target_pe` 然後被 `method_applicability` 擋掉（＝寫一筆自己不相信的假設）；
-    ②一筆 `Abstention`——而它是 **pq2**。於是**每一檔虧損股都要一個編號才能用對的方法估值**。
-    實測到 2026-09-13 為止已經連鑄 8 個，其中 7 個的內容完全由算術決定。
-
-    ⚠ 舊版的註解寫著「方法選擇是判斷，要由 abstention 明示，**不能靠不寫**」。
-    那句話防的是**從缺席推論**（not_yet_recorded → 自動改用別的方法），而那個顧慮是對的。
-    **但本規則不是從缺席推論，是從在場推論**：ledger 裡有一筆帶 rationale、帶 `derivation`、
-    寫進 append-only ledger 的 `ev_to_sales` 假設——**那就是「我選這個方法」的明示宣告本身**，
-    而且它本來就是舊切換條件的必要條件之一（`_has_method_records`）。
-    ⚠ 差別因此不是「放寬」而是「拿掉一道重複的閘門」：舊規則要求同一個判斷講兩次
-    （寫 ev_to_sales ＋ 再寫一筆 Abstention），新規則只要求講一次。
-
-    ## Abstention 沒有被削弱，它回到它自己那一件事
-
-    `Abstention` 原本同時承載兩種語意（L12）：①**宣告不主張**（→ `settled`，這一格不用再做）
-    ②**當方法開關**。②搬到 ledger 之後，①原封不動——POET 就是只有 ① 沒有 ②
-    （有 Abstention、沒有 `ev_to_sales`）：方法仍是本益比法、fair value 仍然缺席、仍然 `settled`。
-
-    ## 兩筆並存＝一格兩義，直接拒絕
-
-    與 `bridge.py` 對 `tax_rate` / `tax_expense_absolute` 的處理同一個形狀：
-    **不挑一個用，也不相加，直接拒絕並說出要撤回哪一條。** 實測 2026-09-13 全庫 58 檔，
-    並存的是 **0 檔**（49 檔只有 target_pe、9 檔只有 ev_to_sales），所以這條路徑今天不會被走到
-    ——它是為了讓「以後有人兩筆都寫」時**不會靜默選錯**，不是為了處理現況。
-    """
-    has_pe = _has_method_records(records, METHOD_FORWARD_EARNINGS_MULTIPLE)
-    has_ev = _has_method_records(records, METHOD_EV_TO_SALES)
-    if has_pe and has_ev:
-        return METHOD_FORWARD_EARNINGS_MULTIPLE, (
-            f"估值 ledger 同時有 {METHOD_FORWARD_EARNINGS_MULTIPLE} 與 {METHOD_EV_TO_SALES} 的生效假設"
-            "——兩者二擇一，不得並存也不得由程式代選（method 是判斷，不是預設值）。"
-            "要換方法就 append 一筆 retracted 撤回不要的那一條")
-    if has_ev:
-        return METHOD_EV_TO_SALES, None
-    # 兩者皆無時仍回本益比法：它的缺席理由（「尚未寫入任何估值假設（target_pe）」）
-    # 才是這種情況下該給使用者看的那一句，不是 EV/Sales 的。
-    return METHOD_FORWARD_EARNINGS_MULTIPLE, None
-
-
-def _has_method_records(records: Sequence[Any], method: str) -> bool:
-    """ledger 裡有沒有這個 method 的**生效**估值假設（選取仍由 build_valuation 依 as-of／期間決定）。
-
-    ⚠⚠ **「生效」必須同時排除被 supersede 的**（2026-09-20 修）。撤回的寫法是
-    **append 一筆 `retracted=True` 的新紀錄去 supersede 舊筆**（append-only ledger，
-    舊筆原地不動、`retracted` 永遠是 `False`）——所以只看每筆自己的 `retracted`
-    等於**完全看不到撤回**。
-
-    實測（pq2 [637] 執行當天）：AXTI 依核准 append 了 `target_ev_to_sales` 並 `--retract`
-    了 `target_pe`，而 `_select_method` 仍回報「兩種 method 並存」並拒絕選——**撤回無效**。
-    這條路先前沒被走過：9 檔 ev_to_sales 都是一開始就只有那一種，AXTI 是第一檔真的做
-    「本益比法 → EV／Sales」切換的。
-    """
-    superseded = {getattr(r, "supersedes_id", None) for r in records
-                  if getattr(r, "supersedes_id", None)}
-    return any(getattr(r, "method", None) == method
-               and not getattr(r, "retracted", False)
-               and getattr(r, "assumption_id", None) not in superseded
-               for r in records)
-
-
-def _balance_input(build: ContextBuild) -> BalanceSheetInput:
-    """Engine C 快照的負債與現金（A2 觀測；只給 ev_to_sales 換每股）。缺就帶 reason，不補 0。"""
-    snap = build.context.fundamentals
-    missing_fields = [name for name in ("total_debt", "cash_and_equivalents") if getattr(snap, name, None) is None]
-    return BalanceSheetInput(
-        total_debt=snap.total_debt, cash_and_equivalents=snap.cash_and_equivalents,
-        # 報表幣別跟著這兩個金額走（2026-09-13）。⚠ 不是 `market.currency`——那是報價幣別。
-        currency=getattr(snap, "financial_currency", None),
-        as_of=build.context.market.bar_date,
-        evidence_refs=tuple(r.ref for r in snap.evidence),
-        reason=(f"Engine C 快照缺 {'、'.join(missing_fields)}" if missing_fields else None),
-    )
-
-
-def _current_price(build: ContextBuild, identity: Mapping[str, Any]) -> CurrentPrice:
-    """Engine C 現價（已依 as-of 過濾）；估值層與報酬層共用**同一個**物件，不各取一份。"""
-    market = build.context.market
-    return CurrentPrice(
-        value=market.price, bar_date=market.bar_date,
-        # 2026-09-19：`market.quote_unit` 開始真的有值（舊欄位 `market.currency`
-        # 實測 16/16 從未被賦值，所以這條 fallback 鏈一直只走 identity 那一段）。
-        unit=(market.quote_unit or identity.get("market_quote_unit") or identity.get("market_currency")),
-        evidence_refs=tuple(r.ref for r in market.evidence),
-        reason=None if market.price is not None else "Engine C 無現價快照",
-    )
-
-
-def _implied_return_model(
-    build: ContextBuild, valuation: ValuationResult | None, valuation_reason: str | None,
-    ticker: Ticker, company_id: CompanyId, *, as_of: date | None, today: date, identity: Mapping[str, Any],
-    fundamental_model: FundamentalModelResult | None = None,
-    fundamentals_provider: Any = None,
-) -> tuple[ImpliedReturnResult | None, str | None, list[Any]]:
-    """Base-case Implied Return v1（Step 2）的取數與執行。
-
-    - horizon 判斷由 private ledger（`alpha/providers/horizon_assumptions.py`）讀出；fair value 是已經跑好的
-      valuation；現價與估值層共用同一個 `CurrentPrice`。本檔不算任何數字——算術在 `alpha.implied_return`。
-    - 任何一段失敗都 fail-soft，原因交給 builder。
-    """
-    records: list[Any] = []
-    try:
-        records, parse_errors = horizon_ledger.read_horizon_assumption_records(str(ticker))
-    except Exception as exc:  # noqa: BLE001
-        return None, f"horizon 假設 ledger 讀取失敗：{type(exc).__name__}", records
-    try:
-        # 兩桿拆解（2026-09-09 P2）只讀 fundamental model 已算好的 EPS 比較；同一個物件，不另取共識。
-        eps_comparison = (fundamental_model.comparisons.get("eps")
-                          if fundamental_model is not None and fundamental_model.as_of == as_of else None)
-        # 匯率觀測（2026-09-13）：報表幣別 ≠ 報價幣別時的**可稽核**換算路徑。
-        # provider 沒有這個能力或 ledger 裡沒有觀測 → 空的 → 報酬層照舊 fail closed。
-        fetch_fx = getattr(fundamentals_provider, "fx_observations", None)
-        fx_rows: tuple = ()
-        if callable(fetch_fx):
-            fx_rows, _fx_reason = fetch_fx(ticker, as_of=as_of)
-        result = build_implied_return(
-            company_id=str(company_id), ticker=str(ticker), as_of=as_of, today=today,
-            valuation=valuation, valuation_reason=valuation_reason, horizon_records=records, parse_errors=parse_errors,
-            evidence_index={ref.ref: ref for ref in build.context.evidence_refs}, price=_current_price(build, identity),
-            fx_observations=fx_rows,
-            eps_comparison=eps_comparison,
-        )
-    except Exception as exc:  # noqa: BLE001 — 報酬失敗只讓該區 missing，不讓整份 view 失敗
-        return None, f"implied return model 執行失敗：{type(exc).__name__}: {str(exc)[:160]}", records
-    return result, None, records
-
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`_valuation_model`／`_select_method`／`_has_method_records`／
+# `_balance_input`／`_current_price`／`_implied_return_model` 整組退役**（估值假設 ledger、horizon ledger、
+# fair value、隱含報酬的取數與執行，約 170 行）。`variant_absence`／`downside_absence`（E 組的兩種「沒有」）
+# 同批移除——它們沒有呼叫端了。三本 ledger 檔案留在 `library/private/alpha/`（L10），但沒有任何消費端。
 
 
 def _ranking_position(graph: Any, company_id: CompanyId, *, as_of: date | None) -> Mapping[str, Any] | None:
@@ -519,34 +328,18 @@ def fetch_alpha_investment_view(
         causal = (_causal_inputs(graph_provider, company_id, as_of=as_of, today=today)
                   if include_causal else {"causal_reason": "本次未取因果路徑（--no-causal）"})
         ranking_position = _ranking_position(graph_provider, company_id, as_of=as_of)
-        fundamental_model, fundamental_reason, records = _fundamental_model(
-            build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today)
-        if scenario == "fiscal_rollover" and fundamental_model is not None and fundamental_model.target_period:
-            # 會計期間推進不是一件事件，是「時間走到了目標期間之後、實際值出爐」。模型的 PIT 自我核對會
-            # 正確拒絕「今天就有 FY2027 實際值」，所以情境必須把 today 推進到該年度結束後（財報約 45 天後）。
-            today = max(today, fundamental_model.target_period.end + timedelta(days=45))
-            override = rollover_actuals(fundamental_model, today=today)
-            if override is not None:
-                fundamental_model, fundamental_reason, records = _fundamental_model(
-                    build, fundamentals_provider, resolved_ticker, company_id, as_of=as_of, today=today,
-                    actuals_override=override)
-        valuation_model, valuation_reason, valuation_records = _valuation_model(
-            build, fundamental_model, fundamental_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-            identity=identity)
-        implied_return_model, implied_return_reason, horizon_records = _implied_return_model(
-            build, valuation_model, valuation_reason, resolved_ticker, company_id, as_of=as_of, today=today,
-            identity=identity,
-            fundamental_model=fundamental_model,
-            fundamentals_provider=fundamentals_provider,
-        )
-        entry_records: list = []                      # F 組退役（2026-09-23）：沒有 entry ledger 了
+        try:
+            records, _ = assumption_ledger.read_assumption_records(str(resolved_ticker))
+        except Exception:  # noqa: BLE001 — 假設 ledger 讀不到只影響催化劑熟成度與 refresh，不讓 view 失敗
+            records = []
+        financials = _engine_c_financials(fundamentals_provider, resolved_ticker, as_of=as_of, today=today)
         # ---- V2（2026-09-15）gap closure：目標期間的共識 EPS 時序。provider 沒這能力就空。
         consensus_history: tuple = ()
         fetch_history = getattr(fundamentals_provider, "fiscal_consensus_history", None)
-        if callable(fetch_history) and fundamental_model is not None and fundamental_model.target_period is not None:
+        if callable(fetch_history) and financials["target_period"] is not None:
             try:
                 consensus_history, _history_reason = fetch_history(
-                    resolved_ticker, metric="eps", period_end=fundamental_model.target_period.end, as_of=as_of)
+                    resolved_ticker, metric="eps", period_end=financials["target_period"].end, as_of=as_of)
             except Exception:  # noqa: BLE001 — 拿不到時序只讓那一格 missing
                 consensus_history = ()
         # ---- 論證層（2026-09-15）：節點人話名字＋claim 引文。provider 沒這能力（測試用假 provider）就空。
@@ -580,7 +373,7 @@ def fetch_alpha_investment_view(
                     judged_on = date.fromisoformat(str(raw)[:10]) if raw else signal.as_of
                 except ValueError:
                     judged_on = signal.as_of
-            since = baseline_since(judged_on, [*records, *valuation_records, *horizon_records, *entry_records])
+            since = baseline_since(judged_on, records)
             lifecycle_for_refresh = _thesis_lifecycle_entry(str(resolved_ticker)) if as_of is None else None
             try:
                 refresh_changes, metric_observations, refresh_notes = detect_changes(
@@ -588,8 +381,7 @@ def fetch_alpha_investment_view(
                     as_of=as_of, fundamentals_provider=fundamentals_provider, graph_provider=graph_provider,
                     assumption_records=records, lifecycle_entry=lifecycle_for_refresh,
                     watches=(list(watches) if watches is not None else load_watches()),
-                    ticker_obj=resolved_ticker, valuation_records=valuation_records,
-                    horizon_records=horizon_records, entry_records=entry_records)
+                    ticker_obj=resolved_ticker)
             except Exception as exc:  # noqa: BLE001 — 偵測失敗不讓 view 失敗，但必須現形（not_run）
                 refresh_changes, metric_observations = None, []
                 refresh_notes = [f"變更偵測失敗：{type(exc).__name__}: {str(exc)[:120]}"]
@@ -599,13 +391,13 @@ def fetch_alpha_investment_view(
         if scenario is not None:
             extra, extra_obs = scenario_changes(
                 scenario, ticker=str(resolved_ticker), company_id=str(company_id), context=build.context,
-                model=fundamental_model, today=today)
+                consensus=financials["consensus"], assumptions=records,
+                base_period_end=(financials["actuals"].period.end if financials["actuals"] is not None else None),
+                target_period=financials["target_period"], today=today)
             refresh_changes = list(refresh_changes or ()) + extra
             metric_observations = list(metric_observations) + extra_obs
             detection = "scenario"
-            refresh_notes = [f"情境 {scenario}：在真實 state 上疊加假想變化（不寫任何 authority）"
-                             + (f"；today 推進到 {today}（目標年度結束後 45 天）" if scenario == "fiscal_rollover" else ""),
-                             *refresh_notes]
+            refresh_notes = [f"情境 {scenario}：在真實 state 上疊加假想變化（不寫任何 authority）", *refresh_notes]
     finally:
         if owns_graph:
             driver = getattr(graph_provider, "driver", None)
@@ -670,9 +462,9 @@ def fetch_alpha_investment_view(
         decision_facts=decision_facts, decision_facts_reason=decision_reason,
         catalyst_checkpoints=checkpoints, checkpoint_source=checkpoint_source,
         thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity,
-        fundamental_model=fundamental_model, fundamental_model_reason=fundamental_reason,
-        valuation=valuation_model, valuation_reason=valuation_reason, valuation_records=valuation_records,
-        implied_return=implied_return_model, implied_return_reason=implied_return_reason, horizon_records=horizon_records,
+        base_actuals=financials["actuals"], fiscal_consensus=financials["consensus"],
+        consensus_bases=financials["bases"], financials_reason=financials["reason"],
+        financial_evidence=financials["evidence"], target_period=financials["target_period"],
         today=today,
         refresh_changes=refresh_changes, assumption_records=records,
         abstention_records=abstention_records,

@@ -42,7 +42,7 @@ Engine D 的公開 cohort 事實與 thesis lifecycle **選取、正規化、語�
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field, fields, is_dataclass
+from dataclasses import dataclass, fields, is_dataclass
 from datetime import date, datetime
 from enum import Enum
 from typing import Any, Literal, Mapping
@@ -110,36 +110,20 @@ STATUS_LABEL: Mapping[str, str] = {
 
 #: capability 等級的具名常數——section 用它宣告「我做到哪裡」，消費端據此不得 overclaim。
 CAP_STRUCTURAL_CAUSAL = "structural_causal_model"
-CAP_FINANCIAL_CAUSAL = "financial_causal_model"
 CAP_NARRATIVE_SCENARIOS = "narrative"
 CAP_QUANTITATIVE_SCENARIOS = "quantitative_scenario_model"
 CAP_STRUCTURED_DISPROOF = "structured_conditions_with_expiry_watch"
 CAP_AUTOMATIC_INVALIDATION = "automatic_invalidation_engine"
 CAP_CATALYST_UNLINKED = "structured_dates_without_repricing_link"
-#: Phase 2：內部估計 vs **同期、同口徑**共識的數值 gap（不含估值、不含價格隱含側）。
-CAP_NUMERIC_EXPECTATION_GAP = "numeric_internal_vs_consensus"
 #: Step 0.5：dependency impact（什麼變了 → 影響誰 → 哪種 state）。它評估 machine-readable 條件與
 #: 已分類的變化，**不解析自然語言 disproof、不改 thesis、不自動呼叫 LLM**——所以不是
 #: `CAP_AUTOMATIC_INVALIDATION`（那個名字保留給「會自己判定條件並改狀態」的東西，今天不存在）。
 CAP_DEPENDENCY_IMPACT = "dependency_impact_v1"
-#: Step 1（2026-09-06）：內部 FY 目標期間 EPS × 明示目標倍數 → 確定性 fair value ＋ 與現價的差。
-#: 它**不是** expected return／upside forecast／entry signal（horizon 與報酬語意住 Step 2 的 implied_return）。
-CAP_DETERMINISTIC_FAIR_VALUE = "deterministic_fair_value_v1"
-#: Step 2（2026-09-06）：現價 ＋ fair value（含 value-date 語意）＋ 明示 horizon 判斷 → 確定性 base-case 隱含
-#: **價格**報酬（simple＋年化）。它**不是** probability-weighted expected return（沒有機率）、不是 total return
-#: （沒有股利預測）、不是 entry signal。名稱刻意用 implied 不用 expected。
-CAP_BASE_CASE_IMPLIED_RETURN = "base_case_implied_return_v1"
-#: Step 3（2026-09-06）：implied return ＋ 明示的要求報酬判準（投資人政策）→ 確定性 analytical entry threshold
-#: （門檻價／現價相對門檻價／算術比較／alignment 對齊與否）。它**不是** buy／sell、不是部位、不是資本許可；
-#: `meets_analytical_hurdle` 只是「現價 ≤ 門檻價」。沒有判準就是 missing，不補 10%／15%／20%。
-CAP_ANALYTICAL_ENTRY_THRESHOLD = "analytical_entry_threshold_v1"
-#: V0（2026-09-15）：**賭注**——variant scenario（base 的生效假設被同 key 的 variant 假設覆蓋）走同一條
-#: 橋／估值／報酬算術，得到「如果我們的差異看法對了」的 fair value 與對現價的隱含報酬（payoff）。
-#: 它**不是** bull case、不是機率加權、不是預測；每條 variant 假設都必須指得出 supporting 證據。
-CAP_VARIANT_PAYOFF = "variant_scenario_payoff_v1"
-#: 2026-09-18（D2）：「判斷錯了值多少」——反證成真時的假設套**同一條橋**。與賭注對稱：
-#: 同一個 section 型別、同一套算術、同樣的型別層證據要求，只有假設的值往另一邊。
-CAP_DOWNSIDE_OVERLAY = "downside_scenario_overlay_v1"
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：七個 capability 常數退役**——
+# `CAP_FINANCIAL_CAUSAL`（FY+1 因果橋）、`CAP_NUMERIC_EXPECTATION_GAP`（內部 vs 共識數值 gap）、
+# `CAP_DETERMINISTIC_FAIR_VALUE`（Step 1 估值）、`CAP_BASE_CASE_IMPLIED_RETURN`（Step 2 隱含報酬）、
+# `CAP_ANALYTICAL_ENTRY_THRESHOLD`（Step 3 進場門檻，F 組）、`CAP_VARIANT_PAYOFF`／`CAP_DOWNSIDE_OVERLAY`
+# （賭注四價，E 組）。宣告它們的 section 都不在了；沒有 producer 的字彙不留（L16）。
 #: 2026-09-15：投資人短評——七格前因後果，文字由 session 寫（append-only ledger）、數字由 authority 填。
 CAP_INVESTOR_BRIEF = "investor_brief_v1"
 #: 2026-09-15：論證層——六段分析師報告體。算術與圖的敘述由封閉句型組；判斷的長文照抄 session 寫的。
@@ -458,7 +442,7 @@ class CausalPathSection:
     substitution_paths: tuple[PathItem, ...]
     impacts_on_company: tuple[ImpactItem, ...]
     structural_events: tuple[EventItem, ...]
-    financial_causal_model: Datum            # 恆 not_modeled，直到 revenue／margin／EPS bridge 存在
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`financial_causal_model` 那一格隨 FY+1 因果橋退役。
 
 
 @dataclass(frozen=True, slots=True)
@@ -478,53 +462,26 @@ class ConsensusSection:
     fiscal_items: tuple[Datum, ...] = ()
 
 
-@dataclass(frozen=True, slots=True)
-class PriceImpliedSection:
-    meta: SectionMeta
-    items: tuple[Datum, ...]
-    reverse_dcf: Datum                       # not_modeled
-
-
-@dataclass(frozen=True, slots=True)
-class InternalFundamentalsSection:
-    meta: SectionMeta                        # available／partial／missing（alpha/fundamental）
-    items: tuple[Datum, ...]
-    plug_in_note: str
-    period: str | None = None                # 目標會計期間標籤（FY2027）
-    period_end: date | None = None           # 目標會計期間身分（結束日）
-    base_period_end: date | None = None      # 基期會計年度結束日
-    accounting_basis: str | None = None      # gaap／non_gaap／not_applicable
-
-
-@dataclass(frozen=True, slots=True)
-class EarningsBridgeSection:
-    meta: SectionMeta
-    steps: tuple[Datum, ...]                 # 基期觀測 → 假設 → 每一步 derived（含公式）
-    inputs_available: tuple[Datum, ...]      # 今天已存在、可接進 bridge 的原料
-    assumptions: tuple[Datum, ...] = ()      # 生效的 OperatingAssumption，每條各自標知識種類
-    sensitivities: tuple[Datum, ...] = ()    # 每條假設動一格，輸出動多少（確定性微擾）
-    selection: "EvidenceSelectionCounts | None" = None   # 假設的 as-of／supersede／證據解析計數
-    period: str | None = None
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`PriceImpliedSection`（PE 比值 proxy）、
+# `InternalFundamentalsSection`（我們的 FY+1 預測）、`EarningsBridgeSection`（因果橋）三個 section 退役。**
+# 它們同出於 `alpha/fundamental` 的模型；模型已刪。Engine C 的共識資料留在 `ConsensusSection.fiscal_items`。
 
 
 @dataclass(frozen=True, slots=True)
 class ExpectationGapSection:
+    """預期差：**session 判斷（Q4）＋ 共識時序的量測**，沒有任何數值 gap。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`proxies`（PE 比值 proxy、估計修正 vs 股價）、
+    `internal_vs_consensus`／`numeric_comparisons`（內部 vs 共識數值 gap）、`internal_vs_price_implied`、
+    `opinion_stance`（我們有沒有形成觀點）、`reverse_bridge`（D 組）、`multiple_derivation`（目標倍數來源）
+    七個欄位整組退役——它們全部讀 FY+1 因果橋或估值鏈。留下的兩格是量測：共識自判斷日以來移了多少、
+    共識時序本身。**量測不是訊號**：不排序、不決定尺寸。
+    """
+
     meta: SectionMeta
     session_judgment: Datum                  # Q4（ordinal，session 判斷）
-    proxies: tuple[Datum, ...]               # 估計修正 vs 股價變動等 deterministic 原料
-    internal_vs_consensus: Datum             # 數值 gap 總表（只在 apples-to-apples 時有值）
-    internal_vs_price_implied: Datum         # not_modeled（估值側是下一階段）
-    numeric_comparisons: tuple[Datum, ...] = ()   # 逐指標：revenue／eps／operating_margin
-    #: 我們有沒有形成自己的觀點（`OPINION_STANCES`）。**與上面那排正交**：一份每格都有數字的
-    #: 比較表，完全可以整組由共識反解而來——那時「我們比市場」的 0 是代數必然，不是判斷。
-    opinion_stance: Datum | None = None
-    #: 反過來問：現價要成立，某個 driver 必須是多少（其餘假設固定成我們的）。
-    #: **每個值都是條件解不是唯一解**——共識只給總量，分項欠定（ROADMAP §B）。
-    reverse_bridge: Datum | None = None
-    #: 目標倍數是我們判斷的，還是抄市場現在付的（`VALUATION_DERIVATIONS`）。
-    #: 與 `opinion_stance`（EPS 桿）並排：**兩根桿各有各的來源問題**。
-    multiple_derivation: Datum | None = None
-    #: V2（2026-09-15）：共識朝我們移了幾成（base 與賭注各一組）＋共識時序本身。量測不是訊號。
+    #: V2（2026-09-15）：共識自判斷日以來的移動＋共識時序本身。2026-09-23 起沒有內部值，
+    #: 所以 `closed_fraction` 恆 None（不是 0）——量到的只有共識自己的移動。
     gap_closure: Datum | None = None
     consensus_series: Datum | None = None
 
@@ -598,7 +555,7 @@ class ScenarioSection:
     base: Datum
     bear: Datum
     probabilities: Datum                     # not_modeled
-    target_valuation: Datum                  # not_modeled
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`target_valuation`（照抄 valuation.fair_value）隨估值鏈退役。
 
 
 @dataclass(frozen=True, slots=True)
@@ -617,73 +574,9 @@ class MarketSection:
     price: Datum
 
 
-@dataclass(frozen=True, slots=True)
-class ValuationSection:
-    """估值（Step 1）：**只消費** `alpha.valuation.build_valuation` 的輸出，builder 不含任何估值公式。
-
-    - `fair_value`／`current_price`／`fair_value_gap` 三格分開：fair value 不依賴現價，gap 才依賴。
-    - `assumptions` 是生效的估值假設（每條自帶 basis／rationale／證據角色）；`trace` 是算式的每一格。
-    - `epistemics` 回答「fair value 裡多少是算術、多少是判斷」——它是分解與計數，不是新判斷。
-    - `gap_is_not`：這格明列 gap 不是什麼（expected return／upside forecast／entry signal／buy-sell）。
-    """
-
-    meta: SectionMeta                          # available／missing／review_required／invalidated
-    method: Datum
-    fundamental_input: Datum                   # 內部 EPS（照抄 internal_fundamentals 那一格的值）
-    assumptions: tuple[Datum, ...]
-    fair_value: Datum
-    current_price: Datum
-    fair_value_gap: Datum
-    trace: tuple[Datum, ...]
-    sensitivities: tuple[Datum, ...]
-    epistemics: Datum
-    selection: "EvidenceSelectionCounts | None"
-    gap_is_not: tuple[str, ...]
-    #: Step 2：fair value 是哪一天的值（spot／target_period_end；估值假設未宣告＝missing，不猜）。
-    value_date: Datum
-    period: str | None = None
-    period_end: date | None = None
-    accounting_basis: str | None = None
-
-
-@dataclass(frozen=True, slots=True)
-class ImpliedReturnSection:
-    """Base-case implied return（Step 2）：**只消費** `alpha.implied_return.build_implied_return` 的輸出，
-    builder 不含任何報酬公式。
-
-    - `price_return`／`annualized_price_return` 是確定性算術；`horizon` 是 session 判斷（`ha_*`）；
-      `value_date` 抄自估值層。四個輸入缺一就 `missing`，不補 12 個月。
-    - `total_return` 與 `probability_weighted_return` 恆 `not_modeled`（系統沒有那個能力），與 `missing` 分開。
-    - `is_not`：這格明列它不是什麼（expected return／total return／entry signal／opportunity ranking）。
-    """
-
-    meta: SectionMeta                          # available／missing／review_required／invalidated／stale
-    return_convention: Datum
-    current_price: Datum
-    fair_value: Datum
-    value_date: Datum
-    horizon: Datum                             # 生效的 horizon 判斷（ha_*）
-    horizon_window: Datum                      # start／end／days／years（確定性）
-    price_return: Datum
-    annualized_price_return: Datum
-    total_return: Datum                        # not_modeled
-    probability_weighted_return: Datum         # not_modeled
-    trace: tuple[Datum, ...]
-    epistemics: Datum
-    selection: "EvidenceSelectionCounts | None"
-    is_not: tuple[str, ...]
-    #: 2026-09-09 P2 兩桿拆解：EPS 差異貢獻／倍數差異貢獻／整包（含市場倍數、共識、恆等式、原則提醒）。
-    #: 拆不出來就是 missing（帶 absence_kind），**不影響 price_return**。
-    eps_contribution: Datum
-    multiple_contribution: Datum
-    attribution: Datum
-    period: str | None = None
-    period_end: date | None = None
-    #: V2（2026-09-15）：現價到了目標價沒（沒賭對／賭對各一個布林）。到達＝該重看要不要收割，不是賣出指令。
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`target_reached` **不再被計算**（兩個目標價隨 E 組與
-    # 估值鏈退役）。欄位保留預設 `None`——它的讀取端隨 `ImpliedReturnSection` 一起在 C／H 組移除，
-    # 現在拿掉欄位只會讓每個讀者各自炸開，而那不是同一件事（先停跑，再刪型別）。
-    target_reached: Datum | None = None
+# ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`ValuationSection`（Step 1 fair value）與
+# `ImpliedReturnSection`（Step 2 隱含報酬，含 `target_reached`）退役。** 現價（它們共用的 `current_price`）
+# 已於 0b.1a 搬進 `MarketSection`。「已定價嗎」由財務三題回答（Phase 3），主參照是自己的歷史、不設門檻。
 
 
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`PayoffScenarioSection` 退役（E 組）。**
@@ -880,18 +773,15 @@ class AlphaInvestmentView:
     causal_paths: CausalPathSection
     fundamentals: FundamentalsSection
     consensus: ConsensusSection
-    price_implied_expectations: PriceImpliedSection
-    internal_fundamentals: InternalFundamentalsSection
-    earnings_bridge: EarningsBridgeSection
+    #: ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`price_implied_expectations`／`internal_fundamentals`／
+    #: `earnings_bridge`／`valuation`／`implied_return` 五個欄位隨估值鏈退役。
     expectation_gap: ExpectationGapSection
     catalysts: CatalystSection
     falsification: FalsificationSection
     scenarios: ScenarioSection
-    #: 2026-09-23（Phase 0 Step 0b.1）：現價自己的家。**排在估值之前**——它是估值的輸入，
-    #: 不是估值的產物；估值退役後它必須還在（個股頁的「現在多少錢」讀它）。
+    #: 2026-09-23（Phase 0 Step 0b.1）：現價自己的家。它曾是估值的輸入，不是估值的產物；
+    #: 估值退役後它還在（個股頁的「現在多少錢」讀它）。
     market: MarketSection
-    valuation: ValuationSection
-    implied_return: ImpliedReturnSection
     #: D2（2026-09-18）：由 `NotModeledSection` 換成與賭注**對稱**的 overlay。
     #: 舊語意「系統不產生下檔估計」已作廢——現在它是「反證成真時的假設套同一條橋」，
     #: 仍然不是 bear case、沒有機率加權。
@@ -908,8 +798,7 @@ class AlphaInvestmentView:
     #: 有 `meta` 的 section 名稱，`capability_map()` 依此列舉。
     SECTIONS_WITH_META = (
         "variant_view", "structural_thesis", "causal_paths", "fundamentals", "consensus",
-        "price_implied_expectations", "internal_fundamentals", "earnings_bridge",
-        "expectation_gap", "catalysts", "falsification", "scenarios", "market", "valuation", "implied_return",
+        "expectation_gap", "catalysts", "falsification", "scenarios", "market",
         "wipeout_flags", "evidence", "refresh_status",
         "investor_brief", "argument",
     )
@@ -957,19 +846,17 @@ def _jsonable(obj: Any) -> Any:
 
 __all__ = [
     "AlphaInvestmentView", "BASES", "BASIS_LABEL", "Basis", "CAP_AUTOMATIC_INVALIDATION",
-    "CAP_BASE_CASE_IMPLIED_RETURN", "ImpliedReturnSection",
-    "CAP_DOWNSIDE_OVERLAY",
     "CAP_INVESTOR_BRIEF", "InvestorBriefSection", "CAP_ARGUMENT", "ArgumentSection",
-    "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT", "CAP_DETERMINISTIC_FAIR_VALUE", "CAP_FINANCIAL_CAUSAL",
-    "CAP_NARRATIVE_SCENARIOS", "MarketSection", "ValuationSection",
-    "CAP_NUMERIC_EXPECTATION_GAP", "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",
+    "CAP_CATALYST_UNLINKED", "CAP_DEPENDENCY_IMPACT",
+    "CAP_NARRATIVE_SCENARIOS", "MarketSection",
+    "ChangeItem", "REFRESH_STATUSES", "RefreshItem", "RefreshStatusSection",
     "CAP_QUANTITATIVE_SCENARIOS", "CAP_STRUCTURAL_CAUSAL", "CAP_STRUCTURED_DISPROOF",
     "CatalystItem", "CatalystSection", "CausalPathSection", "CheckpointItem",
-    "ConsensusSection", "Datum", "DisproofItem", "EarningsBridgeSection", "EventItem",
+    "ConsensusSection", "Datum", "DisproofItem", "EventItem",
     "EvidenceItem", "EvidenceSection", "EvidenceSelectionCounts", "ExpectationGapSection",
     "ExposureItem", "FalsificationSection", "FreshnessItem", "FundamentalsSection",
-    "IdentitySection", "ImpactItem", "InternalFundamentalsSection", "LifecycleFacts",
-    "NotModeledSection", "PathItem", "PriceImpliedSection", "SCHEMA_VERSION",
+    "IdentitySection", "ImpactItem", "LifecycleFacts",
+    "NotModeledSection", "PathItem", "SCHEMA_VERSION",
     "SECTION_STATUSES", "STATUS_LABEL", "ScenarioSection", "SectionMeta", "SectionStatus",
     "SignalCompleteness", "StructuralEdgeItem", "StructuralThesisSection",
     "ABSENCE_KINDS", "VALUELESS_STATUSES", "VariantViewSection", "ViewContractViolation", "missing",

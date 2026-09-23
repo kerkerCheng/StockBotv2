@@ -99,28 +99,11 @@ function structuredText(datum) {
       bits.push(`區間 ${fmtBig(v.low)}–${fmtBig(v.high)}`);
     }
     if (typeof v.growth === 'number') bits.push(`比去年 ${fmtPercent(v.growth)}`);
+    if (v.accounting_basis) bits.push(`口徑 ${basisDisplay(v.accounting_basis).label}`);
     return { text: fmtBig(v.avg, v.currency), sub: bits.join('｜') };
   }
-  // ② 我們 vs 市場：兩個數字與差距全在 datum 裡，不必再算
-  if ('internal' in v && 'consensus' in v) {
-    const ratio = datum.unit === 'ratio';
-    if (typeof v.relative_gap === 'number') bits.push(`我們比市場 ${fmtPercent(v.relative_gap)}`);
-    if (v.period) bits.push(v.period);
-    if (v.consensus_captured_at) bits.push(`共識取自 ${v.consensus_captured_at}`);
-    const ours = ratio ? fmtPercent(v.internal) : fmtBig(v.internal);
-    const theirs = ratio ? fmtPercent(v.consensus) : fmtBig(v.consensus);
-    return { text: `我們 ${ours}　市場 ${theirs}`, sub: bits.join('｜') };
-  }
-  // ③ 兩個指標的差距摘要（上面那兩列的濃縮版）
-  if ('eps' in v || 'revenue' in v) {
-    [['revenue', '營收'], ['eps', 'EPS']].forEach(([key, label]) => {
-      const item = v[key];
-      if (item && typeof item.relative_gap === 'number') {
-        bits.push(`${label} ${fmtPercent(item.relative_gap)}`);
-      }
-    });
-    if (bits.length) return { text: bits.join('　'), sub: '我們的估計相對市場共識' };
-  }
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「我們 vs 市場」「兩個指標的差距摘要」「敏感度」「目標價與現價的差」
+  // 「持有區間」五種形狀隨估值鏈退役——它們的值不會再出現在任何 datum 裡。
   // ④ 五軸分數：宣告了什麼、實際採用什麼、為什麼被降級
   if ('declared' in v && 'effective' in v) {
     if (v.session_level_label) bits.push(v.session_level_label);
@@ -148,34 +131,6 @@ function structuredText(datum) {
     if (v.capability) bits.push(v.capability);
     if (v.does_not) bits.push(`不做：${v.does_not}`);
     return { text: String(v.overall), sub: bits.join('｜') };
-  }
-  // ⑧ 敏感度：動一個假設，目標價變多少
-  if ('bump' in v && 'delta_fair_value' in v) {
-    bits.push(`假設變動 ${fmtNumber(v.bump, 3)} ${v.bump_unit || ''}`.trim());
-    bits.push(`目標價變 ${fmtBig(v.delta_fair_value)}`);
-    return {
-      text: typeof v.fair_value_relative === 'number'
-        ? fmtPercent(v.fair_value_relative) : fmtBig(v.delta_fair_value),
-      sub: bits.join('｜'),
-    };
-  }
-  // ⑨ 目標價與現價的差（**不是報酬**——報酬在結論那一段）
-  if ('fair_value' in v && 'current_price' in v) {
-    bits.push(`目標價 ${fmtBig(v.fair_value, v.unit)}`);
-    bits.push(`現價 ${fmtBig(v.current_price, v.unit)}`);
-    if (typeof v.implied_multiple_at_price === 'number') {
-      bits.push(`以現價回推的倍數 ${fmtNumber(v.implied_multiple_at_price, 1)}x`);
-    }
-    return {
-      text: typeof v.relative_gap === 'number' ? fmtPercent(v.relative_gap) : null,
-      sub: bits.join('｜'),
-    };
-  }
-  // ⑩ 持有區間
-  if ('horizon_start' in v && 'horizon_end' in v) {
-    if (typeof v.holding_period_days === 'number') bits.push(`${v.holding_period_days} 天`);
-    if (v.alignment) bits.push(v.alignment);
-    return { text: `${v.horizon_start} → ${v.horizon_end}`, sub: bits.join('｜') };
   }
   // ⑪ authority 自己組好的一句話——照抄，不改寫
   if (v.one_sentence) return { text: null, sub: v.one_sentence };
@@ -227,59 +182,9 @@ function absenceBadge(kind) {
   return badge;
 }
 
-/* ---------- opinion stance ----------
-   stance 決定隱含報酬能不能當成一個判斷來讀。`consensus_inverted` 時 EPS 由同期共識反解、
-   目標倍數校準到現價，兩個桿都被構造成 1.0，於是 fair value **恆等於**現價——那個 0 是
-   代數上的必然，不是判斷結果。印出「0.0%」等於謊報一個不存在的判斷，所以那一格改印標籤，
-   原值只留在 hover 供稽核。措辭一律取自 /api/v1/meta，前端不維護第二份（L16）。 */
-function stanceInfo(stance) {
-  return ((VOCAB && VOCAB.plain_stance) || {})[stance] || null;
-}
-
-function isOpinionless(stance) { return stance === 'consensus_inverted'; }
-
-function viewStance(view) {
-  const panel = view && view.fundamental;
-  if (!panel || !panel.lines) return null;
-  const line = panel.lines.filter((l) => l.key === 'opinion_stance')[0];
-  return line && line.datum ? line.datum.value : null;
-}
-
-function stanceBadge(stance) {
-  const info = stanceInfo(stance);
-  if (!stance || stance === 'independent') return null;
-  const badge = el('span', 'badge badge-absence', (info && info.short) || stance);
-  if (info && info.reason) badge.title = info.reason;
-  return badge;
-}
-
-function stanceBanner(stance) {
-  const info = stanceInfo(stance);
-  if (!stance || stance === 'independent' || !info) return null;
-  const warn = el('p', 'note note-warn');
-  const badge = el('span', 'badge badge-absence', info.short);
-  warn.appendChild(badge);
-  warn.appendChild(document.createTextNode(' ' + info.reason));
-  return warn;
-}
-
-/* 隱含報酬那一格。三個 surface（列表卡片／頭條／白話頭條）共用同一段邏輯，
-   否則改一處漏兩處——而使用者最先看到的正是這個大數字。 */
-function appendReturnBlock(numbers, label, ret, ann, stance, annPrefix) {
-  if (isOpinionless(stance)) {
-    const info = stanceInfo(stance);
-    const block = numberBlock(label, (info && info.short) || stance,
-      ret && typeof ret.value === 'number'
-        ? `原值 ${fmtPercent(ret.value)}——由共識反解，代數上必然接近 0` : '');
-    numbers.appendChild(block);
-    return;
-  }
-  if (ret && typeof ret.value === 'number') {
-    numbers.appendChild(numberBlock(label, fmtPercent(ret.value),
-      ann && typeof ann.value === 'number' ? annPrefix + fmtPercent(ann.value) : '',
-      signClass(ret.value)));
-  }
-}
+/* ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：opinion stance 那一組（stanceInfo／isOpinionless／viewStance／
+   stanceBadge／stanceBanner）與 appendReturnBlock（隱含報酬那一格）退役。stance 是 FY+1 模型對估值假設
+   derivation 的聚合，隱含報酬是估值鏈的終點——兩者都不在 read model 裡了。 */
 
 function readinessLabel(state) {
   const table = (VOCAB && VOCAB.readiness_states) || {};
@@ -322,11 +227,7 @@ function renderCard(row) {
 
   const badges = el('div', 'badges');
   badges.appendChild(readinessBadge(row.readiness.state));
-  /* readiness 講的是「這份判讀讀不讀得成」，stance 講的是「這份判讀是不是我們自己的」
-     ——兩件正交的事，清單上必須同時看得到，否則 ready 會被讀成「有結論」。 */
-  const cardStance = (row.opinion_stance || {}).value;
-  const sBadge = stanceBadge(cardStance);
-  if (sBadge) badges.appendChild(sBadge);
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：stance 徽章（這份判讀是不是我們自己的）隨 FY+1 模型退役。
   if (row.freshness && row.freshness.state === 'stale') {
     const b = el('span', 'badge badge-stale', 'stale');
     b.title = row.freshness.rule;
@@ -399,9 +300,9 @@ async function renderList() {
       '還沒有任何 materialized 判讀。請在本機跑 `python -m webapp materialize <TICKER>`。'));
     return;
   }
-  /* 常駐計數器。**它必須自己出現**——寫在文件裡的檢查點六天內就被同一個形狀繞過兩次，
-     所以「有幾檔的判讀是我們自己的」要長在第一屏，不是等人去讀某一段（L14）。 */
-  const counters = data.opinion_counters;
+  /* 常駐計數器。**它必須自己出現**——寫在文件裡的檢查點六天內就被同一個形狀繞過兩次（L14）。
+     ⚠ 2026-09-23：「有幾檔的判讀是我們自己的」隨 stance 退役；剩「已有判讀／有賭注」兩個數。 */
+  const counters = data.view_counters;
   if (counters) {
     const bar = el('div', 'counter-bar');
     bar.appendChild(el('strong', null, counters.headline || ''));
@@ -540,7 +441,7 @@ function drill(title, buildBody) {
 
 function renderHeadline(view) {
   const panel = view.headline;
-  const node = panelShell(panel, '結論那幾個數字的每一格');
+  const node = panelShell(panel, '現在多少錢：現價的每一格');
   const lines = lineMap(panel);
 
   const numbers = el('div', 'headline-numbers');
@@ -550,68 +451,10 @@ function renderHeadline(view) {
     numbers.appendChild(numberBlock('現價', fmtQuantity(price.value, quoteUnit) || '—',
       price.as_of ? `bar ${price.as_of}` : ''));
   }
-  const target = lines.fair_value && lines.fair_value.datum;
-  const valueDate = lines.value_date && lines.value_date.datum;
-  if (target && target.value !== null && target.value !== undefined) {
-    const currency = target.dependencies ? target.dependencies.currency : null;
-    numbers.appendChild(numberBlock('Future target value',
-      fmtQuantity(target.value, currency) || '—',
-      valueDate && valueDate.value ? `@ ${valueDate.value}` : ''));
-  }
-  const ret = lines.price_return && lines.price_return.datum;
-  const ann = lines.annualized_price_return && lines.annualized_price_return.datum;
-  appendReturnBlock(numbers, '隱含價格報酬', ret, ann, viewStance(view), '年化 ');
-  // 兩桿拆解（2026-09-09）：只在算得出來時顯示；缺席由下方 attention 區用 absence_kind 說明。
-  const epsC = lines.eps_contribution && lines.eps_contribution.datum;
-  const mulC = lines.multiple_contribution && lines.multiple_contribution.datum;
-  if (epsC && typeof epsC.value === 'number' && mulC && typeof mulC.value === 'number') {
-    numbers.appendChild(numberBlock('其中 EPS 差異', fmtPercent(epsC.value), '我們的 EPS vs 共識', signClass(epsC.value)));
-    numbers.appendChild(numberBlock('其中倍數差異', fmtPercent(mulC.value), '我們的倍數 vs 市場倍數', signClass(mulC.value)));
-  }
   if (numbers.childNodes.length) node.appendChild(numbers);
-
-  // 沒有 target／沒有報酬時：把「為什麼沒有」放到跟數字一樣顯眼的位置，而不是留白。
-  [['Future target value', target], ['隱含價格報酬', ret]].forEach(([label, datum]) => {
-    if (!datum || datum.value !== null && datum.value !== undefined) return;
-    const box = el('div', 'attention ' + (isSettled(datum.absence_kind) ? 'settled' : 'blocked'));
-    const head = el('div', 'attention-head');
-    head.appendChild(document.createTextNode(label + '：'));
-    const badge = absenceBadge(datum.absence_kind);
-    if (badge) head.appendChild(badge);
-    box.appendChild(head);
-    if (datum.reason) box.appendChild(el('div', 'attention-body', datum.reason));
-    box.appendChild(el('div', 'attention-body', absenceLabel(datum.absence_kind) || ''));
-    node.appendChild(box);
-  });
-
-  const one = lines.epistemics_one_sentence && lines.epistemics_one_sentence.datum;
-  if (one && one.value && one.value.one_sentence) {
-    const box = el('div', 'onesentence', one.value.one_sentence);
-    box.appendChild(el('span', 'src', '出處：implied_return.epistemics.one_sentence（authority 自組，不是本畫面造的句子）'));
-    node.appendChild(box);
-  }
-
-  const basis = basisDisplay((panel.context || {}).accounting_basis);
-  const meta = el('div', 'meta-line',
-    `期間 ${(panel.context || {}).period || '—'}　口徑 ${basis.label}（contract 值 ${basis.raw || 'null'}）`);
-  meta.title = basis.note;
-  node.appendChild(meta);
-  node.appendChild(el('p', 'note', basis.note));
-
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：目標價、隱含報酬、兩桿拆解、epistemics 一句話、口徑列
+  // 全部隨估值鏈退役；現價沒有值時由下面的每一格印它自己的缺席理由。
   node.appendChild(group('頭條的每一格（含缺席理由）', () => renderRows(panel.lines)));
-  if (one && one.value) {
-    node.appendChild(group('這個數字裡多少是算術、多少是判斷', () => {
-      const box = el('div', 'rows');
-      const e = one.value;
-      (e.deterministic || []).forEach((t) => box.appendChild(kv('確定性算術', t)));
-      (e.observations || []).forEach((t) => box.appendChild(kv('觀測', t)));
-      Object.keys(e.judgment_inputs || {}).forEach((k) => {
-        box.appendChild(kv('判斷輸入 · ' + k, JSON.stringify(e.judgment_inputs[k])));
-      });
-      (e.this_is_not || []).forEach((t) => box.appendChild(kv('這不是', t)));
-      return box;
-    }));
-  }
   if (panel.notes && panel.notes.length) {
     node.appendChild(group('這一段不是什麼', () => listOf(panel.notes)));
   }
@@ -634,25 +477,21 @@ function listOf(items) {
 
 function renderFundamental(view) {
   const panel = view.fundamental;
-  const node = panelShell(panel, '我們與市場的完整預測');
+  const node = panelShell(panel, '市場預測什麼（原始數字）');
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：internal／consensus_same_period／comparison／market_proxy 四組
+  // 隨 FY+1 因果橋與估值鏈退役；剩下的是 Engine C 的原始數字。
   const groups = [
-    ['internal', '我們的內部預測'],
-    ['consensus_same_period', '同期、同口徑的市場共識（可比）'],
-    ['comparison', '兩者的落差'],
-    ['consensus_other_period', '其他期間的共識（呈現用，不可與內部相減）'],
-    ['market_context', '市場脈絡'],
-    ['market_proxy', '價格隱含的粗略代理'],
+    ['consensus_fiscal', '會計年度別共識（身分是 fiscal_period_end；只呈現，不相減）'],
+    ['market_context', '市場脈絡與共識時序'],
   ];
-  groups.forEach(([role, title], index) => {
+  groups.forEach(([role, title]) => {
     const rows = (panel.lines || []).filter((line) => line.role === role);
     if (!rows.length) return;
-    // 六組全部直接印出來。使用者已經點開「完整細節」了，再藏一層只是多一次摩擦。
+    // 全部直接印出來。使用者已經點開「完整細節」了，再藏一層只是多一次摩擦。
     node.appendChild(el('div', 'group-title', `${title}（${rows.length} 項）`));
     node.appendChild(renderRows(rows));
   });
-  const basis = basisDisplay((panel.context || {}).accounting_basis);
-  node.appendChild(el('p', 'note',
-    `內部口徑：${basis.label}（contract 值 ${basis.raw || 'null'}）。${(panel.context || {}).same_period_rule || ''}`));
+  node.appendChild(el('p', 'note', (panel.context || {}).rule || ''));
   if (panel.notes && panel.notes.length) {
     node.appendChild(group('這一段的警告與涵蓋率說明', () => listOf(panel.notes)));
   }
@@ -796,54 +635,21 @@ function conclusionCard(payload, view) {
     numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
       price.as_of ? `收盤 ${price.as_of}` : ''));
   }
-  const target = lines.fair_value && lines.fair_value.datum;
-  const valueDate = lines.value_date && lines.value_date.datum;
-  if (target && target.value !== null && target.value !== undefined) {
-    const currency = target.dependencies ? target.dependencies.currency : null;
-    numbers.appendChild(numberBlock(plainLine('fair_value'), fmtQuantity(target.value, currency) || '—',
-      valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
-  }
-  const ret = lines.price_return && lines.price_return.datum;
-  const ann = lines.annualized_price_return && lines.annualized_price_return.datum;
-  const headStance = viewStance(view);
-  appendReturnBlock(numbers, plainLine('price_return'), ret, ann, headStance, '一年約 ');
-  // 兩桿拆解（2026-09-09）：負的是因為我們 EPS 比共識低，還是因為我們的倍數比市場低——一眼要分得出。
-  const epsC = lines.eps_contribution && lines.eps_contribution.datum;
-  const mulC = lines.multiple_contribution && lines.multiple_contribution.datum;
-  if (epsC && typeof epsC.value === 'number' && mulC && typeof mulC.value === 'number') {
-    numbers.appendChild(numberBlock(plainLine('eps_contribution'), fmtPercent(epsC.value), '', signClass(epsC.value)));
-    numbers.appendChild(numberBlock(plainLine('multiple_contribution'), fmtPercent(mulC.value), '', signClass(mulC.value)));
-  }
   if (numbers.childNodes.length) node.appendChild(numbers);
-  /* 這句話必須跟大數字在同一張卡——使用者最先看到的就是隱含報酬，
-     解釋它為什麼不能當判斷讀的那句話放在下面第三張卡等於沒說。 */
-  const headBanner = stanceBanner(headStance);
-  if (headBanner) node.appendChild(headBanner);
-
-  // 沒有目標價時，把「為什麼沒有」放在跟數字一樣顯眼的位置——不留白、不寫 0。
-  [[plainLine('fair_value'), target], [plainLine('price_return'), ret]].forEach(([label, datum]) => {
-    if (!datum || (datum.value !== null && datum.value !== undefined)) return;
-    const box = el('div', 'attention ' + (isSettled(datum.absence_kind) ? 'settled' : 'blocked'));
+  // 沒有現價時，把「為什麼沒有」放在跟數字一樣顯眼的位置——不留白、不寫 0。
+  if (price && (price.value === null || price.value === undefined)) {
+    const box = el('div', 'attention ' + (isSettled(price.absence_kind) ? 'settled' : 'blocked'));
     const head = el('div', 'attention-head');
-    head.appendChild(document.createTextNode(label + '：'));
-    const badge = absenceBadge(datum.absence_kind);
+    head.appendChild(document.createTextNode(plainLine('current_price') + '：'));
+    const badge = absenceBadge(price.absence_kind);
     if (badge) head.appendChild(badge);
     box.appendChild(head);
-    if (datum.reason) box.appendChild(el('div', 'attention-body', datum.reason));
-    node.appendChild(box);
-  });
-
-  const one = lines.epistemics_one_sentence && lines.epistemics_one_sentence.datum;
-  if (one && one.value && one.value.one_sentence) {
-    const box = el('div', 'onesentence', one.value.one_sentence);
-    box.appendChild(el('span', 'src', '這句話由計算層自己組出，不是本畫面寫的'));
+    if (price.reason) box.appendChild(el('div', 'attention-body', price.reason));
     node.appendChild(box);
   }
-  // ⚠ **2026-09-23（Phase 0 Step 0b.1b）：賭注／下檔的四價區塊退役（E 組）。**
-  // 「賭對了值多少／判斷錯了值多少」那四個價格是估值鏈跑兩次算出來的；`bet` 面板已於 0b.1a
-  // 改成純文字（讀短評的 `our_bet`）。反證那一端沒有退役——它在 research 面板的 disproofs。
-  // D2（2026-09-18）：歸零旗標。
-  // 它問「這家公司會不會直接歸零」。兩個不同的壞結局，畫面上刻意分開。
+  // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：目標價、隱含報酬、兩桿拆解、stance 橫幅、epistemics 一句話
+  // 隨估值鏈退役（C／H 組）；賭注／下檔的四價區塊已隨 E 組退役。反證那一端在 research 面板的 disproofs。
+  // D2（2026-09-18）：歸零旗標。它問「這家公司會不會直接歸零」。
   node.appendChild(wipeoutBlock(view));
   return node;
 }
@@ -989,91 +795,10 @@ function disproofCard(view) {
   return node;
 }
 
-/* 我們 vs 市場：**一張表就是答案**。
-   2026-09-08 使用者回饋修正的就是這一塊——先前它只印 `comparison` 那三列，而那三列的值
-   是結構化物件，於是每一列都寫著「見下方展開」、底下卻沒有展開：一張看起來有內容的空表。
-   現在左邊是我們估、中間是市場共識、右邊是差多少；市場沒有共識的那一列**不留白也不寫 0**，
-   直接說是哪一種缺席。 */
-const COMPARE_ROWS = [
-  ['營收', 'internal_revenue', 'internal_vs_consensus_revenue'],
-  ['EPS（每股盈餘）', 'internal_eps', 'internal_vs_consensus_eps'],
-  ['營益率', 'internal_operating_margin', 'internal_vs_consensus_operating_margin'],
-];
-
-/* 反過來問：現價要成立，某個 driver 必須是多少（其餘假設固定成我們的）。
-   資深買方不信目標倍數法，因為倍數的自由度會吃掉一切——把目標 P/E 從 20x 改成 25x 是
-   +25%，而讓 EPS 比共識高 5% 要一整條證據鏈。反推法不需要你給新的倍數，那個自由度
-   根本不存在。⚠ 每個值都是**條件解**：共識只給總量，分項欠定，同時套用兩個解會超過。 */
-function reverseBridgeBlock(datum) {
-  if (!datum) return null;
-  const v = datum.value;
-  const box = el('div', 'reverse');
-  box.appendChild(el('h3', null, '現價隱含什麼'));
-  if (!v) {
-    box.appendChild(el('p', 'note', datum.reason || '這一格沒有內容'));
-    return box;
-  }
-  /* 反推的分母就是那個目標倍數——它是我們判斷的還是抄市場的，決定整張表怎麼讀：
-     抄市場時倍數這根桿**結構上不可能**貢獻報酬，隱含報酬全部來自 EPS 差異。 */
-  const mdInfo = ((VOCAB && VOCAB.plain_multiple_derivation) || {})[v.multiple_derivation] || null;
-  const head = el('div', 'headline-numbers');
-  head.appendChild(numberBlock('市場隱含 EPS', fmtNumber(v.market_implied_eps, 2),
-    `以我們的目標倍數 ${fmtNumber(v.target_multiple, 1)}x 反推現價 ${fmtBig(v.current_price)}`));
-  if (typeof v.our_eps === 'number') {
-    head.appendChild(numberBlock('我們估的 EPS', fmtNumber(v.our_eps, 2),
-      typeof v.eps_gap === 'number'
-        ? `市場比我們${v.eps_gap >= 0 ? '樂觀' : '保守'} ${fmtPercent(Math.abs(v.eps_gap))}` : ''));
-  }
-  if (typeof v.consensus_eps === 'number') {
-    head.appendChild(numberBlock('分析師共識 EPS', fmtNumber(v.consensus_eps, 2), '別人的數字'));
-  }
-  box.appendChild(head);
-  if (mdInfo) {
-    const note = el('p', 'note');
-    const tag = el('span', 'badge badge-absence', mdInfo.short);
-    note.appendChild(tag);
-    note.appendChild(document.createTextNode(' ' + mdInfo.reason));
-    box.appendChild(note);
-  }
-
-  const table = el('table', 'rank compare');
-  const headRow = el('tr');
-  ['要獨力撐起現價的話', '我們的假設', '市場隱含'].forEach((t) => headRow.appendChild(th(t)));
-  const thead = el('thead'); thead.appendChild(headRow); table.appendChild(thead);
-  const body = el('tbody');
-  (v.solutions || []).forEach((sol) => {
-    const tr = el('tr');
-    const names = (VOCAB && VOCAB.plain_driver_labels) || {};
-    const driverName = names[sol.driver] || sol.driver;
-    const label = sol.scope && sol.scope !== 'total'
-      ? `${driverName}（${sol.scope}）` : driverName;
-    tr.appendChild(el('td', null, label));
-    tr.appendChild(el('td', 'rank-num', fmtPercent(sol.our_value)));
-    if (typeof sol.implied_value === 'number') {
-      const cell = el('td', 'rank-num ' + signClass(sol.gap), fmtPercent(sol.implied_value));
-      if (sol.status === 'already_equal') {
-        cell.textContent = fmtPercent(sol.implied_value) + '（相同）';
-        cell.className = 'rank-num';
-        cell.title = sol.reason || '';
-      }
-      tr.appendChild(cell);
-    } else {
-      const cell = el('td', 'rank-num');
-      cell.appendChild(el('span', 'badge badge-absence', '撐不起'));
-      cell.title = sol.reason || '';
-      tr.appendChild(cell);
-    }
-    body.appendChild(tr);
-  });
-  table.appendChild(body);
-  const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
-  box.appendChild(wrap);
-  box.appendChild(el('p', 'note',
-    '每一列都是**條件解**：算這一列時其餘假設固定成我們的值，所以兩列不能同時成立。'
-    + '共識只給一個總量，分項本來就欠定——這裡不假造市場沒有提供的精確 driver。'));
-  return box;
-}
-
+/* 市場預測什麼（稽核區）：會計年度別共識與市場觀測的**原始數字**。
+   ⚠ 2026-09-23（Phase 0 Step 0b.1b）：原本這裡是「我們估／市場共識／我們比市場」四欄表＋反推表
+   （COMPARE_ROWS／reverseBridgeBlock）——內部預測與相減全部讀 FY+1 因果橋與估值鏈，整組退役。
+   現在只印市場說了什麼；每一格都是 materialize 端的同一個 datum，本畫面不算任何數。 */
 function versusMarketCard(view) {
   const panel = view.fundamental;
   const lines = lineMap(panel);
@@ -1083,89 +808,13 @@ function versusMarketCard(view) {
   node.appendChild(el('h2', null, meta.title));
   node.appendChild(el('div', 'panel-questions', meta.hint));
 
-  /* 我們有沒有形成自己的觀點。**由模型層宣告**（datum.value），前端不 parse 理由句去猜，
-     短標籤與長句都取自 /api/v1/meta 的 plain_stance——不維護第二份對照表（L16）。 */
-  const stanceDatum = lines.opinion_stance && lines.opinion_stance.datum;
-  const stance = stanceDatum ? stanceDatum.value : null;
-  const sInfo = stanceInfo(stance);
-  /* `consensus_inverted` 的「我們比市場」在代數上必然接近 0——印出那個數字等於謊報一個
-     不存在的判斷，所以那一欄改印標籤，數字只留在 hover 供稽核。 */
-  const opinionless = isOpinionless(stance);
-  const banner = stanceBanner(stance);
-  if (banner) node.appendChild(banner);
-
-  const table = el('table', 'rank compare');
-  const headRow = el('tr');
-  [ctx.period ? `${ctx.period} 預測` : '預測項目', '我們估', '市場共識', '我們比市場']
-    .forEach((title) => headRow.appendChild(th(title)));
-  const thead = el('thead'); thead.appendChild(headRow); table.appendChild(thead);
-
-  const body = el('tbody');
-  const missing = [];
-  let printed = 0;
-  COMPARE_ROWS.forEach(([label, ourKey, gapKey]) => {
-    const ourLine = lines[ourKey];
-    const gapLine = lines[gapKey];
-    if (!ourLine && !gapLine) return;
-    const gap = gapLine && gapLine.datum;
-    const paired = gap && gap.value && typeof gap.value === 'object' && 'consensus' in gap.value;
-    const ratio = (ourLine && ourLine.datum.unit === 'ratio') || (gap && gap.unit === 'ratio');
-    const show = (n) => (n === null || n === undefined ? null
-      : (ratio ? fmtPercent(n) : fmtBig(n)));
-
-    const tr = el('tr');
-    tr.appendChild(el('td', null, label));
-
-    const ourValue = paired ? gap.value.internal : (ourLine && ourLine.datum.value);
-    const ourCell = el('td', 'rank-num', show(ourValue) || '—');
-    if (typeof ourValue === 'number') ourCell.title = String(ourValue);
-    tr.appendChild(ourCell);
-
-    if (paired) {
-      const consensusCell = el('td', 'rank-num', show(gap.value.consensus) || '—');
-      if (typeof gap.value.analyst_count === 'number') {
-        consensusCell.title = `${gap.value.analyst_count} 位分析師`;
-      }
-      tr.appendChild(consensusCell);
-      const relative = gap.value.relative_gap;
-      let gapCell;
-      if (opinionless) {
-        gapCell = el('td', 'rank-num');
-        gapCell.appendChild(el('span', 'badge badge-absence',
-          (sInfo && sInfo.short) || stance));
-        gapCell.title = typeof relative === 'number'
-          ? `${fmtPercent(relative)}——由共識反解，代數上必然接近 0，不是判斷結果`
-          : '由共識反解，不是判斷結果';
-      } else {
-        gapCell = el('td', 'rank-num ' + signClass(relative),
-          typeof relative === 'number' ? fmtPercent(relative) : '—');
-        if (typeof gap.value.absolute_gap === 'number') {
-          gapCell.title = `絕對差 ${fmtBig(gap.value.absolute_gap)}`;
-        }
-      }
-      tr.appendChild(gapCell);
-      printed += 1;
-    } else {
-      const cell = el('td', 'rank-num');
-      const badge = gap ? absenceBadge(gap.absence_kind) : null;
-      if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
-      tr.appendChild(cell);
-      tr.appendChild(el('td', 'rank-num', '—'));
-      if (gap && gap.reason && missing.indexOf(gap.reason) < 0) missing.push(gap.reason);
-    }
-    body.appendChild(tr);
-  });
-  if (!body.childNodes.length) return null;   // 一列都沒有就不要留一張只有表頭的空表
-  table.appendChild(body);
-  const wrap = el('div', 'table-wrap');
-  wrap.appendChild(table);
-  node.appendChild(wrap);
-
-  if (!printed) {
-    node.appendChild(el('p', 'note',
-      '這一期沒有任何一項可以跟市場相減——上表的缺席理由就是原因，補資料的方向也在那裡。'));
+  const fiscal = (panel.lines || []).filter((line) => line.role === 'consensus_fiscal');
+  if (fiscal.length) {
+    node.appendChild(el('div', 'group-title', `會計年度別共識（${fiscal.length} 項；身分是 fiscal_period_end）`));
+    node.appendChild(renderRows(fiscal));
+  } else {
+    node.appendChild(el('p', 'note', '還沒有會計年度別共識（consensus_estimates 沒有這檔的列）。'));
   }
-  missing.forEach((text) => node.appendChild(el('p', 'note', text)));
 
   // 市場還說了什麼：賣方目標價與倍數。**這是別人的數字**，不是本系統的預期報酬。
   const context = el('div', 'headline-numbers');
@@ -1182,12 +831,7 @@ function versusMarketCard(view) {
       '以市場共識 EPS 計'));
   }
   if (context.childNodes.length) node.appendChild(context);
-
-  const reverse = reverseBridgeBlock(lines.reverse_bridge && lines.reverse_bridge.datum);
-  if (reverse) node.appendChild(reverse);
-
-  const basis = basisDisplay(ctx.accounting_basis);
-  node.appendChild(el('p', 'note', `口徑：${basis.label}。${ctx.same_period_rule || ''}`));
+  node.appendChild(el('p', 'note', ctx.rule || ''));
   return node;
 }
 
@@ -1290,34 +934,17 @@ function argumentCard(view) {
    只放六格、每格白話標籤；全部照抄 headline／bet panel 既有的 Datum，不算、不造句。 */
 function numbersStrip(view) {
   const head = lineMap(view.headline);
-  const bet = view.bet ? lineMap(view.bet) : {};
   const node = el('section', 'panel numbers-strip');
   node.appendChild(el('div', 'group-title', '基本數字'));
   const numbers = el('div', 'headline-numbers');
-  const stance = viewStance(view);
   const price = head.current_price && head.current_price.datum;
   const quoteUnit = price && price.dependencies ? price.dependencies.quote_unit : null;
   if (price && typeof price.value === 'number') {
     numbers.appendChild(numberBlock(plainLine('current_price'), fmtQuantity(price.value, quoteUnit) || '—',
       price.as_of ? `收盤 ${price.as_of}` : ''));
   }
-  const base = head.fair_value && head.fair_value.datum;
-  const valueDate = head.value_date && head.value_date.datum;
-  if (base && typeof base.value === 'number') {
-    numbers.appendChild(numberBlock('沒賭對的目標價', fmtQuantity(base.value, base.dependencies ? base.dependencies.currency : null) || '—',
-      valueDate && valueDate.value ? `${valueDate.value} 的值` : ''));
-  }
-  appendReturnBlock(numbers, '沒賭對，要漲跌多少', head.price_return && head.price_return.datum,
-    head.annualized_price_return && head.annualized_price_return.datum, stance, '一年約 ');
-  /* ⚠ **2026-09-23（Phase 0 Step 0b.1b）：「賭對的目標價／賭對要漲跌多少／判斷錯了的目標價／
-     判斷錯了要漲跌多少」四格退役（E 組）。** 它們是估值鏈跑兩次算出來的四個價格；
-     `bet` 面板已於 0b.1a 改成純文字（讀短評的 `our_bet`）。 */
-  const attribution = head.return_attribution && head.return_attribution.datum;
-  const market = attribution && attribution.value ? attribution.value.market_multiple_on_consensus : null;
-  const ours = attribution && attribution.value ? attribution.value.target_multiple : null;
-  if (typeof market === 'number' && typeof ours === 'number') {
-    numbers.appendChild(numberBlock('市場付的倍數 vs 我們給的', `${fmtNumber(market, 1)}x → ${fmtNumber(ours, 1)}x`, '以明年獲利計'));
-  }
+  /* ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「沒賭對的目標價／要漲跌多少／市場付的倍數 vs 我們給的」隨
+     估值鏈退役（C／H 組）；賭注與下檔的四格已隨 E 組退役。基本數字只剩現價——「已定價嗎」由財務三題回答（Phase 3）。 */
   if (numbers.childNodes.length) node.appendChild(numbers);
   return node;
 }

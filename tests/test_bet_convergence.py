@@ -1,10 +1,9 @@
 """V4 賭注收斂（`alpha/gap_closure.py` 三個純函式＋outcome 腳本那一段，2026-09-19）。
 
-守的是**四個會靜默偏掉、而且偏向都固定對我們有利**的地方：
+守的是**會靜默偏掉、而且偏向都固定對我們有利**的地方：
 
-1. **起算日是賭注寫下那天，不是判斷日。** 判斷日恆早於賭注寫下日（實測三檔沒有一檔同日），
-   用它當起點會把「賭注當時還不存在」那段期間的共識變動算成朝我們移動（INV-6）。
-2. **一個賭注由多條 override 組成時取最晚那條。** 取最早＝主張還沒成形就開始記分。
+⚠ 2026-09-23（Phase 0 Step 0b.1b）：`bet_recorded_on`（賭注寫下那天＝最晚一條 override）隨賭注四價與估值鏈退役
+——沒有 variant 模型就沒有 overrides；前兩條判準（起算日是賭注寫下那天、多條取最晚）跟著退役。
 3. **`scanned` ≠ `n_bets`。** 用掃描檔數當分母會把「大部分人沒下注」稀釋成「大部分賭注沒動」。
 4. **`unchanged` ≠ `not_yet_observable`。** 前者是市場看過沒改，後者是還沒輪到市場說話。
 """
@@ -13,31 +12,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
 
-from alpha.gap_closure import bet_convergence, bet_recorded_on, consensus_progress
-
-
-@dataclass(frozen=True)
-class _Assumption:
-    created_at: datetime
-
-
-@dataclass(frozen=True)
-class _Model:
-    overrides: tuple[_Assumption, ...]
-
-
-def test_bet_recorded_on_takes_the_latest_override_not_the_earliest() -> None:
-    """賭注在最後一條 override 寫下時才完整——取最早等於提前開始記分。"""
-    model = _Model((
-        _Assumption(datetime(2026, 9, 15, 2, 0, tzinfo=timezone.utc)),
-        _Assumption(datetime(2026, 9, 18, 2, 0, tzinfo=timezone.utc)),
-    ))
-    assert bet_recorded_on(model) == date(2026, 9, 18)
-    assert bet_recorded_on(_Model(())) is None
-    assert bet_recorded_on(None) is None
-    # 字串時戳也認得（artifact 往返後是 ISO 字串），認不得的原樣跳過而不是整個炸掉
-    assert bet_recorded_on(_Model((_Assumption("2026-09-16T00:00:00+00:00"),))) == date(2026, 9, 16)
-    assert bet_recorded_on(_Model((_Assumption("not-a-date"),))) is None
+from alpha.gap_closure import bet_convergence, consensus_progress
 
 
 def test_progress_exposes_the_denominator_so_a_blown_up_ratio_is_readable() -> None:

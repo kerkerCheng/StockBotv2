@@ -277,7 +277,8 @@ def _fx_freshness_line(*, now: datetime) -> str:
     finally:
         conn.close()
     if not rows:
-        return "FX 觀測：一筆都沒有（capability_absent）——跨幣別標的的隱含報酬全部算不出來"
+        return ("FX 觀測：一筆都沒有（capability_absent）——跨幣別標的沒有可稽核的換算依據"
+                "（原消費端隱含報酬已於 2026-09-23 退役；Phase 3 三題接手）")
     today = now.astimezone().date()
     latest: dict[str, date] = {}
     for ticker, as_of in rows:
@@ -295,7 +296,7 @@ def _fx_freshness_line(*, now: datetime) -> str:
     line = (f"FX 觀測 {len(latest)} 檔｜最新 as_of {newest.isoformat()}"
             f"（{(today - newest).days} 天前，容忍 ±{FX_AS_OF_TOLERANCE_DAYS} 天）")
     if stale:
-        line += (f"｜⚠ **{len(stale)} 檔已過窗，隱含報酬算不出來**："
+        line += (f"｜⚠ **{len(stale)} 檔已過窗，換算依據過期**："
                  + "、".join(stale)
                  + "——補一筆 `fx_rate` mechanical 觀測即可（寫 Engine C 要核准）")
     else:
@@ -398,6 +399,10 @@ def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
 #: 候選狀態板（Phase 3）還沒落地時，心跳用這一句宣告缺席。**kind 由產生缺席的程式自己宣告**
 #: （L16），不由 renderer 猜；`not_yet_recorded` 是刻意的選擇——它**不是** settled，所以這一格
 #: 會一直算成待辦、一直印出來，直到 Phase 3 真的把候選板做出來（L14：常駐計數器）。
+_PRICED_IN_ABSENCE = Absence(
+    "not_yet_recorded",
+    "目標倍數背離計數器已於 2026-09-23 隨估值鏈退役；「已定價嗎」由 Phase 3 財務三題回答，主參照是自己的歷史、不設門檻",
+)
 _CANDIDATE_BOARD_ABSENCE = Absence(
     "not_yet_recorded",
     "籃子 filter、目標價與多年視角已於 Phase 0 退役；接手的候選狀態板要到 Phase 3 才落地")
@@ -459,10 +464,11 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
                     + "、".join(str(n) for n in (triggers.get("nodes") or [])[:5])
                     + "——thesis 要不要改由人決定，系統只標記")
 
-    # 目標倍數背離（2026-09-19）：判準不會腐壞，被存下來的那個**數字**會。
-    # ⚠ 這一格讀的是本機 ledger ＋ Engine C 快照，**零網路、零 LLM、不重新校準**；
-    # 它只是把兩個既有數字相除後比一個門檻——與段 1 的月營收行同一種計算。
-    section.lines.append(_target_multiple_drift_line())
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原本這裡印「目標倍數背離 N 檔」（估值假設 ledger 的
+    # target_pe 對今天的市場倍數）。目標倍數隨估值鏈退役，接手的是財務三題的「已定價嗎」（Phase 3）。
+    # **這一行不得整段消失**：換成缺席宣告（INV-3），三題落地後由它們的計數器取代。
+    section.lines.append(
+        f"已定價嗎（財務三題）未落地（{_PRICED_IN_ABSENCE.kind}）：{_PRICED_IN_ABSENCE.reason}")
 
     beta, beta_absence = _load_state(state_dir, "beta")
     if beta_absence is not None:
@@ -475,16 +481,6 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
             line += "：" + "、".join(str(w) for w in warnings)
         section.lines.append(line)
     return section
-
-
-def _target_multiple_drift_line() -> str:
-    """目標倍數與今天的市場倍數背離幾檔。**這一格壞掉不得把整段帶走**（L17-3③ 的對稱面）。"""
-    try:
-        from alpha.providers.valuation_drift import heartbeat_line, scan
-
-        return heartbeat_line(scan())
-    except Exception as exc:  # noqa: BLE001 — 讀不到 ledger／DB 是降級，不是心跳失敗
-        return f"目標倍數背離：讀不到（{type(exc).__name__}）（upstream_missing）"
 
 
 def _thesis_line(*, now: datetime, thesis_path: Path) -> str:

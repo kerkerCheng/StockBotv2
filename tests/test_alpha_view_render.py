@@ -70,16 +70,17 @@ def test_renderer_contains_no_ranking_or_business_tokens() -> None:
 
 
 def test_missing_and_not_modeled_render_as_words_not_zero() -> None:
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：原本驗內部 EPS／內部 FCF／市場隱含利潤率三行——
+    # 它們隨 FY+1 因果橋與 PE 比值 proxy 退役。判準一字未改，主詞換成仍在的格：
+    # Q3（缺料，不是 0）、情境機率（尚未建模）、共識時序（缺料）。
     text = render_alpha_investment_view_markdown(_view())
-    eps_line = next(line for line in text.splitlines() if "內部稀釋 EPS 估計" in line)
-    assert "缺料" in eps_line                                   # 有能力、本次沒資料
-    assert not re.search(r"[：:]\s*0(\.0+)?%?(\s|$)", eps_line)
-    fcf_line = next(line for line in text.splitlines() if "內部 FCF 估計" in line)
-    assert "尚未建模" in fcf_line                               # bridge v1 沒有現金流量表
-    margin_line = next(line for line in text.splitlines() if "市場隱含利潤率" in line)
-    assert "尚未建模" in margin_line and "0%" not in margin_line.replace("不是 0%", "")
     q3_line = next(line for line in text.splitlines() if "Q3 盈餘曝險" in line)
     assert "缺料" in q3_line and "不是 0" in q3_line
+    assert not re.search(r"[：:]\s*0(\.0+)?%?(\s|$)", q3_line)
+    prob_line = next(line for line in text.splitlines() if "情境機率" in line)
+    assert "尚未建模" in prob_line and "0%" not in prob_line
+    series_line = next(line for line in text.splitlines() if "共識 EPS 的抓取時序" in line)
+    assert "缺料" in series_line
 
 
 def _unescape(text: str) -> str:
@@ -87,18 +88,15 @@ def _unescape(text: str) -> str:
     return text.replace("\\", "")
 
 
-def test_loss_making_company_renders_reason_not_zero_growth() -> None:
-    text = render_alpha_investment_view_markdown(_view(fundamentals=_FakeFundamentals(trailing_pe=None)))
-    line = _unescape(next(line for line in text.splitlines() if "市場隱含 EPS 成長" in line))
-    assert "pe_trailing_missing" in line
-    assert "+0.0%" not in line and "0.0%" not in line
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`test_loss_making_company_renders_reason_not_zero_growth` 退役——
+# 主詞「市場隱含 EPS 成長」那一行隨 PE 比值 proxy 退役。
 
 
 def test_renderer_labels_each_datum_with_its_knowledge_kind() -> None:
     text = render_alpha_investment_view_markdown(_view())
     assert "〔確定性規則｜`alpha://context/structural_score`" in text
     assert "〔session 判斷｜`alpha://session_assessor`" in text
-    assert "〔粗略代理｜`alpha://context/implied_valuation`" in text
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：〔粗略代理〕那一行（市場隱含 EPS 成長）隨 PE 比值 proxy 退役。
     assert "〔散文｜`decision_lab://coverage_assessments`" in text
     assert "structural_causal_model" in text and "不是 financial causal model" in text
     assert "scenario_type=narrative" in text
@@ -110,10 +108,12 @@ def test_renderer_is_deterministic_and_covers_every_section() -> None:
     first = render_alpha_investment_view_markdown(view)
     assert first == render_alpha_investment_view_markdown(view)
     for heading in ("## 0. 能力地圖", "## 1. Variant view", "## 2. 結構 thesis", "## 3. 因果路徑",
-                    "## 4. 財務觀測", "## 5. 共識", "## 6. 價格隱含預期", "## 7. 內部基本面",
-                    "## 8. Earnings bridge", "## 9. Expectation gap", "## 10. 催化劑",
-                    "## 11. 證偽條件", "## 12. 情境", "## 13. 估值", "## 13a. Base-case implied return",
-                        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 13b／13d 兩節退役。
+                    "## 4. 財務觀測", "## 5. 共識",
+                    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：6（價格隱含預期）、7（內部基本面）、
+                    # 8（Earnings bridge）、13（估值）、13a（Base-case implied return）五節退役。
+                    "## 9. Expectation gap", "## 10. 催化劑",
+                    "## 11. 證偽條件", "## 12. 情境",
+                    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 13b／13d 兩節退役。
                     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「## 13c. 進場邏輯」隨 F 組退役。
                     "## 14. 證據與 provenance", "## 15. Refresh／dependency status",
                     "## 16. 新鮮度總表"):
@@ -134,7 +134,7 @@ def test_alpha_cards_render_unknowns_as_unknown_not_zero() -> None:
     card = compact_card(_view(fundamentals=_FakeFundamentals(trailing_pe=None)))
     text = "\n".join(render_alpha_cards([card]))
     row = _unescape(next(line for line in text.splitlines() if line.startswith("| co:coherent")))
-    assert "未知（pe_trailing_missing" in row
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「未知（pe_trailing_missing…）」那一欄隨 PE 比值 proxy 退役。
     assert "+0.0%" not in row
     assert "未知" in row                                   # Q3／Q5 unknown
     unavailable = "\n".join(render_alpha_cards([{"ticker": "XYZ", "status": "unavailable", "reason": "TimeoutError"}]))

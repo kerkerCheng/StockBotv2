@@ -14,20 +14,25 @@ from pathlib import Path
 import pytest
 
 from alpha.errors import ContractViolation
-from alpha.fundamental import FiscalPeriod, build_fundamental_model
 from alpha.fundamental.assumptions import assumption_record, parse_assumption_record
 from alpha.refresh import (
-    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, ARTIFACT_MODEL, COMPANY_GUIDANCE, CONSENSUS, CURRENT,
+    ARTIFACT_ASSUMPTION, ARTIFACT_AXIS, COMPANY_GUIDANCE, CONSENSUS, CURRENT,
     DISPROOF_SIGNAL, FINANCIAL_ACTUAL, GRAPH_EDGE, INVALIDATED, KIND_DETERMINISTIC, KIND_JUDGMENT,
     MARKET_PRICE, MISSING, OPERATING_ASSUMPTION, RECALCULATE, REFRESH_STATES, REVIEW_REQUIRED,
     ROLE_CALIBRATION, ROLE_SUPPORTING, STALE, SUPERSEDED, THESIS_ARTIFACT_ID, THESIS_REVIEW_DUE,
     AffectedArtifact, ArtifactDependency, ChangeEvent, MetricObservation, ReviewCondition,
-    artifacts_from_model, end_of_day, merge_states, resolve_refresh,
+    artifacts_from_assumptions, end_of_day, merge_states, resolve_refresh,
 )
-from tests.test_fundamental_model import (
-    ACT_REF, CONSENSUS as FY_CONSENSUS, GRAPH_REF, INDEX, TARGET, TODAY, _actuals, _assumption,
-    _consensus, _full_set, _run,
+from tests.fixtures_fundamental import (
+    ACT_REF, CONSENSUS as FY_CONSENSUS, GRAPH_REF, INDEX, TARGET, TODAY, _assumption, _full_set,
 )
+
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：FY+1 因果橋退役，refresh 不再登記模型輸出
+# （modeled_metric／expectation_comparison／fundamental_model 三種 artifact）。本檔守的判準一字未改
+# ——price tick 不 stale 判斷、結構事件只動引用它的、假設不因證據物件還在就永遠 current、
+# freshness 與 invalidation 分開、歷史視角不被未來滲入——只是「下游確定性輸出跟著傳播」那幾條
+# 斷言沒有主詞了，隨機制退役；`test_fiscal_rollover_is_named_and_old_assumptions_are_not_reused`
+# 整條退役（它跑的就是模型）。
 
 UTC = timezone.utc
 JUDGED_AT = datetime(2026, 9, 4, 23, 59, 59, tzinfo=UTC)
@@ -79,8 +84,8 @@ def _assumptions():
     return [_dc_assumption(), _industrial(), *rest]
 
 
-def _artifacts(model=None, *, records=None):
-    model = model or _run(_assumptions(), index=_index())
+def _artifacts(*, records=None):
+    records = list(records) if records is not None else _assumptions()
     axes = [
         _axis("structural", {EDGE: ROLE_SUPPORTING}, kind=KIND_DETERMINISTIC, established=BUILD_AT),
         _axis("value_capture", {EDGE: ROLE_SUPPORTING, SNAP: ROLE_SUPPORTING}),
@@ -95,12 +100,12 @@ def _artifacts(model=None, *, records=None):
     market = [ArtifactDependency(artifact_type="market_implied", artifact_id="market_implied_eps_growth",
                                  label="implied", kind=KIND_DETERMINISTIC, established_at=BUILD_AT,
                                  refs={SNAP: "observation"})]
-    return model, axes + artifacts_from_model(model, build_at=BUILD_AT, assumption_records=records or ()) + market
+    return records, axes + artifacts_from_assumptions(records, build_at=BUILD_AT) + market
 
 
 def _resolve(changes=(), *, artifacts=None, observations=(), as_of=None, today=RESOLVE_DAY):
     if artifacts is None:
-        _model, artifacts = _artifacts()
+        _records, artifacts = _artifacts()
     return resolve_refresh(ticker="COHR", company_id="co:coherent", artifacts=artifacts, changes=changes,
                            observations=observations, as_of=as_of, today=today)
 
@@ -153,7 +158,7 @@ def test_price_only_change_does_not_stale_research_judgment() -> None:
                               material_fields=("price",), detail="price 264.41 → 281.86")])
     assert _state(report, "market_implied:market_implied_eps_growth") == RECALCULATE
     for key in ("axis:structural", "axis:value_capture", "axis:expectation_gap",
-                f"thesis:{THESIS_ARTIFACT_ID}", "modeled_metric:eps", "expectation_comparison:eps"):
+                f"thesis:{THESIS_ARTIFACT_ID}"):
         assert _state(report, key) == CURRENT, key
     assert all(a.state == CURRENT for a in report.artifacts
                if a.artifact_type == ARTIFACT_ASSUMPTION and a.state not in (SUPERSEDED, MISSING))
@@ -167,7 +172,6 @@ def test_price_only_change_does_not_stale_research_judgment() -> None:
 def test_consensus_revision_recalculates_gap_and_reviews_q4_only() -> None:
     report = _resolve([_event(CONSENSUS, CONS_EPS, old_version="9.42", new_version="10.00",
                               material_fields=("eps",), detail="FY27 EPS 共識 9.42 → 10.00")])
-    assert _state(report, "expectation_comparison:eps") == RECALCULATE
     assert _state(report, "axis:expectation_gap") == REVIEW_REQUIRED
     assert _state(report, "axis:structural") == CURRENT
     assert _state(report, "axis:value_capture") == CURRENT
@@ -198,10 +202,6 @@ def test_structural_edge_change_reviews_only_what_cites_it() -> None:
     for label in ("tax_rate", "diluted_shares", "nci_attribution", "interest_and_other_net", "Industrial"):
         artifact = next(a for a in report.artifacts if label in a.label and a.state != SUPERSEDED)
         assert artifact.state == CURRENT, label
-    # 下游 EPS 是確定性算術，但它依賴的 D&C 判斷被動搖——必須現形，且標明是傳播來的
-    eps = report.artifact("modeled_metric:eps")
-    assert eps.state == REVIEW_REQUIRED and f"{ARTIFACT_ASSUMPTION}:{_dc_id(report)}" in eps.propagated_from
-    assert all(p.startswith("operating_assumption:") for p in eps.propagated_from)   # 只沿宣告的假設依賴傳播
 
 
 def test_single_edge_change_does_not_cascade_to_everything() -> None:
@@ -246,9 +246,6 @@ def test_new_actual_recalculates_bridge_and_reviews_heuristic_proxies() -> None:
         assert artifact.state == REVIEW_REQUIRED, label
     dc = report.artifact(f"{ARTIFACT_ASSUMPTION}:{_dc_id(report)}")
     assert dc.state == CURRENT                       # session 判斷不因新實際數自動重看（那是 review condition 的事）
-    assert _state(report, "fundamental_model:fundamental_model") in (RECALCULATE, REVIEW_REQUIRED)
-    eps = report.artifact("modeled_metric:eps")
-    assert eps.state == REVIEW_REQUIRED and eps.propagated_from       # 由 heuristic 輸入傳播來的
     assert _state(report, "axis:earnings_exposure") == MISSING          # unknown 沒有可推翻的判斷
     assert _state(report, "axis:value_capture") == REVIEW_REQUIRED
 
@@ -265,10 +262,7 @@ def test_superseded_assumption_is_historical_and_downstream_recalculates() -> No
         evidence_refs=[EDGE, ACT_REF.ref], supersedes_id=old.assumption_id,
         created_at=datetime(2026, 9, 6, 9, 0, tzinfo=UTC), derivation="independent"))
     records = [old, new, _industrial(), *[a for a in _full_set() if a.driver != "revenue_growth"]]
-    model = build_fundamental_model(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2026, 9, 6),
-                                    actuals=_actuals(), actuals_reason=None, consensus=FY_CONSENSUS, guidance=(),
-                                    assumption_records=records, evidence_index=_index())
-    _m, artifacts = _artifacts(model, records=records)
+    _r, artifacts = _artifacts(records=records)
     report = _resolve([_event(OPERATING_ASSUMPTION, new.assumption_id, related_refs=(old.assumption_id,),
                               at=new.created_at, material_fields=("revenue_growth",), detail="D&C 60% → 50%")],
                       artifacts=artifacts, today=date(2026, 9, 6))
@@ -277,11 +271,8 @@ def test_superseded_assumption_is_historical_and_downstream_recalculates() -> No
     assert _state(report, "axis:value_capture") == CURRENT
     assert _state(report, "axis:structural") == CURRENT
     assert _state(report, "axis:expectation_gap") == REVIEW_REQUIRED    # 內部觀點變了，Q4 要重看
-    # 下游：這次 build 已用新假設（模型每次重算），所以是 current；若變化晚於 build 則是 recalculate
     later = _resolve([_event(OPERATING_ASSUMPTION, "oa_future", related_refs=(new.assumption_id,), at=LATER,
                              detail="再次取代")], artifacts=artifacts, today=date(2026, 9, 6))
-    assert _state(later, "modeled_metric:eps") == RECALCULATE
-    assert _state(later, "modeled_metric:revenue") == RECALCULATE
     tax = next(a for a in later.artifacts if "tax_rate" in a.label)
     assert tax.state == CURRENT
 
@@ -295,15 +286,20 @@ def test_retracted_supporting_evidence_invalidates_dependents() -> None:
     dc = report.artifact(f"{ARTIFACT_ASSUMPTION}:{_dc_id(report)}")
     assert dc.state == INVALIDATED
     assert _state(report, "axis:value_capture") == INVALIDATED
-    assert _state(report, "modeled_metric:eps") == INVALIDATED           # 傳播
     assert _state(report, "axis:expectation_gap") == CURRENT             # 沒引用那條邊
-    # 解析不到證據的假設由模型計數，refresh 把它標成 invalidated（前提不成立）
+    # 解析不到證據的假設由 ledger 選取（`select_assumptions`，不是模型）計數，refresh 把它標成 invalidated（前提不成立）
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：這一半原本靠 `build_fundamental_model` 跑選取；模型退役後由
+    # builder 直接跑 `select_assumptions`，拒收原因經 `rejection` 交給 `artifacts_from_assumptions`。
+    from alpha.fundamental.assumptions import select_assumptions
+
     broken = _assumption("tax_rate", "total", 0.19, basis="heuristic_proxy", refs=("graph://gone",))
     records = [broken, *[a for a in _assumptions() if a.driver != "tax_rate"]]
-    model = _run(records, index=_index())
-    _m, artifacts = _artifacts(model, records=records)
+    _acc, selection = select_assumptions(records, target=TARGET, as_of=None, today=TODAY, evidence_index=_index())
+    artifacts = artifacts_from_assumptions(records, build_at=BUILD_AT, rejection=dict(selection.rejected))
     report2 = _resolve(artifacts=artifacts)
     assert _state(report2, f"{ARTIFACT_ASSUMPTION}:{broken.assumption_id}") == INVALIDATED
+    # 對照：證據解析得到的那幾條不受影響
+    assert _state(report2, f"{ARTIFACT_ASSUMPTION}:{_dc_id(report2)}") == CURRENT
 
 
 # ---------------------------------------------------------------------------
@@ -317,8 +313,7 @@ def test_review_condition_fires_from_observation_and_never_replaces_the_value() 
     dc = _dc_assumption(review_conditions=[condition])
     assert dc.review_conditions and isinstance(dc.review_conditions[0], ReviewCondition)
     records = [dc, _industrial(), *[a for a in _full_set() if a.driver != "revenue_growth"]]
-    model = _run(records, index=_index())
-    _m, artifacts = _artifacts(model, records=records)
+    _r, artifacts = _artifacts(records=records)
     # 尚無觀測 → 等待中，current
     waiting = _resolve(artifacts=artifacts)
     assert _state(waiting, f"{ARTIFACT_ASSUMPTION}:{dc.assumption_id}") == CURRENT
@@ -330,7 +325,7 @@ def test_review_condition_fires_from_observation_and_never_replaces_the_value() 
     fired = _resolve(artifacts=artifacts, observations=[obs])
     hit = fired.artifact(f"{ARTIFACT_ASSUMPTION}:{dc.assumption_id}")
     assert hit.state == REVIEW_REQUIRED and any("下修至 +45%" in r for r in hit.reasons)
-    assert model.assumptions[0].value == 0.60 if model.assumptions[0].assumption_id == dc.assumption_id else True
+    assert dc.value == 0.60                                            # 值本身不變：引擎只標 state
     assert fired.changes and fired.changes[-1].change_type == DISPROOF_SIGNAL
     # 觀測不滿足條件 → current
     calm = _resolve(artifacts=artifacts, observations=[MetricObservation(
@@ -340,7 +335,7 @@ def test_review_condition_fires_from_observation_and_never_replaces_the_value() 
     # on_trigger=invalidated 由條件自己宣告
     strict = _dc_assumption(review_conditions=[{**condition, "on_trigger": "invalidated"}])
     records2 = [strict, _industrial(), *[a for a in _full_set() if a.driver != "revenue_growth"]]
-    _m2, artifacts2 = _artifacts(_run(records2, index=_index()), records=records2)
+    _r2, artifacts2 = _artifacts(records=records2)
     assert _state(_resolve(artifacts=artifacts2, observations=[obs]),
                   f"{ARTIFACT_ASSUMPTION}:{strict.assumption_id}") == INVALIDATED
 
@@ -358,25 +353,8 @@ def test_external_disproof_signal_targets_the_named_artifact_only() -> None:
 # 9. fiscal rollover：新目標期間被辨識、舊假設不沿用、理由說明需要新假設
 # ---------------------------------------------------------------------------
 
-def test_fiscal_rollover_is_named_and_old_assumptions_are_not_reused() -> None:
-    fy27 = _actuals(period=FiscalPeriod(end=date(2027, 6, 30)), revenue=10.2e9,
-                    segment_revenue={"Datacenter & Communications": 8.4e9, "Industrial": 1.8e9},
-                    recorded_at=datetime(2027, 8, 15, 4, 0, tzinfo=UTC), source_filed_at=date(2027, 8, 12))
-    records = _assumptions()
-    model = build_fundamental_model(company_id="co:coherent", ticker="COHR", as_of=None, today=date(2027, 8, 20),
-                                    actuals=fy27, actuals_reason=None, consensus=(), guidance=(),
-                                    assumption_records=records, evidence_index=_index())
-    assert model.base_period.end == date(2027, 6, 30) and model.target_period.end == date(2028, 6, 30)
-    assert model.status == "missing" and "會計期間已推進" in model.reason
-    _m, artifacts = _artifacts(model, records=records)
-    report = _resolve(artifacts=artifacts, today=date(2027, 8, 20))
-    assert _state(report, "fundamental_model:fundamental_model") == REVIEW_REQUIRED
-    fm = report.artifact("fundamental_model:fundamental_model")
-    assert any("new operating assumptions required" in r and "target period advanced" in r for r in fm.reasons)
-    old = [a for a in report.artifacts if a.artifact_type == ARTIFACT_ASSUMPTION]
-    assert old and all(a.state == SUPERSEDED for a in old)
-    assert all("不沿用" in a.reasons[0] for a in old)
-    assert any(c.change_type == "fiscal_period_rollover" for c in report.changes)
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`test_fiscal_rollover_is_named_and_old_assumptions_are_not_reused` 退役
+# ——它跑 `build_fundamental_model` 看模型怎麼標會計期間推進；模型已刪。
 
 
 # ---------------------------------------------------------------------------
@@ -394,6 +372,23 @@ def test_as_of_view_does_not_see_future_invalidation() -> None:
     before = _resolve([change], as_of=date(2026, 9, 1), today=date(2026, 9, 12))
     assert before.artifact("axis:value_capture") is None
     assert before.excluded_artifacts["established_after_as_of"] >= 1
+
+
+def test_assumptions_created_after_as_of_do_not_exist_at_that_time() -> None:
+    """INV-6：T 之後才寫的假設在 T 的視角上不存在——由 `select_assumptions` 拒收（created_after_as_of），
+    refresh 端把它預設成 missing，而不是拿當前假設冒充。"""
+    from alpha.fundamental.assumptions import select_assumptions
+
+    records = _assumptions()                                              # 全部寫於 2026-09-05
+    _acc, selection = select_assumptions(records, target=TARGET, as_of=date(2026, 9, 1), today=TODAY,
+                                         evidence_index=_index())
+    assert selection.reasons.get("created_after_as_of") == len(records)
+    artifacts = artifacts_from_assumptions(records, build_at=BUILD_AT, rejection=dict(selection.rejected))
+    assert artifacts and all(a.preset_state == MISSING and "INV-6" in (a.preset_reason or "") for a in artifacts)
+    # 對照：as-of 在寫入之後 → 全部可用
+    _acc2, selection2 = select_assumptions(records, target=TARGET, as_of=date(2026, 9, 6), today=TODAY,
+                                           evidence_index=_index())
+    assert not selection2.reasons.get("created_after_as_of")
 
 
 def test_changes_known_before_the_judgment_are_not_new_changes() -> None:
@@ -464,12 +459,14 @@ def test_same_period_consensus_cannot_be_supporting_evidence_but_legacy_records_
 
 
 def test_guidance_and_missing_data_are_not_review_required() -> None:
-    """AH／AI：缺共識是 missing data，缺指引不是變化——兩者都不得變成 review_required。"""
-    model = _run(_assumptions(), consensus=(), index=_index())
-    assert model.comparisons["eps"].status == "consensus_missing"
-    _m, artifacts = _artifacts(model)
+    """AH／AI：缺指引不是變化——沒有事件就不得變成 review_required。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「缺共識是 missing data（comparison 沒有 state）」那一半隨
+    內部 vs 共識的數值比較退役；refresh 裡從此沒有 comparison 成果可言。
+    """
+    _r, artifacts = _artifacts()
     report = _resolve(artifacts=artifacts)
-    assert report.artifact("expectation_comparison:eps") is None       # 沒有可比較的成果，就沒有 state
+    assert report.artifact("expectation_comparison:eps") is None       # 退役的成果不得復活
     assert report.overall == CURRENT
 
 

@@ -23,7 +23,7 @@ from briefing.alpha_view import changes as ch
 from briefing.alpha_view import compact_card, render_alpha_cards, render_alpha_investment_view_markdown
 from briefing.alpha_view.contracts import CAP_DEPENDENCY_IMPACT, REFRESH_STATUSES, SECTION_STATUSES
 from tests.test_alpha_investment_view import COMPANY, TODAY, _CORROBORATED, _FakeFundamentals, _judgment, _view
-from tests.test_fundamental_model import ACT_REF, TARGET, _run
+from tests.fixtures_fundamental import ACT_REF, TARGET, _full_set
 
 UTC = timezone.utc
 SINCE = datetime(2026, 9, 4, 23, 59, 59, tzinfo=UTC)
@@ -58,7 +58,7 @@ def test_market_and_consensus_changes_separate_price_from_forward_eps() -> None:
 
 
 def test_fiscal_consensus_first_appearance_is_a_note_not_a_change() -> None:
-    from tests.test_fundamental_model import _consensus
+    from tests.fixtures_fundamental import _consensus
 
     new = (_consensus("eps", 9.42, year_ago=5.61, captured=date(2026, 9, 5)),
            _consensus("revenue", 10.618e9, captured=date(2026, 9, 5)))
@@ -191,24 +191,22 @@ def test_structural_change_marks_citing_axis_review_required_and_price_free_axes
     assert "## 15. Refresh／dependency status" in text and "需複查" in text
 
 
-def test_assumption_states_flow_into_bridge_datums_and_compact_card() -> None:
+def test_assumption_states_flow_into_refresh_items_and_compact_card() -> None:
+    """⚠ 2026-09-23（Phase 0 Step 0b.1b）：原名 `..._flow_into_bridge_datums_and_compact_card`——橋的假設格
+    隨 FY+1 因果橋退役。**判準一字未改**：假設 ledger 的 state 要流到 refresh 項目與卡片，不得只留在引擎裡。"""
     from alpha.refresh import ChangeEvent
 
-    model = _run()
     guidance = ChangeEvent(change_type=COMPANY_GUIDANCE, ticker="COHR", company_id="co:coherent",
                            authority="engine_c://manual_observations", changed_ref="engine_c://manual_observation/g2",
                            observed_at=datetime(2026, 11, 11, tzinfo=UTC), published_at=date(2026, 11, 10),
                            material_fields=("tax_rate_low", "tax_rate_high"), detail="Q2 FY27 稅率指引")
-    view = _view(judgment=_stale_judgment(), allow_stale=True, fundamental_model=model, refresh_changes=[guidance],
-                 today=date(2026, 11, 12))
-    by_key = {d.key: d for d in view.earnings_bridge.assumptions}
-    assert by_key["assumption:tax_rate:total"].status == "review_required"
-    assert by_key["assumption:tax_rate:total"].dependencies["refresh_state"] == "review_required"
-    assert by_key["assumption:tax_rate:total"].dependencies["provenance_semantics"] in ("v2", "legacy")
-    assert by_key["assumption:tax_rate:total"].dependencies["requires_review_on_support_change"] is True
-    assert by_key["assumption:diluted_shares:total"].status == "available"
-    eps = next(d for d in view.internal_fundamentals.items if d.key == "internal_eps")
-    assert eps.status == "review_required" and eps.dependencies["refresh_propagated_from"]
+    view = _view(judgment=_stale_judgment(), allow_stale=True, assumption_records=_full_set(),
+                 refresh_changes=[guidance], today=date(2026, 11, 12))
+    items = {i.label: i for i in view.refresh_status.items if i.artifact_type == "operating_assumption"}
+    assert items, "假設 ledger 沒有進 refresh——它們的 review_conditions 與 disproof 目標會無處現形"
+    assert items[next(k for k in items if "tax_rate" in k)].state == "review_required"
+    assert items[next(k for k in items if "diluted_shares" in k)].state == "current"
+    assert not hasattr(view, "earnings_bridge"), "退役的 section 不得復活"
     card = compact_card(view)
     assert card["refresh"]["counts"]["review_required"] >= 2
     row = next(l for l in render_alpha_cards([card]) if l.startswith("| co:coherent"))

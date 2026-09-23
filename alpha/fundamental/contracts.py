@@ -1,22 +1,25 @@
-"""Causal Fundamental Model 的型別契約。**只有型別與驗證，零外部相依。**
+"""會計期間、營運假設與 Engine C 觀測的型別契約。**只有型別與驗證，零外部相依。**
 
-## 四個一等公民
+⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：FY+1 因果橋（`bridge.py`／`model.py`）與內部 vs 共識的
+數值比較（`compare.compare_metric`）退役。** 模型輸出型別（`BridgeStep`／`ModeledMetric`／`Sensitivity`／
+`ExpectationComparison`／`FundamentalModelResult`）、`COMPARISON_STATUSES`、`OPINION_STANCES`／`opinion_stance`
+一併刪除。留下的是**資料契約**：會計期間、營運假設（A3 ledger 的身分）、Engine C 的觀測與共識（A2）。
+
+## 三個一等公民
 
 | 型別 | 誰擁有它 | 可變性 |
 |---|---|---|
 | `FiscalPeriod` | 共同語言 | 身分是 `end` 日期，`FY2027` 只是呈現慣例 |
 | `OperatingAssumption` | A3 研究判斷（private append-only ledger） | 可重算；改假設＝append 新紀錄 |
-| `FiscalYearActuals`／`ConsensusEstimate`／`GuidanceObservation` | A2 Engine C 觀測 | 由 provider 唯讀取出 |
-| `ModeledMetric`／`ExpectationComparison` | A3 模型輸出 | 由 `bridge.py`／`compare.py` 確定性算出 |
+| `FiscalYearActuals`／`ConsensusEstimate`／`GuidanceObservation`／`InterimPeriodResults` | A2 Engine C 觀測 | 由 provider 唯讀取出 |
 
 ## 三條在型別層強制的規則
 
 1. **假設必須帶 basis、rationale、evidence、created_at。** 沒有 provenance 的假設不得存在
    （INV-6）；retracted 紀錄例外，它只是一個「撤回」標記。
-2. **driver 是封閉字彙（contract）。** 每個 driver 對應 `bridge.py` 的一段算術；多一個 driver
-   就要多一段算術，所以打開它是改程式不是改設定。
-3. **模型輸出分兩層標：`calculation="deterministic"` 與 `input_dependency`（最弱輸入的
-   知識種類）。** 前者說「算法確定」，後者說「輸入是判斷」，兩者不得壓成一個欄位（L12）。
+2. **driver 是封閉字彙（contract）。** `DisproofCondition.invalidates` 與 ledger 紀錄的身分都指名它；
+   打開它是改程式不是改設定。
+3. **口徑是身分。** `ACCOUNTING_BASES`／`CONSENSUS_BASES` 是封閉字彙；`unverified` 不得與任何口徑相減。
 """
 from __future__ import annotations
 
@@ -28,9 +31,6 @@ from typing import Any, Mapping, Sequence
 
 from ..contracts import EvidenceRef
 from ..errors import ContractViolation
-
-MODEL_VERSION = "causal-fundamental-model/v1"
-BRIDGE_VERSION = "fundamental-bridge/v1"
 
 # ---------------------------------------------------------------------------
 # 0. 會計期間（身分是日期）
@@ -194,13 +194,7 @@ ASSUMPTION_DRIVERS: Mapping[str, DriverSpec] = {
     "diluted_shares": DriverSpec("shares", "total", "稀釋加權平均股數（絕對股數）", lower=0.0),
 }
 
-#: 比較不成立的每一種原因各有自己的名字，**不合併成一個 unavailable**。
-#: `unreconciled_base`（2026-09-07 Coverage Pilot 補）＝ provider 的 `year_ago_actual` 與我們的
-#: 基期實際值對不上，也就是這串共識量的不是我們基期量的那個東西——它既不是缺料也不是口徑不同。
-COMPARISON_STATUSES: tuple[str, ...] = (
-    "comparable", "internal_missing", "consensus_missing",
-    "incompatible_period", "incompatible_basis", "incompatible_unit", "unreconciled_base",
-)
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`COMPARISON_STATUSES`（內部 vs 共識比較不成立的七種原因）隨 `compare_metric` 退役。
 
 
 def _finite(value: Any, label: str) -> float:
@@ -256,25 +250,13 @@ ASSUMPTION_DERIVATIONS: tuple[str, ...] = (
     "independent", "consensus_inverted", "company_guidance", "carried_forward", "unclassified",
 )
 
-#: `derivation` 屬於「我們有沒有形成觀點」這一題的**核心 driver**。其餘四個 driver
-#: （tax_rate／nci_attribution／diluted_shares／interest_and_other_net）沿用基期實績是正確做法，
-#: 把它們算進來會讓每一家公司都被判成沒有觀點——那個判準會恆亮，也就等於沒有鑑別力（L14-4）。
+#: **核心 driver**：overlay（variant／downside）假設只能落在這兩個 driver 上（型別層規則①）。
+#: 其餘四個 driver（tax_rate／nci_attribution／diluted_shares／interest_and_other_net）沿用基期實績是校準，不是看法。
+#: ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`OPINION_STANCES`／`opinion_stance`（模型對 `derivation` 的聚合，
+#: 「我們有沒有形成自己的觀點」）隨 FY+1 模型退役；這個常數留著，因為 append-only ledger 裡的 overlay 紀錄
+#: 讀取時仍要過同一道驗證（L10：紀錄的身分不因模型退役而改）。
 OPINION_BEARING_DRIVERS: frozenset[str] = frozenset({"revenue_growth", "operating_margin_delta"})
 
-#: 一家公司在**這一期**有沒有形成自己的觀點。由 `derivation` 聚合而來，是**模型層的宣告**，
-#: 不是呈現層 parse 理由句猜出來的（APP 呈現契約：`absence_kind` 那條同理）。
-#:
-#: 優先序刻意 fail safe 到「沒有觀點」：`unclassified` 永遠不會被算成 independent。
-#: - `independent`：至少一條核心 driver 由我們自己決定 → **這一格有內容可讀**。
-#: - `consensus_inverted`：核心 driver 沒有一條是自己的，且至少一條由共識反解 → **這是佔位，
-#:   隱含報酬的 0 不攜帶資訊**。
-#: - `company_guidance`：核心 driver 全部採公司指引 → 既不是我們的觀點，也不是共識循環。
-#: - `undeclared`：只有舊紀錄（未宣告）。
-#: - `no_opinion_bearing_assumptions`：連核心 driver 的假設都沒有 → 還沒開始。
-OPINION_STANCES: tuple[str, ...] = (
-    "independent", "consensus_inverted", "company_guidance", "undeclared",
-    "no_opinion_bearing_assumptions",
-)
 
 #: 假設屬於哪一個 **scenario**（2026-09-15 V0「賭注」；2026-09-18 D2 加 `downside`）。封閉字彙：
 #: - `base`：校準基準。依 2026-09-09 原則，沒有差異化證據時收斂到共識是健康的。
@@ -306,28 +288,6 @@ SCENARIO_LABELS: dict[str, str] = {
     VARIANT_SCENARIO: "賭對了",
     DOWNSIDE_SCENARIO: "判斷錯了",
 }
-
-
-def opinion_stance(assumptions: Sequence["OperatingAssumption"]) -> str:
-    """一組 accepted 假設 → 這家公司這一期的 opinion stance。**純函式**。
-
-    只看 `OPINION_BEARING_DRIVERS`：沿用基期實績的 tax／shares／NCI／interest 不參與，
-    否則每一家公司都會被判成沒有觀點，而一個恆亮的判準等於零鑑別力（L14-4）。
-    """
-    live = [a for a in assumptions
-            if a.driver in OPINION_BEARING_DRIVERS and not a.retracted]
-    if not live:
-        return "no_opinion_bearing_assumptions"
-    kinds = {a.derivation for a in live}
-    # ⚠ 順序不是「哪個聽起來比較強」，是**哪一種結構上可能產生預期差**（2026-09-10 實測後修正）：
-    # `consensus_inverted` 的值就是從共識反解的，所以它**結構上不可能**與共識不同；
-    # `company_guidance` 的值來自公司指引，而公司指引與共識**可以**不同、而且常常不同。
-    # 實例：LITE 的營益率取自公司 Q1 指引持平外推，共識沒這樣做——那條假設一條就貢獻了
-    # +8.92% 的 EPS 差異。把它壓成「還沒形成觀點」會把一個真實的立場說成空白。
-    for stance in ("independent", "company_guidance", "consensus_inverted"):
-        if stance in kinds:
-            return stance
-    return "undeclared"
 
 
 @dataclass(frozen=True, slots=True)
@@ -666,125 +626,9 @@ class InterimPeriodResults:
 
 
 # ---------------------------------------------------------------------------
-# 4. 模型輸出
+# 4. 假設選取的計數（INV-3）。⚠ 2026-09-23：模型輸出型別（BridgeStep／ModeledMetric／Sensitivity／
+#    ExpectationComparison／FundamentalModelResult）隨 FY+1 因果橋退役。
 # ---------------------------------------------------------------------------
-
-@dataclass(frozen=True, slots=True)
-class BridgeStep:
-    """橋上的一格。`kind`：observation（基期觀測）／assumption（輸入假設）／derived（算出）。"""
-
-    key: str
-    label: str
-    kind: str
-    value: float | None
-    unit: str
-    basis: str                       # observation／heuristic_proxy／session_judgment／deterministic／none
-    formula: str | None = None
-    assumption_ids: tuple[str, ...] = ()
-    observation_refs: tuple[str, ...] = ()
-    reason: str | None = None
-    scope: str | None = None
-
-    def __post_init__(self) -> None:
-        if self.kind not in ("observation", "assumption", "derived"):
-            raise ContractViolation(f"BridgeStep.kind 未登記：{self.kind!r}")
-        if self.value is None and self.basis != "none":
-            raise ContractViolation(f"BridgeStep[{self.key}] 沒有值就沒有 basis（missing != zero）")
-        if self.value is not None and self.basis == "none":
-            raise ContractViolation(f"BridgeStep[{self.key}] 有值必須說出知識種類")
-        if self.value is not None:
-            _finite(self.value, f"BridgeStep[{self.key}].value")
-
-
-@dataclass(frozen=True, slots=True)
-class ModeledMetric:
-    """一個內部估計。**沒有 naked number**：值、期間、單位、口徑、公式、依賴全在一起。"""
-
-    metric: str
-    period: FiscalPeriod
-    value: float | None
-    unit: str
-    accounting_basis: str
-    calculation: str = "deterministic"
-    input_dependency: str | None = None    # 最弱輸入假設的 basis；None＝沒有值
-    formula: str | None = None
-    assumption_ids: tuple[str, ...] = ()
-    observation_refs: tuple[str, ...] = ()
-    reason: str | None = None
-
-    def __post_init__(self) -> None:
-        if self.accounting_basis not in ACCOUNTING_BASES:
-            raise ContractViolation(f"ModeledMetric.accounting_basis 未登記：{self.accounting_basis!r}")
-        if self.value is not None:
-            _finite(self.value, f"ModeledMetric[{self.metric}].value")
-            if self.input_dependency is None:
-                raise ContractViolation(
-                    f"ModeledMetric[{self.metric}] 有值就必須說出輸入依賴的知識種類")
-        elif self.input_dependency is not None:
-            raise ContractViolation(f"ModeledMetric[{self.metric}] 沒有值就沒有輸入依賴")
-
-    @property
-    def is_known(self) -> bool:
-        return self.value is not None
-
-
-@dataclass(frozen=True, slots=True)
-class Sensitivity:
-    """一條假設動一格，輸出動多少。純確定性微擾，不是機率、不是情境。"""
-
-    assumption_id: str
-    driver: str
-    scope: str
-    bump: float
-    bump_unit: str                      # absolute_ratio（+0.01）／relative（×1.01）
-    delta_revenue: float | None
-    delta_operating_income: float | None
-    delta_eps: float | None
-    eps_relative: float | None
-
-
-@dataclass(frozen=True, slots=True)
-class ExpectationComparison:
-    """內部估計 vs 共識——**只在 `status == "comparable"` 時有數字**。"""
-
-    metric: str
-    status: str
-    internal_period: FiscalPeriod | None
-    consensus_period: FiscalPeriod | None
-    internal: float | None
-    consensus: float | None
-    absolute_gap: float | None
-    relative_gap: float | None
-    unit: str | None
-    accounting_basis_internal: str | None
-    accounting_basis_consensus: str | None
-    analyst_count: int | None
-    consensus_captured_at: date | None
-    reason: str | None
-    assumption_ids: tuple[str, ...] = ()
-    observation_refs: tuple[str, ...] = ()
-    consensus_refs: tuple[str, ...] = ()
-    #: 共識口徑經**換算容差**認定時的殘差（provider ÷ 一手 − 1）。逐字相等或不可比時是 None。
-    #: ⚠ 它是**這個 gap 的雜訊下限**：同一個換算差原樣進到 gap 裡，所以任何小於它的
-    #: 差異都不具意義。結構化欄位而不是只寫在 `reason` 裡——下游要拿它做比較，
-    #: 而呈現層不得 parse 理由句去猜（L16）。
-    fx_translation_delta: float | None = None
-
-    def __post_init__(self) -> None:
-        if self.status not in COMPARISON_STATUSES:
-            raise ContractViolation(f"ExpectationComparison.status 未登記：{self.status!r}")
-        if self.status != "comparable" and (self.absolute_gap is not None or self.relative_gap is not None):
-            raise ContractViolation(
-                f"ExpectationComparison[{self.metric}] status={self.status} 不得帶 gap 數字——不能硬減")
-        if self.status == "comparable" and (self.internal is None or self.consensus is None):
-            raise ContractViolation("comparable 必須兩邊都有值")
-        if self.fx_translation_delta is not None:
-            _finite(self.fx_translation_delta, "ExpectationComparison.fx_translation_delta")
-            if not str(self.accounting_basis_consensus or "").endswith("_fx_tolerated"):
-                raise ContractViolation(
-                    "fx_translation_delta 只屬於 *_fx_tolerated 的共識口徑——"
-                    f"收到 {self.accounting_basis_consensus!r}")
-
 
 @dataclass(frozen=True, slots=True)
 class AssumptionSelection:
@@ -800,79 +644,13 @@ class AssumptionSelection:
         return self.input_count - self.accepted_count
 
 
-@dataclass(frozen=True, slots=True)
-class FundamentalModelResult:
-    """一次模型執行的完整輸出——read model 只選取，不重算。"""
-
-    company_id: str
-    ticker: str
-    as_of: date | None
-    target_period: FiscalPeriod | None
-    base_period: FiscalPeriod | None
-    accounting_basis: str
-    status: str                             # available／partial／missing
-    reason: str | None
-    metrics: Mapping[str, ModeledMetric]
-    steps: tuple[BridgeStep, ...]
-    assumptions: tuple[OperatingAssumption, ...]
-    selection: AssumptionSelection
-    sensitivities: tuple[Sensitivity, ...]
-    comparisons: Mapping[str, ExpectationComparison]
-    consensus: tuple[ConsensusEstimate, ...]
-    guidance: tuple[GuidanceObservation, ...]
-    base_actuals: FiscalYearActuals | None
-    #: 每筆共識的口徑核實結果，key＝`f"{metric}:{period_end}"`（見 `compare.verify_consensus_basis`）。
-    consensus_bases: Mapping[str, str] = field(default_factory=dict)
-    model_version: str = MODEL_VERSION
-    bridge_version: str = BRIDGE_VERSION
-    digest: str = ""
-    warnings: tuple[str, ...] = ()
-    evidence: tuple[EvidenceRef, ...] = field(default_factory=tuple)
-    #: V0（2026-09-15）：這次模型執行是 base 還是 variant（賭注）。
-    scenario: str = BASE_SCENARIO
-    #: scenario=variant 時，**實際覆蓋了 base 的那幾條** variant 假設（其餘 `assumptions` 沿用 base）。
-    #: base 執行恆為空。它就是「賭注長什麼樣」的機器可讀形式。
-    overrides: tuple[OperatingAssumption, ...] = ()
-
-    def __post_init__(self) -> None:
-        if self.status not in ("available", "partial", "missing"):
-            raise ContractViolation(f"FundamentalModelResult.status 未登記：{self.status!r}")
-        if self.scenario not in ASSUMPTION_SCENARIOS:
-            raise ContractViolation(f"FundamentalModelResult.scenario 未登記：{self.scenario!r}")
-        if self.scenario == BASE_SCENARIO and self.overrides:
-            raise ContractViolation("base 執行不得帶 overrides——覆蓋只在 variant 上有意義")
-        if self.accounting_basis not in ACCOUNTING_BASES:
-            raise ContractViolation(f"accounting_basis 未登記：{self.accounting_basis!r}")
-        # 字彙一旦有行為後果就必須被強制（L16-3）：`consensus_bases` 的值決定
-        # `compare_metric` 比不比較，先前是自由字串——打錯不會報錯，只會靜默變成不可比。
-        for key, value in (self.consensus_bases or {}).items():
-            if value not in CONSENSUS_BASES:
-                raise ContractViolation(
-                    f"consensus_bases[{key!r}] 未登記：{value!r}（合法值 {CONSENSUS_BASES}）")
-
-    def metric(self, name: str) -> ModeledMetric | None:
-        return self.metrics.get(name)
-
-    @property
-    def stance(self) -> str:
-        """這一期我們有沒有形成自己的觀點（`OPINION_STANCES`）。
-
-        ⚠ 它**不是** readiness 也不是 status：一份 `available` 的模型完全可能 stance 是
-        `consensus_inverted`——每一格都有數字、每一個數字都是共識反解出來的。那正是
-        2026-09-10 實測到的 5 檔（隱含報酬 ±0.01%，而那個 0 是代數上的必然，不是判斷）。
-        """
-        return opinion_stance(self.assumptions)
-
-
 __all__ = [
-    "ACCOUNTING_BASES", "CONSENSUS_BASES", "consensus_basis_stem", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS", "ASSUMPTION_REF_ROLES", "BRIDGE_VERSION",
-    "CONSENSUS_REF_PREFIX", "PROVENANCE_SEMANTICS",
-    "COMPARISON_STATUSES", "FISCAL_PERIOD_KINDS", "MODEL_VERSION",
-    "PERIOD_MATCH_TOLERANCE_DAYS", "TOTAL_SCOPE", "AssumptionSelection", "BridgeStep",
-    "ConsensusEstimate", "DriverSpec", "ExpectationComparison", "FiscalPeriod",
-    "FiscalYearActuals", "FundamentalModelResult", "GuidanceObservation", "ModeledMetric",
-    "OPINION_BEARING_DRIVERS", "OPINION_STANCES", "ASSUMPTION_DERIVATIONS",
+    "ACCOUNTING_BASES", "CONSENSUS_BASES", "consensus_basis_stem", "ASSUMPTION_BASES", "ASSUMPTION_DRIVERS",
+    "ASSUMPTION_REF_ROLES", "CONSENSUS_REF_PREFIX", "PROVENANCE_SEMANTICS",
+    "FISCAL_PERIOD_KINDS", "PERIOD_MATCH_TOLERANCE_DAYS", "TOTAL_SCOPE", "AssumptionSelection",
+    "ConsensusEstimate", "DriverSpec", "FiscalPeriod", "FiscalYearActuals", "GuidanceObservation",
+    "INCOME_STATEMENT_SHAPES", "InterimPeriodResults", "ASSUMPTION_DERIVATIONS", "OPINION_BEARING_DRIVERS",
     "ASSUMPTION_SCENARIOS", "BASE_SCENARIO", "VARIANT_SCENARIO", "DOWNSIDE_SCENARIO",
     "OVERLAY_SCENARIOS", "SCENARIO_LABELS",
-    "OperatingAssumption", "Sensitivity", "opinion_stance", "weakest_basis",
+    "OperatingAssumption", "weakest_basis",
 ]

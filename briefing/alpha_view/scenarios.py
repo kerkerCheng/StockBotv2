@@ -2,23 +2,24 @@
 
 用途是驗收與解釋（「如果明天有新指引，哪些東西會變？」），不是預測。情境事件一律標
 `authority="scenario://..."`，`observed_at` 在 build 之後，所以每個成果都會把它視為新變化。
-`fiscal_rollover` 例外：它不是一件事件，是「把基期換成目標期間的實際值」——需要重跑模型。
+
+⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`fiscal_rollover` 情境與 `rollover_actuals` 退役——
+它的定義是「把基期換成目標期間的實際值**重跑模型**」，而 FY+1 因果橋已經不在了。其餘六個情境
+不再吃 `FundamentalModelResult`，改吃它們各自真正需要的東西：共識清單（consensus_revision）、
+生效的營運假設（disproof 的 review_conditions）、基期結束日（new_actual）、目標期間。
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 from typing import Any, Sequence
 
-from alpha.fundamental.contracts import FiscalPeriod, FiscalYearActuals, FundamentalModelResult
 from alpha.refresh import (
     COMPANY_GUIDANCE, CONSENSUS, DISPROOF_SIGNAL, FINANCIAL_ACTUAL, GRAPH_EDGE, MARKET_PRICE,
     ChangeEvent, MetricObservation, ReviewCondition, end_of_day,
 )
-from alpha.contracts import EvidenceRef
 
 SCENARIOS: tuple[str, ...] = (
-    "price_only", "consensus_revision", "graph_edge", "new_guidance", "new_actual",
-    "fiscal_rollover", "disproof",
+    "price_only", "consensus_revision", "graph_edge", "new_guidance", "new_actual", "disproof",
 )
 
 
@@ -29,13 +30,15 @@ def _at(today: date) -> datetime:
 
 def scenario_changes(
     name: str, *, ticker: str, company_id: str | None, context: Any,
-    model: FundamentalModelResult | None, today: date,
+    consensus: Sequence[Any] = (), assumptions: Sequence[Any] = (),
+    base_period_end: date | None = None, target_period: Any = None, today: date,
 ) -> tuple[list[ChangeEvent], list[MetricObservation]]:
     """回傳 (事件, 觀測)。找不到對應的 runtime 物件時用合成 ref，仍然是合法事件。"""
     at = _at(today)
     snap_ref = f"engine_c://financial_snapshot/{ticker}"
     events: list[ChangeEvent] = []
     observations: list[MetricObservation] = []
+    live = [a for a in assumptions if not getattr(a, "retracted", False)]
     if name == "price_only":
         price = context.market.price
         old = f"{price:g}" if price else "?"
@@ -45,8 +48,8 @@ def scenario_changes(
                                   effective_at=today + timedelta(days=1), old_version=old, new_version=new,
                                   material_fields=("price",), detail=f"模擬：只有價格變動 {old} → {new}"))
     elif name == "consensus_revision":
-        target = model.target_period if model and model.target_period else None
-        eps = next((c for c in (model.consensus if model else ()) if c.metric == "eps" and target and c.period.same_as(target)), None)
+        target = target_period
+        eps = next((c for c in consensus if c.metric == "eps" and target is not None and c.period.same_as(target)), None)
         ref = eps.refs[0] if eps and eps.refs else f"engine_c://consensus_estimate/{ticker}/eps/{target.end if target else '?'}"
         old = f"{eps.value:.4g}" if eps and eps.value else "9.42"
         new = f"{(eps.value * 1.0616):.4g}" if eps and eps.value else "10.00"
@@ -74,7 +77,7 @@ def scenario_changes(
                                                    "tax_rate_low", "tax_rate_high"),
                                   detail="模擬：新一季指引（營收／毛利率／稅率）"))
     elif name == "new_actual":
-        q_end = (model.base_period.end + timedelta(days=92)) if model and model.base_period else today
+        q_end = (base_period_end + timedelta(days=92)) if base_period_end is not None else today
         events.append(ChangeEvent(change_type=FINANCIAL_ACTUAL, ticker=ticker, company_id=company_id,
                                   authority="scenario://financial_actual",
                                   changed_ref="engine_c://manual_observation/scenario_actual", observed_at=at,
@@ -83,8 +86,8 @@ def scenario_changes(
                                   detail=f"模擬：新一季實際值（至 {q_end}）"))
     elif name == "disproof":
         condition: ReviewCondition | None = None
-        for a in (model.assumptions if model else ()):
-            if a.review_conditions:
+        for a in live:
+            if getattr(a, "review_conditions", ()):
                 condition = a.review_conditions[0]
                 break
         if condition is not None:
@@ -94,37 +97,14 @@ def scenario_changes(
                 period_kind=condition.period_kind, value=breach,
                 ref="engine_c://manual_observation/scenario_disproof", observed_at=at))
         else:
-            target = next((a.assumption_id for a in (model.assumptions if model else ())), None)
+            target = next((a.assumption_id for a in live), None)
             events.append(ChangeEvent(change_type=DISPROOF_SIGNAL, ticker=ticker, company_id=company_id,
                                       authority="scenario://disproof", changed_ref="library://event_watches/scenario",
                                       observed_at=at, target_artifact=target or "session_judgment",
                                       on_trigger="review_required", detail="模擬：disproof 條件被觀測滿足"))
-    elif name != "fiscal_rollover":
+    else:
         raise ValueError(f"未知情境：{name}；已知 {SCENARIOS}")
     return events, observations
 
 
-def rollover_actuals(model: FundamentalModelResult, *, today: date) -> FiscalYearActuals | None:
-    """把目前模型的**目標期間**當成已報告：用內部估計當「實際值」重跑模型（只為情境，不寫任何 authority）。"""
-    if model.base_actuals is None or model.target_period is None:
-        return None
-    base = model.base_actuals
-    revenue = model.metrics.get("revenue")
-    oi = model.metrics.get("operating_income")
-    if revenue is None or not revenue.is_known:
-        return None
-    ratio = revenue.value / base.revenue
-    ref = EvidenceRef(ref="engine_c://manual_observation/scenario_fy_rollover", kind="engine_c_observation",
-                      origin_entity="issuer_filing", published_at=today + timedelta(days=1),
-                      retrieved_at=today + timedelta(days=1),
-                      recorded_at=_at(today))
-    block = {"operating_income": (oi.value if oi and oi.is_known else (base.non_gaap or base.gaap).get("operating_income", 0.0) * ratio)}
-    return FiscalYearActuals(
-        period=FiscalPeriod(end=model.target_period.end), currency=base.currency, revenue=revenue.value,
-        segment_revenue=({k: v * ratio for k, v in base.segment_revenue.items()} if base.segment_revenue else None),
-        gaap=dict(block), non_gaap=(dict(block) if base.non_gaap else None), evidence=(ref,),
-        source_filed_at=today + timedelta(days=1), recorded_at=_at(today), observation_id="scenario_fy_rollover",
-    )
-
-
-__all__ = ["SCENARIOS", "rollover_actuals", "scenario_changes"]
+__all__ = ["SCENARIOS", "scenario_changes"]

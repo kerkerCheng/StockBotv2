@@ -27,7 +27,7 @@ from briefing.alpha_view import (
     build_alpha_investment_view, compact_card,
 )
 from briefing.alpha_view.contracts import (
-    CAP_FINANCIAL_CAUSAL, CAP_NARRATIVE_SCENARIOS, CAP_STRUCTURAL_CAUSAL, VALUELESS_STATUSES,
+    CAP_NARRATIVE_SCENARIOS, CAP_STRUCTURAL_CAUSAL, VALUELESS_STATUSES,
 )
 
 COMPANY = CompanyId("co:coherent")
@@ -181,33 +181,10 @@ def _walk(node: Any, path: str = ""):
 # Missing != Zero
 # ---------------------------------------------------------------------------
 
-def test_missing_internal_eps_is_not_serialized_as_zero() -> None:
-    """沒有 fundamental model 輸出時 internal EPS 必須是 `missing` ＋ `null`，不是 0。
-
-    ⚠ 2026-09-05 起系統**有**這個能力（`alpha/fundamental`），所以缺席是 `missing`
-    （有能力、沒資料／本次未執行），不再是 `not_modeled`；缺席不是 0 這條不變。
-    """
-    view = _view()
-    section = view.internal_fundamentals
-    assert section.meta.status == "missing"
-    assert section.meta.capability == CAP_FINANCIAL_CAUSAL
-    eps = next(d for d in section.items if d.key == "internal_eps")
-    assert eps.status == "missing" and eps.value is None
-    payload = json.loads(json.dumps(view.to_dict(), ensure_ascii=False))
-    serialized = next(d for d in payload["internal_fundamentals"]["items"] if d["key"] == "internal_eps")
-    assert serialized["value"] is None
-    assert serialized["status"] == "missing"
-    # bridge v1 不做的東西仍是 not_modeled（能力不存在），與 missing 分開
-    fcf = next(d for d in section.items if d.key == "internal_fcf")
-    assert fcf.status == "not_modeled" and fcf.value is None
-
-
-def test_missing_implied_margin_is_not_zero_percent() -> None:
-    view = _view()
-    margin = next(d for d in view.price_implied_expectations.items if d.key == "market_implied_margin")
-    assert margin.status == "not_modeled"
-    assert margin.value is None
-    assert margin.basis == "none"
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`test_missing_internal_eps_is_not_serialized_as_zero` 與
+# `test_missing_implied_margin_is_not_zero_percent` 退役——它們的主詞（internal_fundamentals／
+# price_implied_expectations 兩個 section）隨 FY+1 因果橋退役。**Missing != Zero 的判準沒有退役**：
+# 下一條在型別層守它，`test_unknown_session_axis_is_missing_not_zero` 在 session 軸上守它。
 
 
 def test_datum_contract_enforces_missing_is_not_zero() -> None:
@@ -240,52 +217,27 @@ def test_unknown_session_axis_is_missing_not_zero() -> None:
 # ---------------------------------------------------------------------------
 
 def test_analyst_target_is_not_expected_return() -> None:
-    """Step 2（2026-09-06）：implied_return section **有能力了**——沒注入 horizon／估值就是 missing，不是 not_modeled；
-    但機率加權期望報酬與總報酬仍 not_modeled，且 section 每次列「不是 expected return」。"""
+    """賣方目標價是別人的數字。⚠ 2026-09-23（Phase 0 Step 0b.1b）：`implied_return` section 整個退役，
+    read model 裡不再有任何「本系統的預期報酬」——這條的主詞剩下共識那一格與「不得長回來」。"""
     view = _view()
-    assert view.implied_return.meta.status == "missing"
-    assert view.implied_return.price_return.value is None and view.implied_return.price_return.status == "missing"
-    assert view.implied_return.probability_weighted_return.status == "not_modeled"
-    assert view.implied_return.total_return.status == "not_modeled"
-    assert any("expected return" in x for x in view.implied_return.is_not)
     target = next(d for d in view.consensus.items if d.key == "target_mean")
     assert target.is_known and "不是本系統的預期報酬" in target.label
     # view 不自己算目標價 vs 現價的比值：那是 scripts/alpha_expectation_gap.py 的產出（審計第 5 條）
     assert not any(d.key == "target_vs_price" for d in view.consensus.items)
-    payload = view.to_dict()["implied_return"]
-    numeric = [(p, v) for p, k, v in _walk(payload) if isinstance(v, (int, float)) and not isinstance(v, bool)]
-    assert not numeric, f"implied_return 缺席時出現數值：{numeric}"
+    for retired in ("implied_return", "valuation", "price_implied_expectations", "internal_fundamentals",
+                    "earnings_bridge"):
+        assert not hasattr(view, retired), f"退役的 section 不得復活：{retired}"
+        assert retired not in view.to_dict(), retired
 
 
 # ---------------------------------------------------------------------------
 # Price-implied 是 proxy，不是 model
 # ---------------------------------------------------------------------------
 
-def test_price_implied_growth_is_marked_heuristic_proxy() -> None:
-    view = _view()
-    growth = next(d for d in view.price_implied_expectations.items if d.key == "market_implied_eps_growth")
-    assert growth.is_known
-    assert growth.basis == "heuristic_proxy"
-    assert "trailing_pe/forward_pe" in (growth.method or "")
-    assert view.price_implied_expectations.meta.basis == "heuristic_proxy"
-    assert view.price_implied_expectations.reverse_dcf.status == "not_modeled"
-    assert view.price_implied_expectations.meta.status == "partial"
-
-
-def test_nonpositive_forward_pe_yields_not_applicable_not_a_negative_growth() -> None:
-    """forward PE 為負 ＝ 分析師預估仍虧損；比值無意義，不得印成 −240%。"""
-    view = _view(fundamentals=_FakeFundamentals(forward_pe=-43.1, trailing_pe=60.0))
-    growth = next(d for d in view.price_implied_expectations.items if d.key == "market_implied_eps_growth")
-    assert growth.value is None
-    assert growth.status == "not_applicable"
-    assert "nonpositive" in (growth.reason or "")
-
-
-def test_loss_making_company_has_missing_implied_growth_with_reason() -> None:
-    view = _view(fundamentals=_FakeFundamentals(trailing_pe=None))
-    growth = next(d for d in view.price_implied_expectations.items if d.key == "market_implied_eps_growth")
-    assert growth.value is None and growth.status == "missing"
-    assert "pe_trailing_missing" in (growth.reason or "")
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`test_price_implied_growth_is_marked_heuristic_proxy`、
+# `test_nonpositive_forward_pe_yields_not_applicable_not_a_negative_growth`、
+# `test_loss_making_company_has_missing_implied_growth_with_reason` 三條退役——主詞
+# `price_implied_expectations`（PE 比值 proxy）整個 section 退役。
 
 
 # ---------------------------------------------------------------------------
@@ -299,23 +251,19 @@ def test_scenarios_are_narrative_not_quantitative() -> None:
     assert view.scenarios.meta.capability == CAP_NARRATIVE_SCENARIOS
     assert view.scenarios.bull.basis == "narrative"
     assert view.scenarios.probabilities.status == "not_modeled"
-    # Step 1（2026-09-06）：單點 fair value 有能力了——沒有估值假設是 missing，不再是 not_modeled；
-    # 逐情境目標估值仍然沒有，理由要說出來。
-    assert view.scenarios.target_valuation.status == "missing"
-    assert "逐情境目標估值仍未建模" in (view.scenarios.target_valuation.reason or "")
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`target_valuation`（照抄 fair value）隨估值鏈退役。
+    assert not hasattr(view.scenarios, "target_valuation")
 
 
 def test_causal_section_is_structural_not_financial() -> None:
     view = _view()
     assert view.causal_paths.meta.capability == CAP_STRUCTURAL_CAUSAL
-    assert view.causal_paths.meta.capability != CAP_FINANCIAL_CAUSAL
+    assert view.causal_paths.meta.capability != "financial_causal_model"
     assert view.causal_paths.meta.basis == "structural_inference"
-    # 沒注入 fundamental model：財務橋那一格是 missing（有能力沒資料），causal section 本身仍是 structural
-    assert view.causal_paths.financial_causal_model.status == "missing"
-    assert view.causal_paths.financial_causal_model.value is None
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：財務橋那一格與 earnings_bridge section 隨 FY+1 因果橋退役；
+    # causal section 本身仍是 structural，而且**必須說出它不是 financial causal model**。
+    assert not hasattr(view.causal_paths, "financial_causal_model")
     assert any("不是 financial causal model" in w for w in view.causal_paths.meta.warnings)
-    assert view.earnings_bridge.meta.status == "missing"
-    assert view.earnings_bridge.steps == () and view.earnings_bridge.assumptions == ()
 
 
 # ---------------------------------------------------------------------------
@@ -427,7 +375,6 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     view = _view(fundamentals=_FakeFundamentals(available=False))
     assert view.fundamentals.meta.status == "missing"
     assert view.consensus.meta.status == "missing"
-    assert view.implied_return.meta.status == "missing"                 # Step 2：有能力了；沒資料是 missing
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` section 隨 E 組（四價 overlay）退役。
     # 反證那一端沒有退役——它在 research 面板的 disproofs（Phase 3 會讓每條連到一個 watch）。
     assert not hasattr(view, "downside"), "退役的 section 不得復活"
@@ -435,11 +382,10 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     assert price.value is None and price.status == "missing"
     cap = view.capability_map()
     assert cap["fundamentals"]["status"] == "missing"
-    assert cap["implied_return"]["status"] == "missing"
     # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
     assert "downside" not in cap, "退役的 section 不得留在 capability_map"
-    # internal fundamentals 自 2026-09-05 起是「有能力」：沒資料是 missing，不是 not_modeled
-    assert cap["internal_fundamentals"]["status"] == "missing"
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：implied_return／internal_fundamentals 兩個 section 退役。
+    assert "implied_return" not in cap and "internal_fundamentals" not in cap
 
 
 def test_catalyst_capability_is_partial_and_reuses_shared_state() -> None:
@@ -494,7 +440,7 @@ def test_to_dict_round_trips_json_and_keeps_nulls() -> None:
     assert back["identity"]["ticker"] == "COHR"
     # D2（2026-09-18）：下檔已建模，status 由 `not_modeled` → `missing`（見上方同名說明）。
     assert "downside" not in back["capability_map"]
-    assert back["capability_map"]["implied_return"]["status"] == "missing"
+    assert "implied_return" not in back["capability_map"], "退役的 section 不得留在 capability_map"
     assert "entry_logic" not in back["capability_map"], "退役的 section 不得留在 capability_map"
     nulls = [p for p, k, v in _walk(back) if k == "value" and v is None]
     assert nulls, "read model 裡沒有任何 null——代表缺席被填掉了"
@@ -518,9 +464,6 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     assert card["scores"]["value_capture"]["session_level"] == "strong"
     assert card["scores"]["earnings_exposure"]["status"] == "missing"
     assert card["scores"]["earnings_exposure"]["effective"] is None
-    growth = next(d for d in view.price_implied_expectations.items if d.key == "market_implied_eps_growth")
-    assert card["market_implied_eps_growth"]["value"] == growth.value
-    assert card["market_implied_eps_growth"]["basis"] == "heuristic_proxy"
     assert card["catalyst"]["state"] == "watch"
     # D2（2026-09-18）：`downside` 離開了 `not_modeled` 那一欄——它現在有能力，只是還沒人寫。
     # ⚠ 這條斷言原本守的是「沒能力的東西必須出現在 not_modeled 清單」，那個判準不變；
@@ -531,19 +474,18 @@ def test_compact_card_is_pure_selection_from_the_view() -> None:
     # **「沒能力的東西必須出現在 not_modeled 清單」那個判準不變**——變的是它不再是任何一類。
     assert "entry_logic" not in card, "退役的 section 不得留在卡片上"
     assert "entry_logic" not in set(card["not_modeled"])
-    assert card["implied_return"]["status"] == "missing" and card["implied_return"]["price_return"] is None
-    assert "internal_fundamentals" not in card["not_modeled"]          # 有能力了；沒資料是 missing
-    assert card["internal_fundamentals_status"] == "missing"
-    assert card["internal_vs_consensus"]["eps"]["status"] == "missing"
-    assert card["internal_vs_consensus"]["eps"]["relative_gap"] is None
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：market_implied_eps_growth／implied_return／internal_fundamentals_status／
+    # internal_vs_consensus／valuation 五格隨估值鏈退役，卡片上整格消失。
+    for retired in ("market_implied_eps_growth", "implied_return", "internal_fundamentals_status",
+                    "internal_vs_consensus", "valuation"):
+        assert retired not in card, f"退役的格不得留在卡片上：{retired}"
     banned = set(FORBIDDEN_POSITION_TOKENS)
     assert not any(set(str(k).lower().split("_")) & banned for _p, k, _v in _walk(card))
 
 
-def test_compact_card_keeps_unknowns_as_none_with_reason() -> None:
-    card = compact_card(_view(fundamentals=_FakeFundamentals(trailing_pe=None)))
-    assert card["market_implied_eps_growth"]["value"] is None
-    assert "pe_trailing_missing" in card["market_implied_eps_growth"]["reason"]
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`test_compact_card_keeps_unknowns_as_none_with_reason` 退役——
+# 它的主詞是卡片的 `market_implied_eps_growth` 格（PE 比值 proxy）。「未知是 None 帶原因，不是 0」
+# 由 `test_compact_card_counts_are_none_not_zero_without_a_signal` 在催化劑／反證計數上守著。
 
 
 def test_quote_unit_mismatch_is_warned_in_identity() -> None:

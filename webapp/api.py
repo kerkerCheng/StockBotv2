@@ -138,25 +138,24 @@ def _group_of(row: Mapping[str, Any]) -> str:
     return str(terminal) if terminal in ("ready", "settled", "awaiting_report") else "not_started"
 
 
-def _opinion_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    """stance 分布。**純計數**——不重算、不推論，只數 materialize 端已經寫下的宣告。"""
-    counts: dict[str, int] = {}
-    for row in items:
-        stance = (row.get("opinion_stance") or {}).get("value")
-        counts[str(stance)] = counts.get(str(stance), 0) + 1
+def _view_counters(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """已有判讀／有賭注的檔數。**純計數**——不重算、不推論，只數 materialize 端已經寫下的宣告。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原本叫 `_opinion_counters`，多印一格「有我們自己的看法 N 檔」
+    （stance 分布）。stance 是 FY+1 模型對估值假設 `derivation` 的聚合，隨估值鏈退役；「有沒有自己的觀點」
+    改由讀圖與敘事回答（Phase 2）。**計數器本身不消失**（L14：真正的防呆是會自己出現的計數器）。
+    """
     with_view = sum(1 for r in items if _group_of(r) == "ready")
     # V0（2026-09-15）：有寫賭注的檔數。**純計數**——這裡只數有值的，不重算。
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`overview.payoff` 退役（四價尺），改數有寫下 `our_bet` 的檔。
     with_bet = sum(1 for r in items
                    if isinstance(((r.get("brief") or {}).get("our_bet") or {}).get("value"), str))
     return {
-        "by_stance": counts,
-        "our_own_view": counts.get("independent", 0),
         "with_view": with_view,
         "with_bet": with_bet,
-        "headline": f"有我們自己的看法 {counts.get('independent', 0)} 檔／已有判讀 {with_view} 檔／有賭注 {with_bet} 檔",
-        "note": "`independent` 之外的都不是我們的獨立分析：consensus_inverted 是共識反解的佔位、"
-                "company_guidance 是採信公司、undeclared 是還沒宣告。",
+        "headline": f"已有判讀 {with_view} 檔／有賭注 {with_bet} 檔",
+        "note": "「有我們自己的看法」那一格已於 2026-09-23 隨估值假設退役；"
+                "有沒有自己的觀點改由讀圖與敘事回答（Phase 2）。已有判讀 ≠ 值得投。",
     }
 
 
@@ -189,8 +188,7 @@ async def stocks(request: Request) -> Response:
         "groups": [{"key": k, "label": v, "count": sum(1 for r in items if r.get("group") == k)}
                    for k, v in _GROUP_LABELS.items()],
         # 常駐計數器（L14：真正的防呆是會自己出現的計數器，不是要人讀的段落）。
-        # 「有幾檔的判讀是我們自己的」這個數字，在 2026-09-10 之前從來沒有被印出來過。
-        "opinion_counters": _opinion_counters(items),
+        "view_counters": _view_counters(items),
         "unavailable": unavailable,
         "correlation_warning": _CORRELATION_WARNING,
         "group_note": "分組是研究完整度，**不是投資排序**——組內順序未改動（字母序），"

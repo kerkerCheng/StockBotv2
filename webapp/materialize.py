@@ -163,10 +163,8 @@ def build_overview(view: Mapping[str, Any], *, price_context: Mapping[str, Any] 
         # 判的正是那一天。先前 `closure_terminal` 因此結構上回不出第三種終局。
         "period_end": (headline.get("context") or {}).get("period_end"),
         "refresh_overall": view["refresh"]["overall"],
-        # 我們有沒有形成自己的觀點。**照抄 fundamental panel 的宣告**，這裡不重算、不推論。
-        # 它與 readiness 正交：一份 ready 的判讀完全可以是 `consensus_inverted`（每一格都有
-        # 數字，而每個數字都是共識反解出來的）——列表頁必須分得出這兩件事。
-        "opinion_stance": _cell(_line_map(view.get("fundamental") or {}).get("opinion_stance")),
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`opinion_stance`（我們有沒有形成自己的觀點）退役——
+        # 它是 FY+1 模型對估值假設 `derivation` 的聚合。「有沒有自己的觀點」改由讀圖與敘事回答（Phase 2）。
         # 這一檔到終局了沒（ready／settled／**awaiting_report**／None）。
         # **照抄 `alpha.closure` 的判定**——它已經是這個分類的 SSOT（drain 選題與
         # `webapp status` 都消費它），在 APP 端再寫一份「什麼叫做完」的規則就是 L16 記過的重造品。
@@ -1387,8 +1385,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
-        PLAIN_DRIVER_LABELS, PLAIN_MULTIPLE_DERIVATION,
-        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS, PLAIN_STANCE,
+        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS,
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
     )
@@ -1405,10 +1402,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_line_labels": dict(PLAIN_LINE_LABELS),
         "plain_absence_short": dict(PLAIN_ABSENCE_SHORT),
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
-        # opinion stance 的白話層（2026-09-10）：前端不得再寫第二份（L16）。
-        "plain_stance": {k: dict(v) for k, v in PLAIN_STANCE.items()},
-        "plain_driver_labels": dict(PLAIN_DRIVER_LABELS),
-        "plain_multiple_derivation": {k: dict(v) for k, v in PLAIN_MULTIPLE_DERIVATION.items()},
+        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：plain_stance／plain_driver_labels／plain_multiple_derivation
+        # 三份白話層隨估值鏈退役。
         "price_series_note": PRICE_SERIES_NOTE,
         "questions": dict(QUESTIONS),
         "weak_input_rules": dict(WEAK_INPUT_RULES),

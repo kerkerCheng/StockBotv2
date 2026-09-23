@@ -34,9 +34,10 @@ from briefing.analyst_view.contracts import (
     BLOCKED, READY, READY_WITH_FLAGS, WEAK_INPUT_RULES, readiness_class, worst_status,
 )
 from tests.test_alpha_investment_view import _view
-from tests.test_fundamental_model import _run
-from tests.test_implied_return import TODAY, _return, _valued
-from tests.test_valuation_model import _index
+from tests.fixtures_fundamental import CONSENSUS, GRAPH_REF, TARGET, _actuals, _full_set
+
+TODAY = date(2026, 9, 7)
+EDGE = GRAPH_REF.ref
 
 ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT / "briefing" / "analyst_view"
@@ -47,16 +48,14 @@ PKG = ROOT / "briefing" / "analyst_view"
 # ---------------------------------------------------------------------------
 
 def _full_view(*, with_criterion: bool = True, **kwargs: Any) -> AlphaInvestmentView:
-    """⚠ 2026-09-23（Phase 0 Step 0b.1b）：`with_criterion` 已無作用（`entry` panel 與整個
-    `alpha.entry` 在 F 組退役）。參數保留是為了不動幾十個呼叫端；它不再改變回傳的 view。
+    """「上游齊備」的 view：Engine C 的基期觀測與會計年度別共識、假設 ledger 都有。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`with_criterion` 已無作用（`entry` panel 隨 F 組退役）；
+    模型／估值／報酬三個輸入隨 C／H 組退役——上游齊備不再包含任何模型輸出。
     """
-    model = _run(index=_index())
-    valuation = _valued(model)
-    implied = _return(valuation)
-    return _view(fundamental_model=model, valuation=valuation,
-                 valuation_records=list(valuation.assumptions), implied_return=implied,
-                 horizon_records=[implied.horizon],
-                 today=TODAY, **kwargs)
+    bases = {f"eps:{TARGET.end.isoformat()}": "non_gaap", f"revenue:{TARGET.end.isoformat()}": "not_applicable"}
+    return _view(base_actuals=_actuals(), fiscal_consensus=CONSENSUS, consensus_bases=bases,
+                 assumption_records=_full_set(), today=TODAY, **kwargs)
 
 
 def _bare_view(**kwargs: Any) -> AlphaInvestmentView:
@@ -177,7 +176,11 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
     （73 檔全 missing、從未用過）。守的判準一字未改，只是現在的 optional panel 是
     `fundamental`／`bet`／`downside`：**它們缺席只出現在 `optional_unavailable`，不進 blockers。**
     """
-    analyst = build_analyst_view(_bare_view())
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`fundamental` 現在只讀 Engine C 的共識，所以要讓它缺席
+    # 得把共識快照也拿掉（原本內部預測缺席就足以讓它 missing）。判準一字未改。
+    from tests.test_alpha_investment_view import _FakeFundamentals
+
+    analyst = build_analyst_view(_bare_view(fundamentals=_FakeFundamentals(available=False)))
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` panel 退役。
     assert set(OPTIONAL_PANELS) == {"fundamental", "bet"}
     for name in OPTIONAL_PANELS:
@@ -210,10 +213,14 @@ def test_retired_panels_are_gone_from_every_closed_list() -> None:
         assert not hasattr(analyst, retired), retired
         assert retired not in PLAIN_PANEL_TITLES, retired
     # `why` 專用的四個 line role 與 `entry` 的 role 一併退役（沒有 producer 的字彙不留）。
-    for role in ("assumption", "sensitivity", "trace", "epistemics", "entry"):
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：內部預測／比較／proxy／同期分類的 role 也退役。
+    for role in ("assumption", "sensitivity", "trace", "epistemics", "entry",
+                 "internal", "comparison", "market_proxy", "consensus_same_period", "consensus_other_period",
+                 "headline_context", "override"):
         assert role not in LINE_ROLES, role
-    # 三個退役問句不得留在 QUESTIONS（panel 的 questions 會對它驗封閉性）。
-    for q in ("q4_implied_return", "q5_fragile", "q7_payoff"):
+    assert "consensus_fiscal" in LINE_ROLES
+    # 五個退役問句不得留在 QUESTIONS（panel 的 questions 會對它驗封閉性）。
+    for q in ("q4_implied_return", "q5_fragile", "q7_payoff", "q1_internal", "q3_gap"):
         assert q not in QUESTIONS, q
 
 
@@ -240,10 +247,10 @@ def test_absent_cells_still_occupy_a_row_so_the_gap_is_visible() -> None:
     """INV-3：看不見的缺口等於沒有缺口。not_modeled 的格子照樣印一列。"""
     analyst = build_analyst_view(_full_view(with_criterion=True))
     text = render_analyst_view_markdown(analyst).replace("\\", "")
-    assert "內部 FCF 估計" in text and "尚未建模" in text
-    # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本還驗「總報酬（含股利）」與「機率加權期望報酬」
-    # 兩格 not_modeled 照樣印一列——它們住 `implied_return`，隨估值鏈退役。
-    # **判準一字未改**（INV-3：看不見的缺口等於沒有缺口），上面那一格仍然守著它。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：原本驗「內部 FCF 估計」那一格（FY+1 因果橋）——退役。
+    # **判準一字未改**（INV-3：看不見的缺口等於沒有缺口），主詞換成 research panel 裡仍在的 not_modeled 格：
+    # 沒有任何催化劑指名它會裁決哪條假設時，「催化劑 → 假設的連結與熟成度」照樣佔一列。
+    assert "催化劑 → 假設的連結與熟成度" in text and "尚未建模" in text
 
 
 # ---------------------------------------------------------------------------
@@ -254,7 +261,6 @@ def test_review_required_upstream_surfaces_in_readiness_attention_and_markdown()
     from datetime import datetime, timezone
 
     from alpha.refresh import GRAPH_EDGE, ChangeEvent
-    from tests.test_valuation_model import EDGE
 
     edge = ChangeEvent(change_type=GRAPH_EDGE, ticker="COHR", company_id="co:coherent",
                        authority="engine_a://graph_research_provider", changed_ref=EDGE,
@@ -505,12 +511,12 @@ def test_panel_reason_comes_from_the_section_that_caused_the_status() -> None:
     這是 `AGENTS.md` APP 呈現契約禁的形狀：**缺席由產生它的那段程式自己宣告**——
     讓一個沒有缺席的 section 替別人的缺席發言，等於沒有宣告。
     """
-    view = _view(fundamental_model=_run(index=_index()), today=TODAY)
+    view = _full_view()
     analyst = build_analyst_view(view)
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本主詞是 `why`（它取 earnings_bridge／valuation／
     # implied_return 三段最差）。`why` 已退役，改用仍然「多段取最嚴」的 `fundamental`
-    # （internal_fundamentals／consensus／expectation_gap 三段）。**判準一字未改。**
+    # （2026-09-23 C／H 組後剩 consensus／expectation_gap 兩段）。**判準一字未改。**
     panel = next(p for p in analyst.panels if p.key == "fundamental")
     statuses = panel.source_statuses
     worst = panel.status

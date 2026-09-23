@@ -1,18 +1,22 @@
-"""Gap closure（V2，2026-09-15）：**市場承認了嗎**——共識朝我們的看法移動了幾成、股價到了目標價沒。
+"""Gap closure（V2，2026-09-15）：**市場承認了嗎**——共識自判斷日以來移動了多少。
 
-兩個純函式，零相依。它們是**量測不是訊號**（AGENTS「須區分量測、訊號與脈絡」）：不排序、不決定尺寸，
-只回答「自判斷那天以來，共識與價格各走了多少」。
+純函式，零相依。它們是**量測不是訊號**（AGENTS「須區分量測、訊號與脈絡」）：不排序、不決定尺寸，
+只回答「自判斷那天以來，共識走了多少」。
+
+⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`target_reached`（現價對兩個目標價的比較）與
+`bet_recorded_on`（賭注寫下那天）退役——目標價隨估值鏈與 E 組退役，沒有目標價就沒有「到了沒」。
+AGENTS「`realized` 只提醒、不觸發出場」的判準沒退役，它的新家是候選狀態「已定價等回落」（Phase 3）。
+`consensus_progress` 的 `our_value` 今天恆為 None（內部 EPS 已退役）：`closed_fraction` 是 None、不是 0，
+量到的只有共識本身從起點到現值的移動。
 
 - `consensus_progress`：共識序列（日期、值）＋起算日＋我們的值 → 起點、現值、朝我們移動的比例。
   比例＝(現值 − 起點) ÷ `gap_at_start`，其中 `gap_at_start`＝(我們的值 − 起點)；分母為 0 時無定義（None，不是 0）。
   負值＝反向移動。**分母跟著輸出**——它極小時比例會被放大到不可讀（V4，2026-09-19）。
   ⚠ **起算日是呼叫端的責任，而且 base 與 variant 不是同一天**：base 是判斷日，variant 是**賭注寫下那天**。
-- `target_reached`：現價對兩個目標價的機械比較（≥ 即到達）。到達不是「該賣」，是「該重看要不要收割」——
-  這是 L7 出場靠 disproof 的對稱面：出場也要有「對了」的觸發。
 """
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date
 from typing import Any, Mapping, Sequence
 
 
@@ -48,35 +52,6 @@ def consensus_progress(points: Sequence[tuple[date, float]], *, since: date | No
                 "起點＝起算日當天或之後第一筆共識；起點等於我們的值時無定義（分母 0）；"
                 "⚠ gap_at_start 極小時比例會被放大，要連分母一起讀",
     }
-
-
-def bet_recorded_on(model: Any) -> date | None:
-    """賭注寫下那天＝該 overlay 的生效假設裡**最晚**的建立時點（本機日）；沒有就 `None`。
-
-    ⚠ **取最晚不是最早。** 一個賭注可能由多條 override 組成（實測 AXTI 兩條、LITE 兩條），
-    而 `variant` EPS 的**現值**是它們合起來算出來的——最後一條寫下之前，今天這個主張還不完整。
-    取最早會把「主張尚未成形」那段期間的共識變動算成朝它移動，方向恆為對我們有利（INV-6）。
-
-    本機日而非 UTC 日：`consensus_estimates.snapshot_date` 是 ETL 執行日（本機時區），
-    兩邊要用同一把尺，否則跨日的 UTC 時戳會讓起點早一天。
-
-    `model` 只用 duck typing 讀 `overrides`（本模組維持零相依）。撤回的假設本來就不在 `overrides` 裡。
-    """
-    days: list[date] = []
-    for assumption in (getattr(model, "overrides", None) or ()):
-        created = getattr(assumption, "created_at", None)
-        if isinstance(created, str):
-            try:
-                created = datetime.fromisoformat(created)
-            except ValueError:
-                continue
-        if not isinstance(created, datetime):
-            continue
-        try:
-            days.append((created.astimezone() if created.tzinfo is not None else created).date())
-        except (OSError, OverflowError, ValueError):
-            continue
-    return max(days) if days else None
 
 
 def bet_convergence(
@@ -181,16 +156,4 @@ def bet_convergence(
     }
 
 
-def target_reached(*, price: float | None, base_target: float | None, bet_target: float | None) -> dict[str, Any]:
-    if price is None:
-        return {"status": "missing", "reason": "無現價"}
-    out: dict[str, Any] = {"status": "available", "price": price,
-                           "base_reached": (base_target is not None and price >= base_target),
-                           "bet_reached": (bet_target is not None and price >= bet_target),
-                           "base_target": base_target, "bet_target": bet_target}
-    out["any_reached"] = bool(out["base_reached"] or out["bet_reached"])
-    out["rule"] = "現價 ≥ 目標價即「高於」；它同時涵蓋「市場比我們樂觀」與「該收割」兩種情況，只表示該重看，不是賣出指令"
-    return out
-
-
-__all__ = ["bet_convergence", "bet_recorded_on", "consensus_progress", "target_reached"]
+__all__ = ["bet_convergence", "consensus_progress"]

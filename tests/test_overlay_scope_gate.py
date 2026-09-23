@@ -36,7 +36,7 @@ from alpha.errors import ContractViolation
 from alpha.fundamental.assumptions import live_base_keys, parse_assumption_record
 from alpha.fundamental.contracts import FiscalPeriod
 from alpha.providers.assumptions import append_assumption_record, read_assumption_records
-from tests.test_fundamental_model import TARGET, _assumption
+from tests.fixtures_fundamental import TARGET, _assumption
 
 UTC = timezone.utc
 OTHER = FiscalPeriod(end=date(TARGET.end.year + 1, TARGET.end.month, TARGET.end.day),
