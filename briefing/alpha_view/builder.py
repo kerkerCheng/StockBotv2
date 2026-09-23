@@ -1276,8 +1276,8 @@ def build_alpha_investment_view(
     # =======================================================================
     c = context.consensus
     cons_as_of = _freshness_as_of(build, "consensus")
-    # ⚠ 刻意不算 target_vs_price：那個比值已由 scripts/alpha_expectation_gap.py 產出，
-    # view 只讀 authority，不長第二份算式（審計 2026-09-05 第 5 條）。
+    # ⚠ 刻意不算 target_vs_price：view 只讀 authority，不長第二份算式（審計 2026-09-05 第 5 條）；
+    # 原本產出那個比值的 scripts/alpha_expectation_gap.py 已於 2026-09-23（Phase 0 Step 0b.2）退役。
     consensus_items = (
         _observation("analyst_count", "分析師目標價家數", c.analyst_count, authority=A_SNAP,
                      unit="count", as_of=cons_as_of, freshness=cons_fresh,

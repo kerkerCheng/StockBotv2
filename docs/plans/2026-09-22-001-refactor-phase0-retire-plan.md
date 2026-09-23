@@ -60,8 +60,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0b.1b-F | F 組整組退役：entry criterion（進場門檻） | ✅ | c1d0331 |
 | 0b.1b-E | E 組整組退役：賭注四價 overlay（含 downside、target_reached） | ✅ | bd34a63 |
 | 0b.1b-C/H（1/2） | 估值品質計數器（closure 三個數＋webapp 消費端） | ✅ | 3be1756 |
-| 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section、刪 `alpha/valuation`／`alpha/implied_return`／`alpha/fundamental` 模型半邊（§0.9；偏差 §0.6 #18–27） | ✅ | |
-| 0b.2 | 刪估值鏈 | ○ | |
+| 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section、刪 `alpha/valuation`／`alpha/implied_return`／`alpha/fundamental` 模型半邊（§0.9；偏差 §0.6 #18–27） | ✅ | 1ed420e |
+| 0b.2 | 刪估值鏈（收尾：expectation_gap 腳本、`multiple_horizon` 讀寫；偏差 §0.6 #28–31） | ✅ | |
 | 0b.3 | 排序與籃子 | ○ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
 | 0c | 池子 17 筆 drop | ✅ | cd275e3 |（**先於 0b 執行**：兩者無相依，0b.1 撞到 §6「切不開」要停，先把獨立的 Step 收掉）|
@@ -111,6 +111,10 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 24 | 0b.1b-C/H 2/2 | 「`test_fundamental_model` 整檔退役」 | 45 條測試退役，但它的**資料夾具**（基期觀測／假設／共識）被 7 個存活測試檔引用 → 搬到 `tests/fixtures_fundamental.py`（不以 `test_` 開頭，pytest 不收集） | 存活測試守的是 refresh、口徑核實、共識 section、overlay ledger 閘門，需要同一組夾具；`_run()` 不搬（沒有東西可跑） |
 | 25 | 0b.1b-C/H 2/2 | `test_full_chain_acceptance`「批 2 重寫成新管線」 | 本步先做一半：16 條估值鏈測試退役、12 條改主詞（refresh 矩陣改成 axis／assumption key、PIT 改驗假設不漏、黑箱 CLI 改比現價與共識格）；整檔重寫仍留給 0b.2 | 這一步要全綠（含 Neo4j 在線的整合測試）；新管線要的讀圖 ledger／三題 absence 還沒有 |
 | 26 | 0b.1b-C/H 2/2 | 短評 placeholder | `base_target`／`base_return`／`value_date` 與帶參數的 `{assumption:…}` 四個 placeholder 的來源退役，值改 `None` → 印「（尚無）」並標 partial；`sell_side_target`（賣方目標價均值，A2）照填；**placeholder 字彙一個不刪** | append-only 短評紀錄引用它們（L10）；與 E 組處理 `{bet_*}` 同一條 |
+| 28 | 0b.2 | 「`alpha/fundamental/`（只留資料契約，若已搬則整包刪）」 | **留在原地**：`contracts.py`（會計期間、假設紀錄、Engine C 觀測與共識型別）、`assumptions.py`（ledger 解析／選取／supersede）、`compare.py`（口徑核實與基期對帳）三檔各有活消費端（provider、refresh、read model 的共識 section、催化劑熟成度）；不搬到 `alpha/contracts.py` | 搬家只會把 H 組 regex 的 `alpha\.fundamental` 命中變成零，不改任何行為——那是為了 grep 好看而動 20 個 import（L17：general 到資料支持的那一格為止）。結案 gate 8 走 keep-list：`kept_file: 資料契約與 ledger 邏輯` |
+| 29 | 0b.2 | 「`test_full_chain_acceptance` 重寫成新管線（圖 → 讀圖 ledger → 敘事 → 三題 absence → 心跳）」 | **延到 Phase 2／3**：2/2 已把 16 條估值鏈測試退役、12 條改主詞（refresh 矩陣、PIT、黑箱 CLI），檔頭寫明「會重寫」；新管線的四節裡讀圖 ledger 與三題 absence 還不存在 | 現在重寫只能寫出對不存在機制的測試（空跑，L14-4）；留 12 條活的判準比留一份假的重寫誠實 |
+| 30 | 0b.2 | 批 2 驗收「C／D／F／H 四組在 code 命中 0」（已 amend 為 keep-list） | 剩餘命中逐條分類：退役註記（各檔）、legacy key／placeholder（`calibration_refs`、`{base_target}`…）、Engine C 資料層（`engine_c/*`、`alpha/providers/fundamentals.py`、`pe_forward`）、refresh 字彙常數、批 3 的 `webapp/basket.py`／app.js 籃子頁、以及 `alpha/context.py` 的 PE 比值 proxy＋refresh 的 `market_implied_eps_growth` artifact | 最後一項**不在 Phase 0 退役清單**：它是研究 packet 給 session 判 Q4 的 heuristic proxy（`alpha/context`，核心研究層），read model 的呈現格已於 2/2 拿掉；拿掉 packet 裡的量要另開決定（Phase 3「已定價嗎」的資料源之一）。結案 keep-list 的類別：`kept_file` |
+| 31 | 0b.2 | 未提 `scripts/repricing_check.py`／`scripts/closure_probe.py`（H 組命中） | **留**：前者是「已被定價了嗎」的股價變化分解（唯讀算術，2026-08-18；Phase 3 三題的前身），後者只在 docstring 提到口徑核實 | 不在退役清單；H regex 命中的是 `pe_forward`（Engine C 欄位名） |
 | 27 | 0b.1b-C/H 2/2 | 「argument 少掉的只能是估值來源的段」 | 「數字怎麼算出來」「和市場差在哪」兩段退役（E 組已拿掉「賭注」），六段變三段；句型 `numbers_paragraph`／`market_paragraph`／`bet_paragraph` 刪；`timeline_paragraph` 不再收 value_date／horizon_end／reached | ROADMAP 第 82 行的驗收條件；實測見本 Step 八欄（各檔段數前後對照） |
 
 ## 0.8 ✅ 已裁決（2026-09-23）：**A——`argument` 升核心、`why` 退役**（原 escalation 紀錄留存於下）

@@ -228,7 +228,7 @@ def _implied_valuation(
         else:
             # 負的 forward PE＝分析師預估下一年度仍虧損，比值無意義（POET 現值 −43）。
             # 不擋會算出 −2.4 並被讀成「−240%」——一個看起來像資訊、實際什麼都不是的數字。
-            # 與 scripts/alpha_expectation_gap.py 的 `pe_forward_nonpositive` 同一條判準。
+            # （原本與 scripts/alpha_expectation_gap.py 的 `pe_forward_nonpositive` 同一條判準；該腳本已於 2026-09-23 退役。）
             method_parts.append("implied_growth=不可算（forward／trailing PE 非正，比值無意義）")
     if revision and revision.get("comparable"):
         # Phase 4 的核心：**估計修正與股價變動分開**。原版取 `pe_forward` 的 30 日

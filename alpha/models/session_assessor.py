@@ -139,9 +139,8 @@ JUDGMENT_SCHEMA: Mapping[str, Any] = {
     "direction": "long | short | neutral",
     "confidence": "0..1",
     "expected_horizon": "例 '2-4 quarters'（**多久會被驗證**，不是倍率射程）",
-    "multiple_horizon": "選填。**這個 thesis 主張的倍率在哪一年實現**，會計年度結束日 YYYY-MM-DD。"
-                        "⚠ 不填就是「還沒有人寫下來」，多年橋會誠實 missing；"
-                        "**不得從 expected_horizon 換算**——那會把「多久被驗證」偷換成「多久兌現」",
+    # ⚠ 2026-09-23（Phase 0 Step 0b.2）：`multiple_horizon`（倍率在哪一年實現）隨多年反向橋退役——
+    # 既有判斷檔裡的值留著（L10），只是不再被讀；「這個結構允不允許翻倍」由讀圖（Phase 2）回答。
     "thesis": "一段話",
     "variant_view": "市場隱含 X／本 thesis 認為 Y／催化劑 Z（三段都要）",
     "bull_case": "…", "base_case": "…", "bear_case": "…",
@@ -424,7 +423,6 @@ def compose_signal(
         direction=str(judgment.get("direction") or "neutral"),  # type: ignore[arg-type]
         confidence=float(judgment.get("confidence") or 0.0),
         expected_horizon=str(judgment.get("expected_horizon") or "unspecified"),
-        multiple_horizon=_as_date(judgment.get("multiple_horizon")),
         thesis=str(judgment.get("thesis") or ""),
         variant_view=str(judgment.get("variant_view") or ""),
         bull_case=str(judgment.get("bull_case") or ""),
@@ -448,18 +446,6 @@ def compose_signal(
         },
         **{f"{axis}_score": scores[axis] for axis in AXES},
     )
-
-
-def _as_date(value: Any) -> date | None:
-    """`multiple_horizon` 的解析。**解不出來就是 None**——不猜、不從別的欄位換算。"""
-    if isinstance(value, date):
-        return value
-    if not value:
-        return None
-    try:
-        return date.fromisoformat(str(value)[:10])
-    except ValueError:
-        return None
 
 
 def _public(snapshot: Any) -> dict[str, Any]:

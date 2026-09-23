@@ -233,11 +233,9 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
 
 
 def _brief_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """投資人短評（optional）：七句＋一把尺＋一顆燈＋（有寫倍率射程時）一句「要翻倍需要什麼為真」。
+    """投資人短評（核心）：七句＋一顆燈。**每一格都是 read model 的同一個 Datum。**
 
-    **每一格都是 read model 的同一個 Datum**。2026-09-20 起多一句：它**只在這一檔寫下了
-    `multiple_horizon` 時才存在**——沒寫就沒有那一行（不是印「還沒寫」；71/73 檔都沒寫，
-    逐檔印是噪音，全體缺口由心跳段 4 的常駐計數器負責）。
+    ⚠ 2026-09-23（Phase 0）：那把尺（0b.1a）與「要翻倍需要什麼為真」那一句（D 組，讀 `multiple_horizon`）已退役。
     """
     ib = view.investor_brief
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`brief_scale`（那把尺）與 `brief_multiple_question`
