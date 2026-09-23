@@ -25,7 +25,7 @@
 
 | Phase | plan 檔 | 狀態 |
 |---|---|---|
-| 0 拆 | [2026-09-22-001](2026-09-22-001-refactor-phase0-retire-plan.md) | active |
+| 0 拆 | [2026-09-22-001](2026-09-22-001-refactor-phase0-retire-plan.md) | completed（2026-09-23；closeout `docs/reports/2026-09-23-phase0-closeout.md`） |
 | 1 等待與心跳 | 尚無 | — |
 | 2 讀圖兩種 kind 加走圖 | 尚無 | — |
 | 3 候選狀態加三題 | 尚無 | — |
@@ -54,6 +54,6 @@
 | [Household Capital Authority Phase II-A (2026-07-28)](2026-07-28-002-feat-household-capital-authority-plan.md) | 私人 Capital Authority 唯讀 adapter、point-in-time capital view 與 Daily 四欄輸出 | completed |
 | [Portfolio Risk Policy Redesign (2026-07-29)](2026-07-29-001-refactor-portfolio-risk-policy-plan.md) | 只保留 ETF 槓桿／單筆 hard block、known issuer 穿透、drawn debt 與低雜訊事件監控 | completed |
 | [Serenity 30-Day Research Campaign (2026-07-29)](2026-07-29-002-feat-serenity-30d-research-campaign-plan.md) | 30 天 X 分頁回補、圖片快取、scoped exploration triage 與 robotics 一手追源 | completed |
-| [Phase 0 拆：退役估值鏈、排序驅動、decision_lab 研究側 (2026-09-22)](2026-09-22-001-refactor-phase0-retire-plan.md) | 給便宜模型的完整執行 plan：0a 停跑、0b 四批刪除（先斷 import 再刪）、0c 池子；驗收＝殭屍 grep 歸零、Decision Store sha256 不變 | active |
+| [Phase 0 拆：退役估值鏈、排序驅動、decision_lab 研究側 (2026-09-22)](2026-09-22-001-refactor-phase0-retire-plan.md) | 給便宜模型的完整執行 plan：0a 停跑、0b 四批刪除（先斷 import 再刪）、0c 池子；驗收＝殭屍 grep 差集歸零、Decision Store sha256 不變 | completed（2026-09-23） |
 
-**目前 active plan 只有一份：Phase 0 拆（2026-09-22）。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active plan（Phase 0 拆已於 2026-09-23 結案；Phase 1 的 plan 由 `/phase-plan` 產生）。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。

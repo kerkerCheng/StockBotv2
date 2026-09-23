@@ -25,9 +25,9 @@
 
 | # | gate | 結果 | 查證 |
 |---|---|---|---|
-| 1 | `pytest -q` 全綠，測試數與基準的差＝刪除的測試檔 | ✅ **2180 passed, 1 skipped**（基準 2823 passed）；刪 **52 檔**＋改名 2 檔（逐檔守什麼見 §2） | `python -m pytest -q`；`git log --diff-filter=D --name-only --pretty=format: d6e3fca..HEAD -- tests/ \| sort -u` |
+| 1 | `pytest -q` 全綠，測試數與基準的差＝刪除的測試檔 | ✅ **2180 passed, 1 skipped**（基準 2823 passed）；測試檔 **175 ＝ 226（基準）− 52（刪）＋ 1（新增 `tests/test_hard_caps.py`）**，另 2 檔改名（逐檔守什麼見 §2） | `python -m pytest -q`；`git log --diff-filter=D --name-only --pretty=format: d6e3fca..HEAD -- tests/ \| sort -u` |
 | 2 | `python -m audit invariants` 綠 | ✅ 13 項 PASS／0 FAIL（共檢查 4288 筆） | `python -m audit invariants` |
-| 3 | materialize 前後 73 檔 `brief`／`argument`／`research` 文字不變 | ✅ materialize 79/79 成功（73 檔＋6 個 state kind）；**73/73 檔**的 `brief`／`argument`／`research` 逐面板 digest 前後**逐字相同**（0 個面板不同）。與基準的差異只有 0b.1a／0b.3 已記錄的：`why` 面板退役（§0.8 裁決 A）、`argument` 由六段變三段（§0.6 #27）、COHR／GFS 的「鏈」段同分邊列舉順序（§0.6 #41） | `python scripts/analyst_view_text_digest.py --per-panel` 前後比對（`argument` 的「鏈」段同分邊列舉順序差異見 plan §0.6 #41） |
+| 3 | materialize 前後 73 檔 `brief`／`argument`／`research` 文字不變 | ✅ materialize 79/79 成功（73 檔＋6 個 state kind）；**73/73 檔**的 `brief`／`argument`／`research` 逐面板 digest 前後**逐字相同**（0 個面板不同）。與基準的差異只有 plan 已記錄的：`why` 面板退役（§0.8 裁決 A）、`argument` 由六段變三段（§0.6 #27）、COHR／GFS 的「鏈」段同分邊列舉順序（§0.6 #41）、三本短評的估值 placeholder 印「（尚無）」（§0.6 #26）、`{market_multiple}`／`{analyst_count}` 改由 Engine C 共識快照填（§0.6 #58；R2 實測 COHR 34.1→23.0 倍、LITE 44.0→24.0 倍、25→26 位）。R2 另以基準版本程式重建 73 檔逐面板逐句比對：research 71/73 逐字相同（COHR／LITE 只少退役假設的「等待中」notes）、argument 鏈／風險段 71/73 逐字相同、timeline 73 檔只有刪句 0 改句、our_bet 70/73 逐字相同（3 檔只差 placeholder） | `python scripts/analyst_view_text_digest.py --per-panel` 前後比對（`argument` 的「鏈」段同分邊列舉順序差異見 plan §0.6 #41） |
 | 4 | 無新 dual authority：`record_live_choice(` 呼叫端＝0 | ✅ 0 個呼叫端（只剩 store.py 自己的 docstring 與 keep-list 理由）；`record_live_choice`／`record_live_fill` 直接 raise `FrozenStoreError` | `grep -rn "record_live_choice(" --include=*.py .` |
 | 5 | 心跳五段照印；拿掉的段落印 `not_yet_recorded` | ✅ 五段標題都在；段 2「候選狀態板未落地（not_yet_recorded）」「已定價嗎（財務三題）未落地（not_yet_recorded）」；段 4「賭注帳／量的候選／要幾倍…（not_yet_recorded）」 | `python -m crons.heartbeat --out <temp>` |
 | 6 | Point-in-time 測試綠 | ✅ 含在全測試（`tests/test_alpha_point_in_time.py`、`test_alpha_as_of_projection.py`、`test_alpha_view_as_of_cohr.py`）；audit `PointInTime` PASS | 同 1、2 |
@@ -163,9 +163,21 @@
 6. **`watch_decision` 的 go 語意**（ROADMAP Phase 1 已列）。
 7. **`ra_admission` 的 receipt 契約改為三欄**（`action;digest;commit`，cohort 已退，plan §0.6 #47）：文件與 skill 已同步；Phase 1 若要「入圖後自動登記 watch」，接點在 `complete_ra_admission`。
 8. **`config/decision_blockers.json` 的角色**：現在只服務讀凍結 payload 與 `resolution_mode` 分類；Phase 1 watch registry 的「等你決定／等事件」分類要不要沿用它的 `resolution_mode` 字彙，還是另立？
-9. **舊 Decision Store 的 `research_work_orders`（160 筆）與 `probe_lifecycle_epochs`（13 筆）**：audit `Lifecycle`／`QueueLiveness` 仍讀它們（PASS）；Phase 1 一個 registry 落地後，audit 的這兩項要不要改讀新 registry。
+9. **`{assumption:…}`／`{bet_assumption:…}` 要不要從仍活著的假設 ledger 回填**（R2 #4）；**五個舊店讀取端改 `mode=ro`**（R2 #6）；**`argument` 標題拿掉「賭注」**（R2 #5）。
+10. **舊 Decision Store 的 `research_work_orders`（160 筆）與 `probe_lifecycle_epochs`（13 筆）**：audit `Lifecycle`／`QueueLiveness` 仍讀它們（PASS）；Phase 1 一個 registry 落地後，audit 的這兩項要不要改讀新 registry。
 
-## 8. 附錄：本次實跑的命令
+## 8. R2 結果（2026-09-24 04:xx，乾淨 context 的 reviewer，唯讀）
+
+**Verdict：GO。** 九項全 ✅；Findings 全部 non-blocking，沒有一項動到四個 gate、資本、append-only authority 或可執行面。
+結案 commit 已修的：#1 ARCHITECTURE §6.7 殘段（主流程「終點是 implied return」與面板圖的 `why`／`entry`）、#2 OPERATIONS 第 735 行
+未劃線的 `decision today`、#7 keep-list 一條腐壞理由、#9 gate 1 測試檔數算式、#3 gate 3 引用補 §0.6 #26／#58。
+**留給 Phase 1 決定的（併入 §7）：** #4 `{assumption:…}`／`{bet_assumption:…}` 的來源（假設 ledger）依 §0.6 #28 仍活著，卻依 #26 印「（尚無）」——要不要從 ledger 回填；
+#5 `argument` 面板標題仍寫「鏈、賭注、風險與認錯條件、時間表」而 bet 段已退（純呈現，改標題會動 artifact 文字，留給 Phase 1／2 面板重排）；
+#6 五個 kept_file（`webapp/materialize.py`、`engine_b/routine_config.py`、`audit/sources.py`、`thesis/generate_lane_memo.py`、`scripts/dualrun_axis_conversion.py`）
+用 `open_default_store()`（可寫 handle）而非 `mode=ro` 開舊店——用法唯讀、sha256 未變，但 A5 凍結應由連線層強制（L15）；
+#8 `.pytest_tmp/patch_*.py` 草稿（git-ignored）仍 import 已刪模組，grep 腳本已排除，可清；#10 `forward_view_backlog` 11→70 的主詞已換（§7 #2）。
+
+## 9. 附錄：本次實跑的命令
 
 ```powershell
 python -m pytest -q

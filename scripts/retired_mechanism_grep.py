@@ -83,7 +83,7 @@ KEEP: dict[tuple[str,str],str] = {
     ("webapp/api.py","B"): "retirement_note: /basket 路由退役註記（0a.2）",
     ("webapp/static/app.js","B"): "retirement_note: 結構表區塊註記寫明籃子頁移除；positions 頁「籃子總報酬」量測用語",
     ("alpha/gap_closure.py","B"): "boundary_sentence: 引 AGENTS「籃子總報酬＝最大單檔＋其餘」的量測取捨",
-    ("alpha/abstention/contracts.py","B"): "kept_file: abstention kind `bet` 的字彙註記提到籃子（原消費端）；ledger 資料留（L10），註記待 0b.4 E 組收尾改寫",
+    ("alpha/abstention/contracts.py","B"): "kept_file: ABSTENTION_SUBJECTS 的 bet 字彙是 append-only abstention ledger 的 subject（資料留，L10）；第 49／53 行的籃子註記是歷史消費端的說明，Phase 0 未改寫（R2 2026-09-24 指出，屬註記非機制）",
     ("alpha/providers/market_normalization.py","B"): "retirement_note: 寫明 --basket 與 alpha_screen_check 已退役、Phase 3 候選板接手",
     ("briefing/analyst_view/compose.py","B"): "boundary_sentence: AGENTS 判準句「主題籃子只當脈絡、不設門檻」",
     ("crons/daily_brief_prompt.md","B"): "retirement_note: --basket 已於 0a.1 移除的註記",

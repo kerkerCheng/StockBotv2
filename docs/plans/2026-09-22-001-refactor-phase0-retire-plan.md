@@ -1,7 +1,9 @@
 ---
 date: 2026-09-22
 topic: phase0-retire
-status: active
+status: completed
+completed_at: 2026-09-23
+closeout: docs/reports/2026-09-23-phase0-closeout.md
 derived_from: docs/ROADMAP.md（Phase 0）、docs/brainstorms/2026-09-22-graph-first-direction-decision.md（G1–G12）
 ---
 
@@ -65,7 +67,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0b.3 | 排序與籃子：`rank_bottlenecks` → `structure_table`、state kind `ranking` → `structure_table`、籃子模組刪（偏差 §0.6 #32–#41；續工落點 §0.10） | ✅ | 7db4e1f |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件（三個 commit：1/3 硬擋 8d62c11、2/3 研究側 27007f9、3/3 config／活文件／keep-list；偏差 §0.6 #42–#57） | ✅ | 8d62c11＋27007f9＋3/3 |
 | 0c | 池子 17 筆 drop | ✅ | cd275e3 |（**先於 0b 執行**：兩者無相依，0b.1 撞到 §6「切不開」要停，先把獨立的 Step 收掉）|
-| 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅ | ○ | |
+| 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅（R2 GO：GO，2026-09-24，findings 全 non-blocking，見 closeout §8） | ✅ | 541b416＋本 commit |
 
 **開工／續工指令：貼 `/phase-run` 即可**（skill 會照下面這段做；不能用 skill 時貼這段原文）：
 
@@ -142,6 +144,8 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 55 | 0b.4（3/3） | 「活文件：OPERATIONS 的 decision_lab 命令段、ARCHITECTURE §8.2 與 §7／§9、CONCEPTS 詞條同 commit 更新」 | 覆蓋**八組**（§0.10 #2）：整節退役的 9 段（OPERATIONS 5：decision_review 全函數、Engine D 命令、2026-09-09／09-05 兩份 sandbox review、Valuation／Implied／Entry 六小節；ARCHITECTURE 4：§6.2、§6.4–6.6、§6.10、§6.13）**逐字封存**到 `docs/archive/2026-09-23-phase0-retired-sections.md`，原位留 stub；散句改退役註記；§7 改寫成 frozen；§8.2「煞車仍在」列改指 `record_trade.py`；CONCEPTS 的 Engine D／Investment Process 加區塊 banner，10 個 read-model 詞條與判斷錯了值多少／多年反向橋各加「已退役」行 | AGENTS「被本檔取代的舊章逐字封存於 docs/archive」；活文件剩餘命中逐句列在 3/3 八欄，只剩退役註記、禁止句與 regex 過度匹配（`calibrat` 命中活的假設 ledger ref 角色、`籃子總報酬` 是 AGENTS 量測用語） |
 | 56 | 0b.4（3/3） | 「驗收：殭屍 grep 的 E、G 兩組命中 0」（已 amend 為 keep-list 差集） | keep-list 由 53 條（A／B）補到 **288 條**（C 49、D 15、E 36、F 5、G 95、H 40，扣 app.js 重複列）；三個數字 0／0／0 | 每條理由屬五類之一並指得回 plan §0.6 或 ROADMAP 的「留」；結案 R2 逐條審 |
 | 57 | 0b.4（3/3） | 「`config/decision_blockers.json`、`config/engine_c_observation_fields.json` 裡只服務 payoff／估值的 blocker 碼與欄位移除」 | 只移除 `sheet_only_holding` 一條（它的 producer 是已刪的 decision collector）；其餘碼（catalyst_missing、market_stale、assessment_context_mismatch…）**不刪**，只把 next_step 的散文改成「歷史 payload 才會出現此碼、reassess 已退役」；`_comment` 標明本檔從此只服務讀凍結歷史。`engine_c_observation_fields.json` 只改三段散文（_authority_contract、runway why、fx_rate why），欄位一個不刪；`authority_tokens.json` 的 `_frozen_mapping_note` 改寫 | 這些碼凍在舊店的 decision payload 裡，registry 是讀它們的唯一說明權威（L10：拿不回來的只能 append）；刪碼會讓 audit 把歷史 payload 判成未登記。欄位字彙沒有一個是「只服務 payoff」的——實測 grep 到的是 why 散文 |
+| 58 | 0b.1b-C/H 2/2 | 短評 placeholder 的來源（#26 只記了估值 placeholder 印「尚無」） | `{market_multiple}`／`{analyst_count}` 改由 Engine C 共識快照（`forward_pe`／analyst_count）填，不再由兩桿拆解算：COHR 34.1→23.0 倍、LITE 44.0→24.0 倍、25→26 位（1ed420e commit 訊息有記，plan 漏記；R2 2026-09-24 #3 補） | 同一格先後承載兩種口徑（L12），首屏那句「現價對明年獲利付 N 倍」引用的倍數定義換了而畫面沒有口徑標示。Phase 3「已定價嗎」落地前，該 slot 應印口徑或標 partial——列入 closeout §7 |
+| 59 | 結案 | 「R2 回 GO 後：ROADMAP ✅、README completed，commit、push」 | 同一 commit 順手修 R2 四條十行內文件殘句（ARCHITECTURE §6.7、OPERATIONS 735、keep-list 一條理由、closeout gate 1／3 引用）；其餘六條 non-blocking 記進 closeout §8 與 §7 待決 | 都是讓 closeout 自己的宣稱（「活文件剩餘命中只剩五類」）成立的修正，不動任何機制；NO_GO 才不自動修，GO 的 non-blocking 修文件不違反「不自動 repair loop」 |
 
 ## 0.8 ✅ 已裁決（2026-09-23）：**A——`argument` 升核心、`why` 退役**（原 escalation 紀錄留存於下）
 

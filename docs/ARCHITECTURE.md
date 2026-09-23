@@ -393,25 +393,24 @@ Analyst View 的頭條那把尺、q4／q7 兩個問句、`briefing valuation／i
 **角色一句話：把 canonical read model 依「使用者打開一檔股票時會依序問的六個問題」重新投影，
 讓人在很短時間內看懂 StockBot 相信什麼、跟市場差在哪、怎麼算到這裡、最弱假設是什麼、什麼會讓結論需要重看。**
 
-**先記下產品決策（它決定這一層長什麼樣）：** stock-level **主流程**是
-`Evidence → Internal Forecast → Valuation／Future Target Value → Horizon → Implied Return`，
-**終點是 implied return**；`EntryCriterion`／hurdle 是 **optional analytical capability**，
-**不是必填資料，也不是 research completeness gate**。沒有 hurdle 時系統只說
-「optional entry threshold unavailable」，**不得把這檔標成研究不完整**，也**不得**為了讓自己有答案
-而要求使用者宣告一個固定的 10%／15%／20%。機會成本、風險調整後 hurdle 與跨標的比較留給未來的
-Portfolio／Investor Policy 階段。
+**產品決策（2026-09-23 Phase 0 改寫）：** 原本的 stock-level 主流程「Evidence → Internal Forecast → Valuation → Horizon →
+Implied Return，終點是 implied return；EntryCriterion 是 optional analytical capability」整條已隨估值鏈退役（G3：財務只回答三題，
+不得長回估值模型）。現在這一層的單位是**句與段**：短評（session 寫）→ 論證（鏈／時間表／風險）→ 研究（反證與檢核點）→
+歸零旗標；`fundamental` 降為選配；readiness 只看核心面板（`headline`／`brief`／`argument`／`research`／`wipeout`），
+optional 缺席不得拉低它，也不得為了讓畫面「完整」補任何預設值。
 
 ```
 AlphaInvestmentView（§6.1 canonical read model；18 個 section，依資料結構排列）
         │  build_analyst_view（純函式；只組裝／排序／label）
         ▼
 AnalystView ── headline   （現在多少錢：只有現價｜refresh／review state；2026-09-23 起無目標價、無隱含報酬）
-            ├─ fundamental（Q1 內部 revenue／EPS｜Q2 同期共識｜Q3 數值 gap｜口徑與會計期間）
-            ├─ why        （Q5 生效假設＋basis｜脆弱輸入｜既有敏感度｜算式｜證據）
+            ├─ brief      （短評：session 寫的句，數字由 authority 填 placeholder；沒寫就「還沒寫短評」）
+            ├─ argument   （論證：鏈／風險與認錯條件／時間表；2026-09-23 起 numbers／market／bet 三段退役）
             ├─ research   （Q6 Q1–Q5／thesis／催化劑／disproof／missing・stale・review_required）
-            └─ entry      （**optional**：有判準就顯示 analytical entry threshold；沒有就 Not set (optional)）
+            ├─ wipeout    （歸零旗標四盞：只給燈不給數字；灰＝沒量到）
+            └─ fundamental（**optional**：Engine C 原始數字與同期共識；`why`／`entry` 兩個面板已於 Phase 0 退役）
                 │
-        readiness（只看核心四段）＋refresh 摘要＋limits（「不是什麼」）
+        readiness（只看核心面板 headline／brief／argument／research／wipeout）＋refresh 摘要＋limits（「不是什麼」）
                 │
      `python -m briefing analyst-view <T> [--as-of] [--format markdown|json] [-o]`
 ```
