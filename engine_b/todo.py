@@ -222,14 +222,10 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
     item_type = str(item["type"])
     if item_type == "lead_research":
         raise TodoError("legacy lead 不得在 pq2 go；請先執行 todo sync 移回 pq1")
-    if item_type == "decision_review":
-        if item.get("dispatch_status") not in {"completed", "parked"}:
-            raise TodoError("decision_review 不得 bare go；請先 dispatch 並完成 pq1 checkpoint")
-        if not receipt.strip() or receipt != item.get("dispatch_receipt"):
-            raise TodoError("decision_review receipt 必須等於 terminal pq1 checkpoint receipt")
-        if item.get("dispatch_status") == "completed" and not receipt.startswith("decision:pd_"):
-            raise TodoError("completed decision_review 必須附新 decision receipt")
-        return
+    if item_type in {"decision_review", "sheet_only_holding"}:
+        # ⚠ 2026-09-23（Phase 0 Step 0b.4）：兩個 legacy kind 的 go 語意（dispatch／reassess／
+        # decision receipt）隨 decision_lab 研究側退役。池裡若還有歷史項目只能 drop。
+        raise TodoError(f"{item_type} 是 legacy 型（Phase 0 機制退役）：不得 go；歷史項目請 drop")
 
     if item_type == "thesis_mutation":
         raise TodoError(
@@ -266,26 +262,22 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
     fields = _receipt_fields(receipt)
 
     if item_type == "ra_admission":
-        if set(fields) != {"action", "digest", "commit", "cohort"}:
-            raise TodoError("ra_admission receipt 必須含 action、digest、commit、cohort")
+        # ⚠ 2026-09-23（Phase 0 Step 0b.4）：receipt 不再帶 `cohort`——Decision cohort handoff
+        # 隨 decision_lab 研究側退役；入圖本身已 durable，pq2 授權的就是入圖。
+        if set(fields) != {"action", "digest", "commit"}:
+            raise TodoError("ra_admission receipt 必須含 action、digest、commit")
         if fields["action"] != item["ref_id"]:
             raise TodoError("ra_admission receipt 的 action 不符 exact pq2 item")
         if not _SHA256_RE.fullmatch(fields["digest"]):
             raise TodoError("ra_admission receipt digest 必須是 64 位 sha256")
         if fields["commit"] != "not_required" and not _GIT_COMMIT_RE.fullmatch(fields["commit"]):
             raise TodoError("ra_admission receipt commit 必須是 40 位 Git SHA 或 not_required")
-        # `not_applicable` 的唯一合法來源是 handoff 自己回報主詞不是公司
-        # （decision cohort 是公司形狀的）。語意照 `commit:not_required` 的先例：
-        # **把缺席寫出來**，不假造一個 dc_ 讓稽核以為有 cohort 在追蹤。
-        if fields["cohort"] != "not_applicable" and not fields["cohort"].startswith("dc_"):
-            raise TodoError("ra_admission receipt 必須含 Decision cohort 或 not_applicable")
         completion = item.get("completion_authority") or {}
         if (
             completion.get("action_digest") != fields["digest"]
             or completion.get("commit") != fields["commit"]
-            or completion.get("cohort_id") != fields["cohort"]
         ):
-            raise TodoError("請用 todo complete-ra 驗證 apply／publish／Decision handoff 後再結案")
+            raise TodoError("請用 todo complete-ra 驗證 apply／publish 後再結案")
         return
 
     if item_type == "thesis_lifecycle":
@@ -293,11 +285,6 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
             raise TodoError("thesis_lifecycle receipt 必須含 lifecycle 與 commit")
         if fields["lifecycle"] != item["ref_id"] or not _GIT_COMMIT_RE.fullmatch(fields["commit"]):
             raise TodoError("thesis_lifecycle receipt 必須對應 exact thesis 與 40 位 Git SHA")
-        return
-
-    if item_type == "sheet_only_holding":
-        if set(fields) != {"decision"} or not fields["decision"].startswith("pd_"):
-            raise TodoError("sheet_only_holding receipt 必須是 decision:<decision_id>")
         return
 
     if item_type == "manual":
@@ -368,182 +355,6 @@ def resolve(
     return item
 
 
-def dispatch_decision_review(
-    pool: dict[str, Any],
-    n: int,
-    *,
-    store: Any,
-    at: str | None = None,
-) -> dict[str, Any]:
-    """把使用者核准的 decision review 轉為持久 pq1 job，不先 resolve pq2。"""
-
-    item = get(pool, n)
-    if item["type"] != "decision_review":
-        raise TodoError(f"[{n}] 不是 decision_review，不能 dispatch 到 gap pq1")
-    cohort_id = str(item["ref_id"])
-    if not cohort_id.startswith("dc_"):
-        raise TodoError("全域 authority blocker 沒有 bounded cohort work order，需依 hint 修復")
-    work_order = store.latest_research_work_order(cohort_id)
-    if work_order is None:
-        raise TodoError(
-            f"cohort {cohort_id} 的最新 decision 沒有 research work order"
-            "——代表 coverage 已無 blocker，沒有 bounded gap 可補。若是因為出現新證據而"
-            "要重看，該走 reassess 產生新 decision，不是 dispatch 舊 work order。"
-        )
-    if (
-        str(work_order.get("status")) in {"queued", "researching", "awaiting_approval"}
-        and item.get("dispatch_ref") == str(work_order["work_order_id"])
-    ):
-        # 同一 bounded job 已在 pq1 中；重送不建立新的 go event，也不重複提醒。
-        item["dispatch_status"] = str(work_order["status"])
-        return {"item": item, "work_order": work_order}
-    stamp = at or _now()
-    dispatch_attempt = 1 + sum(
-        1
-        for entry in pool["log"]
-        if entry.get("n") == int(n) and entry.get("verb") == "pq1_queued"
-    )
-    operation_key = f"todo:{n}:go:{dispatch_attempt}"
-    transitioned = store.transition_research_work_order(
-        work_order_id=str(work_order["work_order_id"]),
-        to_status="queued",
-        operation_key=operation_key,
-        receipt={
-            "todo_n": int(n),
-            "todo_ref_id": cohort_id,
-            "baseline_decision_id": str(work_order["decision_id"]),
-            # completed／parked work order 只可由 exact pq2 go 明確重啟；
-            # store 會核對這個 prior status，不把 terminal receipt 靜默抹掉。
-            "prior_work_order_status": str(work_order["status"]),
-        },
-        observed_at=stamp,
-    )
-    item["dispatch_status"] = "queued"
-    item["dispatch_ref"] = str(work_order["work_order_id"])
-    item["dispatch_baseline_decision_id"] = str(work_order["decision_id"])
-    item["dispatch_attempt"] = dispatch_attempt
-    item["dispatched_at"] = stamp
-    item.pop("deferred_at", None)
-    item.pop("waiting_on", None)
-    if not any(
-        entry.get("n") == int(n)
-        and entry.get("verb") == "pq1_queued"
-        and entry.get("receipt") == item["dispatch_ref"]
-        and int(entry.get("attempt") or 1) == dispatch_attempt
-        for entry in pool["log"]
-    ):
-        pool["log"].append({
-            "at": stamp,
-            "n": int(n),
-            "type": item["type"],
-            "ref_id": cohort_id,
-            "verb": "pq1_queued",
-            "reason": "使用者 go 授權 bounded gap research；尚未 reassess",
-            "receipt": item["dispatch_ref"],
-            "attempt": dispatch_attempt,
-        })
-    return {"item": item, "work_order": transitioned}
-
-
-def checkpoint_decision_review(
-    pool: dict[str, Any],
-    n: int,
-    *,
-    store: Any,
-    to_status: str,
-    receipt: str,
-    reason: str = "",
-    at: str | None = None,
-    awaiting_gate: int | None = None,
-) -> dict[str, Any]:
-    """Checkpoint dispatched research；terminal 狀態必須留下 underlying receipt。
-
-    進 `awaiting_approval` 時可帶 `awaiting_gate`＝它在等的 pq2 編號。缺值不擋
-    （既有工單沒有這個欄位），但會被 `gated_items` 報成 `no_pointer`——一個說不出
-    在等誰的等待，就是沒有到期的等待（INV-2）。
-    """
-
-    if to_status not in {"researching", "awaiting_approval", "completed", "parked"}:
-        raise TodoError(f"不支援的 pq1 checkpoint：{to_status}")
-    if not receipt.strip():
-        raise TodoError("pq1 checkpoint 必須附 receipt")
-    item = get(pool, n)
-    if item["type"] != "decision_review" or not item.get("dispatch_ref"):
-        raise TodoError(f"[{n}] 尚未 dispatch decision-review pq1")
-    if to_status == "completed":
-        # ⚠ 格式驗證必須先於任何副作用（ROADMAP 2026-09-02 清項；2026-08-19 [166] 實測）：
-        # 裸 `pd_*` 經 removeprefix 是 no-op，能通過 get_decision 並**先寫入** work order
-        # transition，之後 resolve 端的 `_validate_go_receipt` 才要求 `decision:` 前綴
-        # → 拋錯 → pool 不存檔，但 work order 已 completed，且重試撞
-        # 「completed -> completed」死鎖。同一個 receipt 字串不得被兩套規則解讀（L12）。
-        if not receipt.startswith("decision:"):
-            raise TodoError(
-                f"completed receipt 必須是 `decision:pd_*` 完整格式，收到：{receipt!r}"
-                "（resolve 端同一判準；裸 id 會造成 pool 與 work order 脫鉤）"
-            )
-        decision_id = receipt.removeprefix("decision:")
-        try:
-            decision = store.get_decision(decision_id)
-        except KeyError as exc:
-            raise TodoError(f"completed receipt 不是有效 decision：{decision_id}") from exc
-        if decision["cohort_id"] != item["ref_id"]:
-            raise TodoError("completed decision 不屬於原 cohort")
-        if decision_id == item.get("dispatch_baseline_decision_id"):
-            raise TodoError("completed receipt 不可沿用 dispatch 前的 baseline decision")
-    stamp = at or _now()
-    operation_key = f"todo:{n}:{to_status}:{receipt}"
-    dispatch_ref = str(item["dispatch_ref"])
-    if dispatch_ref.startswith(ASSESSMENT_GAP_PREFIX):
-        # assessment 層缺口沒有 Decision Store work order 可 transition
-        # （work order 只在 coverage_pending 時建立）。checkpoint 仍然要 receipt，
-        # 只是狀態存在 pool 這一側——與 source_trace_review 的 `lead:` ref 同慣例。
-        work_order = None
-    else:
-        work_order = store.transition_research_work_order(
-            work_order_id=dispatch_ref,
-            to_status=to_status,
-            operation_key=operation_key,
-            receipt={"todo_n": int(n), "reference": receipt, "reason": reason},
-            observed_at=stamp,
-        )
-    item["dispatch_status"] = to_status
-    item["dispatch_receipt"] = receipt
-    item["dispatch_updated_at"] = stamp
-    if to_status == "awaiting_approval":
-        if awaiting_gate is not None:
-            set_awaiting_gate(pool, n, awaiting_gate)
-        elif gate_pointer(item) is None:
-            # 不擋（既有工單沒有這個欄位），但不再靜默：一個說不出在等誰的等待
-            # 就是沒有到期的等待（INV-2），而它會安靜地掛在池子裡沒有人回來動它。
-            print(
-                f"  ⚠ [{n}] 進 awaiting_approval 但未指定 --awaiting-gate："
-                "`todo gated` 與 audit 的 QueueLiveness 會把它報成 no_pointer",
-                file=sys.stderr,
-            )
-    else:
-        # 離開 awaiting_approval 就沒有 gate 可等了——留著會變成過期的 pointer。
-        item.pop(AWAITING_GATE_KEY, None)
-    pool["log"].append({
-        "at": stamp,
-        "n": int(n),
-        "type": item["type"],
-        "ref_id": item["ref_id"],
-        "verb": f"pq1_{to_status}",
-        "reason": reason or None,
-        "receipt": receipt,
-    })
-    if to_status in {"completed", "parked"}:
-        resolve(
-            pool,
-            n,
-            "go",
-            reason=reason or f"pq1 {to_status}",
-            receipt=receipt,
-            at=stamp,
-        )
-    return {"item": item, "work_order": work_order}
-
-
 #: `awaiting_approval` 的工單在等哪一個 pq2 編號。**結構化欄位，不是 receipt 字串。**
 #: 過渡期仍會讀既有 receipt 裡的 `manual_todo:<n>`（那是人手寫的），但新寫入一律走這裡。
 AWAITING_GATE_KEY = "awaiting_gate"
@@ -591,7 +402,7 @@ def gated_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
     三種結果，下一步完全不同——這正是原本被壓成同一個狀態的三件事：
     - `waiting`：pointer 指得到、那個編號還沒 resolve → 真的在等你，不必動。
     - `gate_resolved`：pointer 指得到、但那個編號**已經 resolve** → gate 沒了，
-      工單卻還掛著。下一步是 reassess 拿新的 decision receipt，不是直接收掉
+      工單卻還掛著。下一步是完成 pq1 checkpoint 拿 terminal receipt，不是直接收掉
       （2026-09-10 實測：兩張工單 reassess 後都浮出**不同的**新缺口）。
     - `no_pointer`：說不出在等誰 ＝ 沒有到期，也沒有人會叫醒它（INV-2／INV-4）。
     """
@@ -627,278 +438,6 @@ def gated_items(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
-#: 由 assessment 層缺口（非 coverage blocker）驅動的 pq1 dispatch。
-#: 沿用 `dispatch_source_trace_review` 已建立的慣例——`dispatch_ref` 不一定指向
-#: Decision Store work order（那邊指向 lead）。前綴讓 `work` 能分辨要不要去
-#: transition work order。
-ASSESSMENT_GAP_PREFIX = "assessment_gap:"
-
-
-def _prior_execution_intent(store: Any, cohort_id: str) -> str:
-    """該 cohort 上一筆 decision 用的 intent。
-
-    沿用先前 intent，讓同一個 cohort 的評估條件不因呼叫端習慣而跳動。
-
-    ⚠ 這裡原本記著一個更強的理由：2026-08-26 實測，對先前是 `paper` 的 cohort 跑
-    `research`，研究完整度會由 READY 退成 DATA_NEEDED，純由參數造成。**那個陷阱已於
-    2026-08-29 從源頭修掉**——`sizing.py` 改用嚴重度分類，diagnostic 級的
-    `execution_intent_research_only` 不再有改判權。本函式保留是為了評估條件的一致性，
-    不再是為了閃避那個 bug。
-    """
-
-    try:
-        decision = store.latest_decision_for_cohort(cohort_id)
-        intent = str((decision["payload"]["request"] or {}).get("execution_intent") or "")
-    except Exception:  # noqa: BLE001
-        intent = ""
-    return intent or "research"
-
-
-def _load_brief_items() -> list[dict[str, Any]] | None:
-    """今日 decision brief 的 items；讀不到回 `None`（不是空 list——兩者導向相反的判斷）。
-
-    ⚠ `get_decision_brief_core()` 把 Store 開不起來／runtime 沒 ready 都吞成 `{"status": "unavailable"|"error"}`
-    而**不拋例外**（2026-09-09 R2 實測）；只靠 try/except 抓不到，`.get("items") or []` 會把「讀不到」
-    壓成「沒東西」。所以這裡看 status：不是 ok／有 items 鍵的才算讀到。
-    """
-
-    from briefing.public_view import get_decision_brief_core
-
-    try:
-        payload = get_decision_brief_core()
-    except Exception:  # noqa: BLE001
-        return None
-    if not isinstance(payload, Mapping):
-        return None
-    if str(payload.get("status") or "") in {"unavailable", "error"} or "items" not in payload:
-        return None
-    return list(payload.get("items") or [])
-
-
-def _brief_item_for(
-    cohort_id: str,
-    brief_items: Sequence[Mapping[str, Any]] | None,
-) -> Mapping[str, Any] | None:
-    for item in brief_items or ():
-        if str(item.get("cohort_id") or "") == cohort_id:
-            return item
-    return None
-
-
-def _substantive_blockers(
-    cohort_id: str,
-    *,
-    brief_items: Sequence[Mapping[str, Any]] | None = None,
-) -> list[str]:
-    """該 cohort 目前**真的需要人動手**的 blocker。
-
-    唯一權威是 `config/decision_blockers.json` 的 `resolution_mode`；
-    這裡不另外猜一份（2026-08-26 手寫過一份 stale 清單，立刻就誤判了 co:axt）。
-    `brief_items` 可由呼叫端注入（一次 brief 服務多個 cohort），不給就自己讀一次。
-    """
-
-    if brief_items is None:
-        brief_items = _load_brief_items() or []
-    for item in brief_items:
-        if str(item.get("cohort_id") or "") != cohort_id:
-            continue
-        # brief 已經附上分組（`_blockers_by_mode`），直接用——這裡刻意**不**再分一次組。
-        grouped = item.get("blockers_by_mode")
-        if isinstance(grouped, Mapping):
-            return sorted(str(b) for b in (grouped.get("user_decision") or []))
-        # 舊 payload（例如遠端受限 surface）沒有這個欄位時才自行分組。
-        from shared.blockers import describe_blocker
-
-        return sorted(
-            code
-            for code in {str(b) for b in (item.get("blockers") or []) if b}
-            if getattr(describe_blocker(code), "resolution_mode", "user_decision")
-            == "user_decision"
-        )
-    return []
-
-
-#: 已進 pq1 或已有 terminal receipt 的 dispatch 狀態——這些都不是「只需 reassess」。
-_NOT_REASSESS_ONLY_DISPATCH = frozenset({
-    "queued", "researching", "awaiting_approval", "completed", "parked",
-})
-#: reassess-stale 的冷卻天數：同一項目 7 天內只自動 reassess 一次（見 reassess_only_items）。
-REASSESS_COOLDOWN_DAYS = 7
-
-
-def _recently_reassessed(pool: Mapping[str, Any], n: int, *, days: int = REASSESS_COOLDOWN_DAYS,
-                         now: datetime | None = None) -> bool:
-    """這個編號最近 `days` 天內有沒有 `pq1_reassessed` 的 log（機械維護留下的收據）。"""
-    from datetime import timedelta
-
-    moment = now or datetime.now(timezone.utc)
-    for entry in reversed(pool.get("log") or ()):
-        if int(entry.get("n", -1)) != int(n) or entry.get("verb") != "pq1_reassessed":
-            continue
-        try:
-            at = datetime.fromisoformat(str(entry.get("at")).replace("Z", "+00:00"))
-        except ValueError:
-            return False
-        if at.tzinfo is None:
-            at = at.replace(tzinfo=timezone.utc)
-        return (moment - at) < timedelta(days=days)
-    return False
-
-
-def assessment_gap_jobs(pool: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """standing-go／使用者 go 排入 pq1、但**不在 Decision Store work order 表**的 assessment-gap 工單。
-
-    2026-09-09 R2 指出：`engine_b.cli drain` 的 decision_jobs 只來自 `rank_work_orders`，這類 pool-only 的項目
-    drain 看不到、`todo list` 又把它歸在「不需動作」——常規授權每天自動排入之後，唯一會撿它的是使用者
-    哪天主動跑 research-drain（L13：管子只接一頭）。drain 從這裡把它們列出來。
-    """
-    out: list[dict[str, Any]] = []
-    for item in active_items(pool):
-        if item.get("type") != "decision_review":
-            continue
-        if item.get("dispatch_status") not in {"queued", "researching"}:
-            continue
-        ref = str(item.get("dispatch_ref") or "")
-        if not ref.startswith(ASSESSMENT_GAP_PREFIX):
-            continue
-        out.append({
-            "n": int(item["n"]), "cohort_id": ref.removeprefix(ASSESSMENT_GAP_PREFIX),
-            "dispatch_status": item.get("dispatch_status"), "scope": list(item.get("dispatch_scope") or []),
-            "title": item.get("title"), "dispatched_at": item.get("dispatched_at"),
-            "baseline_decision_id": item.get("dispatch_baseline_decision_id"),
-        })
-    return out
-
-
-def reassess_only_items(
-    pool: Mapping[str, Any],
-    store: Any,
-    *,
-    brief_items: Sequence[Mapping[str, Any]] | None = None,
-) -> list[dict[str, Any]]:
-    """佇列段 2（reassess_stale）的成員：REVIEW **純粹**來自凍結 context 過期的 decision_review。
-
-    三個條件缺一不可：①不在 pq1 in-flight、也沒有 terminal receipt；②cohort 沒有
-    research work order（有就該 dispatch，不是 reassess）；③brief 對這個 cohort **有列**、
-    且 blocker **只有 `system_internal`**（判定重用 `_only_system_internal_blockers`，不另猜）。
-
-    為什麼比 `_decision_review_hint` 的「無 user_decision」更嚴（2026-09-09 實測）：hint 對
-    [276]／[279]／[472]／[479] 也寫「請跑 reassess」，但它們各帶一個 `awaiting_external`
-    blocker（fx 缺、corroboration 未齊、財務過期）——那些要等世界先發生事，reassess 只會
-    多 append 一筆同樣 REVIEW 的 decision。機械維護的定義是「跑完會變」，所以只收純
-    system_internal 的；其餘留在「等事件」，由 trigger 或使用者決定。
-
-    ⚠ brief 讀不到或沒列這個 cohort → **不算**（不是「沒有 blocker」）。把讀不到當成
-    沒有，會把整批 decision_review 誤判成機械維護——那是 L12 的兩義同形。
-    """
-
-    if brief_items is None:
-        brief_items = _load_brief_items()
-    if brief_items is None:
-        return []
-    out: list[dict[str, Any]] = []
-    for item in active_items(pool):
-        if item["type"] != "decision_review":
-            continue
-        if item.get("dispatch_status") in _NOT_REASSESS_ONLY_DISPATCH:
-            continue
-        cohort_id = str(item["ref_id"])
-        if not cohort_id.startswith("dc_"):
-            continue
-        if _recently_reassessed(pool, int(item["n"])):
-            # 冷卻（2026-09-09 R2）：reassess 後若仍 REVIEW 且 blocker 沒變，沒有冷卻就會每天多 append 一筆
-            # 同樣 REVIEW 的 decision。7 天內 reassess 過的等下一個事件（sync 的 watch_wake／evidence delta）。
-            continue
-        brief_item = _brief_item_for(cohort_id, brief_items)
-        if brief_item is None:
-            continue
-        try:
-            if store.latest_research_work_order(cohort_id) is not None:
-                continue
-        except Exception:  # noqa: BLE001 — 讀不到就不判，不猜
-            continue
-        if not _only_system_internal_blockers(brief_item.get("blockers") or []):
-            continue
-        out.append(item)
-    return out
-
-
-def reassess_stale(
-    pool: dict[str, Any],
-    store: Any,
-    provider: Any,
-    *,
-    at: str | None = None,
-    dry_run: bool = False,
-    brief_items: Sequence[Mapping[str, Any]] | None = None,
-) -> dict[str, Any]:
-    """段 2 的 consumer：對 `reassess_only_items` 逐筆 reassess，新 decision 不再 REVIEW 就結案。
-
-    這是確定性維護不是研究：reassess 只以既有 Signal 與相同 intent 重新凍結 context，
-    decision 是 append-only、舊筆原封不動、不寫任何 authority。結案的 receipt 是真的
-    （`decision:<新 id>`），與 `system_internal_retired` 同一類——項目本來就不需要使用者
-    決定任何事，留在池裡只是噪音。仍 REVIEW 的**不**結案（代表有新 blocker 冒出來），
-    留給 collector 更新 hint。四個人工 gate 不受影響。
-    """
-
-    stamp = at or _now()
-    candidates = reassess_only_items(pool, store, brief_items=brief_items)
-    numbers = [int(it["n"]) for it in candidates]
-    result: dict[str, Any] = {
-        "candidates": numbers, "closed": [], "still_review": [], "failed": [],
-        "dry_run": dry_run,
-    }
-    if dry_run:
-        return result
-    from decision_lab.workflow import reassess
-
-    for item in candidates:
-        cohort_id = str(item["ref_id"])
-        intent = _prior_execution_intent(store, cohort_id)
-        try:
-            outcome = reassess(store, provider, cohort_id, execution_intent=intent)
-        except Exception as exc:  # noqa: BLE001 — 單筆失敗不擋其餘，但要現形
-            result["failed"].append({
-                "n": item["n"], "cohort_id": cohort_id,
-                "reason": f"{type(exc).__name__}: {exc}",
-            })
-            continue
-        decision_id = str(outcome.get("decision_id") or "")
-        attention = str((outcome.get("action_card") or {}).get("attention") or "")
-        receipt = f"decision:{decision_id}"
-        pool["log"].append({
-            "at": stamp,
-            "n": int(item["n"]),
-            "type": item["type"],
-            "ref_id": cohort_id,
-            "verb": "pq1_reassessed",
-            "reason": f"reassess-stale：僅 context 老化，以 intent={intent} 重新凍結（attention={attention}）",
-            "receipt": receipt,
-        })
-        if attention == "REVIEW":
-            result["still_review"].append({"n": item["n"], "decision_id": decision_id})
-            continue
-        item.pop("waiting_on", None)
-        item.pop("deferred_at", None)
-        item["resolved_at"] = stamp
-        item["resolution"] = "reassessed"
-        item["reason"] = (
-            f"reassess-stale：新 decision {decision_id} 的 attention={attention}，"
-            "不再需要使用者決定"
-        )
-        pool["log"].append({
-            "at": stamp,
-            "n": int(item["n"]),
-            "type": item["type"],
-            "ref_id": cohort_id,
-            "verb": "reassessed_closed",
-            "reason": item["reason"],
-            "receipt": receipt,
-        })
-        result["closed"].append({"n": item["n"], "decision_id": decision_id, "attention": attention})
-    return result
-
-
 #: 常規授權不動的兩種項目：使用者明示 pending 的、與在等世界的（見 config/standing_authorization.json _doc）。
 _STANDING_SKIP_DISPATCH = frozenset({"queued", "researching", "awaiting_approval", "completed", "parked"})
 
@@ -907,8 +446,6 @@ def standing_go_candidates(
     pool: Mapping[str, Any],
     *,
     authorization: Any,
-    store: Any = None,
-    brief_items: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """常規授權（佇列段 2b）的成員與被跳過者。判準全部機械：
 
@@ -916,12 +453,11 @@ def standing_go_candidates(
     - 不在 pq1 in-flight、沒有 terminal receipt；
     - **沒有** `deferred_at`（使用者明示 pending——常規授權不替使用者改決定）；
     - **沒有** `waiting_on`（在等世界——常規授權買的是注意力，不是讓事情發生）；
-    - `source_trace_review` 的 hint 含付費字樣者跳過（付費取得永遠要 exact 金額核准）；
-    - `decision_review` **還要答得出「go 會讓哪個數字變」**（L14）：有 work order（→ dispatch）或有
-      `user_decision` blocker（→ assessment-gap 排入 pq1）才算；只剩 awaiting_external／system_internal 的
-      一律跳過——對它下 go 只會多 append 一筆同樣 REVIEW 的 decision。2026-09-09 P5 smoke 實測：[279][479]
-      首跑 reassess 後仍 REVIEW，第二跑又 reassess 一次——沒有這條，daily 會每天替它們多寫一筆。
-      brief 讀不到時 decision_review 全部跳過（fail closed，不猜）。
+    - `source_trace_review` 的 hint 含付費字樣者跳過（付費取得永遠要 exact 金額核准）。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.4）：原本還有 `decision_review` 的「go 會讓哪個數字變」判定
+    （work order／user_decision blocker／brief 讀不到就跳過）；該 kind 隨 decision_lab 研究側退役，
+    `config/standing_authorization.json` 早已把它列在 `never`（Step 0a.1）。
     """
 
     candidates: list[dict[str, Any]] = []
@@ -944,61 +480,23 @@ def standing_go_candidates(
         if tokens and any(tok in text for tok in tokens):
             skipped.append({"n": item["n"], "reason": "hint 提及付費／訂閱——付費取得永遠要 exact 金額核准"})
             continue
-        if item_type == "decision_review":
-            cohort_id = str(item["ref_id"])
-            has_work_order = False
-            if store is not None:
-                try:
-                    has_work_order = store.latest_research_work_order(cohort_id) is not None
-                except Exception:  # noqa: BLE001 — 讀不到就當沒有，交給下面的 brief 判定
-                    has_work_order = False
-            if not has_work_order:
-                if brief_items is None:
-                    skipped.append({"n": item["n"], "reason": "brief 讀不到，無法判定 go 會讓哪個數字變——不猜（fail closed）"})
-                    continue
-                if _brief_item_for(cohort_id, brief_items) is None:
-                    skipped.append({"n": item["n"], "reason": "brief 沒列這個 cohort，無法判定 go 會做什麼"})
-                    continue
-                if not _substantive_blockers(cohort_id, brief_items=brief_items):
-                    # ⚠ 跳過的理由要說對是哪一種，否則使用者會照著一句不合身的話去做白工。
-                    # 2026-09-11 實測 [512]：它既不是「純 context 老化」也不是「等世界」，
-                    # 而是 evidence_delta=material——證據變了但沒有任何 blocker 需要人決定。
-                    # 這一批**確實**不該自動 go（L14：答不出 go 會讓哪個數字變），但它需要人看一眼，
-                    # 所以理由必須指回 missing_data，而不是叫人去跑兩支不收它的命令。
-                    brief_item = _brief_item_for(cohort_id, brief_items) or {}
-                    if str(brief_item.get("evidence_delta") or "none") in {
-                        "material", "positive", "negative"
-                    }:
-                        reason = (
-                            "證據有實質變動（evidence_delta）但沒有任何需人決定的 blocker——"
-                            "常規授權答不出「go 會讓哪個數字變」，留給你逐項看 missing_data 決定"
-                        )
-                    else:
-                        reason = (
-                            "沒有 work order、也沒有需人決定的 blocker——go 只會多 append 一筆同樣 REVIEW 的 decision；"
-                            "純 context 老化交 reassess-stale，等世界的等 trigger"
-                        )
-                    skipped.append({"n": item["n"], "reason": reason})
-                    continue
         candidates.append(item)
     return candidates, skipped
 
 
 def standing_go(
     pool: dict[str, Any],
-    store: Any,
     *,
     leads_path: Path | str | None = None,
     at: str | None = None,
     dry_run: bool = False,
     authorization: Any = None,
-    brief_items: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """段 2b 的 consumer：對常規授權類別執行「使用者本來會下的那個 go」，一個都不多。
 
-    decision_review → `advance_decision_review`（全函數：dispatch／reassess／assessment-gap）；
-    source_trace_review → `dispatch_source_trace_review`（requeue 回 pq1）。兩者都是 pq2 既有的 go
+    source_trace_review → `dispatch_source_trace_review`（requeue 回 pq1）。這是 pq2 既有的 go
     語意，本函式只是把「誰按的」從使用者換成 config——receipt 一樣、gate 一樣、不含入圖與 authority 寫入。
+    ⚠ 2026-09-23（Phase 0 Step 0b.4）：`decision_review → advance_decision_review` 那條分支隨研究側退役。
     """
 
     from engine_b.leads import DEFAULT_LEADS_PATH
@@ -1008,10 +506,7 @@ def standing_go(
 
         authorization = sa.load()
     stamp = at or _now()
-    if brief_items is None:
-        brief_items = _load_brief_items()
-    candidates, skipped = standing_go_candidates(
-        pool, authorization=authorization, store=store, brief_items=brief_items)
+    candidates, skipped = standing_go_candidates(pool, authorization=authorization)
     result: dict[str, Any] = {
         "candidates": [int(it["n"]) for it in candidates], "skipped": skipped,
         "done": [], "failed": [], "dry_run": dry_run, "config": str(getattr(authorization, "path", "")),
@@ -1022,11 +517,7 @@ def standing_go(
         n = int(item["n"])
         item_type = str(item["type"])
         try:
-            if item_type == "decision_review":
-                outcome = advance_decision_review(pool, n, store=store, at=stamp)
-                verb_outcome = str(outcome.get("outcome"))
-                receipt = str(item.get("dispatch_ref") or outcome.get("decision_id") or "")
-            elif item_type == "source_trace_review":
+            if item_type == "source_trace_review":
                 outcome = dispatch_source_trace_review(pool, n, leads_path=leads_path or DEFAULT_LEADS_PATH, at=stamp)
                 verb_outcome = "dispatched"
                 receipt = str(item.get("dispatch_ref") or "")
@@ -1043,126 +534,6 @@ def standing_go(
         })
         result["done"].append({"n": n, "type": item_type, "outcome": verb_outcome, "receipt": receipt})
     return result
-
-
-def advance_decision_review(
-    pool: dict[str, Any],
-    n: int,
-    *,
-    store: Any,
-    at: str | None = None,
-) -> dict[str, Any]:
-    """`go` 對 decision_review 的**全函數**實作：永遠等於「是，往下走一步」。
-
-    先前 `go` 只覆蓋一種情況（已有 research work order → dispatch），其餘一律
-    拒絕，於是使用者必須自己分辨這一筆屬於哪一類、再翻譯成另一個動詞。
-    2026-08-26 實測 9 個 REVIEW 項目分三類，其中 **4 個會被 `go` 拒絕**——
-    而三類長得一模一樣（都叫 `REVIEW — co:xxx`），系統分得出來卻沒有代勞。
-
-    三個分支，對應實測分類：
-
-    - **有 work order** → dispatch 回 pq1（原行為，不變）。
-    - **無 work order、無實質 blocker** → REVIEW 只是凍結 context 自然老化，
-      reassess 重新凍結即可；下次 sync 自己結案。
-    - **無 work order、有實質 blocker** → 先 reassess（可能清掉一部分並產生
-      work order），再依結果 dispatch 或以 assessment-gap ref 排入 pq1。
-
-    ⚠ **四個 authority gate 完全不受影響**：graph admission、Engine C ledger
-    寫入、thesis mutation、live 資本仍各自走 `complete-*` 與 exact 人工核准。
-    本函式只把「研究要不要開始」這件可逆的事自動化——它本來就是 `go` 的語意。
-    """
-
-    item = get(pool, n)
-    if item["type"] != "decision_review":
-        raise TodoError(f"[{n}] 不是 decision_review")
-    if item.get("dispatch_status") in {"queued", "researching", "awaiting_approval"}:
-        return {"item": item, "outcome": "already_in_flight"}
-
-    cohort_id = str(item["ref_id"])
-    if not cohort_id.startswith("dc_"):
-        raise TodoError("全域 authority blocker 沒有 bounded cohort work order，需依 hint 修復")
-
-    if store.latest_research_work_order(cohort_id) is not None:
-        result = dispatch_decision_review(pool, n, store=store, at=at)
-        result["outcome"] = "dispatched"
-        return result
-
-    # 沒有 work order：先刷新凍結 context。這一步對兩種剩餘情況都必要，
-    # 且不改變任何 authority——decision 是 append-only，舊筆原封不動。
-    from decision_lab.workflow import reassess
-    from engine_d_runtime.bootstrap import build_default_runtime_provider
-
-    stamp = at or _now()
-    intent = _prior_execution_intent(store, cohort_id)
-    reassessed = reassess(
-        store,
-        build_default_runtime_provider(),
-        cohort_id,
-        execution_intent=intent,
-    )
-    decision_id = str(reassessed.get("decision_id") or "")
-
-    if store.latest_research_work_order(cohort_id) is not None:
-        result = dispatch_decision_review(pool, n, store=store, at=stamp)
-        result["outcome"] = "reassessed_then_dispatched"
-        result["decision_id"] = decision_id
-        return result
-
-    brief_items = _load_brief_items()
-    if brief_items is None or _brief_item_for(cohort_id, brief_items) is None:
-        # fail closed（2026-09-09 R2）：brief 服務降級或沒列這個 cohort 時，**不能**把「讀不到」記成
-        # 「僅 context 老化已解決」——那會把一個真實存在、只是這一刻讀不到的 user_decision blocker 靜默關掉。
-        # reassess 已經做了（append-only，無害）；這裡只留 receipt，不下結論、不排隊，交下一輪重判。
-        pool["log"].append({
-            "at": stamp,
-            "n": int(n),
-            "type": item["type"],
-            "ref_id": cohort_id,
-            "verb": "pq1_reassessed",
-            "reason": (f"go：已以 intent={intent} 重新凍結，但 decision brief 讀不到／未列此 cohort，"
-                       "殘餘 blocker 未判定——不視為已解決，下一輪 sync 重判"),
-            "receipt": f"decision:{decision_id}",
-        })
-        return {"item": item, "outcome": "reassessed_blockers_unknown", "decision_id": decision_id}
-    remaining = _substantive_blockers(cohort_id, brief_items=brief_items)
-    if not remaining:
-        # context 老化而已；sync 會依新 decision 自行結案，這裡不強制 resolve。
-        pool["log"].append({
-            "at": stamp,
-            "n": int(n),
-            "type": item["type"],
-            "ref_id": cohort_id,
-            "verb": "pq1_reassessed",
-            "reason": f"go：僅 context 老化，已以 intent={intent} 重新凍結",
-            "receipt": f"decision:{decision_id}",
-        })
-        return {"item": item, "outcome": "reassessed", "decision_id": decision_id}
-
-    # 仍有實質 blocker：assessment 層缺口沒有對應的 Decision Store work order
-    # （work order 只在 coverage_pending 時建立，而 assessment_blockers 是
-    # sizing 階段才算出來的）。用 assessment-gap ref 排入 pq1，完成時同樣要 receipt。
-    item["dispatch_status"] = "queued"
-    item["dispatch_ref"] = f"{ASSESSMENT_GAP_PREFIX}{cohort_id}"
-    item["dispatch_baseline_decision_id"] = decision_id
-    item["dispatched_at"] = stamp
-    item["dispatch_scope"] = remaining
-    item.pop("deferred_at", None)
-    item.pop("waiting_on", None)
-    pool["log"].append({
-        "at": stamp,
-        "n": int(n),
-        "type": item["type"],
-        "ref_id": cohort_id,
-        "verb": "pq1_queued",
-        "reason": "go：assessment 層缺口，排入 bounded pq1；" + "、".join(remaining),
-        "receipt": f"decision:{decision_id}",
-    })
-    return {
-        "item": item,
-        "outcome": "queued_assessment_gap",
-        "decision_id": decision_id,
-        "scope": remaining,
-    }
 
 
 def dispatch_source_trace_review(
@@ -1401,7 +772,7 @@ def _lead_context_for_action(
     focus = (sorted(recorded)[0] if recorded else declared_focus)
     if not focus:
         raise TodoError(
-            f"{action_id} 既沒有 lead 帶 focus_company_id，RA 也未自報——無法決定 handoff 對象")
+            f"{action_id} 既沒有 lead 帶 focus_company_id，RA 也未自報——無法決定 focus company")
 
     # ⚠ **只補空白，不覆寫不符的值。** 已經帶著「別的 digest」的 lead 代表它綁在另一個
     # 已核准版本上——那是衝突，不是漏記；蓋過去就是讓引用去尋找能通過的權威（L15）。
@@ -1529,33 +900,6 @@ def complete_thesis_mutation(
     return result | {"receipt": receipt}
 
 
-def _ensure_shadow_for_completion(
-    *, company_id: str, ticker: str | None, as_of: str, thesis: str | None = None
-) -> dict[str, Any]:
-    from decision_lab.bootstrap import open_default_store
-    from decision_lab.workflow import ensure_shadow_for_company
-    from engine_d_runtime.bootstrap import build_default_runtime_provider
-
-    store = open_default_store()
-    provider = None
-    try:
-        provider = build_default_runtime_provider()
-        return ensure_shadow_for_company(
-            store,
-            provider,
-            company_id=company_id,
-            ticker=ticker,
-            as_of=as_of,
-            thesis=thesis,
-        )
-    finally:
-        try:
-            if provider is not None:
-                provider.close()
-        finally:
-            store.close()
-
-
 def complete_ra_admission(
     pool: dict[str, Any],
     n: int,
@@ -1566,7 +910,11 @@ def complete_ra_admission(
     leads_path: Path | str | None = None,
     at: str | None = None,
 ) -> dict[str, Any]:
-    """驗證 RA 已完整 apply/publish，建立（或沿用）Shadow 後才 resolve pq2。
+    """驗證 RA 已完整 apply/publish 後才 resolve pq2。
+
+    ⚠ 2026-09-23（Phase 0 Step 0b.4）：原本這裡還會建立（或沿用）Decision Shadow cohort 並把
+    `cohort:<dc_…>` 寫進 receipt；Decision handoff 隨 decision_lab 研究側退役，receipt 只剩
+    `action;digest;commit`。入圖本身已 durable，pq2 授權的就是入圖。
 
     此 completion point 不綁 Codex 或 Claude Code；任何本機 agent 在收到使用者
     對 exact item 的明確核准後，都走同一組 authority 與 receipt 檢查。
@@ -1608,44 +956,24 @@ def complete_ra_admission(
     if company_id and company_id.strip() != recorded_company:
         raise TodoError("--company-id 與 applied lead 的 focus_company_id 不符")
     target_company = recorded_company
-    if not ticker:
-        from identity.registry import get_registry
-
-        ticker = get_registry().research_ticker(target_company)
+    del ticker  # 保留參數只為呼叫端相容；Decision handoff 退役後不再用它
     stamp = at or _now()
-    handoff = _ensure_shadow_for_completion(
-        company_id=target_company,
-        ticker=ticker,
-        as_of=stamp,
-        thesis=lead_context.get("title"),
-    )
-    cohort_id = str(handoff.get("cohort_id") or "")
-    if handoff.get("skipped") == "subject_is_not_a_company":
-        # 主詞不是公司 → 不該有 decision cohort，也不該因此結不了案。
-        # 入圖本身已經 durable，pq2 授權的就是入圖；cohort 是**後續追蹤**的載體，
-        # 而追蹤非公司節點需要自己的 lane（ROADMAP）。
-        cohort_id = "not_applicable"
-    elif not cohort_id.startswith("dc_"):
-        raise TodoError("Decision handoff 未回傳有效 cohort receipt")
-    receipt = (
-        f"action:{action_id};digest:{digest};commit:{commit};cohort:{cohort_id}"
-    )
+    receipt = f"action:{action_id};digest:{digest};commit:{commit}"
     item["completion_authority"] = {
         "action_digest": digest,
         "commit": commit,
         "company_id": target_company,
-        "cohort_id": cohort_id,
         "verified_at": stamp,
     }
     resolved = resolve(
         pool,
         n,
         "go",
-        reason="Research Action durable apply＋Decision Shadow handoff 完成",
+        reason="Research Action durable apply／publish 完成",
         receipt=receipt,
         at=stamp,
     )
-    return {"item": resolved, "action": action_id, "handoff": handoff, "receipt": receipt}
+    return {"item": resolved, "action": action_id, "receipt": receipt}
 
 
 def retire_legacy_pq1_items(
@@ -1702,7 +1030,7 @@ def sync(
     """把各來源蒐集到的項目 upsert 進池。
 
     `incoming` 每筆需有 type／ref_id／title，可選 hint／source。已 resolve 的
-    (type, ref_id) 會重新進池（代表它又出現了，例如新的 evidence-delta）——這是
+    (type, ref_id) 會重新進池（代表它又出現了，例如同一條 lead 再次需要追源）——這是
     刻意的：resolve 表示「當時處理過」，不是永久黑名單。
 
     唯一例外是 `ra_admission`：Research Action 是 content-addressed 凍結物件，
@@ -1712,77 +1040,12 @@ def sync(
     prepare，那會產生新的 action_id 與 digest，自然重新進池。
     """
     added = 0
-    reactivated = 0
-    refreshed = 0
-    system_internal_retired = 0
-    churn_suppressed = 0
     stamp = at or _now()
     incoming = list(incoming)
     seen_keys = {_key(str(row["type"]), str(row["ref_id"])) for row in incoming}
     for row in incoming:
-        if row.get("system_internal_only"):
-            key = _key(str(row["type"]), str(row["ref_id"]))
-            existing = next(
-                (
-                    candidate for candidate in active_items(pool)
-                    if _key(candidate["type"], candidate["ref_id"]) == key
-                ),
-                None,
-            )
-            if existing is not None and existing.get("dispatch_status") not in {
-                "queued", "researching", "awaiting_approval"
-            }:
-                prior_waiting = dict(existing.get("waiting_on") or {})
-                existing.pop("waiting_on", None)
-                existing.pop("deferred_at", None)
-                existing["resolved_at"] = stamp
-                existing["resolution"] = "system_internal"
-                # 抑制的理由**跟著 row 走**（L16）。先前這裡硬寫「blocker registry 判定
-                # 只剩 system_internal」，那句話套在別的抑制成因上就是假的（L11-1：
-                # 措辭精度本身就是一個 claim）。
-                suppression = dict(row.get("suppression") or {})
-                existing["reason"] = suppression.get("reason") or (
-                    "blocker registry 判定只剩 system_internal；不需要使用者決定，"
-                    "亦不冒充外部事件"
-                )
-                pool["log"].append({
-                    "at": stamp,
-                    "n": existing["n"],
-                    "type": existing["type"],
-                    "ref_id": existing["ref_id"],
-                    "verb": "system_internal_retired",
-                    "reason": existing["reason"],
-                    "receipt": suppression.get("receipt") or "blocker-registry:system_internal",
-                    **({"prior_waiting_on": prior_waiting} if prior_waiting else {}),
-                })
-                system_internal_retired += 1
-            # 新出現的純系統狀態不建立 pq2；既有 in-flight work order 也不由
-            # classifier 越權結案，仍交給它自己的 terminal receipt。
-            continue
         if str(row["type"]) == "ra_admission" and _dropped_before(pool, row):
             continue
-        # churn 修法第二半（2026-08-31）：corroboration 殘餘類項目以**內容**當復活判準。
-        # resolve 過且 residual_digest 相同＝研究已交付、殘餘未變——不重生新號；
-        # digest 變了＝真的有新缺口，照常鑄號（標題會講新缺口）。
-        if row.get("residual_digest"):
-            key = _key(str(row["type"]), str(row["ref_id"]))
-            active_same = any(
-                _key(it["type"], it["ref_id"]) == key and not it.get("resolved_at")
-                for it in pool["items"]
-            )
-            if not active_same:
-                last_resolved = next(
-                    (
-                        it for it in reversed(pool["items"])
-                        if _key(it["type"], it["ref_id"]) == key and it.get("resolved_at")
-                    ),
-                    None,
-                )
-                if last_resolved is not None and (
-                    last_resolved.get("residual_digest") == row["residual_digest"]
-                ):
-                    churn_suppressed += 1
-                    continue
         before = len(pool["items"])
         item = upsert(
             pool,
@@ -1803,118 +1066,6 @@ def sync(
             item["company_id"] = str(row["company_id"])
         if row.get("ticker"):
             item["ticker"] = str(row["ticker"])
-        if row.get("residual_digest"):
-            item["residual_digest"] = str(row["residual_digest"])
-
-        incoming_waiting = row.get("waiting_on")
-        event_link = row.get("event_link")
-        event_type = str((event_link or {}).get("type") or "")
-        event_value = str((event_link or {}).get("value") or "")
-        waiting_event_type = str(
-            (item.get("waiting_on") or {}).get("event_type") or ""
-        )
-        dispatch_in_flight = item.get("dispatch_status") in {
-            "queued",
-            "researching",
-            "awaiting_approval",
-        }
-        if dispatch_in_flight and (item.get("waiting_on") or {}).get(
-            "derived_from_blockers"
-        ):
-            item.pop("waiting_on", None)
-        # Consumed-marker：同一筆 decision receipt 只喚醒一次。`reactivation_event`
-        # 先前只寫不讀，於是只要 collector 還回報同一個 material delta，每次 sync 都會
-        # 重新喚醒——使用者剛設回等待，下一輪就被打回決策佇列，等待條件永遠黏不住
-        # （2026-08-11 實測 [74]）。綁 event_type 因此把「永遠不會醒」換成「永遠不睡」。
-        # 比對 receipt 而非布林旗標：換一筆新 decision（新 receipt）仍會正常喚醒。
-        consumed_receipt = str(
-            (item.get("reactivation_event") or {}).get("receipt") or ""
-        ).strip()
-        incoming_receipt = str((event_link or {}).get("receipt") or "").strip()
-        material_decision_event = (
-            item["type"] == "decision_review"
-            and event_type == "decision_evidence_delta"
-            and event_value in {"material", "positive", "negative"}
-            and waiting_event_type == event_type
-            and not dispatch_in_flight
-            and not (incoming_receipt and incoming_receipt == consumed_receipt)
-        )
-
-        # 使用者或 blocker 衍生的 waiting item 不能只靠自然語言等人記得回來。
-        # Engine D 對同一 cohort 產生 material evidence delta 時，以 decision receipt
-        # 喚醒原 stable pq2 item；這只恢復人工判斷，不 dispatch 研究、不建 decision。
-        if material_decision_event and item.get("waiting_on"):
-            prior_waiting = dict(item.get("waiting_on") or {})
-            item.pop("waiting_on", None)
-            item.pop("deferred_at", None)
-            item["reactivated_at"] = stamp
-            item["reactivation_event"] = dict(event_link)
-            pool["log"].append({
-                "at": stamp,
-                "n": item["n"],
-                "type": item["type"],
-                "ref_id": item["ref_id"],
-                "verb": "event_reactivated",
-                "reason": "同一 cohort 出現 material evidence delta，恢復人工複查",
-                "receipt": str((event_link or {}).get("receipt") or "") or None,
-                "prior_waiting_on": prior_waiting,
-            })
-            reactivated += 1
-        elif (
-            item.get("waiting_on", {}).get("derived_from_blockers")
-            and not incoming_waiting
-        ):
-            # blocker 已不再全屬 awaiting_external／system_internal，保守地回到
-            # 決策佇列。人工設定的 waiting_on 不由此分支清除。
-            prior_waiting = dict(item.get("waiting_on") or {})
-            item.pop("waiting_on", None)
-            item.pop("deferred_at", None)
-            item["reactivated_at"] = stamp
-            item["reactivation_event"] = {
-                "type": "decision_blocker_mode_changed",
-            }
-            pool["log"].append({
-                "at": stamp,
-                "n": item["n"],
-                "type": item["type"],
-                "ref_id": item["ref_id"],
-                "verb": "event_reactivated",
-                "reason": "blocker 已不再全屬等待事件，恢復人工複查",
-                "receipt": None,
-                "prior_waiting_on": prior_waiting,
-            })
-            reactivated += 1
-        elif (
-            incoming_waiting
-            and not item.get("waiting_on")
-            and not material_decision_event
-            and not dispatch_in_flight
-        ):
-            item["waiting_on"] = dict(incoming_waiting)
-        elif (
-            incoming_waiting
-            and not material_decision_event
-            and not dispatch_in_flight
-            and (item.get("waiting_on") or {}).get("derived_from_blockers")
-            and _waiting_reason_changed(item["waiting_on"], incoming_waiting)
-        ):
-            # blocker 仍全屬等待事件（mode 沒變，所以上面的 reactivate 分支不會觸發），
-            # 但等的是不同的東西了。舊寫法只在沒有 waiting_on 時才填，於是顯示文字會
-            # 一直停在第一次推導的當下——會告訴使用者去修一個已經修好的東西。
-            # 只重算機器推導的；使用者以 --until/--trigger 明確設定的不動。
-            prior_waiting = dict(item["waiting_on"])
-            item["waiting_on"] = dict(incoming_waiting)
-            pool["log"].append({
-                "at": stamp,
-                "n": item["n"],
-                "type": item["type"],
-                "ref_id": item["ref_id"],
-                "verb": "waiting_reason_refreshed",
-                "reason": "blocker 內容改變，重新推導等待理由",
-                "receipt": None,
-                "prior_waiting_on": prior_waiting,
-            })
-            refreshed += 1
 
     cleared, uncleared = _mark_source_cleared(
         pool, seen_keys, healthy_sources, stamp=stamp
@@ -1922,16 +1073,15 @@ def sync(
 
     watch_woken, watch_counts = _check_event_watches(pool, stamp=stamp)
 
+    # ⚠ 2026-09-23（Phase 0 Step 0b.4）：`reactivated`／`waiting_refreshed`／`system_internal_retired`／
+    # `churn_suppressed` 四個計數器隨 decision_review collector 退役——它們唯一的輸入
+    # （event_link／derived waiting_on／system_internal_only／residual_digest）都只由那個 collector 產生。
     return {
         "added": added,
-        "reactivated": reactivated,
-        "waiting_refreshed": refreshed,
         "source_cleared": cleared,
         "source_returned": uncleared,
-        "system_internal_retired": system_internal_retired,
         "watch_woken": watch_woken,
         "watch_counters": watch_counts,
-        "churn_suppressed": churn_suppressed,
         "active": len(active_items(pool)),
     }
 
@@ -2190,7 +1340,7 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
             "ready", "applying", "partial", "ready_for_approval", "partial_apply"
         }:
             action_id = str(action.get("action_id") or action.get("id") or "")
-            # RA 自己聲明的 Decision handoff 優先。從 lead 來的 RA 由綁定 lead 提供
+            # RA 自己聲明的 focus company 優先。從 lead 來的 RA 由綁定 lead 提供
             # focus，但 decision gap work order 產出的 RA 根本沒有 lead 可綁——先前
             # 那類 RA 一律判成「未聲明 focus」而卡住，即使 cohort 早就指名了公司。
             declared = str(
@@ -2218,18 +1368,18 @@ def _collect_research_action_rows() -> list[dict[str, Any]]:
                 )
             elif len(focuses) == 1:
                 handoff_hint = (
-                    f"核准 exact graph delta；Decision handoff：{focuses[0]}。"
+                    f"核准 exact graph delta；focus company：{focuses[0]}。"
                     "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
                 )
             elif focuses:
                 handoff_hint = (
                     "BLOCKER：Research Action 有多個 focus_company_id："
-                    f"{', '.join(focuses)}；先回 pq1 拆成明確 Decision handoff。"
+                    f"{', '.join(focuses)}；先回 pq1 拆成明確 focus company。"
                 )
             else:
                 handoff_hint = (
                     "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；"
-                    "先回 pq1 補 Decision handoff，不得先 apply。"
+                    "先回 pq1 補 focus company，不得先 apply。"
                 )
             title = (
                 action.get("slug")
@@ -2320,423 +1470,6 @@ def _collect_lifecycle_rows() -> list[dict[str, Any]]:
         }
         for tid, why in lifecycle_due()
     ]
-
-
-def _waiting_reason_changed(
-    current: Mapping[str, Any], incoming: Mapping[str, Any]
-) -> bool:
-    """只比對語意欄位；set_at 每次推導都會變，不算改變。"""
-
-    fields = ("trigger", "reason", "until", "event_type")
-    return any(current.get(field) != incoming.get(field) for field in fields)
-
-
-def _derive_waiting_on(blockers: Any) -> dict[str, Any] | None:
-    """依 blocker registry 判斷此項是否純粹在等外部資料。
-
-    回傳 None 代表仍需使用者決定（保守預設：registry 未登記的 code 一律當成需要人看）。
-    """
-    codes = [str(b) for b in blockers if isinstance(b, str)]
-    if not codes:
-        return None
-    try:
-        from shared.blockers import get_blocker_registry
-
-        registry = get_blocker_registry()
-    except Exception:
-        return None
-    if registry.needs_user_decision(codes):
-        return None
-    reasons = registry.waiting_reasons(codes)
-    return {
-        "until": None,
-        "trigger": (
-            "／".join(reasons[:3])
-            if reasons
-            else "僅剩系統內部狀態，重新 reassess 即可（無使用者決定）"
-        ),
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": _now(),
-        "derived_from_blockers": True,
-    }
-
-
-def _only_system_internal_blockers(blockers: Any) -> bool:
-    """是否只有不該進 pq2 的系統內部狀態。
-
-    ``system_internal`` 與 ``awaiting_external`` 對使用者都不需要立即決定，
-    但前者依 registry 契約「不該呈現為待辦」。先前兩者共用
-    ``_derive_waiting_on``，導致 stale context 等系統狀態永久躺在「等事件」。
-    """
-
-    codes = [str(b) for b in blockers if isinstance(b, str)]
-    if not codes:
-        return False
-    try:
-        from shared.blockers import get_blocker_registry
-
-        grouped = get_blocker_registry().classify(codes)
-    except Exception:
-        return False
-    return bool(grouped["system_internal"]) and not (
-        grouped["user_decision"] or grouped["awaiting_external"]
-    )
-
-
-def collect_from_decisions() -> list[dict[str, Any]]:
-    """Fail-soft 外皮，維持既有呼叫面；健康狀態請改用 collect_all_with_health。"""
-
-    return _fail_soft(_collect_decision_rows)
-
-
-def _dispatchable_cohorts(items: Sequence[Mapping[str, Any]]) -> frozenset[str]:
-    """哪些 cohort 的最新 decision **真的**帶得動 `dispatch`。
-
-    `REVIEW` 有兩種成因，但先前的 hint 只寫得出一種：
-    coverage 還有 blocker（有 bounded gap work order，該 `dispatch`），
-    與 coverage 已清空、REVIEW 純粹來自凍結 context 過期（沒有 work order，
-    該 `reassess`）。舊 hint 一律寫「核准 bounded gap research」，把後者誤呈現成
-    「存在可 dispatch 的研究缺口」——使用者照著下 `go`，`dispatch` 拒絕（沒有
-    work order），`resolve --verb go` 也拒絕（decision_review 不得 bare go），
-    看起來像死結。2026-08-26 由本機 Codex 與 Claude Code 各自獨立撞到同一處。
-
-    這是 L12 的形狀：一個表示（`REVIEW` ＋ 單一 hint）承載兩種語意，下游被迫二選一。
-    修法是先分開再各自給正確指示，不是放寬任一邊的判定。
-
-    讀不到 store 時回空集合——此時 hint 退回「兩種都寫」的保守版本，
-    仍然可執行，不會謊報某條路可走。
-    """
-
-    cohort_ids = [
-        str(item.get("cohort_id") or "")
-        for item in items
-        if str(item.get("cohort_id") or "").startswith("dc_")
-    ]
-    if not cohort_ids:
-        return frozenset()
-    try:
-        from decision_lab.bootstrap import open_default_store
-
-        store = open_default_store()
-    except Exception:  # noqa: BLE001 — 取不到 store 只降級 hint，不阻斷 sync
-        return frozenset()
-    try:
-        return frozenset(
-            cohort_id
-            for cohort_id in cohort_ids
-            if store.latest_research_work_order(cohort_id) is not None
-        )
-    except Exception:  # noqa: BLE001
-        return frozenset()
-    finally:
-        store.close()
-
-
-def _decision_review_hint(
-    ref: str,
-    dispatchable: frozenset[str],
-    blockers: Sequence[str] = (),
-    *,
-    material_event: bool = False,
-) -> str:
-    """逐項說出「這一筆現在該做什麼」。
-
-    ⚠ 只分 dispatch／reassess 兩類仍然不夠。2026-08-26 實測：[223] co:lumentum
-    沒有 work order（所以不是 dispatch），但 reassess **跑過之後仍是 REVIEW**——
-    因為它的 blocker 是 `financial_resilience_corroboration_incomplete`，
-    那要靠補證據，不是重跑一次評估。只寫「請跑 reassess」會讓人跑第二次然後
-    再問一次「那我到底要下什麼」。
-
-    所以非 dispatchable 的分支必須把 **blocker 本身**寫出來：reassess 只在
-    REVIEW 純粹來自 context 過期時有用；有實質 blocker 時，要動的是那些 blocker。
-    """
-
-    if ref in dispatchable:
-        return "coverage 仍有 blocker：go 會 dispatch 回 pq1 做 bounded research，完成後才 reassess"
-    # 哪些 blocker 真的需要人動手，唯一權威是 config/decision_blockers.json 的
-    # `resolution_mode`（`shared.blockers` 是唯一 loader）。
-    #
-    # ⚠ 這裡原本手寫了一組 stale_only 清單——那是把一個已有 SSOT 的分類複製第二份，
-    # 而複製品立刻就錯了：2026-08-26 實測 [220] co:axt 的
-    # execution_fx_missing／holdings_unavailable／portfolio_leverage_unavailable
-    # 被誤報成「要補證據／研究」，但 registry 早已把它們標為 system_internal／
-    # awaiting_external，而該項實際上只要 reassess 就從 REVIEW 變成 NO ACTION。
-    # 判準與 L15 一致：分類是語意問題，但它已經被登記成 deterministic 資料，
-    # 就該去讀它，不要另外猜一份。
-    from shared.blockers import describe_blocker
-
-    substantive = sorted(
-        code
-        for code in {str(b) for b in blockers if b}
-        if getattr(describe_blocker(code), "resolution_mode", "user_decision")
-        == "user_decision"
-    )
-    if substantive:
-        # ⚠ 這裡曾寫「沒有 work order，go 不成立」——與 dispatch 實作直接矛盾：
-        # `todo dispatch` 對無 work order 的項目會 reassess 刷新 context，仍有實質
-        # blocker 就以 assessment_gap ref 排入 pq1 並附研究範圍（outcome=
-        # queued_assessment_gap）。使用者的介面就是一個 go（2026-08-30 定案）；
-        # 「大項」只是研究範圍較大，不是另一個動詞。
-        return (
-            "go（大項）＝reassess 後以 assessment_gap 排入 pq1，研究範圍："
-            + "、".join(substantive)
-            + "。產出為 assessment／研究包，完成後 reassess 以新 decision receipt 結案"
-        )
-    # ⚠ 這裡原本只有一句「請跑 reassess」，而它對三種完全不同的情況都照說一次。
-    # 2026-09-11 實測 [512] co:iqe：它拿到那句話，但 `reassess-stale` 根本不收它
-    # （段 2 的判準是 `_only_system_internal_blockers`，比「無 user_decision」嚴得多），
-    # `standing-go` 又把它推回給 `reassess-stale`——兩支互相推，使用者照著做只會白跑。
-    #
-    # 往下追才發現它留在佇列的真正原因是 **evidence_delta=material**：證據有實質變動時
-    # 刻意蓋過 `waiting_on` 推導與 system_internal 退休路徑（見 collect 端註解）。
-    # 所以縫隙不只一條，要分成三種各自說清楚，而且 material 必須排最前面——
-    # 它是「為什麼這一筆在你眼前」的答案，其餘兩種是「為什麼自動化不會碰它」。
-    if material_event:
-        return (
-            "留在佇列是因為**證據有實質變動**（evidence_delta=material），不是因為有需要你決定的 blocker"
-            "——所以 reassess-stale 與 standing-go 都不會自動處理它。"
-            "go＝reassess 後以 assessment_gap 排入 pq1 做 bounded research，範圍見上方 missing_data；"
-            "不含入圖、Engine C 寫入與 live"
-        )
-    if _only_system_internal_blockers(blockers):
-        return (
-            "coverage 已無 blocker，REVIEW 只來自凍結 context 過期——不是 dispatch；"
-            "段 2 的 `todo reassess-stale --run` 會自動接手並結案，**不需要你下 go**"
-        )
-    waiting = sorted(
-        code
-        for code in {str(b) for b in blockers if b}
-        if getattr(describe_blocker(code), "resolution_mode", "user_decision")
-        == "awaiting_external"
-    )
-    if waiting:
-        return (
-            "沒有需要你決定的 blocker，但仍帶等世界的項目："
-            + "、".join(waiting)
-            + "。reassess 只會 append 一筆同樣 REVIEW 的 decision（段 2 因此不收它），"
-            "go 也不會讓事情發生——等 trigger，或用 `pending --trigger` 寫下等待條件"
-        )
-    # blockers 讀不到或為空：不知道就說不知道，不要落進上面任何一句有指示性的話（INV-3）。
-    return (
-        "讀不到這一筆的 blocker 分類——**不當成「沒有 blocker」**。"
-        "請跑 `python -m decision_lab references <cohort_id>` 看它到底缺什麼"
-    )
-
-
-def _decision_review_title(
-    label: str,
-    *,
-    weakest_axis: str | None,
-    sheet_only: bool = False,
-) -> str:
-    """研究缺口項目的標題：指名補哪一檔的哪一軸。
-
-    先前是 `f"{action} — {label}"`，也就是「REVIEW — co:coherent」——它說了狀態卻
-    沒說成因，使用者看到只能再點進去查一次。最弱軸就是排序的瓶頸，也是提高排序的
-    唯一路徑，所以它才是這一列該講的事。
-
-    `sheet_only` 與軸缺失時退回「複查」措辭：那些項目本來就不是研究缺口，硬套研究
-    措辭會讓它們看起來需要補證據。
-    """
-    if sheet_only or not weakest_axis:
-        return f"複查 — {label}"
-    from decision_lab.sizing import AXIS_RESEARCH_PROMPT
-
-    prompt = AXIS_RESEARCH_PROMPT.get(weakest_axis)
-    if not prompt:
-        # 未登記的軸不猜措辭，但仍要指名它——沉默會讓新增的軸悄悄退回舊格式。
-        return f"{label}：補 {weakest_axis}"
-    return f"{label}：{prompt}"
-
-
-def _residual_digest(user_codes: Iterable[str], missing_data: Iterable[str]) -> str:
-    """corroboration 殘餘缺口的 content key。
-
-    churn 的機械成因（2026-08-31 定案）：誠實 assessment 永遠列 missing_data →
-    `corroborated + missing_data` 依規則掛 `{axis}_corroboration_incomplete` →
-    收集端用固定軸文案鑄同標題新號（[294]→[308]）。使用者看到的是「go 了又重生」，
-    實際上缺口每輪都在變小，只是標題不說。修法＝以**殘餘內容**當 key：內容沒變的
-    不因 resolve 而復活；內容變了才鑄新號，且標題直接講新缺口。
-    """
-
-    import hashlib
-
-    payload = json.dumps(
-        [sorted(str(c) for c in user_codes), sorted(str(m) for m in missing_data)],
-        ensure_ascii=False,
-    )
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
-
-
-def _corroboration_only_user_codes(blockers: Any) -> list[str] | None:
-    """若使用者要決定的 blocker **全部**是 `_corroboration_incomplete` 類（誠實殘餘），
-    回傳那些 code；否則 None（有真缺口，照舊 cohort-keyed 行為）。"""
-
-    codes = [str(b) for b in blockers if isinstance(b, str)]
-    if not codes:
-        return None
-    try:
-        from shared.blockers import get_blocker_registry
-
-        grouped = get_blocker_registry().classify(codes)
-    except Exception:
-        return None
-    user_codes = list(grouped.get("user_decision") or ())
-    if user_codes and all(c.endswith("_corroboration_incomplete") for c in user_codes):
-        return user_codes
-    return None
-
-
-def _collect_decision_rows() -> list[dict[str, Any]]:
-    """需要使用者注意的 Engine D 決策項（`attention == "REVIEW"`）→ 複查待辦。
-
-    需要本機 private Decision Store 與外部 authority；失敗會往上拋，由呼叫端
-    決定是 fail-soft 還是記錄成「來源不健康」。
-    """
-    from briefing.public_view import get_decision_brief_core
-
-    brief = get_decision_brief_core()
-    rows: list[dict[str, Any]] = []
-    items = brief.get("items") or []
-    dispatchable = _dispatchable_cohorts(items)
-    for item in items:
-        # U7 之前是 `recommended_action not in {"NO ACTION", ""}`；四動作已移除，
-        # 現在唯一的判準是這一檔今天要不要人看（見 decision_lab.models.ATTENTION_STATES）。
-        if str(item.get("attention") or "") != "REVIEW":
-            continue
-        ref = str(item.get("cohort_id") or item.get("decision_id") or "")
-        company = str(item.get("company_id") or "unknown")
-        company_hint = str(item.get("company_id_hint") or "").strip()
-        ticker = str(item.get("ticker") or "").strip().upper()
-        if not ref and item.get("sheet_only"):
-            identity = company if company not in {"", "unknown", "unresolved"} else (
-                f"ticker:{ticker}" if ticker else ""
-            )
-            ref = f"sheet:{identity}" if identity else ""
-        if not ref:
-            continue
-        blockers = item.get("blockers") or []
-        material_event = str(item.get("evidence_delta") or "none") in {
-            "material", "positive", "negative"
-        }
-        label = company if company not in {"", "unknown", "unresolved"} else (
-            company_hint or ticker or "unknown"
-        )
-        missing = [
-            str(m) for m in (item.get("weakest_missing_data") or []) if str(m).strip()
-        ]
-        title = _decision_review_title(
-            label,
-            weakest_axis=item.get("weakest_axis"),
-            sheet_only=bool(item.get("sheet_only")),
-        )
-        hint = (
-            _decision_review_hint(ref, dispatchable, blockers,
-                                  material_event=material_event)
-            if not item.get("sheet_only") else ""
-        )
-        corroboration_codes = (
-            None if item.get("sheet_only")
-            else _corroboration_only_user_codes(blockers)
-        )
-        if corroboration_codes:
-            # 誠實殘餘類：標題直接講**當前**缺口，不用固定軸文案——使用者才看得出
-            # [308] 問的其實是新問題，不是 [294] 重生（churn 修法第一半）。
-            first = missing[0] if missing else "（missing_data 未列明）"
-            title = f"{label}：殘餘缺口——{first[:70]}"
-        if missing and hint:
-            hint = "當前 missing_data：" + "；".join(m[:60] for m in missing[:3]) + \
-                f"（共 {len(missing)} 項）｜" + hint
-        row = {
-            "type": "sheet_only_holding" if item.get("sheet_only") else "decision_review",
-            "ref_id": ref,
-            "title": title,
-            **({"hint": hint} if hint else {}),
-            "source": "decision_lab",
-        }
-        # 標的歸屬跟著 payload 走（L16）：在這裡它是結構化欄位，到下游卻只剩散文
-        # 標題裡的 `co:xxx：` 前綴，於是每個消費端都得 parse 一次去猜——`closure` 就是
-        # 因此看不見「使用者已 defer 這一檔」。**不是寫一份文件叫人記得去查。**
-        if company not in {"", "unknown", "unresolved"}:
-            row["company_id"] = company
-        if ticker:
-            row["ticker"] = ticker
-        if corroboration_codes:
-            row["residual_digest"] = _residual_digest(corroboration_codes, missing)
-        if not item.get("sheet_only") and item.get("evidence_delta"):
-            row["event_link"] = {
-                "type": "decision_evidence_delta",
-                "value": str(item.get("evidence_delta") or "none"),
-                "receipt": (
-                    f"decision:{item['decision_id']}"
-                    if item.get("decision_id")
-                    else ""
-                ),
-            }
-        # 完全沒有可識別主詞的 cohort 不鑄 pq2：`identity_unresolved` 的 next_step
-        # 寫「提供 exact company_id 或在 registry 登記」，但**連要登記誰都沒人知道**——
-        # 使用者得去翻 `decision_events` 才找得出當初那個 id。這不是使用者決定得了的事。
-        #
-        # 實測代價（2026-09-12）：`tech:hbm` 的自動追蹤 cohort 燒掉 [540]／[547]／[551]／
-        # [554] 四個編號；三次 `go` 全由常規授權自動放行、每次都以 park 收場——而 pq2 是
-        # 使用者**唯一**的授權介面。`AGENTS.md` 對這形狀有明文先例（`sheet_only`
-        # [18]-[33]→[46]-[60]）：**drop 只會換號重生，正確做法是修 collector 端分類。**
-        #
-        # ⚠ 判準是實測分出來的那一格，不是「看起來像沒身分」（L17-4：只 general 到
-        # 資料支持的地方）。9 個 `company_id IS NULL` 的 cohort 實測分成兩群：
-        #   8 筆未上市**公司** → `company_id_hint` 是 `co:*`（主詞在，只是還沒掛牌），
-        #     它們走 `research_ticker_unavailable`＝`awaiting_external`，一個編號用一次
-        #     就停住了——這條路徑**不得**碰到它們；
-        #   1 筆技術節點 → hint 是 None，因為 `capture_signal` 依 INV-1 把非公司 id 擋掉，
-        #     主詞沒留下任何痕跡。
-        # 所以三個欄位同時為空，才是「沒有主詞」。
-        if not item.get("sheet_only") and company in {"", "unknown", "unresolved"} \
-                and not company_hint and not ticker:
-            row["system_internal_only"] = True
-            row["suppression"] = {
-                "receipt": f"cohort-without-subject:{ref}",
-                "reason": (
-                    "這個 cohort 沒有任何可識別的主詞（company_id、hint、ticker 三者皆空），"
-                    "所以 identity_unresolved 的 next_step（登記 company_id）連使用者也執行不了"
-                    "——要登記誰都得先去翻 decision_events。追蹤非公司節點本身有價值，"
-                    "但它需要自己的 lane（不帶 identity／financial／live blocker），"
-                    "那是開發項，載體是 ROADMAP 不是 pq2。"
-                ),
-            }
-            rows.append(row)
-            continue
-        # 純 system_internal 狀態不是 pq2，也不是外部事件。仍回傳給 sync，讓
-        # 既有 stable item 留下 deterministic retirement audit；新狀態則不建 item。
-        # material evidence 優先，不能因同時有 stale 診斷而被吞掉。
-        if not item.get("sheet_only") and not material_event and \
-                _only_system_internal_blockers(blockers):
-            row["system_internal_only"] = True
-            rows.append(row)
-            continue
-        # 若這個決策的所有 blocker 都不需要使用者決定（純粹在等世界產生新資料），
-        # 就直接帶著推導出的等待理由入池，不佔決策注意力。保守規則：只要有一個
-        # blocker 需要人決定就照舊進決策佇列。
-        waiting = (
-            None if material_event else _derive_waiting_on(blockers)
-        )
-        if waiting:
-            row["waiting_on"] = waiting
-        rows.append(row)
-    # Engine D 也可能因 portfolio authority 全域失效而要求 REVIEW，這時沒有
-    # cohort item（例如 Google Sheet holdings 完全讀不到）。這仍是需要使用者
-    # 處理的 pq2，不能因 items=[] 就從統一待辦池消失。
-    if brief.get("action_needed") and not items:
-        blockers = sorted(str(b) for b in (brief.get("blockers") or []) if b)
-        reason = str(brief.get("reason") or "Engine D 全域狀態需要複查")
-        ref = "global:" + ("|".join(blockers) or "review")
-        rows.append({
-            "type": "decision_review",
-            "ref_id": ref,
-            "title": f"複查 — {reason}",
-            "hint": "修復全域 authority blocker 後重跑 decision_lab today",
-            "source": "decision_lab",
-        })
-    return rows
 
 
 def collect_all() -> list[dict[str, Any]]:
@@ -2858,10 +1591,7 @@ def _item_line(item: Mapping[str, Any]) -> str:
         impact = str(item.get("graph_impact") or "").strip()
         if impact:
             line += f"\n        ↳ 圖影響：{impact}"
-    # decision_review 的區段標題只寫得出一種成因（見 _dispatchable_cohorts）。
-    # 逐項 hint 才知道這一筆該 dispatch 還是該 reassess——不顯示等於沒有，
-    # 使用者只會看到區段標題然後下錯 verb（2026-08-26 實測）。
-    # 其他類型的 hint 是密度契約的內容（TL;DR），先前在 CLI 完全不顯示＝資訊遺失；
+    # hint 是密度契約的內容（TL;DR），先前在 CLI 完全不顯示＝資訊遺失；
     # 決策行契約是改閱讀順序不減密度，故一併收在決策行下面。
     hint = str(item.get("hint") or "").strip()
     if hint and not item.get("dispatch_status"):
@@ -2922,7 +1652,7 @@ def _render(pool: Mapping[str, Any]) -> str:
     if gated:
         # ⚠ 這一段原本把兩件事寫成同一句「等人工 gate」：真的在等你核准，以及
         # gate 早就 resolve 了卻沒人回頭動這張工單（2026-09-10 實測 [311]／[411]）。
-        # 分開講，因為下一步不同——後者要 reassess，不是等你。
+        # 分開講，因為下一步不同——後者要完成 checkpoint，不是等你。
         gate_state = {row["n"]: row for row in gated_items(pool)}
         lines.append(
             f"## pq1 已交回，等人工 gate（{len(gated)} 項；不吃 go／drop／pending）"
@@ -2933,7 +1663,7 @@ def _render(pool: Mapping[str, Any]) -> str:
             if state.get("state") == "gate_resolved":
                 suffix = (
                     f"　⚠ 它等的 [{state['gate_n']}] 已 {state['gate_resolution']}"
-                    "——gate 已消失，下一步是 reassess 拿新 decision receipt"
+                    "——gate 已消失，下一步是完成 pq1 checkpoint 並以 terminal receipt 結案"
                 )
             elif state.get("state") == "no_pointer":
                 suffix = "　⚠ 說不出在等哪個編號——這個等待沒有到期（INV-2）"
@@ -2994,18 +1724,11 @@ def main(argv: list[str] | None = None) -> int:
     # 沒有東西可以跳過，留著一個沒有作用的旗標會讓讀者以為預設是「有跑」。
     p_sync.add_argument("--json", action="store_true")
 
-    p_stale = sub.add_parser(
-        "reassess-stale",
-        help="佇列段 2：列出／執行「只因凍結 context 過期而 REVIEW」的 decision_review reassess（機械維護，不吃 pq1 預算）",
-    )
-    p_stale.add_argument("--run", action="store_true", help="實際 reassess 並結案；預設只列出候選")
-    p_stale.add_argument("--json", action="store_true")
-
     p_standing = sub.add_parser(
         "standing-go",
         help="佇列段 2b：對常規授權類別（config/standing_authorization.json）執行使用者本來會下的 go；預設只列候選",
     )
-    p_standing.add_argument("--run", action="store_true", help="實際 dispatch／reassess；預設只列出候選與跳過者")
+    p_standing.add_argument("--run", action="store_true", help="實際 dispatch；預設只列出候選與跳過者")
     p_standing.add_argument("--leads", default="")
     p_standing.add_argument("--json", action="store_true")
 
@@ -3035,7 +1758,7 @@ def main(argv: list[str] | None = None) -> int:
     p_dispatch.add_argument("numbers", nargs="+")
     p_dispatch.add_argument("--leads", default="")
 
-    p_work = sub.add_parser("work", help="更新已 dispatch 的 decision-review pq1 job")
+    p_work = sub.add_parser("work", help="更新已 dispatch 的 source_trace_review pq1 job")
     p_work.add_argument("number", type=int)
     p_work.add_argument(
         "--to", required=True,
@@ -3068,7 +1791,7 @@ def main(argv: list[str] | None = None) -> int:
 
     p_complete_ra = sub.add_parser(
         "complete-ra",
-        help="驗證 RA durable apply＋Decision handoff 後結案 exact pq2 item",
+        help="驗證 RA durable apply／publish 後結案 exact pq2 item",
     )
     p_complete_ra.add_argument("number", type=int)
     p_complete_ra.add_argument("--digest", required=True)
@@ -3121,16 +1844,9 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "standing-go":
-        from decision_lab.bootstrap import open_default_store
         from engine_b.leads import DEFAULT_LEADS_PATH
 
-        decision_store = open_default_store()          # dry-run 也要開：候選判定要看 work order
-        try:
-            outcome = standing_go(
-                pool, decision_store, leads_path=args.leads or DEFAULT_LEADS_PATH, dry_run=not args.run,
-            )
-        finally:
-            decision_store.close()
+        outcome = standing_go(pool, leads_path=args.leads or DEFAULT_LEADS_PATH, dry_run=not args.run)
         if args.run:
             save(pool, args.pool)
         if args.json:
@@ -3149,86 +1865,24 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"  ✗ [{row['n']}] {row['reason']}", file=sys.stderr)
         return 1 if outcome["failed"] else 0
 
-    if args.command == "reassess-stale":
-        from decision_lab.bootstrap import open_default_store
-
-        decision_store = open_default_store()
-        try:
-            provider = None
-            if args.run:
-                from engine_d_runtime.bootstrap import build_default_runtime_provider
-
-                provider = build_default_runtime_provider()
-            outcome = reassess_stale(
-                pool, decision_store, provider, dry_run=not args.run,
-            )
-        finally:
-            decision_store.close()
-        if args.run:
-            save(pool, args.pool)
-        if args.json:
-            print(json.dumps(outcome, ensure_ascii=False, indent=2))
-        else:
-            if outcome["dry_run"]:
-                print(
-                    f"段2 reassess-stale 候選 {len(outcome['candidates'])} 項："
-                    f"{outcome['candidates'] or '—'}（加 --run 執行）"
-                )
-            else:
-                closed = [f"[{row['n']}]→{row['attention']}" for row in outcome["closed"]]
-                print(
-                    f"段2 reassess-stale：候選 {len(outcome['candidates'])}"
-                    f"｜結案 {len(outcome['closed'])}（{'、'.join(closed) or '—'}）"
-                    f"｜仍 REVIEW {len(outcome['still_review'])}"
-                    f"｜失敗 {len(outcome['failed'])}"
-                )
-                for row in outcome["failed"]:
-                    print(f"  ✗ [{row['n']}] {row['reason']}", file=sys.stderr)
-        return 1 if outcome["failed"] else 0
 
     if args.command == "resolve":
         failures = 0
-        decision_store = None
-        try:
-            for raw in args.numbers:
-                try:
-                    # `go` 對 decision_review 是全函數：由系統決定下一步是
-                    # dispatch、reassess 還是排入 assessment-gap pq1，
-                    # 使用者不必自己分辨（見 advance_decision_review）。
-                    item = get(pool, int(raw))
-                    if (
-                        args.verb == "go"
-                        and item["type"] == "decision_review"
-                        and item.get("dispatch_status") not in {"completed", "parked"}
-                    ):
-                        if decision_store is None:
-                            from decision_lab.bootstrap import open_default_store
-
-                            decision_store = open_default_store()
-                        outcome = advance_decision_review(
-                            pool, int(raw), store=decision_store
-                        )
-                        print(f"✓ [{raw}] → go（{outcome['outcome']}）")
-                        scope = outcome.get("scope")
-                        if scope:
-                            print(f"    研究範圍：{'、'.join(scope)}")
-                        continue
-                    resolve(
-                        pool, int(raw), args.verb,
-                        reason=args.reason, receipt=args.receipt,
-                        until=args.until, trigger=args.trigger,
-                        event_type=args.event_type,
-                    )
-                    suffix = ""
-                    if args.verb == "pending" and (args.until or args.trigger):
-                        suffix = f"（等：{args.until or args.trigger}）"
-                    print(f"✓ [{raw}] → {args.verb}{suffix}")
-                except (TodoError, ValueError) as exc:
-                    failures += 1
-                    print(f"✗ [{raw}]：{exc}", file=sys.stderr)
-        finally:
-            if decision_store is not None:
-                decision_store.close()
+        for raw in args.numbers:
+            try:
+                resolve(
+                    pool, int(raw), args.verb,
+                    reason=args.reason, receipt=args.receipt,
+                    until=args.until, trigger=args.trigger,
+                    event_type=args.event_type,
+                )
+                suffix = ""
+                if args.verb == "pending" and (args.until or args.trigger):
+                    suffix = f"（等：{args.until or args.trigger}）"
+                print(f"✓ [{raw}] → {args.verb}{suffix}")
+            except (TodoError, ValueError) as exc:
+                failures += 1
+                print(f"✗ [{raw}]：{exc}", file=sys.stderr)
         save(pool, args.pool)
         return 1 if failures else 0
 
@@ -3242,7 +1896,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         label = {
             "waiting": "真的在等你核准",
-            "gate_resolved": "⚠ gate 已消失（下一步：reassess 拿新 decision receipt）",
+            "gate_resolved": "⚠ gate 已消失（下一步：完成 pq1 checkpoint 並結案）",
             "no_pointer": "⚠ 說不出在等哪個編號——沒有到期（INV-2）",
         }
         for state in ("gate_resolved", "no_pointer", "waiting"):
@@ -3261,69 +1915,47 @@ def main(argv: list[str] | None = None) -> int:
     if args.command in {"dispatch", "work"}:
         from engine_b.leads import DEFAULT_LEADS_PATH
 
-        decision_store = None
         failures = 0
-        try:
-            if args.command == "dispatch":
-                for raw in args.numbers:
-                    try:
-                        item = get(pool, int(raw))
-                        if item["type"] == "decision_review":
-                            if decision_store is None:
-                                from decision_lab.bootstrap import open_default_store
-                                decision_store = open_default_store()
-                            result = dispatch_decision_review(
-                                pool, int(raw), store=decision_store
-                            )
-                        elif item["type"] == "source_trace_review":
-                            result = dispatch_source_trace_review(
-                                pool,
-                                int(raw),
-                                leads_path=args.leads or DEFAULT_LEADS_PATH,
-                            )
-                        else:
-                            raise TodoError(
-                                f"[{raw}] 類型 {item['type']} 不支援 pq1 dispatch"
-                            )
-                        save(pool, args.pool)
-                        print(f"✓ [{raw}] → pq1 queued {result['item']['dispatch_ref']}")
-                    except (TodoError, KeyError, ValueError) as exc:
-                        failures += 1
-                        print(f"✗ [{raw}]：{exc}", file=sys.stderr)
-            else:
+        if args.command == "dispatch":
+            for raw in args.numbers:
                 try:
-                    item = get(pool, args.number)
-                    if item["type"] == "decision_review":
-                        if decision_store is None:
-                            from decision_lab.bootstrap import open_default_store
-                            decision_store = open_default_store()
-                        result = checkpoint_decision_review(
-                            pool, args.number, store=decision_store,
-                            to_status=args.to, receipt=args.receipt,
-                            reason=args.reason,
-                            awaiting_gate=getattr(args, "awaiting_gate", None),
-                        )
-                    elif item["type"] == "source_trace_review":
-                        result = checkpoint_source_trace_review(
+                    item = get(pool, int(raw))
+                    if item["type"] == "source_trace_review":
+                        result = dispatch_source_trace_review(
                             pool,
-                            args.number,
+                            int(raw),
                             leads_path=args.leads or DEFAULT_LEADS_PATH,
-                            to_status=args.to,
-                            receipt=args.receipt,
-                            reason=args.reason,
                         )
                     else:
                         raise TodoError(
-                            f"[{args.number}] 類型 {item['type']} 不支援 pq1 checkpoint"
+                            f"[{raw}] 類型 {item['type']} 不支援 pq1 dispatch"
                         )
                     save(pool, args.pool)
-                    print(f"✓ [{args.number}] pq1 → {args.to} ({args.receipt})")
+                    print(f"✓ [{raw}] → pq1 queued {result['item']['dispatch_ref']}")
                 except (TodoError, KeyError, ValueError) as exc:
                     failures += 1
-                    print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
-        finally:
-            if decision_store is not None:
-                decision_store.close()
+                    print(f"✗ [{raw}]：{exc}", file=sys.stderr)
+        else:
+            try:
+                item = get(pool, args.number)
+                if item["type"] == "source_trace_review":
+                    result = checkpoint_source_trace_review(
+                        pool,
+                        args.number,
+                        leads_path=args.leads or DEFAULT_LEADS_PATH,
+                        to_status=args.to,
+                        receipt=args.receipt,
+                        reason=args.reason,
+                    )
+                else:
+                    raise TodoError(
+                        f"[{args.number}] 類型 {item['type']} 不支援 pq1 checkpoint"
+                    )
+                save(pool, args.pool)
+                print(f"✓ [{args.number}] pq1 → {args.to} ({args.receipt})")
+            except (TodoError, KeyError, ValueError) as exc:
+                failures += 1
+                print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
         return 1 if failures else 0
 
     if args.command == "complete-observation":

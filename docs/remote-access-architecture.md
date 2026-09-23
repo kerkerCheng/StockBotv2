@@ -58,14 +58,15 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 
 ---
 
-## 十二個工具與其應用
+## 十一個工具與其應用
+
+> `get_decision_brief`（今日決策摘要）已於 2026-09-23（Phase 0 Step 0b.4）隨 decision_lab 研究側退役。
 
 | 工具 | 讀/寫 | 應用場景 |
 |------|------|---------|
 | `get_graph_context` | 讀 | 「SIVE 研究狀態如何」——公司子圖/產業全圖的 LLM-ready 摘要（重用 `query/graph_context.py`） |
 | `run_read_query` | 讀 | 精確查詢/稽核：「列出所有 sole_source 邊」「數 origin_entity」。Session 以 READ access mode 開啟，寫入語句會被 Neo4j 拒絕（已實測） |
 | `get_financial_checklist` | 讀 | 查 Engine C 五項財務清單、最新客觀 analyst coverage 與當前 `policy_version` 的即時 view；不暴露 SQL、不持久化 crowding 分類 |
-| `get_decision_brief` | 讀 | 「今天需要動作嗎」——回 `decision_lab today` 的 redacted public DTO（九欄 action-first）。Decision Store 是本機 private runtime、永不進 git，這是手機／雲端看決策佇列的唯一視窗；純讀，不 freeze／不建 decision／不下單，runtime 未就緒回明確 `unavailable`、不洩私有路徑 |
 | `get_pending_leads` | 讀 | 今日 pending leads 佇列（priority 排序）＋狀態計數＋最近 harvest_log。`tracked_tickers` 算 thesis 影響度。leads 只是注意力 metadata |
 | `record_lead_decision` | **寫（本機 state）** | triage／advance 一則 lead（go/no-go/park/researching/applied…）；PASS 必須連同 `content_type`／`decision_impact`（capital commitment 另含 `payment_direction`）原子寫入 classification，拒絕只藏在 reason 的分類。只寫本機 `pending_leads.json`，**不再 commit／push public Git**；不入圖、不改 evidence tier、不建 decision |
 | `get_extraction_rules` | 讀 | 回傳 `prompts/extract_system.md` + `schema/vocab.json` + `prompts/intake_protocol.md` 原文（路徑寫死）。**任何遠端抽取前必讀**——含 storage permission、conflict 與 Research Action 協定 |
@@ -75,7 +76,7 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 | `get_research_action_status` | 讀 | 空 ID 回 recent actionable 摘要；完整 ID 回 frozen review + recovery state；永不回 raw/extraction body |
 | `apply_research_action` | **寫** | 以 ID + 完整 digest 套用使用者核准的 immutable action；逐文件 checkpoint、partial retry、permission-sensitive report；永不跑 Git |
 
-**Connector 權限設定：** 八個 read tools、`prepare_research_action` 與 `record_lead_decision`（只寫本機注意力 state）可設「允許」；`apply_research_action` 與 legacy `load_extraction` 保持「**Needs approval**」。工具權限不會自動繼承，新增／重建／Refresh connector 時逐一檢查。Claude mobile/web 可用同一 remote MCP；ChatGPT web 只有在帳號方案具 full MCP write 權限時能完成 apply。OpenAI 官方目前把 custom MCP apps 限在 web，ChatGPT mobile 不是手機入口。
+**Connector 權限設定：** 七個 read tools、`prepare_research_action` 與 `record_lead_decision`（只寫本機注意力 state）可設「允許」；`apply_research_action` 與 legacy `load_extraction` 保持「**Needs approval**」。工具權限不會自動繼承，新增／重建／Refresh connector 時逐一檢查。Claude mobile/web 可用同一 remote MCP；ChatGPT web 只有在帳號方案具 full MCP write 權限時能完成 apply。OpenAI 官方目前把 custom MCP apps 限在 web，ChatGPT mobile 不是手機入口。
 
 ---
 
@@ -93,7 +94,7 @@ Claude／OpenAI 雲端 = LLM 本體——思考、決定何時呼叫工具
 
 > **殘餘安全邊界：** digest 是 integrity，不是 authentication；Needs approval 是 client UX，不是 server auth。持有完整 MCP bearer URL 的直接呼叫者仍位於既有 graph-write 信任邊界內，可準備／載入錯誤資料，但拿不到 Git 能力。OAuth 2.1、短效且 audience-bound token 仍是後續安全升級；現階段先以最小 Neo4j 權限、路徑 token、action quota 與無 remote Git 壓低 blast radius。
 
-遠端 MCP 目前定位為「查研究資料、看今日決策、載入已核准證據」；部位 sizing 的**執行**與 paper-portfolio append 仍不暴露成遠端寫入工具。手機／網頁端可讀 `get_financial_checklist` 與 `get_decision_brief`（今日決策佇列的 redacted DTO），但 `record-choice`／`record-fill` 等決策寫入永遠只在本機以明確輸入執行——遠端能看建議，不能替使用者接受 choice 或回報 fill。
+遠端 MCP 目前定位為「查研究資料、載入已核准證據」；部位 sizing 的**執行**與 paper-portfolio append 仍不暴露成遠端寫入工具。手機／網頁端可讀 `get_financial_checklist` 與 `get_decision_brief`（今日決策佇列的 redacted DTO），但 `record-choice`／`record-fill` 等決策寫入永遠只在本機以明確輸入執行——遠端能看建議，不能替使用者接受 choice 或回報 fill。
 
 Token 或 Neo4j 密碼要輪換時：改 `.env` → 重啟 MCP server → 到 claude.ai 更新 connector URL。
 

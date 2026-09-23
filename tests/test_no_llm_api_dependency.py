@@ -14,7 +14,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 #: 掃描的 production 套件與腳本。⚠ **不含 `tests/`**——測試提到套件名是正當的。
 _PRODUCTION = (
-    "alpha", "engine_b", "engine_c", "engine_d_runtime", "decision_lab", "loader",
+    "alpha", "engine_b", "engine_c", "decision_lab", "loader",
     "query", "thesis", "fetchers", "portfolio", "risk", "shared", "identity",
     "crons", "scripts", "briefing", "intake", "storage", "audit", "mcp_server",
 )

@@ -53,7 +53,7 @@ tags:
 | 字彙 | 位置 | 擴充方式 |
 |---|---|---|
 | node_type／abstraction_level／role／relation／qualification_status／demand_proof_level／source_type／evidence_tier | `schema/vocab.json` | 加一項；`loader/validate.py` 讀同一份。2026-07-29 的 robotics ontology 就是這樣加的。⚠ 新增 `relation` 必須同步在 `schema/neo4j_setup.cypher` 預熱（`tests/test_robotics_ontology.py` 是這道剎車），並回答它算不算 counter path |
-| 哪些 relation 算 counter path | `schema/vocab.json` 的 `counter_path_relation` | 明列，不是對 relation 名稱做子字串比對；`engine_d_runtime/adapters.py` 的 `counter_path_relations` 是唯一 loader。2026-08-06 從 `substitut／alternative／compete／counter` 四個 token 改來——那既猜不到 `constrained_by`，也會誤命中名字裡剛好含 counter 的 relation |
+| 哪些 relation 算 counter path | `schema/vocab.json` 的 `counter_path_relation` | 明列，不是對 relation 名稱做子字串比對；唯一 loader 原是 ~~`engine_d_runtime/adapters.py`~~ 的 `counter_path_relations`（2026-09-23 Phase 0 Step 0b.4 隨 Engine D 研究側退役；字彙留，Phase 2 走圖的 counter path 問句要接它）。2026-08-06 從 `substitut／alternative／compete／counter` 四個 token 改來——那既猜不到 `constrained_by`，也會誤命中名字裡剛好含 counter 的 relation |
 | 公司 ID ↔ research／execution 識別 | `config/company_identity.json` | 加一列；`identity/registry.py` 是唯一 loader |
 | 交易所報價單位 → ISO 結算幣別 | `config/currency_units.json` | 只登記 minor unit（GBp／ILA／ZAc…）；ISO code 形式的新幣別（TWD／JPY…）不必登記就自動通過。`identity/currency.py` 是唯一 loader |
 | Engine C 人工觀測欄位 | `config/engine_c_observation_fields.json` | 加一項且 `gate_member` 必須為 false；`engine_c/observation_fields.py` 是唯一 loader |
@@ -70,8 +70,7 @@ tags:
 | 字彙 | 位置 | 為什麼凍結 |
 |---|---|---|
 | Confidence 五軸 | `shared/assessment_axes.py` 的 `AXES`（＋`AXIS_RESEARCH_PROMPT`／`weakest_axis_of`） | 評分骨架，已凍進所有既有 decision payload。⚠ 與 `alpha/contracts.py` 的 `AXES`（新五 score）**同名不同物**——舊軸問「證據多強」，新 score 問投資問題，對照表見 `alpha/legacy_axes.py` |
-| 證據充分度三階序數 | `shared/evidence_levels.py` 的 `LEVELS` | 次序本身是排序鍵。⚠ 2026-09-04 前 `decision_lab/sizing.py` 與 `alpha/levels.py` **各存一份**，靠一句註解同步而無測試——漂掉不報錯，只讓 `convert_axis_results` 對歷史 payload 靜默誤轉。兩層都消費它且它不擁有 authority → shared |
-| 軸 → authority 對照 | `decision_lab/sizing.py` 的 `AXIS_REFERENCE_AUTHORITIES` | 證據來源分權；它會擋下「拿 Engine A 文件冒充 Engine C 財務證據」這類錯誤 |
+| 證據充分度三階序數 | `shared/evidence_levels.py` 的 `LEVELS` | 次序本身是排序鍵。⚠ 2026-09-04 前 ~~`decision_lab/sizing.py`~~ 與 `alpha/levels.py` **各存一份**，靠一句註解同步而無測試——漂掉不報錯，只讓 `convert_axis_results` 對歷史 payload 靜默誤轉。兩層都消費它且它不擁有 authority → shared |
 | 觀測欄位的核准分級 | `config/engine_c_observation_fields.json` 的 `verifiability`（`mechanical`／`judgment`） | 決定寫入要不要 pq2。判準是**可否確定性重導**（L10「今天重新取一次拿得回來嗎」），不是「存哪張表」。⚠ 未宣告 fail safe 當 `judgment`；`mechanical` 換來寫入端強制 JSON 數值（拿掉人工閘門的補償控制）。與 `gate_member` 是不同的軸，但**交集必須為空** |
 | 圖 metadata 可回填的屬性 | `loader/source_dating.py` 的 `BACKFILLABLE_PROPERTIES`（`published_at`／`retrieved_at`） | 同一條「可否確定性重導」判準延伸到圖（2026-09-04）。**這是白名單不是黑名單**：擴充前先問「這個值是印在文件上、任何人重讀都得到同一個數嗎」。不是的話它是判讀，走 graph admission（pq2 `ra_admission`）。⚠ `substitutability`／`sole_source`／`evidence_tier` 永遠不得加進來 |
 | SourceDoc 定日方法 | `loader/source_dating.py` 的 `DATING_METHODS`（`url_path`／`filing_metadata`／`document_masthead`／`event_date`） | 每個 method 代表「一種可被接受的日期來源」，新增一個要同時想清楚 **audit 怎麼抽查它**（`audit/checks.py::check_point_in_time`）。⚠ **刻意沒有「抓到的那天」**：ingest 日期冒充 `published_at` 會讓所有東西看起來都是最近才發表的，回測會因此在每個歷史時點看到全部證據 |
@@ -85,7 +84,6 @@ tags:
 | decompose 提案（pq2 `manual` 的 `decompose:<slug>` ref） | `engine_b/decompose_proposals.py` 的 `REF_PREFIX`／`MAX_OPEN`／`breadth_check` | 鑄號前三道判準都是機械的：新錨（`config/sector_anchors.json`＋coverage 快照）、drop 過沒新 lead 不重生（pool ground truth）、open ≤2。放寬任何一道都會把「建議只由 pool ground truth 導出」那條再踩一次 |
 | 佇列段序（有工作的狀態 → 誰來取） | `engine_b/queue_segments.py` 的 `SEGMENTS`（＋`LEAD_STATUSES`／`WATCH_STATUSES`／`DISPATCH_STATUSES`／`NOT_WORK`） | 每一段必須指得出 consumer（沒有 consumer 的段就是黑洞，registry 在 import 時拒絕）。**新的工作狀態要先在這裡登記段與 consumer，再寫產生它的程式**——反過來做，`audit invariants --only QueueSegments` 會在第一筆資料出現當天 FAIL（2026-09-08 實測 39 個 fired watch 與 27 檔 forward view 就是這樣躺了一週沒人取）。`cost`（mechanical／research）決定吃不吃 `drain_limit_per_run` |
 | thesis 生命週期狀態機 | `thesis/pending_lifecycle.py` 的 `ALLOWED_TRANSITIONS` | L7 的語意骨架；`retired` 刻意是終局。開啟它等於改變 thesis 的意義，不是補字彙 |
-| 執行 intent | `decision_lab/workflow.py` 的 `_INTENTS`（research／paper／live） | 資本邊界 |
 | 使用者動詞 | `engine_b/todo.py` 的 `VERBS`（`engine_b/batch.py` 另有一份含 `skip`） | 對話介面契約 |
 | 資本 authority record 類型 | `shared/capital_authority.py` 的 `_ALLOWED_TYPES` | 2026-07-30 定案只保留 cash_floor 與 credit_facility |
 
@@ -103,6 +101,8 @@ tags:
 
 | 字彙 | 原位置 | 移除日期／commit | 為什麼 |
 |---|---|---|---|
+| 軸 → authority 對照 `AXIS_REFERENCE_AUTHORITIES`（＋`_ENGINE_C_AUTHORITIES`／`_GRAPH_AUTHORITIES`） | ~~`decision_lab/sizing.py`~~／~~`decision_lab/context.py`~~ | 2026-09-23 Phase 0 Step 0b.4（2/3） | Engine D 研究側（五軸 sizing／context 凍結）整組退役；token 字彙本身留在 `config/authority_tokens.json`，Engine C 端由 `engine_c/observation_fields.py` 的 `KNOWN_AUTHORITIES` 讀 |
+| 執行 intent `_INTENTS`（research／paper／live） | ~~`decision_lab/workflow.py`~~ | 2026-09-23 Phase 0 Step 0b.4（2/3） | 舊 Decision Store 凍結唯讀、不再建 decision；live 收據改住 `library/trades/trade_log.jsonl`（`scripts/record_trade.py`） |
 | Beta 三態系統動作 `CONTRIBUTE REVIEW`／`HOLD`／`PAUSE CONTRIBUTION` | `portfolio/allocation.py` | 2026-08-29 `6aa31de` | beta 不再回答「今天該不該投」，只回答距目標多遠與在什麼水位 |
 | `signal` 整區：`tiers`（含 `rsi_at_most` 45／40／35）、`baseline_pace`、`allowed_paces`、`repeat_after_sessions`、`stretched_above_sma200` | `config/beta_policy.json` | 2026-08-29 `6aa31de` | 2026-08-01 三次回測 0 勝 3 敗（見 `AGENTS.md`「技術訊號的地位」）。拔的是**已被量測為有害**的東西，不是精簡 |
 | `campaign_budget_fraction_by_sleeve` 與「本輪可評估上限」概念 | `config/beta_policy.json`、`portfolio/allocation.py` | 2026-08-29 `6aa31de` | `self_funded_supported_range` 已重新定義為可部署現金本身，不再乘 pace |

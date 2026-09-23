@@ -61,8 +61,8 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "graph admission" in text
     assert "不連 broker" in text
     assert "recommendation 推定 choice" in text
-    # 決策寫入只在本機、遠端 fallback 用唯讀 get_decision_brief。
-    assert "get_decision_brief" in text
+    # 決策寫入只在本機、遠端 fallback 只有 leads 的受限路徑（get_decision_brief 已於 0b.4 退役）。
+    assert "record_lead_decision" in text
     assert "只在本機" in text
     assert "不推定 choice／fill" in text
     assert "self_funded_supported_range" in text

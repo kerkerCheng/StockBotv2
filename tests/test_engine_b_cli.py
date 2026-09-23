@@ -338,7 +338,6 @@ def test_campaign_triage_passes_selected_and_filters_rest_atomically(
     assert receipt == {"campaign_id": "robotics", "filtered": 1, "passed": 1}
 
 
-
 def _routine_with_limit(tmp_path, limit: int = 5) -> str:
     """給 drain 測試一份**自己的** `daily_routine.json`。
 
@@ -427,32 +426,13 @@ def test_classification_health_and_drain_withhold_active_gap(tmp_path, capsys) -
     assert [item["lead_id"] for item in health["items"]] == [missing]
 
     assert cli.main([
-        "--leads", str(path), "drain", "--decision-work-orders", "skip", "--json",
+        "--leads", str(path), "drain", "--json",
         "--routine-config", _routine_with_limit(tmp_path),
     ]) == 0
     rows = json.loads(capsys.readouterr().out)
     assert [row["lead"]["lead_id"] for row in rows if row["kind"] == "lead"] == [ready]
     withheld = [row for row in rows if row["kind"] == "withheld_unclassified_lead"]
     assert withheld[0]["health"]["lead_id"] == missing
-
-
-def test_default_drain_fails_closed_when_decision_store_is_unavailable(
-    tmp_path, capsys, monkeypatch
-) -> None:
-    path = tmp_path / "pending_leads.json"
-    leads.save(leads.empty_store(), path)
-    monkeypatch.setattr(leads, "DEFAULT_LEADS_PATH", path)
-
-    import decision_lab.bootstrap
-
-    def fail_open():
-        raise RuntimeError("private store blocked")
-
-    monkeypatch.setattr(decision_lab.bootstrap, "open_default_store", fail_open)
-
-    assert cli.main(["--leads", str(path), "drain",
-                     "--routine-config", _routine_with_limit(tmp_path)]) == 2
-    assert "Decision pq1 無法讀取" in capsys.readouterr().err
 
 
 def test_default_priority_list_fails_closed_when_holdings_are_unavailable(
@@ -525,13 +505,13 @@ def test_drain_prints_segment_counters_and_lists_fired_hypothesis_checks(tmp_pat
          "wake_lead": "lead_x", "entities": ["X"], "expires": "2027-01-01", "woken_by": {}},
     ]})
 
-    assert cli.main(["--leads", str(path), "drain", "--decision-work-orders", "skip"]) == 0
+    assert cli.main(["--leads", str(path), "drain"]) == 0
     out = capsys.readouterr().out
     assert "段0 pending 分流 1" in out
     assert "lead 型 1" in out and "假設對照 1" in out
     assert "ew_h" in out and "COUPE" in out
 
-    assert cli.main(["--leads", str(path), "drain", "--decision-work-orders", "skip", "--json"]) == 0
+    assert cli.main(["--leads", str(path), "drain", "--json"]) == 0
     rows = json.loads(capsys.readouterr().out)
     fired_rows = [r for r in rows if r["kind"] == "fired_watch_pending"]
     assert {r["target"] for r in fired_rows} == {"lead", "hypothesis"}
@@ -542,7 +522,7 @@ def test_drain_prints_closure_line_and_says_unread_when_no_artifacts(tmp_path, c
     monkeypatch.setenv("STOCKBOT_APP_ARTIFACT_DIR", str(tmp_path / "empty_app"))
     path = tmp_path / "pending_leads.json"
     leads.save(leads.empty_store(), path)
-    assert cli.main(["--leads", str(path), "drain", "--decision-work-orders", "skip"]) == 0
+    assert cli.main(["--leads", str(path), "drain"]) == 0
     out = capsys.readouterr().out
     assert "段5 每檔閉環：未讀到" in out
     assert "到終局 0" not in out
@@ -588,8 +568,8 @@ def test_drain_limit_zero_selects_nothing_of_every_kind(tmp_path, capsys, monkey
     原斷言只擋得住有人把 0 寫進 config，擋不住任何一個把 limit 當「沒有上限」用的消費端；
     這一條直接證明 limit=0 時**每一種工作都選不出來**——0 不可能是無上限。
 
-    空跑檢查：把 `_cmd_drain` 的 `if include_decisions and limit:` 改回 `if include_decisions:`，
-    或把 `lead_batch` 的切片改成無上限 → 這條會紅。
+    空跑檢查：把 `_cmd_drain` 的 `lead_batch` 切片改成無上限 → 這條會紅。
+    （2026-09-23 Step 0b.4：Decision work order 與 assessment-gap 兩種工作隨研究側退役，kinds 只剩 lead。）
     """
     routine = tmp_path / "daily.json"
     routine.write_text(json.dumps({

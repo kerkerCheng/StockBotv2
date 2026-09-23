@@ -508,9 +508,9 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
     """已通過 triage 的 lead 裡逐字點名、但 registry 沒有的標的。
 
     **這裡補的是一個結構性黑洞。** pq2 的六個 collector 沒有一個負責
-    「這家公司該不該註冊」：已有 cohort 但缺可交易 ticker 的走
-    `decision_lab.brief.identity_registration_pending`；而**完全不在 registry、
-    也沒有 cohort 的公司，先前沒有任何機制會讓它浮出來**。2026-08-25 實測：
+    「這家公司該不該註冊」：（2026-09-23 前）已有 cohort 但缺可交易 ticker 的走 Engine D 的
+    identity_registration_pending（已隨研究側退役）；而**完全不在 registry 的公司，
+    先前沒有任何機制會讓它浮出來**。2026-08-25 實測：
     一條 pq1 研究點名 Largan(3008)、FOCI(3363)、TFC 三家 FAU 供應商，
     registry 76 家裡一家都沒有，而「也許該 onboard Largan」這個判斷只活在
     private 研究筆記裡——沒有任何路徑會讓它再次出現（L13：管子只接一頭）。

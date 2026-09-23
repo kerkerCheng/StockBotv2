@@ -54,7 +54,6 @@ from intake.provenance import (
 )
 from intake import actions as research_actions
 from mcp_server.engine_c_tools import get_financial_checklist_core
-from briefing.public_view import get_decision_brief_core
 from mcp_server.leads_tools import get_pending_leads_core, record_lead_decision_core
 
 # application 邏輯的 re-import：讓既有測試仍能對本模組 monkeypatch。
@@ -143,28 +142,6 @@ def get_financial_checklist(ticker: str) -> str:
 
     return json.dumps(
         get_financial_checklist_core(ticker),
-        ensure_ascii=False,
-        default=str,
-        indent=2,
-    )
-
-@mcp.tool(annotations=READ_ONLY_ANNOTATIONS)
-def get_decision_brief() -> str:
-    """今日 Engine D 決策摘要（純讀，遠端唯一的決策佇列視窗）。
-
-    回傳 `decision_lab today` 的 redacted public DTO：每筆 cohort／decision 附
-    `attention`（`MONITOR`／`REVIEW`）、最弱軸、reason、blockers 與 next review。
-    **系統不輸出任何部位尺寸**——買多少由使用者自行決定。純讀——不 freeze context、
-    不建 decision、不寫任何 authority、不下單。
-
-    Decision Store 是本機 private runtime，永不進 git；本工具是手機／雲端
-    看今日決策的唯一管道。runtime 未就緒時回明確 `unavailable`，不洩私有
-    路徑、也不假裝有資料。record-choice／record-fill 等寫入永遠只在本機
-    以明確輸入執行，不經此遠端面。
-    """
-
-    return json.dumps(
-        get_decision_brief_core(),
         ensure_ascii=False,
         default=str,
         indent=2,

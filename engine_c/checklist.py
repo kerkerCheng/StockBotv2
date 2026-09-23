@@ -1,7 +1,8 @@
 """
 checklist.py — 5 項財務核驗清單查詢。
 ⚠ 舊稱「Watchlist Gate」已停用：三級階梯 2026-09-02 除役（docs/ARCHITECTURE.md §9），
-   但**這五項沒有廢止**——它經 decision_lab/coverage.py 變成 Decision cohort 的 blocker。
+   但**這五項沒有廢止**——2026-09-23 前它經 Engine D coverage 變成 cohort blocker（研究側已退役），
+   現在由 lane memo 與歸零旗標消費。
 
 get_checklist(ticker) -> dict
   回傳 5 項各自的狀態（ok / manual_required / missing）與數值，
@@ -74,8 +75,8 @@ def _prefer_manual(auto_item: dict, manual: dict, field_name: str, label: str) -
 def _extended_observations(manual: dict) -> dict:
     """把非 gate 的已登記人工觀測整理成開放讀取表面。
 
-    每筆自帶 `authorities`，讓 Engine D 的 reference index 不必反查 Engine C registry
-    （decision_lab 不得反向依賴 current-state authority）。未登記或無 provenance 的
+    每筆自帶 `authorities`（token 字彙住 config/authority_tokens.json；原為 Engine D reference index
+    的需求，研究側退役後留給 Phase 3 三題引用）。未登記或無 provenance 的
     欄位一律略過——寧可不出現，也不要讓沒有來源的值被 Confidence 軸引用。
     """
     from engine_c.observation_fields import get_observation_field_registry
@@ -261,10 +262,10 @@ _RUNWAY_INPUT_KEYS = ("cash_and_equivalents", "total_debt", "free_cash_flow_ttm"
 
 
 def _parse_runway_inputs(value, source_note, as_of) -> dict | None:
-    """把 runway_inputs 人工觀測轉成 decision_lab.derive_runway 能吃的 payload。
+    """把 runway_inputs 人工觀測轉成 shared.runway.derive_runway 能吃的 payload。
 
     三個數值缺一即視為未提供：runway 是除法，部分推導只會給出看起來精確的
-    錯誤答案。provenance 沿用該筆觀測自己的 source 與 as_of，讓 decision_lab
+    錯誤答案。provenance 沿用該筆觀測自己的 source 與 as_of，讓 derive_runway
     既有的 timestamp future／stale 檢查照常生效。
     """
     if not value or not source_note or not as_of:
@@ -309,7 +310,7 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
     判色規則住 `alpha/wipeout.py`（純函式、可單測）；型別住 read model。三層分開的理由是
     L15：解析與權限分工——Engine C 擁有觀測，規則層只讀它。
 
-    - `runway`：`decision_lab.derive_runway` 的輸出形狀。人工 `runway_inputs`（`mechanical`
+    - `runway`：`shared.runway.derive_runway` 的輸出形狀。人工 `runway_inputs`（`mechanical`
       欄位）優先於 yfinance 快照——yfinance 在財報後會暫時清空 `free_cash_flow_ttm`。
     - `shares_series`：**同口徑**的在外流通股數序列（全部歷史，不截斷）。⚠ 刻意不混入
       `fiscal_year_results` 的稀釋股數：那是另一個口徑（含潛在股份），相減沒有意義。
@@ -322,7 +323,7 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
     if connection is None:
         return {"ticker": ticker, "status": "unavailable", "reason": "Engine C 資料庫不可用"}
     try:
-        from decision_lab.context import derive_runway
+        from shared.runway import derive_runway
         from engine_c.db import _use_postgres
 
         is_pg = _use_postgres()
@@ -485,7 +486,7 @@ def format_checklist(result: dict) -> str:
 
     # ⚠ 這行只說「五項齊不齊」，**不說升格**：Watchlist／Underwrite 三級模板已於
     # 2026-09-02 除役（docs/ARCHITECTURE.md §9），終點層級是 Decision cohort。
-    # 五項本身仍然有效——它經 decision_lab/coverage.py 變成 cohort blocker。
+    # 五項本身仍然有效——（2026-09-23 前）它經 Engine D coverage 變成 cohort blocker；研究側已退役。
     gate = (
         "✓ 財務核驗五項齊備"
         if result.get("gate_pass")

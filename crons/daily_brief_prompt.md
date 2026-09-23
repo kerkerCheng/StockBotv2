@@ -180,16 +180,12 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    只有 prepared RA 才進 pq2；triage PASS 與 pq1 自動研究都不代表入圖核准。
    `drain` 本身只列 bounded jobs，不執行研究；brief 必須分開寫出本輪已研究、因 cap／同分 tie-break 延後、
    以及尚未 harvest／triage 的 lead，並在延後項目附 score、排序理由與 `first_seen`，不可只說「沒看到」。
-   Decision work order 必須 checkpoint researching；若純唯讀研究即可補齊，產 assessment 後才跑
-   `--intent paper` reassess，並以新 decision receipt 結案。intent 不再產生任何模擬部位（2026-08-28
-   資本表達層已移除）；它現在只決定要不要要求該 lane 的資料完整度，進而影響 `research_status`。
-   「系統準不準」改由等權重報酬回答，錨點是 Shadow observation，與 intent 無關。
-   只有標的正處於使用者設定的 hold 期間才改回 `--intent research`。
-   `--disproof` 必填且必須可觀測、有門檻、有日期（L7 另需核查頻率與觸發後 48h 動作）；它由 agent 起草，
-   但必須隨 packet 進 pq2 由使用者確認，不得自我核准。`--expiry` 由催化劑的預期時點決定（催化劑日 ＋1～2 週），
-   **不得早於催化劑本身**。若需入圖、Engine C manual observation、thesis
-   revise／retire 或其他 authority mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2；不得拿舊
-   assessment bare reassess。
+   ~~Decision work order 必須 checkpoint researching……不得拿舊 assessment bare reassess。~~
+   （2026-09-23 Phase 0 Step 0b.4：Decision work order／assessment／`--intent`／reassess 整段隨 decision_lab
+   研究側退役。留下的判準：反證條件必須可觀測、有門檻、有日期（L7 另需核查頻率與觸發後 48h 動作），
+   由 agent 起草、隨 packet 進 pq2 由使用者確認，不得自我核准；到期**不得早於催化劑本身**——Phase 1 的
+   watch registry 接手承載。若需入圖、Engine C manual observation、thesis revise／retire 或其他 authority
+   mutation，先 checkpoint awaiting_approval，完整 packet 回 pq2。）
 
    </details>
 
@@ -197,13 +193,11 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    保留人工 gate；不得因 routine recommendation 推定使用者核准。本機 Codex／Claude Code 是可互換
    executor；任一方收到使用者對 exact pq2 item 的明確核准後都可完成全套 type-aware 動作，但權限與
    完成狀態只認 underlying authority／receipt，不認 agent 身分、memory 或 transcript。
-7. 批次回覆中的 `decision_review go` 執行
-   `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`：只排入 gap pq1、不先 resolve。原項目在
-   queued／researching／awaiting_approval 時不重複詢問；只有 parked outcome receipt 或補缺口後的新
-   decision receipt 才能結案。`ra_admission go` 必須先完成 apply、把來源 lead 標為 `applied` 並留下
+7. ~~批次回覆中的 `decision_review go`~~（2026-09-23 Phase 0 Step 0b.4：`decision_review` 是 legacy 型，
+   `go` 一律被拒、歷史項目只能 drop）。`ra_admission go` 必須先完成 apply、把來源 lead 標為 `applied` 並留下
    `research_action_id`／`action_digest`／`focus_company_id`、跑 `scripts\commit_pending_intake.py`，最後執行
    `.venv\Scripts\python.exe -m engine_b.todo complete-ra <todo_n> --digest <完整 action_digest>`；此命令驗證
-   durable publication、建立或沿用 Decision cohort 並留下組合 receipt。一般 `todo batch` 不得用 bare go
+   durable publication 並留下組合 receipt（`action;digest;commit`；Decision cohort handoff 已隨研究側退役）。一般 `todo batch` 不得用 bare go
    先清項目。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，

@@ -72,41 +72,15 @@ def _pool():
     return pool, by
 
 
-class _StoreStub:
-    def __init__(self, work_orders: dict[str, object] | None = None):
-        self._wo = work_orders or {}
-
-    def latest_research_work_order(self, cohort_id: str):
-        return self._wo.get(cohort_id)
-
-
-#: brief：dc_go 有需人決定的 blocker（go → assessment-gap 排入 pq1）；dc_stale_only 只剩 system_internal／awaiting_external
-BRIEF = [
-    {"cohort_id": "dc_go", "blockers": ["financial_resilience_corroboration_incomplete", "market_stale_since_decision"]},
-    {"cohort_id": "dc_deferred", "blockers": ["financial_resilience_corroboration_incomplete"]},
-    {"cohort_id": "dc_waiting", "blockers": ["financial_resilience_corroboration_incomplete"]},
-    {"cohort_id": "dc_inflight", "blockers": ["financial_resilience_corroboration_incomplete"]},
-    {"cohort_id": "dc_stale_only", "blockers": ["market_stale_since_decision", "execution_fx_missing"]},
-]
-
-
 def test_candidates_exclude_pending_waiting_inflight_paid_and_never_types() -> None:
     pool, by = _pool()
     todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_stale_only", "title": "I"}])
     by = {it["ref_id"]: it for it in todo.active_items(pool)}
-    candidates, skipped = todo.standing_go_candidates(
-        pool, authorization=sa.load(), store=_StoreStub(), brief_items=BRIEF)
-    # 2026-09-22 Step 0a.1：decision_review 已是 never 類型——**一個都不進候選**，
-    # 連「有 work order」「有 user_decision blocker」那兩條放行路徑也不再走得到。
+    candidates, skipped = todo.standing_go_candidates(pool, authorization=sa.load())
+    # 2026-09-22 Step 0a.1：decision_review 已是 never 類型——**一個都不進候選**。
+    # 2026-09-23 Step 0b.4：「有 work order」「有 user_decision blocker」「brief 讀不到」三條路
+    # 連程式都不存在了（store／brief_items 參數一併拿掉），這裡只剩封閉字彙那一層在擋。
     assert [it["ref_id"] for it in candidates] == ["lead_free"]
-    with_wo, _ = todo.standing_go_candidates(
-        pool, authorization=sa.load(),
-        store=_StoreStub({"dc_stale_only": {"work_order_id": "wo_1"}}), brief_items=BRIEF)
-    assert [it["ref_id"] for it in with_wo] == ["lead_free"]
-    # brief 讀不到也不影響：唯一的 authorized 類型不看 brief。
-    none_brief, _ = todo.standing_go_candidates(
-        pool, authorization=sa.load(), store=_StoreStub(), brief_items=None)
-    assert [it["ref_id"] for it in none_brief] == ["lead_free"]
     reasons = {row["n"]: row["reason"] for row in skipped}
     assert "付費" in reasons[by["lead_paid"]["n"]]
     # never 類型不進 skipped——它們本來就不是候選，不是「被跳過」（與 ra_admission／manual 同形）。
@@ -118,24 +92,19 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
     pool, by = _pool()
     calls: list[tuple] = []
 
-    def fake_advance(p, n, *, store, at=None):
-        calls.append(("decision", n))
-        return {"outcome": "queued_assessment_gap"}
-
     def fake_dispatch(p, n, *, leads_path, at=None):
         calls.append(("trace", n))
         todo.get(p, n)["dispatch_ref"] = "lead:lead_free"
         return {"item": todo.get(p, n)}
 
-    monkeypatch.setattr(todo, "advance_decision_review", fake_advance)
     monkeypatch.setattr(todo, "dispatch_source_trace_review", fake_dispatch)
+    # 2026-09-23 Step 0b.4：`advance_decision_review` 連函式都不存在了——退役生效的可證偽斷言。
+    assert not hasattr(todo, "advance_decision_review")
 
-    dry = todo.standing_go(pool, _StoreStub(), dry_run=True, brief_items=BRIEF)
+    dry = todo.standing_go(pool, dry_run=True)
     assert dry["dry_run"] and calls == []
 
-    out = todo.standing_go(pool, _StoreStub(), at="2026-09-09T00:00:00+00:00", brief_items=BRIEF)
-    # 2026-09-22 Step 0a.1：只剩追源那一條路；`advance_decision_review` **一次都不該被呼叫**
-    # ——這是「退役真的生效了」的那個可證偽斷言，不是「rules 檔裡找不到某串字」。
+    out = todo.standing_go(pool, at="2026-09-09T00:00:00+00:00")
     assert [(c[0]) for c in calls] == ["trace"]
     assert [row["outcome"] for row in out["done"]] == ["dispatched"]
     logs = [e for e in pool["log"] if e["verb"] == "standing_go"]
@@ -164,7 +133,7 @@ def test_standing_go_reports_single_failures_without_stopping(monkeypatch) -> No
         return {"item": todo.get(p, n)}
 
     monkeypatch.setattr(todo, "dispatch_source_trace_review", dispatch)
-    out = todo.standing_go(pool, _StoreStub(), brief_items=BRIEF)
+    out = todo.standing_go(pool)
     assert [row["n"] for row in out["failed"]] == [by["lead_free"]["n"]]
     assert [row["n"] for row in out["done"]] == [by["lead_free2"]["n"]]
 

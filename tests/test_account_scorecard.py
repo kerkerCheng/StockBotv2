@@ -41,11 +41,10 @@ def test_missing_tier_is_not_silently_allowed(tmp_path) -> None:
         ssr.load(path)
 
 
-def test_status_vocabulary_comes_from_decision_lab_ssot() -> None:
-    """status 的 SSOT 在 decision_lab；這裡借它而不是抄一份（L16）。"""
-    from decision_lab.intake import _SOURCE_STATUSES
-
-    assert set(ssr.STATUSES) == set(_SOURCE_STATUSES)
+def test_status_vocabulary_is_the_registry_ssot() -> None:
+    """2026-09-23（Phase 0 Step 0b.4）：status 字彙原本借自 decision_lab.intake（L16）；intake 隨研究側
+    退役後 registry 自己就是 SSOT，值逐字不變——這條鎖住它不漂。"""
+    assert set(ssr.STATUSES) == {"candidate", "probation", "active", "suspended"}
 
 
 def test_probation_means_zero_bonus_and_tiers_are_ordered() -> None:

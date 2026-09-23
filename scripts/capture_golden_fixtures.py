@@ -341,9 +341,14 @@ def cap_point_in_time_boundary() -> dict:
 
 # ---- 14. 多帳戶同一檔（F-21；PRIVATE）------------------------------------
 def cap_multi_account_holding() -> dict:
-    from engine_d_runtime.adapters import fetch_nav_exposure
+    # 2026-09-23（Phase 0 Step 0b.4）：engine_d_runtime.adapters.fetch_nav_exposure 隨研究側退役，改直接取數。
+    from fetchers.gsheets import fetch_portfolio
+    from portfolio.exposure import build_nav_exposure
 
-    exposure = fetch_nav_exposure() or {}
+    try:
+        exposure = build_nav_exposure(list(fetch_portfolio(strict_operational=True))) or {}
+    except Exception as exc:  # noqa: BLE001 — Sheet 讀不到就是 unavailable，不假裝無持股
+        exposure = build_nav_exposure(None, upstream={"status": "unavailable", "failure": type(exc).__name__})
     upstream = exposure.get("upstream") or {}
     status = str(upstream.get("status") or exposure.get("status") or "unknown")
     rows = [r for r in (exposure.get("positions") or exposure.get("rows") or [])

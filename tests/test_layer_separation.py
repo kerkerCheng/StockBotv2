@@ -36,7 +36,7 @@ FORBIDDEN_FOR_ENGINE_D = ("alpha", "portfolio", "briefing")
 CORE_PACKAGES = (
     "alpha", "portfolio", "risk", "shared", "intake", "briefing",
     "decision_lab", "engine_b", "engine_c",
-    "engine_d_runtime", "query", "loader", "thesis", "identity", "storage",
+    "query", "loader", "thesis", "identity", "storage",
     "fetchers", "notifications", "crons", "scripts",
 )
 
@@ -89,7 +89,7 @@ def _rel(path: Path) -> str:
 
 FORBIDDEN_IN_ALPHA = (
     "neo4j", "yfinance", "anthropic", "decision_lab", "engine_c", "engine_b",
-    "engine_d_runtime", "mcp_server", "loader", "query", "thesis", "fetchers",
+    "mcp_server", "loader", "query", "thesis", "fetchers",
     "portfolio", "risk", "requests", "pandas",
 )
 
@@ -208,17 +208,13 @@ TRANSITIONAL_SHIMS: frozenset[str] = frozenset()
 #: 集合是空的，而檢查**仍然在跑**——它擋的是第 1 個新增者。
 PENDING_B6_COUPLINGS: frozenset[tuple[str, str]] = frozenset()
 
-#: `engine_d_runtime` 是 **composition root**——它的職責就是把各層接起來，
-#: 所以它 import `portfolio`／`alpha` 是**正確方向**（peripheral → core 的組裝端）。
-#: 真正不准的是 `decision_lab/` 的 domain 模組反向依賴新層。
+#: ⚠ 2026-09-23（Phase 0 Step 0b.4）：`engine_d_runtime/`（Engine D 的 composition root）隨研究側整包退役，
+#: 這裡不再有它的兩個檔。`decision_lab/cli.py` 現在只是唯讀 status／history，仍列為 entry point。
 COMPOSITION_ROOTS = frozenset({
-    "engine_d_runtime/adapters.py",
-    "engine_d_runtime/bootstrap.py",
     "decision_lab/cli.py",
-    # ⚠ `alpha/cli.py` 是 entry point：它負責把 `AlphaSignal` **序列化**後交給
-    # Engine D 的 adapter。domain 模組（contracts／context／models）仍然完全
-    # 不知道 Engine D 存在——`test_alpha_core_has_no_external_or_engine_dependencies`
-    # 守著那一半。
+    # ⚠ `alpha/cli.py` 是 entry point：它 import `identity`（ticker → CompanyId 走 registry）。
+    # domain 模組（contracts／context／models）仍然完全不知道 Engine D 存在——
+    # `test_alpha_core_has_no_external_or_engine_dependencies` 守著那一半。
     "alpha/cli.py",
 })
 
@@ -230,7 +226,7 @@ def test_decision_lab_domain_does_not_import_new_layers() -> None:
     `AlphaSignal` payload，不 import `alpha/`。
     """
     offenders: list[str] = []
-    for package in ("decision_lab", "engine_d_runtime"):
+    for package in ("decision_lab",):
         for path in _python_files(package):
             rel = _rel(path)
             if rel in COMPOSITION_ROOTS:
@@ -244,6 +240,21 @@ def test_decision_lab_domain_does_not_import_new_layers() -> None:
     assert not offenders, (
         "Engine D 的 domain 模組不得 import alpha／portfolio：\n" + "\n".join(offenders)
     )
+
+
+def test_decision_lab_does_not_import_concrete_current_state_authorities() -> None:
+    """凍結後的 `decision_lab/`（store／coverage_queries／cli／bootstrap／models）仍不得碰 Engine C、
+    fetchers、neo4j——它是歷史檔案館，不是 current-state 的讀取層。
+
+    2026-09-23（Phase 0 Step 0b.4）由 `tests/test_engine_d_runtime.py` 搬來（該檔隨 engine_d_runtime 退役）。
+    """
+    forbidden = ("engine_c", "fetchers", "neo4j")
+    findings: list[str] = []
+    for path in _python_files("decision_lab"):
+        for module in _imported_roots(path):
+            if any(module == prefix or module.startswith(prefix + ".") for prefix in forbidden):
+                findings.append(f"{_rel(path)} → {module}")
+    assert findings == []
 
 
 def test_no_pending_couplings_remain() -> None:

@@ -1,4 +1,9 @@
-"""Decision Store 的唯讀查詢，供**不開整個 store** 的唯讀消費端使用。
+"""舊 Decision Store（frozen 2026-09-22，G12）的唯讀查詢，供**不開整個 store** 的唯讀消費端使用。
+
+⚠ 2026-09-23（Phase 0 Step 0b.4）：研究側退役後這是舊店僅存的讀路徑——個股頁 research 面板的
+catalyst／disproof／expiry（`briefing/alpha_view/sources.py`）與 `scripts/catalyst_watch.py` 都讀這裡的
+凍結歷史；資料不再增加。ROADMAP 凍結表原列本檔為「刪」，但它是那兩個活消費端唯一的 SQL，刪了
+gate 3（research 面板文字不變）即破——見 plan §0.6。
 
 `scripts/catalyst_watch.py` 是 daily 的 unattended entry point，它刻意用
 `mode=ro` 的裸 sqlite 連線而不是 `open_default_store()`——唯讀連線碰不到

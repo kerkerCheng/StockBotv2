@@ -174,41 +174,16 @@ def test_registry_round_trips_the_shipped_config() -> None:
 
 # ── authority 字彙的單一權威 ────────────────────────────────────────────────────
 # 2026-07-31 之前這份字彙有三份寫死副本，靠測試防漂移。現已收斂成
-# config/authority_tokens.json 一份，Engine C 與 decision_lab 都由
-# identity/authority_tokens.py 讀取。以下測試確認收斂沒有回退，
-# 並確認凍結的軸對照表只用已登記的 token。
-
-
-def _engine_c_tokens_from_axes() -> set[str]:
-    from decision_lab.sizing import AXIS_REFERENCE_AUTHORITIES
-
-    return {
-        token
-        for tokens in AXIS_REFERENCE_AUTHORITIES.values()
-        for token in tokens
-        if token.startswith("engine_c_")
-    }
+# config/authority_tokens.json 一份，Engine C 由 identity/authority_tokens.py 讀取。
+# ⚠ 2026-09-23（Phase 0 Step 0b.4）：decision_lab 那一份消費端（context／sizing 的軸對照表）隨研究側退役，
+# 「軸對照表只用已登記 token」「每個欄位至少一軸可引用」兩條守門斷言跟著退；Engine C 與 registry 一致這條留下。
 
 
 def test_engine_c_vocabulary_comes_from_the_single_neutral_registry() -> None:
-    from decision_lab.context import _ENGINE_C_AUTHORITIES
     from identity.authority_tokens import tokens_for_owner
 
     canonical = tokens_for_owner("engine_c")
     assert set(KNOWN_AUTHORITIES) == set(canonical)
-    assert set(_ENGINE_C_AUTHORITIES) == set(canonical)
-    assert _engine_c_tokens_from_axes() <= set(canonical)
-
-
-def test_frozen_axis_mapping_only_uses_registered_tokens() -> None:
-    """AXIS_REFERENCE_AUTHORITIES 刻意維持寫死（評分骨架已凍進舊 decision），
-    但它用到的每個 token 都必須在中立 registry 裡登記。"""
-    from decision_lab.sizing import AXIS_REFERENCE_AUTHORITIES
-    from identity.authority_tokens import all_authority_tokens
-
-    used = {t for tokens in AXIS_REFERENCE_AUTHORITIES.values() for t in tokens}
-    unknown = sorted(used - all_authority_tokens())
-    assert not unknown, f"軸對照表用了未登記的 token：{unknown}"
 
 
 def test_graph_and_engine_c_whitelists_do_not_overlap() -> None:
@@ -216,20 +191,6 @@ def test_graph_and_engine_c_whitelists_do_not_overlap() -> None:
     from identity.authority_tokens import tokens_for_owner
 
     assert not (tokens_for_owner("engine_a") & tokens_for_owner("engine_c"))
-
-
-def test_every_registered_field_is_citable_by_at_least_one_axis() -> None:
-    """防死角登記：欄位宣告的 authority 若沒有任何軸接受，該欄位永遠無法被引用。"""
-    from decision_lab.sizing import AXIS_REFERENCE_AUTHORITIES
-
-    registry = get_observation_field_registry()
-    for name, spec in registry.fields.items():
-        citable_by = [
-            axis
-            for axis, allowed in AXIS_REFERENCE_AUTHORITIES.items()
-            if set(spec.authorities) & set(allowed)
-        ]
-        assert citable_by, f"{name} 宣告的 authorities {spec.authorities} 沒有任何軸接受"
 
 
 def test_runway_inputs_require_all_three_numbers_and_provenance() -> None:

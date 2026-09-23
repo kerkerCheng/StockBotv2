@@ -122,7 +122,7 @@ SEGMENTS: tuple[Segment, ...] = (
     # 排程有能力製造這兩種狀態。
     Segment(
         "gated_gate_resolved", 8, "停在 awaiting_approval，但它等的 pq2 編號已經 resolve",
-        "mechanical", "python -m engine_b.todo gated（下一步是 reassess 拿新 decision receipt）",
+        "mechanical", "python -m engine_b.todo gated（下一步是完成 pq1 checkpoint 並結案）",
         "gate 消失不等於可以直接收單：實測三張工單 reassess 後都浮出不同的新缺口。",
     ),
     Segment(

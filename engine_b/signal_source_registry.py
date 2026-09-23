@@ -40,16 +40,10 @@ TIERS: tuple[str, ...] = ("probation", "measured", "trusted")
 #:   - `tier   = "probation"` → D5 的 **信任級別**：這個來源的點名有沒有被量測過。
 #: 一個帳號可以 `status=active` 且 `tier=probation`（照抓，但信任為零）——那正是今天的實況。
 #:
-#: 這個字彙的 SSOT 是 `decision_lab.intake._SOURCE_STATUSES`（早於本模組存在）。
-#: 這裡**借它而不是自己抄一份**：抄一份就會在某天悄悄分岔，而分岔的那天不會有東西壞掉
-#: （L16：分類已經有 SSOT 時，要讓它跟著資料走到需要它的地方）。
-def _load_statuses() -> tuple[str, ...]:
-    from decision_lab.intake import _SOURCE_STATUSES
-
-    return tuple(sorted(_SOURCE_STATUSES))
-
-
-STATUSES: tuple[str, ...] = _load_statuses()
+#: ⚠ 2026-09-23（Phase 0 Step 0b.4）：這個字彙原本借自 `decision_lab.intake._SOURCE_STATUSES`
+#: （L16：分類有 SSOT 就借它）；intake 隨 decision_lab 研究側退役後，本模組成為唯一 SSOT——
+#: 值逐字不變，`tests/test_account_scorecard.py` 鎖住它。
+STATUSES: tuple[str, ...] = ("active", "candidate", "probation", "suspended")
 
 #: tier → pq1 優先序加分。**只影響研究佇列的順序，不影響入池、不影響 evidence tier。**
 #: probation 是 0 而不是負數：新帳號不該被懲罰，只是還沒有理由被優先看。

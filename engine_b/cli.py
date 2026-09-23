@@ -236,24 +236,6 @@ def _cmd_register(args: argparse.Namespace) -> int:
     return 0
 
 
-def _print_withheld(withheld_jobs: list[dict]) -> None:
-    """被擋下的 work order 必須現形。
-
-    它們不是「做完了」也不是「不存在」——是需要人做別的決定（close／extend，或先
-    處理 supersede）。安靜消失會讓下一個 session 以為佇列本來就這麼短（L13）。
-    """
-    if not withheld_jobs:
-        return
-    print()
-    print(f"⚠ 另有 {len(withheld_jobs)} 件 work order 未列入本輪（不是完成，是需要別的決定）：")
-    for job in withheld_jobs:
-        print(
-            f"  [擋下] {job['work_order_id']}  cohort={job['cohort_id']}  "
-            f"理由={job['withheld_reason']}"
-        )
-        for note in job.get("lifecycle_notes") or []:
-            print(f"          {note}")
-
 
 def _print_classification_gaps(gaps: list[dict]) -> None:
     if not gaps:
@@ -346,8 +328,9 @@ def _cmd_consume_fired(args: argparse.Namespace) -> int:
 def _cmd_drain(args: argparse.Namespace) -> int:
     """列出 pq1 接下來的 bounded jobs，供 agent 逐個研究與 checkpoint。
 
-    使用者明確 dispatch 的 Decision work order 優先，再用剩餘 budget 取
-    triaged_go／researching leads。命令本身不執行語意研究。
+    依 priority 取 triaged_go／researching leads。命令本身不執行語意研究。
+    ⚠ 2026-09-23（Phase 0 Step 0b.4）：原本會先合併使用者已核准的 Decision work order 與
+    assessment-gap 工單（`--decision-work-orders`）；兩者隨 decision_lab 研究側退役。
     """
     store = leads.load(args.leads)
     config = routine_config.load_config(Path(args.routine_config))
@@ -361,53 +344,14 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         if args.tracked is not None
         else routine_config.discover_tracked_tickers(config)
     )
-    decision_jobs: list[dict] = []
-    withheld_jobs: list[dict] = []
     is_default_store = (
         Path(args.leads).resolve() == leads.DEFAULT_LEADS_PATH.resolve()
     )
-    include_decisions = args.decision_work_orders == "include" or (
-        args.decision_work_orders == "auto"
-        and is_default_store
-    )
-    if include_decisions and limit:
-        try:
-            from decision_lab.bootstrap import open_default_store
-
-            from thesis.lifecycle_schedule import checkpoints_by_ticker
-
-            decision_store = open_default_store()
-            try:
-                ranked_orders = decision_store.rank_work_orders(
-                    capacity=limit,
-                    checkpoints_by_ticker=checkpoints_by_ticker(),
-                )
-                decision_jobs = ranked_orders["selected"]
-                withheld_jobs = ranked_orders["withheld"]
-            finally:
-                decision_store.close()
-        except Exception as exc:
-            if is_default_store:
-                print(f"錯誤：Decision pq1 無法讀取：{exc}", file=sys.stderr)
-                return 2
-            print(f"警告：Decision pq1 無法讀取：{exc}", file=sys.stderr)
 
     fired = _fired_watch_summary()
     pending_count = sum(
         1 for l in store["leads"].values() if l.get("status") == "pending"
     )
-    gap_jobs: list[dict] = []
-    # ⚠ `and limit`：assessment-gap 工單**也是研究**，所以 `drain_limit_per_run=0`
-    # （D12：daily 不做研究）必須把它一起關掉。先前只有 decision work order 與 lead
-    # 吃 limit，gap 工單不吃——那會讓「已關閉研究層」的 daily 仍然被派研究工作，
-    # 而且不會有任何東西變紅（L17：機制只認得當初那個案例）。
-    if include_decisions and limit:
-        try:
-            from engine_b import todo as _todo
-
-            gap_jobs = _todo.assessment_gap_jobs(_todo.load(_todo.DEFAULT_POOL_PATH))
-        except Exception as exc:  # noqa: BLE001 — 讀不到就說讀不到；不擋 drain
-            print(f"警告：assessment-gap 工單讀不到：{type(exc).__name__}", file=sys.stderr)
     all_candidates = [
         l for l in store["leads"].values()
         if l["status"] in ("triaged_go", "researching")
@@ -439,23 +383,15 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         chokepoint_tickers=choke_tickers,
         chokepoint_company_ids=choke_company_ids,
     )
-    lead_batch = ranked[:max(0, limit - len(decision_jobs))]
+    # ⚠ `limit=0` 就是零件（D12：daily 不做研究），不是無上限。
+    lead_batch = ranked[:max(0, limit)]
     if args.json:
         rows = [
-            {"kind": "decision_work_order", "work_order": job}
-            for job in decision_jobs
-        ] + [
-            {"kind": "assessment_gap_item", "item": job}
-            for job in gap_jobs
-        ] + [
             {"kind": "lead", "priority": rank.label, "lead": lead}
             for rank, lead in lead_batch
         ] + [
             {"kind": "withheld_unclassified_lead", "health": gap}
             for gap in classification_gaps
-        ] + [
-            {"kind": "withheld_work_order", "work_order": job}
-            for job in withheld_jobs
         ] + [
             # 段 1 的 fired 未消化：只在非零時出現，讓「沒有」與「沒讀到」分得開。
             {"kind": "fired_watch_pending", "target": target, "watch": watch}
@@ -465,7 +401,7 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         print(json.dumps(rows, ensure_ascii=False, indent=2))
         return 0
     _print_segment_counters(pending_count, fired)
-    if not decision_jobs and not gap_jobs and not lead_batch and not classification_gaps:
+    if not lead_batch and not classification_gaps:
         # ⚠⚠ **「上限為 0」與「真的沒有」不得同形**（L12／L13-2，2026-09-20 實測）。
         # Phase 2（D12）把 `drain_limit_per_run` 歸零讓 daily 不做研究，而本行原本一律印
         # 「佇列已空」——實測當天 `drain` 說空、`drain --limit 20` 卻列出 **14 件**。
@@ -478,31 +414,14 @@ def _cmd_drain(args: argparse.Namespace) -> int:
                   f"**這不是「沒有東西」**——待研究 lead 實際有 {waiting} 條。"
                   f"互動 session 要做研究請用 `--limit <N>` 覆寫。）")
         else:
-            print("（pq1 佇列已空——無 dispatched work order 或可研究 lead）")
-        _print_withheld(withheld_jobs)
+            print("（pq1 佇列已空——無可研究 lead）")
         return 0
-    if decision_jobs or lead_batch or gap_jobs:
-        print(f"pq1 drain：接下來 {len(decision_jobs) + len(gap_jobs) + len(lead_batch)} 件：")
-    for job in decision_jobs:
-        print(
-            f"  [USER-GO] {job['work_order_id']}  {job['status']:12}  "
-            f"cohort={job['cohort_id']}"
-        )
-        print(f"            blockers={','.join(job.get('blockers') or [])}")
-        for note in job.get("lifecycle_notes") or []:
-            print(f"            ⚠ {note}")
-    for job in gap_jobs:
-        # pool-only 的 assessment-gap 工單（standing-go／使用者 go 排入）：不在 Decision Store work order 表，
-        # 但一樣是「已授權、還沒做完」——研究範圍就是 scope 那幾個 blocker code。
-        print(
-            f"  [ASSESSMENT-GAP] [{job['n']}]  {job['dispatch_status']:12}  cohort={job['cohort_id']}"
-        )
-        print(f"            scope={','.join(job.get('scope') or []) or '（未列）'}｜{job.get('title') or ''}")
+    if lead_batch:
+        print(f"pq1 drain：接下來 {len(lead_batch)} 件：")
     for rank, l in lead_batch:
         print(f"  [{rank.label}] {l['lead_id']}  {l['status']:12}  {l['source']}")
         print(f"           {l.get('title') or '(無標題)'}  {l.get('url')}")
     _print_classification_gaps(classification_gaps)
-    _print_withheld(withheld_jobs)
     return 0
 
 
@@ -883,10 +802,6 @@ def build_parser() -> argparse.ArgumentParser:
     p_drain.add_argument("--tracked", default=None,
                          help="逗號分隔的已追蹤 ticker；省略時由 lifecycle/cohort 自動導出")
     p_drain.add_argument("--routine-config", default=str(routine_config.DEFAULT_CONFIG))
-    p_drain.add_argument(
-        "--decision-work-orders", choices=("auto", "include", "skip"), default="auto",
-        help="是否合併使用者已核准的 Decision gap jobs；custom leads 預設不混入 production store",
-    )
     p_drain.add_argument("--json", action="store_true")
     p_drain.set_defaults(func=_cmd_drain)
 

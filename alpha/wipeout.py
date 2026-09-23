@@ -69,7 +69,7 @@ _CASH_RULE = (f"自由現金流 ≥ 0 → 綠（自籌）；燒錢且現金跑�
 
 
 def cash_runway_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
-    """`runway` 是 `decision_lab.derive_runway` 的輸出形狀（status／runway_months／三個輸入）。"""
+    """`runway` 是 `shared.runway.derive_runway` 的輸出形狀（status／runway_months／三個輸入）。"""
     runway = dict(runway or {})
     inputs = {k: runway.get(k) for k in ("cash_and_equivalents", "total_debt", "free_cash_flow_ttm",
                                          "as_of", "source", "status", "runway_months")}

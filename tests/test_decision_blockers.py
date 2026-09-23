@@ -34,30 +34,6 @@ def test_registry_loads() -> None:
     assert registry.version >= 1
 
 
-def test_every_blocker_literal_in_the_codebase_is_registered() -> None:
-    """漂移剎車：實際會產生的 blocker literal 必須都命中 registry。"""
-    sources = [
-        ROOT / "decision_lab" / "coverage.py",
-        ROOT / "decision_lab" / "sizing.py",
-        ROOT / "engine_d_runtime" / "adapters.py",
-    ]
-    # 只擷取真正 append 到 blocker 清單的 literal；work order 的 missing_fields
-    # 也用 .append("...")，但那不是 blocker 字彙。
-    pattern = re.compile(r'\bblockers\.append\(\s*"([a-z][a-z0-9_]*)"')
-    literals: set[str] = set()
-    for path in sources:
-        text = path.read_text(encoding="utf-8")
-        for match in pattern.finditer(text):
-            literals.add(match.group(1))
-    assert literals, "應至少擷取到一些 blocker literal，否則此測試失去意義"
-    unregistered = sorted(
-        code for code in literals if describe_blocker(code) is UNKNOWN
-    )
-    assert not unregistered, (
-        f"以下 blocker 未登記於 config/decision_blockers.json：{unregistered}"
-    )
-
-
 def test_parameterised_blockers_resolve_via_longest_prefix() -> None:
     registry = get_blocker_registry()
     # financial_checklist_ 必須勝過較短的 financial_

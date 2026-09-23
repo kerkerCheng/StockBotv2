@@ -104,189 +104,26 @@ def test_unknown_type_rejected() -> None:
 
 
 def test_resolved_item_can_reenter_pool_with_new_number() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
+    # 2026-09-23（Phase 0 Step 0b.4）：原本用 decision_review 當夾具；它已是 legacy 型、go 一律被拒，
+    # 判準（resolve 不是永久黑名單）不變，改用 manual 型。
+    pool = _pool_with({"type": "manual", "ref_id": "weekly:1", "title": "Weekly topic"})
     n1 = todo.active_items(pool)[0]["n"]
-    item = todo.active_items(pool)[0]
-    item["dispatch_status"] = "completed"
-    item["dispatch_receipt"] = "decision:pd_new"
-    todo.resolve(pool, n1, "go", receipt="decision:pd_new")
-    # 同一 cohort 之後又有新 evidence-delta → 應重新進池（resolve 不是永久黑名單）
-    todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW 再現"}])
+    todo.resolve(pool, n1, "go", receipt="authority:registry;ref:weekly:1")
+    # 同一主題之後又被提出 → 應重新進池（resolve 不是永久黑名單）
+    todo.sync(pool, [{"type": "manual", "ref_id": "weekly:1", "title": "Weekly topic 再現"}])
     items = todo.active_items(pool)
     assert len(items) == 1 and items[0]["n"] != n1
 
 
-def test_material_decision_event_reactivates_waiting_stable_item() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    todo.resolve(
-        pool,
-        1,
-        "pending",
-        trigger="下一份公司 filing",
-        event_type="decision_evidence_delta",
-        at="2026-08-01T00:00:00+00:00",
-    )
-
-    result = todo.sync(
-        pool,
-        [{
-            "type": "decision_review",
-            "ref_id": "dc_1",
-            "title": "REVIEW — co:axt",
-            "event_link": {
-                "type": "decision_evidence_delta",
-                "value": "material",
-                "receipt": "decision:pd_new",
-            },
-        }],
-        at="2026-08-02T00:00:00+00:00",
-    )
-
-    item = todo.get(pool, 1)
-    assert result["reactivated"] == 1
-    assert "waiting_on" not in item
-    assert "deferred_at" not in item
-    assert item["reactivation_event"]["receipt"] == "decision:pd_new"
-    assert pool["log"][-1]["verb"] == "event_reactivated"
-
-
-def test_material_event_does_not_guess_unbound_human_trigger() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    todo.resolve(pool, 1, "pending", trigger="只等 S-4 公開")
-
-    result = todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW",
-        "event_link": {
-            "type": "decision_evidence_delta",
-            "value": "material",
-            "receipt": "decision:pd_other",
-        },
-    }])
-
-    assert result["reactivated"] == 0
-    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "只等 S-4 公開"
-
-
-def test_sync_persists_derived_waiting_and_clears_it_when_mode_changes() -> None:
-    waiting = {
-        "until": None,
-        "trigger": "等下一份 filing",
-        "reason": "所有 blocker 都不需要使用者決定",
-        "set_at": "2026-08-01T00:00:00+00:00",
-        "derived_from_blockers": True,
-    }
-    pool = todo.empty_pool()
-    todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW",
-        "waiting_on": waiting,
-    }])
-    assert todo.get(pool, 1)["waiting_on"] == waiting
-
-    result = todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW — needs choice",
-    }])
-    assert result["reactivated"] == 1
-    assert "waiting_on" not in todo.get(pool, 1)
-
-
-def test_sync_refreshes_a_stale_derived_waiting_reason() -> None:
-    """blocker mode 沒變、但等的東西變了時，顯示文字必須跟著更新。
-
-    事發（2026-08-05）：co:applied_optoelectronics 的市場資料問題早已修好，池子卻
-    仍顯示「執行面 context 缺失／市場資料問題」——因為舊寫法只在 `waiting_on`
-    不存在時才填。結果是待辦池叫使用者去修一個已經修好的東西。
-    """
-
-    pool = todo.empty_pool()
-    todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW",
-        "waiting_on": {
-            "until": None,
-            "trigger": "市場資料問題",
-            "reason": "所有 blocker 都不需要使用者決定",
-            "set_at": "2026-08-01T00:00:00+00:00",
-            "derived_from_blockers": True,
-        },
-    }])
-
-    result = todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW",
-        "waiting_on": {
-            "until": None,
-            "trigger": "財務核驗清單欄位缺失或待人工填入",
-            "reason": "所有 blocker 都不需要使用者決定",
-            "set_at": "2026-08-05T00:00:00+00:00",
-            "derived_from_blockers": True,
-        },
-    }])
-
-    assert result["waiting_refreshed"] == 1
-    assert result["reactivated"] == 0  # 仍在等事件區，沒有回到決策佇列
-    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "財務核驗清單欄位缺失或待人工填入"
-    assert any(
-        entry.get("verb") == "waiting_reason_refreshed" for entry in pool["log"]
-    )
-
-
-def test_sync_never_overwrites_a_user_set_waiting_reason() -> None:
-    """使用者用 --until/--trigger 明確設定的等待條件優先於自動推導。"""
-
-    pool = todo.empty_pool()
-    todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"}])
-    todo.resolve(
-        pool, 1, "pending", until="2026-08-27", trigger="SIVE Q2 財報"
-    )
-
-    result = todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW",
-        "waiting_on": {
-            "until": None,
-            "trigger": "市場資料問題",
-            "reason": "所有 blocker 都不需要使用者決定",
-            "set_at": "2026-08-05T00:00:00+00:00",
-            "derived_from_blockers": True,
-        },
-    }])
-
-    assert result["waiting_refreshed"] == 0
-    assert todo.get(pool, 1)["waiting_on"]["trigger"] == "SIVE Q2 財報"
-    assert todo.get(pool, 1)["waiting_on"]["until"] == "2026-08-27"
-
-
-def test_identical_derived_waiting_reason_is_not_rewritten_every_sync() -> None:
-    """set_at 每次推導都會變；只有語意欄位改變才算改變，否則會產生 log 噪音。"""
-
-    pool = todo.empty_pool()
-    base = {
-        "until": None,
-        "trigger": "市場資料問題",
-        "reason": "所有 blocker 都不需要使用者決定",
-        "derived_from_blockers": True,
-    }
-    todo.sync(pool, [{
-        "type": "decision_review", "ref_id": "dc_1", "title": "REVIEW",
-        "waiting_on": {**base, "set_at": "2026-08-01T00:00:00+00:00"},
-    }])
-
-    result = todo.sync(pool, [{
-        "type": "decision_review", "ref_id": "dc_1", "title": "REVIEW",
-        "waiting_on": {**base, "set_at": "2026-08-05T00:00:00+00:00"},
-    }])
-
-    assert result["waiting_refreshed"] == 0
-    assert todo.get(pool, 1)["waiting_on"]["set_at"] == "2026-08-01T00:00:00+00:00"
+def test_legacy_kinds_cannot_be_resolved_with_go() -> None:
+    """2026-09-23（Phase 0 Step 0b.4）：decision_review／sheet_only_holding 的 go 語意整組退役——
+    池裡若還有歷史項目只能 drop。這是「退役真的生效」的可證偽斷言。"""
+    for legacy in ("decision_review", "sheet_only_holding"):
+        pool = _pool_with({"type": legacy, "ref_id": "dc_legacy", "title": "REVIEW"})
+        with pytest.raises(todo.TodoError, match="legacy"):
+            todo.resolve(pool, 1, "go", receipt="decision:pd_x")
+        todo.resolve(pool, 1, "drop", reason="機制退役")
+        assert todo.active_items(pool) == []
 
 
 def test_awaiting_gate_and_in_flight_leave_the_decision_queue() -> None:
@@ -490,21 +327,24 @@ def test_collect_all_with_health_reports_only_the_sources_that_ran(
     # 手寫的後果已經發生過：新增第 5、6 個 collector 時沒人記得更新這裡，
     # 那兩個未被 patch 的 collector 讀到**真實 private runtime 狀態**，
     # 於是本測試隨 daily 產出漂移而恆紅。恆紅＝整套 suite 失去鑑別力。
+    # 2026-09-23（Phase 0 Step 0b.4）：失敗源原本是 decisions collector（已隨研究側退役、不在登記表上），
+    # 改讓 lifecycle collector 炸——判準（失敗的來源不進 healthy）不變。
     for name, attr in todo.SOURCE_COLLECTORS:
-        if name == "decisions":
+        if name == "lifecycle":
             continue
         monkeypatch.setattr(todo, attr, lambda: [])
 
     def boom():
-        raise RuntimeError("Neo4j unreachable")
+        raise RuntimeError("lifecycle.json unreadable")
 
-    monkeypatch.setattr(todo, "_collect_decision_rows", boom)
+    monkeypatch.setattr(todo, "_collect_lifecycle_rows", boom)
 
     collected = todo.collect_all_with_health()
 
     assert collected.rows == [], "所有 collector 都被 patch 成空，不得有真實資料漏進來"
-    assert "decisions" not in collected.healthy
-    expected_healthy = {name for name, _ in todo.SOURCE_COLLECTORS} - {"decisions"}
+    assert "lifecycle" not in collected.healthy
+    assert "decisions" not in {name for name, _ in todo.SOURCE_COLLECTORS}
+    expected_healthy = {name for name, _ in todo.SOURCE_COLLECTORS} - {"lifecycle"}
     assert collected.healthy == expected_healthy
 
 
@@ -522,7 +362,6 @@ def test_dropped_ra_admission_is_not_rebuilt_by_sync() -> None:
     result = todo.sync(pool, [row])
 
     assert result["added"] == 0
-    assert result["reactivated"] == 0
     assert [item["n"] for item in todo.active_items(pool)] == []
 
 
@@ -535,125 +374,6 @@ def test_dropped_ra_admission_returns_under_a_fresh_action_id() -> None:
     todo.sync(pool, [{"type": "ra_admission", "ref_id": "ra_new", "title": "重做的 RA"}])
 
     assert [item["ref_id"] for item in todo.active_items(pool)] == ["ra_new"]
-
-
-def test_dropped_decision_review_still_reactivates() -> None:
-    """drop 的例外只限 ra_admission；decision_review 仍可因新 delta 回池。"""
-    row = {"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"}
-    pool = todo.empty_pool()
-    todo.sync(pool, [row])
-    todo.resolve(pool, 1, "drop", reason="本次略過")
-
-    result = todo.sync(pool, [row])
-
-    assert result["added"] == 1
-    assert [item["ref_id"] for item in todo.active_items(pool)] == ["dc_1"]
-
-
-class _WorkOrderStore:
-    def __init__(self) -> None:
-        self.status = "proposed"
-        self.transitions = []
-
-    def latest_research_work_order(self, cohort_id):
-        assert cohort_id == "dc_1"
-        return {
-            "work_order_id": "wo_1",
-            "decision_id": "pd_old",
-            "status": self.status,
-        }
-
-    def transition_research_work_order(self, **kwargs):
-        self.status = kwargs["to_status"]
-        self.transitions.append(kwargs)
-        return {"work_order_id": kwargs["work_order_id"], "status": self.status}
-
-    def get_decision(self, decision_id):
-        if decision_id != "pd_new":
-            raise KeyError(decision_id)
-        return {"decision_id": decision_id, "cohort_id": "dc_1"}
-
-
-def test_decision_review_go_dispatches_pq1_without_resolving() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    store = _WorkOrderStore()
-
-    result = todo.dispatch_decision_review(
-        pool, 1, store=store, at="2026-07-27T00:00:00+00:00"
-    )
-
-    assert result["item"]["dispatch_status"] == "queued"
-    assert result["item"]["dispatch_ref"] == "wo_1"
-    assert todo.active_items(pool)[0]["n"] == 1
-    assert todo.actionable_items(pool) == []
-    assert pool["log"][-1]["verb"] == "pq1_queued"
-
-    repeated = todo.dispatch_decision_review(pool, 1, store=store)
-    assert repeated["work_order"]["status"] == "queued"
-    assert len(store.transitions) == 1
-    assert len([row for row in pool["log"] if row["verb"] == "pq1_queued"]) == 1
-
-
-def test_dispatch_clears_waiting_metadata_and_sync_does_not_restore_it() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    todo.resolve(pool, 1, "pending", trigger="等 filing")
-    store = _WorkOrderStore()
-
-    todo.dispatch_decision_review(pool, 1, store=store)
-    assert "waiting_on" not in todo.get(pool, 1)
-    todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_1",
-        "title": "REVIEW",
-        "waiting_on": {
-            "trigger": "系統狀態待更新",
-            "derived_from_blockers": True,
-        },
-    }])
-    assert "waiting_on" not in todo.get(pool, 1)
-
-
-@pytest.mark.parametrize("terminal_status", ["completed", "parked"])
-def test_decision_review_go_carries_explicit_terminal_redispatch_receipt(
-    terminal_status: str,
-) -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    store = _WorkOrderStore()
-    store.status = terminal_status
-
-    todo.dispatch_decision_review(
-        pool, 1, store=store, at="2026-07-30T00:00:00+00:00"
-    )
-
-    receipt = store.transitions[-1]["receipt"]
-    assert receipt["todo_n"] == 1
-    assert receipt["prior_work_order_status"] == terminal_status
-    assert store.status == "queued"
-
-
-def test_same_todo_can_redispatch_after_work_order_becomes_terminal() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    store = _WorkOrderStore()
-
-    todo.dispatch_decision_review(pool, 1, store=store)
-    store.status = "completed"
-    todo.dispatch_decision_review(pool, 1, store=store)
-
-    assert [row["operation_key"] for row in store.transitions] == [
-        "todo:1:go:1",
-        "todo:1:go:2",
-    ]
-    assert pool["log"][-1]["receipt"] == "wo_1"
-    assert todo.get(pool, 1)["dispatch_attempt"] == 2
-
-
-def test_batch_cannot_bare_go_a_decision_review() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-
-    outcome = todo.apply_batch(pool, parse_batch_reply("1 go"))
-
-    assert outcome == {"applied": [], "failed": [1]}
-    assert todo.active_items(pool)[0]["n"] == 1
 
 
 def test_source_trace_review_go_dispatches_back_to_pq1(tmp_path) -> None:
@@ -775,11 +495,14 @@ def test_ra_admission_cannot_resolve_without_verified_completion() -> None:
             pool,
             1,
             "go",
-            receipt=f"action:ra_abc;digest:{digest};commit:{commit};cohort:dc_1",
+            receipt=f"action:ra_abc;digest:{digest};commit:{commit}",
         )
 
 
-def test_complete_ra_validates_authorities_hands_off_and_resolves(monkeypatch) -> None:
+def test_complete_ra_validates_authorities_and_resolves(monkeypatch) -> None:
+    """⚠ 2026-09-23（Phase 0 Step 0b.4）：Decision handoff 隨 decision_lab 研究側退役——
+    receipt 只剩 action／digest／commit，complete-ra **不得**再碰 Decision Store（沒有 cohort 可建）。
+    原測試名 `..._hands_off_and_resolves` 守的那個 handoff 呼叫已不存在，改守「沒有 handoff」。"""
     digest = "a" * 64
     commit = "b" * 40
     pool = _pool_with({"type": "ra_admission", "ref_id": "ra_abc", "title": "RA"})
@@ -801,13 +524,7 @@ def test_complete_ra_validates_authorities_hands_off_and_resolves(monkeypatch) -
             "title": "AXT／Casela 2027 InP 長約",
         },
     )
-    shadow_calls = []
-
-    def _handoff(**kwargs):
-        shadow_calls.append(kwargs)
-        return {"created": True, "cohort_id": "dc_new", "decision_id": "pd_new"}
-
-    monkeypatch.setattr(todo, "_ensure_shadow_for_completion", _handoff)
+    assert not hasattr(todo, "_ensure_shadow_for_completion"), "Decision handoff 已退役，不得再有這條路"
 
     result = todo.complete_ra_admission(
         pool,
@@ -820,16 +537,10 @@ def test_complete_ra_validates_authorities_hands_off_and_resolves(monkeypatch) -
     )
 
     assert todo.active_items(pool) == []
-    assert result["receipt"] == (
-        f"action:ra_abc;digest:{digest};commit:{commit};cohort:dc_new"
-    )
-    assert shadow_calls == [{
-        "company_id": "co:axt",
-        "ticker": "AXTI",
-        "as_of": "2026-07-29T00:00:00+00:00",
-        # lead title 必須傳到 Decision handoff：它會成為 cohort 的 atomic_claim。
-        "thesis": "AXT／Casela 2027 InP 長約",
-    }]
+    assert result["receipt"] == f"action:ra_abc;digest:{digest};commit:{commit}"
+    assert "handoff" not in result and "cohort" not in result["receipt"]
+    assert pool["items"][0]["completion_authority"]["company_id"] == "co:axt"
+    assert "cohort_id" not in pool["items"][0]["completion_authority"]
     assert pool["log"][-1]["receipt"] == result["receipt"]
 
 
@@ -862,53 +573,6 @@ def test_ra_lead_context_requires_matching_digest(tmp_path) -> None:
         )
 
 
-def test_decision_review_cannot_complete_with_baseline_decision() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    store = _WorkOrderStore()
-    todo.dispatch_decision_review(
-        pool, 1, store=store, at="2026-07-27T00:00:00+00:00"
-    )
-
-    with pytest.raises(todo.TodoError, match="有效 decision"):
-        todo.checkpoint_decision_review(
-            pool, 1, store=store, to_status="completed",
-            receipt="decision:pd_old", at="2026-07-27T01:00:00+00:00",
-        )
-
-    result = todo.checkpoint_decision_review(
-        pool, 1, store=store, to_status="completed",
-        receipt="decision:pd_new", reason="gap 補齊後 reassess",
-        at="2026-07-27T01:00:00+00:00",
-    )
-    assert result["item"]["resolved_at"]
-    assert result["item"]["receipt"] == "decision:pd_new"
-
-
-def test_bare_decision_id_rejected_before_work_order_mutation() -> None:
-    """ROADMAP 2026-09-02 清項（2026-08-19 [166] 實測）：裸 `pd_*` receipt 曾通過前半段
-    驗證、先寫入 work order transition，才被 resolve 端拒絕——pool 與 work order 脫鉤，
-    且重試撞 completed->completed 死鎖。修法：格式驗證先於任何副作用。"""
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-    store = _WorkOrderStore()
-    todo.dispatch_decision_review(pool, 1, store=store, at="2026-07-27T00:00:00+00:00")
-    transitions_before = len(store.transitions)
-
-    with pytest.raises(todo.TodoError, match="decision:pd_"):
-        todo.checkpoint_decision_review(
-            pool, 1, store=store, to_status="completed",
-            receipt="pd_new", at="2026-07-27T01:00:00+00:00",
-        )
-
-    # work order 完全未被觸碰，pool 項目也還活著——可用正確格式重試。
-    assert len(store.transitions) == transitions_before
-    assert not pool["items"][0].get("resolved_at")
-    result = todo.checkpoint_decision_review(
-        pool, 1, store=store, to_status="completed",
-        receipt="decision:pd_new", at="2026-07-27T01:00:00+00:00",
-    )
-    assert result["item"]["resolved_at"]
-
-
 def test_save_load_round_trip(tmp_path) -> None:
     path = tmp_path / "sub" / "todo_pool.json"
     pool = _pool_with({"type": "manual", "ref_id": "m", "title": "手動項"})
@@ -922,27 +586,6 @@ def test_save_load_round_trip(tmp_path) -> None:
 
 def test_load_missing_returns_empty_pool(tmp_path) -> None:
     assert todo.load(tmp_path / "nope.json") == todo.empty_pool()
-
-
-def test_collect_from_decisions_keeps_global_blocker_without_items(monkeypatch) -> None:
-    from briefing import public_view as decision_tools
-
-    # U7：brief 頂層的 `recommended_action` 已改為 `attention`，全域項標題固定寫「複查」。
-    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
-        "action_needed": True,
-        "attention": "REVIEW",
-        "reason": "Google Sheet current holdings 無法讀取。",
-        "blockers": ["holdings_unavailable"],
-        "items": [],
-    })
-
-    assert todo.collect_from_decisions() == [{
-        "type": "decision_review",
-        "ref_id": "global:holdings_unavailable",
-        "title": "複查 — Google Sheet current holdings 無法讀取。",
-        "hint": "修復全域 authority blocker 後重跑 decision_lab today",
-        "source": "decision_lab",
-    }]
 
 
 def test_collect_from_research_actions_recognizes_actual_ready_state(monkeypatch) -> None:
@@ -973,7 +616,7 @@ def test_collect_from_research_actions_recognizes_actual_ready_state(monkeypatch
             "ref_id": "ra_ready",
             "title": "可核准",
             "hint": (
-                "核准 exact graph delta；Decision handoff：co:agility_robotics。"
+                "核准 exact graph delta；focus company：co:agility_robotics。"
                 "RA 內其他公司只作 evidence／relationship context，不自動建 cohort。"
             ),
             "source": "research_action",
@@ -984,7 +627,7 @@ def test_collect_from_research_actions_recognizes_actual_ready_state(monkeypatch
             "title": "可續跑",
             "hint": (
                 "BLOCKER：Research Action 尚未聲明唯一 focus_company_id；"
-                "先回 pq1 補 Decision handoff，不得先 apply。"
+                "先回 pq1 補 focus company，不得先 apply。"
             ),
             "source": "research_action",
         },
@@ -1014,176 +657,6 @@ def test_collect_from_research_actions_exposes_multiple_focus_blocker(monkeypatc
     row = todo.collect_from_research_actions()[0]
     assert row["hint"].startswith("BLOCKER：Research Action 有多個 focus_company_id")
     assert "co:a, co:b" in row["hint"]
-
-
-def test_collect_from_decisions_keeps_sheet_only_items_without_cohort(
-    monkeypatch,
-) -> None:
-    from briefing import public_view as decision_tools
-
-    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
-        "action_needed": True,
-        "items": [
-            {
-                "cohort_id": None,
-                "decision_id": None,
-                "company_id": "co:nvidia",
-                "ticker": "NVDA",
-                "attention": "REVIEW",
-                "sheet_only": True,
-            },
-            {
-                "cohort_id": None,
-                "decision_id": None,
-                "company_id": "unresolved",
-                "ticker": "QQQ",
-                "attention": "REVIEW",
-                "sheet_only": True,
-            },
-        ],
-    })
-
-    # 標的歸屬跟著 payload 走（L16，2026-09-11）：下游不必 parse `co:xxx：` 標題去猜。
-    # `unresolved` 的那一筆刻意只有 ticker——不得把佔位字串當成 company_id 塞下去。
-    assert todo.collect_from_decisions() == [
-        {
-            "type": "sheet_only_holding",
-            "ref_id": "sheet:co:nvidia",
-            "title": "複查 — co:nvidia",
-            "source": "decision_lab",
-            "company_id": "co:nvidia",
-            "ticker": "NVDA",
-        },
-        {
-            "type": "sheet_only_holding",
-            "ref_id": "sheet:ticker:QQQ",
-            "title": "複查 — QQQ",
-            "source": "decision_lab",
-            "ticker": "QQQ",
-        },
-    ]
-
-
-def test_collect_from_decisions_uses_company_hint_only_as_display_label(
-    monkeypatch,
-) -> None:
-    from briefing import public_view as decision_tools
-
-    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
-        "action_needed": True,
-        "items": [{
-            "cohort_id": "dc_private",
-            "decision_id": "pd_private",
-            "company_id": "unresolved",
-            "company_id_hint": "co:agility_robotics",
-            "ticker": None,
-            "attention": "REVIEW",
-        }],
-    })
-
-    rows = todo.collect_from_decisions()
-    assert len(rows) == 1
-    row = rows[0]
-    assert row["type"] == "decision_review"
-    assert row["ref_id"] == "dc_private"
-    # 本測試的斷言對象是**顯示標籤**：company_id 為 unresolved 時退回 hint 值。
-    # U7 起沒有 weakest_axis 的項目一律寫「複查 — <label>」，不再冠上動作字樣。
-    assert row["title"] == "複查 — co:agility_robotics"
-    assert row["source"] == "decision_lab"
-    # hint 自 2026-08-26 起依該 cohort 有無 research work order 動態決定，
-    # 不再是固定字串；其正確性由 test_decision_review_hint_* 負責，這裡只確認存在。
-    assert row["hint"]
-
-
-def test_collect_material_decision_never_derives_waiting_from_system_blockers(
-    monkeypatch,
-) -> None:
-    from briefing import public_view as decision_tools
-
-    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
-        "action_needed": True,
-        "items": [{
-            "cohort_id": "dc_axt",
-            "decision_id": "pd_axt",
-            "company_id": "co:axt",
-            "attention": "REVIEW",
-            "evidence_delta": "material",
-            "blockers": ["market_stale_since_decision"],
-        }],
-    })
-
-    row = todo.collect_from_decisions()[0]
-    assert "waiting_on" not in row
-    assert row["event_link"]["receipt"] == "decision:pd_axt"
-
-
-def test_collect_marks_pure_system_internal_decision_for_retirement(
-    monkeypatch,
-) -> None:
-    """純 stale context 要交給 sync 留 audit，不可冒充「等事件」。"""
-
-    from briefing import public_view as decision_tools
-
-    monkeypatch.setattr(decision_tools, "get_decision_brief_core", lambda: {
-        "action_needed": True,
-        "items": [{
-            "cohort_id": "dc_meta",
-            "decision_id": "pd_meta",
-            "company_id": "co:meta",
-            "attention": "REVIEW",
-            "evidence_delta": "none",
-            "blockers": [
-                "execution_fx_stale_since_decision",
-                "execution_market_stale_since_decision",
-                "fx_stale_since_decision",
-                "market_stale_since_decision",
-            ],
-        }],
-    })
-
-    row = todo.collect_from_decisions()[0]
-    assert row["system_internal_only"] is True
-    assert "waiting_on" not in row
-
-
-def test_sync_retires_existing_pure_system_internal_item_without_new_pq2() -> None:
-    pool = todo.empty_pool()
-    todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_meta",
-        "title": "REVIEW — co:meta",
-        "source": "decision_lab",
-        "waiting_on": {
-            "derived_from_blockers": True,
-            "reason": "所有 blocker 都不需要使用者決定",
-            "trigger": "市場資料問題",
-            "until": None,
-        },
-    }], healthy_sources={_CLEARED_SOURCE})
-
-    result = todo.sync(pool, [{
-        "type": "decision_review",
-        "ref_id": "dc_meta",
-        "title": "REVIEW — co:meta",
-        "source": "decision_lab",
-        "system_internal_only": True,
-    }], healthy_sources={_CLEARED_SOURCE})
-
-    assert result["system_internal_retired"] == 1
-    assert todo.active_items(pool) == []
-    assert pool["items"][0]["resolution"] == "system_internal"
-    assert pool["log"][-1]["verb"] == "system_internal_retired"
-
-    fresh = todo.empty_pool()
-    result = todo.sync(fresh, [{
-        "type": "decision_review",
-        "ref_id": "dc_meta",
-        "title": "REVIEW — co:meta",
-        "source": "decision_lab",
-        "system_internal_only": True,
-    }], healthy_sources={_CLEARED_SOURCE})
-    assert result["added"] == 0
-    assert todo.active_items(fresh) == []
 
 
 def test_raw_leads_are_not_pq2_and_legacy_items_migrate_with_audit() -> None:
@@ -1238,7 +711,7 @@ def test_ra_can_declare_its_own_decision_handoff(monkeypatch) -> None:
     rows = todo._collect_research_action_rows()
 
     assert len(rows) == 1
-    assert "Decision handoff：co:meta" in rows[0]["hint"]
+    assert "focus company：co:meta" in rows[0]["hint"]
     assert "BLOCKER" not in rows[0]["hint"]
 
 
@@ -1254,51 +727,6 @@ def test_ra_without_any_focus_still_blocks(monkeypatch) -> None:
 
     assert "BLOCKER" in rows[0]["hint"]
     assert "尚未聲明唯一 focus_company_id" in rows[0]["hint"]
-
-
-def test_same_decision_receipt_does_not_rewake_item_every_sync() -> None:
-    """2026-08-11 迴歸：綁 event_type 後等待條件永遠黏不住。
-
-    `reactivation_event` 先前只寫不讀，於是只要 collector 還回報同一筆 material
-    delta，使用者每次設回等待、下一輪 sync 就被打回決策佇列——把「永遠不會醒」
-    換成「永遠不睡」。同一筆 receipt 只該喚醒一次；換新 decision 仍要喚醒。
-    """
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_1", "title": "REVIEW"})
-
-    def _row(receipt: str) -> dict:
-        return {
-            "type": "decision_review",
-            "ref_id": "dc_1",
-            "title": "REVIEW — co:agility_robotics",
-            "event_link": {
-                "type": "decision_evidence_delta",
-                "value": "material",
-                "receipt": receipt,
-            },
-        }
-
-    def _wait(at: str) -> None:
-        todo.resolve(
-            pool, 1, "pending",
-            trigger="等 S-4 公開",
-            event_type="decision_evidence_delta",
-            at=at,
-        )
-
-    _wait("2026-08-01T00:00:00+00:00")
-    first = todo.sync(pool, [_row("decision:pd_a")], at="2026-08-02T00:00:00+00:00")
-    assert first["reactivated"] == 1
-
-    # 看過後設回等待；同一筆 receipt 再 sync 不得重新喚醒
-    _wait("2026-08-03T00:00:00+00:00")
-    again = todo.sync(pool, [_row("decision:pd_a")], at="2026-08-04T00:00:00+00:00")
-    assert again["reactivated"] == 0, "同一筆 decision receipt 不應重複喚醒"
-    assert "waiting_on" in todo.get(pool, 1)
-
-    # 換一筆新 decision（新 receipt）仍必須喚醒
-    fresh = todo.sync(pool, [_row("decision:pd_b")], at="2026-08-05T00:00:00+00:00")
-    assert fresh["reactivated"] == 1
-    assert "waiting_on" not in todo.get(pool, 1)
 
 
 def _trace_lead_applied(tmp_path, doc_id: str, *, stop_at_prepared: bool = False):
@@ -1400,102 +828,6 @@ def test_graph_receipt_rejects_a_lead_that_was_never_loaded(tmp_path) -> None:
         )
 
 
-def test_decision_review_hint_distinguishes_dispatch_from_reassess() -> None:
-    """`REVIEW` 有兩種成因，hint 必須說對是哪一種。
-
-    事發（2026-08-26，本機 Codex 與 Claude Code 各自獨立撞到）：舊 hint 一律寫
-    「核准 bounded gap research」，把「coverage 已清空、REVIEW 來自凍結 context
-    過期」誤呈現成「存在可 dispatch 的研究缺口」。使用者照著下 `go`：
-    `dispatch` 拒絕（沒有 work order），`resolve --verb go` 也拒絕
-    （decision_review 不得 bare go），看起來像死結——正解其實是 `reassess`。
-
-    這是 L12：一個表示承載兩種語意，下游被迫二選一，而兩邊都是錯的。
-    """
-
-    from engine_b.todo import _decision_review_hint
-
-    with_gap = _decision_review_hint("dc_has_work_order", frozenset({"dc_has_work_order"}))
-    without_gap = _decision_review_hint(
-        "dc_no_work_order", frozenset({"dc_has_work_order"}), ["holdings_stale"]
-    )
-
-    assert "dispatch" in with_gap and "pq1" in with_gap
-    # 沒有 work order 且只剩 context 過期類 blocker 時，指向 reassess。
-    assert "reassess" in without_gap
-    assert "不是 dispatch" in without_gap
-    assert with_gap != without_gap
-
-
-def test_hint_names_substantive_blockers_when_reassess_will_not_help() -> None:
-    """只分 dispatch／reassess 兩類不夠——實測 [223] co:lumentum 兩者皆不成立。
-
-    它沒有 work order（不是 dispatch），但 reassess 跑過之後仍是 REVIEW，
-    因為 blocker 是 `financial_resilience_corroboration_incomplete`——要補證據，
-    不是重跑評估。hint 只寫「請跑 reassess」會讓人跑第二次然後再問一次
-    「那我到底要下什麼」。
-    """
-
-    from engine_b.todo import _decision_review_hint
-
-    hint = _decision_review_hint(
-        "dc_x",
-        frozenset(),
-        ["financial_resilience_corroboration_incomplete", "holdings_stale"],
-    )
-
-    assert "financial_resilience_corroboration_incomplete" in hint
-    # context 過期類的不算實質 blocker，不該混進研究範圍。
-    assert "holdings_stale" not in hint
-    # 2026-08-30 使用者定案：介面只有一個 go。無 work order 的項目 go＝
-    # dispatch 的 assessment_gap 路徑（reassess 後排入 pq1），hint 必須說得出
-    # 這條路，不得再寫「go 不成立」。
-    assert "go（大項）" in hint
-    assert "assessment_gap" in hint
-    assert "go 不成立" not in hint
-
-
-def test_dispatchable_cohorts_fails_soft_without_store() -> None:
-    """讀不到 store 只降級 hint，不得阻斷 sync，也不得謊報某條路可走。"""
-
-    from engine_b.todo import _dispatchable_cohorts
-
-    # 沒有 dc_ 前綴就不查 store，直接空集合。
-    assert _dispatchable_cohorts([{"cohort_id": "sheet:co:x"}]) == frozenset()
-    assert _dispatchable_cohorts([]) == frozenset()
-
-
-def test_decision_review_hint_is_rendered_not_just_stored() -> None:
-    """hint 存了但不顯示等於沒有——使用者只看得到區段標題然後下錯 verb。"""
-
-    from engine_b.todo import _item_line
-
-    line = _item_line({
-        "n": 220,
-        "title": "REVIEW — co:axt",
-        "type": "decision_review",
-        "hint": "coverage 已無 blocker……請跑 reassess",
-    })
-    assert "reassess" in line
-
-
-class _FakeStore:
-    """只提供 advance_decision_review 用到的窄 surface。"""
-
-    def __init__(self, *, work_order=None, intent="paper"):
-        self._work_order = work_order
-        self._intent = intent
-        self.closed = False
-
-    def latest_research_work_order(self, cohort_id):
-        return self._work_order
-
-    def latest_decision_for_cohort(self, cohort_id):
-        return {"payload": {"request": {"execution_intent": self._intent}}}
-
-    def close(self):
-        self.closed = True
-
-
 def _decision_pool(n=1, cohort="dc_abc"):
     return {
         "items": [{
@@ -1506,110 +838,6 @@ def _decision_pool(n=1, cohort="dc_abc"):
         }],
         "log": [], "next_n": n + 1, "schema_version": "1",
     }
-
-
-def test_go_dispatches_when_work_order_exists(monkeypatch) -> None:
-    """A 類：原行為不變。"""
-
-    from engine_b import todo
-
-    pool = _decision_pool()
-    store = _FakeStore(work_order={"work_order_id": "wo_1", "status": "proposed",
-                                   "decision_id": "pd_base"})
-    monkeypatch.setattr(todo, "dispatch_decision_review",
-                        lambda p, n, **kw: {"item": todo.get(p, n)})
-
-    out = todo.advance_decision_review(pool, 1, store=store)
-    assert out["outcome"] == "dispatched"
-
-
-def test_go_reassesses_when_only_context_aged(monkeypatch) -> None:
-    """B 類：先前會被拒絕，現在自動 reassess。
-
-    實測 2026-08-26：9 個 REVIEW 有 3 個屬此類（aeva／AAOI／SIVE），
-    使用者下 go 只會拿到「不得 bare go」。
-    """
-
-    from engine_b import todo
-
-    pool = _decision_pool()
-    store = _FakeStore(work_order=None, intent="paper")
-    seen = {}
-
-    def fake_reassess(_store, _provider, cohort_id, *, execution_intent):
-        seen["intent"] = execution_intent
-        return {"decision_id": "pd_new"}
-
-    monkeypatch.setattr("decision_lab.workflow.reassess", fake_reassess)
-    monkeypatch.setattr("engine_d_runtime.bootstrap.build_default_runtime_provider",
-                        lambda: object())
-    ref = todo.get(pool, 1)["ref_id"]
-    # 2026-09-09 R2 起 advance 先確認 brief 讀得到且列了這個 cohort（fail closed），再判殘餘 blocker
-    monkeypatch.setattr(todo, "_load_brief_items", lambda: [{"cohort_id": ref, "blockers": []}])
-    monkeypatch.setattr(todo, "_substantive_blockers", lambda cohort_id, **kw: [])
-
-    out = todo.advance_decision_review(pool, 1, store=store)
-    assert out["outcome"] == "reassessed"
-    # intent 必須沿用該 cohort 上一筆——套錯會讓 research_status 假性退化。
-    assert seen["intent"] == "paper"
-
-
-def test_go_queues_assessment_gap_when_blockers_remain(monkeypatch) -> None:
-    """C 類：assessment 層缺口沒有 Decision Store work order，仍要能開工。"""
-
-    from engine_b import todo
-
-    pool = _decision_pool()
-    store = _FakeStore(work_order=None, intent="research")
-    monkeypatch.setattr("decision_lab.workflow.reassess",
-                        lambda *a, **k: {"decision_id": "pd_new"})
-    monkeypatch.setattr("engine_d_runtime.bootstrap.build_default_runtime_provider",
-                        lambda: object())
-    ref = todo.get(pool, 1)["ref_id"]
-    monkeypatch.setattr(todo, "_load_brief_items",
-                        lambda: [{"cohort_id": ref, "blockers": ["financial_resilience_corroboration_incomplete"]}])
-    monkeypatch.setattr(todo, "_substantive_blockers",
-                        lambda cohort_id, **kw: ["financial_resilience_corroboration_incomplete"])
-
-    out = todo.advance_decision_review(pool, 1, store=store)
-    assert out["outcome"] == "queued_assessment_gap"
-    assert out["scope"] == ["financial_resilience_corroboration_incomplete"]
-    item = todo.get(pool, 1)
-    assert item["dispatch_ref"].startswith(todo.ASSESSMENT_GAP_PREFIX)
-    assert item["dispatch_status"] == "queued"
-
-
-def test_go_is_noop_when_already_in_flight() -> None:
-    """已在 pq1 的不重複派工——否則同一份研究會被排兩次。"""
-
-    from engine_b import todo
-
-    pool = _decision_pool()
-    todo.get(pool, 1)["dispatch_status"] = "researching"
-    out = todo.advance_decision_review(pool, 1, store=_FakeStore())
-    assert out["outcome"] == "already_in_flight"
-
-
-def test_work_checkpoint_accepts_assessment_gap_ref() -> None:
-    """assessment-gap dispatch 沒有 work order 可 transition，但仍必須留 receipt。"""
-
-    from engine_b import todo
-
-    pool = _decision_pool()
-    item = todo.get(pool, 1)
-    item["dispatch_status"] = "queued"
-    item["dispatch_ref"] = f"{todo.ASSESSMENT_GAP_PREFIX}dc_abc"
-
-    class _Store:
-        def transition_research_work_order(self, **kw):  # pragma: no cover
-            raise AssertionError("assessment-gap 不該去動 Decision Store work order")
-
-    out = todo.checkpoint_decision_review(
-        pool, 1, to_status="parked", receipt="research_packet:notes.md", store=_Store()
-    )
-    assert out["work_order"] is None
-    # terminal checkpoint 仍照常 resolve pq2 編號並留下 receipt。
-    assert pool["log"][-1]["receipt"] == "research_packet:notes.md"
 
 
 def test_every_item_type_declares_its_go_authorization_boundary() -> None:
@@ -1707,163 +935,9 @@ def test_check_event_watches_consumes_already_fired_pq2_watches(monkeypatch) -> 
     assert pool["log"][-1]["verb"] == "watch_wake" and pool["log"][-1]["n"] == n
 
 
-class _StoreStub:
-    def __init__(self, work_orders: dict[str, object]):
-        self._wo = work_orders
-
-    def latest_research_work_order(self, cohort_id: str):
-        return self._wo.get(cohort_id)
-
-
-def test_reassess_only_items_requires_all_three_conditions() -> None:
-    pool = _pool_with(
-        {"type": "decision_review", "ref_id": "dc_stale", "title": "A"},       # 只因 context 過期
-        {"type": "decision_review", "ref_id": "dc_has_wo", "title": "B"},      # 有 work order → dispatch
-        {"type": "decision_review", "ref_id": "dc_user", "title": "C"},        # 有需人決定的 blocker
-        {"type": "decision_review", "ref_id": "dc_unlisted", "title": "D"},    # brief 沒列 → 不判
-        {"type": "manual", "ref_id": "m1", "title": "E"},
-    )
-    by_ref = {it["ref_id"]: it for it in todo.active_items(pool)}
-    by_ref["dc_has_wo"]["dispatch_status"] = None
-    # blocker 代碼用真的 registry 值（config/decision_blockers.json 的 resolution_mode）：
-    # market_stale_since_decision＝system_internal；execution_fx_missing＝awaiting_external；
-    # financial_resilience_corroboration_incomplete＝user_decision。
-    brief = [
-        {"cohort_id": "dc_stale", "blockers": ["market_stale_since_decision", "holdings_unconfirmed"]},
-        {"cohort_id": "dc_has_wo", "blockers": ["market_stale_since_decision"]},
-        {"cohort_id": "dc_user", "blockers": ["market_stale_since_decision",
-                                             "financial_resilience_corroboration_incomplete"]},
-        {"cohort_id": "dc_waiting", "blockers": ["market_stale_since_decision", "execution_fx_missing"]},
-        {"cohort_id": "dc_empty", "blockers": []},
-    ]
-    todo.sync(pool, [
-        {"type": "decision_review", "ref_id": "dc_waiting", "title": "F"},   # 帶 awaiting_external → 不算
-        {"type": "decision_review", "ref_id": "dc_empty", "title": "G"},     # 零 blocker 的 REVIEW → 不算
-    ])
-    store = _StoreStub({"dc_has_wo": {"work_order_id": "wo_1"}})
-
-    got = todo.reassess_only_items(pool, store, brief_items=brief)
-    assert [it["ref_id"] for it in got] == ["dc_stale"]
-
-    # in-flight 或已有 terminal receipt 的不算
-    by_ref["dc_stale"]["dispatch_status"] = "queued"
-    assert todo.reassess_only_items(pool, store, brief_items=brief) == []
-    by_ref["dc_stale"]["dispatch_status"] = "completed"
-    assert todo.reassess_only_items(pool, store, brief_items=brief) == []
-
-    # brief 讀不到 → 一個都不判（不是全部都算）
-    by_ref["dc_stale"]["dispatch_status"] = None
-    assert todo.reassess_only_items(pool, store, brief_items=[]) == []
-
-
-def test_reassess_stale_closes_only_when_new_decision_is_not_review(monkeypatch) -> None:
-    pool = _pool_with(
-        {"type": "decision_review", "ref_id": "dc_a", "title": "A"},
-        {"type": "decision_review", "ref_id": "dc_b", "title": "B"},
-        {"type": "decision_review", "ref_id": "dc_c", "title": "C"},
-    )
-    brief = [{"cohort_id": ref, "blockers": ["market_stale_since_decision"]} for ref in ("dc_a", "dc_b", "dc_c")]
-    store = _StoreStub({})
-    monkeypatch.setattr(todo, "_prior_execution_intent", lambda s, c: "paper")
-
-    def fake_reassess(s, provider, cohort_id, *, execution_intent=None, **kw):
-        if cohort_id == "dc_c":
-            raise RuntimeError("provider 壞了")
-        attention = "REVIEW" if cohort_id == "dc_b" else "MONITOR"
-        return {"decision_id": f"pd_{cohort_id}", "action_card": {"attention": attention}}
-
-    import decision_lab.workflow as wf
-    monkeypatch.setattr(wf, "reassess", fake_reassess)
-
-    dry = todo.reassess_stale(pool, store, None, dry_run=True, brief_items=brief)
-    assert dry["dry_run"] is True and sorted(dry["candidates"]) == [1, 2, 3]
-    assert len(todo.active_items(pool)) == 3            # dry-run 一個都不動
-
-    out = todo.reassess_stale(pool, store, object(), at="2026-09-09T00:00:00+00:00", brief_items=brief)
-    assert [row["n"] for row in out["closed"]] == [1]
-    assert [row["n"] for row in out["still_review"]] == [2]
-    assert [row["n"] for row in out["failed"]] == [3]
-    remaining = {it["ref_id"] for it in todo.active_items(pool)}
-    assert remaining == {"dc_b", "dc_c"}
-    closed = next(it for it in pool["items"] if it["ref_id"] == "dc_a")
-    assert closed["resolution"] == "reassessed" and closed["resolved_at"]
-    verbs = [e["verb"] for e in pool["log"] if e["n"] == 1]
-    assert verbs[-2:] == ["pq1_reassessed", "reassessed_closed"]
-    assert pool["log"][-1]["receipt"].startswith("decision:pd_") or any(
-        e["receipt"] == "decision:pd_dc_a" for e in pool["log"]
-    )
-
-
-
 # ---------------------------------------------------------------------------
 # 2026-09-09 R2（P5）findings 的回歸測試
 # ---------------------------------------------------------------------------
-
-def test_load_brief_items_returns_none_when_brief_service_degrades(monkeypatch) -> None:
-    """brief 服務把失敗吞成 status=unavailable 而不拋——讀不到不得變成空清單。"""
-    import briefing.public_view as pv
-
-    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "unavailable", "as_of": "x"})
-    assert todo._load_brief_items() is None
-    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "error", "as_of": "x"})
-    assert todo._load_brief_items() is None
-    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "ok", "items": []})
-    assert todo._load_brief_items() == []                      # 真的沒東西才是空
-    monkeypatch.setattr(pv, "get_decision_brief_core", lambda **kw: {"status": "ok", "items": [{"cohort_id": "dc_1"}]})
-    assert todo._load_brief_items() == [{"cohort_id": "dc_1"}]
-
-
-def test_advance_decision_review_fails_closed_when_brief_is_unreadable(monkeypatch) -> None:
-    """reassess 後 brief 讀不到 → 不得下「僅 context 老化已解決」的結論，也不排隊；留收據等下一輪。"""
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_x", "title": "X"})
-    n = todo.active_items(pool)[0]["n"]
-
-    class _Store:
-        def latest_research_work_order(self, cohort_id):
-            return None
-
-    import decision_lab.workflow as wf
-    import engine_d_runtime.bootstrap as bs
-
-    monkeypatch.setattr(wf, "reassess", lambda s, p, c, *, execution_intent=None, **kw: {"decision_id": "pd_new", "action_card": {"attention": "REVIEW"}})
-    monkeypatch.setattr(bs, "build_default_runtime_provider", lambda: object())
-    monkeypatch.setattr(todo, "_prior_execution_intent", lambda s, c: "paper")
-    monkeypatch.setattr(todo, "_load_brief_items", lambda: None)
-
-    out = todo.advance_decision_review(pool, n, store=_Store(), at="2026-09-09T00:00:00+00:00")
-    assert out["outcome"] == "reassessed_blockers_unknown"
-    item = todo.get(pool, n)
-    assert item.get("dispatch_status") is None                 # 沒排隊（不知道 scope）
-    assert item.get("resolved_at") is None                     # 沒關掉
-    assert "殘餘 blocker 未判定" in pool["log"][-1]["reason"]
-
-
-def test_reassess_stale_has_a_cooldown_so_it_cannot_append_daily() -> None:
-    pool = _pool_with({"type": "decision_review", "ref_id": "dc_cool", "title": "C"})
-    n = todo.active_items(pool)[0]["n"]
-    brief = [{"cohort_id": "dc_cool", "blockers": ["market_stale_since_decision"]}]
-    store = _StoreStub({})
-    assert [it["n"] for it in todo.reassess_only_items(pool, store, brief_items=brief)] == [n]
-    pool["log"].append({"at": "2026-09-09T00:00:00+00:00", "n": n, "type": "decision_review", "ref_id": "dc_cool",
-                        "verb": "pq1_reassessed", "reason": "x", "receipt": "decision:pd_1"})
-    from datetime import datetime, timezone
-    assert todo._recently_reassessed(pool, n, now=datetime(2026, 9, 10, tzinfo=timezone.utc))
-    assert not todo._recently_reassessed(pool, n, now=datetime(2026, 9, 20, tzinfo=timezone.utc))
-
-
-def test_assessment_gap_jobs_lists_pool_only_work_that_drain_would_otherwise_miss() -> None:
-    pool = _pool_with(
-        {"type": "decision_review", "ref_id": "dc_gap", "title": "G"},
-        {"type": "decision_review", "ref_id": "dc_wo", "title": "W"},
-        {"type": "decision_review", "ref_id": "dc_idle", "title": "I"},
-    )
-    by = {it["ref_id"]: it for it in todo.active_items(pool)}
-    by["dc_gap"].update({"dispatch_status": "queued", "dispatch_ref": f"{todo.ASSESSMENT_GAP_PREFIX}dc_gap",
-                         "dispatch_scope": ["financial_resilience_corroboration_incomplete"]})
-    by["dc_wo"].update({"dispatch_status": "queued", "dispatch_ref": "wo_123"})     # 真 work order：drain 另有來源
-    jobs = todo.assessment_gap_jobs(pool)
-    assert [j["cohort_id"] for j in jobs] == ["dc_gap"]
-    assert jobs[0]["scope"] == ["financial_resilience_corroboration_incomplete"]
 
 
 # ---------------------------------------------------------------------------
@@ -1957,48 +1031,6 @@ def test_leaving_awaiting_approval_clears_the_pointer() -> None:
     item["dispatch_status"] = "researching"
     item.pop(todo.AWAITING_GATE_KEY, None)
     assert todo.gated_items(pool) == []
-
-
-def test_decision_review_hint_names_material_evidence_before_the_other_causes() -> None:
-    """`REVIEW` 有第三種成因：證據有實質變動（evidence_delta=material）。
-
-    事發（2026-09-11 實測 [512] co:iqe）：它的 blocker 全部不需要使用者決定，於是 hint
-    落到「請跑 reassess」那一句。但 `reassess-stale` 不收它（段 2 的判準是
-    `_only_system_internal_blockers`，比「無 user_decision」嚴得多），`standing-go` 又把它
-    推回給 `reassess-stale`——使用者照著做只會白跑兩次。
-
-    再往下追，它留在佇列的真正原因是 material evidence delta：collect 端刻意讓它蓋過
-    `waiting_on` 推導與 system_internal 退休路徑。所以這一句必須**排在最前面**，
-    它回答的是「為什麼這一筆在你眼前」，其餘兩種回答的是「為什麼自動化不碰它」。
-    """
-
-    from engine_b.todo import _decision_review_hint
-
-    execution_only = [
-        "execution_fx_missing", "execution_intent_research_only",
-        "execution_market_stale_since_decision", "holdings_unconfirmed",
-        "live_context_not_ready", "market_stale_since_decision",
-    ]
-    material = _decision_review_hint("dc_x", frozenset(), execution_only, material_event=True)
-    assert "evidence_delta" in material and "missing_data" in material
-    # 不得再叫人去跑那兩支不收它的東西
-    assert "reassess-stale 與 standing-go 都不會自動處理" in material
-
-    # 同一組 blocker、沒有 material 時，要說的是「在等世界」而不是「請跑 reassess」——
-    # execution_fx_missing 是 awaiting_external，段 2 也不收它。
-    waiting = _decision_review_hint("dc_x", frozenset(), execution_only, material_event=False)
-    assert "execution_fx_missing" in waiting and "等世界" in waiting
-    assert waiting != material
-
-
-def test_decision_review_hint_fails_closed_when_blockers_are_unreadable() -> None:
-    """讀不到 blocker 時不得落進任何一句有指示性的話——「查不到了」不是合法 lifecycle（INV-3）。"""
-
-    from engine_b.todo import _decision_review_hint
-
-    hint = _decision_review_hint("dc_x", frozenset(), [])
-    assert "讀不到" in hint
-    assert "reassess" not in hint
 
 
 # ---------------------------------------------------------------------------

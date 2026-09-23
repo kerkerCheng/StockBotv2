@@ -74,8 +74,8 @@ def test_daily_prompt_keeps_human_gates_and_batch_contract() -> None:
     assert "go" in text and "drop" in text and "pending" in text
     assert "todo_pool.json" in text and "不得依 section" in text
     assert "engine_b.todo dispatch" in text
-    assert "bare reassess" in text
-    assert "新 decision receipt" in text
+    # 2026-09-23（Phase 0 Step 0b.4）：Decision work order／reassess 段改成退役註記；留下的判準是反證條件三件套。
+    assert "研究側退役" in text and "不得早於催化劑本身" in text
     assert "beta 行情" in text
     # 2026-08-29：已無逐檔 supported range，單檔行情降級不得再被寫成「該商品 range 歸零」。
     assert "單檔行情降級**不歸零**共用 supported range" in text

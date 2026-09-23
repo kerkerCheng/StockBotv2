@@ -161,7 +161,7 @@ def build_nav_exposure(
     }
 
 
-# ⚠ 取數不在這一層。`decision_lab` 不得 import `fetchers`／`engine_c`／`neo4j`
-# （`tests/test_engine_d_runtime.py::test_decision_lab_does_not_import_concrete_
-# current_state_authorities` 守這條線）：這一層只做純轉換，持股列由呼叫端注入。
-# 實際從 Google Sheet 取數的入口在 `engine_d_runtime.adapters.fetch_nav_exposure`。
+# ⚠ 取數不在這一層。這一層是純轉換，不碰 `fetchers`／`engine_c`／`neo4j`
+# （`tests/test_layer_separation.py::test_upstream_layers_do_not_import_engine_d` 與 alpha 純度測試守著）。
+# 2026-09-23（Phase 0 Step 0b.4）：原取數入口 `engine_d_runtime.adapters.fetch_nav_exposure` 隨研究側退役；
+# 呼叫端自己 `fetch_portfolio(strict_operational=True)` 後餵進來（見 scripts/capture_golden_fixtures.py）。

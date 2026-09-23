@@ -5,7 +5,7 @@ import math
 import pytest
 
 from shared.market_normalization import normalize_fx_snapshot, normalize_market_snapshot
-from decision_lab.context import derive_runway
+from shared.runway import derive_runway
 
 
 NOW = "2026-07-21T12:00:00+00:00"

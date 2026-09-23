@@ -396,41 +396,6 @@ MUTATIONS: tuple[Mutation, ...] = (
     # 清單上的 `briefing` 是承重的。這正是本腳本存在的理由——
     # 「看起來在守某件事」與「真的守得住」不是同一件事。
     Mutation(
-        name="Engine D 直接 import 組裝層",
-        path="decision_lab/brief.py",
-        old="from .workflow_ports import WorkflowDataProvider",
-        new="from .workflow_ports import WorkflowDataProvider\nimport briefing  # noqa: F401",
-        test="tests/test_layer_separation.py::test_decision_lab_domain_does_not_import_new_layers",
-        guards="依賴方向只准 briefing → decision_lab，反過來就形成環",
-    ),
-    Mutation(
-        name="Sheet 覆蓋分類變成可略過",
-        path="decision_lab/brief.py",
-        old="    sheet_only_items: Sequence[Mapping[str, Any]],",
-        new="    sheet_only_items: Sequence[Mapping[str, Any]] = (),",
-        test=(
-            "tests/test_decision_brief.py::"
-            "test_coverage_classification_cannot_be_silently_skipped"
-        ),
-        guards=(
-            "pq2 收集鏈漏一環，持股就從待辦池靜默消失——"
-            "而「少了 12 檔」與「本來就沒有」在 brief 上完全同形"
-        ),
-    ),
-    Mutation(
-        name="已終結 cohort 的公司不再算「有人負責」",
-        path="decision_lab/brief.py",
-        old='        if summary.get("company_id")\n    }',
-        new='        if summary.get("company_id")\n        and str(summary.get("lifecycle_status") or "") not in _TERMINAL_LIFECYCLE\n    }',
-        test=(
-            "tests/test_decision_brief.py::"
-            "test_terminal_cohorts_still_claim_their_company"
-        ),
-        guards=(
-            "已 promote／reject 的標的會每天以 sheet-only 身分重新冒出來配新 pq2 編號"
-        ),
-    ),
-    Mutation(
         name="三階序數又被抄成第二份",
         path="alpha/levels.py",
         old="from shared.evidence_levels import LEVELS",
@@ -1013,14 +978,6 @@ MUTATIONS: tuple[Mutation, ...] = (
         new="        judgment_status = \"stale\" if signal_stale else \"available\"\n        axis_status = {axis: judgment_status for axis in AXES}",
         test="tests/test_alpha_view_refresh.py::test_price_only_change_keeps_session_axes_available_in_the_view",
         guards="read model 只消費 alpha.refresh 的 state；digest mismatch 是事實不是 status",
-    ),
-    Mutation(
-        name="today brief 把「未注入 Alpha Card」壓成空 list",
-        path="briefing/today.py",
-        old="        \"alpha_cards\": [dict(card) for card in alpha_cards] if alpha_cards is not None else None,",
-        new="        \"alpha_cards\": [dict(card) for card in alpha_cards] if alpha_cards is not None else [],",
-        test="tests/test_alpha_view_brief.py::test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct",
-        guards="L12：「沒注入」與「沒有候選」不得同形",
     ),
     Mutation(
         name="消費端：自己複製一份 Datum（值一樣、物件不同）",

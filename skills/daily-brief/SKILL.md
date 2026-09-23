@@ -29,7 +29,8 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 > **介面是對話，不用 GitHub UI。** 現行排程是 Codex desktop local scheduled task；本機 Claude Code
 > session 也可手動執行同一流程，直接讀 repo、private runtime 與 `todo_pool.json`。本階段提到 Claude
 > 預設就是 Claude Code 本機；cloud session＋MCP 是備援，只保留
-> `get_decision_brief`／`record_lead_decision` 等既有受限路徑，不要求與本機完全等權。
+> `get_pending_leads`／`record_lead_decision` 等既有受限路徑，不要求與本機完全等權
+> （`get_decision_brief` 已於 2026-09-23 Phase 0 Step 0b.4 隨 decision_lab 研究側退役）。
 > 決策與 private authority 寫入只在本機；所有需要使用者決策的項目一律先進統一待辦池，brief
 > 不自行重編號。pq1／pq2 定義見 CONCEPTS.md。
 

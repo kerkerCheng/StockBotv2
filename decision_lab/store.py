@@ -1,4 +1,11 @@
-"""Decision Cohort 與 paper events 的 private transactional store。"""
+"""Decision Cohort 與 paper events 的 private transactional store——**frozen 2026-09-22（G12）**。
+
+Phase 0 Step 0b.4：研究側（intake／context／coverage／execution／workflow）退役後，本類別只剩
+歷史檔案館的角色：schema 不動、資料不刪、寫入方法留著但**無呼叫端**（結案 gate：
+`grep record_live_choice(` 呼叫端＝0）。live 收據改住 `library/trades/trade_log.jsonl`
+（`scripts/record_trade.py`），資本硬擋改住 `risk/hard_caps.py`；`record_live_choice`／
+`record_live_fill` 因此直接拒絕（A5 不得有第二個 current-state authority）。
+"""
 from __future__ import annotations
 
 import hashlib
@@ -37,127 +44,12 @@ from .models import (
 from shared.redaction import sensitive_payload_path
 
 
+class FrozenStoreError(RuntimeError):
+    """舊 Decision Store 已凍結（2026-09-22，G12）：live 選擇與成交回報不再寫進舊店。"""
+
+
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 _SCHEMA_VERSION = "9"
-
-# `user_sized` 仍然硬擋的 blocker。判準來自 `AGENTS.md`「資本與風控」：
-# **只有 ETF 槓桿 cap 與 5% 單筆上限會把 live supported range 歸零，其餘曝險只記錄／警告。**
-# 這三碼是那句話在 `sizing.py` 的實作對應（`config/decision_blockers.json` 亦標 fatal）。
-#
-# ⚠ **`portfolio_leverage_unavailable` 刻意不在此列**，儘管它在
-# `config/decision_blockers.json` 標為 fatal。首版曾納入（理由是「無法驗證的上限不能宣稱
-# 已執行」），但實測當場推翻：它在乾淨測試 fixture 與**每一筆**真實 decision 上都亮，
-# 觸發率近 100%——那是 `capital-expression-direction` §3.5 的「恆亮」測試，零鑑別力。
-#
-# 更關鍵的是它過不了機制測試（D3）：說不出「這碼亮起時，這檔標的更可能變壞」。
-# 它的實際語意是 `sizing.py` 一個寬 except 捕捉到的三種情況之一——NAV 讀不到、
-# beta policy 載入失敗、component 組不起來（又一個 L12，已登記 ROADMAP）。
-# 那是管線狀態，不是風險判斷，依 D3 不得有資本否決權。
-#
-# 附帶理由：ETF 槓桿 cap 管的是 beta sleeve 的組合結構，買一檔 alpha 個股（AXTI／LITE）
-# 根本不改變槓桿比率。拿算不出來的 beta 控制去擋 alpha 決策是把控制掛錯層。
-# 下面三碼保留，因為它們的語意是「某個上限**確實已經**觸頂」，不是「算不出來」。
-_HARD_CAP_BLOCKERS = frozenset(
-    {
-        "single_position_nav_cap_reached",
-        "etf_leverage_nominal_cap_reached",
-        "etf_leverage_effective_cap_reached",
-    }
-)
-
-# `user_sized` 可以沿用一筆 decision 多久。
-#
-# ⚠ 這個上界是必要的，不是保守癖。資本上限的判定**全部來自凍結快照**：單筆 NAV 上限來自
-# `constraint_trace`、已持有部位來自 `live_current_position`、觸頂與否來自 `live_blockers`。
-# 沒有時效上界時，一筆三個月前的 decision 仍會說「未觸頂」，而期間使用者可能已買到 4.9%
-# NAV——系統會放行再買一次，疊出遠超 5% 的部位（2026-08-18 紅隊審查發現）。
-# holdings 由 Google Sheet 每日更新，所以「凍結超過一週」等於拿過期的投組狀態當風控依據。
-#
-# 解法不是放寬，是 `decision_lab reassess` 重新凍結一次——那很便宜，且順便刷新五軸與行情。
-USER_SIZED_MAX_DECISION_AGE_DAYS = 7
-
-
-def _assert_user_sized_within_capital_caps(
-    sizing: Mapping[str, Any],
-    selected_weight: float,
-    *,
-    decision_effective_at: str | None = None,
-    decided_at: str | None = None,
-) -> None:
-    """三個真正的資本上限硬擋。系統已不輸出建議尺寸，這是唯一剩下的資本護欄。
-
-    刻意**不**檢查研究完整度、五軸等級或 coverage blocker——那些是研究進度，
-    不是風險判斷（D2／D3）。實測依據：72 筆 decision 裡三個資本上限一次都沒 binding 過，
-    100% 的歸零由資料與研究完整度造成，於是 2026-08-28（U7）把資本表達層整組移除。
-
-    ⚠ 這道檢查刻意**留下**。它擋的不是研究不足，是「這一筆會讓單一標的超過 5% NAV」
-    ——一個具體、可否證、與研究進度無關的事實。移除系統建議尺寸不等於移除真實風控
-    （L14：拆煞車前要先裝儀表板，而不是兩個一起拆）。
-    """
-
-    blocked = sorted(_HARD_CAP_BLOCKERS.intersection(sizing.get("live_blockers") or ()))
-    if blocked:
-        raise ValueError(f"user_sized choice blocked by capital caps: {', '.join(blocked)}")
-
-    # 凍結快照有時效。見 USER_SIZED_MAX_DECISION_AGE_DAYS 的註解。
-    if decision_effective_at and decided_at:
-        age_days = (
-            _time(decided_at, "decided_at")
-            - _time(decision_effective_at, "decision.effective_at")
-        ).total_seconds() / 86400.0
-        if age_days > USER_SIZED_MAX_DECISION_AGE_DAYS:
-            raise ValueError(
-                f"user_sized choice needs a decision frozen within "
-                f"{USER_SIZED_MAX_DECISION_AGE_DAYS} days; this one is {age_days:.1f} days old"
-                " — run `decision_lab reassess` to refresh holdings and caps"
-            )
-
-    # 單筆 NAV 上限取自該 decision 自己凍結的值，不重算——point-in-time 契約要求用
-    # 當時的 policy 版本，且重算需要重讀 holdings／NAV。
-    #
-    # 新格式直接凍 `single_position_nav_cap`；U7 之前的 128 筆凍在 `constraint_trace`
-    # 的 `single_position_cap` 條目裡。兩者都要讀得到——Decision Store 是 append-only
-    # 的 private authority，舊 decision 不回寫（L10／KTD4）。
-    cap = sizing.get("single_position_nav_cap")
-    if cap is None:
-        for entry in sizing.get("constraint_trace") or ():
-            if entry.get("lane") == "live" and entry.get("constraint") == "single_position_cap":
-                cap = entry.get("cap_weight")
-                break
-    if cap is None or not isinstance(cap, (int, float)) or isinstance(cap, bool):
-        raise ValueError(
-            "user_sized choice requires a frozen single_position_cap in the decision trace"
-        )
-
-    # ⚠ 上限管的是**部位總量**，不是單次買入量。首版只比 `selected_weight`，於是已持有
-    # 4% 的標的還能再買 5%。`live_current_position` 就在同一份 sizing 裡，沒有理由不看。
-    #
-    # ⚠⚠ 但「持有 0%」與「量不到持有多少」不是同一件事（L12）。`_live_portfolio` 在
-    # NAV 讀不到時回 `0.0` ＋ `live_nav_missing`，而後者是 diagnostic 級、不擋任何東西
-    # ——於是這條總量上限會**靜默退化成單次買入上限**：持有 4.5% 的標的還能再記 5%。
-    # U7 之前這條路被 supported_range 擋住（NAV 缺席時上界為 0，任何非零選擇都被拒），
-    # 移除額度層時把那道副作用一起拆掉了。這裡改成 fail closed：量不到就不放行。
-    unmeasurable = sorted(
-        b
-        for b in (sizing.get("live_blockers") or ())
-        if b == "live_nav_missing" or str(b).startswith("holdings_market_value_missing")
-    )
-    if unmeasurable:
-        raise ValueError(
-            "cannot enforce the single-position cap: current position is unmeasurable "
-            f"({', '.join(unmeasurable)}) — run `decision_lab reassess --confirm-holdings` "
-            "to refresh holdings before recording a live choice"
-        )
-
-    current = sizing.get("live_current_position")
-    held = float(current) if isinstance(current, (int, float)) and not isinstance(current, bool) else 0.0
-    total = held + selected_weight
-    if total > float(cap) + 1e-12:
-        raise ValueError(
-            f"user_sized weight {selected_weight:.4f} + existing {held:.4f} = {total:.4f} "
-            f"exceeds single position cap {float(cap):.4f}"
-        )
-
 
 def _canonical_json(payload: Mapping[str, Any]) -> str:
     sensitive = sensitive_payload_path(payload)
@@ -2131,141 +2023,20 @@ class DecisionStore:
         force_override: bool = False,
         user_sized: bool = False,
     ) -> str:
-        """記錄一筆 live 選擇。**尺寸一律由使用者決定。**
+        """frozen 2026-09-22（G12）：live 選擇不再寫進舊店，呼叫一律拒絕。
 
-        2026-08-28（U7）起系統不再輸出 `live_supported_range`，所以也不再有
-        「接受／低於區間」的分類——只剩「跳過」「使用者自訂尺寸」與（歷史）「override」。
-        擋的仍然只有三個真實資本上限＋凍結快照時效，見
-        `_assert_user_sized_within_capital_caps`。
-
-        ⚠ 舊 decision 仍帶 `live_supported_range`，`system_supported_upper` 欄位
-        因此保留：既有 live_choices 的稽核值不得被改寫（L10 append-only）。新 choice
-        在該欄寫 NULL——「系統沒有給過區間」與「區間是 0」不是同一件事（L12）。
+        歷史唯一一筆 `live_choices` 留作稽核。新的成交收據住 `library/trades/trade_log.jsonl`
+        （`scripts/record_trade.py`），5% 單筆與 ETF 槓桿 cap 由 `risk/hard_caps.py` 在寫入前檢查
+        ——那三個 blocker 碼（`single_position_nav_cap_reached`／`etf_leverage_nominal_cap_reached`／
+        `etf_leverage_effective_cap_reached`）與七天凍結時效原本住在這裡，隨研究側一起搬走。
+        簽名保留是為了讓歷史 payload 與文件指得回來。
         """
-
-        decided_at = _timestamp(decided_at, "decided_at")
-        if not math.isfinite(selected_weight) or selected_weight < 0:
-            raise ValueError("selected_weight must be finite and non-negative")
-        if confirmation_ref is not None and not confirmation_ref.strip():
-            raise ValueError("confirmation_ref must be non-empty when provided")
-        if user_sized and force_override:
-            raise ValueError("user_sized and force_override are mutually exclusive")
-        # reason 綁在**實際結果**上，不綁旗標。U7 之後每一筆非零、非 override 的選擇
-        # 都會被記成 `user_sized`，但檢查若仍看 `user_sized` 旗標，不帶旗標就能記下一筆
-        # 沒有理由的 `user_sized`——欄位說「使用者決定的尺寸」，卻沒有任何一句說明是
-        # 依據什麼決定的。系統既然不再給尺寸，那句理由就是這筆決策僅存的可稽核依據。
-        if selected_weight > 0 and not force_override and not (reason or "").strip():
-            raise ValueError(
-                "a non-zero live choice requires an explicit reason: the system no longer "
-                "proposes any size, so the reason is the only record of what the size was based on"
-            )
-        with immediate_transaction(self._conn):
-            decision = self._conn.execute(
-                """
-                SELECT cohort_id, payload_json, effective_at
-                FROM system_decisions WHERE decision_id = ?
-                """,
-                (decision_id,),
-            ).fetchone()
-            if decision is None:
-                raise KeyError(f"decision not found: {decision_id}")
-            if _time(decided_at, "decided_at") < _time(
-                str(decision["effective_at"]), "decision.effective_at"
-            ):
-                raise ValueError("live choice cannot predate its decision")
-            payload = json.loads(decision["payload_json"])
-            sizing = payload["sizing"]
-            # 舊 decision 才有系統區間；新的沒有。None ≠ 0（L12）。
-            legacy_range = sizing.get("live_supported_range")
-            supported_upper = (
-                float(legacy_range[1])
-                if isinstance(legacy_range, (list, tuple)) and len(legacy_range) == 2
-                else None
-            )
-            if force_override and (not reason or not reason.strip() or not approved_action_id):
-                raise ValueError("live override requires reason and approved action")
-            if selected_weight > 0 and not force_override:
-                # 系統不再有 supported range，所以每一筆非零、非 override 的選擇都是
-                # 使用者自訂尺寸，全部走同一條資本上限檢查——不再有「照系統區間接受」
-                # 這條不必檢查的捷徑。
-                #
-                # skip（0%）不檢查：它不新增曝險，卻會被凍結快照的七天時效擋下，
-                # 而「太久沒 reassess 所以不准放棄」是說不通的。
-                _assert_user_sized_within_capital_caps(
-                    sizing,
-                    selected_weight,
-                    decision_effective_at=str(decision["effective_at"]),
-                    decided_at=decided_at,
-                )
-            choice_type = (
-                "override"
-                if force_override
-                else "skipped"
-                if selected_weight == 0
-                else "user_sized"
-            )
-            choice_id = "lc_" + _digest(
-                _canonical_json(
-                    {
-                        "decision_id": decision_id,
-                        "selected_weight": selected_weight,
-                        "decided_at": decided_at,
-                        "approved_action_id": approved_action_id,
-                    }
-                )
-            )[:32]
-            self._conn.execute(
-                """
-                INSERT OR IGNORE INTO live_choices (
-                    choice_id, decision_id, selected_weight, choice_type,
-                    reason, approved_action_id, system_supported_upper, decided_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    choice_id,
-                    decision_id,
-                    selected_weight,
-                    choice_type,
-                    reason,
-                    approved_action_id,
-                    supported_upper,
-                    decided_at,
-                ),
-            )
-            if confirmation_ref is not None:
-                confirmation_payload = {
-                    "choice_id": choice_id,
-                    "decision_id": decision_id,
-                    "confirmation_ref": confirmation_ref.strip(),
-                }
-                confirmation_json = _canonical_json(confirmation_payload)
-                confirmation_digest = _digest(confirmation_json)
-                confirmation_id = "de_" + _digest(
-                    _canonical_json(
-                        {
-                            "cohort_id": decision["cohort_id"],
-                            "event_type": "live_choice_confirmation",
-                            "payload_digest": confirmation_digest,
-                            "observed_at": decided_at,
-                        }
-                    )
-                )[:32]
-                self._conn.execute(
-                    """
-                    INSERT OR IGNORE INTO decision_events (
-                        event_id, cohort_id, event_type, payload_json,
-                        payload_digest, observed_at
-                    ) VALUES (?, ?, 'live_choice_confirmation', ?, ?, ?)
-                    """,
-                    (
-                        confirmation_id,
-                        decision["cohort_id"],
-                        confirmation_json,
-                        confirmation_digest,
-                        decided_at,
-                    ),
-                )
-            return choice_id
+        del selected_weight, decided_at, reason, confirmation_ref, approved_action_id
+        del force_override, user_sized
+        raise FrozenStoreError(
+            f"Decision Store is frozen (2026-09-22, G12): the live choice for {decision_id} must be "
+            "recorded via scripts/record_trade.py (trade_log), which enforces the hard caps in risk/hard_caps.py"
+        )
 
     def record_live_fill(
         self,
@@ -2277,93 +2048,12 @@ class DecisionStore:
         currency: str,
         executed_at: str,
     ) -> str:
-        executed_at = _timestamp(executed_at, "executed_at")
-        if (
-            not execution_ref.strip()
-            or not math.isfinite(shares)
-            or not math.isfinite(price)
-            or price <= 0
-            or not is_settlement_currency(currency)
-        ):
-            raise ValueError("invalid live fill")
-        fill_id = "lf_" + _digest(execution_ref)[:32]
-        with immediate_transaction(self._conn):
-            choice = self._conn.execute(
-                """
-                SELECT lc.choice_id, lc.selected_weight, lc.decided_at,
-                       sd.context_digest, sd.effective_at AS decision_effective_at
-                FROM live_choices lc
-                JOIN system_decisions sd ON sd.decision_id = lc.decision_id
-                WHERE lc.decision_id = ?
-                ORDER BY lc.decided_at DESC, lc.choice_id DESC LIMIT 1
-                """,
-                (decision_id,),
-            ).fetchone()
-            if choice is None:
-                raise ValueError("live fill requires an explicit live choice")
-            if float(choice["selected_weight"]) <= 0:
-                raise ValueError("live fill requires a positive live choice")
-            if _time(executed_at, "executed_at") < max(
-                _time(str(choice["decided_at"]), "choice.decided_at"),
-                _time(
-                    str(choice["decision_effective_at"]),
-                    "decision.effective_at",
-                ),
-            ):
-                raise ValueError("live fill cannot predate its choice or decision")
-            context = self.get_context_bundle(str(choice["context_digest"])).payload
-            expected_currency = context.get("identity", {}).get("execution_currency")
-            if currency != expected_currency:
-                raise ValueError("live fill currency does not match execution identity")
-            existing = self._conn.execute(
-                """
-                SELECT fill_id, decision_id, choice_id, execution_ref, shares,
-                       price, currency, executed_at
-                FROM live_execution_reports WHERE execution_ref = ?
-                """,
-                (execution_ref,),
-            ).fetchone()
-            expected = (
-                decision_id,
-                str(choice["choice_id"]),
-                execution_ref,
-                float(shares),
-                float(price),
-                currency,
-                executed_at,
-            )
-            if existing is not None:
-                actual = (
-                    existing["decision_id"],
-                    existing["choice_id"],
-                    existing["execution_ref"],
-                    float(existing["shares"]),
-                    float(existing["price"]),
-                    existing["currency"],
-                    existing["executed_at"],
-                )
-                if actual != expected:
-                    raise ValueError("execution_ref already belongs to a different fill")
-                return str(existing["fill_id"])
-            self._conn.execute(
-                """
-                INSERT OR IGNORE INTO live_execution_reports (
-                    fill_id, decision_id, choice_id, execution_ref, shares,
-                    price, currency, executed_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    fill_id,
-                    decision_id,
-                    choice["choice_id"],
-                    execution_ref,
-                    shares,
-                    price,
-                    currency,
-                    executed_at,
-                ),
-            )
-        return fill_id
+        """frozen 2026-09-22（G12）：成交回報不再寫進舊店，呼叫一律拒絕（見 `record_live_choice`）。"""
+        del execution_ref, shares, price, currency, executed_at
+        raise FrozenStoreError(
+            f"Decision Store is frozen (2026-09-22, G12): the live fill for {decision_id} must be "
+            "recorded via scripts/record_trade.py (trade_log)"
+        )
 
     def latest_live_choice(self, decision_id: str) -> dict[str, Any] | None:
         row = self._conn.execute(

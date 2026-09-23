@@ -1,4 +1,10 @@
-"""Alpha Investment View 的消費端：Daily Brief 接線、CLI 派工、取數層的 fail-soft。"""
+"""Alpha Investment View 的消費端：CLI 派工、取數層的 fail-soft、舊 Decision Store 的唯讀查詢。
+
+⚠ 2026-09-23（Phase 0 Step 0b.4）：Daily Brief 接線（`build_today_brief`／`render_today_markdown`）隨
+decision_lab 研究側退役，兩條 today brief 測試跟著退；`company_decision_facts` 的 fixture 改由 SQL 直接
+寫進 tmp store——研究側的 `_decision()`（context → coverage → decision）已不存在，而唯讀查詢守的是
+凍結歷史的讀法，資料怎麼進去不是它的事。
+"""
 from __future__ import annotations
 
 import argparse
@@ -8,11 +14,49 @@ from pathlib import Path
 
 import pytest
 
-from briefing.render import render_today_markdown
-from briefing.today import build_today_brief
-from tests.test_decision_execution import _store
+from decision_lab.store import DecisionStore
+from storage.relational import initialize_private_root
 
 NOW = "2026-09-05T02:00:00+00:00"
+
+
+def _store(tmp_path: Path) -> DecisionStore:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    private_root = repo / "library" / "private"
+    initialize_private_root(private_root, repo_root=repo)
+    return DecisionStore.open(
+        private_root / "decision_lab" / "decision_lab.db",
+        private_root=private_root,
+        repo_root=repo,
+    )
+
+
+def _seed_decision(store: DecisionStore, key: str) -> tuple[str, str, str]:
+    """直接寫一筆 cohort→context→coverage→decision（凍結歷史的形狀），回 (cohort_id, company_id, decision_id)。"""
+    import json as _json
+
+    cohort_id, company_id, decision_id = f"dc_{key}", "co:sivers_semiconductors", f"pd_{key}"
+    digest = f"ctx_{key}"
+    conn = store._conn  # noqa: SLF001 — 測試 fixture 直接落資料
+    conn.execute("INSERT INTO decision_cohorts (cohort_id, dedupe_key, company_id, research_ticker) VALUES (?, ?, ?, ?)",
+                 (cohort_id, f"claim:{key}", company_id, "SIVE.ST"))
+    conn.execute("INSERT INTO context_bundles (context_id, cohort_id, context_digest, evaluation_at, payload_json) "
+                 "VALUES (?, ?, ?, ?, ?)", (f"cb_{key}", cohort_id, digest, "2026-07-21T00:00:00+00:00", "{}"))
+    conn.execute("INSERT INTO coverage_assessments (assessment_id, cohort_id, context_digest, status, blockers_json, "
+                 "paper_blockers_json, live_blockers_json, catalyst, disproof, expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                 (f"ca_{key}", cohort_id, digest, "analyzable", "[]", "[]", "[]",
+                  "Ayar 出貨", "客戶 filing 列出第二家", "2026-12-31T00:00:00+00:00"))
+    payload = {"sizing": {"research_status": "READY", "weakest_axis": "source_reliability", "rubric_version": "v",
+                          "axis_results": {"source_reliability": {"level": "corroborated"}},
+                          "live_current_position": 0.0, "single_position_nav_cap": 0.05, "live_blockers": []}}
+    conn.execute("INSERT INTO system_decisions (decision_id, cohort_id, idempotency_key, request_digest, decision_digest, "
+                 "context_digest, coverage_assessment_id, policy_version, calculator_version, payload_json, effective_at) "
+                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                 (decision_id, cohort_id, f"idem_{key}", "rq", "dd", digest, f"ca_{key}", "p", "c",
+                  _json.dumps(payload), "2026-07-21T00:00:00+00:00"))
+    conn.commit()
+    return cohort_id, company_id, decision_id
 
 
 def _card(ticker: str = "COHR") -> dict:
@@ -41,47 +85,6 @@ def _card(ticker: str = "COHR") -> dict:
                         "entry_logic"],
         "warnings": [],
     }
-
-
-def test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct(tmp_path: Path) -> None:
-    store = _store(tmp_path)
-    try:
-        holdings = {"status": "available", "rows": []}
-        absent = build_today_brief(store, as_of=NOW, current_holdings=holdings)
-        assert "alpha_cards" in absent and absent["alpha_cards"] is None
-        assert "未提供 Alpha Card" in render_today_markdown(absent)
-
-        empty = build_today_brief(store, as_of=NOW, current_holdings=holdings, alpha_cards=[])
-        assert empty["alpha_cards"] == []
-        text = render_today_markdown(empty)
-        assert "無候選可摘要" in text and "未提供 Alpha Card" not in text
-
-        loaded = build_today_brief(store, as_of=NOW, current_holdings=holdings, alpha_cards=[_card()])
-        text = render_today_markdown(loaded)
-        assert "Alpha Card 摘要" in text
-        assert "co:coherent（COHR）（判斷過期⌛）" in text
-        # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：「市場隱含 EPS 成長」那一欄（+239.0%（proxy））隨 PE 比值 proxy 退役。
-        assert "proxy" not in text
-        assert "python -m briefing alpha-card" in text
-    finally:
-        store.close()
-
-
-def test_alpha_cards_sit_before_nav(tmp_path: Path) -> None:
-    """首屏順序：Alpha Card 摘要 → NAV。
-    ⚠ 2026-09-23（Step 0b.3）：原本前面還有瓶頸排序與 `ready_not_ranked`，隨跨檔排序退役；兩鍵不得再出現。"""
-    store = _store(tmp_path)
-    try:
-        brief = build_today_brief(store, as_of=NOW, current_holdings={"status": "available", "rows": []},
-                                  alpha_cards=[_card()])
-        keys = list(brief)
-        assert "ranking" not in keys and "ready_not_ranked" not in keys
-        assert keys.index("alpha_cards") < keys.index("nav_exposure")
-        text = render_today_markdown(brief)
-        assert "瓶頸排序" not in text
-        assert text.index("Alpha Card 摘要") < text.index("持股 NAV 比例")
-    finally:
-        store.close()
 
 
 def test_fetch_alpha_cards_degrades_per_ticker_not_whole_batch(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -162,15 +165,10 @@ def test_company_decision_facts_reads_only_research_fields_from_a_real_store(tmp
     import sqlite3
 
     from decision_lab.coverage_queries import company_decision_facts
-    from tests.test_action_card import _decision
 
     store = _store(tmp_path)
     try:
-        decision = _decision(store, key="facts-ro")
-        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
-        company_id = store._conn.execute(  # noqa: SLF001 — 只為取測試 fixture 的 company_id
-            "SELECT company_id FROM decision_cohorts WHERE cohort_id = ?", (cohort_id,)
-        ).fetchone()["company_id"]
+        cohort_id, company_id, _decision_id = _seed_decision(store, "factsro")
         db_path = Path(store.path)
     finally:
         store.close()
@@ -233,15 +231,10 @@ def test_company_decision_facts_filters_history_by_as_of(tmp_path: Path) -> None
     import sqlite3
 
     from decision_lab.coverage_queries import company_decision_facts
-    from tests.test_action_card import _decision
 
     store = _store(tmp_path)
     try:
-        decision = _decision(store, key="facts-asof")
-        cohort_id = store.get_decision(decision.decision_id)["cohort_id"]
-        company_id = store._conn.execute(  # noqa: SLF001
-            "SELECT company_id FROM decision_cohorts WHERE cohort_id = ?", (cohort_id,)
-        ).fetchone()["company_id"]
+        cohort_id, company_id, _decision_id = _seed_decision(store, "factsasof")
         db_path = Path(store.path)
     finally:
         store.close()

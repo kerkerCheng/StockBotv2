@@ -18,7 +18,7 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from briefing.render import render_today_markdown  # noqa: E402
+from briefing.render import render_backup_status  # noqa: E402
 from briefing.sources import load_backup_status as _backup_status_payload  # noqa: E402
 from engine_b.state_files import STATE_PATHS, StateFileError  # noqa: E402
 
@@ -116,14 +116,8 @@ def test_a_file_created_after_the_last_backup_is_counted_as_not_covered(tmp_path
 
 
 def _render(backup_status) -> str:
-    return render_today_markdown(
-        {
-            "action_needed": False,
-            "attention": "MONITOR",
-            "reason": "test",
-            "backup_status": backup_status,
-        }
-    )
+    # 2026-09-23（Phase 0 Step 0b.4）：today brief 的 Markdown 組裝退役，備份計數器的渲染器獨立留下。
+    return "\n".join(render_backup_status(backup_status))
 
 
 def test_renderer_never_and_invalid_are_red_and_visible():

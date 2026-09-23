@@ -240,9 +240,9 @@ def _build_variant_perception_context(company_id: str | None) -> str:
     if vp is None:
         return (
             "## Variant Perception（cohort thesis）\n"
-            "⚠ 該公司所有 cohort 均未寫 variant perception——memo 的差異點段落"
-            "只能由市場數據現推，寫定請用 "
-            f"`decision_lab variant-perception <cohort> --text …`（company_id={company_id}）\n"
+            "⚠ 該公司所有 cohort 均未寫 variant perception——memo 的差異點段落只能由市場數據現推。"
+            "（2026-09-23 Phase 0 Step 0b.4：舊 Decision Store 凍結唯讀、不再寫入；差異點改由敘事 ledger 承載）"
+            f"（company_id={company_id}）\n"
         )
     return (
         "## Variant Perception（cohort thesis——已寫定的權威版本，memo 必須以此為準）\n"

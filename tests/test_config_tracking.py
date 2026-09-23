@@ -186,14 +186,15 @@ def test_every_symbol_cited_in_the_registry_table_still_exists() -> None:
 @pytest.mark.parametrize(
     "rel,symbol",
     [
-        ("decision_lab/sizing.py", "AXIS_REFERENCE_AUTHORITIES"),
         ("shared/assessment_axes.py", "AXES"),
         # ⚠ 2026-09-04 Phase 3：`LEVELS` 移至 shared/——`alpha/levels.py` 與
         # `decision_lab/sizing.py` 原本各存一份逐字相同的 tuple，而兩者不能
         # 互相 import（方向違規），所以唯一的家是 shared。字彙內容一字未改。
+        # ⚠ 2026-09-23（Phase 0 Step 0b.4）：`decision_lab/sizing.py`（AXIS_REFERENCE_AUTHORITIES）、
+        # `workflow.py`（_INTENTS）、`context.py`（_ENGINE_C_AUTHORITIES）三列隨 Engine D 研究側退役，
+        # 搬進登記表「已移除」段（路徑帶刪除線，由 test_paths_cited_as_removed_are_actually_gone 反向守）。
         ("shared/evidence_levels.py", "LEVELS"),
         ("engine_b/leads.py", "ALLOWED_TRANSITIONS"),
-        ("decision_lab/workflow.py", "_INTENTS"),
         # ⚠ 2026-09-03 Phase 3 搬遷：capital_authority 是 authority 的**讀取器**
         # 不是擁有者，且有兩個不同層的消費端（portfolio 算可部署現金、
         # Engine D 資本許可）→ 移至 shared/。字彙內容一字未改。
@@ -202,7 +203,6 @@ def test_every_symbol_cited_in_the_registry_table_still_exists() -> None:
         ("thesis/evidence_manifest.py", "HIGH_RISK_ATTRIBUTES"),
         ("loader/edge_resolution.py", "ALLOWED_ACTIONS"),
         ("engine_c/observation_fields.py", "KNOWN_AUTHORITIES"),
-        ("decision_lab/context.py", "_ENGINE_C_AUTHORITIES"),
     ],
 )
 def test_frozen_and_at_risk_vocabularies_are_where_the_table_says(
