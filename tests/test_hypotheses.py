@@ -5,7 +5,7 @@ from datetime import date
 import pytest
 
 from engine_b import hypotheses as hy
-from query.bottleneck import rank_bottlenecks, render_what_if
+from query.bottleneck import render_what_if, structure_table
 
 
 def _fresh():
@@ -61,7 +61,7 @@ def test_overlay_shape_and_isolation():
     assert hy.overlay_assertions(data) == []
 
 
-from tests.test_bottleneck_ranking import _FakeRegistry as _Reg
+from tests.test_structure_table import _FakeRegistry as _Reg
 
 
 def _assertion(src, dst, sub, origin="Acme", relation="supplies_to"):
@@ -79,7 +79,7 @@ def test_what_if_diff_detects_structural_change():
         _assertion("co:a", "tech:t1", 5),
         _assertion("co:b", "tech:t2", 4),
     ]
-    baseline = rank_bottlenecks(base_rows, registry)
+    baseline = structure_table(base_rows, registry)
     data = _fresh()
     hy.add_hypothesis(
         data, source_handle="@s", expires="2027-01-01", statement="c is the real choke",
@@ -87,9 +87,10 @@ def test_what_if_diff_detects_structural_change():
                 "attributes": {"substitutability": 5, "sole_source": True}}],
     )
     hyp_rows = hy.overlay_assertions(data)
-    overlaid = rank_bottlenecks(base_rows + hyp_rows, registry)
+    overlaid = structure_table(base_rows + hyp_rows, registry)
     text = render_what_if(baseline, overlaid, hyp_rows)
-    assert "co:c" in text and "新進結構排序" in text
+    # ⚠ 2026-09-23（Step 0b.3）：排序退役，what-if 比的是表上的事實（新列／錨可達性／sub），不是名次。
+    assert "co:c" in text and "新進結構表" in text and "名次" not in text
     # 無變化情境
     text_same = render_what_if(baseline, baseline, hyp_rows)
     assert "無變化" in text_same

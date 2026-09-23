@@ -150,7 +150,7 @@ def test_evidence_column_is_computed_not_a_dataclass_default() -> None:
     """證據欄必須真的算過——**預設值偽裝成觀測**是這一欄先前的實況（2026-09-18 實測）。
 
     `CanonicalEdge.evidence` 的 `"self_reported"` 是 dataclass 預設值，而賦值只寫在
-    `rank_bottlenecks()` 裡；本模組不經過它，於是這張表的「證據」欄在**全圖每一條邊**上
+    `structure_table()` 裡；本模組不經過它，於是這張表的「證據」欄在**全圖每一條邊**上
     都印「供應商自報」——526 條 canonical 邊裡 **430 條（81.7%）印錯**，真實分布是
     外部印證 217（41.3%）／待判定 108／自報·filing 105／供應商自報 96。
 

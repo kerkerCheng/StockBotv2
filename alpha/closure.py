@@ -30,7 +30,7 @@
 1. **有同期 EPS 共識**（Engine C `consensus_estimates`）——沒有共識連兩桿拆解都做不了
 2. **forward EPS 共識為正**——v1 只有本益比法，虧損公司等 P6
 3. **產業能加一**——該檔所屬產業目前**沒有** ready 檔（分散度優先於主線，2026-09-09 使用者定案）
-4. **瓶頸排序名次**——越前越先；不在排序內排最後
+4. **有帶 substitutability 的結構邊**——沒有的排後（2026-09-23 前是瓶頸排序名次；排序退役）
 5. ticker 字典序（tie-break，讓結果可重現）
 
 **深度優先**由 skill 執行：第 N 檔未到終局不開第 N+1 檔，除非它卡在 pq2 或世界。本模組只給順序。
@@ -54,7 +54,7 @@ NEXT_PICK_RULE: tuple[str, ...] = (
     "有同期 EPS 共識",
     "forward EPS 共識為正（v1 只有本益比法）",
     "產業能加一（所屬產業尚無 ready 檔）",
-    "瓶頸排序名次（不在排序內排最後）",
+    "有帶 substitutability 的結構邊（沒有的排後；結構表讀不到的居中）",
     "已有基期觀測（缺的要另外找一手年報／決算短信，實測成本約 3 倍）",
     "ticker 字典序",
 )
@@ -70,7 +70,10 @@ class BacklogRow:
     has_consensus: bool | None = None
     forward_eps_positive: bool | None = None
     sector: str | None = None
-    bottleneck_rank: int | None = None
+    #: 結構表上這檔有沒有任何一條帶 `substitutability` 的向下邊。`None`＝結構表讀不到。
+    #: ⚠ 2026-09-23（Step 0b.3）之前這一格是 `bottleneck_rank`（可行動排序名次）；排序退役後
+    #: 只剩它原本真正在回答的那件事——「這檔寫得出有資訊的 Q1 嗎」。
+    has_structure_edge: bool | None = None
     has_base_observation: bool | None = None
     #: 這一檔在 pq2 有未結案且被使用者明示 defer 的項目。
     #: **它不是啟發法，是使用者的一句話**，所以排在四條研究判準之前。
@@ -189,8 +192,7 @@ def _sort_key(row: BacklogRow, ready_sectors: frozenset[str]) -> tuple:
         _flag(row.forward_eps_positive),
         # 只有「產業已知、且該產業還沒有 ready 檔」才算能加一；產業未知（不在排序內）不給分散度加分
         0 if (row.sector and row.sector not in ready_sectors) else 1,
-        1 if row.bottleneck_rank is None else 0,
-        row.bottleneck_rank or 0,
+        _flag(row.has_structure_edge),
         # 成本維度（2026-09-11 使用者定案）：**只破平手**——放在四條判準之後、ticker 之前。
         # 不放在 ticker 之後：那一格永遠碰不到（ticker 唯一），會變成看起來生效的死設定。
         # 它不是「先做簡單的」——前四條的相對順序一格都沒動；它只在前四條完全同分時，
@@ -213,8 +215,9 @@ def explain_pick(row: BacklogRow, ready_sectors: frozenset[str]) -> str:
         "有共識" if row.has_consensus else ("共識未讀到" if row.has_consensus is None else "無共識"),
         "EPS 為正" if row.forward_eps_positive else ("EPS 未讀到" if row.forward_eps_positive is None else "EPS 非正"),
         (f"產業「{row.sector}」尚無 ready 檔" if row.sector and row.sector not in ready_sectors
-         else (f"產業「{row.sector}」已有 ready 檔" if row.sector else "不在瓶頸排序的產業組內")),
-        (f"瓶頸排序第 {row.bottleneck_rank}" if row.bottleneck_rank else "不在瓶頸排序內"),
+         else (f"產業「{row.sector}」已有 ready 檔" if row.sector else "產業未知（結構表上沒有它走得到錨的邊）")),
+        ("有帶 substitutability 的結構邊" if row.has_structure_edge
+         else ("結構表未讀到" if row.has_structure_edge is None else "沒有帶 substitutability 的結構邊")),
         ("已有基期觀測" if row.has_base_observation
          else ("基期觀測未讀到" if row.has_base_observation is None else "無基期觀測（要先找一手年報）")),
     ]
@@ -254,7 +257,7 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
 #: 未到終局那一批「卡在哪」的彙總欄位。**刻意只用 `_sort_key` 已經在讀的那幾個**——
 #: 新造一組分類就會是 L16 說的「我需要一個分類，系統有，但我手上的介面沒帶」的第二份。
 OPEN_PROFILE_FIELDS: tuple[tuple[str, str], ...] = (
-    ("no_bottleneck_edge", "不在瓶頸排序內（Q1 結構分算不出：沒有帶 substitutability 的結構邊）"),
+    ("no_bottleneck_edge", "沒有帶 substitutability 的結構邊（Q1 結構分算不出）"),
     ("no_consensus", "沒有同期 EPS 共識"),
     ("forward_eps_not_positive", "forward EPS 共識非正（v1 只有本益比法）"),
     ("no_base_observation", "沒有基期觀測（要先自己找一手年報／決算短信，實測成本約 3 倍）"),
@@ -267,7 +270,7 @@ def open_profile(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> dic
 
     事發（2026-09-11）：段5 一次卡在 60 檔時，執行者得自己去讀 Neo4j export 才算得出
     「59 檔的 Q1 結構分是 None」。那個數字每輪都該在眼前，因為它決定的不是「還有幾檔」，
-    而是**剩下的檔寫得出有資訊的判斷嗎**——`bottleneck_rank is None` 代表這檔沒有任何
+    而是**剩下的檔寫得出有資訊的判斷嗎**——`has_structure_edge is False` 代表這檔沒有任何
     帶 substitutability 的結構邊，硬寫判斷只會得到「2 軸 unknown ＋ 2 軸只靠行情快照」。
 
     ⚠ 三個計數**可以重疊**（同一檔可能同時沒共識又不在排序內），所以不相加、不算百分比。
@@ -277,7 +280,7 @@ def open_profile(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> dic
     open_rows = [r for r in rows if r.terminal is None and r.ticker.upper() not in skip_set]
     return {
         "open_count": len(open_rows),
-        "no_bottleneck_edge": sorted(r.ticker for r in open_rows if r.bottleneck_rank is None),
+        "no_bottleneck_edge": sorted(r.ticker for r in open_rows if r.has_structure_edge is False),
         "no_consensus": sorted(r.ticker for r in open_rows if r.has_consensus is False),
         "forward_eps_not_positive": sorted(
             r.ticker for r in open_rows if r.forward_eps_positive is False),
@@ -467,14 +470,16 @@ def _target_period_ends(tickers: Iterable[str], conn: Any) -> dict[str, str | No
     return {t: _pick(t) for t in tickers}
 
 
-def _sector_and_rank(ranking_payload: Mapping[str, Any], registry: Any) -> dict[str, tuple[str | None, int | None]]:
-    """ticker → (產業組, 最佳全域名次)。rows 的順序就是名次；sectors[*].actionable_ranks 給名次→產業。"""
-    rank_to_sector: dict[int, str] = {}
-    for group in ranking_payload.get("sectors") or []:
-        for rank in group.get("actionable_ranks") or []:
-            rank_to_sector[int(rank)] = str(group.get("sector"))
-    out: dict[str, tuple[str | None, int | None]] = {}
-    for index, row in enumerate(ranking_payload.get("rows") or [], start=1):
+def _sector_and_structure_edge(table_payload: Mapping[str, Any], registry: Any,
+                               anchor_to_sector: Mapping[str, str]) -> dict[str, tuple[str | None, bool]]:
+    """ticker → (產業組, 有沒有帶 substitutability 的結構邊)。讀 `structure_table` state artifact。
+
+    ⚠ 2026-09-23（Step 0b.3）之前這裡讀 ranking artifact 的 `sectors[*].actionable_ranks` 拿名次與產業；
+    排序退役後產業由列上的 `demand_anchor` 經 `config/sector_anchors.json` 對照，名次沒有了。
+    同一檔多列：產業取第一個對得到的錨；結構邊只要任一列 `substitutability` 有值就是 True。
+    """
+    out: dict[str, tuple[str | None, bool]] = {}
+    for row in table_payload.get("rows") or []:
         company_id = str(row.get("company_id") or "")
         ticker = None
         try:
@@ -484,10 +489,11 @@ def _sector_and_rank(ranking_payload: Mapping[str, Any], registry: Any) -> dict[
         if not ticker:
             continue
         ticker = str(ticker).upper()
-        sector = rank_to_sector.get(index)
+        anchor = row.get("demand_anchor")
+        sector = anchor_to_sector.get(str(anchor)) if anchor else None
+        has_edge = row.get("substitutability") is not None
         prev = out.get(ticker)
-        if prev is None or (prev[1] is None or index < prev[1]):
-            out[ticker] = (sector or (prev[0] if prev else None), index)
+        out[ticker] = ((prev[0] if prev and prev[0] else sector), bool((prev[1] if prev else False) or has_edge))
     return out
 
 

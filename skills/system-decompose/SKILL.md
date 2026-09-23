@@ -83,7 +83,7 @@ description: >
 
 ```bash
 python -m query.coverage_gaps        # 既有 chokepoint 節點的覆蓋狀態
-python -m query.bottleneck           # 既有邊的排序（確認該層是否已被建模）
+python -m query.bottleneck           # 既有邊的結構表（確認該層是否已被建模；不排序）
 ```
 
 ⚠ 公司 ID 不要憑公司名猜，唯一權威是 `config/company_identity.json`／`identity.registry`。

@@ -3,23 +3,26 @@
 ## 它做什麼、不做什麼
 
 **做**：把既有 `query/` 的輸出轉成 contract 型別，並替每一列補上 `EvidenceRef`。
-**不做**：不新寫 Cypher 排序邏輯、不重算結構分、不另建平行排序。
-`rank_bottlenecks()` 仍是唯一的結構排序權威（`AGENTS.md` 硬契約）。
+**不做**：不新寫 Cypher、不重算結構分、不排序、不另建第二份表。
+⚠ 2026-09-23（Phase 0 Step 0b.3）：上游由 `rank_bottlenecks()`（排序）改為 `structure_table()`
+（逐邊結構事實，不排序、不設門檻）。本 provider 的 `get_bottlenecks` 仍只回 `substitutability`
+達到 `min_substitutability`（預設 4）的邊——**那是 provider 自己宣告的 bottleneck 定義**
+（schema：5＝完全不可替代），不是表的門檻；未填的邊在表上看得到（coverage），但不是 bottleneck row。
 
 ## as-of：真的投影（Phase 6），但保險絲沒有拿掉
 
 canonical edge 仍然沒有時間欄位——唯一的時間線索還是
 `CITES → SourceDoc.published_at`。**投影就是靠它做的**：把 assertion 依
-「引用的文件在 `as_of` 之前發表過沒有」篩一次，再交給 `rank_bottlenecks`。
+「引用的文件在 `as_of` 之前發表過沒有」篩一次，再交給 `structure_table`。
 
-⚠ **順序不可顛倒。** 過濾必須在排序**之前**：`rank_bottlenecks` 是在 assertion 上
-collapse 屬性、判證據等級、走需求鏈的，先排序再砍列會留下用未來文件算出來的
+⚠ **順序不可顛倒。** 過濾必須在建表**之前**：`structure_table` 是在 assertion 上
+collapse 屬性、判證據等級、走需求鏈的，先建表再砍列會留下用未來文件算出來的
 `substitutability` 與 `evidence`——列是對的，值是偷看來的，而那是 lookahead
 最難察覺的形式。
 
 ⚠ **未定日一律排除並計數。** 「我找不到日期」不等於「它在 T 之前」（L11-5）。
 
-**保險絲從「一律拒絕」換成「投影不存在時拒絕」，不是拿掉**（`_rank` 裡兩處
+**保險絲從「一律拒絕」換成「投影不存在時拒絕」，不是拿掉**（`_table` 裡兩處
 `PointInTimeUnsupported`）：圖上完全沒有 `published_at`、或 `as_of` 早於最早的
 證據時，回空 list 會與「那天真的沒有瓶頸」同形（L13），所以那兩種情況仍然拋。
 
@@ -91,14 +94,17 @@ class Neo4jGraphResearchProvider:
 
     driver: Any
     registry: Any = None
+    #: bottleneck row 的定義：`substitutability` ≥ 此值才算（schema：5＝完全不可替代）。
+    #: ⚠ 未填（None）**不算**——與 2026-09-23 之前 `rank_bottlenecks` 的行為一致，read model 的
+    #: Q1 輸入因此一字未變；未填的邊在結構表的 coverage 裡看得到，不在這裡。
     min_substitutability: int = 4
-    _ranked: Mapping[str, Any] | None = None
+    _table_cache: Mapping[str, Any] | None = None
     _projections: dict[date, Mapping[str, Any]] | None = None
     #: 注入的原始 assertion（測試用的縫）。**as-of 投影必須在 assertion 上做**，
-    #: 所以 `_ranked` 那個縫不夠——注入排序結果的測試無法驗投影。
+    #: 所以 `_table_cache` 那個縫不夠——注入表的測試無法驗投影。
     _assertion_rows: Sequence[Mapping[str, Any]] | None = None
 
-    # ---- 內部：取一次排序，快取在 instance 上（不落地成第二個 authority）----
+    # ---- 內部：建一次結構表，快取在 instance 上（不落地成第二個 authority）----
     def _assertions(self) -> list[Mapping[str, Any]]:
         from query.bottleneck import fetch_assertions
 
@@ -107,25 +113,24 @@ class Neo4jGraphResearchProvider:
         with self.driver.session() as session:
             return fetch_assertions(session)
 
-    def _rank(self, as_of: date | None = None) -> Mapping[str, Any]:
+    def _table(self, as_of: date | None = None) -> Mapping[str, Any]:
         """`as_of=None` ＝ 當前視角；給日期則走 as-of 投影。
 
-        ⚠ **投影不是「排序完再過濾」**：`rank_bottlenecks` 是在 assertion 上
+        ⚠ **投影不是「建表完再過濾」**：`structure_table` 是在 assertion 上
         collapse 屬性、分類證據等級、走需求鏈的，所以過濾必須發生在**它之前**。
-        先排序再砍列會留下用未來文件算出來的 `substitutability` 與 `evidence`，
+        先建表再砍列會留下用未來文件算出來的 `substitutability` 與 `evidence`，
         那正是 lookahead 最隱蔽的形式——列是對的，值是偷看來的。
         """
         from identity.registry import get_registry
-        from query.bottleneck import project_assertions_as_of, rank_bottlenecks
+        from query.bottleneck import project_assertions_as_of, structure_table
 
         if as_of is None:
-            if self._ranked is None:
-                self._ranked = rank_bottlenecks(
+            if self._table_cache is None:
+                self._table_cache = structure_table(
                     self._assertions(),
                     self.registry or get_registry(),
-                    min_substitutability=self.min_substitutability,
                 )
-            return self._ranked
+            return self._table_cache
 
         if self._projections is None:
             self._projections = {}
@@ -149,26 +154,55 @@ class Neo4jGraphResearchProvider:
                 f"已定日 assertion 全部晚於它（另有 {projection.excluded_undated} 條未定日）。"
                 "回傳空排序會與『那天沒有任何瓶頸』同形，所以這裡拒絕"
             )
-        ranked = dict(rank_bottlenecks(
+        table = dict(structure_table(
             projection.rows,
             self.registry or get_registry(),
-            min_substitutability=self.min_substitutability,
         ))
         # 投影自己的計數必須跟著資料走（L16），否則消費端會把
         # 「as-of 篩掉一半」讀成「這家公司本來就沒幾條邊」。
-        ranked["coverage"] = dict(ranked.get("coverage") or {}) | {
+        table["coverage"] = dict(table.get("coverage") or {}) | {
             "as_of": as_of.isoformat(),
             "as_of_input_assertions": projection.input_count,
             "as_of_excluded": projection.reasons(),
             "as_of_dated_total": projection.dated_total,
         }
-        self._projections[as_of] = ranked
-        return ranked
+        self._projections[as_of] = table
+        return table
+
+    def _bottleneck_rows(self, as_of: date | None = None) -> list[Mapping[str, Any]]:
+        """結構表裡**達到 `min_substitutability` 的列**——本 provider 的 bottleneck 定義。
+
+        ⚠ 2026-09-23（Step 0b.3）之前這一層拿到的是 `rank_bottlenecks()` 已用門檻 4 濾過的 `rows`；
+        門檻隨排序退役後，表上多了未填與低分的邊，**九個契約方法讀的仍是同一個子集**，
+        所以 read model 的 Q1 輸入、依賴路徑、替代路徑、供應鏈曝險與結構事件一字未變。
+        未填（None）不算 bottleneck row——「不知道」不是「難替代」。
+        """
+        from query.bottleneck import EVIDENCE_RANK, QUALIFICATION_RANK
+
+        rows = [r for r in (self._table(as_of).get("rows") or [])
+                if r.get("substitutability") is not None
+                and r["substitutability"] >= self.min_substitutability]
+        # **同一家公司內**的呈現順序：走得到錨、證據強、sub 高、sole、合格狀態進、離錨近的先。
+        # ⚠ 這不是跨檔順序——公司之間只按 company_id 字典序（索引）。它決定的是敘事「鏈」段落
+        # 先講哪條邊，以及 `alpha/context.py` 取 Q1 最強邊時**同分取第一個**落在哪一條；
+        # 兩者在排序退役前跟著 rank_bottlenecks 的列序走，這裡把那個「同一家公司內」的順序明寫下來，
+        # read model 三面板文字才一字不變（2026-09-23 實測：不排會讓 AXTI／LITE 的 Q1 同分取到
+        # 另一條邊、四檔的鏈段落換序）。
+        rows.sort(key=lambda r: (
+            str(r.get("company_id")),
+            0 if r.get("demand_anchor") else 1,
+            -EVIDENCE_RANK.get(str(r.get("evidence")), 0),
+            -(r.get("substitutability") or 0),
+            0 if r.get("sole_source") else 1,
+            -QUALIFICATION_RANK.get(str(r.get("qualification_status")), 0),
+            r.get("demand_hops") if r.get("demand_hops") is not None else 99,
+        ))
+        return rows
 
     def _row_evidence(self, row: Mapping[str, Any]) -> tuple[EvidenceRef, ...]:
-        """由排序列組出 `EvidenceRef`。
+        """由表的一列組出 `EvidenceRef`。
 
-        ⚠ **`documents` 是注意力指標，不參與排序**（`bottleneck.py` 已明文排除），
+        ⚠ **`documents` 是注意力指標，不是結構事實**（`bottleneck.py` 已明文），
         但它**是 provenance**——每份文件都要能被列出來，否則 provider 就在隱藏證據。
 
         ⚠ **`published_at` 一定要帶。** 沒有它，`select_point_in_time_evidence`
@@ -191,7 +225,7 @@ class Neo4jGraphResearchProvider:
                 # 把 COHR 的 Q1 從 declared 0.9 壓成 effective 0.0——
                 # 而該邊的 `evidence` 明明是 `externally_corroborated`。
                 # 那是 F-22 的形狀：機械比對把真訊號歸零。
-                # `origin_entity` 屬於 SourceDoc，排序列上沒有；留 None 才誠實。
+                # `origin_entity` 屬於 SourceDoc，表的列上沒有；留 None 才誠實。
                 origin_entity=None,
                 confidence=_finite(row.get("confidence")),
                 evidence_class=evidence_class or None,
@@ -213,17 +247,13 @@ class Neo4jGraphResearchProvider:
 
     # ---- 9 個契約方法 ------------------------------------------------------
     def get_bottlenecks(
-        self, *, sector: str | None = None, min_substitutability: int = 4,
-        as_of: date | None = None,
+        self, *, min_substitutability: int = 4, as_of: date | None = None,
     ) -> Sequence[BottleneckRow]:
-        ranked = self._rank(as_of)
-        rows = ranked.get("rows") or []
+        # ⚠ 2026-09-23（Step 0b.3）：`sector` 參數（依 demand_anchor 篩）隨 `--by-sector` 分組退役。
         out: list[BottleneckRow] = []
-        for row in rows:
-            if sector and str(row.get("demand_anchor") or "") != sector:
-                continue
+        for row in self._bottleneck_rows(as_of):
             substitutability = row.get("substitutability")
-            if substitutability is not None and substitutability < min_substitutability:
+            if substitutability < min_substitutability:
                 continue
             try:
                 company = CompanyId(str(row["company_id"]))
@@ -254,11 +284,8 @@ class Neo4jGraphResearchProvider:
     def get_company_structural_context(
         self, company_id: CompanyId, *, as_of: date | None = None
     ) -> StructuralContext:
-        ranked = self._rank(as_of)
-        rows = [r for r in (ranked.get("rows") or [])
+        rows = [r for r in self._bottleneck_rows(as_of)
                 if str(r.get("company_id")) == str(company_id)]
-        structural = [r for r in (ranked.get("structural_rows") or [])
-                      if str(r.get("company_id")) == str(company_id)]
         evidence: list[EvidenceRef] = []
         for row in rows:
             evidence.extend(self._row_evidence(row))
@@ -274,12 +301,9 @@ class Neo4jGraphResearchProvider:
                 "evidence_class": r.get("evidence"),
             } for r in rows),
             claims=(),
-            # ⚠ `structural_rows` 是**純結構排序**（完全不看證據），
-            # 回答「該去補誰的證據」；與 `rows`（可行動）用途不同、不可互換。
-            counter_paths=tuple({
-                "relation": r.get("relation"), "target": r.get("bottleneck"),
-                "purpose": "structural_only_not_actionable",
-            } for r in structural if r not in rows),
+            # ⚠ 2026-09-23（Step 0b.3）：這裡原本由「純結構排序 ∖ 可行動排序」填 `counter_paths`——
+            # 兩份序是同一批 dict 物件，差集**恆為空**；排序退役後照實留空，不編一份。
+            counter_paths=(),
             evidence=tuple(evidence),
         )
 
@@ -287,7 +311,7 @@ class Neo4jGraphResearchProvider:
         self, company_id: CompanyId, *, max_hops: int = 3, as_of: date | None = None
     ) -> Sequence[CausalPath]:
         paths: list[CausalPath] = []
-        for row in self._rank(as_of).get("rows") or []:
+        for row in self._bottleneck_rows(as_of):
             if str(row.get("company_id")) != str(company_id):
                 continue
             chain = [str(c) for c in (row.get("chain") or [])]
@@ -313,7 +337,7 @@ class Neo4jGraphResearchProvider:
         （它反映「我們研究了幾家」不是「世界上有幾家」），但「有沒有第二家」
         對 disproof 是實質資訊。
         """
-        rows = self._rank(as_of).get("rows") or []
+        rows = self._bottleneck_rows(as_of)
         mine = {str(r.get("bottleneck")) for r in rows
                 if str(r.get("company_id")) == str(company_id)}
         paths: list[CausalPath] = []
@@ -337,14 +361,14 @@ class Neo4jGraphResearchProvider:
         direction: Literal["upstream", "downstream"], as_of: date | None = None,
     ) -> Sequence[SupplyExposure]:
         out: list[SupplyExposure] = []
-        for row in self._rank(as_of).get("rows") or []:
+        for row in self._bottleneck_rows(as_of):
             if str(row.get("company_id")) != str(company_id):
                 continue
             relation = str(row.get("relation") or "")
             # 「這家公司的上游曝險」問的就是 `DEPENDENCY_RELATIONS`（src 需要 dst）。
             # 2026-09-18 之前這裡明列 `depends_on`，於是 `co:coherent --constrained_by-->
             # tech:inp_dfb_laser` 被歸成**下游**曝險——方向是反的（L16：第四處硬編）。
-            # ⚠ `is_component_of` 保留但今天走不到：`rank_bottlenecks` 的 `rows` 只含
+            # ⚠ `is_component_of` 保留但今天走不到：`structure_table` 的 `rows` 只含
             # `DOWNSTREAM_RELATIONS`，而它屬 `UPSTREAM_RELATIONS`。留著是為了不在本次
             # 順手改掉一個與 constrained_by 無關的行為。
             from query.bottleneck import DEPENDENCY_RELATIONS
@@ -399,7 +423,7 @@ class Neo4jGraphResearchProvider:
         - **不取平均信心。** `CompanyImpact.confidence` 由 `CausalPath` 取最弱的
           一段（契約已強制），三段強證據不得把一段沒證據的補起來。
         """
-        rows = list(self._rank().get("rows") or [])
+        rows = self._bottleneck_rows()
         subject = str(event.subject_id)
         flip = event.direction == "loosening"
 
@@ -633,14 +657,14 @@ class Neo4jGraphResearchProvider:
         `substitutability` 上升 → `capacity_constraint`（tightening）；
         `qualification_status` 前進 → `qualification`（tightening）。
         其餘的差（confidence 變動、證據等級提升）**刻意不產生事件**——
-        那些量的是我們讀了幾份文件，不是世界（同 `documents` 不參與排序的理由）。
+        那些量的是我們讀了幾份文件，不是世界（同 `documents` 不是結構事實的理由）。
         """
         import hashlib
 
         before = {(r["company_id"], r["relation"], r["bottleneck"]): r
-                  for r in (self._rank(since).get("rows") or [])}
+                  for r in self._bottleneck_rows(since)}
         now = {(r["company_id"], r["relation"], r["bottleneck"]): r
-               for r in (self._rank().get("rows") or [])}
+               for r in self._bottleneck_rows()}
         known_targets = {str(r["bottleneck"]) for r in before.values()}
 
         events: list[StructuralEvent] = []
@@ -787,12 +811,12 @@ class Neo4jGraphResearchProvider:
         return {"node_names": names, "claims": claims}
 
     def coverage(self) -> Mapping[str, Any]:
-        """`rank_bottlenecks` 自帶的覆蓋率摘要。
+        """`structure_table` 自帶的覆蓋率摘要。
 
-        ⚠ 這不是裝飾：`substitutability` 覆蓋率只有 15%，**排名必然偏向已被抽取過
-        的邊，沒填的邊是隱形的**。消費端必須看得到這個數字才不會過度解讀排序。
+        ⚠ 這不是裝飾：`substitutability` 覆蓋率只有一成多，**表必然偏向已被抽取過
+        的邊，沒填的邊是隱形的**。消費端必須看得到這個數字才不會過度解讀表。
         """
-        return dict(self._rank().get("coverage") or {})
+        return dict(self._table().get("coverage") or {})
 
 
 def _finite(value: Any) -> float | None:

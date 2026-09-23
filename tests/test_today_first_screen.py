@@ -1,40 +1,13 @@
-"""today 首屏：瓶頸排序在前、NAV 比例在後。
+"""today 首屏：NAV 比例區與 Engine D 的證據缺口排序鍵。
 
-系統終點是「哪些標的值得看」，不是「今天要不要動作」——首屏順序要反映這件事。
-
-⚠ B6 之後這三個函式分屬三層（`alpha` 排序、`portfolio` NAV、Engine D 排序鍵），
-而**首屏順序這件事只有這裡在守**——它跨層，所以不屬於任何一個 pane 自己的測試檔。
+⚠ 2026-09-23（Phase 0 Step 0b.3）：本檔原本守「瓶頸排序在前、NAV 在後」；瓶頸排序 pane
+（`alpha.brief.render_ranking`）隨跨檔排序退役（G1／L19），5 條排序測試跟著退役，
+NAV 的三條（含「未注入不得靜默消失」的鏡像）與 Engine D 排序鍵的兩條留下。
 """
 from __future__ import annotations
 
-from alpha.brief import render_ranking
 from decision_lab.brief import _evidence_gap_order
 from portfolio.brief import render_nav_exposure
-
-RANKING = {
-    "actionable": [
-        {
-            "rank": 1, "ticker": "COHR", "company_id": "co:coherent",
-            "bottleneck": "co:nvidia", "substitutability": 5, "sole_source": True,
-            "evidence": "externally_corroborated", "weakest_axis": "technical_causal_link",
-            "no_demand_anchor": False,
-        }
-    ],
-    "actionable_total": 27,
-    "actionable_purpose": "現在能投什麼",
-    "structural": [
-        {
-            "rank": 1, "ticker": "AVGO", "company_id": "co:broadcom",
-            "bottleneck": "tech:cpo", "substitutability": 5, "sole_source": True,
-            "evidence": "needs_review", "weakest_axis": None,
-            "no_demand_anchor": False,
-        }
-    ],
-    "structural_total": 27,
-    "structural_purpose": "該去補誰的證據",
-    "judgment_note": "這是研究判斷，不是回測結果",
-    "caveats": ["substitutability 覆蓋 60/413"],
-}
 
 NAV = {
     "status": "available",
@@ -43,37 +16,6 @@ NAV = {
     "buckets": {"大盤": 0.549, "CORE": 0.237},
     "groups": {"AI 光互連": 0.30},
 }
-
-
-def test_ranking_renders_both_orderings_with_their_purposes() -> None:
-    text = "\n".join(render_ranking(RANKING))
-
-    assert "現在能投什麼" in text
-    assert "該去補誰的證據" in text
-    assert "COHR" in text and "AVGO" in text
-    assert text.index("現在能投什麼") < text.index("該去補誰的證據")
-
-
-def test_ranking_shows_total_when_truncated() -> None:
-    """截斷要現形——使用者要知道自己只看到前幾名。"""
-    text = "\n".join(render_ranking(RANKING))
-
-    assert "共 27 個候選" in text
-
-
-def test_ranking_carries_judgment_note_and_caveats() -> None:
-    text = "\n".join(render_ranking(RANKING))
-
-    assert "不是回測" in text
-    assert "60/413" in text
-
-
-def test_absent_ranking_says_so_instead_of_vanishing() -> None:
-    """排序缺席時仍渲染區塊並說明原因——整段消失會被讀成「沒有候選」。"""
-    text = "\n".join(render_ranking(None))
-
-    assert "瓶頸排序" in text
-    assert "不是" in text and "沒有候選" in text
 
 
 def test_nav_renders_positions_and_distribution() -> None:
@@ -97,25 +39,17 @@ def test_nav_unavailable_is_not_zero_exposure() -> None:
 
 
 def test_absent_nav_says_so_instead_of_vanishing() -> None:
-    """NAV 未注入時仍渲染區塊並說明原因——與排序區同一個處置。
+    """NAV 未注入時仍渲染區塊並說明原因。
 
     先前 `render_nav_exposure(None)` 回空 list，於是「呼叫端沒給持股」與「這個人
-    沒有持股」在畫面上完全同形，整區靜默消失。排序區早就有這條斷言
-    （`test_absent_ranking_says_so_instead_of_vanishing`），NAV 沒有——**那個不對稱
-    就是缺陷本身**，所以這條測試刻意寫成它的鏡像。
+    沒有持股」在畫面上完全同形，整區靜默消失。（已退役的）排序區早就有這條斷言，
+    NAV 沒有——**那個不對稱就是缺陷本身**，所以這條測試刻意寫成它的鏡像。
     """
     text = "\n".join(render_nav_exposure(None))
 
     assert "持股 NAV 比例" in text
     assert "未提供" in text
     assert "沒有持股" in text
-
-
-def test_first_screen_order_is_ranking_then_nav() -> None:
-    """R1：排序在前、NAV 在後。"""
-    combined = "\n".join(render_ranking(RANKING) + render_nav_exposure(NAV))
-
-    assert combined.index("瓶頸排序") < combined.index("持股 NAV 比例")
 
 
 def test_evidence_gap_order_reads_effective_level_not_declared_level() -> None:

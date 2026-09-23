@@ -36,25 +36,27 @@ def test_row_from_artifact_copies_blocker_details_without_parsing_prose() -> Non
     assert row.terminal is None
 
 
-def test_next_pick_follows_the_five_rules_in_order() -> None:
+def test_next_pick_follows_the_rules_in_order() -> None:
+    """⚠ 2026-09-23（Step 0b.3）：第 4 條原本是「瓶頸排序名次」；排序退役後改成
+    「有沒有帶 substitutability 的結構邊」，同產業同條件的兩檔只剩 ticker 字典序分先後。"""
     rows = [
-        _row("READY1", readiness="ready", open_panels=(), sector="AI 光互連／CPO", bottleneck_rank=1),
+        _row("READY1", readiness="ready", open_panels=(), sector="AI 光互連／CPO", has_structure_edge=True),
         # 1. 有共識 > 沒共識
-        _row("NOCONS", has_consensus=False, forward_eps_positive=None, sector="機器人", bottleneck_rank=2),
+        _row("NOCONS", has_consensus=False, forward_eps_positive=None, sector="機器人", has_structure_edge=True),
         # 2. EPS 為正 > 非正
-        _row("LOSS", has_consensus=True, forward_eps_positive=False, sector="機器人", bottleneck_rank=3),
+        _row("LOSS", has_consensus=True, forward_eps_positive=False, sector="機器人", has_structure_edge=True),
         # 3. 產業能加一（機器人尚無 ready）> 已有 ready 的產業（AI）
-        _row("AI2", has_consensus=True, forward_eps_positive=True, sector="AI 光互連／CPO", bottleneck_rank=4),
-        _row("ROBOT", has_consensus=True, forward_eps_positive=True, sector="機器人", bottleneck_rank=9),
-        # 4. 名次：同產業、同條件時名次前者先
-        _row("ROBOT_EARLY", has_consensus=True, forward_eps_positive=True, sector="機器人", bottleneck_rank=5),
-        # 不在排序內排最後
-        _row("UNRANKED", has_consensus=True, forward_eps_positive=True, sector=None, bottleneck_rank=None),
+        _row("AI2", has_consensus=True, forward_eps_positive=True, sector="AI 光互連／CPO", has_structure_edge=True),
+        _row("ROBOT", has_consensus=True, forward_eps_positive=True, sector="機器人", has_structure_edge=True),
+        # 4. 同產業、同條件：沒有名次了，只剩 ticker 字典序
+        _row("ROBOT_B", has_consensus=True, forward_eps_positive=True, sector="機器人", has_structure_edge=True),
+        # 結構表讀不到（None）：產業未知、結構邊未知 → 排在有結構邊者之後
+        _row("UNRANKED", has_consensus=True, forward_eps_positive=True, sector=None, has_structure_edge=None),
         # 讀不到（None）排在 False 之後、True 之前
-        _row("UNKNOWN_CONS", has_consensus=None, forward_eps_positive=None, sector="機器人", bottleneck_rank=1),
+        _row("UNKNOWN_CONS", has_consensus=None, forward_eps_positive=None, sector="機器人", has_structure_edge=True),
     ]
     order = [r.ticker for r in closure.rank_backlog(rows)]
-    assert order == ["ROBOT_EARLY", "ROBOT", "AI2", "UNRANKED", "LOSS", "UNKNOWN_CONS", "NOCONS"]
+    assert order == ["ROBOT", "ROBOT_B", "AI2", "UNRANKED", "LOSS", "UNKNOWN_CONS", "NOCONS"]
     assert "READY1" not in order                       # 到終局的不在佇列裡
 
 
@@ -62,9 +64,9 @@ def test_user_defer_sorts_last_but_is_never_hidden() -> None:
     """「使用者剛說先不要」與「系統排第一」不得同時成立（L12）——但也不得消失（INV-3）。"""
     rows = [
         _row("DEFERRED_BEST", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", bottleneck_rank=1, user_deferred=True),
+             sector="機器人", has_structure_edge=True, user_deferred=True),
         _row("PLAIN_WORST", has_consensus=False, forward_eps_positive=False,
-             sector="AI 光互連／CPO", bottleneck_rank=99),
+             sector="AI 光互連／CPO", has_structure_edge=False),
     ]
     order = [r.ticker for r in closure.rank_backlog(rows)]
     assert order == ["PLAIN_WORST", "DEFERRED_BEST"], "四條研究判準不得蓋過使用者的明示指示"
@@ -99,23 +101,23 @@ def test_base_observation_only_breaks_ties_and_never_outranks_the_four_rules() -
     rows = [
         # 前四條同分，只差有無基期觀測
         _row("TIE_NOBASE", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", bottleneck_rank=5, has_base_observation=False),
+             sector="機器人", has_structure_edge=True, has_base_observation=False),
         _row("TIE_BASE", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", bottleneck_rank=5, has_base_observation=True),
-        # 名次較前但沒有基期觀測——第四條仍然贏過成本維度
-        _row("RANK1_NOBASE", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", bottleneck_rank=1, has_base_observation=False),
+             sector="機器人", has_structure_edge=True, has_base_observation=True),
+        # 有基期觀測但沒有結構邊——第四條仍然贏過成本維度
+        _row("NOEDGE_BASE", has_consensus=True, forward_eps_positive=True,
+             sector="機器人", has_structure_edge=False, has_base_observation=True),
     ]
     assert [r.ticker for r in closure.rank_backlog(rows)] == [
-        "RANK1_NOBASE", "TIE_BASE", "TIE_NOBASE"]
+        "TIE_BASE", "TIE_NOBASE", "NOEDGE_BASE"]
 
 
 def test_base_observation_unknown_sorts_between_have_and_have_not() -> None:
     """讀不到 Engine C 時是 None，不是 False——否則整批會被推到最後（L12）。"""
     rows = [
-        _row("NOBASE", has_consensus=True, sector="機器人", bottleneck_rank=5, has_base_observation=False),
-        _row("UNKNOWN", has_consensus=True, sector="機器人", bottleneck_rank=5, has_base_observation=None),
-        _row("HASBASE", has_consensus=True, sector="機器人", bottleneck_rank=5, has_base_observation=True),
+        _row("NOBASE", has_consensus=True, sector="機器人", has_structure_edge=True, has_base_observation=False),
+        _row("UNKNOWN", has_consensus=True, sector="機器人", has_structure_edge=True, has_base_observation=None),
+        _row("HASBASE", has_consensus=True, sector="機器人", has_structure_edge=True, has_base_observation=True),
     ]
     assert [r.ticker for r in closure.rank_backlog(rows)] == ["HASBASE", "UNKNOWN", "NOBASE"]
 
@@ -123,8 +125,8 @@ def test_base_observation_unknown_sorts_between_have_and_have_not() -> None:
 def test_next_pick_rule_prose_matches_the_sort_key_arity() -> None:
     """可讀版本與排序鍵一一對應——多一格少一格都會讓 drain 印出與實際不符的規則。"""
     key = closure._sort_key(_row("X"), frozenset())
-    # 排序鍵把「不在排序內」與「名次」拆成兩格，所以是散文條數 + 1
-    assert len(key) == len(closure.NEXT_PICK_RULE) + 1
+    # 2026-09-23（Step 0b.3）：名次那兩格（不在排序內／名次）合併成「有沒有結構邊」一格，散文與鍵一一對應
+    assert len(key) == len(closure.NEXT_PICK_RULE)
     assert "defer" in closure.NEXT_PICK_RULE[0]
     assert closure.NEXT_PICK_RULE[-1] == "ticker 字典序"
     assert "基期觀測" in closure.NEXT_PICK_RULE[-2]
@@ -132,10 +134,10 @@ def test_next_pick_rule_prose_matches_the_sort_key_arity() -> None:
 
 def test_summary_counts_terminal_and_names_the_next_pick_with_reasons() -> None:
     rows = [
-        _row("COHR", readiness="ready", open_panels=(), sector="AI 光互連／CPO", bottleneck_rank=2),
-        _row("6324.T", readiness="blocked", open_panels=(), settled=("headline",), sector="機器人", bottleneck_rank=26),
-        _row("SHA0.DE", has_consensus=True, forward_eps_positive=True, sector="機器人", bottleneck_rank=30),
-        _row("NVDA", has_consensus=True, forward_eps_positive=True, sector="AI 光互連／CPO", bottleneck_rank=8),
+        _row("COHR", readiness="ready", open_panels=(), sector="AI 光互連／CPO", has_structure_edge=True),
+        _row("6324.T", readiness="blocked", open_panels=(), settled=("headline",), sector="機器人", has_structure_edge=True),
+        _row("SHA0.DE", has_consensus=True, forward_eps_positive=True, sector="機器人", has_structure_edge=True),
+        _row("NVDA", has_consensus=True, forward_eps_positive=True, sector="AI 光互連／CPO", has_structure_edge=True),
     ]
     s = closure.summarize(rows)
     assert s["total"] == 4 and s["terminal_count"] == 2
@@ -176,18 +178,21 @@ def test_consensus_flags_prefer_next_year_and_latest_snapshot() -> None:
     assert flags["DDD"] == (False, None)
 
 
-def test_sector_and_rank_use_row_order_and_registry_ticker() -> None:
+def test_sector_and_structure_edge_come_from_the_table_and_registry_ticker() -> None:
+    """產業由列上的 demand_anchor 經 config 對照；結構邊＝任一列 substitutability 有值。沒有名次。"""
     class _Reg:
         def research_ticker(self, company_id):
             return {"co:a": "AAA", "co:b": "BBB"}.get(company_id)
 
-    payload = {
-        "rows": [{"company_id": "co:a"}, {"company_id": "co:b"}, {"company_id": "co:a"}, {"company_id": "co:private"}],
-        "sectors": [{"sector": "X", "actionable_ranks": [1, 3]}, {"sector": "Y", "actionable_ranks": [2]}],
-    }
-    got = closure._sector_and_rank(payload, _Reg())
-    assert got["AAA"] == ("X", 1)        # 同一檔多列取最佳名次
-    assert got["BBB"] == ("Y", 2)
+    payload = {"rows": [
+        {"company_id": "co:a", "demand_anchor": None, "substitutability": None},
+        {"company_id": "co:b", "demand_anchor": "tech:hbm", "substitutability": None},
+        {"company_id": "co:a", "demand_anchor": "tech:ai_switch", "substitutability": 5},
+        {"company_id": "co:private", "demand_anchor": "tech:ai_switch", "substitutability": 5},
+    ]}
+    got = closure._sector_and_structure_edge(payload, _Reg(), {"tech:ai_switch": "X", "tech:hbm": "Y"})
+    assert got["AAA"] == ("X", True)      # 第二列補上產業與結構邊；第一列的 None 不把它蓋掉
+    assert got["BBB"] == ("Y", False)     # 有錨、但沒有任何一列帶 substitutability
     assert "co:private" not in got and len(got) == 2
 
 
@@ -264,11 +269,11 @@ def test_gate_states_are_a_closed_vocabulary() -> None:
 
 def test_open_profile_counts_only_open_rows_and_honours_skip() -> None:
     rows = [
-        _row("READY", readiness="ready", open_panels=(), bottleneck_rank=None),
-        _row("SETTLED", open_panels=(), settled=("why",), bottleneck_rank=None),
-        _row("OPEN1", bottleneck_rank=None),
-        _row("OPEN2", bottleneck_rank=3),
-        _row("SKIPPED", bottleneck_rank=None),
+        _row("READY", readiness="ready", open_panels=(), has_structure_edge=False),
+        _row("SETTLED", open_panels=(), settled=("why",), has_structure_edge=False),
+        _row("OPEN1", has_structure_edge=False),
+        _row("OPEN2", has_structure_edge=True),
+        _row("SKIPPED", has_structure_edge=False),
     ]
     prof = closure.open_profile(rows, skip=["skipped"])   # 大小寫不該影響 skip 比對
     assert prof["open_count"] == 2
@@ -289,7 +294,7 @@ def test_open_profile_treats_none_as_unread_not_as_no() -> None:
 
 def test_open_profile_render_prints_every_field_even_at_zero() -> None:
     """0 也是資訊：某一項歸零時那一行仍要在，否則「沒印」與「沒發生」同形（L12／L13）。"""
-    rows = [_row("A", bottleneck_rank=1, has_consensus=True, forward_eps_positive=True)]
+    rows = [_row("A", has_structure_edge=True, has_consensus=True, forward_eps_positive=True)]
     lines = closure.render_open_profile(closure.open_profile(rows))
     assert len(lines) == len(closure.OPEN_PROFILE_FIELDS)
     assert all("0／1 檔" in line for line in lines)

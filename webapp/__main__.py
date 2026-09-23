@@ -54,7 +54,7 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 #: 「只 materialize state artifact、不順手重跑每一檔」的旗標清單。
 #: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
 _STATE_FLAGS: tuple[str, ...] = (
-    "ranking", "beta", "coverage", "watches", "positions",
+    "structure_table", "beta", "coverage", "watches", "positions",
     "structure_readings", "account_scorecard",
 )
 
@@ -65,7 +65,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
         materialize_account_scorecard, materialize_beta, materialize_coverage,
         materialize_many, materialize_positions,
         materialize_structure_readings,
-        materialize_ranking, materialize_watches, write_vocabularies,
+        materialize_structure_table, materialize_watches, write_vocabularies,
     )
 
     store, state_store = _stores(args)
@@ -73,16 +73,16 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     failed = 0
     total = 0
 
-    if args.ranking:
+    if getattr(args, "structure_table", False):
         total += 1
         try:
-            path, payload = materialize_ranking(as_of=as_of, store=state_store)
+            path, payload = materialize_structure_table(as_of=as_of, store=state_store)
         except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
             failed += 1
-            print(f"✗ ranking：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+            print(f"✗ structure_table：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
         else:
-            print(f"✓ ranking → {path.name}（{path.stat().st_size:,} bytes；"
-                  f"可行動 {len(payload['rows'])} 條／純結構 {len(payload['structural_rows'])} 條）")
+            print(f"✓ structure_table → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"{len(payload['rows'])} 條邊／母體外 {payload['population'].get('excluded', 0)} 條）")
 
     if args.beta:
         total += 1
@@ -130,8 +130,8 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ positions → {path.name}（{path.stat().st_size:,} bytes；"
                   f"逐檔 {len(payload['rows'])}／真實成交 {len(payload['live']['tickers'])} 檔）")
 
-    # 不給 ticker 且沒要求 ranking ＝ 重跑目錄裡已有的每一檔（原行為）。
-    # 只給 --ranking ＝ 只做 ranking，不順手重跑單檔（那是另一件事，也是另一段時間）。
+    # 不給 ticker 且沒要求任何 state ＝ 重跑目錄裡已有的每一檔（原行為）。
+    # 只給 --structure-table ＝ 只做結構表，不順手重跑單檔（那是另一件事，也是另一段時間）。
     # ⚠ 2026-09-17：這裡原本是一串手寫的 `or`，新增一個 state flag（`--scorecard`）就漏掉，
     # 結果 `--scorecard` 被當成「沒指定專屬 flag」而重跑了全部 73 檔單檔（L17：機制只認得
     # 當初那幾個 case，而且漏掉不會有東西壞掉——它只是安靜地多做了十分鐘的事）。
@@ -273,8 +273,8 @@ def cmd_status(args: argparse.Namespace) -> int:
             print(f"- ✗ {kind}：{reason}")
             continue
         extra = ""
-        if kind == "ranking":
-            extra = f"｜可行動 {len(payload['rows'])} 條／純結構 {len(payload['structural_rows'])} 條"
+        if kind == "structure_table":
+            extra = f"｜{len(payload['rows'])} 條邊／母體外 {(payload.get('population') or {}).get('excluded', 0)} 條"
         elif kind == "beta":
             extra = f"｜sleeve {len(payload['allocation']['sleeves'])} 格／商品 {len(payload['instruments'])} 檔"
         elif kind == "coverage":
@@ -290,7 +290,8 @@ def cmd_status(args: argparse.Namespace) -> int:
         print(f"- {kind}｜{freshness.state}（{freshness.age_hours:.1f}h）"
               f"｜{payload['point_in_time']['mode']}{extra}")
     for kind in missing:
-        print(f"- — {kind}：尚未 materialize（`python -m webapp materialize --{kind}`）")
+        # flag 用連字號（`--structure-table`、`--structure-readings`），kind 用底線；提示要印人能貼的那一種。
+        print(f"- — {kind}：尚未 materialize（`python -m webapp materialize --{kind.replace('_', '-')}`）")
     # 研究閉環 P3 的常駐計數器（L14）：到終局幾檔、有 ready 檔的產業幾個、下一檔是誰。
     try:
         from alpha import closure
@@ -540,8 +541,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     mat = sub.add_parser("materialize", help="跑完整條鏈並寫下 artifact（唯一會跑模型的入口）")
     mat.add_argument("tickers", nargs="*", help="不給就重新 materialize 目錄裡已有的每一檔")
-    mat.add_argument("--ranking", action="store_true",
-                     help="另外（或只）materialize 跨標的瓶頸排序：rank_bottlenecks() 的輸出照抄")
+    # dest 與 state kind 同名（`structure_table`），`_STATE_FLAGS` 才比對得起來。
+    mat.add_argument("--structure-table", dest="structure_table", action="store_true",
+                     help="另外（或只）materialize 跨標的結構表：structure_table() 的輸出照抄（不排序、沒有首選）")
     mat.add_argument("--beta", action="store_true",
                      help="另外（或只）materialize 資產配置：daily_beta_snapshot（--no-refresh --no-record-risk）的輸出照抄")
     mat.add_argument("--registry-listed", action="store_true",
@@ -561,7 +563,7 @@ def build_parser() -> argparse.ArgumentParser:
                      help="另外（或只）materialize 帳號計分表：D5 五欄＋三個偏差（會抓價格，唯一連外的 materializer）")
     mat.add_argument("--structure-readings", action="store_true",
                      help="另外（或只）materialize 結構讀圖：每一份讀圖跟現在的圖還一不一致（唯讀 ledger ＋ 確定性比對）")
-    mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與 ranking 都適用）")
+    mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與結構表都適用）")
     _dirs(mat)
     mat.set_defaults(func=cmd_materialize)
 

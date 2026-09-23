@@ -62,7 +62,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 0b.1b-C/H（1/2） | 估值品質計數器（closure 三個數＋webapp 消費端） | ✅ | 3be1756 |
 | 0b.1b-C/H（2/2） | **樞紐**：拆 6 個 section、刪 `alpha/valuation`／`alpha/implied_return`／`alpha/fundamental` 模型半邊（§0.9；偏差 §0.6 #18–27） | ✅ | 1ed420e |
 | 0b.2 | 刪估值鏈（收尾：expectation_gap 腳本、`multiple_horizon` 讀寫；偏差 §0.6 #28–31） | ✅ | |
-| 0b.3 | 排序與籃子 | ○ | |
+| 0b.3 | 排序與籃子：`rank_bottlenecks` → `structure_table`、state kind `ranking` → `structure_table`、籃子模組刪（偏差 §0.6 #32–#41；續工落點 §0.10） | ✅ | |
 | 0b.4 | 四價、decision_lab 凍結、硬擋搬家、活文件 | ○ | |
 | 0c | 池子 17 筆 drop | ✅ | cd275e3 |（**先於 0b 執行**：兩者無相依，0b.1 撞到 §6「切不開」要停，先把獨立的 Step 收掉）|
 | 結案 | 九項 gate ＋ closeout 報告 ＋ ROADMAP 標 ✅ | ○ | |
@@ -116,6 +116,16 @@ plan 的 §0 說「衝突時以 ROADMAP 與決定紀錄為準，並回頭修本 
 | 30 | 0b.2 | 批 2 驗收「C／D／F／H 四組在 code 命中 0」（已 amend 為 keep-list） | 剩餘命中逐條分類：退役註記（各檔）、legacy key／placeholder（`calibration_refs`、`{base_target}`…）、Engine C 資料層（`engine_c/*`、`alpha/providers/fundamentals.py`、`pe_forward`）、refresh 字彙常數、批 3 的 `webapp/basket.py`／app.js 籃子頁、以及 `alpha/context.py` 的 PE 比值 proxy＋refresh 的 `market_implied_eps_growth` artifact | 最後一項**不在 Phase 0 退役清單**：它是研究 packet 給 session 判 Q4 的 heuristic proxy（`alpha/context`，核心研究層），read model 的呈現格已於 2/2 拿掉；拿掉 packet 裡的量要另開決定（Phase 3「已定價嗎」的資料源之一）。結案 keep-list 的類別：`kept_file` |
 | 31 | 0b.2 | 未提 `scripts/repricing_check.py`／`scripts/closure_probe.py`（H 組命中） | **留**：前者是「已被定價了嗎」的股價變化分解（唯讀算術，2026-08-18；Phase 3 三題的前身），後者只在 docstring 提到口徑核實 | 不在退役清單；H regex 命中的是 `pe_forward`（Engine C 欄位名） |
 | 27 | 0b.1b-C/H 2/2 | 「argument 少掉的只能是估值來源的段」 | 「數字怎麼算出來」「和市場差在哪」兩段退役（E 組已拿掉「賭注」），六段變三段；句型 `numbers_paragraph`／`market_paragraph`／`bet_paragraph` 刪；`timeline_paragraph` 不再收 value_date／horizon_end／reached | ROADMAP 第 82 行的驗收條件；實測見本 Step 八欄（各檔段數前後對照） |
+| 32 | 0b.3 | 刪除清單含 `scripts/outcome_if_settled_today.py` | **留**，只拿掉 `_append_ranking_snapshot`（當日排序快照）與「前/後段對照待排序快照累積」句 | 它是 `positions` kind 的唯一 producer（`webapp/materialize.py::materialize_positions` 按路徑載入）與心跳段 4 power-law 三量的唯一來源（AGENTS「量測」明列）；刪了 gate 5（心跳五段照印）與 INV-4 同時破。ROADMAP Phase 5「量測層從 trade_log 加收據重建」時再處置。B 組命中的是 AGENTS 量測用語「籃子總報酬」，keep-list `kept_file` |
+| 33 | 0b.3 | 「拿掉 `min_substitutability` 當排名門檻」 | 結構表不設門檻（sub 2 與未填的邊都在表上）；但 **provider `get_bottlenecks`**（read model Q1 輸入）與 **pq1 `_chokepoint`** 各自保留「sub ≥ 4 且未填不算」的成員判準，各在自己檔案明寫（`graph_neo4j.py::_bottleneck_rows`、`engine_b/cli.py::_CHOKEPOINT_MIN_SUBSTITUTABILITY`） | 兩者不是排序，是「哪些邊算 bottleneck row」「哪些公司算位於已知瓶頸上」的成員資格；保留讓 read model 三面板文字 digest 與 pq1 優先序**一字不變**（gate 3、L11-6 ④）。要不要連成員判準都拿掉是 Phase 2 讀圖的題目 |
+| 34 | 0b.3 | 未提 `alpha/closure.py`（研究佇列「下一檔」規則第 5 條讀 ranking artifact 的名次與產業） | `bottleneck_rank` → `has_structure_edge`（結構表上有沒有帶 substitutability 的邊）；產業改由列上 `demand_anchor` 經 `config/sector_anchors.json` 對照；`NEXT_PICK_RULE` 散文與 `_sort_key` 同步（7 格對 7 條） | ranking artifact 消失後這條路必斷；名次是排序語意（A 組），「有沒有可算 Q1 的邊」才是它原本真正回答的事。同產業同條件的兩檔從此只剩 ticker 字典序分先後 |
+| 35 | 0b.3 | 批 3 未列 `briefing/today.py`／`briefing/render.py`／`alpha/brief.py`／`decision_lab/cli.py today`（§3 importer 地圖第 305 行有列 `alpha/ranking` 的消費端） | `ranking` pane、`ready_not_ranked` 常駐清單、由排序前段挑 Alpha Card 的 `tickers_from_ranking`、`engine_d_runtime.adapters.fetch_ranking_view` 一併退役；`decision_lab today` 的 `alpha_cards` 注入 None（「未提供」）；`render_outcome_aggregate` 由「排序品質」改稱「等權聚合」 | 它們是 `alpha/ranking.py` 的唯一消費鏈，不斷就無法刪模組；`decision_lab today` 整個命令在 0b.4 刪 |
+| 36 | 0b.3 | 未提 `render_what_if`／`--what-if`（截圖假設層的唯一消費入口，比純結構排序名次） | 改比表上事實：多了哪些列、哪些公司錨可達性改變、哪些邊 sub 變；`skills/source-trace` 那句同改 | 名次沒有了；「若為真結構會變嗎」仍是合法問題，且 `engine_b/hypotheses.py` 的唯一消費入口不能變成沒有 consumer（INV-4） |
+| 37 | 0b.3 | 未提 `tests/fixtures/golden/structural_bottleneck.json`（A 組 tests 命中：note 寫「可行動排序」） | 凍結資料不改；`scripts/capture_golden_fixtures.py` 改擷取結構表前三列（索引序）並註明重跑會報漂移 | golden fixture 的用途就是 frozen input，改寫等於毀掉它；keep-list `legacy_key` |
+| 38 | 0b.3 | 刪測試清單含 `test_bet_endgame` | 檔案不存在（E 組 0b.1b-E 已刪） | 無事可做，記錄以免結案對帳時找 |
+| 39 | 0b.3 | 「`config/lead_classification.json` 的排序引用改走圖」 | 只改 `_doc` 那句；`decision_impact` 的 enum 值 `ranking`（「候選不變，但誰是第一會變」）**留** | 它是 lead 資料的 legacy key（`pending_leads.json` 既有分類），A regex 不命中；改 enum 要遷資料，另開決定 |
+| 40 | 0b.3 | 未提路由與旗標命名 | `#/ranking` → `#/structure-table`、`--ranking` → `--structure-table`、`GET /api/v1/ranking` → `/structure-table`（daily prompt、daily-brief／alpha-status skill、兩條測試同 commit）；`library/private/app/state/ranking.json` 留在磁碟成孤兒（同 0a.2 對 basket.json 的處置）；`webapp status` 缺席提示改印連字號旗標（原本 `structure_readings` 也印錯） | kind 與路由改名才能讓「排序」這個詞從入口消失；孤兒檔是 ignored derived cache |
+| 41 | 0b.3 | 結案 gate 3「73 檔三面板文字不變」 | **實測 71 檔逐字相同；COHR／GFS 的 argument「鏈」段落句子集合相同、只有同分邊的列舉順序不同。** 排序退役後 provider 在同一家公司內明寫「證據強的先」順序（`graph_neo4j.py::_bottleneck_rows`，跨公司只按 company_id），讓 Q1 同分取捨與鏈段落回到退役前（AXTI／LITE 第一版曾換邊，已修）；剩下的差異是**六個鍵全同**的邊：舊順序是 Neo4j 回傳的插入序（非語意、DB 重建後不保證），新順序是表的字典序 | 拿「DB 回傳序」當 tie-break 會讓結構表的順序不可重現；句子一字未改、只是同一段落內同分事實的列舉順序。結案 R2 第 7 項比對 digest 時 COHR 的 argument 會不同，請對照本列 |
 
 ## 0.8 ✅ 已裁決（2026-09-23）：**A——`argument` 升核心、`why` 退役**（原 escalation 紀錄留存於下）
 
@@ -247,6 +257,57 @@ ROADMAP 驗收①與本 plan gate 8、R2 檢查 1 已同步。精確到（檔，
 `A_BRIEF`／`BRIEF_IS_NOT`）。每次都由測試當場抓到並逐字還原，但**切之前先 `awk` 列出該區間內
 所有頂層定義**會比事後修便宜。
 
+## 0.10 續工落點（2026-09-23 晚，0b.3 結案後寫；下一個 Step 是 0b.4）與 plan 審閱
+
+**交接狀態：** 進度表 0.0～0b.3、0c 全 ✅（0b.3 的 commit 短碼由下一個執行者從 `git log` 補進進度表）。剩 **0b.4** 與**結案**。
+**排程時限：** `StockBotv2-Heartbeat` 07:00／`StockBotv2-FxSync` 06:55 今日已跑完（LastResult 0），下次 **2026-09-24 早上**；
+Codex daily 06:30 明早會跑——daily prompt 已改成 `--structure-table`，心跳讀 `structure_table` kind（0b.3 已 materialize）。
+**0b.4 若在 2026-09-24 06:30 之後才開工，第一件事是先暫停 Codex daily／weekly 排程再動手（§0.5）。**
+查證：`Get-ScheduledTask | ? {$_.TaskName -match 'StockBot'} | Get-ScheduledTaskInfo`、`git log --since=2026-09-24`。
+
+### 0b.4 的 importer 地圖（2026-09-23 實測 `grep -rln`，不含 tests）
+
+| 要刪的 decision_lab 模組 | 非測試 importer（斷 import 的落點） |
+|---|---|
+| `brief.py` | `briefing/today.py`、`decision_lab/__init__.py` |
+| `cli.py`（只留 `history`／`status`） | `alpha/__main__.py`、`briefing/__main__.py`、`decision_lab/__main__.py`、`scripts/backfill_shadows.py` |
+| `workflow.py` | `briefing/today.py`、`engine_b/todo.py`、`engine_d_runtime/adapters.py` |
+| `workflow_ports.py` | `briefing/today.py`、`engine_d_runtime/adapters.py`、`scripts/verify_test_nonvacuity.py` |
+| `execution.py`（含 `record_live_choice` 呼叫端 `cli.py:505`） | `decision_lab/cli.py`、`workflow.py` |
+| `outcomes.py`／`references.py` | `decision_lab/cli.py` |
+| `sizing.py` | `brief.py`、`execution.py`、`references.py`、`workflow.py`、**`engine_b/todo.py`** |
+| `context.py` | **`alpha/cli.py`**、`workflow.py`、**`engine_c/checklist.py`** |
+| `coverage.py`／`coverage_queries.py` | **`briefing/alpha_view/sources.py`**、**`scripts/catalyst_watch.py`**（daily 固定入口） |
+| `intake.py` | `workflow.py`、**`engine_b/signal_source_registry.py`** |
+| `action_card.py` | **`briefing/public_view.py`**、**`briefing/render.py`**、`brief.py`、`cli.py`、`workflow.py` |
+| `store.py`（**唯讀留**） | 讀取端：`webapp/{api,materialize,__main__,__init__}.py`、`shared/private_export.py`、`briefing/today.py` |
+| `bootstrap.py`（`open_default_store`，留） | `audit/sources.py`、`briefing/public_view.py`、`engine_b/{cli,routine_config,todo}.py`、`engine_d_runtime/__init__.py`、`webapp/materialize.py`、三支 scripts、`thesis/generate_lane_memo.py` |
+
+粗體是**研究側以外**的消費端——每一個都要決定「斷掉」還是「改讀別的」，這是 0b.4 最花判斷的地方
+（`briefing/alpha_view/sources.py` 讀 coverage_queries 拿 decision facts；`engine_c/checklist.py` 讀 context；
+`scripts/catalyst_watch.py` 是 daily 固定入口，動它要 sandbox impact review）。
+MCP `get_decision_brief` 工具：定義在 `briefing/public_view.py::get_decision_brief_core`，
+被 `mcp_server/graph_mcp.py`、`engine_b/todo.py`（sync 與 standing-go）讀。
+硬擋現況：`decision_lab/store.py:80 _assert_user_sized_within_capital_caps`（`record_live_choice` 內呼叫）；
+`scripts/record_trade.py` 目前只有 `--apply` 與 dry-run diff，**沒有任何 cap 檢查、沒有 `--override`／`--reason`**。
+
+### plan 審閱（正確性與完整性，對照 ROADMAP Phase 0 行與退役清單）
+
+1. **ROADMAP 0b 寫「`sheet_only_holding` kind 退役（Sheet 有、敘事沒有的持股改列候選板『已持有、缺敘事』）」，本 plan 批 4 沒有這一項。**
+   現況：0a.4 已把 todo type 標 legacy、collector 停鑄；`config/standing_authorization.json` 的 `never` 清單與
+   `config/decision_blockers.json:269` 的 blocker code 仍在。0b.4 動 `decision_blockers.json` 時一併處置，結案 gate 對帳要點名。
+2. **批 4「活文件同 commit 更新」的範圍只寫了 decision_lab 段、§8.2、§7／§9**；實測活文件對 A／B／C／D／F 組也有引用
+   （`docs/OPERATIONS.md`：`--ranking` 6 處、decision_lab 18 處；`docs/ARCHITECTURE.md`：`rank_bottlenecks` 11、籃子 7、估值鏈 18；
+   `CONCEPTS.md` 各 1–4）。0b.4 的活文件段應涵蓋八組（`python scripts/retired_mechanism_grep.py` 的 livedocs 列逐句審），
+   否則結案 gate 8 的 livedocs 逐句列會很長。
+3. 批 4 刪測試清單的 `test_bet_endgame` 不存在（§0.6 #38）；批 3 的 `test_bet_endgame` 同。
+4. 結案 gate 1「測試數與 0.0 基準的差＝刪除的測試檔」：本 Phase 至 0b.3 的刪除清單可由
+   `git log --diff-filter=D --name-only --pretty=format: <0.0 commit>..HEAD -- tests/ | sort -u` 得出（0b.3 之前 19 檔、0b.3 再 5 檔＋2 檔改名），
+   closeout 報告逐檔列「守的是哪個退役機制」。
+5. §0.7 keep-list：A／B 兩組已於 0b.3 填 53 條；C～H 組在 0b.4／結案填。腳本現在印的「未列 keep-list」數只剩 C～H。
+6. 批 4 的 R2（硬擋搬家）使用者已常規 opt-in（§0.5）；WORK_REQUEST 發給乾淨 context。**0b.4 建議用強模型**：
+   資本硬擋搬家（fail closed、override 收據、兩個新測試）＋ 12 個模組刪除的 importer 判斷＋活文件三份同 commit。
+
 ## 0. 不可越線（違反即 NO_GO）
 
 1. **不碰資料 authority：** 不碰 Neo4j、Engine C ledger、thesis lifecycle、Google Sheet、`library/private/`、`library/trades/`。
@@ -349,7 +410,7 @@ EOF
   `config/alpha_screen.json`（覆蓋厚薄門檻）**留**，改由 Phase 3 候選板消費；`config/lead_classification.json` 的排序引用改走圖。
 - 刪測試：`test_webapp_basket`、`test_basket_screen_thresholds`、`test_bet_endgame`、`test_ranking_view`；`test_bottleneck_ranking`、`test_webapp_ranking`、
   `test_sole_source_tristate` **改寫**成結構表測試（保留三態、去重、證據上限那些活的斷言）。
-- 驗收：殭屍 grep 的 A、B 兩組命中 0；`webapp status` 列得出 `structure_table`；`pytest` 全綠。
+- 驗收：殭屍 grep 的 A、B 兩組**未列 keep-list 的命中＝0**（§0.7 amend；keep-list 已於 0b.3 填 A／B 兩組 53 條）；`webapp status` 列得出 `structure_table`；`pytest` 全綠。
 - L11-6 第④問：**最先壞的是 `engine_b/priority.py`／`queue_segments.py` 有沒有拿排序當 pq1 優先序**——0a.1 應已移除，動手前 grep 一次 `rank_bottlenecks` 確認只剩結構表。
 
 ### 批 4｜賭注四價、decision_lab 凍結、硬擋搬家、活文件
@@ -407,7 +468,7 @@ Do not trust: 上面那行是待驗證的宣稱，不是事實
 Task: 直接讀 repo，自己跑下列檢查，逐項 ✅／❌ 附實際輸出，回 REVIEW（含 verdict）
   1. python scripts/retired_mechanism_grep.py → 「未列 keep-list 的命中（檔，組）」＝0、「已列但不再命中」＝0；逐條審 keep-list 理由是否屬五類且成立，
      kept_file 類的檔另 grep 確認它沒有活的呼叫端指向退役程式；livedocs 命中逐句列出並判斷是否為禁止句
-  2. python -m webapp status | tail -10 → 沒有 basket、multi_year；kind 數與 closeout 一致
+  2. python -m webapp status | tail -10 → 沒有 basket、multi_year、ranking；有 structure_table；kind 數（7）與 closeout 一致
   3. python -m engine_b.todo list → 未結案 2，皆 manual
   4. python -m pytest -q → 全綠；測試檔數差 ＝ closeout 列出的刪除清單，逐檔核對「守的是哪個退役機制」是否成立
   5. python -m audit invariants → 全綠

@@ -18,7 +18,7 @@ RENDER_ALLOWED_IMPORTS = {"__future__", "datetime", "typing", "shared.markdown",
                           "briefing.alpha_view.contracts", ".contracts"}
 #: 這些 token 出現在 renderer 就是業務邏輯回流：重排、重算、重新決策。
 RENDER_FORBIDDEN_TOKENS = (
-    "sorted(", ".sort(", "min(", "max(", "sum(", "ordering_key", "rank_bottlenecks",
+    "sorted(", ".sort(", "min(", "max(", "sum(", "ordering_key", "structure_table",
     "actionable_now", "compose_signal", "build_research_context", "assess_entry",
     "expected_return =", "import engine_c", "import neo4j", "decision_lab",
 )

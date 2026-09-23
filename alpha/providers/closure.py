@@ -1,6 +1,6 @@
 """每檔閉環的 I/O 收集端（alpha/providers 是 alpha 底下唯一准碰外部世界的子套件）。
 
-讀三個來源，各自 fail-soft：analyst view artifact（必要）、Engine C 共識（選）、ranking state＋registry（選）。
+讀三個來源，各自 fail-soft：analyst view artifact（必要）、Engine C 共識（選）、structure_table state＋registry（選）。
 純函式（終局、排序、摘要）住 `alpha/closure.py`；本檔只負責把資料送進去。
 """
 from __future__ import annotations
@@ -13,7 +13,7 @@ from alpha.closure import (
     BacklogRow,
     _base_observation_tickers,
     _consensus_flags,
-    _sector_and_rank,
+    _sector_and_structure_edge,
     deferred_tickers,
     row_from_artifact,
 )
@@ -21,7 +21,7 @@ from alpha.closure import (
 
 def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None = None,
             conn: Any = None) -> tuple[list[BacklogRow], list[str]]:
-    """讀 artifact（必要）＋共識（選）＋排序產業（選）。回 (rows, notes)。"""
+    """讀 artifact（必要）＋共識（選）＋結構表的產業與結構邊（選）。回 (rows, notes)。"""
     from webapp.store import ArtifactStore, StateArtifactStore, resolve_state_dir
 
     notes: list[str] = []
@@ -60,15 +60,15 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
     # 而 APP 端拿不到這一份，於是「等財報」在 APP 變成「還沒做」（L16）。
     # ⚠ **時鐘仍然住在這一層**：`row_from_artifact` 只在收到 `today` 時才判，純函式不看時鐘。
 
-    # 產業與名次：ranking state ＋ registry
-    sector_rank: dict[str, tuple[str | None, int | None]] = {}
+    # 產業與結構邊：structure_table state ＋ registry ＋ config/sector_anchors.json（錨→產業的 SSOT）
+    sector_edge: dict[str, tuple[str | None, bool]] = {}
     try:
-        payload, _fresh = StateArtifactStore(resolve_state_dir(artifact_dir, state_dir)).read("ranking")
+        payload, _fresh = StateArtifactStore(resolve_state_dir(artifact_dir, state_dir)).read("structure_table")
         from identity import get_registry
 
-        sector_rank = _sector_and_rank(payload, get_registry())
+        sector_edge = _sector_and_structure_edge(payload, get_registry(), _anchor_to_sector())
     except Exception as exc:  # noqa: BLE001
-        notes.append(f"ranking state 讀不到：{type(exc).__name__}")
+        notes.append(f"structure_table state 讀不到：{type(exc).__name__}")
 
     # pq2 的使用者 defer：讀結構化欄位，讀不到就是空集合（不猜、不 parse 標題）
     deferred: frozenset[str] = frozenset()
@@ -92,11 +92,11 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
     for r in rows:
         has_c, pos = flags.get(r.ticker, (None, None))
         awaiting = r.awaiting_report_since      # 已由 row_from_artifact 判好，這裡只照抄
-        sector, rank = sector_rank.get(r.ticker.upper(), (None, None))
+        sector, has_edge = sector_edge.get(r.ticker.upper(), (None, (False if sector_edge else None)))
         enriched.append(BacklogRow(
             ticker=r.ticker, readiness=r.readiness, open_panels=r.open_panels, settled_panels=r.settled_panels,
             absence_kinds=r.absence_kinds, has_consensus=has_c, forward_eps_positive=pos,
-            sector=sector, bottleneck_rank=rank,
+            sector=sector, has_structure_edge=has_edge,
             has_base_observation=(None if base_obs is None else r.ticker.upper() in base_obs),
             user_deferred=r.ticker.upper() in deferred,
             awaiting_report_since=awaiting,
@@ -104,6 +104,20 @@ def collect_backlog(*, artifact_dir: Path | None = None, state_dir: Path | None 
         ))
     return enriched, notes
 
+
+
+def _anchor_to_sector() -> dict[str, str]:
+    """錨→產業對照。SSOT 是 `config/sector_anchors.json`；讀不到就回空（全部落入「產業未知」，不猜）。"""
+    import json
+
+    path = Path(__file__).resolve().parents[2] / "config" / "sector_anchors.json"
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return {str(anchor): str(sector)
+            for sector, anchors in (data.get("sectors") or {}).items()
+            for anchor in (anchors or [])}
 
 
 __all__ = ["collect_backlog"]

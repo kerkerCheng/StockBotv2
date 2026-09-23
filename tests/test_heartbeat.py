@@ -261,7 +261,7 @@ def test_one_broken_state_artifact_does_not_take_out_the_rest_of_section_four(
     section = hb.build_positions(state_dir=broken_env["state_dir"])
     text = "\n".join(section.lines)
     assert "追蹤表：" in text and any(k in text for k in ABSENCE_KINDS)
-    assert "可投資排序" in text or "需求錨集中度" in text, "後面的格子還在"
+    assert "結構表" in text or "需求錨集中度" in text, "後面的格子還在"
 
 
 def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Path) -> None:
@@ -320,18 +320,17 @@ def test_app_freshness_today_is_the_local_today(tmp_path: Path) -> None:
     state_dir = tmp_path / "state"
     state_dir.mkdir()
     yesterday_pm = datetime(2026, 9, 17, 14, 44).astimezone()   # naive → 本地時區
-    # ⚠ 2026-09-22（Step 0a.2）：原本借籃子 artifact 當道具，籃子 kind 退役後改用 ranking。
-    # **本條測的是「今天」是哪個時區的今天，與是哪一種 artifact 無關。**
-    # 手搭一份最小但形狀正確的 ranking artifact（`content_digest` 由 canonical_digest 算，
-    # 不然 store 讀回來會 fail closed）。**本條測的是「今天」是哪個時區的今天**，不是 ranking 的內容。
+    # ⚠ 2026-09-22（Step 0a.2）：原本借籃子 artifact 當道具，籃子 kind 退役後改用 ranking；
+    # 2026-09-23（Step 0b.3）ranking → structure_table。**本條測的是「今天」是哪個時區的今天，與是哪一種 artifact 無關。**
+    # 手搭一份最小但形狀正確的 artifact（`content_digest` 由 canonical_digest 算，不然 store 讀回來會 fail closed）。
     from webapp.contracts import STATE_SCHEMA_VERSIONS, canonical_digest
 
     payload = {
-        "schema_version": STATE_SCHEMA_VERSIONS["ranking"], "kind": "ranking",
+        "schema_version": STATE_SCHEMA_VERSIONS["structure_table"], "kind": "structure_table",
         "generated_at": yesterday_pm.isoformat(), "as_of": None,
         "point_in_time": {"as_of": None, "mode": "current"},
         "authority": {"source": "test"}, "freshness_identity": "test",
-        "materializer": {"version": "test"}, "rows": [], "structural_rows": [],
+        "materializer": {"version": "test"}, "rows": [],
     }
     payload["content_digest"] = canonical_digest(payload)
     StateArtifactStore(state_dir).write(payload)

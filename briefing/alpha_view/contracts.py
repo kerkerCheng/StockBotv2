@@ -152,7 +152,7 @@ class Datum:
 
     - `value`：值；沒有就是 `None`（**不是 0、不是空字串、不是空 dict**）。
     - `authority`：誰擁有這個真相（邏輯 URI，如 `engine_c://financial_snapshots`、
-      `engine_a://rank_bottlenecks`、`alpha://session_assessor/v1`、
+      `engine_a://structure_table`、`alpha://session_assessor/v1`、
       `decision_lab://coverage_assessments`）。**不得是檔案路徑**。
     - `method`：怎麼得到（規則版本、公式、或「人工判讀」）。
     - `unit`：單位語意。⚠ 報價單位 ≠ 結算幣別，`quote_unit`／`reporting_currency`／`ratio`
@@ -401,7 +401,7 @@ class StructuralThesisSection:
     meta: SectionMeta
     structural_score: Datum                  # Q1
     scarcity_inputs: tuple[Datum, ...]
-    ranking: tuple[Datum, ...]
+    # ⚠ 2026-09-23（Step 0b.3）：`ranking: tuple[Datum, ...]`（可行動排序名次／候選總數）退役。
     edges: tuple[StructuralEdgeItem, ...]
     supply_exposure: tuple[ExposureItem, ...]
     substitution_paths: tuple[PathItem, ...]

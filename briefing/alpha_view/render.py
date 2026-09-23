@@ -285,8 +285,6 @@ def render_alpha_investment_view_markdown(view: AlphaInvestmentView) -> str:
     lines.append(_datum_line(st.structural_score))
     for datum in st.scarcity_inputs:
         lines.append(_datum_line(datum))
-    for datum in st.ranking:
-        lines.append(_datum_line(datum))
     lines.append(_datum_line(st.evidence_quality))
     if st.edges:
         lines += ["", "| 關係 | 對象 | 替代難度 | 獨家 | 認證 | 需求錨點／跳數 | 證據等級 | 用途 |",

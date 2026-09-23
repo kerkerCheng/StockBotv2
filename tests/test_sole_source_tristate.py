@@ -1,8 +1,9 @@
 """`sole_source` 的三態語意（Phase 1.1 第 4 項）：未填是 `None`，不是 `bool(None) == False`。
 
-修在**上游**（`query/bottleneck.py::rank_bottlenecks`），不是只在 read model 貼註記——
-壓平發生在排序權威的輸出，下游每一層（provider、Q1 佐證、view）都只能看到假的 False。
-排序鍵仍是 `1 if sole_source else 0`（None 與 False 同為 0），所以排序語意不變。
+修在**上游**（`query/bottleneck.py::structure_table`），不是只在 read model 貼註記——
+壓平發生在結構表的輸出，下游每一層（provider、Q1 佐證、view）都只能看到假的 False。
+⚠ 2026-09-23（Step 0b.3）：排序退役；原本「None 與 False 同為排序鍵 0」那條改守
+「表的順序是索引，sole_source 不參與」。
 """
 from __future__ import annotations
 
@@ -13,11 +14,11 @@ from alpha.identity import CompanyId, EntityId
 from alpha.provider import BottleneckRow
 from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
 from alpha.testing import FakeGraphResearchProvider
-from query.bottleneck import rank_bottlenecks
+from query.bottleneck import structure_table
 
 
 class _Reg:
-    """只實作 `rank_bottlenecks`／`classify_evidence` 用到的 registry surface。"""
+    """只實作 `structure_table`／`classify_evidence` 用到的 registry surface。"""
 
     _map = {"co:a": "AAA", "co:b": "BBB", "co:c": "CCC"}
     companies = ()
@@ -38,10 +39,10 @@ def _assertion(src, dst, *, attrs, conf=0.8, doc="d1"):
             "published_at": "2026-05-01"}
 
 
-def test_rank_bottlenecks_keeps_unknown_sole_source_as_none_not_false() -> None:
+def test_structure_table_keeps_unknown_sole_source_as_none_not_false() -> None:
     """三條邊：明確 True、明確 False、完全沒發言。第三條必須是 None。
 
-    空跑檢查：把 `rank_bottlenecks` 的 `"sole_source": edge.sole_source` 改回
+    空跑檢查：把 `_table_row` 的 `"sole_source": edge.sole_source` 改回
     `bool(edge.sole_source)` → 這條會紅。
     """
     rows = [
@@ -49,22 +50,20 @@ def test_rank_bottlenecks_keeps_unknown_sole_source_as_none_not_false() -> None:
         _assertion("co:b", "tech:ai_switch", attrs={"substitutability": 5, "sole_source": False}),
         _assertion("co:c", "tech:ai_switch", attrs={"substitutability": 5}),
     ]
-    by_company = {r["company_id"]: r for r in rank_bottlenecks(rows, _Reg())["rows"]}
+    by_company = {r["company_id"]: r for r in structure_table(rows, _Reg())["rows"]}
     assert by_company["co:a"]["sole_source"] is True
     assert by_company["co:b"]["sole_source"] is False
     assert by_company["co:c"]["sole_source"] is None, "未填必須是 None，不是 False"
 
 
-def test_ordering_is_unchanged_because_unknown_and_false_both_sort_as_zero() -> None:
-    """排序鍵 `1 if sole_source else 0` 對 None 與 False 一視同仁——這是本修正不改排序語意的機械保證。"""
+def test_table_order_ignores_sole_source_because_it_is_an_index() -> None:
+    """表的順序是 `(company_id, relation, bottleneck)` 字典序；sole_source 是 True／False／None 都不動它。"""
     rows = [
         _assertion("co:b", "tech:ai_switch", attrs={"substitutability": 5, "sole_source": False}),
         _assertion("co:c", "tech:ai_switch", attrs={"substitutability": 5}),
         _assertion("co:a", "tech:ai_switch", attrs={"substitutability": 5, "sole_source": True}),
     ]
-    ranked = [r["company_id"] for r in rank_bottlenecks(rows, _Reg())["rows"]]
-    assert ranked[0] == "co:a"                                  # True 仍排最前
-    assert set(ranked[1:]) == {"co:b", "co:c"}                  # False 與 None 同階
+    assert [r["company_id"] for r in structure_table(rows, _Reg())["rows"]] == ["co:a", "co:b", "co:c"]
 
 
 def test_structural_diff_treats_unknown_to_true_and_true_to_unknown_honestly() -> None:
@@ -86,7 +85,7 @@ class _TriStateProvider(FakeGraphResearchProvider):
 
     sole_source: bool | None = None
 
-    def get_bottlenecks(self, *, sector=None, min_substitutability=4, as_of=None):
+    def get_bottlenecks(self, *, min_substitutability=4, as_of=None):
         refs = self._evidence(as_of)
         return (BottleneckRow(
             company_id=self.company_id, edge_key="edge:tri", relation="supplies_to",

@@ -3,7 +3,7 @@
 ## 這裡只做五件事：選取、正規化、語意標註、組裝、序列化
 
 - **不重算**：Q1 來自 `alpha.context.structural_score`、Q2–Q5 來自 `session_assessor`、
-  瓶頸排序來自 `rank_bottlenecks()`（經 provider）、估值 proxy 來自 `alpha.context`、
+  結構事實來自 `structure_table()`（經 provider）、估值 proxy 來自 `alpha.context`、
   催化劑狀態來自 `shared.catalyst_state.assess_entry`、thesis 到期來自
   `thesis.lifecycle_schedule`。本檔沒有任何一條業務公式。
 - **語意標註不是判斷**：`basis` 由**來源路徑**決定（Q1 走 deterministic 規則、Q2–Q5 走
@@ -66,7 +66,7 @@ from .contracts import (
 # ---------------------------------------------------------------------------
 # authority 的邏輯 URI（不是路徑）。改名要連 docs/ARCHITECTURE.md 的 authority map 一起改。
 # ---------------------------------------------------------------------------
-A_RANK = "engine_a://rank_bottlenecks"
+A_STRUCTURE = "engine_a://structure_table"
 A_GRAPH = "engine_a://graph_research_provider"
 A_Q1 = "alpha://context/structural_score"
 A_SESSION = "alpha://session_assessor"
@@ -215,7 +215,7 @@ def _market_section(build: Any, *, reference_day: date) -> "MarketSection":
 # 本檔不算任何數：payoff、兩桿拆解、年化全部照抄 `alpha.implied_return` 對 variant 的執行。
 # ---------------------------------------------------------------------------
 WIPEOUT_IS_NOT: tuple[str, ...] = (
-    "不是評分也不是排序鍵：四盞燈**不參與 `rank_bottlenecks`**、不決定尺寸——"
+    "不是評分也不是排序鍵：四盞燈**不參與結構表**、不決定尺寸——"
     "它與總曝險倍數、追繳門檻同屬量測（AGENTS「須區分量測、訊號與脈絡」）",
     "不是進出場訊號：黃燈不讀成「減碼」、紅燈不讀成「賣出」；出場只認反證（D3）",
     "不是合成分數：四盞燈刻意不相加、不加權——加起來就必須決定誰比較重要，而那是沒有根據的",
@@ -660,7 +660,6 @@ def build_alpha_investment_view(
     impacts: Sequence[CompanyImpact] = (),
     structural_events: Sequence[StructuralEvent] = (),
     causal_reason: str | None = None,
-    ranking_position: Mapping[str, Any] | None = None,
     estimate_revision: Mapping[str, Any] | None = None,
     decision_facts: DecisionFacts | None = None,
     decision_facts_reason: str | None = None,
@@ -1033,16 +1032,16 @@ def build_alpha_investment_view(
     )
 
     # =======================================================================
-    # C. Structural Thesis（Q1 ＋ 已入圖事實 ＋ 排序位置）
+    # C. Structural Thesis（Q1 ＋ 已入圖事實）
     # =======================================================================
     scarcity = context.structural
     scarcity_refs = _refs(scarcity.evidence)
     graph_as_of = context.as_of
     scarcity_inputs = tuple(
-        _observation(key, label, value, authority=A_RANK, unit=unit, as_of=graph_as_of,
+        _observation(key, label, value, authority=A_STRUCTURE, unit=unit, as_of=graph_as_of,
                      freshness=None, evidence_refs=scarcity_refs,
                      method="已經 graph admission gate 核准的邊屬性；provider 取最強的一條邊，不平均",
-                     missing_reason="圖上這條邊沒有這個屬性（未填≠否；rank_bottlenecks 自 2026-09-05 起保留三態）")
+                     missing_reason="圖上這條邊沒有這個屬性（未填≠否；結構表自 2026-09-05 起保留三態）")
         for key, label, value, unit in (
             ("substitutability", "替代難度", scarcity.substitutability, "ordinal_1_5"),
             ("sole_source", "獨家供應", scarcity.sole_source, "bool"),
@@ -1054,21 +1053,8 @@ def build_alpha_investment_view(
              str(scarcity.demand_anchor) if scarcity.demand_anchor else None, "entity_id"),
         )
     )
-    ranking_items: list[Datum] = []
-    if ranking_position:
-        for key, label in (("actionable_rank", "可行動排序名次（rank_bottlenecks rows）"),
-                           ("actionable_total", "可行動候選總數")):
-            value = ranking_position.get(key)
-            ranking_items.append(
-                Datum(key=key, label=label, value=value, status="available",
-                      basis="deterministic", authority=A_RANK,
-                      method="讀 rank_bottlenecks() 的既有順序，本 view 不重排", unit="rank")
-                if value is not None else
-                missing(key, label, "這家公司不在 rows（可行動排序）內", authority=A_RANK)
-            )
-    else:
-        ranking_items.append(missing("actionable_rank", "可行動排序名次",
-                                     "本次未注入排序位置", authority=A_RANK))
+    # ⚠ 2026-09-23（Phase 0 Step 0b.3）：這裡原本有「可行動排序名次／候選總數」兩格（`ranking_position`）。
+    # 跨檔排序退役（G1／L19），名次格整組拿掉；結構段只剩結構事實。
     edges = tuple(
         StructuralEdgeItem(
             relation=str(e.get("relation") or ""), target=str(e.get("target") or ""),
@@ -1113,15 +1099,15 @@ def build_alpha_investment_view(
     elif context.graph.edges or context.graph.counter_paths:
         struct_status, struct_reason = "insufficient_evidence", "有邊但 Q1 算不出來：" + "；".join(build.notes)
     else:
-        struct_status, struct_reason = "missing", "圖中沒有這家公司的可行動瓶頸邊（可能是 substitutability 未填，不代表它不是瓶頸）"
+        struct_status, struct_reason = "missing", "圖中沒有這家公司 substitutability ≥ 4 的瓶頸邊（可能是未填，不代表它不是瓶頸）"
     structural_section = StructuralThesisSection(
         meta=SectionMeta(
             status=struct_status,
             basis="deterministic" if struct_status == "available" else "none",
-            authority=A_RANK, reason=struct_reason, as_of=graph_as_of,
+            authority=A_STRUCTURE, reason=struct_reason, as_of=graph_as_of,
             warnings=("結構重要 ≠ 可投資；瓶頸 ≠ 買進訊號。Q1 只是五分之一。",),
         ),
-        structural_score=q1, scarcity_inputs=scarcity_inputs, ranking=tuple(ranking_items),
+        structural_score=q1, scarcity_inputs=scarcity_inputs,
         edges=edges,
         supply_exposure=tuple(
             ExposureItem(direction=x.direction, counterparty=str(x.counterparty_id),

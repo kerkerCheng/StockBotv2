@@ -552,8 +552,8 @@ stable pq2 編號後不得只貼短標題或 `co:*` ID。決策行之下，每�
 ⚠ **[321] 起 registry 同時涵蓋追源，計數器必須加報「停滯 s」**——那是「看起來在等、但被動層
 不會再醒」的筆數，是這個機制唯一會安靜失效的地方，必須常駐可見（L14：防呆要自己出現）。
 `derived_from_blockers` 的等待項不需要 watch（每次 sync 重新推導），不算缺口。
-**Pane 1 末尾附 `query.bottleneck --by-sector` 的每產業 top-3**（含開頭兩條需求錨重疊警告）；
-分組解決可視性、分數不可跨組比較，單一排序仍是唯一權威；空產業組與「🔴 無需求錨」要現形。
+⚠ 2026-09-23（Phase 0 Step 0b.3）：原本「Pane 1 末尾附 `query.bottleneck --by-sector` 的每產業 top-3」——
+產業分組與 top-N 隨跨檔排序退役，`--by-sector` 旗標已不存在；Pane 1 不附任何分組或 top-N。
 
 ```
 # Daily Brief <YYYY-MM-DD> (Asia/Taipei)
@@ -603,7 +603,7 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 
 | 畫面 | 今天 | 較昨 |
 |---|---|---|
-| 結構表 `#/ranking` | N 條（**只印條數；不印首選、不印名次**——2026-09-22 排序退役） | — |
+| 結構表 `#/structure-table` | N 條邊（**只印條數；不印首選、不印名次**——2026-09-22 排序退役；路由 2026-09-23 改名） | — |
 | 資產配置 `#/beta` | 6 sleeve：低於 N／高於 N／到位 N | 無門檻跨越 |
 | 研究缺口 `#/coverage` | 🔴 真缺口 N／🟡 建模待補 N | ±0 |
 | 在等什麼 `#/watches` | 在等 N／停滯 N／fired 未消化 N／追源需處置 N | fired +1 |
@@ -725,7 +725,7 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 ### Step 7 — 收尾同步
 
 - **更新 APP 讀的畫面**（2026-09-08；2026-09-09 起加 `--registry-listed`，APP 73 檔每天更新）：
-  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --structure-readings`。
+  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --coverage --watches --positions --structure-readings`。
   ⚠ 2026-09-22（Step 0a.2）：`--basket` 已移除（籃子 filter 退役，候選狀態板 Phase 3 接手）。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。

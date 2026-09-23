@@ -161,57 +161,9 @@ def fetch_identity_alignment() -> dict[str, Any] | None:
     return compute_identity_alignment(graph_ids, registry_ids)
 
 
-def fetch_ranking_view(
-    *,
-    weakest_axes: Mapping[str, str] | None = None,
-    disproofs: Mapping[str, str] | None = None,
-    limit: int = 10,
-) -> dict[str, Any] | None:
-    """從 Neo4j 讀 assertion 並產生瓶頸排序視圖；讀不到就回 `None`。
-
-    取數住在這一層而不是 `alpha.ranking`：後者是純轉換層，不得 import
-    Neo4j driver（架構邊界由 `test_decision_lab_does_not_import_concrete_current_state_
-    authorities` 守著）。
-
-    ⚠ 失敗回 `None` 而不是空排序。`brief` 對 `None` 渲染的是「本次未提供排序資料」，
-    對空排序渲染的是「沒有候選」——那是兩件完全不同的事，壓成同一個訊號正是 L12
-    的形狀。這裡不吞成空 dict。
-    """
-
-    import os
-
-    from alpha.ranking import build_ranking_view
-    from query.bottleneck import fetch_assertions, rank_bottlenecks
-
-    password = os.environ.get("NEO4J_PASSWORD")
-    if not password:
-        _LOG.warning("ranking view unavailable: NEO4J_PASSWORD is not set")
-        return None
-    try:
-        from neo4j import GraphDatabase
-
-        driver = GraphDatabase.driver(
-            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
-        )
-        try:
-            with driver.session() as session:
-                rows = fetch_assertions(session)
-        finally:
-            driver.close()
-    except Exception as exc:  # noqa: BLE001 — 排序缺席只降級，不阻斷 brief
-        _LOG.warning("ranking view fetch failed: %s", exc, exc_info=True)
-        return None
-    try:
-        return build_ranking_view(
-            rank_bottlenecks(rows, get_registry()),
-            weakest_axes=weakest_axes,
-            disproofs=disproofs,
-            limit=limit,
-        )
-    except Exception as exc:  # noqa: BLE001 — docstring 承諾「讀不到回 None」，轉換例外同樣適用
-        _LOG.warning("ranking view transform failed: %s", exc, exc_info=True)
-        return None
+# ⚠ 2026-09-23（Phase 0 Step 0b.3）：`fetch_ranking_view`（Neo4j → rank_bottlenecks → alpha.ranking
+# 的排序視圖）隨跨檔排序退役（G1／L19）。結構事實走 `query/bottleneck.py::structure_table`，
+# APP 的 `structure_table` state kind 由 `webapp/materialize.py` 產生。
 
 
 _LOG = logging.getLogger(__name__)

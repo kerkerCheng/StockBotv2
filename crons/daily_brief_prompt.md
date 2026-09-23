@@ -208,7 +208,7 @@ X／EDGAR、Engine C ETL、today 與 todo pool 都在同一次執行完成。
    `source_trace_review go` 同樣執行 `.venv\Scripts\python.exe -m engine_b.todo dispatch <編號>`；只將
    exact lead 排回 pq1，不接受 claim、不提高 evidence tier，也不授權購買報告。pq1 prepare 出 RA 後，
    graph admission 仍是另一個 `ra_admission` pq2。
-8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --ranking --beta --coverage --watches --positions --structure-readings`，
+8. 收尾**先**執行 `.venv\Scripts\python.exe -m webapp materialize --tracked --registry-listed --structure-table --beta --coverage --watches --positions --structure-readings`，
    把 APP 讀的畫面與 registry 全部上市公司（73 檔；`--registry-listed` 是 materialize 自己的宇宙，**不動** pq1 的
    tracked 導出）更新成今天的資料（追蹤中標的由 `engine_b.routine_config` 導出，與 pq1 drain 同一個權威，
    不手寫清單）。它只寫 ignored derived cache（`library/private/app/`），**不寫任何 authority、不入圖、不建 decision**，
@@ -293,7 +293,7 @@ watch 的要逐項點名——那是回到純靠人記得的狀態，必須現�
 機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R；每檔閉環：到終局 T／未到終局 U，下一檔 X」——數字照抄 consume-fired／standing-go／backfill_fiscal_year_results 的輸出與
 `webapp status` 的「每檔閉環」行。任何一支沒跑成就寫「未跑：<原因>」，不得印 0。>
 <四個畫面由收尾的 materialize 更新；本段只印計數與較昨變動，完整內容不重印。
-一張四列小表：結構表 `#/ranking`（N 條；**只印條數，不印首選、不印名次**——排序已退役，2026-09-22 Step 0a.1／G1）｜資產配置 `#/beta`（低於／高於／到位各 N）｜
+一張四列小表：結構表 `#/structure-table`（N 條邊；**只印條數，不印首選、不印名次**——排序已退役，2026-09-22 Step 0a.1／G1；路由 2026-09-23 Step 0b.3 改名）｜資產配置 `#/beta`（低於／高於／到位各 N）｜
 研究缺口 `#/coverage`（🔴 真缺口 N／🟡 N）｜在等什麼 `#/watches`（在等 N／停滯 N／fired 未消化 N／追源需處置 N）。
 **有變動才展開**：sleeve 進出容忍區間、風控門檻跨越、缺口節點增減、watch 轉 fired／stalled，
 各一行寫清楚什麼變了。**「首選換人」已不是變動項**——沒有首選了。

@@ -205,7 +205,7 @@ class EngineCFundamentalsProvider:
 
         ⚠ **這裡刻意不換算成 USD**：那需要 FX，而 FX 要打外部——放在 provider 裡就等於
         每次 materialize 都打外部。正規化的責任在需要跨標的比較的那一層
-        （`scripts/alpha_screen_check.py` 已實作）。本函式只負責**讓單位跟著值走**。
+        （`alpha/providers/market_normalization.py`；Phase 3 候選板消費）。本函式只負責**讓單位跟著值走**。
         """
         from identity.registry import get_registry
 

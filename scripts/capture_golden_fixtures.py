@@ -130,7 +130,7 @@ def _graph_rows() -> list[dict]:
     load_dotenv(ROOT / ".env")
     from neo4j import GraphDatabase
     from identity.registry import get_registry
-    from query.bottleneck import fetch_assertions, rank_bottlenecks
+    from query.bottleneck import fetch_assertions, structure_table
 
     driver = GraphDatabase.driver(
         os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
@@ -139,24 +139,25 @@ def _graph_rows() -> list[dict]:
     try:
         with driver.session() as session:
             assertions = fetch_assertions(session)
-            ranked = rank_bottlenecks(assertions, get_registry())
+            table = structure_table(assertions, get_registry())
     finally:
         driver.close()
-    rows = ranked["rows"] if isinstance(ranked, dict) else ranked
-    return [dict(r) for r in rows]
+    return [dict(r) for r in table["rows"]]
 
 
 def cap_structural_bottleneck() -> dict:
+    # ⚠ 2026-09-23（Phase 0 Step 0b.3）：原本擷取「sub>=4 可行動排序」的前三名；排序退役後改擷取
+    # 結構表前三列（索引序，不是名次）。tracked 的 `structural_bottleneck.json` 是 2026-08 凍結的
+    # golden input，重跑本腳本會報它漂移——那是預期的，不是資料壞了。
     rows = _graph_rows()
-    top = rows[:3]
     return {
-        "top3": [{k: v for k, v in r.items() if k in
-                  ("company_id", "relation", "target_id", "substitutability",
-                   "sole_source", "evidence_class", "qualification_status",
-                   "demand_anchor")} for r in top],
+        "sample3": [{k: v for k, v in r.items() if k in
+                     ("company_id", "relation", "target_id", "substitutability",
+                      "sole_source", "evidence_class", "qualification_status",
+                      "demand_anchor")} for r in rows[:3]],
         "total_rows": len(rows),
-        "note": "sub>=4 的可行動排序。**唯一排序權威是 query/bottleneck.py**；"
-                "alpha 排序必須消費它，不得重算結構分",
+        "note": "結構表前三列（(company_id, relation, bottleneck) 字典序，**不是名次**）。"
+                "結構事實只有 query/bottleneck.py::structure_table 一份，不得重算結構分",
     }
 
 

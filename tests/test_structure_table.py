@@ -1,5 +1,9 @@
-"""瓶頸鏈排序：鎖住 2026-08-18 實際踩過的四個 bug。
+"""結構表（`query/bottleneck.py::structure_table`）：鎖住 2026-08-18 起實際踩過的缺陷。
 
+⚠ 2026-09-23（Phase 0 Step 0b.3）：本檔原名 `test_bottleneck_ranking.py`，守的是 `rank_bottlenecks()`。
+排序、兩份序、門檻與產業分組退役後，守排序鍵／門檻／落差註記的 5 條隨機制退役；其餘判準一字未改，
+只是主詞換成結構表——去重不放大、屬性逐條取最佳、需求鏈方向、證據分級、母體定義的 INV-3 計數、anchor gap 診斷。
+新增 3 條守退役後的形狀：沒有門檻、順序是索引不是名次、markdown 沒有名次欄與首選。
 每個 test 對應一個**跑出來才發現**的缺陷，不是假想的。
 """
 from __future__ import annotations
@@ -13,7 +17,7 @@ from query.bottleneck import (
     collapse_assertions,
     demand_chain,
     is_entity_id,
-    rank_bottlenecks,
+    structure_table,
 )
 
 
@@ -227,12 +231,15 @@ def test_evidence_is_three_way_and_unresolved_origin_does_not_auto_pass() -> Non
     )
 
 
-def test_claim_nodes_are_excluded_from_ranking() -> None:
-    """188 個 Claim 節點貼著 `:Entity` 標籤；真 Entity 一律有 `前綴:slug`。"""
+def test_claim_nodes_are_excluded_from_the_table() -> None:
+    """188 個 Claim 節點貼著 `:Entity` 標籤；真 Entity 一律有 `前綴:slug`。
+
+    Claim 在 `collapse_assertions` 就不成為 canonical edge（它不是 Entity），所以它不進母體計數；
+    「是 Entity 但不是公司」的排除（`not_company_source`）由母體報告那條測試守。"""
     assert is_entity_id("co:axt")
     assert not is_entity_id("axti_10_k_20260317_cl1")
 
-    result = rank_bottlenecks(
+    result = structure_table(
         [
             _row("axti_10_k_20260317_cl1", "supplies_to", "co:coherent", conf=0.9,
                  attrs={"substitutability": 5}),
@@ -242,11 +249,12 @@ def test_claim_nodes_are_excluded_from_ranking() -> None:
         _FakeRegistry(),
     )
     assert [r["company_id"] for r in result["rows"]] == ["co:axt"]
+    assert result["coverage"]["canonical_edges"] == 1 and result["population"]["input"] == 1
 
 
 def test_coverage_limits_are_always_reported() -> None:
     """已知限制必須隨輸出常駐，不得只寫在文件裡（L14）。"""
-    result = rank_bottlenecks(
+    result = structure_table(
         [_row("co:axt", "supplies_to", "co:coherent", conf=0.5,
               attrs={"substitutability": 4})],
         _FakeRegistry(),
@@ -261,41 +269,30 @@ def test_coverage_limits_are_always_reported() -> None:
         assert key in cov
 
 
-def test_structural_rows_ignore_evidence_and_expose_research_gap() -> None:
-    """純結構排序必須與可行動排序分離——否則排名反映的是研究深度，不是瓶頸性。
+def test_table_order_is_an_index_not_a_signal() -> None:
+    """列的順序是 `(company_id, relation, bottleneck)` 字典序——**沒有任何一格參與**。
 
-    事發（2026-08-21）：使用者指出「研究筆數多 → 證據強，但不代表瓶頸性強」。
-    查證屬實：rank_bottlenecks 的排序鍵把 EVIDENCE_RANK 放在 substitutability 之前，
-    而 evidence 最高級（externally_corroborated）必須靠研究找到客戶端文件才拿得到。
-    實測差異：可行動排序第 1 是 COHR→NVIDIA，純結構第 1 是 AVGO→CPO——同為 sub=5／
-    sole_source，但 AVGO 距需求端只有 1 跳。
+    ⚠ 2026-09-23（Step 0b.3）：這裡原本守「純結構排序與可行動排序分離」（2026-08-21 使用者指出
+    研究筆數多→證據強≠瓶頸性強）。兩份序都退役後，那個坑的新形狀是「第一列被讀成第一名」，
+    所以這條反過來鎖：把 sub、證據、sole_source 全部反轉，順序一格都不動。
     """
-
-    from query.bottleneck import rank_bottlenecks
 
     class _Reg:
         def research_ticker(self, company_id):
             return {"co:a": "AAA", "co:b": "BBB"}.get(company_id)
 
-    rows = [
-        # 結構較強（1 跳）但只有自報證據
-        {"src": "co:b", "relation": "supplies_to", "dst": "tech:ai_switch",
-         "substitutability": 5, "sole_source": True, "qualification_status": "designed_in",
-         "confidence": 0.8, "origin_entity": "co:b", "doc_id": "d1"},
-        # 結構較弱（2 跳）但有外部印證
-        {"src": "co:a", "relation": "supplies_to", "dst": "co:b",
-         "substitutability": 4, "sole_source": False, "qualification_status": "qualified",
-         "confidence": 0.8, "origin_entity": "third_party", "doc_id": "d2"},
-    ]
-    result = rank_bottlenecks(rows, _Reg())
-
-    assert "structural_rows" in result
-    assert len(result["structural_rows"]) == len(result["rows"])
-    # 純結構第一名的 substitutability 必須 >= 可行動第一名
-    if result["rows"] and result["structural_rows"]:
-        assert (result["structural_rows"][0]["substitutability"] or 0) >= (
-            result["rows"][0]["substitutability"] or 0
-        )
+    strong_b = {"src": "co:b", "relation": "supplies_to", "dst": "tech:ai_switch",
+                "substitutability": 5, "sole_source": True, "qualification_status": "designed_in",
+                "confidence": 0.8, "origin_entity": "co:b", "doc_id": "d1"}
+    weak_a = {"src": "co:a", "relation": "supplies_to", "dst": "co:b",
+              "substitutability": 2, "sole_source": False, "qualification_status": "sampling",
+              "confidence": 0.8, "origin_entity": "third_party", "doc_id": "d2"}
+    forward = structure_table([strong_b, weak_a], _Reg())
+    flipped = structure_table([dict(weak_a, substitutability=5, sole_source=True),
+                               dict(strong_b, substitutability=2, sole_source=False)], _Reg())
+    assert [r["company_id"] for r in forward["rows"]] == ["co:a", "co:b"]
+    assert [r["company_id"] for r in flipped["rows"]] == ["co:a", "co:b"]
+    assert "structural_rows" not in forward and "filter" not in forward
 
 
 def test_evidence_five_level_costly_and_joint() -> None:
@@ -334,12 +331,12 @@ def test_evidence_five_level_costly_and_joint() -> None:
 
 
 def test_presentation_text_has_one_home_and_the_markdown_prints_it() -> None:
-    """限制文字、兩份排序的說明與純結構表註記只有一份（L16）：markdown 從常數印，
+    """限制文字、表的註記與順序說明只有一份（L16）：markdown 從常數印，
     APP artifact（`webapp/materialize.py`）從同一批常數拿。抄第二份的那天起，後改的那份
     不會回頭更新前一份。"""
     from query.bottleneck import (
-        RANKING_TITLE, STRUCTURAL_TABLE_NOTE, TWO_RANKINGS_NOTE, known_limitations,
-        rank_bottlenecks, render_markdown, structural_gap_notes,
+        ORDER_NOTE, STRUCTURE_TABLE_NOTE, STRUCTURE_TABLE_TITLE, known_limitations,
+        render_markdown, structure_table,
     )
 
     rows = [
@@ -349,39 +346,34 @@ def test_presentation_text_has_one_home_and_the_markdown_prints_it() -> None:
         _row("co:axt", "supplies_to", "co:coherent", conf=0.8,
              attrs={"substitutability": 4}, origin="AXT"),
     ]
-    result = rank_bottlenecks(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry())
     md = render_markdown(result)
-    assert RANKING_TITLE in md
+    assert STRUCTURE_TABLE_TITLE in md
     for text in known_limitations(result["coverage"]):
         assert text in md
-    for text in TWO_RANKINGS_NOTE:
-        assert text in md
-    assert STRUCTURAL_TABLE_NOTE in md
-    notes = structural_gap_notes(result)
-    assert notes and all(rank is not None for _, rank, _ in notes)   # 兩份排序是同一批物件
-    for _, _, gap in notes:
-        if gap:
-            assert gap in md
+    assert STRUCTURE_TABLE_NOTE in md
+    assert ORDER_NOTE in md
 
 
-def test_sort_key_priority_anchor_first_then_evidence_or_substitutability() -> None:
-    """`SORT_KEY_DESCRIPTIONS` 是散文，會腐壞；這裡用行為鎖住它宣稱的前兩個優先序。"""
-    from query.bottleneck import SORT_KEY_DESCRIPTIONS, rank_bottlenecks
+def test_render_markdown_has_no_rank_column_and_no_top_pick() -> None:
+    """退役後的形狀：表頭沒有 `#`、沒有首選、沒有兩份序；母體報告有印（INV-3 的可見面）。"""
+    from query.bottleneck import render_markdown
 
-    assert SORT_KEY_DESCRIPTIONS["rows"][:2] == ("需求錨點可達", "證據等級")
-    assert SORT_KEY_DESCRIPTIONS["structural_rows"][:2] == ("需求錨點可達", "替代難度")
     rows = [
-        # 有錨、只有自報、sub 4
-        _row("co:axt", "supplies_to", "co:nvidia", conf=0.9,
-             attrs={"substitutability": 4}, origin="AXT"),
+        _row("co:axt", "supplies_to", "co:nvidia", conf=0.9, attrs={"substitutability": 4}, origin="AXT"),
         _row("co:nvidia", "supplies_to", "tech:ai_switch", conf=0.9, origin="NVIDIA"),
-        # 外部印證、sub 5、sole——但走不到任何錨
         _row("co:coherent", "supplies_to", "mat:nowhere", conf=0.9,
              attrs={"substitutability": 5, "sole_source": True}, origin="NVIDIA"),
     ]
-    result = rank_bottlenecks(rows, _FakeRegistry())
-    assert [r["company_id"] for r in result["rows"]] == ["co:axt", "co:coherent"]
-    assert [r["company_id"] for r in result["structural_rows"]] == ["co:axt", "co:coherent"]
+    md = render_markdown(structure_table(rows, _FakeRegistry()))
+    body = md.split(chr(10), 1)[1]                 # 標題那一句「不給首選」是禁止句，不算
+    assert "| # |" not in body
+    for banned in ("首選", "可行動排序", "純結構排序", "排序鍵", "現在要投"):
+        assert banned not in body, banned
+    assert "母體定義排除了誰（INV-3）" in md
+    assert "input 3｜accepted 3｜excluded 0" in md
+    # 走不到錨的列在表上（不是被濾掉），且讀法跟著印
+    assert "co:coherent（COHR）" in md and "🔴 無" in md and "無需求錨列的讀法" in md
 
 
 class _NamedRegistry(_FakeRegistry):
@@ -463,12 +455,12 @@ def test_single_stray_mention_cannot_lift_evidence() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 門檻是一個 filter，所以它必須報得出 input／accepted／filtered／reasons（INV-3）
+# 母體定義是一個 filter，所以它必須報得出 input／accepted／excluded／reasons（INV-3）
 # ---------------------------------------------------------------------------
 
-def _sub_edge(src, dst, sub, **extra):
+def _sub_edge(src, dst, sub, relation="supplies_to", **extra):
     row = {
-        "src": src, "relation": "supplies_to", "dst": dst,
+        "src": src, "relation": relation, "dst": dst,
         "attributes": {"substitutability": sub} if sub is not None else {},
         "confidence": 0.8, "origin": "Someone", "source_type": "filing",
         "source_doc_id": f"doc_{src}_{dst}", "published_at": "2026-01-01",
@@ -477,68 +469,48 @@ def _sub_edge(src, dst, sub, **extra):
     return row
 
 
-def test_threshold_reports_input_accepted_filtered_and_reasons() -> None:
-    """**先前這個門檻是靜默 `continue`**——被擋下的邊在任何下游層看到之前就消失了。
+def test_no_threshold_low_and_unfilled_substitutability_stay_on_the_table() -> None:
+    """**門檻退役**（2026-09-23）：sub 5、sub 2、未填三條邊都在表上，各自帶著自己的值。
 
-    空跑檢查：把 `filtered.append(...)` 改回單純 `continue` → 這條會紅。
+    2026-09-17 之前 sub<4 是靜默 `continue`，之後是帶理由的 `filtered_rows`；兩者都讓
+    「不是瓶頸」與「還沒研究」在下游只能靠另一張表分辨。現在它們就在同一張表上：
+    `substitutability` 是 2 還是 None，讀的人自己看得到。
+    空跑檢查：把 `_table_row` 前面加回 `if (sub or 0) < 4: continue` → 這條會紅。
     """
-    from query.bottleneck import rank_bottlenecks
-
     rows = [
-        _sub_edge("co:axt", "tech:x", 5),         # 通過
-        _sub_edge("co:coherent", "tech:x", 2),    # 已研究、低於門檻
-        _sub_edge("co:nvidia", "tech:x", None),   # 沒填
+        _sub_edge("co:axt", "tech:x", 5),
+        _sub_edge("co:coherent", "tech:x", 2),
+        _sub_edge("co:nvidia", "tech:x", None),
     ]
-    result = rank_bottlenecks(rows, _FakeRegistry())
-
-    report = result["filter"]
-    assert report["input"] == 3
-    assert report["accepted"] == 1
-    assert report["filtered"] == 2
-    # ⚠ 兩種理由**必須分得開**：一個要去補研究，一個已經有答案了（L12）。
-    assert report["reasons"] == {
-        "substitutability_unfilled": 1,
-        "substitutability_below_threshold": 1,
-    }
-    filtered = {r["company_id"]: r["reasons"][0] for r in result["filtered_rows"]}
-    assert filtered == {
-        "co:coherent": "substitutability_below_threshold",
-        "co:nvidia": "substitutability_unfilled",
-    }
+    result = structure_table(rows, _FakeRegistry())
+    by_company = {r["company_id"]: r["substitutability"] for r in result["rows"]}
+    assert by_company == {"co:axt": 5, "co:coherent": 2, "co:nvidia": None}
+    assert result["population"] == {**result["population"], "input": 3, "accepted": 3, "excluded": 0}
+    assert "threshold" not in result["rows"][0]
 
 
-def test_exposing_filtered_rows_does_not_change_the_ranking() -> None:
-    """新增 `filtered_rows` 是**純加法**：`rows` 與 `structural_rows` 一字未動。
+def test_population_rule_reports_input_accepted_excluded_and_reasons() -> None:
+    """**先前這兩種排除是靜默 `continue`**——不是公司的 src、不是向下的 relation。
 
-    `rank_bottlenecks()` 仍是唯一排序權威（ROADMAP 硬約束 4）——本次只是不再靜默丟棄。
+    空跑檢查：把 `excluded.append(...)` 改回單純 `continue` → 這條會紅。
     """
-    from query.bottleneck import rank_bottlenecks
+    rows = [
+        _sub_edge("co:axt", "tech:x", 5),                                   # 母體
+        _sub_edge("tech:x", "tech:y", 4, relation="is_component_of"),       # 不是向下
+        _sub_edge("tech:cpo", "tech:ai_switch", 5),                          # src 不是公司
+    ]
+    result = structure_table(rows, _FakeRegistry())
 
-    rows = [_sub_edge("co:axt", "tech:x", 5), _sub_edge("co:coherent", "tech:x", 2)]
-    result = rank_bottlenecks(rows, _FakeRegistry())
-
-    assert [r["company_id"] for r in result["rows"]] == ["co:axt"]
-    assert [r["company_id"] for r in result["structural_rows"]] == ["co:axt"]
-    # 被擋下的那條**不得**混進任何一份排序裡
-    assert all(r["company_id"] != "co:coherent" for r in result["rows"])
-    assert all(r["company_id"] != "co:coherent" for r in result["structural_rows"])
-
-
-def test_filtered_rows_carry_enough_to_act_on() -> None:
-    """下游要能問「那它還值得看嗎」，所以被擋下的列必須帶得出身分、卡點與成熟度。"""
-    from query.bottleneck import rank_bottlenecks
-
-    result = rank_bottlenecks(
-        [_sub_edge("co:coherent", "tech:x", 3, qualification_status="qualified")],
-        _FakeRegistry(),
-    )
-    row = result["filtered_rows"][0]
-    for key in ("company_id", "ticker", "bottleneck", "substitutability",
-                "threshold", "qualification_status", "evidence", "reasons"):
-        assert key in row, key
-    assert row["ticker"] == "COHR"
-    assert row["threshold"] == 4
-    assert row["qualification_status"] == "qualified"
+    report = result["population"]
+    assert report["input"] == 3 and report["accepted"] == 1 and report["excluded"] == 2
+    # ⚠ 兩種理由**必須分得開**：一個是關係方向，一個是節點型別（L12）。
+    assert report["reasons"] == {"not_downstream_relation": 1, "not_company_source": 1}
+    excluded = {(r["company_id"], r["relation"]): r["reasons"][0] for r in report["excluded_rows"]}
+    assert excluded == {("tech:x", "is_component_of"): "not_downstream_relation",
+                        ("tech:cpo", "supplies_to"): "not_company_source"}
+    assert set(report["reasons"]) <= set(report["reason_labels"])
+    for key in ("company_id", "relation", "bottleneck", "reasons"):
+        assert key in report["excluded_rows"][0], key
 
 
 def test_anchor_gap_causes_are_separable_and_never_collapse_into_one_reason() -> None:
@@ -588,12 +560,12 @@ def test_anchor_gap_causes_are_separable_and_never_collapse_into_one_reason() ->
     assert set(gaps["nodes"]) <= set(ANCHOR_GAP_CAUSES)
 
 
-def test_anchor_gap_diagnosis_does_not_touch_the_ranking() -> None:
-    """診斷是**新增輸出**，不是新的排序。
+def test_anchor_gap_diagnosis_does_not_touch_the_table() -> None:
+    """診斷是**另一段輸出**，不改列上任何一格。
 
-    AGENTS 明訂唯一排序權威是 `rank_bottlenecks()`，且「瓶頸節點接不接得到錢」與
-    「這家公司的產出有沒有人在花錢買」是兩個問題——2026-09-18 實測過把排序改成前者
-    會讓 accepted 列失去錨。本測試鎖住：加了診斷之後，排序輸出一個欄位都沒有動。
+    「瓶頸節點接不接得到錢」與「這家公司的產出有沒有人在花錢買」是兩個問題——
+    2026-09-18 實測過把列上的錨改成前者會讓多數列失去錨。本測試鎖住：加了診斷之後，
+    列上一個欄位都沒有動。
     """
     from query.bottleneck import classify_anchor_gaps
 
@@ -602,16 +574,16 @@ def test_anchor_gap_diagnosis_does_not_touch_the_ranking() -> None:
         _row("co:coherent", "is_component_of", "tech:ai_switch", conf=0.9),
         _row("co:nvidia", "depends_on", "tech:lonely", conf=0.9, attrs={"substitutability": 4}),
     ]
-    result = rank_bottlenecks(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry())
 
     assert "anchor_gaps" in result
-    # 排序本身：rows 的每一列都還帶著公司側的錨，診斷沒有把它換成節點側的。
+    # 表本身：rows 的每一列都還帶著公司側的錨，診斷沒有把它換成節點側的。
     for row in result["rows"]:
-        assert "anchor_gap" not in row, "診斷不得滲進排序列"
+        assert "anchor_gap" not in row, "診斷不得滲進表的列"
     axt = [r for r in result["rows"] if r["company_id"] == "co:axt"]
     assert axt and axt[0]["demand_anchor"] == "tech:ai_switch"
 
-    # 診斷自己算得出東西，但它的母體與排序列無關。
+    # 診斷自己算得出東西，但它的母體與表的列無關。
     edges = list(collapse_assertions(rows).values())
     standalone = classify_anchor_gaps(edges, build_upward_index(edges))
     assert standalone["counts"] == result["anchor_gaps"]["counts"]
@@ -630,7 +602,7 @@ def test_anchor_gap_section_prints_even_when_nothing_is_missing() -> None:
         _row("co:axt", "supplies_to", "co:coherent", conf=0.9, attrs={"substitutability": 5}),
         _row("co:coherent", "is_component_of", "tech:ai_switch", conf=0.9),
     ]
-    result = rank_bottlenecks(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry())
     assert result["anchor_gaps"]["without_anchor"] == 0
     assert result["anchor_gaps"]["population"] > 0
 
@@ -639,7 +611,7 @@ def test_anchor_gap_section_prints_even_when_nothing_is_missing() -> None:
     assert "每一個瓶頸節點都走得到需求錨" in text
 
     # 母體真的是 0（沒有任何向下邊）時才可以不印——那時是真的沒東西可算。
-    empty = rank_bottlenecks(
+    empty = structure_table(
         [_row("co:axt", "is_component_of", "tech:ai_switch", conf=0.9)], _FakeRegistry()
     )
     assert empty["anchor_gaps"]["population"] == 0

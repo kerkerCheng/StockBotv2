@@ -198,7 +198,7 @@ def test_daily_prompt_points_at_where_the_panes_live_now() -> None:
     ⚠ 2026-09-08 由「必須印完整四 pane」改寫。合法前提只有一個：內容在別處已經讀得到（L13）。
     """
     text = DAILY.read_text(encoding="utf-8")
-    for pointer in ("#/ranking", "#/beta", "#/coverage", "#/watches"):
+    for pointer in ("#/structure-table", "#/beta", "#/coverage", "#/watches"):
         assert pointer in text, f"prompt 沒有指出 {pointer}"
     # 部位與問責 2026-09-08 也搬進 APP，Daily 只印變動；兩種報酬的錨點語意必須標明
     assert "#/positions" in text

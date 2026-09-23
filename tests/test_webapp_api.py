@@ -415,7 +415,7 @@ def test_full_detail_has_exactly_one_level_of_expansion() -> None:
 def test_list_is_grouped_but_the_order_inside_a_group_is_untouched(client) -> None:
     """分組**不是排序**。
 
-    `AGENTS.md`：唯一排序權威是 `rank_bottlenecks()`，且研究完整度不得拿來排序。
+    `AGENTS.md`：不得輸出跨檔全序或首選，且研究完整度不得拿來排序。
     「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果——
     LYC.AX 是 ready，隱含報酬 −35.7%。分段解決「打開第一屏全是空的」這個真實問題，
     但組內順序必須一個字都沒動，否則它就變成第二套投資排序了。

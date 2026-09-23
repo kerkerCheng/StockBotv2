@@ -682,11 +682,13 @@ def build_positions(*, state_dir: Path | None) -> Section:
         f"歸零旗標彙總：{_WIPEOUT_ROLLUP_ABSENCE.reason}（{_WIPEOUT_ROLLUP_ABSENCE.kind}）"
         "　←逐檔那盞燈仍在個股頁，停的只有這個彙總計數")
 
-    ranking, rank_absence = _load_state(state_dir, "ranking")
-    if rank_absence is not None:
-        section.lines.append(f"需求錨集中度：{rank_absence.reason}（{rank_absence.kind}）")
+    # ⚠ 2026-09-23（Step 0b.3）：原本讀 `ranking` kind 的可行動排序列；跨檔排序退役後改讀 `structure_table`
+    # 的逐邊列（含未填與低分的邊）。這一行量的是**相關性**（N 檔不等於 N 個獨立機會），不是排序。
+    table, table_absence = _load_state(state_dir, "structure_table")
+    if table_absence is not None:
+        section.lines.append(f"需求錨集中度：{table_absence.reason}（{table_absence.kind}）")
     else:
-        rows = ranking.get("rows") or []
+        rows = table.get("rows") or []
         anchors: dict[str, int] = {}
         for row in rows:
             anchors[str(row.get("demand_anchor") or "（走不到錨）")] = (
@@ -695,7 +697,7 @@ def build_positions(*, state_dir: Path | None) -> Section:
         top = sorted(anchors.items(), key=lambda kv: -kv[1])[:3]
         shape = "、".join(f"{k} {v}" for k, v in top)
         section.lines.append(
-            f"可投資排序 {len(rows)} 列分佈在 {len(anchors)} 個需求錨（前三：{shape}）"
+            f"結構表 {len(rows)} 條邊分佈在 {len(anchors)} 個需求錨（前三：{shape}）"
             f"——**N 檔不等於 N 個獨立機會**"
         )
 

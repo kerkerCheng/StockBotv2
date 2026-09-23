@@ -257,17 +257,8 @@ def _read_abstentions(ticker: str) -> list[Any]:
 # 同批移除——它們沒有呼叫端了。三本 ledger 檔案留在 `library/private/alpha/`（L10），但沒有任何消費端。
 
 
-def _ranking_position(graph: Any, company_id: CompanyId, *, as_of: date | None) -> Mapping[str, Any] | None:
-    try:
-        rows = list(graph.get_bottlenecks(as_of=as_of))
-    except Exception:  # noqa: BLE001
-        return None
-    rank = None
-    for index, row in enumerate(rows, 1):
-        if str(row.company_id) == str(company_id):
-            rank = index
-            break
-    return {"actionable_rank": rank, "actionable_total": len(rows)}
+# ⚠ 2026-09-23（Phase 0 Step 0b.3）：`_ranking_position`（可行動排序名次）與 `tickers_from_ranking`
+# （由排序前段挑 Alpha Card 的標的）隨跨檔排序退役（G1／L19）。
 
 
 def fetch_alpha_investment_view(
@@ -327,7 +318,6 @@ def fetch_alpha_investment_view(
         estimate_revision = revision_fn(resolved_ticker, as_of=as_of) if callable(revision_fn) else None
         causal = (_causal_inputs(graph_provider, company_id, as_of=as_of, today=today)
                   if include_causal else {"causal_reason": "本次未取因果路徑（--no-causal）"})
-        ranking_position = _ranking_position(graph_provider, company_id, as_of=as_of)
         try:
             records, _ = assumption_ledger.read_assumption_records(str(resolved_ticker))
         except Exception:  # noqa: BLE001 — 假設 ledger 讀不到只影響催化劑熟成度與 refresh，不讓 view 失敗
@@ -458,7 +448,7 @@ def fetch_alpha_investment_view(
         supply_exposure=causal.get("supply_exposure", ()),
         impacts=causal.get("impacts", ()), structural_events=causal.get("structural_events", ()),
         causal_reason=causal.get("causal_reason"),
-        ranking_position=ranking_position, estimate_revision=estimate_revision,
+        estimate_revision=estimate_revision,
         decision_facts=decision_facts, decision_facts_reason=decision_reason,
         catalyst_checkpoints=checkpoints, checkpoint_source=checkpoint_source,
         thesis_lifecycle=lifecycle_entry, checklist=checklist, identity=identity,
@@ -477,23 +467,6 @@ def fetch_alpha_investment_view(
     )
 
 
-def tickers_from_ranking(ranking: Mapping[str, Any] | None, *, limit: int = 5) -> list[str]:
-    """由 `alpha.ranking.build_ranking_view` 的輸出取可行動排序前段的 ticker（去重、保序）。
-
-    ⚠ 順序＝排序權威的順序，本函式不重排。
-    """
-    if not ranking:
-        return []
-    seen: list[str] = []
-    for row in ranking.get("actionable") or []:
-        ticker = row.get("ticker")
-        if ticker and str(ticker) not in seen:
-            seen.append(str(ticker))
-        if len(seen) >= limit:
-            break
-    return seen
-
-
 def fetch_alpha_cards(
     tickers: Iterable[str], *, today: date | None = None,
     graph_provider: Any = None, fundamentals_provider: Any = None,
@@ -501,8 +474,8 @@ def fetch_alpha_cards(
     """Daily Brief 用：每檔一張精簡卡。單檔失敗只降級成 `status=unavailable` 那一列，
     不丟掉、不阻斷（INV-3）。
 
-    provider **整批共用一份**：Neo4j provider 會把 `rank_bottlenecks()` 快取在 instance 上，
-    每檔各開一個 driver 等於把 663 條 assertion 的排序算 N 次。呼叫端沒注入時這裡開一次、
+    provider **整批共用一份**：Neo4j provider 會把 `structure_table()` 快取在 instance 上，
+    每檔各開一個 driver 等於把 663 條 assertion 的表建 N 次。呼叫端沒注入時這裡開一次、
     最後關一次。
     """
     tickers = list(tickers)
@@ -545,5 +518,4 @@ def fetch_alpha_cards(
 __all__ = [
     "DECISION_DB", "JUDGMENT_DIR", "LEGACY_JUDGMENT_DIR", "STRUCTURAL_EVENT_LOOKBACK_DAYS",
     "fetch_alpha_cards", "fetch_alpha_investment_view", "locate_judgment", "resolve_company",
-    "tickers_from_ranking",
 ]

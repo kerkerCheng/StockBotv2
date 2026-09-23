@@ -772,9 +772,9 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
         print(f"另有 {len(unavailable)} 個 cohort 的 Shadow 是 `unavailable`，無錨點可計算。")
 
     # 等權重聚合（2026-09-02 ROADMAP 交付）：AGENTS outcome 契約的量測基準——
-    # 「推薦籃子」以每檔等權計，回答排序整體有沒有跑贏。錨點日各異，
-    # 這是跨持有期的粗聚合，明標不是回測；前段 vs 後段對照需排序歷史快照
-    #（本腳本已開始 append，見 _append_ranking_snapshot），累積後才能算。
+    # 研究 cohort 以每檔等權計。錨點日各異，這是跨持有期的粗聚合，明標不是回測。
+    # ⚠ 2026-09-23（Phase 0 Step 0b.3）：原本另 append 當日**排序**快照當前／後段對照的史料
+    # （`_append_ranking_snapshot`）；跨檔排序退役，那一段整個拿掉，`ranking_order_snapshots.jsonl` 留檔不再寫。
     aggregate = equal_weight_aggregate(results)
     # V4 的分母是「寫了賭注的檔」，與追蹤表的分母無關——所以它在 `if` 外面算也在外面印。
     # 追蹤表空的時候賭注收斂仍然有話可說（反之亦然），綁在一起會讓其中一邊靜默消失。
@@ -783,7 +783,7 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
         line = f"\n**等權重聚合（{aggregate['n']} 檔）：絕對 {_pct(aggregate['absolute'])}"
         if aggregate["excess"] is not None:
             line += f"｜超額({PRIMARY_BENCHMARK}) {_pct(aggregate['excess'])}"
-        line += "**——各檔錨點日不同，粗聚合非回測；前/後段對照待排序快照累積"
+        line += "**——各檔錨點日不同，粗聚合非回測"
         print(line)
         power = power_law_aggregate(results)
         for text in render_power_law(power):
@@ -793,7 +793,6 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
     for text in render_bet_convergence(convergence):
         print(text)
 
-    _append_ranking_snapshot()
     _render_live_lane(results, _live_fills())
     _render_chase_check(results)
 
@@ -854,44 +853,6 @@ def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None,
             "".join(_json.dumps(r, ensure_ascii=False) + chr(10) for r in rows),
             encoding="utf-8")
     except OSError:
-        pass
-
-
-def _append_ranking_snapshot() -> None:
-    """append 當日 actionable 排序順序到 jsonl——前/後段對照的史料從今天開始累積。
-
-    best-effort：排序取不到（無 Neo4j 等）就靜默略過，不影響唯讀報告本體。
-    同一天重跑只留第一筆（append-only、日期去重）。
-    """
-    import json as _json
-
-    out = Path("library/private/decision_lab/ranking_order_snapshots.jsonl")
-    today = date.today().isoformat()
-    try:
-        if out.exists():
-            for raw in out.read_text(encoding="utf-8").splitlines():
-                try:
-                    if _json.loads(raw).get("date") == today:
-                        return
-                except ValueError:
-                    continue
-        from engine_d_runtime.adapters import fetch_ranking_view
-
-        view = fetch_ranking_view(limit=50)
-        if not view:
-            return
-        order = [
-            e.get("company_id")
-            for e in view.get("actionable") or []
-            if e.get("company_id")
-        ]
-        if not order:
-            return
-        out.parent.mkdir(parents=True, exist_ok=True)
-        with out.open("a", encoding="utf-8") as fh:
-            fh.write(_json.dumps({"date": today, "actionable_order": order}) + "\n")
-        print(f"\n（排序快照已 append：{len(order)} 檔 → {out.name}）")
-    except Exception:  # noqa: BLE001 — 快照缺一天不影響報告
         pass
 
 

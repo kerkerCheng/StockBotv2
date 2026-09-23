@@ -11,7 +11,6 @@ from typing import Any, Mapping, TextIO
 
 from .action_card import RedactionError, assert_safe_payload, build_action_card, render_markdown
 from .bootstrap import open_default_store
-from .brief import ranking_annotations
 from .execution import (
     ExecutionError,
     assess_probe,
@@ -397,33 +396,18 @@ def run(
             from engine_d_runtime.adapters import (
                 fetch_identity_alignment,
                 fetch_nav_exposure,
-                fetch_ranking_view,
             )
 
-            annotations = ranking_annotations(store, as_of=evaluation_at)
-            ranking = _optional(
-                lambda: fetch_ranking_view(
-                    weakest_axes=annotations["weakest_axes"],
-                    disproofs=annotations["disproofs"],
-                )
-            )
+            # ⚠ 2026-09-23（Phase 0 Step 0b.3）：瓶頸排序（`fetch_ranking_view`）與由排序前段挑出的
+            # Alpha Card 摘要隨跨檔排序退役（G1／L19）。alpha_cards 注入 None＝「未提供」，不是「沒有候選」。
             nav_exposure = _optional(fetch_nav_exposure)
             identity_alignment = _optional(fetch_identity_alignment)
-            # Alpha Card 精簡摘要（2026-09-05）：對可行動排序前段的標的各組一份 canonical
-            # view 再壓成一列。同樣 fail-soft：整批讀不到就 None（「未提供」），單檔讀不到
-            # 由 fetch_alpha_cards 自己降級成那一列的 unavailable。沒有排序就沒有候選 → None。
-            from briefing.alpha_view.sources import fetch_alpha_cards, tickers_from_ranking
-
-            alpha_cards = (
-                _optional(lambda: fetch_alpha_cards(tickers_from_ranking(ranking)))
-                if ranking else None
-            )
+            alpha_cards = None
             brief = build_today_brief(
                 store,
                 as_of=evaluation_at,
                 current_holdings=holdings,
                 provider=runtime,
-                ranking=ranking,
                 nav_exposure=nav_exposure,
                 identity_alignment=identity_alignment,
                 alpha_cards=alpha_cards,

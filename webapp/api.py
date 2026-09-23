@@ -94,7 +94,7 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/meta",
             f"GET /api/{API_VERSION}/stocks",
             f"GET /api/{API_VERSION}/stocks/{{ticker}}",
-            f"GET /api/{API_VERSION}/ranking",
+            f"GET /api/{API_VERSION}/structure-table",
             f"GET /api/{API_VERSION}/beta",
             f"GET /api/{API_VERSION}/coverage",
             f"GET /api/{API_VERSION}/watches",
@@ -103,8 +103,8 @@ async def meta(request: Request) -> Response:
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
             "沒有 runtime LLM：APP 讀已經形成的判讀，不在點擊時產生新判斷。",
-            "不重算排序：/api/v1/ranking 照抄 materialize 當下 rank_bottlenecks() 的輸出（唯一排序權威）；"
-            "APP 不重排、不加權、不自建第二套結構評分。",
+            "不重算、不排序：/api/v1/structure-table 照抄 materialize 當下 structure_table() 的輸出（逐邊結構事實）；"
+            "APP 不重排、不加權、不自建第二套結構評分；跨檔排序與首選已於 2026-09-23 退役。",
             "沒有部位尺寸：買多少、什麼時候買由使用者自行判斷並手動下單。",
         ],
     }
@@ -174,10 +174,9 @@ async def stocks(request: Request) -> Response:
         overview["generated_at"] = payload["generated_at"]
         overview["research_context_digest"] = payload.get("research_context_digest")
         items.append(overview)
-    # 分組**不是排序**。`AGENTS.md`：唯一排序權威是 rank_bottlenecks()，且研究完整度不得
-    # 拿來排序——「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果
-    # （LYC.AX 是 ready，隱含報酬 −35.7%）。分段解決「打開第一屏全是空的」這個真實問題，
-    # 又不製造第二套投資排序：**組內順序一個字都沒動**（仍是字母序）。
+    # 分組**不是排序**。`AGENTS.md`：不得輸出跨檔全序或首選，且研究完整度不得
+    # 拿來排序——「ready 排最上面」會被讀成「最值得看」，而 ready 與值不值得投相關但非因果。
+    # 分段解決「打開第一屏全是空的」這個真實問題，又不製造第二套投資排序：**組內順序一個字都沒動**（仍是字母序）。
     items.sort(key=lambda row: (_GROUP_ORDER.get(_group_of(row), 9), str(row.get("ticker") or "")))
     for row in items:
         row["group"] = _group_of(row)
@@ -191,8 +190,8 @@ async def stocks(request: Request) -> Response:
         "view_counters": _view_counters(items),
         "unavailable": unavailable,
         "correlation_warning": _CORRELATION_WARNING,
-        "group_note": "分組是研究完整度，**不是投資排序**——組內順序未改動（字母序），"
-                      "唯一排序權威仍是 /api/v1/ranking 照抄的 rank_bottlenecks()。",
+        "group_note": "分組是研究完整度，**不是投資排序**——組內順序未改動（字母序）；"
+                      "跨檔排序已退役，結構事實住 /api/v1/structure-table。",
     })
 
 
@@ -217,8 +216,8 @@ async def stock_detail(request: Request) -> Response:
 
 #: 每種 state kind 的「讀不到 vs 沒結論」說明——兩者不得同形，所以要各自講清楚。
 _STATE_NOTES = {
-    "ranking": ("跑 `python -m webapp materialize --ranking`",
-                "「artifact 讀不到」與「排不出任何一列」是兩件事——後者會以 200 ＋ top_pick=null ＋ top_pick_absent_reason 回。"),
+    "structure_table": ("跑 `python -m webapp materialize --structure-table`",
+                        "「artifact 讀不到」與「母體為空」是兩件事——後者會以 200 ＋ rows=[] ＋ population 計數回。"),
     "beta": ("跑 `python -m webapp materialize --beta`",
              "「artifact 讀不到」與「配置算不出來」是兩件事——後者會以 200 ＋ allocation.status=unavailable ＋ 理由回。"),
     "coverage": ("跑 `python -m webapp materialize --coverage`",
@@ -260,9 +259,9 @@ async def _serve_state(request: Request, kind: str) -> Response:
     return _json(body)
 
 
-async def ranking(request: Request) -> Response:
-    """跨標的瓶頸排序（`rank_bottlenecks()` 的輸出照抄）。"""
-    return await _serve_state(request, "ranking")
+async def structure_table(request: Request) -> Response:
+    """跨標的結構表（`structure_table()` 的輸出照抄；不排序、沒有首選）。"""
+    return await _serve_state(request, "structure_table")
 
 
 async def beta(request: Request) -> Response:
@@ -364,7 +363,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route("/static/{asset}", static_asset, methods=["GET"]),
         Route(f"/api/{API_VERSION}/health", health, methods=["GET"]),
         Route(f"/api/{API_VERSION}/meta", meta, methods=["GET"]),
-        Route(f"/api/{API_VERSION}/ranking", ranking, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/structure-table", structure_table, methods=["GET"]),
         Route(f"/api/{API_VERSION}/beta", beta, methods=["GET"]),
         Route(f"/api/{API_VERSION}/coverage", coverage, methods=["GET"]),
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),

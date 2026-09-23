@@ -1036,230 +1036,12 @@ async function renderDetail(ticker) {
   window.scrollTo(0, 0);
 }
 
-/* ---------- 籃子（V3；ranking × 各檔 overview × positions 的 join；順序照抄、首選是 filter） ---------- */
+/* ---------- 結構表（structure_table state；照抄 structure_table() 的輸出，不重排、不加權、沒有名次） ----------
+   ⚠ 2026-09-23（Phase 0 Step 0b.3）：這一頁原本是「瓶頸排序」（首選、可行動／純結構兩份序、產業別分組、
+   落差註記）；跨檔排序退役（G1／L19）後只剩逐邊的結構事實。列序是 (company_id, relation, bottleneck)
+   字典序——索引不是名次，畫面上沒有 # 欄。籃子頁與多年視角頁（0a.2 退役 kind）的程式碼同批移除。 */
 
-function pctCell(value) { return returnCell(value); }
-
-const BASKET_COLUMNS = [
-  { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
-  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id, company_label: row.company_label }, set) },
-  { title: '同一個賭注的群', cell: (row) => el('td', 'nowrap dim', row.sector || '—') },
-  { title: '賭什麼', cell: (row) => {
-      // Q2（2026-09-17）：三種狀態必須在畫面上分得出來——「刻意不主張」是研究結論（settled），
-      // 「欠一個答案」是待辦。壓成同一句「還沒寫賭注」等於把結論與待辦混成一格（L12）。
-      const c = el('td', 'wrap');
-      if (row.our_bet) c.textContent = row.our_bet;
-      else if (row.bet_state === 'bet') c.textContent = '（有賭注，還沒寫短評）';
-      else if (row.bet_state === 'abstained') {
-        c.appendChild(el('span', 'badge badge-settled', '刻意不主張'));
-        if (row.bet_absence_reason) c.appendChild(el('div', 'note', row.bet_absence_reason));
-      } else {
-        c.appendChild(el('span', 'badge badge-blocked', '欠一個答案'));
-      }
-      return c;
-    } },
-  { title: '賭對，漲跌', cell: (row) => pctCell(row.payoff) },
-  { title: '沒賭對，漲跌', cell: (row) => pctCell(row.base_return) },
-  { title: '裁決點', cell: (row) => {
-      const r = row.ripeness;
-      return el('td', 'nowrap', r && r.linked ? `已裁決 ${r.resolved}／${r.linked}` : '—');
-    } },
-  { title: '市場承認了嗎', cell: (row) => {
-      const c = el('td', 'nowrap');
-      if (typeof row.consensus_moved === 'number') c.textContent = `共識朝我們 ${fmtPercent(row.consensus_moved)}（${row.consensus_points} 次）`;
-      else c.textContent = '—';
-      return c;
-    } },
-  { title: '部位', cell: (row) => {
-      const c = el('td', 'nowrap');
-      if (row.position) c.textContent = `持有 ${fmtNumber(row.position.shares, 2)} 股（${fmtPercent(row.position.live_return)}）`;
-      else c.appendChild(el('span', 'dim', '未持有'));
-      return c;
-    } },
-  { title: 'filter', cell: (row) => {
-      const c = el('td', 'nowrap');
-      if (row.passes_filter) c.appendChild(el('span', 'badge badge-ready', '通過'));
-      else c.textContent = (row.filter_reasons || []).map((k) => ((BASKET_VOCAB && BASKET_VOCAB[k]) || k)).join('；');
-      return c;
-    } },
-];
-let BASKET_VOCAB = null;
-
-/* 量的候選（Q1，2026-09-17）：被門檻擋下、但已研究過的那些。**另一個問題、另一組條件、沒有排序。** */
-const VOLUME_COLUMNS = [
-  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id, company_label: row.company_label }, set) },
-  { title: '卡在哪', cell: (row) => el('td', 'nowrap dim', row.bottleneck || '—') },
-  { title: '替代難度', cell: (row) => el('td', 'nowrap', `${row.substitutability ?? '—'}（門檻 ${row.threshold ?? '—'}）`) },
-  { title: '出貨了嗎', cell: (row) => {
-      const c = el('td', 'nowrap');
-      const shipping = row.qualification_status === 'qualified' || row.qualification_status === 'designed_in';
-      if (shipping) c.appendChild(el('span', 'badge badge-ready', row.qualification_status));
-      else c.appendChild(el('span', 'dim', row.qualification_status || '未填'));
-      return c;
-    } },
-  { title: '需求錨', cell: (row) => el('td', 'nowrap dim', row.demand_anchor || '（走不到）') },
-  { title: '賭什麼', cell: (row) => {
-      const c = el('td', 'wrap');
-      if (row.our_bet) c.textContent = row.our_bet;
-      else if (row.bet_state === 'bet') c.textContent = '（有賭注，還沒寫短評）';
-      else if (row.bet_state === 'abstained') c.appendChild(el('span', 'badge badge-settled', '刻意不主張'));
-      else c.appendChild(el('span', 'badge badge-blocked', '欠一個答案'));
-      return c;
-    } },
-  { title: 'filter', cell: (row) => {
-      const c = el('td', 'nowrap');
-      if (row.passes_filter) c.appendChild(el('span', 'badge badge-ready', '通過'));
-      else c.textContent = (row.filter_reasons || []).map((k) => ((VOLUME_VOCAB && VOLUME_VOCAB[k]) || k)).join('；');
-      return c;
-    } },
-];
-let VOLUME_VOCAB = null;
-
-
-// Phase 7 Step 7.4（2026-09-19）：「要幾倍，哪一格得為真」。
-// ⚠ 這一頁**只讀已 materialize 的 artifact**，一個數都不算——多年橋是金融模型，
-// 而 APP 呈現契約禁止 request path 跑模型。要更新就跑 `python -m webapp materialize --multi-year`。
-async function renderMultiYear() {
-  markNav('multi-year');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/multi-year`);
-  } catch (err) {
-    renderStateError(err, '讀不到多年視角');
-    return;
-  }
-  app.textContent = '';
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  app.appendChild(head);
-
-  const intro = el('section', 'panel callout');
-  intro.appendChild(el('p', 'arg-text', payload.this_is_not || ''));
-  const counts = payload.counts || {};
-  // ⚠ 四種缺席各自現形，不併成一個「還沒寫」（INV-3）：「我們還沒寫目標年度」是待辦，
-  // 「方法不適用」是已經算過而且知道答案沒有意義，兩者要做的事完全不同。
-  const absences = [
-    counts.no_horizon ? `還沒寫下目標年度 ${counts.no_horizon}` : '',
-    counts.method_not_applicable ? `方法不適用 ${counts.method_not_applicable}` : '',
-    counts.no_judgment ? `沒有判斷檔 ${counts.no_judgment}` : '',
-    counts.other_missing ? `其他缺料 ${counts.other_missing}` : '',
-  ].filter(Boolean);
-  intro.appendChild(el('p', 'note',
-    `${counts.input || 0} 檔｜算得出 ${counts.available || 0}`
-    + (absences.length ? `｜${absences.join('｜')}` : '')));
-  app.appendChild(intro);
-
-  (payload.rows || []).forEach((row) => {
-    const card = el('section', 'panel');
-    card.appendChild(el('h2', null, row.ticker));
-    if (row.status !== 'available') {
-      // ⚠ 「還沒有人寫下來」與「這一檔沒有多年主張」是兩件事——理由逐字印出來，不壓成一句。
-      card.appendChild(el('p', 'note', row.reason || '算不出來'));
-      app.appendChild(card);
-      return;
-    }
-    card.appendChild(el('p', 'note',
-      `目標年度 ${row.horizon}｜基期 ${row.base_period}｜距離 ${row.span_years} 年`
-      + `｜現價 ${row.current_price}｜目標倍數 ${row.target_multiple}x`));
-    if (row.multiple_source) card.appendChild(el('p', 'note', row.multiple_source));
-    (row.bridge_warnings || []).forEach((w) => card.appendChild(el('p', 'note', w)));
-    const table = el('table', 'rank compare');
-    const thead = el('thead');
-    const hr = el('tr');
-    ['倍率', '需要 EPS', '比錨點高', '解得出來的', '拉到極限也做不到'].forEach((label) => {
-      hr.appendChild(el('th', null, label));
-    });
-    thead.appendChild(hr);
-    table.appendChild(thead);
-    const tbody = el('tbody');
-    (row.ladder || []).forEach((step) => {
-      const tr = el('tr');
-      tr.appendChild(el('td', null, `${step.multiple}x`));
-      tr.appendChild(el('td', null, step.required_eps == null ? '—' : step.required_eps.toFixed(2)));
-      tr.appendChild(el('td', null, signedPct(step.required_gap, 0)));
-      const solved = (step.solutions || []).filter((s) => s.status === 'solved')
-        .map((s) => `${s.driver}[${s.scope}] = ${s.implied_value == null ? '—' : s.implied_value.toPrecision(4)}`);
-      tr.appendChild(el('td', null, solved.length ? solved.join('；') : '—'));
-      tr.appendChild(el('td', null, (step.unreachable || []).join('、') || '—'));
-      tbody.appendChild(tr);
-    });
-    table.appendChild(tbody);
-    card.appendChild(table);
-    app.appendChild(card);
-  });
-}
-
-async function renderBasket() {
-  markNav('basket');
-  let payload;
-  try {
-    payload = await getJSON(`${API}/basket`);
-  } catch (err) {
-    renderStateError(err, '讀不到籃子');
-    return;
-  }
-  BASKET_VOCAB = (payload.filter || {}).reason_labels || {};
-  const detailSet = new Set(payload.analyst_view_tickers || []);
-  app.textContent = '';
-  footerWarning.textContent = payload.correlation_warning || '';
-  const head = el('div', 'detail-head');
-  head.appendChild(el('h1', null, payload.title));
-  app.appendChild(head);
-
-  // 首選（filter 的結果）或它為什麼缺席——兩者不同形。
-  const pick = el('section', 'panel callout');
-  if (payload.top_pick) {
-    const p = payload.top_pick;
-    pick.appendChild(el('h2', null, `首選：${p.ticker}（結構第 ${p.rank}）`));
-    if (p.our_bet) pick.appendChild(el('p', 'arg-text', p.our_bet));
-    pick.appendChild(el('p', 'note', `賭對漲跌 ${fmtPercent(p.payoff)}｜群：${p.sector || '—'}｜${p.note}`));
-  } else {
-    pick.appendChild(el('h2', null, '目前沒有首選'));
-    pick.appendChild(el('p', 'arg-text', payload.top_pick_absent_reason || ''));
-  }
-  const f = payload.filter || {};
-  pick.appendChild(el('p', 'note', `filter：${f.input} 檔進來、${f.accepted} 檔通過、${f.filtered} 檔被擋。${f.rule || ''}`));
-  // 賭注帳（Q2）：每一列強制二選一，欠帳會自己出現在首屏——不是要人翻表才看得到（L14）。
-  const bl = payload.bet_ledger;
-  if (bl) {
-    pick.appendChild(mdParagraph(
-      `賭注帳：有賭注 ${bl.bet}｜刻意不主張 ${bl.abstained}｜**欠一個答案 ${bl.unanswered}**`
-      + (bl.owed && bl.owed.length ? `（${bl.owed.join('、')}）` : ''), 'note'));
-    pick.appendChild(mdParagraph(bl.rule || '', 'note'));
-  }
-  app.appendChild(pick);
-
-  const sec = el('section', 'panel');
-  sec.appendChild(el('h2', null, `全部（${(payload.rows || []).length} 檔，順序＝瓶頸排序）`));
-  sec.appendChild(rankTable(payload.rows || [], BASKET_COLUMNS, detailSet));
-  (payload.correlation_notes || []).forEach((t) => sec.appendChild(el('p', 'warn', '▲ ' + t)));
-  app.appendChild(sec);
-
-  // 第二個宇宙（Q1）：**分開呈現、分開判定**——另一個問題，不與上面那份比較、不合併計數。
-  const vf = payload.volume_filter;
-  if (vf) {
-    VOLUME_VOCAB = vf.reason_labels || {};
-    const vol = el('section', 'panel');
-    vol.appendChild(el('h2', null, `量的候選（${(payload.volume_rows || []).length} 家；已研究、低於門檻）`));
-    vol.appendChild(mdParagraph(vf.universe_note || '', 'note'));
-    vol.appendChild(mdParagraph(vf.order_note || '', 'note'));
-    vol.appendChild(el('p', 'note', `filter：${vf.input} 家進來、${vf.accepted} 家通過、${vf.filtered} 家被擋。`));
-    const vbl = payload.volume_bet_ledger;
-    if (vbl) {
-      vol.appendChild(mdParagraph(
-        `賭注帳：有賭注 ${vbl.bet}｜刻意不主張 ${vbl.abstained}｜**欠一個答案 ${vbl.unanswered}**`
-        + (vbl.owed && vbl.owed.length ? `（${vbl.owed.join('、')}）` : ''), 'note'));
-    }
-    vol.appendChild(rankTable(payload.volume_rows || [], VOLUME_COLUMNS, detailSet));
-    (vf.missing_criteria || []).forEach((t) => vol.appendChild(el('p', 'warn', '▲ 今天還沒有資料源：' + t)));
-    app.appendChild(vol);
-  }
-  app.appendChild(stateFooter(payload, '這份籃子不是什麼'));
-}
-
-/* ---------- 瓶頸排序（跨標的 state；照抄 rank_bottlenecks 的輸出，不重排、不加權） ---------- */
-
-let RANK_VOCAB = null;
+let TABLE_VOCAB = null;
 
 function markNav(name) {
   document.querySelectorAll('.nav a').forEach((link) => {
@@ -1297,7 +1079,7 @@ function mdParagraph(text, className) {
 
 /** sole_source 是三態：true／false／null。**null 是「未填」，不是 false**——畫面必須分得出來。 */
 function soleSourceBadge(value) {
-  const table = (RANK_VOCAB && RANK_VOCAB.sole_source_states) || {};
+  const table = (TABLE_VOCAB && TABLE_VOCAB.sole_source_states) || {};
   let text; let key;
   if (value === true) { text = '獨家供應'; key = 'true'; }
   else if (value === false) { text = '有第二來源'; key = 'false'; }
@@ -1383,60 +1165,30 @@ function rankTable(rows, columns, detailSet) {
   return wrap;
 }
 
-const ACTIONABLE_COLUMNS = [
-  { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
+/* 沒有 # 欄：列序是索引不是名次。 */
+const TABLE_COLUMNS = [
   { title: '標的', cell: companyCell },
   { title: '卡在哪一層', cell: edgeCell },
   { title: '有多難換掉', cell: subCell },
   { title: '證據強度', cell: (row) => { const c = el('td', 'nowrap', row.evidence_label || row.evidence); c.title = row.evidence; return c; } },
   { title: '合格狀態', cell: (row) => el('td', 'nowrap', row.qualification_status || '—') },
+  { title: '離花錢的人幾步', cell: (row) => el('td', 'nowrap', hopsText(row)) },
   { title: '誰在花錢', cell: anchorCell },
 ];
 
-const STRUCTURAL_COLUMNS = [
-  { title: '#', cell: (row) => el('td', 'rank-num', row.rank) },
-  { title: '標的', cell: companyCell },
-  { title: '卡在哪一層', cell: edgeCell },
-  { title: '有多難換掉', cell: subCell },
-  { title: '離花錢的人幾步', cell: (row) => el('td', 'nowrap', hopsText(row)) },
-  { title: '目前證據強度', cell: (row) => { const c = el('td', 'nowrap', row.evidence_label || row.evidence); c.title = row.evidence; return c; } },
-  { title: '落差', cell: (row) => {
-      const cell = el('td', 'dim nowrap');
-      if (row.gap_note) cell.textContent = row.gap_note;
-      else if (row.actionable_rank) cell.textContent = `可行動排序第 ${row.actionable_rank}`;
-      else cell.textContent = '—';
-      return cell;
-    } },
-];
-
-function renderRankingError(err) {
-  app.textContent = '';
-  const box = el('div', 'error');
-  const detail = (err.body && err.body.error) || {};
-  box.appendChild(el('h2', null, '讀不到瓶頸排序'));
-  box.appendChild(el('p', null, detail.reason || detail.message || 'request failed'));
-  if (detail.remedy) {
-    const p = el('p', 'note');
-    p.appendChild(document.createTextNode('修法：'));
-    p.appendChild(el('code', null, detail.remedy));
-    box.appendChild(p);
-  }
-  if (detail.note) box.appendChild(el('p', 'note', detail.note));
-  app.appendChild(box);
-}
-
-async function renderRanking() {
-  markNav('ranking');
+async function renderStructureTable() {
+  markNav('structure-table');
   let payload;
   try {
-    payload = await getJSON(`${API}/ranking`);
+    payload = await getJSON(`${API}/structure-table`);
   } catch (err) {
-    renderRankingError(err);
+    renderStateError(err, '讀不到結構表');
     return;
   }
-  RANK_VOCAB = payload.vocab || {};
+  TABLE_VOCAB = payload.vocab || {};
   const detailSet = new Set(payload.analyst_view_tickers || []);
   const notes = payload.notes || {};
+  const rows = payload.rows || [];
   app.textContent = '';
   footerWarning.textContent = payload.correlation_warning || '';
 
@@ -1453,31 +1205,7 @@ async function renderRanking() {
   head.appendChild(badges);
   app.appendChild(head);
 
-  // ① 首選：authority 的第 1 名，不是本畫面的判斷。
-  const pick = el('section', 'panel callout');
-  pick.appendChild(el('h2', null, '現在要投哪一檔'));
-  if (payload.top_pick) {
-    const p = payload.top_pick;
-    const line = el('div', 'pick-line');
-    line.appendChild(el('span', 'pick-rank', '#1'));
-    if (p.ticker && detailSet.has(p.ticker)) {
-      const link = el('a', 'ticker-link', p.ticker);
-      link.href = '#/' + encodeURIComponent(p.ticker);
-      line.appendChild(link);
-    } else {
-      line.appendChild(el('span', 'ticker-plain', p.ticker || '—'));
-    }
-    line.appendChild(el('span', 'company', p.company_label || p.company_id));
-    line.appendChild(el('span', 'dim', `${p.relation} →`));
-    line.appendChild(el('code', null, p.bottleneck));
-    pick.appendChild(line);
-    pick.appendChild(el('p', 'note', p.note));
-  } else {
-    pick.appendChild(el('p', 'note', payload.top_pick_absent_reason || '無候選'));
-  }
-  app.appendChild(pick);
-
-  // ② 已知限制：契約說「解讀前必讀」，所以不摺疊。
+  // ① 已知限制：契約說「解讀前必讀」，所以不摺疊。
   const limits = el('section', 'panel');
   limits.appendChild(el('h2', null, '🔴 已知限制，解讀前必讀'));
   const ol = el('ol', 'limits');
@@ -1494,70 +1222,63 @@ async function renderRanking() {
     `｜lead time 有值 ${cov.edges_with_lead_time} 條`));
   app.appendChild(limits);
 
-  // ③ 可行動排序
-  const sortKeys = (RANK_VOCAB.sort_keys) || {};
+  // ② 結構表：全部列、沒有名次、沒有首選。
   const sec1 = el('section', 'panel');
-  sec1.appendChild(el('h2', null, `可行動排序（${payload.rows.length} 條）——現在能投什麼`));
-  sec1.appendChild(el('div', 'panel-questions', '排序鍵優先序（不是加權）：' + (sortKeys.rows || []).join(' › ')));
-  if (payload.rows.length) sec1.appendChild(rankTable(payload.rows, ACTIONABLE_COLUMNS, detailSet));
-  else sec1.appendChild(el('p', 'empty', '（無符合門檻的瓶頸邊）'));
+  sec1.appendChild(el('h2', null, `結構表（${rows.length} 條邊）——卡在哪、多難繞、誰在花錢`));
+  if (notes.order) sec1.appendChild(mdParagraph(notes.order, 'panel-questions'));
+  if (rows.length) sec1.appendChild(rankTable(rows, TABLE_COLUMNS, detailSet));
+  else sec1.appendChild(el('p', 'empty', '（母體為空：沒有任何公司→向下的邊）'));
+  if (notes.no_anchor_reading) sec1.appendChild(mdParagraph(notes.no_anchor_reading));
+  if (notes.table) sec1.appendChild(mdParagraph(notes.table));
   app.appendChild(sec1);
 
-  // ④ 純結構排序
+  // ③ 瓶頸節點走不到需求錨：診斷，不改上表任何一格。
+  const gaps = payload.anchor_gaps || {};
   const sec2 = el('section', 'panel');
-  sec2.appendChild(el('h2', null, '純結構排序（只看多卡，不看證據）——該去補誰的證據'));
-  sec2.appendChild(el('div', 'panel-questions', '排序鍵優先序（不是加權）：' + (sortKeys.structural_rows || []).join(' › ')));
-  (notes.two_rankings || []).forEach((text) => sec2.appendChild(mdParagraph(text)));
-  const structural = payload.structural_rows || [];
-  const shown = structural.slice(0, 10);
-  if (shown.length) sec2.appendChild(rankTable(shown, STRUCTURAL_COLUMNS, detailSet));
-  else sec2.appendChild(el('p', 'empty', '（無）'));
-  if (structural.length > shown.length) {
-    const rest = structural.slice(shown.length);
-    sec2.appendChild(drill(`展開：其餘 ${rest.length} 條`, () => rankTable(rest, STRUCTURAL_COLUMNS, detailSet)));
+  if (gaps.population) {
+    sec2.appendChild(el('h2', null, `瓶頸節點走不到需求錨：${gaps.without_anchor}／${gaps.population} 個（診斷，不改上表）`));
+    if (gaps.this_is_not) sec2.appendChild(mdParagraph(gaps.this_is_not));
+    if (!gaps.without_anchor) {
+      sec2.appendChild(el('p', 'note', '✅ 母體裡每一個瓶頸節點都走得到需求錨（這一行會出現，就代表檢查真的跑過了）。'));
+    } else {
+      const ul = el('ul', 'notes');
+      Object.entries(gaps.counts || {}).forEach(([cause, count]) => {
+        if (!count) return;
+        const sample = ((gaps.nodes || {})[cause] || []).slice(0, 3).map((n) => n.node).join('、');
+        const li = el('li', null, `${cause}：${count} 個（例：${sample}）`);
+        li.appendChild(el('div', 'dim', (gaps.cause_labels || {})[cause] || ''));
+        ul.appendChild(li);
+      });
+      sec2.appendChild(ul);
+    }
+  } else {
+    sec2.appendChild(el('h2', null, '瓶頸節點走不到需求錨'));
+    sec2.appendChild(el('p', 'note', '母體為 0（圖空或查詢失敗），這段沒有東西可算。'));
   }
-  if (notes.structural_table) sec2.appendChild(mdParagraph(notes.structural_table));
   app.appendChild(sec2);
 
-  // ⑤ 產業別分組：解決可視性，不解決可比性。
+  // ④ 母體定義排除了誰（INV-3 的可見面）。
+  const pop = payload.population || {};
   const sec3 = el('section', 'panel');
-  sec3.appendChild(el('h2', null, '產業別分組（解決可視性，分數不可跨組比較）'));
-  (payload.correlation_notes || []).forEach((text) => sec3.appendChild(el('p', 'warn', '⚠ ' + text)));
-  if (payload.empty_sectors && payload.empty_sectors.length) {
-    sec3.appendChild(el('p', 'warn', '🔴 空產業組（sub 覆蓋未及，研究缺口）：' + payload.empty_sectors.join('、')));
-  }
-  if (notes.no_anchor_reading) sec3.appendChild(mdParagraph(notes.no_anchor_reading));
-  const byRank = {};
-  payload.rows.forEach((row) => { byRank[row.rank] = row; });
-  (payload.sectors || []).forEach((sector) => {
-    const box = el('div', 'sector');
-    box.appendChild(el('div', 'group-title', `${sector.sector}（可行動 ${sector.actionable_count} 條）`));
-    const ul = el('ul', 'notes');
-    sector.actionable_ranks.slice(0, 3).forEach((rank) => {
-      const row = byRank[rank];
-      if (!row) return;
-      const hasSub = row.substitutability !== null && row.substitutability !== undefined;
-      ul.appendChild(el('li', null,
-        `#${row.rank} ${row.ticker || '—'}（${row.company_label || row.company_id}） ${row.relation} → ${row.bottleneck}` +
-        `｜sub ${hasSub ? row.substitutability : '未填'}${row.sole_source === true ? '｜sole_source' : ''}` +
-        `｜${row.evidence_label || row.evidence}`));
-    });
-    if (sector.structural_first) {
-      const f = sector.structural_first;
-      ul.appendChild(el('li', 'dim', `↳ 純結構第一（該去補證據的）：${f.ticker || f.company_id} → ${f.bottleneck}`));
-    }
-    box.appendChild(ul);
-    sec3.appendChild(box);
+  sec3.appendChild(el('h2', null, '母體定義排除了誰（INV-3）'));
+  sec3.appendChild(el('p', 'note', `input ${pop.input}｜accepted ${pop.accepted}｜excluded ${pop.excluded}`));
+  if (pop.rule) sec3.appendChild(mdParagraph(pop.rule));
+  const reasons = el('ul', 'notes');
+  Object.entries(pop.reasons || {}).forEach(([reason, count]) => {
+    const li = el('li', null, `${reason}：${count} 條`);
+    li.appendChild(el('div', 'dim', (pop.reason_labels || {})[reason] || ''));
+    reasons.appendChild(li);
   });
+  sec3.appendChild(reasons);
   app.appendChild(sec3);
 
-  // ⑥ 需求鏈
+  // ⑤ 需求鏈
   const sec4 = el('section', 'panel');
   sec4.appendChild(el('h2', null, '需求鏈（誰在花錢 → 這家公司）'));
-  sec4.appendChild(drill(`展開：每一列的鏈路（${payload.rows.length}）`, () => {
+  sec4.appendChild(drill(`展開：每一列的鏈路（${rows.length}）`, () => {
     const ul = el('ul', 'notes');
-    payload.rows.forEach((row) => {
-      const li = el('li', null, `#${row.rank} ${row.company_id} ${row.relation} ${row.bottleneck}`);
+    rows.forEach((row) => {
+      const li = el('li', null, `${row.company_id} ${row.relation} ${row.bottleneck}`);
       const sub = el('div', 'dim');
       if (row.chain && row.chain.length) sub.textContent = row.chain.join(' → ') + `　（距需求端 ${row.demand_hops} 跳）`;
       else sub.appendChild(mdInline(notes.no_anchor_chain || ''));
@@ -1568,27 +1289,17 @@ async function renderRanking() {
   }));
   app.appendChild(sec4);
 
-  // ⑦ 新鮮度與 authority
-  const f = payload.freshness || {};
-  const sec5 = el('section', 'panel');
-  sec5.appendChild(el('h2', null, '這份排序有多新'));
-  const rows = el('div', 'rows');
-  rows.appendChild(kv('materialize 於', `${f.generated_at}（${Number(f.age_hours).toFixed(1)} 小時前，${f.state}）`));
-  rows.appendChild(kv('排序權威', `${payload.authority.function}（${payload.authority.command}）`));
-  rows.appendChild(kv('視角', pit.mode === 'as_of' ? `as-of ${payload.as_of}` : '現況'));
-  if (pit.excluded) rows.appendChild(kv('as-of 視角排除的 assertion', JSON.stringify(pit.excluded)));
-  rows.appendChild(kv('新鮮度身分', payload.freshness_identity));
-  rows.appendChild(kv('artifact content digest', payload.content_digest));
-  sec5.appendChild(rows);
-  sec5.appendChild(el('p', 'note', f.rule || ''));
-  sec5.appendChild(el('p', 'note', payload.authority.note || ''));
-  app.appendChild(sec5);
-
-  // ⑧ 這份排序不是什麼
-  const sec6 = el('section', 'panel');
-  sec6.appendChild(el('h2', null, '這份排序不是什麼'));
-  sec6.appendChild(listOf(payload.this_is_not || []));
-  app.appendChild(sec6);
+  // ⑥ 視角與新鮮度：as-of 排除的 assertion 計數不得消失（INV-3）。
+  if (pit.excluded) {
+    const sec5 = el('section', 'panel');
+    sec5.appendChild(el('h2', null, '這份表的視角'));
+    const kvs = el('div', 'rows');
+    kvs.appendChild(kv('視角', pit.mode === 'as_of' ? `as-of ${payload.as_of}` : '現況'));
+    kvs.appendChild(kv('as-of 視角排除的 assertion', JSON.stringify(pit.excluded)));
+    sec5.appendChild(kvs);
+    app.appendChild(sec5);
+  }
+  app.appendChild(stateFooter(payload, '這份結構表不是什麼'));
   window.scrollTo(0, 0);
 }
 
@@ -2671,10 +2382,9 @@ async function route() {
       const meta = await getJSON(`${API}/meta`);
       VOCAB = meta.vocabularies || {};
     }
-    // `ranking` 是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
-    if (target === 'basket') await renderBasket();
-    else if (target === 'multi-year') await renderMultiYear();
-    else if (target === 'ranking') await renderRanking();
+    // `structure-table` 等含連字號的路徑是保留字：ticker 一律大寫（store 的 slug 規則），所以不會撞到真實代碼。
+    // ⚠ 2026-09-23（Step 0b.3）：`#/ranking`（瓶頸排序）→ `#/structure-table`；`#/basket`／`#/multi-year` 路由同批移除。
+    if (target === 'structure-table') await renderStructureTable();
     else if (target === 'beta') await renderBeta();
     else if (target === 'coverage') await renderCoverage();
     else if (target === 'watches') await renderWatches();

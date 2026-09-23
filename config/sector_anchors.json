@@ -1,9 +1,9 @@
 {
   "_doc": [
-    "產業別分排序（--by-sector）的錨→產業對照（docs/brainstorms/2026-08-31-industry-sector-ranking-requirements.md A 案）。",
-    "分組解決可視性不解決可比性：分數不可跨組比較（證據密度不同）。",
-    "未映射的 demand anchor 自動以錨 id 自成一組（不靜默丟失）；無錨列「🔴 無需求錨」組——那是該補研究的訊號。",
-    "correlation_notes 是分組呈現時必附的需求錨重疊警告（N 產業 ≠ N 個獨立賭注）。"
+    "需求錨（demand anchor）的 SSOT：所有 sectors 底下的 anchors 就是 query/bottleneck.py 走需求鏈時認的錨白名單（[323]）。",
+    "錨→產業對照另供 alpha/providers/closure.py 判「所屬產業尚無 ready 檔」（研究佇列的分散度判準）。",
+    "⚠ 2026-09-23（Phase 0 Step 0b.3）：產業別分排序（--by-sector）與籃子頁的「同一個賭注的群」隨跨檔排序退役；本檔不再驅動任何排序或分組呈現。",
+    "correlation_notes 是需求錨重疊警告（N 產業 ≠ N 個獨立賭注）；APP 頁尾的相關性警告另有 SSOT，這裡的兩句目前沒有消費端。"
   ],
   "sectors": {
     "AI 光互連／CPO": ["tech:ai_switch", "tech:optical_scale_up", "tech:scale_across"],

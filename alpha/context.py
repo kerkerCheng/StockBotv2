@@ -137,6 +137,9 @@ def build_research_context(
     if rows:
         # 取這家公司**最強的一條瓶頸邊**當 Q1 的輸入。
         # ⚠ 不平均、不加總——多條邊不會讓一條弱的邊變強（補償性）。
+        # ⚠ 同分（sub、sole 都一樣）取**第一個**：那個「第一個」是 provider 在同一家公司內排好的
+        # 「證據強的先」（`graph_neo4j.py::_bottleneck_rows`），不是任何跨檔順序。2026-09-23 排序退役時
+        # 實測過：沒有那個順序，AXTI／LITE 的 Q1 會同分取到另一條邊，qualification 加成跟著變。
         best = max(rows, key=lambda r: (r.inputs.substitutability or 0,
                                         bool(r.inputs.sole_source)))
         scarcity = best.inputs

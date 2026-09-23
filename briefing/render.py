@@ -12,12 +12,7 @@ from __future__ import annotations
 
 from typing import Any, Mapping
 
-from alpha.brief import (
-    render_outcome_aggregate,
-    render_position_events,
-    render_ranking,
-    render_ready_not_ranked,
-)
+from alpha.brief import render_outcome_aggregate, render_position_events
 from decision_lab.action_card import assert_safe_payload
 from portfolio.brief import render_nav_exposure
 from shared.markdown import markdown_text, pct
@@ -233,12 +228,9 @@ def render_today_markdown(brief: Mapping[str, Any]) -> str:
 
     assert_safe_payload(brief)
     blockers = "、".join(markdown_text(item) for item in brief.get("blockers") or []) or "無"
-    # 首屏是瓶頸排序——系統的終點是「哪些標的值得看」，不是「今天要不要動作」。
-    lines = render_ranking(brief.get("ranking"))
-    lines += render_ready_not_ranked(brief.get("ready_not_ranked"))
-    # Alpha Card 精簡摘要緊接排序之後：它回答「排序第一名到底知道什麼、還不知道什麼」，
-    # 是排序的補充不是替代。完整卡片走 `python -m briefing alpha-card <TICKER>`。
-    lines += render_alpha_cards(brief.get("alpha_cards"), present="alpha_cards" in brief)
+    # ⚠ 2026-09-23（Phase 0 Step 0b.3）：首屏原本是瓶頸排序＋「研究完整但不在排序內」清單，
+    # 隨跨檔排序退役（G1／L19）。首屏改由 Alpha Card 摘要起頭；完整卡片走 `python -m briefing alpha-card <TICKER>`。
+    lines = render_alpha_cards(brief.get("alpha_cards"), present="alpha_cards" in brief)
     lines += render_nav_exposure(brief.get("nav_exposure"))
     lines += [
         f"# 今天需要動作嗎？{'是' if brief['action_needed'] else '否'}",

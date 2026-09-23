@@ -67,28 +67,21 @@ def test_today_brief_passes_alpha_cards_through_and_keeps_none_distinct(tmp_path
         store.close()
 
 
-def test_alpha_cards_sit_between_ranking_and_nav(tmp_path: Path) -> None:
-    """首屏順序：排序 → Alpha Card 摘要 → NAV。摘要是排序的補充，不是替代。"""
+def test_alpha_cards_sit_before_nav(tmp_path: Path) -> None:
+    """首屏順序：Alpha Card 摘要 → NAV。
+    ⚠ 2026-09-23（Step 0b.3）：原本前面還有瓶頸排序與 `ready_not_ranked`，隨跨檔排序退役；兩鍵不得再出現。"""
     store = _store(tmp_path)
     try:
         brief = build_today_brief(store, as_of=NOW, current_holdings={"status": "available", "rows": []},
                                   alpha_cards=[_card()])
         keys = list(brief)
-        assert keys.index("ready_not_ranked") < keys.index("alpha_cards") < keys.index("nav_exposure")
+        assert "ranking" not in keys and "ready_not_ranked" not in keys
+        assert keys.index("alpha_cards") < keys.index("nav_exposure")
         text = render_today_markdown(brief)
-        assert text.index("瓶頸排序") < text.index("Alpha Card 摘要") < text.index("持股 NAV 比例")
+        assert "瓶頸排序" not in text
+        assert text.index("Alpha Card 摘要") < text.index("持股 NAV 比例")
     finally:
         store.close()
-
-
-def test_tickers_from_ranking_preserves_authority_order_and_dedupes() -> None:
-    from briefing.alpha_view.sources import tickers_from_ranking
-
-    ranking = {"actionable": [{"ticker": "COHR"}, {"ticker": "COHR"}, {"ticker": "LITE"},
-                              {"ticker": None}, {"ticker": "AXTI"}]}
-    assert tickers_from_ranking(ranking) == ["COHR", "LITE", "AXTI"]
-    assert tickers_from_ranking(ranking, limit=2) == ["COHR", "LITE"]
-    assert tickers_from_ranking(None) == []
 
 
 def test_fetch_alpha_cards_degrades_per_ticker_not_whole_batch(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -136,8 +129,8 @@ def test_fetch_view_with_injected_providers_and_no_private_authorities(
     assert view.catalysts.narrative.status == "missing"
     assert view.fundamentals.checklist[0].status == "missing"
     assert view.structural_thesis.structural_score.is_known         # Q1 仍算得出
-    ranking = {d.key: d for d in view.structural_thesis.ranking}
-    assert ranking["actionable_rank"].value == 1
+    # ⚠ 2026-09-23（Step 0b.3）：結構段的「可行動排序名次」格隨跨檔排序退役
+    assert not hasattr(view.structural_thesis, "ranking")
     # FakeGraphResearchProvider 的 get_structural_changes_since 會回一個事件 → 二階影響也接得上
     assert view.causal_paths.meta.status == "available"
 

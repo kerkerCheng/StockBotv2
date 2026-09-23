@@ -46,7 +46,7 @@ def test_candidates_are_joined_to_current_holdings() -> None:
 
 
 def test_incoming_order_is_preserved_because_ranking_lives_elsewhere() -> None:
-    """唯一排序權威是 `rank_bottlenecks`；這一層不重排、不加權。
+    """跨檔排序已退役（2026-09-23）；這一層本來就不重排、不加權，順序只是進來的順序。
 
     空跑檢查：在 `build_alpha_candidate_exposure` 裡依 `nav_pct` 排序 → 這條會紅。
     """

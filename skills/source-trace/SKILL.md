@@ -138,7 +138,7 @@ Referer；不得使用外洩鏡像、共用登入或規避限制的代理／快�
 **`isolated_tier_3`／`lead_only_tier_4` park 前多做一步（2026-08-31 定案）：** 若截圖/轉述
 含可結構化的具體主張（誰供應誰、誰付錢給誰），park 時同步建假設
 （`python -m engine_b.hypotheses add`，見 `docs/OPERATIONS.md`「截圖假設層」）＋跑一次
-`query.bottleneck --what-if`：**純結構名次有動的**才升高追平行證據的優先權（可掛
+`query.bottleneck --what-if`：**結構表有動的（多一列、或錨可達性／sub 改變；2026-09-23 起不比名次）**才升高追平行證據的優先權（可掛
 fact_verification watch）；沒動的照常 park——沉底從此是計算結果不是黑洞。假設永不入圖、
 永不參與 evidence 分級；入圖唯一路徑仍是本 skill 的一手取得流程。
 

@@ -770,47 +770,6 @@ MUTATIONS: tuple[Mutation, ...] = (
         ),
         guards="as-of 投影的唯一時間線索被靜默清空，且不會有任何東西報錯",
     ),
-    Mutation(
-        name="價格往前補（拿未來的價當進場價）",
-        path="alpha/backtest.py",
-        old="        if not day or day > target:\n            continue",
-        new="        if not day:\n            continue",
-        test=(
-            "tests/test_alpha_backtest.py::"
-            "test_prices_are_never_carried_forward_from_the_future"
-        ),
-        guards="在一份專門檢查 lookahead 的模組裡，這是最不能犯的錯",
-    ),
-    Mutation(
-        name="缺價的標的被靜默丟棄",
-        path="alpha/backtest.py",
-        old="            missing.append(ticker)\n            continue",
-        new="            continue",
-        test=(
-            "tests/test_alpha_backtest.py::"
-            "test_missing_prices_are_named_not_silently_dropped"
-        ),
-        guards="L13：「排序沒用」與「資料缺一半」不得同形",
-    ),
-    Mutation(
-        name="算不出報酬時回 0.0 而不是 None",
-        path="alpha/backtest.py",
-        old="    if not returns:\n        return None, tuple(missing)",
-        new="    if not returns:\n        return 0.0, tuple(missing)",
-        test="tests/test_alpha_backtest.py::test_no_data_is_none_not_zero",
-        guards="L12：「沒資料」與「持平」是兩件事",
-    ),
-    Mutation(
-        name="先切前後段再剔除缺價",
-        path="alpha/backtest.py",
-        old="    half = len(priced) // 2\n    top, bottom = priced[:half], priced[-half:]",
-        new="    half = len(ranked) // 2\n    top, bottom = ranked[:half], ranked[-half:]",
-        test=(
-            "tests/test_alpha_backtest.py::"
-            "test_unpriced_names_are_removed_before_the_split_not_after"
-        ),
-        guards="缺價的多半是非美股，它們在排序裡不是均勻分布的",
-    ),
     # ---- Phase 4c：下一會計年度營收共識 ------------------------------------
     Mutation(
         name="共識取不到時回 0 而不是 None",
@@ -855,7 +814,7 @@ MUTATIONS: tuple[Mutation, ...] = (
             "tests/test_portfolio_alpha_exposure.py::"
             "test_incoming_order_is_preserved_because_ranking_lives_elsewhere"
         ),
-        guards="唯一排序權威是 rank_bottlenecks，不得另建平行排序",
+        guards="跨檔排序已退役（2026-09-23）；portfolio 層不得自建任何順序",
     ),
     Mutation(
         name="沒有 ticker 的 signal 被靜默丟棄",
@@ -867,17 +826,6 @@ MUTATIONS: tuple[Mutation, ...] = (
             "test_signals_without_a_ticker_are_listed_not_dropped"
         ),
         guards="INV-3：被 filter 掉的 item 必須說得出理由",
-    ),
-    Mutation(
-        name="極端值不現形",
-        path="alpha/backtest.py",
-        old="        if not self.contributions:\n            return None",
-        new="        if True:\n            return None",
-        test=(
-            "tests/test_alpha_backtest.py::"
-            "test_the_dominant_name_is_surfaced_not_removed"
-        ),
-        guards="一檔 +334% 撐起整期價差，只看平均完全看不出來",
     ),
     Mutation(
         name="子命令 handler 退回 lazy import 的 lambda",
@@ -978,12 +926,12 @@ MUTATIONS: tuple[Mutation, ...] = (
         guards="這一層存在的理由就是分辨知識種類；人填的紀錄不得冒充規則算出來的",
     ),
     Mutation(
-        name="rank_bottlenecks 把未填的 sole_source 壓成 False",
+        name="structure_table 把未填的 sole_source 壓成 False",
         path="query/bottleneck.py",
-        old="                \"sole_source\": edge.sole_source,",
-        new="                \"sole_source\": bool(edge.sole_source),",
-        test="tests/test_sole_source_tristate.py::test_rank_bottlenecks_keeps_unknown_sole_source_as_none_not_false",
-        guards="三態：未填是 None 不是 False；壓平發生在排序權威就沒有任何下游救得回來",
+        old="        \"sole_source\": edge.sole_source,",
+        new="        \"sole_source\": bool(edge.sole_source),",
+        test="tests/test_sole_source_tristate.py::test_structure_table_keeps_unknown_sole_source_as_none_not_false",
+        guards="三態：未填是 None 不是 False；壓平發生在結構表就沒有任何下游救得回來",
     ),
     Mutation(
         name="Engine D 唯讀查詢忽略 as_of 過濾",

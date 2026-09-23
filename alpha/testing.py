@@ -88,8 +88,7 @@ class FakeGraphResearchProvider:
         )
 
     def get_bottlenecks(
-        self, *, sector: str | None = None, min_substitutability: int = 4,
-        as_of: date | None = None,
+        self, *, min_substitutability: int = 4, as_of: date | None = None,
     ) -> Sequence[BottleneckRow]:
         refs = self._evidence(as_of)
         return (

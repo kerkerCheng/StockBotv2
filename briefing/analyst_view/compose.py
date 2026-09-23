@@ -407,7 +407,7 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     fixed = (
         "不是 buy／sell：系統不給動作；進場靠判斷，出場靠 disproof（隱含報酬與門檻價已於 2026-09-23 退役）。",
         "不是部位尺寸或配置：買多少、什麼時候買由使用者自行判斷並手動下單。",
-        "不是跨標的機會排序：本畫面只看一檔；瓶頸排序的唯一權威是 rank_bottlenecks。",
+        "不是跨標的機會排序：本畫面只看一檔；跨檔排序已於 2026-09-23 退役，結構事實住 query/bottleneck.py 的結構表。",
     )
     everything: list[str] = list(fixed)
     # ⚠ 2026-09-23（Step 0b.1b）：`implied_return.is_not`／`valuation.gap_is_not`（C／H 組）與

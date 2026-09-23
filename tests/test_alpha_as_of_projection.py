@@ -83,7 +83,7 @@ def test_attributes_from_future_documents_do_not_leak_into_the_projection() -> N
     這是 lookahead 最難察覺的形式：列是對的（那條邊當時真的存在），
     但 `substitutability` 是後來那份文件才填的——先排序再砍列會留下這個值。
 
-    空跑檢查：把 `_rank` 改成「先 rank 再依日期砍 rows」→ 這條會紅
+    空跑檢查：把 `_table` 改成「先建表再依日期砍 rows」→ 這條會紅
     （sub 會變成 5，且該列會出現在排序裡）。
     """
     old = _assertion("mat:inp_substrate", "2026-01-05", sub=3, doc="sd_old")
@@ -133,7 +133,7 @@ def test_projection_coverage_travels_with_the_data() -> None:
         _assertion("tech:cpo", "2026-08-14", relation="supplies_to"),
     )
     provider.get_bottlenecks(as_of=AS_OF)
-    coverage = provider._rank(AS_OF)["coverage"]
+    coverage = provider._table(AS_OF)["coverage"]
 
     assert coverage["as_of"] == AS_OF.isoformat()
     assert coverage["as_of_input_assertions"] == 2
@@ -418,3 +418,33 @@ def test_audit_rejects_a_method_outside_the_closed_vocabulary() -> None:
         "method": "guessed", "basis": "感覺", "backfilled": "2026-02-03",
     }])
     assert any("不在封閉字彙內" in p for p in problems)
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-23（Step 0b.3）：排序退役後，同一家公司內的邊仍有明寫的呈現順序
+# ---------------------------------------------------------------------------
+
+def test_within_company_edge_order_is_evidence_first_and_across_companies_is_just_the_id() -> None:
+    """結構表的列序是 (company_id, relation, bottleneck) 字典序；provider 拿到後**同一家公司內**改成
+    證據強的先（走得到錨、證據等級、sub、sole、合格狀態、離錨跳數），公司之間只按 company_id。
+
+    這不是跨檔排序：它決定的是敘事「鏈」段落先講哪條邊、以及 Q1 同分時取哪一條
+    （`alpha/context.py` 取第一個最大值）。實測不排會讓 AXTI／LITE 的 Q1 理由換邊、四檔鏈段落換序。
+    空跑檢查：把 `_bottleneck_rows` 的 `rows.sort(...)` 拿掉 → 這條會紅（字典序讓 mat:aaa 排在 tech:zzz 前）。
+    """
+    weak = _assertion("mat:aaa_weak", "2026-01-05", doc="sd_w")                       # origin 解析不到 → needs_review
+    strong = _assertion("tech:zzz_strong", "2026-01-05", doc="sd_s")
+    strong["origin"] = "NVIDIA"                                                        # 客戶端 origin → externally_corroborated
+    other = _assertion("tech:zzz_strong", "2026-01-05", doc="sd_o", src="co:axt")     # 另一家公司，證據最弱
+    other["origin"] = "AXT"
+    provider = _provider(weak, strong, other)
+    rows = provider.get_bottlenecks()
+    assert [(str(r.company_id), str(r.target_id)) for r in rows] == [
+        ("co:axt", "tech:zzz_strong"),            # 公司之間：只按 company_id，證據弱也排前（不是名次）
+        ("co:coherent", "tech:zzz_strong"),       # 同一家公司內：證據強的先
+        ("co:coherent", "mat:aaa_weak"),
+    ]
+    # 表本身仍是字典序——順序只在 provider 這一層加，結構表不動。
+    table = provider._table()["rows"]  # noqa: SLF001
+    assert [(r["company_id"], r["bottleneck"]) for r in table] == [
+        ("co:axt", "tech:zzz_strong"), ("co:coherent", "mat:aaa_weak"), ("co:coherent", "tech:zzz_strong")]

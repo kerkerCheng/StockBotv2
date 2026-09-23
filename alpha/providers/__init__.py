@@ -6,8 +6,8 @@ Neo4j／Engine C／行情的 import 全部關在這裡。
 對本目錄開了明確例外，**不是整條檢查被關掉**。
 
 ⚠ **provider 包既有的 `query/`／`engine_c/`，不新寫查詢。**
-`rank_bottlenecks()` 仍是唯一的結構排序權威（`AGENTS.md` 硬契約）；
-這一層只做型別轉換與 provenance 附加，不重算、不加權、不另建平行排序。
+結構事實只有 `query/bottleneck.py::structure_table()` 一份（不排序，2026-09-23）；
+這一層只做型別轉換與 provenance 附加，不重算、不加權、不排序。
 """
 from __future__ import annotations
 

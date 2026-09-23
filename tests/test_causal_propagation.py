@@ -43,7 +43,8 @@ def _rows(*extra):
 
 
 def _provider(rows):
-    return Neo4jGraphResearchProvider(driver=None, _ranked={"rows": rows})
+    # 2026-09-23（Step 0b.3）：快取欄位由 `_ranked`（排序）改名 `_table_cache`（結構表）。
+    return Neo4jGraphResearchProvider(driver=None, _table_cache={"rows": rows})
 
 
 def _event(subject: str, direction: str = "tightening") -> StructuralEvent:

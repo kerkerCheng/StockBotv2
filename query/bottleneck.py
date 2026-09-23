@@ -1,38 +1,37 @@
-"""瓶頸鏈排序：在**已研究過的公司**中，排出誰最可能是真瓶頸。
+"""結構表：**已研究過的公司**逐邊的結構事實——卡在哪條邊、那條邊多難繞過、往上接到誰在花錢。
 
-設計依據 `docs/brainstorms/2026-08-18-alpha-live-user-sized-requirements.md` §8。
+⚠ 2026-09-23（Phase 0 Step 0b.3）：本檔原本是「瓶頸鏈排序」（`rank_bottlenecks()`，唯一排序權威）。
+排序、兩份序（可行動／純結構）、top-N、`min_substitutability` 門檻與 `--by-sector` 分組整組退役
+（ROADMAP Phase 0／G1、L19：排序讓研究火力去補格子把某一檔推上第一名）。**留下的是逐邊的事實**：
+證據等級、`substitutability`（含未填）、`sole_source` 三態、`qualification_status`、自報／外部印證、
+走不走得到需求錨、`anchor_gaps` 診斷、以及母體定義的 INV-3 計數。列的順序是 `(company_id, relation, bottleneck)`
+字典序——**那是索引，不是名次**。
 
-使用者的模型（2026-08-18）：
+設計依據 `docs/brainstorms/2026-08-18-alpha-live-user-sized-requirements.md` §8 的三個問句仍在：
 
 > CPO 是 AI SERVER 的瓶頸，InP 是 CPO 的瓶頸，瓶頸相連要能連到真的市場有在放 CapEx 的地方。
-> 要是真的市場有在投資的點，不然一個沒人用的技術的瓶頸，好像也沒用。
 
 因此每一列回答三件事：**卡在哪條邊、那條邊多難繞過、往上接到誰在花錢**。
 
-## 三個刻意的設計限制
+## 三個刻意的設計限制（排序退役後仍成立）
 
-1. **不算加權綜合分數。** 綜合分數是未經量測的新機制（D6），且會把「證據強度」與
-   「瓶頸強度」壓成一個數字（L12）。這裡只做**確定性排序**並攤開所有成分，
-   排序鍵是 `(證據等級, substitutability, sole_source, qualification)`。
+1. **不算加權綜合分數，也不排序。** 綜合分數是未經量測的新機制（D6），且會把「證據強度」與
+   「瓶頸強度」壓成一個數字（L12）。這裡只攤開所有成分；「該看誰」由讀圖與敘事回答（Phase 2／3）。
 
 2. **先以 `(src, relation, dst)` 去重，每組取最高 confidence，不加總。**
    實測 `co:axt → mat:inp_substrate` 有 4 條 EdgeAssertion 來自 4 份文件；
-   若數邊，分數就變成「我們讀了幾份文件」的函數——再 ingest 五份 InP 報導，
-   分數就上升而世界沒有改變。`documents` 欄位保留該計數，但它只作**注意力**指標，
-   **不參與排序**。
+   若數邊，任何量都會變成「我們讀了幾份文件」的函數。`documents` 欄位保留該計數，但它只作**注意力**指標。
 
-3. **證據等級是排名上限。** 只有供應商自評 sub=5 的邊，不得排在有客戶端印證的 sub=4
-   之前。實測 58 條帶 `substitutability` 的邊有 50% 只有供應商自報 origin
-   （`scripts/audit_sole_source_independence.py --all-bottleneck`）。
+3. **證據等級是獨立的一欄，不是乘數。** 只有供應商自評 sub=5 的邊，與有客戶端印證的 sub=4，在表上是兩列
+   各自可讀的事實；把它們合成一個序正是退役的那個機制。
 
 ## 已知限制（隨輸出常駐，不得只寫在文件裡）
 
-- `substitutability` 覆蓋率僅 22%（91/423 assertion）；排名必然偏向已被抽取過的邊。
+- `substitutability` 有值的邊是少數；沒填的邊在表上是 `None`（未填≠否），coverage 欄印出比例。
 - `structural_lead_time_weeks` 實質為空。**語意已限定為 qualification lead time**
   （換供應商合格週期，2026-09-02 定案）：交貨週期另住 `delivery_lead_time_weeks`，
   不得混入——當年唯一的「真值」（GF 52 週）就是交貨週期誤標，已改標。
-  qualification 數字財報極少揭露（多在法說 Q&A），常年近空是誠實狀態，
-  不是待填欄。「難替代」與「換掉要多久」是兩件事，**本排名不含後者**。
+  「難替代」與「換掉要多久」是兩件事，**本表不含後者**。
 """
 from __future__ import annotations
 
@@ -92,8 +91,10 @@ DEMAND_PULL_RELATIONS = ("enables",)
 #: 得到的會是一格憑空填上的答案（L17-4：general 到資料支持的那一格為止）。
 DEPENDENCY_RELATIONS = ("depends_on", "constrained_by")
 
-# 進入排名的最低替代難度。3 以下不算瓶頸，只是普通供應關係。
-MIN_SUBSTITUTABILITY = 4
+# ⚠ 2026-09-23（Step 0b.3）：`MIN_SUBSTITUTABILITY = 4`（向下邊 sub ≥ 4 才進排序）隨排序退役。
+# 結構表不設門檻：sub 2 的邊與未填的邊都在表上，各自帶著自己的值。要「難替代」的子集由消費端自己說
+# 它用了什麼判準（`alpha/providers/graph_neo4j.py::get_bottlenecks` 的 `min_substitutability` 是 provider
+# 自己宣告的 bottleneck 定義，不是本表的門檻）。
 
 # 需求錨點（封閉字彙，會隨圖成長而擴充——擴充改這裡，不要改演算法）。
 #
@@ -459,7 +460,7 @@ def demand_chain(
 ) -> list[str] | None:
     """從 `target` 往上走到**明確登記的需求錨點**，回傳最短的一條鏈；走不到回 None。
 
-    ⚠ **`target` 傳誰，決定了這條鏈在回答哪個問題。** `rank_bottlenecks` 一律傳**公司**
+    ⚠ **`target` 傳誰，決定了這條鏈在回答哪個問題。** `structure_table` 一律傳**公司**
     （`edge.src`），所以輸出的 `demand_anchor` 是「這家公司的產出有沒有人在花錢買」，
     **同一家公司的每一列都相同**；傳瓶頸節點（`edge.dst`）問的是另一件事。
     2026-09-18 實測過換成 dst 的後果：accepted 列有一批會失去錨（圖裡沒有人記錄過誰需要那些節點），
@@ -496,19 +497,22 @@ def demand_chain(
 #: 被門檻濾掉的理由（封閉字彙）。**「未填」與「填了但低於門檻」刻意分開**——
 #: 前者是我們還沒研究，後者是研究過而答案是否定的，兩者的下一步完全不同：
 #: 一個要去補研究，一個要去問「那這檔還值得看嗎、憑什麼」。壓成一句就同形了（L12）。
-FILTER_REASONS: Mapping[str, str] = {
-    "substitutability_unfilled": "還沒有人判過這條邊的可替代性——這是研究缺口，不是否定答案",
-    "substitutability_below_threshold": "已研究，但可替代性低於門檻——這是答案，不是缺漏",
+#: 結構表的**母體**是「公司→向下」的 canonical edge。不在母體裡的邊要報得出為什麼（INV-3：
+#: 每個 filter 都能報 input／accepted／filtered／reasons）。
+#: ⚠ 2026-09-23（Step 0b.3）之前這裡是門檻的兩種理由（`substitutability_unfilled`／`_below_threshold`）；
+#: 門檻退役後那兩種邊**都在表上**，剩下的排除只剩母體定義本身——而它們先前是靜默 `continue`。
+EXCLUSION_REASONS: Mapping[str, str] = {
+    "not_company_source": "邊的 src 不是公司（`co:*`）——技術層／材料層之間的邊不是「誰卡在哪」的列",
+    "not_downstream_relation": "relation 不是向下（depends_on／supplies_to／constrained_by）——上游與需求拉動邊另有用途",
 }
 
 
 #: 「**瓶頸節點自己**走不到需求錨」的成因（封閉字彙）。
 #:
-#: ⚠ **這不是 `FILTER_REASONS`，兩者問的不是同一件事。** `FILTER_REASONS` 講的是
-#: 「這條邊為什麼沒進排序」；本字彙講的是「這個**節點**接不接得到有人花錢的地方」。
-#: 排序用的 `demand_anchor` 是從**公司**側走的（見 `demand_chain` 的 docstring），
-#: 所以一條列可以同時「公司側有錨」而「瓶頸節點側沒有錨」——後者今天不影響排序，
-#: 也**刻意不該影響**（AGENTS：唯一排序權威是 `rank_bottlenecks`，不得自建第二套評分）。
+#: ⚠ **這不是 `EXCLUSION_REASONS`，兩者問的不是同一件事。** 後者講的是
+#: 「這條邊為什麼不在母體裡」；本字彙講的是「這個**節點**接不接得到有人花錢的地方」。
+#: 列上的 `demand_anchor` 是從**公司**側走的（見 `demand_chain` 的 docstring），
+#: 所以一條列可以同時「公司側有錨」而「瓶頸節點側沒有錨」——後者是診斷，不改列上任何一格。
 #:
 #: ⚠ **三種成因刻意不壓成一句「走不到錨」**（ROADMAP Phase 4 驗收條件逐字要求）：
 #: 它們的下一步完全不同——一個要先拆封閉字彙、一個是研究、一個要等前兩個解完。
@@ -518,7 +522,7 @@ FILTER_REASONS: Mapping[str, str] = {
 #: （那些節點現在走得到上游，根本不進母體），留一個恆為 0 的格子就是 L14-4 的
 #: 「不會滅＝那是牆不是閘門」。目前已退場兩種，各由一條方向測試守著迴歸：
 #:   ①`constrained_by` 沒有被走訪（2026-09-18 修）→
-#:     `tests/test_bottleneck_ranking.py::test_constrained_by_carries_demand_upward_in_the_depends_on_direction`
+#:     `tests/test_structure_table.py::test_constrained_by_carries_demand_upward_in_the_depends_on_direction`
 #:   ②`enables` 走訪方向與抽取定義相反（2026-09-18 資料歸位＋程式歸位後修）→
 #:     `::test_enables_carries_demand_from_the_adopter_to_what_it_pulls_in`
 #:     ⚠ 它退場的前提是**資料先改對**：29 條誤植的邊由 pq2 [607]／[608]／[609] 逐條重判改正，
@@ -546,7 +550,7 @@ def classify_anchor_gaps(
     ROADMAP Phase 4 的驗收條件逐字寫著「四種成因要分得開（不得壓成一句走不到錨）」，
     而在此之前**沒有任何地方數過它們**——`demand_anchor` 只在表格裡呈現成一格「🔴 無」，
     那是呈現不是計數（L14：會自己出現的常駐計數器，不是要人讀的段落）。
-    現況數字不寫在這裡（會腐壞）：跑 `python -m query.bottleneck --top-n 60` 看那一段。
+    現況數字不寫在這裡（會腐壞）：跑 `python -m query.bottleneck` 看那一段。
 
     ⚠ **走訪一律消費既有的 `build_upward_index`／`demand_chain`／`DEPENDENCY_RELATIONS`**，
     本函式不自己判「誰需要誰」——否則就是 L16 說的「每個消費端重造一份，而重造品會
@@ -555,7 +559,7 @@ def classify_anchor_gaps(
     edges = list(edges)
     anchor_set = set(anchors) if anchors is not None else set(load_demand_anchors())
 
-    # 母體＝所有出現在「公司→向下」邊裡的瓶頸節點，也就是排序真的問過的那些。
+    # 母體＝所有出現在「公司→向下」邊裡的瓶頸節點，也就是結構表真的問過的那些。
     population = sorted({e.dst for e in edges if e.relation in DOWNSTREAM_RELATIONS})
 
     by_cause: dict[str, list[dict[str, Any]]] = {k: [] for k in ANCHOR_GAP_CAUSES}
@@ -585,45 +589,64 @@ def classify_anchor_gaps(
         "nodes": by_cause,
         "cause_labels": dict(ANCHOR_GAP_CAUSES),
         "this_is_not": (
-            "這**不是**排序欄位，也不是 filter 理由。排序用的 `demand_anchor` 是從**公司**側走的，"
+            "這**不是**列上的欄位，也不是排除理由。列上的 `demand_anchor` 是從**公司**側走的，"
             "問「這家公司的產出有沒有人在花錢買」；本段問的是「這個**瓶頸節點**接不接得到錢」。"
-            "兩者是不同問題，2026-09-18 實測過把排序改成後者會讓 accepted 列失去錨而變差。"
+            "兩者是不同問題，2026-09-18 實測過把列上的錨改成後者會讓多數列失去錨。"
         ),
     }
 
 
-def _filtered_row(edge, registry, upward, threshold: int) -> dict[str, Any]:
-    """一條被門檻擋下的邊，帶得出「是誰、卡在哪、為什麼被擋」。"""
-    reason = (
-        "substitutability_unfilled"
-        if edge.substitutability is None
-        else "substitutability_below_threshold"
-    )
+def _table_row(edge, registry, upward) -> dict[str, Any]:
+    """一條邊的結構事實。**每一格都是圖上的值或由圖上的值走出來的路徑**，沒有任何評分。"""
+    # ⚠ 從**公司**往上走，不是從瓶頸節點。這一列問的是「這家公司的產出有沒有人
+    # 在花錢買」，不是「這個材料有沒有人要」。首版從 `edge.dst` 走，於是
+    # co:lumentum 那列的鏈路繞經 co:coherent——對 `mat:inp_substrate` 而言正確，
+    # 但那不是這一列在問的問題。
     chain = demand_chain(edge.src, upward)
     return {
         "company_id": edge.src,
         "ticker": registry.research_ticker(edge.src),
         "relation": edge.relation,
         "bottleneck": edge.dst,
+        # 未填是 None（未填≠否），不補 0、不補門檻。
         "substitutability": edge.substitutability,
-        "threshold": threshold,
+        # ⚠ 三態：True／False／None。None＝圖上沒有任何文件對這條邊的 sole_source
+        # 發言過（未填），**不是** False。2026-09-05 之前這裡是 `bool(...)`，把
+        # 「不知道」壓成「否」，下游（read model、Q1 佐證）就再也分不出兩者。
+        "sole_source": edge.sole_source,
         "qualification_status": edge.qualification_status,
+        "ramp_execution": edge.ramp_execution,
+        "lead_time_weeks": edge.lead_time_weeks,
         "evidence": edge.evidence,
+        "confidence": edge.confidence,
         "documents": edge.documents,
+        # provenance：`documents` 只是計數（注意力指標），`sources` 才讓下游列得出
+        # **是哪幾份**。`published_at` 取所有已知引用日期中最早的一個——它回答
+        # 「這條邊最早什麼時候說得出來」。
+        "sources": sorted(edge.source_docs),
+        "source_dates": {k: (str(v) if v else None)
+                         for k, v in sorted(edge.source_docs.items())},
+        "published_at": min(
+            (str(v) for v in edge.source_docs.values() if v), default=None),
         "chain": chain,
         "demand_anchor": chain[0] if chain else None,
         "demand_hops": (len(chain) - 1) if chain else None,
-        "reasons": [reason],
     }
 
 
-def rank_bottlenecks(
+def structure_table(
     rows: Iterable[Mapping[str, Any]],
     registry,
-    *,
-    min_substitutability: int = MIN_SUBSTITUTABILITY,
 ) -> dict[str, Any]:
-    """輸出「公司 × 瓶頸邊」的排序，附鏈路、需求錨點與證據等級。"""
+    """輸出「公司 × 向下邊」的結構表，附鏈路、需求錨點與證據等級。**不排序、不設門檻、不給首選。**
+
+    ⚠ 2026-09-23（Step 0b.3）：這裡原本是 `rank_bottlenecks()`——同一批列、外加排序鍵、
+    `min_substitutability` 門檻、兩份序與 top-N。那些整組退役；列上的每一格與 `anchor_gaps`／
+    `coverage` 一字未動。名稱不留 alias：誰還在 import `rank_bottlenecks` 就該在這裡紅。
+
+    列的順序是 `(company_id, relation, bottleneck)` 字典序——**索引，不是名次**。消費端不得把
+    第一列讀成「最值得看」；要比較請看各自的格子。
+    """
     rows = list(rows)
     canonical = collapse_assertions(rows)
     edges = list(canonical.values())
@@ -633,131 +656,44 @@ def rank_bottlenecks(
         )
 
     upward = build_upward_index(edges)
-    scored = []
-    #: 被 `min_substitutability` 濾掉的邊，**逐條帶理由**（INV-3：每個 filter 都能報
-    #: input／accepted／filtered／reasons）。
-    #:
-    #: ⚠ 2026-09-17 之前這裡是 `continue` 直接丟掉，於是 185/222 條「公司→向下」邊
-    #: 在任何下游層看見它們之前就消失了——包括所有已研究但判 2–3 的邊緣小公司。
-    #: 那讓「這家公司不是瓶頸」與「我們還沒研究這家公司」在下游完全同形（L12），
-    #: 而籃子層因此**結構上不可能**對它們做任何別的判斷。
-    #:
-    #: **這不改變排序，也不改變 `rows` 的內容**：門檻仍是 4、順序一字未動、
-    #: `rank_bottlenecks()` 仍是唯一排序權威。多的只是「被濾掉的那些是誰、為什麼」。
-    filtered: list[dict[str, Any]] = []
+    table: list[dict[str, Any]] = []
+    #: 不在母體裡的邊**逐條帶理由**（INV-3）。門檻退役之前這兩種是靜默 `continue`；
+    #: 現在母體定義本身就是唯一的 filter，所以它也要報 input／accepted／excluded／reasons。
+    excluded: list[dict[str, Any]] = []
     for edge in edges:
         if edge.relation not in DOWNSTREAM_RELATIONS:
+            excluded.append({"company_id": edge.src, "relation": edge.relation,
+                             "bottleneck": edge.dst, "reasons": ["not_downstream_relation"]})
             continue
         if not edge.src.startswith("co:"):
+            excluded.append({"company_id": edge.src, "relation": edge.relation,
+                             "bottleneck": edge.dst, "reasons": ["not_company_source"]})
             continue
-        if (edge.substitutability or 0) < min_substitutability:
-            filtered.append(
-                _filtered_row(edge, registry, upward, min_substitutability)
-            )
-            continue
-        # ⚠ 從**公司**往上走，不是從瓶頸節點。這一列問的是「這家公司的產出有沒有人
-        # 在花錢買」，不是「這個材料有沒有人要」。首版從 `edge.dst` 走，於是
-        # co:lumentum 那列的鏈路繞經 co:coherent——對 `mat:inp_substrate` 而言正確，
-        # 但那不是這一列在問的問題。
-        chain = demand_chain(edge.src, upward)
-        scored.append(
-            {
-                "company_id": edge.src,
-                "ticker": registry.research_ticker(edge.src),
-                "relation": edge.relation,
-                "bottleneck": edge.dst,
-                "substitutability": edge.substitutability,
-                # ⚠ 三態：True／False／None。None＝圖上沒有任何文件對這條邊的 sole_source
-                # 發言過（未填），**不是** False。2026-09-05 之前這裡是 `bool(...)`，把
-                # 「不知道」壓成「否」，下游（read model、Q1 佐證）就再也分不出兩者。
-                # 排序鍵仍用 `1 if sole_source else 0`（None 與 False 同為 0），排序不變。
-                "sole_source": edge.sole_source,
-                "qualification_status": edge.qualification_status,
-                "ramp_execution": edge.ramp_execution,
-                "lead_time_weeks": edge.lead_time_weeks,
-                "evidence": edge.evidence,
-                "confidence": edge.confidence,
-                "documents": edge.documents,
-                # provenance：`documents` 只是計數（注意力指標，不參與排序），
-                # `sources` 才讓下游列得出**是哪幾份**。`published_at` 取所有已知
-                # 引用日期中最早的一個——它回答「這條邊最早什麼時候說得出來」。
-                "sources": sorted(edge.source_docs),
-                "source_dates": {k: (str(v) if v else None)
-                                 for k, v in sorted(edge.source_docs.items())},
-                "published_at": min(
-                    (str(v) for v in edge.source_docs.values() if v), default=None),
-                "chain": chain,
-                "demand_anchor": chain[0] if chain else None,
-                "demand_hops": (len(chain) - 1) if chain else None,
-            }
-        )
+        table.append(_table_row(edge, registry, upward))
 
-    # 排序鍵刻意有明確的優先序，不是加權綜合分數（那會是未經量測的新機制，D6）。
-    # 需求錨點可達性排最前：依使用者判準，連不到有人花錢的地方的瓶頸沒有投資意義。
-    #
-    # ⚠ evidence 排在 substitutability 之前是**刻意的**，但只對「現在能投什麼」成立：
-    # 證據弱的邊不能拿來下注。代價是這份排序同時被「我們挖得多深」影響——`evidence`
-    # 的三級（self_reported → needs_review → externally_corroborated）中，最高級必須
-    # 靠研究去找到客戶端或第三方文件才拿得到，預設每條邊都是 self_reported。
-    # 2026-08-21 使用者指出：「研究筆數多 → 證據強，但不代表瓶頸性強」——屬實。
-    # 因此另出 `structural_rows`，見下。
-    scored.sort(
-        key=lambda r: (
-            1 if r["demand_anchor"] else 0,
-            EVIDENCE_RANK.get(r["evidence"], 0),
-            r["substitutability"] or 0,
-            1 if r["sole_source"] else 0,
-            QUALIFICATION_RANK.get(str(r["qualification_status"]), 0),
-            -(r["demand_hops"] if r["demand_hops"] is not None else 99),
-        ),
-        reverse=True,
-    )
-
-    # 純結構排序：只看瓶頸本身有多卡，**完全不看證據等級**。
-    # 兩份排序回答不同問題，不可互換：
-    #   rows            → 「現在能投什麼」（證據夠強才可行動）
-    #   structural_rows → 「該去補誰的證據」（結構很卡但證據沒跟上的，是研究最高 ROI）
-    # 實測差異（2026-08-21）：現行排序第 1 是 COHR→NVIDIA，純結構第 1 是 AVGO→CPO
-    # ——同為 sub=5／sole_source，但 AVGO 距需求端只有 1 跳，它排在後面純粹因為
-    # evidence 還是 needs_review。另有 LITE→UHP laser（sub=5、sole_source）因
-    # self_reported 幾乎在現行排序中看不到。
-    structural = sorted(
-        scored,
-        key=lambda r: (
-            1 if r["demand_anchor"] else 0,
-            r["substitutability"] or 0,
-            1 if r["sole_source"] else 0,
-            -(r["demand_hops"] if r["demand_hops"] is not None else 99),
-            QUALIFICATION_RANK.get(str(r["qualification_status"]), 0),
-        ),
-        reverse=True,
-    )
+    # 索引序：公司、關係、節點。**不是排序鍵**——沒有任何一格參與。
+    table.sort(key=lambda r: (str(r["company_id"]), str(r["relation"]), str(r["bottleneck"])))
 
     with_sub = [e for e in edges if e.substitutability is not None]
     reason_counts: dict[str, int] = {}
-    for row in filtered:
+    for row in excluded:
         for reason in row["reasons"]:
             reason_counts[reason] = reason_counts.get(reason, 0) + 1
     return {
-        "rows": scored,
-        "structural_rows": structural,
-        # INV-3：門檻是一個 filter，所以它必須報得出 input／accepted／filtered／reasons。
-        # ⚠ 這是**新增的輸出**，不是新的排序：`rows` 與 `structural_rows` 一字未動。
-        "filtered_rows": filtered,
-        "filter": {
-            "input": len(scored) + len(filtered),
-            "accepted": len(scored),
-            "filtered": len(filtered),
-            "rule": (
-                f"公司→向下邊中 substitutability >= {min_substitutability} 才進排序。"
-                "門檻不動；本欄只讓被擋下的那些看得見（INV-3）。"
-            ),
+        "rows": table,
+        # INV-3：母體定義是一個 filter，所以它必須報得出 input／accepted／excluded／reasons。
+        "population": {
+            "input": len(table) + len(excluded),
+            "accepted": len(table),
+            "excluded": len(excluded),
+            "rule": "母體＝src 為公司（co:*）且 relation 為向下（depends_on／supplies_to／constrained_by）的 canonical edge。"
+                    "沒有門檻：substitutability 未填或很低的邊都在表上，各自帶著自己的值。",
             "reasons": reason_counts,
-            "reason_labels": dict(FILTER_REASONS),
+            "reason_labels": dict(EXCLUSION_REASONS),
+            "excluded_rows": excluded,
         },
-        # ⚠ **新增的診斷輸出，不是新的排序**：`rows`／`structural_rows`／`filtered_rows`
-        # 與 `filter` 一字未動。它回答的是 ROADMAP Phase 4 ②③④「瓶頸節點走不到錨」
-        # 的成因分佈，母體與排序母體相同但問的是另一個方向（見 `this_is_not`）。
+        # ⚠ **診斷輸出，不是列上的欄位**：它回答的是 ROADMAP Phase 4 ②③④「瓶頸節點走不到錨」
+        # 的成因分佈，母體與表的母體相同但問的是另一個方向（見 `this_is_not`）。
         "anchor_gaps": classify_anchor_gaps(edges, upward),
         "coverage": {
             "assertions": len(rows),
@@ -879,22 +815,13 @@ def project_assertions_as_of(
 # 抄第二份的那天起，後改的那份就不會回頭更新前一份（AGENTS「清單會腐壞，判準不會」）。
 # ---------------------------------------------------------------------------
 
-RANKING_TITLE = "瓶頸鏈排序（在已研究過的公司中排序，不是發現新標的）"
+STRUCTURE_TABLE_TITLE = "結構表（已研究過的公司逐邊的結構事實；不排序、不設門檻、不給首選）"
 
-TWO_RANKINGS_NOTE = (
-    "上表回答「**現在能投什麼**」——證據不夠強的邊不能拿來下注，所以 evidence "
-    "排在 substitutability 之前。代價是它同時被「我們挖得多深」影響：`evidence` "
-    "的最高級必須靠研究找到客戶端或第三方文件才拿得到，預設每條邊都是 "
-    "`self_reported`。",
-    "本表回答「**該去補誰的證據**」——結構很卡但證據沒跟上的邊，是研究投入的"
-    "最高 ROI。兩份排序用途不同，不可互換。",
-)
-
-STRUCTURAL_TABLE_NOTE = (
+STRUCTURE_TABLE_NOTE = (
     "⚠ **本表不含「瓶頸業務占該公司多少」**。同為 `sub=5`，大型多角化公司的"
     "單一瓶頸邊對其整體營收影響可能很小（研究它接近研究 beta），小型專業廠則"
     "接近純曝險。判斷投資意義時必須另看市值、營收結構與分析師覆蓋度——"
-    "那些資料在 Engine C，不在本排序內。"
+    "那些資料在 Engine C，不在本表內。"
 )
 
 NO_ANCHOR_CHAIN_NOTE = (
@@ -903,64 +830,30 @@ NO_ANCHOR_CHAIN_NOTE = (
 )
 
 NO_ANCHOR_READING = (
-    "🔴 **無需求錨組的讀法**：這些邊「難替代」但「不知服務誰」。三種可能："
+    "🔴 **無需求錨列的讀法**：這些邊「難替代」但「不知服務誰」。三種可能："
     "①需求端在圖裡但缺中間的邊 → 補邊；②它服務的市場還沒登記成錨 → "
     "在 `config/sector_anchors.json` 補錨（**可能要開新產業群**）；"
     "③真的沒有終端需求 → 不是投資標的。**不得預設是第③種**。"
 )
 
-#: 排序鍵的**優先序**（不是加權），供消費端原樣呈現。
-#: ⚠ 它是散文，會腐壞：`tests/test_bottleneck_ranking.py` 以行為鎖住前兩個優先序
-#: （錨點先於證據、純結構不看證據），改排序鍵時兩處要一起動。
-SORT_KEY_DESCRIPTIONS = {
-    "rows": ("需求錨點可達", "證據等級", "替代難度", "sole_source", "合格狀態",
-             "距需求端跳數（越近越前）"),
-    "structural_rows": ("需求錨點可達", "替代難度", "sole_source", "距需求端跳數（越近越前）",
-                        "合格狀態"),
-}
+#: 表的順序是什麼、不是什麼——供消費端原樣呈現，讓「第一列」永遠不被讀成「第一名」。
+ORDER_NOTE = "列依 (company_id, relation, bottleneck) 字典序——**索引，不是名次**；沒有任何一格參與順序。"
 
 
 def known_limitations(coverage: Mapping[str, Any]) -> list[str]:
-    """排序的三條已知限制，**隨輸出常駐**（模組 docstring 的要求）。任何消費端都從這裡拿。"""
+    """結構表的三條已知限制，**隨輸出常駐**（模組 docstring 的要求）。任何消費端都從這裡拿。"""
     return [
-        f"覆蓋率 {coverage['substitutability_coverage']:.0%}——排名必然偏向已被抽取過的邊，"
-        "沒填的邊是隱形的。",
-        "**本排名不含 lead time**（換掉一個供應商要多久）。「難替代」與「換掉要多久」"
+        f"覆蓋率 {coverage['substitutability_coverage']:.0%}——表必然偏向已被抽取過的邊，"
+        "沒填的邊在表上是「未填」，不是「不是瓶頸」。",
+        "**本表不含 lead time**（換掉一個供應商要多久）。「難替代」與「換掉要多久」"
         "是兩件事：第二供應商若半年可合格，sub=5 也很脆。",
-        "`documents` 是注意力指標，**不參與排序**——否則分數會變成「我們讀了幾份文件」。",
+        "`documents` 是注意力指標，**不是結構事實**——它量的是我們讀了幾份文件。",
     ]
-
-
-def structural_gap_notes(
-    result: Mapping[str, Any], *, top_n: int = 10
-) -> list[tuple[Mapping[str, Any], int | None, str]]:
-    """純結構前 N 名各附「可行動排序第幾名」與落差註記。
-
-    落差判準（可行動名次比純結構名次低 ≥ 2 ＝ 補證據可翻上來）只有這一份——
-    markdown 與 APP artifact 都從這裡拿。依 `id()` 對應是刻意的：兩份排序是同一批
-    dict 物件的不同順序，不需要（也不該）另造一個 key。
-    """
-    rank_in_actionable = {id(r): i for i, r in enumerate(result["rows"], 1)}
-    out: list[tuple[Mapping[str, Any], int | None, str]] = []
-    for i, r in enumerate((result.get("structural_rows") or [])[:top_n], 1):
-        actionable_rank = rank_in_actionable.get(id(r))
-        gap = ""
-        if actionable_rank and actionable_rank - i >= 2:
-            gap = f"⬆ 可行動排序第 {actionable_rank}——補證據可翻上來"
-        out.append((r, actionable_rank, gap))
-    return out
-
-
-def empty_sectors(grouped: Mapping[str, Any],
-                  sector_map: Mapping[str, Any] | None = None) -> list[str]:
-    """configured 但零列的產業組——那是 sub 覆蓋缺口，**必須現形**，不是省略對象。"""
-    configured = list(((sector_map or load_sector_map()).get("sectors") or {}).keys())
-    return [s for s in configured if s not in grouped["sectors"]]
 
 
 def render_markdown(result: Mapping[str, Any]) -> str:
     cov = result["coverage"]
-    out = [f"# {RANKING_TITLE}\n"]
+    out = [f"# {STRUCTURE_TABLE_TITLE}\n"]
     out.append(
         f"- EdgeAssertion {cov['assertions']} → canonical edge {cov['canonical_edges']}"
         f"（去重收斂 {cov['duplicate_collapse']} 筆）"
@@ -976,17 +869,20 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         + "".join(f"{i}. {text}\n" for i, text in enumerate(known_limitations(cov), 1))
     )
     if not result["rows"]:
-        out.append("\n（無符合門檻的瓶頸邊）")
+        out.append("\n（母體為空：沒有任何公司→向下的邊）")
+        out.extend(render_population_report(result))
         return "\n".join(out)
 
-    out.append("\n| # | 標的 | 卡在哪 | 替代難度 | 證據 | 合格狀態 | 文件 | 公司側需求錨 |")
-    out.append("|---|---|---|---|---|---|---|---|")
-    for i, r in enumerate(result["rows"], 1):
+    out.append(f"\n> {ORDER_NOTE}\n")
+    out.append("| 標的 | 卡在哪 | 替代難度 | 證據 | 合格狀態 | 文件 | 公司側需求錨 |")
+    out.append("|---|---|---|---|---|---|---|")
+    for r in result["rows"]:
         ticker = r["ticker"] or "—"
         sole = "｜sole_source" if r["sole_source"] else ""
+        sub = "未填" if r["substitutability"] is None else f"{r['substitutability']}/5"
         out.append(
-            f"| {i} | {r['company_id']}（{ticker}） | {r['relation']} → `{r['bottleneck']}` "
-            f"| {r['substitutability']}/5{sole} | {EVIDENCE_LABEL[r['evidence']]} "
+            f"| {r['company_id']}（{ticker}） | {r['relation']} → `{r['bottleneck']}` "
+            f"| {sub}{sole} | {EVIDENCE_LABEL[r['evidence']]} "
             f"| {r['qualification_status'] or '—'} | {r['documents']} "
             f"| {r['demand_anchor'] or '🔴 無'} |"
         )
@@ -996,11 +892,14 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         "\n> **「公司側需求錨」是從標的公司往上走最短路徑找到的，不是從「卡在哪」那個節點走。**"
         "所以**同一家公司的每一列都是同一個錨**——它回答「這家公司的產出有沒有人在花錢買」，"
         "不回答「這條邊的瓶頸節點接不接得到錢」。"
-        "\n> ⚠ 改成從瓶頸節點走**已經量過是錯的**（2026-09-18）：accepted 列中有一批"
-        "（`tech:isolator`、`tech:eml`、`tech:ocs` 等）會**直接失去錨**而掉到排序末端，"
-        "因為圖裡沒有人記錄過「誰需要它們」。**那個「瓶頸節點走不到錨」是研究缺口訊號**"
-        "（同 ROADMAP Phase 4 成因③「真的沒有需求方邊」），不是一個該加進排序的欄位。"
+        "\n> ⚠ 改成從瓶頸節點走**已經量過是錯的**（2026-09-18）：多數列（`tech:isolator`、"
+        "`tech:eml`、`tech:ocs` 等）會**直接失去錨**，因為圖裡沒有人記錄過「誰需要它們」。"
+        "**那個「瓶頸節點走不到錨」是研究缺口訊號**（同 ROADMAP Phase 4 成因③「真的沒有需求方邊」），"
+        "不是一個該加進列上的欄位。"
     )
+    if any(not r["demand_anchor"] for r in result["rows"]):
+        out.append("\n> " + NO_ANCHOR_READING)
+    out.append("\n" + STRUCTURE_TABLE_NOTE)
 
     # ⚠ 條件是 `population` 不是 `without_anchor`：用後者會讓「**全部都走得到錨**」與
     # 「**這段根本沒跑**」在輸出上同形，而那正是 L13-2 說的「成功與失敗在同一個訊號上」。
@@ -1009,7 +908,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     if gaps.get("population"):
         out.append(
             f"\n## 瓶頸節點走不到需求錨：{gaps['without_anchor']}／{gaps['population']} 個"
-            "（診斷，**不影響上面的排序**）\n"
+            "（診斷，**不改上面任何一格**）\n"
         )
         out.append(f"> {gaps['this_is_not']}")
     if gaps.get("population") and not gaps.get("without_anchor"):
@@ -1051,31 +950,12 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             if count:
                 out.append(f"> **`{cause}`** — {gaps['cause_labels'][cause]}")
 
-    structural = result.get("structural_rows") or []
-    if structural:
-        out.append(
-            "\n## 純結構排序（只看多卡，**不看證據**）\n\n"
-            f"> {TWO_RANKINGS_NOTE[0]}\n>\n> {TWO_RANKINGS_NOTE[1]}"
-        )
-        out.append("\n| # | 標的 | 卡在哪 | 替代難度 | 距需求端 | 目前證據 | 落差 |")
-        out.append("|---|---|---|---|---|---|---|")
-        for i, (r, _actionable_rank, gap) in enumerate(structural_gap_notes(result, top_n=10), 1):
-            ticker = r["ticker"] or "—"
-            sole = "｜sole_source" if r["sole_source"] else ""
-            hops = r["demand_hops"] if r["demand_hops"] is not None else "—"
-            out.append(
-                f"| {i} | {r['company_id']}（{ticker}） | {r['relation']} → "
-                f"`{r['bottleneck']}` | {r['substitutability']}/5{sole} | {hops} 跳 "
-                f"| {EVIDENCE_LABEL[r['evidence']]} | {gap} |"
-            )
-        out.append("\n" + STRUCTURAL_TABLE_NOTE)
-
-    out.extend(render_filter_report(result))
+    out.extend(render_population_report(result))
 
     out.append("\n## 需求鏈（誰在花錢 → 這家公司）\n")
-    for i, r in enumerate(result["rows"], 1):
+    for r in result["rows"]:
         out.append(
-            f"{i}. **{r['company_id']}** {r['relation']} `{r['bottleneck']}`"
+            f"- **{r['company_id']}** {r['relation']} `{r['bottleneck']}`"
         )
         if r["chain"]:
             out.append(f"   {' → '.join(r['chain'])}　（距需求端 {r['demand_hops']} 跳）")
@@ -1084,183 +964,75 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     return "\n".join(out)
 
 
-def render_filter_report(result: Mapping[str, Any]) -> list[str]:
-    """門檻濾掉了誰——**INV-3 的可見面**。
+def render_population_report(result: Mapping[str, Any]) -> list[str]:
+    """母體定義排除了誰——**INV-3 的可見面**。
 
-    ⚠ 沒有這一段的話，`rank_bottlenecks` 的 `filtered_rows` 就是一個沒有 consumer 的
-    producer（INV-4）。它存在的意義不是「多印幾行」，是讓兩件事分得開：
-    **「已研究，答案是否定的」**與**「還沒有人研究過」**——前者要問「那這檔還值得看嗎」，
-    後者要去補研究，下一步完全相反。
+    ⚠ 沒有這一段的話，`structure_table` 的 `population.excluded_rows` 就是一個沒有 consumer 的
+    producer（INV-4）。它存在的意義不是「多印幾行」，是讓「這條邊不在表上」有一個查得到的理由。
     """
-    report = result.get("filter")
+    report = result.get("population")
     if not report:
         return []
     out = [
-        "\n## 門檻濾掉了誰（INV-3）\n",
-        f"`input {report['input']}｜accepted {report['accepted']}｜filtered {report['filtered']}`"
+        "\n## 母體定義排除了誰（INV-3）\n",
+        f"`input {report['input']}｜accepted {report['accepted']}｜excluded {report['excluded']}`"
         f"——{report['rule']}\n",
     ]
     labels = report.get("reason_labels") or {}
     for reason, count in sorted(report.get("reasons", {}).items(), key=lambda kv: -kv[1]):
         out.append(f"- **{reason}：{count} 條**——{labels.get(reason, '')}")
-
-    researched = [
-        r for r in result.get("filtered_rows", [])
-        if "substitutability_below_threshold" in r["reasons"]
-    ]
-    if researched:
-        by_company: dict[str, list[str]] = {}
-        for row in researched:
-            key = row["ticker"] or row["company_id"]
-            by_company.setdefault(key, []).append(
-                f"{row['bottleneck'].split(':')[-1]}({row['substitutability']})"
-            )
-        out.append(
-            "\n**已研究、答案是否定的**（這些不是研究缺口——要問的是「那它還值得看嗎、憑什麼」）：\n"
-        )
-        for key, items in sorted(by_company.items()):
-            out.append(f"- `{key}`：{'、'.join(items)}")
     out.append(
-        "\n⚠ **本段不改變排序，門檻也沒有放寬**。它只是讓被擋下的那 "
-        f"{report['filtered']} 條看得見——先前它們在任何下游層看到之前就消失了，"
-        "於是「不是瓶頸」與「還沒研究」在下游完全同形（L12）。"
+        "\n⚠ **本段沒有門檻**：2026-09-23 之前這裡印的是 `substitutability ≥ 4` 濾掉了誰；"
+        "門檻隨排序退役，未填與低分的邊現在都在上表裡、各自帶著自己的值。"
     )
     return out
 
 
-def load_sector_map(path: str = "config/sector_anchors.json") -> dict[str, Any]:
-    """錨→產業對照（SSOT：config/sector_anchors.json）。讀不到時 fail-soft 空表——
-    所有錨落到自成一組，分組仍可用只是粗。"""
-
-    try:
-        with open(path, encoding="utf-8") as handle:
-            return json.load(handle)
-    except (OSError, json.JSONDecodeError):
-        return {"sectors": {}, "correlation_notes": []}
-
-
-def group_rows_by_sector(
-    result: Mapping[str, Any], sector_map: Mapping[str, Any] | None = None
-) -> dict[str, Any]:
-    """把 rank_bottlenecks 的兩份排序依 demand anchor 聚成產業組（A 案）。
-
-    分組解決**可視性**不解決可比性：各組內維持原有排序，組與組之間的分數
-    不可比較（證據密度不同）。未映射的錨自成一組（不靜默丟失）；無錨列
-    「🔴 無需求錨」——那是該補研究的訊號，不是雜訊。
-    """
-
-    sector_map = sector_map or load_sector_map()
-    anchor_to_sector: dict[str, str] = {}
-    for sector, anchors in (sector_map.get("sectors") or {}).items():
-        for anchor in anchors:
-            anchor_to_sector[str(anchor)] = str(sector)
-
-    def bucket(row: Mapping[str, Any]) -> str:
-        anchor = row.get("demand_anchor")
-        if not anchor:
-            return "🔴 無需求錨"
-        return anchor_to_sector.get(str(anchor), f"（未映射錨）{anchor}")
-
-    grouped: dict[str, dict[str, list]] = {}
-    for key in ("rows", "structural_rows"):
-        for row in result.get(key) or ():
-            grouped.setdefault(bucket(row), {"rows": [], "structural_rows": []})[
-                key
-            ].append(dict(row))
-    return {
-        "sectors": grouped,
-        "correlation_notes": list(sector_map.get("correlation_notes") or ()),
-    }
-
-
-def render_by_sector(result: Mapping[str, Any], *, top_n: int = 3) -> str:
-    """分組呈現：每產業各自 top-N（可行動）＋純結構第一名。"""
-
-    grouped = group_rows_by_sector(result)
-    lines = ["# 瓶頸排序（產業別分組——解決可視性，分數不可跨組比較）", ""]
-    for note in grouped["correlation_notes"]:
-        lines.append(f"> ⚠ {note}")
-    if grouped["correlation_notes"]:
-        lines.append("")
-    # 空產業組要現形（prompt 契約）：configured 但零列的組是 sub 覆蓋缺口，不是省略對象。
-    empty = empty_sectors(grouped)
-    if empty:
-        lines.append(
-            "🔴 **空產業組（sub 覆蓋未及，研究缺口）**：" + "、".join(empty)
-        )
-        lines.append("")
-    # 「🔴 無需求錨」是**該不該建新產業群**的唯一訊號，必須附解讀：
-    # 一條 sub>=4 的邊代表「這個瓶頸換掉很難」，走不到任何錨代表「但我們不知道它服務誰」。
-    # 兩者同時成立時只有三種可能，都需要人動手，不會自己消失：
-    # ⚠ [323] 把 DEMAND_ANCHORS 收斂到 config 之後，原本的「（未映射錨）」偵測恆為空
-    # （錨就是從 config 讀的，不可能不在 config 裡），本組因此是僅存的新群訊號。
-    if "🔴 無需求錨" in grouped["sectors"]:
-        lines.append("> " + NO_ANCHOR_READING)
-        lines.append("")
-    for sector, buckets in sorted(
-        grouped["sectors"].items(), key=lambda kv: -len(kv[1]["rows"])
-    ):
-        lines.append(f"## {sector}（可行動 {len(buckets['rows'])} 條）")
-        for row in buckets["rows"][:top_n]:
-            sole = "｜sole_source" if row.get("sole_source") else ""
-            lines.append(
-                f"- {row['company_id']}（{row.get('ticker') or '—'}）"
-                f" {row['relation']} → `{row['bottleneck']}`"
-                f"｜sub {row.get('substitutability')}{sole}"
-                f"｜{row.get('evidence')}"
-            )
-        structural = buckets["structural_rows"]
-        if structural:
-            top = structural[0]
-            lines.append(
-                f"  ↳ 純結構第一（該去補證據的）：{top['company_id']}"
-                f" → `{top['bottleneck']}`"
-            )
-        lines.append("")
-    return "\n".join(lines)
-
-
 def render_what_if(
     baseline: Mapping[str, Any], overlaid: Mapping[str, Any],
-    hypothesis_rows: list, *, top_n: int = 10,
+    hypothesis_rows: list,
 ) -> str:
-    """what-if 排序 diff：**只比純結構排序**（structural_rows，evidence-blind）。
+    """what-if 結構 diff：**只比表上的事實**（新邊、錨可達性、替代難度），不比名次。
 
-    「若為真」問的是陳述的真值，不是證據狀態——所以用不看證據的那份排序。
-    可行動排序刻意不比：假設永不參與 evidence 分級，讓它進可行動排序等於
-    讓未驗證陳述假裝有證據（硬邊界）。輸出必標「若為真」。
+    「若為真」問的是陳述的真值，不是證據狀態——假設永不參與 evidence 分級（硬邊界）。
+    ⚠ 2026-09-23（Step 0b.3）：原本比的是純結構排序的名次；排序退役後，「若為真結構會變嗎」
+    改問三件事：多了哪些列、哪些公司從走不到錨變成走得到（或反過來）、哪些邊的 sub 變了。
+    輸出必標「若為真」。
     """
 
-    def positions(result: Mapping[str, Any]) -> dict[tuple, int]:
-        return {
-            (r["company_id"], r["bottleneck"]): i + 1
-            for i, r in enumerate(result.get("structural_rows") or ())
-        }
+    def rows_by_key(result: Mapping[str, Any]) -> dict[tuple, Mapping[str, Any]]:
+        return {(r["company_id"], r["relation"], r["bottleneck"]): r
+                for r in (result.get("rows") or ())}
 
-    before, after = positions(baseline), positions(overlaid)
+    before, after = rows_by_key(baseline), rows_by_key(overlaid)
     lines = [
-        "# What-if 排序 diff（純結構、若為真——不是證據判斷，不進任何預設輸出）",
+        "# What-if 結構 diff（若為真——不是證據判斷，不進任何預設輸出）",
         "",
         f"疊加假設邊 {len(hypothesis_rows)} 條（origin 固定 `(hypothesis)`）。",
         "",
     ]
-    moved = []
-    for key, pos_after in list(after.items())[:max(top_n * 3, 30)]:
-        pos_before = before.get(key)
-        if pos_before is None:
-            moved.append((key, "（新進結構排序）", pos_after))
-        elif pos_before != pos_after:
-            moved.append((key, f"#{pos_before}→", pos_after))
-    moved.sort(key=lambda item: item[2])
-    if not moved:
-        lines.append("**結構排序無變化**——若為真也不改變任何相對位置；安心 park，不值得花力氣追平行證據。")
+    changed: list[tuple[tuple, str]] = []
+    for key, row in sorted(after.items()):
+        prev = before.get(key)
+        if prev is None:
+            changed.append((key, "（新進結構表）"))
+            continue
+        notes: list[str] = []
+        if (prev.get("demand_anchor") is None) != (row.get("demand_anchor") is None):
+            notes.append("走不到錨 → 走得到" if row.get("demand_anchor") else "走得到錨 → 走不到")
+        if prev.get("substitutability") != row.get("substitutability"):
+            notes.append(f"sub {prev.get('substitutability')} → {row.get('substitutability')}")
+        if notes:
+            changed.append((key, "；".join(notes)))
+    if not changed:
+        lines.append("**結構表無變化**——若為真也不多一列、不改任何錨可達性；安心 park，不值得花力氣追平行證據。")
     else:
-        lines.append("| 標的→瓶頸 | 變化 | 疊加後名次 |")
-        lines.append("|---|---|---|")
-        for (company, bottleneck), delta, pos in moved[:top_n]:
-            lines.append(f"| {company} → `{bottleneck}` | {delta} | #{pos} |")
+        lines.append("| 標的→瓶頸 | 若為真的變化 |")
+        lines.append("|---|---|")
+        for (company, _relation, bottleneck), delta in changed:
+            lines.append(f"| {company} → `{bottleneck}` | {delta} |")
         lines.append("")
-        lines.append("名次有動＝值得投入平行驗證（B1 免費一手／B2 fact-check trigger）；入圖仍走原檔 admission。")
+        lines.append("表有動＝值得投入平行驗證（B1 免費一手／B2 fact-check trigger）；入圖仍走原檔 admission。")
     return "\n".join(lines)
 
 
@@ -1277,17 +1049,13 @@ def main() -> int:
 
     from identity.registry import get_registry
 
-    parser = argparse.ArgumentParser(description="瓶頸鏈排序")
-    parser.add_argument(
-        "--by-sector", action="store_true",
-        help="產業別分組呈現（demand anchor 聚類；預設輸出不受影響）",
-    )
+    parser = argparse.ArgumentParser(description="結構表（逐邊的結構事實；不排序）")
     parser.add_argument(
         "--what-if", metavar="HYP_ID", nargs="*", default=None,
-        help="疊加截圖假設層（engine_b/hypotheses.py）輸出純結構排序 diff；"
+        help="疊加截圖假設層（engine_b/hypotheses.py）輸出結構表 diff；"
              "不帶 id＝全部 active 假設。永不影響預設輸出。",
     )
-    parser.add_argument("--top-n", type=int, default=3)
+    # ⚠ 2026-09-23（Step 0b.3）：`--by-sector`（產業別分組 top-N）與 `--top-n` 隨排序退役。
     args = parser.parse_args()
 
     load_dotenv()
@@ -1304,7 +1072,7 @@ def main() -> int:
             rows = fetch_assertions(session)
     finally:
         driver.close()
-    result = rank_bottlenecks(rows, get_registry())
+    result = structure_table(rows, get_registry())
     if args.what_if is not None:
         from engine_b.hypotheses import load_store, overlay_assertions
 
@@ -1312,10 +1080,8 @@ def main() -> int:
         if not hyp_rows:
             print("（沒有 active 假設可疊加；先用 python -m engine_b.hypotheses add 建立）")
             return 0
-        overlaid = rank_bottlenecks(list(rows) + hyp_rows, get_registry())
-        print(render_what_if(result, overlaid, hyp_rows, top_n=max(args.top_n, 10)))
-    elif args.by_sector:
-        print(render_by_sector(result, top_n=args.top_n))
+        overlaid = structure_table(list(rows) + hyp_rows, get_registry())
+        print(render_what_if(result, overlaid, hyp_rows))
     else:
         print(render_markdown(result))
     return 0

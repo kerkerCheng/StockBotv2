@@ -35,15 +35,24 @@ def _tracked(arg: str | None) -> frozenset[str]:
     return frozenset(t.strip().upper() for t in (arg or "").split(",") if t.strip())
 
 
+#: 「位於已知瓶頸上」的判準：圖字彙 `substitutability` 1–5（5＝完全不可替代），≥ 4 才算難替代。
+#: 2026-09-23 之前這個 4 住在 `query/bottleneck.py::MIN_SUBSTITUTABILITY`（排序門檻）；排序退役後
+#: 結構表不設門檻，pq1 的成員資格判準搬到這裡。
+_CHOKEPOINT_MIN_SUBSTITUTABILITY = 4
+
+
 def _chokepoint(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]]:
     """位於已知瓶頸上的公司（ticker 與 company_id）。
 
     2026-08-20 之前 pq1 排序完全不看瓶頸性——「AXT 供應 COHR 的 InP」與「財報季
     總評」只由 tier 與 flags 區分，而系統整個定位就是找瓶頸。這裡把
-    `query/bottleneck.py` 已經算好的排序接進 priority。
+    `query/bottleneck.py` 的結構表接進 priority。
 
-    **只收 `demand_anchor` 非空的列**：依既有判準，連不到有人花錢的地方的瓶頸沒有
-    投資意義（`rank_bottlenecks` 自己的排序鍵也把需求錨點可達性放第一）。
+    **只收 `demand_anchor` 非空、且 `substitutability` ≥ 4 的列**：依既有判準，連不到有人花錢
+    的地方的瓶頸沒有投資意義；sub < 4 或未填的邊是「普通供應關係」或「還沒研究」，不是已知瓶頸。
+    ⚠ 2026-09-23（Step 0b.3）：上游由 `rank_bottlenecks()`（已用門檻 4 濾過）改為 `structure_table()`
+    （不設門檻），所以門檻搬到這裡明寫——**集合與之前一字不差**，pq1 的優先序沒有變。
+    它是 pq1 注意力的成員資格，不是任何排序或首選（G1）。
     與 `_held()` 同樣是唯讀輸入，取不到就回空集合讓排序退回原行為，不阻斷 drain。
     """
 
@@ -67,7 +76,7 @@ def _chokepoint(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]
                 rows = bottleneck.fetch_assertions(session)
         finally:
             driver.close()
-        result = bottleneck.rank_bottlenecks(rows, get_registry())
+        result = bottleneck.structure_table(rows, get_registry())
     except Exception as exc:
         if strict:
             if isinstance(exc, PriorityContextError):
@@ -79,6 +88,9 @@ def _chokepoint(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]
     company_ids: set[str] = set()
     for row in result.get("rows") or ():
         if not row.get("demand_anchor"):
+            continue
+        sub = row.get("substitutability")
+        if sub is None or sub < _CHOKEPOINT_MIN_SUBSTITUTABILITY:
             continue
         company_id = row.get("company_id")
         if company_id:

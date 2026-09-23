@@ -15,7 +15,8 @@
 `alpha/providers/fundamentals.py` 的 `market()` **刻意不換算 USD**（2026-09-19 缺陷 7）：
 換算需要 FX，而 FX 要打外部——放進 provider 就等於**每次建 packet 都打外部**。
 那一層只負責讓單位跟著值走；**正規化的責任在需要跨標的比較的那一層**，而那一層
-一輪只跑一次（`webapp materialize --basket`、`scripts/alpha_screen_check.py`）。
+一輪只跑一次（原本是 `webapp materialize --basket` 與 `scripts/alpha_screen_check.py`，兩者已於
+2026-09-23 Phase 0 退役；Phase 3 候選板接手時仍從這裡取正規化後的值，`config/alpha_screen.json` 留）。
 
 ⚠ 這與 APP 呈現契約不衝突：**request path 不得抓外部，materialize 不是 request path**。
 

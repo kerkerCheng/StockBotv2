@@ -3,7 +3,7 @@
 Neo4j／Cypher 是 implementation detail：**Cypher 不得出現在 `alpha/` 裡**
 （`tests/test_layer_separation.py` 掃描守住）。concrete 實作在 Phase 2 的
 `alpha/providers/graph_neo4j.py`，它包既有的 `query/`，不新寫查詢——
-這樣 `rank_bottlenecks()` 仍是唯一的結構排序權威。
+結構事實只有 `query/bottleneck.py::structure_table()` 一份（2026-09-23 起不排序）。
 
 ## 三條硬規則
 
@@ -29,10 +29,10 @@ from .identity import CompanyId, EntityId
 
 @dataclass(frozen=True, slots=True)
 class BottleneckRow:
-    """`rank_bottlenecks()` 的一列，轉成 contract 型別。
+    """`structure_table()` 的一列（達到 provider 的 `min_substitutability`），轉成 contract 型別。
 
-    ⚠ 這一層是**純轉換**：排序本身的唯一權威仍是 `query/bottleneck.py`。
-    本型別不重算、不加權、不另建平行排序。
+    ⚠ 這一層是**純轉換**：結構事實的唯一權威仍是 `query/bottleneck.py`。
+    本型別不重算、不加權、不排序、不另建第二份表。
     """
 
     company_id: CompanyId
@@ -82,10 +82,11 @@ class GraphResearchProvider(Protocol):
     def get_bottlenecks(
         self,
         *,
-        sector: str | None = None,
         min_substitutability: int = 4,
         as_of: date | None = None,
     ) -> Sequence[BottleneckRow]: ...
+    #: ⚠ `min_substitutability` 是 provider 對「bottleneck row」的定義（schema：5＝完全不可替代），
+    #: 不是排序門檻——排序已於 2026-09-23 退役；`sector`（依 demand_anchor 篩）同批退役。
 
     def get_dependency_paths(
         self, company_id: CompanyId, *, max_hops: int = 3, as_of: date | None = None

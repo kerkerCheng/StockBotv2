@@ -156,21 +156,11 @@ def test_going_concern_refuses_to_read_a_colour_out_of_free_text() -> None:
 # 5. 燈是量測不是訊號
 # ---------------------------------------------------------------------------
 
-def test_flags_do_not_participate_in_ranking_or_filtering() -> None:
-    """排序權威與籃子 filter **都不得**讀到歸零旗標——它一旦能擋掉候選就變回訊號（INV-5）。"""
-    ranking = (ROOT / "query" / "bottleneck.py").read_text(encoding="utf-8")
-    assert "wipeout" not in ranking, "排序權威讀到了歸零旗標——燈不得參與排序"
-    basket = (ROOT / "webapp" / "basket.py").read_text(encoding="utf-8")
-    row_fn = basket.split("def build_basket_row", 1)[1].split("def ", 1)[0]
-    # 列上可以**帶著**燈（呈現），但不得把它塞進 filter_reasons（判定去留）。
-    reasons_block = row_fn.split("reasons: list[str] = []", 1)[1].split("return {", 1)[0]
-    assert "wipeout" not in reasons_block, "歸零旗標進了 filter_reasons——量測不得決定去留"
-
-
-def test_lamp_count_and_company_count_are_not_collapsed_into_one_number() -> None:
-    """「一檔亮四盞」與「四檔各亮一盞」是兩件事，籃子帳必須分開算。"""
-    basket = (ROOT / "webapp" / "basket.py").read_text(encoding="utf-8")
-    assert '"lamps"' in basket and '"companies"' in basket and '"red_tickers"' in basket
+def test_flags_do_not_participate_in_the_structure_table() -> None:
+    """結構表**不得**讀到歸零旗標——它一旦能擋掉候選就變回訊號（INV-5）。
+    ⚠ 2026-09-23（Step 0b.3）：籃子 filter 那一半（`webapp/basket.py`）隨籃子退役，只剩結構表這一半。"""
+    table = (ROOT / "query" / "bottleneck.py").read_text(encoding="utf-8")
+    assert "wipeout" not in table, "結構表讀到了歸零旗標——燈不得參與結構事實"
 
 
 # ---------------------------------------------------------------------------

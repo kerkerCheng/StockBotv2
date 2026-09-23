@@ -18,7 +18,7 @@ Phase 6 之前，`portfolio/` 與 alpha 之間**一條線都沒有**（實測：
 真正的硬擋在 `store.record_live_choice`，那裡一個字都沒放寬。
 
 排序也不在這裡做：候選的先後**原樣沿用** `AlphaSignal` 進來的順序
-（唯一排序權威是 `query/bottleneck.py::rank_bottlenecks`）。本模組不重排、不加權。
+（跨檔排序已於 2026-09-23 退役；本模組本來就不重排、不加權）。
 
 ## ⚠ 「沒持有」與「持股讀不到」不得同形（L12／L13）
 

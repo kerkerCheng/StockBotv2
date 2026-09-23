@@ -213,7 +213,7 @@ def test_state_kind_registered_and_validates() -> None:
     with pytest.raises(ArtifactUnavailable, match="content_digest"):
         validate_state_artifact("beta", dict(payload, instruments=[]))
     with pytest.raises(ArtifactUnavailable, match="kind"):
-        validate_state_artifact("ranking", payload)
+        validate_state_artifact("structure_table", payload)
 
 
 def test_issuer_focus_only_lists_issuers_at_or_above_the_warning() -> None:

@@ -60,8 +60,10 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 #: `briefing/multi_year.py`）留到 0b 才刪——先斷 import，再刪模組。
 #: 磁碟上既有的兩份 artifact 不刪（`library/private/` 是 ignored derived cache，plan 不碰它），
 #: 只是從今天起沒有人讀得到它們。
+#: ⚠ 2026-09-23（Phase 0 Step 0b.3）：`ranking`（跨標的瓶頸排序：首選、兩份序、產業分組）→ `structure_table`
+#: （逐邊結構事實，不排序、不設門檻、沒有名次）。kind 數不變，仍是 7；磁碟上的 `ranking.json` 同上處置。
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
-    "ranking": "stockbot-app/ranking/1",
+    "structure_table": "stockbot-app/structure_table/1",
     "beta": "stockbot-app/beta/1",
     "coverage": "stockbot-app/coverage/2",
     "watches": "stockbot-app/watches/1",

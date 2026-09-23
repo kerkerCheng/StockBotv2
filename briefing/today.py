@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from typing import Any, Mapping, Sequence
 
-from alpha.brief import build_ready_not_ranked
 from decision_lab.brief import build_decision_brief, cohort_company_ids
 from decision_lab.store import DecisionStore
 from decision_lab.workflow_ports import WorkflowDataProvider
@@ -35,18 +34,16 @@ def build_today_brief(
     provider: WorkflowDataProvider | None = None,
     registry: IdentityRegistry | None = None,
     alpha_series_by_ticker: Mapping[str, Any] | None = None,
-    ranking: Mapping[str, Any] | None = None,
     nav_exposure: Mapping[str, Any] | None = None,
     identity_alignment: Mapping[str, Any] | None = None,
     alpha_cards: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """掃描 cohorts／decisions 與當前 Sheet snapshot；不寫入任何 authority。
 
-    `ranking`（`alpha.ranking.build_ranking_view` 的輸出）與 `nav_exposure`
-    （`portfolio.exposure.build_nav_exposure` 的輸出）由呼叫端注入——前者需要
-    Neo4j、後者需要 Google Sheet，取數住 `engine_d_runtime.adapters`。兩者缺席時
-    首屏照常渲染，只是那兩區明說「未提供」；**不得因此讓整份 brief 失敗，也不得
-    讓「沒注入」與「沒有東西」同形**（L12）。
+    `nav_exposure`（`portfolio.exposure.build_nav_exposure` 的輸出）由呼叫端注入——
+    它需要 Google Sheet，取數住 `engine_d_runtime.adapters`。缺席時首屏照常渲染，只是那一區
+    明說「未提供」；**不得因此讓整份 brief 失敗，也不得讓「沒注入」與「沒有東西」同形**（L12）。
+    ⚠ 2026-09-23（Phase 0 Step 0b.3）：`ranking` pane 與 `ready_not_ranked` 常駐清單隨跨檔排序退役。
     """
 
     registry = registry or get_registry()
@@ -77,13 +74,10 @@ def build_today_brief(
         provider=provider,
     )
 
-    # 系統終點：瓶頸排序在前、NAV 比例在後。兩者都是注入的（見 docstring）。
     panes: dict[str, Any] = {
-        "ranking": dict(ranking) if ranking else None,
-        "ready_not_ranked": build_ready_not_ranked(brief["items"], ranking),
         # Alpha Card 精簡摘要（2026-09-05）：由 `briefing.alpha_view` 的 canonical view 經
         # `compact_card` 選取而來，呼叫端注入（取數要 Neo4j＋Engine C＋Decision Store）。
-        # None＝未注入／整批讀取失敗，不與「排序內沒有候選」的空 list 混用（L12）。
+        # None＝未注入／整批讀取失敗，不與「沒有候選」的空 list 混用（L12）。
         "alpha_cards": [dict(card) for card in alpha_cards] if alpha_cards is not None else None,
         "nav_exposure": dict(nav_exposure) if nav_exposure else None,
         # 公司三集合對齊常駐計數器（2026-09-02 使用者稽核定案）：圖∖registry 是
@@ -101,17 +95,17 @@ def build_today_brief(
         # （L14——靠人記得跑 scripts/backup_private.py 的段落就是會被忘記的段落）。
         # None 只代表這個 surface 沒有 private root，不與「從未備份」混用（L12）。
         "backup_status": load_backup_status(),
-        # 排序品質計數器（2026-09-02）：讀 outcome_if_settled_today 落的狀態檔，
+        # 等權聚合計數器（2026-09-02）：讀 outcome_if_settled_today 落的狀態檔，
         # 不在 brief 生成時重打行情 API。None＝從未量測（檔不存在），現形於缺席。
         "outcome_aggregate": load_outcome_aggregate(),
     }
 
-    # 鍵序維持 B6 之前的 `decision_lab today --format json` 輸出：排序／NAV 在
-    # 決策欄位之前，items 永遠在最後。
+    # 鍵序維持 B6 之前的 `decision_lab today --format json` 輸出：卡片／NAV 在
+    # 決策欄位之前，items 永遠在最後（`ranking`／`ready_not_ranked` 兩鍵已退役）。
     assembled: dict[str, Any] = {}
     for key in ("schema_version", "as_of"):
         assembled[key] = brief[key]
-    for key in ("ranking", "ready_not_ranked", "alpha_cards", "nav_exposure"):
+    for key in ("alpha_cards", "nav_exposure"):
         assembled[key] = panes[key]
     for key in (
         "action_needed", "attention", "reason", "alpha_thesis_changes",

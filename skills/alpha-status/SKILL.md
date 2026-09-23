@@ -79,7 +79,8 @@ description: >
 
 **(a) 結構表** — 跑 `python -m query.bottleneck`，逐邊照抄：證據等級、`substitutability`、
 `sole_source`、`qualification_status`、自報／外部印證、走不走得到需求錨、`anchor_gaps`，
-以及被 filter 掉的列與理由（INV-3：input／accepted／filtered／reasons 四個數都要有）。
+以及母體定義排除的列與理由（INV-3：input／accepted／excluded／reasons 四個數都要有；
+2026-09-23 起**沒有門檻**——`substitutability` 未填或很低的邊都在表上，各自帶著自己的值）。
 **照抄順序即可，不得宣稱那是優先序**；`demand_anchor` 為空的列不是候選，但要列出來並說明。
 
 **(b) 候選狀態板** — 封閉字彙五值：可開／缺 X／已定價等回落／不要／已持有。
@@ -301,7 +302,7 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 
 | 情況 | 用哪個 |
 |---|---|
-| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP `#/ranking`／`#/coverage`） |
+| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP `#/structure-table`／`#/coverage`） |
 | 單一標的深挖 | `skills/investment-research` |
 | 由上而下拆解一個系統、產生新節點 | `skills/system-decompose` |
 | 新公司入圖 | `skills/company-onboard` |
