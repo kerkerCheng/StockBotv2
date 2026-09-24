@@ -55,6 +55,6 @@
 | [Portfolio Risk Policy Redesign (2026-07-29)](2026-07-29-001-refactor-portfolio-risk-policy-plan.md) | 只保留 ETF 槓桿／單筆 hard block、known issuer 穿透、drawn debt 與低雜訊事件監控 | completed |
 | [Serenity 30-Day Research Campaign (2026-07-29)](2026-07-29-002-feat-serenity-30d-research-campaign-plan.md) | 30 天 X 分頁回補、圖片快取、scoped exploration triage 與 robotics 一手追源 | completed |
 | [Phase 0 拆：退役估值鏈、排序驅動、decision_lab 研究側 (2026-09-22)](2026-09-22-001-refactor-phase0-retire-plan.md) | 給便宜模型的完整執行 plan：0a 停跑、0b 四批刪除（先斷 import 再刪）、0c 池子；驗收＝殭屍 grep 差集歸零、Decision Store sha256 不變 | completed（2026-09-23） |
-| [Phase 1 等待與心跳 (2026-09-24)](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | 一個 Windows daily（Codex 只做 triage、weekly 退役）、`semantic_condition` watch、反證登記 hook 與補登記、到期轉 pq2 `watch_decision`、心跳改版；驗收＝watch registry 的筆數與狀態 | active（P0 第 1 輪 NO_GO 已修訂，第 2 輪待跑） |
+| [Phase 1 等待與心跳 (2026-09-24)](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | 一個 Windows daily（Codex 只做 triage、weekly 退役）、`semantic_condition` watch、反證登記 hook 與補登記、到期轉 pq2 `watch_decision`、心跳改版；驗收＝watch registry 的筆數與狀態 | active（P0 第 2 輪 NO_GO 已修訂，第 3 輪待跑） |
 
 **目前 active plan：Phase 1（2026-09-24-001）。開工前先過 P0 plan review（該檔 §0.6），review 回 GO 之後切便宜模型貼 `/phase-run`。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
