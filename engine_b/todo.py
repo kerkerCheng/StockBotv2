@@ -64,7 +64,8 @@ GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
     "ra_admission": ("exact graph admission（apply_research_action）", "thesis mutation 與 live"),
     "decision_review": ("（legacy）不再建立新項目", "任何 authority mutation"),
     "source_trace_review": ("bounded 追源（dispatch 回 pq1）", "提高 evidence tier 與入圖"),
-    "thesis_lifecycle": ("本機複查該 thesis", "自動改 lifecycle 或入圖"),
+    "thesis_lifecycle": ("本機複查該 thesis；go／drop 後它名下列出的反證續盯到下一個核查點、判定觸及的標已處置並續盯（A7）",
+                         "自動改 lifecycle 或入圖"),
     "sheet_only_holding": ("（legacy）不再建立新項目", "任何部位動作"),
     "engine_c_observation": ("寫入 Engine C append-only ledger", "入圖與 thesis mutation"),
     "thesis_mutation": ("該筆 thesis lifecycle 變更", "入圖與 live"),
@@ -379,15 +380,15 @@ def resolve(
 _WATCH_DECISION_EVIDENCE_KEYS = frozenset({"lead", "report", "watch"})
 _WATCH_DECISION_OUTCOMES = ("touched", "not_touched")
 #: report 收據只收研究產出所在的目錄（R2-b NB-5：`report:AGENTS.md` 這種「存在但不是研究結果」的檔案不算）
-_WATCH_DECISION_REPORT_ROOTS = ("docs/reports/", "thesis/", "library/private/")
+_WATCH_DECISION_REPORT_ROOTS = ("docs/reports/", "thesis/")   # R2-b 第三輪 NB3-6：library/private 的 state 檔含所有 watch_id
 
 
 def _validate_watch_decision_go(receipt: str, *, quote: str | None, watch: Mapping[str, Any]) -> dict[str, str]:
     """`watch_decision` 的 go＝「研究結論：條件已被觸及」（R2-b B2）。收據要**指得回這次到期之後的研究結果**：
 
     - `outcome:touched` 必填（`not_touched` 不是 go：續等或 drop）；`--quote` 必填（文件逐字；L18）。
-    - 至少一項 `lead:<id>`（leads store 有、且最後動作不早於這次到期日）／`report:<路徑>`（在
-      `_WATCH_DECISION_REPORT_ROOTS` 之下、檔案存在）／`watch:<id>`（不是自己、非 consumed、建立不早於到期日）。
+    - 至少一項 `lead:<id>`（leads store 有、且**首次出現**不早於這次到期日）／`report:<路徑>`（在
+      `_WATCH_DECISION_REPORT_ROOTS` 之下的 `.md`、內文提到這個 watch_id）／`watch:<id>`（不是自己、非 consumed、建立不早於到期日）。
     """
     if not receipt.strip():
         raise TodoError('watch_decision 的 go 必須附研究結論與結果：--receipt "outcome:touched;report:<路徑>" '
@@ -420,8 +421,8 @@ def _validate_watch_decision_go(receipt: str, *, quote: str | None, watch: Mappi
     if "report" in fields:
         rel = fields["report"].replace("\\", "/")
         path = (_ROOT / rel).resolve()
-        if (not rel.startswith(_WATCH_DECISION_REPORT_ROOTS) or not path.is_relative_to(_ROOT.resolve())
-                or not path.is_file()):
+        if (not rel.startswith(_WATCH_DECISION_REPORT_ROOTS) or not rel.endswith(".md")
+                or not path.is_relative_to(_ROOT.resolve()) or not path.is_file()):
             raise TodoError(f"watch_decision receipt 的 report 必須是 {'／'.join(_WATCH_DECISION_REPORT_ROOTS)} "
                             f"之下存在的檔案：{fields['report']}")
         # 報告要寫到這個 watch（NB2-3：lifecycle.json、兩個月前的報告都會通過「存在」這一關）
@@ -1256,8 +1257,10 @@ def sync(
         # （比照 `watch_wake`）——否則觸及會安靜地躺在等事件那一區。
         if row.get("disproof_watch_ids"):
             known = set(item.get("disproof_watch_ids") or ())
-            fresh = sorted(set(row["disproof_watch_ids"]) - known)
             item["disproof_watch_ids"] = sorted(known | set(row["disproof_watch_ids"]))
+            # 只有「判定觸及」是事件、要把延後的項目叫回；到期與一併續盯的只附掛——否則使用者明示的延後被單純的
+            # 到期拉回、還記成「反證被判觸及」（R2-b 第三輪 NB3-5a；L12）
+            fresh = sorted(set(row.get("disproof_touched_ids") or ()) - known)
             if fresh and (item.get("waiting_on") or item.get("deferred_at")):
                 prior = dict(item.get("waiting_on") or {})
                 item.pop("waiting_on", None)
@@ -1267,6 +1270,8 @@ def sync(
                     "verb": "disproof_touch", "reason": f"反證被判觸及：{', '.join(fresh)}",
                     "receipt": None, "prior_waiting_on": prior,
                 })
+
+    _wake_passed_until(pool, stamp=stamp)
 
     reconcile = reconciled if reconciled is not None else _reconcile_disproof()
 
@@ -1290,6 +1295,25 @@ def sync(
     }
 
 
+def _wake_passed_until(pool: dict[str, Any], *, stamp: str) -> int:
+    """`pending --until <日期>` 的日期過了 → 叫回「球在你」（R2-b 第三輪 NB3-5b；INV-2：每個等待都要有到期，
+    到期是重問）。原本 `waiting_on.until` 沒有任何程式讀，過了日期仍永遠躺在「等事件」。冪等（清掉就不再命中）。"""
+    today = datetime.now(timezone.utc).date().isoformat()
+    woken = 0
+    for item in active_items(pool):
+        until = str((item.get("waiting_on") or {}).get("until") or "")[:10]
+        if not until or until >= today:
+            continue
+        prior = dict(item["waiting_on"])
+        item.pop("waiting_on", None)
+        item.pop("deferred_at", None)
+        pool["log"].append({"at": stamp, "n": item["n"], "type": item["type"], "ref_id": item["ref_id"],
+                            "verb": "waiting_until_passed", "reason": f"等到 {until} 的日期已過：重問",
+                            "receipt": None, "prior_waiting_on": prior})
+        woken += 1
+    return woken
+
+
 def _reconcile_disproof() -> dict[str, Any] | None:
     """thesis 反證對帳（Phase 1 Step 1.5）：在 watch 比對之前跑，這一輪新登記的條件同一輪就開始比對。
 
@@ -1300,7 +1324,7 @@ def _reconcile_disproof() -> dict[str, Any] | None:
 
         data = event_watch.load_watches()
         summary = disproof.reconcile_thesis_disproof(data)
-        if summary["registered"] or summary["consumed"]:
+        if summary["registered"] or summary["consumed"] or summary.get("relinked"):
             event_watch.save_watches(data)
         return summary
     except Exception:  # noqa: BLE001
@@ -1355,9 +1379,9 @@ def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict
             and w["watch_id"] not in fresh_ids
         ]
         woken = 0
-        # 到期處置（Phase 1 Step 1.7，A3）：pq2 型 → 它指向的未結案編號翻回「球在你」（不另鑄號）；
-        # 讀圖型 → 不另處置（讀圖自己的到期由 needs_reread 重問），只記處置；語意／假設型 → 收集器鑄 watch_decision；
-        # 追源型 → consume-fired 轉終局。
+        # 到期處置（Phase 1 Step 1.7，A3／A7）：pq2 型 → 它指向的未結案編號翻回「球在你」（不另鑄號）；
+        # wake_reading → 只記處置（讀圖自己的到期由 needs_reread 重問）；thesis／讀圖來源的反證 → 列進 thesis 複查與
+        # 節點重讀（不在這裡處置）；假設型等 → 收集器鑄 watch_decision；追源型 → consume-fired 轉終局。
         for watch in data["watches"]:
             if watch.get("status") != "expired":
                 continue
@@ -1737,8 +1761,9 @@ def _collect_lifecycle_rows() -> list[dict[str, Any]]:
 
     反證被判觸及（C3／A5，Phase 1 Step 1.5）：row 帶 `disproof_watch_ids`，`sync` 寫到 item 上；使用者對這一筆
     `go`／`drop` 時，同一個動作把那些 watch 標 `judgment.handled`——觸及的等待由這一筆接住，不會消失。"""
-    from crons.thesis_freshness_check import lifecycle_due_detail
+    from crons.thesis_freshness_check import lifecycle_due_detail, touched_disproof_by_thesis
 
+    touched = touched_disproof_by_thesis()
     return [
         {
             "type": "thesis_lifecycle",
@@ -1746,6 +1771,8 @@ def _collect_lifecycle_rows() -> list[dict[str, Any]]:
             "title": f"thesis {tid}：{why}",
             "source": "lifecycle",
             **({"disproof_watch_ids": ids} if ids else {}),
+            **({"disproof_touched_ids": sorted(str(w["watch_id"]) for w in touched.get(tid, []))}
+               if touched.get(tid) else {}),
         }
         for tid, why, ids in lifecycle_due_detail(strict=True)
     ]
@@ -2166,7 +2193,7 @@ def main(argv: list[str] | None = None) -> int:
                               f"、sidecar 不符 {len(rc['sidecar_mismatch'])}"
                               + (f"、沒有結構化反證 {len(rc['no_structured'])}（由 Step 1.6 補登記）"
                                  if rc["no_structured"] else "")
-                              + (f"、⚠ 登記失敗 {len(rc.get('errors') or [])}"
+                              + (f"、⚠ 對帳錯誤 {len(rc.get('errors') or [])}"
                                  if rc.get("errors") else ""))
             print(
                 f"（新增 {result['added']}，目前 {result['active']} 項待辦"

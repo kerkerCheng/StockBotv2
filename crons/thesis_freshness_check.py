@@ -141,6 +141,32 @@ def expired_disproof_by_thesis(data: dict | None = None, *, lifecycle: dict | No
     return out
 
 
+def upcoming_disproof_by_thesis(data: dict | None = None, *, lifecycle: dict, today: date) -> dict[str, list[dict]]:
+    """thesis 來源、還在等（active／fired）且到期日落在「今天＋一個核查週期」之內的條件，依 thesis id 分組（NB3-3）。"""
+    from datetime import timedelta
+
+    if data is None:
+        from engine_b.event_watch import load_watches
+
+        data = load_watches()
+    horizon: dict[str, tuple[str, str]] = {}
+    for tid, e in lifecycle.items():
+        if isinstance(e, dict) and e.get("memo") and e.get("status") != "retired":
+            interval = e.get("check_interval_days")
+            days = int(interval) if isinstance(interval, (int, float)) and not isinstance(interval, bool) and interval > 0 else 90
+            horizon[str(e["memo"])] = (str(tid), (today + timedelta(days=days)).isoformat())
+    out: dict[str, list[dict]] = {}
+    for watch in (data or {}).get("watches") or []:
+        ref = str(watch.get("source_ref") or "")
+        if watch.get("kind") != "semantic_condition" or not ref.startswith("thesis:") \
+                or watch.get("status") not in ("active", "fired"):
+            continue
+        hit = horizon.get(ref[len("thesis:"):].split("#", 1)[0])
+        if hit and str(watch.get("expires")) <= hit[1]:
+            out.setdefault(hit[0], []).append(watch)
+    return out
+
+
 def touched_disproof_by_thesis(data: dict | None = None) -> dict[str, list[dict]]:
     """判定觸及、還沒處置的 thesis 來源語意 watch，依 thesis id 分組（C3／A5；Phase 1 Step 1.5）。
 
@@ -198,6 +224,13 @@ def lifecycle_due_detail(*, watch_data: dict | None = None, strict: bool = False
             reasons.setdefault(tid, []).append(
                 f"反證被判觸及：{condition_label(watch.get('condition'))}｜48 小時動作：{watch.get('action_48h')}")
             watch_ids.setdefault(tid, []).append(str(watch["watch_id"]))
+    # 排程到期的那一筆一併帶上「一個核查週期內會到期」的反證（NB3-3）：準時複查時條件就在同一次續盯，
+    # 不會在隔天各自到期、另開一筆。
+    for tid, watches in upcoming_disproof_by_thesis(watch_data, lifecycle=data, today=today).items():
+        if tid not in reasons:
+            continue
+        reasons[tid].append(f"（複查時一併續盯 {len(watches)} 條反證）")
+        watch_ids.setdefault(tid, []).extend(str(w["watch_id"]) for w in watches)
     for tid, watches in expired_disproof_by_thesis(watch_data, lifecycle=data).items():
         labels = "、".join(condition_label(w.get("condition"), 24) for w in watches[:3])
         more = f" 等 {len(watches)} 條" if len(watches) > 3 else ""

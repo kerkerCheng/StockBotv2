@@ -166,7 +166,7 @@ NOT_WORK: dict[str, str] = {
     "lead:triaged_no_go": "終局",
     "watch:active": "在等（未觸發）",
     "watch:consumed": "終局",
-    "watch:expired": "到期：需要人決定的已轉 pq2 watch_decision；pq2 型已翻回球在你；追源型已結案（watch_expired）",
+    "watch:expired": "到期：thesis／讀圖來源的列進 thesis 複查與節點重讀（A7）；假設型等轉 pq2 watch_decision；pq2 型已翻回球在你；追源型已結案（watch_expired）",
     "todo:awaiting_approval": "等 pq2 人工 gate",
     "todo:completed": "終局（等 resolve）",
     "todo:parked": "終局（等 resolve）",

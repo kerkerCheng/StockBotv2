@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import re
 import tempfile
 from datetime import date, datetime, timedelta, timezone
@@ -277,6 +278,9 @@ def add_watch(
         _validate_semantic(condition=condition, entities=list(entities), source_ref=source_ref,
                            disproof_ref=disproof_ref, check_frequency=check_frequency,
                            action_48h=action_48h, expires=expires, today=today or _today())
+        if str(source_ref).startswith("reading:") and not str(node or "").strip():
+            # 讀圖來源必帶節點（R2-b 第三輪 NB3-4）：重讀理由（reread_reasons）以節點認，沒有 node 只剩計數
+            raise EventWatchError("讀圖來源的語意 watch 必須帶 node（--node <節點>）")
     watch = {
         "watch_id": f"ew_{len(data['watches']) + 1:04d}_{_today().isoformat()}",
         "created_at": created_at or _now(),
@@ -498,8 +502,9 @@ EXPIRY_RESOLUTION_KINDS: dict[str, str] = {
 def mark_expired(data: dict[str, Any], *, today: date | None = None, only: str | None = None) -> list[str]:
     """`expires < 今天` 的 active watch → `expired`，記 `expired_at`（Phase 1 Step 1.7）。回傳這一次轉到期的 id。
 
-    到期不是丟（INV-2）：需要人決定的（語意型、假設型）由 `todo sync` 鑄 `watch_decision`；pq2 型把它指向的
-    編號翻回「球在你」；追源型把 lead 轉終局 `watch_expired` 並計數；讀圖型由讀圖自己的到期重問。"""
+    到期不是丟（INV-2），處置依 `expiry_class`：thesis 來源的反證列進 thesis 複查、讀圖來源的列進節點重讀（A7）；
+    假設型等沒有自己複查週期的由 `todo sync` 鑄 `watch_decision`；pq2 型把它指向的編號翻回「球在你」；
+    追源型把 lead 轉終局 `watch_expired` 並計數；`wake_reading` 由讀圖自己的到期重問。"""
     today = today or _today()
     out: list[str] = []
     for watch in data["watches"]:
@@ -576,6 +581,24 @@ def renew(data: dict[str, Any], watch_id: str, *, until: str, n: int | None = No
         watch["status"] = "active"
         watch.pop("expired_at", None)
         watch.pop("expiry_resolution", None)
+        return watch
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def extend(data: dict[str, Any], watch_id: str, *, until: str, n: int | None = None, note: str = "") -> dict[str, Any]:
+    """還在等的（active／fired）watch 把到期往後延（A7：thesis 複查時一併續盯；R2-b 第三輪 NB3-3）。只延不縮，歷史附加。"""
+    until_day = date.fromisoformat(str(until))
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if watch.get("status") not in ("active", "fired"):
+            raise EventWatchError(f"只能延長還在等的 watch：{watch_id}（現況 {watch.get('status')}）")
+        if until_day.isoformat() <= str(watch.get("expires")):
+            return watch
+        watch["extensions"] = [*(watch.get("extensions") or []),
+                               {"at": _now(), "previous_expires": watch["expires"], "until": until_day.isoformat(),
+                                "n": n, "note": note or None}]
+        watch["expires"] = until_day.isoformat()
         return watch
     raise EventWatchError(f"watch 不存在：{watch_id}")
 
@@ -1086,6 +1109,16 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps(counters(data, coverage=coverage), ensure_ascii=False))
         return 0
     if args.cmd == "register-disproof":
+        # 去重（R2-b 第三輪 NB3-9）：同一來源、同一條件已有還在處理中的 watch 就拒收——否則同一份 lead 叫醒兩次、複查兩筆一起續盯
+        from engine_b import disproof as _dp
+
+        source = str(args.source_ref).split("#", 1)[0]
+        dup = next((w for w in data["watches"] if w.get("kind") == SEMANTIC_KIND and _dp._live(w)
+                    and str(w.get("source_ref") or "").split("#", 1)[0] == source
+                    and _dp.normalize(w.get("condition")) == _dp.normalize(args.condition)), None)
+        if dup is not None:
+            print(f"✗ 同一來源已有這個條件的等待：{dup['watch_id']}（{dup.get('status')}）——不重複登記", file=sys.stderr)
+            return 2
         watch = add_watch(
             data, kind=SEMANTIC_KIND, disproof_ref=args.source_ref, expires=args.expires,
             entities=[e for e in args.entities.split(",") if e.strip()], condition=args.condition,

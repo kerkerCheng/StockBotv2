@@ -641,6 +641,9 @@ def _disproof_lines() -> list[str]:
     if c.get("lifecycle_unreadable"):
         lines.append("⚠ **thesis/lifecycle.json 讀不到**——thesis 反證沒算（不是 0），對帳本輪不動任何等待；"
                      "修好檔案（`python -m json.tool thesis/lifecycle.json`）")
+    if c.get("memo_unreadable"):
+        lines.append(f"⚠ thesis memo 讀不到或「推翻」節解析不到 {len(c['memo_unreadable'])}："
+                     f"{'、'.join(c['memo_unreadable'])}——它的反證沒算進預期（不是 0）")
     lines.append(f"反證：在盯 {c['watching']}（其中叫不醒 {unreachable}）｜**觸及待處置 {c['touched_pending']}**{waits}"
                  f"｜到期待複查 {c['expired_pending']}（併進 thesis 複查／節點重讀）"
                  f"｜未盯 {c['unwatched']}{orphan}（v1 讀圖散文 {c['v1_prose_readings']} 份不可機械數；凍結歷史 {frozen} 不盯）")

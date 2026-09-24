@@ -107,6 +107,13 @@ def review_horizon(entry: Mapping[str, Any], *, today: date) -> date:
     return max(nxt, today) + timedelta(days=_interval(entry))
 
 
+def rearm_until(entry: Mapping[str, Any], condition: str, *, today: date) -> date:
+    """續盯到哪天：`review_horizon`，且不早於條件自己寫的完整日期＋30 天（同 `_default_expires` 的規則；NB3-1）。"""
+    horizon = review_horizon(entry, today=today)
+    written = ew.condition_dates(condition)
+    return max([horizon, *(d + timedelta(days=30) for d in written)])
+
+
 def _touched_pending(watch: Mapping[str, Any]) -> bool:
     judgment = watch.get("judgment") or {}
     return judgment.get("touches") == "yes" and not judgment.get("handled")
@@ -243,12 +250,18 @@ def after_thesis_review(data: dict[str, Any], watch_ids: Sequence[str], *, n: in
     - 判定觸及、未處置 → 標 `judgment.handled`；memo 仍現行且同條件沒有別的 `_live` watch → 開一筆新的續盯
       （到期＝`review_horizon`；結構化與手動登記一致，NB2-5）。
     - 到期未處置 → 續到 `review_horizon`（同一筆 watch 回 active、歷史附加）。memo 已不是現行 → 記 `source_superseded`。
-    lifecycle 讀不到 → 觸及照標 handled（那是使用者的動作），續盯與續等本輪不做（下一次複查項目會再列出）。"""
+    - 還在等（active／fired）而被列進來的（排程到期時一併帶上的，NB3-3）→ 延到 `rearm_until`（只延不縮）。
+    lifecycle 讀不到 → **什麼都不做**（觸及也不標 handled：標了就不會再列出，續盯又做不了——那一條會從「在盯」掉到
+    「未盯」；留著，下一筆複查項目會再列出，多問一次；R2-b 第三輪 NB3-1）。"""
     lifecycle = load_lifecycle() if lifecycle is None else lifecycle
     today = today or datetime.now(timezone.utc).date()
-    out: dict[str, list[str]] = {"handled": [], "rewatched": [], "renewed": [], "superseded": [], "errors": []}
+    out: dict[str, list[str]] = {"handled": [], "rewatched": [], "renewed": [], "extended": [], "superseded": [],
+                                 "errors": []}
     ids = set(watch_ids)
-    by_memo = {str(e.get("memo")): e for e in (lifecycle or {}).values()
+    if lifecycle is None:
+        out["errors"].append("lifecycle 讀不到——這一筆複查的反證本輪不處理，下一筆複查項目會再列出")
+        return out
+    by_memo = {str(e.get("memo")): e for e in lifecycle.values()
                if isinstance(e, dict) and e.get("memo") and e.get("status") != "retired"}
     for watch in list(data["watches"]):
         if watch.get("watch_id") not in ids or watch.get("kind") != ew.SEMANTIC_KIND:
@@ -268,7 +281,8 @@ def after_thesis_review(data: dict[str, Any], watch_ids: Sequence[str], *, n: in
             try:
                 new = ew.add_watch(
                     data, kind=ew.SEMANTIC_KIND, disproof_ref=watch["source_ref"], source_ref=watch["source_ref"],
-                    expires=review_horizon(entry, today=today).isoformat(), entities=list(watch.get("entities") or ()),
+                    expires=rearm_until(entry, str(watch.get("condition")), today=today).isoformat(),
+                    entities=list(watch.get("entities") or ()),
                     condition=str(watch.get("condition")), check_frequency=str(watch.get("check_frequency")),
                     action_48h=str(watch.get("action_48h")), quote_locator=str(watch.get("quote_locator") or ""),
                     node=str(watch.get("node") or ""), note=f"thesis 複查（[{n}] {verb}）後續盯；原 {watch['watch_id']}",
@@ -276,16 +290,20 @@ def after_thesis_review(data: dict[str, Any], watch_ids: Sequence[str], *, n: in
                 out["rewatched"].append(new["watch_id"])
             except ew.EventWatchError as exc:
                 out["errors"].append(f"{watch['watch_id']}：{exc}")
+        elif watch.get("status") in ("active", "fired"):
+            if entry is not None:
+                ew.extend(data, watch["watch_id"], n=n, note=f"thesis 複查（[{n}] {verb}）一併續盯",
+                          until=rearm_until(entry, str(watch.get("condition")), today=today).isoformat())
+                out["extended"].append(watch["watch_id"])
         elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
-            if lifecycle is None:
-                continue
             if entry is None:
                 ew.resolve_expiry(data, watch["watch_id"], {"kind": "source_superseded",
                                                             "note": "thesis 複查時 memo 已不是現行"})
                 out["superseded"].append(watch["watch_id"])
                 continue
             try:
-                ew.renew(data, watch["watch_id"], until=review_horizon(entry, today=today).isoformat(), n=n)
+                ew.renew(data, watch["watch_id"], n=n,
+                         until=rearm_until(entry, str(watch.get("condition")), today=today).isoformat())
                 out["renewed"].append(watch["watch_id"])
             except ew.EventWatchError as exc:
                 out["errors"].append(f"{watch['watch_id']}：{exc}")
@@ -333,6 +351,7 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
     lifecycle = load_lifecycle() if lifecycle is None else lifecycle
     expected: dict[tuple[str, str], str] = {}   # (來源, 正規化文字) → 它在等哪裡
     mismatch: list[str] = []
+    unreadable_memos: list[str] = []   # 讀不到或「推翻」節解析不到——它的條件沒算進預期（不是 0；NB3-8）
     for tid, entry in (lifecycle or {}).items():
         if not isinstance(entry, dict) or not entry.get("memo") or entry.get("status") == "retired":
             continue
@@ -340,8 +359,12 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
         try:
             text = (root / memo).read_text(encoding="utf-8")
         except OSError:
+            unreadable_memos.append(str(tid))
             continue
-        for item in disproof_items(text):
+        items = disproof_items(text)
+        if not items:
+            unreadable_memos.append(str(tid))
+        for item in items:
             expected[(f"thesis:{memo}", normalize(item))] = f"thesis {tid} 複查"
         sidecar = _sidecar(root / memo)
         if sidecar and sidecar.get("disproof_conditions"):
@@ -371,6 +394,8 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
         else:
             continue
         key = (str(watch.get("source_ref") or "").split("#", 1)[0], normalize(watch.get("condition")))
+        if lifecycle is None and key[0].startswith("thesis:"):
+            continue   # lifecycle 讀不到時 thesis 那一半是「沒算」，不是孤兒（NB3-8）
         if key not in expected:
             orphan_touched += cat == "touched"
             continue
@@ -390,6 +415,7 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
         "v1_prose_readings": v1_prose,
         "frozen_history": frozen_history,
         "thesis_sidecar_mismatch": mismatch,
+        "memo_unreadable": unreadable_memos,
         "lifecycle_unreadable": lifecycle is None,
     }
 

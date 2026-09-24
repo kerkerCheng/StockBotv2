@@ -124,11 +124,20 @@ def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | 
     data = ew.load_watches(watches_path)
     summary: dict[str, list[str]] = {"registered": [], "consumed": [], "reread_registered": [],
                                      "reread_consumed": [], "touched_handled": []}
-    if parsed.supersedes_id:
-        prefix = f"reading:{parsed.supersedes_id}#"
+    # 收舊：撤回只收被撤回那一份的；新讀圖收**這個節點其他每一份**的（R2-b 第三輪 NB3-4：只認 supersedes_id 時，
+    # 重讀忘了帶或帶錯，舊讀圖的條件永遠掛著，同一條件新舊兩筆）。節點的讀圖 id 從 ledger 讀，不只靠 watch 上的 node。
+    if parsed.retracted:
+        stale_ids = {str(parsed.supersedes_id)} if parsed.supersedes_id else set()
+    else:
+        records, _errors = read_reading_records(parsed.node)
+        stale_ids = ({r.reading_id for r in records} | ({str(parsed.supersedes_id)} if parsed.supersedes_id else set())) \
+            - {parsed.reading_id}
+    if stale_ids:
         note = "retracted" if parsed.retracted else f"superseded by {parsed.reading_id}"
         for watch in data["watches"]:
-            if watch.get("kind") != ew.SEMANTIC_KIND or not str(watch.get("source_ref") or "").startswith(prefix):
+            ref = str(watch.get("source_ref") or "")
+            if (watch.get("kind") != ew.SEMANTIC_KIND or not ref.startswith("reading:")
+                    or ref[len("reading:"):].split("#", 1)[0] not in stale_ids):
                 continue
             if watch.get("status") in ("active", "fired"):
                 watch["status"] = "consumed"

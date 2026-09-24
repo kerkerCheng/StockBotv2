@@ -70,6 +70,7 @@ def env(tmp_path, monkeypatch):
 
     write_memo([CONDITION])
     save_life()
+    state["real_reconcile_wrapper"] = todo._reconcile_disproof   # NB3-2：要測正式包裝的存檔條件
     monkeypatch.setattr(todo, "_reconcile_disproof", reconcile)
     monkeypatch.setattr(disproof, "load_lifecycle", lambda *a, **k: state["life"])
     real_load = leads.load
@@ -767,3 +768,179 @@ def test_watch_expired_is_a_registered_terminal_trace_status() -> None:
     registry = json.loads(open("config/lead_trace_status.json", encoding="utf-8").read())
     assert registry["statuses"]["watch_expired"]["terminal"] is True
     assert lead_refs.validate_ref_updates({"trace_status": "watch_expired"})["trace_status"] == "watch_expired"
+
+
+# ---------------------------------------------------------------------------
+# R2-b 第三輪（GO）的 NB3 處置
+# ---------------------------------------------------------------------------
+
+def _touch(data, watch):
+    watch["status"] = "fired"
+    watch["woken_by"] = {"lead_id": "L1"}
+    ew.judge(data, watch["watch_id"], touches=True, note="量產了", quote="entered volume production")
+
+
+def test_review_with_unreadable_lifecycle_leaves_the_touch_for_the_next_item(env) -> None:
+    """NB3-1(a)：lifecycle 讀不到時不標 handled——標了就不會再列出、續盯又做不了。"""
+    data = ew.load_watches()
+    watch = _semantic(data, expires=FUTURE)
+    _touch(data, watch)
+    ew.save_watches(data)
+    pool = _pool()
+    _sync_lifecycle(pool)
+    env["life"] = None
+    todo.resolve(pool, _open(pool, "thesis_lifecycle")[0]["n"], "drop", reason="複查")
+    assert not _watch(watch["watch_id"])["judgment"].get("handled"), "讀不到 lifecycle 時觸及要留給下一筆"
+
+
+def test_rewatch_never_expires_before_the_date_written_in_the_condition(env) -> None:
+    """NB3-1(b)：續盯的到期不早於條件原文寫的完整日期＋30 天（否則 add_watch 拒收、條件掉進未盯）。"""
+    dated = "若客戶在 2099-06-30 前正式宣布改用不經這個節點的替代路徑並量產"
+    env["write_memo"]([dated])
+    data = ew.load_watches()
+    watch = ew.add_watch(data, kind=ew.SEMANTIC_KIND, disproof_ref=REF, source_ref=REF, expires="2099-08-01",
+                         entities=[SIVERS], condition=dated, check_frequency="每季", action_48h="重讀")
+    _touch(data, watch)
+    ew.save_watches(data)
+    pool = _pool()
+    _sync_lifecycle(pool)
+    todo.resolve(pool, _open(pool, "thesis_lifecycle")[0]["n"], "drop", reason="複查")
+    live = _live_for(dated)
+    assert len(live) == 1 and live[0]["expires"] >= "2099-07-30"
+
+
+def test_relink_is_saved_by_the_real_reconcile_wrapper(env, monkeypatch) -> None:
+    """NB3-2：只換位置時正式包裝也要存檔（fixture 的替身每次都存，蓋掉過這個 bug）。"""
+    env["write_memo"]([C1])
+    data = ew.load_watches()
+    _semantic(data, expires=FUTURE, condition=C1)
+    ew.save_watches(data)
+    env["write_memo"]([C2, C1])
+    real = disproof.reconcile_thesis_disproof
+    monkeypatch.setattr(disproof, "reconcile_thesis_disproof", lambda d, **k: real(d, root=env["tmp"]))
+    summary = env["real_reconcile_wrapper"]()
+    assert len(summary["relinked"]) == 1
+    assert _refs() == [(C1, f"thesis:{MEMO}#2")], "relink 要落地"
+
+
+def test_scheduled_review_carries_conditions_that_would_expire_within_a_cycle(env) -> None:
+    """NB3-3：準時複查時快到期的條件同一次續盯，不會隔天各自到期、另開一筆。"""
+    from crons import thesis_freshness_check as tfc
+
+    env["life"]["x"]["next_check"] = (date.today() - timedelta(days=1)).isoformat()   # 排程到期
+    env["save_life"]()
+    data = ew.load_watches()
+    soon = _semantic(data, expires=(date.today() + timedelta(days=10)).isoformat())
+    later = _semantic(data, expires=(date.today() + timedelta(days=400)).isoformat(), condition=C1)
+    ew.save_watches(data)
+    detail = tfc.lifecycle_due_detail()
+    assert detail[0][2] == [soon["watch_id"]] and "一併續盯 1 條" in detail[0][1]
+    pool = _pool()
+    _sync_lifecycle(pool)
+    env["life"]["x"]["next_check"] = (date.today() + timedelta(days=90)).isoformat()   # 複查後移到下一個核查點
+    todo.resolve(pool, _open(pool, "thesis_lifecycle")[0]["n"], "drop", reason="複查")
+    assert _watch(soon["watch_id"])["expires"] == (date.today() + timedelta(days=180)).isoformat()
+    assert _watch(soon["watch_id"])["extensions"][0]["n"] == 1
+    assert _watch(later["watch_id"])["expires"] == (date.today() + timedelta(days=400)).isoformat(), "只延不縮"
+
+
+def test_new_reading_retires_every_older_reading_of_the_node(env, monkeypatch) -> None:
+    """NB3-4：重讀忘了帶 supersedes_id，也要以節點收掉舊讀圖的條件——不留新舊兩筆。"""
+    from alpha.providers import structure_readings as sr
+    from alpha.structure_reading.contracts import structure_reading_record
+
+    old = "sr_0123456789abcdef"
+    watch_id = _expired(ref=f"reading:{old}#1", node="tech:cw_dfb_laser")
+
+    class _R:
+        def __init__(self, rid):
+            self.reading_id = rid
+
+    monkeypatch.setattr(sr, "read_reading_records", lambda node, **k: ([_R(old)], []))
+    record = structure_reading_record(
+        node="tech:cw_dfb_laser", structure={"result_digest": "d" * 16, "angles": {}, "anchor_chain": []},
+        kind="volume", reading="重讀：供給側大家差不多，賭的是產能一時補不上——判讀不變。",
+        expires=date.today() + timedelta(days=30), created_at=datetime.now(timezone.utc), author="test",
+        disproof=[{"condition": CONDITION, "entities": [SIVERS], "check_frequency": "每季", "action_48h": "重讀"}])
+    assert record.get("supersedes_id") is None
+    summary = sr.register_reading_watches(record)
+    assert watch_id in summary["consumed"]
+    assert _watch(watch_id)["expiry_resolution"]["kind"] == "source_superseded"
+
+
+def test_reading_sourced_semantic_watch_requires_a_node(env) -> None:
+    data = ew.load_watches()
+    with pytest.raises(ew.EventWatchError, match="node"):
+        ew.add_watch(data, kind=ew.SEMANTIC_KIND, disproof_ref="reading:sr_x#1", source_ref="reading:sr_x#1",
+                      expires=FUTURE, entities=[SIVERS], condition=CONDITION, check_frequency="每季", action_48h="重讀")
+
+
+def test_expiry_attaches_to_a_deferred_review_but_only_a_touch_pulls_it_back(env) -> None:
+    """NB3-5a：使用者明示延後的複查，單純到期只附掛、不叫回；判定觸及才叫回。"""
+    pool = _pool()
+    todo.sync(pool, [{"type": "thesis_lifecycle", "ref_id": "x", "title": "thesis x：到期", "source": "lifecycle"}])
+    n = pool["items"][0]["n"]
+    todo.resolve(pool, n, "pending", until=FUTURE)
+    expired_id = _expired()
+    _sync_lifecycle(pool)
+    item = pool["items"][0]
+    assert item.get("waiting_on") and expired_id in item["disproof_watch_ids"]
+    data = ew.load_watches()
+    watch = _semantic(data, expires=FUTURE, condition=C1)
+    _touch(data, watch)
+    ew.save_watches(data)
+    env["write_memo"]([CONDITION, C1])
+    _sync_lifecycle(pool)
+    assert not pool["items"][0].get("waiting_on")
+    assert pool["log"][-1]["verb"] == "disproof_touch" and watch["watch_id"] in pool["log"][-1]["reason"]
+
+
+def test_passed_until_wakes_the_item(env) -> None:
+    """NB3-5b：`pending --until` 的日期過了要重問，不能永遠躺在「等事件」。"""
+    pool = _pool()
+    item = todo.upsert(pool, item_type="manual", ref_id="m1", title="等 S-4", hint="", source="manual")
+    item["waiting_on"] = {"until": PAST, "trigger": None, "reason": None, "set_at": "x"}
+    item["deferred_at"] = "x"
+    keep = todo.upsert(pool, item_type="manual", ref_id="m2", title="等 10-K", hint="", source="manual")
+    keep["waiting_on"] = {"until": FUTURE, "trigger": None, "reason": None, "set_at": "x"}
+    todo.sync(pool, [])
+    assert "waiting_on" not in item and item in todo.actionable_items(pool)
+    assert keep.get("waiting_on")
+    assert [e["verb"] for e in pool["log"]].count("waiting_until_passed") == 1
+
+
+@pytest.mark.parametrize("path", ["library/private/app/state/watches.json", "docs/reports/r.txt"])
+def test_report_receipt_is_only_a_research_markdown(env, path) -> None:
+    """NB3-6：state 檔含所有 watch_id，不得當研究結果。"""
+    watch_id = _hyp()
+    target = env["tmp"] / path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(f"{watch_id}", encoding="utf-8")
+    pool = _pool()
+    _sync(pool)
+    with pytest.raises(todo.TodoError, match="report"):
+        todo.resolve(pool, _open(pool)[0]["n"], "go", receipt=f"outcome:touched;report:{path}", quote="x")
+
+
+def test_counts_do_not_call_thesis_touches_orphans_when_lifecycle_is_unreadable(env) -> None:
+    """NB3-8：lifecycle 讀不到時 thesis 的觸及是「沒算」，不是孤兒；memo 解析不到要現形。"""
+    data = ew.load_watches()
+    watch = _semantic(data, expires=FUTURE)
+    _touch(data, watch)
+    env["life"] = None                                   # load_lifecycle（被 fixture 換掉）回 None＝讀不到
+    c = disproof.disproof_counts(data["watches"], readings={}, root=env["tmp"])
+    assert c["lifecycle_unreadable"] is True and c["orphan_touched"] == 0
+    env["life"] = {"x": {"status": "active", "memo": MEMO}}
+    (env["tmp"] / MEMO).write_text("# memo\n\n沒有推翻那一節\n", encoding="utf-8")
+    c = disproof.disproof_counts(data["watches"], readings={}, root=env["tmp"])
+    assert c["memo_unreadable"] == ["x"]
+
+
+def test_register_disproof_refuses_a_duplicate(env, capsys) -> None:
+    """NB3-9：同一來源、同一條件已有處理中的等待 → 拒收（否則同一份 lead 叫醒兩次）。"""
+    argv = ["register-disproof", "--condition", CONDITION, "--entities", SIVERS, "--source-ref", REF,
+            "--check-frequency", "每季", "--action-48h", "重讀", "--expires", FUTURE]
+    assert ew.main(argv) == 0
+    assert ew.main([*argv[:6], f"thesis:{MEMO}#2", *argv[7:]]) == 2, "換了 #n 也是同一條件"
+    assert "不重複登記" in capsys.readouterr().err
+    assert len([w for w in ew.load_watches()["watches"] if w.get("kind") == ew.SEMANTIC_KIND]) == 1
