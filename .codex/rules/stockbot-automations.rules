@@ -1,103 +1,23 @@
-# Codex standalone scheduled task 會沿用 workspace-write sandbox；以下 fixed entry
-# （條數由 tests/test_codex_daily_permissions.py 斷言，刻意不寫在這裡——寫死的數字會腐壞）
-# 是 Daily 唯一的 outside-sandbox 權限來源。首次呼叫就使用 exact rule，不先失敗再重跑；
-# 不放行任意 Python、PowerShell、shell、Git 或 working tree。
+# Codex 無人值守 allowlist——**2026-09-24 起為 0 條**（Phase 1 Step 1.3；C1／C4／C6）。
 #
-# ⚠ **2026-09-17（Phase 2 Step 2.2／D12）：daily 的研究層關閉，五條只為研究而存在的 entry 一併移除**
-# ——`fetchers\edgar.py`、`fetchers\mops.py`、`engine_b.cli drain`、
-# `scripts\prepare_research_action.py --action-file`、`engine_b.todo work`。
-# 研究改由互動 session 的 research-drain 做，daily 的 `drain_limit_per_run` 已為 0
-# （查證：`python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`）。
-# 這是**純收緊**：拿掉的每一條在 daily 都已經走不到，且對應的 prompt 步驟在同一個 change 移除。
-# ⚠ **2026-09-22（Phase 0 Step 0a.1）：decision_lab 研究側退役，兩條 entry 一併移除**
-# ——`-m decision_lab today` 與 `-m engine_b.todo reassess-stale`。
-# 同樣是**純收緊**：兩者在 daily prompt 的步驟同一個 change 移除，standing-go 的 authorized
-# 類型只剩 source_trace_review，所以沒有任何無人值守呼叫端還走得到它們。
-# ⚠ fetchers 目錄現在**一支都不在列**。edgar.py／mops.py 與 mfn.py／rns.py 一樣改為互動式入口；
-# 同目錄的 gsheets.py 使用 Google service account 憑證，屬 credential-bearing surface，
-# 要放行任何一支都必須重做一次 sandbox impact review。
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "crons\\harvest_leads.py"],
-    decision="allow",
-    justification=(
-        "Daily harvest 需要連 X API 與 SEC EDGAR，憑證與 source_state 都留在本機。"
-        + "⚠ 2026-09-17 更正（ROADMAP Phase 6 / D15，台股重訊 watcher）：本 prefix 現在多連三個"
-        + "**公開、無憑證**的交易所端點——openapi.twse.com.tw、www.tpex.org.tw、mopsov.twse.com.tw。"
-        + "新增的是主機不只是請求量，所以在這裡明寫而不是留給讀者推斷。"
-        + "它們與公開資訊觀測站的 PDF 抓取器（已於同日退出本 allowlist）屬同一家族，"
-        + "同樣不帶憑證、不碰 Windows identity／ACL、不寫任何 authority、不觸 .git。"
-        + "重訊只 register lead（進 pending 交下輪 triage），**不自動 triage、不入圖、不寫 Engine C**；"
-        + "監看範圍由 crons/harvest_config.json 的 mops_watch 決定，tickers 是下限、"
-        + "derive_from_registry 併入 registry 裡的台股（load_config 拒收「兩者皆空」的設定，"
-        + "否則 watcher 會每天回報成功卻監看 0 檔）。"
-        + "⚠ **月營收刻意不在這條路徑上**：它的歷史頁按年月永久可查、漏抓補得回來（L10），"
-        + "所以維持互動式入口（engine_c 的月營收模組），**沒有新增第 16 條 entry**；"
-        + "該補的時候由心跳第 1 段自己說話（落後幾個月）。"
-    ),
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "engine_c\\etl_yfinance.py"],
-    decision="allow",
-    justification="Daily Engine C ETL 需要連 Yahoo Finance 並只寫 ignored private runtime。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\alpha_purity_snapshot.py"],
-    decision="allow",
-    justification="Daily Alpha purity consumer 只讀 owner-only Engine C authority，輸出正規化市值與分析師覆蓋，不寫任何 authority。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\daily_beta_snapshot.py"],
-    decision="allow",
-    justification="Daily beta fixed entry 只刷新 Engine C technical observations、唯讀 Sheet 並產人工 review，不下單或寫 Sheet。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.cli", "list"],
-    decision="allow",
-    justification="Daily pending lead priority list 需要唯讀 Google Sheet 持股與本機 Neo4j chokepoint context。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\catalyst_watch.py"],
-    decision="allow",
-    justification="Daily catalyst watch 只讀 owner-only private Decision Store 與 tracked thesis lifecycle。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\outcome_if_settled_today.py"],
-    decision="allow",
-    justification="Daily Alpha Pane 4 只讀 private Decision Store 與最新已收盤行情，計算 live／shadow 報酬，不寫任何 authority。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "sync"],
-    decision="allow",
-    justification="Daily todo sync 只同步本機 approval authorities 到 stable todo pool。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "engine_b.todo", "standing-go"],
-    decision="allow",
-    justification="研究閉環 P5（2026-09-09）佇列段 2b：對 config/standing_authorization.json 列為 authorized 的 pq2 類型執行使用者本來會下的 go——⚠ 2026-09-22（Phase 0 Step 0a.1）起 authorized **只剩 source_trace_review**（decision_review 隨 decision_lab 研究側退役，已移到 never），所以這條 rule 的 surface 比原本更窄：同一個 dispatch_source_trace_review，只是按鍵的人從使用者換成 config；receipt 與 gate 完全相同。config 載入時驗封閉性（每種類型必須明寫 authorized 或 never，四個 gate 類型永遠 never）；使用者明示 pending、在等世界、hint 提及付費的一律跳過。不入圖、不寫 Engine C 判讀、不動 thesis、不動 live。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "-m", "webapp", "materialize"],
-    decision="allow",
-    justification="Daily 收尾把 APP 讀的判讀重算一次並寫進 ignored derived cache（library/private/app/）。讀 Neo4j、Engine C SQLite、private ledger 與 Google Sheet（readonly）——與 daily_beta_snapshot.py／catalyst_watch.py 同一組本機資源，無憑證（原本這裡對照的是 decision_lab today，它已於 2026-09-22 Step 0a.1 退出本 allowlist——對照組必須指得到還在列上的 entry，否則這句話驗不了）；⚠ 2026-09-17 更正：`--scorecard`（D5 帳號計分表）**會連 yfinance 取歷史收盤**，所以「無新增網路主機」這句話對本 prefix 已不再成立——主機與 engine_c/etl_yfinance.py 與 scripts/daily_beta_snapshot.py 相同（兩支都已在本 allowlist、同樣無憑證），新增的是請求量而不是主機。對應的收緊同一個 change 落地：engine_b.account_scorecard.MAX_PRICED_SYMBOLS=200 是硬上限，超過就截斷並在 artifact 的 price_budget 與 filter reasons 裡現形（L15：放行與收緊必須同時發生）；不寫任何 authority、不入圖、不建 decision、不碰 .git 或 tracked 檔。⚠ 只放行 materialize 子命令：同一個模組的 serve 會綁定本機 port（新增 listener surface），刻意不在列——那是開機自啟的長駐服務，不是排程動作。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\publish_daily_brief.py"],
-    decision="allow",
-    justification="Discord publisher 只把 canonical Daily Brief 送到既有 private Forum webhook。",
-)
-
-prefix_rule(
-    pattern=[".venv\\Scripts\\python.exe", "scripts\\backfill_fiscal_year_results.py"],
-    decision="allow",
-    justification="研究閉環 P7-a（2026-09-10）：把段 5 backlog 裡卡在「Engine C 無 fiscal_year_results 觀測」的美股標的，用 SEC XBRL companyfacts 補上基期實績（revenue、gaap.operating_income 兩個數）。網路只連 data.sec.gov 與 www.sec.gov 的公開端點，與既有的 fetchers\edgar.py 同一組主機、無憑證。寫入 Engine C SQLite 的 manual_observations（ignored private runtime），且**只寫得了 fiscal_year_results 這一個 verifiability=mechanical 欄位**——腳本啟動時以 observation_fields registry 驗證，非 mechanical 直接 exit 3；FIELD 是常數、無 CLI 參數可改。mechanical 依 AGENTS.md 明定不需 pq2，其補償控制（value 必須是可機械比對的 JSON 數值）由 append_manual_observation 強制，另加白名單 tag 歧異拒寫、20-F/10-K 年報期間限定、單一幣別、source_filed_at 取 accession 的 filed 日期（不得用今天）、基期超過 550 天拒寫五道。不寫任何判讀欄位、不入圖、不建 decision、不動 thesis、不動 live、不碰 .git 或 tracked 檔。⚠ 只放行這一支：同目錄的 record_mechanical_observation.py 接受任意 --field，刻意不在列。",
-)
+# 無人值守只剩一條路：Windows 工作 StockBotv2-Daily → crons/daily_task.py（封閉步驟清單，程式寫死，
+# 由 tests/test_daily_task.py 逐項守）。它不經 Codex，所以這份 rules 對它不適用；daily 裡的 LLM 步驟
+# 是 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位，寫入由程式驗證後做。
+# **Codex 不在任何無人值守步驟裡**；兩個 Codex automation（Daily Brief、Weekly Scan）由使用者停用。
+#
+# 為什麼清為 0 而不是留著：P0 plan review 第 2、3 輪（plan §0.7 X1、R3-1、R3-2）實測 Codex 的唯讀證明不了
+# ——workspace-write 下能改 .env 與 .venv、exec 預設載入使用者層的外掛與 MCP、`[windows] sandbox` 住在
+# 使用者層 config。留著任何一條 allow，就是留一個不再有人需要、卻仍放行的權限（AGENTS：不得用 broad
+# permission 掩蓋整合缺口）。
+#
+# 退役前的 12 條 exact prefix（歷史，**現在逐條都不是 allow**，由 tests/test_codex_daily_permissions.py
+# 用 Codex 自己的 execpolicy parser 證明）：crons\harvest_leads.py、engine_c\etl_yfinance.py、
+# scripts\alpha_purity_snapshot.py、scripts\daily_beta_snapshot.py、-m engine_b.cli list、
+# scripts\catalyst_watch.py、scripts\outcome_if_settled_today.py、-m engine_b.todo sync、
+# -m engine_b.todo standing-go、-m webapp materialize、scripts\publish_daily_brief.py、
+# scripts\backfill_fiscal_year_results.py。它們各自的 justification（連哪些主機、有哪道收緊）搬到
+# docs/OPERATIONS.md「Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.2a）」；
+# 原文見 git 歷史（本檔 2026-09-24 之前的版本）。
+#
+# 將來若有人想把任何無人值守步驟交回 Codex：先讀 plan §0.7 第 2、3 輪，再做一次 sandbox impact review
+# 五步（docs/OPERATIONS.md），同一個 change 改 permission contract test。

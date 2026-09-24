@@ -1,0 +1,34 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["items"],
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["lead_id", "decision", "tier", "reason", "content_type", "decision_impact", "payment_direction", "priority_flags"],
+        "properties": {
+          "lead_id": {"type": "string"},
+          "decision": {"type": "string", "enum": ["go", "no_go"]},
+          "tier": {"type": "integer", "enum": [1, 2, 3, 4]},
+          "reason": {"type": "string"},
+          "content_type": {"type": ["string", "null"], "enum": ["capital_commitment", "structural_fact", "financial_fact", "insider_transaction", "sentiment", "no_content", null]},
+          "decision_impact": {"type": ["string", "null"], "enum": ["exit_condition", "candidate_set", "ranking", "confidence_only", null]},
+          "payment_direction": {"type": ["string", "null"], "enum": ["customer_to_supplier", "unclear", "supplier_to_customer", null]},
+          "priority_flags": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["contradiction", "novelty", "independent_source"],
+            "properties": {
+              "contradiction": {"type": "boolean"},
+              "novelty": {"type": "boolean"},
+              "independent_source": {"type": "boolean"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

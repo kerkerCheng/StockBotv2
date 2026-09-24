@@ -101,18 +101,17 @@ def test_pairs_come_from_the_ledger_not_a_hand_written_list() -> None:
     assert conn.seen[0][1] == ("fx_rate",)
 
 
-def test_it_is_not_escalated_in_the_codex_sandbox() -> None:
-    """它跑在獨立排程裡，**不需要** Codex 的 outside-sandbox rule。
+def test_it_runs_as_a_daily_step_not_through_codex() -> None:
+    """FX 同步是 Windows daily 的一步（2026-09-24 取代獨立的 `StockBotv2-FxSync` 工作），**不經 Codex**。
 
-    ⚠ 問的是「有沒有這樣一條 rule」，不是「檔案裡有沒有這串字」——
-    掃 `pattern=[...]` 而不是全文（L15：gate 攔到的是散文不是權限）。
+    ⚠ 原本問「rules 的 `pattern=[...]` 裡沒有它」；`.codex/rules` 清為 0 條之後那個問法恆真，
+    所以改問兩件會變的事：它真的在 daily 的封閉清單裡、rules 裡真的一條 rule 都沒有。
     """
-    if not RULES.is_file():
-        pytest.skip("本機沒有 .codex/rules")
-    patterns = re.findall(r"pattern=\[(.*?)\]", RULES.read_text(encoding="utf-8"), re.S)
-    assert patterns, "rules 檔解析不出任何 pattern——這條檢查會變成恆真"
-    offenders = [p for p in patterns if "sync_fx_observations" in p]
-    assert not offenders, f"FX 同步不走 Codex，卻出現在 rule pattern：{offenders}"
+    from crons.daily_task import DAILY_STEPS
+
+    assert any(s.argv == ("scripts/sync_fx_observations.py",) for s in DAILY_STEPS)
+    if RULES.is_file():
+        assert not re.findall(r"(?m)^\s*prefix_rule\(", RULES.read_text(encoding="utf-8"))
 
 
 def test_report_counts_every_pair_and_never_drops_one_silently() -> None:

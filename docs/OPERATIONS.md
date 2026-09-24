@@ -102,11 +102,21 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 
 | 步 | 結論 |
 |---|---|
-| **1 path／side effect／capability** | **可執行面＝`crons/daily_task.py` 的 `DAILY_STEPS` 這份封閉清單**（程式寫死、無 LLM 選命令；1.2a 時兩個 LLM 步驟由 `llm.executor=none` 記 skipped）。每步 `shell=False`、venv python、cwd＝repo root。**連網主機與憑證與原 Codex daily 相同**：X API、SEC（`www.sec.gov`、`data.sec.gov`）、TWSE／TPEx／MOPS、Yahoo、Google Sheet（`spreadsheets.readonly`）、Discord webhook、harvest 的 feed 主機（`crons/harvest_config.json` 的 `feeds[].url`：`mfn.se`、`www.sivers-semiconductors.com`、`feeds.finance.yahoo.com`）；**不含 Drive**（`backup_private.py run --no-drive`）。Anthropic（`claude -p`）要到 Step 1.3 才加。**寫入範圍**：`library/leads/` 四份 state 與鎖／收工標記、Engine C private runtime（etl、FX、beta technical、XBRL 基期補值四支，不新增寫入者）、`library/private/decision_lab/` 的 `portfolio_risk_snapshots.jsonl` 與 `outcome_aggregate.json`／`.jsonl`（**不含任何 `*.db`**）、`library/private/app/`、`library/private/backups/`、`library/private/heartbeat/`（執行紀錄、心跳、capture 檔、log）。**不寫 git、不寫任何 tracked 檔**（保險檢查只讀 git，且一律帶 `-c core.fsmonitor=false`）。**Discord 發送授權**由 Windows daily 持有（原本授權給 Codex daily automation）；每一條限制由 `notifications/publisher.py` 強制（host、logical channel `private-investing`、content class `full_private`），不靠 prompt。⚠ publisher 擋不住「`.env` 的 webhook 被換成另一個 Discord webhook」——所以保險檢查比對 `.env` 指紋。 |
+| **1 path／side effect／capability** | **可執行面＝`crons/daily_task.py` 的 `DAILY_STEPS` 這份封閉清單**（程式寫死、無 LLM 選命令；1.2a 時兩個 LLM 步驟由 `llm.executor=none` 記 skipped）。每步 `shell=False`、venv python、cwd＝repo root。**連網主機與憑證與原 Codex daily 相同**：X API、SEC（`www.sec.gov`、`data.sec.gov`）、TWSE／TPEx／MOPS（harvest 的重訊 watcher：`openapi.twse.com.tw`、`www.tpex.org.tw`、`mopsov.twse.com.tw`，公開、無憑證；月營收刻意不在 daily——歷史頁永久可查，維持互動入口）、Yahoo／yfinance（含 `webapp materialize --scorecard` 取價；上限 `MAX_PRICED_SYMBOLS` 由 `engine_b/account_scorecard.py` 在程式裡執行，不只寫在這裡）、Google Sheet（`spreadsheets.readonly`）、Discord webhook、harvest 的 feed 主機（`crons/harvest_config.json` 的 `feeds[].url`：`mfn.se`、`www.sivers-semiconductors.com`、`feeds.finance.yahoo.com`）；**不含 Drive**（`backup_private.py run --no-drive`）。Anthropic（`claude -p`）要到 Step 1.3 才加。**寫入範圍**：`library/leads/` 四份 state 與鎖／收工標記、Engine C private runtime（etl、FX、beta technical、XBRL 基期補值四支，不新增寫入者）、`library/private/decision_lab/` 的 `portfolio_risk_snapshots.jsonl` 與 `outcome_aggregate.json`／`.jsonl`（**不含任何 `*.db`**）、`library/private/app/`、`library/private/backups/`、`library/private/heartbeat/`（執行紀錄、心跳、capture 檔、log）。**不寫 git、不寫任何 tracked 檔**（保險檢查只讀 git，且一律帶 `-c core.fsmonitor=false`）。**Discord 發送授權**由 Windows daily 持有（原本授權給 Codex daily automation）；每一條限制由 `notifications/publisher.py` 強制（host、logical channel `private-investing`、content class `full_private`），不靠 prompt。⚠ publisher 擋不住「`.env` 的 webhook 被換成另一個 Discord webhook」——所以保險檢查比對 `.env` 指紋。 |
 | **2 canonical skill／prompt／本檔** | 本節與上面兩節；`docs/ARCHITECTURE.md` §4.1；`config/daily_routine.json` 的 `schedule._doc`（唯一時間來源）與新的 `llm` 區塊；`crons/daily_brief_prompt.md` 在 Step 1.3 封存（使用者停用 Codex automation 之前它維持 PAUSED）。 |
 | **3 最窄 rule** | Windows daily **不經 Codex**，`.codex/rules` 對它不適用；本 Step 不增不減任何 rule（1.3 清為 0 條）。新增的無人值守入口只有 `crons/daily_task.py` 一支；它呼叫的全部是既有腳本，新增旗標只有 `query/health_audit.py --json`（同一組檢查的機器可讀版，不新增任何連線或寫入）。 |
 | **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
 | **5 端到端 smoke** | 2026-09-24 實跑 `python crons\daily_task.py`（run `bf21bb07`）：19 步 17 ok、2 skipped（`executor=none`）、約 7 分鐘（materialize 282 秒最長）；harvest 最後一輪＝當天、APP 7 份 state 當天 materialize、publisher 回 `sent` 3/3、鎖已釋放、收工標記 `finalized`。`register_daily_task.py --apply` 後 `StockBotv2-Daily` Ready（下次 05:30）、自我比對 `match`；舊兩個工作 `Disabled`。⚠ 端到端驗收仍要等**真正的排程觸發**（1.2b 的前提：`LastTaskResult 0` 且當天執行紀錄完整），手動觸發不算（L13-1）。 |
+
+### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.3：triage 併進 daily、Codex 退出無人值守）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新增的無人值守能力只有一個：⑦a 以 `claude -p` 呼叫 Anthropic（**訂閱登入**，`apiKeySource == "none"`）。**LLM 手上沒有任何工具**：`--tools ""`（只剩 `--json-schema` 帶進來的 `StructuredOutput`）、`--strict-mcp-config`、`--setting-sources ""`、`disableAllHooks`、`autoMemoryEnabled:false`、`--disable-slash-commands`、`--include-hook-events`；cwd＝repo 外的空目錄（`llm.cwd`）；環境變數白名單 10 個鍵，不帶任何憑證（含 `ANTHROPIC_API_KEY`——漏進去會改走 API 計費）。規則與批次由程式組成 prompt 從 stdin 餵，LLM 不讀檔、不跑命令。**每次執行**邊讀 stream 邊檢查 init 的能力欄位（六欄缺席算不符、`memory_paths` 出現算不符、任何 `hook_started` 算不符），不符就殺行程樹、丟棄輸出、不寫結果檔。寫入由 ⑦b `engine_b.cli triage-apply` 做（同一個 `leads.triage()`；逐則驗證、收據帶 `decided_by`）。新增的寫入只在 `library/private/heartbeat/`（結果檔）與 `library/leads/pending_leads.json`（⑦b，與 CLI `triage` 同一條路徑）；`claude -p` 自己的 session 紀錄在 `~/.claude/projects/<以 llm.cwd 命名的目錄>/`（供稽核）。 |
+| **2 canonical skill／prompt／本檔** | `crons/triage_prompt.md`（新）、`crons/triage_schema.json`（新）、`skills/signal-triage/SKILL.md`（判準加起訖標記，由程式逐字截取）、`skills/daily-brief/SKILL.md`（改成互動專用）、`crons/daily_brief_prompt.md` 逐字封存 `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`、本節。 |
+| **3 最窄 rule** | `.codex/rules/stockbot-automations.rules` **12 → 0 條**：Codex 不在任何無人值守步驟裡。⚠ 刪 prompt 不是保證；**真正的保證是 rules 0 條＋使用者停用兩個 Codex automation**。 |
+| **4 contract test** | `tests/test_daily_task.py`：LLM argv 逐項相等、禁用旗標不出現、cwd＝`llm.cwd`、白名單擋得住 `ANTHROPIC_API_KEY`／`NOTIFY_*`／`X_*`／`CLAUDECODE`、能力檢查每種不符（六欄各自缺席、`memory_paths` 出現、hook 事件在 init 前後）都丟棄輸出且 init 不符時在 result 前就殺、分批任一批不符整步丟棄、同日舊結果檔先刪、`subtype: success`＋`is_error: true` 判失敗、`rate_limit` 非 allowed 才算額度問題。`tests/test_triage_apply.py`（新）。`tests/test_codex_daily_permissions.py`：prefix 數＝0、舊 12 條逐條以 execpolicy parser 驗非 allow；原本掛在 rules 上的判準（materialize 不含 serve、XBRL 只寫一個欄位、scorecard 網路上限在程式裡、重訊主機寫出來、月營收留在互動）改主詞搬到 `tests/test_daily_task.py`。 |
+| **5 端到端 smoke** | `llm.executor` 改 `claude` 後以 `schtasks /Run /TN StockBotv2-Daily` 走真正的排程路徑跑一次（結果記在 plan 進度表與 Step 1.3 的八欄）。 |
 
 ### Sandbox impact review 結論（2026-09-17，Phase 2 Step 2.2：研究層移出 Daily）
 
@@ -226,8 +236,8 @@ python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 
   依 2026-09-02 量測 daily 中位 19 分／p90 30 分／最長 43 分取兩倍餘裕）；
   `scripts/finalize_daily_state.py` 收尾 release（結果附 `writer_lock_released`）；state 驗證失敗
   仍釋放自己的鎖並留下 `state_invalid` 收工標記，避免錯誤路徑把鎖留到 TTL。
-  互動 session 持鎖時 harvest exit 3＋stderr `writer_lock_held`，**整輪 Daily 中止**
-  （見 `crons/daily_brief_prompt.md`），不得跳過 harvest 續跑會寫共用檔的命令。
+  互動 session 持鎖時 `crons/daily_task.py` 開頭就拿不到鎖 → **跳過所有寫入步驟**、心跳照發並在段 1 印出原因
+  （2026-09-24 Phase 1 Step 1.2a；每個寫入步驟前以同一 owner 續期，續期失敗其後的寫入步驟也跳過）。
 - **互動側**：長時間寫入前 `python scripts/writer_guard.py acquire --minutes N --purpose "…"`，
   收尾 `release`；`check` 同時看排程時間窗與鎖（鎖補上時間窗防不了的延遲開跑——
   2026-08-29 排程 08:21 才收尾的那種）。互動手跑 harvest 時用
@@ -241,8 +251,8 @@ python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 
   `tests/test_daily_state_finalizer.py`。
 
 **Routine 分工：**
-- daily（`crons/daily_brief_prompt.md`）＝harvest ＋ ETL ＋ beta monitor ＋ triage ＋ today ＋ 統一 pq2 brief
-- weekly（`crons/weekly_scan_prompt.md`，台北週日 04:00）＝topic discovery ＋ 完整本機健康審查 ＋ 唯讀 lifecycle，報告留 `docs/reports/`
+- daily（Windows `StockBotv2-Daily` → `crons/daily_task.py`，2026-09-24 起）＝harvest ＋ ETL ＋ beta monitor ＋ triage（`claude -p` 零工具提議、程式寫入）＋ 機械段 ＋ materialize ＋ 健康審查 ＋ invariants ＋ 備份 ＋ 心跳；互動 session 說「daily brief」才組含 pq2 建議的長版。~~`crons/daily_brief_prompt.md`~~ 已封存
+- weekly（`crons/weekly_scan_prompt.md`，台北週日 04:00）＝topic discovery ＋ 完整本機健康審查 ＋ 唯讀 lifecycle，報告留 `docs/reports/`（Phase 1 Step 1.9 退役：題材掃描改互動 skill）
 
 兩者刻意錯開，且都不替使用者寫 thesis 結論、入圖或建立 live facts。
 
@@ -728,6 +738,8 @@ Sheet 的 credential scope 分兩種：日常全部走 `SCOPES`（`spreadsheets.
 Sheet adapter 的標準輸出是 `ticker`、`shares`、`currency`、`market_value_base`、`nav_base`、`base_currency`；可直接提供完整標準欄位，或以逐列 mark-to-market `market_usd` 安全正規化成 USD NAV。**禁止退回 `avg_cost` 或 `market_twd` 猜值。**
 
 Price／FX 預設 yfinance（無 API key）。非同幣 FX 缺失或方向不符一律 fail closed。
+
+⚠ **2026-09-24（Phase 1 Step 1.3）起本段是歷史：`.codex/rules` 已清為 0 條，Codex 不在任何無人值守步驟裡**（無人值守只剩 Windows daily，見「Daily」節）。下面保留原文，因為「文字存在不等於 rule 生效」那條教訓仍然適用於任何 rules 檔。
 
 Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，因此 project permission profile 不作 Daily authority。唯一升權來源是 `.codex/rules/stockbot-automations.rules` 的十四個（2026-09-22 Step 0a.1 起 12 個）窄 fixed entry：harvest、Engine C ETL、Alpha purity snapshot、Beta snapshot、pending priority list、catalyst watch、Alpha outcome snapshot、~~decision today~~（2026-09-22 退役）、todo sync、todo ~~reassess-stale~~（2026-09-22 退役）、todo standing-go、Discord publisher、APP materialize、基期實績 XBRL 補值，第一次呼叫就用 `require_escalated` 命中各自 exact outside-sandbox rule；不先失敗再升權重補跑，也不放行任意 Python、PowerShell、Git 或 working tree。state finalizer 只碰 workspace 內本機檔案，刻意不進 rules。修改 rules 後須讓 Codex 重新載入設定；但在要求重啟前先確認 exact rule **確實存在、而且整份檔載入得起來**——重啟不能修復漏寫的 rule，**也不能修復語法錯誤**。
 

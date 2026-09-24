@@ -31,6 +31,18 @@ prepared RA 入圖，不必在研究前先回答一次。判斷錯了的主要�
 
 ---
 
+## 無人值守（daily）模式（Phase 1 Step 1.3，2026-09-24）
+
+daily 的分類層是 `crons/daily_task.py` 的 ⑦a：`claude -p` **零工具**——它讀不到本檔、也跑不了任何命令。
+程式把本檔 `triage-criteria:start` 與 `triage-criteria:end` 兩個標記之間的判準**逐字**截取貼進 prompt
+（前面接 `crons/triage_prompt.md`、後面接本輪批次），模型只回一份符合 `crons/triage_schema.json` 的 JSON；
+寫入由 ⑦b `engine_b.cli triage-apply` **逐則驗證後**做（同一個 `leads.triage()`，收據帶
+`decided_by: claude-p:<session_id>`）。LLM 只提議、程式寫入（L15）。
+
+互動模式照舊：人在場時直接跑 `engine_b.cli triage`（見下方 CLI 範例）。
+**改判準只改兩個標記之間的段落**；標記本身不得移除（`tests/test_daily_task.py` 驗截得到、非空）。
+
+<!-- triage-criteria:start -->
 ## 判斷五要素
 
 ### 1. 關聯性（Relevance）
@@ -155,6 +167,8 @@ candidate events**，預期新領域 campaign 的 PASS 率約 50–70%，只作�
 **不是配額**；raw posts 的比例沒有判讀價值。不得為達比例硬放行。若 candidate-event PASS 低於
 30%，先檢查是否仍錯用「未追蹤＝無關」；若高於 80%，抽查是否把作者推斷、績效宣稱或無法追源
 的敘事誤當可研究 claim。
+
+<!-- triage-criteria:end -->
 
 ---
 

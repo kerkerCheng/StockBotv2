@@ -19,7 +19,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parent.parent
-PROMPT = ROOT / "crons" / "daily_brief_prompt.md"
+PROMPT = ROOT / "crons" / "triage_prompt.md"
 
 
 def test_limit_comes_from_config_and_is_validated() -> None:
@@ -86,15 +86,18 @@ def test_truncation_says_how_many_did_not_make_it() -> None:
 
 
 def test_the_cap_is_executed_by_the_cli_not_asked_of_the_model() -> None:
-    """daily prompt 必須帶旗標，而且不得把上限數字寫成要 LLM 自己遵守的散文。"""
-    prompt = PROMPT.read_text(encoding="utf-8")
-    assert "--triage-batch" in prompt
-    assert "cap 由該命令自己執行，不是你去數" in prompt
-    # prompt 裡不得出現寫死的上限值——那會與 config 各自漂移（L16）
+    """daily 的 triage 批次步驟必須帶 `--triage-batch`（上限由 CLI 截斷），prompt 不得寫死上限讓模型自己數。
+
+    ⚠ 2026-09-24（Phase 1 Step 1.3）：原本讀 Codex daily prompt；那份 prompt 已封存，主詞改成
+    `crons/daily_task.py` 的 ⑥ 與 `crons/triage_prompt.md`——判準一字未改（L15：權限永遠 deterministic）。
+    """
+    from crons.daily_task import DAILY_STEPS
     from engine_b.routine_config import triage_daily_limit
 
-    assert str(triage_daily_limit()) not in prompt.split("--triage-batch")[1][:600], (
-        "prompt 裡寫死了上限數字，它會與 config 漂移")
+    batch = next(s for s in DAILY_STEPS if s.key == "06_triage_batch")
+    assert "--triage-batch" in batch.argv
+    prompt = PROMPT.read_text(encoding="utf-8")
+    assert f"{triage_daily_limit()} 則" not in prompt, "prompt 裡寫死了上限數字，它會與 config 漂移"
 
 
 def test_heartbeat_prints_the_limit_next_to_the_backlog() -> None:

@@ -1,3 +1,11 @@
+# Codex daily brief prompt v1.8 逐字封存（2026-09-24 退役）
+
+> Phase 1 Step 1.3（C1／C4／C6）：無人值守改由 Windows daily（`crons/daily_task.py`）執行，triage 改 `claude -p` 零工具提議、程式寫入；
+> Codex 不在任何無人值守步驟裡、`.codex/rules` 已清為 0 條。本檔是退役前 `crons/daily_brief_prompt.md` 的逐字副本，**不再是現行規範、不得執行**。
+> 仍有效的判準已搬到 `skills/daily-brief/SKILL.md`（互動專用）與 `tests/test_daily_task.py`。
+
+---
+
 # Daily Approval Brief — Codex 本機排程 Prompt（v1.8）
 
 > ## ⚠ 2026-09-17（Phase 2 Step 2.2／D12）：Daily 拆成三層，**本檔只負責中間那一層**

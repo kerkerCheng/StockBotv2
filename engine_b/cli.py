@@ -467,6 +467,132 @@ def _cmd_triage(args: argparse.Namespace) -> int:
     return 0
 
 
+#: triage-apply 套進 `leads.triage` 的 priority flag 鍵（`user_requested` 只有使用者點名的 campaign 才有）。
+_APPLY_FLAG_KEYS = ("contradiction", "novelty", "independent_source")
+
+
+def _cmd_triage_apply(args: argparse.Namespace) -> int:
+    """daily ⑦b：把 LLM 的 triage 提議**逐則驗證後**寫入（Phase 1 Step 1.3；C4、C6）。
+
+    LLM 只提議、程式寫入（L15）。寫入路徑與 `triage` 子命令是**同一個** `leads.triage()`，分類驗證沿用
+    `_classification_from_args` 的同一條規則，不另寫一份。**一則都不寫**的情形：沒有結果檔、壞 JSON、
+    `run_id` 對不上（結果、批次、參數三者必須相同——只比日期的話同日重跑會配到舊檔；第 4 輪 N4-7）。
+    逐則拒收（INV-3：不寫、附原因）：批次外、重複 lead_id（那個 id 全部拒收）、寫入當下 live store 已非
+    pending、decision／tier／reason 不合法、PASS 缺分類或字彙不在 CLI 接受的範圍。
+    """
+    def fail(message: str) -> int:
+        print(json.dumps({"status": "error", "error": message}, ensure_ascii=False))
+        print(f"triage-apply 一則都不寫：{message}", file=sys.stderr)
+        return 1
+
+    try:
+        result = json.loads(Path(args.file).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return fail(f"沒有結果檔：{args.file}")
+    except (OSError, ValueError) as exc:
+        return fail(f"結果檔讀不到或不是 JSON：{exc}")
+    try:
+        batch = json.loads(Path(args.batch).read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return fail(f"批次檔讀不到或不是 JSON：{exc}")
+    if not isinstance(result, dict) or not isinstance(batch, dict):
+        return fail("結果檔或批次檔不是 JSON object")
+    if not (result.get("run_id") == batch.get("run_id") == args.run_id):
+        return fail(f"run_id 不符：結果 {result.get('run_id')!r}／批次 {batch.get('run_id')!r}"
+                    f"／參數 {args.run_id!r}")
+    batch_rows = batch.get("payload")
+    items = result.get("items")
+    if not isinstance(batch_rows, list) or not isinstance(items, list):
+        return fail("批次的 payload 或結果的 items 不是 list")
+    in_batch = {str(row.get("lead_id")) for row in batch_rows if isinstance(row, dict)}
+    occurrences: dict[str, int] = {}
+    for item in items:
+        if isinstance(item, dict):
+            key = str(item.get("lead_id") or "")
+            occurrences[key] = occurrences.get(key, 0) + 1
+
+    store = leads.load(args.leads)
+    rejected: list[dict[str, str]] = []
+    answered: set[str] = set()
+    passed = filtered = 0
+    for item in items:
+        if not isinstance(item, dict):
+            rejected.append({"lead_id": "?", "reason": "不是 object"})
+            continue
+        lead_id = str(item.get("lead_id") or "")
+        answered.add(lead_id)
+        if occurrences.get(lead_id, 0) > 1:
+            rejected.append({"lead_id": lead_id, "reason": "duplicate"})
+            continue
+        if lead_id not in in_batch:
+            rejected.append({"lead_id": lead_id, "reason": "not_in_batch"})
+            continue
+        live = store["leads"].get(lead_id)
+        if live is None or live.get("status") != "pending":
+            status = None if live is None else live.get("status")
+            rejected.append({"lead_id": lead_id, "reason": f"not_pending（寫入當下是 {status}）"})
+            continue
+        decision = item.get("decision")
+        if decision not in ("go", "no_go"):
+            rejected.append({"lead_id": lead_id, "reason": f"decision 不合法：{decision!r}"})
+            continue
+        go = decision == "go"
+        tier = item.get("tier")
+        if isinstance(tier, bool) or not isinstance(tier, int):
+            rejected.append({"lead_id": lead_id, "reason": f"tier 必須是整數：{tier!r}"})
+            continue
+        vocab_args = argparse.Namespace(
+            content_type=item.get("content_type"), decision_impact=item.get("decision_impact"),
+            payment_direction=item.get("payment_direction"), classification_reason=None)
+        flags = item.get("priority_flags") if isinstance(item.get("priority_flags"), dict) else {}
+        try:
+            if go:
+                _check_cli_vocabulary(vocab_args)
+            # no_go 帶分類同樣拒收——與 CLI `triage --no-go` 同一條規則（「FILTER 不接受 classification」）
+            classification = _classification_from_args(vocab_args, required=go)
+            leads.triage(
+                store, lead_id, go=go, tier=tier, reason=str(item.get("reason") or ""),
+                priority_flags={key: bool(flags.get(key)) for key in _APPLY_FLAG_KEYS},
+                classification=classification,
+                decided_by=str(item.get("decided_by") or "") or None,
+            )
+        except (leads.LeadStateError, ValueError) as exc:
+            rejected.append({"lead_id": lead_id, "reason": str(exc)})
+            continue
+        if go:
+            passed += 1
+        else:
+            filtered += 1
+    not_answered = sorted(in_batch - answered)
+    leads.save(store, args.leads)
+    summary = {"processed": passed + filtered, "pass": passed, "filter": filtered,
+               "rejected": len(rejected), "not_answered": len(not_answered)}
+    print(json.dumps({"status": "ok", "summary": summary, "rejected": rejected,
+                      "not_answered": not_answered}, ensure_ascii=False))
+    print(f"處理 {summary['processed']}｜PASS {passed}｜FILTER {filtered}｜拒收 {len(rejected)}"
+          f"｜未進本批 {len(not_answered)}", file=sys.stderr)
+    return 0
+
+
+def _cli_vocabulary() -> dict[str, list[str]]:
+    """CLI `triage` 接受的分類字彙——`triage-apply` 與 `crons/triage_schema.json` 都對齊這一份（L16）。"""
+    vocab = priority.vocabulary()
+    return {
+        "content_type": [v for v in vocab["content_type"]["_order"] if v != "unknown"],
+        "decision_impact": [v for v in vocab["decision_impact"]["_order"] if v != "unknown"],
+        "payment_direction": list(vocab["payment_direction"]["_order"]),
+    }
+
+
+def _check_cli_vocabulary(args: argparse.Namespace) -> None:
+    """argparse 的 choices 在 `triage-apply` 走不到，所以同一組字彙在這裡再擋一次（含 `unknown` 不得寫入）。"""
+    allowed = _cli_vocabulary()
+    for key, values in allowed.items():
+        value = getattr(args, key, None)
+        if value is not None and value not in values:
+            raise ValueError(f"{key}={value!r} 不在 CLI 接受的字彙內")
+
+
 def _campaign_ids(lead: dict) -> frozenset[str]:
     raw = (lead.get("refs") or {}).get("campaign_ids") or []
     return frozenset(str(item) for item in raw if str(item).strip())
@@ -805,14 +931,10 @@ def build_parser() -> argparse.ArgumentParser:
     p_drain.add_argument("--json", action="store_true")
     p_drain.set_defaults(func=_cmd_drain)
 
-    vocab = priority.vocabulary()
-    content_choices = [
-        item for item in vocab["content_type"]["_order"] if item != "unknown"
-    ]
-    impact_choices = [
-        item for item in vocab["decision_impact"]["_order"] if item != "unknown"
-    ]
-    payment_choices = list(vocab["payment_direction"]["_order"])
+    cli_vocab = _cli_vocabulary()
+    content_choices = cli_vocab["content_type"]
+    impact_choices = cli_vocab["decision_impact"]
+    payment_choices = cli_vocab["payment_direction"]
 
     p_tri = sub.add_parser("triage", help="對 pending lead 下 go／no-go")
     p_tri.add_argument("lead_id")
@@ -832,6 +954,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_tri.add_argument("--novelty", action="store_true", help="新穎性（priority）")
     p_tri.add_argument("--independent", action="store_true", help="新 origin_entity/獨立來源（priority）")
     p_tri.set_defaults(func=_cmd_triage)
+
+    p_apply = sub.add_parser(
+        "triage-apply",
+        help="daily ⑦b：逐則驗證 LLM 的 triage 提議後寫入（同一個 leads.triage；LLM 只提議）",
+    )
+    p_apply.add_argument("--file", required=True, help="⑦a 的結果檔（triage_<日期>.json）")
+    p_apply.add_argument("--batch", required=True, help="⑥ 的批次檔（triage_batch_<日期>.json）")
+    p_apply.add_argument("--run-id", dest="run_id", required=True,
+                         help="這一輪 daily 的 run_id；結果、批次、參數三者必須相同")
+    p_apply.set_defaults(func=_cmd_triage_apply)
 
     p_campaign = sub.add_parser(
         "triage-campaign",

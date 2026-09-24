@@ -120,13 +120,13 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("-m", "engine_b.cli", "list", "--status", "pending", "--by-priority",
                "--triage-batch", "--json"),
               3, False, False, kind="capture", capture="triage_batch_{date}.json"),
-    DailyStep("07a_triage_propose", "triage 提議（claude -p 零工具；Step 1.3 接上）",
+    DailyStep("07a_triage_propose", "triage 提議（claude -p 零工具、只回 JSON）",
               (), 15, False, True, kind="llm"),
     DailyStep("08_integrity_after_triage", "保險檢查（LLM 步驟前後指紋）",
               (), 1, False, False, kind="integrity"),
-    DailyStep("07b_triage_apply", "triage 套用（程式驗證後寫入；Step 1.3 接上）",
-              ("-m", "engine_b.cli", "triage-apply", "--batch", "{triage_batch}",
-               "--result", "{triage_result}", "--run-id", "{run_id}"),
+    DailyStep("07b_triage_apply", "triage 套用（程式逐則驗證後寫入）",
+              ("-m", "engine_b.cli", "triage-apply", "--file", "{triage_result}",
+               "--batch", "{triage_batch}", "--run-id", "{run_id}"),
               3, True, False, kind="apply"),
     DailyStep("07c_classification_health", "分類完整性檢查",
               ("-m", "engine_b.cli", "classification-health"), 2, False, False),
@@ -223,6 +223,10 @@ class DailyRun:
     lock_path: Path | None = None
     marker_path: Path | None = None
     schtasks_query: Callable[[str], str | None] | None = None
+    #: LLM 呼叫（預設 `crons.llm_step.run_claude`）；測試注入假的，不真的叫模型。
+    llm_runner: Callable[..., Any] | None = None
+    #: 子行程環境的來源（預設 os.environ）；測試用它證明白名單擋得住憑證。
+    parent_env: Mapping[str, str] | None = None
     record: dict[str, Any] = field(default_factory=dict)
     schedule: dict[str, Any] | None = None
     llm: dict[str, Any] | None = None
@@ -273,7 +277,7 @@ class DailyRun:
             "brief": str(self.brief_path),
             "summary": "每日心跳",
             "triage_batch": str(self.out_dir / f"triage_batch_{self.date}.json"),
-            "triage_result": str(self.out_dir / f"triage_result_{self.date}.json"),
+            "triage_result": str(self.out_dir / f"triage_{self.date}.json"),
         }
 
     def _expand(self, argv: Sequence[str]) -> list[str]:
@@ -481,9 +485,7 @@ class DailyRun:
             self._integrity_step(step)
             return
         if step.kind == "llm":
-            # Step 1.3 才接上 claude -p；在那之前 executor 只要不是 none 就照實記失敗，不假裝跑過。
-            self._step_row(step, status="failed", reason="llm runner 尚未接上（Step 1.3）")
-            self.log(f"{step.key} failed：llm runner 尚未接上")
+            self._triage_propose(step, now)
             return
         timeout = step_timeout_minutes(step, self.llm)
         if not step.essential and self.deadline is not None:
@@ -518,12 +520,96 @@ class DailyRun:
                 target.write_text(json.dumps(envelope, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
                 row["capture"] = str(target)
                 row.pop("stdout_tail", None)
+        if step.kind == "apply" and completed is not None:
+            try:
+                applied = json.loads(completed.stdout.strip().splitlines()[0])
+            except (ValueError, IndexError):
+                applied = None
+            if isinstance(applied, dict):
+                row["summary"] = applied.get("summary")
+                row["rejected"] = (applied.get("rejected") or [])[:30]
+                row.pop("stdout_tail", None)
         if step.kind == "publish" and completed is not None:
             try:
                 row["receipt"] = json.loads(completed.stdout.strip().splitlines()[-1])
             except (ValueError, IndexError):
                 pass
         self.log(f"{step.key} {row['status']}（exit={row.get('exit')}，{seconds:.0f}s）")
+
+    def _triage_propose(self, step: DailyStep, now: datetime) -> None:
+        """⑦a：`claude -p` 零工具提議（C6）。任何一批能力不符或失敗 → **整步丟棄、不寫結果檔**（N4-7）。"""
+        from crons import llm_step
+
+        paths = self._templates()
+        result_path = Path(paths["triage_result"])
+        result_path.unlink(missing_ok=True)  # 先刪同日舊檔：這一次失敗就不留任何可被 ⑦b 套用的東西
+        row = self._step_row(step, status="running")
+        self.log(f"{step.key} 開始")
+
+        def fail(status: str, error: str) -> None:
+            row["status"] = status
+            row["error"] = error
+            self.log(f"{step.key} {status}：{error}")
+
+        try:
+            envelope = json.loads(Path(paths["triage_batch"]).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            return fail("failed", f"批次讀不到：{type(exc).__name__}: {exc}")
+        if not isinstance(envelope, dict) or envelope.get("run_id") != self.run_id:
+            return fail("failed", "批次的 run_id 不是這一輪的——不拿舊批次去跑")
+        leads = [lead for lead in envelope.get("payload") or [] if isinstance(lead, dict)]
+        assert self.llm is not None
+        if not leads:
+            self._write_triage_result(result_path, [])
+            row.update(status="ok", proposed=0, note="批次為空，沒有呼叫模型")
+            self.log(f"{step.key} ok：批次為空")
+            return
+        cwd = Path(self.llm["cwd_path"])
+        try:
+            cwd.mkdir(parents=True, exist_ok=True)
+            leftover = [p.name for p in cwd.iterdir()]
+        except OSError as exc:
+            return fail("failed", f"llm.cwd 建不起來：{exc}")
+        if leftover:
+            return fail("failed", f"llm.cwd 不是空目錄（{leftover[:3]}）——CLI 會把裡面的東西帶進 context")
+        argv = llm_step.llm_argv(self.llm["claude_path_resolved"], str(self.llm["claude_model"]),
+                                 llm_step.schema_text())
+        env = llm_step.llm_env(self.parent_env)
+        runner = self.llm_runner or llm_step.run_claude
+        timeout = float(self.llm["triage_timeout_minutes"])
+        if self.deadline is not None:
+            timeout = max(0.5, min(timeout, (self.deadline - now).total_seconds() / 60))
+        size = int(self.llm["triage_chunk_size"])
+        calls: list[dict[str, Any]] = []
+        items: list[dict[str, Any]] = []
+        for start in range(0, len(leads), size):
+            chunk = leads[start:start + size]
+            outcome = runner(llm_step.compose_triage_prompt(chunk), argv=argv, cwd=cwd, env=env,
+                             timeout_minutes=timeout)
+            calls.append(outcome.as_record())
+            row["calls"] = calls
+            if outcome.status == "capability_violation":
+                self.record["capability_violation"] = {"step": step.key, "violations": outcome.violations,
+                                                       "init_capabilities": calls[-1]["init_capabilities"]}
+                return fail("capability_violation", "；".join(outcome.violations))
+            if outcome.status != "ok":
+                return fail(outcome.status, outcome.error or outcome.status)
+            structured = outcome.structured
+            if not isinstance(structured, dict) or not isinstance(structured.get("items"), list):
+                return fail("failed", "structured_output 不是 {items: [...]}")
+            for item in structured["items"]:
+                if isinstance(item, dict):
+                    items.append({**item, "decided_by": f"claude-p:{outcome.session_id}"})
+        self._write_triage_result(result_path, items, sessions=[c["session_id"] for c in calls])
+        row.update(status="ok", proposed=len(items), batch=len(leads),
+                   session_id=",".join(str(c["session_id"]) for c in calls))
+        self.log(f"{step.key} ok：{len(leads)} 則、{len(calls)} 次呼叫")
+
+    def _write_triage_result(self, path: Path, items: list[dict[str, Any]],
+                             sessions: list[Any] | None = None) -> None:
+        payload = {"schema": "triage-result-v1", "run_id": self.run_id, "run_date": self.date,
+                   "sessions": sessions or [], "items": items}
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     def _integrity_step(self, step: DailyStep) -> None:
         before = self.fingerprint_before

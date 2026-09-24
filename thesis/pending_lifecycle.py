@@ -1,6 +1,6 @@
 """Thesis lifecycle 變更的待核准提案層。
 
-為什麼需要這一層：`crons/daily_brief_prompt.md` 要求「若結果需要 thesis revise／
+為什麼需要這一層：Codex daily prompt（2026-09-24 封存為 `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`）要求「若結果需要 thesis revise／
 retire，完整 packet 回 pq2」，但在 2026-08-06 之前那句話沒有鑄號機制——
 `thesis_lifecycle` 型別的 pq2 只由到期檢查產生（「這條 thesis 該複查了」），研究
 結論想主張「這條 thesis 該退場」時沒有任何路徑，`lifecycle.json` 也只是一個可以

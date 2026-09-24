@@ -30,7 +30,7 @@
       "cwd：null＝%LOCALAPPDATA%\\StockBotv2\\llm_cwd；**必須在 repo 之外**（工作樹內 CLI 會跑 git、載入自動記憶），",
       "載入時驗證，違反即 fail closed。triage_chunk_size：批次超過就分多次呼叫，每次各自驗。"
     ],
-    "executor": "none",
+    "executor": "claude",
     "claude_path": null,
     "claude_model": "sonnet",
     "cwd": null,

@@ -205,9 +205,9 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | P0 | plan review（乾淨 context 的 Opus 5.5 max；使用者跑 §0.6） | ✅ 第 4 輪 GO（2026-09-24；歷程：第 1–3 輪 NO_GO → 修訂 → 第 4 輪 GO，N4-1–N4-13 已併入 §0.7） | 0c34de8（第 1 輪標的）、1bb46fb（第 2 輪標的）、9fc7593（第 3 輪標的）、7bd79ad（第 4 輪標的） |
 | 1.0 | 基準快照 | ✅ `docs/reports/2026-09-24-phase1-baseline.md`（watch 95／active 90／semantic 0；pq2 球在你 0；2180 passed；invariants 13 PASS；舊店 sha256 同 Phase 0） | b07427b |
 | 1.1 | 舊店讀取端改唯讀連線（`mode=ro`） | ✅ 7 個讀取端（5 kept_file＋2 支 fixture 擷取）改 `open_readonly_store()`；可寫的 `open_default_store()` 拿掉（偏差 #1）；舊店 sha256 不變 | e830c72 |
-| 1.2a | 一個 daily：`crons/daily_task.py`、config 唯一時間來源、註冊命令、自我比對、最外層保證、鎖續期、保險檢查、`crons/routine_hint.py`；註冊新工作並**停用**舊兩個 | ✅ 實跑 run `bf21bb07`：19 步 17 ok／2 skipped（executor=none）、7 分鐘、Discord 3/3；`StockBotv2-Daily` 已註冊（明天 05:30）、自我比對 match；舊兩個 Disabled（偏差 #2–#4） | |
+| 1.2a | 一個 daily：`crons/daily_task.py`、config 唯一時間來源、註冊命令、自我比對、最外層保證、鎖續期、保險檢查、`crons/routine_hint.py`；註冊新工作並**停用**舊兩個 | ✅ 實跑 run `bf21bb07`：19 步 17 ok／2 skipped（executor=none）、7 分鐘、Discord 3/3；`StockBotv2-Daily` 已註冊（明天 05:30）、自我比對 match；舊兩個 Disabled（偏差 #2–#4） | dcc8d2c |
 | 1.2b | 至少一次排程觸發成功後，**刪除**舊兩個 Windows 工作與 `crons/heartbeat_task.py`（不擋 1.3 起的 Step） | ○ | |
-| 1.3 | triage 併進 daily（`claude -p` 零工具＋JSON、每次 init 能力檢查、`triage-apply` 由程式寫入、`.codex/rules` 清零、排程器實測、daily-brief skill 改成互動專用）＋ R2-a | ○ | |
+| 1.3 | triage 併進 daily（`claude -p` 零工具＋JSON、每次 init 能力檢查、`triage-apply` 由程式寫入、`.codex/rules` 清零、排程器實測、daily-brief skill 改成互動專用）＋ R2-a | ✅ 排程器實跑 run `9dffbd83`：⑦a 13 則 1 次呼叫、init 能力欄位＝§0.2 那組、hook 0、`memory_paths` 缺席；⑦b 處理 13／PASS 2／FILTER 11／拒收 0；⑧ ok；`llm.executor=claude`；rules 12→0（偏差 #5–#6）；R2-a 已發 | |
 | 1.4 | `semantic_condition` kind（feed 宣告一手與公司、回填實體、待檢、判定、排除持股申報）＋ 語意預篩（抓全文、`claude -p` 零工具提議、程式驗引文後寫標旗；C7） | ○ | |
 | 1.5 | 反證登記 hook（讀圖 v2 `disproof[]`、thesis 由 `todo sync` 對帳 lifecycle 現行 memo 登記與收舊）＋ `wake_reading` ＋ 在盯／未盯／觸及待處置／叫不醒計數 ＋ 觸及後的 `thesis_lifecycle` 項目 | ○ | |
 | 1.6 | 既有反證補登記（**強模型**；16 條 thesis 用 `register-disproof`；2 份現行讀圖各 append 一份 v2 取代；不擋後續 Step、結案前必完成） | ○ | |
@@ -423,6 +423,8 @@ reviewer 重跑了 C6 的合成探針與對照組（§0.2「第 4 輪重驗」�
 | 2 | 1.2a | 步驟順序 ⑦a → ⑦b → ⑧ | ⑦a → **⑧** → ⑦b（`DAILY_STEPS` 的 `08_integrity_after_triage` 緊接在 ⑦a 之後） | 保險檢查在套用 LLM 提議之前就判——指紋變了的那一輪，⑦b 連一則都不會寫；「前」快照仍取在 ⑥ 之後、⑦a 之前 |
 | 3 | 1.2a | 「`run_id` 以參數傳給 ⑥」 | ⑥ 仍跑原本的 `engine_b.cli list … --triage-batch --json`，由 daily 把 stdout 包成帶 `run_id`／`run_date`／`exit` 的封套寫檔（`capture` 類步驟；⑭ 健康審查、⑮ invariants 同一機制）；失敗時先刪同日舊檔、不留任何檔 | 一個封套機制涵蓋三個 JSON 產出，不必替三支 CLI 各加 `--out`／`--run-id`；配對語意（以 `run_id`、不以日期）不變。stdout 是合法 JSON 就存（invariants 有 FAIL 時 exit 1，但那份結果正是要看的），狀態仍照 exit code，⑦a 只認 `status == ok` |
 | 4 | 1.2a | `decided_by` 在 1.3 才加 | 1.2a 就給 `leads.triage()` 加可選的 `decided_by`，harvest 的 Form 4 機械 FILTER 寫 `harvest:auto_no_go_forms` | 實跑後段 3 的「分類層上次成功」顯示成當天 15:21——那是 harvest 機械 FILTER 寫的 triage 時間，不是分類層（L12：一個欄位兩種語意）。修法不 parse 理由散文，改由寫入端標明判斷者、心跳排除 `harvest:` 開頭的。⚠ 本次實跑寫入的 5 筆機械 FILTER 早於這個修法、沒有標記，所以今天的心跳那一行仍會錯到 1.3 的分類層第一次跑完為止 |
+| 5 | 1.3 | 「`crons/daily_task.py` 的 LLM 呼叫（⑦a 與 ⑩b 共用一個函式）」 | 共用的那一組（argv、白名單、能力檢查、stream 判定、triage prompt 組裝）放在新模組 `crons/llm_step.py`，`daily_task.py` 的 ⑦a 呼叫它 | 同一個函式、兩個呼叫端（⑦a、1.4 的 ⑩b），放獨立模組才不會讓 daily 的步驟迴圈與 LLM 的 stream 解析混在一個 700 行的檔裡；測試照 plan 的條目逐條在 `tests/test_daily_task.py` |
+| 6 | 1.3 | 「cwd＝repo 外時沒有 `gitStatus`、沒有 `instructions` 附件」（§0.2 第 4 輪） | 排程器實跑的 session jsonl 確認：沒有 `instructions`、沒有 `gitStatus`、沒有 MEMORY.md；**但 `session_context` 仍帶帳號 email**（來自訂閱登入，不是 repo 內容） | 關掉它只能改用 `--bare`（只吃 API key，禁用旗標）；它是沒記進收據的輸入（L12），對 triage 無害但照實列 §15 待決。另：init 事件有一欄 `agents`（內建 subagent 清單）——零工具下沒有 Agent 工具叫不動它們，不在六欄檢查內，同列 §15 |
 
 ---
 
@@ -849,3 +851,4 @@ R2 回 GO 後：ROADMAP Phase 1 標 ✅、`docs/plans/README.md` 對照表本列
 6. `scripts/catalyst_watch.py` 失去消費端之後要退役還是留作互動入口。
 7. **daily 要不要做研究**（C7 刻意沒放）：`pq1.drain_limit_per_run` 從 0 調上去＝讓無人值守推進 pq1 研究，要改 AGENTS「研究（只在互動 session）」那句判準——使用者決定，走 amendment。
 8. **預篩全文的覆蓋**：EDGAR 與 MFN 有 fetcher，`sivers:press` 等沒有；本 Phase 只計數 `prescreen_no_fetcher`／`prescreen_no_text`。另兩個已知缺口（第 4 輪 N4-8、N4-9）：MFN 只取公告頁、不抓 `mb.cision.com` 的 PDF 附件（期中報告本體在附件）；EDGAR 只取主文件、不抓 EX-99（8-K／6-K 的主文件常只是封面）。結案時照實際數字（三種 verdict 的比例、「看不出」偏多的來源）決定要不要補 fetcher、抓附件（抓附件＝新增主機，要另做 sandbox impact review）。
+9. **`claude -p` 的 context 仍帶帳號 email**（1.3 排程器實跑確認，偏差 #6）：來自訂閱登入的 `session_context`，不是 repo；關掉只能 `--bare`（禁用）。要不要接受、或改用 API key 走 `--bare`（會改走 API 計費、`apiKeySource` 期望值要改）——使用者決定。init 另有一欄 `agents`（內建 subagent 清單），零工具下叫不動，要不要納入能力檢查一併決定。

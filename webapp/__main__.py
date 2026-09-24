@@ -1,8 +1,8 @@
 """`python -m webapp <materialize|serve|status|verify>`。
 
 ⚠ **改任何 `python -m <module>` 命令字串前先走 sandbox impact review 五步**（OPERATIONS）——
-`.codex/rules/stockbot-automations.rules` 的 exact prefix 會靜默打斷排程。本模組是新增的命令，
-不動任何既有命令字串。
+無人值守的 daily 以 `crons/daily_task.py` 的封閉步驟清單寫死命令字串（`tests/test_daily_task.py` 逐項守），
+改名會讓那一步每天失敗。本模組是新增的命令，不動任何既有命令字串。
 
 artifact 有兩類：per-ticker 的 Analyst View（`analyst_view/<TICKER>.json`）與跨標的的 state
 （`state/<kind>.json`，目前只有 `ranking`）。兩類都是 derived cache，同一套 atomic write／

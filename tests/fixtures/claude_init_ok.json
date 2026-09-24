@@ -1,0 +1,28 @@
+{
+  "type": "system",
+  "subtype": "init",
+  "tools": [
+    "StructuredOutput"
+  ],
+  "mcp_servers": [],
+  "plugins": [
+    {
+      "name": "agents-md",
+      "path": "builtin",
+      "source": "agents-md@builtin"
+    },
+    {
+      "name": "telemetry",
+      "path": "builtin",
+      "source": "telemetry@builtin"
+    }
+  ],
+  "slash_commands": [],
+  "skills": [],
+  "apiKeySource": "none",
+  "claude_code_version": "2.1.281",
+  "model": "claude-sonnet-5",
+  "permissionMode": "default",
+  "session_id": "00000000-0000-0000-0000-000000000000",
+  "cwd": "C:/Users/example/AppData/Local/StockBotv2/llm_cwd"
+}

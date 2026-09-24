@@ -25,7 +25,8 @@ def test_references_batch_verbs_and_operational_commands() -> None:
         "crons\\harvest_leads.py",
         "engine_c\\etl_yfinance.py",
         "scripts\\daily_beta_snapshot.py",
-        "scripts\\alpha_purity_snapshot.py",
+        # scripts\alpha_purity_snapshot.py：2026-09-08 起不在 daily；2026-09-24 隨 Codex 權限段移出本 skill，
+        # 它的家是 $alpha-status（互動入口）
         "-m engine_b.cli",
         "-m engine_b.todo sync",
         "-m engine_b.todo work",
@@ -132,24 +133,24 @@ def test_codex_scheduled_run_does_not_depend_on_task_rename_app() -> None:
     assert "title_update_failed" not in text
 
 
-def test_first_call_uses_single_fixed_entry_path_and_retry_is_last_resort() -> None:
+def test_source_failures_stay_visible_and_retry_is_last_resort() -> None:
+    """⚠ 2026-09-24（Phase 1 Step 1.3）：原本這條守的是 Codex scheduled task 的權限契約（fixed entry、
+    首次呼叫就 `require_escalated` 命中 exact rule）——Codex 退出無人值守、`.codex/rules` 清為 0 條，
+    那半跟機制退役（現行可執行面由 `tests/test_daily_task.py` 守）。**沒有退役的那半留在這裡**：
+    來源失敗不得寫成零筆、retry 只能是最後一步。"""
     text = _text()
     assert "harvest-health" in text
     assert "failure_class" in text
-    assert "access_blocked" in text
-    assert "legacy `workspace-write` sandbox" in text
-    assert "Daily 的唯一權限來源" in text
-    assert "第一次呼叫就用 `require_escalated` 命中 exact" in text
-    assert "outside-sandbox rule" in text
-    assert "不是先製造可預期的 `access_blocked` 再以升權重重跑" in text
-    assert "bounded、idempotent retry 作最後一步" in text
-    assert "不得在 routine 層重跑整份 fixed entry、整份 Daily Brief" in text
-    assert "不得放行整個 PowerShell、Python、Git 或 working tree" in text
-    assert "保留結構化 failure、讓受影響資料 fail closed" in text
-    assert "不得改用第二條更寬 rule、手動重跑或改寫成「零筆」／`no_result`" in text
+    assert "不得改寫成「零筆」／`no_result`" in text
+    assert "保留結構化 failure、讓受影響資料" in text and "fail closed" in text
+    assert "bounded、idempotent" in text.replace("\n", " ") and "retry 作最後一步" in text
+    assert "`.codex/rules` 已清為 0 條" in text
+    # 退役的那半必須真的不在（不是還在、只是沒人驗）
+    assert "第一次呼叫就用 `require_escalated` 命中 exact" not in text
+    assert "Daily 的唯一權限來源" not in text
 
 
-def test_scheduled_run_auto_drains_pq1_but_keeps_admission_gate() -> None:
+def test_pq1_drain_keeps_the_admission_gate() -> None:
     text = _text()
     assert "依每輪 limit 自動跑" in text
     assert "scripts\\prepare_research_action.py --action-file" in text

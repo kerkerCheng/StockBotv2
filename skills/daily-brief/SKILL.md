@@ -1,22 +1,33 @@
 ---
 name: daily-brief
 description: >
-  每日核准迴路：把 harvest → triage → pq1 自動研究 → 今日決策 → 到期 thesis 聚合成一份
-  action-first 的 Daily Approval Brief。持久現況（瓶頸排序／資產配置／研究缺口／在等什麼）自 2026-09-08
+  互動 session 的每日核准迴路（2026-09-24 起**只在互動 session**；無人值守的每日訊息是 Windows daily
+  的心跳）：讀當天 daily 的輸出與待辦池現值，把今日決策與到期 thesis 聚合成一份 action-first 的
+  Daily Approval Brief，給 pq2 建議與批次指令。持久現況（結構／資產配置／研究缺口／在等什麼）自 2026-09-08
   起住 APP，Daily 只印較昨變動。使用者用一行批次語法
   （`1 3 7 go 4 drop 5 6 pending`）
   核准。當使用者說「daily brief」「今天有什麼要處理」「跑每日摘要」「有哪些待判斷」「今天需要
   動作嗎」時使用。三道閘門不放寬：graph admission 必經核准、深挖由 priority/使用者驅動但入圖仍
-  核准、live 資本永遠人工。Scheduled run 可自動 pq1 到 prepared，但不建 decision、不下單、不自動入圖。觸發詞：daily brief、
+  核准、live 資本永遠人工。本 skill 不下單、不自動入圖。觸發詞：daily brief、
   每日摘要、今天有什麼、待判斷、今天需要動作嗎。
 ---
 
-# Daily Approval Brief Skill（v1.7）
+# Daily Approval Brief Skill（v1.8）
 
-> ⚠ **Scope note（2026-09-16）：呈現契約重寫中，本檔任何句子與 `AGENTS.md` 衝突時以 `AGENTS.md` 為準。**
-> 使用者已定案 Daily 拆成**心跳**（零 LLM，Python 排程）／**分類**（便宜模型、每日硬上限）／**研究**（只在互動 session）
-> 三層（決定紀錄 [`2026-09-16-alpha-edge-discovery-requirements.md`](../../docs/brainstorms/2026-09-16-alpha-edge-discovery-requirements.md) D12；規格 `docs/ARCHITECTURE.md` §4.1）。
-> 本 skill 隨該 Phase **同一個 change** 改寫；**在那之前本檔流程照舊執行**，不要在本檔補寫第二份判準。
+> ## ⚠ 2026-09-24（Phase 1 Step 1.3）：本 skill **只在互動 session** 被叫
+>
+> **無人值守的每日訊息是 Windows daily**（`StockBotv2-Daily` → `crons/daily_task.py`）：它每天抓資料、跑機械段、
+> triage（`claude -p` 零工具提議、程式驗證後寫入）、materialize、組零 LLM 的心跳並發 Discord——**每天一則**。
+> Codex 不在任何無人值守步驟裡；舊的 Codex daily prompt 逐字封存於
+> `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`（不得再執行）。
+>
+> 使用者在互動 session 說「daily brief」時，本 skill：①讀**當天 daily 的輸出**（執行紀錄
+> `library/private/heartbeat/daily_run_<日期>.json`、心跳 `heartbeat_<日期>.md`）與待辦池**現值**；
+> ②給 pq2 建議與可直接複製的批次指令（呈現契約見下方「待核准項目的內容密度」與「收尾建議摘要是義務」——
+> **這兩節是所有 skill 共用的，本次一字未改**）。**不重跑 daily 已做的步驟**；daily 沒跑或某步失敗時，
+> 照 `docs/OPERATIONS.md`「Daily」節補跑（整輪 `python crons\daily_task.py`，或只補失敗的那一步）。
+> 研究（pq1 source-trace／extract／prepare RA）走 `skills/research-drain`；本檔下方 Step 3 的判準是它沿用的那一份。
+> 本檔任何句子與 `AGENTS.md` 衝突時以 `AGENTS.md` 為準。
 
 ## 定位一句話
 
@@ -26,8 +37,8 @@ description: >
 無事時 brief 是一行 `MONITOR`。三道閘門永不自動：graph
 admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核准、live 資本永遠人工。
 
-> **介面是對話，不用 GitHub UI。** 現行排程是 Codex desktop local scheduled task；本機 Claude Code
-> session 也可手動執行同一流程，直接讀 repo、private runtime 與 `todo_pool.json`。本階段提到 Claude
+> **介面是對話，不用 GitHub UI。** 現行排程是 Windows daily（見上）；本機 Claude Code 或 Codex 互動
+> session 執行本 skill，直接讀 repo、private runtime 與 `todo_pool.json`。本階段提到 Claude
 > 預設就是 Claude Code 本機；cloud session＋MCP 是備援，只保留
 > `get_pending_leads`／`record_lead_decision` 等既有受限路徑，不要求與本機完全等權
 > （`get_decision_brief` 已於 2026-09-23 Phase 0 Step 0b.4 隨 decision_lab 研究側退役）。
@@ -38,7 +49,11 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 ## 執行流程
 
-### Step 1 — 本機資料更新（零 token）
+### Step 1 — 本機資料更新（零 token；Windows daily 每天已做，互動 session 只在它沒跑或失敗時補）
+
+先看 daily 今天有沒有跑完：`library/private/heartbeat/daily_run_<日期>.json` 的每一步 status。
+全部補跑用 `& '.venv\Scripts\python.exe' crons\daily_task.py`（⚠ 會發一則 Discord；不得持有 interactive 鎖）；
+只補一步時照下列單支命令：
 
 ```powershell
 & '.venv\Scripts\python.exe' crons\harvest_leads.py
@@ -68,34 +83,12 @@ credit 不進 NAV／cash／allocation。行情／capital telemetry 不進 pq1，
 「熱度」「節奏」再放回排序或尺寸同樣禁止。查證：
 `python -c "import json;print(sorted(json.load(open('config/beta_policy.json'))))"` 不應出現 `signal`。
 **解析失敗 ≠ 無新文**。每筆失敗必須保存 `failure_class`；最新一次仍失敗的來源由
-`harvest-health` 持續顯示。Codex standalone scheduled task 會沿用 legacy `workspace-write` sandbox，
-因此 Daily 的唯一權限來源是 `.codex/rules/stockbot-automations.rules` 的窄 fixed entry；不得再用 project
-permission profile 當成 scheduled primary path。下列連外命令**第一次呼叫就用 `require_escalated` 命中 exact
-outside-sandbox rule**，
-不是先製造可預期的 `access_blocked` 再以升權重重跑；不得放行整個 PowerShell、Python、Git 或 working tree。
-fixed entry 包含
-`crons\harvest_leads.py`、`engine_c\etl_yfinance.py`、`fetchers\edgar.py`、`fetchers\mops.py`、
-`scripts\alpha_purity_snapshot.py`、
-`scripts\daily_beta_snapshot.py`、`engine_b.cli list`、`engine_b.cli drain`、
-`scripts\catalyst_watch.py`、`scripts\outcome_if_settled_today.py`、`scripts\prepare_research_action.py --action-file`、
-`engine_b.todo sync`、`engine_b.todo work`、
-`engine_b.todo standing-go`、`scripts\publish_daily_brief.py` 與
-`-m webapp materialize`；那組 rule 就是單一 authority，不是 primary＋fallback 兩套來源。
-**條數不寫死在這裡**（寫死的數字會腐壞，而它腐壞過一次）——查證：`pytest tests/test_codex_daily_permissions.py`。
-⚠ 2026-09-22（Phase 0 Step 0a.1）：`decision_lab today` 與 `engine_b.todo reassess-stale`
-兩條已隨 decision_lab 研究側退役移除，14 → 12。
-`engine_b.cli consume-fired` 刻意**不在列**：它只讀寫 repo 內 JSON，在 sandbox 內就能跑（與 `event_watch sweep` 同先例）。
-⚠ `fetchers/` 不是整包放行：只有 `edgar.py` 與 `mops.py` 在列，`gsheets.py` 帶 Google 憑證故排除。
-`engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 work order；
-它不授權 `dispatch`／`resolve`，也不放寬 graph admission 或 live gate。
-`query.bottleneck`、`query.coverage_gaps`、harvest health、trace backlog、todo list 與 JSON 檢查已可留在 sandbox；使用者核准後的
-apply／complete-ra／commit intake 不加入 unattended rule，仍走 type-aware 人工 gate。
-若 exact rule 未匹配、升權限被拒或命令仍出現 `access_blocked`，保留結構化 failure、讓受影響資料 fail closed，
-不得改用第二條更寬 rule、手動重跑或改寫成「零筆」／`no_result`。權限正確後若仍發生暫時性 transport error，
-只允許該命令**既有的 bounded、idempotent retry 作最後一步**（例如 TWSE bounded retry、Discord 每段最多
-3 次）；不得在 routine 層重跑整份 fixed entry、整份 Daily Brief，或重做已 checkpoint 的研究／authority
-mutation。retry 用盡後照樣保存 failure 並 fail closed。
-`harvest-health`、queue list／count、JSON 檢查等純本機唯讀命令維持 sandbox。
+`harvest-health` 持續顯示。**來源失敗不得改寫成「零筆」／`no_result`**：保留結構化 failure、讓受影響資料
+fail closed；同一來源後續成功才算 recovered。暫時性 transport error 只允許該命令**既有的 bounded、idempotent
+retry 作最後一步**（例如 TWSE bounded retry、Discord 每段最多 3 次）；不得重做已 checkpoint 的研究或 authority
+mutation。⚠ 2026-09-24（Phase 1 Step 1.3）：原本這裡是 Codex scheduled task 的權限契約（`.codex/rules` 的
+fixed entry、首次呼叫就命中 exact rule）——Windows daily 不經 Codex、`.codex/rules` 已清為 0 條，那一整段隨機制退役；
+Windows daily 的可執行面是 `crons/daily_task.py` 的封閉步驟清單，由 `tests/test_daily_task.py` 逐項守。
 `insufficient_history`／`unavailable`／`stale`
 也必須在健康段落明示，並讓受影響那一列的相對水位標為不可信而非靜默消失；
 **單檔行情降級不歸零共用 self-funded range**（已無逐檔區間），只有資本 authority 失效或硬擋才歸零。Windows 本機與
@@ -175,7 +168,7 @@ decision gap 研究）不在 daily 自動做**——LLM 無人值守寫判斷檔
 & '.venv\Scripts\python.exe' -m engine_b.cli drain
 ```
 
-`drain` 首次呼叫使用 exact outside-sandbox rule；default store 的 Decision work orders、Google Sheet 持股或
+default store 的 Decision work orders、Google Sheet 持股或
 Neo4j chokepoint context 任一不可讀時 exit 2，心跳仍輸出，但本輪不得用降級排序選 pq1。
 
 列出接下來可研究的 bounded jobs。**使用者已明確 go 的 Decision gap work order 優先**，再以剩餘
@@ -194,7 +187,9 @@ checkpoint 狀態。Triage PASS 只授權研究、不授權入圖；prepared RA 
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> action_prepared --ref research_action_id=<ra_id>   # prepare 完
 ```
 
-`source_trace_review` 的 `go` 只授權 bounded 追源，先留下跨 session receipt：
+`source_trace_review` 的 `go` 只授權 bounded 追源，先留下跨 session receipt。
+`engine_b.todo work` 只 checkpoint 已由使用者 exact `go` 且已有 `dispatch_ref` 的 work order；
+它不授權 `dispatch`／`resolve`，也不放寬 graph admission 或 live gate：
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.todo dispatch <todo_n>
@@ -259,8 +254,8 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 
 這支 CLI 只接受該 draft 目錄、重跑既有 extraction／storage／permission validation 並寫 owner-only private
 staging；不 apply、不寫 Neo4j、不建 Decision／live permission。只有回 `status=ready` 才可把 lead checkpoint
-成 `action_prepared`。SEC 原文若需 repo fetcher，使用 `fetchers\edgar.py` exact rule；台股原文用 `fetchers\mops.py` exact rule；其他公開頁可走
-WebSearch／Browser，兩者是 shell rules 之外的獨立權限 surface。
+成 `action_prepared`。SEC 原文若需 repo fetcher，使用 `fetchers\edgar.py`；台股原文用 `fetchers\mops.py`；其他公開頁可走
+WebSearch／Browser（研究只在互動 session，這些都是互動入口）。
 
 每輪 drain 後另列不會被一般 queue 自動撿回的 trace backlog：
 
@@ -740,7 +735,10 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 
 ### Step 8 — provider-neutral 單向通知（best effort）
 
-Daily Brief 組成後，Codex 與本機 Claude Code 都呼叫同一支 repo publisher；不得在兩份 hook／prompt
+⚠ 2026-09-24（Phase 1 Step 1.3）：**每天的 Discord 訊息由 Windows daily 發一則**（心跳）。互動 session 組的
+Daily Brief **預設不發送**——使用者明確要求時才照下列方式發，免得同一天出現兩份互相競爭的 canonical brief。
+
+要發送時，Codex 與本機 Claude Code 都呼叫同一支 repo publisher；不得在兩份 hook／prompt
 各自複製 Discord 業務邏輯。publisher 只做 outbound，不接受 Discord 的 `go`、交易、入圖或任何核准指令，
 也不改變 todo／Decision／Graph／Sheet authority。
 
@@ -771,10 +769,11 @@ task 最終回覆必須原樣輸出送入 publisher 的 canonical Markdown；不
 
 ## 現行本機排程與遠端 fallback
 
-`crons/daily_brief_prompt.md` 是 Codex desktop 每日 06:30 的本機 scheduled task prompt，可直接讀 repo 與
-private authorities；本機 Claude Code session 亦可沿用同一 prompt 手動執行；`crons/weekly_scan_prompt.md`
-是台北週日 04:00 的本機 weekly prompt。Cloud session＋MCP 不承擔現行排程，只保留遠端 chat／手機
-intake 的 fallback；遠端永遠不得取代本機 decision／lifecycle authority。
+**唯一的無人值守排程是 Windows daily**（`StockBotv2-Daily`；時間只住 `config/daily_routine.json`，改法與失敗長相見
+`docs/OPERATIONS.md`「Daily」節）。~~`crons/daily_brief_prompt.md`（Codex desktop 每日 scheduled task prompt）~~
+已於 2026-09-24 封存為 `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`，兩個 Codex automation 由使用者停用。
+`crons/weekly_scan_prompt.md` 待 Phase 1 Step 1.9 退役（題材掃描改互動 skill）。Cloud session＋MCP 不承擔現行排程；
+遠端永遠不得取代本機 decision／lifecycle authority。
 
 ## 已知會壞的地方（v0，撞到回頭修）
 
