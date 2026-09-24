@@ -1014,11 +1014,14 @@ schtasks /Query /TN StockBotv2-FxSync /FO LIST /V                          # Sta
 
 ## MCP server
 
-本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，十二工具 surface，Git 能力僅 leads.json 一個窄例外。daily／weekly 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
+本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，工具數以 `tools/list` 實測為準（2026-09-24 為 11，`get_decision_brief` 已隨 Phase 0 退役），Git 能力僅 leads.json 一個窄例外。daily／weekly 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
 
 **⚠ 改完 `mcp_server/` 一定要重啟 process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。
 
-重啟：停掉 `graph_mcp` python process 再跑 `.venv\Scripts\python.exe mcp_server\graph_mcp.py`（或雙擊該 `.vbs`）。**驗證跑著的版本：** 對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
+重啟：停掉 `graph_mcp` python process，**在 repo root** 跑 `.venv\Scripts\python.exe -m mcp_server.graph_mcp`。
+⚠ **必須用 `-m`，不能用檔案路徑**：2026-09-03（`5e364f1`）拿掉 `graph_mcp.py` 的 `sys.path.insert` 之後，`python mcp_server\graph_mcp.py`
+會 `ModuleNotFoundError: query`；2026-08-27 起的舊 process 一直開著所以沒被發現，2026-09-24 重啟時才現形，同日 `.vbs` 已改成 `-m`。
+不要為了只重啟 MCP 而雙擊整個 `.vbs`——它會連 Neo4j、tunnel、webapp 一起再起一份。**驗證跑著的版本：** 對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
 
 ---
 
