@@ -156,7 +156,8 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > **2026-09-24（Phase 1 Step 1.2a；A1、C1、C4、C6）：無人值守收斂成一個 Windows daily。**
 > Windows 工作 `StockBotv2-Daily`（時間只住 `config/daily_routine.json` 的 `schedule`，由 `scripts/register_daily_task.py`
 > 導出、`crons/daily_task.py` 每次開跑比對）跑一份**程式寫死的封閉步驟清單** `DAILY_STEPS`：抓資料、機械段、materialize、
-> 健康審查、invariants、本機備份、心跳、發送。它取代 Codex daily automation、`StockBotv2-Heartbeat` 與 `StockBotv2-FxSync`。
+> 健康審查、invariants、本機備份、心跳、發送。它取代 Codex daily automation、`StockBotv2-Heartbeat` 與 `StockBotv2-FxSync`
+> （舊兩個工作與舊入口 `crons/heartbeat_task.py` 於 2026-09-25 Step 1.2b 刪除；上面 09-17 那段的查證命令已查不到東西）。
 > **daily 的目標：心跳不靠 LLM；其他步驟可以用 LLM，但 LLM 只產出提議，由程式驗證後寫入**（C4）。分類（triage）與語意預篩
 > 是 daily 裡的兩步，一律 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位（Step 1.3、1.4 接上；在那之前 `llm.executor=none`）。
 > 失敗長相與改時間的唯一做法見 OPERATIONS「Daily」節。查證：`schtasks /Query /TN StockBotv2-Daily /FO LIST /V`、

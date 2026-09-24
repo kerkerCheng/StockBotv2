@@ -410,7 +410,8 @@ def test_renewed_watch_expiring_again_says_so_in_the_title(env) -> None:
     _sync(pool)
     todo.resolve(pool, _open(pool)[0]["n"], "pending", until=FUTURE)
     data = ew.load_watches()
-    later = (date.today() - timedelta(days=1)).isoformat()
+    # 「今天」取程式用的那一個（UTC 日期）：台北 00:00–08:00 本地日期比它多一天，「昨天」會變成 UTC 的今天而不到期
+    later = (ew._today() - timedelta(days=1)).isoformat()
     next(w for w in data["watches"] if w["watch_id"] == watch_id)["expires"] = later
     ew.mark_expired(data)
     ew.save_watches(data)
@@ -436,7 +437,7 @@ def test_renew_date_must_be_in_the_future(env) -> None:
     pool = _pool()
     _sync(pool)
     with pytest.raises(todo.TodoError, match="晚於今天"):
-        todo.resolve(pool, _open(pool)[0]["n"], "pending", until=date.today().isoformat())
+        todo.resolve(pool, _open(pool)[0]["n"], "pending", until=ew._today().isoformat())   # 同上：程式的今天
 
 
 def test_drop_records_a_closed_vocabulary_resolution(env) -> None:

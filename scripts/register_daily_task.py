@@ -33,7 +33,8 @@ sys.path.insert(0, str(ROOT))
 from crons.daily_task import parse_task_xml  # noqa: E402
 from engine_b.routine_config import load_schedule  # noqa: E402
 
-#: 由 `StockBotv2-Daily` 取代的兩個舊工作。1.2a 只停用（回滾＝重新啟用），1.2b 才刪。
+#: 由 `StockBotv2-Daily` 取代的兩個舊工作。1.2a 只停用（回滾＝重新啟用），1.2b 才刪（2026-09-25 已刪；
+#: 之後 `--apply` 對它們印「停用失敗或不存在」是預期的，不是故障）。
 LEGACY_TASKS: tuple[str, ...] = ("StockBotv2-Heartbeat", "StockBotv2-FxSync")
 ENTRYPOINT = r"crons\daily_task.py"
 

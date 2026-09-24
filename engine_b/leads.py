@@ -1125,7 +1125,8 @@ def _requeue_related_trace_backlog(
                 # 由 `classification-health` 之類的常駐檢查現形，而不是讓它安靜消失。
                 skipped.append({"lead_id": lead_id, "watch_id": watch["watch_id"],
                                 "reason": str(exc)})
-                # 不靜默：daily 的 stderr 會進 heartbeat_task.log，所以這行有消費端。
+                # 不靜默：daily 的 stderr 末段（1500 字）進執行紀錄 `daily_run_<日期>.json` 的 `stderr_tail`
+                # ——只是留痕，步驟成功時心跳不印它（還沒有常駐計數器，見本函式結尾）。
                 print(f"警告：跳過重排 {lead_id}（{exc}）——該 parked lead 缺 trace receipt，"
                       "triage 本身照常完成", file=_sys.stderr)
                 ew.reactivate(watch_data, watch["watch_id"],
@@ -1150,7 +1151,7 @@ def _requeue_related_trace_backlog(
     # 留一份平行實作只會讓兩邊再度偏離（L16：重造品會開始偏離，而偏離不報錯）。
     # 未涵蓋的 lead 由 trace_backlog 以 wake_state=unwatched 現形，交人處置。
     # ⚠ `skipped` 刻意不併進回傳值（那會動 contract 與所有呼叫端）——它已在發生當下
-    # 印到 stderr，而 daily 的 stderr 進 heartbeat_task.log。要讓它有常駐計數器是
+    # 印到 stderr，而 daily 的 stderr 末段進執行紀錄的 `stderr_tail`。要讓它有常駐計數器是
     # 另一件事（開發項），不在這次的修復範圍：這次只保證**一筆壞資料不再擋住整個分類層**。
     return sorted(requeued)
 

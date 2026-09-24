@@ -496,6 +496,76 @@ def test_main_always_exits_zero(monkeypatch) -> None:
 
 
 # ---------------------------------------------------------------------------
+# 無人值守入口（Step 1.2b：原 `tests/test_heartbeat.py` 守 `crons/heartbeat_task.py` 的五條，改主詞搬來）
+# ---------------------------------------------------------------------------
+
+def test_entrypoint_is_python_not_cmd_and_the_legacy_one_is_gone() -> None:
+    """排程入口必須是 `.py`，**不得是 `.cmd`**（2026-09-17 實測：`cmd.exe` 以 cp950 讀 UTF-8 檔，
+    中文註解被拆成無效指令）。註冊命令跑的就是這支；舊入口 1.2b 已刪，不得回來成為第二個排程入口。"""
+    from scripts import register_daily_task as reg
+
+    assert (ROOT / "crons" / "daily_task.py").is_file()
+    assert not list((ROOT / "crons").glob("*.cmd"))
+    assert not (ROOT / "crons" / "heartbeat_task.py").exists()
+    assert reg.ENTRYPOINT == r"crons\daily_task.py"
+
+
+def test_dry_run_executes_nothing_and_never_publishes(monkeypatch, capsys) -> None:
+    """`--dry-run` 只印清單與 config 時間：不建 `DailyRun`，所以一步都不跑、一則都不發。"""
+    def must_not_run(*_a, **_k):
+        raise AssertionError("dry-run 建了 DailyRun")
+
+    monkeypatch.setattr(dt, "DailyRun", must_not_run)
+    assert dt.main(["--dry-run"]) == 0
+    out = capsys.readouterr().out
+    assert "19_publish" in out and "scripts/publish_daily_brief.py" in out
+
+
+def test_publisher_failure_is_recorded_and_the_run_still_completes(tmp_path: Path) -> None:
+    """發送是 best-effort，**不得阻斷**（AGENTS：通知不是 authority）——失敗記進紀錄，run 照樣收尾。"""
+    runner = FakeRunner(tmp_path / "repo")
+    runner.fail = {"scripts/publish_daily_brief.py"}
+    run, _ = _run(tmp_path, runner=runner)
+    status = _status(run)
+    assert status["19_publish"] == "failed" and status["18_heartbeat"] == "ok"
+    assert run.record["status"] == "completed"
+
+
+@pytest.mark.parametrize("steps,needle", [
+    # 心跳沒產出（舊入口的「沒有東西可發」）：⑱ 失敗，⑲ 拿不到檔
+    ([{"key": "18_heartbeat", "status": "failed", "error": "exit 1"}], "心跳沒有成功"),
+    ([{"key": "19_publish", "status": "failed", "error": "exit 1"}], "Discord 發送沒有成功"),
+    # publisher 讀不到心跳檔時回 delivery_failed 但 exit 0——步驟是 ok，只有 receipt 說得出來
+    ([{"key": "19_publish", "status": "ok",
+       "receipt": {"status": "delivery_failed", "error_code": "brief_file_FileNotFoundError"}}],
+     "brief_file_FileNotFoundError"),
+])
+def test_nothing_sent_is_said_at_session_start(tmp_path: Path, steps, needle) -> None:
+    """Discord 沒收到是沉默——不得靜默結束（L13-2），由 `routine_hint` 在開 session 時說出來。"""
+    from crons.routine_hint import daily_problem
+
+    run_dir = tmp_path / "runs"
+    run_dir.mkdir()
+    (run_dir / "daily_run_2026-09-24.json").write_text(json.dumps(
+        {"status": "completed", "integrity_violation": None, "steps": steps}), encoding="utf-8")
+    after = datetime(2026, 9, 24, 7, 0, tzinfo=timezone(timedelta(hours=8)))
+    problem = daily_problem(now=after, config_path=_config(tmp_path), run_dir=run_dir)
+    assert problem and needle in problem, problem
+
+
+def test_the_only_outbound_path_is_the_existing_publisher() -> None:
+    """outbound surface 只有一個入口：既有的 `scripts/publish_daily_brief.py`，以 subprocess 呼叫。"""
+    publish = [s for s in DAILY_STEPS if s.network and s.kind == "publish"]
+    assert [s.argv[0] for s in publish] == ["scripts/publish_daily_brief.py"]
+    # 第二條出口長什麼樣：自己送 HTTP、或繞過腳本直接 import publisher。daily 自己、LLM 那一步、心跳都不准。
+    for rel in ("crons/daily_task.py", "crons/llm_step.py", "crons/heartbeat.py"):
+        source = (ROOT / rel).read_text(encoding="utf-8").lower()
+        for second_path in ("import requests", "import httpx", "urllib.request",
+                            "from notifications", "import notifications", "webhook_url"):
+            assert second_path not in source, (rel, second_path)
+
+
+# ---------------------------------------------------------------------------
 # register：時間只住 config，註冊與自我比對讀同一組欄位
 # ---------------------------------------------------------------------------
 

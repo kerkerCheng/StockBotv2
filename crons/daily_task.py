@@ -12,6 +12,13 @@
   `llm.executor=none` 時兩者記 `skipped`，這也是 R2-a 的回滾開關。
 - 每步獨立 subprocess（`shell=False`、venv python、cwd＝repo root）＋timeout，**失敗記錄後繼續**（fail-soft）。
 
+## 「LLM 失敗心跳照發」怎麼在同一個排程裡成立（`crons/heartbeat_task.py` 的第一條理由，Step 1.2b 刪檔時搬來）
+
+舊心跳刻意是**獨立排程**，不掛在 Codex daily 底下：掛在 LLM 底下的話，LLM 沒起來就沒有心跳——而「LLM 沒起來」
+正是心跳要讓人看得見的失敗之一。合併成一個排程之後，這條規則改由**這支程式本身**在結構上保證，不靠 LLM 起得來：
+LLM 只是清單裡的步驟（⑦a、⑩b），各有 timeout、失敗只記錄；心跳與發送是 `essential` 步驟，deadline 之後仍會跑。
+唯一例外是保險檢查觸發（見下）——那時連心跳都不跑，改由 `crons/routine_hint.py` 在開 session 時說。
+
 ## 為什麼永遠 exit 0（從 `crons/heartbeat_task.py` 搬來的理由）
 
 心跳的下游是人眼，它一旦不發人就什麼都看不到；通知失敗依 `AGENTS.md` 是 best-effort，**不得阻斷**

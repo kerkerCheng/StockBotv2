@@ -12,7 +12,8 @@
 
 **2026-09-24（Phase 1 Step 1.2a）起，無人值守只有一條路：Windows 工作 `StockBotv2-Daily`。**
 它取代三個東西：Codex daily automation（抓資料、機械段、materialize）、`StockBotv2-Heartbeat`（07:00 心跳）、
-`StockBotv2-FxSync`（06:55 FX 同步）——舊兩個工作在 1.2a 只**停用**（回滾＝重新啟用），1.2b 才刪。研究仍只在互動 session。
+`StockBotv2-FxSync`（06:55 FX 同步）——舊兩個工作在 1.2a 只**停用**，2026-09-25 第一次排程觸發成功（`Last Result 0`、執行紀錄 25 步齊全）後
+由 1.2b **刪除**，舊入口 `crons/heartbeat_task.py` 同步刪除。研究仍只在互動 session。
 
 ```
 Daily   Windows 工作 StockBotv2-Daily（時間只住 config/daily_routine.json 的 schedule，現為 05:30）
@@ -61,9 +62,10 @@ schtasks /Run /TN StockBotv2-Daily       # 走真正的排程路徑
 Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ```
 
-**回滾**（R2-a 回 NO_GO 時）：`config/daily_routine.json` 的 `llm.executor` 改 `none`（triage 與預篩一起停）；
-1.2b 刪舊工作之前，必要時 `schtasks /Change /TN StockBotv2-Heartbeat /ENABLE`、`/TN StockBotv2-FxSync /ENABLE`、
-`/TN StockBotv2-Daily /DISABLE`。
+**回滾**：LLM 步驟出事 → `config/daily_routine.json` 的 `llm.executor` 改 `none`（triage 與預篩一起停，其餘照跑）。
+舊兩個工作已於 2026-09-25（1.2b）刪除，「重新啟用舊工作」這條退路不存在了；真要退回舊形狀，註冊範本在
+`library/private/heartbeat/legacy_tasks/*.xml`（`schtasks /Create /TN <名稱> /XML <檔>`），而舊心跳入口要先從 git 還原
+`crons/heartbeat_task.py`（1.2b 之前的任一 commit）。
 
 ⚠ **`LogonType Interactive`＝只在使用者已登入時執行。** 換成「不論是否登入都執行」要存密碼，會在機器上多一份憑證——刻意不做。
 `StartWhenAvailable`：05:30 電腦沒開，開機後補跑。註冊時觸發起點取「下一次」而不是今天（今天已過的時間會被當成錯過的一次、當場補跑）。
@@ -95,8 +97,8 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `test_every_source_broken_still_renders_five_sections` 就是這條契約本身）。
 
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
-`StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、1.2b 刪除）；它們的理由（永遠 exit 0、Python 不用 `.cmd`、發送走 subprocess）
-搬進 `crons/daily_task.py` 的 docstring。
+`StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
+發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.2a：一個 Windows daily）
 
@@ -997,8 +999,9 @@ impact review。
 
 ### FX 觀測同步（2026-09-19 完成 sandbox impact review）
 
-`scripts\sync_fx_observations.py` 由**獨立 Windows 排程** `StockBotv2-FxSync` 每日 06:55 觸發
-（排在心跳 07:00 之前，所以心跳當天讀得到最新狀態）。
+`scripts\sync_fx_observations.py` 是 Windows daily 的 ③（在 ⑱ 心跳之前，所以心跳當天讀得到最新狀態）。
+~~由獨立 Windows 排程 `StockBotv2-FxSync` 每日 06:55 觸發~~——2026-09-24 Phase 1 Step 1.2a 併入 daily、2026-09-25 1.2b 刪除該工作；
+下表是 2026-09-19 的 impact review 原文（第 3、5 列講的「獨立排程」即指那個已刪的工作）。
 
 **它要消掉的失敗模式：** 消費端只接受與現價 `bar_date` 相差 ±3 天內的匯率觀測
 （`alpha/fx.py::FX_AS_OF_TOLERANCE_DAYS`），而 2026-09-13 手抄的四筆每一筆的 `_note` 自己就寫著
@@ -1026,7 +1029,7 @@ impact review。
 ```powershell
 & '.venv\Scripts\python.exe' scripts\sync_fx_observations.py --dry-run   # 只印會寫什麼
 & '.venv\Scripts\python.exe' scripts\sync_fx_observations.py             # 同步
-schtasks /Query /TN StockBotv2-FxSync /FO LIST /V                          # Status=Ready、Last Result=0
+Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_fx_sync 的 status／exit
 ```
 
 
