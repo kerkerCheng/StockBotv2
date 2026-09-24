@@ -290,4 +290,4 @@ def test_heartbeat_does_not_take_out_its_neighbours_when_readings_are_missing(tm
     section = hb.build_changes(now=datetime.now(timezone.utc), state_dir=state_dir,
                                thesis_path=tmp_path / "missing.json")
     text = "\n".join(section.lines)
-    assert "結構讀圖：" in text and "事件監看" in text and "beta" in text
+    assert "結構讀圖：" in text and "watch：今日醒" in text and "beta" in text   # 1.8：watch 行改讀 registry

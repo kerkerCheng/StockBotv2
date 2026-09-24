@@ -67,7 +67,7 @@ DRIVE_SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 DRIVE_FOLDER_NAME = "StockBotv2-backups"
 DRIVE_ZIP_PREFIX = "stockbotv2_backup_"
 DRIVE_RETENTION = 8
-LOCAL_RETENTION = 3
+LOCAL_RETENTION = 7   # Phase 1 Step 1.8：daily 每天跑，本機留一週
 
 # files.zip 的排除清單。頂層目錄整包排除；-wal/-shm 與 restore 暫存檔一律排除。
 EXCLUDE_TOP_DIRS = {"models", "lead_media", "backups", "backups_verify_tmp", "gdrive_oauth"}

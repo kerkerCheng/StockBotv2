@@ -25,14 +25,15 @@ D12（2026-09-16 使用者定案）把 Daily 拆成三層——心跳／分類�
 所以它的失敗模式是「把失敗印在該印的那一行、並宣告 `absence_kind`」，不是「不發」。
 （這與 INV-6 不衝突：INV-6 禁的是**靜默**回傳當前值，而這裡每一次降級都出現在輸出裡。）
 
-**段 2「變了什麼」目前印的是狀態，不是 diff。** 門檻跨越／反證觸發／催化劑到期都是狀態
-（今天成立就該說），但「現價過目標價」若連續三十天都是同兩檔，它就從訊息變成背景噪音。
-真正的「較昨變動」需要昨天的心跳快照——**排程接上之前不存在昨天**，所以刻意不假裝有
-（Step 2.2 接上排程後再補，屆時第一天仍然沒有昨天，那一天要誠實印出來）。
+**段 2 的第一行是「較昨變動」（Phase 1 Step 1.8）。** 每次 daily 寫一份快照
+（`library/private/heartbeat/snapshots/<日期>.json`，鍵是封閉清單 `SNAPSHOT_KEYS`、留 14 天），心跳只印跟上一份比
+**變了的鍵**，其餘印「N 項相同」。快照是 derived、只給 diff 用，**不是** current-state authority（AGENTS：不建立
+與待辦池競爭的第二個狀態源）。沒有上一份（第一天、或中間斷了很多天）就誠實印出來，不假裝有。
 
 ## 它明確不做的事
 
-- **不寫任何 authority**，不碰 Neo4j、不連外、不讀憑證。唯一的寫入是 `--out` 指定的 Markdown 檔。
+- **不寫任何 authority**，不碰 Neo4j、不連外、不讀憑證。寫入只有 `--out`（Markdown）、`--summary-out`
+  （Discord 摘要行）與 `--write-snapshot`（快照，derived）三個，全部在 `library/private/heartbeat/` 底下。
 - **不自己發送。** outbound 仍走既有的 `scripts/publish_daily_brief.py`（那支是 fixed entry，
   且 Windows PowerShell 的 UTF-8 管線有坑，所以這裡只寫檔、由呼叫端帶 `--brief-file`）。
 - **不重算任何排序或判讀。** 段 3 的佇列計數消費 `engine_b.queue_segments.observe()` 與
@@ -52,10 +53,11 @@ LLM 那一層（反過來就是拆煞車不裝儀表板，L14-3）。**接上排
 
 用法：
 
-    python -m crons.heartbeat                     # 印 Markdown 到 stdout
+    python -m crons.heartbeat                     # 印 Markdown 到 stdout（不寫快照）
     python -m crons.heartbeat --format json       # 機器可讀（測試與未來的 APP 用）
-    python -m crons.heartbeat --weekly            # 第 5 段（帳號計分表）只在 weekly 有內容
     python -m crons.heartbeat --out <path>        # 寫 UTF-8 檔，交給既有 publisher
+    python -m crons.heartbeat --out <p> --summary-out <p2> --write-snapshot   # daily ⑱ 的用法
+（`--weekly` 已於 Phase 1 Step 1.8 拿掉：帳號計分表每天印 tier 分布與較昨變化，完整表在 APP。）
 """
 from __future__ import annotations
 
@@ -159,7 +161,7 @@ def _x_spend_cap() -> float:
 
 
 def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
-                    run_record_path: Path | None = None) -> Section:
+                    run_record_path: Path | None = None, capture_dir: Path | None = None) -> Section:
     """daily 執行紀錄、harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
     section = Section(1, SECTION_TITLES[0])
 
@@ -266,7 +268,76 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
     except Exception as exc:  # noqa: BLE001
         absence = Absence("upstream_unavailable", f"APP artifact 盤點失敗：{type(exc).__name__}")
         section.lines.append(f"APP materialize：{absence.reason}（{absence.kind}）")
+
+    # (e)(f)(g) 備份、健康審查、invariants（Phase 1 Step 1.8）——daily ⑯⑭⑮ 的結果；心跳只讀，不重跑。
+    for label, fn in (("備份", lambda: _backup_line(now=now)),
+                      ("健康審查", lambda: _health_line(now=now, capture_dir=capture_dir)),
+                      ("invariants", lambda: _invariants_line(now=now, capture_dir=capture_dir))):
+        try:
+            section.lines.append(fn())
+        except Exception as exc:  # noqa: BLE001
+            absence = Absence("upstream_unavailable", f"{label}盤點失敗：{type(exc).__name__}")
+            section.lines.append(f"{label}：{absence.reason}（{absence.kind}）")
     return section
+
+
+#: 備份超過幾天算舊（Discord 摘要行的紅旗也用它）。
+BACKUP_STALE_DAYS = 7
+
+
+def _backup_line(*, now: datetime) -> str:
+    """`scripts/backup_private.py` 的狀態（Phase 1 Step 1.8）。loader 是 `briefing.sources.load_backup_status`——
+    APP 首屏用同一支（L16：不另寫一份）。"""
+    from briefing.sources import load_backup_status
+
+    status = load_backup_status(now=now)
+    if status is None:
+        return "備份：這台沒有 private root（method_not_applicable）"
+    if status.get("status") == "never":
+        return "⚠ **備份：從來沒有備份過**（`python scripts/backup_private.py run`）"
+    if status.get("status") != "ok":
+        return "⚠ **備份：狀態檔讀不懂**（upstream_unavailable）——視同沒有備份"
+    age = int(status.get("age_days") or 0)
+    line = (f"備份：最後 {age} 天前（{status.get('backup_id') or '?'}）｜Drive {status.get('drive_status')}"
+            f"｜還原驗證 {'有' if status.get('restore_verified') else '沒有'}"
+            f"｜之後變動未備份 {status.get('unbacked_files', '?')} 檔")
+    return (f"⚠ **{line}——超過 {BACKUP_STALE_DAYS} 天**" if age > BACKUP_STALE_DAYS else line)
+
+
+def _capture(name: str, *, now: datetime, capture_dir: Path | None) -> tuple[Any, str | None]:
+    """daily 的 capture 檔（`<name>_<本地日期>.json` 的 payload）。今天沒有是要說出來的狀態。"""
+    path = (capture_dir or RUN_RECORD_DIR) / f"{name}_{now.astimezone().strftime('%Y-%m-%d')}.json"
+    if not path.is_file():
+        return None, "今天沒有紀錄（daily 沒跑到這一步或失敗）"
+    try:
+        envelope = _read_json(path)
+    except (OSError, ValueError) as exc:
+        return None, f"紀錄讀不到：{type(exc).__name__}"
+    return (envelope or {}).get("payload"), None
+
+
+def _health_line(*, now: datetime, capture_dir: Path | None) -> str:
+    payload, problem = _capture("health", now=now, capture_dir=capture_dir)
+    if problem:
+        return f"⚠ 健康審查：{problem}"
+    sections = [s for s in (payload or {}).get("sections") or [] if isinstance(s, Mapping)]
+    red = [str(s.get("title")) for s in sections if s.get("level") == "red"]
+    return (f"健康審查 {len(sections)} 節｜**🔴 {len(red)}**：" + "、".join(red) if red
+            else f"健康審查 {len(sections)} 節｜🔴 0")
+
+
+def _invariants_line(*, now: datetime, capture_dir: Path | None) -> str:
+    payload, problem = _capture("invariants", now=now, capture_dir=capture_dir)
+    if problem:
+        return f"⚠ invariants：{problem}"
+    checks = [c for c in payload or [] if isinstance(c, Mapping)]
+    fail = [str(c.get("check")) for c in checks if c.get("status") == "FAIL"]
+    skipped = [str(c.get("check")) for c in checks if c.get("status") == "SKIPPED"]
+    line = (f"invariants {len(checks)} 項｜**FAIL {len(fail)}**：" + "、".join(fail) if fail
+            else f"invariants {len(checks)} 項全部 PASS" if not skipped else f"invariants {len(checks)} 項｜FAIL 0")
+    if skipped:
+        line += f"｜SKIPPED {len(skipped)}：" + "、".join(skipped)
+    return line
 
 
 #: daily 執行紀錄的位置（`crons/daily_task.py` 寫、心跳只讀）。
@@ -542,20 +613,19 @@ _WIPEOUT_ROLLUP_ABSENCE = Absence(
     "四盞燈的彙總原本由籃子 artifact 產生，籃子已退役；Phase 3 候選板接手前沒有上游")
 
 
-def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -> Section:
-    """門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作，D3）、結構讀圖 staleness。"""
+def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
+                  diff_lines: Sequence[str] = (), leads_path: Path | None = None) -> Section:
+    """較昨變動、watch 今日、反證、新點名、thesis、候選板缺席、讀圖（含重讀理由）、已定價缺席、beta。"""
     section = Section(2, SECTION_TITLES[1])
+    section.lines.extend(diff_lines)
 
-    watches, absence = _load_state(state_dir, "watches")
-    if absence is not None:
-        section.lines.append(f"事件監看：{absence.reason}（{absence.kind}）")
-    else:
-        due = watches.get("due_this_round") or []
-        fired = watches.get("fired_unconsumed") or []
-        expired = watches.get("expired") or []
-        section.lines.append(
-            f"事件監看：本輪該查 {len(due)}｜已觸發未消費 {len(fired)}｜到期 {len(expired)}"
-        )
+    # watch 今日（Phase 1 Step 1.8）：取代原本讀 watches artifact 的「本輪該查／已觸發未消費／到期」——
+    # 「本輪該查」是 T2 主動輪詢的配額，而輪詢已不在 daily（1.2a）；其餘兩格在這一行，改讀 registry（零網路）。
+    try:
+        section.lines.append(_watch_today_line(now=now))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"watch 盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"watch：{absence.reason}（{absence.kind}）")
 
     # 反證（Phase 1 Step 1.5；A5）：在盯／觸及待處置／未盯分開印——「沒人盯」與「已觸發、等你處置」不得同形。
     try:
@@ -563,6 +633,14 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
     except Exception as exc:  # noqa: BLE001 — 這一格壞掉不帶走整段
         absence = Absence("upstream_unavailable", f"反證計數失敗：{type(exc).__name__}")
         section.lines.append(f"反證：{absence.reason}（{absence.kind}）")
+
+    # 新點名雷達（Phase 1 Step 1.8）：今天第一次被點名、registry 沒有的名字——依首次點名時間排，
+    # **不依次數**（依次數的話 AMZN 這種常駐大名會恆亮，L14-4）。
+    try:
+        section.lines.append(_new_names_line(now=now, leads_path=leads_path))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"新點名盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"新點名：{absence.reason}（{absence.kind}）")
 
     # thesis 生命週期：非 active 的就是「有東西變了」（L7 的五態）。
     section.lines.append(_thesis_line(now=now, thesis_path=thesis_path))
@@ -593,6 +671,12 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
             if nodes:
                 line += "：" + "、".join(str(n) for n in nodes[:5]) + ("…" if len(nodes) > 5 else "")
             section.lines.append(line)
+            # 重讀理由（Phase 1 Step 1.5／1.7）：客戶出了新文件、反證被判觸及、反證等滿一輪都沒發生。
+            for row in (readings.get("rows") or [])[:20]:
+                reasons = [str(r) for r in (row.get("reread_reasons") or [])]
+                if row.get("needs_reread") and reasons:
+                    section.lines.append(f"  {row.get('node')} 該重讀：" + "；".join(reasons[:3])
+                                         + (f"（另 {len(reasons) - 3} 條）" if len(reasons) > 3 else ""))
             triggers = readings.get("disproof_triggers") or {}
             if triggers.get("n"):
                 section.lines.append(
@@ -653,6 +737,50 @@ def _disproof_lines() -> list[str]:
                      "被手改過，它的反證不會自動登記：重跑 generator 更新 sidecar，或用 "
                      "`python -m engine_b.event_watch register-disproof` 手動登記")
     return lines
+
+
+def _local_day(raw: Any) -> date | None:
+    if not raw:
+        return None
+    try:
+        stamp = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if stamp.tzinfo is None:
+        stamp = stamp.replace(tzinfo=timezone.utc)
+    return stamp.astimezone().date()
+
+
+def _watch_today_line(*, now: datetime) -> str:
+    from engine_b import event_watch as ew
+
+    data = ew.load_watches()
+    watches = data.get("watches") or []
+    today = now.astimezone().date()
+    woken = sum(1 for w in watches if _local_day((w.get("woken_by") or {}).get("at")) == today)
+    expired = sum(1 for w in watches if _local_day(w.get("expired_at")) == today)
+    c = ew.counters(data)
+    return (f"watch：今日醒 {woken}｜今日到期 {expired}｜已觸發未消化 {c['fired_unconsumed']}"
+            f"｜語意標旗 {c['semantic_flagged']}｜**未檢 {c['semantic_pending_check']}**（判定只在互動："
+            "`python -m engine_b.event_watch semantic-queue`）")
+
+
+def _new_names_line(*, now: datetime, leads_path: Path | None) -> str:
+    """今天第一次被點名、registry 沒有的名字（registry 是「圖裡沒有」的代理：圖裡的公司都在 registry）。"""
+    from engine_b import leads as leads_mod
+
+    store = leads_mod.load(leads_path) if leads_path is not None else leads_mod.load()
+    rows = leads_mod.onboard_candidates(store)
+    today = now.astimezone().date()
+    fresh = sorted((r for r in rows if _local_day(r.get("first_seen")) == today),
+                   key=lambda r: str(r.get("first_seen")))
+    tail = f"｜累計被點名但未登記 {len(rows)}（`python -m engine_b.cli onboard-candidates`）"
+    if not fresh:
+        return "今天第一次被點名、registry 沒有的名字 0" + tail
+    names = "、".join(f"{r.get('ticker')}（{' '.join(str(r.get('sample_title') or '').split())[:30]}）"
+                     for r in fresh[:5])
+    return (f"**今天第一次被點名、registry 沒有的名字 {len(fresh)}**：{names}"
+            + (f"…另 {len(fresh) - 5} 個" if len(fresh) > 5 else "") + tail)
 
 
 def _thesis_line(*, now: datetime, thesis_path: Path) -> str:
@@ -763,6 +891,11 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         + ("　←**超過上限，今天清不完**" if over else "")
     )
     section.lines.append(_classification_line(leads=leads, now=moment, record_path=run_record_path))
+    # 預篩本輪結果與 LLM 額度（Phase 1 Step 1.4／1.3）——讀 daily 執行紀錄，心跳不重跑。
+    try:
+        section.lines.extend(_prescreen_and_quota_lines(now=moment, record_path=run_record_path))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"預篩：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
 
     # ⚠ `None` 是「本次沒讀到那個 authority」，不是 0——把它加成 0 會讓「沒讀到」與「真的沒有」
     # 同形（INV-3）。所以先分開，再讓沒讀到的段自己現形。
@@ -787,14 +920,13 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         f"**pq2 球在你手上 {len(actionable)}**｜池中未結案 {len(active)}"
         f"（差額＝等事件或已在 pq1 跑）"
     )
+    # 逐筆（Phase 1 Step 1.8）：go／不含的字串取自 `todo.GO_AUTHORIZATION`（L16：不在這裡另寫一份），
+    # 使用者不展開就知道 go 會做什麼、不會做什麼（AGENTS 收尾摘要契約）。
+    section.lines.extend(_pq2_item_lines(actionable, todo_mod=todo_mod))
 
-    expired = sum(1 for w in watches if str(w.get("status") or "") == "expired")
-    # Phase 1 Step 1.7（A3）：到期不是丟——每筆 expired 落在某個處置裡；沒落的（多半是 A3 之前的歷史到期）照數
-    exp = event_watch.expiry_counters({"watches": watches})
-    line = (f"watch 到期 {expired}（待決 watch_decision {exp['expiry_decision_pending']}｜"
-            f"等 thesis 複查 {exp['expiry_thesis_review_pending']}｜等重讀 {exp['expiry_reread_pending']}｜"
-            f"追源到期結案 {exp['trace_expired_closed']}（今日 {exp['trace_expired_closed_today']}）｜"
-            f"未處置 {exp['expiry_unresolved']}）｜事件監看總數 {len(watches)}")
+    # 到期（Phase 1 Step 1.7／1.8；A3、A7）：今日與累計分開，累計照處置封閉字彙逐格列——加起來要等於累計。
+    section.lines.append(_expiry_line(watches, now=moment, event_watch=event_watch))
+    line = f"事件監看總數 {len(watches)}"
     # ROADMAP Phase 6（D15，2026-09-17 使用者核准 A 案）：**沒有到期的等待**要自己出現。
     # 原提案是「parked 超過 60 天自動 expired」，實測推翻——479 筆 parked 裡 413 筆是
     # terminal trace_status（那是歸檔不是等待），而真正沒有任何機制會回來的只有個位數。
@@ -814,7 +946,122 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
             f"⚠ 分不到段的狀態 {len(observation['unmapped'])} 筆——新工作類型沒有 consumer："
             + "、".join(observation["unmapped"][:5])
         )
+    # 題材掃描（Phase 1 Step 1.8／1.9）：**每天都印**；≥ 門檻時粗體（訊息第一行另由 compose 放一份）。
+    try:
+        section.lines.append(theme_scan_line(now=moment)[0])
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"題材掃描：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
     return section
+
+
+#: pq2 逐筆最多印幾筆（其餘寫「其餘 N 筆」）。
+PQ2_LIST_LIMIT = 10
+
+
+def _pq2_item_lines(actionable: Sequence[Mapping[str, Any]], *, todo_mod: Any) -> list[str]:
+    if not actionable:
+        return []
+    lines = []
+    items = sorted(actionable, key=lambda i: int(i["n"]))
+    for item in items[:PQ2_LIST_LIMIT]:
+        auth = todo_mod.go_authorization(str(item.get("type")))
+        title = " ".join(str(item.get("title") or "").split())
+        lines.append(f"  [{item['n']}] {title[:70]}{'…' if len(title) > 70 else ''}"
+                     f"｜go＝{auth['go_authorizes']}｜不含：{auth['go_excludes']}")
+    if len(items) > PQ2_LIST_LIMIT:
+        lines.append(f"  其餘 {len(items) - PQ2_LIST_LIMIT} 筆（`python -m engine_b.todo list`）")
+    decisions = [int(i["n"]) for i in items if i.get("type") == "watch_decision"]
+    others = [int(i["n"]) for i in items if i.get("type") != "watch_decision"]
+    batch = "批次回覆：`<編號…> go <編號…> drop <編號…> pending`"
+    if others:
+        batch += f"（例：`{others[0]} go`）"
+    if decisions:
+        # 批次語法帶不了日期，watch_decision 的 bare go／bare pending 一定被拒（Step 1.7，第 2 輪 N-h）
+        batch += (f"｜watch_decision {', '.join(map(str, decisions))} 在批次裡只能 drop；"
+                  "續等：`python -m engine_b.todo resolve <n> --verb pending --until <日期>`；要研究就在互動 session 說")
+    lines.append("  " + batch)
+    return lines
+
+
+#: 到期處置 kind → 心跳的短標籤。**鍵必須等於 `event_watch.EXPIRY_RESOLUTION_KINDS`**（測試守；L16）。
+EXPIRY_KIND_LABELS: dict[str, str] = {
+    "requeued_to_pq2": "翻回 pq2", "pq2_item_gone": "pq2 已結案", "trace_closed": "追源結案",
+    "lead_already_terminal": "lead 早已終局", "lead_in_flight": "lead 在路上", "lead_closed": "lead 已結案",
+    "lead_missing": "lead 不存在", "superseded_by_newer_watch": "已有新等待", "reading_expiry": "讀圖到期",
+    "source_superseded": "來源已換版", "dropped": "放棄", "touched": "判定已發生",
+}
+
+
+def _expiry_line(watches: Sequence[Mapping[str, Any]], *, now: datetime, event_watch: Any) -> str:
+    """今日到期 a｜累計 b＝各處置 k 筆 ＋ 未處置（待決 watch_decision／等 thesis 複查／等重讀／其他）。"""
+    expired = [w for w in watches if w.get("status") == "expired"]
+    touched = [w for w in watches if (w.get("expiry_resolution") or {}).get("kind") == "touched"]
+    today = now.astimezone().date()
+    today_n = sum(1 for w in expired + touched if _local_day(w.get("expired_at")) == today)
+    by_kind: dict[str, int] = {}
+    unresolved: dict[str, int] = {}
+    for w in expired + touched:
+        kind = (w.get("expiry_resolution") or {}).get("kind")
+        if kind:
+            by_kind[kind] = by_kind.get(kind, 0) + 1
+        else:
+            cls = event_watch.expiry_class(w)
+            unresolved[cls] = unresolved.get(cls, 0) + 1
+    total = len(expired) + len(touched)
+    done = "、".join(f"{EXPIRY_KIND_LABELS.get(k, k)} {n}" for k, n in sorted(by_kind.items(), key=lambda kv: -kv[1]))
+    pending = (f"待決 watch_decision {unresolved.get('decision', 0)}｜等 thesis 複查 {unresolved.get('thesis_review', 0)}"
+               f"｜等重讀 {unresolved.get('reread', 0)}")
+    other = sum(n for cls, n in unresolved.items() if cls not in ("decision", "thesis_review", "reread"))
+    if other:
+        pending += f"｜其他未處置 {other}"
+    exp = event_watch.expiry_counters({"watches": list(watches)}, today=today)
+    return (f"watch 到期：今日 {today_n}｜累計 {total}（已處置：{done or '0'}；{pending}）"
+            f"｜追源到期結案今日 {exp['trace_expired_closed_today']}")
+
+
+def theme_scan_line(*, now: datetime) -> tuple[str, bool]:
+    """(那一行, 是否已達門檻)。門檻 `config/daily_routine.json` 的 `theme_scan.nudge_after_days`。"""
+    from engine_b.routine_config import load_theme_scan
+    from engine_b.theme_scan import last_scan
+
+    threshold = load_theme_scan()["nudge_after_days"]
+    scan = last_scan(today=now.astimezone().date())
+    if scan["date"] is None:
+        return (f"**距上次掃題材：從來沒掃過**（門檻 {threshold} 天；說「掃題材」啟動 `skills/theme-scan`）", True)
+    days = int(scan["days"])
+    if days >= threshold:
+        return (f"**距上次掃題材 {days} 天**（{scan['date']}；門檻 {threshold} 天——說「掃題材」啟動 `skills/theme-scan`）",
+                True)
+    return (f"距上次掃題材 {days} 天（{scan['date']}；門檻 {threshold} 天）", False)
+
+
+def _prescreen_and_quota_lines(*, now: datetime, record_path: Path | None) -> list[str]:
+    record, problem = _load_run_record(record_path, now=now)
+    if record is None:
+        return [f"預篩：{problem}"]
+    rows = {str(r.get("key")): r for r in record.get("steps") or [] if isinstance(r, Mapping)}
+    lines = []
+    apply = rows.get("10c_prescreen_apply")
+    propose = rows.get("10b_prescreen_propose") or {}
+    if apply is None and "10a_prescreen_prepare" not in rows:
+        lines.append("預篩：執行紀錄裡沒有預篩步驟")
+    elif apply is not None and apply.get("status") == "ok" and isinstance(apply.get("summary"), Mapping):
+        s = apply["summary"]
+        v = s.get("by_verdict") or {}
+        lines.append(f"預篩 {s.get('batch', '?')}｜標旗 {s.get('flagged', '?')}（可能觸及 {v.get('likely_touches', 0)}"
+                     f"／無關 {v.get('likely_unrelated', 0)}／看不出 {v.get('cannot_tell', 0)}）"
+                     f"｜無全文 {s.get('no_text', '?')}｜無 fetcher {s.get('no_fetcher', '?')}"
+                     f"｜截斷 {s.get('truncated', '?')}｜拒收 {s.get('rejected', '?')}")
+    else:
+        step = apply or propose
+        lines.append(f"預篩：本輪沒完成（{(step or {}).get('status')}：{(step or {}).get('reason') or (step or {}).get('error') or '—'}）")
+    for key in ("07a_triage_propose", "10b_prescreen_propose"):
+        for call in (rows.get(key) or {}).get("calls") or []:
+            limit = (call or {}).get("rate_limit") or {}
+            if limit and limit.get("status") not in (None, "allowed"):
+                lines.append(f"⚠ **LLM 額度 {limit.get('status')}**（{key}；{limit.get('rateLimitType') or '?'}"
+                             f"，重置 {limit.get('resetsAt') or '?'}）")
+    return lines
 
 
 def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path: Path | None) -> str:
@@ -897,6 +1144,12 @@ def build_positions(*, state_dir: Path | None) -> Section:
             )
 
     positions, pos_absence = _load_state(state_dir, "positions")
+    # NAV（Phase 1 Step 1.8）：bucket 分布、最大單筆占 NAV——**只呈現**，完整表在 APP positions。
+    # producer 是 `webapp materialize --positions`（讀 Sheet readonly）；心跳零網路，只讀 artifact。
+    if pos_absence is not None:
+        section.lines.append(f"NAV：{pos_absence.reason}（{pos_absence.kind}）")
+    else:
+        section.lines.append(_nav_line(positions.get("nav_exposure")))
     if pos_absence is not None:
         section.lines.append(f"追蹤表：{pos_absence.reason}（{pos_absence.kind}）")
     else:
@@ -1011,21 +1264,36 @@ def build_positions(*, state_dir: Path | None) -> Section:
     return section
 
 
+def _nav_line(nav: Mapping[str, Any] | None) -> str:
+    if nav is None:
+        return "NAV：這份 positions artifact 還沒有 nav_exposure（upstream_unavailable；下一次 materialize --positions 補上）"
+    if nav.get("status") != "available":
+        return (f"NAV：持股讀不到（{nav.get('status')}"
+                + (f"：{nav.get('failure')}" if nav.get("failure") else "")
+                + (f"；{'、'.join(map(str, nav.get('blockers') or []))}" if nav.get("blockers") else "")
+                + "）——不是「沒有持股」")
+    buckets = sorted((nav.get("buckets") or {}).items(), key=lambda kv: -float(kv[1]))
+    largest = nav.get("largest") or {}
+    shape = "、".join(f"{k} {_pct(v, 1)}" for k, v in buckets) or "—"
+    line = (f"NAV：{shape}｜最大單筆 {largest.get('ticker', '—')} {_pct(largest.get('nav_pct'), 1)}"
+            f"（{nav.get('positions', '?')} 檔；只呈現，完整表在 APP positions）")
+    if any("槓桿" in str(k) for k, _v in buckets):
+        # AGENTS：兩個槓桿指標不得混用——bucket 名稱照 Sheet，這一格是 nominal_weight，不是 effective_weight
+        line += "｜「槓桿」格＝投入槓桿 ETF 的資金占 NAV，不是乘上倍數後的曝險"
+    return line
+
+
 # ---------------------------------------------------------------------------
-# 段 5｜帳號計分表（weekly）
+# 段 5｜帳號計分表（每天）
 # ---------------------------------------------------------------------------
 
-def build_scorecard(*, weekly: bool, state_dir: Path | None = None) -> Section:
-    """D5 帳號計分表。**只讀已 materialize 的 artifact**——心跳零網路，價格不在這裡抓。
+def build_scorecard(*, state_dir: Path | None = None, previous: Mapping[str, Any] | None = None) -> Section:
+    """D5 帳號計分表：**每天印** tier 分布＋較昨變化（Phase 1 Step 1.8；原本只在 weekly）。完整表在 APP。
 
-    要更新計分表跑 `python -m webapp materialize --scorecard`；心跳讀不到就誠實說讀不到，
-    **不偷偷重建**（APP 呈現契約的同一條紀律）。
+    **只讀已 materialize 的 artifact**——心跳零網路，價格不在這裡抓（daily ⑬ 跑 `materialize --scorecard`）；
+    讀不到就誠實說讀不到，**不偷偷重建**（APP 呈現契約的同一條紀律）。`previous` 是上一份快照的值。
     """
     section = Section(5, SECTION_TITLES[4])
-    if not weekly:
-        section.absence = Absence("method_not_applicable", "計分表是 weekly 才算的，本輪是 daily")
-        section.lines.append(f"{section.absence.reason}（{section.absence.kind}）")
-        return section
     card, absence = _load_state(state_dir, "account_scorecard")
     if absence is not None or not card:
         section.absence = absence or Absence(
@@ -1034,26 +1302,194 @@ def build_scorecard(*, weekly: bool, state_dir: Path | None = None) -> Section:
         section.lines.append("→ 跑 `python -m webapp materialize --scorecard` 之後這一段才有內容")
         return section
     counts = card.get("tier_counts") or {}
-    section.lines.append("tier 分佈：" + "／".join(f"{k} {v}" for k, v in counts.items())
-                         + f"｜計分表 as-of {card.get('as_of')}")
-    for account in card.get("accounts") or []:
-        metrics = account.get("metrics") or {}
-        first = (account.get("metrics_first_call_per_symbol") or {}).get("excess_returns") or {}
-        section.lines.append(
-            f"**{account.get('harvest_key')}**｜tier `{account.get('tier')}`｜"
-            f"量測 {account.get('measurement_start')} → {account.get('measurement_end')}｜"
-            f"具名點名 {account.get('named_calls')} 則／{account.get('distinct_symbols')} 檔")
-        for key, cell in (metrics.get("excess_returns") or {}).items():
-            line = f"  {key}：{_score_cell(cell)}"
-            if key in first:
-                line += f"｜每檔只算最早一次：{_score_cell(first[key])}"
-            section.lines.append(line)
-        for label, key in (("點名前 30 天漲幅", "prior_30d_move"), ("追源成功率", "trace_success_rate"),
-                           ("假設命中率", "hypothesis_hit_rate"), ("no-go 率", "no_go_rate")):
-            section.lines.append(f"  {label}：{_score_cell(metrics.get(key) or {})}")
-    for bias in card.get("known_biases") or []:
-        section.lines.append(f"⚠ {bias}")
+    line = ("tier 分佈：" + "／".join(f"{k} {v}" for k, v in counts.items())
+            + f"｜{len(card.get('accounts') or [])} 個帳號｜計分表 as-of {card.get('as_of')}")
+    if previous is None:
+        line += "｜較昨：尚無上一份快照"
+    else:
+        moved = [f"{t} {previous.get(f'tier.{t}')}→{counts.get(t)}" for t in SCORECARD_TIERS
+                 if previous.get(f"tier.{t}") != counts.get(t)]
+        line += "｜較昨：" + ("、".join(moved) if moved else "沒有變化")
+    section.lines.append(line)
+    biases = list(card.get("known_biases") or [])
+    section.lines.append("完整表（每個帳號的量測窗、點名數、超額報酬、追源成功率）在 APP 帳號計分表頁"
+                         + (f"｜已知偏差 {len(biases)} 條（也在 APP）" if biases else ""))
     return section
+
+
+# ---------------------------------------------------------------------------
+# 快照與較昨變動（Phase 1 Step 1.8）
+# ---------------------------------------------------------------------------
+
+SNAPSHOT_DIR = ROOT / "library" / "private" / "heartbeat" / "snapshots"
+SNAPSHOT_RETENTION_DAYS = 14
+
+#: 快照的鍵用到的封閉字彙——**與各自的 SSOT 相等**（測試守；L16）。
+LEAD_STATUSES: tuple[str, ...] = ("pending", "triaged_go", "triaged_no_go", "researching", "action_prepared",
+                                  "applied", "parked")          # engine_b.leads.ALL_STATUSES
+THESIS_STATUSES: tuple[str, ...] = ("active", "watch", "review_required", "realized", "revised",
+                                    "retired")                  # thesis.pending_lifecycle.ALLOWED_TRANSITIONS
+SCORECARD_TIERS: tuple[str, ...] = ("probation", "measured", "trusted")   # engine_b.signal_source_registry.TIERS
+
+#: 快照的鍵是**封閉清單**（鍵 → 人讀標籤）。改這裡就是改 diff 的語意，要一起改測試。
+SNAPSHOT_KEYS: dict[str, str] = {
+    "watch.active": "watch 在等", "watch.fired": "watch 已觸發未消化", "watch.expired": "watch 已到期",
+    "watch.consumed": "watch 已收",
+    "semantic.active": "語意 watch 在盯", "semantic.pending_check": "語意 watch 未檢",
+    "semantic.flagged": "語意 watch 標旗",
+    "pq2.open": "pq2 未結案", "pq2.actionable": "pq2 球在你",
+    **{f"lead.{s}": f"lead {s}" for s in LEAD_STATUSES},
+    "reading.current": "讀圖現行", "reading.needs_reread": "讀圖該重讀",
+    **{f"thesis.{s}": f"thesis {s}" for s in THESIS_STATUSES},
+    "disproof.watching": "反證在盯", "disproof.unreachable": "反證叫不醒",
+    "disproof.touched_pending": "反證觸及待處置", "disproof.expired_pending": "反證到期待複查",
+    "disproof.unwatched": "反證未盯", "thesis.sidecar_mismatch": "thesis sidecar 不符",
+    "prescreen.no_text": "預篩無全文", "prescreen.no_fetcher": "預篩無 fetcher",
+    "health.red": "健康紅燈", "invariants.fail": "invariants FAIL",
+    **{f"tier.{t}": f"帳號 {t}" for t in SCORECARD_TIERS},
+}
+#: 較昨變動一行最多列幾項（其餘寫「另 N 項」）。
+DIFF_LIMIT = 12
+
+
+def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path, thesis_path: Path,
+                     run_record_path: Path | None, capture_dir: Path | None) -> dict[str, int | None]:
+    """每個鍵各自讀、各自降級：讀不到就是 None（「沒讀到」不是 0，INV-3）。"""
+    values: dict[str, int | None] = {key: None for key in SNAPSHOT_KEYS}
+
+    def guard(fn: Callable[[], Mapping[str, Any]]) -> None:
+        try:
+            values.update({k: (None if v is None else int(v)) for k, v in fn().items() if k in SNAPSHOT_KEYS})
+        except Exception:  # noqa: BLE001 — 一組讀不到不帶走其他組
+            pass
+
+    def watches() -> dict[str, Any]:
+        from engine_b import event_watch as ew
+
+        data = ew.load_watches()
+        rows = data.get("watches") or []
+        c = ew.counters(data)
+        out = {f"watch.{s}": sum(1 for w in rows if w.get("status") == s)
+               for s in ("active", "fired", "expired", "consumed")}
+        out.update({"semantic.active": c["semantic_active"], "semantic.pending_check": c["semantic_pending_check"],
+                    "semantic.flagged": c["semantic_flagged"]})
+        return out
+
+    def pq2() -> dict[str, Any]:
+        from engine_b import todo as todo_mod
+
+        pool = todo_mod.load()
+        return {"pq2.open": len(todo_mod.active_items(pool)), "pq2.actionable": len(todo_mod.actionable_items(pool))}
+
+    def lead_states() -> dict[str, Any]:
+        leads = (_read_json(leads_path) or {}).get("leads") or {}
+        return {f"lead.{s}": sum(1 for lead in leads.values() if (lead or {}).get("status") == s)
+                for s in LEAD_STATUSES}
+
+    def readings() -> dict[str, Any]:
+        payload, absence = _load_state(state_dir, "structure_readings")
+        if absence is not None:
+            return {}
+        return {"reading.current": (payload.get("counts") or {}).get("current"),
+                "reading.needs_reread": (payload.get("needs_reread") or {}).get("n")}
+
+    def thesis() -> dict[str, Any]:
+        payload = _read_json(thesis_path)
+        entries = [e for e in (payload.values() if isinstance(payload, Mapping) else []) if isinstance(e, Mapping)]
+        return {f"thesis.{s}": sum(1 for e in entries if e.get("status") == s) for s in THESIS_STATUSES}
+
+    def disproof_counts() -> dict[str, Any]:
+        from engine_b import disproof
+        from engine_b import event_watch as ew
+
+        try:
+            coverage: frozenset[str] | None = ew.primary_coverage()
+        except Exception:  # noqa: BLE001
+            coverage = None
+        c = disproof.disproof_counts(ew.load_watches().get("watches") or [], readings=disproof.current_readings(),
+                                     coverage=coverage)
+        if c.get("lifecycle_unreadable"):
+            return {}
+        return {"disproof.watching": c["watching"], "disproof.unreachable": c["unreachable"],
+                "disproof.touched_pending": c["touched_pending"], "disproof.expired_pending": c["expired_pending"],
+                "disproof.unwatched": c["unwatched"], "thesis.sidecar_mismatch": len(c["thesis_sidecar_mismatch"])}
+
+    def prescreen() -> dict[str, Any]:
+        record, _problem = _load_run_record(run_record_path, now=now)
+        step = next((r for r in (record or {}).get("steps") or []
+                     if isinstance(r, Mapping) and r.get("key") == "10c_prescreen_apply"), None)
+        summary = (step or {}).get("summary") or {}
+        return {"prescreen.no_text": summary.get("no_text"), "prescreen.no_fetcher": summary.get("no_fetcher")}
+
+    def captures() -> dict[str, Any]:
+        out: dict[str, Any] = {}
+        health, problem = _capture("health", now=now, capture_dir=capture_dir)
+        if problem is None:
+            out["health.red"] = sum(1 for s in (health or {}).get("sections") or [] if s.get("level") == "red")
+        checks, problem = _capture("invariants", now=now, capture_dir=capture_dir)
+        if problem is None:
+            out["invariants.fail"] = sum(1 for c in checks or [] if c.get("status") == "FAIL")
+        return out
+
+    def tiers() -> dict[str, Any]:
+        card, absence = _load_state(state_dir, "account_scorecard")
+        if absence is not None or not card:
+            return {}
+        counts = card.get("tier_counts") or {}
+        return {f"tier.{t}": counts.get(t) for t in SCORECARD_TIERS}
+
+    for fn in (watches, pq2, lead_states, readings, thesis, disproof_counts, prescreen, captures, tiers):
+        guard(fn)
+    return values
+
+
+def load_previous_snapshot(snapshot_dir: Path, *, today: date) -> tuple[dict[str, Any] | None, str | None]:
+    """今天之前最新的一份（不一定是昨天——中間斷了就比最近那一份，並印出日期）。"""
+    best: tuple[str, Path] | None = None
+    for path in (snapshot_dir.glob("*.json") if snapshot_dir.is_dir() else ()):
+        stem = path.stem
+        if len(stem) == 10 and stem < today.isoformat() and (best is None or stem > best[0]):
+            best = (stem, path)
+    if best is None:
+        return None, None
+    try:
+        payload = _read_json(best[1])
+    except (OSError, ValueError):
+        return None, None
+    values = (payload or {}).get("values")
+    return (values if isinstance(values, dict) else None), best[0]
+
+
+def snapshot_diff_lines(current: Mapping[str, Any], previous: Mapping[str, Any] | None,
+                        *, previous_date: str | None, today: date) -> list[str]:
+    if previous is None:
+        return ["較昨變動：尚無上一份快照（第一次產生；之後每天逐項比對，只印變了的）"]
+    label = "較昨" if previous_date == (today.fromordinal(today.toordinal() - 1)).isoformat() else f"較 {previous_date} "
+
+    def fmt(value: Any) -> str:
+        return "未讀到" if value is None else str(value)
+
+    changed = [(k, previous.get(k), current.get(k)) for k in SNAPSHOT_KEYS if previous.get(k) != current.get(k)]
+    same = len(SNAPSHOT_KEYS) - len(changed)
+    if not changed:
+        return [f"{label}變動 0（{same} 項都相同）"]
+    shown = "、".join(f"{SNAPSHOT_KEYS[k]} {fmt(a)}→{fmt(b)}" for k, a, b in changed[:DIFF_LIMIT])
+    more = f"…另 {len(changed) - DIFF_LIMIT} 項" if len(changed) > DIFF_LIMIT else ""
+    return [f"**{label}變動 {len(changed)} 項**：{shown}{more}｜其餘 {same} 項相同"]
+
+
+def write_snapshot(snapshot_dir: Path, *, today: date, now: datetime, values: Mapping[str, Any]) -> Path:
+    """寫今天的快照、刪掉超過保留天數的舊檔。快照是 derived，只給 diff 用。"""
+    snapshot_dir.mkdir(parents=True, exist_ok=True)
+    target = snapshot_dir / f"{today.isoformat()}.json"
+    target.write_text(json.dumps({"schema": "heartbeat-snapshot-v1", "date": today.isoformat(),
+                                  "generated_at": now.isoformat(), "values": dict(values)},
+                                 ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    cutoff = today.fromordinal(today.toordinal() - SNAPSHOT_RETENTION_DAYS).isoformat()
+    for path in snapshot_dir.glob("*.json"):
+        if len(path.stem) == 10 and path.stem < cutoff:
+            path.unlink(missing_ok=True)
+    return target
 
 
 def _score_cell(cell: Mapping[str, Any]) -> str:
@@ -1094,40 +1530,135 @@ def _guard(order: int, title: str, fn: Callable[[], Section]) -> Section:
         return Section(order, title, [f"{absence.reason}（{absence.kind}）"], absence)
 
 
-def build_heartbeat(
+@dataclass
+class Heartbeat:
+    """一次心跳的全部產出：五段、這次的快照值、訊息最上面的橫幅、Discord 摘要行。"""
+
+    sections: list[Section]
+    snapshot: dict[str, int | None]
+    banner: list[str]
+    summary: str
+
+
+def compose_heartbeat(
     *,
     now: datetime | None = None,
-    weekly: bool = False,
     state_dir: Path | None = None,
     leads_path: Path | None = None,
     thesis_path: Path | None = None,
     run_record_path: Path | None = None,
-) -> list[Section]:
-    """固定五段，順序固定，**任何情況下都回五個 Section**。"""
+    capture_dir: Path | None = None,
+    snapshot_dir: Path | None = None,
+) -> Heartbeat:
+    """固定五段，順序固定，**任何情況下都回五個 Section**；另組快照、橫幅與摘要行（各自降級）。"""
     moment = now or datetime.now(timezone.utc)
+    today = moment.astimezone().date()
     leads = leads_path or ROOT / "library" / "leads" / "pending_leads.json"
     thesis = thesis_path or ROOT / "thesis" / "lifecycle.json"
+    snapshots = snapshot_dir or SNAPSHOT_DIR
+    try:
+        snapshot = collect_snapshot(now=moment, state_dir=state_dir, leads_path=leads, thesis_path=thesis,
+                                    run_record_path=run_record_path, capture_dir=capture_dir)
+    except Exception:  # noqa: BLE001
+        snapshot = {key: None for key in SNAPSHOT_KEYS}
+    try:
+        previous, previous_date = load_previous_snapshot(snapshots, today=today)
+    except Exception:  # noqa: BLE001
+        previous, previous_date = None, None
+    diff = snapshot_diff_lines(snapshot, previous, previous_date=previous_date, today=today)
     sections = [
         _guard(1, SECTION_TITLES[0],
                lambda: build_freshness(now=moment, state_dir=state_dir, leads_path=leads,
-                                       run_record_path=run_record_path)),
+                                       run_record_path=run_record_path, capture_dir=capture_dir)),
         _guard(2, SECTION_TITLES[1],
-               lambda: build_changes(now=moment, state_dir=state_dir, thesis_path=thesis)),
+               lambda: build_changes(now=moment, state_dir=state_dir, thesis_path=thesis, diff_lines=diff,
+                                     leads_path=leads_path)),
         _guard(3, SECTION_TITLES[2], lambda: build_queue(state_dir=state_dir, now=moment,
                                                          run_record_path=run_record_path)),
         _guard(4, SECTION_TITLES[3], lambda: build_positions(state_dir=state_dir)),
-        _guard(5, SECTION_TITLES[4], lambda: build_scorecard(weekly=weekly, state_dir=state_dir)),
+        _guard(5, SECTION_TITLES[4], lambda: build_scorecard(state_dir=state_dir, previous=previous)),
     ]
     assert len(sections) == len(SECTION_TITLES), "心跳必須固定五段"
-    return sections
+    banner: list[str] = []
+    try:
+        theme_line, nudge = theme_scan_line(now=moment)
+        if nudge:
+            banner.append(theme_line)   # ≥ 門檻：移到訊息第一行（段 3 照樣印）
+    except Exception:  # noqa: BLE001
+        theme_line, nudge = "", False
+    try:
+        summary = summary_line(now=moment, snapshot=snapshot, run_record_path=run_record_path, leads_path=leads,
+                               theme_nudge=nudge, theme_line=theme_line)
+    except Exception as exc:  # noqa: BLE001
+        summary = f"Daily {today.isoformat()}｜⚠ 摘要行組不出來（{type(exc).__name__}）"
+    return Heartbeat(sections=sections, snapshot=snapshot, banner=banner, summary=summary)
 
 
-def render_markdown(sections: Sequence[Section], *, now: datetime | None = None, weekly: bool = False) -> str:
+def build_heartbeat(**kwargs: Any) -> list[Section]:
+    """固定五段（`compose_heartbeat` 的五段部分；舊呼叫端與測試用）。"""
+    return compose_heartbeat(**kwargs).sections
+
+
+def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path: Path | None, leads_path: Path,
+                 theme_nudge: bool, theme_line: str) -> str:
+    """Discord 摘要行（`publish --summary`）：`Daily <日期>｜球在你 N` ＋ 紅旗。紅旗全部來自已讀到的狀態，不另判讀。"""
+    today = now.astimezone().date().isoformat()
+    actionable = snapshot.get("pq2.actionable")
+    head = f"Daily {today}｜球在你 {'未讀到' if actionable is None else actionable}"
+    flags: list[str] = []
+    try:
+        log = list((_read_json(leads_path) or {}).get("harvest_log") or [])
+        newest = max((str(r.get("run_at") or "") for r in log), default="")
+        age = harvest_age_hours(newest, now=now)
+        limit = _harvest_stale_hours()
+        if age is None or (limit is not None and age > limit):
+            flags.append("harvest 沒跑")
+    except Exception:  # noqa: BLE001
+        flags.append("harvest 狀態讀不到")
+    record, _problem = _load_run_record(run_record_path, now=now)
+    if record is None:
+        flags.append("今天沒有 daily 執行紀錄")
+    else:
+        steps = [r for r in record.get("steps") or [] if isinstance(r, Mapping)]
+        bad = [r for r in steps if r.get("status") not in ("ok", "skipped", "running", None)]
+        if bad:
+            flags.append(f"daily 失敗 {len(bad)} 步")
+        llm = [r for r in steps if r.get("kind") == "llm"]
+        if record.get("capability_violation"):
+            flags.append("LLM 能力檢查不符")
+        elif any(r.get("status") not in ("ok", "skipped") for r in llm):
+            flags.append("LLM 步驟失敗")
+        elif llm and all(r.get("status") == "skipped" and "executor=none" in str(r.get("reason") or "") for r in llm):
+            flags.append("LLM 關閉（executor=none）")
+        if (record.get("schedule_check") or {}).get("status") == "mismatch":
+            flags.append("排程不一致")
+    touched = snapshot.get("disproof.touched_pending")
+    if touched:
+        flags.append(f"反證觸及待處置 {touched}")
+    red = snapshot.get("health.red")
+    if red:
+        flags.append(f"健康紅燈 {red}")
+    if theme_nudge:
+        flags.append(theme_line.replace("**", "").split("（", 1)[0])
+    try:
+        from briefing.sources import load_backup_status
+
+        backup = load_backup_status(now=now)
+        if backup is not None and (backup.get("status") != "ok" or int(backup.get("age_days") or 0) > BACKUP_STALE_DAYS):
+            flags.append("備份過舊" if backup.get("status") == "ok" else "沒有可用的備份")
+    except Exception:  # noqa: BLE001
+        flags.append("備份狀態讀不到")
+    return head + "".join(f"｜⚠ {flag}" for flag in flags)
+
+
+def render_markdown(sections: Sequence[Section], *, now: datetime | None = None,
+                    banner: Sequence[str] = ()) -> str:
     moment = now or datetime.now(timezone.utc)
-    kind = "Weekly" if weekly else "Daily"
     head = [
-        f"# {kind} 心跳 — {moment.astimezone().strftime('%Y-%m-%d %H:%M %Z')}",
+        f"# Daily 心跳 — {moment.astimezone().strftime('%Y-%m-%d %H:%M %Z')}",
         "",
+        *(f"> ⚠ {line}" for line in banner),
+        *([""] if banner else []),
         "> 零 LLM、零網路：只讀本機 authority 與已 materialize 的 state。**不判讀、不研究、不下單。**",
         "> 它回答「系統還活著、這些數字是多少」；要決定什麼、要研究什麼不在這裡。",
         "",
@@ -1143,21 +1674,32 @@ def render_markdown(sections: Sequence[Section], *, now: datetime | None = None,
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Daily 心跳（零 LLM、零網路、固定五段）")
     parser.add_argument("--format", choices=("markdown", "json"), default="markdown")
-    parser.add_argument("--weekly", action="store_true", help="第 5 段（帳號計分表）只在 weekly 有內容")
     parser.add_argument("--out", type=Path, default=None,
                         help="把結果以 UTF-8 寫到這個檔（交給既有 publisher 的 --brief-file）")
+    parser.add_argument("--summary-out", type=Path, default=None,
+                        help="把 Discord 摘要行寫到這個檔（daily ⑲ 帶進 publish --summary）")
+    parser.add_argument("--write-snapshot", action="store_true",
+                        help="寫今天的快照（daily ⑱ 才帶；互動手跑不帶，免得蓋掉 daily 的那一份）")
     args = parser.parse_args(argv)
 
     now = datetime.now(timezone.utc)
-    sections = build_heartbeat(now=now, weekly=args.weekly)
+    beat = compose_heartbeat(now=now)
+    sections = beat.sections
     if args.format == "json":
         text = json.dumps(
-            {"generated_at": now.isoformat(), "weekly": args.weekly,
-             "sections": [s.as_dict() for s in sections]},
+            {"generated_at": now.isoformat(), "banner": beat.banner, "summary": beat.summary,
+             "snapshot": beat.snapshot, "sections": [s.as_dict() for s in sections]},
             ensure_ascii=False, indent=2,
         ) + "\n"
     else:
-        text = render_markdown(sections, now=now, weekly=args.weekly)
+        text = render_markdown(sections, now=now, banner=beat.banner)
+    if args.summary_out is not None:
+        args.summary_out.write_text(beat.summary + "\n", encoding="utf-8")
+    if args.write_snapshot:
+        try:
+            write_snapshot(SNAPSHOT_DIR, today=now.astimezone().date(), now=now, values=beat.snapshot)
+        except OSError as exc:
+            print(f"⚠ 快照寫不進去（明天的較昨變動會說沒有上一份）：{exc}", file=sys.stderr)
 
     if args.out is not None:
         args.out.write_text(text, encoding="utf-8")

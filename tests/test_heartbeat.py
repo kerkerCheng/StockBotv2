@@ -138,36 +138,34 @@ def test_missing_artifacts_say_which_kind_of_missing(broken_env: dict[str, Path]
     assert "capability_absent" not in text, "已交付的能力不得被宣告成『還沒建』"
 
 
-def test_weekly_scorecard_is_not_applicable_on_daily(tmp_path) -> None:
-    """daily 不算計分表——那不是「還沒建」，是方法不適用，兩者不得同形。"""
-    daily = hb.build_scorecard(weekly=False, state_dir=tmp_path)
-    assert daily.absence is not None and daily.absence.kind == "method_not_applicable"
-
-
-def test_weekly_scorecard_without_artifact_says_so_instead_of_rebuilding(tmp_path) -> None:
+def test_scorecard_without_artifact_says_so_instead_of_rebuilding(tmp_path) -> None:
     """心跳零網路：讀不到 artifact 就誠實說讀不到，**不偷偷重建**（計分表要抓價格）。"""
-    weekly = hb.build_scorecard(weekly=True, state_dir=tmp_path)
-    assert weekly.absence is not None and weekly.absence.kind == "upstream_unavailable"
-    assert any("materialize --scorecard" in line for line in weekly.lines), (
+    card = hb.build_scorecard(state_dir=tmp_path)
+    assert card.absence is not None and card.absence.kind == "upstream_unavailable"
+    assert any("materialize --scorecard" in line for line in card.lines), (
         "讀不到的時候要說出「怎麼讓它有內容」，否則使用者只看到一句沒有值")
 
 
-def test_weekly_scorecard_prints_measurement_window_sample_size_and_biases(tmp_path) -> None:
-    """有內容時：量測起始日、樣本數、三個偏差**都要在輸出裡**（D5 的交付義務）。"""
+def test_scorecard_prints_every_day_with_tiers_change_and_where_the_full_table_is(tmp_path) -> None:
+    """Phase 1 Step 1.8：每天印 tier 分布＋較昨變化；完整表（量測窗、樣本數、偏差）在 APP——`--weekly` 那條路拿掉。"""
     from engine_b.account_scorecard import build_scorecard as build_card
     from webapp.store import StateArtifactStore
 
-    card = build_card(price_loader=lambda *_: {})
-    StateArtifactStore(tmp_path).write(card)
+    payload = build_card(price_loader=lambda *_: {})
+    StateArtifactStore(tmp_path).write(payload)
+    tiers = payload["tier_counts"]
 
-    weekly = hb.build_scorecard(weekly=True, state_dir=tmp_path)
-    assert weekly.absence is None, "artifact 在就不該有 absence"
-    text = chr(10).join(weekly.lines)
-    assert "量測" in text and "具名點名" in text
-    assert "倖存者" in text and "後見之明" in text and "單邊上漲" in text, (
-        "三個已知偏差是這張表的一部分，不是註腳")
-    # 沒有值的欄位要印出**為什麼**沒有值，不得印成 0。
-    assert "capability_absent" in text or "insufficient_sample" in text
+    first = hb.build_scorecard(state_dir=tmp_path)
+    assert first.absence is None, "artifact 在就不該有 absence"
+    text = chr(10).join(first.lines)
+    assert "tier 分佈" in text and "尚無上一份快照" in text and "APP" in text
+    assert "已知偏差" in text, "偏差條數要現形（全文在 APP）"
+    moved = dict({f"tier.{t}": tiers.get(t) for t in hb.SCORECARD_TIERS}, **{"tier.probation": -1})
+    again = chr(10).join(hb.build_scorecard(state_dir=tmp_path, previous=moved).lines)
+    assert f"probation -1→{tiers.get('probation')}" in again
+    same = chr(10).join(hb.build_scorecard(
+        state_dir=tmp_path, previous={f"tier.{t}": tiers.get(t) for t in hb.SCORECARD_TIERS}).lines)
+    assert "較昨：沒有變化" in same
 
 
 def test_main_always_exits_zero_even_when_everything_is_broken(

@@ -672,6 +672,9 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
             if not row["sample_title"]:
                 title = " ".join(str(lead.get("title") or "").split())
                 row["sample_title"] = title[:120]
+            seen_at = str(lead.get("first_seen") or "")
+            if seen_at and (not row.get("first_seen") or seen_at < row["first_seen"]):
+                row["first_seen"] = seen_at   # 首次點名（心跳的新點名雷達；Phase 1 Step 1.8）
         entities = extract_entities(
             title=lead.get("title"),
             raw_text=lead.get("raw_text"),
@@ -704,6 +707,9 @@ def onboard_candidates(store: dict[str, Any]) -> list[dict[str, Any]]:
             if not row["sample_title"]:
                 title = " ".join(str(lead.get("title") or "").split())
                 row["sample_title"] = title[:120]
+            seen_at = str(lead.get("first_seen") or "")
+            if seen_at and (not row.get("first_seen") or seen_at < row["first_seen"]):
+                row["first_seen"] = seen_at   # 首次點名（心跳的新點名雷達；Phase 1 Step 1.8）
     return sorted(
         seen.values(), key=lambda row: (-row["lead_count"], row["ticker"])
     )

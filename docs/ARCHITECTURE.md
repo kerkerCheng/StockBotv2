@@ -167,12 +167,22 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 | **分類／語意預篩** | Windows daily 的兩步：`claude -p` 零工具提議、程式驗證後寫入（Step 1.3／1.4 接上） | 每日硬上限（由 CLI 截斷，不靠 prompt） | 失敗不阻斷；印「未 triage N」與分類層本輪結果 |
 | **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零 |
 
+> **2026-09-24（Phase 1 Step 1.8）心跳改版**：五段不增不減。段 2 第一行是**較昨變動**——⑱ 帶 `--write-snapshot` 寫
+> `library/private/heartbeat/snapshots/<日期>.json`（鍵是封閉清單 `crons/heartbeat.SNAPSHOT_KEYS`、留 14 天；derived、只給 diff，
+> **不是** current-state authority），只印變了的鍵。段 1 加備份／健康審查（⑭ capture）／invariants（⑮ capture）；段 2 的 watch 行改讀
+> registry（今日醒／今日到期／已觸發未消化／語意標旗／未檢），加**新點名雷達**（今天第一次被點名、registry 沒有的名字，依首次點名
+> 時間排、不依次數）與讀圖重讀理由；段 3 加預篩本輪結果、LLM 額度（不是 allowed 才印）、**pq2 逐筆**（go／不含字串取自
+> `todo.GO_AUTHORIZATION`，超過 10 筆印前 10）、到期行（今日／累計，累計照 `EXPIRY_RESOLUTION_KINDS` 逐格）、**距上次掃題材 N 天**
+> （每天印；≥ `theme_scan.nudge_after_days` 時粗體並移到訊息第一行）；段 4 加 NAV（bucket 分布、最大單筆；producer 是
+> `materialize --positions` 的 `nav_exposure`）；段 5 **每天印** tier 分布＋較昨，完整表在 APP（`--weekly` 拿掉）。
+> ⑱ 另寫 Discord 摘要行 `heartbeat_<日期>.summary.txt`（`Daily <日期>｜球在你 N`＋紅旗），⑲ 帶進 `publish --summary`。
+
 心跳固定五段：
 1. **資料新鮮**：每個 harvest 來源 ok／fail、行情最新交易日、APP 今天是否 materialize、**台股月營收最新月份與落後幾個月**（2026-09-17 Phase 6：月營收**刻意不進無人值守**——歷史頁按年月永久可查、漏抓補得回來（L10），與「只有前一營業日、漏一天永久漏」的重訊性質相反。所以它不需要排程，需要的是**該補的時候自己說話**；`lag` 相對**法定公告期限**（次月 10 日）算，不是相對今天，否則每個月前 10 天都會誤報落後）。
 2. **變了什麼**：門檻跨越、反證觸發、催化劑到期、現價過目標價（提醒不是動作）、**結構讀圖 staleness**（2026-09-17 Q5：N 份現行／該重讀 M，含哪個節點、哪個角度變了；§6.14）。
 3. **佇列**：新 lead N、待 triage N、pq1 可做 N、pq2 卡在你 N、expired N。
 4. **部位**：alpha 占淨值、全歸零少幾 %、追蹤表三個 power-law 統計量、**歸零旗標帳**（2026-09-18 D2：每檔四盞，**盞數與有紅燈的檔數分開算**——「一檔亮四盞」與「四檔各亮一盞」是兩件事；⚠ **灰＝沒量到，不是綠**，`alpha/wipeout.py` 是判色的唯一權威，心跳與 APP 都只照抄。「alpha 全歸零少幾 %」直接取 `beta` artifact 的 `risk.snapshot.alpha_total_weight`，**不另算一份**，也不得與同段「占已投入非現金」混用——分母不同）、幾檔共用同一需求錨、**兩個宇宙各自的賭注帳**（2026-09-17 Q2／Q1：有賭注／刻意不主張／**欠一個答案**，護城河籃子與量的候選**分開計數**——兩個宇宙問的是不同問題，合起來的數字沒有意義）。
-5. **帳號計分表變動**（weekly）：量測起始日與樣本數必印，讓「還沒量」看得見（2026-09-17 Phase 3 交付：D5 五欄＋三個已知偏差；**心跳只讀 `state/account_scorecard.json`，不自己算**——計分表要抓價格，而心跳零網路。更新跑 `python -m webapp materialize --scorecard`；讀不到就誠實說讀不到，不偷偷重建）。
+5. **帳號計分表**（2026-09-24 起每天：tier 分布＋較昨；以下為 weekly 時代的完整表規格，現在住 APP 帳號計分表頁）：量測起始日與樣本數必印，讓「還沒量」看得見（2026-09-17 Phase 3 交付：D5 五欄＋三個已知偏差；**心跳只讀 `state/account_scorecard.json`，不自己算**——計分表要抓價格，而心跳零網路。更新跑 `python -m webapp materialize --scorecard`；讀不到就誠實說讀不到，不偷偷重建）。
    ⚠ **兩個基準必須都印**：2026-09-17 第一次量測，同一個帳號對 QQQ 是 −2.03%、對 SOXX 是 +3.06%——**相反符號**。只印一個會得到相反的結論，而兩個結論都是錯的。
    ⚠ 第 1 段另加**本月 X 花費／上限**與預算停抓列（`budget_exhausted` 刻意不是 `fetch_failed`：它是保護生效不是故障，塞進失敗會讓健康段恆亮，而恆亮等於零鑑別力）。
 

@@ -67,5 +67,13 @@
       "合法範圍 0..200。"
     ],
     "daily_limit": 30
+  },
+  "theme_scan": {
+    "_doc": [
+      "Phase 1 Step 1.8／1.9：weekly 退役後題材掃描只在互動 session 發起（skills/theme-scan）。",
+      "心跳段 3 每天印「距上次掃題材 N 天」（engine_b/theme_scan.last_scan）；N ≥ nudge_after_days 時",
+      "粗體並移到心跳第一行、Discord 摘要行加紅旗，SessionStart hook 要求轉述（1.9）。"
+    ],
+    "nudge_after_days": 7
   }
 }

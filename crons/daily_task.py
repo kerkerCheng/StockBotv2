@@ -186,9 +186,10 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("scripts/backup_private.py", "run", "--no-drive"), 15, True, False),
     DailyStep("17_finalize", "收尾（驗 state、釋放鎖、收工標記）",
               ("scripts/finalize_daily_state.py",), 2, True, False, essential=True),
+    # ⑱ 同時寫 Discord 摘要行與今天的快照（Phase 1 Step 1.8）：兩者都在 library/private/heartbeat/，derived、不是 authority。
     DailyStep("18_heartbeat", "組心跳（零 LLM、零網路）",
-              ("-m", "crons.heartbeat", "--out", "{brief}"), 3, False, False,
-              kind="heartbeat", essential=True),
+              ("-m", "crons.heartbeat", "--out", "{brief}", "--summary-out", "{summary_file}", "--write-snapshot"),
+              3, False, False, kind="heartbeat", essential=True),
     DailyStep("19_publish", "發送 Discord",
               ("scripts/publish_daily_brief.py", "--brief-file", "{brief}", "--summary", "{summary}"),
               3, False, True, kind="publish", essential=True),
@@ -304,12 +305,22 @@ class DailyRun:
     def brief_path(self) -> Path:
         return self.out_dir / f"heartbeat_{self.date}.md"
 
+    def _summary_text(self) -> str:
+        path = self.out_dir / f"heartbeat_{self.date}.summary.txt"
+        try:
+            text = path.read_text(encoding="utf-8").strip()
+        except OSError:
+            text = ""
+        return text.splitlines()[0][:300] if text else "每日心跳"
+
     def _templates(self) -> dict[str, str]:
         return {
             "date": self.date,
             "run_id": self.run_id,
             "brief": str(self.brief_path),
-            "summary": "每日心跳",
+            # ⑲ 的 --summary：⑱ 寫出的摘要行（`Daily <日期>｜球在你 N`＋紅旗）；⑱ 沒寫出來就退回固定字串
+            "summary": self._summary_text(),
+            "summary_file": str(self.out_dir / f"heartbeat_{self.date}.summary.txt"),
             "triage_batch": str(self.out_dir / f"triage_batch_{self.date}.json"),
             "triage_result": str(self.out_dir / f"triage_{self.date}.json"),
             "prescreen_batch": str(self.out_dir / f"prescreen_batch_{self.date}.json"),

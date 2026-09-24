@@ -1058,7 +1058,8 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                              health: Mapping[str, Any] | None, live_rows: Sequence[Mapping[str, Any]],
                              paper_only: Sequence[str], counters: Mapping[str, Any],
                              benchmarks: tuple[str, str],
-                             generated_at: datetime | None = None) -> dict[str, Any]:
+                             generated_at: datetime | None = None,
+                             nav_exposure: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """outcome 腳本的結果 ＋ Decision Store 計數器 → `positions` state artifact。**純函式**。"""
     primary, reference = benchmarks
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -1099,6 +1100,9 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
         # 賣出就能驗證，也不受同漲同跌的 beta 污染（AGENTS「N 檔不等於 N 個獨立機會」）。
         # `None` ＝ 這次沒算，不是「算了但都是 0」（同 `power_law` 的取捨）。
         "bet_convergence": None if bet_convergence is None else dict(bet_convergence),
+        # NAV 摘要（Phase 1 Step 1.8）：bucket 分布、最大單筆占 NAV——**只呈現**，心跳段 4 讀它。
+        # `None` ＝ 這次沒算（舊呼叫端），不是「沒有持股」；讀不到持股時 `status` 照實帶出來。
+        "nav_exposure": None if nav_exposure is None else dict(nav_exposure),
         # 時序（2026-09-11）。**照抄 `outcome_if_settled_today` 落的檔案，不重算**——
         # 沒有歷史就做不了樣本外驗證（ROADMAP §F：保存當時的 PIT view，事後對 actual 算誤差）。
         "aggregate_series": _outcome_series(),
@@ -1160,6 +1164,38 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
     return payload
 
 
+def nav_exposure_summary(exposure: Mapping[str, Any]) -> dict[str, Any]:
+    """`portfolio.exposure.build_nav_exposure` 的回傳 → 心跳用的摘要（Phase 1 Step 1.8）。**純函式、只呈現**。
+
+    bucket 分布照抄；最大單筆取非現金部位的 `nav_pct` 最大者。讀不到持股時 `status` 與 `blockers` 原樣帶出——
+    「持股讀不到」與「什麼都沒持有」是相反的結論（build_nav_exposure 的同一條紀律）。"""
+    positions = [p for p in exposure.get("positions") or [] if isinstance(p, Mapping)]
+    top = max(positions, key=lambda p: float(p.get("nav_pct") or 0), default=None)
+    return {
+        "status": str(exposure.get("status") or "unknown"),
+        "buckets": {str(k): float(v) for k, v in (exposure.get("buckets") or {}).items()},
+        "cash_pct": exposure.get("cash_pct"),
+        "positions": len(positions),
+        "largest": None if top is None else {"ticker": top.get("ticker"), "nav_pct": top.get("nav_pct"),
+                                             "bucket": top.get("bucket")},
+        "blockers": list(exposure.get("blockers") or []),
+        "failure": exposure.get("failure"),
+    }
+
+
+def _nav_exposure() -> dict[str, Any]:
+    """讀持股（Google Sheet，readonly）→ NAV 摘要。讀不到就照實回 status（不丟例外、不猜 0）。"""
+    from portfolio.exposure import build_nav_exposure
+
+    try:
+        from fetchers.gsheets import fetch_portfolio
+
+        exposure = build_nav_exposure(list(fetch_portfolio(strict_operational=True)))
+    except Exception as exc:  # noqa: BLE001 — 持股讀不到不得拖垮整份 positions artifact
+        exposure = build_nav_exposure(None, upstream={"status": "unavailable", "failure": type(exc).__name__})
+    return nav_exposure_summary(exposure)
+
+
 def materialize_positions(*, store: StateArtifactStore | None = None,
                           generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次 outcome 的 `collect()` 並寫下 artifact。
@@ -1194,7 +1230,7 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
         health=outcome.anchor_health(results),
         live_rows=live_rows, paper_only=paper_only, counters=counters,
         benchmarks=(outcome.PRIMARY_BENCHMARK, outcome.REFERENCE_BENCHMARK),
-        generated_at=generated_at)
+        generated_at=generated_at, nav_exposure=_nav_exposure())
     target = store or StateArtifactStore()
     return target.write(payload), payload
 

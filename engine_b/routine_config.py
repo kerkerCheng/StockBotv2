@@ -61,6 +61,20 @@ def _positive_number(block: Mapping[str, Any], key: str, where: str, *, allow_ze
     return float(value)
 
 
+def load_theme_scan(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
+    """`theme_scan` 區塊（Phase 1 Step 1.8）：`nudge_after_days` 必須是 1..60 的整數。缺整段 → 預設 7。"""
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    block = payload.get("theme_scan")
+    if block is None:
+        return {"nudge_after_days": 7}
+    if not isinstance(block, dict):
+        raise ValueError("daily routine config 的 theme_scan 必須是 object")
+    days = block.get("nudge_after_days")
+    if isinstance(days, bool) or not isinstance(days, int) or not 1 <= days <= 60:
+        raise ValueError("theme_scan.nudge_after_days 必須是 1..60 的整數")
+    return {"nudge_after_days": days}
+
+
 def load_schedule(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     """`schedule` 區塊——**排程時間的唯一來源**（Phase 1 Step 1.2a，A1）。
 
