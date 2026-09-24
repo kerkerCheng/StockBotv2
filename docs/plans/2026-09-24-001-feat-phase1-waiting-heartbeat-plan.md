@@ -225,7 +225,7 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | 1.8 | 心跳改版（較昨 diff、watch／反證計數、pq2 逐筆、備份、健康、NAV、計分表每日、Discord 摘要） | ✅ 五段不增不減；實跑新版心跳（摘要行 `Daily 2026-09-24｜球在你 0｜⚠ 健康紅燈 1`）、`materialize --positions` 後 NAV 為真實 bucket 分布；與 1.0 的心跳逐行對照每一條拿掉的行都有取代行；NB2-8／NB3-11(d) 併入（到期行今日／累計＋處置逐格）；`tests/test_heartbeat_phase1.py` 28 條；2483 passed（偏差 #20–#23） | 5134575 |
 | 1.9 | 題材掃描（weekly 退役、`skills/theme-scan`、提醒 hook、AGENTS 兩句、`weekly` 字眼清掉） | ✅ `skills/theme-scan` 新增並同步；`crons/weekly_scan_prompt.md` 逐字封存 `docs/archive/2026-09-24-weekly-scan-prompt-v1.2.md`；AGENTS 兩句逐字照核准版本（diff 只有兩行）；hook 門檻兩側有測試；**以 `claude -p` 在 repo 起真實 session：5 支 SessionStart hook 全部 exit 0，routine_hint 輸出「距上次掃題材 4 天」**；Codex 側未驗（同一條命令；使用者若用 Codex 互動需信任新 hook）；`weekly` 剩下的每一處都有理由（偏差 #25）；2487 passed（偏差 #24、#25） | 1a1217f |
 | 1.10 | 稽核改讀新 registry | ✅ `Lifecycle` 拿掉舊店、改驗 watch 狀態與收據；`Expiry` 依 A7 驗到期去處＋`until` 已過＋**沒有到期也沒有 watch 的 `waiting_on`**；`Orphans` 加喚醒目標已結案（NB2-12，含對稱的追源 lead）、disproof_ref 對不到條件、非現行 memo／讀圖、sidecar 不符、wake_reading 無現行讀圖；`QueueLiveness` 加待檢滯留、watch_decision 指向不存在、觸及 48h 沒被複查接住。30 條新測試，18 條變異全紅；快轉試跑 25 個事件日（模擬使用者／不動作兩種）新判準 0 誤報、sync 停擺 3 天 23/24 次有響（沒響那次 3 天內沒有任何到期）；**`todo sync` 收掉喚醒目標已結案的 8 筆**（偏差 #26）；真實資料 `audit invariants` 12 PASS、**1 FAIL＝[586]**（`pending --trigger` 沒帶 `--until`、也沒有 watch：INV-2 違反；偏差 #27）→ 使用者 2026-09-25 同意續等到 2026-12-31，等待四項稽核轉綠；2517 passed | 2299f9f |
-| 結案 | 九項 gate ＋ closeout 報告 ＋ R2 | ○ | |
+| 結案 | 九項 gate ＋ closeout 報告 ＋ R2 | ▶ 九項 gate 與驗收①–⑤見 `docs/reports/2026-09-25-phase1-closeout.md`（②真實喚醒已發生、排程心跳因計數 bug 印 0 已修；③④ 已交付、未生效，回查改用心跳計數器＝偏差 #29）；結案 R2 已發 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（skill 會照下面這段做；不能用 skill 時貼這段原文）：
 
@@ -548,6 +548,7 @@ RB-1 以真實 registry 副本重跑（四種壞檔）：ew_0096～0111 一筆�
 | 26 | 1.10 | 「改哪裡：`audit/checks.py`、`audit/sources.py`、對應測試」；NB2-12 處置只寫「audit Orphans 加一條」 | 另改 `engine_b/todo.py`（`_close_orphaned_waits`，sync 在比對前收掉喚醒目標只有一個、而那個目標已結案的 active watch）與 `engine_b/event_watch.py`（`WATCH_STATUSES`、`close_orphan`）；對稱面：`wake_lead` 指向 applied／triaged_no_go 的 lead 同樣收（L17 對稱面）。編號／lead 不存在的**不收**（資料錯，由 audit 現形）；帶第二個喚醒目標的不收 | L11-6 ④：新判準在真實資料上抓到 8 筆（6 pq2、2 lead），計畫說不得放寬判準；而它們醒來時 `consume_fired`、到期時 `pq2_item_gone`／`lead_closed` 本來就得到同一個結論——提早到目標消失的那一刻就是 INV-4 的修法，不是新決定。16 筆「parked＋終局 trace_status」的追源 watch **不是**孤兒：醒來時 `consume_fired_lead_watches` 仍會把 parked lead 排回 pq1 |
 | 27 | 1.10 | `Expiry` 的判準清單（A7 改寫版） | 另加「pq2 的 `waiting_on` 沒有 `until`、也沒有任何 active／fired watch 會叫醒它 → FAIL」 | `check_expiry` 自己的 docstring 就是「每一個等待都必須有到期」（INV-2），但原本只看 watch；`pending --trigger` 不帶 `--until` 仍被接受、沒有任何程式讀 `trigger`——等待住在 registry 之外且永不重問。真實資料 [586] 命中；修資料要使用者決定（重問日期），修 CLI（`--trigger` 必須帶 `--until` 或綁 watch）是動 contract，列 closeout §15 提案 |
 | 28 | 1.2b | 「刪舊兩個工作與 `crons/heartbeat_task.py`；`tests/` 裡指向它的斷言改主詞」 | 另改三處：①`tests/test_heartbeat.py` 的 5 條舊入口測試改主詞搬進 `tests/test_daily_task.py`，其中「沒產出要說」在 daily 側原本**沒有測試**（`routine_hint` 對 ⑱⑲ 失敗與 publisher `delivery_failed` receipt 的那三個分支），補上；②`engine_b/leads.py` 兩句「stderr 進 `heartbeat_task.log`」改成照實（只進執行紀錄的 `stderr_tail` 末段、無常駐計數器）；③全套測試 2 紅（`tests/test_watch_expiry.py` 兩條以本地 `date.today()` 對照程式的 UTC `_today()`，台北 00:00–08:00 必紅），測試改用 `ew._today()` | ①plan 原文是「改主詞」，但被刪的機制若在新主詞下沒有守門就等於刪測試（不可越線 8）；②刪檔會讓那兩句變假（Step 3「code 改動讓某句話變假 → 同一個 commit 改掉」）；③L17 十行內、不動 contract 當下修——**只修測試**，程式的時區語意是 contract，列 §15 #16 |
+| 29 | 結案 | §0.1 #6／§12：②③④ 未自然發生時「登記回查用的 date watch」 | **不登記 date watch**；回查改由心跳的常駐計數器承擔（段 2「今日醒／未檢」、段 3「watch 到期」，「較昨變動」快照鍵含 `semantic.pending_check`、`watch.expired`、`disproof.expired_pending`，第一次從 0 變非 0 的那天 Daily 自己印）；下一個 Phase 核對後補記 | date watch 醒來只能叫醒 pq2 編號，而 AGENTS「開發項不走 pq2」——結案時向使用者提出三案（計數器／鑄一個 pq2 當例外／寫進 ROADMAP），**使用者 2026-09-25 選計數器**（拿掉機制優於加一個；#6 的文字是使用者定案，不改，由本列記載） |
 
 ---
 
@@ -860,6 +861,8 @@ Boundaries: 只讀
 | ④ 到期的 watch 不消失（A7） | 假設型：`watch_decision` 項目；thesis 來源：thesis 複查項目的 `disproof_watch_ids`；讀圖來源：節點重讀理由 | 等待 registry → pq2／複查／重讀 | `python -m engine_b.todo list`、`python -m alpha structure-reading <node> --check` |
 | ⑤（A1／C1）一個 daily、每天一則 Discord、時間與 config 一致、triage 是其中一步 | Windows 工作清單、執行紀錄（含 triage 步驟的結果與 session id）、publisher receipt、自我比對結果 | 機制存在與否（同 Phase 0 的做法） | `schtasks /Query`；`library/private/heartbeat/daily_run_*.json` |
 
+> **2026-09-25 結案時使用者改定（偏差 #29）：** 回查不登記 date watch（date watch 只能叫醒 pq2，與 AGENTS「開發項不走 pq2」衝突），改由心跳的常駐計數器與「較昨變動」快照承擔。
+
 ②③④ 結案時若尚未自然發生：照 A3——測試證明機制、closeout 寫「已交付、未生效」、登記回查 date watch（④ 依 A7 分兩半：thesis／讀圖來源的「不消失」（列進複查／重讀）最早 2026-11-18 → 回查 **2026-11-19**（`tech:cw_dfb_laser` 讀圖來源 5 條，偏差 #17）；假設型的 `watch_decision` 最早 2027-01-01 → 回查 **2027-01-02**（ew_0004、ew_0006）；②③ 用結案日＋14 天），
 **不得造假資料觸發**。本 Phase 沒有任何驗收數字是「幾檔通過某個 filter」。
 
@@ -987,3 +990,7 @@ R2 回 GO 後：ROADMAP Phase 1 標 ✅、`docs/plans/README.md` 對照表本列
     不是 §0.1 #6 推的 01-01）；台北 00:00–08:00 的互動 session 也一樣（`--until 今天` 會被接受）。
     daily 的執行紀錄檔名卻用本地日期——同一輪裡兩種「今天」。要不要統一成 `config/daily_routine.json` 的 `schedule.timezone`（動 contract：
     到期日語意、既有 watch 的 `expires` 解讀）——使用者決定。查證：`grep -n "def _today" -A 2 engine_b/event_watch.py`。
+17. **`leads.requeue_trace` 機械寫 `triage`**（結案 gate 4 的例外，2026-09-25 結案蒐證時發現）：watch 把舊 lead 排回 pq1 時
+    寫一筆 `decision: go`、沿用舊 tier 與分類（`engine_b/leads.py:928`，[321] 起就在，不是 Phase 1 新增）。它是重排不是判斷，
+    但讓 gate 4「triage 寫入者只有 `leads.triage()`」字面不成立；1.3 的 c8a7dea 已讓心跳排除它的時間戳。要不要改成不寫 `triage`
+    （另記 `requeued_by`）——與 #14 同一處，一起決定。
