@@ -552,5 +552,9 @@ def test_classification_line_reports_this_run_and_the_last_success(tmp_path: Pat
     mechanical = {**leads, "L3": {"triage": {"decided_at": "2026-09-24T06:00:00+00:00",
                                              "decided_by": "harvest:auto_no_go_forms"}}}
     assert "（2 天前）" in hb._classification_line(leads=mechanical, now=now, record_path=_record(tmp_path))
+    # 追源重排把 receipt 改寫成今天——也不是分類層跑過
+    requeued = {**leads, "L4": {"triage": {"decided_at": "2026-09-24T06:00:00+00:00"},
+                                "refs": {"trace_requeued_at": "2026-09-24T06:00:00+00:00"}}}
+    assert "（2 天前）" in hb._classification_line(leads=requeued, now=now, record_path=_record(tmp_path))
     missing = hb._classification_line(leads={}, now=now, record_path=tmp_path / "nope.json")
     assert "今天沒有 daily 執行紀錄" in missing and "沒有任何 triage 紀錄" in missing
