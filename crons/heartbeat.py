@@ -751,13 +751,24 @@ def _local_day(raw: Any) -> date | None:
     return stamp.astimezone().date()
 
 
+def _woke_on(watch: dict, day: date) -> bool:
+    """那一天醒過＝現行 `woken_by` 或任一筆 `reactivations[].woken_by` 的時間落在那一天（本地日期）。
+
+    追源型與 pq2 型醒來後常在同一輪就排回、轉回 active，醒來紀錄移進 `reactivations`、`woken_by` 清成 null——
+    只看現行 `woken_by` 的話，真的醒了也印「今日醒 0」（2026-09-24／25 兩天各醒 2／3 筆都印 0；L13 同形）。
+    """
+    stamps = [(watch.get("woken_by") or {}).get("at")]
+    stamps += [(r.get("woken_by") or {}).get("at") for r in watch.get("reactivations") or [] if isinstance(r, dict)]
+    return any(_local_day(s) == day for s in stamps)
+
+
 def _watch_today_line(*, now: datetime) -> str:
     from engine_b import event_watch as ew
 
     data = ew.load_watches()
     watches = data.get("watches") or []
     today = now.astimezone().date()
-    woken = sum(1 for w in watches if _local_day((w.get("woken_by") or {}).get("at")) == today)
+    woken = sum(1 for w in watches if _woke_on(w, today))
     expired = sum(1 for w in watches if _local_day(w.get("expired_at")) == today)
     c = ew.counters(data)
     return (f"watch：今日醒 {woken}｜今日到期 {expired}｜已觸發未消化 {c['fired_unconsumed']}"

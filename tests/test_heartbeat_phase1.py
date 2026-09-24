@@ -153,6 +153,29 @@ def test_pq2_items_use_go_authorization_verbatim_and_cap_at_ten() -> None:
     assert hb._pq2_item_lines([], todo_mod=todo) == []
 
 
+def test_woken_today_counts_wakes_that_were_requeued_in_the_same_run(monkeypatch) -> None:
+    """醒來後當場排回（`woken_by` 清成 null、紀錄進 `reactivations`）也是今天醒過——否則醒了印 0（L13）。
+    昨天醒、今天才排回的不算今天；一個 watch 今天醒兩次只算一個。"""
+    from engine_b import event_watch as ew
+
+    today = NOW.isoformat()
+    yesterday = (NOW - timedelta(days=1)).isoformat()
+    watches = [
+        {"watch_id": "cur", "status": "fired", "woken_by": {"at": today}},
+        {"watch_id": "requeued", "status": "active", "woken_by": None,
+         "reactivations": [{"at": today, "woken_by": {"at": today}}]},
+        {"watch_id": "twice", "status": "active", "woken_by": {"at": today},
+         "reactivations": [{"at": today, "woken_by": {"at": today}}]},
+        {"watch_id": "late_requeue", "status": "active", "woken_by": None,
+         "reactivations": [{"at": today, "woken_by": {"at": yesterday}}]},
+        {"watch_id": "idle", "status": "active", "woken_by": None},
+    ]
+    monkeypatch.setattr(ew, "load_watches", lambda: {"watches": watches})
+    monkeypatch.setattr(ew, "counters", lambda _d: {"fired_unconsumed": 0, "semantic_flagged": 0,
+                                                    "semantic_pending_check": 0})
+    assert "今日醒 3｜" in hb._watch_today_line(now=NOW)
+
+
 def test_expiry_line_parts_add_up_to_the_cumulative_total() -> None:
     from engine_b import event_watch as ew
 
