@@ -21,7 +21,7 @@
 併入的真正收益不是整齊，是**讓 trace 繼承它缺的那道硬邊界：`expires` 必填**。
 14 筆的死因是 consumed-marker（2026-08-12 為防止重複喚醒吃光 pq1 slot 而加的補丁）
 沒有到期兜底，用完即靜默沉底。有 expires 之後，喚醒幾次都無所謂——等不到就會到期現形，
-由人決定續等／改主動輪詢／放棄。consumed-marker 保留（它防的浪費是真的），只是不再是
+追源型轉終局 `watch_expired` 並計數（Phase 1 A3）；需要人決定的等待才進 pq2。consumed-marker 保留（它防的浪費是真的），只是不再是
 唯一的終止條件。
 
 同時消掉一組重複實作：`entity_filing_signal` 與 trace 的 `primary_source_signal` 判準
@@ -521,14 +521,40 @@ def past_expiry(watch: Mapping[str, Any], *, today: date | None = None) -> bool:
 
 
 def expiry_class(watch: Mapping[str, Any]) -> str:
-    """到期要怎麼處置：`decision`（語意／假設→watch_decision）｜`pq2`｜`trace`｜`reading`。"""
+    """到期要怎麼處置（Phase 1 Step 1.7；到期成批的設計 B，使用者 2026-09-24）：
+
+    - `pq2`：它指向的編號翻回球在你｜`trace`：lead 轉終局並計數｜`reading`（`wake_reading`）：只記處置
+    - `thesis_review`：thesis 來源的語意條件——**不鑄號**，列進那份 thesis 的複查項目，複查（go／drop）時續盯
+    - `reread`：讀圖來源的語意條件——**不鑄號**，列進該節點的重讀理由，重讀時收掉換新
+    - `decision`：其餘（假設型等**沒有自己複查週期**的等待）→ pq2 `watch_decision`
+    """
     if watch.get("wake_pq2"):
         return "pq2"
     if watch.get("wake_lead"):
         return "trace"
     if watch.get("wake_reading"):
         return "reading"
+    if watch.get("kind") == SEMANTIC_KIND:
+        ref = str(watch.get("source_ref") or "")
+        if ref.startswith("thesis:"):
+            return "thesis_review"
+        if ref.startswith("reading:"):
+            return "reread"
     return "decision"
+
+
+def condition_label(text: Any, limit: int = 40) -> str:
+    """給人讀的條件短句（NB2-9）：去掉 markdown 粗體、開頭的【…】標記、「…」省略前的逐字前導、
+    「圖外三條要人看：」這類接在編號前的導語——標題要讓人不展開就知道主詞。"""
+    import re
+
+    s = " ".join(str(text or "").replace("**", "").split())
+    s = re.sub(r"^【[^】]*】", "", s)
+    if "…" in s:
+        s = s.rsplit("…", 1)[1]
+    s = re.sub(r"^[^：]{0,40}：(?=[①-⑳])", "", s)
+    s = s.strip("：:；; ")
+    return s if len(s) <= limit else s[:limit] + "…"
 
 
 def renew(data: dict[str, Any], watch_id: str, *, until: str, n: int | None = None) -> dict[str, Any]:
@@ -577,8 +603,9 @@ def record_touched(data: dict[str, Any], watch_id: str, *, quote: str, note: str
 
     - 語意型：寫 `judgment`（`touches=yes`、`quote`、`handled=None`、`via=watch_decision:<n>`）→ thesis 來源由
       `thesis_lifecycle` 那一筆接住（`touched_disproof_by_thesis`）、讀圖來源列進 needs_reread（`reread_reasons`）。
-    - 假設型：記 `woken_by`（`kind=watch_decision`）→ 個股頁的 `disproof_signal`／假設對照照原本的路接手。
-    兩者都轉 `consumed`（同 judge）並記 `expiry_resolution: touched`。不改任何 authority。"""
+    - 假設型：記 `woken_by`（`kind=watch_decision`）並**停在 fired** → 假設對照（`hypotheses verify` → consume）與
+      個股頁的 `disproof_signal` 照原本的路接手（NB2-2）。
+    語意型轉 `consumed`（同 judge）。兩者都記 `expiry_resolution: touched`。不改任何 authority。"""
     if not str(quote or "").strip():
         raise EventWatchError("條件已被觸及必須附原文（quote；L18）")
     watch = next((w for w in data["watches"] if w.get("watch_id") == watch_id), None)
@@ -590,7 +617,12 @@ def record_touched(data: dict[str, Any], watch_id: str, *, quote: str, note: str
     judgment = {"at": stamp, "touches": "yes", "note": note or "watch_decision 研究結論：條件已被觸及",
                 "quote": quote, "handled": None, "via": via, "evidence": receipt, "lead_id": None}
     if watch.get("kind") != SEMANTIC_KIND:
-        watch["woken_by"] = {"kind": "watch_decision", "at": stamp, "n": n, "evidence": receipt, "quote": quote}
+        # 假設型：停在 fired、記 woken_by——走回原本的路（`hypotheses verify` 對照後 `event_watch consume`；
+        # oa_* 由個股頁 disproof_signal 標 review_required）。直接 consumed 會繞過假設層（R2-b 重審 NB2-2）。
+        watch["woken_by"] = {"kind": "watch_decision", "at": stamp, "n": n, "evidence": receipt, "quote": quote,
+                             "note": note or None}
+        watch["status"] = "fired"
+        return watch
     watch["judgment"] = judgment
     watch["status"] = "consumed"
     return watch
@@ -731,15 +763,18 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
 def expiry_counters(data: Mapping[str, Any], *, today: date | None = None) -> dict[str, int]:
     """到期處置的計數（Phase 1 Step 1.7）：到期不是丟——每一筆 expired 都要落在某個處置裡，沒落的現形。
 
-    - `expiry_decision_pending`：語意／假設型到期、還沒處置（＝待決 `watch_decision`）
+    - `expiry_decision_pending`：假設型等沒有自己複查週期的到期、還沒處置（＝待決 `watch_decision`）
+    - `expiry_thesis_review_pending`／`expiry_reread_pending`：thesis／讀圖來源的條件到期、等複查／重讀（設計 B）
     - `trace_expired_closed`／`_today`：追源型到期、lead 轉終局 `watch_expired`（重問＝計數現形，不佔 pq2）
     - `expiry_unresolved`：任何型別 expired 且沒有 `expiry_resolution`（含 A3 之前的歷史到期）"""
     today_iso = (today or _today()).isoformat()
     expired = [w for w in data["watches"] if w.get("status") == "expired"]
     closed = [w for w in expired if (w.get("expiry_resolution") or {}).get("kind") == "trace_closed"]
+    unresolved = [w for w in expired if not w.get("expiry_resolution")]
     return {
-        "expiry_decision_pending": sum(1 for w in expired if not w.get("expiry_resolution")
-                                       and expiry_class(w) == "decision"),
+        "expiry_decision_pending": sum(1 for w in unresolved if expiry_class(w) == "decision"),
+        "expiry_thesis_review_pending": sum(1 for w in unresolved if expiry_class(w) == "thesis_review"),
+        "expiry_reread_pending": sum(1 for w in unresolved if expiry_class(w) == "reread"),
         "trace_expired_closed": len(closed),
         "trace_expired_closed_today": sum(1 for w in closed
                                           if str(w["expiry_resolution"].get("at") or "")[:10] == today_iso),

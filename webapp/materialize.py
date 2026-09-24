@@ -878,7 +878,8 @@ WATCHES_MATERIALIZER_VERSION = "webapp-materialize-watches/1"
 WATCHES_THIS_IS_NOT = (
     "不是提醒系統：這一頁不會通知你，它只讓「還有什麼在等」現形（L14：防呆要自己出現）。",
     "**停滯（stalled）不等於死亡**：具名標的都觸發過一輪、被動層短期不會再醒，但到期日仍會兜底。",
-    "「等事件」不代表不用動作：`unwatched`／`expired`／停滯三種都需要人當場處置（延長／改主動輪詢／改 terminal）。",
+    "「等事件」不代表不用動作：`unwatched`／停滯需要人當場處置（補觸發條件／改主動輪詢／改 terminal）；"
+    "`expired` 的追源型由 daily 自動轉終局並計數，需要人決定的（假設型）才進 pq2。",
     "本 APP 不寫任何東西：不喚醒 watch、不消化 fired、不改 lead 狀態——那些只能在對話裡做。",
     "本 APP 不重算：每一格都是 materialize 當下 registry 的原值照抄。",
 )

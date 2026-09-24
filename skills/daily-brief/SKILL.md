@@ -277,7 +277,7 @@ watch 的 `entities`。`trace_trigger_kind` 仍是 lead 上的寫入端字彙（
 **`wake_state` 必須逐筆列出，`stalled`／`expired`／`unwatched` 三種必須當場處置。** 它們代表
 被動層救不了——等下去不會有事發生：
 - `stalled`：具名標的都觸發過一輪了。靠到期日兜底或開主動輪詢（`poll.eligible`）撈回。
-- `expired`：等待到期。決定續等（延長）、改主動輪詢、或放棄（改 terminal `trace_status`）。
+- `expired`：等待到期。追源型由 daily ⑨ 自動轉終局 `watch_expired` 並計數（Phase 1 A3），不需要人決定；之後有新的一手文件會以新 lead 回來。
 - `unwatched`：**沒有任何機制在等它**，唯一真正的黑洞。三種誠實處置擇一：(a) 主體已登記但
   沒填進機器欄位 → 補 `trace_trigger_entities` 後重建 watch；(b) 根本沒有可追的 claim
   （原文即該貼文本身）→ 改 terminal `trace_status` 豁免重排；(c) 真的需要人工 access／付費／
@@ -678,10 +678,10 @@ dispatch 或同時寫同一 working tree。
 pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先完成或 checkpoint 對應動作，
 再由 type-specific completion command（或附該類型要求的 receipt）結案，不能先 resolve 再假裝已執行：
 
-| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | 到期 thesis | 到期 watch（`watch_decision`） |
+| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | 到期 thesis（含反證等滿一輪沒發生） | 到期 watch（`watch_decision`，只有假設型等沒有自己複查週期的） |
 |------|-------------|---------------------|-------------------|-------------|-------------------------------|
-| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准 | **研究之後**才用：條件已被觸及 → `resolve <n> --verb go --receipt "outcome:touched;report:<路徑>" --quote "<原文>"`，交給 thesis 複查／讀圖重讀／假設對照；沒觸及不得 go；批次 bare go 一律拒收 |
-| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 標記已看、不複查 | 放棄這個等待（thesis 條件會計進「未盯」） |
+| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准；go／drop 後它名下到期的反證自動續到下一個核查點、觸及的續盯 | **研究之後**才用：已發生 → `resolve <n> --verb go --receipt "outcome:touched;report:<內文提到該 watch 的報告>" --quote "<原文>"`，watch 回 fired 交給假設對照；沒發生不得 go；批次 bare go 一律拒收 |
+| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 標記已看、不複查（到期的反證同樣續到下一個核查點） | 放棄這個等待 |
 | `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 | **必須**帶日期＝續等：`resolve <n> --verb pending --until <日期>`（watch 回 active、編號結案）；批次語法帶不了日期，bare pending 拒收 |
 
 ⚠ **2026-09-22（Phase 0）：表上原本有 `Decision review` 一欄，已退役**（ROADMAP Phase 0／G12）。

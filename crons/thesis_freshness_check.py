@@ -100,6 +100,47 @@ def check() -> list[tuple[str, int]]:
 
 
 
+class LifecycleUnreadable(RuntimeError):
+    """lifecycle.json 讀不到——「讀不到」不得被當成「沒有到期」（R2-b 重審 RB-1 的同型）。"""
+
+
+def _read_lifecycle(*, strict: bool) -> dict | None:
+    try:
+        data = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        if strict:
+            raise LifecycleUnreadable(f"{LIFECYCLE}：{type(exc).__name__}: {exc}") from exc
+        return None
+    if not isinstance(data, dict):
+        if strict:
+            raise LifecycleUnreadable(f"{LIFECYCLE} 不是 object")
+        return None
+    return data
+
+
+def expired_disproof_by_thesis(data: dict | None = None, *, lifecycle: dict | None = None) -> dict[str, list[dict]]:
+    """thesis 來源、到期未處置的語意條件，依 thesis id 分組（Phase 1 Step 1.7 設計 B：重問併進 thesis 複查）。"""
+    lifecycle = _read_lifecycle(strict=False) if lifecycle is None else lifecycle
+    if lifecycle is None:
+        return {}
+    if data is None:
+        from engine_b.event_watch import load_watches
+
+        data = load_watches()
+    by_memo = {str(e.get("memo")): str(tid) for tid, e in lifecycle.items()
+               if isinstance(e, dict) and e.get("memo") and e.get("status") != "retired"}
+    out: dict[str, list[dict]] = {}
+    for watch in (data or {}).get("watches") or []:
+        ref = str(watch.get("source_ref") or "")
+        if (watch.get("kind") != "semantic_condition" or not ref.startswith("thesis:")
+                or watch.get("status") != "expired" or watch.get("expiry_resolution")):
+            continue
+        tid = by_memo.get(ref[len("thesis:"):].split("#", 1)[0])
+        if tid:
+            out.setdefault(tid, []).append(watch)
+    return out
+
+
 def touched_disproof_by_thesis(data: dict | None = None) -> dict[str, list[dict]]:
     """判定觸及、還沒處置的 thesis 來源語意 watch，依 thesis id 分組（C3／A5；Phase 1 Step 1.5）。
 
@@ -131,11 +172,15 @@ def touched_disproof_by_thesis(data: dict | None = None) -> dict[str, list[dict]
     return out
 
 
-def lifecycle_due_detail(*, watch_data: dict | None = None) -> list[tuple[str, str, list[str]]]:
-    """[(thesis_id, 原因, 涵蓋的反證 watch_id)]——排程到期與「反證被判觸及」**合併成同一筆**（同一 thesis 只會有一筆）。"""
-    try:
-        data = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+def lifecycle_due_detail(*, watch_data: dict | None = None, strict: bool = False) -> list[tuple[str, str, list[str]]]:
+    """[(thesis_id, 原因, 涵蓋的反證 watch_id)]——排程到期、「反證被判觸及」、「反證等滿一輪都沒發生」**合併成同一筆**
+    （同一 thesis 只會有一筆）。涵蓋的 watch_id 在那一筆 go／drop 時由 `engine_b.disproof.after_thesis_review` 處理
+    （觸及→handled＋續盯；到期→續到下一個核查點）。
+
+    `strict=True`（pq2 收集器用）：lifecycle 讀不到就 raise，讓這個來源本輪不算健康——否則「讀不到」會被當成
+    「沒有到期」，已開的複查項目被標成可結案（R2-b 重審 RB-1 的同型）。"""
+    data = _read_lifecycle(strict=strict)
+    if data is None:
         return []
     today = date.today()
     reasons: dict[str, list[str]] = {}
@@ -146,11 +191,20 @@ def lifecycle_due_detail(*, watch_data: dict | None = None) -> list[tuple[str, s
         due_now, reason = is_due(entry, today=today)
         if due_now:
             reasons.setdefault(str(tid), []).append(reason)
+    from engine_b.event_watch import condition_label
+
     for tid, watches in touched_disproof_by_thesis(watch_data).items():
         for watch in watches:
             reasons.setdefault(tid, []).append(
-                f"反證被判觸及：{str(watch.get('condition') or '')[:40]}｜48 小時動作：{watch.get('action_48h')}")
+                f"反證被判觸及：{condition_label(watch.get('condition'))}｜48 小時動作：{watch.get('action_48h')}")
             watch_ids.setdefault(tid, []).append(str(watch["watch_id"]))
+    for tid, watches in expired_disproof_by_thesis(watch_data, lifecycle=data).items():
+        labels = "、".join(condition_label(w.get("condition"), 24) for w in watches[:3])
+        more = f" 等 {len(watches)} 條" if len(watches) > 3 else ""
+        reasons.setdefault(tid, []).append(
+            f"反證等滿一輪都沒發生 {len(watches)} 條（{labels}{more}）——複查時一併決定："
+            "memo 不改＝這一筆 go／drop 後自動續盯到下一個核查點；要放棄就改寫 memo")
+        watch_ids.setdefault(tid, []).extend(str(w["watch_id"]) for w in watches)
     return [(tid, "；".join(why), sorted(watch_ids.get(tid, []))) for tid, why in reasons.items()]
 
 

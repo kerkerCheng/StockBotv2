@@ -340,28 +340,53 @@ def test_new_touch_pulls_an_item_out_of_the_waiting_area(tmp_path, monkeypatch) 
 # 計數
 # ---------------------------------------------------------------------------
 
+class _Entry:
+    def __init__(self, condition):
+        self.condition = condition
+
+
 class _Reading:
-    def __init__(self, rid, n, version=RECORD_VERSION):
+    def __init__(self, rid, conditions, version=RECORD_VERSION):
         self.reading_id = rid
-        self.disproof = tuple(range(n))
+        self.disproof = tuple(_Entry(c) for c in conditions)
         self.record_version = version
 
 
-def test_five_counts_each_move(tmp_path) -> None:
+R1 = "讀圖反證：任一供應商以正式文件宣布第二條量產線通過客戶認證"
+
+
+def test_counts_are_per_condition_and_the_four_cells_add_up(tmp_path) -> None:
+    """R2-b 重審 NB2-4：以條件為單位、每個條件恰一格（觸及待處置＞到期待複查＞在盯＞未盯），四格加總＝預期。"""
     life = _thesis_env(tmp_path, conditions=[C1, C2])
-    readings = {"tech:a": _Reading("sr_a", 1), "tech:b": _Reading("sr_b", 0, version=RECORD_VERSION_V1)}
+    readings = {"tech:a": _Reading("sr_a", [R1]), "tech:b": _Reading("sr_b", [], version=RECORD_VERSION_V1)}
     watches: list[dict] = []
     base = disproof.disproof_counts(watches, lifecycle=life, readings=readings, root=tmp_path,
                                     coverage=frozenset({SIVERS}), frozen_history=3)
     assert base["expected"] == 3 and base["unwatched"] == 3 and base["v1_prose_readings"] == 1
-    assert base["frozen_history"] == 3 and base["watching"] == 0
-    watches.append({"kind": ew.SEMANTIC_KIND, "status": "active", "source_ref": "thesis:thesis/x_v1_lane_memo.md#1",
+    assert base["frozen_history"] == 3 and base["watching"] == 0 and base["lifecycle_unreadable"] is False
+    thesis1 = "thesis:thesis/x_v1_lane_memo.md#1"
+    watches.append({"kind": ew.SEMANTIC_KIND, "status": "active", "source_ref": thesis1, "condition": C1,
                     "entities": [SIVERS]})
-    watches.append({"kind": ew.SEMANTIC_KIND, "status": "active", "source_ref": "reading:sr_a#1",
+    watches.append({"kind": ew.SEMANTIC_KIND, "status": "active", "source_ref": thesis1, "condition": C1,
+                    "entities": [SIVERS]})   # 同一條件的第二筆不得重算
+    watches.append({"kind": ew.SEMANTIC_KIND, "status": "active", "source_ref": "reading:sr_a#1", "condition": R1,
                     "entities": ["co:jx_advanced_metals"]})
-    watches.append({"kind": ew.SEMANTIC_KIND, "status": "consumed", "source_ref": "thesis:thesis/x_v1_lane_memo.md#2",
-                    "judgment": {"touches": "yes", "handled": None}})
+    watches.append({"kind": ew.SEMANTIC_KIND, "status": "consumed", "condition": C2,
+                    "source_ref": "thesis:thesis/x_v1_lane_memo.md#2", "judgment": {"touches": "yes", "handled": None}})
+    watches.append({"kind": ew.SEMANTIC_KIND, "status": "consumed", "condition": "已不在任何來源裡的舊條件文字寫在這裡",
+                    "source_ref": "thesis:thesis/old.md#1", "judgment": {"touches": "yes", "handled": None}})
     c = disproof.disproof_counts(watches, lifecycle=life, readings=readings, root=tmp_path,
                                  coverage=frozenset({SIVERS}))
-    assert (c["watching"], c["unreachable"], c["touched_pending"], c["unwatched"]) == (2, 1, 1, 0)
-    assert disproof.disproof_counts(watches, lifecycle=life, readings=readings, root=tmp_path)["unreachable"] is None
+    assert (c["watching"], c["unreachable"], c["touched_pending"], c["expired_pending"], c["unwatched"]) == (2, 1, 1, 0, 0)
+    assert c["watching"] + c["touched_pending"] + c["expired_pending"] + c["unwatched"] == c["expected"]
+    assert c["touched_waits_on"] == ["thesis x 複查"] and c["orphan_touched"] == 1
+    watches[0]["status"] = watches[1]["status"] = "expired"
+    c = disproof.disproof_counts(watches, lifecycle=life, readings=readings, root=tmp_path)
+    assert (c["watching"], c["expired_pending"]) == (1, 1) and c["unreachable"] is None
+
+
+def test_counts_say_unreadable_instead_of_zero(tmp_path, monkeypatch) -> None:
+    """RB-1：lifecycle 讀不到時 thesis 那一半是「沒算」，不是 0。"""
+    monkeypatch.setattr(disproof, "load_lifecycle", lambda *a, **k: None)
+    c = disproof.disproof_counts([], readings={}, root=tmp_path)
+    assert c["lifecycle_unreadable"] is True

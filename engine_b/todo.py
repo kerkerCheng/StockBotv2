@@ -44,8 +44,9 @@ ITEM_TYPES: dict[str, str] = {
     "sheet_only_holding": "（legacy）機制退役（Phase 0），不再建立新項目；Sheet 有而敘事沒有的持股改列候選板「已持有、缺敘事」（Phase 3）",
     "engine_c_observation": "核准把人工觀測寫入 Engine C append-only ledger",
     "thesis_mutation": "核准 thesis lifecycle 變更（revise／retire／watch）",
-    "watch_decision": ("語意／假設 watch 到期、條件沒發生：續等（resolve <n> --verb pending --until <日期>）、放棄（drop）；"
-                       "研究後發現條件已被觸及 → go（receipt 帶 outcome:touched＋研究結果、--quote 原文）"),
+    "watch_decision": ("假設型等沒有自己複查週期的 watch 到期、沒對照到：續等（resolve <n> --verb pending --until <日期>）、"
+                       "放棄（drop）；研究後發現已發生 → go（receipt 帶 outcome:touched＋研究結果、--quote 原文）。"
+                       "thesis／讀圖的反證到期不在這裡——併進 thesis 複查與節點重讀"),
     "manual": "依 hint 執行",
 }
 
@@ -68,7 +69,7 @@ GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
     "engine_c_observation": ("寫入 Engine C append-only ledger", "入圖與 thesis mutation"),
     "thesis_mutation": ("該筆 thesis lifecycle 變更", "入圖與 live"),
     # Phase 1 Step 1.7（定案 #4）：永不列入常規授權——它真正要你答的是續等或放棄，自動 go 會讓重問消失。
-    "watch_decision": ("記下研究結論「條件已被觸及」（附研究結果與原文）→ 交給 thesis 複查／讀圖重讀／假設對照接手",
+    "watch_decision": ("記下研究結論「條件已被觸及」（附研究結果與原文）→ 交給假設對照接手（watch 回 fired）",
                        "任何 authority mutation（入圖、Engine C 判讀、thesis mutation、live）；"
                        "研究本身不在 go 裡（要研究就在互動 session 說）；條件沒被觸及不得 go（續等或 drop）"),
     "manual": ("依 hint 執行的 exact 動作", "hint 未載明的任何動作"),
@@ -411,10 +412,11 @@ def _validate_watch_decision_go(receipt: str, *, quote: str | None, watch: Mappi
         lead = (leads_mod.load().get("leads") or {}).get(fields["lead"])
         if lead is None:
             raise TodoError(f"watch_decision receipt 的 lead 不存在：{fields['lead']}")
-        latest = max(str(lead.get("first_seen") or ""), str((lead.get("triage") or {}).get("decided_at") or ""))
-        if latest[:10] < since:
-            raise TodoError(f"receipt 的 lead {fields['lead']} 最後動作 {latest[:10] or '（無）'} 早於這次到期 {since}"
-                            "——要指研究這次到期時的產出（或改附 report:）")
+        # 只認 first_seen：追源重排會改寫 decided_at，舊 lead 會被騙成「剛研究過」（R2-b 重審 NB2-3）
+        first_seen = str(lead.get("first_seen") or "")
+        if first_seen[:10] < since:
+            raise TodoError(f"receipt 的 lead {fields['lead']} 首次出現 {first_seen[:10] or '（無）'} 早於這次到期 {since}"
+                            "——要指研究這次到期時找到的產出（或改附 report:）")
     if "report" in fields:
         rel = fields["report"].replace("\\", "/")
         path = (_ROOT / rel).resolve()
@@ -422,6 +424,13 @@ def _validate_watch_decision_go(receipt: str, *, quote: str | None, watch: Mappi
                 or not path.is_file()):
             raise TodoError(f"watch_decision receipt 的 report 必須是 {'／'.join(_WATCH_DECISION_REPORT_ROOTS)} "
                             f"之下存在的檔案：{fields['report']}")
+        # 報告要寫到這個 watch（NB2-3：lifecycle.json、兩個月前的報告都會通過「存在」這一關）
+        try:
+            body = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            body = ""
+        if str(watch.get("watch_id")) not in body:
+            raise TodoError(f"receipt 的 report 內文沒有提到 {watch.get('watch_id')}——研究結果要寫明它回答的是哪一個等待")
     if "watch" in fields:
         from engine_b import event_watch
 
@@ -501,6 +510,11 @@ def _resolve_watch_decision(pool: dict[str, Any], item: dict[str, Any], verb: st
             resolution, final_receipt = "drop", None
         else:
             _validate_watch_decision_go(receipt, quote=quote, watch=watch)
+            from engine_b.disproof import source_is_current
+
+            if not source_is_current(watch):
+                # 續等已有這一道，go 是對稱面（R2-b 重審 NB2-1）：來源換版後判定觸及，沒有任何複查項目接得住
+                raise TodoError("來源已不是現行（或 lifecycle 讀不到）——這個條件沒有對象了，drop 即可")
             event_watch.record_touched(data, watch_id, quote=str(quote), note=reason, n=item["n"], receipt=receipt)
             resolution, final_receipt = "go", receipt
     except (event_watch.EventWatchError, ValueError) as exc:
@@ -1301,14 +1315,14 @@ def _mark_disproof_handled(item: Mapping[str, Any], verb: str, stamp: str) -> No
     if not ids:
         return
     try:
-        from engine_b import event_watch
+        from engine_b import disproof, event_watch
 
         data = event_watch.load_watches()
-        for watch in data["watches"]:
-            judgment = watch.get("judgment") or {}
-            if watch.get("watch_id") in ids and judgment.get("touches") == "yes" and not judgment.get("handled"):
-                judgment["handled"] = {"n": item.get("n"), "verb": verb, "at": stamp}
+        # 觸及 → handled＋（memo 仍現行）續盯；到期 → 續到下一個核查點（設計 B；NB2-5）
+        outcome = disproof.after_thesis_review(data, sorted(ids), n=item.get("n"), verb=verb, stamp=stamp)
         event_watch.save_watches(data)
+        for err in outcome["errors"]:
+            print(f"⚠ 複查後續盯失敗：{err}", file=sys.stderr)
     except Exception as exc:  # noqa: BLE001
         print(f"⚠ 反證 watch 標 handled 失敗（下一次 sync 會再出一筆）：{type(exc).__name__}: {exc}",
               file=sys.stderr)
@@ -1345,27 +1359,35 @@ def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict
         # 讀圖型 → 不另處置（讀圖自己的到期由 needs_reread 重問），只記處置；語意／假設型 → 收集器鑄 watch_decision；
         # 追源型 → consume-fired 轉終局。
         for watch in data["watches"]:
-            if watch.get("status") != "expired" or watch.get("expiry_resolution"):
+            if watch.get("status") != "expired":
                 continue
+            resolution = watch.get("expiry_resolution") or {}
             if event_watch.expiry_class(watch) == "reading":
-                event_watch.resolve_expiry(data, watch["watch_id"], {"kind": "reading_expiry",
-                                                                     "node": watch.get("wake_reading")})
+                if not resolution:
+                    event_watch.resolve_expiry(data, watch["watch_id"], {"kind": "reading_expiry",
+                                                                         "node": watch.get("wake_reading")})
                 continue
-            if not watch.get("wake_pq2"):
+            if not watch.get("wake_pq2") or (resolution and resolution.get("kind") != "requeued_to_pq2"):
                 continue
+            # 依編號現況判斷（冪等，R2-b 重審 NB2-13）：registry 已記 requeued、pool 還沒存到就崩潰的話，
+            # 下一輪照樣翻回；使用者在到期**之後**自己又 pending 的不動。
             n = int(watch["wake_pq2"])
             item = next((it for it in pool["items"] if it["n"] == n and not it.get("resolved_at")), None)
-            if item is not None:
-                prior = dict(item.get("waiting_on") or {})
-                item.pop("waiting_on", None)
-                item.pop("deferred_at", None)
-                pool["log"].append({
-                    "at": stamp, "n": n, "type": item["type"], "ref_id": item["ref_id"],
-                    "verb": "watch_expired", "reason": f"event watch {watch['watch_id']} 到期：它等的事件沒發生",
-                    "receipt": None, "prior_waiting_on": prior,
-                })
-            event_watch.resolve_expiry(data, watch["watch_id"], {
-                "kind": "requeued_to_pq2" if item is not None else "pq2_item_gone", "n": n})
+            expired_at = str(watch.get("expired_at") or watch.get("expires") or "")
+            if item is not None and (item.get("waiting_on") or item.get("deferred_at")):
+                set_at = str((item.get("waiting_on") or {}).get("set_at") or item.get("deferred_at") or "")
+                if not set_at or set_at <= expired_at:
+                    prior = dict(item.get("waiting_on") or {})
+                    item.pop("waiting_on", None)
+                    item.pop("deferred_at", None)
+                    pool["log"].append({
+                        "at": stamp, "n": n, "type": item["type"], "ref_id": item["ref_id"],
+                        "verb": "watch_expired", "reason": f"event watch {watch['watch_id']} 到期：它等的事件沒發生",
+                        "receipt": None, "prior_waiting_on": prior,
+                    })
+            if not resolution:
+                event_watch.resolve_expiry(data, watch["watch_id"], {
+                    "kind": "requeued_to_pq2" if item is not None else "pq2_item_gone", "n": n})
         for watch in fired + backlog:
             if not watch.get("wake_pq2"):
                 # 假設型 fact-check 到點：沒有 pq2 可翻醒——停在 fired 現形於
@@ -1725,12 +1747,13 @@ def _collect_lifecycle_rows() -> list[dict[str, Any]]:
             "source": "lifecycle",
             **({"disproof_watch_ids": ids} if ids else {}),
         }
-        for tid, why, ids in lifecycle_due_detail()
+        for tid, why, ids in lifecycle_due_detail(strict=True)
     ]
 
 
 def _collect_watch_expiry_rows() -> list[dict[str, Any]]:
-    """語意型／假設型 watch 到期、還沒處置 → `watch_decision`（Phase 1 Step 1.7；A3）。
+    """沒有自己複查週期的 watch（假設型等）到期、還沒處置 → `watch_decision`（Phase 1 Step 1.7；設計 B：thesis／讀圖
+    來源的語意條件不在這裡——`expiry_class` 回 `thesis_review`／`reread`，重問併進 thesis 複查與節點重讀）。
 
     **每個到期事件恰好一個編號**：ref_id＝`<watch_id>@<expires>`——續等會改 `expires`，所以再到期是新的事件、
     新的編號；同一次到期重跑 sync 不重鑄。**用 `expires` 不用 `expired_at`**：CLI 的 sync 先收集、後由
@@ -1748,18 +1771,19 @@ def _collect_watch_expiry_rows() -> list[dict[str, Any]]:
         if event_watch.expiry_class(watch) != "decision":
             continue
         when = str(watch.get("expires"))
-        if watch.get("kind") == event_watch.SEMANTIC_KIND:
-            title = (f"反證 watch 到期、條件沒發生：{str(watch.get('condition') or '')[:40]}"
-                     f"（來源 {watch.get('source_ref')}）")
-        else:
-            title = (f"假設 watch 到期、沒有對照到：{str(watch.get('fact') or watch.get('note') or '')[:40]}"
-                     f"（假設 {watch.get('hypothesis_ref')}）")
+        rounds = len(watch.get("renewals") or []) + 1
+        nth = f"（第 {rounds} 次到期）" if rounds > 1 else ""
+        target = (f"假設 {watch.get('hypothesis_ref')}" if watch.get("hypothesis_ref")
+                  else f"{','.join(str(e) for e in (watch.get('entities') or [])[:3])}")
+        title = (f"等待到期、沒有對照到{nth}：{event_watch.condition_label(watch.get('fact') or watch.get('condition') or watch.get('note'))}"
+                 f"（{target}）")
         rows.append({
             "type": "watch_decision",
             "ref_id": f"{watch['watch_id']}@{when}",
             "title": title,
             "hint": ("續等：python -m engine_b.todo resolve <編號> --verb pending --until <日期>｜放棄：drop｜"
-                     "要研究就在互動 session 說；研究後條件已被觸及才 go（receipt 帶 outcome:touched＋研究結果、--quote 原文）"),
+                     "要研究就在互動 session 說；研究後已發生才 go（receipt 帶 outcome:touched＋內文提到這個 watch 的報告、"
+                     "--quote 原文）"),
             "source": "watch_expiry",
         })
     return rows
@@ -1791,7 +1815,7 @@ SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
     # 兩個 legacy kind 從此**沒有 collector**——與 `manual` 同形：缺席不代表完成（見上方 docstring）。
     "engine_c_observations": frozenset({"engine_c_observation"}),
     "thesis_mutations": frozenset({"thesis_mutation"}),
-    # "watch_expiry": frozenset({"watch_decision"}) —— R2-b 重審 NO_GO 回滾，見 SOURCE_COLLECTORS
+    "watch_expiry": frozenset({"watch_decision"}),
 }
 
 
@@ -1829,9 +1853,8 @@ SOURCE_COLLECTORS: tuple[tuple[str, str], ...] = (
     ("lifecycle", "_collect_lifecycle_rows"),
     ("engine_c_observations", "_collect_engine_c_observation_rows"),
     ("thesis_mutations", "_collect_thesis_mutation_rows"),
-    # ⚠ 2026-09-24 R2-b 重審 NO_GO 回滾（plan §0.5 預寫的回滾）：`("watch_expiry", "_collect_watch_expiry_rows")`
-    # 停登記——RB-1（lifecycle 讀不到時對帳把所有 thesis 反證收掉）與 RB-2（條件換位置時同一條件兩筆、到期兩個編號）
-    # 修好前不鑄 watch_decision。重新啟用＝把這一列與 SOURCE_ITEM_TYPES 那一列加回來（並改回 test_watch_expiry 的接線測試）。
+    # 2026-09-24 R2-b 兩輪 NO_GO 都曾回滾停登記；RB-1／RB-2／NB2 修好、到期成批改設計 B 後重新啟用（plan §0.7）。
+    ("watch_expiry", "_collect_watch_expiry_rows"),
 )
 
 
@@ -2138,6 +2161,7 @@ def main(argv: list[str] | None = None) -> int:
                 )
             rc = result.get("disproof_reconcile")
             reconcile_line = ("；反證對帳沒跑（失敗）" if rc is None else
+                              "；⚠ 反證對帳：lifecycle 讀不到，本輪不動任何等待" if rc.get("lifecycle_unreadable") else
                               f"；反證對帳：登記 {len(rc['registered'])}、收掉 {len(rc['consumed'])}"
                               f"、sidecar 不符 {len(rc['sidecar_mismatch'])}"
                               + (f"、沒有結構化反證 {len(rc['no_structured'])}（由 Step 1.6 補登記）"

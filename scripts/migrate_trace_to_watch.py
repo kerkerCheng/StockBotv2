@@ -29,7 +29,7 @@ from engine_b import event_watch as ew  # noqa: E402
 from engine_b.leads import load as load_leads, trace_backlog  # noqa: E402
 
 # 一個財報週期（90 天）＋緩衝。最常見的等待模式是「下一份季報會不會揭露」，
-# 等滿一輪還沒出現就該讓人重新決定，而不是無聲續等。
+# 等滿一輪還沒出現就結案（追源型轉終局 watch_expired 並計數，Phase 1 A3），不無聲續等。
 DEFAULT_TTL_DAYS = 120
 
 

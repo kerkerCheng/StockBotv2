@@ -164,6 +164,16 @@ plan_review: 第 1 輪 NO_GO（2026-09-24，對 0c34de8；blocking B1–B3）→
 | why | 主控制從「證明沙盒擋得住」換成「LLM 手上沒有工具，且每次執行都機械驗證這件事」；額度理由消失的限制不該留著（一個保守選擇說不出證據就是偏差），結構理由的（心跳零 LLM、只提議、判定在互動、研究在互動）照舊 |
 | impact | ROADMAP Phase 1 列三處；plan §0.1 C1／C4 註記、§0.2、§0.3、A1、A4、1.2a、1.3、1.4、1.8、§12 ③、§13、§14；AGENTS 不改 |
 
+**A7｜到期的重問併進它自己的複查（設計 B；使用者 2026-09-24 選定）**
+
+| 欄 | 內容 |
+|---|---|
+| 原 roadmap | Phase 1 列：「到期（A3）：語意／假設型鑄 pq2 新 kind `watch_decision`（go＝現在啟動研究…；續等…；`drop`＝放棄）」；驗收④「到期的語意／假設 watch 出現在 pq2 為 `watch_decision`（`user_decision`），不消失」 |
+| 新觀察 | 試跑（`scripts/trial_run_waiting.py`，真實資料副本快轉到 2027-10）：同一份 thesis／讀圖的條件同一天到期，一次鑄 5～6 個編號（2026-11-18 讀圖 5、2027-02-14 AXT 6、2027-03-02 COHR 5、2027-03-18 讀圖 6），不回應的話 27 個；續等要逐筆帶日期。thesis 與讀圖本來就有自己的複查週期（lifecycle 核查點、讀圖到期）——同一個問題被問兩次 |
+| proposed change | thesis 來源的反證到期 → **不鑄號**，以理由列進那份 thesis 的 `thesis_lifecycle` 複查項目（同一 thesis 只會有一筆），那一筆 go／drop 後自動續盯到下一個核查點、判定觸及的標 handled 並續盯；要放棄條件＝改寫 memo。讀圖來源的 → 列進節點重讀理由，重讀時換新。**`watch_decision` 只給沒有自己複查週期的等待（假設型等）**；go＝研究結論已發生（watch 回 fired 交假設對照） |
+| why | AGENTS「每筆等待有到期，到期是重問不是丟」——重問的是**有人會回答的地方**：thesis 的條件由 thesis 複查回答、讀圖的由重讀回答，拆成逐條 pq2 只會讓同一個決定被問 N 次（L14：注意力噪音）。試跑：到 2027-10 `watch_decision` 27+ → 4、pq2 球在你 31 → 6；每個到期仍落在一個會自己出現的地方（心跳段 2「到期待複查」、段 3「等 thesis 複查／等重讀」） |
+| impact | ROADMAP Phase 1 列兩處（到期、④）；plan A3 註記、§8、§12 ④（假設型的 `watch_decision` 最早 2027-01-01 → 回查 2027-01-02；thesis／讀圖來源的「不消失」最早 2026-11-18 → 回查 2026-11-19）；`engine_b/event_watch.expiry_class`、`engine_b/disproof.after_thesis_review`、`crons/thesis_freshness_check`、收集器、心跳；AGENTS 不改 |
+
 **AGENTS 兩句改寫（使用者 2026-09-24 核准的逐字版本；Step 1.9 執行，不得改動其他判準句）：**
 
 - 「3. **weekly 只發現、不處置**；處置建議只由讀得到 pool 現值的 daily／互動 session 給出。」
@@ -211,7 +221,7 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | 1.4 | `semantic_condition` kind（feed 宣告一手與公司、回填實體、待檢、判定、排除持股申報）＋ 語意預篩（抓全文、`claude -p` 零工具提議、程式驗引文後寫標旗；C7） | ✅ 回填 EDGAR 419／MFN 64／sivers 26／yahoo 26／MOPS 4／X 514（冪等）；Sivers 兩 feed 的 lead 含 `co:sivers_semiconductors` 0→100%；非語意型命中差異只有 ew_0042 多 4 則 `sivers:press`（全由宣告的 company_id 交集解釋）；真實醒來的語意 watch 0（1.6 才登記）；工作時限 180→240 並重新註冊（偏差 #7–#8） | 5c5d875（R2-a 處置 fc5304d） |
 | 1.5 | 反證登記 hook（讀圖 v2 `disproof[]`、thesis 由 `todo sync` 對帳 lifecycle 現行 memo 登記與收舊）＋ `wake_reading` ＋ 在盯／未盯／觸及待處置／叫不醒計數 ＋ 觸及後的 `thesis_lifecycle` 項目 | ✅ 8 筆 v1 讀圖 id 重算不變、解析失敗 0、兩節點 current；對帳在真實資料上不動任何東西（三份現行 memo 沒有結構化反證→等 1.6）；計數＝預期 16／在盯 0／未盯 16／v1 散文 2 份／凍結歷史 32；`pending_lifecycle.py` 無 diff；心跳段 2 已印反證行（偏差 #9） | f9b8e7c |
 | 1.6 | 既有反證補登記（**強模型**；16 條 thesis 用 `register-disproof`；2 份現行讀圖各 append 一份 v2 取代；不擋後續 Step、結案前必完成） | ✅ thesis 16 條（ew_0096–0111）＋讀圖 v2 兩份（`sr_ad503ae880ceb398` 6 條、`sr_d07679979a8e4202` 5 條）＋需求側客戶 `wake_reading` 5；計數：預期 27／在盯 27／未盯 0／觸及待處置 0／**叫不醒 2**（AXT §7-3 JX／住友、inp ③ IQE）／v1 散文 0；sync 後對帳收掉 0；N15＝claim 39（+edge 8）全部帶 `disproof_condition`；逐條表 `docs/reports/2026-09-24-phase1-step16-disproof-registration.md`（偏差 #14–#17） | （本 commit） |
-| 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ✅ 機制由 22 條測試證明（變異檢查：ref_id 改用 `expired_at` 會紅 3 條）；真實資料 expired 0、最早到期＝追源型 2026-11-22、語意／pq2 型 2026-12-31——照 A3「已交付、未生效」；暫存池 sync：pq2 型 watch 指向的 6 個編號逐筆不變、新 log 0、`watch_decision` 0；2404 passed；**R2-b NO_GO（B1、B2；NB-1–NB-10）→ 回滾（19120b9）→ 使用者確認修法 → 全數修好並重新啟用、試跑再修一個（偏差 #18）、**R2-b 重審 NO_GO（RB-1、RB-2；NB2-1～NB2-14）→ 再度回滾（收集器停登記），AWAITING_HUMAN**（偏差 #10–#13、#18；處置見 §0.7 R2-b 表與重審表） | c9e950f、19120b9、155f6ec、（本 commit） |
+| 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ✅ 機制由 22 條測試證明（變異檢查：ref_id 改用 `expired_at` 會紅 3 條）；真實資料 expired 0、最早到期＝追源型 2026-11-22、語意／pq2 型 2026-12-31——照 A3「已交付、未生效」；暫存池 sync：pq2 型 watch 指向的 6 個編號逐筆不變、新 log 0、`watch_decision` 0；2404 passed；**R2-b NO_GO（B1、B2；NB-1–NB-10）→ 回滾（19120b9）→ 使用者確認修法 → 全數修好並重新啟用、試跑再修一個（偏差 #18）、R2-b 重審 NO_GO（RB-1、RB-2）→ 回滾（b67f1fb）→ 使用者確認修法＋到期成批選 B（A7）→ 全數修好、收集器重新啟用；試跑到 2027-10：`watch_decision` 27+ → 4、pq2 球在你 31 → 6、真實 16 條手動登記 42 個模擬日對帳改位置 0／收掉 0；2444 passed；**R2-b 第三輪已發**（偏差 #10–#13、#18、#19） | c9e950f、19120b9、155f6ec、b67f1fb、（本 commit） |
 | 1.8 | 心跳改版（較昨 diff、watch／反證計數、pq2 逐筆、備份、健康、NAV、計分表每日、Discord 摘要） | ○ | |
 | 1.9 | 題材掃描（weekly 退役、`skills/theme-scan`、提醒 hook、AGENTS 兩句、`weekly` 字眼清掉） | ○ | |
 | 1.10 | 稽核改讀新 registry | ○ | |
@@ -485,6 +495,8 @@ reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutat
 | NB2-13 | non-blocking | `todo._check_event_watches` | 先存 registry（記 requeued）後存 pool，中間崩潰 → 編號永遠掛 `waiting_on` | 翻回改成依編號現況判斷（冪等） |
 | NB2-14 | non-blocking | sidecar 順序 | sidecar 條目順序不保證等於 memo「推翻」節順序，`#n` 可能指錯條（L18） | 併入 RB-2：以文字對 index |
 
+**處置（2026-09-24，使用者：「修 RB-1、RB-2 與 NB2 提案（NB2-8 併 1.8、NB2-12 併 1.10）；到期成批選 B；修好後試跑＋R2-b 再審，GO 就續做 1.8」）：**RB-1（`load_lifecycle` 讀不到回 None、對帳 fail closed、計數標 `lifecycle_unreadable`、lifecycle 收集器 strict 讀不到就不算健康來源）、RB-2＋NB2-14（條件以文字認位置、relink 留歷史、sidecar 以文字對 index、手動登記一視同仁）、NB2-1（go 檢查來源現行）、NB2-2（假設型 go 回 fired）、NB2-3（report 內文須含 watch_id、lead 只認 first_seen）、NB2-4（以條件為單位、四格加總＝預期、孤兒觸及另計）、NB2-5（複查後手動與結構化一致續盯，隨 B 落地）、NB2-6（已處置的到期不擋重登）、NB2-7（五處殘句）、NB2-9（`condition_label`、第 k 次到期）、NB2-10（＝設計 B，A7）、NB2-11（觸及待處置印在等哪裡）、NB2-13（翻回依編號現況、冪等）全數落地；NB2-8 併 1.8、NB2-12 併 1.10。`tests/test_watch_expiry.py` 49→60 條（改測設計 B）＋計數測試改寫；變異檢查：RB-1 紅 1、RB-1 收集器紅 1、RB-2 relink 紅 3、B 續盯紅 2、NB2-2 紅 1、NB2-13 紅 1（「去重看位置」0：第 1 步已把位置對齊到文字，屬等價變異）。
+
 ### 執行偏差紀錄（執行者填；每筆寫「plan 原文怎麼寫／實際怎麼做／為什麼」，並回頭修本 plan 對應段落）
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
@@ -507,6 +519,7 @@ reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutat
 | 16 | 1.6 | 到期＝「下一個核查點＋一個核查週期」 | Sivers 的核查週期取「每季財報」90 天而非 lifecycle 的 30 天；讀圖來源的條目＝讀圖到期＋讀圖有效期（90／30 天）；原文不足 20 字的讀圖條目帶同一句的逐字前導 | Sivers 的反證多由季報判定，30 天的重問只會在沒有新季報時再問一次；讀圖原文沒有「核查週期」，有效期是它唯一的週期 |
 | 17 | 1.6 | §0.1 #6／§12：④ 最早 2027-01-01 才可能發生、回查 date watch 2027-01-02 | 回查 date watch 改 **2026-11-19**（#6 那一列是使用者定案，文字不動） | `tech:cw_dfb_laser` 讀圖來源 5 條 watch 到期 2026-11-17；若該節點在那之前重讀、舊 watch 被取代收掉，下一個是 AXT 的 2027-02-13 |
 | 18 | 1.7 | 反證計數五格：在盯／叫不醒／觸及待處置／未盯／v1 散文（1.5、1.8 的心跳段 2） | 多一格**到期待決**（`expired_pending`：expired、未處置、指向預期條目），不再算進「未盯」 | 試跑（`scripts/trial_run_waiting.py`）發現到期當天正在 pq2 等決定的條件被印成「未盯」——一個數字兩種語意（L12）；drop 之後的才是真的未盯 |
+| 19 | 1.7 | A3：「語意型、假設型到期 → 鑄 pq2 `watch_decision`」 | **A7（設計 B）**：thesis／讀圖來源的到期併進 thesis 複查與節點重讀；`watch_decision` 只給假設型等沒有自己複查週期的等待 | 使用者 2026-09-24 看了試跑（成批 5～6 個、到 2027-10 累積 27 個）後選 B；五欄見 A7 |
 
 ---
 
@@ -819,7 +832,7 @@ Boundaries: 只讀
 | ④ 到期的語意／假設 watch 出現在 pq2 | `watch_decision` 項目 | 等待 registry → pq2 | `python -m engine_b.todo list` |
 | ⑤（A1／C1）一個 daily、每天一則 Discord、時間與 config 一致、triage 是其中一步 | Windows 工作清單、執行紀錄（含 triage 步驟的結果與 session id）、publisher receipt、自我比對結果 | 機制存在與否（同 Phase 0 的做法） | `schtasks /Query`；`library/private/heartbeat/daily_run_*.json` |
 
-②③④ 結案時若尚未自然發生：照 A3——測試證明機制、closeout 寫「已交付、未生效」、登記回查 date watch（④ 用 **2026-11-19**——1.6 之後最早的語意型到期是 `tech:cw_dfb_laser` 讀圖來源 5 條的 2026-11-17（11-18 轉 expired；偏差 #17）；原寫 2027-01-02；②③ 用結案日＋14 天），
+②③④ 結案時若尚未自然發生：照 A3——測試證明機制、closeout 寫「已交付、未生效」、登記回查 date watch（④ 依 A7 分兩半：thesis／讀圖來源的「不消失」（列進複查／重讀）最早 2026-11-18 → 回查 **2026-11-19**（`tech:cw_dfb_laser` 讀圖來源 5 條，偏差 #17）；假設型的 `watch_decision` 最早 2027-01-01 → 回查 **2027-01-02**（ew_0004、ew_0006）；②③ 用結案日＋14 天），
 **不得造假資料觸發**。本 Phase 沒有任何驗收數字是「幾檔通過某個 filter」。
 
 ## 13. Phase 1 結案

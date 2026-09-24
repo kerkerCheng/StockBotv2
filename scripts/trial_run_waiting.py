@@ -7,8 +7,8 @@
 
 只寫暫存副本（`--out`，預設 `library/private/trial_runs/waiting/`），真檔一個 byte 都不動（結尾有檢查）；
 thesis、讀圖 ledger、registry 設定照讀真的。每個模擬日：⑨ consume-fired（含追源到期結案）→ ⑩ todo sync
-（先對帳再收集）→ 心跳第 2、3 段的相關行。第一次出現 watch_decision 時模擬使用者的三種回答（續等／放棄／
-研究後判定觸及），看之後的日子長什麼樣子。**這是試跑不是驗收**：輸出不得當成「已生效」的證據（plan §0.3 #10）。
+（先對帳再收集）→ 心跳第 2、3 段的相關行。第一次出現「列了到期反證的 thesis 複查」與第一次出現 watch_decision（假設型）時各模擬一次使用者的回答
+（複查看過不改 memo；續等／放棄），看之後的日子長什麼樣子。**這是試跑不是驗收**：輸出不得當成「已生效」的證據（plan §0.3 #10）。
 不在任何無人值守步驟裡（它會換掉模組的時鐘）。
 
 用法：python scripts/trial_run_waiting.py [--until 2027-10-01] [--no-actions] [--out <目錄>]
@@ -90,7 +90,7 @@ def next_event_day(after: date, until: date) -> date | None:
                 days.add(date.fromisoformat(str(w["expires"])) + timedelta(days=1))
             except ValueError:
                 pass
-    for entry in dp.load_lifecycle().values():
+    for entry in (dp.load_lifecycle() or {}).values():
         if isinstance(entry, dict) and entry.get("next_check"):
             try:
                 days.add(date.fromisoformat(str(entry["next_check"])))
@@ -142,21 +142,32 @@ def run_day(day: date) -> dict:
     return report
 
 
-def simulate_user(pool_items: list[tuple], day: date) -> list[str]:
-    """第一次出現 watch_decision 的那天，模擬使用者對前三個編號的三種回答。"""
+def simulate_user(day: date, acted: set[str]) -> list[str]:
+    """模擬使用者（設計 B）：第一次出現「列了到期反證的 thesis 複查」→ drop（看過、memo 不改）；
+    第一次出現 watch_decision（假設型）→ 第一個續等一季、第二個放棄。"""
     pool = todo.load()
-    open_decisions = [i for i in pool["items"] if i["type"] == "watch_decision" and not i.get("resolved_at")]
+    open_items = [i for i in pool["items"] if not i.get("resolved_at")]
     notes = []
-    actions = [("pending", {"until": (day + timedelta(days=90)).isoformat(), "reason": "試跑：續等一季"}),
-               ("drop", {"reason": "試跑：放棄"}),
-               ("go", {"receipt": "outcome:touched;report:docs/reports/2026-09-24-phase1-baseline.md",
-                       "quote": "（試跑用的假原文）", "reason": "試跑：研究後判定觸及"})]
-    for item, (verb, kwargs) in zip(open_decisions, actions):
-        try:
-            done = todo.resolve(pool, item["n"], verb, **kwargs)
-            notes.append(f"[{item['n']}] {verb} → resolution={done['resolution']}｜{item['title'][:60]}")
-        except todo.TodoError as exc:
-            notes.append(f"[{item['n']}] {verb} ✗ {exc}")
+    if "review" not in acted:
+        reviews = [i for i in open_items if i["type"] == "thesis_lifecycle" and i.get("disproof_watch_ids")]
+        if reviews:
+            acted.add("review")
+            for item in reviews:
+                done = todo.resolve(pool, item["n"], "drop", reason="試跑：看過、memo 不改")
+                notes.append(f"[{item['n']}] thesis 複查 drop → {done['resolution']}（涵蓋 {len(item['disproof_watch_ids'])} 條）"
+                             f"｜{item['title'][:70]}")
+    if "decision" not in acted:
+        decisions = [i for i in open_items if i["type"] == "watch_decision"]
+        if decisions:
+            acted.add("decision")
+            actions = [("pending", {"until": (day + timedelta(days=90)).isoformat(), "reason": "試跑：續等一季"}),
+                       ("drop", {"reason": "試跑：放棄"})]
+            for item, (verb, kwargs) in zip(decisions, actions):
+                try:
+                    done = todo.resolve(pool, item["n"], verb, **kwargs)
+                    notes.append(f"[{item['n']}] {verb} → {done['resolution']}｜{item['title'][:70]}")
+                except todo.TodoError as exc:
+                    notes.append(f"[{item['n']}] {verb} ✗ {exc}")
     todo.save(pool)
     return notes
 
@@ -179,7 +190,7 @@ def main() -> int:
     out_lines = [f"# 試跑：等待系統快轉（起點 {SIM[0]}，到 {until}；真實資料的暫存副本）", ""]
     baseline = run_day(SIM[0])
     out_lines += [f"## {baseline['day']}（起點，今天）", *[f"- {ln}" for ln in baseline["heartbeat"]], ""]
-    acted = args.no_actions
+    acted: set[str] = {"review", "decision"} if args.no_actions else set()
     day = SIM[0]
     while True:
         nxt = next_event_day(day, until)
@@ -195,9 +206,8 @@ def main() -> int:
         for n, t, title in rep["new_items"]:
             out_lines.append(f"- 新編號 [{n}] {t}：{title}")
         out_lines += [f"- 心跳｜{ln}" for ln in rep["heartbeat"]]
-        if not acted and any(t == "watch_decision" for _n, t, _ in rep["new_items"]):
-            out_lines += [f"- 模擬使用者｜{ln}" for ln in simulate_user(rep["new_items"], day)]
-            acted = True
+        if len(acted) < 2:
+            out_lines += [f"- 模擬使用者｜{ln}" for ln in simulate_user(day, acted)]
         out_lines.append("")
     # 真檔一個 byte 都不能動
     for rel, blob in real.items():

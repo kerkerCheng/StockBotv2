@@ -184,10 +184,20 @@ def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]
             reasons.append(f"客戶 {','.join(woken.get('shared_entities') or watch.get('entities') or [])}"
                            f" 出了新文件 {woken.get('lead_id')}")
         judgment = watch.get("judgment") or {}
-        if (watch.get("node") == node and str(watch.get("source_ref") or "").startswith("reading:")
-                and judgment.get("touches") == "yes" and not judgment.get("handled")):
-            reasons.append(f"反證被判觸及：{str(watch.get('condition') or '')[:40]}")
+        if watch.get("node") != node or not str(watch.get("source_ref") or "").startswith("reading:"):
+            continue
+        if judgment.get("touches") == "yes" and not judgment.get("handled"):
+            reasons.append(f"反證被判觸及：{ew_label(watch.get('condition'))}")
+        elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
+            # 設計 B（Phase 1 Step 1.7）：讀圖來源的條件到期不鑄 pq2——重讀就是它的重問
+            reasons.append(f"反證等滿一輪都沒發生：{ew_label(watch.get('condition'))}（重讀時換新一批）")
     return reasons
+
+
+def ew_label(text: Any) -> str:
+    from engine_b.event_watch import condition_label
+
+    return condition_label(text)
 
 
 def known_nodes(*, directory: Path | None = None) -> list[str]:

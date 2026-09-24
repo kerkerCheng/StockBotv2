@@ -635,9 +635,15 @@ def _disproof_lines() -> list[str]:
                                  coverage=coverage, frozen_history=disproof.frozen_history_count())
     unreachable = "未算" if c["unreachable"] is None else c["unreachable"]
     frozen = "讀不到" if c["frozen_history"] is None else c["frozen_history"]
-    lines = [f"反證：在盯 {c['watching']}（其中叫不醒 {unreachable}）｜**觸及待處置 {c['touched_pending']}**"
-             f"｜到期待決 {c['expired_pending']}（在 pq2 等續等／放棄）"
-             f"｜未盯 {c['unwatched']}（v1 讀圖散文 {c['v1_prose_readings']} 份不可機械數；凍結歷史 {frozen} 不盯）"]
+    waits = f"（等：{'、'.join(c['touched_waits_on'])}）" if c.get("touched_waits_on") else ""
+    orphan = f"｜⚠ 孤兒觸及 {c['orphan_touched']}（來源已不在預期裡）" if c.get("orphan_touched") else ""
+    lines = []
+    if c.get("lifecycle_unreadable"):
+        lines.append("⚠ **thesis/lifecycle.json 讀不到**——thesis 反證沒算（不是 0），對帳本輪不動任何等待；"
+                     "修好檔案（`python -m json.tool thesis/lifecycle.json`）")
+    lines.append(f"反證：在盯 {c['watching']}（其中叫不醒 {unreachable}）｜**觸及待處置 {c['touched_pending']}**{waits}"
+                 f"｜到期待複查 {c['expired_pending']}（併進 thesis 複查／節點重讀）"
+                 f"｜未盯 {c['unwatched']}{orphan}（v1 讀圖散文 {c['v1_prose_readings']} 份不可機械數；凍結歷史 {frozen} 不盯）")
     mismatch = c["thesis_sidecar_mismatch"]
     if mismatch:
         lines.append(f"⚠ **thesis sidecar 與 memo 不符 {len(mismatch)}**：{'、'.join(mismatch)}——memo 在 sidecar 產生之後"
@@ -782,9 +788,8 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     expired = sum(1 for w in watches if str(w.get("status") or "") == "expired")
     # Phase 1 Step 1.7（A3）：到期不是丟——每筆 expired 落在某個處置裡；沒落的（多半是 A3 之前的歷史到期）照數
     exp = event_watch.expiry_counters({"watches": watches})
-    # ⚠ R2-b 重審 NO_GO 回滾（2026-09-24）：watch_decision 收集器停登記，這一格的到期**不會**進 pq2——標籤照實寫
-    line = (f"watch 到期 {expired}（語意／假設型到期未處置 {exp['expiry_decision_pending']}"
-            f"〔watch_decision 收集器停用中，不進 pq2〕｜"
+    line = (f"watch 到期 {expired}（待決 watch_decision {exp['expiry_decision_pending']}｜"
+            f"等 thesis 複查 {exp['expiry_thesis_review_pending']}｜等重讀 {exp['expiry_reread_pending']}｜"
             f"追源到期結案 {exp['trace_expired_closed']}（今日 {exp['trace_expired_closed_today']}）｜"
             f"未處置 {exp['expiry_unresolved']}）｜事件監看總數 {len(watches)}")
     # ROADMAP Phase 6（D15，2026-09-17 使用者核准 A 案）：**沒有到期的等待**要自己出現。
