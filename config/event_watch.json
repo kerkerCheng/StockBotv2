@@ -8,10 +8,34 @@
     "預設 120＝一個財報週期 90 天＋緩衝：最常見的等待是『下一份季報會不會揭露』，",
     "等滿一輪還沒出現就該讓人重新決定續等／改輪詢／放棄，而不是無聲續等。",
     "這個到期日是 trace 併入 registry 的核心收益——consumed-marker 防的是重複喚醒，",
-    "但它沒有兜底，用完即靜默沉底（實測 10/50 已不可能再醒卻仍顯示可喚醒）。"
+    "但它沒有兜底，用完即靜默沉底（實測 10/50 已不可能再醒卻仍顯示可喚醒）。",
+    "── 語意條件 watch 與預篩（Phase 1 Step 1.4；G7、C2、C7）──",
+    "semantic_screen_daily_limit＝daily 的語意預篩每天最多標幾筆（⑩a 選取、⑩b claude -p 零工具提議、⑩c 程式驗引文後寫 semantic_flag）。",
+    "預篩**只標旗、不改 watch 狀態**，判定一律在互動 session（event_watch semantic-queue → judge）；0＝關閉（退化路徑），",
+    "心跳照印「未檢 N」。額度由 CLI 截斷、扣掉**當日**已寫的標旗數（手動重跑不得超過 G7 的每日硬上限），截掉的印出來。",
+    "沒有全文 fetcher 的來源不佔名額（只計數）；全文由程式抓（EDGAR 主文件、MFN 公告頁），不拿標題充數。",
+    "prescreen_text_max_chars＝塞進 prompt 的全文上限（超過就截斷並在文字裡明寫、計數）。EDGAR 全文先從封面起算",
+    "（inline XBRL 的隱藏表頭實測 8.6k–33.9k 字）；8-K／6-K 主文件常只是封面、實質在 EX-99——「看不出」會偏高，三種 verdict 分開數。",
+    "ownership_forms_excluded＝語意 watch 不比對的持股申報 form（EDGAR lead 七成以上是 Form 4）；比對 lead 的 form_type。"
   ],
   "enabled": true,
   "sweep_budget_per_run": 2,
   "min_recheck_days": 3,
-  "trace_ttl_days": 120
+  "trace_ttl_days": 120,
+  "semantic_screen_daily_limit": 10,
+  "prescreen_text_max_chars": 60000,
+  "ownership_forms_excluded": [
+    "3",
+    "3/A",
+    "4",
+    "4/A",
+    "5",
+    "5/A",
+    "144",
+    "144/A",
+    "SC 13D",
+    "SC 13D/A",
+    "SC 13G",
+    "SC 13G/A"
+  ]
 }

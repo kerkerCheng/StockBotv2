@@ -13,11 +13,12 @@ import sys as _sys
 
 import hashlib
 import json
+import re
 import os
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterable, Mapping
 from urllib.parse import urlsplit, urlunsplit
 
 from access_failures import FAILURE_CLASSES
@@ -66,6 +67,91 @@ HARVEST_FAILURE_CLASSES: frozenset[str] = FAILURE_CLASSES
 
 class LeadStateError(ValueError):
     """非法狀態轉移或未知 lead。"""
+
+
+#: lead 的來源宣告（Phase 1 Step 1.4；C2）：「這份文件是誰發的、是不是正式文件」在抓取那一刻就知道，
+#: 由 harvest 的 feed 宣告（EDGAR／MOPS 由程式固定為 primary、公司由 ticker 經 registry 解析）寫成
+#: lead **自己的頂層欄位**——不寫進 `entities`（那一欄會被兩條既有路徑只從文字重算並覆寫）、
+#: **不看 triage 的 tier**（未 triage 一律不算一手、tier 是 LLM 給的、Form 4 因機械 FILTER 全帶 tier=1）。
+#: 語意 watch（`semantic_condition`）只認這三欄；其他 kind 的判準一個字都不動。
+SOURCE_CLASSES: tuple[str, ...] = ("primary", "secondary")
+
+
+class LeadProvenanceError(ValueError):
+    """來源宣告不合法（source_class 不在字彙內、company_id 不是 registry 解析得到的 co:*）。
+
+    ⚠ 刻意是 `ValueError` 的子類，所以 harvest 的 `_register_all` 必須**在**泛用的
+    `except ValueError: continue` 之前單獨接它——否則整批 lead 會被靜默跳過（INV-3）。"""
+
+
+def validate_provenance(*, source_class: str | None, company_id: str | None,
+                        form_type: str | None) -> dict[str, str]:
+    out: dict[str, str] = {}
+    if source_class is not None:
+        if source_class not in SOURCE_CLASSES:
+            raise LeadProvenanceError(f"source_class 必須是 {SOURCE_CLASSES} 之一：{source_class!r}")
+        out["source_class"] = source_class
+    if company_id is not None:
+        from identity.registry import get_registry
+
+        if not str(company_id).startswith("co:") or not get_registry().has_company(str(company_id)):
+            raise LeadProvenanceError(f"company_id 不是 registry 解析得到的 co:*（INV-1，不憑名字猜）：{company_id!r}")
+        out["company_id"] = str(company_id)
+    if form_type is not None and str(form_type).strip():
+        out["form_type"] = str(form_type).strip()
+    return out
+
+
+#: EDGAR lead 標題 `<TICKER> <FORM> filed <YYYY-MM-DD>[ [accession 末 6 碼]]`（`crons/harvest_leads.filings_to_leads`）。
+#: FORM 可能帶空白（`SC 13G/A`），所以用非貪婪比對到 ` filed ` 為止。
+_EDGAR_TITLE = re.compile(r"^(?P<ticker>\S+) (?P<form>.+?) filed \d{4}-\d{2}-\d{2}")
+
+
+def edgar_form_from_title(title: str | None) -> str | None:
+    """舊 EDGAR lead 沒存 `form_type`（harvest item 有、`register` 以前沒收）——回填時由標題取回。"""
+    match = _EDGAR_TITLE.match(str(title or "").strip())
+    return match.group("form").strip() if match else None
+
+
+def backfill_provenance(store: dict[str, Any], *, feeds: Iterable[Mapping[str, Any]]) -> dict[str, int]:
+    """替既有 lead 補來源宣告（Phase 1 Step 1.4；C2）。**冪等**：只補缺的欄位、不覆寫已有值。
+
+    依據：feed 的宣告（`crons/harvest_config.json`）；`edgar:` 與 `mops:` 天生一手、公司由 ticker 經 registry
+    解析（查不到留空，不猜；INV-1），EDGAR 另由標題取回 `form_type`；`x:` 為二手。其他來源（weekly、decompose、
+    手動…）沒有宣告可依，**不補**——它們不是 harvest 的 feed。回傳「每個來源補了幾筆」。
+    """
+    from identity.registry import get_registry
+
+    registry = get_registry()
+    declared = {str(f.get("source")): f for f in feeds if isinstance(f, Mapping)}
+    counts: dict[str, int] = {}
+    for lead in (store.get("leads") or {}).values():
+        source = str(lead.get("source") or "")
+        form = None
+        if source in declared:
+            klass, company = declared[source].get("source_class"), declared[source].get("company_id")
+            bucket = source
+        elif source.startswith("edgar:"):
+            klass, company = "primary", registry.company_id_for_ticker(source.split(":", 1)[1])
+            form = edgar_form_from_title(lead.get("title"))
+            bucket = "edgar:*"
+        elif source.startswith("mops:"):
+            klass, company = "primary", registry.company_id_for_ticker(source.split(":", 1)[1])
+            bucket = "mops:*"
+        elif source.startswith("x:"):
+            klass, company = "secondary", None
+            bucket = "x:*"
+        else:
+            continue
+        provenance = validate_provenance(source_class=klass, company_id=company, form_type=form)
+        changed = False
+        for key, value in provenance.items():
+            if key not in lead:
+                lead[key] = value
+                changed = True
+        if changed:
+            counts[bucket] = counts.get(bucket, 0) + 1
+    return counts
 
 
 def _now() -> str:
@@ -169,8 +255,15 @@ def register(
     media: list[dict[str, Any]] | None = None,
     published_at: str | None = None,
     seen_at: str | None = None,
+    source_class: str | None = None,
+    company_id: str | None = None,
+    form_type: str | None = None,
 ) -> tuple[str, bool]:
     """以 URL-hash upsert 一筆 lead；重抓只補內容，不覆寫狀態／triage。
+
+    `source_class`／`company_id`／`form_type`（Phase 1 Step 1.4）：來源宣告，寫成頂層欄位；
+    既有 lead 只補**缺的**，不覆寫已有值（冪等，與回填同一條規則）。驗證失敗 raise
+    `LeadProvenanceError`——呼叫端必須單獨接（見該類別的說明）。
 
     回傳 (lead_id, is_new)。這是 harvest 去重的唯一入口——同一 URL 重複
     harvest 只註冊一次，狀態不倒退。X 等可取得全文的來源以 raw_text 保存
@@ -183,8 +276,12 @@ def register(
     leads = store["leads"]
     clean_title = (title or "").strip()
     clean_media = _clean_media(media)
+    provenance = validate_provenance(source_class=source_class, company_id=company_id,
+                                     form_type=form_type)
     if lead_id in leads:
         lead = leads[lead_id]
+        for key, value in provenance.items():
+            lead.setdefault(key, value)
         enriched = False
         old_title = str(lead.get("title") or "")
         if (
@@ -231,6 +328,7 @@ def register(
         lead["raw_text"] = str(raw_text)
     if media is not None:
         lead["media"] = clean_media
+    lead.update(provenance)
     # 具名標的是 lead 之間唯一的確定性關聯鍵（URL hash 只認同一篇文章）。
     lead["entities"] = _entities_for(lead)
     lead["themes"] = _themes_for(lead)
@@ -1141,8 +1239,12 @@ def record_run(
     run_at: str | None = None,
     failure_class: str | None = None,
     cost_usd: float | None = None,
+    provenance_errors: int | None = None,
 ) -> None:
-    """記一次 harvest run 結果。parse_failed／fetch_failed 都必須誠實入帳
+    """記一次 harvest run 結果。
+
+    `provenance_errors`（Phase 1 Step 1.4）：這一輪有幾筆來源宣告驗證失敗（lead 仍登記、只是沒帶宣告）。
+    只有非零才寫——它必須在 harvest log 上現形，不得被 `_register_all` 的泛用 ValueError 吞掉（INV-3）。parse_failed／fetch_failed 都必須誠實入帳
     （plan R4：解析失敗 ≠ 無新文）。
 
     `cost_usd`（2026-09-17，ROADMAP Phase 3）：這一輪付了多少錢。**只有付費來源會帶**，
@@ -1165,6 +1267,8 @@ def record_run(
         entry["failure_class"] = failure_class
     if cost_usd is not None:
         entry["cost_usd"] = round(float(cost_usd), 4)
+    if provenance_errors:
+        entry["provenance_errors"] = int(provenance_errors)
     store["harvest_log"].append(entry)
 
 

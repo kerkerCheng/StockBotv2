@@ -258,7 +258,7 @@ def _fired_watch_summary() -> dict[str, list[dict]]:
     讀不到 registry 時回三個空 list——**這是 fail-soft 不是 fail-closed**，因為 drain 的主責是
     列研究工作；但 audit 的 QueueSegments 會用同一份資料 fail closed，兩邊不會同時安靜。
     """
-    out: dict[str, list[dict]] = {"lead": [], "pq2": [], "hypothesis": []}
+    out: dict[str, list[dict]] = {"lead": [], "pq2": [], "hypothesis": [], "disproof": []}
     try:
         from engine_b import event_watch as ew
 
@@ -272,6 +272,9 @@ def _fired_watch_summary() -> dict[str, list[dict]]:
             out["pq2"].append(watch)
         elif watch.get("wake_lead"):
             out["lead"].append(watch)
+        elif watch.get("disproof_ref"):
+            # 語意條件醒來＝待檢（Phase 1 Step 1.4）：不是假設對照，沒有 fact 可印——判定在互動 session
+            out["disproof"].append(watch)
         else:
             out["hypothesis"].append(watch)
     return out
@@ -283,7 +286,8 @@ def _print_segment_counters(pending_count: int, fired: dict[str, list[dict]]) ->
         f"段0 pending 分流 {pending_count}｜段1 fired 未消化："
         f"lead 型 {len(fired['lead'])}（→ `engine_b.cli consume-fired`）／"
         f"pq2 型 {len(fired['pq2'])}（→ `engine_b.todo sync`）／"
-        f"假設對照 {len(fired['hypothesis'])}（→ 對照後 `engine_b.event_watch consume <id>`）"
+        f"假設對照 {len(fired['hypothesis'])}（→ 對照後 `engine_b.event_watch consume <id>`）／"
+        f"反證待檢 {len(fired.get('disproof') or [])}（→ `engine_b.event_watch semantic-queue` → `judge`）"
     )
     for watch in fired["hypothesis"]:
         fact = str(watch.get("fact") or "")[:70]
@@ -884,11 +888,22 @@ def _cmd_backfill_entities(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     entities = backfill_entities(store, rescan=args.rescan)
     themes = backfill_themes(store)
-    if not args.dry_run and (entities or themes):
+    provenance: dict[str, int] = {}
+    if args.provenance:
+        feeds = json.loads(HARVEST_CONFIG.read_text(encoding="utf-8")).get("feeds") or []
+        provenance = leads.backfill_provenance(store, feeds=feeds)
+    if not args.dry_run and (entities or themes or provenance):
         leads.save(store, args.leads)
     verb = "將更新" if args.dry_run else "已更新"
     print(f"{verb} entities {entities} 筆、themes {themes} 筆")
+    if args.provenance:
+        detail = "、".join(f"{k} {v}" for k, v in sorted(provenance.items())) or "無"
+        print(f"{verb}來源宣告（source_class／company_id／form_type）：{detail}")
     return 0
+
+
+#: harvest 的來源設定（feed 宣告的唯一來源；回填與 harvest 讀同一份）。
+HARVEST_CONFIG = Path(__file__).resolve().parent.parent / "crons" / "harvest_config.json"
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1070,6 +1085,10 @@ def build_parser() -> argparse.ArgumentParser:
         help="替既有 lead 補上具名標的標記（一次性）",
     )
     p_backfill.add_argument("--dry-run", action="store_true")
+    p_backfill.add_argument(
+        "--provenance", action="store_true",
+        help="另補來源宣告（source_class／company_id／EDGAR form_type；Phase 1 Step 1.4），冪等、只補缺的",
+    )
     p_backfill.add_argument(
         "--rescan",
         action="store_true",

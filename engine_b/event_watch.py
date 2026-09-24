@@ -33,6 +33,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import tempfile
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -46,7 +47,16 @@ WATCH_KINDS = frozenset({
     "entity_filing_signal",
     "fact_verification",
     "related_entity_signal",
+    "semantic_condition",
 })
+
+#: 語意條件 watch（Phase 1 Step 1.4；G7、C2）：thesis／讀圖寫下的反證或確認條件，**原文逐字**。
+#: T0 只做「一手文件、實體有交集、時間在建立之後」的機械比對——醒來＝待檢，**判定在互動 session**
+#: （`semantic-queue` → `judge`）；daily 的預篩只標旗、不改狀態。喚醒目標恆為 `disproof_ref`
+#: （＝`source_ref`，指回 memo 條目或讀圖）。「一手」與「是誰的文件」讀 lead 的來源宣告
+#: （`source_class`／`company_id`／`form_type`，harvest 登記當下寫的），**不看 triage 的 tier 或 go**。
+SEMANTIC_KIND = "semantic_condition"
+SEMANTIC_MIN_CONDITION_CHARS = 20
 
 # 需要 tier-1 一手來源才觸發的 kind：「等某實體的正式文件」不該被任何一則提到該實體的
 # 推文觸發。`related_entity_signal` 刻意不在此列——它等的就是「同一標的有任何新動靜」。
@@ -78,21 +88,72 @@ def _today() -> date:
 DEFAULT_TRACE_TTL_DAYS = 120
 
 
+#: 持股申報（Form 3／4／5、144、SC 13D／13G 及其修正）：語意 watch 一律不比對——EDGAR lead 七成以上是它們，
+#: 大公司的 watch 會被數十筆 Form 4 淹沒（2026-09-09 NVDA／TSM 同型事故）。config 缺席時用這份。
+DEFAULT_OWNERSHIP_FORMS = ("3", "3/A", "4", "4/A", "5", "5/A", "144", "144/A",
+                           "SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A")
+
+
 def load_config() -> dict[str, Any]:
-    """T2 力度旋鈕。檔案缺席時 fail-soft 到保守預設（sweep 停用）。"""
+    """T2 力度旋鈕。檔案缺席時 fail-soft 到保守預設（sweep 停用、預篩 0）。"""
     try:
         cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return {
             "enabled": False, "sweep_budget_per_run": 0, "min_recheck_days": 3,
             "trace_ttl_days": DEFAULT_TRACE_TTL_DAYS,
+            "semantic_screen_daily_limit": 0, "prescreen_text_max_chars": 20000,
+            "ownership_forms_excluded": list(DEFAULT_OWNERSHIP_FORMS),
         }
     return {
         "enabled": bool(cfg.get("enabled", True)),
         "sweep_budget_per_run": int(cfg.get("sweep_budget_per_run", 2)),
         "min_recheck_days": int(cfg.get("min_recheck_days", 3)),
         "trace_ttl_days": int(cfg.get("trace_ttl_days", DEFAULT_TRACE_TTL_DAYS)),
+        "semantic_screen_daily_limit": int(cfg.get("semantic_screen_daily_limit", 0)),
+        "prescreen_text_max_chars": int(cfg.get("prescreen_text_max_chars", 20000)),
+        "ownership_forms_excluded": [str(f) for f in cfg.get("ownership_forms_excluded",
+                                                             DEFAULT_OWNERSHIP_FORMS)],
     }
+
+
+def parse_published(raw: Any) -> date | None:
+    """lead 的 `published_at` → 日期。**兩種格式**（第 2 輪 N-c）：RSS feed 是 RFC 822
+    （`Tue, 30 Jun 2026 23:15:00 +0000`），EDGAR／MOPS 是 ISO 日期。**不得用字串比較**——
+    `"Tue, …" > "2026-…"` 恆真，那道檢查會靜默失效。解析不到回 None（呼叫端計數，不猜）。"""
+    text = str(raw or "").strip()
+    if not text:
+        return None
+    try:
+        return date.fromisoformat(text[:10])
+    except ValueError:
+        pass
+    try:
+        from email.utils import parsedate_to_datetime
+
+        stamp = parsedate_to_datetime(text)
+    except (TypeError, ValueError, IndexError):
+        return None
+    if stamp is None:
+        return None
+    if stamp.tzinfo is not None:
+        stamp = stamp.astimezone(timezone.utc)
+    return stamp.date()
+
+
+_CONDITION_DATE = re.compile(
+    r"(?P<y>20\d{2})\s*[-/年]\s*(?P<m>\d{1,2})\s*[-/月]\s*(?P<d>\d{1,2})")
+
+
+def condition_dates(text: str) -> list[date]:
+    """條件原文裡寫出的完整日期（`2027-06-30`、`2027/6/30`、`2027 年 6 月 30 日`）——到期不得早於它們。"""
+    out: list[date] = []
+    for match in _CONDITION_DATE.finditer(str(text or "")):
+        try:
+            out.append(date(int(match["y"]), int(match["m"]), int(match["d"])))
+        except ValueError:
+            continue
+    return out
 
 
 def ensure_trace_watch(
@@ -180,6 +241,14 @@ def add_watch(
     consumed_entities: Iterable[str] = (),
     note: str = "",
     created_at: str | None = None,
+    disproof_ref: str = "",
+    condition: str = "",
+    source_ref: str = "",
+    quote_locator: str = "",
+    check_frequency: str = "",
+    action_48h: str = "",
+    node: str = "",
+    today: date | None = None,
 ) -> dict[str, Any]:
     if kind not in WATCH_KINDS:
         raise EventWatchError(f"未知 watch kind：{kind}（封閉字彙 {sorted(WATCH_KINDS)}）")
@@ -191,11 +260,17 @@ def add_watch(
         raise EventWatchError("kind=fact_verification 必須帶 fact")
     if not expires:
         raise EventWatchError("expires 必填——無限期等待會腐爛成事實（brainstorm 硬邊界）")
-    # 喚醒目標三選一（[321] 由二選一擴充）：pq2 編號（翻醒 waiting 項）、假設 id
-    # （fact-check 到點，agent 對照＋verify 後 consume）、或 lead id（追源線索排回 pq1）。
-    targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead)]
+    # 喚醒目標恰好擇一（[321] 由二選一擴充；Phase 1 Step 1.4 加 disproof_ref）：pq2 編號（翻醒 waiting 項）、
+    # 假設 id（fact-check 到點）、lead id（追源線索排回 pq1）、或反證來源（語意條件，指回 memo／讀圖）。
+    targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead), bool(disproof_ref)]
     if sum(targets) != 1:
-        raise EventWatchError("wake_pq2／hypothesis_ref／wake_lead 必須恰好擇一")
+        raise EventWatchError("wake_pq2／hypothesis_ref／wake_lead／disproof_ref 必須恰好擇一")
+    if (kind == SEMANTIC_KIND) != bool(disproof_ref):
+        raise EventWatchError("semantic_condition 的喚醒目標必須是 disproof_ref，其他 kind 不得用它")
+    if kind == SEMANTIC_KIND:
+        _validate_semantic(condition=condition, entities=list(entities), source_ref=source_ref,
+                           disproof_ref=disproof_ref, check_frequency=check_frequency,
+                           action_48h=action_48h, expires=expires, today=today or _today())
     watch = {
         "watch_id": f"ew_{len(data['watches']) + 1:04d}_{_today().isoformat()}",
         "created_at": created_at or _now(),
@@ -222,8 +297,49 @@ def add_watch(
         "status": "active",
         "woken_by": None,
     }
+    if kind == SEMANTIC_KIND:
+        watch.update({
+            "disproof_ref": disproof_ref,
+            "condition": condition,
+            "source_ref": source_ref,
+            "quote_locator": quote_locator,
+            "check_frequency": check_frequency,
+            "action_48h": action_48h,
+            "node": node or None,
+        })
     data["watches"].append(watch)
     return watch
+
+
+def _validate_semantic(*, condition: str, entities: list[str], source_ref: str, disproof_ref: str,
+                       check_frequency: str, action_48h: str, expires: str, today: date) -> None:
+    """L7 三件套、實體（INV-1）、到期不早於條件自己寫的日期——缺一拒收。"""
+    if len(str(condition or "").strip()) < SEMANTIC_MIN_CONDITION_CHARS:
+        raise EventWatchError(f"condition 必須是原文逐字、至少 {SEMANTIC_MIN_CONDITION_CHARS} 字")
+    if not str(check_frequency or "").strip() or not str(action_48h or "").strip():
+        raise EventWatchError("L7 三件套缺件：check_frequency 與 action_48h 都必填")
+    if not (source_ref.startswith("thesis:") or source_ref.startswith("reading:")) or "#" not in source_ref:
+        raise EventWatchError("source_ref 必須是 thesis:<memo 路徑>#<n> 或 reading:<reading_id>#<n>")
+    if disproof_ref != source_ref:
+        raise EventWatchError("disproof_ref 必須等於 source_ref（喚醒時指回原文）")
+    companies = [e for e in entities if str(e).startswith("co:")]
+    if not companies:
+        raise EventWatchError("entities 至少要有一個 co:*——feed 的 lead 只帶 co:*，只寫 ticker 永遠叫不醒（第 2 輪 N-b）")
+    from identity.registry import get_registry
+
+    registry = get_registry()
+    unknown = [c for c in companies if not registry.has_company(c)]
+    if unknown:
+        raise EventWatchError(f"entities 有 registry 解析不到的 co:*（INV-1，不憑名字猜）：{unknown}")
+    try:
+        until = date.fromisoformat(str(expires))
+    except ValueError as exc:
+        raise EventWatchError(f"expires 不是 ISO 日期：{expires}") from exc
+    if until <= today:
+        raise EventWatchError("expires 必須晚於建立日")
+    written = condition_dates(condition)
+    if written and until < max(written):
+        raise EventWatchError(f"expires {until} 早於條件自己寫的日期 {max(written)}——不得早於核查點或催化劑")
 
 
 def _lead_stamp(lead: Mapping[str, Any]) -> str:
@@ -243,6 +359,7 @@ def check_watches(
     *,
     leads: Mapping[str, Any] | None = None,
     today: date | None = None,
+    stats: dict[str, int] | None = None,
 ) -> list[dict[str, Any]]:
     """跑 T0＋T1 檢查，回傳觸發清單（呼叫端負責喚醒 pq2 與存檔）。
 
@@ -273,6 +390,16 @@ def check_watches(
                 watch["status"] = "fired"
                 watch["woken_by"] = {"kind": "date", "at": _now()}
                 fired.append(dict(watch))
+        elif kind == SEMANTIC_KIND and leads:
+            hit = _semantic_matches(watch, leads, stats=stats)
+            if not hit:
+                continue
+            lead_id, shared = hit[0]
+            watch["status"] = "fired"
+            watch["woken_by"] = {"kind": kind, "lead_id": lead_id, "shared_entities": shared,
+                                 "at": _now(), "disproof_ref": watch.get("disproof_ref")}
+            watch["consumed_leads"] = sorted(set(watch.get("consumed_leads") or ()) | {lid for lid, _ in hit})
+            fired.append(dict(watch))
         elif kind in ENTITY_MATCH_KINDS and leads:
             targets = set(watch.get("entities") or ())
             created = str(watch.get("created_at") or "")
@@ -347,6 +474,44 @@ def check_watches(
     return fired
 
 
+def _semantic_matches(watch: Mapping[str, Any], leads: Mapping[str, Any], *,
+                      stats: dict[str, int] | None = None) -> list[tuple[str, list[str]]]:
+    """語意 watch 的 T0：①來源宣告 primary（**不看 triage**）②不是持股申報 ③實體有交集
+    ④`first_seen` 晚於 watch 建立、且 `published_at`（有值時）不早於建立日——EDGAR `lookback_count`
+    回補與新 feed 首跑會把舊文件以今天的 `first_seen` 登記 ⑤不在 consumed_leads、不是追源重排。
+    `published_at` 解析不到就只用 `first_seen` 並計數 `published_at_unparsed`（INV-3）。"""
+    from engine_b.entities import lead_entities
+
+    excluded = {str(f).strip().upper() for f in load_config()["ownership_forms_excluded"]}
+    targets = set(watch.get("entities") or ())
+    created = str(watch.get("created_at") or "")
+    try:
+        created_day = date.fromisoformat(created[:10])
+    except ValueError:
+        created_day = None
+    consumed = set(watch.get("consumed_leads") or ())
+    out: list[tuple[str, list[str]]] = []
+    for lead_id, lead in leads.items():
+        if lead_id in consumed or _is_trace_requeue(lead):
+            continue
+        if lead.get("source_class") != "primary":
+            continue
+        if str(lead.get("form_type") or "").strip().upper() in excluded:
+            continue
+        if str(lead.get("first_seen") or "") <= created:
+            continue
+        raw_published = lead.get("published_at")
+        published = parse_published(raw_published)
+        if raw_published and published is None and stats is not None:
+            stats["published_at_unparsed"] = stats.get("published_at_unparsed", 0) + 1
+        if published is not None and created_day is not None and published < created_day:
+            continue
+        shared = sorted(targets & lead_entities(lead))
+        if shared:
+            out.append((lead_id, shared))
+    return out
+
+
 def _is_trace_requeue(lead: Mapping[str, Any]) -> bool:
     """這則 lead 目前的 triage receipt 是不是由追源重排寫的（而非原始 PASS）。
 
@@ -417,10 +582,29 @@ def is_stalled(watch: Mapping[str, Any]) -> bool:
     return not (entities - consumed)
 
 
-def counters(data: Mapping[str, Any]) -> dict[str, int]:
-    """常駐計數器（L14：防呆要自己出現）。"""
+def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None) -> dict[str, int | None]:
+    """常駐計數器（L14：防呆要自己出現）。
+
+    `coverage`（Phase 1 Step 1.4）：有一手來源會產出 lead 的實體集合（`primary_coverage()`）。
+    沒給就不算 `semantic_unreachable`，回 None——「沒算」不是 0（INV-3）。"""
 
     active = [w for w in data["watches"] if w.get("status") == "active"]
+    semantic = [w for w in data["watches"] if w.get("kind") == SEMANTIC_KIND]
+    watching = [w for w in semantic if w.get("status") in ("active", "fired")]
+    pending = [w for w in semantic if w.get("status") == "fired"]
+    extra: dict[str, int | None] = {
+        "semantic_active": sum(1 for w in semantic if w.get("status") == "active"),
+        # 醒了、還沒判定＝待檢（有沒有預篩標旗都算；預篩只標旗、不減少未檢）
+        "semantic_pending_check": len(pending),
+        "semantic_flagged": sum(1 for w in pending if flag_for_current(w) is not None),
+        "wake_disproof": sum(1 for w in active if w.get("disproof_ref")),
+        "semantic_unreachable": (None if coverage is None else
+                                 sum(1 for w in watching if not is_reachable(w, coverage))),
+    }
+    return {**_base_counters(data, active), **extra}
+
+
+def _base_counters(data: Mapping[str, Any], active: list[Mapping[str, Any]]) -> dict[str, int]:
     return {
         "active": len(active),
         "t1_date": sum(1 for w in active if w["kind"] == "date"),
@@ -476,6 +660,110 @@ def reactivate(data: dict[str, Any], watch_id: str, *, note: str | None = None) 
     raise EventWatchError(f"沒有待消化的 fired watch：{watch_id}")
 
 
+def flag_for_current(watch: Mapping[str, Any]) -> dict[str, Any] | None:
+    """預篩標旗——只算**這一次叫醒它的那則 lead** 的標旗（reactivate 後被別則叫醒要重新標）。"""
+    flag = watch.get("semantic_flag")
+    woken = watch.get("woken_by") or {}
+    if isinstance(flag, dict) and flag.get("lead_id") and flag.get("lead_id") == woken.get("lead_id"):
+        return flag
+    return None
+
+
+#: 預篩 verdict 的封閉字彙（`crons/prescreen_schema.json` 的 enum 由測試斷言等於它）。
+PRESCREEN_VERDICTS = ("likely_touches", "likely_unrelated", "cannot_tell")
+
+
+def flag(data: dict[str, Any], watch_id: str, *, lead_id: str, verdict: str,
+         quote: str | None = None, session_id: str | None = None) -> dict[str, Any]:
+    """預篩標旗（C7；只由 ⑩c `prescreen-apply` 呼叫）：**只寫 `semantic_flag`，不改狀態**（G7：只標旗不判定）。"""
+    if verdict not in PRESCREEN_VERDICTS:
+        raise EventWatchError(f"verdict 必須是 {PRESCREEN_VERDICTS} 之一：{verdict!r}")
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if watch.get("kind") != SEMANTIC_KIND or watch.get("status") != "fired":
+            raise EventWatchError(f"只能對 fired 的語意 watch 標旗：{watch_id}")
+        if (watch.get("woken_by") or {}).get("lead_id") != lead_id:
+            raise EventWatchError(f"{watch_id} 不是被 {lead_id} 叫醒的")
+        if verdict == "likely_touches" and not str(quote or "").strip():
+            raise EventWatchError("likely_touches 必須附文件逐字引文（L18）")
+        entry = {"lead_id": lead_id, "at": _now(), "verdict": verdict, "quote": quote,
+                 "session_id": session_id}
+        watch["semantic_flag"] = entry
+        return entry
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def judge(data: dict[str, Any], watch_id: str, *, touches: bool, note: str,
+          quote: str | None = None) -> dict[str, Any]:
+    """互動 session 的判定（G7：判定只在互動）。
+
+    - `touches=False` → `reactivate`（note 必填）：觸發 lead 已在 consumed_leads，不會再叫醒；到期仍由 expires 收斂。
+    - `touches=True` → consume＋寫 `judgment`（`quote`＝文件逐字，**必填**；L18：標籤要指得回原文）。
+      **等待不在這裡消失**：thesis 來源的由 `thesis_lifecycle` 那一筆接住、讀圖來源的列進 `needs_reread`（C3／A5；Step 1.5）。
+    """
+    if not str(note or "").strip():
+        raise EventWatchError("judge 必須附 note（為什麼判定觸及／無關）")
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if watch.get("kind") != SEMANTIC_KIND or watch.get("status") != "fired":
+            raise EventWatchError(f"只能判定 fired 的語意 watch：{watch_id}")
+        judgment = {"at": _now(), "touches": "yes" if touches else "no", "note": note,
+                    "lead_id": (watch.get("woken_by") or {}).get("lead_id")}
+        if touches:
+            if not str(quote or "").strip():
+                raise EventWatchError("判定觸及必須附 --quote（文件逐字）")
+            judgment["quote"] = quote
+            judgment["handled"] = None
+            watch["judgment"] = judgment
+            watch["status"] = "consumed"
+        else:
+            watch["judgments"] = [*(watch.get("judgments") or []), judgment]
+            reactivate(data, watch_id, note=note)
+        return judgment
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def primary_coverage() -> frozenset[str]:
+    """有一手來源會產出 lead 的實體（ticker 與 co:*）：宣告 primary 的 feed 公司、EDGAR 監看清單、
+    MOPS 監看清單。語意 watch 的實體若全不在這裡＝**登記了但叫不醒**（只剩到期或互動查詢能救）。"""
+    from engine_b import routine_config
+    from identity.registry import get_registry
+
+    registry = get_registry()
+    config = json.loads((Path(__file__).resolve().parent.parent / "crons" / "harvest_config.json")
+                        .read_text(encoding="utf-8"))
+    out: set[str] = set()
+    for feed in config.get("feeds") or []:
+        if feed.get("source_class") == "primary" and feed.get("company_id"):
+            out.add(str(feed["company_id"]))
+    tickers: set[str] = set()
+    watch = config.get("edgar_watch") or {}
+    if watch:
+        try:
+            tracked = routine_config.discover_tracked_tickers(routine_config.load_config())
+        except Exception:  # noqa: BLE001 — derivation 失敗只縮小涵蓋面（手動清單仍是下限）
+            tracked = frozenset()
+        tickers |= set(routine_config.edgar_watch_tickers(watch, tracked=tracked))
+    mops = config.get("mops_watch") or {}
+    if mops:
+        taiwan = frozenset(t for company in registry.companies
+                           for t in [str(getattr(company, "research_ticker", "") or "")]
+                           if t.upper().endswith((".TW", ".TWO")))
+        tickers |= set(routine_config.mops_watch_tickers(mops, registry_tickers=taiwan))
+    for ticker in tickers:
+        out.add(ticker)
+        company = registry.company_id_for_ticker(ticker)
+        if company:
+            out.add(company)
+    return frozenset(out)
+
+
+def is_reachable(watch: Mapping[str, Any], coverage: frozenset[str]) -> bool:
+    return bool(set(watch.get("entities") or ()) & coverage)
+
+
 def watch_detail(watch: Mapping[str, Any]) -> str:
     """一句話說出「這個 watch 在等什麼」。
 
@@ -489,6 +777,8 @@ def watch_detail(watch: Mapping[str, Any]) -> str:
         "entity_filing_signal": f"等 {','.join(watch.get('entities') or [])} 的一手文件",
         "fact_verification": f"對照 {watch.get('fact', '')[:50]}",
         "related_entity_signal": f"等 {','.join(watch.get('entities') or [])} 的新動靜",
+        "semantic_condition": (f"條件「{str(watch.get('condition') or '')[:40]}…」"
+                               f"（{watch.get('source_ref')}；比對 {','.join(watch.get('entities') or [])} 的一手文件）"),
     }.get(watch["kind"], "（未知 kind——render 端缺條目，請補 watch_detail）")
 
 
@@ -499,8 +789,14 @@ def wake_target(watch: Mapping[str, Any]) -> dict[str, Any]:
         return {"kind": "pq2", "ref": watch["wake_pq2"], "label": f"pq2 [{watch['wake_pq2']}]"}
     if watch.get("wake_lead"):
         return {"kind": "lead", "ref": watch["wake_lead"], "label": f"lead {watch['wake_lead']}"}
-    return {"kind": "hypothesis", "ref": watch.get("hypothesis_ref"),
-            "label": f"假設 {watch.get('hypothesis_ref')}"}
+    if watch.get("disproof_ref"):
+        return {"kind": "disproof", "ref": watch["disproof_ref"],
+                "label": f"反證 {watch['disproof_ref']}（互動判定）"}
+    if watch.get("hypothesis_ref"):
+        return {"kind": "hypothesis", "ref": watch.get("hypothesis_ref"),
+                "label": f"假設 {watch.get('hypothesis_ref')}"}
+    # ⚠ 沒有任何喚醒目標的 watch 以前會被預設成「假設」（§14 已知陷阱）——現在照實說。
+    return {"kind": "unknown", "ref": None, "label": "（沒有喚醒目標——add_watch 應已拒收）"}
 
 
 def _render_watch(watch: Mapping[str, Any]) -> str:
@@ -520,7 +816,42 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Event Watch registry")
     sub = parser.add_subparsers(dest="cmd", required=True)
     sub.add_parser("list")
-    sub.add_parser("counters")
+    sub.add_parser("counters", help="常駐計數器（含語意型叫不醒數；會讀 harvest 設定算一手涵蓋面）")
+    reg = sub.add_parser(
+        "register-disproof",
+        help="登記一條 thesis／讀圖的反證或確認條件（semantic_condition；原文逐字、L7 三件套必填）",
+    )
+    reg.add_argument("--condition", required=True, help="原文逐字（≥20 字）")
+    reg.add_argument("--entities", required=True, help="逗號分隔；至少一個 registry 解析得到的 co:*")
+    reg.add_argument("--source-ref", required=True, help="thesis:<memo 路徑>#<n> 或 reading:<reading_id>#<n>")
+    reg.add_argument("--quote-locator", default="", help="原文在哪一節")
+    reg.add_argument("--check-frequency", required=True)
+    reg.add_argument("--action-48h", required=True)
+    reg.add_argument("--expires", required=True)
+    reg.add_argument("--node", default="")
+    reg.add_argument("--note", default="")
+    sub.add_parser("semantic-queue",
+                   help="列醒來待檢的語意 watch（照醒來時間；標旗只是給人讀的提示，不是排序權）")
+    jud = sub.add_parser("judge", help="互動 session 判定：觸及（consume＋judgment）或無關（reactivate）")
+    jud.add_argument("watch_id")
+    jud.add_argument("--touches", required=True, choices=("yes", "no"))
+    jud.add_argument("--note", required=True)
+    jud.add_argument("--quote", default="", help="文件逐字（--touches yes 時必填）")
+    flg = sub.add_parser("flag", help="預篩標旗（只寫 semantic_flag、不改狀態；由 prescreen-apply 呼叫）")
+    flg.add_argument("watch_id")
+    flg.add_argument("--lead", required=True)
+    flg.add_argument("--verdict", required=True, choices=PRESCREEN_VERDICTS)
+    flg.add_argument("--quote", default="")
+    flg.add_argument("--session-id", default="")
+    prep = sub.add_parser("prescreen-prepare",
+                          help="daily ⑩a：選醒來的語意 watch、以程式抓全文、寫預篩批次（名額＝每日上限扣當日已標旗）")
+    prep.add_argument("--run-id", required=True)
+    prep.add_argument("--out", required=True)
+    papp = sub.add_parser("prescreen-apply",
+                          help="daily ⑩c：驗證 LLM 的標旗提議（引文必須是原文逐字）後只寫 semantic_flag")
+    papp.add_argument("--file", required=True)
+    papp.add_argument("--batch", required=True)
+    papp.add_argument("--run-id", required=True)
     consume = sub.add_parser("consume", help="假設對照完成後收掉 fired watch")
     consume.add_argument("watch_id")
     react = sub.add_parser(
@@ -566,8 +897,79 @@ def main(argv: list[str] | None = None) -> int:
         print(f"✓ {args.watch_id} 回 active 繼續等（觸發 lead 已在 consumed_leads，不會再叫醒）")
         return 0
     if args.cmd == "counters":
-        print(json.dumps(counters(data), ensure_ascii=False))
+        try:
+            coverage: frozenset[str] | None = primary_coverage()
+        except Exception as exc:  # noqa: BLE001 — 涵蓋面算不出來就照實說，不當成 0
+            print(f"（一手涵蓋面算不出來：{type(exc).__name__}: {exc}——semantic_unreachable 記 null）")
+            coverage = None
+        print(json.dumps(counters(data, coverage=coverage), ensure_ascii=False))
         return 0
+    if args.cmd == "register-disproof":
+        watch = add_watch(
+            data, kind=SEMANTIC_KIND, disproof_ref=args.source_ref, expires=args.expires,
+            entities=[e for e in args.entities.split(",") if e.strip()], condition=args.condition,
+            source_ref=args.source_ref, quote_locator=args.quote_locator,
+            check_frequency=args.check_frequency, action_48h=args.action_48h, node=args.node,
+            note=args.note,
+        )
+        save_watches(data)
+        print(f"✓ 已登記 {watch['watch_id']} ← {args.source_ref}")
+        return 0
+    if args.cmd == "semantic-queue":
+        from engine_b.leads import load as load_leads
+
+        try:
+            leads_store = load_leads()["leads"]
+        except Exception:  # noqa: BLE001
+            leads_store = {}
+        pending = [w for w in data["watches"] if w.get("kind") == SEMANTIC_KIND and w.get("status") == "fired"]
+        pending.sort(key=lambda w: str((w.get("woken_by") or {}).get("at") or ""))
+        if not pending:
+            print("（沒有醒來待檢的語意 watch）")
+        for watch in pending:
+            woken = watch.get("woken_by") or {}
+            lead = leads_store.get(str(woken.get("lead_id"))) or {}
+            current = flag_for_current(watch)
+            print(f"{watch['watch_id']}｜醒於 {woken.get('at')}｜{watch.get('source_ref')}")
+            print(f"  條件：{watch.get('condition')}")
+            print(f"  觸發：{lead.get('title') or woken.get('lead_id')}｜{lead.get('url')}"
+                  f"｜form {lead.get('form_type') or '—'}｜共用 {','.join(woken.get('shared_entities') or [])}")
+            if current:
+                print(f"  預篩（提示，不是判定）：{current.get('verdict')}"
+                      + (f"｜引文：{current.get('quote')}" if current.get("quote") else ""))
+            text_path = Path("library/private/semantic_text") / f"{woken.get('lead_id')}.txt"
+            if text_path.is_file():
+                print(f"  全文：{text_path}")
+            print(f"  判定：python -m engine_b.event_watch judge {watch['watch_id']} --touches yes|no "
+                  f"--note \"…\" [--quote \"文件逐字\"]")
+        return 0
+    if args.cmd == "judge":
+        judgment = judge(data, args.watch_id, touches=args.touches == "yes", note=args.note,
+                         quote=args.quote or None)
+        save_watches(data)
+        if args.touches == "yes":
+            watch = next(w for w in data["watches"] if w["watch_id"] == args.watch_id)
+            print(f"✓ {args.watch_id} 判定觸及（{judgment['at']}）")
+            print(f"下一步：L7 48 小時動作＝{watch.get('action_48h')}")
+            print("（等待不會消失：thesis 來源由 todo sync 出一筆 thesis_lifecycle；讀圖來源列進 needs_reread）")
+        else:
+            print(f"✓ {args.watch_id} 判定無關，回 active 繼續等（觸發 lead 不會再叫醒）")
+        return 0
+    if args.cmd == "flag":
+        flag(data, args.watch_id, lead_id=args.lead, verdict=args.verdict,
+             quote=args.quote or None, session_id=args.session_id or None)
+        save_watches(data)
+        print(f"✓ {args.watch_id} 標旗 {args.verdict}（狀態不變）")
+        return 0
+    if args.cmd == "prescreen-prepare":
+        from engine_b import semantic_prescreen
+
+        return semantic_prescreen.cmd_prepare(run_id=args.run_id, out=Path(args.out))
+    if args.cmd == "prescreen-apply":
+        from engine_b import semantic_prescreen
+
+        return semantic_prescreen.cmd_apply(result_path=Path(args.file), batch_path=Path(args.batch),
+                                            run_id=args.run_id)
     if args.cmd == "sweep":
         due = sweep_due(data)
         for watch in due:

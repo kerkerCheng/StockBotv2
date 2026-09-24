@@ -2010,9 +2010,29 @@ async function renderWatches() {
     { label: 'fired 未消化', value: String(k.fired_unconsumed), sub: '已觸發、還沒有人處理' },
     { label: '追源需處置', value: String((backlog.needs_attention || []).length), sub: `追源 backlog 共 ${backlog.total}` },
   ]));
-  sec0.appendChild(el('p', 'note', `喚醒去處：pq2 ${k.wake_pq2}｜lead ${k.wake_lead}｜假設 ${k.wake_hypothesis}`));
+  sec0.appendChild(el('p', 'note', `喚醒去處：pq2 ${k.wake_pq2}｜lead ${k.wake_lead}｜假設 ${k.wake_hypothesis}｜反證 ${k.wake_disproof ?? 0}`));
   sec0.appendChild(el('p', 'note', notes.budget || ''));
   app.appendChild(sec0);
+
+  const semantic = payload.semantic || [];
+  if (semantic.length) {
+    const secS = el('section', 'panel');
+    const waiting = semantic.filter((row) => row.status === 'fired').length;
+    secS.appendChild(el('h2', null, `反證與確認條件（在盯 ${semantic.length - waiting}｜醒來待檢 ${waiting}）`));
+    secS.appendChild(el('p', 'note', notes.semantic || ''));
+    const list = el('ul', 'weak');
+    semantic.forEach((row) => {
+      const li = el('li');
+      li.appendChild(el('div', null, row.condition || row.detail));
+      const bits = [row.status === 'fired' ? '醒來待檢' : '在盯', row.source_ref, '到期 ' + row.expires];
+      if (row.semantic_flag) bits.push('預篩（提示）：' + row.semantic_flag.verdict);
+      li.appendChild(el('span', 'rule', bits.filter(Boolean).join('｜')));
+      li.appendChild(el('span', 'rule', row.watch_id));
+      list.appendChild(li);
+    });
+    secS.appendChild(list);
+    app.appendChild(secS);
+  }
 
   if ((payload.stalled || []).length) {
     const sec1 = el('section', 'panel callout');

@@ -328,3 +328,35 @@ def compose_triage_prompt(leads: Sequence[Mapping[str, Any]]) -> str:
 
 def schema_text(path: Path = TRIAGE_SCHEMA) -> str:
     return json.dumps(json.loads(path.read_text(encoding="utf-8")), ensure_ascii=False, separators=(",", ":"))
+
+
+# ---------------------------------------------------------------------------
+# 語意預篩（⑩b）：條件原文＋程式抓的全文——只標旗，判定在互動 session（G7）
+# ---------------------------------------------------------------------------
+
+PRESCREEN_PROMPT = ROOT / "crons" / "prescreen_prompt.md"
+PRESCREEN_SCHEMA = ROOT / "crons" / "prescreen_schema.json"
+TRUNCATION_MARK = "……（以下截斷：全文超過上限，後面沒有給你）"
+
+
+def compose_prescreen_prompt(items: Sequence[Mapping[str, Any]], *, max_chars: int | None = None) -> str:
+    """每筆：watch_id、lead_id、條件原文、全文（超過上限就截斷並明寫）。全文由 ⑩a 存檔、這裡讀檔塞進來。"""
+    if max_chars is None:
+        from engine_b.event_watch import load_config
+
+        max_chars = int(load_config()["prescreen_text_max_chars"])
+    blocks = []
+    for item in items:
+        text = Path(str(item.get("text_path"))).read_text(encoding="utf-8")
+        body = text[:max_chars] + ("\n" + TRUNCATION_MARK if len(text) > max_chars else "")
+        blocks.append("\n".join([
+            f"### watch_id: {item.get('watch_id')}｜lead_id: {item.get('lead_id')}",
+            f"條件（thesis／讀圖的原文）：{item.get('condition')}",
+            "文件全文：",
+            body,
+        ]))
+    data = "\n\n".join(blocks)
+    return "\n\n".join([
+        PRESCREEN_PROMPT.read_text(encoding="utf-8").strip(),
+        f"## 本輪批次（{len(items)} 筆）\n\n{DATA_START}\n{data}\n{DATA_END}",
+    ]) + "\n"

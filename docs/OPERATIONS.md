@@ -108,6 +108,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
 | **5 端到端 smoke** | 2026-09-24 實跑 `python crons\daily_task.py`（run `bf21bb07`）：19 步 17 ok、2 skipped（`executor=none`）、約 7 分鐘（materialize 282 秒最長）；harvest 最後一輪＝當天、APP 7 份 state 當天 materialize、publisher 回 `sent` 3/3、鎖已釋放、收工標記 `finalized`。`register_daily_task.py --apply` 後 `StockBotv2-Daily` Ready（下次 05:30）、自我比對 `match`；舊兩個工作 `Disabled`。⚠ 端到端驗收仍要等**真正的排程觸發**（1.2b 的前提：`LastTaskResult 0` 且當天執行紀錄完整），手動觸發不算（L13-1）。 |
 
+### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.4：語意條件 watch ＋ 語意預篩）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | `DAILY_STEPS` 加三步：⑩a `-m engine_b.event_watch prescreen-prepare`（程式，連網）、⑩b 預篩提議（`claude -p`，**與 ⑦a 同一個呼叫函式、同一組 argv、白名單、能力檢查**；只回標旗 JSON）、⑩c `-m engine_b.event_watch prescreen-apply`（程式驗引文逐字後**只寫 `semantic_flag`、不改 watch 狀態**）；⑩b 後另一道保險檢查。**新增的連網只到既有主機**：`www.sec.gov`（EDGAR 主文件，`fetchers/edgar.py:fetch_filing_text`）與 `mfn.se`（公告頁；`engine_b/semantic_prescreen.py:fetch_mfn_text` 只取頁面文字）——**不含 `mb.cision.com`**（不抓 MFN 的 PDF 附件；`fetchers/mfn.py:fetch_release` 會抓，所以不用它）。**新增的寫入只到 `library/private/`**：`semantic_text/<lead_id>.txt`（＋sha256 meta，已存在就重用）、`heartbeat/prescreen_batch_<日期>.json`／`prescreen_<日期>.json`；⑩c 寫 `library/leads/event_watches.json` 的 `semantic_flag`（寫入步驟，在 daily 的鎖底下）。harvest 多寫三個 lead 頂層欄位（`source_class`／`company_id`／`form_type`，由 feed 宣告或 EDGAR／MOPS 固定值），不新增主機。 |
+| **2 canonical skill／prompt／本檔** | `crons/prescreen_prompt.md`、`crons/prescreen_schema.json`（新，strict）；`config/event_watch.json` 的 `_doc` 與 `semantic_screen_daily_limit`／`prescreen_text_max_chars`／`ownership_forms_excluded`；`crons/harvest_config.json` 每個 feed 宣告 `company_id`／`source_class`；本節；ARCHITECTURE 決策表那一列。 |
+| **3 最窄 rule** | 不經 Codex，`.codex/rules` 維持 0 條。預篩額度由 CLI 截斷（`semantic_screen_daily_limit` 扣當日已標旗），不寫進 prompt。 |
+| **4 contract test** | `tests/test_daily_task.py`：清單相等含 ⑩a–⑩c、⑩b 與 ⑦a 同一條 LLM 路徑、以 `run_id` 配對；`tests/test_semantic_watch.py`（新）：kind × 喚醒目標、T0 矩陣（一手 8-K 命中、Form 4 即使 tier=1 不命中、secondary 不命中、X 不命中、未 triage 的 MFN 公告命中、ISO／RFC 822 回補舊文件不命中）、登記驗證、預篩名額（每日、無 fetcher 不佔名額）、只連 `mfn.se`、引文逐字、`run_id` 不符一則不寫。 |
+| **5 端到端 smoke** | 回填實跑：`backfill-entities --provenance` 補 EDGAR 419、MFN 64、sivers 26、yahoo 26、MOPS 4、X 514，第二次 0（冪等）；Sivers 兩個 feed 的 lead 含 `co:sivers_semiconductors` 由 0 → 100%。真實資料上醒來的語意 watch 目前 0（1.6 才登記條件）——預篩照實印「預篩 0」，不造假資料觸發。 |
+
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.3：triage 併進 daily、Codex 退出無人值守）
 
 | 步 | 結論 |

@@ -899,9 +899,9 @@ WAKE_STATE_LABELS = {
 
 
 def _watch_row(watch: Mapping[str, Any]) -> dict[str, Any]:
-    from engine_b.event_watch import is_stalled, watch_detail, wake_target
+    from engine_b.event_watch import SEMANTIC_KIND, flag_for_current, is_stalled, watch_detail, wake_target
 
-    return {
+    row = {
         "watch_id": watch["watch_id"], "kind": watch["kind"], "status": watch.get("status"),
         "detail": watch_detail(watch), "target": wake_target(watch),
         "entities": list(watch.get("entities") or ()),
@@ -912,6 +912,15 @@ def _watch_row(watch: Mapping[str, Any]) -> dict[str, Any]:
         "created_at": watch.get("created_at"), "expires": watch.get("expires"),
         "stalled": is_stalled(watch),
     }
+    if watch.get("kind") == SEMANTIC_KIND:
+        # 語意條件（Phase 1 Step 1.4）：原文逐字、指回來源、預篩標旗（提示，不是判定）與判定——APP 先讀得到。
+        row.update({
+            "condition": watch.get("condition"), "source_ref": watch.get("source_ref"),
+            "check_frequency": watch.get("check_frequency"), "action_48h": watch.get("action_48h"),
+            "woken_by": watch.get("woken_by"), "semantic_flag": flag_for_current(watch),
+            "judgment": watch.get("judgment"),
+        })
+    return row
 
 
 def build_watches_artifact(watch_data: Mapping[str, Any], *, config: Mapping[str, Any],
@@ -944,6 +953,9 @@ def build_watches_artifact(watch_data: Mapping[str, Any], *, config: Mapping[str
         "due_this_round": [_watch_row(w) for w in due],
         "fired_unconsumed": by_status.get("fired") or [],
         "expired": by_status.get("expired") or [],
+        # 反證與確認條件（語意 watch）：在盯的與醒來待檢的——判定只在互動 session（`event_watch judge`）
+        "semantic": [row for row in (by_status.get("active") or []) + (by_status.get("fired") or [])
+                     if row["kind"] == "semantic_condition"],
         "trace_backlog": {
             "needs_attention": needs_attention,
             "total": len(backlog),
@@ -954,6 +966,9 @@ def build_watches_artifact(watch_data: Mapping[str, Any], *, config: Mapping[str
             "budget": "每輪主動輪詢的上限由 `config/event_watch.json` 的 `sweep_budget_per_run` 決定；"
                       "budget=0 或 enabled=false 時系統退回純被動。",
             "fired": "fired 未消化＝事件已觸發但還沒有人去處理；它不會自己消失。",
+            "semantic": "反證與確認條件由 thesis／讀圖登記、原文逐字；一手文件提到它的實體就醒來待檢。"
+                        "預篩標旗只是提示，**判定只在互動 session**："
+                        "`python -m engine_b.event_watch semantic-queue` → `judge`。",
         },
         "this_is_not": list(WATCHES_THIS_IS_NOT),
         "materializer": {

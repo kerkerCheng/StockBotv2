@@ -1,0 +1,48 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "flags"
+  ],
+  "properties": {
+    "flags": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "watch_id",
+          "lead_id",
+          "verdict",
+          "quote",
+          "note"
+        ],
+        "properties": {
+          "watch_id": {
+            "type": "string"
+          },
+          "lead_id": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "likely_touches",
+              "likely_unrelated",
+              "cannot_tell"
+            ]
+          },
+          "quote": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

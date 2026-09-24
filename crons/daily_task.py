@@ -98,6 +98,10 @@ class DailyStep:
     essential: bool = False
     #: capture 的輸出檔名樣板（在 OUT_DIR 下）。
     capture: str | None = None
+    #: 前置步驟（它不是 ok 就跳過這一步：LLM 不拿舊批次去跑、套用不套沒成功的提議）。
+    requires: str | None = None
+    #: LLM 步驟的任務（`triage`｜`prescreen`）——決定 prompt、schema、批次與結果檔、timeout 與分批大小。
+    llm_task: str | None = None
 
 
 #: ⚠ **封閉清單**：順序、argv、timeout、寫入與連網宣告都由 `tests/test_daily_task.py` 逐項斷言。
@@ -121,19 +125,32 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
                "--triage-batch", "--json"),
               3, False, False, kind="capture", capture="triage_batch_{date}.json"),
     DailyStep("07a_triage_propose", "triage 提議（claude -p 零工具、只回 JSON）",
-              (), 15, False, True, kind="llm"),
+              (), 15, False, True, kind="llm", requires="06_triage_batch", llm_task="triage"),
     DailyStep("08_integrity_after_triage", "保險檢查（LLM 步驟前後指紋）",
               (), 1, False, False, kind="integrity"),
     DailyStep("07b_triage_apply", "triage 套用（程式逐則驗證後寫入）",
               ("-m", "engine_b.cli", "triage-apply", "--file", "{triage_result}",
                "--batch", "{triage_batch}", "--run-id", "{run_id}"),
-              3, True, False, kind="apply"),
+              3, True, False, kind="apply", requires="07a_triage_propose"),
     DailyStep("07c_classification_health", "分類完整性檢查",
               ("-m", "engine_b.cli", "classification-health"), 2, False, False),
     DailyStep("09_consume_fired", "fired 追源 watch 排回 pq1",
               ("-m", "engine_b.cli", "consume-fired"), 3, True, False),
     DailyStep("10_todo_sync", "待辦池同步（含 watch 比對與到期）",
               ("-m", "engine_b.todo", "sync"), 5, True, False),
+    # ⑩a–⑩c 語意預篩（Phase 1 Step 1.4；C7）：只標旗、不判定（G7）。⑩a 照抓全文（互動判定也用得到），
+    # ⑩b／⑩c 跟著 `llm.executor`。⑩a 只寫 library/private（全文存檔、批次檔），不寫共用 state，所以不取鎖。
+    DailyStep("10a_prescreen_prepare", "語意預篩：選醒來的語意 watch、以程式抓全文",
+              ("-m", "engine_b.event_watch", "prescreen-prepare", "--run-id", "{run_id}",
+               "--out", "{prescreen_batch}"), 10, False, True),
+    DailyStep("10b_prescreen_propose", "語意預篩提議（claude -p 零工具、只回標旗 JSON）",
+              (), 15, False, True, kind="llm", requires="10a_prescreen_prepare", llm_task="prescreen"),
+    DailyStep("10b_integrity_after_prescreen", "保險檢查（LLM 步驟前後指紋）",
+              (), 1, False, False, kind="integrity"),
+    DailyStep("10c_prescreen_apply", "語意預篩套用（程式驗引文逐字後只寫 semantic_flag）",
+              ("-m", "engine_b.event_watch", "prescreen-apply", "--file", "{prescreen_result}",
+               "--batch", "{prescreen_batch}", "--run-id", "{run_id}"),
+              3, True, False, kind="apply", requires="10b_prescreen_propose"),
     DailyStep("11_standing_go", "常規授權（封閉清單）",
               ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False),
     DailyStep("12_fiscal_year_backfill", "XBRL 基期補值（mechanical 欄位）",
@@ -169,9 +186,9 @@ def essential_reserve_minutes(steps: Sequence[DailyStep] = DAILY_STEPS) -> float
 
 
 def step_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None) -> float:
-    """LLM 步驟的 timeout 住 config（`llm.triage_timeout_minutes`）；其餘寫死在清單。"""
-    if step.kind == "llm" and llm is not None:
-        return float(llm.get("triage_timeout_minutes") or step.timeout_minutes)
+    """LLM 步驟的 timeout 住 config（`llm.<task>_timeout_minutes`）；其餘寫死在清單。"""
+    if step.kind == "llm" and llm is not None and step.llm_task:
+        return float(llm.get(f"{step.llm_task}_timeout_minutes") or step.timeout_minutes)
     return step.timeout_minutes
 
 
@@ -278,6 +295,8 @@ class DailyRun:
             "summary": "每日心跳",
             "triage_batch": str(self.out_dir / f"triage_batch_{self.date}.json"),
             "triage_result": str(self.out_dir / f"triage_{self.date}.json"),
+            "prescreen_batch": str(self.out_dir / f"prescreen_batch_{self.date}.json"),
+            "prescreen_result": str(self.out_dir / f"prescreen_{self.date}.json"),
         }
 
     def _expand(self, argv: Sequence[str]) -> list[str]:
@@ -448,10 +467,10 @@ class DailyRun:
             executor = (self.llm or {}).get("executor")
             if executor == "none":
                 return "executor=none"
-            if step.kind == "apply" and self._status_of("07a_triage_propose") != "ok":
-                return "llm_not_ok：提議那一步沒有成功"
-        if step.key in ("07a_triage_propose", "07b_triage_apply") and self._status_of("06_triage_batch") != "ok":
-            return "batch_failed：triage 批次沒有產出（不拿舊批次去跑）"
+        if step.requires and self._status_of(step.requires) != "ok":
+            if step.kind == "llm":
+                return f"batch_failed：{step.requires} 沒有產出（不拿舊批次去跑）"
+            return f"llm_not_ok：{step.requires} 沒有成功"
         if step.writes:
             if not self.lock_ok:
                 return f"writer_lock：{self.lock_reason or '沒拿到鎖'}"
@@ -473,8 +492,9 @@ class DailyRun:
 
     def run_step(self, step: DailyStep) -> None:
         now = self.clock()
-        if step.kind == "llm":
+        if step.kind == "llm" and not self.aborted:
             # 保險檢查的「前」快照：取在 LLM 步驟之前、⑥ 之後（批次檔在 library/private，不影響 git 指紋）。
+            # ⚠ 已中止（例如前一個 LLM 步驟後 `.git/config` 變了）就**不再取**——取指紋會跑 git。
             self.fingerprint_before = self.fingerprint()
         reason = self._skip_reason(step, now)
         if reason is not None:
@@ -485,7 +505,7 @@ class DailyRun:
             self._integrity_step(step)
             return
         if step.kind == "llm":
-            self._triage_propose(step, now)
+            self._llm_propose(step, now)
             return
         timeout = step_timeout_minutes(step, self.llm)
         if not step.essential and self.deadline is not None:
@@ -536,13 +556,33 @@ class DailyRun:
                 pass
         self.log(f"{step.key} {row['status']}（exit={row.get('exit')}，{seconds:.0f}s）")
 
-    def _triage_propose(self, step: DailyStep, now: datetime) -> None:
-        """⑦a：`claude -p` 零工具提議（C6）。任何一批能力不符或失敗 → **整步丟棄、不寫結果檔**（N4-7）。"""
+    def _llm_task(self, task: str) -> dict[str, Any]:
+        """兩個 LLM 任務的差異全部集中在這裡；呼叫、白名單、能力檢查與丟棄規則是同一套（C6）。"""
         from crons import llm_step
 
         paths = self._templates()
-        result_path = Path(paths["triage_result"])
-        result_path.unlink(missing_ok=True)  # 先刪同日舊檔：這一次失敗就不留任何可被 ⑦b 套用的東西
+        assert self.llm is not None
+        if task == "triage":
+            return {"batch": Path(paths["triage_batch"]), "result": Path(paths["triage_result"]),
+                    "batch_key": "payload", "out_key": "items", "schema": llm_step.TRIAGE_SCHEMA,
+                    "compose": llm_step.compose_triage_prompt,
+                    "chunk": int(self.llm["triage_chunk_size"]),
+                    "stamp": lambda item, session: {**item, "decided_by": f"claude-p:{session}"}}
+        if task == "prescreen":
+            return {"batch": Path(paths["prescreen_batch"]), "result": Path(paths["prescreen_result"]),
+                    "batch_key": "items", "out_key": "flags", "schema": llm_step.PRESCREEN_SCHEMA,
+                    "compose": llm_step.compose_prescreen_prompt,
+                    "chunk": int(self.llm["prescreen_chunk_size"]),
+                    "stamp": lambda item, session: {**item, "session_id": session}}
+        raise ValueError(f"未知 LLM 任務：{task}")
+
+    def _llm_propose(self, step: DailyStep, now: datetime) -> None:
+        """LLM 提議（⑦a triage、⑩b 預篩；C6）。任何一批能力不符或失敗 → **整步丟棄、不寫結果檔**（N4-7）。"""
+        from crons import llm_step
+
+        spec = self._llm_task(str(step.llm_task))
+        result_path: Path = spec["result"]
+        result_path.unlink(missing_ok=True)  # 先刪同日舊檔：這一次失敗就不留任何可被套用步驟吃到的東西
         row = self._step_row(step, status="running")
         self.log(f"{step.key} 開始")
 
@@ -552,15 +592,15 @@ class DailyRun:
             self.log(f"{step.key} {status}：{error}")
 
         try:
-            envelope = json.loads(Path(paths["triage_batch"]).read_text(encoding="utf-8"))
+            envelope = json.loads(spec["batch"].read_text(encoding="utf-8"))
         except (OSError, ValueError) as exc:
             return fail("failed", f"批次讀不到：{type(exc).__name__}: {exc}")
         if not isinstance(envelope, dict) or envelope.get("run_id") != self.run_id:
             return fail("failed", "批次的 run_id 不是這一輪的——不拿舊批次去跑")
-        leads = [lead for lead in envelope.get("payload") or [] if isinstance(lead, dict)]
+        batch = [item for item in envelope.get(spec["batch_key"]) or [] if isinstance(item, dict)]
         assert self.llm is not None
-        if not leads:
-            self._write_triage_result(result_path, [])
+        if not batch:
+            self._write_llm_result(result_path, spec["out_key"], [])
             row.update(status="ok", proposed=0, note="批次為空，沒有呼叫模型")
             self.log(f"{step.key} ok：批次為空")
             return
@@ -573,19 +613,18 @@ class DailyRun:
         if leftover:
             return fail("failed", f"llm.cwd 不是空目錄（{leftover[:3]}）——CLI 會把裡面的東西帶進 context")
         argv = llm_step.llm_argv(self.llm["claude_path_resolved"], str(self.llm["claude_model"]),
-                                 llm_step.schema_text())
+                                 llm_step.schema_text(spec["schema"]))
         env = llm_step.llm_env(self.parent_env)
         runner = self.llm_runner or llm_step.run_claude
-        timeout = float(self.llm["triage_timeout_minutes"])
+        timeout = step_timeout_minutes(step, self.llm)
         if self.deadline is not None:
             timeout = max(0.5, min(timeout, (self.deadline - now).total_seconds() / 60))
-        size = int(self.llm["triage_chunk_size"])
+        size = spec["chunk"]
         calls: list[dict[str, Any]] = []
-        items: list[dict[str, Any]] = []
-        for start in range(0, len(leads), size):
-            chunk = leads[start:start + size]
-            outcome = runner(llm_step.compose_triage_prompt(chunk), argv=argv, cwd=cwd, env=env,
-                             timeout_minutes=timeout)
+        proposals: list[dict[str, Any]] = []
+        for start in range(0, len(batch), size):
+            chunk = batch[start:start + size]
+            outcome = runner(spec["compose"](chunk), argv=argv, cwd=cwd, env=env, timeout_minutes=timeout)
             calls.append(outcome.as_record())
             row["calls"] = calls
             if outcome.status == "capability_violation":
@@ -595,20 +634,21 @@ class DailyRun:
             if outcome.status != "ok":
                 return fail(outcome.status, outcome.error or outcome.status)
             structured = outcome.structured
-            if not isinstance(structured, dict) or not isinstance(structured.get("items"), list):
-                return fail("failed", "structured_output 不是 {items: [...]}")
-            for item in structured["items"]:
+            if not isinstance(structured, dict) or not isinstance(structured.get(spec["out_key"]), list):
+                return fail("failed", f"structured_output 不是 {{{spec['out_key']}: [...]}}")
+            for item in structured[spec["out_key"]]:
                 if isinstance(item, dict):
-                    items.append({**item, "decided_by": f"claude-p:{outcome.session_id}"})
-        self._write_triage_result(result_path, items, sessions=[c["session_id"] for c in calls])
-        row.update(status="ok", proposed=len(items), batch=len(leads),
+                    proposals.append(spec["stamp"](item, outcome.session_id))
+        self._write_llm_result(result_path, spec["out_key"], proposals,
+                               sessions=[c["session_id"] for c in calls])
+        row.update(status="ok", proposed=len(proposals), batch=len(batch),
                    session_id=",".join(str(c["session_id"]) for c in calls))
-        self.log(f"{step.key} ok：{len(leads)} 則、{len(calls)} 次呼叫")
+        self.log(f"{step.key} ok：{len(batch)} 則、{len(calls)} 次呼叫")
 
-    def _write_triage_result(self, path: Path, items: list[dict[str, Any]],
-                             sessions: list[Any] | None = None) -> None:
-        payload = {"schema": "triage-result-v1", "run_id": self.run_id, "run_date": self.date,
-                   "sessions": sessions or [], "items": items}
+    def _write_llm_result(self, path: Path, out_key: str, proposals: list[dict[str, Any]],
+                          sessions: list[Any] | None = None) -> None:
+        payload = {"schema": "llm-result-v1", "run_id": self.run_id, "run_date": self.date,
+                   "sessions": sessions or [], out_key: proposals}
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     def _integrity_step(self, step: DailyStep) -> None:

@@ -256,13 +256,19 @@ def test_render_watch_covers_every_kind_and_wake_target():
         data, kind="related_entity_signal", wake_lead="lead_2",
         expires="2027-01-01", entities=["COHR"],
     )
+    ew.add_watch(
+        data, kind="semantic_condition", disproof_ref="thesis:thesis/x.md#1",
+        source_ref="thesis:thesis/x.md#1", expires="2099-01-01",
+        entities=["co:sivers_semiconductors"], condition="Sivers 揭露 CW DFB laser array 進入量產並具名客戶",
+        check_frequency="每季", action_48h="重讀 thesis",
+    )
     rendered_kinds = set()
     for watch in data["watches"]:
         line = ew._render_watch(watch)
         assert "未知 kind" not in line, f"{watch['kind']} 缺 render 條目"
         rendered_kinds.add(watch["kind"])
     assert rendered_kinds == set(ew.WATCH_KINDS)
-    lead_line = ew._render_watch(data["watches"][-1])
+    lead_line = ew._render_watch(data["watches"][-2])
     assert "lead lead_2" in lead_line
 
 

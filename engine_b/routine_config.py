@@ -119,9 +119,10 @@ def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str
         raise ValueError("llm.claude_model 不可為空（模型只住這裡）")
     for key in ("triage_timeout_minutes", "prescreen_timeout_minutes"):
         _positive_number(llm, key, "llm")
-    chunk = llm.get("triage_chunk_size")
-    if isinstance(chunk, bool) or not isinstance(chunk, int) or chunk < 1:
-        raise ValueError("llm.triage_chunk_size 必須是 ≥1 的整數")
+    for key in ("triage_chunk_size", "prescreen_chunk_size"):
+        chunk = llm.get(key)
+        if isinstance(chunk, bool) or not isinstance(chunk, int) or chunk < 1:
+            raise ValueError(f"llm.{key} 必須是 ≥1 的整數")
     import os
 
     raw_cwd = llm.get("cwd")

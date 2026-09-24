@@ -58,7 +58,8 @@ class Segment:
 SEGMENTS: tuple[Segment, ...] = (
     Segment(
         "pending_triage", 0, "新 harvest 的 pending lead 分流（signal-triage）",
-        "research", "python -m engine_b.cli list --status pending --by-priority（daily Step 2）",
+        "research", "daily ⑦（claude -p 零工具提議＋engine_b.cli triage-apply 程式寫入）；"
+                    "超過每日上限或 LLM 失敗的由互動 session 以 python -m engine_b.cli triage 處理",
         "使用者定案（2026-09-09 B 項）：每日進來的新東西先處理，避免全部被卡住。",
     ),
     Segment(
@@ -70,6 +71,11 @@ SEGMENTS: tuple[Segment, ...] = (
     Segment(
         "fired_pq2_wake", 1, "fired watch → pq2 項目由「等事件」翻回「等你決定」",
         "mechanical", "python -m engine_b.todo sync",
+    ),
+    Segment(
+        "semantic_pending_check", 1, "fired 語意 watch（反證／確認條件）→ 互動 session 判定觸及與否",
+        "research", "互動 session：python -m engine_b.event_watch semantic-queue → judge",
+        "Phase 1 Step 1.4（G7）：醒來＝待檢；daily 的預篩只標旗、不判定，所以這一段不會因預篩而變少。",
     ),
     Segment(
         "fired_hypothesis_check", 1, "fired watch → 截圖假設對照（agent 拿 fact 去對一手）",
@@ -207,6 +213,8 @@ def classify_watch(watch: Mapping[str, Any]) -> str | None:
             return "fired_pq2_wake"
         if watch.get("wake_lead"):
             return "fired_lead_requeue"
+        if watch.get("disproof_ref"):
+            return "semantic_pending_check"
         return "fired_hypothesis_check"
     if status == "active" and (watch.get("poll") or {}).get("eligible"):
         # 可輪詢的 active watch 才是「要人主動去查」的工作；其餘 active 只是等。

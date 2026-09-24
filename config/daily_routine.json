@@ -16,7 +16,7 @@
     "timezone": "Asia/Taipei",
     "daily_local_time": "05:30",
     "task_name": "StockBotv2-Daily",
-    "execution_time_limit_minutes": 180,
+    "execution_time_limit_minutes": 240,
     "expected_duration_minutes": 60,
     "guard_margin_minutes": 15,
     "harvest_stale_hours": 30
@@ -28,7 +28,8 @@
       "executor：none＝兩個 LLM 步驟都記 skipped（也是 R2-a 的回滾開關）；claude＝啟用。",
       "claude_path：null＝~/.local/bin/claude.exe。claude_model：模型只住這裡。",
       "cwd：null＝%LOCALAPPDATA%\\StockBotv2\\llm_cwd；**必須在 repo 之外**（工作樹內 CLI 會跑 git、載入自動記憶），",
-      "載入時驗證，違反即 fail closed。triage_chunk_size：批次超過就分多次呼叫，每次各自驗。"
+      "載入時驗證，違反即 fail closed。triage_chunk_size：批次超過就分多次呼叫，每次各自驗。",
+      "prescreen_chunk_size：預篩每次呼叫最多幾筆（每筆帶一份全文，上限見 config/event_watch.json 的 prescreen_text_max_chars）。"
     ],
     "executor": "claude",
     "claude_path": null,
@@ -36,7 +37,8 @@
     "cwd": null,
     "triage_timeout_minutes": 15,
     "triage_chunk_size": 30,
-    "prescreen_timeout_minutes": 15
+    "prescreen_timeout_minutes": 15,
+    "prescreen_chunk_size": 3
   },
   "pq1": {
     "_drain_doc": [

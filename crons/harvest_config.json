@@ -15,10 +15,13 @@
     "monthly_spend_cap_usd": 10
   },
   "_feeds_note": "2026-07-25：移除 aleabitoreddit substack feed——查證確認他的產出在 X 不在 Substack（該 feed 至今只有 1 篇 2026-05-19 舊文），已由上方 x_accounts 覆蓋；他若發長文也會在 X 貼連結。2026-08-11：補外國發行人 filing watcher——SIVE.ST／IQE.L 是 EDGAR 永遠不會有的外國發行人，先前完全無自動監測（§10.11 待做 #2）。每個 feed 都經 fetch＋parse_rss 實測，不憑印象填；下方 verified_* 記錄實測結果。⚠ MFN 只載 regulatory disclosure，純商業 PR（如 2026-04-15 Jabil 合作）不在其中，故 sivers 需兩個 feed 互補。⚠ 兩個 feed 都是瑞典文＋英文雙語各發一篇，同一事件會產生兩筆 lead（URL hash 不同），由 triage 過濾。",
+  "_feeds_provenance_note": "2026-09-24（Phase 1 Step 1.4；C2）：每個 feed 必須宣告 company_id（registry 的 co:*；聚合型寫 null）與 source_class（primary＝公司自己或法定揭露管道發的正式文件；secondary＝轉述、新聞聚合）。harvest 登記時寫成 lead 自己的頂層欄位；語意 watch（反證條件）只比對 primary、不看 triage 的 tier。EDGAR／MOPS 由程式固定為 primary、公司由 ticker 經 registry 解析。缺欄或解析不到 → load_config fail closed。",
   "feeds": [
     {
       "source": "mfn:sivers-semiconductors",
       "url": "https://mfn.se/all/a/sivers-semiconductors.rss",
+      "company_id": "co:sivers_semiconductors",
+      "source_class": "primary",
       "note": "Nasdaq Stockholm 法定訊息揭露（MFN）。這是 [10] 等的 2026-08-27 Q2 分辨點唯一自動監測來源。",
       "verified_at": "2026-08-11",
       "verified_items": 48,
@@ -35,6 +38,8 @@
     {
       "source": "sivers:press",
       "url": "https://www.sivers-semiconductors.com/?feed=rss2&post_type=press",
+      "company_id": "co:sivers_semiconductors",
+      "source_class": "primary",
       "note": "公司站 WordPress press post_type feed，補 MFN 不載的商業 PR。視窗僅最新 10 篇，daily 節奏足夠。",
       "verified_at": "2026-08-11",
       "verified_items": 10
@@ -42,6 +47,8 @@
     {
       "source": "yahoo:iqe-l",
       "url": "https://feeds.finance.yahoo.com/rss/2.0/headline?s=IQE.L&region=GB&lang=en-GB",
+      "company_id": "co:iqe",
+      "source_class": "secondary",
       "note": "IQE plc（AIM: IQE，LSE）filing watcher。⚠ 這是 Yahoo 新聞聚合，不是 RNS 一手來源：只當『有事發生了』的觸發器，evidence tier 仍須依 skills/source-trace 追回 RNS／公司公告原文，不得直接引用 Yahoo 標題當證據。含 AIM Market Roundup 與一般選股文等雜訊，由 triage 過濾。視窗約 20 筆。",
       "verified_at": "2026-08-11",
       "verified_items": 20,

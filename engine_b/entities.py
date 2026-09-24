@@ -137,17 +137,29 @@ def extract_entities(
 
 
 def lead_entities(lead: dict) -> set[str]:
-    """取一筆 lead 已存的實體集合；未擷取過的即時由文字推導。"""
+    """取一筆 lead 已存的實體集合；未擷取過的即時由文字推導。
+
+    ⚠ 2026-09-24（Phase 1 Step 1.4；C2）：另併入 lead 自己的 `company_id`（來源宣告：這份文件是誰發的）。
+    `entities` 會被 `register` 的內容補強與 `backfill_entities(rescan=True)` 只從文字重算並覆寫，所以
+    宣告的公司不住那一欄，而是在這裡——**所有 kind 共用的 T0 入口**——併入。這讓 Sivers 的 MFN 公告
+    （全名對不上 cashtag 抽取）第一次叫得醒任何 watch；對實體含 Sivers／IQE 的非語意型 watch 同樣是
+    宣告過的改善（它們原本同樣叫不醒），不是意外。
+    """
 
     stored = lead.get("entities")
     if isinstance(stored, dict):
-        return set(stored.get("tickers") or ()) | set(stored.get("company_ids") or ())
-    derived = extract_entities(
-        title=lead.get("title"),
-        raw_text=lead.get("raw_text"),
-        source=lead.get("source"),
-    )
-    return set(derived["tickers"]) | set(derived["company_ids"])
+        out = set(stored.get("tickers") or ()) | set(stored.get("company_ids") or ())
+    else:
+        derived = extract_entities(
+            title=lead.get("title"),
+            raw_text=lead.get("raw_text"),
+            source=lead.get("source"),
+        )
+        out = set(derived["tickers"]) | set(derived["company_ids"])
+    declared = lead.get("company_id")
+    if isinstance(declared, str) and declared.startswith("co:"):
+        out.add(declared)
+    return out
 
 
 def related_leads(

@@ -328,6 +328,11 @@ def watch_changes(
     for watch in watches:
         if watch.get("status") not in ("fired", "consumed"):
             continue
+        # ⚠ 語意條件 watch（Phase 1 Step 1.4，`disproof_ref`）刻意不在這裡轉成 disproof_signal：
+        # 它醒來只是「待檢」，觸及與否在互動 session 判定；本 Phase 不動個股頁（結案 gate 3）。
+        # 它的家是 APP 的 watches 頁與 `event_watch semantic-queue`。
+        if watch.get("disproof_ref"):
+            continue
         target = str(watch.get("hypothesis_ref") or "")
         entities = {str(e).upper() for e in (watch.get("entities") or ())} | {str(e).lower() for e in (watch.get("entities") or ())}
         if not (entities & wanted):

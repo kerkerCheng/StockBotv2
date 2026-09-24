@@ -65,6 +65,12 @@ def load_config(path: Path | str = DEFAULT_CONFIG_PATH) -> dict:
     for feed in feeds:
         if not isinstance(feed, dict) or not feed.get("source") or not feed.get("url"):
             raise ValueError("每個 feed 必須有 source 與 url")
+        # Phase 1 Step 1.4（C2）：每個 feed 宣告「是誰的文件」與「是不是一手」。語意 watch 只認這個宣告，
+        # 不看 triage 的 tier。兩欄都**必填**（聚合型 feed 的 company_id 明寫 null），寫錯 fail closed。
+        if "company_id" not in feed or "source_class" not in feed:
+            raise ValueError(f"feed {feed.get('source')} 必須宣告 company_id（聚合型寫 null）與 source_class")
+        leads.validate_provenance(source_class=feed.get("source_class"),
+                                  company_id=feed.get("company_id"), form_type=None)
     if watch:
         if not isinstance(watch.get("tickers"), list) or not isinstance(
             watch.get("forms"), list
@@ -184,11 +190,11 @@ def filings_to_leads(ticker: str, cik: str, filings: list[dict]) -> list[dict]:
     return out
 
 
-#: 自動 no-go 的理由句。寫死成一句而不是每次現組，讓「為什麼這批沒進 pq1」可以被
-#: 一條 grep 全部撈出來。
 #: 機械 FILTER 的判斷者標記（Phase 1 Step 1.2a）：心跳的「分類層上次成功」要排除它——
 #: 它每天都會寫 triage 時間，不代表分類層有跑（L12：一個欄位兩種語意）。
 AUTO_NO_GO_DECIDED_BY = "harvest:auto_no_go_forms"
+#: 自動 no-go 的理由句。寫死成一句而不是每次現組，讓「為什麼這批沒進 pq1」可以被
+#: 一條 grep 全部撈出來。
 AUTO_NO_GO_REASON = (
     "harvest 端自動 no_go：{form} 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead："
     "applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。"
@@ -203,20 +209,36 @@ def _register_all(
     seen_at: str | None,
     *,
     auto_no_go_forms: frozenset[str] = frozenset(),
+    provenance: dict | None = None,
+    errors: list[str] | None = None,
 ) -> int:
+    """`provenance`（Phase 1 Step 1.4）：這個來源的宣告（source_class、company_id）；`form_type` 取自 item。
+
+    ⚠ 來源宣告驗證失敗**不得**走下面那條 `except ValueError: continue`——那會把整筆 lead 靜默跳過
+    （INV-3）。它先被單獨接住：記進 `errors`（呼叫端寫進 harvest log 的 `provenance_errors`），
+    lead 照樣登記、只是不帶宣告。"""
     new = 0
+    base = dict(provenance or {})
     for item in items:
+        declared = {**base, "form_type": item.get("form_type")}
+        common = dict(
+            source=source,
+            url=item["url"],
+            title=item.get("title", ""),
+            raw_text=item.get("raw_text"),
+            media=item.get("media"),
+            published_at=item.get("published_at"),
+            seen_at=seen_at,
+        )
         try:
-            lead_id, is_new = leads.register(
-                store,
-                source=source,
-                url=item["url"],
-                title=item.get("title", ""),
-                raw_text=item.get("raw_text"),
-                media=item.get("media"),
-                published_at=item.get("published_at"),
-                seen_at=seen_at,
-            )
+            try:
+                lead_id, is_new = leads.register(store, **common, **declared)
+            except leads.LeadProvenanceError as exc:
+                if errors is not None:
+                    errors.append(f"{item.get('url')}: {exc}")
+                print(f"[harvest] {source} 來源宣告不合法（lead 照樣登記、不帶宣告）：{exc}",
+                      file=sys.stderr)
+                lead_id, is_new = leads.register(store, **common)
         except ValueError:
             continue  # 壞 URL 跳過，不讓單筆汙染整批
         if is_new:
@@ -261,8 +283,11 @@ def harvest_feeds(config: dict, store: dict, *, seen_at: str | None = None) -> N
                              run_at=seen_at, failure_class="parse_error")
             print(f"[harvest] {source} parse_failed: {exc}", file=sys.stderr)
             continue
-        new = _register_all(store, source, items, seen_at)
-        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
+        errors: list[str] = []
+        new = _register_all(store, source, items, seen_at, errors=errors, provenance={
+            "source_class": feed.get("source_class"), "company_id": feed.get("company_id")})
+        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at,
+                         provenance_errors=len(errors))
         print(f"[harvest] {source} ok: {new} new / {len(items)} items")
 
 
@@ -430,7 +455,8 @@ def harvest_x(config: dict, store: dict, *, seen_at: str | None = None) -> None:
             continue
 
         items = [_x_post_item(handle, post, section, x_api) for post in posts]
-        new = _register_all(store, source, items, seen_at)
+        # X 貼文是二手（轉述、評論）；語意 watch 不看它（C2）
+        new = _register_all(store, source, items, seen_at, provenance={"source_class": "secondary"})
         newest = x_api.newest_id(posts)
         pending_high = state.get("x_pagination_high_watermark")
         high_watermark = max(
@@ -652,6 +678,16 @@ def _edgar_watch_tickers(watch: dict) -> list[str]:
         return sorted({str(t).strip().upper() for t in (watch.get("tickers") or []) if str(t).strip()})
 
 
+def _registry_company(ticker: str) -> str | None:
+    """ticker → registry 的 `co:*`；查不到回 None（INV-1：不憑名字猜）。"""
+    try:
+        from identity.registry import get_registry
+
+        return get_registry().company_id_for_ticker(ticker)
+    except Exception:  # noqa: BLE001 — registry 讀不到就不帶公司宣告，lead 照樣登記
+        return None
+
+
 def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> None:
     watch = config.get("edgar_watch") or {}
     tickers = _edgar_watch_tickers(watch)
@@ -682,9 +718,13 @@ def harvest_edgar(config: dict, store: dict, *, seen_at: str | None = None) -> N
             print(f"[harvest] {source} fetch_failed: {exc}", file=sys.stderr)
             continue
         items = filings_to_leads(ticker, cik, filings)
+        errors: list[str] = []
+        # EDGAR 天生一手；公司由 ticker 經 registry 解析（查不到＝null，不猜；INV-1）
         new = _register_all(store, source, items, seen_at,
-                            auto_no_go_forms=auto_no_go)
-        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
+                            auto_no_go_forms=auto_no_go, errors=errors,
+                            provenance={"source_class": "primary", "company_id": _registry_company(ticker)})
+        leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at,
+                         provenance_errors=len(errors))
         print(f"[harvest] {source} ok: {new} new / {len(items)} filings")
 
 
@@ -787,8 +827,12 @@ def harvest_mops(config: dict, store: dict, *, seen_at: str | None = None) -> No
             source = f"mops:{ticker.upper()}"
             mine, _report = select_tickers(rows, [ticker])
             items = announcements_to_leads(ticker, mine)
-            new = _register_all(store, source, items, seen_at)
-            leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at)
+            errors: list[str] = []
+            # MOPS 重訊天生一手；公司由 ticker 經 registry 解析
+            new = _register_all(store, source, items, seen_at, errors=errors, provenance={
+                "source_class": "primary", "company_id": _registry_company(ticker)})
+            leads.record_run(store, source=source, result="ok", new=new, run_at=seen_at,
+                             provenance_errors=len(errors))
             print(f"[harvest] {source} ok: {new} new / {len(items)} announcements")
 
 
