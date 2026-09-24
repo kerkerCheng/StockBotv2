@@ -232,6 +232,13 @@ def test_standing_go_never_touches_watch_decision(expired_semantic) -> None:
     assert candidates == []
 
 
+def test_r2b_rollback_collector_is_not_wired_into_sync() -> None:
+    """R2-b NO_GO（2026-09-24）的回滾守衛：B1／B2 修好前，sync 不得呼叫 watch_decision 收集器。
+    重新啟用時連同這條測試一起拿掉——那是一個要被看見的決定，不是順手改回。"""
+    assert "watch_expiry" not in {name for name, _ in todo.SOURCE_COLLECTORS}
+    assert "watch_expiry" not in todo.SOURCE_ITEM_TYPES
+
+
 def test_go_authorization_row_excludes_every_authority_mutation() -> None:
     go_means, excludes = todo.GO_AUTHORIZATION["watch_decision"]
     assert "bounded research" in go_means

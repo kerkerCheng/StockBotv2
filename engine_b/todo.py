@@ -1715,7 +1715,7 @@ SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
     # 兩個 legacy kind 從此**沒有 collector**——與 `manual` 同形：缺席不代表完成（見上方 docstring）。
     "engine_c_observations": frozenset({"engine_c_observation"}),
     "thesis_mutations": frozenset({"thesis_mutation"}),
-    "watch_expiry": frozenset({"watch_decision"}),
+    # "watch_expiry": frozenset({"watch_decision"}) —— R2-b NO_GO 回滾，見 SOURCE_COLLECTORS
 }
 
 
@@ -1753,7 +1753,9 @@ SOURCE_COLLECTORS: tuple[tuple[str, str], ...] = (
     ("lifecycle", "_collect_lifecycle_rows"),
     ("engine_c_observations", "_collect_engine_c_observation_rows"),
     ("thesis_mutations", "_collect_thesis_mutation_rows"),
-    ("watch_expiry", "_collect_watch_expiry_rows"),
+    # ⚠ 2026-09-24 R2-b NO_GO 回滾（plan §0.5 預寫的回滾）：`("watch_expiry", "_collect_watch_expiry_rows")`
+    # 停登記——B1（thesis 對帳對到期條件重登、同一等待兩處住）與 B2（go 記不了「條件已成立」）修好前不鑄 watch_decision。
+    # 收集器函式與測試保留；重新啟用＝把這一列與 SOURCE_ITEM_TYPES 那一列加回來（並拿掉 test_watch_expiry 的回滾守衛）。
 )
 
 
