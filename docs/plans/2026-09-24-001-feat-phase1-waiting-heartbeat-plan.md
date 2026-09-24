@@ -46,7 +46,7 @@ plan_review: 第 1 輪 NO_GO（2026-09-24，對 0c34de8；blocking B1–B3）→
 | C2 | 語意比對的「一手」與實體（P0 review B1／B2） | harvest 設定的每個 feed 宣告 `company_id` 與是否一手（EDGAR／MOPS 天生一手、公司由 ticker 決定）；語意比對用它，**不看 triage 的 tier 或 go**；回填既有 lead 的實體；心跳加「登記了但沒有來源能叫醒 N」 |
 | C3 | 反證判定「觸及」之後（P0 review B3） | `thesis_lifecycle` 收集器看到「該 thesis 有反證被判觸及、且之後尚未複查」就出一筆 pq2（go＝本機複查該 thesis、不含自動改 lifecycle；同一 thesis 本來就只會有一筆，理由合併）；讀圖來源的標 `needs_reread`；心跳印「反證已觸及待處置 N」。「尚未複查」的判法見 1.5（第 2 輪 N-d：不比 `last_checked` 日期，改由項目記下它涵蓋的 watch_id、結案時標 handled） |
 | C4 | Codex 的權限與 daily 的目標（P0 第 2 輪 X1；使用者 2026-09-24「權限照你建議」） | **Codex 只看不寫**：`codex exec --ignore-user-config --disable hooks -s read-only`，只回一份符合 `--output-schema` 的 JSON；**寫入由 daily 的程式驗證後做**（`engine_b.cli triage-apply`，收據記是哪個 Codex session 判的）；子行程環境變數白名單（不帶任何憑證）。daily 的目標改寫為：**心跳不靠 LLM；其他步驟可以用 LLM，但 LLM 只產出提議，由程式驗證後寫入**（原寫「零 LLM 選命令」，太窄也不準）。目前 LLM 步驟只有 triage（使用者 2026-09-24：暫不加 AI 摘要行） |
-| C5 | Graph MCP（2026-09-24 使用者決定停用） | 已停：`graph_mcp` process 停止、開機 vbs 移除該行（Claude session 2026-09-24 執行）；tunnel 的 `mcp.`、`neo4j.` 兩個 hostname **由使用者自己從 `~/.cloudflared/config.yml` 移除**（agent 改 tunnel 設定被權限規則擋下）；拆 code 列 ROADMAP「旁支開發項」，**不在 Phase 1 範圍** |
+| C5 | Graph MCP（2026-09-24 使用者決定停用） | 已停：`graph_mcp` process 停止、開機 vbs 移除該行（Claude session 2026-09-24 執行）；tunnel 的 `mcp.`、`neo4j.` 兩個 hostname 經使用者授權同日移除、cloudflared 重啟（外部實測 `mcp.`、`neo4j.` 回 404，`stockbot.` 照舊）；claude.ai connector 由使用者斷開；手機改用 Claude Code Remote Control；拆 code 列 ROADMAP「旁支開發項」，**不在 Phase 1 範圍** |
 
 ## 0.2 現況實測（2026-09-24；**現況數字會腐壞，引用前重跑查證命令**）
 
@@ -67,7 +67,7 @@ plan_review: 第 1 輪 NO_GO（2026-09-24，對 0c34de8；blocking B1–B3）→
 | Codex 使用者層設定（P0 第 2 輪 X1） | `~/.codex/config.toml` 開了 slack、google-calendar、computer-use、chrome、browser 等 plugin；`codex mcp list` 列出 enabled 的 `node_repl`（任意 Node 程式、有網路）、`cua_repl`（操作桌面）、`openaiDeveloperDocs`。**exec 預設全部載入**；MCP 工具不受 `.codex/rules`（只管 shell 升權）與 shell 沙盒約束 | `codex.exe mcp list`；`grep -n "plugins\|mcp_servers" ~/.codex/config.toml` |
 | Codex 沙盒對 repo 的 ACL（X1） | `CodexSandboxUsers:(I)(M)`（Modify）繼承到整個 repo：`.env`、`.venv\Lib\site-packages` 都可改；`library\private` 只有 `Cheng`（沙盒讀不到）。`.env` 存 `NOTIFY_DISCORD_WEBHOOK_URL`、`X_BEARER_TOKEN`、`ANTHROPIC_API_KEY` 等（`scripts/publish_daily_brief.py:56-57` 發送前 `load_dotenv(.env)`）；`.env`、`.venv/`、`__pycache__/` 都被 gitignore，`git status` 看不到 | `icacls .env`；`icacls .venv\Lib\site-packages`；`icacls library\private`；`grep -o "^[A-Z_]*=" .env`（只印鍵名） |
 | repo 的 Codex hook（X1） | `.codex/hooks.json` 的 SessionStart 跑 `python crons/thesis_freshness_check.py`，輸出「…要現在複查嗎？」注入 session——exec 也會跑，除非 `--disable hooks` | `cat .codex/hooks.json` |
-| Graph MCP（C5） | 2026-09-24 已停：process 停、開機 vbs 移除；`~/.cloudflared/config.yml` 仍有 `mcp.`、`neo4j.` 兩個 hostname，待使用者移除 | `grep hostname ~/.cloudflared/config.yml`；`curl http://127.0.0.1:8788/` 連不上 |
+| Graph MCP（C5） | 2026-09-24 已停：process 停、開機 vbs 移除、`mcp.`、`neo4j.` 兩個 hostname 移除、connector 斷開 | `grep hostname ~/.cloudflared/config.yml`；`curl http://127.0.0.1:8788/` 連不上 |
 | lead 的 `published_at` 格式（第 2 輪 N-c） | RSS feed（MFN、sivers:press、yahoo）是 RFC 822（`Tue, 30 Jun 2026 23:15:00 +0000`，112 筆全是）；EDGAR、MOPS 是 ISO 日期 | 唯讀掃 `pending_leads.json` |
 | lead 的 `entities` 會被重算（第 2 輪 N-a） | `leads.register` 內容補強時（`engine_b/leads.py:216`）與 `backfill_entities(rescan=True)`（`engine_b/entities.py:207-217`）都**只從文字**重算 `entities` 並覆寫 | 讀程式 |
 | writer lock TTL（第 2 輪 N-g） | `DEFAULT_TTL_MINUTES = 90`；合併後 daily 估 60–90 分鐘 | `engine_b/writer_lock.py:43` |

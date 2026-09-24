@@ -1014,7 +1014,7 @@ schtasks /Query /TN StockBotv2-FxSync /FO LIST /V                          # Sta
 
 ## MCP server
 
-> **⚠ 2026-09-24 起停用**（使用者決定；ROADMAP「旁支開發項：Graph MCP 退役」）：process 已停、開機 vbs 已移除啟動行；tunnel 的 `mcp.`、`neo4j.` hostname 由使用者從 `~/.cloudflared/config.yml` 移除。
+> **⚠ 2026-09-24 起停用**（使用者決定；ROADMAP「旁支開發項：Graph MCP 退役」）：process 已停、開機 vbs 已移除啟動行；tunnel 的 `mcp.`、`neo4j.` hostname 已從 `~/.cloudflared/config.yml` 移除（外部實測回 404）；claude.ai connector 已斷開。手機改用 Claude Code Remote Control 操作本機 session。
 > 下面是停用前的操作說明，拆除時一併改寫；**不要照著重新啟動**，除非使用者決定恢復。
 
 本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，工具數以 `tools/list` 實測為準（2026-09-24 為 11，`get_decision_brief` 已隨 Phase 0 退役），Git 能力僅 leads.json 一個窄例外。daily／weekly 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。

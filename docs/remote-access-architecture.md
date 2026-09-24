@@ -1,6 +1,6 @@
 # 遠端存取架構 — 資料流與安全邊界
 
-> **⚠ 2026-09-24 起 Graph MCP 停用**（使用者決定）：`graph_mcp` process 已停、開機 vbs 已移除啟動行；`mcp.`、`neo4j.` 兩個 hostname 由使用者移除。
+> **⚠ 2026-09-24 起 Graph MCP 停用**（使用者決定）：`graph_mcp` process 已停、開機 vbs 已移除啟動行；`mcp.`、`neo4j.` 兩個 hostname 已移除（外部實測回 404）；claude.ai connector 已斷開。手機改用 Claude Code Remote Control 操作本機 session。
 > 本檔描述的是停用前的架構，待 ROADMAP「旁支開發項：Graph MCP 退役」封存進 `docs/archive/`。APP（`stockbot.` hostname＋Cloudflare Access）不受影響。
 
 > 2026-07-11 建立（U7a/U7d），2026-07-16 更新為 server-owned Research Action。這份是活文件：任何改動 tunnel、MCP server、connector 的人都應同步更新。
