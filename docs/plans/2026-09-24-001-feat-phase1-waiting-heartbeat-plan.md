@@ -203,7 +203,7 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | Step | 內容 | 狀態 | commit |
 |---|---|---|---|
 | P0 | plan review（乾淨 context 的 Opus 5.5 max；使用者跑 §0.6） | ✅ 第 4 輪 GO（2026-09-24；歷程：第 1–3 輪 NO_GO → 修訂 → 第 4 輪 GO，N4-1–N4-13 已併入 §0.7） | 0c34de8（第 1 輪標的）、1bb46fb（第 2 輪標的）、9fc7593（第 3 輪標的）、7bd79ad（第 4 輪標的） |
-| 1.0 | 基準快照 | ○ | |
+| 1.0 | 基準快照 | ✅ `docs/reports/2026-09-24-phase1-baseline.md`（watch 95／active 90／semantic 0；pq2 球在你 0；2180 passed；invariants 13 PASS；舊店 sha256 同 Phase 0） | |
 | 1.1 | 舊店讀取端改唯讀連線（`mode=ro`） | ○ | |
 | 1.2a | 一個 daily：`crons/daily_task.py`、config 唯一時間來源、註冊命令、自我比對、最外層保證、鎖續期、保險檢查、`crons/routine_hint.py`；註冊新工作並**停用**舊兩個 | ○ | |
 | 1.2b | 至少一次排程觸發成功後，**刪除**舊兩個 Windows 工作與 `crons/heartbeat_task.py`（不擋 1.3 起的 Step） | ○ | |
