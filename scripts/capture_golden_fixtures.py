@@ -208,9 +208,9 @@ def cap_watch_states() -> dict:
 
 # ---- 8/9. cohort lifecycle 與 blocked state（F-06／F-24；結構 only）------
 def cap_cohort_lifecycle() -> dict:
-    from decision_lab.bootstrap import open_default_store
+    from decision_lab.bootstrap import open_readonly_store
 
-    store = open_default_store()
+    store = open_readonly_store()
     try:
         cohorts = store.list_operational_cohorts(
             as_of=datetime.now().astimezone().isoformat())
@@ -232,9 +232,9 @@ def cap_cohort_lifecycle() -> dict:
 
 
 def cap_blocked_states() -> dict:
-    from decision_lab.bootstrap import open_default_store
+    from decision_lab.bootstrap import open_readonly_store
 
-    store = open_default_store()
+    store = open_readonly_store()
     try:
         cohorts = store.list_operational_cohorts(
             as_of=datetime.now().astimezone().isoformat())

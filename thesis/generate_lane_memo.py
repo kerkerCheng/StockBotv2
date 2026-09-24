@@ -228,9 +228,9 @@ def _build_variant_perception_context(company_id: str | None) -> str:
     if not company_id:
         return ""
     try:
-        from decision_lab.bootstrap import open_default_store
+        from decision_lab.bootstrap import open_readonly_store
 
-        store = open_default_store()
+        store = open_readonly_store()
         try:
             vp = store.latest_variant_perception_for_company(company_id)
         finally:

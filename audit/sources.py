@@ -159,11 +159,11 @@ def engine_c_conn() -> sqlite3.Connection:
 @contextmanager
 def decision_store() -> Iterator[Any]:
     try:
-        from decision_lab.bootstrap import open_default_store
+        from decision_lab.bootstrap import open_readonly_store
     except ImportError as exc:  # pragma: no cover
         raise SourceUnavailable(f"decision_lab 不可用：{exc}") from exc
     try:
-        store = open_default_store()
+        store = open_readonly_store()
     except Exception as exc:  # noqa: BLE001
         raise SourceUnavailable(f"Decision Store 打不開：{exc}") from exc
     try:

@@ -6,7 +6,7 @@ catalyst／disproof／expiry（`briefing/alpha_view/sources.py`）與 `scripts/c
 gate 3（research 面板文字不變）即破——見 plan §0.6。
 
 `scripts/catalyst_watch.py` 是 daily 的 unattended entry point，它刻意用
-`mode=ro` 的裸 sqlite 連線而不是 `open_default_store()`——唯讀連線碰不到
+`mode=ro` 的裸 sqlite 連線而不是開整個 `DecisionStore`——唯讀連線碰不到
 append-only authority，permission surface 因此比開整個 store 窄。SQL 住這裡而不住
 腳本裡：它認識的是 Decision Store 的 schema，那是 Engine D 的東西。
 

@@ -117,7 +117,7 @@ point-in-time 需求獨立成 `ResearchContext`，Engine D 才減得下來。
 
 查證：
 ```
-python -c "from decision_lab.bootstrap import open_default_store as o; s=o(); \
+python -c "from decision_lab.bootstrap import open_readonly_store as o; s=o(); \
 print({t: s.table_count(t) for t in sorted(s.table_names())}); s.close()"
 python -m engine_b.cli counts
 ```
@@ -569,7 +569,7 @@ python -c "from engine_c.db import get_conn; c=get_conn().cursor(); \
 c.execute('SELECT COUNT(*),COUNT(bar_date) FROM financial_snapshots'); print(c.fetchone())"
 
 # Engine D
-python -c "from decision_lab.bootstrap import open_default_store as o; s=o(); \
+python -c "from decision_lab.bootstrap import open_readonly_store as o; s=o(); \
 print(s.capital_expression_counters()); s.close()"
 
 # 瓶頸排序現況

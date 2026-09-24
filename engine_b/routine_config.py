@@ -210,9 +210,9 @@ def discover_tracked_tickers(
         tickers.update(lifecycle_tickers(lifecycle_path))
     if sources["decision_cohorts"]:
         try:
-            from decision_lab.bootstrap import open_default_store
+            from decision_lab.bootstrap import open_readonly_store
 
-            store = open_default_store()
+            store = open_readonly_store()
             try:
                 rows = store.list_operational_cohorts(
                     as_of=datetime.now(timezone.utc).isoformat()

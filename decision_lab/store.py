@@ -48,6 +48,10 @@ class FrozenStoreError(RuntimeError):
     """舊 Decision Store 已凍結（2026-09-22，G12）：live 選擇與成交回報不再寫進舊店。"""
 
 
+class DecisionStoreAbsent(FileNotFoundError):
+    """唯讀入口找不到舊店 DB 檔——明確缺席，不是空店（唯讀入口不建庫）。"""
+
+
 _SCHEMA_PATH = Path(__file__).with_name("schema.sql")
 _SCHEMA_VERSION = "9"
 
@@ -161,6 +165,40 @@ class DecisionStore:
                     encoding="utf-8",
                 )
                 os.replace(marker_temp, marker)
+        except BaseException:
+            conn.close()
+            raise
+        return cls(conn, resolved)
+
+    @classmethod
+    def open_readonly(cls, path: Path) -> "DecisionStore":
+        """連線層強制唯讀（`mode=ro`）——凍結後所有讀取端的唯一入口（Phase 1 Step 1.1）。
+
+        刻意繞過 `open()` 會寫的每一步：新庫 `executescript`、`PRAGMA journal_mode = WAL`、
+        authority marker、以及 `connect_sqlite` 的 `mkdir`。可寫連線在最後一個 handle 關閉時
+        還會 checkpoint，把 `-wal` 併回 `.db`——那正是「用法唯讀、檔案卻被改」的路徑。
+        DB 檔不存在 → `DecisionStoreAbsent`，不建空庫；任何寫入方法 → `sqlite3.OperationalError`。
+        """
+        resolved = Path(path).resolve()
+        if not resolved.is_file():
+            raise DecisionStoreAbsent(f"Decision Store 不存在（唯讀入口不建庫）：{resolved}")
+        conn = sqlite3.connect(
+            f"{resolved.as_uri()}?mode=ro",
+            uri=True,
+            check_same_thread=False,
+        )
+        conn.row_factory = sqlite3.Row
+        try:
+            integrity = conn.execute("PRAGMA integrity_check").fetchone()
+            version_row = conn.execute(
+                "SELECT value FROM decision_store_meta WHERE key = 'schema_version'"
+            ).fetchone()
+            if integrity is None or str(integrity[0]) != "ok" or version_row is None:
+                raise RuntimeError("Decision Store authority is invalid")
+            if str(version_row["value"]) != _SCHEMA_VERSION:
+                raise RuntimeError(
+                    "Decision Store schema version mismatch; use an explicit migration or empty bootstrap"
+                )
         except BaseException:
             conn.close()
             raise

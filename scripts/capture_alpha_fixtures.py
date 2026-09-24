@@ -213,9 +213,9 @@ def _as_datetime(value) -> datetime | None:
 # ---------------------------------------------------------------------------
 
 def capture_axis_assessment(company_id: str = "co:coherent") -> dict:
-    from decision_lab.bootstrap import open_default_store
+    from decision_lab.bootstrap import open_readonly_store
 
-    store = open_default_store()
+    store = open_readonly_store()
     try:
         cohorts = store.list_operational_cohorts(as_of=datetime.now().astimezone().isoformat())
         match = [c for c in cohorts if str(c.get("company_id")) == company_id]

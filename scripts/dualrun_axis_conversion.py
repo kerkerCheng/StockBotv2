@@ -66,9 +66,9 @@ EXPECTED: dict[str, str] = {
 
 
 def main() -> int:
-    from decision_lab.bootstrap import open_default_store
+    from decision_lab.bootstrap import open_readonly_store
 
-    store = open_default_store()
+    store = open_readonly_store()
     rows: list[dict] = []
     try:
         cohorts = store.list_operational_cohorts(

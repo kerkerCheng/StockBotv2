@@ -203,8 +203,8 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | Step | 內容 | 狀態 | commit |
 |---|---|---|---|
 | P0 | plan review（乾淨 context 的 Opus 5.5 max；使用者跑 §0.6） | ✅ 第 4 輪 GO（2026-09-24；歷程：第 1–3 輪 NO_GO → 修訂 → 第 4 輪 GO，N4-1–N4-13 已併入 §0.7） | 0c34de8（第 1 輪標的）、1bb46fb（第 2 輪標的）、9fc7593（第 3 輪標的）、7bd79ad（第 4 輪標的） |
-| 1.0 | 基準快照 | ✅ `docs/reports/2026-09-24-phase1-baseline.md`（watch 95／active 90／semantic 0；pq2 球在你 0；2180 passed；invariants 13 PASS；舊店 sha256 同 Phase 0） | |
-| 1.1 | 舊店讀取端改唯讀連線（`mode=ro`） | ○ | |
+| 1.0 | 基準快照 | ✅ `docs/reports/2026-09-24-phase1-baseline.md`（watch 95／active 90／semantic 0；pq2 球在你 0；2180 passed；invariants 13 PASS；舊店 sha256 同 Phase 0） | b07427b |
+| 1.1 | 舊店讀取端改唯讀連線（`mode=ro`） | ✅ 7 個讀取端（5 kept_file＋2 支 fixture 擷取）改 `open_readonly_store()`；可寫的 `open_default_store()` 拿掉（偏差 #1）；舊店 sha256 不變 | |
 | 1.2a | 一個 daily：`crons/daily_task.py`、config 唯一時間來源、註冊命令、自我比對、最外層保證、鎖續期、保險檢查、`crons/routine_hint.py`；註冊新工作並**停用**舊兩個 | ○ | |
 | 1.2b | 至少一次排程觸發成功後，**刪除**舊兩個 Windows 工作與 `crons/heartbeat_task.py`（不擋 1.3 起的 Step） | ○ | |
 | 1.3 | triage 併進 daily（`claude -p` 零工具＋JSON、每次 init 能力檢查、`triage-apply` 由程式寫入、`.codex/rules` 清零、排程器實測、daily-brief skill 改成互動專用）＋ R2-a | ○ | |
@@ -419,7 +419,7 @@ reviewer 重跑了 C6 的合成探針與對照組（§0.2「第 4 輪重驗」�
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
-| | | | | |
+| 1 | 1.1 | 「提供 `open_readonly_store()`；五個讀取端改用它」，兩支 fixture 擷取腳本「一併改唯讀，或寫明豁免」 | 七個呼叫端全改唯讀後，`open_default_store()` 已無任何呼叫端，**整支拿掉**（bootstrap 只剩 `open_readonly_store`／`default_store_path`）；要建新庫的只剩測試，直接用 `DecisionStore.open`；`tests/test_decision_store_readonly.py` 以 AST 守「非測試程式不得出現 `DecisionStore.open` 或 `open_default_store`」 | 修法層級三問的③：拿掉一個機制優先於加一個——留著可寫入口，下一個讀取端還是可能順手用它（L15：唯讀靠連線不靠用法） |
 
 ---
 

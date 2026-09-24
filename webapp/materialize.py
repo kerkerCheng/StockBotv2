@@ -1162,9 +1162,9 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
     spec.loader.exec_module(outcome)
 
     results, unavailable, benchmarks = outcome.collect()
-    from decision_lab.bootstrap import open_default_store
+    from decision_lab.bootstrap import open_readonly_store
 
-    store_handle = open_default_store()
+    store_handle = open_readonly_store()
     try:
         counters = dict(store_handle.capital_expression_counters())
     finally:
