@@ -242,6 +242,7 @@ def add_watch(
     note: str = "",
     created_at: str | None = None,
     disproof_ref: str = "",
+    wake_reading: str = "",
     condition: str = "",
     source_ref: str = "",
     quote_locator: str = "",
@@ -262,9 +263,12 @@ def add_watch(
         raise EventWatchError("expires 必填——無限期等待會腐爛成事實（brainstorm 硬邊界）")
     # 喚醒目標恰好擇一（[321] 由二選一擴充；Phase 1 Step 1.4 加 disproof_ref）：pq2 編號（翻醒 waiting 項）、
     # 假設 id（fact-check 到點）、lead id（追源線索排回 pq1）、或反證來源（語意條件，指回 memo／讀圖）。
-    targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead), bool(disproof_ref)]
+    # Phase 1 Step 1.5 再加 wake_reading（讀圖節點：需求側客戶出了新一手文件 → 該節點列進 needs_reread）。
+    targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead), bool(disproof_ref), bool(wake_reading)]
     if sum(targets) != 1:
-        raise EventWatchError("wake_pq2／hypothesis_ref／wake_lead／disproof_ref 必須恰好擇一")
+        raise EventWatchError("wake_pq2／hypothesis_ref／wake_lead／disproof_ref／wake_reading 必須恰好擇一")
+    if wake_reading and kind != "entity_filing_signal":
+        raise EventWatchError("wake_reading 只用在 entity_filing_signal（等需求側客戶的一手文件）")
     if (kind == SEMANTIC_KIND) != bool(disproof_ref):
         raise EventWatchError("semantic_condition 的喚醒目標必須是 disproof_ref，其他 kind 不得用它")
     if kind == SEMANTIC_KIND:
@@ -297,6 +301,8 @@ def add_watch(
         "status": "active",
         "woken_by": None,
     }
+    if wake_reading:
+        watch["wake_reading"] = wake_reading
     if kind == SEMANTIC_KIND:
         watch.update({
             "disproof_ref": disproof_ref,
@@ -598,6 +604,7 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
         "semantic_pending_check": len(pending),
         "semantic_flagged": sum(1 for w in pending if flag_for_current(w) is not None),
         "wake_disproof": sum(1 for w in active if w.get("disproof_ref")),
+        "wake_reading": sum(1 for w in active if w.get("wake_reading")),
         "semantic_unreachable": (None if coverage is None else
                                  sum(1 for w in watching if not is_reachable(w, coverage))),
     }
@@ -792,6 +799,9 @@ def wake_target(watch: Mapping[str, Any]) -> dict[str, Any]:
     if watch.get("disproof_ref"):
         return {"kind": "disproof", "ref": watch["disproof_ref"],
                 "label": f"反證 {watch['disproof_ref']}（互動判定）"}
+    if watch.get("wake_reading"):
+        return {"kind": "reading", "ref": watch["wake_reading"],
+                "label": f"讀圖 {watch['wake_reading']}（醒來＝列進該重讀，不自動重讀）"}
     if watch.get("hypothesis_ref"):
         return {"kind": "hypothesis", "ref": watch.get("hypothesis_ref"),
                 "label": f"假設 {watch.get('hypothesis_ref')}"}

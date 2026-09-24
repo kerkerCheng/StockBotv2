@@ -108,6 +108,14 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
 | **5 端到端 smoke** | 2026-09-24 實跑 `python crons\daily_task.py`（run `bf21bb07`）：19 步 17 ok、2 skipped（`executor=none`）、約 7 分鐘（materialize 282 秒最長）；harvest 最後一輪＝當天、APP 7 份 state 當天 materialize、publisher 回 `sent` 3/3、鎖已釋放、收工標記 `finalized`。`register_daily_task.py --apply` 後 `StockBotv2-Daily` Ready（下次 05:30）、自我比對 `match`；舊兩個工作 `Disabled`。⚠ 端到端驗收仍要等**真正的排程觸發**（1.2b 的前提：`LastTaskResult 0` 且當天執行紀錄完整），手動觸發不算（L13-1）。 |
 
+### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.5：反證登記 hook）
+
+**不新增無人值守可執行面**：`DAILY_STEPS` 不變。⑩ `engine_b.todo sync` 多做一件事——thesis 反證對帳
+（`engine_b/disproof.py`），寫的是 ⑩ 本來就在寫的 `library/leads/event_watches.json`；讀 `thesis/lifecycle.json`、
+現行 memo 與 sidecar（唯讀）。心跳段 2 多一行反證計數：全部本機讀取（registry、lifecycle、memo、讀圖 ledger、
+harvest 設定、凍結舊店以 `mode=ro`），零網路。讀圖 `--add` 後的等待登記只在互動 session 發生。
+`thesis/pending_lifecycle.py`（thesis mutation 的人工 gate contract）一個字未動。
+
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.4：語意條件 watch ＋ 語意預篩）
 
 | 步 | 結論 |

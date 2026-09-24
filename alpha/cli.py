@@ -413,6 +413,31 @@ def cmd_abstention(args: argparse.Namespace) -> int:
     return 0
 
 
+def _register_watches(record: dict, register) -> int:
+    """讀圖寫入之後的等待登記（Phase 1 Step 1.5）。失敗就大聲說、非零離開——ledger 已寫、watch 沒登記，
+    `--register-watches` 可冪等重跑。"""
+    try:
+        summary = register(record)
+    except Exception as exc:  # noqa: BLE001
+        print(f"✗ 讀圖已寫入，但等待登記失敗：{type(exc).__name__}: {exc}"
+              f"——修好後跑 `python -m alpha structure-reading {record.get('node')} --register-watches`",
+              file=sys.stderr)
+        return 1
+    print(f"  反證 watch 登記 {len(summary['registered'])}、被取代收掉 {len(summary['consumed'])}；"
+          f"客戶重讀 watch 登記 {len(summary['reread_registered'])}、已重讀收掉 {len(summary['reread_consumed'])}"
+          f"；觸及已處置 {len(summary['touched_handled'])}")
+    print("  下一步：python -m webapp materialize --structure-readings"
+          "（心跳第 2 段才看得到它的 staleness）")
+    return 0
+
+
+def ledger_lines(node: str) -> list[str]:
+    from .providers.structure_readings import ledger_path
+
+    path = ledger_path(node)
+    return [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()] if path.is_file() else []
+
+
 def cmd_structure_reading(args: argparse.Namespace) -> int:
     """結構讀圖 ledger 的讀寫入口（Q5，2026-09-17）——**存輸入，不存結論**。
 
@@ -429,7 +454,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
     from datetime import date, datetime, timezone
 
     from .providers.structure_readings import (
-        append_reading_record, fetch_structure_snapshot, read_reading_records,
+        append_reading_record, fetch_structure_snapshot, read_reading_records, register_reading_watches,
     )
     from .structure_reading import (
         READING_KINDS, needs_reread, reading_status, select_reading, structure_reading_record,
@@ -457,6 +482,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
                     tickers=list(spec.get("tickers") or []),
                     supersedes_id=spec.get("supersedes_id"),
                     author=str(spec.get("author") or "user"), created_at=datetime.now(timezone.utc),
+                    disproof=spec.get("disproof"),
                 )
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 讀圖紀錄不合法：{exc}", file=sys.stderr)
@@ -478,9 +504,17 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
             print(f"✗ {exc}", file=sys.stderr)
             return 2
         print(f"✓ {record['reading_id']} → {path}")
-        print("  下一步：python -m webapp materialize --structure-readings"
-              "（心跳第 2 段才看得到它的 staleness）")
-        return 0
+        return _register_watches(record, register_reading_watches)
+
+    if getattr(args, "register_watches", False):
+        # 冪等補登記：append 之後登記失敗（或更早的紀錄）時，以現行那一份重跑等待登記。
+        current = select_reading(records, today=date.today())
+        if current is None:
+            print("✗ 沒有現行的讀圖紀錄可以登記", file=sys.stderr)
+            return 2
+        raw = next(json.loads(line) for line in ledger_lines(node)
+                   if json.loads(line).get("reading_id") == current.reading_id)
+        return _register_watches(raw, register_reading_watches)
 
     today = date.today()
     current = select_reading(records, today=today)
@@ -549,6 +583,8 @@ def build_parser() -> argparse.ArgumentParser:
     reading.add_argument("--check", action="store_true", help="跟現在的圖比一次並分級（唯讀）")
     reading.add_argument("--add", help="append 一筆（JSON spec：kind／reading／expires 必填；快照由本命令現跑）")
     reading.add_argument("--retract", help="append 一筆撤回紀錄（指定 reading_id）")
+    reading.add_argument("--register-watches", action="store_true",
+                         help="以現行讀圖冪等重跑等待登記（反證語意 watch、需求側客戶的重讀 watch；Phase 1 Step 1.5）")
     reading.add_argument("--format", choices=("markdown", "json"), default="markdown")
     reading.set_defaults(func=cmd_structure_reading)
 

@@ -557,6 +557,13 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
             f"事件監看：本輪該查 {len(due)}｜已觸發未消費 {len(fired)}｜到期 {len(expired)}"
         )
 
+    # 反證（Phase 1 Step 1.5；A5）：在盯／觸及待處置／未盯分開印——「沒人盯」與「已觸發、等你處置」不得同形。
+    try:
+        section.lines.extend(_disproof_lines())
+    except Exception as exc:  # noqa: BLE001 — 這一格壞掉不帶走整段
+        absence = Absence("upstream_unavailable", f"反證計數失敗：{type(exc).__name__}")
+        section.lines.append(f"反證：{absence.reason}（{absence.kind}）")
+
     # thesis 生命週期：非 active 的就是「有東西變了」（L7 的五態）。
     section.lines.append(_thesis_line(now=now, thesis_path=thesis_path))
 
@@ -610,6 +617,32 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path) -
             line += "：" + "、".join(str(w) for w in warnings)
         section.lines.append(line)
     return section
+
+
+def _disproof_lines() -> list[str]:
+    """反證計數一行＋（>0 才印、每天印）thesis sidecar 與 memo 不符一行（第 4 輪 N4-11：快照鍵只在有變時印，
+    持續不符只會出現一天，所以這一行不走 diff）。全部本機讀取：registry、lifecycle、memo、讀圖 ledger、
+    harvest 設定、凍結舊店（唯讀）——零網路。"""
+    from engine_b import disproof
+    from engine_b import event_watch as ew
+
+    data = ew.load_watches()
+    try:
+        coverage: frozenset[str] | None = ew.primary_coverage()
+    except Exception:  # noqa: BLE001 — 涵蓋面算不出來就是「未算」，不是 0
+        coverage = None
+    c = disproof.disproof_counts(data.get("watches") or [], readings=disproof.current_readings(),
+                                 coverage=coverage, frozen_history=disproof.frozen_history_count())
+    unreachable = "未算" if c["unreachable"] is None else c["unreachable"]
+    frozen = "讀不到" if c["frozen_history"] is None else c["frozen_history"]
+    lines = [f"反證：在盯 {c['watching']}（其中叫不醒 {unreachable}）｜**觸及待處置 {c['touched_pending']}**"
+             f"｜未盯 {c['unwatched']}（v1 讀圖散文 {c['v1_prose_readings']} 份不可機械數；凍結歷史 {frozen} 不盯）"]
+    mismatch = c["thesis_sidecar_mismatch"]
+    if mismatch:
+        lines.append(f"⚠ **thesis sidecar 與 memo 不符 {len(mismatch)}**：{'、'.join(mismatch)}——memo 在 sidecar 產生之後"
+                     "被手改過，它的反證不會自動登記：重跑 generator 更新 sidecar，或用 "
+                     "`python -m engine_b.event_watch register-disproof` 手動登記")
+    return lines
 
 
 def _thesis_line(*, now: datetime, thesis_path: Path) -> str:

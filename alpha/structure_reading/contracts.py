@@ -40,7 +40,10 @@ from typing import Any, Mapping, Sequence
 
 from ..errors import ContractViolation
 
-RECORD_VERSION = "structure-reading/v1"
+#: v2（Phase 1 Step 1.5，2026-09-24）加結構化 `disproof[]`：寫讀圖時就寫下「什麼會推翻這份讀法」，
+#: append 成功後由 provider 登記成語意 watch。**v1 紀錄照樣解析成 `disproof=()`、不改寫**（L10：append-only）。
+RECORD_VERSION = "structure-reading/v2"
+RECORD_VERSION_V1 = "structure-reading/v1"
 
 #: 讀成什麼。封閉字彙，**由寫的人宣告**（見檔頭第 3 條：不得由程式從 `angles` 推導）。
 #:
@@ -62,6 +65,54 @@ ANGLE_KEYS: tuple[str, ...] = ("demand_side", "supply_side", "next_layer", "coun
 
 _ID_FIELDS = ("node", "result_digest", "kind", "reading", "created_at", "author",
               "expires", "tickers", "supersedes_id", "retracted")
+#: ⚠ v2 才把 `disproof` 納入 id：直接加進 `_ID_FIELDS` 會讓 v1 重算出不同的 id（body 多一個 `"disproof": null`），
+#: 既有 8 筆紀錄的 id 就對不上了。所以**依 `record_version` 分支**，v1 的算法一個字不動。
+_ID_FIELDS_V2 = _ID_FIELDS + ("disproof",)
+
+#: 這兩種讀法本身就是賭注，必須寫下什麼會推翻它（v2 起）；`neither`／`undecided` 可以沒有。
+KINDS_REQUIRING_DISPROOF = frozenset({"moat", "volume"})
+
+
+@dataclass(frozen=True, slots=True)
+class DisproofEntry:
+    """讀圖的一條反證／確認條件（L7 三件套：條件、核查頻率、觸發後 48 小時動作）。"""
+
+    condition: str
+    entities: tuple[str, ...]
+    check_frequency: str
+    action_48h: str
+    expires: date | None = None
+
+    def __post_init__(self) -> None:
+        if len(str(self.condition).strip()) < 20:
+            raise ContractViolation("disproof.condition 必須是原文、至少 20 字")
+        if not any(str(e).startswith("co:") for e in self.entities):
+            raise ContractViolation("disproof.entities 至少要有一個 co:*——只寫 ticker 的 watch 叫不醒")
+        if not str(self.check_frequency).strip() or not str(self.action_48h).strip():
+            raise ContractViolation("disproof 缺 L7 件：check_frequency 與 action_48h 都必填")
+
+    def as_dict(self) -> dict[str, Any]:
+        out: dict[str, Any] = {"condition": self.condition, "entities": list(self.entities),
+                               "check_frequency": self.check_frequency, "action_48h": self.action_48h}
+        if self.expires is not None:
+            out["expires"] = self.expires.isoformat()
+        return out
+
+
+def _disproof_entries(raw: Any) -> tuple[DisproofEntry, ...]:
+    entries = []
+    for item in raw or ():
+        if not isinstance(item, Mapping):
+            raise ContractViolation("disproof 的每一條必須是 object")
+        expires = item.get("expires")
+        entries.append(DisproofEntry(
+            condition=str(item.get("condition") or ""),
+            entities=tuple(str(e) for e in (item.get("entities") or ())),
+            check_frequency=str(item.get("check_frequency") or ""),
+            action_48h=str(item.get("action_48h") or ""),
+            expires=date.fromisoformat(str(expires)[:10]) if expires else None,
+        ))
+    return tuple(entries)
 
 
 @dataclass(frozen=True, slots=True)
@@ -81,6 +132,8 @@ class StructureReading:
     tickers: tuple[str, ...] = ()
     supersedes_id: str | None = None
     retracted: bool = False
+    disproof: tuple[DisproofEntry, ...] = ()
+    record_version: str = RECORD_VERSION_V1
 
     def __post_init__(self) -> None:
         if not self.reading_id.startswith("sr_"):
@@ -106,6 +159,10 @@ class StructureReading:
         if self.expires <= self.created_at.astimezone(timezone.utc).date():
             raise ContractViolation(
                 "expires 必須晚於 created_at——沒有到期的等待就是不會到期的等待（INV-2）")
+        if (self.record_version == RECORD_VERSION and not self.retracted
+                and self.kind in KINDS_REQUIRING_DISPROOF and not self.disproof):
+            raise ContractViolation(
+                f"{self.kind} 讀法本身就是賭注——v2 起必須寫下至少一條 disproof（什麼會推翻這份讀法）")
 
     @property
     def created_on(self) -> date:
@@ -116,8 +173,11 @@ class StructureReading:
 
 
 def new_reading_id(payload: Mapping[str, Any]) -> str:
-    """content-addressed id：同一份內容永遠得到同一個 id（重複 append 可被偵測）。"""
-    body = {k: payload.get(k) for k in _ID_FIELDS}
+    """content-addressed id：同一份內容永遠得到同一個 id（重複 append 可被偵測）。
+
+    v2 把 `disproof` 納入（只差反證的兩份 v2 才不會同 id）；v1 的欄位與算法不變。"""
+    fields = _ID_FIELDS_V2 if payload.get("record_version") == RECORD_VERSION else _ID_FIELDS
+    body = {k: payload.get(k) for k in fields}
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "sr_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -141,8 +201,9 @@ def structure_reading_record(
     tickers: Sequence[str] = (),
     supersedes_id: str | None = None,
     retracted: bool = False,
+    disproof: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    """建一筆可寫進 ledger 的紀錄。
+    """建一筆可寫進 ledger 的紀錄（v2：`disproof` 是結構化反證，moat／volume 至少一條）。
 
     `structure` 直接吃 `query.structure.StructureView.as_dict()`——**快照由那一支產生，
     這裡不自己查圖**，否則同一個節點會有兩套查法而它們遲早會漂開（L16）。
@@ -178,6 +239,7 @@ def structure_reading_record(
         "tickers": [str(t).upper() for t in tickers],
         "supersedes_id": supersedes_id,
         "retracted": bool(retracted),
+        "disproof": [entry.as_dict() for entry in _disproof_entries(disproof)],
     }
     payload["reading_id"] = new_reading_id(payload)
     parse_structure_reading_record(payload)   # 驗證；不合法就在這裡炸，不會寫進 ledger
@@ -206,6 +268,8 @@ def parse_structure_reading_record(raw: Mapping[str, Any]) -> StructureReading:
         tickers=tuple(str(t).upper() for t in (raw.get("tickers") or ())),
         supersedes_id=(str(raw["supersedes_id"]) if raw.get("supersedes_id") else None),
         retracted=bool(raw.get("retracted")),
+        disproof=_disproof_entries(raw.get("disproof")),
+        record_version=str(raw.get("record_version") or RECORD_VERSION_V1),
     )
 
 
@@ -227,6 +291,7 @@ def select_reading(
 
 
 __all__ = [
-    "ANGLE_KEYS", "READING_KINDS", "RECORD_VERSION", "StructureReading",
+    "ANGLE_KEYS", "DisproofEntry", "KINDS_REQUIRING_DISPROOF", "READING_KINDS", "RECORD_VERSION",
+    "RECORD_VERSION_V1", "StructureReading",
     "new_reading_id", "parse_structure_reading_record", "select_reading", "structure_reading_record",
 ]

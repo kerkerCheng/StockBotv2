@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
@@ -92,6 +92,99 @@ def fetch_structure_snapshot(node: str) -> dict[str, Any]:
     return build_structure(str(node), _load_edges()).as_dict()
 
 
+def demand_side_customers(record: Mapping[str, Any]) -> list[str]:
+    """快照 `demand_side` 那一角的公司端點（`co:*`，不含節點自己）——需求側客戶。"""
+    node = str(record.get("node") or "")
+    out: set[str] = set()
+    for row in (record.get("angles") or {}).get("demand_side") or ():
+        for endpoint in (row[0] if len(row) > 0 else None, row[2] if len(row) > 2 else None):
+            if isinstance(endpoint, str) and endpoint.startswith("co:") and endpoint != node:
+                out.add(endpoint)
+    return sorted(out)
+
+
+def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | None = None) -> dict[str, list[str]]:
+    """讀圖 append 成功後的等待登記（Phase 1 Step 1.5；冪等，可重跑）。
+
+    1. 被取代（`supersedes_id`）或撤回的那一份：它還在盯的語意 watch → consume（note 寫明 superseded／retracted）。
+    2. 這一份的 `disproof[]` → 每條一筆語意 watch（`source_ref=reading:<id>#<n>`，到期預設＝讀圖到期）。
+    3. 需求側客戶 → `entity_filing_signal`＋`wake_reading=<node>`（到期＝讀圖到期）：客戶出了新一手文件，
+       這個節點就列進 needs_reread——不自動重讀（重讀是研究）。已有同節點同客戶的 active 那一筆就不重登。
+    4. 這一份本身就是「重讀完成」：這個節點 fired 的 `wake_reading` watch → consume；讀圖來源的反證被判觸及、
+       還沒處置的 → `judgment.handled`（verb `reread`）。
+
+    ⚠ 經 providers 呼叫 `engine_b`：`alpha/` 核心不得 import 它（`tests/test_layer_separation.py`）。
+    """
+    from datetime import datetime, timezone
+
+    from engine_b import event_watch as ew
+
+    parsed = parse_structure_reading_record(record)
+    stamp = datetime.now(timezone.utc).isoformat()
+    data = ew.load_watches(watches_path)
+    summary: dict[str, list[str]] = {"registered": [], "consumed": [], "reread_registered": [],
+                                     "reread_consumed": [], "touched_handled": []}
+    if parsed.supersedes_id:
+        prefix = f"reading:{parsed.supersedes_id}#"
+        note = "retracted" if parsed.retracted else f"superseded by {parsed.reading_id}"
+        for watch in data["watches"]:
+            if (watch.get("kind") == ew.SEMANTIC_KIND and str(watch.get("source_ref") or "").startswith(prefix)
+                    and watch.get("status") in ("active", "fired")):
+                watch["status"] = "consumed"
+                watch["closed"] = {"at": stamp, "note": note}
+                summary["consumed"].append(watch["watch_id"])
+    if not parsed.retracted:
+        for index, entry in enumerate(parsed.disproof, 1):
+            ref = f"reading:{parsed.reading_id}#{index}"
+            if any(w.get("source_ref") == ref for w in data["watches"]):
+                continue
+            watch = ew.add_watch(
+                data, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref,
+                expires=(entry.expires or parsed.expires).isoformat(), entities=list(entry.entities),
+                condition=entry.condition, check_frequency=entry.check_frequency,
+                action_48h=entry.action_48h, node=parsed.node, quote_locator="structure reading disproof[]",
+                note=f"讀圖 {parsed.reading_id} 的第 {index} 條反證",
+            )
+            summary["registered"].append(watch["watch_id"])
+        for customer in demand_side_customers(record):
+            if any(w.get("wake_reading") == parsed.node and customer in (w.get("entities") or ())
+                   and w.get("status") == "active" for w in data["watches"]):
+                continue
+            watch = ew.add_watch(
+                data, kind="entity_filing_signal", wake_reading=parsed.node, expires=parsed.expires.isoformat(),
+                entities=[customer], note=f"需求側客戶 {customer} 出了新一手文件 → {parsed.node} 該重讀",
+            )
+            summary["reread_registered"].append(watch["watch_id"])
+    for watch in data["watches"]:
+        if watch.get("wake_reading") == parsed.node and watch.get("status") == "fired":
+            watch["status"] = "consumed"
+            watch["closed"] = {"at": stamp, "note": f"已重讀：{parsed.reading_id}"}
+            summary["reread_consumed"].append(watch["watch_id"])
+        judgment = watch.get("judgment") or {}
+        if (watch.get("kind") == ew.SEMANTIC_KIND and watch.get("node") == parsed.node
+                and str(watch.get("source_ref") or "").startswith("reading:")
+                and judgment.get("touches") == "yes" and not judgment.get("handled")):
+            judgment["handled"] = {"verb": "reread", "reading_id": parsed.reading_id, "at": stamp}
+            summary["touched_handled"].append(watch["watch_id"])
+    ew.save_watches(data, watches_path)
+    return summary
+
+
+def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]:
+    """這個節點為什麼該重讀（watch 那一側的理由）：需求側客戶出了新文件、讀圖的反證被判觸及未處置。"""
+    reasons: list[str] = []
+    for watch in watches:
+        woken = watch.get("woken_by") or {}
+        if watch.get("wake_reading") == node and watch.get("status") == "fired":
+            reasons.append(f"客戶 {','.join(woken.get('shared_entities') or watch.get('entities') or [])}"
+                           f" 出了新文件 {woken.get('lead_id')}")
+        judgment = watch.get("judgment") or {}
+        if (watch.get("node") == node and str(watch.get("source_ref") or "").startswith("reading:")
+                and judgment.get("touches") == "yes" and not judgment.get("handled")):
+            reasons.append(f"反證被判觸及：{str(watch.get('condition') or '')[:40]}")
+    return reasons
+
+
 def known_nodes(*, directory: Path | None = None) -> list[str]:
     """ledger 裡有紀錄的節點（由檔案內容回報真正的 node，不從檔名反推 slug）。"""
     root = directory or STRUCTURE_READING_DIR
@@ -113,5 +206,6 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
     return nodes
 
 
-__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "fetch_structure_snapshot", "known_nodes",
-           "ledger_path", "read_reading_records"]
+__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers",
+           "fetch_structure_snapshot", "known_nodes", "ledger_path", "read_reading_records",
+           "register_reading_watches", "reread_reasons"]

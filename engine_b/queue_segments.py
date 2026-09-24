@@ -78,6 +78,12 @@ SEGMENTS: tuple[Segment, ...] = (
         "Phase 1 Step 1.4（G7）：醒來＝待檢；daily 的預篩只標旗、不判定，所以這一段不會因預篩而變少。",
     ),
     Segment(
+        "fired_reading_reread", 1, "fired 讀圖 watch（需求側客戶出了新一手文件）→ 該節點要重讀",
+        "research", "互動 session：python -m query.structure <node> → alpha structure-reading <node> --add"
+                    "（下一次 --add 自動 consume 這些 watch）",
+        "Phase 1 Step 1.5：醒來只把節點列進 needs_reread（理由寫出是哪位客戶的哪份文件），不自動重讀——重讀是研究。",
+    ),
+    Segment(
         "fired_hypothesis_check", 1, "fired watch → 截圖假設對照（agent 拿 fact 去對一手）",
         "research", "research-drain 段 0b：對照後 `python -m engine_b.event_watch consume <watch_id>`",
         "刻意不自動 consume：對照是研究動作，收據要留在假設層（engine_b/hypotheses.py）。",
@@ -215,6 +221,8 @@ def classify_watch(watch: Mapping[str, Any]) -> str | None:
             return "fired_lead_requeue"
         if watch.get("disproof_ref"):
             return "semantic_pending_check"
+        if watch.get("wake_reading"):
+            return "fired_reading_reread"
         return "fired_hypothesis_check"
     if status == "active" and (watch.get("poll") or {}).get("eligible"):
         # 可輪詢的 active watch 才是「要人主動去查」的工作；其餘 active 只是等。

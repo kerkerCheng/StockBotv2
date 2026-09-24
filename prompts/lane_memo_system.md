@@ -44,9 +44,23 @@
       "source_ids": ["逐字取自上述 assertion"],
       "purpose": "這項證據支援哪個論點"
     }
+  ],
+  "disproof_conditions": [
+    {
+      "condition": "逐字等於 memo 第 6 段的某一條（去掉行首的 - 或 1.）",
+      "entities": ["co:逐字取自 registry 的公司 id（至少一個；可另寫 ticker）"],
+      "check_frequency": "多久核查一次（例：每季財報後）",
+      "action_48h": "觸發後 48 小時內要做什麼",
+      "expires": "YYYY-MM-DD（可省略；有寫日期的條件不得早於它）"
+    }
   ]
 }
 ```
+
+`disproof_conditions`（2026-09-24 Phase 1 Step 1.5）：第 6 段**每一條**反證都要有一筆結構化條目，
+**條數必須等於第 6 段的條目數**（程式機械數，不符就不寫 memo）。`condition` 逐字取自第 6 段。
+產生 memo 時**不登記**任何 watch——memo 被 lifecycle 採用（`thesis/lifecycle.json` 的 `memo` 指向它）
+之後，`engine_b.todo sync` 的對帳才把這些條件登記成語意 watch。
 
 `memo_markdown` 依下列 7 段撰寫。每個主要論點在句尾以 `[E1]`、`[E2]`
 引用 evidence item；Markdown 使用的每個 `[E#]` 必須在 evidence_items 出現，且每個

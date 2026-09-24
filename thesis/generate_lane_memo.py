@@ -46,6 +46,8 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+from thesis.memo_structure import disproof_items, memo_text_sha256  # noqa: E402
+
 SYSTEM_PROMPT_FILE = ROOT / "prompts" / "lane_memo_system.md"
 DEFAULT_OUT = ROOT / "thesis" / "cpo_v1_lane_memo.md"
 
@@ -267,6 +269,31 @@ def _parse_envelope(raw_text: str) -> tuple[dict | None, str | None]:
     return parsed, None
 
 
+_DISPROOF_KEYS = ("condition", "entities", "check_frequency", "action_48h")
+
+
+def _structured_disproof(envelope: dict) -> tuple[list[dict], str | None]:
+    """envelope 的 `disproof_conditions` → 驗過的條目。條數≠memo「推翻」節條目數、缺欄、文字不在那一節 → 錯誤。"""
+    items = disproof_items(str(envelope.get("memo_markdown") or ""))
+    raw = envelope.get("disproof_conditions")
+    if not isinstance(raw, list):
+        return [], ("envelope 缺 disproof_conditions——memo 第 6 段每一條反證都要有結構化條目"
+                    f"（第 6 段有 {len(items)} 條）")
+    if len(raw) != len(items):
+        return [], f"disproof_conditions 有 {len(raw)} 條，memo「推翻」那一節有 {len(items)} 條——必須相等"
+    normalized_items = {" ".join(i.split()) for i in items}
+    out: list[dict] = []
+    for index, entry in enumerate(raw, 1):
+        if not isinstance(entry, dict) or any(not entry.get(k) for k in _DISPROOF_KEYS):
+            return [], f"disproof_conditions 第 {index} 條缺欄位（必填 {', '.join(_DISPROOF_KEYS)}）"
+        if " ".join(str(entry["condition"]).split()) not in normalized_items:
+            return [], f"disproof_conditions 第 {index} 條的 condition 不是 memo「推翻」那一節的原文"
+        if not any(str(e).startswith("co:") for e in entry.get("entities") or []):
+            return [], f"disproof_conditions 第 {index} 條的 entities 至少要有一個 co:*"
+        out.append({k: entry[k] for k in (*_DISPROOF_KEYS, "expires") if entry.get(k) is not None})
+    return out, None
+
+
 def _atomic_write_pair(memo_path: Path, memo_text: str, sidecar: dict) -> Path:
     """Publish a memo and its evidence sidecar without exposing partial files."""
 
@@ -458,6 +485,13 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
         validation = validate_envelope(envelope, inventory)
     evidence_gate = evaluate_evidence_gates(validation, inventory)
 
+    # 結構化反證（Phase 1 Step 1.5）：條數必須等於 memo「推翻」那一節的條目數（機械數），不符 fail closed。
+    # 產生 memo **不登記** watch——memo 是「隨叫隨到的視圖」，被 lifecycle 採用之後才由 `todo sync` 對帳登記。
+    disproof_conditions, disproof_error = _structured_disproof(envelope)
+    if disproof_error:
+        print(f"ERROR: {disproof_error}", file=sys.stderr)
+        return 1
+
     evidence_pass = validation["ok"] and evidence_gate["promotion_pass"]
     # ⚠ `output_type` 已移除（2026-09-21）。它是三級模板的遺物——那個階梯 2026-09-02
     # 就除役了（docs/ARCHITECTURE.md §9：「升格標記在生產碼中沒有任何下游消費端」），
@@ -504,7 +538,8 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
         # 它只取 evidence_items，不碰這一格。
         "schema_version": "1.1",
         "memo_path": out.name,
-        "memo_sha256": hashlib.sha256(full_output.encode("utf-8")).hexdigest(),
+        # 對 LF 文字算（與 engine_b/disproof.py 的對帳共用同一個函式；working tree 是 CRLF 也對得上）
+        "memo_sha256": memo_text_sha256(full_output),
         "gates_all_pass": gates_all_pass,
         "ticker": resolved_ticker,
         "company_id": company_id,
@@ -513,6 +548,7 @@ evidence_items；所有 ID 必須逐字取自 Evidence Inventory。"""
         ).hexdigest(),
         "context_inventory": inventory,
         "evidence_items": envelope.get("evidence_items") or [],
+        "disproof_conditions": disproof_conditions,
         "validation": validation,
         "evidence_gate": evidence_gate,
         "engine_c_context": {

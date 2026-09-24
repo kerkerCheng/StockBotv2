@@ -230,6 +230,7 @@ KEEP: dict[tuple[str,str],str] = {
     ('engine_b/cli.py','G'): 'retirement_note: drain 的 Decision work order／assessment-gap 退役註記',
     ('engine_b/queue_segments.py','G'): 'retirement_note: 段 2 reassess_stale 退役註記（0a.1）',
     ('engine_b/routine_config.py','G'): 'kept_file: tracked ticker 來源之一唯讀開舊店讀 cohort（frozen 歷史，讀取合法）',
+    ('engine_b/disproof.py','G'): 'kept_file: 心跳的「凍結歷史 N（不盯）」以 open_readonly_store（mode=ro）讀舊店 coverage_assessments 的反證家數——只印數，不登記、不盯（Phase 1 定案 #1）',
     ('engine_b/signal_source_registry.py','G'): 'retirement_note: STATUSES 原借自 decision_lab.intake 的註記（現為 SSOT）',
     ('engine_b/todo.py','G'): 'legacy_key: decision_review／sheet_only_holding 是 legacy 封閉字彙 key，池裡歷史項目仍是此 type，go 一律拒絕；producer 已刪',
     ('engine_c/pending_observations.py','G'): 'retirement_note: 檔頭記事發（decision_lab 的 gap research packet）',

@@ -56,10 +56,16 @@ def _structure(*, supply=("co:a", "co:b"), demand=("tech:cpo",), digest="d0", an
     }
 
 
+#: v2（Phase 1 Step 1.5）：moat／volume 讀法必須寫下至少一條反證。
+DISPROOF = [{"condition": "任一需求側客戶在正式文件宣布改用不經這個節點的替代路徑並量產",
+             "entities": ["co:sivers_semiconductors"], "check_frequency": "每季財報後",
+             "action_48h": "重讀這個節點並決定是否改寫讀法"}]
+
+
 def _record(**kw):
     params = dict(node=NODE, structure=_structure(), kind="volume",
                   reading="供給側兩家的 substitutability 都是 2，沒有人明顯高於其他——需求側繞不過但供給端誰都不獨佔。",
-                  expires=LATER, created_at=NOW, author="test")
+                  expires=LATER, created_at=NOW, author="test", disproof=DISPROOF)
     params.update(kw)
     return structure_reading_record(**params)
 

@@ -208,8 +208,8 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | 1.2a | 一個 daily：`crons/daily_task.py`、config 唯一時間來源、註冊命令、自我比對、最外層保證、鎖續期、保險檢查、`crons/routine_hint.py`；註冊新工作並**停用**舊兩個 | ✅ 實跑 run `bf21bb07`：19 步 17 ok／2 skipped（executor=none）、7 分鐘、Discord 3/3；`StockBotv2-Daily` 已註冊（明天 05:30）、自我比對 match；舊兩個 Disabled（偏差 #2–#4） | dcc8d2c |
 | 1.2b | 至少一次排程觸發成功後，**刪除**舊兩個 Windows 工作與 `crons/heartbeat_task.py`（不擋 1.3 起的 Step） | ○ | |
 | 1.3 | triage 併進 daily（`claude -p` 零工具＋JSON、每次 init 能力檢查、`triage-apply` 由程式寫入、`.codex/rules` 清零、排程器實測、daily-brief skill 改成互動專用）＋ R2-a | ✅ 排程器實跑 run `9dffbd83`：⑦a 13 則 1 次呼叫、init 能力欄位＝§0.2 那組、hook 0、`memory_paths` 缺席；⑦b 處理 13／PASS 2／FILTER 11／拒收 0；⑧ ok；`llm.executor=claude`；rules 12→0（偏差 #5–#6）；R2-a GO（non-blocking 12，處置見 §0.7 R2-a 表） | 3d5daa1、c8a7dea |
-| 1.4 | `semantic_condition` kind（feed 宣告一手與公司、回填實體、待檢、判定、排除持股申報）＋ 語意預篩（抓全文、`claude -p` 零工具提議、程式驗引文後寫標旗；C7） | ✅ 回填 EDGAR 419／MFN 64／sivers 26／yahoo 26／MOPS 4／X 514（冪等）；Sivers 兩 feed 的 lead 含 `co:sivers_semiconductors` 0→100%；非語意型命中差異只有 ew_0042 多 4 則 `sivers:press`（全由宣告的 company_id 交集解釋）；真實醒來的語意 watch 0（1.6 才登記）；工作時限 180→240 並重新註冊（偏差 #7–#8） | |
-| 1.5 | 反證登記 hook（讀圖 v2 `disproof[]`、thesis 由 `todo sync` 對帳 lifecycle 現行 memo 登記與收舊）＋ `wake_reading` ＋ 在盯／未盯／觸及待處置／叫不醒計數 ＋ 觸及後的 `thesis_lifecycle` 項目 | ○ | |
+| 1.4 | `semantic_condition` kind（feed 宣告一手與公司、回填實體、待檢、判定、排除持股申報）＋ 語意預篩（抓全文、`claude -p` 零工具提議、程式驗引文後寫標旗；C7） | ✅ 回填 EDGAR 419／MFN 64／sivers 26／yahoo 26／MOPS 4／X 514（冪等）；Sivers 兩 feed 的 lead 含 `co:sivers_semiconductors` 0→100%；非語意型命中差異只有 ew_0042 多 4 則 `sivers:press`（全由宣告的 company_id 交集解釋）；真實醒來的語意 watch 0（1.6 才登記）；工作時限 180→240 並重新註冊（偏差 #7–#8） | 5c5d875（R2-a 處置 fc5304d） |
+| 1.5 | 反證登記 hook（讀圖 v2 `disproof[]`、thesis 由 `todo sync` 對帳 lifecycle 現行 memo 登記與收舊）＋ `wake_reading` ＋ 在盯／未盯／觸及待處置／叫不醒計數 ＋ 觸及後的 `thesis_lifecycle` 項目 | ✅ 8 筆 v1 讀圖 id 重算不變、解析失敗 0、兩節點 current；對帳在真實資料上不動任何東西（三份現行 memo 沒有結構化反證→等 1.6）；計數＝預期 16／在盯 0／未盯 16／v1 散文 2 份／凍結歷史 32；`pending_lifecycle.py` 無 diff；心跳段 2 已印反證行（偏差 #9） | |
 | 1.6 | 既有反證補登記（**強模型**；16 條 thesis 用 `register-disproof`；2 份現行讀圖各 append 一份 v2 取代；不擋後續 Step、結案前必完成） | ○ | |
 | 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ○ | |
 | 1.8 | 心跳改版（較昨 diff、watch／反證計數、pq2 逐筆、備份、健康、NAV、計分表每日、Discord 摘要） | ○ | |
@@ -448,6 +448,7 @@ reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutat
 | 6 | 1.3 | 「cwd＝repo 外時沒有 `gitStatus`、沒有 `instructions` 附件」（§0.2 第 4 輪） | 排程器實跑的 session jsonl 確認：沒有 `instructions`、沒有 `gitStatus`、沒有 MEMORY.md；**但 `session_context` 仍帶帳號 email**（來自訂閱登入，不是 repo 內容） | 關掉它只能改用 `--bare`（只吃 API key，禁用旗標）；它是沒記進收據的輸入（L12），對 triage 無害但照實列 §15 待決。另：init 事件有一欄 `agents`（內建 subagent 清單）——零工具下沒有 Agent 工具叫不動它們，不在六欄檢查內，同列 §15 |
 | 7 | 1.4 | 預篩全文取 EDGAR 主文件原文 | 先從封面（`UNITED STATES SECURITIES AND EXCHANGE COMMISSION`）起算，`prescreen_text_max_chars` 設 60000 | §14 要求先看一份真實 10-Q：三份 10-Q 轉文字後前 8.6k／23.9k／33.9k 字全是 inline XBRL 隱藏表頭；8-K 主文件只有 3k 字封面（N4-9 證實）。另加 `llm.prescreen_chunk_size`（3；每筆帶一份全文）與 DailyStep 的 `requires`／`llm_task` 欄位（兩個 LLM 任務共用一條路徑） |
 | 8 | 1.4 | `execution_time_limit_minutes` 180 | 240，並照唯一做法（改 config → `register_daily_task.py --apply`）重新註冊 | 加 ⑩a–⑩c 後各步 timeout 加總 194 分，超過 180（測試斷言）；重新註冊會清掉工作的執行歷史，1.2b 本來就要等明天 05:30 的自然觸發 |
+| 9 | 1.5 | 計數與「觸及待處置」寫在 1.8 心跳改版 | 1.5 就在心跳段 2 加反證那一行（在盯／叫不醒／觸及待處置／未盯／v1 散文／凍結歷史）與 sidecar 不符的常駐行；共用的 memo 規則放 `thesis/memo_structure.py`（generator 與對帳同一個 hash 函式、同一個「推翻」節解析）；讀圖寫入後的登記另給 `structure-reading --register-watches` 冪等重跑 | A5 要求 1.5 交付時心跳就印「觸及待處置 N」，拆兩次改同一行不划算；登記失敗時 ledger 已寫、watch 沒登記，要有不必重寫讀圖的補救路徑 |
 
 ---
 

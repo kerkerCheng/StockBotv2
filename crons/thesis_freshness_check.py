@@ -100,8 +100,62 @@ def check() -> list[tuple[str, int]]:
 
 
 
+def touched_disproof_by_thesis(data: dict | None = None) -> dict[str, list[dict]]:
+    """判定觸及、還沒處置的 thesis 來源語意 watch，依 thesis id 分組（C3／A5；Phase 1 Step 1.5）。
+
+    watch 的 `source_ref` 是 `thesis:<memo 路徑>#<n>`；memo 路徑對回 lifecycle 的現行 `memo` 得到 thesis id。
+    「還沒處置」＝`judgment.handled` 為空——**不比 `last_checked` 日期**（`judgment.at` 是 UTC 日期時間、
+    `last_checked` 是日期：照字串比同日複查後永遠清不掉；照日期比同日稍早已複查過的話這次觸及會靜默消失）。
+    """
+    try:
+        lifecycle = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
+        if data is None:
+            from engine_b.event_watch import load_watches
+
+            data = load_watches()
+    except (OSError, ValueError):
+        return {}
+    by_memo = {str(e.get("memo")): str(tid) for tid, e in (lifecycle.items() if isinstance(lifecycle, dict) else [])
+               if isinstance(e, dict) and e.get("memo")}
+    out: dict[str, list[dict]] = {}
+    for watch in (data or {}).get("watches") or []:
+        judgment = watch.get("judgment") or {}
+        ref = str(watch.get("source_ref") or "")
+        if watch.get("kind") != "semantic_condition" or not ref.startswith("thesis:"):
+            continue
+        if judgment.get("touches") != "yes" or judgment.get("handled"):
+            continue
+        tid = by_memo.get(ref[len("thesis:"):].split("#", 1)[0])
+        if tid:
+            out.setdefault(tid, []).append(watch)
+    return out
+
+
+def lifecycle_due_detail(*, watch_data: dict | None = None) -> list[tuple[str, str, list[str]]]:
+    """[(thesis_id, 原因, 涵蓋的反證 watch_id)]——排程到期與「反證被判觸及」**合併成同一筆**（同一 thesis 只會有一筆）。"""
+    try:
+        data = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    today = date.today()
+    reasons: dict[str, list[str]] = {}
+    watch_ids: dict[str, list[str]] = {}
+    for tid, entry in (data.items() if isinstance(data, dict) else []):
+        if not isinstance(entry, dict):
+            continue
+        due_now, reason = is_due(entry, today=today)
+        if due_now:
+            reasons.setdefault(str(tid), []).append(reason)
+    for tid, watches in touched_disproof_by_thesis(watch_data).items():
+        for watch in watches:
+            reasons.setdefault(tid, []).append(
+                f"反證被判觸及：{str(watch.get('condition') or '')[:40]}｜48 小時動作：{watch.get('action_48h')}")
+            watch_ids.setdefault(tid, []).append(str(watch["watch_id"]))
+    return [(tid, "；".join(why), sorted(watch_ids.get(tid, []))) for tid, why in reasons.items()]
+
+
 def lifecycle_due() -> list[tuple[str, str]]:
-    """讀 lifecycle.json，回 [(thesis_id, 原因)]——到期或 review_required。
+    """讀 lifecycle.json，回 [(thesis_id, 原因)]——到期、review_required，或反證被判觸及未處置（包 `lifecycle_due_detail`）。
     這是 lifecycle 的權威到期訊號（memo 檔日期只是次要 fallback）。
 
     到期判準委派給 `thesis.lifecycle_schedule`：固定週期與催化劑取較早者。先前這裡
@@ -111,19 +165,7 @@ def lifecycle_due() -> list[tuple[str, str]]:
     lifecycle 的正式狀態更新（disproof 評估、retired/revised）需人工判斷，本 hook
     只 surface 到期供你本機手動複查（plan R17）；不寫入。
     """
-    try:
-        data = json.loads(LIFECYCLE.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return []
-    today = date.today()
-    due: list[tuple[str, str]] = []
-    for tid, entry in (data.items() if isinstance(data, dict) else []):
-        if not isinstance(entry, dict):
-            continue
-        due_now, reason = is_due(entry, today=today)
-        if due_now:
-            due.append((tid, reason))
-    return due
+    return [(tid, why) for tid, why, _ids in lifecycle_due_detail()]
 
 
 def active_lifecycle_todo_refs() -> set[str]:

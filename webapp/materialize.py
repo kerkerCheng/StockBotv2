@@ -1235,11 +1235,17 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     ⚠ 一次把圖的邊載進來（`_load_edges`），對每個節點各建一次 `StructureView`——
     不是每個節點各查一次圖。節點數會長，查詢次數不該跟著長。
     """
-    from alpha.providers.structure_readings import known_nodes, read_reading_records
+    from alpha.providers.structure_readings import known_nodes, read_reading_records, reread_reasons
     from alpha.structure_reading import needs_reread, reading_status, select_reading
+    from engine_b.event_watch import load_watches
     from query.structure import _load_edges, build_structure
 
     target = store or StateArtifactStore()
+    # watch 那一側的重讀理由（Phase 1 Step 1.5）：需求側客戶出了新一手文件、讀圖的反證被判觸及——唯讀
+    try:
+        watches = list(load_watches().get("watches") or ())
+    except Exception:  # noqa: BLE001 — registry 讀不到只少了這一側的理由，圖那一側照算
+        watches = []
     today = as_of or date.today()
     nodes = known_nodes()
     rows: list[dict[str, Any]] = []
@@ -1256,6 +1262,7 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
             continue
         view = build_structure(node, edges)
         status = reading_status(reading, view.as_dict(), today=today)
+        watch_reasons = reread_reasons(node, watches)
         rows.append({
             "node": node,
             "reading_id": reading.reading_id,
@@ -1265,7 +1272,8 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
             "read_on": reading.created_on.isoformat(),
             "expires": reading.expires.isoformat(),
             **status,
-            "needs_reread": needs_reread(status),
+            "needs_reread": needs_reread(status) or bool(watch_reasons),
+            "reread_reasons": watch_reasons,
         })
     payload = build_structure_readings_artifact(rows=rows, parse_errors=parse_errors,
                                                 generated_at=generated_at, as_of=as_of)

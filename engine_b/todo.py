@@ -347,6 +347,8 @@ def resolve(
         item["resolution"] = verb
         item["reason"] = reason or None
         item["receipt"] = receipt or None
+        if item["type"] == "thesis_lifecycle" and verb in ("go", "drop"):
+            _mark_disproof_handled(item, verb, stamp)
     pool["log"].append({
         "at": stamp, "n": item["n"], "type": item["type"],
         "ref_id": item["ref_id"], "verb": verb, "reason": reason or None,
@@ -1066,6 +1068,23 @@ def sync(
             item["company_id"] = str(row["company_id"])
         if row.get("ticker"):
             item["ticker"] = str(row["ticker"])
+        # 反證被判觸及（C3）：item 記下它涵蓋的 watch_id；有新的觸及時，若它躺在「等事件」區就叫回來
+        # （比照 `watch_wake`）——否則觸及會安靜地躺在等事件那一區。
+        if row.get("disproof_watch_ids"):
+            known = set(item.get("disproof_watch_ids") or ())
+            fresh = sorted(set(row["disproof_watch_ids"]) - known)
+            item["disproof_watch_ids"] = sorted(known | set(row["disproof_watch_ids"]))
+            if fresh and (item.get("waiting_on") or item.get("deferred_at")):
+                prior = dict(item.get("waiting_on") or {})
+                item.pop("waiting_on", None)
+                item.pop("deferred_at", None)
+                pool["log"].append({
+                    "at": stamp, "n": item["n"], "type": item["type"], "ref_id": item["ref_id"],
+                    "verb": "disproof_touch", "reason": f"反證被判觸及：{', '.join(fresh)}",
+                    "receipt": None, "prior_waiting_on": prior,
+                })
+
+    reconcile = _reconcile_disproof()
 
     cleared, uncleared = _mark_source_cleared(
         pool, seen_keys, healthy_sources, stamp=stamp
@@ -1082,8 +1101,47 @@ def sync(
         "source_returned": uncleared,
         "watch_woken": watch_woken,
         "watch_counters": watch_counts,
+        "disproof_reconcile": reconcile,
         "active": len(active_items(pool)),
     }
+
+
+def _reconcile_disproof() -> dict[str, Any] | None:
+    """thesis 反證對帳（Phase 1 Step 1.5）：在 watch 比對之前跑，這一輪新登記的條件同一輪就開始比對。
+
+    fail-soft：失敗回 None（呼叫端照實印「對帳沒跑」），不阻斷 sync。"""
+    try:
+        from engine_b import disproof
+        from engine_b import event_watch
+
+        data = event_watch.load_watches()
+        summary = disproof.reconcile_thesis_disproof(data)
+        if summary["registered"] or summary["consumed"]:
+            event_watch.save_watches(data)
+        return summary
+    except Exception:  # noqa: BLE001
+        return None
+
+
+def _mark_disproof_handled(item: Mapping[str, Any], verb: str, stamp: str) -> None:
+    """`thesis_lifecycle` 結案（go／drop）時，把它涵蓋的反證 watch 標 `judgment.handled`（C3）。
+
+    best-effort：寫不進去就大聲說——下一次 sync 會因同一條觸及再出一筆，等待不會消失（只是多問一次）。"""
+    ids = set(item.get("disproof_watch_ids") or ())
+    if not ids:
+        return
+    try:
+        from engine_b import event_watch
+
+        data = event_watch.load_watches()
+        for watch in data["watches"]:
+            judgment = watch.get("judgment") or {}
+            if watch.get("watch_id") in ids and judgment.get("touches") == "yes" and not judgment.get("handled"):
+                judgment["handled"] = {"n": item.get("n"), "verb": verb, "at": stamp}
+        event_watch.save_watches(data)
+    except Exception as exc:  # noqa: BLE001
+        print(f"⚠ 反證 watch 標 handled 失敗（下一次 sync 會再出一筆）：{type(exc).__name__}: {exc}",
+              file=sys.stderr)
 
 
 def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict]:
@@ -1458,8 +1516,11 @@ def collect_from_lifecycle() -> list[dict[str, Any]]:
 
 
 def _collect_lifecycle_rows() -> list[dict[str, Any]]:
-    """到期／review_required 的 thesis → 本機複查待辦。"""
-    from crons.thesis_freshness_check import lifecycle_due
+    """到期／review_required／反證被判觸及的 thesis → 本機複查待辦（同一 thesis 只會有一筆，理由合併）。
+
+    反證被判觸及（C3／A5，Phase 1 Step 1.5）：row 帶 `disproof_watch_ids`，`sync` 寫到 item 上；使用者對這一筆
+    `go`／`drop` 時，同一個動作把那些 watch 標 `judgment.handled`——觸及的等待由這一筆接住，不會消失。"""
+    from crons.thesis_freshness_check import lifecycle_due_detail
 
     return [
         {
@@ -1467,8 +1528,9 @@ def _collect_lifecycle_rows() -> list[dict[str, Any]]:
             "ref_id": tid,
             "title": f"thesis {tid}：{why}",
             "source": "lifecycle",
+            **({"disproof_watch_ids": ids} if ids else {}),
         }
-        for tid, why in lifecycle_due()
+        for tid, why, ids in lifecycle_due_detail()
     ]
 
 
@@ -1836,9 +1898,15 @@ def main(argv: list[str] | None = None) -> int:
                     f"／可輪詢 {wc.get('t2_pollable', 0)}"
                     f"，本輪喚醒 {result.get('watch_woken', 0)}）"
                 )
+            rc = result.get("disproof_reconcile")
+            reconcile_line = ("；反證對帳沒跑（失敗）" if rc is None else
+                              f"；反證對帳：登記 {len(rc['registered'])}、收掉 {len(rc['consumed'])}"
+                              f"、sidecar 不符 {len(rc['sidecar_mismatch'])}"
+                              + (f"、沒有結構化反證 {len(rc['no_structured'])}（由 Step 1.6 補登記）"
+                                 if rc["no_structured"] else ""))
             print(
                 f"（新增 {result['added']}，目前 {result['active']} 項待辦"
-                f"{migration}{watch_line}）\n"
+                f"{migration}{watch_line}{reconcile_line}）\n"
             )
             print(_render(pool))
         return 0

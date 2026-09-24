@@ -258,7 +258,7 @@ def _fired_watch_summary() -> dict[str, list[dict]]:
     讀不到 registry 時回三個空 list——**這是 fail-soft 不是 fail-closed**，因為 drain 的主責是
     列研究工作；但 audit 的 QueueSegments 會用同一份資料 fail closed，兩邊不會同時安靜。
     """
-    out: dict[str, list[dict]] = {"lead": [], "pq2": [], "hypothesis": [], "disproof": []}
+    out: dict[str, list[dict]] = {"lead": [], "pq2": [], "hypothesis": [], "disproof": [], "reading": []}
     try:
         from engine_b import event_watch as ew
 
@@ -275,6 +275,9 @@ def _fired_watch_summary() -> dict[str, list[dict]]:
         elif watch.get("disproof_ref"):
             # 語意條件醒來＝待檢（Phase 1 Step 1.4）：不是假設對照，沒有 fact 可印——判定在互動 session
             out["disproof"].append(watch)
+        elif watch.get("wake_reading"):
+            # 讀圖 watch 醒來（Phase 1 Step 1.5）：列進 needs_reread，由下一次 structure-reading --add 收掉
+            out["reading"].append(watch)
         else:
             out["hypothesis"].append(watch)
     return out
@@ -287,7 +290,8 @@ def _print_segment_counters(pending_count: int, fired: dict[str, list[dict]]) ->
         f"lead 型 {len(fired['lead'])}（→ `engine_b.cli consume-fired`）／"
         f"pq2 型 {len(fired['pq2'])}（→ `engine_b.todo sync`）／"
         f"假設對照 {len(fired['hypothesis'])}（→ 對照後 `engine_b.event_watch consume <id>`）／"
-        f"反證待檢 {len(fired.get('disproof') or [])}（→ `engine_b.event_watch semantic-queue` → `judge`）"
+        f"反證待檢 {len(fired.get('disproof') or [])}（→ `engine_b.event_watch semantic-queue` → `judge`）／"
+        f"讀圖該重讀 {len(fired.get('reading') or [])}（→ `alpha structure-reading <node> --add`）"
     )
     for watch in fired["hypothesis"]:
         fact = str(watch.get("fact") or "")[:70]
