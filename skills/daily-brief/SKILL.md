@@ -678,11 +678,11 @@ dispatch 或同時寫同一 working tree。
 pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先完成或 checkpoint 對應動作，
 再由 type-specific completion command（或附該類型要求的 receipt）結案，不能先 resolve 再假裝已執行：
 
-| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | 到期 thesis |
-|------|-------------|---------------------|-------------------|-------------|
-| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准 |
-| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 標記已看、不複查 |
-| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 |
+| 動詞 | legacy lead | Source trace review | 已 prepared 的 RA | 到期 thesis | 到期 watch（`watch_decision`） |
+|------|-------------|---------------------|-------------------|-------------|-------------------------------|
+| `go` | raw lead 不再進 pq2 | `todo dispatch` 回 pq1；不接受 claim、不授權付費 | **apply 入圖**（見下） | 引導複查；authority mutation 仍另核准 | **研究之後**才用：條件已被觸及 → `resolve <n> --verb go --receipt "outcome:touched;report:<路徑>" --quote "<原文>"`，交給 thesis 複查／讀圖重讀／假設對照；沒觸及不得 go；批次 bare go 一律拒收 |
+| `drop` | raw lead 不再進 pq2 | 略過本次人工追源 | 略過該 RA | 標記已看、不複查 | 放棄這個等待（thesis 條件會計進「未盯」） |
+| `pending` | 維持不動、留到之後 brief | 同左 | 同左 | 同左 | **必須**帶日期＝續等：`resolve <n> --verb pending --until <日期>`（watch 回 active、編號結案）；批次語法帶不了日期，bare pending 拒收 |
 
 ⚠ **2026-09-22（Phase 0）：表上原本有 `Decision review` 一欄，已退役**（ROADMAP Phase 0／G12）。
 `ra_admission go` 那一格原本還寫「入圖後自動建 Shadow」——Shadow 是 Engine D 的東西，也一併退役；

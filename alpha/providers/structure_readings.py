@@ -128,10 +128,15 @@ def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | 
         prefix = f"reading:{parsed.supersedes_id}#"
         note = "retracted" if parsed.retracted else f"superseded by {parsed.reading_id}"
         for watch in data["watches"]:
-            if (watch.get("kind") == ew.SEMANTIC_KIND and str(watch.get("source_ref") or "").startswith(prefix)
-                    and watch.get("status") in ("active", "fired")):
+            if watch.get("kind") != ew.SEMANTIC_KIND or not str(watch.get("source_ref") or "").startswith(prefix):
+                continue
+            if watch.get("status") in ("active", "fired"):
                 watch["status"] = "consumed"
                 watch["closed"] = {"at": stamp, "note": note}
+                summary["consumed"].append(watch["watch_id"])
+            elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
+                # 到期待決的也收（R2-b NB-4）：否則已被取代的讀圖條件還掛著 watch_decision，續等會復活一筆孤兒
+                ew.resolve_expiry(data, watch["watch_id"], {"kind": "source_superseded", "note": note})
                 summary["consumed"].append(watch["watch_id"])
     if not parsed.retracted:
         for index, entry in enumerate(parsed.disproof, 1):

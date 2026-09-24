@@ -84,7 +84,7 @@ def _today() -> date:
 
 
 # 一個財報週期（90 天）＋緩衝。最常見的等待模式是「下一份季報會不會揭露」；
-# 等滿一輪還沒出現就該讓人重新決定續等／改輪詢／放棄，而不是無聲續等。
+# 等滿一輪還沒出現就結案——追源型轉終局 `watch_expired` 並由心跳計數（A3，不佔 pq2、也不無聲續等）。
 DEFAULT_TRACE_TTL_DAYS = 120
 
 
@@ -177,7 +177,9 @@ def ensure_trace_watch(
         return None  # 沒有具名標的就沒有觸發條件，不假裝在等（由 wake_state=unwatched 現形）
     data = load_watches()
     for watch in data.get("watches", []):
-        if watch.get("wake_lead") == lead_id and watch.get("status") != "consumed":
+        # 只沿用還在等的（active／fired）。到期的那一筆代表**上一輪**等待——lead 研究完再 park 是新的一輪，
+        # 沿用它會變成沒有到期的等待且不被任何計數器數到（R2-b NB-1）。
+        if watch.get("wake_lead") == lead_id and watch.get("status") in ("active", "fired"):
             return watch
     today = today or _today()
     ttl = load_config()["trace_ttl_days"]
@@ -475,7 +477,25 @@ def check_watches(
     return fired
 
 
-def mark_expired(data: dict[str, Any], *, today: date | None = None) -> list[str]:
+#: 到期處置的封閉字彙（R2-b NB-6；L16：字彙有行為後果就必須被強制）——每一筆 expired 都落在其中一格。
+#: 續等不在這裡：續等讓 watch 回 active、處置清空，歷史在 `renewals`。
+EXPIRY_RESOLUTION_KINDS: dict[str, str] = {
+    "requeued_to_pq2": "pq2 型：指向的未結案編號翻回球在你",
+    "pq2_item_gone": "pq2 型：指向的編號已結案，無事可做",
+    "trace_closed": "追源型：lead 轉終局 watch_expired",
+    "lead_already_terminal": "追源型：lead 的 trace_status 早已是終局，不覆寫",
+    "lead_in_flight": "追源型：lead 已在路上（之後再 park 會建新的等待）",
+    "lead_closed": "追源型：lead 已 applied／no-go",
+    "lead_missing": "追源型：lead 不存在",
+    "superseded_by_newer_watch": "追源型：同一 lead 已有較新的等待",
+    "reading_expiry": "讀圖型：由讀圖自己的到期重問",
+    "source_superseded": "語意型：來源 memo／讀圖已不是現行",
+    "dropped": "使用者 drop（watch_decision）",
+    "touched": "使用者 go：研究結論＝條件已被觸及（watch_decision）",
+}
+
+
+def mark_expired(data: dict[str, Any], *, today: date | None = None, only: str | None = None) -> list[str]:
     """`expires < 今天` 的 active watch → `expired`，記 `expired_at`（Phase 1 Step 1.7）。回傳這一次轉到期的 id。
 
     到期不是丟（INV-2）：需要人決定的（語意型、假設型）由 `todo sync` 鑄 `watch_decision`；pq2 型把它指向的
@@ -483,6 +503,8 @@ def mark_expired(data: dict[str, Any], *, today: date | None = None) -> list[str
     today = today or _today()
     out: list[str] = []
     for watch in data["watches"]:
+        if only is not None and watch.get("watch_id") != only:
+            continue
         if watch.get("status") == "active" and past_expiry(watch, today=today):
             watch["status"] = "expired"
             watch["expired_at"] = _now()
@@ -533,7 +555,10 @@ def renew(data: dict[str, Any], watch_id: str, *, until: str, n: int | None = No
 
 
 def resolve_expiry(data: dict[str, Any], watch_id: str, resolution: Mapping[str, Any]) -> dict[str, Any]:
-    """到期處置的收據（`expiry_resolution`）。只能寫在 expired 的 watch 上，寫過就不改。"""
+    """到期處置的收據（`expiry_resolution`）。只能寫在 expired 的 watch 上，寫過就不改；`kind` 必須在封閉字彙裡。"""
+    kind = str(resolution.get("kind") or "")
+    if kind not in EXPIRY_RESOLUTION_KINDS:
+        raise EventWatchError(f"未知的到期處置 kind：{kind!r}（封閉字彙 {sorted(EXPIRY_RESOLUTION_KINDS)}）")
     for watch in data["watches"]:
         if watch["watch_id"] != watch_id:
             continue
@@ -544,6 +569,31 @@ def resolve_expiry(data: dict[str, Any], watch_id: str, resolution: Mapping[str,
         watch["expiry_resolution"] = {**dict(resolution), "at": _now()}
         return watch
     raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def record_touched(data: dict[str, Any], watch_id: str, *, quote: str, note: str, n: int,
+                   receipt: str) -> dict[str, Any]:
+    """`watch_decision` 的 go＝研究結論「條件已被觸及」（R2-b B2）——與 `judge(touches=True)` 同形，接手路徑才接得到。
+
+    - 語意型：寫 `judgment`（`touches=yes`、`quote`、`handled=None`、`via=watch_decision:<n>`）→ thesis 來源由
+      `thesis_lifecycle` 那一筆接住（`touched_disproof_by_thesis`）、讀圖來源列進 needs_reread（`reread_reasons`）。
+    - 假設型：記 `woken_by`（`kind=watch_decision`）→ 個股頁的 `disproof_signal`／假設對照照原本的路接手。
+    兩者都轉 `consumed`（同 judge）並記 `expiry_resolution: touched`。不改任何 authority。"""
+    if not str(quote or "").strip():
+        raise EventWatchError("條件已被觸及必須附原文（quote；L18）")
+    watch = next((w for w in data["watches"] if w.get("watch_id") == watch_id), None)
+    if watch is None:
+        raise EventWatchError(f"watch 不存在：{watch_id}")
+    resolve_expiry(data, watch_id, {"kind": "touched", "n": n, "receipt": receipt, "reason": note or None})
+    stamp = _now()
+    via = f"watch_decision:{n}"
+    judgment = {"at": stamp, "touches": "yes", "note": note or "watch_decision 研究結論：條件已被觸及",
+                "quote": quote, "handled": None, "via": via, "evidence": receipt, "lead_id": None}
+    if watch.get("kind") != SEMANTIC_KIND:
+        watch["woken_by"] = {"kind": "watch_decision", "at": stamp, "n": n, "evidence": receipt, "quote": quote}
+    watch["judgment"] = judgment
+    watch["status"] = "consumed"
+    return watch
 
 
 def _semantic_matches(watch: Mapping[str, Any], leads: Mapping[str, Any], *,

@@ -44,7 +44,8 @@ ITEM_TYPES: dict[str, str] = {
     "sheet_only_holding": "（legacy）機制退役（Phase 0），不再建立新項目；Sheet 有而敘事沒有的持股改列候選板「已持有、缺敘事」（Phase 3）",
     "engine_c_observation": "核准把人工觀測寫入 Engine C append-only ledger",
     "thesis_mutation": "核准 thesis lifecycle 變更（revise／retire／watch）",
-    "watch_decision": "語意／假設 watch 到期、條件沒發生：續等（pending --until）、放棄（drop），或要研究（go 附研究結果）",
+    "watch_decision": ("語意／假設 watch 到期、條件沒發生：續等（resolve <n> --verb pending --until <日期>）、放棄（drop）；"
+                       "研究後發現條件已被觸及 → go（receipt 帶 outcome:touched＋研究結果、--quote 原文）"),
     "manual": "依 hint 執行",
 }
 
@@ -67,8 +68,9 @@ GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
     "engine_c_observation": ("寫入 Engine C append-only ledger", "入圖與 thesis mutation"),
     "thesis_mutation": ("該筆 thesis lifecycle 變更", "入圖與 live"),
     # Phase 1 Step 1.7（定案 #4）：永不列入常規授權——它真正要你答的是續等或放棄，自動 go 會讓重問消失。
-    "watch_decision": ("現在啟動研究：查這條條件是否已成立（bounded research）",
-                       "任何 authority mutation（入圖、Engine C 判讀、thesis mutation、live）"),
+    "watch_decision": ("記下研究結論「條件已被觸及」（附研究結果與原文）→ 交給 thesis 複查／讀圖重讀／假設對照接手",
+                       "任何 authority mutation（入圖、Engine C 判讀、thesis mutation、live）；"
+                       "研究本身不在 go 裡（要研究就在互動 session 說）；條件沒被觸及不得 go（續等或 drop）"),
     "manual": ("依 hint 執行的 exact 動作", "hint 未載明的任何動作"),
 }
 
@@ -262,8 +264,7 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
         return
 
     if item_type == "watch_decision":
-        _validate_watch_decision_receipt(receipt)
-        return
+        raise TodoError("watch_decision 的 go 由 resolve 依 watch 狀態驗證（_resolve_watch_decision），不走這裡")
 
     if not receipt.strip():
         raise TodoError(f"{item_type} go 必須附 underlying authority receipt")
@@ -315,6 +316,7 @@ def resolve(
     until: str | None = None,
     trigger: str | None = None,
     event_type: str | None = None,
+    quote: str | None = None,
     _skip_receipt_validation: bool = False,
 ) -> dict[str, Any]:
     """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。
@@ -326,14 +328,18 @@ def resolve(
     if verb not in VERBS:
         raise TodoError(f"未知動詞：{verb}（可用：{', '.join(VERBS)}）")
     item = get(pool, n)
-    if verb == "go" and not _skip_receipt_validation:
-        # 只有已完成 underlying 寫入的 complete-* 入口才略過——它自己就是收據來源。
-        _validate_go_receipt(item, receipt)
     if (until or trigger or event_type) and verb != "pending":
         raise TodoError("until／trigger／event-type 只適用於 pending")
     if item["type"] == "watch_decision":
-        return _resolve_watch_decision(pool, item, verb, reason=reason, receipt=receipt, at=at,
-                                       until=until, trigger=trigger)
+        if _skip_receipt_validation:
+            raise TodoError("watch_decision 沒有 complete-* 入口")
+        return _resolve_watch_decision(pool, item, verb, reason=reason, receipt=receipt, quote=quote, at=at,
+                                       until=until, trigger=trigger, event_type=event_type)
+    if quote:
+        raise TodoError("--quote 只用在 watch_decision 的 go（outcome:touched 的原文）")
+    if verb == "go" and not _skip_receipt_validation:
+        # 只有已完成 underlying 寫入的 complete-* 入口才略過——它自己就是收據來源。
+        _validate_go_receipt(item, receipt)
     if event_type and not trigger:
         raise TodoError("event-type 必須搭配人類可讀的 trigger")
     stamp = at or _now()
@@ -369,34 +375,63 @@ def resolve(
     return item
 
 
-_WATCH_DECISION_RECEIPT_KEYS = frozenset({"lead", "report", "watch"})
+_WATCH_DECISION_EVIDENCE_KEYS = frozenset({"lead", "report", "watch"})
+_WATCH_DECISION_OUTCOMES = ("touched", "not_touched")
+#: report 收據只收研究產出所在的目錄（R2-b NB-5：`report:AGENTS.md` 這種「存在但不是研究結果」的檔案不算）
+_WATCH_DECISION_REPORT_ROOTS = ("docs/reports/", "thesis/", "library/private/")
 
 
-def _validate_watch_decision_receipt(receipt: str) -> None:
-    """`watch_decision` 的 go 要**指得回研究結果**（Phase 1 Step 1.7）：`lead:<id>`（leads store 裡有）、
-    `report:<repo 內相對路徑>`（檔案存在）、`watch:<id>`（registry 裡有，研究後新登記的）——至少一項、只准這三種鍵，
-    每一項都查得到。go 不授權任何 authority mutation；批次語法的 bare go 在這裡被拒。"""
+def _validate_watch_decision_go(receipt: str, *, quote: str | None, watch: Mapping[str, Any]) -> dict[str, str]:
+    """`watch_decision` 的 go＝「研究結論：條件已被觸及」（R2-b B2）。收據要**指得回這次到期之後的研究結果**：
+
+    - `outcome:touched` 必填（`not_touched` 不是 go：續等或 drop）；`--quote` 必填（文件逐字；L18）。
+    - 至少一項 `lead:<id>`（leads store 有、且最後動作不早於這次到期日）／`report:<路徑>`（在
+      `_WATCH_DECISION_REPORT_ROOTS` 之下、檔案存在）／`watch:<id>`（不是自己、非 consumed、建立不早於到期日）。
+    """
     if not receipt.strip():
-        raise TodoError("watch_decision go 必須附研究結果：lead:<id>／report:<path>／watch:<id>"
-                        "（要研究就在互動 session 說；批次語法的 bare go 一律拒絕）")
+        raise TodoError('watch_decision 的 go 必須附研究結論與結果：--receipt "outcome:touched;report:<路徑>" '
+                        '--quote "<原文>"（批次語法的 bare go 一律拒絕；條件沒被觸及就續等或 drop）')
     fields = _receipt_fields(receipt)
-    if not fields or set(fields) - _WATCH_DECISION_RECEIPT_KEYS:
-        raise TodoError("watch_decision go receipt 只接受 lead:<id>／report:<path>／watch:<id>")
+    unknown = set(fields) - _WATCH_DECISION_EVIDENCE_KEYS - {"outcome"}
+    if unknown:
+        raise TodoError(f"watch_decision go receipt 不認得的欄位：{sorted(unknown)}（只收 outcome／lead／report／watch）")
+    outcome = fields.get("outcome")
+    if outcome not in _WATCH_DECISION_OUTCOMES:
+        raise TodoError("watch_decision go receipt 必須帶 outcome:touched（研究結論：條件已被觸及）")
+    if outcome == "not_touched":
+        raise TodoError("條件沒被觸及不是 go：續等用 resolve <n> --verb pending --until <日期>，放棄用 --verb drop")
+    if not set(fields) & _WATCH_DECISION_EVIDENCE_KEYS:
+        raise TodoError("go 必須附研究結果：lead:<id>／report:<路徑>／watch:<id>")
+    if not str(quote or "").strip():
+        raise TodoError("outcome:touched 必須附 --quote（文件逐字；L18：標籤要指得回原文）")
+    since = str(watch.get("expires") or "")
     if "lead" in fields:
         from engine_b import leads as leads_mod
 
-        if fields["lead"] not in (leads_mod.load().get("leads") or {}):
+        lead = (leads_mod.load().get("leads") or {}).get(fields["lead"])
+        if lead is None:
             raise TodoError(f"watch_decision receipt 的 lead 不存在：{fields['lead']}")
+        latest = max(str(lead.get("first_seen") or ""), str((lead.get("triage") or {}).get("decided_at") or ""))
+        if latest[:10] < since:
+            raise TodoError(f"receipt 的 lead {fields['lead']} 最後動作 {latest[:10] or '（無）'} 早於這次到期 {since}"
+                            "——要指研究這次到期時的產出（或改附 report:）")
     if "report" in fields:
-        path = (_ROOT / fields["report"]).resolve()
-        if not path.is_relative_to(_ROOT.resolve()) or not path.is_file():
-            raise TodoError(f"watch_decision receipt 的 report 不是 repo 內存在的檔案：{fields['report']}")
+        rel = fields["report"].replace("\\", "/")
+        path = (_ROOT / rel).resolve()
+        if (not rel.startswith(_WATCH_DECISION_REPORT_ROOTS) or not path.is_relative_to(_ROOT.resolve())
+                or not path.is_file()):
+            raise TodoError(f"watch_decision receipt 的 report 必須是 {'／'.join(_WATCH_DECISION_REPORT_ROOTS)} "
+                            f"之下存在的檔案：{fields['report']}")
     if "watch" in fields:
         from engine_b import event_watch
 
-        known = {str(w.get("watch_id")) for w in event_watch.load_watches().get("watches") or []}
-        if fields["watch"] not in known:
-            raise TodoError(f"watch_decision receipt 的 watch 不存在：{fields['watch']}")
+        if fields["watch"] == watch.get("watch_id"):
+            raise TodoError("receipt 的 watch 不能是這個到期的 watch 自己")
+        new = next((w for w in event_watch.load_watches().get("watches") or []
+                    if w.get("watch_id") == fields["watch"]), None)
+        if new is None or new.get("status") == "consumed" or str(new.get("created_at") or "")[:10] < since:
+            raise TodoError(f"receipt 的 watch {fields['watch']} 必須存在、未 consumed、建立不早於這次到期 {since}")
+    return fields
 
 
 def watch_id_of(item: Mapping[str, Any]) -> str:
@@ -404,50 +439,87 @@ def watch_id_of(item: Mapping[str, Any]) -> str:
     return str(item.get("ref_id") or "").split("@", 1)[0]
 
 
+def _watch_decision_stale(watch: Mapping[str, Any] | None, event_expires: str) -> str | None:
+    """這個編號對應的到期事件還在不在（R2-b NB-3）。回傳過時的理由，還在就回 None。"""
+    from engine_b import event_watch
+
+    if watch is None:
+        return "watch 已不在 registry"
+    if watch.get("expiry_resolution"):
+        return f"這次到期已處置過（{watch['expiry_resolution'].get('kind')}）"
+    if event_expires and str(watch.get("expires")) != event_expires:
+        return f"watch 的到期日已變成 {watch.get('expires')}（續等過）"
+    if watch.get("status") == "active" and event_watch.past_expiry(watch):
+        return None
+    if watch.get("status") != "expired":
+        return f"watch 現況 {watch.get('status')}"
+    return None
+
+
 def _resolve_watch_decision(pool: dict[str, Any], item: dict[str, Any], verb: str, *, reason: str,
-                            receipt: str, at: str | None, until: str | None, trigger: str | None) -> dict[str, Any]:
-    """`watch_decision` 的三個動詞（Phase 1 Step 1.7）——**等待只住 registry，不得同時掛在 pq2 的 `waiting_on`**。
+                            receipt: str, quote: str | None, at: str | None, until: str | None,
+                            trigger: str | None, event_type: str | None) -> dict[str, Any]:
+    """`watch_decision` 的三個動詞（Phase 1 Step 1.7；R2-b 修訂）——**等待只住 registry，不得同時掛在 pq2 的 `waiting_on`**。
 
     - `pending --until <日期>`＝續等：watch 以新到期日回 active（歷史附加），這個編號結案（`resolution=renewed`）、
-      receipt 記新到期日。**bare `pending`（沒帶 --until）與 `--trigger` 拒收**——否則同一個動詞在這一型上會變成
-      「不結案、留在球在你」，兩種結果（L12）。
-    - `drop`：watch 記 `expiry_resolution`（drop、編號、理由）。
-    - `go`：receipt 必須指得回研究結果（`_validate_go_receipt`）；watch 記 `expiry_resolution`。
+      receipt 記新到期日。bare `pending`、`--trigger`、`--event-type` 拒收（L12）；來源已不是現行時拒收（NB-4）。
+    - `drop`：watch 記 `expiry_resolution: dropped`。
+    - `go`：研究結論「條件已被觸及」（`_validate_watch_decision_go`）→ `event_watch.record_touched`，接手路徑與 judge 同形（B2）。
+    - 編號對應的到期事件已過時（watch 已處置／續等過／不在）→ 只准 `drop`，結案成 `stale_event`、不動 registry（NB-3）。
     ⚠ `_mark_source_cleared` 永不自動 resolve，所以結案在這同一個動作裡明確做。
     """
     from engine_b import event_watch
 
     stamp = at or _now()
     watch_id = watch_id_of(item)
+    event_expires = str(item.get("ref_id") or "").partition("@")[2]
     data = event_watch.load_watches()
-    event_watch.mark_expired(data)  # 到期當天收集時還是 active（見 `_collect_watch_expiry_rows`）
-    if verb == "pending":
-        if trigger or not until:
-            raise TodoError("watch_decision 的 pending 必須帶 --until <日期>：python -m engine_b.todo resolve "
-                            f"{item['n']} --verb pending --until <日期>（續等住 registry，不在 pq2 掛等待；"
-                            "批次語法帶不了日期）；要放棄就 drop，要研究就在互動 session 說")
-        try:
+    watch = next((w for w in data["watches"] if w.get("watch_id") == watch_id), None)
+    stale = _watch_decision_stale(watch, event_expires)
+    if stale is not None:
+        if verb != "drop":
+            raise TodoError(f"編號 {item['n']} 對應的到期事件已過時：{stale}——只能 drop 結案（不動 registry）")
+        return _close_watch_decision(pool, item, verb, resolution="stale_event", receipt=f"stale:{stale}",
+                                     reason=reason, stamp=stamp)
+    # 到期當天收集時 watch 還是 active——只標這一筆（NB-9：互動 resolve 不掃整份 registry）
+    event_watch.mark_expired(data, only=watch_id)
+    try:
+        if verb == "pending":
+            if trigger or event_type or not until:
+                raise TodoError("watch_decision 的 pending 必須帶 --until <日期>：python -m engine_b.todo resolve "
+                                f"{item['n']} --verb pending --until <日期>（續等住 registry，不在 pq2 掛等待；"
+                                "批次語法帶不了日期；--trigger／--event-type 不適用）；要放棄就 drop")
+            from engine_b.disproof import source_is_current
+
+            if not source_is_current(watch):
+                raise TodoError("來源已不是現行（memo 換版／thesis retired／讀圖已被取代）——這個條件沒有對象了，drop 即可")
             event_watch.renew(data, watch_id, until=until, n=item["n"])
-        except (event_watch.EventWatchError, ValueError) as exc:
-            raise TodoError(str(exc)) from exc
-        event_watch.save_watches(data)
-        resolution, final_receipt = "renewed", f"renewed_until:{until}"
-    else:
-        try:
-            event_watch.resolve_expiry(data, watch_id, {"verb": verb, "n": item["n"], "reason": reason or None,
-                                                        "receipt": receipt or None})
-        except event_watch.EventWatchError as exc:
-            raise TodoError(str(exc)) from exc
-        event_watch.save_watches(data)
-        resolution, final_receipt = verb, receipt or None
+            resolution, final_receipt = "renewed", f"renewed_until:{until}"
+        elif verb == "drop":
+            event_watch.resolve_expiry(data, watch_id, {"kind": "dropped", "n": item["n"],
+                                                        "reason": reason or None})
+            resolution, final_receipt = "drop", None
+        else:
+            _validate_watch_decision_go(receipt, quote=quote, watch=watch)
+            event_watch.record_touched(data, watch_id, quote=str(quote), note=reason, n=item["n"], receipt=receipt)
+            resolution, final_receipt = "go", receipt
+    except (event_watch.EventWatchError, ValueError) as exc:
+        raise TodoError(str(exc)) from exc
+    event_watch.save_watches(data)
+    return _close_watch_decision(pool, item, verb, resolution=resolution, receipt=final_receipt,
+                                 reason=reason, stamp=stamp)
+
+
+def _close_watch_decision(pool: dict[str, Any], item: dict[str, Any], verb: str, *, resolution: str,
+                          receipt: str | None, reason: str, stamp: str) -> dict[str, Any]:
     item.pop("waiting_on", None)
     item.pop("deferred_at", None)
     item["resolved_at"] = stamp
     item["resolution"] = resolution
     item["reason"] = reason or None
-    item["receipt"] = final_receipt
+    item["receipt"] = receipt
     pool["log"].append({"at": stamp, "n": item["n"], "type": item["type"], "ref_id": item["ref_id"],
-                        "verb": verb, "reason": reason or None, "receipt": final_receipt})
+                        "verb": verb, "reason": reason or None, "receipt": receipt})
     return item
 
 
@@ -1122,8 +1194,12 @@ def sync(
     *,
     at: str | None = None,
     healthy_sources: Iterable[str] | None = None,
+    reconciled: dict[str, Any] | None = None,
 ) -> dict[str, int]:
     """把各來源蒐集到的項目 upsert 進池。
+
+    `reconciled`：呼叫端已在**收集之前**跑過 thesis 反證對帳時傳入它的結果，這裡就不再跑（CLI 的順序；R2-b NB-3：
+    memo 在到期當天換版時，先收集會先鑄一個之後結不了案的編號）。
 
     `incoming` 每筆需有 type／ref_id／title，可選 hint／source。已 resolve 的
     (type, ref_id) 會重新進池（代表它又出現了，例如同一條 lead 再次需要追源）——這是
@@ -1178,7 +1254,7 @@ def sync(
                     "receipt": None, "prior_waiting_on": prior,
                 })
 
-    reconcile = _reconcile_disproof()
+    reconcile = reconciled if reconciled is not None else _reconcile_disproof()
 
     cleared, uncleared = _mark_source_cleared(
         pool, seen_keys, healthy_sources, stamp=stamp
@@ -1683,7 +1759,7 @@ def _collect_watch_expiry_rows() -> list[dict[str, Any]]:
             "ref_id": f"{watch['watch_id']}@{when}",
             "title": title,
             "hint": ("續等：python -m engine_b.todo resolve <編號> --verb pending --until <日期>｜放棄：drop｜"
-                     "要研究就在互動 session 說（go 須附研究結果）"),
+                     "要研究就在互動 session 說；研究後條件已被觸及才 go（receipt 帶 outcome:touched＋研究結果、--quote 原文）"),
             "source": "watch_expiry",
         })
     return rows
@@ -1715,7 +1791,7 @@ SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
     # 兩個 legacy kind 從此**沒有 collector**——與 `manual` 同形：缺席不代表完成（見上方 docstring）。
     "engine_c_observations": frozenset({"engine_c_observation"}),
     "thesis_mutations": frozenset({"thesis_mutation"}),
-    # "watch_expiry": frozenset({"watch_decision"}) —— R2-b NO_GO 回滾，見 SOURCE_COLLECTORS
+    "watch_expiry": frozenset({"watch_decision"}),
 }
 
 
@@ -1753,9 +1829,8 @@ SOURCE_COLLECTORS: tuple[tuple[str, str], ...] = (
     ("lifecycle", "_collect_lifecycle_rows"),
     ("engine_c_observations", "_collect_engine_c_observation_rows"),
     ("thesis_mutations", "_collect_thesis_mutation_rows"),
-    # ⚠ 2026-09-24 R2-b NO_GO 回滾（plan §0.5 預寫的回滾）：`("watch_expiry", "_collect_watch_expiry_rows")`
-    # 停登記——B1（thesis 對帳對到期條件重登、同一等待兩處住）與 B2（go 記不了「條件已成立」）修好前不鑄 watch_decision。
-    # 收集器函式與測試保留；重新啟用＝把這一列與 SOURCE_ITEM_TYPES 那一列加回來（並拿掉 test_watch_expiry 的回滾守衛）。
+    # 2026-09-24 R2-b NO_GO 曾回滾停登記；B1／B2／NB-1～NB-9 修好後重新啟用（見 plan §0.7 R2-b 表）。
+    ("watch_expiry", "_collect_watch_expiry_rows"),
 )
 
 
@@ -1958,6 +2033,8 @@ def main(argv: list[str] | None = None) -> int:
     p_res.add_argument("--verb", required=True, choices=VERBS)
     p_res.add_argument("--reason", default="")
     p_res.add_argument("--receipt", default="")
+    p_res.add_argument("--quote", default=None,
+                       help="watch_decision 的 go 專用：outcome:touched 的文件原文逐字（L18）")
     p_res.add_argument(
         "--until", default=None,
         help="pending 專用：等到哪個日期（如 2026-08-27）。設了就歸入「等事件」，不再佔決策注意力。",
@@ -2038,9 +2115,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "sync":
         retired = retire_legacy_pq1_items(pool)
+        reconciled = _reconcile_disproof()  # 先對帳再收集（R2-b NB-3）
         collected = collect_all_with_health()
         result = sync(
-            pool, collected.rows, healthy_sources=collected.healthy
+            pool, collected.rows, healthy_sources=collected.healthy, reconciled=reconciled,
         )
         save(pool, args.pool)
         if args.json:
@@ -2062,7 +2140,9 @@ def main(argv: list[str] | None = None) -> int:
                               f"；反證對帳：登記 {len(rc['registered'])}、收掉 {len(rc['consumed'])}"
                               f"、sidecar 不符 {len(rc['sidecar_mismatch'])}"
                               + (f"、沒有結構化反證 {len(rc['no_structured'])}（由 Step 1.6 補登記）"
-                                 if rc["no_structured"] else ""))
+                                 if rc["no_structured"] else "")
+                              + (f"、⚠ 登記失敗 {len(rc.get('errors') or [])}"
+                                 if rc.get("errors") else ""))
             print(
                 f"（新增 {result['added']}，目前 {result['active']} 項待辦"
                 f"{migration}{watch_line}{reconcile_line}）\n"
@@ -2101,10 +2181,12 @@ def main(argv: list[str] | None = None) -> int:
                     pool, int(raw), args.verb,
                     reason=args.reason, receipt=args.receipt,
                     until=args.until, trigger=args.trigger,
-                    event_type=args.event_type,
+                    event_type=args.event_type, quote=args.quote,
                 )
                 suffix = ""
-                if done.get("resolution") == "renewed":
+                if done.get("resolution") == "stale_event":
+                    suffix = f"（到期事件已過時，只結案編號：{done.get('receipt')}）"
+                elif done.get("resolution") == "renewed":
                     suffix = f"（續等到 {args.until}：watch 回 active，這個編號結案——等待只住 registry）"
                 elif args.verb == "pending" and (args.until or args.trigger):
                     suffix = f"（等：{args.until or args.trigger}）"

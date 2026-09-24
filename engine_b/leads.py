@@ -771,7 +771,8 @@ def trace_backlog(store: dict[str, Any]) -> list[dict[str, Any]]:
             )
         elif watch.get("status") == "expired":
             wake_state, reason = "expired", (
-                f"等待已到期（{watch.get('expires')}）——請決定續等、改主動輪詢或放棄"
+                f"等待已到期（{watch.get('expires')}）——追源型由 daily ⑨ 轉終局 watch_expired 並計數（A3），"
+                "不需要人決定；有新的一手文件會以新 lead 回來"
             )
         elif ew_mod.is_stalled(watch):
             wake_state, reason = "stalled", (
@@ -831,10 +832,14 @@ def parked_without_expiry(store: dict[str, Any]) -> list[dict[str, Any]]:
     from engine_b import event_watch as ew_mod
 
     watch_data = ew_mod.load_watches()
+    # 「在等」＝active／fired，或已到期但還沒處置（下一輪 daily ⑨ 會結案）。已處置的到期不算在等——
+    # lead 在路上時到期、之後再 park 的那一型曾因此從所有計數器消失（R2-b NB-1）。
     watched = {
         str(watch.get("wake_lead") or "")
         for watch in watch_data.get("watches", [])
-        if watch.get("wake_lead") and watch.get("status") != "consumed"
+        if watch.get("wake_lead") and (
+            watch.get("status") in ("active", "fired")
+            or (watch.get("status") == "expired" and not watch.get("expiry_resolution")))
     }
     registry = get_trace_status_registry()
     holes: list[dict[str, Any]] = []
@@ -1152,20 +1157,35 @@ def close_expired_trace_watches(store: dict[str, Any], watch_data: dict[str, Any
     `watch_decision`。計數由心跳印「追源到期結案 N（今日 M）」。只動 parked 的 lead；已經在路上或終局的只記處置。"""
     from engine_b import event_watch as ew
 
+    registry = get_trace_status_registry()
+    # 同一 lead 已有還在等的 watch（研究完重新 park 建的新一輪）→ 這筆到期的是上一輪，不動 lead（NB-1）
+    live = {str(w.get("wake_lead")) for w in watch_data.get("watches", [])
+            if w.get("wake_lead") and w.get("status") in ("active", "fired")}
     closed: list[dict[str, str]] = []
     for watch in watch_data.get("watches", []):
         if watch.get("status") != "expired" or not watch.get("wake_lead") or watch.get("expiry_resolution"):
             continue
         lead_id = str(watch["wake_lead"])
         lead = store["leads"].get(lead_id)
-        outcome = "lead_missing"
-        if lead is not None and lead.get("status") == "parked":
+        trace_status = str(((lead or {}).get("refs") or {}).get("trace_status") or "").strip()
+        if lead_id in live:
+            kind = "superseded_by_newer_watch"
+        elif lead is None:
+            kind = "lead_missing"
+        elif lead.get("status") == "parked" and trace_status and registry.is_terminal(trace_status):
+            # 已是終局（original_obtained／contradicts／not_pursued…）→ 不覆寫：`watch_expired` 的定義是
+            # 「等待結束不是主張為假」，蓋掉 `contradicts` 等於丟失「原主張被推翻」（R2-b NB-2；L17 覆蓋還是聯集）
+            kind = "lead_already_terminal"
+        elif lead.get("status") == "parked":
             annotate_refs(store, lead_id, refs={"trace_status": "watch_expired"})
-            outcome = "trace_closed"
-        elif lead is not None:
-            outcome = f"lead_{lead.get('status')}"
-        ew.resolve_expiry(watch_data, str(watch["watch_id"]), {"kind": outcome, "lead_id": lead_id})
-        closed.append({"watch_id": str(watch["watch_id"]), "lead_id": lead_id, "outcome": outcome})
+            kind = "trace_closed"
+        elif lead.get("status") in ("applied", "triaged_no_go"):
+            kind = "lead_closed"
+        else:
+            kind = "lead_in_flight"
+        ew.resolve_expiry(watch_data, str(watch["watch_id"]), {
+            "kind": kind, "lead_id": lead_id, "lead_status": (lead or {}).get("status")})
+        closed.append({"watch_id": str(watch["watch_id"]), "lead_id": lead_id, "outcome": kind})
     return closed
 
 

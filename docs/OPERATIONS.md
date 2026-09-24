@@ -113,10 +113,13 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 **不新增無人值守可執行面**：`DAILY_STEPS` 與各步 argv 不變，不新增主機、憑證或寫入檔案。行為變化只在兩個既有寫入步驟、
 寫的都是它們本來就在寫的檔：⑨ `engine_b.cli consume-fired` 多做「追源型到期」——`expires` 已過的 watch 轉 `expired`、
 parked lead 的 `trace_status` 轉終局 `watch_expired`（`library/leads/pending_leads.json`）、watch 記 `expiry_resolution`
-（`library/leads/event_watches.json`）；⑩ `engine_b.todo sync` 多鑄 `watch_decision`（語意／假設型到期；⚠ R2-b NO_GO 後收集器已停登記，重新啟用前不鑄）、把 pq2 型到期指向的
+（`library/leads/event_watches.json`）；⑩ `engine_b.todo sync` 多鑄 `watch_decision`（語意／假設型到期；R2-b 修訂後重新啟用；CLI 先跑 thesis 反證對帳再收集）、把 pq2 型到期指向的
 編號翻回球在你（`library/leads/todo_pool.json`）、讀圖型到期與「memo 已被取代」的到期只記處置。**`watch_decision` 永不列入常規授權**
 （`config/standing_authorization.json` 的 `never`），無人值守路徑不會替使用者按它的 `go`／`drop`／續等；`go` 必附指得回的研究結果，
-不授權任何 authority mutation。互動路徑：`python -m engine_b.todo resolve <n> --verb pending --until <日期>`（續等）／`--verb drop`。
+不授權任何 authority mutation。互動路徑：`python -m engine_b.todo resolve <n> --verb pending --until <日期>`（續等）／`--verb drop`／研究後條件已被觸及：`--verb go --receipt "outcome:touched;report:<docs/reports|thesis|library/private 下的檔>" --quote "<原文>"`。
+
+**試跑（2026-09-24 起的常規做法）**：改到等待系統（到期、喚醒、反證登記、心跳段 2／3）時，交付前跑
+`python scripts/trial_run_waiting.py [--until <日期>]`——拿真實 registry／待辦池／leads 的暫存副本（`library/private/trial_runs/waiting/`）把「今天」逐個事件日快轉，跑 ⑨⑩ 與心跳相關行，並模擬一次續等／放棄／判定觸及；真檔 byte 不變（腳本結尾檢查）。它換掉模組時鐘，**不得**放進任何無人值守步驟；輸出是試跑，不是「已生效」的證據。
 
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.5：反證登記 hook）
 

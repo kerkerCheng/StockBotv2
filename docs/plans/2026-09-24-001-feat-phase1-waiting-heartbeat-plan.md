@@ -211,7 +211,7 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | 1.4 | `semantic_condition` kind（feed 宣告一手與公司、回填實體、待檢、判定、排除持股申報）＋ 語意預篩（抓全文、`claude -p` 零工具提議、程式驗引文後寫標旗；C7） | ✅ 回填 EDGAR 419／MFN 64／sivers 26／yahoo 26／MOPS 4／X 514（冪等）；Sivers 兩 feed 的 lead 含 `co:sivers_semiconductors` 0→100%；非語意型命中差異只有 ew_0042 多 4 則 `sivers:press`（全由宣告的 company_id 交集解釋）；真實醒來的語意 watch 0（1.6 才登記）；工作時限 180→240 並重新註冊（偏差 #7–#8） | 5c5d875（R2-a 處置 fc5304d） |
 | 1.5 | 反證登記 hook（讀圖 v2 `disproof[]`、thesis 由 `todo sync` 對帳 lifecycle 現行 memo 登記與收舊）＋ `wake_reading` ＋ 在盯／未盯／觸及待處置／叫不醒計數 ＋ 觸及後的 `thesis_lifecycle` 項目 | ✅ 8 筆 v1 讀圖 id 重算不變、解析失敗 0、兩節點 current；對帳在真實資料上不動任何東西（三份現行 memo 沒有結構化反證→等 1.6）；計數＝預期 16／在盯 0／未盯 16／v1 散文 2 份／凍結歷史 32；`pending_lifecycle.py` 無 diff；心跳段 2 已印反證行（偏差 #9） | f9b8e7c |
 | 1.6 | 既有反證補登記（**強模型**；16 條 thesis 用 `register-disproof`；2 份現行讀圖各 append 一份 v2 取代；不擋後續 Step、結案前必完成） | ✅ thesis 16 條（ew_0096–0111）＋讀圖 v2 兩份（`sr_ad503ae880ceb398` 6 條、`sr_d07679979a8e4202` 5 條）＋需求側客戶 `wake_reading` 5；計數：預期 27／在盯 27／未盯 0／觸及待處置 0／**叫不醒 2**（AXT §7-3 JX／住友、inp ③ IQE）／v1 散文 0；sync 後對帳收掉 0；N15＝claim 39（+edge 8）全部帶 `disproof_condition`；逐條表 `docs/reports/2026-09-24-phase1-step16-disproof-registration.md`（偏差 #14–#17） | （本 commit） |
-| 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ✅ 機制由 22 條測試證明（變異檢查：ref_id 改用 `expired_at` 會紅 3 條）；真實資料 expired 0、最早到期＝追源型 2026-11-22、語意／pq2 型 2026-12-31——照 A3「已交付、未生效」；暫存池 sync：pq2 型 watch 指向的 6 個編號逐筆不變、新 log 0、`watch_decision` 0；2404 passed；**R2-b NO_GO（B1、B2；NB-1–NB-10）→ 已照 §0.5 回滾（收集器停登記），AWAITING_HUMAN**（偏差 #10–#13；處置見 §0.7 R2-b 表） | c9e950f（回滾見下一個 commit） |
+| 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ✅ 機制由 22 條測試證明（變異檢查：ref_id 改用 `expired_at` 會紅 3 條）；真實資料 expired 0、最早到期＝追源型 2026-11-22、語意／pq2 型 2026-12-31——照 A3「已交付、未生效」；暫存池 sync：pq2 型 watch 指向的 6 個編號逐筆不變、新 log 0、`watch_decision` 0；2404 passed；**R2-b NO_GO（B1、B2；NB-1–NB-10）→ 回滾（19120b9）→ 使用者確認修法 → 全數修好並重新啟用、試跑再修一個（偏差 #18）、R2-b 重審中**（偏差 #10–#13、#18；處置見 §0.7 R2-b 表） | c9e950f、19120b9、（本 commit） |
 | 1.8 | 心跳改版（較昨 diff、watch／反證計數、pq2 逐筆、備份、健康、NAV、計分表每日、Discord 摘要） | ○ | |
 | 1.9 | 題材掃描（weekly 退役、`skills/theme-scan`、提醒 hook、AGENTS 兩句、`weekly` 字眼清掉） | ○ | |
 | 1.10 | 稽核改讀新 registry | ○ | |
@@ -457,6 +457,9 @@ reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutat
 | NB-9 | non-blocking | `todo.py` `_resolve_watch_decision` | 互動 resolve 對整份 registry 跑 `mark_expired` 並存檔（無害，但擴大 NB-3 的崩潰窗） | 只標自己那一筆 |
 | NB-10 | non-blocking | plan §0.1 #6、A3、ROADMAP ④ | 「最早 2027-01-01」已過期（1.6 後最早 2026-11-17） | 偏差 #17 已改 §12 回查日；#6 是使用者定案，文字待使用者決定 |
 
+**處置（2026-09-24，使用者：「確認修法是正解」＋「用現有的資料自己跑看看未來系統長出來的樣子」）：** B1、B2、NB-1～NB-9 照上表提案修法全數落地，收集器重新啟用（回滾守衛測試拿掉、改成「已接上」的測試）；NB-6 的封閉字彙現在做、心跳的完整處置分布併進 1.8；NB-10 待使用者。`tests/test_watch_expiry.py` 重寫成**真的跑對帳**（暫存 thesis＋結構化 sidecar），49 條；變異檢查：B1 改回紅 3、NB-2 紅 1、NB-1 紅 1、B2 紅 2。
+**試跑**（新工具 `scripts/trial_run_waiting.py`：真實 registry／待辦池／leads 的暫存副本快轉到 2027-10，真檔 byte 不變）又抓到一個測試沒抓到的：**到期待決的條件被算進「未盯」**（2026-11-18 那 5 條正在 pq2 等決定，心跳寫「未盯 5」；L12）→ `disproof_counts` 多一格 `expired_pending`、心跳段 2 分開印（偏差 #18）。另一個是設計問題、**待使用者決定**：同一份 thesis／讀圖的條件同一天到期，一次鑄 5–6 個編號（2026-11-18 讀圖 5、2027-02-14 AXT 6、2027-03-02 COHR 5、2027-03-18 讀圖 6；不回應的話 2027-10 前累積 27 個），而續等必須逐筆帶日期。R2-b 重審已發（修訂後的 commit）。
+
 ### 執行偏差紀錄（執行者填；每筆寫「plan 原文怎麼寫／實際怎麼做／為什麼」，並回頭修本 plan 對應段落）
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
@@ -478,6 +481,7 @@ reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutat
 | 15 | 1.6 | 兩份現行讀圖「從 reading 散文逐字找出每一條」 | `tech:cw_dfb_laser` 現行那份沒有列條文、只說沿用前一份（寫的是「六條」）；照前一份 `sr_a181641ddb99c69c` 的原文登記 **5 條** | 鏈上的條文實際只有 ①–⑤；讀圖原文依 plan 不改，不一致記在 1.6 報告（L11：自己引用的事實也要追源） |
 | 16 | 1.6 | 到期＝「下一個核查點＋一個核查週期」 | Sivers 的核查週期取「每季財報」90 天而非 lifecycle 的 30 天；讀圖來源的條目＝讀圖到期＋讀圖有效期（90／30 天）；原文不足 20 字的讀圖條目帶同一句的逐字前導 | Sivers 的反證多由季報判定，30 天的重問只會在沒有新季報時再問一次；讀圖原文沒有「核查週期」，有效期是它唯一的週期 |
 | 17 | 1.6 | §0.1 #6／§12：④ 最早 2027-01-01 才可能發生、回查 date watch 2027-01-02 | 回查 date watch 改 **2026-11-19**（#6 那一列是使用者定案，文字不動） | `tech:cw_dfb_laser` 讀圖來源 5 條 watch 到期 2026-11-17；若該節點在那之前重讀、舊 watch 被取代收掉，下一個是 AXT 的 2027-02-13 |
+| 18 | 1.7 | 反證計數五格：在盯／叫不醒／觸及待處置／未盯／v1 散文（1.5、1.8 的心跳段 2） | 多一格**到期待決**（`expired_pending`：expired、未處置、指向預期條目），不再算進「未盯」 | 試跑（`scripts/trial_run_waiting.py`）發現到期當天正在 pq2 等決定的條件被印成「未盯」——一個數字兩種語意（L12）；drop 之後的才是真的未盯 |
 
 ---
 

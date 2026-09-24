@@ -19,7 +19,9 @@ status／last_checked／next_check），所以「換 memo 的那一刻」沒有�
 
 預期條目＝非 retired thesis 現行 memo「推翻」那一節的條目（`thesis:<memo>#1..n`）＋ 各節點現行 **v2** 讀圖的
 `disproof[]`（`reading:<id>#1..n`）。五個數：**在盯**（active／fired 的語意 watch 指向預期條目）、
-**觸及待處置**（判定觸及、還沒處置；A5——不得併進「未盯」）、**未盯**（預期扣掉前兩者）、
+**觸及待處置**（判定觸及、還沒處置；A5——不得併進「未盯」）、**到期待決**（等滿一輪沒發生、正在 pq2
+`watch_decision` 等人決定續等或放棄——2026-09-24 試跑發現它原本被算進「未盯」，一個數字兩種語意，L12）、
+**未盯**（預期扣掉前三者；drop 之後的條件在這裡）、
 **叫不醒**（在盯之中、沒有任何一手來源會產出帶它實體的 lead）；另報 v1 讀圖散文份數（不可機械數）
 與凍結歷史（舊店 `coverage_assessments` 的反證，不盯）。
 """
@@ -89,7 +91,8 @@ def reconcile_thesis_disproof(data: dict[str, Any], *, lifecycle: Mapping[str, A
 
     lifecycle = load_lifecycle() if lifecycle is None else lifecycle
     today = today or datetime.now(timezone.utc).date()
-    summary: dict[str, Any] = {"registered": [], "consumed": [], "sidecar_mismatch": [], "no_structured": []}
+    summary: dict[str, Any] = {"registered": [], "consumed": [], "sidecar_mismatch": [], "no_structured": [],
+                               "errors": []}
     current: dict[str, str] = {}
     retired: dict[str, str] = {}
     for tid, entry in lifecycle.items():
@@ -118,25 +121,38 @@ def reconcile_thesis_disproof(data: dict[str, Any], *, lifecycle: Mapping[str, A
             if not isinstance(cond, dict):
                 continue
             ref = f"thesis:{memo}#{index}"
-            watching = [w for w in data["watches"] if w.get("kind") == ew.SEMANTIC_KIND
-                        and w.get("source_ref") == ref and w.get("status") in ("active", "fired")]
-            if any(normalize(w.get("condition")) == normalize(cond.get("condition")) for w in watching):
+            # 去重認「任何非 consumed」（R2-b B1）：到期待決、drop 過、續等中的條件都算已登記——只認 active／fired 時，
+            # 條件一到期就被重登一筆，同一個等待同時住 pq2 與 registry、drop 不生效、續等後一個條件兩個編號。
+            # drop 之後這條就沒人盯，由「未盯」計數現形（那是誠實的狀態）；consumed（判定觸及）之後照 1.5 重登續盯。
+            registered = [w for w in data["watches"] if w.get("kind") == ew.SEMANTIC_KIND
+                          and w.get("source_ref") == ref and w.get("status") != "consumed"]
+            if any(normalize(w.get("condition")) == normalize(cond.get("condition")) for w in registered):
                 continue
-            watch = ew.add_watch(
-                data, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref,
-                expires=str(cond.get("expires") or _default_expires(entry, str(cond.get("condition")), today=today)),
-                entities=list(cond.get("entities") or ()), condition=str(cond.get("condition")),
-                check_frequency=str(cond.get("check_frequency")), action_48h=str(cond.get("action_48h")),
-                quote_locator="memo「推翻」那一節", note=f"todo sync 對帳：thesis {tid} 現行 memo 的第 {index} 條",
-                today=today,
-            )
+            try:
+                watch = ew.add_watch(
+                    data, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref,
+                    expires=str(cond.get("expires") or _default_expires(entry, str(cond.get("condition")), today=today)),
+                    entities=list(cond.get("entities") or ()), condition=str(cond.get("condition")),
+                    check_frequency=str(cond.get("check_frequency")), action_48h=str(cond.get("action_48h")),
+                    quote_locator="memo「推翻」那一節", note=f"todo sync 對帳：thesis {tid} 現行 memo 的第 {index} 條",
+                    today=today,
+                )
+            except ew.EventWatchError as exc:
+                # 一條壞掉不得拖垮整輪對帳（R2-b B1-4：過去日期的 expires 曾讓所有 thesis 的對帳天天失敗）
+                summary["errors"].append({"ref": ref, "error": str(exc)})
+                continue
             summary["registered"].append(watch["watch_id"])
         # 同一份現行 memo、條件已不在 sidecar 的（原地重產、反證換了）→ 收掉
         for watch in data["watches"]:
-            if (watch.get("kind") == ew.SEMANTIC_KIND and memo_ref(watch.get("source_ref") or "") == memo
-                    and watch.get("status") in ("active", "fired")
-                    and normalize(watch.get("condition")) not in wanted):
+            if (watch.get("kind") != ew.SEMANTIC_KIND or memo_ref(watch.get("source_ref") or "") != memo
+                    or normalize(watch.get("condition")) in wanted):
+                continue
+            if watch.get("status") in ("active", "fired"):
                 _close(watch, "memo 原地重產、條件已變")
+                summary["consumed"].append(watch["watch_id"])
+            elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
+                ew.resolve_expiry(data, watch["watch_id"], {"kind": "source_superseded",
+                                                            "note": "memo 原地重產、條件已變"})
                 summary["consumed"].append(watch["watch_id"])
     for watch in data["watches"]:
         memo = memo_ref(watch.get("source_ref") or "")
@@ -151,6 +167,24 @@ def reconcile_thesis_disproof(data: dict[str, Any], *, lifecycle: Mapping[str, A
             ew.resolve_expiry(data, watch["watch_id"], {"kind": "source_superseded", "note": note})
             summary["consumed"].append(watch["watch_id"])
     return summary
+
+
+def source_is_current(watch: Mapping[str, Any], *, lifecycle: Mapping[str, Any] | None = None,
+                      readings: Mapping[str, Any] | None = None) -> bool:
+    """語意 watch 的來源還是不是現行（R2-b NB-4：來源已換版時拒絕續等）。
+
+    thesis 來源：memo 是某個非 retired thesis 的現行 memo。讀圖來源：reading_id 是該節點現行讀圖。其餘（假設型）→ True。"""
+    ref = str(watch.get("source_ref") or "")
+    memo = memo_ref(ref)
+    if memo is not None:
+        lifecycle = load_lifecycle() if lifecycle is None else lifecycle
+        return any(isinstance(e, dict) and str(e.get("memo")) == memo and e.get("status") != "retired"
+                   for e in lifecycle.values())
+    if ref.startswith("reading:"):
+        reading_id = ref[len("reading:"):].split("#", 1)[0]
+        readings = current_readings() if readings is None else readings
+        return any(getattr(r, "reading_id", None) == reading_id for r in readings.values())
+    return True
 
 
 def _close(watch: dict[str, Any], note: str) -> None:
@@ -202,13 +236,17 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
     semantic = [w for w in watches if w.get("kind") == ew.SEMANTIC_KIND]
     watching = [w for w in semantic if w.get("status") in ("active", "fired") and w.get("source_ref") in expected]
     touched = [w for w in semantic if _touched_pending(w)]
-    covered = {w.get("source_ref") for w in watching} | {w.get("source_ref") for w in touched}
+    awaiting = [w for w in semantic if w.get("status") == "expired" and not w.get("expiry_resolution")
+                and w.get("source_ref") in expected]
+    covered = ({w.get("source_ref") for w in watching} | {w.get("source_ref") for w in touched}
+               | {w.get("source_ref") for w in awaiting})
     return {
         "expected": len(expected),
         "watching": len(watching),
         "unreachable": (None if coverage is None else
                         sum(1 for w in watching if not ew.is_reachable(w, coverage))),
         "touched_pending": len(touched),
+        "expired_pending": len(awaiting),
         "unwatched": len(expected - covered),
         "v1_prose_readings": v1_prose,
         "frozen_history": frozen_history,
@@ -247,4 +285,4 @@ def frozen_history_count() -> int | None:
 
 
 __all__ = ["current_readings", "disproof_counts", "frozen_history_count", "load_lifecycle", "memo_ref",
-           "normalize", "reconcile_thesis_disproof"]
+           "normalize", "reconcile_thesis_disproof", "source_is_current"]
