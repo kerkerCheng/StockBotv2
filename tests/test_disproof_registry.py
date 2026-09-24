@@ -146,6 +146,16 @@ def test_disproof_items_stop_at_any_heading_and_accept_both_list_styles() -> Non
     assert disproof_items("# memo\n沒有那一節\n") == []
 
 
+def test_disproof_items_join_indented_continuation_lines() -> None:
+    """AXT §7 第 2 條跨兩行（Phase 1 Step 1.6 實測）：只取第一行會把條件截斷。"""
+    text = ("## 7. 什麼會推翻這個 thesis\n\n- 條款 → 「防禦性鎖客」\n  的解讀被推翻，議價權解讀成立。\n"
+            "- second item wraps\n  onto a new line\n\n  not part of any item\n- 第三條\n")
+    assert disproof_items(text) == ["條款 → 「防禦性鎖客」的解讀被推翻，議價權解讀成立。",
+                                    "second item wraps onto a new line", "第三條"]
+    axt = (Path(__file__).resolve().parents[1] / "thesis" / "axt_inp_v1_lane_memo.md").read_text(encoding="utf-8")
+    assert disproof_items(axt)[1].endswith("「防禦性鎖客」的解讀被推翻，議價權解讀成立。")
+
+
 def test_memo_hash_matches_the_generator_under_crlf_and_detects_real_edits(tmp_path) -> None:
     lf = "# memo\nline\n"
     memo = tmp_path / "m.md"
