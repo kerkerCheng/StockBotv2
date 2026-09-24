@@ -2,34 +2,41 @@
   "schema_version": "1",
   "schedule": {
     "_doc": [
-      "本機排程的時間窗，給**互動 session 用來避讓**，不是給排程器讀的",
-      "（實際觸發仍在 OS task scheduler）。",
-      "事發 2026-08-31：`AGENTS.md` 早就寫著「排程與互動 session 也算兩個 writer，",
-      "不能重疊」，但 06:30 這個時間只存在於散文與排程器設定裡，程式看不到，",
-      "所以程式也不可能自己避開——保護完全靠人記得（L14：真正的防呆要會自己出現）。",
-      "兩邊寫的是同一組檔：pending_leads.json／todo_pool.json／event_watches.json ＋ git。",
-      "⚠ **這個時間有兩個 SSOT，而它們沒有任何機械連結**：OS task scheduler 決定實際觸發，",
-      "本欄只決定互動側避讓哪 90 分鐘。改排程時間**必須同時改這裡**——2026-09-12 實測",
-      "只改了排程器（06:30→05:30）而本欄沒跟上，結果 guard 在 05:15–06:15（daily 真的在跑）",
-      "回報 safe，卻在 06:45–07:45（daily 早就跑完）擋住互動 session 約 1.5 小時——**兩個方向都錯**。",
-      "⚠ 這是**單向避讓**不是互斥鎖：只有互動側會檢查。真正的雙向鎖需要動 daily 的",
-      "sandbox allowlist（見 ROADMAP）。單向仍然有效，因為 daily 有界且時間可預測。"
+      "排程時間的**唯一來源**（Phase 1 Step 1.2a，2026-09-24）：Windows 工作 `task_name` 由",
+      "`python scripts/register_daily_task.py --apply` 從本區塊導出，`crons/daily_task.py` 每次開跑再以",
+      "`schtasks /Query /TN <task_name> /XML` 比對實際註冊值與這裡（結果寫進執行紀錄、心跳段 1 印出）。",
+      "**改時間的唯一做法：改這裡 → 跑 register（先 dry-run 看差異，再 --apply）。**",
+      "事發 2026-09-12：時間曾有兩個 SSOT（本欄與 OS 排程器）且沒有機械連結——只改了排程器（06:30→05:30）",
+      "而本欄沒跟上，guard 在 daily 真的在跑時回報 safe、卻在 daily 跑完後擋住互動 session 約 1.5 小時，兩個方向都錯。",
+      "同一組時間也給互動 session 避讓（scripts/writer_guard.py）：窗＝daily_local_time − guard_margin ～",
+      "daily_local_time ＋ expected_duration ＋ guard_margin；真正的雙向互斥由 writer lock 執行。",
+      "execution_time_limit_minutes ≥ 各步 timeout 加總＋心跳＋發送（tests/test_daily_task.py 斷言）；",
+      "舊心跳工作的 PT10M 一定不夠。harvest_stale_hours：harvest 最後一輪超過這麼久，心跳段 1 亮 ⚠、段 3 改印「沒跑」。"
     ],
     "timezone": "Asia/Taipei",
     "daily_local_time": "05:30",
-    "_heartbeat_doc": [
-      "心跳（crons/heartbeat.py）由**獨立的 Windows 工作排程**觸發，不經 Codex——",
-      "這樣 Codex 沒起來、LLM 壞掉、sandbox 擋住時，心跳照發（D12 硬規則）。",
-      "排在 daily 之後：daily 05:30 起跑、預估 60 分鐘，心跳 07:00 讀的才是今天的 state。",
-      "⚠ 這個時間同樣有兩個 SSOT（Windows 排程器 ＋ 本欄）。改時間必須同時改兩邊；",
-      "查證實際註冊值：schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V"
-    ],
-    "heartbeat_local_time": "07:00",
-    "heartbeat_task_name": "StockBotv2-Heartbeat",
-    "weekly_local_time": "04:00",
-    "weekly_weekday": "sunday",
+    "task_name": "StockBotv2-Daily",
+    "execution_time_limit_minutes": 180,
     "expected_duration_minutes": 60,
-    "guard_margin_minutes": 15
+    "guard_margin_minutes": 15,
+    "harvest_stale_hours": 30
+  },
+  "llm": {
+    "_doc": [
+      "daily 裡的 LLM 步驟（C6／C7）：triage（⑦a）與語意預篩（⑩b），一律 `claude -p` 零工具、只回 JSON，",
+      "由程式驗證後寫入；每次執行檢查 init 事件的能力欄位，不符就殺行程、丟棄輸出。",
+      "executor：none＝兩個 LLM 步驟都記 skipped（也是 R2-a 的回滾開關）；claude＝啟用。",
+      "claude_path：null＝~/.local/bin/claude.exe。claude_model：模型只住這裡。",
+      "cwd：null＝%LOCALAPPDATA%\\StockBotv2\\llm_cwd；**必須在 repo 之外**（工作樹內 CLI 會跑 git、載入自動記憶），",
+      "載入時驗證，違反即 fail closed。triage_chunk_size：批次超過就分多次呼叫，每次各自驗。"
+    ],
+    "executor": "none",
+    "claude_path": null,
+    "claude_model": "sonnet",
+    "cwd": null,
+    "triage_timeout_minutes": 15,
+    "triage_chunk_size": 30,
+    "prescreen_timeout_minutes": 15
   },
   "pq1": {
     "_drain_doc": [

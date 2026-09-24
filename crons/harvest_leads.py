@@ -186,6 +186,9 @@ def filings_to_leads(ticker: str, cik: str, filings: list[dict]) -> list[dict]:
 
 #: 自動 no-go 的理由句。寫死成一句而不是每次現組，讓「為什麼這批沒進 pq1」可以被
 #: 一條 grep 全部撈出來。
+#: 機械 FILTER 的判斷者標記（Phase 1 Step 1.2a）：心跳的「分類層上次成功」要排除它——
+#: 它每天都會寫 triage 時間，不代表分類層有跑（L12：一個欄位兩種語意）。
+AUTO_NO_GO_DECIDED_BY = "harvest:auto_no_go_forms"
 AUTO_NO_GO_REASON = (
     "harvest 端自動 no_go：{form} 的歷史 graph delta 為 0（2026-09-10 實測 267 筆 lead："
     "applied 0、action_prepared 0），登記保留可 grep，但不佔 pq1 drain 預算。"
@@ -230,6 +233,7 @@ def _register_all(
                         tier=1,
                         reason=AUTO_NO_GO_REASON.format(form=f"Form {form}"),
                         decided_at=seen_at,
+                        decided_by=AUTO_NO_GO_DECIDED_BY,
                     )
                 except ValueError as exc:
                     # 單筆 triage 失敗不得讓整批 harvest 死掉——那會讓所有來源當天靜默停擺。

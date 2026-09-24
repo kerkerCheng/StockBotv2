@@ -158,9 +158,18 @@ def _x_spend_cap() -> float:
         return 0.0
 
 
-def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) -> Section:
-    """harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
+def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
+                    run_record_path: Path | None = None) -> Section:
+    """daily 執行紀錄、harvest 來源 ok／fail、行情最新交易日、APP 今天有沒有 materialize。"""
     section = Section(1, SECTION_TITLES[0])
+
+    # (0) daily 執行紀錄（Phase 1 Step 1.2a）：失敗步驟逐條、排程比對、鎖、工作區。
+    # ⚠ 心跳**只讀**這份紀錄——排程比對由 `crons/daily_task.py` 開 subprocess 查，心跳不得自己查。
+    try:
+        section.lines.extend(_daily_run_lines(now=now, record_path=run_record_path))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"daily 執行紀錄盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"daily 執行紀錄：{absence.reason}（{absence.kind}）")
 
     # (a) harvest：每個來源最後一輪的結果。harvest_log 是 append-only 的執行紀錄。
     harvest_absence: Absence | None = None
@@ -184,6 +193,9 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         if bad:
             head += "：" + "、".join(bad)
         section.lines.append(f"{head}｜最後一輪 {_local_stamp(newest)}")
+        stale = _harvest_staleness(newest, now=now)
+        if stale is not None:
+            section.lines.append(stale)
         month = now.astimezone(timezone.utc).strftime("%Y-%m")
         spend = sum(float(r.get("cost_usd") or 0)
                     for r in log
@@ -255,6 +267,111 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path) 
         absence = Absence("upstream_unavailable", f"APP artifact 盤點失敗：{type(exc).__name__}")
         section.lines.append(f"APP materialize：{absence.reason}（{absence.kind}）")
     return section
+
+
+#: daily 執行紀錄的位置（`crons/daily_task.py` 寫、心跳只讀）。
+RUN_RECORD_DIR = ROOT / "library" / "private" / "heartbeat"
+
+
+def run_record_path_for(now: datetime) -> Path:
+    return RUN_RECORD_DIR / f"daily_run_{now.astimezone().strftime('%Y-%m-%d')}.json"
+
+
+def _load_run_record(path: Path | None, *, now: datetime) -> tuple[Mapping[str, Any] | None, str | None]:
+    """(紀錄, 問題)。今天沒有紀錄是一個**要說出來**的狀態，不是空白。"""
+    target = path or run_record_path_for(now)
+    if not target.is_file():
+        return None, "今天沒有 daily 執行紀錄（daily 沒跑，或這份心跳不是 daily 產的）"
+    try:
+        record = _read_json(target)
+    except (OSError, ValueError) as exc:
+        return None, f"daily 執行紀錄讀不到：{type(exc).__name__}"
+    if not isinstance(record, dict):
+        return None, "daily 執行紀錄格式不對"
+    return record, None
+
+
+def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
+    record, problem = _load_run_record(record_path, now=now)
+    if record is None:
+        return [f"⚠ {problem}"]
+    steps = [row for row in record.get("steps") or [] if isinstance(row, Mapping)]
+    ok = [r for r in steps if r.get("status") == "ok"]
+    bad = [r for r in steps if r.get("status") in ("failed", "timeout", "error", "violation")]
+    skipped = [r for r in steps if r.get("status") == "skipped"]
+    head = f"daily（run {str(record.get('run_id') or '?')[:8]}）：{len(ok)} 步完成"
+    if bad:
+        head += f"｜**失敗 {len(bad)}**：" + "、".join(
+            f"{r.get('key')}（{r.get('status')}"
+            + (f"，exit {r.get('exit')}" if r.get("exit") not in (None, 0) else "") + "）"
+            for r in bad)
+    else:
+        head += "｜失敗 0"
+    if skipped:
+        reasons: dict[str, int] = {}
+        for r in skipped:
+            key = str(r.get("reason") or "?").split("：", 1)[0]
+            reasons[key] = reasons.get(key, 0) + 1
+        head += f"｜跳過 {len(skipped)}（" + "、".join(f"{k} {n}" for k, n in reasons.items()) + "）"
+    lines = [head]
+    if record.get("pre_loop_error"):
+        lines.append(f"⚠ **daily 進步驟迴圈前就失敗**：{record['pre_loop_error']}——今天只組了心跳")
+    lock = record.get("writer_lock") or {}
+    if isinstance(lock, Mapping) and lock.get("acquired") is False:
+        lines.append(f"⚠ **沒拿到 writer lock**：{lock.get('reason')}——所有寫入步驟跳過")
+    dirty = [p for p in record.get("dirty_paths") or [] if p]
+    if dirty:
+        lines.append(f"⚠ 開跑時工作區不乾淨（{len(dirty)} 個路徑）：" + "、".join(str(p) for p in dirty[:3]))
+    check = record.get("schedule_check") or {}
+    status = check.get("status") if isinstance(check, Mapping) else None
+    expected = (check.get("expected") or {}) if isinstance(check, Mapping) else {}
+    if status == "match":
+        lines.append(f"排程設定與 config 一致（{expected.get('time')}／時限 "
+                     f"{expected.get('execution_time_limit_minutes')} 分鐘）")
+    elif status == "mismatch":
+        lines.append(f"⚠ **排程設定與 config 不一致**：{'、'.join(check.get('diffs') or [])}"
+                     f"（實際 {check.get('actual')}）｜修正：`{check.get('fix')}`")
+    else:
+        lines.append(f"⚠ 排程設定讀不到（unknown）：{(check or {}).get('reason') or '沒有比對結果'}")
+    return lines
+
+
+def _harvest_newest_at(raw: str) -> datetime | None:
+    try:
+        stamp = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return stamp if stamp.tzinfo else stamp.replace(tzinfo=timezone.utc)
+
+
+def _harvest_stale_hours() -> float | None:
+    try:
+        from engine_b.routine_config import load_schedule
+
+        return float(load_schedule()["harvest_stale_hours"])
+    except Exception:  # noqa: BLE001 — 讀不到門檻就不判過期（呼叫端照實說）
+        return None
+
+
+def harvest_age_hours(newest_raw: str, *, now: datetime) -> float | None:
+    newest = _harvest_newest_at(newest_raw) if newest_raw else None
+    if newest is None:
+        return None
+    return (now - newest).total_seconds() / 3600
+
+
+def _harvest_staleness(newest_raw: str, *, now: datetime) -> str | None:
+    """harvest 最後一輪超過 `harvest_stale_hours` → ⚠。2026-09-22 起 Codex 暫停，harvest 兩天沒跑而
+    段 3 照印「未 triage 0」——那個 0 是「沒跑」不是「沒有」（L13 同形）。"""
+    limit = _harvest_stale_hours()
+    age = harvest_age_hours(newest_raw, now=now)
+    if age is None:
+        return None
+    if limit is None:
+        return f"harvest 新鮮度門檻讀不到（config schedule.harvest_stale_hours）｜最後一輪 {age:.0f} 小時前"
+    if age > limit:
+        return f"⚠ **harvest 已 {age:.0f} 小時沒跑**（門檻 {limit:g} 小時）——新文件沒有進來"
+    return None
 
 
 def _fx_freshness_line(*, now: datetime) -> str:
@@ -526,7 +643,8 @@ def _as_date(raw: Any) -> date | None:
 # 段 3｜佇列
 # ---------------------------------------------------------------------------
 
-def build_queue(*, state_dir: Path | None = None) -> Section:
+def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
+                run_record_path: Path | None = None) -> Section:
     """新 lead N、**待 triage N（必印）**、pq1 可做 N、pq2 卡在你 N、expired N。
 
     ⚠ 計數一律消費 `engine_b.queue_segments.observe()`——段序是那裡的封閉字彙，
@@ -570,12 +688,26 @@ def build_queue(*, state_dir: Path | None = None) -> Section:
     over = (isinstance(pending_triage, int) and isinstance(limit, int)
             and limit > 0 and pending_triage > limit)
     # **0 也要印**：沒有待 triage 與沒有人跑 triage 在數字上長得一樣，所以這一行是無條件的。
+    # ⚠ 原本這裡寫死「零＝真的沒有，不是沒跑」——2026-09-22 起 harvest 停了兩天，那句話每天都是假的
+    # （L13 同形）。現在由 harvest 的新鮮度決定怎麼說：過期時 0 不代表沒有新文件。
+    moment = now or datetime.now(timezone.utc)
+    newest_raw = max((str(r.get("run_at") or "") for r in leads_store.get("harvest_log") or []),
+                     default="")
+    age = harvest_age_hours(newest_raw, now=moment)
+    stale_limit = _harvest_stale_hours()
+    if age is None:
+        meaning = "｜⚠ harvest 沒有執行紀錄——0 不代表沒有新文件"
+    elif stale_limit is not None and age > stale_limit:
+        meaning = f"｜⚠ **harvest {age / 24:.0f} 天沒跑——0 不代表沒有新文件**"
+    else:
+        meaning = "｜新 harvest lead 需要分流"
     section.lines.append(
         f"**未 triage {pending_triage if pending_triage is not None else '未讀到'}**"
-        f"｜新 harvest lead 需要分流（零＝真的沒有，不是沒跑）"
+        + meaning
         + (f"｜分類層每日上限 {limit}" if isinstance(limit, int) else "｜分類層上限未讀到")
         + ("　←**超過上限，今天清不完**" if over else "")
     )
+    section.lines.append(_classification_line(leads=leads, now=moment, record_path=run_record_path))
 
     # ⚠ `None` 是「本次沒讀到那個 authority」，不是 0——把它加成 0 會讓「沒讀到」與「真的沒有」
     # 同形（INV-3）。所以先分開，再讓沒讀到的段自己現形。
@@ -623,6 +755,54 @@ def build_queue(*, state_dir: Path | None = None) -> Section:
             + "、".join(observation["unmapped"][:5])
         )
     return section
+
+
+def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path: Path | None) -> str:
+    """分類層：<本輪結果>｜上次成功：<時間>（N 天前）。
+
+    本輪結果讀 daily 執行紀錄的 triage 步驟（⑦a 提議、⑦b 套用）；「上次成功」取 lead store 裡最新的
+    `triage.decided_at`——兩個問題分開答：今天有沒有跑、以及最後一次真的分出東西是什麼時候。
+    """
+    record, problem = _load_run_record(record_path, now=now)
+    if record is None:
+        result = problem or "今天沒有 daily 執行紀錄"
+    else:
+        rows = {str(r.get("key")): r for r in record.get("steps") or [] if isinstance(r, Mapping)}
+        propose = rows.get("07a_triage_propose") or {}
+        apply = rows.get("07b_triage_apply") or {}
+        status = propose.get("status")
+        if status == "skipped":
+            result = f"本輪沒跑（{propose.get('reason')}）"
+        elif status == "ok" and apply.get("status") == "ok":
+            summary = apply.get("summary") or {}
+            result = "本輪完成" + (
+                f"：處理 {summary.get('processed')}、PASS {summary.get('pass')}、FILTER {summary.get('filter')}"
+                f"、拒收 {summary.get('rejected')}" if summary else "")
+            if propose.get("session_id"):
+                result += f"｜session {propose.get('session_id')}"
+        elif status is None:
+            result = "執行紀錄裡沒有 triage 步驟"
+        else:
+            detail = propose.get("reason") or propose.get("error") or apply.get("reason") or apply.get("error")
+            result = (f"**本輪失敗**（提議 {status}／套用 {apply.get('status')}"
+                      + (f"：{detail}" if detail else "") + "）")
+    stamps = []
+    for lead in leads.values():
+        triage = (lead or {}).get("triage") or {}
+        # harvest 的機械 FILTER（Form 4）每天都寫 triage 時間——那不是分類層跑過（L12）。
+        if str(triage.get("decided_by") or "").startswith("harvest:"):
+            continue
+        raw = str(triage.get("decided_at") or "")
+        stamp = _harvest_newest_at(raw) if raw else None
+        if stamp is not None:
+            stamps.append(stamp)
+    if stamps:
+        last = max(stamps)
+        days = (now - last).total_seconds() / 86400
+        tail = f"｜上次成功：{last.astimezone().strftime('%Y-%m-%d %H:%M')}（{days:.0f} 天前）"
+    else:
+        tail = "｜上次成功：沒有任何 triage 紀錄"
+    return f"分類層：{result}{tail}"
 
 
 # ---------------------------------------------------------------------------
@@ -857,6 +1037,7 @@ def build_heartbeat(
     state_dir: Path | None = None,
     leads_path: Path | None = None,
     thesis_path: Path | None = None,
+    run_record_path: Path | None = None,
 ) -> list[Section]:
     """固定五段，順序固定，**任何情況下都回五個 Section**。"""
     moment = now or datetime.now(timezone.utc)
@@ -864,10 +1045,12 @@ def build_heartbeat(
     thesis = thesis_path or ROOT / "thesis" / "lifecycle.json"
     sections = [
         _guard(1, SECTION_TITLES[0],
-               lambda: build_freshness(now=moment, state_dir=state_dir, leads_path=leads)),
+               lambda: build_freshness(now=moment, state_dir=state_dir, leads_path=leads,
+                                       run_record_path=run_record_path)),
         _guard(2, SECTION_TITLES[1],
                lambda: build_changes(now=moment, state_dir=state_dir, thesis_path=thesis)),
-        _guard(3, SECTION_TITLES[2], lambda: build_queue(state_dir=state_dir)),
+        _guard(3, SECTION_TITLES[2], lambda: build_queue(state_dir=state_dir, now=moment,
+                                                         run_record_path=run_record_path)),
         _guard(4, SECTION_TITLES[3], lambda: build_positions(state_dir=state_dir)),
         _guard(5, SECTION_TITLES[4], lambda: build_scorecard(weekly=weekly, state_dir=state_dir)),
     ]

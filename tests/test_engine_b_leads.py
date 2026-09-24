@@ -430,6 +430,8 @@ def test_auto_no_go_forms_never_reach_the_triage_queue() -> None:
     assert "pq1 drain" in by_status["triaged_no_go"]["triage"]["reason"]
     # 不在清單裡的 form 一律照舊走 pending → triage
     assert by_status["pending"]["triage"] is None
+    # 機械 FILTER 標明判斷者（Phase 1 Step 1.2a）：心跳的「分類層上次成功」靠它排除，不 parse 理由
+    assert by_status["triaged_no_go"]["triage"]["decided_by"] == "harvest:auto_no_go_forms"
 
 
 def test_auto_no_go_forms_must_be_a_subset_of_harvested_forms(tmp_path: Path) -> None:

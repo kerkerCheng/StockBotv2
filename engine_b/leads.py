@@ -855,8 +855,13 @@ def triage(
     priority_flags: Mapping[str, Any] | None = None,
     classification: Mapping[str, Any] | None = None,
     decided_at: str | None = None,
+    decided_by: str | None = None,
 ) -> dict[str, Any]:
     """對 pending lead 下 triage 判斷，轉入 triaged_go／triaged_no_go。
+
+    decided_by（可選，Phase 1 Step 1.2a）：誰下的判斷——`harvest:auto_no_go_forms`（機械 FILTER）、
+    `claude-p:<session_id>`（daily 的分類層，Step 1.3）。舊資料沒有這欄＝legacy，讀取端不得要求它。
+    它讓「分類層上次分出東西是什麼時候」不必去 parse 理由散文（L16）。
 
     tier 只是 triage 的初步來源分級記錄，**不是** evidence tier，不影響入圖
     強度（plan R2 不變式）；真正 evidence tier 由 source-trace／lead-intake 決定。
@@ -908,6 +913,8 @@ def triage(
         "decided_at": stamp,
         "priority_flags": flags,
     }
+    if decided_by:
+        triage_record["decided_by"] = str(decided_by)
     if classification_record is not None:
         triage_record["classification"] = classification_record
     lead["triage"] = triage_record

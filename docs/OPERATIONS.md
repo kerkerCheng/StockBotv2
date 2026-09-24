@@ -10,52 +10,76 @@
 
 ## 每日操作
 
-**2026-09-17（Phase 2 Step 2.2／D12）起，Daily 是三條獨立的路，不是一條**（2026-09-19 前面再加一條零 LLM 的 FX 同步）。
+**2026-09-24（Phase 1 Step 1.2a）起，無人值守只有一條路：Windows 工作 `StockBotv2-Daily`。**
+它取代三個東西：Codex daily automation（抓資料、機械段、materialize）、`StockBotv2-Heartbeat`（07:00 心跳）、
+`StockBotv2-FxSync`（06:55 FX 同步）——舊兩個工作在 1.2a 只**停用**（回滾＝重新啟用），1.2b 才刪。研究仍只在互動 session。
 
 ```
-⓪ FX     Windows 工作排程 StockBotv2-FxSync（每日 06:55，零 LLM）
-           → scripts/sync_fx_observations.py（只寫 `fx_rate` 這一個 mechanical 欄位）
-           **不經 Codex**，理由同心跳；排在心跳之前，所以心跳當天讀得到最新狀態
-
-① 心跳   Windows 工作排程 StockBotv2-Heartbeat（每日 07:00，零 LLM、零網路）
-           → crons/heartbeat_task.py → crons/heartbeat.py --out → publish_daily_brief.py
-           **不經 Codex**：Codex 沒起來、LLM 壞掉、sandbox 擋住，心跳照發
-
-② 分類   Codex local scheduled task（05:30）
-           → X／EDGAR harvest → Engine C financial／beta technical ETL
-           → 單一 shared-cash-pool beta monitor → triage
-           → 機械段（consume-fired／todo sync／standing-go／XBRL 補值；reassess-stale 已於 2026-09-22 退役）
-           → today／lifecycle todo sync → materialize → brief
-
-③ 研究   **只在互動 session** 的 `research-drain`
-           daily 的 drain_limit_per_run = 0；drain／fetchers／prepare RA 都已不在 allowlist
+Daily   Windows 工作 StockBotv2-Daily（時間只住 config/daily_routine.json 的 schedule，現為 05:30）
+          → crons/daily_task.py：固定步驟清單 DAILY_STEPS（程式寫死；LLM 不決定跑什麼）
+             ① harvest → ② Engine C ETL → ③ FX 同步 → ④ beta 快照 → ⑤ outcome
+             → ⑥ triage 批次 → ⑦a triage 提議（claude -p 零工具；Step 1.3 接上）→ ⑧ 保險檢查
+             → ⑦b triage 套用（程式驗證後寫入；Step 1.3 接上）→ classification-health
+             → ⑨ consume-fired → ⑩ todo sync → ⑪ standing-go → ⑫ XBRL 基期補值 → ⑬ materialize
+             → ⑭ 健康審查（--json）→ ⑮ invariants（--json）→ ⑯ 本機備份 → ⑰ 收尾（驗 state、釋放鎖）
+             → ⑱ 心跳（零 LLM、零網路）→ ⑲ Discord（唯一發送者）
+研究    只在互動 session 的 research-drain（daily 的 drain_limit_per_run = 0）
 ```
 
-~~本機說「daily brief」或由 06:30 排程觸發 `$daily-brief`。流程：Codex local scheduled task → X／EDGAR
-harvest → Engine C financial／beta technical ETL → 單一 shared-cash-pool beta monitor → triage →
-priority pq1 best-effort drain → prepared RA／today／lifecycle todo sync → brief~~
-（2026-09-17 拆成上面三條；研究段移出，排程時間 06:30 → 05:30 的更正見 `config/daily_routine.json`。）
-
-查證（四條都要對得上）：
+查證：
 ```powershell
-schtasks /Query /TN StockBotv2-FxSync /FO LIST /V         # Status=Ready、Next Run Time=明天 06:55
-schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V      # Status=Ready、Next Run Time=明天 07:00
+schtasks /Query /TN StockBotv2-Daily /FO LIST /V                  # Status=Ready、Next Run Time=明天 05:30
+& '.venv\Scripts\python.exe' crons\daily_task.py --dry-run          # 步驟清單、config 時間、timeout 加總
+& '.venv\Scripts\python.exe' scripts\register_daily_task.py         # dry-run：與現行註冊值的差異應為「無」
+Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 status／exit／秒數／stderr 末段
 & '.venv\Scripts\python.exe' -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"   # 0
-Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'prefix_rule\(' | Measure-Object | % Count   # 15
 ```
+
+### Daily（`crons/daily_task.py`）——唯一的無人值守排程
+
+**改時間的唯一做法：** 改 `config/daily_routine.json` 的 `schedule`（`daily_local_time`／`execution_time_limit_minutes`）
+→ `python scripts\register_daily_task.py`（dry-run 看差異）→ `--apply`。**不要在工作排程器 UI 裡改**——daily 每次開跑都拿
+實際註冊值比對 config，不一致時心跳段 1 亮 ⚠ 並印這條命令（2026-09-12 事故：兩個 SSOT 沒有機械連結，只改了排程器）。
+
+**失敗長相**（心跳一律照發，除了保險檢查那一列）：
+
+| 情況 | 會看到什麼 |
+|---|---|
+| 某一步失敗／timeout | 段 1「daily（run xxxxxxxx）：N 步完成｜**失敗 k**：…」；其餘步驟照跑 |
+| 進步驟迴圈前就失敗（config 壞掉等） | 段 1「⚠ daily 進步驟迴圈前就失敗：…——今天只組了心跳」 |
+| 互動 session 持有 writer lock | 段 1「⚠ 沒拿到 writer lock」，所有寫入步驟跳過 |
+| 排程設定與 config 不一致／讀不到 | 段 1「⚠ 排程設定與 config 不一致」＋修正命令；讀不到印 unknown |
+| harvest 超過 `harvest_stale_hours` 沒跑 | 段 1 ⚠；段 3「harvest N 天沒跑——0 不代表沒有新文件」 |
+| 開跑時工作區不乾淨 | 段 1 ⚠ 列出路徑（照跑） |
+| 保險檢查觸發（LLM 步驟前後指紋變了） | **沒有心跳也沒有 Discord**（心跳會 import 被改的檔）；開 session 時 `crons/routine_hint.py` 第一句說出來 |
+| daily 根本沒跑 | 開 session 時 `crons/routine_hint.py`：「今天沒有 daily 執行紀錄」 |
+
+手動跑（這就是正常的每日動作，**會真的發一則 Discord**；⚠ 當下不得持有 interactive 鎖，否則寫入步驟全跳過）：
+```powershell
+& '.venv\Scripts\python.exe' crons\daily_task.py
+schtasks /Run /TN StockBotv2-Daily       # 走真正的排程路徑
+Get-Content library\private\heartbeat\daily_task.log -Tail 30
+```
+
+**回滾**（R2-a 回 NO_GO 時）：`config/daily_routine.json` 的 `llm.executor` 改 `none`（triage 與預篩一起停）；
+1.2b 刪舊工作之前，必要時 `schtasks /Change /TN StockBotv2-Heartbeat /ENABLE`、`/TN StockBotv2-FxSync /ENABLE`、
+`/TN StockBotv2-Daily /DISABLE`。
+
+⚠ **`LogonType Interactive`＝只在使用者已登入時執行。** 換成「不論是否登入都執行」要存密碼，會在機器上多一份憑證——刻意不做。
+`StartWhenAvailable`：05:30 電腦沒開，開機後補跑。註冊時觸發起點取「下一次」而不是今天（今天已過的時間會被當成錯過的一次、當場補跑）。
 
 ### 心跳（`crons/heartbeat.py`）——零 LLM、零網路、固定五段
 
 ```powershell
 & '.venv\Scripts\python.exe' crons\heartbeat.py                    # Markdown 到 stdout
 & '.venv\Scripts\python.exe' crons\heartbeat.py --format json      # 機器可讀
-& '.venv\Scripts\python.exe' crons\heartbeat.py --weekly           # 第 5 段（帳號計分表）只在 weekly 有內容
 & '.venv\Scripts\python.exe' crons\heartbeat.py --out .\hb.md       # 寫 UTF-8 檔，交給既有 publisher
 ```
 
 它**只讀**本機 authority（`pending_leads.json`／`todo_pool.json`／`event_watches.json`／
-`thesis/lifecycle.json`）與 `webapp` 已 materialize 的 state artifact，**不寫任何 authority、不連外、不呼叫任何模型**。
-要送到 Discord 仍走既有的 publisher（心跳自己不發送，也不新增任何 outbound surface）：
+`thesis/lifecycle.json`）、`webapp` 已 materialize 的 state artifact 與 daily 的執行紀錄，**不寫任何 authority、不連外、
+不呼叫任何模型、不開 subprocess**（排程比對由 daily 查、心跳只讀結果）。無人值守時由 daily 的 ⑱ 產檔、⑲ 發送；
+手動要送到 Discord 仍走既有的 publisher（心跳自己不發送，也不新增任何 outbound surface）：
 
 ```powershell
 & '.venv\Scripts\python.exe' crons\heartbeat.py --out <private.md>
@@ -70,46 +94,19 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'prefix_rul
 查證：`python -m pytest tests/test_heartbeat.py -q`（其中
 `test_every_source_broken_still_renders_five_sections` 就是這條契約本身）。
 
-#### 排程（2026-09-17 Step 2.2 已註冊）
+~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
+`StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、1.2b 刪除）；它們的理由（永遠 exit 0、Python 不用 `.cmd`、發送走 subprocess）
+搬進 `crons/daily_task.py` 的 docstring。
 
-無人值守的進入點是 **`crons/heartbeat_task.py`**（不是 `heartbeat.py`）：它產檔、再呼叫既有 publisher，
-永遠 exit 0。⚠ **第一版寫成 `.cmd` 直接解析失敗**——`cmd.exe` 以 OEM codepage（本機 cp950）讀檔，
-而檔案是 UTF-8，中文註解被拆成無效指令。Python 進入點沒有這個問題。
+### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.2a：一個 Windows daily）
 
-```powershell
-# 空跑（只產檔、不發送）——改任何東西之後先跑這個
-& '.venv\Scripts\python.exe' crons\heartbeat_task.py --dry-run
-Get-Content library\private\heartbeat\heartbeat_task.log -Tail 10
-
-# 查排程現況
-schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V
-
-# 手動觸發一次（會真的發一則到 Discord）
-schtasks /Run /TN StockBotv2-Heartbeat
-
-# 重新註冊（改時間時用；不需要管理員、不需要密碼）
-$repo='C:\Users\Cheng\code\StockBotv2'
-$a=New-ScheduledTaskAction -Execute (Join-Path $repo '.venv\Scripts\python.exe') -Argument 'crons\heartbeat_task.py' -WorkingDirectory $repo
-$t=New-ScheduledTaskTrigger -Daily -At '07:00'
-$p=New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
-$s=New-ScheduledTaskSettingsSet -StartWhenAvailable -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -MultipleInstances IgnoreNew -ExecutionTimeLimit (New-TimeSpan -Minutes 10)
-Register-ScheduledTask -TaskName 'StockBotv2-Heartbeat' -Action $a -Trigger $t -Principal $p -Settings $s -Force
-
-# 停用／移除
-Disable-ScheduledTask -TaskName 'StockBotv2-Heartbeat'
-Unregister-ScheduledTask -TaskName 'StockBotv2-Heartbeat' -Confirm:$false
-```
-
-⚠ **`LogonType Interactive` ＝「只在使用者已登入時執行」。** 換成「不論是否登入都執行」要存密碼，
-那會在機器上多一份憑證——**刻意不做**。現行 Codex daily 本來就需要使用者已登入且 Codex App 運行，
-心跳的條件只會更寬鬆，不會更嚴。
-
-⚠ **這個時間有兩個 SSOT**（Windows 排程器 ＋ `config/daily_routine.json` 的 `heartbeat_local_time`），
-與 daily 的時間同一個毛病。改時間必須同時改兩邊，並以上面的 `schtasks /Query` 對照實際註冊值。
-
-⚠ **weekly 心跳（`--weekly`）刻意還沒註冊成第二個排程**：它今天唯一的額外內容是第 5 段的
-「帳號計分表還沒建（Phase 3）」一行。等 Phase 3 讓那一段真的有內容再建，
-否則是為零內容多開一個無人值守入口（L17-4：general 到資料支持的那一格為止）。
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | **可執行面＝`crons/daily_task.py` 的 `DAILY_STEPS` 這份封閉清單**（程式寫死、無 LLM 選命令；1.2a 時兩個 LLM 步驟由 `llm.executor=none` 記 skipped）。每步 `shell=False`、venv python、cwd＝repo root。**連網主機與憑證與原 Codex daily 相同**：X API、SEC（`www.sec.gov`、`data.sec.gov`）、TWSE／TPEx／MOPS、Yahoo、Google Sheet（`spreadsheets.readonly`）、Discord webhook、harvest 的 feed 主機（`crons/harvest_config.json` 的 `feeds[].url`：`mfn.se`、`www.sivers-semiconductors.com`、`feeds.finance.yahoo.com`）；**不含 Drive**（`backup_private.py run --no-drive`）。Anthropic（`claude -p`）要到 Step 1.3 才加。**寫入範圍**：`library/leads/` 四份 state 與鎖／收工標記、Engine C private runtime（etl、FX、beta technical、XBRL 基期補值四支，不新增寫入者）、`library/private/decision_lab/` 的 `portfolio_risk_snapshots.jsonl` 與 `outcome_aggregate.json`／`.jsonl`（**不含任何 `*.db`**）、`library/private/app/`、`library/private/backups/`、`library/private/heartbeat/`（執行紀錄、心跳、capture 檔、log）。**不寫 git、不寫任何 tracked 檔**（保險檢查只讀 git，且一律帶 `-c core.fsmonitor=false`）。**Discord 發送授權**由 Windows daily 持有（原本授權給 Codex daily automation）；每一條限制由 `notifications/publisher.py` 強制（host、logical channel `private-investing`、content class `full_private`），不靠 prompt。⚠ publisher 擋不住「`.env` 的 webhook 被換成另一個 Discord webhook」——所以保險檢查比對 `.env` 指紋。 |
+| **2 canonical skill／prompt／本檔** | 本節與上面兩節；`docs/ARCHITECTURE.md` §4.1；`config/daily_routine.json` 的 `schedule._doc`（唯一時間來源）與新的 `llm` 區塊；`crons/daily_brief_prompt.md` 在 Step 1.3 封存（使用者停用 Codex automation 之前它維持 PAUSED）。 |
+| **3 最窄 rule** | Windows daily **不經 Codex**，`.codex/rules` 對它不適用；本 Step 不增不減任何 rule（1.3 清為 0 條）。新增的無人值守入口只有 `crons/daily_task.py` 一支；它呼叫的全部是既有腳本，新增旗標只有 `query/health_audit.py --json`（同一組檢查的機器可讀版，不新增任何連線或寫入）。 |
+| **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
+| **5 端到端 smoke** | 2026-09-24 實跑 `python crons\daily_task.py`（run `bf21bb07`）：19 步 17 ok、2 skipped（`executor=none`）、約 7 分鐘（materialize 282 秒最長）；harvest 最後一輪＝當天、APP 7 份 state 當天 materialize、publisher 回 `sent` 3/3、鎖已釋放、收工標記 `finalized`。`register_daily_task.py --apply` 後 `StockBotv2-Daily` Ready（下次 05:30）、自我比對 `match`；舊兩個工作 `Disabled`。⚠ 端到端驗收仍要等**真正的排程觸發**（1.2b 的前提：`LastTaskResult 0` 且當天執行紀錄完整），手動觸發不算（L13-1）。 |
 
 ### Sandbox impact review 結論（2026-09-17，Phase 2 Step 2.2：研究層移出 Daily）
 

@@ -17,6 +17,11 @@
             "type": "command",
             "command": "python crons/phase_status_hint.py 2>/dev/null || true",
             "statusMessage": "Checking phase status..."
+          },
+          {
+            "type": "command",
+            "command": "python crons/routine_hint.py 2>/dev/null || true",
+            "statusMessage": "Checking today's daily run..."
           }
         ]
       }

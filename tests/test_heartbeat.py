@@ -474,3 +474,83 @@ def test_fx_line_failure_does_not_take_out_the_rest_of_section_one(
     text = "\n".join(section.lines)
     assert "FX 觀測" in text and "upstream_unavailable" in text
     assert len(section.lines) > 1, text
+
+
+# ---------------------------------------------------------------------------
+# Phase 1 Step 1.2a：段 1 讀 daily 執行紀錄、harvest 過期、段 3 分類層
+# ---------------------------------------------------------------------------
+
+def _record(tmp_path: Path, **overrides) -> Path:
+    record = {
+        "run_id": "abcdef1234567890", "status": "completed", "pre_loop_error": None,
+        "writer_lock": {"acquired": True}, "dirty_paths": [],
+        "schedule_check": {"status": "match", "expected": {"time": "05:30", "execution_time_limit_minutes": 180}},
+        "steps": [
+            {"key": "01_harvest", "status": "failed", "exit": 1},
+            {"key": "02_engine_c_etl", "status": "ok", "exit": 0},
+            {"key": "07a_triage_propose", "status": "skipped", "reason": "executor=none"},
+            {"key": "07b_triage_apply", "status": "skipped", "reason": "executor=none"},
+        ],
+    }
+    record.update(overrides)
+    path = tmp_path / "daily_run.json"
+    path.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
+    return path
+
+
+def test_section_one_lists_failed_daily_steps_and_the_schedule_check(tmp_path: Path) -> None:
+    lines = hb._daily_run_lines(now=datetime.now(timezone.utc), record_path=_record(tmp_path))
+    assert "失敗 1" in lines[0] and "01_harvest（failed，exit 1）" in lines[0]
+    assert "executor=none 2" in lines[0]
+    assert any("排程設定與 config 一致" in line for line in lines)
+
+
+@pytest.mark.parametrize("check, expected", [
+    ({"status": "mismatch", "diffs": ["time"], "actual": {"time": "06:30"},
+      "fix": "python scripts/register_daily_task.py --apply"}, "排程設定與 config 不一致"),
+    ({"status": "unknown", "reason": "schtasks 查不到這個工作"}, "排程設定讀不到（unknown）"),
+])
+def test_schedule_mismatch_and_unknown_are_never_silent(tmp_path: Path, check, expected) -> None:
+    lines = hb._daily_run_lines(now=datetime.now(timezone.utc), record_path=_record(tmp_path, schedule_check=check))
+    assert any(expected in line for line in lines), lines
+
+
+def test_missing_run_record_is_said_out_loud(tmp_path: Path) -> None:
+    lines = hb._daily_run_lines(now=datetime.now(timezone.utc), record_path=tmp_path / "nope.json")
+    assert lines and "今天沒有 daily 執行紀錄" in lines[0]
+
+
+def test_lock_and_pre_loop_problems_are_printed(tmp_path: Path) -> None:
+    path = _record(tmp_path, pre_loop_error="ValueError: x",
+                   writer_lock={"acquired": False, "reason": "writer lock 由 'interactive' 持有中"},
+                   dirty_paths=[" M a.py"])
+    text = "\n".join(hb._daily_run_lines(now=datetime.now(timezone.utc), record_path=path))
+    assert "進步驟迴圈前就失敗" in text and "沒拿到 writer lock" in text and "工作區不乾淨" in text
+
+
+def test_harvest_staleness_uses_the_config_threshold(monkeypatch: pytest.MonkeyPatch) -> None:
+    now = datetime(2026, 9, 24, 7, 0, tzinfo=timezone.utc)
+    monkeypatch.setattr(hb, "_harvest_stale_hours", lambda: 30.0)
+    assert hb._harvest_staleness("2026-09-23T21:00:00+00:00", now=now) is None
+    stale = hb._harvest_staleness("2026-09-22T00:00:00+00:00", now=now)
+    assert stale and "55 小時沒跑" in stale
+
+
+def test_the_always_true_zero_sentence_is_gone() -> None:
+    """「零＝真的沒有，不是沒跑」在 harvest 停跑時每天都是假的（2026-09-22 起，L13 同形）。"""
+    source = (ROOT / "crons" / "heartbeat.py").read_text(encoding="utf-8")
+    assert '"｜新 harvest lead 需要分流（零＝真的沒有，不是沒跑）"' not in source
+    assert "0 不代表沒有新文件" in source
+
+
+def test_classification_line_reports_this_run_and_the_last_success(tmp_path: Path) -> None:
+    now = datetime(2026, 9, 24, 7, 0, tzinfo=timezone.utc)
+    leads = {"L1": {"triage": {"decided_at": "2026-09-22T00:00:00+00:00"}}, "L2": {}}
+    line = hb._classification_line(leads=leads, now=now, record_path=_record(tmp_path))
+    assert line.startswith("分類層：本輪沒跑（executor=none）") and "上次成功" in line and "（2 天前）" in line
+    # harvest 的機械 FILTER 每天都寫 triage 時間——不得被當成「分類層上次成功」（L12）
+    mechanical = {**leads, "L3": {"triage": {"decided_at": "2026-09-24T06:00:00+00:00",
+                                             "decided_by": "harvest:auto_no_go_forms"}}}
+    assert "（2 天前）" in hb._classification_line(leads=mechanical, now=now, record_path=_record(tmp_path))
+    missing = hb._classification_line(leads={}, now=now, record_path=tmp_path / "nope.json")
+    assert "今天沒有 daily 執行紀錄" in missing and "沒有任何 triage 紀錄" in missing

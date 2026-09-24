@@ -43,12 +43,16 @@ from engine_b.writer_lock import (  # noqa: E402
 
 
 def _load_schedule() -> dict:
-    raw = json.loads(CONFIG.read_text(encoding="utf-8-sig"))
-    schedule = raw.get("schedule")
-    if not isinstance(schedule, dict):
+    """時間窗讀 `schedule`——**與 Windows 工作同一個來源**（Phase 1 Step 1.2a：時間只住 config，
+    `scripts/register_daily_task.py` 由它導出工作、`crons/daily_task.py` 每次比對）。
+    驗證走 `engine_b.routine_config.load_schedule`（唯一的驗證器），不合法就 fail closed。"""
+    from engine_b.routine_config import load_schedule
+
+    try:
+        return load_schedule(CONFIG)
+    except (OSError, ValueError) as exc:
         # fail closed：讀不到時間窗就當成不安全，不猜一個預設值。
-        raise SystemExit("config/daily_routine.json 缺 schedule 區塊；無法判斷排程時間窗")
-    return schedule
+        raise SystemExit(f"config/daily_routine.json 的 schedule 讀不到或不合法：{exc}；無法判斷排程時間窗")
 
 
 def _git(*args: str) -> str:

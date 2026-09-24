@@ -152,11 +152,20 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > 查證：`schtasks /Query /TN StockBotv2-Heartbeat /FO LIST /V`、
 > `python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`。
 
+> **2026-09-24（Phase 1 Step 1.2a；A1、C1、C4、C6）：無人值守收斂成一個 Windows daily。**
+> Windows 工作 `StockBotv2-Daily`（時間只住 `config/daily_routine.json` 的 `schedule`，由 `scripts/register_daily_task.py`
+> 導出、`crons/daily_task.py` 每次開跑比對）跑一份**程式寫死的封閉步驟清單** `DAILY_STEPS`：抓資料、機械段、materialize、
+> 健康審查、invariants、本機備份、心跳、發送。它取代 Codex daily automation、`StockBotv2-Heartbeat` 與 `StockBotv2-FxSync`。
+> **daily 的目標：心跳不靠 LLM；其他步驟可以用 LLM，但 LLM 只產出提議，由程式驗證後寫入**（C4）。分類（triage）與語意預篩
+> 是 daily 裡的兩步，一律 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位（Step 1.3、1.4 接上；在那之前 `llm.executor=none`）。
+> 失敗長相與改時間的唯一做法見 OPERATIONS「Daily」節。查證：`schtasks /Query /TN StockBotv2-Daily /FO LIST /V`、
+> `python crons/daily_task.py --dry-run`。
+
 | 層 | 誰跑 | LLM | 做什麼 |
 |---|---|---|---|
-| **心跳** | 純 Python 排程，從 state 檔組出，推到既有 Discord publisher | 零 | 固定五段，每段可以只有一行 |
-| **分類** | 便宜模型（signal-triage） | 每日硬上限 | 失敗不阻斷；印「未 triage N」 |
-| **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零；weekly 同一套，帳號計分表在 weekly 算 |
+| **心跳** | Windows daily 的 ⑱（純 Python，從 state 檔與 daily 執行紀錄組出），⑲ 推到既有 Discord publisher | 零 | 固定五段，每段可以只有一行 |
+| **分類／語意預篩** | Windows daily 的兩步：`claude -p` 零工具提議、程式驗證後寫入（Step 1.3／1.4 接上） | 每日硬上限（由 CLI 截斷，不靠 prompt） | 失敗不阻斷；印「未 triage N」與分類層本輪結果 |
+| **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零 |
 
 心跳固定五段：
 1. **資料新鮮**：每個 harvest 來源 ok／fail、行情最新交易日、APP 今天是否 materialize、**台股月營收最新月份與落後幾個月**（2026-09-17 Phase 6：月營收**刻意不進無人值守**——歷史頁按年月永久可查、漏抓補得回來（L10），與「只有前一營業日、漏一天永久漏」的重訊性質相反。所以它不需要排程，需要的是**該補的時候自己說話**；`lag` 相對**法定公告期限**（次月 10 日）算，不是相對今天，否則每個月前 10 天都會誤報落後）。

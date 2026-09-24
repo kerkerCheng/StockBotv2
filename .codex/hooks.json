@@ -8,6 +8,12 @@
             "command": "python crons/thesis_freshness_check.py 2>/dev/null || true",
             "commandWindows": "python crons/thesis_freshness_check.py",
             "statusMessage": "Checking thesis review freshness..."
+          },
+          {
+            "type": "command",
+            "command": "python crons/routine_hint.py 2>/dev/null || true",
+            "commandWindows": "python crons/routine_hint.py",
+            "statusMessage": "Checking today's daily run..."
           }
         ]
       }

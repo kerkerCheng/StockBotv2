@@ -115,3 +115,18 @@ def test_engine_c_freshness_reports_stale_and_missing() -> None:
     assert result["stale"] == [("LITE", 47)]
     assert result["missing"] == ["AXTI"]
     assert result["tracked"] == 3
+
+
+def test_json_output_comes_from_the_same_section_calls_not_from_parsing_markdown(monkeypatch) -> None:
+    """`--json` 的每一節由 `_section` 收集（Phase 1 Step 1.2a）——daily 讀燈號不 parse markdown 標題。"""
+    import query.health_audit as ha
+
+    def fake_audit(*, today=None):
+        return "".join("\n".join(ha._section(t, lvl, items)) for t, lvl, items in (
+            ("重複 SourceDoc", "red", ["- `x` ← ['a', 'b']"]), ("Graph schema 版本", "green", [])))
+
+    monkeypatch.setattr(ha, "run_local_audit", fake_audit)
+    result = ha.run_local_audit_json()
+    assert result["counts"] == {"green": 1, "yellow": 0, "red": 1}
+    assert [s["title"] for s in result["sections"]] == ["重複 SourceDoc", "Graph schema 版本"]
+    assert ha._COLLECTOR is None  # 收集器用完就關，不影響之後的 markdown 呼叫

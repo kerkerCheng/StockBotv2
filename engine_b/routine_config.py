@@ -52,6 +52,103 @@ def load_config(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
     return payload
 
 
+def _positive_number(block: Mapping[str, Any], key: str, where: str, *, allow_zero: bool = False) -> float:
+    value = block.get(key)
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ValueError(f"{where}.{key} 必須是數字")
+    if value < 0 or (value == 0 and not allow_zero):
+        raise ValueError(f"{where}.{key} 必須 {'≥' if allow_zero else '>'} 0")
+    return float(value)
+
+
+def load_schedule(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
+    """`schedule` 區塊——**排程時間的唯一來源**（Phase 1 Step 1.2a，A1）。
+
+    Windows 工作由 `scripts/register_daily_task.py` 從這裡導出，`crons/daily_task.py` 每次開跑
+    再拿實際註冊值與這裡比對（2026-09-12 事故：兩個 SSOT 沒有機械連結，只改了排程器）。
+    寫錯就 raise——打錯的時間比沒有更危險，它看起來像有排程。
+    """
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    schedule = payload.get("schedule")
+    if not isinstance(schedule, dict):
+        raise ValueError("daily routine config 缺 schedule 區塊")
+    tz = schedule.get("timezone")
+    try:
+        from zoneinfo import ZoneInfo
+
+        ZoneInfo(str(tz))
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(f"schedule.timezone 不是合法時區：{tz!r}") from exc
+    raw = str(schedule.get("daily_local_time") or "")
+    parts = raw.split(":")
+    if len(parts) != 2 or not all(p.isdigit() and len(p) == 2 for p in parts) \
+            or not (0 <= int(parts[0]) <= 23 and 0 <= int(parts[1]) <= 59):
+        raise ValueError(f"schedule.daily_local_time 必須是 HH:MM：{raw!r}")
+    if not str(schedule.get("task_name") or "").strip():
+        raise ValueError("schedule.task_name 不可為空")
+    limit = schedule.get("execution_time_limit_minutes")
+    if isinstance(limit, bool) or not isinstance(limit, int) or not 30 <= limit <= 720:
+        raise ValueError("schedule.execution_time_limit_minutes 必須是 30..720 的整數")
+    _positive_number(schedule, "expected_duration_minutes", "schedule")
+    _positive_number(schedule, "guard_margin_minutes", "schedule", allow_zero=True)
+    _positive_number(schedule, "harvest_stale_hours", "schedule")
+    return schedule
+
+
+#: `llm.executor` 的封閉字彙。一個開關同時管 triage 與語意預篩，也是 R2-a 的回滾開關。
+LLM_EXECUTORS = ("none", "claude")
+
+
+def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str, Any]:
+    """`llm` 區塊（C6）：daily 裡 LLM 步驟的執行者、模型、timeout 與 cwd。
+
+    ⚠ `cwd` 必須在 repo 之外（第 4 輪 N4-2）：cwd 在 git 工作樹裡時 CLI 會往上找到 `.git` 跑 git
+    取 gitStatus、並載入使用者的自動記憶——那些是沒記進收據、卻會影響輸出的輸入（L12）。
+    `library/private/` 也在工作樹內，不算。違反就 raise（fail closed），不自動改到別處。
+    回傳的 dict 另帶解析好的 `cwd_path`／`claude_path_resolved`。
+    """
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    llm = payload.get("llm")
+    if not isinstance(llm, dict):
+        raise ValueError("daily routine config 缺 llm 區塊")
+    executor = llm.get("executor")
+    if executor not in LLM_EXECUTORS:
+        raise ValueError(f"llm.executor 必須是 {LLM_EXECUTORS} 之一：{executor!r}")
+    model = llm.get("claude_model")
+    if not isinstance(model, str) or not model.strip():
+        raise ValueError("llm.claude_model 不可為空（模型只住這裡）")
+    for key in ("triage_timeout_minutes", "prescreen_timeout_minutes"):
+        _positive_number(llm, key, "llm")
+    chunk = llm.get("triage_chunk_size")
+    if isinstance(chunk, bool) or not isinstance(chunk, int) or chunk < 1:
+        raise ValueError("llm.triage_chunk_size 必須是 ≥1 的整數")
+    import os
+
+    raw_cwd = llm.get("cwd")
+    if raw_cwd is None:
+        base = os.environ.get("LOCALAPPDATA") or str(Path.home() / "AppData" / "Local")
+        cwd = Path(base) / "StockBotv2" / "llm_cwd"
+    elif isinstance(raw_cwd, str) and raw_cwd.strip():
+        cwd = Path(os.path.expandvars(raw_cwd))
+    else:
+        raise ValueError("llm.cwd 必須是 null 或非空字串")
+    cwd = cwd.resolve()
+    repo = repo_root.resolve()
+    if cwd == repo or repo in cwd.parents:
+        raise ValueError(f"llm.cwd 必須在 repo 之外（現為 {cwd}）——工作樹內 CLI 會跑 git、載入自動記憶")
+    raw_claude = llm.get("claude_path")
+    if raw_claude is None:
+        claude = Path.home() / ".local" / "bin" / "claude.exe"
+    elif isinstance(raw_claude, str) and raw_claude.strip():
+        claude = Path(os.path.expandvars(raw_claude))
+    else:
+        raise ValueError("llm.claude_path 必須是 null 或非空字串")
+    resolved = dict(llm)
+    resolved["cwd_path"] = cwd
+    resolved["claude_path_resolved"] = claude
+    return resolved
+
+
 #: 分類層每日上限的預設值——**config 沒寫 `triage` 整段時用它**。
 #: ⚠ 刻意不是「無上限」：拿不到設定時退回無上限，等於在最不確定的時候拆掉煞車。
 DEFAULT_TRIAGE_LIMIT = 30

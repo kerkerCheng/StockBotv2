@@ -271,9 +271,29 @@ def _driver():
     )
 
 
+#: `--json` 的收集器：`_section` 是每一節的唯一出口，所以結構化輸出從這裡取，**不 parse markdown 標題**
+#: （Phase 1 Step 1.2a：daily 的 ⑭ 要讀每節的燈號）。None＝不收集。
+_COLLECTOR: list[dict] | None = None
+
+
 def _section(title: str, level: str, lines: list[str]) -> list[str]:
     icon = {"green": "🟢", "yellow": "🟡", "red": "🔴"}[level]
+    if _COLLECTOR is not None:
+        _COLLECTOR.append({"title": title, "level": level, "items": list(lines or [])})
     return [f"## {icon} {title}", "", *(lines or ["_(none)_"]), ""]
+
+
+def run_local_audit_json(*, today: date | None = None) -> dict:
+    """同一組檢查的機器可讀版：每節 title／level／items，另附各燈號節數。"""
+    global _COLLECTOR
+    _COLLECTOR = []
+    try:
+        run_local_audit(today=today)
+        sections = list(_COLLECTOR)
+    finally:
+        _COLLECTOR = None
+    counts = {level: sum(1 for s in sections if s["level"] == level) for level in ("green", "yellow", "red")}
+    return {"date": (today or date.today()).isoformat(), "sections": sections, "counts": counts}
 
 
 def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 組裝層
@@ -554,7 +574,12 @@ def main() -> int:  # pragma: no cover - CLI 入口
         action="store_true",
         help="跑完整本機審查（預設行為；旗標保留給 weekly 報告的指令一致性）",
     )
-    parser.parse_args()
+    parser.add_argument("--json", action="store_true",
+                        help="輸出機器可讀 JSON（每節 title／level／items；daily 的健康審查步驟用）")
+    args = parser.parse_args()
+    if args.json:
+        print(json.dumps(run_local_audit_json(), ensure_ascii=False, indent=2))
+        return 0
     print(run_local_audit(), end="")
     return 0
 

@@ -1,0 +1,568 @@
+"""唯一的無人值守排程（`crons/daily_task.py`，Phase 1 Step 1.2a）。
+
+守的機制：
+- 步驟清單是**程式寫死的封閉清單**（逐項相等）；清單裡沒有 serve、任意欄位寫入者、git 寫入、LLM CLI。
+- 每步 fail-soft、心跳一定跑、永遠 exit 0；進步驟迴圈前的例外仍會組心跳並發送。
+- 保險檢查：LLM 步驟前後指紋任一不同 → 其後全部跳過（含心跳與發送）；`.git/config` 變了就不跑 git。
+- writer lock：開頭取鎖、每個寫入步驟前續期；撞到外人鎖跳過寫入步驟、心跳照發。
+- 自我比對：實際註冊值 vs config，一致／不一致／讀不到三種都寫進紀錄。
+- 時間只住 config：register 由它導出 XML，self-compare 讀回同一組欄位。
+"""
+from __future__ import annotations
+
+import json
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+import pytest
+
+from crons import daily_task as dt
+from crons.daily_task import DAILY_STEPS, Completed, DailyRun, DailyStep
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+# ---------------------------------------------------------------------------
+# 封閉清單
+# ---------------------------------------------------------------------------
+
+EXPECTED_STEPS = (
+    ("01_harvest", ("crons/harvest_leads.py",), 20, True, True, "command", False, None),
+    ("02_engine_c_etl", ("engine_c/etl_yfinance.py",), 15, True, True, "command", False, None),
+    ("03_fx_sync", ("scripts/sync_fx_observations.py",), 5, True, True, "command", False, None),
+    ("04_beta_snapshot", ("scripts/daily_beta_snapshot.py", "--format", "markdown", "--risk-view", "changes"),
+     10, True, True, "command", False, None),
+    ("05_outcome", ("scripts/outcome_if_settled_today.py",), 10, True, True, "command", False, None),
+    ("06_triage_batch", ("-m", "engine_b.cli", "list", "--status", "pending", "--by-priority",
+                         "--triage-batch", "--json"), 3, False, False, "capture", False,
+     "triage_batch_{date}.json"),
+    ("07a_triage_propose", (), 15, False, True, "llm", False, None),
+    ("08_integrity_after_triage", (), 1, False, False, "integrity", False, None),
+    ("07b_triage_apply", ("-m", "engine_b.cli", "triage-apply", "--batch", "{triage_batch}",
+                          "--result", "{triage_result}", "--run-id", "{run_id}"), 3, True, False, "apply",
+     False, None),
+    ("07c_classification_health", ("-m", "engine_b.cli", "classification-health"), 2, False, False,
+     "command", False, None),
+    ("09_consume_fired", ("-m", "engine_b.cli", "consume-fired"), 3, True, False, "command", False, None),
+    ("10_todo_sync", ("-m", "engine_b.todo", "sync"), 5, True, False, "command", False, None),
+    ("11_standing_go", ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False, "command", False, None),
+    ("12_fiscal_year_backfill", ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True,
+     "command", False, None),
+    ("13_materialize", ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
+                        "--beta", "--coverage", "--watches", "--positions", "--structure-readings", "--scorecard"),
+     25, True, True, "command", False, None),
+    ("14_health_audit", ("query/health_audit.py", "--local", "--json"), 5, False, False, "capture", False,
+     "health_{date}.json"),
+    ("15_invariants", ("-m", "audit", "invariants", "--json"), 5, False, False, "capture", False,
+     "invariants_{date}.json"),
+    ("16_backup", ("scripts/backup_private.py", "run", "--no-drive"), 15, True, False, "command", False, None),
+    ("17_finalize", ("scripts/finalize_daily_state.py",), 2, True, False, "command", True, None),
+    ("18_heartbeat", ("-m", "crons.heartbeat", "--out", "{brief}"), 3, False, False, "heartbeat", True, None),
+    ("19_publish", ("scripts/publish_daily_brief.py", "--brief-file", "{brief}", "--summary", "{summary}"),
+     3, False, True, "publish", True, None),
+)
+
+
+def test_daily_steps_are_exactly_the_closed_list() -> None:
+    actual = tuple(
+        (s.key, s.argv, s.timeout_minutes, s.writes, s.network, s.kind, s.essential, s.capture)
+        for s in DAILY_STEPS
+    )
+    assert actual == EXPECTED_STEPS
+
+
+@pytest.mark.parametrize("forbidden", ["serve", "record_mechanical_observation", "set_manual_field",
+                                       "claude", "codex", "git", "catalyst_watch", "trace-backlog",
+                                       "harvest-health", "sweep", "drain"])
+def test_no_forbidden_command_in_the_list(forbidden: str) -> None:
+    for step in DAILY_STEPS:
+        joined = " ".join(step.argv)
+        assert forbidden not in joined.split() and f"/{forbidden}" not in joined and \
+            f"{forbidden}." not in joined.replace("engine_b.", "").replace("engine_c/", ""), (step.key, forbidden)
+
+
+def test_llm_steps_have_no_argv_in_the_list() -> None:
+    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有 ⑦a。"""
+    llm = [s for s in DAILY_STEPS if s.kind == "llm"]
+    assert [s.key for s in llm] == ["07a_triage_propose"]
+    assert all(s.argv == () for s in llm)
+
+
+def test_timeouts_fit_inside_the_task_time_limit() -> None:
+    from engine_b.routine_config import load_llm, load_schedule
+
+    schedule = load_schedule()
+    llm = load_llm()
+    total = dt.total_timeout_minutes(DAILY_STEPS, llm)
+    assert total < schedule["execution_time_limit_minutes"], (total, schedule["execution_time_limit_minutes"])
+    # 必要步驟的保留時間也要塞得進去（deadline 之後它們仍要跑）
+    assert dt.essential_reserve_minutes() < schedule["execution_time_limit_minutes"]
+
+
+def test_default_runner_uses_shell_false_and_the_list_uses_the_venv_python() -> None:
+    source = (ROOT / "crons" / "daily_task.py").read_text(encoding="utf-8")
+    block = source.split("def _default_runner(", 1)[1].split("\ndef ", 1)[0]
+    assert "shell=False" in block
+    assert 'PYTHON = ROOT / ".venv" / "Scripts" / "python.exe"' in source
+
+
+# ---------------------------------------------------------------------------
+# 執行期：fake runner
+# ---------------------------------------------------------------------------
+
+SCHEDULE_XML = """<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.3" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <Settings><ExecutionTimeLimit>PT3H</ExecutionTimeLimit></Settings>
+  <Triggers><CalendarTrigger><StartBoundary>2026-09-25T05:30:00+08:00</StartBoundary></CalendarTrigger></Triggers>
+  <Actions Context="Author"><Exec><Command>C:\\x\\python.exe</Command><Arguments>crons\\daily_task.py</Arguments></Exec></Actions>
+</Task>"""
+
+
+def _config(tmp_path: Path, *, executor: str = "none", limit: int = 180) -> Path:
+    path = tmp_path / "daily_routine.json"
+    path.write_text(json.dumps({
+        "schema_version": "1",
+        "schedule": {"timezone": "Asia/Taipei", "daily_local_time": "05:30", "task_name": "StockBotv2-Daily",
+                     "execution_time_limit_minutes": limit, "expected_duration_minutes": 60,
+                     "guard_margin_minutes": 15, "harvest_stale_hours": 30},
+        "llm": {"executor": executor, "claude_path": None, "claude_model": "sonnet",
+                "cwd": str(tmp_path / "llm_cwd"), "triage_timeout_minutes": 15, "triage_chunk_size": 30,
+                "prescreen_timeout_minutes": 15},
+        "pq1": {"drain_limit_per_run": 0, "tracked_ticker_sources": {
+            "thesis_lifecycle": True, "decision_cohorts": True, "theme_core_companies": True}},
+    }), encoding="utf-8")
+    return path
+
+
+class FakeRunner:
+    """依 argv 裡的腳本名回應；git 另有可變的 status／HEAD。"""
+
+    def __init__(self, repo: Path) -> None:
+        self.repo = repo
+        self.calls: list[list[str]] = []
+        self.fail: set[str] = set()
+        self.stdout: dict[str, str] = {}
+        self.git_status = ""
+        self.head = "abc123"
+        self.hooks: dict[str, object] = {}
+
+    @staticmethod
+    def key_of(argv: list[str]) -> str:
+        if argv and argv[0] == "git":
+            return "git " + argv[-1] if argv[-1] in ("HEAD", "--porcelain") else "git"
+        rest = argv[1:]
+        if rest and rest[0] == "-m":
+            return " ".join(rest[1:3])
+        return rest[0] if rest else ""
+
+    def __call__(self, argv, *, cwd, timeout, env=None):
+        argv = list(argv)
+        self.calls.append(argv)
+        key = self.key_of(argv)
+        if key == "git --porcelain":
+            return Completed(0, self.git_status, "")
+        if key == "git HEAD":
+            return Completed(0, self.head, "")
+        hook = self.hooks.get(key)
+        if callable(hook):
+            hook(argv)
+        if key in self.fail:
+            return Completed(1, "", f"{key} boom")
+        return Completed(0, self.stdout.get(key, "{}" if "--json" in argv else "ok"), "")
+
+    def ran(self, key: str) -> bool:
+        return any(self.key_of(c) == key for c in self.calls)
+
+
+def _run(tmp_path: Path, *, executor: str = "none", runner: FakeRunner | None = None,
+         clock=None, config: Path | None = None, schtasks=lambda _n: SCHEDULE_XML,
+         steps=DAILY_STEPS) -> tuple[DailyRun, FakeRunner]:
+    repo = tmp_path / "repo"
+    (repo / ".git").mkdir(parents=True, exist_ok=True)
+    (repo / ".git" / "config").write_text("[core]\n", encoding="utf-8")
+    (repo / ".env").write_text("X=1\n", encoding="utf-8")
+    runner = runner or FakeRunner(repo)
+    run = DailyRun(root=repo, out_dir=tmp_path / "out", config_path=config or _config(tmp_path, executor=executor),
+                   python="PY", runner=runner, lock_path=tmp_path / "lock.json",
+                   schtasks_query=schtasks, steps=steps,
+                   **({"clock": clock} if clock else {}))
+    run.run()
+    return run, runner
+
+
+def _status(run: DailyRun) -> dict[str, str]:
+    return {row["key"]: row["status"] for row in run.record["steps"]}
+
+
+def test_happy_path_runs_every_step_and_records_them(tmp_path: Path) -> None:
+    run, runner = _run(tmp_path)
+    status = _status(run)
+    assert status["07a_triage_propose"] == "skipped" and status["07b_triage_apply"] == "skipped"
+    assert all(v == "ok" for k, v in status.items() if k not in ("07a_triage_propose", "07b_triage_apply")), status
+    assert run.record["status"] == "completed"
+    assert run.record_path.is_file()
+    saved = json.loads(run.record_path.read_text(encoding="utf-8"))
+    assert saved["run_id"] == run.run_id and len(saved["steps"]) == len(DAILY_STEPS)
+    # 每一個非 git 的呼叫都用 venv python
+    assert all(c[0] == "PY" for c in runner.calls if c[0] != "git")
+    # git 一律帶 core.fsmonitor=false
+    assert all(c[:3] == ["git", "-c", "core.fsmonitor=false"] for c in runner.calls if c[0] == "git")
+
+
+def test_executor_none_skips_both_llm_steps_with_the_reason(tmp_path: Path) -> None:
+    run, _ = _run(tmp_path)
+    rows = {r["key"]: r for r in run.record["steps"]}
+    assert rows["07a_triage_propose"]["reason"] == "executor=none"
+    assert rows["07b_triage_apply"]["reason"] == "executor=none"
+
+
+def test_single_failure_does_not_block_later_steps_and_heartbeat_runs(tmp_path: Path) -> None:
+    runner = FakeRunner(tmp_path / "repo")
+    runner.fail = {"crons/harvest_leads.py", "webapp materialize"}
+    run, runner = _run(tmp_path, runner=runner)
+    status = _status(run)
+    assert status["01_harvest"] == "failed" and status["13_materialize"] == "failed"
+    assert status["02_engine_c_etl"] == "ok" and status["18_heartbeat"] == "ok" and status["19_publish"] == "ok"
+    assert dt.main(["--dry-run"]) == 0
+
+
+def test_heartbeat_reads_a_record_that_is_already_on_disk(tmp_path: Path) -> None:
+    seen: dict[str, object] = {}
+    runner = FakeRunner(tmp_path / "repo")
+
+    def at_heartbeat(argv):
+        record = json.loads((tmp_path / "out" / f"daily_run_{datetime.now().astimezone():%Y-%m-%d}.json")
+                            .read_text(encoding="utf-8"))
+        seen["keys"] = [r["key"] for r in record["steps"]]
+
+    runner.hooks["crons.heartbeat --out"] = at_heartbeat
+    _run(tmp_path, runner=runner)
+    assert seen["keys"][-1] == "17_finalize"
+
+
+def test_pre_loop_exception_still_builds_and_sends_the_heartbeat(tmp_path: Path) -> None:
+    bad = tmp_path / "bad.json"
+    bad.write_text("{ not json", encoding="utf-8")
+    run, runner = _run(tmp_path, config=bad)
+    assert run.record["pre_loop_error"]
+    assert run.record["status"] == "pre_loop_error"
+    assert runner.ran("crons.heartbeat --out") and runner.ran("scripts/publish_daily_brief.py")
+    assert not runner.ran("crons/harvest_leads.py")
+    assert dt.main(["--dry-run"]) == 0
+
+
+def test_exception_inside_a_step_is_recorded_and_the_rest_continue(tmp_path: Path) -> None:
+    runner = FakeRunner(tmp_path / "repo")
+
+    def explode(_argv):
+        raise RuntimeError("kaboom")
+
+    runner.hooks["engine_c/etl_yfinance.py"] = explode
+    run, _ = _run(tmp_path, runner=runner)
+    status = _status(run)
+    assert status["02_engine_c_etl"] == "error" and status["19_publish"] == "ok"
+
+
+# ---- 保險檢查 -------------------------------------------------------------
+
+def _mutate_during_llm(tmp_path: Path, mutate) -> tuple[DailyRun, FakeRunner]:
+    """在 ⑦a（skipped）與 ⑧ 之間改東西：用 ⑥ 之後、⑧ 之前唯一會被呼叫的東西——⑥ 本身不行
+    （「前」快照取在 ⑥ 之後），所以包一層 fingerprint，在第一次取完「前」快照後才動手。"""
+    runner = FakeRunner(tmp_path / "repo")
+    original = DailyRun.fingerprint
+
+    def fingerprint(self, baseline=None):
+        result = original(self, baseline)
+        if baseline is None and not getattr(self, "_mutated", False):
+            self._mutated = True
+            mutate(self.root, runner)
+        return result
+
+    DailyRun.fingerprint = fingerprint
+    try:
+        return _run(tmp_path, runner=runner)
+    finally:
+        DailyRun.fingerprint = original
+
+
+@pytest.mark.parametrize("name, mutate, expected", [
+    ("tracked", lambda root, r: setattr(r, "git_status", " M alpha/x.py"), "git:status"),
+    ("head", lambda root, r: setattr(r, "head", "def456"), "git:HEAD"),
+    ("env", lambda root, r: (root / ".env").write_text("X=2\n", encoding="utf-8"), "file:.env"),
+    ("settings_local", lambda root, r: ((root / ".claude").mkdir(exist_ok=True),
+                                        (root / ".claude" / "settings.local.json").write_text("{}", encoding="utf-8")),
+     "file:.claude/settings.local.json"),
+    ("git_config", lambda root, r: (root / ".git" / "config").write_text("[core]\nfsmonitor=x\n", encoding="utf-8"),
+     "file:.git/config"),
+])
+def test_integrity_violation_aborts_everything_after_it(tmp_path: Path, name, mutate, expected) -> None:
+    run, runner = _mutate_during_llm(tmp_path, mutate)
+    violation = run.record["integrity_violation"]
+    assert violation and expected in violation["changed"], violation
+    status = _status(run)
+    after = [s.key for s in DAILY_STEPS][[s.key for s in DAILY_STEPS].index("08_integrity_after_triage") + 1:]
+    assert all(status[k] == "skipped" for k in after), status
+    assert not runner.ran("crons.heartbeat --out") and not runner.ran("scripts/publish_daily_brief.py")
+    assert run.record["status"] == "aborted_integrity"
+
+
+def test_changed_git_config_means_no_git_process_is_started(tmp_path: Path) -> None:
+    calls_after: list[list[str]] = []
+
+    def mutate(root, runner):
+        (root / ".git" / "config").write_text("[core]\nfsmonitor=evil\n", encoding="utf-8")
+        runner.calls.clear()
+
+    run, runner = _mutate_during_llm(tmp_path, mutate)
+    calls_after = list(runner.calls)
+    assert run.record["integrity_violation"]
+    assert not any(c[0] == "git" for c in calls_after), calls_after
+
+
+def test_unchanged_fingerprint_passes(tmp_path: Path) -> None:
+    run, _ = _run(tmp_path)
+    assert _status(run)["08_integrity_after_triage"] == "ok"
+    assert run.record["integrity_violation"] is None
+
+
+def test_dirty_worktree_at_start_is_recorded_but_the_run_continues(tmp_path: Path) -> None:
+    runner = FakeRunner(tmp_path / "repo")
+    runner.git_status = " M docs/x.md\n?? new.txt"
+    run, _ = _run(tmp_path, runner=runner)
+    assert run.record["dirty_paths"] == [" M docs/x.md", "?? new.txt"]
+    assert _status(run)["19_publish"] == "ok"
+
+
+# ---- writer lock ------------------------------------------------------------
+
+def test_foreign_lock_skips_every_write_step_but_heartbeat_still_runs(tmp_path: Path) -> None:
+    from engine_b.writer_lock import acquire
+
+    acquire("interactive", path=tmp_path / "lock.json")
+    run, runner = _run(tmp_path)
+    rows = {r["key"]: r for r in run.record["steps"]}
+    for step in DAILY_STEPS:
+        if step.writes:
+            assert rows[step.key]["status"] == "skipped", step.key
+            assert rows[step.key]["reason"].startswith(("writer_lock", "executor=none")), rows[step.key]
+    assert run.record["writer_lock"]["acquired"] is False
+    assert rows["18_heartbeat"]["status"] == "ok" and rows["19_publish"]["status"] == "ok"
+    assert not runner.ran("crons/harvest_leads.py")
+
+
+def test_lock_is_renewed_so_a_run_longer_than_the_ttl_keeps_it(tmp_path: Path, monkeypatch) -> None:
+    from engine_b import writer_lock
+
+    fake_now = [datetime(2026, 9, 25, 5, 30, tzinfo=timezone.utc)]
+    monkeypatch.setattr(writer_lock, "_now", lambda: fake_now[0])
+    runner = FakeRunner(tmp_path / "repo")
+    held_at_finalize: list[bool] = []
+    runner.hooks["scripts/finalize_daily_state.py"] = lambda _argv: held_at_finalize.append(
+        writer_lock.holder(tmp_path / "lock.json") is not None
+        and not writer_lock.is_stale(writer_lock.holder(tmp_path / "lock.json"), now=fake_now[0]))
+    original_call = runner.__call__
+
+    def advancing(argv, **kw):
+        fake_now[0] += timedelta(minutes=8)  # 約 25 次呼叫 × 8 分 ≫ 90 分 TTL（時限拉到 720 免得撞 deadline）
+        return original_call(argv, **kw)
+
+    run, _ = _run(tmp_path, runner=advancing, clock=lambda: fake_now[0],  # type: ignore[arg-type]
+                  config=_config(tmp_path, limit=720))
+    elapsed = fake_now[0] - datetime(2026, 9, 25, 5, 30, tzinfo=timezone.utc)
+    assert elapsed > timedelta(minutes=writer_lock.DEFAULT_TTL_MINUTES), elapsed
+    rows = {r["key"]: r for r in run.record["steps"]}
+    assert rows["16_backup"]["status"] == "ok", rows["16_backup"]
+    assert rows["17_finalize"]["status"] == "ok"
+    # 沒有續期的話，開頭取的鎖在 90 分鐘後就過期——收尾時仍是 scheduled 持有才算數
+    assert held_at_finalize == [True]
+
+
+def test_failed_renewal_skips_the_remaining_write_steps(tmp_path: Path, monkeypatch) -> None:
+    from engine_b import writer_lock
+
+    real = writer_lock.acquire
+    calls = {"n": 0}
+
+    def flaky(owner, **kw):
+        calls["n"] += 1
+        if calls["n"] > 4:  # 開頭一次＋前三個寫入步驟續期成功，之後被外人接手
+            raise writer_lock.WriterLockHeld({"owner": "interactive", "expires_at": "2999-01-01"})
+        return real(owner, **kw)
+
+    monkeypatch.setattr(writer_lock, "acquire", flaky)
+    run, _ = _run(tmp_path)
+    rows = {r["key"]: r for r in run.record["steps"]}
+    assert rows["01_harvest"]["status"] == "ok" and rows["03_fx_sync"]["status"] == "ok"
+    assert rows["04_beta_snapshot"]["status"] == "skipped"
+    assert "續期失敗" in rows["04_beta_snapshot"]["reason"]
+    assert rows["16_backup"]["status"] == "skipped"
+    assert rows["18_heartbeat"]["status"] == "ok"
+
+
+# ---- 自我比對 ---------------------------------------------------------------
+
+def test_schedule_match_mismatch_and_unknown(tmp_path: Path) -> None:
+    run, _ = _run(tmp_path / "a")
+    assert run.record["schedule_check"]["status"] == "match"
+    run, _ = _run(tmp_path / "b", schtasks=lambda _n: SCHEDULE_XML.replace("05:30", "06:30"))
+    check = run.record["schedule_check"]
+    assert check["status"] == "mismatch" and check["diffs"] == ["time"]
+    assert check["fix"] == "python scripts/register_daily_task.py --apply"
+    run, _ = _run(tmp_path / "c", schtasks=lambda _n: None)
+    assert run.record["schedule_check"]["status"] == "unknown"
+
+
+def test_parse_task_xml_reads_the_fields_we_compare() -> None:
+    fields = dt.parse_task_xml(SCHEDULE_XML)
+    assert fields["time"] == "05:30" and fields["execution_time_limit_minutes"] == 180
+    assert dt._duration_minutes("PT1H30M") == 90 and dt._duration_minutes("PT10M") == 10
+
+
+# ---- capture 與 run_id ------------------------------------------------------
+
+def test_capture_writes_an_envelope_with_the_run_id(tmp_path: Path) -> None:
+    runner = FakeRunner(tmp_path / "repo")
+    runner.stdout["engine_b.cli list"] = json.dumps([{"lead_id": "L1"}])
+    run, _ = _run(tmp_path, runner=runner)
+    batch = tmp_path / "out" / f"triage_batch_{run.date}.json"
+    envelope = json.loads(batch.read_text(encoding="utf-8"))
+    assert envelope["run_id"] == run.run_id and envelope["payload"] == [{"lead_id": "L1"}]
+
+
+def test_failed_batch_leaves_no_file_and_llm_steps_skip_as_batch_failed(tmp_path: Path) -> None:
+    out = tmp_path / "out"
+    out.mkdir()
+    stale = out / f"triage_batch_{datetime.now().astimezone():%Y-%m-%d}.json"
+    stale.write_text('{"run_id": "old"}', encoding="utf-8")
+    runner = FakeRunner(tmp_path / "repo")
+    runner.fail = {"engine_b.cli list"}
+    run, _ = _run(tmp_path, runner=runner, executor="claude")
+    rows = {r["key"]: r for r in run.record["steps"]}
+    assert not stale.exists(), "失敗時不得留下同日的舊批次"
+    assert rows["07a_triage_propose"]["status"] == "skipped"
+    assert rows["07a_triage_propose"]["reason"].startswith("batch_failed")
+    assert rows["07b_triage_apply"]["status"] == "skipped"
+
+
+def test_invalid_json_on_a_capture_is_a_failure(tmp_path: Path) -> None:
+    runner = FakeRunner(tmp_path / "repo")
+    runner.stdout["engine_b.cli list"] = "not json"
+    run, _ = _run(tmp_path, runner=runner)
+    assert _status(run)["06_triage_batch"] == "failed"
+
+
+# ---- deadline -----------------------------------------------------------
+
+def test_deadline_skips_non_essential_steps_but_runs_the_essential_tail(tmp_path: Path) -> None:
+    start = datetime(2026, 9, 25, 5, 30, tzinfo=timezone.utc)
+    ticks = iter([start] + [start + timedelta(hours=10)] * 200)
+    run, runner = _run(tmp_path, clock=lambda: next(ticks))
+    status = _status(run)
+    assert status["01_harvest"] == "skipped" and status["13_materialize"] == "skipped"
+    assert status["17_finalize"] == "ok" and status["18_heartbeat"] == "ok" and status["19_publish"] == "ok"
+
+
+def test_main_always_exits_zero(monkeypatch) -> None:
+    def boom(*_a, **_k):
+        raise RuntimeError("x")
+
+    monkeypatch.setattr(dt, "DailyRun", boom)
+    assert dt.main([]) == 0
+
+
+# ---------------------------------------------------------------------------
+# register：時間只住 config，註冊與自我比對讀同一組欄位
+# ---------------------------------------------------------------------------
+
+def test_register_xml_round_trips_to_the_config_fields(tmp_path: Path) -> None:
+    from engine_b.routine_config import load_schedule
+    from scripts import register_daily_task as reg
+
+    schedule = load_schedule(_config(tmp_path))
+    xml = reg.build_task_xml(schedule, repo=Path(r"C:\repo"), user="HOST\\me",
+                             now=datetime(2026, 9, 24, 15, 0, tzinfo=timezone(timedelta(hours=8))))
+    fields = dt.parse_task_xml(xml)
+    expected = reg.expected_fields(schedule, repo=Path(r"C:\repo"))
+    assert reg.diff_fields(expected, fields) == []
+    assert "<LogonType>InteractiveToken</LogonType>" in xml and "<StartWhenAvailable>true" in xml
+
+
+def test_register_start_boundary_is_the_next_occurrence_not_a_missed_one(tmp_path: Path) -> None:
+    from engine_b.routine_config import load_schedule
+    from scripts import register_daily_task as reg
+
+    schedule = load_schedule(_config(tmp_path))
+    tz = timezone(timedelta(hours=8))
+    assert reg.next_start_boundary(schedule, now=datetime(2026, 9, 24, 15, 0, tzinfo=tz)).startswith(
+        "2026-09-25T05:30")
+    assert reg.next_start_boundary(schedule, now=datetime(2026, 9, 24, 4, 0, tzinfo=tz)).startswith(
+        "2026-09-24T05:30")
+
+
+# ---------------------------------------------------------------------------
+# config
+# ---------------------------------------------------------------------------
+
+def test_llm_cwd_inside_the_repo_fails_closed(tmp_path: Path) -> None:
+    from engine_b.routine_config import load_llm
+
+    path = _config(tmp_path)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["llm"]["cwd"] = str(tmp_path / "repo" / "library" / "private" / "x")
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="repo 之外"):
+        load_llm(path, repo_root=tmp_path / "repo")
+
+
+@pytest.mark.parametrize("key, bad", [("daily_local_time", "5:30"), ("daily_local_time", "25:00"),
+                                      ("execution_time_limit_minutes", 10), ("task_name", ""),
+                                      ("timezone", "Mars/Base"), ("harvest_stale_hours", 0)])
+def test_bad_schedule_values_are_rejected(tmp_path: Path, key, bad) -> None:
+    from engine_b.routine_config import load_schedule
+
+    path = _config(tmp_path)
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["schedule"][key] = bad
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_schedule(path)
+
+
+def test_real_config_has_a_single_time_source() -> None:
+    data = json.loads((ROOT / "config" / "daily_routine.json").read_text(encoding="utf-8"))
+    for retired in ("heartbeat_local_time", "heartbeat_task_name", "weekly_local_time", "weekly_weekday"):
+        assert retired not in data["schedule"], retired
+    assert data["llm"]["executor"] in ("none", "claude")
+
+
+# ---------------------------------------------------------------------------
+# routine_hint
+# ---------------------------------------------------------------------------
+
+def test_routine_hint_speaks_only_when_the_daily_did_not_finish(tmp_path: Path) -> None:
+    from crons.routine_hint import daily_problem
+
+    config = _config(tmp_path)
+    run_dir = tmp_path / "runs"
+    run_dir.mkdir()
+    tz = timezone(timedelta(hours=8))
+    before = datetime(2026, 9, 24, 6, 0, tzinfo=tz)
+    after = datetime(2026, 9, 24, 7, 0, tzinfo=tz)
+    assert daily_problem(now=before, config_path=config, run_dir=run_dir) is None
+    assert "沒有 daily 執行紀錄" in daily_problem(now=after, config_path=config, run_dir=run_dir)
+    record = run_dir / "daily_run_2026-09-24.json"
+    record.write_text(json.dumps({"status": "completed", "integrity_violation": None}), encoding="utf-8")
+    assert daily_problem(now=after, config_path=config, run_dir=run_dir) is None
+    record.write_text(json.dumps({"status": "aborted_integrity",
+                                  "integrity_violation": {"changed": ["file:.env"]}}), encoding="utf-8")
+    assert "保險檢查觸發" in daily_problem(now=after, config_path=config, run_dir=run_dir)
+    record.write_text(json.dumps({"status": "running", "started_at": "x"}), encoding="utf-8")
+    assert "running" in daily_problem(now=after, config_path=config, run_dir=run_dir)
+
+
+def test_routine_hint_is_attached_on_both_providers() -> None:
+    claude = json.loads((ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
+    codex = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))
+    for settings in (claude, codex):
+        commands = [h["command"] for block in settings["hooks"]["SessionStart"] for h in block["hooks"]]
+        assert any("crons/routine_hint.py" in c and "|| true" in c for c in commands)

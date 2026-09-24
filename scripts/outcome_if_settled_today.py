@@ -1,11 +1,15 @@
-"""若今天結算：對有 Shadow 錨點的 cohort 計算實際報酬（唯讀）。
+"""若今天結算：對有 Shadow 錨點的 cohort 計算實際報酬（不寫任何 authority）。
 
 回答的問題是「系統過去的判斷準不準」——這是 `outcome_envelopes` 本該承擔、但至今
 0 筆真實量測的那件事（8 筆全是開發驗證與 cohort 合併簿記）。
 
-**本腳本完全唯讀**：不 close cohort、不寫 Decision Store、不寫 Engine C、不改任何
+**本腳本不寫任何 authority**：不 close cohort、不寫 Decision Store、不寫 Engine C、不改任何
 authority。它只是把既有的 Shadow 錨點與 Engine C 價格序列組起來，讓「系統的判斷準
 不準」第一次能用證據回答。要真正結算仍須 `decision_lab close`（人工）。
+⚠ **但它不是「完全唯讀」**（2026-09-24 Phase 1 Step 1.2a 更正原句）：render 時會寫兩個 ignored
+private runtime 檔——`library/private/decision_lab/outcome_aggregate.json`（當日聚合）與
+`outcome_aggregate.jsonl`（逐日序列）。它們在凍結舊店的目錄裡，但不是 `*.db`，所以舊店 sha256
+比對不涵蓋（Phase 1 baseline §9）；daily 的 sandbox impact review 把它們列在寫入範圍內。
 
 兩個必須小心的地方，都已 fail closed：
 
