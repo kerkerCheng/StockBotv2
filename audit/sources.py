@@ -75,6 +75,33 @@ def hypotheses() -> list[dict]:
     return got
 
 
+def thesis_lifecycle() -> dict[str, dict]:
+    """`thesis_id → lifecycle entry`（`thesis/lifecycle.json`）。反證等待的「現行 memo」由它決定。"""
+    data = _load_json(ROOT / "thesis" / "lifecycle.json")
+    if not isinstance(data, dict):
+        raise SourceUnavailable("thesis/lifecycle.json 不是 object——schema 變了")
+    return data
+
+
+def reading_ledgers() -> dict[str, dict]:
+    """讀圖 ledger（private）：`node → {"records": [...], "current": 現行那一筆或 None, "errors": [...]}`。
+
+    目錄不存在就丟例外——「沒有讀圖」與「讀圖目錄沒掛載」是兩件事。"""
+    from datetime import date
+
+    from alpha.providers.structure_readings import STRUCTURE_READING_DIR, known_nodes, read_reading_records
+    from alpha.structure_reading.contracts import select_reading
+
+    if not STRUCTURE_READING_DIR.is_dir():
+        raise SourceUnavailable(f"{STRUCTURE_READING_DIR.relative_to(ROOT)} 不存在——讀圖 ledger 未掛載")
+    out: dict[str, dict] = {}
+    for node in known_nodes():
+        records, errors = read_reading_records(node)
+        out[node] = {"records": records, "errors": errors,
+                     "current": select_reading(records, today=date.today())}
+    return out
+
+
 # ---------------------------------------------------------------------------
 # identity registry
 # ---------------------------------------------------------------------------

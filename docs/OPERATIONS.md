@@ -108,6 +108,15 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
 | **5 端到端 smoke** | 2026-09-24 實跑 `python crons\daily_task.py`（run `bf21bb07`）：19 步 17 ok、2 skipped（`executor=none`）、約 7 分鐘（materialize 282 秒最長）；harvest 最後一輪＝當天、APP 7 份 state 當天 materialize、publisher 回 `sent` 3/3、鎖已釋放、收工標記 `finalized`。`register_daily_task.py --apply` 後 `StockBotv2-Daily` Ready（下次 05:30）、自我比對 `match`；舊兩個工作 `Disabled`。⚠ 端到端驗收仍要等**真正的排程觸發**（1.2b 的前提：`LastTaskResult 0` 且當天執行紀錄完整），手動觸發不算（L13-1）。 |
 
+### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.10：稽核改讀新 registry）
+
+**不新增無人值守可執行面**：`DAILY_STEPS` 與各步 argv 不變，不新增主機、憑證或寫入檔案。行為變化只在 ⑩ `engine_b.todo sync`、
+寫的是它本來就在寫的 `library/leads/event_watches.json`：喚醒目標只有一個、而那個目標已結案的 active watch（`wake_pq2` 指向已結案編號、
+`wake_lead` 指向 applied／triaged_no_go 的 lead）轉 `consumed` 並記 `closed`（`pq2_item_gone`／`lead_closed`）——與它醒來或到期時
+既有的處置同一個結論，只是提早到目標消失的那一刻（NB2-12）；編號或 lead 不存在的不收（資料錯，由 `audit` Orphans 現形），leads 讀不到
+就整個不動追源型。sync 輸出多一句「收掉叫醒目標已結案的 N」。`audit/` 只讀，不在任何無人值守步驟裡。
+契約測試：`tests/test_audit_waiting.py::test_sync_closes_waits_whose_only_consumer_is_gone`；首跑（2026-09-24 互動、writer lock 下）收掉 8 筆。
+
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.8：心跳改版）
 
 | 步 | 結論 |

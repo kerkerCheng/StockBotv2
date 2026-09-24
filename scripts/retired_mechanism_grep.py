@@ -263,6 +263,7 @@ KEEP: dict[tuple[str,str],str] = {
     ('skills/research-drain/SKILL.md','G'): 'retirement_note: decision_lab references 退役註記',
     ('tests/test_account_scorecard.py','G'): 'retirement_note: STATUSES 原借自 decision_lab.intake 的註記',
     ('tests/test_alpha_view_as_of_cohr.py','G'): 'kept_file: 需要本機舊店存在才跑的 as-of 整合測試（路徑）',
+    ('tests/test_audit_waiting.py','G'): 'guard_assertion: 斷言 audit Lifecycle 不再開舊 Decision Store（凍結資料恆 PASS＝不會滅；Phase 1 Step 1.10）',
     ('tests/test_alpha_view_brief.py','G'): 'kept_file: company_decision_facts 唯讀查詢測試（SQL 夾具直寫 tmp store）',
     ('tests/test_alpha_view_render.py','G'): 'guard_assertion: render 不得 import decision_lab；authority 標籤字串 decision_lab://coverage_assessments',
     ('tests/test_analyst_view.py','G'): 'legacy_key: refresh required_action 字串「reassess in a session」（refresh 字彙）',

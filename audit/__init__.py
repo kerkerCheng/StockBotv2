@@ -126,7 +126,7 @@ def _registry() -> tuple[AuditCheck, ...]:
                    "禁止 active-but-unreachable／expired-but-active；terminal 動詞語意正確",
                    run=checks.check_lifecycle),
         AuditCheck("Expiry", "INV-2", ("F-15", "F-16"), "Phase 3",
-                   "每個等待都有到期；watch／RA／cohort expiry 皆可達",
+                   "每個等待都有到期（含 pq2 的 waiting_on），每次到期都有去處（A7：複查／重讀／watch_decision）",
                    run=checks.check_expiry),
         AuditCheck("Orphans", "INV-3", ("F-17", "F-20"), "Phase 3",
                    "沒有 disposition 的 item；被 filter 掉卻沒有理由的 item",

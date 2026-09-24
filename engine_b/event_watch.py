@@ -59,6 +59,10 @@ WATCH_KINDS = frozenset({
 SEMANTIC_KIND = "semantic_condition"
 SEMANTIC_MIN_CONDITION_CHARS = 20
 
+#: watch 狀態的封閉字彙（contract；`audit` 的 Lifecycle 據此驗，Phase 1 Step 1.10）。
+#: active → fired（被叫醒）→ consumed（處理完）；active → expired（到期，處置記在 `expiry_resolution`）。
+WATCH_STATUSES = ("active", "fired", "consumed", "expired")
+
 # 需要 tier-1 一手來源才觸發的 kind：「等某實體的正式文件」不該被任何一則提到該實體的
 # 推文觸發。`related_entity_signal` 刻意不在此列——它等的就是「同一標的有任何新動靜」。
 PRIMARY_ONLY_KINDS = frozenset({"entity_filing_signal", "fact_verification"})
@@ -616,6 +620,27 @@ def resolve_expiry(data: dict[str, Any], watch_id: str, resolution: Mapping[str,
         if watch.get("expiry_resolution"):
             return watch
         watch["expiry_resolution"] = {**dict(resolution), "at": _now()}
+        return watch
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+#: 喚醒目標在 watch 醒來或到期**之前**就已消失時的收法（NB2-12）——與醒來／到期時的處置同一個結論，字彙沿用上表。
+ORPHAN_CLOSE_KINDS = ("pq2_item_gone", "lead_closed")
+
+
+def close_orphan(data: dict[str, Any], watch_id: str, *, kind: str, note: str, **ref: Any) -> dict[str, Any]:
+    """active watch 的喚醒目標已不在（它要叫醒的 pq2 編號已結案、追源 lead 已 applied／no-go）→ `consumed`＋`closed`
+    收據（Phase 1 Step 1.10；INV-4：producer 指得出 consumer）。醒來時 `consume_fired` 與到期時 `resolve_expiry`
+    本來就會得到同一個結論；提早收是因為不收的話它在計數器裡算「在盯」，一年後才到期現形。"""
+    if kind not in ORPHAN_CLOSE_KINDS:
+        raise EventWatchError(f"未知的孤兒收法：{kind!r}（封閉字彙 {ORPHAN_CLOSE_KINDS}）")
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if watch.get("status") != "active":
+            raise EventWatchError(f"只收 active 的 watch：{watch_id}（現況 {watch.get('status')}）")
+        watch["status"] = "consumed"
+        watch["closed"] = {"at": _now(), "kind": kind, "note": note, **ref}
         return watch
     raise EventWatchError(f"watch 不存在：{watch_id}")
 

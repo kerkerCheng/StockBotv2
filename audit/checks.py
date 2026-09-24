@@ -15,7 +15,7 @@
 from __future__ import annotations
 
 import json
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 from audit import AuditResult, fail, ok, skip
@@ -225,27 +225,73 @@ def check_graph_financial_join() -> AuditResult:
 # INV-2 — Lifecycle / Expiry
 # ---------------------------------------------------------------------------
 
-def check_lifecycle() -> AuditResult:
-    """terminal 狀態與 outcome 必須同進退；已 resolve 的 pq2 不得仍是 active。
+#: 到期／`until` 過了之後，處置要在多久內落地。機械處置（pq2／追源／讀圖型）與「列進複查／重讀／watch_decision」
+#: 都在每天 `todo sync` 的同一輪完成——給一天餘裕是為了不在當天 sync 之前誤報。
+_EXPIRY_GRACE = timedelta(days=1)
+#: 判定觸及（thesis 來源）之後，C3 的接點（thesis 複查那一筆）必須在多久內出現（plan §11；第 2 輪 N-d）。
+_TOUCHED_GRACE = timedelta(hours=48)
 
-    兩個來源：Decision Store 既有的 `lifecycle_invariant_violations()`
-    （terminal 卻無 outcome／非 terminal 卻有 outcome），以及待辦池本身的
-    resolution／resolved_at 一致性。
+
+def _open_review_ids(items: list[dict]) -> set[str]:
+    """未結案 `thesis_lifecycle` 項目涵蓋的 watch_id（到期與觸及的反證由這一筆接住；A7、C3）。"""
+    return {str(wid) for item in items
+            if item.get("type") == "thesis_lifecycle" and not item.get("resolution")
+            for wid in (item.get("disproof_watch_ids") or ())}
+
+
+def _label(watch: dict) -> str:
+    from engine_b.event_watch import condition_label
+
+    return condition_label(watch.get("condition") or watch.get("fact") or watch.get("note"), 30)
+
+
+def _watch_lifecycle_findings(watches: list[dict]) -> list[str]:
+    """watch 的狀態與收據同進退（Phase 1 Step 1.10）：狀態在封閉字彙內、fired 說得出誰叫醒它、
+    終局（consumed／expired）帶收據、`expiry_resolution` 與狀態相符。"""
+    from engine_b import event_watch as ew
+
+    out: list[str] = []
+    for watch in watches:
+        wid = watch.get("watch_id", "?")
+        status = watch.get("status")
+        if status not in ew.WATCH_STATUSES:
+            out.append(f"watch {wid} status={status!r} 不在封閉字彙 {ew.WATCH_STATUSES}——沒有任何 consumer 認得這個狀態")
+            continue
+        if status == "fired" and not watch.get("woken_by"):
+            out.append(f"watch {wid} fired 卻沒有 woken_by——說不出是哪一份文件叫醒它，判定無從對照")
+        if status == "expired" and _parse_dt(watch.get("expired_at")) is None:
+            out.append(f"watch {wid} expired 卻沒有 expired_at——到期多久無從得知，重問的時限算不出來")
+        if status == "consumed" and not any(watch.get(k) for k in ("woken_by", "judgment", "closed",
+                                                                      "expiry_resolution")):
+            out.append(f"watch {wid} consumed 卻沒有任何收據（woken_by／judgment／closed／expiry_resolution）"
+                       "——說不出它為什麼結束")
+        kind = (watch.get("expiry_resolution") or {}).get("kind")
+        if not watch.get("expiry_resolution"):
+            continue
+        if kind not in ew.EXPIRY_RESOLUTION_KINDS:
+            out.append(f"watch {wid} 的到期處置 kind={kind!r} 不在封閉字彙裡")
+        elif status == "active":
+            out.append(f"watch {wid} active 卻帶到期處置 {kind}——續等應清掉處置（renew），"
+                       "否則下一次到期會被當成已處置")
+        elif status in ("fired", "consumed") and kind != "touched":
+            out.append(f"watch {wid} {status} 卻帶到期處置 {kind}——只有 touched（研究結論＝條件已被觸及）"
+                       "會讓到期的 watch 離開 expired")
+    return out
+
+
+def check_lifecycle() -> AuditResult:
+    """terminal 狀態與收據必須同進退：待辦池的 resolution／resolved_at、watch 的狀態與到期處置。
+
+    ⚠ 2026-09-24（Phase 1 Step 1.10）：原本還讀舊 Decision Store 的 `probe_lifecycle_epochs`——那是凍結資料，
+    永遠 PASS＝不會滅的檢查（L14-4）；凍結歷史由 `DecisionLineage` 照看。改讀等待 registry
+    （`_watch_lifecycle_findings`）。
     """
     def run() -> AuditResult:
         findings: list[str] = []
-        examined = 0
-
-        with sources.decision_store() as store:
-            violations = store.lifecycle_invariant_violations()
-            rows = store._conn.execute(  # noqa: SLF001
-                "select count(*) n from probe_lifecycle_epochs").fetchone()
-            examined += int(rows["n"])
-        for item in violations:
-            findings.append(f"Decision lifecycle：{item}")
 
         items = sources.todo_items()
-        examined += len(items)
+        watches = sources.event_watches()
+        examined = len(items) + len(watches)
         for item in items:
             n = item.get("n")
             has_resolution = bool(item.get("resolution"))
@@ -255,11 +301,13 @@ def check_lifecycle() -> AuditResult:
                     f"[{n}] resolution={item.get('resolution')!r} 與 "
                     f"resolved_at={item.get('resolved_at')!r} 不一致"
                     "（一個說結案了、一個說沒有）")
+        findings.extend(_watch_lifecycle_findings(watches))
 
         if findings:
             return fail("Lifecycle", f"{len(findings)} 筆生命週期狀態自相矛盾",
                         _clip(findings), examined)
-        return ok("Lifecycle", "lifecycle epoch 與待辦池結案狀態一致", examined)
+        return ok("Lifecycle", f"待辦池 {len(items)} 項結案狀態一致；watch {len(watches)} 筆狀態與收據相符",
+                  examined)
 
     return _guard("Lifecycle", run)
 
@@ -270,14 +318,25 @@ def check_expiry() -> AuditResult:
     這是 [321] 定案的直接執行：`stalled`／`expired`／`unwatched` 之所以要被撈出來，
     是因為原本的 consumed-marker 沒有到期兜底，標的用完即靜默沉底
     （實測 50 筆有 10 筆已不可能再被喚醒）。
+
+    Phase 1 Step 1.10（A7）：**每一次到期也都必須有去處。** 到期未處置、`expired_at` 超過一天的，依
+    `expiry_class` 驗它被接住了沒——thesis 來源列進未結案 thesis 複查的 `disproof_watch_ids`、讀圖來源列進
+    節點的重讀理由、假設型等有未結案的 `watch_decision`；pq2／追源／讀圖型是同一輪 sync 的機械處置，
+    超過一天沒處置＝處置沒跑。pq2 的 `waiting_on` 也是等待：`until` 過了還掛著、或既沒有 `until` 也沒有
+    watch 會叫醒它 → FAIL（那個等待永遠不會被重問）。
     """
     def run() -> AuditResult:
+        from engine_b import event_watch as ew
+
         watches = sources.event_watches()
+        items = sources.todo_items()
         findings: list[str] = []
         now = _now()
+        today = now.date()
         examined = 0
-        expired_active = 0
+        unchecked: list[str] = []
 
+        # ① 在等的 watch 必須有到期；過了到期日兩天還是 active＝轉到期（`mark_expired`）沒跑
         for watch in watches:
             if watch.get("status") != "active":
                 continue
@@ -288,10 +347,105 @@ def check_expiry() -> AuditResult:
                 findings.append(
                     f"watch {wid}（{watch.get('kind')}）status=active 但沒有 expires"
                     "——沒有到期的等待不會醒，也不會有人發現它沒醒")
-            elif expires < now:
-                expired_active += 1
+            elif expires.date() < today - _EXPIRY_GRACE:
+                findings.append(
+                    f"watch {wid}（{_label(watch)}）過了到期日 {watch.get('expires')} 仍是 active"
+                    "——轉到期（`todo sync` 的 `mark_expired`）沒跑，這個等待不會被重問")
 
-        # 到期未處置：不算 FAIL（那是待辦，不是不變式違反），但必須現形
+        # ② 到期之後有沒有去處
+        open_items = [i for i in items if not i.get("resolution")]
+        by_n = {int(i["n"]): i for i in items if i.get("n") is not None}
+        review_ids = _open_review_ids(items)
+        decision_refs = {str(i.get("ref_id")) for i in open_items if i.get("type") == "watch_decision"}
+        try:
+            sources.thesis_lifecycle()
+            lifecycle_note = None
+        except SourceUnavailable as exc:
+            lifecycle_note = str(exc)
+        try:
+            readings = sources.reading_ledgers()
+            readings_note = None
+        except SourceUnavailable as exc:
+            readings, readings_note = {}, str(exc)
+        for watch in watches:
+            if watch.get("status") != "expired":
+                continue
+            examined += 1
+            wid = watch.get("watch_id", "?")
+            cls = ew.expiry_class(watch)
+            expired_at = _parse_dt(watch.get("expired_at"))
+            if expired_at is None or now - expired_at <= _EXPIRY_GRACE:
+                continue   # expired_at 缺席由 Lifecycle 報；一天內的還在同一輪 sync 的處置窗內
+            if cls == "pq2":
+                n = int(watch["wake_pq2"])
+                item = by_n.get(n)
+                waiting = (item or {}).get("waiting_on") or {}
+                if item is not None and not item.get("resolution") and (waiting or item.get("deferred_at")):
+                    set_at = _parse_dt(waiting.get("set_at") or item.get("deferred_at"))
+                    if set_at is None or set_at <= expired_at:
+                        findings.append(
+                            f"watch {wid} 到期超過一天，它要叫回的 [{n}] 仍掛在等待"
+                            "——到期沒有把編號翻回「球在你」")
+                        continue
+            if watch.get("expiry_resolution"):
+                continue
+            if cls == "thesis_review":
+                if lifecycle_note:
+                    unchecked.append(wid)
+                elif wid not in review_ids:
+                    findings.append(
+                        f"watch {wid}（thesis 反證「{_label(watch)}」）到期超過一天，沒有列進任何未結案 thesis "
+                        "複查的 disproof_watch_ids——到期被丟了（A7：重問＝併進那份 thesis 的複查）")
+            elif cls == "reread":
+                if readings_note:
+                    unchecked.append(wid)
+                    continue
+                from alpha.providers.structure_readings import reread_reasons
+
+                node = str(watch.get("node") or "")
+                current = (readings.get(node) or {}).get("current") if node else None
+                reasons = reread_reasons(node, watches) if current is not None else []
+                if not any(ew.condition_label(watch.get("condition")) in reason for reason in reasons):
+                    findings.append(
+                        f"watch {wid}（讀圖反證「{_label(watch)}」）到期超過一天，節點 {node or '（沒寫 node）'}"
+                        f"{'' if current is not None else '沒有現行讀圖，'}的重讀理由裡沒有它——APP 與心跳都不會叫你重讀")
+            elif cls == "decision":
+                ref = f"{wid}@{watch.get('expires')}"
+                if ref not in decision_refs:
+                    findings.append(
+                        f"watch {wid}（{_label(watch)}）到期超過一天，既沒有未結案的 watch_decision（{ref}）"
+                        "也沒有處置——到期被丟了（INV-2：到期是重問不是丟）")
+            else:
+                findings.append(
+                    f"watch {wid}（{cls} 型）到期超過一天仍沒有處置——這一型由 `todo sync` 同一輪機械處置，"
+                    "處置沒跑")
+
+        # ③ pq2 的等待：`until` 過了還掛著；或既沒有 `until`、也沒有 watch 會叫醒它
+        live_wakes = {int(w["wake_pq2"]) for w in watches
+                      if w.get("wake_pq2") and w.get("status") in ("active", "fired")}
+        for item in open_items:
+            waiting = item.get("waiting_on")
+            if not isinstance(waiting, dict):
+                continue
+            examined += 1
+            n = item.get("n")
+            until = str(waiting.get("until") or "")[:10]
+            if until:
+                try:
+                    passed = date.fromisoformat(until) < today - _EXPIRY_GRACE
+                except ValueError:
+                    findings.append(f"[{n}] waiting_on.until={until!r} 讀不成日期——這個等待不會被重問")
+                    continue
+                if passed:
+                    findings.append(
+                        f"[{n}] 等到 {until} 的日期已過仍掛在「等事件」——叫回（`todo sync` 的 `_wake_passed_until`）沒跑")
+            elif n is None or int(n) not in live_wakes:
+                findings.append(
+                    f"[{n}] 在等事件（{ew.condition_label(waiting.get('trigger') or waiting.get('reason'), 30)}）"
+                    "卻沒有到期日、也沒有任何 watch 會叫醒它——這個等待永遠不會被重問"
+                    "（修法：`todo resolve <n> --verb pending --until <日期> --trigger …` 或 drop）")
+
+        # 舊店的 prepared actions（凍結唯讀）
         prepared_findings: list[str] = []
         try:
             rows = sources.decision_rows(
@@ -308,14 +462,14 @@ def check_expiry() -> AuditResult:
 
         hard = findings + [f for f in prepared_findings if not f.startswith("⚠")]
         soft = [f for f in prepared_findings if f.startswith("⚠")]
-        if expired_active:
-            soft.append(f"另有 {expired_active} 個 active watch 已過期待處置——"
-                        "有到期就不算違反不變式，但等下去不會有事發生"
-                        "（`engine_b.cli trace-backlog --needs-attention`）")
+        if unchecked:
+            notes = "；".join(n for n in (lifecycle_note, readings_note) if n)
+            soft.append(f"⚠ {len(unchecked)} 筆到期的反證沒檢查去處（{notes}）："
+                        + "、".join(unchecked[:6]))
         if hard:
-            return fail("Expiry", f"{len(hard)} 個等待沒有到期日",
-                        _clip(hard + soft), examined)
-        return ok("Expiry", f"{examined} 個進行中的等待全部有到期日",
+            return fail("Expiry", f"{len(hard)} 個等待沒有到期，或到期了沒有去處",
+                        _clip(hard + soft, len(hard) + len(soft)), examined)
+        return ok("Expiry", f"{examined} 個等待全部有到期，到期的都有去處",
                   examined, _clip(soft))
 
     return _guard("Expiry", run)
@@ -367,20 +521,42 @@ def check_orphans() -> AuditResult:
                     f"{lead_id[:22]} 的 {key} 指向不存在的 {ref}"
                     "——引用已發布，被引用的檔案沒有")
 
-        # ② watch → pq2 編號
-        numbers = {item.get("n") for item in sources.todo_items()}
-        for watch in sources.event_watches():
+        # ② watch → 喚醒目標。編號／lead 不存在是資料錯；存在但已結案（且它是唯一的喚醒目標）＝醒了也沒有
+        #    東西會接——`todo sync` 應已收掉（NB2-12；`_close_orphaned_waits`）
+        items = sources.todo_items()
+        watches = sources.event_watches()
+        leads_map = sources.leads()
+        by_n = {int(item["n"]): item for item in items if item.get("n") is not None}
+        for watch in watches:
+            wid = watch.get("watch_id")
+            only_target = not (watch.get("hypothesis_ref") or watch.get("wake_reading")
+                               or watch.get("disproof_ref")) and not (watch.get("wake_pq2") and watch.get("wake_lead"))
             wake = watch.get("wake_pq2")
-            if wake is None:
-                continue
-            examined += 1
-            if int(wake) not in numbers:
-                findings.append(
-                    f"watch {watch.get('watch_id')} 要喚醒 pq2 [{wake}]，"
-                    "但待辦池裡沒有這個編號——醒了也沒有東西會接")
+            if wake:
+                examined += 1
+                item = by_n.get(int(wake))
+                if item is None:
+                    findings.append(
+                        f"watch {wid} 要喚醒 pq2 [{wake}]，"
+                        "但待辦池裡沒有這個編號——醒了也沒有東西會接")
+                elif item.get("resolution") and watch.get("status") == "active" and only_target:
+                    findings.append(
+                        f"watch {wid} 還在等，要喚醒的 pq2 [{wake}] 卻已 {item['resolution']}"
+                        "——醒了也沒有東西會接（`todo sync` 應已收掉）")
+            lead_id = watch.get("wake_lead")
+            if lead_id and watch.get("status") in ("active", "fired"):
+                examined += 1
+                lead = leads_map.get(str(lead_id))
+                if lead is None:
+                    findings.append(f"watch {wid} 要排回 pq1 的 lead {str(lead_id)[:22]} 不存在")
+                elif (lead.get("status") in ("applied", "triaged_no_go") and watch.get("status") == "active"
+                      and only_target):
+                    findings.append(
+                        f"watch {wid} 還在等，要排回 pq1 的 lead {str(lead_id)[:22]} 卻已 {lead['status']}"
+                        "——醒了也沒有東西會接（`todo sync` 應已收掉）")
 
         # ③ 假設 → watch
-        watch_ids = {w.get("watch_id") for w in sources.event_watches()}
+        watch_ids = {w.get("watch_id") for w in watches}
         for hypothesis in sources.hypotheses():
             wid = hypothesis.get("watch_id")
             if not wid:
@@ -391,12 +567,137 @@ def check_orphans() -> AuditResult:
                     f"假設 {hypothesis.get('hypothesis_id')} 綁的 watch {wid} 不存在"
                     "——沒有任何機制在等它被驗證")
 
+        # ④–⑦ 語意 watch 與讀圖喚醒 → 它們的來源
+        more, soft, count = _semantic_source_orphans(watches)
+        findings.extend(more)
+        examined += count
+
         if findings:
-            return fail("Orphans", f"{len(findings)} 個引用指向不存在的東西",
-                        _clip(findings), examined)
-        return ok("Orphans", f"{examined} 個跨檔引用全部解析得到", examined)
+            return fail("Orphans", f"{len(findings)} 個引用指向不存在或已不是現行的東西",
+                        _clip(findings + soft), examined)
+        return ok("Orphans", f"{examined} 個跨檔引用全部解析得到", examined, _clip(soft))
 
     return _guard("Orphans", run)
+
+
+def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str], int]:
+    """語意 watch 與讀圖喚醒指回的來源（Phase 1 Step 1.10）：
+
+    ④ 處理中的語意 watch 的 `disproof_ref` 解析得到——memo 的第 k 條存在且就是它的條件；讀圖的 reading_id 存在、
+       第 k 條存在（對帳沒跑或壞了，舊 memo 還在時「指向不存在」抓不到，所以條件文字也要對上）
+    ⑤ 在等的 `wake_reading` 指向有現行讀圖的節點（沒有的話醒了列進重讀也沒有畫面會顯示）
+    ⑥ 在等的語意 watch 的來源是現行：thesis＝lifecycle 的現行 memo；讀圖＝節點現行讀圖（第 2 輪 X2）
+    ⑦ 現行 memo 的 sidecar 有結構化反證且 hash 相符 → 在等的語意 watch 的條件在 sidecar 裡（第 4 輪 N4-12；
+       sidecar 沒有結構化反證時不適用——1.6 手動登記的合法地不在任何 sidecar 裡）
+    lifecycle 或讀圖 ledger 讀不到 → 那一半列 ⚠ 未檢查，不當通過也不當失敗。"""
+    from engine_b import disproof
+    from engine_b import event_watch as ew
+    from thesis.memo_structure import disproof_items, memo_file_sha256
+
+    findings: list[str] = []
+    soft: list[str] = []
+    examined = 0
+    try:
+        lifecycle = sources.thesis_lifecycle()
+    except SourceUnavailable as exc:
+        lifecycle = None
+        soft.append(f"⚠ thesis 來源的反證 watch 未檢查：{exc}")
+    try:
+        ledgers = sources.reading_ledgers()
+    except SourceUnavailable as exc:
+        ledgers = None
+        soft.append(f"⚠ 讀圖來源的反證與 wake_reading 未檢查：{exc}")
+    current_memos = {str(e["memo"]) for e in (lifecycle or {}).values()
+                     if isinstance(e, dict) and e.get("memo") and e.get("status") != "retired"}
+    memo_items: dict[str, list[str] | None] = {}
+    sidecar_sets: dict[str, set[str] | None] = {}
+
+    def items_of(memo: str) -> list[str] | None:
+        if memo not in memo_items:
+            try:
+                memo_items[memo] = [disproof.normalize(x) for x in
+                                    disproof_items((ROOT / memo).read_text(encoding="utf-8"))]
+            except OSError:
+                memo_items[memo] = None
+        return memo_items[memo]
+
+    def sidecar_of(memo: str) -> set[str] | None:
+        """現行 memo 的結構化反證集合；沒有結構化反證或 hash 不符 → None（不適用）。"""
+        if memo not in sidecar_sets:
+            sidecar_sets[memo] = None
+            try:
+                data = json.loads((ROOT / memo).with_suffix(".evidence.json").read_text(encoding="utf-8"))
+                conditions = data.get("disproof_conditions") if isinstance(data, dict) else None
+                if conditions and memo_file_sha256(ROOT / memo) == data.get("memo_sha256"):
+                    sidecar_sets[memo] = {disproof.normalize(c.get("condition")) for c in conditions
+                                          if isinstance(c, dict)}
+            except (OSError, ValueError):
+                pass
+        return sidecar_sets[memo]
+
+    for watch in watches:
+        wid = watch.get("watch_id", "?")
+        status = watch.get("status")
+        waiting = status in ("active", "fired")
+        if watch.get("wake_reading") and waiting and ledgers is not None:
+            examined += 1
+            node = str(watch["wake_reading"])
+            if (ledgers.get(node) or {}).get("current") is None:
+                findings.append(f"watch {wid} 的 wake_reading 指向 {node}，那個節點沒有現行讀圖"
+                                "——醒了列進重讀也沒有畫面會顯示")
+        if watch.get("kind") != ew.SEMANTIC_KIND:
+            continue
+        in_process = waiting or (status == "expired" and not watch.get("expiry_resolution"))
+        if not in_process:
+            continue
+        ref = str(watch.get("disproof_ref") or watch.get("source_ref") or "")
+        base, _, index_text = ref.partition("#")
+        try:
+            index = int(index_text)
+        except ValueError:
+            index = 0
+        text = disproof.normalize(watch.get("condition"))
+        label = _label(watch)
+        memo = disproof.memo_ref(ref)
+        if memo is not None:
+            if lifecycle is None:
+                continue
+            examined += 1
+            items = items_of(memo)
+            if items is None:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref 指向讀不到的 memo {memo}")
+                continue
+            if not 1 <= index <= len(items) or items[index - 1] != text:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在 memo「推翻」節對不到它的條件"
+                                f"（該節 {len(items)} 條）——對帳（`todo sync`）沒跑或壞了")
+            if waiting and memo not in current_memos:
+                findings.append(f"watch {wid}（「{label}」）還在等，來源 memo {memo} 卻不是 lifecycle 的現行 memo"
+                                "——換版後舊條件沒收（`todo sync` 的反證對帳）")
+            elif waiting:
+                structured = sidecar_of(memo)
+                if structured is not None and text not in structured:
+                    findings.append(f"watch {wid}（「{label}」）還在等，但現行 memo 的結構化反證（sidecar）裡沒有這條"
+                                    "——memo 原地重產後舊條件沒收")
+        elif base.startswith("reading:"):
+            if ledgers is None:
+                continue
+            examined += 1
+            reading_id = base[len("reading:"):]
+            node = str(watch.get("node") or "")
+            record = next((r for r in (ledgers.get(node) or {}).get("records", [])
+                           if r.reading_id == reading_id), None)
+            if record is None:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref 指向讀圖 {reading_id}，"
+                                f"節點 {node or '（沒寫 node）'} 的 ledger 裡沒有這一份")
+                continue
+            entries = tuple(record.disproof or ())
+            if not 1 <= index <= len(entries) or disproof.normalize(entries[index - 1].condition) != text:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在讀圖的 disproof[] 對不到它的條件")
+            current = (ledgers.get(node) or {}).get("current")
+            if waiting and getattr(current, "reading_id", None) != reading_id:
+                findings.append(f"watch {wid}（「{label}」）還在等，來源讀圖 {reading_id} 卻不是 {node} 的現行讀圖"
+                                "——重讀後舊條件沒收")
+    return findings, soft, examined
 
 
 # ---------------------------------------------------------------------------
@@ -483,12 +784,47 @@ def check_queue_liveness() -> AuditResult:
                     f"線索 {lead_id[:22]}（{lead.get('source')}）triaged_go 已 "
                     f"{(now - entered).days} 天未進 pq1——PASS 了但沒有人取")
 
+        # 等待 registry 側（Phase 1 Step 1.10）
+        from engine_b import event_watch as ew
+        from engine_b.todo import watch_id_of
+
+        watches = sources.event_watches()
+        watch_ids = {w.get("watch_id") for w in watches}
+        review_ids = _open_review_ids(items)
+        stuck_watches = 0
+        for watch in watches:
+            if watch.get("kind") != ew.SEMANTIC_KIND:
+                continue
+            wid = watch.get("watch_id", "?")
+            judgment = watch.get("judgment") or {}
+            if watch.get("status") == "fired" and not judgment:
+                woke = _parse_dt((watch.get("woken_by") or {}).get("at"))
+                if woke and (now - woke).days > _STALLED_DAYS:
+                    stuck_watches += 1
+                    findings.append(
+                        f"watch {wid}（「{_label(watch)}」）醒了 {(now - woke).days} 天還沒判定"
+                        "——待檢沒有人取（`event_watch semantic-queue` → `judge`）")
+            if (str(watch.get("source_ref") or "").startswith("thesis:")
+                    and judgment.get("touches") == "yes" and not judgment.get("handled")):
+                touched_at = _parse_dt(judgment.get("at"))
+                if touched_at and now - touched_at > _TOUCHED_GRACE and wid not in review_ids:
+                    stuck_watches += 1
+                    findings.append(
+                        f"watch {wid}（thesis 反證「{_label(watch)}」）判定觸及已 "
+                        f"{int((now - touched_at).total_seconds() // 3600)} 小時，池裡沒有一筆未結案的 thesis 複查"
+                        "接住它——觸及後的等待消失了（C3）")
+        for item in active:
+            if item.get("type") == "watch_decision" and watch_id_of(item) not in watch_ids:
+                findings.append(
+                    f"[{item.get('n')}] watch_decision 指向不存在的 watch {watch_id_of(item)}"
+                    "——go／drop／續等都沒有東西可寫")
+
         examined = len(active) + sum(1 for l in leads.values()
-                                     if l.get("status") == "triaged_go")
+                                     if l.get("status") == "triaged_go") + len(watches)
         if findings:
             return fail("QueueLiveness",
-                        f"{len(findings)} 項在佇列中失聯超過 {_STALLED_DAYS} 天"
-                        f"（待辦 {stalled}／線索 {stuck_leads}）",
+                        f"{len(findings)} 項在佇列中失聯"
+                        f"（待辦 {stalled}／線索 {stuck_leads}／等待 {stuck_watches}）",
                         _clip(findings), examined)
         return ok("QueueLiveness",
                   f"{examined} 項進行中工作全部在 {_STALLED_DAYS} 天內有進展", examined)

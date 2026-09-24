@@ -1365,8 +1365,12 @@ def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict
             return 0, {}
         try:
             leads = load_leads()["leads"]
+            leads_ok = True
         except Exception:
             leads = {}
+            leads_ok = False
+        # 先收喚醒目標已不在的（NB2-12），它們才不會被比對、叫醒一個沒人接的東西
+        orphaned = _close_orphaned_waits(data, pool, leads if leads_ok else None)
         fired = event_watch.check_watches(data, leads=leads)
         # 也收「先前已 fired、但由別的呼叫端觸發而本函式沒看到」的 pq2 型 watch。
         # 2026-09-08 實測：triage 路徑先把 ew_0002（喚醒 [134]）標成 fired 存檔；本函式
@@ -1443,10 +1447,41 @@ def _check_event_watches(pool: dict[str, Any], *, stamp: str) -> tuple[int, dict
                 woken += 1
             event_watch.consume_fired(data, watch["watch_id"])
         event_watch.save_watches(data)
-        return woken, event_watch.counters(data)
+        return woken, {**event_watch.counters(data), "orphan_closed": len(orphaned)}
     except Exception:
         # watch 檢查失敗不阻斷 sync；缺席時計數器不出現即是訊號。
         return 0, {}
+
+
+def _close_orphaned_waits(data: dict[str, Any], pool: Mapping[str, Any],
+                          leads: Mapping[str, Any] | None) -> list[str]:
+    """喚醒目標只有一個、而那個目標已結案的 active watch → `consumed`＋收據（Phase 1 Step 1.10；NB2-12）。
+
+    - `wake_pq2` 指向**已結案**的編號 → `pq2_item_gone`（編號不存在的不收：那是資料錯，由 audit Orphans 現形）
+    - `wake_lead` 指向 applied／triaged_no_go 的 lead → `lead_closed`（lead 不存在的不收，理由同上；`leads` 讀不到
+      〔None〕就整個不動追源型——空的與讀不到是兩件事）
+    帶了第二個喚醒目標（假設、讀圖、反證）的不收：還有東西會接。"""
+    from engine_b import event_watch
+
+    resolved = {int(it["n"]): str(it.get("resolution")) for it in pool["items"] if it.get("resolved_at")}
+    closed: list[str] = []
+    for watch in list(data["watches"]):
+        if (watch.get("status") != "active" or watch.get("hypothesis_ref") or watch.get("wake_reading")
+                or watch.get("disproof_ref") or (bool(watch.get("wake_pq2")) == bool(watch.get("wake_lead")))):
+            continue
+        if watch.get("wake_pq2"):
+            n = int(watch["wake_pq2"])
+            if n in resolved:
+                event_watch.close_orphan(data, watch["watch_id"], kind="pq2_item_gone", n=n,
+                                         note=f"要叫醒的 pq2 [{n}] 已 {resolved[n]}——醒了也沒有東西會接")
+                closed.append(str(watch["watch_id"]))
+        elif leads is not None:
+            lead = leads.get(str(watch["wake_lead"]))
+            if lead is not None and lead.get("status") in ("applied", "triaged_no_go"):
+                event_watch.close_orphan(data, watch["watch_id"], kind="lead_closed", lead_id=str(watch["wake_lead"]),
+                                         note=f"要排回 pq1 的 lead 已 {lead.get('status')}——醒了也沒有東西會接")
+                closed.append(str(watch["watch_id"]))
+    return closed
 
 
 def _mark_source_cleared(
@@ -2184,7 +2219,9 @@ def main(argv: list[str] | None = None) -> int:
                     f"；watch {wc.get('active', 0)} 筆"
                     f"（T1 {wc.get('t1_date', 0)}／T0 {wc.get('t0_passive', 0)}"
                     f"／可輪詢 {wc.get('t2_pollable', 0)}"
-                    f"，本輪喚醒 {result.get('watch_woken', 0)}）"
+                    f"，本輪喚醒 {result.get('watch_woken', 0)}"
+                    + (f"，收掉叫醒目標已結案的 {wc['orphan_closed']}" if wc.get("orphan_closed") else "")
+                    + "）"
                 )
             rc = result.get("disproof_reconcile")
             reconcile_line = ("；反證對帳沒跑（失敗）" if rc is None else
