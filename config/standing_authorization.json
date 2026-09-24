@@ -45,7 +45,8 @@
     "thesis_lifecycle": "lifecycle 結論由使用者決定",
     "manual": "manual 型是使用者指示或系統提案（含 decompose 提案），逐項核准",
     "sheet_only_holding": "持股要不要研究是使用者的 scope 決定",
-    "lead_research": "legacy，已移回 pq1，不再建立"
+    "lead_research": "legacy，已移回 pq1，不再建立",
+    "watch_decision": "語意／假設 watch 到期（Phase 1 Step 1.7，定案 #4）——它真正要你答的是續等或放棄；自動 go 會讓重問消失（INV-2：到期是重問不是丟）"
   },
   "dev_change": {
     "_doc": [

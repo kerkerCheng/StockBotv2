@@ -323,10 +323,14 @@ def _cmd_consume_fired(args: argparse.Namespace) -> int:
     store = leads.load(args.leads)
     watch_data = ew.load_watches()
     result = leads.consume_fired_lead_watches(store, watch_data)
+    # 追源型到期（Phase 1 Step 1.7，A3）：lead 轉終局 `watch_expired` 並計數，不佔 pq2
+    newly_expired = ew.mark_expired(watch_data)
+    result["trace_expired_closed"] = leads.close_expired_trace_watches(store, watch_data)
     if args.dry_run:
         print(json.dumps({**result, "dry_run": True}, ensure_ascii=False, indent=2))
         return 0
-    if result["requeued"] or result["reactivated"] or result["consumed"]:
+    if (result["requeued"] or result["reactivated"] or result["consumed"] or newly_expired
+            or result["trace_expired_closed"]):
         leads.save(store, args.leads)
         ew.save_watches(watch_data)
     print(json.dumps(result, ensure_ascii=False, indent=2))

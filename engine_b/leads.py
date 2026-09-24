@@ -1144,6 +1144,31 @@ def _requeue_related_trace_backlog(
     return sorted(requeued)
 
 
+def close_expired_trace_watches(store: dict[str, Any], watch_data: dict[str, Any]) -> list[dict[str, str]]:
+    """追源型（`wake_lead`）watch 到期 → lead 的 `trace_status` 轉終局 `watch_expired`、watch 記處置（Phase 1 Step 1.7；A3）。
+
+    ⚠ 這與 AGENTS「每筆有到期，到期是重問不是丟」、G7「到期＝進 pq2 重問」字面上有張力——使用者已核准（定案 #3）：
+    **追源型的重問＝轉終局並計數現形，不佔 pq2**（AGENTS：lead 留在 pq1、不占 pq2 編號）；需要人決定的等待才鑄
+    `watch_decision`。計數由心跳印「追源到期結案 N（今日 M）」。只動 parked 的 lead；已經在路上或終局的只記處置。"""
+    from engine_b import event_watch as ew
+
+    closed: list[dict[str, str]] = []
+    for watch in watch_data.get("watches", []):
+        if watch.get("status") != "expired" or not watch.get("wake_lead") or watch.get("expiry_resolution"):
+            continue
+        lead_id = str(watch["wake_lead"])
+        lead = store["leads"].get(lead_id)
+        outcome = "lead_missing"
+        if lead is not None and lead.get("status") == "parked":
+            annotate_refs(store, lead_id, refs={"trace_status": "watch_expired"})
+            outcome = "trace_closed"
+        elif lead is not None:
+            outcome = f"lead_{lead.get('status')}"
+        ew.resolve_expiry(watch_data, str(watch["watch_id"]), {"kind": outcome, "lead_id": lead_id})
+        closed.append({"watch_id": str(watch["watch_id"]), "lead_id": lead_id, "outcome": outcome})
+    return closed
+
+
 def consume_fired_lead_watches(
     store: dict[str, Any],
     watch_data: dict[str, Any],

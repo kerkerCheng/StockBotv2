@@ -43,6 +43,11 @@
       "terminal": false,
       "label": "等具名揭露",
       "description": "一手已取得，但缺的正是具名——客戶端未點名供應商、供應商未點名客戶、或官方名單未說明角色。依 L8 這類缺口不能靠再讀一份供應商自述來補，只能等交易對手方的具名文件。"
+    },
+    "watch_expired": {
+      "terminal": true,
+      "label": "等待到期結案",
+      "description": "追源 watch 等滿一輪（trace_ttl_days）等的文件沒出現，自動結案（Phase 1 Step 1.7，A3）。⚠ 這是『等待結束』不是『主張為假』；追源型的重問＝轉終局並由心跳計數現形（追源到期結案 N），不佔 pq2——lead 留在 pq1、不占 pq2 編號。之後有新的一手文件點名同一標的，它會以新 lead 回來。"
     }
   },
   "aliases": {

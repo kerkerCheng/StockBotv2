@@ -140,13 +140,16 @@ def reconcile_thesis_disproof(data: dict[str, Any], *, lifecycle: Mapping[str, A
                 summary["consumed"].append(watch["watch_id"])
     for watch in data["watches"]:
         memo = memo_ref(watch.get("source_ref") or "")
-        if memo is None or watch.get("kind") != ew.SEMANTIC_KIND or watch.get("status") not in ("active", "fired"):
-            continue
-        if memo in current:
+        if memo is None or watch.get("kind") != ew.SEMANTIC_KIND or memo in current:
             continue
         note = "thesis retired" if memo in retired else "memo 已不是 lifecycle 的現行 memo（superseded）"
-        _close(watch, note)
-        summary["consumed"].append(watch["watch_id"])
+        if watch.get("status") in ("active", "fired"):
+            _close(watch, note)
+            summary["consumed"].append(watch["watch_id"])
+        elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
+            # Phase 1 Step 1.7：到期待決的條件，它的 memo 已不是現行 → 記處置，不再鑄 watch_decision 問一個沒有對象的問題
+            ew.resolve_expiry(data, watch["watch_id"], {"kind": "source_superseded", "note": note})
+            summary["consumed"].append(watch["watch_id"])
     return summary
 
 

@@ -779,7 +779,11 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     )
 
     expired = sum(1 for w in watches if str(w.get("status") or "") == "expired")
-    line = f"到期歸檔 watch {expired}｜事件監看總數 {len(watches)}"
+    # Phase 1 Step 1.7（A3）：到期不是丟——每筆 expired 落在某個處置裡；沒落的（多半是 A3 之前的歷史到期）照數
+    exp = event_watch.expiry_counters({"watches": watches})
+    line = (f"watch 到期 {expired}（待決 watch_decision {exp['expiry_decision_pending']}｜"
+            f"追源到期結案 {exp['trace_expired_closed']}（今日 {exp['trace_expired_closed_today']}）｜"
+            f"未處置 {exp['expiry_unresolved']}）｜事件監看總數 {len(watches)}")
     # ROADMAP Phase 6（D15，2026-09-17 使用者核准 A 案）：**沒有到期的等待**要自己出現。
     # 原提案是「parked 超過 60 天自動 expired」，實測推翻——479 筆 parked 裡 413 筆是
     # terminal trace_status（那是歸檔不是等待），而真正沒有任何機制會回來的只有個位數。

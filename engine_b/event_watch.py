@@ -377,15 +377,10 @@ def check_watches(
 
     today = today or _today()
     fired: list[dict[str, Any]] = []
+    mark_expired(data, today=today)
     for watch in data["watches"]:
         if watch.get("status") != "active":
             continue
-        try:
-            if date.fromisoformat(str(watch["expires"])) < today:
-                watch["status"] = "expired"
-                continue
-        except ValueError:
-            pass
         kind = watch["kind"]
         if kind == "date":
             try:
@@ -478,6 +473,77 @@ def check_watches(
             watch["woken_by"] = woken
             fired.append(dict(watch))
     return fired
+
+
+def mark_expired(data: dict[str, Any], *, today: date | None = None) -> list[str]:
+    """`expires < 今天` 的 active watch → `expired`，記 `expired_at`（Phase 1 Step 1.7）。回傳這一次轉到期的 id。
+
+    到期不是丟（INV-2）：需要人決定的（語意型、假設型）由 `todo sync` 鑄 `watch_decision`；pq2 型把它指向的
+    編號翻回「球在你」；追源型把 lead 轉終局 `watch_expired` 並計數；讀圖型由讀圖自己的到期重問。"""
+    today = today or _today()
+    out: list[str] = []
+    for watch in data["watches"]:
+        if watch.get("status") == "active" and past_expiry(watch, today=today):
+            watch["status"] = "expired"
+            watch["expired_at"] = _now()
+            out.append(str(watch["watch_id"]))
+    return out
+
+
+def past_expiry(watch: Mapping[str, Any], *, today: date | None = None) -> bool:
+    """`expires < 今天`（日期壞掉的不算——那是資料錯，由 audit 現形，不在這裡猜）。"""
+    try:
+        return date.fromisoformat(str(watch["expires"])) < (today or _today())
+    except (KeyError, ValueError):
+        return False
+
+
+def expiry_class(watch: Mapping[str, Any]) -> str:
+    """到期要怎麼處置：`decision`（語意／假設→watch_decision）｜`pq2`｜`trace`｜`reading`。"""
+    if watch.get("wake_pq2"):
+        return "pq2"
+    if watch.get("wake_lead"):
+        return "trace"
+    if watch.get("wake_reading"):
+        return "reading"
+    return "decision"
+
+
+def renew(data: dict[str, Any], watch_id: str, *, until: str, n: int | None = None) -> dict[str, Any]:
+    """續等（`watch_decision` 的 `pending --until`）：以新到期日回 `active`，歷史附加、不覆寫（Phase 1 Step 1.7）。
+
+    等待只住 registry——續等不在 pq2 掛 `waiting_on`。"""
+    until_day = date.fromisoformat(str(until))
+    if until_day <= _today():
+        raise EventWatchError(f"續等的新到期日必須晚於今天：{until}")
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if watch.get("status") != "expired":
+            raise EventWatchError(f"只能續等已到期的 watch：{watch_id}（現況 {watch.get('status')}）")
+        watch["renewals"] = [*(watch.get("renewals") or []),
+                             {"at": _now(), "previous_expires": watch["expires"],
+                              "expired_at": watch.get("expired_at"), "until": until_day.isoformat(), "n": n}]
+        watch["expires"] = until_day.isoformat()
+        watch["status"] = "active"
+        watch.pop("expired_at", None)
+        watch.pop("expiry_resolution", None)
+        return watch
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def resolve_expiry(data: dict[str, Any], watch_id: str, resolution: Mapping[str, Any]) -> dict[str, Any]:
+    """到期處置的收據（`expiry_resolution`）。只能寫在 expired 的 watch 上，寫過就不改。"""
+    for watch in data["watches"]:
+        if watch["watch_id"] != watch_id:
+            continue
+        if watch.get("status") != "expired":
+            raise EventWatchError(f"{watch_id} 不是 expired（現況 {watch.get('status')}）")
+        if watch.get("expiry_resolution"):
+            return watch
+        watch["expiry_resolution"] = {**dict(resolution), "at": _now()}
+        return watch
+    raise EventWatchError(f"watch 不存在：{watch_id}")
 
 
 def _semantic_matches(watch: Mapping[str, Any], leads: Mapping[str, Any], *,
@@ -607,8 +673,28 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
         "wake_reading": sum(1 for w in active if w.get("wake_reading")),
         "semantic_unreachable": (None if coverage is None else
                                  sum(1 for w in watching if not is_reachable(w, coverage))),
+        **expiry_counters(data),
     }
     return {**_base_counters(data, active), **extra}
+
+
+def expiry_counters(data: Mapping[str, Any], *, today: date | None = None) -> dict[str, int]:
+    """到期處置的計數（Phase 1 Step 1.7）：到期不是丟——每一筆 expired 都要落在某個處置裡，沒落的現形。
+
+    - `expiry_decision_pending`：語意／假設型到期、還沒處置（＝待決 `watch_decision`）
+    - `trace_expired_closed`／`_today`：追源型到期、lead 轉終局 `watch_expired`（重問＝計數現形，不佔 pq2）
+    - `expiry_unresolved`：任何型別 expired 且沒有 `expiry_resolution`（含 A3 之前的歷史到期）"""
+    today_iso = (today or _today()).isoformat()
+    expired = [w for w in data["watches"] if w.get("status") == "expired"]
+    closed = [w for w in expired if (w.get("expiry_resolution") or {}).get("kind") == "trace_closed"]
+    return {
+        "expiry_decision_pending": sum(1 for w in expired if not w.get("expiry_resolution")
+                                       and expiry_class(w) == "decision"),
+        "trace_expired_closed": len(closed),
+        "trace_expired_closed_today": sum(1 for w in closed
+                                          if str(w["expiry_resolution"].get("at") or "")[:10] == today_iso),
+        "expiry_unresolved": sum(1 for w in expired if not w.get("expiry_resolution")),
+    }
 
 
 def _base_counters(data: Mapping[str, Any], active: list[Mapping[str, Any]]) -> dict[str, int]:

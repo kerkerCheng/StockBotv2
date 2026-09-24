@@ -108,6 +108,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
 | **5 端到端 smoke** | 2026-09-24 實跑 `python crons\daily_task.py`（run `bf21bb07`）：19 步 17 ok、2 skipped（`executor=none`）、約 7 分鐘（materialize 282 秒最長）；harvest 最後一輪＝當天、APP 7 份 state 當天 materialize、publisher 回 `sent` 3/3、鎖已釋放、收工標記 `finalized`。`register_daily_task.py --apply` 後 `StockBotv2-Daily` Ready（下次 05:30）、自我比對 `match`；舊兩個工作 `Disabled`。⚠ 端到端驗收仍要等**真正的排程觸發**（1.2b 的前提：`LastTaskResult 0` 且當天執行紀錄完整），手動觸發不算（L13-1）。 |
 
+### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.7：到期處置）
+
+**不新增無人值守可執行面**：`DAILY_STEPS` 與各步 argv 不變，不新增主機、憑證或寫入檔案。行為變化只在兩個既有寫入步驟、
+寫的都是它們本來就在寫的檔：⑨ `engine_b.cli consume-fired` 多做「追源型到期」——`expires` 已過的 watch 轉 `expired`、
+parked lead 的 `trace_status` 轉終局 `watch_expired`（`library/leads/pending_leads.json`）、watch 記 `expiry_resolution`
+（`library/leads/event_watches.json`）；⑩ `engine_b.todo sync` 多鑄 `watch_decision`（語意／假設型到期）、把 pq2 型到期指向的
+編號翻回球在你（`library/leads/todo_pool.json`）、讀圖型到期與「memo 已被取代」的到期只記處置。**`watch_decision` 永不列入常規授權**
+（`config/standing_authorization.json` 的 `never`），無人值守路徑不會替使用者按它的 `go`／`drop`／續等；`go` 必附指得回的研究結果，
+不授權任何 authority mutation。互動路徑：`python -m engine_b.todo resolve <n> --verb pending --until <日期>`（續等）／`--verb drop`。
+
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.5：反證登記 hook）
 
 **不新增無人值守可執行面**：`DAILY_STEPS` 不變。⑩ `engine_b.todo sync` 多做一件事——thesis 反證對帳
