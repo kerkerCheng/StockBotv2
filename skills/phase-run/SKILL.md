@@ -19,7 +19,7 @@ description: >
    **必須唯一。** 0 份 → 停，回一句「沒有 active plan，請切 fable 執行 `/phase-plan`」；2 份以上 → `AWAITING_HUMAN`。
 2. 讀該 plan 全文（`AGENTS.md` 每個 session 本來就要先讀）。
 3. 看 plan §0.5 進度表與 `git log --oneline -20`，找**第一個未 ✅ 的 Step**；已 ✅ 的不重做。
-4. **單一 writer 確認：** plan 若要求暫停排程，且進度表還沒記「排程已暫停」，先問使用者一句「daily／weekly 排程暫停了嗎」，
+4. **單一 writer 確認：** plan 若要求暫停排程，且進度表還沒記「排程已暫停」，先問使用者一句「daily 排程暫停了嗎」，
    得到肯定後把它記進進度表；這是開工前唯一要問的話。
 5. 從那個 Step 起走 development-flow：Z1 以上預設 R1；**Phase 結案、與執行期間 trigger 命中的 R2 已常規 opt-in**
    （`AGENTS.md`「協作與邊界」），能 spawn 就直接發 `WORK_REQUEST`，不能就把原文交回。

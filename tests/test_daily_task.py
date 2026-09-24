@@ -585,6 +585,42 @@ def test_routine_hint_speaks_only_when_the_daily_did_not_finish(tmp_path: Path) 
     assert "running" in daily_problem(now=after, config_path=config, run_dir=run_dir)
 
 
+@pytest.mark.parametrize("days,nudge", [(6, False), (7, True)])
+def test_routine_hint_theme_scan_line_both_sides(tmp_path: Path, days: int, nudge: bool) -> None:
+    """Phase 1 Step 1.9：每次開 session 都有一行「距上次掃題材 N 天」；達門檻（7）改成要求轉述的版本。"""
+    from datetime import date
+
+    from crons.routine_hint import theme_scan_hint
+
+    reports = tmp_path / "reports"
+    reports.mkdir()
+    (reports / "theme_scan_2026-09-18.md").write_text("x", encoding="utf-8")
+    line, flag = theme_scan_hint(today=date(2026, 9, 18) + timedelta(days=days), reports_dir=reports)
+    assert flag is nudge and f"{days} 天" in line
+    assert line.startswith("【請在第一則回覆開頭轉述】") is nudge
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    never, flag = theme_scan_hint(reports_dir=empty)
+    assert flag and "從來沒掃過題材" in never
+
+
+def test_routine_hint_always_prints_the_theme_line_and_never_breaks(monkeypatch, capsys) -> None:
+    from crons import routine_hint as rh
+
+    monkeypatch.setattr(rh, "daily_problem", lambda: None)
+    monkeypatch.setattr(rh, "theme_scan_hint", lambda: ("距上次掃題材 3 天（上次 x，門檻 7 天）", False))
+    assert rh.main() == 0
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["hookSpecificOutput"]["additionalContext"] == "距上次掃題材 3 天（上次 x，門檻 7 天）"
+
+    def boom():
+        raise RuntimeError("x")
+
+    monkeypatch.setattr(rh, "daily_problem", boom)
+    monkeypatch.setattr(rh, "theme_scan_hint", boom)
+    assert rh.main() == 0 and capsys.readouterr().out == "", "hook 絕不能讓 session 開不起來"
+
+
 def test_routine_hint_is_attached_on_both_providers() -> None:
     claude = json.loads((ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
     codex = json.loads((ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))

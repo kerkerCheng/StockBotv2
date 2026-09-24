@@ -520,19 +520,19 @@ def test_markdown_is_aggregate_and_preserves_human_boundary() -> None:
         assert raw not in rendered
 
 
-def test_daily_risk_view_is_silent_without_change_but_weekly_full_is_explicit() -> None:
+def test_daily_risk_view_is_silent_without_change_but_full_view_is_explicit() -> None:
     first = _report()
     second = _report(previous_risk_snapshot=first["risk_snapshot"])
 
     daily = render_beta_monitor_markdown(second)
-    weekly = render_beta_monitor_markdown(second, risk_view="full")
+    full = render_beta_monitor_markdown(second, risk_view="full")
 
     assert "## 投組風險變化" not in daily
-    assert "## 投組風險完整快照" in weekly
-    assert "Issuer look-through coverage：partial" in weekly
-    assert "槓桿 ETF 資金占比" in weekly
-    assert "換算槓桿曝險" in weekly
-    assert "名目槓桿" not in weekly
+    assert "## 投組風險完整快照" in full
+    assert "Issuer look-through coverage：partial" in full
+    assert "槓桿 ETF 資金占比" in full
+    assert "換算槓桿曝險" in full
+    assert "名目槓桿" not in full
 
 
 # ── 2026-08-29 隨技術訊號一併刪除的測試（不留空殼，只留刪除理由） ─────────────

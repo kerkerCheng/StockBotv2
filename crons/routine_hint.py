@@ -6,6 +6,10 @@ daily（`crons/daily_task.py`）是唯一的心跳來源——**它自己當掉�
 - 本地時間已過 `daily_local_time`＋`expected_duration_minutes`，今天卻沒有 `daily_run_<日期>.json`；或
 - 紀錄裡有 `integrity_violation`（保險檢查觸發、已中止，心跳與發送都沒跑）、或紀錄停在 `running`。
 
+另外**每次開 session 都印一行「距上次掃題材 N 天」**（Phase 1 Step 1.9，定案 B：session 開頭常駐）——weekly 退役後
+題材掃描只在互動 session 由使用者發起，沒有排程會提醒它；天數 ≥ `config/daily_routine.json` 的
+`theme_scan.nudge_after_days` 時改成要求轉述的版本。
+
 兩邊都掛（`.claude/settings.json` 與 `.codex/hooks.json`，provider-neutral）；無人值守的 `claude -p`
 以 `--setting-sources ""`＋`disableAllHooks` 跑，不會觸發。只讀、不連外；任何例外安靜跳過
 （hook 絕不能讓 session 開不起來）。只輸出 additionalContext 一個通道（同 `thesis_freshness_check.py`：
@@ -20,6 +24,8 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 CONFIG = ROOT / "config" / "daily_routine.json"
 RUN_DIR = ROOT / "library" / "private" / "heartbeat"
 
@@ -60,17 +66,42 @@ def daily_problem(*, now: datetime | None = None, config_path: Path = CONFIG,
     return None
 
 
+def theme_scan_hint(*, today=None, config_path: Path = CONFIG, reports_dir: Path | None = None) -> tuple[str, bool]:
+    """(那一行, 是否達門檻)。達門檻（或從沒掃過）→ 要求轉述；否則是一行普通的常駐計數。"""
+    from engine_b.routine_config import load_theme_scan
+    from engine_b.theme_scan import REPORTS_DIR, last_scan
+
+    threshold = load_theme_scan(config_path)["nudge_after_days"]
+    scan = last_scan(reports_dir=reports_dir or REPORTS_DIR, today=today)
+    if scan["date"] is None:
+        return (f"【請在第一則回覆開頭轉述】從來沒掃過題材（門檻 {threshold} 天）——說「掃題材」啟動題材掃描", True)
+    days = int(scan["days"])
+    if days >= threshold:
+        return (f"【請在第一則回覆開頭轉述】已 {days} 天沒掃題材（上次 {scan['date']}，門檻 {threshold} 天）"
+                "——說「掃題材」啟動題材掃描", True)
+    return (f"距上次掃題材 {days} 天（上次 {scan['date']}，門檻 {threshold} 天）", False)
+
+
 def main() -> int:
+    # 兩件事各自降級：任何一件讀不到就安靜跳過那一件（hook 絕不能讓 session 開不起來）。
+    # 只用 additionalContext 一個通道（見模組 docstring）；兩件事合成同一段文字。
+    messages: list[str] = []
     try:
         problem = daily_problem()
-    except Exception:  # noqa: BLE001 — hook 絕不能讓 session 開不起來
-        return 0
-    if not problem:
+        if problem:
+            messages.append(f"【請在第一則回覆開頭轉述】今天的 daily 沒有跑完：{problem}")
+    except Exception:  # noqa: BLE001
+        pass
+    try:
+        messages.append(theme_scan_hint()[0])
+    except Exception:  # noqa: BLE001
+        pass
+    if not messages:
         return 0
     print(json.dumps({
         "hookSpecificOutput": {
             "hookEventName": "SessionStart",
-            "additionalContext": f"【請在第一則回覆開頭轉述】今天的 daily 沒有跑完：{problem}",
+            "additionalContext": "\n".join(messages),
         },
     }, ensure_ascii=False))
     return 0

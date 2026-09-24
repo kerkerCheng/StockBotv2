@@ -108,7 +108,7 @@ Mobile-friendly 燈號。**燈號只表達行情資料狀態，不表達投入�
 `effective_weight` 才稱「換算槓桿曝險」，不得再輸出模糊的「名目槓桿」。目標配置比例顯示為
 「目標 40.0%｜容忍區間 ±5.0%」，並解釋分母是**已投入的非現金部位**，不是 NAV／現金／單輪預算。
 Portfolio risk 另以 ignored append-only JSONL 保存 aggregate snapshot：Daily 只顯示門檻跨越／狀態翻轉，
-Weekly 才用 `--risk-view full --no-record-risk` 顯示完整快照。硬擋包含 ETF nominal／effective 槓桿 cap、
+要完整快照時（互動）用 `--risk-view full --no-record-risk`。硬擋包含 ETF nominal／effective 槓桿 cap、
 總曝險 cap、callable debt cap 與 investment policy 的 5% 單筆上限；issuer concentration 與 alpha 總量只警告。
 `issuer_loads` 是已知、partial ownership look-through，不是完整 ETF 成分，也不含 Engine A 上游依賴；
 coverage 為 `partial` 時一律顯示「已知至少 X%」，不得輸出成完整曝險估計。
@@ -513,7 +513,7 @@ tier）；其他類型由撰寫者一句話回答「核准後我的圖／authori
 
 ### 收尾建議摘要是義務（2026-08-30 使用者定案）
 
-每個研究段落、daily／weekly 報告與較長的互動回覆，結尾必附「建議摘要」——
+每個研究段落、daily／題材掃描報告與較長的互動回覆，結尾必附「建議摘要」——
 `go`／`drop`／`pending`／不動各列編號＋一句理由，**最後一行單獨給可直接複製的批次指令**
 （如 `252 253 256 257 go 255 pending`），使用者不回讀全文即可複製回覆。
 
@@ -772,7 +772,7 @@ task 最終回覆必須原樣輸出送入 publisher 的 canonical Markdown；不
 **唯一的無人值守排程是 Windows daily**（`StockBotv2-Daily`；時間只住 `config/daily_routine.json`，改法與失敗長相見
 `docs/OPERATIONS.md`「Daily」節）。~~`crons/daily_brief_prompt.md`（Codex desktop 每日 scheduled task prompt）~~
 已於 2026-09-24 封存為 `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`，兩個 Codex automation 由使用者停用。
-`crons/weekly_scan_prompt.md` 待 Phase 1 Step 1.9 退役（題材掃描改互動 skill）。Cloud session＋MCP 不承擔現行排程；
+weekly 已於 Phase 1 Step 1.9 退役（題材掃描改互動 skill `skills/theme-scan`；舊 prompt 封存於 `docs/archive/`）。Cloud session＋MCP 不承擔現行排程；
 遠端永遠不得取代本機 decision／lifecycle authority。
 
 ## 已知會壞的地方（v0，撞到回頭修）

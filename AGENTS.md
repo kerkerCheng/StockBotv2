@@ -124,7 +124,7 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 
 1. **推薦 `go` 前必須答得出「go 會讓哪個數字變」**（L14）；bounded research 解不了的改建議 `pending --trigger`，或直接問 scope 問題。
 2. **推薦 `drop` 前必須查 pool 現值**並附查證命令；collector 仍會重新推導的項目 drop 只會換號重生，正確做法是修 collector 端分類。
-3. **weekly 只發現、不處置**；處置建議只由讀得到 pool 現值的 daily／互動 session 給出。
+3. **題材掃描只發現、不處置**：掃描報告不對 pq2 編號給 go／drop；處置建議只由讀得到 pool 現值的 daily／互動 session 給出。
 4. **收尾建議摘要是義務：** 各列編號＋一句理由，最後一行單獨給可直接複製的批次指令。呈現契約住
    [`skills/daily-brief/SKILL.md`](skills/daily-brief/SKILL.md)；不可退讓的一條：**不得假設使用者能從 `co:*` ID 或內部術語還原主詞**，
    決策行的「不含」欄必須逐項寫出最相鄰的未授權動作。
@@ -233,7 +233,7 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
 - **subagent 委派預設關閉、每次明確 opt-in**；回傳只是 review packet；不得委派任何寫入、核准、入圖、thesis mutation、資本配置、commit／push。
 - **Push 是常規動作**；push 前 `git ls-files library/private` 應為空。
 - **通知不是 authority**；Canonical Brief 只有一份；發送失敗不得阻斷。
-- **不建立與待辦池競爭的第二個狀態源**；daily brief 不留檔；weekly report 留檔但不是 current-state truth。
+- **不建立與待辦池競爭的第二個狀態源**；daily brief 不留檔；題材掃描報告留檔但不是 current-state truth。
 - **一手來源優先**；出投資建議前必看五項：客戶集中度、毛利率／產能利用率、backlog／營收結構、稀釋、估值壓力。
 
 ## 現況數字會過期，判準不會（2026-08-19）

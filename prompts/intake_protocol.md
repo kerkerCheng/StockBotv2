@@ -150,6 +150,6 @@ pathset 安全續跑。
 
 ## 7. Legacy direct load 邊界
 
-`load_extraction` 暫時保留給已經有自己人工核准閘門的 weekly/local 流程；它仍是一份文件
+`load_extraction` 暫時保留給已經有自己人工核准閘門的本機流程；它仍是一份文件
 一個呼叫，依 filesystem-first → graph receipt 協定運作。手機／ad hoc remote intake **不得**
-用它繞過整個 Research Action review。weekly scan 遷移前，其既有 PR gate 不變。
+用它繞過整個 Research Action review。（weekly scan 已於 2026-09-24 退役；接手的題材掃描只發現、不抽取，不會呼叫它。）

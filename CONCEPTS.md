@@ -82,16 +82,17 @@ The signal-discovery and intake subsystem in StockBotv2's four-engine architectu
 ### Signal Triage
 The automatic, low-cost judgment step between harvesting raw signals (tracked-theme web search, Engine B feeds) and running full LLM extraction. Decides whether a raw item is relevant to an already-tracked theme/company, novel, quotable (contains concrete, verbatim-checkable claims per the L6 anti-hallucination rule), and a plausible new `origin_entity` for the L8 gate. Deliberately lenient — a silently dropped good lead is treated as worse than a wasted extraction — and every run reports what it filtered and why.
 
-### Weekly Signal Scan
+### Theme Scan（題材掃描；舊稱 Weekly Signal Scan）
+**2026-09-24 起（Phase 1 Step 1.9）：** 使用者在互動 session 發起的探索（`skills/theme-scan`）——掃 watch 清單外的新公司、新題材與新需求錨，只到 Topic Digest、lead 註冊（`theme_scan:<主題>`）與 decompose 提案；**只發現、不處置**，不追源、不抽取、不入圖。沒有排程；心跳段 3 與 session 開頭每天印「距上次掃題材 N 天」。報告 `docs/reports/theme_scan_<日期>.md` 留檔但不是 current-state truth。以下是它最早（cloud 時代）的定義，保留作歷史：
 The recurring cloud-run process that keeps the knowledge graph fed without the user initiating research: harvest (tracked themes + Engine B feeds) → Signal Triage → full extraction drafts → a review artifact (PR for reports with drafts, Issue for pure alerts) awaiting human approval. Two hard rules define it: it never loads its own fresh drafts into the graph (approval always precedes loading), and a week with no primary-source material is reported honestly as sparse rather than padded.
-*Avoid:* weekly scan cron, 週報 routine
+*Avoid:* weekly scan cron, 週報 routine, weekly（已退役的排程名；舊 lead 的 `weekly:` 來源標籤是同一管道的歷史名稱）
 
 ### Source Trace Manual（追源手冊）
-The shared repo skill that turns the source registry's routing knowledge (US → EDGAR, TW → MOPS, technical → arXiv, generic search only as third-layer fallback) into an executable tracing chain. All three graph entry points — the Weekly Signal Scan, local lead-intake, and claude.ai chat via the Graph MCP Gateway — follow this one manual, so tracing behavior is identical regardless of where a signal enters. Every trace must record the routes attempted; "couldn't trace" without an attempt list is invalid.
+The shared repo skill that turns the source registry's routing knowledge (US → EDGAR, TW → MOPS, technical → arXiv, generic search only as third-layer fallback) into an executable tracing chain. All three graph entry points — the Theme Scan (formerly Weekly Signal Scan), local lead-intake, and claude.ai chat via the Graph MCP Gateway — follow this one manual, so tracing behavior is identical regardless of where a signal enters. Every trace must record the routes attempted; "couldn't trace" without an attempt list is invalid.
 *Avoid:* source routing prompt, per-entry tracing rules
 
 ### Trace Quarantine（追源未果清單）
-The disposition for signals that pass triage but fail primary-source tracing, applied by tier: tier 1–2 sources (filings, earnings calls known to exist) still produce extraction drafts with honest relay marking; tier 3+ (social relays) produce no draft and instead land in the weekly report's untraced list plus a `weekly-scan` labeled Issue, surfacing via the existing session-start digest. Closing the Issue means the source was recovered (re-enters intake) or abandoned. Trades draft volume for graph trustworthiness.
+The disposition for signals that pass triage but fail primary-source tracing, applied by tier: tier 1–2 sources (filings, earnings calls known to exist) still produce extraction drafts with honest relay marking; tier 3+ (social relays) produce no draft and instead land in the weekly report's untraced list plus a `weekly-scan` labeled Issue, surfacing via the existing session-start digest (historical: the weekly report was retired 2026-09-24; untraced leads now surface through the trace backlog and the heartbeat). Closing the Issue means the source was recovered (re-enters intake) or abandoned. Trades draft volume for graph trustworthiness.
 *Avoid:* failed-trace park, blocked signals
 
 ### ⚠ 「Backlog」一詞在本專案有四個互不相關的意思

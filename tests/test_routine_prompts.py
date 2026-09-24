@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 AGENTS = ROOT / "AGENTS.md"
 SKILL = ROOT / "skills" / "daily-brief" / "SKILL.md"
-WEEKLY = ROOT / "crons" / "weekly_scan_prompt.md"
+THEME_SCAN = ROOT / "skills" / "theme-scan" / "SKILL.md"
 TRIAGE_PROMPT = ROOT / "crons" / "triage_prompt.md"
 
 
@@ -84,20 +84,19 @@ def test_interactive_brief_does_not_publish_a_second_daily_message_by_default() 
     assert "互動 session 組的\nDaily Brief **預設不發送**" in text or "Daily Brief **預設不發送**" in text
 
 
-def test_weekly_is_local_health_discovery_and_read_only_lifecycle() -> None:
-    text = WEEKLY.read_text(encoding="utf-8")
-    for token in (
-        "query\\health_audit.py --local",
-        "發現未知",
-        "Topic discovery",
-        "不追源",
-        "不抽取",
-        "不改 lifecycle",
-        "engine_b.todo sync",
-        "穩定編號",
-    ):
-        assert token in text
-    assert "健康 finding 與 pq2 是正交" in text
-    assert "Codex 本機" in text
-    assert "--risk-view full --no-record-risk" in text
-    assert "投組風險完整快照" in text
+def test_weekly_prompt_is_archived_not_live() -> None:
+    """Phase 1 Step 1.9：weekly 排程退役，prompt 逐字封存、原檔刪除。"""
+    assert not (ROOT / "crons" / "weekly_scan_prompt.md").exists()
+    archive = (ROOT / "docs" / "archive" / "2026-09-24-weekly-scan-prompt-v1.2.md").read_text(encoding="utf-8")
+    assert "不得執行" in archive and "# Weekly 審查 — Codex 本機 Prompt（v1.2）" in archive
+
+
+def test_theme_scan_only_discovers_never_disposes() -> None:
+    """「只發現、不處置」原本由 weekly prompt 的測試守，改由 theme-scan skill 守（AGENTS 判準句的執行面）。"""
+    text = THEME_SCAN.read_text(encoding="utf-8")
+    for token in ("只發現、不處置", "**不得**對 pq2 編號輸出 `go`／`drop` 建議", "不追源、不抽取、不入圖",
+                  "theme_scan:<主題>", "decompose-propose", "docs/reports/theme_scan_", "只限互動",
+                  "掃題材", "onboard-candidates", "不是 current-state truth"):
+        assert token in text, token
+    agents = AGENTS.read_text(encoding="utf-8")
+    assert "題材掃描只發現、不處置" in agents and "weekly 只發現" not in agents

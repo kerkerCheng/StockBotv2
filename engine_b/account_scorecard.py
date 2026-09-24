@@ -509,7 +509,7 @@ def _yfinance_closes(
 
 
 def render(scorecard: Mapping[str, Any]) -> str:
-    """計分表 → 給人讀的 Markdown。心跳第 5 段與 weekly 報告共用。"""
+    """計分表 → 給人讀的 Markdown（互動報告用；心跳段 5 自 Phase 1 Step 1.8 起只印 tier 分布，完整表在 APP）。"""
     lines = [f"# 帳號計分表（as-of {scorecard['as_of']}）"]
     counts = scorecard.get("tier_counts") or {}
     lines.append("tier 分佈：" + "／".join(f"{k} {v}" for k, v in counts.items()))

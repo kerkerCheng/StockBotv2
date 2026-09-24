@@ -2,8 +2,8 @@
 name: signal-triage
 description: >
   Stage 2 判斷層：決定一則從 web search 或 Engine B（如 aleabitoreddit）harvest 到的
-  原始材料，值不值得進 pq1（source-trace＋抽取）。由 daily／weekly routine 在 harvest
-  之後自動呼叫；設計上刻意寬鬆，PASS 後可自動研究，但不等於入圖核准。
+  原始材料，值不值得進 pq1（source-trace＋抽取）。由 daily 在 harvest 之後自動呼叫（互動的題材掃描
+  也套它的五要素）；設計上刻意寬鬆，PASS 後可自動研究，但不等於入圖核准。
   觸發詞：本 skill 由 routine 自動呼叫，不是使用者直接觸發的入口。
 ---
 
@@ -174,7 +174,7 @@ candidate events**，預期新領域 campaign 的 PASS 率約 50–70%，只作�
 
 ## 輸出格式
 
-每次 routine 執行後，Stage 2 的結果彙整進 Daily Brief／Weekly Report 的稽核段；不開 PR／Issue：
+每次 routine 執行後，Stage 2 的結果彙整進心跳段 3 的分類層那一行（題材掃描則進它自己的報告）；不開 PR／Issue：
 
 ```
 ## Triage 結果
@@ -196,6 +196,6 @@ candidate events**，預期新領域 campaign 的 PASS 率約 50–70%，只作�
 
 | 情況 | 用哪個 skill |
 |------|-------------|
-| 本機 daily／weekly routine 判斷一則 harvest 材料值不值得進 pq1 | 本 skill |
+| 本機 daily（或互動的題材掃描）判斷一則材料值不值得進 pq1 | 本 skill |
 | 使用者自己貼一條推文/新聞，要不要入庫 | `skills/lead-intake`（人在場的 Fast Path，判斷邏輯類似但由人主導） |
 | 新公司決定要不要入圖 | `skills/company-onboard`（本 skill 只建議候選，不觸發） |

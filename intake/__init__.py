@@ -16,6 +16,6 @@ raw 文件 → extraction → prepare（驗證＋凍結成 immutable action）
 
 **MCP 是 optional adapter**：`intake/` 完全不 import `mcp`，本機路徑
 （`scripts/prepare_research_action.py`、`scripts/commit_pending_intake.py`、
-weekly digest）直接呼叫這裡，不經過任何遠端協定。
+本機互動 session）直接呼叫這裡，不經過任何遠端協定。
 """
 from __future__ import annotations

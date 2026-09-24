@@ -6,7 +6,7 @@
 本模組把**提案**變成機械流程，**核准仍逐題**（decompose 選題不在常規授權清單，見
 `config/standing_authorization.json` 的 never／`AGENTS.md`「常規授權類別」）：
 
-- **提名**（系統名、需求錨、為什麼是新錨、哪條 lead 點名）由 research-drain／weekly／使用者貼入的 lead
+- **提名**（系統名、需求錨、為什麼是新錨、哪條 lead 點名）由 research-drain／題材掃描／使用者貼入的 lead
   產生——那是語意工作，LLM 可以解析與提議；本模組只驗兩件機械的事，然後鑄一個 `manual` 型 pq2 編號。
 - **廣度判準是機械的**：需求錨不在 `config/sector_anchors.json` 既有各組、**且**頂層節點不在圖裡
   （用 coverage state artifact 的節點清單當圖的快照，不連 Neo4j）。兩者都不成立就是深度題，
@@ -112,7 +112,7 @@ def _lead_ids_in(item: Mapping[str, Any]) -> set[str]:
 
 def build_hint(*, system: str, anchor: str, why_new_anchor: str, lead_ids: Sequence[str],
                layers_estimate: int | None, check: BreadthCheck) -> str:
-    leads_text = "、".join(lead_ids) if lead_ids else "（無 lead；由 weekly／使用者提名）"
+    leads_text = "、".join(lead_ids) if lead_ids else "（無 lead；由題材掃描／使用者提名）"
     layers = f"預估拆出 {layers_estimate} 層" if layers_estimate else "層數未估"
     return (
         f"decompose 提案（自動鑄號，核准逐題）｜系統：{system}｜需求錨：{anchor}｜為什麼是新錨：{why_new_anchor}"

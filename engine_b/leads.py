@@ -117,7 +117,7 @@ def backfill_provenance(store: dict[str, Any], *, feeds: Iterable[Mapping[str, A
     """替既有 lead 補來源宣告（Phase 1 Step 1.4；C2）。**冪等**：只補缺的欄位、不覆寫已有值。
 
     依據：feed 的宣告（`crons/harvest_config.json`）；`edgar:` 與 `mops:` 天生一手、公司由 ticker 經 registry
-    解析（查不到留空，不猜；INV-1），EDGAR 另由標題取回 `form_type`；`x:` 為二手。其他來源（weekly、decompose、
+    解析（查不到留空，不猜；INV-1），EDGAR 另由標題取回 `form_type`；`x:` 為二手。其他來源（theme_scan／舊 weekly、decompose、
     手動…）沒有宣告可依，**不補**——它們不是 harvest 的 feed。回傳「每個來源補了幾筆」。
     """
     from identity.registry import get_registry

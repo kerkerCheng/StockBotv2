@@ -5,7 +5,7 @@ triage 判斷，這支 CLI 負責寫入狀態機（不讓 agent 手寫 JSON 冒�
 狀態語意與不變式（lead 狀態不影響 evidence tier）全在 engine_b/leads.py。
 
 用法:
-    python -m engine_b.cli register --source weekly --url <url> --title "..."
+    python -m engine_b.cli register --source theme_scan:<主題> --url <url> --title "..."
     python -m engine_b.cli list [--status pending]
     python -m engine_b.cli triage <lead_id> --go --tier 3 --reason "有新角度" \
         --content-type structural_fact --decision-impact ranking
@@ -218,7 +218,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
 
 
 def _cmd_register(args: argparse.Namespace) -> int:
-    """把 weekly／手動發現註冊成 pending lead，仍走 URL-hash 冪等入口。"""
+    """把題材掃描／手動發現註冊成 pending lead，仍走 URL-hash 冪等入口（舊 `weekly:` 標籤是同一管道的歷史名稱）。"""
     store = leads.load(args.leads)
     try:
         lead_id, is_new = leads.register(
@@ -796,7 +796,7 @@ def _cmd_decompose_propose(args: argparse.Namespace) -> int:
     """研究閉環 P∥：把一個 decompose 選題鑄成 `manual` 型 pq2 編號（核准仍逐題）。
 
     廣度判準機械（需求錨不在 sector_anchors 各組、且不在圖的 coverage 快照裡）；drop 過沒新 lead 不重生；
-    同時 open ≤ 2。提名（系統名／為什麼是新錨）是語意工作，由呼叫端（research-drain／weekly／使用者）給。
+    同時 open ≤ 2。提名（系統名／為什麼是新錨）是語意工作，由呼叫端（research-drain／題材掃描／使用者）給。
     """
     from engine_b import decompose_proposals as dp
     from engine_b import todo
@@ -920,7 +920,7 @@ def build_parser() -> argparse.ArgumentParser:
                     help="pending_leads.json 路徑（預設本機 authority）")
     sub = ap.add_subparsers(dest="command", required=True)
 
-    p_reg = sub.add_parser("register", help="把 weekly／手動發現註冊成 pending lead")
+    p_reg = sub.add_parser("register", help="把題材掃描／手動發現註冊成 pending lead")
     p_reg.add_argument("--source", required=True)
     p_reg.add_argument("--url", required=True)
     p_reg.add_argument("--title", default="")

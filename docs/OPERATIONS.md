@@ -293,14 +293,14 @@ python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 
 
 **Routine 分工：**
 - daily（Windows `StockBotv2-Daily` → `crons/daily_task.py`，2026-09-24 起）＝harvest ＋ ETL ＋ beta monitor ＋ triage（`claude -p` 零工具提議、程式寫入）＋ 機械段 ＋ materialize ＋ 健康審查 ＋ invariants ＋ 備份 ＋ 心跳；互動 session 說「daily brief」才組含 pq2 建議的長版。~~`crons/daily_brief_prompt.md`~~ 已封存
-- weekly（`crons/weekly_scan_prompt.md`，台北週日 04:00）＝topic discovery ＋ 完整本機健康審查 ＋ 唯讀 lifecycle，報告留 `docs/reports/`（Phase 1 Step 1.9 退役：題材掃描改互動 skill）
+- ~~weekly~~（2026-09-24 Phase 1 Step 1.9 退役）：題材掃描改互動 skill `skills/theme-scan`（說「掃題材」），報告 `docs/reports/theme_scan_<日期>.md`；健康審查、thesis 唯讀提醒、投組風險快照由 Windows daily 接手；舊 prompt 封存於 `docs/archive/2026-09-24-weekly-scan-prompt-v1.2.md`
 
 兩者刻意錯開，且都不替使用者寫 thesis 結論、入圖或建立 live facts。
 
 ### 自主研究迴圈（2026-08-29 建立；互動 session 內由使用者觸發）
 
 **Trigger：** 使用者說「跑自主研究迴圈」（單輪）或「/loop 自主研究」（連續、agent 自排程、
-使用者隨時打斷）。**不設 cron、不進無人值守排程**——它與 daily／weekly 共用 working tree，
+使用者隨時打斷）。**不設 cron、不進無人值守排程**——它與 daily 共用 working tree，
 必須由互動 session 承載才能遵守 single-writer 契約。
 
 **每輪固定形狀：** 從題源挑一題 → bounded research → 留 receipt（park／prepared RA／
@@ -321,7 +321,7 @@ Engine C 提案）→ 報告本輪產出與下一題。**所有 authority mutati
 > D8「補三格」（已在圖裡的邊緣公司的可替代性／外部印證／瓶頸業務占營收比例）依決定紀錄 §8 排到題源最前——
 > 落地隨 ROADMAP Phase 1，落地前題源順序照上表。
 
-**紅線：** ①台北 04:00（週日 weekly）與 06:30（daily）前後 30 分鐘內不動 working tree，
+**紅線：** ①daily 的寫入窗（台北 05:15–06:45；`python scripts/writer_guard.py check`）內不動 working tree，
 排程結束後先讀 `git status --short` 再續跑；②每輪必留 receipt，違反 = 該輪視為未發生。
 
 **節奏（2026-08-30 使用者定案：做到底、gate 事後批次審）：** 迴圈**不因 gate 而閒置**——
@@ -1067,7 +1067,7 @@ schtasks /Query /TN StockBotv2-FxSync /FO LIST /V                          # Sta
 > **⚠ 2026-09-24 起停用**（使用者決定；ROADMAP「旁支開發項：Graph MCP 退役」）：process 已停、開機 vbs 已移除啟動行；tunnel 的 `mcp.`、`neo4j.` hostname 已從 `~/.cloudflared/config.yml` 移除（外部實測回 404）；claude.ai connector 已斷開。手機改用 Claude Code Remote Control 操作本機 session。
 > 下面是停用前的操作說明，拆除時一併改寫；**不要照著重新啟動**，除非使用者決定恢復。
 
-本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，工具數以 `tools/list` 實測為準（2026-09-24 為 11，`get_decision_brief` 已隨 Phase 0 退役），Git 能力僅 leads.json 一個窄例外。daily／weekly 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
+本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，工具數以 `tools/list` 實測為準（2026-09-24 為 11，`get_decision_brief` 已隨 Phase 0 退役），Git 能力僅 leads.json 一個窄例外。daily 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
 
 **⚠ 改完 `mcp_server/` 一定要重啟 process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。
 
@@ -1080,7 +1080,7 @@ schtasks /Query /TN StockBotv2-FxSync /FO LIST /V                          # Sta
 
 ## （歷史／fallback）雲端 egress 白名單
 
-2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，實際是 claude.ai cloud environment 的 Network access allowlist，不是平台硬限制。現行 daily／weekly 已移回本機，以下只在日後重啟 cloud fallback 時適用。
+2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，實際是 claude.ai cloud environment 的 Network access allowlist，不是平台硬限制。現行 daily 已在本機（weekly 已於 2026-09-24 退役），以下只在日後重啟 cloud fallback 時適用。
 
 - 白名單需含：`sec.gov`、`*.sec.gov`、`substack.com`、`*.substack.com`，並保留 default package-manager 清單
 - **MCP connector 流量不受影響**（走 Anthropic 伺服器轉發）——證據：403 那次 MCP 工具仍可呼叫
@@ -1321,7 +1321,7 @@ python -m briefing alpha-card COHR
 |---|---|---|---|
 | `crons/thesis_freshness_check.py`（SessionStart hook） | 你開 session 時 | **尚未進待辦池**的新到期項目 | 它是 Daily 沒跑時的唯一提醒。2026-09-05→09-08 排程停了三天，那三天只有它會說話 |
 | Daily Brief 的「賣出側」 | 每天 06:30 | 每筆 decision 的 `disproof`／`catalyst`／`expiry` 四態 | 那是 decision 層的到期，不是 lifecycle 層；且已進池的項目 hook 會靜默 |
-| Weekly report 的「Thesis 核查」 | 每週日 | 唯讀複查提醒 | 週期不同、對象是整體健康而非單筆 |
+| ~~Weekly report 的「Thesis 核查」~~（2026-09-24 隨 weekly 退役） | — | — | 由 Windows daily 心跳段 2 的 thesis 行與 `thesis_lifecycle` 項目承擔 |
 
 ⚠ **「三個嘴」曾被判為重複，實測後不成立**：hook 對已進池項目會靜默（`active_lifecycle_todo_refs`），
 而 `thesis/lifecycle.json` 現有 3 條 active 且都有 `next_check`（最近 2026-09-28）——它會觸發、不是死機制。
@@ -1387,14 +1387,12 @@ graph admission**。任何新訂閱／購買必須另列 exact 金額與方案�
 ## 報告留檔與 outbound 通知
 
 **daily brief 不留檔**（只出在 session；稽核價值由待辦池 log ＋ leads 狀態機 ＋
-Decision Store 承擔）；**weekly report 留檔**（`docs/reports/`，含無法從池重建的
-topic discovery 與健康審查趨勢）。不回到 PR/Issue 形式。
+Decision Store 承擔）；**題材掃描報告留檔**（`docs/reports/theme_scan_<日期>.md`，含無法從池重建的
+topic discovery；舊的 `weekly_scan_<日期>.md` 保留為歷史）。不回到 PR/Issue 形式。
 
-**Weekly authority hierarchy：** `AGENTS.md` 是政策 SSOT；`crons/weekly_scan_prompt.md`
-是 executable runbook，只有開發／人工修 policy 時才改，**weekly routine 本身不得自我
-改寫**；`docs/reports/weekly_scan_<date>.md` 是當週 point-in-time 歷史報告，
-不是 current-state truth。
-⚠ 2026-09-16 D5／D12：weekly 與 daily 同一套三層；**帳號計分表在 weekly 算**並 materialize 進 APP（落地前無此段，ROADMAP Phase 3）。
+**題材掃描 authority hierarchy（2026-09-24 起；原 Weekly）：** `AGENTS.md` 是政策 SSOT；`skills/theme-scan/SKILL.md`
+是 runbook，只有開發／人工修 policy 時才改，**掃描本身不得自我改寫**；報告是當次 point-in-time 發現，不是 current-state truth。
+帳號計分表每天由 daily ⑬ materialize 進 APP、心跳段 5 印 tier 分布（原「在 weekly 算」隨 weekly 退役）。
 
 **Daily Brief outbound 通知（2026-08-04）：** 完成後可由 Codex 或本機 Claude Code 呼叫
 同一支 `scripts/publish_daily_brief.py`，outbound-only 送到 Discord private Forum

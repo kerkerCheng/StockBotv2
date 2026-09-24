@@ -1,3 +1,11 @@
+# Weekly 審查 prompt v1.2 逐字封存（2026-09-24 退役）
+
+> Phase 1 Step 1.9（A1）：weekly 排程退役。題材掃描改由使用者在互動 session 發起（`skills/theme-scan/SKILL.md`）；
+> 健康審查、thesis 唯讀提醒、投組風險快照三段已由 Windows daily（`crons/daily_task.py` ⑭、心跳段 2、④）接手。
+> 本檔是退役前 `crons/weekly_scan_prompt.md` 的逐字副本（以下分隔線之後），**不再是現行規範、不得執行**。
+
+---
+
 # Weekly 審查 — Codex 本機 Prompt（v1.2）
 
 > 現行執行端是 Codex 本機 scheduled task（台北週日 04:00），直接在 `master` working tree 執行。

@@ -29,7 +29,7 @@ def test_register_is_url_idempotent(tmp_path, capsys) -> None:
     path = tmp_path / "pending_leads.json"
     args = [
         "--leads", str(path), "register",
-        "--source", "weekly:sivers",
+        "--source", "theme_scan:sivers",
         "--url", "https://example.com/sivers",
         "--title", "Sivers insider transactions",
         "--published-at", "2026-07-21",

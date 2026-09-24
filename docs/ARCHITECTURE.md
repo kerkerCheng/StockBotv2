@@ -122,8 +122,9 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
   `probation`／`measured`／`trusted`，只影響 pq1 優先序）＋每則貼文自動蓋章（貼文時間＋當日收盤價＋具名實體）
   ＋每週計分表五欄、materialize 進 APP（D5）；MOPS 重訊 watcher 與台股每月營收 datum；parked lead 超過 60 天
   自動 `expired` 並計數、不刪（D15，INV-2）。推文永遠是 tier-4 lead，lead-intake 不變。
-- **每週審查：** `crons/weekly_scan_prompt.md`，只做 topic discovery ＋ lifecycle
-  唯讀提醒 ＋ 健康審查；刻意與 daily 錯開。
+- **題材掃描（原每週審查）：** 2026-09-24 起（Phase 1 Step 1.9）是互動 skill `skills/theme-scan`，只做 topic discovery；
+  原 weekly 的健康審查／thesis 唯讀提醒／投組風險快照由 Windows daily 接手（⑭、心跳段 2、④）。舊 prompt 逐字封存於
+  `docs/archive/2026-09-24-weekly-scan-prompt-v1.2.md`。
 - **本機音訊追源：** `scripts/transcribe_audio.py`（`faster-whisper`），模型與逐字稿
   只存 ignored `library/private/`。ASR 只提供 timestamp locator。
 - **遠端存取：** 本機 MCP server ＋ Cloudflare Tunnel ＋ connector，十一工具 surface（`get_decision_brief` 於 2026-09-23（Phase 0 Step 0b.4） 退役）。
