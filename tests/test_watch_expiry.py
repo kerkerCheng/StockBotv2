@@ -475,9 +475,11 @@ def test_go_authorization_row_says_what_go_records_and_excludes_every_authority(
         assert word in excludes
 
 
-def test_collector_is_wired_into_sync() -> None:
-    assert ("watch_expiry", "_collect_watch_expiry_rows") in todo.SOURCE_COLLECTORS
-    assert todo.SOURCE_ITEM_TYPES["watch_expiry"] == frozenset({"watch_decision"})
+def test_r2b_rerun_rollback_collector_is_not_wired_into_sync() -> None:
+    """R2-b 重審 NO_GO（RB-1、RB-2）的回滾守衛：修好前 sync 不得呼叫 watch_decision 收集器。
+    重新啟用時改回「已接上」的測試——那是一個要被看見的決定，不是順手改回。"""
+    assert "watch_expiry" not in {name for name, _ in todo.SOURCE_COLLECTORS}
+    assert "watch_expiry" not in todo.SOURCE_ITEM_TYPES
 
 
 def test_quote_is_only_for_watch_decision(env) -> None:

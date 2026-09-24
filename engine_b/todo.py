@@ -1791,7 +1791,7 @@ SOURCE_ITEM_TYPES: dict[str, frozenset[str]] = {
     # 兩個 legacy kind 從此**沒有 collector**——與 `manual` 同形：缺席不代表完成（見上方 docstring）。
     "engine_c_observations": frozenset({"engine_c_observation"}),
     "thesis_mutations": frozenset({"thesis_mutation"}),
-    "watch_expiry": frozenset({"watch_decision"}),
+    # "watch_expiry": frozenset({"watch_decision"}) —— R2-b 重審 NO_GO 回滾，見 SOURCE_COLLECTORS
 }
 
 
@@ -1829,8 +1829,9 @@ SOURCE_COLLECTORS: tuple[tuple[str, str], ...] = (
     ("lifecycle", "_collect_lifecycle_rows"),
     ("engine_c_observations", "_collect_engine_c_observation_rows"),
     ("thesis_mutations", "_collect_thesis_mutation_rows"),
-    # 2026-09-24 R2-b NO_GO 曾回滾停登記；B1／B2／NB-1～NB-9 修好後重新啟用（見 plan §0.7 R2-b 表）。
-    ("watch_expiry", "_collect_watch_expiry_rows"),
+    # ⚠ 2026-09-24 R2-b 重審 NO_GO 回滾（plan §0.5 預寫的回滾）：`("watch_expiry", "_collect_watch_expiry_rows")`
+    # 停登記——RB-1（lifecycle 讀不到時對帳把所有 thesis 反證收掉）與 RB-2（條件換位置時同一條件兩筆、到期兩個編號）
+    # 修好前不鑄 watch_decision。重新啟用＝把這一列與 SOURCE_ITEM_TYPES 那一列加回來（並改回 test_watch_expiry 的接線測試）。
 )
 
 

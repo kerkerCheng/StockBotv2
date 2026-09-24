@@ -211,7 +211,7 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | 1.4 | `semantic_condition` kind（feed 宣告一手與公司、回填實體、待檢、判定、排除持股申報）＋ 語意預篩（抓全文、`claude -p` 零工具提議、程式驗引文後寫標旗；C7） | ✅ 回填 EDGAR 419／MFN 64／sivers 26／yahoo 26／MOPS 4／X 514（冪等）；Sivers 兩 feed 的 lead 含 `co:sivers_semiconductors` 0→100%；非語意型命中差異只有 ew_0042 多 4 則 `sivers:press`（全由宣告的 company_id 交集解釋）；真實醒來的語意 watch 0（1.6 才登記）；工作時限 180→240 並重新註冊（偏差 #7–#8） | 5c5d875（R2-a 處置 fc5304d） |
 | 1.5 | 反證登記 hook（讀圖 v2 `disproof[]`、thesis 由 `todo sync` 對帳 lifecycle 現行 memo 登記與收舊）＋ `wake_reading` ＋ 在盯／未盯／觸及待處置／叫不醒計數 ＋ 觸及後的 `thesis_lifecycle` 項目 | ✅ 8 筆 v1 讀圖 id 重算不變、解析失敗 0、兩節點 current；對帳在真實資料上不動任何東西（三份現行 memo 沒有結構化反證→等 1.6）；計數＝預期 16／在盯 0／未盯 16／v1 散文 2 份／凍結歷史 32；`pending_lifecycle.py` 無 diff；心跳段 2 已印反證行（偏差 #9） | f9b8e7c |
 | 1.6 | 既有反證補登記（**強模型**；16 條 thesis 用 `register-disproof`；2 份現行讀圖各 append 一份 v2 取代；不擋後續 Step、結案前必完成） | ✅ thesis 16 條（ew_0096–0111）＋讀圖 v2 兩份（`sr_ad503ae880ceb398` 6 條、`sr_d07679979a8e4202` 5 條）＋需求側客戶 `wake_reading` 5；計數：預期 27／在盯 27／未盯 0／觸及待處置 0／**叫不醒 2**（AXT §7-3 JX／住友、inp ③ IQE）／v1 散文 0；sync 後對帳收掉 0；N15＝claim 39（+edge 8）全部帶 `disproof_condition`；逐條表 `docs/reports/2026-09-24-phase1-step16-disproof-registration.md`（偏差 #14–#17） | （本 commit） |
-| 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ✅ 機制由 22 條測試證明（變異檢查：ref_id 改用 `expired_at` 會紅 3 條）；真實資料 expired 0、最早到期＝追源型 2026-11-22、語意／pq2 型 2026-12-31——照 A3「已交付、未生效」；暫存池 sync：pq2 型 watch 指向的 6 個編號逐筆不變、新 log 0、`watch_decision` 0；2404 passed；**R2-b NO_GO（B1、B2；NB-1–NB-10）→ 回滾（19120b9）→ 使用者確認修法 → 全數修好並重新啟用、試跑再修一個（偏差 #18）、R2-b 重審中**（偏差 #10–#13、#18；處置見 §0.7 R2-b 表） | c9e950f、19120b9、（本 commit） |
+| 1.7 | 到期處置（`watch_decision`、pq2 型翻回、追源型結案）＋ R2-b | ✅ 機制由 22 條測試證明（變異檢查：ref_id 改用 `expired_at` 會紅 3 條）；真實資料 expired 0、最早到期＝追源型 2026-11-22、語意／pq2 型 2026-12-31——照 A3「已交付、未生效」；暫存池 sync：pq2 型 watch 指向的 6 個編號逐筆不變、新 log 0、`watch_decision` 0；2404 passed；**R2-b NO_GO（B1、B2；NB-1–NB-10）→ 回滾（19120b9）→ 使用者確認修法 → 全數修好並重新啟用、試跑再修一個（偏差 #18）、**R2-b 重審 NO_GO（RB-1、RB-2；NB2-1～NB2-14）→ 再度回滾（收集器停登記），AWAITING_HUMAN**（偏差 #10–#13、#18；處置見 §0.7 R2-b 表與重審表） | c9e950f、19120b9、155f6ec、（本 commit） |
 | 1.8 | 心跳改版（較昨 diff、watch／反證計數、pq2 逐筆、備份、健康、NAV、計分表每日、Discord 摘要） | ○ | |
 | 1.9 | 題材掃描（weekly 退役、`skills/theme-scan`、提醒 hook、AGENTS 兩句、`weekly` 字眼清掉） | ○ | |
 | 1.10 | 稽核改讀新 registry | ○ | |
@@ -459,6 +459,31 @@ reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutat
 
 **處置（2026-09-24，使用者：「確認修法是正解」＋「用現有的資料自己跑看看未來系統長出來的樣子」）：** B1、B2、NB-1～NB-9 照上表提案修法全數落地，收集器重新啟用（回滾守衛測試拿掉、改成「已接上」的測試）；NB-6 的封閉字彙現在做、心跳的完整處置分布併進 1.8；NB-10 待使用者。`tests/test_watch_expiry.py` 重寫成**真的跑對帳**（暫存 thesis＋結構化 sidecar），49 條；變異檢查：B1 改回紅 3、NB-2 紅 1、NB-1 紅 1、B2 紅 2。
 **試跑**（新工具 `scripts/trial_run_waiting.py`：真實 registry／待辦池／leads 的暫存副本快轉到 2027-10，真檔 byte 不變）又抓到一個測試沒抓到的：**到期待決的條件被算進「未盯」**（2026-11-18 那 5 條正在 pq2 等決定，心跳寫「未盯 5」；L12）→ `disproof_counts` 多一格 `expired_pending`、心跳段 2 分開印（偏差 #18）。另一個是設計問題、**待使用者決定**：同一份 thesis／讀圖的條件同一天到期，一次鑄 5–6 個編號（2026-11-18 讀圖 5、2027-02-14 AXT 6、2027-03-02 COHR 5、2027-03-18 讀圖 6；不回應的話 2027-10 前累積 27 個），而續等必須逐筆帶日期。R2-b 重審已發（修訂後的 commit）。
+
+### R2-b 重審 findings（2026-09-24，對 `155f6ec`；VERDICT **NO_GO**）
+
+第一輪 B1、B2、NB-1～NB-9 的修法經重審確認都關掉了原情境（探針重跑全綠）。新抓到的兩條 blocking 都在 1.5 的 thesis 反證對帳
+（`engine_b/disproof.py`），不是 155f6ec 新開的，但 1.7 的 `source_superseded` 分支把 RB-1 延伸到到期待決的條件，RB-2 與 B1 同型。
+回滾：照 §0.5 再度讓 `watch_decision` 收集器停登記（心跳標籤照實寫「收集器停用中」）。**依 AGENTS「NO_GO 回 AWAITING_HUMAN，不自動修」——以下都是提案。**
+
+| # | 級別 | 位置 | 問題（執行者已從程式碼確認的標 ✔） | 提案修法 |
+|---|---|---|---|---|
+| RB-1 | blocking | `engine_b/disproof.py:50-55`＋`:157-168` | ✔ `load_lifecycle` 讀不到（手改留下尾逗號）回 `{}` → 對帳把**所有** thesis 反證當成「memo 不是現行」收掉；重審在真實 registry 副本重現 `consumed 16`（ew_0096～0111，1.6 手動登記、修好檔案後**永遠不會重登**）；同期 `disproof_counts` 的 expected 也沒有 thesis 條目，「未盯」不會現形 | 分清「讀不到」與「空」；對帳讀不到就 fail closed（不收、不 supersede，summary 記錯誤）；計數印「讀不到」；lifecycle collector 讀不到時不算健康來源；補壞檔測試 |
+| RB-2 | blocking | `engine_b/disproof.py:127-130`＋`:146-156` | ✔ 去重鍵含 `#index`：memo 原地重產、條件對調或刪中間一條 → 同一條件兩筆 active、到期兩個編號（重審探針：對調 [C1,C2]→[C2,C1] 得 4 筆、到期 4 個編號）。真實影響目前 0 | 去重改 `(memo, 正規化條件)`；同條件換位置就把既有 watch 的 `source_ref` 改到新 index 並留 note（L10：registry 可重建）；sidecar 條目以文字對回 memo 的 index（NB2-14）；補對調／刪中間測試 |
+| NB2-1 | non-blocking | `todo.py` go 路徑 | sync 之後手改 lifecycle 換 memo，go 仍被接受 → 觸及待處置永遠清不掉 | go 也檢查 `source_is_current`（續等已有，對稱面） |
+| NB2-2 | non-blocking | `event_watch.record_touched` | `hy_*` 假設的 go 直接 consumed，繞過 `hypotheses verify`；第一批真實案例 ew_0004、ew_0006（2027-01-01） | 非語意型的 go 讓 watch 停在 fired（`woken_by.kind=watch_decision`），走回原本的路 |
+| NB2-3 | non-blocking | `_validate_watch_decision_go` | `report:` 只驗目錄與存在：`thesis/lifecycle.json`、兩個月前的報告都過；`lead:` 可被追源重排改寫的 `decided_at` 騙過 | 報告內文必須含 watch_id 或編號；lead 只認 `first_seen` |
+| NB2-4 | non-blocking | `disproof_counts` | 各格單位不一（watch 筆數 vs 條件數）、觸及待處置沒限 expected，五格加總≠預期 | 以條件為單位＋優先序；孤兒觸及另一格 |
+| NB2-5 | 設計（待使用者） | 對帳 | 結構化條件 go 觸及後立刻重登一筆 active（同一條件同時「在盯」與「觸及待處置」），手動登記的不會——兩者不一致；sidecar 過期 `expires` 的重登每輪失敗而心跳看不到 | 隨「到期成批」設計決定一起定 |
+| NB2-6 | non-blocking | 對帳去重 | memo A→B→A 換回、或 retire 後恢復：`source_superseded` 的 watch 擋住重登，條件永遠未盯 | 去重忽略 `source_superseded` |
+| NB2-7 | non-blocking | `skills/daily-brief/SKILL.md:280`、`webapp/materialize.py:881`、`event_watch.py:24`、`OPERATIONS.md:686`、`scripts/migrate_trace_to_watch.py:32` | 與 A3 相反的「決定續等／延長」殘句（skill 那句會被互動 session 載入；L19） | 改寫 |
+| NB2-8 | non-blocking | `crons/heartbeat.py` 到期行 | 「watch 到期 N」是累計、分項加不起來（試跑 113＝60＋25＋28 沒交代）；段 2「到期待決」與段 3「待決 watch_decision」名字像、數不同 | 1.8 改成今日／累計分開＋完整封閉字彙分布 |
+| NB2-9 | non-blocking | 收集器標題 | 讀圖條件的前 40 字多是逐字前導或 `**`；來源只印 reading id 沒有節點名；續等後再到期的標題與第一次一模一樣 | 標題去標記、印節點名、標「第 k 次到期」 |
+| NB2-10 | 設計（待使用者） | — | 同一來源同日到期一次鑄 5～6 個編號（＝已提給使用者的「到期成批」問題） | 使用者決定 A／B／C |
+| NB2-11 | non-blocking | 心跳段 2 | 讀圖來源 go 觸及後「觸及待處置 1」連亮數月、沒寫它在等哪裡（實為 needs_reread） | 印出在等哪個節點重讀 |
+| NB2-12 | non-blocking（既有資料） | registry | 6 筆 active 的 pq2 型 watch 指向 2026-09-22 已 drop 的 decision_review；16 筆追源 watch 等的是早已終局的 lead | 1.10 的 audit Orphans 加「wake_pq2 指向已結案編號」 |
+| NB2-13 | non-blocking | `todo._check_event_watches` | 先存 registry（記 requeued）後存 pool，中間崩潰 → 編號永遠掛 `waiting_on` | 翻回改成依編號現況判斷（冪等） |
+| NB2-14 | non-blocking | sidecar 順序 | sidecar 條目順序不保證等於 memo「推翻」節順序，`#n` 可能指錯條（L18） | 併入 RB-2：以文字對 index |
 
 ### 執行偏差紀錄（執行者填；每筆寫「plan 原文怎麼寫／實際怎麼做／為什麼」，並回頭修本 plan 對應段落）
 
