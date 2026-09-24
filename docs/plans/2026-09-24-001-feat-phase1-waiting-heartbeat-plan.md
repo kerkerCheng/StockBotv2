@@ -415,6 +415,27 @@ reviewer 重跑了 C6 的合成探針與對照組（§0.2「第 4 輪重驗」�
 | N4-12 | `source_ref=thesis:<memo 路徑>#<n>` 不含內容：memo 原地重產（同路徑）且反證換了時，以 source_ref 去重會留下舊條件、新條件不登記，Orphans 也抓不到 | 去重鍵＝（`source_ref`、正規化後的條件文字）；對帳時 consume 條件已不在現行 sidecar 集合的；1.10 Orphans 加一條 | Step 1.5、1.10 |
 | N4-13 | 小處：sidecar 檔名是 `memo_path.with_suffix(".evidence.json")`（`generate_lane_memo.py:274`）；可為 null 的 enum 要把 `null` 放進 enum；`tools == ["StructuredOutput"]` 依賴 `--json-schema` | 逐條寫明 | Step 1.3、1.5 |
 
+### R2-a findings（2026-09-24，對 `dcc8d2c`／`3d5daa1`／`c8a7dea`；verdict **GO**，全部 non-blocking）
+
+reviewer 在 `git archive c8a7dea` 的匯出樹上跑相關測試、17 個 mutation（全被抓到；另一個「延後 kill」mutant 存活→NB-6）、
+2 次合成探針（init 能力欄位＝§0.2）、Codex execpolicy 對照（新 rules `matchedRules: []`、`3d5daa1^` 的舊 rules `allow`）。
+處置在 Step 1.4 之後的獨立 commit（標題「Step 1.3（R2-a 處置）」）。
+
+| # | finding | 處置 |
+|---|---|---|
+| NB-1 | 段 1 只把 failed／timeout／error／violation 當失敗，`capability_violation`／`rate_limited` 漏算（段 1「失敗 0」、段 3「本輪失敗」同形矛盾） | 凡不是 ok／skipped／running 都算失敗；紀錄的 `capability_violation`、`llm_config_error` 印到段 1；測試 |
+| NB-2 | 續期失敗時執行紀錄的 `writer_lock` 沒更新 | 記 `renewal_failed_at`＋理由，段 1 印出；測試 |
+| NB-3 | 心跳或 Discord 發送失敗時 `routine_hint` 不說話 | 18／19 步不是 ok、或 publisher receipt 不是 `sent` → 開 session 第一句說出來 |
+| NB-4 | 1.2a 的 sandbox review 漏列 `pbs.twimg.com`（X 圖片快取）與本機 Neo4j bolt | OPERATIONS 1.2a 那一節補列 |
+| NB-5 | ⑥ 宣告 `network=False`，但 `--by-priority` 以 strict 讀 Google Sheet | 改 `network=True`（清單相等測試同步），註明 Sheet 讀不到時 triage 記 `batch_failed` |
+| NB-6 | 「init 不符先殺」的測試分不出先殺與讀完才殺 | FakePopen 計吐出行數，斷言只讀了 init 那一行 |
+| NB-7 | 讀到 `result` 就 break，之後的 hook 事件沒驗 | 不 break、讀完整個 stream；result 之後的 hook 事件同樣判不符、丟棄輸出；測試 |
+| NB-8 | ⑧ 保險檢查不是必要步驟（越過 deadline 會被跳過） | 兩道保險檢查都設 `essential`；測試 |
+| NB-9 | 指紋沒蓋 `.git/hooks`（被忽略、卻會被執行） | 加 `.git/hooks/*` 的合併 digest；fixture 測試 |
+| NB-10 | 實跑證據跑在未提交的工作樹；`dirty_paths` 截在 20 條卻印成總數；WIP 若留到 05:30 會被 daily 執行 | 加 `dirty_count`（心跳印總數）；1.4 已 commit、工作樹在每個 Step 收尾時乾淨 |
+| NB-11 | 沒有每次檢查 `llm.cwd` 上層有沒有 AGENTS.md／CLAUDE.md（`agents-md@builtin` 會載入） | ⑦a／⑩b 呼叫前檢查 cwd 與每一層上層，有就 fail closed、不呼叫模型；測試。`agents` 欄位與 `claude_code_version` 變更提示留 §15 #9、Step 1.8 |
+| NB-12 | `load_llm` 失敗變 `pre_loop_error`，連 harvest／備份都跳過 | 只停 LLM 步驟（`llm_config_error`），其他步驟照跑；心跳段 1 印出；測試 |
+
 ### 執行偏差紀錄（執行者填；每筆寫「plan 原文怎麼寫／實際怎麼做／為什麼」，並回頭修本 plan 對應段落）
 
 | # | Step | plan 原文 | 實際 | 為什麼 |

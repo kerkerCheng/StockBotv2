@@ -48,6 +48,15 @@ def daily_problem(*, now: datetime | None = None, config_path: Path = CONFIG,
     if record.get("status") == "running" and moment >= due:
         return (f"daily 執行紀錄停在 running（開始於 {record.get('started_at')}）——"
                 "daily 可能被中途殺掉，今天的心跳可能沒發")
+    # 心跳或發送沒成功＝Discord 沒收到（R2-a NB-3）：這種失敗在 Discord 上是沉默，只能在這裡說
+    steps = {str(s.get("key")): s for s in record.get("steps") or [] if isinstance(s, dict)}
+    for key, label in (("18_heartbeat", "心跳"), ("19_publish", "Discord 發送")):
+        step = steps.get(key)
+        if step is not None and step.get("status") != "ok":
+            return f"daily 的{label}沒有成功（{step.get('status')}：{step.get('error') or step.get('reason') or ''}）——今天可能沒收到訊息"
+    receipt = (steps.get("19_publish") or {}).get("receipt") or {}
+    if receipt and receipt.get("status") not in (None, "sent"):
+        return f"daily 的 Discord 發送回 {receipt.get('status')}（{receipt.get('error_code')}）——今天可能沒收到訊息"
     return None
 
 

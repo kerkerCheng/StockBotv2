@@ -297,7 +297,9 @@ def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
         return [f"⚠ {problem}"]
     steps = [row for row in record.get("steps") or [] if isinstance(row, Mapping)]
     ok = [r for r in steps if r.get("status") == "ok"]
-    bad = [r for r in steps if r.get("status") in ("failed", "timeout", "error", "violation")]
+    # 凡不是 ok／skipped 都算失敗（R2-a NB-1：capability_violation、rate_limited 原本漏算，段 1 印「失敗 0」、
+    # 段 3 卻印「本輪失敗」——兩段同形矛盾，L13）。`running` 是心跳正在跑的那一步，不算。
+    bad = [r for r in steps if r.get("status") not in ("ok", "skipped", "running", None)]
     skipped = [r for r in steps if r.get("status") == "skipped"]
     head = f"daily（run {str(record.get('run_id') or '?')[:8]}）：{len(ok)} 步完成"
     if bad:
@@ -314,14 +316,24 @@ def _daily_run_lines(*, now: datetime, record_path: Path | None) -> list[str]:
             reasons[key] = reasons.get(key, 0) + 1
         head += f"｜跳過 {len(skipped)}（" + "、".join(f"{k} {n}" for k, n in reasons.items()) + "）"
     lines = [head]
+    violation = record.get("capability_violation")
+    if isinstance(violation, Mapping):
+        lines.append(f"⚠ **LLM 能力檢查不符（{violation.get('step')}）**：{'；'.join(violation.get('violations') or [])}"
+                     "——輸出已丟棄、沒有寫入")
+    if record.get("llm_config_error"):
+        lines.append(f"⚠ LLM 設定讀不到或不合法：{record['llm_config_error']}——LLM 步驟全部跳過，其他步驟照跑")
     if record.get("pre_loop_error"):
         lines.append(f"⚠ **daily 進步驟迴圈前就失敗**：{record['pre_loop_error']}——今天只組了心跳")
     lock = record.get("writer_lock") or {}
     if isinstance(lock, Mapping) and lock.get("acquired") is False:
         lines.append(f"⚠ **沒拿到 writer lock**：{lock.get('reason')}——所有寫入步驟跳過")
+    elif isinstance(lock, Mapping) and lock.get("renewal_failed_at"):
+        lines.append(f"⚠ **writer lock 續期失敗（{lock.get('renewal_failed_at')}）**：{lock.get('reason')}"
+                     "——其後的寫入步驟跳過")
     dirty = [p for p in record.get("dirty_paths") or [] if p]
     if dirty:
-        lines.append(f"⚠ 開跑時工作區不乾淨（{len(dirty)} 個路徑）：" + "、".join(str(p) for p in dirty[:3]))
+        total = record.get("dirty_count") or len(dirty)
+        lines.append(f"⚠ 開跑時工作區不乾淨（{total} 個路徑）：" + "、".join(str(p) for p in dirty[:3]))
     check = record.get("schedule_check") or {}
     status = check.get("status") if isinstance(check, Mapping) else None
     expected = (check.get("expected") or {}) if isinstance(check, Mapping) else {}

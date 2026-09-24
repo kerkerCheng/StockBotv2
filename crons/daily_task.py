@@ -79,6 +79,22 @@ RUN_RECORD_SCHEMA = "daily-run-v1"
 #: 保險檢查比對的三個檔（N4；第 2 輪 X1）。`.claude/settings.local.json` 被 `.gitignore` 忽略，
 #: 寫進去的 hook 下次開 session 會執行——所以它不能只靠 `git status` 看。
 FINGERPRINT_FILES: tuple[str, ...] = (".env", ".git/config", ".claude/settings.local.json")
+#: `claude -p` 的內建 `agents-md` plugin 會沿 cwd 往上找的指令檔（R2-a NB-11）——cwd 與上層一律不得有。
+INSTRUCTION_FILES: tuple[str, ...] = ("AGENTS.md", "CLAUDE.md", "CLAUDE.local.md")
+
+
+def _dir_digest(path: Path) -> str | None:
+    """目錄下每個檔（名稱＋sha256）的合併 digest；目錄不存在回 None。`.git/hooks` 被 git 忽略、卻會被執行。"""
+    if not path.is_dir():
+        return None
+    digest = hashlib.sha256()
+    for child in sorted(p for p in path.rglob("*") if p.is_file()):
+        digest.update(child.relative_to(path).as_posix().encode("utf-8"))
+        try:
+            digest.update(hashlib.sha256(child.read_bytes()).digest())
+        except OSError as exc:
+            digest.update(f"unreadable:{type(exc).__name__}".encode("utf-8"))
+    return digest.hexdigest()
 GIT_SAFE = ("git", "-c", "core.fsmonitor=false")
 
 
@@ -120,14 +136,15 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               10, True, True),
     DailyStep("05_outcome", "追蹤表與問責（outcome）",
               ("scripts/outcome_if_settled_today.py",), 10, True, True),
+    # ⑥ 連網：`--by-priority` 以 strict 模式讀 Google Sheet 持股（R2-a NB-5）；Sheet 讀不到時它 exit 2、triage 記 batch_failed。
     DailyStep("06_triage_batch", "triage 批次（上限由 CLI 截斷）",
               ("-m", "engine_b.cli", "list", "--status", "pending", "--by-priority",
                "--triage-batch", "--json"),
-              3, False, False, kind="capture", capture="triage_batch_{date}.json"),
+              3, False, True, kind="capture", capture="triage_batch_{date}.json"),
     DailyStep("07a_triage_propose", "triage 提議（claude -p 零工具、只回 JSON）",
               (), 15, False, True, kind="llm", requires="06_triage_batch", llm_task="triage"),
     DailyStep("08_integrity_after_triage", "保險檢查（LLM 步驟前後指紋）",
-              (), 1, False, False, kind="integrity"),
+              (), 1, False, False, kind="integrity", essential=True),
     DailyStep("07b_triage_apply", "triage 套用（程式逐則驗證後寫入）",
               ("-m", "engine_b.cli", "triage-apply", "--file", "{triage_result}",
                "--batch", "{triage_batch}", "--run-id", "{run_id}"),
@@ -146,7 +163,7 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("10b_prescreen_propose", "語意預篩提議（claude -p 零工具、只回標旗 JSON）",
               (), 15, False, True, kind="llm", requires="10a_prescreen_prepare", llm_task="prescreen"),
     DailyStep("10b_integrity_after_prescreen", "保險檢查（LLM 步驟前後指紋）",
-              (), 1, False, False, kind="integrity"),
+              (), 1, False, False, kind="integrity", essential=True),
     DailyStep("10c_prescreen_apply", "語意預篩套用（程式驗引文逐字後只寫 semantic_flag）",
               ("-m", "engine_b.event_watch", "prescreen-apply", "--file", "{prescreen_result}",
                "--batch", "{prescreen_batch}", "--run-id", "{run_id}"),
@@ -369,8 +386,14 @@ class DailyRun:
         from engine_b import routine_config
 
         self.schedule = routine_config.load_schedule(self.config_path)
-        self.llm = routine_config.load_llm(self.config_path, repo_root=self.root)
-        self.record["llm_executor"] = self.llm["executor"]
+        try:
+            self.llm = routine_config.load_llm(self.config_path, repo_root=self.root)
+            self.record["llm_executor"] = self.llm["executor"]
+        except ValueError as exc:
+            # LLM 設定壞掉只停 LLM 步驟（R2-a NB-12）：harvest、ETL、備份跟它無關，不陪葬。
+            self.llm = None
+            self.record["llm_executor"] = None
+            self.record["llm_config_error"] = str(exc)
         started = datetime.fromisoformat(self.record["started_at"])
         limit = float(self.schedule["execution_time_limit_minutes"])
         self.deadline = started + timedelta(minutes=limit - essential_reserve_minutes(self.steps))
@@ -379,9 +402,12 @@ class DailyRun:
         head = self._git("rev-parse", "HEAD")
         porcelain = self._git("status", "--porcelain")
         self.record["head"] = head
-        self.record["dirty_paths"] = [] if not porcelain else porcelain.splitlines()[:20]
+        lines = [] if not porcelain else porcelain.splitlines()
+        self.record["dirty_paths"] = lines[:20]
+        self.record["dirty_count"] = len(lines)  # 列表只留前 20 條，總數照實記（INV-3：不得靜默截斷）
         if porcelain is None:
             self.record["dirty_paths"] = ["（git status 讀不到）"]
+            self.record["dirty_count"] = None
 
         self.record["schedule_check"] = self.compare_schedule()
 
@@ -437,6 +463,7 @@ class DailyRun:
                 files[rel] = None
             except OSError as exc:
                 files[rel] = f"unreadable:{type(exc).__name__}"
+        files[".git/hooks/*"] = _dir_digest(self.root / ".git" / "hooks")
         result: dict[str, Any] = {"files": files}
         if baseline is not None and baseline.get("files", {}).get(".git/config") != files[".git/config"]:
             result["git_skipped"] = ".git/config 變了——不再跑任何 git"
@@ -447,7 +474,7 @@ class DailyRun:
 
     @staticmethod
     def fingerprint_diff(before: Mapping[str, Any], after: Mapping[str, Any]) -> list[str]:
-        changed = [f"file:{rel}" for rel in FINGERPRINT_FILES
+        changed = [f"file:{rel}" for rel in (*FINGERPRINT_FILES, ".git/hooks/*")
                    if before.get("files", {}).get(rel) != after.get("files", {}).get(rel)]
         if after.get("git_skipped"):
             return changed or ["file:.git/config"]
@@ -464,7 +491,9 @@ class DailyRun:
         if not step.essential and self.deadline is not None and now >= self.deadline:
             return "deadline：已到全域 deadline，跳過非必要步驟"
         if step.kind in ("llm", "apply"):
-            executor = (self.llm or {}).get("executor")
+            if self.llm is None:
+                return f"llm_config_error：{self.record.get('llm_config_error')}"
+            executor = self.llm.get("executor")
             if executor == "none":
                 return "executor=none"
         if step.requires and self._status_of(step.requires) != "ok":
@@ -481,6 +510,8 @@ class DailyRun:
             except WriterLockHeld as exc:
                 self.lock_ok = False
                 self.lock_reason = f"續期失敗：鎖被 {exc.holder.get('owner')!r} 接手"
+                self.record["writer_lock"] = {"acquired": True, "renewal_failed_at": step.key,
+                                              "reason": self.lock_reason, "holder": exc.holder}
                 return f"writer_lock：{self.lock_reason}"
         return None
 
@@ -612,6 +643,10 @@ class DailyRun:
             return fail("failed", f"llm.cwd 建不起來：{exc}")
         if leftover:
             return fail("failed", f"llm.cwd 不是空目錄（{leftover[:3]}）——CLI 會把裡面的東西帶進 context")
+        instruction_files = [str(p / name) for p in (cwd, *cwd.parents) for name in INSTRUCTION_FILES
+                             if (p / name).is_file()]
+        if instruction_files:
+            return fail("failed", f"llm.cwd 或上層目錄有指令檔 {instruction_files[:3]}——`agents-md@builtin` 會載入它們（R2-a NB-11）")
         argv = llm_step.llm_argv(self.llm["claude_path_resolved"], str(self.llm["claude_model"]),
                                  llm_step.schema_text(spec["schema"]))
         env = llm_step.llm_env(self.parent_env)

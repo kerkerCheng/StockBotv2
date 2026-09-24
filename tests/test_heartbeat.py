@@ -558,3 +558,16 @@ def test_classification_line_reports_this_run_and_the_last_success(tmp_path: Pat
     assert "（2 天前）" in hb._classification_line(leads=requeued, now=now, record_path=_record(tmp_path))
     missing = hb._classification_line(leads={}, now=now, record_path=tmp_path / "nope.json")
     assert "今天沒有 daily 執行紀錄" in missing and "沒有任何 triage 紀錄" in missing
+
+
+def test_every_non_ok_step_counts_as_failed_and_capability_violations_are_printed(tmp_path: Path) -> None:
+    """R2-a NB-1：capability_violation／rate_limited 原本不算失敗，段 1 印「失敗 0」而段 3 印「本輪失敗」。"""
+    path = _record(tmp_path, steps=[{"key": "07a_triage_propose", "status": "capability_violation"},
+                                    {"key": "10b_prescreen_propose", "status": "rate_limited"}],
+                   capability_violation={"step": "07a_triage_propose", "violations": ["apiKeySource: 'X'"]},
+                   writer_lock={"acquired": True, "renewal_failed_at": "04_beta_snapshot", "reason": "續期失敗"},
+                   dirty_paths=[" M a"] * 20, dirty_count=24)
+    lines = hb._daily_run_lines(now=datetime.now(timezone.utc), record_path=path)
+    text = "\n".join(lines)
+    assert "失敗 2" in lines[0]
+    assert "能力檢查不符" in text and "續期失敗（04_beta_snapshot）" in text and "24 個路徑" in text

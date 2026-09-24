@@ -224,14 +224,14 @@ def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str,
                 if outcome.init is not None:
                     outcome.violations = [f"hook 事件 {outcome.hook_events} 筆（在 init 之後）"]
                     outcome.status = "capability_violation"
-                    outcome.killed_before_result = True
+                    outcome.killed_before_result = result is None
                     kill(proc)
                     break
             elif etype == "rate_limit_event":
                 outcome.rate_limit = _rate_limit(event.get("rate_limit_info") or {})
             elif etype == "result":
+                # 不 break：把剩下的 stream 讀完，result 之後的 hook 事件照樣算（R2-a NB-7：「整個 stream」）
                 result = event
-                break
         try:
             proc.wait(timeout=30)
         except Exception:  # noqa: BLE001
