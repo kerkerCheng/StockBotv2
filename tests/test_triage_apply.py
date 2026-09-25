@@ -153,6 +153,22 @@ def test_no_go_with_classification_is_rejected_like_the_cli(tmp_path, capsys) ->
     assert out["summary"]["rejected"] == 1 and store["leads"][ids[0]]["status"] == "pending"
 
 
+def test_legacy_ranking_is_rejected_and_counted_structure_change_passes(tmp_path, capsys) -> None:
+    """plan A4／R-2（2026-09-26）：triage 不再提供「誰是第一會變」——新分類寫 `ranking` 拒收並計入拒收數，
+    同一批其他項照寫；`structure_change` 是它的接替。schema 的 enum 也不含它（test_daily_task 守相等）。"""
+    from engine_b.cli import _cli_vocabulary
+
+    assert "ranking" not in _cli_vocabulary()["decision_impact"]
+    assert "structure_change" in _cli_vocabulary()["decision_impact"]
+    path, ids = _store(tmp_path, n=2)
+    items = [_go(ids[0], decision_impact="ranking"), _go(ids[1], decision_impact="structure_change")]
+    code, out, store = _apply(tmp_path, path, ids, items, capsys=capsys)
+    assert code == 0 and out["summary"]["rejected"] == 1 and out["summary"]["pass"] == 1
+    assert "ranking" in out["rejected"][0]["reason"]
+    assert store["leads"][ids[0]]["status"] == "pending"
+    assert store["leads"][ids[1]]["triage"]["classification"]["decision_impact"] == "structure_change"
+
+
 def test_capital_commitment_requires_payment_direction(tmp_path, capsys) -> None:
     path, ids = _store(tmp_path, n=2)
     items = [_go(ids[0], content_type="capital_commitment"),

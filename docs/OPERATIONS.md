@@ -1367,6 +1367,9 @@ weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同
   `python -c "import json;print(json.load(open('config/daily_routine.json'))['pq1']['drain_limit_per_run'])"`
   排序權重唯一 authority 是 `engine_b/priority.py`。tracked thesis impact 由非 retired
   lifecycle ＋ non-terminal Decision cohorts 自動導出。
+  ⚠ **2026-09-26（Phase 2 Step 2.8）**：字典序拿掉「瓶頸」鍵（drain 不再為排序讀 Neo4j），`lead_id` 之前加
+  lead 首見時間（舊的先；缺值排同級最後、不補假日期）；`decision_impact` 的 `ranking`（誰是第一會變）標 legacy、
+  與新值 `structure_change`（結構或讀圖會變）同級，triage 不再提供、`triage-apply` 拒收並計數。
   ✅ **2026-09-17（Phase 2 Step 2.2）已落地：`drain_limit_per_run` = 0**（研究只在互動 session 跑）。
   同一條查證命令印出 > 0 就是有人改回去了。⚠ **0 不是「無上限」**——它原本被驗證器拒絕正是因為那個誤讀，
   現在改由 `tests/test_engine_b_cli.py::test_drain_limit_zero_selects_nothing_of_every_kind` 證明

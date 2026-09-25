@@ -63,6 +63,7 @@ def _restore_active_history(store: dict, *, now: str) -> int:
             restored = priority.validate_classification(
                 record,
                 require_receipt=True,
+                allow_legacy=True,   # history 裡的舊 receipt，可能是 2026-09-26 前的 `ranking`
             )
             restored["restored_at"] = now
             restored["restored_by"] = "backfill_history_restore_v1"
@@ -108,7 +109,7 @@ def main() -> int:
             "decision_impact": "confidence_only",
             "classified_by": "backfill_deterministic_v1",
             "classified_at": now,
-            "reason": "個別 Form 4 不改變候選集合或排序；內部人交易應以彙總方式讀（Engine C 稀釋項）",
+            "reason": "個別 Form 4 不改變候選集合或讀圖判讀；內部人交易應以彙總方式讀（Engine C 稀釋項）",
         }
         changed += 1
 

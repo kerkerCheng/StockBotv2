@@ -110,7 +110,7 @@ insider／稀釋時變觀測」，那句「低優先」只能寫進自由文字 
 | 欄位 | 問題 | 值 |
 |---|---|---|
 | `content_type` | 這則材料是什麼 | `capital_commitment`／`structural_fact`／`financial_fact`／`insider_transaction`／`sentiment`／`no_content` |
-| `decision_impact` | **答案回來會改變什麼** | `exit_condition`／`candidate_set`／`ranking`／`confidence_only` |
+| `decision_impact` | **答案回來會改變什麼** | `exit_condition`／`candidate_set`／`structure_change`／`confidence_only` |
 | `payment_direction` | 僅 `capital_commitment` 必填 | `customer_to_supplier`／`supplier_to_customer`／`unclear` |
 
 再加 `classified_by`（`triage_semantic_v1`）、`classified_at`、`reason`。
@@ -136,8 +136,13 @@ FILTER 不寫 classification，仍使用 `--no-go --tier ... --reason ...`。PAS
 **`decision_impact` 是判斷核心，也最容易填錯。** 問法固定：*「如果查證結果是 A，什麼會變？
 是 B 呢？」*
 
-- 兩個答案都不改變候選集合與排序 → **`confidence_only`**。這是退化態：它的上限被鎖死在
-  「把已知第一名確認成第一名」。不是零價值，是最低價值。
+- 候選或圖上的公司會多一個或少一個 → **`candidate_set`**。
+- 某一層多一家或少一家、合格狀態變、客戶第一次具名、出現新的替代路線（讀圖的判讀——護城河還是量——可能翻）
+  → **`structure_change`**。
+- 兩個答案都不改變候選與讀圖的判讀 → **`confidence_only`**。這是退化態：判讀不會動，只是更確定。
+  不是零價值，是最低價值。
+- ⚠ **沒有「誰是第一會變」這一格**：跨檔排序已退役（2026-09-22 G1），舊字彙的 `ranking` 自 2026-09-26 起
+  不再提供，寫了會被拒收。
 - ⚠ **不要因為材料是一手、或關於我們持有的公司，就往上填。** 那正是舊加權總分的病
   （tier＋holdings＋thesis 三個弱理由相加壓過真正的資本承諾事件）。一手性與持股在排序裡
   另有位置，不需要你在這裡替它們加分。

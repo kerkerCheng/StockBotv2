@@ -109,7 +109,7 @@ def test_park_auto_stamps_the_receipt_instead_of_crashing_unattended_routines() 
                             title="$AAOI 某個轉述")
     L.triage(store, lead_id, go=True, tier=3, reason="t",
              classification={"content_type": "structural_fact",
-                             "decision_impact": "ranking"})
+                             "decision_impact": "structure_change"})
     L.advance(store, lead_id, "researching")
     L.advance(store, lead_id, "parked", ref={
         "trace_status": "isolated_tier_3",

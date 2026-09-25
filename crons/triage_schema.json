@@ -15,7 +15,7 @@
           "tier": {"type": "integer", "enum": [1, 2, 3, 4]},
           "reason": {"type": "string"},
           "content_type": {"type": ["string", "null"], "enum": ["capital_commitment", "structural_fact", "financial_fact", "insider_transaction", "sentiment", "no_content", null]},
-          "decision_impact": {"type": ["string", "null"], "enum": ["exit_condition", "candidate_set", "ranking", "confidence_only", null]},
+          "decision_impact": {"type": ["string", "null"], "enum": ["exit_condition", "candidate_set", "structure_change", "confidence_only", null]},
           "payment_direction": {"type": ["string", "null"], "enum": ["customer_to_supplier", "unclear", "supplier_to_customer", null]},
           "priority_flags": {
             "type": "object",

@@ -8,7 +8,7 @@ triage 判斷，這支 CLI 負責寫入狀態機（不讓 agent 手寫 JSON 冒�
     python -m engine_b.cli register --source theme_scan:<主題> --url <url> --title "..."
     python -m engine_b.cli list [--status pending]
     python -m engine_b.cli triage <lead_id> --go --tier 3 --reason "有新角度" \
-        --content-type structural_fact --decision-impact ranking
+        --content-type structural_fact --decision-impact structure_change
     python -m engine_b.cli advance <lead_id> researching
     python -m engine_b.cli annotate <lead_id> --ref outcome=audio_obtained
     python -m engine_b.cli counts
@@ -35,76 +35,9 @@ def _tracked(arg: str | None) -> frozenset[str]:
     return frozenset(t.strip().upper() for t in (arg or "").split(",") if t.strip())
 
 
-#: 「位於已知瓶頸上」的判準：圖字彙 `substitutability` 1–5（5＝完全不可替代），≥ 4 才算難替代。
-#: 2026-09-23 之前這個 4 住在 `query/bottleneck.py::MIN_SUBSTITUTABILITY`（排序門檻）；排序退役後
-#: 結構表不設門檻，pq1 的成員資格判準搬到這裡。
-_CHOKEPOINT_MIN_SUBSTITUTABILITY = 4
-
-
-def _chokepoint(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]]:
-    """位於已知瓶頸上的公司（ticker 與 company_id）。
-
-    2026-08-20 之前 pq1 排序完全不看瓶頸性——「AXT 供應 COHR 的 InP」與「財報季
-    總評」只由 tier 與 flags 區分，而系統整個定位就是找瓶頸。這裡把
-    `query/bottleneck.py` 的結構表接進 priority。
-
-    **只收 `demand_anchor` 非空、且 `substitutability` ≥ 4 的列**：依既有判準，連不到有人花錢
-    的地方的瓶頸沒有投資意義；sub < 4 或未填的邊是「普通供應關係」或「還沒研究」，不是已知瓶頸。
-    ⚠ 2026-09-23（Step 0b.3）：上游由 `rank_bottlenecks()`（已用門檻 4 濾過）改為 `structure_table()`
-    （不設門檻），所以門檻搬到這裡明寫——**集合與之前一字不差**，pq1 的優先序沒有變。
-    它是 pq1 注意力的成員資格，不是任何排序或首選（G1）。
-    與 `_held()` 同樣是唯讀輸入，取不到就回空集合讓排序退回原行為，不阻斷 drain。
-    """
-
-    try:
-        import os
-
-        from neo4j import GraphDatabase
-
-        from identity.registry import get_registry
-        from query import bottleneck
-
-        password = os.environ.get("NEO4J_PASSWORD")
-        if not password:
-            raise PriorityContextError("缺少 NEO4J_PASSWORD，無法載入 chokepoint context")
-        driver = GraphDatabase.driver(
-            os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-            auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
-        )
-        try:
-            with driver.session() as session:
-                rows = bottleneck.fetch_assertions(session)
-        finally:
-            driver.close()
-        result = bottleneck.structure_table(rows, get_registry())
-    except Exception as exc:
-        if strict:
-            if isinstance(exc, PriorityContextError):
-                raise
-            raise PriorityContextError("無法載入 Neo4j chokepoint context") from exc
-        return frozenset(), frozenset()
-
-    tickers: set[str] = set()
-    company_ids: set[str] = set()
-    for row in result.get("rows") or ():
-        if not row.get("demand_anchor"):
-            continue
-        sub = row.get("substitutability")
-        if sub is None or sub < _CHOKEPOINT_MIN_SUBSTITUTABILITY:
-            continue
-        company_id = row.get("company_id")
-        if company_id:
-            company_ids.add(str(company_id))
-        ticker = row.get("ticker")
-        if ticker:
-            ticker = str(ticker).upper()
-            tickers.add(ticker)
-            # registry 存 research ticker（SIVE.ST／6324.T），lead 的 cashtag 多是
-            # 無交易所後綴的形式（$SIVE）——兩者都收，交集比對才不會漏。
-            base = ticker.split(".", 1)[0]
-            if base:
-                tickers.add(base)
-    return frozenset(tickers), frozenset(company_ids)
+# ⚠ 2026-09-26（Phase 2 Step 2.8，plan A4）：取「瓶頸成員資格」的函式與它的 sub≥4 門檻常數刪除——
+# pq1 字典序的第五鍵「公司坐在 sub≥4 的難替代邊上就往前排」是跨檔排序退役（G1／G2）後殘留在研究注意力入口的
+# 最後一處（Phase 0 偏差 #33 延到本 Phase）。drain 從此不為排序讀 Neo4j；優先序＝使用者點名＋分類＋lead 時間。
 
 
 def _held(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]]:
@@ -167,7 +100,6 @@ def _cmd_list(args: argparse.Namespace) -> int:
     if args.by_priority:
         try:
             held_tickers, held_company_ids = _held(strict=is_default_store)
-            choke_tickers, choke_company_ids = _chokepoint(strict=is_default_store)
         except PriorityContextError as exc:
             print(f"錯誤：pq1 priority context 無法讀取：{exc}", file=sys.stderr)
             return 2
@@ -176,8 +108,6 @@ def _cmd_list(args: argparse.Namespace) -> int:
             tracked_tickers=_tracked(args.tracked),
             held_tickers=held_tickers,
             held_company_ids=held_company_ids,
-            chokepoint_tickers=choke_tickers,
-            chokepoint_company_ids=choke_company_ids,
         )
         rows = [lead for _rank, lead in ranked]
         scores = {lead["lead_id"]: rank.label for rank, lead in ranked}
@@ -383,7 +313,6 @@ def _cmd_drain(args: argparse.Namespace) -> int:
     ]
     try:
         held_tickers, held_company_ids = _held(strict=is_default_store)
-        choke_tickers, choke_company_ids = _chokepoint(strict=is_default_store)
     except PriorityContextError as exc:
         print(f"錯誤：pq1 priority context 無法讀取：{exc}", file=sys.stderr)
         return 2
@@ -392,8 +321,6 @@ def _cmd_drain(args: argparse.Namespace) -> int:
         tracked_tickers=tracked,
         held_tickers=held_tickers,
         held_company_ids=held_company_ids,
-        chokepoint_tickers=choke_tickers,
-        chokepoint_company_ids=choke_company_ids,
     )
     # ⚠ `limit=0` 就是零件（D12：daily 不做研究），不是無上限。
     lead_batch = ranked[:max(0, limit)]
@@ -587,11 +514,20 @@ def _cmd_triage_apply(args: argparse.Namespace) -> int:
 
 
 def _cli_vocabulary() -> dict[str, list[str]]:
-    """CLI `triage` 接受的分類字彙——`triage-apply` 與 `crons/triage_schema.json` 都對齊這一份（L16）。"""
+    """CLI `triage` 接受的分類字彙——`triage-apply` 與 `crons/triage_schema.json` 都對齊這一份（L16）。
+
+    ⚠ 2026-09-26（plan A4／R-2）：字彙裡標 `legacy` 的值（`ranking`）不提供——新分類不得再回答
+    「誰是第一會變」這個已退役的問題；`triage-apply` 對它拒收並計入拒收數（`_check_cli_vocabulary`）。
+    """
     vocab = priority.vocabulary()
+
+    def offered(axis: str) -> list[str]:
+        return [v for v in vocab[axis]["_order"]
+                if v != "unknown" and not (vocab[axis].get(v) or {}).get("legacy")]
+
     return {
-        "content_type": [v for v in vocab["content_type"]["_order"] if v != "unknown"],
-        "decision_impact": [v for v in vocab["decision_impact"]["_order"] if v != "unknown"],
+        "content_type": offered("content_type"),
+        "decision_impact": offered("decision_impact"),
         "payment_direction": list(vocab["payment_direction"]["_order"]),
     }
 

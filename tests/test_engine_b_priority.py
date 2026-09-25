@@ -165,7 +165,6 @@ def test_no_compensation_many_weak_signals_cannot_outrank_one_strong_one() -> No
         [many_weak, one_strong],
         tracked_tickers=frozenset({"MU"}),
         held_tickers=frozenset({"MU"}),
-        chokepoint_tickers=frozenset({"MU"}),
     )
     assert _order(ranked) == ["strong", "weak"]
 
@@ -222,18 +221,55 @@ def test_broad_macro_post_no_longer_outranks_focused_tier1_filing() -> None:
     assert _order(ranked) == ["filing", "macro"]
 
 
-def test_chokepoint_impact_lifts_supply_chain_leads_over_generic_commentary() -> None:
-    """位於已知瓶頸上的公司優先——系統整個定位就是找瓶頸（2026-08-20 加入）。
+def test_chokepoint_is_no_longer_an_input_and_lead_time_decides_within_a_tier() -> None:
+    """2026-09-26（Phase 2 Step 2.8，plan A4）：第五鍵「公司坐在 sub≥4 的難替代邊上就往前排」拿掉。
 
-    但它排在 `decision_impact`／`content_type` 之後：結構上重要不代表這一則有內容。
+    原本這一條斷言「瓶頸上的公司優先」（2026-08-20 加入）；它吃結構表的成員資格，是跨檔排序退役（G1／G2）後
+    殘留在研究注意力入口的最後一處。**斷言翻面，不是刪掉**——有人把它加回來會紅。
+    同級（其餘各鍵相同）改按 lead 的首見時間，舊的先。
     """
+    import inspect
 
-    choke = _lead("choke", tickers=["AXTI"])
-    generic = _lead("generic", tickers=["ZZZ"])
-    ranked = priority.rank_leads(
-        [generic, choke], chokepoint_tickers=frozenset({"AXTI"})
-    )
-    assert _order(ranked) == ["choke", "generic"]
+    assert "chokepoint_impact" not in inspect.signature(priority.rank_lead).parameters
+    assert "chokepoint_tickers" not in inspect.signature(priority.rank_leads).parameters
+    assert not hasattr(priority.LeadRank, "chokepoint")
+    new = dict(_lead("a_new", tickers=["AXTI"]), first_seen="2026-09-24T00:00:00+00:00")
+    old = dict(_lead("z_old", tickers=["ZZZ"]), first_seen="2026-07-23T00:00:00+00:00")
+    assert _order(priority.rank_leads([new, old])) == ["z_old", "a_new"]
+
+
+def test_lead_without_first_seen_sorts_last_within_its_tier_and_is_not_backfilled() -> None:
+    """INV-6：缺首見時間不補假日期——排在同級最後，名次上看得出來（`first_seen_missing`）。"""
+    dated = dict(_lead("z_dated"), first_seen="2026-09-24T00:00:00+00:00")
+    undated = _lead("a_undated")
+    ranked = priority.rank_leads([undated, dated])
+    assert _order(ranked) == ["z_dated", "a_undated"]
+    assert ranked[1][0].first_seen_missing == 1 and ranked[1][0].first_seen == ""
+
+
+def test_legacy_ranking_shares_a_rank_with_structure_change() -> None:
+    """plan A4／R-2：`ranking` 標 legacy、與 `structure_change` 同級——舊 lead 不因換字彙而升降。"""
+    old = priority.rank_lead(_lead("old", classification={"content_type": "structural_fact",
+                                                           "decision_impact": "ranking"}))
+    new = priority.rank_lead(_lead("new", classification={"content_type": "structural_fact",
+                                                           "decision_impact": "structure_change"}))
+    candidate = priority.rank_lead(_lead("c", classification={"content_type": "structural_fact",
+                                                               "decision_impact": "candidate_set"}))
+    only = priority.rank_lead(_lead("o", classification={"content_type": "structural_fact",
+                                                          "decision_impact": "confidence_only"}))
+    assert old.decision_impact == new.decision_impact
+    assert candidate.decision_impact < new.decision_impact < only.decision_impact
+
+
+def test_new_classification_rejects_legacy_ranking_but_old_receipts_still_validate() -> None:
+    receipt = {"content_type": "structural_fact", "decision_impact": "ranking",
+               "classified_by": "triage_semantic_v1", "classified_at": "2026-09-24", "reason": "舊的"}
+    with pytest.raises(priority.ClassificationValidationError, match="legacy"):
+        priority.validate_classification(receipt)
+    assert priority.validate_classification(receipt, require_receipt=True, allow_legacy=True)["decision_impact"] == "ranking"
+    vocab = priority.vocabulary()["decision_impact"]
+    assert vocab["ranking"]["legacy"] is True and vocab["ranking"]["rank_as"] == "structure_change"
+    assert "第一" not in vocab["confidence_only"]["hint"] and "第一" not in vocab["candidate_set"]["hint"]
 
 
 def test_held_outranks_merely_tracked() -> None:
@@ -293,9 +329,8 @@ def test_label_explains_why_it_ranked_there() -> None:
                 "decision_impact": "candidate_set",
             },
         ),
-        chokepoint_impact=True,
     )
     assert "候選集合" in rank.label
     assert "客戶端資本承諾" in rank.label
-    assert "瓶頸" in rank.label
+    assert "瓶頸" not in rank.label   # 2026-09-26：瓶頸那一鍵拿掉了，標籤不得還說它
     assert not hasattr(rank, "score")

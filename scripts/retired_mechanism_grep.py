@@ -57,7 +57,6 @@ KEEP: dict[tuple[str,str],str] = {
     ("briefing/alpha_view/contracts.py","A"): "retirement_note: StructuralThesisSection.ranking 退役註記",
     ("briefing/alpha_view/sources.py","A"): "retirement_note: _ranking_position／tickers_from_ranking 退役註記",
     ("crons/heartbeat.py","A"): "retirement_note: 段 4 需求錨集中度改讀 structure_table 的註記（原讀可行動排序列）",
-    ("engine_b/cli.py","A"): "retirement_note: _chokepoint 註記寫明前身 rank_bottlenecks，且明寫「不是任何排序或首選」",
     ("scripts/capture_golden_fixtures.py","A"): "retirement_note: cap_structural_bottleneck 註記寫明原本擷取可行動排序前三名",
     ("webapp/materialize.py","A"): "retirement_note: structure_table 區塊註記寫明原 ranking kind 的首選／兩份序；THIS_IS_NOT 第一句是禁止句",
     ("webapp/contracts.py","A"): "retirement_note: STATE_SCHEMA_VERSIONS 註記 ranking → structure_table",

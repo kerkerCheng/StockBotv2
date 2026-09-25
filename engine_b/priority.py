@@ -82,8 +82,13 @@ def vocabulary() -> dict[str, Any]:
 def _rank_of(axis: str, value: Any, *, fallback: str = "unknown") -> int:
     """字彙值 → 名次（0 最優先）。未登記的值排在最後，不猜、不報錯。"""
 
-    order = list(vocabulary()[axis]["_order"])
+    axis_vocab = vocabulary()[axis]
+    order = list(axis_vocab["_order"])
     name = str(value) if value is not None else fallback
+    # legacy 值以 `rank_as` 映到同一個名次（2026-09-26：`ranking` 與 `structure_change` 同級，plan A4）。
+    entry = axis_vocab.get(name)
+    if isinstance(entry, Mapping) and entry.get("rank_as") in order:
+        name = str(entry["rank_as"])
     if name in order:
         return order.index(name)
     if fallback in order:
@@ -96,12 +101,16 @@ def validate_classification(
     *,
     allow_unknown: bool = False,
     require_receipt: bool = False,
+    allow_legacy: bool = False,
 ) -> dict[str, Any]:
     """驗證並複製一筆結構化 pq1 分類。
 
     排序器仍能讀歷史 ``unknown``，但任何新 triage／backfill 都應以
     ``allow_unknown=False`` 寫入完整字彙。``require_receipt`` 用於檢查已落盤
     authority，確保語意結論不只剩兩個排序欄位而沒有時間、來源與理由。
+    ``allow_legacy``：字彙裡標 ``legacy`` 的值（2026-09-26 起的 ``ranking``）只准出現在**舊紀錄**——
+    讀舊 receipt（健康審查、追源排回保留、history 還原）時明示 ``True``；新寫入一律拒收（plan A4／R-2）。
+    預設是嚴格的：忘了給的新寫入端會被擋下，而不是安靜放行一個已退役的問題。
     """
 
     if not isinstance(raw, Mapping):
@@ -119,6 +128,11 @@ def validate_classification(
         if value == "unknown" and not allow_unknown:
             raise ClassificationValidationError(
                 f"新 classification 不得寫入 {axis}=unknown"
+            )
+        entry = vocab[axis].get(value)
+        if isinstance(entry, Mapping) and entry.get("legacy") and not allow_legacy:
+            raise ClassificationValidationError(
+                f"{axis}={value!r} 已退役（legacy），新 classification 不得寫入"
             )
         record[axis] = value
 
@@ -208,24 +222,30 @@ class LeadRank:
     decision_impact: int
     content_type: int
     payment_direction: int
-    chokepoint: int
     relevance: int
     tier: int
     independent_source: int
     novelty: int
+    #: 0＝有首見時間、1＝沒有（排在同級最後、由呼叫端計數；**不補假日期**，INV-6）。
+    first_seen_missing: int
+    #: lead 的首見時間（ISO 字串，舊的先）。2026-09-26 加（plan A4：優先序＝lead 時間＋使用者點名）。
+    first_seen: str
     lead_id: str
 
+    # ⚠ 2026-09-26（Phase 2 Step 2.8，plan A4）：第五鍵 `chokepoint`（公司坐在 sub≥4 的難替代邊上就往前排）拿掉——
+    # 它吃結構表的成員資格，是跨檔排序退役（G1／G2）後殘留在研究注意力入口的最後一處；drain 從此不為排序讀 Neo4j。
     def sort_key(self) -> tuple:
         return (
             self.user_authority,
             self.decision_impact,
             self.content_type,
             self.payment_direction,
-            self.chokepoint,
             self.relevance,
             self.tier,
             self.independent_source,
             self.novelty,
+            self.first_seen_missing,
+            self.first_seen,
             self.lead_id,
         )
 
@@ -247,8 +267,6 @@ class LeadRank:
         ]
         if self.user_authority == 0:
             parts.insert(0, "使用者指定")
-        if self.chokepoint == 0:
-            parts.append("瓶頸")
         return "·".join(parts)
 
 
@@ -257,12 +275,11 @@ def rank_lead(
     *,
     thesis_impact: bool = False,
     holdings_impact: bool = False,
-    chokepoint_impact: bool = False,
 ) -> LeadRank:
     """單則 lead 的字典序名次。
 
-    `thesis_impact`／`holdings_impact`／`chokepoint_impact` 由呼叫端注入而非在此
-    查圖或查持股，讓本模組不依賴 Neo4j／Engine C／Engine D。
+    `thesis_impact`／`holdings_impact` 由呼叫端注入而非在此查持股，讓本模組不依賴
+    Engine C／Engine D。
     """
 
     triage = lead.get("triage") or {}
@@ -301,11 +318,12 @@ def rank_lead(
         payment_direction=_rank_of(
             "payment_direction", tags.get("payment_direction"), fallback="unclear"
         ),
-        chokepoint=0 if chokepoint_impact else 1,
         relevance=relevance,
         tier=tier,
         independent_source=0 if flags.get("independent_source") else 1,
         novelty=0 if flags.get("novelty") else 1,
+        first_seen_missing=0 if str(lead.get("first_seen") or "").strip() else 1,
+        first_seen=str(lead.get("first_seen") or ""),
         lead_id=str(lead.get("lead_id") or ""),
     )
 
@@ -316,8 +334,6 @@ def rank_leads(
     tracked_tickers: frozenset[str] = frozenset(),
     held_tickers: frozenset[str] = frozenset(),
     held_company_ids: frozenset[str] = frozenset(),
-    chokepoint_tickers: frozenset[str] = frozenset(),
-    chokepoint_company_ids: frozenset[str] = frozenset(),
 ) -> list[tuple[LeadRank, dict[str, Any]]]:
     """回 [(LeadRank, lead)]，字典序由優先到不優先。
 
@@ -325,8 +341,7 @@ def rank_leads(
 
     `tracked_tickers`（有在追）與 `held_tickers`／`held_company_ids`（真的有部位）
     分開注入：兩者語意不同，先前只有前者，導致實際持股在排序上零加權。
-    `chokepoint_tickers`／`chokepoint_company_ids` 由 caller 從
-    `query/bottleneck.py` 的排序結果導出；本模組不查圖。
+    ⚠ 2026-09-26：`chokepoint_tickers`／`chokepoint_company_ids` 兩個注入參數隨第五鍵一起拿掉（plan A4）。
     """
 
     ranked: list[tuple[LeadRank, dict[str, Any]]] = []
@@ -340,8 +355,6 @@ def rank_leads(
                     thesis_impact=bool(tickers & tracked_tickers),
                     holdings_impact=bool(tickers & held_tickers)
                     or bool(company_ids & held_company_ids),
-                    chokepoint_impact=bool(tickers & chokepoint_tickers)
-                    or bool(company_ids & chokepoint_company_ids),
                 ),
                 dict(lead),
             )

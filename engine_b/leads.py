@@ -938,6 +938,7 @@ def requeue_trace(
         lead["triage"]["classification"] = priority.validate_classification(
             preserved_classification,
             require_receipt=True,
+            allow_legacy=True,   # 保留的是舊 receipt，可能是 2026-09-26 前的 `ranking`
         )
     lead.setdefault("refs", {}).update({
         "trace_requeued_at": stamp,
@@ -1400,7 +1401,8 @@ def classification_gaps(store: dict[str, Any]) -> list[dict[str, Any]]:
         issue = "missing"
         if record:
             try:
-                priority.validate_classification(record, require_receipt=True)
+                # 健康審查讀的是已落盤的舊 receipt：legacy 值（`ranking`）照常認得，不是缺口。
+                priority.validate_classification(record, require_receipt=True, allow_legacy=True)
             except priority.ClassificationValidationError as exc:
                 issue = str(exc)
             else:

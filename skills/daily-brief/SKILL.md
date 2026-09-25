@@ -127,8 +127,8 @@ beta 的 20% 集中度門檻對單筆上限 5% 的 alpha 結構上恆不觸發�
 & '.venv\Scripts\python.exe' -m engine_b.cli list --status pending --by-priority --tracked <已追蹤ticker>
 ```
 
-default store 的 Google Sheet 持股或 Neo4j chokepoint context 任一不可讀時，priority list 必須 exit 2、
-fail closed；不得把持股靜默降成空集合後仍宣稱已依完整 priority 排序。
+default store 的 Google Sheet 持股不可讀時，priority list 必須 exit 2、
+fail closed（2026-09-26 起排序不再讀 Neo4j：瓶頸那一鍵隨跨檔排序退役）；不得把持股靜默降成空集合後仍宣稱已依完整 priority 排序。
 
 對每條**新** pending lead 套 `skills/signal-triage/SKILL.md` 五要素判準。判斷完用本機 CLI 寫回，
 並帶上 priority flags（供 pq1 排序）；PASS 必須傳
@@ -167,8 +167,8 @@ decision gap 研究）不在 daily 自動做**——LLM 無人值守寫判斷檔
 & '.venv\Scripts\python.exe' -m engine_b.cli drain
 ```
 
-default store 的 Decision work orders、Google Sheet 持股或
-Neo4j chokepoint context 任一不可讀時 exit 2，心跳仍輸出，但本輪不得用降級排序選 pq1。
+default store 的 Decision work orders 或 Google Sheet 持股
+任一不可讀時 exit 2，心跳仍輸出，但本輪不得用降級排序選 pq1。
 
 列出接下來可研究的 bounded jobs。**使用者已明確 go 的 Decision gap work order 優先**，再以剩餘
 budget 取 leads（依 priority；pop triaged_go＋researching）。每輪 limit 由

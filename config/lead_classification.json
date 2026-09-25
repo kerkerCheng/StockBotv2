@@ -14,19 +14,25 @@
   ],
 
   "decision_impact": {
-    "_doc": "答案回來時會改變什麼。這是排序的第一鍵，因為它就是最佳化目標本身。",
-    "_order": ["exit_condition", "candidate_set", "ranking", "unknown", "confidence_only"],
+    "_doc": "答案回來時會改變什麼。這是排序的第一鍵，因為它就是最佳化目標本身。2026-09-26（Phase 2 Step 2.8，plan R-2）：`ranking`（誰是第一會變）隨跨檔排序退役（G1）改為 legacy——舊 lead 保留這個值、排序與 `structure_change` 同級；新分類（triage／backfill）不再提供它。",
+    "_order": ["exit_condition", "candidate_set", "structure_change", "ranking", "unknown", "confidence_only"],
     "exit_condition": {
       "label": "出場條件",
       "hint": "可能觸發既有 thesis 的 disproof。沿用舊 contradiction 權重最高的理由：可能推翻 thesis 的事最急，且它保護的是已投入的資本。"
     },
     "candidate_set": {
       "label": "候選集合",
-      "hint": "清單上會多一個或少一個名字。長期價值最高——不出手就沒有 outcome。"
+      "hint": "候選或圖上的公司會多一個或少一個。長期價值最高——不出手就沒有 outcome。"
+    },
+    "structure_change": {
+      "label": "結構或讀圖會變",
+      "hint": "某一層多一家或少一家、合格狀態變、客戶第一次具名、出現新的替代路線——讀圖的判讀（護城河還是量）可能翻。例：查出客戶對某供應商有預付款。"
     },
     "ranking": {
-      "label": "排序",
-      "hint": "候選不變，但誰是第一會變。例：查出客戶對某供應商有預付款。"
+      "label": "排序（legacy）",
+      "legacy": true,
+      "rank_as": "structure_change",
+      "hint": "已退役（2026-09-26）：原問「候選不變，但誰是第一會變」——跨檔排序已於 Phase 0 退役（G1）。舊 lead 保留此值，排序與 structure_change 同級；新分類不得寫入。"
     },
     "unknown": {
       "label": "未分類",
@@ -34,7 +40,7 @@
     },
     "confidence_only": {
       "label": "只是信心",
-      "hint": "排序不會動，只是更確定。退化態：它的上限被鎖死在『把已知第一名確認成第一名』。不是零價值，是最低價值。"
+      "hint": "判讀不會動，只是更確定。退化態：不是零價值，是最低價值。"
     }
   },
 

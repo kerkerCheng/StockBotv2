@@ -9,11 +9,11 @@ from engine_b import cli, leads
 
 PASS_CLASSIFICATION_ARGS = [
     "--content-type", "structural_fact",
-    "--decision-impact", "ranking",
+    "--decision-impact", "structure_change",
 ]
 PASS_CLASSIFICATION = {
     "content_type": "structural_fact",
-    "decision_impact": "ranking",
+    "decision_impact": "structure_change",
 }
 
 
@@ -58,7 +58,7 @@ def test_triage_then_advance_round_trip(tmp_path, capsys) -> None:
     assert store["leads"][lead_id]["triage"]["decision"] == "go"
     classification = store["leads"][lead_id]["triage"]["classification"]
     assert classification["content_type"] == "structural_fact"
-    assert classification["decision_impact"] == "ranking"
+    assert classification["decision_impact"] == "structure_change"
     assert classification["classified_by"] == "triage_semantic_v1"
     assert classification["reason"] == "有新角度"
 
