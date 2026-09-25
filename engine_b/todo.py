@@ -37,7 +37,7 @@ DEFAULT_POOL_PATH = _ROOT / "library" / "leads" / "todo_pool.json"
 # 停的是**鑄號**：`SOURCE_COLLECTORS` 不再登記 decisions collector，所以不會再有新項目進來。
 ITEM_TYPES: dict[str, str] = {
     "lead_research": "（legacy）已移回自動 pq1，不再建立新項目",
-    "ra_admission": "核准入圖（apply_research_action）",
+    "ra_admission": "核准入圖（Research Action apply）",
     "decision_review": "（legacy）機制退役（Phase 0／G12），不再建立新項目",
     "source_trace_review": "核准人工 authority 後做 bounded 追源；go 只 dispatch 回 pq1",
     "thesis_lifecycle": "本機複查 thesis 並手動更新 lifecycle.json",
@@ -61,7 +61,7 @@ ITEM_TYPES: dict[str, str] = {
 # 新增一個類型時會被強迫決定它的授權邊界，而不是預設繼承某個較寬的。
 GO_AUTHORIZATION: dict[str, tuple[str, str]] = {
     "lead_research": ("（legacy）不再建立新項目", "任何 authority mutation"),
-    "ra_admission": ("exact graph admission（apply_research_action）", "thesis mutation 與 live"),
+    "ra_admission": ("exact graph admission（Research Action apply）", "thesis mutation 與 live"),
     "decision_review": ("（legacy）不再建立新項目", "任何 authority mutation"),
     "source_trace_review": ("bounded 追源（dispatch 回 pq1）", "提高 evidence tier 與入圖"),
     "thesis_lifecycle": ("本機複查該 thesis；go／drop 後它名下列出的反證續盯到下一個核查點、判定觸及的標已處置並續盯（A7）",
@@ -793,7 +793,7 @@ def checkpoint_source_trace_review(
         source_doc = str(refs.get("source_doc") or "")
         # 兩條入圖路徑，各自要求自己的完整 receipt——不是二選一放寬，是分開後兩邊都更嚴。
         #
-        # (a) Research Action：MCP prepare→apply 流程，receipt 是 ra_ id。
+        # (a) Research Action：prepare→apply 流程（intake.application），receipt 是 ra_ id。
         # (b) loader.load_to_neo4j：repo 內既有的正規入圖路徑，但**不產生 RA id**，
         #     於是 2026-08-15 的 COHR／MTSI 兩筆逐字稿入圖後結不了案——圖裡資料是
         #     真的、lead 已 applied、commit 也在，卻被擋在 receipt 格式上。那是
@@ -921,7 +921,7 @@ def _lead_context_for_action(
     matches = [lead for _lead_id, lead in pairs]
     if not matches:
         # 從 decision gap work order 產出的 RA 沒有來源 lead——它的 focus 由 RA
-        # 自己聲明（見 mcp_server/research_actions 的 focus_company_id）。lead
+        # 自己聲明（見 intake.actions 的 focus_company_id）。lead
         # receipt 對這類 RA 不存在，不能當成缺漏；action digest 已在呼叫端驗過。
         declared = _declared_focus_for_action(action_id)
         if declared:

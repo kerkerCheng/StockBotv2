@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from mcp_server import graph_mcp
+from intake import application
 from intake import provenance as intake
 from intake import actions as research_actions
 
@@ -436,19 +436,19 @@ def test_prepare_validates_every_document_without_graph_or_publication(
     tmp_path: Path, monkeypatch
 ) -> None:
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "_driver",
         lambda: (_ for _ in ()).throw(AssertionError("graph must not be opened")),
     )
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "publish_provenance",
         lambda *_args, **_kwargs: (_ for _ in ()).throw(
             AssertionError("prepare must not publish provenance")
         ),
     )
 
-    prepared = graph_mcp._prepare_research_action_impl(
+    prepared = application._prepare_research_action_impl(
         _request_for_docs("first_doc", "second_doc"), root=tmp_path
     )
 
@@ -467,7 +467,7 @@ def test_prepare_rejects_whole_action_when_later_document_is_invalid(
     broken["source_doc"]["doc_id"] = "../escape"
     request["documents"][1]["extraction_json"] = json.dumps(broken)
 
-    result = graph_mcp._prepare_research_action_impl(
+    result = application._prepare_research_action_impl(
         json.dumps(request), root=tmp_path
     )
 
@@ -479,19 +479,19 @@ def test_prepare_rejects_whole_action_when_later_document_is_invalid(
 def test_apply_partial_retry_skips_completed_document_and_compacts_payload(
     tmp_path: Path,
 ) -> None:
-    prepared = graph_mcp._prepare_research_action_impl(
+    prepared = application._prepare_research_action_impl(
         _request_for_docs("first_doc", "second_doc"), root=tmp_path
     )
     calls: list[str] = []
     loader = _durable_fake_loader(calls, fail_once={"second_doc"})
 
-    partial = graph_mcp._apply_research_action_impl(
+    partial = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
         load_document=loader,
     )
-    applied = graph_mcp._apply_research_action_impl(
+    applied = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
@@ -518,22 +518,22 @@ def test_apply_partial_retry_skips_completed_document_and_compacts_payload(
 def test_apply_digest_mismatch_and_replay_do_not_reload(
     tmp_path: Path,
 ) -> None:
-    prepared = graph_mcp._prepare_research_action_impl(
+    prepared = application._prepare_research_action_impl(
         _request_for_docs("single_doc"), root=tmp_path
     )
     calls: list[str] = []
     loader = _durable_fake_loader(calls)
 
-    mismatch = graph_mcp._apply_research_action_impl(
+    mismatch = application._apply_research_action_impl(
         prepared["action_id"], "0" * 64, root=tmp_path, load_document=loader
     )
-    applied = graph_mcp._apply_research_action_impl(
+    applied = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
         load_document=loader,
     )
-    replay = graph_mcp._apply_research_action_impl(
+    replay = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
@@ -552,7 +552,7 @@ def test_apply_digest_mismatch_and_replay_do_not_reload(
 def test_report_failure_retry_only_publishes_missing_report(
     tmp_path: Path, monkeypatch
 ) -> None:
-    prepared = graph_mcp._prepare_research_action_impl(
+    prepared = application._prepare_research_action_impl(
         _request_for_docs("report_doc"), root=tmp_path
     )
     calls: list[str] = []
@@ -568,13 +568,13 @@ def test_report_failure_retry_only_publishes_missing_report(
         return real_publish(record, root=root)
 
     monkeypatch.setattr(research_actions, "publish_action_reports", fail_once)
-    partial = graph_mcp._apply_research_action_impl(
+    partial = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
         load_document=loader,
     )
-    applied = graph_mcp._apply_research_action_impl(
+    applied = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
@@ -591,7 +591,7 @@ def test_report_failure_retry_only_publishes_missing_report(
 def test_unexpected_apply_exception_returns_redacted_recovery_envelope(
     tmp_path: Path, monkeypatch
 ) -> None:
-    prepared = graph_mcp._prepare_research_action_impl(
+    prepared = application._prepare_research_action_impl(
         _request_for_docs("unexpected_doc"), root=tmp_path
     )
     loader = _durable_fake_loader([])
@@ -600,7 +600,7 @@ def test_unexpected_apply_exception_returns_redacted_recovery_envelope(
         raise AssertionError("SENSITIVE_CLIENT_PROSE")
 
     monkeypatch.setattr(research_actions, "publish_action_reports", explode)
-    result = graph_mcp._apply_research_action_impl(
+    result = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,
@@ -616,7 +616,7 @@ def test_unexpected_apply_exception_returns_redacted_recovery_envelope(
 
 
 def test_tampered_prepared_payload_fails_before_loader(tmp_path: Path) -> None:
-    prepared = graph_mcp._prepare_research_action_impl(
+    prepared = application._prepare_research_action_impl(
         _request_for_docs("tamper_doc"), root=tmp_path
     )
     path = (
@@ -630,7 +630,7 @@ def test_tampered_prepared_payload_fails_before_loader(tmp_path: Path) -> None:
     record["payload"]["report"]["findings"] = "silently changed"
     path.write_text(json.dumps(record), encoding="utf-8")
 
-    result = graph_mcp._apply_research_action_impl(
+    result = application._apply_research_action_impl(
         prepared["action_id"],
         prepared["action_digest"],
         root=tmp_path,

@@ -18,8 +18,8 @@ if load_dotenv is not None:
     load_dotenv(ROOT / ".env")
 
 
-# This constant is the shared query for local CLI and remote MCP run_read_query.
-# Keep normalization in Cypher so cloud callers do not need a second copy.
+# This constant is the single query for the local CLI (the remote read tool that
+# also ran it retired 2026-09-25). Keep normalization in Cypher so every caller shares one copy.
 SINGLE_ORIGIN_CYPHER = """
 CALL () {
   MATCH (claim:Claim)

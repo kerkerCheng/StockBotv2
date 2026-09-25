@@ -31,5 +31,8 @@ google-api-python-client
 # service account 已實測無 storage quota，個人帳號只能走這條。
 google-auth-oauthlib
 
-# Graph MCP server. Stable v1 only; v2 is a deliberate breaking migration.
-mcp>=1.28,<2
+# 本機 APP（webapp/）：Starlette ＋ uvicorn；httpx 供 starlette.testclient。
+# 原本隨遠端 graph server 的套件間接安裝，2026-09-25 該 server 退役後改為直接宣告。
+starlette>=1.3,<2
+uvicorn>=0.51
+httpx>=0.28

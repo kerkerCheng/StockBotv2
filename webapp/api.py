@@ -2,7 +2,8 @@
 
 ## 為什麼是 Starlette
 
-repo 已經有 `starlette` 與 `uvicorn`（`mcp>=1.28` 的相依），所以這一層**沒有新增任何套件**。
+`starlette` 與 `uvicorn` 當時已隨既有套件間接安裝，所以這一層**沒有新增任何套件**
+（2026-09-25 間接來源退役後，兩者改在 `requirements.txt` 直接宣告）。
 不引 FastAPI／Flask／React 的理由是同一條：APP 要做的事是「讀一份已經算好的 JSON 並排版」，
 不需要 ORM、不需要 pydantic 驗證層（artifact 的驗證住 `contracts.validate_artifact`）、
 也不需要前端建置工具鏈——那些只會多一套要維護的平行架構。

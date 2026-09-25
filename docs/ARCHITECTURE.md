@@ -64,8 +64,9 @@ trade_log（library/trades/）— 成交收據；risk/hard_caps.py — 寫入前
 `briefing/` 是 daily brief 與 **Alpha Investment Read Model**（§6.1）的組裝層，同樣看得到
 所有層；Engine D 的 domain 模組不得 import 它（`FORBIDDEN_FOR_ENGINE_D`）。
 
-**MCP／remote access 是 Legacy Peripheral，不是核心。** 新核心必須能在完全沒有 MCP
-的情況下運作；`Core → mcp_server` 的 import 已於 Phase 3 歸零。
+**沒有對外的寫入入口。** 手機以 Claude Code Remote Control 連本機 session，走的是同一套本機工具與人工 gate；
+遠端 graph server 已於 2026-09-25（Phase 2 Step 2.1）退役刪除（核心對它的 import 早在 Phase 3 歸零）。
+舊架構逐字封存於 `docs/archive/2026-09-25-remote-access-architecture.md`。
 
 ---
 
@@ -109,8 +110,8 @@ canonical edge **沒有時間欄位**——唯一時間線索是 `CITES → Sour
 ```
 文件 → library/raw/ → extract.py → loader/validate.py → loader/load_to_neo4j.py → Neo4j
 fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
-線索 → source-trace → prepare_research_action（server-owned review packet）
-     → 使用者明確核准 ID → apply_research_action（filesystem-first + resumable graph write）
+線索 → source-trace → scripts/prepare_research_action.py（review packet，進 pq2 ra_admission）
+     → 使用者明確核准 ID → intake.application 的 apply（filesystem-first + resumable graph write）
      → 本機 session 執行 scripts/commit_pending_intake.py
 ```
 
@@ -127,13 +128,11 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
   `docs/archive/2026-09-24-weekly-scan-prompt-v1.2.md`。
 - **本機音訊追源：** `scripts/transcribe_audio.py`（`faster-whisper`），模型與逐字稿
   只存 ignored `library/private/`。ASR 只提供 timestamp locator。
-- **遠端存取：** 本機 MCP server ＋ Cloudflare Tunnel ＋ connector，十一工具 surface（`get_decision_brief` 於 2026-09-23（Phase 0 Step 0b.4） 退役）。
-  完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
+- **遠端存取：** 手機以 Claude Code Remote Control 連本機 session；沒有對外的寫入入口（2026-09-25 移除遠端 graph server）。
+  Cloudflare Tunnel 只剩 APP 一條（`deploy/cloudflare/README.md`）。
 - **各類來源的抽取 instruction：** [`extraction-instructions.md`](extraction-instructions.md)。
 
-> ⚠ 這張圖裡的 `prepare_research_action`／`apply_research_action` 是 **MCP 的動詞**。
-> 它們之所以出現在架構圖裡是歷史因素（Research Action 的 domain 曾被關在
-> `mcp_server/` 裡），Phase 3 已把 domain 抽到 `intake/`。
+> Research Action 的 domain（prepare／apply／publish）住 `intake/`；本機協定見 `prompts/intake_protocol.md`。
 
 ### 4.1 Daily 三層與心跳規格（2026-09-16 使用者定案 D12；ROADMAP Phase 2 交付前這裡是規格，不是現況）
 
@@ -622,7 +621,7 @@ renderer 都還在那個 details 裡。
 （2026-09-23 前）`implied_return.epistemics.one_sentence`（authority 自組）並註明出處——估值鏈退役後頭條只剩現價；
 缺席語意的中文說明來自 `/api/v1/meta` 的字彙表，前端不維護第二份對照表。
 
-**技術棧沿用既有的**：`starlette` ＋ `uvicorn` 已隨 `mcp>=1.28` 安裝，**本次沒有新增任何套件**，
+**技術棧沿用既有的**：`starlette` ＋ `uvicorn` 當時已隨既有套件間接安裝（2026-09-25 起在 `requirements.txt` 直接宣告），**本次沒有新增任何套件**，
 也沒有前端建置工具鏈。部署重用既有 Cloudflare Tunnel（見 `deploy/cloudflare/README.md`）。
 
 **刻意不做：** runtime chatbot／LLM、broker、買賣、部位尺寸、Portfolio 排序、跨標的排序（2026-09-23 起 `/structure-table` 只照抄 `structure_table()`，不排序）、

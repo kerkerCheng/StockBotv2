@@ -2,7 +2,9 @@
 
 > **狀態（2026-09-07 實測）：已上線並可從外部使用。**
 > Access 應用程式、DNS、ingress 三步都已完成；未登入時 `https://stockbot.minatoyukina.uk`
-> 回 **302 導向 Access 登入頁**，登入後可看到判讀清單。既有 `mcp.` 與 `neo4j.` 未受影響。
+> 回 **302 導向 Access 登入頁**，登入後可看到判讀清單。
+> **2026-09-24 起 tunnel 只剩 APP 這一條**（`neo4j.` 與遠端 graph server 的 hostname 由使用者移除；
+> 2026-09-25 Phase 2 Step 2.1 連同程式一起退役）——沒有對外的寫入入口。
 > **Google 登入也已生效**——Access event analytics 顯示 `Identity provider = google`。
 > ⚠ **不是照下方步驟 0 手動設的**：新版 Cloudflare One 在建立 Access 應用程式的流程中
 > 已自動把 Google 加成 identity provider。**步驟 0 仍然保留**，但它現在的用途是
@@ -18,7 +20,7 @@
 iPhone Safari／桌機瀏覽器
     → https://stockbot.minatoyukina.uk
     → Cloudflare Access（外部認證邊界）
-    → 既有的 Cloudflare Tunnel（d3074ec2-…，與 MCP 同一條）
+    → 既有的 Cloudflare Tunnel（d3074ec2-…）
     → cloudflared → http://127.0.0.1:8790（本機 StockBot APP）
 ```
 
@@ -32,11 +34,9 @@ iPhone Safari／桌機瀏覽器
 | Cloudflare 帳號／網域 `minatoyukina.uk` | 已有（2026-07-11 註冊，DNS 由 Cloudflare 管理） | 重用 |
 | Tunnel `d3074ec2-c2a3-4782-9c54-8604289b5fd3` | 已有，`cloudflared` 開機自啟 | **重用同一條**，只加一條 ingress |
 | `~/.cloudflared/cert.pem`、credentials JSON | 已有 | 重用，**不進 Git** |
-| `neo4j.minatoyukina.uk`、`mcp.minatoyukina.uk` | 運作中 | **一個字都不動** |
-| 開機自啟 `stockbotv2-graph-services.vbs` | 已有（Neo4j＋cloudflared＋MCP） | 可選：加一行啟動 APP（見下方「開機自啟」） |
+| 開機自啟 `stockbotv2-graph-services.vbs` | 已有（Neo4j＋cloudflared；遠端 graph server 那行已於 2026-09-24 移除） | 可選：加一行啟動 APP（見下方「開機自啟」） |
 
-⚠ **不得破壞既有 MCP hostname／route。** 下方 ingress 是**新增一條規則**，
-`mcp.minatoyukina.uk` 那條連同它的 `httpHostHeader` 改寫原封不動。
+（2026-09-07 上線時 tunnel 上還有 `neo4j.` 與遠端 graph server 兩條 hostname；2026-09-24 已移除，現在只剩 APP。）
 
 ## 本機先跑起來（不需要 Cloudflare 也能用）
 
@@ -51,7 +51,7 @@ python -m webapp serve                                   # http://127.0.0.1:8790
 
 | 變數 | 預設 | 說明 |
 |---|---|---|
-| `STOCKBOT_APP_PORT` | `8790` | MCP 是 8788，刻意錯開 |
+| `STOCKBOT_APP_PORT` | `8790` | 本機只綁 127.0.0.1 |
 | `STOCKBOT_APP_HOST` | `127.0.0.1` | 改成別的介面**必須**同時設 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式拒絕啟動 |
 | `STOCKBOT_APP_ARTIFACT_DIR` | `library/private/app/analyst_view` | artifact 目錄（在 ignored 的 private 樹下） |
 | `STOCKBOT_APP_STATE_DIR` | `library/private/app/state` | 跨標的 state artifact 目錄（`ranking`；同在 ignored 的 private 樹下） |
@@ -185,10 +185,9 @@ Start-Process -FilePath "C:\Program Files (x86)\cloudflared\cloudflared.exe" `
 ```
 
 ⚠ **只重啟 cloudflared 一個行程**，不要雙擊 `stockbotv2-graph-services.vbs`——
-那支會連 Neo4j 與 MCP server 一起再啟動一次（雖然會因 port 佔用自然退出、無害，但沒必要）。
+那支會連 Neo4j 與 APP 一起再啟動一次（雖然會因 port 佔用自然退出、無害，但沒必要）。
 
-⚠ 重啟期間 `mcp.minatoyukina.uk` 與 `neo4j.minatoyukina.uk` 會短暫中斷（數秒）。
-挑一個沒有排程在跑的時間做。
+⚠ 重啟期間 `stockbot.minatoyukina.uk` 會短暫中斷（數秒）。挑一個沒有排程在跑的時間做。
 
 ### 驗收（2026-09-07 實跑結果）
 
@@ -197,7 +196,6 @@ Start-Process -FilePath "C:\Program Files (x86)\cloudflared\cloudflared.exe" `
 | `nslookup stockbot.minatoyukina.uk` | `104.21.83.81`／`172.67.217.216`（＋IPv6） | ✅ CNAME 已建立且走 Cloudflare 代理 |
 | `curl -sI https://stockbot.minatoyukina.uk/api/v1/health` | **`302`** → `bold-…cloudflareaccess.com/cdn-cgi/access/login/…` | ✅ **未登入拿不到研究內容**（最重要的一條） |
 | 瀏覽器登入後 | 四檔判讀清單 | ✅ 使用者實測 |
-| `curl -sI https://mcp.minatoyukina.uk/` | `404` | ✅ **正常**——MCP 的網址含 40 字元 path token，沒帶就是 404，不是被打壞 |
 | `curl -s http://127.0.0.1:8790/api/v1/health` | `{"status":"ok",…}` | ✅ 本機直連未受影響 |
 
 ### 驗收指令（重跑用）
@@ -210,10 +208,7 @@ curl -s http://127.0.0.1:8790/api/v1/health
 curl -sI https://stockbot.minatoyukina.uk/api/v1/health | head -3
 #    預期看到 302 → cloudflareaccess.com；**若直接回 200 ＋ JSON，代表 Access 沒生效，立刻停用 DNS**
 
-# 3. 既有 MCP 沒被打壞
-curl -sI https://mcp.minatoyukina.uk/ | head -1
-
-# 4. 手機：Safari 開 https://stockbot.minatoyukina.uk → Access 登入 → 清單頁
+# 3. 手機：Safari 開 https://stockbot.minatoyukina.uk → Access 登入 → 清單頁
 ```
 
 ---
@@ -248,7 +243,7 @@ Cloudflare One → **團隊與資源（Team & Resources）→ 使用者（Users�
 ## 開機自啟 ✅ 已完成（2026-09-07）
 
 現有的 `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\stockbotv2-graph-services.vbs`
-（原本負責 Neo4j＋cloudflared＋MCP）**已在檔尾追加兩行**，讓 APP 也隨登入啟動：
+（負責 Neo4j＋cloudflared；遠端 graph server 那行已於 2026-09-24 移除）**已在檔尾追加兩行**，讓 APP 也隨登入啟動：
 
 ```vbs
 ' StockBot Web App（Phase 2 Step 5，2026-09-07）——read-only serve。
@@ -267,7 +262,7 @@ ws.Run """C:\Users\Cheng\code\StockBotv2\.venv\Scripts\python.exe"" -m webapp se
 3. **只放 `serve`。** ⚠ **絕對不要在自啟腳本裡放 `materialize`**——那會在每次開機時跑模型、
    連 Neo4j、讀 private ledger。更新判讀應該由你在互動 session 明確執行。
 
-**驗收（2026-09-07 實跑）：** 把新增的兩行抽成獨立 vbs 單獨執行（不碰 Neo4j／cloudflared／MCP），
+**驗收（2026-09-07 實跑）：** 把新增的兩行抽成獨立 vbs 單獨執行（不碰 Neo4j／cloudflared），
 結果——APP 起得來（`/api/v1/health` 回 `ok`）、**沒有任何可見視窗**、
 `Get-NetTCPConnection -LocalPort 8790` 顯示 **`LocalAddress = 127.0.0.1`**（不是 `0.0.0.0`，
 確認安全預設生效）。原檔備份在同目錄 `stockbotv2-graph-services.vbs.bak-2026-09-07`；
@@ -275,7 +270,7 @@ ws.Run """C:\Users\Cheng\code\StockBotv2\.venv\Scripts\python.exe"" -m webapp se
 
 **要停用：** 把那兩行（與上面四行註解）刪掉，或直接還原備份。
 
-## 安全邊界（分層，與 MCP 同一套思路）
+## 安全邊界（分層）
 
 1. **本機綁定**：APP 只聽 `127.0.0.1:8790`；家用路由器零入站、對外不知道你的 IP。
    綁其他介面需明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式**拒絕啟動**。
@@ -295,8 +290,8 @@ ws.Run """C:\Users\Cheng\code\StockBotv2\.venv\Scripts\python.exe"" -m webapp se
 ## 殘餘風險（誠實列出）
 
 - **Access session 綁在瀏覽器上。** 手機遺失時要到 Zero Trust → Access → 撤銷 session。
-- **Cloudflare 本身看得到流量**（TLS 在它那裡終止）。這與既有 MCP／Neo4j hostname 的姿態一致，
+- **Cloudflare 本身看得到流量**（TLS 在它那裡終止）。這與上線當時其他 hostname 的姿態一致，
   不是本次新增的暴露面。
-- **APP 沒有第二層 token。** 若日後想要 defence in depth，加一個 path token（與 MCP 同做法）
+- **APP 沒有第二層 token。** 若日後想要 defence in depth，加一個 URL path token
   是最小改動；本版刻意不做，因為 Access 已經是明確的認證邊界，兩套認證會讓「誰擋下了這個請求」
   變得難以回答。

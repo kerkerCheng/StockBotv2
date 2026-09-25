@@ -75,7 +75,7 @@ Live lane 只提供 supported range。使用者必須明確接受、縮小、跳
 
 ### 新入口只編排既有 primitive
 
-CLI、Daily Brief、skill 或 remote MCP 都應重用同一組 capture、context、coverage、sizing、execution、card 與 outcome primitive。入口可以改變，以下內容不能分叉：
+CLI、Daily Brief、skill 或任何遠端入口都應重用同一組 capture、context、coverage、sizing、execution、card 與 outcome primitive。入口可以改變，以下內容不能分叉：
 
 - 不建立平行 Coverage Gate 或 sizing 公式；
 - 不建立第二份 paper／live position truth；

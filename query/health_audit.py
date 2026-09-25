@@ -1,6 +1,6 @@
 """系統健康審查的唯一權威：Cypher 常數 + 本機 CLI（Windows daily ⑭ 每天跑 `--local --json`，心跳段 1 讀結果）。
 
-（歷史：雲端 weekly routine 曾讀本檔的具名 Cypher 常數，經 MCP `run_read_query` 執行；weekly 已於 2026-09-24 退役）
+（歷史：雲端 weekly routine 曾讀本檔的具名 Cypher 常數，經遠端唯讀查詢工具執行；weekly 已於 2026-09-24 退役、遠端入口已於 2026-09-25 退役）
 （同 query/single_origin_report.py 的 SINGLE_ORIGIN_CYPHER 模式，不在 prompt 裡
 複製第二份 Cypher）。本機 CLI（`python query/health_audit.py --local`）跑同一組
 Cypher，外加只有本機能做的檢查：Engine C 新鮮度、財務清單可跑性、深度 conflict

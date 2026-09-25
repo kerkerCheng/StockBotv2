@@ -152,7 +152,7 @@ description: >
 
 **核准邊界：** Step 4 的自動化終點是 `prepare_research_action` 回傳的 server-rendered review packet，
 不是 graph write。只有 Research Action 進入廣義 pq2；raw lead、triage PASS 與仍在追源／抽取的工作都留在
-pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可呼叫 `apply_research_action`；`pending`／
+pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可在本機 apply（`intake.application._apply_research_action_impl`）；`pending`／
 `drop` 不得寫圖。同一輪不得 prepare 後自行 apply。
 
 ### Step 5 — 驗證並準備 Research Action（接既有 pipeline，不重造輪子）
@@ -164,7 +164,7 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 - 在凍結前，分開列出 graph delta 內所有公司與唯一 `focus_company_id`；把 focus 寫入綁定 lead，並在
   `ra_admission` pq2 明列 `Decision handoff: co:x`。其他公司只作 evidence／relationship context，不因入圖
   自動建立 cohort；若沒有唯一 focus，先留 pq1，若要追多個投資標的則分開提出 handoff。
-- **不要**在 pq1 或同一輪呼叫 loader／`apply_research_action`。只有使用者明確核准 action ID 後，才由
+- **不要**在 pq1 或同一輪呼叫 loader 或 RA apply。只有使用者明確核准 action ID 後，才由
   apply 流程寫入、驗圖並接續窄 pathset commit/push
 
 ### Step 6 — 產出 Directional Lane Memo

@@ -453,7 +453,7 @@ cashtag 由 `entities.py` 確定性抽取；公司名寫成純文字時 regex �
 ```
 
 研究側命令（evaluate-signal／reassess／today／card／references／record-choice／record-fill）已於 2026-09-23（Phase 0 Step 0b.4） 退役，
-舊店只剩上面兩個唯讀窗；成交紀錄與資本硬擋見「記錄成交」；MCP 的 `get_decision_brief` 同批退役。原命令段封存於 archive。
+舊店只剩上面兩個唯讀窗；成交紀錄與資本硬擋見「記錄成交」；遠端的 `get_decision_brief` 工具同批退役。原命令段封存於 archive。
 
 ### Alpha Card（canonical read model，2026-09-05）
 
@@ -780,7 +780,6 @@ canonical 邊失去 assertion backing，`loader.edge_resolution project` 會以
 | Live holdings | `GSHEETS_SERVICE_ACCOUNT_JSON`、`GSHEETS_SPREADSHEET_ID`、可選 `GSHEETS_SHEET_NAME` |
 | X harvest（**只放本機**） | `X_BEARER_TOKEN` |
 | Engine C Postgres（可選，預設 SQLite） | `POSTGRES_HOST`／`POSTGRES_DSN` |
-| MCP | `GRAPH_MCP_PORT`、`GRAPH_MCP_TOKEN` |
 | Daily Brief outbound Discord Forum（**只放本機**） | `NOTIFY_DISCORD_WEBHOOK_URL`、可選 `NOTIFY_DISCORD_TAG_USER_ID`、`NOTIFY_CHANNEL_ALIAS`、`NOTIFY_CONTENT_CLASS`、`NOTIFY_MAX_ATTEMPTS`、`NOTIFY_TIMEOUT_SECONDS` |
 
 Sheet 的 credential scope 分兩種：日常全部走 `SCOPES`（`spreadsheets.readonly`），
@@ -1074,19 +1073,13 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 
 ---
 
-## MCP server
+## 遠端操作
 
-> **⚠ 2026-09-24 起停用**（使用者決定；ROADMAP「旁支開發項：Graph MCP 退役」）：process 已停、開機 vbs 已移除啟動行；tunnel 的 `mcp.`、`neo4j.` hostname 已從 `~/.cloudflared/config.yml` 移除（外部實測回 404）；claude.ai connector 已斷開。手機改用 Claude Code Remote Control 操作本機 session。
-> 下面是停用前的操作說明，拆除時一併改寫；**不要照著重新啟動**，除非使用者決定恢復。
-
-本機 `mcp_server/graph_mcp.py` + Cloudflare Tunnel + connector，工具數以 `tools/list` 實測為準（2026-09-24 為 11，`get_decision_brief` 已隨 Phase 0 退役），Git 能力僅 leads.json 一個窄例外。daily 現行排程不需要 MCP（直接在本機 repo 執行）。完整資料流與安全邊界見 [`remote-access-architecture.md`](remote-access-architecture.md)。
-
-**⚠ 改完 `mcp_server/` 一定要重啟 process，否則遠端看到的是舊 tool surface。** 沒有 auto-reload：process 開機由 `shell:startup` 的 `stockbotv2-graph-services.vbs` 啟動、之後一直跑舊程式碼。2026-07-24 首次 daily routine 即因此回報「三支新工具不在 tool surface」（程式碼有、跑著的 process 沒有）。
-
-重啟：停掉 `graph_mcp` python process，**在 repo root** 跑 `.venv\Scripts\python.exe -m mcp_server.graph_mcp`。
-⚠ **必須用 `-m`，不能用檔案路徑**：2026-09-03（`5e364f1`）拿掉 `graph_mcp.py` 的 `sys.path.insert` 之後，`python mcp_server\graph_mcp.py`
-會 `ModuleNotFoundError: query`；2026-08-27 起的舊 process 一直開著所以沒被發現，2026-09-24 重啟時才現形，同日 `.vbs` 已改成 `-m`。
-不要為了只重啟 MCP 而雙擊整個 `.vbs`——它會連 Neo4j、tunnel、webapp 一起再起一份。**驗證跑著的版本：** 對 `http://127.0.0.1:$GRAPH_MCP_PORT/$GRAPH_MCP_TOKEN/mcp` 送 MCP `tools/list` 數工具數，**不要只看原始碼或測試**（那只證明 repo 對）。
+**沒有對外的寫入入口。** 手機以 Claude Code Remote Control 連本機 session，走的是同一套本機工具與人工 gate。
+遠端 graph server、tunnel 的兩條 hostname 與 claude.ai connector 已於 2026-09-24 停用、2026-09-25（Phase 2 Step 2.1）
+連同程式刪除；Cloudflare Tunnel 只剩 APP 一條（`deploy/cloudflare/README.md`）。
+Research Action 的本機協定見 `prompts/intake_protocol.md`；舊的遠端架構與操作說明逐字封存於
+`docs/archive/2026-09-25-remote-access-architecture.md`，**不要照著重新啟動**。
 
 ---
 
@@ -1095,7 +1088,6 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 2026-07-24 首跑時 cloud 直連 `substack.com` 與 `www.sec.gov` 收到 proxy 403，實際是 claude.ai cloud environment 的 Network access allowlist，不是平台硬限制。現行 daily 已在本機（weekly 已於 2026-09-24 退役），以下只在日後重啟 cloud fallback 時適用。
 
 - 白名單需含：`sec.gov`、`*.sec.gov`、`substack.com`、`*.substack.com`，並保留 default package-manager 清單
-- **MCP connector 流量不受影響**（走 Anthropic 伺服器轉發）——證據：403 那次 MCP 工具仍可呼叫
 - **`WebSearch` 不受影響**（是工具不是 egress）；受影響的只有直接抓取（`WebFetch`／`curl`／`urllib`）
 - 設計取捨：維持 Custom 白名單較安全——本 routine 天職就是讀不受信任的網路內容且握有圖寫入能力，收斂 egress 可壓低 prompt-injection 外流面
 

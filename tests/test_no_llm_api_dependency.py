@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 _PRODUCTION = (
     "alpha", "engine_b", "engine_c", "decision_lab", "loader",
     "query", "thesis", "fetchers", "portfolio", "risk", "shared", "identity",
-    "crons", "scripts", "briefing", "intake", "storage", "audit", "mcp_server",
+    "crons", "scripts", "briefing", "intake", "storage", "audit",
 )
 
 #: 已知的 LLM SDK。新增一個 provider 就加一項——這是白名單的反面，

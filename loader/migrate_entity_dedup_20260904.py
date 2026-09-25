@@ -2,7 +2,7 @@
 
 ## 事發（2026-09-04）
 
-`apply_research_action` 對兩份已核准的 RA 一律回 `partial`：
+Research Action 的 apply（`intake.application._apply_research_action_impl`）對兩份已核准的 RA 一律回 `partial`：
 
     graph reconciliation is incomplete: unprojected=0, legacy=1, orphaned_evidence=0
 

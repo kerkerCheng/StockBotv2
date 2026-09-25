@@ -88,7 +88,7 @@ The recurring cloud-run process that keeps the knowledge graph fed without the u
 *Avoid:* weekly scan cron, 週報 routine, weekly（已退役的排程名；舊 lead 的 `weekly:` 來源標籤是同一管道的歷史名稱）
 
 ### Source Trace Manual（追源手冊）
-The shared repo skill that turns the source registry's routing knowledge (US → EDGAR, TW → MOPS, technical → arXiv, generic search only as third-layer fallback) into an executable tracing chain. All three graph entry points — the Theme Scan (formerly Weekly Signal Scan), local lead-intake, and claude.ai chat via the Graph MCP Gateway — follow this one manual, so tracing behavior is identical regardless of where a signal enters. Every trace must record the routes attempted; "couldn't trace" without an attempt list is invalid.
+The shared repo skill that turns the source registry's routing knowledge (US → EDGAR, TW → MOPS, technical → arXiv, generic search only as third-layer fallback) into an executable tracing chain. Every graph entry point — the Theme Scan (formerly Weekly Signal Scan), local lead-intake, and phone sessions reaching the local session via Remote Control — follows this one manual, so tracing behavior is identical regardless of where a signal enters. Every trace must record the routes attempted; "couldn't trace" without an attempt list is invalid.
 *Avoid:* source routing prompt, per-entry tracing rules
 
 ### Trace Quarantine（追源未果清單）
@@ -124,9 +124,6 @@ Daily Approval Loop 的**昂貴研究階段**：priority 排序的 `triaged_go` 
 ### PQ2（入圖核准佇列 / pq2）
 Daily Approval Loop 的**統一人工決策池**：prepared Research Action 入圖、到期 thesis、Engine C 人工觀測、thesis mutation、追源派回與 manual authority 都使用同一組穩定編號與對話式批次語法（`1 3 go 4 drop 5 6 pending`）。`go` 是 type-aware：對 prepared RA 才代表 apply 入圖；對追源只代表派回 pq1。（`decision_review`／`sheet_only_holding` 兩種 legacy 型已於 2026-09-23 退役，歷史項目只能 drop。）
 *Avoid:* PR checkbox approval、auto-admission
-
-### Graph MCP Gateway
-The narrow-tool gateway through which supported Claude surfaces and full-MCP web clients read or write the knowledge graph remotely. It exposes nine fixed capabilities—graph/financial reads, rulebooks, legacy single-document load, and Research Action prepare/status/apply—rather than raw database or shell access. Mobile ad hoc writes are two-phase: prepare validates and freezes the whole action without graph mutation; apply requires its exact server ID + digest behind one native approval. No remotely exposed tool can run Git.
 
 ### Research Action（研究行動）
 The durable, provider-neutral unit of remote-intake approval and provenance. A session submits one bounded multi-document `research-action/v1` containing a structured research report plus validated extraction/raw inputs; the server assigns an ID, canonical digest, expiry, immutable review packet, per-document checkpoints, and publication state. The user approves that exact ID, then one apply call resumes idempotently to graph + permission-safe report. Repo-eligible actions later produce exactly one local Git commit per action; mixed actions commit only eligible documents plus a server-redacted stub, while local-only actions require no Git. Action artifacts cross sessions/providers; chat transcripts do not.

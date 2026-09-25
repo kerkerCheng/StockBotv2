@@ -39,9 +39,8 @@ admission 必經核准 exact 對象、深挖由 priority 排序但入圖仍核�
 
 > **介面是對話，不用 GitHub UI。** 現行排程是 Windows daily（見上）；本機 Claude Code 或 Codex 互動
 > session 執行本 skill，直接讀 repo、private runtime 與 `todo_pool.json`。本階段提到 Claude
-> 預設就是 Claude Code 本機；cloud session＋MCP 是備援，只保留
-> `get_pending_leads`／`record_lead_decision` 等既有受限路徑，不要求與本機完全等權
-> （`get_decision_brief` 已於 2026-09-23 Phase 0 Step 0b.4 隨 decision_lab 研究側退役）。
+> 預設就是 Claude Code 本機；遠端操作走 Claude Code Remote Control 連同一個本機 session，
+> **沒有對外的寫入入口**（遠端 graph server 與 connector 已於 2026-09-25 Phase 2 Step 2.1 退役）。
 > 決策與 private authority 寫入只在本機；所有需要使用者決策的項目一律先進統一待辦池，brief
 > 不自行重編號。pq1／pq2 定義見 CONCEPTS.md。
 
@@ -131,9 +130,9 @@ beta 的 20% 集中度門檻對單筆上限 5% 的 alpha 結構上恆不觸發�
 default store 的 Google Sheet 持股或 Neo4j chokepoint context 任一不可讀時，priority list 必須 exit 2、
 fail closed；不得把持股靜默降成空集合後仍宣稱已依完整 priority 排序。
 
-對每條**新** pending lead 套 `skills/signal-triage/SKILL.md` 五要素判準。判斷完寫回（本機用 CLI、
-雲端用 MCP `record_lead_decision`），並帶上 priority flags（供 pq1 排序）；MCP 的 PASS 亦必須傳
-`content_type`／`decision_impact`／必要的 `payment_direction`，與本機同一契約：
+對每條**新** pending lead 套 `skills/signal-triage/SKILL.md` 五要素判準。判斷完用本機 CLI 寫回，
+並帶上 priority flags（供 pq1 排序）；PASS 必須傳
+`content_type`／`decision_impact`／必要的 `payment_direction`：
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier 3 --reason "<要素>" --content-type <type> --decision-impact <impact> [--payment-direction <direction>] [--classification-reason "<分類理由>"] [--contradiction] [--novelty] [--independent]
@@ -696,7 +695,7 @@ pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先
 依主要投資問題篩出的 cohort 目標，不等於 action 內唯一公司；使用者的 `go` 同時核准 exact graph delta
 與已揭露的 handoff。若 hint 顯示未聲明／多個 focus blocker，不得先 apply 再事後補選。
 
-**go 一個 prepared RA ＝入圖**：走既有 `apply_research_action`（本機或 MCP native approval，一次確認）
+**go 一個 prepared RA ＝入圖**：在本機 session 呼叫 `intake.application._apply_research_action_impl(<ra_id>, <digest>)`（一次確認；協定見 `prompts/intake_protocol.md`）
 → `advance <lead> applied --ref research_action_id=<ra_id> --ref action_digest=<digest> --ref focus_company_id=co:x`
 → `scripts/commit_pending_intake.py` 完成 durable publication → 用同一個 deterministic completion point 驗證
 apply／publish 並自動建立（或沿用）Decision Shadow：
@@ -731,7 +730,6 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
   釋放自己的 writer lock 並寫收工標記，**不碰 Git、不連網**。驗證失敗仍釋放自己的鎖，
   並把 `state_invalid` 放進健康段；四份 state 由 private backup 涵蓋。
 - **入圖帳本**：有實際 apply 才另外跑 `scripts/commit_pending_intake.py`。
-- **遠端 chat adapter**：`record_lead_decision` 只寫同一份本機 leads authority，不再經 public Git 同步。
 
 ### Step 8 — provider-neutral 單向通知（best effort）
 
@@ -772,7 +770,7 @@ task 最終回覆必須原樣輸出送入 publisher 的 canonical Markdown；不
 **唯一的無人值守排程是 Windows daily**（`StockBotv2-Daily`；時間只住 `config/daily_routine.json`，改法與失敗長相見
 `docs/OPERATIONS.md`「Daily」節）。~~`crons/daily_brief_prompt.md`（Codex desktop 每日 scheduled task prompt）~~
 已於 2026-09-24 封存為 `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`，兩個 Codex automation 由使用者停用。
-weekly 已於 Phase 1 Step 1.9 退役（題材掃描改互動 skill `skills/theme-scan`；舊 prompt 封存於 `docs/archive/`）。Cloud session＋MCP 不承擔現行排程；
+weekly 已於 Phase 1 Step 1.9 退役（題材掃描改互動 skill `skills/theme-scan`；舊 prompt 封存於 `docs/archive/`）。遠端操作只經 Remote Control 連本機 session；
 遠端永遠不得取代本機 decision／lifecycle authority。
 
 ## 已知會壞的地方（v0，撞到回頭修）

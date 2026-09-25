@@ -40,16 +40,6 @@ CORE_PACKAGES = (
     "fetchers", "notifications", "crons", "scripts",
 )
 
-#: ✅ **2026-09-03 Phase 3b：5 → 0，欠債清空。**
-#:
-#: 原本這裡有 5 個 core 消費端被迫 import `mcp_server`（含 pq2 待辦池本身），
-#: 成因是 `mcp_server/` 4,016 行有 **79% 不是 MCP**——Research Action 的 domain、
-#: filesystem provenance 原語、local-only Git 發布，全被關在 transport package 裡。
-#: 抽出到 `intake/` 之後，**新核心可以在完全沒有 MCP 的情況下運作**。
-#:
-#: ⚠ 這個集合現在是空的，而檢查**仍然在跑**——它擋的是第 1 個新增者。
-KNOWN_MCP_CONSUMERS: frozenset[str] = frozenset()
-
 #: Cypher 偵測。⚠ **刻意大小寫敏感，且前面不得是 `.`**——第一版用 IGNORECASE，
 #: 結果把 `alpha/identity.py` 的 `_ENTITY_RE.match(` 判成 Cypher `MATCH (`。
 #: 那是本 session 第二次「gate 攔下的是格式而不是風險」（L15），修法一樣是
@@ -89,7 +79,7 @@ def _rel(path: Path) -> str:
 
 FORBIDDEN_IN_ALPHA = (
     "neo4j", "yfinance", "anthropic", "decision_lab", "engine_c", "engine_b",
-    "mcp_server", "loader", "query", "thesis", "fetchers",
+    "loader", "query", "thesis", "fetchers",
     "portfolio", "risk", "requests", "pandas",
 )
 
@@ -340,62 +330,7 @@ def test_shim_list_has_no_stale_entries() -> None:
 
 
 # ---------------------------------------------------------------------------
-# 3. Core 不得依賴 MCP（依賴方向只准 peripheral → core）
-# ---------------------------------------------------------------------------
-
-def test_core_does_not_import_mcp_server() -> None:
-    """MCP／remote 是 **optional adapter**，不是核心架構。
-
-    新核心必須能在完全沒有 MCP 的情況下運作。這條**現在就會通過**，因為 5 個
-    已知消費端都在 allowlist 裡；它擋的是**第 6 個**。
-    """
-    offenders = sorted(
-        _rel(path)
-        for package in CORE_PACKAGES
-        for path in _python_files(package)
-        if any(m.split(".")[0] == "mcp_server" for m in _imported_roots(path))
-    )
-    unexpected = set(offenders) - KNOWN_MCP_CONSUMERS
-    assert not unexpected, (
-        "新增了 core → mcp_server 的依賴：\n" + "\n".join(sorted(unexpected))
-        + "\n依賴方向必須 peripheral → core；請改為呼叫 application service"
-    )
-
-
-def test_mcp_allowlist_has_no_stale_entries() -> None:
-    """欠債清單要跟著現實縮小——修好了卻沒從 allowlist 移除，下一個人會以為還欠著。
-
-    ⚠ 這條與上一條是一對：上一條防新增，這一條防清單腐壞（「清單會腐壞，判準不會」）。
-    """
-    actual = {
-        _rel(path)
-        for package in CORE_PACKAGES
-        for path in _python_files(package)
-        if any(m.split(".")[0] == "mcp_server" for m in _imported_roots(path))
-    }
-    stale = KNOWN_MCP_CONSUMERS - actual
-    assert not stale, f"allowlist 有已修好的殘留條目，請移除：{sorted(stale)}"
-    # 反向也要成立：清單為空時，實際依賴也必須為空
-    assert not (actual - KNOWN_MCP_CONSUMERS), (
-        f"出現未登記的 mcp_server 依賴：{sorted(actual - KNOWN_MCP_CONSUMERS)}"
-    )
-
-
-def test_no_core_module_depends_on_mcp() -> None:
-    """**Phase 3b 的驗收：core → `mcp_server` 的 import 數 5 → 0。**
-
-    這個數字寫成斷言才不會悄悄變回去。若日後真的又需要一個例外，
-    加進 `KNOWN_MCP_CONSUMERS` 會讓這條紅——那是刻意的摩擦：
-    每一個例外都應該是被討論過的決定，不是順手加的 import。
-    """
-    assert KNOWN_MCP_CONSUMERS == frozenset(), (
-        "core 不應再有任何 mcp_server 依賴；"
-        f"目前欠債清單：{sorted(KNOWN_MCP_CONSUMERS)}"
-    )
-
-
-# ---------------------------------------------------------------------------
-# 4. audit/ 是 composition root：它看得到所有層，所有層看不到它
+# 3. audit/ 是 composition root：它看得到所有層，所有層看不到它
 # ---------------------------------------------------------------------------
 
 def test_nothing_imports_audit() -> None:
@@ -426,34 +361,3 @@ def test_audit_may_read_every_layer() -> None:
     roots = _imported_roots(ROOT / "audit" / "sources.py")
     assert {"identity.registry", "neo4j", "decision_lab.bootstrap"} <= roots, (
         f"audit/sources.py 沒有讀到各層：{sorted(roots)}")
-
-
-# ---------------------------------------------------------------------------
-# 5. intake/ 是 application layer，不得依賴 transport
-# ---------------------------------------------------------------------------
-
-def test_intake_does_not_import_mcp() -> None:
-    """**`intake/` 可以在完全沒有 MCP 的情況下運作。**
-
-    這是「MCP 是 optional adapter」這句話唯一可執行的形式——
-    若 `intake/` 需要 `mcp`，那它就不是 application layer，只是換了個目錄的 transport。
-    """
-    offenders = [
-        f"{_rel(p)} → {m}"
-        for p in _python_files("intake")
-        for m in _imported_roots(p)
-        if m.split(".")[0] in ("mcp", "mcp_server")
-    ]
-    assert not offenders, "intake/ 不得依賴 MCP：\n" + "\n".join(offenders)
-
-
-def test_mcp_adapter_is_thin() -> None:
-    """adapter 只該有 `@mcp.tool()` 包裝——**business logic 不得回流**。
-
-    baseline（2026-09-03 抽出後）：`graph_mcp.py` 從 1,349 行降到 ~350。
-    若它又長回 500 行以上，代表 application 邏輯正在回流到 transport 層。
-    """
-    text = (ROOT / "mcp_server" / "graph_mcp.py").read_text(encoding="utf-8")
-    assert len(text.splitlines()) < 500, (
-        "mcp_server/graph_mcp.py 又變厚了——application 邏輯應該住 intake/"
-    )

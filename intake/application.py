@@ -1,13 +1,12 @@
 """Research Action 與圖寫入的 **application service**。
 
-## 為什麼它不在 `mcp_server/`
+## 為什麼它是獨立的 application service
 
-實測（2026-09-03）：`mcp_server/` 4,016 行有 **79% 不是 MCP**。這一整組
-（prepare／apply／finalize／load extraction、圖寫入就緒檢查、provenance 驗證）
-是 domain 與 application 邏輯，只是歷史上因為第一個入口是遠端而住進 transport
-package——於是 5 個 core 消費端被迫 import 它，其中包含 pq2 待辦池本身。
+這一整組（prepare／apply／finalize／load extraction、圖寫入就緒檢查、provenance 驗證）
+是 domain 與 application 邏輯。歷史上第一個入口是遠端 adapter，它們因此住在 transport
+package 裡（2026-09-03 抽出；遠端 adapter 於 2026-09-25 退役刪除，本機 session 直接呼叫本模組）。
 
-## 保留的 domain semantics（**不因 MCP 降級而丟掉**）
+## 保留的 domain semantics（**不因入口改變而丟掉**）
 
 bounded research mutation｜provenance（storage_permission／canonical hash）｜
 immutable review packet｜**content digest ＝ identity**（stale／tampered payload 在
@@ -16,10 +15,8 @@ idempotent apply ＋ 逐文件 checkpoint ＋ filesystem-first｜Research Action
 
 ## 降級為 transport 的（**不得升格為 domain invariant**）
 
-MCP server ID｜remote provider session｜action quota／30 天過期／5 MiB 上限｜
+remote provider session｜action quota／30 天過期／5 MiB 上限｜
 mobile two-call workflow｜遠端 Git 限制。它們是 ops 限制，不是 domain 規則。
-
-⚠ **本模組不 import `mcp`**——`tests/test_layer_separation.py` 守著。
 """
 from __future__ import annotations
 import json
@@ -72,25 +69,7 @@ USER = os.environ.get("NEO4J_ROUTINE_USER")
 
 PASSWORD = os.environ.get("NEO4J_ROUTINE_PASSWORD")
 
-TOKEN = os.environ.get("GRAPH_MCP_TOKEN")
-
-PORT = int(os.environ.get("GRAPH_MCP_PORT", "8788"))
-
 GRAPH_SCHEMA_VERSION = "2026-07-16-u3b"
-
-SOURCE_TRACE_MANUAL = ROOT / "skills" / "source-trace" / "SKILL.md"
-
-def _check_server_config() -> None:
-    """Fail at server start, while keeping read-only helpers import-testable."""
-
-    if not (USER and PASSWORD):
-        raise RuntimeError(
-            "需要 .env 設定 NEO4J_ROUTINE_USER / NEO4J_ROUTINE_PASSWORD（最小權限帳號）"
-        )
-    if not TOKEN or len(TOKEN) < 16:
-        raise RuntimeError(
-            "需要 .env 設定 GRAPH_MCP_TOKEN（≥16 字元強隨機字串，將內嵌於 URL 路徑）"
-        )
 
 def _driver() -> neo4j.Driver:
     return neo4j.GraphDatabase.driver(URI, auth=(USER, PASSWORD))
@@ -152,15 +131,6 @@ def _check_graph_write_readiness(driver) -> None:
             f"unprojected={unprojected}, legacy={legacy}, orphaned_evidence={orphaned}"
         )
 
-def _read_source_trace_manual(path: Path = SOURCE_TRACE_MANUAL) -> str:
-    try:
-        return path.read_text(encoding="utf-8")
-    except OSError as exc:
-        return (
-            "追源手冊目前不可用；不要在缺少規則時繼續抽取或入圖。"
-            f"請檢查 skills/source-trace/SKILL.md（{type(exc).__name__}: {exc}）。"
-        )
-
 def _prepare_extraction_impl(
     extraction_json: str,
     storage_permission: str,
@@ -219,7 +189,7 @@ def _prepare_extraction_impl(
                 "doc_id": doc_id,
                 "error": (
                     f"驗證器異常（{type(e).__name__}: {e}）；"
-                    "請先呼叫 get_extraction_rules 核對格式後重試"
+                    "請先對照 prompts/extract_system.md 與 schema/vocab.json 核對格式後重試"
                 ),
             }
     finally:
@@ -424,8 +394,6 @@ def _load_extraction_impl(
 
 def _safe_error_message(value: object) -> str:
     message = str(value)
-    if TOKEN:
-        message = message.replace(TOKEN, "[redacted]")
     message = message.replace("\r", " ").replace("\n", " ")
     return message[:2_000]
 
@@ -990,8 +958,8 @@ def _finalize_research_action_impl(
             "git_status": "not_committed",
             "reason": "remote_finalize_disabled",
             "action": (
-                "Set ENABLE_REMOTE_FINALIZE=true only after accepting the remote-push "
-                "security boundary and configuring this MCP tool as Needs approval."
+                "Remote finalize has no caller since the remote entry point retired (2026-09-25); "
+                "publish locally with scripts/commit_pending_intake.py."
             ),
         }
     try:

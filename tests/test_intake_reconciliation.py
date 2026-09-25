@@ -8,7 +8,7 @@
 ## 事發（2026-09-20）
 
 V1（逐字入圖，2026-09-18）把 1,105 段逐字載進圖，產生 `QUOTES` 2,968 ＋ `FROM_DOC` 1,058
-＝ **4,026 筆被誤判成 legacy**，於是 `apply_research_action` 對所有 RA 回
+＝ **4,026 筆被誤判成 legacy**，於是 RA 的 apply（`intake.application._apply_research_action_impl`）對所有 RA 回
 `partial: graph reconciliation is incomplete`——**入圖閘門從那天起全面卡死**。
 
 兩天沒有任何東西會叫，因為中間沒有人 apply 過 RA（pq2 [570] 是 09-12 prepare 的）。
@@ -36,7 +36,7 @@ def test_traversal_relationships_are_excluded_from_the_legacy_check() -> None:
     for kind in ("CITES", "ABOUT", "QUOTES", "FROM_DOC"):
         assert kind in listed, (
             f"{kind} 不在排除清單裡——它是走訪關係、沒有 edge_key，"
-            "算進 legacy 會讓 apply_research_action 對所有 RA 一律拒絕")
+            "算進 legacy 會讓 RA 的 apply 對所有 RA 一律拒絕")
 
 
 def test_the_other_two_reconciliation_checks_are_untouched() -> None:

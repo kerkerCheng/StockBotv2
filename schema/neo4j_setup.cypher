@@ -87,7 +87,7 @@ OPTIONS { indexConfig: {
 }};
 
 // ── 6. 寫入 readiness sentinel ────────────────────────────
-// 只在本檔所有 schema DDL 成功後寫入。MCP 寫工具還會另外檢查 canonical
+// 只在本檔所有 schema DDL 成功後寫入。intake 的寫入路徑還會另外檢查 canonical
 // projection、legacy edge 與 CITES reconciliation，避免未完成 migration 就收新資料。
 MERGE (state:GraphSchemaState {id: 'stockbotv2'})
 SET state.version = '2026-07-16-u3b';

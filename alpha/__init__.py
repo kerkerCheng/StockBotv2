@@ -21,8 +21,8 @@
 
 ## 相依邊界（`tests/test_layer_separation.py` 守住）
 
-`alpha/` 本身**不 import** `decision_lab.store`、`neo4j`、`yfinance`、`anthropic`、
-`mcp_server`，也不得出現 Cypher 字串。concrete provider 住 `alpha/providers/`
+`alpha/` 本身**不 import** `decision_lab.store`、`neo4j`、`yfinance`、`anthropic`，
+也不得出現 Cypher 字串。concrete provider 住 `alpha/providers/`
 （Phase 2），它們才碰外部世界。
 """
 from __future__ import annotations

@@ -6,7 +6,7 @@
 # **Codex 不在任何無人值守步驟裡**；兩個 Codex automation（Daily Brief、Weekly Scan）由使用者停用。
 #
 # 為什麼清為 0 而不是留著：P0 plan review 第 2、3 輪（plan §0.7 X1、R3-1、R3-2）實測 Codex 的唯讀證明不了
-# ——workspace-write 下能改 .env 與 .venv、exec 預設載入使用者層的外掛與 MCP、`[windows] sandbox` 住在
+# ——workspace-write 下能改 .env 與 .venv、exec 預設載入使用者層的外掛與 `mcp_servers` 設定、`[windows] sandbox` 住在
 # 使用者層 config。留著任何一條 allow，就是留一個不再有人需要、卻仍放行的權限（AGENTS：不得用 broad
 # permission 掩蓋整合缺口）。
 #

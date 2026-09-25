@@ -224,7 +224,7 @@ Lesson 的事發經過與實作落點住 [`docs/lessons-incidents.md`](docs/less
   **下列任一成立一律停下：** ①Z2／Z3 且 plan 裡確實有要使用者選的問題；②動到四個人工 gate；③動到資本、live 或 append-only authority；
   ④要改本檔判準句或 ROADMAP 的 Phase／Step 定義；⑤需要 R2；⑥Verdict 不是 `GO`。
   判準：**這條授權買的是「不必為了說一聲而停」，不是「不必為了決定而停」。** 撞到 pq2 gate 時掛號後接著做下一件不需核准的事，不得停在編號上等。
-- **Local-first：** 「Claude」預設指本機 Claude Code；cloud＋MCP 是備援，新核心不得依賴 MCP。
+- **Local-first：** 「Claude」預設指本機 Claude Code；遠端操作走 Remote Control 連本機 session，不開對外的寫入入口。
 - **Provider-neutral：** 本機 Codex 與 Claude Code 是可互換 executor；權限與完成狀態綁 action type、authority 與 receipt，不綁 provider。
 - **同一 working tree 只讓一個 agent 寫入**；排程與互動 session 也算兩個 writer。
 - **Session memory 不是 authority**：transcript／memory 都是 disposable advisory cache；未寫 authority 的「已 go」不得被視為完成。

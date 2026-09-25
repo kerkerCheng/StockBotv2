@@ -1,6 +1,6 @@
 """Local-only Git publication for applied Research Actions.
 
-This module is intentionally not imported by the remote MCP tool surface. It
+This module is intentionally local-only (no remote tool surface imports it). It
 accepts only server-derived eligible paths and explains every ahead commit with
 an action ID + digest trailer before a batch push.
 """

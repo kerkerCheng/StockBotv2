@@ -208,7 +208,7 @@ Samsung 兩例都 park 成 scope 問題丟回給使用者，但契約早就允�
 
 **硬 gate（永遠不自動）：**
 
-- **入圖**（`apply_research_action`）——包含隨之而來的 registry 增列
+- **入圖**（Research Action apply）——包含隨之而來的 registry 增列
 - **Engine C 寫入**（manual observation ledger）
 - **thesis revise／retire**
 - **live choice／fill**

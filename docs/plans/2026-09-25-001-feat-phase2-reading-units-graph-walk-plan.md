@@ -173,8 +173,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
-| 2.0 | 基準快照 | ✅ | 便宜 | （本 commit；短碼由 2.1 補填） |
-| 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ○ | 便宜 | |
+| 2.0 | 基準快照 | ✅ | 便宜 | `475e167` |
+| 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ▶ R2-a 待審 | 便宜 | （本 commit；GO 後由 2.2 補填並改 ✅） |
 | 2.2 | 反向路徑只收競爭關係 | ○ | 便宜 | |
 | 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ○ | 便宜 | |
 | 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ○ | 便宜 | |
@@ -201,6 +201,8 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
 | 1 | 2.0→2.2 | §3「對 2.0 的全圖 digest 重算，**變動的節點集合＝§0.2 那 7 個**」 | 2.0 預先算出預期變動集合＝8 條 `constrained_by` canonical 邊的兩端＝**14 個節點**（名單見 baseline §10）；§3 已改寫 | 7 是「反向路徑因此**變空**」的節點數（tech／mat／prod 口徑），不是 digest 會變的節點數：反向路徑裡只要有任一條 `constrained_by`，即使還有 `competes_with`（如 `tech:cpo`、`co:coherent`），digest 也會變。照原文驗收會把 7 個以外的預期變動誤判成「多變了」 |
+| 2 | 2.1 | §2「`retired_mechanism_grep.py` 加 MCP 組並把 AREAS 擴到所有 tracked `.md`」 | 新增第九組 I，**它自己**掃 `git ls-files` 的所有 tracked 檔（含每一個 `.md`、`AGENTS.md`、`prompts/`、`deploy/`、`.claude/skills`）；A～H 的 AREAS 與驗收範圍**不動**；I 組 keep-list 只收 `historical_record`，歷史目錄以 `/` 結尾的前綴鍵登記 | 擴 A～H 的 AREAS 等於事後改 Phase 0 的驗收定義；ROADMAP 要求的「所有 tracked `.md`」是 MCP 組的範圍，由 I 組直接滿足 |
+| 3 | 2.1 | ROADMAP 旁支列的盤點命令（`git grep -i`，含 `apply_research_action`、`load_extraction` 全字串） | I 組 regex 只抓**本專案的** Graph MCP：大寫 `MCP` 與工具名以 ASCII 邊界包成獨立 token；`intake.application._apply_research_action_impl`／`_load_extraction_impl`（本機 domain，ROADMAP 明寫留）與 Claude CLI 的 `--strict-mcp-config`、`mcp_servers`（**擋掉** MCP 的守門設定）不算命中。邊界不用 Python `\b`（它把中文字算 word 字元，「與MCP」會漏） | 盤點命令是找處置對象用的（要寬）；驗收 regex 要能歸零且不誤殺活的 domain 與守門設定——否則只能靠非「歷史紀錄」類的 keep-list，違反 ROADMAP 驗收② |
 
 ---
 
@@ -453,3 +455,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 5. **走圖母體 <10 的型別**（`reading_stale` 等）命中率只印不判——讀圖份數長大後要不要回到 <50% 規則。
 6. Phase 1 closeout §7 未併入本 Phase 的各題（§0.3 最後一條列的編號），照實帶到 Phase 3 的 plan session。
 7. `argument` 面板標題（Phase 0 延下來、Phase 1 定「Phase 2／3」）：本 Phase 沒有重排面板，延 Phase 3。
+8. **本機 apply 沒有固定 CLI 入口**（2.1 發現）：遠端入口退役後，已核准 RA 的入圖只能在互動 session 直接呼叫
+   `intake.application._apply_research_action_impl(<ra_id>, <digest>)`（私有底線函式；prepare 有 `scripts/prepare_research_action.py`、
+   publish 有 `scripts/commit_pending_intake.py`，中間這一步沒有）。它在 graph admission gate 的路徑上，加不加 CLI、要不要綁 pq2 `ra_admission`
+   的 `go` 收據，是開發項（ROADMAP），不是本 Phase 的 scope。

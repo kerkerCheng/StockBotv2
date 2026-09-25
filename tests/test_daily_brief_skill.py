@@ -43,7 +43,7 @@ def test_references_closed_loop_and_no_github() -> None:
     assert "evidence-delta" in text or "evidence_delta" in text
     assert "自動建 Shadow" in text
     assert "GitHub" in text  # 明文說不用 GitHub UI
-    assert "record_lead_decision" in text  # 遠端 fallback 仍走 MCP
+    assert "Remote Control" in text  # 遠端只經 Remote Control 連本機 session（2026-09-25 起）
     assert "scripts\\finalize_daily_state.py" in text
     assert "publish_daily_state.py" not in text
     assert "不碰 Git、不連網" in text
@@ -62,8 +62,8 @@ def test_states_gates_and_human_boundaries() -> None:
     assert "graph admission" in text
     assert "不連 broker" in text
     assert "recommendation 推定 choice" in text
-    # 決策寫入只在本機、遠端 fallback 只有 leads 的受限路徑（get_decision_brief 已於 0b.4 退役）。
-    assert "record_lead_decision" in text
+    # 決策寫入只在本機；沒有對外的寫入入口（遠端 graph server 於 2026-09-25 Phase 2 Step 2.1 退役）。
+    assert "沒有對外的寫入入口" in text
     assert "只在本機" in text
     assert "不推定 choice／fill" in text
     assert "self_funded_supported_range" in text

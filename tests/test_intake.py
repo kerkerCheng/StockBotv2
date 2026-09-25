@@ -10,11 +10,10 @@ from pathlib import Path
 
 import pytest
 
-# ⚠ 2026-09-03 Phase 3b：application 邏輯已搬到 `intake/`，`mcp_server/graph_mcp.py`
-# 只剩 @mcp.tool 包裝。**測試目標跟著模組走——斷言一條未改。**
-# `graph_mcp` 這個別名保留，是為了讓 diff 只有 import 一行，而不是全檔改名。
+# ⚠ 測試目標是 `intake/` 的 application service（2026-09-03 Phase 3b 由遠端 adapter 抽出；
+# adapter 於 2026-09-25 Phase 2 Step 2.1 隨遠端入口退役刪除）。**斷言一條未改。**
 from intake import provenance as intake
-from intake import application as graph_mcp
+from intake import application
 
 
 def _extraction(
@@ -609,25 +608,25 @@ def test_graph_write_readiness_requires_version_and_reconciliation() -> None:
         def session(self, **_kwargs):
             return Session(self.version, self.counts)
 
-    graph_mcp._check_graph_write_readiness(
-        Driver(graph_mcp.GRAPH_SCHEMA_VERSION, [0, 0, 0])
+    application._check_graph_write_readiness(
+        Driver(application.GRAPH_SCHEMA_VERSION, [0, 0, 0])
     )
 
     with pytest.raises(RuntimeError, match="schema is not ready"):
-        graph_mcp._check_graph_write_readiness(Driver("old", [0, 0, 0]))
+        application._check_graph_write_readiness(Driver("old", [0, 0, 0]))
     with pytest.raises(RuntimeError, match="reconciliation is incomplete"):
-        graph_mcp._check_graph_write_readiness(
-            Driver(graph_mcp.GRAPH_SCHEMA_VERSION, [1, 0, 0])
+        application._check_graph_write_readiness(
+            Driver(application.GRAPH_SCHEMA_VERSION, [1, 0, 0])
         )
 
 
 def _install_graph_success(monkeypatch, *, conflicts: list[str] | None = None) -> None:
-    monkeypatch.setattr(graph_mcp, "_driver", lambda: _FakeDriver())
-    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
-    monkeypatch.setattr(graph_mcp, "load_to_graph", lambda _doc, _session: None)
-    monkeypatch.setattr(graph_mcp, "_verify_loaded_doc", lambda _driver, _doc: None)
+    monkeypatch.setattr(application, "_driver", lambda: _FakeDriver())
+    monkeypatch.setattr(application, "_check_graph_write_readiness", lambda _driver: None)
+    monkeypatch.setattr(application, "load_to_graph", lambda _doc, _session: None)
+    monkeypatch.setattr(application, "_verify_loaded_doc", lambda _driver, _doc: None)
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "project_edge_keys",
         lambda _driver, _keys: {
             "open_conflict_ids": conflicts or [],
@@ -641,7 +640,7 @@ def test_load_extraction_publishes_before_graph_and_supports_extraction_only(
 ) -> None:
     _install_graph_success(monkeypatch)
 
-    result = graph_mcp._load_extraction_impl(
+    result = application._load_extraction_impl(
         json.dumps(_extraction("remote_doc")),
         "repo_full",
         "Official public filing retained for private research",
@@ -659,10 +658,10 @@ def test_load_extraction_rejects_non_object_json_before_driver(
     payload: str, tmp_path: Path, monkeypatch
 ) -> None:
     monkeypatch.setattr(
-        graph_mcp, "_driver", lambda: (_ for _ in ()).throw(AssertionError())
+        application, "_driver", lambda: (_ for _ in ()).throw(AssertionError())
     )
 
-    result = graph_mcp._load_extraction_impl(
+    result = application._load_extraction_impl(
         payload,
         "repo_full",
         "Official public filing retained for private research",
@@ -687,17 +686,17 @@ def test_load_extraction_uses_one_graph_write_transaction(
         def session(self):
             return TransactionSession()
 
-    monkeypatch.setattr(graph_mcp, "_driver", lambda: TransactionDriver())
-    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
-    monkeypatch.setattr(graph_mcp, "load_to_graph", lambda _doc, _tx: calls.append("load"))
-    monkeypatch.setattr(graph_mcp, "_verify_loaded_doc", lambda _driver, _doc: None)
+    monkeypatch.setattr(application, "_driver", lambda: TransactionDriver())
+    monkeypatch.setattr(application, "_check_graph_write_readiness", lambda _driver: None)
+    monkeypatch.setattr(application, "load_to_graph", lambda _doc, _tx: calls.append("load"))
+    monkeypatch.setattr(application, "_verify_loaded_doc", lambda _driver, _doc: None)
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "project_edge_keys",
         lambda _driver, _keys: {"open_conflict_ids": [], "stale_resolution_ids": []},
     )
 
-    result = graph_mcp._load_extraction_impl(
+    result = application._load_extraction_impl(
         json.dumps(_extraction("transaction_doc")),
         "repo_full",
         "Official public filing retained for private research",
@@ -713,7 +712,7 @@ def test_load_extraction_rejects_changed_same_doc_before_driver(
 ) -> None:
     _install_graph_success(monkeypatch)
     first = _extraction("remote_doc")
-    assert graph_mcp._load_extraction_impl(
+    assert application._load_extraction_impl(
         json.dumps(first),
         "repo_full",
         "Official public filing retained for private research",
@@ -727,8 +726,8 @@ def test_load_extraction_rejects_changed_same_doc_before_driver(
     def forbidden_driver():
         raise AssertionError("Neo4j driver must not be created for a provenance conflict")
 
-    monkeypatch.setattr(graph_mcp, "_driver", forbidden_driver)
-    rejected = graph_mcp._load_extraction_impl(
+    monkeypatch.setattr(application, "_driver", forbidden_driver)
+    rejected = application._load_extraction_impl(
         json.dumps(changed),
         "repo_full",
         "Official public filing retained for private research",
@@ -742,15 +741,15 @@ def test_load_extraction_rejects_changed_same_doc_before_driver(
 def test_load_extraction_graph_failure_is_recoverable_with_identical_payload(
     tmp_path: Path, monkeypatch
 ) -> None:
-    monkeypatch.setattr(graph_mcp, "_driver", lambda: _FakeDriver())
-    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
+    monkeypatch.setattr(application, "_driver", lambda: _FakeDriver())
+    monkeypatch.setattr(application, "_check_graph_write_readiness", lambda _driver: None)
 
     def fail_graph(_doc, _session):
         raise RuntimeError("simulated graph outage")
 
-    monkeypatch.setattr(graph_mcp, "load_to_graph", fail_graph)
+    monkeypatch.setattr(application, "load_to_graph", fail_graph)
     payload = json.dumps(_extraction("retry_doc"))
-    pending = graph_mcp._load_extraction_impl(
+    pending = application._load_extraction_impl(
         payload,
         "repo_full",
         "Official public filing retained for private research",
@@ -763,7 +762,7 @@ def test_load_extraction_graph_failure_is_recoverable_with_identical_payload(
     assert (tmp_path / "library" / "raw" / "retry_doc.txt").exists()
 
     _install_graph_success(monkeypatch)
-    retried = graph_mcp._load_extraction_impl(
+    retried = application._load_extraction_impl(
         payload,
         "repo_full",
         "Official public filing retained for private research",
@@ -774,14 +773,14 @@ def test_load_extraction_graph_failure_is_recoverable_with_identical_payload(
 
 
 def test_pending_graph_document_cannot_finalize(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setattr(graph_mcp, "_driver", lambda: _FakeDriver())
-    monkeypatch.setattr(graph_mcp, "_check_graph_write_readiness", lambda _driver: None)
+    monkeypatch.setattr(application, "_driver", lambda: _FakeDriver())
+    monkeypatch.setattr(application, "_check_graph_write_readiness", lambda _driver: None)
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "load_to_graph",
         lambda _doc, _tx: (_ for _ in ()).throw(RuntimeError("graph down")),
     )
-    pending = graph_mcp._load_extraction_impl(
+    pending = application._load_extraction_impl(
         json.dumps(_extraction("pending_doc")),
         "repo_full",
         "Official public filing retained for private research",
@@ -789,7 +788,7 @@ def test_pending_graph_document_cannot_finalize(tmp_path: Path, monkeypatch) -> 
         root=tmp_path,
     )
 
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "pending-doc",
         "must not commit",
@@ -808,7 +807,7 @@ def test_load_extraction_returns_conflicts_without_treating_document_as_failed(
 ) -> None:
     _install_graph_success(monkeypatch, conflicts=["conflict:sole_source"])
 
-    loaded = graph_mcp._load_extraction_impl(
+    loaded = application._load_extraction_impl(
         json.dumps(_extraction("conflict_doc")),
         "repo_excerpt",
         "Publisher terms permit limited research excerpts only",
@@ -830,7 +829,7 @@ def test_load_extraction_local_only_loads_graph_but_cannot_finalize(
 ) -> None:
     _install_graph_success(monkeypatch)
 
-    loaded = graph_mcp._load_extraction_impl(
+    loaded = application._load_extraction_impl(
         json.dumps(_extraction("private_remote")),
         "local_only",
         "Source terms do not permit third-party cloud storage",
@@ -849,8 +848,8 @@ def test_load_extraction_invalid_doc_id_and_permission_fail_before_graph(
     def forbidden_driver():
         raise AssertionError("driver must not be created")
 
-    monkeypatch.setattr(graph_mcp, "_driver", forbidden_driver)
-    invalid_id = graph_mcp._load_extraction_impl(
+    monkeypatch.setattr(application, "_driver", forbidden_driver)
+    invalid_id = application._load_extraction_impl(
         json.dumps(_extraction("../evil")),
         "repo_full",
         "Official public filing retained for private research",
@@ -858,7 +857,7 @@ def test_load_extraction_invalid_doc_id_and_permission_fail_before_graph(
     )
     assert invalid_id["status"] == "rejected"
 
-    invalid_permission = graph_mcp._load_extraction_impl(
+    invalid_permission = application._load_extraction_impl(
         json.dumps(_extraction("safe_doc")),
         "repo_excerpt",
         "",
@@ -898,7 +897,7 @@ def test_finalize_two_documents_creates_one_exact_commit_and_push(
     for doc_id in ("doc_a", "doc_b"):
         _publish_loaded(doc_id, root=tmp_git_repo, raw_text=f"raw {doc_id}")
 
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "two-docs",
         "record traced evidence",
@@ -936,7 +935,7 @@ def test_finalize_is_manifest_scoped_and_warns_about_other_pending_files(
     for doc_id in ("leftover", "selected"):
         _publish_loaded(doc_id, root=tmp_git_repo, raw_text=doc_id)
 
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "selected-only",
         "record selected evidence",
@@ -958,7 +957,7 @@ def test_finalize_preflight_failure_writes_no_report(
     (tmp_git_repo / "staged.txt").write_text("staged", encoding="utf-8")
     subprocess.run(["git", "add", "staged.txt"], cwd=tmp_git_repo, check=True)
 
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "blocked",
         "must not commit",
@@ -977,17 +976,17 @@ def test_finalize_propagates_second_preflight_failure(
 ) -> None:
     _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "git_preflight",
         lambda **_kwargs: {"ok": True, "reason": None},
     )
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "pending_intake_files",
         lambda **_kwargs: {"untracked": [], "modified": [], "error": None},
     )
     monkeypatch.setattr(
-        graph_mcp,
+        application,
         "commit_and_push",
         lambda *_args, **_kwargs: {
             "status": "not_committed",
@@ -996,7 +995,7 @@ def test_finalize_propagates_second_preflight_failure(
         },
     )
 
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "second-preflight",
         "must remain pending",
@@ -1025,7 +1024,7 @@ def test_finalize_rejects_malicious_slug_and_local_only_before_report(
         root=tmp_git_repo,
     )
 
-    bad_slug = graph_mcp._finalize_research_action_impl(
+    bad_slug = application._finalize_research_action_impl(
         _valid_report(),
         "../evil",
         "must not commit",
@@ -1035,7 +1034,7 @@ def test_finalize_rejects_malicious_slug_and_local_only_before_report(
     )
     assert bad_slug["git_status"] == "not_committed"
 
-    local_only = graph_mcp._finalize_research_action_impl(
+    local_only = application._finalize_research_action_impl(
         _valid_report(),
         "private",
         "must not commit",
@@ -1059,7 +1058,7 @@ def test_finalize_push_failure_keeps_local_commit(
         check=True,
     )
 
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "push-fails",
         "retain local commit",
@@ -1073,7 +1072,7 @@ def test_finalize_push_failure_keeps_local_commit(
 
 
 def test_finalize_is_disabled_by_default() -> None:
-    result = graph_mcp._finalize_research_action_impl(
+    result = application._finalize_research_action_impl(
         _valid_report(),
         "disabled",
         "must not run",

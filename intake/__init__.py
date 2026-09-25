@@ -9,12 +9,11 @@ raw 文件 → extraction → prepare（驗證＋凍結成 immutable action）
         → publish（本機 Git，每 action 一 commit）
 ```
 
-## 為什麼它是獨立的 package 而不是 `mcp_server/` 的一部分
+## 為什麼它是獨立的 package
 
-實測（2026-09-03）：`mcp_server/` 4,016 行有 **79% 不是 MCP**。這些邏輯只是因為
-第一個入口是遠端而住進 transport package，導致 5 個 core 消費端被迫 import 它。
-
-**MCP 是 optional adapter**：`intake/` 完全不 import `mcp`，本機路徑
+這些邏輯歷史上因為第一個入口是遠端 adapter 而住進 transport package，導致 5 個 core
+消費端被迫 import 它（2026-09-03 抽出）。遠端 adapter 已於 2026-09-25 退役刪除
+（ROADMAP 旁支「遠端入口退役」／Phase 2 Step 2.1）：本機路徑
 （`scripts/prepare_research_action.py`、`scripts/commit_pending_intake.py`、
 本機互動 session）直接呼叫這裡，不經過任何遠端協定。
 """

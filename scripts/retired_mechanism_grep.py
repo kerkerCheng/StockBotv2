@@ -1,14 +1,16 @@
 """退役機制的殭屍 grep（ROADMAP Phase 0 驗收；2026-09-22）。
 
 **不是 linter、不進 CI 或 hook**（L16-4）：Phase 0 結案時跑一次，之後每季跑一次。
-八組 regex 對應 ROADMAP「Phase 0 退役清單」；驗收＝code／static／skills／tests／config 全部命中 0。
+八組 regex（A～H）對應 ROADMAP「Phase 0 退役清單」；驗收＝code／static／skills／tests／config 全部命中 0。
+第九組 I（遠端 Graph MCP，2026-09-25 Phase 2 Step 2.1）掃**所有 tracked 檔**（`git ls-files`，含每一個 .md），
+keep-list 只准 historical_record；A～H 的驗收範圍維持 Phase 0 的定義不動（改它等於事後改 Phase 0 的驗收）。
 排除 docs/archive、docs/lessons-incidents.md、library/。`livedocs`（OPERATIONS／ARCHITECTURE／CONCEPTS）的命中要在 STEP_RESULT 逐句列出，
 禁止句（「不做 X」「X 已退役」）可留；`docs` 那一列只供參考，不計入驗收。
 
     python scripts/retired_mechanism_grep.py
 """
 import os,re,io,collections
-AREAS={'code':['alpha','briefing','webapp','engine_b','engine_c','decision_lab','thesis','query','crons','scripts','mcp_server','shared','portfolio','risk','loader','identity','audit'],
+AREAS={'code':['alpha','briefing','webapp','engine_b','engine_c','decision_lab','thesis','query','crons','scripts','shared','portfolio','risk','loader','identity','audit'],
        'skills':['skills'],'tests':['tests'],'docs':['docs','CONCEPTS.md','README.md'],'config':['config','.codex','.claude/settings.json','.agents'],'static':['webapp/static'],
        'livedocs':['docs/OPERATIONS.md','docs/ARCHITECTURE.md','CONCEPTS.md']}
 GROUPS={
@@ -277,7 +279,6 @@ KEEP: dict[tuple[str,str],str] = {
     ('tests/test_engine_c_observation_fields.py','G'): 'retirement_note: 五軸消費端退役、兩條守門斷言退役的註記',
     ('tests/test_engine_c_observation_gate.py','G'): 'retirement_note: 檔頭記事發（decision_lab 的 gap research packet）',
     ('tests/test_full_chain_acceptance.py','G'): 'guard_assertion: consumer 不得 import decision_lab.store 的 IO 禁止清單；skip 條件用舊店路徑',
-    ('tests/test_graph_mcp_manual.py','G'): 'retirement_note: get_decision_brief 退役 12 → 11 的註記',
     ('tests/test_graph_preservation.py','G'): 'guard_assertion: decision_lab 不得有 graph write 能力、source tree 不得 import graph writers',
     ('tests/test_identity_registry.py','G'): 'guard_assertion: decision_lab 不得反向 import identity authority',
     ('tests/test_layer_separation.py','G'): 'guard_assertion: decision_lab 不得 import alpha／portfolio／briefing、上游層不得 import decision_lab、凍結後不得碰 engine_c／fetchers／neo4j',
@@ -328,7 +329,6 @@ KEEP: dict[tuple[str,str],str] = {
     ('tests/test_coverage_pilot_generalization.py','H'): 'kept_file: 口徑核實（reconcile_consensus_base／verify_consensus_basis）測試',
     ('tests/test_engine_c_bar_date.py','H'): 'kept_file: Engine C 欄位清單含 pe_forward',
     ('tests/test_engine_c_coverage.py','H'): 'kept_file: Engine C 夾具含 pe_forward',
-    ('tests/test_engine_c_mcp.py','H'): 'kept_file: Engine C checklist 夾具含 pe_forward',
     ('tests/test_engine_c_probe_financial.py','H'): 'kept_file: Engine C 夾具含 pe_forward',
     ('tests/test_estimate_revision.py','H'): 'kept_file: 估計修正測試用 pe_forward 序列（Engine C 欄位）',
     ('tests/test_opinion_stance.py','H'): 'kept_file: overlay ledger 閘門測試讀 alpha.fundamental.contracts 字彙',
@@ -339,8 +339,69 @@ KEEP: dict[tuple[str,str],str] = {
 }
 ACCEPT_AREAS=("code","static","skills","tests","config")
 
+# ---- I 遠端 Graph MCP（Phase 2 Step 2.1，2026-09-25；ROADMAP 旁支「Graph MCP 退役」）----
+# 與 A～H 不同：範圍是**所有 tracked 檔（含每一個 .md、AGENTS.md、prompts/、deploy/、.claude/skills）**，
+# keep-list 的理由**只准 historical_record**（ROADMAP 驗收②）。鍵以 `/` 結尾代表整個目錄（歷史目錄才用）。
+# ⚠ 邊界用 ASCII lookaround、不用 `\b`：Python 的 `\b` 把中文字算成 word 字元，「與MCP」會漏抓，
+#   而 ROADMAP 的盤點命令（git grep -P）會抓到——兩邊不一致就是 L16 說的重造品開始偏離。
+# ⚠ 只抓**本專案的** Graph MCP：`_apply_research_action_impl`／`_load_extraction_impl` 是本機 intake domain（留），
+#   `--strict-mcp-config`、`mcp_servers` 是 Claude／Codex CLI **擋掉** MCP 的設定（守門，不是殘留），都不算命中。
+def _w(tok): return r'(?<![A-Za-z0-9_])'+tok+r'(?![A-Za-z0-9_])'
+MCP_GROUP='I 遠端 Graph MCP'
+MCP_PATTERN=re.compile('|'.join([
+    _w('mcp_server'), 'graph_mcp', 'GRAPH_MCP', _w('MCP'), r'stockbotv2-graph(?!-services)', r'mcp\.minatoyukina',
+    _w('record_lead_decision'), _w('apply_research_action'), _w('load_extraction'), _w(r'mcp>='),
+    r'^[ \t]*(?:from|import) mcp(?![A-Za-z0-9_])']),re.M)
+MCP_SKIP=re.compile(r'^scripts/retired_mechanism_grep\.py$')
+KEEP_MCP: dict[str,str] = {
+    # ---- 整個目錄都是歷史（ROADMAP 旁支列 ④ 點名）----
+    'docs/archive/': 'historical_record: 逐字封存區（含 2026-09-25 封存的遠端存取架構、connector solution、遠端 intake 協定）',
+    'docs/brainstorms/': 'historical_record: 當時的需求與決策討論，不改寫',
+    'docs/refactor/': 'historical_record: 2026-09 重構時的現況／目標架構盤點（當時 mcp_server 仍在）',
+    'docs/reports/': 'historical_record: 帶日期的報告與基準快照（含本 Phase 基準的盤點命令與命中數）',
+    'library/raw/': 'historical_record: 一手原文存檔（第三方文件逐字，L10 不改寫）；命中的是該文件自己的用語，與本專案遠端入口無關',
+    # ---- 已 completed／superseded 的 dated plans（逐檔；plans/ 目錄裡有 active plan，所以不整個放）----
+    'docs/plans/2026-07-10-006-feat-personal-investment-advisor-roadmap-plan.md': 'historical_record: superseded plan（→008）',
+    'docs/plans/2026-07-14-007-feat-remote-intake-provenance-plan.md': 'historical_record: superseded plan（→008），遠端入圖 provenance 的設計紀錄',
+    'docs/plans/2026-07-14-007-feat-source-trace-upgrade-plan.md': 'historical_record: superseded plan（→008）',
+    'docs/plans/2026-07-15-008-feat-unified-workplan-plan.md': 'historical_record: completed plan',
+    'docs/plans/2026-07-16-001-feat-mobile-research-action-launch-plan.md': 'historical_record: completed plan（遠端 Research Action 兩段式協定的交付紀錄）',
+    'docs/plans/2026-07-21-001-feat-action-oriented-alpha-decision-lab-plan.md': 'historical_record: completed plan',
+    'docs/plans/2026-07-22-001-feat-engine-d-operational-workflow-plan.md': 'historical_record: completed plan',
+    'docs/plans/2026-07-22-002-feat-daily-approval-loop-plan.md': 'historical_record: completed plan',
+    'docs/plans/2026-07-24-001-feat-daily-approval-loop-v1-1-plan.md': 'historical_record: completed plan',
+    'docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md': 'historical_record: completed plan（Phase 0；get_decision_brief 遠端工具退役的紀錄）',
+    'docs/plans/2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md': 'historical_record: completed plan（Phase 1；C5 停用遠端入口的決定）',
+    'docs/plans/2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md': 'historical_record: 本次退役的決定紀錄（§0.4 A6 五欄、Step 2.1）',
+    # ---- 活文件裡的紀錄列 ----
+    'docs/ROADMAP.md': 'historical_record: 旁支「Graph MCP 退役 ✅」列與 Phase 2 列是這次退役的決定與交付紀錄；Phase 0 退役清單的盤點範圍（2026-09-22）；硬約束 12 的改寫註記',
+    'docs/plans/README.md': 'historical_record: plan 索引列的主題描述（2026-07-24 v1.1 的 leads 同步、Phase 2 的退役項）',
+}
+
+def _tracked_files():
+    import subprocess
+    out=subprocess.run(['git','ls-files','-z'],capture_output=True,check=True).stdout.decode('utf-8','replace')
+    return [p for p in out.split('\0') if p]
+
+def _mcp_hits():
+    hits={}
+    for p in _tracked_files():
+        if MCP_SKIP.search(p) or not os.path.isfile(p): continue
+        try: t=io.open(p,encoding='utf-8').read()
+        except (UnicodeDecodeError,OSError): continue
+        n=len(MCP_PATTERN.findall(t))
+        if n: hits[p]=n
+    return hits
+
+def _mcp_key(path):
+    if path in KEEP_MCP: return path
+    for k in KEEP_MCP:
+        if k.endswith('/') and path.startswith(k): return k
+    return None
+
 def _verdict(idx):
     bad=[(k,v) for k,v in KEEP.items() if v.split(":",1)[0] not in KEEP_CLASSES]
+    bad+=[((k,'I'),v) for k,v in KEEP_MCP.items() if v.split(":",1)[0]!='historical_record']
     hits=set(); unlisted=[]
     for g in GROUPS:
         letter=g.split()[0]
@@ -348,13 +409,18 @@ def _verdict(idx):
             for p,n in idx[g].get(area,{}).items():
                 key=(p.replace(os.sep,'/'),letter); hits.add(key)
                 if key not in KEEP: unlisted.append((letter,area,key[0],n))
-    stale=[k for k in KEEP if k not in hits]
+    used=set()
+    for p,n in MCP_HITS.items():
+        k=_mcp_key(p)
+        if k is None: unlisted.append(('I','tracked',p,n))
+        else: used.add(k)
+    stale=[k for k in KEEP if k not in hits]+[(k,'I') for k in KEEP_MCP if k not in used]
     print("\n## 驗收（差集；Phase 0 結案要三個數字都是 0）")
     print(f"  未列 keep-list 的命中（檔，組）數：{len(unlisted)}")
     for letter,area,p,n in sorted(unlisted): print(f"    {letter} {area} {p} ({n})")
     print(f"  已列但不再命中（腐壞條目）數：{len(stale)}")
     for k in stale: print(f"    {k}")
-    print(f"  keep-list 條目數：{len(KEEP)}｜理由類別不合法：{len(bad)}")
+    print(f"  keep-list 條目數：{len(KEEP)}＋I 組 {len(KEEP_MCP)}｜理由類別不合法：{len(bad)}")
     for k,v in bad: print(f"    {k}: {v}")
     return 0 if (not unlisted and not stale and not bad) else 1
 
@@ -365,4 +431,8 @@ for g in GROUPS:
         if not d: continue
         top=sorted(d.items(),key=lambda x:-x[1])[:8]
         print(f"  {area}: {len(d)} 檔｜"+"、".join(f"{p.replace(os.sep,'/')}({n})" for p,n in top))
+MCP_HITS=_mcp_hits()
+print(f"\n## {MCP_GROUP}（所有 tracked 檔）")
+by_top=collections.Counter(p.split('/')[0] if '/' in p else p for p in MCP_HITS)
+print(f"  {len(MCP_HITS)} 檔｜"+"、".join(f"{k}({v})" for k,v in by_top.most_common()))
 raise SystemExit(_verdict(idx))

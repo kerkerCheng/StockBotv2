@@ -309,14 +309,6 @@ MUTATIONS: tuple[Mutation, ...] = (
         test="tests/test_layer_separation.py::test_the_io_exception_stays_narrow",
         guards="例外清單會腐壞——放行 providers 不等於放行整個 alpha/",
     ),
-    Mutation(
-        name="新增第 6 個 core → mcp_server 消費端",
-        path="identity/registry.py",
-        old="from __future__ import annotations",
-        new="from __future__ import annotations\nimport mcp_server  # noqa: F401",
-        test="tests/test_layer_separation.py::test_core_does_not_import_mcp_server",
-        guards="依賴方向只准 peripheral → core（allowlist 擋新增）",
-    ),
     # --- audit（2026-09-04）---------------------------------------------
     Mutation(
         name="audit 讓「看了 0 筆」算通過",
