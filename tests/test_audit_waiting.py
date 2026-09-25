@@ -259,6 +259,35 @@ def test_watch_waking_a_resolved_pq2_item_is_an_orphan(world) -> None:
     assert checks.check_orphans().status.name == "PASS"
 
 
+def test_liveness_counts_a_stalled_lead_from_its_last_entry_into_pq1(world) -> None:
+    """QueueLiveness 線索側原本沒有任何測試——2.9b（排回不再改寫 triage）後它把今早排回的 lead 報成「16 天沒人取」。
+    起算點＝最後一次進 pq1（triage 與最後一次排回取較晚）：今天排回的不報、真的放著 16 天的照報。"""
+    old_triage = {"decision": "go", "decided_at": _ago(days=16)}
+    world["leads"] = {
+        "lead_requeued_today": {"status": "triaged_go", "source": "x", "triage": dict(old_triage),
+                                "requeued": [{"at": _ago(hours=5), "trigger": "event_watch:ew_1"}]},
+        "lead_really_stalled": {"status": "triaged_go", "source": "x", "triage": dict(old_triage)},
+    }
+    findings = _findings(checks.check_queue_liveness())
+    assert "lead_really_stalled" in findings and "lead_requeued_today" not in findings
+
+
+def test_re_park_after_requeue_creates_the_trace_watch_from_the_requeue_time() -> None:
+    """重新停放建追源 watch 時，`created_at` 要是最後一次進 pq1 的時間；拿原始 triage 時間，剛觸發排回的那則
+    lead 比 watch 還新、會立刻再叫醒它（排回迴圈）。"""
+    from engine_b import leads as L
+
+    lead = {"triage": {"decided_at": "2026-09-09T00:00:00+00:00"},
+            "requeued": [{"at": "2026-09-25T21:31:27+00:00"}, {"at": "2026-09-12T00:00:00+00:00"}]}
+    assert L.last_entered_pq1_at(lead) == "2026-09-25T21:31:27+00:00"
+    assert L.last_entered_pq1_at({"triage": {"decided_at": "2026-09-09T00:00:00+00:00"}}) == "2026-09-09T00:00:00+00:00"
+    assert L.last_entered_pq1_at({}) == ""
+    from pathlib import Path
+
+    source = Path(L.__file__).read_text(encoding="utf-8")
+    assert "created_at=last_entered_pq1_at(lead) or None" in source
+
+
 def test_watch_requeueing_a_closed_or_missing_lead_is_an_orphan(world) -> None:
     world["watches"] = [_watch("ew_l", wake_lead="lead_1")]
     world["leads"] = {"lead_1": {"status": "applied"}}

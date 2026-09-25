@@ -518,7 +518,9 @@ def advance(
                 query_hint=str(refs.get("trace_next_trigger") or ""),
                 note=f"park 時自動建立；trace_status={trace_status or 'unstructured'}",
                 consumed_entities=refs.get("trace_requeue_consumed_entities") or (),
-                created_at=(lead.get("triage") or {}).get("decided_at"),
+                # 最後一次進 pq1 的時間，不是原始 triage 時間：2.9b 起排回不改寫 triage，若拿 decided_at，
+                # 剛觸發排回的那則 lead 比 watch 還新、會立刻再叫醒它（排回迴圈）。
+                created_at=last_entered_pq1_at(lead) or None,
             )
     return lead
 
@@ -923,6 +925,18 @@ def requeue_trace(
         "trace_requeue_trigger": cleaned_trigger,
     })
     return lead
+
+
+def last_entered_pq1_at(lead: Mapping[str, Any]) -> str:
+    """這則 lead **最後一次進入 pq1** 的時間（ISO 字串；都沒有就回空字串）。
+
+    ＝ triage 的時間與最後一次追源排回（`lead["requeued"]`）取較晚者。2026-09-26（Step 2.9b 的回歸修正）：
+    排回不再改寫 `triage.decided_at` 之後，原本拿 `decided_at` 當「進佇列時間」的消費端（稽核 QueueLiveness、
+    重新停放時建追源 watch 的 `created_at`）會把今天才排回的 lead 讀成幾週前——同一件事要有一個定義（L16）。
+    """
+    stamps = [str((lead.get("triage") or {}).get("decided_at") or "")]
+    stamps += [str(r.get("at") or "") for r in lead.get("requeued") or () if isinstance(r, Mapping)]
+    return max(stamps)
 
 
 #: 使用者本人觸發的排回（給排序的「使用者指定」一鍵讀；`engine_b/priority.py::rank_lead`）。

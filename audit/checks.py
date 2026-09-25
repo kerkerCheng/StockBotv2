@@ -766,17 +766,20 @@ def check_queue_liveness() -> AuditResult:
                 findings.append(f"[{n}] waiting_on 型別異常：{type(waiting).__name__}")
 
         # 線索側：triaged_go 卻長期沒有前進。
-        # 起算點是**這一次 PASS 的時間**（`triage.decided_at`），不是 `first_seen`：
-        # fired watch 把 parked lead 重排回 pq1 時會重寫 triage receipt，lead 是「今天」
-        # 才回到佇列的；用 first_seen 會把當天重排的 lead 全報成「27 天沒人取」
-        # （2026-09-09 consume-fired 上線首跑實測 35 筆假警報）。沒有 decided_at 才退回 first_seen。
+        # 起算點是**最後一次進 pq1 的時間**（`leads.last_entered_pq1_at`：triage 與最後一次排回取較晚），
+        # 不是 `first_seen`：fired watch 把 parked lead 重排回 pq1 時，lead 是「今天」才回到佇列的；
+        # 用 first_seen 會把當天重排的 lead 全報成「27 天沒人取」（2026-09-09 實測 35 筆假警報）。
+        # ⚠ 2026-09-26：原本讀 `triage.decided_at`，靠的是舊式排回會改寫它；2.9b 拿掉改寫後，今早排回的
+        # `lead_55bd36e6…` 被報成「16 天沒人取」——改讀同一個定義。都沒有才退回 first_seen。
+        from engine_b.leads import last_entered_pq1_at
+
         leads = sources.leads()
         stuck_leads = 0
         for lead_id, lead in leads.items():
             if lead.get("status") != "triaged_go":
                 continue
             entered = (
-                _parse_dt((lead.get("triage") or {}).get("decided_at"))
+                _parse_dt(last_entered_pq1_at(lead))
                 or _parse_dt(lead.get("first_seen"))
             )
             if entered and (now - entered).days > _STALLED_DAYS:

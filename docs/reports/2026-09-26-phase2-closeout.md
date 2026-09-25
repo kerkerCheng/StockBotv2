@@ -122,3 +122,11 @@ Non-blocking 的處置：
 | 2 | §3 `test_fixed_text_has_one_home…` 的去向說法過度 | §3 改成「前提消失」 |
 | 3 | 插槽「扣掉製造者」的正向面只有單元測試守，真實資料驗不到（#20） | 已在 §5 #6；#20 修好後用真實資料再驗 |
 | 4 | 小瑕疵：plan §0.6 偏差 #6 排在 #5 前；`ANGLE_KEYS` 註解寫「五個角度」實際 4 個 key（anchor 另計）；`coverage.json`／`ranking.json` 磁碟孤兒 | 照實記錄；前兩者是文字，不動行為，留給下一次動到那兩處的 Step 順手改 |
+
+## 8. 結案後的回歸修正（2026-09-26 06:30 後；使用者要求處理 3 則排回 lead 與 QueueLiveness 紅燈時發現）
+
+2.9b（排回不再改寫 `triage.decided_at`）漏掉兩個把 `decided_at` 當「進 pq1 時間」的消費端（L11-6 ④沒列到）：
+①稽核 QueueLiveness 把今早 daily 新式排回的 `lead_55bd36e6…` 報成「16 天沒人取」（真實 FAIL）；
+②重新停放時建追源 watch 的 `created_at` 會退回原始 triage 時間，剛觸發排回的 lead 可能立刻再叫醒它。
+修法：`engine_b/leads.py::last_entered_pq1_at`（triage 與最後一次排回取較晚）一個定義、兩處共用；
+QueueLiveness 線索側原本沒有任何測試，補兩條（突變驗過會紅）。修後 invariants 13 PASS、2592 passed。
