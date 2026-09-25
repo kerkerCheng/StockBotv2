@@ -54,6 +54,7 @@ import os
 import sys
 from collections import Counter
 from dataclasses import dataclass, field
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -91,7 +92,25 @@ ANGLES: tuple[tuple[str, str], ...] = (
 #: `DEMAND_PULL_RELATIONS` 是同一個決定，兩邊都從那裡讀，不各寫一份（L16）。
 _DEMAND_INBOUND = tuple(DEPENDENCY_RELATIONS) + tuple(DEMAND_PULL_RELATIONS)
 _DEMAND_OUTBOUND = ("is_component_of",)
-_COUNTER = ("competes_with", "constrained_by")
+
+VOCAB_PATH = ROOT / "schema" / "vocab.json"
+
+
+@lru_cache(maxsize=None)
+def counter_path_relations(path: Path = VOCAB_PATH) -> tuple[str, ...]:
+    """反向路徑收哪些 relation——`schema/vocab.json` 的 `counter_path_relation`，**唯一 loader**。
+
+    ⚠ 2026-09-25 之前這裡硬編 `("competes_with", "constrained_by")`，字彙檔那一份則沒有任何 loader
+    （原 loader 隨 Engine D 研究側於 Phase 0 退役）——同一個分類兩份、各走各的（L16）。
+    同日依 plan A3 把 `constrained_by` 移出：它是「又一個人繞不過它」（需求側證據），不是替代路線；
+    它仍在需求側與下一層（`DEPENDENCY_RELATIONS`）。
+    讀不到或是空的就 fail closed——反向路徑是讀圖的反證來源，空集合會讓「沒有替代路線」看起來像觀測。
+    """
+    vocab = json.loads(Path(path).read_text(encoding="utf-8"))
+    relations = vocab.get("counter_path_relation")
+    if not isinstance(relations, list) or not relations:
+        raise RuntimeError(f"{path} 的 counter_path_relation 缺或為空——反向路徑無從判定")
+    return tuple(str(r) for r in relations)
 
 
 @dataclass
@@ -192,9 +211,10 @@ def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
         if (e.src == node and e.relation in DEPENDENCY_RELATIONS)
         or (e.dst == node and e.relation == "is_component_of")
     ]
+    counter = counter_path_relations()
     view.angles["counter_path"] = [
         _view(e) for e in edges
-        if (e.dst == node or e.src == node) and e.relation in _COUNTER
+        if (e.dst == node or e.src == node) and e.relation in counter
     ]
     view.anchor_chain = demand_chain(node, build_upward_index(edges))
     return view

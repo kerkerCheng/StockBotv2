@@ -122,13 +122,14 @@ def test_missing_anchor_is_said_out_loud() -> None:
     assert "走不到任何已登記的需求錨" in text
 
 
-def test_constrained_by_answers_demand_side_and_next_layer_not_only_counter_path() -> None:
-    """`constrained_by` 是 counter path，**但同時也是「誰需要它／它卡在誰身上」的答案**。
+def test_constrained_by_answers_demand_side_and_next_layer_not_counter_path() -> None:
+    """`constrained_by` 是「誰需要它／它卡在誰身上」的答案，**不是反向路徑**。
 
-    這三個角度問的是方向，`counter_path` 問的是證據性質——同一條邊同時是兩者的答案，
-    不是重複計算。事發（2026-09-18）：`_DEMAND_INBOUND` 與 `next_layer` 各自硬編
-    `depends_on`，於是圖裡逐字寫著「co:coherent 受限於 tech:inp_dfb_laser」的那條邊，
-    在 `tech:inp_dfb_laser` 的需求側是看不見的（L16：分類沒跟著資料走到消費端）。
+    事發（2026-09-18）：`_DEMAND_INBOUND` 與 `next_layer` 各自硬編 `depends_on`，於是圖裡逐字寫著
+    「co:coherent 受限於 tech:inp_dfb_laser」的那條邊，在 `tech:inp_dfb_laser` 的需求側是看不見的
+    （L16：分類沒跟著資料走到消費端）。
+    2026-09-25（plan A3）：它移出反向路徑——「又一個人繞不過它」是需求側證據（利多），不是替代路線；
+    留在反向路徑會讓讀圖的「反向路徑新增」反證誤響（`mat:inp_substrate` 讀圖 sr_6ad5c884eb7bc3fb 量過）。
     """
     rows = [
         _row("co:coherent", "constrained_by", "tech:inp_dfb_laser", 5),
@@ -137,13 +138,43 @@ def test_constrained_by_answers_demand_side_and_next_layer_not_only_counter_path
     laser = build_structure("tech:inp_dfb_laser", _edges(rows))
     demand = [(e.src, e.relation) for e in laser.angles["demand_side"]]
     assert ("co:coherent", "constrained_by") in demand
-    # 同一條邊照樣留在反向路徑——兩個角度問的不是同一件事。
-    assert [e.relation for e in laser.angles["counter_path"]] == ["constrained_by"]
+    # 反向路徑不收它（A3）——需求側已經答了「誰繞不過它」。
+    assert laser.angles["counter_path"] == []
 
     coherent = build_structure("co:coherent", _edges(rows))
     assert [(e.relation, e.dst) for e in coherent.angles["next_layer"]] == [
         ("constrained_by", "tech:inp_dfb_laser")
     ]
+
+
+def test_counter_path_members_are_the_vocabulary(monkeypatch) -> None:
+    """反向路徑的成員**就是** `schema/vocab.json` 的 `counter_path_relation`——改字彙就改行為，不能各寫一份（L16）。
+
+    2026-09-25 之前 `query/structure.py` 硬編一份、字彙檔另一份且沒有 loader。這條守兩件事：
+    ①loader 讀到的＝字彙檔原文；②`build_structure` 真的去問 loader（換掉 loader 的回傳，行為跟著變）。
+    """
+    import json
+    import query.structure as structure
+
+    vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
+    assert structure.counter_path_relations() == tuple(vocab["counter_path_relation"])
+    assert "constrained_by" not in structure.counter_path_relations()
+
+    rows = [_row("co:coherent", "constrained_by", "tech:inp_dfb_laser", 5)]
+    monkeypatch.setattr(structure, "counter_path_relations",
+                        lambda: ("competes_with", "constrained_by"))
+    widened = build_structure("tech:inp_dfb_laser", _edges(rows))
+    assert [e.relation for e in widened.angles["counter_path"]] == ["constrained_by"]
+
+
+def test_counter_path_vocabulary_fails_closed_when_missing(tmp_path) -> None:
+    """字彙檔缺這個鍵或是空的就拒絕——空集合會讓「沒有替代路線」看起來像觀測（INV-3）。"""
+    from query.structure import counter_path_relations
+
+    bad = tmp_path / "vocab.json"
+    bad.write_text('{"counter_path_relation": []}', encoding="utf-8")
+    with pytest.raises(RuntimeError, match="counter_path_relation"):
+        counter_path_relations(bad)
 
 
 def test_evidence_column_is_computed_not_a_dataclass_default() -> None:

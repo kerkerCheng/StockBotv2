@@ -53,7 +53,7 @@ tags:
 | 字彙 | 位置 | 擴充方式 |
 |---|---|---|
 | node_type／abstraction_level／role／relation／qualification_status／demand_proof_level／source_type／evidence_tier | `schema/vocab.json` | 加一項；`loader/validate.py` 讀同一份。2026-07-29 的 robotics ontology 就是這樣加的。⚠ 新增 `relation` 必須同步在 `schema/neo4j_setup.cypher` 預熱（`tests/test_robotics_ontology.py` 是這道剎車），並回答它算不算 counter path |
-| 哪些 relation 算 counter path | `schema/vocab.json` 的 `counter_path_relation` | 明列，不是對 relation 名稱做子字串比對；唯一 loader 原是 ~~`engine_d_runtime/adapters.py`~~ 的 `counter_path_relations`（2026-09-23 Phase 0 Step 0b.4 隨 Engine D 研究側退役；字彙留，Phase 2 走圖的 counter path 問句要接它）。2026-08-06 從 `substitut／alternative／compete／counter` 四個 token 改來——那既猜不到 `constrained_by`，也會誤命中名字裡剛好含 counter 的 relation |
+| 哪些 relation 算 counter path（讀圖的反向路徑） | `schema/vocab.json` 的 `counter_path_relation` | 明列，不是對 relation 名稱做子字串比對；**唯一 loader 是 `query/structure.py::counter_path_relations()`**（2026-09-25 Phase 2 Step 2.2；原 loader ~~`engine_d_runtime/adapters.py`~~ 於 Phase 0 退役，之間 `query/structure.py` 自己硬編一份）。同日移出 `constrained_by`（「又一個人繞不過它」是需求側證據、不是替代路線，plan A3），現在只收 `competes_with`。2026-08-06 從 `substitut／alternative／compete／counter` 四個 token 改來——那既猜不到該收的，也會誤命中名字裡剛好含 counter 的 relation |
 | 公司 ID ↔ research／execution 識別 | `config/company_identity.json` | 加一列；`identity/registry.py` 是唯一 loader |
 | 交易所報價單位 → ISO 結算幣別 | `config/currency_units.json` | 只登記 minor unit（GBp／ILA／ZAc…）；ISO code 形式的新幣別（TWD／JPY…）不必登記就自動通過。`identity/currency.py` 是唯一 loader |
 | Engine C 人工觀測欄位 | `config/engine_c_observation_fields.json` | 加一項且 `gate_member` 必須為 false；`engine_c/observation_fields.py` 是唯一 loader |

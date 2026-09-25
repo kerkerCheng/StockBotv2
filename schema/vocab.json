@@ -52,10 +52,9 @@
     "partnership_with",
     "constrained_by"
   ],
-  "_counter_path_relation_comment": "哪些 relation 算 counter path（Engine D 的 counter_path_missing 判定）。先前是對 relation 名稱做子字串比對（substitut/alternative/compete/counter）：既猜不到 constrained_by，未來也會誤命中像 counterfeits 這種無關的名字。改成明列；新增 relation 時要順便決定它算不算反向路徑。唯一 loader 是 engine_d_runtime/adapters.py 的 counter_path_relations()。",
+  "_counter_path_relation_comment": "哪些 relation 算反向路徑（讀圖第四個角度「有沒有東西在取代它」，也是讀圖反證的來源之一）。明列、不對 relation 名稱做子字串比對（那會猜不到該收的、誤中 counterfeits 這種無關的名字）；新增 relation 時要順便決定它算不算。**唯一 loader 是 query/structure.py 的 counter_path_relations()**（原 loader engine_d_runtime 已於 2026-09-23 Phase 0 退役）。2026-09-25（Phase 2 Step 2.2，plan 2026-09-25-001 §0.4 A3）移出 constrained_by：`A constrained_by N` 是「又一個人繞不過 N」，是需求側證據（利多），不是替代路線；2026-09-18 讀圖 sr_6ad5c884eb7bc3fb 已量到 mat:inp_substrate 唯一的反向路徑就是 co:iqe constrained_by mat:inp_substrate，會讓「反向路徑新增」這條反證誤響。移出後它照樣出現在需求側與下一層（DEPENDENCY_RELATIONS 的一員，query/bottleneck.py），只是不再被讀成反證。",
   "counter_path_relation": [
-    "competes_with",
-    "constrained_by"
+    "competes_with"
   ],
   "_sole_source_beneficiary_end_comment": "sole_source=true 時，這條邊在替哪一端背書。L8 的自報檢查要問的是「宣稱獨家性的人，是不是就是受益的那一方」，不是「src 是不是 origin」。supplies_to 的獨家性抬高 src（我是唯一供應商）；depends_on 的獨家性抬高 dst（沒有人能取代 B）。方向弄反會同時漏抓與誤抓：issuer 自承「我依賴 B」是不利益陳述，反而可信，不該警告。未列出的 relation 一律兩端都查（fail safe）。唯一 loader 是 loader/validate.py。新增 relation 時要順便決定它的受益端。",
   "sole_source_beneficiary_end": {
