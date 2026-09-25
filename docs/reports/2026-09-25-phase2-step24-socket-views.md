@@ -61,3 +61,9 @@ step: 2.4
 ```
 
 ELS 8ch module 與 PH18DA 的完整輸出由同一條命令重跑即得（逐字見 §1、§3 引用）。
+
+## 5. R2-b 之後的修正（2026-09-25）
+
+R2-b（CONDITIONAL_GO）B1：製造者段原本把 `deploys` 也當製造者。`deploys` 的字彙定義是部署方（營運者／客戶），所以改成**只認 `develops`**、
+`deploys` 另列「部署方（客戶，不是製造者）」。真實樣本 `prod:vera_verarubin`：修正前印六家雲端「製造者」且沒有缺席警告；修正後印「分不出製造者」
+＋部署方 `co:coreweave`、`co:google`、`co:microsoft`、`co:nebius`、`co:oracle`、`co:spacexai`。本報告 §1 的三個產品不受影響（三個都沒有 develops／deploys 邊）。

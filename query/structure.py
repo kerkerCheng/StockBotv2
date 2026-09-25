@@ -220,8 +220,12 @@ def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
     return view
 
 
-#: 「誰的產品」——進到 prod 節點的這兩種邊指得出製造者（Phase 2 Step 2.4，plan §5）。
-_MAKER_RELATIONS = ("develops", "deploys")
+#: 「誰的產品」——只有 `develops` 指得出製造者（Phase 2 Step 2.4，plan §5）。
+#: ⚠ `deploys` 是**部署方（營運者／客戶）**（`prompts/extract_system.md`：「an operator/customer deploys a robot
+#: product」），不是製造者——R2-b B1（2026-09-25）：先前兩者都標「製造者」，`prod:vera_verarubin` 的六家雲端
+#: 客戶因此被印成製造者，還壓掉了「分不出製造者」的缺席警告，而真正的製造者 NVIDIA 在圖上只是 `supplies_to`。
+_MAKER_RELATIONS = ("develops",)
+_DEPLOYER_RELATIONS = ("deploys",)
 
 SOCKET_NO_MAKER = ("圖上分不出這個產品是誰的：`supplies_to` 可能是製造者自己，也可能是零件供應商"
                    "（L12：一個關係承載兩種語意，見 plan 2026-09-25-001 R-4）")
@@ -235,12 +239,13 @@ class SocketView:
     node: str
     makers: list[dict[str, Any]] = field(default_factory=list)
     maker_absence: str | None = None
+    deployers: list[str] = field(default_factory=list)
     customer_quotes: list[dict[str, Any]] = field(default_factory=list)
     customer_absence: str | None = None
     sources: list[dict[str, Any]] = field(default_factory=list)
 
     def as_dict(self) -> dict[str, Any]:
-        return {"makers": self.makers, "maker_absence": self.maker_absence,
+        return {"makers": self.makers, "maker_absence": self.maker_absence, "deployers": self.deployers,
                 "customer_quotes": self.customer_quotes, "customer_absence": self.customer_absence,
                 "sources": self.sources}
 
@@ -268,6 +273,7 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
                     "label": "製造者（不是零件供應商）" if src in suppliers else "製造者"} for src, rel in makers]
     if not makers:
         view.maker_absence = SOCKET_NO_MAKER
+    view.deployers = sorted({e.src for e in edges if e.dst == node and e.relation in _DEPLOYER_RELATIONS})
     docs: dict[str, dict[str, Any]] = {}
     for edge_key, found in sorted(quotes.items()):
         if node not in (edge_key[0], edge_key[2]):
@@ -293,6 +299,8 @@ def render_socket_markdown(socket: SocketView) -> str:
             out.append(f"- `{m['company']}` {m['relation']} `{socket.node}`——{m['label']}")
     else:
         out.append(f"⚠ {socket.maker_absence}")
+    if socket.deployers:
+        out.append(f"- 部署方（客戶，不是製造者）：{'、'.join(f'`{c}`' for c in socket.deployers)}")
     out.append("\n## 插槽：客戶端或可解析第三方的原文（不進 digest）\n")
     if socket.customer_quotes:
         for q in socket.customer_quotes:

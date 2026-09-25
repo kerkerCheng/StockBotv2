@@ -169,6 +169,12 @@ class Citation:
                 "source_id": self.source_id, "independent": self.independent}
 
 
+def _strict_bool(value: Any) -> bool:
+    if not isinstance(value, bool):
+        raise ContractViolation(f"citation.independent 必須是 true／false，不是 {value!r}（字串 \"false\" 會被讀成真）")
+    return value
+
+
 def _citations(raw: Any) -> tuple[Citation, ...]:
     out = []
     for item in raw or ():
@@ -182,7 +188,7 @@ def _citations(raw: Any) -> tuple[Citation, ...]:
             edge=tuple(str(x) for x in edge),
             quote=str(item.get("quote") or ""),
             source_id=str(item.get("source_id") or ""),
-            independent=bool(item.get("independent", False)),
+            independent=_strict_bool(item.get("independent", False)),
         ))
     return tuple(out)
 
@@ -369,6 +375,8 @@ def parse_structure_reading_record(raw: Mapping[str, Any]) -> StructureReading:
         raise ContractViolation(f"structure reading 的時間欄位不合法：{exc}") from None
     anchor = raw.get("anchor_chain")
     version = str(raw.get("record_version") or RECORD_VERSION_V1)
+    if version not in (RECORD_VERSION, RECORD_VERSION_V2, RECORD_VERSION_V1):
+        raise ContractViolation(f"record_version 未登記：{version!r}——不靜默當成哪一版（拼錯的 v3 會丟掉引用）")
     is_v3 = version == RECORD_VERSION
     return StructureReading(
         reading_id=str(raw.get("reading_id") or ""),

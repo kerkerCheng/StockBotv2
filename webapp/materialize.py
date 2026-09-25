@@ -1300,6 +1300,9 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
             continue
         view = build_structure(node, edges)
         watch_reasons = reread_reasons(node, watches)
+        for unit in sorted({r.unit for r in records} - set(current)):
+            rows.append({"node": node, "unit": unit, "status": None, "reading_id": None,
+                         "reason": f"這個節點的 {unit} 讀圖有紀錄但目前沒有現行的那一筆（已全部撤回）"})
         for unit, reading in current.items():
             status = reading_status(reading, view.as_dict(), today=today)
             rows.append({

@@ -185,7 +185,8 @@ def demand_side_customers(record: Mapping[str, Any]) -> list[str]:
     return sorted(out)
 
 
-def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | None = None) -> dict[str, list[str]]:
+def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | None = None,
+                             directory: Path | None = None) -> dict[str, list[str]]:
     """讀圖 append 成功後的等待登記（Phase 1 Step 1.5；冪等，可重跑）。
 
     1. 被取代（`supersedes_id`）或撤回的那一份：它還在盯的語意 watch → consume（note 寫明 superseded／retracted）。
@@ -210,7 +211,7 @@ def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | 
     # 重讀忘了帶或帶錯，舊讀圖的條件永遠掛著，同一條件新舊兩筆）。節點的讀圖 id 從 ledger 讀，不只靠 watch 上的 node。
     # ⚠ 以（節點, 單位）為單位（v3，A1）：同一個 prod 節點的層讀圖與插槽讀圖各自是現行，
     # 新的插槽讀圖不得收掉層讀圖還在盯的條件，反之亦然。
-    records, _errors = read_reading_records(parsed.node)
+    records, _errors = read_reading_records(parsed.node, directory=directory)
     same_unit_ids = {r.reading_id for r in records if r.unit == parsed.unit} | {parsed.reading_id}
     other_unit_ids = {r.reading_id for r in records if r.unit != parsed.unit}
     if parsed.retracted:

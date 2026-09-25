@@ -201,7 +201,7 @@ def test_a_legal_v3_reading_appends_and_registers_its_watches(tmp_path) -> None:
     append_reading_record(record, directory=tmp_path, quotes=_quotes(SOCKET))
     records, errors = read_reading_records(SOCKET, directory=tmp_path)
     assert not errors and records[0].unit == "socket" and len(records[0].citations) == 2
-    summary = register_reading_watches(record)
+    summary = register_reading_watches(record, directory=tmp_path)   # R2-b N3：不讀真實 ledger
     assert len(summary["registered"]) == 1, "v3 的反證照樣登記成語意 watch（G7）"
 
 
@@ -385,3 +385,62 @@ def test_socket_view_is_refused_on_non_product_nodes(capsys) -> None:
 
     assert main(["tech:cw_dfb_laser", "--unit", "socket"]) == 2
     assert "prod:" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# R2-b 處置（2026-09-25）
+# ---------------------------------------------------------------------------
+
+def test_deploys_is_a_deployer_not_a_maker() -> None:
+    """R2-b B1：`deploys` 是部署方（營運者／客戶），不是製造者；只有它時仍要印「分不出製造者」。
+
+    真實樣本：`prod:vera_verarubin` 的六家雲端 `deploys` 它，唯一的供給側是 `co:nvidia supplies_to`。
+    """
+    from identity.registry import get_registry
+    from query.structure import SOCKET_NO_MAKER, build_socket_view
+
+    node = "prod:vera_verarubin"
+    edges = _canonical([_row("co:nvidia", "supplies_to", node), _row("co:coreweave", "deploys", node),
+                        _row("co:oracle", "deploys", node)])
+    view = build_socket_view(node, edges, {}, registry=get_registry())
+    assert view.makers == [] and view.maker_absence == SOCKET_NO_MAKER
+    assert view.deployers == ["co:coreweave", "co:oracle"]
+
+
+def test_independent_must_be_a_real_boolean() -> None:
+    """R2-b N7：字串 "false" 用 bool() 會變成真——只收 true／false。"""
+    cites = _two_halves(SOCKET)
+    cites[1]["independent"] = "false"
+    with pytest.raises(ContractViolation, match="independent"):
+        _v3(citations=cites)
+
+
+def test_unknown_record_version_is_rejected_not_read_as_a_layer() -> None:
+    """R2-b N7：拼錯的版本（例 `.../V3`）先前會靜默當成 v1 層讀圖、引用被丟掉。"""
+    record = _v3()
+    record["record_version"] = "structure-reading/V3"
+    with pytest.raises(ContractViolation, match="record_version"):
+        parse_structure_reading_record(record)
+
+
+def test_a_fully_retracted_unit_still_gets_a_row_when_the_other_unit_is_current(tmp_path, monkeypatch) -> None:
+    """R2-b N5：同一節點層仍現行、插槽全部撤回——插槽那一格也要出現一列，不得安靜消失（INV-3）。"""
+    import query.structure as qs
+    from alpha.providers import structure_readings as sr
+    from webapp.materialize import materialize_structure_readings
+    from webapp.store import StateArtifactStore
+
+    monkeypatch.setattr(sr, "STRUCTURE_READING_DIR", tmp_path / "ledger")
+    monkeypatch.setattr(qs, "_load_edges", lambda: _canonical([_row(SIVERS, "supplies_to", SOCKET)]))
+    layer = _v3(SOCKET, unit="layer")
+    socket = _v3(SOCKET, unit="socket", created_at=NOW.replace(hour=4))
+    sr.append_reading_record(layer, quotes=_quotes(SOCKET))
+    sr.append_reading_record(socket, quotes=_quotes(SOCKET))
+    retract = structure_reading_record(node=SOCKET, structure=_structure(SOCKET), unit="socket", kind="volume",
+                                       reading=socket["reading"], expires=LATER, created_at=NOW.replace(hour=5),
+                                       author="test", supersedes_id=socket["reading_id"], retracted=True)
+    sr.append_reading_record(retract)
+    _path, payload = materialize_structure_readings(store=StateArtifactStore(tmp_path / "state"), as_of=TODAY)
+    by_unit = {row["unit"]: row for row in payload["rows"]}
+    assert set(by_unit) == {"layer", "socket"}
+    assert by_unit["socket"]["reading_id"] is None and "撤回" in by_unit["socket"]["reason"]
