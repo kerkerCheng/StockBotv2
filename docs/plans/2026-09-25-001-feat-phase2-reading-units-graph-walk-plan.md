@@ -184,8 +184,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ✅（13 則 pq1 位移 0，逐則原因見偏差 #18；圖不在時 drain 照常排序；triage 字彙不再提供 `ranking`） | 便宜 | `a1640db` |
 | 2.9a | `pending --trigger` 必帶到期或綁 watch | ✅（只帶 trigger 拒收並印兩種寫法；`--watch` 必須是會叫醒這個編號、仍在等的 watch；現存池 1 筆只帶 trigger 的 [632] 已有 `ew_0094` 會叫醒它，audit Expiry PASS） | 便宜 | `a124746` |
 | 2.9b | 追源排回不寫假 triage、缺分類有人接 | ✅（`requeue_trace` 只追加 `requeued`；`classification-health` 另計 `requeued_unclassified_count`＝3、每筆帶 consumer；「triage 判斷的寫入者只有 `leads.triage()`」字面成立——另兩處是回到 pending 時清成 None） | 便宜 | `28057cf` |
-| 2.9c | watch 的「今天」改台北日期 | ✅（`event_watch._today()` 讀 `schedule.timezone`；disproof、pq2 `until` 叫回、audit Expiry 共用；順手修「追源到期結案今日」拿 UTC 前 10 碼比本地今天的少算；偏差 #19） | 便宜 | 見結案列補填 |
-| 結案 | completion gate ＋ closeout 報告 ＋ R2 ＋ ROADMAP ✅ | ○ | 便宜 | |
+| 2.9c | watch 的「今天」改台北日期 | ✅（`event_watch._today()` 讀 `schedule.timezone`；disproof、pq2 `until` 叫回、audit Expiry 共用；順手修「追源到期結案今日」拿 UTC 前 10 碼比本地今天的少算；偏差 #19） | 便宜 | `c00896e` |
+| 結案 | completion gate ＋ closeout 報告 ＋ R2 ＋ ROADMAP ✅ | ▶（closeout 已寫、九項 gate 過；R2 進行中） | 便宜 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 
