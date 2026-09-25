@@ -34,7 +34,7 @@ iPhone Safari／桌機瀏覽器
 | Cloudflare 帳號／網域 `minatoyukina.uk` | 已有（2026-07-11 註冊，DNS 由 Cloudflare 管理） | 重用 |
 | Tunnel `d3074ec2-c2a3-4782-9c54-8604289b5fd3` | 已有，`cloudflared` 開機自啟 | **重用同一條**，只加一條 ingress |
 | `~/.cloudflared/cert.pem`、credentials JSON | 已有 | 重用，**不進 Git** |
-| 開機自啟 `stockbotv2-graph-services.vbs` | 已有（Neo4j＋cloudflared；遠端 graph server 那行已於 2026-09-24 註解停用） | 可選：加一行啟動 APP（見下方「開機自啟」） |
+| 開機自啟 `stockbotv2-graph-services.vbs` | 已有（Neo4j＋cloudflared；遠端 graph server 那行 2026-09-24 停用、2026-09-25 已從檔內移除） | 可選：加一行啟動 APP（見下方「開機自啟」） |
 
 （2026-09-07 上線時 tunnel 上還有 `neo4j.` 與遠端 graph server 兩條 hostname；2026-09-24 已移除，現在只剩 APP。）
 
@@ -243,7 +243,7 @@ Cloudflare One → **團隊與資源（Team & Resources）→ 使用者（Users�
 ## 開機自啟 ✅ 已完成（2026-09-07）
 
 現有的 `%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\stockbotv2-graph-services.vbs`
-（負責 Neo4j＋cloudflared；遠端 graph server 那行已於 2026-09-24 註解停用）**已在檔尾追加兩行**，讓 APP 也隨登入啟動：
+（負責 Neo4j＋cloudflared；遠端 graph server 那行 2026-09-24 停用、2026-09-25 已從檔內移除）**已在檔尾追加兩行**，讓 APP 也隨登入啟動：
 
 ```vbs
 ' StockBot Web App（Phase 2 Step 5，2026-09-07）——read-only serve。
