@@ -115,6 +115,7 @@ Coherent「we have multiple six-inch indium phosphide substrate suppliers」；L
 - **10 個是製造者賣自己的產品**（AMAT ×2、NVIDIA ×3、POET ×2、Lam、Tower 的 PH18DA、IQE 的 QD 雷射磊晶片）；其中 POET→blazar 與 Lam→reliant 已經有 `develops`，`supplies_to` 是重複。
 - **3 個是真正的零件進客戶產品**：`prod:supernova`、`prod:gf_scale`、`prod:els_8ch_module`——**三個都是 Sivers 的插槽**。插槽這個單位在圖上只存在於我們研究過的那一家（供應商計數＝研究深度，決定紀錄 §1.1 的同一個形狀）。
 提案逐條寫在 **pq2 [651]**：10 個改 `develops`、補 `co:ayar_labs`／`co:globalfoundries` 的 `develops`、`co:o_net_technologies` 改 `develops`、PH18DA 補 `co:openlight develops`。go 只到研究包，入圖另取 `ra_admission`。
+⚠ **這個提案在 go 之後被模擬推翻，改成「只加 develops」——見 §7。**
 
 ### 4.5 本 Step 鑄的 pq2
 
@@ -138,7 +139,62 @@ Coherent「we have multiple six-inch indium phosphide substrate suppliers」；L
 - 沒有做 [652] 的追源；The Next Platform 那句是 WebFetch 摘錄，入圖前要逐字重核。
 - 沒有追 Sivers 管理層「2027 年 production-ready」的一手（二手轉述，寫在 SuperNova 讀圖的圖外段，標明待追）。
 
+## 7. 使用者 go [651]、[652] 之後（2026-09-25 同一 session）
+
+使用者同時確認偏差 #9 的收緊。`go` 的語意是推進到下一道人工閘門；兩項都做到研究包，**沒有寫圖**。
+
+### 7.1 [651]：原提案被推翻，改成「只加 develops」
+
+準備研究包時先跑唯讀模擬（L11-6：這個修法若錯，最先壞哪一筆）：
+
+| 修法 | digest 變動節點 | 失去需求錨的公司 | 結構表母體（公司→向下 sub≥4） |
+|---|---|---|---|
+| S1 改型別（[651] 原提案） | 13 | `co:nvidia` | 30 → 29（`co:tower_semiconductor → prod:ph18da` sub=4 消失） |
+| S2 只加 `develops`（含 Sivers→SuperNova 重掛） | **0** | **0** | 30 → 30 |
+
+原因：需求錨走訪與結構表都走 `supplies_to`、不走 `develops`；而對「供應商自己的產品／平台」（Blackwell、PH18DA…），`supplies_to` 的意思是「製造者賣這個東西」，
+跟 `co:axt supplies_to mat:inp_substrate` 一樣，**並沒有錯**。R-4 的兩義真正的形狀是 `prod:` 一表多義（§3.5 第 5 點）——缺的只是「客戶產品」那幾格的製造者。
+
+研究包＝`loader/manifests/r4-socket-makers-20260925.json`：8 份既有抽取檔新增 12 條（11 條製造者 `develops`＋Sivers→SuperNova 的 ECOC 原文重掛＝[652]①），
+只引用各檔既有 sources、quote 一字不動。刻意不列 POET→Starlight（沒有逐字同時寫出兩個名字，L6）與 IQE→QD 雷射磊晶片（製造者說不清楚）。
+工具：`loader/migrate_relation_rejudge.py --additions`（偏差 #10）；dry-run：files 8／edges_added 12／not_found []，每份改完都過 `loader/validate.py`。
+**入圖閘門：pq2 [654]**（go＝備份→遷移→驗收全圖 digest 0 變動）。
+
+### 7.2 [652]：Lumentum 那一半追到一手；Coherent、住友追不到
+
+- **The Next Platform 原句逐字核對**：«laser makers Lumentum and Coherent (who along with Sumitomo are suppliers of laser dies to Ayar Labs for its SuperNova external light sources)»
+  ——是作者插句，不是 Mark Wade 的引述；同文引述 Wade 的只有「the company is also buying semiconductor lasers and building its SuperNova remote light sources」。
+- **Lumentum 部分追到一手**：Lumentum／Ayar 2022-03-09 聯合新聞稿（Lumentum IR）——Lumentum 以高量供應 CW-WDM MSA 外部雷射光源給 Ayar 的 optical I/O，
+  Ayar CEO Charles Wuischpard 具名。**全文沒有 SuperNova**，依 L6 只入公司層級的 `co:lumentum supplies_to co:ayar_labs`。
+- **Sivers 2024-12-19 新聞稿原文**（`python -m fetchers.mfn --url …`，JSON-LD datePublished 2024-12-19T07:49:17Z）：Mark Wade「Ayar Labs, a strategic customer of Sivers Semiconductors,
+  **intends** to expand its relationship … through NRE and pre-purchase of products」；Sivers 自稱「in **advanced discussions**」。意向，不是合約；同樣沒有 SuperNova。
+- 兩份做成研究包 **`ra_905c6719146417c137e3ded2c22dc75f`**（digest `79643b8f…`，到期 2026-10-25）→ **入圖閘門 pq2 [653]**。節點宣告照抄圖上現值（loader 對節點是覆寫）。
+- **Coherent、住友**：追不到一手＝`isolated_tier_3`，依 source-trace 規則書**不產抽取、不入圖**（我在 [652] 提案裡寫的「追不到就以 tier 3 入圖」違反這條，已照規則書更正），
+  建假設 **`hy_0007_2026-09-25`**（到期 2026-12-24）；`python -m query.bottleneck --what-if hy_0007_2026-09-25`：若為真，結構表新增 3 列（Coherent／Lumentum／住友 → SuperNova）
+  ——「表有動」，值得追平行證據；SuperNova 讀圖第 2 條反證的 watch 已在盯這四家。
+- **對 SuperNova 插槽的意義**：Ayar 的雷射來源從 2022 年起就不只 Sivers 一家（公司層級、一手）。這不是 SuperNova 那一格的證據（L6），所以插槽讀圖**現在不改**；
+  [653]、[654] 入圖後插槽的供給側與製造者段會變，由那時的研究 session 重讀。
+
+### 7.3 準備研究包時又現形的兩個系統問題（記進 plan §14 #20、#21，沒有順手改）
+
+1. **聯合公告偵測對 71／100 家公司無效**：`co:ayar_labs` 等 71 家沒有 `display_name`，`_origin_mentions` 認不出它們。`classify_evidence` 註解點名的例子
+   「Sivers 官方 PR，內含 Ayar Labs CTO 具名引述 → counterparty_joint」實際跑出來是 `self_reported`。所以 [654] 入圖後，Sivers→SuperNova 的文件數 1 → 2，證據等級仍是 needs_review。
+   修它會牽動很多邊的證據等級，要先量再放。
+2. **OpenLight 有兩個 registry ID**（`co:openlight`、`co:openlight_photonics`）。
+
+### 7.4 pq2 狀態
+
+| 編號 | 狀態 | 收據／下一步 |
+|---|---|---|
+| [651] | go ✓ | `authority:graph_migration_packet;ref:loader/manifests/r4-socket-makers-20260925.json` |
+| [652] | go ✓ | `authority:research_packet;ref:ra_905c…＋manifest＋hy_0007` |
+| [653] | 待核准（`ra_admission`） | 研究包 `ra_905c6719146417c137e3ded2c22dc75f` 入圖 |
+| [654] | 待核准（manual） | 遷移 manifest 入圖（只加不改，12 條） |
+
 ## 參考來源（圖外，本 Step 查證用）
+
+- [Lumentum／Ayar Labs 2022-03-09 聯合新聞稿（Lumentum IR）](https://investor.lumentum.com/financial-news-releases/news-details/2022/Lumentum-and-Ayar-Labs-Announce-Strategic-Collaboration-to-Supply-External-Light-Sources-for-Co-packaged-Optical-Interconnect-Solutions/default.aspx)
+- [Sivers 2024-12-19 公告（MFN）](https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-and-ayar-labs-to-expand-their-partnership-on-enabling-high-volume-manufacturing-of-optical-i-o-solutions-for-scalable-cost-effective-ai-infrastructure-43633a81)
 
 - [The Next Platform, 2026-03-04: Ayar Labs Gets $500 Million To Ramp Photonics Into 2028 AI Systems](https://www.nextplatform.com/connect/2026/03/04/ayar-labs-gets-500-million-to-ramp-photonics-into-2028-ai-systems/4093515)
 - [Sivers／Ayar 2024-12-19 擴大合作新聞稿（PR Newswire）](https://www.prnewswire.com/news-releases/sivers-semiconductors-and-ayar-labs-to-expand-their-partnership-on-enabling-high-volume-manufacturing-of-optical-io-solutions-for-scalable-cost-effective-ai-infrastructure-302335984.html)

@@ -1,0 +1,23 @@
+The strengthened partnership framework will focus on product qualification and manufacturing readiness of Sivers high precision laser arrays for high volume deployment of optical I/O solutions in AI Datacenters
+
+Kista, Sweden - December 19, 2024 - Sivers Semiconductors AB (STO:SIVE), a global leader in photonics and wireless technologies, is in advanced discussions with its strategic customer, Ayar Labs, to partner on the next phase of engagement focused on manufacturing at scale to support deployment of Ayar labs in-package optical interconnect solutions.
+
+Successful large-scale deployment of high-bandwidth, energy efficient AI Datacenters will require a move from copper to optical I/O interconnects, a necessity now widely acknowledged by many in the industry including ecosystem pioneers such as Nvidia, AMD, Intel, and several hyperscalers. The emphasis is firmly shifting from initial development of solutions to the enablement of a robust manufacturing eco-system in the next couple of years to support deployments at scale. Ayar Labs is a key innovator at the forefront of developing optical I/O solutions for AI data centers.
+
+Mark Wade, CEO of Ayar Labs said "Ayar Labs, a strategic customer of Sivers Semiconductors, intends to expand its relationship with Sivers Semiconductors through NRE and pre-purchase of products to prepare for high volume deployment of optical I/O to address bandwidth bottlenecks in AI infrastructure."
+
+"Having recently announced closing their $155 million Series D round led by Advent Global Opportunities, Light Street Capital and with participation from Nvidia and other top tier chip companies, Ayar Labs is positioned extremely well strategically, technically, and financially to be a very significant customer for Sivers' high performance laser arrays as shipment volumes are expected to ramp in the next 18-24 months", said Vickram Vathulya, CEO of Sivers Semiconductors. "The continued enthusiasm and funding from top-tier chipmakers, foundries, and investment firms into Ayar Labs is a testament to the market conviction in their optical I/O solution as a breakthrough innovation for AI Datacenters. Sivers' high-performance laser arrays are critical enablers for optical I/O solutions in AI Datacenters. We are enthusiastic about the potential for our strategic partnership with Ayar Labs and look forward to this next stage of our collaboration centered around achieving manufacturing readiness and production scale."
+
+Contact
+Vickram Vathulya
+CEO, Sivers Semiconductors
+Tel: +46 (0)8 703 68 00
+Email: ir@sivers-semiconductors.com
+
+About Ayar Labs
+Ayar Labs is the leader in optical interconnect solutions that move data at the speed of AI. Recognizing that the complexity and size of AI models are increasing at a rate that traditional interconnect technology cannot handle, the company has developed the industry's first optical I/O solution that enables customers to maximize the compute efficiency and performance of growing AI infrastructure, while reducing costs, latency and power consumption. Based on open standards and optimized for both AI training and inference, Ayar Labs' optical I/O solution is backed by a robust ecosystem that enables it to integrate smoothly into AI systems at scale. Ayar Labs was founded in 2015. For more information, visit www.ayarlabs.com.
+
+About Sivers Semiconductors
+We are Critical Enablers of a Greener Data Economy with Energy Efﬁcient Photonics & Wireless Solutions. Our differentiated high precision laser and RF beamformer technologies help our customers in key markets such as AI Data Centers, SATCOM, Defense and Telecom solve essential performance challenges while enabling a much greener footprint. Visit us at: www.sivers-semiconductors.com. (SIVE.ST)
+
+Källa Cision

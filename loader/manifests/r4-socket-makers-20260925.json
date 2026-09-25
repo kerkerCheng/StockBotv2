@@ -1,0 +1,30 @@
+{
+  "_comment": "pq2 [651]（R-4：產品的製造者）與 [652]①（SuperNova 那一格的原文掛錯節點）。只新增、不改既有邊：Step 2.5 的唯讀模擬量過，把製造者的 supplies_to 改成 develops 會讓 13 個節點的 digest 變、co:nvidia 失去需求錨、結構表少掉 Tower→PH18DA（sub=4）；只加 develops 這三項全部是 0（develops 不在任何角度、也不在需求錨走訪裡）。每一列只引用該抽取檔既有的 sources，quote 一字不動。刻意不列：POET→Starlight（那份文件沒有一段逐字同時寫出 POET 與 Starlight，L6）、IQE→QD 雷射磊晶片（逐字看得出 IQE 替 Quintessent 長磊晶，設計者可能是 Quintessent——製造者說不清楚）。",
+  "pq2": [651, 652],
+  "additions": [
+    {"file": "amat_10_q_20260521.json", "why": "AMAT 自己的 10-Q：Our two reportable segments are: Semiconductor Systems and Applied Global Services (AGS)",
+     "edge": {"src_id": "co:applied_materials", "relation": "develops", "dst_id": "prod:amat_semiconductor_systems", "confidence": 0.9, "source_ids": ["amat_10_q_20260521_s10"], "attributes": {}}},
+    {"file": "amat_10_q_20260521.json", "why": "同上",
+     "edge": {"src_id": "co:applied_materials", "relation": "develops", "dst_id": "prod:amat_ags", "confidence": 0.9, "source_ids": ["amat_10_q_20260521_s10"], "attributes": {}}},
+    {"file": "nvidia_q1fy27.json", "why": "Blackwell architecture: NVIDIA's latest GPU platform／Our Blackwell architecture is everywhere",
+     "edge": {"src_id": "co:nvidia", "relation": "develops", "dst_id": "prod:blackwell", "confidence": 0.9, "source_ids": ["Nvidia_q1fy27_s17", "Nvidia_q1fy27_s5"], "attributes": {}}},
+    {"file": "nvidia_q1fy27.json", "why": "Vera/VeraRubin: NVIDIA's custom CPU product and its paired platform",
+     "edge": {"src_id": "co:nvidia", "relation": "develops", "dst_id": "prod:vera_verarubin", "confidence": 0.9, "source_ids": ["Nvidia_q1fy27_s18"], "attributes": {}}},
+    {"file": "nvidia_q1fy27.json", "why": "Spectrum-X: End-to-end Ethernet networking platform from NVIDIA",
+     "edge": {"src_id": "co:nvidia", "relation": "develops", "dst_id": "prod:spectrum_x", "confidence": 0.9, "source_ids": ["Nvidia_q1fy27_s9"], "attributes": {}}},
+    {"file": "tower_ph18da_sub_addendum_2026_08_31.json", "why": "Tower 6-K（tier 1）：Tower Semiconductor’s PH18DA indium phosphide (InP)-on-silicon photonics platform",
+     "edge": {"src_id": "co:tower_semiconductor", "relation": "develops", "dst_id": "prod:ph18da", "confidence": 0.9, "source_ids": ["tsem_openlight_cadence_pdk_6k_2026_08_11_s1"], "attributes": {}}},
+    {"file": "openlight_ph18da_volume_orders_pr_2026_03.json", "why": "OpenLight 新聞稿：on its PH18DA ... platform, developed in collaboration with Tower Semiconductor（與 Tower 共同開發）",
+     "edge": {"src_id": "co:openlight_photonics", "relation": "develops", "dst_id": "prod:ph18da", "confidence": 0.8, "source_ids": ["openlight_ph18da_volume_orders_pr_2026_03_s1"], "attributes": {}}},
+    {"file": "enablence_sivers_onet_ofc_pr_2026_03_17.json", "why": "to develop an 8-channel external light source (ELS) module／O-Net Technologies will serve as the OEM partner, integrating Sivers Semiconductors' laser arrays and Enablence's NxN Star Coupler（O-Net 是整合者；s2 的「共同開發」三家都有，這裡只標 OEM 那一家為製造者）",
+     "edge": {"src_id": "co:o_net_technologies", "relation": "develops", "dst_id": "prod:els_8ch_module", "confidence": 0.7, "source_ids": ["enablence_sivers_onet_ofc_pr_2026_03_17_s2", "enablence_sivers_onet_ofc_pr_2026_03_17_s3"], "attributes": {}}},
+    {"file": "silicon_matter_sivers_ayar_2026_03_14.json", "why": "integrated in Ayar Labs' SuperNova™ light source module（tier 3）",
+     "edge": {"src_id": "co:ayar_labs", "relation": "develops", "dst_id": "prod:supernova", "confidence": 0.5, "source_ids": ["silicon_matter_sivers_ayar_2026_03_14_s1"], "attributes": {}}},
+    {"file": "sivers_ayar_wdm16_ecoc_2024_09_19.json", "why": "[652]①：integrated into Ayar Labs' SuperNova multi-wavelength light source（tier 2）",
+     "edge": {"src_id": "co:ayar_labs", "relation": "develops", "dst_id": "prod:supernova", "confidence": 0.75, "source_ids": ["sivers_ayar_wdm16_ecoc_2024_09_19_s1"], "attributes": {}}},
+    {"file": "sivers_ayar_wdm16_ecoc_2024_09_19.json", "why": "[652]①：Sivers Semiconductors' 16-wavelength ... laser array integrated into Ayar Labs' SuperNova／our second-generation SuperNova light source combined with Sivers' 16-wavelength laser array——原本只掛在 tech:wdm_laser_16ch，插槽看不到。不帶 qualification_status（2024 是 demo，不主張合格狀態）",
+     "edge": {"src_id": "co:sivers_semiconductors", "relation": "supplies_to", "dst_id": "prod:supernova", "confidence": 0.75, "source_ids": ["sivers_ayar_wdm16_ecoc_2024_09_19_s1", "sivers_ayar_wdm16_ecoc_2024_09_19_s4"], "attributes": {}}},
+    {"file": "sivers_gf_pr_2026_06_02.json", "why": "Sivers' laser arrays will also be available in GF's Silicon Photonics Co-packaged Advanced Light Engine (SCALE™) platform",
+     "edge": {"src_id": "co:globalfoundries", "relation": "develops", "dst_id": "prod:gf_scale", "confidence": 0.8, "source_ids": ["sivers_gf_pr_2026_06_02_s4"], "attributes": {}}}
+  ]
+}

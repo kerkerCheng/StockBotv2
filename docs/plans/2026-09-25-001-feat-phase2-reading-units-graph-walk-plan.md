@@ -209,6 +209,7 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | 7 | 2.5 | §6「毛病＝回頭修 2.4，記偏差」（未預期會撞到 staleness） | `staleness.py` 新增 `counter_path_removed`（normal、**不是** disproof 觸發）；反向路徑「消失」不再與「新增」共用 `counter_path` | 真實資料：Step 2.2 移出 `constrained_by` 後，`mat:inp_substrate --check` 印「消失 1 條｜**同時是 disproof 觸發**」、心跳照數——替代路線少一條是反證的反方向。供給側早就有 `supply_removed`，反向路徑漏了對稱面（L17-3）。測試 `test_counter_path_added_is_a_disproof_trigger_but_removed_is_not` |
 | 8 | 2.5 | 同上（`query.structure --quotes` 的呈現） | 每條邊超過 3 段時印「另有 N 段逐字沒印，出自哪幾份」、切斷的片段標「…」；`fetch_quotes` 去掉同文件同段的重複 | 真實資料：InP 基板 `co:lumentum` 那條邊 11 段只印 3 段、**不說**，藏掉的正是 Lumentum 10-K 與 Q4 法說「又向 AXT 找基板」——判斷供給側可不可替代的客戶端原文；CW DFB 藏 7 段（L13-2、INV-3；與 `sr_6ad5c884eb7bc3fb` 記的 claim 截斷同形）。不進 digest，四份讀圖寫完後 `--check` 全 current |
 | 9 | 2.5 | §14 #12「Step 2.5 看完後定案，定案若要改規則走 plan 修改」 | **定案：插槽的 `independent` 排除該插槽所有供應商**（與插槽視角的「客戶端原文」同一定義）；層不變（只排除那條邊的主詞）。`alpha/providers/structure_readings.py::verify_citations` | 真實資料乾跑：`prod:els_8ch_module` 拿同插槽另一家供應商 Enablence 發的聯合新聞稿標 independent，舊規則**放行**了一份 Sivers 的插槽護城河——聯合公告方與 Sivers 利益一致，不是客戶。這是收緊、不放寬任何 gate；使用者可否決。⚠ 要正確還得先修 R-4：O-Net（ELS 的客戶）在圖上是 `supplies_to`，會被一併排除（pq2 [651]）。測試 `test_independent_on_a_socket_excludes_every_supplier_of_that_socket` |
+| 10 | 2.5（[651]／[652] go 之後） | §6 第 4 點「寫一筆 pq2 manual 提案，不自己改圖」（沒預期要寫工具） | `loader/migrate_relation_rejudge.py` 加 `--additions <manifest>`：在指定抽取檔新增邊，只准引用該檔既有 sources、端點照抄圖上現值宣告、改完過 `loader/validate.py`、重跑冪等；只做 dry-run，**沒有 apply**（入圖閘門 [654]） | 既有通用遷移以 assertion_id 為鍵，只表達得出「改」，表達不出「同一段逐字其實還支持另一條邊」；手改抽取檔再重載沒有可重現的清單。測試 `tests/test_migrate_relation_rejudge_additions.py`（6 條）。研究包（Research Action）只收新文件，不能用 |
 
 ---
 
@@ -455,7 +456,10 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 ## 14. 結案時要列的待決問題（種子；執行中發現的往下加）
 
 1. **`supplies_to → prod:` 的兩義**（R-4）：製造者與零件供應商共用一個關係；schema 層要不要另給一個關係（Phase 4 層中心選源時一起定）。
-   **2.5 已提 pq2 [651]**：13 個產品逐條讀逐字，10 個是製造者自己（改 `develops`）、真正的插槽 3 個且都是 Sivers 的；結案時寫 [651] 的處置狀態。
+   **2.5 已提 pq2 [651]**：13 個產品逐條讀逐字，真正的插槽 3 個且都是 Sivers 的。**[651] go 之後的研究推翻了原提案**：
+   對「供應商自己的產品／平台」，`supplies_to` 與 `co:axt supplies_to mat:inp_substrate` 同義、並沒有錯；唯讀模擬顯示「改型別」會讓 13 個節點 digest 變、
+   `co:nvidia` 失去需求錨、結構表少掉 Tower→PH18DA（sub=4），「只加 `develops`」則 0／0／0。研究包改為只加（`loader/manifests/r4-socket-makers-20260925.json`，
+   12 條），入圖閘門 **pq2 [654]**；結案時寫 [654] 的處置狀態。
 2. **read model 的 `get_bottlenecks`（sub≥4 成員）**：個股頁 argument「鏈」段仍用它；Phase 3 面板重排時決定留不留（Phase 0 偏差 #33 的另一半）。
 3. **讀圖面板升核心**與 readiness 換（Phase 3，ROADMAP 已排）；Phase 0 偏差 #16「`review_required` 的路接回讀圖面板」一併處理。
 4. ~~**`tech:cw_dfb_laser` 讀圖 2026-10-18 到期**與反證出處（#19）若 2.5 沒做，列進研究並行。~~ **2.5 已做**：`sr_d49b81b6465e1181`（v3，到期 2026-12-24），四條沿用的反證標回 `sr_a181641ddb99c69c`——#19 解決。
@@ -493,3 +497,13 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 18. **`prod:` 一表多義**（2.5 發現）：客戶產品、供應商型錄產品、製程平台（`prod:ph18da`）都是 `prod:`，插槽單位只對第一種有意義；
     目前判斷「這個 prod: 是不是插槽」只能靠人讀逐字。[651] 把製造者分出來之後再量還剩幾個模糊的。
 19. **SuperNova 唯一的原文沒有 `published_at`**（audit `PointInTime` 已列：`silicon_matter_sivers_ayar_2026_03_14` 擋住 3 條）——這一格在任何 as-of 查詢裡都被排除；併進 [652] 的追源。
+    （[652] 追源後：[654] 會把 ECOC 2024（有日期）的原文掛上這條邊，as-of 查詢從 2024-09-19 起看得到它；substack 本身仍未定日。）
+20. **聯合公告偵測對 71／100 家公司無效**（[652] 追源時發現）：`_origin_mentions` 只比對 registry 的 `display_name`／`aliases`，而 71 家沒有 `display_name`
+    （含 `co:ayar_labs`、`co:sumitomo_electric`、`co:jx_advanced_metals`、`co:o_net_technologies`、`co:enablence_technologies`）。`classify_evidence` 註解裡點名的例子
+    「Sivers 官方 PR，內含 Ayar Labs CTO 具名引述 → counterparty_joint」實際跑出來是 `self_reported`——從來沒生效過（L17）。修法（補 display_name，或由 ID 推名稱）
+    會改動很多邊的證據等級、牽動 digest 與讀圖 staleness，**必須先量「改了之後幾條邊、幾個節點變」再放**（同 Step 2.2 的做法）；開發項，不在研究步驟裡順手改。
+21. **OpenLight 在 registry 有兩個 ID**（`co:openlight`、`co:openlight_photonics`；INV-1）：插槽視角把 OpenLight 新聞稿解析成 `co:openlight`，抽取檔用的是 `co:openlight_photonics`。
+    判定是不是同一家、要不要合併，是重複節點的研究題（pq2 `ra_admission`）；[654] 暫用抽取檔既有的 `co:openlight_photonics`。
+22. **[654] 入圖後，插槽的「供應商」要扣掉製造者**：O-Net 對 ELS 同時是 `supplies_to`（賣模組）與 `develops`（整合者＝雷射那一格的客戶）。
+    插槽視角的「客戶端原文」與寫入端的 `independent`（偏差 #9）目前都排除「任何一家 `supplies_to`」，會把 O-Net 自己的一手也排除——
+    兩處都應改成「`supplies_to` 的公司扣掉 `develops` 的公司」；寫入端要從同一次快照查詢拿到製造者。觸發條件＝[654] apply。
