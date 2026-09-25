@@ -59,7 +59,7 @@ HIGH_RISK_ATTRIBUTE_NAMES = (
 )
 
 
-# ── 雲端可跑的 Cypher 常數（routine 讀常數 → run_read_query）─────────────────
+# ── 具名 Cypher 常數（本機 CLI 讀常數執行；歷史上雲端 routine 也讀同一份）──────────
 
 # L8 圖層巡檢：sole_source=true 的邊，其所有 assertion 的 origin_entity 只有一個
 # （單一來源，多半是供應商自報）。attributes 是 JSON 字串，用 CONTAINS 啟發式匹配

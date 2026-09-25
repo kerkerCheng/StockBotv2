@@ -245,7 +245,7 @@ prepare 前先把「graph delta 涵蓋哪些公司」與「完成後唯一要建
 推定「全部開始投資追蹤」。
 
 有 graph delta 時，把 research-action/v1 request 寫到 ignored
-`library/leads/action_drafts/<lead_id>.json`，再用窄 fixed entry 凍結 server-owned packet：
+`library/leads/action_drafts/<lead_id>.json`，再用窄 fixed entry 凍結由程式產生的 packet：
 
 ```powershell
 & '.venv\Scripts\python.exe' scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead_id>.json

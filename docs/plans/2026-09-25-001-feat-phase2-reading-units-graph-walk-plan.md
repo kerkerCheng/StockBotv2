@@ -174,7 +174,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
 | 2.0 | 基準快照 | ✅ | 便宜 | `475e167` |
-| 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ▶ R2-a 待審 | 便宜 | （本 commit；GO 後由 2.2 補填並改 ✅） |
+| 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ✅（R2-a GO；non-blocking 八條處置見 R2-a 處置 commit） | 便宜 | `ba47419`＋R2-a 處置（短碼由 2.2 補填） |
 | 2.2 | 反向路徑只收競爭關係 | ○ | 便宜 | |
 | 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ○ | 便宜 | |
 | 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ○ | 便宜 | |
@@ -458,4 +458,8 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 8. **本機 apply 沒有固定 CLI 入口**（2.1 發現）：遠端入口退役後，已核准 RA 的入圖只能在互動 session 直接呼叫
    `intake.application._apply_research_action_impl(<ra_id>, <digest>)`（私有底線函式；prepare 有 `scripts/prepare_research_action.py`、
    publish 有 `scripts/commit_pending_intake.py`，中間這一步沒有）。它在 graph admission gate 的路徑上，加不加 CLI、要不要綁 pq2 `ra_admission`
-   的 `go` 收據，是開發項（ROADMAP），不是本 Phase 的 scope。
+   的 `go` 收據，是開發項，不是本 Phase 的 scope——**已排進 ROADMAP 旁支「本機 Research Action apply 入口」**（R2-a non-blocking #6）。
+9. **`intake.application._finalize_research_action_impl` 沒有任何 production 呼叫端**（R2-a #5；475e167 時已如此，只剩 9 個測試在用）：
+   本機發布走 `scripts/commit_pending_intake.py`；要不要連同測試一起退役，隨上一條一起定。
+10. **`scripts/verify_test_nonvacuity.py` 有幾條突變指向已不存在的測試**（R2-a #8；475e167 前就失效，例：`tests/test_weakest_axis.py::*`、
+    `test_layer_separation.py::test_decision_lab_does_not_import_new_layers`）：非本 Phase 造成，照實帶到下一 Phase；本 Phase 只刪了 2.1 那條。

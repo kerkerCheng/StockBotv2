@@ -1119,8 +1119,7 @@ Research Action 的本機協定見 `prompts/intake_protocol.md`；舊的遠端�
   對應 action／decision receipt，**不得依賴上一個 session 的自然語言摘要**。
   交接訊息至少附：目前 plan 路徑、進行中的編號、`git status --short`、
   最後一次驗證命令與結果。
-- 本機開發 agent 可以是 Claude Code 或 Codex；架構中明指 `claude.ai` custom connector
-  的遠端流程仍維持 Claude，不因本機開發工具切換而改名。
+- 本機開發 agent 可以是 Claude Code 或 Codex；手機經 Remote Control 連的是本機 Claude Code session。
 
 ### 開發流程（Agent Development Flow，2026-09-07）
 

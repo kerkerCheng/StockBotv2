@@ -1082,3 +1082,20 @@ def test_finalize_is_disabled_by_default() -> None:
 
     assert result["git_status"] == "not_committed"
     assert result["reason"] == "remote_finalize_disabled"
+
+
+def test_local_intake_protocol_keeps_domain_rules() -> None:
+    """本機 Research Action 協定仍要講清楚 domain 規則（R2-a 2026-09-25 #3）。
+
+    原本由遠端規則書工具的測試順帶守著；工具退役後 `prompts/intake_protocol.md` 仍是活文件，
+    所以把「協定內容」這一半的斷言搬到這裡，遠端工具那一半隨工具消失。
+    """
+    text = (Path(__file__).resolve().parent.parent / "prompts" / "intake_protocol.md").read_text(
+        encoding="utf-8")
+    assert "Storage permission" in text
+    assert "`partial`" in text
+    assert "open_conflict_ids" in text
+    assert "scripts/prepare_research_action.py" in text or "scripts\prepare_research_action.py" in text
+    assert "_apply_research_action_impl" in text
+    assert "scripts/commit_pending_intake.py" in text
+    assert "finalize_research_action(" not in text

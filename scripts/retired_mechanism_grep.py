@@ -350,8 +350,10 @@ def _w(tok): return r'(?<![A-Za-z0-9_])'+tok+r'(?![A-Za-z0-9_])'
 MCP_GROUP='I 遠端 Graph MCP'
 MCP_PATTERN=re.compile('|'.join([
     _w('mcp_server'), 'graph_mcp', 'GRAPH_MCP', _w('MCP'), r'stockbotv2-graph(?!-services)', r'mcp\.minatoyukina',
-    _w('record_lead_decision'), _w('apply_research_action'), _w('load_extraction'), _w(r'mcp>='),
-    r'^[ \t]*(?:from|import) mcp(?![A-Za-z0-9_])']),re.M)
+    _w('record_lead_decision'), _w('apply_research_action'), _w('load_extraction'),
+    r'^[ \t]*(?:from|import) mcp(?![A-Za-z0-9_])',
+    # requirements 行：`mcp>=1.28,<2`／`mcp`（R2-a #1：原本 `_w('mcp>=')` 的尾端 lookahead 擋掉版本號，永遠不中）
+    r'^[ \t]*mcp[ \t]*(?:[<>=!~]|$)']),re.M)
 MCP_SKIP=re.compile(r'^scripts/retired_mechanism_grep\.py$')
 KEEP_MCP: dict[str,str] = {
     # ---- 整個目錄都是歷史（ROADMAP 旁支列 ④ 點名）----
@@ -377,6 +379,14 @@ KEEP_MCP: dict[str,str] = {
     'docs/ROADMAP.md': 'historical_record: 旁支「Graph MCP 退役 ✅」列與 Phase 2 列是這次退役的決定與交付紀錄；Phase 0 退役清單的盤點範圍（2026-09-22）；硬約束 12 的改寫註記',
     'docs/plans/README.md': 'historical_record: plan 索引列的主題描述（2026-07-24 v1.1 的 leads 同步、Phase 2 的退役項）',
 }
+#: 活文件整檔放行會讓之後新增的字樣被靜默吞掉（R2-a #2）——這幾個檔**釘住命中數**：數字變了就算未列命中，
+#: 由改的人逐處看過後再改這裡的數字。只釘仍會被編輯的檔；歷史目錄與已 completed 的 plan 不會再變，不釘。
+KEEP_MCP_PIN: dict[str,int] = {
+    'docs/ROADMAP.md': 30,
+    'docs/plans/README.md': 2,
+    'docs/plans/2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md': 41,
+}
+MCP_UNREADABLE: list[str] = []
 
 def _tracked_files():
     import subprocess
@@ -388,7 +398,7 @@ def _mcp_hits():
     for p in _tracked_files():
         if MCP_SKIP.search(p) or not os.path.isfile(p): continue
         try: t=io.open(p,encoding='utf-8').read()
-        except (UnicodeDecodeError,OSError): continue
+        except (UnicodeDecodeError,OSError): MCP_UNREADABLE.append(p); continue
         n=len(MCP_PATTERN.findall(t))
         if n: hits[p]=n
     return hits
@@ -413,7 +423,9 @@ def _verdict(idx):
     for p,n in MCP_HITS.items():
         k=_mcp_key(p)
         if k is None: unlisted.append(('I','tracked',p,n))
-        else: used.add(k)
+        else:
+            used.add(k)
+            if k in KEEP_MCP_PIN and KEEP_MCP_PIN[k]!=n: unlisted.append(('I',f'pinned={KEEP_MCP_PIN[k]}',p,n))
     stale=[k for k in KEEP if k not in hits]+[(k,'I') for k in KEEP_MCP if k not in used]
     print("\n## 驗收（差集；Phase 0 結案要三個數字都是 0）")
     print(f"  未列 keep-list 的命中（檔，組）數：{len(unlisted)}")
@@ -435,4 +447,6 @@ MCP_HITS=_mcp_hits()
 print(f"\n## {MCP_GROUP}（所有 tracked 檔）")
 by_top=collections.Counter(p.split('/')[0] if '/' in p else p for p in MCP_HITS)
 print(f"  {len(MCP_HITS)} 檔｜"+"、".join(f"{k}({v})" for k,v in by_top.most_common()))
+print(f"  非 UTF-8 而沒掃到的 tracked 檔：{len(MCP_UNREADABLE)}"+("｜"+"、".join(MCP_UNREADABLE[:8]) if MCP_UNREADABLE else ""))
+print("  釘住命中數："+"、".join(f"{k}={MCP_HITS.get(k,0)}（釘 {v}）" for k,v in KEEP_MCP_PIN.items()))
 raise SystemExit(_verdict(idx))

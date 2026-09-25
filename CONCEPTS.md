@@ -126,7 +126,7 @@ Daily Approval Loop 的**統一人工決策池**：prepared Research Action 入�
 *Avoid:* PR checkbox approval、auto-admission
 
 ### Research Action（研究行動）
-The durable, provider-neutral unit of remote-intake approval and provenance. A session submits one bounded multi-document `research-action/v1` containing a structured research report plus validated extraction/raw inputs; the server assigns an ID, canonical digest, expiry, immutable review packet, per-document checkpoints, and publication state. The user approves that exact ID, then one apply call resumes idempotently to graph + permission-safe report. Repo-eligible actions later produce exactly one local Git commit per action; mixed actions commit only eligible documents plus a server-redacted stub, while local-only actions require no Git. Action artifacts cross sessions/providers; chat transcripts do not.
+The durable, provider-neutral unit of graph-admission approval and provenance. A session submits one bounded multi-document `research-action/v1` containing a structured research report plus validated extraction/raw inputs; the local `intake/` service assigns an ID, canonical digest, expiry, immutable review packet, per-document checkpoints, and publication state. The user approves that exact ID, then one apply call resumes idempotently to graph + permission-safe report. Repo-eligible actions later produce exactly one local Git commit per action; mixed actions commit only eligible documents plus a redacted stub, while local-only actions require no Git. Action artifacts cross sessions/providers; chat transcripts do not.
 *Avoid:* per-document intake, ingestion batch
 
 ### Financial Snapshot

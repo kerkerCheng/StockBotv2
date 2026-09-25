@@ -44,7 +44,7 @@ description: >
 完整讀取並執行 `skills/source-trace/SKILL.md`。追到原文才以原文進抽取；tier 1–2
 轉述未能取得上游文件時依手冊誠實降級；tier 3–4 未果只留 lead，不生成 extraction。
 若結果需要新公司完整 onboarding，再切換到 `skills/company-onboard`。本機美股文件可用
-`python fetchers/edgar.py --ticker <TICKER>`；遠端 chat 不得假設可執行本機命令。
+`python fetchers/edgar.py --ticker <TICKER>`。
 
 用戶可在 Turn 2 說「No」直接結束，或說「只存不研究」跳過 Turn 3。
 
@@ -150,7 +150,7 @@ description: >
 | 有來源直接矛盾 | park 成 `conflict` 或產 conflict-resolution proposal，人工裁決，不自動入圖 |
 > 原則:**寧可 park,不可污染圖。** 圖的價值在每條都可追溯;一條沒來源的 claim 進去,整個庫的可信度打折。
 
-**核准邊界：** Step 4 的自動化終點是 `prepare_research_action` 回傳的 server-rendered review packet，
+**核准邊界：** Step 4 的自動化終點是 `prepare_research_action` 回傳的、由程式產生的 review packet，
 不是 graph write。只有 Research Action 進入廣義 pq2；raw lead、triage PASS 與仍在追源／抽取的工作都留在
 pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可在本機 apply（`intake.application._apply_research_action_impl`）；`pending`／
 `drop` 不得寫圖。同一輪不得 prepare 後自行 apply。
@@ -160,7 +160,7 @@ pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可
 - 整理成 DB 無關中介格式(`schema/intermediate_format.schema.json`),如同 `extract.py` 的輸出
 - 跑 `loader/validate.py`(vocab + schema 形狀檢查;新 relation/type 先補 `schema/vocab.json`)
 - node/edge 帶齊 `source_ids`(全域格式)、`confidence`、L4 歸位好的屬性
-- 呼叫 `prepare_research_action` 讓 server 重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2
+- 呼叫 `prepare_research_action` 讓程式重跑驗證並凍結 immutable payload；把原樣 review packet 放進 pq2
 - 在凍結前，分開列出 graph delta 內所有公司與唯一 `focus_company_id`；把 focus 寫入綁定 lead，並在
   `ra_admission` pq2 明列 `Decision handoff: co:x`。其他公司只作 evidence／relationship context，不因入圖
   自動建立 cohort；若沒有唯一 focus，先留 pq1，若要追多個投資標的則分開提出 handoff。
