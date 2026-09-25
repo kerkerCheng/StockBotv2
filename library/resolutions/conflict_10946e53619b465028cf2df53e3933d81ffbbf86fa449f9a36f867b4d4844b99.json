@@ -1,0 +1,24 @@
+{
+  "schema_version": "1",
+  "resolution_id": "resolution_10946e53619b465028cf2df53e3933d81ffbbf86fa449f9a36f867b4d4844b99_df699d5db656",
+  "conflict_id": "conflict_10946e53619b465028cf2df53e3933d81ffbbf86fa449f9a36f867b4d4844b99",
+  "edge_key": "edge:60c5c41ce38247c69feb0050b787e6a68b7db943e5179c1ec2c199373d1abd9d",
+  "attribute": "qualification_status",
+  "candidate_set_hash": "df699d5db656702a5035dc858f29c85e5f6fdc7e12f4061fb9aa0f8a5eca0ae1",
+  "action": "choose_value",
+  "selected_value": "qualifying",
+  "supporting_assertion_ids": [
+    "mfn_sivers_semiconductors_43633a81_e1"
+  ],
+  "rejected_assertion_ids": [
+    "aleabitoreddit_sivers_cpo_customer_map_e1"
+  ],
+  "supporting_source_ids": [
+    "mfn_sivers_semiconductors_43633a81_s4",
+    "mfn_sivers_semiconductors_43633a81_s1"
+  ],
+  "rationale": "同一 scope（Sivers 雷射陣列供 Ayar Labs），兩個候選只有一個的逐字在講合格狀態。①qualifying：Sivers 2024-12-19 新聞稿（MFN／Cision，tier 2，內含 Ayar CEO Mark Wade 具名引述）s4「The strengthened partnership framework will focus on product qualification and manufacturing readiness of Sivers high precision laser arrays」、s1「in advanced discussions with its strategic customer, Ayar Labs, to partner on the next phase of engagement focused on manufacturing at scale」。②none：aleabitoreddit substack（tier 3，2026-05-19）唯一逐字是「SIVE as the laser supplier is listed on Ayar Labs Website」，完全沒有講合格狀態；同一筆斷言的 note 自己寫「no current qualification or volume status is established」——這個 none 表示的是『不知道』，不是『觀察到沒有合格』（L12：一個值裝兩種意思），所以它不是反證、也不因較新而 supersede。不以較新或 confidence 決勝：拒收 ② 的理由是它的逐字不支持它的值。限制：① 是供應商發布、用詞是未來式與意向（advanced discussions／will focus），2026 年沒有新的一手更新（Sivers 管理層「2027 年 production-ready」只有二手轉述，未入圖）——所以 resolved_confidence 只給 0.6，這不是『已進入客戶 qualification』的強結論。",
+  "resolved_confidence": 0.6,
+  "approved_by": "Cheng",
+  "approved_at": "2026-09-25T16:03:14.737229+00:00"
+}
