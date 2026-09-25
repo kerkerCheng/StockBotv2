@@ -181,7 +181,7 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True),
     DailyStep("13_materialize", "APP materialize",
               ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
-               "--beta", "--coverage", "--watches", "--positions", "--structure-readings", "--scorecard"),
+               "--beta", "--graph-walk", "--watches", "--positions", "--structure-readings", "--scorecard"),
               25, True, True),
     DailyStep("14_health_audit", "健康審查",
               ("query/health_audit.py", "--local", "--json"),

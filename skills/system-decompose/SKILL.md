@@ -82,7 +82,7 @@ description: >
 ## Step 4 — **這時候才**對照圖
 
 ```bash
-python -m query.coverage_gaps        # 既有 chokepoint 節點的覆蓋狀態
+python -m query.graph_walk           # 既有節點的洞（第 7 型＝零供應商、第 8 型＝建模待補；分桶沿用 coverage_gaps）
 python -m query.bottleneck           # 既有邊的結構表（確認該層是否已被建模；不排序）
 ```
 
@@ -93,7 +93,7 @@ python -m query.bottleneck           # 既有邊的結構表（確認該層是�
 | 結果 | 意義 | 下一步 |
 |---|---|---|
 | 有節點、有供應商 | ✅ 已覆蓋 | 無 |
-| 有節點、零供應商 | 🟡 `coverage_gaps` 已在報 | 找誰供應它 → pq1 |
+| 有節點、零供應商 | 🟡 走圖第 7 型（`coverage_gaps` 分桶）已在報 | 找誰供應它 → pq1 |
 | **圖裡根本沒這個節點** | 🔴🔴 **未知層** | 建節點＋找供應商 → pq1 |
 
 **第三格是本 skill 存在的全部理由。** 系統裡沒有其他機制能產出它。

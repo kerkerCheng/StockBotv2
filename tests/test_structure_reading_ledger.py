@@ -250,20 +250,28 @@ def test_artifact_counts_every_status_and_points_at_its_consumer() -> None:
     payload = build_structure_readings_artifact(rows=rows)
     assert payload["counts"] == {"current": 1, "stale": 1, "stale_low": 0, "expired": 0, "unknown": 0}
     assert payload["needs_reread"]["n"] == 1 and payload["needs_reread"]["nodes"] == ["b"]
-    assert payload["needs_reread"]["segment"] == "stale_structure_readings"
+    # Step 2.6：圖那一側住 `graph_holes`（走圖第 4 型）、watch 那一側住 `fired_reading_reread`——兩段都得指得出來。
+    assert "graph_holes" in payload["needs_reread"]["segment"]
+    assert "fired_reading_reread" in payload["needs_reread"]["segment"]
+    for key in ("graph_holes", "fired_reading_reread"):
+        assert key in qs.SEGMENT_BY_KEY, key
     assert payload["needs_reread"]["consumer"], "producer 必須指得出 consumer（INV-4）"
     assert payload["disproof_triggers"]["n"] == 1
 
 
 def test_the_segment_is_registered_with_a_consumer() -> None:
-    segment = qs.SEGMENT_BY_KEY["stale_structure_readings"]
+    # Step 2.6：`stale_structure_readings` 併進 `graph_holes`（走圖第 4 型 `reading_stale`）。
+    segment = qs.SEGMENT_BY_KEY["graph_holes"]
     assert segment.consumer, "沒有 consumer 的段就是黑洞"
     assert segment.cost == "research"
-    observation = qs.observe(stale_structure_readings=3)
+    observation = qs.observe(graph_holes=3)
     counts = {s["key"]: s["count"] for s in observation["segments"]}
-    assert counts["stale_structure_readings"] == 3
+    assert counts["graph_holes"] == 3
     # 沒注入時是 None（本次沒讀到那個 authority），**不是 0**（INV-3）
-    assert {s["key"]: s["count"] for s in qs.observe()["segments"]}["stale_structure_readings"] is None
+    assert {s["key"]: s["count"] for s in qs.observe()["segments"]}["graph_holes"] is None
+    from query.graph_walk import QUESTION_TYPE_KEYS
+
+    assert "reading_stale" in QUESTION_TYPE_KEYS
 
 
 def test_artifact_is_json_serialisable_and_has_the_required_state_fields() -> None:

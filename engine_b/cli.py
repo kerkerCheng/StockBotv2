@@ -795,7 +795,7 @@ def _cmd_onboard_candidates(args: argparse.Namespace) -> int:
 def _cmd_decompose_propose(args: argparse.Namespace) -> int:
     """研究閉環 P∥：把一個 decompose 選題鑄成 `manual` 型 pq2 編號（核准仍逐題）。
 
-    廣度判準機械（需求錨不在 sector_anchors 各組、且不在圖的 coverage 快照裡）；drop 過沒新 lead 不重生；
+    廣度判準機械（需求錨不在 sector_anchors 各組、且不在圖的走圖快照裡）；drop 過沒新 lead 不重生；
     同時 open ≤ 2。提名（系統名／為什麼是新錨）是語意工作，由呼叫端（research-drain／題材掃描／使用者）給。
     """
     from engine_b import decompose_proposals as dp
@@ -805,8 +805,8 @@ def _cmd_decompose_propose(args: argparse.Namespace) -> int:
     try:
         from webapp.store import StateArtifactStore
 
-        payload, _fresh = StateArtifactStore().read("coverage")
-        graph_nodes = dp.graph_nodes_from_coverage(payload)
+        payload, _fresh = StateArtifactStore().read("graph_walk")
+        graph_nodes = dp.graph_nodes_from_walk(payload)
     except Exception:  # noqa: BLE001 — 讀不到就只驗產業組，判準會在 hint 註明
         graph_nodes = None
     pool = todo.load(args.pool) if args.pool else todo.load(todo.DEFAULT_POOL_PATH)

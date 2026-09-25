@@ -64,6 +64,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -74,6 +75,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from alpha.absence import check_absence_kind  # noqa: E402
+from query.graph_walk import QUESTION_TYPES as WALK_QUESTION_TYPES  # noqa: E402
 
 #: 段序是封閉字彙：**五段，不多不少**。ARCHITECTURE §4.1 是它的規格來源。
 SECTION_TITLES: tuple[str, ...] = (
@@ -607,6 +609,9 @@ _CANDIDATE_BOARD_ABSENCE = Absence(
     "not_yet_recorded",
     "籃子 filter、目標價與多年視角已於 Phase 0 退役；接手的候選狀態板要到 Phase 3 才落地")
 
+#: 讀圖單位的短名（鍵＝`alpha.structure_reading.READING_UNITS`，測試守相等；L16）。
+_UNIT_LABEL: dict[str, str] = {"layer": "層", "socket": "插槽"}
+
 #: 歸零旗標的**彙總**計數暫停（逐檔的燈沒停，見個股頁 wipeout 面板）。
 _WIPEOUT_ROLLUP_ABSENCE = Absence(
     "upstream_unavailable",
@@ -664,7 +669,11 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
             section.lines.append("結構讀圖：**一份都還沒寫**（`python -m alpha structure-reading <node> --add`）")
         else:
             reread = readings.get("needs_reread") or {}
-            line = (f"結構讀圖 {total} 份｜現行 {counts.get('current', 0)}"
+            # 單位拆分（Phase 2 Step 2.6；讀圖 v3 的 `unit`）：層與插槽各自現行、各自重讀，合成一個數會藏掉
+            # 「插槽讀圖一份都還沒有」這件事。
+            units = Counter(str(r.get("unit")) for r in readings.get("rows") or () if r.get("reading_id"))
+            line = (f"結構讀圖 {total} 份（層 {units.get('layer', 0)}／插槽 {units.get('socket', 0)}）"
+                    f"｜現行 {counts.get('current', 0)}"
                     f"｜**該重讀 {reread.get('n', 0)}**（stale {counts.get('stale', 0)}"
                     f"／過期 {counts.get('expired', 0)}；低級 {counts.get('stale_low', 0)} 不進佇列）")
             nodes = reread.get("nodes") or []
@@ -675,7 +684,9 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
             for row in (readings.get("rows") or [])[:20]:
                 reasons = [str(r) for r in (row.get("reread_reasons") or [])]
                 if row.get("needs_reread") and reasons:
-                    section.lines.append(f"  {row.get('node')} 該重讀：" + "；".join(reasons[:3])
+                    # 帶單位（R2-b N6）：同一個 prod 節點層與插槽各一份時，不說單位就不知道要重讀哪一份。
+                    section.lines.append(f"  {row.get('node')}（{_UNIT_LABEL.get(str(row.get('unit')), row.get('unit'))}）"
+                                         "該重讀：" + "；".join(reasons[:3])
                                          + (f"（另 {len(reasons) - 3} 條）" if len(reasons) > 3 else ""))
             triggers = readings.get("disproof_triggers") or {}
             if triggers.get("n"):
@@ -837,6 +848,23 @@ def _as_date(raw: Any) -> date | None:
 # 段 3｜佇列
 # ---------------------------------------------------------------------------
 
+def _graph_walk_line(questions: Sequence[Mapping[str, Any]], absence: Absence | None) -> str:
+    """「走圖：」接九型各自「中文短名 命中／母體」。讀不到 artifact 印 `upstream_unavailable`，不印 0（INV-3）。
+
+    ⚠ 格式取自 `query.graph_walk.summary_line`（L16：走圖的呈現只有一份），心跳只讀 artifact、不查圖。
+    """
+    if absence is not None:
+        return f"走圖：{absence.reason}（{absence.kind}）——不是「沒有洞」"
+    from query.graph_walk import QUESTION_TYPE_KEYS, summary_line
+
+    seen = [str(q.get("key")) for q in questions]
+    line = "走圖：" + summary_line({"questions": questions})
+    if seen != list(QUESTION_TYPE_KEYS):
+        # artifact 的型別與現行字彙不一致（舊 artifact 或字彙改了沒重跑）——說出來，不假裝九格齊全。
+        line += f"｜⚠ artifact 的型別與現行字彙不一致（{len(seen)} 型），請重跑 materialize --graph-walk"
+    return line + "（consumer：research-drain 第三段）"
+
+
 def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
                 run_record_path: Path | None = None) -> Section:
     """新 lead N、**待 triage N（必印）**、pq1 可做 N、pq2 卡在你 N、expired N。
@@ -858,15 +886,16 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     watches = event_watch.load_watches().get("watches") or []
     pool = todo_mod.load()
     todo_items = pool.get("items") or []
-    # 結構讀圖那一段的 authority 是已 materialize 的 artifact，不在 leads 目錄——照 observe 的
-    # 注入慣例給值；讀不到就給 None（「沒讀到」與「真的是 0」不得同形，INV-3）。
-    readings, readings_absence = _load_state(state_dir, "structure_readings")
-    stale_readings = None if readings_absence is not None else int(
-        (readings.get("needs_reread") or {}).get("n") or 0)
+    # 走圖那一段（Phase 2 Step 2.6：取代 coverage／重複節點／讀圖待重讀三段）的 authority 是已 materialize 的
+    # `graph_walk` artifact，不在 leads 目錄——照 observe 的注入慣例給值；讀不到就給 None
+    # （「沒讀到」與「真的是 0」不得同形，INV-3）。心跳不查圖（零網路、零 LLM）。
+    walk, walk_absence = _load_state(state_dir, "graph_walk")
+    walk_questions = list(walk.get("questions") or ()) if walk_absence is None else []
+    holes = (None if walk_absence is not None else
+             sum(int(q.get("hit_n") or 0) for q in walk_questions if not q.get("absence")))
     observation = qs.observe(
         leads=leads, watches=watches, todo_items=todo_items,
-        forward_view_backlog=None, coverage_gaps=None,
-        stale_structure_readings=stale_readings,
+        forward_view_backlog=None, graph_holes=holes,
     )
     counts = {seg["key"]: seg["count"] for seg in observation["segments"]}
 
@@ -914,13 +943,13 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     pq1 = sum(counts[key] for key in pq1_keys if counts.get(key) is not None)
     unread = [key for key in pq1_keys if counts.get(key) is None]
     line = f"pq1 可做 {pq1}｜機械段待清 {observation['mechanical_total']}"
-    # 結構讀圖那一段的 consumer 是 research-drain（互動），不是 `engine_b.cli drain`，所以
-    # **不加進 pq1 的數**；但它確實是研究工作，只印在第 2 段會讓這裡的 0 被讀成「沒事做」。
-    if stale_readings:
-        line += f"｜＋結構讀圖待重讀 {stale_readings}（consumer：research-drain）"
     if unread:
         line += f"｜⚠ 未讀到 {len(unread)} 段：" + "、".join(unread)
     section.lines.append(line)
+    # 走圖（Phase 2 Step 2.6）：九型各自「命中／母體」，**0 也印、不加總、不排序**（plan §0 第 7 條）。
+    # consumer 是 research-drain（互動），不是 `engine_b.cli drain`，所以不加進 pq1 的數；但它是研究工作，
+    # 不印在這裡會讓上一行的 0 被讀成「沒事做」。原本的「＋結構讀圖待重讀 N」由第 4 型承載。
+    section.lines.append(_graph_walk_line(walk_questions, walk_absence))
 
     # ⚠ 「球在使用者手上」有 SSOT——`engine_b.todo.actionable_items()`（它已經處理了
     # `waiting_on`＝等事件、已 dispatch 的 pq1 job 不重複詢問這兩種情形）。
@@ -1351,6 +1380,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "pq2.open": "pq2 未結案", "pq2.actionable": "pq2 球在你",
     **{f"lead.{s}": f"lead {s}" for s in LEAD_STATUSES},
     "reading.current": "讀圖現行", "reading.needs_reread": "讀圖該重讀",
+    # 走圖九型各自的命中（Phase 2 Step 2.6）——由封閉字彙導出，不抄一份（L16）；各自一鍵、不加總。
+    **{f"walk.{q.key}": f"走圖 {q.short}" for q in WALK_QUESTION_TYPES},
     **{f"thesis.{s}": f"thesis {s}" for s in THESIS_STATUSES},
     "disproof.watching": "反證在盯", "disproof.unreachable": "反證叫不醒",
     "disproof.touched_pending": "反證觸及待處置", "disproof.expired_pending": "反證到期待複查",
@@ -1404,6 +1435,13 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         return {"reading.current": (payload.get("counts") or {}).get("current"),
                 "reading.needs_reread": (payload.get("needs_reread") or {}).get("n")}
 
+    def walk() -> dict[str, Any]:
+        payload, absence = _load_state(state_dir, "graph_walk")
+        if absence is not None:
+            return {}
+        return {f"walk.{q.get('key')}": q.get("hit_n") for q in payload.get("questions") or ()
+                if not q.get("absence")}
+
     def thesis() -> dict[str, Any]:
         payload = _read_json(thesis_path)
         entries = [e for e in (payload.values() if isinstance(payload, Mapping) else []) if isinstance(e, Mapping)]
@@ -1449,7 +1487,7 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         counts = card.get("tier_counts") or {}
         return {f"tier.{t}": counts.get(t) for t in SCORECARD_TIERS}
 
-    for fn in (watches, pq2, lead_states, readings, thesis, disproof_counts, prescreen, captures, tiers):
+    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, prescreen, captures, tiers):
         guard(fn)
     return values
 

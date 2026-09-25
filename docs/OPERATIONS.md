@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-09-26，Phase 2 Step 2.6：走圖取代 coverage）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的命令字串 `-m webapp materialize ... --coverage ...` → `... --graph-walk ...`（**同一個入口的旗標改名，不是新入口**；舊旗標不留別名）。`--graph-walk` 跑 `query.graph_walk.collect()`：本機 Neo4j bolt 唯讀（邊、全部節點 id、coverage 掃描、重複節點掃描，同一個 session）＋讀圖 ledger（`library/private/alpha/structure_readings/*.jsonl`，唯讀）＋`library/leads/pending_leads.json`（唯讀）。**只寫** `library/private/app/state/graph_walk.json`（ignored derived cache，atomic）。無新網路主機、無憑證、不寫任何 authority、不碰 `.git`。`python -m query.graph_walk` 是互動／稽核用的新唯讀入口（不在 daily 清單） |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「Web App／API」命令與 materialize 表；`skills/research-drain`（第三段改成走圖）、`skills/alpha-status`、`skills/daily-brief`、`skills/system-decompose` 已同步（`python scripts/sync_agent_skills.py`）；`docs/ARCHITECTURE.md` state kind 段 |
+| **3 最窄 rule** | Windows daily 不經 Codex，`.codex/rules` 仍是 0 條，不增不減 |
+| **4 contract test** | `tests/test_daily_task.py` 的 `DAILY_STEPS` 逐項相等斷言同一個 commit 改；`tests/test_webapp_graph_walk_watches.py` 斷言舊路由 `/api/v1/coverage` 回 404、`#/coverage` 不在 nav；`tests/test_graph_walk.py` 守 `query/` 只有 `graph_walk.collect()` 一處 import `alpha/` |
+| **5 端到端 smoke** | 2026-09-26 實跑 `python -m webapp materialize --graph-walk`：`graph_walk.json` 約 190 KB、九型與 `python -m query.graph_walk` 同數；`python -m webapp status` 列 `graph_walk`、不列 `coverage`；`python -m crons.heartbeat` 段 3 印九格走圖行；`python -m audit invariants --only QueueSegments` 讀得到 `graph_holes`（不再是三段「未讀到」） |
+
 ### Sandbox impact review 結論（2026-09-24，Phase 1 Step 1.2a：一個 Windows daily）
 
 | 步 | 結論 |
@@ -537,9 +547,10 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m webapp materialize --structure-table         # 結構表（state artifact；照抄 structure_table，不排序、不設門檻，2026-09-23）
 & '.venv\Scripts\python.exe' -m webapp materialize --structure-table --as-of 2026-09-05   # as-of 視角的結構表；被排除的 assertion 計數帶在 artifact 內
 & '.venv\Scripts\python.exe' -m webapp materialize --beta                    # 資產配置（state artifact；daily_beta_snapshot --no-refresh --no-record-risk 照抄，2026-09-08）
-& '.venv\Scripts\python.exe' -m webapp materialize --coverage --watches      # 研究缺口＋在等什麼（唯讀照抄；2026-09-08）
+& '.venv\Scripts\python.exe' -m webapp materialize --graph-walk --watches    # 走圖九型＋在等什麼（唯讀照抄；2026-09-26 取代 --coverage）
+& '.venv\Scripts\python.exe' -m query.graph_walk                            # 走圖：九型問句各自「命中／母體」（零 LLM、不排序、不加總）
 & '.venv\Scripts\python.exe' -m query.duplicate_nodes                        # 重複節點候選（唯讀；只提名不合併，2026-09-18 V3）
-& '.venv\Scripts\python.exe' -m webapp materialize --tracked --ranking --beta --coverage --watches --positions   # Daily 收尾用的完整一輪（追蹤中 30 檔＋四種 state）
+& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard   # Daily ⑬ 的完整一輪（crons/daily_task.py 是唯一權威）
 
 # 2) serve：純讀。**不重建任何東西**
 & '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/
@@ -621,7 +632,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 只有結果集比對得出「多了一條我當初沒讀到的邊」。`kind` 由寫的人宣告，**不由程式從 angles 推**
 （A/B 判準表刻意還沒機械化：先產出幾十份、看它準不準，INV-5）。
 
-⚠ **分級不是 binary**：供給側增減／sub 變動＝`high`（進 pq1 段 `stale_structure_readings`）；
+⚠ **分級不是 binary**：供給側增減／sub 變動＝`high`（進走圖第 4 型 `reading_stale`、佇列段 `graph_holes`；2026-09-26 前是段 `stale_structure_readings`）；
 只有 evidence 變＝`low`（記錄，不進佇列）；**`documents` 計數根本到不了這一層**（`EdgeView.key()` 不含它）
 ——binary 的 stale 會恆亮，而恆亮＝零鑑別力（L14-4）。
 
@@ -1238,7 +1249,7 @@ Select-String -Path .codex\rules\stockbot-automations.rules -Pattern 'refresh'
 | `python -m webapp materialize [T ...] [--as-of] [--dir]`　⚠ **本列的「互動專用」判定已於 2026-09-08 改判**（見下方該日 review：materialize 已納入 Daily 收尾，成為第十七個 fixed entry；`serve` 仍不在列） | 寫 **derived cache**（`library/private/app/analyst_view/*.json`，atomic）；讀 Neo4j／Engine C／private ledger。**不寫任何 authority**、不入圖、不建 decision | 與 `alpha-card` 相同的本機資源；無新增網路主機或憑證 | **互動專用**。新 CLI 名稱，不進 unattended rule |
 | `python -m webapp serve [--host] [--port] [--dir]` | **開一個本機 listener**（預設 `127.0.0.1:8790`）。唯讀：無寫入端點、無模型執行、無外部抓取 | ⚠ **新增 executable surface**：綁定本機 port。非 `127.0.0.1` 需明示 `STOCKBOT_APP_ALLOW_PUBLIC_BIND=1`，否則程式拒絕啟動。外部認證邊界是 Cloudflare Access（`deploy/cloudflare/README.md`），不是本程式 | **互動／長駐專用**，不進 unattended rule |
 | `python -m webapp status｜verify [--dir]` | 唯讀：只讀 artifact 目錄 | 無 | 互動專用 |
-| `python -m webapp materialize --coverage｜--watches [--state-dir]`（2026-09-08 B2b） | 寫 **derived cache**（`state/coverage.json`／`state/watches.json`，atomic）；`--coverage` 讀 Neo4j（`coverage_gaps.scan` ＋ `duplicate_nodes.scan`，同一個 session 兩份查詢），`--watches` 只讀 repo 內的 `event_watches.json` 與 `pending_leads.json`。**唯讀**：不喚醒 watch、不 mark-checked、不改 lead | `--coverage` 同 `python -m query.coverage_gaps` ＋ `python -m query.duplicate_nodes`（本機 Neo4j bolt，皆唯讀）；`--watches` 無網路、無憑證 | **互動專用**。同一命令字串的新 flag，不進 unattended rule；Phase A 排進 daily 收尾前須再走一次本表 |
+| `python -m webapp materialize --coverage｜--watches [--state-dir]`（2026-09-08 B2b；⚠ `--coverage` 已於 2026-09-26 由 `--graph-walk` 取代，見 Phase 2 Step 2.6 的 review） | 寫 **derived cache**（`state/coverage.json`／`state/watches.json`，atomic）；`--coverage` 讀 Neo4j（`coverage_gaps.scan` ＋ `duplicate_nodes.scan`，同一個 session 兩份查詢），`--watches` 只讀 repo 內的 `event_watches.json` 與 `pending_leads.json`。**唯讀**：不喚醒 watch、不 mark-checked、不改 lead | `--coverage` 同 `python -m query.coverage_gaps` ＋ `python -m query.duplicate_nodes`（本機 Neo4j bolt，皆唯讀）；`--watches` 無網路、無憑證 | **互動專用**。同一命令字串的新 flag，不進 unattended rule；Phase A 排進 daily 收尾前須再走一次本表 |
 | `python -m webapp materialize --beta [--state-dir]`（2026-09-08 B2） | 寫 **derived cache**（`library/private/app/state/beta.json`，atomic）；讀 Google Sheet 持股與 Capital Authority（`spreadsheets.readonly`）、yfinance FX、Engine C technical_observations。**不寫任何 authority**：`--no-refresh` 不寫 Engine C、`--no-record-risk` 不 append 風險快照 | 與 `scripts\daily_beta_snapshot.py` 相同的本機資源與憑證；無新增網路主機 | **互動專用**。同一命令字串的新 flag，不進 unattended rule；Phase A 排進 daily 收尾前須再走一次本表 |
 | `python -m webapp materialize --ranking [--as-of] [--state-dir]`（2026-09-08 B1） | 寫 **derived cache**（`library/private/app/state/ranking.json`，atomic）；讀 Neo4j（`query.bottleneck.fetch_assertions`，與 `python -m query.bottleneck` 同一條路）與 registry。**不寫任何 authority**、不入圖 | 與 `python -m query.bottleneck` 相同的本機資源（Neo4j bolt）；無新增網路主機或憑證 | **互動專用**。同一個命令字串的新 flag，不進 unattended rule；日後 Phase A 要排進 daily 收尾前須再走一次本表 |
 | `python -m alpha abstention <T> [--list｜--add｜--retract]` | `--add`／`--retract` **append** 一筆到 private ledger（`library/private/alpha/abstentions/`）；**結構上不可能寫入任何數值主張** | 無 | **互動專用**（authority write，需使用者明確執行） |

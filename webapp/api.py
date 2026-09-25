@@ -97,7 +97,8 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/stocks/{{ticker}}",
             f"GET /api/{API_VERSION}/structure-table",
             f"GET /api/{API_VERSION}/beta",
-            f"GET /api/{API_VERSION}/coverage",
+            f"GET /api/{API_VERSION}/graph-walk",
+            f"GET /api/{API_VERSION}/structure-readings",
             f"GET /api/{API_VERSION}/watches",
             f"GET /api/{API_VERSION}/positions",
         ],
@@ -221,8 +222,8 @@ _STATE_NOTES = {
                         "「artifact 讀不到」與「母體為空」是兩件事——後者會以 200 ＋ rows=[] ＋ population 計數回。"),
     "beta": ("跑 `python -m webapp materialize --beta`",
              "「artifact 讀不到」與「配置算不出來」是兩件事——後者會以 200 ＋ allocation.status=unavailable ＋ 理由回。"),
-    "coverage": ("跑 `python -m webapp materialize --coverage`",
-                 "「artifact 讀不到」與「圖裡沒有缺口」是兩件事——後者會以 200 ＋ counts 全零回。"),
+    "graph_walk": ("跑 `python -m webapp materialize --graph-walk`",
+                   "「artifact 讀不到」與「走圖沒有命中」是兩件事——後者會以 200 ＋ 每型 hit_n=0（母體照印）回。"),
     "watches": ("跑 `python -m webapp materialize --watches`",
                 "「artifact 讀不到」與「沒有東西在等」是兩件事——後者會以 200 ＋ counters.active=0 回。"),
     "positions": ("跑 `python -m webapp materialize --positions`",
@@ -270,9 +271,9 @@ async def beta(request: Request) -> Response:
     return await _serve_state(request, "beta")
 
 
-async def coverage(request: Request) -> Response:
-    """供給側覆蓋掃描：圖裡哪些瓶頸還沒有供應商（`coverage_gaps.scan()` 的輸出照抄）。"""
-    return await _serve_state(request, "coverage")
+async def graph_walk(request: Request) -> Response:
+    """走圖：九型問句的命中／母體（`query.graph_walk.collect()` 的輸出照抄；不排序、不合成跨型別數字）。"""
+    return await _serve_state(request, "graph_walk")
 
 
 async def watches(request: Request) -> Response:
@@ -366,7 +367,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/meta", meta, methods=["GET"]),
         Route(f"/api/{API_VERSION}/structure-table", structure_table, methods=["GET"]),
         Route(f"/api/{API_VERSION}/beta", beta, methods=["GET"]),
-        Route(f"/api/{API_VERSION}/coverage", coverage, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/graph-walk", graph_walk, methods=["GET"]),
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
         Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
         Route(f"/api/{API_VERSION}/structure-readings", structure_readings, methods=["GET"]),

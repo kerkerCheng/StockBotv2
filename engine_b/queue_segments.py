@@ -31,9 +31,8 @@
 
 - 不重排 lead（priority.py 是唯一權威）。
 - 不寫任何檔案；`observe()` 是純函式。
-- 不判定 forward view／coverage 缺口／結構讀圖／重複節點候選的**內容**——那四段的計數
-  由呼叫端注入（authority 分別是 analyst view artifact、Neo4j、state artifact、Neo4j），
-  本模組只登記它們的 consumer。
+- 不判定 forward view／走圖的**內容**——那兩段的計數由呼叫端注入（authority 分別是
+  analyst view artifact、走圖 `query.graph_walk`），本模組只登記它們的 consumer。
 """
 from __future__ import annotations
 
@@ -105,25 +104,17 @@ SEGMENTS: tuple[Segment, ...] = (
         "research", "research-drain §每檔閉環（P3；深度優先，一檔到終局才開下一檔）",
         "終局三種：ready／剩餘 blocker 全部 settled／全部掛在 pq2 編號上。",
     ),
+    # ⚠ 2026-09-26（Phase 2 Step 2.6）：`coverage_gaps`、`duplicate_node_candidates`、`stale_structure_readings`
+    # 三段併成 `graph_holes`——它們成為走圖的第 7／8、9、4 型（`query/graph_walk.py`），另加五型
+    # （薄層沒人讀、獨家且自報、供給側未填、lead 點名不在圖、供貨走不到錨）。三段不是安靜消失：
+    # 同一個 change 改掉 `observe()` 的注入參數、`audit/checks.py` 與心跳的呼叫端、research-drain 第三段。
+    # `fired_reading_reread`（watch 那一側叫醒的重讀）**留**——它是事件驅動，走圖第 4 型只看圖那一側。
     Segment(
-        "coverage_gaps", 6, "圖的 🔴 研究缺口與 🟡 建模待補",
-        "research", "research-drain 第三段（python -m query.coverage_gaps）",
-    ),
-    Segment(
-        "duplicate_node_candidates", 6, "名字重疊的重複節點候選（沒人提過的那些）",
-        "research", "research-drain 第三段：python -m query.duplicate_nodes（判定同一個 → pq2 ra_admission）",
-        "2026-09-18 V3：它與 coverage_gaps 是同一頁的兩題，但方向相反——後者問「誰供應這個節點」，"
-        "前者問「這個節點是不是旁邊那個」。重複節點正是 coverage 🔴 的誤報來源。"
-        "⚠ 只收 `unmentioned`（registry 從沒提過的）：registry 已經寫過 note 的那些不算待辦，"
-        "否則清單會恆亮而恆亮＝零鑑別力（L14-4）。合併仍逐筆 ra_admission，本段只提名。",
-    ),
-    Segment(
-        "stale_structure_readings", 6, "結構讀圖與圖不再一致（分級後仍會改變 A/B 讀法的）",
-        "research", "research-drain：重跑 `python -m query.structure <node>` 後改寫讀圖紀錄",
-        "2026-09-17 Q5：偵測到 stale 只是 producer——沒有東西真的去重讀，計數器只會愈長愈大"
-        "（L13「已排入不等於已推進」、INV-4「producer 指得出 consumer」）。"
-        "⚠ 只收 `stale`／`expired`：`stale_low`（只有 evidence 變）不進佇列，"
-        "否則 binary 的 stale 會恆亮而恆亮＝零鑑別力（L14-4）。",
+        "graph_holes", 6, "走圖九型問句的命中（圖上該去研究的洞；每型各自一格，不排序）",
+        "research", "research-drain 第三段：python -m query.graph_walk（每筆命中附下一個研究動作）",
+        "計數＝九型命中筆數之和，**只用來回答「這一段有沒有工作」**（INV-4）——它不是分數、不排序、"
+        "不在任何人讀的畫面上當成一個數字印（心跳與 APP 一律九格各自印，plan §0 第 7 條）。"
+        "母體 ≥10 的型別命中率 ≥50% 就是恆亮（L14-4），走圖自己會標出來。",
     ),
     Segment(
         "pollable_watches", 7, "stalled 且可主動輪詢的 watch（被動層不會再醒）",
@@ -257,14 +248,11 @@ def observe(
     watches: Iterable[Mapping[str, Any]] = (),
     todo_items: Iterable[Mapping[str, Any]] = (),
     forward_view_backlog: int | None = None,
-    coverage_gaps: int | None = None,
-    stale_structure_readings: int | None = None,
-    duplicate_node_candidates: int | None = None,
+    graph_holes: int | None = None,
 ) -> dict[str, Any]:
     """由資料反推每一段有幾筆工作。
 
-    `forward_view_backlog`／`coverage_gaps`／`stale_structure_readings`／
-    `duplicate_node_candidates` 由呼叫端注入
+    `forward_view_backlog`／`graph_holes` 由呼叫端注入
     （它們的 authority 不在 leads 目錄）；給 `None` 表示「本次沒有讀到那個 authority」，
     輸出會照實寫 `None`，不寫 0（INV-3）。
     """
@@ -310,9 +298,7 @@ def observe(
             examples[key].append(f"[{item.get('n', '?')}]")
 
     counts["forward_view_backlog"] = forward_view_backlog
-    counts["coverage_gaps"] = coverage_gaps
-    counts["stale_structure_readings"] = stale_structure_readings
-    counts["duplicate_node_candidates"] = duplicate_node_candidates
+    counts["graph_holes"] = graph_holes
 
     # gated 兩段由 todo_items 直接算得出來（不需要外部 authority），所以不走注入。
     from engine_b.todo import gate_pointer

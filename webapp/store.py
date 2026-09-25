@@ -173,7 +173,7 @@ class StateArtifactStore:
     def read(self, kind: str) -> tuple[Mapping[str, Any], Freshness]:
         path = self.path_for(kind)
         if not path.is_file():
-            raise ArtifactUnavailable(kind, f"尚未 materialize（請跑 `python -m webapp materialize --{kind}`）")
+            raise ArtifactUnavailable(kind, f"尚未 materialize（請跑 `python -m webapp materialize --{kind.replace('_', '-')}`）")
         try:
             raw = path.read_text(encoding="utf-8")
         except OSError as exc:

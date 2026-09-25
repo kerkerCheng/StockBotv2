@@ -217,7 +217,8 @@ def test_every_alpha_pane_still_has_a_home_after_daily_stopped_embedding_them() 
     assert "本 skill 仍是「完整四 pane」的權威" in alpha
 
     # ② Daily 必須指得出前三個 pane 的新家（APP），而不是安靜不提
-    for pointer in ("#/structure-table", "#/coverage", "$alpha-status"):
+    # 2026-09-26（Step 2.6）：pane 3（哪裡還是空白）的新家由 `#/coverage` 改為 `#/graph-walk`。
+    for pointer in ("#/structure-table", "#/graph-walk", "$alpha-status"):
         assert pointer in text, f"Daily 沒有指出 {pointer}"
 
     # ③ Pane 4 於 2026-09-08 也搬進 APP（`positions` kind）→ Daily 只印變動。

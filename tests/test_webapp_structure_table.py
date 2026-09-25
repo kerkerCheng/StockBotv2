@@ -179,7 +179,7 @@ def test_state_kinds_are_a_closed_vocabulary() -> None:
     # 2026-09-23（Step 0b.3）：`ranking` → `structure_table`，仍是 7。
     # 這是**封閉字彙**的相等斷言，所以「有人把它加回來」與「有人新增一個沒登記的 kind」
     # 都會在這裡變紅——不必另外寫一條「不得出現」的斷言。
-    assert STATE_KINDS == ("structure_table", "beta", "coverage", "watches", "positions",
+    assert STATE_KINDS == ("structure_table", "beta", "graph_walk", "watches", "positions",
                            "structure_readings", "account_scorecard")
     assert STATE_SCHEMA_VERSIONS["structure_table"] == "stockbot-app/structure_table/1"
 
@@ -194,7 +194,7 @@ def test_state_artifact_fails_closed() -> None:
     with pytest.raises(ArtifactUnavailable, match="kind"):
         validate_state_artifact("beta", payload)          # 已登記的 kind，但檔名與內容不一致
     with pytest.raises(ArtifactUnavailable, match="kind"):
-        validate_state_artifact("structure_table", dict(payload, kind="coverage"))
+        validate_state_artifact("structure_table", dict(payload, kind="graph_walk"))
     with pytest.raises(ArtifactUnavailable, match="schema"):
         validate_state_artifact("structure_table", dict(payload, schema_version="stockbot-app/structure_table/0"))
     with pytest.raises(ArtifactUnavailable, match="content_digest"):
@@ -246,7 +246,7 @@ def test_state_store_round_trip(tmp_path) -> None:
     got, fresh = store.read("structure_table")
     assert got == payload and fresh.state == "fresh"
     assert store.kinds() == ["structure_table"]
-    assert store.missing_kinds() == ["beta", "coverage", "watches", "positions",
+    assert store.missing_kinds() == ["beta", "graph_walk", "watches", "positions",
                                      "structure_readings", "account_scorecard"]
     with pytest.raises(ArtifactUnavailable, match="未登記"):
         store.read("cashflow")
@@ -259,7 +259,7 @@ def test_state_store_round_trip(tmp_path) -> None:
 def test_state_store_reports_missing_and_broken_separately(tmp_path) -> None:
     store = StateArtifactStore(tmp_path)
     assert store.kinds() == []
-    assert store.missing_kinds() == ["structure_table", "beta", "coverage", "watches", "positions",
+    assert store.missing_kinds() == ["structure_table", "beta", "graph_walk", "watches", "positions",
                                      "structure_readings", "account_scorecard"]
     with pytest.raises(ArtifactUnavailable, match="尚未 materialize"):
         store.read("structure_table")
@@ -341,7 +341,7 @@ def test_status_and_verify_commands_include_state(tmp_path, capsys) -> None:
     assert main(["status", "--dir", str(tmp_path), "--format", "json"]) == 0
     doc = json.loads(capsys.readouterr().out)
     assert [s["kind"] for s in doc["state"]] == ["structure_table"]
-    assert doc["state_missing"] == ["beta", "coverage", "watches", "positions",
+    assert doc["state_missing"] == ["beta", "graph_walk", "watches", "positions",
                                    "structure_readings", "account_scorecard"]
 
 

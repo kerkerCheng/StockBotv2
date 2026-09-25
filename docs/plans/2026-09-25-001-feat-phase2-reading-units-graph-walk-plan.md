@@ -178,8 +178,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.2 | 反向路徑只收競爭關係 | ✅ | 便宜 | `73d8c53` |
 | 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ✅（R2-b CONDITIONAL_GO → B1 已修） | 便宜 | `cb6c612`＋R2-b 處置 |
 | 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ✅（R2-b CONDITIONAL_GO → B1 已修；non-blocking 處置見 R2-b 處置 commit） | 便宜 | `12dbc8c`＋`f1fe714`（R2-b 處置）＋`6053c25`（2.1 補） |
-| 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ✅（插槽讀圖 2 份、層讀圖 2 份重讀成 v3；工具毛病三個當下修＝偏差 #7–#9；pq2 [651]、[652]） | **強模型** | 見 2.6 列補填（ledger 不在 git；收據＝[`2026-09-25-phase2-step25-readings.md`](../reports/2026-09-25-phase2-step25-readings.md)） |
-| 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ○ | 便宜 | |
+| 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ✅（插槽讀圖 2 份、層讀圖 2 份重讀成 v3；工具毛病三個當下修＝偏差 #7–#9；pq2 [651]、[652]） | **強模型** | `c9390b9`＋`647245d`／`4ab71d4`／`974e2c9`／`c0db0a1`／`eb2a7ce`（[651]–[654] 與衝突決策收據；ledger 不在 git；收據＝[`2026-09-25-phase2-step25-readings.md`](../reports/2026-09-25-phase2-step25-readings.md)） |
+| 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ✅（九型重現 §0.2 基準；母體 ≥10 的型別皆 <50%；偏差 #11–#15） | 便宜 | 見 2.7 列補填 |
 | 2.7 | 讀圖頁 ＋ 個股頁讀圖面板（選配） | ○ | 便宜 | |
 | 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ○ | 便宜 | |
 | 2.9a | `pending --trigger` 必帶到期或綁 watch | ○ | 便宜 | |
@@ -210,6 +210,11 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | 8 | 2.5 | 同上（`query.structure --quotes` 的呈現） | 每條邊超過 3 段時印「另有 N 段逐字沒印，出自哪幾份」、切斷的片段標「…」；`fetch_quotes` 去掉同文件同段的重複 | 真實資料：InP 基板 `co:lumentum` 那條邊 11 段只印 3 段、**不說**，藏掉的正是 Lumentum 10-K 與 Q4 法說「又向 AXT 找基板」——判斷供給側可不可替代的客戶端原文；CW DFB 藏 7 段（L13-2、INV-3；與 `sr_6ad5c884eb7bc3fb` 記的 claim 截斷同形）。不進 digest，四份讀圖寫完後 `--check` 全 current |
 | 9 | 2.5 | §14 #12「Step 2.5 看完後定案，定案若要改規則走 plan 修改」 | **定案：插槽的 `independent` 排除該插槽所有供應商**（與插槽視角的「客戶端原文」同一定義）；層不變（只排除那條邊的主詞）。`alpha/providers/structure_readings.py::verify_citations` | 真實資料乾跑：`prod:els_8ch_module` 拿同插槽另一家供應商 Enablence 發的聯合新聞稿標 independent，舊規則**放行**了一份 Sivers 的插槽護城河——聯合公告方與 Sivers 利益一致，不是客戶。這是收緊、不放寬任何 gate；使用者可否決。⚠ 要正確還得先修 R-4：O-Net（ELS 的客戶）在圖上是 `supplies_to`，會被一併排除（pq2 [651]）。測試 `test_independent_on_a_socket_excludes_every_supplier_of_that_socket` |
 | 10 | 2.5（[651]／[652] go 之後） | §6 第 4 點「寫一筆 pq2 manual 提案，不自己改圖」（沒預期要寫工具） | `loader/migrate_relation_rejudge.py` 加 `--additions <manifest>`：在指定抽取檔新增邊，只准引用該檔既有 sources、端點照抄圖上現值宣告、改完過 `loader/validate.py`、重跑冪等；只做 dry-run，**沒有 apply**（入圖閘門 [654]） | 既有通用遷移以 assertion_id 為鍵，只表達得出「改」，表達不出「同一段逐字其實還支持另一條邊」；手改抽取檔再重載沒有可重現的清單。測試 `tests/test_migrate_relation_rejudge_additions.py`（6 條）。研究包（Research Action）只收新文件，不能用 |
+| 11 | 2.6 | §7「`audit/checks.py` 的段計數注入」（未說注入什麼；原三段在稽核裡是 `None`＝「未讀到」） | 稽核的 `QueueSegments` **直接跑走圖的 authority**（`query.graph_walk.collect()`：圖＋讀圖 ledger＋leads）算 `graph_holes`；圖沒開回 `None` 並註明，不寫 0 | 基準報告 §2 註記「新段要在 audit 裡讀得到（不是繼承未讀到）」；原本給 `None` 的理由是「不讀 derived cache」，直接跑 authority 同時滿足兩者。代價：稽核多約 4 秒、這一格依賴 Neo4j（其餘各格不受影響） |
+| 12 | 2.6 | §13「`query/` 不得 import `alpha/`（`tests/test_layer_separation.py`）」 | 那個測試**沒有**這條規則（只守 alpha 不 import query 等）。實作：讀圖狀態的逐（節點, 單位）比對由 `webapp/materialize.py::materialize_structure_readings` **原樣搬到** `alpha/providers/structure_readings.py::reading_status_rows`（讀圖 artifact 與走圖第 4 型共用一份）；`query/graph_walk.py::collect()` 是 `query/` 唯一 import `alpha/` 之處，由新測試 `test_query_layer_imports_alpha_only_in_the_graph_walk_composition` 守「只有這一處」 | `python -m query.graph_walk` 是 R2 與 plan 的驗收命令，必須自己算得出第 4 型；若組裝只住 webapp，CLI 就得 import webapp（更高層）。把 plan 的意圖寫成可執行的規則，例外只有一個 |
+| 13 | 2.6 | §7 表第 7／8／9 型的母體寫「coverage 既有定義」「`duplicate_nodes` 既有定義」（沒有數） | 第 7 型母體＝非概念的 tech／mat 節點（**129**；prod: 0 家是抽取副產品，只計數）；第 8 型＝非概念的 tech／mat／prod（**181**）；第 9 型＝`duplicate_nodes` 掃描的非公司實體節點（**188**），命中＝`unmentioned` 候選對（每對一筆——**命中與母體單位不同**，已在 `scope_rule`／`hit_rule` 寫明） | coverage 本身沒有「母體」概念；取「這一題對誰問得出來」。三型命中率 7%／6%／12%，都遠低於 50%，母體取法不影響判定 |
+| 14 | 2.6 | §0 第 7 條「沒有跨型別的數字合成」 | 佇列段 `graph_holes` 的計數＝九型命中筆數之和（60），**只**出現在 `observe()`／稽核 `QueueSegments` 那一行，用來回答「這一段有沒有工作」（INV-4）；心跳、APP、`query.graph_walk` 輸出一律九格各自印、沒有加總欄位（測試 `test_there_is_no_cross_type_number_anywhere_in_the_result`、`test_graph_walk_artifact_copies_every_type_and_adds_no_total` 守） | 佇列段必須有一個數才分得出「有工作／沒工作／未讀到」；它不是分數、不排序。請 R2 看這一條要不要改成「段計數＝有命中的型別數」 |
+| 15 | 2.6 | （未預期） | ①`tests/test_migrate_relation_rejudge_additions.py` 兩條測試在 HEAD 就是紅的：夾具拷真實抽取檔，而 [654] 入圖（`4ab71d4`）後那條 `develops` 邊已在檔內——夾具改成還原入圖前的形狀（只動測試，L17 當下修）；②`webapp/store.py`／`contracts.py` 的「請跑 materialize --{kind}」提示印底線（`--graph_walk`、`--structure_table`，貼了會失敗）——改印連字號（全部 kind 一起修）；③心跳重讀理由帶單位（§14 #14，原排 2.6） | ①不是本 Step 造成，但全套測試要綠才能判 GO；②第一次真跑心跳就撞到（L13）；③plan 本來就排在 2.6 |
 
 ---
 
@@ -443,7 +448,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 - **快照必須由 `--add` 現跑**（`cmd_structure_reading` 已拒收夾帶快照的 spec）；引用核對也要對**同一份**快照，不要另查一次圖（兩次查詢之間圖可能變）。
 - **`digest_changed` 分不出「圖變了」與「走訪清單改了」**（`sr_6ad5c884eb7bc3fb` 已記）：2.2 會讓 InP 基板轉 stale，**那是預期**；不要為了讓它回 current 去動 digest。
 - **插槽的附加段不得進 digest**：一進去，逐字篇數就會讓 staleness 恆亮（AGENTS：會隨我們多讀文件單調上升的指標）。
-- **`query/` 不得 import `alpha/`**（`tests/test_layer_separation.py`）：讀圖狀態由 `webapp/materialize.py` 組進走圖，或以參數注入 `query/graph_walk.py`。
+- **`query/` 不得 import `alpha/`**，唯一例外是 `query/graph_walk.py::collect()`（偏差 #12；`tests/test_graph_walk.py::test_query_layer_imports_alpha_only_in_the_graph_walk_composition` 守「只有這一處」）：讀圖狀態的算法住 `alpha/providers/structure_readings.py::reading_status_rows`，讀圖 artifact 與走圖共用。
 - **evidence 與 origin 解析有唯一 owner**（`query/bottleneck.py::classify_evidence`、`company_id_for_origin`）：`query/structure.py` 曾因自己不經過它而印錯 430 條（L16）；走圖第 2 型與 v3 的 `independent` 核對都用它。
 - **`webapp/contracts.py` 的 kind 是封閉字彙**：改名要同步 materialize、api、app.js、`webapp status` 提示、心跳 `_load_state`、測試；舊 `coverage.json` 留在磁碟當孤兒（同 Phase 0 的 basket.json）。
 - **`engine_b/queue_segments.py` 是封閉字彙且 audit 注入計數**：刪段時 `audit/checks.py` 與心跳 `observe()` 的注入參數一起改，否則 `unmapped` 或 TypeError。
@@ -486,7 +491,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
     算不算插槽護城河要的客戶端印證——寫入端目前當成供應商自己（origin 解析到供應商）。這是契約問題，要使用者決定。
 13. **讀圖 artifact 的 `needs_reread.nodes` 對插槽列放 `prod:x［socket］` 標籤**（R2-b N2）：research-drain 叫人拿它直接跑 `--check` 會找不到；
     **併進 Step 2.7**（讀圖頁）：payload 多結構化的 `{node, unit}`，skill 寫上 `--unit`。
-14. **心跳重讀理由那一行不帶單位**（R2-b N6）：**併進 Step 2.6**（心跳段 2 讀圖行本來就要加單位拆分）。
+14. **心跳重讀理由那一行不帶單位**（R2-b N6）：**併進 Step 2.6**（心跳段 2 讀圖行本來就要加單位拆分）。 **2.6 已做**（`crons/heartbeat.py`：「`prod:x`（插槽）該重讀：…」，測試 `test_reading_line_splits_by_unit_and_reread_reasons_carry_the_unit`）。
 15. **插槽的客戶重讀 watch 登記 0**（2.5 發現）：`demand_side_customers()` 只收需求側的 `co:*`；SuperNova 的需求側是 `prod:teraphy_chiplet`、
     ELS 的是 `tech:cpo`，所以 Ayar／O-Net 出新文件叫不醒這兩格。插槽的客戶其實是**製造者**（`develops`）——等 [651] 入圖後，
     插槽讀圖的重讀 watch 改綁製造者。與 #11 同一個觸發時一起處理。

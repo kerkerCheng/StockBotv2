@@ -67,7 +67,7 @@ EXPECTED_STEPS = (
     ("12_fiscal_year_backfill", ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True,
      "command", False, None, None, None),
     ("13_materialize", ("-m", "webapp", "materialize", "--tracked", "--registry-listed", "--structure-table",
-                        "--beta", "--coverage", "--watches", "--positions", "--structure-readings", "--scorecard"),
+                        "--beta", "--graph-walk", "--watches", "--positions", "--structure-readings", "--scorecard"),
      25, True, True, "command", False, None, None, None),
     ("14_health_audit", ("query/health_audit.py", "--local", "--json"), 5, False, False, "capture", False,
      "health_{date}.json", None, None),

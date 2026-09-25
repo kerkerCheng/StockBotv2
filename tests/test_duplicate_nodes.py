@@ -145,11 +145,10 @@ def test_the_app_page_prints_the_verbatim_not_just_the_ids() -> None:
     """APP 那一區塊若只印 id 與 name，它就跟 2026-09-18 之前的工具一樣沒有判斷依據。"""
 
     source = Path("webapp/static/app.js").read_text(encoding="utf-8")
-    assert "function duplicateSide" in source and "function duplicateList" in source
+    # Step 2.6：重複節點成為走圖第 9 型，APP 在走圖頁逐對印兩端的逐字（不再是獨立區塊）。
+    assert "function duplicateSide" in source and "function walkHitList" in source
     assert "q.quote" in source, "APP 區塊必須印出逐字本身"
-    assert "duplicate_unmentioned" in source
-    # 這一頁不排序、不評分——與 coverage 同一條規矩。
-    assert "duplicateList(dup.unmentioned" in source
+    assert "duplicateSide(hit.left)" in source and "duplicateSide(hit.right)" in source
 
 
 def test_the_queue_segment_points_at_a_consumer_that_really_mentions_it() -> None:
@@ -157,7 +156,9 @@ def test_the_queue_segment_points_at_a_consumer_that_really_mentions_it() -> Non
 
     from engine_b.queue_segments import SEGMENT_BY_KEY
 
-    seg = SEGMENT_BY_KEY["duplicate_node_candidates"]
-    assert seg.cost == "research" and "duplicate_nodes" in seg.consumer
+    # Step 2.6：`duplicate_node_candidates` 段併進 `graph_holes`（走圖第 9 型）——consumer 跟著搬。
+    seg = SEGMENT_BY_KEY["graph_holes"]
+    assert seg.cost == "research" and "query.graph_walk" in seg.consumer
     skill = Path("skills/research-drain/SKILL.md").read_text(encoding="utf-8")
-    assert "query.duplicate_nodes" in skill, "consumer 指到的 skill 沒提到它＝那個 consumer 是說謊"
+    assert "query.graph_walk" in skill, "consumer 指到的 skill 沒提到它＝那個 consumer 是說謊"
+    assert "query.duplicate_nodes" in skill, "判定同一個之後的逐字檢視仍走 duplicate_nodes"

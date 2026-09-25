@@ -1797,9 +1797,10 @@ function renderStateError(err, title) {
   app.appendChild(box);
 }
 
-/* ---------- 覆蓋掃描（coverage state）與在等什麼（watches state） ----------
+/* ---------- 走圖（graph_walk state）與在等什麼（watches state） ----------
    兩頁都是「計數＋清單」——依 dataviz 的 form heuristic，>7 類且每類都有意義時用表格／清單，
-   不是更多顏色；四個桶的數字用 KPI stat tile。這裡沒有圖表，也沒有排序。 */
+   不是更多顏色；九型的「命中／母體」用 KPI stat tile。**這裡沒有圖表、沒有排序、沒有加總**：
+   九格各自一格，型別順序是閱讀順序（plan 2026-09-25-001 §0 第 7 條）。 */
 
 function kpiRow(items) {
   const row = el('div', 'tiles');
@@ -1807,33 +1808,11 @@ function kpiRow(items) {
   return row;
 }
 
-function nodeList(rows, opts) {
-  const o = opts || {};
-  const list = el('ul', 'weak');
-  rows.forEach((row) => {
-    const li = el('li');
-    if (o.question && row.question) {
-      li.appendChild(el('div', null, row.question));
-      li.appendChild(el('span', 'rule', `${row.node}${row.name ? '　' + row.name : ''}`));
-    } else {
-      const head = el('div');
-      head.appendChild(el('code', null, row.node));
-      if (row.name) head.appendChild(el('span', 'dim', '　' + row.name));
-      li.appendChild(head);
-      const linked = (row.indirect || []).slice(0, 6);
-      if (linked.length) li.appendChild(el('span', 'rule', '間接相連：' + linked.join('、')));
-      const direct = (row.direct || []).slice(0, 6);
-      if (direct.length) li.appendChild(el('span', 'rule', '直接供應：' + direct.join('、')));
-    }
-    list.appendChild(li);
-  });
-  return list;
-}
-
 /* 一對重複節點候選。**逐字是主角**：2026-09-18 之前圖裡只有 id 與 name，而兩者都是抽取時
    LLM 取的——用它們判重複等於用 label 驗 label。所以每一端都要印得出它自己的逐字（L18）。 */
 function duplicateSide(side) {
   const box = el('div', 'pair-side');
+  if (!side) return box;
   const head = el('div');
   head.appendChild(el('code', null, side.node));
   if (side.name) head.appendChild(el('span', 'dim', '　' + side.name));
@@ -1851,40 +1830,46 @@ function duplicateSide(side) {
   return box;
 }
 
-function duplicateList(rows, ruleLabels) {
+function walkFraction(q) {
+  if (q.absence) return q.absence.kind;
+  return `${q.hit_n}／${q.scope_n}`;
+}
+
+function walkHitList(q) {
   const list = el('ul', 'weak');
-  (rows || []).forEach((row) => {
+  (q.hits || []).forEach((hit) => {
     const li = el('li');
-    const head = el('div');
-    head.appendChild(el('code', null, row.pair[0]));
-    head.appendChild(el('span', 'dim', ' ↔ '));
-    head.appendChild(el('code', null, row.pair[1]));
-    li.appendChild(head);
-    li.appendChild(el('span', 'rule',
-      (row.rules || []).map((r) => (ruleLabels || {})[r] || r).join('＋')
-      + '｜' + (row.same_abstraction_level ? '同層' : '不同層')));
-    li.appendChild(duplicateSide(row.left));
-    li.appendChild(duplicateSide(row.right));
-    (row.registry_mentions || []).forEach((m) => {
-      li.appendChild(el('span', 'rule',
-        `📄 ${m.canonical}（${m.basis}／${m.approval_receipt || '無 receipt'}）：${m.note}`));
-    });
+    li.appendChild(mdInline(hit.text || ''));
+    if (q.key === 'duplicate_node') {
+      li.appendChild(el('span', 'rule', (hit.rules || []).join('＋') + '｜' + (hit.same_abstraction_level ? '同層' : '不同層')));
+      li.appendChild(duplicateSide(hit.left));
+      li.appendChild(duplicateSide(hit.right));
+    } else if (hit.suppliers && hit.suppliers.length) {
+      li.appendChild(el('span', 'rule', '供給側：' + hit.suppliers.join('、')));
+    } else if (hit.supplier) {
+      li.appendChild(el('span', 'rule', `供給側：${hit.supplier}｜證據：${hit.evidence_label || '—'}`));
+    } else if (hit.indirect && hit.indirect.length) {
+      li.appendChild(el('span', 'rule', '間接相連：' + hit.indirect.slice(0, 6).join('、')));
+    } else if (hit.supplies && hit.supplies.length) {
+      li.appendChild(el('span', 'rule', '往下供貨：' + hit.supplies.join('、')));
+    } else if (hit.first_seen) {
+      li.appendChild(el('span', 'rule', `首見 ${hit.first_seen}${hit.title ? '｜' + hit.title : ''}`));
+    }
+    if (hit.demand && hit.demand.length) li.appendChild(el('span', 'rule', '需求側：' + hit.demand.join('；')));
     list.appendChild(li);
   });
   return list;
 }
 
-async function renderCoverage() {
-  markNav('coverage');
+async function renderGraphWalk() {
+  markNav('graph-walk');
   let payload;
   try {
-    payload = await getJSON(`${API}/coverage`);
+    payload = await getJSON(`${API}/graph-walk`);
   } catch (err) {
-    renderStateError(err, '讀不到覆蓋掃描');
+    renderStateError(err, '讀不到走圖');
     return;
   }
-  const c = payload.counts || {};
-  const notes = payload.notes || {};
   app.textContent = '';
   footerWarning.textContent = payload.correlation_warning || '';
 
@@ -1897,61 +1882,47 @@ async function renderCoverage() {
   head.appendChild(badges);
   app.appendChild(head);
 
+  const questions = payload.questions || [];
   const sec0 = el('section', 'panel');
-  sec0.appendChild(el('h2', null, `圖裡 ${c.nodes} 個瓶頸節點，哪些還沒有供應商`));
-  sec0.appendChild(kpiRow([
-    { label: '🔴 真的還沒挖', value: String(c.research_gap_real), sub: '有名有姓、零供應商的子瓶頸', cls: 'hero' },
-    { label: '🟡 建模待補', value: String(c.modelling_gap), sub: '研究過了，邊沒接上' },
-    { label: '✅ 已覆蓋', value: String(c.covered), sub: '有公司直接連上' },
-    { label: '⚪ 概念節點', value: String(c.concept), sub: '不適用「誰供應它」' },
-  ]));
-  sec0.appendChild(mdParagraph(notes.buckets || ''));
-  sec0.appendChild(mdParagraph(notes.scope || ''));
+  sec0.appendChild(el('h2', null, '九個問句，各自「命中／母體」——不加總、不排序'));
+  sec0.appendChild(kpiRow(questions.map((q) => ({
+    label: `${q.order}. ${q.short}`,
+    value: walkFraction(q),
+    sub: q.absence ? '這次沒讀到——不是 0' : (q.judged ? (q.always_on ? '⚠ 恆亮（≥50%）' : '母體 ≥10') : '母體 <10，只印不判'),
+  }))));
   app.appendChild(sec0);
 
-  const sec1 = el('section', 'panel callout');
-  sec1.appendChild(el('h2', null, `🔴 真正的空白（${c.research_gap_real}）——可以直接拿去研究的題目`));
-  sec1.appendChild(mdParagraph(notes.research_gap_split || ''));
-  sec1.appendChild(nodeList(payload.research_gaps || [], { question: true }));
-  sec1.appendChild(el('p', 'note', notes.question_template || ''));
-  if ((payload.product_noise || []).length) {
-    sec1.appendChild(drill(`展開：另有 ${payload.product_noise.length} 個是抽取產生的產品名詞（只計數，不是題目）`,
-      () => nodeList(payload.product_noise)));
-  }
-  app.appendChild(sec1);
+  questions.forEach((q) => {
+    const sec = el('section', 'panel');
+    sec.appendChild(el('h2', null, `${q.order}. ${q.short}（${walkFraction(q)}）`));
+    sec.appendChild(el('div', 'panel-questions', `母體：${q.scope_rule}｜命中：${q.hit_rule}`));
+    sec.appendChild(el('p', 'note', '下一步：' + q.next_action));
+    if (q.absence) {
+      sec.appendChild(el('p', 'warn', '▲ ' + q.absence.reason));
+      app.appendChild(sec);
+      return;
+    }
+    if ((q.hits || []).length) sec.appendChild(walkHitList(q));
+    else sec.appendChild(el('p', 'note', '這一型今天沒有命中（母體照印在上面）。'));
+    const extra = q.extra || {};
+    if ((extra.unresolved_names || []).length) {
+      sec.appendChild(el('p', 'note',
+        `另有 ${extra.unresolved_names.length} 個名字 registry 解析不到（不算命中；ID 沒解析對 ≠ 圖中真無此公司）：`
+        + extra.unresolved_names.join('、')));
+    }
+    if ((extra.product_noise || []).length) {
+      sec.appendChild(drill(`展開：另有 ${extra.product_noise.length} 個 prod: 抽取副產品（只計數，不是題目）`,
+        () => listOf(extra.product_noise)));
+    }
+    if ((extra.withdrawn || []).length) sec.appendChild(el('p', 'note', '有紀錄但已全部撤回（不在母體）：' + extra.withdrawn.join('、')));
+    if ((extra.registry_mentioned || []).length) {
+      sec.appendChild(drill(`展開：registry 的 note 提過的 ${extra.registry_mentioned.length} 對（不算命中；先讀 note）`,
+        () => listOf(extra.registry_mentioned)));
+    }
+    app.appendChild(sec);
+  });
 
-  const sec2 = el('section', 'panel');
-  sec2.appendChild(el('h2', null, `🟡 建模待補（${c.modelling_gap}）——補邊，不是重新研究`));
-  sec2.appendChild(el('div', 'panel-questions', (payload.next_steps || {}).modelling_gap || ''));
-  sec2.appendChild(nodeList(payload.modelling_gaps || []));
-  app.appendChild(sec2);
-
-  const dup = payload.duplicates || {};
-  const secDup = el('section', 'panel');
-  secDup.appendChild(el('h2', null,
-    `${dup.title || '重複節點候選'}（${c.duplicate_unmentioned}）——先問「它是不是旁邊那個」`));
-  secDup.appendChild(kpiRow([
-    { label: '沒人提過', value: String(c.duplicate_unmentioned), sub: '這些要人看', cls: 'hero' },
-    { label: 'registry 提過', value: String(c.duplicate_mentioned), sub: '先讀 note 說了什麼' },
-    { label: '掃描節點', value: String(dup.node_total || 0), sub: '非公司實體（公司走 registry）' },
-  ]));
-  secDup.appendChild(duplicateList(dup.unmentioned, dup.rule_labels));
-  if ((dup.mentioned || []).length) {
-    secDup.appendChild(drill(`展開：registry 的 note 提過的 ${dup.mentioned.length} 對`,
-      () => duplicateList(dup.mentioned, dup.rule_labels)));
-  }
-  const dupNotes = el('ul', 'notes');
-  (dup.this_is_not || []).forEach((t) => dupNotes.appendChild(el('li', null, t.replace(/[`*]/g, ''))));
-  secDup.appendChild(dupNotes);
-  app.appendChild(secDup);
-
-  const sec3 = el('section', 'panel');
-  sec3.appendChild(el('h2', null, '其餘'));
-  sec3.appendChild(drill(`展開：✅ 已覆蓋（${c.covered}）`, () => nodeList(payload.covered || [])));
-  sec3.appendChild(drill(`展開：⚪ 概念／政策節點（${c.concept}）`, () => nodeList(payload.concept || [])));
-  app.appendChild(sec3);
-
-  app.appendChild(stateFooter(payload, '這份掃描不是什麼'));
+  app.appendChild(stateFooter(payload, '走圖不是什麼'));
   window.scrollTo(0, 0);
 }
 
@@ -2406,7 +2377,8 @@ async function route() {
     // ⚠ 2026-09-23（Step 0b.3）：`#/ranking`（瓶頸排序）→ `#/structure-table`；`#/basket`／`#/multi-year` 路由同批移除。
     if (target === 'structure-table') await renderStructureTable();
     else if (target === 'beta') await renderBeta();
-    else if (target === 'coverage') await renderCoverage();
+    // ⚠ 2026-09-26（Step 2.6）：`#/coverage`（研究缺口）→ `#/graph-walk`（走圖九型）。
+    else if (target === 'graph-walk') await renderGraphWalk();
     else if (target === 'watches') await renderWatches();
     else if (target === 'positions') await renderPositions();
     else if (target) await renderDetail(target);

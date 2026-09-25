@@ -837,6 +837,27 @@ def check_queue_liveness() -> AuditResult:
 # INV-4 — Queue segments（佇列段序的封閉字彙）
 # ---------------------------------------------------------------------------
 
+def _graph_holes() -> tuple[int | None, str | None]:
+    """走圖九型的命中筆數（`graph_holes` 段；Phase 2 Step 2.6）。
+
+    ⚠ **直接跑走圖的 authority**（`query.graph_walk.collect()`：圖＋讀圖 ledger＋leads），不讀 `graph_walk`
+    state artifact——那是 derived cache，稽核讀它等於讓結論取決於「有沒有人 materialize 過」
+    （原 `coverage_gaps` 注入給 `None` 的同一個理由；那時是乾脆不讀，所以三段在稽核裡永遠「未讀到」）。
+    圖沒開就回 `(None, 原因)`，不寫 0（INV-3）。
+    """
+    try:
+        from query.graph_walk import collect
+    except Exception as exc:  # noqa: BLE001
+        return None, f"graph_holes：走圖載入失敗 {type(exc).__name__}"
+    try:
+        result = collect()
+    except Exception as exc:  # noqa: BLE001 — 圖沒開不是「沒有洞」
+        return None, f"graph_holes：讀不到圖（{type(exc).__name__}）"
+    absent = [q["key"] for q in result["questions"] if q.get("absence")]
+    total = sum(int(q["hit_n"] or 0) for q in result["questions"] if not q.get("absence"))
+    return total, (f"graph_holes：{'、'.join(absent)} 這次沒讀到（不計入）" if absent else None)
+
+
 def _forward_view_backlog() -> tuple[int | None, str | None]:
     """tracked 標的中「單檔判讀 blocked 且仍有未 settled blocker」的檔數。
 
@@ -883,19 +904,17 @@ def check_queue_segments() -> AuditResult:
         # ⚠ 2026-09-22（Phase 0 Step 0a.1）：原本這裡還會開 Decision Store 算「只需 reassess」
         # 的 pq2 編號餵段 2。reassess 隨 decision_lab 研究側退役，段 2 已從封閉字彙移除，
         # 所以這裡連 Decision Store 都不必開——稽核不再依賴一個凍結中的 authority。
+        holes, holes_note = _graph_holes()
         observation = qs.observe(
             leads=leads_map,
             watches=watches,
             todo_items=items,
             forward_view_backlog=forward,
-            coverage_gaps=None,  # authority 在 Neo4j；由 query.coverage_gaps 另報，這裡不冒充
-            # 同理（2026-09-18 V3）：重複節點候選的 authority 也在 Neo4j。它的數字確實已經
-            # 在 coverage state artifact 裡，但那是 derived cache 不是 authority——audit 讀它
-            # 等於讓稽核的結論取決於「有沒有人 materialize 過」。
+            graph_holes=holes,
         )
         examined = len(leads_map) + len(watches) + len(items)
         findings = list(observation["unmapped"])
-        notes = [n for n in (forward_note,) if n]
+        notes = [n for n in (forward_note, holes_note) if n]
         counts = "；".join(
             f"{seg['key']}={'未讀到' if seg['count'] is None else seg['count']}"
             for seg in observation["segments"]

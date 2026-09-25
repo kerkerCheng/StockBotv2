@@ -307,6 +307,60 @@ def ew_label(text: Any) -> str:
     return condition_label(text)
 
 
+def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
+                        watches: Sequence[Mapping[str, Any]] = (),
+                        directory: Path | None = None) -> tuple[list[dict[str, Any]], list[str]]:
+    """每一份現行讀圖（節點, 單位）跟現在的圖還一不一致——**唯一算法**，讀圖 artifact 與走圖第 4 型共用。
+
+    ⚠ 2026-09-26（Phase 2 Step 2.6）由 `webapp/materialize.py::materialize_structure_readings` 原樣搬出：
+    走圖要問「哪份讀圖該重讀」，若在走圖裡再寫一份比對，兩份會立刻開始偏離（L16）。
+    `edges` 由呼叫端一次載入（節點數會長，查詢次數不該跟著長）。回 `(rows, parse_errors)`。
+
+    `needs_reread` ＝ 圖那一側（stale／expired）**或** watch 那一側（客戶出新文件、反證被判觸及）；
+    `needs_reread_by_graph` 只看圖那一側——走圖第 4 型用它，watch 那一側由佇列段 `fired_reading_reread` 承載，
+    不在兩處各算一次。
+    """
+    from query.structure import build_structure
+
+    from ..structure_reading import needs_reread, reading_status, select_readings
+
+    rows: list[dict[str, Any]] = []
+    parse_errors: list[str] = []
+    for node in known_nodes(directory=directory):
+        records, errors = read_reading_records(node, directory=directory)
+        parse_errors.extend(errors)
+        # 一列＝（節點, 單位）（v3，A1）：層讀圖與插槽讀圖各自現行、各自算 staleness。
+        current = select_readings(records, as_of=as_of, today=today)
+        if not current:
+            # 有檔案但沒有現行紀錄（全部被撤回）——**不是「沒有這個節點」**，照實列出（INV-3）。
+            rows.append({"node": node, "unit": None, "status": None, "reading_id": None,
+                         "reason": "ledger 有紀錄但目前沒有現行的那一筆（已全部撤回）"})
+            continue
+        view = build_structure(node, edges)
+        watch_reasons = reread_reasons(node, watches)
+        for unit in sorted({r.unit for r in records} - set(current)):
+            rows.append({"node": node, "unit": unit, "status": None, "reading_id": None,
+                         "reason": f"這個節點的 {unit} 讀圖有紀錄但目前沒有現行的那一筆（已全部撤回）"})
+        for unit, reading in current.items():
+            status = reading_status(reading, view.as_dict(), today=today)
+            by_graph = needs_reread(status)
+            rows.append({
+                "node": node,
+                "unit": unit,
+                "reading_id": reading.reading_id,
+                "kind": reading.kind,
+                "reading": reading.reading,
+                "tickers": list(reading.tickers),
+                "read_on": reading.created_on.isoformat(),
+                "expires": reading.expires.isoformat(),
+                **status,
+                "needs_reread": by_graph or bool(watch_reasons),
+                "needs_reread_by_graph": by_graph,
+                "reread_reasons": watch_reasons,
+            })
+    return rows, parse_errors
+
+
 def known_nodes(*, directory: Path | None = None) -> list[str]:
     """ledger 裡有紀錄的節點（由檔案內容回報真正的 node，不從檔名反推 slug）。"""
     root = directory or STRUCTURE_READING_DIR

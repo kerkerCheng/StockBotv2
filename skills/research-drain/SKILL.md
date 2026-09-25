@@ -2,7 +2,7 @@
 name: research-drain
 description: >
   把「目前能做的研究」一次做到底：先清已核准的 pq1 工單，再依 drain 排序清 triaged_go
-  線索，最後補圖裡的覆蓋缺口與已具名候選的初判。中途不報告、不等使用者；撞到 authority
+  線索，最後補走圖報出的洞與已具名候選的初判。中途不報告、不等使用者；撞到 authority
   gate 就把該項掛成 pq2 編號**接著做下一件不需核准的研究**，直到閉包（每項工作都到達
   packet／誠實 park／排入 pq1 三種終局之一）才回來，用一份批次核准摘要收尾。當使用者說
   「清工單」「把 pq1 清掉」「你能做的全部做掉」「一路挖到沒東西做」「最後我一次核准」時使用。
@@ -107,7 +107,7 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 2. **`triaged_go` 線索** — 順序**只認 `engine_b.cli drain` 的輸出**。
    ⚠ 不得另建排序：`engine_b/priority.py` 是 pq1 排序的唯一權威，
    「我覺得這條比較有趣」正是它要防的東西。
-3. **每檔閉環（段 5，2026-09-09 起）** — 前兩段清空後、覆蓋缺口之前。工單不是自己列的：
+3. **每檔閉環（段 5，2026-09-09 起）** — 前兩段清空後、走圖之前。工單不是自己列的：
    `drain` 首行的「段5 每檔閉環」一行與 `python -m webapp status` 的「每檔閉環」段，都由
    `alpha/closure.py` 從 analyst view artifact 的 `readiness.blocker_details` 照抄（每格帶
    `absence_kind`／`settled`）。**下一檔選誰不是自由心證**——`closure.NEXT_PICK_RULE` 七條依序比：
@@ -130,45 +130,38 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
      它是 append-only 紀錄，不是呈現層的標籤。
    - 判讀型 Engine C 觀測（backlog、客戶集中）→ 打包觀測提案（pq2）；同類缺口跨多檔就打包成一批
    每消一格 `python -m webapp materialize <TICKER>` 一次，讓下一格的判斷讀到新狀態。
-3.5. **結構讀圖過期或與圖不一致**（2026-09-17 Q5，段 key `stale_structure_readings`）——排在覆蓋缺口之前，因為它是**已投入研究的維護**，而且其中一類直接影響現有賭注。
-   清單不是自己列的：`python -m webapp materialize --structure-readings` 之後讀
-   `library/private/app/state/structure_readings.json` 的 `needs_reread.nodes`，
-   或逐節點 `python -m alpha structure-reading <node> --check`。
-   做法：重跑 `python -m query.structure <node>` → 重讀五個角度 → 
-   `python -m alpha structure-reading <node> --add spec.json`（帶 `supersedes_id` 指向舊那筆）。
-   ⚠ **只做 `stale`／`expired`**：`stale_low`（只有 evidence 等級變）刻意不進佇列——
-   把它做進來會讓這一段恆亮，而恆亮＝零鑑別力（L14-4）。
-   ⚠ **變化若被標成 `disproof_trigger`**（供給側多一家／反向路徑變動），那是**既有 disproof 的觸發**：
-   依 L7 要在 48 小時內處置。但 **thesis 要不要改是四個人工 gate 之一**——把它鑄成 `thesis_mutation` 型 pq2 編號，**不要自己改 thesis**。
-
-4. **圖的覆蓋缺口** — 只有前三段清空後才做。這一段沒有既有排序，是唯一需要判斷的地方，
-   判準見下。**這一段有兩題，先問後者**：①誰供應這個節點（`coverage_gaps`）；
-   ②這個節點是不是旁邊那個（`duplicate_nodes`，段 key `duplicate_node_candidates`）。
-
-### 第 4 段（覆蓋缺口）的排序判準（唯一需要判斷之處）
-
-依序問，先滿足者先做：
-
-0. **它是不是重複節點？**（2026-09-18 V3，先問這一題）
+4. **走圖：圖上該去研究的洞**（段 key `graph_holes`；2026-09-26 Phase 2 Step 2.6 起取代原「3.5 結構讀圖過期」與
+   「4 圖的覆蓋缺口」兩段）——只有前面各段清空後才做。清單不是自己列的：
    ```powershell
-   & '.venv\Scripts\python.exe' -m query.duplicate_nodes
+   & '.venv\Scripts\python.exe' -m query.graph_walk            # 九型各自「命中／母體」＋每筆的問句（--json 給機器）
    ```
-   **順序不可換**：重複節點正是 🔴 的誤報來源——一個已經有供應商的東西被攤成兩個節點之後，
-   其中孤立的那一個看起來像空白，於是研究被派去挖一個已經挖過的東西
-   （`config/entity_aliases.json` 的 `_readme` 逐字記過這個後果）。
-   **只做 `unmentioned` 那一桶**；`mentioned`（registry 的 note 提過的）先讀 note 說了什麼——
-   ⚠ note 是自由文字，「刻意不併」與「留待研究判斷」長得一模一樣，**機械分不出來，要人讀**。
-   ⚠ **判定「是同一個」是研究判斷，合併走 pq2 `ra_admission`**（`semantic_reviewed` 必須帶
-   `approval_receipt`），本段只到 packet 為止。
-   ⚠ **判斷依據是兩端各自的逐字，不是 id 與 name**——那兩者都是抽取時 LLM 取的，
-   用它們判重複等於用 label 驗 label（L18）。逐字已隨候選印出來，不必再去翻抽取檔。
-1. **答案會改變候選集合嗎？** 會 → 最先。`coverage_gaps` 的 🔴 研究缺口（零供應商節點）
-   多半屬此。
-2. **是不是同一次沒做完的拆解殘骸？** 是 → 接著做。層的名字已經在那裡、只缺供應商，
-   成本最低（例：CPO stack 的 `scale_up_cpo`／`tfln_platform`／`wdm_laser_16ch` 那一群）。
-3. **缺的是「值」還是「證據」？** 缺值優先。**沒填 `substitutability` 的邊在排序裡是隱形的**，
-   而證據弱的邊至少看得見——隱形比薄弱危險。
-4. **🟡 建模待補**（已研究過、只差接邊）排最後：它的下一步是補邊走入圖，不是重新研究。
+   ⚠ **走圖不排序、不打分**：九型的順序是閱讀順序，型別內按節點 id（lead 按首見時間）——**不是先後名次**。
+   沒有「最該研究的洞」；挑哪一筆由 lead 時間與使用者點名決定（`AGENTS.md`「不得輸出跨檔全序」）。
+   每一筆命中都附下一個研究動作；各型的做法：
+
+   - **①薄層沒人讀**（`thin_layer_unread`）：`python -m query.structure <node> --quotes` → 寫讀圖
+     （`python -m alpha structure-reading <node> --add spec.json`；兩半各至少一段引用，A2）。這是
+     「集中需求灌進薄層」的研究入口；「只有 1–3 家」是問句母體，**不是瓶頸性證據**（量到的是我們讀了誰的文件）。
+   - **②獨家且自報**／**③供給側未填**：source-trace 找客戶端或第三方一手（層中心選源）；補 `substitutability`
+     或第二家供應商的研究包入圖仍走 pq2 `ra_admission`。
+   - **④讀圖該重讀**（`reading_stale`；原段 3.5）：重跑 `python -m query.structure <node>`（插槽加 `--unit socket`）→
+     重讀五個角度 → `alpha structure-reading <node> --add`（帶 `supersedes_id`）。
+     ⚠ **只做 `stale`／`expired`**：`stale_low`（只有 evidence 等級變）刻意不進——恆亮＝零鑑別力（L14-4）。
+     ⚠ 「客戶出新文件叫醒的重讀」不在這一型，在段 `fired_reading_reread`（同一件事不算兩次）。
+     ⚠ **變化若被標成 `disproof_trigger`**（供給側多一家／反向路徑新增），那是**既有 disproof 的觸發**：
+     依 L7 要在 48 小時內處置。但 **thesis 要不要改是四個人工 gate 之一**——鑄成 `thesis_mutation` 型 pq2 編號，**不要自己改 thesis**。
+   - **⑤lead 點名不在圖**：onboard 評估（`skills/company-onboard`）。「另有 N 個名字 registry 解析不到」是
+     **ID 沒解析對**，不是圖中無此公司（INV-1）——先修 registry 解析，不是 onboard。
+   - **⑥供貨走不到錨**：補需求鏈（誰買它的產出），或確認它不屬本題材（寫進 lead／報告，不要默默略過）。
+   - **⑦沒人供應**／**⑧建模待補**／**⑨重複節點**（原覆蓋缺口與重複節點兩題）：**⑦之前先看⑨**——
+     重複節點正是⑦的誤報來源：一個已經有供應商的東西被攤成兩個節點之後，其中孤立的那一個看起來像空白
+     （`config/entity_aliases.json` 的 `_readme` 逐字記過這個後果）。逐字對照用
+     `python -m query.duplicate_nodes`；**只做 `unmentioned`**（registry 的 note 提過的先讀 note——
+     「刻意不併」與「留待研究判斷」長得一模一樣，機械分不出來，要人讀）。判定「是同一個」是研究判斷，
+     合併走 pq2 `ra_admission`；**判斷依據是兩端各自的逐字，不是 id 與 name**（L18）。
+     ⑦的孤立節點（連一條邊都沒有）下一步是**先確認它該掛在 stack 哪一層**，不是「誰供應它」；
+     `prod:` 前綴的 0 家節點是抽取副產品，只計數、不是題目。
+     ⑧的下一步是補邊（入圖走 pq2），不是重新研究。
 
 ---
 
@@ -244,15 +237,15 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 ## Step 5 — 停止條件（機器查得出來）
 
 **「做完」＝閉包，不是「佇列空」（2026-09-01 使用者定案）。** 事發：skill 上線首日，
-執行者在 `triaged_go=0`＋工單清空時就收工睡覺，而第三段（覆蓋缺口）還有 15 個 🔴、
+執行者在 `triaged_go=0`＋工單清空時就收工睡覺，而第三段（當時叫覆蓋缺口，今為走圖）還有 15 個 🔴、
 外加一批已具名未初判的 onboard 候選——**那些全是不需要使用者核准的研究**。
 使用者原話：「不是說需要我核准就停，你可以去做其他不需要我核准的研究。」
 「等核准的東西堆著」從來不是停止條件；authority gate 擋的是**入圖**，不是**研究**。
 
 閉包的定義：**工作集合裡每一項都到達三種終局之一**——
 ①packet 已備（取得 pq2 編號等核准）；②誠實 park（帶 trace_status＋trigger）；
-③已排入 pq1 佇列（留給 budget 化的排程輪）。工作集合＝前兩段佇列＋第三段的
-🔴／🟡 缺口＋**沒人提過的重複節點候選**＋**該重讀的結構讀圖（段 3.5）**＋一手文件已具名、
+③已排入 pq1 佇列（留給 budget 化的排程輪）。工作集合＝前兩段佇列＋**走圖九型的每一筆命中**
+（段 4；含原本的 🔴／🟡 缺口、沒人提過的重複節點候選、該重讀的結構讀圖）＋一手文件已具名、
 但尚未做四維初判的 onboard 候選。
 
 **這回答「會不會停不下來」：工作集合是有限清單，每項有終局，閉包必然可達**——
@@ -264,9 +257,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go       # 候選 0（常規授權類別都已排入 pq1）
 & '.venv\Scripts\python.exe' -m engine_b.cli counts          # triaged_go 為 0
 & '.venv\Scripts\python.exe' -m engine_b.todo list           # 無 queued／researching 的 dispatch_status
-& '.venv\Scripts\python.exe' -m query.coverage_gaps          # 每個 🔴 都已有對應終局（packet／park／pq1）
-& '.venv\Scripts\python.exe' -m query.duplicate_nodes       # `unmentioned` 每一對都已有終局（packet／note／pq1）
-& '.venv\Scripts\python.exe' -m alpha structure-reading <node> --check   # 段 3.5：該重讀的都已重讀或掛號
+& '.venv\Scripts\python.exe' -m query.graph_walk           # 段 4：九型每一筆命中都已有終局（packet／park／pq1／讀圖已寫）
 & '.venv\Scripts\python.exe' -m audit invariants --only QueueSegments   # 每段的數字；分不到段的狀態＝新工作沒有 consumer
 & '.venv\Scripts\python.exe' -m webapp closure-gate         # 段5：exit 0＝閉包／1＝還有工作／2＝讀不到
 ```
@@ -310,7 +301,7 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
 偵測器多找出 JBL（才過 12 天）。`--skip` 從此只留給**真的需要人判斷**的兩種：卡 pq2、卡世界。
 
 成績單（Step 6）固定加三個數：到終局檔數（ready＋settled）、有 ready 檔的產業數、
-下一檔與它還缺的格。覆蓋缺口可能因為新節點入圖而增加，**增加不代表退步**，代表發現了新的層。
+下一檔與它還缺的格。走圖的洞可能因為新節點入圖而增加，**增加不代表退步**，代表發現了新的層。
 
 ⚠ **2026-09-22（Phase 0）：原本 `closure-gate` 還印三個估值品質數**（隱含報酬正負分布｜
 倍數＝校準倍數的檔數｜有折溢價主張的檔與貢獻）。**整條估值鏈退役**（ROADMAP Phase 0／G3），
@@ -439,8 +430,8 @@ Samsung／SKH 側」）。這種問題 park 成 pq2 並繼續下一條，收尾�
   [`skills/daily-brief/SKILL.md`](../daily-brief/SKILL.md)「待核准項目的內容密度」。
   **本 skill 不自己定義格式**——欄位、折行方式、「不含」與「圖影響」兩欄的必填規則都在那裡。
   ⚠ 不得用表格，也不得把欄位用 `｜` 串成一行：使用者在手機上讀，那需要左右滑。
-- **decompose 提案直接鑄成 pq2 編號（2026-09-09 起）**：覆蓋缺口只會減不會增——
-  `coverage_gaps` 只能從既有節點往回看，新層唯一產生器是 `system-decompose`。本 skill 每輪收尾
+- **decompose 提案直接鑄成 pq2 編號（2026-09-09 起）**：走圖的洞（原覆蓋缺口）只會減不會增——
+  走圖（含原 `coverage_gaps`）只能從既有節點往回看，新層唯一產生器是 `system-decompose`。本 skill 每輪收尾
   若本輪的 lead／研究裡出現**需求錨不是 AI capex 也不是人形放量**的實體系統（判準機械：
   錨不在 `config/sector_anchors.json` 各組、且不在圖裡），就用
   `python -m engine_b.cli decompose-propose --system "<一台實體>" --anchor <tech:x> --why "<為什麼是新錨>" --lead <id>`

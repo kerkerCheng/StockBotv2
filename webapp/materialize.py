@@ -690,181 +690,87 @@ def materialize_beta(*, store: StateArtifactStore | None = None,
 
 
 # ---------------------------------------------------------------------------
-# state artifact：`coverage`（圖的供給側覆蓋掃描；照抄 `query.coverage_gaps.scan()`）
+# state artifact：`graph_walk`（走圖九型問句；照抄 `query.graph_walk.collect()`）
 # ---------------------------------------------------------------------------
+# ⚠ 2026-09-26（Phase 2 Step 2.6）：取代 `coverage` kind。coverage 的「沒人供應」「建模待補」與重複節點
+# 候選成為走圖第 7、8、9 型（沿用 `query/coverage_gaps.py`、`query/duplicate_nodes.py`，不搬不重算）；
+# 磁碟上既有的 `coverage.json` 留著當孤兒（同 Phase 0 的 basket.json），從今天起沒有人讀它。
 
-COVERAGE_MATERIALIZER_VERSION = "webapp-materialize-coverage/2"
+GRAPH_WALK_MATERIALIZER_VERSION = "webapp-materialize-graph-walk/1"
 
-COVERAGE_THIS_IS_NOT = (
-    "不是「世界上還缺哪些瓶頸」——它只能從**圖裡既有的節點**往回看；圖裡沒有的瓶頸不會出現在這裡。",
-    "🔴 的數字不是研究待辦數：`prod:` 前綴是抽取副產品（文件掉出來的產品型號），只計數、不是題目。",
-    "🟡 不是「還沒研究」——那個領域已經研究過，缺的是把邊接到 chokepoint 節點上（走入圖核准）。",
-    "不排序、不評分：這一頁沒有名次，補哪一個由使用者決定。",
-    "`層` 與 `邊` 不是分類也不是分數：它們是節點自己的屬性與邊數，只用來讓「下一步做什麼」看得出差別。",
-    "本 APP 不重算：每一格都是 materialize 當下 `python -m query.coverage_gaps` 的輸出照抄。",
-    "重複節點候選**不是缺口的一種**：它問的是「這個節點是不是旁邊那個」，"
-    "放在同一頁是因為重複節點正是 🔴 的誤報來源——一個已經有供應商的東西被攤成兩個節點之後，"
-    "其中孤立的那個看起來像空白。",
-)
-
-_COVERAGE_AUTHORITY = {
-    "function": "query.coverage_gaps.scan",
-    "command": "python -m query.coverage_gaps",
-    "note": "唯一覆蓋掃描權威。本 artifact 照抄它的分桶結果：不重新分類、不補節點、不排序。",
-    # 同一頁的第二題有自己的 authority——混成一個會讓「誰算的」答不出來。
-    "duplicates": {
-        "function": "query.duplicate_nodes.pair_candidates",
-        "command": "python -m query.duplicate_nodes",
-        "note": "只提名不合併；合併走 pq2 ra_admission ＋ config/entity_aliases.json。",
+_GRAPH_WALK_AUTHORITY = {
+    "function": "query.graph_walk.collect",
+    "command": "python -m query.graph_walk",
+    "note": "唯一走圖權威。本 artifact 照抄九型的命中／母體與每一筆問句：不重新分類、不排序、不合成跨型別數字。",
+    "inputs": {
+        "graph": "Neo4j（collapse_assertions ＋ classify_evidence；coverage_gaps.scan；duplicate_nodes.scan）",
+        "readings": "alpha.providers.structure_readings.reading_status_rows（與 structure_readings kind 同一份算法）",
+        "leads": "engine_b.leads.load（triaged_go／researching）",
     },
 }
 
 
-def _coverage_row(row: Mapping[str, Any], *, with_question: bool = False) -> dict[str, Any]:
-    out = {"node": row["node"], "name": row.get("name"),
-           "direct": list(row.get("direct") or ()), "indirect": list(row.get("indirect") or ()),
-           # 脈絡欄位（非分類）：節點自己的邊數與 stack 層別，照抄不重算。
-           "degree": row.get("degree"), "abstraction_level": row.get("abstraction_level")}
-    if with_question:
-        from query.coverage_gaps import ISOLATED_DEGREE, RESEARCH_QUESTION_TEMPLATE
-
-        # 孤立節點的下一步不是「誰供應它」——它連 stack 都還沒接上。
-        out["question"] = (
-            "先確認它該掛在 stack 哪一層"
-            if row.get("degree") == ISOLATED_DEGREE
-            else RESEARCH_QUESTION_TEMPLATE.format(node=row["node"])
-        )
-        out["isolated"] = row.get("degree") == ISOLATED_DEGREE
-    return out
+def _duplicate_side(view: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """重複節點候選的一端。**逐字照抄**，因為那是這一型存在的全部理由（L18）。"""
+    if not view:
+        return None
+    return {"node": view.get("node"), "name": view.get("name"),
+            "abstraction_level": view.get("abstraction_level"),
+            "degree": view.get("degree"), "quote_count": view.get("quote_count"),
+            "quotes": [dict(q) for q in view.get("quotes") or ()]}
 
 
-def _duplicate_pair_row(pair: Mapping[str, Any]) -> dict[str, Any]:
-    """一對候選 → artifact 列。**逐字照抄**，因為那是這一區塊存在的全部理由（L18）。"""
-
-    def _side(view: Mapping[str, Any]) -> dict[str, Any]:
-        return {"node": view["node"], "name": view.get("name"),
-                "abstraction_level": view.get("abstraction_level"),
-                "degree": view.get("degree"), "quote_count": view.get("quote_count"),
-                "quotes": [dict(q) for q in view.get("quotes") or ()]}
-
-    return {
-        "pair": list(pair["pair"]),
-        "rules": list(pair["rules"]),
-        "same_abstraction_level": pair["same_abstraction_level"],
-        "left": _side(pair["left"]), "right": _side(pair["right"]),
-        "registry_mentions": [dict(m) for m in pair.get("registry_mentions") or ()],
-    }
-
-
-def build_coverage_artifact(rows: Sequence[Mapping[str, Any]], *,
-                            duplicate_buckets: Mapping[str, Sequence[Mapping[str, Any]]],
-                            duplicate_node_total: int,
-                            generated_at: datetime | None = None) -> dict[str, Any]:
-    """`coverage_gaps.scan()` 的結果 → `coverage` state artifact。**純函式**：不連 DB、不重新分類。
-
-    ⚠ `duplicate_buckets` 與 `duplicate_node_total` 是**必要參數而非預設 `None`**：預設值會讓
-    「呼叫端忘了傳」與「這次真的沒算」同形（D15 的 `power_law` 踩過同一個坑）。
-    """
-    from query.coverage_gaps import (
-        BUCKET_LABELS, BUCKET_NEXT_STEP, BUCKET_NOTE, COVERAGE_SCOPE_NOTE, COVERAGE_TITLE,
-        ISOLATED_NOTE, LEVEL_NOTE, PRODUCT_NOISE_PREFIX, RESEARCH_GAP_SPLIT_NOTE,
-        bucketize, split_research_gaps,
-    )
-    # 固定文字跟著判準走，不在 APP 抄第二份（L16）。
-    from query.duplicate_nodes import (
-        RULE_LABELS as DUPLICATE_RULE_LABELS,
-        THIS_IS_NOT as DUPLICATE_THIS_IS_NOT,
-        TITLE as DUPLICATE_TITLE,
-    )
-
+def build_graph_walk_artifact(result: Mapping[str, Any], *,
+                              generated_at: datetime | None = None) -> dict[str, Any]:
+    """`query.graph_walk.collect()` 的結果 → `graph_walk` state artifact。**純函式**：不連 DB、不重新分類。"""
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    buckets = bucketize(rows)
-    real_gaps, product_noise = split_research_gaps(buckets["research_gap"])
+    questions = []
+    for q in result["questions"]:
+        row = dict(q)
+        if q["key"] == "duplicate_node":
+            row["hits"] = [dict(h, left=_duplicate_side(h.get("left")), right=_duplicate_side(h.get("right")))
+                           for h in q["hits"]]
+        else:
+            row["hits"] = [dict(h) for h in q["hits"]]
+        questions.append(row)
     payload: dict[str, Any] = {
-        "schema_version": STATE_SCHEMA_VERSIONS["coverage"],
-        "kind": "coverage",
-        "title": COVERAGE_TITLE,
+        "schema_version": STATE_SCHEMA_VERSIONS["graph_walk"],
+        "kind": "graph_walk",
+        "title": result["title"],
         "generated_at": stamp.isoformat(),
         "as_of": None,
         "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
-        "authority": dict(_COVERAGE_AUTHORITY),
-        "counts": {"nodes": len(rows), **{k: len(v) for k, v in buckets.items()},
-                   "research_gap_real": len(real_gaps), "research_gap_product_noise": len(product_noise),
-                   # 重複節點候選：`unmentioned` 才是待辦（registry 提過的那些已經有人寫過話了）。
-                   "duplicate_unmentioned": len(duplicate_buckets["unmentioned"]),
-                   "duplicate_mentioned": len(duplicate_buckets["mentioned"])},
-        "labels": dict(BUCKET_LABELS),
-        "next_steps": dict(BUCKET_NEXT_STEP),
-        "notes": {"buckets": BUCKET_NOTE, "research_gap_split": RESEARCH_GAP_SPLIT_NOTE,
-                  "scope": COVERAGE_SCOPE_NOTE,
-                  "question_template": "研究題目是固定模板不是新判斷：同一個節點永遠得到同一句。",
-                  "product_noise_rule": f"前綴 `{PRODUCT_NOISE_PREFIX}` ＝抽取副產品（機械比對，可重導）",
-                  "isolated": ISOLATED_NOTE, "abstraction_level": LEVEL_NOTE},
-        "research_gaps": [_coverage_row(r, with_question=True) for r in real_gaps],
-        "product_noise": [_coverage_row(r) for r in product_noise],
-        "modelling_gaps": [_coverage_row(r) for r in buckets["modelling_gap"]],
-        "covered": [_coverage_row(r) for r in buckets["covered"]],
-        "concept": [_coverage_row(r) for r in buckets["concept"]],
-        "duplicates": {
-            "title": DUPLICATE_TITLE,
-            "node_total": duplicate_node_total,
-            "rule_labels": dict(DUPLICATE_RULE_LABELS),
-            "this_is_not": list(DUPLICATE_THIS_IS_NOT),
-            "unmentioned": [_duplicate_pair_row(p) for p in duplicate_buckets["unmentioned"]],
-            "mentioned": [_duplicate_pair_row(p) for p in duplicate_buckets["mentioned"]],
-        },
-        "this_is_not": list(COVERAGE_THIS_IS_NOT),
+        "authority": dict(_GRAPH_WALK_AUTHORITY),
+        # 每型各自一格——**沒有加總**（加起來就是跨型別合成的數字，plan §0 第 7 條）。
+        "counts": {q["key"]: {"hit_n": q["hit_n"], "scope_n": q["scope_n"]} for q in questions},
+        "questions": questions,
+        # 圖上全部節點 id：decompose 選題的「這個錨是不是已經在圖裡」讀它（原本讀 coverage 快照）。
+        "graph_nodes": list(result["graph_nodes"]),
+        "rules": dict(result["rules"]),
+        "this_is_not": list(result["this_is_not"]),
         "materializer": {
-            "version": COVERAGE_MATERIALIZER_VERSION,
+            "version": GRAPH_WALK_MATERIALIZER_VERSION,
             "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
             "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
         },
     }
     payload = redact_private_paths(payload)
     payload["freshness_identity"] = state_freshness_identity(
-        kind="coverage", as_of=None,
-        # 認知狀態＝哪些節點還空白、哪些已覆蓋。節點名稱改字不算認知變了。
-        identity={"research_gap": sorted(r["node"] for r in real_gaps),
-                  "product_noise": sorted(r["node"] for r in product_noise),
-                  "modelling_gap": sorted(r["node"] for r in buckets["modelling_gap"]),
-                  "covered": sorted(r["node"] for r in buckets["covered"]),
-                  # 哪幾對還沒人看過＝認知狀態；逐字改字不算認知變了（與上面四桶同一條原則）。
-                  "duplicate_unmentioned": sorted(
-                      "|".join(p["pair"]) for p in duplicate_buckets["unmentioned"])})
+        kind="graph_walk", as_of=None,
+        # 認知狀態＝每一型命中了誰（與母體多大）。問句文字改字不算認知變了。
+        identity={q["key"]: {"hits": sorted(str(h.get("subject")) for h in q["hits"]),
+                             "scope_n": q["scope_n"]} for q in questions})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 
 
-def materialize_coverage(*, store: StateArtifactStore | None = None,
-                         generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
-    """跑一次 `coverage_gaps.scan()` 並寫下 artifact。**只有這裡會連 Neo4j。**"""
-    from dotenv import load_dotenv
-    from neo4j import GraphDatabase
+def materialize_graph_walk(*, store: StateArtifactStore | None = None, as_of: date | None = None,
+                           generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """跑一次 `query.graph_walk.collect()` 並寫下 artifact。**只有這裡（與 CLI）會為走圖連 Neo4j。**"""
+    from query.graph_walk import collect
 
-    from identity import entities
-    from query.coverage_gaps import scan
-    from query.duplicate_nodes import bucketize, pair_candidates
-    from query.duplicate_nodes import scan as scan_duplicates
-
-    load_dotenv()
-    password = os.environ.get("NEO4J_PASSWORD")
-    if not password:
-        raise RuntimeError("請設 NEO4J_PASSWORD（與 python -m query.coverage_gaps 相同的前置）")
-    driver = GraphDatabase.driver(
-        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
-    )
-    try:
-        with driver.session() as session:
-            rows = scan(session)
-            # 同一個 session 掃兩題：兩個 authority、兩份 Cypher，但只連一次圖。
-            duplicate_rows = scan_duplicates(session)
-    finally:
-        driver.close()
-    duplicate_buckets = bucketize(pair_candidates(duplicate_rows), entities.load())
-    payload = build_coverage_artifact(
-        rows, duplicate_buckets=duplicate_buckets,
-        duplicate_node_total=len(duplicate_rows), generated_at=generated_at)
+    result = collect(today=as_of or date.today(), as_of=as_of)
+    payload = build_graph_walk_artifact(result, generated_at=generated_at)
     target = store or StateArtifactStore()
     return target.write(payload), payload
 
@@ -1272,10 +1178,9 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     ⚠ 一次把圖的邊載進來（`_load_edges`），對每個節點各建一次 `StructureView`——
     不是每個節點各查一次圖。節點數會長，查詢次數不該跟著長。
     """
-    from alpha.providers.structure_readings import known_nodes, read_reading_records, reread_reasons
-    from alpha.structure_reading import needs_reread, reading_status, select_readings
+    from alpha.providers.structure_readings import known_nodes, reading_status_rows
     from engine_b.event_watch import load_watches
-    from query.structure import _load_edges, build_structure
+    from query.structure import _load_edges
 
     target = store or StateArtifactStore()
     # watch 那一側的重讀理由（Phase 1 Step 1.5）：需求側客戶出了新一手文件、讀圖的反證被判觸及——唯讀
@@ -1284,40 +1189,9 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     except Exception:  # noqa: BLE001 — registry 讀不到只少了這一側的理由，圖那一側照算
         watches = []
     today = as_of or date.today()
-    nodes = known_nodes()
-    rows: list[dict[str, Any]] = []
-    parse_errors: list[str] = []
-    edges = _load_edges() if nodes else []
-    for node in nodes:
-        records, errors = read_reading_records(node)
-        parse_errors.extend(errors)
-        # 一列＝（節點, 單位）（v3，A1）：層讀圖與插槽讀圖各自現行、各自算 staleness。
-        current = select_readings(records, as_of=as_of, today=today)
-        if not current:
-            # 有檔案但沒有現行紀錄（全部被撤回）——**不是「沒有這個節點」**，照實列出（INV-3）。
-            rows.append({"node": node, "unit": None, "status": None, "reading_id": None,
-                         "reason": "ledger 有紀錄但目前沒有現行的那一筆（已全部撤回）"})
-            continue
-        view = build_structure(node, edges)
-        watch_reasons = reread_reasons(node, watches)
-        for unit in sorted({r.unit for r in records} - set(current)):
-            rows.append({"node": node, "unit": unit, "status": None, "reading_id": None,
-                         "reason": f"這個節點的 {unit} 讀圖有紀錄但目前沒有現行的那一筆（已全部撤回）"})
-        for unit, reading in current.items():
-            status = reading_status(reading, view.as_dict(), today=today)
-            rows.append({
-                "node": node,
-                "unit": unit,
-                "reading_id": reading.reading_id,
-                "kind": reading.kind,
-                "reading": reading.reading,
-                "tickers": list(reading.tickers),
-                "read_on": reading.created_on.isoformat(),
-                "expires": reading.expires.isoformat(),
-                **status,
-                "needs_reread": needs_reread(status) or bool(watch_reasons),
-                "reread_reasons": watch_reasons,
-            })
+    edges = _load_edges() if known_nodes() else []
+    # 算法住 provider（Step 2.6 搬出）：走圖第 4 型用同一份，不各算一次（L16）。
+    rows, parse_errors = reading_status_rows(edges, today=today, as_of=as_of, watches=watches)
     payload = build_structure_readings_artifact(rows=rows, parse_errors=parse_errors,
                                                 generated_at=generated_at, as_of=as_of)
     return target.write(payload), payload
@@ -1392,12 +1266,12 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     return path
 
 
-__all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "COVERAGE_MATERIALIZER_VERSION",
-           "COVERAGE_THIS_IS_NOT", "MATERIALIZER_VERSION", "STRUCTURE_TABLE_MATERIALIZER_VERSION",
+__all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "GRAPH_WALK_MATERIALIZER_VERSION",
+           "MATERIALIZER_VERSION", "STRUCTURE_TABLE_MATERIALIZER_VERSION",
            "STRUCTURE_TABLE_THIS_IS_NOT", "WATCHES_MATERIALIZER_VERSION", "WATCHES_THIS_IS_NOT",
-           "WAKE_STATE_LABELS", "build_beta_artifact", "build_coverage_artifact", "build_overview",
+           "WAKE_STATE_LABELS", "build_beta_artifact", "build_graph_walk_artifact", "build_overview",
            "build_structure_table_artifact", "build_watches_artifact", "materialize", "materialize_beta",
-           "materialize_coverage", "materialize_many", "materialize_structure_table", "materialize_view",
+           "materialize_graph_walk", "materialize_many", "materialize_structure_table", "materialize_view",
            "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
            "build_positions_artifact", "materialize_positions",
            "redact_private_paths", "write_vocabularies",

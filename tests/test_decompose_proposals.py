@@ -24,11 +24,15 @@ def test_breadth_check_is_mechanical_and_names_the_reason() -> None:
     assert unknown_graph.adds_breadth and "圖快照讀不到" in unknown_graph.reason
 
 
-def test_shipped_sector_anchors_load_and_coverage_nodes_extract() -> None:
+def test_shipped_sector_anchors_load_and_walk_nodes_extract() -> None:
     anchors = dp.load_known_anchors()
     assert "mat:rare_earth_magnets" in anchors
-    nodes = dp.graph_nodes_from_coverage({"covered": [{"node": "a"}], "research_gaps": ["b"], "concept": [{"node": "c"}]})
-    assert nodes == frozenset({"a", "b", "c"})
+    # Step 2.6：節點清單改讀 graph_walk artifact 的 graph_nodes（含 co: 與 prod: 0 家節點，原 coverage 版漏掉）。
+    nodes = dp.graph_nodes_from_walk({"graph_nodes": ["tech:a", "prod:b", "co:c", ""]})
+    assert nodes == frozenset({"tech:a", "prod:b", "co:c"})
+    # 欄位缺席不得回空集合（空集合會讓「錨已在圖裡」永遠答否）——呼叫端把例外當成「快照讀不到」。
+    with pytest.raises(KeyError):
+        dp.graph_nodes_from_walk({"covered": [{"node": "a"}]})
 
 
 def test_propose_mints_a_manual_item_whose_go_only_authorizes_the_decompose_run() -> None:

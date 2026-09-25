@@ -54,7 +54,7 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 #: 「只 materialize state artifact、不順手重跑每一檔」的旗標清單。
 #: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
 _STATE_FLAGS: tuple[str, ...] = (
-    "structure_table", "beta", "coverage", "watches", "positions",
+    "structure_table", "beta", "graph_walk", "watches", "positions",
     "structure_readings", "account_scorecard",
 )
 
@@ -62,7 +62,7 @@ _STATE_FLAGS: tuple[str, ...] = (
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_account_scorecard, materialize_beta, materialize_coverage,
+        materialize_account_scorecard, materialize_beta, materialize_graph_walk,
         materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_structure_table, materialize_watches, write_vocabularies,
@@ -95,17 +95,17 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ beta → {path.name}（{path.stat().st_size:,} bytes；"
                   f"sleeve {len(payload['allocation']['sleeves'])} 格／商品 {len(payload['instruments'])} 檔）")
 
-    if args.coverage:
+    if getattr(args, "graph_walk", False):
         total += 1
         try:
-            path, payload = materialize_coverage(store=state_store)
+            path, payload = materialize_graph_walk(store=state_store, as_of=as_of)
         except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
             failed += 1
-            print(f"✗ coverage：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+            print(f"✗ graph_walk：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
         else:
-            counts = payload["counts"]
-            print(f"✓ coverage → {path.name}（{path.stat().st_size:,} bytes；"
-                  f"🔴 真缺口 {counts['research_gap_real']}／🟡 建模待補 {counts['modelling_gap']}）")
+            from query.graph_walk import summary_line
+
+            print(f"✓ graph_walk → {path.name}（{path.stat().st_size:,} bytes；{summary_line(payload)}）")
 
     if args.watches:
         total += 1
@@ -277,10 +277,10 @@ def cmd_status(args: argparse.Namespace) -> int:
             extra = f"｜{len(payload['rows'])} 條邊／母體外 {(payload.get('population') or {}).get('excluded', 0)} 條"
         elif kind == "beta":
             extra = f"｜sleeve {len(payload['allocation']['sleeves'])} 格／商品 {len(payload['instruments'])} 檔"
-        elif kind == "coverage":
-            extra = (f"｜🔴 真缺口 {payload['counts']['research_gap_real']}"
-                     f"／🟡 建模待補 {payload['counts']['modelling_gap']}"
-                     f"／重複節點候選 {payload['counts']['duplicate_unmentioned']}（沒人提過）")
+        elif kind == "graph_walk":
+            from query.graph_walk import summary_line
+
+            extra = f"｜{summary_line(payload)}"
         elif kind == "watches":
             extra = (f"｜在等 {payload['counters']['active']}"
                      f"／停滯 {payload['counters']['stalled']}")
@@ -550,8 +550,10 @@ def build_parser() -> argparse.ArgumentParser:
                      help="materialize registry 裡所有有 research_ticker 的公司（APP 的第二種宇宙；不改 pq1 的 tracked 導出）")
     mat.add_argument("--tracked", action="store_true",
                      help="materialize 所有追蹤中的標的（與 pq1 drain 同一個導出權威，不手寫清單）")
-    mat.add_argument("--coverage", action="store_true",
-                     help="另外（或只）materialize 覆蓋掃描：query.coverage_gaps.scan() 的輸出照抄")
+    # dest 與 state kind 同名（`graph_walk`），`_STATE_FLAGS` 才比對得起來。
+    # ⚠ 2026-09-26（Phase 2 Step 2.6）取代 `--coverage`：舊旗標刻意不留別名——留著就是一條沒人用、卻仍放行的入口。
+    mat.add_argument("--graph-walk", dest="graph_walk", action="store_true",
+                     help="另外（或只）materialize 走圖：query.graph_walk.collect() 九型問句的命中／母體照抄")
     mat.add_argument("--watches", action="store_true",
                      help="另外（或只）materialize 事件監看：Event Watch registry ＋ 追源 backlog 的原值照抄")
     mat.add_argument("--positions", action="store_true",

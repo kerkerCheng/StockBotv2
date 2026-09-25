@@ -22,6 +22,12 @@ GRAPH = {"co:globalfoundries": {"type": "Company", "name": "GlobalFoundries", "a
 @pytest.fixture()
 def extractions(tmp_path, monkeypatch):
     shutil.copy(ROOT / "extractions" / FIXTURE, tmp_path / FIXTURE)
+    # ⚠ 真實檔在 [654] 入圖（2026-09-25，4ab71d4）後已含這條 develops 邊，「新增」就變成無事可做、
+    # 測試因此 KeyError（2026-09-26 Step 2.6 全套測試時發現）。夾具還原成入圖前的形狀，讓測試不隨 live 資料變。
+    data = json.loads((tmp_path / FIXTURE).read_text(encoding="utf-8"))
+    data["edges"] = [e for e in data["edges"]
+                     if (e["src_id"], e["relation"], e["dst_id"]) != ("co:ayar_labs", "develops", "prod:supernova")]
+    (tmp_path / FIXTURE).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     monkeypatch.setattr(mig, "EXTRACTIONS", tmp_path)
     return tmp_path
 
@@ -78,7 +84,7 @@ def test_an_addition_to_a_file_that_does_not_exist_is_reported(extractions) -> N
 
 
 def test_an_invalid_result_is_refused_before_anything_is_written(extractions) -> None:
+    before = json.loads((extractions / FIXTURE).read_text(encoding="utf-8"))   # 夾具（不是真實檔，見 fixture）
     with pytest.raises(RuntimeError, match="驗證不過"):
         mig.plan({}, [_row(relation="not_a_relation")], node_props=_props)
-    assert json.loads((extractions / FIXTURE).read_text(encoding="utf-8")) == \
-        json.loads((ROOT / "extractions" / FIXTURE).read_text(encoding="utf-8"))
+    assert json.loads((extractions / FIXTURE).read_text(encoding="utf-8")) == before

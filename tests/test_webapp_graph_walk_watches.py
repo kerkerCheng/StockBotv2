@@ -1,7 +1,8 @@
-"""`coverage` 與 `watches` state artifact：照抄各自 authority 的輸出，不重新分類、不排序。
+"""`graph_walk` 與 `watches` state artifact：照抄各自 authority 的輸出，不重新分類、不排序。
 
-fixture 全部離線（不連 Neo4j、不讀真實 registry）：這一層的責任是「一份掃描結果 → 一份 artifact」，
+fixture 全部離線（不連 Neo4j、不讀真實 registry）：這一層的責任是「一份走圖結果 → 一份 artifact」，
 綁在真實資料上只會讓測試在 DB 沒開時變成綠色的空跑（L13-2）。
+⚠ 2026-09-26（Phase 2 Step 2.6）：本檔原為 `test_webapp_coverage_watches.py`；`coverage` kind 由 `graph_walk` 取代。
 """
 from __future__ import annotations
 
@@ -11,45 +12,25 @@ import pytest
 from starlette.testclient import TestClient
 
 from engine_b.event_watch import is_stalled, wake_target, watch_detail
-from query.coverage_gaps import (
-    BUCKET_NOTE, COVERAGE_TITLE, RESEARCH_QUESTION_TEMPLATE, bucketize, render_markdown,
-    split_research_gaps,
-)
+from query.coverage_gaps import bucketize, split_research_gaps
 from webapp.api import create_app
 from webapp.contracts import STATE_KINDS, ArtifactUnavailable, validate_state_artifact
 from webapp.materialize import (
-    build_coverage_artifact, build_watches_artifact, materialize_view,
+    build_graph_walk_artifact, build_watches_artifact, materialize_view,
 )
 from webapp.store import ArtifactStore, StateArtifactStore
 
+from test_graph_walk import fake_coverage, run_walk
 from test_webapp_materialize import fake_view
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 # ---------------------------------------------------------------------------
-# coverage
+# graph_walk
 # ---------------------------------------------------------------------------
 
-def _node(node, name, *, direct=(), indirect=(), status=None):
-    from query.coverage_gaps import classify
-
-    return {"node": node, "name": name, "direct": list(direct), "indirect": list(indirect),
-            "status": status or classify(list(direct), list(indirect), node)}
-
-
-def fake_scan():
-    return [
-        _node("tech:scale_up_cpo", "Scale-up CPO"),                                  # 真缺口
-        _node("mat:exotic_substrate", "Exotic substrate"),                           # 真缺口
-        _node("prod:tomahawk6", "Tomahawk 6"),                                       # 產品名詞（只計數）
-        _node("tech:npo", "NPO", indirect=["co:lumentum"]),                          # 建模待補
-        _node("tech:uhp_laser", "UHP laser", direct=["co:lumentum"]),                # 已覆蓋
-        _node("policy:export_control", "Export control", status="concept"),          # 概念節點
-    ]
-
-
-def fake_duplicates():
+def fake_duplicate_buckets():
     """重複節點候選的假資料——用真實抓到的那一對（逐字是同一句話）當樣本。"""
     from query.duplicate_nodes import bucketize as dup_bucketize, pair_candidates
 
@@ -64,84 +45,67 @@ def fake_duplicates():
     return dup_bucketize(pair_candidates(rows), {}), len(rows)
 
 
-def fake_coverage_payload(**kw):
-    buckets, total = fake_duplicates()
-    kw.setdefault("duplicate_buckets", buckets)
-    kw.setdefault("duplicate_node_total", total)
-    return build_coverage_artifact(fake_scan(), **kw)
+def fake_walk_result(**overrides):
+    buckets, total = fake_duplicate_buckets()
+    overrides.setdefault("duplicate_buckets", buckets)
+    overrides.setdefault("duplicate_node_total", total)
+    return run_walk(**overrides)
 
 
-def test_coverage_counts_and_buckets_are_the_scanner_output() -> None:
-    rows = fake_scan()
-    payload = fake_coverage_payload()
-    buckets = bucketize(rows)
-    assert payload["counts"] == {
-        "nodes": 6, "research_gap": 3, "modelling_gap": 1, "covered": 1, "concept": 1,
-        "research_gap_real": 2, "research_gap_product_noise": 1,
-        # 同一頁的第二題（V3）：重複節點候選，`unmentioned` 才是待辦。
-        "duplicate_unmentioned": 1, "duplicate_mentioned": 0,
-    }
-    assert [r["node"] for r in payload["modelling_gaps"]] == [r["node"] for r in buckets["modelling_gap"]]
-    assert payload["title"] == COVERAGE_TITLE
-    assert payload["notes"]["buckets"] == BUCKET_NOTE
+def fake_graph_walk_payload(**kw):
+    return build_graph_walk_artifact(fake_walk_result(), **kw)
+
+
+def test_graph_walk_artifact_copies_every_type_and_adds_no_total() -> None:
+    result = fake_walk_result()
+    payload = fake_graph_walk_payload()
+    assert [q["key"] for q in payload["questions"]] == [q["key"] for q in result["questions"]]
+    assert payload["counts"] == {q["key"]: {"hit_n": q["hit_n"], "scope_n": q["scope_n"]}
+                                 for q in result["questions"]}
+    # 每型各自一格——artifact 上沒有任何加總欄位（plan §0 第 7 條）。
+    assert not {"total", "hits_total", "nodes"} & set(payload) and not {"total"} & set(payload["counts"])
+    assert payload["graph_nodes"] == result["graph_nodes"]
+    assert payload["this_is_not"] == result["this_is_not"]
+
+
+def test_duplicate_hits_keep_their_verbatim_on_both_sides() -> None:
+    """L18：重複節點候選的逐字是這一型存在的全部理由——artifact 不得把它壓成 id。"""
+    hit = next(q for q in fake_graph_walk_payload()["questions"] if q["key"] == "duplicate_node")["hits"][0]
+    assert hit["pair"] == ["prod:reliant", "prod:reliant_product_line"]
+    assert hit["left"]["quotes"][0]["quote"].startswith("our Reliant")
+    assert hit["right"]["quote_count"] is None or hit["right"]["quotes"]
 
 
 def test_product_noise_is_counted_but_never_a_research_question() -> None:
     """🔴 桶混了兩種東西：`prod:` 是抽取副產品，不得列為研究題目（alpha-status 的判準）。"""
-    payload = fake_coverage_payload()
-    assert [r["node"] for r in payload["research_gaps"]] == ["tech:scale_up_cpo", "mat:exotic_substrate"]
-    assert [r["node"] for r in payload["product_noise"]] == ["prod:tomahawk6"]
-    assert all("question" in r for r in payload["research_gaps"])
-    assert all("question" not in r for r in payload["product_noise"])
-    assert payload["research_gaps"][0]["question"] == RESEARCH_QUESTION_TEMPLATE.format(node="tech:scale_up_cpo")
+    q = next(q for q in fake_graph_walk_payload()["questions"] if q["key"] == "no_supplier")
+    assert [h["subject"] for h in q["hits"]] == ["tech:gap", "tech:isolated"]
+    assert q["extra"]["product_noise"] == ["prod:noise"]
 
 
 def test_split_is_a_prefix_match_not_a_judgement() -> None:
-    real, noise = split_research_gaps(bucketize(fake_scan())["research_gap"])
-    assert {r["node"] for r in real} == {"tech:scale_up_cpo", "mat:exotic_substrate"}
-    assert {r["node"] for r in noise} == {"prod:tomahawk6"}
+    real, noise = split_research_gaps(bucketize(fake_coverage())["research_gap"])
+    assert {r["node"] for r in real} == {"tech:gap", "tech:isolated"}
+    assert {r["node"] for r in noise} == {"prod:noise"}
 
 
-def test_fixed_text_has_one_home_and_the_markdown_prints_it() -> None:
-    """限制文字與桶說明只有一份（L16）：markdown 與 artifact 同源。"""
-    rows = fake_scan()
-    payload = fake_coverage_payload()
-    md = "\n".join(render_markdown(rows))
-    assert payload["title"] in md
-    assert payload["notes"]["buckets"] in md
+def test_graph_walk_scope_limit_travels_with_the_data() -> None:
+    payload = fake_graph_walk_payload()
+    text = " ".join(payload["this_is_not"])
+    assert "圖裡既有的節點" in text and "system-decompose" in text
+    assert "不是排序" in text
 
 
-def test_coverage_scope_limit_travels_with_the_data() -> None:
-    payload = fake_coverage_payload()
-    # 兩個地方都要講：頁尾的「不是什麼」給看完的人，scope note 給只看首屏的人。
-    assert "圖裡沒有的瓶頸不會出現在這裡" in " ".join(payload["this_is_not"])
-    assert "從沒聽過的瓶頸" in payload["notes"]["scope"]
-    assert "system-decompose" in payload["notes"]["scope"]
-
-
-def test_coverage_identity_tracks_which_nodes_are_blank_not_their_names() -> None:
-    a = fake_coverage_payload()
-    rows = fake_scan()
-    rows[0] = dict(rows[0], name="Scale-up CPO（改名）")
-    buckets, total = fake_duplicates()
-    kw = {"duplicate_buckets": buckets, "duplicate_node_total": total}
-    b = build_coverage_artifact(rows, **kw)
+def test_graph_walk_identity_tracks_who_is_hit_not_the_wording() -> None:
+    a = fake_graph_walk_payload()
+    result = fake_walk_result()
+    reworded = dict(result, questions=[dict(q, hits=[dict(h, text=h["text"] + "（改字）") for h in q["hits"]])
+                                      for q in result["questions"]])
+    b = build_graph_walk_artifact(reworded)
     assert b["freshness_identity"] == a["freshness_identity"]
     assert b["content_digest"] != a["content_digest"]
-    rows[0] = dict(rows[0], direct=["co:someone"], status="covered")
-    c = build_coverage_artifact(rows, **kw)
+    c = build_graph_walk_artifact(fake_walk_result(leads={}))
     assert c["freshness_identity"] != a["freshness_identity"]
-    # 重複節點候選也是認知狀態：多一對沒人看過的，identity 必須跟著變。
-    from query.duplicate_nodes import bucketize as dup_bucketize, pair_candidates
-
-    more = dup_bucketize(pair_candidates([
-        {"node": "tech:eml", "name": "EML", "abstraction_level": "device_chip",
-         "degree": 2, "quotes": []},
-        {"node": "tech:inp_eml", "name": "InP EML", "abstraction_level": "device_chip",
-         "degree": 1, "quotes": []},
-    ]), {})
-    d = build_coverage_artifact(fake_scan(), duplicate_buckets=more, duplicate_node_total=2)
-    assert d["freshness_identity"] != a["freshness_identity"]
 
 
 # ---------------------------------------------------------------------------
@@ -245,9 +209,10 @@ def test_both_kinds_are_registered_and_validate() -> None:
     # ⚠ 這一串刻意硬編：新增 state kind 就該讓這個測試紅一次，逼人確認
     # 「它的 CLI flag 加了嗎、materializer 有嗎、心跳／APP 讀得到嗎」。
     # 2026-09-22 Step 0a.2：basket／multi_year 退役，9 → 7。2026-09-23 Step 0b.3：ranking → structure_table。
-    assert STATE_KINDS == ("structure_table", "beta", "coverage", "watches", "positions",
+    # 2026-09-26 Step 2.6：coverage → graph_walk（kind 數不變）。
+    assert STATE_KINDS == ("structure_table", "beta", "graph_walk", "watches", "positions",
                            "structure_readings", "account_scorecard")
-    for kind, payload in (("coverage", fake_coverage_payload()), ("watches", fake_watches_payload())):
+    for kind, payload in (("graph_walk", fake_graph_walk_payload()), ("watches", fake_watches_payload())):
         assert validate_state_artifact(kind, payload) is payload
         with pytest.raises(ArtifactUnavailable, match="content_digest"):
             validate_state_artifact(kind, dict(payload, title="改過了"))
@@ -257,31 +222,35 @@ def test_both_kinds_are_registered_and_validate() -> None:
 def client(tmp_path):
     ArtifactStore(tmp_path).write(materialize_view(fake_view("COHR")))
     store = StateArtifactStore(tmp_path / "state")
-    store.write(fake_coverage_payload())
+    store.write(fake_graph_walk_payload())
     store.write(fake_watches_payload())
     return TestClient(create_app(tmp_path))
 
 
 def test_endpoints_serve_the_artifacts_verbatim(client) -> None:
-    cov = client.get("/api/v1/coverage").json()
-    assert cov["kind"] == "coverage" and cov["counts"] == fake_coverage_payload()["counts"]
-    assert cov["research_gaps"] == fake_coverage_payload()["research_gaps"]
+    walk = client.get("/api/v1/graph-walk").json()
+    assert walk["kind"] == "graph_walk" and walk["counts"] == fake_graph_walk_payload()["counts"]
+    assert walk["questions"] == fake_graph_walk_payload()["questions"]
+    # 舊路由已退役：不留別名（留著就是一條沒人用、卻仍放行的入口）。
+    assert client.get("/api/v1/coverage").status_code == 404
     wat = client.get("/api/v1/watches").json()
     assert wat["kind"] == "watches" and wat["counters"] == fake_watches_payload()["counters"]
     assert wat["stalled"] == fake_watches_payload()["stalled"]
 
 
-@pytest.mark.parametrize("kind", ["coverage", "watches"])
+@pytest.mark.parametrize("kind", ["graph_walk", "watches"])
 def test_absent_artifact_is_503_with_its_own_remedy(tmp_path, kind: str) -> None:
     ArtifactStore(tmp_path).write(materialize_view(fake_view("COHR")))
-    response = TestClient(create_app(tmp_path)).get(f"/api/v1/{kind}")
+    route = kind.replace("_", "-")
+    response = TestClient(create_app(tmp_path)).get(f"/api/v1/{route}")
     assert response.status_code == 503
     error = response.json()["error"]
-    assert error["state_kind"] == kind and f"materialize --{kind}" in error["remedy"]
+    # 提示要印人能貼的旗標（連字號），不是 kind 名（底線）。
+    assert error["state_kind"] == kind and f"materialize --{route}" in error["remedy"]
     assert not (tmp_path / "state" / f"{kind}.json").exists()
 
 
-@pytest.mark.parametrize("kind", ["coverage", "watches"])
+@pytest.mark.parametrize("kind", ["graph-walk", "watches"])
 @pytest.mark.parametrize("method", ["POST", "PUT", "PATCH", "DELETE"])
 def test_mutation_verbs_are_rejected(client, kind: str, method: str) -> None:
     assert client.request(method, f"/api/v1/{kind}").status_code == 405
@@ -289,13 +258,16 @@ def test_mutation_verbs_are_rejected(client, kind: str, method: str) -> None:
 
 def test_meta_declares_both(client) -> None:
     endpoints = client.get("/api/v1/meta").json()["endpoints"]
-    assert "GET /api/v1/coverage" in endpoints and "GET /api/v1/watches" in endpoints
+    assert "GET /api/v1/graph-walk" in endpoints and "GET /api/v1/watches" in endpoints
+    assert "GET /api/v1/coverage" not in endpoints
 
 
 def test_frontend_has_both_views_and_no_ranking_of_gaps() -> None:
     source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
-    assert "function renderCoverage" in source and "function renderWatches" in source
+    assert "function renderGraphWalk" in source and "function renderWatches" in source
+    assert "function renderCoverage" not in source
     for token in (".sort(", "優先度", "最重要", "建議先做"):
         assert token not in source, token
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
-    assert 'href="#/coverage"' in html and 'href="#/watches"' in html
+    assert 'href="#/graph-walk"' in html and 'href="#/watches"' in html
+    assert 'href="#/coverage"' not in html

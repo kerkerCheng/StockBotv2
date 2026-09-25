@@ -41,7 +41,7 @@ description: >
 | 要回答的 | 唯一權威 | 指令 |
 |---|---|---|
 | 結構長什麼樣（哪條邊薄、走不走得到錨） | `query/bottleneck.py` 的逐邊 rows | `python -m query.bottleneck` |
-| 哪裡是空白 | `query/coverage_gaps.py` | `python -m query.coverage_gaps` |
+| 哪裡是空白、該去研究的洞 | `query/graph_walk.py`（第 7／8 型沿用 `query/coverage_gaps.py` 的分桶） | `python -m query.graph_walk` |
 | 覆蓋厚薄（市值／分析師家數） | Engine C `financial_snapshots`／`consensus_coverage_observations` | 見 §pane 1 |
 | 候選狀態（可開／缺 X／已定價等回落／不要／已持有） | narrative ledger 的 `candidate_state` | **Phase 3 才落地；在那之前印「未落地」** |
 | 部位與計數器 | APP 的 `positions` state artifact | `python -m webapp status`／`python -m crons.heartbeat` 段 4 |
@@ -210,7 +210,9 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 
 ## Pane 3 — 哪裡還是空白（本 skill 唯一的產生器）
 
-跑 `python -m query.coverage_gaps`，它已經把節點分成 🔴 研究缺口／🟡 建模待補／✅ 已覆蓋。
+跑 `python -m query.graph_walk`（2026-09-26 起；APP `#/graph-walk`）。它報九型問句各自的「命中／母體」，
+**不排序、不加總**；本 pane 讀其中「沒人供應」（第 7 型＝原 🔴）與「建模待補」（第 8 型＝原 🟡），
+分桶判準仍是 `query/coverage_gaps.py` 那一份。其餘七型（薄層沒人讀、獨家且自報…）照走圖原樣列出，不在這裡重算。
 
 | 桶 | 意義 | 下一步 |
 |---|---|---|
@@ -235,7 +237,7 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 本 pane 的輸出**必須是可直接進 pq1 的研究題目**（「誰供應 `tech:X`」），不是一張看完點頭
 的清單。每題附上 §「答案回來會改變什麼」的分類（多半是 `候選集合`）。
 
-⚠ 但 `coverage_gaps` 只能從**既有節點**往回看。**它無法提出一個我們從沒聽過的瓶頸**——
+⚠ 但走圖（含 `coverage_gaps`）只能從**既有節點**往回看。**它無法提出一個我們從沒聽過的瓶頸**——
 那需要由上而下的系統拆解（見 `skills/system-decompose`，尚未建立時請明說這一格是空的）。
 
 ---
@@ -302,7 +304,7 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 
 | 情況 | 用哪個 |
 |---|---|
-| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP `#/structure-table`／`#/coverage`） |
+| 今天有什麼要核准 | `skills/daily-brief`（只印較昨變動；持久內容在 APP `#/structure-table`／`#/graph-walk`） |
 | 單一標的深挖 | `skills/investment-research` |
 | 由上而下拆解一個系統、產生新節點 | `skills/system-decompose` |
 | 新公司入圖 | `skills/company-onboard` |

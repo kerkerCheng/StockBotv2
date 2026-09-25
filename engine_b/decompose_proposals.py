@@ -9,8 +9,8 @@
 - **提名**（系統名、需求錨、為什麼是新錨、哪條 lead 點名）由 research-drain／題材掃描／使用者貼入的 lead
   產生——那是語意工作，LLM 可以解析與提議；本模組只驗兩件機械的事，然後鑄一個 `manual` 型 pq2 編號。
 - **廣度判準是機械的**：需求錨不在 `config/sector_anchors.json` 既有各組、**且**頂層節點不在圖裡
-  （用 coverage state artifact 的節點清單當圖的快照，不連 Neo4j）。兩者都不成立就是深度題，
-  該走 `coverage_gaps`，不鑄 decompose 提案。
+  （用 graph_walk state artifact 的節點清單當圖的快照，不連 Neo4j）。兩者都不成立就是深度題，
+  該走走圖（`query.graph_walk`），不鑄 decompose 提案。
 - **防噪音**（「建議只由 pool ground truth 導出」）：同時 open 的提案 ≤ `MAX_OPEN`；使用者 `drop`
   過的系統，除非有**新的** lead 點名，否則不重生。
 
@@ -56,15 +56,15 @@ def load_known_anchors(path: Path | None = None) -> dict[str, str]:
     return out
 
 
-def graph_nodes_from_coverage(payload: Mapping[str, Any]) -> frozenset[str]:
-    """coverage state artifact 裡出現過的節點 id（covered／modelling_gaps／research_gaps／concept）。"""
-    nodes: set[str] = set()
-    for key in ("covered", "modelling_gaps", "research_gaps", "concept"):
-        for row in payload.get(key) or ():
-            node = row.get("node") if isinstance(row, Mapping) else row
-            if node:
-                nodes.add(str(node))
-    return frozenset(nodes)
+def graph_nodes_from_walk(payload: Mapping[str, Any]) -> frozenset[str]:
+    """`graph_walk` state artifact 的 `graph_nodes`（圖上全部節點 id）。
+
+    ⚠ 2026-09-26（Phase 2 Step 2.6）取代 `graph_nodes_from_coverage`：coverage kind 退役。原本從 coverage 的
+    四個桶收節點，**漏掉 `product_noise`（prod: 前綴的 0 家節點）與所有 co:**——走圖 artifact 直接帶圖上全部節點 id。
+    欄位缺席就丟例外（呼叫端當成「圖快照讀不到」），不回空集合——空集合會讓「錨已在圖裡」永遠答否。
+    """
+    nodes = payload["graph_nodes"]
+    return frozenset(str(n) for n in nodes if n)
 
 
 @dataclass(frozen=True)
@@ -81,10 +81,10 @@ def breadth_check(anchor: str, *, known_anchors: Mapping[str, str],
     in_graph = None if graph_nodes is None else (anchor in graph_nodes)
     if sector is not None:
         return BreadthCheck(False, sector, in_graph,
-                            f"需求錨 {anchor} 已屬產業組「{sector}」——這是深度題，走 coverage_gaps，不是新錨")
+                            f"需求錨 {anchor} 已屬產業組「{sector}」——這是深度題，走走圖（query.graph_walk），不是新錨")
     if in_graph:
         return BreadthCheck(False, None, True,
-                            f"頂層節點 {anchor} 已在圖裡（coverage 快照）——請改 decompose 一台以它為錨的實體，或走 coverage_gaps")
+                            f"頂層節點 {anchor} 已在圖裡（走圖快照）——請改 decompose 一台以它為錨的實體，或走走圖（query.graph_walk）")
     note = "（圖快照讀不到，只驗了產業組）" if in_graph is None else ""
     return BreadthCheck(True, None, in_graph, f"需求錨 {anchor} 不在任何產業組、不在圖裡——是新錨{note}")
 
@@ -165,6 +165,6 @@ def propose(
 
 __all__ = [
     "MAX_OPEN", "REF_PREFIX", "SOURCE", "BreadthCheck", "DecomposeProposalError", "breadth_check",
-    "build_hint", "dropped_before", "graph_nodes_from_coverage", "load_known_anchors", "open_proposals",
+    "build_hint", "dropped_before", "graph_nodes_from_walk", "load_known_anchors", "open_proposals",
     "propose", "slugify",
 ]

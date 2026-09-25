@@ -295,9 +295,9 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 & '.venv\Scripts\python.exe' scripts\outcome_if_settled_today.py
 ```
 
-⚠ **2026-09-08 起，覆蓋缺口與標的純度不再由 Daily 印出**——它們住 APP（`#/coverage`），
+⚠ **2026-09-08 起，覆蓋缺口與標的純度不再由 Daily 印出**——它們住 APP（2026-09-26 起覆蓋缺口併進走圖 `#/graph-walk`），
 由收尾的 `-m webapp materialize` 每天更新。`query.bottleneck`／`alpha_purity_snapshot`／
-`query.coverage_gaps` 從 Daily 的命令清單移除；它們仍是
+`query.coverage_gaps`（今由 `query.graph_walk` 承載）從 Daily 的命令清單移除；它們仍是
 [`skills/alpha-status`](../alpha-status/SKILL.md) 的入口，隨叫隨到。
 
 ⚠ **2026-09-22（Phase 0／G1）：跨檔排序整組退役，「較昨變動」的排序基準也一併退役。**
@@ -600,13 +600,13 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 |---|---|---|
 | 結構表 `#/structure-table` | N 條邊（**只印條數；不印首選、不印名次**——2026-09-22 排序退役；路由 2026-09-23 改名） | — |
 | 資產配置 `#/beta` | 6 sleeve：低於 N／高於 N／到位 N | 無門檻跨越 |
-| 研究缺口 `#/coverage` | 🔴 真缺口 N／🟡 建模待補 N | ±0 |
+| 走圖 `#/graph-walk` | 九型各自「命中／母體」（照抄心跳段 3 的走圖行；**不加總、不排序**） | 心跳「較昨變動」的 `走圖 …` 各項 |
 | 在等什麼 `#/watches` | 在等 N／停滯 N／fired 未消化 N／追源需處置 N | fired +1 |
 
 必填規則：
 
 - **有變動才展開，各一行寫清楚「什麼變了」**：sleeve 進出容忍區間、風控門檻被跨過、
-  缺口節點增減、watch 由 active 轉 fired／stalled。沒變就只留計數。
+  走圖某一型命中增減、watch 由 active 轉 fired／stalled。沒變就只留計數。
   ⚠ **「首選換人」已不是變動項**——沒有首選了（2026-09-22 Phase 0／G1）。結構表那一列沒有較昨基準。
 - ⚠ **APP 若沒被 materialize（收尾那一步失敗），本段必須改印「APP 未更新：<原因>」**，
   不得照印昨天的計數——否則「看不到」與「沒發生」又同形了（L12）。
@@ -720,7 +720,8 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 ### Step 7 — 收尾同步
 
 - **更新 APP 讀的畫面**（2026-09-08；2026-09-09 起加 `--registry-listed`，APP 73 檔每天更新）：
-  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --coverage --watches --positions --structure-readings`。
+  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings`。
+  ⚠ 2026-09-26（Phase 2 Step 2.6）：`--coverage` → `--graph-walk`（舊旗標不留別名）。
   ⚠ 2026-09-22（Step 0a.2）：`--basket` 已移除（籃子 filter 退役，候選狀態板 Phase 3 接手）。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。

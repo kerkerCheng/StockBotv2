@@ -74,7 +74,9 @@ def build_structure_readings_artifact(
         "rows": list(rows),
         # producer 必須指得出 consumer（INV-4）：這個數字就是 pq1 那一段的長度。
         "needs_reread": {"n": len(needs), "nodes": [_row_label(r) for r in needs],
-                         "segment": "stale_structure_readings",
+                         # Step 2.6：圖那一側（stale／過期）是走圖第 4 型、住 `graph_holes` 段；
+                         # watch 那一側（客戶出新文件、反證被判觸及）住 `fired_reading_reread` 段。
+                         "segment": "graph_holes（圖那一側：走圖 reading_stale）／fired_reading_reread（watch 那一側）",
                          "consumer": "research-drain：重跑 python -m query.structure <node> 後改寫讀圖紀錄"},
         "disproof_triggers": {"n": len(triggers),
                               "nodes": [_row_label(r) for r in triggers],

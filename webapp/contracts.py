@@ -62,10 +62,12 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 #: 只是從今天起沒有人讀得到它們。
 #: ⚠ 2026-09-23（Phase 0 Step 0b.3）：`ranking`（跨標的瓶頸排序：首選、兩份序、產業分組）→ `structure_table`
 #: （逐邊結構事實，不排序、不設門檻、沒有名次）。kind 數不變，仍是 7；磁碟上的 `ranking.json` 同上處置。
+#: ⚠ 2026-09-26（Phase 2 Step 2.6）：`coverage`（覆蓋掃描＋重複節點候選）→ `graph_walk`（走圖九型問句；
+#: 沒人供應／建模待補／重複節點成為第 7–9 型）。kind 數不變，仍是 7；磁碟上的 `coverage.json` 同上處置。
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "structure_table": "stockbot-app/structure_table/1",
     "beta": "stockbot-app/beta/1",
-    "coverage": "stockbot-app/coverage/2",
+    "graph_walk": "stockbot-app/graph_walk/1",
     "watches": "stockbot-app/watches/1",
     "positions": "stockbot-app/positions/1",
     "structure_readings": "stockbot-app/structure_readings/1",
@@ -219,7 +221,7 @@ def validate_state_artifact(kind: str, payload: Any) -> Mapping[str, Any]:
     if version != expected:
         raise ArtifactUnavailable(
             kind, f"artifact schema {version!r} 與本版 {expected!r} 不符——"
-                  f"請重跑 `python -m webapp materialize --{kind}`（artifact 是可重建的 cache，不是 authority）")
+                  f"請重跑 `python -m webapp materialize --{kind.replace('_', '-')}`（artifact 是可重建的 cache，不是 authority）")
     if payload.get("content_digest") != canonical_digest(payload):
         raise ArtifactUnavailable(kind, "artifact content_digest 對不上——內容在寫入後被改過或寫到一半")
     return payload

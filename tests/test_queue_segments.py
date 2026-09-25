@@ -16,13 +16,17 @@ def test_registry_is_closed_and_every_segment_names_a_consumer() -> None:
     for seg in qs.SEGMENTS:
         assert seg.consumer.strip(), seg.key
         assert seg.cost in {"mechanical", "research"}, seg.key
-    # 使用者定案的段（fired 重排／已核准工單／triaged_go／forward view／覆蓋缺口）都在，
+    # 使用者定案的段（fired 重排／已核准工單／triaged_go／forward view／走圖）都在，
     # 外加前面的 pending 分流與後面的主動輪詢。
     for required in (
         "fired_lead_requeue", "approved_work_orders",
-        "triaged_go_leads", "forward_view_backlog", "coverage_gaps",
+        "triaged_go_leads", "forward_view_backlog", "graph_holes", "fired_reading_reread",
     ):
         assert required in qs.SEGMENT_BY_KEY
+    # 2026-09-26（Phase 2 Step 2.6）：三段併進 `graph_holes`（走圖第 4／7／8／9 型）。斷言翻面，不是刪掉——
+    # 有人把它們加回來、又讓同一個洞在兩段各算一次，會變紅。
+    for retired in ("coverage_gaps", "duplicate_node_candidates", "stale_structure_readings"):
+        assert retired not in qs.SEGMENT_BY_KEY
     # 2026-09-22（Phase 0 Step 0a.1）：`reassess_stale` 隨 decision_lab 研究側退役。
     # 斷言翻面，不是刪掉——這樣「有人把它加回來」會變紅（ROADMAP Phase 0 驗收①）。
     assert "reassess_stale" not in qs.SEGMENT_BY_KEY
@@ -104,7 +108,7 @@ def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
             {"n": 7},
         ],
         forward_view_backlog=None,
-        coverage_gaps=20,
+        graph_holes=20,
     )
     by_key = {s["key"]: s["count"] for s in obs["segments"]}
     assert by_key["pending_triage"] == 1
@@ -115,11 +119,11 @@ def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
     assert by_key["approved_work_orders"] == 1
     assert "reassess_stale" not in by_key
     assert by_key["forward_view_backlog"] is None      # 沒讀到 ≠ 0
-    assert by_key["coverage_gaps"] == 20
+    assert by_key["graph_holes"] == 20
     assert obs["unmapped"] == []
     assert obs["mechanical_total"] == 2               # fired lead＋fired pq2
     rendered = qs.render(obs)
-    assert "未讀到" in rendered and "coverage" in rendered
+    assert "未讀到" in rendered and "走圖" in rendered
 
 
 def test_observe_reports_unmapped_states_instead_of_dropping_them() -> None:
