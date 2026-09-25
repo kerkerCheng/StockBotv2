@@ -955,3 +955,44 @@ def test_register_disproof_refuses_a_duplicate(env, capsys) -> None:
     assert ew.main([*argv[:6], f"thesis:{MEMO}#2", *argv[7:]]) == 2, "換了 #n 也是同一條件"
     assert "不重複登記" in capsys.readouterr().err
     assert len([w for w in ew.load_watches()["watches"] if w.get("kind") == ew.SEMANTIC_KIND]) == 1
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 Step 2.9c：watch 的「今天」＝排程時區（Phase 1 待決 #16）
+# ---------------------------------------------------------------------------
+
+def test_today_is_the_schedule_timezone_date_not_utc() -> None:
+    """daily 在台北 05:30（UTC 前一天 21:30）跑：原本「今天」是 UTC 日期，到期判斷比本地晚一天。"""
+    from datetime import datetime, timezone
+
+    from engine_b.routine_config import load_schedule
+
+    assert ew._local_timezone().key == load_schedule()["timezone"] == "Asia/Taipei"
+    daily_run = datetime(2026, 9, 25, 21, 30, tzinfo=timezone.utc)          # 台北 2026-09-26 05:30
+    assert ew._today(daily_run) == date(2026, 9, 26)
+    assert ew._today(datetime(2026, 9, 25, 15, 0, tzinfo=timezone.utc)) == date(2026, 9, 25)   # 台北 23:00
+    # contract 變更：同一個 daily 時刻，到期 2026-09-25 的 watch 現在算過期（原本 UTC 日期下還沒到）
+    assert ew.past_expiry({"expires": "2026-09-25"}, today=ew._today(daily_run))
+    assert not ew.past_expiry({"expires": "2026-09-25"}, today=daily_run.date())
+
+
+def test_every_expiry_comparison_uses_the_same_today() -> None:
+    """disproof、pq2 until 叫回、audit Expiry 都用 `event_watch._today()`——兩個「今天」就是 L12。"""
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    for rel in ("engine_b/disproof.py", "engine_b/todo.py", "audit/checks.py"):
+        text = (root / rel).read_text(encoding="utf-8")
+        assert "_today(" in text, rel
+    todo_src = (root / "engine_b" / "todo.py").read_text(encoding="utf-8")
+    wake = todo_src[todo_src.index("def _wake_passed_until"):todo_src.index("def _wake_passed_until") + 900]
+    assert "datetime.now(timezone.utc).date()" not in wake and "event_watch._today()" in wake
+
+
+def test_closed_today_counts_a_utc_stamp_by_its_schedule_timezone_day() -> None:
+    """daily（台北 05:30＝UTC 前一天 21:30）那一輪結案的追源到期，「今日」要算到——原本拿 UTC 前 10 碼比，恆少算。"""
+    data = {"watches": [{"watch_id": "ew_t", "status": "expired",
+                         "expiry_resolution": {"kind": "trace_closed", "at": "2026-09-25T21:40:00+00:00"}}]}
+    assert ew.expiry_counters(data, today=date(2026, 9, 26))["trace_expired_closed_today"] == 1
+    assert ew.expiry_counters(data, today=date(2026, 9, 25))["trace_expired_closed_today"] == 0
+    assert ew._stamp_day("not a time") is None

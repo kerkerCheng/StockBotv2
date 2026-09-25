@@ -152,7 +152,7 @@ def reconcile_thesis_disproof(data: dict[str, Any], *, lifecycle: Mapping[str, A
     from thesis.memo_structure import disproof_items, memo_file_sha256
 
     lifecycle = load_lifecycle() if lifecycle is None else lifecycle
-    today = today or datetime.now(timezone.utc).date()
+    today = today or ew._today()   # 排程時區的今天（Step 2.9c；與 event_watch 同一個定義）
     summary: dict[str, Any] = {"registered": [], "consumed": [], "relinked": [], "sidecar_mismatch": [],
                                "no_structured": [], "errors": [], "lifecycle_unreadable": False}
     if lifecycle is None:
@@ -254,7 +254,7 @@ def after_thesis_review(data: dict[str, Any], watch_ids: Sequence[str], *, n: in
     lifecycle 讀不到 → **什麼都不做**（觸及也不標 handled：標了就不會再列出，續盯又做不了——那一條會從「在盯」掉到
     「未盯」；留著，下一筆複查項目會再列出，多問一次；R2-b 第三輪 NB3-1）。"""
     lifecycle = load_lifecycle() if lifecycle is None else lifecycle
-    today = today or datetime.now(timezone.utc).date()
+    today = today or ew._today()   # 排程時區的今天（Step 2.9c）
     out: dict[str, list[str]] = {"handled": [], "rewatched": [], "renewed": [], "extended": [], "superseded": [],
                                  "errors": []}
     ids = set(watch_ids)

@@ -183,8 +183,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.7 | 讀圖頁 ＋ 個股頁讀圖面板（選配） | ✅（核心面板文字 digest 前後逐字相同、readiness 73／73 相同；有讀圖面板內容的個股頁 10 檔；併做 §14 #13、#22；偏差 #16–#17） | 便宜 | `1f80ac3` |
 | 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ✅（13 則 pq1 位移 0，逐則原因見偏差 #18；圖不在時 drain 照常排序；triage 字彙不再提供 `ranking`） | 便宜 | `a1640db` |
 | 2.9a | `pending --trigger` 必帶到期或綁 watch | ✅（只帶 trigger 拒收並印兩種寫法；`--watch` 必須是會叫醒這個編號、仍在等的 watch；現存池 1 筆只帶 trigger 的 [632] 已有 `ew_0094` 會叫醒它，audit Expiry PASS） | 便宜 | `a124746` |
-| 2.9b | 追源排回不寫假 triage、缺分類有人接 | ✅（`requeue_trace` 只追加 `requeued`；`classification-health` 另計 `requeued_unclassified_count`＝3、每筆帶 consumer；「triage 判斷的寫入者只有 `leads.triage()`」字面成立——另兩處是回到 pending 時清成 None） | 便宜 | 見 2.9c 列補填 |
-| 2.9c | watch 的「今天」改台北日期 | ○ | 便宜 | |
+| 2.9b | 追源排回不寫假 triage、缺分類有人接 | ✅（`requeue_trace` 只追加 `requeued`；`classification-health` 另計 `requeued_unclassified_count`＝3、每筆帶 consumer；「triage 判斷的寫入者只有 `leads.triage()`」字面成立——另兩處是回到 pending 時清成 None） | 便宜 | `28057cf` |
+| 2.9c | watch 的「今天」改台北日期 | ✅（`event_watch._today()` 讀 `schedule.timezone`；disproof、pq2 `until` 叫回、audit Expiry 共用；順手修「追源到期結案今日」拿 UTC 前 10 碼比本地今天的少算；偏差 #19） | 便宜 | 見結案列補填 |
 | 結案 | completion gate ＋ closeout 報告 ＋ R2 ＋ ROADMAP ✅ | ○ | 便宜 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
@@ -218,6 +218,7 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | 16 | 2.7 | §8「個股頁 `readings` 面板：由圖推這家公司…連到的節點 → 那些節點的現行讀圖」（沒說輸入從哪進 compose） | `briefing/analyst_view/compose.py::build_analyst_view(view, *, readings=None)` 多一個注入參數；輸入由 `webapp/materialize.py::readings_context()`（一次載圖＋讀圖 ledger）與 `readings_input_for()` 組好，**判讀／單位／狀態的中文標籤在那一端附上**，compose 只照抄。`tests/test_analyst_view.py` 兩條「panel 狀態／理由必須抄自 read model 某一段」的測試把 `readings` 列為 `INJECTED_PANELS` 例外，另加三條專屬測試守「照抄注入的輸入」 | compose 的 import 白名單（`test_module_import_allowlists_keep_the_layer_presentation_independent`）不准碰讀圖模組，read model（`AlphaInvestmentView`）也沒有讀圖 section；把讀圖塞進 read model 是動 A3／read model 的邊界，比注入一份輸入大得多 |
 | 17 | 2.7 | §14 #22「寫入端要從同一次快照查詢拿到製造者」 | 製造者從 `verify_citations` 收到的 `quotes` 鍵（同一次唯讀 transaction 的逐字）裡取 `develops → 這個節點` 的邊；**不改快照格式**（快照進 reading_id，改它會動 id） | 一條 develops 邊若沒有逐字，那家會被當成供應商而被排除——方向是更嚴、不放寬；全圖 canonical 邊 100% 有逐字（§0.2） |
 | 18 | 2.8 | §9「對 2.0 記下的 13 則 pq1 排序重排，每一則位移都指得出原因」 | **位移 0**（10 則排序＋3 則缺分類扣住，與基準 §8 逐位相同）。原本靠「瓶頸」鍵分開的三對——#2／#3、#6／#7、#8／#9——拿掉之後由下一鍵「持股關聯」（relevance 0 vs 2）分開，方向相同：被標瓶頸的 5 則恰好都點名持股公司；#1／#2 由 novelty、#3／#4 由 tier 分開（與前相同）；首見時間鍵這批沒有走到。`ranking` 5 則（#5–#9）改顯示「結構或讀圖會變」、名次不變（`rank_as`） | 位移 0 不代表這一鍵沒作用過：它與持股關聯在這批資料上共線。拿掉它的理由是 G1／G2（排序不得吃結構表成員資格），不是這批資料上的效果 |
+| 19 | 2.9c | §10「`_today()` 等所有以日期比較到期的地方改用 `schedule.timezone`」 | 除 `_today()` 外另改三處同義的「今天」（`disproof.py` 兩處、`todo._wake_passed_until`、audit `check_expiry`）；另修 `expiry_counters` 的 `trace_expired_closed_today`：原本拿 UTC 時間戳前 10 碼比「今天」，心跳傳的是本地日期，daily（台北 05:30＝UTC 前一天）那一輪結案的恆算成昨天——新增 `_stamp_day()` 用同一個時區換算。`tests/test_audit_waiting.py` 的 TODAY 改讀程式的 `_today()`（台北凌晨時段它先紅了） | 兩個「今天」是 L12；plan 列的 L11-6 ④（test_watch_expiry、audit 寬限）照預期是最先壞的 |
 
 ---
 

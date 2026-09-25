@@ -36,7 +36,8 @@ import os
 import sys
 import re
 import tempfile
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone, tzinfo
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
@@ -84,8 +85,36 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _today() -> date:
-    return datetime.now(timezone.utc).date()
+@lru_cache(maxsize=1)
+def _local_timezone() -> tzinfo:
+    """排程時區（`config/daily_routine.json` 的 `schedule.timezone`，唯一來源；讀不到就 raise，不退回 UTC）。"""
+    from zoneinfo import ZoneInfo
+
+    from engine_b.routine_config import load_schedule
+
+    return ZoneInfo(str(load_schedule()["timezone"]))
+
+
+def _stamp_day(stamp: Any) -> date | None:
+    """一個 UTC ISO 時間戳落在排程時區的哪一天；讀不成時間回 None（不猜）。"""
+    try:
+        moment = datetime.fromisoformat(str(stamp or ""))
+    except ValueError:
+        return None
+    return _today(moment)
+
+
+def _today(now: datetime | None = None) -> date:
+    """到期判斷的「今天」＝**排程時區**的日期（2026-09-26 Phase 2 Step 2.9c，Phase 1 待決 #16）。
+
+    原本是 UTC 日期：daily 在台北 05:30（UTC 前一天 21:30）跑，於是 daily 裡的到期判斷一律比本地日期晚一天、
+    執行紀錄檔名卻用本地日期——同一輪兩個「今天」（L12）。⚠ **這是 contract 變更**：到期判斷比原本早一天生效
+    （台北 00:00–08:00 之間尤其明顯）。時間戳（`_now()`、`created_at`、`fired_at`…）仍存 UTC ISO，PIT 不變。
+    """
+    moment = now or datetime.now(timezone.utc)
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return moment.astimezone(_local_timezone()).date()
 
 
 # 一個財報週期（90 天）＋緩衝。最常見的等待模式是「下一份季報會不會揭露」；
@@ -830,7 +859,7 @@ def expiry_counters(data: Mapping[str, Any], *, today: date | None = None) -> di
     - `expiry_thesis_review_pending`／`expiry_reread_pending`：thesis／讀圖來源的條件到期、等複查／重讀（設計 B）
     - `trace_expired_closed`／`_today`：追源型到期、lead 轉終局 `watch_expired`（重問＝計數現形，不佔 pq2）
     - `expiry_unresolved`：任何型別 expired 且沒有 `expiry_resolution`（含 A3 之前的歷史到期）"""
-    today_iso = (today or _today()).isoformat()
+    day = today or _today()
     expired = [w for w in data["watches"] if w.get("status") == "expired"]
     closed = [w for w in expired if (w.get("expiry_resolution") or {}).get("kind") == "trace_closed"]
     unresolved = [w for w in expired if not w.get("expiry_resolution")]
@@ -839,8 +868,9 @@ def expiry_counters(data: Mapping[str, Any], *, today: date | None = None) -> di
         "expiry_thesis_review_pending": sum(1 for w in unresolved if expiry_class(w) == "thesis_review"),
         "expiry_reread_pending": sum(1 for w in unresolved if expiry_class(w) == "reread"),
         "trace_expired_closed": len(closed),
-        "trace_expired_closed_today": sum(1 for w in closed
-                                          if str(w["expiry_resolution"].get("at") or "")[:10] == today_iso),
+        # 時間戳存 UTC；「是哪一天」用排程時區換算（Step 2.9c）——拿 UTC 前 10 碼比本地的今天，daily（台北 05:30）
+        # 那一輪結案的會被算成昨天，「今日」恆少算。
+        "trace_expired_closed_today": sum(1 for w in closed if _stamp_day(w["expiry_resolution"].get("at")) == day),
         "expiry_unresolved": sum(1 for w in expired if not w.get("expiry_resolution")),
     }
 

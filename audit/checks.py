@@ -332,7 +332,7 @@ def check_expiry() -> AuditResult:
         items = sources.todo_items()
         findings: list[str] = []
         now = _now()
-        today = now.date()
+        today = ew._today(now)   # 排程時區的今天（Step 2.9c）：與 watch 到期判斷同一個定義，寬限照舊
         examined = 0
         unchecked: list[str] = []
 

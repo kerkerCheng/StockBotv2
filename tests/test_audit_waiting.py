@@ -15,7 +15,10 @@ from audit import checks, sources
 from audit.sources import SourceUnavailable
 
 NOW = datetime.now(timezone.utc)
-TODAY = NOW.date()
+# 程式的「今天」是排程時區（Step 2.9c）；測試的今天取同一個定義，否則台北凌晨時段兩邊差一天。
+from engine_b.event_watch import _today as _program_today  # noqa: E402
+
+TODAY = _program_today(NOW)
 FUTURE = (TODAY + timedelta(days=60)).isoformat()
 PAST = (TODAY - timedelta(days=5)).isoformat()
 MEMO = "thesis/x_memo.md"

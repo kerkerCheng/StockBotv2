@@ -1334,7 +1334,9 @@ def sync(
 def _wake_passed_until(pool: dict[str, Any], *, stamp: str) -> int:
     """`pending --until <日期>` 的日期過了 → 叫回「球在你」（R2-b 第三輪 NB3-5b；INV-2：每個等待都要有到期，
     到期是重問）。原本 `waiting_on.until` 沒有任何程式讀，過了日期仍永遠躺在「等事件」。冪等（清掉就不再命中）。"""
-    today = datetime.now(timezone.utc).date().isoformat()
+    from engine_b import event_watch
+
+    today = event_watch._today().isoformat()   # 排程時區的今天（Step 2.9c；與 watch 到期同一個定義）
     woken = 0
     for item in active_items(pool):
         until = str((item.get("waiting_on") or {}).get("until") or "")[:10]
