@@ -173,7 +173,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
-| 2.0 | 基準快照 | ○ | 便宜 | |
+| 2.0 | 基準快照 | ✅ | 便宜 | （本 commit；短碼由 2.1 補填） |
 | 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ○ | 便宜 | |
 | 2.2 | 反向路徑只收競爭關係 | ○ | 便宜 | |
 | 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ○ | 便宜 | |
@@ -200,6 +200,7 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
+| 1 | 2.0→2.2 | §3「對 2.0 的全圖 digest 重算，**變動的節點集合＝§0.2 那 7 個**」 | 2.0 預先算出預期變動集合＝8 條 `constrained_by` canonical 邊的兩端＝**14 個節點**（名單見 baseline §10）；§3 已改寫 | 7 是「反向路徑因此**變空**」的節點數（tech／mat／prod 口徑），不是 digest 會變的節點數：反向路徑裡只要有任一條 `constrained_by`，即使還有 `competes_with`（如 `tech:cpo`、`co:coherent`），digest 也會變。照原文驗收會把 7 個以外的預期變動誤判成「多變了」 |
 
 ---
 
@@ -259,7 +260,7 @@ git grep -n -i -e mcp_server -e graph_mcp -e "\bMCP\b" -e stockbotv2-graph -e "m
 
 - **改哪裡**：`schema/vocab.json`（`counter_path_relation` → `["competes_with"]`，加 `_counter_path_relation_comment`：`constrained_by` 為什麼移出、2026-09-18 讀圖 `sr_6ad5c884eb7bc3fb` 的量測、它仍在需求側／下一層）；`query/structure.py`（`_COUNTER` 改由一支讀 `schema/vocab.json` 的函式提供——先找 repo 裡既有的 vocab loader 用它，沒有才新增一支、並讓它是唯一一支）；`docs/solutions/architecture-patterns/closed-vocabulary-registry.md` 那一列；`schema/graph_schema.md` 若提到 counter path。
 - **不改**：`staleness.py` 的 `DISPROOF_KINDS`（`counter_path` 仍是反證來源，只是成員變乾淨）；`tests/test_is_variant_of.py` 守的「`is_variant_of` 不進任何走訪清單」必須照樣綠。
-- **怎麼驗**：新測試：反向路徑成員＝字彙（改字彙就改行為，不能各寫一份）；`constrained_by` 邊仍出現在需求側或下一層；對 2.0 的全圖 digest 重算，**變動的節點集合＝§0.2 那 7 個（或 2.0 重跑的數字）**，一個不多一個不少；`python -m alpha structure-reading mat:inp_substrate --check` 報 stale、變化只有 `counter_path` 消失 1 條；`tech:cw_dfb_laser --check` 與 2.0 相同。
+- **怎麼驗**：新測試：反向路徑成員＝字彙（改字彙就改行為，不能各寫一份）；`constrained_by` 邊仍出現在需求側或下一層；對 2.0 的全圖 digest 重算，**變動的節點集合＝baseline §10 預先算好的 14 個（8 條 `constrained_by` 邊的兩端；偏差 #1）**，一個不多一個不少；`python -m alpha structure-reading mat:inp_substrate --check` 報 stale、變化只有 `counter_path` 消失 1 條；`tech:cw_dfb_laser --check` 與 2.0 相同。
 - **驗收（層：圖——讀圖工具的角度成員）**：反向路徑非空的節點 26 → 19（或 2.0 重跑的數 − 只靠 `constrained_by` 的數）。
 - **L11-6 ④**：最先壞的是 **`mat:inp_substrate` 讀圖的反證 ③（「反向路徑新增」）**——它登記成語意 watch（Phase 1 Step 1.6）；確認 watch 的條件原文與實體不受影響（語意 watch 不讀角度，只比對一手文件），並在八欄寫明「InP 基板讀圖轉 stale 是本 Step 的預期結果，由 2.5 重讀」。**不要為了讓它回 current 去改 digest 或 staleness 規則。**
 
