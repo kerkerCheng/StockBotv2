@@ -67,7 +67,7 @@ def _pool():
     ])
     by = {it["ref_id"]: it for it in todo.active_items(pool)}
     todo.resolve(pool, by["dc_deferred"]["n"], "pending")
-    todo.resolve(pool, by["dc_waiting"]["n"], "pending", trigger="等 Q3 財報")
+    todo.resolve(pool, by["dc_waiting"]["n"], "pending", trigger="等 Q3 財報", until="2026-12-31")
     by["dc_inflight"]["dispatch_status"] = "queued"
     return pool, by
 

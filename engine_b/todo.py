@@ -319,6 +319,7 @@ def resolve(
     trigger: str | None = None,
     event_type: str | None = None,
     quote: str | None = None,
+    watch: str | None = None,
     _skip_receipt_validation: bool = False,
 ) -> dict[str, Any]:
     """以動詞處理一個編號。`pending` 不 resolve（明確 defer，留在池中）。
@@ -326,6 +327,9 @@ def resolve(
     `pending` 可帶 `until`（日期）或 `trigger`（事件描述）。帶了觸發條件的項目會被
     歸入「等事件」而非「等你決定」——它仍在池中可稽核，但在觸發之前不佔用決策注意力。
     這是使用者明確表達的等待，優先於由 blocker 自動推導的分類。
+    ⚠ 2026-09-26（Phase 2 Step 2.9a）：`trigger` 必須同時帶 `until`，或 `watch`（一筆會叫醒這個編號的
+    Event Watch：`wake_pq2`＝這個編號、仍在等、有到期）——散文 trigger 沒有到期（INV-2）。
+    既有未結案項目不回溯改寫（它們在寫入當下合法）。
     """
     if verb not in VERBS:
         raise TodoError(f"未知動詞：{verb}（可用：{', '.join(VERBS)}）")
@@ -344,16 +348,29 @@ def resolve(
         _validate_go_receipt(item, receipt)
     if event_type and not trigger:
         raise TodoError("event-type 必須搭配人類可讀的 trigger")
+    if watch and verb != "pending":
+        raise TodoError("--watch 只適用於 pending")
+    if verb == "pending" and trigger and not until and not watch:
+        # Phase 1 待決 #13（Phase 2 Step 2.9a）：只帶散文 trigger 的等待沒有到期——事件永遠不發生就永遠躺在
+        # 「等事件」（INV-2：每個等待都必須有到期）。兩種正確寫法都讓它會自己回來。
+        raise TodoError(
+            f"pending --trigger 必須同時帶到期或綁一筆會叫醒它的 watch（INV-2：每個等待都要有到期）：\n"
+            f"  ① python -m engine_b.todo resolve {item['n']} --verb pending --trigger \"{trigger}\" --until <日期>\n"
+            f"  ② python -m engine_b.event_watch add ... --wake-pq2 {item['n']} --expires <日期>，再\n"
+            f"     python -m engine_b.todo resolve {item['n']} --verb pending --trigger \"{trigger}\" --watch <ew_id>")
+    if watch:
+        _check_bound_watch(item, watch)
     stamp = at or _now()
     if verb == "pending":
         item["deferred_at"] = stamp
-        if until or trigger:
+        if until or trigger or watch:
             item["waiting_on"] = {
                 "until": until or None,
                 "trigger": trigger or None,
                 "reason": reason or None,
                 "set_at": stamp,
                 **({"event_type": event_type} if event_type else {}),
+                **({"watch_id": watch} if watch else {}),
             }
         else:
             # 無條件 pending 的語意是「尚待人工決定」，不是沿用上一輪的外部事件。
@@ -447,6 +464,25 @@ def _validate_watch_decision_go(receipt: str, *, quote: str | None, watch: Mappi
 def watch_id_of(item: Mapping[str, Any]) -> str:
     """`watch_decision` 的 ref_id 是 `<watch_id>@<expires>`（每個到期事件恰好一個編號）。"""
     return str(item.get("ref_id") or "").split("@", 1)[0]
+
+
+def _check_bound_watch(item: Mapping[str, Any], watch_id: str) -> None:
+    """`pending --watch <ew_id>`：那筆 watch 必須真的會叫醒這個編號（`wake_pq2`＝它、仍在等）。
+
+    綁一筆不會叫醒它的 watch 等於沒綁——事件發生了這個編號也不會回來（INV-4：producer 指得出 consumer）。
+    watch 自己有到期（`event_watch.add_watch` 強制），所以這條等待也有到期（INV-2）。
+    """
+    from engine_b import event_watch
+
+    watch = next((w for w in event_watch.load_watches().get("watches") or ()
+                  if w.get("watch_id") == watch_id), None)
+    if watch is None:
+        raise TodoError(f"--watch {watch_id} 不在 Event Watch registry")
+    if int(watch.get("wake_pq2") or 0) != int(item["n"]):
+        raise TodoError(f"--watch {watch_id} 叫醒的不是 [{item['n']}]（它的 wake_pq2={watch.get('wake_pq2')}）——"
+                        f"先建一筆 `python -m engine_b.event_watch add ... --wake-pq2 {item['n']} --expires <日期>`")
+    if watch.get("status") != "active":
+        raise TodoError(f"--watch {watch_id} 現況是 {watch.get('status')}，不是在等的 watch")
 
 
 def _watch_decision_stale(watch: Mapping[str, Any] | None, event_expires: str) -> str | None:
@@ -2127,7 +2163,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_res.add_argument(
         "--trigger", default=None,
-        help="pending 專用：等哪個事件（如「S-4 公開」）。",
+        help="pending 專用：等哪個事件（如「S-4 公開」）。必須同時帶 --until 或 --watch（INV-2：每個等待都要有到期）。",
+    )
+    p_res.add_argument(
+        "--watch", default=None, metavar="EW_ID",
+        help="pending 專用：綁一筆會叫醒這個編號的 Event Watch（wake_pq2＝這個編號、仍在等；到期由那筆 watch 承擔）。",
     )
     p_res.add_argument(
         "--event-type",
@@ -2270,7 +2310,7 @@ def main(argv: list[str] | None = None) -> int:
                     pool, int(raw), args.verb,
                     reason=args.reason, receipt=args.receipt,
                     until=args.until, trigger=args.trigger,
-                    event_type=args.event_type, quote=args.quote,
+                    event_type=args.event_type, quote=args.quote, watch=args.watch,
                 )
                 suffix = ""
                 if done.get("resolution") == "stale_event":
@@ -2278,7 +2318,7 @@ def main(argv: list[str] | None = None) -> int:
                 elif done.get("resolution") == "renewed":
                     suffix = f"（續等到 {args.until}：watch 回 active，這個編號結案——等待只住 registry）"
                 elif args.verb == "pending" and (args.until or args.trigger):
-                    suffix = f"（等：{args.until or args.trigger}）"
+                    suffix = f"（等：{args.until or args.trigger}" + (f"｜綁 {args.watch}" if args.watch else "") + "）"
                 print(f"✓ [{raw}] → {args.verb}{suffix}")
             except (TodoError, ValueError) as exc:
                 failures += 1

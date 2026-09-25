@@ -181,8 +181,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ✅（插槽讀圖 2 份、層讀圖 2 份重讀成 v3；工具毛病三個當下修＝偏差 #7–#9；pq2 [651]、[652]） | **強模型** | `c9390b9`＋`647245d`／`4ab71d4`／`974e2c9`／`c0db0a1`／`eb2a7ce`（[651]–[654] 與衝突決策收據；ledger 不在 git；收據＝[`2026-09-25-phase2-step25-readings.md`](../reports/2026-09-25-phase2-step25-readings.md)） |
 | 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ✅（九型重現 §0.2 基準；母體 ≥10 的型別皆 <50%；偏差 #11–#15） | 便宜 | `be7a85e` |
 | 2.7 | 讀圖頁 ＋ 個股頁讀圖面板（選配） | ✅（核心面板文字 digest 前後逐字相同、readiness 73／73 相同；有讀圖面板內容的個股頁 10 檔；併做 §14 #13、#22；偏差 #16–#17） | 便宜 | `1f80ac3` |
-| 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ✅（13 則 pq1 位移 0，逐則原因見偏差 #18；圖不在時 drain 照常排序；triage 字彙不再提供 `ranking`） | 便宜 | 見 2.9a 列補填 |
-| 2.9a | `pending --trigger` 必帶到期或綁 watch | ○ | 便宜 | |
+| 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ✅（13 則 pq1 位移 0，逐則原因見偏差 #18；圖不在時 drain 照常排序；triage 字彙不再提供 `ranking`） | 便宜 | `a1640db` |
+| 2.9a | `pending --trigger` 必帶到期或綁 watch | ✅（只帶 trigger 拒收並印兩種寫法；`--watch` 必須是會叫醒這個編號、仍在等的 watch；現存池 1 筆只帶 trigger 的 [632] 已有 `ew_0094` 會叫醒它，audit Expiry PASS） | 便宜 | 見 2.9b 列補填 |
 | 2.9b | 追源排回不寫假 triage、缺分類有人接 | ○ | 便宜 | |
 | 2.9c | watch 的「今天」改台北日期 | ○ | 便宜 | |
 | 結案 | completion gate ＋ closeout 報告 ＋ R2 ＋ ROADMAP ✅ | ○ | 便宜 | |

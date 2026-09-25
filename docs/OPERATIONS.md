@@ -383,7 +383,7 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 & '.venv\Scripts\python.exe' -m engine_b.todo standing-go [--run]         # 佇列段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go；pending／等世界／付費的不碰
 ```
 
-`pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
+`pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。⚠ **2026-09-26 起 `--trigger` 必須同時帶 `--until <日期>` 或 `--watch <ew_id>`**（那筆 watch 的 `wake_pq2` 必須是這個編號、仍在等）——只有散文 trigger 的等待沒有到期（INV-2），CLI 拒收並印兩種正確寫法；既有項目不回溯改寫。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。
 
 ### Private authority 備份（本機＋Google Drive 異地）
 

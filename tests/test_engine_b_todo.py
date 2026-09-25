@@ -66,7 +66,7 @@ def test_pending_defers_but_keeps_item_active() -> None:
 def test_unconditional_pending_clears_stale_external_wait() -> None:
     """人工判讀不得因上一輪 trigger 繼續被藏在「等事件」。"""
     pool = _pool_with({"type": "manual", "ref_id": "x", "title": "A"})
-    todo.resolve(pool, 1, "pending", trigger="等 Q3 guidance")
+    todo.resolve(pool, 1, "pending", trigger="等 Q3 guidance", until="2026-12-31")
     assert todo.get(pool, 1)["waiting_on"]["trigger"] == "等 Q3 guidance"
 
     todo.resolve(pool, 1, "pending", reason="也可由使用者現在指定門檻")
@@ -912,7 +912,7 @@ def test_check_event_watches_consumes_already_fired_pq2_watches(monkeypatch) -> 
 
     pool = _pool_with({"type": "manual", "ref_id": "m", "title": "等 Q3 guidance"})
     n = todo.active_items(pool)[0]["n"]
-    todo.resolve(pool, n, "pending", trigger="等 Q3 guidance")
+    todo.resolve(pool, n, "pending", trigger="等 Q3 guidance", until="2026-12-31")
     assert todo.get(pool, n).get("waiting_on")
 
     data = {"schema_version": 1, "watches": [
@@ -1140,3 +1140,55 @@ def test_complete_ra_never_overwrites_a_conflicting_digest(monkeypatch, tmp_path
         assert "不覆寫" in str(exc)
     else:
         raise AssertionError("digest 衝突必須拒絕，不得覆寫")
+
+
+# ---------------------------------------------------------------------------
+# Phase 2 Step 2.9a：`pending --trigger` 必帶到期或綁 watch（Phase 1 待決 #13）
+# ---------------------------------------------------------------------------
+
+def _watch_registry(monkeypatch, watches):
+    from engine_b import event_watch as ew
+
+    monkeypatch.setattr(ew, "load_watches", lambda path=None: {"schema_version": 1, "watches": list(watches)})
+
+
+def test_trigger_alone_is_rejected_with_both_correct_forms_and_nothing_is_written() -> None:
+    """INV-2：散文 trigger 沒有到期——事件永遠不發生就永遠躺在「等事件」。拒收並印兩種正確寫法。"""
+    pool = _pool_with({"type": "manual", "ref_id": "x", "title": "A"})
+    with pytest.raises(todo.TodoError) as exc:
+        todo.resolve(pool, 1, "pending", trigger="等 S-4 公開")
+    assert "--until" in str(exc.value) and "--watch" in str(exc.value) and "--wake-pq2 1" in str(exc.value)
+    assert "waiting_on" not in todo.get(pool, 1) and "deferred_at" not in todo.get(pool, 1)
+    todo.resolve(pool, 1, "pending", trigger="等 S-4 公開", until="2026-12-31")
+    assert todo.get(pool, 1)["waiting_on"]["until"] == "2026-12-31"
+
+
+def test_trigger_may_bind_a_watch_that_really_wakes_this_item(tmp_path, monkeypatch) -> None:
+    """INV-4：綁的 watch 必須真的會叫醒這個編號（wake_pq2＝它、仍在等）；到期由那筆 watch 承擔。"""
+    _watch_registry(monkeypatch, [
+        {"watch_id": "ew_ok", "status": "active", "wake_pq2": 1, "expires": "2027-01-01"},
+        {"watch_id": "ew_other", "status": "active", "wake_pq2": 99, "expires": "2027-01-01"},
+        {"watch_id": "ew_done", "status": "consumed", "wake_pq2": 1, "expires": "2027-01-01"},
+    ])
+    pool = _pool_with({"type": "manual", "ref_id": "x", "title": "A"})
+    for bad, needle in (("ew_missing", "不在"), ("ew_other", "叫醒的不是"), ("ew_done", "consumed")):
+        with pytest.raises(todo.TodoError, match=needle):
+            todo.resolve(pool, 1, "pending", trigger="等 S-4 公開", watch=bad)
+    todo.resolve(pool, 1, "pending", trigger="等 S-4 公開", watch="ew_ok")
+    assert todo.get(pool, 1)["waiting_on"]["watch_id"] == "ew_ok"
+    with pytest.raises(todo.TodoError, match="只適用於 pending"):
+        todo.resolve(pool, 1, "drop", watch="ew_ok")
+
+
+def test_the_cli_offers_watch_and_the_docs_show_no_trigger_without_until() -> None:
+    """同 commit 改掉範例句（L11-6 ④：最先壞的是寫著 `pending --trigger` 的範例）。"""
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    assert '"--watch", default=None' in (root / "engine_b" / "todo.py").read_text(encoding="utf-8")
+    for rel in ("docs/OPERATIONS.md", "skills/daily-brief/SKILL.md", "skills/research-drain/SKILL.md"):
+        text = (root / rel).read_text(encoding="utf-8")
+        for line in text.splitlines():
+            if re.search(r"--verb pending\b.*--trigger", line):
+                assert "--until" in line or "--watch" in line, (rel, line)
