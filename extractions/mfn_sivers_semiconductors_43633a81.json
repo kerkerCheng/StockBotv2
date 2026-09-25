@@ -1,0 +1,118 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Sivers 2026 年報或 2027 H1 的期中報告仍未揭露 Ayar 的量產訂單或 production-ready，本 claim 轉 watch；每季 Sivers 期中報告（MFN）核查，觸發後 48 小時內重讀 prod:supernova 插槽讀圖並重評 Sivers→Ayar 邊的 qualification_status。",
+      "id": "mfn_sivers_semiconductors_43633a81_cl1",
+      "source_ids": [
+        "mfn_sivers_semiconductors_43633a81_s1",
+        "mfn_sivers_semiconductors_43633a81_s2",
+        "mfn_sivers_semiconductors_43633a81_s3",
+        "mfn_sivers_semiconductors_43633a81_s4"
+      ],
+      "statement": "2024-12-19 Sivers 新聞稿：Sivers 與其「strategic customer」Ayar Labs 處於「advanced discussions」，下一階段聚焦雷射陣列的 qualification 與量產就緒；Ayar CEO Mark Wade 逐字說 Ayar「intends to expand its relationship ... through NRE and pre-purchase of products」；Sivers CEO 說出貨量預計 18–24 個月內放量（即 2026 中到 2027 底）。⚠ 是意向不是合約（intends／advanced discussions）；全文沒有 SuperNova 的名字，所以只入公司層級的 supplies_to（L6）。",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.75,
+      "dst_id": "co:ayar_labs",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mfn_sivers_semiconductors_43633a81_s1",
+        "mfn_sivers_semiconductors_43633a81_s2",
+        "mfn_sivers_semiconductors_43633a81_s3",
+        "mfn_sivers_semiconductors_43633a81_s4"
+      ],
+      "src_id": "co:sivers_semiconductors"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Sivers",
+        "SIVE",
+        "SIVE.ST",
+        "Sivers Semiconductors AB",
+        "Sivers Photonics",
+        "Sivers Photonics Ltd"
+      ],
+      "attributes": {
+        "fy2025_adj_ebitda_sek_m": -50.3,
+        "fy2025_gross_margin_pct": -0.7,
+        "fy2025_op_loss_sek_m": -177.8,
+        "fy2025_photonics_revenue_sek_m": 93.4,
+        "fy2025_revenue_sek_m": 306.6,
+        "fy2025_wireless_revenue_sek_m": 213.1,
+        "ticker": "SIVE.ST"
+      },
+      "confidence": 0.95,
+      "id": "co:sivers_semiconductors",
+      "name": "Sivers Semiconductors",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "mfn_sivers_semiconductors_43633a81_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "id": "co:ayar_labs",
+      "name": "Ayar Labs",
+      "role": "disruptor",
+      "source_ids": [
+        "mfn_sivers_semiconductors_43633a81_s1",
+        "mfn_sivers_semiconductors_43633a81_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mfn_sivers_semiconductors_43633a81",
+    "evidence_tier": 2,
+    "origin_entity": "Sivers Semiconductors（新聞稿，內含 Ayar Labs CEO Mark Wade 具名引述）",
+    "permission_basis": "Nasdaq Stockholm 上市公司經 MFN／Cision 公開發布的新聞稿，issuer 自行公開；全文由 fetchers/mfn.py 自公開來源取得並存 library/raw，repo_full 是為了讓引文可逐字核對。",
+    "published_at": "2024-12-19",
+    "publisher": "MFN (Modular Finance) / Cision",
+    "retrieved_at": "2026-09-25",
+    "source_type": "news",
+    "storage_permission": "repo_full",
+    "title": "Sivers Semiconductors and Ayar Labs to expand their partnership on enabling high volume manufacturing of optical I/O solutions (MFN／Cision 2024-12-19)",
+    "url": "https://mfn.se/cis/a/sivers-semiconductors/sivers-semiconductors-and-ayar-labs-to-expand-their-partnership-on-enabling-high-volume-manufacturing-of-optical-i-o-solutions-for-scalable-cost-effective-ai-infrastructure-43633a81"
+  },
+  "sources": [
+    {
+      "id": "mfn_sivers_semiconductors_43633a81_s1",
+      "locator": "para 1（dateline）",
+      "quote": "Sivers Semiconductors AB (STO:SIVE), a global leader in photonics and wireless technologies, is in advanced discussions with its strategic customer, Ayar Labs, to partner on the next phase of engagement focused on manufacturing at scale to support deployment of Ayar labs in-package optical interconnect solutions."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_43633a81_s2",
+      "locator": "Mark Wade（CEO, Ayar Labs）引述",
+      "quote": "Ayar Labs, a strategic customer of Sivers Semiconductors, intends to expand its relationship with Sivers Semiconductors through NRE and pre-purchase of products to prepare for high volume deployment of optical I/O to address bandwidth bottlenecks in AI infrastructure."
+    },
+    {
+      "id": "mfn_sivers_semiconductors_43633a81_s3",
+      "locator": "Vickram Vathulya（CEO, Sivers）引述",
+      "quote": "Ayar Labs is positioned extremely well strategically, technically, and financially to be a very significant customer for Sivers' high performance laser arrays as shipment volumes are expected to ramp in the next 18-24 months"
+    },
+    {
+      "id": "mfn_sivers_semiconductors_43633a81_s4",
+      "locator": "副標",
+      "quote": "The strengthened partnership framework will focus on product qualification and manufacturing readiness of Sivers high precision laser arrays for high volume deployment of optical I/O solutions in AI Datacenters"
+    }
+  ]
+}

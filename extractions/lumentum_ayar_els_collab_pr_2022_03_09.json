@@ -1,0 +1,100 @@
+{
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "guided",
+      "disproof_condition": "若 Ayar 或 Lumentum 的一手文件表明這項合作已終止、或 SuperNova 的雷射只來自 Sivers，本 claim 降級；每季 Lumentum 財報與 Ayar newsroom 核查，觸發後 48 小時內重讀 prod:supernova 插槽讀圖。",
+      "id": "lumentum_ayar_els_collab_pr_2022_03_09_cl1",
+      "source_ids": [
+        "lumentum_ayar_els_collab_pr_2022_03_09_s1",
+        "lumentum_ayar_els_collab_pr_2022_03_09_s2",
+        "lumentum_ayar_els_collab_pr_2022_03_09_s3"
+      ],
+      "statement": "2022-03-09 Lumentum 與 Ayar Labs 聯合新聞稿：雙方簽 strategic collaboration agreement，由 Lumentum 以高量供應 CW-WDM MSA 相容的外部雷射光源，用來驅動 Ayar 的 optical I/O；Ayar CEO Charles Wuischpard 具名說 Lumentum「will provide the proven capability to address the volume, quality, and reliability requirements of our optical I/O solution」。含義：Ayar 的雷射來源從 2022 年起就不只 Sivers 一家。⚠ 全文沒有 SuperNova 的名字，所以只入公司層級的 supplies_to，不入 prod:supernova（L6）；合格狀態與量產進度 2022 年後沒有公開更新，不主張。",
+      "subject_id": "e1"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "co:ayar_labs",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "lumentum_ayar_els_collab_pr_2022_03_09_s1",
+        "lumentum_ayar_els_collab_pr_2022_03_09_s2",
+        "lumentum_ayar_els_collab_pr_2022_03_09_s3"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "LITE"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "ramp_difficulty_intrinsic": 5,
+        "ticker": "LITE"
+      },
+      "confidence": 0.9,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "lumentum_ayar_els_collab_pr_2022_03_09_s1"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [],
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "id": "co:ayar_labs",
+      "name": "Ayar Labs",
+      "role": "disruptor",
+      "source_ids": [
+        "lumentum_ayar_els_collab_pr_2022_03_09_s1",
+        "lumentum_ayar_els_collab_pr_2022_03_09_s2"
+      ],
+      "type": "Company"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "lumentum_ayar_els_collab_pr_2022_03_09",
+    "evidence_tier": 2,
+    "origin_entity": "Lumentum Holdings Inc. / Ayar Labs (joint press release)",
+    "permission_basis": "Official joint press release (Business Wire), hosted on Lumentum IR; canonical URL retained, research-relevant excerpts only.",
+    "published_at": "2022-03-09",
+    "publisher": "Business Wire (Lumentum IR)",
+    "retrieved_at": "2026-09-25",
+    "source_type": "news",
+    "storage_permission": "repo_excerpt",
+    "title": "Lumentum and Ayar Labs Announce Strategic Collaboration to Supply External Light Sources for Co-packaged Optical Interconnect Solutions (Business Wire, 2022-03-09)",
+    "url": "https://investor.lumentum.com/financial-news-releases/news-details/2022/Lumentum-and-Ayar-Labs-Announce-Strategic-Collaboration-to-Supply-External-Light-Sources-for-Co-packaged-Optical-Interconnect-Solutions/default.aspx"
+  },
+  "sources": [
+    {
+      "id": "lumentum_ayar_els_collab_pr_2022_03_09_s1",
+      "locator": "para 1",
+      "quote": "today announced that they have entered into a strategic collaboration agreement to deliver CW-WDM MSA compliant external laser sources in high volume. These light sources are critical to power Ayar Labs’ optical I/O solution"
+    },
+    {
+      "id": "lumentum_ayar_els_collab_pr_2022_03_09_s2",
+      "locator": "Charles Wuischpard（CEO, Ayar Labs）引述",
+      "quote": "Lumentum is one of the largest and most efficient laser manufacturers in the world, and will provide the proven capability to address the volume, quality, and reliability requirements of our optical I/O solution."
+    },
+    {
+      "id": "lumentum_ayar_els_collab_pr_2022_03_09_s3",
+      "locator": "副標",
+      "quote": "Lumentum and Ayar Labs collaborate on CW-WDM multi-source agreement (MSA) compliant external laser sources to power Ayar Labs’ optical I/O solution"
+    }
+  ]
+}
