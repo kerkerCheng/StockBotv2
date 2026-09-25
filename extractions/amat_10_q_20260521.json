@@ -305,6 +305,28 @@
         "amat_10_q_20260521_s6",
         "amat_10_q_20260521_s1"
       ]
+    },
+    {
+      "src_id": "co:applied_materials",
+      "relation": "develops",
+      "dst_id": "prod:amat_semiconductor_systems",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ],
+      "attributes": {},
+      "id": "add_edge:4e866"
+    },
+    {
+      "src_id": "co:applied_materials",
+      "relation": "develops",
+      "dst_id": "prod:amat_ags",
+      "confidence": 0.9,
+      "source_ids": [
+        "amat_10_q_20260521_s10"
+      ],
+      "attributes": {},
+      "id": "add_edge:1ffa7"
     }
   ],
   "claims": [

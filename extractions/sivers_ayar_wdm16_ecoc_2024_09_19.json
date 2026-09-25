@@ -30,6 +30,29 @@
         "sivers_ayar_wdm16_ecoc_2024_09_19_s2"
       ],
       "src_id": "co:sivers_semiconductors"
+    },
+    {
+      "src_id": "co:ayar_labs",
+      "relation": "develops",
+      "dst_id": "prod:supernova",
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1"
+      ],
+      "attributes": {},
+      "id": "add_edge:c178d"
+    },
+    {
+      "src_id": "co:sivers_semiconductors",
+      "relation": "supplies_to",
+      "dst_id": "prod:supernova",
+      "confidence": 0.75,
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1",
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s4"
+      ],
+      "attributes": {},
+      "id": "add_edge:b620d"
     }
   ],
   "nodes": [
@@ -68,6 +91,36 @@
         "sivers_ayar_wdm16_ecoc_2024_09_19_s1"
       ],
       "type": "TechNode"
+    },
+    {
+      "type": "Company",
+      "name": "Ayar Labs",
+      "abstraction_level": "module_subsystem",
+      "role": "disruptor",
+      "aliases": [],
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "id": "co:ayar_labs",
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1"
+      ]
+    },
+    {
+      "type": "Product",
+      "name": "Ayar Labs SuperNova light source module",
+      "abstraction_level": "module_subsystem",
+      "role": null,
+      "aliases": [
+        "SuperNova"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "prod:supernova",
+      "source_ids": [
+        "sivers_ayar_wdm16_ecoc_2024_09_19_s1"
+      ]
     }
   ],
   "schema_version": "0.1",

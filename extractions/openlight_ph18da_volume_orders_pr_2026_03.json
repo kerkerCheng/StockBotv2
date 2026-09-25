@@ -49,6 +49,17 @@
         "openlight_ph18da_volume_orders_pr_2026_03_s2"
       ],
       "src_id": "co:openlight_photonics"
+    },
+    {
+      "src_id": "co:openlight_photonics",
+      "relation": "develops",
+      "dst_id": "prod:ph18da",
+      "confidence": 0.8,
+      "source_ids": [
+        "openlight_ph18da_volume_orders_pr_2026_03_s1"
+      ],
+      "attributes": {},
+      "id": "add_edge:d194c"
     }
   ],
   "nodes": [

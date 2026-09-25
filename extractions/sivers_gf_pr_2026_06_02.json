@@ -158,6 +158,17 @@
       "source_ids": [
         "sivers_gf_pr_2026_06_02_s1"
       ]
+    },
+    {
+      "src_id": "co:globalfoundries",
+      "relation": "develops",
+      "dst_id": "prod:gf_scale",
+      "confidence": 0.8,
+      "source_ids": [
+        "sivers_gf_pr_2026_06_02_s4"
+      ],
+      "attributes": {},
+      "id": "add_edge:1a38a"
     }
   ],
   "claims": [

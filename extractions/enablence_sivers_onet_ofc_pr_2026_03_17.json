@@ -185,6 +185,18 @@
         "enablence_sivers_onet_ofc_pr_2026_03_17_s1",
         "enablence_sivers_onet_ofc_pr_2026_03_17_s4"
       ]
+    },
+    {
+      "src_id": "co:o_net_technologies",
+      "relation": "develops",
+      "dst_id": "prod:els_8ch_module",
+      "confidence": 0.7,
+      "source_ids": [
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s2",
+        "enablence_sivers_onet_ofc_pr_2026_03_17_s3"
+      ],
+      "attributes": {},
+      "id": "add_edge:dc3b4"
     }
   ],
   "claims": [
