@@ -171,10 +171,10 @@ def test_unreadable_lifecycle_is_unchecked_not_a_verdict(world) -> None:
 
 def test_reading_condition_expired_must_show_up_in_the_node_reread_reasons(world) -> None:
     world["watches"] = [_expired(_reading_watch("ew_r"))]
-    world["ledgers"] = {"tech:laser": {"records": [], "errors": [], "current": _reading("sr_new", READING_COND)}}
+    world["ledgers"] = {"tech:laser": {"records": [], "errors": [], "current": {"layer": _reading("sr_new", READING_COND)}}}
     assert checks.check_expiry().status.name == "PASS"
 
-    world["ledgers"] = {"tech:laser": {"records": [], "errors": [], "current": None}}
+    world["ledgers"] = {"tech:laser": {"records": [], "errors": [], "current": {}}}
     result = checks.check_expiry()
     assert result.status.name == "FAIL" and "沒有現行讀圖" in _findings(result)
 
@@ -305,7 +305,7 @@ def test_condition_missing_from_a_structured_sidecar_is_an_orphan(world) -> None
 
 def test_reading_disproof_ref_must_resolve_to_the_current_reading(world) -> None:
     old, new = _reading("sr_old", READING_COND), _reading("sr_new", READING_COND)
-    world["ledgers"] = {"tech:laser": {"records": [old, new], "errors": [], "current": new}}
+    world["ledgers"] = {"tech:laser": {"records": [old, new], "errors": [], "current": {"layer": new}}}
     world["watches"] = [_reading_watch("ew_r", reading_id="sr_gone")]
     assert "ledger 裡沒有這一份" in _findings(checks.check_orphans())
     world["watches"] = [_reading_watch("ew_r", reading_id="sr_old")]
@@ -318,7 +318,7 @@ def test_wake_reading_on_a_node_without_a_current_reading_is_an_orphan(world) ->
     world["watches"] = [_watch("ew_w", wake_reading="mat:inp")]
     world["ledgers"] = {}
     assert "沒有現行讀圖" in _findings(checks.check_orphans())
-    world["ledgers"] = {"mat:inp": {"records": [], "errors": [], "current": _reading("sr_1")}}
+    world["ledgers"] = {"mat:inp": {"records": [], "errors": [], "current": {"layer": _reading("sr_1")}}}
     assert checks.check_orphans().status.name == "PASS"
 
 

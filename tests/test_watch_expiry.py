@@ -24,6 +24,13 @@ from thesis.memo_structure import memo_text_sha256
 
 SIVERS = "co:sivers_semiconductors"
 CONDITION = "任一需求側客戶在正式文件宣布改用不經這個節點的替代路徑並量產"
+#: v3 讀圖（Phase 2 Step 2.3）的兩半引用——本檔只用到契約層，不寫 ledger。
+_V3_CITATIONS = [
+    {"angle": "demand_side", "edge": ["co:nvidia", "depends_on", "tech:cw_dfb_laser"],
+     "quote": "每一個 CPO 光引擎都需要外部 CW 雷射光源才能運作", "source_id": "doc_demand"},
+    {"angle": "supply_side", "edge": [SIVERS, "supplies_to", "tech:cw_dfb_laser"],
+     "quote": "Sivers 出貨 CW DFB 雷射陣列給 CPO 客戶並擴充產能", "source_id": "doc_supply"},
+]
 C1 = "Sivers 期中報告揭露 CW DFB 雷射陣列進入量產並具名客戶"
 C2 = "任一 hyperscaler 在正式文件宣布改用不經外部雷射的整合方案"
 C3 = "任一 hyperscaler 在正式文件宣布第二家外部雷射供應商通過認證"
@@ -276,7 +283,8 @@ def test_superseded_reading_resolves_its_expired_conditions(env) -> None:
         kind="volume", reading="重讀：供給側大家差不多，賭的是產能一時補不上——判讀不變。",
         expires=date.today() + timedelta(days=30),
         created_at=datetime.now(timezone.utc), author="test", supersedes_id=old,
-        disproof=[{"condition": CONDITION, "entities": [SIVERS], "check_frequency": "每季", "action_48h": "重讀"}])
+        disproof=[{"condition": CONDITION, "entities": [SIVERS], "check_frequency": "每季", "action_48h": "重讀",
+                   "source": "self"}], unit="layer", citations=_V3_CITATIONS)
     summary = register_reading_watches(record)
     assert watch_id in summary["consumed"]
     assert _watch(watch_id)["expiry_resolution"]["kind"] == "source_superseded"
@@ -856,13 +864,15 @@ def test_new_reading_retires_every_older_reading_of_the_node(env, monkeypatch) -
     class _R:
         def __init__(self, rid):
             self.reading_id = rid
+            self.unit = "layer"
 
     monkeypatch.setattr(sr, "read_reading_records", lambda node, **k: ([_R(old)], []))
     record = structure_reading_record(
         node="tech:cw_dfb_laser", structure={"result_digest": "d" * 16, "angles": {}, "anchor_chain": []},
         kind="volume", reading="重讀：供給側大家差不多，賭的是產能一時補不上——判讀不變。",
         expires=date.today() + timedelta(days=30), created_at=datetime.now(timezone.utc), author="test",
-        disproof=[{"condition": CONDITION, "entities": [SIVERS], "check_frequency": "每季", "action_48h": "重讀"}])
+        disproof=[{"condition": CONDITION, "entities": [SIVERS], "check_frequency": "每季", "action_48h": "重讀",
+                   "source": "self"}], unit="layer", citations=_V3_CITATIONS)
     assert record.get("supersedes_id") is None
     summary = sr.register_reading_watches(record)
     assert watch_id in summary["consumed"]

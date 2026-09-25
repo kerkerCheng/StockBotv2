@@ -374,10 +374,15 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
             except OSError:
                 mismatch.append(str(tid))
     v1_prose = 0
-    for node, reading in (readings or {}).items():
-        if str(getattr(reading, "record_version", "")).endswith("/v2"):
+    for key, reading in (readings or {}).items():
+        node, unit = key if isinstance(key, tuple) else (key, "layer")
+        where = f"{node} 重讀" if unit == "layer" else f"{node}（{unit}）重讀"
+        # v2 起有結構化 disproof[]（v3 也是）；只有 v1（或沒寫版本）是散文、不可機械數。
+        # ⚠ 2026-09-25 前這裡寫 `endswith("/v2")`——v3 會被誤算成 v1 散文（Step 2.3 的 L11-6 ④）。
+        version = str(getattr(reading, "record_version", "") or "")
+        if version and not version.endswith("/v1"):
             for entry in tuple(getattr(reading, "disproof", ()) or ()):
-                expected[(f"reading:{reading.reading_id}", normalize(getattr(entry, "condition", "")))] = f"{node} 重讀"
+                expected[(f"reading:{reading.reading_id}", normalize(getattr(entry, "condition", "")))] = where
         else:
             v1_prose += 1
     state: dict[tuple[str, str], tuple[str, Mapping[str, Any]]] = {}
@@ -420,17 +425,16 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
     }
 
 
-def current_readings() -> dict[str, Any]:
-    """各節點現行讀圖（讀 ledger；經 alpha.providers）。"""
+def current_readings() -> dict[tuple[str, str], Any]:
+    """各（節點, 單位）現行讀圖（讀 ledger；經 alpha.providers）。v3 起一個節點可以同時有層與插槽兩份現行。"""
     from alpha.providers.structure_readings import known_nodes, read_reading_records
-    from alpha.structure_reading import select_reading
+    from alpha.structure_reading import select_readings
 
-    out: dict[str, Any] = {}
+    out: dict[tuple[str, str], Any] = {}
     for node in known_nodes():
         records, _errors = read_reading_records(node)
-        reading = select_reading(records, today=date.today())
-        if reading is not None:
-            out[node] = reading
+        for unit, reading in select_readings(records, today=date.today()).items():
+            out[(node, unit)] = reading
     return out
 
 

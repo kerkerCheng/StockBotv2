@@ -343,7 +343,7 @@ def _load_quotes(node: str) -> dict:
         driver.close()
 
 
-def _load_edges() -> list[CanonicalEdge]:
+def _graph_driver():
     from dotenv import load_dotenv
     from neo4j import GraphDatabase
 
@@ -351,15 +351,40 @@ def _load_edges() -> list[CanonicalEdge]:
     password = os.environ.get("NEO4J_PASSWORD")
     if not password:
         raise SystemExit("請設 NEO4J_PASSWORD")
-    driver = GraphDatabase.driver(
+    return GraphDatabase.driver(
         os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
         auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
     )
+
+
+def load_snapshot_with_quotes(node: str) -> tuple[StructureView, dict[tuple[str, str, str], list[dict[str, Any]]]]:
+    """**同一個唯讀 transaction** 裡取邊與這個節點的逐字（讀圖 v3 的引用核對用，plan A2）。
+
+    ⚠ 引用必須對**同一份**快照核對：先建快照、再另查一次逐字，兩次查詢之間圖可能變
+    （plan §13：「不要另查一次圖」）。Neo4j 的讀是 read-committed，一個 transaction 不保證快照隔離，
+    但把兩條查詢收進同一個 transaction 是這裡做得到的最窄窗口。
+    """
+    driver = _graph_driver()
+    try:
+        with driver.session() as session:
+            rows, quotes = session.execute_read(
+                lambda tx: (fetch_assertions(tx), fetch_quotes(tx, node)))
+    finally:
+        driver.close()
+    return build_structure(node, _classify_edges(rows)), quotes
+
+
+def _load_edges() -> list[CanonicalEdge]:
+    driver = _graph_driver()
     try:
         with driver.session() as session:
             rows = fetch_assertions(session)
     finally:
         driver.close()
+    return _classify_edges(rows)
+
+
+def _classify_edges(rows) -> list[CanonicalEdge]:
     # ⚠ 共用 `collapse_assertions`，不自己收斂——否則結構讀圖與排序會對同一條邊
     # 給出不同的值，而那是 L16 說的「每個消費端重造一份，重造品立刻開始偏離」。
     edges = list(collapse_assertions(rows).values())

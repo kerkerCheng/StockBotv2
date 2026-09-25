@@ -1273,7 +1273,7 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     不是每個節點各查一次圖。節點數會長，查詢次數不該跟著長。
     """
     from alpha.providers.structure_readings import known_nodes, read_reading_records, reread_reasons
-    from alpha.structure_reading import needs_reread, reading_status, select_reading
+    from alpha.structure_reading import needs_reread, reading_status, select_readings
     from engine_b.event_watch import load_watches
     from query.structure import _load_edges, build_structure
 
@@ -1291,27 +1291,30 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     for node in nodes:
         records, errors = read_reading_records(node)
         parse_errors.extend(errors)
-        reading = select_reading(records, as_of=as_of, today=today)
-        if reading is None:
+        # 一列＝（節點, 單位）（v3，A1）：層讀圖與插槽讀圖各自現行、各自算 staleness。
+        current = select_readings(records, as_of=as_of, today=today)
+        if not current:
             # 有檔案但沒有現行紀錄（全部被撤回）——**不是「沒有這個節點」**，照實列出（INV-3）。
-            rows.append({"node": node, "status": None, "reading_id": None,
+            rows.append({"node": node, "unit": None, "status": None, "reading_id": None,
                          "reason": "ledger 有紀錄但目前沒有現行的那一筆（已全部撤回）"})
             continue
         view = build_structure(node, edges)
-        status = reading_status(reading, view.as_dict(), today=today)
         watch_reasons = reread_reasons(node, watches)
-        rows.append({
-            "node": node,
-            "reading_id": reading.reading_id,
-            "kind": reading.kind,
-            "reading": reading.reading,
-            "tickers": list(reading.tickers),
-            "read_on": reading.created_on.isoformat(),
-            "expires": reading.expires.isoformat(),
-            **status,
-            "needs_reread": needs_reread(status) or bool(watch_reasons),
-            "reread_reasons": watch_reasons,
-        })
+        for unit, reading in current.items():
+            status = reading_status(reading, view.as_dict(), today=today)
+            rows.append({
+                "node": node,
+                "unit": unit,
+                "reading_id": reading.reading_id,
+                "kind": reading.kind,
+                "reading": reading.reading,
+                "tickers": list(reading.tickers),
+                "read_on": reading.created_on.isoformat(),
+                "expires": reading.expires.isoformat(),
+                **status,
+                "needs_reread": needs_reread(status) or bool(watch_reasons),
+                "reread_reasons": watch_reasons,
+            })
     payload = build_structure_readings_artifact(rows=rows, parse_errors=parse_errors,
                                                 generated_at=generated_at, as_of=as_of)
     return target.write(payload), payload

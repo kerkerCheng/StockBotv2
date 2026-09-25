@@ -597,10 +597,24 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 ```
 
 ```jsonc
-// spec.json（kind／reading／expires 必填；**快照不得夾帶**，由命令現跑 query.structure 產生）
-{"kind": "volume", "reading": "……為什麼讀成量的賭注而不是護城河賭注……",
- "expires": "2026-12-16", "tickers": ["COHR", "LITE"]}
+// spec.json（v3，2026-09-25：unit／kind／reading／expires 必填；**快照不得夾帶**，由命令現跑 query.structure 產生）
+{"unit": "layer",                       // layer＝一層（tech／mat）；socket＝客戶產品裡的一格（只能是 prod:*）
+ "kind": "volume", "reading": "……為什麼讀成量的賭注而不是護城河賭注……",
+ "expires": "2026-12-16", "tickers": ["COHR", "LITE"],
+ // moat／volume 必須兩半各至少一段：quote 要是那條邊出自 source_id 的逐字（先跑 query.structure <node> --quotes 挑）
+ "citations": [
+   {"angle": "demand_side", "edge": ["tech:cpo", "depends_on", "tech:cw_dfb_laser"], "quote": "……≥20 字逐字……", "source_id": "<doc_id>"},
+   {"angle": "supply_side", "edge": ["co:coherent", "supplies_to", "tech:cw_dfb_laser"], "quote": "……", "source_id": "<doc_id>",
+    "independent": false}               // 插槽的 moat 需至少一段供給側 independent=true（來源不是供應商自己、且解析得到）
+ ],
+ "disproof": [{"condition": "……", "entities": ["co:…"], "check_frequency": "每季", "action_48h": "……",
+               "source": "self"}]       // self＝本份寫下；沿用舊讀圖的寫它的 sr_*
+}
 ```
+
+⚠ **引用由命令對同一次查詢的圖上逐字核對**：邊不在這次快照的那個角度、片段不是那條邊出自 `source_id` 的逐字、
+`independent` 的來源是供應商自己或解析不到、反證的 `sr_*` 不在同節點 ledger——任何一條不過就整筆拒收並逐條說明。
+判不出 A／B 的寫 `undecided`（不強制引用），在 `reading` 寫清楚缺哪一格。
 
 ⚠ **存輸入，不存結論**：紀錄的主體是「當時那五條查詢回什麼」，判讀只是附帶——
 只有結果集比對得出「多了一條我當初沒讀到的邊」。`kind` 由寫的人宣告，**不由程式從 angles 推**

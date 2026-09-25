@@ -175,8 +175,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 |---|---|---|---|---|
 | 2.0 | 基準快照 | ✅ | 便宜 | `475e167` |
 | 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ✅（R2-a GO；non-blocking 八條處置見 R2-a 處置 commit） | 便宜 | `ba47419`＋`6da4892`（R2-a 處置） |
-| 2.2 | 反向路徑只收競爭關係 | ✅ | 便宜 | （本 commit；短碼由 2.3 補填） |
-| 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ○ | 便宜 | |
+| 2.2 | 反向路徑只收競爭關係 | ✅ | 便宜 | `73d8c53` |
+| 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ✅（R1；R2-b 於 2.4 後一起審） | 便宜 | （本 commit；短碼由 2.4 補填） |
 | 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ○ | 便宜 | |
 | 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ○ | **強模型** | （ledger 不在 git；收據寫進 plan §0.6 與報告） |
 | 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ○ | 便宜 | |
@@ -203,6 +203,8 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | 1 | 2.0→2.2 | §3「對 2.0 的全圖 digest 重算，**變動的節點集合＝§0.2 那 7 個**」 | 2.0 預先算出預期變動集合＝8 條 `constrained_by` canonical 邊的兩端＝**14 個節點**（名單見 baseline §10）；§3 已改寫 | 7 是「反向路徑因此**變空**」的節點數（tech／mat／prod 口徑），不是 digest 會變的節點數：反向路徑裡只要有任一條 `constrained_by`，即使還有 `competes_with`（如 `tech:cpo`、`co:coherent`），digest 也會變。照原文驗收會把 7 個以外的預期變動誤判成「多變了」 |
 | 2 | 2.1 | §2「`retired_mechanism_grep.py` 加 MCP 組並把 AREAS 擴到所有 tracked `.md`」 | 新增第九組 I，**它自己**掃 `git ls-files` 的所有 tracked 檔（含每一個 `.md`、`AGENTS.md`、`prompts/`、`deploy/`、`.claude/skills`）；A～H 的 AREAS 與驗收範圍**不動**；I 組 keep-list 只收 `historical_record`，歷史目錄以 `/` 結尾的前綴鍵登記 | 擴 A～H 的 AREAS 等於事後改 Phase 0 的驗收定義；ROADMAP 要求的「所有 tracked `.md`」是 MCP 組的範圍，由 I 組直接滿足 |
 | 3 | 2.1 | ROADMAP 旁支列的盤點命令（`git grep -i`，含 `apply_research_action`、`load_extraction` 全字串） | I 組 regex 只抓**本專案的** Graph MCP：大寫 `MCP` 與工具名以 ASCII 邊界包成獨立 token；`intake.application._apply_research_action_impl`／`_load_extraction_impl`（本機 domain，ROADMAP 明寫留）與 Claude CLI 的 `--strict-mcp-config`、`mcp_servers`（**擋掉** MCP 的守門設定）不算命中。邊界不用 Python `\b`（它把中文字算 word 字元，「與MCP」會漏） | 盤點命令是找處置對象用的（要寬）；驗收 regex 要能歸零且不誤殺活的 domain 與守門設定——否則只能靠非「歷史紀錄」類的 keep-list，違反 ROADMAP 驗收② |
+| 4 | 2.3 | §4「改哪裡」只列 contracts／providers／cli／ledger 測試／登記 hook | 另改四個讀「現行讀圖」的消費端：`audit/sources.py::reading_ledgers`（`current` 改成 `{unit: 讀圖}`）與 `audit/checks.py` 三處、`engine_b/disproof.py::current_readings`（鍵改（節點, 單位））與 `disproof_counts`、`webapp/materialize.py`（一列＝（節點, 單位），多 `unit` 欄）、`webapp/structure_readings.py`（插槽列的名字帶單位）；CLI `--format json` 的 `current`／`status` 改成以單位為鍵 | 不改的話 2.5 寫進的第一份插槽讀圖會被這四處以「節點只有一份現行」讀掉其中一份（INV-3 安靜消失）；另外 `disproof_counts` 用 `endswith("/v2")` 判斷結構化反證，v3 會被誤算成 v1 散文、條件變成「未盯」——這是本 Step 的 L11-6 ④，已由測試守（突變驗過會紅） |
+| 5 | 2.3 | §4 第 5 點「`select_reading(records, unit=…, …)`」 | `unit` **沒有預設值**（漏給就 TypeError），另加 `select_readings()` 回每個單位各自的現行；`structure_reading_record(unit=…)` 同樣沒有預設；`register_reading_watches` 收舊條件只收**同單位**的、判定觸及的處置排除**已知是另一個單位**的來源讀圖 | 有預設值的單位參數就是 review profile 第 3 條「把沒給悄悄補成一個值」：同一個 prod 節點層與插槽各自現行，漏給單位的呼叫端會安靜只看到一種 |
 
 ---
 
@@ -463,3 +465,5 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
    本機發布走 `scripts/commit_pending_intake.py`；要不要連同測試一起退役，隨上一條一起定。
 10. **`scripts/verify_test_nonvacuity.py` 有幾條突變指向已不存在的測試**（R2-a #8；475e167 前就失效，例：`tests/test_weakest_axis.py::*`、
     `test_layer_separation.py::test_decision_lab_does_not_import_new_layers`）：非本 Phase 造成，照實帶到下一 Phase；本 Phase 只刪了 2.1 那條。
+11. **`wake_reading` 仍以節點為單位**（2.3 發現）：需求側客戶出新文件叫醒的是「這個節點該重讀」，任一單位重讀完成就收掉它。
+    只有 prod 節點可能同時有層與插槽兩份讀圖；目前 0 個節點如此。等第一個同時有兩種讀圖的 prod 節點出現，再看要不要把 watch 綁到單位（L17-4：general 到資料支持的那一格為止）。

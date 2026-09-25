@@ -59,8 +59,73 @@ def read_reading_records(node: str, *, directory: Path | None = None,
     return records, errors
 
 
-def append_reading_record(record: Mapping[str, Any], *, directory: Path | None = None) -> Path:
-    """append 一筆（已由 `structure_reading_record()` 驗證過的）紀錄；只 append，永不改寫既有行。"""
+def _norm(text: Any) -> str:
+    return " ".join(str(text or "").split())
+
+
+def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, str], Sequence[Mapping[str, Any]]],
+                     *, registry: Any = None) -> list[str]:
+    """v3 引用的寫入端核對（plan A2）：回傳問題清單，空＝全部核對得到。**不查圖**——`quotes` 必須與
+    紀錄的快照出自同一次查詢（`fetch_structure_snapshot_with_quotes`）。
+
+    每一條引用：①邊在紀錄快照的那個角度裡；②片段（去空白正規化）是那條邊某段逐字的子字串，且那段逐字
+    出自 `source_id` 那份文件；③標 `independent` 的，那份文件的 `origin_entity` 經
+    `query.bottleneck.company_id_for_origin`（唯一 owner，不重造）解析得到、且不是那條邊的主詞（供應商自己）。
+    """
+    parsed = parse_structure_reading_record(record)
+    problems: list[str] = []
+    if not parsed.citations:
+        return problems
+    if registry is None:
+        from identity.registry import get_registry
+
+        registry = get_registry()
+    from query.bottleneck import company_id_for_origin
+
+    for index, citation in enumerate(parsed.citations, 1):
+        edge = tuple(citation.edge)
+        label = f"第 {index} 條引用（{citation.angle}：{edge[0]} {edge[1]} {edge[2]}）"
+        rows = {tuple(str(x) for x in row[:3]) for row in parsed.angles.get(citation.angle, ())}
+        if edge not in rows:
+            problems.append(f"{label}：這條邊不在這次快照的 {citation.angle} 角度裡")
+            continue
+        needle = _norm(citation.quote)
+        hits = [q for q in quotes.get(edge, ()) if str(q.get("doc") or "") == citation.source_id
+                and needle in _norm(q.get("quote"))]
+        if not hits:
+            docs = sorted({str(q.get("doc")) for q in quotes.get(edge, ())})
+            problems.append(f"{label}：片段不是這條邊出自 {citation.source_id} 的任何一段逐字"
+                            f"（這條邊的逐字來自 {docs or '（沒有任何逐字）'}）")
+            continue
+        if citation.independent:
+            origins = {str(q.get("origin") or "") for q in hits}
+            resolved = {company_id_for_origin(o, registry) for o in origins}
+            if None in resolved or not resolved:
+                problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 的 origin_entity "
+                                f"{sorted(origins)} 解析不到任何 co:*——解析不到的不算外部印證（L8、INV-1）")
+            elif edge[0] in resolved:
+                problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 就是 {edge[0]} 自己——"
+                                "供應商自稱是弱主張（L8）")
+    return problems
+
+
+def verify_disproof_sources(record: Mapping[str, Any], existing: Sequence[StructureReading]) -> list[str]:
+    """v3 反證出處的寫入端核對：`sr_*` 必須是同節點 ledger 裡既有的一份。"""
+    parsed = parse_structure_reading_record(record)
+    known = {r.reading_id for r in existing}
+    return [f"第 {i} 條反證的 source={entry.source}：同節點 ledger 裡沒有這一份"
+            for i, entry in enumerate(parsed.disproof, 1)
+            if entry.source and entry.source.startswith("sr_") and entry.source not in known]
+
+
+def append_reading_record(record: Mapping[str, Any], *, directory: Path | None = None,
+                          quotes: Mapping[tuple[str, str, str], Sequence[Mapping[str, Any]]] | None = None,
+                          registry: Any = None) -> Path:
+    """append 一筆（已由 `structure_reading_record()` 驗證過的）紀錄；只 append，永不改寫既有行。
+
+    v3 起多兩道寫入端核對（plan A2）：引用要對**同一份快照**的逐字核對（有引用卻沒給 `quotes` 就拒收，
+    fail closed）；反證出處的 `sr_*` 要存在。任何一條不過就整筆拒收，並逐條說出是哪一條、為什麼。
+    """
     parsed = parse_structure_reading_record(record)
     sensitive = sensitive_payload_path(dict(record), "structure_reading")
     if sensitive is not None:
@@ -70,6 +135,15 @@ def append_reading_record(record: Mapping[str, Any], *, directory: Path | None =
         raise ContractViolation(f"reading {parsed.reading_id} 已在 ledger 中——同內容不得重複 append")
     if parsed.supersedes_id and not any(r.reading_id == parsed.supersedes_id for r in existing):
         raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不在 ledger 中")
+    if not parsed.retracted:
+        problems = verify_disproof_sources(record, existing)
+        if parsed.citations:
+            if quotes is None:
+                problems.append("這筆有引用，但沒有給同一份快照的逐字（quotes）——核對不了就不寫")
+            else:
+                problems += verify_citations(record, quotes, registry=registry)
+        if problems:
+            raise ContractViolation("讀圖紀錄拒收：\n  - " + "\n  - ".join(problems))
     path = ledger_path(parsed.node, directory=directory)
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as handle:
@@ -90,6 +164,14 @@ def fetch_structure_snapshot(node: str) -> dict[str, Any]:
     from query.structure import _load_edges, build_structure
 
     return build_structure(str(node), _load_edges()).as_dict()
+
+
+def fetch_structure_snapshot_with_quotes(node: str) -> tuple[dict[str, Any], dict[tuple[str, str, str], list[dict]]]:
+    """快照＋這個節點每條邊的逐字，**出自同一次查詢**（v3 引用核對用；plan §13：不要另查一次圖）。"""
+    from query.structure import load_snapshot_with_quotes
+
+    view, quotes = load_snapshot_with_quotes(str(node))
+    return view.as_dict(), quotes
 
 
 def demand_side_customers(record: Mapping[str, Any]) -> list[str]:
@@ -126,11 +208,15 @@ def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | 
                                      "reread_consumed": [], "touched_handled": []}
     # 收舊：撤回只收被撤回那一份的；新讀圖收**這個節點其他每一份**的（R2-b 第三輪 NB3-4：只認 supersedes_id 時，
     # 重讀忘了帶或帶錯，舊讀圖的條件永遠掛著，同一條件新舊兩筆）。節點的讀圖 id 從 ledger 讀，不只靠 watch 上的 node。
+    # ⚠ 以（節點, 單位）為單位（v3，A1）：同一個 prod 節點的層讀圖與插槽讀圖各自是現行，
+    # 新的插槽讀圖不得收掉層讀圖還在盯的條件，反之亦然。
+    records, _errors = read_reading_records(parsed.node)
+    same_unit_ids = {r.reading_id for r in records if r.unit == parsed.unit} | {parsed.reading_id}
+    other_unit_ids = {r.reading_id for r in records if r.unit != parsed.unit}
     if parsed.retracted:
         stale_ids = {str(parsed.supersedes_id)} if parsed.supersedes_id else set()
     else:
-        records, _errors = read_reading_records(parsed.node)
-        stale_ids = ({r.reading_id for r in records} | ({str(parsed.supersedes_id)} if parsed.supersedes_id else set())) \
+        stale_ids = (same_unit_ids | ({str(parsed.supersedes_id)} if parsed.supersedes_id else set())) \
             - {parsed.reading_id}
     if stale_ids:
         note = "retracted" if parsed.retracted else f"superseded by {parsed.reading_id}"
@@ -175,8 +261,10 @@ def register_reading_watches(record: Mapping[str, Any], *, watches_path: Path | 
             watch["closed"] = {"at": stamp, "note": f"已重讀：{parsed.reading_id}"}
             summary["reread_consumed"].append(watch["watch_id"])
         judgment = watch.get("judgment") or {}
+        source_ref = str(watch.get("source_ref") or "")
         if (watch.get("kind") == ew.SEMANTIC_KIND and watch.get("node") == parsed.node
-                and str(watch.get("source_ref") or "").startswith("reading:")
+                and source_ref.startswith("reading:")
+                and source_ref[len("reading:"):].split("#", 1)[0] not in other_unit_ids
                 and judgment.get("touches") == "yes" and not judgment.get("handled")):
             judgment["handled"] = {"verb": "reread", "reading_id": parsed.reading_id, "at": stamp}
             summary["touched_handled"].append(watch["watch_id"])
@@ -230,6 +318,6 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
     return nodes
 
 
-__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers",
+__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "fetch_structure_snapshot_with_quotes",
            "fetch_structure_snapshot", "known_nodes", "ledger_path", "read_reading_records",
-           "register_reading_watches", "reread_reasons"]
+           "register_reading_watches", "reread_reasons", "verify_citations", "verify_disproof_sources"]

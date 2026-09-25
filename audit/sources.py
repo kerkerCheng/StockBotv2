@@ -84,13 +84,15 @@ def thesis_lifecycle() -> dict[str, dict]:
 
 
 def reading_ledgers() -> dict[str, dict]:
-    """讀圖 ledger（private）：`node → {"records": [...], "current": 現行那一筆或 None, "errors": [...]}`。
+    """讀圖 ledger（private）：`node → {"records": [...], "current": {unit: 現行那一筆}, "errors": [...]}`。
+
+    ⚠ `current` 以單位為鍵（v3，A1）：同一個節點的層讀圖與插槽讀圖各自是現行；沒有現行的單位不出現。
 
     目錄不存在就丟例外——「沒有讀圖」與「讀圖目錄沒掛載」是兩件事。"""
     from datetime import date
 
     from alpha.providers.structure_readings import STRUCTURE_READING_DIR, known_nodes, read_reading_records
-    from alpha.structure_reading.contracts import select_reading
+    from alpha.structure_reading.contracts import select_readings
 
     if not STRUCTURE_READING_DIR.is_dir():
         raise SourceUnavailable(f"{STRUCTURE_READING_DIR.relative_to(ROOT)} 不存在——讀圖 ledger 未掛載")
@@ -98,7 +100,7 @@ def reading_ledgers() -> dict[str, dict]:
     for node in known_nodes():
         records, errors = read_reading_records(node)
         out[node] = {"records": records, "errors": errors,
-                     "current": select_reading(records, today=date.today())}
+                     "current": select_readings(records, today=date.today())}
     return out
 
 

@@ -403,12 +403,12 @@ def check_expiry() -> AuditResult:
                 from alpha.providers.structure_readings import reread_reasons
 
                 node = str(watch.get("node") or "")
-                current = (readings.get(node) or {}).get("current") if node else None
-                reasons = reread_reasons(node, watches) if current is not None else []
+                current = ((readings.get(node) or {}).get("current") or {}) if node else {}
+                reasons = reread_reasons(node, watches) if current else []
                 if not any(ew.condition_label(watch.get("condition")) in reason for reason in reasons):
                     findings.append(
                         f"watch {wid}（讀圖反證「{_label(watch)}」）到期超過一天，節點 {node or '（沒寫 node）'}"
-                        f"{'' if current is not None else '沒有現行讀圖，'}的重讀理由裡沒有它——APP 與心跳都不會叫你重讀")
+                        f"{'' if current else '沒有現行讀圖，'}的重讀理由裡沒有它——APP 與心跳都不會叫你重讀")
             elif cls == "decision":
                 ref = f"{wid}@{watch.get('expires')}"
                 if ref not in decision_refs:
@@ -642,7 +642,7 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
         if watch.get("wake_reading") and waiting and ledgers is not None:
             examined += 1
             node = str(watch["wake_reading"])
-            if (ledgers.get(node) or {}).get("current") is None:
+            if not (ledgers.get(node) or {}).get("current"):
                 findings.append(f"watch {wid} 的 wake_reading 指向 {node}，那個節點沒有現行讀圖"
                                 "——醒了列進重讀也沒有畫面會顯示")
         if watch.get("kind") != ew.SEMANTIC_KIND:
@@ -693,7 +693,8 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
             entries = tuple(record.disproof or ())
             if not 1 <= index <= len(entries) or disproof.normalize(entries[index - 1].condition) != text:
                 findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在讀圖的 disproof[] 對不到它的條件")
-            current = (ledgers.get(node) or {}).get("current")
+            # 比的是**同一個單位**的現行那一份（v3：層與插槽各自現行；v1／v2 紀錄都是 layer）
+            current = ((ledgers.get(node) or {}).get("current") or {}).get(getattr(record, "unit", "layer"))
             if waiting and getattr(current, "reading_id", None) != reading_id:
                 findings.append(f"watch {wid}（「{label}」）還在等，來源讀圖 {reading_id} 卻不是 {node} 的現行讀圖"
                                 "——重讀後舊條件沒收")

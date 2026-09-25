@@ -59,13 +59,25 @@ def _structure(*, supply=("co:a", "co:b"), demand=("tech:cpo",), digest="d0", an
 #: v2（Phase 1 Step 1.5）：moat／volume 讀法必須寫下至少一條反證。
 DISPROOF = [{"condition": "任一需求側客戶在正式文件宣布改用不經這個節點的替代路徑並量產",
              "entities": ["co:sivers_semiconductors"], "check_frequency": "每季財報後",
-             "action_48h": "重讀這個節點並決定是否改寫讀法"}]
+             "action_48h": "重讀這個節點並決定是否改寫讀法", "source": "self"}]
+
+#: v3（Phase 2 Step 2.3）：moat／volume 兩半各一段引用；`QUOTES` 是「同一份快照」的逐字，append 時核對。
+DEMAND_QUOTE = "CPO switch 的每一個光引擎都需要外部 CW 雷射光源，沒有替代設計"
+SUPPLY_QUOTE = "我們出貨 CW DFB 雷射給多家 CPO 客戶，產能正在擴充中"
+CITATIONS = [
+    {"angle": "demand_side", "edge": ["tech:cpo", "depends_on", NODE], "quote": DEMAND_QUOTE, "source_id": "doc_demand"},
+    {"angle": "supply_side", "edge": ["co:a", "supplies_to", NODE], "quote": SUPPLY_QUOTE, "source_id": "doc_supply"},
+]
+QUOTES = {
+    ("tech:cpo", "depends_on", NODE): [{"quote": DEMAND_QUOTE, "doc": "doc_demand", "origin": "Someone Else"}],
+    ("co:a", "supplies_to", NODE): [{"quote": SUPPLY_QUOTE, "doc": "doc_supply", "origin": "A Corp"}],
+}
 
 
 def _record(**kw):
-    params = dict(node=NODE, structure=_structure(), kind="volume",
+    params = dict(node=NODE, structure=_structure(), kind="volume", unit="layer",
                   reading="供給側兩家的 substitutability 都是 2，沒有人明顯高於其他——需求側繞不過但供給端誰都不獨佔。",
-                  expires=LATER, created_at=NOW, author="test", disproof=DISPROOF)
+                  expires=LATER, created_at=NOW, author="test", disproof=DISPROOF, citations=CITATIONS)
     params.update(kw)
     return structure_reading_record(**params)
 
@@ -102,25 +114,25 @@ def test_a_reading_must_say_why() -> None:
 
 def test_append_only_rules(tmp_path: Path) -> None:
     record = _record()
-    append_reading_record(record, directory=tmp_path)
+    append_reading_record(record, directory=tmp_path, quotes=QUOTES)
     with pytest.raises(ContractViolation, match="已在 ledger"):
-        append_reading_record(record, directory=tmp_path)
+        append_reading_record(record, directory=tmp_path, quotes=QUOTES)
     with pytest.raises(ContractViolation, match="supersedes_id"):
-        append_reading_record(_record(kind="moat", supersedes_id="sr_nonexistent"), directory=tmp_path)
+        append_reading_record(_record(kind="moat", supersedes_id="sr_nonexistent"), directory=tmp_path, quotes=QUOTES)
 
 
 def test_retraction_removes_the_current_reading(tmp_path: Path) -> None:
     first = _record()
-    append_reading_record(first, directory=tmp_path)
+    append_reading_record(first, directory=tmp_path, quotes=QUOTES)
     append_reading_record(_record(created_at=NOW + timedelta(hours=1), retracted=True,
                                   supersedes_id=first["reading_id"]), directory=tmp_path)
     records, errors = read_reading_records(NODE, directory=tmp_path)
     assert len(records) == 2 and not errors, "撤回是 append 一筆，舊行永不改寫（L10）"
-    assert select_reading(records, today=TODAY) is None
+    assert select_reading(records, unit="layer", today=TODAY) is None
 
 
 def test_broken_lines_are_reported_not_silently_dropped(tmp_path: Path) -> None:
-    append_reading_record(_record(), directory=tmp_path)
+    append_reading_record(_record(), directory=tmp_path, quotes=QUOTES)
     with ledger_path(NODE, directory=tmp_path).open("a", encoding="utf-8") as handle:
         handle.write('{"node": "x", "kind": "volume"}\n')
     records, errors = read_reading_records(NODE, directory=tmp_path)
@@ -134,7 +146,7 @@ def test_node_id_is_safe_as_a_filename() -> None:
 
 
 def test_known_nodes_reads_the_real_node_not_the_slug(tmp_path: Path) -> None:
-    append_reading_record(_record(), directory=tmp_path)
+    append_reading_record(_record(), directory=tmp_path, quotes=QUOTES)
     assert known_nodes(directory=tmp_path) == [NODE], "檔名是 slug，node 要從內容讀回來"
 
 

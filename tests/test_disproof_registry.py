@@ -30,7 +30,15 @@ SIVERS = "co:sivers_semiconductors"
 NOW = datetime(2026, 9, 24, 8, 0, tzinfo=timezone.utc)
 LATER = date(2026, 12, 31)
 DISPROOF = [{"condition": "任一需求側客戶在正式文件宣布改用不經這個節點的替代路徑並量產",
-             "entities": [SIVERS], "check_frequency": "每季財報後", "action_48h": "重讀這個節點並決定是否改寫"}]
+             "entities": [SIVERS], "check_frequency": "每季財報後", "action_48h": "重讀這個節點並決定是否改寫",
+             "source": "self"}]
+#: v3（Phase 2 Step 2.3）：volume 要兩半各一段引用（契約層只驗形狀；本檔不寫 ledger，不需要逐字核對）。
+CITATIONS = [
+    {"angle": "demand_side", "edge": ["co:nvidia", "USES", "tech:cw_dfb_laser"],
+     "quote": "每一個 CPO 光引擎都需要外部 CW 雷射光源才能運作", "source_id": "doc_demand"},
+    {"angle": "supply_side", "edge": [SIVERS, "supplies_to", "tech:cw_dfb_laser"],
+     "quote": "Sivers 出貨 CW DFB 雷射陣列給 CPO 客戶並擴充產能", "source_id": "doc_supply"},
+]
 
 
 def _structure(customers=("co:nvidia",)):
@@ -40,9 +48,9 @@ def _structure(customers=("co:nvidia",)):
 
 
 def _reading(**kw):
-    params = dict(node="tech:cw_dfb_laser", structure=_structure(), kind="volume",
+    params = dict(node="tech:cw_dfb_laser", structure=_structure(), kind="volume", unit="layer",
                   reading="供給側大家差不多，賭的是產能一時補不上——需求側繞不過。", expires=LATER,
-                  created_at=NOW, author="test", disproof=DISPROOF)
+                  created_at=NOW, author="test", disproof=DISPROOF, citations=CITATIONS)
     params.update(kw)
     return structure_reading_record(**params)
 

@@ -38,6 +38,13 @@ STRUCTURE_READINGS_THIS_IS_NOT: tuple[str, ...] = (
 )
 
 
+def _row_label(row: Mapping[str, Any]) -> str:
+    """一列的名字：層讀圖只寫節點（v1／v2 的舊樣子不變），插槽讀圖加單位——同一節點兩種單位要分得開（v3）。"""
+    node = str(row.get("node"))
+    unit = row.get("unit")
+    return node if unit in (None, "layer") else f"{node}［{unit}］"
+
+
 def build_structure_readings_artifact(
     *, rows: Sequence[Mapping[str, Any]], parse_errors: Sequence[str] = (),
     generated_at: datetime | None = None, as_of: date | None = None,
@@ -66,11 +73,11 @@ def build_structure_readings_artifact(
         "counts": counts,
         "rows": list(rows),
         # producer 必須指得出 consumer（INV-4）：這個數字就是 pq1 那一段的長度。
-        "needs_reread": {"n": len(needs), "nodes": [str(r.get("node")) for r in needs],
+        "needs_reread": {"n": len(needs), "nodes": [_row_label(r) for r in needs],
                          "segment": "stale_structure_readings",
                          "consumer": "research-drain：重跑 python -m query.structure <node> 後改寫讀圖紀錄"},
         "disproof_triggers": {"n": len(triggers),
-                              "nodes": [str(r.get("node")) for r in triggers],
+                              "nodes": [_row_label(r) for r in triggers],
                               "note": "供給側多一家／反向路徑變動本來就是量的賭注的 disproof 條件（§6b ④）。"
                                       "**這裡只標記**——thesis mutation 是四個人工 gate 之一，不自動寫。"},
         "parse_errors": list(parse_errors),
