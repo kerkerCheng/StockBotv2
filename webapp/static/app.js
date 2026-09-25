@@ -993,6 +993,9 @@ async function renderDetail(ticker) {
   app.appendChild(briefCard(payload, view));
   app.appendChild(numbersStrip(view));
   app.appendChild(argumentCard(view));
+  // Phase 2 Step 2.7：讀圖面板（選配）緊接在論證之後——論證講這條鏈怎麼走，讀圖講鏈上那一層現在還是不是當初讀的樣子。
+  const readings = readingsCard(view);
+  if (readings) app.appendChild(readings);
   const audit = el('section', 'panel');
   audit.appendChild(drill('稽核：每一格的來源、狀態、算式與警告（給查核用，不是給你讀的）', () => {
     const box = el('div', 'why-box');
@@ -1926,6 +1929,99 @@ async function renderGraphWalk() {
   window.scrollTo(0, 0);
 }
 
+/* ---------- 讀圖（structure_readings state）與個股頁的讀圖面板（Phase 2 Step 2.7） ----------
+   讀圖是研究判斷（A3）：這裡照抄 ledger 寫下的判讀、單位、引文與反證，加上 materialize 當下與圖比對的**狀態**。
+   不排序、不打分：列序是（節點, 單位）字典序；沒有讀圖的節點不列——那是走圖第 1 型的事。 */
+
+const READING_STATUS_TEXT = {
+  current: '現行', stale: '跟圖不一致（該重讀）', stale_low: '只有證據等級變了（不必重讀）', expired: '過期（該重讀）',
+};
+
+function readingsCard(view) {
+  const panel = view.readings;
+  if (!panel) return null;
+  const node = panelShell(panel, '讀圖：它坐的那一層結構變了沒');
+  const hint = plainPanel('readings', panel.title).hint;
+  if (hint) node.appendChild(mdParagraph(hint));
+  if (!(panel.lines || []).length) {
+    node.appendChild(el('p', 'note', panel.reason || '還沒有讀圖'));
+    return node;
+  }
+  node.appendChild(renderRows(panel.lines));
+  const seats = (panel.context || {}).seats || [];
+  if (seats.length) node.appendChild(el('p', 'note', '圖上它供貨或開發的節點：' + seats.join('、')));
+  node.appendChild(el('p', 'note', '完整的引文與反證在「讀圖」頁（#/structure-readings）。'));
+  return node;
+}
+
+function readingRow(row) {
+  const li = el('li');
+  const head = el('div');
+  head.appendChild(el('code', null, row.node));
+  head.appendChild(el('span', 'dim', `　${row.unit === 'socket' ? '插槽' : '層'}｜${row.kind || '—'}｜`
+    + (READING_STATUS_TEXT[row.status] || '這次沒比對到圖（不是現行）')));
+  li.appendChild(head);
+  li.appendChild(el('span', 'rule', `讀於 ${row.read_on || '—'}｜到期 ${row.expires || '—'}｜${row.reading_id || ''}`
+    + ((row.tickers || []).length ? '｜' + row.tickers.join('、') : '')));
+  if (row.reason) li.appendChild(el('span', 'rule', '狀態理由：' + row.reason));
+  (row.reread_reasons || []).forEach((r) => li.appendChild(el('span', 'rule', '重讀理由：' + r)));
+  if (row.reading) li.appendChild(el('p', 'note', row.reading));
+  (row.citations || []).forEach((c) => {
+    const quote = el('div', 'verbatim', c.quote);
+    quote.appendChild(el('div', 'src', `${c.angle}｜${(c.edge || []).join(' ')}｜${c.source_id}`
+      + (c.independent ? '｜外部印證' : '')));
+    li.appendChild(quote);
+  });
+  (row.disproof || []).forEach((d) => {
+    li.appendChild(el('span', 'rule', `反證／確認條件：${d.condition}（出處 ${d.source || '—'}｜`
+      + `${d.watch_id ? 'watch ' + d.watch_id + '（' + (d.watch_status || '?') + '）' : '沒有登記 watch'}）`));
+  });
+  return li;
+}
+
+async function renderStructureReadings() {
+  markNav('structure-readings');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/structure-readings`);
+  } catch (err) {
+    renderStateError(err, '讀不到讀圖');
+    return;
+  }
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  app.appendChild(head);
+
+  const c = payload.counts || {};
+  const rows = (payload.rows || []).filter((r) => r.reading_id);
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('h2', null, `現行讀圖 ${rows.length} 份（層 ${rows.filter((r) => r.unit !== 'socket').length}`
+    + `／插槽 ${rows.filter((r) => r.unit === 'socket').length}）`));
+  sec0.appendChild(kpiRow([
+    { label: '現行', value: String(c.current || 0), sub: '與圖一致、未到期' },
+    { label: '該重讀', value: String((payload.needs_reread || {}).n || 0), sub: '跟圖不一致、過期或被叫醒', cls: 'hero' },
+    { label: '只有證據等級變', value: String(c.stale_low || 0), sub: '記錄，不必重讀' },
+    { label: '過期', value: String(c.expired || 0), sub: '到期未重讀' },
+  ]));
+  app.appendChild(sec0);
+
+  const sec1 = el('section', 'panel');
+  sec1.appendChild(el('h2', null, '每一份讀圖（節點 × 單位；依節點字典序，不是名次）'));
+  const list = el('ul', 'weak');
+  rows.forEach((row) => list.appendChild(readingRow(row)));
+  sec1.appendChild(list);
+  const withdrawn = (payload.rows || []).filter((r) => !r.reading_id);
+  if (withdrawn.length) {
+    sec1.appendChild(el('p', 'note', '有紀錄但已全部撤回：' + withdrawn.map((r) => `${r.node}（${r.unit || '全部單位'}）`).join('、')));
+  }
+  app.appendChild(sec1);
+
+  app.appendChild(stateFooter(payload, '讀圖頁不是什麼'));
+  window.scrollTo(0, 0);
+}
+
 function watchRow(row, labels) {
   const li = el('li');
   const head = el('div');
@@ -2379,6 +2475,7 @@ async function route() {
     else if (target === 'beta') await renderBeta();
     // ⚠ 2026-09-26（Step 2.6）：`#/coverage`（研究缺口）→ `#/graph-walk`（走圖九型）。
     else if (target === 'graph-walk') await renderGraphWalk();
+    else if (target === 'structure-readings') await renderStructureReadings();
     else if (target === 'watches') await renderWatches();
     else if (target === 'positions') await renderPositions();
     else if (target) await renderDetail(target);

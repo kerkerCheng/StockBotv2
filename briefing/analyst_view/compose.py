@@ -323,6 +323,63 @@ def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
     )
 
 
+#: 讀圖狀態 → 這一格的 Datum status（宣告好的查表，不是新判斷）。`stale_low`（只有證據等級變）不要人重看；
+#: `stale`（圖變了、可能翻 A/B）＝依據有 material change → review_required；`expired`＝時間到期 → stale。
+#: 讀不到比對結果（None）不得印成現行（L13-2）→ review_required。
+_READING_DATUM_STATUS: Mapping[str | None, str] = {
+    "current": "available", "stale_low": "available", "stale": "review_required", "expired": "stale",
+    None: "review_required",
+}
+
+
+def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
+    """讀圖（optional，Phase 2 Step 2.7）：這家公司坐的層與插槽的現行讀圖，**每一份印狀態**。
+
+    `readings` 由 materialize 組好（圖推這家公司 `supplies_to`／`develops` 到的節點 → 那些節點的現行讀圖；
+    INV-1：由 `co:*` 推，不靠讀圖紀錄裡的 ticker）。標籤（判讀、單位、狀態的中文）由那一端從讀圖字彙附上——
+    本層**一個字都不造**，也不 import 讀圖模組（import 白名單）。
+    缺席分型由產生缺席的那一端宣告（L16）：`not_yet_recorded`＝坐的層與插槽都還沒有讀圖；
+    `upstream_unavailable`＝這次沒讀到圖或 ledger。兩者不得壓成同一句。
+    """
+    title = "讀圖：它坐的那一層結構變了沒（optional）"
+    base = dict(key="readings", title=title, questions=(), optional=True, source_sections=("structure_readings",))
+    notes = ("讀圖是研究判斷（A3）：不 gate、不排序、不給尺寸；判讀由寫的人宣告，本層照抄。",
+             "狀態只回答「讀圖跟圖還一不一致」，不回答「讀圖對不對」——對不對要靠 outcome 量測。")
+    if readings is None:
+        readings = {"absence": {"kind": "upstream_unavailable",
+                                "reason": "這次 materialize 沒有給讀圖輸入（沒讀到圖或讀圖 ledger）"}}
+    absence = readings.get("absence")
+    seats = list(readings.get("seats") or ())
+    rows = list(readings.get("readings") or ())
+    if absence or not rows:
+        kind = (absence or {}).get("kind") or "not_yet_recorded"
+        reason = ((absence or {}).get("reason")
+                  or ("這家公司坐的層與插槽都還沒有讀圖（圖上它供貨或開發的節點："
+                      + ("、".join(seats) if seats else "無") + "）"))
+        return AnalystPanel(**base, status="missing", source_statuses={"structure_readings": "missing"},
+                            source_absence_kinds={"structure_readings": kind}, notes=notes,
+                            context={"available": False, "seats": seats}, reason=reason)
+    lines = []
+    for row in rows:
+        status = _READING_DATUM_STATUS.get(row.get("status"), "review_required")
+        datum = Datum(
+            key=f"reading:{row['node']}:{row.get('unit')}", label=f"{row['node']}（{row.get('unit_label')}）",
+            value=f"{row.get('kind_label')}｜{row.get('status_label')}", status=status, basis="session_judgment",
+            authority="alpha://structure_reading", method="讀圖 ledger（研究 session 寫；append-only）＋ 與現在的圖確定性比對",
+            reason=row.get("reason"),
+            dependencies={"reading_id": row.get("reading_id"), "unit": row.get("unit"), "kind": row.get("kind"),
+                          "status": row.get("status"), "read_on": row.get("read_on"), "expires": row.get("expires"),
+                          "reading": row.get("reading"), "needs_reread": row.get("needs_reread")},
+        )
+        lines.append(_line(datum.key, datum.label, datum, "reading"))
+    status = worst_status([line.datum.status for line in lines])
+    return AnalystPanel(**base, status=status, source_statuses={"structure_readings": status},
+                        source_absence_kinds={"structure_readings": None}, lines=tuple(lines), notes=notes,
+                        context={"available": True, "seats": seats,
+                                 "optional_rule": "沒有讀圖只表示「還沒讀」，不代表這檔研究不完整；本面板不改 readiness"},
+                        reason=None)
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`_downside_panel` 退役（E 組）。**
 # 「判斷錯了值多少」原本是四個價格。反證那一端沒有退役——它在 `research` 面板的 disproofs，
 # 而 Phase 3 會讓每條反證連到一個 watch。
@@ -421,8 +478,12 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     return tuple(dict.fromkeys(everything))
 
 
-def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
-    """把 canonical read model 投影成 analyst 判讀畫面。純函式、確定性、可預先 materialize。"""
+def build_analyst_view(view: AlphaInvestmentView, *, readings: Mapping[str, Any] | None = None) -> AnalystView:
+    """把 canonical read model 投影成 analyst 判讀畫面。純函式、確定性、可預先 materialize。
+
+    `readings`（Phase 2 Step 2.7）：讀圖面板的輸入，由 materialize 組好；沒給＝這次沒讀到（`upstream_unavailable`），
+    不是「沒有讀圖」。
+    """
     panels = {
         "headline": _headline_panel(view),
         "fundamental": _fundamental_panel(view),
@@ -431,6 +492,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         "wipeout": _wipeout_panel(view),
         "brief": _brief_panel(view),
         "argument": _argument_panel(view),
+        "readings": _readings_panel(readings),
     }
     rs = view.refresh_status
     ident = view.identity
@@ -442,7 +504,7 @@ def build_analyst_view(view: AlphaInvestmentView) -> AnalystView:
         headline=panels["headline"], fundamental=panels["fundamental"],
         research=panels["research"], bet=panels["bet"],
         wipeout=panels["wipeout"], brief=panels["brief"],
-        argument=panels["argument"],
+        argument=panels["argument"], readings=panels["readings"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),
                                change_detection=rs.change_detection,

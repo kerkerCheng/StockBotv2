@@ -179,8 +179,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ✅（R2-b CONDITIONAL_GO → B1 已修） | 便宜 | `cb6c612`＋R2-b 處置 |
 | 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ✅（R2-b CONDITIONAL_GO → B1 已修；non-blocking 處置見 R2-b 處置 commit） | 便宜 | `12dbc8c`＋`f1fe714`（R2-b 處置）＋`6053c25`（2.1 補） |
 | 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ✅（插槽讀圖 2 份、層讀圖 2 份重讀成 v3；工具毛病三個當下修＝偏差 #7–#9；pq2 [651]、[652]） | **強模型** | `c9390b9`＋`647245d`／`4ab71d4`／`974e2c9`／`c0db0a1`／`eb2a7ce`（[651]–[654] 與衝突決策收據；ledger 不在 git；收據＝[`2026-09-25-phase2-step25-readings.md`](../reports/2026-09-25-phase2-step25-readings.md)） |
-| 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ✅（九型重現 §0.2 基準；母體 ≥10 的型別皆 <50%；偏差 #11–#15） | 便宜 | 見 2.7 列補填 |
-| 2.7 | 讀圖頁 ＋ 個股頁讀圖面板（選配） | ○ | 便宜 | |
+| 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ✅（九型重現 §0.2 基準；母體 ≥10 的型別皆 <50%；偏差 #11–#15） | 便宜 | `be7a85e` |
+| 2.7 | 讀圖頁 ＋ 個股頁讀圖面板（選配） | ✅（核心面板文字 digest 前後逐字相同、readiness 73／73 相同；有讀圖面板內容的個股頁 10 檔；併做 §14 #13、#22；偏差 #16–#17） | 便宜 | 見 2.8 列補填 |
 | 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ○ | 便宜 | |
 | 2.9a | `pending --trigger` 必帶到期或綁 watch | ○ | 便宜 | |
 | 2.9b | 追源排回不寫假 triage、缺分類有人接 | ○ | 便宜 | |
@@ -215,6 +215,8 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | 13 | 2.6 | §7 表第 7／8／9 型的母體寫「coverage 既有定義」「`duplicate_nodes` 既有定義」（沒有數） | 第 7 型母體＝非概念的 tech／mat 節點（**129**；prod: 0 家是抽取副產品，只計數）；第 8 型＝非概念的 tech／mat／prod（**181**）；第 9 型＝`duplicate_nodes` 掃描的非公司實體節點（**188**），命中＝`unmentioned` 候選對（每對一筆——**命中與母體單位不同**，已在 `scope_rule`／`hit_rule` 寫明） | coverage 本身沒有「母體」概念；取「這一題對誰問得出來」。三型命中率 7%／6%／12%，都遠低於 50%，母體取法不影響判定 |
 | 14 | 2.6 | §0 第 7 條「沒有跨型別的數字合成」 | 佇列段 `graph_holes` 的計數＝九型命中筆數之和（60），**只**出現在 `observe()`／稽核 `QueueSegments` 那一行，用來回答「這一段有沒有工作」（INV-4）；心跳、APP、`query.graph_walk` 輸出一律九格各自印、沒有加總欄位（測試 `test_there_is_no_cross_type_number_anywhere_in_the_result`、`test_graph_walk_artifact_copies_every_type_and_adds_no_total` 守） | 佇列段必須有一個數才分得出「有工作／沒工作／未讀到」；它不是分數、不排序。請 R2 看這一條要不要改成「段計數＝有命中的型別數」 |
 | 15 | 2.6 | （未預期） | ①`tests/test_migrate_relation_rejudge_additions.py` 兩條測試在 HEAD 就是紅的：夾具拷真實抽取檔，而 [654] 入圖（`4ab71d4`）後那條 `develops` 邊已在檔內——夾具改成還原入圖前的形狀（只動測試，L17 當下修）；②`webapp/store.py`／`contracts.py` 的「請跑 materialize --{kind}」提示印底線（`--graph_walk`、`--structure_table`，貼了會失敗）——改印連字號（全部 kind 一起修）；③心跳重讀理由帶單位（§14 #14，原排 2.6） | ①不是本 Step 造成，但全套測試要綠才能判 GO；②第一次真跑心跳就撞到（L13）；③plan 本來就排在 2.6 |
+| 16 | 2.7 | §8「個股頁 `readings` 面板：由圖推這家公司…連到的節點 → 那些節點的現行讀圖」（沒說輸入從哪進 compose） | `briefing/analyst_view/compose.py::build_analyst_view(view, *, readings=None)` 多一個注入參數；輸入由 `webapp/materialize.py::readings_context()`（一次載圖＋讀圖 ledger）與 `readings_input_for()` 組好，**判讀／單位／狀態的中文標籤在那一端附上**，compose 只照抄。`tests/test_analyst_view.py` 兩條「panel 狀態／理由必須抄自 read model 某一段」的測試把 `readings` 列為 `INJECTED_PANELS` 例外，另加三條專屬測試守「照抄注入的輸入」 | compose 的 import 白名單（`test_module_import_allowlists_keep_the_layer_presentation_independent`）不准碰讀圖模組，read model（`AlphaInvestmentView`）也沒有讀圖 section；把讀圖塞進 read model 是動 A3／read model 的邊界，比注入一份輸入大得多 |
+| 17 | 2.7 | §14 #22「寫入端要從同一次快照查詢拿到製造者」 | 製造者從 `verify_citations` 收到的 `quotes` 鍵（同一次唯讀 transaction 的逐字）裡取 `develops → 這個節點` 的邊；**不改快照格式**（快照進 reading_id，改它會動 id） | 一條 develops 邊若沒有逐字，那家會被當成供應商而被排除——方向是更嚴、不放寬；全圖 canonical 邊 100% 有逐字（§0.2） |
 
 ---
 
@@ -490,7 +492,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
     延伸、**未定**：「客戶高管在供應商新聞稿裡具名」（`classify_evidence` 給 `counterparty_joint`，例：Sivers ECOC 2024 新聞稿內含 Ayar CTO 具名）
     算不算插槽護城河要的客戶端印證——寫入端目前當成供應商自己（origin 解析到供應商）。這是契約問題，要使用者決定。
 13. **讀圖 artifact 的 `needs_reread.nodes` 對插槽列放 `prod:x［socket］` 標籤**（R2-b N2）：research-drain 叫人拿它直接跑 `--check` 會找不到；
-    **併進 Step 2.7**（讀圖頁）：payload 多結構化的 `{node, unit}`，skill 寫上 `--unit`。
+    **併進 Step 2.7**（讀圖頁）：payload 多結構化的 `{node, unit}`，skill 寫上 `--unit`。 **2.7 已做**：`needs_reread.items`／`disproof_triggers.items` 是 `{node, unit}`；research-drain 的走圖第 4 型已寫 `--unit <unit> --check`（2.6）。
 14. **心跳重讀理由那一行不帶單位**（R2-b N6）：**併進 Step 2.6**（心跳段 2 讀圖行本來就要加單位拆分）。 **2.6 已做**（`crons/heartbeat.py`：「`prod:x`（插槽）該重讀：…」，測試 `test_reading_line_splits_by_unit_and_reread_reasons_carry_the_unit`）。
 15. **插槽的客戶重讀 watch 登記 0**（2.5 發現）：`demand_side_customers()` 只收需求側的 `co:*`；SuperNova 的需求側是 `prod:teraphy_chiplet`、
     ELS 的是 `tech:cpo`，所以 Ayar／O-Net 出新文件叫不醒這兩格。插槽的客戶其實是**製造者**（`develops`）——等 [651] 入圖後，
@@ -514,3 +516,4 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
     插槽視角的「客戶端原文」與寫入端的 `independent`（偏差 #9）目前都排除「任何一家 `supplies_to`」，會把 O-Net 自己的一手也排除——
     兩處都應改成「`supplies_to` 的公司扣掉 `develops` 的公司」；寫入端要從同一次快照查詢拿到製造者。觸發條件＝[654] apply——**已成立（2026-09-25）**。
     十行內、不動契約（L17：當下修），可在 2.6 之前或併進 2.7 做；它改的是插槽視角與寫入端規則，不動 digest。
+    **2.7 已做**（偏差 #17）：插槽視角的 `suppliers` 扣掉 `develops` 的公司；寫入端從同一次查詢的逐字鍵取製造者。真實資料 0 筆變動（ELS 唯一來源仍是另一家供應商 Enablence；O-Net 沒有一手、且 origin 解析不到＝#20）。

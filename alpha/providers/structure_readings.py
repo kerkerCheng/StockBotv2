@@ -86,7 +86,11 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
     # plan 待決 #12，Step 2.5 定案）。實測：`prod:els_8ch_module` 用同插槽另一家供應商 Enablence 發的聯合新聞稿
     # 標 independent，舊規則（只排除那條邊的主詞）放行了一份 Sivers 的插槽護城河——聯合公告方與它利益一致，不是客戶。
     # 層讀圖不變：一層的其他供應商是競爭者，不是聯合公告方。
-    socket_suppliers = ({str(row[0]) for row in parsed.angles.get("supply_side", ())}
+    # ⚠ 扣掉**製造者**（對這個產品有 `develops` 的公司；plan 待決 #22）：製造者是插槽那一格的客戶，它的一手
+    # 就是客戶端原文。製造者從**同一次查詢的逐字鍵**取（`develops` 不在五個角度、快照裡沒有）——
+    # 一條 develops 邊若沒有逐字，那家會被當成供應商而被排除：方向是更嚴，不會放寬。
+    makers = {str(k[0]) for k in quotes if len(k) == 3 and k[1] == "develops" and k[2] == parsed.node}
+    socket_suppliers = ({str(row[0]) for row in parsed.angles.get("supply_side", ())} - makers
                         if parsed.unit == "socket" else set())
     for index, citation in enumerate(parsed.citations, 1):
         edge = tuple(citation.edge)
@@ -344,6 +348,18 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
         for unit, reading in current.items():
             status = reading_status(reading, view.as_dict(), today=today)
             by_graph = needs_reread(status)
+            # 讀圖頁要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（Step 2.7；L18：標籤指得回原始證據）。
+            # watch 以 `reading:<id>#<序>` 指回（`register_reading_watches` 的鍵）；沒登記到就是 None，照實印。
+            by_ref = {str(w.get("source_ref")): w for w in watches if str(w.get("source_ref") or "").startswith("reading:")}
+            disproof = []
+            for index, entry in enumerate(reading.disproof, 1):
+                watch = by_ref.get(f"reading:{reading.reading_id}#{index}") or {}
+                disproof.append({"condition": entry.condition, "entities": list(entry.entities),
+                                 "check_frequency": entry.check_frequency, "action_48h": entry.action_48h,
+                                 "source": entry.source, "watch_id": watch.get("watch_id"),
+                                 "watch_status": watch.get("status")})
+            citations = [{"angle": c.angle, "edge": list(c.edge), "quote": c.quote, "source_id": c.source_id,
+                          "independent": c.independent} for c in reading.citations]
             rows.append({
                 "node": node,
                 "unit": unit,
@@ -357,6 +373,8 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
                 "needs_reread": by_graph or bool(watch_reasons),
                 "needs_reread_by_graph": by_graph,
                 "reread_reasons": watch_reasons,
+                "citations": citations,
+                "disproof": disproof,
             })
     return rows, parse_errors
 

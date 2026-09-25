@@ -277,6 +277,41 @@ def test_independent_on_a_socket_excludes_every_supplier_of_that_socket(tmp_path
     append_reading_record(layer, directory=tmp_path, quotes=quotes)   # 層：另一家供應商是競爭者，不是聯合公告方
 
 
+def test_a_maker_that_also_supplies_the_socket_is_the_customer_not_a_supplier(tmp_path) -> None:
+    """plan 待決 #22（[654] 入圖後成立）：O-Net 對 ELS 同時 supplies_to（賣模組）與 develops（整合者）——
+    它是雷射那一格的客戶。製造者由同一次查詢的逐字鍵（develops 邊）得知；沒有那條逐字就照舊排除（更嚴，不放寬）。"""
+    from alpha.providers.structure_readings import append_reading_record
+
+    structure = _structure(SOCKET)
+    structure["angles"]["supply_side"].append(
+        {"src": "co:ayar_labs", "relation": "supplies_to", "dst": SOCKET, "substitutability": None,
+         "sole_source": None, "qualification_status": None, "evidence": "self_reported", "documents": 1})
+    cites = [_cite("demand_side", DEMAND_Q, "doc_demand", SOCKET),
+             _cite("supply_side", CUSTOMER_Q, "doc_customer", SOCKET, independent=True)]
+    socket = _v3(kind="moat", structure=structure, citations=cites)
+
+    without_maker = _quotes(SOCKET)
+    with pytest.raises(ContractViolation, match="另一家供應商"):
+        append_reading_record(socket, directory=tmp_path, quotes=without_maker)
+    with_maker = dict(without_maker)
+    with_maker[("co:ayar_labs", "develops", SOCKET)] = [
+        {"quote": "Ayar Labs develops the SuperNova light source", "doc": "doc_customer", "origin": "Ayar Labs"}]
+    append_reading_record(socket, directory=tmp_path, quotes=with_maker)
+
+
+def test_socket_view_counts_the_makers_own_quotes_as_customer_side() -> None:
+    from identity.registry import get_registry
+    from query.structure import build_socket_view
+
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("co:ayar_labs", "supplies_to", SOCKET),
+                        _row("co:ayar_labs", "develops", SOCKET)])
+    quotes = {(SIVERS, "supplies_to", SOCKET): [
+        {"quote": CUSTOMER_Q, "doc": "ayar_pr", "tier": 1, "origin": "Ayar Labs"}]}
+    view = build_socket_view(SOCKET, edges, quotes, registry=get_registry())
+    assert [q["company"] for q in view.customer_quotes] == ["co:ayar_labs"]
+    assert view.makers[0]["also_supplies"] is True and view.makers[0]["label"] == "製造者（不是零件供應商）"
+
+
 def test_disproof_source_must_be_an_existing_reading_of_this_node(tmp_path) -> None:
     from alpha.providers.structure_readings import append_reading_record
 
@@ -467,3 +502,68 @@ def test_a_fully_retracted_unit_still_gets_a_row_when_the_other_unit_is_current(
     by_unit = {row["unit"]: row for row in payload["rows"]}
     assert set(by_unit) == {"layer", "socket"}
     assert by_unit["socket"]["reading_id"] is None and "撤回" in by_unit["socket"]["reason"]
+
+
+# ---------------------------------------------------------------------------
+# Step 2.7：讀圖頁與個股頁讀圖面板的輸入
+# ---------------------------------------------------------------------------
+
+def test_reading_rows_carry_citations_and_each_disproof_points_at_its_watch(tmp_path, monkeypatch) -> None:
+    """讀圖頁要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（L18）；沒登記到就是 None，照實印。"""
+    import query.structure as qs
+    from alpha.providers import structure_readings as sr
+
+    monkeypatch.setattr(sr, "STRUCTURE_READING_DIR", tmp_path / "ledger")
+    record = _v3(SOCKET, citations=_two_halves(SOCKET), disproof=_disproof())
+    sr.append_reading_record(record, quotes=_quotes(SOCKET))
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("prod:teraphy_chiplet", "depends_on", SOCKET)])
+    watch = {"watch_id": "ew_9", "status": "active", "source_ref": f"reading:{record['reading_id']}#1"}
+    rows, errors = sr.reading_status_rows(edges, today=TODAY, watches=[watch])
+    assert not errors and len(rows) == 1
+    row = rows[0]
+    assert [c["source_id"] for c in row["citations"]] == ["doc_demand", "doc_supply"]
+    assert row["disproof"][0]["watch_id"] == "ew_9" and row["disproof"][0]["source"] == "self"
+    unregistered, _ = sr.reading_status_rows(edges, today=TODAY, watches=[])
+    assert unregistered[0]["disproof"][0]["watch_id"] is None
+
+
+def test_readings_input_is_sliced_by_the_company_seats_from_the_graph_not_by_ticker() -> None:
+    """INV-1：由 `co:*` 在圖上 supplies_to／develops 的節點推，不靠讀圖紀錄裡的 ticker。"""
+    from webapp.materialize import readings_input_for
+
+    context = {"seats": {SIVERS: [SOCKET, LAYER]},
+               "by_node": {SOCKET: [{"node": SOCKET, "unit": "socket"}], "mat:other": [{"node": "mat:other"}]}}
+    sliced = readings_input_for(context, SIVERS)
+    assert sliced["seats"] == [SOCKET, LAYER] and [r["node"] for r in sliced["readings"]] == [SOCKET]
+    assert readings_input_for(context, "co:nobody") == {"seats": [], "readings": []}
+    assert readings_input_for(context, None)["absence"]["kind"] == "upstream_unavailable"
+    down = {"absence": {"kind": "upstream_unavailable", "reason": "讀不到圖"}}
+    assert readings_input_for(down, SIVERS) == down
+
+
+def test_readings_context_says_unavailable_instead_of_empty_when_the_graph_is_down(monkeypatch) -> None:
+    import query.structure as qs
+    from webapp.materialize import readings_context
+
+    def boom():
+        raise RuntimeError("neo4j down")
+
+    monkeypatch.setattr(qs, "_load_edges", boom)
+    context = readings_context(today=TODAY)
+    assert context["absence"]["kind"] == "upstream_unavailable" and "seats" not in context
+
+
+def test_readings_context_seats_are_supplies_and_develops_to_non_company_nodes(tmp_path, monkeypatch) -> None:
+    import query.structure as qs
+    from alpha.providers import structure_readings as sr
+    from webapp.materialize import readings_context
+
+    monkeypatch.setattr(sr, "STRUCTURE_READING_DIR", tmp_path / "ledger")
+    sr.append_reading_record(_v3(SOCKET), quotes=_quotes(SOCKET))
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("co:ayar_labs", "develops", SOCKET),
+                        _row(SIVERS, "supplies_to", "co:ayar_labs"), _row("prod:teraphy_chiplet", "depends_on", SOCKET)])
+    monkeypatch.setattr(qs, "_load_edges", lambda: edges)
+    context = readings_context(today=TODAY)
+    assert context["seats"] == {SIVERS: [SOCKET], "co:ayar_labs": [SOCKET]}   # 公司對公司的邊不算「坐在」
+    row = context["by_node"][SOCKET][0]
+    assert row["unit_label"] == "插槽" and row["kind_label"].startswith("B：") and row["status_label"]

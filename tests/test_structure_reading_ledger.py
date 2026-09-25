@@ -250,6 +250,9 @@ def test_artifact_counts_every_status_and_points_at_its_consumer() -> None:
     payload = build_structure_readings_artifact(rows=rows)
     assert payload["counts"] == {"current": 1, "stale": 1, "stale_low": 0, "expired": 0, "unknown": 0}
     assert payload["needs_reread"]["n"] == 1 and payload["needs_reread"]["nodes"] == ["b"]
+    # plan 待決 #13（Step 2.7）：給命令用的結構化 {node, unit}——標籤帶［socket］，拿標籤跑 --check 會找不到。
+    assert payload["needs_reread"]["items"] == [{"node": "b", "unit": None}]
+    assert payload["disproof_triggers"]["items"] == [{"node": "b", "unit": None}]
     # Step 2.6：圖那一側住 `graph_holes`（走圖第 4 型）、watch 那一側住 `fired_reading_reread`——兩段都得指得出來。
     assert "graph_holes" in payload["needs_reread"]["segment"]
     assert "fired_reading_reread" in payload["needs_reread"]["segment"]

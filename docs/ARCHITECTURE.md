@@ -454,6 +454,8 @@ AnalystView ── headline   （現在多少錢：只有現價｜refresh／revi
 `readiness` ∈ `ready`／`ready_with_flags`／`blocked`，**只看核心四段**，判準逐字寫在 `readiness.rule`。
 **optional panel 不參與**——`tests/test_analyst_view.py` 逐欄比對「有判準 vs 沒判準」兩份投影的 readiness。
 
+**`readings` panel（2026-09-26 Phase 2 Step 2.7；optional）：** 這家公司坐的層與插槽的現行讀圖，每一份印判讀、單位與**狀態**（現行／跟圖不一致／只有證據等級變／過期）——`AGENTS.md`「結構不變就抱」要持有者看得到那一層變了沒。它是**唯一來源不在 read model 的 panel**：`webapp/materialize.py::readings_context()` 一次載入圖的邊與讀圖 ledger（`co:*` 以 `supplies_to`／`develops` 連到的非公司節點＝它「坐」的節點，INV-1 由圖推、不靠讀圖紀錄的 ticker），判讀／單位／狀態的中文標籤由那一端從讀圖字彙附上，compose 只照抄（import 白名單不含讀圖模組）。缺席分型由注入端宣告：沒給輸入或讀不到圖＝`upstream_unavailable`，坐的節點都沒讀圖＝`not_yet_recorded`。不進 `CORE_PANELS`、不改 readiness（Phase 3 面板重排時一起決定）。
+
 **頭條那一句話不是 consumer 造的。** （2026-09-23 前）`implied_return.epistemics.one_sentence` 由
 `alpha://implied_return/model` 自己組出，consumer 只是把它挪到最前面並註明出處；估值鏈退役後頭條只剩現價，判準不變——造句就是在 read model
 之外生出第二種說法。
@@ -565,7 +567,7 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
-2026-09-23 起是 `structure_table`／`beta`／`coverage`／`watches`／`positions`／`structure_readings`／`account_scorecard`；
+2026-09-26 起是 `structure_table`／`beta`／`graph_walk`／`watches`／`positions`／`structure_readings`／`account_scorecard`（`coverage` → `graph_walk`，Phase 2 Step 2.6；`structure_readings` 的頁 `#/structure-readings` 於 Step 2.7 上線，每一列帶引用原文與反證登記的 watch id）；
 `ranking`／`basket`／`multi_year` 已於 Phase 0 退役，查證 `python -m webapp status`）。`python -m webapp materialize --structure-table`
 走與 `python -m query.bottleneck` **同一條路**（同一個 driver、`fetch_assertions`、registry），把 `structure_table()` 的逐邊事實
 **照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。

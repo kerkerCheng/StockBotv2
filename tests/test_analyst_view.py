@@ -182,7 +182,8 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
 
     analyst = build_analyst_view(_bare_view(fundamentals=_FakeFundamentals(available=False)))
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` panel 退役。
-    assert set(OPTIONAL_PANELS) == {"fundamental", "bet"}
+    # Phase 2 Step 2.7：`readings`（讀圖）加入選配。
+    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "readings"}
     for name in OPTIONAL_PANELS:
         assert getattr(analyst, name).optional is True, name
     # optional 的缺席一律不進 blockers／flags，只進 optional_unavailable。
@@ -414,8 +415,9 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 退役，`brief` 移到最前面
     # （首屏的單位是句不是格）。**封閉清單的相等斷言留著**——有人加回來或漏刪一處都會紅。
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` 退出 PANEL_ORDER。
+    # Phase 2 Step 2.7：`readings` 緊接在論證之後。
     assert first["panel_order"] == list(
-        ("brief", "argument", "bet", "wipeout",
+        ("brief", "argument", "readings", "bet", "wipeout",
          "headline", "fundamental", "research"))
     assert set(first["questions"]) == set(QUESTIONS)
 
@@ -468,10 +470,63 @@ def test_worst_status_and_readiness_class_are_declared_lookups() -> None:
         readiness_class("looks_fine")
 
 
+#: 來源**不在** read model 的 panel：由 materialize 注入一份輸入（讀圖：圖 ＋ 讀圖 ledger 的比對結果）。
+#: 規則不變——狀態與理由照抄那份輸入，不得由本層造——只是主詞換成注入的輸入（下面三條專屬測試）。
+INJECTED_PANELS = frozenset({"readings"})
+
+
+def _reading_row(status: str, **kw) -> dict:
+    row = {"node": "mat:inp_substrate", "unit": "layer", "unit_label": "層", "kind": "volume",
+           "kind_label": "B：量的賭注", "status": status, "status_label": f"{status} 的說明",
+           "reason": f"{status} 的理由", "reading_id": "sr_1", "read_on": "2026-09-25", "expires": "2026-12-24",
+           "reading": "量的賭注：基板一時補不上", "needs_reread": status in ("stale", "expired")}
+    row.update(kw)
+    return row
+
+
+def test_readings_panel_absence_kinds_are_declared_by_the_input_not_guessed() -> None:
+    """L16：缺席分型由產生缺席的一端宣告。沒給輸入＝這次沒讀到（upstream_unavailable），不是「沒有讀圖」。"""
+    missing_input = build_analyst_view(_bare_view()).readings
+    assert missing_input.status == "missing" and missing_input.absence_kind == "upstream_unavailable"
+    no_reading = build_analyst_view(_bare_view(), readings={"seats": ["mat:x"], "readings": []}).readings
+    assert no_reading.absence_kind == "not_yet_recorded" and "mat:x" in no_reading.reason
+    unreadable = build_analyst_view(_bare_view(), readings={"absence": {"kind": "upstream_unavailable",
+                                                                         "reason": "讀不到圖"}}).readings
+    assert unreadable.absence_kind == "upstream_unavailable" and unreadable.reason == "讀不到圖"
+    # 選配：缺席不進 blockers／flags（readiness 不變差）。
+    analyst = build_analyst_view(_bare_view())
+    assert "readings" not in {b.panel for b in analyst.readiness.blocker_details}
+    assert "readings" not in {f.panel for f in analyst.readiness.flag_details}
+
+
+def test_readings_panel_copies_each_reading_and_maps_status_by_a_declared_table() -> None:
+    rows = [_reading_row("current"), _reading_row("stale", node="prod:supernova", unit="socket", unit_label="插槽"),
+            _reading_row("stale_low", node="tech:cw_dfb_laser"), _reading_row("expired", node="tech:hbm")]
+    panel = build_analyst_view(_bare_view(), readings={"seats": ["mat:inp_substrate"], "readings": rows}).readings
+    by_key = {line.key: line.datum for line in panel.lines}
+    assert by_key["reading:mat:inp_substrate:layer"].status == "available"
+    assert by_key["reading:prod:supernova:socket"].status == "review_required"
+    assert by_key["reading:tech:cw_dfb_laser:layer"].status == "available"       # 只有證據等級變：不必重讀
+    assert by_key["reading:tech:hbm:layer"].status == "stale"
+    assert by_key["reading:prod:supernova:socket"].label == "prod:supernova（插槽）"
+    assert by_key["reading:mat:inp_substrate:layer"].value == "B：量的賭注｜current 的說明"
+    assert by_key["reading:tech:hbm:layer"].reason == "expired 的理由"
+    assert panel.status == worst_status([d.status for d in by_key.values()])
+    assert all(line.role == "reading" for line in panel.lines)
+
+
+def test_readings_panel_never_prints_an_uncompared_reading_as_current() -> None:
+    """L13-2：「沒比對」與「比對過沒變」不得同形——status=None 的讀圖不得是 available。"""
+    panel = build_analyst_view(_bare_view(), readings={"seats": [], "readings": [_reading_row(None)]}).readings
+    assert panel.lines[0].datum.status == "review_required"
+
+
 def test_panel_status_is_copied_from_the_source_sections_not_invented() -> None:
     view = _full_view(with_criterion=True)
     analyst = build_analyst_view(view)
     for panel in analyst.panels:
+        if panel.key in INJECTED_PANELS:
+            continue   # 來源不在 read model：由 test_readings_panel_* 守「照抄注入的輸入」
         for section, status in panel.source_statuses.items():
             assert getattr(view, section).meta.status == status
         assert panel.status == worst_status(list(panel.source_statuses.values()))
@@ -529,7 +584,7 @@ def test_panel_reason_comes_from_the_section_that_caused_the_status() -> None:
 
     # 每一個 panel 都適用同一條規則：reason 若存在，必須是某個 source section 自己說的。
     for panel in analyst.panels:
-        if not panel.reason:
+        if not panel.reason or panel.key in INJECTED_PANELS:
             continue
         said_by = {getattr(view, name).meta.reason for name in panel.source_statuses}
         assert panel.reason in said_by, f"{panel.key} 的 reason 不是任何 source section 說的"

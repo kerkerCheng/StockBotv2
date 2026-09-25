@@ -244,15 +244,80 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
     return payload
 
 
+#: 公司「坐在」哪些節點：它對那個節點有這兩種邊之一（plan §8：由**圖**推，INV-1——不靠讀圖紀錄裡的 ticker）。
+_SEAT_RELATIONS = ("supplies_to", "develops")
+
+
+def readings_context(*, today: date | None = None, as_of: date | None = None) -> dict[str, Any]:
+    """讀圖面板的輸入（Phase 2 Step 2.7）：**一次**載入圖的邊與讀圖 ledger，給每一檔切用。
+
+    - `seats`：`co:*` → 它 `supplies_to`／`develops` 到的非公司節點（讀圖只寫在層與插槽上）。
+    - `by_node`：節點 → 現行讀圖（每個單位一份）＋ 由讀圖字彙附上的中文標籤——compose 的 import 白名單
+      不准碰讀圖模組，所以標籤在這裡附上，那一端只照抄（L16：字彙只有一份）。
+    讀不到就整份回 `upstream_unavailable`，不回空集合——空集合會讓每一檔都印「還沒讀」（INV-3）。
+    """
+    try:
+        from alpha.providers.structure_readings import reading_status_rows
+        from alpha.structure_reading import READING_KINDS, READING_UNITS
+        from alpha.structure_reading.staleness import READING_STATUSES
+        from query.structure import _load_edges
+
+        edges = _load_edges()
+        rows, _errors = reading_status_rows(edges, today=today or date.today(), as_of=as_of)
+    except Exception as exc:  # noqa: BLE001 — 讀不到圖只讓這個選配面板說讀不到，其餘照走
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": f"這次沒讀到圖或讀圖 ledger（{type(exc).__name__}）——不是「沒有讀圖」"}}
+    seats: dict[str, set[str]] = {}
+    for edge in edges:
+        if edge.src.startswith("co:") and edge.relation in _SEAT_RELATIONS and not edge.dst.startswith("co:"):
+            seats.setdefault(edge.src, set()).add(edge.dst)
+    by_node: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        if not row.get("reading_id"):
+            continue
+        reasons = list(row.get("reread_reasons") or ())
+        status_label = READING_STATUSES.get(str(row.get("status")), "這次沒比對到圖（不是現行）")
+        if reasons:
+            status_label += "；另有重讀理由：" + "；".join(reasons[:2])
+        by_node.setdefault(str(row["node"]), []).append({
+            "node": row["node"], "unit": row.get("unit"),
+            "unit_label": str(READING_UNITS.get(str(row.get("unit")), row.get("unit"))).split("讀圖")[0],
+            "kind": row.get("kind"),
+            "kind_label": str(READING_KINDS.get(str(row.get("kind")), row.get("kind"))).split("——")[0],
+            "status": row.get("status"), "status_label": status_label, "reason": row.get("reason"),
+            "reading_id": row.get("reading_id"), "read_on": row.get("read_on"), "expires": row.get("expires"),
+            "reading": row.get("reading"), "needs_reread": row.get("needs_reread"),
+        })
+    return {"seats": {co: sorted(nodes) for co, nodes in seats.items()}, "by_node": by_node}
+
+
+def readings_input_for(context: Mapping[str, Any], company_id: str | None) -> dict[str, Any]:
+    """一檔的讀圖面板輸入。缺席分型由這裡宣告（L16）：讀不到圖／沒有 co: id＝`upstream_unavailable`；
+    坐的節點都沒有讀圖＝交給 compose 寫 `not_yet_recorded`。"""
+    if context.get("absence"):
+        return {"absence": dict(context["absence"])}
+    if not company_id:
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": "這檔沒有 co: id（registry 解析不到），推不出它坐在哪些節點（INV-1）"}}
+    seats = list((context.get("seats") or {}).get(company_id) or ())
+    by_node = context.get("by_node") or {}
+    return {"seats": seats, "readings": [r for node in seats for r in by_node.get(node, ())]}
+
+
 def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None = None,
                 store: ArtifactStore | None = None,
-                generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
-    """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**"""
+                generated_at: datetime | None = None,
+                readings: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+    """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
+
+    `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
+    """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
 
     view = fetch_alpha_investment_view(ticker, as_of=as_of, include_causal=False, scenario=scenario)
-    analyst = build_analyst_view(view)
+    context = readings if readings is not None else readings_context(as_of=as_of)
+    analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id))
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker))
     target = store or ArtifactStore()
@@ -278,9 +343,11 @@ def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
     """一次 materialize 多檔。**一檔失敗不影響其他檔**——失敗以理由現形，不靜默跳過（INV-3）。"""
     target = store or ArtifactStore()
     results: list[tuple[str, Path | None, str | None]] = []
+    # 讀圖面板的輸入只載一次（節點數會長，查詢次數不該跟著檔數長）。
+    readings = readings_context(as_of=as_of) if tickers else None
     for ticker in tickers:
         try:
-            path, _ = materialize(ticker, as_of=as_of, store=target)
+            path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:

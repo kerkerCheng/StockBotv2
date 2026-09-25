@@ -76,7 +76,10 @@ CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "wi
 #: 沒寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
 #: `downside`（D2，2026-09-18）：判斷錯了值多少。四價渲染在 Phase 0 批 4 退役，panel 留。
 #: ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` panel 隨 E 組（四價 overlay）退役。
-OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet")
+#: `readings`（Phase 2 Step 2.7）：這家公司坐的層與插槽的現行讀圖＋**狀態**（現行／stale／過期）——
+#: `AGENTS.md`「結構不變就抱」要求持有者看得到「我騎的那一層結構變了沒」。**選配**：不改 readiness
+#: （Phase 3 面板重排時一起決定升不升核心，plan §14 #3）。
+OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "readings")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -120,6 +123,7 @@ LINE_ROLES = frozenset({
     "brief",                   # optional：投資人短評的七句＋一顆燈
     "paragraph",               # optional：論證層的三段
     "wipeout",                 # optional：歸零旗標的一盞燈（D2；顏色＋一句話，數字在 dependencies）
+    "reading",                 # optional：一份現行讀圖（節點 × 單位）的判讀與狀態（Phase 2 Step 2.7）
 })
 
 #: 「為什麼這一格被列進脆弱清單」的封閉字彙。**每一條都是宣告好的列入規則**，
@@ -175,6 +179,8 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
                 "hint": "四盞燈：現金跑道、負債、稀釋、going concern。**只給顏色不給數字**——"
                         "算出顏色的數字在每盞燈自己的稽核格裡。灰燈不是綠燈：它表示這一項沒量到，"
                         "而「沒查」不等於「沒事」"},
+    "readings": {"title": "它坐的那一層結構變了沒",
+                 "hint": "這家公司在圖上供貨或開發的層與插槽，各自的現行讀圖：讀成什麼（護城河／量／都不是／判不出）、讀的是一層還是一格插槽，以及**狀態**——現行、跟圖不一致該重讀、或過期。結構不變就抱；變了就重讀，要不要改 thesis 由你決定。沒有讀圖不代表沒事，只是還沒讀"},
     "bet": {"title": "我們賭什麼",
             "hint": "研究 session 寫下的那一句（短評的 our_bet）。沒有價格、沒有報酬、沒有機率加權——"
                     "四個價格已於 2026-09-23 退役。沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
@@ -519,6 +525,9 @@ class AnalystView:
     brief: AnalystPanel
     #: 2026-09-15：論證層 panel（optional）：短評展開成六段，附引文與長文。
     argument: AnalystPanel
+    #: Phase 2 Step 2.7：讀圖 panel（optional）：這家公司坐的層與插槽的現行讀圖與狀態。
+    #: 放在論證之後——論證講「這條鏈怎麼走」，讀圖講「鏈上那一層現在還是不是當初讀的樣子」。
+    readings: AnalystPanel
 
     #: ⚠ 新增 panel 必須同時登記在這裡與 `OPTIONAL_PANELS`／`CORE_PANELS`——**兩份都是封閉清單**。
     #: `downside` 緊接在 `bet` 後面：它們是同一把尺的兩端，讀的人要並排看。
@@ -527,7 +536,7 @@ class AnalystView:
     #: 機制在、但分類沒跟著資料走到消費端（L16）。**materialize 一次就看得到，所以要驗 artifact。**
     #: ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 已從這份清單移除（兩個 panel 退役）。
     #: 順序即閱讀順序：短評 → 論證 → 賭注／下檔 → 歸零旗標 → 現價 → 稽核區的原始數字 → 什麼會推翻它。
-    PANEL_ORDER = ("brief", "argument", "bet", "wipeout",
+    PANEL_ORDER = ("brief", "argument", "readings", "bet", "wipeout",
                    "headline", "fundamental", "research")
 
     @property

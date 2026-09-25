@@ -266,11 +266,14 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
     if registry is None:
         registry = get_registry()
     edges = list(edges)
-    suppliers = {e.src for e in edges if e.dst == node and e.relation == "supplies_to"}
-    view = SocketView(node=node)
     makers = sorted({(e.src, e.relation) for e in edges if e.dst == node and e.relation in _MAKER_RELATIONS})
-    view.makers = [{"company": src, "relation": rel, "also_supplies": src in suppliers,
-                    "label": "製造者（不是零件供應商）" if src in suppliers else "製造者"} for src, rel in makers]
+    # 「零件供應商」＝ supplies_to 的公司**扣掉製造者**（plan 待決 #22，[654] 入圖後成立）：O-Net 對 ELS 同時是
+    # supplies_to（賣模組）與 develops（整合者＝雷射那一格的客戶）——它的一手是客戶端原文，不是供應商自稱。
+    supplying = {e.src for e in edges if e.dst == node and e.relation == "supplies_to"}
+    suppliers = supplying - {src for src, _rel in makers}
+    view = SocketView(node=node)
+    view.makers = [{"company": src, "relation": rel, "also_supplies": src in supplying,
+                    "label": "製造者（不是零件供應商）" if src in supplying else "製造者"} for src, rel in makers]
     if not makers:
         view.maker_absence = SOCKET_NO_MAKER
     view.deployers = sorted({e.src for e in edges if e.dst == node and e.relation in _DEPLOYER_RELATIONS})
