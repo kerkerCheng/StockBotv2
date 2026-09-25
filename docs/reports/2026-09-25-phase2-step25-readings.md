@@ -188,8 +188,27 @@ Coherent「we have multiple six-inch indium phosphide substrate suppliers」；L
 |---|---|---|
 | [651] | go ✓ | `authority:graph_migration_packet;ref:loader/manifests/r4-socket-makers-20260925.json` |
 | [652] | go ✓ | `authority:research_packet;ref:ra_905c…＋manifest＋hy_0007` |
-| [653] | 待核准（`ra_admission`） | 研究包 `ra_905c6719146417c137e3ded2c22dc75f` 入圖 |
-| [654] | 待核准（manual） | 遷移 manifest 入圖（只加不改，12 條） |
+| [653] | go ✓（2026-09-25） | `action:ra_905c…;digest:79643b8f…;commit:974e2c9`（`todo complete-ra` 驗證） |
+| [654] | go ✓（2026-09-25） | `authority:graph_migration;ref:loader/manifests/r4-socket-makers-20260925.json`；commit `4ab71d4` |
+
+### 7.5 [653]、[654] 入圖結果（使用者 2026-09-25 go）
+
+全圖唯讀快照（每個節點的 `result_digest`、公司需求錨、結構表母體）在入圖前、[654] 後、[653] 後各存一份比對：
+
+| 階段 | canonical 邊 | digest 變動節點 | 需求錨變動 | 結構表母體 |
+|---|---|---|---|---|
+| [654] 遷移（備份 `library/private/backups/20260925T081603Z` 後） | 525 → 535 | **0** | 0 | 30 → 30 |
+| [653] 研究包 apply＋發布 | 535 → 536 | 1（`co:ayar_labs`） | 0 | 30 → 30 |
+
+- [654]：files 8／added 12／removed 0／orphans 0／reprojected 43，與入圖前的模擬一致。語意比對：8 份抽取檔只多出新增邊（ECOC 那份多宣告 2 個節點），sources 一字不變；
+  git diff 的行數是 JSON 重新序列化的格式差。`nvidia_q1fy27.json`、`silicon_matter_sivers_ayar_2026_03_14.json` 依 `.gitignore` 只存本機，舊版封存在本機 `extractions/superseded/`。
+- 插槽視角的製造者段：SuperNova＝Ayar Labs、ELS＝O-Net（製造者，不是零件供應商）、GF SCALE＝GF、PH18DA＝Tower＋OpenLight、Blackwell＝NVIDIA。
+- [653]：`co:ayar_labs` 的供給側現在是 Sivers（qualifying｜needs_review｜3 份）與 Lumentum（needs_review｜1 份）。兩條都是 needs_review——plan 待決 #20 的預期結果。
+  新開衝突 `conflict_10946e53…`：Sivers→Ayar 的 `qualification_status`（本包 qualifying vs 既有 tier 3 的 none），走 evidence-conflict-resolution，本次不處置。
+- 四份讀圖 `--check` 仍全部 current（製造者不進 digest；Ayar 的變動在公司節點，不在 SuperNova 那一格）。
+  ⚠ SuperNova 插槽讀圖寫的三個缺口裡，②「圖上分不出是誰的產品」現在已補上（Ayar develops），ECOC 原文也掛上了——digest 不會因此轉 stale，下一次重讀要把它寫進去。
+- 另一個觀察：PH18DA 的「客戶端原文」把 OpenLight 自己描述自家平台的那段列進去，而且 origin 解析成 `co:openlight`（不是抽取檔的 `co:openlight_photonics`）——待決 #21 的兩個 ID 在工具輸出上現形。
+- plan 待決 #22（插槽的「供應商」要扣掉製造者）的觸發條件「[654] apply」已成立。
 
 ## 參考來源（圖外，本 Step 查證用）
 

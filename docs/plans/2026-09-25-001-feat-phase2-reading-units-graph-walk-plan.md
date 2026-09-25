@@ -459,7 +459,8 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
    **2.5 已提 pq2 [651]**：13 個產品逐條讀逐字，真正的插槽 3 個且都是 Sivers 的。**[651] go 之後的研究推翻了原提案**：
    對「供應商自己的產品／平台」，`supplies_to` 與 `co:axt supplies_to mat:inp_substrate` 同義、並沒有錯；唯讀模擬顯示「改型別」會讓 13 個節點 digest 變、
    `co:nvidia` 失去需求錨、結構表少掉 Tower→PH18DA（sub=4），「只加 `develops`」則 0／0／0。研究包改為只加（`loader/manifests/r4-socket-makers-20260925.json`，
-   12 條），入圖閘門 **pq2 [654]**；結案時寫 [654] 的處置狀態。
+   12 條），入圖閘門 **pq2 [654]**。**[654] 已入圖（2026-09-25，commit `4ab71d4`）**：canonical 525 → 535、全圖 digest 變動 0、需求錨 0、結構表 30 → 30；
+   [652] 的研究包 [653] 同日入圖（`974e2c9`），只動 `co:ayar_labs` 一個節點的 digest。收據見 step25 報告 §7.5。
 2. **read model 的 `get_bottlenecks`（sub≥4 成員）**：個股頁 argument「鏈」段仍用它；Phase 3 面板重排時決定留不留（Phase 0 偏差 #33 的另一半）。
 3. **讀圖面板升核心**與 readiness 換（Phase 3，ROADMAP 已排）；Phase 0 偏差 #16「`review_required` 的路接回讀圖面板」一併處理。
 4. ~~**`tech:cw_dfb_laser` 讀圖 2026-10-18 到期**與反證出處（#19）若 2.5 沒做，列進研究並行。~~ **2.5 已做**：`sr_d49b81b6465e1181`（v3，到期 2026-12-24），四條沿用的反證標回 `sr_a181641ddb99c69c`——#19 解決。
@@ -506,4 +507,5 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
     判定是不是同一家、要不要合併，是重複節點的研究題（pq2 `ra_admission`）；[654] 暫用抽取檔既有的 `co:openlight_photonics`。
 22. **[654] 入圖後，插槽的「供應商」要扣掉製造者**：O-Net 對 ELS 同時是 `supplies_to`（賣模組）與 `develops`（整合者＝雷射那一格的客戶）。
     插槽視角的「客戶端原文」與寫入端的 `independent`（偏差 #9）目前都排除「任何一家 `supplies_to`」，會把 O-Net 自己的一手也排除——
-    兩處都應改成「`supplies_to` 的公司扣掉 `develops` 的公司」；寫入端要從同一次快照查詢拿到製造者。觸發條件＝[654] apply。
+    兩處都應改成「`supplies_to` 的公司扣掉 `develops` 的公司」；寫入端要從同一次快照查詢拿到製造者。觸發條件＝[654] apply——**已成立（2026-09-25）**。
+    十行內、不動契約（L17：當下修），可在 2.6 之前或併進 2.7 做；它改的是插槽視角與寫入端規則，不動 digest。
