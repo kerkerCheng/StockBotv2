@@ -296,3 +296,92 @@ def test_v3_disproof_is_counted_as_structured_not_as_v1_prose() -> None:
     counts = disproof.disproof_counts([], lifecycle={}, readings={(SOCKET, "socket"): reading})
     assert counts["v1_prose_readings"] == 0
     assert counts["unwatched"] == 1, "這份讀圖的一條反證還沒登記 watch——要算成未盯，不是散文"
+
+
+# ---------------------------------------------------------------------------
+# Step 2.4：分單位的 staleness ＋ 插槽視角
+# ---------------------------------------------------------------------------
+
+def _after_with_supply_evidence(node: str, evidence: str) -> dict:
+    after = _structure(node)
+    after["angles"]["supply_side"][0]["evidence"] = evidence
+    after["result_digest"] = "f" * 64
+    return after
+
+
+def test_supply_evidence_change_is_high_for_a_socket_and_low_for_a_layer() -> None:
+    """客戶第一次具名（evidence 由待判定升成外部印證）：插槽賭注的確認事件＝高等級；層讀圖不變＝低級。"""
+    from alpha.structure_reading.staleness import reading_status
+
+    after = _after_with_supply_evidence(SOCKET, "externally_corroborated")
+    socket = parse_structure_reading_record(_v3(SOCKET, unit="socket"))
+    layer = parse_structure_reading_record(_v3(SOCKET, unit="layer"))
+    s = reading_status(socket, after, today=TODAY)
+    l_ = reading_status(layer, after, today=TODAY)
+    assert s["status"] == "stale" and s["highest_grade"] == "high"
+    assert [c["kind"] for c in s["changes"]] == ["supply_evidence"]
+    assert l_["status"] == "stale_low" and [c["kind"] for c in l_["changes"]] == ["evidence"], "層的分級一字不動"
+
+
+def _canonical(rows):
+    from query.bottleneck import collapse_assertions
+
+    return list(collapse_assertions(rows).values())
+
+
+def _row(src, relation, dst, origin="Someone"):
+    return {"src": src, "relation": relation, "dst": dst, "attributes": {}, "confidence": 0.8,
+            "origin": origin, "source_type": "press_release", "source_doc_id": f"doc_{src}", "published_at": None}
+
+
+def test_socket_view_says_out_loud_when_the_graph_cannot_tell_maker_from_supplier() -> None:
+    from identity.registry import get_registry
+    from query.structure import SOCKET_NO_CUSTOMER_QUOTE, SOCKET_NO_MAKER, build_socket_view
+
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("prod:teraphy_chiplet", "depends_on", SOCKET)])
+    quotes = {(SIVERS, "supplies_to", SOCKET): [
+        {"quote": SUPPLY_Q, "doc": "substack_post", "tier": 3, "origin": "silicon_matter_substack"}]}
+    view = build_socket_view(SOCKET, edges, quotes, registry=get_registry())
+    assert view.makers == [] and view.maker_absence == SOCKET_NO_MAKER
+    assert view.customer_quotes == [] and view.customer_absence == SOCKET_NO_CUSTOMER_QUOTE
+    assert view.sources == [{"doc": "substack_post", "tier": 3, "origin": "silicon_matter_substack", "company": None}], \
+        "沒有客戶端原文時要列出現有來源的等級（例：SuperNova 只有一篇 tier 3 substack）"
+
+
+def test_socket_view_names_the_maker_and_finds_customer_side_quotes() -> None:
+    from identity.registry import get_registry
+    from query.structure import build_socket_view
+
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("co:ayar_labs", "develops", SOCKET)])
+    quotes = {(SIVERS, "supplies_to", SOCKET): [
+        {"quote": SUPPLY_Q, "doc": "sivers_pr", "tier": 2, "origin": "Sivers Semiconductors"},
+        {"quote": CUSTOMER_Q, "doc": "ayar_pr", "tier": 2, "origin": "Ayar Labs"}]}
+    view = build_socket_view(SOCKET, edges, quotes, registry=get_registry())
+    assert view.maker_absence is None
+    assert view.makers == [{"company": "co:ayar_labs", "relation": "develops", "also_supplies": False,
+                            "label": "製造者"}]
+    assert [q["doc"] for q in view.customer_quotes] == ["ayar_pr"], "供應商自己的原文不算客戶端原文（L8）"
+    both = build_socket_view(SOCKET, _canonical([_row("co:ayar_labs", "supplies_to", SOCKET),
+                                                 _row("co:ayar_labs", "develops", SOCKET)]), {},
+                             registry=get_registry())
+    assert both.makers[0]["label"] == "製造者（不是零件供應商）"
+
+
+def test_socket_segments_never_enter_the_digest() -> None:
+    """多讀一份客戶端文件不得讓插槽讀圖 stale——逐字篇數是研究量的函數（AGENTS 已知會失焦的指標）。"""
+    from identity.registry import get_registry
+    from query.structure import build_socket_view, build_structure
+
+    edges = _canonical([_row(SIVERS, "supplies_to", SOCKET), _row("prod:teraphy_chiplet", "depends_on", SOCKET)])
+    before = build_structure(SOCKET, edges).result_digest()
+    more = {(SIVERS, "supplies_to", SOCKET): [
+        {"quote": CUSTOMER_Q, "doc": "ayar_pr", "tier": 2, "origin": "Ayar Labs"}]}
+    assert build_socket_view(SOCKET, edges, more, registry=get_registry()).customer_quotes
+    assert build_structure(SOCKET, edges).result_digest() == before
+
+
+def test_socket_view_is_refused_on_non_product_nodes(capsys) -> None:
+    from query.structure import main
+
+    assert main(["tech:cw_dfb_laser", "--unit", "socket"]) == 2
+    assert "prod:" in capsys.readouterr().err

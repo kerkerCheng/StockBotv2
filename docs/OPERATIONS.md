@@ -590,6 +590,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 
 ```powershell
 & '.venv\Scripts\python.exe' -m query.structure tech:cw_dfb_laser          # 五個角度一次查出（零 LLM、零判斷）
+& '.venv\Scripts\python.exe' -m query.structure prod:supernova --unit socket --quotes   # 插槽視角（只用在 prod:*）：多印「誰的產品」「客戶端原文」兩段，不進 digest
 & '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser  # 列出讀圖紀錄
 & '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser --check   # 跟現在的圖比一次並分級（唯讀）
 & '.venv\Scripts\python.exe' -m alpha structure-reading tech:cw_dfb_laser --add spec.json

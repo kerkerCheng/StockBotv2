@@ -12,6 +12,7 @@
 | 下一層變了 | 可能（會改變「更卡的在哪一層」） | `normal` |
 | 反向路徑新增或消失 | 可能，**而且它本來就是 disproof 的來源** | `normal`（另標 `disproof`） |
 | 只有 evidence 等級變 | 不改變結構，改變的是可下注性 | `low` |
+| **插槽讀圖**的供貨邊 evidence 變（v3） | 會——客戶或第三方第一次具名就是插槽賭注的確認或推翻 | `high`（`supply_evidence`） |
 
 ## `documents` 為什麼不在上表裡
 
@@ -66,6 +67,9 @@ CHANGE_KINDS: Mapping[str, tuple[str, str]] = {
     "counter_path": ("normal", "反向路徑新增或消失——它本來就是 disproof 的來源"),
     "anchor": ("normal", "需求錨可達性變了——走不走得到有人花錢的地方"),
     "evidence": ("low", "只有 evidence 等級變——不改變結構，改變的是可下注性"),
+    # v3（Phase 2 Step 2.4）：插槽讀圖的供貨邊證據變動是高等級。插槽賭的是「客戶的這一格指定了誰」，
+    # 客戶或第三方第一次具名（evidence 由自報升成外部印證）本身就是確認或推翻事件；層讀圖的分級一字不動。
+    "supply_evidence": ("high", "插槽的供貨邊證據等級變了——客戶或第三方第一次具名，是插槽賭注的確認或推翻事件"),
 }
 
 #: 哪些變化**同時**是既有 disproof 機制的觸發來源（§6b ④）。
@@ -111,8 +115,8 @@ def _rows_by_identity(rows: Iterable[Sequence[Any]]) -> dict[tuple[str, str, str
     return {_identity(r): list(r) for r in rows}
 
 
-def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[Sequence[Any]]
-                   ) -> list[StructureChange]:
+def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[Sequence[Any]],
+                   *, unit: str = "layer") -> list[StructureChange]:
     member_kind, attr_kind = _ANGLE_TO_KINDS[angle]
     old = _rows_by_identity(before)
     new = _rows_by_identity(after)
@@ -138,17 +142,19 @@ def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[
                 changes.append(StructureChange(
                     angle, attr_kind, f"{label} 的 {name}：{before_row[index]} → {after_row[index]}"))
         if before_row[_EVID] != after_row[_EVID]:
+            kind = "supply_evidence" if (unit == "socket" and angle == "supply_side") else "evidence"
             changes.append(StructureChange(
-                angle, "evidence", f"{label} 的 evidence：{before_row[_EVID]} → {after_row[_EVID]}"))
+                angle, kind, f"{label} 的 evidence：{before_row[_EVID]} → {after_row[_EVID]}"))
     return changes
 
 
 def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
                   after_structure: Mapping[str, Any],
-                  *, before_anchor: Sequence[str] | None = None) -> list[StructureChange]:
+                  *, before_anchor: Sequence[str] | None = None, unit: str) -> list[StructureChange]:
     """快照 vs 現在的圖 → 逐項分級的變化清單。**純函式，不查圖。**
 
     `after_structure` 吃 `query.structure.StructureView.as_dict()`。
+    `unit` 沒有預設（v3）：同一個變化對層與插槽的意義不同——插槽的供貨邊證據變動是高等級。
     """
     after_angles = after_structure.get("angles") or {}
     changes: list[StructureChange] = []
@@ -159,7 +165,7 @@ def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
              e.get("qualification_status"), e.get("evidence")]
             for e in after_angles.get(angle, ())
         ]
-        changes += _angle_changes(angle, before_angles.get(angle) or (), after_rows)
+        changes += _angle_changes(angle, before_angles.get(angle) or (), after_rows, unit=unit)
 
     after_anchor = list(after_structure.get("anchor_chain") or [])
     if list(before_anchor or []) != after_anchor:
@@ -178,7 +184,8 @@ def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, t
     if after_structure is None:
         return {"status": None, "reason": "這次沒有讀到圖，無法比對（不是 current）",
                 "changes": [], "expired": reading.is_expired(today)}
-    changes = grade_changes(reading.angles, after_structure, before_anchor=reading.anchor_chain)
+    changes = grade_changes(reading.angles, after_structure, before_anchor=reading.anchor_chain,
+                            unit=reading.unit)
     digest_changed = str(after_structure.get("result_digest") or "") != reading.result_digest
     grades = {c.grade for c in changes}
     if reading.is_expired(today):

@@ -65,7 +65,7 @@ if str(ROOT) not in sys.path:
 from identity.registry import get_registry  # noqa: E402
 from query.bottleneck import (  # noqa: E402
     DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
-    classify_evidence, collapse_assertions, demand_chain, fetch_assertions,
+    classify_evidence, collapse_assertions, company_id_for_origin, demand_chain, fetch_assertions,
 )
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
@@ -218,6 +218,91 @@ def build_structure(node: str, edges: Iterable[CanonicalEdge]) -> StructureView:
     ]
     view.anchor_chain = demand_chain(node, build_upward_index(edges))
     return view
+
+
+#: 「誰的產品」——進到 prod 節點的這兩種邊指得出製造者（Phase 2 Step 2.4，plan §5）。
+_MAKER_RELATIONS = ("develops", "deploys")
+
+SOCKET_NO_MAKER = ("圖上分不出這個產品是誰的：`supplies_to` 可能是製造者自己，也可能是零件供應商"
+                   "（L12：一個關係承載兩種語意，見 plan 2026-09-25-001 R-4）")
+SOCKET_NO_CUSTOMER_QUOTE = "沒有任何客戶端或可解析第三方的一手原文"
+
+
+@dataclass
+class SocketView:
+    """插槽視角的兩段附加資訊。**刻意不進 `result_digest`**（見 `build_socket_view`）。"""
+
+    node: str
+    makers: list[dict[str, Any]] = field(default_factory=list)
+    maker_absence: str | None = None
+    customer_quotes: list[dict[str, Any]] = field(default_factory=list)
+    customer_absence: str | None = None
+    sources: list[dict[str, Any]] = field(default_factory=list)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"makers": self.makers, "maker_absence": self.maker_absence,
+                "customer_quotes": self.customer_quotes, "customer_absence": self.customer_absence,
+                "sources": self.sources}
+
+
+def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
+                      quotes: Mapping[tuple[str, str, str], Iterable[Mapping[str, Any]]],
+                      registry: Any = None) -> SocketView:
+    """插槽（客戶的產品 × 那一格零件）要多問的兩件事：**這是誰的產品**、**有沒有客戶端的原文**。
+
+    ⚠ **這兩段都不進 `result_digest`**：
+    - 逐字篇數會隨我們多讀一份文件而單調上升（`AGENTS.md`「已知會失焦的指標」）——進了 digest，
+      插槽讀圖的 staleness 就會恆亮（L14-4）。
+    - 「客戶第一次具名」已經由 digest 裡那條供貨邊的 `evidence` 欄位捕捉到（`classify_evidence`
+      由自報升成外部印證），插槽的讀圖分級把這種變動算高等級（`alpha.structure_reading.staleness`）。
+    - 製造者（`develops`／`deploys`）不在五個角度裡，是**讀法**的輔助；它變了由重讀時看見，不觸發 stale。
+    缺席一律明說（INV-3）：分不出製造者、沒有客戶端原文，都印出來，不印空白。
+    """
+    if registry is None:
+        registry = get_registry()
+    edges = list(edges)
+    suppliers = {e.src for e in edges if e.dst == node and e.relation == "supplies_to"}
+    view = SocketView(node=node)
+    makers = sorted({(e.src, e.relation) for e in edges if e.dst == node and e.relation in _MAKER_RELATIONS})
+    view.makers = [{"company": src, "relation": rel, "also_supplies": src in suppliers,
+                    "label": "製造者（不是零件供應商）" if src in suppliers else "製造者"} for src, rel in makers]
+    if not makers:
+        view.maker_absence = SOCKET_NO_MAKER
+    docs: dict[str, dict[str, Any]] = {}
+    for edge_key, found in sorted(quotes.items()):
+        if node not in (edge_key[0], edge_key[2]):
+            continue
+        for q in found:
+            origin = q.get("origin")
+            company = company_id_for_origin(origin, registry)
+            doc = str(q.get("doc") or "")
+            docs.setdefault(doc, {"doc": doc, "tier": q.get("tier"), "origin": origin, "company": company})
+            if company is not None and company not in suppliers:
+                view.customer_quotes.append({"edge": list(edge_key), "quote": q.get("quote"), "doc": doc,
+                                             "tier": q.get("tier"), "origin": origin, "company": company})
+    view.sources = sorted(docs.values(), key=lambda d: d["doc"])
+    if not view.customer_quotes:
+        view.customer_absence = SOCKET_NO_CUSTOMER_QUOTE
+    return view
+
+
+def render_socket_markdown(socket: SocketView) -> str:
+    out = ["\n## 插槽：這是誰的產品（不進 digest）\n"]
+    if socket.makers:
+        for m in socket.makers:
+            out.append(f"- `{m['company']}` {m['relation']} `{socket.node}`——{m['label']}")
+    else:
+        out.append(f"⚠ {socket.maker_absence}")
+    out.append("\n## 插槽：客戶端或可解析第三方的原文（不進 digest）\n")
+    if socket.customer_quotes:
+        for q in socket.customer_quotes:
+            out.append(f"- `{q['edge'][0]}` {q['edge'][1]} `{q['edge'][2]}`：«{str(q['quote'])[:200]}»"
+                       f"　`{q['doc']}`（tier {q['tier']}｜{q['origin']} → `{q['company']}`）")
+    else:
+        levels = "、".join(f"`{d['doc']}`（tier {d['tier']}｜{d['origin']}"
+                          f"{'' if d['company'] else '｜解析不到'}）" for d in socket.sources) or "（這個節點的邊沒有任何逐字）"
+        out.append(f"⚠ {socket.customer_absence}——現有來源：{levels}")
+    return "\n".join(out)
 
 
 def _sub_distribution(rows: Iterable[EdgeView]) -> str:
@@ -412,8 +497,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--digest", action="store_true", help="只印 result_digest（staleness 比對用）")
     parser.add_argument("--quotes", action="store_true",
                         help="每條邊附上它自己的逐字（V1/L18：不看逐字就只能相信 label）")
+    parser.add_argument("--unit", choices=("layer", "socket"), default="layer",
+                        help="socket＝插槽視角（只用在 prod:*）：多印「這是誰的產品」與「客戶端原文」兩段，都不進 digest")
     args = parser.parse_args(argv)
 
+    if args.unit == "socket" and not args.node.startswith("prod:"):
+        print(f"✗ 插槽視角只用在客戶的產品 prod:*，`{args.node}` 請用層視角（預設）", file=sys.stderr)
+        return 2
     edges = _load_edges()
     known = {e.src for e in edges} | {e.dst for e in edges}
     if args.node not in known:
@@ -425,14 +515,22 @@ def main(argv: list[str] | None = None) -> int:
 
     view = build_structure(args.node, edges)
     quotes = None
-    if args.quotes:
+    if args.quotes or args.unit == "socket":
         quotes = _load_quotes(args.node)
+    socket = build_socket_view(args.node, edges, quotes or {}) if args.unit == "socket" else None
     if args.digest:
         print(view.result_digest())
     elif args.json:
-        print(json.dumps(view.as_dict(), ensure_ascii=False, indent=2))
+        payload = view.as_dict()
+        payload["unit"] = args.unit
+        if socket is not None:
+            payload["socket"] = socket.as_dict()
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
     else:
-        print(render_markdown(view, quotes))
+        text = render_markdown(view, quotes if args.quotes else None)
+        if socket is not None:
+            text += "\n" + render_socket_markdown(socket)
+        print(text)
     return 0
 
 
