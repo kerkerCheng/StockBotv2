@@ -26,7 +26,7 @@
 | Phase | plan 檔 | 狀態 |
 |---|---|---|
 | 0 拆 | [2026-09-22-001](2026-09-22-001-refactor-phase0-retire-plan.md) | completed（2026-09-23；closeout `docs/reports/2026-09-23-phase0-closeout.md`） |
-| 1 等待與心跳 | [2026-09-24-001](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md)（P0 plan review 第 4 輪 GO，已可開工） | active |
+| 1 等待與心跳 | [2026-09-24-001](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | completed（2026-09-25；closeout `docs/reports/2026-09-25-phase1-closeout.md`；R2 GO） |
 | 2 讀圖兩種 kind 加走圖 | 尚無 | — |
 | 3 候選狀態加三題 | 尚無 | — |
 | 4 層中心來源 | 尚無 | — |
@@ -55,6 +55,6 @@
 | [Portfolio Risk Policy Redesign (2026-07-29)](2026-07-29-001-refactor-portfolio-risk-policy-plan.md) | 只保留 ETF 槓桿／單筆 hard block、known issuer 穿透、drawn debt 與低雜訊事件監控 | completed |
 | [Serenity 30-Day Research Campaign (2026-07-29)](2026-07-29-002-feat-serenity-30d-research-campaign-plan.md) | 30 天 X 分頁回補、圖片快取、scoped exploration triage 與 robotics 一手追源 | completed |
 | [Phase 0 拆：退役估值鏈、排序驅動、decision_lab 研究側 (2026-09-22)](2026-09-22-001-refactor-phase0-retire-plan.md) | 給便宜模型的完整執行 plan：0a 停跑、0b 四批刪除（先斷 import 再刪）、0c 池子；驗收＝殭屍 grep 差集歸零、Decision Store sha256 不變 | completed（2026-09-23） |
-| [Phase 1 等待與心跳 (2026-09-24)](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | 一個 Windows daily（LLM 以 Claude CLI 零工具做 triage 與語意預篩、weekly 退役）、`semantic_condition` watch、反證登記 hook 與補登記、到期轉 pq2 `watch_decision`、心跳改版；驗收＝watch registry 的筆數與狀態 | active（P0 ✅：第 4 輪 GO，N4-1–N4-13 已併入；下一步 `/phase-run` 從 Step 1.0 開始） |
+| [Phase 1 等待與心跳 (2026-09-24)](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | 一個 Windows daily（LLM 以 Claude CLI 零工具做 triage 與語意預篩、weekly 退役）、`semantic_condition` watch、反證登記 hook 與補登記、到期轉 pq2 `watch_decision`、心跳改版；驗收＝watch registry 的筆數與狀態 | completed（2026-09-25；closeout `docs/reports/2026-09-25-phase1-closeout.md`；R2 GO） |
 
-**目前 active plan：Phase 1（2026-09-24-001）。P0 plan review 已 ✅（2026-09-24 第 4 輪 GO），切便宜模型貼 `/phase-run`。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active plan：Phase 1（2026-09-24-001）已於 2026-09-25 結案；Phase 2 尚無 plan——切 fable 開新 session 貼 `/phase-plan`（待決問題清單見 `docs/reports/2026-09-25-phase1-closeout.md` §7）。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。

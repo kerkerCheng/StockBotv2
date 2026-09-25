@@ -1,7 +1,8 @@
 ---
 date: 2026-09-24
 topic: phase1-waiting-heartbeat
-status: active
+status: completed
+completed: 2026-09-25（closeout `docs/reports/2026-09-25-phase1-closeout.md`；R2 GO）
 derived_from: docs/ROADMAP.md（Phase 1，含 2026-09-24 amendment A1–A4）、docs/brainstorms/2026-09-22-graph-first-direction-decision.md（G7、G8）、docs/reports/2026-09-23-phase0-closeout.md §7–§8
 plan_review: 第 1 輪 NO_GO（2026-09-24，對 0c34de8；blocking B1–B3）→ 使用者同日定案 C1–C3、已修訂 → 第 2 輪 NO_GO（2026-09-24，對 1bb46fb；blocking X1–X2）→ 使用者同日定案 C4、已修訂 → 第 3 輪 NO_GO（2026-09-24，對 9fc7593；blocking R3-1–R3-3）→ 使用者同日定案 C6（triage 改 Claude CLI）、C7（LLM 用量放寬的範圍）、已修訂（三輪 findings 逐條處置見 §0.7）→ 第 4 輪 **GO**（2026-09-24，對 7bd79ad；blocking 0、non-blocking N4-1–N4-13 已併入，§0.7）→ P0 ✅
 ---
@@ -225,7 +226,7 @@ P0 ✅ 之後：`AGENTS.md`「常規推進授權」照用——Verdict 為 `GO` 
 | 1.8 | 心跳改版（較昨 diff、watch／反證計數、pq2 逐筆、備份、健康、NAV、計分表每日、Discord 摘要） | ✅ 五段不增不減；實跑新版心跳（摘要行 `Daily 2026-09-24｜球在你 0｜⚠ 健康紅燈 1`）、`materialize --positions` 後 NAV 為真實 bucket 分布；與 1.0 的心跳逐行對照每一條拿掉的行都有取代行；NB2-8／NB3-11(d) 併入（到期行今日／累計＋處置逐格）；`tests/test_heartbeat_phase1.py` 28 條；2483 passed（偏差 #20–#23） | 5134575 |
 | 1.9 | 題材掃描（weekly 退役、`skills/theme-scan`、提醒 hook、AGENTS 兩句、`weekly` 字眼清掉） | ✅ `skills/theme-scan` 新增並同步；`crons/weekly_scan_prompt.md` 逐字封存 `docs/archive/2026-09-24-weekly-scan-prompt-v1.2.md`；AGENTS 兩句逐字照核准版本（diff 只有兩行）；hook 門檻兩側有測試；**以 `claude -p` 在 repo 起真實 session：5 支 SessionStart hook 全部 exit 0，routine_hint 輸出「距上次掃題材 4 天」**；Codex 側未驗（同一條命令；使用者若用 Codex 互動需信任新 hook）；`weekly` 剩下的每一處都有理由（偏差 #25）；2487 passed（偏差 #24、#25） | 1a1217f |
 | 1.10 | 稽核改讀新 registry | ✅ `Lifecycle` 拿掉舊店、改驗 watch 狀態與收據；`Expiry` 依 A7 驗到期去處＋`until` 已過＋**沒有到期也沒有 watch 的 `waiting_on`**；`Orphans` 加喚醒目標已結案（NB2-12，含對稱的追源 lead）、disproof_ref 對不到條件、非現行 memo／讀圖、sidecar 不符、wake_reading 無現行讀圖；`QueueLiveness` 加待檢滯留、watch_decision 指向不存在、觸及 48h 沒被複查接住。30 條新測試，18 條變異全紅；快轉試跑 25 個事件日（模擬使用者／不動作兩種）新判準 0 誤報、sync 停擺 3 天 23/24 次有響（沒響那次 3 天內沒有任何到期）；**`todo sync` 收掉喚醒目標已結案的 8 筆**（偏差 #26）；真實資料 `audit invariants` 12 PASS、**1 FAIL＝[586]**（`pending --trigger` 沒帶 `--until`、也沒有 watch：INV-2 違反；偏差 #27）→ 使用者 2026-09-25 同意續等到 2026-12-31，等待四項稽核轉綠；2517 passed | 2299f9f |
-| 結案 | 九項 gate ＋ closeout 報告 ＋ R2 | ▶ 九項 gate 與驗收①–⑤見 `docs/reports/2026-09-25-phase1-closeout.md`（②真實喚醒已發生、排程心跳因計數 bug 印 0 已修；③④ 已交付、未生效，回查改用心跳計數器＝偏差 #29）；結案 R2 已發 | |
+| 結案 | 九項 gate ＋ closeout 報告 ＋ R2 | ✅ 九項 gate 全 ✅、驗收①⑤ ✅、②真實喚醒已發生（排程心跳計數 bug 已修）、③④ 已交付未生效（回查改用心跳計數器＝偏差 #29）；**R2 GO**（blocking 0；N1 當下修 closeout §3、N2→§15 #19、N3＝§15 #16）；closeout `docs/reports/2026-09-25-phase1-closeout.md` | 17e6dc1、（本 commit） |
 
 **開工／續工指令：貼 `/phase-run` 即可**（skill 會照下面這段做；不能用 skill 時貼這段原文）：
 
@@ -994,3 +995,7 @@ R2 回 GO 後：ROADMAP Phase 1 標 ✅、`docs/plans/README.md` 對照表本列
     寫一筆 `decision: go`、沿用舊 tier 與分類（`engine_b/leads.py:928`，[321] 起就在，不是 Phase 1 新增）。它是重排不是判斷，
     但讓 gate 4「triage 寫入者只有 `leads.triage()`」字面不成立；1.3 的 c8a7dea 已讓心跳排除它的時間戳。要不要改成不寫 `triage`
     （另記 `requeued_by`）——與 #14 同一處，一起決定。
+18. **封存 prompt 帶走的幾句判準還是不是活的**（結案 R2 N1）：「同一來源後續成功才算 recovered」「不得依 section」「單檔行情降級不歸零」
+    「Alpha／Beta 共用」原本只斷言在已封存的 Codex daily prompt 上，現在沒有測試守；計分表量測窗／樣本數／偏差在 APP `app.js` 的呈現沒有測試。
+19. **讀圖 v2 `disproof[]` 沒有出處欄位**（結案 R2 N2；L18）：`tech:cw_dfb_laser` 的 5 條從 `sr_a181641ddb99c69c` 逐字搬來，但各項指不回來源紀錄、
+    現行那份散文寫「六條」——追原文要跳兩層。要不要在 v2 contract 加出處欄位，或下次重讀時讓散文與 `disproof[]` 自洽（Phase 2）。

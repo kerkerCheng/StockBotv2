@@ -6,7 +6,7 @@
 > 本檔每個數字都附查證命令；數的是**等待 registry 的筆數與狀態、pq2 項目、daily 執行紀錄、機制存在與否**（plan §12），
 > 沒有一個是「幾檔通過某個 filter」。
 
-## 0. Phase 1 做了什麼（21 個 commit，2026-09-24 → 09-25）
+## 0. Phase 1 做了什麼（23 個 commit，2026-09-24 → 09-25）
 
 | Step | commit | 一句話 |
 |---|---|---|
@@ -23,12 +23,13 @@
 | 1.10 | 2299f9f、f2159f7 | 稽核改讀新的等待 registry（Lifecycle／Expiry／Orphans／QueueLiveness） |
 | 1.2b | fc0f2a6 | 舊兩個 Windows 工作與 `crons/heartbeat_task.py` 刪除；排程只剩 `StockBotv2-Daily` |
 | 結案前置 | bf0bf7e | 心跳「今日醒」漏算當輪就排回的醒來（09-24／25 真醒 2／3 筆都印 0；L13 同形） |
+| 結案 | 17e6dc1、（本 commit） | 本報告（R2 前）；R2 GO 後處置 N1、ROADMAP Phase 1 ✅、plans README completed |
 
 ## 1. 九項 completion gate（plan §13）
 
 | # | gate | 結果 | 查證 |
 |---|---|---|---|
-| 1 | `pytest -q` 全綠；測試數差＝新增－退役（逐檔） | ✅ **2520 passed, 1 skipped**（基準 2180 passed）；測試檔 **183 ＝ 175（基準）＋ 8（新增）− 0（刪除）**，無改名。新增：`test_audit_waiting`、`test_daily_task`、`test_decision_store_readonly`、`test_disproof_registry`、`test_heartbeat_phase1`、`test_semantic_watch`、`test_triage_apply`、`test_watch_expiry`。**沒有刪任何測試檔**；1.2b 把 `test_heartbeat.py` 裡守舊入口的 5 條改主詞搬進 `test_daily_task.py`（§3） | `python -m pytest -q`；`git log --diff-filter=A --name-only --pretty=format: b07427b..HEAD -- tests/`（`--diff-filter=D` 為空） |
+| 1 | `pytest -q` 全綠；測試數差＝新增－退役（逐檔） | ✅ **2520 passed, 1 skipped**（基準 2180 passed）；測試檔 **183 ＝ 175（基準）＋ 8（新增）− 0（刪除）**，無改名。新增：`test_audit_waiting`、`test_daily_task`、`test_decision_store_readonly`、`test_disproof_registry`、`test_heartbeat_phase1`、`test_semantic_watch`、`test_triage_apply`、`test_watch_expiry`。**沒有刪任何測試檔、沒有改名**；但在既有檔裡**拿掉 33 個測試函式、加 26 個**（6 檔，逐條去向見 §3；R2 N1 更正本檔初稿「唯一是 1.2b 那 5 條」的說法） | `python -m pytest -q`；`git log --diff-filter=A --name-only --pretty=format: b07427b..HEAD -- tests/`（`--diff-filter=D` 為空） |
 | 2 | `python -m audit invariants` 綠（含 1.10 新判準） | ✅ **13 項 PASS／0 FAIL（共檢查 4730 筆）**；1.10 的新判準（`Lifecycle` 讀 watch 收據 127 筆、`Expiry` 116 個等待全有到期與去處、`Orphans` 134 個跨檔引用、`QueueLiveness` 142 項）都在其中。今天 05:30 那輪 daily 的 ⑮ 是 FAIL 1（Expiry＝[586] `pending --trigger` 沒有到期）；使用者當天補 `--until 2026-12-31` 後轉綠 | `python -m audit invariants` |
 | 3 | 無未解釋語意 diff | ✅ **心跳**：與 1.0 那份（09-24 07:00 舊版）逐行對照，拿掉的三行都有取代行——「事件監看：本輪該查／已觸發未消費／到期」→ 段 2「watch：今日醒…」＋段 3「watch 到期…」（偏差 #21，T2 輪詢已移出 daily、沒有 consumer）；段 3「（零＝真的沒有，不是沒跑）」→ 刻意刪（恆真，1.2a），由「分類層：本輪…」與 harvest 過期 ⚠ 說話；段 5「計分表是 weekly 才算的」→ 每天的 tier 分布。五段不增不減。**APP 個股頁**：同一天（09-25）materialize 前後 `--per-panel` digest **逐字相同**（368 行 diff 0；materialize 80/80 成功）。⚠ 限制照實寫：「前」那份是 05:30 daily 以 2299f9f 的程式產生，所以同日比對只證明 1.2b 與 bf0bf7e 沒動個股頁；Phase 1 整體的證據是**程式面**——對 `webapp/`、`alpha/` 的改動只在 watches／positions／structure_readings 三個 state kind、讀圖 contract 與 `alpha/cli.py`，沒有碰個股頁 builder（`git diff --stat cb4b9c4..HEAD -- webapp/ alpha/`）。參考：對 1.0 基準那份（09-24），292 個面板沒有多也沒有少，變了 25 個（research 22、brief 3——AXTI／COHR／LITE 三本短評，數字 placeholder 每天由 authority 填）；**未逐面板歸因** | `python -m crons.heartbeat --out <temp>`；`python scripts/analyst_view_text_digest.py --per-panel` 在同一天 materialize 前後比對 |
 | 4 | 無新 dual authority | ✅（一個列出的例外）排程時間只住 config（兩天的自我比對都 `match`）；Codex 沒有自己的時間、不在任何無人值守步驟（兩個 automation `PAUSED`、`.codex/rules` 0 條）；等待只住 registry（`watch_decision` 續等不掛 `waiting_on`，`engine_b/todo.py` 的三個動詞與 `tests/test_watch_expiry.py`；觸及後的等待住該 thesis 的 `thesis_lifecycle` 那一筆）；**triage 判斷的寫入者只有 `leads.triage()`**（CLI `triage` 與 `triage-apply` 共用，`engine_b/cli.py`）。⚠ **例外照實列**：`leads.requeue_trace`（`engine_b/leads.py:928`）在 watch 叫醒舊 lead 排回 pq1 時機械地寫一筆 `triage`（`decision: go`、沿用舊 tier 與分類）——Phase 1 之前就存在（[321]），不是判斷而是重排；1.3 的 c8a7dea 已讓心跳「分類層上次成功」排除它；它排回的 lead 缺分類就是 §7 #14。是否該改成不寫 `triage` 列 §7 #17 | `grep -n 'lead\["triage"\] =' engine_b/leads.py`；`grep -n "leads.triage(" engine_b/cli.py` |
@@ -57,9 +58,22 @@
 `semantic.pending_check`（③）、`watch.expired`、`disproof.expired_pending`（④），**第一次從 0 變成非 0 的那天 Daily 會自己印出來**。
 下一個 Phase 的 plan（或 closeout）核對③④是否已生效並補記。這是「拿掉一個機制」的做法：不新增 pq2 編號、不新增 watch。
 
-## 3. 測試（沒有刪任何測試檔；硬約束 8）
+## 3. 測試跟機制走（沒有刪測試檔；函式層級拿掉 33、加 26；不可越線 8）
 
-Phase 1 沒有刪測試檔。唯一的「測試跟機制走」是 1.2b：`crons/heartbeat_task.py` 刪除，`tests/test_heartbeat.py` 裡守它的 5 條改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節：
+⚠ 初稿本節寫「唯一的『測試跟機制走』是 1.2b」——**錯**，R2 N1 抓到。以 `cb4b9c4` 為起點逐檔比 `def test_` 名稱（查證命令見 §9），6 個既有檔拿掉 33 個函式、加 26 個：
+
+| 檔 | 拿掉／加 | Step | 拿掉的守什麼 → 現在由誰守 |
+|---|---|---|---|
+| `test_codex_daily_permissions.py` | 13／4 | 1.3 | 舊 `.codex/rules` 12 條逐條（每條 parse 得到、窄 rule、fetchers 不整包放行、sweep 不升權、相鄰命令不放行）→ rules **0 條**：`test_rules_file_has_zero_prefix_rules`、`test_every_retired_prefix_is_no_longer_allowed_by_the_parser`（Codex 自己的 parser 驗舊 12 條都不是 allow）、`test_adjacent_commands_are_not_allowed_either`、`test_retired_list_matches_the_history_written_in_the_rules_header`。掛在 rules 上的**活判準改主詞**到 `tests/test_daily_task.py`：materialize 不含 serve（`test_daily_runs_materialize_but_never_serve`）、機械段跑而使用者動詞不跑（`test_mechanical_segments_run_but_user_verbs_never_do`）、XBRL 只寫一個欄位（`test_xbrl_backfill_is_the_only_engine_c_manual_writer_and_writes_one_field`）、scorecard 網路上限在程式裡（`test_scorecard_network_surface_has_a_hard_cap_in_code_and_the_review_admits_it`）、MOPS 主機寫出來且月營收留在互動（`test_mops_hosts_are_written_in_the_review_and_monthly_revenue_stays_interactive`） |
+| `test_routine_prompts.py` | 8／8 | 1.3、1.9 | 舊 Codex daily／weekly prompt 的內容斷言（兩份 prompt 已逐字封存）→ 封存本身（`test_codex_daily_prompt_is_archived_not_live`、`test_weekly_prompt_is_archived_not_live`）、triage prompt 零工具／資料不是指令／不寫死上限、題材掃描只發現不處置、互動 brief 預設不發第二則、canonical brief 逐字輸出、決策區塊只改閱讀順序 |
+| `test_heartbeat.py` | 8／10 | 1.2b、1.8 | 舊入口 5 條 → `test_daily_task.py`「無人值守入口」節（下表）；weekly 計分表 3 條 → 每天印（`test_scorecard_prints_every_day_with_tiers_change_and_where_the_full_table_is`、`test_scorecard_without_artifact_says_so_instead_of_rebuilding`）；`test_weekly_scorecard_is_not_applicable_on_daily` 是**真刪**（weekly 退役，沒有「非 weekly 不適用」可守）。另加段 1／段 3 的 daily 執行紀錄各條 |
+| `test_daily_brief_skill.py` | 2／2 | 1.3 | 「排程第一次呼叫走固定入口、重試是最後手段」「排程自動 drain pq1 但保留入圖 gate」→ skill 改互動專用後：`test_source_failures_stay_visible_and_retry_is_last_resort`、`test_pq1_drain_keeps_the_admission_gate` |
+| `test_beta_monitor.py` | 1／1 | 1.9 | weekly 完整版 → 「沒變就安靜、完整版要明說」主詞改成 full view |
+| `test_fx_sync.py` | 1／1 | 1.2a | 「不在 Codex sandbox 升權」→ 「是 daily 的一步、不經 Codex」 |
+
+**守門變弱的兩處（R2 N1，照實列，§7 #18 待決）：** ①只斷言在已封存 Codex prompt 上的幾句，現在沒有測試守：「同一來源後續成功才算 recovered」（`skills/daily-brief/SKILL.md` 有這句、無斷言）、「不得依 section」、「單檔行情降級不歸零」、「Alpha／Beta 共用」——它們還是不是活判準要先決定；②舊心跳測試要求輸出本身印量測窗、樣本數與三條偏差，新測試只要求「已知偏差 N 條（在 APP）」；偏差在 artifact 層仍由 `tests/test_account_scorecard.py` 守，APP `app.js` 的呈現沒有測試。
+
+1.2b 的 5 條改主詞（守 `crons/heartbeat_task.py` → 守 `crons/daily_task.py`）：
 
 | 舊（守 `heartbeat_task.py`） | 新主詞（守 `daily_task.py`） |
 |---|---|
@@ -115,10 +129,25 @@ decision_lab.db sha256=e99d1c79fd22dbe1099f30c4e06f2d1188f26a8cbfa987a27cd884253
 15. **使用者動作**：要用 Codex 互動 session 需信任 1.9 新增的 SessionStart hook。
 16. **watch 的「今天」是 UTC 日期**，daily 在台北 05:30（UTC 前一天）跑：daily 裡的到期判斷一律比本地日期晚一天、執行紀錄檔名卻用本地日期。要不要統一成 `schedule.timezone`（動 contract）。1.2b 已把兩條以本地日期寫死的測試改成讀程式的 `_today()`。
 17. **`leads.requeue_trace` 機械寫 `triage`**（gate 4 例外）：watch 排回舊 lead 時寫 `decision: go`、沿用舊 tier——它是重排不是判斷，要不要改成不寫 `triage`（例如另記 `requeued_by`），讓「triage 寫入者只有 `leads.triage()`」字面成立；與 #14 同一處。
+18. **封存 prompt 帶走的幾句判準還是不是活的**（R2 N1）：「同一來源後續成功才算 recovered」「不得依 section」「單檔行情降級不歸零」「Alpha／Beta 共用」
+    原本只斷言在已封存的 Codex daily prompt 上，現在沒有測試守；是活判準就補斷言（守它實際住的地方），不是就在封存說明裡寫明退役。
+    另：計分表的量測窗／樣本數／三條偏差在 APP `app.js` 的呈現沒有測試（artifact 層有）。
+19. **讀圖 v2 `disproof[]` 的出處欄位**（R2 N2；L18）：`tech:cw_dfb_laser` 現行讀圖 `sr_d07679979a8e4202` 的散文沿用前一份、寫「六條」，
+    而 `disproof[]` 5 條是從 `sr_a181641ddb99c69c` 逐字搬來、各項沒有指回來源紀錄的欄位——追回原文要跳兩層，這條鏈只記在 1.6 報告與偏差 #15。
+    ledger 是 append-only 不能改；要不要在 v2 contract 給 disproof 項加出處欄位，或下次重讀該節點時讓散文與 `disproof[]` 自洽——Phase 2（讀圖是主角）決定。
 
 ## 8. R2 結果
 
-（進行中：2026-09-25 以 plan §13 的 WORK_REQUEST 發給乾淨 context 的 reviewer，唯讀。回 GO 才標 ROADMAP Phase 1 ✅、plans README 改 completed；回 NO_GO → `AWAITING_HUMAN`。）
+**2026-09-25 台北 07:59–08:12，乾淨 context 的 reviewer，唯讀（對 `17e6dc1`）。Verdict：GO。** 九項全 ✅；blocking 0；non-blocking 3。
+reviewer 另做了本檔沒有的反證：audit 三組記憶體內變異（`_TOUCHED_GRACE`、`_EXPIRY_GRACE` 放大、`_open_review_ids` 恆真）各自讓對應測試轉紅；
+`codex execpolicy` 以**舊** rules 檔跑同樣 12 條全回 `allow`（證明對現行 rules 的「不是 allow」不是空轉）；語意 watch 14 個實體全在 registry、
+抽 4 筆（Sivers `ew_0107`、`tech:cw_dfb_laser` `ew_0122`、叫不醒的 `ew_0114`／`ew_0098`、POET `ew_0124`）逐字對回原文與一手 lead 交集。
+
+| # | finding | 處置 |
+|---|---|---|
+| N1 | 本檔 §3 初稿說「唯一的測試跟機制走是 1.2b 那 5 條」，實際 6 檔拿掉 33 個函式；其中兩處守門變弱 | **結案 commit 當下修**：§3 改成函式層級逐檔去向（自己重跑比對，33／26 相符）、gate 1 那格改寫；變弱的兩處列 §7 #18 |
+| N2 | `tech:cw_dfb_laser` 的反證要跳兩層才追得回原文（L18） | append-only 不能改；列 §7 #19 給 Phase 2 |
+| N3 | 同一輪兩種「今天」（心跳用本地、watch 到期用 UTC） | 已是 §7 #16，reviewer 確認現象屬實；不另處置 |
 
 ## 9. 附錄：本次實跑的命令
 
@@ -137,4 +166,5 @@ python -m webapp materialize --tracked --registry-listed --structure-table --bet
 python scripts\analyst_view_text_digest.py --per-panel      # materialize 後
 git diff cb4b9c4 HEAD -- AGENTS.md
 git log --diff-filter=A --name-only --pretty=format: b07427b..HEAD -- tests/
+# 函式層級：對 cb4b9c4 的每個 tests/test_*.py，比 `git show cb4b9c4:<檔>` 與 HEAD 的 `^def test_` 名稱集合（§3 的 33／26）
 ```
