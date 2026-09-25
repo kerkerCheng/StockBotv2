@@ -27,7 +27,7 @@
 |---|---|---|
 | 0 拆 | [2026-09-22-001](2026-09-22-001-refactor-phase0-retire-plan.md) | completed（2026-09-23；closeout `docs/reports/2026-09-23-phase0-closeout.md`） |
 | 1 等待與心跳 | [2026-09-24-001](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | completed（2026-09-25；closeout `docs/reports/2026-09-25-phase1-closeout.md`；R2 GO） |
-| 2 讀圖兩種單位加走圖 | [2026-09-25-001](2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md) | active |
+| 2 讀圖兩種單位加走圖 | [2026-09-25-001](2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md) | completed（2026-09-26；closeout `docs/reports/2026-09-26-phase2-closeout.md`；R2 GO） |
 | 3 候選狀態加三題 | 尚無 | — |
 | 4 層中心來源 | 尚無 | — |
 | 5 量測 | 尚無 | — |
@@ -56,6 +56,6 @@
 | [Serenity 30-Day Research Campaign (2026-07-29)](2026-07-29-002-feat-serenity-30d-research-campaign-plan.md) | 30 天 X 分頁回補、圖片快取、scoped exploration triage 與 robotics 一手追源 | completed |
 | [Phase 0 拆：退役估值鏈、排序驅動、decision_lab 研究側 (2026-09-22)](2026-09-22-001-refactor-phase0-retire-plan.md) | 給便宜模型的完整執行 plan：0a 停跑、0b 四批刪除（先斷 import 再刪）、0c 池子；驗收＝殭屍 grep 差集歸零、Decision Store sha256 不變 | completed（2026-09-23） |
 | [Phase 1 等待與心跳 (2026-09-24)](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | 一個 Windows daily（LLM 以 Claude CLI 零工具做 triage 與語意預篩、weekly 退役）、`semantic_condition` watch、反證登記 hook 與補登記、到期轉 pq2 `watch_decision`、心跳改版；驗收＝watch registry 的筆數與狀態 | completed（2026-09-25；closeout `docs/reports/2026-09-25-phase1-closeout.md`；R2 GO） |
-| [Phase 2 讀圖兩種單位加走圖 (2026-09-25)](2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md) | Graph MCP 退役；反向路徑只收競爭關係；讀圖 v3（`unit` 層／插槽、兩半逐字引用由程式核對、反證出處）；插槽視角；強模型寫第一份插槽讀圖；走圖九型問句與 `graph_holes`、`graph_walk` kind；讀圖頁與個股頁讀圖面板；pq1 拿掉結構排序殘留；Phase 1 三個小修；驗收＝讀圖 ledger、走圖命中／母體、state kind | active |
+| [Phase 2 讀圖兩種單位加走圖 (2026-09-25)](2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md) | Graph MCP 退役；反向路徑只收競爭關係；讀圖 v3（`unit` 層／插槽、兩半逐字引用由程式核對、反證出處）；插槽視角；強模型寫第一份插槽讀圖；走圖九型問句與 `graph_holes`、`graph_walk` kind；讀圖頁與個股頁讀圖面板；pq1 拿掉結構排序殘留；Phase 1 三個小修；驗收＝讀圖 ledger、走圖命中／母體、state kind | completed（2026-09-26；closeout `docs/reports/2026-09-26-phase2-closeout.md`；R2 GO） |
 
-**目前 active plan：Phase 2（2026-09-25-001）——切便宜模型貼 `/phase-run`；Step 2.5 輪到時會停下來請你切強模型。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active plan：Phase 2 已結案（2026-09-26），Phase 3 還沒有 plan——切 fable 貼 `/phase-plan`。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。

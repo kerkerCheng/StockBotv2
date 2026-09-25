@@ -1,7 +1,7 @@
 ---
 date: 2026-09-25
 topic: phase2-reading-units-graph-walk
-status: active
+status: completed
 derived_from: docs/ROADMAP.md（Phase 2，含本 plan §0.4 的 amendment A1–A6）、docs/brainstorms/2026-09-22-graph-first-direction-decision.md（G2、G5、G7、G8）、docs/reports/2026-09-25-phase1-closeout.md §7、docs/brainstorms/2026-09-17-structural-reading-layer.md、docs/brainstorms/2026-09-18-verbatim-never-reaches-the-decision.md
 plan_review: 未做 P0（使用者 2026-09-25 選 8A：執行期間 R2 常規 opt-in，plan 本身不先審）
 ---
@@ -185,7 +185,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.9a | `pending --trigger` 必帶到期或綁 watch | ✅（只帶 trigger 拒收並印兩種寫法；`--watch` 必須是會叫醒這個編號、仍在等的 watch；現存池 1 筆只帶 trigger 的 [632] 已有 `ew_0094` 會叫醒它，audit Expiry PASS） | 便宜 | `a124746` |
 | 2.9b | 追源排回不寫假 triage、缺分類有人接 | ✅（`requeue_trace` 只追加 `requeued`；`classification-health` 另計 `requeued_unclassified_count`＝3、每筆帶 consumer；「triage 判斷的寫入者只有 `leads.triage()`」字面成立——另兩處是回到 pending 時清成 None） | 便宜 | `28057cf` |
 | 2.9c | watch 的「今天」改台北日期 | ✅（`event_watch._today()` 讀 `schedule.timezone`；disproof、pq2 `until` 叫回、audit Expiry 共用；順手修「追源到期結案今日」拿 UTC 前 10 碼比本地今天的少算；偏差 #19） | 便宜 | `c00896e` |
-| 結案 | completion gate ＋ closeout 報告 ＋ R2 ＋ ROADMAP ✅ | ▶（closeout 已寫、九項 gate 過；R2 進行中） | 便宜 | |
+| 結案 | completion gate ＋ closeout 報告 ＋ R2 ＋ ROADMAP ✅ | ✅（九項 gate 過；結案 R2 GO，non-blocking 四條處置見 closeout §7） | 便宜 | `354b315`＋本 commit |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 

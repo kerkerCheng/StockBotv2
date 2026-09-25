@@ -22,7 +22,7 @@
 | 2.9a | a124746 | `pending --trigger` 必帶 `--until` 或綁一筆會叫醒它的 watch（`--watch`） |
 | 2.9b | 28057cf | 追源排回不再寫假 triage（只追加 `requeued`）；缺分類的排回 lead 在健康審查單獨計數並指出 consumer |
 | 2.9c | c00896e | watch 的「今天」改排程時區（台北）日期；同一個 `_today()` 給 disproof、pq2 `until` 叫回、audit Expiry |
-| 結案 | （本 commit） | 本報告（R2 前）；R2 GO 後 ROADMAP Phase 2 ✅、plans README completed |
+| 結案 | 354b315、（本 commit） | 本報告（R2 前）；結案 R2 GO 後處置 non-blocking、ROADMAP Phase 2 ✅、plans README completed |
 
 ## 1. 九項 completion gate（plan §12）
 
@@ -59,7 +59,7 @@
 |---|---|---|
 | `test_engine_c_mcp.py`（刪檔，6）、`test_graph_mcp_manual.py`（刪檔，5）、`test_leads_mcp.py`（刪檔，5）、`test_layer_separation.py`（5 個 MCP 相關） | 21 | 守的 `mcp_server/` 已不存在（2.1）；「不得有對外寫入入口」改由殭屍 grep 第九組（所有 tracked 檔 MCP 字樣扣 keep-list 為 0）守。R2-a 已抽 5 個確認 |
 | `test_structure_reading.py::test_constrained_by_answers_demand_side_and_next_layer_not_only_counter_path` | 1 | 改名翻面為 `…_not_counter_path`（A3：`constrained_by` 不在反向路徑）＋ `test_counter_path_members_are_the_vocabulary`、`…_fails_closed_when_missing`（2.2） |
-| `test_webapp_coverage_watches.py` 四條（counts／identity／scope／固定文字同源） | 4 | 檔改名 `test_webapp_graph_walk_watches.py`：`test_graph_walk_artifact_copies_every_type_and_adds_no_total`、`…_identity_tracks_who_is_hit_not_the_wording`、`…_scope_limit_travels_with_the_data`、`test_duplicate_hits_keep_their_verbatim_on_both_sides`；coverage 的 markdown 文字同源由 `tests/test_coverage_gaps.py` 繼續守（CLI 仍在） |
+| `test_webapp_coverage_watches.py` 四條（counts／identity／scope／固定文字同源） | 4 | 檔改名 `test_webapp_graph_walk_watches.py`：`test_graph_walk_artifact_copies_every_type_and_adds_no_total`、`…_identity_tracks_who_is_hit_not_the_wording`、`…_scope_limit_travels_with_the_data`、`test_duplicate_hits_keep_their_verbatim_on_both_sides`；`test_fixed_text_has_one_home_and_the_markdown_prints_it` 守的是「coverage artifact 與 markdown 同源」——artifact 退役後**前提消失**，不是改由別處守（R2 non-blocking #2 更正；原句寫「由 `tests/test_coverage_gaps.py` 繼續守」是過度說法） |
 | `test_decompose_proposals.py::test_shipped_sector_anchors_load_and_coverage_nodes_extract` | 1 | 改名 `…_walk_nodes_extract`（節點清單改讀 `graph_walk` artifact，欄位缺席 raise） |
 | `test_engine_b_priority.py::test_chokepoint_impact_lifts_supply_chain_leads_over_generic_commentary` | 1 | **機制刻意退役**（A4）：斷言翻面為 `test_chokepoint_is_no_longer_an_input_and_lead_time_decides_within_a_tier`（有人把瓶頸鍵加回來會紅） |
 | `test_engine_b_cli.py::test_trace_requeue_restores_latest_classification_from_history` | 1 | **行為刻意改變**（2.9b）：翻成 `test_trace_requeue_leaves_classification_to_its_consumer_and_never_rejudges`（缺分類交給 backfill 的確定性還原、consumer 真的接得住）＋兩條新測試 |
@@ -80,7 +80,7 @@
 
 **本 Phase 執行中新增：**
 
-1. **`graph_holes` 段的計數語意**（偏差 #14）：九型命中之和 vs 有命中的型別數。它不在任何人讀的畫面上當一個數字印，但它是跨型別合成——若 R2 認為違反 §0 第 7 條，Phase 3 改。
+1. **`graph_holes` 段的計數語意**（偏差 #14；結案 R2 判定「形式上是跨型別合成、不違反 §0 第 7 條的立法目的、不擋結案」）：它是**異單位加總**（第 9 型是候選對、其他是節點或 lead），而且不只在 `observe()`／稽核那一行——`queue_segments.observe()` 的 `research_total` 會再加一次（該欄位目前沒有 production consumer），心跳 `build_queue` 也自己算了一份傳進 `observe()`（與 `audit/checks.py::_graph_holes` 兩份實作）。R2 建議二擇一：段計數改「有命中的型別數」，或段計數留 int、稽核那一行改印逐型字串（同 `summary_line`）並刪 `research_total` 或排除 `graph_holes`。
 2. **3 則排回的舊 lead 缺分類**（`lead_44ce140c…`、`lead_f6d7fdd6…` AXTI 8-K、`lead_9b9d5797…` $SIVE）：沒有可還原的歷史 receipt，consumer 是**互動 session 的語意補分類**（`scripts/backfill_lead_classification.py --from-json … --apply`，不重判 go／no_go）；在做之前 daily ⑦c `classification-health` 每天照舊亮燈（exit 2），drain 扣住它們。**這是研究動作，不是開發**。
 3. **lead 實體的 ticker 解析缺口**（走圖第 5 型的「registry 解析不到」列出 `SIVE`、`ASML`、`AMZN`、`STM`、`SOI`…12 個）：`SIVE` 在 registry 是 `SIVE.ST`，cashtag 解析不到＝INV-1「ID 沒解析對」，不是圖中無此公司。要不要讓 `company_id_for_ticker` 認無後綴的 cashtag（有歧義風險），是 identity 的決定。
 4. **稽核 `QueueSegments` 那一格依賴 Neo4j**（偏差 #11）：圖沒開時 `graph_holes` 印「未讀到」並註明——可接受，還是要回到「稽核不讀圖」？
@@ -107,3 +107,18 @@
 - 上面 §5 第 2 條的 3 則補分類（研究，互動 session）。
 
 最後一次全套：`python -m pytest -q` → **2590 passed, 1 skipped**（2026-09-26 結案前）。
+
+## 7. 結案 R2（2026-09-26；乾淨 context 的 reviewer，使用者已常規 opt-in）
+
+**Verdict：GO**——plan §12 的九項 reviewer 自己重跑全數成立（2590 passed；audit 13 PASS；ledger 14／14 id 重算相同；
+v3 volume 引用 20／20 逐條對圖；自造 6 筆應拒收的 spec 全被拒、對照組寫入成功、真實 ledger sha256 前後不變；走圖九型逐型抽樣對圖屬實；
+核心面板 digest `b620cdb0be9cb3a1`；triage-apply 端到端拒收 ranking；Decision Store 三檔相同）。**Blocking：無。**
+
+Non-blocking 的處置：
+
+| # | 內容 | 處置 |
+|---|---|---|
+| 1 | `graph_holes` 是異單位加總，且另在 `research_total` 與心跳各算一次（closeout 原寫「只在 observe()／稽核那一行」不精確） | §5 #1 改寫成精確描述＋R2 的兩個方案，**Phase 3 決定**（不擋結案） |
+| 2 | §3 `test_fixed_text_has_one_home…` 的去向說法過度 | §3 改成「前提消失」 |
+| 3 | 插槽「扣掉製造者」的正向面只有單元測試守，真實資料驗不到（#20） | 已在 §5 #6；#20 修好後用真實資料再驗 |
+| 4 | 小瑕疵：plan §0.6 偏差 #6 排在 #5 前；`ANGLE_KEYS` 註解寫「五個角度」實際 4 個 key（anchor 另計）；`coverage.json`／`ranking.json` 磁碟孤兒 | 照實記錄；前兩者是文字，不動行為，留給下一次動到那兩處的 Step 順手改 |
