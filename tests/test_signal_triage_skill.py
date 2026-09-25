@@ -30,6 +30,7 @@ def test_pass_requires_atomic_classification_and_health_gate() -> None:
         "--payment-direction",
         "classification-health",
         "withheld_unclassified_lead",
-        "trace requeue 必須保留",
+        # 2026-09-26（Step 2.9b）：排回不再寫 triage——句子改成「不寫 triage」＋缺分類單獨計數。
+        "trace requeue 不寫 triage", "requeued_unclassified_count",
     ):
         assert token in text

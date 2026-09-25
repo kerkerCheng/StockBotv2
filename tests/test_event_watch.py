@@ -298,6 +298,24 @@ def test_same_lead_does_not_refire_a_reactivated_watch() -> None:
     assert len(fired) == 1 and fired[0]["woken_by"]["lead_id"] == "l_next_10q"
 
 
+def test_new_style_requeue_without_a_triage_rewrite_is_still_not_an_event() -> None:
+    """2026-09-26（Phase 2 Step 2.9b）：排回不再改寫 triage，只追加 `requeued`——判別改看「最後一次排回晚於
+    triage 時間」。舊式（改寫 triage）仍由下一條守；心跳只排除舊式那種（`_triage_written_by_requeue`）。"""
+    data = _fresh()
+    watch = ew.add_watch(
+        data, kind="related_entity_signal", wake_lead="lead_other",
+        expires="2027-03-31", entities=["co:axt"],
+    )
+    watch["created_at"] = "2026-09-01T00:00:00+00:00"
+    lead = _lead(decided="2026-09-05T00:00:00+00:00", entities=["co:axt"])
+    lead["requeued"] = [{"at": "2026-09-09T00:00:00+00:00", "trigger": "event_watch:ew_x"}]
+    assert ew._is_trace_requeue(lead) and not ew._triage_written_by_requeue(lead)
+    assert ew.check_watches(data, leads={"l_requeued": lead}, today=date(2026, 9, 9)) == []
+    retriaged = dict(lead, triage=dict(lead["triage"], decided_at="2026-09-10T00:00:00+00:00"))
+    assert not ew._is_trace_requeue(retriaged)
+    assert len(ew.check_watches(data, leads={"l_requeued": retriaged}, today=date(2026, 9, 10))) == 1
+
+
 def test_trace_requeue_is_not_an_event() -> None:
     """requeue_trace 會把 triage receipt 整包重寫成今天——那不是新 PASS，不得叫醒任何 watch。"""
     data = _fresh()

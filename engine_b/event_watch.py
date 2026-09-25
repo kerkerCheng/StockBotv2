@@ -714,15 +714,30 @@ def _semantic_matches(watch: Mapping[str, Any], leads: Mapping[str, Any], *,
     return out
 
 
-def _is_trace_requeue(lead: Mapping[str, Any]) -> bool:
-    """這則 lead 目前的 triage receipt 是不是由追源重排寫的（而非原始 PASS）。
+def _triage_written_by_requeue(lead: Mapping[str, Any]) -> bool:
+    """這則 lead 目前的 triage receipt 是不是**舊式**追源重排寫的（2026-09-26 前 `requeue_trace` 會改寫 triage）。
 
-    `requeue_trace` 把 `triage.decided_at` 與 `refs.trace_requeued_at` 寫成同一個 stamp；
-    兩者相等＝這一輪是重排。原始 PASS 的 decided_at 早於任何 requeue，不會相等。
+    舊式重排把 `triage.decided_at` 與 `refs.trace_requeued_at` 寫成同一個 stamp；兩者相等＝那一筆不是分類層跑的。
+    2026-09-26 起重排不再寫 triage，新資料這裡恆為 False——只剩舊資料會命中（心跳「分類層上次成功」用它）。
     """
     refs = lead.get("refs") or {}
     stamp = str(refs.get("trace_requeued_at") or "")
     return bool(stamp) and stamp == str((lead.get("triage") or {}).get("decided_at") or "")
+
+
+def _is_trace_requeue(lead: Mapping[str, Any]) -> bool:
+    """這則 lead 目前的動靜是**追源排回**，不是新的 triage——排回不是事件，不得叫醒任何 watch。
+
+    兩種形狀都認：舊式（重排改寫了 triage，`_triage_written_by_requeue`）與新式（2026-09-26 起只追加
+    `lead["requeued"]`：最後一次排回晚於 triage 的時間）。之後若真的被重新 triage（decided_at 晚於最後一次排回），
+    那才是新事件。
+    """
+    if _triage_written_by_requeue(lead):
+        return True
+    stamps = [str(r.get("at") or "") for r in lead.get("requeued") or () if isinstance(r, Mapping)]
+    if not stamps:
+        return False
+    return max(stamps) >= str((lead.get("triage") or {}).get("decided_at") or "")
 
 
 def sweep_due(data: Mapping[str, Any], *, today: date | None = None) -> list[dict[str, Any]]:

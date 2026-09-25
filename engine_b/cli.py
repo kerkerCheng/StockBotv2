@@ -700,9 +700,13 @@ def _cmd_classification_health(args: argparse.Namespace) -> int:
 
     store = leads.load(args.leads)
     gaps = leads.classification_gaps(store)
+    requeued = [g for g in gaps if g.get("requeued")]
     print(json.dumps({
         "status": "ok" if not gaps else "error",
         "active_unclassified_count": len(gaps),
+        # 排回的舊 lead 缺分類單獨計數（Phase 1 待決 #14；INV-4：每一筆都帶 consumer）——不排除在審查外。
+        "requeued_unclassified_count": len(requeued),
+        "requeued_restorable_from_history": sum(1 for g in requeued if g.get("restorable_from_history")),
         "items": gaps,
     }, ensure_ascii=False, indent=2))
     return 0 if not gaps else 2

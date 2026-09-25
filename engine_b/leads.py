@@ -880,7 +880,15 @@ def requeue_trace(
     reason: str,
     requeued_at: str | None = None,
 ) -> dict[str, Any]:
-    """把 exact trace review 從 parked 重新排入 pq1，並保留舊 triage receipt。"""
+    """把 exact trace review 從 parked 重新排入 pq1。**不寫 `triage`**——排回是重排，不是判斷。
+
+    ⚠ 2026-09-26（Phase 2 Step 2.9b，Phase 1 待決 #14＋#17）：原本這裡把 `lead["triage"]` 整包重建
+    （`decision: go`、`decided_at`＝排回時間、`reason`＝排回理由），看起來像剛 triage 過——心跳「分類層上次成功」
+    與事件監看都得另寫判別把它排除（L12：一個欄位兩種語意）。現在只追加 `lead["requeued"]`（時間、觸發、
+    理由、原狀態、叫醒它的 watch），`triage` 保持原始那一筆，「triage 的寫入者只有 `leads.triage()`」字面成立。
+    原始 triage 沒有分類的，排回後由分類健康審查單獨計數並指出 consumer（`classification_gaps`，INV-4），
+    **不重判 go／no_go**。使用者觸發（`user_go` 等）的優先旗標記在 `requeued` 那一筆，由排序讀。
+    """
 
     cleaned_trigger = str(trigger or "").strip()
     cleaned_reason = str(reason or "").strip()
@@ -896,55 +904,29 @@ def requeue_trace(
         raise LeadStateError("lead 沒有 trace backlog receipt")
 
     stamp = requeued_at or _now()
-    previous = lead.get("triage")
-    if previous:
-        history = lead.setdefault("triage_history", [])
-        if not isinstance(history, list):
-            raise ValueError("triage_history 必須是 list")
-        history.append({
-            "status": "parked",
-            "triage": dict(previous),
-            "superseded_at": stamp,
-            "superseded_reason": cleaned_reason,
-            "trace_trigger": cleaned_trigger,
-        })
-    previous_flags = dict((previous or {}).get("priority_flags") or {})
-    if cleaned_trigger in {"user_go", "user_requested", "access_granted"}:
-        previous_flags["user_requested"] = True
-    preserved_classification = dict(
-        (previous or {}).get("classification") or {}
-    )
-    if not preserved_classification:
-        # 2026-08-27 實測：trace requeue 會把 active triage 整包重建，XFAB
-        # 原本的 candidate_set／structural_fact 因此只剩在 history，drain 顯示
-        # 未分類。分類描述的是 lead 本身，不是這次喚醒事件；重排時應沿用最近
-        # 一筆 receipt，不另做語意推論。
-        for entry in reversed(lead.get("triage_history") or []):
-            candidate = ((entry.get("triage") or {}).get("classification") or {})
-            if candidate:
-                preserved_classification = dict(candidate)
-                break
-    lead["status"] = "triaged_go"
-    lead["triage"] = {
-        "decision": "go",
-        "tier": int((previous or {}).get("tier") or 4),
+    requeued = lead.setdefault("requeued", [])
+    if not isinstance(requeued, list):
+        raise ValueError("requeued 必須是 list")
+    watch_id = (cleaned_trigger.split(":", 1)[1]
+                if cleaned_trigger.startswith("event_watch:") else None)
+    requeued.append({
+        "at": stamp,
+        "from_status": lead["status"],
+        "trigger": cleaned_trigger,
         "reason": cleaned_reason,
-        "decided_at": stamp,
-        "priority_flags": previous_flags,
-    }
-    if preserved_classification:
-        from engine_b import priority
-
-        lead["triage"]["classification"] = priority.validate_classification(
-            preserved_classification,
-            require_receipt=True,
-            allow_legacy=True,   # 保留的是舊 receipt，可能是 2026-09-26 前的 `ranking`
-        )
+        "watch_id": watch_id,
+        "user_requested": cleaned_trigger in USER_REQUEUE_TRIGGERS,
+    })
+    lead["status"] = "triaged_go"
     lead.setdefault("refs", {}).update({
         "trace_requeued_at": stamp,
         "trace_requeue_trigger": cleaned_trigger,
     })
     return lead
+
+
+#: 使用者本人觸發的排回（給排序的「使用者指定」一鍵讀；`engine_b/priority.py::rank_lead`）。
+USER_REQUEUE_TRIGGERS = frozenset({"user_go", "user_requested", "access_granted"})
 
 
 _PRIORITY_FLAG_KEYS = (
@@ -1408,11 +1390,22 @@ def classification_gaps(store: dict[str, Any]) -> list[dict[str, Any]]:
             else:
                 continue
         title = " ".join(str(lead.get("title") or "").split())
+        # 排回的舊 lead 缺分類（Phase 1 待決 #14）：單獨標出並指出 consumer（INV-4），**不排除在審查外**。
+        # 有歷史 receipt 的走確定性還原；沒有的要語意分類——互動 session 產 JSON 後套用，只補分類、不重判 go／no_go。
+        requeued = bool(lead.get("requeued")) or bool((lead.get("refs") or {}).get("trace_requeued_at"))
+        restorable = any(((e.get("triage") or {}).get("classification"))
+                         for e in lead.get("triage_history") or () if isinstance(e, dict))
+        consumer = ("python scripts/backfill_lead_classification.py --apply（history 還原，確定性）" if restorable else
+                    "互動 session：依 skills/signal-triage 判準產 JSON → python scripts/backfill_lead_classification.py "
+                    "--from-json <file> --apply（只補分類、不重判 go／no_go）")
         rows.append({
             "lead_id": lead_id,
             "status": lead.get("status"),
             "source": lead.get("source"),
             "title": title[:200],
             "issue": issue,
+            "requeued": requeued,
+            "restorable_from_history": restorable,
+            "consumer": consumer,
         })
     return sorted(rows, key=lambda row: row["lead_id"])

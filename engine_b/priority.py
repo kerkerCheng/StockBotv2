@@ -292,9 +292,11 @@ def rank_lead(
         tier = 4
     tier = min(4, max(1, tier))
 
+    # 使用者觸發的追源排回也算使用者指定（2026-09-26 起旗標記在 `lead["requeued"]`，不再改寫 triage）。
     user_authority = 0 if (
         flags.get("user_requested")
         or (lead.get("refs") or {}).get("campaign_focus") == "primary"
+        or any(isinstance(r, Mapping) and r.get("user_requested") for r in lead.get("requeued") or ())
     ) else 1
 
     # 反證仍是最高優先——舊 `contradiction` 權重 5.0 的理由（可能推翻 thesis）

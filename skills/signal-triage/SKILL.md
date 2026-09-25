@@ -130,8 +130,8 @@ FILTER 不寫 classification，仍使用 `--no-go --tier ... --reason ...`。PAS
 不在封閉字彙內時，CLI 必須拒絕且不得改 lead status。triage 完成後固定執行
 `engine_b.cli classification-health`；active 缺口回 exit 2。`drain` 會把缺口逐筆列為
 `withheld_unclassified_lead`，不讓 `unknown` sentinel 偷走 pq1 slot；已核准的 Decision work order
-與其他分類完整的 leads 仍可繼續。trace requeue 必須保留 lead 最近一筆合法 classification receipt，
-不能因重建 active triage 而遺失。
+與其他分類完整的 leads 仍可繼續。trace requeue 不寫 triage（2026-09-26 起只追加 `requeued`），原始那一筆分類照留；原始沒有分類的排回 lead
+由 `classification-health` 單獨計數（`requeued_unclassified_count`）並指出 consumer，只補分類、不重判 go／no_go。
 
 **`decision_impact` 是判斷核心，也最容易填錯。** 問法固定：*「如果查證結果是 A，什麼會變？
 是 B 呢？」*

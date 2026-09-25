@@ -207,13 +207,25 @@ def test_trace_requeue_preserves_triage_receipt_and_returns_to_pq1(tmp_path) -> 
         requeued_at="2026-07-29T00:00:00+00:00",
     )
 
+    # 2026-09-26（Phase 2 Step 2.9b）：排回不寫 triage——原始那一筆一字不動，排回另記在 `requeued`。
     assert lead["status"] == "triaged_go"
-    assert lead["triage_history"][0]["triage"]["reason"] == "先追原報告"
-    assert lead["triage"]["priority_flags"]["user_requested"] is True
+    assert lead["triage"]["reason"] == "先追原報告"
+    assert lead["triage"]["decided_at"] != "2026-07-29T00:00:00+00:00"
+    assert "triage_history" not in lead
+    assert lead["requeued"] == [{"at": "2026-07-29T00:00:00+00:00", "from_status": "parked", "trigger": "user_go",
+                                 "reason": "使用者提供合法 access，重排 pq1", "watch_id": None,
+                                 "user_requested": True}]
+    # 使用者觸發的排回仍是「使用者指定」（旗標從 triage 搬到 requeued，排序讀得到）
+    from engine_b import priority
+    assert priority.rank_lead(lead).user_authority == 0
 
 
-def test_trace_requeue_restores_latest_classification_from_history() -> None:
-    """2026-08-27 XFAB 迴歸：requeue 不得把分類只留在 history。"""
+def test_trace_requeue_leaves_classification_to_its_consumer_and_never_rejudges() -> None:
+    """2026-08-27 XFAB 迴歸的新接法（Phase 2 Step 2.9b，Phase 1 待決 #14＋#17）：排回不寫 triage，
+    所以 history 裡的分類不再由排回偷偷搬回來——缺分類的排回 lead 由分類健康審查**單獨標出並指出 consumer**
+    （INV-4），history 有 receipt 的走 backfill 的確定性還原；**不重判 go／no_go**。"""
+    import importlib.util
+    from pathlib import Path as _P
 
     store = leads.empty_store()
     lead_id, _ = leads.register(
@@ -239,12 +251,52 @@ def test_trace_requeue_restores_latest_classification_from_history() -> None:
     lead = leads.requeue_trace(
         store,
         lead_id,
-        trigger="related_triaged_lead:lead_event",
+        trigger="event_watch:ew_0042",
         reason="新一手事件觸發 bounded retry",
     )
 
-    assert lead["triage"]["classification"] == old_receipt
+    assert "classification" not in lead["triage"] and lead["triage"]["reason"] == "舊 active receipt"
+    assert lead["requeued"][-1]["watch_id"] == "ew_0042"
+    gaps = leads.classification_gaps(store)
+    assert [g["lead_id"] for g in gaps] == [lead_id]
+    assert gaps[0]["requeued"] is True and gaps[0]["restorable_from_history"] is True
+    assert "backfill_lead_classification.py --apply" in gaps[0]["consumer"]
+
+    # consumer 真的接得住：backfill 的 history 還原（確定性、不需要 LLM）補回分類，go／no_go 不動
+    spec = importlib.util.spec_from_file_location(
+        "backfill", _P(__file__).resolve().parents[1] / "scripts" / "backfill_lead_classification.py")
+    backfill = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(backfill)
+    assert backfill._restore_active_history(store, now="2026-09-26T00:00:00+00:00") == 1
+    assert lead["triage"]["classification"]["decision_impact"] == "candidate_set"
+    assert lead["triage"]["decision"] == "go" and leads.classification_gaps(store) == []
+
+
+def test_requeued_lead_keeps_its_original_classification_for_pq1_ordering() -> None:
+    """L11-6 ④：排序讀 `triage.classification`——排回不碰 triage，原始分類照讀，不進缺口、不被 withheld。"""
+    from engine_b import priority
+
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="x:test", url="https://x.com/test/status/keep")
+    leads.triage(store, lead_id, go=True, tier=2, reason="原始 PASS", classification=PASS_CLASSIFICATION)
+    leads.advance(store, lead_id, "parked", ref={"trace_status": "partial", "trace_requires_user": "false"})
+    before = dict(store["leads"][lead_id]["triage"])
+    lead = leads.requeue_trace(store, lead_id, trigger="event_watch:ew_2", reason="重排")
+    assert lead["triage"] == before
     assert leads.classification_gaps(store) == []
+    assert priority.rank_lead(lead).decision_impact == priority.rank_lead(
+        {"triage": {"classification": PASS_CLASSIFICATION}}).decision_impact
+
+
+def test_requeued_lead_without_any_receipt_points_at_semantic_backfill() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="x:test", url="https://x.com/test/status/none")
+    leads.triage(store, lead_id, go=True, tier=4, reason="沒有分類的舊 PASS")
+    leads.advance(store, lead_id, "parked", ref={"trace_status": "partial", "trace_requires_user": "false"})
+    leads.requeue_trace(store, lead_id, trigger="event_watch:ew_1", reason="重排")
+    gap = leads.classification_gaps(store)[0]
+    assert gap["requeued"] is True and gap["restorable_from_history"] is False
+    assert "--from-json" in gap["consumer"] and "不重判" in gap["consumer"]
 
 
 def test_advance_records_ref(tmp_path) -> None:

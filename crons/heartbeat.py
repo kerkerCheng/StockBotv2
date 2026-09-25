@@ -1133,15 +1133,15 @@ def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path
             detail = propose.get("reason") or propose.get("error") or apply.get("reason") or apply.get("error")
             result = (f"**本輪失敗**（提議 {status}／套用 {apply.get('status')}"
                       + (f"：{detail}" if detail else "") + "）")
-    from engine_b.event_watch import _is_trace_requeue
+    from engine_b.event_watch import _triage_written_by_requeue
 
     stamps = []
     for lead in leads.values():
         triage = (lead or {}).get("triage") or {}
         # 兩種寫 triage 時間、卻不是分類層跑過的寫入者（L12：一個欄位兩種語意）：
-        # harvest 的機械 FILTER（Form 4，寫入端標 `harvest:`）與追源重排（consume-fired 把 receipt
-        # 改寫成今天；判別沿用 event_watch 的同一個函式，不另寫一份）。
-        if str(triage.get("decided_by") or "").startswith("harvest:") or _is_trace_requeue(lead or {}):
+        # harvest 的機械 FILTER（Form 4，寫入端標 `harvest:`）與**舊式**追源重排（2026-09-26 前會把 receipt
+        # 改寫成排回那天；判別沿用 event_watch 的同一個函式，不另寫一份）。新式排回不寫 triage，不必排除。
+        if str(triage.get("decided_by") or "").startswith("harvest:") or _triage_written_by_requeue(lead or {}):
             continue
         raw = str(triage.get("decided_at") or "")
         stamp = _harvest_newest_at(raw) if raw else None
