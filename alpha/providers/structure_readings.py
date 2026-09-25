@@ -82,6 +82,12 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
         registry = get_registry()
     from query.bottleneck import company_id_for_origin
 
+    # 插槽的「不是供應商自己」＝不是**這個插槽的任何一家供應商**（與插槽視角的「客戶端原文」同一個定義；
+    # plan 待決 #12，Step 2.5 定案）。實測：`prod:els_8ch_module` 用同插槽另一家供應商 Enablence 發的聯合新聞稿
+    # 標 independent，舊規則（只排除那條邊的主詞）放行了一份 Sivers 的插槽護城河——聯合公告方與它利益一致，不是客戶。
+    # 層讀圖不變：一層的其他供應商是競爭者，不是聯合公告方。
+    socket_suppliers = ({str(row[0]) for row in parsed.angles.get("supply_side", ())}
+                        if parsed.unit == "socket" else set())
     for index, citation in enumerate(parsed.citations, 1):
         edge = tuple(citation.edge)
         label = f"第 {index} 條引用（{citation.angle}：{edge[0]} {edge[1]} {edge[2]}）"
@@ -106,6 +112,9 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
             elif edge[0] in resolved:
                 problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 就是 {edge[0]} 自己——"
                                 "供應商自稱是弱主張（L8）")
+            elif resolved & socket_suppliers:
+                problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 是這個插槽的另一家供應商 "
+                                f"{sorted(resolved & socket_suppliers)}——同插槽的聯合公告方不是客戶端（L8；plan 待決 #12）")
     return problems
 
 

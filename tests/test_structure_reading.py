@@ -235,6 +235,24 @@ def test_is_component_of_answers_the_next_layer_from_the_container_side() -> Non
     assert not a.angles["next_layer"]
 
 
+def test_the_same_quote_from_the_same_doc_is_kept_once_per_edge() -> None:
+    """Step 2.5 實測：[596] 補 sub 的三筆 assertion 重引同一句 GSR 市佔，印兩次只會灌「另有 N 段沒印」。"""
+    from query.structure import fetch_quotes
+
+    def rec(doc, quote):
+        return {"src": "co:a", "relation": "supplies_to", "dst": "tech:x", "quote": quote,
+                "locator": None, "doc": doc, "tier": 3, "origin": "Someone"}
+
+    class _Session:
+        def run(self, *_a, **_k):
+            return [rec("doc_1", "Three players control over 90%"), rec("doc_1", "Three players  control over 90%"),
+                    rec("doc_2", "Three players control over 90%"), rec("doc_1", None)]
+
+    out = fetch_quotes(_Session(), "tech:x")
+    assert [q["doc"] for q in out[("co:a", "supplies_to", "tech:x")]] == ["doc_1", "doc_2"], \
+        "同文件同逐字只留一段；不同文件的同一句要各自留（引用核對以 source_id 對文件）"
+
+
 def test_quotes_reach_the_reader_and_absence_of_quotes_is_stated() -> None:
     """⚠ 這個工具存在的意義取決於它印不印得出逐字（L18）。
 
@@ -256,6 +274,15 @@ def test_quotes_reach_the_reader_and_absence_of_quotes_is_stated() -> None:
     assert "A ships X in volume today." in text
     assert "doc_a" in text and "tier 1" in text
     assert "這條邊在圖裡沒有任何逐字" in text, "co:b 沒有逐字，必須明說"
+
+    # 截斷要說話（Step 2.5）：超過 3 段時明說還有幾段、出自哪份；超過 200 字的片段標「…」
+    many = {("co:a", "supplies_to", "tech:x"): [
+        {"quote": f"quote number {i} " + "x" * (250 if i == 0 else 0), "locator": None,
+         "doc": f"doc_{i}", "tier": 2, "origin": "A"} for i in range(5)]}
+    crowded = render_markdown(view, many)
+    assert "quote number 3" not in crowded
+    assert "另有 2 段逐字沒印" in crowded and "`doc_3`、`doc_4`" in crowded
+    assert "x" * 150 + "…»" in crowded, "切掉的片段沒有標出來"
 
     # 不要逐字時，輸出不得混進逐字欄
     plain = render_markdown(view)

@@ -254,6 +254,29 @@ def test_independent_citation_whose_origin_does_not_resolve_is_rejected(tmp_path
         append_reading_record(record, directory=tmp_path, quotes=_quotes(SOCKET, supply_origin="Silicon Matter"))
 
 
+def test_independent_on_a_socket_excludes_every_supplier_of_that_socket(tmp_path) -> None:
+    """plan 待決 #12（Step 2.5 定案）：`prod:els_8ch_module` 實測——同插槽另一家供應商 Enablence 發的聯合新聞稿，
+    舊規則（只排除那條邊的主詞）放行了一份 Sivers 的插槽護城河。插槽排除該插槽所有供應商；層不變。"""
+    from alpha.providers.structure_readings import append_reading_record
+
+    partner_q = "O-Net will serve as the OEM partner, integrating Sivers laser arrays and the Enablence coupler"
+    structure = _structure(SOCKET)
+    structure["angles"]["supply_side"].append(
+        {"src": "co:enablence_technologies", "relation": "supplies_to", "dst": SOCKET, "substitutability": None,
+         "sole_source": None, "qualification_status": "designed_in", "evidence": "self_reported", "documents": 1})
+    quotes = _quotes(SOCKET)
+    quotes[(SIVERS, "supplies_to", SOCKET)].append(
+        {"quote": partner_q, "doc": "doc_partner", "origin": "Enablence Technologies"})
+    cites = [_cite("demand_side", DEMAND_Q, "doc_demand", SOCKET),
+             _cite("supply_side", partner_q, "doc_partner", SOCKET, independent=True)]
+
+    socket = _v3(kind="moat", structure=structure, citations=cites)
+    with pytest.raises(ContractViolation, match="另一家供應商"):
+        append_reading_record(socket, directory=tmp_path, quotes=quotes)
+    layer = _v3(unit="layer", kind="moat", structure=structure, citations=cites)
+    append_reading_record(layer, directory=tmp_path, quotes=quotes)   # 層：另一家供應商是競爭者，不是聯合公告方
+
+
 def test_disproof_source_must_be_an_existing_reading_of_this_node(tmp_path) -> None:
     from alpha.providers.structure_readings import append_reading_record
 

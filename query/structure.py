@@ -374,11 +374,18 @@ def render_markdown(view: StructureView,
                 out.append("|  |  |  |  |  | ⚠ **這條邊在圖裡沒有任何逐字** |")
                 continue
             for q in found[:3]:
+                cut = "…" if len(q["quote"]) > 200 else ""
                 out.append(
-                    f"|  |  |  |  |  | «{q['quote'][:200]}»"
+                    f"|  |  |  |  |  | «{q['quote'][:200]}{cut}»"
                     f"<br>　`{q['doc']}`（tier {q['tier']}｜{q['origin']}）"
                     f"{'｜' + q['locator'] if q['locator'] else ''} |"
                 )
+            if len(found) > 3:
+                # ⚠ 截斷要說話（Step 2.5 實測：InP 基板 co:lumentum 那條邊 5 段只印 3 段，被藏的正是 Lumentum
+                # 最新一季「又向 AXT 找基板」——判斷供給側可不可替代的客戶端原文；L13-2／INV-3）。
+                hidden = sorted({str(q["doc"]) for q in found[3:]})
+                out.append(f"|  |  |  |  |  | ⚠ 另有 {len(found) - 3} 段逐字沒印（每條邊只印前 3 段），"
+                           f"出自 {'、'.join(f'`{d}`' for d in hidden)} |")
     out.append(
         "\n---\n\n⚠ **本工具維護的是「讀圖結論跟圖還一不一致」，不是「結論對不對」。**"
         "\n對不對要靠 outcome 量測——一份跟圖完全一致但判斷錯誤的讀圖，digest 永遠不會變。"
@@ -407,9 +414,16 @@ def fetch_quotes(session, node: str) -> dict[tuple[str, str, str], list[dict[str
     而深挖若需要繞過自己的工具，它就不會例行發生（L18）。
     """
     out: dict[tuple[str, str, str], list[dict[str, Any]]] = {}
+    seen: set[tuple[Any, ...]] = set()
     for r in session.run(_Q_QUOTES, node=node):
         if not r["quote"]:
             continue
+        # 同一份文件的同一段逐字掛在同一條 canonical 邊的多筆 assertion 上（例：[596] 補 sub 的三筆
+        # 重引 GSR 市佔句）——印兩次只會灌「另有 N 段沒印」的數（Step 2.5 實測）。
+        key = (r["src"], r["relation"], r["dst"], r["doc"], " ".join(str(r["quote"]).split()))
+        if key in seen:
+            continue
+        seen.add(key)
         out.setdefault((r["src"], r["relation"], r["dst"]), []).append({
             "quote": " ".join(str(r["quote"]).split()),
             "locator": r["locator"],

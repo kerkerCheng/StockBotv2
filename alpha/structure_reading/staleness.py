@@ -64,7 +64,10 @@ CHANGE_KINDS: Mapping[str, tuple[str, str]] = {
     "demand_substitutability": ("high", "需求側 substitutability 變了——這是「繞不繞得過」"),
     "demand_edges": ("high", "需求側的邊增減——誰需要它變了"),
     "next_layer": ("normal", "下一層變了——更卡的可能換了一層"),
-    "counter_path": ("normal", "反向路徑新增或消失——它本來就是 disproof 的來源"),
+    "counter_path": ("normal", "反向路徑新增——它本來就是 disproof 的來源"),
+    # 對稱面（Phase 2 Step 2.5 實測，L17-3）：替代路線少一條是反證的反方向，不得與「新增」共用一個 kind——
+    # 共用時 `mat:inp_substrate` 在 Step 2.2 移出 constrained_by 後被標成「同時是 disproof 觸發」，心跳照數。
+    "counter_path_removed": ("normal", "反向路徑消失——替代路線少了一條，不是反證觸發"),
     "anchor": ("normal", "需求錨可達性變了——走不走得到有人花錢的地方"),
     "evidence": ("low", "只有 evidence 等級變——不改變結構，改變的是可下注性"),
     # v3（Phase 2 Step 2.4）：插槽讀圖的供貨邊證據變動是高等級。插槽賭的是「客戶的這一格指定了誰」，
@@ -128,7 +131,7 @@ def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[
         changes.append(StructureChange(angle, member_kind,
                                        f"新增 {len(added)} 條：" + "、".join(f"{s}→{d}" for s, _r, d in added[:3])))
     if removed:
-        kind = "supply_removed" if angle == "supply_side" else member_kind
+        kind = {"supply_side": "supply_removed", "counter_path": "counter_path_removed"}.get(angle, member_kind)
         changes.append(StructureChange(angle, kind,
                                        f"消失 {len(removed)} 條：" + "、".join(f"{s}→{d}" for s, _r, d in removed[:3])))
 

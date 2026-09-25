@@ -177,8 +177,8 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 2.1 | Graph MCP 退役 ＋ AGENTS 一句（R2-a） | ✅（R2-a GO；non-blocking 八條處置見 R2-a 處置 commit） | 便宜 | `ba47419`＋`6da4892`（R2-a 處置） |
 | 2.2 | 反向路徑只收競爭關係 | ✅ | 便宜 | `73d8c53` |
 | 2.3 | 讀圖契約 v3：`unit`、`citations[]`、反證出處 | ✅（R2-b CONDITIONAL_GO → B1 已修） | 便宜 | `cb6c612`＋R2-b 處置 |
-| 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ✅（R2-b CONDITIONAL_GO → B1 已修；non-blocking 處置見 R2-b 處置 commit） | 便宜 | `12dbc8c`＋R2-b 處置（短碼由 2.5 補填） |
-| 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ○ | **強模型** | （ledger 不在 git；收據寫進 plan §0.6 與報告） |
+| 2.4 | 插槽視角 ＋ 分單位的 staleness（R2-b 涵蓋 2.3＋2.4） | ✅（R2-b CONDITIONAL_GO → B1 已修；non-blocking 處置見 R2-b 處置 commit） | 便宜 | `12dbc8c`＋`f1fe714`（R2-b 處置）＋`6053c25`（2.1 補） |
+| 2.5 | 第一份插槽讀圖、InP 基板重讀、兩個插槽試跑 | ✅（插槽讀圖 2 份、層讀圖 2 份重讀成 v3；工具毛病三個當下修＝偏差 #7–#9；pq2 [651]、[652]） | **強模型** | 見 2.6 列補填（ledger 不在 git；收據＝[`2026-09-25-phase2-step25-readings.md`](../reports/2026-09-25-phase2-step25-readings.md)） |
 | 2.6 | 走圖：`query/graph_walk.py`、`graph_holes` 段、`graph_walk` kind、心跳 | ○ | 便宜 | |
 | 2.7 | 讀圖頁 ＋ 個股頁讀圖面板（選配） | ○ | 便宜 | |
 | 2.8 | pq1 排序：拿掉 chokepoint、`decision_impact` 換詞、加 lead 時間 | ○ | 便宜 | |
@@ -206,6 +206,9 @@ Step 2.5 是強模型的研究步驟：輪到它時停下來，印出 §6 的「
 | 4 | 2.3 | §4「改哪裡」只列 contracts／providers／cli／ledger 測試／登記 hook | 另改四個讀「現行讀圖」的消費端：`audit/sources.py::reading_ledgers`（`current` 改成 `{unit: 讀圖}`）與 `audit/checks.py` 三處、`engine_b/disproof.py::current_readings`（鍵改（節點, 單位））與 `disproof_counts`、`webapp/materialize.py`（一列＝（節點, 單位），多 `unit` 欄）、`webapp/structure_readings.py`（插槽列的名字帶單位）；CLI `--format json` 的 `current`／`status` 改成以單位為鍵 | 不改的話 2.5 寫進的第一份插槽讀圖會被這四處以「節點只有一份現行」讀掉其中一份（INV-3 安靜消失）；另外 `disproof_counts` 用 `endswith("/v2")` 判斷結構化反證，v3 會被誤算成 v1 散文、條件變成「未盯」——這是本 Step 的 L11-6 ④，已由測試守（突變驗過會紅） |
 | 6 | 2.4 | §5 第 1 點「圖上沒有任何 `develops`／`deploys` 進這個產品時，印明示缺席」 | 製造者**只認 `develops`**；`deploys` 另列「部署方（客戶，不是製造者）」；缺席條件＝沒有 `develops` | R2-b B1：`deploys` 的字彙定義是「an operator/customer deploys a robot product」（`prompts/extract_system.md`），是部署方不是製造者；照原文實作時 `prod:vera_verarubin` 的六家雲端被印成製造者、還壓掉了缺席警告 |
 | 5 | 2.3 | §4 第 5 點「`select_reading(records, unit=…, …)`」 | `unit` **沒有預設值**（漏給就 TypeError），另加 `select_readings()` 回每個單位各自的現行；`structure_reading_record(unit=…)` 同樣沒有預設；`register_reading_watches` 收舊條件只收**同單位**的、判定觸及的處置排除**已知是另一個單位**的來源讀圖 | 有預設值的單位參數就是 review profile 第 3 條「把沒給悄悄補成一個值」：同一個 prod 節點層與插槽各自現行，漏給單位的呼叫端會安靜只看到一種 |
+| 7 | 2.5 | §6「毛病＝回頭修 2.4，記偏差」（未預期會撞到 staleness） | `staleness.py` 新增 `counter_path_removed`（normal、**不是** disproof 觸發）；反向路徑「消失」不再與「新增」共用 `counter_path` | 真實資料：Step 2.2 移出 `constrained_by` 後，`mat:inp_substrate --check` 印「消失 1 條｜**同時是 disproof 觸發**」、心跳照數——替代路線少一條是反證的反方向。供給側早就有 `supply_removed`，反向路徑漏了對稱面（L17-3）。測試 `test_counter_path_added_is_a_disproof_trigger_but_removed_is_not` |
+| 8 | 2.5 | 同上（`query.structure --quotes` 的呈現） | 每條邊超過 3 段時印「另有 N 段逐字沒印，出自哪幾份」、切斷的片段標「…」；`fetch_quotes` 去掉同文件同段的重複 | 真實資料：InP 基板 `co:lumentum` 那條邊 11 段只印 3 段、**不說**，藏掉的正是 Lumentum 10-K 與 Q4 法說「又向 AXT 找基板」——判斷供給側可不可替代的客戶端原文；CW DFB 藏 7 段（L13-2、INV-3；與 `sr_6ad5c884eb7bc3fb` 記的 claim 截斷同形）。不進 digest，四份讀圖寫完後 `--check` 全 current |
+| 9 | 2.5 | §14 #12「Step 2.5 看完後定案，定案若要改規則走 plan 修改」 | **定案：插槽的 `independent` 排除該插槽所有供應商**（與插槽視角的「客戶端原文」同一定義）；層不變（只排除那條邊的主詞）。`alpha/providers/structure_readings.py::verify_citations` | 真實資料乾跑：`prod:els_8ch_module` 拿同插槽另一家供應商 Enablence 發的聯合新聞稿標 independent，舊規則**放行**了一份 Sivers 的插槽護城河——聯合公告方與 Sivers 利益一致，不是客戶。這是收緊、不放寬任何 gate；使用者可否決。⚠ 要正確還得先修 R-4：O-Net（ELS 的客戶）在圖上是 `supplies_to`，會被一併排除（pq2 [651]）。測試 `test_independent_on_a_socket_excludes_every_supplier_of_that_socket` |
 
 ---
 
@@ -451,10 +454,11 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 
 ## 14. 結案時要列的待決問題（種子；執行中發現的往下加）
 
-1. **`supplies_to → prod:` 的兩義**（R-4）：製造者與零件供應商共用一個關係；2.5 若提了 pq2，結案時寫處置狀態；schema 層要不要另給一個關係（Phase 4 層中心選源時一起定）。
+1. **`supplies_to → prod:` 的兩義**（R-4）：製造者與零件供應商共用一個關係；schema 層要不要另給一個關係（Phase 4 層中心選源時一起定）。
+   **2.5 已提 pq2 [651]**：13 個產品逐條讀逐字，10 個是製造者自己（改 `develops`）、真正的插槽 3 個且都是 Sivers 的；結案時寫 [651] 的處置狀態。
 2. **read model 的 `get_bottlenecks`（sub≥4 成員）**：個股頁 argument「鏈」段仍用它；Phase 3 面板重排時決定留不留（Phase 0 偏差 #33 的另一半）。
 3. **讀圖面板升核心**與 readiness 換（Phase 3，ROADMAP 已排）；Phase 0 偏差 #16「`review_required` 的路接回讀圖面板」一併處理。
-4. **`tech:cw_dfb_laser` 讀圖 2026-10-18 到期**與反證出處（#19）若 2.5 沒做，列進研究並行。
+4. ~~**`tech:cw_dfb_laser` 讀圖 2026-10-18 到期**與反證出處（#19）若 2.5 沒做，列進研究並行。~~ **2.5 已做**：`sr_d49b81b6465e1181`（v3，到期 2026-12-24），四條沿用的反證標回 `sr_a181641ddb99c69c`——#19 解決。
 5. **走圖母體 <10 的型別**（`reading_stale` 等）命中率只印不判——讀圖份數長大後要不要回到 <50% 規則。
 6. Phase 1 closeout §7 未併入本 Phase 的各題（§0.3 最後一條列的編號），照實帶到 Phase 3 的 plan session。
 7. `argument` 面板標題（Phase 0 延下來、Phase 1 定「Phase 2／3」）：本 Phase 沒有重排面板，延 Phase 3。
@@ -472,6 +476,20 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
     且只有重讀插槽才清得掉。同一個觸發條件（第一個雙單位 prod 節點出現）時一起處理。
 12. **「獨立來源」兩處定義不一致**（R2-b N4）：寫入端的 `independent` 只排除「那條邊的供應商」；插槽視角的「客戶端原文」排除「任何一家供應商」。
     `prod:els_8ch_module` 是活樣本（Enablence 同時是另一家供應商與 Sivers 那條邊的第三方）——**Step 2.5 看完後定案**，定案若要改規則走 plan 修改。
+    **2.5 定案（偏差 #9）**：插槽的 `independent` 排除該插槽所有供應商，兩處定義一致；層不變。使用者可否決。
+    延伸、**未定**：「客戶高管在供應商新聞稿裡具名」（`classify_evidence` 給 `counterparty_joint`，例：Sivers ECOC 2024 新聞稿內含 Ayar CTO 具名）
+    算不算插槽護城河要的客戶端印證——寫入端目前當成供應商自己（origin 解析到供應商）。這是契約問題，要使用者決定。
 13. **讀圖 artifact 的 `needs_reread.nodes` 對插槽列放 `prod:x［socket］` 標籤**（R2-b N2）：research-drain 叫人拿它直接跑 `--check` 會找不到；
     **併進 Step 2.7**（讀圖頁）：payload 多結構化的 `{node, unit}`，skill 寫上 `--unit`。
 14. **心跳重讀理由那一行不帶單位**（R2-b N6）：**併進 Step 2.6**（心跳段 2 讀圖行本來就要加單位拆分）。
+15. **插槽的客戶重讀 watch 登記 0**（2.5 發現）：`demand_side_customers()` 只收需求側的 `co:*`；SuperNova 的需求側是 `prod:teraphy_chiplet`、
+    ELS 的是 `tech:cpo`，所以 Ayar／O-Net 出新文件叫不醒這兩格。插槽的客戶其實是**製造者**（`develops`）——等 [651] 入圖後，
+    插槽讀圖的重讀 watch 改綁製造者。與 #11 同一個觸發時一起處理。
+16. **兩條新語意 watch 叫不醒**（2.5；`semantic_unreachable` 2 → 3）：`ew_0138`（只綁私人公司 `co:ayar_labs`）、`ew_0140`（只綁港股 `co:o_net_technologies`）。
+    沒有為了讓計數歸零硬塞實體；靠讀圖到期（2026-12-24）重問。要不要把 Ayar newsroom／HKEX 公告納入一手涵蓋面，是涵蓋面的決定。
+17. **`classify_evidence` 把「支撐屬性值的引文」算成「印證這條邊存在」**（2.5 發現，L12）：`co:sivers_semiconductors supplies_to tech:cw_dfb_laser`
+    的「外部印證」只來自華星光年報一句沒點名的「策略合作夥伴」（年報全文沒有 Sivers），那句是補 sub=2 的研究判斷。層讀圖不受影響，
+    但插槽的供貨邊證據變動是 high（2.4），這個機制會讓插槽賭注被一句不相關的話觸發。Phase 4「層中心選源／substitutability 稽核」一併處理。
+18. **`prod:` 一表多義**（2.5 發現）：客戶產品、供應商型錄產品、製程平台（`prod:ph18da`）都是 `prod:`，插槽單位只對第一種有意義；
+    目前判斷「這個 prod: 是不是插槽」只能靠人讀逐字。[651] 把製造者分出來之後再量還剩幾個模糊的。
+19. **SuperNova 唯一的原文沒有 `published_at`**（audit `PointInTime` 已列：`silicon_matter_sivers_ayar_2026_03_14` 擋住 3 條）——這一格在任何 as-of 查詢裡都被排除；併進 [652] 的追源。

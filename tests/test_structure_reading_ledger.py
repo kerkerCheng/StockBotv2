@@ -176,6 +176,22 @@ def test_one_more_supplier_is_high_grade_and_a_disproof_trigger() -> None:
     assert status["disproof_triggers"], "供給側多一家沒有被標成 disproof 觸發"
 
 
+def test_counter_path_added_is_a_disproof_trigger_but_removed_is_not() -> None:
+    """對稱面（Step 2.5 實測）：替代路線多一條是反證的樣子；少一條是它的反方向，不得同樣標成觸發。"""
+    rival = _edge("tech:rival", dst=NODE, relation="competes_with", sub=None)
+    with_rival = _structure(digest="d_rival")
+    with_rival["angles"]["counter_path"] = [rival]
+
+    added = _status(with_rival)
+    assert {c["kind"] for c in added["changes"]} == {"counter_path"}
+    assert added["disproof_triggers"], "反向路徑新增沒有被標成 disproof 觸發"
+
+    removed = _status(_structure(digest="d_gone"), record=_record(structure=with_rival))
+    assert {c["kind"] for c in removed["changes"]} == {"counter_path_removed"}
+    assert removed["status"] == "stale", "反向路徑變了仍要重讀（normal），只是不是反證觸發"
+    assert not removed["disproof_triggers"], "反向路徑消失被誤標成 disproof 觸發"
+
+
 def test_only_evidence_changed_is_low_and_stays_out_of_the_queue() -> None:
     """記錄，但不優先——否則佇列會被 evidence 微調灌滿，而恆亮＝零鑑別力（L14-4）。"""
     status = _status(_structure(evidence="externally_corroborated", digest="d2"))
