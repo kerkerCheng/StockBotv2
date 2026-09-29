@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from query.coverage_gaps import (
-    ISOLATED_DEGREE, classify, is_concept_node, render_markdown, split_research_gaps,
+    ISOLATED_DEGREE, classify, is_concept_node, split_research_gaps,
 )
 
 
@@ -28,21 +28,9 @@ def test_concept_nodes_never_counted_as_gaps() -> None:
     assert not is_concept_node("tech:robotic_actuator")
 
 
-def test_render_separates_two_gap_kinds_with_counts() -> None:
-    rows = [
-        {"node": "tech:serdes", "name": "SerDes", "direct": [], "indirect": [],
-         "status": "research_gap"},
-        {"node": "tech:robotic_actuator", "name": "Actuator", "direct": [],
-         "indirect": ["co:boston_dynamics"], "status": "modelling_gap"},
-        {"node": "tech:hbm", "name": "HBM", "direct": ["co:micron_technology"],
-         "indirect": [], "status": "covered"},
-    ]
-    out = "\n".join(render_markdown(rows))
-    assert "研究缺口 **1**" in out
-    assert "建模待補 **1**" in out
-    # 兩種缺口必須分開呈現：下一步動作不同（補研究 vs 補邊）
-    assert "## 🟡 建模待補" in out and "## 🔴 研究缺口" in out
-    assert "`co:boston_dynamics`" in out
+# 2026-09-29（Phase 3 Step 3.1c）：`test_render_separates_two_gap_kinds_with_counts` 隨本模組的 markdown 與 CLI 退役移除——
+# 「兩種缺口分開呈現、下一步不同」現在由走圖第 7／8 型承載，守它的是
+# `tests/test_graph_walk.py::test_coverage_types_reuse_the_scanner_buckets_and_count_product_noise_separately`。
 
 
 def test_isolated_node_gets_a_different_next_step_than_a_real_research_question() -> None:
@@ -60,14 +48,18 @@ def test_isolated_node_gets_a_different_next_step_than_a_real_research_question(
         {"node": "tech:serdes", "name": "SerDes", "direct": [], "indirect": [],
          "status": "research_gap", "degree": 3, "abstraction_level": "device_chip"},
     ]
-    out = "\n".join(render_markdown(rows))
+    # 2026-09-29（Phase 3 Step 3.1c）：本模組的 markdown 退役，這條判準改驗走圖第 7 型（同一份分桶、同一個模板）。
+    from query.graph_walk import coverage_questions
 
-    assert "先確認它該掛在 stack 哪一層" in out
-    assert "誰供應 `tech:serdes`？" in out
+    hits = {h["subject"]: h for h in coverage_questions(rows)["no_supplier"]["hits"]}
+
+    assert "先確認它該掛在 stack 哪一層" in hits["tech:orphan"]["text"]
+    assert "誰供應 `tech:serdes`？" in hits["tech:serdes"]["text"]
     # 孤立節點不得同時拿到「去查誰供應它」那句
-    assert "誰供應 `tech:orphan`？" not in out
-    # 兩欄脈絡都要出現在表裡
-    assert "network_systems" in out and "device_chip" in out
+    assert "誰供應" not in hits["tech:orphan"]["text"]
+    # 兩欄脈絡都要跟著走
+    assert hits["tech:orphan"]["abstraction_level"] == "network_systems"
+    assert hits["tech:serdes"]["abstraction_level"] == "device_chip"
 
 
 def test_context_columns_do_not_change_any_bucket() -> None:

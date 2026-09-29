@@ -52,7 +52,6 @@ ROADMAP，因為要決定「不併要不要 receipt」是使用者的題目，�
 from __future__ import annotations
 
 import itertools
-import os
 import re
 from typing import Any, Iterable, Mapping, Sequence
 
@@ -69,10 +68,8 @@ RULE_LABELS: dict[str, str] = {
     "name_identical": "name 逐字相同",
 }
 
-#: 每個節點最多端幾段逐字。多於此的在 CLI 提示「還有 N 段」，不靜默截斷（INV-3）。
+#: 每個節點最多端幾段逐字。多於此的提示「還有 N 段」，不靜默截斷（INV-3）。
 QUOTES_PER_NODE = 2
-
-TITLE = "重複節點候選（只提名，不合併）"
 
 THIS_IS_NOT = (
     "不是「這兩個是同一個東西」的判定——那是研究判斷，載體是 pq2 的 `ra_admission`；"
@@ -222,7 +219,9 @@ def scan(session) -> list[dict[str, Any]]:
     return [dict(r) for r in session.run(SCAN_CYPHER, prefixes=list(ENTITY_PREFIXES))]
 
 
-def _fmt_node(view: Mapping[str, Any]) -> list[str]:
+def format_node_verbatim(view: Mapping[str, Any]) -> list[str]:
+    """一個節點的 id、name、層、邊數與逐字（markdown 行）。走圖第 9 型逐對印兩端時用這一份（L18：
+    判斷依據是兩端各自的逐字，不是 id 與 name）；2026-09-29 前 CLI `render_markdown` 也用它。"""
     out = [f"- `{view['node']}`　{view.get('name') or ''}"
            f"　〔{view.get('abstraction_level') or '—'}｜邊 {view['degree']}"
            f"｜逐字 {view['quote_count']} 段〕"]
@@ -237,69 +236,12 @@ def _fmt_node(view: Mapping[str, Any]) -> list[str]:
     return out
 
 
-def render_markdown(pairs: Iterable[Mapping[str, Any]], *, node_total: int) -> list[str]:
-    pairs = list(pairs)
-    buckets: dict[str, list[Mapping[str, Any]]] = {"unmentioned": [], "mentioned": []}
-    for pair in pairs:
-        buckets["mentioned" if pair.get("registry_mentions") else "unmentioned"].append(pair)
-    involved = {n for p in pairs for n in p["pair"]}
-    same_level = sum(1 for p in pairs if p["same_abstraction_level"])
-
-    out = ["", f"# {TITLE}", ""]
-    out.append(
-        f"候選 **{len(pairs)}** 對｜同層 {same_level}｜涉及節點 {len(involved)}／{node_total}"
-        f"｜registry 提過 {len(buckets['mentioned'])}｜**沒人提過 {len(buckets['unmentioned'])}**"
-    )
-    out += ["", "> " + "\n> ".join(THIS_IS_NOT), ""]
-
-    for key, heading in (
-        ("unmentioned", "## 沒人提過（這些要人看）"),
-        ("mentioned", "## registry 的 note 提過（先讀它說了什麼，再決定要不要重開）"),
-    ):
-        rows = buckets[key]
-        if not rows:
-            continue
-        out += ["", heading, ""]
-        for pair in rows:
-            rules = "＋".join(RULE_LABELS[r] for r in pair["rules"])
-            level = "同層" if pair["same_abstraction_level"] else "**不同層**"
-            out.append(f"### `{pair['pair'][0]}` ↔ `{pair['pair'][1]}`　〔{rules}｜{level}〕")
-            out += _fmt_node(pair["left"])
-            out += _fmt_node(pair["right"])
-            for hit in pair.get("registry_mentions") or ():
-                receipt = hit.get("approval_receipt") or "無 receipt"
-                out.append(f"  - 📄 `{hit['canonical']}`（{hit.get('basis')}／{receipt}）："
-                           f"{hit['note']}")
-            out.append("")
-    return out
-
-
-def main() -> int:
-    from dotenv import load_dotenv
-    from neo4j import GraphDatabase
-
-    from identity import entities
-
-    load_dotenv()
-    password = os.environ.get("NEO4J_PASSWORD")
-    if not password:
-        print("請設 NEO4J_PASSWORD")
-        return 2
-    driver = GraphDatabase.driver(
-        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
-    )
-    try:
-        with driver.session() as session:
-            rows = scan(session)
-    finally:
-        driver.close()
-    pairs = pair_candidates(rows)
-    buckets = bucketize(pairs, entities.load())
-    print("\n".join(render_markdown(
-        buckets["unmentioned"] + buckets["mentioned"], node_total=len(rows))))
-    return 0
-
-
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # ⚠ 2026-09-29（Phase 3 Step 3.1c）：CLI 入口退役——重複節點候選改由 `python -m query.graph_walk` 第 9 型承載，
+    # 逐對印兩端逐字與 registry note（同一個掃描、同一份分桶，照抄不重算）。印退役訊息並 exit 2，而不是安靜 exit 0：
+    # 安靜結束會被讀成「沒有重複節點」（L13：成功與失敗不得同形）。
+    import sys
+
+    print("✗ `python -m query.duplicate_nodes` 已於 2026-09-29 退役（Phase 3 Step 3.1c）："
+          "改用 `python -m query.graph_walk`（第 9 型：逐對印兩端逐字與 registry note）", file=sys.stderr)
+    raise SystemExit(2)

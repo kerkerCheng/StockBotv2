@@ -157,8 +157,9 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
    - **⑥供貨走不到錨**：補需求鏈（誰買它的產出），或確認它不屬本題材（寫進 lead／報告，不要默默略過）。
    - **⑦沒人供應**／**⑧建模待補**／**⑨重複節點**（原覆蓋缺口與重複節點兩題）：**⑦之前先看⑨**——
      重複節點正是⑦的誤報來源：一個已經有供應商的東西被攤成兩個節點之後，其中孤立的那一個看起來像空白
-     （`config/entity_aliases.json` 的 `_readme` 逐字記過這個後果）。逐字對照用
-     `python -m query.duplicate_nodes`；**只做 `unmentioned`**（registry 的 note 提過的先讀 note——
+     （`config/entity_aliases.json` 的 `_readme` 逐字記過這個後果）。逐字對照看走圖第 9 型——
+     `python -m query.graph_walk` 對每一對印兩端各自的逐字，registry 的 note 也照抄在旁邊
+     （原 `query.duplicate_nodes` 的 CLI 已於 2026-09-29 退役）；**只做 `unmentioned`**（registry 的 note 提過的先讀 note——
      「刻意不併」與「留待研究判斷」長得一模一樣，機械分不出來，要人讀）。判定「是同一個」是研究判斷，
      合併走 pq2 `ra_admission`；**判斷依據是兩端各自的逐字，不是 id 與 name**（L18）。
      ⑦的孤立節點（連一條邊都沒有）下一步是**先確認它該掛在 stack 哪一層**，不是「誰供應它」；

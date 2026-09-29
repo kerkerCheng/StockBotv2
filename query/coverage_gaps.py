@@ -21,7 +21,6 @@ platform「covering ~80% of market demand」。
 """
 from __future__ import annotations
 
-import os
 from typing import Any, Iterable, Mapping
 
 CHOKEPOINT_PREFIXES = ("tech:", "mat:", "prod:")
@@ -70,69 +69,26 @@ ORDER BY size(direct_ids), size(indirect_ids), node
 # 這是 L17 的形狀——不會壞、不會報錯、測試不會紅，因為沒有任何東西被它逼著回來修。
 
 # ---------------------------------------------------------------------------
-# 呈現用的固定文字與分桶：**跟著資料走**（L16）。markdown（本檔）與 APP artifact
-# （`webapp/materialize.py`）都從這裡拿，不各自抄一份——抄第二份的那天起，後改的
-# 那份就不會回頭更新前一份。
+# 分桶與走圖共用的常數：**跟著資料走**（L16）。走圖第 7／8 型（`query/graph_walk.py`）從這裡拿，
+# 不各自抄一份。⚠ 2026-09-29（Phase 3 Step 3.1c）：本檔的 markdown 與 CLI 退役，只給它們用的固定文字
+# （標題、分桶說明、孤立／層兩段註記、APP coverage kind 的標籤與下一步）一併拿掉——走圖的問句與
+# 下一步住 `query/graph_walk.py` 的 `QUESTION_TYPES`。
 # ---------------------------------------------------------------------------
-
-COVERAGE_TITLE = "Chokepoint 供給側覆蓋掃描"
-
-BUCKET_NOTE = (
-    "> 🔴 **研究缺口**＝沒有任何公司連到它（直接或間接）——這才是真正該去挖的。\n"
-    "> 🟡 **建模待補**＝已有公司經 `prod:` 或公司對公司邊間接相連，代表**這個領域已經研究過**，\n"
-    "> 只是邊沒接到 chokepoint 節點上。下一步是補邊（走 graph admission），不是重新研究。\n"
-    "> ⚪ 概念／政策節點不適用「誰供應它」，不列入缺口。"
-)
-
-BUCKET_LABELS = {
-    "research_gap": "🔴 研究缺口（沒有任何公司連到它）",
-    "modelling_gap": "🟡 建模待補（已研究過，邊沒接上）",
-    "covered": "✅ 已覆蓋",
-    "concept": "⚪ 概念／政策節點（不適用「誰供應它」）",
-}
-
-BUCKET_NEXT_STEP = {
-    "research_gap": "去挖：誰供應它——可直接進 pq1 的研究題目",
-    "modelling_gap": "補邊（走 graph admission），**不是**重新研究",
-    "covered": "無；已有公司直接連上",
-    "concept": "不適用——概念／政策節點沒有「誰供應它」這個問題",
-}
 
 #: 🔴 桶裡混了兩種東西，下一步完全不同（判準出自 `skills/alpha-status`）。
 #: ⚠ 這個切分是**前綴比對**，不是語意判斷——任何人重跑都得到同一組，可被機械重導。
+#: `tech:`／`mat:` 是有名有姓、零供應商的子瓶頸；`prod:` 是抽取的副產品，只計數、不列為研究題目。
 PRODUCT_NOISE_PREFIX = "prod:"
-
-RESEARCH_GAP_SPLIT_NOTE = (
-    "🔴 的數字**不可直接當研究待辦**：`tech:`／`mat:` 前綴是有名有姓、零供應商的子瓶頸"
-    "（新 alpha 候選最可能從這裡長出來）；`prod:` 前綴是抽取的副產品（文件裡掉出來的產品型號），"
-    "**從來不是我們選定要研究的瓶頸**——只計數、不列為研究題目。"
-)
 
 #: 研究題目的固定模板：它是**排版**不是新判斷（同一個節點永遠得到同一句）。
 RESEARCH_QUESTION_TEMPLATE = "誰供應 `{node}`？"
 
-#: 🔴 桶的兩個脈絡欄位。**它們不是分類**——不改變任何節點落在哪一桶，只是把節點
-#: 自己已有的事實一起印出來，讓「下一步做什麼」看得出差別。
-#: ⚠ 刻意不再往下分桶：2026-09-10 逐節點查證過，🔴 裡的節點在 `source_ids`、
-#: `abstraction_level`、ABOUT 文件數上完全同形，沒有可機械分辨的差異。在沒有事實
-#: 支撐的地方切一刀，得到的是會誤報的分類（L16-4）。
+#: `degree=0` ＝這個節點連一條邊都沒有——它還沒接進 stack。下一步是**先確認它該掛在哪**，
+#: 不是「去查誰供應它」（走圖第 7 型據此換句）。
+#: ⚠ 它**不是分類**——不改變任何節點落在哪一桶。2026-09-10 逐節點查證過，🔴 裡的節點在 `source_ids`、
+#: `abstraction_level`、ABOUT 文件數上完全同形，沒有可機械分辨的差異；在沒有事實支撐的地方切一刀，
+#: 得到的是會誤報的分類（L16-4）。
 ISOLATED_DEGREE = 0
-
-ISOLATED_NOTE = (
-    "`degree=0` ＝這個節點連一條邊都沒有——它還沒接進 stack。下一步是**先確認它該掛在哪**，"
-    "不是「去查誰供應它」；把它當研究題目派出去，研究者會找不到題目的落點。"
-)
-
-LEVEL_NOTE = (
-    "`層` 是節點自己的 `abstraction_level`（封閉字彙，SSOT 在 `schema/vocab.json`）——"
-    "決定先挖哪個空白時，同一層的空白通常該一起挖。"
-)
-
-COVERAGE_SCOPE_NOTE = (
-    "本掃描只能從**既有節點**往回看：它答得出「圖裡這個瓶頸還沒有供應商」，"
-    "答不出「有一個我們從沒聽過的瓶頸」。後者要由上而下拆解一個真實系統"
-    "（`skills/system-decompose`），且選題由使用者決定。"
-)
 
 
 def bucketize(rows: Iterable[Mapping[str, Any]]) -> dict[str, list[Mapping[str, Any]]]:
@@ -193,76 +149,12 @@ def scan(session) -> list[dict[str, Any]]:
     return rows
 
 
-def render_markdown(rows: Iterable[Mapping[str, Any]]) -> list[str]:
-    rows = list(rows)
-    buckets = bucketize(rows)
-
-    out = ["", f"# {COVERAGE_TITLE}", ""]
-    out.append(
-        f"節點 {len(rows)}｜🔴 研究缺口 **{len(buckets['research_gap'])}**"
-        f"｜🟡 建模待補 **{len(buckets['modelling_gap'])}**"
-        f"｜✅ 已覆蓋 {len(buckets['covered'])}"
-        f"｜⚪ 概念節點 {len(buckets['concept'])}"
-    )
-    out.append("")
-    out.append(BUCKET_NOTE)
-
-    if buckets["modelling_gap"]:
-        out += ["", "## 🟡 建模待補（已研究過，邊沒接上）", ""]
-        out.append("| 節點 | 間接相連的公司 |")
-        out.append("|---|---|")
-        for row in buckets["modelling_gap"]:
-            companies = "、".join(f"`{c}`" for c in row["indirect"][:6])
-            out.append(f"| `{row['node']}` | {companies} |")
-
-    if buckets["research_gap"]:
-        real, noise = split_research_gaps(buckets["research_gap"])
-        out += ["", "## 🔴 研究缺口（真正的空白）", ""]
-        out.append(RESEARCH_GAP_SPLIT_NOTE)
-        if real:
-            out += ["", f"{ISOLATED_NOTE}", f"{LEVEL_NOTE}", ""]
-            out.append("| 節點 | 名稱 | 層 | 邊 | 下一步 |")
-            out.append("|---|---|---|---|---|")
-            for row in real:
-                level = row.get("abstraction_level") or "—"
-                degree = row.get("degree", 0)
-                step = (
-                    "先確認它該掛在 stack 哪一層"
-                    if degree == ISOLATED_DEGREE
-                    else RESEARCH_QUESTION_TEMPLATE.format(node=row["node"])
-                )
-                out.append(
-                    f"| `{row['node']}` | {row['name'] or ''} | {level} | {degree} | {step} |"
-                )
-        if noise:
-            out += ["", f"抽取副產品（`{PRODUCT_NOISE_PREFIX}` 前綴）{len(noise)} 個，只計數：", ""]
-            out += [f"- `{row['node']}`" for row in noise]
-    return out
-
-
-def main() -> int:
-    from dotenv import load_dotenv
-    from neo4j import GraphDatabase
-
-    # `bottleneck.py` 一直有這行、本檔沒有，於是直接跑會報「請設 NEO4J_PASSWORD」，
-    # 看起來像設定漏了而不是程式漏了（2026-08-21 實測踩到）。
-    load_dotenv()
-    password = os.environ.get("NEO4J_PASSWORD")
-    if not password:
-        print("請設 NEO4J_PASSWORD")
-        return 2
-    driver = GraphDatabase.driver(
-        os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
-        auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
-    )
-    try:
-        with driver.session() as session:
-            rows = scan(session)
-        print("\n".join(render_markdown(rows)))
-    finally:
-        driver.close()
-    return 0
-
-
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # ⚠ 2026-09-29（Phase 3 Step 3.1c）：CLI 入口退役——覆蓋缺口改由 `python -m query.graph_walk` 第 7／8 型承載
+    # （沒人供應、建模待補；同一個掃描、同一份分桶，照抄不重算）。印退役訊息並 exit 2，而不是安靜 exit 0：
+    # 安靜結束會被讀成「沒有缺口」（L13：成功與失敗不得同形）。
+    import sys
+
+    print("✗ `python -m query.coverage_gaps` 已於 2026-09-29 退役（Phase 3 Step 3.1c）："
+          "改用 `python -m query.graph_walk`（第 7／8 型：沒人供應、建模待補）", file=sys.stderr)
+    raise SystemExit(2)

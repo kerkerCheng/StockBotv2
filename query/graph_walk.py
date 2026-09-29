@@ -336,7 +336,13 @@ def duplicate_questions(duplicate_buckets: Mapping[str, Sequence[Mapping[str, An
                      "left": pair.get("left"), "right": pair.get("right"),
                      "text": QUESTION_BY_KEY["duplicate_node"].question.format(a=a, b=b)})
     mentioned = sorted("|".join(p["pair"]) for p in duplicate_buckets.get("mentioned") or ())
-    return {"hits": hits, "scope_n": int(node_total), "extra": {"registry_mentioned": mentioned}}
+    # note 逐字跟著走（2026-09-29 Phase 3 Step 3.1c：`python -m query.duplicate_nodes` 退役前，note 只在那支 CLI
+    # 印得出來）。**只照抄、不下結論**——「刻意不併」與「留待研究判斷」機械分不出來（duplicate_nodes 檔頭）。
+    notes = {"|".join(p["pair"]): [{k: m.get(k) for k in ("canonical", "basis", "approval_receipt", "note")}
+                                   for m in p.get("registry_mentions") or ()]
+             for p in duplicate_buckets.get("mentioned") or ()}
+    return {"hits": hits, "scope_n": int(node_total),
+            "extra": {"registry_mentioned": mentioned, "registry_notes": dict(sorted(notes.items()))}}
 
 
 def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
@@ -469,6 +475,26 @@ def fraction(question: Mapping[str, Any]) -> str:
     return f"{question['hit_n']}／{question['scope_n']}"
 
 
+def _duplicate_hit_lines(hit: Mapping[str, Any]) -> list[str]:
+    """第 9 型逐對印**兩端各自的逐字**（L18：判斷依據是逐字，不是 id 與 name）。
+
+    格式沿用 `query.duplicate_nodes.format_node_verbatim`（不重寫）；那支模組的 CLI 已退役（2026-09-29 Phase 3 Step 3.1c），
+    所以命令列上看兩端逐字的唯一入口就是這裡。
+    """
+    from query.duplicate_nodes import RULE_LABELS, format_node_verbatim
+
+    rules = "＋".join(RULE_LABELS.get(r, r) for r in hit.get("rules") or ())
+    level = "同層" if hit.get("same_abstraction_level") else "**不同層**"
+    out = [f"  〔{rules}｜{level}〕"]
+    for side in ("left", "right"):
+        view = hit.get(side)
+        if view:
+            out += ["  " + line for line in format_node_verbatim(view)]
+        else:
+            out.append(f"  - ⚠ {side} 端的節點資料缺席（不是沒有逐字，是這一筆沒帶到）")
+    return out
+
+
 def summary_line(result: Mapping[str, Any]) -> str:
     """一行九格（心跳段 3 用）：每型「中文短名 命中／母體」，順序固定、0 也印、**不加總**。"""
     return "｜".join(f"{q['short']} {fraction(q)}" for q in result["questions"])
@@ -489,6 +515,8 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             continue
         for hit in q["hits"]:
             out.append(f"- {hit['text']}")
+            if q["key"] == "duplicate_node":
+                out += _duplicate_hit_lines(hit)
         extra = q.get("extra") or {}
         if extra.get("unresolved_names"):
             names = extra["unresolved_names"]
@@ -506,6 +534,15 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             out.append(f"- 有紀錄但已全部撤回（不在母體）：{'、'.join(extra['withdrawn'])}")
         if extra.get("registry_mentioned"):
             out.append(f"- registry 的 note 提過的候選 {len(extra['registry_mentioned'])} 對（不算命中；先讀 note）")
+            for pair, mentions in (extra.get("registry_notes") or {}).items():
+                for m in mentions:
+                    out.append(f"  - `{pair.replace('|', '` ↔ `')}`：📄 `{m.get('canonical')}`"
+                               f"（{m.get('basis')}／{m.get('approval_receipt') or '無 receipt'}）：{m.get('note')}")
+        if q["key"] == "duplicate_node" and not q.get("absence"):
+            from query.duplicate_nodes import THIS_IS_NOT as DUPLICATE_LIMITS
+
+            out.append("- 射程（這一型的偵測器抓得到與抓不到什麼）：")
+            out += [f"  > {line}" for line in DUPLICATE_LIMITS]
         out.append("")
     out.append("---")
     out += [f"- {line}" for line in result["this_is_not"]]

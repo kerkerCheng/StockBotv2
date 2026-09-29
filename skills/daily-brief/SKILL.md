@@ -297,8 +297,9 @@ prepared RA」（通常為否）。`original_obtained` 也要說明「已取得�
 
 ⚠ **2026-09-08 起，覆蓋缺口與標的純度不再由 Daily 印出**——它們住 APP（2026-09-26 起覆蓋缺口併進走圖 `#/graph-walk`），
 由收尾的 `-m webapp materialize` 每天更新。`query.bottleneck`／`alpha_purity_snapshot`／
-`query.coverage_gaps`（今由 `query.graph_walk` 承載）從 Daily 的命令清單移除；它們仍是
-[`skills/alpha-status`](../alpha-status/SKILL.md) 的入口，隨叫隨到。
+覆蓋缺口掃描從 Daily 的命令清單移除；前兩者仍是
+[`skills/alpha-status`](../alpha-status/SKILL.md) 的入口，隨叫隨到；覆蓋缺口由 `python -m query.graph_walk`
+（第 7／8 型）承載，原本那支 CLI 已於 2026-09-29 退役。
 
 ⚠ **2026-09-22（Phase 0／G1）：跨檔排序整組退役，「較昨變動」的排序基準也一併退役。**
 原本 Daily 用 `decision_lab today` 已含的兩份排序與 `ranking_order_snapshots.jsonl` 的前一筆
