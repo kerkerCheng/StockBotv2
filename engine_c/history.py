@@ -22,19 +22,22 @@ def _iso(value: date | str) -> str:
 
 
 def fundamental_series(conn: Any, ticker: str, metric: str, *, as_of: date | str) -> list[dict[str, Any]]:
-    """as-of T 的某一指標序列（`period_end` 升序）；每個期間只留 `filed ≤ T` 的最新那一列。"""
+    """as-of T 的某一指標序列（`period_end` 升序）；每個期間只留 `filed ≤ T` 的最新那一列。
+
+    規則只住 `shared.as_of.latest_known_by_period`（三題的逐日計算用同一支，L16）。
+    """
+    from shared.as_of import latest_known_by_period
+
     rows = conn.execute(
         """SELECT period_start, period_end, filed, accession, form, value, currency, unit_scale, derived, tag
            FROM fundamental_history
            WHERE ticker = ? AND metric = ? AND filed <= ?
            ORDER BY period_end, filed, accession""",
         (ticker, metric, _iso(as_of))).fetchall()
-    latest: dict[str, dict[str, Any]] = {}
-    for r in rows:
-        latest[str(r[1])] = {"period_start": r[0], "period_end": r[1], "filed": r[2], "accession": r[3],
-                             "form": r[4], "value": r[5], "currency": r[6], "unit_scale": r[7],
-                             "derived": r[8], "tag": r[9]}
-    return [latest[k] for k in sorted(latest)]
+    keys = ("period_start", "period_end", "filed", "accession", "form", "value", "currency", "unit_scale",
+            "derived", "tag")
+    known = latest_known_by_period([dict(zip(keys, r)) for r in rows], _iso(as_of))
+    return [dict(known[k]) for k in sorted(known)]
 
 
 def monthly_revenue_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, Any]:

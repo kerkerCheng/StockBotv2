@@ -314,7 +314,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
 
     for concept in ("revenue", "operating_income"):
         candidates = [f for namespace, tags in _flow_tags(concept) for tag in tags
-                      for f in _facts(facts, namespace, tag, forms=forms)]
+                      for f in _facts(facts, namespace, tag, forms=forms) if f.end >= horizon]
         by_span: dict[str, list[_Fact]] = {}
         for fact in candidates:
             span = _span_class(fact)
@@ -354,7 +354,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
         if metric == "shares_outstanding_cover" and filer != "domestic_quarterly":
             continue
         candidates = [f for namespace, tags in spec for tag in tags
-                      for f in _facts(facts, namespace, tag, forms=forms) if f.start is None]
+                      for f in _facts(facts, namespace, tag, forms=forms) if f.start is None and f.end >= horizon]
         reason = ("同一份申報的封面股數有多個值（多股類分別申報）——不加總" if metric == "shares_outstanding_cover"
                   else "白名單 tag 對同一時點給出不同的數")
         resolved = _resolve_groups(candidates, lambda f: (f.end, f.accession), label=metric,
@@ -507,7 +507,9 @@ def backfill_ticker_edgar(conn: Any, ticker: str, cik: str | None, *, today: dat
     lag_status = lag_status or companyfacts_lag_status
     report: dict[str, Any] = {"cik": cik}
     if not cik:
-        report.update(outcome="no_cik", absence="非美國 SEC 申報人（company_tickers.json 查不到）——EDGAR 不適用")
+        report.update(outcome="no_cik", absence=(
+            "帶交易所後綴的非美國掛牌——不查 SEC，EDGAR 不適用" if "." in ticker else
+            "company_tickers.json 查不到這個 ticker——不是 SEC 申報人，EDGAR 不適用"))
         return report
     if incremental:
         stored = _latest_stored_filed(conn, ticker)
@@ -537,7 +539,9 @@ def backfill_ticker_edgar(conn: Any, ticker: str, cik: str | None, *, today: dat
         report.update(outcome="unknown_filer", absence=basis)
         return report
     forms = DOMESTIC_FORMS if filer == "domestic_quarterly" else FOREIGN_ANNUAL_FORMS
-    lag = dict(lag_status(cik, facts, forms=forms))
+    # R2-c（2026-09-29）：快照日只看**會被消費的營收白名單 fact**——TSM／UMC 最新 20-F 只收到封面 dei／srt，
+    # 看全部 namespace 會被推成 current，FY2025 營收就靜默缺席。
+    lag = dict(lag_status(cik, facts, forms=forms, snapshot_tags=revenue_whitelist()))
     report["lag"] = {k: (v.isoformat() if isinstance(v, date) else v) for k, v in lag.items()}
     if lag.get("status") == "lagging":
         report.update(outcome="lagging", absence=lag.get("warning"))
@@ -547,6 +551,11 @@ def backfill_ticker_edgar(conn: Any, ticker: str, cik: str | None, *, today: dat
     report.update(outcome="written", rows_built=len(rows), rows_new=written, rejected=rejected,
                   lag_unknown=(lag.get("status") == "unknown"))
     return report
+
+
+def revenue_whitelist() -> set[tuple[str, str]]:
+    """落後檢查的快照 tag：營收白名單（us-gaap＋ifrs-full）。它是每一檔都一定會消費的那一組 fact。"""
+    return {(namespace, tag) for namespace, tags in _flow_tags("revenue") for tag in tags}
 
 
 def _submissions_latest(cik: str, forms: Sequence[str]) -> date | None:

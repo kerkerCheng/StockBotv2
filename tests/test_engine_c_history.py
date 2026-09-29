@@ -313,6 +313,37 @@ def test_lag_status_distinguishes_unknown_from_current_and_checks_20f(monkeypatc
     assert companyfacts_lag("1", facts) == (date(2025, 4, 17), None, None)
 
 
+def test_a_20f_that_only_brought_cover_facts_is_lagging_not_silently_current(monkeypatch: pytest.MonkeyPatch) -> None:
+    """R2-c（2026-09-29）找到的 TSM／UMC 形狀：最新一份 20-F 在 companyfacts 只收到封面 `dei`，財報 fact 停在前一年。
+    看全部 namespace 的快照日會被封面 fact 推成 current → FY2025 營收靜默缺席、報告一個字都沒寫。"""
+    import fetchers.edgar as edgar
+
+    facts = _companyfacts({
+        ("ifrs-full", "Revenue"): [_fact("2024-01-01", "2024-12-31", 100, "F24", "20-F", "2025-04-17", unit="USD")],
+        ("dei", "EntityCommonStockSharesOutstanding"): [
+            _fact(None, "2025-12-31", 5_000, "F25", "20-F", "2026-04-16", unit="shares")],
+    })
+    monkeypatch.setattr(edgar, "get_filings",
+                        lambda *_a, **_k: [{"filed_date": "2026-04-16", "form_type": "20-F"}])
+    conn = _conn()
+    report = hb.backfill_ticker_edgar(conn, "TSMX", "0000000002", today=TODAY, incremental=False,
+                                      fetched_at=FETCHED, fetch_facts=lambda _c: facts)
+    assert report["outcome"] == "lagging" and "落後" in report["absence"]
+    assert conn.execute("SELECT COUNT(*) FROM fundamental_history").fetchone()[0] == 0
+
+
+def test_rejections_outside_the_lookback_window_are_not_counted() -> None:
+    """窗外（> 5 年）的期間本來就不寫——把它們的歧異算進拒寫數會把數字灌大（R2-c non-blocking #1）。"""
+    rev = "RevenueFromContractWithCustomerExcludingAssessedTax"
+    facts = _companyfacts({("us-gaap", rev): [
+        _fact("2015-01-01", "2015-03-31", 1, "OLD", "10-Q", "2015-05-01"),
+        _fact("2015-01-01", "2015-03-31", 2, "OLD", "10-Q", "2015-05-01"),
+        _fact("2026-01-01", "2026-03-31", 5, "NEW", "10-Q", "2026-05-01")]})
+    rows, rejected = hb.build_fundamental_rows(facts, ticker="X", filer="domestic_quarterly", today=TODAY,
+                                               fetched_at=FETCHED)
+    assert rejected == [] and [r["period_end"] for r in rows] == ["2026-03-31"]
+
+
 def test_backfill_skips_lagging_writes_unknown_and_reports_every_outcome() -> None:
     conn = _conn()
     facts = _domestic_facts()

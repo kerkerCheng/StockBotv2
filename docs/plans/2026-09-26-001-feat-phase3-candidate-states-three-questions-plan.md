@@ -242,6 +242,10 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
+| 1 | 3.2 | 表的欄位：`fundamental_history(ticker, metric, period_start, period_end, filed, accession, value, currency, unit_scale, derived, source, fetched_at)` | 多兩欄 `form`、`tag` | `form` 是申報人類別判定的輸入（讀取端從已存列判，零網路）；`tag` 讓每一列指得回 companyfacts 的原 tag（L15：mechanical 要可重導）。plan 寫「名稱可調」 |
+| 2 | 3.2 | 「國內申報人」例：EDGAR submissions 最近 18 個月有 10-Q | 同一條規則，輸入改成 companyfacts 各 fact 的 `form`／`filed`（回填時）或已存列（讀取端） | 讀取端（三題、稀釋燈）不得連網；兩個輸入都是同一份 companyfacts，判出同一個類別。落後檢查仍另查 submissions |
+| 3 | 3.2 | 回填前跑 `companyfacts_lag`、落後就記缺席 | 抽成 `companyfacts_lag_status`（表單當參數、抓不到＝`unknown`、**快照日只看營收白名單 fact**）；`companyfacts_lag` 改成它的薄殼、行為不變 | 原函式寫死 10-K／10-Q（20-F 恆不報落後）、抓不到與「沒落後」同形；R2-c 另抓到 TSM／UMC 形狀（最新 20-F 只有封面 dei fact 會把快照推成 current），條件①修正 |
+| 4 | 3.2 | as-of 讀取規則 | 抽成 `shared/as_of.py::latest_known_by_period`，Engine C 讀取端與三題逐日計算共用 | 同一條「T 時刻知道什麼」規則兩份實作的那天起就會開始偏離（L16）；`alpha/` 核心不得 import `engine_c`，所以放 `shared/` |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -623,3 +627,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 12. **邊緣門檻的兩個數**（10B、12 位）是 2026-09-19 由 16 檔實測斷點定的；候選板上線後若「非倍率候選」與「邊緣無法量」長期占多數，要不要重量（不得為了可開非空而調）。
 13. **TYO:7803 在 registry 解析不到**：「持股解析不到」計數會恆為 ≥1；要不要登記進 registry（identity 的決定）。
 14. **決定紀錄 §10 的「可開恆為 0 或恆非 0」**：心跳每天印各狀態檔數，但較昨快照只留短期——2026-12-22 回查時要有足夠長的序列，屆時確認來源（完整性補查推翻了「沒有計數器」這條，但序列長度仍要在 Phase 5 前確認）。
+15. **20-F 便利換算造成約一年延遲**（Step 3.2 R2-c）：TWD／RUB＋USD 便利換算的發行人，當年度 20-F 被「多單位就拒寫」擋掉，要等下一份的比較欄——要不要改成「只收報表本位幣那一個單位」（需要一個機械判定本位幣的來源）。
+16. **companyfacts 部分收錄的發行人**（TSM、UMC：最新 20-F 只收到封面 fact）：落後檢查已把它們記成 `lagging` 不寫；何時補齊取決於 SEC，daily ②b 每天重試。要不要改由其他一手來源（公司年報）取年度營收——那是人工觀測，不是本表。
+17. **價格 adjusted 序列的窗邊界斷層、分割事件只涵蓋 3 年窗**（R2-c #3、#9）：目前沒有消費端跨越窗邊界；Phase 5 量測若要更長的報酬序列，先處理這兩點。
+18. **`engine_c/history.py` 只跑 SQLite**（R2-c #7）：Postgres 只做到建表對等；切後端前要補讀取端的佔位符。

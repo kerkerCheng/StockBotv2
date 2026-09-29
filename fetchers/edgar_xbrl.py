@@ -152,7 +152,8 @@ def fetch_companyfacts(cik: str | int, *, timeout: float = 30.0, retries: int = 
     raise XbrlUnavailable(f"companyfacts 取不到（CIK {cik}）：{type(last).__name__}: {last}")
 
 
-def latest_filed(facts: Mapping[str, Any], *, forms: Sequence[str] | None = None) -> date | None:
+def latest_filed(facts: Mapping[str, Any], *, forms: Sequence[str] | None = None,
+                 tags: Iterable[tuple[str, str]] | None = None) -> date | None:
     """companyfacts 這一份快照裡**最新的申報日**。
 
     ## 為什麼需要它
@@ -170,11 +171,18 @@ def latest_filed(facts: Mapping[str, Any], *, forms: Sequence[str] | None = None
 
     `forms`（前綴，例 `("20-F", "40-F")`）只看那幾種表單的 fact——與 submissions 對照時兩邊要是同一組表單，
     否則 8-K 附的 XBRL 會讓快照看起來比實際新（2026-09-29 Phase 3 Step 3.2）。省略＝全部表單（原行為）。
+
+    `tags`（`(namespace, tag)` 集合）只看**實際會被消費的** fact。2026-09-29 R2-c 抓到：TSM／UMC 最新一份
+    20-F 在 companyfacts 裡只收到封面 `dei`／`srt` 的 fact，財報 fact 停在前一年——看全部 namespace 的
+    快照日會被封面 fact 推成「沒落後」，FY2025 營收就此靜默缺席。省略＝全部 tag（原行為）。
     """
     newest: date | None = None
     prefixes = tuple(forms) if forms else None
-    for namespace in (facts.get("facts") or {}).values():
-        for entry in namespace.values():
+    wanted = set(tags) if tags is not None else None
+    for ns_name, namespace in (facts.get("facts") or {}).items():
+        for tag_name, entry in namespace.items():
+            if wanted is not None and (ns_name, tag_name) not in wanted:
+                continue
             for items in (entry.get("units") or {}).values():
                 for item in items:
                     if prefixes is not None and not str(item.get("form") or "").startswith(prefixes):
@@ -204,7 +212,8 @@ LAG_STATUSES: tuple[str, ...] = ("current", "lagging", "unknown")
 
 
 def companyfacts_lag_status(cik: str | int, facts: Mapping[str, Any], *, forms: Sequence[str],
-                            snapshot_all_forms: bool = False) -> dict[str, Any]:
+                            snapshot_all_forms: bool = False,
+                            snapshot_tags: Iterable[tuple[str, str]] | None = None) -> dict[str, Any]:
     """companyfacts 與 EDGAR submissions 的同一組表單對照（2026-09-29 Phase 3 Step 3.2 抽出）。
 
     回 `{status, snapshot, newest, lag_days, warning}`；`status` ∈ `LAG_STATUSES`：
@@ -216,7 +225,8 @@ def companyfacts_lag_status(cik: str | int, facts: Mapping[str, Any], *, forms: 
     `(snapshot, None, None)`、與「沒落後」同形（plan §0.2 那兩列）。這裡把表單當參數、把失敗單獨成一態；
     `companyfacts_lag` 改成它的薄殼，行為不變（`snapshot_all_forms=True` 保留它原本看全部表單的快照）。
     """
-    snapshot = latest_filed(facts) if snapshot_all_forms else latest_filed(facts, forms=forms)
+    snapshot = (latest_filed(facts) if snapshot_all_forms
+                else latest_filed(facts, forms=forms, tags=snapshot_tags))
     out: dict[str, Any] = {"status": "unknown", "snapshot": snapshot, "newest": None,
                            "lag_days": None, "warning": None}
     try:

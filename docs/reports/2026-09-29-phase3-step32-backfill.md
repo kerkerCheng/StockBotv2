@@ -10,15 +10,19 @@ step: 3.2
 **這份報告回答「每檔每種指標有幾列、從哪到哪、缺什麼、為什麼缺」**（plan §3 第 4 點）。它只數 Engine C 表裡的列與日期，
 不是任何研究結論；三題怎麼讀這些列是 Step 3.3 的事。
 
-- 產生：`python -m engine_c.history_backfill --report <file>`（writer lock 下，2026-09-29 12:06 台北）＋
-  `python -m engine_c.monthly_revenue --backfill 48`；先對正式庫的 backup API 副本跑過同一輪（結果相同，只差下述 6 列 NaN 那一修）。
-- 舊表結構：正式庫所有既有表的 `PRAGMA table_info` 指紋 **`65cbef0f…`＝3.0 基準**（`docs/reports/2026-09-29-phase3-baseline.md` §11）——舊表一欄都沒動。
-- 申報人類別只有一個判準（`engine_c.history_backfill.classify_filer`）：最近 18 個月有 10-Q＝國內季度申報人；否則有 20-F／40-F＝只存年度點；都沒有＝unknown。
+- 產生：`python -m engine_c.history_backfill --report <file>`＋`python -m engine_c.monthly_revenue --backfill 48`，都在 writer lock 下跑。
+  - 第一輪 12:06（台北）；R2-c（CONDITIONAL_GO）之後修正落後檢查與拒寫計數，12:27 重跑一輪。本報告是**重跑後**的版本（§3 列出兩輪的差）。
+  - 兩輪之前都先對正式庫的 backup API 副本跑過一次。
+- 舊表結構：正式庫所有既有表的 `PRAGMA table_info` 指紋是 **`65cbef0f…`，等於 3.0 基準**（`docs/reports/2026-09-29-phase3-baseline.md` §11）——舊表一欄都沒動；R2-c 也獨立重算過，結果相同。
+- 申報人類別只有一個判準（`engine_c.history_backfill.classify_filer`）：
+  - 最近 18 個月有 10-Q → 國內申報人；
+  - 否則有 20-F／40-F → 只存年度點；
+  - 兩者都沒有 → unknown。
 
 ## 1. 結果
 
-- 模式 `backfill`｜today 2026-09-29｜fetched_at `2026-09-29T04:06:51.453272+00:00`（抓取紀錄，不參與任何可用日判斷）
-- 價格：{'written': 73}｜EDGAR：{'no_cik': 29, 'written': 43, 'lagging': 1}｜申報人類別：{'—': 29, 'domestic_quarterly': 36, 'foreign_annual': 8}｜拒寫組數 164
+- 模式 `backfill`｜today 2026-09-29｜fetched_at `2026-09-29T04:27:24.587994+00:00`（抓取紀錄，不參與任何可用日判斷）
+- 價格：{'written': 73}｜EDGAR：{'no_cik': 29, 'written': 41, 'lagging': 3}｜申報人類別：{'—': 29, 'domestic_quarterly': 36, 'foreign_annual': 8}｜拒寫組數 19
 
 ### 價格（`price_history`；73 檔）
 
@@ -73,9 +77,9 @@ step: 3.2
 | SNDK | domestic_quarterly | 17（2023-12→2026-07） | 6（2023-06→2026-07） | 17（2023-12→2026-07） | 6（2023-06→2026-07） | 16（2024-06→2026-07） | 11（2024-06→2026-07） | 8（2025-02→2026-08） |
 | TSEM | foreign_annual | — | 12（2021-12→2025-12） | — | 12（2021-12→2025-12） | 9（2021-12→2025-12） | 3（2021-12→2022-12） | — |
 | TSLA | domestic_quarterly | 39（2021-09→2026-06） | 12（2021-12→2025-12） | 39（2021-09→2026-06） | 12（2021-12→2025-12） | 64（2021-09→2026-06） | 38（2021-09→2026-06） | 23（2021-10→2026-07） |
-| TSM | foreign_annual | — | 5（2021-12→2023-12） | — | 5（2021-12→2023-12） | 3（2021-12→2022-12） | — | — |
+| TSM | foreign_annual｜**lagging** | — | 5（2021-12→2023-12） | — | 5（2021-12→2023-12） | 3（2021-12→2022-12） | — | — |
 | TXN | domestic_quarterly | 39（2021-09→2026-06） | 12（2021-12→2025-12） | 39（2021-09→2026-06） | 12（2021-12→2025-12） | 38（2021-09→2026-06） | 38（2021-09→2026-06） | 20（2021-10→2026-07） |
-| UMC | foreign_annual | — | 5（2021-12→2023-12） | — | 5（2021-12→2023-12） | 3（2021-12→2022-12） | — | — |
+| UMC | foreign_annual｜**lagging** | — | 5（2021-12→2023-12） | — | 5（2021-12→2023-12） | 3（2021-12→2022-12） | — | — |
 | XPEV | foreign_annual | — | 12（2021-12→2025-12） | — | 12（2021-12→2025-12） | 9（2021-12→2025-12） | — | — |
 
 - 衍生 Q4（年度 − 前三季累計，`derived` 欄寫明兩份 accession）：694 列、34 檔。
@@ -85,22 +89,18 @@ step: 3.2
 - **無 CIK（非美國 SEC 申報人）29 檔**——EDGAR 不適用：000660.KS、002472.SZ、005930.KS、012330.KS、2301.TW、2455.TW、300308.SZ、3081.TWO、3105.TWO、3363.TWO、4971.TWO、4979.TWO、5016.T、5802.T、6268.T、6324.T、6481.T、6594.T、6680.HK、688017.SS、688836.SS、ENA.V、HEXA-B.ST、IQE.L、LYC.AX、SHA0.DE、SIVE.ST、SOI.PA、XFAB.PA
   - 其中台股 7 檔（2301.TW、2455.TW、3081.TWO、3105.TWO、3363.TWO、4971.TWO、4979.TWO）的營收由 `monthly_revenue_observations` 承載（見下）；**台股歷史股數沒有機械來源**（TWSE／TPEx OpenAPI 的公司基本資料只有當期股本；集保股權分散表的歷史查詢只有一年）——記缺席，不用今天的股數回推（plan §3 第 2 點；§14 #10）。
 - **CDNS：lagging**——companyfacts 落後 89 天：快照最新申報日 2026-05-01，但 EDGAR 已有 2026-07-29 的定期報告。取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。（這一輪不寫；daily 增量每天重試，companyfacts 跟上後自己補上）
+- **TSM：lagging**——companyfacts 落後 364 天：快照最新申報日 2025-04-17，但 EDGAR 已有 2026-04-16 的定期報告。取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。（這一輪不寫；daily 增量每天重試，companyfacts 跟上後自己補上）
+- **UMC：lagging**——companyfacts 落後 371 天：快照最新申報日 2025-04-24，但 EDGAR 已有 2026-04-30 的定期報告。取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。（這一輪不寫；daily 增量每天重試，companyfacts 跟上後自己補上）
 - **20-F／40-F 發行人 8 檔只存年度點、不存封面股數**（ADS 與普通股不是同一種證券單位）：GFS、HIMX、NBIS、POET、TSEM、TSM、UMC、XPEV
-- companyfacts 落後檢查「抓不到 submissions＝落後未知」照寫的：0 檔
-- **拒寫 164 組**（同一期間同一份申報的白名單 tag 歧異或多種計價單位；不挑一個、不換算）。依檔：NBIS 60、TSM 32、UMC 32、ORCL 17、MP 11、COHR 8、XPEV 3、FN 1
-  - cash：同一期間同一份申報出現多種計價單位 ['TWD', 'USD']——32 組
-  - cash：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——26 組
-  - revenue_quarter：白名單 tag 對同一期間給出不同的數——20 組
-  - revenue_annual：同一期間同一份申報出現多種計價單位 ['TWD', 'USD']——16 組
-  - operating_income_annual：同一期間同一份申報出現多種計價單位 ['TWD', 'USD']——16 組
-  - revenue_annual：白名單 tag 對同一期間給出不同的數——15 組
-  - revenue_annual：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——13 組
-  - operating_income_annual：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——13 組
-  - revenue_nine_month：白名單 tag 對同一期間給出不同的數——8 組
+- companyfacts 落後檢查「抓不到 submissions＝落後未知」照寫的：['CCXI']
+- **拒寫 19 組**（同一期間同一份申報的白名單 tag 歧異或多種計價單位；不挑一個、不換算）。依檔：NBIS 14、MP 5
+  - cash：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——5 組
+  - revenue_quarter：白名單 tag 對同一期間給出不同的數——3 組
+  - revenue_annual：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——3 組
+  - operating_income_annual：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——3 組
+  - revenue_annual：白名單 tag 對同一期間給出不同的數——2 組
   - total_debt：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——2 組
-  - revenue_annual：同一期間同一份申報出現多種計價單位 ['CNY', 'USD']——1 組
-  - operating_income_annual：同一期間同一份申報出現多種計價單位 ['CNY', 'USD']——1 組
-  - cash：同一期間同一份申報出現多種計價單位 ['CNY', 'USD']——1 組
+  - revenue_nine_month：白名單 tag 對同一期間給出不同的數——1 組
 - 白名單沒有對應 tag 的指標就沒有列（例：債務只收 `us-gaap:LongTermDebt`／`ifrs-full:Borrowings` 那一行總額，只有分項的公司淨負債缺席、已定價①照實退回 P/S）。
 
 ### 台股月營收（`monthly_revenue_observations`；不複製進 `fundamental_history`）
@@ -115,21 +115,46 @@ step: 3.2
 - 列數比月數多 1：2026-08 由 openapi 當期檔與歷史頁各抓一次、數字相同——讀取端 `engine_c.history.monthly_revenue_as_of` 同值合併，不同值列 conflicts、不挑一個。
 - 可用日＝`disclosure_deadline`（次月 10 日，法定上界，不是實際公告日）；`published_at` 維持 NULL。
 
-## 2. 手核三點（對原始來源）
+## 2. 手核（對原始來源）
 
-| 檔（類別） | 表裡的值 | 原始來源 | 一致？ |
+以下由本 Step 執行者與 R2-c reviewer 各自核對。R2-c 另外做了全體重建：用重抓的 companyfacts 逐列重建 42 檔，結果是 0 列只在 DB、0 列只在重建、0 個值不同。
+
+| 檔（類別） | 表裡的值 | 原始來源 | 核對者 |
 |---|---|---|---|
-| AXTI（10-Q 國內申報人） | `revenue_quarter` 2026-04-01→2026-06-30＝47,589,000 USD，filed 2026-08-13，accession 0001437749-26-027677；衍生 Q4 2025＝23,041,000（FY 88,326,000 − 9M 65,285,000） | companyfacts `us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax` 同期 47,589,000（10-Q, filed 2026-08-13）；FY2025 88,326,000（10-K, filed 2026-03-17）；Q1–Q3 2025＝19,356,000＋17,974,000＋27,955,000 | ✅ |
-| AXTI（PIT） | as-of 2026-08-12 的最新一季是 2026-03-31（26,924,000）——Q2 的 10-Q 要到 2026-08-13 才申報 | 同上 | ✅ |
-| GFS（20-F） | `revenue_annual` FY2025＝6,791,000,000 USD（20-F, filed 2026-02-27）；沒有任何季度列、沒有封面股數 | companyfacts `ifrs-full:Revenue` 同期同值 | ✅ |
-| 2455.TW（台股） | 2026-08 月營收 470,904（千元 TWD），可用日 2026-09-10（法定期限）；2026-07 為 422,106 | MOPS 歷史頁 t21sc03_115_8_0／115_7_0 與 openapi t187ap05_L 同值 | ✅ |
-| NVDA（分割） | 2024-06-07 `close_raw` 1,208.88、`close_adjusted` 120.54；2024-06-10 起 121.79（×10 分割） | yfinance `Close`（已分割調整）120.888 × 10 | ✅ |
+| AXTI（10-Q） | 2026 Q2 營收 47,589,000 USD（filed 2026-08-13）；衍生 Q4 2025＝23,041,000（FY 88,326,000 − 9M 65,285,000） | companyfacts `us-gaap:RevenueFromContractWithCustomerExcludingAssessedTax` 同值；Q1–Q3 2025＝19,356,000＋17,974,000＋27,955,000 | 執行者 ✅ |
+| AAOI（10-Q） | 2026 Q2 營收 191,922,000（filed 2026-08-06）；衍生 Q4 2025＝134,274,000；封面股數 2026-08-03 為 84,569,237；as-of 2026-08-05 還看不到 Q2 | companyfacts 原文 | R2-c ✅ |
+| GFS（20-F） | FY2025 營收 6,791,000,000 USD（20-F，filed 2026-02-27）；沒有季度列、沒有封面股數 | companyfacts `ifrs-full:Revenue` 同期同值 | 執行者 ✅ |
+| XPEV／TSEM（20-F） | XPEV FY2025 營收 76,719,742,000 **CNY**（照存、不換算）；TSEM FY2025 營收 1,566,104,000 USD、營業利益 194,172,000 | companyfacts 原文 | R2-c ✅ |
+| 2455.TW／3081.TWO（台股） | 3081.TWO：2026-08 月營收 520,469、2026-07 為 501,210、2022-09 為 225,498（千元）；可用日＝次月 10 日 | MOPS 原頁 t21sc03_115_8_0／115_7_0／111_9_0 | 執行者＋R2-c ✅ |
+| NVDA（分割） | 2024-06-07 `close_raw` 1,208.88；2024-06-10 起 121.79（×10 分割） | yfinance `Close`（已分割調整）120.888 × 10；R2-c 用最小跳動單位（tick）反推 9 個分割事件的方向，全部正確 | 執行者＋R2-c ✅ |
 
-## 3. 已知限制（照實寫，不修也不藏）
+## 3. R2-c 的發現與處置（2026-09-29，CONDITIONAL_GO）
 
-- **稀釋燈的新來源只有國內季度申報人**（36 檔有封面股數序列，最早 2021）；其餘續用 yfinance 快照序列（使用者定案 #14，兩個來源不混）。
-  例：AXTI 封面股數 46,623,170（2025-11）→ 55,573,599（2026-03）→ 65,573,212（2026-08）——一年窗滿了就會自己判色（3.3 接）。
-- **COHR 的營業利益只到 2024-06**：之後的申報沒有白名單 tag（`us-gaap:OperatingIncomeLoss`）——TTM 營益缺席時已定價①照規則退回 P/S，不找替代 tag（白名單外一律不看）。
-- **每天價格整段重抓**（股利會回頭改整條 adjusted 序列）；EDGAR 只在 submissions 出現比已存更新的申報時才重抓 companyfacts。
-  若新申報的數字全被拒寫（歧異），那一檔每天都會重抓一次——成本問題不是正確性問題，報告的 `rejected` 會一直列著它。
-- Postgres 後端：建表由 migration `20260929_add_history_tables.sql` 負責；回填 CLI 目前只寫 SQLite（現行後端），在 Postgres 上會直接拒跑並說明。
+- **條件①（已修）**：TSM、UMC 最新一份 20-F 在 companyfacts 裡只有封面 `dei`／`srt` 的 fact，財報 fact 還停在前一年。
+  - 原本的落後檢查拿「任何 fact 的最新 filed」當快照日，所以判成 `current`：FY2025 營收靜默缺席，報告也一個字沒寫。
+  - 修法：快照日只看**會被消費的營收白名單 fact**（`fetchers.edgar_xbrl.latest_filed(tags=…)`、`companyfacts_lag_status(snapshot_tags=…)`），並補 TSM 形夾具測試。
+  - 重跑結果：TSM 落後 364 天、UMC 落後 371 天 → `lagging`，**這一輪不寫**，缺席有名有姓。第一輪寫進去的 TSM／UMC FY2021–2023 列照留：它們在各自申報日之後都是正確的 as-of 事實，而且已定價①對這兩檔本來就是 `inputs_incompatible`（TWD 報表、USD ADR）。
+- **條件②（本節）**：這兩檔的 FY2024 年度數字，在 FY2024 20-F 裡同時有 TWD 與 USD 便利換算兩種單位，被「多單位就拒寫」守則擋掉；FY2025 在 companyfacts 只收到封面 fact。所以最新可用年度停在 **FY2023**。
+  - 三題的「出現在數字裡」對 TSM 會印 `insufficient_evidence`（最新一期距今逾 550 天），不會把 2023 當成現在的數字。
+- **非阻擋的處置**：
+  - 拒寫數原本把 5 年窗外本來就不寫的期間也算進去（164 組），現在只算窗內（19 組：NBIS 14、MP 5）。
+  - 帶交易所後綴的 ticker 的缺席措辭改成「不查 SEC」，不再寫「company_tickers.json 查不到」。
+  - 其餘列在 §4 與 plan §14。
+
+## 4. 已知限制（照實寫，不修也不藏）
+
+- **稀釋燈的新來源只有國內季度申報人**：36 檔有封面股數序列，最早到 2021；其餘續用 yfinance 快照序列（使用者定案 #14，兩個來源不混）。
+  - 例：AXTI 封面股數 46,623,170（2025-11）→ 55,573,599（2026-03）→ 65,573,212（2026-08）。
+- **COHR 的營業利益只到 2024-06**：之後的申報沒有白名單 tag（`us-gaap:OperatingIncomeLoss`）。TTM 營益缺席時，已定價①照規則退回 P/S，不找替代 tag。
+- **20-F 便利換算造成約一年延遲**：有 TWD／RUB＋USD 便利換算的發行人，當年度那份 20-F 會被多單位守則擋掉，要等下一份 20-F 的比較欄才可用。這是保守，不是洩漏（R2-c non-blocking #2；列 plan §14）。
+- **價格每天整段重抓，窗外列保留舊的 adjusted 基準**：
+  - 股利會回頭改整條 adjusted 序列，而重抓只涵蓋「3 年＋30 天」窗；之後有配息或分割時，adjusted 序列會在窗邊界斷層（R2-c #3）。
+  - raw 不受影響，目前也沒有消費端跨越窗邊界。
+- **分割事件只涵蓋 yfinance 3 年窗**：封面股數卻回到 2021（例：TSLA 2022-08 的 3:1 沒記）。跨 3 年以上比股數時會缺分割調整；trailing 一年的稀釋燈不受影響（R2-c #9）。
+- **EDGAR 增量的重抓條件**：只在 submissions 出現比已存更新的申報時才重抓 companyfacts。若新申報的數字全被拒寫，那一檔每天都會重抓一次——這是成本問題，不是正確性問題。
+- **其他小限制**：
+  - `fundamental_history.currency` 對封面股數存的是 XBRL 單位 `shares`（R2-c #4）。
+  - NBIS 的序列跨期混著 RUB 與 USD，每一列都有標幣別，三題端以「同一序列幣別一致」擋（R2-c #5）。
+  - IREN 轉成國內申報人之前的 20-F 歷史被排除（R2-c #6）。
+  - 讀取端 `engine_c/history.py` 目前只跑 SQLite；Postgres 只做到建表對等（R2-c #7）。
+  - 月營收 conflicts 沒有「更正日」可用：今天是 0 筆；有衝突時，讀取端兩列都不用（R2-c #8）。
