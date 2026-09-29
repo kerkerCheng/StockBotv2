@@ -15,6 +15,13 @@
    （nominal／effective）。超過或**量不到**一律 fail closed（dry-run 也擋）；
    `--override --reason "<理由>"` 才放行，且事件紀錄寫 `override_reason` 與整份 verdict 當收據。
    賣出不檢查（不增加曝險）。成交幣別 ≠ NAV 基準幣別時要給 `--fx-to-base`，否則量不到。
+6. **alpha 成交附研究收據（2026-09-30，Phase 3 Step 3.8；使用者 2026-09-29 預先授權 #16）。**
+   alpha／beta 只由 `risk/hard_caps.py` 的公開判別決定（賣出也判）。alpha 一律要 `--why "<一句>"`（碰 Sheet 之前就驗）；
+   事件紀錄多一個 `research_receipt`：`declared`（現行 v2 敘事的宣告）與 `derived`（當天候選板與個股頁 artifact 的推導）
+   分開記，組法住 `portfolio/research_receipt.py`。**alpha 買進沒有現行 v2 敘事 → fail closed（exit 4）**，
+   `--no-narrative-override "<理由>"` 放行並留收據；它與硬擋的 `--override` **互不放行**。賣出可附
+   `--disproof-watch <id>`（以來源歸屬驗它屬於這檔）。收據路徑只讀檔案與 Sheet readonly——不連 Neo4j、不打行情或 FX；
+   artifact 缺席或過期只記 `derived: upstream_unavailable`，不擋成交（A3 不替 A5 做決定）。beta 行為不變。
 
 用法：
     python scripts/record_trade.py --symbol QQQ --side buy --shares 10 \\
@@ -38,6 +45,8 @@ TRADE_LOG = _ROOT / "library" / "trades" / "trade_log.jsonl"
 
 #: 硬擋擋下時的 exit code（與 2＝輸入／持股不合法區分，讓呼叫端與測試分得出「被煞車擋」）。
 EXIT_HARD_CAP = 3
+#: alpha 買進沒有現行 v2 敘事被擋下（Phase 3 Step 3.8）。與硬擋（3）、輸入錯誤（2）各自區分。
+EXIT_NARRATIVE = 4
 
 
 def _now() -> str:
@@ -109,7 +118,166 @@ def build_parser() -> argparse.ArgumentParser:
         help="硬擋擋下時仍放行；必須同時給 --reason，理由與整份 verdict 會寫進事件紀錄當收據",
     )
     ap.add_argument("--reason", default="", help="override 的理由（--override 必填）")
+    ap.add_argument("--why", default=None,
+                    help="alpha 成交必填：為什麼現在買／賣的一句話（寫進研究收據）；beta 不收")
+    ap.add_argument("--no-narrative-override", default=None, metavar="理由",
+                    help="alpha 買進沒有現行 v2 敘事時放行，理由寫進收據；**不放行**硬擋（那要 --override）")
+    ap.add_argument("--disproof-watch", default=None, metavar="WATCH_ID",
+                    help="alpha 賣出：觸發這次賣出的反證 watch id（以來源歸屬驗它屬於這檔）")
     return ap
+
+
+def _today():
+    """排程時區的今天（與 daily、候選板 artifact 的 today 同一個定義）。"""
+    from engine_b import event_watch as ew
+
+    return ew._today()
+
+
+def _shown(path: Path) -> str:
+    """顯示用路徑：repo 內印相對路徑，repo 外（測試的暫存 log）印絕對路徑——顯示不得讓成交 crash。"""
+    try:
+        return str(path.relative_to(_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def _research_inputs(symbol: str, *, today) -> dict:
+    """研究收據的原料——**一次讀好**：Sheet 那一列（readonly，只為解析公司）、敘事 ledger、watch registry、
+    thesis lifecycle、讀圖 ledger（騎的那幾份寫入當時的 result_digest）、當天的候選板與個股頁 artifact。
+    全是本機檔案或 Sheet readonly——**不連 Neo4j、不打行情或 FX**（讀圖對圖與邊緣判定已在 materialize 算好）。
+    任何一項讀不到都記進 `problems`（或各自的 `*_error`），**不擋成交**（A3 不替 A5 做決定）。"""
+    from portfolio import research_receipt
+
+    problems: list[str] = []
+    sheet_read = True
+    try:
+        from fetchers.gsheets import fetch_portfolio
+
+        rows = list(fetch_portfolio(strict_operational=True))
+    except Exception as exc:  # noqa: BLE001 — 讀不到就改由別名／registry 解析，照實記
+        rows, sheet_read = [], False
+        problems.append(f"Sheet 讀不到（{type(exc).__name__}）——公司改由 execution 別名／registry 解析")
+    key = symbol.strip().upper()
+    row = next((r for r in rows if str(r.get("ticker") or "").strip().upper() == key), None) or {"ticker": symbol}
+    try:
+        from identity.registry import get_registry
+        from portfolio.holdings import resolve_holding, resolve_holdings
+
+        registry = get_registry()
+        resolved = resolve_holding(row, registry=registry)
+    except Exception as exc:  # noqa: BLE001 — registry／別名讀不到＝解析不到（不猜），照實記
+        registry = None
+        resolved = {"company_id": None, "research_ticker": None, "source": None}
+        problems.append(f"registry／execution 別名讀不到（{type(exc).__name__}）——公司解析不到")
+    cid = resolved["company_id"]
+    out: dict = {"company_id": cid, "research_ticker": resolved["research_ticker"],
+                 "resolution_source": resolved["source"], "records": [], "narrative_readable": True,
+                 "watches": [], "lifecycle": None, "reading_digests": {}, "candidates": None,
+                 "candidates_error": None, "analyst": None, "analyst_error": None, "held_company": None,
+                 "problems": problems}
+    # 公司層級的「成交前有沒有持有」：同一家公司在 Sheet 任何一列股數 > 0（候選板「已持有」同一個層級；INV-1）。
+    if sheet_read and cid and registry is not None:
+        try:
+            resolution = resolve_holdings(rows, registry=registry)
+            out["held_company"] = any(r["company_id"] == cid and (r["shares"] or 0) > 0 and not r["cash"]
+                                      for r in resolution["rows"])
+        except Exception as exc:  # noqa: BLE001
+            problems.append(f"Sheet 持股解析失敗（{type(exc).__name__}）——公司層級持有沒記")
+    research = resolved["research_ticker"]
+    if cid and not research:
+        out["narrative_readable"] = False
+        problems.append(f"registry 沒有 {cid} 的 research ticker——敘事 ledger 以 ticker 為鍵，無從對（不是「沒有敘事」）")
+    if research:
+        try:
+            from alpha.providers.briefs import read_brief_records
+
+            records, errors = read_brief_records(str(research))
+            out["records"] = list(records)
+            if errors:
+                # 有壞行時 select_brief 可能退回較舊的一版——確認不了現行是哪一版，fail closed（3.8 R1）。
+                out["narrative_readable"] = False
+                problems.append(f"敘事 ledger 有 {len(errors)} 行解析失敗——確認不了現行是哪一版")
+        except Exception as exc:  # noqa: BLE001 — 讀不到≠沒有（L11-5），照實記、買進 fail closed
+            out["narrative_readable"] = False
+            problems.append(f"敘事 ledger 讀不到（{type(exc).__name__}）")
+    try:
+        from engine_b import event_watch as ew
+
+        out["watches"] = list(ew.load_watches().get("watches") or ())
+    except Exception as exc:  # noqa: BLE001
+        problems.append(f"watch registry 讀不到（{type(exc).__name__}）——收據沒有在盯的 watch")
+    from engine_b.disproof import load_lifecycle
+
+    out["lifecycle"] = load_lifecycle()
+    if out["lifecycle"] is None:
+        problems.append("thesis lifecycle 讀不到——thesis 來源的 watch 歸屬不到本檔")
+    brief = research_receipt.current_brief(out["records"], today=today)
+    for ride in getattr(brief, "rides", ()) or ():
+        try:
+            from alpha.providers.structure_readings import read_reading_records
+
+            recs, reading_errors = read_reading_records(ride.node)
+            hit = next((r for r in recs if r.reading_id == ride.reading_id), None)
+            out["reading_digests"][ride.reading_id] = hit.result_digest if hit is not None else None
+            if reading_errors:
+                problems.append(f"讀圖 ledger {ride.node} 有 {len(reading_errors)} 行解析失敗")
+        except Exception as exc:  # noqa: BLE001
+            problems.append(f"讀圖 ledger {ride.node} 讀不到（{type(exc).__name__}）")
+    from webapp.store import ArtifactStore, StateArtifactStore
+
+    try:
+        out["candidates"], _fresh = StateArtifactStore().read("candidates")
+    except Exception as exc:  # noqa: BLE001
+        out["candidates_error"] = f"{type(exc).__name__}: {str(exc)[:160]}"
+    if research:
+        try:
+            out["analyst"], _fresh = ArtifactStore().read(str(research))
+        except Exception as exc:  # noqa: BLE001
+            out["analyst_error"] = f"{type(exc).__name__}: {str(exc)[:160]}"
+    else:
+        # 沒有個股頁可對（不是「讀不到」——下一步是補 registry，不是修讀取；L12）。
+        out["analyst_error"] = ("Sheet symbol 解析不到公司，沒有個股頁 artifact 可對" if not cid
+                                else f"registry 沒有 {cid} 的 research ticker，對不到個股頁 artifact")
+    return out
+
+
+def _print_receipt(receipt: dict) -> None:
+    from portfolio.research_receipt import NARRATIVE_STATES
+
+    print(f"\n研究收據（alpha {receipt['side']}）：narrative＝{receipt['narrative']}"
+          f"（{NARRATIVE_STATES[receipt['narrative']]}）｜公司 {receipt.get('company_id') or '解析不到'}"
+          f"（{receipt.get('research_ticker') or '—'}；解析 {receipt.get('resolution') or '—'}）")
+    print(f"  why：{receipt['why']}")
+    declared = receipt.get("declared")
+    if declared:
+        cs = declared.get("candidate_state") or {}
+        answers = declared.get("answers") or {}
+        print(f"  declared：敘事 {declared['brief_id']}｜候選 {cs.get('state')}"
+              f"{'（等 ' + str(cs.get('watch_id')) + '）' if cs.get('watch_id') else ''}"
+              f"｜已定價 {answers.get('priced_in')}／數字裡 {answers.get('in_numbers')}"
+              f"｜在處理中的 watch {len(declared.get('watches') or [])} 筆")
+        for ride in declared.get("rides") or ():
+            print(f"    騎 {ride['node']}（{ride['unit']}）{ride['reading_id']} digest "
+                  f"{(ride.get('result_digest') or '讀不到')[:16]}")
+    derived = receipt.get("derived") or {}
+    if derived.get("status") == "available":
+        cand = derived.get("candidate") or {}
+        where = cand.get("derived") or cand.get("side") or (derived.get("candidate_note") if not cand else None) or "—"
+        print(f"  derived：候選板 {derived.get('candidate_as_of')}｜推導 {where}"
+              f"｜前提失效 {len(cand.get('preconditions') or [])}｜三題 {len(derived.get('three_questions') or [])} 行")
+    else:
+        print(f"  derived：upstream_unavailable——{derived.get('reason')}（不擋成交）")
+    sheet = derived.get("sheet") or {}
+    print(f"  Sheet：這一列成交前持有 {sheet.get('held_before_this_row')}｜公司層級 {sheet.get('held_before_company')}"
+          f"（{sheet.get('sheet_state')}）")
+    if receipt.get("narrative_override_reason"):
+        print(f"  ⚠ 缺敘事放行：{receipt['narrative_override_reason']}")
+    if receipt.get("disproof_watch"):
+        dw = receipt["disproof_watch"]
+        print(f"  觸發賣出的反證 watch：{dw['watch_id']}（{dw.get('status')}；來源 {dw.get('source_ref')}）")
+    for problem in receipt.get("input_problems") or ():
+        print(f"  · {problem}")
 
 
 def _hard_cap_verdict(args: argparse.Namespace):
@@ -175,6 +343,28 @@ def main(argv: list[str] | None = None) -> int:
     if args.reason.strip() and not args.override:
         print("✗ --reason 只在 --override 時有意義；沒有 override 的成交不需要理由", file=sys.stderr)
         return 2
+    # alpha／beta 只由硬擋的公開判別決定（Phase 3 Step 3.8；賣出也判——不靠 verdict 間接取得）。
+    from risk.hard_caps import is_beta_symbol
+
+    is_beta = is_beta_symbol(args.symbol)
+    # 以「有沒有給這個旗標」判斷，不以值的真假——空字串代表使用者以為給了（例：shell 變數展開成空；3.8 R1）。
+    research_flags = [flag for flag, given in (("--why", args.why is not None),
+                                               ("--no-narrative-override", args.no_narrative_override is not None),
+                                               ("--disproof-watch", args.disproof_watch is not None)) if given]
+    if is_beta and research_flags:
+        print(f"✗ {args.symbol} 是 beta：不需要研究收據，{'／'.join(research_flags)} 只用在 alpha", file=sys.stderr)
+        return 2
+    if not is_beta:
+        if not (args.why or "").strip():
+            print("✗ alpha 成交必須附 --why「<一句：為什麼現在買／賣>」——它寫進研究收據（Phase 3 Step 3.8）",
+                  file=sys.stderr)
+            return 2
+        if args.no_narrative_override is not None and (args.side != "buy" or not args.no_narrative_override.strip()):
+            print("✗ --no-narrative-override 只用在 alpha 買進，而且必須附理由", file=sys.stderr)
+            return 2
+        if args.disproof_watch is not None and (args.side != "sell" or not args.disproof_watch.strip()):
+            print("✗ --disproof-watch 只用在 alpha 賣出（觸發這次賣出的反證），而且要給 watch id", file=sys.stderr)
+            return 2
     from fetchers.gsheets import locate_portfolio_cells, write_portfolio_cells
 
     gross = round(args.shares * args.price, 2)
@@ -247,6 +437,51 @@ def main(argv: list[str] | None = None) -> int:
         receipt["override_reason"] = args.reason.strip()
         print(f"\n⚠ override 放行：{args.reason.strip()}（將寫進事件紀錄）")
 
+    # 研究收據（alpha；Phase 3 Step 3.8）。順序：locate → 硬擋 → 收據；dry-run 也組、也印、也擋。
+    # 兩個放行互不放行：硬擋的 --override 不放行缺敘事，--no-narrative-override 不放行硬擋（上面已先過硬擋）。
+    if not is_beta:
+        from portfolio import research_receipt
+
+        try:
+            today = _today()
+            today_problem = None
+        except Exception as exc:  # noqa: BLE001 — 排程時區讀不到：退回本機日期、照實記，不讓成交 crash
+            from datetime import date
+
+            today, today_problem = date.today(), f"排程時區讀不到（{type(exc).__name__}）——「今天」退回本機日期"
+        inputs = _research_inputs(args.symbol, today=today)
+        if today_problem:
+            inputs["problems"].append(today_problem)
+        brief = research_receipt.current_brief(inputs["records"], today=today)
+        state = research_receipt.narrative_state(inputs["company_id"], brief,
+                                                 readable=bool(inputs.get("narrative_readable", True)))
+        watch_summary = None
+        if args.disproof_watch is not None:
+            watch_summary, error = research_receipt.check_disproof_watch(
+                args.disproof_watch, company_id=inputs["company_id"], ticker=inputs["research_ticker"],
+                records=inputs["records"], brief=brief, watches=inputs["watches"], lifecycle=inputs["lifecycle"])
+            if error:
+                print(f"✗ --disproof-watch：{error}", file=sys.stderr)
+                for problem in inputs["problems"]:
+                    print(f"  · {problem}", file=sys.stderr)
+                return 2
+        if args.side == "buy" and state == "present" and args.no_narrative_override is not None:
+            print("✗ 這檔有現行 v2 敘事，不需要 --no-narrative-override（放行只給缺敘事的買進）", file=sys.stderr)
+            return 2
+        research = research_receipt.build_receipt(
+            side=args.side, why=(args.why or "").strip(), symbol=args.symbol, today=today, inputs=inputs,
+            # --log-only 時 Sheet 已是成交後的狀態，推不出「成交前有沒有持有」——照實記 None 並標明（不回推）。
+            held_before=(None if args.log_only else old_shares > 0), log_only=bool(args.log_only),
+            narrative_override=(args.no_narrative_override.strip() if args.no_narrative_override else None),
+            disproof_watch=watch_summary)
+        _print_receipt(research)
+        if args.side == "buy" and state != "present" and args.no_narrative_override is None:
+            print(f"\n✗ 未寫入。alpha 買進需要現行 v2 敘事（現在：{research_receipt.NARRATIVE_STATES[state]}）。"
+                  "先寫敘事（python -m alpha brief <T> --add spec.json），或加 --no-narrative-override「<理由>」放行"
+                  "（理由寫進收據；它不放行硬擋）。", file=sys.stderr)
+            return EXIT_NARRATIVE
+        receipt["research_receipt"] = research
+
     if _already_recorded(trade_id):
         print("\n⚠ 這筆成交已在 trade_log.jsonl 中；重複執行不會再寫事件紀錄。")
 
@@ -268,7 +503,7 @@ def main(argv: list[str] | None = None) -> int:
                 **receipt,
             }
         )
-        print(f"\n✓ 事件已記於 {TRADE_LOG.relative_to(_ROOT)}；"
+        print(f"\n✓ 事件已記於 {_shown(TRADE_LOG)}；"
               "Sheet 未被改動（已由使用者手動更新）。")
         print("  上方 diff 僅供對照，不是待執行的變更。")
         return 0
@@ -299,7 +534,7 @@ def main(argv: list[str] | None = None) -> int:
                 **receipt,
             }
         )
-    print(f"\n✓ 已寫入 {len(result['written'])} 格，事件已記於 {TRADE_LOG.relative_to(_ROOT)}")
+    print(f"\n✓ 已寫入 {len(result['written'])} 格，事件已記於 {_shown(TRADE_LOG)}")
     print("  Sheet 仍是持股唯一權威；市值與 NAV 未被本腳本改動。")
     return 0
 

@@ -152,8 +152,20 @@ def _sheet_rows(nav: float = 100_000.0, **positions: float) -> list[dict]:
     return rows
 
 
-def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0):
-    """把 Sheet 的三個入口換成假的：定位格、持股列、寫入（寫入被叫到就記下來）。"""
+def _present_inputs() -> dict:
+    """研究收據的原料（Phase 3 Step 3.8）：一份現行 v2 敘事——讓硬擋的既有測試只驗硬擋，不被缺敘事擋下。
+    不讀真實 ledger（`_research_inputs` 整支換掉）。"""
+    from tests.test_candidates import _brief
+
+    return {"company_id": "co:axt", "research_ticker": "AXTI", "resolution_source": "registry_ticker",
+            "records": [_brief(state="priced_wait", watch_id="ew_wait")], "watches": [], "lifecycle": {},
+            "reading_digests": {}, "candidates": None, "candidates_error": "測試不讀 artifact", "analyst": None,
+            "analyst_error": "測試不讀 artifact", "problems": []}
+
+
+def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, inputs=None):
+    """把 Sheet 的三個入口換成假的：定位格、持股列、寫入（寫入被叫到就記下來）。
+    3.8 起 alpha 成交還要研究收據的原料：預設給一份現行 v2 敘事（`inputs` 可換）。"""
     from fetchers import gsheets
 
     calls: dict[str, list] = {"writes": []}
@@ -176,11 +188,16 @@ def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0):
     monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False: rows)
     module = _module()
     module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    from datetime import date
+
+    module._today = lambda: date(2026, 9, 30)
+    module._research_inputs = lambda symbol, *, today: dict(inputs if inputs is not None else _present_inputs())
     return module, calls
 
 
+# ⚠ 2026-09-30（Phase 3 Step 3.8）：alpha 成交一律要 `--why`（寫進研究收據），所以夾具帶一句。
 _BUY = ["--symbol", "AXTI", "--side", "buy", "--shares", "10", "--price", "200",
-        "--executed-at", "2026-09-23T14:00:00-04:00", "--broker", "IB"]
+        "--executed-at", "2026-09-23T14:00:00-04:00", "--broker", "IB", "--why", "測試：加碼"]
 
 
 def test_dry_run_over_five_percent_fails_closed_without_touching_sheet_or_log(
@@ -250,7 +267,7 @@ def test_foreign_currency_buy_needs_fx_to_base(monkeypatch, tmp_path) -> None:
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0))
     twd = ["--symbol", "3105.TWO", "--side", "buy", "--shares", "1000", "--price", "100",
            "--currency", "TWD", "--cash-column", "none",
-           "--executed-at", "2026-09-23T09:05:00+08:00", "--broker", "FUBON"]
+           "--executed-at", "2026-09-23T09:05:00+08:00", "--broker", "FUBON", "--why", "測試：建倉"]
     assert module.main(twd) == module.EXIT_HARD_CAP, "沒有匯率就量不到"
     assert module.main(twd + ["--fx-to-base", "0.03125"]) == 0, "100,000 TWD ≈ 3,125 USD = 3.1% < 5%"
 
@@ -258,7 +275,7 @@ def test_foreign_currency_buy_needs_fx_to_base(monkeypatch, tmp_path) -> None:
 def test_sell_is_never_blocked_by_the_caps(monkeypatch, tmp_path) -> None:
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=9_000.0))
     sell = ["--symbol", "AXTI", "--side", "sell", "--shares", "5", "--price", "200",
-            "--executed-at", "2026-09-23T14:00:00-04:00", "--broker", "IB", "--apply"]
+            "--executed-at", "2026-09-23T14:00:00-04:00", "--broker", "IB", "--apply", "--why", "測試：減碼"]
     assert module.main(sell) == 0
     entry = json.loads(module.TRADE_LOG.read_text(encoding="utf-8").splitlines()[0])
     assert entry["hard_cap_check"]["status"] == "not_applicable"

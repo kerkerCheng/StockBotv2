@@ -747,6 +747,40 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 **只寫指定儲存格**（不會蓋掉你手填的欄位）、**寫前比對現值**（不符即整批中止）。
 市值與 NAV 不由本腳本改動。
 
+**alpha 成交的研究收據（2026-09-30，Phase 3 Step 3.8）：**
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\record_trade.py --symbol FRA:2DG --side buy `
+    --shares 100 --price 7.1 --currency EUR --fx-to-base 1.08 --cash-column none `
+    --executed-at <ISO> --broker IB `
+    --why "<一句：為什麼現在買>"                                   # alpha 必填（碰 Sheet 之前就驗）
+#   ⚠ 非 USD 成交要給 --cash-column none（或該幣別的現金欄）：預設 cash_usd，會把歐元金額寫進美元現金
+#   沒有現行 v2 敘事的 alpha 買進 → exit 4（fail closed）；確定要買：
+#   --no-narrative-override "<理由>"                              # 理由寫進收據；不放行硬擋
+#   賣出：--why 必填；--disproof-watch <watch_id>（可選，觸發賣出的反證，以來源歸屬驗）
+```
+
+- alpha／beta 只由 `risk/hard_caps.py` 的公開判別決定（賣出也判）。beta（QQQ 等）不要收據、行為不變；給 beta 帶 `--why`
+  會被拒（exit 2），不是默默忽略。
+- 順序：定位（恰好一列）→ 硬擋 → 收據；**dry-run 也組收據、也印、也擋**。exit code：2＝輸入錯、3＝硬擋、4＝缺敘事
+  （缺敘事也含「敘事 ledger 讀不到／有壞行／registry 沒有 research ticker」＝`narrative: unreadable`——確認不了現行是哪一版）；
+  定位不到那一列是 traceback＋exit 1（見下方首次建倉）。旗標以「有沒有給」判斷：給了空字串（例：shell 變數展開成空）照樣拒絕。
+  **兩個放行互不放行**：`--override --reason`（硬擋）不放行缺敘事，`--no-narrative-override`（敘事）不放行硬擋。
+- 收據進那一筆事件的 `research_receipt`：`declared`（現行 v2 敘事的 brief_id、候選狀態、兩題答案、騎的讀圖與寫入當時的
+  result_digest、歸屬本檔還在處理中的 watch）／`derived`（**當天**候選板 artifact 那一列、個股頁 artifact 的三題稽核行、成交前的
+  Sheet 持有）。收據路徑只讀本機檔案與 Sheet readonly——**不連 Neo4j、不打行情或 FX**；artifact 缺席或不是今天只記
+  `derived: upstream_unavailable`，**不擋成交**。要收據帶得到當天的推導，先讓 daily ⑬ 跑過，或手動
+  `python -m webapp materialize <研究代號> --candidates`（`--candidates` 只重算候選板；三題稽核行住個股頁 artifact，要連該檔一起跑）。
+  個股頁 artifact 是 as-of 視角、三題整段缺席、或候選板那一列的敘事版本不是現行，也都記 `upstream_unavailable`＋原因。
+  「成交前持有」記兩個層級：這一列（symbol＋broker）與公司層級（同一家公司任何一列）。
+- Sheet symbol → 公司：Sheet 列自己的 company_id → execution 別名（`FRA:2DG`→`SIVE.ST`）→ registry；都不中＝`narrative: unresolved`
+  （不猜；要買就補 registry 或用 `--no-narrative-override`）。
+- **首次建倉：先在 Sheet 手動建好那一列**：symbol、broker、bucket、`currency`／`base_currency`（三碼幣別），shares 填 0，
+  `market_value_base`／`nav_base`（或舊表的 `market_usd`）要是數字或公式——持股列在嚴格讀取時每一列都要能轉成數字，否則整張表
+  讀不到、所有買進的硬擋變成量不到（exit 3）。腳本以 symbol＋broker 定位、必須恰好一列，沒有列就中止（traceback＋exit 1）；
+  它只改既有列的三格，從不新增列。
+- 舊事件（3.8 之前的 2 筆）沒有 `research_receipt`：未來讀取端要把它當**缺席**，不是錯誤（plan §14）。
+
 事件紀錄在 tracked `library/trades/trade_log.jsonl`（append-only）。
 它是「發生了什麼」的稽核軌跡，**不是持股真相**——後者永遠只有 Sheet。
 2026-09-16 D14 再確認：**Sheet 是部位真相**（含貸款額度、投入標的與現金），Decision Store 只留可選 receipt；

@@ -225,7 +225,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2（收據 `docs/reports/2026-09-29-phase3-step35-narratives.md`；pq2 [656]–[661] 等使用者 go） | ✅ | **強模型** | 見 git log「Step 3.5」 |
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳（多面向審查＋覆核：32 條處置，見偏差 18–26） | ✅ | 執行模型 | `f7f1711`＋收尾 |
 | 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ✅ | 執行模型 | 本 Step commit |
-| 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ○ | 執行模型 | |
+| 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ✅ | 執行模型 | 本 Step commit |
 | 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ○ | 執行模型 | |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
 
@@ -276,6 +276,11 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 32 | 3.7（修 3.3／3.4） | （未寫）個股頁三題的 `history_not_comparable` | `briefing/alpha_view/sources.py` 把現行 v2 敘事宣告的 `history_not_comparable` 交給 `three_questions_for` | L17 對稱面：候選板與寫入端都帶、個股頁沒帶；今天四份 v2 都沒宣告，所以是潛在不一致，不是現行錯值 |
 | 33 | 3.7 | （未寫）argument 標題、bet 三段、readiness 白話 | argument 標題「憑什麼這樣想：它在哪條鏈上、錯了怎麼知道、什麼時候知道」；bet 三格照抄 read model（新 `investor_brief.rides` Datum）；`PLAIN_READINESS`「四段都讀得成」→「核心各段都讀得成」；歸零旗標燈名印成內部 key（`plainLine` 的 fallback 沒傳）當下修 | 標題還掛著 0b.1b 已退役的「賭注」段；核心早已不是四段（L16：不寫段數）；燈名 bug 是 headless 渲染實測抓到的，一行修（L17） |
 | 34 | 3.7（R1） | §8 各點的邊界情況（未寫） | R1 覆核（5 面向＋逐條反駁，38 條成立）全修：①as-of 視角讀圖 context 明確拒絕（`point_in_time_unavailable`，鏈段與核心讀圖面板照抄；INV-6）；②markdown 逐節印讀圖／候選／downside／三題，bet 的 rides 不印 repr、缺席不印 None；③Sheet 讀不到時首屏宣告「持有判定暫停」（`row_absence`）而不是「也沒有持有」；④稽核區序列逐鍵攤開三種形狀（EDGAR／台股月營收／分部占比）並印推算出處；⑤沒有讀圖分兩種（坐了沒讀＝`not_yet_recorded`、圖上沒有坐的層＝`upstream_unavailable`，產生端宣告）；⑥downside 空列依產生端的 `empty`（來源讀不到＝`upstream_unavailable`）、騎的讀圖「沒有列」與「已換版」分開、thesis 列照抄 watch 的 L7 兩欄；⑦同一輪個股頁與候選板共用一份候選 context（`webapp/__main__.py`）、alias 正規化成 research ticker；⑧as-of 三題分型改 `point_in_time_unavailable`；⑨v1 敘事印「舊版（缺候選狀態）」、面板名走 `/meta` 白話、「核心四段」殘留三處；補 15 條測試（22 個變異全紅）。**覆核第二輪**（3 個唯讀 agent 逐條核對：blocking 全修、無新 blocking）另修 13 條 non-blocking：downside 整格撤回≠讀不到（`retracted_cells`）、空列理由照事實組、同一格內醒來待判優先（不看 registry 順序）、共用 context 的組板宇宙仍以 materialize 後的目錄為準（失敗檔不上板）、markdown 巢狀值不印 repr、占比格式只對 0–1 ×100、「什麼時候會知道」改讀 description／expected_at（HEAD 起就錯，搬到第二層才看得到）、選配缺席行走 `/meta` 白話與產生端分型、三題卡印 detail（敘事引用的倍數核對得到）、as-of 的 downside 標題、「核心四段」再兩處、compose 舊註解；再補 9 條測試（兩輪共 30 個變異全紅） | 覆核逐條實證；L12（一個分型兩種語意）、L16（缺席由產生端宣告）、L17（對稱面）、INV-3、INV-6 |
+| 35 | 3.8 | §9 第 2 點 `derived`「讀當天的 candidates artifact（…三題稽核各行）」 | 候選那一列讀候選板 artifact；**三題稽核行讀個股頁 artifact**（`view.three_questions.lines`），兩份各自驗「是不是今天」 | 候選板 artifact 每列只帶三個字，稽核行住個股頁 artifact（3.7）；另算一份就違反「資本路徑不連 Neo4j／不打行情」 |
+| 36 | 3.8 | （未寫）exit code 與旗標誤用 | 缺敘事 exit 4（硬擋 3、輸入錯 2 各自區分）；beta 帶 `--why`／`--no-narrative-override`／`--disproof-watch` → exit 2（不默默忽略）；`--no-narrative-override` 只收 alpha 買進、有現行 v2 敘事時拒收；`--disproof-watch` 只收 alpha 賣出；`--why` 在碰 Sheet 之前就驗 | 與既有「`--reason` 無 `--override` 就 exit 2」同一種守門：多給的旗標代表使用者以為它有作用 |
+| 37 | 3.8 | §9 第 2 點「成交前由 Sheet 推得的持有狀態；`--log-only` 時標明」 | `--log-only` 時 `held_before=None`＋`sheet_state=post_trade…`，**不回推**（不用成交後股數減回去） | 回推是一個沒有人宣告過的推論；照實記「推不出」 |
+| 38 | 3.8 | §9「FRA:2DG→SIVE.ST 用 §7 的持股解析」 | 真實 dry-run 走 `sheet_company_id`——**來源不是 Sheet 欄位**，是 `fetchers/gsheets.py::fetch_portfolio` 以寫死的 `_TICKER_ENRICHMENT` 注入的 `neo4j_id`（只有 FRA:2DG 有值；R1 查證更正）；三條解析路徑（sheet_company_id／execution_alias／registry_ticker）各有測試 | 同一個 `resolve_holding`，三條解析順序照舊；第二份 ticker→co:* 對照表的去留記 §14 #35 |
+| 39 | 3.8（R1） | §9 的邊界情況（未寫） | R1 覆核（3 面向＋逐條反駁，28 條成立、1 條 blocking）修：①三題整段缺席不再記成 available＋空陣列（照抄面板的 status／absence_kind／reason，列入原因）；②新敘事狀態 `unreadable`（ledger 讀不到、有壞行、registry 沒有 research ticker）——買進 fail closed、賣出照記（有壞行時 `select_brief` 會退回舊版而自動放行，原本是 fail-open）；③收據原料每一項讀取都接住（registry、敘事 ledger、排程時區），讀不到不擋賣出；④個股頁 artifact 是 as-of 視角不算當天；⑤候選板那一列的敘事版本不是現行時標出；⑥持有記列與公司兩個層級；⑦稽核行照抄 rule／detail／status；⑧lifecycle 讀不到時 thesis 來源的 `--disproof-watch` 說「無法確認」不說「不歸屬」；⑨空字串旗標拒收；⑩讀圖 ledger 壞行現形；⑪顯示路徑不再讓 repo 外的 log crash；⑫「不對外連線」測試改用 `except Exception` 吞不掉的例外並斷言沒有嘗試；補 13 條測試 | 覆核逐條實證；L11-5、L12、L17、INV-3、INV-6 |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -529,6 +534,8 @@ sandbox impact review（daily 旗標）；**05:30 前 push**。
 **怎麼驗：** 測試全用暫存 log 與假 Sheet：FRA:2DG 買進找得到 SIVE.ST 的 v2 敘事且收據欄位齊全；無敘事 → fail closed、`--no-narrative-override` 後收據記 absent；v1 → 同無敘事並記 legacy_v1；**缺敘事放行不連帶放行 >5%**、**硬擋 override 不連帶放行缺敘事**；賣出缺 `--why` → fail closed；`--disproof-watch` 不屬於這檔 → 拒收（來源歸屬本檔但 entities 不含本檔 → 收；entities 含本檔但來源不歸屬 → 拒）；beta 不要求收據；`--log-only` 的 `derived` 標成交後；candidates artifact 缺席或過期 → 收據記 `upstream_unavailable`、成交照走；「registry 解析得到但沒有敘事的 alpha」用夾具測（真實 Sheet 沒有這種列）。**真實試跑只做 dry-run（不帶 `--apply`、不帶 `--log-only`）**，用 Sheet 裡確實存在的列：FRA:2DG（v2 敘事）、TYO:7803（registry 解析不到的 alpha → `narrative: unresolved`）、QQQ（beta），輸出貼八欄。
 **L11-6 ④：** 今天沒有任何 production reader 讀 trade_log 事件內容（只有 `_already_recorded` 與兩條讀真實 log 的測試）——①那兩條測試在新欄位出現後照綠；②`tests/test_record_trade.py` 中因新規則改期望值的測試逐條列出；③舊事件缺 `research_receipt` 要被未來讀取端當 absence 而不是錯誤——寫進 §14 給 Phase 5。`trade_log.jsonl` sha256 不變。
 
+**執行結果（2026-09-30）：** `portfolio/research_receipt.py`（純組裝）＋`scripts/record_trade.py`（讀檔與流程）；偏差 35–39、待決 §14 #33–36。真實 dry-run（不帶 `--apply`／`--log-only`）：FRA:2DG → SIVE.ST（`sheet_company_id`，來源見偏差 38）、narrative present、騎三份讀圖各帶寫入當時 digest、derived 讀到當天候選板（held）與三題 11 行、exit 0；TYO:7803 → `unresolved`、exit 4；QQQ → beta、沒有收據、行為不變，帶 `--why` 被拒。`trade_log.jsonl` sha256 前後相同。L11-6 ④：讀真實 log 的兩條測試照綠；`tests/test_record_trade.py` 因新規則改期望的 6 條（`test_dry_run_over_five_percent…`、`test_override_with_reason…`、`test_buy_under_the_cap…`、`test_unreadable_holdings…`、`test_foreign_currency_buy…`、`test_sell_is_never_blocked…`）只加 `--why` 與注入一份現行 v2 敘事，硬擋期望值一個都沒改。
+
 **R2-b（常規 opt-in）WORK_REQUEST：**
 ```
 WORK_REQUEST（R2-b，Phase 3 Step 3.8）
@@ -678,3 +685,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 30. **argument 鏈段的邊仍經 `min_substitutability`（sub≥4）過濾**（`get_company_structural_context` 讀 `_bottleneck_rows`）：57/73 檔因此沒有邊可講，其中 SIVE.ST、AAOI 圖上是有邊的。plan §8 第 4 點明文只改需求錨、邊照舊；要不要改讀全部邊，與 #5（`get_bottlenecks` 退役）一起決定。
 31. **測試隔離**（3.7 在 worktree 跑全套時現形）：13 條測試在沒有 `.env`／`library/leads`／`extractions`／watch registry／Engine C 的 checkout 會紅（它們讀真實 Neo4j、leads、registry）——主樹全綠；`test_private_authority_is_never_touched_by_a_request` 雜湊整個 `library/private`（含 derived cache），與 materialize 並行會假紅。
 32. **圖上沒有坐的層的 23 檔（例 AAPL、MSFT、ORCL、TSLA）讀圖面板永遠是 `upstream_unavailable` blocker**（3.7 R1）：下一步是補它的供貨／開發邊或判定它在需求側，但注入面板沒有 Abstention 的 settle 管道——若判定是需求側（本來就不坐任何層），它的每檔閉環永遠到不了終局。要不要給讀圖面板一條 Abstention settle 路徑（`刻意不主張：它是需求側`），使用者決定；今天 23 檔都已因 brief blocked，readiness 沒有一檔因此改變。
+33. **舊成交事件沒有 `research_receipt`**（3.8 之前的 2 筆，`trade_log.jsonl` 未改、sha256 前後相同）：Phase 5 的讀取端（追蹤表、成交回顧）要把它當**缺席**，不是錯誤；同理 beta 事件永遠沒有收據（不是漏記）。
+34. **同一筆成交重跑 `--apply` 會把 Sheet 再寫一次、事件紀錄卻不追加**（3.8 R1 查到，**HEAD 起就存在，不是 3.8 引入**）：trade_id 已在 trade_log 時只印警告，Sheet 仍依「剛讀到的現值＋本筆」寫入（持股 100→110→120、現金扣兩次）。修法（已記錄的 trade_id 在 `--apply` 時 fail closed、不寫 Sheet）是資本路徑改動、**超出 #16 預先授權的 §9 範圍**，本 Step 不修——使用者決定。
+35. **`fetchers/gsheets.py::_TICKER_ENRICHMENT` 是第二份 ticker→co:* 對照表**（不受 `config/company_identity.json` 管，INV-1）：`resolve_holding` 把它注入的 `neo4j_id` 當成 `sheet_company_id`、優先於別名與 registry；今天只有 FRA:2DG 有值、且與 registry 一致。要不要讓它退出身分解析（改走 registry／execution 別名），屬 3.6 持股解析的範圍——使用者決定。
+36. **收據的 derived 要當天的個股頁 artifact**：`materialize --candidates` 只重算候選板；同一天寫了新敘事或新讀圖後下單，候選板那一列會是舊版（收據已會標出），要完整就連該檔一起 materialize（OPERATIONS 已寫）。
