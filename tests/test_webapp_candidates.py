@@ -89,3 +89,24 @@ def test_the_route_serves_the_artifact_verbatim(tmp_path) -> None:
     assert body["kind"] == "candidates" and body["groups"]["priced_wait"][0]["ticker"] == "AXTI"
     missing = TestClient(create_app(tmp_path / "empty")).get("/api/v1/candidates")
     assert missing.status_code == 503 and "可開為 0" in missing.json()["error"]["note"]
+
+
+def test_materialize_candidates_keeps_an_explicit_empty_universe(monkeypatch, tmp_path) -> None:
+    """`tickers=[]`＝指定了、而且是空的；不得悄悄換成預設目錄（`--dir` 指到別處時會讀到真實清單）。"""
+    import alpha.providers.candidates as cand
+    from webapp import materialize as mat
+    from webapp.store import ArtifactStore
+
+    seen = []
+
+    def fake_load(universe):
+        seen.append(list(universe))
+        payload = fake_candidates_payload()
+        return {k: payload[k] for k in ("groups", "side_groups", "counts", "oldest_stall_days", "holdings",
+                                        "narrative_rewrite", "ledger", "rollup", "universe", "today")}
+
+    monkeypatch.setattr(cand, "load_board", fake_load)
+    monkeypatch.setattr(ArtifactStore, "tickers", lambda self: ["SHOULD_NOT_BE_USED"])
+    mat.materialize_candidates(tickers=[], store=StateArtifactStore(tmp_path))
+    mat.materialize_candidates(tickers=None, store=StateArtifactStore(tmp_path))
+    assert seen == [[], ["SHOULD_NOT_BE_USED"]]

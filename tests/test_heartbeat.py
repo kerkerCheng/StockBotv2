@@ -566,3 +566,48 @@ def test_every_non_ok_step_counts_as_failed_and_capability_violations_are_printe
     text = "\n".join(lines)
     assert "失敗 2" in lines[0]
     assert "能力檢查不符" in text and "續期失敗（04_beta_snapshot）" in text and "24 個路徑" in text
+
+
+def test_queue_section_says_unread_instead_of_zero_when_links_cannot_be_read(monkeypatch: pytest.MonkeyPatch) -> None:
+    """讀不到敘事（或 link_breaks 例外）＝連結斷**未讀到**，不是 0（INV-3；3.6 覆核 c12／s2）。"""
+    import engine_b.disproof as disproof
+
+    def boom():
+        raise RuntimeError("ledger 壞了")
+
+    monkeypatch.setattr(disproof, "current_briefs", boom)
+    lines = hb.build_queue().lines
+    rewrite = [line for line in lines if line.startswith("敘事該重寫")]
+    assert rewrite and "連結斷未讀到" in rewrite[0] and "其中連結斷 0" not in rewrite[0], rewrite
+
+
+def test_snapshot_keeps_held_unverified_as_none_not_zero(tmp_path: Path) -> None:
+    """持股讀不到那天 candidate.held 記 None——記 0 會讓較昨印出假的「已持有 N→0」（3.6 覆核 c20）。"""
+    from webapp.materialize import build_candidates_artifact
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import fake_candidates_payload
+
+    payload = fake_candidates_payload()
+    board = {k: payload[k] for k in ("groups", "side_groups", "oldest_stall_days", "narrative_rewrite", "ledger",
+                                     "rollup", "universe", "today", "holdings")}
+    board["counts"] = dict(payload["counts"], held=None)
+    StateArtifactStore(tmp_path).write(build_candidates_artifact(board))
+    values = hb.collect_snapshot(now=datetime(2026, 9, 29, tzinfo=timezone.utc), state_dir=tmp_path,
+                                 leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
+                                 run_record_path=None, capture_dir=None)
+    assert values["candidate.held"] is None and values["candidate.priced_wait"] == 1
+
+
+def test_candidate_lines_surface_reading_ledger_parse_errors(tmp_path: Path) -> None:
+    from webapp.materialize import build_candidates_artifact
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import fake_candidates_payload
+
+    payload = fake_candidates_payload()
+    board = {k: payload[k] for k in ("groups", "side_groups", "oldest_stall_days", "narrative_rewrite", "ledger",
+                                     "rollup", "universe", "today", "holdings", "counts")}
+    board["readings"] = {"parse_errors": 2, "parse_error_examples": ["tech_x.jsonl:3: bad"]}
+    StateArtifactStore(tmp_path).write(build_candidates_artifact(board))
+    assert any("讀圖 ledger 有 2 行解析不了" in line for line in hb._candidate_lines(tmp_path))

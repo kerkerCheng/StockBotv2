@@ -77,7 +77,7 @@ KEEP: dict[tuple[str,str],str] = {
     ("tests/test_daily_brief_skill.py","A"): "retirement_note: 註記寫明 pane 1 由「現在要投哪一檔」改為結構＋候選狀態",
     # ---- B 籃子 filter（籃子 filter 已退役；「籃子」另有 AGENTS 量測用語「籃子總報酬」「主題籃子」，regex 分不開）----
     ("scripts/outcome_if_settled_today.py","B"): "kept_file: positions kind 唯一 producer（plan §0.6 #32）；命中的是 AGENTS 量測三量的「籃子總報酬」，不是籃子 filter",
-    ("crons/heartbeat.py","B"): "retirement_note: 段 2／段 4 籃子退役的缺席宣告（not_yet_recorded／upstream_unavailable）；「power-law：籃子總報酬」是 AGENTS 量測用語",
+    ("crons/heartbeat.py","B"): "retirement_note: 段 2／段 4 籃子退役的註記（0a.2 的缺席宣告 3.6 由候選板接手）；「power-law：籃子總報酬」是 AGENTS 量測用語",
     ("webapp/materialize.py","B"): "retirement_note: materialize_basket 退役註記；positions 的 power_law note 用「籃子總報酬」量測用語",
     ("webapp/contracts.py","B"): "retirement_note: basket kind 退役註記（0a.2）",
     ("webapp/api.py","B"): "retirement_note: /basket 路由退役註記（0a.2）",
@@ -159,7 +159,7 @@ KEEP: dict[tuple[str,str],str] = {
     ('briefing/alpha_view/sources.py','D'): 'retirement_note: 多年視角整組退役註記',
     ('briefing/analyst_view/compose.py','D'): 'retirement_note: 「要翻倍需要什麼為真」那一句退役註記',
     ('briefing/cli.py','D'): 'retirement_note: cmd_multi_year 子命令退役註記',
-    ('crons/heartbeat.py','D'): 'retirement_note: 段 4「要幾倍」明示缺席宣告（not_yet_recorded，五段永遠出現）',
+    ('crons/heartbeat.py','D'): 'retirement_note: 段 4「賭注帳／量的候選／要幾倍」那一行 0a.2 改明示缺席、3.6 隨三個退役機制刪除的註記',
     ('tests/test_investor_brief.py','D'): 'retirement_note: multiple_question 退役註記',
     ('tests/test_webapp_graph_walk_watches.py','D'): 'guard_assertion: kind 數 9 → 7 的封閉字彙相等斷言',
     ('tests/test_webapp_structure_table.py','D'): 'guard_assertion: kind 數 9 → 7 的封閉字彙相等斷言',

@@ -108,6 +108,7 @@ def test_held_is_alpha_with_shares_and_beta_never_counts() -> None:
                             {"ticker": "AXTI", "shares": 0.0, "bucket": "觀察"},
                             {"ticker": "QQQ", "shares": 3.0, "bucket": "大盤"},
                             {"ticker": "CASH-USD", "shares": 0.0, "bucket": "現金"},
+                            {"ticker": "CASH-TWD", "shares": 1000.0, "bucket": "CASH"},   # 股數 > 0 的現金也不算
                             {"ticker": "TYO:7803", "shares": 10.0, "bucket": "觀察"}])
     held = held_index(res, is_beta=is_beta_symbol)
     assert set(held["by_company"]) == {"co:sivers_semiconductors"}   # NVDA 是 beta、AXTI 股數 0
@@ -182,6 +183,7 @@ def test_a_clean_open_stays_open() -> None:
     ({"rows": _rows(status="stale")}, "狀態 stale"),
     ({"rows": _rows(reading_id="sr_" + "b" * 16)}, "已不是現行"),
     ({"tq": _tq(absent_priced=True)}, "已定價的稽核行已全部缺席"),
+    ({"tq": _tq(absent_numbers=True)}, "出現在數字裡的稽核行已缺席"),
     ({"tq": None, "note": "OperationalError"}, "讀不到三題稽核區"),        # fail closed：讀不到不等於沒變
 ])
 def test_open_preconditions_fail_into_the_side_group(kw, reason) -> None:
@@ -347,9 +349,10 @@ def board_env(monkeypatch, tmp_path):
     monkeypatch.setattr(qstruct, "_load_edges", lambda: [])
     monkeypatch.setattr(sr, "reading_status_rows", lambda *a, **k: ([], []))
     monkeypatch.setattr(edge_mod, "edge_states", lambda tickers: {t: dict(EDGE) for t in tickers})
-    state = {"tq_fail": set()}
+    state = {"tq_fail": set(), "hnc": {}}
 
     def tq(ticker, *, today, history_not_comparable):
+        state["hnc"][ticker] = history_not_comparable
         return (None, "OperationalError: locked") if ticker in state["tq_fail"] else (_tq(), None)
 
     monkeypatch.setattr(cand, "_wipeout_and_three_questions", tq)
@@ -366,7 +369,9 @@ def test_load_board_merges_the_ledger_into_the_universe_and_shows_sheet_only_hol
     from alpha.providers.candidates import load_board
 
     board = load_board([], today=TODAY, holdings_loader=lambda: [{"ticker": "FRA:2DG", "shares": 5.0, "bucket": "觀察"}])
-    assert board["universe"] == [T] and board["counts"]["pass"] == 1       # 宇宙沒給，敘事 ledger 裡有的照上板
+    # 宇宙沒給：敘事 ledger 裡有的照上板；只在 Sheet 持有的也進宇宙與彙總（已持有最需要看會死嗎）
+    assert board["universe"] == [T, "SIVE.ST"] and board["counts"]["pass"] == 1
+    assert board["rollup"]["universe"] == 2 and board["rollup"]["wipeout"]["companies"] == 2
     held = board["groups"]["held"]
     assert [r["ticker"] for r in held] == ["SIVE.ST"] and held[0]["note"] == "已持有、缺敘事"
     assert held[0]["three_words"]["will_it_die"] != "未讀到"               # 只在 Sheet 的公司也算三題，不是「沒算」
@@ -401,3 +406,101 @@ def test_load_board_says_the_ledger_is_missing_instead_of_no_narratives(board_en
     monkeypatch.setattr(briefs_mod, "BRIEF_DIR", tmp_path / "nope")
     board = load_board([T], today=TODAY, holdings_loader=lambda: [{"ticker": "CASH", "shares": 0.0, "bucket": "CASH"}])
     assert board["ledger"]["present"] is False and board["counts"]["no_narrative"] == 1
+
+
+def test_load_board_passes_the_declared_history_not_comparable_to_three_questions(board_env) -> None:
+    """敘事宣告「歷史不可比」→ 三題讀取端收到它（R2-a N3；3.6 覆核 c23 第 ③ 點）。"""
+    from alpha.providers.briefs import append_brief_record
+    from alpha.providers.candidates import load_board
+
+    rec = brief_record(company_id="co:coherent", ticker="COHR", slots=_slots(), record_version=RECORD_VERSION_V2,
+                       rides=[], answers={"priced_in": "unmeasurable", "in_numbers": "yes"},
+                       candidate_state={"state": "pass", "watch_id": None, "reason": "非邊緣"},
+                       history_not_comparable={"since": "2026-01-01", "reason": "剛轉型", "source": "self"},
+                       created_at=datetime(2026, 9, 28, tzinfo=timezone.utc))
+    append_brief_record(rec, directory=board_env["ledger"])
+    load_board([], today=TODAY, holdings_loader=lambda: [{"ticker": "CASH", "shares": 0.0, "bucket": "CASH"}])
+    assert board_env["hnc"]["COHR"] == {"since": "2026-01-01", "reason": "剛轉型", "source": "self"}
+    assert board_env["hnc"][T] is None
+
+
+def test_load_board_counts_ledger_parse_errors(board_env) -> None:
+    from alpha.providers.candidates import load_board
+
+    with (board_env["ledger"] / "AXTI.jsonl").open("a", encoding="utf-8") as fh:
+        fh.write("{這不是 json\n")
+    board = load_board([T], today=TODAY, holdings_loader=lambda: [{"ticker": "CASH", "shares": 0.0, "bucket": "CASH"}])
+    assert board["ledger"]["parse_errors"] == 1 and board["counts"]["pass"] == 1   # 壞行現形，好的照上板
+
+
+def test_load_board_shows_a_holding_whose_company_has_no_research_ticker(board_env, monkeypatch) -> None:
+    import identity.registry as reg_mod
+    from alpha.providers.candidates import load_board
+
+    real = reg_mod.get_registry()
+
+    class NoResearch:
+        def __getattr__(self, name):
+            return getattr(real, name)
+
+        def research_ticker(self, company_id):
+            return None if company_id == "co:sivers_semiconductors" else real.research_ticker(company_id)
+
+    monkeypatch.setattr(reg_mod, "get_registry", lambda: NoResearch())
+    board = load_board([T], today=TODAY, holdings_loader=lambda: [{"ticker": "FRA:2DG", "shares": 5.0, "bucket": "觀察"}])
+    held = board["groups"]["held"]
+    assert [r["company_id"] for r in held] == ["co:sivers_semiconductors"]
+    assert held[0]["three_words"]["will_it_die"] == "未讀到（registry 沒有這家公司的 research ticker）"
+
+
+def test_a_retraction_breaks_the_stall_clock_even_when_the_rewrite_supersedes_the_retracted_target() -> None:
+    """撤回用時間判：新版直接 supersede 被撤的那一筆（撤回紀錄不在鏈上），中間那段仍沒有宣告。"""
+    first = _brief(state="missing", watch_id="ew_1", days_ago=20)
+    retract = _brief(state="missing", watch_id="ew_1", days_ago=10, supersedes=first.brief_id, retracted=True)
+    again = _brief(state="missing", watch_id="ew_1", days_ago=1, supersedes=first.brief_id)
+    assert stall_since([first, retract, again], again) == again.created_at
+
+
+def test_stall_days_count_in_the_schedule_timezone() -> None:
+    """「今天」是排程時區的今天：台北 09-29 01:00（UTC 09-28 17:00）寫的，09-29 當天是 0 天，不是 1 天。"""
+    rec = brief_record(company_id=CO, ticker=T, slots=_slots(), record_version=RECORD_VERSION_V2,
+                       rides=[{"node": "tech:x", "unit": "layer", "reading_id": READ}],
+                       answers={"priced_in": "yes", "in_numbers": "yes"},
+                       candidate_state={"state": "pass", "watch_id": None, "reason": "貴"},
+                       created_at=datetime(2026, 9, 28, 17, tzinfo=timezone.utc))
+    assert _derive([parse_brief_record(rec)])["stall_days"] == 0
+
+
+def test_a_date_wait_whose_day_arrived_but_daily_has_not_fired_is_flagged() -> None:
+    w = _active("ew_1", kind="date", until="2026-09-29", wake_brief=CO)
+    row = _derive([_brief(state="missing", watch_id="ew_1")], watches=[w])
+    assert any("在等的日子 2026-09-29 已到" in r for r in row["rewrite"]), row["rewrite"]
+
+
+def test_the_board_carries_rewrite_watches_of_companies_without_a_current_v2_row() -> None:
+    """現行敘事已撤回／是 v1／沒有敘事時，那筆該重寫的 watch 仍要在板上（整板清單），audit 才不會報錯主詞。"""
+    from alpha.providers.candidates import board_rewrite
+
+    fired = {"watch_id": "ew_w", "kind": "date", "status": "fired", "wake_brief": CO, "until": "2026-09-01",
+             "expires": "2027-01-01"}
+    out = board_rewrite([None], [], watches=[fired], company_ticker={CO: T})
+    assert out == [{"kind": "watch", "ticker": T, "company_id": CO, "brief_id": None, "watch_id": "ew_w",
+                    "state": "醒來", "note": "那家公司的現行敘事已撤回、是舊版或沒有敘事——板上沒有帶著它的 v2 列"}]
+    row = _derive([_brief(state="missing", watch_id="ew_w")], watches=[fired])
+    carried = board_rewrite([row], [], watches=[fired])
+    assert [(b["watch_id"], b["state"]) for b in carried] == [("ew_w", "醒來")]   # 列帶著就不重複
+
+
+def test_a_link_break_prefers_the_unresolved_reason_among_several_watches_on_one_key() -> None:
+    from engine_b.narrative_watches import link_break_reason
+
+    older = {"status": "consumed", "judgment": {"touches": "yes", "handled": None}}
+    newer = {"status": "consumed", "closed": {"at": "2026-09-20T00:00:00+00:00"}}
+    assert link_break_reason([older, newer])[0] == "touched"
+
+
+def test_a_ride_whose_reading_row_is_missing_is_not_called_superseded() -> None:
+    row = _derive([_brief(state="pass", reason="貴")], rows={("tech:other", "layer"): {"reading_id": "sr_z"}})
+    assert row["rides"][0]["status"] == "not_found"
+    row = _derive([_brief(state="pass", reason="貴")], rows=_rows(reading_id="sr_" + "b" * 16))
+    assert row["rides"][0]["status"] == "superseded"

@@ -223,7 +223,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.3 | 三題稽核區；主題等權組 ledger；邊緣判定 | ✅ | 執行模型 | 見 git log「Step 3.3」 |
 | 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `4e96223`、`0d4c7ad`＋收尾 |
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2（收據 `docs/reports/2026-09-29-phase3-step35-narratives.md`；pq2 [656]–[661] 等使用者 go） | ✅ | **強模型** | 見 git log「Step 3.5」 |
-| 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳 | ○ | 執行模型 | |
+| 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳（多面向審查＋覆核：32 條處置，見偏差 18–26） | ✅ | 執行模型 | `f7f1711`＋收尾 |
 | 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ○ | 執行模型 | |
 | 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ○ | 執行模型 | |
 | 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ○ | 執行模型 | |
@@ -266,6 +266,8 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 22 | 3.6 | 心跳段 4 的歸零旗標「改讀 rollup」 | 印**盞數**（紅／黃／綠／**灰＝沒量到**，灰依 kind）＋有紅燈的檔＋讀不到的檔，不印「每檔最差色」 | 3.6 審查 c2（blocking）：取每檔最差色會把一綠三灰算成「綠」，違反 ARCHITECTURE §4.1 段 4「灰不是綠」與 plan「依 kind 的缺席計數」；rollup 改用 Step 3.3 既有的 `alpha.three_questions.rollup`，不另算（L16） |
 | 23 | 3.6 | （§5 第 6 點）rewrite 類「有去處」包含「候選板 artifact 的該檔列帶著它」 | 候選板每一列帶 `rewrite[]`／`rewrite_watch_ids`；audit 的 Expiry 與 QueueLiveness 經 `audit/sources.candidates_artifact()` 查，只問 artifact 產生之前就進入該重寫狀態的 watch，讀不到 artifact 記成「沒檢查」 | 3.6 審查 c1：原實作只有宣告可開的列看得到自己的反證醒了；稽核原則上不讀 derived cache，這是 §5 第 6 點的明文例外，時間閘門避免「之後才醒的」誤報 |
 | 24 | 3.6 | 字彙住哪 | 候選板字彙與純函式搬到零 I/O 的 `alpha/candidates.py`；providers 版只留要讀 watch／讀圖／Engine C／Sheet 的推導 | 3.6 審查評審 c0（blocking）：fake payload 經 `alpha.providers` 預載 engine_c／yfinance／requests，請求路徑的 runtime 哨兵變瞎（通過與失效同形，L13）；心跳 import 期也因此多一串會失敗的相依（c5／c15） |
+| 25 | 3.6 | §7：連結斷了印「敘事該重寫：連結 <ref> 已換版」 | 依原因印：來源已收掉（讀圖重讀、memo 換版）／被判觸及未處置／到期未判／不存在；同一來源鍵多筆時未處置的優先 | 3.6 審查 c6／c14（L12）：「換版」「觸及」「到期」下一步不同——前者改來源鍵，後兩者先看來源那一邊的處置 |
+| 26 | 3.6（修 3.4） | （未寫）drain 段 1 計數器的 fired 分堆 | `engine_b/cli.py::_fired_watch_summary` 改呼叫 `queue_segments.classify_watch`，另加「敘事該重寫」一堆 | 3.6 覆核：它自己另分一份，`wake_brief` 的 date watch 醒來落到「假設對照」、敘事 `brief:` 反證醒來落到「反證待檢」——3.4 在 classify_watch 修過的錯 consumer，第二份分類沒跟著改（L16） |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -662,3 +664,4 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 25. **going concern pq2 [657]–[661] 的兩個判讀點要使用者看**（Step 3.5）：SIVE.ST 的 ISA「betydande tvivel（significant doubt）」對到本欄 `substantial_doubt`；IQE.L 的 KPMG 第 4 節第三點模板句與第二點字面矛盾，判讀依第二點。美國三檔的 no_substantial_doubt 依據是「說明段不存在」。
 26. **請求路徑哨兵對 `webapp.materialize` 本身一直是瞎的**（3.6 審查評審 c0 的旁證）：既有五份 state fake 都經 `webapp.materialize` 組 payload，哨兵取 `before` 之前它就在 `sys.modules` 裡；3.6 補的測試只守「不得多預載」。要不要讓 fake 不經 materialize（直接寫 JSON 夾具）。
 27. **`test_watch_expiry.py::test_expired_structured_condition_is_not_re_registered_by_reconcile` 在一次全套跑紅、單跑與整檔跑都綠**（2026-09-29 3.6）：重現不出來，疑似順序或時間相依；Phase 3 結案前再觀察。
+28. **3.6 覆核的 non-blocking 殘留**（不影響本 Step 驗收）：APP rollup 段的缺席 kind 印原始代碼、沒經 `/meta` 字彙轉中文（心跳也印代碼，兩邊一致）；敘事 ledger 最新一行壞掉時 `select_brief` 退回上一版，那一列沒標「顯示的是較舊版」；freshness identity 只記 parse_errors 數量；daily ⑬ 若在單檔途中被截斷，候選板當天不更新（⑬ 實耗 282–298 秒、上限 25 分鐘）；同一個根因（thesis 來源觸及／到期）可能由 C3 或 Expiry 與連結滯留各報一次；`engine_b.disproof.current_briefs` 仍丟掉 ledger 的 parse errors（3.4 起）。

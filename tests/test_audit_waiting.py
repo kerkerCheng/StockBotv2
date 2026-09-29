@@ -431,3 +431,123 @@ def test_sync_closes_waits_whose_only_consumer_is_gone() -> None:
 
     with pytest.raises(ew.EventWatchError):
         ew.close_orphan(data, "ew_open", kind="whatever", note="x")
+
+
+# ---------------------------------------------------------------------------
+# Phase 3 Step 3.6：敘事該重寫要被候選板帶著（plan §5 第 6 點）、連結斷了的失聯
+# ---------------------------------------------------------------------------
+
+def _narrative_world(world):
+    from test_candidates import _brief
+
+    brief = _brief(state="priced_wait", watch_id="ew_w")
+    world["brief_ledgers"] = {"AXTI": {"records": [brief], "errors": []}}
+    world["briefs"] = [brief]
+    ref = f"brief:{brief.brief_id}#1"
+    woke = _watch("ew_b", kind="semantic_condition", status="fired", source_ref=ref, disproof_ref=ref,
+                  condition="若 JX 在年底前宣布新產能投產則供給缺口消失", entities=["co:axt"],
+                  woken_by={"at": _ago(days=1)})
+    world["watches"] = [woke]
+    return woke
+
+
+def _board(*, at, row_ids=(), board_ids=()):
+    return {"generated_at": at, "groups": {"priced_wait": [{"company_id": "co:axt", "rewrite_watch_ids": list(row_ids)}]},
+            "side_groups": {}, "narrative_rewrite": [{"kind": "watch", "watch_id": w} for w in board_ids]}
+
+
+def test_a_narrative_watch_that_woke_before_the_board_must_be_carried_by_it(world) -> None:
+    _narrative_world(world)
+    world["board"] = _board(at=_ago(hours=1))
+    result = checks.check_queue_liveness()
+    assert result.status.name == "FAIL" and "候選板卻沒帶著它" in _findings(result)
+    world["board"] = _board(at=_ago(hours=1), row_ids=["ew_b"])
+    assert checks.check_queue_liveness().status.name == "PASS"
+    world["board"] = _board(at=_ago(hours=1), board_ids=["ew_b"])       # 沒有 v2 列時由整板清單帶
+    assert checks.check_queue_liveness().status.name == "PASS"
+
+
+def test_board_carry_is_unchecked_not_failed_when_it_cannot_be_judged(world, monkeypatch) -> None:
+    woke = _narrative_world(world)
+    woke["woken_by"] = {"at": _ago(minutes=10)}
+    world["board"] = _board(at=_ago(hours=1))                            # 板在它醒來之前產生：下一輪才會帶
+    assert checks.check_queue_liveness().status.name == "PASS"
+    woke["woken_by"] = {"at": _ago(days=4)}
+    world["board"] = _board(at=_ago(days=3))                             # 板停更：時間閘門不得讓它恆 PASS 而不說
+    result = checks.check_queue_liveness()
+    assert result.status.name == "PASS" and "沒更新" in result.summary and "沒檢查" in result.summary
+    world["board"] = None
+    result = checks.check_queue_liveness()
+    assert result.status.name == "PASS" and "沒檢查" in result.summary
+    world["board"] = _board(at=_ago(hours=1))
+
+    def no_ledger():
+        raise SourceUnavailable("敘事 ledger 未掛載")
+
+    monkeypatch.setattr(sources, "brief_ledgers", no_ledger)            # 對不到公司＝沒檢查，不是「公司不明」FAIL
+    result = checks.check_queue_liveness()
+    assert result.status.name == "PASS" and "沒檢查" in result.summary
+
+
+def test_an_expired_narrative_watch_the_board_does_not_carry_fails_expiry(world) -> None:
+    woke = _narrative_world(world)
+    woke.update(status="expired", expires=PAST, expired_at=_ago(days=2), woken_by=None)
+    world["board"] = _board(at=_ago(hours=1))
+    result = checks.check_expiry()
+    assert result.status.name == "FAIL" and "候選板卻沒帶著它" in _findings(result)
+    world["board"] = _board(at=_ago(hours=1), row_ids=["ew_b"])
+    assert checks.check_expiry().status.name == "PASS"
+
+
+def test_a_broken_narrative_link_that_nobody_rewrites_is_stalled(world) -> None:
+    from test_candidates import LINK, _brief
+
+    world["briefs"] = [_brief(state="pass", reason="貴", disproof=[LINK])]
+    result = checks.check_queue_liveness()
+    assert result.status.name == "FAIL" and "連結指向沒有東西" in _findings(result)
+    closed = _reading_watch("ew_r", reading_id="a" * 16, status="consumed", closed={"at": _ago(days=20)})
+    closed["source_ref"] = LINK["link_source_ref"]
+    world["watches"] = [closed]
+    result = checks.check_queue_liveness()
+    assert result.status.name == "FAIL" and "敘事還沒重寫" in _findings(result)
+    closed["closed"] = {"at": _ago(days=3)}
+    assert checks.check_queue_liveness().status.name == "PASS"
+
+
+def test_a_broken_link_whose_source_is_held_by_an_open_thesis_review_is_not_stalled(world) -> None:
+    """球在使用者的 thesis 複查手上＝不是敘事沒人取（與 C3、awaiting_approval 同一原則）。"""
+    from test_candidates import LINK, _brief
+
+    link = dict(LINK, link_source_ref=f"thesis:{MEMO}#1")
+    world["briefs"] = [_brief(state="pass", reason="貴", disproof=[link])]
+    touched = _thesis_watch("ew_t", status="consumed", judgment={"touches": "yes", "handled": None, "at": _ago(days=20)})
+    world["watches"] = [touched]
+    world["items"] = [_item(12, "thesis_lifecycle", disproof_watch_ids=["ew_t"])]
+    assert checks.check_queue_liveness().status.name == "PASS"
+
+
+def test_unreadable_narratives_are_unchecked_not_zero(world, monkeypatch) -> None:
+    def no_briefs():
+        raise SourceUnavailable("敘事 ledger 未掛載")
+
+    world["watches"] = [_watch("ew_x")]                                  # 0 筆的 PASS 是假的——給它一筆可看的
+    monkeypatch.setattr(sources, "current_briefs", no_briefs)
+    result = checks.check_queue_liveness()
+    assert result.status.name == "PASS" and "連結斷沒檢查" in result.summary
+
+
+def test_queue_segments_counts_broken_links_and_says_when_it_could_not_read_them(world, monkeypatch) -> None:
+    from test_candidates import LINK, _brief
+
+    monkeypatch.setattr(checks, "_graph_holes", lambda: (0, None))
+    monkeypatch.setattr(checks, "_forward_view_backlog", lambda: (0, None))
+    world["briefs"] = [_brief(state="pass", reason="貴", disproof=[LINK])]
+    world["watches"] = [_watch("ew_x")]                                  # 0 筆的 PASS 是假的——給它一筆可看的
+    assert "narrative_rewrite=1" in checks.check_queue_segments().summary
+
+    def no_briefs():
+        raise SourceUnavailable("敘事 ledger 未掛載")
+
+    monkeypatch.setattr(sources, "current_briefs", no_briefs)
+    summary = checks.check_queue_segments().summary
+    assert "narrative_rewrite=0" in summary and "敘事連結斷未讀到" in summary

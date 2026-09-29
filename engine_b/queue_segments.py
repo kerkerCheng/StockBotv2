@@ -83,7 +83,7 @@ SEGMENTS: tuple[Segment, ...] = (
         "Phase 1 Step 1.5：醒來只把節點列進 needs_reread（理由寫出是哪位客戶的哪份文件），不自動重讀——重讀是研究。",
     ),
     Segment(
-        "narrative_rewrite", 1, "敘事來源的 watch 醒來、被判觸及或到期未判，或敘事連結的反證來源已換版 → 該重寫那一檔的敘事",
+        "narrative_rewrite", 1, "敘事來源的 watch 醒來、被判觸及或到期未判，或敘事連結的反證來源已不在盯（收掉／觸及／到期／不存在）→ 該重寫那一檔的敘事",
         "research", "research-drain「敘事該重寫」段：讀那一檔現行敘事與觸發的 watch → "
                     "python -m alpha brief <T> --add spec.json（v2；`acknowledged_touched` 逐條處置，不列就拒收；"
                     "連結斷了的那一條：來源換版就把 link_source_ref 換成新來源鍵，來源被觸及／到期就先看來源那一邊的處置再改寫）",

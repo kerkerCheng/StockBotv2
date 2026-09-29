@@ -100,8 +100,12 @@ def brief_ledgers() -> dict[str, dict]:
 def current_briefs() -> list:
     """各檔現行的 v2 敘事（`engine_b.disproof.current_briefs`）。經這裡讀，稽核才能在測試裡被替換——
     直接呼叫會讓稽核測試讀到真實 ledger（3.6 審查：QueueLiveness 因此把真實敘事的連結報成「指向沒有東西」）。"""
+    from alpha.providers.briefs import BRIEF_DIR
     from engine_b.disproof import current_briefs as _current
 
+    if not BRIEF_DIR.is_dir():
+        # 與 brief_ledgers 同一個判定：「沒有敘事」與「敘事目錄沒掛載」是兩件事（3.6 覆核 R6）。
+        raise SourceUnavailable(f"{BRIEF_DIR.relative_to(ROOT)} 不存在——敘事 ledger 未掛載")
     return list(_current())
 
 

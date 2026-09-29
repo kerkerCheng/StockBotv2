@@ -69,7 +69,7 @@ def held_index(resolution: Mapping[str, Any] | None, *, is_beta: Callable[[str],
       都不算進「解析不到」——它們不是要人決定的 identity 問題。"""
     rows = list((resolution or {}).get("rows") or ())
     if resolution is None or not rows:
-        why = failure or ("Sheet 回空表（沒有任何持股列，連現金列都沒有）——視同讀不到" if resolution is not None
+        why = failure or ("Sheet 沒有任何可解析的持股列（連現金列都沒有）——視同讀不到" if resolution is not None
                           else "讀取失敗")
         return {"status": "upstream_unavailable",
                 "reason": f"持股未讀到，已持有判定暫停（{why}）——其餘列的宣告照印，但標「持股未驗」",
@@ -116,8 +116,12 @@ def three_words(three_questions: Mapping[str, Any] | None, brief: InvestorBrief 
 
 def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datetime:
     """沿 `supersedes` 鏈往回，取**連續宣告同一 state** 的最早一筆 `created_at`（缺 X／等回落另要求同一 watch）——
-    同 state 重寫不歸零。**撤回打斷連續**：撤回之後到重寫之前那段「沒有宣告」，不算進滯留。"""
+    同 state 重寫不歸零。**撤回打斷連續**：撤回之後到重寫之前那段「沒有宣告」，不算進滯留。
+
+    撤回用**時間**判，不看鏈上有沒有經過撤回紀錄：新版可以直接 supersede 被撤的那一筆（撤回紀錄本身不在鏈上），
+    所以只要兩筆之間有任何一筆撤回紀錄落在 (prev, cur] 之間，那段時間就沒有生效的宣告（`select_brief` 回 None）。"""
     by_id = {r.brief_id: r for r in records}
+    retractions = [r.created_at for r in records if r.retracted]
     state = brief.candidate_state.state if brief.candidate_state else None
     watch = brief.candidate_state.watch_id if brief.candidate_state else None
     since, cur, seen = brief.created_at, brief, {brief.brief_id}
@@ -126,7 +130,8 @@ def stall_since(records: Sequence[InvestorBrief], brief: InvestorBrief) -> datet
         seen.add(prev.brief_id)
         cs = prev.candidate_state
         if prev.retracted or prev.record_version != RECORD_VERSION_V2 or cs is None or cs.state != state \
-                or (state in ("missing", "priced_wait") and cs.watch_id != watch):
+                or (state in ("missing", "priced_wait") and cs.watch_id != watch) \
+                or any(prev.created_at < t <= cur.created_at for t in retractions):
             break
         since, cur = prev.created_at, prev
     return since

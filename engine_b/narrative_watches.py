@@ -144,14 +144,18 @@ def link_break_reason(same_ref: Sequence[Mapping[str, Any]]) -> tuple[str, str]:
     """同一個來源鍵的 watch（都不是 active／fired）→ 為什麼斷。取最後登記的那一筆。"""
     if not same_ref:
         return "missing", LINK_BREAK_REASONS["missing"]
-    w = same_ref[-1]
-    judgment = w.get("judgment") or {}
-    if w.get("status") == "consumed" and judgment.get("touches") == "yes" and not judgment.get("handled"):
-        key = "touched"
-    elif w.get("status") == "expired" and not w.get("expiry_resolution"):
-        key = "expired"
-    else:
-        key = "closed"
+    # 同一個來源鍵有多筆時，「還沒處置完」的優先（觸及未處置＞到期未判＞收掉）——較新的一筆收掉了，
+    # 不代表較舊那筆的觸及已處置（3.6 覆核）。
+    keys = []
+    for w in same_ref:
+        judgment = w.get("judgment") or {}
+        if w.get("status") == "consumed" and judgment.get("touches") == "yes" and not judgment.get("handled"):
+            keys.append("touched")
+        elif w.get("status") == "expired" and not w.get("expiry_resolution"):
+            keys.append("expired")
+        else:
+            keys.append("closed")
+    key = next((k for k in ("touched", "expired") if k in keys), "closed")
     return key, LINK_BREAK_REASONS[key]
 
 

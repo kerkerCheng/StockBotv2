@@ -1252,6 +1252,7 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
         "holdings": dict(board.get("holdings") or {}),
         "narrative_rewrite": list(board.get("narrative_rewrite") or ()),
         "ledger": dict(board.get("ledger") or {}),
+        "readings": dict(board.get("readings") or {}),
         "rollup": dict(board.get("rollup") or {}),
         "universe": list(board.get("universe") or ()),
         "this_is_not": list(CANDIDATES_THIS_IS_NOT),
@@ -1286,7 +1287,8 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
 
 def materialize_candidates(*, tickers: Sequence[str] | None = None, store: StateArtifactStore | None = None,
                            generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
-    """推導整板並寫下 artifact。**唯讀**：敘事 ledger、讀圖對圖、watch registry、Engine C（?mode=ro）、Sheet（readonly）。
+    """推導整板並寫下 artifact。**不寫任何 authority**：讀敘事 ledger、讀圖對圖、watch registry、Engine C（三題 ?mode=ro；
+    四盞燈與邊緣判定走一般連線）、Sheet（readonly）、邊緣判定的 FX（yfinance，與 `--beta` 同一個 get_fx_snapshot）。
     `tickers`：宇宙；沒給就用 APP 已 materialize 的那幾檔（`ArtifactStore().tickers()`）。"""
     from alpha.providers.candidates import load_board
 

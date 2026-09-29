@@ -645,6 +645,10 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
     elif ledger.get("parse_errors"):
         lines.append(f"  敘事 ledger 有 {ledger['parse_errors']} 行解析不了（那幾份宣告沒進板）："
                      + "；".join(str(e) for e in (ledger.get("parse_error_examples") or [])[:2]))
+    readings = board.get("readings") or {}
+    if readings.get("parse_errors"):
+        lines.append(f"  讀圖 ledger 有 {readings['parse_errors']} 行解析不了（騎它們的列會印 not_found）："
+                     + "；".join(str(e) for e in (readings.get("parse_error_examples") or [])[:2]))
     roll = board.get("rollup") or {}
     own, nums, wipe = roll.get("priced_in_own") or {}, roll.get("in_numbers") or {}, roll.get("wipeout") or {}
     not_read = (roll.get("not_read") or {}).get("n") or 0
@@ -932,16 +936,21 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     holes = None if walk_absence is not None else qs.graph_holes_count(walk_questions)
     # Phase 3 Step 3.6：敘事連結的反證來源已換版也是 narrative_rewrite 的工作（與 audit、候選推導同一個判定）。
     # 讀的是本機 ledger 與 registry（零網路）；讀不到只少這一格的注入，不帶走整段。
+    breaks: list | None
+    breaks_reason = None
     try:
+        from alpha.providers.briefs import BRIEF_DIR
         from engine_b.disproof import current_briefs
         from engine_b.narrative_watches import link_breaks
 
+        if not BRIEF_DIR.is_dir():
+            raise FileNotFoundError("敘事 ledger 目錄不存在")
         breaks = link_breaks(current_briefs(), watches=watches)
-    except Exception:  # noqa: BLE001
-        breaks = []
+    except Exception as exc:  # noqa: BLE001 — 讀不到＝未讀到，**不是 0**（INV-3；3.6 覆核）
+        breaks, breaks_reason = None, f"{type(exc).__name__}: {str(exc)[:60]}"
     observation = qs.observe(
         leads=leads, watches=watches, todo_items=todo_items,
-        forward_view_backlog=None, graph_holes=holes, narrative_link_breaks=breaks,
+        forward_view_backlog=None, graph_holes=holes, narrative_link_breaks=breaks or (),
     )
     counts = {seg["key"]: seg["count"] for seg in observation["segments"]}
 
@@ -1002,7 +1011,8 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     if rewrite is not None:
         section.lines.append(
             f"敘事該重寫 {'未讀到' if rewrite['count'] is None else rewrite['count']}"
-            f"（其中連結斷 {len(breaks)}）"
+            + (f"（其中連結斷 {len(breaks)}）" if breaks is not None
+               else f"（**連結斷未讀到**：{breaks_reason}——上面的數不含它）")
             + (("：" + "、".join(str(e) for e in rewrite.get("examples") or ())) if rewrite.get("examples") else ""))
 
     # ⚠ 「球在使用者手上」有 SSOT——`engine_b.todo.actionable_items()`（它已經處理了

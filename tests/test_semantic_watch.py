@@ -91,6 +91,25 @@ def test_fired_summary_puts_semantic_watches_in_their_own_bucket(monkeypatch) ->
     assert len(summary["disproof"]) == 1 and all(w.get("hypothesis_ref") for w in summary["hypothesis"])
 
 
+def test_drain_counters_put_narrative_waits_in_their_own_pile_not_hypothesis_check(monkeypatch) -> None:
+    """drain 的段 1 計數器分堆**呼叫 classify_watch**（3.6 覆核）：`wake_brief` 的 date watch 醒來、敘事自己的
+    `brief:` 反證醒來，都是「敘事該重寫」，不是假設對照、也不是反證待檢（3.4 在 classify_watch 修過的同一個錯）。"""
+    from engine_b import cli
+
+    data = {"watches": [
+        {"watch_id": "ew_d", "kind": "date", "status": "fired", "until": "2026-09-01", "expires": "2099-01-01",
+         "wake_brief": "co:axt"},
+        {"watch_id": "ew_b", "kind": ew.SEMANTIC_KIND, "status": "fired", "source_ref": "brief:ib_x#1",
+         "disproof_ref": "brief:ib_x#1", "expires": "2099-01-01", "entities": ["co:axt"], "condition": "c" * 30},
+        {"watch_id": "ew_h", "kind": "date", "status": "fired", "until": "2026-09-01", "expires": "2099-01-01",
+         "hypothesis_ref": "hyp_1"},
+    ]}
+    monkeypatch.setattr(ew, "load_watches", lambda *a, **k: data)
+    summary = cli._fired_watch_summary()
+    assert [w["watch_id"] for w in summary["narrative"]] == ["ew_d", "ew_b"]
+    assert [w["watch_id"] for w in summary["hypothesis"]] == ["ew_h"] and summary["disproof"] == []
+
+
 # ---------------------------------------------------------------------------
 # 登記的驗證
 # ---------------------------------------------------------------------------

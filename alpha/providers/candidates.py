@@ -97,10 +97,13 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     }
     if brief is not None:
         for ride in (brief.rides if v2 else ()):
-            r = reading_rows.get((ride.node, ride.unit)) or {}
+            r = reading_rows.get((ride.node, ride.unit))
+            same = r is not None and r.get("reading_id") == ride.reading_id
+            # 三種不同的事分開寫（L12）：現行（照印狀態）、那一格現行的是另一份（superseded）、那一格這次沒有讀圖列
+            # （讀圖 ledger 讀不到或壞行——不是「換版」）。
             row["rides"].append({"node": ride.node, "unit": ride.unit, "reading_id": ride.reading_id,
-                                 "kind": r.get("kind") if r.get("reading_id") == ride.reading_id else None,
-                                 "status": r.get("status") if r.get("reading_id") == ride.reading_id else "superseded"})
+                                 "kind": r.get("kind") if same else None,
+                                 "status": r.get("status") if same else ("superseded" if r is not None else "not_found")})
     if held_info is not None:                                                   # Sheet 持有 → 已持有，宣告照留
         row.update(derived="held", group="held")
         if brief is None:
@@ -131,11 +134,16 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
             elif w.get("status") == "active" and ew.past_expiry(w, today=today):
                 row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch 已過到期日 {w.get('expires')}"
                                       "（daily 尚未標記），該重寫")
+            elif w.get("status") == "active" and w.get("kind") == "date" and _until_reached(w, today):
+                # 對稱面（寫入端 settle_due 兩種轉換都做）：date 已到 until、daily 還沒把它轉成 fired
+                row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的日子 {w.get('until')} 已到"
+                                      "（daily 尚未標記），該重寫")
             elif w.get("status") != "active":
                 row["rewrite"].append(f"{GROUP_LABELS[cs.state]}在等的 watch 已 {w.get('status')}，該重寫")
     since = stall_since(records, brief)
     row["since"] = since.isoformat()
-    row["stall_days"] = (today - since.date()).days
+    # 「今天」是排程時區的今天；since 是 UTC 時戳——換到同一個時區再相減，否則台北 00:00–08:00 寫的會多算一天。
+    row["stall_days"] = (today - since.astimezone(ew._local_timezone()).date()).days
     if row["group"] == "held":
         return row
     state = (edge or {}).get("state")
@@ -157,14 +165,43 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
     return row
 
 
-def board_rewrite(rows: Sequence[Mapping[str, Any] | None],
-                  breaks: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    """整板「敘事該重寫」清單：連結斷了（全部現行 v2 敘事，`link_breaks`）＋各列的敘事來源 watch 待重寫。"""
+def _until_reached(watch: Mapping[str, Any], today: date) -> bool:
+    try:
+        return date.fromisoformat(str(watch.get("until"))) <= today
+    except (TypeError, ValueError):
+        return False
+
+
+def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Mapping[str, Any]], *,
+                  watches: Sequence[Mapping[str, Any]] = (),
+                  company_ticker: Mapping[str, str] | None = None,
+                  brief_company: Mapping[str, str] | None = None) -> list[dict[str, Any]]:
+    """整板「敘事該重寫」清單：連結斷了（全部現行 v2 敘事，`link_breaks`）＋各列的敘事來源 watch 待重寫
+    ＋**沒有列帶著的**待重寫 watch（現行敘事已撤回、是 v1、或根本沒有敘事——那家公司不在板上或那一列不是 v2，
+    watch 仍在 narrative_rewrite 段；3.6 覆核：只收現行 v2 列會讓它們在板上消失、audit 卻報「那一列沒帶著」）。"""
+    from engine_b.queue_segments import narrative_rewrite_state
+
     out = [{"kind": "link", **dict(b)} for b in breaks]
+    carried: set[str] = set()
+    by_id = {str(w.get("watch_id")): w for w in watches}
     for row in rows:
         for wid in (row or {}).get("rewrite_watch_ids") or ():
+            carried.add(str(wid))
+            state = narrative_rewrite_state(by_id.get(str(wid)) or {})
             out.append({"kind": "watch", "ticker": row["ticker"], "company_id": row.get("company_id"),
-                        "brief_id": row.get("brief_id"), "watch_id": wid})
+                        "brief_id": row.get("brief_id"), "watch_id": wid,
+                        "state": REWRITE_STATE_WORDS.get(str(state), state)})
+    for w in watches:
+        state = narrative_rewrite_state(w)
+        wid = str(w.get("watch_id"))
+        if state is None or wid in carried:
+            continue
+        company = str(w.get("wake_brief") or (brief_company or {}).get(str(w.get("source_ref") or "").split("#")[0])
+                      or "")
+        out.append({"kind": "watch", "ticker": (company_ticker or {}).get(company) or company or "（公司不明）",
+                    "company_id": company or None, "brief_id": None, "watch_id": wid,
+                    "state": REWRITE_STATE_WORDS.get(str(state), state),
+                    "note": "那家公司的現行敘事已撤回、是舊版或沒有敘事——板上沒有帶著它的 v2 列"})
     return out
 
 
@@ -216,7 +253,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     universe = sorted({str(t).upper() for t in tickers} | {t.upper() for t in ledger_tickers})
     watches = list(ew.load_watches().get("watches") or ())
     lifecycle = load_lifecycle()
-    rows_raw, _errors = reading_status_rows(_load_edges(), today=today, watches=watches)
+    rows_raw, reading_errors = reading_status_rows(_load_edges(), today=today, watches=watches)
     reading_rows = {(r.get("node"), r.get("unit")): r for r in rows_raw if r.get("reading_id")}
     beta_policy = load_beta_policy()
     try:
@@ -236,14 +273,21 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         if research and research not in universe:
             extra[research] = cid
     edges = edge_states(sorted(set(universe) | set(extra)))
+    # 只在 Sheet 持有的公司也進彙總（3.6 覆核：列上算了三題與燈、rollup 卻不含它——已持有最需要看會死嗎）。
+    board_universe = sorted(set(universe) | set(extra))
 
     tq_by_ticker: dict[str, Mapping[str, Any] | None] = {}
     tq_notes: dict[str, str] = {}
     parse_errors: list[str] = []
     rows: list[dict[str, Any] | None] = []
+    company_ticker: dict[str, str] = {}
+    brief_company: dict[str, str] = {}
     for ticker in [*universe, *sorted(extra)]:
         records, errors = briefs_provider.read_brief_records(ticker)
         parse_errors.extend(errors)
+        for rec in records:
+            brief_company[f"brief:{rec.brief_id}"] = rec.company_id
+            company_ticker.setdefault(rec.company_id, ticker)
         brief = select_brief(records, as_of=None, today=today)
         hnc = (brief.history_not_comparable.as_dict()
                if brief is not None and brief.record_version == RECORD_VERSION_V2 and brief.history_not_comparable
@@ -262,12 +306,16 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                                    reading_rows=reading_rows, watches=watches, lifecycle=lifecycle, edge=None,
                                    three_questions=None, held=held,
                                    three_questions_note="registry 沒有這家公司的 research ticker"))
-    board = assemble_board(rows, universe=universe, held=held,
-                           narrative_rewrite=board_rewrite(rows, link_breaks(current_briefs(), watches=watches)))
-    board["rollup"] = rollup({t: tq_by_ticker[t] for t in universe}, {t: edges.get(t) or {} for t in universe},
-                             not_read_reasons=tq_notes)
+    board = assemble_board(rows, universe=board_universe, held=held,
+                           narrative_rewrite=board_rewrite(rows, link_breaks(current_briefs(), watches=watches),
+                                                           watches=watches, company_ticker=company_ticker,
+                                                           brief_company=brief_company))
+    board["rollup"] = rollup({t: tq_by_ticker[t] for t in board_universe},
+                             {t: edges.get(t) or {} for t in board_universe}, not_read_reasons=tq_notes)
     board["ledger"] = {"present": ledger_present, "tickers": len(ledger_tickers), "parse_errors": len(parse_errors),
                        "parse_error_examples": parse_errors[:3]}
+    # 讀圖 ledger 的壞行也要現形（對稱面：敘事 ledger 那一側已做）——壞掉的那份讀圖不在讀圖列裡，騎它的列會印 not_found。
+    board["readings"] = {"parse_errors": len(reading_errors), "parse_error_examples": list(reading_errors)[:3]}
     board["today"] = today.isoformat()
     board["generated_at"] = datetime.now(timezone.utc).isoformat()
     return board
