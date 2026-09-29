@@ -224,9 +224,9 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `4e96223`、`0d4c7ad`＋收尾 |
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2（收據 `docs/reports/2026-09-29-phase3-step35-narratives.md`；pq2 [656]–[661] 等使用者 go） | ✅ | **強模型** | 見 git log「Step 3.5」 |
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳（多面向審查＋覆核：32 條處置，見偏差 18–26） | ✅ | 執行模型 | `f7f1711`＋收尾 |
-| 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ✅ | 執行模型 | 本 Step commit |
-| 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ✅ | 執行模型 | 本 Step commit |
-| 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ○ | 執行模型 | |
+| 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ✅ | 執行模型 | `f942d26` |
+| 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ✅ | 執行模型 | `be73d4e`＋收尾 `ec8f19b`（R2-b 兩位都 GO） |
+| 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ✅ | 執行模型 | 本 Step commit |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
@@ -554,6 +554,7 @@ Boundaries: 不改 code、不 commit、不帶 --apply、不動 Sheet、不核准
 1. **新增**夾具版 full chain（新檔）：夾具圖 → 讀圖（暫存 ledger）→ v2 敘事（暫存 ledger、disproof 自動登記到暫存 watch 檔）→ 三題稽核區（暫存 Engine C）→ 候選狀態推導與 candidates artifact → 個股頁 compose → **心跳段 2 讀到候選計數與三題 rollup**（Phase 0 偏差 #29 的鏈）→ 收據 dry-run。每一段斷言**產出到了下一段手上**（L13），並有一條「中間一段缺席時，下一段印缺席而不是空白」的測試。
 2. **現行 `tests/test_full_chain_acceptance.py` 的 12 條活判準保留**（原檔或搬到新檔，逐條寫出去向；§0 第 7 條）；它是本機真 runtime 整合測試，不得整檔替換成夾具版。skip 條件若仍依賴凍結的 `decision_lab.db`／COHR assumptions ledger，改成不依賴，或寫明為何仍需要。
 **L11-6 ④：** 真 runtime 那份在本機仍跑得起來（27 passed 對 3.0）；拿掉或搬走的斷言逐條列。
+**執行結果（2026-09-30）：** 新檔 `tests/test_phase3_full_chain.py`（3 條）：一條整鏈用正式入口串起讀圖（ledger＋反證登記）→ 三題（記憶體 Engine C）→ `write_brief`（寫入當下前提＋反證登記）→ `load_board`→ artifact → 心跳段 2（計數與三題 rollup）→ 個股頁（讀圖面板、候選狀態、三題稽核、downside 連 watch、鏈段讀騎的讀圖需求側）→ 收據 dry-run 與 `--apply`（假 Sheet、暫存 log）；兩條「中間一段缺席時下一段印缺席」（候選板 artifact 缺席、讀圖 ledger 讀不到）。8 個交接變異 7 紅、1 個等價（compose 對舊輸入的預設理由同樣宣告「還沒讀」）。真 runtime 那份（`tests/test_full_chain_acceptance.py`）**一條都沒拿掉或搬走**，本機 27 passed（＝3.0 基準）；skip 條件仍依賴凍結的 COHR 假設 ledger 與 Decision Store，理由寫進該檔 docstring。
 
 ## 11. 驗收數的是哪一層（completion gate 第九項）
 

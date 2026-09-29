@@ -22,6 +22,14 @@ refresh 只影響該影響的、PIT 不漏未來、缺料要說原因、舊判�
 
 整合測試：需要本機 Neo4j＋Engine C＋Decision Store。沒有 runtime 就 skip，
 **skip 會在報表上現形**（不是靜默通過）。
+
+⚠ **2026-09-30（Phase 3 Step 3.9）：新管線的夾具版 full chain 住 `tests/test_phase3_full_chain.py`**
+（圖 → 讀圖 → v2 敘事 → 三題 → 候選狀態 → 個股頁 → 心跳段 2 → 收據）；本檔是**真 runtime** 的那一份，照留、不互相取代，
+12 條判準原檔保留（3.0 基準 27 passed，3.9 時同數）。skip 條件仍依賴兩樣凍結的本機資料，理由逐條：
+- `library/private/alpha/assumptions/COHR.jsonl`：`operating_assumption` 的 refresh 案例（each_change／superseded／
+  as-of 前沒有 ledger／缺 ledger 與壞行）斷言的就是這本 ledger 的紀錄——沒有它那些案例量不到東西；
+- `library/private/decision_lab/decision_lab.db`（凍結唯讀）：research 面板與黑箱 CLI 的 Decision Store 事實從這裡讀，
+  baseline 釘值與「CLI 與 read model 逐格相等」都含這一段。缺了它 view 仍建得起來但數字會變，釘值就不再有意義。
 """
 from __future__ import annotations
 
