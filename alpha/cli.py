@@ -274,7 +274,7 @@ def cmd_brief(args: argparse.Namespace) -> int:
       通過後 `disproof[]` 自動登記成語意 watch（已在盯的只連結）、舊版還 active 的 `brief:` watch 收掉。
     - `--retract <id>`：append 一筆撤回紀錄（沿用被撤那筆的版本；撤回 v2 只收它登記、還 active 的 watch）。
     """
-    from datetime import date, datetime, timezone
+    from datetime import datetime, timezone
 
     from .narrative import RECORD_VERSION_V2, brief_record
     from .providers.briefs import WriteContext, read_brief_records, write_brief
@@ -322,7 +322,10 @@ def cmd_brief(args: argparse.Namespace) -> int:
                 note=str(args.rationale or "retracted"), created_at=datetime.now(timezone.utc),
                 record_version=target.record_version, **v2)
         try:
-            ctx = WriteContext.load(ticker, today=date.today())
+            from engine_b import event_watch as _ew
+
+            # 排程時區的今天（與 daily、`settle_due` 的到期判定同一個定義；R2-a 覆核 non-blocking #1）
+            ctx = WriteContext.load(ticker, today=_ew._today())
             result = write_brief(record, ctx=ctx)
         except (AlphaError, ValueError) as exc:
             print(f"✗ {exc}", file=sys.stderr)

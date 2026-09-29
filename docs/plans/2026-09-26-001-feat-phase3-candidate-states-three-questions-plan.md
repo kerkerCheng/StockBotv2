@@ -221,7 +221,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.1 | Phase 2 帶過來的三個小修（A6 a／b／c） | ✅ | 執行模型 | `ebab3d0`、`50954a9`、見 3.1c |
 | 3.2 | Engine C 機械歷史表＋一次回填＋daily 增量步驟；going concern 結構化欄位（R2-c：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `aaf926b`、`42f2596`、`b403e78`＋收尾 |
 | 3.3 | 三題稽核區；主題等權組 ledger；邊緣判定 | ✅ | 執行模型 | 見 git log「Step 3.3」 |
-| 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a） | ○ | 執行模型 | |
+| 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `4e96223`、`0d4c7ad`＋收尾 |
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2 | ○ | **強模型** | |
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳 | ○ | 執行模型 | |
 | 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ○ | 執行模型 | |
@@ -647,3 +647,4 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 20. **稀釋燈一年窗滿了之後 30 檔裡 24 檔亮黃**（Step 3.3 試跑）：規則是「一年內同口徑股數增加 → 黃」（D2，不設量級門檻）；FN +0.01% 與 AXTI +42% 同樣是黃。它量的是事實，但國內申報人 80% 亮黃接近恆亮（L14-4）——要不要把員工股酬等級與增發分開、用什麼非憑空的判準（例如只看有沒有 S-3／424B 發行），**要使用者決定**。今天照規則印、數字在稽核層。
 21. **三題尚未接 as-of 視角**：歷史表的 PIT 讀法已備（`shared/as_of.py`），但 view 其他段在 as-of 下各有規則；目前 as-of 模式下三題 section 誠實缺席。
 22. **R2-a non-blocking（Step 3.4 覆核）**：N2 寫入端「供給側」只認 `supplies_to`（plan 寫 supplies_to／develops，方向更嚴）、「它在需求側」的提示對外向需求邊會印成「兩側都不在」；N4 QueueLiveness：fired 的 `wake_brief`（非語意 kind）沒有滯留檢查、fired 的 `brief:` 語意 watch 滯留訊息指向的 consumer 寫成「semantic-queue → judge」；N5 v2 的禁字表與 placeholder 字彙在 parse 路徑上，日後改字彙會讓舊 v2 紀錄解析失敗（v1 早就如此，§13 要註明）；N8 舊版／已撤回版 fired 的 `brief:` watch 不進 `disproof_counts` 任何一格、brief ledger 的 parse errors 被 `current_briefs` 與 audit 忽略、舊版 `candidate_state` 用過的 `wake_brief` 若新版不再引用仍留著（醒來時多處置一次）。
+23. **R2-a 覆核 non-blocking（0d4c7ad）**：①「今天」已統一成排程時區（`alpha brief` CLI 改用 `event_watch._today()`，收尾 commit 當場修）；②`settle_due` 只轉敘事來源的 watch——thesis／讀圖來源已過 expires、daily 還沒標記的，可開前提③最多晚一天才算「到期未判」（hook 不會收掉它們、不丟資料；3.6 每天重驗補上）；③寫入被拒時記憶體裡的 `ctx.watches` 已被時間轉換過（不存檔；CLI 丟掉 ctx，重用 ctx 的呼叫端要知道）；④**writer lock 沒有在 `alpha brief --add` 程式裡強制**：它在讀 registry 與存檔之間整份覆寫 `event_watches.json`，互斥只靠操作程序先取鎖——要不要在 CLI 內自動取鎖。
