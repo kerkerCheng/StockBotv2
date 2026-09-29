@@ -105,6 +105,9 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 
 - ⓐ 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`）；
 - ⓑ 重跑 `python -m alpha research <T>` 的 packet（`brief_frame` 是 v2）與三題稽核區；
+- ⓑ′ **連結斷了**（2026-09-29 Step 3.6；心跳段 3「敘事該重寫 N（其中連結斷 M）」、候選板那一列的「該重寫」）：敘事
+  `disproof[].link_source_ref` 連到的 watch 已不在盯，並寫出為什麼斷——來源已收掉（讀圖重讀、memo 換版）就把那條改成新來源鍵
+  （新讀圖的 `reading:<新 id>#n`）或改為新登；來源被判觸及／到期未判就先看來源那一邊（thesis 複查、節點重讀）怎麼處置，再改寫這份敘事；
 - ⓒ 寫新的一版 `python -m alpha brief <T> --add spec.json`，`acknowledged_touched[]` **逐條處置本公司名下
   所有**該重寫的 watch（`still_holds`／`thesis_changed`／`retired`＋一句 note）——**不列就拒收**；
   換版與撤回都不會吞掉它們（已過到期日但 daily 還沒標記的，寫入端會先照日期轉成到期）。處置寫成 watch 既有的收據

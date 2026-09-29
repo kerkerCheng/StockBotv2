@@ -233,7 +233,17 @@ _STATE_NOTES = {
 
 # ⚠ 2026-09-22（Phase 0 Step 0a.2）：`/basket` 與 `/multi-year` 兩個路由退役——兩個 state kind
 # 已從封閉字彙移除（ROADMAP Phase 0／G1、G3），serve 它們只會回「未登記的 state kind」。
-# 候選狀態板（Phase 3）接手時會是一個新路由，不是把這兩個改名回來。
+# 2026-09-29（Phase 3 Step 3.6）候選狀態板接手：`/candidates` 是新路由，不是把這兩個改名回來。
+
+
+_STATE_NOTES["candidates"] = (
+    "python -m webapp materialize --candidates",
+    "「artifact 讀不到」與「可開為 0」是兩件事——後者會以 200 ＋ counts.open=0 回（可開為零就零，不為了非空放寬）。")
+
+
+async def candidates(request: Request) -> Response:
+    """候選狀態板：五組＋附組、三題與四盞燈 rollup（推導結果照抄；組內按 ticker 字母，不排序、不給尺寸）。"""
+    return await _serve_state(request, "candidates")
 
 
 _STATE_NOTES["structure_readings"] = (
@@ -371,6 +381,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/watches", watches, methods=["GET"]),
         Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
         Route(f"/api/{API_VERSION}/structure-readings", structure_readings, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/candidates", candidates, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]

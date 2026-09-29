@@ -267,18 +267,96 @@ def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Pat
 
     這一條是「停跑真的生效了」的可證偽斷言：段 2 與段 4 各有一行指名候選狀態板還沒落地，
     段 4 另有一行指名歸零旗標的彙總停在哪裡、逐檔的燈沒停。少任何一行都會紅。
+
+    ⚠ 2026-09-29（Phase 3 Step 3.6）：候選板落地，三行缺席宣告改讀 `candidates` artifact。這條守的判準不變——
+    artifact 讀不到時仍是**具名缺席**（`upstream_unavailable`）而不是整行消失；讀得到時每一組都印，**0 也印**。
+    「賭注帳／量的候選／要幾倍」那一行隨三個退役機制一起刪除（不是換措辭）。
     """
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import fake_candidates_payload
+
     state_dir = tmp_path / "state"
     state_dir.mkdir()
-    changes = "\n".join(hb.build_changes(
-        now=datetime(2026, 9, 22, tzinfo=timezone.utc), state_dir=state_dir,
-        thesis_path=tmp_path / "nope.json").lines)
+    now = datetime(2026, 9, 29, tzinfo=timezone.utc)
+    changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
     positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
-    assert "候選狀態板未落地（not_yet_recorded）" in changes, changes
-    assert "not_yet_recorded" in positions, positions
-    assert "歸零旗標彙總" in positions and "逐檔那盞燈仍在個股頁" in positions, positions
+    assert "候選板：candidates artifact 讀不到" in changes and "（upstream_unavailable）" in changes, changes
+    assert "三題：candidates artifact 讀不到" in changes, changes
+    assert "歸零旗標彙總：" in positions and "逐檔那盞燈仍在個股頁" in positions, positions
+    assert "賭注帳" not in positions and "要幾倍" not in positions
     # 目標價那一行真的不見了（退役的是機制，不是只換了措辭）。
     assert "現價已高於目標價" not in changes
+
+    StateArtifactStore(state_dir).write(fake_candidates_payload())
+    changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
+    positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
+    assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天）｜不要 0｜已持有 0" in changes, changes
+    assert "無敘事 2" in changes and "持股解析不到 1：TYO:7803" in changes
+    assert "三題（3 檔）：已定價① 有值 1／缺席 2" in changes and "不是結論" in changes
+    # 盞數與有紅燈的檔分開、灰依 kind 分——灰不是綠（ARCHITECTURE §4.1 段 4）
+    assert ("歸零旗標 3 檔 × 4 盞：紅 1｜黃 4｜綠 3｜**灰（沒量到）4**（insufficient_evidence 1、not_yet_recorded 3）"
+            "——⚠ 灰不是綠；有紅燈 1 檔：COHR") in positions, positions
+
+
+def test_candidate_lines_say_held_is_unverified_when_the_sheet_was_unreadable(tmp_path: Path) -> None:
+    """持股讀不到＝已持有判定暫停：印「未驗」與理由，不得印 0（3.6 審查 c19）。"""
+    from webapp.materialize import build_candidates_artifact
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import fake_candidates_payload
+
+    payload = fake_candidates_payload()
+    board = {k: payload[k] for k in ("groups", "side_groups", "oldest_stall_days", "narrative_rewrite", "ledger",
+                                     "rollup", "universe", "today")}
+    board["counts"] = dict(payload["counts"], held=None)
+    board["holdings"] = {"status": "upstream_unavailable", "reason": "持股未讀到，已持有判定暫停（HttpError）",
+                         "unresolved": [], "beta_excluded": 0, "zero_shares": 0}
+    StateArtifactStore(tmp_path).write(build_candidates_artifact(board))
+    lines = hb._candidate_lines(tmp_path)
+    assert "已持有 未驗（持股未讀到）" in lines[0] and "｜已持有 0" not in lines[0]
+    assert any("持股未讀到，已持有判定暫停（upstream_unavailable）" in line for line in lines)
+
+
+def test_snapshot_candidate_keys_are_read_from_the_artifact(tmp_path: Path) -> None:
+    """較昨 diff 的 `candidate.*` 真的由 artifact 填值（3.6 審查 c20）；已持有未驗是 None，不是 0。"""
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import fake_candidates_payload
+
+    StateArtifactStore(tmp_path).write(fake_candidates_payload())
+    values = hb.collect_snapshot(now=datetime(2026, 9, 29, tzinfo=timezone.utc), state_dir=tmp_path,
+                                 leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
+                                 run_record_path=None, capture_dir=None)
+    assert values["candidate.priced_wait"] == 1 and values["candidate.open"] == 0
+    assert values["candidate.no_narrative"] == 2
+    empty = hb.collect_snapshot(now=datetime(2026, 9, 29, tzinfo=timezone.utc), state_dir=tmp_path / "none",
+                                leads_path=tmp_path / "nope.json", thesis_path=tmp_path / "nope2.json",
+                                run_record_path=None, capture_dir=None)
+    assert all(empty[k] is None for k in empty if k.startswith("candidate."))   # 讀不到＝沒讀到，不是 0
+
+
+def test_queue_section_injects_link_breaks_and_prints_the_rewrite_count(monkeypatch: pytest.MonkeyPatch) -> None:
+    """段 3：連結斷了由 `link_breaks` 注入 observe，「敘事該重寫 N（其中連結斷 M）」**0 也印**（3.6 審查 c12／s2）。"""
+    import engine_b.disproof as disproof
+    from engine_b import queue_segments as qs
+
+    from test_candidates import LINK, _brief
+
+    calls: list[dict] = []
+    real_observe = qs.observe
+
+    def spy(**kwargs):
+        calls.append(kwargs)
+        return real_observe(**{**kwargs, "leads": {}, "watches": [], "todo_items": []})
+
+    monkeypatch.setattr(disproof, "current_briefs", lambda: [_brief(disproof=[LINK])])
+    monkeypatch.setattr(qs, "observe", spy)
+    section = hb.build_queue()
+    assert [b["link_source_ref"] for b in calls[0]["narrative_link_breaks"]] == [LINK["link_source_ref"]]
+    assert any(line.startswith("敘事該重寫 1（其中連結斷 1）") for line in section.lines), section.lines
+    monkeypatch.setattr(disproof, "current_briefs", lambda: [])
+    assert any(line.startswith("敘事該重寫 0（其中連結斷 0）") for line in hb.build_queue().lines)
 
 
 def test_unreadable_leads_file_is_not_the_same_as_an_empty_log(broken_env: dict[str, Path]) -> None:

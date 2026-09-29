@@ -2256,6 +2256,13 @@ async function renderPositions() {
       + '這個數字只有靠累積真實下單才會變大，時間經過不會讓它自己滿足。'));
   }
   sec0.appendChild(el('p', 'note', `只有 paper 的 cohort：${(live.paper_only || []).length} 個。`));
+  // Phase 3 Step 3.6：這裡是錢在哪；「已持有」的敘事與候選狀態在候選板的已持有組。
+  const toBoard = el('p', 'note');
+  toBoard.appendChild(document.createTextNode('已持有的 alpha 標的（敘事宣告、三題、在等什麼）見 '));
+  const boardLink = el('a', null, '候選板的「已持有」組');
+  boardLink.href = '#/candidates';
+  toBoard.appendChild(boardLink);
+  sec0.appendChild(toBoard);
   app.appendChild(sec0);
 
   // ② 樣本效度**先於**數字——排版順序本身就是判準的一部分。
@@ -2463,6 +2470,165 @@ async function renderPositions() {
   window.scrollTo(0, 0);
 }
 
+/* ---------- 候選狀態板（candidates state；Phase 3 Step 3.6：推導結果照抄——組內按 ticker 字母，不排序、不給尺寸） ---------- */
+
+const CANDIDATE_ORDER = ['open', 'missing', 'priced_wait', 'pass', 'held'];
+const CANDIDATE_SIDE_ORDER = ['not_multiple', 'edge_unmeasurable', 'legacy', 'precondition_failed'];
+
+function candidateRow(row, detailSet) {
+  const li = el('li');
+  const top = el('div');
+  if (detailSet.has(row.ticker)) {
+    const a = el('a', null, row.ticker);
+    a.href = `#/${encodeURIComponent(row.ticker)}`;
+    top.appendChild(a);
+  } else {
+    top.appendChild(el('strong', null, row.ticker));
+  }
+  const w = row.three_words || {};
+  top.appendChild(el('span', 'dim', `　會死嗎 ${w.will_it_die || '—'}｜已定價 ${w.priced_in || '—'}｜數字裡 ${w.in_numbers || '—'}`));
+  li.appendChild(top);
+  const bits = [];
+  if (row.declared_label && row.derived !== row.declared) bits.push('敘事宣告：' + row.declared_label);
+  (row.rides || []).forEach((r) => bits.push(`騎 ${r.node}（${r.unit === 'socket' ? '插槽' : '層'}｜判讀 ${r.kind || '—'}｜${r.status || '—'}）`));
+  const e = row.edge || {};
+  bits.push(`邊緣：${e.label || e.state || '—'}（市值 ${e.market_cap_label || '—'}｜分析師 ${e.analyst_count ?? '—'}）`);
+  if (row.watch) bits.push(`在等 ${row.watch.watch_id}（${row.watch.status}｜until ${row.watch.until || '—'}｜到期 ${row.watch.expires || '—'}）`);
+  if (row.stall_days !== null && row.stall_days !== undefined) bits.push(`滯留 ${row.stall_days} 天`);
+  li.appendChild(el('span', 'rule', bits.join('｜')));
+  if (row.reason) li.appendChild(el('span', 'rule', '理由：' + row.reason));
+  if (row.note) li.appendChild(el('span', 'rule', row.note));
+  if (row.held_source) li.appendChild(el('span', 'rule', `Sheet：${row.held_source.sheet_ticker}（解析：${row.held_source.source}）`));
+  (row.preconditions || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 前提失效：' + p)));
+  (row.rewrite || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 該重寫：' + p)));
+  if (row.holdings_verified === false) li.appendChild(el('span', 'warn', '持股未驗（可能其實已持有）'));
+  return li;
+}
+
+async function renderCandidates() {
+  markNav('candidates');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/candidates`);
+  } catch (err) {
+    renderStateError(err, '讀不到候選狀態板');
+    return;
+  }
+  const counts = payload.counts || {};
+  const oldest = payload.oldest_stall_days || {};
+  const labels = payload.group_labels || {};
+  const sideLabels = payload.side_labels || {};
+  const holdings = payload.holdings || {};
+  const detailSet = new Set(payload.analyst_view_tickers || []);
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
+  }
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('h2', null, '各組檔數（0 也印）'));
+  const aged = (key) => (counts[key] && oldest[key] !== null && oldest[key] !== undefined) ? `最老滯留 ${oldest[key]} 天` : '';
+  sec0.appendChild(kpiRow(CANDIDATE_ORDER.map((key) => ({
+    label: labels[key] || key,
+    value: (counts[key] === null || counts[key] === undefined) ? '未驗' : String(counts[key]),
+    sub: key === 'held' && counts.held === null ? '持股未讀到' : aged(key),
+    cls: key === 'open' ? 'hero' : undefined,
+  }))));
+  sec0.appendChild(el('p', 'note', CANDIDATE_SIDE_ORDER.map((k) => `${sideLabels[k] || k} ${counts[k] ?? 0}`).join('｜')
+    + `｜無敘事 ${counts.no_narrative ?? 0}（沒有敘事的不上板）`));
+  if (holdings.status !== 'ok') {
+    sec0.appendChild(el('p', 'warn', '▲ ' + (holdings.reason || '持股未讀到，已持有判定暫停')));
+  } else if ((holdings.unresolved || []).length) {
+    sec0.appendChild(el('p', 'note', `持股解析不到 ${holdings.unresolved.length}：${holdings.unresolved.join('、')}（不猜；要不要登記是 identity 的決定）`));
+  }
+  app.appendChild(sec0);
+
+  const section = (title, rows, emptyText) => {
+    const sec = el('section', 'panel');
+    sec.appendChild(el('h2', null, `${title}（${rows.length}）`));
+    if (!rows.length) {
+      sec.appendChild(el('p', 'note', emptyText));
+    } else {
+      const list = el('ul', 'weak');
+      rows.forEach((row) => list.appendChild(candidateRow(row, detailSet)));
+      sec.appendChild(list);
+    }
+    app.appendChild(sec);
+  };
+  const groups = payload.groups || {};
+  CANDIDATE_ORDER.forEach((key) => {
+    const empty = key === 'open'
+      ? '0——可開為零就零；讓它非空的路是研究，不是放寬前提。'
+      : (key === 'held' && counts.held === null ? '持股未讀到——已持有判定暫停（不是「沒有持有」）。' : '0');
+    section(labels[key] || key, groups[key] || [], empty);
+  });
+  const sides = payload.side_groups || {};
+  CANDIDATE_SIDE_ORDER.forEach((key) => {
+    if ((sides[key] || []).length) section(sideLabels[key] || key, sides[key], '0');
+  });
+
+  const rewrite = payload.narrative_rewrite || [];
+  const secW = el('section', 'panel');
+  secW.appendChild(el('h2', null, `敘事該重寫（${rewrite.length}）`));
+  if (!rewrite.length) {
+    secW.appendChild(el('p', 'note', '0'));
+  } else {
+    const list = el('ul', 'weak');
+    rewrite.forEach((b) => list.appendChild(el('li', null, b.kind === 'link'
+      ? `${b.ticker}：連結 ${b.link_source_ref}——${b.label || '已沒有在盯的 watch'}`
+      : `${b.ticker}：敘事來源的 watch ${b.watch_id} 醒來／觸及／到期未判`)));
+    secW.appendChild(list);
+  }
+  app.appendChild(secW);
+
+  const ledger = payload.ledger || {};
+  if (ledger.present === false) {
+    app.appendChild(el('p', 'warn', '▲ 敘事 ledger 目錄不存在——「無敘事」是讀不到，不是真的沒有。'));
+  } else if (ledger.parse_errors) {
+    app.appendChild(el('p', 'warn', `▲ 敘事 ledger 有 ${ledger.parse_errors} 行解析不了（那幾份宣告沒進板）：${(ledger.parse_error_examples || []).join('；')}`));
+  }
+
+  const absentText = (block) => {
+    const parts = Object.entries(block.absent || {}).map(([k, v]) => `${k} ${v}`);
+    return parts.length ? `（${parts.join('、')}）` : '';
+  };
+  const roll = payload.rollup || {};
+  const secR = el('section', 'panel');
+  secR.appendChild(el('h2', null, `三題與四盞燈（${roll.universe ?? '?'} 檔；只數有值與缺席，不是結論）`));
+  const own = roll.priced_in_own || {};
+  const nums = roll.in_numbers || {};
+  const wipe = roll.wipeout || {};
+  const lamps = wipe.lamps || {};
+  const unlit = Object.entries(wipe.unlit_by_kind || {}).map(([k, v]) => `${k} ${v}`).join('、');
+  secR.appendChild(el('p', 'note', `已定價①（自家歷史）有值 ${own.valued ?? '?'}／缺席 ${own.absent_total ?? '?'}${absentText(own)}`));
+  secR.appendChild(el('p', 'note', `出現在數字裡 有值 ${nums.valued ?? '?'}／缺席 ${nums.absent_total ?? '?'}${absentText(nums)}`));
+  secR.appendChild(el('p', 'note', `會死嗎：${wipe.companies ?? '?'} 檔 × 4 盞——紅 ${lamps.red ?? '?'}｜黃 ${lamps.amber ?? '?'}｜綠 ${lamps.green ?? '?'}｜灰（沒量到）${lamps.unlit ?? '?'}${unlit ? `（${unlit}）` : ''}——灰不是綠；四盞都非灰 ${wipe.all_four_non_grey ?? '?'} 檔`));
+  if ((wipe.red_tickers || []).length) {
+    secR.appendChild(el('p', 'note', `有紅燈的檔：${wipe.red_tickers.join('、')}`));
+  }
+  const notRead = roll.not_read || {};
+  if (notRead.n) {
+    secR.appendChild(el('p', 'warn', `▲ 讀不到三題與燈 ${notRead.n} 檔：` + (notRead.tickers || []).map((t) => `${t}（${(notRead.reasons || {})[t] || '—'}）`).join('、')));
+  }
+  const edge = roll.edge || {};
+  secR.appendChild(el('p', 'note', `邊緣判定：邊緣 ${edge.edge ?? 0}｜非邊緣 ${edge.not_edge ?? 0}｜無法量 ${edge.unmeasurable ?? 0}`));
+  app.appendChild(secR);
+
+  const secN = el('section', 'panel');
+  secN.appendChild(el('h2', null, '這份板不是什麼'));
+  const listN = el('ul', 'weak');
+  (payload.this_is_not || []).forEach((t) => listN.appendChild(el('li', null, t)));
+  secN.appendChild(listN);
+  app.appendChild(secN);
+}
+
 /* ---------- 路由 ---------- */
 
 async function route() {
@@ -2484,6 +2650,7 @@ async function route() {
     else if (target === 'structure-readings') await renderStructureReadings();
     else if (target === 'watches') await renderWatches();
     else if (target === 'positions') await renderPositions();
+    else if (target === 'candidates') await renderCandidates();
     else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {

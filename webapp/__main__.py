@@ -55,14 +55,14 @@ def _stores(args: argparse.Namespace) -> tuple[ArtifactStore, StateArtifactStore
 #: 新增一個 state materializer 時**必須加進來**，否則它會被當成「沒指定」而重跑全部單檔。
 _STATE_FLAGS: tuple[str, ...] = (
     "structure_table", "beta", "graph_walk", "watches", "positions",
-    "structure_readings", "account_scorecard",
+    "structure_readings", "account_scorecard", "candidates",
 )
 
 
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_account_scorecard, materialize_beta, materialize_graph_walk,
+        materialize_account_scorecard, materialize_beta, materialize_candidates, materialize_graph_walk,
         materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_structure_table, materialize_watches, write_vocabularies,
@@ -130,6 +130,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
             print(f"✓ positions → {path.name}（{path.stat().st_size:,} bytes；"
                   f"逐檔 {len(payload['rows'])}／真實成交 {len(payload['live']['tickers'])} 檔）")
 
+
     # 不給 ticker 且沒要求任何 state ＝ 重跑目錄裡已有的每一檔（原行為）。
     # 只給 --structure-table ＝ 只做結構表，不順手重跑單檔（那是另一件事，也是另一段時間）。
     # ⚠ 2026-09-17：這裡原本是一串手寫的 `or`，新增一個 state flag（`--scorecard`）就漏掉，
@@ -163,6 +164,22 @@ def cmd_materialize(args: argparse.Namespace) -> int:
                 size = path.stat().st_size
                 print(f"✓ {ticker} → {path.name}（{size:,} bytes）")
         print(f"字彙表 → {vocab_path.name}")
+    # 候選狀態板（Phase 3 Step 3.6）：**放在單檔 materialize 之後**——宇宙取自同一個 store 的目錄，
+    # 同一輪新 materialize 的檔要算進去（3.6 審查：原本在前面，取樣到的是上一輪的目錄）。各自 fail-soft。
+    if getattr(args, "candidates", False):
+        total += 1
+        try:
+            # 宇宙＝這個 store 已 materialize 的那幾檔（`--dir` 指到哪就是哪，不換成預設目錄）；
+            # 敘事 ledger 裡有的另外併進來（load_board 負責）。
+            path, payload = materialize_candidates(tickers=store.tickers(), store=state_store)
+        except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
+            failed += 1
+            print(f"✗ candidates：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)
+        else:
+            c = payload["counts"]
+            print(f"✓ candidates → {path.name}（{path.stat().st_size:,} bytes；"
+                  f"可開 {c.get('open')}／缺 X {c.get('missing')}／等回落 {c.get('priced_wait')}／不要 {c.get('pass')}"
+                  f"／已持有 {'未驗' if c.get('held') is None else c.get('held')}／無敘事 {c.get('no_narrative')}）")
     # 帳號計分表（Phase 3）：唯一會抓價格的 materializer，所以 fail-soft 且與其他各自獨立。
     if getattr(args, "account_scorecard", False):
         total += 1
@@ -563,6 +580,8 @@ def build_parser() -> argparse.ArgumentParser:
     mat.add_argument("--scorecard", "--account-scorecard", dest="account_scorecard",
                      action="store_true",
                      help="另外（或只）materialize 帳號計分表：D5 五欄＋三個偏差（會抓價格，唯一連外的 materializer）")
+    mat.add_argument("--candidates", action="store_true",
+                     help="另外（或只）materialize 候選狀態板：敘事宣告 × Sheet 持有 × 前提每天重驗（唯讀；會讀 Sheet readonly）")
     mat.add_argument("--structure-readings", action="store_true",
                      help="另外（或只）materialize 結構讀圖：每一份讀圖跟現在的圖還一不一致（唯讀 ledger ＋ 確定性比對）")
     mat.add_argument("--as-of", help="YYYY-MM-DD：point-in-time 視角（單檔與結構表都適用）")

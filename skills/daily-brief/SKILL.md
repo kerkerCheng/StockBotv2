@@ -595,7 +595,7 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 今日自動清了 N（fired 重排 a／常規授權 go c），機械段剩 M；基期實績補值：寫入 W／跳過 S／拒寫 R（拒寫逐筆列理由）｜每檔閉環：到終局 T／未到終局 U，下一檔 X
 <2026-09-09 P5 固定第一行（L14 常駐計數器）：數字照抄三支機械段命令與 `webapp status` 的「每檔閉環」行；沒跑成寫「未跑：<原因>」，不得印 0>
 
-四個持久畫面由收尾的 `-m webapp materialize` 每天更新；**本段只印計數與較昨變動，完整內容一律不重印**。
+五個持久畫面由收尾的 `-m webapp materialize` 每天更新；**本段只印計數與較昨變動，完整內容一律不重印**。
 
 | 畫面 | 今天 | 較昨 |
 |---|---|---|
@@ -603,6 +603,7 @@ park：社群 CPO 推論 → 一手來源未支持，不產空 RA
 | 資產配置 `#/beta` | 6 sleeve：低於 N／高於 N／到位 N | 無門檻跨越 |
 | 走圖 `#/graph-walk` | 九型各自「命中／母體」（照抄心跳段 3 的走圖行；**不加總、不排序**） | 心跳「較昨變動」的 `走圖 …` 各項 |
 | 在等什麼 `#/watches` | 在等 N／停滯 N／fired 未消化 N／追源需處置 N | fired +1 |
+| 候選板 `#/candidates` | 可開 N／缺 X N／等回落 N／不要 N／已持有 N（**0 也印**；照抄心跳段 2 的候選行，**不排序、不挑首選**） | 心跳「較昨變動」的 `候選 …` 各項 |
 
 必填規則：
 
@@ -721,9 +722,11 @@ instrument／tranche 核准前不得輸出自動金額；**貸款 tranche 不適
 ### Step 7 — 收尾同步
 
 - **更新 APP 讀的畫面**（2026-09-08；2026-09-09 起加 `--registry-listed`，APP 73 檔每天更新）：
-  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings`。
+  `& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard --candidates`
+  （與 `crons/daily_task.py` 的 ⑬ 同一串；`tests/test_daily_task.py` 逐項守 daily 那一份）。
   ⚠ 2026-09-26（Phase 2 Step 2.6）：`--coverage` → `--graph-walk`（舊旗標不留別名）。
-  ⚠ 2026-09-22（Step 0a.2）：`--basket` 已移除（籃子 filter 退役，候選狀態板 Phase 3 接手）。
+  ⚠ 2026-09-22（Step 0a.2）：`--basket` 已移除（籃子 filter 退役）；2026-09-29（Phase 3 Step 3.6）由 `--candidates`
+  （候選狀態板）接手——不是把 `--basket` 改名回來：沒有 filter 分數、沒有首選。
   APP 讀的是**已經算好**的判讀（`LLM changes cognition; APP reads cognition`），所以「今天的資料」必須由這一步推進；
   不跑它，使用者打開 APP 看到的是上一次 materialize 的內容（畫面會自己標 stale，但那不是新資訊）。
   只寫 ignored derived cache，不寫任何 authority；**失敗只記健康段、不中止 Daily**。

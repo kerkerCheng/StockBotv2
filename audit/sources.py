@@ -97,6 +97,29 @@ def brief_ledgers() -> dict[str, dict]:
     return out
 
 
+def current_briefs() -> list:
+    """各檔現行的 v2 敘事（`engine_b.disproof.current_briefs`）。經這裡讀，稽核才能在測試裡被替換——
+    直接呼叫會讓稽核測試讀到真實 ledger（3.6 審查：QueueLiveness 因此把真實敘事的連結報成「指向沒有東西」）。"""
+    from engine_b.disproof import current_briefs as _current
+
+    return list(_current())
+
+
+def candidates_artifact() -> dict:
+    """候選狀態板 state artifact（Phase 3 Step 3.6；derived cache，`webapp.store` 驗 digest 後讀）。
+
+    ⚠ 稽核原則上不讀 derived cache（結論不該取決於「有沒有人 materialize 過」）；這裡是 plan §5 第 6 點的明文例外：
+    rewrite 類的「有去處」包含「候選板該檔列帶著它」。呼叫端只檢查**在 artifact 產生之前**就進入該重寫狀態的 watch，
+    讀不到就記成「沒檢查」而不是失敗。"""
+    from webapp.store import StateArtifactStore
+
+    try:
+        payload, _freshness = StateArtifactStore().read("candidates")
+    except Exception as exc:  # noqa: BLE001
+        raise SourceUnavailable(f"候選板 artifact 讀不到：{type(exc).__name__}") from exc
+    return dict(payload)
+
+
 def reading_ledgers() -> dict[str, dict]:
     """讀圖 ledger（private）：`node → {"records": [...], "current": {unit: 現行那一筆}, "errors": [...]}`。
 

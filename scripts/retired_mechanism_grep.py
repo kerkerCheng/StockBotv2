@@ -95,6 +95,7 @@ KEEP: dict[tuple[str,str],str] = {
     ("tests/test_webapp_positions.py","B"): "kept_file: positions artifact 的 power_law 夾具（basket_total_return 量測鍵）",
     ("tests/test_wipeout_flags.py","B"): "guard_assertion: 斷言心跳段 4 仍印「power-law：籃子總報酬」；其餘是籃子退役註記",
     ("tests/test_heartbeat.py","B"): "retirement_note: 0a.2 籃子退役後換主詞的註記",
+    ("tests/test_heartbeat.py","D"): "guard_assertion: 斷言心跳段 4「賭注帳／量的候選／要幾倍」那一行已隨三個退役機制刪除（Phase 3 Step 3.6）",
     ('tests/test_daily_task.py','G'): 'guard_assertion: 斷言 daily 的封閉步驟清單不含 reassess-stale 等使用者動詞（原守在 Codex prompt／rules，2026-09-24 改主詞）',
     ("tests/test_webapp_graph_walk_watches.py","B"): "retirement_note: STATE_KINDS 斷言旁的 0a.2 退役註記",
     ("tests/test_webapp_structure_table.py","B"): "retirement_note: STATE_KINDS 斷言旁的 0a.2 退役註記",

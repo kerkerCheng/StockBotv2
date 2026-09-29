@@ -83,11 +83,14 @@ SEGMENTS: tuple[Segment, ...] = (
         "Phase 1 Step 1.5：醒來只把節點列進 needs_reread（理由寫出是哪位客戶的哪份文件），不自動重讀——重讀是研究。",
     ),
     Segment(
-        "narrative_rewrite", 1, "敘事來源的 watch 醒來、被判觸及或到期未判 → 該重寫那一檔的敘事",
+        "narrative_rewrite", 1, "敘事來源的 watch 醒來、被判觸及或到期未判，或敘事連結的反證來源已換版 → 該重寫那一檔的敘事",
         "research", "research-drain「敘事該重寫」段：讀那一檔現行敘事與觸發的 watch → "
-                    "python -m alpha brief <T> --add spec.json（v2；`acknowledged_touched` 逐條處置，不列就拒收）",
+                    "python -m alpha brief <T> --add spec.json（v2；`acknowledged_touched` 逐條處置，不列就拒收；"
+                    "連結斷了的那一條：來源換版就把 link_source_ref 換成新來源鍵，來源被觸及／到期就先看來源那一邊的處置再改寫）",
         "Phase 3 Step 3.4：`brief:` 語意 watch（敘事自己的反證）與 `wake_brief` watch（「缺 X」「已定價等回落」在等的事）"
-        "醒來、觸及或到期都不鑄 pq2、不進假設對照——下一步是重寫敘事，而重寫是研究。換版與撤回不會吞掉它們。",
+        "醒來、觸及或到期都不鑄 pq2、不進假設對照——下一步是重寫敘事，而重寫是研究。換版與撤回不會吞掉它們。"
+        "Step 3.6：敘事 `disproof[].link_source_ref` 連到的 watch 已不在盯（`narrative_watches.link_breaks`，附為什麼斷）"
+        "也算這一段的工作——它不是任何一筆 watch 的狀態，由呼叫端注入 `observe(narrative_link_breaks=…)`。",
     ),
     Segment(
         "fired_hypothesis_check", 1, "fired watch → 截圖假設對照（agent 拿 fact 去對一手）",
@@ -296,8 +299,13 @@ def observe(
     todo_items: Iterable[Mapping[str, Any]] = (),
     forward_view_backlog: int | None = None,
     graph_holes: int | None = None,
+    narrative_link_breaks: Iterable[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     """由資料反推每一段有幾筆工作。
+
+    `narrative_link_breaks`（Phase 3 Step 3.6）：`engine_b.narrative_watches.link_breaks()` 的結果——現行敘事的
+    連結來源已換版。它不是任何一筆 watch 的狀態（是「敘事指向的那筆 watch 不在了」），所以由呼叫端注入，
+    每一條算一筆 `narrative_rewrite` 工作。
 
     `forward_view_backlog`／`graph_holes` 由呼叫端注入
     （它們的 authority 不在 leads 目錄）；給 `None` 表示「本次沒有讀到那個 authority」，
@@ -343,6 +351,12 @@ def observe(
         counts[key] = (counts[key] or 0) + 1
         if len(examples[key]) < 3:
             examples[key].append(f"[{item.get('n', '?')}]")
+
+    for brk in narrative_link_breaks:
+        counts["narrative_rewrite"] = (counts["narrative_rewrite"] or 0) + 1
+        if len(examples["narrative_rewrite"]) < 3:
+            examples["narrative_rewrite"].append(
+                f"{brk.get('ticker')}（連結 {brk.get('link_source_ref')}：{brk.get('label') or '已換版'}）")
 
     counts["forward_view_backlog"] = forward_view_backlog
     counts["graph_holes"] = graph_holes

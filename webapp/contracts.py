@@ -64,6 +64,8 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 #: （逐邊結構事實，不排序、不設門檻、沒有名次）。kind 數不變，仍是 7；磁碟上的 `ranking.json` 同上處置。
 #: ⚠ 2026-09-26（Phase 2 Step 2.6）：`coverage`（覆蓋掃描＋重複節點候選）→ `graph_walk`（走圖九型問句；
 #: 沒人供應／建模待補／重複節點成為第 7–9 型）。kind 數不變，仍是 7；磁碟上的 `coverage.json` 同上處置。
+#: 2026-09-29（Phase 3 Step 3.6）：新增 `candidates`（候選狀態板：五組＋附組、三題與四盞燈 rollup）→ 8。
+#: 它接手的是 Phase 0 退役的籃子頁留下的位置，但**不是**把 `basket` 改名回來：沒有 filter 分數、沒有首選。
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "structure_table": "stockbot-app/structure_table/1",
     "beta": "stockbot-app/beta/1",
@@ -72,6 +74,7 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "positions": "stockbot-app/positions/1",
     "structure_readings": "stockbot-app/structure_readings/1",
     "account_scorecard": "stockbot-app/account_scorecard/1",
+    "candidates": "stockbot-app/candidates/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)
 

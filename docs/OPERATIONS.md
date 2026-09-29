@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.6：候選狀態板＋心跳）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | `python -m webapp materialize --candidates`：推導、**不寫任何 authority**——讀敘事 ledger（`library/private/alpha/briefs/`）、讀圖對圖（Neo4j bolt 本機，唯讀）、watch registry、thesis lifecycle、Engine C（三題走 `?mode=ro`；四盞燈沿用 `engine_c.checklist.get_wipeout_inputs`，與單檔 materialize 同一條一般連線）、Google Sheet（`spreadsheets.readonly`，已持有判定）、邊緣判定的 FX（`alpha/providers/market_normalization.py` 經 yfinance 取一次，與單檔 materialize 同一份）；只寫 ignored derived cache `library/private/app/state/candidates.json`（atomic）。**無新增網路主機或憑證**：Sheet readonly、Engine C、yfinance FX 與同一步的 `--positions`／單檔 materialize 是同一組（2026-09-29 3.6 審查 c9 更正：原稿把 Engine C 全寫成 `?mode=ro`、漏了 FX）。`engine_b/cli.py::_held` 改呼叫共用的持股身分解析，語意不變（全部持股、含 beta、Sheet 讀不到 fail closed；2026-09-29 實測 pq1 排序對 3.0 基準 12 則逐位相同）。`risk/hard_caps.py` 只匯出判別函式（#17），硬擋行為不變。心跳只多讀一份 state artifact（零網路） |
+| **2 canonical skill／prompt／本檔** | 本節與上方 materialize 命令；`skills/alpha-status`（pane 1 候選板照抄 artifact）、`skills/daily-brief`（持久畫面表加候選板、⑬ 命令同步）、`skills/lead-intake`（三題已落地）；`docs/ARCHITECTURE.md` state artifact 段；`CONCEPTS.md`「候選狀態板」 |
+| **3 最窄 rule** | daily ⑬ 的 argv 加一個旗標 `--candidates`（`tests/test_daily_task.py` 逐項相等）；不新增任何 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條。APP 多一個 GET 路由 `/api/v1/candidates`（沒有寫入端點；請求路徑測試四份清單都加了它，含 405 與斷網） |
+| **4 contract test** | `tests/test_candidates.py`（持股解析、已持有、五組＋附組、前提四條各一、連結斷了進佇列段、滯留不歸零、組內字母序、rollup 只數、`_held` 語意、`hard_caps` 匯出同一函式）；`tests/test_webapp_candidates.py`；`tests/test_webapp_request_path.py`；`tests/test_heartbeat.py`／`test_heartbeat_phase1.py`（候選行、三題行、歸零旗標彙總、新鍵首日） |
+| **5 端到端 smoke** | 2026-09-29：真實資料 `materialize --candidates` → 可開 0／缺 X 0／等回落 1（AXTI）／不要 0／已持有 1（SIVE.ST，宣告缺 X 照留）／非倍率候選 2（COHR、LITE）／無敘事 69、持股解析不到 1（TYO:7803）；`webapp status` 列得出 `candidates`；headless Edge 實際渲染 `#/candidates` 與 positions 頁的候選板連結；心跳較昨印「首日 10 項」而不是 10 個「未讀到→N」 |
+
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.4：短評 v2 與敘事來源的 watch）
 
 | 步 | 結論 |
@@ -597,7 +607,8 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m webapp materialize --graph-walk --watches    # 走圖九型＋在等什麼（唯讀照抄；2026-09-26 取代 --coverage）
 & '.venv\Scripts\python.exe' -m query.graph_walk                            # 走圖：九型問句各自「命中／母體」（零 LLM、不排序、不加總）；第 9 型逐對印兩端逐字與 registry note
 #   （重複節點與覆蓋缺口原本各有一支 CLI，2026-09-29 Phase 3 Step 3.1c 退役——跑它們會 exit 2 並指回走圖）
-& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard   # Daily ⑬ 的完整一輪（crons/daily_task.py 是唯一權威）
+& '.venv\Scripts\python.exe' -m webapp materialize --candidates              # 候選狀態板（2026-09-29 Phase 3 Step 3.6；不寫 authority：敘事 ledger、讀圖對圖、watch、Engine C、Sheet readonly、FX）
+& '.venv\Scripts\python.exe' -m webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard --candidates   # Daily ⑬ 的完整一輪（crons/daily_task.py 是唯一權威）
 
 # 2) serve：純讀。**不重建任何東西**
 & '.venv\Scripts\python.exe' -m webapp serve                  # http://127.0.0.1:8790/

@@ -66,20 +66,25 @@ def _held(*, strict: bool = False) -> tuple[frozenset[str], frozenset[str]]:
             # ticker（$SIVE）。兩者都收，交集比對才不會漏。
             if ":" in ticker:
                 tickers.add(ticker.split(":", 1)[1])
+        # Sheet 自己帶的 id 不論 registry 有沒有都照收（舊語意；只加不減）。
         company_id = row.get("company_id") or row.get("neo4j_id")
         if company_id:
             company_ids.add(str(company_id))
+    # 身分解析改走共用的那一段（Phase 3 Step 3.6：`portfolio/holdings.py`，候選板的「已持有」同一份）。
+    # ⚠ **語意不變**：這裡是**全部持股**（含 beta——它餵 pq1 的「持股關聯」鍵），不排除 beta、不看股數；
+    # Sheet 讀不到時上面已 fail closed。解析多出來的 company_id（Sheet 沒帶 id、但 registry 嚴格比對得到的列）
+    # 2026-09-29 實測對全部 1,163 條 lead 的 pq1 排序逐位不變。
     # 同一家公司三個字串：Sheet 是 execution symbol（FRA:2DG）、registry 是 research
     # ticker（SIVE.ST）、推文 cashtag 是 base（$SIVE）。lead 的 entities 是 harvest
     # 當時算的、不會重算，所以要從持股這一側補上 research ticker 與其 base 形式，
     # 否則「我持有的公司被點名」永遠比對不到。
     try:
-        from identity.registry import get_registry
+        from portfolio.holdings import resolve_holdings
 
-        registry = get_registry()
-        for company_id in list(company_ids):
-            company = registry.company(company_id)
-            research = str(getattr(company, "research_ticker", "") or "").upper()
+        for holding in resolve_holdings(rows)["rows"]:
+            if holding["company_id"]:
+                company_ids.add(str(holding["company_id"]))
+            research = str(holding.get("research_ticker") or "").upper()
             if research:
                 tickers.add(research)
                 if "." in research:

@@ -410,6 +410,10 @@ bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩�
 這一檔算不算倍率候選：`config/alpha_screen.json` 的市值 ≤10B **且**覆蓋 ≤12 位（市值先正規化成 USD）。三態：邊緣／非邊緣／邊緣無法量（缺輸入不放行也不濾掉）。只決定候選板把它放哪一組（非邊緣進「非倍率候選」），**不排序、不給尺寸、不擋成交**。純函式 `alpha/edge.py`。
 *Avoid:* 把邊緣讀成「可以買」、為了讓可開非空調門檻
 
+### 候選狀態板（Candidate board）
+每一檔「現在是哪一種候選」的每日重算板（Phase 3 Step 3.6）。五組封閉字彙：**可開／缺 X／已定價等回落／不要／已持有**；另有四個附組：非倍率候選（非邊緣）、邊緣無法量、舊版（v1 敘事沒有候選狀態）、前提失效（宣告可開但每天重驗的前提破了），以及「無敘事 N」只計數不上板。宣告來自敘事，已持有來自 Sheet（alpha、股數 > 0），兩者不同時兩個都印。可開為零就零。APP `#/candidates`；推導 `alpha/providers/candidates.py`。
+*Avoid:* 排名、首選、「最值得買」、把組內順序讀成優先序（組內是 ticker 字母序）
+
 ### alpha 全歸零淨值少幾 %（Alpha wipe-out share）
 系統給的第三件事（D2）：alpha sleeve 全部歸零時淨值少幾 %。純呈現、零門檻；尺寸仍由使用者決定。alpha 格自 D1 起只觀測不設目標。
 它**就是 alpha 佔 NAV 的比例本身**（`beta` artifact 的 `risk.snapshot.alpha_total_weight`），不另算一份——

@@ -38,8 +38,10 @@ from risk.snapshot import build_portfolio_components
 
 __all__ = [
     "HardCapVerdict",
+    "beta_instrument_for",
     "check_trade_hard_caps",
     "gross_in_base_currency",
+    "is_beta_symbol",
 ]
 
 #: verdict 的封閉字彙。`blocked` 與 `unmeasurable` 對呼叫端都是「不放行」，分開是為了讓收據
@@ -102,12 +104,26 @@ def gross_in_base_currency(
     return float(gross) * rate, None
 
 
-def _instrument_for(symbol: str, beta_policy: Mapping[str, Any]) -> Mapping[str, Any] | None:
+def beta_instrument_for(symbol: str, beta_policy: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    """Sheet symbol → 它對到的 beta instrument（`beta_policy.json` 的 `sheet_aliases`）；不是 beta 回 None。
+
+    **alpha／beta 界線的唯一判別**（Phase 3 Step 3.6 匯出，使用者 2026-09-29 #17：只匯出、行為不變）：
+    硬擋用它決定哪條 cap 適用，候選板用它把 beta 持股排出「已持有」——兩邊是同一條線，不各抄一份（L16）。
+    """
     key = symbol.strip().upper()
     for instrument in beta_policy["instruments"]:
         if key in {str(alias).upper() for alias in instrument["sheet_aliases"]}:
             return instrument
     return None
+
+
+#: 舊名（模組內部原本的呼叫點）；匯出前後是同一個函式物件——行為不變的證據之一。
+_instrument_for = beta_instrument_for
+
+
+def is_beta_symbol(symbol: str, beta_policy: Mapping[str, Any] | None = None) -> bool:
+    """這個 Sheet symbol 是不是 beta instrument。`beta_policy` 沒給就讀 `config/beta_policy.json`。"""
+    return beta_instrument_for(symbol, beta_policy or load_beta_policy()) is not None
 
 
 def _held_value_for_symbol(rows: Sequence[Mapping[str, Any]], symbol: str) -> float:

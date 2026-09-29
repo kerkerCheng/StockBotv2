@@ -107,6 +107,54 @@ def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping
     return reasons
 
 
+#: 連結算「還活著」的 watch 狀態：在等（active）或已醒待判（fired，那是來源那一邊的事件，連結本身沒斷）。
+LIVE_LINK_STATUSES: frozenset[str] = frozenset({"active", "fired"})
+
+
+def link_breaks(briefs: Iterable[Any], *, watches: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """現行敘事的連結斷了哪幾條：`disproof[].link_source_ref` 已沒有 active／fired 的 watch（讀圖重讀收掉換新、
+    memo 換版、來源到期）。**唯一判定**——佇列段 `narrative_rewrite`、audit、心跳、候選推導都呼叫這裡
+    （Phase 3 Step 3.6，R2-a N1，plan 偏差 14）。`briefs`：各檔現行的 v2 敘事（`InvestorBrief`）。"""
+    live = {_src(w) for w in watches if w.get("status") in LIVE_LINK_STATUSES}
+    by_ref: dict[str, list[Mapping[str, Any]]] = {}
+    for w in watches:
+        by_ref.setdefault(_src(w), []).append(w)
+    out: list[dict[str, Any]] = []
+    for brief in briefs:
+        for index, item in enumerate(getattr(brief, "disproof", ()) or (), 1):
+            ref = getattr(item, "link_source_ref", None)
+            if ref and str(ref) not in live:
+                reason, label = link_break_reason(by_ref.get(str(ref)) or ())
+                out.append({"ticker": brief.ticker, "company_id": brief.company_id, "brief_id": brief.brief_id,
+                            "index": index, "link_source_ref": str(ref), "reason": reason, "label": label})
+    return out
+
+
+#: 連結為什麼斷（L12：「來源換版」「來源被判觸及」「來源到期未判」是三件事，下一步不同——前者換成新來源鍵，
+#: 後兩者是那條反證本身出事了，要先看來源那一邊的處置）。
+LINK_BREAK_REASONS: Mapping[str, str] = {
+    "touched": "來源被判觸及、未處置",
+    "expired": "來源到期未判",
+    "closed": "來源已收掉（讀圖重讀、memo 換版或處置完）",
+    "missing": "來源不存在",
+}
+
+
+def link_break_reason(same_ref: Sequence[Mapping[str, Any]]) -> tuple[str, str]:
+    """同一個來源鍵的 watch（都不是 active／fired）→ 為什麼斷。取最後登記的那一筆。"""
+    if not same_ref:
+        return "missing", LINK_BREAK_REASONS["missing"]
+    w = same_ref[-1]
+    judgment = w.get("judgment") or {}
+    if w.get("status") == "consumed" and judgment.get("touches") == "yes" and not judgment.get("handled"):
+        key = "touched"
+    elif w.get("status") == "expired" and not w.get("expiry_resolution"):
+        key = "expired"
+    else:
+        key = "closed"
+    return key, LINK_BREAK_REASONS[key]
+
+
 def settle_due(data: dict[str, Any], company_id: str, *, brief_ids: Iterable[str], today: date) -> list[str]:
     """本公司敘事來源的 watch 做 daily 會做的時間轉換：已過 `expires` 的 active → expired（`mark_expired` 同一條），
     date 型已到 `until` 的 active → fired（`check_dates` 同一條）。回傳這一次轉換的 id。
@@ -205,5 +253,6 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
     return summary
 
 
-__all__ = ["attributed_watches", "blocking_for_open", "narrative_watches_of", "pending_rewrite",
-           "register_brief_watches", "settle_due", "thesis_memos"]
+__all__ = ["LINK_BREAK_REASONS", "LIVE_LINK_STATUSES", "attributed_watches", "blocking_for_open", "link_break_reason",
+           "link_breaks", "narrative_watches_of",
+           "pending_rewrite", "register_brief_watches", "settle_due", "thesis_memos"]

@@ -81,6 +81,17 @@ def world(monkeypatch: pytest.MonkeyPatch, tmp_path):
     monkeypatch.setattr(sources, "hypotheses", lambda: state["hypotheses"])
     monkeypatch.setattr(sources, "thesis_lifecycle", lifecycle)
     monkeypatch.setattr(sources, "reading_ledgers", ledgers)
+    # Phase 3 Step 3.6：敘事（現行 v2 與 ledger）與候選板 artifact 一律注入——不得讀到真實私有資料。
+    state.update(briefs=[], brief_ledgers={}, board=None)
+    monkeypatch.setattr(sources, "current_briefs", lambda: state["briefs"])
+    monkeypatch.setattr(sources, "brief_ledgers", lambda: state["brief_ledgers"])
+
+    def board():
+        if state["board"] is None:
+            raise SourceUnavailable("候選板 artifact 讀不到（測試夾具）")
+        return state["board"]
+
+    monkeypatch.setattr(sources, "candidates_artifact", board)
     monkeypatch.setattr(checks, "ROOT", tmp_path)
     (tmp_path / "thesis").mkdir()
     (tmp_path / MEMO).write_text(f"# x\n\n## 什麼會推翻它\n\n- {COND_1}\n- {COND_2}\n", encoding="utf-8")

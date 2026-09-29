@@ -77,7 +77,8 @@ class WriteContext:
 
     def __init__(self, *, today: Any, reading_rows: Sequence[Mapping[str, Any]],
                  readings_by_id: Mapping[str, Any], three_questions: Mapping[str, Any] | None,
-                 watches: dict[str, Any], lifecycle: Mapping[str, Any] | None, registry: Any = None) -> None:
+                 watches: dict[str, Any], lifecycle: Mapping[str, Any] | None, registry: Any = None,
+                 three_questions_reload: Any = None) -> None:
         self.today = today
         self.reading_rows = list(reading_rows)
         self.readings_by_id = dict(readings_by_id)
@@ -85,6 +86,9 @@ class WriteContext:
         self.watches = watches
         self.lifecycle = lifecycle
         self.registry = registry
+        #: `history_not_comparable` → 重算三題（R2-a N3：敘事宣告「歷史不可比」時，驗 unmeasurable 要用宣告後的
+        #: 稽核區，否則自家歷史那一行有值、宣告了反而被拒收）。測試注入時為 None＝不重算。
+        self.three_questions_reload = three_questions_reload
 
     @classmethod
     def load(cls, ticker: str, *, today: Any = None) -> "WriteContext":
@@ -109,8 +113,16 @@ class WriteContext:
             tq = three_questions_for(ticker, today=today, wipeout=None, wipeout_reason="（寫入端只看已定價與出現在數字裡）")
         except Exception:  # noqa: BLE001 — 讀不到三題時 answers 的 unmeasurable 檢查會 fail closed
             tq = None
+        def reload(history_not_comparable: Mapping[str, Any]) -> Mapping[str, Any] | None:
+            try:
+                return three_questions_for(ticker, today=today, wipeout=None,
+                                           wipeout_reason="（寫入端只看已定價與出現在數字裡）",
+                                           history_not_comparable=history_not_comparable)
+            except Exception:  # noqa: BLE001 — 讀不到就讓 unmeasurable 的檢查 fail closed
+                return None
+
         return cls(today=today, reading_rows=rows, readings_by_id=readings, three_questions=tq, watches=watches,
-                   lifecycle=load_lifecycle())
+                   lifecycle=load_lifecycle(), three_questions_reload=reload)
 
 
 def _registry(ctx: WriteContext) -> Any:
@@ -260,6 +272,8 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     brief_ids = [r.brief_id for r in existing] + [parsed.brief_id]
     # R2-a C4：先做 daily 會做的時間轉換（已過到期→expired、date 已到→fired），再判——否則換版會吞掉「到期未判」。
     settle_due(ctx.watches, parsed.company_id, brief_ids=brief_ids, today=ctx.today)
+    if parsed.history_not_comparable is not None and ctx.three_questions_reload is not None:
+        ctx.three_questions = ctx.three_questions_reload(parsed.history_not_comparable.as_dict())
     if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted:
         problems = v2_write_problems(parsed, ctx=ctx, existing=existing)
         if problems:

@@ -569,7 +569,20 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 **state artifact（2026-09-08，呈現責任重切 B1）：** per-ticker 的 Analyst View 之外，多了**跨標的的 state**
 （`library/private/app/state/<kind>.json`；`webapp/contracts.py::STATE_SCHEMA_VERSIONS` 是封閉的 kind 字彙，
 2026-09-26 起是 `structure_table`／`beta`／`graph_walk`／`watches`／`positions`／`structure_readings`／`account_scorecard`（`coverage` → `graph_walk`，Phase 2 Step 2.6；`structure_readings` 的頁 `#/structure-readings` 於 Step 2.7 上線，每一列帶引用原文與反證登記的 watch id）；
-`ranking`／`basket`／`multi_year` 已於 Phase 0 退役，查證 `python -m webapp status`）。`python -m webapp materialize --structure-table`
+`ranking`／`basket`／`multi_year` 已於 Phase 0 退役；2026-09-29 Phase 3 Step 3.6 加 `candidates`，共 8 個，查證 `python -m webapp status`）。
+**`candidates` kind（候選狀態板）：** 字彙與純函式（三個字、滯留、已持有索引、整板組裝、rollup）住零 I/O 的 `alpha/candidates.py`——
+心跳與 APP 的 fake payload 只 import 它，不經 `alpha.providers`（那會把 Neo4j／Engine C／yfinance 載進來）；推導住 `alpha/providers/candidates.py`（候選板、心跳、個股頁、成交收據共用一個函式），
+持股身分解析住 `portfolio/holdings.py`（`engine_b/cli.py::_held` 也呼叫它，但保留自己的語意：全部持股、含 beta、Sheet 讀不到 fail closed）；
+alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is_beta_symbol`（與硬擋同一條線）。每列回
+`{declared, derived, preconditions[], edge, held_source, …}`：已持有（Sheet、alpha、股數 > 0）優先；非邊緣進「非倍率候選」、
+邊緣無法量另一組；宣告可開每天重驗四個前提（騎的讀圖仍現行且是護城河／量、answers 的稽核行沒變全缺席、歸屬本檔的 watch 沒有待判、
+連結的反證來源仍在盯），破了進「前提失效」。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
+到期未判，L12）、敘事來源 watch 醒來／觸及／到期未判（plan §5 第 6 點）、缺 X／等回落在等的 watch 已失效。「連結斷了」的唯一判定是
+`engine_b/narrative_watches.py::link_breaks`，佇列段 `narrative_rewrite`（經 `observe(narrative_link_breaks=…)` 注入）、audit
+（QueueSegments、QueueLiveness 的兩週滯留）、心跳段 3 共用；audit 的 rewrite 類「有去處」另查候選板該檔列帶著那筆 watch
+（只查 artifact 產生之前就該重寫的，讀不到 artifact 記成「沒檢查」）。artifact 另帶宇宙每一檔的 rollup：逐行有值／依 kind 的缺席
+（沿用 `alpha.three_questions.rollup`）、燈的**盞數**（紅／黃／綠／**灰＝沒量到**，灰依 kind 分）與有紅燈的檔、讀不到的檔與理由——
+心跳段 2 與段 4 只讀這一份（⚠ 不取「每檔最差色」：一綠三灰會被算成綠）。**組內按 ticker 字母，不排序、不打分、不給尺寸。**`python -m webapp materialize --structure-table`
 走與 `python -m query.bottleneck` **同一條路**（同一個 driver、`fetch_assertions`、registry），把 `structure_table()` 的逐邊事實
 **照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。
 （2026-09-08 至 09-23 之間這裡是 `ranking` kind：兩份排序＋`top_pick`；隨 G1 退役，見 plan §0.6 #40。）
@@ -711,7 +724,7 @@ APP：briefCard → argumentCard → priceCard → drill「稽核」→ drill「
 | 市場承認了嗎（V2） | `alpha/gap_closure.py` → `expectation_gap.gap_closure`／`consensus_series` | 共識自判斷日以來朝我們移了幾成；起點等於我們的值時 None 不是 0；量測不是訊號。⚠ 2026-09-23：「朝我們移了幾成」的分母（內部 EPS）已退役，`closed_fraction` 恆 `None`（不是 0）；只量共識自判斷日以來的移動 |
 | ~~目標價比較（V2）~~ | ~~`implied_return.target_reached`~~ | 2026-09-23 隨估值鏈退役（C 組） |
 | 兌現出口（V2b） | `thesis/pending_lifecycle.py::ALLOWED_TRANSITIONS`＋`lifecycle_schedule.is_due` | `realized`：active／watch → realized → retired／revised；恆視為到期。進入由人提案（thesis mutation gate），`target_reached` 只提醒 |
-| ~~籃子（V3）~~ | ~~`webapp/basket.py`~~ | 2026-09-22／23 Phase 0 退役（G1）；Phase 3 以候選狀態板回來 |
+| ~~籃子（V3）~~ | ~~`webapp/basket.py`~~ | 2026-09-22／23 Phase 0 退役（G1）；2026-09-29 Phase 3 Step 3.6 由候選狀態板（`candidates` kind）接手——不是籃子改名：沒有 filter 分數、沒有首選 |
 
 ⚠ 2026-09-16 D3：`realized` **降為提醒，不觸發出場**——出場只認反證；lifecycle 字彙不動，改的是它的後果（ROADMAP Phase 5）。
 

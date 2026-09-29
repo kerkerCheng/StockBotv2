@@ -16,7 +16,7 @@ description: >
 > 方向是「圖是中心」（決定紀錄 [`2026-09-22-graph-first-direction-decision.md`](../../docs/brainstorms/2026-09-22-graph-first-direction-decision.md) G1–G12）：
 > **跨檔排序與首選已於 Phase 0 退役**——它們讓研究火力去補格子過 filter（L19）。
 > 取代它們的是：pane 1 印**結構表**（哪條邊薄、走不走得到需求錨）與**候選狀態板**
-> （五值封閉字彙，Phase 3 落地；在那之前印「未落地」）；追蹤表主統計量是三個 power-law
+> （五值封閉字彙，2026-09-29 Phase 3 Step 3.6 落地：APP `#/candidates`）；追蹤表主統計量是三個 power-law
 > 統計量（D15，已落地）；alpha 格只觀測不設目標（D1）。
 
 ## 定位一句話
@@ -43,14 +43,14 @@ description: >
 | 結構長什麼樣（哪條邊薄、走不走得到錨） | `query/bottleneck.py` 的逐邊 rows | `python -m query.bottleneck` |
 | 哪裡是空白、該去研究的洞 | `query/graph_walk.py`（第 7／8 型沿用 `query/coverage_gaps.py` 的分桶） | `python -m query.graph_walk` |
 | 覆蓋厚薄（市值／分析師家數） | Engine C `financial_snapshots`／`consensus_coverage_observations` | 見 §pane 1 |
-| 候選狀態（可開／缺 X／已定價等回落／不要／已持有） | narrative ledger 的 `candidate_state` | **Phase 3 才落地；在那之前印「未落地」** |
+| 候選狀態（可開／缺 X／已定價等回落／不要／已持有） | `alpha/providers/candidates.py` 的推導（敘事 `candidate_state` × Sheet 持有 × 前提每天重驗），`candidates` state artifact | APP `#/candidates`／`python -m webapp materialize --candidates`／心跳段 2 |
 | 部位與計數器 | APP 的 `positions` state artifact | `python -m webapp status`／`python -m crons.heartbeat` 段 4 |
 | 注意力佇列現況 | `engine_b/priority.py` 的分類 | `python -m engine_b.cli drain` |
 
 ⚠ **這張表 2026-09-22 少了兩列**：「現在能投什麼」（可行動排序）與「股價已經定價了什麼」
 （`alpha_expectation_gap.py`）。前者是跨檔排序、後者是估值鏈，兩者都在 Phase 0 退役。
 **沒有等價替代品**：「該買誰」改由人讀敘事決定，「已定價嗎」改由財務三題的第二題回答
-（主參照是自己的歷史、不設門檻，Phase 3 落地）。
+（主參照是自己的歷史、不設門檻；2026-09-29 Phase 3 Step 3.3 落地，稽核區在個股頁）。
 
 ---
 
@@ -83,10 +83,13 @@ description: >
 2026-09-23 起**沒有門檻**——`substitutability` 未填或很低的邊都在表上，各自帶著自己的值）。
 **照抄順序即可，不得宣稱那是優先序**；`demand_anchor` 為空的列不是候選，但要列出來並說明。
 
-**(b) 候選狀態板** — 封閉字彙五值：可開／缺 X／已定價等回落／不要／已持有。
-**Phase 3 才落地**；在那之前這一塊照實印「候選狀態板未落地（`not_yet_recorded`）」，
-**不得用結構表的前幾名冒充它**。「可開」是每檔各自過的 filter 不是分數，可同時多檔；
-**可開為零就零，不得為了非空放寬條件**。
+**(b) 候選狀態板** — 封閉字彙五值：可開／缺 X／已定價等回落／不要／已持有，外加四個附組
+（非倍率候選／邊緣無法量／舊版／前提失效）與「無敘事 N」。**照抄 `candidates` state artifact**
+（`python -m webapp materialize --candidates` 產生；APP `#/candidates`）：各組檔數**0 也印**、組內按 ticker 字母、
+缺 X／等回落／可開各印最老滯留天數；每列的「敘事宣告」與「推導結果」不同時兩個都寫（例：宣告缺 X、Sheet 持有 → 已持有）。
+**不得用結構表的前幾名冒充它**。「可開」是每檔各自過的前提不是分數，可同時多檔；
+**可開為零就零，不得為了非空放寬條件**——讓它非空的路是研究。artifact 讀不到就照實寫
+「候選板讀不到（`upstream_unavailable`）」；持股讀不到時已持有組印「未驗」，不得寫成 0。
 
 覆蓋厚薄（市值／分析師家數）補在結構表旁邊：
 

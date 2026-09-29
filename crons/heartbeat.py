@@ -76,6 +76,12 @@ if str(ROOT) not in sys.path:
 
 from alpha.absence import check_absence_kind  # noqa: E402
 from query.graph_walk import QUESTION_TYPES as WALK_QUESTION_TYPES  # noqa: E402
+# 候選板字彙取自零 I/O 的核心模組（不經 `alpha.providers`——那會在 import 期載入 Neo4j／Engine C／yfinance，
+# 心跳的「某一格壞了其餘照發」在 import 期就失效；2026-09-29 3.6 審查）。
+from alpha.candidates import GROUP_LABELS as CANDIDATE_GROUP_LABELS  # noqa: E402
+from alpha.candidates import GROUPS as CANDIDATE_GROUPS  # noqa: E402
+from alpha.candidates import SIDE_GROUPS as CANDIDATE_SIDE_GROUPS  # noqa: E402
+from alpha.candidates import SIDE_LABELS as CANDIDATE_SIDE_LABELS  # noqa: E402
 
 #: 段序是封閉字彙：**五段，不多不少**。ARCHITECTURE §4.1 是它的規格來源。
 SECTION_TITLES: tuple[str, ...] = (
@@ -598,24 +604,57 @@ def _app_freshness_line(*, now: datetime, state_dir: Path | None) -> str:
 # 段 2｜變了什麼
 # ---------------------------------------------------------------------------
 
-#: 候選狀態板（Phase 3）還沒落地時，心跳用這一句宣告缺席。**kind 由產生缺席的程式自己宣告**
-#: （L16），不由 renderer 猜；`not_yet_recorded` 是刻意的選擇——它**不是** settled，所以這一格
-#: 會一直算成待辦、一直印出來，直到 Phase 3 真的把候選板做出來（L14：常駐計數器）。
-_PRICED_IN_ABSENCE = Absence(
-    "not_yet_recorded",
-    "目標倍數背離計數器已於 2026-09-23 隨估值鏈退役；「已定價嗎」由 Phase 3 財務三題回答，主參照是自己的歷史、不設門檻",
-)
-_CANDIDATE_BOARD_ABSENCE = Absence(
-    "not_yet_recorded",
-    "籃子 filter、目標價與多年視角已於 Phase 0 退役；接手的候選狀態板要到 Phase 3 才落地")
+#: ⚠ 2026-09-29（Phase 3 Step 3.6）：`_PRICED_IN_ABSENCE`／`_CANDIDATE_BOARD_ABSENCE`／`_WIPEOUT_ROLLUP_ABSENCE`
+#: 三個缺席宣告退役——候選狀態板（`candidates` artifact）落地，它們宣告缺席的那三格改讀它：
+#: 段 2 的候選各組檔數＋最老滯留、三題有值／缺席計數；段 4 的歸零旗標彙總。artifact 讀不到時照樣具名缺席
+#: （`upstream_unavailable`，由 `_load_state` 宣告），不是整行消失。
 
 #: 讀圖單位的短名（鍵＝`alpha.structure_reading.READING_UNITS`，測試守相等；L16）。
 _UNIT_LABEL: dict[str, str] = {"layer": "層", "socket": "插槽"}
 
-#: 歸零旗標的**彙總**計數暫停（逐檔的燈沒停，見個股頁 wipeout 面板）。
-_WIPEOUT_ROLLUP_ABSENCE = Absence(
-    "upstream_unavailable",
-    "四盞燈的彙總原本由籃子 artifact 產生，籃子已退役；Phase 3 候選板接手前沒有上游")
+
+
+def _candidate_lines(state_dir: Path | None) -> list[str]:
+    """段 2：候選各組檔數（**0 也印**、最老滯留逐狀態各印）＋持股讀不到／解析不到＋三題有值與缺席計數。
+    只讀 `candidates` artifact（零網路；推導在 materialize）。**只數，不下結論**：三題那一行不得讀成「幾檔已定價」。"""
+    board, absence = _load_state(state_dir, "candidates")
+    if absence is not None:
+        return [f"候選板：{absence.reason}（{absence.kind}）",
+                f"三題：{absence.reason}（{absence.kind}）"]
+    counts = board.get("counts") or {}
+    oldest = board.get("oldest_stall_days") or {}
+
+    def aged(key: str) -> str:
+        n, d = counts.get(key, 0), oldest.get(key)
+        return f"{n}（最老 {d} 天）" if n and d is not None else f"{n}"
+
+    held = "未驗（持股未讀到）" if counts.get("held") is None else str(counts.get("held"))
+    lines = [f"候選：可開 {aged('open')}｜缺 X {aged('missing')}｜等回落 {aged('priced_wait')}｜不要 {counts.get('pass', 0)}"
+             f"｜已持有 {held}｜非倍率候選 {counts.get('not_multiple', 0)}｜邊緣無法量 {counts.get('edge_unmeasurable', 0)}"
+             f"｜舊版 {counts.get('legacy', 0)}｜前提失效 {counts.get('precondition_failed', 0)}"
+             f"｜無敘事 {counts.get('no_narrative', 0)}"]
+    holdings = board.get("holdings") or {}
+    if holdings.get("status") != "ok":
+        lines.append(f"  持股未讀到，已持有判定暫停（upstream_unavailable）：{holdings.get('reason')}")
+    elif holdings.get("unresolved"):
+        unresolved = list(holdings.get("unresolved") or ())
+        lines.append(f"  持股解析不到 {len(unresolved)}：{'、'.join(unresolved[:5])}（不猜；要不要登記是 identity 的決定）")
+    ledger = board.get("ledger") or {}
+    if ledger and not ledger.get("present"):
+        lines.append("  敘事 ledger 目錄不存在（upstream_unavailable）——「無敘事」是讀不到，不是真的沒有")
+    elif ledger.get("parse_errors"):
+        lines.append(f"  敘事 ledger 有 {ledger['parse_errors']} 行解析不了（那幾份宣告沒進板）："
+                     + "；".join(str(e) for e in (ledger.get("parse_error_examples") or [])[:2]))
+    roll = board.get("rollup") or {}
+    own, nums, wipe = roll.get("priced_in_own") or {}, roll.get("in_numbers") or {}, roll.get("wipeout") or {}
+    not_read = (roll.get("not_read") or {}).get("n") or 0
+    lines.append(f"三題（{roll.get('universe', '?')} 檔）：已定價① 有值 {own.get('valued', '?')}／缺席 {own.get('absent_total', '?')}"
+                 f"｜出現在數字裡 有值 {nums.get('valued', '?')}／缺席 {nums.get('absent_total', '?')}"
+                 f"｜會死嗎 四盞非灰 {wipe.get('all_four_non_grey', '?')}"
+                 + (f"｜**讀不到 {not_read} 檔**" if not_read else "")
+                 + "　←只數有值與缺席，不是結論")
+    return lines
+
 
 
 def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
@@ -651,11 +690,12 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
     section.lines.append(_thesis_line(now=now, thesis_path=thesis_path))
 
     # ⚠ 2026-09-22（Phase 0 Step 0a.2）：原本這裡印「現價已高於目標價」，讀的是籃子 artifact
-    # 的 `price_above_target`。目標價與籃子 filter 一起退役（ROADMAP Phase 0／G3），接手的是
-    # Phase 3 的候選狀態板。**這一行不得整段消失**：拿掉的內容換成一行缺席宣告，因為五段永遠
-    # 出現，而「這一格沒有了」與「這一格是 0」是相反的結論（INV-3）。
-    section.lines.append(
-        f"候選狀態板未落地（{_CANDIDATE_BOARD_ABSENCE.kind}）：{_CANDIDATE_BOARD_ABSENCE.reason}")
+    # 的 `price_above_target`。目標價與籃子 filter 一起退役（ROADMAP Phase 0／G3）。
+    # 2026-09-29（Phase 3 Step 3.6）：接手的候選狀態板落地——各組檔數與最老滯留（AGENTS「每個候選狀態的檔數與
+    # 最老滯留天數」）；一個全域最老值會被「不要」長期霸占，所以逐狀態各印。
+    candidate_lines = _candidate_lines(state_dir)
+    section.lines.append(candidate_lines[0])
+    section.lines.extend(line for line in candidate_lines[1:-1])
 
     # 結構讀圖（Q5，2026-09-17）：讓它**不可能安靜腐壞**。心跳只讀已 materialize 的比對結果，
     # 不查圖、不重新推理——重讀是研究，只在互動 session（D12）。
@@ -696,10 +736,8 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
                     + "——thesis 要不要改由人決定，系統只標記")
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原本這裡印「目標倍數背離 N 檔」（估值假設 ledger 的
-    # target_pe 對今天的市場倍數）。目標倍數隨估值鏈退役，接手的是財務三題的「已定價嗎」（Phase 3）。
-    # **這一行不得整段消失**：換成缺席宣告（INV-3），三題落地後由它們的計數器取代。
-    section.lines.append(
-        f"已定價嗎（財務三題）未落地（{_PRICED_IN_ABSENCE.kind}）：{_PRICED_IN_ABSENCE.reason}")
+    # target_pe 對今天的市場倍數）。目標倍數隨估值鏈退役；2026-09-29（Step 3.6）起由三題的有值／缺席計數取代。
+    section.lines.append(candidate_lines[-1])
 
     beta, beta_absence = _load_state(state_dir, "beta")
     if beta_absence is not None:
@@ -892,9 +930,18 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     walk, walk_absence = _load_state(state_dir, "graph_walk")
     walk_questions = list(walk.get("questions") or ()) if walk_absence is None else []
     holes = None if walk_absence is not None else qs.graph_holes_count(walk_questions)
+    # Phase 3 Step 3.6：敘事連結的反證來源已換版也是 narrative_rewrite 的工作（與 audit、候選推導同一個判定）。
+    # 讀的是本機 ledger 與 registry（零網路）；讀不到只少這一格的注入，不帶走整段。
+    try:
+        from engine_b.disproof import current_briefs
+        from engine_b.narrative_watches import link_breaks
+
+        breaks = link_breaks(current_briefs(), watches=watches)
+    except Exception:  # noqa: BLE001
+        breaks = []
     observation = qs.observe(
         leads=leads, watches=watches, todo_items=todo_items,
-        forward_view_backlog=None, graph_holes=holes,
+        forward_view_backlog=None, graph_holes=holes, narrative_link_breaks=breaks,
     )
     counts = {seg["key"]: seg["count"] for seg in observation["segments"]}
 
@@ -949,6 +996,14 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # consumer 是 research-drain（互動），不是 `engine_b.cli drain`，所以不加進 pq1 的數；但它是研究工作，
     # 不印在這裡會讓上一行的 0 被讀成「沒事做」。原本的「＋結構讀圖待重讀 N」由第 4 型承載。
     section.lines.append(_graph_walk_line(walk_questions, walk_absence))
+    # 敘事該重寫（Phase 3 Step 3.4／3.6）：敘事來源 watch 醒來／觸及／到期未判＋敘事連結的反證來源已不在盯。
+    # 研究工作（consumer＝research-drain），不加進 pq1；**0 也印**——不印會讓它安靜積著（L14）。
+    rewrite = next((seg for seg in observation["segments"] if seg["key"] == "narrative_rewrite"), None)
+    if rewrite is not None:
+        section.lines.append(
+            f"敘事該重寫 {'未讀到' if rewrite['count'] is None else rewrite['count']}"
+            f"（其中連結斷 {len(breaks)}）"
+            + (("：" + "、".join(str(e) for e in rewrite.get("examples") or ())) if rewrite.get("examples") else ""))
 
     # ⚠ 「球在使用者手上」有 SSOT——`engine_b.todo.actionable_items()`（它已經處理了
     # `waiting_on`＝等事件、已 dispatch 的 pq1 job 不重複詢問這兩種情形）。
@@ -1207,17 +1262,34 @@ def build_positions(*, state_dir: Path | None) -> Section:
             )
 
     # ⚠ 2026-09-22（Phase 0 Step 0a.2）：這裡原本有四行，全部讀籃子／多年視角 artifact——
-    # 賭注帳（Q2）、量的候選（Q1）、要幾倍（Step 7.4）、歸零旗標彙總。前三個機制退役
-    # （ROADMAP Phase 0／G3），第四個是**活的量測**但它唯一的 producer 是籃子 artifact，
-    # 所以彙總跟著暫停到 Phase 3 候選板接手；**逐檔那盞燈沒有停**，它住在個股頁的
-    # `wipeout` 面板（0b.1 明列為核心面板），APP 首屏照亮。
-    # 兩行都是明示缺席而不是整段消失：不印，與印 0，導向相反的行動（INV-3、L14）。
-    section.lines.append(
-        f"賭注帳／量的候選／要幾倍：{_CANDIDATE_BOARD_ABSENCE.reason}"
-        f"（{_CANDIDATE_BOARD_ABSENCE.kind}）")
-    section.lines.append(
-        f"歸零旗標彙總：{_WIPEOUT_ROLLUP_ABSENCE.reason}（{_WIPEOUT_ROLLUP_ABSENCE.kind}）"
-        "　←逐檔那盞燈仍在個股頁，停的只有這個彙總計數")
+    # 賭注帳（Q2）、量的候選（Q1）、要幾倍（Step 7.4）、歸零旗標彙總。
+    # 2026-09-29（Phase 3 Step 3.6）：「賭注帳／量的候選／要幾倍」那一行**刪除**——三個機制都已退役
+    # （賭注帳＝估值鏈的賭注 overlay、量的候選＝籃子 filter、要幾倍＝多年反向橋；ROADMAP Phase 0／G1、G3），
+    # 接手它們位置的候選狀態板印在段 2，不在這裡再印一次。歸零旗標彙總改讀候選板 artifact 的 rollup。
+    board, board_absence = _load_state(state_dir, "candidates")
+    if board_absence is not None:
+        section.lines.append(f"歸零旗標彙總：{board_absence.reason}（{board_absence.kind}）"
+                             "　←逐檔那盞燈仍在個股頁，停的只有這個彙總計數")
+    else:
+        # 歸零旗標帳（ARCHITECTURE §4.1 段 4）：**盞數與有紅燈的檔數分開**——「一檔亮四盞」與「四檔各亮一盞」
+        # 是兩件事；⚠ 灰＝沒量到，不是綠，灰依 kind 分開印（缺席不得壓成一種）。取每檔「最差色」會把灰吞掉
+        # （一綠三灰算成綠），2026-09-29 3.6 審查抓到後改回這個形狀。
+        roll = board.get("rollup") or {}
+        wipe = roll.get("wipeout") or {}
+        lamps = wipe.get("lamps") or {}
+        kinds = wipe.get("unlit_by_kind") or {}
+        line = (f"歸零旗標 {wipe.get('companies', '?')} 檔 × 4 盞：紅 {lamps.get('red', '?')}｜黃 {lamps.get('amber', '?')}"
+                f"｜綠 {lamps.get('green', '?')}｜**灰（沒量到）{lamps.get('unlit', '?')}**"
+                + (f"（{'、'.join(f'{k} {v}' for k, v in kinds.items())}）" if kinds else "")
+                + "——⚠ 灰不是綠")
+        red = list(wipe.get("red_tickers") or ())
+        if red:
+            line += "；有紅燈 " + str(len(red)) + " 檔：" + "、".join(red[:8]) + ("…" if len(red) > 8 else "")
+        section.lines.append(line)
+        not_read = (roll.get("not_read") or {}).get("tickers") or []
+        if not_read:
+            section.lines.append(f"歸零旗標讀不到 {len(not_read)} 檔：" + "、".join(not_read[:8])
+                                 + ("…" if len(not_read) > 8 else "") + "（理由在候選板 artifact 的 rollup.not_read）")
 
     # ⚠ 2026-09-23（Step 0b.3）：原本讀 `ranking` kind 的可行動排序列；跨檔排序退役後改讀 `structure_table`
     # 的逐邊列（含未填與低分的邊）。這一行量的是**相關性**（N 檔不等於 N 個獨立機會），不是排序。
@@ -1389,6 +1461,10 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "prescreen.no_text": "預篩無全文", "prescreen.no_fetcher": "預篩無 fetcher",
     "health.red": "健康紅燈", "invariants.fail": "invariants FAIL",
     **{f"tier.{t}": f"帳號 {t}" for t in SCORECARD_TIERS},
+    # 候選板（Phase 3 Step 3.6）：每一組一鍵——由候選推導的封閉字彙導出，不抄一份（L16）。
+    **{f"candidate.{g}": f"候選 {CANDIDATE_GROUP_LABELS[g]}" for g in CANDIDATE_GROUPS},
+    **{f"candidate.{g}": f"候選 {CANDIDATE_SIDE_LABELS[g]}" for g in CANDIDATE_SIDE_GROUPS},
+    "candidate.no_narrative": "候選 無敘事",
 }
 #: 較昨變動一行最多列幾項（其餘寫「另 N 項」）。
 DIFF_LIMIT = 12
@@ -1487,7 +1563,15 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         counts = card.get("tier_counts") or {}
         return {f"tier.{t}": counts.get(t) for t in SCORECARD_TIERS}
 
-    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, prescreen, captures, tiers):
+    def candidates() -> dict[str, Any]:
+        board, absence = _load_state(state_dir, "candidates")
+        if absence is not None:
+            return {}
+        counts = board.get("counts") or {}
+        return {f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")}
+
+    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, prescreen, captures, tiers,
+               candidates):
         guard(fn)
     return values
 
@@ -1518,13 +1602,19 @@ def snapshot_diff_lines(current: Mapping[str, Any], previous: Mapping[str, Any] 
     def fmt(value: Any) -> str:
         return "未讀到" if value is None else str(value)
 
-    changed = [(k, previous.get(k), current.get(k)) for k in SNAPSHOT_KEYS if previous.get(k) != current.get(k)]
-    same = len(SNAPSHOT_KEYS) - len(changed)
+    # 新鍵（上一份快照裡根本沒有這個鍵）＝**首日**，不是「未讀到→N」的變動（Phase 3 Step 3.6，L11-6 ④）：
+    # 把它算成變動，新增一組鍵的那天較昨會被灌滿、真正的變動被擠到「另 N 項」。
+    first_day = [k for k in SNAPSHOT_KEYS if k not in previous]
+    changed = [(k, previous.get(k), current.get(k)) for k in SNAPSHOT_KEYS
+               if k in previous and previous.get(k) != current.get(k)]
+    same = len(SNAPSHOT_KEYS) - len(changed) - len(first_day)
+    tail = f"｜首日 {len(first_day)} 項（今天起比對：{'、'.join(SNAPSHOT_KEYS[k] for k in first_day[:4])}" \
+           f"{'…' if len(first_day) > 4 else ''}）" if first_day else ""
     if not changed:
-        return [f"{label}變動 0（{same} 項都相同）"]
+        return [f"{label}變動 0（{same} 項都相同）{tail}"]
     shown = "、".join(f"{SNAPSHOT_KEYS[k]} {fmt(a)}→{fmt(b)}" for k, a, b in changed[:DIFF_LIMIT])
     more = f"…另 {len(changed) - DIFF_LIMIT} 項" if len(changed) > DIFF_LIMIT else ""
-    return [f"**{label}變動 {len(changed)} 項**：{shown}{more}｜其餘 {same} 項相同"]
+    return [f"**{label}變動 {len(changed)} 項**：{shown}{more}｜其餘 {same} 項相同{tail}"]
 
 
 def write_snapshot(snapshot_dir: Path, *, today: date, now: datetime, values: Mapping[str, Any]) -> Path:

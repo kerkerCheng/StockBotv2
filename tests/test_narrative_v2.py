@@ -200,6 +200,22 @@ def test_unmeasurable_only_when_the_audit_lines_are_all_absent(tmp_path: Path) -
     _write(tmp_path, rec, _ctx(tq=all_absent))
 
 
+def test_declared_history_not_comparable_is_what_the_writer_checks_unmeasurable_against(tmp_path: Path) -> None:
+    """R2-a N3（Step 3.6 接上）：宣告「歷史不可比」→ 寫入端用宣告後重算的三題驗 unmeasurable。"""
+    rec = _record(answers={"priced_in": "unmeasurable", "in_numbers": "yes"},
+                  history_not_comparable={"since": "2026-01-01", "reason": "剛轉型：營收結構換了", "source": "self"})
+    plain = _ctx()                                                    # 自家歷史那一行有值、沒有重算 → 拒收
+    with pytest.raises(ContractViolation, match="量得到就要答"):
+        _write(tmp_path, rec, plain)
+    seen = []
+    declared = _ctx()
+    declared.three_questions_reload = lambda hnc: (seen.append(hnc), _tq(
+        own_history_pctile="insufficient_evidence", cohort_median="not_yet_recorded",
+        rel_return_30d="not_yet_recorded", rel_return_90d="not_yet_recorded"))[1]
+    _write(tmp_path, rec, declared)
+    assert seen and seen[0]["since"] == "2026-01-01"
+
+
 def test_missing_must_point_at_this_companys_active_wake_brief_watch(tmp_path: Path) -> None:
     ctx = _ctx()
     mine = _wake_brief(ctx)

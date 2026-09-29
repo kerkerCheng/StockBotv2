@@ -36,6 +36,26 @@ def test_first_day_says_there_is_no_previous_snapshot() -> None:
     assert lines == ["較昨變動：尚無上一份快照（第一次產生；之後每天逐項比對，只印變了的）"]
 
 
+def test_new_keys_are_first_day_not_changes() -> None:
+    """Phase 3 Step 3.6（L11-6 ④）：上一份快照根本沒有的鍵＝首日，不得算成「未讀到→N」的變動。"""
+    new_keys = [k for k in hb.SNAPSHOT_KEYS if k.startswith("candidate.")]
+    before = {k: 1 for k in hb.SNAPSHOT_KEYS if k not in new_keys}
+    after = dict({k: 1 for k in hb.SNAPSHOT_KEYS}, **{"pq2.actionable": 3})
+    yesterday = (TODAY - timedelta(days=1)).isoformat()
+    line = hb.snapshot_diff_lines(after, before, previous_date=yesterday, today=TODAY)[0]
+    assert line.startswith("**較昨變動 1 項**") and "pq2 球在你 1→3" in line
+    assert f"首日 {len(new_keys)} 項" in line and "未讀到→" not in line
+    quiet = hb.snapshot_diff_lines({k: 1 for k in hb.SNAPSHOT_KEYS}, before, previous_date=yesterday, today=TODAY)[0]
+    assert quiet.startswith("較昨變動 0") and f"首日 {len(new_keys)} 項" in quiet
+
+
+def test_candidate_snapshot_keys_come_from_the_candidate_vocabulary() -> None:
+    from alpha.providers.candidates import GROUPS, SIDE_GROUPS
+
+    keys = [k for k in hb.SNAPSHOT_KEYS if k.startswith("candidate.")]
+    assert keys == [f"candidate.{g}" for g in (*GROUPS, *SIDE_GROUPS)] + ["candidate.no_narrative"]
+
+
 def test_diff_prints_only_changed_keys_and_counts_the_rest() -> None:
     before = {k: 1 for k in hb.SNAPSHOT_KEYS}
     after = dict(before, **{"pq2.actionable": 3, "disproof.watching": None})

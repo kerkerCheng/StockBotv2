@@ -312,6 +312,57 @@ def check_lifecycle() -> AuditResult:
     return _guard("Lifecycle", run)
 
 
+def _board_rows() -> tuple[dict[str, dict], datetime | None, str | None]:
+    """候選板 artifact 的列（company_id → 列）＋產生時間；讀不到回 `({}, None, 理由)`。"""
+    try:
+        payload = sources.candidates_artifact()
+    except Exception as exc:  # noqa: BLE001
+        return {}, None, str(exc)
+    rows: dict[str, dict] = {}
+    for bucket in (*(payload.get("groups") or {}).values(), *(payload.get("side_groups") or {}).values()):
+        for row in bucket or ():
+            rows[str(row.get("company_id"))] = row
+    return rows, _parse_dt(payload.get("generated_at")), None
+
+
+def _rewrite_entered_at(watch: dict) -> datetime | None:
+    """敘事來源 watch 進入「該重寫」的時間：醒來＝woken_by.at；觸及＝judgment.at；到期＝expired_at。"""
+    from engine_b.queue_segments import narrative_rewrite_state
+
+    state = narrative_rewrite_state(watch)
+    if state == "fired":
+        return _parse_dt((watch.get("woken_by") or {}).get("at"))
+    if state == "touched":
+        return _parse_dt((watch.get("judgment") or {}).get("at"))
+    if state == "expired":
+        return _parse_dt(watch.get("expired_at"))
+    return None
+
+
+def _board_misses(watch: dict, *, board: dict[str, dict], board_at: datetime | None, company_of: dict[str, str]
+                  ) -> str | None:
+    """plan §5 第 6 點：rewrite 類「有去處」＝在 narrative_rewrite 段**且**候選板該檔列帶著它。
+    只問在 artifact 產生之前就進入該重寫狀態的 watch（之後才醒的，下一輪 materialize 才會帶）。"""
+    entered = _rewrite_entered_at(watch)
+    if board_at is None or entered is None or entered > board_at:
+        return None
+    company = str(watch.get("wake_brief") or company_of.get(str(watch.get("source_ref") or "").split("#")[0], ""))
+    row = board.get(company)
+    if row is None or str(watch.get("watch_id")) not in (row.get("rewrite_watch_ids") or ()):
+        return (f"watch {watch.get('watch_id')}（敘事來源，{company or '公司不明'}）在候選板產生之前就該重寫了，"
+                "候選板那一列卻沒帶著它——板上看不到那份敘事該重寫（plan §5 第 6 點）")
+    return None
+
+
+def _brief_company_map() -> dict[str, str]:
+    """`brief:<brief_id>` → company_id（讀敘事 ledger；讀不到回空，呼叫端照「公司不明」報）。"""
+    try:
+        ledgers = sources.brief_ledgers()
+    except Exception:  # noqa: BLE001
+        return {}
+    return {f"brief:{r.brief_id}": r.company_id for entry in ledgers.values() for r in entry.get("records") or ()}
+
+
 def check_expiry() -> AuditResult:
     """**每一個等待都必須有到期。** 沒有到期的等待就是沉底。
 
@@ -335,6 +386,8 @@ def check_expiry() -> AuditResult:
         today = ew._today(now)   # 排程時區的今天（Step 2.9c）：與 watch 到期判斷同一個定義，寬限照舊
         examined = 0
         unchecked: list[str] = []
+        board_state = None                 # 候選板 artifact（第一次需要時才讀；Step 3.6）
+        board_note: str | None = None
 
         # ① 在等的 watch 必須有到期；過了到期日兩天還是 active＝轉到期（`mark_expired`）沒跑
         for watch in watches:
@@ -412,12 +465,24 @@ def check_expiry() -> AuditResult:
             elif cls == "rewrite":
                 # Phase 3 Step 3.4：敘事型到期不鑄號——它的去處是佇列段 narrative_rewrite（consumer：research-drain），
                 # 處置在下一次重寫的 acknowledged_touched。分不到那一段＝到期被丟了。
+                # Step 3.6：去處的另一半是候選板那一列帶著它（plan §5 第 6 點）。
                 from engine_b.queue_segments import classify_watch
 
                 if classify_watch(watch) != "narrative_rewrite":
                     findings.append(
                         f"watch {wid}（敘事「{_label(watch)}」）到期超過一天，卻不在 narrative_rewrite 段"
                         "——沒有人會重寫那份敘事（INV-2：到期是重問不是丟）")
+                else:
+                    if board_state is None:
+                        board_state = _board_rows() + (_brief_company_map(),)
+                    rows_b, at_b, note_b, company_of = board_state
+                    if note_b:
+                        unchecked.append(wid)
+                        board_note = note_b
+                    else:
+                        miss = _board_misses(watch, board=rows_b, board_at=at_b, company_of=company_of)
+                        if miss:
+                            findings.append(miss)
             elif cls == "decision":
                 ref = f"{wid}@{watch.get('expires')}"
                 if ref not in decision_refs:
@@ -472,7 +537,7 @@ def check_expiry() -> AuditResult:
         hard = findings + [f for f in prepared_findings if not f.startswith("⚠")]
         soft = [f for f in prepared_findings if f.startswith("⚠")]
         if unchecked:
-            notes = "；".join(n for n in (lifecycle_note, readings_note) if n)
+            notes = "；".join(n for n in (lifecycle_note, readings_note, board_note) if n)
             soft.append(f"⚠ {len(unchecked)} 筆到期的反證沒檢查去處（{notes}）："
                         + "、".join(unchecked[:6]))
         if hard:
@@ -870,6 +935,38 @@ def check_queue_liveness() -> AuditResult:
                         f"watch {wid}（thesis 反證「{_label(watch)}」）判定觸及已 "
                         f"{int((now - touched_at).total_seconds() // 3600)} 小時，池裡沒有一筆未結案的 thesis 複查"
                         "接住它——觸及後的等待消失了（C3）")
+        # Phase 3 Step 3.6（plan §5 第 6 點）：醒來／觸及的敘事來源 watch，「有去處」的另一半是候選板那一列帶著它。
+        # 到期的那一種在 Expiry 查。候選板 artifact 讀不到＝沒檢查（照實寫），不是失敗。
+        from engine_b.queue_segments import narrative_rewrite_state
+
+        waiting = [w for w in watches if narrative_rewrite_state(w) in ("fired", "touched")]
+        board_note = None
+        if waiting:
+            board, board_at, board_note = _board_rows()
+            if board_note is None:
+                company_of = _brief_company_map()
+                for watch in waiting:
+                    miss = _board_misses(watch, board=board, board_at=board_at, company_of=company_of)
+                    if miss:
+                        stuck_watches += 1
+                        findings.append(miss)
+        # 敘事連結斷了（來源收掉／觸及／到期）：它不是任何一筆 watch 的狀態，所以另查——斷了超過兩週還沒重寫
+        # ＝那份敘事的反證依賴失聯；來源根本不存在＝連結指向沒有東西（INV-4：producer 指得出 consumer）。
+        from engine_b.narrative_watches import link_breaks
+
+        by_ref = {str(w.get("source_ref") or ""): w for w in watches}
+        for brk in link_breaks(sources.current_briefs(), watches=watches):
+            source = by_ref.get(brk["link_source_ref"]) or {}
+            since = (_parse_dt((source.get("closed") or {}).get("at")) or _parse_dt(source.get("expired_at"))
+                     or _parse_dt((source.get("judgment") or {}).get("at")))
+            if brk.get("reason") == "missing":
+                stuck_watches += 1
+                findings.append(f"{brk['ticker']} 的敘事 {brk['brief_id']} 第 {brk['index']} 條連到 "
+                                f"{brk['link_source_ref']}，但沒有任何 watch 用這個來源鍵——連結指向沒有東西")
+            elif since and (now - since).days > _STALLED_DAYS:
+                stuck_watches += 1
+                findings.append(f"{brk['ticker']} 的敘事連結 {brk['link_source_ref']}（{brk.get('label')}）已 "
+                                f"{(now - since).days} 天，敘事還沒重寫（narrative_rewrite 段沒有人取）")
         for item in active:
             if item.get("type") == "watch_decision" and watch_id_of(item) not in watch_ids:
                 findings.append(
@@ -883,8 +980,10 @@ def check_queue_liveness() -> AuditResult:
                         f"{len(findings)} 項在佇列中失聯"
                         f"（待辦 {stalled}／線索 {stuck_leads}／等待 {stuck_watches}）",
                         _clip(findings), examined)
+        unchecked_note = (f"｜⚠ {len(waiting)} 筆該重寫的敘事 watch 沒檢查候選板是否帶著（{board_note}）"
+                          if waiting and board_note else "")
         return ok("QueueLiveness",
-                  f"{examined} 項進行中工作全部在 {_STALLED_DAYS} 天內有進展", examined)
+                  f"{examined} 項進行中工作全部在 {_STALLED_DAYS} 天內有進展{unchecked_note}", examined)
 
     return _guard("QueueLiveness", run)
 
@@ -965,12 +1064,17 @@ def check_queue_segments() -> AuditResult:
         # 的 pq2 編號餵段 2。reassess 隨 decision_lab 研究側退役，段 2 已從封閉字彙移除，
         # 所以這裡連 Decision Store 都不必開——稽核不再依賴一個凍結中的 authority。
         holes, holes_note = _graph_holes()
+        # Phase 3 Step 3.6：敘事連結的反證來源已換版——與心跳、候選推導同一個判定（`narrative_watches.link_breaks`）。
+        from engine_b.narrative_watches import link_breaks
+
+        breaks = link_breaks(sources.current_briefs(), watches=watches)
         observation = qs.observe(
             leads=leads_map,
             watches=watches,
             todo_items=items,
             forward_view_backlog=forward,
             graph_holes=holes,
+            narrative_link_breaks=breaks,
         )
         examined = len(leads_map) + len(watches) + len(items)
         findings = list(observation["unmapped"])

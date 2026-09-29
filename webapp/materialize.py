@@ -1212,6 +1212,92 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
 # 首選＝filter）隨籃子 filter 退役；kind 已於 0a.2 從封閉字彙移除，這裡是最後一段程式。
 
 
+# ---------------------------------------------------------------------------
+# state artifact：`candidates`（候選狀態板；Phase 3 Step 3.6）
+# ---------------------------------------------------------------------------
+
+CANDIDATES_MATERIALIZER_VERSION = "webapp-materialize-candidates/1"
+
+_CANDIDATES_AUTHORITY = {
+    "function": "alpha.providers.candidates.load_board",
+    "command": "python -m webapp materialize --candidates",
+    "note": "宣告來自敘事 ledger（append-only）；已持有來自 Google Sheet（readonly）；前提每天對讀圖、watch registry、"
+            "三題稽核區重驗。本 artifact 照抄推導結果：不排序、不加權、不給尺寸。",
+}
+
+
+def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetime | None = None) -> dict[str, Any]:
+    """`load_board()` 的結果 → `candidates` state artifact。**純函式**。
+
+    字彙取自零 I/O 的 `alpha.candidates`（不經 `alpha.providers`：那會把 Neo4j／Engine C／yfinance 載進來，
+    請求路徑測試的「不得載入模型／IO」哨兵在 fixture 階段就被預載瞎掉——2026-09-29 3.6 審查）。"""
+    from alpha.candidates import CANDIDATES_THIS_IS_NOT, GROUP_LABELS, SIDE_LABELS
+
+    stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    payload: dict[str, Any] = {
+        "schema_version": STATE_SCHEMA_VERSIONS["candidates"],
+        "kind": "candidates",
+        "title": "候選狀態板（可開／缺 X／已定價等回落／不要／已持有）",
+        "generated_at": stamp.isoformat(),
+        "as_of": None,
+        "point_in_time": {"mode": "current", "as_of": None, "excluded": None},
+        "authority": dict(_CANDIDATES_AUTHORITY),
+        "today": board.get("today"),
+        "group_labels": dict(GROUP_LABELS),
+        "side_labels": dict(SIDE_LABELS),
+        "groups": {k: list(v) for k, v in (board.get("groups") or {}).items()},
+        "side_groups": {k: list(v) for k, v in (board.get("side_groups") or {}).items()},
+        "counts": dict(board.get("counts") or {}),
+        "oldest_stall_days": dict(board.get("oldest_stall_days") or {}),
+        "holdings": dict(board.get("holdings") or {}),
+        "narrative_rewrite": list(board.get("narrative_rewrite") or ()),
+        "ledger": dict(board.get("ledger") or {}),
+        "rollup": dict(board.get("rollup") or {}),
+        "universe": list(board.get("universe") or ()),
+        "this_is_not": list(CANDIDATES_THIS_IS_NOT),
+        "materializer": {
+            "version": CANDIDATES_MATERIALIZER_VERSION,
+            "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
+        },
+    }
+    payload = redact_private_paths(payload)
+
+    def ids(rows: Sequence[Mapping[str, Any]]) -> list[str]:
+        # 每一列的認知狀態：敘事版本、推導結果、前提失效與該重寫的理由、首屏三個字（燈變色就是認知變了）。
+        return sorted(json.dumps([r.get("ticker"), r.get("brief_id"), r.get("derived"), list(r.get("preconditions") or ()),
+                                  list(r.get("rewrite") or ()), r.get("three_words")], ensure_ascii=False, sort_keys=True)
+                      for r in rows)
+
+    roll = payload["rollup"]
+    payload["freshness_identity"] = state_freshness_identity(
+        kind="candidates", as_of=None,
+        # 認知狀態＝每一組有誰（連同上面那幾格）、持股讀得到嗎與誰解析不到、哪些敘事該重寫、ledger 讀得到嗎、
+        # 三題與燈的計數。滯留天數每天自己加一，那不算認知變了（對稱面：會變的都要在，不會變的都不在）。
+        identity={"groups": {k: ids(v) for k, v in payload["groups"].items()},
+                  "side_groups": {k: ids(v) for k, v in payload["side_groups"].items()},
+                  "holdings": [payload["holdings"].get("status"), sorted(payload["holdings"].get("unresolved") or ())],
+                  "rewrite": sorted(json.dumps(b, ensure_ascii=False, sort_keys=True) for b in payload["narrative_rewrite"]),
+                  "ledger": [payload["ledger"].get("present"), payload["ledger"].get("parse_errors")],
+                  "rollup": {k: roll.get(k) for k in ("lines", "wipeout", "not_read", "edge")}})
+    payload["content_digest"] = canonical_digest(payload)
+    return payload
+
+
+def materialize_candidates(*, tickers: Sequence[str] | None = None, store: StateArtifactStore | None = None,
+                           generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+    """推導整板並寫下 artifact。**唯讀**：敘事 ledger、讀圖對圖、watch registry、Engine C（?mode=ro）、Sheet（readonly）。
+    `tickers`：宇宙；沒給就用 APP 已 materialize 的那幾檔（`ArtifactStore().tickers()`）。"""
+    from alpha.providers.candidates import load_board
+
+    # `tickers=None`＝沒指定 → 預設 store 的目錄；**空 list 是「指定了、而且是空的」**，不得悄悄換成預設目錄
+    # （`--dir` 指到別的目錄時會讀到真實機器上的清單；3.6 審查）。
+    universe = list(tickers) if tickers is not None else ArtifactStore().tickers()
+    payload = build_candidates_artifact(load_board(universe), generated_at=generated_at)
+    target = store or StateArtifactStore()
+    return target.write(payload), payload
+
+
 def materialize_account_scorecard(*, store: StateArtifactStore | None = None,
                                   allow_network: bool = True,
                                   generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
@@ -1341,5 +1427,6 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "GRAPH_WALK_MATERIAL
            "materialize_graph_walk", "materialize_many", "materialize_structure_table", "materialize_view",
            "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
            "build_positions_artifact", "materialize_positions",
+           "build_candidates_artifact", "materialize_candidates",
            "redact_private_paths", "write_vocabularies",
            "materialize_account_scorecard"]
