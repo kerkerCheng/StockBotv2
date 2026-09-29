@@ -841,7 +841,9 @@ def check_queue_liveness() -> AuditResult:
 # ---------------------------------------------------------------------------
 
 def _graph_holes() -> tuple[int | None, str | None]:
-    """走圖九型的命中筆數（`graph_holes` 段；Phase 2 Step 2.6）。
+    """走圖九型裡有命中的型別數（`graph_holes` 段；Phase 2 Step 2.6，Phase 3 Step 3.1a 改計數語意）。
+
+    計數規則只住 `engine_b.queue_segments.graph_holes_count`——心跳讀 artifact 也呼叫同一個函式。
 
     ⚠ **直接跑走圖的 authority**（`query.graph_walk.collect()`：圖＋讀圖 ledger＋leads），不讀 `graph_walk`
     state artifact——那是 derived cache，稽核讀它等於讓結論取決於「有沒有人 materialize 過」
@@ -856,9 +858,11 @@ def _graph_holes() -> tuple[int | None, str | None]:
         result = collect()
     except Exception as exc:  # noqa: BLE001 — 圖沒開不是「沒有洞」
         return None, f"graph_holes：讀不到圖（{type(exc).__name__}）"
+    from engine_b.queue_segments import graph_holes_count
+
     absent = [q["key"] for q in result["questions"] if q.get("absence")]
-    total = sum(int(q["hit_n"] or 0) for q in result["questions"] if not q.get("absence"))
-    return total, (f"graph_holes：{'、'.join(absent)} 這次沒讀到（不計入）" if absent else None)
+    return (graph_holes_count(result["questions"]),
+            (f"graph_holes：{'、'.join(absent)} 這次沒讀到（不計入）" if absent else None))
 
 
 def _forward_view_backlog() -> tuple[int | None, str | None]:

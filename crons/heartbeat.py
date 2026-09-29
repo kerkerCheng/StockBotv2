@@ -891,8 +891,7 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # （「沒讀到」與「真的是 0」不得同形，INV-3）。心跳不查圖（零網路、零 LLM）。
     walk, walk_absence = _load_state(state_dir, "graph_walk")
     walk_questions = list(walk.get("questions") or ()) if walk_absence is None else []
-    holes = (None if walk_absence is not None else
-             sum(int(q.get("hit_n") or 0) for q in walk_questions if not q.get("absence")))
+    holes = None if walk_absence is not None else qs.graph_holes_count(walk_questions)
     observation = qs.observe(
         leads=leads, watches=watches, todo_items=todo_items,
         forward_view_backlog=None, graph_holes=holes,

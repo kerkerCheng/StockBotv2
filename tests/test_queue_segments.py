@@ -137,3 +137,64 @@ def test_observe_reports_unmapped_states_instead_of_dropping_them() -> None:
     assert any("watch:limbo" in row for row in obs["unmapped"])
     assert any("todo:elsewhere" in row for row in obs["unmapped"])
     assert "分不到段" in qs.render(obs)
+
+
+# ---- Phase 3 Step 3.1a：`graph_holes` 的計數是「有命中的型別數」，不是異單位的命中筆數之和 ----
+
+def _walk_questions(hits: list[int], absent: tuple[int, ...] = ()) -> list[dict]:
+    return [{"key": f"t{i}", "short": f"型{i}", "hit_n": (None if i in absent else n), "scope_n": 10,
+             "absence": ({"kind": "upstream_unavailable"} if i in absent else None)}
+            for i, n in enumerate(hits)]
+
+
+def test_graph_holes_count_is_the_number_of_types_with_hits() -> None:
+    # 2026-09-29 基準的九型命中（4,2,2,0,4,6,9,10,23）：舊計數＝60（節點＋公司＋lead＋節點對相加），新計數＝8。
+    questions = _walk_questions([4, 2, 2, 0, 4, 6, 9, 10, 23])
+    count = qs.graph_holes_count(questions)
+    assert count == 8
+    assert count <= 9
+    assert count == sum(1 for q in questions if q["hit_n"] > 0)
+
+
+def test_graph_holes_count_skips_absent_types_and_is_none_when_nothing_was_read() -> None:
+    assert qs.graph_holes_count(_walk_questions([3, 0, 5], absent=(2,))) == 1
+    # 全部沒讀到 ≠ 沒有洞（INV-3）
+    assert qs.graph_holes_count(_walk_questions([3, 5], absent=(0, 1))) is None
+    assert qs.graph_holes_count([]) is None
+
+
+def test_research_total_does_not_add_the_graph_holes_type_count() -> None:
+    obs = qs.observe(forward_view_backlog=2, graph_holes=8)
+    assert obs["research_total"] == 2
+
+
+def test_audit_and_heartbeat_both_count_graph_holes_with_the_shared_function(
+        monkeypatch: pytest.MonkeyPatch) -> None:
+    """稽核（跑走圖）與心跳（讀 artifact）各自算一份，就會像 2026-09-26 那樣只在一邊改對。"""
+    import query.graph_walk as graph_walk
+    from audit import checks
+    from crons import heartbeat as hb
+
+    questions = _walk_questions([4, 0, 1])
+    seen: list[list] = []
+
+    def sentinel(qs_arg):
+        seen.append(list(qs_arg))
+        return 42
+
+    monkeypatch.setattr(qs, "graph_holes_count", sentinel)
+    monkeypatch.setattr(graph_walk, "collect", lambda **_kw: {"questions": questions})
+    assert checks._graph_holes()[0] == 42
+
+    captured: dict = {}
+
+    def fake_observe(**kwargs):
+        captured.update(kwargs)
+        return {"segments": [], "unmapped": [], "mechanical_total": 0, "research_total": 0, "not_work": {}}
+
+    monkeypatch.setattr(qs, "observe", fake_observe)
+    monkeypatch.setattr(hb, "_load_state",
+                        lambda _d, kind: ({"questions": questions}, None) if kind == "graph_walk" else ({}, None))
+    hb.build_queue()
+    assert captured["graph_holes"] == 42
+    assert len(seen) == 2 and all(s == questions for s in seen)

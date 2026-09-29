@@ -582,7 +582,7 @@ Engine C `technical_observations` 的 `session_date`＋`close_adjusted`——那
 調色盤用 dataviz 參考實例的已驗證值（深淺兩套）。`freshness_identity` 只含各 sleeve 狀態／各檔行情狀態／風險警告，
 價格心跳變了不算認知變了。
 
-**`graph_walk` kind（2026-09-26 Phase 2 Step 2.6；取代 `coverage`）：** 照抄 `query.graph_walk.collect()`——九型問句（封閉字彙 `QUESTION_TYPES`：薄層沒人讀、獨家且自報、供給側未填、讀圖該重讀、lead 點名不在圖、供貨走不到錨、沒人供應、建模待補、重複節點）各自的「命中／母體」與每一筆問句。**不排序、不打分、不加總**：型別順序是閱讀順序；母體 ≥10 且命中率 ≥50% 的型別標「恆亮」（L14-4）。讀圖狀態那一型與讀圖 artifact 共用`alpha.providers.structure_readings.reading_status_rows`（`query/` 只有 `graph_walk.collect()` 一處 import `alpha/`）。第 7／8／9 型沿用下面 coverage 的分桶與 `query/duplicate_nodes.py`，不搬不重算；佇列段 `graph_holes` 取代`coverage_gaps`／`duplicate_node_candidates`／`stale_structure_readings` 三段，consumer 是 research-drain 第三段。
+**`graph_walk` kind（2026-09-26 Phase 2 Step 2.6；取代 `coverage`）：** 照抄 `query.graph_walk.collect()`——九型問句（封閉字彙 `QUESTION_TYPES`：薄層沒人讀、獨家且自報、供給側未填、讀圖該重讀、lead 點名不在圖、供貨走不到錨、沒人供應、建模待補、重複節點）各自的「命中／母體」與每一筆問句。**不排序、不打分、不加總**：型別順序是閱讀順序；母體 ≥10 且命中率 ≥50% 的型別標「恆亮」（L14-4）。讀圖狀態那一型與讀圖 artifact 共用`alpha.providers.structure_readings.reading_status_rows`（`query/` 只有 `graph_walk.collect()` 一處 import `alpha/`）。第 7／8／9 型沿用下面 coverage 的分桶與 `query/duplicate_nodes.py`，不搬不重算；佇列段 `graph_holes` 取代`coverage_gaps`／`duplicate_node_candidates`／`stale_structure_readings` 三段，consumer 是 research-drain 第三段；段計數＝**有命中的型別數**（`engine_b.queue_segments.graph_holes_count`，稽核與心跳共用一份；2026-09-29 Phase 3 Step 3.1a 起，原本是異單位的命中筆數之和、也不再加進 `research_total`）。
 
 **`coverage`／`watches` kind（2026-09-08 B2b；`coverage` 已由 `graph_walk` 取代，下述分桶仍是第 7／8 型的判準）：** 前者照抄 `query.coverage_gaps.scan()` 的分桶，並把 🔴 桶依
 **前綴**切成「真正該挖的子瓶頸（`tech:`／`mat:`）」與「抽取產生的產品名詞（`prod:`）」——那是機械比對不是語意判斷，

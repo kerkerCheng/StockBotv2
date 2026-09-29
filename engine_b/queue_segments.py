@@ -112,8 +112,9 @@ SEGMENTS: tuple[Segment, ...] = (
     Segment(
         "graph_holes", 6, "走圖九型問句的命中（圖上該去研究的洞；每型各自一格，不排序）",
         "research", "research-drain 第三段：python -m query.graph_walk（每筆命中附下一個研究動作）",
-        "計數＝九型命中筆數之和，**只用來回答「這一段有沒有工作」**（INV-4）——它不是分數、不排序、"
-        "不在任何人讀的畫面上當成一個數字印（心跳與 APP 一律九格各自印，plan §0 第 7 條）。"
+        "計數＝**有命中的型別數**（0–9；`graph_holes_count()`），**只用來回答「這一段有沒有工作」**（INV-4）——"
+        "九型的單位各不相同（節點、公司、lead、節點對），命中筆數相加沒有意義，所以不加總、也不進 `research_total`。"
+        "它不是分數、不排序、不在任何人讀的畫面上當成一個數字印（心跳與 APP 一律九格各自印）。"
         "母體 ≥10 的型別命中率 ≥50% 就是恆亮（L14-4），走圖自己會標出來。",
     ),
     Segment(
@@ -242,6 +243,20 @@ def classify_todo(item: Mapping[str, Any]) -> str | None:
 # 觀測
 # ---------------------------------------------------------------------------
 
+def graph_holes_count(questions: Iterable[Mapping[str, Any]]) -> int | None:
+    """`graph_holes` 段的計數：走圖九型裡**有命中的型別數**（Phase 3 Step 3.1a）。
+
+    `questions` 是 `query.graph_walk.collect()["questions"]`（稽核直接跑走圖）或 `graph_walk` artifact 的
+    `questions`（心跳只讀 artifact）——兩者同形，所以兩個呼叫端共用這一份，不各算一次（L16）。
+    ⚠ 原本是九型命中筆數之和（2026-09-26 實測 60）——節點、公司、lead、節點對混在一起加，那個數沒有單位。
+    帶 `absence` 的型別不計；**全部型別都沒讀到時回 `None`**（「沒讀到」與「沒有洞」不得同形，INV-3）。
+    """
+    present = [q for q in questions if not q.get("absence")]
+    if not present:
+        return None
+    return sum(1 for q in present if int(q.get("hit_n") or 0) > 0)
+
+
 def observe(
     *,
     leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[str, Any]] = (),
@@ -336,9 +351,10 @@ def observe(
         "mechanical_total": sum(
             (counts[s.key] or 0) for s in SEGMENTS if s.cost == "mechanical"
         ),
+        # `graph_holes` 的計數是型別數、不是工作筆數（Phase 3 Step 3.1a）——加進來就是異單位相加。
         "research_total": sum(
             (counts[s.key] or 0) for s in SEGMENTS
-            if s.cost == "research" and counts[s.key] is not None
+            if s.cost == "research" and counts[s.key] is not None and s.key != "graph_holes"
         ),
         "not_work": dict(NOT_WORK),
     }
