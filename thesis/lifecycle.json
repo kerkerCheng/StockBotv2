@@ -95,7 +95,7 @@
       }
     ],
     "check_interval_days": 30,
-    "last_checked": "2026-08-29",
+    "last_checked": "2026-09-29",
     "memo": "thesis/sivers_v4_lane_memo.md",
     "mutations": [
       {
@@ -125,8 +125,8 @@
         "to": "active"
       }
     ],
-    "next_check": "2026-09-28",
-    "note": "2026-08-29 v4 memo 完成（proposal tm_fbcf9bfe，pq2 [251] 核准）：Q2 分辨點裁決——2025 營收重編僅 -SEK 4.314M（~1.4%），Ningi 指控量級（~97M/31%）未成立，原 retire gate 未觸發；依 L7 revised → active。v4 矛盾軸心從數字可信度移到執行時間表與稀釋：Jabil 1.6T ramp 延 2027、SEK 825M 增發＋Bootstrap $12M 轉股稀釋 >10%、pipeline USD 1.2B 明示 non-binding、H1 營運現金流 -119.2M。Disproof 五條見 v4 §6；下一分辨點 Q3 2026-11-26（毛利率方向＋photonics 分項）與年底 ELS production readiness。（歷史脈絡見 git history 中本欄 08-28 前版本與 docs/reports/sive-ningi-audit-trace-2026-07-20.md。）",
+    "next_check": "2026-10-29",
+    "note": "2026-09-29 複查（pq2 [655]）：v4 §6 五條 disproof 均未觸發，status 維持 active、無 mutation。08-29 後一手事件四件：①08-31 認股權 1,659,015 股以 SEK 4.53 行使、總股數 356,740,332（已在 v4 股數內，非新增發）；②09-03 投資 USD 30M 擴建 Glasgow，CW DFB 年產能 >1 億顆、預計 2027-Q4 運轉（已入圖；加大 capex 燒錢，資金螺旋第 4 條改在 Q3 報告看現金消耗）；③09-24 高層異動——光子 CTO Andrew McKee（CST Global 共同創辦人）退休、過渡至 2026 年底，David Clark 10-31 起任光子工程副總，無任何財報、審計、營收認列或 ELS／Jabil／Ayar 時程字句（第 5 條未觸）；注意 CTO 交接期與 ELS production readiness 同落在年底；④09-17 Digitimes 轉述推文為 tier-3，已 park、不構成 [632] 觸發。五條語意 watch（ew_0107–ew_0111）皆 active、未醒。下一分辨點不變：Q3 2026-11-26、年底 ELS。｜2026-08-29 v4 memo 完成（proposal tm_fbcf9bfe，pq2 [251] 核准）：Q2 分辨點裁決——2025 營收重編僅 -SEK 4.314M（~1.4%），Ningi 指控量級（~97M/31%）未成立，原 retire gate 未觸發；依 L7 revised → active。v4 矛盾軸心從數字可信度移到執行時間表與稀釋：Jabil 1.6T ramp 延 2027、SEK 825M 增發＋Bootstrap $12M 轉股稀釋 >10%、pipeline USD 1.2B 明示 non-binding、H1 營運現金流 -119.2M。Disproof 五條見 v4 §6；下一分辨點 Q3 2026-11-26（毛利率方向＋photonics 分項）與年底 ELS production readiness。（歷史脈絡見 git history 中本欄 08-28 前版本與 docs/reports/sive-ningi-audit-trace-2026-07-20.md。）",
     "status": "active",
     "ticker": "SIVE.ST"
   }
