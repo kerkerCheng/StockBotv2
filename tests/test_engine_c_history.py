@@ -344,6 +344,19 @@ def test_rejections_outside_the_lookback_window_are_not_counted() -> None:
     assert rejected == [] and [r["period_end"] for r in rows] == ["2026-03-31"]
 
 
+def test_the_window_only_decides_what_is_reported_not_what_can_derive_q4() -> None:
+    """R2-c 覆核 non-blocking #1：窗邊界之前的 9M 累計仍要拿來衍生窗內的第四季（AMAT／AMD 那一型）。"""
+    rev = "RevenueFromContractWithCustomerExcludingAssessedTax"
+    facts = _companyfacts({("us-gaap", rev): [
+        _fact("2020-11-01", "2021-07-31", 270, "Q3", "10-Q", "2021-08-20"),     # 9M 期末在窗外（< 2021-09-30）
+        _fact("2020-11-01", "2021-10-31", 380, "FY", "10-K", "2021-12-10"),     # 年度期末在窗內
+    ]})
+    rows, _ = hb.build_fundamental_rows(facts, ticker="X", filer="domestic_quarterly", today=TODAY,
+                                        fetched_at=FETCHED)
+    q4 = [r for r in rows if r["metric"] == "revenue_quarter"]
+    assert len(q4) == 1 and q4[0]["value"] == 110 and q4[0]["derived"]
+
+
 def test_backfill_skips_lagging_writes_unknown_and_reports_every_outcome() -> None:
     conn = _conn()
     facts = _domestic_facts()

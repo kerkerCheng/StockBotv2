@@ -92,7 +92,7 @@ step: 3.2
 - **TSM：lagging**——companyfacts 落後 364 天：快照最新申報日 2025-04-17，但 EDGAR 已有 2026-04-16 的定期報告。取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。（這一輪不寫；daily 增量每天重試，companyfacts 跟上後自己補上）
 - **UMC：lagging**——companyfacts 落後 371 天：快照最新申報日 2025-04-24，但 EDGAR 已有 2026-04-30 的定期報告。取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。（這一輪不寫；daily 增量每天重試，companyfacts 跟上後自己補上）
 - **20-F／40-F 發行人 8 檔只存年度點、不存封面股數**（ADS 與普通股不是同一種證券單位）：GFS、HIMX、NBIS、POET、TSEM、TSM、UMC、XPEV
-- companyfacts 落後檢查「抓不到 submissions＝落後未知」照寫的：['CCXI']
+- 落後檢查判「落後未知」（`unknown`）而照寫的：CCXI——原因**不是**抓不到 submissions，是它根本沒有營收白名單 fact（SPAC 形狀，快照日是 None），所以無從比對；照寫的只有 2 列季度營業利益（R2-c 覆核 non-blocking #3 更正措辭）
 - **拒寫 19 組**（同一期間同一份申報的白名單 tag 歧異或多種計價單位；不挑一個、不換算）。依檔：NBIS 14、MP 5
   - cash：同一期間同一份申報出現多種計價單位 ['RUB', 'USD']——5 組
   - revenue_quarter：白名單 tag 對同一期間給出不同的數——3 組
@@ -135,7 +135,8 @@ step: 3.2
   - 修法：快照日只看**會被消費的營收白名單 fact**（`fetchers.edgar_xbrl.latest_filed(tags=…)`、`companyfacts_lag_status(snapshot_tags=…)`），並補 TSM 形夾具測試。
   - 重跑結果：TSM 落後 364 天、UMC 落後 371 天 → `lagging`，**這一輪不寫**，缺席有名有姓。第一輪寫進去的 TSM／UMC FY2021–2023 列照留：它們在各自申報日之後都是正確的 as-of 事實，而且已定價①對這兩檔本來就是 `inputs_incompatible`（TWD 報表、USD ADR）。
 - **條件②（本節）**：這兩檔的 FY2024 年度數字，在 FY2024 20-F 裡同時有 TWD 與 USD 便利換算兩種單位，被「多單位就拒寫」守則擋掉；FY2025 在 companyfacts 只收到封面 fact。所以最新可用年度停在 **FY2023**。
-  - 三題的「出現在數字裡」對 TSM 會印 `insufficient_evidence`（最新一期距今逾 550 天），不會把 2023 當成現在的數字。
+  - （Step 3.3 接上三題之後）三題的「出現在數字裡」對 TSM 會印 `insufficient_evidence`（最新一期距今逾 550 天），不會把 2023 當成現在的數字——這一句描述的是 3.3 的行為，驗證在 3.3 的收據。
+- **覆核（同日，GO）**：reviewer 重跑原反例與四種同形變體，全部判 `lagging` 或 `unknown`，沒有冒充 `current`；並另找到一個副作用——窗內過濾原本套在候選上，把窗邊界之前的 9M 累計濾掉，AMAT／AMD／AVGO／INTC／MTSI 最早那一年的衍生 Q4 重跑時會算不出來（正式庫裡第一輪寫的 30 列照留、值正確）。已改成**只在記錄拒寫時套窗**，並補測試。
 - **非阻擋的處置**：
   - 拒寫數原本把 5 年窗外本來就不寫的期間也算進去（164 組），現在只算窗內（19 組：NBIS 14、MP 5）。
   - 帶交易所後綴的 ticker 的缺席措辭改成「不查 SEC」，不再寫「company_tickers.json 查不到」。

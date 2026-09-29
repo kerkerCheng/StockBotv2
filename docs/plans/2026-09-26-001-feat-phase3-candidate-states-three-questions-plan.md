@@ -219,7 +219,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 |---|---|---|---|---|
 | 3.0 | 基準快照（`docs/reports/2026-09-29-phase3-baseline.md`） | ✅ | 執行模型 | `559414e` |
 | 3.1 | Phase 2 帶過來的三個小修（A6 a／b／c） | ✅ | 執行模型 | `ebab3d0`、`50954a9`、見 3.1c |
-| 3.2 | Engine C 機械歷史表＋一次回填＋daily 增量步驟；going concern 結構化欄位（R2-c） | ○ | 執行模型 | |
+| 3.2 | Engine C 機械歷史表＋一次回填＋daily 增量步驟；going concern 結構化欄位（R2-c：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `aaf926b`、`42f2596`、`b403e78`＋收尾 |
 | 3.3 | 三題稽核區；主題等權組 ledger；邊緣判定 | ○ | 執行模型 | |
 | 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a） | ○ | 執行模型 | |
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2 | ○ | **強模型** | |
@@ -631,3 +631,4 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 16. **companyfacts 部分收錄的發行人**（TSM、UMC：最新 20-F 只收到封面 fact）：落後檢查已把它們記成 `lagging` 不寫；何時補齊取決於 SEC，daily ②b 每天重試。要不要改由其他一手來源（公司年報）取年度營收——那是人工觀測，不是本表。
 17. **價格 adjusted 序列的窗邊界斷層、分割事件只涵蓋 3 年窗**（R2-c #3、#9）：目前沒有消費端跨越窗邊界；Phase 5 量測若要更長的報酬序列，先處理這兩點。
 18. **`engine_c/history.py` 只跑 SQLite**（R2-c #7）：Postgres 只做到建表對等；切後端前要補讀取端的佔位符。
+19. **落後檢查還騙得過的一種更窄形狀**（R2-c 覆核 non-blocking #2）：最新申報只帶「比較年度」的營收、沒帶當年度時，快照日仍被推成 current。正式資料目前沒有；要不要改成比對「最新申報的 period_end 是否有營收 fact」。

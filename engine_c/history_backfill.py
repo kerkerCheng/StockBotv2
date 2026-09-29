@@ -259,24 +259,31 @@ def _flow_tags(concept: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
 
 
 def _resolve_groups(candidates: Iterable[_Fact], key: Callable[[_Fact], tuple],
-                    *, label: str, rejected: list[dict[str, Any]], multi_value_reason: str
-                    ) -> dict[tuple, _Fact]:
-    """同一組（期間、申報）的白名單 fact 收斂成一筆；多單位或多值 → 拒寫並記原因（不挑一個）。"""
+                    *, label: str, rejected: list[dict[str, Any]], multi_value_reason: str,
+                    horizon: date | None = None) -> dict[tuple, _Fact]:
+    """同一組（期間、申報）的白名單 fact 收斂成一筆；多單位或多值 → 拒寫並記原因（不挑一個）。
+
+    `horizon`：期末早於它的組本來就不寫（回填窗外），拒寫**不記**——算進去會把拒寫數灌大（R2-c non-blocking #1）。
+    ⚠ 窗只套在「記不記」，不套在候選：窗邊界之前的 9M 累計仍要拿來衍生窗內的第四季（R2-c 覆核 non-blocking #1）。
+    """
     groups: dict[tuple, list[_Fact]] = {}
     for fact in candidates:
         groups.setdefault(key(fact), []).append(fact)
     out: dict[tuple, _Fact] = {}
     for group_key, facts in groups.items():
         units = {f.unit for f in facts}
+        record = horizon is None or max(f.end for f in facts) >= horizon
         if len(units) > 1:
-            rejected.append({"metric": label, "key": [str(k) for k in group_key],
-                             "reason": f"同一期間同一份申報出現多種計價單位 {sorted(units)}——不換算，拒寫"})
+            if record:
+                rejected.append({"metric": label, "key": [str(k) for k in group_key],
+                                 "reason": f"同一期間同一份申報出現多種計價單位 {sorted(units)}——不換算，拒寫"})
             continue
         values = {round(f.value, 2) for f in facts}
         if len(values) > 1:
-            detail = "；".join(sorted(f"{f.namespace}:{f.tag}={f.value:,.0f}" for f in facts))
-            rejected.append({"metric": label, "key": [str(k) for k in group_key],
-                             "reason": f"{multi_value_reason}（{detail}）——不挑一個，拒寫"})
+            if record:
+                detail = "；".join(sorted(f"{f.namespace}:{f.tag}={f.value:,.0f}" for f in facts))
+                rejected.append({"metric": label, "key": [str(k) for k in group_key],
+                                 "reason": f"{multi_value_reason}（{detail}）——不挑一個，拒寫"})
             continue
         out[group_key] = sorted(facts, key=lambda f: (f.namespace, f.tag))[0]
     return out
@@ -314,7 +321,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
 
     for concept in ("revenue", "operating_income"):
         candidates = [f for namespace, tags in _flow_tags(concept) for tag in tags
-                      for f in _facts(facts, namespace, tag, forms=forms) if f.end >= horizon]
+                      for f in _facts(facts, namespace, tag, forms=forms)]
         by_span: dict[str, list[_Fact]] = {}
         for fact in candidates:
             span = _span_class(fact)
@@ -323,17 +330,17 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
         key = lambda f: (f.start, f.end, f.accession)  # noqa: E731
         reason = "白名單 tag 對同一期間給出不同的數"
         annual = _resolve_groups(by_span.get("annual", ()), key, label=f"{concept}_annual",
-                                 rejected=rejected, multi_value_reason=reason)
+                                 rejected=rejected, multi_value_reason=reason, horizon=horizon)
         for fact in annual.values():
             emit(f"{concept}_annual", fact)
         if filer != "domestic_quarterly":
             continue
         quarter = _resolve_groups(by_span.get("quarter", ()), key, label=f"{concept}_quarter",
-                                  rejected=rejected, multi_value_reason=reason)
+                                  rejected=rejected, multi_value_reason=reason, horizon=horizon)
         for fact in quarter.values():
             emit(f"{concept}_quarter", fact)
         nine = _resolve_groups(by_span.get("nine_month", ()), key, label=f"{concept}_nine_month",
-                               rejected=rejected, multi_value_reason=reason)
+                               rejected=rejected, multi_value_reason=reason, horizon=horizon)
         # 第四季：companyfacts 沒有直接的 3 個月 fact 時，以「年度 − 同一會計年度的前三季累計」衍生，標 derived。
         # 累計取 `filed ≤ 年度 filed` 的最新一筆（那是年報發出時已知的版本）；filed 取兩者較晚者（INV-6）。
         quarter_ends = {f.end for f in quarter.values()}
@@ -354,11 +361,11 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
         if metric == "shares_outstanding_cover" and filer != "domestic_quarterly":
             continue
         candidates = [f for namespace, tags in spec for tag in tags
-                      for f in _facts(facts, namespace, tag, forms=forms) if f.start is None and f.end >= horizon]
+                      for f in _facts(facts, namespace, tag, forms=forms) if f.start is None]
         reason = ("同一份申報的封面股數有多個值（多股類分別申報）——不加總" if metric == "shares_outstanding_cover"
                   else "白名單 tag 對同一時點給出不同的數")
         resolved = _resolve_groups(candidates, lambda f: (f.end, f.accession), label=metric,
-                                   rejected=rejected, multi_value_reason=reason)
+                                   rejected=rejected, multi_value_reason=reason, horizon=horizon)
         for fact in resolved.values():
             emit(metric, fact)
     return rows, rejected
