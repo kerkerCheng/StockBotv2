@@ -209,8 +209,10 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
         w = next((w for w in watches if w.get("watch_id") == cs.watch_id), None)
         if w is None:
             problems.append(f"candidate_state：watch {cs.watch_id} 不存在")
-        elif w.get("status") != "active":
-            problems.append(f"candidate_state：watch {cs.watch_id} 不是 active（{w.get('status')}）——指向一筆活的等待")
+        elif w.get("status") != "active" or ew.past_expiry(w, today=ctx.today):
+            problems.append(f"candidate_state：watch {cs.watch_id} 不是 active（{w.get('status')}"
+                            f"{'、已過 expires ' + str(w.get('expires')) if ew.past_expiry(w, today=ctx.today) else ''}）"
+                            "——指向一筆活的等待")
         elif w.get("wake_brief") != company:
             problems.append(f"candidate_state：watch {cs.watch_id} 必須是 wake_brief={company} 的 watch"
                             "（thesis／讀圖的語意 watch、別家的、或前一版 brief: 的都不行）")
@@ -225,7 +227,7 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     if acked - pending:
         problems.append(f"acknowledged_touched 處置了不在「該重寫」狀態的 watch：{sorted(acked - pending)}")
 
-    # ⑥ 可開的三個前提
+    # ⑥ 可開的三個前提（lifecycle 讀不到由 `blocking_for_open` fail closed，R2-a C3）
     if cs is not None and cs.state == "open":
         for ride in parsed.rides:
             row = status_by_ride.get((ride.node, ride.unit)) or {}
@@ -241,8 +243,10 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
 def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path | None = None,
                 watches_path: Path | None = None) -> dict[str, Any]:
     """v2 的正式寫入入口：寫入當下檢查 → append → 登記／收舊／處置 watch → 存 registry。v1 只收撤回。"""
+    import copy
+
     from engine_b import event_watch as ew
-    from engine_b.narrative_watches import register_brief_watches
+    from engine_b.narrative_watches import register_brief_watches, settle_due
 
     from ..narrative.contracts import RECORD_VERSION_V2
 
@@ -250,12 +254,20 @@ def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path
     existing, _ = read_brief_records(parsed.ticker, directory=directory)
     if parsed.record_version != RECORD_VERSION_V2 and not parsed.retracted:
         raise ContractViolation("新寫的短評一律 v2（v1 照讀、只收撤回；Phase 3 Step 3.4）")
+    brief_ids = [r.brief_id for r in existing] + [parsed.brief_id]
+    # R2-a C4：先做 daily 會做的時間轉換（已過到期→expired、date 已到→fired），再判——否則換版會吞掉「到期未判」。
+    settle_due(ctx.watches, parsed.company_id, brief_ids=brief_ids, today=ctx.today)
     if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted:
         problems = v2_write_problems(parsed, ctx=ctx, existing=existing)
         if problems:
             raise ContractViolation("短評 v2 寫入拒收：\n- " + "\n- ".join(problems))
+    # R2-a C1：hook 的任何失敗（例：語意 watch 的條件不到 20 字）都必須發生在 append **之前**——
+    # 否則 ledger 已有一行、registry 沒存，同一份重跑又被「已在 ledger 中」擋掉。先在副本上預演一次。
+    try:
+        register_brief_watches(parsed, data=copy.deepcopy(ctx.watches), company_brief_ids=brief_ids)
+    except ew.EventWatchError as exc:
+        raise ContractViolation(f"短評寫入拒收（watch 登記預演失敗，ledger 未動）：{exc}") from None
     path = append_brief_record(record, directory=directory)
-    brief_ids = [r.brief_id for r in existing] + [parsed.brief_id]
     summary = register_brief_watches(parsed, data=ctx.watches, company_brief_ids=brief_ids)
     ew.save_watches(ctx.watches, watches_path)
     return {"path": str(path), "brief_id": parsed.brief_id, **summary}

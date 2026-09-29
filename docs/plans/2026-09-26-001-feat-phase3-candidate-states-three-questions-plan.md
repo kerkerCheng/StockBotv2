@@ -254,6 +254,8 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 10 | 3.4 | （未寫）沒有短評時首屏列的題目 | 沒有短評的 70 檔，brief 面板列的是 **v2 七題**（原本是 v1 七題） | v1 的題目含已退役的估值題（市場怎麼看、對了值多少）；每次載入的題目會被當成目標（L19）。個股頁核心面板文字 digest 因此在這 70 檔的 brief 面板變動——3.7 的前後對照要把它列為預期變動 |
 | 11 | 3.4 | 寫入端檢查 | `alpha brief --add` 寫入前讀 Neo4j（讀圖現行狀態）與 Engine C（三題），寫入後寫 `event_watches.json`；新寫一律 v2、v1 只收撤回 | 「現行」要跟現在的圖比才答得出；三題的 unmeasurable 要讀稽核區才驗得了；v1 新寫會把退役題目再帶回來 |
 | 12 | 3.4 | `still_holds` 對到 watch 的 reactivate | 醒來的舊版 `brief:` watch 處置為 still_holds 時**收掉並記收據**，不 reactivate | 新一版的 `disproof[]` 會以新的 `brief:<新 id>#n` 重登同一條件；舊版的回 active 會與新版的同條件並存（L12：同一條件兩筆 watch） |
+| 14 | 3.4 | §5 第 4 點：`link_source_ref` 指向的來源換版（讀圖重讀、memo 換版）→ 進 `narrative_rewrite` | 3.4 **沒做**，移進 3.6 的候選狀態推導（§7 第 1 點新增一條） | R2-a N1 抓到：3.4 沒實作也沒測試。它不是 watch 的狀態，是「現行敘事的連結斷了」——要從敘事往 registry 看，候選狀態推導本來就逐檔重算這件事；放 3.6 讓佇列段、audit、心跳與候選板用同一個判定 |
+| 15 | 3.4 | （未寫）寫入端怎麼看「已過到期日、daily 還沒標記」的 watch | 寫入前先對本公司敘事來源的 watch 做 daily 同一條時間轉換（`narrative_watches.settle_due`：過 `expires`→expired、date 到 `until`→fired）；`candidate_state` 另外拒收照日期已過期的 watch；watch 登記在 append 前先在副本上預演 | R2-a C1／C4：否則換版會把「到期未判」當成還在等收掉，登記失敗會留下「ledger 有、registry 沒有」的半套寫入 |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -459,6 +461,8 @@ Boundaries: 不改 code、不 commit、不寫真實 ledger 或 event_watches.jso
    - **Sheet 讀不到**：整板加一行「持股未讀到，已持有判定暫停（`upstream_unavailable`）」；held 組印缺席；其餘每一列照印敘事宣告，**但標「持股未驗」**——它們可能其實已持有，所以不得宣稱「不是已持有」，也不得把宣告當成 held 的替代。
    - 否則取現行 v2 敘事的宣告；`open` 每天重驗：①`rides[]` 讀圖仍現行（`current`／`stale_low`，未 `stale`、未過 `expires`）且 kind 仍 moat／volume；②`answers` 對應的稽核行沒有從有值變全缺席；③**§5 第 8 點歸屬函式給出的全部 watch**（本檔 thesis、`rides[]` 讀圖、連結的來源、現行敘事自己的）沒有醒來待判、觸及待處置或到期未判；④連結的反證來源仍是現行——破掉印「可開（前提失效：…）」。
    - **邊緣（#13）**：`not_edge` → 「非倍率候選」組（宣告 `open` 也不算可開）；`unmeasurable` → 「邊緣無法量」組。
+   - **連結來源換版（R2-a N1，自 3.4 移入，偏差 14）**：現行 v2 敘事任一 `disproof[].link_source_ref` 已沒有 active／fired 的 watch（讀圖重讀收掉換新、memo 換版）→ 不論宣告哪一態都列「敘事該重寫：連結 <ref> 已換版」，並計進 `narrative_rewrite`（佇列段、audit QueueLiveness、心跳用同一個判定）；`open` 另失效（前提③）。
+   - **`history_not_comparable`（R2-a N3）**：敘事宣告的「歷史不可比」要傳進三題讀取端（寫入端驗 unmeasurable 時、候選推導、3.7 稽核區），今天沒有人讀。
    - `missing`／`priced_wait` 的 watch 已不 active → 「缺 X（watch 已 <狀態>，該重寫）」；v1 現行 → 「舊版，缺候選狀態」；沒有敘事的 → 不上板，**計數另印「無敘事 N」**。
    - **滯留天數**：沿 `supersedes` 鏈往回，取連續宣告同一 state（`missing`／`priced_wait` 另要求同一 `watch_id`）的最早一筆 `created_at`——同 state 重寫不歸零。
 2. **candidates artifact** 除上板的列，另帶 **73 檔的三題與四盞燈 rollup**（有值／依 kind 的缺席計數）與邊緣三態計數——心跳段 2 與段 4 只讀這一份（心跳零網路、只經 `_load_state`）。
@@ -642,3 +646,4 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 19. **落後檢查還騙得過的一種更窄形狀**（R2-c 覆核 non-blocking #2）：最新申報只帶「比較年度」的營收、沒帶當年度時，快照日仍被推成 current。正式資料目前沒有；要不要改成比對「最新申報的 period_end 是否有營收 fact」。
 20. **稀釋燈一年窗滿了之後 30 檔裡 24 檔亮黃**（Step 3.3 試跑）：規則是「一年內同口徑股數增加 → 黃」（D2，不設量級門檻）；FN +0.01% 與 AXTI +42% 同樣是黃。它量的是事實，但國內申報人 80% 亮黃接近恆亮（L14-4）——要不要把員工股酬等級與增發分開、用什麼非憑空的判準（例如只看有沒有 S-3／424B 發行），**要使用者決定**。今天照規則印、數字在稽核層。
 21. **三題尚未接 as-of 視角**：歷史表的 PIT 讀法已備（`shared/as_of.py`），但 view 其他段在 as-of 下各有規則；目前 as-of 模式下三題 section 誠實缺席。
+22. **R2-a non-blocking（Step 3.4 覆核）**：N2 寫入端「供給側」只認 `supplies_to`（plan 寫 supplies_to／develops，方向更嚴）、「它在需求側」的提示對外向需求邊會印成「兩側都不在」；N4 QueueLiveness：fired 的 `wake_brief`（非語意 kind）沒有滯留檢查、fired 的 `brief:` 語意 watch 滯留訊息指向的 consumer 寫成「semantic-queue → judge」；N5 v2 的禁字表與 placeholder 字彙在 parse 路徑上，日後改字彙會讓舊 v2 紀錄解析失敗（v1 早就如此，§13 要註明）；N8 舊版／已撤回版 fired 的 `brief:` watch 不進 `disproof_counts` 任何一格、brief ledger 的 parse errors 被 `current_briefs` 與 audit 忽略、舊版 `candidate_state` 用過的 `wake_brief` 若新版不再引用仍留著（醒來時多處置一次）。

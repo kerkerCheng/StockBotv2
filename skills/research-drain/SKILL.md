@@ -98,16 +98,19 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 實測（2026-09-09）：ew_0005／0007／0057 三個 `fact_verification` 都被**無關的** tier-1 lead
 以 entity 交集誤觸（COHR 8-K 是 RSU、AAOI 8-K 是租賃），當時沒有這個命令，只能直接改 JSON。
 
-**段 `narrative_rewrite`（敘事該重寫，2026-09-29 Phase 3 Step 3.4 起）**：敘事自己的反證（`brief:` 語意 watch）
+**段 `narrative_rewrite`（敘事該重寫，2026-09-29 Phase 3 Step 3.4 起；與段 0b 同級，排在下面三段固定之前**——
+它和 0b 一樣是**已經醒來的等待**，醒來的反證不排在新線索後面）：敘事自己的反證（`brief:` 語意 watch）
 與「缺 X」「已定價等回落」在等的事（`wake_brief` watch）**醒來、被判觸及或到期未判**都進這一段——不鑄 pq2、
 不進假設對照。下一步是**重寫那一檔的敘事**（研究；寫敘事是強模型的工作，便宜模型只列出來交回）：
 
-1. 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`）；
-2. 重跑 `python -m alpha research <T>` 的 packet（`brief_frame` 是 v2）與三題稽核區；
-3. 寫新的一版 `python -m alpha brief <T> --add spec.json`，`acknowledged_touched[]` **逐條處置本公司名下
-   所有**該重寫的 watch（`still_holds`／`thesis_changed`／`retired`＋一句 note）——**不列就拒收**；
-   換版與撤回都不會吞掉它們。處置寫成 watch 既有的收據（fired → consumed、觸及 → `judgment.handled`、
-   到期 → `expiry_resolution: narrative_rewritten`）。
+- ⓐ 讀那一檔的現行敘事（`python -m alpha brief <T>`）與觸發的 watch（`python -m engine_b.event_watch list`）；
+- ⓑ 重跑 `python -m alpha research <T>` 的 packet（`brief_frame` 是 v2）與三題稽核區；
+- ⓒ 寫新的一版 `python -m alpha brief <T> --add spec.json`，`acknowledged_touched[]` **逐條處置本公司名下
+  所有**該重寫的 watch（`still_holds`／`thesis_changed`／`retired`＋一句 note）——**不列就拒收**；
+  換版與撤回都不會吞掉它們（已過到期日但 daily 還沒標記的，寫入端會先照日期轉成到期）。處置寫成 watch 既有的收據
+  （fired → consumed、觸及 → `judgment.handled`、到期 → `expiry_resolution: narrative_rewritten`）。
+
+以下是**三段固定**：
 
 1. **所有「使用者已授權、還沒做完」的項目** — 放著不動是本 skill 要修的那個 bug。
    **永遠排第一，不論它們看起來多無聊。** 包含兩類，同級處理：

@@ -155,6 +155,38 @@ def test_write_time_preconditions_refuse_with_the_reason(tmp_path: Path, ctx_kw,
     assert not (tmp_path / "briefs").exists()
 
 
+_LATER = (TODAY + timedelta(days=400)).isoformat()
+
+
+@pytest.mark.parametrize("record_kw, message", [
+    ({"disproof": [_disproof(condition=f"若 JX 在 {_LATER} 前宣布新產能投產則供給缺口消失，本敘事的量的賭注不成立",
+                             expires=(TODAY + timedelta(days=30)).isoformat())]}, "早於條件自己寫的日期"),
+    ({"disproof": [_disproof(entities=[CO, "co:no_such_company_xyz"])]}, "registry 解析不到"),
+    ({"disproof": [_disproof(link_source_ref="reading:sr_" + "c" * 16 + "#9")]}, "沒有在盯的 watch"),
+    ({"disproof": [_disproof(source="sr_" + "c" * 16)]}, "不是任何讀圖 id"),
+    ({"rides": [{"node": "tech:x", "unit": "layer", "reading_id": "sr_" + "b" * 16}]}, "現行讀圖不是"),
+])
+def test_write_time_disproof_and_ride_checks_refuse_with_the_reason(tmp_path: Path, record_kw, message) -> None:
+    """R2-a N7：寫入端這幾條原本只有手動驗過。"""
+    with pytest.raises(ContractViolation, match=message):
+        _write(tmp_path, _record(**record_kw), _ctx())
+    assert not (tmp_path / "briefs").exists()
+
+
+def test_retracting_a_v2_closes_its_active_watches(tmp_path: Path) -> None:
+    ctx = _ctx()
+    first = _write(tmp_path, _record(), ctx)
+    watch = ctx.watches["watches"][0]
+    target = read_brief_records(T, directory=tmp_path / "briefs")[0][0]
+    retract = brief_record(company_id=CO, ticker=T, created_at=datetime.now(timezone.utc) + timedelta(seconds=1),
+                           slots=[{"key": s.key, "text": s.text, "evidence_refs": list(s.evidence_refs)} for s in target.slots],
+                           supersedes_id=first["brief_id"], retracted=True, record_version=target.record_version,
+                           rides=[r.as_dict() for r in target.rides], disproof=[d.as_dict() for d in target.disproof],
+                           answers=target.answers.as_dict(), candidate_state=target.candidate_state.as_dict())
+    _write(tmp_path, retract, ctx)
+    assert watch["status"] == "consumed" and watch["closed"]["note"].startswith("retracted by")
+
+
 def test_stale_low_counts_as_current(tmp_path: Path) -> None:
     _write(tmp_path, _record(), _ctx(status="stale_low"))
 
@@ -226,7 +258,37 @@ def test_supersede_closes_only_active_watches_and_the_next_write_must_acknowledg
         {"watch_id": w2["watch_id"], "disposition": "thesis_changed", "note": "住友 9/30 公告量產，已改寫量的賭注"}]), ctx)
     assert w1["status"] == "consumed" and w1["closed"]["note"].startswith("superseded")
     assert w2["status"] == "consumed" and w2["judgment"]["handled"]["verb"] == "thesis_changed"
+    assert "quote" not in w2["judgment"]                      # R2-a C5：作者 note 不是文件逐字，不得進 quote（L12／L18）
+    assert w2["judgment"]["note"].startswith("住友")
     assert second["registered"]
+
+
+def test_a_past_expiry_brief_watch_not_yet_marked_by_daily_is_not_swallowed_by_supersede(tmp_path: Path) -> None:
+    """R2-a C4：daily 還沒跑時，已過 expires 的 `brief:` watch 仍是 active——換版不得把它當「還在等」收掉。"""
+    ctx = _ctx()
+    first = _write(tmp_path, _record(), ctx)
+    watch = ctx.watches["watches"][0]
+    watch["expires"] = (TODAY - timedelta(days=1)).isoformat()
+    assert watch["status"] == "active"
+    with pytest.raises(ContractViolation, match="acknowledged_touched 沒處置"):
+        _write(tmp_path, _record(supersedes=first["brief_id"]), ctx)
+    _write(tmp_path, _record(supersedes=first["brief_id"], acks=[
+        {"watch_id": watch["watch_id"], "disposition": "retired", "note": "條件已過期、本版不再依賴"}]), ctx)
+    assert watch["status"] == "expired" and watch["expiry_resolution"]["kind"] == "narrative_rewritten"
+    assert "closed" not in watch                              # 不是被換版 consumed 掉的
+
+
+@pytest.mark.parametrize("change", ["until_arrived", "past_expiry"])
+def test_candidate_state_refuses_a_wait_that_has_already_woken_or_expired_by_date(tmp_path: Path, change) -> None:
+    """R2-a C4：`candidate_state` 不得指向一筆照日期已醒／已到期、只是 daily 還沒標記的 watch。"""
+    ctx = _ctx()
+    w = _wake_brief(ctx)
+    if change == "until_arrived":
+        w["until"] = TODAY.isoformat()
+    else:
+        w["expires"] = (TODAY - timedelta(days=1)).isoformat()
+    with pytest.raises(ContractViolation, match="不是 active"):
+        _write(tmp_path, _record(state="missing", watch_id=w["watch_id"]), ctx)
 
 
 def test_retract_does_not_swallow_a_touched_watch_and_rewriting_after_retract_still_acknowledges(tmp_path: Path) -> None:
@@ -248,6 +310,26 @@ def test_retract_does_not_swallow_a_touched_watch_and_rewriting_after_retract_st
     _write(tmp_path, _record(stamp=datetime.now(timezone.utc) + timedelta(seconds=3), acks=[
         {"watch_id": watch["watch_id"], "disposition": "still_holds", "note": "判定後確認條件其實沒發生"}]), ctx)
     assert watch["judgment"]["handled"]["verb"] == "still_holds"
+
+
+def test_a_watch_registration_failure_is_refused_before_the_ledger_is_touched(tmp_path: Path) -> None:
+    """R2-a C1：條件不到 20 字的反證過得了契約與寫入前提，但 `add_watch` 會拒——必須在 append 之前拒收。"""
+    ctx = _ctx()
+    before = copy.deepcopy(ctx.watches)
+    with pytest.raises(ContractViolation, match="預演失敗"):
+        _write(tmp_path, _record(disproof=[_disproof(condition="JX 宣布新產能投產")]), ctx)
+    assert read_brief_records(T, directory=tmp_path / "briefs")[0] == []
+    assert ctx.watches == before and not (tmp_path / "w.json").exists()
+    _write(tmp_path, _record(), ctx)                          # 修好之後同一家照常寫得進去
+
+
+def test_open_fails_closed_when_the_thesis_lifecycle_cannot_be_read(tmp_path: Path) -> None:
+    """R2-a C3：lifecycle 讀不到＝thesis 來源的 watch 歸屬不到本檔，醒來待判也擋不住——可開要 fail closed。"""
+    ctx = _ctx()
+    ctx.lifecycle = None
+    with pytest.raises(ContractViolation, match="lifecycle 讀不到"):
+        _write(tmp_path, _record(), ctx)
+    _write(tmp_path, _record(state="pass", reason="非邊緣"), ctx)   # 只擋可開
 
 
 def test_rerunning_the_same_record_does_not_register_twice(tmp_path: Path) -> None:

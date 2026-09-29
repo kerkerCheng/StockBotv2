@@ -21,7 +21,7 @@
 """
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any, Iterable, Mapping, Sequence
 
 from engine_b import event_watch as ew
@@ -85,6 +85,10 @@ def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping
     回傳人讀的理由清單（空＝沒有擋的）。"""
     acked = set(acknowledged)
     reasons = []
+    if lifecycle is None:
+        # R2-a C3：讀不到 lifecycle＝thesis 來源的 watch 歸屬不到本檔——擋不住「醒來待判」就等於 fail open。
+        # 與 `engine_b/disproof.py` 對 None 的處理一致：fail closed。
+        reasons.append("thesis lifecycle 讀不到——本檔 thesis 來源的反證 watch 無法歸屬，前提③確認不了（fail closed）")
     for w in attributed_watches(company_id, ticker, watches=watches, lifecycle=lifecycle, brief_ids=brief_ids,
                                 current_brief=current_brief):
         wid = str(w.get("watch_id"))
@@ -103,8 +107,35 @@ def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping
     return reasons
 
 
+def settle_due(data: dict[str, Any], company_id: str, *, brief_ids: Iterable[str], today: date) -> list[str]:
+    """本公司敘事來源的 watch 做 daily 會做的時間轉換：已過 `expires` 的 active → expired（`mark_expired` 同一條），
+    date 型已到 `until` 的 active → fired（`check_dates` 同一條）。回傳這一次轉換的 id。
+
+    R2-a C4：daily 還沒跑（或 audit 的一天 grace 內）時，已過到期日的 `brief:` watch 仍是 active——換版會把它當成
+    「還在等」收掉（consumed、沒有 `expiry_resolution`），「到期未判」就被吞了；`candidate_state` 也會指向一筆其實
+    已到期或已醒的等待。寫入端先做同一個轉換，判準與 `todo` 收集器一樣是「照日期認」。"""
+    out: list[str] = []
+    for watch in narrative_watches_of(company_id, watches=data["watches"], brief_ids=brief_ids):
+        if watch.get("status") != "active":
+            continue
+        if ew.past_expiry(watch, today=today):
+            ew.mark_expired(data, today=today, only=str(watch["watch_id"]))
+            out.append(str(watch["watch_id"]))
+            continue
+        if watch.get("kind") == "date":
+            try:
+                due = date.fromisoformat(str(watch.get("until")))
+            except (TypeError, ValueError):
+                continue
+            if due <= today:
+                watch["status"] = "fired"
+                watch["woken_by"] = {"kind": "date", "at": _now()}
+                out.append(str(watch["watch_id"]))
+    return out
+
+
 # ---------------------------------------------------------------------------
-# 寫入後的 hook（由 `alpha/providers/briefs.py` 在 append 成功後呼叫；冪等）
+# 寫入後的 hook（由 `alpha/providers/briefs.py` 呼叫：append 之前先在副本上預演一次，append 之後正式跑；冪等）
 # ---------------------------------------------------------------------------
 
 def _close_active(data: dict[str, Any], prefixes: tuple[str, ...], note: str, summary: list[str]) -> None:
@@ -125,7 +156,9 @@ def _apply_ack(data: dict[str, Any], watch_id: str, disposition: str, note: str,
     receipt = {"at": _now(), "kind": "narrative_ack", "disposition": disposition, "note": note, "brief_id": brief_id}
     if state == "fired":
         if disposition == "thesis_changed" and watch.get("kind") == ew.SEMANTIC_KIND:
-            watch["judgment"] = {"at": receipt["at"], "touches": "yes", "note": note, "quote": note,
+            # ⚠ 不寫 `quote`：`judge` 路徑的 quote 是**文件逐字**（L18），作者 note 不是逐字——同一欄承載兩種語意，
+            # 下游印成「引文：」就是把作者的話當成原文（R2-a C5，L12）。處置理由只在 `note` 與 `handled`。
+            watch["judgment"] = {"at": receipt["at"], "touches": "yes", "note": note, "via": "narrative_ack",
                                  "lead_id": (watch.get("woken_by") or {}).get("lead_id"),
                                  "handled": {"at": receipt["at"], "verb": disposition, "brief_id": brief_id}}
         watch["status"] = "consumed"
@@ -173,4 +206,4 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
 
 
 __all__ = ["attributed_watches", "blocking_for_open", "narrative_watches_of", "pending_rewrite",
-           "register_brief_watches", "thesis_memos"]
+           "register_brief_watches", "settle_due", "thesis_memos"]
