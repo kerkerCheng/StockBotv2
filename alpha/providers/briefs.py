@@ -87,13 +87,16 @@ class WriteContext:
         self.registry = registry
 
     @classmethod
-    def load(cls, ticker: str, *, today: Any) -> "WriteContext":
+    def load(cls, ticker: str, *, today: Any = None) -> "WriteContext":
+        """`today` 沒給＝排程時區的今天（`event_watch._today()`，與 daily 的到期判定同一個定義）。"""
         from engine_b import event_watch as ew
         from engine_b.disproof import load_lifecycle
         from query.structure import _load_edges
 
         from .structure_readings import known_nodes, read_reading_records, reading_status_rows
         from .three_questions import three_questions_for
+
+        today = today or ew._today()
 
         watches = ew.load_watches()
         edges = _load_edges()

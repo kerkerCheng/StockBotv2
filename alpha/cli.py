@@ -322,10 +322,9 @@ def cmd_brief(args: argparse.Namespace) -> int:
                 note=str(args.rationale or "retracted"), created_at=datetime.now(timezone.utc),
                 record_version=target.record_version, **v2)
         try:
-            from engine_b import event_watch as _ew
-
-            # 排程時區的今天（與 daily、`settle_due` 的到期判定同一個定義；R2-a 覆核 non-blocking #1）
-            ctx = WriteContext.load(ticker, today=_ew._today())
+            # 「今天」由 provider 取排程時區的今天（與 daily、`settle_due` 同一個定義；R2-a 覆核 non-blocking #1）——
+            # alpha 核心不得直接 import engine_b（tests/test_layer_separation.py）。
+            ctx = WriteContext.load(ticker)
             result = write_brief(record, ctx=ctx)
         except (AlphaError, ValueError) as exc:
             print(f"✗ {exc}", file=sys.stderr)

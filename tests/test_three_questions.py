@@ -40,6 +40,12 @@ def _quarters(first_end: date, n: int, *, revenue: float = 100.0, growth: float 
     return rows
 
 
+def _balance(first_end: date, n: int, value: float) -> list[dict]:
+    """與營收同期末的資產負債表點（淨負債要同一期末、而且夠新）。"""
+    return [{"period_end": r["period_end"], "filed": r["filed"], "accession": r["accession"], "value": value}
+            for r in _quarters(first_end, n)]
+
+
 def _domestic(**over) -> dict:
     bars_days = _weekdays(TODAY - timedelta(days=365 * 3 + 20), TODAY)
     price = {d: 10.0 + 5.0 * (i / len(bars_days)) for i, d in enumerate(bars_days)}    # 一路上漲
@@ -49,8 +55,8 @@ def _domestic(**over) -> dict:
         "price_settlement_currency": "USD", "price_to_settlement": 1.0,
         "revenue_quarters": _quarters(date(2022, 3, 31), 18),
         "operating_income_quarters": _quarters(date(2022, 3, 31), 18, revenue=10.0),
-        "cash": [{"period_end": "2022-01-01", "filed": "2022-02-01", "accession": "C", "value": 50.0}],
-        "total_debt": [{"period_end": "2022-01-01", "filed": "2022-02-01", "accession": "C", "value": 20.0}],
+        "cash": _balance(date(2022, 3, 31), 18, 50.0),
+        "total_debt": _balance(date(2022, 3, 31), 18, 20.0),
         "shares_cover": [{"period_end": "2022-01-15", "filed": "2022-02-01", "accession": "S", "value": 1000.0}],
         "splits": [], "source": "fixture",
     }
@@ -109,6 +115,28 @@ def test_net_debt_needs_the_same_period_end_on_both_sides() -> None:
 # ---------------------------------------------------------------------------
 # 已定價①
 # ---------------------------------------------------------------------------
+
+def test_basis_refuses_a_stale_operating_income_ttm_and_a_stale_net_debt() -> None:
+    """COHR 型：營業利益的 tag 停在兩年前，舊版拿那個 TTM 當「今天」判 EV/S（2026-09-29 Step 3.5 試跑撞到）。"""
+    assert tq.decide_basis(_domestic(), TODAY)[0] == "EV/S"
+    stale_op = _domestic(operating_income_quarters=_quarters(date(2022, 3, 31), 10, revenue=10.0))
+    basis, reason = tq.decide_basis(stale_op, TODAY)
+    assert basis == "P/S" and "不同步或已過期" in reason
+    stale_bs = _domestic(cash=_balance(date(2022, 3, 31), 10, 50.0), total_debt=_balance(date(2022, 3, 31), 10, 20.0))
+    basis, reason = tq.decide_basis(stale_bs, TODAY)
+    assert basis == "P/S" and "淨負債" in reason
+
+
+def test_history_samples_skip_days_whose_ttm_has_gone_stale() -> None:
+    """營收停在某一季之後，更晚的價格日不得繼續拿那個舊 TTM 算倍數（樣本數只算新鮮的日子）。"""
+    fresh = tq.own_history(_domestic(operating_income_quarters=()), today=TODAY)
+    stopped = tq.own_history(_domestic(operating_income_quarters=(),
+                                       revenue_quarters=_quarters(date(2022, 3, 31), 12)), today=TODAY)
+    assert fresh["basis"] == stopped["basis"] == "P/S"
+    assert fresh["absence_kind"] is None
+    assert stopped["absence_kind"] == "insufficient_evidence"            # 今天的倍數算不出來：不拿兩年前的營收冒充
+    assert stopped["detail"]["samples"] < fresh["detail"]["samples"]
+
 
 def test_own_history_percentile_on_a_rising_price_with_flat_revenue_is_near_the_top() -> None:
     row = tq.own_history(_domestic(), today=TODAY)

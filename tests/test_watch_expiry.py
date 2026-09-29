@@ -939,11 +939,11 @@ def test_counts_do_not_call_thesis_touches_orphans_when_lifecycle_is_unreadable(
     watch = _semantic(data, expires=FUTURE)
     _touch(data, watch)
     env["life"] = None                                   # load_lifecycle（被 fixture 換掉）回 None＝讀不到
-    c = disproof.disproof_counts(data["watches"], readings={}, root=env["tmp"])
+    c = disproof.disproof_counts(data["watches"], readings={}, root=env["tmp"], briefs=())
     assert c["lifecycle_unreadable"] is True and c["orphan_touched"] == 0
     env["life"] = {"x": {"status": "active", "memo": MEMO}}
     (env["tmp"] / MEMO).write_text("# memo\n\n沒有推翻那一節\n", encoding="utf-8")
-    c = disproof.disproof_counts(data["watches"], readings={}, root=env["tmp"])
+    c = disproof.disproof_counts(data["watches"], readings={}, root=env["tmp"], briefs=())
     assert c["memo_unreadable"] == ["x"]
 
 

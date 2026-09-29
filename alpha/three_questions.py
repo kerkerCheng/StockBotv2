@@ -40,6 +40,9 @@ PRICE_FRESH_DAYS = 14
 RELATIVE_WINDOWS: tuple[int, ...] = (30, 90)
 #: 季度連續的判準：相鄰兩季 period_end 相距 80–100 天（13／14 週季度都落在裡面）。
 _QUARTER_GAP = (80, 100)
+#: TTM 與淨負債的最新一期距 d 最多多舊（天）：一季（~91 天）＋申報期限與緩衝。超過＝那一天的財報已經過期，
+#: 樣本不算（2026-09-29 Step 3.5 試跑：COHR 的營業利益 tag 停在 2024-06，舊版拿兩年前的 TTM 當「今天」判成 EV/S）。
+FUNDAMENTAL_MAX_AGE_DAYS = 200
 
 _RULE_OWN = (
     "每個交易日 d：市值＝當天 raw 收盤 ×（d 之前最新一份封面股數 × 其後到 d 的分割比例）；"
@@ -163,15 +166,17 @@ def _multiple_series(inp: Mapping[str, Any], *, basis: str) -> list[tuple[date, 
         if inp.get("revenue_kind") == "monthly":
             revenue, _ = monthly_ttm(inp.get("monthly_revenue") or (), d)
         else:
-            revenue, _, _ = ttm(inp.get("revenue_quarters") or (), d)
+            revenue, last_end, _ = ttm(inp.get("revenue_quarters") or (), d)
+            if last_end is None or (d - last_end).days > FUNDAMENTAL_MAX_AGE_DAYS:
+                continue                                 # 那一天的營收 TTM 已經過期——不拿舊數字冒充當天
         shares = shares_on(inp.get("shares_cover") or (), splits, d)
         if not revenue or revenue <= 0 or not shares:
             continue
         cap = float(close_raw) * factor * shares
         value = cap
         if basis == "EV/S":
-            nd, _ = net_debt_on(inp.get("cash") or (), inp.get("total_debt") or (), d)
-            if nd is None:
+            nd, nd_end = net_debt_on(inp.get("cash") or (), inp.get("total_debt") or (), d)
+            if nd is None or nd_end is None or (d - nd_end).days > FUNDAMENTAL_MAX_AGE_DAYS:
                 continue
             value = cap + nd
         out.append((d, value / revenue))
@@ -182,14 +187,17 @@ def decide_basis(inp: Mapping[str, Any], today: date) -> tuple[str, str]:
     """今天的口徑：TTM 營業利益 ≥ 0 且有同期淨負債 → EV/S；否則 P/S（理由寫明）。"""
     if inp.get("revenue_kind") == "monthly":
         return "P/S", "台股月營收沒有營業利益 → 一律 P/S"
-    op, _, _ = ttm(inp.get("operating_income_quarters") or (), today)
-    nd, _ = net_debt_on(inp.get("cash") or (), inp.get("total_debt") or (), today)
+    op, op_end, _ = ttm(inp.get("operating_income_quarters") or (), today)
+    _rev, rev_end, _ = ttm(inp.get("revenue_quarters") or (), today)
+    nd, nd_end = net_debt_on(inp.get("cash") or (), inp.get("total_debt") or (), today)
     if op is None:
         return "P/S", "今天的 TTM 營業利益取不到 → P/S"
+    if op_end != rev_end or (today - op_end).days > FUNDAMENTAL_MAX_AGE_DAYS:
+        return "P/S", (f"TTM 營業利益的最新一季（{op_end}）與營收（{rev_end}）不同步或已過期——不拿舊的營業利益判口徑 → P/S")
     if op < 0:
         return "P/S", "今天 TTM 營業利益 < 0（虧損期）→ P/S"
-    if nd is None:
-        return "P/S", "今天沒有同一期末的債務與現金 → 淨負債缺席 → P/S"
+    if nd is None or nd_end is None or (today - nd_end).days > FUNDAMENTAL_MAX_AGE_DAYS:
+        return "P/S", "今天沒有夠新的同一期末債務與現金 → 淨負債缺席 → P/S"
     return "EV/S", "今天 TTM 營業利益 ≥ 0 且有同期淨負債 → EV/S"
 
 
@@ -234,7 +242,7 @@ def own_history(inp: Mapping[str, Any], *, today: date,
     if not series or series[-1][0] != last_bar:
         return line(key, label, rule=_RULE_OWN, basis=basis, absence_kind="insufficient_evidence",
                     reason=f"今天（{last_bar.isoformat()}）的 {basis} 算不出來（{basis_reason}；"
-                           "TTM 營收、股數或淨負債缺一）",
+                           "TTM 營收、股數或淨負債缺一或已過期）",
                     detail={"basis_reason": basis_reason, "samples": len(series)})
     window_days = (series[-1][0] - series[0][0]).days
     today_value = series[-1][1]

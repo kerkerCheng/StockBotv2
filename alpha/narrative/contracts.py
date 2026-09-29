@@ -134,7 +134,7 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
         "do_not": "⚠ 不得寫『AI 需求強勁』這種沒有主詞的句子——要有誰、花多少、買什麼。⚠ 金額要指得回引用。",
     },
     "position": {
-        "question": "它坐在哪幾層／哪幾格？各占多少營收？（出現在數字裡了嗎——引用 {in_numbers_latest}／{in_numbers_as_of}）",
+        "question": "它坐在哪幾層／哪幾格？各占多少營收？（出現在數字裡了嗎——引用「年增 {in_numbers_latest}（{in_numbers_as_of}）」；它填的是年增率，不是營收）",
         "look_at": "rides[] 的讀圖供給側、分部／產品線占比、三題稽核區「出現在數字裡了嗎」那一行",
         "do_not": "⚠ 不得用內部節點名——用人話。⚠ 答了 `answers.in_numbers`＝yes／no 這一格就必須含 {in_numbers_latest}。",
     },
@@ -197,7 +197,7 @@ PLACEHOLDERS_V2: Mapping[str, str] = {
     "cohort_median": "已定價②：主題等權組同口徑中位數",
     "rel_return_30d": "已定價③：相對組 30 個交易日漲幅",
     "rel_return_90d": "已定價③：相對組 90 個交易日漲幅",
-    "in_numbers_latest": "出現在數字裡了嗎：序列最新一點",
+    "in_numbers_latest": "出現在數字裡了嗎：序列最新一點的**年增率**（YoY；不是營收本身——寫「年增 {in_numbers_latest}」；最新一點沒有年增〔例：分部占比序列〕時印（尚無））",
     "in_numbers_as_of": "出現在數字裡了嗎：最新一點的日期",
 }
 #: `what_must_be_true` 不得出現的 placeholder：價格與已定價的數字（「對了值多少」已退役，那一格只談條件）。

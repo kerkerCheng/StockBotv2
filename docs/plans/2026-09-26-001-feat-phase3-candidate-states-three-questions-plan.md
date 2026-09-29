@@ -222,7 +222,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.2 | Engine C 機械歷史表＋一次回填＋daily 增量步驟；going concern 結構化欄位（R2-c：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `aaf926b`、`42f2596`、`b403e78`＋收尾 |
 | 3.3 | 三題稽核區；主題等權組 ledger；邊緣判定 | ✅ | 執行模型 | 見 git log「Step 3.3」 |
 | 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `4e96223`、`0d4c7ad`＋收尾 |
-| 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2 | ○ | **強模型** | |
+| 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2（收據 `docs/reports/2026-09-29-phase3-step35-narratives.md`；pq2 [656]–[661] 等使用者 go） | ✅ | **強模型** | 見 git log「Step 3.5」 |
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳 | ○ | 執行模型 | |
 | 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ○ | 執行模型 | |
 | 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ○ | 執行模型 | |
@@ -254,8 +254,11 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 10 | 3.4 | （未寫）沒有短評時首屏列的題目 | 沒有短評的 70 檔，brief 面板列的是 **v2 七題**（原本是 v1 七題） | v1 的題目含已退役的估值題（市場怎麼看、對了值多少）；每次載入的題目會被當成目標（L19）。個股頁核心面板文字 digest 因此在這 70 檔的 brief 面板變動——3.7 的前後對照要把它列為預期變動 |
 | 11 | 3.4 | 寫入端檢查 | `alpha brief --add` 寫入前讀 Neo4j（讀圖現行狀態）與 Engine C（三題），寫入後寫 `event_watches.json`；新寫一律 v2、v1 只收撤回 | 「現行」要跟現在的圖比才答得出；三題的 unmeasurable 要讀稽核區才驗得了；v1 新寫會把退役題目再帶回來 |
 | 12 | 3.4 | `still_holds` 對到 watch 的 reactivate | 醒來的舊版 `brief:` watch 處置為 still_holds 時**收掉並記收據**，不 reactivate | 新一版的 `disproof[]` 會以新的 `brief:<新 id>#n` 重登同一條件；舊版的回 active 會與新版的同條件並存（L12：同一條件兩筆 watch） |
+| 13 | 3.5（修 3.3） | 已定價①的口徑判定與逐日倍數沒有鮮度規則 | `FUNDAMENTAL_MAX_AGE_DAYS = 200`：口徑判定要求營業利益 TTM 與營收 TTM **同一季收尾**且不過期、淨負債不過期，否則 P/S；逐日序列裡營收 TTM／淨負債過期的那一天不算樣本 | 3.5 試跑：COHR 營業利益 tag 停在 2024-06、LITE 總負債 tag 停在 2023-04，舊版拿兩三年前的數字當「今天」判成 EV/S（偏差 7 的同一類，這次在已定價①）。修後兩檔落 P/S、理由寫出是哪一側過期 |
 | 14 | 3.4 | §5 第 4 點：`link_source_ref` 指向的來源換版（讀圖重讀、memo 換版）→ 進 `narrative_rewrite` | 3.4 **沒做**，移進 3.6 的候選狀態推導（§7 第 1 點新增一條） | R2-a N1 抓到：3.4 沒實作也沒測試。它不是 watch 的狀態，是「現行敘事的連結斷了」——要從敘事往 registry 看，候選狀態推導本來就逐檔重算這件事；放 3.6 讓佇列段、audit、心跳與候選板用同一個判定 |
 | 15 | 3.4 | （未寫）寫入端怎麼看「已過到期日、daily 還沒標記」的 watch | 寫入前先對本公司敘事來源的 watch 做 daily 同一條時間轉換（`narrative_watches.settle_due`：過 `expires`→expired、date 到 `until`→fired）；`candidate_state` 另外拒收照日期已過期的 watch；watch 登記在 append 前先在副本上預演 | R2-a C1／C4：否則換版會把「到期未判」當成還在等收掉，登記失敗會留下「ledger 有、registry 沒有」的半套寫入 |
+| 16 | 3.5（修 3.4） | `{in_numbers_latest}` 的說明：「出現在數字裡了嗎：序列最新一點」 | 說明與 `brief_frame` 題目改成「序列最新一點的**年增率**——寫『年增 {in_numbers_latest}』」；三份敘事同日換版只更正措辭 | 3.5 寫入後首屏現形：照說明寫「最新一季營收 {in_numbers_latest}」填出來是「營收 +164.8%」——說明與填值不一致，寫的人一定照說明寫（L12）。append-only，所以更正是換版不是改行 |
+| 17 | 3.5（修 3.4） | （未寫）測試與真實 ledger 的隔離；「今天」取哪一個 | `disproof_counts` 的 7 處測試呼叫改為注入 `briefs=()`；`WriteContext.load` 的 `today` 預設改由 provider 取排程時區的今天，`alpha/cli.py` 不再 import `engine_b` | 3.5 寫進第一筆 v2 敘事後，`test_counts_are_per_condition_and_the_four_cells_add_up` 期望 3 得 4——`disproof_counts` 沒給 `briefs` 就讀真實 ledger，3.4 的測試一直在讀真實資料，只是當時 ledger 裡沒有 v2。另外 3.4 收尾（`6dd0fd4`）為了統一「今天」在 `alpha/cli.py` 直接 import `engine_b`，違反 `test_layer_separation`（當時只跑子集測試沒抓到；已 push），本 Step 修正並跑全套 |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -648,3 +651,5 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 21. **三題尚未接 as-of 視角**：歷史表的 PIT 讀法已備（`shared/as_of.py`），但 view 其他段在 as-of 下各有規則；目前 as-of 模式下三題 section 誠實缺席。
 22. **R2-a non-blocking（Step 3.4 覆核）**：N2 寫入端「供給側」只認 `supplies_to`（plan 寫 supplies_to／develops，方向更嚴）、「它在需求側」的提示對外向需求邊會印成「兩側都不在」；N4 QueueLiveness：fired 的 `wake_brief`（非語意 kind）沒有滯留檢查、fired 的 `brief:` 語意 watch 滯留訊息指向的 consumer 寫成「semantic-queue → judge」；N5 v2 的禁字表與 placeholder 字彙在 parse 路徑上，日後改字彙會讓舊 v2 紀錄解析失敗（v1 早就如此，§13 要註明）；N8 舊版／已撤回版 fired 的 `brief:` watch 不進 `disproof_counts` 任何一格、brief ledger 的 parse errors 被 `current_briefs` 與 audit 忽略、舊版 `candidate_state` 用過的 `wake_brief` 若新版不再引用仍留著（醒來時多處置一次）。
 23. **R2-a 覆核 non-blocking（0d4c7ad）**：①「今天」已統一成排程時區（`alpha brief` CLI 改用 `event_watch._today()`，收尾 commit 當場修）；②`settle_due` 只轉敘事來源的 watch——thesis／讀圖來源已過 expires、daily 還沒標記的，可開前提③最多晚一天才算「到期未判」（hook 不會收掉它們、不丟資料；3.6 每天重驗補上）；③寫入被拒時記憶體裡的 `ctx.watches` 已被時間轉換過（不存檔；CLI 丟掉 ctx，重用 ctx 的呼叫端要知道）；④**writer lock 沒有在 `alpha brief --add` 程式裡強制**：它在讀 registry 與存檔之間整份覆寫 `event_watches.json`，互斥只靠操作程序先取鎖——要不要在 CLI 內自動取鎖。
+24. **分部／產品線占比序列沒有年增**（Step 3.5）：「出現在數字裡了嗎」第一優先來源是占比序列，它的最新一點沒有 `yoy`，`{in_numbers_latest}` 會印「（尚無）」——寫的人答 yes／no 時型別層強制引用它，卻引用到一個恆缺席的值（例：3081.TWO）。要不要讓占比序列另給一個可引用的 placeholder（例如瓶頸業務占比的變化）。
+25. **going concern pq2 [657]–[661] 的兩個判讀點要使用者看**（Step 3.5）：SIVE.ST 的 ISA「betydande tvivel（significant doubt）」對到本欄 `substantial_doubt`；IQE.L 的 KPMG 第 4 節第三點模板句與第二點字面矛盾，判讀依第二點。美國三檔的 no_substantial_doubt 依據是「說明段不存在」。

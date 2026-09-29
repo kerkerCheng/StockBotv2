@@ -351,7 +351,7 @@ def test_v3_disproof_is_counted_as_structured_not_as_v1_prose() -> None:
     from engine_b import disproof
 
     reading = parse_structure_reading_record(_v3())
-    counts = disproof.disproof_counts([], lifecycle={}, readings={(SOCKET, "socket"): reading})
+    counts = disproof.disproof_counts([], lifecycle={}, readings={(SOCKET, "socket"): reading}, briefs=())
     assert counts["v1_prose_readings"] == 0
     assert counts["unwatched"] == 1, "這份讀圖的一條反證還沒登記 watch——要算成未盯，不是散文"
 
