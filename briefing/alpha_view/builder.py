@@ -43,6 +43,8 @@ from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from alpha.gap_closure import consensus_progress
 from alpha.narrative import ABSENT, SLOT_LABELS_V2, fill_brief, format_value, select_brief, slot_labels
+from alpha.narrative.contracts import RECORD_VERSION_V2
+from alpha.structure_reading import READING_UNITS
 from alpha.narrative.argument import chain_paragraph, closure_phrase, timeline_paragraph
 from briefing.analyst_view.contracts import PLAIN_REFRESH_OVERALL
 
@@ -364,6 +366,7 @@ def _investor_brief_section(
     price: Datum, consensus: ConsensusSection, catalysts: CatalystSection,
     refresh_overall: str, gap: ExpectationGapSection | None = None,
     three_questions: Mapping[str, Any] | None = None,
+    names: Mapping[str, str] | None = None,
 ) -> InvestorBriefSection:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：那把尺（現價／沒賭對／賭對／判斷錯了）整格退役。**
     # ROADMAP「個股頁／首屏」那一列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
@@ -383,7 +386,8 @@ def _investor_brief_section(
         slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
                       for key, label in SLOT_LABELS_V2.items())
         return InvestorBriefSection(meta=meta, slots=slots, status_light=light,
-                                    brief_id=None, is_not=BRIEF_IS_NOT)
+                                    brief_id=None, is_not=BRIEF_IS_NOT,
+                                    rides=_rides_datum(None, names or {}, reason=why))
     values = _brief_values(price=price, consensus=consensus, catalysts=catalysts, today=today, gap=gap,
                            three_questions=three_questions)
     filled, absent = fill_brief(brief, values)
@@ -405,7 +409,33 @@ def _investor_brief_section(
                                  "每一句的引用見各格 evidence_refs",))
     return InvestorBriefSection(meta=meta, slots=tuple(slots), status_light=light,
                                 brief_id=brief.brief_id, is_not=BRIEF_IS_NOT,
-                                )
+                                rides=_rides_datum(brief, names or {}))
+
+
+#: 騎的單位 → 人讀（讀圖字彙的前半句：「層讀圖：…」→「層」）。
+RIDE_UNIT_LABELS: Mapping[str, str] = {unit: text.split("讀圖")[0] for unit, text in READING_UNITS.items()}
+RIDES_LABEL = "騎哪一層或插槽"
+
+
+def _rides_datum(brief: Any, names: Mapping[str, str], *, reason: str | None = None) -> Datum:
+    """v2 敘事的 `rides[]` → 一格（Phase 3 Step 3.7，`bet` 面板的「騎層或插槽」）。**照抄宣告，不驗現行**——
+    騎的讀圖還是不是現行由候選狀態推導與讀圖面板回答，這一格只說「寫的人宣告騎在哪」。"""
+    if brief is None:
+        return missing("brief:rides", RIDES_LABEL, reason or "還沒寫敘事", authority=A_BRIEF,
+                       absence_kind="not_yet_recorded")
+    if brief.record_version != RECORD_VERSION_V2:
+        return missing("brief:rides", RIDES_LABEL, "這份敘事是舊版（v1 沒有 rides）——重寫成 v2 才有", authority=A_BRIEF,
+                       absence_kind="not_yet_recorded")
+    if not brief.rides:
+        return missing("brief:rides", RIDES_LABEL, "這份 v2 敘事沒有宣告騎哪一格", authority=A_BRIEF,
+                       absence_kind="not_yet_recorded")
+    value = [{"node": r.node, "node_name": names.get(r.node) or r.node.split(":", 1)[-1].replace("_", " "),
+              "unit": r.unit, "unit_label": RIDE_UNIT_LABELS.get(r.unit, r.unit), "reading_id": r.reading_id}
+             for r in brief.rides]
+    return Datum(key="brief:rides", label=RIDES_LABEL, value=value, status="available", basis="session_judgment",
+                 authority=A_BRIEF, as_of=brief.created_on,
+                 method="研究 session 寫進敘事 ledger 的 rides[]（append-only）；本格照抄",
+                 dependencies={"brief_id": brief.brief_id})
 
 
 # ---------------------------------------------------------------------------
@@ -445,7 +475,8 @@ def _citations(narrative: Mapping[str, Any], about: Sequence[str], *, limit: int
 def _argument_section(*, company_label: str, company_id: str | None, structural: StructuralThesisSection,
                       variant: VariantViewSection,
                       falsification: FalsificationSection, catalysts: CatalystSection, lifecycle: LifecycleFacts,
-                      narrative: Mapping[str, Any], reporting_currency: str | None, reference_day: date) -> ArgumentSection:
+                      narrative: Mapping[str, Any], reporting_currency: str | None, reference_day: date,
+                      chain_readings: Mapping[str, Any] | None = None) -> ArgumentSection:
     names = dict(narrative.get("node_names") or {})
     # 公司名字：圖的 name 優先；registry 沒有 display name 時 identity 會給 `co:xxx（TICKER）`，那不是人話——退回 id 尾巴。
     company_name = names.get(company_id or "") or (
@@ -463,13 +494,19 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
                                 dependencies={"citations": list(citations), "long_form": list(long_form)}))
 
     # 1. 鏈
-    anchor = next((d.value for d in structural.scarcity_inputs if d.key == "demand_anchor"), None)
+    # ⚠ 2026-09-30（Phase 3 Step 3.7）：需求端改讀**騎的讀圖**（沒有 v2 敘事時讀它坐的層／插槽的現行讀圖）的需求側，
+    # 不再經 `structural.scarcity_inputs` 的 `demand_anchor`（`get_bottlenecks` 的 sub≥4 成員需求錨＝filter 殘留，G1）。
+    # `get_bottlenecks` 本身不退役（Q1 與 PointInTime 探針仍用它，plan §0.3）。邊照舊來自 `get_company_structural_context`。
+    demand = dict(chain_readings) if chain_readings is not None else {
+        "absence": {"kind": "upstream_unavailable", "reason": "這次沒有給讀圖輸入"}}
     edges = [{"relation": e.relation, "target": e.target, "evidence_class": e.evidence_class,
               "sole_source": e.sole_source, "qualification_status": e.qualification_status}
              for e in structural.edges if e.purpose == "actionable"]
-    chain_about = [str(e["target"]) for e in edges] + ([str(anchor)] if anchor else [])
-    _para("chain", chain_paragraph(company=company_name, anchor_id=anchor, edges=edges, names=names),
+    demand_ids = [str(c) for row in demand.get("rows") or () for c in row.get("demand_customers") or ()]
+    chain_about = [str(e["target"]) for e in edges] + demand_ids
+    _para("chain", chain_paragraph(company=company_name, edges=edges, names=names, demand=demand),
           citations=_citations(narrative, chain_about + ([company_id] if company_id else [])), refs=[])
+    paragraphs[-1] = _with_demand(paragraphs[-1], demand)
 
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b，C／H 組）：「數字怎麼算出來」與「和市場差在哪」兩段退役。**
     # 前者由橋的 steps／假設／敏感度組句，後者由內部 vs 共識的數值比較、目標倍數與反向橋組句——
@@ -504,6 +541,22 @@ def _argument_section(*, company_label: str, company_id: str | None, structural:
                        as_of=reference_day,
                        warnings=(("圖來源的 claim 引文取不到：" + str(narrative.get("error")),) if narrative.get("error") else ()))
     return ArgumentSection(meta=meta, paragraphs=tuple(paragraphs), is_not=ARGUMENT_IS_NOT)
+
+
+def _with_demand(datum: Datum, demand: Mapping[str, Any]) -> Datum:
+    """鏈段那一格的 `dependencies` 補上需求端的出處（騎的讀圖 id、依據、缺席分型）——標籤指得回原始證據（L18）。"""
+    deps = dict(datum.dependencies or {})
+    deps["demand"] = {
+        "basis": demand.get("basis"), "absence": demand.get("absence"),
+        "readings": [{"node": r.get("node"), "unit": r.get("unit"), "reading_id": r.get("reading_id"),
+                      "status": r.get("status"), "demand_customers": list(r.get("demand_customers") or ())}
+                     for r in demand.get("rows") or ()],
+        "gone": [dict(g) for g in demand.get("gone") or ()], "seats": list(demand.get("seats") or ()),
+    }
+    return Datum(key=datum.key, label=datum.label, value=datum.value, status=datum.status, basis=datum.basis,
+                 authority=datum.authority, method=datum.method, unit=datum.unit, as_of=datum.as_of,
+                 reason=datum.reason, evidence_refs=datum.evidence_refs, dependencies=deps,
+                 absence_kind=datum.absence_kind)
 
 
 # ---------------------------------------------------------------------------
@@ -721,10 +774,14 @@ def build_alpha_investment_view(
     #: Phase 3 Step 3.3：財務三題（`alpha.providers.three_questions.three_questions_for` 的輸出），取數層算好帶進來。
     three_questions: Mapping[str, Any] | None = None,
     three_questions_reason: str | None = None,
+    three_questions_absence_kind: str = "upstream_unavailable",
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
     narrative_context: Mapping[str, Any] | None = None,
     consensus_history: Sequence[tuple[date, float, Any]] = (),
+    #: Phase 3 Step 3.7：argument 鏈段的需求端——騎的讀圖（或坐的層／插槽的現行讀圖）＋需求側客戶。
+    #: 取數層（`sources._chain_readings`）由一次載入的讀圖 context 切好帶進來；None＝這次沒給（印「沒讀到」）。
+    chain_readings: Mapping[str, Any] | None = None,
 ) -> AlphaInvestmentView:
     """組裝一家公司的 `AlphaInvestmentView`。所有參數都是已取好的既有 authority 輸出。
 
@@ -1794,13 +1851,13 @@ def build_alpha_investment_view(
         company_label=identity_section.company_label, company_id=identity_section.company_id,
         structural=structural_section, variant=variant_section, falsification=falsification_section,
         catalysts=catalyst_section, lifecycle=identity_section.lifecycle, narrative=dict(narrative_context or {}),
-        reporting_currency=reporting_currency, reference_day=reference_day)
+        reporting_currency=reporting_currency, reference_day=reference_day, chain_readings=chain_readings)
     brief_section = _investor_brief_section(
         brief_records, brief_parse_errors,
         as_of=context.as_of, today=today, reference_day=reference_day,
         price=market_section.price, consensus=consensus_section, catalysts=catalyst_section,
         refresh_overall=refresh_section.overall, gap=expectation_gap_section,
-        three_questions=three_questions,
+        three_questions=three_questions, names=dict((narrative_context or {}).get("node_names") or {}),
         )
 
     return AlphaInvestmentView(
@@ -1816,7 +1873,8 @@ def build_alpha_investment_view(
         freshness=tuple(freshness_items), refresh_status=refresh_section,
         investor_brief=brief_section, argument=argument_section, warnings=tuple(warnings),
         three_questions=_three_questions_section(three_questions, reason=three_questions_reason,
-                                                 reference_day=reference_day),
+                                                 reference_day=reference_day,
+                                                 absence_kind=three_questions_absence_kind),
     )
 
 
@@ -1829,12 +1887,13 @@ THREE_QUESTIONS_IS_NOT: tuple[str, ...] = (
 
 
 def _three_questions_section(result: Mapping[str, Any] | None, *, reason: str | None,
-                             reference_day: date) -> ThreeQuestionsSection:
-    """三題 → section。**不判讀**：行原樣帶著；section 的 status 只反映「有沒有接到三題」。"""
+                             reference_day: date, absence_kind: str = "upstream_unavailable") -> ThreeQuestionsSection:
+    """三題 → section。**不判讀**：行原樣帶著；section 的 status 只反映「有沒有接到三題」。
+    `absence_kind`：取不到時是哪一種沒有，由取數層宣告（as-of 視角＝`point_in_time_unavailable`，不是上游壞了；3.7 R1）。"""
     if result is None:
         meta = SectionMeta(status="missing", basis="none", authority=A_THREE_QUESTIONS,
                            capability=CAP_THREE_QUESTIONS, reason=reason or "三題取數失敗",
-                           as_of=reference_day, absence_kind="upstream_unavailable")
+                           as_of=reference_day, absence_kind=absence_kind)
         return ThreeQuestionsSection(meta=meta, will_it_die=(), priced_in=(), in_numbers=(), filer_class=None,
                                      is_not=THREE_QUESTIONS_IS_NOT)
     rows = [r for q in ("will_it_die", "priced_in", "in_numbers") for r in result.get(q) or ()]
@@ -1844,10 +1903,29 @@ def _three_questions_section(result: Mapping[str, Any] | None, *, reason: str | 
                        capability=CAP_THREE_QUESTIONS, as_of=reference_day,
                        reason=(f"{len(rows) - valued}／{len(rows)} 行缺席（每行都宣告了是哪一種）" if valued < len(rows)
                                else None))
+    lines = tuple(_three_question_datum(q, i, row)
+                  for q in ("will_it_die", "priced_in", "in_numbers") for i, row in enumerate(result.get(q) or ()))
     return ThreeQuestionsSection(
         meta=meta, will_it_die=tuple(result.get("will_it_die") or ()), priced_in=tuple(result.get("priced_in") or ()),
         in_numbers=tuple(result.get("in_numbers") or ()), filer_class=result.get("filer_class"),
-        is_not=THREE_QUESTIONS_IS_NOT)
+        is_not=THREE_QUESTIONS_IS_NOT, lines=lines)
+
+
+def _three_question_datum(question: str, index: int, row: Mapping[str, Any]) -> Datum:
+    """三題的一行 → 一格（個股頁稽核區，Step 3.7）。**照抄**：值、source、as_of、口徑、rule 或缺席分型與理由。
+    有值與缺席二擇一（`alpha.three_questions.line` 已在產生端強制）；status 由缺席分型查表，不另判。"""
+    kind = row.get("absence_kind")
+    key = f"tq:{question}:{index}:{row.get('key')}"
+    label = str(row.get("label") or row.get("key"))
+    deps = {"question": question, "row_key": row.get("key"), "source": row.get("source"), "basis": row.get("basis"),
+            "rule": row.get("rule"), "detail": dict(row.get("detail") or {})}
+    as_of = _as_date(row.get("as_of"))
+    if kind is None:
+        return Datum(key=key, label=label, value=row.get("value"), status="available", basis="deterministic",
+                     authority=A_THREE_QUESTIONS, method=row.get("rule"), as_of=as_of, dependencies=deps)
+    return Datum(key=key, label=label, status=("insufficient_evidence" if kind == "insufficient_evidence" else "missing"),
+                 authority=A_THREE_QUESTIONS, method=row.get("rule"), as_of=as_of, reason=row.get("reason"),
+                 absence_kind=kind, dependencies=deps)
 
 
 def _as_date(value: Any) -> date | None:

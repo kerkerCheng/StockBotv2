@@ -182,8 +182,8 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
 
     analyst = build_analyst_view(_bare_view(fundamentals=_FakeFundamentals(available=False)))
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` panel 退役。
-    # Phase 2 Step 2.7：`readings`（讀圖）加入選配。
-    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "readings"}
+    # Phase 2 Step 2.7：`readings`（讀圖）加入選配；Phase 3 Step 3.7 升核心，另加三個選配。
+    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "candidate", "three_questions", "downside"}
     for name in OPTIONAL_PANELS:
         assert getattr(analyst, name).optional is True, name
     # optional 的缺席一律不進 blockers／flags，只進 optional_unavailable。
@@ -193,9 +193,9 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
     assert not (flagged_panels & set(OPTIONAL_PANELS))
     unavailable = "｜".join(analyst.readiness.optional_unavailable)
     assert "fundamental" in unavailable and "bet" in unavailable
-    # 而核心 panel 的缺席**必須**進 blockers——短評與歸零旗標 2026-09-23 起是核心。
-    assert set(CORE_PANELS) == {"headline", "brief", "argument", "research", "wipeout"}
-    assert "brief" in blocked_panels and "wipeout" in blocked_panels
+    # 而核心 panel 的缺席**必須**進 blockers——短評與歸零旗標 2026-09-23 起是核心；讀圖 2026-09-30（Step 3.7）起。
+    assert set(CORE_PANELS) == {"headline", "brief", "argument", "research", "readings", "wipeout"}
+    assert "brief" in blocked_panels and "wipeout" in blocked_panels and "readings" in blocked_panels
 
 
 def test_retired_panels_are_gone_from_every_closed_list() -> None:
@@ -416,9 +416,10 @@ def test_projection_is_deterministic_and_json_round_trips_with_nulls_preserved()
     # （首屏的單位是句不是格）。**封閉清單的相等斷言留著**——有人加回來或漏刪一處都會紅。
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` 退出 PANEL_ORDER。
     # Phase 2 Step 2.7：`readings` 緊接在論證之後。
+    # Phase 3 Step 3.7：`candidate` 緊接短評（首屏末行）；`downside` 緊接讀圖；`three_questions` 在稽核區。
     assert first["panel_order"] == list(
-        ("brief", "argument", "readings", "bet", "wipeout",
-         "headline", "fundamental", "research"))
+        ("brief", "candidate", "argument", "readings", "downside", "bet", "wipeout",
+         "headline", "fundamental", "three_questions", "research"))
     assert set(first["questions"]) == set(QUESTIONS)
 
 
@@ -438,7 +439,9 @@ def test_information_hierarchy_puts_the_sentence_before_the_cells() -> None:
     """
     analyst = build_analyst_view(_full_view(with_criterion=True))
     order = list(analyst.PANEL_ORDER)
-    assert order[0] == "brief" and order[1] == "argument", order
+    # Step 3.7：首屏是短評＋末行候選狀態（ROADMAP「首屏：末行候選狀態；三題三個字」），接著才是論證。
+    assert order[0] == "brief" and order[1] == "candidate" and order[2] == "argument", order
+    assert order.index("three_questions") > order.index("argument")          # 三題的數字住稽核區
     # 稽核區的原始數字（fundamental）與現價排在論證之後，不搶在句子前面。
     assert order.index("fundamental") > order.index("argument")
     assert order.index("headline") > order.index("argument")
@@ -472,7 +475,7 @@ def test_worst_status_and_readiness_class_are_declared_lookups() -> None:
 
 #: 來源**不在** read model 的 panel：由 materialize 注入一份輸入（讀圖：圖 ＋ 讀圖 ledger 的比對結果）。
 #: 規則不變——狀態與理由照抄那份輸入，不得由本層造——只是主詞換成注入的輸入（下面三條專屬測試）。
-INJECTED_PANELS = frozenset({"readings"})
+INJECTED_PANELS = frozenset({"readings", "candidate", "downside"})
 
 
 def _reading_row(status: str, **kw) -> dict:
@@ -493,10 +496,10 @@ def test_readings_panel_absence_kinds_are_declared_by_the_input_not_guessed() ->
     unreadable = build_analyst_view(_bare_view(), readings={"absence": {"kind": "upstream_unavailable",
                                                                          "reason": "讀不到圖"}}).readings
     assert unreadable.absence_kind == "upstream_unavailable" and unreadable.reason == "讀不到圖"
-    # 選配：缺席不進 blockers／flags（readiness 不變差）。
-    analyst = build_analyst_view(_bare_view())
-    assert "readings" not in {b.panel for b in analyst.readiness.blocker_details}
-    assert "readings" not in {f.panel for f in analyst.readiness.flag_details}
+    # 2026-09-30（Step 3.7）升核心：缺席進 blockers，而且帶著產生端宣告的缺席分型（不是 settled）。
+    analyst = build_analyst_view(_bare_view(), readings={"seats": ["mat:x"], "readings": []})
+    blocker = next(b for b in analyst.readiness.blocker_details if b.panel == "readings")
+    assert blocker.absence_kind == "not_yet_recorded" and blocker.settled is False
 
 
 def test_readings_panel_copies_each_reading_and_maps_status_by_a_declared_table() -> None:

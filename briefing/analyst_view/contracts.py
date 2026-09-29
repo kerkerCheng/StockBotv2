@@ -70,16 +70,24 @@ QUESTIONS: Mapping[str, str] = {
 #:       不是判讀完整度的條件）；`why` 退役；`wipeout`（歸零旗標）升核心——AGENTS「歸零旗標是燈不是數字」
 #:       把它列為量測，而量測缺席不該被讀成「沒事」。
 #:   讀圖面板 Phase 2 才加，所以現在不在列（`brief` 的 70/73 missing 是真實 backlog，不是規則錯）。
-CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "wipeout")
+#: ⚠ **2026-09-30（Phase 3 Step 3.7）：`readings` 升核心**（ROADMAP「Readiness 規則同步換」；接回 Phase 0 偏差 #16
+#:   「review_required 的路」）。讀圖面板在讀圖 stale 時自己是 `review_required` → readiness `ready_with_flags`；
+#:   **它的狀態只由讀圖對圖決定，不吃 `refresh.overall`**（今天的 `review_required` 全是退役估值鏈殘留）。
+#:   沒有讀圖的公司因此多一個 blocker（`not_yet_recorded`）——真實 backlog，下一步是寫讀圖（research-drain 段 5）。
+CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "readings", "wipeout")
 #: `fundamental`：稽核區的原始數字（內部預測／共識／落差）。2026-09-23 由核心降選配。
 #: `bet`：賭注。2026-09-23 起是**純文字**（讀 `our_bet`），不再是四個價格。optional——
 #: 沒寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
 #: `downside`（D2，2026-09-18）：判斷錯了值多少。四價渲染在 Phase 0 批 4 退役，panel 留。
 #: ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` panel 隨 E 組（四價 overlay）退役。
 #: `readings`（Phase 2 Step 2.7）：這家公司坐的層與插槽的現行讀圖＋**狀態**（現行／stale／過期）——
-#: `AGENTS.md`「結構不變就抱」要求持有者看得到「我騎的那一層結構變了沒」。**選配**：不改 readiness
-#: （Phase 3 面板重排時一起決定升不升核心，plan §14 #3）。
-OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "readings")
+#: `AGENTS.md`「結構不變就抱」要求持有者看得到「我騎的那一層結構變了沒」。2026-09-30（Step 3.7）升核心。
+#: Phase 3 Step 3.7 新增三個選配（都**不改 readiness**——它們回答的是「在哪一格、錯了怎麼知道、數字憑什麼」，
+#: 不是「研究完不完整」）：
+#: - `candidate`：首屏末行——候選狀態（與候選板同一個推導）＋財務三題三個字；由 materialize 注入。
+#: - `three_questions`：稽核區——三題每一行的值、來源、as_of、口徑、規則，或缺席分型。
+#: - `downside`：每一條反證連到盯它的 watch（沒有的印「未盯」）；由 materialize 注入。
+OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "candidate", "three_questions", "downside")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。
@@ -93,7 +101,7 @@ _VALUELESS_PANEL_STATUSES: frozenset[str] = frozenset(
     {"missing", "not_modeled", "not_applicable", "insufficient_evidence", "invalidated"})
 
 #: readiness 三態。**只看核心 panel**。
-READY = "ready"                        # 核心四段都有內容，且沒有被標記需要動作
+READY = "ready"                        # 核心各段都有內容，且沒有被標記需要動作（段數讀 CORE_PANELS，不寫死）
 READY_WITH_FLAGS = "ready_with_flags"  # 有內容，但至少一段 stale／review_required／not_applicable
 BLOCKED = "blocked"                    # 至少一段核心缺內容（missing／invalidated／not_modeled／證據不足）
 READINESS_STATES = frozenset({READY, READY_WITH_FLAGS, BLOCKED})
@@ -123,7 +131,10 @@ LINE_ROLES = frozenset({
     "brief",                   # optional：投資人短評的七句＋一顆燈
     "paragraph",               # optional：論證層的三段
     "wipeout",                 # optional：歸零旗標的一盞燈（D2；顏色＋一句話，數字在 dependencies）
-    "reading",                 # optional：一份現行讀圖（節點 × 單位）的判讀與狀態（Phase 2 Step 2.7）
+    "reading",                 # 核心（3.7 起）：一份現行讀圖（節點 × 單位）的判讀與狀態（Phase 2 Step 2.7）
+    "candidate",               # optional：候選狀態一格＋三題三個字（Phase 3 Step 3.7，首屏末行）
+    "three_question",          # optional：財務三題稽核區的一行（Phase 3 Step 3.7）
+    "downside",                # optional：一條反證與盯它的 watch（Phase 3 Step 3.7）
 })
 
 #: 「為什麼這一格被列進脆弱清單」的封閉字彙。**每一條都是宣告好的列入規則**，
@@ -168,10 +179,9 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
                             "這裡是稽核區的原始數字，不是判讀完整度的條件"},
     "research": {"title": "什麼會推翻它",
                  "hint": "出場靠這些條件，不是靠感覺；還有什麼時候會知道答案"},
-    "argument": {"title": "為什麼這樣想",
-                 "hint": "三段：這條鏈怎麼走、風險與認錯條件、時間表。圖的敘述由句型組；"
-                         "風險、認錯條件是研究時寫的長文，逐字附在段後。"
-                         "⚠ 2026-09-23 少了「數字怎麼算出來」「和市場差在哪」（讀估值鏈）與「賭注」（讀四價）三段"},
+    "argument": {"title": "憑什麼這樣想：它在哪條鏈上、錯了怎麼知道、什麼時候知道",
+                 "hint": "三段：這條鏈怎麼走（需求端讀它騎的那一層或插槽的讀圖）、風險與認錯條件、時間表。"
+                         "圖的敘述由句型組；風險、認錯條件是研究時寫的長文，逐字附在段後"},
     "brief": {"title": "這檔在賭什麼",
               "hint": "七句話講前因後果：什麼在放量、這家公司供什麼、為什麼卡在它、市場怎麼看、我們賭什麼、"
                       "對了／錯了會怎樣、什麼時候知道。文字是研究時寫的判斷，數字由系統填"},
@@ -182,8 +192,18 @@ PLAIN_PANEL_TITLES: Mapping[str, Mapping[str, str]] = {
     "readings": {"title": "它坐的那一層結構變了沒",
                  "hint": "這家公司在圖上供貨或開發的層與插槽，各自的現行讀圖：讀成什麼（護城河／量／都不是／判不出）、讀的是一層還是一格插槽，以及**狀態**——現行、跟圖不一致該重讀、或過期。結構不變就抱；變了就重讀，要不要改 thesis 由你決定。沒有讀圖不代表沒事，只是還沒讀"},
     "bet": {"title": "我們賭什麼",
-            "hint": "研究 session 寫下的那一句（短評的 our_bet）。沒有價格、沒有報酬、沒有機率加權——"
-                    "四個價格已於 2026-09-23 退役。沒寫賭注的檔這裡是空的，不影響判讀完不完整"},
+            "hint": "三件事，全是文字：研究時寫下的那一句賭注、騎在哪一層或哪一格插槽、什麼必須為真。"
+                    "沒有價格、沒有報酬、沒有機率加權。沒寫的檔這裡是空的，不影響判讀完不完整"},
+    "candidate": {"title": "這檔現在在哪一格",
+                  "hint": "候選狀態（可開／缺 X／已定價等回落／不要／已持有，或為什麼不上板）與財務三題三個字："
+                          "會死嗎看四盞燈最差的那一盞（灰＝沒量到）；已定價嗎、出現在數字裡了嗎是寫敘事的人宣告的，"
+                          "沒宣告就是「未答」。和候選板是同一個推導，每天重算"},
+    "three_questions": {"title": "財務三題的數字：憑什麼說是或否",
+                        "hint": "每一行都是一個數字與它的出處（來源、日期、口徑、怎麼算），或說清楚為什麼沒有。"
+                                "**沒有門檻**：幾分算「已定價」由寫敘事的人判斷，並引用這裡的數字"},
+    "downside": {"title": "錯了怎麼知道：每條反證與盯它的 watch",
+                 "hint": "這家公司名下每一條會推翻賭注的條件，連到正在盯它的那一筆 watch；沒有 watch 的印「未盯」"
+                         "——那表示條件寫了，但沒有東西會在它成真時叫醒你"},
 }
 
 #: 逐格標籤的白話版。沒列到的沿用 read model 的 `display_label`（那些多半本來就看得懂）。
@@ -220,7 +240,7 @@ PLAIN_ABSENCE_SHORT: Mapping[str, str] = {
 
 #: 三個 readiness 狀態的白話版。**不得寫成能不能買**——它只描述「這份判讀讀不讀得成」。
 PLAIN_READINESS: Mapping[str, Mapping[str, str]] = {
-    "ready": {"label": "四段都讀得成", "note": "不是「可以買」的意思——這裡只講資料完不完整"},
+    "ready": {"label": "核心各段都讀得成", "note": "不是「可以買」的意思——這裡只講資料完不完整"},
     "ready_with_flags": {"label": "讀得成，但有幾格要留意",
                          "note": "有內容，但至少一段過期或需要重看"},
     "blocked": {"label": "有一段讀不成", "note": "看下面「卡在哪」——它會說是還沒做、刻意不做，還是缺上游"},
@@ -525,9 +545,13 @@ class AnalystView:
     brief: AnalystPanel
     #: 2026-09-15：論證層 panel（optional）：短評展開成六段，附引文與長文。
     argument: AnalystPanel
-    #: Phase 2 Step 2.7：讀圖 panel（optional）：這家公司坐的層與插槽的現行讀圖與狀態。
+    #: Phase 2 Step 2.7：讀圖 panel（3.7 起核心）：這家公司坐的層與插槽的現行讀圖與狀態。
     #: 放在論證之後——論證講「這條鏈怎麼走」，讀圖講「鏈上那一層現在還是不是當初讀的樣子」。
     readings: AnalystPanel
+    #: Phase 3 Step 3.7（三個 optional）：首屏末行的候選狀態＋三個字、稽核區的三題、每條反證連 watch。
+    candidate: AnalystPanel
+    three_questions: AnalystPanel
+    downside: AnalystPanel
 
     #: ⚠ 新增 panel 必須同時登記在這裡與 `OPTIONAL_PANELS`／`CORE_PANELS`——**兩份都是封閉清單**。
     #: `downside` 緊接在 `bet` 後面：它們是同一把尺的兩端，讀的人要並排看。
@@ -536,8 +560,10 @@ class AnalystView:
     #: 機制在、但分類沒跟著資料走到消費端（L16）。**materialize 一次就看得到，所以要驗 artifact。**
     #: ⚠ 2026-09-23（Phase 0 Step 0b.1）：`why` 與 `entry` 已從這份清單移除（兩個 panel 退役）。
     #: 順序即閱讀順序：短評 → 論證 → 賭注／下檔 → 歸零旗標 → 現價 → 稽核區的原始數字 → 什麼會推翻它。
-    PANEL_ORDER = ("brief", "argument", "readings", "bet", "wipeout",
-                   "headline", "fundamental", "research")
+    #: 2026-09-30（Step 3.7）：`candidate` 緊接短評（首屏末行）；`downside` 緊接讀圖（論證層：錯了怎麼知道）；
+    #: `three_questions` 在稽核區的原始數字旁。
+    PANEL_ORDER = ("brief", "candidate", "argument", "readings", "downside", "bet", "wipeout",
+                   "headline", "fundamental", "three_questions", "research")
 
     @property
     def panels(self) -> tuple[AnalystPanel, ...]:

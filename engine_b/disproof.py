@@ -40,7 +40,7 @@ from __future__ import annotations
 import json
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from engine_b import event_watch as ew
 
@@ -342,6 +342,25 @@ def _close(watch: dict[str, Any], note: str) -> None:
 _PRIORITY = {"touched": 3, "expired": 2, "watching": 1}
 
 
+def watch_category(watch: Mapping[str, Any]) -> str | None:
+    """一筆語意 watch 在反證計數裡落哪一格（`touched`／`expired`／`watching`；不在處理中回 None）。
+    **心跳段 2、audit、個股頁 downside 共用這一個判定**（Phase 3 Step 3.7 由 `disproof_counts` 抽出；L16）。"""
+    if watch.get("kind") != ew.SEMANTIC_KIND:
+        return None
+    if _touched_pending(watch):
+        return "touched"
+    if watch.get("status") == "expired" and not watch.get("expiry_resolution"):
+        return "expired"
+    if watch.get("status") in ("active", "fired"):
+        return "watching"
+    return None
+
+
+def condition_key(watch: Mapping[str, Any]) -> tuple[str, str]:
+    """（來源, 正規化文字）——條件的身分（計數與 downside 同一個鍵；位置不算身分，RB-2）。"""
+    return (str(watch.get("source_ref") or "").split("#", 1)[0], normalize(watch.get("condition")))
+
+
 def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[str, Any] | None = None,
                     readings: Mapping[str, Any] | None = None, coverage: frozenset[str] | None = None,
                     frozen_history: int | None = None, root: Path = ROOT,
@@ -398,17 +417,10 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
     state: dict[tuple[str, str], tuple[str, Mapping[str, Any]]] = {}
     orphan_touched = 0
     for watch in watches:
-        if watch.get("kind") != ew.SEMANTIC_KIND:
+        cat = watch_category(watch)
+        if cat is None:
             continue
-        if _touched_pending(watch):
-            cat = "touched"
-        elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
-            cat = "expired"
-        elif watch.get("status") in ("active", "fired"):
-            cat = "watching"
-        else:
-            continue
-        key = (str(watch.get("source_ref") or "").split("#", 1)[0], normalize(watch.get("condition")))
+        key = condition_key(watch)
         if lifecycle is None and key[0].startswith("thesis:"):
             continue   # lifecycle 讀不到時 thesis 那一半是「沒算」，不是孤兒（NB3-8）
         if key not in expected and key[0].startswith("brief:") and cat in ("touched", "expired"):
@@ -436,6 +448,169 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
         "memo_unreadable": unreadable_memos,
         "lifecycle_unreadable": lifecycle is None,
     }
+
+
+#: 個股頁 downside 每條反證的狀態（封閉字彙；plan §8 第 5 點）。**沒有 watch 的一律「未盯」**——
+#: 不因為它屬於舊判讀、或來源解析不到就不印（INV-3）。
+DOWNSIDE_STATES: Mapping[str, str] = {
+    "touched": "觸及待處置", "expired": "到期待複查", "fired": "醒來待判", "active": "在盯", "unwatched": "未盯",
+}
+#: 反證的出處（封閉字彙）。`judgment` 是舊 session assessor 判讀的反證：反證登記（thesis／讀圖／敘事）不涵蓋它，
+#: 系統沒有來源鍵對得回任何 watch——照實印「未盯」，不猜文字相似。
+DOWNSIDE_SOURCES: Mapping[str, str] = {
+    "brief": "敘事自己登記的反證", "link": "敘事連到既有來源的反證", "thesis": "thesis memo 的推翻條件",
+    "reading": "騎的讀圖的反證", "watch_only": "歸屬本檔、但條件不在現行來源裡的 watch",
+    "judgment": "舊判讀（session assessor）的反證——反證登記不涵蓋",
+}
+
+
+def downside_rows(company_id: str | None, ticker: str, *, records: Sequence[Any], current_brief: Any,
+                  watches: Sequence[Mapping[str, Any]], lifecycle: Mapping[str, Any] | None,
+                  reading_rows: Mapping[tuple[str, str], Mapping[str, Any]],
+                  judgment_conditions: Sequence[Mapping[str, Any]] = (), root: Path | None = None,
+                  retracted_cells: Iterable[tuple[str, str | None]] = ()) -> dict[str, Any]:
+    """個股頁 downside（Phase 3 Step 3.7）：這家公司名下**每一條反證** → 盯它的 watch id 與狀態；沒有 watch 印「未盯」。
+
+    歸屬用 `engine_b.narrative_watches.attributed_watches`（plan §5 第 8 點，單一 SSOT）；條件落哪一格用
+    `watch_category`、條件身分用 `condition_key`——與心跳段 2／audit 的反證計數同一套（L16）。
+    `current_brief`：現行 v2 敘事或 None；`judgment_conditions`：舊 session 判讀的反證（read model 的
+    `falsification.conditions`），每條 `{condition, check_frequency, action}`。"""
+    from engine_b.narrative_watches import attributed_watches, thesis_memos
+    from thesis.memo_structure import disproof_items
+
+    # memo 的位置在**呼叫時**取（預設參數在定義時就綁死，換根目錄的測試會悄悄讀不到 memo、改從 watch_only 列出——3.7 變異檢查）。
+    root = ROOT if root is None else root
+    brief_ids = [str(getattr(r, "brief_id", "")) for r in records]
+    mine = (attributed_watches(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
+                               brief_ids=brief_ids, current_brief=current_brief) if company_id else [])
+    ranked = [(watch_category(w), w) for w in mine]
+    ranked = [(c, w) for c, w in ranked if c is not None]
+
+    def rank(cat: str, watch: Mapping[str, Any]) -> tuple[int, int]:
+        # 同一格內醒來待判優先於在盯（同分時不得看 registry 順序；3.7 覆核）。
+        return (_PRIORITY[cat], 1 if watch.get("status") == "fired" else 0)
+
+    best: dict[tuple[str, str], tuple[str, Mapping[str, Any]]] = {}
+    for cat, w in ranked:
+        key = condition_key(w)
+        if key not in best or rank(cat, w) > rank(*best[key]):
+            best[key] = (cat, w)
+    retracted = set(retracted_cells)
+    rewrite_needed: list[str] = []
+    used: set[str] = set()
+    rows: list[dict[str, Any]] = []
+    notes: list[str] = []
+    #: 讀不到或解析不到的來源（結構化）：rows 空時面板依它宣告 upstream_unavailable，不是「還沒有反證」（3.7 R1；L16）。
+    unread: list[dict[str, str]] = []
+
+    def state_of(cat: str | None, watch: Mapping[str, Any] | None) -> str:
+        if cat is None or watch is None:
+            return "unwatched"
+        if cat == "watching":
+            return "fired" if watch.get("status") == "fired" else "active"
+        return cat
+
+    def row(source: str, source_ref: str | None, condition: str, frequency: Any, action: Any,
+            cat: str | None, watch: Mapping[str, Any] | None) -> dict[str, Any]:
+        state = state_of(cat, watch)
+        return {"source": source, "source_label": DOWNSIDE_SOURCES[source], "source_ref": source_ref,
+                "condition": condition, "check_frequency": frequency, "action_48h": action,
+                "watch_id": (watch or {}).get("watch_id"), "watch_status": (watch or {}).get("status"),
+                "until": (watch or {}).get("expires"), "state": state, "state_label": DOWNSIDE_STATES[state]}
+
+    def emit(source: str, source_ref: str, condition: str, *, frequency: Any = None, action: Any = None,
+             exact: str | None = None) -> None:
+        if exact is not None:
+            # 以來源鍵連到既有 watch 的（`link_source_ref`）：對**完整**來源鍵，不對文字（敘事的措辭可以跟來源不同）。
+            hits = [(c, w) for c, w in ranked if str(w.get("source_ref") or "") == exact]
+            cat, watch = max(hits, key=lambda h: rank(*h)) if hits else (None, None)
+        else:
+            cat, watch = best.get((source_ref, normalize(condition)), (None, None))
+        if watch is not None:
+            used.add(str(watch.get("watch_id")))
+            # memo 條目只有文字；L7 的核查頻率與 48 小時動作住在它登記成的那一筆 watch 上——照抄，不留白。
+            frequency = frequency if frequency is not None else watch.get("check_frequency")
+            action = action if action is not None else watch.get("action_48h")
+        rows.append(row(source, exact or source_ref, condition, frequency, action, cat, watch))
+
+    def missed(source: str, text: str) -> None:
+        notes.append(text)
+        unread.append({"source": source, "reason": text})
+
+    if lifecycle is None:
+        missed("thesis", "thesis lifecycle 讀不到——thesis memo 那一半的條件沒列（不是沒有；fail closed）")
+    for memo in sorted(thesis_memos(ticker, lifecycle)):
+        try:
+            items = disproof_items((root / memo).read_text(encoding="utf-8"))
+        except OSError:
+            missed("thesis", f"memo {memo} 讀不到——它的推翻條件沒列（不是沒有）")
+            continue
+        if not items:
+            missed("thesis", f"memo {memo} 的「推翻」節解析不到——它的條件沒列（不是沒有）")
+        for item in items:
+            emit("thesis", f"thesis:{memo}", item)
+    for index, entry in enumerate(getattr(current_brief, "disproof", ()) or (), 1):
+        if entry.link_source_ref:
+            emit("link", f"brief:{current_brief.brief_id}#{index}", entry.condition, frequency=entry.check_frequency,
+                 action=entry.action_48h, exact=str(entry.link_source_ref))
+        else:
+            emit("brief", f"brief:{current_brief.brief_id}", entry.condition, frequency=entry.check_frequency,
+                 action=entry.action_48h)
+    for ride in getattr(current_brief, "rides", ()) or ():
+        current = reading_rows.get((ride.node, ride.unit))
+        # 三種不同的「沒有」分開說（L12；與 `derive_row` 對稱，L17）：整格撤回、讀不到、已換版——前兩者下一步相反。
+        if current is None and ((ride.node, ride.unit) in retracted or (ride.node, None) in retracted):
+            notes.append(f"騎的讀圖 {ride.reading_id} 那一格已全部撤回——它的反證沒列；先重寫敘事")
+            rewrite_needed.append("騎的讀圖那一格已全部撤回")
+            continue
+        if current is None:
+            missed("reading", f"騎的讀圖 {ride.reading_id} 這次沒有那一格的讀圖列（讀圖 ledger 讀不到或壞行）"
+                              "——它的反證沒列；先修讀取，不是重寫敘事")
+            continue
+        if current.get("reading_id") != ride.reading_id:
+            notes.append(f"騎的讀圖 {ride.reading_id} 已換版（現行 {current.get('reading_id')}）——它的反證沒列；先重寫敘事")
+            rewrite_needed.append("騎的讀圖已換版")
+            continue
+        for entry in current.get("disproof") or ():
+            emit("reading", f"reading:{ride.reading_id}", str(entry.get("condition") or ""),
+                 frequency=entry.get("check_frequency"), action=entry.get("action_48h"))
+    # 歸屬本檔、還在處理中、但條件對不到任何現行來源的 watch——也要現形（例：memo 改寫後還沒對帳的舊條件）。
+    for _key, (cat, watch) in sorted(best.items()):
+        if str(watch.get("watch_id")) in used:
+            continue
+        used.add(str(watch.get("watch_id")))
+        rows.append(row("watch_only", str(watch.get("source_ref") or ""), str(watch.get("condition") or ""),
+                        watch.get("check_frequency"), watch.get("action_48h"), cat, watch))
+    for item in judgment_conditions:
+        rows.append(row("judgment", None, str(item.get("condition") or ""), item.get("check_frequency"),
+                        item.get("action"), None, None))
+    # 同一筆 watch 只印一列：敘事以來源鍵連到自家 thesis／騎的讀圖的反證時，兩個來源指的是同一個等待——
+    # 印兩列會讓「在盯」多算一次（心跳段 2 的計數也不另算連結）。後到的來源併進 `also`，不丟（2026-09-30 真實資料試跑）。
+    merged: list[dict[str, Any]] = []
+    by_watch: dict[str, dict[str, Any]] = {}
+    for item in rows:
+        wid = item.get("watch_id")
+        if wid and wid in by_watch:
+            by_watch[wid].setdefault("also", []).append(
+                {"source": item["source"], "source_label": item["source_label"], "source_ref": item["source_ref"],
+                 "condition": item["condition"]})
+            continue
+        if wid:
+            by_watch[str(wid)] = item
+        merged.append(item)
+    counts = {state: sum(1 for r in merged if r["state"] == state) for state in DOWNSIDE_STATES}
+    if unread:
+        empty = {"kind": "upstream_unavailable", "reason": unread[0]["reason"]}
+    else:
+        # 理由照事實組（3.7 覆核：原本寫死「沒有 v2 敘事」，有 v2 敘事但它沒寫反證、或騎的讀圖已換版時是錯的）。
+        facts = ["沒有 thesis memo" if not thesis_memos(ticker, lifecycle) else "thesis memo 沒有推翻條件",
+                 ("v2 敘事沒有寫自己的反證" if getattr(current_brief, "record_version", None) else "沒有 v2 敘事"),
+                 "沒有舊判讀的反證"]
+        reason = "這家公司名下還沒有任何反證（" + "、".join(facts) + "）"
+        if rewrite_needed:
+            reason += "；" + "、".join(rewrite_needed) + "——先重寫敘事"
+        empty = {"kind": "not_yet_recorded", "reason": reason}
+    return {"rows": merged, "notes": notes, "counts": counts, "unread": unread, "empty": empty}
 
 
 def current_briefs() -> list[Any]:
@@ -485,5 +660,7 @@ def frozen_history_count() -> int | None:
     return sum(1 for row in rows if str(row.get("disproof") or "").strip())
 
 
-__all__ = ["after_thesis_review", "current_readings", "disproof_counts", "frozen_history_count", "load_lifecycle",
-           "memo_ref", "normalize", "reconcile_thesis_disproof", "review_horizon", "source_is_current"]
+__all__ = ["DOWNSIDE_SOURCES", "DOWNSIDE_STATES", "after_thesis_review", "condition_key", "current_readings",
+           "disproof_counts", "downside_rows", "frozen_history_count", "load_lifecycle",
+           "memo_ref", "normalize", "reconcile_thesis_disproof", "review_horizon", "source_is_current",
+           "watch_category"]

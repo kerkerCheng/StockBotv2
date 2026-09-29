@@ -393,3 +393,9 @@ table.rank.compare td:first-child { color: var(--muted); }
 
 /* 走勢圖住在短評卡裡：去掉內層 panel 的外框，只留標題與圖 */
 .brief-card > .panel { border: 0; padding: .6rem 0 0; margin: .6rem 0 0; box-shadow: none; background: transparent; }
+
+/* 首屏末行（Phase 3 Step 3.7）：候選狀態＋財務三題三個字。字全由 materialize 端給，這裡只排版。 */
+.brief-card .candidate-line { margin-top: .7rem; padding-top: .6rem; border-top: 1px solid var(--border); }
+.brief-card .candidate-state { font-size: 15px; }
+.brief-card .candidate-words { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin: .35rem 0; }
+.brief-card .candidate-words .word { white-space: nowrap; }

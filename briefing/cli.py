@@ -25,6 +25,8 @@ def cmd_alpha_card(args: argparse.Namespace) -> int:
     from .alpha_view import render_alpha_investment_view_markdown
     from .alpha_view.sources import fetch_alpha_investment_view
 
+    from alpha.providers.structure_readings import seat_readings_context
+
     as_of = date.fromisoformat(args.as_of) if args.as_of else None
     try:
         view = fetch_alpha_investment_view(
@@ -32,6 +34,8 @@ def cmd_alpha_card(args: argparse.Namespace) -> int:
             judgment_path=Path(args.judgment) if args.judgment else None,
             allow_stale_judgment=not args.strict_judgment,
             include_causal=not args.no_causal,
+            # Step 3.7：鏈段的需求端讀讀圖——單檔 CLI 載一次（讀不到時 context 自己說 upstream_unavailable）。
+            seat_readings=seat_readings_context(as_of=as_of),
         )
     except PointInTimeUnsupported as exc:
         print(f"✗ {exc}", file=sys.stderr)
@@ -112,20 +116,24 @@ def cmd_analyst_view(args: argparse.Namespace) -> int:
     from .alpha_view.sources import fetch_alpha_investment_view
     from .analyst_view import build_analyst_view, render_analyst_view_markdown
 
+    from alpha.providers.structure_readings import seat_readings_context, seat_readings_for
+
     as_of = date.fromisoformat(args.as_of) if args.as_of else None
+    # Step 3.7：讀圖面板升核心、鏈段需求端讀讀圖——單檔 CLI 載一次，兩處共用（與 APP materialize 同一個組法）。
+    readings = seat_readings_context(as_of=as_of)
     try:
         view = fetch_alpha_investment_view(
             args.ticker, as_of=as_of,
             judgment_path=Path(args.judgment) if args.judgment else None,
             include_causal=False, scenario=args.scenario,
-            sandbox_hurdle=args.sandbox_hurdle)
+            sandbox_hurdle=args.sandbox_hurdle, seat_readings=readings)
     except PointInTimeUnsupported as exc:
         print(f"✗ {exc}", file=sys.stderr)
         return 3
     except AlphaError as exc:
         print(f"✗ {exc}", file=sys.stderr)
         return 2
-    analyst = build_analyst_view(view)
+    analyst = build_analyst_view(view, readings=seat_readings_for(readings, view.identity.company_id))
     if args.format == "json":
         text = json.dumps(analyst.to_dict(), ensure_ascii=False, indent=2)
     else:

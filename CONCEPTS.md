@@ -301,7 +301,7 @@ StockBot 對「fair value 何時會被市場定價到」的**明示**判斷（`a
 *Avoid:* 第二份研究 authority、runtime 用 LLM 重寫 thesis、在 consumer 補一格 read model 沒有的數字、把它叫 dashboard 或 recommendation
 
 ### Core Readiness（核心 panel 讀不讀得成一份判讀）
-`AnalystView.readiness`（2026-09-07）：`ready`（核心四段都有內容）／`ready_with_flags`（有內容，但至少一段 `stale`／`review_required`／`not_applicable`）／`blocked`（至少一段缺內容：`missing`／`invalidated`／`not_modeled`／`insufficient_evidence`）。它是既有 section `meta.status` 的**查表計數**，不是新的研究完整度分數；判準逐字寫在 `readiness.rule` 裡。**optional panel 一律不參與**。
+`AnalystView.readiness`（2026-09-07）：`ready`（核心各段都有內容；清單讀 `CORE_PANELS`，2026-09-30 起含讀圖）／`ready_with_flags`（有內容，但至少一段 `stale`／`review_required`／`not_applicable`）／`blocked`（至少一段缺內容：`missing`／`invalidated`／`not_modeled`／`insufficient_evidence`）。它是既有 section `meta.status` 的**查表計數**，不是新的研究完整度分數；判準逐字寫在 `readiness.rule` 裡。**optional panel 一律不參與**。
 *Avoid:* research_status（那是 Engine D 的覆蓋度）、把 readiness 當作可不可以買的信號、讓 optional 缺席拉低它
 
 ### Optional Analytical Capability（可選的分析能力）
@@ -377,7 +377,7 @@ research-drain 跑，daily 的 `drain_limit_per_run` 歸零。
 *Avoid:* 無人值守 drain、讓分類層寫任何 authority
 
 ### 判斷錯了值多少（Downside overlay）
-⚠ **已退役（2026-09-23，Phase 0 E 組）**：四價（賭對了值多少／判斷錯了值多少）的算術與首屏那把尺已刪；`bet/downside.overlay` 的 Abstention 字彙與 `scenario="downside"` 的 ledger 資料留。反證那一端沒有退役——它住 research 面板的 disproofs，Phase 1 接 watch registry。
+⚠ **已退役（2026-09-23，Phase 0 E 組）**：四價（賭對了值多少／判斷錯了值多少）的算術與首屏那把尺已刪；`bet/downside.overlay` 的 Abstention 字彙與 `scenario="downside"` 的 ledger 資料留。反證那一端沒有退役——2026-09-30（Phase 3 Step 3.7）起個股頁 `downside` 面板「錯了怎麼知道」把這家公司名下每一條反證連到盯它的 watch（沒有的印「未盯」），歸屬與落格與心跳段 2 同一套。
 與賭注（variant overlay）**對稱**的 scenario（D2）：反證觸發後的假設套**同一條橋**、同一套估值與報酬算術，得到「認錯時值多少」。
 它是條件句，不是 bear case、沒有機率加權；與「賭對了值多少」並排就是短評那把尺的兩端。
 **2026-09-18 已交付**：`scenario="downside"`（`ASSUMPTION_SCENARIOS` 第三個值），寫入端沿用
@@ -411,7 +411,7 @@ bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩�
 *Avoid:* 把邊緣讀成「可以買」、為了讓可開非空調門檻
 
 ### 候選狀態板（Candidate board）
-每一檔「現在是哪一種候選」的每日重算板（Phase 3 Step 3.6）。五組封閉字彙：**可開／缺 X／已定價等回落／不要／已持有**；另有四個附組：非倍率候選（非邊緣）、邊緣無法量、舊版（v1 敘事沒有候選狀態）、前提失效（宣告可開但每天重驗的前提破了），以及「無敘事 N」只計數不上板。宣告來自敘事，已持有來自 Sheet（alpha、股數 > 0），兩者不同時兩個都印。可開為零就零。APP `#/candidates`；推導 `alpha/providers/candidates.py`。
+每一檔「現在是哪一種候選」的每日重算板（Phase 3 Step 3.6）。五組封閉字彙：**可開／缺 X／已定價等回落／不要／已持有**；另有四個附組：非倍率候選（非邊緣）、邊緣無法量、舊版（v1 敘事沒有候選狀態）、前提失效（宣告可開但每天重驗的前提破了），以及「無敘事 N」只計數不上板。宣告來自敘事，已持有來自 Sheet（alpha、股數 > 0），兩者不同時兩個都印。可開為零就零。APP `#/candidates`；推導 `alpha/providers/candidates.py`。個股頁首屏末行（Step 3.7）照抄同一個推導，外加財務三題三個字——不上板的檔三個字照印。
 *Avoid:* 排名、首選、「最值得買」、把組內順序讀成優先序（組內是 ticker 字母序）
 
 ### alpha 全歸零淨值少幾 %（Alpha wipe-out share）

@@ -62,7 +62,8 @@ _STATE_FLAGS: tuple[str, ...] = (
 def cmd_materialize(args: argparse.Namespace) -> int:
     """跑完整條鏈並寫下 artifact。**這是唯一會跑模型、連 DB、讀 private ledger 的入口。**"""
     from .materialize import (
-        materialize_account_scorecard, materialize_beta, materialize_candidates, materialize_graph_walk,
+        candidate_context, materialize_account_scorecard, materialize_beta, materialize_candidates,
+        materialize_graph_walk,
         materialize_many, materialize_positions,
         materialize_structure_readings,
         materialize_structure_table, materialize_watches, write_vocabularies,
@@ -152,8 +153,14 @@ def cmd_materialize(args: argparse.Namespace) -> int:
         print("✗ 沒有指定 ticker，而 artifact 目錄也是空的——第一次請明寫要 materialize 哪幾檔",
               file=sys.stderr)
         return 2
+    # 同一輪也要組候選板時，候選推導的輸入（Sheet、watch、讀圖對圖、邊緣判定）只載一次、個股頁與候選板共用
+    # （Phase 3 Step 3.7 R1：各載一次＝同一輪兩份快照，實測 SIVE.ST 的市值兩邊差一次 FX）。載候選板的超集
+    # （宇宙＝這一輪要 materialize 的 ∪ store 已有的，等於組板時的 `store.tickers()`；另併敘事 ledger 與只在 Sheet 的持有）。
+    shared = None
+    if tickers and getattr(args, "candidates", False) and as_of is None:
+        shared = candidate_context(sorted(set(tickers) | set(store.tickers())), board=True)
     if tickers:
-        results = materialize_many(tickers, as_of=as_of, store=store)
+        results = materialize_many(tickers, as_of=as_of, store=store, candidates=shared)
         vocab_path = write_vocabularies(store)
         total += len(results)
         for ticker, path, reason in results:
@@ -171,7 +178,7 @@ def cmd_materialize(args: argparse.Namespace) -> int:
         try:
             # 宇宙＝這個 store 已 materialize 的那幾檔（`--dir` 指到哪就是哪，不換成預設目錄）；
             # 敘事 ledger 裡有的另外併進來（load_board 負責）。
-            path, payload = materialize_candidates(tickers=store.tickers(), store=state_store)
+            path, payload = materialize_candidates(tickers=store.tickers(), store=state_store, context=shared)
         except Exception as exc:  # noqa: BLE001 — 理由原樣回報，不吞
             failed += 1
             print(f"✗ candidates：{type(exc).__name__}: {str(exc)[:200]}", file=sys.stderr)

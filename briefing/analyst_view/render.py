@@ -29,7 +29,7 @@ _LEGEND = (
 )
 
 _READINESS_LABEL = {
-    "ready": "ready——核心四段都有內容",
+    "ready": "ready——核心各段都有內容",
     "ready_with_flags": "ready_with_flags——核心有內容，但有段落被標記需要重看",
     "blocked": "blocked——核心有段落缺內容",
 }
@@ -44,6 +44,32 @@ _CONTEXT_LABEL = {
 # ---------------------------------------------------------------------------
 # 呈現原語
 # ---------------------------------------------------------------------------
+
+def _absent_line(panel: AnalystPanel) -> str:
+    """面板沒有內容時的一行：狀態字＋缺席分型＋產生端給的理由（不是 0、不是空白；INV-3）。"""
+    kind = f"（`{markdown_text(panel.absence_kind)}`）" if panel.absence_kind else ""
+    return f"**{status_label(panel.status)}**{kind} — {markdown_text(panel.reason or '沒有理由句')}"
+
+
+def _plain_text(value: Any) -> str:
+    """巢狀值攤成人讀的一句（字典逐鍵、清單逐項），**不印 Python repr**（3.7 覆核：AEHR 的分部金額子字典）。"""
+    if isinstance(value, Mapping):
+        return "、".join(f"{k} {_plain_text(v)}" for k, v in value.items() if v is not None)
+    if isinstance(value, (list, tuple)):
+        return "；".join(_plain_text(v) for v in value)
+    return str(value)
+
+
+def _plain_value(datum: Datum) -> str:
+    """稽核區一格的值：清單印期數與最新一點、字典逐鍵、其餘沿用共用格式。缺席 → 狀態字（不是 None）。"""
+    if not datum.is_known:
+        return _value_cell(datum)
+    value = datum.value
+    if isinstance(value, list):
+        return f"{len(value)} 期（最新一點：{_plain_text(value[-1]) if value else '—'}）"
+    if isinstance(value, Mapping):
+        return _plain_text(value)
+    return format_datum_value(datum)
 
 def _value_cell(datum: Datum) -> str:
     """一格的值。缺席 → 狀態字（不是 0、不是空白）。"""
@@ -231,6 +257,32 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     else:
         lines += [f"**Not set (optional)** — {markdown_text(brief.reason or '還沒寫短評')}", ""]
 
+    # ---- 首屏末行：候選狀態＋三題三個字（Phase 3 Step 3.7；optional、注入）----------
+    # 字全由產生端給（候選板同一個 derive_row）；本層只排版。不上板也印三個字。
+    cand = view.candidate
+    lines += ["## 這檔現在在哪一格：候選狀態與三題三個字（optional）", ""]
+    by_key = {line.key: line.datum for line in cand.lines}
+    state = by_key.get("candidate:state")
+    if state is not None and state.is_known and isinstance(state.value, Mapping):
+        row = state.value
+        head_line = f"- 候選狀態：**{markdown_text(str(row.get('derived_label') or row.get('derived') or '—'))}**"
+        if row.get("declared") and row.get("declared") != row.get("derived"):
+            head_line += f"（敘事宣告：{markdown_text(str(row.get('declared_label') or row.get('declared')))}）"
+        if row.get("stall_days") is not None:
+            head_line += f"｜滯留 {row.get('stall_days')} 天"
+        lines.append(head_line)
+        lines += [f"  - 前提失效：{markdown_text(str(t))}" for t in row.get("preconditions") or ()]
+        lines += [f"  - {markdown_text(str(t))}" for t in row.get("rewrite") or ()]
+        if row.get("note"):
+            lines.append(f"  - {markdown_text(str(row.get('note')))}")
+    else:
+        lines.append(f"- 候選狀態：{_absent_line(cand)}")
+    words = [f"{markdown_text(by_key[k].label)}　**{markdown_text(str(by_key[k].value))}**"
+             for k in ("candidate:will_it_die", "candidate:priced_in", "candidate:in_numbers") if k in by_key]
+    if words:
+        lines.append("- " + "｜".join(words))
+    lines.append("")
+
     # ---- 論證層（optional）-----------------------------------------------
     arg = view.argument
     lines += [f"## 論證 — {QUESTIONS['q0_argument']}（optional）", ""]
@@ -245,13 +297,58 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
             lines.append(f"**{markdown_text(line.display_label)}**　（{markdown_text(line.datum.reason or '缺料')}）")
         lines.append("")
 
+    # ---- 讀圖（核心，Phase 3 Step 3.7 升核心）------------------------------
+    rd = view.readings
+    lines += ["## 讀圖：它坐的那一層結構變了沒（核心）", ""]
+    if rd.lines:
+        for line in rd.lines:
+            deps = line.datum.dependencies or {}
+            lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(str(line.datum.value))}"
+                         f"｜{status_label(line.datum.status)}"
+                         f"｜讀於 {markdown_text(str(deps.get('read_on') or '—'))}"
+                         f"｜到期 {markdown_text(str(deps.get('expires') or '—'))}"
+                         + (f"｜{markdown_text(line.datum.reason)}" if line.datum.reason else ""))
+            if deps.get("reading"):
+                lines.append(f"  - {markdown_text(str(deps.get('reading')))}")
+    else:
+        lines.append(_absent_line(rd))
+    lines.append("")
+
+    # ---- 錯了怎麼知道：每條反證與盯它的 watch（Phase 3 Step 3.7；optional、注入）------
+    ds = view.downside
+    lines += ["## 錯了怎麼知道：每條反證與盯它的 watch（optional）", ""]
+    if ds.lines:
+        counts = ds.context.get("counts") or {}
+        lines.append(f"在盯 {counts.get('active', 0)}｜醒來待判 {counts.get('fired', 0)}｜觸及待處置 {counts.get('touched', 0)}"
+                     f"｜到期待複查 {counts.get('expired', 0)}｜**未盯 {counts.get('unwatched', 0)}**")
+        lines.append("")
+        for line in ds.lines:
+            r = line.datum.value if isinstance(line.datum.value, Mapping) else {}
+            watch = (f"watch `{markdown_text(str(r.get('watch_id')))}`：{markdown_text(str(r.get('state_label')))}"
+                     if r.get("watch_id") else f"**{markdown_text(str(r.get('state_label') or '未盯'))}**")
+            lines.append(f"- {markdown_text(str(r.get('condition') or ''))}（{markdown_text(str(r.get('source_label') or ''))}｜{watch}）")
+    else:
+        lines.append(_absent_line(ds))
+    lines += [""] + [f"- {markdown_text(note)}" for note in ds.notes] + [""]
+
     # ---- 賭注（optional；V0）---------------------------------------------
     bet = view.bet
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：賭注由四個價格改成**一句話**（讀 `our_bet`）。
-    lines += ["## 賭注：我們賭什麼（optional）", ""]
+    lines += ["## 賭注：我們賭什麼、騎在哪、什麼必須為真（optional）", ""]
     if bet.context.get("available"):
+        # Step 3.7：三格（our_bet／騎的層或插槽／什麼必須為真）。rides 是清單——印成「節點（層／插槽）」；
+        # 缺席的格印狀態字與理由，不印 None（本檔 legend：缺席一律不是 0）。
         for line in _by_role(bet, "bet"):
-            lines.append(f"{markdown_text(str(line.datum.value))}")
+            datum = line.datum
+            if isinstance(datum.value, list):
+                text = "、".join(f"「{r.get('node_name') or r.get('node')}」（{r.get('unit_label') or r.get('unit')}）"
+                                for r in datum.value if isinstance(r, Mapping))
+                lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(text)}")
+            elif datum.is_known:
+                lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(str(datum.value))}")
+            else:
+                lines.append(f"- **{markdown_text(line.display_label)}**：{_value_cell(datum)}"
+                             + (f" — {markdown_text(datum.reason)}" if datum.reason else ""))
         lines.append("")
     else:
         lines += [f"**Not set (optional)** — {markdown_text(bet.reason or '還沒寫短評裡的 our_bet')}", ""]
@@ -284,6 +381,25 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
               f"（來源 {markdown_text('、'.join(f'{k}={v}' for k, v in fund.source_statuses.items()))}）"
               + (f"｜{markdown_text(fund.reason)}" if fund.reason else "")]
     lines += [f"- 註：{markdown_text(note)}" for note in fund.notes] + [""]
+
+    # ---- 財務三題的數字（稽核區；Phase 3 Step 3.7）-------------------------
+    # 每一行＝值＋來源＋as of＋口徑，或缺席分型與理由；**沒有門檻**（幾分算已定價由寫敘事的人判斷）。
+    tq = view.three_questions
+    lines += ["## 財務三題的數字：會死嗎、已定價嗎、出現在數字裡了嗎（稽核區）", ""]
+    if tq.lines:
+        for line in tq.lines:
+            datum, deps = line.datum, (line.datum.dependencies or {})
+            where = "｜".join(x for x in (
+                f"來源 {deps.get('source')}" if deps.get("source") else "",
+                f"as of {datum.as_of.isoformat()}" if datum.as_of else "",
+                f"口徑 {deps.get('basis')}" if deps.get("basis") else "") if x)
+            reason = (f" — `{markdown_text(datum.absence_kind)}`：{markdown_text(datum.reason or '')}"
+                      if not datum.is_known else "")
+            lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(_plain_value(datum)) if datum.is_known else _plain_value(datum)}"
+                         + (f"（{markdown_text(where)}）" if where else "") + reason)
+    else:
+        lines.append(_absent_line(tq))
+    lines += [""] + [f"- 不是：{markdown_text(note)}" for note in tq.notes] + [""]
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：原本這裡是「## 4. 怎麼算到這裡｜哪些假設最脆弱」，
     # 四個子節（最脆弱的輸入／生效的假設／既有敏感度／算式）全部讀估值鏈。`why` panel 已退役，

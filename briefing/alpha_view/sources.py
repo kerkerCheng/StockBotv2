@@ -24,6 +24,8 @@ from alpha.models import compose_signal
 from alpha.providers import assumptions as assumption_ledger
 from alpha.providers import briefs as brief_ledger
 from alpha.providers import abstentions as abstention_ledger
+from alpha.narrative import select_brief
+from alpha.narrative.contracts import RECORD_VERSION_V2
 from identity.registry import get_registry
 
 from .builder import DecisionFacts, build_alpha_investment_view, compact_card
@@ -275,12 +277,17 @@ def fetch_alpha_investment_view(
     scenario: str | None = None,
     watches: Sequence[Mapping[str, Any]] | None = None,
     sandbox_hurdle: float | None = None,
+    seat_readings: Mapping[str, Any] | None = None,
 ) -> AlphaInvestmentView:
     """單一公司的完整 view。`graph_provider`／`fundamentals_provider` 可注入（測試用）。
 
     Step 0.5：預設跑 authority 變更偵測（`changes.detect_changes`）並把 `ChangeEvent` 交給 builder；
     `scenario` 指定時在真實 state 上疊一件假想變化（`scenarios.py`），refresh section 標 `scenario`。
     ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`sandbox_hurdle` 隨 F 組（entry criterion）退役，已無作用。
+
+    `seat_readings`（Phase 3 Step 3.7）：`alpha.providers.structure_readings.seat_readings_context()` 的結果——
+    argument 鏈段的需求端讀它（騎的讀圖或坐的層／插槽的現行讀圖）。**由呼叫端一次載入後傳入**（多檔時不得每檔各自
+    重載一次圖）；沒給＝鏈段印「這次沒讀到讀圖」，本函式不自己載（測試與 Daily 卡片的假 provider 不碰真實圖）。
     """
     if scenario is not None and scenario not in SCENARIOS:
         raise AlphaError(f"未知情境 {scenario!r}；已知 {SCENARIOS}")
@@ -334,13 +341,24 @@ def fetch_alpha_investment_view(
                 consensus_history = ()
         # ---- 論證層（2026-09-15）：節點人話名字＋claim 引文。provider 沒這能力（測試用假 provider）就空。
         narrative_context: Mapping[str, Any] = {}
+        # 敘事 ledger 先讀：鏈段的需求端要知道現行 v2 敘事騎哪幾格（Step 3.7），三題要它宣告的 history_not_comparable。
+        try:
+            brief_records, brief_errors = brief_ledger.read_brief_records(str(resolved_ticker))
+        except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
+            brief_records, brief_errors = [], [f"短評 ledger 讀取失敗：{type(exc).__name__}"]
+        current_brief = select_brief(brief_records, as_of=as_of, today=today)
+        chain_readings = _chain_readings(seat_readings, str(company_id) if company_id else None, current_brief)
         fetch_narrative = getattr(graph_provider, "get_narrative_context", None)
         if callable(fetch_narrative):
             try:
                 node_ids = [str(e.get("target")) for e in build.context.graph.edges if e.get("target")]
-                if build.context.structural.demand_anchor:
-                    node_ids.append(str(build.context.structural.demand_anchor))
-                narrative_context = fetch_narrative(company_id, node_ids=node_ids)
+                # ⚠ Step 3.7：不再取 `demand_anchor` 的名字（鏈段不用它了）；改取需求端與騎的節點的名字。
+                node_ids += [str(c) for row in chain_readings.get("rows") or () for c in row.get("demand_customers") or ()]
+                node_ids += [str(row.get("node")) for row in chain_readings.get("rows") or ()]
+                node_ids += [str(g.get("node")) for g in chain_readings.get("gone") or ()]
+                node_ids += [str(n) for n in chain_readings.get("seats") or ()]
+                node_ids += [str(r.node) for r in getattr(current_brief, "rides", ()) or ()]
+                narrative_context = fetch_narrative(company_id, node_ids=list(dict.fromkeys(node_ids)))
             except Exception as exc:  # noqa: BLE001 — 拿不到引文只讓論證層少引文，不讓 view 失敗
                 narrative_context = {"error": f"{type(exc).__name__}: {str(exc)[:120]}"}
         # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）整組退役。**
@@ -436,22 +454,25 @@ def fetch_alpha_investment_view(
     # Phase 3 Step 3.3：財務三題。取數在 Engine C（唯讀連線）、判定在 `alpha.three_questions`；四盞燈沿用上面那一份。
     # 取不到就帶著理由往下走——section 會是帶 absence_kind 的缺席，不是空白（L12）。as-of 視角不接（歷史表的
     # PIT 讀法已備，但 view 的其他段在 as-of 下各有規則，這一段先誠實缺席）。
-    three_questions, three_questions_reason = None, None
+    three_questions, three_questions_reason, three_questions_absence = None, None, "upstream_unavailable"
     if as_of is None:
         try:
             from alpha.providers.three_questions import three_questions_for
 
+            # 敘事宣告的 history_not_comparable 要帶進來（Step 3.7，L17 對稱面）：候選板與寫入端都帶，
+            # 個股頁不帶會讓同一檔的三題在兩個畫面不一樣。
+            hnc = (current_brief.history_not_comparable.as_dict()
+                   if current_brief is not None and current_brief.record_version == RECORD_VERSION_V2
+                   and current_brief.history_not_comparable else None)
             three_questions = three_questions_for(str(resolved_ticker), today=today or date.today(),
-                                                  wipeout=wipeout, wipeout_reason=wipeout_reason)
+                                                  wipeout=wipeout, wipeout_reason=wipeout_reason,
+                                                  history_not_comparable=hnc)
         except Exception as exc:  # noqa: BLE001
             three_questions_reason = f"三題取數失敗：{type(exc).__name__}: {str(exc)[:120]}"
     else:
-        three_questions_reason = "as-of 視角尚未接三題（point_in_time_unavailable 之外的誠實缺席）"
-
-    try:
-        brief_records, brief_errors = brief_ledger.read_brief_records(str(resolved_ticker))
-    except Exception as exc:  # noqa: BLE001 — 讀不到就是沒有短評，但要現形
-        brief_records, brief_errors = [], [f"短評 ledger 讀取失敗：{type(exc).__name__}"]
+        # 歷史表的 PIT 讀法已備，但 view 還沒接——那是「這個視角沒有時點投影」，不是上游壞了（3.7 R1）。
+        three_questions_reason = "as-of 視角尚未接三題——歷史表有時點讀法，但個股頁這一段還沒接（不是上游缺料）"
+        three_questions_absence = "point_in_time_unavailable"
 
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：多年視角（要幾倍、哪一格得為真）整組退役。**
     # 它跑的是多年反向橋（`alpha/reverse` ＋ `briefing/multi_year`），ROADMAP Phase 0／D 組。
@@ -478,10 +499,44 @@ def fetch_alpha_investment_view(
         refresh_notes=refresh_notes,
         wipeout=wipeout, wipeout_reason=wipeout_reason,
         three_questions=three_questions, three_questions_reason=three_questions_reason,
+        three_questions_absence_kind=three_questions_absence,
         brief_records=brief_records, brief_parse_errors=brief_errors,
         narrative_context=narrative_context,
         consensus_history=consensus_history,
+        chain_readings=chain_readings,
     )
+
+
+def _chain_readings(context: Mapping[str, Any] | None, company_id: str | None, brief: Any) -> dict[str, Any]:
+    """argument 鏈段的需求端輸入（Phase 3 Step 3.7）：現行 v2 敘事的 `rides[]` 對到的現行讀圖；沒有 v2 敘事（或它沒騎）
+    時用這家公司坐的層／插槽的現行讀圖（Phase 2 Step 2.7 的組法，`seat_readings_for`）。**純切片**，不讀檔。
+
+    三種缺席分開帶（L12）：這次沒給讀圖輸入／讀不到圖（`absence`）、騎的讀圖已不是現行（`gone`）、坐的地方還沒有讀圖
+    （`rows` 空、`seats` 列出坐在哪）。"""
+    if context is None:
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": "這次沒有給讀圖輸入（呼叫端沒有載入讀圖 context）"}}
+    from alpha.providers.structure_readings import seat_readings_for
+
+    sliced = seat_readings_for(context, company_id)
+    if sliced.get("absence"):
+        return {"absence": dict(sliced["absence"])}
+    rides = (list(brief.rides) if brief is not None and brief.record_version == RECORD_VERSION_V2 and brief.rides
+             else [])
+    if rides:
+        by_node = context.get("by_node") or {}
+        rows: list[Mapping[str, Any]] = []
+        gone: list[dict[str, Any]] = []
+        for ride in rides:
+            current = next((r for r in by_node.get(ride.node, ()) if r.get("unit") == ride.unit), None)
+            if current is None or current.get("reading_id") != ride.reading_id:
+                gone.append({"node": ride.node, "unit": ride.unit, "reading_id": ride.reading_id,
+                             "current": (current or {}).get("reading_id")})
+            else:
+                rows.append(current)
+        return {"basis": "rides", "rows": rows, "gone": gone, "seats": list(sliced.get("seats") or ())}
+    return {"basis": "seats", "rows": list(sliced.get("readings") or ()), "gone": [],
+            "seats": list(sliced.get("seats") or ())}
 
 
 def fetch_alpha_cards(

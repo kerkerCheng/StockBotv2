@@ -535,7 +535,11 @@ def test_readings_input_is_sliced_by_the_company_seats_from_the_graph_not_by_tic
                "by_node": {SOCKET: [{"node": SOCKET, "unit": "socket"}], "mat:other": [{"node": "mat:other"}]}}
     sliced = readings_input_for(context, SIVERS)
     assert sliced["seats"] == [SOCKET, LAYER] and [r["node"] for r in sliced["readings"]] == [SOCKET]
-    assert readings_input_for(context, "co:nobody") == {"seats": [], "readings": []}
+    assert sliced["empty"]["kind"] == "not_yet_recorded"
+    nobody = readings_input_for(context, "co:nobody")
+    assert nobody["seats"] == [] and nobody["readings"] == []
+    # 圖上沒有坐的層＝要先補圖，不是「讀圖還沒寫」（3.7 R1；L12）
+    assert nobody["empty"]["kind"] == "upstream_unavailable" and "圖上沒有它供貨或開發的層" in nobody["empty"]["reason"]
     assert readings_input_for(context, None)["absence"]["kind"] == "upstream_unavailable"
     down = {"absence": {"kind": "upstream_unavailable", "reason": "讀不到圖"}}
     assert readings_input_for(down, SIVERS) == down

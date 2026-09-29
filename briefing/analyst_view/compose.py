@@ -269,7 +269,9 @@ def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
     ag = view.argument
     lines = tuple(_line(d.key, d.label, d, "paragraph") for d in ag.paragraphs)
     return AnalystPanel(
-        key="argument", title="為什麼這樣想：鏈、賭注、風險與認錯條件、時間表",
+        # ⚠ 2026-09-30（Step 3.7）：標題原本是「鏈、賭注、風險與認錯條件、時間表」——「賭注」段早在 0b.1b 退役，
+        # 標題還留著它，讀的人會去找一段不存在的東西。改成三段各自回答的問句。
+        key="argument", title="憑什麼這樣想：它在哪條鏈上、錯了怎麼知道、什麼時候知道",
         questions=("q0_argument",),
         # ⚠ 2026-09-23（Phase 0 Step 0b.1）：由 optional 升為**核心**。它是在答「憑什麼」的面板，
         # 73/73 檔都有內容（實測 438 段）；原本站在核心位的 `why` 答的是「估值怎麼算」，已退役。
@@ -288,23 +290,27 @@ def _argument_panel(view: AlphaInvestmentView) -> AnalystPanel:
 
 
 def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
-    """賭注（optional）：**純文字**。2026-09-23（Phase 0 Step 0b.1）由四個價格改成一句話。
+    """賭注（optional）：**純文字**——`our_bet` 那一句＋騎的層或插槽＋什麼必須為真（ROADMAP「bet 改純文字」）。
 
-    原本這裡是 11 格數字（賭注目標價、報酬、年化、EPS 貢獻、倍數貢獻、base 對照…）＋ overrides。
-    ROADMAP「個股頁」對照表把它們列進「拿掉」：`bet` 的四個價格退役，改成
-    **型別、騎層或插槽、什麼必須為真**——那是文字，不是價格。
-
-    今天能照抄的文字只有短評裡的 `our_bet`（研究 session 寫進 append-only ledger 的那一句）。
-    「騎層或插槽」要等 Phase 2 的讀圖 kind 才有主詞，所以**現在不假裝有**：沒寫 `our_bet`
-    就是 `not_yet_recorded`，不是 0、不是空白。**本層一個字都不造**（`our_bet` 是同一個 Datum）。
+    2026-09-23（Phase 0 Step 0b.1）由四個價格改成一句話；2026-09-30（Phase 3 Step 3.7）補齊另外兩件：
+    「騎層或插槽」照抄敘事的 `rides[]`（read model 的 `investor_brief.rides`），「什麼必須為真」照抄短評那一格
+    （`brief:what_must_be_true`）。**三格都是 read model 的同一個 Datum，本層一個字都不造；沒有任何價格。**
+    status 仍取 `our_bet` 那一格——賭注那一句沒寫，另外兩格寫了也不構成「有賭注」。
     """
     ib = view.investor_brief
     our_bet = next((d for d in ib.slots if d.key.endswith("our_bet")), None)
-    lines = (_line("our_bet", "我們賭什麼（研究 session 寫下的那一句）", our_bet, "bet"),) if our_bet else ()
+    must = next((d for d in ib.slots if d.key.endswith("what_must_be_true")), None)
+    rides = getattr(ib, "rides", None)
+    lines = tuple(
+        _line(key, label, datum, "bet")
+        for key, label, datum in (("our_bet", "我們賭什麼（研究 session 寫下的那一句）", our_bet),
+                                  ("rides", "騎哪一層或插槽（敘事宣告）", rides),
+                                  ("what_must_be_true", "什麼必須為真、錯的訊號是什麼", must))
+        if datum is not None)
     status = ("available" if (our_bet is not None and our_bet.is_known)
               else ((our_bet.status if our_bet is not None else None) or "missing"))
     return AnalystPanel(
-        key="bet", title="賭注：我們賭什麼（純文字，optional）",
+        key="bet", title="賭注：我們賭什麼、騎在哪、什麼必須為真（純文字，optional）",
         questions=(),
         status=status, optional=True,
         source_sections=("investor_brief",),
@@ -313,8 +319,7 @@ def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
         lines=lines,
         notes=(
             "**沒有價格、沒有報酬、沒有機率加權**——四個價格已於 2026-09-23 Phase 0 退役。",
-            "「騎哪一層或哪一個插槽」「什麼必須為真」要等 Phase 2 的讀圖落地才有主詞；"
-            "在那之前這裡只有研究 session 寫下的那一句。",
+            "「騎哪一層或插槽」是寫的人宣告的；那一份讀圖**現在**還是不是現行，看讀圖面板與候選狀態（前提失效會現形）。",
         ),
         context={"available": status not in VALUELESS_STATUSES,
                  "optional_rule": "沒寫賭注只表示「還沒寫」，不代表這檔研究不完整；"
@@ -333,7 +338,11 @@ _READING_DATUM_STATUS: Mapping[str | None, str] = {
 
 
 def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
-    """讀圖（optional，Phase 2 Step 2.7）：這家公司坐的層與插槽的現行讀圖，**每一份印狀態**。
+    """讀圖（**核心**，Phase 2 Step 2.7；2026-09-30 Step 3.7 升核心）：這家公司坐的層與插槽的現行讀圖，**每一份印狀態**。
+
+    升核心＝接回 Phase 0 偏差 #16「review_required 的路」：讀圖 stale 時這個面板自己是 `review_required`，readiness
+    因此 `ready_with_flags`。**狀態只由讀圖對圖決定，不吃 `refresh.overall`**（那一格今天全是退役估值鏈的殘留）。
+    沒有讀圖＝`not_yet_recorded` blocker；它的下一步是寫讀圖（research-drain 段 5），**不得**為了收斂標成 settled。
 
     `readings` 由 materialize 組好（圖推這家公司 `supplies_to`／`develops` 到的節點 → 那些節點的現行讀圖；
     INV-1：由 `co:*` 推，不靠讀圖紀錄裡的 ticker）。標籤（判讀、單位、狀態的中文）由那一端從讀圖字彙附上——
@@ -341,8 +350,8 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
     缺席分型由產生缺席的那一端宣告（L16）：`not_yet_recorded`＝坐的層與插槽都還沒有讀圖；
     `upstream_unavailable`＝這次沒讀到圖或 ledger。兩者不得壓成同一句。
     """
-    title = "讀圖：它坐的那一層結構變了沒（optional）"
-    base = dict(key="readings", title=title, questions=(), optional=True, source_sections=("structure_readings",))
+    title = "讀圖：它坐的那一層結構變了沒"
+    base = dict(key="readings", title=title, questions=(), optional=False, source_sections=("structure_readings",))
     notes = ("讀圖是研究判斷（A3）：不 gate、不排序、不給尺寸；判讀由寫的人宣告，本層照抄。",
              "狀態只回答「讀圖跟圖還一不一致」，不回答「讀圖對不對」——對不對要靠 outcome 量測。")
     if readings is None:
@@ -352,8 +361,10 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
     seats = list(readings.get("seats") or ())
     rows = list(readings.get("readings") or ())
     if absence or not rows:
-        kind = (absence or {}).get("kind") or "not_yet_recorded"
-        reason = ((absence or {}).get("reason")
+        # 缺席分型照抄產生端（`seat_readings_for` 的 `absence`／`empty`）；舊輸入沒有 `empty` 時退回「還沒讀」。
+        declared = absence or readings.get("empty") or {}
+        kind = declared.get("kind") or "not_yet_recorded"
+        reason = (declared.get("reason")
                   or ("這家公司坐的層與插槽都還沒有讀圖（圖上它供貨或開發的節點："
                       + ("、".join(seats) if seats else "無") + "）"))
         return AnalystPanel(**base, status="missing", source_statuses={"structure_readings": "missing"},
@@ -376,13 +387,122 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
     return AnalystPanel(**base, status=status, source_statuses={"structure_readings": status},
                         source_absence_kinds={"structure_readings": None}, lines=tuple(lines), notes=notes,
                         context={"available": True, "seats": seats,
-                                 "optional_rule": "沒有讀圖只表示「還沒讀」，不代表這檔研究不完整；本面板不改 readiness"},
+                                 "core_rule": "核心面板（3.7 起）：讀圖 stale／過期會讓 readiness 變成「讀得成但要留意」；"
+                                              "狀態只由讀圖對圖決定，不看 refresh 燈"},
                         reason=None)
 
 
-# ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`_downside_panel` 退役（E 組）。**
-# 「判斷錯了值多少」原本是四個價格。反證那一端沒有退役——它在 `research` 面板的 disproofs，
-# 而 Phase 3 會讓每條反證連到一個 watch。
+#: 候選狀態與 downside 的 authority（邏輯 URI）：兩者都是 materialize 注入的推導結果，不是 read model。
+A_CANDIDATES = "alpha://candidates/v1"
+A_DOWNSIDE = "engine_b://event_watch/downside"
+#: 首屏三個字的題目（字彙與判定住 `alpha.candidates.three_words`；這裡只是行的標籤）。
+_THREE_WORD_LABELS = (("will_it_die", "會死嗎"), ("priced_in", "已定價嗎"), ("in_numbers", "出現在數字裡了嗎"))
+
+
+def _candidate_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
+    """首屏末行（optional，Phase 3 Step 3.7）：候選狀態＋財務三題三個字。
+
+    `candidate` 由 materialize 組好（`alpha.providers.candidates.page_input`——**與候選板同一個 `derive_row`**）；
+    字（可開／缺 X…、紅黃綠灰、是／否／無法量／未答）全由那一端給，本層照抄、不判、不 import 候選模組。
+    status 取「候選狀態」那一格：沒有敘事也沒有持有＝不上板（`not_yet_recorded`），三個字照印。"""
+    base = dict(key="candidate", title="這檔現在在哪一格：候選狀態與三題三個字", questions=(), optional=True,
+                source_sections=("candidates",))
+    notes = ("候選狀態與候選板是同一個推導、每天重算；它不是分數、不是名次、不給尺寸。",
+             "會死嗎＝四盞燈最差的那一盞（灰＝沒量到，不是綠）；已定價嗎／出現在數字裡了嗎＝寫敘事的人宣告，沒宣告印「未答」。")
+    if candidate is None:
+        candidate = {"absence": {"kind": "upstream_unavailable",
+                                 "reason": "這次沒有給候選狀態輸入（CLI 單檔不讀 Sheet；APP 的 materialize 才載）——不是「不上板」"}}
+    absence = candidate.get("absence")
+    if absence:
+        return AnalystPanel(**base, status="missing", source_statuses={"candidates": "missing"},
+                            source_absence_kinds={"candidates": absence.get("kind") or "upstream_unavailable"},
+                            notes=notes, context={"available": False}, reason=absence.get("reason"))
+    row = candidate.get("row")
+    words = dict(candidate.get("three_words") or {})
+    if row is not None:
+        state = Datum(key="candidate:state", label="候選狀態", value=dict(row), status="available",
+                      basis="deterministic", authority=A_CANDIDATES,
+                      method="alpha.providers.candidates.derive_row（候選板同一個推導）",
+                      reason=row.get("note"))
+    else:
+        # 不上板是哪一種不上板由產生端宣告（`page_input` 的 `row_absence`）：Sheet 讀不到時「也沒有持有」是沒驗過的否定。
+        declared = candidate.get("row_absence") or {"kind": "not_yet_recorded",
+                                                    "reason": "沒有敘事、也沒有持有——不上候選板（寫敘事才有候選狀態）"}
+        state = Datum(key="candidate:state", label="候選狀態", status="missing", authority=A_CANDIDATES,
+                      absence_kind=declared.get("kind") or "not_yet_recorded", reason=declared.get("reason"))
+    lines = [_line(state.key, state.label, state, "candidate")]
+    for key, label in _THREE_WORD_LABELS:
+        word = words.get(key) or "未讀到"
+        datum = Datum(key=f"candidate:{key}", label=label, value=word, status="available", basis="deterministic",
+                      authority=A_CANDIDATES, method="alpha.candidates.three_words")
+        lines.append(_line(datum.key, label, datum, "candidate"))
+    status = state.status
+    return AnalystPanel(**base, status=status, source_statuses={"candidates": status},
+                        source_absence_kinds={"candidates": state.absence_kind}, lines=tuple(lines), notes=notes,
+                        context={"available": row is not None, "today": candidate.get("today"),
+                                 "sheet": dict(candidate.get("sheet") or {})},
+                        reason=state.reason)
+
+
+def _three_questions_panel(view: AlphaInvestmentView) -> AnalystPanel:
+    """財務三題稽核區（optional，Phase 3 Step 3.7）：三題每一行的值、來源、as_of、口徑、rule，或缺席分型。
+
+    **每一行是 read model 的同一個 Datum**（`three_questions.lines`，builder 與原始行一起組）；本層不判、不比、不設門檻。"""
+    tq = view.three_questions
+    base = dict(key="three_questions", title="財務三題的數字：會死嗎、已定價嗎、出現在數字裡了嗎（稽核區）",
+                questions=(), optional=True, source_sections=("three_questions",))
+    if tq is None:
+        return AnalystPanel(**base, status="missing", source_statuses={"three_questions": "missing"},
+                            source_absence_kinds={"three_questions": "upstream_unavailable"},
+                            context={"available": False}, reason="這份 read model 沒有接三題")
+    return AnalystPanel(**base, status=tq.meta.status, source_statuses={"three_questions": tq.meta.status},
+                        source_absence_kinds=_absence_kinds(three_questions=tq.meta),
+                        lines=_lines(tq.lines, "three_question"), notes=tq.is_not,
+                        context={"available": tq.meta.status not in VALUELESS_STATUSES, "filer_class": tq.filer_class},
+                        reason=tq.meta.reason)
+
+
+def _downside_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
+    """錯了怎麼知道（optional，Phase 3 Step 3.7）：每一條反證 → 盯它的 watch id 與狀態；沒有 watch 印「未盯」。
+
+    輸入由 materialize 組好（`engine_b.disproof.downside_rows`：歸屬＝`attributed_watches`、條件落格＝`watch_category`，
+    與心跳段 2 的反證計數同一套）。本層照抄，一個字都不造。"""
+    base = dict(key="downside", title="錯了怎麼知道：每條反證與盯它的 watch", questions=(), optional=True,
+                source_sections=("downside",))
+    notes = ("「未盯」＝條件寫了，但沒有 watch 會在它成真時叫醒你；舊判讀（session assessor）的反證不在反證登記範圍，一律未盯。",
+             "反證用來決定何時認錯，不是進場的前置條件；觸及後要不要改 thesis 由你決定（thesis mutation 是人工 gate）。")
+    if candidate is None:
+        candidate = {"absence": {"kind": "upstream_unavailable",
+                                 "reason": "這次沒有給 watch 輸入（CLI 單檔不載；APP 的 materialize 才載）——不是「沒有反證」"}}
+    absence = candidate.get("absence")
+    if absence:
+        return AnalystPanel(**base, status="missing", source_statuses={"downside": "missing"},
+                            source_absence_kinds={"downside": absence.get("kind") or "upstream_unavailable"},
+                            notes=notes, context={"available": False}, reason=absence.get("reason"))
+    downside = dict(candidate.get("downside") or {})
+    rows = list(downside.get("rows") or ())
+    extra = tuple(downside.get("notes") or ())
+    if not rows:
+        # 空的是哪一種空由產生端宣告（`downside_rows` 的 `empty`）：來源讀不到時是 upstream_unavailable，不是「還沒有反證」。
+        declared = downside.get("empty") or {"kind": "not_yet_recorded", "reason": "這家公司名下還沒有任何反證"}
+        return AnalystPanel(**base, status="missing", source_statuses={"downside": "missing"},
+                            source_absence_kinds={"downside": declared.get("kind") or "not_yet_recorded"},
+                            notes=extra + notes,
+                            context={"available": False, "counts": dict(downside.get("counts") or {})},
+                            reason=declared.get("reason"))
+    lines = []
+    for index, row in enumerate(rows):
+        datum = Datum(key=f"downside:{index}", label=str(row.get("source_label") or row.get("source")),
+                      value=dict(row), status="available", basis="deterministic", authority=A_DOWNSIDE,
+                      method="engine_b.disproof.downside_rows（歸屬＝narrative_watches.attributed_watches）")
+        lines.append(_line(datum.key, datum.label, datum, "downside"))
+    return AnalystPanel(**base, status="available", source_statuses={"downside": "available"},
+                        source_absence_kinds={"downside": None}, lines=tuple(lines), notes=extra + notes,
+                        context={"available": True, "counts": dict(downside.get("counts") or {})}, reason=None)
+
+
+# ⚠ 2026-09-23（Phase 0 Step 0b.1b）：舊的 `_downside_panel`（「判斷錯了值多少」四個價格，E 組）退役；
+# 2026-09-30（Phase 3 Step 3.7）同名函式（上面那一個）是新的「錯了怎麼知道」——每條反證連到 watch，不是四價復活。
 
 
 def _wipeout_panel(view: AlphaInvestmentView) -> AnalystPanel:
@@ -427,6 +547,8 @@ _READINESS_RULE = (
     "——沒有賭注、沒有下檔、沒有稽核區的基本面數字都不會讓 readiness 變差。"
     "⚠ 2026-09-23（Phase 0 Step 0b.1）：**短評與歸零旗標改為核心**，所以它們缺席會讓 readiness 變差"
     "——那是刻意的：新方向下沒寫短評的檔就是沒有產出，沒量到的燈不是綠燈。"
+    "⚠ 2026-09-30（Phase 3 Step 3.7）：**讀圖升核心**——讀圖 stale 會讓 readiness 變成 ready_with_flags"
+    "（狀態只由讀圖對圖決定，不看 refresh 燈）；還沒有讀圖的檔多一個「還沒做」的 blocker。"
 )
 
 
@@ -478,11 +600,14 @@ def _limits(view: AlphaInvestmentView) -> tuple[str, ...]:
     return tuple(dict.fromkeys(everything))
 
 
-def build_analyst_view(view: AlphaInvestmentView, *, readings: Mapping[str, Any] | None = None) -> AnalystView:
+def build_analyst_view(view: AlphaInvestmentView, *, readings: Mapping[str, Any] | None = None,
+                       candidate: Mapping[str, Any] | None = None) -> AnalystView:
     """把 canonical read model 投影成 analyst 判讀畫面。純函式、確定性、可預先 materialize。
 
     `readings`（Phase 2 Step 2.7）：讀圖面板的輸入，由 materialize 組好；沒給＝這次沒讀到（`upstream_unavailable`），
     不是「沒有讀圖」。
+    `candidate`（Phase 3 Step 3.7）：候選狀態＋三個字＋downside 的輸入（`alpha.providers.candidates.page_input`），
+    由 materialize 一次載入 context 後逐檔組好；沒給＝這次沒讀到，兩個面板都說 `upstream_unavailable`。
     """
     panels = {
         "headline": _headline_panel(view),
@@ -493,6 +618,9 @@ def build_analyst_view(view: AlphaInvestmentView, *, readings: Mapping[str, Any]
         "brief": _brief_panel(view),
         "argument": _argument_panel(view),
         "readings": _readings_panel(readings),
+        "candidate": _candidate_panel(candidate),
+        "three_questions": _three_questions_panel(view),
+        "downside": _downside_panel(candidate),
     }
     rs = view.refresh_status
     ident = view.identity
@@ -505,6 +633,7 @@ def build_analyst_view(view: AlphaInvestmentView, *, readings: Mapping[str, Any]
         research=panels["research"], bet=panels["bet"],
         wipeout=panels["wipeout"], brief=panels["brief"],
         argument=panels["argument"], readings=panels["readings"],
+        candidate=panels["candidate"], three_questions=panels["three_questions"], downside=panels["downside"],
         readiness=_readiness(panels),
         refresh=RefreshSummary(overall=rs.overall, counts=dict(rs.counts),
                                change_detection=rs.change_detection,

@@ -158,7 +158,7 @@ Daily 的「Alpha Card 摘要」區是同一份 view 的一列精簡版。
 第二層論證、第三層才是格；沒寫短評就印「還沒寫短評」，**不得用任何數字補**。
 ⚠ 2026-09-22：原文寫的問句序列（頭條隱含報酬 → 市場預測 → 差異 → optional entry threshold）
 整條隨估值鏈與進場邏輯退役。
-（f）`readiness` 的三態（`ready`／`ready_with_flags`／`blocked`）只描述**核心四段**讀不讀得成，
+（f）`readiness` 的三態（`ready`／`ready_with_flags`／`blocked`）只描述**核心各段**（`CORE_PANELS`；2026-09-30 起含讀圖）讀不讀得成，
 **不是**可不可以買的信號，也不是 Engine D 的 `research_status`。
 
 ### 四維度（`AGENTS.md` 為唯一權威，此處只是操作提示）

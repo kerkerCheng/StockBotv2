@@ -45,13 +45,41 @@ def test_chain_paragraph_names_nodes_and_isolates_the_thin_links() -> None:
         {"relation": "supplies_to", "target": "tech:cpo", "evidence_class": "self_reported",
          "sole_source": False, "qualification_status": "designed_in"},
     ]
-    text = chain_paragraph(company="Coherent", anchor_id="tech:ai_switch", edges=edges, names=NAMES)
+    # 2026-09-30（Step 3.7）：需求端改讀騎的讀圖的需求側（不再是 `get_bottlenecks` 的 sub≥4 需求錨）。
+    demand = {"basis": "rides", "gone": [], "rows": [
+        {"node": "tech:cpo", "unit": "layer", "unit_label": "層", "kind_label": "B：量的賭注", "status": "current",
+         "demand_customers": ["co:nvidia"]}]}
+    text = chain_paragraph(company="Coherent", edges=edges, names=NAMES, demand=demand)
     _clean(text)
-    assert text.startswith("需求端是「Data-center switch」。")
+    assert text.startswith("騎的層「Co-Packaged Optics」讀成「B：量的賭注」（現行）；需求端是「NVIDIA」。")
     assert "Coherent供應「NVIDIA」；目前是唯一來源；已被設計進客戶產品；有客戶或第三方印證。" in text
     assert "另外 1 條連結（「Co-Packaged Optics」）只有公司自己在講" in text and "最薄" in text
-    assert "tech:" not in text and "sub=" not in text
-    assert chain_paragraph(company="X", anchor_id=None, edges=[], names={}) == "圖裡還沒有 X 的供應鏈連結，所以說不出它在哪條鏈上。"
+    assert "tech:" not in text and "sub=" not in text and "Data-center switch" not in text
+    no_edges = chain_paragraph(company="X", edges=[], names={}, demand=demand)
+    assert no_edges.startswith("X 在圖上還沒有評為難替代（替代難度 4 以上）的連結，這一段沒有邊可講。騎的層")
+    assert "圖裡還沒有" not in no_edges, "「沒評到 4」不等於「圖上沒有它的連結」（SIVE.ST 有邊）"
+
+
+def test_chain_demand_side_says_which_kind_of_absence_it_is() -> None:
+    """三種缺席分開說（L12）：沒讀到讀圖、騎的那份已換版、坐的地方還沒有讀圖——下一步都不同。"""
+    from alpha.narrative.argument import demand_sentence
+
+    unread = demand_sentence({"absence": {"kind": "upstream_unavailable", "reason": "neo4j down"}}, NAMES)
+    assert "這次沒讀到讀圖（neo4j down）" in unread and "不是沒有需求端" in unread
+    assert "這次沒有給讀圖輸入" in demand_sentence(None, NAMES)
+    gone = demand_sentence({"basis": "rides", "rows": [], "gone": [{"node": "tech:cpo", "reading_id": "sr_old"}]}, NAMES)
+    assert "「Co-Packaged Optics」）已不是現行" in gone and "敘事重寫" in gone and "sr_old" not in gone
+    none_yet = demand_sentence({"basis": "seats", "rows": [], "gone": [], "seats": ["tech:cpo"]}, NAMES)
+    assert "還沒有讀圖（「Co-Packaged Optics」）" in none_yet and "不是沒有需求端" in none_yet
+    nowhere = demand_sentence({"basis": "seats", "rows": [], "gone": [], "seats": []}, NAMES)
+    assert "圖上它沒有供貨或開發到任何層" in nowhere
+    anonymous = demand_sentence({"basis": "seats", "gone": [], "rows": [
+        {"node": "tech:cpo", "unit_label": "插槽", "kind_label": "A：護城河賭注", "status": "stale",
+         "demand_customers": []}]}, NAMES)
+    assert anonymous.startswith("它坐的插槽「Co-Packaged Optics」讀成「A：護城河賭注」（圖變了、該重讀）")
+    assert "需求側沒有具名的公司" in anonymous
+    for text in (unread, gone, none_yet, nowhere, anonymous):
+        _clean(text)
 
 
 # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`test_numbers_paragraph_prints_the_given_values_in_human_units` 與

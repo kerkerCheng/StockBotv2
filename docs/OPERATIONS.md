@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-09-30，Phase 3 Step 3.7：個股頁首屏、稽核區、readiness、downside）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | `python -m webapp materialize <T>…`（daily ⑬ 同一條）的讀取**變多、寫入不變**：每一輪多載一次候選推導的輸入（同一輪帶 `--candidates` 時個股頁與候選板共用這一份，不是各讀一次 Sheet／FX）——與 `--candidates` 同一個 `alpha.providers.candidates.candidate_context`：watch registry、thesis lifecycle、讀圖對圖（Neo4j bolt 本機，唯讀）、敘事 ledger、Google Sheet（`spreadsheets.readonly`，已持有判定）、邊緣判定（Engine C 本機檔＋市值正規化的 FX，yfinance，與 `--beta`／`--candidates` 同一個 `get_fx_snapshot`）；thesis memo 檔（downside 的推翻條件，唯讀）。只寫 ignored derived cache（個股 artifact，atomic）。**無新增網路主機或憑證**。as-of 視角不載（`point_in_time_unavailable`）。`python -m briefing alpha-card`／`analyst-view` 單檔 CLI 多讀一次圖與讀圖 ledger（鏈段需求端、讀圖面板），唯讀；CLI **不讀 Sheet**，所以候選與 downside 兩個選配面板在 CLI 印「這次沒有給」（as-of 視角讀圖也明確拒絕）。讀不到任何一項＝兩個選配面板說 `upstream_unavailable`，其餘照走 |
+| **2 canonical skill／prompt／本檔** | 本節；`skills/research-drain` 段 5 補「讀圖缺席 blocker 的下一步是寫讀圖、不得標 settled」；`docs/ARCHITECTURE.md` §6.7（面板、readiness、鏈段需求端）；`CONCEPTS.md`「候選狀態板」「判斷錯了值多少」 |
+| **3 最窄 rule** | daily ⑬ 的 argv **不變**（`tests/test_daily_task.py` 逐項相等照過）；不新增 step、不進任何 allowlist；`.codex/rules` 仍是 0 條；APP 不新增路由（個股頁多三個面板，同一個 GET） |
+| **4 contract test** | `tests/test_stock_page_phase3.py`（downside 歸屬與落格、個股頁與候選板同一推導、三種缺席、讀圖升核心兩個方向＋圖變動端到端、鏈段需求端、三題稽核格是同一個 Datum、bet 三段純文字、history_not_comparable 對稱面）；`tests/test_analyst_view.py`（封閉清單、INJECTED_PANELS）；`tests/test_argument_layer.py` |
+| **5 端到端 smoke** | 見 Step 3.7 的合併驗收（真實資料 materialize、readiness 前後對照、鏈段逐檔比對、headless Edge 渲染 AXTI 與無敘事一檔） |
+
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.6：候選狀態板＋心跳）
 
 | 步 | 結論 |
@@ -554,7 +564,7 @@ Analyst View 依**消費者問句**排列：現在多少錢（只有現價）→
 （每一行都是 read model 裡同一個 `Datum` 物件的參照），不寫任何 authority、不呼叫 LLM。
 `--format json` 的輸出完全 JSON-able 且保留 `null`，可預先產生給未來 APP 點擊直接讀。
 
-**讀 readiness：** `ready`／`ready_with_flags`／`blocked` **只看核心四段**；
+**讀 readiness：** `ready`／`ready_with_flags`／`blocked` **只看核心各段**（`CORE_PANELS`，2026-09-30 起含讀圖）；
 optional 的 entry 缺席只會出現在 `optional_unavailable`，**不會**讓 readiness 變差
 （產品決策見 `docs/archive/roadmap-pre-alpha-edge.md`「主流程的終點是 Implied Return」；2026-09-16 起該終點排定由
 多年反向橋取代，見 `docs/ROADMAP.md` Phase 7，落地前照舊）。

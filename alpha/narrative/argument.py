@@ -41,13 +41,51 @@ def _name(node_id: str | None, names: Mapping[str, str]) -> str:
     return names.get(node_id) or node_id.split(":", 1)[-1].replace("_", " ")
 
 
-def chain_paragraph(*, company: str, anchor_id: str | None, edges: Sequence[Mapping[str, Any]],
-                    names: Mapping[str, str]) -> str:
-    """「這條鏈怎麼走」：需求端→公司的每一段連結各一句，再點出證據最薄的那段。"""
+#: 讀圖對圖的狀態 → 鏈段裡的一句話（`alpha.structure_reading.staleness.READING_STATUSES` 的白話；那張表寫給稽核）。
+READING_STATUS_PLAIN: Mapping[str, str] = {
+    "current": "現行", "stale_low": "現行（圖上只有證據等級變了）", "stale": "圖變了、該重讀", "expired": "過期未重讀",
+}
+
+
+def demand_sentence(demand: Mapping[str, Any] | None, names: Mapping[str, str]) -> str:
+    """鏈段的需求端（Phase 3 Step 3.7）：**讀騎的讀圖（或它坐的層／插槽的現行讀圖）的需求側**，
+    不再讀 sub≥4 成員的需求錨（filter 殘留，G1）。三種缺席分開說（L12）：沒讀到讀圖、騎的那份已換版、還沒有讀圖。
+
+    `demand`：`{"basis": "rides"|"seats", "rows": [讀圖列], "gone": [已不是現行的騎乘], "seats": [...]}`，
+    或 `{"absence": {"kind", "reason"}}`。讀圖列帶 `node`／`unit_label`／`kind_label`／`status`／`demand_customers`。"""
+    if not demand or demand.get("absence"):
+        reason = ((demand or {}).get("absence") or {}).get("reason") or "這次沒有給讀圖輸入"
+        return f"需求端：這次沒讀到讀圖（{reason}）——不是沒有需求端。"
+    parts: list[str] = []
+    lead = "騎的" if demand.get("basis") == "rides" else "它坐的"
+    for row in demand.get("rows") or ():
+        where = f"{lead}{row.get('unit_label') or '一格'}「{_name(row.get('node'), names)}」"
+        status = READING_STATUS_PLAIN.get(str(row.get("status")), "這次沒比對到圖")
+        who = "、".join(f"「{_name(c, names)}」" for c in row.get("demand_customers") or ())
+        parts.append(f"{where}讀成「{row.get('kind_label') or '沒寫判讀'}」（{status}）；"
+                     + (f"需求端是{who}。" if who else "那份讀圖的需求側沒有具名的公司。"))
+    for gone in demand.get("gone") or ():
+        parts.append(f"騎的讀圖（「{_name(gone.get('node'), names)}」）已不是現行——需求端要等敘事重寫才說得出來。")
+    if not parts:
+        seats = "、".join(f"「{_name(s, names)}」" for s in demand.get("seats") or ())
+        parts.append("需求端：這家公司坐的層與插槽還沒有讀圖"
+                     + (f"（{seats}）" if seats else "（圖上它沒有供貨或開發到任何層）")
+                     + "——說不出需求端是誰，不是沒有需求端。")
+    return "".join(parts)
+
+
+def chain_paragraph(*, company: str, edges: Sequence[Mapping[str, Any]], names: Mapping[str, str],
+                    demand: Mapping[str, Any] | None = None) -> str:
+    """「這條鏈怎麼走」：需求端（讀圖的需求側）一句，再把公司的每一段連結各一句，最後點出證據最薄的那段。
+
+    ⚠ 2026-09-30（Phase 3 Step 3.7）：需求端原本是 `get_bottlenecks` 的 `demand_anchor`（sub≥4 成員的需求錨），
+    改讀讀圖；鏈段的邊照舊來自 `get_company_structural_context`。"""
+    head = demand_sentence(demand, names)
     if not edges:
-        return f"圖裡還沒有 {company} 的供應鏈連結，所以說不出它在哪條鏈上。"
-    anchor = _name(anchor_id, names)
-    parts: list[str] = [f"需求端是「{anchor}」。"]
+        # ⚠ 鏈段的邊只收評為難替代（替代難度 4 以上）的那幾條（`get_company_structural_context`，plan §8 第 4 點照舊）；
+        # 「一條都沒有」不等於「圖上沒有它的連結」（SIVE.ST、AAOI 都有邊，只是沒評到或評不到 4）——照實說（L12）。
+        return f"{company} 在圖上還沒有評為難替代（替代難度 4 以上）的連結，這一段沒有邊可講。" + head
+    parts: list[str] = [head]
     strong = [e for e in edges if str(e.get("evidence_class") or "") not in WEAK_CLASSES]
     weak = [e for e in edges if str(e.get("evidence_class") or "") in WEAK_CLASSES]
     # 有印證的連結逐條講（唯一來源與設計進客戶產品的排前面）；只有公司自己說的合成一句，不逐條佔版面。
@@ -126,5 +164,5 @@ def timeline_paragraph(*, checkpoints: Sequence[Mapping[str, Any]], catalysts: S
 
 __all__ = [
     "EVIDENCE_CLASS_PLAIN", "QUALIFICATION_PLAIN", "RELATION_PLAIN", "WEAK_CLASSES",
-    "chain_paragraph", "closure_phrase", "timeline_paragraph",
+    "READING_STATUS_PLAIN", "chain_paragraph", "closure_phrase", "demand_sentence", "timeline_paragraph",
 ]

@@ -417,8 +417,8 @@ Analyst View 的頭條那把尺、q4／q7 兩個問句、`briefing valuation／i
 **產品決策（2026-09-23 Phase 0 改寫）：** 原本的 stock-level 主流程「Evidence → Internal Forecast → Valuation → Horizon →
 Implied Return，終點是 implied return；EntryCriterion 是 optional analytical capability」整條已隨估值鏈退役（G3：財務只回答三題，
 不得長回估值模型）。現在這一層的單位是**句與段**：短評（session 寫）→ 論證（鏈／時間表／風險）→ 研究（反證與檢核點）→
-歸零旗標；`fundamental` 降為選配；readiness 只看核心面板（`headline`／`brief`／`argument`／`research`／`wipeout`），
-optional 缺席不得拉低它，也不得為了讓畫面「完整」補任何預設值。
+歸零旗標；`fundamental` 降為選配；readiness 只看核心面板（`headline`／`brief`／`argument`／`research`／`readings`／`wipeout`；
+`readings` 2026-09-30 Phase 3 Step 3.7 升核心），optional 缺席不得拉低它，也不得為了讓畫面「完整」補任何預設值。
 
 ```
 AlphaInvestmentView（§6.1 canonical read model；18 個 section，依資料結構排列）
@@ -429,9 +429,14 @@ AnalystView ── headline   （現在多少錢：只有現價｜refresh／revi
             ├─ argument   （論證：鏈／風險與認錯條件／時間表；2026-09-23 起 numbers／market／bet 三段退役）
             ├─ research   （Q6 Q1–Q5／thesis／催化劑／disproof／missing・stale・review_required）
             ├─ wipeout    （歸零旗標四盞：只給燈不給數字；灰＝沒量到）
+            ├─ readings   （讀圖：坐的層／插槽的現行讀圖＋狀態；3.7 起核心，stale→review_required）
+            ├─ candidate      （**optional，注入**：首屏末行——候選狀態＋三題三個字，與候選板同一個 derive_row）
+            ├─ downside       （**optional，注入**：每條反證→盯它的 watch id 與狀態；沒有的印「未盯」）
+            ├─ bet            （**optional**：純文字——our_bet＋騎的層／插槽＋什麼必須為真）
+            ├─ three_questions（**optional**：稽核區——三題每行的值、來源、as_of、口徑、rule 或缺席分型）
             └─ fundamental（**optional**：Engine C 原始數字與同期共識；`why`／`entry` 兩個面板已於 Phase 0 退役）
                 │
-        readiness（只看核心面板 headline／brief／argument／research／wipeout）＋refresh 摘要＋limits（「不是什麼」）
+        readiness（只看核心面板 headline／brief／argument／research／readings／wipeout）＋refresh 摘要＋limits（「不是什麼」）
                 │
      `python -m briefing analyst-view <T> [--as-of] [--format markdown|json] [-o]`
 ```
@@ -452,10 +457,17 @@ AnalystView ── headline   （現在多少錢：只有現價｜refresh／revi
 
 **status roll-up 與 readiness 都是查表。** panel `status` ＝來源 section `meta.status` 取最嚴
 （`_WORST_FIRST` 是宣告好的嚴重度序，且 `source_statuses` 保留取最嚴之前的原值）；
-`readiness` ∈ `ready`／`ready_with_flags`／`blocked`，**只看核心四段**，判準逐字寫在 `readiness.rule`。
+`readiness` ∈ `ready`／`ready_with_flags`／`blocked`，**只看核心面板**（清單讀 `CORE_PANELS`，不寫段數），判準逐字寫在 `readiness.rule`。
 **optional panel 不參與**——`tests/test_analyst_view.py` 逐欄比對「有判準 vs 沒判準」兩份投影的 readiness。
 
-**`readings` panel（2026-09-26 Phase 2 Step 2.7；optional）：** 這家公司坐的層與插槽的現行讀圖，每一份印判讀、單位與**狀態**（現行／跟圖不一致／只有證據等級變／過期）——`AGENTS.md`「結構不變就抱」要持有者看得到那一層變了沒。它是**唯一來源不在 read model 的 panel**：`webapp/materialize.py::readings_context()` 一次載入圖的邊與讀圖 ledger（`co:*` 以 `supplies_to`／`develops` 連到的非公司節點＝它「坐」的節點，INV-1 由圖推、不靠讀圖紀錄的 ticker），判讀／單位／狀態的中文標籤由那一端從讀圖字彙附上，compose 只照抄（import 白名單不含讀圖模組）。缺席分型由注入端宣告：沒給輸入或讀不到圖＝`upstream_unavailable`，坐的節點都沒讀圖＝`not_yet_recorded`。不進 `CORE_PANELS`、不改 readiness（Phase 3 面板重排時一起決定）。
+**`readings` panel（2026-09-26 Phase 2 Step 2.7；optional）：** 這家公司坐的層與插槽的現行讀圖，每一份印判讀、單位與**狀態**（現行／跟圖不一致／只有證據等級變／過期）——`AGENTS.md`「結構不變就抱」要持有者看得到那一層變了沒。它是**第一個來源不在 read model 的 panel**（3.7 起另有 `candidate`／`downside`，同一種注入例外）：`webapp/materialize.py::readings_context()` 一次載入圖的邊與讀圖 ledger（`co:*` 以 `supplies_to`／`develops` 連到的非公司節點＝它「坐」的節點，INV-1 由圖推、不靠讀圖紀錄的 ticker），判讀／單位／狀態的中文標籤由那一端從讀圖字彙附上，compose 只照抄（import 白名單不含讀圖模組）。缺席分型由注入端宣告：沒給輸入或讀不到圖＝`upstream_unavailable`，坐的節點都沒讀圖＝`not_yet_recorded`。
+**2026-09-30（Phase 3 Step 3.7）升核心**（接回 Phase 0 偏差 #16「review_required 的路」）：讀圖 stale 時面板自己是 `review_required` → readiness `ready_with_flags`；**狀態只由讀圖對圖決定，不吃 `refresh.overall`**（那一格今天全是退役估值鏈殘留）。組法 3.7 起住 `alpha/providers/structure_readings.py::seat_readings_context`／`seat_readings_for`（webapp 的 `readings_context` 只是薄包裝——briefing 的 CLI 也要用，而 briefing 不得 import webapp）；每列另帶 `demand_customers`（`demand_side_customers`，與登記 watch 同一個函式）。**as-of 視角明確拒絕**（`point_in_time_unavailable`；坐在哪一層與 staleness 都只有現在的圖，INV-6）。沒有讀圖時分兩種、由 `seat_readings_for` 宣告（`empty`）：坐了但還沒讀＝`not_yet_recorded`；圖上沒有它供貨或開發的層＝`upstream_unavailable`（要先補圖或判定它在需求側）。
+
+**argument 鏈段的需求端（2026-09-30 Phase 3 Step 3.7）：** 改讀**騎的讀圖**（現行 v2 敘事的 `rides[]` 對到的現行讀圖；沒有 v2 敘事時用它坐的層／插槽的現行讀圖）的需求側客戶，不再經 `structural.scarcity_inputs` 的 `demand_anchor`（`get_bottlenecks` 的 sub≥4 成員需求錨＝filter 殘留，G1）。`get_bottlenecks` 本身不退役（`build_research_context` Q1 與 PointInTime 探針仍用它）。三種缺席分開說：這次沒讀到讀圖、騎的那份已換版、坐的地方還沒有讀圖——鏈段因此永遠有一句話，不會變成 missing。讀圖 context 由 `fetch_alpha_investment_view(seat_readings=...)` 注入（materialize 與 briefing CLI 一次載入；沒給就印「這次沒讀到」，取數層不自己載，避免 Daily 卡片每檔重載一次圖）。標題改成「憑什麼這樣想：它在哪條鏈上、錯了怎麼知道、什麼時候知道」（原標題還掛著 0b.1b 已退役的「賭注」段）。
+
+**`candidate`／`downside` panel（2026-09-30 Phase 3 Step 3.7；optional、注入）：** 與 `readings` 同一種「來源不在 read model」的例外。`webapp/materialize.py::candidate_context()` 一次載入候選推導的輸入（同一輪也組候選板時由 `webapp/__main__.py` 載候選板的超集、個股頁與候選板共用一份——不是兩份快照；呼叫端給 alias 時先正規化成 research ticker）（與候選板同一個 `alpha.providers.candidates.candidate_context`：watch registry、thesis lifecycle、讀圖對圖、Sheet readonly、邊緣判定），`candidate_input_for` 把 read model 已算好的三題與舊判讀反證交給 `page_input`——**候選狀態就是候選板那一列**（`derive_row`），只是去掉 Sheet 來源欄位（個股頁不帶任何部位欄位名）。三個字（會死嗎＝四盞燈最差色與灰燈數；兩題＝敘事宣告，沒宣告「未答」）即使不上板也照印。downside 每條反證的歸屬用 `engine_b.narrative_watches.attributed_watches`、落格用 `engine_b.disproof.watch_category`（與心跳段 2 的反證計數同一套）；舊 session assessor 判讀的反證不在反證登記範圍，一律「未盯」。as-of 視角兩者都是 `point_in_time_unavailable`（watch、Sheet、讀圖對圖只有現在）。不上板與 downside 空列的缺席分型都由產生端宣告（Sheet 讀不到＝持有判定暫停、來源讀不到＝`upstream_unavailable`），compose 照抄。CLI 的 `analyst-view` 不載候選輸入（不在 CLI 讀 Sheet），兩個面板照實印「這次沒有給」；markdown 逐節印出讀圖、候選、downside、三題。
+
+**`three_questions` panel（2026-09-30 Phase 3 Step 3.7；optional）：** 稽核區的財務三題。每一行是 read model `ThreeQuestionsSection.lines` 的同一個 `Datum`（builder 與原始行在同一個函式裡一起組；`dependencies` 帶 source／口徑／rule／detail），缺席行帶產生端宣告的 `absence_kind`。沒有門檻、不比較。個股頁的三題與候選板同源：取數層把現行 v2 敘事宣告的 `history_not_comparable` 交給 `three_questions_for`（3.7 補上的對稱面）。
 
 **頭條那一句話不是 consumer 造的。** （2026-09-23 前）`implied_return.epistemics.one_sentence` 由
 `alpha://implied_return/model` 自己組出，consumer 只是把它挪到最前面並註明出處；估值鏈退役後頭條只剩現價，判準不變——造句就是在 read model

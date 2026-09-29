@@ -360,6 +360,9 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
                                  "watch_status": watch.get("status")})
             citations = [{"angle": c.angle, "edge": list(c.edge), "quote": c.quote, "source_id": c.source_id,
                           "independent": c.independent} for c in reading.citations]
+            # 需求側客戶（Phase 3 Step 3.7）：個股頁 argument 鏈段的需求端改讀**這份讀圖當時查到的需求側**，
+            # 不再經 `get_bottlenecks` 的 sub≥4 需求錨（filter 殘留，G1）。沿用登記 watch 的同一個函式（L16）。
+            customers = demand_side_customers({"node": node, "angles": reading.angles})
             rows.append({
                 "node": node,
                 "unit": unit,
@@ -375,8 +378,88 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
                 "reread_reasons": watch_reasons,
                 "citations": citations,
                 "disproof": disproof,
+                "demand_customers": customers,
             })
     return rows, parse_errors
+
+
+#: 公司「坐在」哪些節點：它對那個節點有這兩種邊之一（由**圖**推，INV-1——不靠讀圖紀錄裡的 ticker）。
+SEAT_RELATIONS: tuple[str, ...] = ("supplies_to", "develops")
+
+
+def seat_readings_context(*, today: Any = None, as_of: Any = None) -> dict[str, Any]:
+    """讀圖面板與 argument 鏈段的輸入：**一次**載入圖的邊與讀圖 ledger，給每一檔切用（`seat_readings_for`）。
+
+    - `seats`：`co:*` → 它 `supplies_to`／`develops` 到的非公司節點（讀圖只寫在層與插槽上）。
+    - `by_node`：節點 → 現行讀圖（每個單位一份）＋ 由讀圖字彙附上的中文標籤——消費端（compose、builder）
+      不碰讀圖字彙，標籤在這裡附上，那一端只照抄（L16：字彙只有一份）。每列帶 `demand_customers`（Step 3.7）。
+    讀不到就整份回 `upstream_unavailable`，不回空集合——空集合會讓每一檔都印「還沒讀」（INV-3）。
+    ⚠ Step 3.7 由 `webapp/materialize.py::readings_context` 原樣搬來（briefing 的 CLI 也要用，briefing 不得 import webapp）。
+    ⚠ **as-of 視角明確拒絕**（INV-6；3.7 R1）：坐在哪些節點讀的是現在的圖（`_load_edges` 沒有時點投影），讀圖對圖的
+    staleness 也拿現在的圖與今天比——拿它回答「T 時刻這一層變了沒」就是用當前值冒充。讀圖面板升核心後這會進 readiness。
+    """
+    from datetime import date
+
+    if as_of is not None:
+        return {"absence": {"kind": "point_in_time_unavailable",
+                            "reason": "as-of 視角沒有讀圖對圖的時點投影——坐在哪一層、那一層變了沒都只有現在的圖（INV-6）"}}
+    try:
+        from query.structure import _load_edges
+
+        from ..structure_reading import READING_KINDS, READING_UNITS
+        from ..structure_reading.staleness import READING_STATUSES
+
+        edges = _load_edges()
+        rows, _errors = reading_status_rows(edges, today=today or date.today(), as_of=as_of)
+    except Exception as exc:  # noqa: BLE001 — 讀不到圖只讓讀圖面板與鏈段需求端說讀不到，其餘照走
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": f"這次沒讀到圖或讀圖 ledger（{type(exc).__name__}）——不是「沒有讀圖」"}}
+    seats: dict[str, set[str]] = {}
+    for edge in edges:
+        if edge.src.startswith("co:") and edge.relation in SEAT_RELATIONS and not edge.dst.startswith("co:"):
+            seats.setdefault(edge.src, set()).add(edge.dst)
+    by_node: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        if not row.get("reading_id"):
+            continue
+        reasons = list(row.get("reread_reasons") or ())
+        status_label = READING_STATUSES.get(str(row.get("status")), "這次沒比對到圖（不是現行）")
+        if reasons:
+            status_label += "；另有重讀理由：" + "；".join(reasons[:2])
+        by_node.setdefault(str(row["node"]), []).append({
+            "node": row["node"], "unit": row.get("unit"),
+            "unit_label": str(READING_UNITS.get(str(row.get("unit")), row.get("unit"))).split("讀圖")[0],
+            "kind": row.get("kind"),
+            "kind_label": str(READING_KINDS.get(str(row.get("kind")), row.get("kind"))).split("——")[0],
+            "status": row.get("status"), "status_label": status_label, "reason": row.get("reason"),
+            "reading_id": row.get("reading_id"), "read_on": row.get("read_on"), "expires": row.get("expires"),
+            "reading": row.get("reading"), "needs_reread": row.get("needs_reread"),
+            "demand_customers": list(row.get("demand_customers") or ()),
+        })
+    return {"seats": {co: sorted(nodes) for co, nodes in seats.items()}, "by_node": by_node}
+
+
+def seat_readings_for(context: Mapping[str, Any], company_id: str | None) -> dict[str, Any]:
+    """一家公司坐的節點與那些節點的現行讀圖（Phase 2 Step 2.7 的組法；3.7 起讀圖面板與 argument 鏈段共用）。
+
+    `context`：`webapp.materialize.readings_context()` 的輸出（`{"seats", "by_node"}` 或 `{"absence"}`）。
+    缺席分型由這裡宣告（L16）：讀不到圖／沒有 co: id＝`upstream_unavailable`；坐的節點都沒有讀圖＝交給消費端寫
+    `not_yet_recorded`。⚠ 由 `co:*` 推（INV-1），不靠讀圖紀錄裡的 ticker。"""
+    if context.get("absence"):
+        return {"absence": dict(context["absence"])}
+    if not company_id:
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": "這檔沒有 co: id（registry 解析不到），推不出它坐在哪些節點（INV-1）"}}
+    seats = list((context.get("seats") or {}).get(company_id) or ())
+    by_node = context.get("by_node") or {}
+    readings = [r for node in seats for r in by_node.get(node, ())]
+    # 沒有讀圖時是哪一種沒有——由這裡宣告，面板照抄（L12：「還沒讀」與「圖上沒有可讀的層」下一步不同）。
+    empty = ({"kind": "not_yet_recorded",
+              "reason": "這家公司坐的層與插槽都還沒有讀圖（圖上它供貨或開發的節點：" + "、".join(seats) + "）"}
+             if seats else
+             {"kind": "upstream_unavailable",
+              "reason": "圖上沒有它供貨或開發的層或插槽——讀圖寫在層與插槽上，要先補圖的供貨／開發邊，或判定它在需求側"})
+    return {"seats": seats, "readings": readings, "empty": empty}
 
 
 def known_nodes(*, directory: Path | None = None) -> list[str]:
@@ -402,4 +485,6 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
 
 __all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "fetch_structure_snapshot_with_quotes",
            "fetch_structure_snapshot", "known_nodes", "ledger_path", "read_reading_records",
-           "register_reading_watches", "reread_reasons", "verify_citations", "verify_disproof_sources"]
+           "register_reading_watches", "reread_reasons", "seat_readings_context", "seat_readings_for",
+           "verify_citations",
+           "verify_disproof_sources"]

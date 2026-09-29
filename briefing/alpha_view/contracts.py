@@ -602,7 +602,10 @@ class InvestorBriefSection:
     status_light: Datum
     brief_id: str | None
     is_not: tuple[str, ...]
-    #: 要翻倍需要什麼為真（2026-09-20）。`None`＝這一檔還沒寫下倍率射程，**刻意不印**。
+    #: 騎哪一層或插槽（Phase 3 Step 3.7；v2 敘事的 `rides[]`）：`value` 是 `[{node, node_name, unit, unit_label,
+    #: reading_id}]`。`bet` 面板的「騎層或插槽」照抄它。沒有 v2 敘事＝帶 absence_kind 的缺席，不是空 list。
+    #: 預設 None 只給舊測試夾具；正式 builder 一律給一格。
+    rides: "Datum | None" = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -673,6 +676,10 @@ class ThreeQuestionsSection:
     in_numbers: tuple[Mapping[str, Any], ...]
     filer_class: str | None
     is_not: tuple[str, ...]
+    #: 稽核區的每一行（Phase 3 Step 3.7）：**同一批行**的 `Datum` 形式，與上面三個 tuple 在同一個函式裡一起組
+    #: （`builder._three_questions_section`），不是第二份判定——個股頁稽核區照抄它（compose 不造 Datum）；
+    #: 候選狀態推導讀上面的原始行（它要 key 與 absence_kind）。`dependencies` 帶 source／口徑／rule／detail。
+    lines: tuple[Datum, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)

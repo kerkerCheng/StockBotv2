@@ -224,7 +224,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `4e96223`、`0d4c7ad`＋收尾 |
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2（收據 `docs/reports/2026-09-29-phase3-step35-narratives.md`；pq2 [656]–[661] 等使用者 go） | ✅ | **強模型** | 見 git log「Step 3.5」 |
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳（多面向審查＋覆核：32 條處置，見偏差 18–26） | ✅ | 執行模型 | `f7f1711`＋收尾 |
-| 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ○ | 執行模型 | |
+| 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ✅ | 執行模型 | 本 Step commit |
 | 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ○ | 執行模型 | |
 | 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ○ | 執行模型 | |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
@@ -268,6 +268,14 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 24 | 3.6 | 字彙住哪 | 候選板字彙與純函式搬到零 I/O 的 `alpha/candidates.py`；providers 版只留要讀 watch／讀圖／Engine C／Sheet 的推導 | 3.6 審查評審 c0（blocking）：fake payload 經 `alpha.providers` 預載 engine_c／yfinance／requests，請求路徑的 runtime 哨兵變瞎（通過與失效同形，L13）；心跳 import 期也因此多一串會失敗的相依（c5／c15） |
 | 25 | 3.6 | §7：連結斷了印「敘事該重寫：連結 <ref> 已換版」 | 依原因印：來源已收掉（讀圖重讀、memo 換版）／被判觸及未處置／到期未判／不存在；同一來源鍵多筆時未處置的優先 | 3.6 審查 c6／c14（L12）：「換版」「觸及」「到期」下一步不同——前者改來源鍵，後兩者先看來源那一邊的處置 |
 | 26 | 3.6（修 3.4） | （未寫）drain 段 1 計數器的 fired 分堆 | `engine_b/cli.py::_fired_watch_summary` 改呼叫 `queue_segments.classify_watch`，另加「敘事該重寫」一堆 | 3.6 覆核：它自己另分一份，`wake_brief` 的 date watch 醒來落到「假設對照」、敘事 `brief:` 反證醒來落到「反證待檢」——3.4 在 classify_watch 修過的錯 consumer，第二份分類沒跟著改（L16） |
+| 27 | 3.7 | §8 第 2 點「稽核區：三題各行…」（沒指名住哪個面板） | 新選配面板 `three_questions`：read model 的 `ThreeQuestionsSection.lines`（builder 與原始行在同一個函式裡組成 Datum，`dependencies` 帶 source／口徑／rule／detail）；APP 稽核區的 `disproofCard` 換成三題卡 | 3.3 只把三題放進 read model，analyst view 與 APP 沒有任何消費端；compose 不得造 Datum，所以 Datum 在 builder 組 |
+| 28 | 3.7 | §8 第 1 點首屏「短評之後一行候選狀態」＋偏差 21「持股讀一次注入」 | 新選配注入面板 `candidate`（首屏末行）與 `downside`；materialize 以 `candidate_context` 一次載入（由 `load_board` 抽出的同一個 `alpha.providers.candidates.candidate_context`），`page_input` 呼叫同一個 `derive_row`；個股頁那一列去掉 `held_source`／`holdings_verified`、改帶 `sheet_verified` | 個股頁不得另推一份（L16）；analyst view 的部位 token 掃描禁 `held` 欄位名，Sheet 來源欄位留在候選板 |
+| 29 | 3.7 | §8 第 4 點二擇一 | 選 (a)：`fetch_alpha_investment_view(seat_readings=...)`；讀圖 context 的組法由 webapp 搬到 `alpha/providers/structure_readings.seat_readings_context`／`seat_readings_for`（webapp 留薄包裝），讀圖列加 `demand_customers`（沿用登記 watch 的 `demand_side_customers`）；briefing CLI 單檔載一次；取數層**不自己載**（Daily 卡片每檔各載一次就違反「不得每檔各自重載一次圖」） | (a) 讓句型留在 read model（`alpha.narrative.argument`）；CLI 的 `analyst-view` 也要讀圖面板——升核心後不給就 blocked |
+| 30 | 3.7 | §8 第 4 點「變成 missing 的逐檔列出並改成明示缺席」 | 鏈段永遠有一句話：需求端三種缺席（沒讀到讀圖／騎的已換版／坐的地方沒讀圖）分開說；真實資料 73/73 available、0 檔變 missing。沒有 sub≥4 邊的那一句由「圖裡還沒有 X 的供應鏈連結」改為「X 在圖上還沒有評為難替代（替代難度 4 以上）的連結」 | 真實資料試跑：SIVE.ST 圖上有邊（只是沒評到 4）卻被說成沒有連結，接上需求端後同一段自相矛盾（L12） |
+| 31 | 3.7 | §8 第 5 點「每條反證連到它的 watch id」 | `engine_b.disproof.downside_rows`：thesis memo 推翻條件＋現行 v2 敘事 disproof（self／link）＋騎的讀圖 disproof＋歸屬本檔但條件已不在現行來源的 watch＋舊 session assessor 判讀的反證（一律「未盯」）；落格由 `disproof_counts` 抽出 `watch_category`／`condition_key` 共用；同一筆 watch 只印一列（後到的來源進 `also`） | 真實資料：舊判讀的反證 240 條（63 檔）沒有來源鍵、不在反證登記範圍——不印等於藏起來（INV-3）；AXTI／SIVE.ST 的敘事以來源鍵連到自家 thesis 條件，不合併就重複算在盯 |
+| 32 | 3.7（修 3.3／3.4） | （未寫）個股頁三題的 `history_not_comparable` | `briefing/alpha_view/sources.py` 把現行 v2 敘事宣告的 `history_not_comparable` 交給 `three_questions_for` | L17 對稱面：候選板與寫入端都帶、個股頁沒帶；今天四份 v2 都沒宣告，所以是潛在不一致，不是現行錯值 |
+| 33 | 3.7 | （未寫）argument 標題、bet 三段、readiness 白話 | argument 標題「憑什麼這樣想：它在哪條鏈上、錯了怎麼知道、什麼時候知道」；bet 三格照抄 read model（新 `investor_brief.rides` Datum）；`PLAIN_READINESS`「四段都讀得成」→「核心各段都讀得成」；歸零旗標燈名印成內部 key（`plainLine` 的 fallback 沒傳）當下修 | 標題還掛著 0b.1b 已退役的「賭注」段；核心早已不是四段（L16：不寫段數）；燈名 bug 是 headless 渲染實測抓到的，一行修（L17） |
+| 34 | 3.7（R1） | §8 各點的邊界情況（未寫） | R1 覆核（5 面向＋逐條反駁，38 條成立）全修：①as-of 視角讀圖 context 明確拒絕（`point_in_time_unavailable`，鏈段與核心讀圖面板照抄；INV-6）；②markdown 逐節印讀圖／候選／downside／三題，bet 的 rides 不印 repr、缺席不印 None；③Sheet 讀不到時首屏宣告「持有判定暫停」（`row_absence`）而不是「也沒有持有」；④稽核區序列逐鍵攤開三種形狀（EDGAR／台股月營收／分部占比）並印推算出處；⑤沒有讀圖分兩種（坐了沒讀＝`not_yet_recorded`、圖上沒有坐的層＝`upstream_unavailable`，產生端宣告）；⑥downside 空列依產生端的 `empty`（來源讀不到＝`upstream_unavailable`）、騎的讀圖「沒有列」與「已換版」分開、thesis 列照抄 watch 的 L7 兩欄；⑦同一輪個股頁與候選板共用一份候選 context（`webapp/__main__.py`）、alias 正規化成 research ticker；⑧as-of 三題分型改 `point_in_time_unavailable`；⑨v1 敘事印「舊版（缺候選狀態）」、面板名走 `/meta` 白話、「核心四段」殘留三處；補 15 條測試（22 個變異全紅）。**覆核第二輪**（3 個唯讀 agent 逐條核對：blocking 全修、無新 blocking）另修 13 條 non-blocking：downside 整格撤回≠讀不到（`retracted_cells`）、空列理由照事實組、同一格內醒來待判優先（不看 registry 順序）、共用 context 的組板宇宙仍以 materialize 後的目錄為準（失敗檔不上板）、markdown 巢狀值不印 repr、占比格式只對 0–1 ×100、「什麼時候會知道」改讀 description／expected_at（HEAD 起就錯，搬到第二層才看得到）、選配缺席行走 `/meta` 白話與產生端分型、三題卡印 detail（敘事引用的倍數核對得到）、as-of 的 downside 標題、「核心四段」再兩處、compose 舊註解；再補 9 條測試（兩輪共 30 個變異全紅） | 覆核逐條實證；L12（一個分型兩種語意）、L16（缺席由產生端宣告）、L17（對稱面）、INV-3、INV-6 |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -500,6 +508,7 @@ sandbox impact review（daily 旗標）；**05:30 前 push**。
 
 **怎麼驗：** readiness 73 檔前後對照表（每檔 blocked／ready 變化逐檔指得出是哪個面板）；鏈段改寫後逐檔比對 3.0 記下的 chain 段，**變成 missing 的逐檔列出並改成明示缺席**；兩條方向相反的測試：讀圖節點上的邊變動 → 讀圖 stale → readiness `ready_with_flags`；只有 `operating_assumption` 的 `review_required` 時讀圖面板狀態不變；核心面板文字 digest 只在預期處變（brief 對 v2 四檔、argument 鏈段、readings 升核心）；`python -m audit invariants --only PointInTime` 照 PASS（探針仍在）；headless Edge 渲染一檔 v2（AXTI）與一檔無敘事（例 AAOI）。
 **L11-6 ④：** 3.0 記下的 `ready`／`ready_with_flags` 清單——readings 升核心後，沒有讀圖的公司會不會從 ready 掉成 blocked；逐檔看，變化必須指得出原因。
+**執行結果（2026-09-30）：** 三題稽核區、候選／downside 兩個注入面板、讀圖 context 搬進 alpha、鏈段不會變 missing、downside 的範圍與合併、個股頁三題補 `history_not_comparable`、標題與白話——見 §0.6 偏差 27–34；待決見 §14 #29–32。真實資料：readiness ready 4→4（AXTI、COHR、LITE、SIVE.ST，全部有讀圖）、63 檔多一個 readings blocker（`not_yet_recorded` 40＝坐了但沒讀、`upstream_unavailable` 23＝圖上沒有坐的層；全部原本就因 brief blocked）、0 檔從 ready 掉成 blocked；`argument:chain` 73/73 available。
 
 ## 9. Step 3.8 `record_trade.py` 研究收據（Z2，R1 ＋ R2-b 常規 opt-in；資本路徑；**使用者 2026-09-29 預先授權，#16**）
 
@@ -665,3 +674,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 26. **請求路徑哨兵對 `webapp.materialize` 本身一直是瞎的**（3.6 審查評審 c0 的旁證）：既有五份 state fake 都經 `webapp.materialize` 組 payload，哨兵取 `before` 之前它就在 `sys.modules` 裡；3.6 補的測試只守「不得多預載」。要不要讓 fake 不經 materialize（直接寫 JSON 夾具）。
 27. **`test_watch_expiry.py::test_expired_structured_condition_is_not_re_registered_by_reconcile` 在一次全套跑紅、單跑與整檔跑都綠**（2026-09-29 3.6）：重現不出來，疑似順序或時間相依；Phase 3 結案前再觀察。
 28. **3.6 覆核的 non-blocking 殘留**（不影響本 Step 驗收）：APP rollup 段的缺席 kind 印原始代碼、沒經 `/meta` 字彙轉中文（心跳也印代碼，兩邊一致）；敘事 ledger 最新一行壞掉時 `select_brief` 退回上一版，那一列沒標「顯示的是較舊版」；freshness identity 只記 parse_errors 數量；daily ⑬ 若在單檔途中被截斷，候選板當天不更新（⑬ 實耗 282–298 秒、上限 25 分鐘）；同一個根因（thesis 來源觸及／到期）可能由 C3 或 Expiry 與連結滯留各報一次；`engine_b.disproof.current_briefs` 仍丟掉 ledger 的 parse errors（3.4 起）。
+29. **舊 session assessor 判讀的反證 240 條（63 檔）在個股頁 downside 全印「未盯」**（3.7 實測）：它們是估值鏈時期的判讀（動作句多提 fair value、重新 materialize），沒有來源鍵、不在反證登記範圍（thesis memo／讀圖／敘事）。要退役（不再印）還是改寫進 thesis memo 或敘事（登記 watch）是研究判斷——使用者決定；在那之前照實印「未盯」。
+30. **argument 鏈段的邊仍經 `min_substitutability`（sub≥4）過濾**（`get_company_structural_context` 讀 `_bottleneck_rows`）：57/73 檔因此沒有邊可講，其中 SIVE.ST、AAOI 圖上是有邊的。plan §8 第 4 點明文只改需求錨、邊照舊；要不要改讀全部邊，與 #5（`get_bottlenecks` 退役）一起決定。
+31. **測試隔離**（3.7 在 worktree 跑全套時現形）：13 條測試在沒有 `.env`／`library/leads`／`extractions`／watch registry／Engine C 的 checkout 會紅（它們讀真實 Neo4j、leads、registry）——主樹全綠；`test_private_authority_is_never_touched_by_a_request` 雜湊整個 `library/private`（含 derived cache），與 materialize 並行會假紅。
+32. **圖上沒有坐的層的 23 檔（例 AAPL、MSFT、ORCL、TSLA）讀圖面板永遠是 `upstream_unavailable` blocker**（3.7 R1）：下一步是補它的供貨／開發邊或判定它在需求側，但注入面板沒有 Abstention 的 settle 管道——若判定是需求側（本來就不坐任何層），它的每檔閉環永遠到不了終局。要不要給讀圖面板一條 Abstention settle 路徑（`刻意不主張：它是需求側`），使用者決定；今天 23 檔都已因 brief blocked，readiness 沒有一檔因此改變。

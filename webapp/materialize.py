@@ -244,80 +244,85 @@ def materialize_view(analyst_view_dict: Mapping[str, Any], *,
     return payload
 
 
-#: 公司「坐在」哪些節點：它對那個節點有這兩種邊之一（plan §8：由**圖**推，INV-1——不靠讀圖紀錄裡的 ticker）。
-_SEAT_RELATIONS = ("supplies_to", "develops")
-
-
 def readings_context(*, today: date | None = None, as_of: date | None = None) -> dict[str, Any]:
-    """讀圖面板的輸入（Phase 2 Step 2.7）：**一次**載入圖的邊與讀圖 ledger，給每一檔切用。
+    """讀圖面板與 argument 鏈段的輸入（Phase 2 Step 2.7；3.7 起兩者共用）：**一次**載入圖的邊與讀圖 ledger。
 
-    - `seats`：`co:*` → 它 `supplies_to`／`develops` 到的非公司節點（讀圖只寫在層與插槽上）。
-    - `by_node`：節點 → 現行讀圖（每個單位一份）＋ 由讀圖字彙附上的中文標籤——compose 的 import 白名單
-      不准碰讀圖模組，所以標籤在這裡附上，那一端只照抄（L16：字彙只有一份）。
-    讀不到就整份回 `upstream_unavailable`，不回空集合——空集合會讓每一檔都印「還沒讀」（INV-3）。
-    """
-    try:
-        from alpha.providers.structure_readings import reading_status_rows
-        from alpha.structure_reading import READING_KINDS, READING_UNITS
-        from alpha.structure_reading.staleness import READING_STATUSES
-        from query.structure import _load_edges
+    組法住 `alpha.providers.structure_readings.seat_readings_context`（3.7 搬過去：briefing 的 CLI 也要用，
+    而 briefing 不得 import webapp）。讀不到就整份回 `upstream_unavailable`，不回空集合（INV-3）。"""
+    from alpha.providers.structure_readings import seat_readings_context
 
-        edges = _load_edges()
-        rows, _errors = reading_status_rows(edges, today=today or date.today(), as_of=as_of)
-    except Exception as exc:  # noqa: BLE001 — 讀不到圖只讓這個選配面板說讀不到，其餘照走
-        return {"absence": {"kind": "upstream_unavailable",
-                            "reason": f"這次沒讀到圖或讀圖 ledger（{type(exc).__name__}）——不是「沒有讀圖」"}}
-    seats: dict[str, set[str]] = {}
-    for edge in edges:
-        if edge.src.startswith("co:") and edge.relation in _SEAT_RELATIONS and not edge.dst.startswith("co:"):
-            seats.setdefault(edge.src, set()).add(edge.dst)
-    by_node: dict[str, list[dict[str, Any]]] = {}
-    for row in rows:
-        if not row.get("reading_id"):
-            continue
-        reasons = list(row.get("reread_reasons") or ())
-        status_label = READING_STATUSES.get(str(row.get("status")), "這次沒比對到圖（不是現行）")
-        if reasons:
-            status_label += "；另有重讀理由：" + "；".join(reasons[:2])
-        by_node.setdefault(str(row["node"]), []).append({
-            "node": row["node"], "unit": row.get("unit"),
-            "unit_label": str(READING_UNITS.get(str(row.get("unit")), row.get("unit"))).split("讀圖")[0],
-            "kind": row.get("kind"),
-            "kind_label": str(READING_KINDS.get(str(row.get("kind")), row.get("kind"))).split("——")[0],
-            "status": row.get("status"), "status_label": status_label, "reason": row.get("reason"),
-            "reading_id": row.get("reading_id"), "read_on": row.get("read_on"), "expires": row.get("expires"),
-            "reading": row.get("reading"), "needs_reread": row.get("needs_reread"),
-        })
-    return {"seats": {co: sorted(nodes) for co, nodes in seats.items()}, "by_node": by_node}
+    return seat_readings_context(today=today, as_of=as_of)
 
 
 def readings_input_for(context: Mapping[str, Any], company_id: str | None) -> dict[str, Any]:
-    """一檔的讀圖面板輸入。缺席分型由這裡宣告（L16）：讀不到圖／沒有 co: id＝`upstream_unavailable`；
-    坐的節點都沒有讀圖＝交給 compose 寫 `not_yet_recorded`。"""
+    """一檔的讀圖面板輸入（切片規則住 `alpha.providers.structure_readings.seat_readings_for`；L16）。"""
+    from alpha.providers.structure_readings import seat_readings_for
+
+    return seat_readings_for(context, company_id)
+
+
+def candidate_context(tickers: Sequence[str], *, as_of: date | None = None, board: bool = False) -> dict[str, Any]:
+    """個股頁候選狀態＋downside 的共用輸入（Phase 3 Step 3.7；接回偏差 21）：**一次**載入 watch registry、thesis
+    lifecycle、讀圖對圖、Sheet（readonly）、邊緣判定——與候選板同一個載入函式（`alpha.providers.candidates`）。
+
+    as-of 視角不推：watch registry、Sheet、讀圖對圖都只有「現在」（INV-6：答不出 T 時刻的就明確拒絕）。
+    讀不到＝`upstream_unavailable`，不是「不上板」（INV-3）。
+    `board=True`：同一輪也要組候選板時載**候選板的超集**，一份同時交給個股頁與 `materialize_candidates`——
+    否則同一輪兩次讀 Sheet／FX，兩份快照（3.7 R1 實測：SIVE.ST 的市值兩邊差一次 FX）。"""
+    if as_of is not None:
+        return {"absence": {"kind": "point_in_time_unavailable",
+                            "reason": "as-of 視角不推候選狀態與反證 watch——watch registry、Sheet、讀圖對圖都只有現在（INV-6）"}}
+    try:
+        from alpha.providers.candidates import candidate_context as load
+
+        return load(list(tickers), board=board)
+    except Exception as exc:  # noqa: BLE001 — 讀不到只讓兩個選配面板說讀不到，其餘照走
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": f"候選狀態的輸入沒讀到（{type(exc).__name__}: {str(exc)[:120]}）——不是「不上板」"}}
+
+
+def candidate_input_for(context: Mapping[str, Any], view: Any) -> dict[str, Any]:
+    """一檔的首屏候選狀態＋downside 輸入：把 read model 已算好的三題與舊判讀反證交給 `page_input`（候選板同一個推導）。"""
     if context.get("absence"):
         return {"absence": dict(context["absence"])}
-    if not company_id:
+    tq = getattr(view, "three_questions", None)
+    if tq is None or (tq.meta.status == "missing" and tq.meta.absence_kind == "upstream_unavailable"):
+        three, note = None, (tq.meta.reason if tq is not None else "read model 沒有接三題")
+    else:
+        three, note = {"will_it_die": list(tq.will_it_die), "priced_in": list(tq.priced_in),
+                       "in_numbers": list(tq.in_numbers)}, None
+    judgments = [{"condition": c.condition, "check_frequency": c.check_frequency, "action": c.action_within_48h}
+                 for c in view.falsification.conditions]
+    try:
+        from alpha.providers.candidates import page_input
+
+        return page_input(context, str(view.identity.ticker), view.identity.company_id, three_questions=three,
+                          three_questions_note=note, judgment_conditions=judgments)
+    except Exception as exc:  # noqa: BLE001 — 一檔推不出只讓這一檔的兩個選配面板說讀不到
         return {"absence": {"kind": "upstream_unavailable",
-                            "reason": "這檔沒有 co: id（registry 解析不到），推不出它坐在哪些節點（INV-1）"}}
-    seats = list((context.get("seats") or {}).get(company_id) or ())
-    by_node = context.get("by_node") or {}
-    return {"seats": seats, "readings": [r for node in seats for r in by_node.get(node, ())]}
+                            "reason": f"這一檔的候選狀態推不出來（{type(exc).__name__}: {str(exc)[:120]}）"}}
 
 
 def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None = None,
                 store: ArtifactStore | None = None,
                 generated_at: datetime | None = None,
-                readings: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
+                readings: Mapping[str, Any] | None = None,
+                candidates: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """跑一次完整鏈並寫下 artifact。**只有這裡會連 Neo4j／Engine C／private ledger。**
 
     `readings`：`readings_context()` 的結果（多檔時由 `materialize_many` 載入一次傳進來）；沒給就自己載一次。
+    3.7 起它同時餵讀圖面板與 argument 鏈段的需求端（同一份，不各載一次）。
+    `candidates`：`candidate_context()` 的結果（同上，多檔載一次）；沒給就為這一檔載一次。
     """
     from briefing.alpha_view.sources import fetch_alpha_investment_view
     from briefing.analyst_view import build_analyst_view
 
-    view = fetch_alpha_investment_view(ticker, as_of=as_of, include_causal=False, scenario=scenario)
     context = readings if readings is not None else readings_context(as_of=as_of)
-    analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id))
+    view = fetch_alpha_investment_view(ticker, as_of=as_of, include_causal=False, scenario=scenario,
+                                       seat_readings=context)
+    candidate_ctx = candidates if candidates is not None else candidate_context([ticker], as_of=as_of)
+    analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id),
+                                 candidate=candidate_input_for(candidate_ctx, view))
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker))
     target = store or ArtifactStore()
@@ -339,15 +344,18 @@ def _close_series(ticker: str, *, sessions: int = 180) -> list[dict[str, Any]]:
 
 
 def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
-                     store: ArtifactStore | None = None) -> list[tuple[str, Path | None, str | None]]:
+                     store: ArtifactStore | None = None,
+                     candidates: Mapping[str, Any] | None = None) -> list[tuple[str, Path | None, str | None]]:
     """一次 materialize 多檔。**一檔失敗不影響其他檔**——失敗以理由現形，不靜默跳過（INV-3）。"""
     target = store or ArtifactStore()
     results: list[tuple[str, Path | None, str | None]] = []
-    # 讀圖面板的輸入只載一次（節點數會長，查詢次數不該跟著檔數長）。
+    # 讀圖面板的輸入只載一次（節點數會長，查詢次數不該跟著檔數長）；候選狀態的輸入同理（Sheet、watch、讀圖對圖）。
     readings = readings_context(as_of=as_of) if tickers else None
+    if candidates is None and tickers:
+        candidates = candidate_context(tickers, as_of=as_of)
     for ticker in tickers:
         try:
-            path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings)
+            path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates)
         except Exception as exc:  # noqa: BLE001 — 逐檔隔離；理由原樣回報
             results.append((ticker, None, f"{type(exc).__name__}: {str(exc)[:200]}"))
         else:
@@ -1286,7 +1294,8 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
 
 
 def materialize_candidates(*, tickers: Sequence[str] | None = None, store: StateArtifactStore | None = None,
-                           generated_at: datetime | None = None) -> tuple[Path, dict[str, Any]]:
+                           generated_at: datetime | None = None,
+                           context: Mapping[str, Any] | None = None) -> tuple[Path, dict[str, Any]]:
     """推導整板並寫下 artifact。**不寫任何 authority**：讀敘事 ledger、讀圖對圖、watch registry、Engine C（三題 ?mode=ro；
     四盞燈與邊緣判定走一般連線）、Sheet（readonly）、邊緣判定的 FX（yfinance，與 `--beta` 同一個 get_fx_snapshot）。
     `tickers`：宇宙；沒給就用 APP 已 materialize 的那幾檔（`ArtifactStore().tickers()`）。"""
@@ -1295,7 +1304,10 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
     # `tickers=None`＝沒指定 → 預設 store 的目錄；**空 list 是「指定了、而且是空的」**，不得悄悄換成預設目錄
     # （`--dir` 指到別的目錄時會讀到真實機器上的清單；3.6 審查）。
     universe = list(tickers) if tickers is not None else ArtifactStore().tickers()
-    payload = build_candidates_artifact(load_board(universe), generated_at=generated_at)
+    # `context`：同一輪個股頁用的那一份（`candidate_context(..., board=True)`）；載入失敗的缺席 context 不能拿來組板，
+    # 就照舊自己載一次（失敗會原樣拋出，由呼叫端印理由）。
+    shared = context if context is not None and not context.get("absence") else None
+    payload = build_candidates_artifact(load_board(universe, context=shared), generated_at=generated_at)
     target = store or StateArtifactStore()
     return target.write(payload), payload
 
@@ -1409,7 +1421,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "core_panels": list(CORE_PANELS),
         "optional_panels": list(OPTIONAL_PANELS),
         "readiness_states": {
-            "ready": "核心四段都有內容，且沒有被標記需要動作",
+            "ready": "核心各段都有內容，且沒有被標記需要動作",
             "ready_with_flags": "有內容，但至少一段 stale／review_required／not_applicable",
             "blocked": "至少一段核心缺內容——看 blocker_details 的 absence_kind 才知道該不該去補",
         },

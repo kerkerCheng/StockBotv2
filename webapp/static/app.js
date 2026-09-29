@@ -266,7 +266,7 @@ function renderCard(row) {
     const box = el('div', 'attention ' + tone);
     const head2 = el('div', 'attention-head');
     head2.appendChild(document.createTextNode(
-      `${PANEL_TITLE[attention.panel] || attention.panel}：${attention.status}`));
+      `${plainPanel(attention.panel, PANEL_TITLE[attention.panel] || attention.panel).title}：${attention.status}`));
     const badge = absenceBadge(kind);
     if (badge) { head2.appendChild(document.createTextNode(' ')); head2.appendChild(badge); }
     box.appendChild(head2);
@@ -520,11 +520,13 @@ function renderResearch(view) {
   }
   if (panel.catalysts && panel.catalysts.length) {
     node.appendChild(group(`催化劑（${panel.catalysts.length}）`, () => listOf(
-      panel.catalysts.map((c) => [c.label, c.due, c.state].filter(Boolean).join('｜')))));
+      panel.catalysts.map((c) => [c.description || c.label, c.expected_at || c.due, c.date_confidence, c.state]
+        .filter(Boolean).join('｜')))));
   }
   if (panel.checkpoints && panel.checkpoints.length) {
     node.appendChild(group(`檢核點（${panel.checkpoints.length}）`, () => listOf(
-      panel.checkpoints.map((c) => [c.label, c.due, c.state].filter(Boolean).join('｜')))));
+      panel.checkpoints.map((c) => [c.date || c.due, c.what || c.label, c.decides ? '決定：' + c.decides : null,
+        c.date_confidence].filter(Boolean).join('｜')))));
   }
   if (panel.risks && panel.risks.length) {
     node.appendChild(group(`風險（${panel.risks.length}）`, () => listOf(panel.risks)));
@@ -570,7 +572,7 @@ function renderReadiness(payload) {
     const box = el('div', 'attention ' + (item.settled ? 'settled' : 'blocked'));
     const head2 = el('div', 'attention-head');
     head2.appendChild(document.createTextNode(
-      `卡在「${PANEL_TITLE[item.panel] || item.panel}」這一層（${item.status}）　`));
+      `卡在「${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}」這一層（${item.status}）　`));
     const badge = absenceBadge(item.absence_kind);
     if (badge) head2.appendChild(badge);
     box.appendChild(head2);
@@ -581,15 +583,22 @@ function renderReadiness(payload) {
   (readiness.flag_details || []).forEach((item) => {
     const box = el('div', 'attention flags');
     const head2 = el('div', 'attention-head',
-      `旗標：${PANEL_TITLE[item.panel] || item.panel}（${item.status}）`);
+      `旗標：${plainPanel(item.panel, PANEL_TITLE[item.panel] || item.panel).title}（${item.status}）`);
     box.appendChild(head2);
     if (item.reason) box.appendChild(el('div', 'attention-body', item.reason));
     node.appendChild(box);
   });
   if (readiness.optional_unavailable && readiness.optional_unavailable.length) {
+    // 面板名走 /meta 白話、缺席走產生端宣告的分型（3.7 覆核：原本印內部 key，並把「不上板」說成能力未提供）。
+    const view = payload.view || {};
+    const items = readiness.optional_unavailable.map((text) => {
+      const key = String(text).split('：')[0];
+      const panel = view[key] || {};
+      const short = (VOCAB && VOCAB.plain_absence_short && VOCAB.plain_absence_short[panel.absence_kind]) || panel.status;
+      return `${plainPanel(key, PANEL_TITLE[key] || key).title}（${short || '沒有內容'}）`;
+    });
     node.appendChild(el('p', 'note',
-      'optional 能力未提供：' + readiness.optional_unavailable.join('、') +
-      '（**不影響** readiness——沒有 entry 判準不代表這檔研究不完整）'));
+      '選配面板沒有內容：' + items.join('、') + '——**不影響** readiness，不代表這檔研究不完整'));
   }
   node.appendChild(group('readiness 的判準原文', () => el('p', 'note', readiness.rule)));
   return node;
@@ -679,7 +688,9 @@ function wipeoutBlock(view) {
     const colour = WIPEOUT_COLOURS[value.colour];
     const li = el('li');
     li.appendChild(document.createTextNode(
-      `${colour ? colour.mark + ' ' + colour.word : '⬜ 灰'}　${plainLine(line.key) || line.display_label}`));
+      // ⚠ 2026-09-30（Step 3.7 渲染實測）：原本是 `plainLine(line.key) || display_label`——plainLine 查不到會回 key 本身，
+      // 於是 `||` 右邊永遠用不到，畫面印出 `wipeout_going_concern` 這種內部名。fallback 要傳進去。
+      `${colour ? colour.mark + ' ' + colour.word : '⬜ 灰'}　${plainLine(line.key, line.display_label)}`));
     const why = value.reason || d.reason;
     if (why) li.appendChild(el('span', 'rule', why));
     if (!colour) {
@@ -706,9 +717,23 @@ function wipeoutBlock(view) {
 
 function renderBet(view) {
   const panel = view.bet;
-  const node = panelShell(panel, '賭注的每一格（optional，不影響這份判讀完不完整）');
+  const node = panelShell(panel, '賭注：我們賭什麼、騎在哪、什麼必須為真（optional，不影響這份判讀完不完整）');
   node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
-  node.appendChild(renderRows(panel.lines));
+  // Step 3.7：「騎哪一層或插槽」是敘事宣告的 rides[]——印成「節點（層／插槽）」一句；其餘兩格照 renderRow。
+  const box = el('div', 'rows');
+  (panel.lines || []).forEach((line) => {
+    const d = line.datum;
+    if (line.key === 'rides' && Array.isArray(d.value)) {
+      const row = el('div', 'row');
+      row.appendChild(el('div', 'row-label', line.display_label));
+      row.appendChild(el('div', 'row-value',
+        d.value.map((r) => `「${r.node_name || r.node}」（${r.unit_label || r.unit}）`).join('、')));
+      box.appendChild(row);
+    } else {
+      box.appendChild(renderRow(plainLine(line.key, line.display_label), d));
+    }
+  });
+  node.appendChild(box);
   if (panel.notes && panel.notes.length) {
     node.appendChild(group('賭注不是什麼', () => listOf(panel.notes)));
   }
@@ -766,32 +791,184 @@ function blockerCard(payload) {
   return node;
 }
 
-function disproofCard(view) {
-  const panel = view.research;
-  const disproofs = panel.disproofs || [];
-  const catalysts = panel.catalysts || [];
-  if (!disproofs.length && !catalysts.length) return null;
-  const meta = plainPanel('research', panel.title);
+/* 錯了怎麼知道（Phase 3 Step 3.7，論證層）：每一條反證連到盯它的 watch；沒有 watch 的印「未盯」。
+   **全部照抄** downside 面板（歸屬＝`attributed_watches`、落格＝`watch_category`，與心跳段 2 同一套）；
+   本畫面不判、不算，連計數都是 materialize 端給的。舊判讀（session assessor）的反證不在反證登記範圍，一律未盯。 */
+function downsideCard(view) {
+  const panel = view.downside;
+  if (!panel) return null;
+  const meta = plainPanel('downside', panel.title);
   const node = el('section', 'panel');
   node.appendChild(el('h2', null, meta.title));
-  node.appendChild(el('div', 'panel-questions', meta.hint));
-  if (disproofs.length) {
+  if (meta.hint) node.appendChild(el('div', 'panel-questions', meta.hint));
+  const lines = (panel.lines || []).filter((line) => line.role === 'downside');
+  if (!lines.length) {
+    const box = el('div', 'attention flags');
+    // 「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1）：標題跟著產生端宣告的分型走。
+    const head = el('div', 'attention-head',
+      panel.absence_kind === 'not_yet_recorded' ? '名下還沒有反證　'
+        : (panel.absence_kind === 'point_in_time_unavailable' ? '回看的那天不推反證與 watch　' : '這次沒讀到反證的來源　'));
+    const badge = absenceBadge(panel.absence_kind);
+    if (badge) head.appendChild(badge);
+    box.appendChild(head);
+    if (panel.reason) box.appendChild(el('div', 'attention-body', panel.reason));
+    node.appendChild(box);
+  } else {
+    const counts = (panel.context || {}).counts || {};
+    node.appendChild(el('div', 'rule', `在盯 ${counts.active || 0}｜醒來待判 ${counts.fired || 0}｜`
+      + `觸及待處置 ${counts.touched || 0}｜到期待複查 ${counts.expired || 0}｜未盯 ${counts.unwatched || 0}`));
     const list = el('ul', 'weak');
-    disproofs.forEach((item) => {
-      const li = el('li', null, item.condition || item.label || '');
-      const bits = [];
-      if (item.check_frequency) bits.push('多久看一次：' + item.check_frequency);
-      if (item.action_on_trigger) bits.push('觸發後要做什麼：' + item.action_on_trigger);
-      if (item.status) bits.push('狀態 ' + item.status);
-      if (bits.length) li.appendChild(el('span', 'rule', bits.join('｜')));
+    lines.forEach((line) => {
+      const r = line.datum.value || {};
+      const li = el('li', null, r.condition || '');
+      const bits = [r.source_label || line.display_label,
+        r.watch_id ? `watch ${r.watch_id}：${r.state_label}` + (r.until ? `（到期 ${r.until}）` : '') : r.state_label];
+      if (r.check_frequency) bits.push('多久看一次：' + r.check_frequency);
+      if (r.action_48h) bits.push('觸發後要做什麼：' + r.action_48h);
+      li.appendChild(el('span', 'rule', bits.join('｜')));
+      // 同一筆 watch 只印一列；敘事也以來源鍵連到它時，把另一個來源寫在這裡（不另起一列、不多算一次）。
+      if ((r.also || []).length) {
+        li.appendChild(el('span', 'rule', '也連到這一條：' + r.also.map((a) => a.source_label).join('、')));
+      }
       list.appendChild(li);
     });
     node.appendChild(list);
   }
+  (panel.notes || []).forEach((text) => node.appendChild(el('p', 'note', text)));
+  const catalysts = (view.research && view.research.catalysts) || [];
   if (catalysts.length) {
     node.appendChild(el('div', 'group-title', '什麼時候會知道'));
-    node.appendChild(listOf(catalysts.map((c) => [c.label, c.due, c.state].filter(Boolean).join('｜'))));
+    // 催化劑的欄位是 description／expected_at（3.7 覆核：原本照抄 label／due，畫面只剩內部狀態字 unlinked）。
+    node.appendChild(listOf(catalysts.map((c) => [c.expected_at || '日期未定', c.description || c.label,
+      c.date_confidence].filter(Boolean).join('｜'))));
   }
+  return node;
+}
+
+/* 財務三題的數字（Phase 3 Step 3.7，稽核區）：每一行＝值＋來源＋as of＋口徑＋規則，或缺席分型的中文。
+   **照抄** three_questions 面板（read model 的同一格）；這裡只挑顯示格式（百分位、倍數、百分比、燈色），不算、不比、
+   **沒有門檻**——幾分算已定價由寫敘事的人判斷。 */
+const TQ_QUESTIONS = { will_it_die: '會死嗎', priced_in: '已定價嗎', in_numbers: '出現在數字裡了嗎' };
+const TQ_VALUE_FORMAT = {
+  own_history_pctile: (v) => `第 ${fmtNumber(v, 1)} 百分位（自己跟自己比）`,
+  cohort_median: (v) => `${fmtNumber(v, 2)} 倍`,
+  rel_return_30d: (v) => fmtPercent(v),
+  rel_return_90d: (v) => fmtPercent(v),
+};
+
+function tqValueText(datum) {
+  const v = datum.value;
+  if (v === null || v === undefined) return null;
+  if (typeof v === 'string' && WIPEOUT_COLOURS[v]) return `${WIPEOUT_COLOURS[v].mark} ${WIPEOUT_COLOURS[v].word}`;
+  const fmt = TQ_VALUE_FORMAT[(datum.dependencies || {}).row_key];
+  if (fmt && typeof v === 'number') return fmt(v);
+  if (typeof v === 'number') return fmtNumber(v, 2);
+  if (Array.isArray(v)) return `${v.length} 期（逐期列在下面）`;
+  if (typeof v === 'object') return '';
+  return String(v);
+}
+
+/* 序列的一點（3.7 R1）：`alpha/three_questions.py` 產三種形狀——EDGAR 季／年
+   `{period_end, value, filed, yoy, derived}`、台股月營收 `{data_month, revenue_twd_thousand, yoy, available_on}`、
+   分部占比 `{as_of, revenue_mix}`。已知的鍵給白話，**認不得的鍵照印**（不得濾掉，INV-3）；`derived`（例：FY−9M 推算）
+   照印出處——推算值與申報值不得同形（L18）。 */
+const TQ_POINT_KEYS = {
+  period_end: (v) => v, data_month: (v) => v, as_of: (v) => v,
+  value: (v) => fmtBig(v), revenue_twd_thousand: (v) => `${fmtBig(v)}（千元）`,
+  yoy: (v) => (typeof v === 'number' ? '年增 ' + fmtPercent(v) : null),
+  filed: (v) => (v ? '申報 ' + v : null), available_on: (v) => (v ? '可用日 ' + v : null),
+  derived: (v) => (v ? '推算：' + v : null),
+  // 占比只對 0–1 的數字 ×100；其餘（例：total_ntd_thousand 金額、fiscal_period 字串、巢狀出處）照原形印（3.7 覆核）。
+  revenue_mix: (v) => (v && typeof v === 'object'
+    ? Object.keys(v).map((k) => {
+      const x = v[k];
+      if (typeof x === 'number') return `${k} ${x >= 0 && x <= 1 ? fmtRatioPct(x, 1) : fmtBig(x)}`;
+      if (x && typeof x === 'object') return `${k} ${JSON.stringify(x)}`;
+      return `${k} ${x}`;
+    }).join('、') : null),
+};
+
+function tqPoint(point) {
+  const li = el('li');
+  if (!point || typeof point !== 'object') {
+    li.textContent = String(point);
+    return li;
+  }
+  const bits = [];
+  Object.keys(TQ_POINT_KEYS).forEach((key) => {
+    if (point[key] === null || point[key] === undefined) return;
+    const text = TQ_POINT_KEYS[key](point[key]);
+    if (text) bits.push(text);
+  });
+  li.appendChild(document.createTextNode(bits.join('｜')));
+  const rest = {};
+  Object.keys(point).forEach((key) => {
+    if (!(key in TQ_POINT_KEYS) && point[key] !== null && point[key] !== undefined) rest[key] = point[key];
+  });
+  if (Object.keys(rest).length) li.appendChild(keyValueList(rest));
+  return li;
+}
+
+function threeQuestionsCard(view) {
+  const panel = view.three_questions;
+  if (!panel) return null;
+  const meta = plainPanel('three_questions', panel.title);
+  const node = el('section', 'panel');
+  node.appendChild(el('h2', null, meta.title));
+  if (meta.hint) node.appendChild(el('div', 'panel-questions', meta.hint));
+  const lines = (panel.lines || []).filter((line) => line.role === 'three_question');
+  if (!lines.length) {
+    const box = el('div', 'attention flags');
+    const head = el('div', 'attention-head', '這次沒有三題的數字　');
+    const badge = absenceBadge(panel.absence_kind);
+    if (badge) head.appendChild(badge);
+    box.appendChild(head);
+    if (panel.reason) box.appendChild(el('div', 'attention-body', panel.reason));
+    node.appendChild(box);
+    return node;
+  }
+  Object.keys(TQ_QUESTIONS).forEach((question) => {
+    const rows = lines.filter((line) => (line.datum.dependencies || {}).question === question);
+    if (!rows.length) return;
+    node.appendChild(el('div', 'group-title', TQ_QUESTIONS[question]));
+    const box = el('div', 'rows');
+    rows.forEach((line) => {
+      const d = line.datum;
+      const deps = d.dependencies || {};
+      const row = el('div', 'row');
+      row.appendChild(el('div', 'row-label', line.display_label));
+      const text = tqValueText(d);
+      if (text === null) {
+        row.classList.add('row-absent');
+        const cell = el('div', 'row-value');
+        const badge = absenceBadge(d.absence_kind);
+        if (badge) cell.appendChild(badge); else cell.appendChild(document.createTextNode('—'));
+        row.appendChild(cell);
+        row.appendChild(el('div', 'row-reason', absenceLabel(d.absence_kind) || ''));
+        if (d.reason) row.appendChild(el('div', 'row-reason', d.reason));
+      } else {
+        row.appendChild(el('div', 'row-value', text));
+        const where = [deps.source ? '來源 ' + deps.source : null, d.as_of ? 'as of ' + d.as_of : null,
+          deps.basis ? '口徑 ' + deps.basis : null].filter(Boolean).join('｜');
+        if (where) row.appendChild(el('div', 'row-reason', where));
+        if (Array.isArray(d.value)) {
+          const list = el('ul', 'weak');
+          d.value.forEach((point) => list.appendChild(tqPoint(point)));
+          row.appendChild(list);
+        } else if (typeof d.value === 'object') {
+          row.appendChild(keyValueList(d.value));
+        }
+      }
+      // 算出這一格的輸入（倍數、中位數、窗、口徑理由）——敘事引用的數字要在這裡核對得到（AGENTS：敘事那一句引用稽核區）。
+      if (deps.detail && typeof deps.detail === 'object' && Object.keys(deps.detail).length) {
+        row.appendChild(keyValueList(deps.detail));
+      }
+      if (d.method) row.appendChild(el('div', 'rule', '規則：' + d.method));
+      box.appendChild(row);
+    });
+    node.appendChild(box);
+  });
+  (panel.notes || []).forEach((text) => node.appendChild(el('p', 'note', text)));
   return node;
 }
 
@@ -870,9 +1047,57 @@ function briefCard(payload, view) {
   // ⚠ **2026-09-23（Phase 0 Step 0b.1）：首屏那把尺與「要翻倍需要什麼為真」計算框整塊退役。**
   // ROADMAP「個股頁」對照表把它們列進「拿掉」：尺上是現價／沒賭對／賭對／判斷錯了，
   // 計算框問的是「這個結構允不允許翻倍」——兩者都建在估值鏈與多年反向橋上。
-  // 接手的是末行候選狀態與財務三題三個字（Phase 3）；在那之前首屏只有句子、燈與走勢圖。
+  // 接手的是末行候選狀態與財務三題三個字（Phase 3 Step 3.7，下面這一行）。
+  const line = candidateLine(view);
+  if (line) node.appendChild(line);
   // 走勢圖留下來：它是**脈絡**不是訊號（AGENTS「量測、訊號、脈絡三分」）。
   node.appendChild(priceCard(payload));
+  return node;
+}
+
+/* 首屏末行（Phase 3 Step 3.7）：候選狀態＋財務三題三個字。**全部照抄** candidate 面板——字由 materialize 端給
+   （與候選板同一個推導），本畫面不判、不算。沒有敘事也沒有持有＝不上板，三個字照印（會死嗎看燈，兩題「未答」）。 */
+const CANDIDATE_WORDS = [['candidate:will_it_die', '會死嗎'], ['candidate:priced_in', '已定價嗎'],
+  ['candidate:in_numbers', '出現在數字裡了嗎']];
+
+function candidateLine(view) {
+  const panel = view.candidate;
+  if (!panel) return null;      // 3.7 之前 materialize 的 artifact 沒有這個面板
+  const lines = lineMap(panel);
+  const node = el('div', 'candidate-line');
+  const head = el('div', 'candidate-state');
+  head.appendChild(document.createTextNode('候選狀態：'));
+  const state = lines['candidate:state'] && lines['candidate:state'].datum;
+  const row = state && state.value;
+  if (row) {
+    head.appendChild(el('strong', null, row.derived_label || row.derived || '—'));
+    if (row.declared && row.declared !== row.derived) {
+      head.appendChild(el('span', 'dim', `（敘事宣告：${row.declared_label || row.declared}）`));
+    }
+    if (typeof row.stall_days === 'number') head.appendChild(el('span', 'dim', `　滯留 ${row.stall_days} 天`));
+    if (row.sheet_verified === false) head.appendChild(el('span', 'dim', '　持股未驗'));
+  } else {
+    const badge = absenceBadge(panel.absence_kind);
+    if (badge) head.appendChild(badge);
+    if (panel.reason) head.appendChild(el('span', 'dim', '　' + panel.reason));
+  }
+  node.appendChild(head);
+  if ((panel.lines || []).length) {
+    const words = el('div', 'candidate-words');
+    CANDIDATE_WORDS.forEach(([key, label]) => {
+      const d = lines[key] && lines[key].datum;
+      words.appendChild(el('span', 'word', `${label}　${d && d.value ? d.value : '—'}`));
+    });
+    node.appendChild(words);
+  }
+  if (row) {
+    (row.preconditions || []).forEach((text) => node.appendChild(el('div', 'row-reason', '前提失效：' + text)));
+    (row.rewrite || []).forEach((text) => node.appendChild(el('div', 'row-reason', text)));
+    if (row.note) node.appendChild(el('div', 'row-reason', row.note));
+  }
+  const link = el('a', 'dim', '看候選板 →');
+  link.href = '#/candidates';
+  node.appendChild(link);
   return node;
 }
 
@@ -996,13 +1221,18 @@ async function renderDetail(ticker) {
   // Phase 2 Step 2.7：讀圖面板（選配）緊接在論證之後——論證講這條鏈怎麼走，讀圖講鏈上那一層現在還是不是當初讀的樣子。
   const readings = readingsCard(view);
   if (readings) app.appendChild(readings);
+  // Phase 3 Step 3.7：downside（錯了怎麼知道）緊接讀圖——每條反證連到盯它的 watch，沒有的印「未盯」。
+  const downside = downsideCard(view);
+  if (downside) app.appendChild(downside);
   const audit = el('section', 'panel');
   audit.appendChild(drill('稽核：每一格的來源、狀態、算式與警告（給查核用，不是給你讀的）', () => {
     const box = el('div', 'why-box');
     box.appendChild(conclusionCard(payload, view));
     // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`fragileCard`（最脆弱的假設）隨 `why` panel 退役
-    // ——它列的是估值假設的敏感度，那個模型不在了。風險與認錯條件在 disproofCard。
-    [blockerCard(payload), disproofCard(view), versusMarketCard(view)]
+    // ——它列的是估值假設的敏感度，那個模型不在了。
+    // ⚠ 2026-09-30（Step 3.7）：`disproofCard` 搬出稽核區、換成論證層的 downsideCard（每條反證連 watch）；
+    // 稽核區補上財務三題的數字（值、來源、as of、口徑、規則，或缺席分型）。
+    [blockerCard(payload), threeQuestionsCard(view), versusMarketCard(view)]
       .forEach((card) => { if (card) box.appendChild(card); });
     return box;
   }));

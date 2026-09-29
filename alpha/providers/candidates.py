@@ -225,16 +225,16 @@ def _wipeout_and_three_questions(ticker: str, *, today: date, history_not_compar
         return None, f"{type(exc).__name__}: {str(exc)[:120]}"
 
 
-def load_board(tickers: Sequence[str], *, today: date | None = None,
-               holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None) -> dict[str, Any]:
-    """讀真實資料組整板（materialize 用；**唯讀**：敘事 ledger、讀圖對圖、registry、Engine C、Sheet readonly）。
+def candidate_context(tickers: Sequence[str], *, today: date | None = None,
+                      holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
+                      board: bool = True) -> dict[str, Any]:
+    """候選狀態推導的共用輸入——**一次載入**，候選板與個股頁 materialize 共用（Step 3.7 接回偏差 21）。
 
-    ⚠ Engine C：三題走 `?mode=ro`；四盞燈沿用 `engine_c.checklist.get_wipeout_inputs`（與單檔 materialize 同一條路，
-    一般連線）；邊緣判定的市值正規化沿用 `alpha/providers/market_normalization.py`（FX 由 yfinance 取一次）。
-    `tickers`：宇宙（APP 已 materialize 的那幾十檔）；敘事 ledger 裡有、宇宙沒有的也併進來——上板的依據是敘事。"""
+    唯讀：敘事 ledger 目錄、讀圖對圖、watch registry、thesis lifecycle、registry、Engine C（邊緣判定）、Sheet readonly。
+    `board=True`（候選板）：宇宙併入敘事 ledger 裡有的與只在 Sheet 持有的——上板的依據是敘事與持有；
+    `board=False`（個股頁）：只算傳進來那幾檔的邊緣判定（頁面不需要別檔）。Sheet 讀不到＝已持有判定暫停，不是「沒持有」。"""
     from engine_b import event_watch as ew
-    from engine_b.disproof import current_briefs, load_lifecycle
-    from engine_b.narrative_watches import link_breaks
+    from engine_b.disproof import load_lifecycle
     from identity.registry import get_registry
     from portfolio.holdings import resolve_holdings
     from portfolio.policy import load_beta_policy
@@ -250,11 +250,20 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     brief_dir = briefs_provider.BRIEF_DIR
     ledger_present = brief_dir.is_dir()
     ledger_tickers = sorted(p.stem for p in brief_dir.glob("*.jsonl")) if ledger_present else []
-    universe = sorted({str(t).upper() for t in tickers} | {t.upper() for t in ledger_tickers})
+
+    def research(ticker: str) -> str:
+        # 呼叫端可能給 alias（SIVEF、SKHY、XFAB）；上板與個股頁都以 research ticker 為鍵（3.7 R1：alias 查不到邊緣判定）。
+        cid = registry.company_id_for_ticker(str(ticker))
+        return str((registry.research_ticker(cid) if cid else None) or ticker).upper()
+
+    universe = sorted({research(t) for t in tickers} | ({t.upper() for t in ledger_tickers} if board else set()))
     watches = list(ew.load_watches().get("watches") or ())
     lifecycle = load_lifecycle()
     rows_raw, reading_errors = reading_status_rows(_load_edges(), today=today, watches=watches)
     reading_rows = {(r.get("node"), r.get("unit")): r for r in rows_raw if r.get("reading_id")}
+    # 有紀錄但沒有現行的格子＝全部撤回（`reading_status_rows` 的兩種 reading_id=None 列；整個節點撤回時 unit 是 None）。
+    retracted_cells = sorted({(str(r.get("node")), r.get("unit")) for r in rows_raw if not r.get("reading_id")},
+                             key=str)
     beta_policy = load_beta_policy()
     try:
         if holdings_loader is None:
@@ -267,12 +276,95 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         resolution, failure = None, type(exc).__name__
     held = held_index(resolution, is_beta=lambda s: is_beta_symbol(s, beta_policy), failure=failure)
     # 只在 Sheet 持有、宇宙沒有的公司也要上板（已持有、缺敘事），三題與燈一樣要算——不是「未讀到」。
-    extra = {}
-    for cid, info in (held.get("by_company") or {}).items():
-        research = str(registry.research_ticker(cid) or "").upper()
-        if research and research not in universe:
-            extra[research] = cid
-    edges = edge_states(sorted(set(universe) | set(extra)))
+    extra: dict[str, str] = {}
+    if board:
+        for cid, _info in (held.get("by_company") or {}).items():
+            research = str(registry.research_ticker(cid) or "").upper()
+            if research and research not in universe:
+                extra[research] = cid
+    return {"today": today, "registry": registry, "universe": universe, "extra": extra, "watches": watches,
+            "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
+            "retracted_cells": retracted_cells,
+            "held": held, "edges": edge_states(sorted(set(universe) | set(extra))),
+            "ledger_present": ledger_present, "ledger_tickers": ledger_tickers}
+
+
+def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, *,
+               three_questions: Mapping[str, Any] | None, three_questions_note: str | None = None,
+               judgment_conditions: Sequence[Mapping[str, Any]] = ()) -> dict[str, Any]:
+    """個股頁首屏的候選狀態＋三個字、downside 的反證對 watch（Step 3.7）。**與候選板同一個 `derive_row`**——
+    個股頁不另推一份（L16）。`three_questions`：這一頁 read model 已算好的那一份（與候選板同一個函式、同一個
+    `history_not_comparable`）；沒有敘事也沒有持有時 `row` 是 None，三個字照印（會死嗎看燈；兩題「未答」）。"""
+    from engine_b.disproof import downside_rows
+
+    from . import briefs as briefs_provider
+
+    today = context["today"]
+    records, errors = briefs_provider.read_brief_records(ticker)
+    row = derive_row(ticker, company_id, records=records, today=today, reading_rows=context["reading_rows"],
+                     watches=context["watches"], lifecycle=context["lifecycle"],
+                     edge=(context.get("edges") or {}).get(str(ticker).upper()), three_questions=three_questions,
+                     held=context["held"], three_questions_note=three_questions_note)
+    brief = select_brief(records, as_of=None, today=today)
+    v2 = brief if brief is not None and brief.record_version == RECORD_VERSION_V2 else None
+    words = (row["three_words"] if row is not None else
+             three_words(three_questions, brief, not_read=(f"未讀到（{three_questions_note}）"
+                                                           if three_questions_note else "未讀到")))
+    page_row = None
+    sheet = context["held"]
+    row_absence = None
+    if row is not None:
+        # 個股頁是分析畫面，不帶任何部位欄位（`tests/test_analyst_view.py` 的部位 token 掃描）：「已持有」只以狀態字出現，
+        # Sheet 那一列的來源欄位留在候選板（它才是對帳 Sheet 的畫面）。
+        page_row = {k: v for k, v in row.items() if k not in ("held_source", "holdings_verified")}
+        page_row["sheet_verified"] = bool(row.get("holdings_verified"))
+        derived = row.get("derived")
+        # v1 敘事只落附組（derived 是 None）：標籤跟候選板同一個（舊版（缺候選狀態）），不印「—」。
+        page_row["derived_label"] = (GROUP_LABELS.get(str(derived)) or SIDE_LABELS.get(str(derived))
+                                     or SIDE_LABELS.get(str(row.get("side"))))
+    elif sheet.get("status") == "ok":
+        row_absence = {"kind": "not_yet_recorded", "reason": "沒有敘事、也沒有持有——不上候選板（寫敘事才有候選狀態）"}
+    else:
+        # Sheet 讀不到時「也沒有持有」是沒驗過的否定（3.7 R1；L12）——產生端宣告暫停，不是「還沒做」。
+        row_absence = {"kind": "upstream_unavailable",
+                       "reason": f"沒有敘事；持股未讀到，已持有判定暫停（{sheet.get('reason') or '讀取失敗'}）——推不出它上不上板"}
+    return {"row": page_row, "row_absence": row_absence, "three_words": words, "today": today.isoformat(),
+            "sheet": {"status": sheet.get("status"), "reason": sheet.get("reason")},
+            "brief_parse_errors": len(errors),
+            "downside": downside_rows(company_id, ticker, records=records, current_brief=v2,
+                                      watches=context["watches"], lifecycle=context["lifecycle"],
+                                      reading_rows=context["reading_rows"],
+                                      judgment_conditions=judgment_conditions,
+                                      retracted_cells=context.get("retracted_cells") or ())}
+
+
+def load_board(tickers: Sequence[str], *, today: date | None = None,
+               holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
+               context: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """讀真實資料組整板（materialize 用；**唯讀**：敘事 ledger、讀圖對圖、registry、Engine C、Sheet readonly）。
+
+    ⚠ Engine C：三題走 `?mode=ro`；四盞燈沿用 `engine_c.checklist.get_wipeout_inputs`（與單檔 materialize 同一條路，
+    一般連線）；邊緣判定的市值正規化沿用 `alpha/providers/market_normalization.py`（FX 由 yfinance 取一次）。
+    `tickers`：宇宙（APP 已 materialize 的那幾十檔）；敘事 ledger 裡有、宇宙沒有的也併進來——上板的依據是敘事。
+    `context`：`candidate_context(tickers)` 的結果（沒給就自己載一次）。"""
+    from engine_b.disproof import current_briefs
+    from engine_b.narrative_watches import link_breaks
+
+    from . import briefs as briefs_provider
+
+    ctx = context if context is not None else candidate_context(tickers, today=today,
+                                                                 holdings_loader=holdings_loader)
+    today = ctx["today"]
+    registry = ctx["registry"]
+    universe, extra, edges, held = ctx["universe"], ctx["extra"], ctx["edges"], ctx["held"]
+    if context is not None:
+        # 共用 context 是在 materialize **之前**以（要跑的 ∪ store 已有的）載的超集；組板的宇宙仍以呼叫端給的 `tickers`
+        # （materialize 之後的目錄）為準——materialize 失敗的那一檔不得上板（3.7 覆核）。敘事 ledger 裡有的照舊併進來。
+        wanted = {str(t).upper() for t in tickers} | {t.upper() for t in ctx["ledger_tickers"]}
+        universe = [t for t in universe if t in wanted]
+    watches, lifecycle, reading_rows = ctx["watches"], ctx["lifecycle"], ctx["reading_rows"]
+    reading_errors = ctx["reading_errors"]
+    ledger_present, ledger_tickers = ctx["ledger_present"], ctx["ledger_tickers"]
     # 只在 Sheet 持有的公司也進彙總（3.6 覆核：列上算了三題與燈、rollup 卻不含它——已持有最需要看會死嗎）。
     board_universe = sorted(set(universe) | set(extra))
 
@@ -322,5 +414,5 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
-           "UNANSWERED", "assemble_board", "board_rewrite", "derive_row", "held_index", "load_board",
-           "open_preconditions", "rollup", "stall_since", "three_words"]
+           "UNANSWERED", "assemble_board", "board_rewrite", "candidate_context", "derive_row", "held_index",
+           "load_board", "open_preconditions", "page_input", "rollup", "stall_since", "three_words"]

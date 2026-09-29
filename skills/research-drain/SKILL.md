@@ -146,6 +146,13 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
      ——整個估值層不再存在。`Abstention` 保留它自己那件事：**宣告這一格不用再做**（→`settled`），
      它是 append-only 紀錄，不是呈現層的標籤。
    - 判讀型 Engine C 觀測（backlog、客戶集中）→ 打包觀測提案（pq2）；同類缺口跨多檔就打包成一批
+   - ⚠ **2026-09-30（Phase 3 Step 3.7）：讀圖面板升核心。** `readings=not_yet_recorded`（這家公司坐的層與插槽都還
+     沒有讀圖）的下一步是**寫那一層或插槽的讀圖**——強模型、研究：`python -m query.structure <node> --quotes` →
+     `python -m alpha structure-reading <node> --add spec.json`（兩半各至少一段引用）；那一層若已由走圖第 1 型
+     （薄層沒人讀）排入，就在那裡一起做，不重複開題。坐在哪幾個節點見個股頁讀圖面板的 `seats`。
+     **不得為了讓閉環收斂把讀圖缺席標成 settled**——「刻意不主張」只能來自 Abstention 紀錄（它是研究結論，要寫得出理由）。
+     `readings=upstream_unavailable` 有兩種，看理由句（產生端寫明）：「圖上沒有它供貨或開發的層或插槽」＝先補圖的供貨／開發邊（入圖走 pq2 `ra_admission`），或判定它在需求側（寫進敘事）；「這次沒讀到圖或讀圖 ledger」＝先修取數。兩者都不是去寫讀圖。
+     `readings=review_required`（讀圖 stale，readiness 只帶 flag）→ 走圖第 4 型重讀，不在段 5 處理。
    每消一格 `python -m webapp materialize <TICKER>` 一次，讓下一格的判斷讀到新狀態。
 4. **走圖：圖上該去研究的洞**（段 key `graph_holes`；2026-09-26 Phase 2 Step 2.6 起取代原「3.5 結構讀圖過期」與
    「4 圖的覆蓋缺口」兩段）——只有前面各段清空後才做。清單不是自己列的：
