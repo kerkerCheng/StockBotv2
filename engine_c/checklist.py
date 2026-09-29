@@ -304,6 +304,80 @@ def _fetch_runway_inputs(connection, ticker: str, *, is_pg: bool) -> dict | None
     return _parse_runway_inputs(row[0], row[1], row[2])
 
 
+def _cover_shares_series(connection, ticker: str, *, today) -> list | None:
+    """10-K／10-Q 國內申報人的 SEC 封面股數序列，**分割調整到最新基準**（Phase 3 Step 3.3，使用者定案 #14）。
+
+    不是國內季度申報人、或 as-of 今天已知的封面日不足兩個 → None（呼叫端續用 yfinance 快照序列；
+    逐檔單一來源，兩個來源不混）。多股類的申報在回填時就被拒寫（不加總），所以這裡讀到的都是單一值。
+    """
+    import sqlite3 as _sqlite3
+
+    from engine_c.history_backfill import filer_class
+    from shared.as_of import latest_known_by_period
+
+    try:
+        klass, _basis = filer_class(connection, ticker, today=today)
+        if klass != "domestic_quarterly":
+            return None
+        rows = connection.execute(
+            "SELECT period_end, filed, accession, value FROM fundamental_history "
+            "WHERE ticker = ? AND metric = 'shares_outstanding_cover'", (ticker,)).fetchall()
+        splits = connection.execute(
+            "SELECT action_date, ratio FROM corporate_actions WHERE ticker = ? AND kind = 'split'",
+            (ticker,)).fetchall()
+    except _sqlite3.OperationalError:
+        return None   # 歷史表不存在（舊庫）：退回快照序列，不猜
+    known = latest_known_by_period(
+        [{"period_end": r[0], "filed": r[1], "accession": r[2], "value": r[3]} for r in rows], today)
+    if len(known) < 2:
+        return None
+    parsed_splits = []
+    for d, ratio in splits:
+        try:
+            parsed_splits.append((type(today).fromisoformat(str(d)[:10]), float(ratio)))
+        except (TypeError, ValueError):
+            continue
+    series = []
+    for end, row in sorted(known.items()):
+        factor = 1.0
+        for split_date, ratio in parsed_splits:
+            if end < split_date <= today:
+                factor *= ratio
+        series.append((end, float(row["value"]) * factor))
+    return series
+
+
+def _going_concern_record(connection, ticker: str) -> dict | None:
+    """`going_concern_opinion` 的生效紀錄：最新 as_of、supersedes 沒被指到的那一筆（Phase 3 Step 3.3）。
+
+    同一個 as_of 有多筆生效 → `{"conflict": [...]}`（燈不挑一個）；沒有紀錄 → None。
+    """
+    import json as _json
+    import sqlite3 as _sqlite3
+
+    from engine_c.manual_observations import live_observation_ids
+
+    try:
+        row = connection.execute(
+            "SELECT MAX(as_of) FROM manual_observations WHERE ticker = ? AND field_name = 'going_concern_opinion'",
+            (ticker,)).fetchone()
+    except _sqlite3.OperationalError:
+        return None
+    if not row or not row[0]:
+        return None
+    as_of = str(row[0])
+    live = live_observation_ids(connection, ticker, "going_concern_opinion", as_of)
+    if len(live) != 1:
+        return {"conflict": list(live), "as_of": as_of} if live else None
+    rec = connection.execute(
+        "SELECT value, source_ref FROM manual_observations WHERE observation_id = ?", (live[0],)).fetchone()
+    try:
+        value = _json.loads(rec[0])
+    except (TypeError, ValueError):
+        return None
+    return {"value": value, "source": rec[1], "as_of": as_of, "observation_id": live[0]}
+
+
 def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
     """歸零旗標（D2）要的三組**原始輸入**。這裡只取數，**一個顏色都不判**。
 
@@ -374,10 +448,15 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
                 series.append((_date.fromisoformat(str(row[0])[:10]), float(row[1])))
             except (TypeError, ValueError):
                 continue
-        going_concern = ({"value": gc_row[0], "source": gc_row[1], "as_of": str(gc_row[2])}
-                         if gc_row else None)
+        del gc_row  # ⚠ 2026-09-29（Phase 3 Step 3.3）：`litigation_and_audit_flags` 的散文不再餵燈（見下）
+        shares_source = "yfinance_snapshot"
+        if not is_pg:
+            cover = _cover_shares_series(connection, ticker, today=_date.today())
+            if cover is not None:
+                series, shares_source = cover, "sec_cover_shares"
+        going_concern = None if is_pg else _going_concern_record(connection, ticker)
         return {"ticker": ticker, "status": "ok", "runway": runway,
-                "shares_series": series, "going_concern": going_concern}
+                "shares_series": series, "shares_source": shares_source, "going_concern": going_concern}
     except Exception as exc:  # noqa: BLE001 — 取不到就誠實說取不到，不回一組看起來合理的空值
         return {"ticker": ticker, "status": "unavailable", "reason": f"{type(exc).__name__}: {exc}"}
     finally:

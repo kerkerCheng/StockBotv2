@@ -100,6 +100,23 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.3：三題、主題等權組、邊緣判定）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | ①`python -m alpha theme-cohort [<TICKER>] [--format json]`：**唯讀**（讀 `library/private/alpha/theme_cohorts/*.jsonl`），零網路。②`python -m engine_b.todo add-theme-cohort --spec <file>`：驗 spec、成員以 registry 嚴格比對解析，**寫 `library/leads/todo_pool.json`**（鑄一個帶凍結 spec＋digest 的 manual 項）。③`python -m engine_b.todo complete-theme-cohort <n>`：讀凍結 spec、比對 digest，**append `library/private/alpha/theme_cohorts/<題材>.jsonl`**，再結案那個編號。②③都是互動專用、零網路、不寫 Engine C／圖／thesis。三題本身沒有新入口：materialize 時由 `briefing/alpha_view/sources.py` 以**唯讀**連線讀 Engine C（`?mode=ro`）；邊緣判定的市值正規化沿用 `alpha/providers/market_normalization.py`（FX 取一次），只在 materialize 跑 |
+| **2 canonical skill／prompt／本檔** | 本節與下方「主題等權組」命令段；`CONCEPTS.md` 新增三個詞條（財務三題、主題等權組、邊緣判定）；`docs/ARCHITECTURE.md` read model authority map 加 `three_questions` 列。research-drain／daily-brief 的 consumer 在 3.4／3.6 接 |
+| **3 最窄 rule** | ②③寫 pq2 池與 private ledger，**不進任何無人值守 allowlist**；`.codex/rules` 仍是 0 條；daily 的 `DAILY_STEPS` 本 Step 不變（三題跟著既有 ⑬ materialize 跑） |
+| **4 contract test** | `tests/test_theme_cohort_pq2.py`（bare go／手寫 receipt 拒收、digest 不符拒收、已 drop 拒收、一般 manual 不受波及）；`tests/test_three_questions.py`（每個缺席出口、PIT、ADR 型不換算、沒有布林結論、邊緣 AND 與無法量）；`tests/test_three_question_inputs.py` |
+| **5 端到端 smoke** | 2026-09-29：`python -m alpha theme-cohort` 印「0 組」；73 檔三題試跑每一行都有值或具名缺席；邊緣三態 25／46／2 與 3.0 基準相同 |
+
+主題等權組（互動）：
+```powershell
+& '.venv\Scripts\python.exe' -m alpha theme-cohort [<TICKER>]                       # 唯讀：現行的組／一檔屬於哪幾組
+& '.venv\Scripts\python.exe' -m engine_b.todo add-theme-cohort --spec <spec.json>   # 研究步驟：凍結 spec 進一個 pq2 編號
+& '.venv\Scripts\python.exe' -m engine_b.todo complete-theme-cohort <n>             # 使用者 go 之後：比對 digest 才寫 ledger（bare go 拒收）
+```
+
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.2：Engine C 機械歷史表＋daily ②b）
 
 | 步 | 結論 |

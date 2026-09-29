@@ -142,14 +142,39 @@ def test_dilution_keeps_the_observed_change_in_inputs_even_when_it_refuses_to_co
 def test_going_concern_refuses_to_read_a_colour_out_of_free_text() -> None:
     """逐字的審計意見是 judgment 欄位；機械比對不得從自由文字推顏色（L15-2）。
 
-    ⚠ 有逐字紀錄時**理由句要變**（它不是「沒有資料」，是「沒有能判色的欄位」），
-    但顏色仍然不亮——否則就是讓一個字串比對決定一個 claim。
+    ⚠ 2026-09-29（Phase 3 Step 3.3）翻面：結構化欄位 `going_concern_opinion` 存在之後，沒有紀錄是
+    **還沒人寫**（`not_yet_recorded`），不再是 `capability_absent`。守的東西沒變——**散文仍然不上色**：
+    `litigation_and_audit_flags` 那種自由文字就算寫了 going concern，燈也不亮。
     """
     without = going_concern_flag(None)
     withtext = going_concern_flag({"value": "KPMG：material uncertainty related to going concern"})
     assert without["colour"] is None and withtext["colour"] is None
-    assert without["absence_kind"] == withtext["absence_kind"] == "capability_absent"
-    assert without["reason"] != withtext["reason"]
+    assert without["absence_kind"] == withtext["absence_kind"] == "not_yet_recorded"
+
+
+def test_going_concern_colours_only_from_the_structured_judgment() -> None:
+    def rec(opinion, **kw):
+        return {"value": {"opinion": opinion, "quote": "q", "page": "F-2", "report_date": "2026-03-17"},
+                "as_of": "2026-03-17", "source": "annual report", **kw}
+
+    assert going_concern_flag(rec("substantial_doubt"))["colour"] == "red"
+    assert going_concern_flag(rec("no_substantial_doubt"))["colour"] == "green"
+    not_reviewed = going_concern_flag(rec("not_reviewed"))
+    assert not_reviewed["colour"] is None and not_reviewed["absence_kind"] == "not_yet_recorded"
+    conflict = going_concern_flag(rec("substantial_doubt", conflict=["mo_a", "mo_b"]))
+    assert conflict["colour"] is None and conflict["absence_kind"] == "insufficient_evidence"
+
+
+def test_dilution_compares_a_trailing_year_not_the_whole_backfilled_series() -> None:
+    """回填把封面股數拉回五年：頭尾一比每一檔都會亮黃（員工股酬累積）——那是恆亮，不是稀釋（L14-4）。"""
+    series = [(date(2021, 11, 1), 900_000.0), (date(2023, 11, 1), 950_000.0),
+              (date(2025, 9, 1), 1_000_000.0), (date(2025, 12, 1), 1_000_000.0), (TODAY, 1_000_000.0)]
+    flag = dilution_flag(series, _runway(), today=TODAY, source="sec_cover")
+    assert flag["colour"] == "green"
+    assert flag["inputs"]["base_date"] == date(2025, 9, 1)            # 距最新一點 ≥365 天的最近一點
+    assert flag["inputs"]["span_days"] >= FULL_YEAR_DAYS and flag["inputs"]["source"] == "sec_cover"
+    grew = [*series[:-1], (TODAY, 1_200_000.0)]
+    assert dilution_flag(grew, _runway(), today=TODAY)["colour"] == "amber"
 
 
 # ---------------------------------------------------------------------------

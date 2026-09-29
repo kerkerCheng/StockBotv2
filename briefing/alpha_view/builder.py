@@ -59,7 +59,7 @@ from .contracts import (
     LifecycleFacts, MarketSection, PathItem,
     RefreshItem, RefreshStatusSection, ScenarioSection, SectionMeta,
     SignalCompleteness, StructuralEdgeItem, StructuralThesisSection, VariantViewSection,
-    CAP_WIPEOUT_FLAGS, WipeoutFlagsSection,
+    CAP_WIPEOUT_FLAGS, WipeoutFlagsSection, CAP_THREE_QUESTIONS, ThreeQuestionsSection,
     missing, not_modeled,
 )
 
@@ -690,6 +690,9 @@ def build_alpha_investment_view(
     #: builder 不連 DB、不自己判色。
     wipeout: Mapping[str, Mapping[str, Any]] | None = None,
     wipeout_reason: str | None = None,
+    #: Phase 3 Step 3.3：財務三題（`alpha.providers.three_questions.three_questions_for` 的輸出），取數層算好帶進來。
+    three_questions: Mapping[str, Any] | None = None,
+    three_questions_reason: str | None = None,
     brief_records: Sequence[Any] = (),
     brief_parse_errors: Sequence[str] = (),
     narrative_context: Mapping[str, Any] | None = None,
@@ -1783,7 +1786,39 @@ def build_alpha_investment_view(
         evidence=evidence_section,
         freshness=tuple(freshness_items), refresh_status=refresh_section,
         investor_brief=brief_section, argument=argument_section, warnings=tuple(warnings),
+        three_questions=_three_questions_section(three_questions, reason=three_questions_reason,
+                                                 reference_day=reference_day),
     )
+
+
+A_THREE_QUESTIONS = "alpha://three_questions/v1"
+THREE_QUESTIONS_IS_NOT: tuple[str, ...] = (
+    "不是估值：沒有目標價、沒有報酬期望、不對同業倍數校準（ROADMAP「明確不做」）",
+    "不是門檻：沒有「已定價／未定價」的分界——幾分算已定價由寫敘事的人判斷，並引用這裡的數字",
+    "不是排序：組中位數與相對漲幅只印、不比較、不算差，不參與任何順序或尺寸",
+)
+
+
+def _three_questions_section(result: Mapping[str, Any] | None, *, reason: str | None,
+                             reference_day: date) -> ThreeQuestionsSection:
+    """三題 → section。**不判讀**：行原樣帶著；section 的 status 只反映「有沒有接到三題」。"""
+    if result is None:
+        meta = SectionMeta(status="missing", basis="none", authority=A_THREE_QUESTIONS,
+                           capability=CAP_THREE_QUESTIONS, reason=reason or "三題取數失敗",
+                           as_of=reference_day, absence_kind="upstream_unavailable")
+        return ThreeQuestionsSection(meta=meta, will_it_die=(), priced_in=(), in_numbers=(), filer_class=None,
+                                     is_not=THREE_QUESTIONS_IS_NOT)
+    rows = [r for q in ("will_it_die", "priced_in", "in_numbers") for r in result.get(q) or ()]
+    valued = sum(1 for r in rows if r.get("absence_kind") is None)
+    status = "available" if rows and valued == len(rows) else "partial"
+    meta = SectionMeta(status=status, basis="deterministic", authority=A_THREE_QUESTIONS,
+                       capability=CAP_THREE_QUESTIONS, as_of=reference_day,
+                       reason=(f"{len(rows) - valued}／{len(rows)} 行缺席（每行都宣告了是哪一種）" if valued < len(rows)
+                               else None))
+    return ThreeQuestionsSection(
+        meta=meta, will_it_die=tuple(result.get("will_it_die") or ()), priced_in=tuple(result.get("priced_in") or ()),
+        in_numbers=tuple(result.get("in_numbers") or ()), filer_class=result.get("filer_class"),
+        is_not=THREE_QUESTIONS_IS_NOT)
 
 
 def _as_date(value: Any) -> date | None:

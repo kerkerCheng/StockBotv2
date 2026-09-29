@@ -397,6 +397,19 @@ bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩�
 查證：`python -m briefing alpha-card <TICKER>`（13f 段）、`python -m briefing analyst-view <TICKER>`、心跳第 4 段。
 *Avoid:* 合成一個分數、把黃燈讀成「減碼」、**把灰讀成綠**、拿燈擋掉候選
 
+### 財務三題（Three questions）
+財務只回答三個是非題：**會死嗎／已定價嗎／出現在數字裡了嗎**（決定紀錄 §4；Phase 3 Step 3.3）。程式只印數字、資料源、口徑與規則，「是／否」由寫敘事的人宣告並引用那幾格（使用者定案 #5）；會死嗎＝四盞歸零旗標。已定價嗎三行：①自家三年歷史百分位（EV/S 或 P/S，自己跟自己比）、②主題等權組中位數、③相對組 30／90 日漲幅——②③**只印不比**。**不設「已定價」門檻、不長回估值模型。**
+查證：`python -m pytest tests/test_three_questions.py -q`。
+*Avoid:* 目標倍數、同業折價率、「低於 X 百分位＝便宜」、把組中位數讀成合理價
+
+### 主題等權組（Theme cohort）
+「已定價嗎」②③的對照組，也是 Phase 5 量測的基準（決定紀錄 §4.2、G9 共用同一個定義）。成分是判斷：研究步驟把 spec 凍結進一個 pq2 編號，使用者 go 之後由 `python -m engine_b.todo complete-theme-cohort <n>` 比對 digest 才寫；append-only、等權、不排序。`python -m alpha theme-cohort` 只讀。
+*Avoid:* 籃子（Phase 0 退役的 filter 的字）、權重、「組內最強」
+
+### 邊緣判定（Edge）
+這一檔算不算倍率候選：`config/alpha_screen.json` 的市值 ≤10B **且**覆蓋 ≤12 位（市值先正規化成 USD）。三態：邊緣／非邊緣／邊緣無法量（缺輸入不放行也不濾掉）。只決定候選板把它放哪一組（非邊緣進「非倍率候選」），**不排序、不給尺寸、不擋成交**。純函式 `alpha/edge.py`。
+*Avoid:* 把邊緣讀成「可以買」、為了讓可開非空調門檻
+
 ### alpha 全歸零淨值少幾 %（Alpha wipe-out share）
 系統給的第三件事（D2）：alpha sleeve 全部歸零時淨值少幾 %。純呈現、零門檻；尺寸仍由使用者決定。alpha 格自 D1 起只觀測不設目標。
 它**就是 alpha 佔 NAV 的比例本身**（`beta` artifact 的 `risk.snapshot.alpha_total_weight`），不另算一份——

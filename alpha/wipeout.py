@@ -114,15 +114,16 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
 
 
 _DILUTION_RULE = (
-    f"窗滿 {FULL_YEAR_DAYS} 天（一個完整會計年度）才判色：沒增加 → 綠；增加 → 黃。"
-    "**窗不滿就是灰**——「我沒看到增發」與「它沒有增發」是兩個不同的 claim，後者舉證責任高得多"
+    f"trailing 一年窗：最新一點 vs 距它 ≥{FULL_YEAR_DAYS} 天的最近一點（不是整條序列的頭尾）；沒增加 → 綠；增加 → 黃。"
+    "股數逐檔只用**一個來源**（10-K／10-Q 國內申報人＝SEC 封面股數、分割調整到同一基準；其餘＝yfinance 快照序列），"
+    "兩個來源不混。**窗不滿就是灰**——「我沒看到增發」與「它沒有增發」是兩個不同的 claim，後者舉證責任高得多"
     "（L11-5）。⚠ **刻意不用燒錢與否把黃再切成紅**：那需要分辨員工股酬與真增發，而那是量級問題，"
     "今天沒有非憑空的門檻可用（實測見 docstring）"
 )
 
 
 def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
-                  runway: Mapping[str, Any] | None, *, today: date) -> dict[str, Any]:
+                  runway: Mapping[str, Any] | None, *, today: date, source: str | None = None) -> dict[str, Any]:
     """`shares_series` 是**同口徑**的在外流通股數序列（日期遞增）。
 
     ⚠ 刻意不吃「會計年度稀釋股數 vs 今日在外流通股數」那一組：窗夠長但**口徑不同**
@@ -137,26 +138,31 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
     那一半留白：量級問題交給稽核層的數字，而「是不是靠外部資金活著」本來就由現金跑道與負債
     那兩盞回答了——這盞燈在那個問題上沒有增加任何資訊。
     """
-    rows = [(d, v) for d, v in (shares_series or ()) if isinstance(v, (int, float)) and v > 0]
+    rows = sorted((d, v) for d, v in (shares_series or ()) if isinstance(v, (int, float)) and v > 0)
     fcf = (runway or {}).get("free_cash_flow_ttm")
     if len(rows) < 2:
         return _flag(None, "同口徑的股數序列不足兩點，看不出增減", rule=_DILUTION_RULE,
-                     inputs={"n_points": len(rows)}, absence_kind="upstream_unavailable")
+                     inputs={"n_points": len(rows), "source": source}, absence_kind="upstream_unavailable")
     first, last = rows[0], rows[-1]
-    span_days = (last[0] - first[0]).days
-    change = (last[1] - first[1]) / first[1]
-    # `span_days` 量的是**觀測窗**（第一點到最後一點），不是「從第一點到今天」——ETL 停了半年的話，
+    # ⚠ 2026-09-29（Phase 3 Step 3.3）：比較窗改成 **trailing 一年**——最新一點 vs 距它 ≥365 天的最近一點。
+    # 原本比整條序列的頭尾：回填把 SEC 封面股數拉回 2021 之後，頭尾一比幾乎每一檔都會亮黃（五年的員工股酬
+    # 累積），那是恆亮（L14-4），不是稀釋。
+    eligible = [r for r in rows if (last[0] - r[0]).days >= FULL_YEAR_DAYS]
+    base = eligible[-1] if eligible else first
+    span_days = (last[0] - base[0]).days
+    change = (last[1] - base[1]) / base[1]
+    # `span_days` 量的是**觀測窗**（比較的兩點之間），不是「從第一點到今天」——ETL 停了半年的話，
     # 我們有的不是一年的觀測，是半年的觀測加半年的空白。`days_since_last` 把那段空白單獨印出來，
     # 讓稽核層看得到「這條序列還活著嗎」，而不是讓它悄悄混進窗長裡（L12）。
-    inputs = {"n_points": len(rows), "distinct_values": len({v for _, v in rows}),
-              "first_date": first[0], "first_shares": first[1],
-              "last_date": last[0], "last_shares": last[1],
+    inputs = {"n_points": len(rows), "distinct_values": len({v for _, v in rows}), "source": source,
+              "series_start": first[0], "base_date": base[0], "base_outstanding": base[1],
+              "last_date": last[0], "last_outstanding": last[1],
               "span_days": span_days, "days_since_last": (today - last[0]).days,
               "change": change, "free_cash_flow_ttm": fcf}
-    if span_days >= FULL_YEAR_DAYS:
+    if eligible:
         if change > 0:
-            return _flag("amber", "滿一個完整會計年度的同口徑股數增加了", rule=_DILUTION_RULE, inputs=inputs)
-        return _flag("green", "滿一個完整會計年度的同口徑股數沒有增加", rule=_DILUTION_RULE, inputs=inputs)
+            return _flag("amber", "一個完整會計年度內同口徑股數增加了", rule=_DILUTION_RULE, inputs=inputs)
+        return _flag("green", "一個完整會計年度內同口徑股數沒有增加", rule=_DILUTION_RULE, inputs=inputs)
     # 有到期的等待（INV-2：每個等待都必須有到期）：窗會自己長到一年，那天這盞燈自己判色，
     # 不必有人記得回來。**窗內看到的變化照樣進 `inputs`**——稽核層看得到，只是不拿它上色。
     inputs["colour_available_on"] = first[0].replace(year=first[0].year + 1)
@@ -165,38 +171,52 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
 
 
 _GOING_CONCERN_RULE = (
-    "只認**結構化**的 going-concern 判讀。逐字的審計意見是 `judgment` 欄位（L11-1：going concern、"
-    "保留意見這類措辭精度本身就是一個 claim），機械比對不得從自由文字推顏色（L15-2：語意交給語言"
-    "處理、權限永遠 deterministic）——所以這盞燈寧可不亮，也不猜"
+    "只認**結構化**的 going-concern 判讀（Engine C 欄位 `going_concern_opinion`，judgment、經 pq2 寫入）："
+    "substantial_doubt → 紅；no_substantial_doubt → 綠；not_reviewed 或沒有紀錄 → 灰。逐字的審計意見本身"
+    "是 claim（L11-1：going concern、保留意見這類措辭精度），機械比對不得從自由文字推顏色（L15-2）——"
+    "`litigation_and_audit_flags` 的散文不讀"
 )
 
 
 def going_concern_flag(observation: Mapping[str, Any] | None) -> dict[str, Any]:
-    """今天必然回灰：系統還沒有承載「結構化 going-concern 判讀」的欄位。
+    """`observation`：`going_concern_opinion` 的生效紀錄 `{value: {opinion, quote, page, report_date}, source, as_of}`
+    （Phase 3 Step 3.2 新增欄位、Step 3.3 接上）；沒有紀錄給 None。
 
-    ⚠ 這不是「沒資料」，是**沒有能讓它判色的欄位**（`capability_absent`）。IQE.L 是 D7 指定的
-    第一個案例，它的逐字內容目前躺在 `debt_maturity_and_covenants` 裡——**分類有 SSOT 卻沒有
-    跟著資料走到需要它的地方**，那正是 L16 的形狀。
+    ⚠ 2026-09-29 以前這盞燈恆灰（`capability_absent`：沒有能讓它判色的欄位）。欄位存在之後，沒有紀錄就是
+    **還沒人寫**（`not_yet_recorded`），不再是能力缺席——兩者的下一步不同（前者去讀年報，後者去建能力）。
+    IQE.L 的 KPMG 逐字仍躺在 `debt_maturity_and_covenants`；它要經 pq2 寫進新欄位才會亮。
     """
-    has_text = bool((observation or {}).get("value"))
-    return _flag(None,
-                 ("已有逐字核對的審計意見紀錄，但它是自由文字，機械判不出顏色"
-                  if has_text else "還沒有任何結構化的 going-concern 判讀"),
-                 rule=_GOING_CONCERN_RULE,
-                 inputs={"has_verbatim_record": has_text,
-                         "source_field": "litigation_and_audit_flags"},
-                 absence_kind="capability_absent")
+    value = (observation or {}).get("value")
+    opinion = value.get("opinion") if isinstance(value, Mapping) else None
+    inputs = {"opinion": opinion, "source_field": "going_concern_opinion",
+              "report_date": value.get("report_date") if isinstance(value, Mapping) else None,
+              "page": value.get("page") if isinstance(value, Mapping) else None,
+              "quote": value.get("quote") if isinstance(value, Mapping) else None,
+              "as_of": (observation or {}).get("as_of"), "source": (observation or {}).get("source"),
+              "conflict": (observation or {}).get("conflict")}
+    if (observation or {}).get("conflict"):
+        return _flag(None, "同一日期有多筆生效的 going-concern 判讀，不挑一個", rule=_GOING_CONCERN_RULE,
+                     inputs=inputs, absence_kind="insufficient_evidence")
+    if opinion == "substantial_doubt":
+        return _flag("red", "查核意見對繼續經營表示重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs)
+    if opinion == "no_substantial_doubt":
+        return _flag("green", "查核意見沒有繼續經營的重大疑慮", rule=_GOING_CONCERN_RULE, inputs=inputs)
+    if opinion == "not_reviewed":
+        return _flag(None, "已登記「還沒讀查核意見」", rule=_GOING_CONCERN_RULE, inputs=inputs,
+                     absence_kind="not_yet_recorded")
+    return _flag(None, "還沒有任何結構化的 going-concern 判讀", rule=_GOING_CONCERN_RULE, inputs=inputs,
+                 absence_kind="not_yet_recorded")
 
 
 def wipeout_flags(*, runway: Mapping[str, Any] | None,
                   shares_series: Sequence[tuple[date, float]] | None,
                   going_concern: Mapping[str, Any] | None,
-                  today: date) -> dict[str, dict[str, Any]]:
+                  today: date, shares_source: str | None = None) -> dict[str, dict[str, Any]]:
     """四盞燈一次算出。**每盞都回值**——少一盞與「那盞是綠的」不得同形（INV-3）。"""
     out = {
         "cash_runway": cash_runway_flag(runway),
         "debt": debt_flag(runway),
-        "dilution": dilution_flag(shares_series, runway, today=today),
+        "dilution": dilution_flag(shares_series, runway, today=today, source=shares_source),
         "going_concern": going_concern_flag(going_concern),
     }
     if tuple(out) != WIPEOUT_LANES:

@@ -581,6 +581,41 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_theme_cohort(args: argparse.Namespace) -> int:
+    """主題等權組（Phase 3 Step 3.3）：**唯讀**——列出各題材現行的組、查一檔屬於哪幾組。
+
+    ⚠ 本命令不寫任何東西。成分是判斷：研究步驟以 `python -m engine_b.todo add-theme-cohort --spec <file>`
+    把 spec 凍結進一個 pq2 編號；使用者 go 之後由 `python -m engine_b.todo complete-theme-cohort <n>`
+    讀凍結的那一份、比對 digest 才寫 ledger（bare go 拒收）。
+    """
+    from .providers.theme_cohorts import THEME_COHORT_DIR, current_cohorts, memberships
+
+    cohorts, errors = current_cohorts()
+    if args.ticker:
+        cohorts = memberships(args.ticker, cohorts)
+    if args.format == "json":
+        print(json.dumps({"cohorts": [{
+            "cohort_id": c.cohort_id, "theme": c.theme, "decided_on": c.decided_on.isoformat(),
+            "pq2_ref": c.pq2_ref, "reason": c.reason,
+            "members": [{"ticker": m.ticker, "company_id": m.company_id, "reason": m.reason} for m in c.members],
+            "excluded": [dict(e) for e in c.excluded]} for c in cohorts], "parse_errors": errors},
+            ensure_ascii=False, indent=2))
+        return 0
+    if not cohorts:
+        where = f"（{args.ticker} 不在任何一組）" if args.ticker else f"（{THEME_COHORT_DIR} 沒有任何紀錄）"
+        print(f"主題等權組：0 組{where}——已定價②③會印 not_yet_recorded")
+    for c in cohorts:
+        print(f"## {c.theme}｜{c.cohort_id}｜決定於 {c.decided_on.isoformat()}（pq2 [{c.pq2_ref}]）｜{len(c.members)} 檔等權")
+        print(f"理由：{c.reason}")
+        for m in c.members:
+            print(f"- {m.ticker}（{m.company_id}）：{m.reason}")
+        for e in c.excluded:
+            print(f"- ✗ 排除 {e.get('name')}：{e.get('reason')}")
+    if errors:
+        print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+    return 0
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_entry_criterion` 與 `entry-criterion` 子命令退役（F 組）。**
 # EntryCriterion ledger 的讀寫入口。ledger 檔案本身留在 `library/private/alpha/entry_criteria/`
 # （private append-only，L10：拿不回來的只能 append），但**沒有任何消費端**——進場靠判斷。
@@ -607,6 +642,12 @@ def build_parser() -> argparse.ArgumentParser:
                          help="只看這個單位（層／插槽，v3）；預設兩種都列。--add 的單位寫在 spec 裡")
     reading.add_argument("--format", choices=("markdown", "json"), default="markdown")
     reading.set_defaults(func=cmd_structure_reading)
+
+    cohort = sub.add_parser(
+        "theme-cohort", help="主題等權組（唯讀）：列出現行的組／查一檔屬於哪幾組；寫入只經 pq2 complete-theme-cohort")
+    cohort.add_argument("ticker", nargs="?", help="只看這一檔屬於哪幾組")
+    cohort.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    cohort.set_defaults(func=cmd_theme_cohort)
 
     abstention = sub.add_parser(
         "abstention", help="Abstention ledger：--list／--add spec.json／--retract <id>（Step 5；「刻意不主張」）")

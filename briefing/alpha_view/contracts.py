@@ -131,6 +131,9 @@ CAP_ARGUMENT = "argument_layer_v1"
 #: 2026-09-18（D2）：歸零旗標——四盞紅黃綠燈（現金跑道／負債／稀釋／going concern）。
 #: **量測不是訊號**：不參與排序、不決定尺寸。判色規則與「為什麼這盞不亮」住 `alpha/wipeout.py`。
 CAP_WIPEOUT_FLAGS = "wipeout_flags_v1"
+#: 2026-09-29（Phase 3 Step 3.3）：財務三題稽核區——會死嗎／已定價嗎／出現在數字裡了嗎。每行有值或缺席 kind，
+#: **沒有任何結論欄位**（是／否由敘事宣告）。判定住 `alpha/three_questions.py`，取數住 Engine C。
+CAP_THREE_QUESTIONS = "three_questions_v1"
 
 
 class ViewContractViolation(ValueError):
@@ -656,6 +659,23 @@ class WipeoutFlagsSection:
 
 
 @dataclass(frozen=True, slots=True)
+class ThreeQuestionsSection:
+    """財務三題的稽核區（Phase 3 Step 3.3）。每一行是 `alpha.three_questions.line()` 的輸出：
+    `{key, label, value, source, as_of, basis（口徑）, rule, absence_kind, reason, detail}`，有值與缺席二擇一。
+
+    ⚠ **沒有門檻、沒有「已定價／未定價」布林**：自家歷史百分位是自己跟自己比；主題等權組中位數與相對組漲幅
+    只印、不比較、不算差。「是／否」由寫敘事的人宣告並強制引用這裡的數字（使用者定案 #5）。
+    """
+
+    meta: SectionMeta
+    will_it_die: tuple[Mapping[str, Any], ...]
+    priced_in: tuple[Mapping[str, Any], ...]
+    in_numbers: tuple[Mapping[str, Any], ...]
+    filer_class: str | None
+    is_not: tuple[str, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class EvidenceItem:
     ref: str
     kind: str
@@ -794,6 +814,9 @@ class AlphaInvestmentView:
     investor_brief: InvestorBriefSection
     argument: ArgumentSection
     warnings: tuple[str, ...] = ()
+    #: 2026-09-29（Phase 3 Step 3.3）：財務三題稽核區。預設 None＝這一份 view 沒有接三題（舊測試夾具）；
+    #: 正式 materialize 一律帶一個 section（取不到時是帶 absence_kind 的缺席 section，不是 None）。
+    three_questions: "ThreeQuestionsSection | None" = None
 
     #: 有 `meta` 的 section 名稱，`capability_map()` 依此列舉。
     SECTIONS_WITH_META = (

@@ -425,12 +425,28 @@ def fetch_alpha_investment_view(
         raw = get_wipeout_inputs(str(resolved_ticker))
         if raw.get("status") == "ok":
             wipeout = wipeout_flags(runway=raw.get("runway"), shares_series=raw.get("shares_series"),
-                                    going_concern=raw.get("going_concern"), today=today or date.today())
+                                    going_concern=raw.get("going_concern"), today=today or date.today(),
+                                    shares_source=raw.get("shares_source"))
             wipeout_reason = None
         else:
             wipeout, wipeout_reason = None, str(raw.get("reason") or "Engine C 觀測不可用")
     except Exception as exc:  # noqa: BLE001
         wipeout, wipeout_reason = None, f"歸零旗標取數失敗：{type(exc).__name__}"
+
+    # Phase 3 Step 3.3：財務三題。取數在 Engine C（唯讀連線）、判定在 `alpha.three_questions`；四盞燈沿用上面那一份。
+    # 取不到就帶著理由往下走——section 會是帶 absence_kind 的缺席，不是空白（L12）。as-of 視角不接（歷史表的
+    # PIT 讀法已備，但 view 的其他段在 as-of 下各有規則，這一段先誠實缺席）。
+    three_questions, three_questions_reason = None, None
+    if as_of is None:
+        try:
+            from alpha.providers.three_questions import three_questions_for
+
+            three_questions = three_questions_for(str(resolved_ticker), today=today or date.today(),
+                                                  wipeout=wipeout, wipeout_reason=wipeout_reason)
+        except Exception as exc:  # noqa: BLE001
+            three_questions_reason = f"三題取數失敗：{type(exc).__name__}: {str(exc)[:120]}"
+    else:
+        three_questions_reason = "as-of 視角尚未接三題（point_in_time_unavailable 之外的誠實缺席）"
 
     try:
         brief_records, brief_errors = brief_ledger.read_brief_records(str(resolved_ticker))
@@ -461,6 +477,7 @@ def fetch_alpha_investment_view(
         metric_observations=metric_observations, change_detection=detection,
         refresh_notes=refresh_notes,
         wipeout=wipeout, wipeout_reason=wipeout_reason,
+        three_questions=three_questions, three_questions_reason=three_questions_reason,
         brief_records=brief_records, brief_parse_errors=brief_errors,
         narrative_context=narrative_context,
         consensus_history=consensus_history,

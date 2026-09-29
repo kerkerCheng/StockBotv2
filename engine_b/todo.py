@@ -268,6 +268,15 @@ def _validate_go_receipt(item: Mapping[str, Any], receipt: str) -> None:
     if item_type == "watch_decision":
         raise TodoError("watch_decision 的 go 由 resolve 依 watch 狀態驗證（_resolve_watch_decision），不走這裡")
 
+    frozen = item.get(FROZEN_SPEC_KEY)
+    if frozen:
+        # Phase 3 Step 3.3：帶凍結 spec 的 manual 項（主題等權組成分）——go 之後唯一的寫入入口是 complete-*，
+        # 它讀**凍結的那一份**、比對 digest 才寫。bare go（或手打一個 authority:…;ref:… receipt）證明不了
+        # 使用者 go 的就是寫進去的那一份（比照 engine_c_observation／ra_admission）。
+        raise TodoError(
+            f"[{item.get('n')}] 帶凍結 spec（{frozen.get('kind')}）：不得 bare go；請用 "
+            "`todo complete-theme-cohort <編號>` 讀凍結 spec、比對 digest 後寫入並結案")
+
     if not receipt.strip():
         raise TodoError(f"{item_type} go 必須附 underlying authority receipt")
     fields = _receipt_fields(receipt)
@@ -1092,6 +1101,77 @@ def complete_engine_c_observation(
     resolve(pool, n, "go", reason="使用者核准後寫入 Engine C ledger",
             receipt=receipt, at=at, _skip_receipt_validation=True)
     return {"observation_id": observation_id, "receipt": receipt}
+
+
+#: 帶凍結 spec 的 manual 項目把 spec 放在這個鍵（Phase 3 Step 3.3：主題等權組成分）。
+FROZEN_SPEC_KEY = "frozen_spec"
+
+
+def propose_theme_cohort(pool: dict[str, Any], spec: Mapping[str, Any], *, at: str | None = None) -> dict[str, Any]:
+    """研究步驟提主題等權組成分：驗證 spec、成員身分解析，**凍結進一個 manual pq2 編號**（spec＋digest）。
+
+    同一份 spec 重提得到同一個編號（ref_id 含 digest）；改了任何一個字就是另一個編號——核准綁的是內容。
+    """
+    from alpha.errors import ContractViolation
+    from alpha.providers.theme_cohorts import resolve_members
+    from alpha.theme_cohort import spec_digest, validate_spec
+
+    try:
+        clean = validate_spec(spec)
+    except ContractViolation as exc:
+        raise TodoError(f"theme cohort spec 不合法：{exc}") from exc
+    problems = resolve_members(clean)
+    if problems:
+        raise TodoError("成員身分解析不到（INV-1，不猜）：" + "；".join(problems))
+    digest = spec_digest(clean)
+    tickers = "、".join(m["ticker"] for m in clean["members"])
+    item = upsert(
+        pool, item_type="manual", ref_id=f"theme_cohort:{digest[:16]}",
+        title=f"主題等權組成分（{clean['theme']}，{len(clean['members'])} 檔等權）：{tickers}",
+        hint=("go 後跑 `python -m engine_b.todo complete-theme-cohort <編號>`——讀凍結 spec、比對 digest、寫 "
+              "theme cohort ledger 並結案；bare go 拒收。go 只定「已定價②③的對照組是誰」，不含任何排序、尺寸或買賣"),
+        source="theme_cohort", at=at)
+    item[FROZEN_SPEC_KEY] = {"kind": "theme_cohort", "spec": clean, "digest": digest}
+    return item
+
+
+def complete_theme_cohort(pool: dict[str, Any], n: int, *, at: str | None = None,
+                          directory: Any = None, registry: Any = None) -> dict[str, Any]:
+    """使用者對 exact 編號 go 之後：讀凍結 spec → 比對 digest → 寫 theme cohort ledger → 以
+    `authority:theme_cohort;ref:<cohort_id>` 結案。任何一步不符就拒收，ledger 一行都不寫。"""
+    from datetime import date as _date
+
+    from alpha.errors import ContractViolation
+    from alpha.providers.theme_cohorts import append_cohort_record
+    from alpha.theme_cohort import cohort_record, spec_digest
+
+    item = get(pool, n)
+    if item["type"] != "manual":
+        raise TodoError(f"[{n}] 不是 manual 型（主題等權組成分是帶凍結 spec 的 manual 項）")
+    frozen = item.get(FROZEN_SPEC_KEY) or {}
+    if frozen.get("kind") != "theme_cohort":
+        raise TodoError(f"[{n}] 沒有凍結的 theme cohort spec——不是由 add-theme-cohort 鑄的號")
+    if item.get("resolved_at") or item.get("resolution"):
+        raise TodoError(f"[{n}] 已結案（{item.get('resolution')}），不得寫入")
+    spec = frozen.get("spec") or {}
+    try:
+        recomputed = spec_digest(spec)
+    except ContractViolation as exc:
+        raise TodoError(f"[{n}] 凍結 spec 不合法：{exc}") from exc
+    if recomputed != frozen.get("digest") or not str(item.get("ref_id", "")).endswith(recomputed[:16]):
+        raise TodoError(f"[{n}] 凍結 spec 的 digest 不符——spec 在鑄號之後被改過，拒收")
+    stamp = at or _now()
+    decided = _date.fromisoformat(stamp[:10])
+    record = cohort_record(spec, pq2_ref=int(n), decided_on=decided)
+    try:
+        append_cohort_record(record, directory=directory, registry=registry)
+    except ContractViolation as exc:
+        raise TodoError(f"[{n}] 寫入拒收：{exc}") from exc
+    receipt = f"authority:theme_cohort;ref:{record['cohort_id']}"
+    resolve(pool, n, "go", reason="使用者核准後寫入主題等權組 ledger（凍結 spec、digest 相符）",
+            receipt=receipt, at=at, _skip_receipt_validation=True)
+    return {"cohort_id": record["cohort_id"], "theme": record["theme"], "receipt": receipt,
+            "members": [m["ticker"] for m in record["members"]]}
 
 
 def complete_thesis_mutation(
@@ -2209,6 +2289,18 @@ def main(argv: list[str] | None = None) -> int:
     )
     p_complete_obs.add_argument("number", type=int)
 
+    p_add_tc = sub.add_parser(
+        "add-theme-cohort",
+        help="把主題等權組成分 spec 凍結進一個 manual pq2 編號（研究步驟用；互動專用）",
+    )
+    p_add_tc.add_argument("--spec", required=True, help="spec JSON 檔（theme／members／excluded／reason）")
+
+    p_complete_tc = sub.add_parser(
+        "complete-theme-cohort",
+        help="核准後讀凍結 spec、比對 digest、寫主題等權組 ledger 並結案（bare go 拒收）",
+    )
+    p_complete_tc.add_argument("number", type=int)
+
     p_complete_tm = sub.add_parser(
         "complete-thesis-mutation",
         help="核准後把 thesis lifecycle 變更寫入 lifecycle.json 並結案",
@@ -2403,6 +2495,27 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "complete-observation":
         try:
             result = complete_engine_c_observation(pool, args.number)
+            save(pool, args.pool)
+            print(json.dumps(result, ensure_ascii=False, indent=2))
+            return 0
+        except TodoError as exc:
+            print(f"✗ [{args.number}]：{exc}", file=sys.stderr)
+            return 2
+
+    if args.command == "add-theme-cohort":
+        try:
+            spec = json.loads(Path(args.spec).read_text(encoding="utf-8"))
+            item = propose_theme_cohort(pool, spec)
+            save(pool, args.pool)
+            print(f"✓ [{item['n']}] {item['title']}｜digest {item[FROZEN_SPEC_KEY]['digest'][:16]}")
+            return 0
+        except (TodoError, OSError, ValueError) as exc:
+            print(f"✗ add-theme-cohort：{exc}", file=sys.stderr)
+            return 2
+
+    if args.command == "complete-theme-cohort":
+        try:
+            result = complete_theme_cohort(pool, args.number)
             save(pool, args.pool)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0

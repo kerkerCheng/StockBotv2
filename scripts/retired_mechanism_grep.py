@@ -101,6 +101,7 @@ KEEP: dict[tuple[str,str],str] = {
     ("tests/test_absence_semantics.py","B"): "retirement_note: 事發紀錄提到籃子的 bet_state（消費端已退役）",
     ("tests/test_market_quote_unit.py","B"): "retirement_note: 事發紀錄用語「本籃子裡」指研究宇宙，非籃子 filter",
     ("tests/test_nav_exposure.py","B"): "kept_file: regex 誤命中——「籃子」在此是 bucket 的普通名詞",
+    ("tests/test_three_questions.py","B"): "guard_assertion: 斷言邊緣判定的理由碼不得沿用 Phase 0 退役 filter 的兩個理由碼（Phase 3 Step 3.3）",
     # ---- C～H 組（0b.4 3/3 結案時填；C 估值鏈、D 多年橋、E 四價、F entry、G decision_lab、H 估值模型）----
     ('alpha/abstention/contracts.py','C'): 'boundary_sentence: 估值層 abstention 的「不是第二份 ValuationAssumption authority」「隱含倍數錨不住目標倍數」是禁止句，字彙留作 append-only 紀錄的 subject（L10）',
     ('alpha/cli.py','C'): 'legacy_key: `alpha assumptions --add` 的 spec 欄位 calibration_refs（假設 ledger 的 ref 角色，活的 ledger 邏輯，plan §0.6 #28）',

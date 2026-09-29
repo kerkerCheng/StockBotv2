@@ -220,7 +220,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.0 | 基準快照（`docs/reports/2026-09-29-phase3-baseline.md`） | ✅ | 執行模型 | `559414e` |
 | 3.1 | Phase 2 帶過來的三個小修（A6 a／b／c） | ✅ | 執行模型 | `ebab3d0`、`50954a9`、見 3.1c |
 | 3.2 | Engine C 機械歷史表＋一次回填＋daily 增量步驟；going concern 結構化欄位（R2-c：CONDITIONAL_GO → 條件修正後覆核 GO） | ✅ | 執行模型 | `aaf926b`、`42f2596`、`b403e78`＋收尾 |
-| 3.3 | 三題稽核區；主題等權組 ledger；邊緣判定 | ○ | 執行模型 | |
+| 3.3 | 三題稽核區；主題等權組 ledger；邊緣判定 | ✅ | 執行模型 | 見 git log「Step 3.3」 |
 | 3.4 | 敘事 v2 契約＋敘事來源的語意 watch＋`narrative_rewrite` 佇列段（R2-a） | ○ | 執行模型 | |
 | 3.5 | 研究：v2 重寫 AXTI／COHR／LITE、寫 Sivers；提主題等權組與 going concern 的 pq2 | ○ | **強模型** | |
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳 | ○ | 執行模型 | |
@@ -246,6 +246,11 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 2 | 3.2 | 「國內申報人」例：EDGAR submissions 最近 18 個月有 10-Q | 同一條規則，輸入改成 companyfacts 各 fact 的 `form`／`filed`（回填時）或已存列（讀取端） | 讀取端（三題、稀釋燈）不得連網；兩個輸入都是同一份 companyfacts，判出同一個類別。落後檢查仍另查 submissions |
 | 3 | 3.2 | 回填前跑 `companyfacts_lag`、落後就記缺席 | 抽成 `companyfacts_lag_status`（表單當參數、抓不到＝`unknown`、**快照日只看營收白名單 fact**）；`companyfacts_lag` 改成它的薄殼、行為不變 | 原函式寫死 10-K／10-Q（20-F 恆不報落後）、抓不到與「沒落後」同形；R2-c 另抓到 TSM／UMC 形狀（最新 20-F 只有封面 dei fact 會把快照推成 current），條件①修正 |
 | 4 | 3.2 | as-of 讀取規則 | 抽成 `shared/as_of.py::latest_known_by_period`，Engine C 讀取端與三題逐日計算共用 | 同一條「T 時刻知道什麼」規則兩份實作的那天起就會開始偏離（L16）；`alpha/` 核心不得 import `engine_c`，所以放 `shared/` |
+| 5 | 3.3 | 取數住 `engine_c/checklist.py` | 三題取數另立 `engine_c/three_question_inputs.py`；稀釋與 GC 的取數仍在 `checklist.get_wipeout_inputs`（加 `_cover_shares_series`、`_going_concern_record`） | checklist 是 L9 gate 的財務核驗清單（五項凍結），三題與它無關；塞進去會讓「動三題」與「動 gate 清單」改同一個檔。取數仍只在 Engine C |
+| 6 | 3.3 | 20-F 的已定價①：股數與價格不是同一種證券單位（ADR）→ `inputs_incompatible` | 20-F／40-F 發行人一律 `inputs_incompatible`（不分是不是 ADR）；報表幣別≠報價結算幣別先判 | ADS 比率沒有登記、機械分不出 GFS（普通股）與 HIMX（ADS）；我們也沒存 20-F 的封面股數——一律不算比猜一個比率誠實（plan §0.3 不猜 ADR 比率） |
+| 7 | 3.3 | 「出現在數字裡了嗎」沒有鮮度規則 | 最新一點太舊 → `insufficient_evidence`＋`days_since_last`（季 200 天、年 550 天、月 75 天） | 試跑：TSM 的年度營收最新一期停在 2023（Step 3.2 R2-c），照印就是把三年前的數字當現在；上限沿用 `edgar_xbrl._MAX_BASELINE_AGE_DAYS` 的量級 |
+| 8 | 3.3 | 分部／產品線占比序列 | 同一個欄位有 ≥2 個觀測日才成序列；兩個欄位不湊點 | 試跑：3081.TWO 的產品線占比（2025-12）與分部占比（2026-06）被湊成一條「序列」——兩種切法不能相比（L12） |
+| 9 | 3.3 | 稀釋燈 inputs 鍵名 | `base_outstanding`／`last_outstanding`（原 `first_shares`／`last_shares`） | 燈一亮 inputs 就進黑箱輸出，`shares` 是部位語意禁用字（`FORBIDDEN_POSITION_TOKENS`），`test_full_chain_acceptance` 抓到；公司的在外流通股數不是部位，但欄位名不得讓人分不出來 |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -632,3 +637,5 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 17. **價格 adjusted 序列的窗邊界斷層、分割事件只涵蓋 3 年窗**（R2-c #3、#9）：目前沒有消費端跨越窗邊界；Phase 5 量測若要更長的報酬序列，先處理這兩點。
 18. **`engine_c/history.py` 只跑 SQLite**（R2-c #7）：Postgres 只做到建表對等；切後端前要補讀取端的佔位符。
 19. **落後檢查還騙得過的一種更窄形狀**（R2-c 覆核 non-blocking #2）：最新申報只帶「比較年度」的營收、沒帶當年度時，快照日仍被推成 current。正式資料目前沒有；要不要改成比對「最新申報的 period_end 是否有營收 fact」。
+20. **稀釋燈一年窗滿了之後 30 檔裡 24 檔亮黃**（Step 3.3 試跑）：規則是「一年內同口徑股數增加 → 黃」（D2，不設量級門檻）；FN +0.01% 與 AXTI +42% 同樣是黃。它量的是事實，但國內申報人 80% 亮黃接近恆亮（L14-4）——要不要把員工股酬等級與增發分開、用什麼非憑空的判準（例如只看有沒有 S-3／424B 發行），**要使用者決定**。今天照規則印、數字在稽核層。
+21. **三題尚未接 as-of 視角**：歷史表的 PIT 讀法已備（`shared/as_of.py`），但 view 其他段在 as-of 下各有規則；目前 as-of 模式下三題 section 誠實缺席。
