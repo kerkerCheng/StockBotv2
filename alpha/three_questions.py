@@ -1,6 +1,6 @@
 """財務三題（Phase 3 Step 3.3）：**會死嗎／已定價嗎／出現在數字裡了嗎**——判定只住這裡，取數在 Engine C。
 
-純函式，零相依、不連 DB（比照 `alpha/wipeout.py`）。輸入由 `engine_c.checklist.get_three_question_inputs`
+純函式，零相依、不連 DB（比照 `alpha/wipeout.py`）。輸入由 `engine_c.three_question_inputs.get_three_question_inputs`
 組好帶進來；輸出每一行都是 `{value, source, as_of, basis（口徑）, rule}` **或** `absence_kind`（封閉字彙，
 `alpha.absence`），兩者不同時出現（L12：燈滅與燈綠不同形）。
 
@@ -203,7 +203,7 @@ def decide_basis(inp: Mapping[str, Any], today: date) -> tuple[str, str]:
 
 def own_history(inp: Mapping[str, Any], *, today: date,
                 history_not_comparable: Mapping[str, Any] | None = None) -> dict[str, Any]:
-    """已定價①。`inp` 的形狀見 `engine_c.checklist.get_three_question_inputs`。"""
+    """已定價①。`inp` 的形狀見 `engine_c.three_question_inputs.get_three_question_inputs`。"""
     key, label = "own_history_pctile", "已定價①：自家歷史百分位"
     gate = inp.get("gate")
     if gate:

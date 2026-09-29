@@ -280,6 +280,8 @@ def test_coverage_types_reuse_the_scanner_buckets_and_count_product_noise_separa
     # 母體：非概念的 tech／mat（prod 是抽取副產品、不是題目）。
     assert no_sup["scope_n"] == 4
     assert [h["subject"] for h in modelling["hits"]] == ["tech:npo"] and modelling["scope_n"] == 5
+    # 建模待補的下一步是「把間接供應商建成直接邊」——它得指名是誰（3.1c 退役的 coverage_gaps markdown 原本守這條）。
+    assert modelling["hits"][0]["indirect"] == ["co:lumentum"]
 
 
 def test_duplicate_type_counts_unmentioned_pairs_only() -> None:

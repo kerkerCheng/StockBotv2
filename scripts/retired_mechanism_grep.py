@@ -154,7 +154,6 @@ KEEP: dict[tuple[str,str],str] = {
     ('webapp/static/app.js','C'): 'retirement_note: stance／appendReturnBlock／兩格退役註記',
     ('alpha/contracts.py','D'): 'retirement_note: multiple_horizon 退役註記（判斷檔資料留，plan §0.6 #31）',
     ('alpha/models/session_assessor.py','D'): 'retirement_note: multiple_horizon 隨多年反向橋退役註記',
-    ('briefing/alpha_view/contracts.py','D'): 'retirement_note: 倍率射程「刻意不印」註記',
     ('briefing/alpha_view/render.py','D'): 'retirement_note: 倍率射程那一句的歷史註記',
     ('briefing/alpha_view/sources.py','D'): 'retirement_note: 多年視角整組退役註記',
     ('briefing/analyst_view/compose.py','D'): 'retirement_note: 「要翻倍需要什麼為真」那一句退役註記',

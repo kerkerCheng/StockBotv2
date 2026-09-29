@@ -226,7 +226,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.6 | 候選狀態推導與候選板、`candidates` kind、心跳（多面向審查＋覆核：32 條處置，見偏差 18–26） | ✅ | 執行模型 | `f7f1711`＋收尾 |
 | 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ✅ | 執行模型 | `f942d26` |
 | 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ✅ | 執行模型 | `be73d4e`＋收尾 `ec8f19b`（R2-b 兩位都 GO） |
-| 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ✅ | 執行模型 | 本 Step commit |
+| 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ✅ | 執行模型 | `5ae780a` |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
@@ -282,6 +282,7 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 38 | 3.8 | §9「FRA:2DG→SIVE.ST 用 §7 的持股解析」 | 真實 dry-run 走 `sheet_company_id`——**來源不是 Sheet 欄位**，是 `fetchers/gsheets.py::fetch_portfolio` 以寫死的 `_TICKER_ENRICHMENT` 注入的 `neo4j_id`（只有 FRA:2DG 有值；R1 查證更正）；三條解析路徑（sheet_company_id／execution_alias／registry_ticker）各有測試 | 同一個 `resolve_holding`，三條解析順序照舊；第二份 ticker→co:* 對照表的去留記 §14 #35 |
 | 39 | 3.8（R1） | §9 的邊界情況（未寫） | R1 覆核（3 面向＋逐條反駁，28 條成立、1 條 blocking）修：①三題整段缺席不再記成 available＋空陣列（照抄面板的 status／absence_kind／reason，列入原因）；②新敘事狀態 `unreadable`（ledger 讀不到、有壞行、registry 沒有 research ticker）——買進 fail closed、賣出照記（有壞行時 `select_brief` 會退回舊版而自動放行，原本是 fail-open）；③收據原料每一項讀取都接住（registry、敘事 ledger、排程時區），讀不到不擋賣出；④個股頁 artifact 是 as-of 視角不算當天；⑤候選板那一列的敘事版本不是現行時標出；⑥持有記列與公司兩個層級；⑦稽核行照抄 rule／detail／status；⑧lifecycle 讀不到時 thesis 來源的 `--disproof-watch` 說「無法確認」不說「不歸屬」；⑨空字串旗標拒收；⑩讀圖 ledger 壞行現形；⑪顯示路徑不再讓 repo 外的 log crash；⑫「不對外連線」測試改用 `except Exception` 吞不掉的例外並斷言沒有嘗試；補 13 條測試 | 覆核逐條實證；L11-5、L12、L17、INV-3、INV-6 |
 | 40 | 3.8（R2-b）／流程 | §0.5「R2-b 回 GO 才接續」；AGENTS「同一 working tree 只讓一個 agent 寫入」 | R2-b（兩位獨立審查者，**都 GO**）進行期間，執行者在同一個 working tree 跑了 3.9 的變異測試、也開始寫 3.9 的測試檔（未 commit）——**違反上面兩條**；兩位審查者以 mtime／size＋git status 防護重跑，確認他們的證據期間 0 個 tracked 檔變動、HEAD 未動，判定不受影響。R2-b 另指出 `_local_date` 只接 TypeError／ValueError（排程時區設定讀不到會連賣出一起擋），收尾時修（退回本機時區＋測試） | 照實記錄；之後審查進行中，變異測試與下一步的寫入一律等 verdict 或改在獨立 worktree |
+| 41 | 結案／流程 | §0.5「同一 working tree 只讓一個 writer」 | 結案證據查到：2026-09-30 05:30 的 daily（head `f942d26`）開跑時工作區有 3.8 未提交的 `portfolio/research_receipt.py`（心跳「開跑時工作區不乾淨」照印）；沒有任何 tracked 檔 import 它、daily 取得 writer lock、`integrity_violation` 為 None，產出不受影響。另外結案證據的殭屍 grep 腐壞 1 條（`('briefing/alpha_view/contracts.py','D')`：3.7 刪了那行註解、keep-list 沒同步縮，§13 寫過的形狀）與 `alpha/three_questions.py` docstring 指向不存在的函式、3.1c 拿掉的測試另守的「建模待補指名間接供應商」沒有接手斷言——三處在結案 commit 修 | 照實記錄；跨 05:30 的寫入改在獨立 worktree 或先 commit（同 #40）；三處修正都在十行內、不動 contract（L17） |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
@@ -587,7 +588,7 @@ Boundaries: 不改 code、不 commit、不帶 --apply、不動 Sheet、不核准
 
 **另核對：** 舊 Decision Store 三個 `*.db` sha256 與 `live_choices` ＝ 3.0；`trade_log.jsonl` 除了使用者真實成交外不變；`git diff <3.0> HEAD -- AGENTS.md` 為空；`identity/registry.py::company_id_for_ticker` 未改。
 
-closeout 報告存 `docs/reports/2026-09-2x-phase3-closeout.md`，附「本 Phase 執行中發現、Phase 4 要決定的問題」（§14 種子＋執行中新增）。
+closeout 報告存 [`docs/reports/2026-09-30-phase3-closeout.md`](../reports/2026-09-30-phase3-closeout.md)，附「本 Phase 執行中發現、Phase 4 要決定的問題」（§14 種子＋執行中新增）。
 
 ### 結案 R2（使用者已常規 opt-in；執行者不必再問）
 
@@ -693,3 +694,6 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 36. **收據的 derived 要當天的個股頁 artifact**：`materialize --candidates` 只重算候選板；同一天寫了新敘事或新讀圖後下單，候選板那一列會是舊版（收據已會標出），要完整就連該檔一起 materialize（OPERATIONS 已寫）。
 37. **資本路徑連帶載入有連線能力的模組（只載入、沒有連線）**（3.8 R2-b）：`alpha.providers.briefs` 經 `alpha/providers/__init__` import `graph_neo4j` 與 `fundamentals`→`engine_c.etl_yfinance`→yfinance；實測沒有任何非 Google 連線、neo4j 套件沒載入，「不連 Neo4j、不打行情」目前靠那些模組是 lazy。要不要讓 `alpha/providers/__init__` 不要 eager import 需要外部連線的 provider，另議。
 38. **alpha 成交讀三次 Sheet**（定位、硬擋、收據；beta 兩次）——三份不同時間點的快照，使用者在那幾秒內改 Sheet 時，收據的公司層級持有與硬擋的 NAV 可能不是同一份。把同一次 rows 傳給硬擋與收據是資本路徑改動（#16 範圍外），另議。
+39. **research 面板 digest 會隨每日共識 notes 變**（結案 G3）：跨日語意 diff 的判準只能是「排除 notes 後不變」；另有基準前就有的怪象——「首次出現於」的日期每天往後推、2455.TW 同一條 note 曾重複 5 次（`alpha/refresh/resolver.py`，不在本 Phase 範圍）。
+40. **`get_wipeout_inputs`→`wipeout_flags` 的串接寫了兩次**（`alpha/providers/candidates.py` 與 `briefing/alpha_view/sources.py`；結案 G4）：同一組取數與判定函式、實測一致，但兩份串接日後會各自長。
+41. **`held` 不可宣告有兩道防線，測試分不出哪一道擋下**（結案 G2 變異：兩道都拿掉才紅）——各加一條只拆一道的測試，或刪掉其中一道。
