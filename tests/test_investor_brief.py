@@ -146,9 +146,15 @@ def test_read_model_without_brief_is_missing_and_blocks_readiness() -> None:
 def test_packet_carries_the_brief_frame_for_the_session() -> None:
     from alpha.models.session_assessor import _brief_frame
 
+    from alpha.narrative import PLACEHOLDERS_V2, SLOT_KEYS_V2
+
     frame = _brief_frame()
-    assert [s["key"] for s in frame["slots"]] == list(SLOT_KEYS)
-    assert set(frame["placeholders"]) == set(PLACEHOLDERS) and "session_judgment" in frame["forbidden_terms"]
+    # 2026-09-29（Phase 3 Step 3.4）翻面：packet 只給 v2——v1 的題目含已退役的估值題，每次載入的題目會被當成目標（L19）。
+    assert frame["record_version"] == "investor-brief/v2"
+    assert [s["key"] for s in frame["slots"]] == list(SLOT_KEYS_V2) != list(SLOT_KEYS)
+    assert set(frame["placeholders"]) == set(PLACEHOLDERS_V2) and "session_judgment" in frame["forbidden_terms"]
+    retired = set(PLACEHOLDERS) - set(PLACEHOLDERS_V2)
+    assert retired and not retired & set(frame["placeholders"]) and "param_placeholders" not in frame
     assert "alpha brief" in frame["_how_to_use"]
 
 

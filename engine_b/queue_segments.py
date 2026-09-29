@@ -83,6 +83,13 @@ SEGMENTS: tuple[Segment, ...] = (
         "Phase 1 Step 1.5：醒來只把節點列進 needs_reread（理由寫出是哪位客戶的哪份文件），不自動重讀——重讀是研究。",
     ),
     Segment(
+        "narrative_rewrite", 1, "敘事來源的 watch 醒來、被判觸及或到期未判 → 該重寫那一檔的敘事",
+        "research", "research-drain「敘事該重寫」段：讀那一檔現行敘事與觸發的 watch → "
+                    "python -m alpha brief <T> --add spec.json（v2；`acknowledged_touched` 逐條處置，不列就拒收）",
+        "Phase 3 Step 3.4：`brief:` 語意 watch（敘事自己的反證）與 `wake_brief` watch（「缺 X」「已定價等回落」在等的事）"
+        "醒來、觸及或到期都不鑄 pq2、不進假設對照——下一步是重寫敘事，而重寫是研究。換版與撤回不會吞掉它們。",
+    ),
+    Segment(
         "fired_hypothesis_check", 1, "fired watch → 截圖假設對照（agent 拿 fact 去對一手）",
         "research", "research-drain 段 0b：對照後 `python -m engine_b.event_watch consume <watch_id>`",
         "刻意不自動 consume：對照是研究動作，收據要留在假設層（engine_b/hypotheses.py）。",
@@ -158,7 +165,7 @@ NOT_WORK: dict[str, str] = {
     "lead:triaged_no_go": "終局",
     "watch:active": "在等（未觸發）",
     "watch:consumed": "終局",
-    "watch:expired": "到期：thesis／讀圖來源的列進 thesis 複查與節點重讀（A7）；假設型等轉 pq2 watch_decision；pq2 型已翻回球在你；追源型已結案（watch_expired）",
+    "watch:expired": "到期：thesis／讀圖來源的列進 thesis 複查與節點重讀（A7）；假設型等轉 pq2 watch_decision；pq2 型已翻回球在你；追源型已結案（watch_expired）；敘事型（未處置的）在 narrative_rewrite",
     "todo:awaiting_approval": "等 pq2 人工 gate",
     "todo:completed": "終局（等 resolve）",
     "todo:parked": "終局（等 resolve）",
@@ -202,10 +209,35 @@ def classify_lead(lead: Mapping[str, Any]) -> str | None:
     return None
 
 
+def is_narrative_watch(watch: Mapping[str, Any]) -> bool:
+    """敘事來源的 watch（Phase 3 Step 3.4）：敘事自己的反證（`brief:` 語意）或敘事在等的事（`wake_brief`）。"""
+    return bool(watch.get("wake_brief")) or str(watch.get("source_ref") or "").startswith("brief:")
+
+
+def narrative_rewrite_state(watch: Mapping[str, Any]) -> str | None:
+    """敘事來源的 watch 處在哪一種「該重寫」狀態：`fired`（醒來）｜`touched`（判定觸及、未處置）｜
+    `expired`（到期未處置）；還在等（active）或已處置回 None。**換版與撤回的 hook 只收 None 的**（§5 第 6 點）。"""
+    if not is_narrative_watch(watch):
+        return None
+    status = watch.get("status")
+    if status == "fired":
+        return "fired"
+    judgment = watch.get("judgment") or {}
+    if status == "consumed" and judgment.get("touches") == "yes" and not judgment.get("handled"):
+        return "touched"
+    if status == "expired" and not watch.get("expiry_resolution"):
+        return "expired"
+    return None
+
+
 def classify_watch(watch: Mapping[str, Any]) -> str | None:
     status = str(watch.get("status") or "")
     if status not in WATCH_STATUSES:
         return f"unmapped:watch:{status or '<empty>'}"
+    # ⚠ 敘事來源先判（Phase 3 Step 3.4）：`wake_brief` 的 date watch 到 until 轉 fired，若落到下面的預設分支就會被
+    # 當成「假設對照」——錯的 consumer，QueueLiveness 還會照綠（plan §13）。
+    if narrative_rewrite_state(watch) is not None:
+        return "narrative_rewrite"
     if status == "fired":
         if watch.get("wake_pq2"):
             return "fired_pq2_wake"

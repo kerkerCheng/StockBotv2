@@ -59,6 +59,10 @@ WATCH_KINDS = frozenset({
 #: （`source_class`／`company_id`／`form_type`，harvest 登記當下寫的），**不看 triage 的 tier 或 go**。
 SEMANTIC_KIND = "semantic_condition"
 SEMANTIC_MIN_CONDITION_CHARS = 20
+#: 語意 watch 的來源（封閉）：thesis memo 條目、讀圖反證、敘事反證（Phase 3 Step 3.4，`brief:<brief_id>#<n>`）。
+SEMANTIC_SOURCE_PREFIXES: tuple[str, ...] = ("thesis:", "reading:", "brief:")
+#: `wake_brief` 可以掛的 kind：敘事在等的日子（date）或某家公司的新文件（entity_filing／related_entity）。
+WAKE_BRIEF_KINDS = frozenset({"date", "entity_filing_signal", "related_entity_signal"})
 
 #: watch 狀態的封閉字彙（contract；`audit` 的 Lifecycle 據此驗，Phase 1 Step 1.10）。
 #: active → fired（被叫醒）→ consumed（處理完）；active → expired（到期，處置記在 `expiry_resolution`）。
@@ -286,6 +290,7 @@ def add_watch(
     action_48h: str = "",
     node: str = "",
     today: date | None = None,
+    wake_brief: str = "",
 ) -> dict[str, Any]:
     if kind not in WATCH_KINDS:
         raise EventWatchError(f"未知 watch kind：{kind}（封閉字彙 {sorted(WATCH_KINDS)}）")
@@ -300,9 +305,22 @@ def add_watch(
     # 喚醒目標恰好擇一（[321] 由二選一擴充；Phase 1 Step 1.4 加 disproof_ref）：pq2 編號（翻醒 waiting 項）、
     # 假設 id（fact-check 到點）、lead id（追源線索排回 pq1）、或反證來源（語意條件，指回 memo／讀圖）。
     # Phase 1 Step 1.5 再加 wake_reading（讀圖節點：需求側客戶出了新一手文件 → 該節點列進 needs_reread）。
-    targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead), bool(disproof_ref), bool(wake_reading)]
+    # Phase 3 Step 3.4 再加 wake_brief（公司 co:*）：敘事宣告「缺 X」「已定價等回落」時在等的那件事——醒來或到期
+    # 都進佇列段 `narrative_rewrite`（該重寫敘事），不鑄 pq2、不進假設對照。
+    targets = [bool(wake_pq2), bool(hypothesis_ref), bool(wake_lead), bool(disproof_ref), bool(wake_reading),
+               bool(wake_brief)]
     if sum(targets) != 1:
-        raise EventWatchError("wake_pq2／hypothesis_ref／wake_lead／disproof_ref／wake_reading 必須恰好擇一")
+        raise EventWatchError(
+            "wake_pq2／hypothesis_ref／wake_lead／disproof_ref／wake_reading／wake_brief 必須恰好擇一")
+    if wake_brief:
+        if kind not in WAKE_BRIEF_KINDS:
+            raise EventWatchError(f"wake_brief 只用在 {sorted(WAKE_BRIEF_KINDS)}（敘事在等的日子或某家公司的新文件）")
+        if not str(wake_brief).startswith("co:"):
+            raise EventWatchError("wake_brief 必須是 co:*（敘事屬於哪一家公司；INV-1）")
+        from identity.registry import get_registry
+
+        if not get_registry().has_company(str(wake_brief)):
+            raise EventWatchError(f"wake_brief {wake_brief} 不在 registry（INV-1，不猜）")
     if wake_reading and kind != "entity_filing_signal":
         raise EventWatchError("wake_reading 只用在 entity_filing_signal（等需求側客戶的一手文件）")
     if (kind == SEMANTIC_KIND) != bool(disproof_ref):
@@ -342,6 +360,8 @@ def add_watch(
     }
     if wake_reading:
         watch["wake_reading"] = wake_reading
+    if wake_brief:
+        watch["wake_brief"] = str(wake_brief)
     if kind == SEMANTIC_KIND:
         watch.update({
             "disproof_ref": disproof_ref,
@@ -363,8 +383,9 @@ def _validate_semantic(*, condition: str, entities: list[str], source_ref: str, 
         raise EventWatchError(f"condition 必須是原文逐字、至少 {SEMANTIC_MIN_CONDITION_CHARS} 字")
     if not str(check_frequency or "").strip() or not str(action_48h or "").strip():
         raise EventWatchError("L7 三件套缺件：check_frequency 與 action_48h 都必填")
-    if not (source_ref.startswith("thesis:") or source_ref.startswith("reading:")) or "#" not in source_ref:
-        raise EventWatchError("source_ref 必須是 thesis:<memo 路徑>#<n> 或 reading:<reading_id>#<n>")
+    if not source_ref.startswith(SEMANTIC_SOURCE_PREFIXES) or "#" not in source_ref:
+        raise EventWatchError(
+            "source_ref 必須是 thesis:<memo 路徑>#<n>、reading:<reading_id>#<n> 或 brief:<brief_id>#<n>")
     if disproof_ref != source_ref:
         raise EventWatchError("disproof_ref 必須等於 source_ref（喚醒時指回原文）")
     companies = [e for e in entities if str(e).startswith("co:")]
@@ -527,6 +548,7 @@ EXPIRY_RESOLUTION_KINDS: dict[str, str] = {
     "superseded_by_newer_watch": "追源型：同一 lead 已有較新的等待",
     "reading_expiry": "讀圖型：由讀圖自己的到期重問",
     "source_superseded": "語意型：來源 memo／讀圖已不是現行",
+    "narrative_rewritten": "敘事型（`rewrite`）：重寫敘事時在 `acknowledged_touched` 逐條處置（Phase 3 Step 3.4）",
     "dropped": "使用者 drop（watch_decision）",
     "touched": "使用者 go：研究結論＝條件已被觸及（watch_decision）",
 }
@@ -572,12 +594,16 @@ def expiry_class(watch: Mapping[str, Any]) -> str:
         return "trace"
     if watch.get("wake_reading"):
         return "reading"
+    if watch.get("wake_brief"):
+        return "rewrite"
     if watch.get("kind") == SEMANTIC_KIND:
         ref = str(watch.get("source_ref") or "")
         if ref.startswith("thesis:"):
             return "thesis_review"
         if ref.startswith("reading:"):
             return "reread"
+        if ref.startswith("brief:"):
+            return "rewrite"
     return "decision"
 
 
@@ -845,6 +871,8 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
         "semantic_flagged": sum(1 for w in pending if flag_for_current(w) is not None),
         "wake_disproof": sum(1 for w in active if w.get("disproof_ref")),
         "wake_reading": sum(1 for w in active if w.get("wake_reading")),
+        # Phase 3 Step 3.4：敘事宣告「缺 X」「已定價等回落」在等的事（醒來／到期＝該重寫敘事）
+        "wake_brief": sum(1 for w in active if w.get("wake_brief")),
         "semantic_unreachable": (None if coverage is None else
                                  sum(1 for w in watching if not is_reachable(w, coverage))),
         **expiry_counters(data),
@@ -867,6 +895,7 @@ def expiry_counters(data: Mapping[str, Any], *, today: date | None = None) -> di
         "expiry_decision_pending": sum(1 for w in unresolved if expiry_class(w) == "decision"),
         "expiry_thesis_review_pending": sum(1 for w in unresolved if expiry_class(w) == "thesis_review"),
         "expiry_reread_pending": sum(1 for w in unresolved if expiry_class(w) == "reread"),
+        "expiry_rewrite_pending": sum(1 for w in unresolved if expiry_class(w) == "rewrite"),
         "trace_expired_closed": len(closed),
         # 時間戳存 UTC；「是哪一天」用排程時區換算（Step 2.9c）——拿 UTC 前 10 碼比本地的今天，daily（台北 05:30）
         # 那一輪結案的會被算成昨天，「今日」恆少算。
@@ -1066,6 +1095,9 @@ def wake_target(watch: Mapping[str, Any]) -> dict[str, Any]:
     if watch.get("wake_reading"):
         return {"kind": "reading", "ref": watch["wake_reading"],
                 "label": f"讀圖 {watch['wake_reading']}（醒來＝列進該重讀，不自動重讀）"}
+    if watch.get("wake_brief"):
+        return {"kind": "brief", "ref": watch["wake_brief"],
+                "label": f"敘事 {watch['wake_brief']}（醒來或到期＝列進該重寫，不自動重寫）"}
     if watch.get("hypothesis_ref"):
         return {"kind": "hypothesis", "ref": watch.get("hypothesis_ref"),
                 "label": f"假設 {watch.get('hypothesis_ref')}"}
@@ -1149,6 +1181,10 @@ def main(argv: list[str] | None = None) -> int:
         "--wake-lead", default="",
         help="追源線索 id（三個 wake 目標擇一）；一般由 park 自動建立，手動用於補漏",
     )
+    add.add_argument(
+        "--wake-brief", default="",
+        help="co:*——敘事宣告「缺 X」「已定價等回落」時在等的事（kind 限 date／entity_filing_signal／"
+             "related_entity_signal；醒來或到期進 narrative_rewrite，Phase 3 Step 3.4）")
     add.add_argument("--poll", action="store_true")
     add.add_argument("--query-hint", default="")
     add.add_argument("--note", default="")
@@ -1281,6 +1317,7 @@ def main(argv: list[str] | None = None) -> int:
             fact_check_ref=args.fact_check_ref,
             hypothesis_ref=args.wake_hypothesis,
             wake_lead=args.wake_lead,
+            wake_brief=args.wake_brief,
             poll_eligible=args.poll,
             poll_query_hint=args.query_hint,
             note=args.note,
@@ -1288,6 +1325,8 @@ def main(argv: list[str] | None = None) -> int:
         save_watches(data)
         if watch.get("wake_pq2"):
             target = f"pq2 [{watch['wake_pq2']}]"
+        elif watch.get("wake_brief"):
+            target = f"敘事 {watch['wake_brief']}（醒來或到期＝該重寫）"
         elif watch.get("hypothesis_ref"):
             target = f"假設 {watch['hypothesis_ref']}"
         else:

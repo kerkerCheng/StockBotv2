@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.4：短評 v2 與敘事來源的 watch）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | ①`python -m alpha brief <T> --add spec.json` 的副作用**變多**：寫入前讀 Neo4j（讀圖現行狀態，唯讀 bolt）與 Engine C（三題，`?mode=ro`），寫入後**寫 `library/leads/event_watches.json`**（`disproof[]` 登記成語意 watch、收掉舊版 active 的、寫處置收據），再 append `library/private/alpha/briefs/<T>.jsonl`；新寫一律 v2。`--retract` 同樣會收 watch。**寫 registry 前先取互動 writer lock**（plan §0.5；daily 也寫這個檔）。②`python -m engine_b.event_watch add` 新旗標 `--wake-brief <co:*>`（kind 限 date／entity_filing_signal／related_entity_signal）。兩者都是互動專用、零 LLM、不寫圖／Engine C／thesis |
+| **2 canonical skill／prompt／本檔** | 本節；`skills/research-drain`（新段 `narrative_rewrite` 的 consumer）；`docs/ARCHITECTURE.md` §6.11 v2 段；研究包 `brief_frame` 改 v2（`alpha/models/session_assessor.py`） |
+| **3 最窄 rule** | 兩個命令都不進任何無人值守 allowlist；`.codex/rules` 仍是 0 條；daily 的 `DAILY_STEPS` 不變——daily 的 ⑩ `todo sync` 照舊跑 `check_watches`，`wake_brief` 的 date watch 到點會在那一步轉 fired（分到 narrative_rewrite，不鑄號） |
+| **4 contract test** | `tests/test_narrative_v2.py`（v2 拒收規則逐條、寫入當下前提、連結不重登、換版／撤回不吞觸及、重寫須處置、wake_brief 兩條路、歸屬以來源）；`tests/test_queue_segments.py`（段序封閉） |
+| **5 端到端 smoke** | 2026-09-29：真實 registry 上 `semantic_active` 仍 36、147 筆既有 watch 的 `expiry_class` 一筆沒變；v1 7 行 id 重算 7／7、固定夾具的 `fill_brief` 輸出 sha 等於 3.0 基準；`python -m audit invariants` 13 PASS |
+
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.3：三題、主題等權組、邊緣判定）
 
 | 步 | 結論 |

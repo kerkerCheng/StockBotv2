@@ -83,6 +83,20 @@ def thesis_lifecycle() -> dict[str, dict]:
     return data
 
 
+def brief_ledgers() -> dict[str, dict]:
+    """敘事（短評）ledger（private）：`ticker → {"records": [...], "errors": [...]}`（Phase 3 Step 3.4）。
+    目錄不存在就丟例外——「沒有敘事」與「敘事目錄沒掛載」是兩件事。"""
+    from alpha.providers.briefs import BRIEF_DIR, read_brief_records
+
+    if not BRIEF_DIR.is_dir():
+        raise SourceUnavailable(f"{BRIEF_DIR.relative_to(ROOT)} 不存在——敘事 ledger 未掛載")
+    out: dict[str, dict] = {}
+    for path in sorted(BRIEF_DIR.glob("*.jsonl")):
+        records, errors = read_brief_records(path.stem)
+        out[path.stem] = {"records": records, "errors": errors}
+    return out
+
+
 def reading_ledgers() -> dict[str, dict]:
     """讀圖 ledger（private）：`node → {"records": [...], "current": {unit: 現行那一筆}, "errors": [...]}`。
 

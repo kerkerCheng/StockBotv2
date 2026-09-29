@@ -1028,11 +1028,12 @@ EXPIRY_KIND_LABELS: dict[str, str] = {
     "lead_already_terminal": "lead 早已終局", "lead_in_flight": "lead 在路上", "lead_closed": "lead 已結案",
     "lead_missing": "lead 不存在", "superseded_by_newer_watch": "已有新等待", "reading_expiry": "讀圖到期",
     "source_superseded": "來源已換版", "dropped": "放棄", "touched": "判定已發生",
+    "narrative_rewritten": "敘事重寫已處置",
 }
 
 
 def _expiry_line(watches: Sequence[Mapping[str, Any]], *, now: datetime, event_watch: Any) -> str:
-    """今日到期 a｜累計 b＝各處置 k 筆 ＋ 未處置（待決 watch_decision／等 thesis 複查／等重讀／其他）。"""
+    """今日到期 a｜累計 b＝各處置 k 筆 ＋ 未處置（待決 watch_decision／等 thesis 複查／等重讀／等敘事重寫（Phase 3 Step 3.4）／其他）。"""
     expired = [w for w in watches if w.get("status") == "expired"]
     touched = [w for w in watches if (w.get("expiry_resolution") or {}).get("kind") == "touched"]
     today = now.astimezone().date()
@@ -1049,8 +1050,8 @@ def _expiry_line(watches: Sequence[Mapping[str, Any]], *, now: datetime, event_w
     total = len(expired) + len(touched)
     done = "、".join(f"{EXPIRY_KIND_LABELS.get(k, k)} {n}" for k, n in sorted(by_kind.items(), key=lambda kv: -kv[1]))
     pending = (f"待決 watch_decision {unresolved.get('decision', 0)}｜等 thesis 複查 {unresolved.get('thesis_review', 0)}"
-               f"｜等重讀 {unresolved.get('reread', 0)}")
-    other = sum(n for cls, n in unresolved.items() if cls not in ("decision", "thesis_review", "reread"))
+               f"｜等重讀 {unresolved.get('reread', 0)}｜等敘事重寫 {unresolved.get('rewrite', 0)}")
+    other = sum(n for cls, n in unresolved.items() if cls not in ("decision", "thesis_review", "reread", "rewrite"))
     if other:
         pending += f"｜其他未處置 {other}"
     exp = event_watch.expiry_counters({"watches": list(watches)}, today=today)

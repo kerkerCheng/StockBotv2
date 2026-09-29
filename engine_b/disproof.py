@@ -344,8 +344,13 @@ _PRIORITY = {"touched": 3, "expired": 2, "watching": 1}
 
 def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[str, Any] | None = None,
                     readings: Mapping[str, Any] | None = None, coverage: frozenset[str] | None = None,
-                    frozen_history: int | None = None, root: Path = ROOT) -> dict[str, Any]:
-    """心跳段 2 與 audit 共用。以條件為單位（見模組 docstring）；`coverage` 沒給 → 叫不醒記 None。"""
+                    frozen_history: int | None = None, root: Path = ROOT,
+                    briefs: Sequence[Any] | None = None) -> dict[str, Any]:
+    """心跳段 2 與 audit 共用。以條件為單位（見模組 docstring）；`coverage` 沒給 → 叫不醒記 None。
+
+    `briefs`（Phase 3 Step 3.4）：各檔**現行的 v2 敘事**。它們自己新登的反證（`brief:<id>#n`）算進預期；
+    以來源鍵連到既有 watch 的（`link_source_ref`）**不另算**——那條條件已在 thesis／讀圖那一邊算過一次。
+    沒給就讀 ledger（`current_briefs()`）。"""
     from thesis.memo_structure import disproof_items, memo_file_sha256
 
     lifecycle = load_lifecycle() if lifecycle is None else lifecycle
@@ -373,6 +378,11 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
                     mismatch.append(str(tid))
             except OSError:
                 mismatch.append(str(tid))
+    for brief in (current_briefs() if briefs is None else briefs):
+        for index, entry in enumerate(getattr(brief, "disproof", ()) or (), 1):
+            if getattr(entry, "link_source_ref", None):
+                continue
+            expected[(f"brief:{brief.brief_id}", normalize(entry.condition))] = f"{brief.ticker} 敘事重寫"
     v1_prose = 0
     for key, reading in (readings or {}).items():
         node, unit = key if isinstance(key, tuple) else (key, "layer")
@@ -401,6 +411,9 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
         key = (str(watch.get("source_ref") or "").split("#", 1)[0], normalize(watch.get("condition")))
         if lifecycle is None and key[0].startswith("thesis:"):
             continue   # lifecycle 讀不到時 thesis 那一半是「沒算」，不是孤兒（NB3-8）
+        if key not in expected and key[0].startswith("brief:") and cat in ("touched", "expired"):
+            # 舊版敘事的反證醒來或到期、還沒被重寫處置——它是 narrative_rewrite 的工作，不是孤兒。
+            expected[key] = "敘事重寫（舊版）"
         if key not in expected:
             orphan_touched += cat == "touched"
             continue
@@ -423,6 +436,24 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
         "memo_unreadable": unreadable_memos,
         "lifecycle_unreadable": lifecycle is None,
     }
+
+
+def current_briefs() -> list[Any]:
+    """每檔現行的 v2 敘事（最新一筆、未撤回）。讀不到 ledger 回空 list——敘事的反證就不算進預期（不猜）。"""
+    try:
+        from alpha.narrative.contracts import RECORD_VERSION_V2
+        from alpha.providers.briefs import BRIEF_DIR, read_brief_records
+    except Exception:  # noqa: BLE001
+        return []
+    out = []
+    if not BRIEF_DIR.is_dir():
+        return out
+    for path in sorted(BRIEF_DIR.glob("*.jsonl")):
+        records, _errors = read_brief_records(path.stem)
+        visible = sorted(records, key=lambda r: (r.created_at, r.brief_id))
+        if visible and not visible[-1].retracted and visible[-1].record_version == RECORD_VERSION_V2:
+            out.append(visible[-1])
+    return out
 
 
 def current_readings() -> dict[tuple[str, str], Any]:

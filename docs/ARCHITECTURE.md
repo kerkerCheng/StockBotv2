@@ -658,6 +658,20 @@ read model InvestorBriefSection：fill_brief() 把既有 Datum 的值格式化�
 AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為什麼這樣算」，再下一層「完整細節」
 ```
 
+**v2（2026-09-29 Phase 3 Step 3.4，ROADMAP A1）：七格改題＋結構化欄位，v1 照讀不改寫。**
+- 七格：`demand`／**`position`**（原 `supply`）／`bottleneck`／**`priced_in`**（原 `market_view`，必含 `{own_history_pctile}`）／`our_bet`／
+  **`what_must_be_true`**（原 `if_right_if_wrong`，不得有價格或報酬）／`when`——**題目變了的格換 key**（L12）。placeholder 字彙拿掉已退役估值鏈的九個
+  與帶參數的兩種，加三題稽核區的七個（`alpha/narrative/contracts.py::PLACEHOLDERS_V2`）。
+- 結構化欄位（全部進 v2 的 id 欄位集合；v1 的集合一個字不動）：`rides[]`（騎的讀圖）、`disproof[]`（寫入即登記成 `brief:<id>#n` 語意 watch；
+  已在盯的只以來源鍵 `link_source_ref` 連結）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`
+  （open／missing／priced_wait／pass；**held 不收**，由 Sheet 推導）、`history_not_comparable`、`acknowledged_touched[]`。
+- **寫入當下才成立的檢查只放寫入端**（`alpha/providers/briefs.py::v2_write_problems`）：讀圖現行（current／stale_low）、本公司在讀圖快照供給側、
+  answers 與稽核行一致、缺 X／等回落指向本公司 active 的 `wake_brief` watch、可開三前提、該重寫的 watch 逐條處置。放在 parse 路徑，
+  舊紀錄日後會解析失敗、從候選板安靜消失。
+- **敘事來源的等待**：`wake_brief=<co:*>`（缺 X／等回落在等的事）與 `brief:` 語意 watch 醒來、觸及、到期都進佇列段 `narrative_rewrite`
+  （`expiry_class=rewrite`，不鑄 pq2、不進假設對照）；換版與撤回只收 active 的。**watch 歸屬的唯一 SSOT** 是
+  `engine_b/narrative_watches.py::attributed_watches`（以來源判，不以 entities；`candidate_state.watch_id` 不構成歸屬）。
+
 **為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
 讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。
 **為什麼禁字表在型別層：** 首屏是投資人的；「白話別名」那次是把欄位翻成中文，欄位還在——這次是欄位不上首屏。

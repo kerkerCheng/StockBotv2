@@ -42,7 +42,7 @@ from shared.catalyst_state import STATE_LABEL, assess_entry
 from thesis.lifecycle_schedule import CATALYST, effective_next_check
 
 from alpha.gap_closure import consensus_progress
-from alpha.narrative import ABSENT, SLOT_LABELS, fill_brief, format_value, select_brief
+from alpha.narrative import ABSENT, SLOT_LABELS_V2, fill_brief, format_value, select_brief, slot_labels
 from alpha.narrative.argument import chain_paragraph, closure_phrase, timeline_paragraph
 from briefing.analyst_view.contracts import PLAIN_REFRESH_OVERALL
 
@@ -294,9 +294,31 @@ BRIEF_IS_NOT: tuple[str, ...] = (
 )
 
 
+def _three_question_values(three_questions: Mapping[str, Any] | None) -> dict[str, str | None]:
+    """v2 的七個三題 placeholder（Phase 3 Step 3.4）：**純選取＋格式化**稽核區已算好的行——缺席的行給 None
+    （`fill_brief` 印「（尚無）」並標 partial，不補 0）。多個主題等權組時取第一組（稽核區逐組都印）。"""
+    rows = {r["key"]: r for q in ("priced_in", "in_numbers") for r in (three_questions or {}).get(q) or ()
+            if r.get("absence_kind") is None}
+    own = rows.get("own_history_pctile")
+    series = rows.get("in_numbers_series")
+    latest = (series["value"][-1] if series and isinstance(series.get("value"), list) and series["value"] else None)
+    yoy = latest.get("yoy") if isinstance(latest, Mapping) else None
+    as_of = (latest.get("period_end") or latest.get("data_month") or latest.get("as_of")) if isinstance(latest, Mapping) else None
+    return {
+        "own_history_pctile": (f"{float(own['value']):.0f}" if own else None),
+        "own_history_basis": (own.get("basis") if own else None),
+        "cohort_median": format_value("multiple", rows["cohort_median"]["value"]) if "cohort_median" in rows else None,
+        "rel_return_30d": format_value("ratio", rows["rel_return_30d"]["value"]) if "rel_return_30d" in rows else None,
+        "rel_return_90d": format_value("ratio", rows["rel_return_90d"]["value"]) if "rel_return_90d" in rows else None,
+        "in_numbers_latest": format_value("ratio", yoy) if yoy is not None else None,
+        "in_numbers_as_of": (str(as_of)[:10] if as_of else None),
+    }
+
+
 def _brief_values(*, price: Datum, consensus: ConsensusSection,
                   catalysts: CatalystSection, today: date,
-                  gap: ExpectationGapSection | None = None) -> dict[str, str | None]:
+                  gap: ExpectationGapSection | None = None,
+                  three_questions: Mapping[str, Any] | None = None) -> dict[str, str | None]:
     """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。
 
     ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`base_target`／`base_return`／`value_date` 的來源
@@ -332,6 +354,7 @@ def _brief_values(*, price: Datum, consensus: ConsensusSection,
     closure_value = (gap.gap_closure.value if gap is not None and gap.gap_closure is not None
                      and isinstance(gap.gap_closure.value, Mapping) else None)
     values["gap_closure"] = closure_phrase(closure_value)
+    values.update(_three_question_values(three_questions))
     return values
 
 
@@ -340,6 +363,7 @@ def _investor_brief_section(
     as_of: date | None, today: date, reference_day: date,
     price: Datum, consensus: ConsensusSection, catalysts: CatalystSection,
     refresh_overall: str, gap: ExpectationGapSection | None = None,
+    three_questions: Mapping[str, Any] | None = None,
 ) -> InvestorBriefSection:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：那把尺（現價／沒賭對／賭對／判斷錯了）整格退役。**
     # ROADMAP「個股頁／首屏」那一列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
@@ -354,17 +378,21 @@ def _investor_brief_section(
                "還沒寫投資人短評（不拿 thesis 硬截——那些句子是分析師欄位，不是給人讀的）")
         meta = SectionMeta(status="missing", basis="none", authority=A_BRIEF, capability=CAP_INVESTOR_BRIEF,
                            reason=why, as_of=reference_day, absence_kind="not_yet_recorded")
+        # 沒有短評時列的是 **v2 的七題**（Phase 3 Step 3.4）：v1 的題目含已退役的估值題（市場怎麼看、對了值多少），
+        # 每次載入的題目會被當成目標（L19）。
         slots = tuple(missing(f"brief:{key}", label, why, authority=A_BRIEF, absence_kind="not_yet_recorded")
-                      for key, label in SLOT_LABELS.items())
+                      for key, label in SLOT_LABELS_V2.items())
         return InvestorBriefSection(meta=meta, slots=slots, status_light=light,
                                     brief_id=None, is_not=BRIEF_IS_NOT)
-    values = _brief_values(price=price, consensus=consensus, catalysts=catalysts, today=today, gap=gap)
+    values = _brief_values(price=price, consensus=consensus, catalysts=catalysts, today=today, gap=gap,
+                           three_questions=three_questions)
     filled, absent = fill_brief(brief, values)
+    labels = slot_labels(brief.record_version)
     slots: list[Datum] = []
     for slot in brief.slots:
         gaps = absent.get(slot.key, [])
         slots.append(Datum(
-            key=f"brief:{slot.key}", label=SLOT_LABELS[slot.key], value=filled[slot.key],
+            key=f"brief:{slot.key}", label=labels[slot.key], value=filled[slot.key],
             status="partial" if gaps else "available", basis="session_judgment", authority=A_BRIEF,
             as_of=brief.created_on, evidence_refs=tuple(slot.evidence_refs),
             reason=(f"有 {len(gaps)} 個數字尚無：{'、'.join(gaps)}（印成{ABSENT}，不補 0）" if gaps else None),
@@ -1772,6 +1800,7 @@ def build_alpha_investment_view(
         as_of=context.as_of, today=today, reference_day=reference_day,
         price=market_section.price, consensus=consensus_section, catalysts=catalyst_section,
         refresh_overall=refresh_section.overall, gap=expectation_gap_section,
+        three_questions=three_questions,
         )
 
     return AlphaInvestmentView(

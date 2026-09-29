@@ -207,19 +207,44 @@ def out_of_scope_hint(ref: str) -> str | None:
 
 
 def _brief_frame() -> dict[str, Any]:
-    from alpha.narrative import BRIEF_FRAME, BRIEF_SLOTS, FORBIDDEN_TERMS, PLACEHOLDERS
+    """packet 的 `brief_frame`（Phase 3 Step 3.4 起是 **v2**）：七題、placeholder 字彙、結構化欄位的形狀。
+
+    ⚠ v1 的題目含已退役的估值題（市場怎麼看、對了值多少）——每次載入的題目會被當成目標（L19），所以這裡只給 v2。
+    """
+    from alpha.narrative import BRIEF_FRAME_V2, BRIEF_SLOTS_V2, FORBIDDEN_TERMS, PLACEHOLDERS_V2
+    from alpha.narrative.contracts import (
+        ACK_DISPOSITIONS, ANSWER_VALUES, CANDIDATE_STATES_DECLARABLE, RIDE_UNITS, WHAT_MUST_BE_TRUE_FORBIDDEN,
+    )
 
     return {
+        "record_version": "investor-brief/v2",
         "_how_to_use": (
-            "七格照順序各寫一到兩句白話；數字一律用 placeholder（{price}／{bet_target}／{payoff}／"
-            "{assumption:driver[scope]}…），不得打字面值；每格 evidence_refs 必須是 evidence_index 的 key；"
-            "禁字表裡的內部名詞一出現就拒收。存檔：python -m alpha brief <T> --add spec.json"),
-        "slots": [{"key": k, "label": v, **BRIEF_FRAME[k]} for k, v in BRIEF_SLOTS],
-        "placeholders": dict(PLACEHOLDERS),
-        "param_placeholders": ["{assumption:driver[scope]}", "{bet_assumption:driver[scope]}"],
+            "七格照順序各寫一到兩句白話；數字一律用 placeholder（{price}／{own_history_pctile}／{in_numbers_latest}…），"
+            "不得打字面值；每格 evidence_refs 必須是 evidence_index 的 key；禁字表裡的內部名詞一出現就拒收。"
+            "結構化欄位：rides[]（只能騎本公司在供給側的現行讀圖）、disproof[]（寫入即登記成 watch；已在盯的只填 "
+            "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（缺 X／等回落要先用 "
+            "`python -m engine_b.event_watch add --wake-brief <co:*> …` 建好 watch）。存檔：python -m alpha brief <T> --add spec.json"),
+        "slots": [{"key": k, "label": v, **BRIEF_FRAME_V2[k]} for k, v in BRIEF_SLOTS_V2],
+        "placeholders": dict(PLACEHOLDERS_V2),
         "forbidden_terms": list(FORBIDDEN_TERMS),
-        "spec_shape": {"slots": {"demand": {"text": "…{sell_side_target}…", "evidence_refs": ["graph://…"]}},
-                       "note": "可選"},
+        "what_must_be_true_forbidden_placeholders": sorted(WHAT_MUST_BE_TRUE_FORBIDDEN),
+        "candidate_states": list(CANDIDATE_STATES_DECLARABLE),
+        "answer_values": list(ANSWER_VALUES),
+        "ride_units": list(RIDE_UNITS),
+        "ack_dispositions": list(ACK_DISPOSITIONS),
+        "spec_shape": {
+            "slots": {"priced_in": {"text": "…自家三年 {own_history_basis} 的第 {own_history_pctile} 百分位…",
+                                    "evidence_refs": ["graph://…"]}},
+            "rides": [{"node": "tech:…", "unit": "layer", "reading_id": "sr_…"}],
+            "disproof": [{"condition": "原文逐字…", "check_frequency": "每季", "action_48h": "…",
+                          "entities": ["co:…"], "expires": "YYYY-MM-DD", "source": "self",
+                          "link_source_ref": None}],
+            "answers": {"priced_in": "yes|no|unmeasurable", "in_numbers": "yes|no|unmeasurable"},
+            "candidate_state": {"state": "open|missing|priced_wait|pass", "watch_id": "ew_…（缺 X／等回落必填）",
+                                "reason": "（不要必填）"},
+            "history_not_comparable": None,
+            "acknowledged_touched": [],
+            "supersedes_id": "ib_…（重寫時）", "note": "可選"},
     }
 
 

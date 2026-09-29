@@ -409,6 +409,15 @@ def check_expiry() -> AuditResult:
                     findings.append(
                         f"watch {wid}（讀圖反證「{_label(watch)}」）到期超過一天，節點 {node or '（沒寫 node）'}"
                         f"{'' if current else '沒有現行讀圖，'}的重讀理由裡沒有它——APP 與心跳都不會叫你重讀")
+            elif cls == "rewrite":
+                # Phase 3 Step 3.4：敘事型到期不鑄號——它的去處是佇列段 narrative_rewrite（consumer：research-drain），
+                # 處置在下一次重寫的 acknowledged_touched。分不到那一段＝到期被丟了。
+                from engine_b.queue_segments import classify_watch
+
+                if classify_watch(watch) != "narrative_rewrite":
+                    findings.append(
+                        f"watch {wid}（敘事「{_label(watch)}」）到期超過一天，卻不在 narrative_rewrite 段"
+                        "——沒有人會重寫那份敘事（INV-2：到期是重問不是丟）")
             elif cls == "decision":
                 ref = f"{wid}@{watch.get('expires')}"
                 if ref not in decision_refs:
@@ -607,6 +616,17 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
     except SourceUnavailable as exc:
         ledgers = None
         soft.append(f"⚠ 讀圖來源的反證與 wake_reading 未檢查：{exc}")
+    try:
+        briefs = sources.brief_ledgers()
+    except SourceUnavailable as exc:
+        briefs = None
+        soft.append(f"⚠ 敘事來源的反證與 wake_brief 未檢查：{exc}")
+    brief_by_id = {r.brief_id: (t, r) for t, led in (briefs or {}).items() for r in led["records"]}
+    current_brief_ids: set[str] = set()
+    for _t, led in (briefs or {}).items():
+        visible = sorted(led["records"], key=lambda r: (r.created_at, r.brief_id))
+        if visible and not visible[-1].retracted:
+            current_brief_ids.add(visible[-1].brief_id)
     current_memos = {str(e["memo"]) for e in (lifecycle or {}).values()
                      if isinstance(e, dict) and e.get("memo") and e.get("status") != "retired"}
     memo_items: dict[str, list[str] | None] = {}
@@ -639,6 +659,13 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
         wid = watch.get("watch_id", "?")
         status = watch.get("status")
         waiting = status in ("active", "fired")
+        if watch.get("wake_brief") and waiting:
+            examined += 1
+            from identity.registry import get_registry
+
+            if not get_registry().has_company(str(watch["wake_brief"])):
+                findings.append(f"watch {wid} 的 wake_brief 指向 registry 沒有的 {watch['wake_brief']}"
+                                "——醒了也沒有哪一份敘事會重寫")
         if watch.get("wake_reading") and waiting and ledgers is not None:
             examined += 1
             node = str(watch["wake_reading"])
@@ -678,6 +705,22 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
                 if structured is not None and text not in structured:
                     findings.append(f"watch {wid}（「{label}」）還在等，但現行 memo 的結構化反證（sidecar）裡沒有這條"
                                     "——memo 原地重產後舊條件沒收")
+        elif base.startswith("brief:"):
+            if briefs is None:
+                continue
+            examined += 1
+            brief_id = base[len("brief:"):]
+            owner = brief_by_id.get(brief_id)
+            if owner is None:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref 指向敘事 {brief_id}，任何 ledger 裡都沒有這一份")
+                continue
+            entries = tuple(owner[1].disproof or ())
+            if not 1 <= index <= len(entries) or disproof.normalize(entries[index - 1].condition) != text:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在那份敘事的 disproof[] 對不到它的條件")
+            # 還在等（active）卻不是現行敘事的＝換版／撤回沒收；fired／觸及／到期的舊版是「該重寫」的工作，合法地留著。
+            if status == "active" and brief_id not in current_brief_ids:
+                findings.append(f"watch {wid}（「{label}」）還在等，來源敘事 {brief_id} 卻不是 {owner[0]} 的現行敘事"
+                                "——換版或撤回後舊條件沒收")
         elif base.startswith("reading:"):
             if ledgers is None:
                 continue
@@ -808,6 +851,16 @@ def check_queue_liveness() -> AuditResult:
                     findings.append(
                         f"watch {wid}（「{_label(watch)}」）醒了 {(now - woke).days} 天還沒判定"
                         "——待檢沒有人取（`event_watch semantic-queue` → `judge`）")
+            if (str(watch.get("source_ref") or "").startswith("brief:")
+                    and judgment.get("touches") == "yes" and not judgment.get("handled")):
+                # Phase 3 Step 3.4：敘事自己的反證被判觸及——接手的是 narrative_rewrite（research-drain）；
+                # 兩週沒人重寫＝觸及後的等待消失了。
+                touched_at = _parse_dt(judgment.get("at"))
+                if touched_at and (now - touched_at).days > _STALLED_DAYS:
+                    stuck_watches += 1
+                    findings.append(
+                        f"watch {wid}（敘事反證「{_label(watch)}」）判定觸及已 {(now - touched_at).days} 天，"
+                        "那份敘事還沒重寫（narrative_rewrite 段沒有人取）")
             if (str(watch.get("source_ref") or "").startswith("thesis:")
                     and judgment.get("touches") == "yes" and not judgment.get("handled")):
                 touched_at = _parse_dt(judgment.get("at"))

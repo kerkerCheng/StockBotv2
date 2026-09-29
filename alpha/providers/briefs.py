@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
@@ -59,4 +59,207 @@ def append_brief_record(record: Mapping[str, Any], *, directory: Path | None = N
     return path
 
 
-__all__ = ["BRIEF_DIR", "append_brief_record", "ledger_path", "read_brief_records"]
+# ---------------------------------------------------------------------------
+# v2 的寫入端（Phase 3 Step 3.4）：寫入當下才成立的檢查只放這裡，不放 parse 路徑（plan §13）
+# ---------------------------------------------------------------------------
+
+#: 「可開」要求騎的讀圖判讀是護城河或量（`undecided` 不行）。
+OPEN_READING_KINDS: frozenset[str] = frozenset({"moat", "volume"})
+#: 讀圖「現行」＝這兩態：`stale_low` 只有低等級變動、不進重讀佇列——不算現行的話，可開會被一個修不回來的狀態打掉。
+CURRENT_READING_STATUSES: frozenset[str] = frozenset({"current", "stale_low"})
+_PRICED_IN_LINES = ("own_history_pctile", "cohort_median", "rel_return_30d", "rel_return_90d")
+_IN_NUMBERS_LINES = ("in_numbers_series",)
+
+
+class WriteContext:
+    """寫入當下的世界（讀圖狀態、讀圖紀錄、三題、watch registry、thesis lifecycle）。正式入口由 `load()` 讀真實資料；
+    測試直接注入。**這裡的每一樣都是 as-of 今天的**——所以這些檢查只放寫入端。"""
+
+    def __init__(self, *, today: Any, reading_rows: Sequence[Mapping[str, Any]],
+                 readings_by_id: Mapping[str, Any], three_questions: Mapping[str, Any] | None,
+                 watches: dict[str, Any], lifecycle: Mapping[str, Any] | None, registry: Any = None) -> None:
+        self.today = today
+        self.reading_rows = list(reading_rows)
+        self.readings_by_id = dict(readings_by_id)
+        self.three_questions = three_questions
+        self.watches = watches
+        self.lifecycle = lifecycle
+        self.registry = registry
+
+    @classmethod
+    def load(cls, ticker: str, *, today: Any) -> "WriteContext":
+        from engine_b import event_watch as ew
+        from engine_b.disproof import load_lifecycle
+        from query.structure import _load_edges
+
+        from .structure_readings import known_nodes, read_reading_records, reading_status_rows
+        from .three_questions import three_questions_for
+
+        watches = ew.load_watches()
+        edges = _load_edges()
+        rows, _errors = reading_status_rows(edges, today=today, watches=watches.get("watches") or ())
+        readings = {}
+        for node in known_nodes():
+            for rec in read_reading_records(node)[0]:
+                readings[rec.reading_id] = rec
+        try:
+            tq = three_questions_for(ticker, today=today, wipeout=None, wipeout_reason="（寫入端只看已定價與出現在數字裡）")
+        except Exception:  # noqa: BLE001 — 讀不到三題時 answers 的 unmeasurable 檢查會 fail closed
+            tq = None
+        return cls(today=today, reading_rows=rows, readings_by_id=readings, three_questions=tq, watches=watches,
+                   lifecycle=load_lifecycle())
+
+
+def _registry(ctx: WriteContext) -> Any:
+    if ctx.registry is None:
+        from identity.registry import get_registry
+
+        ctx.registry = get_registry()
+    return ctx.registry
+
+
+def _supply_side(reading: Any) -> set[str]:
+    return {str(edge[0]) for edge in ((getattr(reading, "angles", {}) or {}).get("supply_side") or ())
+            if isinstance(edge, (list, tuple)) and edge and str(edge[0]).startswith("co:")}
+
+
+def _demand_side(reading: Any) -> set[str]:
+    return {str(edge[0]) for edge in ((getattr(reading, "angles", {}) or {}).get("demand_side") or ())
+            if isinstance(edge, (list, tuple)) and edge and str(edge[0]).startswith("co:")}
+
+
+def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Sequence[InvestorBrief]) -> list[str]:
+    """v2 寫入當下的前提（plan §5 第 4–6 點）。回問題清單；空＝可以寫。"""
+    from engine_b import event_watch as ew
+    from engine_b.disproof import normalize
+    from engine_b.narrative_watches import blocking_for_open, pending_rewrite
+
+    problems: list[str] = []
+    company, ticker = parsed.company_id, parsed.ticker
+    watches = list(ctx.watches.get("watches") or ())
+    brief_ids = [r.brief_id for r in existing] + [parsed.brief_id]
+    status_by_ride = {(r.get("node"), r.get("unit")): r for r in ctx.reading_rows if r.get("reading_id")}
+
+    # ① rides：現行（current／stale_low）、而且本公司在那份讀圖快照的**供給側**
+    for ride in parsed.rides:
+        row = status_by_ride.get((ride.node, ride.unit))
+        if row is None or row.get("reading_id") != ride.reading_id:
+            problems.append(f"rides：{ride.node}（{ride.unit}）的現行讀圖不是 {ride.reading_id}"
+                            f"（現行是 {row.get('reading_id') if row else '沒有'}）")
+            continue
+        if row.get("status") not in CURRENT_READING_STATUSES:
+            problems.append(f"rides：{ride.reading_id} 的狀態是 {row.get('status')}——只有 current／stale_low 算現行")
+        reading = ctx.readings_by_id.get(ride.reading_id)
+        if reading is None or company not in _supply_side(reading):
+            side = ("需求側" if reading is not None and company in _demand_side(reading) else "兩側都不在")
+            problems.append(f"rides：{company} 不在 {ride.reading_id}（{ride.node}）的供給側——它在{side}；"
+                            "只能騎自己在供給側的讀圖")
+
+    # ② disproof：到期、實體、出處、已在盯的只連結
+    live_by_condition = {}
+    for w in watches:
+        if w.get("kind") == ew.SEMANTIC_KIND and w.get("status") in ("active", "fired") \
+                and str(w.get("source_ref") or "").startswith(("thesis:", "reading:")):
+            live_by_condition[normalize(w.get("condition"))] = str(w.get("source_ref"))
+    live_refs = {str(w.get("source_ref")) for w in watches if w.get("status") in ("active", "fired")}
+    for n, item in enumerate(parsed.disproof, 1):
+        if item.expires <= ctx.today:
+            problems.append(f"disproof[{n}]：expires {item.expires} 必須晚於今天")
+        written = ew.condition_dates(item.condition)
+        if written and item.expires < max(written):
+            problems.append(f"disproof[{n}]：expires {item.expires} 早於條件自己寫的日期 {max(written)}")
+        unknown = [e for e in item.entities if str(e).startswith("co:") and not _registry(ctx).has_company(e)]
+        if unknown:
+            problems.append(f"disproof[{n}]：entities 有 registry 解析不到的 co:*（INV-1）：{unknown}")
+        if item.source.startswith("sr_") and item.source not in ctx.readings_by_id:
+            problems.append(f"disproof[{n}]：source {item.source} 不是任何讀圖 id")
+        if item.link_source_ref:
+            if item.link_source_ref not in live_refs:
+                problems.append(f"disproof[{n}]：link_source_ref {item.link_source_ref} 沒有在盯的 watch——沒人盯就新登，不要連結")
+        else:
+            existing_ref = live_by_condition.get(normalize(item.condition))
+            if existing_ref:
+                problems.append(f"disproof[{n}]：這條已在盯（{existing_ref}）——只填 link_source_ref，不重登")
+
+    # ③ answers：unmeasurable 只在對應稽核行全是缺席時允許；yes／no 時組的兩行有值就要一併引用
+    tq = ctx.three_questions
+    rows = {r["key"]: r for q in ("priced_in", "in_numbers") for r in (tq or {}).get(q) or ()}
+    slots = {s.key: s.text for s in parsed.slots}
+    for answer_key, lines in (("priced_in", _PRICED_IN_LINES), ("in_numbers", _IN_NUMBERS_LINES)):
+        value = getattr(parsed.answers, answer_key) if parsed.answers else None
+        valued = [k for k in lines if (rows.get(k) or {}).get("absence_kind") is None and k in rows]
+        if value == "unmeasurable":
+            if tq is None:
+                problems.append(f"answers.{answer_key}=unmeasurable：這次讀不到三題稽核區，無法確認它真的量不到（fail closed）")
+            elif valued:
+                problems.append(f"answers.{answer_key}=unmeasurable，但稽核區 {valued} 有值——量得到就要答 yes／no")
+    if parsed.answers and parsed.answers.priced_in in ("yes", "no"):
+        text = slots.get("priced_in", "")
+        if (rows.get("cohort_median") or {}).get("absence_kind") is None and "cohort_median" in rows \
+                and "{cohort_median}" not in text:
+            problems.append("priced_in：主題等權組中位數有值，這一格必須一併引用 {cohort_median}")
+        rel = [k for k in ("rel_return_30d", "rel_return_90d")
+               if k in rows and (rows.get(k) or {}).get("absence_kind") is None]
+        if rel and not any("{" + k + "}" in text for k in rel):
+            problems.append("priced_in：相對組漲幅有值，這一格必須一併引用 {rel_return_30d} 或 {rel_return_90d}")
+
+    # ④ candidate_state：缺 X／等回落 → 本公司 wake_brief、active、kind 合法
+    cs = parsed.candidate_state
+    if cs is not None and cs.state in ("missing", "priced_wait"):
+        w = next((w for w in watches if w.get("watch_id") == cs.watch_id), None)
+        if w is None:
+            problems.append(f"candidate_state：watch {cs.watch_id} 不存在")
+        elif w.get("status") != "active":
+            problems.append(f"candidate_state：watch {cs.watch_id} 不是 active（{w.get('status')}）——指向一筆活的等待")
+        elif w.get("wake_brief") != company:
+            problems.append(f"candidate_state：watch {cs.watch_id} 必須是 wake_brief={company} 的 watch"
+                            "（thesis／讀圖的語意 watch、別家的、或前一版 brief: 的都不行）")
+        elif w.get("kind") not in ew.WAKE_BRIEF_KINDS:
+            problems.append(f"candidate_state：watch {cs.watch_id} 的 kind {w.get('kind')} 不在 {sorted(ew.WAKE_BRIEF_KINDS)}")
+
+    # ⑤ 該重寫的 watch 逐條處置（不論是否帶 supersedes_id、不論前一筆是否撤回）
+    pending = {str(w.get("watch_id")) for w in pending_rewrite(company, watches=watches, brief_ids=brief_ids)}
+    acked = {a.watch_id for a in parsed.acknowledged_touched}
+    if pending - acked:
+        problems.append(f"acknowledged_touched 沒處置本公司名下該重寫的 watch：{sorted(pending - acked)}（不列就拒收）")
+    if acked - pending:
+        problems.append(f"acknowledged_touched 處置了不在「該重寫」狀態的 watch：{sorted(acked - pending)}")
+
+    # ⑥ 可開的三個前提
+    if cs is not None and cs.state == "open":
+        for ride in parsed.rides:
+            row = status_by_ride.get((ride.node, ride.unit)) or {}
+            if row.get("kind") not in OPEN_READING_KINDS:
+                problems.append(f"open：騎的 {ride.reading_id} 判讀是 {row.get('kind')}——可開要護城河或量")
+        blocking = blocking_for_open(company, ticker, watches=watches, lifecycle=ctx.lifecycle, brief_ids=brief_ids,
+                                     current_brief=parsed, acknowledged=acked)
+        if blocking:
+            problems.append("open：還有待處置的反證 watch——" + "；".join(blocking))
+    return problems
+
+
+def write_brief(record: Mapping[str, Any], *, ctx: WriteContext, directory: Path | None = None,
+                watches_path: Path | None = None) -> dict[str, Any]:
+    """v2 的正式寫入入口：寫入當下檢查 → append → 登記／收舊／處置 watch → 存 registry。v1 只收撤回。"""
+    from engine_b import event_watch as ew
+    from engine_b.narrative_watches import register_brief_watches
+
+    from ..narrative.contracts import RECORD_VERSION_V2
+
+    parsed = parse_brief_record(record)
+    existing, _ = read_brief_records(parsed.ticker, directory=directory)
+    if parsed.record_version != RECORD_VERSION_V2 and not parsed.retracted:
+        raise ContractViolation("新寫的短評一律 v2（v1 照讀、只收撤回；Phase 3 Step 3.4）")
+    if parsed.record_version == RECORD_VERSION_V2 and not parsed.retracted:
+        problems = v2_write_problems(parsed, ctx=ctx, existing=existing)
+        if problems:
+            raise ContractViolation("短評 v2 寫入拒收：\n- " + "\n- ".join(problems))
+    path = append_brief_record(record, directory=directory)
+    brief_ids = [r.brief_id for r in existing] + [parsed.brief_id]
+    summary = register_brief_watches(parsed, data=ctx.watches, company_brief_ids=brief_ids)
+    ew.save_watches(ctx.watches, watches_path)
+    return {"path": str(path), "brief_id": parsed.brief_id, **summary}
+
+
+__all__ = ["BRIEF_DIR", "CURRENT_READING_STATUSES", "OPEN_READING_KINDS", "WriteContext", "append_brief_record",
+           "ledger_path", "read_brief_records", "v2_write_problems", "write_brief"]

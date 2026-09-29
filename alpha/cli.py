@@ -264,17 +264,20 @@ def cmd_assumptions(args: argparse.Namespace) -> int:
 
 
 def cmd_brief(args: argparse.Namespace) -> int:
-    """投資人短評 ledger 的讀寫入口（2026-09-15）。七格前因後果、文字 session 寫、數字 authority 填。
+    """投資人短評 ledger 的讀寫入口（2026-09-15；**Phase 3 Step 3.4 起新寫一律 v2**）。
 
     - `--list`：列出 ledger 全部紀錄。
-    - `--add spec.json`：append 一筆。spec：`{"slots": {"demand": {"text": …, "evidence_refs": […]}, …}, "note": …}`
-      七格缺一不可；placeholder 與禁字由型別層擋。
-    - `--retract <id>`：append 一筆撤回紀錄。
+    - `--add spec.json`：append 一筆 v2。spec：`{"slots": {"demand": {"text": …, "evidence_refs": […]}, …},
+      "rides": […], "disproof": […], "answers": {…}, "candidate_state": {…}, "history_not_comparable": null,
+      "acknowledged_touched": […], "supersedes_id": …, "note": …}`（形狀見 `python -m alpha research <T>` packet 的
+      `brief_frame.spec_shape`）。寫入當下檢查讀圖現行、供給側、watch、answers、可開前提，不過就整筆拒收並逐條說明；
+      通過後 `disproof[]` 自動登記成語意 watch（已在盯的只連結）、舊版還 active 的 `brief:` watch 收掉。
+    - `--retract <id>`：append 一筆撤回紀錄（沿用被撤那筆的版本；撤回 v2 只收它登記、還 active 的 watch）。
     """
-    from datetime import datetime, timezone
+    from datetime import date, datetime, timezone
 
-    from .narrative import brief_record
-    from .providers.briefs import append_brief_record, read_brief_records
+    from .narrative import RECORD_VERSION_V2, brief_record
+    from .providers.briefs import WriteContext, read_brief_records, write_brief
 
     try:
         resolved_ticker, company_id = _resolve_company(args.ticker)
@@ -290,7 +293,11 @@ def cmd_brief(args: argparse.Namespace) -> int:
                     company_id=str(company_id), ticker=ticker, slots=spec["slots"],
                     supersedes_id=spec.get("supersedes_id"), author=str(spec.get("author") or "session"),
                     context_digest=spec.get("context_digest"), note=str(spec.get("note") or ""),
-                    created_at=datetime.now(timezone.utc))
+                    created_at=datetime.now(timezone.utc), record_version=RECORD_VERSION_V2,
+                    rides=spec.get("rides") or (), disproof=spec.get("disproof") or (),
+                    answers=spec.get("answers"), candidate_state=spec.get("candidate_state"),
+                    history_not_comparable=spec.get("history_not_comparable"),
+                    acknowledged_touched=spec.get("acknowledged_touched") or ())
             except (KeyError, ValueError, TypeError, AlphaError) as exc:
                 print(f"✗ 短評不合法：{exc}", file=sys.stderr)
                 return 2
@@ -300,17 +307,29 @@ def cmd_brief(args: argparse.Namespace) -> int:
             if target is None:
                 print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
                 return 2
+            v2 = {}
+            if target.record_version == RECORD_VERSION_V2:
+                v2 = {"rides": [r.as_dict() for r in target.rides], "disproof": [d.as_dict() for d in target.disproof],
+                      "answers": target.answers.as_dict() if target.answers else None,
+                      "candidate_state": target.candidate_state.as_dict() if target.candidate_state else None,
+                      "history_not_comparable": (target.history_not_comparable.as_dict()
+                                                 if target.history_not_comparable else None),
+                      "acknowledged_touched": [a.as_dict() for a in target.acknowledged_touched]}
             record = brief_record(
                 company_id=target.company_id, ticker=ticker,
                 slots=[{"key": s.key, "text": s.text, "evidence_refs": list(s.evidence_refs)} for s in target.slots],
                 supersedes_id=target.brief_id, retracted=True, author=target.author,
-                note=str(args.rationale or "retracted"), created_at=datetime.now(timezone.utc))
+                note=str(args.rationale or "retracted"), created_at=datetime.now(timezone.utc),
+                record_version=target.record_version, **v2)
         try:
-            path = append_brief_record(record)
-        except AlphaError as exc:
+            ctx = WriteContext.load(ticker, today=date.today())
+            result = write_brief(record, ctx=ctx)
+        except (AlphaError, ValueError) as exc:
             print(f"✗ {exc}", file=sys.stderr)
             return 2
-        print(f"✓ {record['brief_id']} → {path}")
+        print(f"✓ {record['brief_id']} → {result['path']}")
+        print(f"  watch：新登 {len(result['registered'])}｜連結既有 {len(result['linked'])}"
+              f"｜收掉舊版 {len(result['consumed'])}｜處置 {len(result['acknowledged'])}")
         print(f"  下一步：python -m webapp materialize {ticker}（首屏會長出七句；引用解析不到的格會現形）")
         return 0
     records, errors = read_brief_records(ticker)

@@ -251,6 +251,9 @@ Step 3.5 是強模型的研究步驟：執行者是強模型就直接做，不�
 | 7 | 3.3 | 「出現在數字裡了嗎」沒有鮮度規則 | 最新一點太舊 → `insufficient_evidence`＋`days_since_last`（季 200 天、年 550 天、月 75 天） | 試跑：TSM 的年度營收最新一期停在 2023（Step 3.2 R2-c），照印就是把三年前的數字當現在；上限沿用 `edgar_xbrl._MAX_BASELINE_AGE_DAYS` 的量級 |
 | 8 | 3.3 | 分部／產品線占比序列 | 同一個欄位有 ≥2 個觀測日才成序列；兩個欄位不湊點 | 試跑：3081.TWO 的產品線占比（2025-12）與分部占比（2026-06）被湊成一條「序列」——兩種切法不能相比（L12） |
 | 9 | 3.3 | 稀釋燈 inputs 鍵名 | `base_outstanding`／`last_outstanding`（原 `first_shares`／`last_shares`） | 燈一亮 inputs 就進黑箱輸出，`shares` 是部位語意禁用字（`FORBIDDEN_POSITION_TOKENS`），`test_full_chain_acceptance` 抓到；公司的在外流通股數不是部位，但欄位名不得讓人分不出來 |
+| 10 | 3.4 | （未寫）沒有短評時首屏列的題目 | 沒有短評的 70 檔，brief 面板列的是 **v2 七題**（原本是 v1 七題） | v1 的題目含已退役的估值題（市場怎麼看、對了值多少）；每次載入的題目會被當成目標（L19）。個股頁核心面板文字 digest 因此在這 70 檔的 brief 面板變動——3.7 的前後對照要把它列為預期變動 |
+| 11 | 3.4 | 寫入端檢查 | `alpha brief --add` 寫入前讀 Neo4j（讀圖現行狀態）與 Engine C（三題），寫入後寫 `event_watches.json`；新寫一律 v2、v1 只收撤回 | 「現行」要跟現在的圖比才答得出；三題的 unmeasurable 要讀稽核區才驗得了；v1 新寫會把退役題目再帶回來 |
+| 12 | 3.4 | `still_holds` 對到 watch 的 reactivate | 醒來的舊版 `brief:` watch 處置為 still_holds 時**收掉並記收據**，不 reactivate | 新一版的 `disproof[]` 會以新的 `brief:<新 id>#n` 重登同一條件；舊版的回 active 會與新版的同條件並存（L12：同一條件兩筆 watch） |
 
 ## 0.7 P0 review 處置（2026-09-28／29；逐條原文在 workflow journal，此處只列處置）
 
