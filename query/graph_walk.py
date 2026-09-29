@@ -235,8 +235,15 @@ def lead_not_in_graph(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[
         ids = list((lead.get("entities") or {}).get("company_ids") or ())
         if ids:
             scope.append(lead)
+    # ticker 解析與 lead 的 `company_ids` 用**同一條規則**（`engine_b.entities.resolve_lead_ticker`，Phase 3 Step 3.1b）：
+    # 原本這裡另用嚴格的 `company_id_for_ticker` 重算，把 `$SIVE`／`$SOI` 報成「registry 解析不到」——
+    # 而同一則 lead 的 `company_ids` 早已解析出 Sivers／Soitec。去後綴對到多家時**列候選、不解析**。
+    from engine_b.entities import base_ticker_candidates, resolve_lead_ticker
+
+    bases = base_ticker_candidates(registry)
     hits: list[dict[str, Any]] = []
     unresolved: set[str] = set()
+    ambiguous: dict[str, list[str]] = {}
     no_first_seen: list[str] = []
     for lead in scope:
         entities = lead.get("entities") or {}
@@ -247,7 +254,10 @@ def lead_not_in_graph(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[
             elif cid not in graph:
                 missing.append(cid)
         for ticker in entities.get("tickers") or ():
-            if registry.company_id_for_ticker(str(ticker)) is None:
+            resolution = resolve_lead_ticker(str(ticker), registry, base_candidates=bases)
+            if resolution.via == "ambiguous":
+                ambiguous[resolution.ticker] = list(resolution.candidates)
+            elif resolution.company_id is None:
                 unresolved.add(str(ticker))
         if not missing:
             continue
@@ -261,7 +271,8 @@ def lead_not_in_graph(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[
     # 首見時間舊的先；缺值排最後並計數，不補假日期（INV-6）。
     hits.sort(key=lambda h: (h["first_seen"] is None, str(h["first_seen"] or ""), h["subject"]))
     return {"hits": hits, "scope_n": len(scope),
-            "extra": {"unresolved_names": sorted(unresolved), "no_first_seen": sorted(no_first_seen)}}
+            "extra": {"unresolved_names": sorted(unresolved), "ambiguous_names": dict(sorted(ambiguous.items())),
+                      "no_first_seen": sorted(no_first_seen)}}
 
 
 def supplier_no_anchor(edges: Sequence[CanonicalEdge], *,
@@ -483,6 +494,10 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             names = extra["unresolved_names"]
             out.append(f"- 另有 {len(names)} 個名字 registry 解析不到（不算命中；ID 沒解析對 ≠ 圖中真無此公司）："
                        + "、".join(f"`{n}`" for n in names))
+        if extra.get("ambiguous_names"):
+            amb = extra["ambiguous_names"]
+            out.append(f"- 另有 {len(amb)} 個名字去掉交易所後綴後對到多家（不解析、不猜）："
+                       + "、".join(f"`{n}`→{'／'.join(f'`{c}`' for c in cands)}" for n, cands in amb.items()))
         if extra.get("no_first_seen"):
             out.append(f"- 其中 {len(extra['no_first_seen'])} 則沒有首見時間，排在最後（不補假日期）")
         if extra.get("product_noise"):

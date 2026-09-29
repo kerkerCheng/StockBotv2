@@ -17,6 +17,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from typing import Iterable
 
 # $TICKER：1-6 個英數字，允許 .TW 這類後綴的點與連字號後綴由 registry 決定。
@@ -64,21 +65,67 @@ def _base_ticker_index(registry) -> dict[str, str]:
     正解是在 registry 明列 alias／deny，而不是放棄整個 base 反查。
     """
 
+    return {base: ids[0] for base, ids in base_ticker_candidates(registry).items() if len(ids) == 1}
+
+
+def base_ticker_candidates(registry) -> dict[str, tuple[str, ...]]:
+    """交易所後綴去掉後的 ticker → **全部**對應的 company_id（排序、去重）。
+
+    `_base_ticker_index` 只取唯一的那些；這一份把「多於一家」也留著，讓呼叫端能**列出候選**
+    而不是安靜丟掉（INV-3）——歧義本身是一筆要人看的資訊，不是「查不到」。
+    registry 沒有 `companies`（測試替身）時回空表：只剩嚴格比對，不猜。
+    """
+
     counts: dict[str, set[str]] = {}
-    for company in registry.companies:
+    for company in getattr(registry, "companies", ()) or ():
         ticker = str(getattr(company, "research_ticker", "") or "").upper()
         if not ticker or "." not in ticker:
             continue
         base = ticker.split(".", 1)[0]
         if base and base != ticker:
             counts.setdefault(base, set()).add(company.company_id)
-    return {
-        base: next(iter(ids)) for base, ids in counts.items() if len(ids) == 1
-    }
+    return {base: tuple(sorted(ids)) for base, ids in counts.items()}
+
+
+@dataclass(frozen=True)
+class TickerResolution:
+    """一個 lead 裡的 ticker 字串解析成什麼。**只用於 lead 關聯與走圖問句，不用於資本歸屬。**
+
+    `via`：`exact`（registry 嚴格比對，含 alias）｜`base`（去後綴後唯一對應）｜
+    `ambiguous`（去後綴後對到多家——`company_id` 為 None，`candidates` 列出全部，不猜）｜`none`。
+    """
+
+    ticker: str
+    company_id: str | None
+    via: str
+    candidates: tuple[str, ...] = ()
+
+
+def resolve_lead_ticker(ticker: str, registry, *,
+                        base_candidates: dict[str, tuple[str, ...]] | None = None) -> TickerResolution:
+    """lead 關聯的 ticker 解析：先嚴格（`company_id_for_ticker`），再去後綴唯一對應。
+
+    這是 `resolve_company_ids` 與走圖第 5 型（`query/graph_walk.py`）共用的**同一條規則**
+    （Phase 3 Step 3.1b）：原本走圖另用嚴格查詢重算，把 `$SIVE`／`$SOI` 報成「registry 解析不到」，
+    而同一則 lead 的 `company_ids` 早已由這裡解析出 Sivers／Soitec。
+    ⚠ `registry.company_id_for_ticker` 本身**不放寬**（資本歸屬路徑，見本檔檔頭與 `_base_ticker_index`）。
+    """
+
+    raw = str(ticker).upper()
+    exact = registry.company_id_for_ticker(raw)
+    if exact:
+        return TickerResolution(raw, exact, "exact")
+    bases = base_ticker_candidates(registry) if base_candidates is None else base_candidates
+    ids = bases.get(raw, ())
+    if len(ids) == 1:
+        return TickerResolution(raw, ids[0], "base")
+    if len(ids) > 1:
+        return TickerResolution(raw, None, "ambiguous", ids)
+    return TickerResolution(raw, None, "none")
 
 
 def resolve_company_ids(tickers: Iterable[str]) -> tuple[str, ...]:
-    """把 ticker 反查成已登記的 company_id；查不到的直接略過。"""
+    """把 ticker 反查成已登記的 company_id；查不到的直接略過（歧義的也不收——不猜）。"""
 
     try:
         from identity.registry import get_registry
@@ -87,13 +134,12 @@ def resolve_company_ids(tickers: Iterable[str]) -> tuple[str, ...]:
     except Exception:
         return ()
     try:
-        base_index = _base_ticker_index(registry)
+        bases = base_ticker_candidates(registry)
     except Exception:
-        base_index = {}
+        bases = {}
     seen: dict[str, None] = {}
     for ticker in tickers:
-        raw = str(ticker).upper()
-        company_id = registry.company_id_for_ticker(raw) or base_index.get(raw)
+        company_id = resolve_lead_ticker(ticker, registry, base_candidates=bases).company_id
         if company_id:
             seen.setdefault(company_id, None)
     return tuple(seen)

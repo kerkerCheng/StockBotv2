@@ -227,6 +227,30 @@ def test_lead_not_in_graph_separates_unresolved_names_from_companies_missing_fro
     assert [(h["subject"], h["companies"]) for h in q["hits"]] == [("L_old", ["co:amd"]), ("L_new", ["co:iren"])]
     # INV-1：registry 解析不到的名字不算命中，但另列（INV-3）。
     assert q["extra"]["unresolved_names"] == ["CXMT", "co:not_in_registry"]
+    assert q["extra"]["ambiguous_names"] == {}
+
+
+def test_lead_not_in_graph_resolves_tickers_with_the_lead_resolver_and_lists_ambiguous_bases() -> None:
+    """Phase 3 Step 3.1b：第 5 型的 ticker 與 lead 的 company_ids 用同一條規則——`$SIVE` 不再是誤報；
+    一個 base 對到兩家時列候選、不解析，也不混進「registry 解析不到」。"""
+    from types import SimpleNamespace
+
+    from query.graph_walk import lead_not_in_graph
+
+    class SuffixRegistry(FakeRegistry):
+        companies = [SimpleNamespace(company_id="co:sivers", research_ticker="SIVE.ST"),
+                     SimpleNamespace(company_id="co:abc_se", research_ticker="ABC.ST"),
+                     SimpleNamespace(company_id="co:abc_fr", research_ticker="ABC.PA")]
+
+    reg = SuffixRegistry({"co:sivers", "co:abc_se", "co:abc_fr"},
+                         {"SIVE.ST": "co:sivers", "ABC.ST": "co:abc_se", "ABC.PA": "co:abc_fr"})
+    leads = {"L": {"lead_id": "L", "status": "triaged_go", "first_seen": "2026-09-01",
+                   "entities": {"company_ids": ["co:sivers"], "tickers": ["SIVE", "ABC", "NOPE"]}}}
+    q = lead_not_in_graph(leads=leads, graph_nodes={"co:sivers"}, registry=reg)
+    assert q["extra"]["unresolved_names"] == ["NOPE"]
+    assert q["extra"]["ambiguous_names"] == {"ABC": ["co:abc_fr", "co:abc_se"]}
+    # 嚴格比對本身沒被放寬（測試替身照舊只認完整 ticker）
+    assert reg.company_id_for_ticker("SIVE") is None
 
 
 def test_lead_without_first_seen_sorts_last_and_is_counted_not_backfilled() -> None:

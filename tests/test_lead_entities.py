@@ -62,6 +62,46 @@ def test_unregistered_ticker_is_kept_but_not_resolved() -> None:
     assert result["company_ids"] == []
 
 
+class _SuffixRegistry:
+    """嚴格比對只認完整 research ticker；`companies` 提供去後綴的候選。"""
+
+    def __init__(self, tickers: dict[str, str]) -> None:
+        from types import SimpleNamespace
+
+        self._tickers = {k.upper(): v for k, v in tickers.items()}
+        self.companies = [SimpleNamespace(company_id=v, research_ticker=k) for k, v in tickers.items()]
+
+    def company_id_for_ticker(self, ticker: str):
+        return self._tickers.get(str(ticker).upper())
+
+
+def test_lead_ticker_resolution_is_exact_then_unique_base_and_lists_ambiguous_candidates() -> None:
+    """Phase 3 Step 3.1b：同一條規則給 lead 的 company_ids 與走圖第 5 型；歧義列候選、不猜。"""
+    from engine_b.entities import resolve_lead_ticker
+
+    reg = _SuffixRegistry({"SIVE.ST": "co:sivers", "ABC.ST": "co:abc_se", "ABC.PA": "co:abc_fr", "AAOI": "co:aaoi"})
+    assert resolve_lead_ticker("SIVE.ST", reg) == resolve_lead_ticker("sive.st", reg)
+    assert resolve_lead_ticker("SIVE.ST", reg).via == "exact"
+    base = resolve_lead_ticker("SIVE", reg)
+    assert (base.company_id, base.via) == ("co:sivers", "base")
+    amb = resolve_lead_ticker("ABC", reg)
+    assert amb.company_id is None and amb.via == "ambiguous"
+    assert amb.candidates == ("co:abc_fr", "co:abc_se")
+    none = resolve_lead_ticker("ZZZ", reg)
+    assert (none.company_id, none.via, none.candidates) == (None, "none", ())
+
+
+def test_real_registry_base_cashtag_resolves_for_leads_but_capital_lookup_stays_strict() -> None:
+    """`$SIVE` 在 lead 關聯解析得到 Sivers；`company_id_for_ticker("SIVE")` 仍是 None（資本歸屬不放寬）。"""
+    from engine_b.entities import resolve_lead_ticker
+    from identity.registry import get_registry
+
+    reg = get_registry()
+    assert reg.company_id_for_ticker("SIVE") is None
+    assert resolve_lead_ticker("SIVE", reg).company_id == reg.company_id_for_ticker("SIVE.ST")
+    assert "co:sivers_semiconductors" in extract_entities(title="$SIVE")["company_ids"]
+
+
 def _store() -> dict:
     return {
         "leads": {

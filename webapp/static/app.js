@@ -1913,6 +1913,12 @@ async function renderGraphWalk() {
         `另有 ${extra.unresolved_names.length} 個名字 registry 解析不到（不算命中；ID 沒解析對 ≠ 圖中真無此公司）：`
         + extra.unresolved_names.join('、')));
     }
+    const ambiguous = Object.entries(extra.ambiguous_names || {});
+    if (ambiguous.length) {
+      sec.appendChild(el('p', 'note',
+        `另有 ${ambiguous.length} 個名字去掉交易所後綴後對到多家（不解析、不猜）：`
+        + ambiguous.map(([name, cands]) => `${name}→${cands.join('／')}`).join('、')));
+    }
     if ((extra.product_noise || []).length) {
       sec.appendChild(drill(`展開：另有 ${extra.product_noise.length} 個 prod: 抽取副產品（只計數，不是題目）`,
         () => listOf(extra.product_noise)));
