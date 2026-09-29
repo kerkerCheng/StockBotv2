@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.2：Engine C 機械歷史表＋daily ②b）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新入口 `python -m engine_c.history_backfill`（回填；互動）與 `... --incremental`（daily ②b，排在 ② ETL 之後）。**網路**：yfinance（`query*.finance.yahoo.com`，與 ② 同一個主機群）、SEC `data.sec.gov`（companyfacts、submissions）與 `www.sec.gov/files/company_tickers.json`（與 ⑫ 基期補值同一組主機）。**寫入**：只寫 Engine C 正式庫的三張新表 `price_history`／`corporate_actions`／`fundamental_history`（可重建的 ETL 觀測；建表由 `engine_c.db._ensure_sqlite_schema` 在開庫時 CREATE IF NOT EXISTS，舊表一欄不動——2026-09-29 以 `PRAGMA table_info` 指紋比對 3.0 基準相同）。不寫人工 ledger、不寫任何 authority、不碰 `.git`、零 LLM、零憑證（SEC 只要 User-Agent）。單檔失敗記進報告、不 fail 整步；全部價格都抓不到才 exit 1（心跳段 1 看得到） |
+| **2 canonical skill／prompt／本檔** | 本節；本檔 Engine C 命令段（回填與增量兩行）；`crons/daily_task.py` 的 `DAILY_STEPS` 註解。skill 不動 |
+| **3 最窄 rule** | Windows daily 不經 Codex，`.codex/rules` 仍是 0 條，不增不減；新命令字串只進 `DAILY_STEPS` 這一個封閉清單 |
+| **4 contract test** | `tests/test_daily_task.py::test_daily_steps_are_exactly_the_closed_list`（②b 逐項相等：argv、15 分鐘、writes、network）與 `::test_timeouts_fit_inside_the_task_time_limit`；`tests/test_engine_c_history.py`（PIT、冪等、分割、20-F 只有年度、拒寫原因、落後不寫） |
+| **5 端到端 smoke** | 2026-09-29 先對正式庫的 backup API 副本跑全體回填（73 檔價格、EDGAR 43 檔寫入／29 檔無 CIK／CDNS 落後 89 天不寫），再在 writer lock 下對正式庫跑；台股月營收以既有 `python -m engine_c.monthly_revenue --backfill 48` 補到 2022-09（TPEX 2022-10 一個月 MOPS 逾時，報告列出）。回填報告：`docs/reports/2026-09-29-phase3-step32-backfill.md` |
+
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.1c：兩支唯讀 CLI 退役）
 
 | 步 | 結論 |
@@ -656,6 +666,10 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m engine_c.set_manual_field --fields <T>   # 列出已登記觀測欄位（階層式）
 # ⚠ set_manual_field 只建立待核准提案，不直接寫 ledger；核准後走 todo complete-observation
 & '.venv\Scripts\python.exe' -m engine_c.set_manual_field --list <T>     # 列出該標的已填欄位
+# 機械歷史表（Phase 3 Step 3.2）：價格 raw／adjusted＋分割、EDGAR 基本面（每份申報各一列，as-of 看 filed）
+& '.venv\Scripts\python.exe' -m engine_c.history_backfill --report <file.json>   # 全體回填（寫正式庫：先取 writer lock、不得與 daily 同時）
+& '.venv\Scripts\python.exe' -m engine_c.history_backfill --incremental          # daily ②b 跑的那一行
+& '.venv\Scripts\python.exe' -m engine_c.history_backfill --db <副本.db> --tickers AXTI   # 對暫存副本試跑（副本用 sqlite3 backup API 產生，正式庫是 WAL）
 ```
 
 ⚠ **寫入含 `$` 的金額字串不要經 PowerShell 傳參**——`US$71.3M` 會被當變數前綴展開成 `US.3M`，在 append-only ledger 造成需 supersede 才能更正的損毀。用 Python 或 heredoc。

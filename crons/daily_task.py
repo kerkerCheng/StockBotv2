@@ -136,6 +136,10 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("crons/harvest_leads.py",), 20, True, True),
     DailyStep("02_engine_c_etl", "Engine C 行情與財務 ETL",
               ("engine_c/etl_yfinance.py",), 15, True, True),
+    # ②b（Phase 3 Step 3.2，使用者定案 #15）：機械歷史表增量——價格整段重抓（股利會回頭改 adjusted）、
+    # EDGAR 只在 submissions 有新申報時重抓 companyfacts。零 LLM；單檔失敗記進報告、不 fail 整步。
+    DailyStep("02b_history_incremental", "Engine C 機械歷史表增量（收盤、EDGAR 新申報、封面股數）",
+              ("-m", "engine_c.history_backfill", "--incremental"), 15, True, True),
     DailyStep("03_fx_sync", "FX 觀測同步（取代 StockBotv2-FxSync）",
               ("scripts/sync_fx_observations.py",), 5, True, True),
     DailyStep("04_beta_snapshot", "beta 技術面與曝險快照",

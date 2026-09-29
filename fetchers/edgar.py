@@ -74,6 +74,26 @@ def _strip_html(html: str) -> str:
     return text.strip()
 
 
+def ticker_cik_map() -> dict[str, str]:
+    """SEC `company_tickers.json` 的整份 ticker（大寫）→ CIK（10 位補零）。抓不到就 raise——不回空表。
+
+    ⚠ `get_cik` 原本每查一檔就重抓整份（約 1 MB）；批次回填（Phase 3 Step 3.2）一次要查幾十檔，所以抽成一份，
+    `get_cik` 的第一段改呼叫它（權威來源與比對規則不變：大寫 ticker 逐字相等）。
+    """
+    rate_sleep()
+    headers = _build_headers()
+    headers["Host"] = "www.sec.gov"
+    resp = requests.get("https://www.sec.gov/files/company_tickers.json", headers=headers, timeout=15)
+    resp.raise_for_status()
+    data = resp.json()
+    out: dict[str, str] = {}
+    for entry in data.values():
+        symbol = str(entry.get("ticker", "")).upper()
+        if symbol and symbol not in out:
+            out[symbol] = str(entry["cik_str"]).zfill(10)
+    return out
+
+
 def get_cik(ticker: str) -> str | None:
     """ticker → CIK（10 位補零格式）。
 
@@ -82,20 +102,10 @@ def get_cik(ticker: str) -> str | None:
     ChemoCentryx 舊代號，2022 年被 Amgen 收購下市後 ticker 被 Churchill Capital Corp XI
     回收，但 browse-edgar 仍優先吐出舊 CIK），只在 company_tickers.json 找不到時才當備援。
     """
-    rate_sleep()
     try:
-        headers = _build_headers()
-        headers["Host"] = "www.sec.gov"
-        resp = requests.get(
-            "https://www.sec.gov/files/company_tickers.json",
-            headers=headers, timeout=15
-        )
-        resp.raise_for_status()
-        data = resp.json()
-        ticker_upper = ticker.upper()
-        for entry in data.values():
-            if entry.get("ticker", "").upper() == ticker_upper:
-                return str(entry["cik_str"]).zfill(10)
+        cik = ticker_cik_map().get(ticker.upper())
+        if cik:
+            return cik
     except Exception as e:
         print(f"[edgar] company_tickers lookup failed for {ticker}: {e}", file=sys.stderr)
 
@@ -117,8 +127,12 @@ def get_cik(ticker: str) -> str | None:
     return None
 
 
-def get_filings(cik: str, form_types: list[str], n: int) -> list[dict]:
-    """取最近 n 份指定 form_type 的 filing metadata。"""
+def get_filings(cik: str, form_types: list[str], n: int, *, raise_on_error: bool = False) -> list[dict]:
+    """取最近 n 份指定 form_type 的 filing metadata。
+
+    `raise_on_error=True`：抓不到就 raise，而不是回 `[]`——`[]` 同時代表「抓不到」與「沒有這種申報」，
+    需要分辨兩者的呼叫端（companyfacts 落後檢查，2026-09-29 Phase 3 Step 3.2）要帶它。
+    """
     url = f"{EDGAR_SUBMISSIONS}/CIK{cik}.json"
     headers = _build_headers()
     rate_sleep()
@@ -127,6 +141,8 @@ def get_filings(cik: str, form_types: list[str], n: int) -> list[dict]:
         resp.raise_for_status()
         data = resp.json()
     except Exception as e:
+        if raise_on_error:
+            raise
         print(f"[edgar] submissions fetch failed for CIK {cik}: {e}", file=sys.stderr)
         return []
 

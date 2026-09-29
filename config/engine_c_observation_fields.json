@@ -189,6 +189,18 @@
       "verifiability": "judgment"
     },
     {
+      "field_name": "going_concern_opinion",
+      "category": "regulatory_and_legal",
+      "label": "查核意見的 going concern 判讀（結構化）",
+      "gate_member": false,
+      "auto_source": null,
+      "authorities": [
+        "engine_c_manual"
+      ],
+      "why": "歸零旗標第四盞（Phase 3 Step 3.2，使用者 2026-09-26 定案 #6）。`litigation_and_audit_flags` 是自由文字，機械判不出顏色（`alpha/wipeout.py::going_concern_flag` 因此恆灰 `capability_absent`）；本欄把判讀結構化，燈才讀得到。value 必須是 JSON 物件：`opinion` ∈ substantial_doubt／no_substantial_doubt／not_reviewed、`quote`（查核報告或管理層 going concern 段落的逐字原文，非英語照原文；not_reviewed 可空）、`page`（頁碼或段落定位）、`report_date`（查核報告日期 YYYY-MM-DD）。驗證只有一支（`engine_c.manual_observations.validate_field_value`），提案層（`pending_observations.propose`，發編號之前）與 ledger 寫入層都呼叫它——2026-08-14 LITE 事故就是只在 ledger 端驗、核准後才失敗。 ｜verifiability=judgment（刻意）：going concern、substantial doubt 這類措辭的精度本身就是一個 claim（L11-1），「這段算不算重大疑慮」要人讀原文決定；寫入走 Engine C 判讀寫入 gate（pq2 `complete-observation`）。",
+      "verifiability": "judgment"
+    },
+    {
       "field_name": "segment_revenue_share",
       "category": "profitability",
       "label": "分部營收占比（瓶頸業務佔公司多少）",

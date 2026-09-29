@@ -152,7 +152,7 @@ def fetch_companyfacts(cik: str | int, *, timeout: float = 30.0, retries: int = 
     raise XbrlUnavailable(f"companyfacts 取不到（CIK {cik}）：{type(last).__name__}: {last}")
 
 
-def latest_filed(facts: Mapping[str, Any]) -> date | None:
+def latest_filed(facts: Mapping[str, Any], *, forms: Sequence[str] | None = None) -> date | None:
     """companyfacts 這一份快照裡**最新的申報日**。
 
     ## 為什麼需要它
@@ -167,12 +167,18 @@ def latest_filed(facts: Mapping[str, Any]) -> date | None:
     這支只回答「這份快照看到哪一天」；**要不要當成過期是呼叫端的事**——因為
     「最新申報日」本身不是缺陷，只有與 submissions index 對照之後才是
     （L16：分類要跟著資料走到需要它的地方，不是在每個消費端各猜一份）。
+
+    `forms`（前綴，例 `("20-F", "40-F")`）只看那幾種表單的 fact——與 submissions 對照時兩邊要是同一組表單，
+    否則 8-K 附的 XBRL 會讓快照看起來比實際新（2026-09-29 Phase 3 Step 3.2）。省略＝全部表單（原行為）。
     """
     newest: date | None = None
+    prefixes = tuple(forms) if forms else None
     for namespace in (facts.get("facts") or {}).values():
         for entry in namespace.values():
             for items in (entry.get("units") or {}).values():
                 for item in items:
+                    if prefixes is not None and not str(item.get("form") or "").startswith(prefixes):
+                        continue
                     filed = _as_date(item.get("filed"))
                     if filed is not None and (newest is None or filed > newest):
                         newest = filed
@@ -189,20 +195,51 @@ def companyfacts_lag(cik: str | int, facts: Mapping[str, Any]) -> tuple[date | N
     `latest_filed` 只說快照看到哪天，單獨看不出異常；只有與 submissions 對照
     才知道少了東西。2026-09-12 實測 CIK 813672（Cadence）差 **89 天**。
     """
-    snapshot = latest_filed(facts)
+    status = companyfacts_lag_status(cik, facts, forms=("10-K", "10-Q"), snapshot_all_forms=True)
+    return status["snapshot"], status["newest"], status["warning"]
+
+
+#: `companyfacts_lag_status` 的狀態封閉字彙。`unknown` 與 `current` 不得同形：對照不到 ≠ 沒落後。
+LAG_STATUSES: tuple[str, ...] = ("current", "lagging", "unknown")
+
+
+def companyfacts_lag_status(cik: str | int, facts: Mapping[str, Any], *, forms: Sequence[str],
+                            snapshot_all_forms: bool = False) -> dict[str, Any]:
+    """companyfacts 與 EDGAR submissions 的同一組表單對照（2026-09-29 Phase 3 Step 3.2 抽出）。
+
+    回 `{status, snapshot, newest, lag_days, warning}`；`status` ∈ `LAG_STATUSES`：
+    - `lagging`：submissions 有比快照新的定期報告——快照少了最近的期間；
+    - `current`：對照得到且沒有落後；
+    - `unknown`：submissions 抓不到、或兩邊任一沒有這組表單的日期——**不是「沒落後」**。
+
+    ⚠ 原本的 `companyfacts_lag` 寫死 10-K／10-Q，所以 **20-F／40-F 發行人恆不報落後**；抓取失敗也回
+    `(snapshot, None, None)`、與「沒落後」同形（plan §0.2 那兩列）。這裡把表單當參數、把失敗單獨成一態；
+    `companyfacts_lag` 改成它的薄殼，行為不變（`snapshot_all_forms=True` 保留它原本看全部表單的快照）。
+    """
+    snapshot = latest_filed(facts) if snapshot_all_forms else latest_filed(facts, forms=forms)
+    out: dict[str, Any] = {"status": "unknown", "snapshot": snapshot, "newest": None,
+                           "lag_days": None, "warning": None}
     try:
         from .edgar import get_filings          # 區域匯入：避免模組載入期的循環相依
-        filings = get_filings(str(int(cik)).zfill(10), ["10-K", "10-Q"], 4)
-    except Exception:                            # noqa: BLE001
-        return snapshot, None, None              # 對照不到就不下判斷（「查不到」≠「沒問題」，但也不冒充警告）
+        filings = get_filings(str(int(cik)).zfill(10), list(forms), 4, raise_on_error=True)
+    except Exception as exc:                     # noqa: BLE001
+        out["reason"] = f"submissions 抓不到：{type(exc).__name__}"
+        return out
     filed = [d for d in (_as_date(f.get("filed_date")) for f in filings) if d is not None]
     newest = max(filed) if filed else None
-    if snapshot is None or newest is None or newest <= snapshot:
-        return snapshot, newest, None
-    return snapshot, newest, (
-        f"companyfacts 落後 {(newest - snapshot).days} 天："
+    out["newest"] = newest
+    if snapshot is None or newest is None:
+        out["reason"] = "快照或 submissions 沒有這組表單的申報日"
+        return out
+    if newest <= snapshot:
+        out.update(status="current", lag_days=0)
+        return out
+    lag = (newest - snapshot).days
+    out.update(status="lagging", lag_days=lag, warning=(
+        f"companyfacts 落後 {lag} 天："
         f"快照最新申報日 {snapshot.isoformat()}，但 EDGAR 已有 {newest.isoformat()} 的定期報告。"
-        "取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。")
+        "取到的資料仍然合法，只是少了最近的期間——不要把它讀成「公司沒有新財報」。"))
+    return out
 
 
 def _as_date(text: Any) -> date | None:

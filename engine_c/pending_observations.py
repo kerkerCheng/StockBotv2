@@ -20,7 +20,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterator, Mapping
 
-from engine_c.manual_observations import normalize_as_of
+from engine_c.manual_observations import normalize_as_of, validate_field_value
 from engine_c.observation_fields import validate_field_name
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -117,6 +117,11 @@ def propose(
                 "runway_inputs.value 必須是合法 JSON 物件，且包含 "
                 "cash_and_equivalents、total_debt、free_cash_flow_ttm 三個數值"
             )
+    # 欄位形狀（going_concern_opinion…）與 ledger 寫入層同一支驗證——發編號之前就拒收（Phase 3 Step 3.2）。
+    try:
+        validate_field_value(spec.field_name, payload["value"])
+    except ValueError as exc:
+        raise ProposalError(str(exc)) from exc
     if supersedes_id is not None:
         payload["supersedes_id"] = str(supersedes_id).strip() or None
 

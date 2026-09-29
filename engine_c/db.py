@@ -201,6 +201,7 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
         conn.execute(
             "ALTER TABLE financial_snapshots "
             "ADD COLUMN revenue_estimate_next_fy_analysts INTEGER")
+    from engine_c.history_backfill import ensure_history_schema
     from engine_c.manual_observations import ensure_manual_observation_schema
     from engine_c.monthly_revenue import ensure_monthly_revenue_schema
     from engine_c.technical import ensure_technical_schema
@@ -208,6 +209,8 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
     ensure_manual_observation_schema(conn)
     ensure_technical_schema(conn)
     ensure_monthly_revenue_schema(conn)
+    # Phase 3 Step 3.2：價格／分割／EDGAR 基本面的機械歷史表（只 CREATE IF NOT EXISTS，不動既有表）。
+    ensure_history_schema(conn)
     conn.commit()
 
 

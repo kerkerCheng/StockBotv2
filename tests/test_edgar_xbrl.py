@@ -230,7 +230,7 @@ def test_companyfacts_lag_warns_when_edgar_has_a_newer_periodic_report(monkeypat
     facts = _facts(**{"us-gaap": {"Revenues": {"USD": [
         _entry("2025-01-01", "2025-12-31", 1.0, filed="2026-05-01")]}}})
     monkeypatch.setattr("fetchers.edgar.get_filings",
-                        lambda cik, forms, n: [{"filed_date": "2026-07-29", "form_type": "10-Q"}])
+                        lambda cik, forms, n, **_kw: [{"filed_date": "2026-07-29", "form_type": "10-Q"}])
     snapshot, newest, warning = x.companyfacts_lag(813672, facts)
     assert (snapshot, newest) == (date(2026, 5, 1), date(2026, 7, 29))
     assert warning is not None and "89" in warning
@@ -240,7 +240,7 @@ def test_companyfacts_lag_is_quiet_when_in_sync(monkeypatch) -> None:
     facts = _facts(**{"us-gaap": {"Revenues": {"USD": [
         _entry("2025-01-01", "2025-12-31", 1.0, filed="2026-07-31")]}}})
     monkeypatch.setattr("fetchers.edgar.get_filings",
-                        lambda cik, forms, n: [{"filed_date": "2026-07-31", "form_type": "10-Q"}])
+                        lambda cik, forms, n, **_kw: [{"filed_date": "2026-07-31", "form_type": "10-Q"}])
     assert x.companyfacts_lag(320193, facts)[2] is None
 
 

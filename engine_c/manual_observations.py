@@ -185,6 +185,56 @@ def _require_pnl_sign_convention(field_name: str, value: str) -> None:
         )
 
 
+#: `going_concern_opinion` 的判讀封閉字彙（Phase 3 Step 3.2，使用者 2026-09-26 定案 #6）。
+#: `not_reviewed` 是「讀過目錄、刻意記下還沒讀查核意見」——與「沒有紀錄」不同形（燈都是灰，但理由不同）。
+GOING_CONCERN_OPINIONS: tuple[str, ...] = ("substantial_doubt", "no_substantial_doubt", "not_reviewed")
+_GOING_CONCERN_KEYS = frozenset({"opinion", "quote", "page", "report_date"})
+
+
+def _validate_going_concern_opinion(value: str) -> None:
+    """`{opinion, quote, page, report_date}`；判讀了（非 not_reviewed）就必須帶逐字、頁碼與查核報告日。"""
+    try:
+        payload = json.loads(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"going_concern_opinion.value 必須是 JSON 物件：{exc}") from None
+    if not isinstance(payload, Mapping):
+        raise ValueError("going_concern_opinion.value 必須是 JSON 物件")
+    unknown = sorted(set(payload) - _GOING_CONCERN_KEYS)
+    if unknown:
+        raise ValueError(f"going_concern_opinion.value 有未登記的鍵 {unknown}；只收 {sorted(_GOING_CONCERN_KEYS)}")
+    opinion = payload.get("opinion")
+    if opinion not in GOING_CONCERN_OPINIONS:
+        raise ValueError(f"going_concern_opinion.opinion 必須是 {GOING_CONCERN_OPINIONS} 之一，收到 {opinion!r}")
+    if opinion == "not_reviewed":
+        return
+    quote = payload.get("quote")
+    if not isinstance(quote, str) or not quote.strip():
+        raise ValueError("going_concern_opinion 判讀了就必須帶 quote（查核意見的逐字原文）——措辭精度本身是 claim（L11-1）")
+    page = payload.get("page")
+    if page is None or isinstance(page, bool) or not str(page).strip():
+        raise ValueError("going_concern_opinion 判讀了就必須帶 page（頁碼或段落定位）——逐字要指得回原文（L18）")
+    report_date = payload.get("report_date")
+    if not isinstance(report_date, str) or not _DATE_ONLY.match(report_date.strip()):
+        raise ValueError("going_concern_opinion.report_date 必須是 YYYY-MM-DD（查核報告日期）")
+    try:
+        date.fromisoformat(report_date.strip())
+    except ValueError as exc:
+        raise ValueError(f"going_concern_opinion.report_date 不是合法日期：{exc}") from None
+
+
+#: 欄位值的形狀驗證（封閉表）。**提案層（`pending_observations.propose`，發編號之前）與 ledger 寫入層
+#: （`append_manual_observation`）都呼叫 `validate_field_value`**——只在 ledger 端驗，錯誤會遲到使用者核准
+#: 之後才出現（2026-08-14 LITE 事故）。沒登記的欄位不驗形狀（照舊）。
+_FIELD_VALUE_VALIDATORS = {"going_concern_opinion": _validate_going_concern_opinion}
+
+
+def validate_field_value(field_name: str, value: str) -> None:
+    """欄位有登記形狀就驗；不合法 raise `ValueError`。"""
+    validator = _FIELD_VALUE_VALIDATORS.get(str(field_name).strip())
+    if validator is not None:
+        validator(value)
+
+
 def live_observation_ids(conn: Any, ticker: str, field_name: str, as_of: str) -> list[str]:
     """這個 (ticker, field_name, as_of) 目前有幾筆「生效」紀錄——`supersedes_id` 沒被指到的那些。
 
@@ -277,6 +327,7 @@ def append_manual_observation(
         raise ValueError("manual observation requires value, provenance, as_of, and author")
     _require_machine_comparable_if_mechanical(str(fields["field_name"]), str(fields["value"]))
     _require_pnl_sign_convention(str(fields["field_name"]), str(fields["value"]))
+    validate_field_value(str(fields["field_name"]), str(fields["value"]))
     fields["as_of"] = normalize_as_of(str(fields["as_of"]))
     sensitive = sensitive_payload_path(fields, "manual_observation")
     if sensitive is not None:

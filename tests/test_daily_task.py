@@ -38,6 +38,8 @@ EXPECTED_STEPS = (
     # (key, argv, timeout, writes, network, kind, essential, capture, requires, llm_task)
     ("01_harvest", ("crons/harvest_leads.py",), 20, True, True, "command", False, None, None, None),
     ("02_engine_c_etl", ("engine_c/etl_yfinance.py",), 15, True, True, "command", False, None, None, None),
+    ("02b_history_incremental", ("-m", "engine_c.history_backfill", "--incremental"), 15, True, True,
+     "command", False, None, None, None),
     ("03_fx_sync", ("scripts/sync_fx_observations.py",), 5, True, True, "command", False, None, None, None),
     ("04_beta_snapshot", ("scripts/daily_beta_snapshot.py", "--format", "markdown", "--risk-view", "changes"),
      10, True, True, "command", False, None, None, None),
@@ -410,7 +412,8 @@ def test_failed_renewal_skips_the_remaining_write_steps(tmp_path: Path, monkeypa
 
     def flaky(owner, **kw):
         calls["n"] += 1
-        if calls["n"] > 4:  # 開頭一次＋前三個寫入步驟續期成功，之後被外人接手
+        # 開頭一次＋前四個寫入步驟（①②②b③；②b 是 Phase 3 Step 3.2 新增的）續期成功，之後被外人接手
+        if calls["n"] > 5:
             raise writer_lock.WriterLockHeld({"owner": "interactive", "expires_at": "2999-01-01"})
         return real(owner, **kw)
 
