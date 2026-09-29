@@ -107,12 +107,18 @@ def declared_half(brief: Any, *, company_id: str | None, ticker: str | None, rec
 
 
 def _local_date(stamp: Any) -> date | None:
+    """排程時區的日期。排程時區讀不到時退回本機時區——與 `record_trade` 對 `_today()` 的退回一致，
+    **不讓成交 crash**（3.8 R2-b：原本只接 TypeError／ValueError，設定檔讀不到的 OSError 會連賣出一起擋下）。"""
+    try:
+        moment = datetime.fromisoformat(str(stamp))
+    except (TypeError, ValueError):
+        return None
     try:
         from engine_b import event_watch as ew
 
-        return datetime.fromisoformat(str(stamp)).astimezone(ew._local_timezone()).date()
-    except (TypeError, ValueError):
-        return None
+        return moment.astimezone(ew._local_timezone()).date()
+    except Exception:  # noqa: BLE001 — 設定檔讀不到／時區名不認得：退回本機時區
+        return moment.astimezone().date()
 
 
 def _candidate_row(artifact: Mapping[str, Any], ticker: str | None,

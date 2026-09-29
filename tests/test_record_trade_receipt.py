@@ -519,3 +519,18 @@ def test_board_row_from_an_older_narrative_version_is_flagged(env) -> None:
     derived = receipt["derived"]
     assert derived["status"] == "upstream_unavailable" and "不是現行" in derived["reason"]
     assert receipt["declared"]["brief_id"] in derived["reason"] and "ib_" + "0" * 16 in derived["reason"]
+
+
+def test_an_unreadable_schedule_timezone_never_blocks_the_trade(env, monkeypatch) -> None:
+    """3.8 R2-b：排程時區設定讀不到（OSError）時，「今天」退回本機日期、artifact 的日期換算退回本機時區——賣出照記。"""
+    from engine_b import event_watch as ew
+
+    def boom(*a, **k):
+        raise FileNotFoundError("config/daily_routine.json")
+
+    monkeypatch.setattr(ew, "_local_timezone", boom)
+    module = env["module"]
+    module._today = boom
+    assert module.main(_trade("FRA:2DG", "sell", "--why", "時區設定壞了也要記得下來", "--apply")) == 0
+    receipt = _entry(env)["research_receipt"]
+    assert any("排程時區讀不到" in p for p in receipt["input_problems"])
