@@ -2,7 +2,7 @@
 date: 2026-09-26
 revised: 2026-09-29（P0 review 後改寫；使用者追加定案 13–16）
 topic: phase3-candidate-states-three-questions
-status: active
+status: completed
 derived_from: docs/ROADMAP.md（Phase 3，含本 plan §0.4 的 amendment A1–A7）、docs/brainstorms/2026-09-22-graph-first-direction-decision.md（G3、G6、G8、G9、G12；§4.2、§6）、docs/reports/2026-09-26-phase2-closeout.md §5、docs/reports/2026-09-25-phase1-closeout.md §7、docs/plans/2026-09-22-001-refactor-phase0-retire-plan.md（`config/alpha_screen.json` 留給 Phase 3）
 plan_review: P0 已做（2026-09-28，使用者問「需要 R2 嗎」後以 workflow 跑：8 面向唯讀審查→每個 finding 獨立反方驗證；95 個 finding，成立 57、推翻 7、31 個因額度未驗——其中獨有的由 plan 作者自己查證，成立 4）；完整性補查（2026-09-29，改寫後 c427d0c，3 視角：37 個 finding，成立 22、推翻 4、11 個因額度未驗——作者自查）。全部處置見 §0.7
 ---
@@ -227,7 +227,7 @@ go 之後的寫入由收到 go 的那個 session 做（§6 第 3 點）。
 | 3.7 | 個股頁：首屏、稽核區、readiness、argument 鏈段／標題、downside 連 watch | ✅ | 執行模型 | `f942d26` |
 | 3.8 | `record_trade.py` 研究收據（R2-b；#16 預先授權；R2-b 一併審 3.6 的 `hard_caps` 匯出） | ✅ | 執行模型 | `be73d4e`＋收尾 `ec8f19b`（R2-b 兩位都 GO） |
 | 3.9 | 新管線 full chain 測試（保留現行 12 條活判準） | ✅ | 執行模型 | `5ae780a` |
-| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
+| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅（結案 R2：五位唯讀審查者全部 GO、blocking 0） | ✅ | 執行模型 | `889bc0e`＋R2 GO 後 commit |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 
@@ -697,3 +697,13 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 39. **research 面板 digest 會隨每日共識 notes 變**（結案 G3）：跨日語意 diff 的判準只能是「排除 notes 後不變」；另有基準前就有的怪象——「首次出現於」的日期每天往後推、2455.TW 同一條 note 曾重複 5 次（`alpha/refresh/resolver.py`，不在本 Phase 範圍）。
 40. **`get_wipeout_inputs`→`wipeout_flags` 的串接寫了兩次**（`alpha/providers/candidates.py` 與 `briefing/alpha_view/sources.py`；結案 G4）：同一組取數與判定函式、實測一致，但兩份串接日後會各自長。
 41. **`held` 不可宣告有兩道防線，測試分不出哪一道擋下**（結案 G2 變異：兩道都拿掉才紅）——各加一條只拆一道的測試，或刪掉其中一道。
+42. **同一份 v2 敘事裡兩條相同的 self 反證會登記兩筆同條件 watch**（結案 R2）：`v2_write_problems` 的 `live_by_condition` 只收 `thesis:`／`reading:` 來源，本版 `disproof[]` 之間不互比（暫存副本重現；真實 ledger 沒有）。修法候選：本版內 normalize(condition) 重複即拒收；活的 `brief:` 來源要不要一起比（跨公司同條件算不算重複）要使用者定義。
+43. **`{rel_return_30d}`／`{rel_return_90d}` 寫不進任何格**（結案 R2）：`SIMPLE_PLACEHOLDER` 是 `[a-z_]+`、不收數字，兩個登記的 placeholder 被當成格式錯誤；`priced_in` 的框架又要求組的兩行有值時一併引用。修 regex 之前先定 #44。
+44. **「首屏沒有價格報酬」沒有型別層強制**（結案 R2）：`現價 {price}` 放 demand、字面「賭對報酬 +50%」放 our_bet 都收（禁字表只有「隱含報酬」、只有 what_must_be_true 擋 `{price}`）；首屏卡另附收盤價走勢圖（2026-09-15 起）。今天 73 檔 0 命中。相對組漲幅能不能上首屏、走勢圖算不算首屏——**使用者決定**，之後才修 #43。
+45. **分部／產品線占比在 as-of 下洩漏未來**（結案 R2）：`engine_c/three_question_inputs.py::_segment_points` 沒有 T 過濾（as_of 是期末日不是可知日，要一併看 `recorded_at`）；今天被 view 的 `point_in_time_unavailable` 擋住。**是 #21 的前置條件**。
+46. **自家百分位「滿 3 年」只看頭尾跨度**（結案 R2）：LRCX 窗內 751 個交易日只有 314 個樣本（淨負債只有年報點，2–7 月全缺）仍給 98.4。至少把覆蓋率印進 detail；要不要設覆蓋率下限是新門檻，**使用者決定**。
+47. **20-F 的 `inputs_incompatible` 比字彙定義寬**（結案 R2）：HIMX／GFS 的封面股數是 0 列（輸入不存在，不是身分不相容），GFS 掛牌的是普通股；與 #9 一起處理。
+48. **三題的兩個測試缺口**（結案 R2）：百分位的嚴格小於沒有平手樣本的測試（改成 `<=` 全綠）；無布林結論的斷言只守 `evaluate()`，沒守 materialize 後的 section。
+49. **TYO:7803 恆亮**（結案 R2）：`config/holdings_coverage.json` 已記使用者 2026-07-29 決定不研究，`held_index` 與心跳沒讀它，「持股解析不到 1」天天出現（L14-4）。把 ignored 附到 payload（L16）、另計「使用者決定不研究」；與 #13 一起。
+50. **心跳以讀寫模式開 Engine C 私有庫**（結案 R2；09-17／09-19 既有）：`get_conn()` 會跑 `_ensure_sqlite_schema`；改成 `mode=ro` 的 URI 連線。另：`?mode=ro` 讀 WAL 庫仍會更新 `-shm` mtime，審查證據只看主檔 sha 與 `-wal` 大小。
+51. **驗收工具的盲區**（結案 R2）：殭屍 grep A–H 以（檔，組）為粒度會吸收同檔新命中（I 組已釘命中數）、理由文字未隨 3.6 的接手句更新、掃描範圍不含 `fetchers/` 等（可加「範圍外命中數 vs 上次」計數）；敘事寫入不記 ride 當時的 status／result_digest（日後無法證偽「寫入當時現行」，收據已記、寫入端可比照、不進 id 欄位）；completion gate 只數函式、不清點既有測試的斷言翻面；CLI 的建模待補不印間接供應商（只有 APP 印、JS 無測試）；基準報告的函式名單 sha 無法重現、「research 排除 notes 後不變」無法重算——基準快照要連同正規化命令與面板原文一起存。

@@ -8,7 +8,7 @@
 > 證據由一次唯讀 workflow 收集（HEAD `5ae780a`、基準 `559414e`；變異只在 `git archive` 匯出到 `%TEMP%` 的副本上做，repo `git status` 前後皆空），
 > 本報告 commit 另含三處結案修正（§1 gate 8 的註）。
 
-## 0. Phase 3 做了什麼（19 個 commit，2026-09-29 → 09-30）
+## 0. Phase 3 做了什麼（19 個 Step commit＋2 個結案 commit，2026-09-29 → 09-30）
 
 | Step | commit | 一句話 |
 |---|---|---|
@@ -22,7 +22,7 @@
 | 3.7 | f942d26 | 個股頁：首屏候選狀態＋三題三個字、稽核區三題、讀圖升核心、argument 鏈段改讀騎的讀圖需求側、downside 反證連 watch |
 | 3.8 | be73d4e、ec8f19b | `record_trade.py` 研究收據（#16 預先授權）：缺 v2 敘事的 alpha 買進 fail closed（exit 4）、兩種放行互不放行；R2-b 兩位都 GO |
 | 3.9 | 5ae780a | 新管線 full chain（夾具版）；真 runtime 那份 27 passed＝3.0，一條未動 |
-| 結案 | （本 commit）、（R2 後 commit） | 本報告；殭屍 grep keep-list 腐壞 1 條、docstring 指向、`indirect` 斷言三處結案修正；R2 GO 後 ROADMAP Phase 3 ✅、plans README completed |
+| 結案 | 889bc0e、（R2 GO 後的 commit） | 本報告；殭屍 grep keep-list 腐壞 1 條、docstring 指向、`indirect` 斷言三處結案修正；R2 GO 後 ROADMAP Phase 3 ✅、plans README completed |
 
 ## 1. 九項 completion gate（plan §12）
 
@@ -55,12 +55,12 @@
 |---|---|---|---|---|
 | ① | 有敘事的檔 100% 有候選狀態 | ✅ 現行敘事是 v2 的檔數／有現行敘事的檔數＝**4／4**（AXTI `priced_wait`、COHR／LITE `pass`（非邊緣：約 553 億美元 22 位／約 826 億美元 25 位）、SIVE.ST `missing`）；v1 現行 0；ledger parse errors 0 | 敘事 | `python -m alpha brief <ticker> --format json`（逐檔，最新未撤回的一列）；`engine_b.disproof.current_briefs()` |
 | ② | 「缺 X」100% 指向活的 watch | ✅ **2／2**：AXTI → `ew_0148_2026-09-29`（date，until 2026-11-13、expires 2027-01-15）、SIVE.ST → `ew_0149_2026-09-29`（date，until 2026-11-26、expires 2027-01-31），皆 `active`、`wake_brief` 是本公司、`attributed_watches` 歸屬本檔、未過期 | 敘事 × 等待 registry | `python -m engine_b.event_watch list`（找 ew_0148、ew_0149）；`engine_b.narrative_watches.attributed_watches` |
-| ③ | 三題每題對每檔有值或有 `absence_kind` | ✅ 73 份個股頁 × 三題逐行 **695／695**（會死嗎 292／292、已定價 292／292、出現在數字裡 111／111）；依 kind：有值 279、`not_yet_recorded` 292、`upstream_unavailable` 63、`insufficient_evidence` 53、`inputs_incompatible` 8。缺席最多的三列是**結構性的**：`wipeout_going_concern` 73（pq2 [657]–[661] 未 go）、`cohort_median`／`rel_return_30d`／`rel_return_90d` 各 73（主題等權組 0 組，[656] 未 go） | 敘事（個股頁稽核區） | `library/private/app/state/analyst_view/*.json` 的 `three_questions.lines` |
+| ③ | 三題每題對每檔有值或有 `absence_kind` | ✅ 73 份個股頁 × 三題逐行 **695／695**（會死嗎 292／292、已定價 292／292、出現在數字裡 111／111）；依 kind：有值 279、`not_yet_recorded` 292、`upstream_unavailable` 63、`insufficient_evidence` 53、`inputs_incompatible` 8。缺席最多的三列是**結構性的**：`wipeout_going_concern` 73（pq2 [657]–[661] 未 go）、`cohort_median`／`rel_return_30d`／`rel_return_90d` 各 73（主題等權組 0 組，[656] 未 go） | 敘事（個股頁稽核區） | `library/private/app/analyst_view/*.json` 的 `view.three_questions.lines` |
 | ④ | 歸零旗標四盞有值的檔數 | ✅ **現金跑道 67→67、負債 70→70、稀釋 0→30、going concern 0→0**。稀釋 30 檔全是 SEC 封面股數來源（國內申報人，一年窗滿；IREN 窗未滿＝`insufficient_evidence`），非 SEC 來源 0 檔亮燈；顏色與 3.0 相比只有 dilution 由灰變黃 24／綠 6。GC 0：結構化欄位與取數已交付（3.2），觀測寫入要 pq2 [657]–[661] go——**已交付、未生效** | 敘事（個股頁稽核區） | `engine_c.checklist.get_wipeout_inputs`＋`alpha.wipeout.wipeout_flags`（唯讀重算，與 artifact 逐格相同） |
-| ⑤ | 新成交事件 100% 帶收據 | ✅ **已交付、未生效**：be73d4e 之後新增 alpha 成交事件 **0 筆**（trade_log 仍是基準的 2 筆，都在 3.8 之前、沒有 `research_receipt`，§5 #33 當缺席處理）。測試證明：`tests/test_record_trade_receipt.py` 31 條＋`test_record_trade.py`（33 passed，後者測試前後 trade_log sha 不變）＋3.9 整鏈的 `--apply`（假 Sheet、暫存 log）斷言事件帶收據 | 追蹤表（trade_log） | `python -m pytest -q tests/test_record_trade_receipt.py tests/test_record_trade.py tests/test_phase3_full_chain.py` |
-| A1 | v1 不變 | ✅ v1 7 行 id 重算 **7／7**，與基準清單逐位相同（v2 8 行另 8／8） | 敘事 | `alpha.providers.briefs` id 重算腳本（同 3.0） |
+| ⑤ | 新成交事件 100% 帶收據 | ✅ **已交付、未生效**：be73d4e 之後新增 alpha 成交事件 **0 筆**（trade_log 仍是基準的 2 筆，都在 3.8 之前、沒有 `research_receipt`，§5 #33 當缺席處理）。測試證明：`tests/test_record_trade_receipt.py` 30 passed＋`tests/test_record_trade.py` 18 passed＋`tests/test_phase3_full_chain.py` 3 passed（三檔合跑 51 passed，跑前跑後 trade_log sha 不變；3.9 整鏈的 `--apply` 用假 Sheet、暫存 log 斷言事件帶收據） | 追蹤表（trade_log） | `python -m pytest -q tests/test_record_trade_receipt.py tests/test_record_trade.py tests/test_phase3_full_chain.py` |
+| A1 | v1 不變 | ✅ v1 7 行 id 重算 **7／7**，與基準清單逐位相同（v2 8 行另 8／8） | 敘事 | `python -c "import json,pathlib; from alpha.narrative.contracts import new_brief_id as f; rows=[json.loads(l) for p in pathlib.Path('library/private/alpha/briefs').glob('*.jsonl') for l in p.read_text(encoding='utf-8').splitlines() if l.strip()]; print(sum(f(r)==r['brief_id'] for r in rows), len(rows))"`（2026-09-30：15 15） |
 | — | 反證登記 | ✅ 現行 v2 的 `disproof[]` 共 **10 條＝新登 1（AXTI #5 → `ew_0151`）＋連結 9**（AXTI #1–4 → ew_0100／0128／0131／0132 active；SIVE.ST #1–4 → ew_0107／0109／0110／0111、#5 → ew_0147）；link_breaks 0；無重複登記。**`semantic_active` 字面是 26、不是 37**：active 26＋fired 11＝37＝基準 36＋新登 1——少掉的 11 筆是 2026-09-30 05:31 daily 被同一則 lead（`lead_20ce4e7d…`，Sivers 臨時股東會召集公告）叫醒（active→fired），與登記無關；fired 仍算活連結，`semantic_pending_check`＝11 待判（研究動作） | 等待 registry | `python -m engine_b.event_watch counters` |
-| A2 | 主題等權組 | ✅ ledger **0 組**（[656] 未 go），已定價②③全體印 `not_yet_recorded` | 機制存在與否 | `ls library/private/alpha/theme_cohorts` |
+| A2 | 主題等權組 | ✅ ledger **0 組**（[656] 未 go），已定價②③全體印 `not_yet_recorded` | 機制存在與否 | `python -m alpha theme-cohort`（唯讀；目錄在第一筆寫入前不存在） |
 | A6 b | 走圖第 5 型 `unresolved_names` | ✅ **12 → 10**（SIVE、SOI 不再列）；圖 2688 節點不變，九型（命中，母體）與基準完全相同 | 圖（走圖問句） | `python -m query.graph_walk --json` |
 | A5、A6 a／c、A7、3.6 | 符號與 kind 存在、拒收測試 | ✅ 見 §1 gate 4／8；`candidates` kind 已登記 | 機制存在與否 | `python -m webapp status` |
 
@@ -78,7 +78,7 @@
 ## 4. 執行中發現、實際做了什麼（偏差摘要；全文在 plan §0.6）
 
 - **資料口徑（3.2／3.3／3.5）**：#1–#9、#13——表多 `form`／`tag` 欄讓每列指得回原 tag；落後檢查抽成 `companyfacts_lag_status`（20-F 也報、抓不到＝`unknown`、快照日只看營收白名單）；as-of 規則一份住 `shared/as_of.py`；20-F／40-F 一律 `inputs_incompatible`（不猜 ADS 比率）；序列鮮度規則；兩種占比切法不湊點；已定價①的口徑判定要營業利益與營收同一季收尾、不過期（COHR、LITE 原本拿兩三年前的數判 EV/S）。
-- **敘事契約（3.4／3.5）**：#10–#12、#14–#17——沒有短評的 69 檔改列 v2 七題；寫入端讀圖與三題；舊版 `brief:` watch 收掉不 reactivate；連結斷由 3.6 的候選推導判；寫入前先做 daily 同一條時間轉換、登記先在副本預演；`{in_numbers_latest}` 說明改成年增率；測試與真實 ledger 隔離（3.4 的一條測試一直在讀真實資料）。
+- **敘事契約（3.4／3.5）**：#10–#12、#14–#17——沒有短評的 69 檔改列 v2 七題；寫入端讀圖與三題；舊版 `brief:` watch 收掉不 reactivate；「連結來源換版進 `narrative_rewrite`」3.4 **漏做**（R2-a N1 抓到），移到 3.6 由候選推導判；寫入前先做 daily 同一條時間轉換、登記先在副本預演；`{in_numbers_latest}` 說明改成年增率；測試與真實 ledger 隔離（3.4 的一條測試一直在讀真實資料）；**3.4 收尾（6dd0fd4）在 `alpha/cli.py` 直接 import `engine_b`、違反 `test_layer_separation` 且已 push**——當時只跑子集測試沒抓到，3.5 修正並改跑全套。
 - **候選板（3.6）**：#18–#26——`_held` 的 company_id 集合是舊集合的超集（pq1 排序逐位不變）；宇宙＝materialize 目錄 ∪ 敘事 ∪ 只在 Sheet 持有；beta 不算「解析不到」（否則恆 ≥10）；字彙與純函式搬到零 I/O 的 `alpha/candidates.py`（請求路徑哨兵原本會變瞎）；歸零旗標印盞數不印每檔最差色（灰不是綠）；drain 段 1 的第二份 watch 分類改呼叫 `classify_watch`。
 - **個股頁（3.7）**：#27–#34——三題進選配面板 `three_questions`（Datum 在 builder 組）；候選與 downside 為注入面板；讀圖 context 搬進 alpha；鏈段三種缺席分開說、沒有 sub≥4 邊的句子不再自相矛盾；downside 由 `engine_b.disproof.downside_rows` 產生、同一筆 watch 只印一列；R1 38 條＋覆核 13 條全修（as-of 明確拒絕、Sheet 讀不到＝持有判定暫停、坐了沒讀與沒坐的層分開…）。
 - **收據（3.8）**：#35–#40——三題稽核行讀個股頁 artifact、候選列讀候選板 artifact，兩份各驗是不是今天；exit 4 與旗標誤用 exit 2；`--log-only` 不回推持有；FRA:2DG 經 `_TICKER_ENRICHMENT` 解析（§5 #35）；R1 28 條（1 blocking：三題整段缺席被記成 available＋空陣列）全修；**#40 流程違規**：R2-b 期間執行者在同一 working tree 跑變異與寫 3.9 檔（審查者以 mtime 防護確認證據未受影響）。
@@ -130,6 +130,32 @@
 
 最後一次全套：`python -m pytest -q` → **2867 passed, 1 skipped**（2026-09-30 07:42，結案修正後；新增的是一行斷言、不是函式，所以函式數不變）；`python -m audit invariants` → 13 PASS／4877 筆。
 
-## 7. 結案 R2
+## 7. 結案 R2（2026-09-30；乾淨 context 的唯讀審查者，使用者已常規 opt-in）
 
-（R2 回來後填。）
+**Verdict：GO**——五位審查者（四位分工跑 plan §12 WORK_REQUEST 八項、一位逐條核對本報告）**全部 GO、blocking 0**（所以沒有啟動反方驗證者）。
+各自重跑成立的：全套 2867 passed／1 skipped（唯一 skip 是 `test_layer_separation.py:313` 刻意的空參數集，自基準 0 行 diff）；audit 13 PASS／4877；
+測試檔 184→194、函式 +228／−1（regex 與 AST 兩種算法相同，含非 ASCII 函式名），拿掉那一條的去向＋本 commit 補的斷言在副本上變異會紅；
+敘事 ledger v1 7／7、v2 8／8 id 重算、`rides[]` 本公司在供給側、`disproof[]` 無重複登記、缺 X／等回落的 watch active 且歸屬；
+自造 5 個應拒收的 v2 spec 全被拒、對照組寫入暫存目錄成功、真實 ledger 與 `event_watches.json` sha256 前後不變；
+三題 695／695、抽三檔（國內、20-F、台股）對歷史表手算自家百分位與 artifact 相同、沒有門檻或布林結論欄位、營收的 PIT 成立；
+候選板組內按 ticker、無分數、FRA:2DG 在已持有、beta 不在任何組、非邊緣不在可開；心跳段 2 兩行照印含 0；
+`CORE_PANELS` 含 readings 不含 fundamental、鏈段需求端不經 `get_bottlenecks`（定義與 PointInTime 探針仍在）、downside 連 watch；
+`record_trade.py` 對 FRA:2DG／TYO:7803／QQQ 各 dry-run 一次、trade_log sha 不變；殭屍 grep 三個 0；Decision Store 三檔、AGENTS.md、`company_id_for_ticker` 不變。
+五位的起訖 HEAD 都是 `889bc0e`、`git status` 前後皆空（主執行者 R2 期間沒有寫 working tree）。
+
+**Non-blocking 的處置**（同一條多位提到的合併；需要改程式的一律不在 R2 GO 之後動，登記 plan §14 #42–#51 帶到 Phase 4）：
+
+| # | 內容 | 處置 |
+|---|---|---|
+| 1 | 本報告⑤測試條數寫錯（31／33）；③的 artifact 路徑寫錯（多了 `state/`）；A1、A2 的查證命令不能直接重跑；§0「19 個 commit」含糊 | 本 commit 更正（30／18／3 passed；`library/private/app/analyst_view/*.json` 的 `view.three_questions.lines`；A1 改一行可跑的 id 重算、A2 改 `python -m alpha theme-cohort`） |
+| 2 | §4 漏寫 6dd0fd4 已 push 的分層違規（只跑子集測試）；#14 寫得偏中性（原文是 3.4 漏做、R2-a 抓到） | 本 commit 補進 §4 |
+| 3 | ROADMAP Phase 3 列的「做什麼」欄沒有照 amendment 改寫（仍寫 `--receipt`、缺收據 fail closed、主題籃子、籃子頁），⑤沒寫只算 alpha | 標 ✅ 的同一個 commit 照 A1／A2／A4／A5／A7 的**已定案用語**同步（不改任何驗收或定義，只把漏改的字換成 amendment 原文），並在該列註明 |
+| 4 | 「research 排除 notes 後 73／73 相同」無法獨立重算（基準只存 digest，不存面板原文） | 照實記錄：這一條只有結案證據收集那次算過；之後的基準快照連同要比的面板原文（或已排除 notes 的 digest）一起存（§14 #51） |
+| 5 | 同一份 v2 敘事裡兩條相同的 self 反證會登記兩筆同條件 watch（探針在暫存副本上重現；真實 ledger 沒有這種情形） | §14 #42 |
+| 6 | `{rel_return_30d}`／`{rel_return_90d}` 兩個登記的 placeholder 因 regex 不收數字而寫不進任何格；「首屏沒有價格報酬」今天的資料成立（0 命中）但型別層沒有強制（`現價 {price}`、字面「報酬 +50%」可寫進首屏格） | §14 #43、#44——兩條連在一起：修 regex 之前要先定「相對組漲幅能不能上首屏」，**使用者決定** |
+| 7 | 分部占比在 as-of 下沒有 T 過濾（`_segment_points`）；今天被 view 的 `point_in_time_unavailable` 擋住 | §14 #45，寫成 §14 #21 的前置條件 |
+| 8 | 自家百分位的「滿 3 年」只看頭尾跨度（LRCX 751 個交易日只有 314 個樣本、2–7 月全缺）；百分位用嚴格小於沒有測試守；20-F 的 `inputs_incompatible` 比字彙定義寬（GFS 不是 ADS）；無布林結論的測試只守 `evaluate()` | §14 #46–#48 |
+| 9 | TYO:7803 天天以「持股解析不到」出現，但 `config/holdings_coverage.json` 已記使用者 2026-07-29 決定不研究（恆亮的問句） | §14 #49（與 #13 一起） |
+| 10 | 心跳以讀寫模式開 Engine C 私有庫（09-17／09-19 既有）；`?mode=ro` 讀 WAL 庫仍會更新 `-shm` mtime（不能當「有人碰過」的訊號） | §14 #50 |
+| 11 | 殭屍 grep A–H 以（檔，組）為粒度會吸收同檔新命中（I 組已釘數）；掃描範圍不含 `fetchers/` 等；敘事寫入不記 ride 當時的 status（日後無法證偽「寫入當時現行」）；completion gate 只數函式、不清點斷言層級的翻面；CLI 的建模待補不印間接供應商（只有 APP 印、JS 無測試）；基準的函式名單 sha 無法重現 | §14 #51 |
+| 12 | SIVE.ST 敘事連結的四條 thesis 反證在 fired（Sivers 臨時股東會公告叫醒） | 已在 §6；下一個互動 session 判讀 11 筆（研究動作） |
