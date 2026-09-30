@@ -174,6 +174,11 @@ def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, input
     def locate(requests, values=None):
         # 按欄名回格子（2026-09-30：既有列多定位一格 currency，按位置回會錯位）。
         calls.setdefault("located_with", []).append(values)
+        # 那一列的三格（股數、成本、幣別）必須用同一個 symbol＋broker 定位——幣別格改成別的 match（例：CASH 列）
+        # 就是 B1 原樣回來（第三次覆核 N1：替身原本不看 match，那種變異全綠）。
+        row_matches = [r["match"] for r in requests if r["column"] in ("shares", "avg_cost", "currency")]
+        assert all(m == row_matches[0] for m in row_matches), f"那一列的格子不是同一個 match：{requests}"
+        assert all(set(m) == {"symbol", "broker"} for m in row_matches), f"那一列要用 symbol＋broker 定位：{requests}"
         by_column = {"shares": {"a1": "B2", "current": str(held_shares)}, "avg_cost": {"a1": "C2", "current": "100"},
                      "currency": {"a1": "F2", "current": row_currency}}
         return [dict(by_column.get(r["column"], {"a1": "D5", "current": "50000"})) for r in requests]

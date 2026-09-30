@@ -833,7 +833,9 @@ def test_existing_row_trade_currency_must_equal_the_sheet_rows_currency(monkeypa
     argv = ["--symbol", "AXTI", *_ROW] + (["--log-only", "--apply"] if log_only else ["--apply"])
     assert module.main(argv) == 2
     err = capsys.readouterr().err
-    assert "沒給 --currency，預設 USD" in err and expect in err
+    assert "沒給 --currency，預設 USD" in err
+    # --log-only 不碰現金格：指路不提現金欄（第三次覆核順手修）
+    assert (expect.split(" --cash-column")[0] in err and "--cash-column" not in err) if log_only else expect in err
     assert calls["writes"] == [] and not module.TRADE_LOG.exists()
 
 
@@ -889,3 +891,67 @@ def test_cash_column_case_and_spaces_are_normalised_before_the_vocabulary_check(
 
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0))
     assert module.main(["--symbol", "AXTI", *_ROW, "--cash-column", " Cash_USD "]) == 0
+
+
+# ---------------------------------------------------------------------------
+# 14. R2 第三次覆核（12f36a7：GO）——測試護欄與指路措辭
+# ---------------------------------------------------------------------------
+
+def test_the_sheet_rows_currency_is_normalised_before_comparing(monkeypatch, tmp_path) -> None:
+    """N2：Sheet 那一列手打成 ` jpy `（Sheets 的 $F="JPY" 不分大小寫，市值照算）——比對前要正規化，不得誤擋。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency=" jpy ")
+    assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "JPY", "--cash-column", "none",
+                        "--fx-to-base", "0.0068"]) == 0
+
+
+def test_a_twd_cash_column_without_a_currency_is_refused_before_reading_the_sheet(monkeypatch, tmp_path) -> None:
+    """T2：沒給 --currency（＝USD）卻給 cash_twd——美元金額會被扣進台幣欄；在讀 Sheet 之前擋。"""
+    from tests.test_record_trade import _module
+
+    from fetchers import gsheets as gs
+
+    reads = []
+    monkeypatch.setattr(gs, "read_portfolio_values", lambda **k: reads.append(k) or [["symbol"]])
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    assert module.main(["--symbol", "LON:VWRA", *_ROW[:-2], "--broker", "FUBON", "--cash-column", "cash_twd"]) == 2
+    assert reads == []
+
+
+@pytest.mark.parametrize("fx", ["0", "-0.0068"])
+def test_a_non_positive_fx_is_refused_at_the_door(monkeypatch, tmp_path, capsys, fx) -> None:
+    """N4：匯率 0 或負數原本在硬擋那端被當成「未提供」、收尾卻指路 --override——入口就拒收。"""
+    from tests.test_record_trade import _module
+
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    assert module.main(["--symbol", "7803.T", *_ROW, "--currency", "JPY", "--cash-column", "none",
+                        "--fx-to-base", fx]) == 2
+    assert "--fx-to-base 必須大於 0" in capsys.readouterr().err
+
+
+def test_mismatch_hints_are_complete_in_one_go(monkeypatch, tmp_path, capsys) -> None:
+    """N3／F3：幣別不符的提示一次寫齊——USD 列也寫現金欄；賣出不量硬擋，不叫人給匯率。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency="USD")
+    assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "TWD", "--cash-column", "none"]) == 2
+    assert "請給 --currency USD --cash-column cash_usd 或 none" in capsys.readouterr().err
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency="JPY")
+    sell = ["--symbol", "AXTI", "--side", "sell", "--shares", "1", "--price", "350", "--executed-at",
+            "2026-09-30T10:00:00+09:00", "--broker", "IB", "--why", "x"]
+    assert module.main(sell) == 2
+    err = capsys.readouterr().err
+    assert "請給 --currency JPY --cash-column none" in err and "--fx-to-base" not in err
+
+
+def test_log_only_does_not_print_a_cash_diff_that_does_not_apply(monkeypatch, tmp_path, capsys) -> None:
+    """F2：--log-only 不碰現金格——不印「H21 18,700 → −16,300」這種不適用、會被照著手改的對照。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency="JPY")
+    assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "JPY", "--fx-to-base", "0.0068", "--log-only"]) == 0
+    out = capsys.readouterr().out
+    assert "--log-only：現金格不比對、不寫" in out and "cash_usd" not in out

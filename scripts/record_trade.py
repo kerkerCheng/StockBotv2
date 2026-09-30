@@ -391,6 +391,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.disproof_watch is not None and (args.side != "sell" or not args.disproof_watch.strip()):
             print("✗ --disproof-watch 只用在 alpha 賣出（觸發這次賣出的反證），而且要給 watch id", file=sys.stderr)
             return 2
+    if args.fx_to_base is not None and not args.fx_to_base > 0:
+        # 0 或負數在硬擋那一端會被當成「未提供」、收尾卻指路 --override（第三次覆核 N4）——在入口就拒收。
+        print(f"✗ --fx-to-base 必須大於 0（給的是 {args.fx_to_base}）：它是「1 成交幣等於多少 NAV 基準幣」", file=sys.stderr)
+        return 2
     if args.open_position and (args.side != "buy" or args.log_only):
         print("✗ --open-position 只用在買進，而且要由本腳本寫 Sheet（不能配 --log-only）", file=sys.stderr)
         return 2
@@ -487,12 +491,16 @@ def main(argv: list[str] | None = None) -> int:
             cash_cell = None if skip_cash else cells[3]
             row_currency = str(currency_cell["current"] or "").strip().upper()
             if row_currency != args.currency:
-                fx = ("" if row_currency in ("", "USD") else
-                      f" --fx-to-base <1 {row_currency} 等於多少 USD>"
-                      f" --cash-column {'cash_twd' if row_currency == 'TWD' else 'none'}")
+                # 一次寫齊要給的旗標（第三次覆核 N3：只寫 --currency 時，現金欄還會再擋一兩次才收斂）；
+                # 匯率只有買進要（賣出不量硬擋），--log-only 不碰現金格所以不提現金欄。
+                fx = (f" --fx-to-base <1 {row_currency} 等於多少 USD>"
+                      if row_currency not in ("", "USD") and args.side == "buy" else "")
+                cash = ("" if args.log_only else
+                        f" --cash-column {'cash_' + row_currency.lower() + ' 或 none' if row_currency in ('USD', 'TWD') else 'none'}")
                 raise ValueError(f"Sheet 那一列（{currency_cell['a1']}）的幣別是 {row_currency or '（空）'}，成交幣別是 "
                                  f"{args.currency}{'' if currency_given else '（沒給 --currency，預設 USD）'}——"
-                                 + (f"請給 --currency {row_currency}{fx}" if row_currency else "先在 Sheet 補上那一列的幣別"))
+                                 + (f"請給 --currency {row_currency}{fx}{cash}" if row_currency
+                                    else "先在 Sheet 補上那一列的幣別"))
             old_shares = _number(shares_cell["current"])
             old_cost = _number(cost_cell["current"])
     except ValueError as exc:
@@ -553,11 +561,15 @@ def main(argv: list[str] | None = None) -> int:
             print(f"  {cash_a1:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}"
                   f"{'   ← 插列後下移一列' if cash_a1 != cash_cell['a1'] else ''}")
     else:
-        print(f"\n將變更的儲存格（僅此{'兩' if skip_cash else '三'}格，其餘欄位不動）：")
+        print(f"\n將變更的儲存格（僅此{'兩' if skip_cash or args.log_only else '三'}格，其餘欄位不動）：")
         print(f"  {shares_cell['a1']:<16} shares          {old_shares:g} → {new_shares:g}")
         print(f"  {cost_cell['a1']:<16} avg_cost        {old_cost} → {new_cost}"
               f"   ← 由本腳本計算，非通知逐字值")
-        if skip_cash:
+        if args.log_only:
+            # --log-only 不碰現金格、也不比現金欄幣別——印出現金的前後對照會被照著手改（第三次覆核 F2：
+            # 日圓成交配預設 cash_usd 會印出 H21 18,700 → −16,300 這種不適用的數字）。
+            print("  （--log-only：現金格不比對、不寫；Sheet 由你手動更新）")
+        elif skip_cash:
             print("  （現金列不改：--cash-column none，金流不經 Sheet 現金列，由使用者另行更新）")
         else:
             print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
