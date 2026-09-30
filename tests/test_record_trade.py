@@ -133,7 +133,8 @@ def test_writer_checks_current_value_before_writing() -> None:
     source = (ROOT / "fetchers" / "gsheets.py").read_text(encoding="utf-8")
     writer = source.split("def write_portfolio_cells(")[1].split("\ndef ")[0]
     assert "expected" in writer
-    assert "raise ValueError" in writer, "現值不符必須中止而非覆蓋"
+    # 2026-09-30 R2 覆核：改丟專用的 StaleCellError（ValueError 子類）——呼叫端只有接到它才能斷定一格都沒寫
+    assert "raise StaleCellError" in writer, "現值不符必須中止而非覆蓋"
 
 
 # ---------------------------------------------------------------------------

@@ -230,6 +230,13 @@ def locate_portfolio_cells(
     return located
 
 
+class StaleCellError(ValueError):
+    """寫入前逐格重讀，現值和預期不符——**一格都沒寫**（先全部比對才寫）。
+
+    專用型別（R2 覆核 2026-09-30）：呼叫端只有接到它才能斷定「沒寫進去」；其他 ValueError（例如伺服器已套用、
+    回應本體不是 JSON 的 JSONDecodeError）都可能已經寫了，要回讀才知道。"""
+
+
 def write_portfolio_cells(writes: list[dict[str, Any]]) -> dict[str, Any]:
     """逐格寫入，且寫入前必須通過「現值仍等於 expected」檢查。
 
@@ -248,7 +255,7 @@ def write_portfolio_cells(writes: list[dict[str, Any]]) -> dict[str, Any]:
         ).execute().get("values", [[""]])
         actual = (current[0][0] if current and current[0] else "")
         if str(actual).strip() != str(write["expected"]).strip():
-            raise ValueError(
+            raise StaleCellError(
                 f"{write['a1']} 現值為 {actual!r}，與預期的 {write['expected']!r} 不符"
                 "——可能是同時被手動編輯過。整批中止，未寫入任何儲存格。"
             )
@@ -303,17 +310,20 @@ SHEET_PRICED_CURRENCIES: frozenset[str] = frozenset({"USD", "TWD", "EUR", "JPY"}
 #: LON: 的 GBX 股票、.ST／.PA 這類公式轉不出的寫法都會安靜算錯）。**認不得的寫法一律拒收，走手動建列。**
 #: 對齊 Sheet 市值公式：有冒號照原字串抓價；幣別 TWD 或 4 碼數字 → TPE:；JPY 且 `數字.T` → TYO:；其餘照原字串。
 _SYMBOL_CURRENCY = (
-    (re.compile(r"[0-9]{4}\.TW|[0-9]{4,6}[A-Z]?\.TW|TPE:[0-9]{4,6}[A-Z]?"), "TWD", "台股"),
+    (re.compile(r"[0-9]{4,6}[A-Z]?\.TW"), "TWD", "台股"),
     (re.compile(r"TYO:[0-9]{4}|[0-9]{4}\.T"), "JPY", "日股"),
     (re.compile(r"(?:FRA|ETR|EPA|AMS):[A-Z0-9]{1,6}"), "EUR", "歐元區交易所"),
-    (re.compile(r"[A-Z]{1,5}(?:\.[A-Z])?"), "USD", "美股"),
+    (re.compile(r"[A-Z]{1,5}(?:\.[AB])?"), "USD", "美股"),      # 後綴只收股別 .A／.B（VOD.L 這類是別的交易所）
 )
 
 
 def canonical_symbol(symbol: str) -> str:
-    """比對同一檔用：大寫、裸 4 碼台股補成 `.TW`（Sheet 公式把兩者當同一檔，比對也要）。"""
+    """比對同一檔用：大寫；`TPE:XXXX` 與裸的台股數字代號都補成 `XXXX.TW`（Sheet 公式把它們當同一檔，比對也要；
+    R2 覆核 2026-09-30：只處理裸 4 碼時，`TPE:2330` 被當成 2330.TW 以外的另一檔、會開出重複列）。"""
     s = symbol.strip().upper()
-    return f"{s}.TW" if re.fullmatch(r"[0-9]{4}", s) else s
+    if s.startswith("TPE:"):
+        s = s[4:]
+    return f"{s}.TW" if re.fullmatch(r"[0-9]{4,6}[A-Z]?", s) else s
 
 
 def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
@@ -322,12 +332,12 @@ def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
     s, cur = symbol.strip().upper(), currency.strip().upper()
     if cur not in SHEET_PRICED_CURRENCIES:
         return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
-    if re.fullmatch(r"[0-9]{4}", s):
-        return f"台股代號請寫成 Sheet 既有的寫法 {s}.TW（裸 4 碼會被公式當台股、比對同一檔時卻對不上）"
+    if re.fullmatch(r"(?:TPE:)?[0-9]{4,6}[A-Z]?", s):
+        return f"台股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（別的寫法公式也當台股，但 Sheet 的慣例是 .TW）"
     for pattern, need, label in _SYMBOL_CURRENCY:
         if pattern.fullmatch(s):
             return None if cur == need else f"{symbol} 是{label}代號，幣別應該是 {need}（給的是 {cur}）"
-    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW／TPE:、日股 TYO:／.T、歐元區 FRA:／ETR:／EPA:／AMS:、"
+    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW、日股 TYO:／.T、歐元區 FRA:／ETR:／EPA:／AMS:、"
             "美股裸代號；上櫃 .TWO、LON:、.ST／.PA 等請手動建列）")
 
 
@@ -536,11 +546,26 @@ def _is_our_row(values: list[list[Any]], row: int, fill: Mapping[str, Any]) -> b
             and shares_ok)
 
 
-def new_row_landed(plan: Mapping[str, Any], fill: Mapping[str, Any]) -> bool:
+def new_row_state(plan: Mapping[str, Any], fill: Mapping[str, Any]) -> str:
     """唯讀：開列請求丟例外時確認「到底有沒有套用」——client 逾時不等於伺服器沒套用（R2 2026-09-30）。
-    列數剛好多一列、插入點那一列的代號＋券商＋股數都是剛寫的，才算套用。"""
+
+    三值（R2 第二次覆核：只給兩值時，已套用又碰上使用者同時加列，會被說成「沒改動」）：
+    `landed`＝插入點那一列的代號＋券商＋股數都是剛寫的，而且列數至少多一列（要還原）；
+    `absent`＝列數和寫入前一樣、整張表沒有任何一列是這個代號＋這家券商（此刻沒套用）；
+    `unknown`＝其他（例：使用者同時改了列數）——不猜，請人看。"""
     values = read_portfolio_values()
-    return len(values) == int(plan["last_row"]) + 1 and _is_our_row(values, int(plan["insert_at"]), fill)
+    last = int(plan["last_row"])
+    if len(values) >= last + 1 and _is_our_row(values, int(plan["insert_at"]), fill):
+        return "landed"
+    headers = [str(h).strip().lower() for h in (values[0] if values else [])]
+    if len(values) == last and {"symbol", "broker"} <= set(headers):
+        mine = [r for r in range(2, len(values) + 1)
+                if canonical_symbol(str(_cell(values, headers, r, "symbol"))) == canonical_symbol(str(fill.get("symbol", "")))
+                and str(_cell(values, headers, r, "broker")).strip().casefold()
+                == str(fill.get("broker", "")).strip().casefold()]
+        if not mine:
+            return "absent"
+    return "unknown"
 
 
 def delete_position_row(opened: Mapping[str, Any], fill: Mapping[str, Any], *,

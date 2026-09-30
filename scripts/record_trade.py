@@ -201,8 +201,11 @@ def _research_inputs(symbol: str, *, today, sheet_rows: list | None = None, shee
     if sheet_read and cid and registry is not None:
         try:
             resolution = resolve_holdings(rows, registry=registry)
-            out["held_company"] = any(r["company_id"] == cid and (r["shares"] or 0) > 0 and not r["cash"]
-                                      for r in resolution["rows"])
+            held = [r for r in resolution["rows"] if r["company_id"] == cid and (r["shares"] or 0) > 0 and not r["cash"]]
+            out["held_company"] = bool(held)
+            from fetchers.gsheets import canonical_symbol
+
+            out["company_held_symbols"] = sorted({canonical_symbol(str(r.get("ticker") or "")) for r in held})
         except Exception as exc:  # noqa: BLE001
             problems.append(f"Sheet 持股解析失敗（{type(exc).__name__}）——公司層級持有沒記")
     research = resolved["research_ticker"]
@@ -472,7 +475,11 @@ def main(argv: list[str] | None = None) -> int:
             elsewhere = sorted({str(r.get("broker") or "").strip() for r in (sheet_rows or [])
                                 if gsheets.canonical_symbol(str(r.get("ticker") or "")) == gsheets.canonical_symbol(args.symbol)}
                                - {""})
-            hint = (f"\n  {args.symbol} 在 {'、'.join(elsewhere)} 有列——是不是 --broker 沒給對？" if elsewhere else
+            same_broker = [str(r.get("ticker")) for r in (sheet_rows or [])
+                           if gsheets.canonical_symbol(str(r.get("ticker") or "")) == gsheets.canonical_symbol(args.symbol)
+                           and str(r.get("broker") or "").strip().casefold() == args.broker.strip().casefold()]
+            hint = (f"\n  代號請寫成 Sheet 的寫法 {same_broker[0]}（{args.broker} 那一列）" if same_broker else
+                    f"\n  {args.symbol} 在 {'、'.join(elsewhere)} 有列——是不是 --broker 沒給對？" if elsewhere else
                     "\n  Sheet 還沒有這一列？首次建倉請加 --open-position --broker … --currency … --cash-column … --bucket …")
         print(f"✗ {'首次建倉：' if args.open_position else ''}{exc}{hint}", file=sys.stderr)
         return 2
@@ -556,9 +563,10 @@ def main(argv: list[str] | None = None) -> int:
         inputs = _research_inputs(args.symbol, today=today, sheet_rows=sheet_rows, sheet_error=sheet_error)
         from fetchers.gsheets import canonical_symbol
 
-        same_symbol_held = any(canonical_symbol(str(r.get("ticker") or "")) == canonical_symbol(args.symbol)
-                               and (r.get("shares") or 0) > 0 for r in (sheet_rows or []))
-        # 同代號在別家券商持有不算：5% 硬擋本來就跨券商按代號加總（R2 覆核 non-blocking）。
+        held_symbols = set(inputs.get("company_held_symbols") or ())
+        same_symbol_held = bool(held_symbols) and held_symbols <= {canonical_symbol(args.symbol)}
+        # 同代號在別家券商持有不算：5% 硬擋本來就跨券商按代號加總（R2 覆核 non-blocking）。但只要這家公司還有**任何
+        # 別的代號**在持有，就照擋（第二次覆核：豁免只看「有沒有同代號」會把另一個代號漏掉）。
         if plan is not None and inputs.get("held_company") and not same_symbol_held:
             # 5% 單筆上限按代號加總：同一家公司換一個掛牌建倉會繞過它（R2 2026-09-30 non-blocking）。按公司合併是
             # 資本規則、要使用者決定（Phase 4）；在那之前建倉這一條路 fail closed。
@@ -650,15 +658,18 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001 — 原子請求：驗證錯誤就沒改動；但 client 逾時不等於伺服器沒套用
             print(f"\n✗ 新增列失敗（{type(exc).__name__}: {str(exc)[:160]}）", file=sys.stderr)
             try:
-                landed = gsheets.new_row_landed(plan, fill)
+                state = gsheets.new_row_state(plan, fill)
             except Exception as read_exc:  # noqa: BLE001
-                print(f"  ⚠⚠ 回讀也失敗（{type(read_exc).__name__}）——無法確認有沒有套用，請手動檢查 Sheet 第 "
-                      f"{plan['insert_at']} 列；事件紀錄沒有寫。", file=sys.stderr)
-                return 2
-            if landed:
-                print("  回讀發現新列其實已經套用（代號、券商、股數都對、列數多一列）——刪掉還原：", file=sys.stderr)
+                state = f"讀不到（{type(read_exc).__name__}）"
+            if state == "landed":
+                print("  回讀發現新列其實已經套用（插入點那一列的代號、券商、股數都對）——刪掉還原：", file=sys.stderr)
                 return _rollback(gsheets, {"row": plan["insert_at"]}, fill, plan)
-            print("  已回讀確認：Sheet 沒有被改動；事件紀錄沒有寫。", file=sys.stderr)
+            if state == "absent":
+                print(f"  目前讀回未套用（列數沒變、沒有 {args.symbol}／{args.broker} 的列）；事件紀錄沒有寫。"
+                      f"伺服器可能稍後才套用——重跑前先看一眼第 {plan['insert_at']} 列附近。", file=sys.stderr)
+                return 2
+            print(f"  ⚠⚠ 無法確認新列有沒有套用（回讀：{state}）——請手動看 Sheet 第 {plan['insert_at']} 列附近；"
+                  "事件紀錄沒有寫。重跑前一定先核對，否則股數可能重複。", file=sys.stderr)
             return 2
         try:
             problems = gsheets.verify_new_position(plan, fill)
@@ -680,7 +691,7 @@ def main(argv: list[str] | None = None) -> int:
     confirmed_note = None
     try:
         result = gsheets.write_portfolio_cells(writes)
-    except ValueError as exc:  # 寫入前逐格比對不符＝一格都沒寫（先全部重讀才寫）；建倉的新列一併還原
+    except gsheets.StaleCellError as exc:  # 寫入前逐格比對不符＝一格都沒寫（先全部比對才寫）；建倉的新列一併還原
         print(f"\n✗ 寫入中止（{str(exc)[:200]}）", file=sys.stderr)
         return _rollback(gsheets, opened, fill, plan) if opened else 2
     except Exception as exc:  # noqa: BLE001 — 網路類：可能已套用、也可能沒有——回讀決定，不猜（R2 覆核 blocking #3）
