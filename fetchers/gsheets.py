@@ -340,7 +340,10 @@ def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
         return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
     if cur == "JPY" and re.fullmatch(r"(?:TYO:)?[0-9]{4}", s):
         # 日股（含裸 4 碼配 JPY）：提示名冊寫法——裸 4 碼若照台股的提示改成 .TW，會再被幣別擋一次（R2 覆核 C4）。
-        return f"日股代號請寫成公司名冊的寫法 {s.removeprefix('TYO:')}.T（Sheet 的日股一律用名冊的 .T 寫法）"
+        # 台股與東證的 4 碼重疊：裸碼也可能是台股配錯幣別，兩條路都寫出來（第二次覆核 N3），不替人猜。
+        code = s.removeprefix("TYO:")
+        also = "" if s.startswith("TYO:") else f"；如果是台股，幣別改 TWD、寫成 {code}.TW"
+        return f"日股代號請寫成公司名冊的寫法 {code}.T（Sheet 的日股一律用名冊的 .T 寫法）{also}"
     if re.fullmatch(r"(?:TPE:)?[0-9]{4,6}[A-Z]?", s):
         return f"台股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（別的寫法公式也當台股，但 Sheet 的慣例是 .TW）"
     if re.fullmatch(r"TYO:[0-9]{4}", s):

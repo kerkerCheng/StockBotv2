@@ -111,11 +111,14 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--price", required=True, type=float)
     ap.add_argument("--executed-at", required=True, help="成交時間（ISO-8601，含時區）")
     ap.add_argument("--broker", default=None, help="Sheet 的 broker 欄值（預設 IB；--open-position 時必須明給）")
-    ap.add_argument("--currency", default=None, help="成交幣別（預設 USD；--open-position 時必須明給）")
+    ap.add_argument("--currency", default=None,
+                    help="成交幣別（沒給時是 USD；既有列必須等於 Sheet 那一列的 currency，對不上就拒收；"
+                         "--open-position 時必須明給）")
     ap.add_argument(
         "--cash-column",
         default=None,
-        help="要扣款／入帳的現金欄名；傳 none 表示金流不經 Sheet 現金列（如台幣交割戶未入帳），只改股數與成本",
+        help="要扣款／入帳的現金欄：cash_usd（預設）／cash_twd／none（金流不經 Sheet 現金列，只改股數與成本；"
+             "日圓、歐元成交只能用 none）；必須與成交幣別一致",
     )
     ap.add_argument("--account-ref", default="", help="遮蔽後的帳號，如 U****1599")
     ap.add_argument("--note", default="", help="券商通知逐字內容，供稽核")
@@ -416,15 +419,23 @@ def main(argv: list[str] | None = None) -> int:
         if missing:
             print(f"✗ --open-position 必須明給 {'、'.join(missing)}——新列沒有既有列可以核對，不猜", file=sys.stderr)
             return 2
+    currency_given = args.currency is not None
     args.broker = args.broker or "IB"
     args.currency = (args.currency or "USD").strip().upper()
-    args.cash_column = args.cash_column if args.cash_column is not None else "cash_usd"
+    args.cash_column = (args.cash_column if args.cash_column is not None else "cash_usd").strip().lower()
+    # 現金欄是封閉字彙（R2 覆核 N2：原本任何欄名都放行——`market_usd` 會定位到公式格）：Sheet 只有這兩個現金欄。
+    cash_currency = {"cash_usd": "USD", "cash_twd": "TWD", "none": None}
+    if args.cash_column not in cash_currency:
+        print(f"✗ --cash-column 只收 {'／'.join(cash_currency)}（給的是 {args.cash_column!r}）", file=sys.stderr)
+        return 2
     # 現金欄的幣別必須等於成交幣別——**兩條路徑都擋**（R2 2026-09-30 覆核 C1：原本只有建倉路徑檢查；既有列加碼日股／歐股
     # 沒給 --cash-column 時，預設的 cash_usd 會把日圓／歐元金額當美元扣掉，--apply 就照寫）。--log-only 不碰現金格，不擋。
-    cash_currency = {"cash_usd": "USD", "cash_twd": "TWD"}.get(args.cash_column.strip().lower())
-    if not args.log_only and cash_currency and cash_currency != args.currency:
-        print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency}，成交幣別是 {args.currency}——"
-              "金額會以錯的幣別扣款；幣別不同請給對應的現金欄或 --cash-column none", file=sys.stderr)
+    # 沒給 --currency 的那一半由下面「成交幣別對 Sheet 那一列的幣別」接住（第二次覆核 B1）。
+    if not args.log_only and cash_currency[args.cash_column] and cash_currency[args.cash_column] != args.currency:
+        fix = (f"請給 --cash-column cash_{args.currency.lower()} 或 none" if args.currency in ("USD", "TWD") else
+               f"Sheet 沒有 {args.currency} 的現金欄——請給 --cash-column none（帳上的現金另行手動更新）")
+        print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency[args.cash_column]}，成交幣別是 {args.currency}"
+              f"{'' if currency_given else '（沒給 --currency，預設 USD）'}——金額會以錯的幣別扣款；{fix}", file=sys.stderr)
         return 2
     from fetchers import gsheets
 
@@ -465,12 +476,23 @@ def main(argv: list[str] | None = None) -> int:
             requests = [
                 {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "shares"},
                 {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "avg_cost"},
+                # 那一列的幣別（R2 第二次覆核 B1）：沒給 --currency 就預設 USD，日圓／歐元／台幣金額會被當美元扣現金、
+                # 硬擋也用錯幣別量——既有列有自己的幣別，拿來對，對不上就拒收（--log-only 也擋：trade_log 的幣別是 append-only）。
+                {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "currency"},
             ]
             if not skip_cash:
                 requests.append(cash_request)
             cells = gsheets.locate_portfolio_cells(requests, values=sheet_values)
-            shares_cell, cost_cell = cells[0], cells[1]
-            cash_cell = None if skip_cash else cells[2]
+            shares_cell, cost_cell, currency_cell = cells[0], cells[1], cells[2]
+            cash_cell = None if skip_cash else cells[3]
+            row_currency = str(currency_cell["current"] or "").strip().upper()
+            if row_currency != args.currency:
+                fx = ("" if row_currency in ("", "USD") else
+                      f" --fx-to-base <1 {row_currency} 等於多少 USD>"
+                      f" --cash-column {'cash_twd' if row_currency == 'TWD' else 'none'}")
+                raise ValueError(f"Sheet 那一列（{currency_cell['a1']}）的幣別是 {row_currency or '（空）'}，成交幣別是 "
+                                 f"{args.currency}{'' if currency_given else '（沒給 --currency，預設 USD）'}——"
+                                 + (f"請給 --currency {row_currency}{fx}" if row_currency else "先在 Sheet 補上那一列的幣別"))
             old_shares = _number(shares_cell["current"])
             old_cost = _number(cost_cell["current"])
     except ValueError as exc:
@@ -545,6 +567,14 @@ def main(argv: list[str] | None = None) -> int:
     _print_verdict(verdict)
     receipt: dict = {"hard_cap_check": verdict.to_dict()}
     if not verdict.allows:
+        base = next((str(r.get("base_currency") or "").strip().upper() for r in (sheet_rows or [])
+                     if r.get("base_currency")), None)
+        if not args.override and verdict.status == "unmeasurable" and args.fx_to_base is None and base \
+                and base != args.currency:
+            # 缺的是匯率，不是放行（R2 第二次覆核 FX-4：照正確幣別記帳的人會先撞到這一步，別把他引去 override）。
+            print(f"\n✗ 未寫入。成交幣別 {args.currency} 與 NAV 基準幣別 {base} 不同——請加 --fx-to-base "
+                  f"<1 {args.currency} 等於多少 {base}>，硬擋才量得到。", file=sys.stderr)
+            return EXIT_HARD_CAP
         if not args.override:
             print("\n✗ 未寫入。要放行請加 --override --reason「<理由>」（理由與 verdict 會寫進事件紀錄）。",
                   file=sys.stderr)

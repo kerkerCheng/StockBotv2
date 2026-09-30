@@ -164,7 +164,7 @@ def _present_inputs() -> dict:
             "analyst_error": "測試不讀 artifact", "problems": []}
 
 
-def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, inputs=None):
+def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, inputs=None, row_currency: str = "USD"):
     """把 Sheet 的三個入口換成假的：定位格、持股列、寫入（寫入被叫到就記下來）。
     3.8 起 alpha 成交還要研究收據的原料：預設給一份現行 v2 敘事（`inputs` 可換）。"""
     from fetchers import gsheets
@@ -172,14 +172,11 @@ def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, input
     calls: dict[str, list] = {"writes": []}
 
     def locate(requests, values=None):
+        # 按欄名回格子（2026-09-30：既有列多定位一格 currency，按位置回會錯位）。
         calls.setdefault("located_with", []).append(values)
-        cells = [
-            {"a1": "B2", "current": str(held_shares)},
-            {"a1": "C2", "current": "100"},
-        ]
-        if len(requests) == 3:
-            cells.append({"a1": "D5", "current": "50000"})
-        return cells
+        by_column = {"shares": {"a1": "B2", "current": str(held_shares)}, "avg_cost": {"a1": "C2", "current": "100"},
+                     "currency": {"a1": "F2", "current": row_currency}}
+        return [dict(by_column.get(r["column"], {"a1": "D5", "current": "50000"})) for r in requests]
 
     def write(writes):
         calls["writes"].append(writes)
@@ -270,7 +267,7 @@ def test_unreadable_holdings_is_unmeasurable_and_fails_closed(monkeypatch, tmp_p
 
 
 def test_foreign_currency_buy_needs_fx_to_base(monkeypatch, tmp_path) -> None:
-    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0))
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency="TWD")
     twd = ["--symbol", "3105.TWO", "--side", "buy", "--shares", "1000", "--price", "100",
            "--currency", "TWD", "--cash-column", "none",
            "--executed-at", "2026-09-23T09:05:00+08:00", "--broker", "FUBON", "--why", "測試：建倉"]

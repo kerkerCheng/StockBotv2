@@ -119,9 +119,10 @@ def env(monkeypatch, tmp_path):
     state["reads"] = []
     monkeypatch.setattr(gsheets, "read_portfolio_values",
                         lambda *, formulas=False, sheet=None: state["reads"].append(formulas) or [["symbol"]])
+    cells = {"shares": {"a1": "B2", "current": "100"}, "avg_cost": {"a1": "C2", "current": "10"},
+             "currency": {"a1": "F2", "current": "USD"}}
     monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests, values=None: [
-        {"a1": "B2", "current": "100"}, {"a1": "C2", "current": "10"}]
-        + ([{"a1": "D5", "current": "50000"}] if len(requests) == 3 else []))
+        dict(cells.get(r["column"], {"a1": "D5", "current": "50000"})) for r in requests])
 
     def write(writes):
         state["writes"].append(writes)

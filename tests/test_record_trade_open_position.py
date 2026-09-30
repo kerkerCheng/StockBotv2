@@ -769,6 +769,7 @@ def test_a_legacy_tyo_row_still_blocks_a_duplicate_registry_spelled_open() -> No
     ("ABC.T", "JPY", "認不得"),
     ("TYO:12345", "JPY", "認不得"),        # C4：不再提示一個又會被拒收的寫法
     ("6324", "JPY", "寫成公司名冊的寫法 6324.T"),   # C4：裸 4 碼配 JPY 提示日股寫法，不是 .TW
+    ("2330", "JPY", "如果是台股，幣別改 TWD、寫成 2330.TW"),   # 第二次覆核 N3：4 碼重疊，兩條路都寫出來
     ("tyo:6324", "JPY", "寫成公司名冊的寫法 6324.T"),
     ("6324.t", "JPY", "大寫"),             # JP-CASE-1：公式分大小寫，小寫轉不成 TYO:
     ("2330.tw", "TWD", "大寫"),            # 同一個洞的台股面（公式會拿到 TPE:2330.tw）
@@ -806,3 +807,85 @@ def test_existing_row_path_also_refuses_a_cash_column_in_another_currency(monkey
     monkeypatch.setattr(gs, "read_portfolio_values", stop)
     module.main(ok)
     assert reached, "給 --cash-column none 要過得了幣別檢查、走到讀 Sheet"
+
+
+# ---------------------------------------------------------------------------
+# 13. R2 第二次覆核（747df40：CONDITIONAL_GO）——必修 B1 與順手修
+# ---------------------------------------------------------------------------
+
+_ROW = ["--side", "buy", "--shares", "10", "--price", "350", "--executed-at", "2026-09-30T10:00:00+09:00",
+        "--broker", "IB", "--why", "x"]
+
+
+@pytest.mark.parametrize("row_currency, expect", [
+    ("EUR", "--currency EUR --fx-to-base <1 EUR 等於多少 USD> --cash-column none"),
+    ("JPY", "--currency JPY --fx-to-base <1 JPY 等於多少 USD> --cash-column none"),
+    ("TWD", "--currency TWD --fx-to-base <1 TWD 等於多少 USD> --cash-column cash_twd"),
+])
+@pytest.mark.parametrize("log_only", [False, True])
+def test_existing_row_trade_currency_must_equal_the_sheet_rows_currency(monkeypatch, tmp_path, capsys, row_currency,
+                                                                        expect, log_only) -> None:
+    """B1（必修）：沒給 --currency 就預設 USD——日圓／歐元／台幣金額會被當美元扣現金、硬擋用錯幣別量、trade_log 永久記成 USD。
+    既有列有自己的幣別：對不上就拒收、一格都不寫、不記事件；訊息指路該給哪些旗標。--log-only 也擋（幣別 append-only）。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency=row_currency)
+    argv = ["--symbol", "AXTI", *_ROW] + (["--log-only", "--apply"] if log_only else ["--apply"])
+    assert module.main(argv) == 2
+    err = capsys.readouterr().err
+    assert "沒給 --currency，預設 USD" in err and expect in err
+    assert calls["writes"] == [] and not module.TRADE_LOG.exists()
+
+
+@pytest.mark.parametrize("row_currency, extra", [
+    ("USD", []),                                                                    # FUBON VWRA 那種 USD 列：預設照常
+    ("TWD", ["--currency", "TWD", "--cash-column", "cash_twd", "--fx-to-base", "0.03125"]),
+    ("JPY", ["--currency", "JPY", "--cash-column", "none", "--fx-to-base", "0.0068"]),
+])
+def test_existing_row_trades_in_the_rows_currency_still_go_through(monkeypatch, tmp_path, row_currency, extra) -> None:
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency=row_currency)
+    assert module.main(["--symbol", "AXTI", *_ROW, *extra]) == 0
+
+
+def test_missing_fx_points_to_fx_to_base_not_to_override(monkeypatch, tmp_path, capsys) -> None:
+    """FX-4：照正確幣別記帳、只缺匯率的人，不該被引去 --override。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency="JPY")
+    assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "JPY", "--cash-column", "none"]) == module.EXIT_HARD_CAP
+    err = capsys.readouterr().err
+    assert "--fx-to-base <1 JPY 等於多少 USD>" in err and "--override" not in err
+
+
+@pytest.mark.parametrize("cash_column, code", [("market_usd", 2), ("cash_eur", 2), ("Cash_USD", 2), (" cash_usd ", 2)])
+def test_cash_column_is_a_closed_vocabulary_and_case_does_not_slip_past(monkeypatch, tmp_path, cash_column, code) -> None:
+    """N2：現金欄只收 cash_usd／cash_twd／none（`market_usd` 原本會定位到公式格）；N1：大小寫與空白正規化後照樣比幣別——
+    `Cash_USD` 配 JPY 不得繞過。全部在讀 Sheet 之前擋。"""
+    from tests.test_record_trade import _module
+
+    from fetchers import gsheets as gs
+
+    reads = []
+    monkeypatch.setattr(gs, "read_portfolio_values", lambda **k: reads.append(k) or [["symbol"]])
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    assert module.main(["--symbol", "7803.T", *_ROW, "--currency", "JPY", "--cash-column", cash_column]) == code
+    assert reads == []
+
+
+def test_log_only_does_not_touch_cash_so_the_cash_column_check_skips_it(monkeypatch, tmp_path) -> None:
+    """N1：--log-only 不碰現金格——預設 cash_usd 配 JPY 不擋（幣別本身仍由 Sheet 那一列的幣別把關）。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0), row_currency="JPY")
+    assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "JPY", "--fx-to-base", "0.0068", "--log-only"]) == 0
+
+
+def test_cash_column_case_and_spaces_are_normalised_before_the_vocabulary_check(monkeypatch, tmp_path) -> None:
+    """N1 的正向面：` Cash_USD ` 正規化成 cash_usd 後照常放行（不是被封閉字彙誤擋）。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows(AXTI=0.0))
+    assert module.main(["--symbol", "AXTI", *_ROW, "--cash-column", " Cash_USD "]) == 0

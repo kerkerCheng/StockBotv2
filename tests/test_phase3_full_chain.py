@@ -198,8 +198,10 @@ def test_the_new_pipeline_hands_each_stage_output_to_the_next(chain, monkeypatch
 
     monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False, values=None: _sheet_rows())
     monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: [["symbol"]])
-    monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests, values=None: [
-        {"a1": "B2", "current": "100"}, {"a1": "C2", "current": "10"}])
+    cells = {"shares": {"a1": "B2", "current": "100"}, "avg_cost": {"a1": "C2", "current": "10"},
+             "currency": {"a1": "F2", "current": "USD"}}
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells",
+                        lambda requests, values=None: [dict(cells[r["column"]]) for r in requests])
     monkeypatch.setattr(gsheets, "write_portfolio_cells", lambda writes: {"written": [w["a1"] for w in writes]})
     module = _record_trade()
     module._today = lambda: TODAY
