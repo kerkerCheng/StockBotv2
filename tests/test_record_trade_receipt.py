@@ -38,7 +38,7 @@ def _sheet_rows(**extra) -> list[dict]:
     rows = [
         {"ticker": "FRA:2DG", "bucket": "觀察", "market_value_base": 1_000.0, "nav_base": 100_000.0,
          "base_currency": "USD", "currency": "EUR", "shares": 100.0},
-        {"ticker": "TYO:7803", "bucket": "觀察", "market_value_base": 500.0, "nav_base": 100_000.0,
+        {"ticker": "7803.T", "bucket": "觀察", "market_value_base": 500.0, "nav_base": 100_000.0,
          "base_currency": "USD", "currency": "JPY", "shares": 10.0},
         {"ticker": "QQQ", "bucket": "BETA", "market_value_base": 20_000.0, "nav_base": 100_000.0,
          "base_currency": "USD", "currency": "USD", "shares": 30.0},
@@ -101,7 +101,7 @@ def env(monkeypatch, tmp_path):
                "derived": "held", "group": "held", "declared": "missing", "preconditions": [], "rewrite": [],
                "three_words": {"will_it_die": "紅（灰 2）", "priced_in": "是", "in_numbers": "是"}}
         return {"today": state["candidates_today"], "generated_at": "2026-09-30T05:37:00+00:00",
-                "groups": {"held": [row]}, "side_groups": {}, "holdings": {"unresolved": ["TYO:7803"]}}, None
+                "groups": {"held": [row]}, "side_groups": {}, "holdings": {"unresolved": ["7803.T"]}}, None
 
     def read_view(self, ticker):
         line = {"datum": {"label": "已定價①", "value": 88.5, "status": "available", "absence_kind": None,
@@ -215,8 +215,8 @@ def test_legacy_v1_narrative_counts_as_missing_v2(env, monkeypatch) -> None:
 
 def test_unresolved_symbol_is_unresolved_not_guessed(env) -> None:
     module = env["module"]
-    assert module.main(_trade("TYO:7803", "buy", "--why", "x")) == module.EXIT_NARRATIVE
-    assert module.main(_trade("TYO:7803", "buy", "--why", "x", "--apply", "--no-narrative-override", "registry 還沒登")) == 0
+    assert module.main(_trade("7803.T", "buy", "--why", "x")) == module.EXIT_NARRATIVE
+    assert module.main(_trade("7803.T", "buy", "--why", "x", "--apply", "--no-narrative-override", "registry 還沒登")) == 0
     receipt = _entry(env)["research_receipt"]
     assert receipt["narrative"] == "unresolved" and receipt["company_id"] is None
     assert "解析不到公司" in receipt["derived"]["reason"], "沒有個股頁可對≠讀不到（下一步是補 registry）"

@@ -93,12 +93,12 @@ def _active(wid, **kw):
 
 def test_execution_symbol_resolves_through_the_reverse_alias_without_guessing() -> None:
     res = resolve_holdings([{"ticker": "FRA:2DG", "shares": 100.0, "bucket": "觀察"},
-                            {"ticker": "TYO:7803", "shares": 10.0, "bucket": "觀察"},
+                            {"ticker": "7803.T", "shares": 10.0, "bucket": "觀察"},
                             {"ticker": "CASH-TWD", "shares": 0.0, "bucket": "CASH"}])
     by = {r["ticker"]: r for r in res["rows"]}
     assert by["FRA:2DG"]["company_id"] == "co:sivers_semiconductors" and by["FRA:2DG"]["source"] == "execution_alias"
-    assert by["TYO:7803"]["company_id"] is None
-    assert res["unresolved"] == ["TYO:7803"]                         # 現金列不是「解析不到」
+    assert by["7803.T"]["company_id"] is None
+    assert res["unresolved"] == ["7803.T"]                         # 現金列不是「解析不到」
     assert res["cash_rows"] == 1
 
 
@@ -109,12 +109,12 @@ def test_held_is_alpha_with_shares_and_beta_never_counts() -> None:
                             {"ticker": "QQQ", "shares": 3.0, "bucket": "大盤"},
                             {"ticker": "CASH-USD", "shares": 0.0, "bucket": "現金"},
                             {"ticker": "CASH-TWD", "shares": 1000.0, "bucket": "CASH"},   # 股數 > 0 的現金也不算
-                            {"ticker": "TYO:7803", "shares": 10.0, "bucket": "觀察"}])
+                            {"ticker": "7803.T", "shares": 10.0, "bucket": "觀察"}])
     held = held_index(res, is_beta=is_beta_symbol)
     assert set(held["by_company"]) == {"co:sivers_semiconductors"}   # NVDA 是 beta、AXTI 股數 0
     assert held["beta_excluded"] == 2 and held["zero_shares"] == 1
-    # 候選板與心跳讀的是這一份 unresolved：QQQ（beta）與現金列不算，只有 alpha 的 TYO:7803
-    assert held["unresolved"] == ["TYO:7803"]
+    # 候選板與心跳讀的是這一份 unresolved：QQQ（beta）與現金列不算，只有 alpha 的 7803.T
+    assert held["unresolved"] == ["7803.T"]
 
 
 @pytest.mark.parametrize("resolution, failure", [(None, "HttpError"), ({"rows": [], "unresolved": []}, None)])

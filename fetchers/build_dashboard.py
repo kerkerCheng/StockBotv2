@@ -176,7 +176,7 @@ for a in agg:
 HOLDINGS_DATA_END = _r[0] - 1
 skip()
 add(["* 成本基礎以當前即時匯率折算 USD（非購入時匯率）",
-     "⚠ DRAM/TYO:7803：GOOGLEFINANCE 無資料，市值欄可能不正確"])
+     "⚠ DRAM/7803.T：GOOGLEFINANCE 無資料，市值欄可能不正確"])
 
 # 回填 cost 加總
 batches.append({

@@ -22,7 +22,7 @@ MKT = '=IF($B{r}="CASH",N($G{r}),IF($D{r}="","",N($D{r})*IFERROR(GOOGLEFINANCE($
 
 def _grid(*, nav_end: int | None = None, manual_row: int | None = None, cash: bool = True):
     """持股 2–6 列（IB×3、TAISHIN×2）＋ CASH 7–8 列；回（values, formulas）。"""
-    body = [("IB", "觀察", "FRA:2DG"), ("IB", "觀察", "TYO:7803"), ("IB", "CORE", "NVDA"),
+    body = [("IB", "觀察", "FRA:2DG"), ("IB", "觀察", "7803.T"), ("IB", "CORE", "NVDA"),
             ("TAISHIN", "大盤", "0050.TW"), ("TAISHIN", "CORE", "2330.TW")]
     if cash:
         body += [("IB", "CASH", "—"), ("TAISHIN", "CASH", "—")]
@@ -183,8 +183,8 @@ def test_rollback_refuses_to_delete_a_row_that_is_not_ours(monkeypatch) -> None:
     monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: values)
     with pytest.raises(ValueError, match="不刪"):
         gsheets.delete_position_row({"row": 3, "sheet_id": 7}, {"symbol": "AXTI", "broker": "IB", "shares": 10.0})
-    assert fake.bodies == []                                          # 第 3 列是 TYO:7803
-    gsheets.delete_position_row({"row": 3, "sheet_id": 7}, {"symbol": "TYO:7803", "broker": "IB", "shares": 10.0})
+    assert fake.bodies == []                                          # 第 3 列是 7803.T
+    gsheets.delete_position_row({"row": 3, "sheet_id": 7}, {"symbol": "7803.T", "broker": "IB", "shares": 10.0})
     assert fake.bodies[0]["requests"][0]["deleteDimension"]["range"]["startIndex"] == 2
 
 
@@ -347,7 +347,7 @@ def test_cash_column_currency_must_match_the_trade(monkeypatch, tmp_path) -> Non
     ("2330.TW", "USD", "台股代號"),
     ("3081.TWO", "TWD", "上櫃"),
     ("SIVE.ST", "SEK", "只換算"),
-    ("TYO:6324", "USD", "日股代號"),
+    ("6324.T", "USD", "日股代號"),
     ("2330", "USD", "寫成 Sheet 既有的寫法 2330.TW"),       # R2 覆核：裸 4 碼會被公式當台股
     ("0050", "TWD", "寫成"),
     ("LON:VWRA", "USD", "認不得"),                          # LON: 的 GBX 股票配 USD 高估百倍
@@ -355,7 +355,7 @@ def test_cash_column_currency_must_match_the_trade(monkeypatch, tmp_path) -> Non
     ("AXTI", "JPY", "美股代號"),
     ("TPE:2330", "TWD", "寫成 Sheet 既有的寫法 2330.TW"),   # 第二次覆核：TPE: 會被當成另一檔
     ("VOD.L", "USD", "認不得"),                              # 美股後綴只收 .A／.B
-    ("6324.T", "JPY", "寫成 Sheet 既有的寫法 TYO:6324"),     # 第三次覆核：XXXX.T 與 TYO: 是同一檔
+    ("TYO:6324", "JPY", "寫成公司名冊的寫法 6324.T"),        # 2026-09-30 定案：Sheet 用名冊寫法，TYO: 改寫
 ])
 def test_symbol_and_currency_are_checked_before_anything_is_written(symbol, currency, message) -> None:
     values, formulas = _grid()
@@ -670,12 +670,24 @@ def test_the_hint_names_the_sheet_spelling_when_the_broker_is_right(monkeypatch,
 # ---------------------------------------------------------------------------
 
 def test_japanese_spellings_are_the_same_listing_like_taiwanese_ones() -> None:
-    """blocking（台股修法的對稱面）：公式把 `7803.T`（JPY）轉成 TYO:7803——同一檔，比對也要當同一檔。"""
-    assert gsheets.canonical_symbol("7803.T") == gsheets.canonical_symbol("TYO:7803") == "TYO:7803"
+    """blocking（台股修法的對稱面）：公式把 `7803.T`（JPY）轉成 TYO:7803——同一檔，比對也要當同一檔。
+    2026-09-30 使用者定案：Sheet 用公司名冊的寫法——正規化方向是名冊的 `XXXX.T`（不為 Sheet 另做別名）。"""
+    assert gsheets.canonical_symbol("TYO:7803") == gsheets.canonical_symbol("7803.t") == "7803.T"
     assert gsheets.canonical_symbol("TPE:ABC") == "TPE:ABC"            # TPE: 後面不是數字碼就不剝（不會併進美股 ABC）
+    assert gsheets.canonical_symbol("TYO:ABC") == "TYO:ABC"            # 同理：TYO: 後面不是數字碼就不動
     values, formulas = _grid()
     with pytest.raises(ValueError, match="第 3 列已經是"):
-        gsheets.plan_new_position(values, formulas, broker="IB", symbol="7803.T")
+        gsheets.plan_new_position(values, formulas, broker="IB", symbol="TYO:7803")
+
+
+def test_a_registry_spelled_japanese_listing_plans_like_any_other() -> None:
+    """名冊寫法的日股（6324.T＝Harmonic Drive，registry 的 research ticker）配 JPY 過得了白名單、規劃得出插入點——
+    這是改寫法的目的：建倉收據解析得到公司，不必走缺敘事 override。"""
+    values, formulas = _grid()
+    plan = gsheets.plan_new_position(values, formulas, broker="IB", symbol="6324.T", currency="JPY")
+    assert plan["insert_at"] == 5                                       # IB 最後一列持股（第 4 列 NVDA）的下一列
+    with pytest.raises(ValueError, match="寫成公司名冊的寫法 6324.T"):
+        gsheets.plan_new_position(values, formulas, broker="IB", symbol="TYO:6324", currency="JPY")
 
 
 def test_an_absent_readback_is_read_again_before_saying_so(monkeypatch, tmp_path) -> None:

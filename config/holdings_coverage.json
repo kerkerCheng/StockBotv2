@@ -4,7 +4,9 @@
   "policy_version": "2026-07-29.1",
   "ignored": [
     {
-      "sheet_ticker": "TYO:7803",
+      "sheet_ticker": "7803.T",
+      "previous_sheet_ticker": "TYO:7803",
+      "renamed_at": "2026-09-30",
       "reason": "使用者 2026-07-29 明確指示不做 alpha 研究（自述為隨意買進的小額部位）。identity registry 亦無對應 co: ID。",
       "decided_at": "2026-07-29"
     }

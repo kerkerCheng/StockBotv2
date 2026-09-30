@@ -97,10 +97,10 @@ _BUCKET_ALIASES: dict[str, str] = {
 }
 
 # Tickers that need enrichment — company name + Neo4j node ID (if in graph)
-# Exchange-prefixed tickers (FRA:, LON:, TYO:) are not self-explanatory.
+# Exchange-prefixed tickers (FRA:, LON:) and numeric codes (7803.T) are not self-explanatory.
 _TICKER_ENRICHMENT: dict[str, dict] = {
     "FRA:2DG":    {"company": "Sivers Semiconductors AB",              "neo4j_id": "co:sivers_semiconductors"},
-    "TYO:7803":   {"company": "Bushiroad Inc",                         "neo4j_id": None},
+    "7803.T":     {"company": "Bushiroad Inc",                         "neo4j_id": None},   # 2026-09-30 前 Sheet 寫 TYO:7803
     "LON:VWRA":   {"company": "Vanguard FTSE All-World UCITS ETF (Acc)", "neo4j_id": None},
     "00981A.TW":  {"company": "主動統一台股增長 ETF (統一投信)",          "neo4j_id": None},
     "00631L.TW":  {"company": "元大台灣50正2 ETF",                      "neo4j_id": None},
@@ -309,23 +309,26 @@ SHEET_PRICED_CURRENCIES: frozenset[str] = frozenset({"USD", "TWD", "EUR", "JPY"}
 #: 建倉接受的代號寫法 → 必須的幣別（白名單；R2 覆核 2026-09-30：只擋「認得出的錯」會漏——裸 4 碼台股配 USD、
 #: LON: 的 GBX 股票、.ST／.PA 這類公式轉不出的寫法都會安靜算錯）。**認不得的寫法一律拒收，走手動建列。**
 #: 對齊 Sheet 市值公式：有冒號照原字串抓價；幣別 TWD 或 4 碼數字 → TPE:；JPY 且 `數字.T` → TYO:；其餘照原字串。
+#: 台股、日股的寫法＝公司名冊（`config/company_identity.json`）的 research ticker 寫法（`.TW`、`.T`）——
+#: 2026-09-30 使用者定案：Sheet 改用名冊的寫法，不為 Sheet 另做一套別名（原本 Sheet 寫 `TYO:7803`，已改成 `7803.T`）。
 _SYMBOL_CURRENCY = (
     (re.compile(r"[0-9]{4,6}[A-Z]?\.TW"), "TWD", "台股"),
-    (re.compile(r"TYO:[0-9]{4}"), "JPY", "日股"),
+    (re.compile(r"[0-9]{4}\.T"), "JPY", "日股"),
     (re.compile(r"(?:FRA|ETR|EPA|AMS):[A-Z0-9]{1,6}"), "EUR", "歐元區交易所"),
     (re.compile(r"[A-Z]{1,5}(?:\.[AB])?"), "USD", "美股"),      # 後綴只收股別 .A／.B（VOD.L 這類是別的交易所）
 )
 
 
 def canonical_symbol(symbol: str) -> str:
-    """比對同一檔用，照 Sheet 市值公式的規則（公式把它們當同一檔，比對也要）：大寫；`TPE:XXXX` 與裸的台股數字代號
-    補成 `XXXX.TW`；日股 `XXXX.T` 補成 `TYO:XXXX`（R2 覆核 2026-09-30：只處理台股時，`7803.T` 被當成 TYO:7803 以外的
-    另一檔——同券商開出重複列、5% 上限少算已持有；第三次覆核指出的對稱面）。"""
+    """比對同一檔用，照 Sheet 市值公式的規則（公式把它們當同一檔，比對也要）；正規化的方向一律是**公司名冊的寫法**：
+    大寫；`TPE:XXXX` 與裸的台股數字代號補成 `XXXX.TW`；日股 `TYO:XXXX` 補成 `XXXX.T`（R2 覆核 2026-09-30：只處理台股時，
+    同一檔日股的兩種寫法被當成兩檔——同券商開出重複列、5% 上限少算已持有；同日使用者定案 Sheet 改用名冊寫法，
+    這裡跟著以名冊寫法為準，不為 Sheet 另做別名）。"""
     s = symbol.strip().upper()
     if re.fullmatch(r"TPE:[0-9]{4,6}[A-Z]?", s):
         s = s[4:]
-    if re.fullmatch(r"[0-9]+\.T", s):
-        return "TYO:" + s[:-2]
+    if re.fullmatch(r"TYO:[0-9]+", s):
+        return s[4:] + ".T"
     return f"{s}.TW" if re.fullmatch(r"[0-9]{4,6}[A-Z]?", s) else s
 
 
@@ -337,12 +340,12 @@ def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
         return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
     if re.fullmatch(r"(?:TPE:)?[0-9]{4,6}[A-Z]?", s):
         return f"台股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（別的寫法公式也當台股，但 Sheet 的慣例是 .TW）"
-    if re.fullmatch(r"[0-9]+\.T", s):
-        return f"日股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（XXXX.T 公式也當日股，但 Sheet 的慣例是 TYO:）"
+    if re.fullmatch(r"TYO:[0-9]+", s):
+        return f"日股代號請寫成公司名冊的寫法 {canonical_symbol(s)}（TYO: 公式也當日股，但 Sheet 一律用名冊的 .T）"
     for pattern, need, label in _SYMBOL_CURRENCY:
         if pattern.fullmatch(s):
             return None if cur == need else f"{symbol} 是{label}代號，幣別應該是 {need}（給的是 {cur}）"
-    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW、日股 TYO:、歐元區 FRA:／ETR:／EPA:／AMS:、"
+    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW、日股 XXXX.T、歐元區 FRA:／ETR:／EPA:／AMS:、"
             "美股裸代號；上櫃 .TWO、LON:、.ST／.PA 等請手動建列）")
 
 
@@ -386,7 +389,7 @@ def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, bro
     positions = [r for r in range(2, insert_at) if val(r, "bucket").upper() != "CASH"]
     if not positions:
         raise ValueError("第一個 CASH 列上面沒有任何持股列可以複製公式")
-    # 標準公式＝持股列裡的多數形狀；少數列是使用者的手動例外（2026-09-30 實測：TYO:7803 抓不到價，手寫市值），
+    # 標準公式＝持股列裡的多數形狀；少數列是使用者的手動例外（2026-09-30 實測：7803——當時代號寫 TYO:7803——抓不到價，手寫市值），
     # 照實列出、不中止——但範本只從標準列挑。多數不到三分之二就不猜，中止。
     all_positions = [r for r in range(2, last + 1) if val(r, "bucket").upper() != "CASH"]
     formula_columns = [h for h in headers
