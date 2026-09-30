@@ -35,6 +35,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import os
 import sys
 from datetime import datetime, timezone
@@ -391,9 +392,10 @@ def main(argv: list[str] | None = None) -> int:
         if args.disproof_watch is not None and (args.side != "sell" or not args.disproof_watch.strip()):
             print("✗ --disproof-watch 只用在 alpha 賣出（觸發這次賣出的反證），而且要給 watch id", file=sys.stderr)
             return 2
-    if args.fx_to_base is not None and not args.fx_to_base > 0:
-        # 0 或負數在硬擋那一端會被當成「未提供」、收尾卻指路 --override（第三次覆核 N4）——在入口就拒收。
-        print(f"✗ --fx-to-base 必須大於 0（給的是 {args.fx_to_base}）：它是「1 成交幣等於多少 NAV 基準幣」", file=sys.stderr)
+    if args.fx_to_base is not None and not (math.isfinite(args.fx_to_base) and args.fx_to_base > 0):
+        # 0、負數、NaN、inf 在硬擋那一端會被當成「未提供」、收尾卻指路 --override（第三次覆核 N4、第四次 NB1）——入口就拒收。
+        print(f"✗ --fx-to-base 必須是大於 0 的有限數（給的是 {args.fx_to_base}）：它是「1 成交幣等於多少 NAV 基準幣」",
+              file=sys.stderr)
         return 2
     if args.open_position and (args.side != "buy" or args.log_only):
         print("✗ --open-position 只用在買進，而且要由本腳本寫 Sheet（不能配 --log-only）", file=sys.stderr)
@@ -438,8 +440,11 @@ def main(argv: list[str] | None = None) -> int:
     if not args.log_only and cash_currency[args.cash_column] and cash_currency[args.cash_column] != args.currency:
         fix = (f"請給 --cash-column cash_{args.currency.lower()} 或 none" if args.currency in ("USD", "TWD") else
                f"Sheet 沒有 {args.currency} 的現金欄——請給 --cash-column none（帳上的現金另行手動更新）")
+        # 給了 --currency 卻給錯時，這裡還不知道 Sheet 那一列的幣別（還沒讀 Sheet）——提醒一併核對（第四次覆核 NB5）。
+        check = "（也請確認 --currency 與 Sheet 那一列一致）" if currency_given else ""
         print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency[args.cash_column]}，成交幣別是 {args.currency}"
-              f"{'' if currency_given else '（沒給 --currency，預設 USD）'}——金額會以錯的幣別扣款；{fix}", file=sys.stderr)
+              f"{'' if currency_given else '（沒給 --currency，預設 USD）'}——金額會以錯的幣別扣款；{fix}{check}",
+              file=sys.stderr)
         return 2
     from fetchers import gsheets
 
@@ -493,8 +498,11 @@ def main(argv: list[str] | None = None) -> int:
             if row_currency != args.currency:
                 # 一次寫齊要給的旗標（第三次覆核 N3：只寫 --currency 時，現金欄還會再擋一兩次才收斂）；
                 # 匯率只有買進要（賣出不量硬擋），--log-only 不碰現金格所以不提現金欄。
-                fx = (f" --fx-to-base <1 {row_currency} 等於多少 USD>"
-                      if row_currency not in ("", "USD") and args.side == "buy" else "")
+                # 匯率的基準幣讀 Sheet 的 base_currency（第四次覆核 NB4：原本寫死 USD，基準幣一改就叫人給錯匯率）。
+                base = next((str(r.get("base_currency") or "").strip().upper() for r in (sheet_rows or [])
+                             if r.get("base_currency")), "USD")
+                fx = (f" --fx-to-base <1 {row_currency} 等於多少 {base}>"
+                      if row_currency not in ("", base) and args.side == "buy" else "")
                 cash = ("" if args.log_only else
                         f" --cash-column {'cash_' + row_currency.lower() + ' 或 none' if row_currency in ('USD', 'TWD') else 'none'}")
                 raise ValueError(f"Sheet 那一列（{currency_cell['a1']}）的幣別是 {row_currency or '（空）'}，成交幣別是 "

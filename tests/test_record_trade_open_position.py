@@ -920,7 +920,7 @@ def test_a_twd_cash_column_without_a_currency_is_refused_before_reading_the_shee
     assert reads == []
 
 
-@pytest.mark.parametrize("fx", ["0", "-0.0068"])
+@pytest.mark.parametrize("fx", ["0", "-0.0068", "nan", "inf"])     # 第四次覆核 NB1／NB2
 def test_a_non_positive_fx_is_refused_at_the_door(monkeypatch, tmp_path, capsys, fx) -> None:
     """N4：匯率 0 或負數原本在硬擋那端被當成「未提供」、收尾卻指路 --override——入口就拒收。"""
     from tests.test_record_trade import _module
@@ -929,7 +929,7 @@ def test_a_non_positive_fx_is_refused_at_the_door(monkeypatch, tmp_path, capsys,
     module.TRADE_LOG = tmp_path / "trade_log.jsonl"
     assert module.main(["--symbol", "7803.T", *_ROW, "--currency", "JPY", "--cash-column", "none",
                         "--fx-to-base", fx]) == 2
-    assert "--fx-to-base 必須大於 0" in capsys.readouterr().err
+    assert "--fx-to-base 必須是大於 0 的有限數" in capsys.readouterr().err
 
 
 def test_mismatch_hints_are_complete_in_one_go(monkeypatch, tmp_path, capsys) -> None:
@@ -955,3 +955,25 @@ def test_log_only_does_not_print_a_cash_diff_that_does_not_apply(monkeypatch, tm
     assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "JPY", "--fx-to-base", "0.0068", "--log-only"]) == 0
     out = capsys.readouterr().out
     assert "--log-only：現金格不比對、不寫" in out and "cash_usd" not in out
+    assert "僅此兩格" in out                                          # 第四次覆核 NB3：標題不說三格
+
+
+def test_a_wrong_currency_hint_also_asks_to_check_the_row(monkeypatch, tmp_path, capsys) -> None:
+    """第四次覆核 NB5：給了錯的 --currency 時，讀 Sheet 前的現金欄檢查還不知道那一列的幣別——提示要一併叫人核對。"""
+    from tests.test_record_trade import _module
+
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    assert module.main(["--symbol", "AXTI", *_ROW, "--currency", "TWD"]) == 2
+    assert "也請確認 --currency 與 Sheet 那一列一致" in capsys.readouterr().err
+
+
+def test_the_fx_hint_names_the_sheets_base_currency_not_a_hardcoded_usd(monkeypatch, tmp_path, capsys) -> None:
+    """第四次覆核 NB4：提示裡的匯率基準幣要讀 Sheet 的 base_currency——寫死 USD 時，基準幣一改就叫人給錯匯率。"""
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    rows = [dict(r, base_currency="TWD") for r in _sheet_rows(AXTI=0.0)]
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=rows, row_currency="JPY")
+    assert module.main(["--symbol", "AXTI", *_ROW]) == 2
+    err = capsys.readouterr().err
+    assert "--fx-to-base <1 JPY 等於多少 TWD>" in err and "等於多少 USD" not in err
