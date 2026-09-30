@@ -42,6 +42,12 @@ def fake_candidates_payload() -> dict:
                    "not_read": {"n": 0, "tickers": [], "reasons": {}},
                    "edge": {"edge": 2, "not_edge": 1}},
         "universe": ["AXTI", "COHR", "LITE"],
+        "no_narrative": [
+            {"ticker": "COHR", "company_id": "co:coherent",
+             "three_words": {"will_it_die": "紅", "priced_in": "未答", "in_numbers": "未答"}},
+            {"ticker": "LITE", "company_id": "co:lumentum",
+             "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "未答", "in_numbers": "未答"}},
+        ],
     }
     return build_candidates_artifact(board, generated_at=datetime(2026, 9, 29, tzinfo=timezone.utc))
 
@@ -106,7 +112,50 @@ def test_materialize_candidates_keeps_an_explicit_empty_universe(monkeypatch, tm
                                         "narrative_rewrite", "ledger", "rollup", "universe", "today")}
 
     monkeypatch.setattr(cand, "load_board", fake_load)
+    monkeypatch.setattr(mat, "_graph_node_names", lambda ids: {})          # 測試不連真的圖
     monkeypatch.setattr(ArtifactStore, "tickers", lambda self: ["SHOULD_NOT_BE_USED"])
     mat.materialize_candidates(tickers=[], store=StateArtifactStore(tmp_path))
     mat.materialize_candidates(tickers=None, store=StateArtifactStore(tmp_path))
     assert seen == [[], ["SHOULD_NOT_BE_USED"]]
+
+
+def test_the_no_narrative_list_travels_with_the_board_and_counts_as_cognition() -> None:
+    """2026-09-30：不上板的那幾檔照抄進 artifact（計數旁邊列得出是誰）；燈變色＝認知變了，freshness 跟著變。"""
+    payload = fake_candidates_payload()
+    assert [r["ticker"] for r in payload["no_narrative"]] == ["COHR", "LITE"]
+    assert payload["counts"]["no_narrative"] == len(payload["no_narrative"])
+    board = {k: v for k, v in payload.items()}
+    board["no_narrative"] = [dict(payload["no_narrative"][0], three_words={"will_it_die": "黃", "priced_in": "未答",
+                                                                           "in_numbers": "未答"}),
+                             payload["no_narrative"][1]]
+    again = build_candidates_artifact(board, generated_at=datetime(2026, 9, 29, tzinfo=timezone.utc))
+    assert again["freshness_identity"] != payload["freshness_identity"]
+
+
+def test_frontend_lists_no_narrative_tickers_and_says_how_to_get_on_the_board() -> None:
+    from pathlib import Path
+
+    source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "payload.no_narrative" in source and "沒有敘事、不上板" in source
+    assert "要讓一檔上板，路是研究它、寫敘事" in source
+
+
+def test_board_rides_get_node_names_from_the_graph_and_fall_back_to_ids(monkeypatch) -> None:
+    """候選板「押在哪一格」補節點名（圖裡的 name）；圖讀不到就不補（畫面照印 ID）、不擋組板。"""
+    from webapp import materialize as mat
+
+    payload = fake_candidates_payload()
+    board = {"groups": payload["groups"], "side_groups": payload["side_groups"]}
+    monkeypatch.setattr(mat, "_graph_node_names", lambda ids: {"mat:inp_substrate": "Indium Phosphide (InP) substrate"})
+    mat._attach_ride_node_names(board)
+    assert board["groups"]["priced_wait"][0]["rides"][0]["node_name"] == "Indium Phosphide (InP) substrate"
+
+    fresh = fake_candidates_payload()
+    board = {"groups": fresh["groups"], "side_groups": fresh["side_groups"]}
+
+    def down(ids):
+        raise RuntimeError("neo4j down")
+
+    monkeypatch.setattr(mat, "_graph_node_names", down)
+    mat._attach_ride_node_names(board)
+    assert "node_name" not in board["groups"]["priced_wait"][0]["rides"][0]

@@ -221,7 +221,7 @@ def _brief_frame() -> dict[str, Any]:
         "_how_to_use": (
             "七格照順序各寫一到兩句白話；數字一律用 placeholder（{price}／{own_history_pctile}／{in_numbers_latest}…），"
             "不得打字面值；每格 evidence_refs 必須是 evidence_index 的 key；禁字表裡的內部名詞一出現就拒收。"
-            "結構化欄位：rides[]（只能騎本公司在供給側的現行讀圖）、disproof[]（寫入即登記成 watch；已在盯的只填 "
+            "結構化欄位：rides[]（只能押本公司在供給側的現行讀圖）、disproof[]（寫入即登記成 watch；已在盯的只填 "
             "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（缺 X／等回落要先用 "
             "`python -m engine_b.event_watch add --wake-brief <co:*> …` 建好 watch）。存檔：python -m alpha brief <T> --add spec.json"),
         "slots": [{"key": k, "label": v, **BRIEF_FRAME_V2[k]} for k, v in BRIEF_SLOTS_V2],

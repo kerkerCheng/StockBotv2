@@ -169,7 +169,7 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
         if reading is None or company not in _supply_side(reading):
             side = ("需求側" if reading is not None and company in _demand_side(reading) else "兩側都不在")
             problems.append(f"rides：{company} 不在 {ride.reading_id}（{ride.node}）的供給側——它在{side}；"
-                            "只能騎自己在供給側的讀圖")
+                            "只能押自己在供給側的讀圖")
 
     # ② disproof：到期、實體、出處、已在盯的只連結
     live_by_condition = {}
@@ -244,7 +244,7 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
         for ride in parsed.rides:
             row = status_by_ride.get((ride.node, ride.unit)) or {}
             if row.get("kind") not in OPEN_READING_KINDS:
-                problems.append(f"open：騎的 {ride.reading_id} 判讀是 {row.get('kind')}——可開要護城河或量")
+                problems.append(f"open：押的 {ride.reading_id} 判讀是 {row.get('kind')}——可開要護城河或量")
         blocking = blocking_for_open(company, ticker, watches=watches, lifecycle=ctx.lifecycle, brief_ids=brief_ids,
                                      current_brief=parsed, acknowledged=acked)
         if blocking:

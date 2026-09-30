@@ -587,16 +587,16 @@ filesystem 結構，不該經由 HTTP 出去。遮成 `«private-authority»`，
 持股身分解析住 `portfolio/holdings.py`（`engine_b/cli.py::_held` 也呼叫它，但保留自己的語意：全部持股、含 beta、Sheet 讀不到 fail closed）；
 alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is_beta_symbol`（與硬擋同一條線）。每列回
 `{declared, derived, preconditions[], edge, held_source, …}`：已持有（Sheet、alpha、股數 > 0）優先；非邊緣進「非倍率候選」、
-邊緣無法量另一組；宣告可開每天重驗四個前提（騎的讀圖仍現行且是護城河／量、answers 的稽核行沒變全缺席、歸屬本檔的 watch 沒有待判、
+邊緣無法量另一組；宣告可開每天重驗四個前提（押的讀圖仍現行且是護城河／量、answers 的稽核行沒變全缺席、歸屬本檔的 watch 沒有待判、
 連結的反證來源仍在盯），破了進「前提失效」。每一列（不論宣告哪一態）另帶 `rewrite[]`：連結斷了（附為什麼斷——來源收掉／被判觸及／
 到期未判，L12）、敘事來源 watch 醒來／觸及／到期未判（plan §5 第 6 點）、缺 X／等回落在等的 watch 已失效。「連結斷了」的唯一判定是
 `engine_b/narrative_watches.py::link_breaks`，佇列段 `narrative_rewrite`（經 `observe(narrative_link_breaks=…)` 注入）、audit
 （QueueSegments、QueueLiveness 的兩週滯留）、心跳段 3 共用；audit 的 rewrite 類「有去處」另查候選板該檔列帶著那筆 watch
 （只查 artifact 產生之前就該重寫的，讀不到 artifact 記成「沒檢查」）。artifact 另帶宇宙每一檔的 rollup：逐行有值／依 kind 的缺席
 （沿用 `alpha.three_questions.rollup`）、燈的**盞數**（紅／黃／綠／**灰＝沒量到**，灰依 kind 分）與有紅燈的檔、讀不到的檔與理由——
-心跳段 2 與段 4 只讀這一份（⚠ 不取「每檔最差色」：一綠三灰會被算成綠）。**組內按 ticker 字母，不排序、不打分、不給尺寸。**`python -m webapp materialize --structure-table`
+心跳段 2 與段 4 只讀這一份（⚠ 不取「每檔最差色」：一綠三灰會被算成綠）。沒有敘事、不上板的檔另列 `no_narrative[]`（2026-09-30：原本只有計數；每檔帶三個字，與 `counts.no_narrative` 同一個來源——`derive_row` 回 None 的那幾檔；不是第六組）。**組內按 ticker 字母，不排序、不打分、不給尺寸。**`python -m webapp materialize --structure-table`
 走與 `python -m query.bottleneck` **同一條路**（同一個 driver、`fetch_assertions`、registry），把 `structure_table()` 的逐邊事實
-**照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。
+**照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；每列另帶圖裡節點的 `name`（`bottleneck_name`／`demand_anchor_name`／`chain_names`；同一個 session 查，圖裡沒有名字就是 None、不從 ID 猜），`layers[]` 是畫面「只看某一層」的選項（依名字字母，選單排列不是名次；app.js 不排序）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。
 （2026-09-08 至 09-23 之間這裡是 `ranking` kind：兩份排序＋`top_pick`；隨 G1 退役，見 plan §0.6 #40。）
 
 **`beta` kind（2026-09-08 B2）：** `python -m webapp materialize --beta` 以 `--no-refresh --no-record-risk` 純讀呼叫

@@ -304,13 +304,13 @@ def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
     lines = tuple(
         _line(key, label, datum, "bet")
         for key, label, datum in (("our_bet", "我們賭什麼（研究 session 寫下的那一句）", our_bet),
-                                  ("rides", "騎哪一層或插槽（敘事宣告）", rides),
+                                  ("rides", "押在哪一層（或哪個插槽；敘事宣告）", rides),
                                   ("what_must_be_true", "什麼必須為真、錯的訊號是什麼", must))
         if datum is not None)
     status = ("available" if (our_bet is not None and our_bet.is_known)
               else ((our_bet.status if our_bet is not None else None) or "missing"))
     return AnalystPanel(
-        key="bet", title="賭注：我們賭什麼、騎在哪、什麼必須為真（純文字，optional）",
+        key="bet", title="賭注：我們賭什麼、押在哪一層、什麼必須為真（純文字，optional）",
         questions=(),
         status=status, optional=True,
         source_sections=("investor_brief",),
@@ -319,7 +319,7 @@ def _bet_panel(view: AlphaInvestmentView) -> AnalystPanel:
         lines=lines,
         notes=(
             "**沒有價格、沒有報酬、沒有機率加權**——四個價格已於 2026-09-23 Phase 0 退役。",
-            "「騎哪一層或插槽」是寫的人宣告的；那一份讀圖**現在**還是不是現行，看讀圖面板與候選狀態（前提失效會現形）。",
+            "「押在哪一層（或哪個插槽）」是寫的人宣告的；那一份讀圖**現在**還是不是現行，看讀圖面板與候選狀態（前提失效會現形）。",
         ),
         context={"available": status not in VALUELESS_STATUSES,
                  "optional_rule": "沒寫賭注只表示「還沒寫」，不代表這檔研究不完整；"

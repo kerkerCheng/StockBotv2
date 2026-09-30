@@ -21,6 +21,7 @@ from ..candidates import (
     stall_since, three_words,
 )
 from ..narrative.contracts import RECORD_VERSION_V2, InvestorBrief, select_brief
+from ..structure_reading.contracts import READING_KINDS, READING_UNITS
 from .briefs import CURRENT_READING_STATUSES, OPEN_READING_KINDS
 
 
@@ -39,11 +40,11 @@ def open_preconditions(brief: InvestorBrief, *, reading_rows: Mapping[tuple[str,
     for ride in brief.rides:                                                   # ① 騎的讀圖仍現行、判讀仍是護城河或量
         row = reading_rows.get((ride.node, ride.unit))
         if row is None or row.get("reading_id") != ride.reading_id:
-            failed.append(f"騎的讀圖 {ride.reading_id} 已不是現行（現行 {row.get('reading_id') if row else '沒有'}）")
+            failed.append(f"押的讀圖 {ride.reading_id} 已不是現行（現行 {row.get('reading_id') if row else '沒有'}）")
         elif row.get("status") not in CURRENT_READING_STATUSES:
-            failed.append(f"騎的讀圖 {ride.reading_id} 狀態 {row.get('status')}（只有 current／stale_low 算現行）")
+            failed.append(f"押的讀圖 {ride.reading_id} 狀態 {row.get('status')}（只有 current／stale_low 算現行）")
         elif row.get("kind") not in OPEN_READING_KINDS:
-            failed.append(f"騎的讀圖 {ride.reading_id} 判讀是 {row.get('kind')}（可開要護城河或量）")
+            failed.append(f"押的讀圖 {ride.reading_id} 判讀是 {row.get('kind')}（可開要護城河或量）")
     answers = brief.answers                                                    # ② answers 的稽核行沒有全變缺席
     if answers is not None:
         if three_questions is None:
@@ -101,8 +102,13 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
             same = r is not None and r.get("reading_id") == ride.reading_id
             # 三種不同的事分開寫（L12）：現行（照印狀態）、那一格現行的是另一份（superseded）、那一格這次沒有讀圖列
             # （讀圖 ledger 讀不到或壞行——不是「換版」）。
+            kind = r.get("kind") if same else None
+            # 中文標籤跟著列走（2026-09-30 使用者回饋：候選板印 `volume`／`layer` 看不懂）——字彙的 SSOT 是讀圖 contracts，
+            # 取前半句（與個股頁讀圖面板同一個切法）；畫面照抄、不自己維護對照表（L16）。
             row["rides"].append({"node": ride.node, "unit": ride.unit, "reading_id": ride.reading_id,
-                                 "kind": r.get("kind") if same else None,
+                                 "unit_label": str(READING_UNITS.get(ride.unit, ride.unit)).split("讀圖")[0],
+                                 "kind": kind,
+                                 "kind_label": str(READING_KINDS.get(str(kind), kind)).split("——")[0] if kind else None,
                                  "status": r.get("status") if same else ("superseded" if r is not None else "not_found")})
     if held_info is not None:                                                   # Sheet 持有 → 已持有，宣告照留
         row.update(derived="held", group="held")
@@ -372,6 +378,9 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
     tq_notes: dict[str, str] = {}
     parse_errors: list[str] = []
     rows: list[dict[str, Any] | None] = []
+    # 不上板的那幾檔（沒有敘事、也沒有持有）：原本只有計數，使用者看不到是誰（2026-09-30 回饋「候選板是死的」）。
+    # 每檔帶首屏三個字——會死嗎照燈，兩題「未答」；上板的依據仍是敘事，這份清單不是第六組。
+    no_narrative: list[dict[str, Any]] = []
     company_ticker: dict[str, str] = {}
     brief_company: dict[str, str] = {}
     for ticker in [*universe, *sorted(extra)]:
@@ -389,9 +398,14 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         if note:
             tq_notes[ticker] = note
         cid = extra.get(ticker) or registry.company_id_for_ticker(ticker)
-        rows.append(derive_row(ticker, cid, records=records, today=today, reading_rows=reading_rows,
-                               watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
-                               held=held, three_questions_note=note))
+        row = derive_row(ticker, cid, records=records, today=today, reading_rows=reading_rows,
+                         watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
+                         held=held, three_questions_note=note)
+        rows.append(row)
+        if row is None:
+            no_narrative.append({"ticker": ticker, "company_id": cid,
+                                 "three_words": three_words(tq, brief, not_read=(f"未讀到（{note}）" if note
+                                                                                 else "未讀到"))})
     for cid, info in (held.get("by_company") or {}).items():                   # registry 沒有 research ticker 的持有
         if cid not in {r["company_id"] for r in rows if r} and cid not in extra.values():
             rows.append(derive_row(str(info.get("sheet_ticker")), cid, records=[], today=today,
@@ -402,6 +416,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                            narrative_rewrite=board_rewrite(rows, link_breaks(current_briefs(), watches=watches),
                                                            watches=watches, company_ticker=company_ticker,
                                                            brief_company=brief_company))
+    board["no_narrative"] = no_narrative
     board["rollup"] = rollup({t: tq_by_ticker[t] for t in board_universe},
                              {t: edges.get(t) or {} for t in board_universe}, not_read_reasons=tq_notes)
     board["ledger"] = {"present": ledger_present, "tickers": len(ledger_tickers), "parse_errors": len(parse_errors),

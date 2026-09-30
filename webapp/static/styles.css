@@ -399,3 +399,22 @@ table.rank.compare td:first-child { color: var(--muted); }
 .brief-card .candidate-state { font-size: 15px; }
 .brief-card .candidate-words { display: flex; flex-wrap: wrap; gap: .3rem 1.2rem; margin: .35rem 0; }
 .brief-card .candidate-words .word { white-space: nowrap; }
+/* 2026-09-30：三個字可以點（跳到同頁稽核區那一題）。 */
+.brief-card .candidate-words .word-link {
+  font: inherit; color: var(--accent); background: transparent; cursor: pointer;
+  border: 1px solid var(--border); border-radius: 999px; padding: .15rem .6rem;
+}
+.brief-card .candidate-words .word-link:hover { background: var(--surface-2); }
+.brief-card .lamp-notes { margin: .1rem 0 .3rem; }
+.glossary { margin-top: .6rem; padding: .45rem .7rem; border-left: 3px solid var(--border); }
+.glossary .rule { margin: .15rem 0; }
+.table-filter { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 4px; }
+.table-filter input, .table-filter select {
+  font: inherit; color: var(--text); background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 6px 10px; min-width: 0; max-width: 100%;
+}
+.table-filter input { flex: 1 1 220px; }
+.table-filter select { flex: 0 1 260px; }
+.table-filter-count { flex-basis: 100%; }
+.node-name { font-weight: 600; }
+ul.no-narrative { columns: 3 12rem; }

@@ -362,3 +362,44 @@ def test_frontend_structure_table_view_never_sorts_or_scores() -> None:
     assert "TABLE_VOCAB.sole_source_states" in source     # 三態說明來自 artifact，不是前端自寫
     html = (ROOT / "webapp" / "static" / "index.html").read_text(encoding="utf-8")
     assert 'href="#/structure-table"' in html and "#/ranking" not in html
+
+
+
+# ---------------------------------------------------------------------------
+# 2026-09-30：內部代號換成名字、依層篩選的選項（使用者回饋「結構表是死的頁面」）
+# ---------------------------------------------------------------------------
+
+def test_node_names_replace_internal_ids_but_are_never_guessed() -> None:
+    """名字取自圖裡節點的 `name`（materialize 時同一個 session 查）；圖裡沒有名字就是 None——不從 ID 造名字。
+    公司名先用 registry，registry 沒有才用圖裡的名字。"""
+    names = {"tech:ai_switch": "AI Switch", "co:lumentum": "Lumentum Holdings"}
+    payload = fake_table_payload(node_names=names)
+    by_company = {r["company_id"]: r for r in payload["rows"]}
+    lite = by_company["co:lumentum"]
+    assert lite["company_label"] == "Lumentum Holdings"                  # registry 沒有 → 圖裡的名字
+    assert by_company["co:coherent"]["company_label"] == "Coherent Corp."  # registry 有 → registry 優先
+    assert lite["bottleneck_name"] == "AI Switch" and lite["demand_anchor_name"] == "AI Switch"
+    assert len(lite["chain_names"]) == len(lite["chain"])
+    axt = by_company["co:axt"]
+    assert axt["bottleneck_name"] is None                                  # co:coherent 沒給名字 → None，不猜
+    assert all(n is None or n in names.values() for r in payload["rows"] for n in r["chain_names"])
+    assert fake_table_payload()["rows"][0]["bottleneck_name"] is None       # 沒給名字表：照舊可建
+
+
+def test_layer_options_cover_every_bottleneck_once_in_name_order_not_rank() -> None:
+    """「只看某一層」的選項：每個瓶頸節點一項、幾條邊照數；依名字字母（選單排列，不是名次）；表的列序不動。"""
+    names = {"tech:ai_switch": "AI Switch", "co:coherent": "Coherent"}
+    payload = fake_table_payload(node_names=names)
+    layers = payload["layers"]
+    assert {item["id"] for item in layers} == {r["bottleneck"] for r in payload["rows"]}
+    assert sum(item["edges"] for item in layers) == len(payload["rows"])
+    keys = [str(item["name"] or item["id"]).casefold() for item in layers]
+    assert keys == sorted(keys)
+    assert [r["company_id"] for r in payload["rows"]] == ["co:axt", "co:coherent", "co:lumentum", "co:nvidia"]
+
+
+def test_frontend_structure_table_hides_ids_behind_names_and_filters_without_sorting() -> None:
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "row.bottleneck_name" in source and "row.demand_anchor_name" in source and "chain_names" in source
+    assert "payload.layers" in source and "type = 'search'" in source
+    assert "篩掉" in source                                                # 篩掉幾條照印（INV-3）

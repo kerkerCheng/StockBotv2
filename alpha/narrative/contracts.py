@@ -130,7 +130,7 @@ BRIEF_FRAME: Mapping[str, Mapping[str, str]] = {
 BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
     "demand": {
         "question": "什麼在放量、誰在花錢？（需求端：哪個系統／哪家客戶正在花真錢，錢往哪裡流）",
-        "look_at": "你騎的讀圖的需求側、客戶端的資本承諾（投資／預付／長約）",
+        "look_at": "你押的那份讀圖的需求側、客戶端的資本承諾（投資／預付／長約）",
         "do_not": "⚠ 不得寫『AI 需求強勁』這種沒有主詞的句子——要有誰、花多少、買什麼。⚠ 金額要指得回引用。",
     },
     "position": {
@@ -139,7 +139,7 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
         "do_not": "⚠ 不得用內部節點名——用人話。⚠ 答了 `answers.in_numbers`＝yes／no 這一格就必須含 {in_numbers_latest}。",
     },
     "bottleneck": {
-        "question": "為什麼卡在它？（引用你騎的讀圖結論；誰想殺它＝反向路徑上的替代者）",
+        "question": "為什麼卡在它？（引用你押的那份讀圖結論；誰想殺它＝反向路徑上的替代者）",
         "look_at": "rides[] 的讀圖判讀（護城河／量）、substitutability、客戶端印證、反向路徑",
         "do_not": "⚠ 不得寫 sole_source／designed_in／substitutability=5——寫『目前只有它一家被設計進去』。"
                   "⚠ 供應商自己說的獨家不算，要說出是誰印證的。",
@@ -151,7 +151,7 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
                   "寫出理由，不寫目標價、不寫同業折價、不寫報酬（相對組漲幅也是報酬，只在稽核區）。",
     },
     "our_bet": {
-        "question": "我們賭的是哪一件事？騎的是層還是插槽？",
+        "question": "我們賭的是哪一件事？押的是層還是插槽？",
         "look_at": "rides[] 的單位與讀圖結論、thesis 的爭點",
         "do_not": "⚠ 賭的是一件可被反證的事，不是一個價格。",
     },
@@ -487,7 +487,7 @@ class InvestorBrief:
             if bad:
                 raise ContractViolation(f"what_must_be_true 不得有價格或報酬：{bad}")
         if self.candidate_state.state == "open" and not self.rides:
-            raise ContractViolation("candidate_state=open 至少要騎一格讀圖（rides[] 不得為空）")
+            raise ContractViolation("candidate_state=open 至少要押一格讀圖（rides[] 不得為空）")
         seen: set[str] = set()
         for a in self.acknowledged_touched:
             if a.watch_id in seen:

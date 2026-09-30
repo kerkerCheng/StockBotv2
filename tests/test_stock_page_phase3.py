@@ -106,7 +106,7 @@ def test_downside_links_every_disproof_to_its_watch_and_prints_unwatched(tmp_pat
     assert link["watch_id"] == "ew_read" and link["source_ref"] == f"reading:{READ}#1", "連結以完整來源鍵對，不以措辭"
     # 騎的讀圖那一條也是 ew_read：同一筆 watch 只印一列，後到的來源併進 also（不多算一次在盯）
     assert ("reading", READ_COND) not in rows
-    assert link["also"] == [{"source": "reading", "source_label": "騎的讀圖的反證", "source_ref": f"reading:{READ}",
+    assert link["also"] == [{"source": "reading", "source_label": "押的那份讀圖的反證", "source_ref": f"reading:{READ}",
                              "condition": READ_COND}]
     judged = rows[("judgment", "舊判讀的推翻條件")]
     assert judged["watch_id"] is None and judged["state"] == "unwatched" and "不涵蓋" in judged["source_label"]
@@ -444,7 +444,7 @@ def test_argument_chain_reads_the_demand_side_and_carries_where_it_came_from() -
     view = _full_view(chain_readings=demand,
                       narrative_context={"node_names": {"co:coherent": "Coherent", "mat:inp_substrate": "InP 基板"}})
     chain = next(p for p in view.argument.paragraphs if p.key == "argument:chain")
-    assert chain.value.startswith("騎的層「InP 基板」讀成「B：量的賭注」（現行）；需求端是「Coherent」。")
+    assert chain.value.startswith("押的層「InP 基板」讀成「B：量的賭注」（現行）；需求端是「Coherent」。")
     assert chain.dependencies["demand"]["readings"][0]["reading_id"] == READ
     assert chain.dependencies["demand"]["basis"] == "rides"
     unread = next(p for p in _full_view().argument.paragraphs if p.key == "argument:chain")
@@ -731,7 +731,7 @@ def test_markdown_renders_every_new_panel_and_no_python_repr(monkeypatch) -> Non
                                           "watch_id": "ew_1", "state": "active", "state_label": "在盯"}],
                                 "counts": {"active": 1}}}))
     for heading in ("## 這檔現在在哪一格", "## 讀圖：它坐的那一層結構變了沒（核心）", "## 錯了怎麼知道",
-                    "## 財務三題的數字", "## 賭注：我們賭什麼、騎在哪、什麼必須為真"):
+                    "## 財務三題的數字", "## 賭注：我們賭什麼、押在哪一層、什麼必須為真"):
         assert heading in text, heading
     assert "已定價等回落" in text and "B：量的賭注" in text and "ew\\_1" in text
     assert "「InP 基板」（層）" in text and "{'node'" not in text and "\nNone" not in text

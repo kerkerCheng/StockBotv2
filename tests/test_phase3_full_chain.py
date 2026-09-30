@@ -161,7 +161,8 @@ def test_the_new_pipeline_hands_each_stage_output_to_the_next(chain, monkeypatch
     board = chain["board"]
     row = board["groups"]["missing"][0]
     assert row["ticker"] == TICKER and row["brief_id"] == brief.brief_id and row["watch"]["watch_id"] == chain["wait"]["watch_id"]
-    assert row["rides"] == [{"node": SOCKET, "unit": "socket", "reading_id": rid, "kind": "volume", "status": "current"}]
+    assert row["rides"] == [{"node": SOCKET, "unit": "socket", "reading_id": rid, "kind": "volume", "status": "current",
+                             "unit_label": "插槽", "kind_label": "B：量的賭注"}]
     assert row["three_words"]["will_it_die"].startswith("紅") and row["three_words"]["priced_in"] == "無法量"
 
     # 候選板 artifact → 心跳段 2：計數與三題 rollup 讀得到
@@ -183,7 +184,7 @@ def test_the_new_pipeline_hands_each_stage_output_to_the_next(chain, monkeypatch
     chain_para = next(p for p in view.argument.paragraphs if p.key == "argument:chain")
     assert chain_para.dependencies["demand"]["readings"][0]["reading_id"] == rid
     assert chain_para.dependencies["demand"]["basis"] == "rides", "有 v2 敘事就讀它騎的那一格，不是退回坐的層"
-    assert "Ayar Labs" in chain_para.value and chain_para.value.startswith("騎的"), "需求端讀騎的讀圖的需求側（具名客戶）"
+    assert "Ayar Labs" in chain_para.value and chain_para.value.startswith("押的"), "需求端讀騎的讀圖的需求側（具名客戶）"
 
     # 個股頁 artifact＋候選板 artifact＋敘事＋讀圖 → 收據（dry-run 印出、--apply 寫進暫存 log）
     from webapp.materialize import materialize_view

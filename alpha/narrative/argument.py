@@ -57,7 +57,7 @@ def demand_sentence(demand: Mapping[str, Any] | None, names: Mapping[str, str]) 
         reason = ((demand or {}).get("absence") or {}).get("reason") or "這次沒有給讀圖輸入"
         return f"需求端：這次沒讀到讀圖（{reason}）——不是沒有需求端。"
     parts: list[str] = []
-    lead = "騎的" if demand.get("basis") == "rides" else "它坐的"
+    lead = "押的" if demand.get("basis") == "rides" else "它坐的"
     for row in demand.get("rows") or ():
         where = f"{lead}{row.get('unit_label') or '一格'}「{_name(row.get('node'), names)}」"
         status = READING_STATUS_PLAIN.get(str(row.get("status")), "這次沒比對到圖")
@@ -65,7 +65,7 @@ def demand_sentence(demand: Mapping[str, Any] | None, names: Mapping[str, str]) 
         parts.append(f"{where}讀成「{row.get('kind_label') or '沒寫判讀'}」（{status}）；"
                      + (f"需求端是{who}。" if who else "那份讀圖的需求側沒有具名的公司。"))
     for gone in demand.get("gone") or ():
-        parts.append(f"騎的讀圖（「{_name(gone.get('node'), names)}」）已不是現行——需求端要等敘事重寫才說得出來。")
+        parts.append(f"押的那份讀圖（「{_name(gone.get('node'), names)}」）已不是現行——需求端要等敘事重寫才說得出來。")
     if not parts:
         seats = "、".join(f"「{_name(s, names)}」" for s in demand.get("seats") or ())
         parts.append("需求端：這家公司坐的層與插槽還沒有讀圖"

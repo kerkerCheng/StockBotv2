@@ -412,7 +412,7 @@ def _investor_brief_section(
 
 #: 騎的單位 → 人讀（讀圖字彙的前半句：「層讀圖：…」→「層」）。
 RIDE_UNIT_LABELS: Mapping[str, str] = {unit: text.split("讀圖")[0] for unit, text in READING_UNITS.items()}
-RIDES_LABEL = "騎哪一層或插槽"
+RIDES_LABEL = "押在哪一層（或哪個插槽）"
 
 
 def _rides_datum(brief: Any, names: Mapping[str, str], *, reason: str | None = None) -> Datum:
@@ -425,7 +425,7 @@ def _rides_datum(brief: Any, names: Mapping[str, str], *, reason: str | None = N
         return missing("brief:rides", RIDES_LABEL, "這份敘事是舊版（v1 沒有 rides）——重寫成 v2 才有", authority=A_BRIEF,
                        absence_kind="not_yet_recorded")
     if not brief.rides:
-        return missing("brief:rides", RIDES_LABEL, "這份 v2 敘事沒有宣告騎哪一格", authority=A_BRIEF,
+        return missing("brief:rides", RIDES_LABEL, "這份 v2 敘事沒有宣告押在哪一格", authority=A_BRIEF,
                        absence_kind="not_yet_recorded")
     value = [{"node": r.node, "node_name": names.get(r.node) or r.node.split(":", 1)[-1].replace("_", " "),
               "unit": r.unit, "unit_label": RIDE_UNIT_LABELS.get(r.unit, r.unit), "reading_id": r.reading_id}

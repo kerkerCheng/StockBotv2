@@ -504,3 +504,38 @@ def test_a_ride_whose_reading_row_is_missing_is_not_called_superseded() -> None:
     assert row["rides"][0]["status"] == "not_found"
     row = _derive([_brief(state="pass", reason="貴")], rows=_rows(reading_id="sr_" + "b" * 16))
     assert row["rides"][0]["status"] == "superseded"
+
+
+def test_load_board_lists_who_has_no_narrative_not_only_how_many(board_env) -> None:
+    """2026-09-30 使用者回饋（「候選板是死的頁面」）：不上板的檔原本只有計數，看不到是誰（INV-3 的可見面）。
+    清單與計數同一個來源（`derive_row` 回 None 的那幾檔），每檔帶首屏三個字——會死嗎照燈、兩題「未答」。"""
+    from alpha.providers.candidates import load_board
+
+    board = load_board([T, "ZZZ", "AAA"], today=TODAY,
+                       holdings_loader=lambda: [{"ticker": "CASH", "shares": 0.0, "bucket": "CASH"}])
+    listed = [r["ticker"] for r in board["no_narrative"]]
+    assert listed == ["AAA", "ZZZ"] and board["counts"]["no_narrative"] == len(listed)
+    assert T not in listed                                                  # 有敘事的在組裡，不在這份清單
+    words = board["no_narrative"][0]["three_words"]
+    assert words["priced_in"] == words["in_numbers"] == "未答" and words["will_it_die"] not in ("未讀到", "未答")
+
+
+def test_no_narrative_rows_keep_the_three_questions_read_failure_reason(board_env) -> None:
+    """讀不到三題的那一檔也要在清單上，而且說得出為什麼讀不到——不是安靜少一檔（INV-3）。"""
+    from alpha.providers.candidates import load_board
+
+    board_env["tq_fail"].add("ZZZ")
+    board = load_board([T, "ZZZ"], today=TODAY,
+                       holdings_loader=lambda: [{"ticker": "CASH", "shares": 0.0, "bucket": "CASH"}])
+    assert board["no_narrative"][0]["three_words"]["will_it_die"] == "未讀到（OperationalError: locked）"
+
+
+def test_rides_carry_chinese_unit_and_kind_labels_from_the_reading_vocabulary() -> None:
+    """候選板印 `volume`／`layer` 看不懂（2026-09-30）：標籤跟著列走，取自讀圖 contracts（唯一字彙）。"""
+    from alpha.structure_reading.contracts import READING_KINDS
+
+    brief = _brief(state="pass", reason="貴")
+    ride = _derive([brief])["rides"][0]
+    assert ride["unit_label"] == "層" and ride["kind_label"] == READING_KINDS["volume"].split("——")[0]
+    gone = _derive([brief], rows={("tech:other", "layer"): {"reading_id": "sr_z"}})["rides"][0]
+    assert gone["status"] == "not_found" and gone["kind_label"] is None and gone["unit_label"] == "層"

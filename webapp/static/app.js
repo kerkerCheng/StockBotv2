@@ -717,9 +717,9 @@ function wipeoutBlock(view) {
 
 function renderBet(view) {
   const panel = view.bet;
-  const node = panelShell(panel, '賭注：我們賭什麼、騎在哪、什麼必須為真（optional，不影響這份判讀完不完整）');
+  const node = panelShell(panel, '賭注：我們賭什麼、押在哪一層、什麼必須為真（optional，不影響這份判讀完不完整）');
   node.appendChild(el('p', 'note', (panel.context || {}).optional_rule || ''));
-  // Step 3.7：「騎哪一層或插槽」是敘事宣告的 rides[]——印成「節點（層／插槽）」一句；其餘兩格照 renderRow。
+  // Step 3.7：「押在哪一層（或哪個插槽）」是敘事宣告的 rides[]——印成「節點（層／插槽）」一句；其餘兩格照 renderRow。
   const box = el('div', 'rows');
   (panel.lines || []).forEach((line) => {
     const d = line.datum;
@@ -734,6 +734,8 @@ function renderBet(view) {
     }
   });
   node.appendChild(box);
+  const glossary = unitGlossary();
+  if (glossary) node.appendChild(glossary);
   if (panel.notes && panel.notes.length) {
     node.appendChild(group('賭注不是什麼', () => listOf(panel.notes)));
   }
@@ -930,7 +932,9 @@ function threeQuestionsCard(view) {
   Object.keys(TQ_QUESTIONS).forEach((question) => {
     const rows = lines.filter((line) => (line.datum.dependencies || {}).question === question);
     if (!rows.length) return;
-    node.appendChild(el('div', 'group-title', TQ_QUESTIONS[question]));
+    const title = el('div', 'group-title', TQ_QUESTIONS[question]);
+    title.id = 'tq-' + question;
+    node.appendChild(title);
     const box = el('div', 'rows');
     rows.forEach((line) => {
       const d = line.datum;
@@ -1038,6 +1042,11 @@ function briefCard(payload, view) {
       story.appendChild(row);
     });
     node.appendChild(story);
+    const rides = view.bet && lineMap(view.bet).rides;
+    if (rides && Array.isArray(rides.datum.value) && rides.datum.value.length) {
+      const glossary = unitGlossary();
+      if (glossary) node.appendChild(glossary);
+    }
   } else {
     const box = el('div', 'attention flags');
     box.appendChild(el('div', 'attention-head', '還沒寫短評'));
@@ -1056,9 +1065,51 @@ function briefCard(payload, view) {
 }
 
 /* 首屏末行（Phase 3 Step 3.7）：候選狀態＋財務三題三個字。**全部照抄** candidate 面板——字由 materialize 端給
-   （與候選板同一個推導），本畫面不判、不算。沒有敘事也沒有持有＝不上板，三個字照印（會死嗎看燈，兩題「未答」）。 */
-const CANDIDATE_WORDS = [['candidate:will_it_die', '會死嗎'], ['candidate:priced_in', '已定價嗎'],
-  ['candidate:in_numbers', '出現在數字裡了嗎']];
+   （與候選板同一個推導），本畫面不判、不算。沒有敘事也沒有持有＝不上板，三個字照印（會死嗎看燈，兩題「未答」）。
+   2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節其實在同一頁的稽核區——三個字改成可以點，
+   點了打開稽核區、跳到那一題的數字；候選狀態直接寫理由、在等什麼、哪天醒；會死嗎把不是綠的燈逐盞寫出來。 */
+const CANDIDATE_WORDS = [['candidate:will_it_die', '會死嗎', 'will_it_die'], ['candidate:priced_in', '已定價嗎', 'priced_in'],
+  ['candidate:in_numbers', '出現在數字裡了嗎', 'in_numbers']];
+
+/** 打開同頁的稽核區、捲到那一題（`threeQuestionsCard` 給每一題的標題掛了 id）。稽核區不在就不動。 */
+function jumpToAudit(question) {
+  const box = document.getElementById('audit-drill');
+  if (!box) return;
+  box.open = true;
+  const target = document.getElementById('tq-' + question) || box;
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/** 候選狀態在等的那一筆 watch：哪天醒、最晚哪天到期重問。watch id 放 title（查得到，但不擋在句子裡）。 */
+function candidateWatchLine(watch) {
+  const bits = [];
+  if (watch.until) bits.push(`${watch.until} 那天醒來重看`);
+  if (watch.expires) bits.push(`最晚 ${watch.expires} 到期重問（到期是重問，不是丟掉）`);
+  if (watch.status && watch.status !== 'active') bits.push(`這筆等待目前是「${watch.status}」`);
+  const line = el('div', 'row-reason', '在等：' + (bits.join('；') || '沒寫醒來與到期日'));
+  line.title = 'watch ' + watch.watch_id;
+  return line;
+}
+
+/** 會死嗎不是綠的那幾盞：燈名＋顏色＋理由，照抄 wipeout 面板（與稽核區同一份）。全綠就不印。 */
+function lampsNotGreen(view) {
+  const panel = view.wipeout;
+  if (!panel) return null;
+  const items = [];
+  (panel.lines || []).filter((line) => line.role === 'wipeout').forEach((line) => {
+    const d = line.datum || {};
+    const value = d.value || {};
+    if (value.colour === 'green') return;
+    const colour = WIPEOUT_COLOURS[value.colour];
+    const name = plainLine(line.key, line.display_label).replace(/^歸零旗標：/, '');
+    const why = value.reason || d.reason || absenceLabel(d.absence_kind) || '';
+    items.push(`${colour ? colour.mark + ' ' + colour.word + '　' + name : '⬜ 灰　' + name + '（沒量到，不是綠）'}${why ? '：' + why : ''}`);
+  });
+  if (!items.length) return null;
+  const box = el('div', 'lamp-notes');
+  items.forEach((text) => box.appendChild(el('div', 'row-reason', text)));
+  return box;
+}
 
 function candidateLine(view) {
   const panel = view.candidate;
@@ -1082,23 +1133,41 @@ function candidateLine(view) {
     if (panel.reason) head.appendChild(el('span', 'dim', '　' + panel.reason));
   }
   node.appendChild(head);
+  if (row && row.reason) node.appendChild(el('div', 'row-reason', '理由：' + row.reason));
+  if (row && row.watch) node.appendChild(candidateWatchLine(row.watch));
   if ((panel.lines || []).length) {
     const words = el('div', 'candidate-words');
-    CANDIDATE_WORDS.forEach(([key, label]) => {
+    CANDIDATE_WORDS.forEach(([key, label, question]) => {
       const d = lines[key] && lines[key].datum;
-      words.appendChild(el('span', 'word', `${label}　${d && d.value ? d.value : '—'}`));
+      const word = el('button', 'word word-link', `${label}　${d && d.value ? d.value : '—'} ↓`);
+      word.type = 'button';
+      word.title = '打開下面的稽核區，跳到這一題的數字';
+      word.addEventListener('click', () => jumpToAudit(question));
+      words.appendChild(word);
     });
     node.appendChild(words);
+    const lamps = lampsNotGreen(view);
+    if (lamps) node.appendChild(lamps);
   }
   if (row) {
     (row.preconditions || []).forEach((text) => node.appendChild(el('div', 'row-reason', '前提失效：' + text)));
     (row.rewrite || []).forEach((text) => node.appendChild(el('div', 'row-reason', text)));
     if (row.note) node.appendChild(el('div', 'row-reason', row.note));
   }
-  const link = el('a', 'dim', '看候選板 →');
+  // 候選板是「和其他檔並排看」，不是這一檔的細節（細節在上面三個字點下去的稽核區）。
+  const link = el('a', 'dim', '和其他檔一起看（候選板）→');
   link.href = '#/candidates';
   node.appendChild(link);
   return node;
+}
+
+/** 層／插槽／押在哪一格的白話（字彙由 materialize 從 contracts 的 PLAIN_BET_UNITS 帶來；沒有就不印，不自己補一份）。 */
+function unitGlossary() {
+  const table = (VOCAB && VOCAB.plain_bet_units) || null;
+  if (!table) return null;
+  const box = el('div', 'glossary');
+  ['layer', 'socket', 'ride'].forEach((key) => { if (table[key]) box.appendChild(el('div', 'rule', table[key])); });
+  return box.childNodes.length ? box : null;
 }
 
 /* ⚠ **2026-09-23（Phase 0 Step 0b.1）：`priceScale`（那把尺）整個函式退役。**
@@ -1225,7 +1294,7 @@ async function renderDetail(ticker) {
   const downside = downsideCard(view);
   if (downside) app.appendChild(downside);
   const audit = el('section', 'panel');
-  audit.appendChild(drill('稽核：每一格的來源、狀態、算式與警告（給查核用，不是給你讀的）', () => {
+  const auditDrill = drill('稽核：每一格的來源、狀態、算式與警告（給查核用；首屏三個字點下去會跳到這裡）', () => {
     const box = el('div', 'why-box');
     box.appendChild(conclusionCard(payload, view));
     // ⚠ 2026-09-23（Phase 0 Step 0b.1）：`fragileCard`（最脆弱的假設）隨 `why` panel 退役
@@ -1235,7 +1304,9 @@ async function renderDetail(ticker) {
     [blockerCard(payload), threeQuestionsCard(view), versusMarketCard(view)]
       .forEach((card) => { if (card) box.appendChild(card); });
     return box;
-  }));
+  });
+  auditDrill.id = 'audit-drill';
+  audit.appendChild(auditDrill);
   app.appendChild(audit);
 
   // 完整細節：**一個展開，展開後就是全部**。先前這裡是七個 details，每個裡面還有第二層
@@ -1337,21 +1408,28 @@ function companyCell(row, detailSet) {
     plain.title = row.ticker ? '這檔尚未 materialize 單檔判讀' : 'registry 沒有登記 research ticker';
     cell.appendChild(plain);
   }
-  cell.appendChild(el('div', 'company', row.company_label || row.company_id));
+  const company = el('div', 'company', row.company_label || row.company_id);
+  company.title = row.company_id;
+  cell.appendChild(company);
   return cell;
 }
 
 /* 關係動詞寫成人話，原始 label 附在 title 供查圖（判準：望文生義還是要查表）。 */
 const RELATION_PLAIN = { supplies_to: '供貨給', depends_on: '依賴', constrained_by: '受限於' };
 
+/** 節點的人話名字（materialize 時從圖取）；圖裡沒有名字才印 ID——不從 ID 猜名字。ID 一律放 title。 */
+function nodeLabel(name, id) {
+  const node = name ? el('span', 'node-name', name) : el('code', null, id);
+  node.title = `圖裡的節點 ID：${id}（可貼回來查）`;
+  return node;
+}
+
 function edgeCell(row) {
   const cell = el('td', 'rank-edge');
   const verb = el('div', 'dim', RELATION_PLAIN[row.relation] || row.relation);
   verb.title = row.relation;
   cell.appendChild(verb);
-  const node = el('code', null, row.bottleneck);
-  node.title = '圖裡的節點 ID，可貼回來查';
-  cell.appendChild(node);
+  cell.appendChild(nodeLabel(row.bottleneck_name, row.bottleneck));
   return cell;
 }
 
@@ -1367,7 +1445,7 @@ function subCell(row) {
 function anchorCell(row) {
   const cell = el('td', 'rank-anchor');
   if (row.demand_anchor) {
-    cell.appendChild(el('code', null, row.demand_anchor));
+    cell.appendChild(nodeLabel(row.demand_anchor_name, row.demand_anchor));
     cell.appendChild(el('div', 'dim', `離它 ${row.demand_hops} 步`));
   } else {
     cell.appendChild(el('span', 'badge badge-blocked', '🔴 找不到誰在花錢'));
@@ -1456,11 +1534,51 @@ async function renderStructureTable() {
   app.appendChild(limits);
 
   // ② 結構表：全部列、沒有名次、沒有首選。
+  // 2026-09-30 使用者回饋（「結構表是死的頁面」）：加搜尋（代號／公司／層的名字）與依層篩選——**只篩、不重排**，
+  // 列序照舊是 materialize 當下的索引；篩掉幾條照印（INV-3 的可見面）。
   const sec1 = el('section', 'panel');
   sec1.appendChild(el('h2', null, `結構表（${rows.length} 條邊）——卡在哪、多難繞、誰在花錢`));
   if (notes.order) sec1.appendChild(mdParagraph(notes.order, 'panel-questions'));
-  if (rows.length) sec1.appendChild(rankTable(rows, TABLE_COLUMNS, detailSet));
-  else sec1.appendChild(el('p', 'empty', '（母體為空：沒有任何公司→向下的邊）'));
+  if (rows.length) {
+    const controls = el('div', 'table-filter');
+    const search = el('input');
+    search.type = 'search';
+    search.placeholder = '搜尋代號、公司或層（例：AXTI、InP）';
+    search.setAttribute('aria-label', '搜尋結構表');
+    const layerSelect = el('select');
+    layerSelect.setAttribute('aria-label', '只看某一層');
+    layerSelect.appendChild(el('option', null, '全部的層'));
+    layerSelect.firstChild.value = '';
+    // 層的選項由 materialize 端給（依名字字母）：前端一律不排序，這個檔連排序呼叫都是禁字。
+    (payload.layers || []).forEach((layer) => {
+      const option = el('option', null, `${layer.name || layer.id}（${layer.edges}）`);
+      option.value = layer.id;
+      layerSelect.appendChild(option);
+    });
+    const shown = el('div', 'dim table-filter-count');
+    controls.appendChild(search);
+    controls.appendChild(layerSelect);
+    controls.appendChild(shown);
+    sec1.appendChild(controls);
+    const holder = el('div');
+    sec1.appendChild(holder);
+    const haystack = (row) => [row.ticker, row.company_label, row.company_id, row.bottleneck_name, row.bottleneck,
+      row.demand_anchor_name, row.demand_anchor].filter(Boolean).join(' ').toLowerCase();
+    const apply = () => {
+      const q = search.value.trim().toLowerCase();
+      const layer = layerSelect.value;
+      const picked = rows.filter((row) => (!layer || row.bottleneck === layer) && (!q || haystack(row).includes(q)));
+      holder.textContent = '';
+      if (picked.length) holder.appendChild(rankTable(picked, TABLE_COLUMNS, detailSet));
+      else holder.appendChild(el('p', 'empty', '這張表沒有符合的邊——清掉搜尋字或換一層再看'));
+      shown.textContent = (q || layer) ? `顯示 ${picked.length}／${rows.length} 條（篩掉 ${rows.length - picked.length} 條）` : `全部 ${rows.length} 條`;
+    };
+    search.addEventListener('input', apply);
+    layerSelect.addEventListener('change', apply);
+    apply();
+  } else {
+    sec1.appendChild(el('p', 'empty', '（母體為空：沒有任何公司→向下的邊）'));
+  }
   if (notes.no_anchor_reading) sec1.appendChild(mdParagraph(notes.no_anchor_reading));
   if (notes.table) sec1.appendChild(mdParagraph(notes.table));
   app.appendChild(sec1);
@@ -1511,9 +1629,15 @@ async function renderStructureTable() {
   sec4.appendChild(drill(`展開：每一列的鏈路（${rows.length}）`, () => {
     const ul = el('ul', 'notes');
     rows.forEach((row) => {
-      const li = el('li', null, `${row.company_id} ${row.relation} ${row.bottleneck}`);
+      const li = el('li', null, `${row.ticker || row.company_label || row.company_id} ${RELATION_PLAIN[row.relation] || row.relation} `
+        + `${row.bottleneck_name || row.bottleneck}`);
+      li.title = `${row.company_id} ${row.relation} ${row.bottleneck}`;
       const sub = el('div', 'dim');
-      if (row.chain && row.chain.length) sub.textContent = row.chain.join(' → ') + `　（距需求端 ${row.demand_hops} 跳）`;
+      if (row.chain && row.chain.length) {
+        sub.textContent = row.chain.map((id, i) => (row.chain_names || [])[i] || id).join(' → ')
+          + `　（距需求端 ${row.demand_hops} 跳）`;
+        sub.title = row.chain.join(' → ');
+      }
       else sub.appendChild(mdInline(notes.no_anchor_chain || ''));
       li.appendChild(sub);
       ul.appendChild(li);
@@ -2184,6 +2308,8 @@ function readingsCard(view) {
     return node;
   }
   node.appendChild(renderRows(panel.lines));
+  const glossary = unitGlossary();
+  if (glossary) node.appendChild(glossary);
   const seats = (panel.context || {}).seats || [];
   if (seats.length) node.appendChild(el('p', 'note', '圖上它供貨或開發的節點：' + seats.join('、')));
   node.appendChild(el('p', 'note', '完整的引文與反證在「讀圖」頁（#/structure-readings）。'));
@@ -2703,6 +2829,8 @@ async function renderPositions() {
 /* ---------- 候選狀態板（candidates state；Phase 3 Step 3.6：推導結果照抄——組內按 ticker 字母，不排序、不給尺寸） ---------- */
 
 const CANDIDATE_ORDER = ['open', 'missing', 'priced_wait', 'pass', 'held'];
+/* 押的那份讀圖不是現行的兩種情形（derive_row 分開寫，L12）。 */
+const RIDE_GONE_TEXT = { superseded: '那一格現行的已是另一份讀圖（該重寫敘事）', not_found: '這次沒讀到那一格的讀圖列' };
 const CANDIDATE_SIDE_ORDER = ['not_multiple', 'edge_unmeasurable', 'legacy', 'precondition_failed'];
 
 function candidateRow(row, detailSet) {
@@ -2720,10 +2848,15 @@ function candidateRow(row, detailSet) {
   li.appendChild(top);
   const bits = [];
   if (row.declared_label && row.derived !== row.declared) bits.push('敘事宣告：' + row.declared_label);
-  (row.rides || []).forEach((r) => bits.push(`騎 ${r.node}（${r.unit === 'socket' ? '插槽' : '層'}｜判讀 ${r.kind || '—'}｜${r.status || '—'}）`));
+  // 押在哪一格：節點名（沒有才印 ID）＋單位＋判讀＋那份讀圖現在的狀態——字全由 materialize 端給（2026-09-30）。
+  (row.rides || []).forEach((r) => bits.push(`押在「${r.node_name || r.node}」（${r.unit_label || (r.unit === 'socket' ? '插槽' : '層')}`
+    + `｜判讀 ${r.kind_label || r.kind || '—'}｜${READING_STATUS_TEXT[r.status] || RIDE_GONE_TEXT[r.status] || r.status || '—'}）`));
   const e = row.edge || {};
   bits.push(`邊緣：${e.label || e.state || '—'}（市值 ${e.market_cap_label || '—'}｜分析師 ${e.analyst_count ?? '—'}）`);
-  if (row.watch) bits.push(`在等 ${row.watch.watch_id}（${row.watch.status}｜until ${row.watch.until || '—'}｜到期 ${row.watch.expires || '—'}）`);
+  if (row.watch) {
+    bits.push(`在等：${row.watch.until ? row.watch.until + ' 醒來重看' : '沒寫醒來日'}；最晚 ${row.watch.expires || '—'} 到期重問`
+      + (row.watch.status !== 'active' ? `（這筆等待目前是「${row.watch.status}」）` : '') + `（${row.watch.watch_id}）`);
+  }
   if (row.stall_days !== null && row.stall_days !== undefined) bits.push(`滯留 ${row.stall_days} 天`);
   li.appendChild(el('span', 'rule', bits.join('｜')));
   if (row.reason) li.appendChild(el('span', 'rule', '理由：' + row.reason));
@@ -2803,6 +2936,36 @@ async function renderCandidates() {
   CANDIDATE_SIDE_ORDER.forEach((key) => {
     if ((sides[key] || []).length) section(sideLabels[key] || key, sides[key], '0');
   });
+
+  // 沒有敘事、不上板的那幾檔（2026-09-30 使用者回饋「候選板是死的」）：原本只有計數，看不到是誰。
+  // 上板的依據是敘事——這份清單不是第六組，只是讓「沒上板的是誰」看得到；點代號進個股頁。
+  const noNarrative = payload.no_narrative;
+  const secX = el('section', 'panel');
+  secX.appendChild(el('h2', null, `沒有敘事、不上板（${counts.no_narrative ?? 0}）`));
+  secX.appendChild(el('p', 'note', '候選狀態是寫敘事時宣告的——這些檔還沒寫敘事，所以不在上面任何一組。'
+    + '要讓一檔上板，路是研究它、寫敘事（研究 session 做），不是這個畫面。會死嗎照燈；另外兩題沒有敘事就是「未答」。'));
+  if (!Array.isArray(noNarrative)) {
+    secX.appendChild(el('p', 'note', '這份板是舊版 materialize 的，沒有帶清單——重跑 python -m webapp materialize --candidates。'));
+  } else if (noNarrative.length) {
+    secX.appendChild(drill(`展開：${noNarrative.length} 檔（依代號字母，不是名次）`, () => {
+      const list = el('ul', 'weak no-narrative');
+      noNarrative.forEach((r) => {
+        const li = el('li');
+        if (detailSet.has(r.ticker)) {
+          const a = el('a', null, r.ticker);
+          a.href = `#/${encodeURIComponent(r.ticker)}`;
+          li.appendChild(a);
+        } else {
+          li.appendChild(el('strong', null, r.ticker));
+        }
+        const w = r.three_words || {};
+        li.appendChild(el('span', 'dim', `　會死嗎 ${w.will_it_die || '—'}`));
+        list.appendChild(li);
+      });
+      return list;
+    }));
+  }
+  app.appendChild(secX);
 
   const rewrite = payload.narrative_rewrite || [];
   const secW = el('section', 'panel');

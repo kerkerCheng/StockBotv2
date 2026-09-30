@@ -51,12 +51,12 @@ def test_chain_paragraph_names_nodes_and_isolates_the_thin_links() -> None:
          "demand_customers": ["co:nvidia"]}]}
     text = chain_paragraph(company="Coherent", edges=edges, names=NAMES, demand=demand)
     _clean(text)
-    assert text.startswith("騎的層「Co-Packaged Optics」讀成「B：量的賭注」（現行）；需求端是「NVIDIA」。")
+    assert text.startswith("押的層「Co-Packaged Optics」讀成「B：量的賭注」（現行）；需求端是「NVIDIA」。")
     assert "Coherent供應「NVIDIA」；目前是唯一來源；已被設計進客戶產品；有客戶或第三方印證。" in text
     assert "另外 1 條連結（「Co-Packaged Optics」）只有公司自己在講" in text and "最薄" in text
     assert "tech:" not in text and "sub=" not in text and "Data-center switch" not in text
     no_edges = chain_paragraph(company="X", edges=[], names={}, demand=demand)
-    assert no_edges.startswith("X 在圖上還沒有評為難替代（替代難度 4 以上）的連結，這一段沒有邊可講。騎的層")
+    assert no_edges.startswith("X 在圖上還沒有評為難替代（替代難度 4 以上）的連結，這一段沒有邊可講。押的層")
     assert "圖裡還沒有" not in no_edges, "「沒評到 4」不等於「圖上沒有它的連結」（SIVE.ST 有邊）"
 
 

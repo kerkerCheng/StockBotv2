@@ -471,3 +471,25 @@ def test_counters_do_not_invent_a_bet_for_stocks_that_have_none(tmp_path) -> Non
     counters = body["view_counters"]
     assert counters["with_bet"] == 0
     assert counters["with_view"] <= len(body["stocks"])
+
+
+
+def test_layer_and_socket_are_explained_from_one_vocabulary(client) -> None:
+    """2026-09-30 使用者回饋（「騎是什麼、插槽是什麼」）：白話說明只有一份（contracts → `.meta.json` → API），
+    前端照抄；使用者看得到的字不再寫「騎」（較早的敘事原文照留——ledger 是 append-only）。"""
+    vocab = client.get("/api/v1/meta").json()["vocabularies"]
+    units = vocab["plain_bet_units"]
+    assert set(units) == {"layer", "socket", "ride"}
+    assert "量的賭注" in units["layer"] and "護城河賭注" in units["socket"] and "騎" in units["ride"]
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "VOCAB.plain_bet_units" in source and "騎" not in source
+
+
+def test_stock_page_three_words_jump_to_the_audit_rows_on_the_same_page() -> None:
+    """2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節在同一頁的稽核區——三個字可以點，
+    稽核區與每一題都有錨點；連到候選板的那一句不再暗示細節在那裡。"""
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "jumpToAudit(question)" in source and "auditDrill.id = 'audit-drill'" in source
+    assert "title.id = 'tq-' + question" in source
+    assert "看候選板 →" not in source and "和其他檔一起看（候選板）→" in source
+    assert "candidateWatchLine(row.watch)" in source and "'理由：' + row.reason" in source

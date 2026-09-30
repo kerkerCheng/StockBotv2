@@ -334,7 +334,7 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     # ---- 賭注（optional；V0）---------------------------------------------
     bet = view.bet
     # ⚠ 2026-09-23（Phase 0 Step 0b.1）：賭注由四個價格改成**一句話**（讀 `our_bet`）。
-    lines += ["## 賭注：我們賭什麼、騎在哪、什麼必須為真（optional）", ""]
+    lines += ["## 賭注：我們賭什麼、押在哪一層、什麼必須為真（optional）", ""]
     if bet.context.get("available"):
         # Step 3.7：三格（our_bet／騎的層或插槽／什麼必須為真）。rides 是清單——印成「節點（層／插槽）」；
         # 缺席的格印狀態字與理由，不印 None（本檔 legend：缺席一律不是 0）。

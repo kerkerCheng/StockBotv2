@@ -459,7 +459,7 @@ DOWNSIDE_STATES: Mapping[str, str] = {
 #: 系統沒有來源鍵對得回任何 watch——照實印「未盯」，不猜文字相似。
 DOWNSIDE_SOURCES: Mapping[str, str] = {
     "brief": "敘事自己登記的反證", "link": "敘事連到既有來源的反證", "thesis": "thesis memo 的推翻條件",
-    "reading": "騎的讀圖的反證", "watch_only": "歸屬本檔、但條件不在現行來源裡的 watch",
+    "reading": "押的那份讀圖的反證", "watch_only": "歸屬本檔、但條件不在現行來源裡的 watch",
     "judgment": "舊判讀（session assessor）的反證——反證登記不涵蓋",
 }
 
@@ -560,16 +560,16 @@ def downside_rows(company_id: str | None, ticker: str, *, records: Sequence[Any]
         current = reading_rows.get((ride.node, ride.unit))
         # 三種不同的「沒有」分開說（L12；與 `derive_row` 對稱，L17）：整格撤回、讀不到、已換版——前兩者下一步相反。
         if current is None and ((ride.node, ride.unit) in retracted or (ride.node, None) in retracted):
-            notes.append(f"騎的讀圖 {ride.reading_id} 那一格已全部撤回——它的反證沒列；先重寫敘事")
-            rewrite_needed.append("騎的讀圖那一格已全部撤回")
+            notes.append(f"押的讀圖 {ride.reading_id} 那一格已全部撤回——它的反證沒列；先重寫敘事")
+            rewrite_needed.append("押的讀圖那一格已全部撤回")
             continue
         if current is None:
-            missed("reading", f"騎的讀圖 {ride.reading_id} 這次沒有那一格的讀圖列（讀圖 ledger 讀不到或壞行）"
+            missed("reading", f"押的讀圖 {ride.reading_id} 這次沒有那一格的讀圖列（讀圖 ledger 讀不到或壞行）"
                               "——它的反證沒列；先修讀取，不是重寫敘事")
             continue
         if current.get("reading_id") != ride.reading_id:
-            notes.append(f"騎的讀圖 {ride.reading_id} 已換版（現行 {current.get('reading_id')}）——它的反證沒列；先重寫敘事")
-            rewrite_needed.append("騎的讀圖已換版")
+            notes.append(f"押的讀圖 {ride.reading_id} 已換版（現行 {current.get('reading_id')}）——它的反證沒列；先重寫敘事")
+            rewrite_needed.append("押的讀圖已換版")
             continue
         for entry in current.get("disproof") or ():
             emit("reading", f"reading:{ride.reading_id}", str(entry.get("condition") or ""),

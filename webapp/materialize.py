@@ -407,17 +407,45 @@ def _company_label(registry: Any, company_id: str) -> str | None:
 
 
 def _project_table_row(row: Mapping[str, Any], *, registry: Any,
-                       evidence_label: Mapping[str, str]) -> dict[str, Any]:
-    """一列的投影：**每一格照抄**，只加上公司名與證據標籤——沒有任何算術，也沒有名次。"""
+                       evidence_label: Mapping[str, str],
+                       node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
+    """一列的投影：**每一格照抄**，只加上公司名、節點名與證據標籤——沒有任何算術，也沒有名次。
+
+    節點名（2026-09-30 使用者回饋：結構表滿是 `tech:cpo_full_stack_test` 這種內部代號）取自圖裡節點的 `name`；
+    圖裡沒有名字就是 None，**不從 ID 猜**（畫面照印 ID）。公司名先用 registry，registry 沒有才用圖裡的名字。"""
+    names = node_names or {}
     out = dict(row)
-    out["company_label"] = _company_label(registry, str(row["company_id"]))
+    out["company_label"] = _company_label(registry, str(row["company_id"])) or names.get(str(row["company_id"]))
+    out["bottleneck_name"] = names.get(str(row.get("bottleneck")))
+    out["demand_anchor_name"] = names.get(str(row["demand_anchor"])) if row.get("demand_anchor") else None
+    out["chain_names"] = [names.get(str(n)) for n in (row.get("chain") or ())]
     out["evidence_label"] = evidence_label.get(str(row.get("evidence")), str(row.get("evidence")))
     return out
 
 
+def _layer_options(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """結構表的瓶頸節點（＝畫面上的「層」篩選選項）：`{id, name, edges}`，依名字字母（沒名字用 ID）。"""
+    seen: dict[str, dict[str, Any]] = {}
+    for r in rows:
+        node = str(r.get("bottleneck"))
+        item = seen.setdefault(node, {"id": node, "name": r.get("bottleneck_name"), "edges": 0})
+        item["edges"] += 1
+    return sorted(seen.values(), key=lambda item: (str(item["name"] or item["id"]).casefold(), item["id"]))
+
+
+def _table_node_ids(rows: Sequence[Mapping[str, Any]]) -> list[str]:
+    """結構表各列提到的節點 ID（公司、瓶頸、需求錨、鏈上每一節）——取名字用。"""
+    ids: set[str] = set()
+    for r in rows:
+        ids.update(str(x) for x in (r.get("company_id"), r.get("bottleneck"), r.get("demand_anchor")) if x)
+        ids.update(str(x) for x in (r.get("chain") or ()) if x)
+    return sorted(ids)
+
+
 def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
                                    as_of: date | None = None, projection: Any = None,
-                                   generated_at: datetime | None = None) -> dict[str, Any]:
+                                   generated_at: datetime | None = None,
+                                   node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
     """`structure_table()` 的結果 → `structure_table` state artifact。**純函式**：不連 DB、不重排。
 
     所有固定文字（已知限制、表的註記、順序說明、無需求錨的讀法）都從 `query.bottleneck` 取——
@@ -429,7 +457,7 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
     )
 
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    rows = [_project_table_row(r, registry=registry, evidence_label=EVIDENCE_LABEL)
+    rows = [_project_table_row(r, registry=registry, evidence_label=EVIDENCE_LABEL, node_names=node_names)
             for r in (result.get("rows") or ())]
     coverage = dict(result["coverage"])
     payload: dict[str, Any] = {
@@ -451,6 +479,9 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
         "coverage": coverage,
         "limitations": known_limitations(coverage),
         "rows": rows,
+        # 畫面「只看某一層」的選項（2026-09-30）：每個瓶頸節點一項＋幾條邊，**依名字字母**（沒名字用 ID）——
+        # 這是選單的排列，不是名次；表的列序不動。前端不排序（`.sort(` 是 app.js 的禁字），所以在這裡排好。
+        "layers": _layer_options(rows),
         # INV-3：母體定義是一個 filter，所以 input／accepted／excluded／reasons 跟著 artifact 走。
         # ⚠ 沒有門檻：2026-09-23 之前這裡是 `filter`／`filtered_rows`（substitutability ≥ 4 濾掉了誰）。
         "population": dict(result.get("population") or {}),
@@ -514,17 +545,22 @@ def materialize_structure_table(*, as_of: date | None = None, store: StateArtifa
     try:
         with driver.session() as session:
             raw_rows = fetch_assertions(session)
+            projection = None
+            rows: Sequence[Mapping[str, Any]] = raw_rows
+            if as_of is not None:
+                projection = project_assertions_as_of(raw_rows, as_of)
+                rows = list(projection.rows)
+            registry = get_registry()
+            result = structure_table(rows, registry)
+            # 節點的人話名字（同一個 session；與 `get_narrative_context` 同一條查詢）——畫面不再只印內部代號。
+            node_names = {str(r["id"]): str(r["name"]) for r in session.run(
+                "MATCH (n) WHERE n.id IN $ids AND n.name IS NOT NULL RETURN n.id AS id, n.name AS name",
+                ids=_table_node_ids(result.get("rows") or ()))}
     finally:
         driver.close()
-    projection = None
-    rows: Sequence[Mapping[str, Any]] = raw_rows
-    if as_of is not None:
-        projection = project_assertions_as_of(raw_rows, as_of)
-        rows = list(projection.rows)
-    registry = get_registry()
-    result = structure_table(rows, registry)
     payload = build_structure_table_artifact(result, registry=registry, as_of=as_of,
-                                             projection=projection, generated_at=generated_at)
+                                             projection=projection, generated_at=generated_at,
+                                             node_names=node_names)
     target = store or StateArtifactStore()
     return target.write(payload), payload
 
@@ -1264,6 +1300,8 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
         "oldest_stall_days": dict(board.get("oldest_stall_days") or {}),
         "holdings": dict(board.get("holdings") or {}),
         "narrative_rewrite": list(board.get("narrative_rewrite") or ()),
+        # 不上板的那幾檔（沒有敘事、也沒有持有）：計數在 counts.no_narrative，這裡列出是誰（2026-09-30）。
+        "no_narrative": list(board.get("no_narrative") or ()),
         "ledger": dict(board.get("ledger") or {}),
         "readings": dict(board.get("readings") or {}),
         "rollup": dict(board.get("rollup") or {}),
@@ -1292,6 +1330,7 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
                   "side_groups": {k: ids(v) for k, v in payload["side_groups"].items()},
                   "holdings": [payload["holdings"].get("status"), sorted(payload["holdings"].get("unresolved") or ())],
                   "rewrite": sorted(json.dumps(b, ensure_ascii=False, sort_keys=True) for b in payload["narrative_rewrite"]),
+                  "no_narrative": ids(payload["no_narrative"]),
                   "ledger": [payload["ledger"].get("present"), payload["ledger"].get("parse_errors")],
                   "rollup": {k: roll.get(k) for k in ("lines", "wipeout", "not_read", "edge")}})
     payload["content_digest"] = canonical_digest(payload)
@@ -1312,9 +1351,40 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
     # `context`：同一輪個股頁用的那一份（`candidate_context(..., board=True)`）；載入失敗的缺席 context 不能拿來組板，
     # 就照舊自己載一次（失敗會原樣拋出，由呼叫端印理由）。
     shared = context if context is not None and not context.get("absence") else None
-    payload = build_candidates_artifact(load_board(universe, context=shared), generated_at=generated_at)
+    board = load_board(universe, context=shared)
+    _attach_ride_node_names(board)
+    payload = build_candidates_artifact(board, generated_at=generated_at)
     target = store or StateArtifactStore()
     return target.write(payload), payload
+
+
+def _graph_node_names(ids: Sequence[str]) -> dict[str, str]:
+    """圖裡節點的 `name`（與結構表、`get_narrative_context` 同一條查詢）。只在 materialize 用；請求路徑不碰。"""
+    if not ids:
+        return {}
+    from query.structure import _graph_driver
+
+    driver = _graph_driver()
+    try:
+        with driver.session() as session:
+            return {str(r["id"]): str(r["name"]) for r in session.run(
+                "MATCH (n) WHERE n.id IN $ids AND n.name IS NOT NULL RETURN n.id AS id, n.name AS name", ids=list(ids))}
+    finally:
+        driver.close()
+
+
+def _attach_ride_node_names(board: Mapping[str, Any]) -> None:
+    """候選板每一列「押在哪一格」補上節點名（2026-09-30：原本只印 `mat:inp_substrate`）。**fail-soft**：
+    圖讀不到就不補——畫面照印 ID；名字只是顯示，不是認知狀態（不進 freshness identity）。"""
+    rides = [ride for rows in (*(board.get("groups") or {}).values(), *(board.get("side_groups") or {}).values())
+             for row in rows for ride in (row.get("rides") or ())]
+    try:
+        names = _graph_node_names(sorted({str(ride.get("node")) for ride in rides if ride.get("node")}))
+    except Exception:  # noqa: BLE001 — 名字補不上不擋組板
+        return
+    for ride in rides:
+        if names.get(str(ride.get("node"))):
+            ride["node_name"] = names[str(ride.get("node"))]
 
 
 def materialize_account_scorecard(*, store: StateArtifactStore | None = None,
@@ -1400,7 +1470,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
-        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
+        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT, PLAIN_BET_UNITS,
         PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS,
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
@@ -1417,6 +1487,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_panel_titles": {k: dict(v) for k, v in PLAIN_PANEL_TITLES.items()},
         "plain_line_labels": dict(PLAIN_LINE_LABELS),
         "plain_absence_short": dict(PLAIN_ABSENCE_SHORT),
+        "plain_bet_units": dict(PLAIN_BET_UNITS),
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
         # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：plain_stance／plain_driver_labels／plain_multiple_derivation
         # 三份白話層隨估值鏈退役。
