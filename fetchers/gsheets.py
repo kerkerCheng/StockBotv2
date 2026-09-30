@@ -311,18 +311,21 @@ SHEET_PRICED_CURRENCIES: frozenset[str] = frozenset({"USD", "TWD", "EUR", "JPY"}
 #: 對齊 Sheet 市值公式：有冒號照原字串抓價；幣別 TWD 或 4 碼數字 → TPE:；JPY 且 `數字.T` → TYO:；其餘照原字串。
 _SYMBOL_CURRENCY = (
     (re.compile(r"[0-9]{4,6}[A-Z]?\.TW"), "TWD", "台股"),
-    (re.compile(r"TYO:[0-9]{4}|[0-9]{4}\.T"), "JPY", "日股"),
+    (re.compile(r"TYO:[0-9]{4}"), "JPY", "日股"),
     (re.compile(r"(?:FRA|ETR|EPA|AMS):[A-Z0-9]{1,6}"), "EUR", "歐元區交易所"),
     (re.compile(r"[A-Z]{1,5}(?:\.[AB])?"), "USD", "美股"),      # 後綴只收股別 .A／.B（VOD.L 這類是別的交易所）
 )
 
 
 def canonical_symbol(symbol: str) -> str:
-    """比對同一檔用：大寫；`TPE:XXXX` 與裸的台股數字代號都補成 `XXXX.TW`（Sheet 公式把它們當同一檔，比對也要；
-    R2 覆核 2026-09-30：只處理裸 4 碼時，`TPE:2330` 被當成 2330.TW 以外的另一檔、會開出重複列）。"""
+    """比對同一檔用，照 Sheet 市值公式的規則（公式把它們當同一檔，比對也要）：大寫；`TPE:XXXX` 與裸的台股數字代號
+    補成 `XXXX.TW`；日股 `XXXX.T` 補成 `TYO:XXXX`（R2 覆核 2026-09-30：只處理台股時，`7803.T` 被當成 TYO:7803 以外的
+    另一檔——同券商開出重複列、5% 上限少算已持有；第三次覆核指出的對稱面）。"""
     s = symbol.strip().upper()
-    if s.startswith("TPE:"):
+    if re.fullmatch(r"TPE:[0-9]{4,6}[A-Z]?", s):
         s = s[4:]
+    if re.fullmatch(r"[0-9]+\.T", s):
+        return "TYO:" + s[:-2]
     return f"{s}.TW" if re.fullmatch(r"[0-9]{4,6}[A-Z]?", s) else s
 
 
@@ -334,10 +337,12 @@ def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
         return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
     if re.fullmatch(r"(?:TPE:)?[0-9]{4,6}[A-Z]?", s):
         return f"台股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（別的寫法公式也當台股，但 Sheet 的慣例是 .TW）"
+    if re.fullmatch(r"[0-9]+\.T", s):
+        return f"日股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（XXXX.T 公式也當日股，但 Sheet 的慣例是 TYO:）"
     for pattern, need, label in _SYMBOL_CURRENCY:
         if pattern.fullmatch(s):
             return None if cur == need else f"{symbol} 是{label}代號，幣別應該是 {need}（給的是 {cur}）"
-    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW、日股 TYO:／.T、歐元區 FRA:／ETR:／EPA:／AMS:、"
+    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW、日股 TYO:、歐元區 FRA:／ETR:／EPA:／AMS:、"
             "美股裸代號；上櫃 .TWO、LON:、.ST／.PA 等請手動建列）")
 
 

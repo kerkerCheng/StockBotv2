@@ -49,6 +49,8 @@ TRADE_LOG = _ROOT / "library" / "trades" / "trade_log.jsonl"
 EXIT_HARD_CAP = 3
 #: alpha 買進沒有現行 v2 敘事被擋下（Phase 3 Step 3.8）。與硬擋（3）、輸入錯誤（2）各自區分。
 EXIT_NARRATIVE = 4
+#: 開列請求丟例外、第一次回讀判成「此刻沒套用」時，隔幾秒再讀一次（伺服器可能稍後才套用；R2 第三次覆核）。
+ABSENT_RECHECK_SECONDS = 3.0
 
 
 def _now() -> str:
@@ -659,6 +661,11 @@ def main(argv: list[str] | None = None) -> int:
             print(f"\n✗ 新增列失敗（{type(exc).__name__}: {str(exc)[:160]}）", file=sys.stderr)
             try:
                 state = gsheets.new_row_state(plan, fill)
+                if state == "absent" and ABSENT_RECHECK_SECONDS:
+                    import time
+
+                    time.sleep(ABSENT_RECHECK_SECONDS)
+                    state = gsheets.new_row_state(plan, fill)
             except Exception as read_exc:  # noqa: BLE001
                 state = f"讀不到（{type(read_exc).__name__}）"
             if state == "landed":

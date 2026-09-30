@@ -195,6 +195,7 @@ def test_rollback_refuses_to_delete_a_row_that_is_not_ours(monkeypatch) -> None:
 def _wire_open(monkeypatch, tmp_path, *, verify=(), cash_fails=False, open_fails=False, verify_raises=False,
                inputs=None, rows=None, cash_network=False):
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=rows or _sheet_rows(), inputs=inputs or _present_inputs())
+    module.ABSENT_RECHECK_SECONDS = 0
     values, formulas = _grid()
     calls["reads"] = []
     monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas_=None, formulas=False, sheet=None:
@@ -354,6 +355,7 @@ def test_cash_column_currency_must_match_the_trade(monkeypatch, tmp_path) -> Non
     ("AXTI", "JPY", "美股代號"),
     ("TPE:2330", "TWD", "寫成 Sheet 既有的寫法 2330.TW"),   # 第二次覆核：TPE: 會被當成另一檔
     ("VOD.L", "USD", "認不得"),                              # 美股後綴只收 .A／.B
+    ("6324.T", "JPY", "寫成 Sheet 既有的寫法 TYO:6324"),     # 第三次覆核：XXXX.T 與 TYO: 是同一檔
 ])
 def test_symbol_and_currency_are_checked_before_anything_is_written(symbol, currency, message) -> None:
     values, formulas = _grid()
@@ -603,8 +605,10 @@ def test_the_readback_after_an_open_error_has_three_answers(monkeypatch) -> None
     plan = gsheets.plan_new_position(values, formulas, broker="IB", symbol="AXTI", currency="USD")
     after_v, _ = _after(values, formulas, plan, FILL)
     user_added = after_v + [["IB", "CASH", "—", "", "", "USD", "1", "1", "", "", "1", "1", "USD"]]
+    ins = plan["insert_at"]
+    user_deleted_below = after_v[:ins] + after_v[ins + 1:]              # 已套用、同時刪了下面一列：列數剛好回到原樣
     for grid, want in ((after_v, "landed"), (user_added, "landed"), (values, "absent"),
-                       (values + [values[-1]], "unknown")):
+                       (values + [values[-1]], "unknown"), (user_deleted_below, "unknown")):
         monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None, g=grid: g)
         assert gsheets.new_row_state(plan, FILL) == want
 
@@ -659,3 +663,56 @@ def test_the_hint_names_the_sheet_spelling_when_the_broker_is_right(monkeypatch,
     argv = [a if a != "AXTI" else "0050" for a in _BUY]
     assert module.main(argv[:argv.index("--why")]) == 2
     assert "代號請寫成 Sheet 的寫法 0050.TW" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# 11. R2 第三次覆核（2026-09-30）
+# ---------------------------------------------------------------------------
+
+def test_japanese_spellings_are_the_same_listing_like_taiwanese_ones() -> None:
+    """blocking（台股修法的對稱面）：公式把 `7803.T`（JPY）轉成 TYO:7803——同一檔，比對也要當同一檔。"""
+    assert gsheets.canonical_symbol("7803.T") == gsheets.canonical_symbol("TYO:7803") == "TYO:7803"
+    assert gsheets.canonical_symbol("TPE:ABC") == "TPE:ABC"            # TPE: 後面不是數字碼就不剝（不會併進美股 ABC）
+    values, formulas = _grid()
+    with pytest.raises(ValueError, match="第 3 列已經是"):
+        gsheets.plan_new_position(values, formulas, broker="IB", symbol="7803.T")
+
+
+def test_an_absent_readback_is_read_again_before_saying_so(monkeypatch, tmp_path) -> None:
+    """第三次覆核 non-blocking：伺服器可能稍後才套用——判成「此刻沒套用」前隔幾秒再讀一次。"""
+    module, calls = _wire_open(monkeypatch, tmp_path, open_fails=True)
+    module.ABSENT_RECHECK_SECONDS = 0.001
+    answers = iter(["absent", "landed"])
+    monkeypatch.setattr(gsheets, "new_row_state", lambda plan, fill: next(answers))
+    assert module.main(_OPEN + ["--apply"]) == 2
+    assert calls["deleted"] == [5] and not module.TRADE_LOG.exists()
+
+
+def test_company_held_symbols_come_from_the_real_resolution_path(monkeypatch) -> None:
+    """第三次覆核 non-blocking（M13 存活）：測試原本都直接注入 company_held_symbols，正式路徑沒人守——
+    它壞掉，「同公司換代號建倉」的 fail closed 就失效。"""
+    import alpha.providers.briefs as briefs_mod
+    import engine_b.disproof as disproof
+    import identity.registry as reg
+    import portfolio.holdings as holdings
+    import webapp.store as store
+    from engine_b import event_watch as ew
+    from tests.test_record_trade import _module
+
+    rows = [{"ticker": "FRA:2DG", "broker": "IB", "shares": 100.0, "bucket": "觀察"},
+            {"ticker": "SIVE.ST", "broker": "FUBON", "shares": 50.0, "bucket": "觀察"}]
+    monkeypatch.setattr(reg, "get_registry", lambda: object())
+    monkeypatch.setattr(holdings, "resolve_holding", lambda row, registry=None: {
+        "company_id": "co:sivers_semiconductors", "research_ticker": "SIVE.ST", "source": "test"})
+    monkeypatch.setattr(holdings, "resolve_holdings", lambda rows_, registry=None: {"rows": [
+        {"ticker": r["ticker"], "company_id": "co:sivers_semiconductors", "shares": r["shares"], "cash": False}
+        for r in rows_]})
+    monkeypatch.setattr(briefs_mod, "read_brief_records", lambda ticker: ([], []))
+    monkeypatch.setattr(ew, "load_watches", lambda *a, **k: {"watches": []})
+    monkeypatch.setattr(disproof, "load_lifecycle", lambda *a, **k: {})
+    monkeypatch.setattr(store.StateArtifactStore, "read", lambda self, kind: (None, None))
+    monkeypatch.setattr(store.ArtifactStore, "read", lambda self, t: (None, None))
+    from datetime import date
+
+    out = _module()._research_inputs("TPE:9999", today=date(2026, 9, 30), sheet_rows=rows)
+    assert out["held_company"] is True and out["company_held_symbols"] == ["FRA:2DG", "SIVE.ST"]
