@@ -658,7 +658,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 
 1. Phase 2 closeout §5 未併入本 Phase 的：#2（3 則排回 lead 補分類——研究）、#4（稽核依賴 Neo4j，本 Phase 維持）、#6（聯合公告偵測 `display_name`，先量）、#7（`supplies_to → prod:` 兩義，Phase 4）、#10（走圖母體 <10 型別）、#11（Phase 1 §7 殘題）、#13（apply 入口旁支、`_finalize…` 無呼叫端、`verify_test_nonvacuity.py` 失效突變）、#14（`wake_reading` 以節點為單位）、#15（「客戶高管在供應商新聞稿具名」算不算客戶端印證——**要使用者決定**）、#16（兩條叫不醒的語意 watch）、#17（`classify_evidence` 屬性引文算邊印證、`prod:` 一表多義、SuperNova 原文未定日、OpenLight 兩個 ID）。
 2. **「剛轉型」只能由敘事宣告**：若敘事沒寫而歷史其實不可比，百分位會照算——要不要讓讀圖或 thesis 也能宣告。
-3. **主題等權組 pq2 若結案時仍未 go**：已定價②③全體缺席；照實寫，Phase 5 前要有人定。
+3. **主題等權組 pq2 若結案時仍未 go**：已定價②③全體缺席；照實寫，Phase 5 前要有人定。——**2026-09-30 結案後 [656] go、已寫入 1 組**；組中位數仍因成員自家倍數缺席而 0 檔有值（見 #14 的資料源題）。
 4. **Phase 5 從 trade_log 收據重建量測**：`research_receipt` 欄位是否足夠由 Phase 5 plan 驗；舊事件缺它要當 absence。
 5. **`get_bottlenecks`／Q1 scarcity 那條路**要不要退役（PointInTime 探針要先換成等價的 as-of 投影探針、跑讓它紅的突變）。
 6. **`refresh=review_required` 的來源全是退役估值鏈殘留**（`operating_assumption`／axis／thesis）：refresh 規則要不要清。
@@ -680,7 +680,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 22. **R2-a non-blocking（Step 3.4 覆核）**：N2 寫入端「供給側」只認 `supplies_to`（plan 寫 supplies_to／develops，方向更嚴）、「它在需求側」的提示對外向需求邊會印成「兩側都不在」；N4 QueueLiveness：fired 的 `wake_brief`（非語意 kind）沒有滯留檢查、fired 的 `brief:` 語意 watch 滯留訊息指向的 consumer 寫成「semantic-queue → judge」；N5 v2 的禁字表與 placeholder 字彙在 parse 路徑上，日後改字彙會讓舊 v2 紀錄解析失敗（v1 早就如此，§13 要註明）；N8 舊版／已撤回版 fired 的 `brief:` watch 不進 `disproof_counts` 任何一格、brief ledger 的 parse errors 被 `current_briefs` 與 audit 忽略、舊版 `candidate_state` 用過的 `wake_brief` 若新版不再引用仍留著（醒來時多處置一次）。
 23. **R2-a 覆核 non-blocking（0d4c7ad）**：①「今天」已統一成排程時區（`alpha brief` CLI 改用 `event_watch._today()`，收尾 commit 當場修）；②`settle_due` 只轉敘事來源的 watch——thesis／讀圖來源已過 expires、daily 還沒標記的，可開前提③最多晚一天才算「到期未判」（hook 不會收掉它們、不丟資料；3.6 每天重驗補上）；③寫入被拒時記憶體裡的 `ctx.watches` 已被時間轉換過（不存檔；CLI 丟掉 ctx，重用 ctx 的呼叫端要知道）；④**writer lock 沒有在 `alpha brief --add` 程式裡強制**：它在讀 registry 與存檔之間整份覆寫 `event_watches.json`，互斥只靠操作程序先取鎖——要不要在 CLI 內自動取鎖。
 24. **分部／產品線占比序列沒有年增**（Step 3.5）：「出現在數字裡了嗎」第一優先來源是占比序列，它的最新一點沒有 `yoy`，`{in_numbers_latest}` 會印「（尚無）」——寫的人答 yes／no 時型別層強制引用它，卻引用到一個恆缺席的值（例：3081.TWO）。要不要讓占比序列另給一個可引用的 placeholder（例如瓶頸業務占比的變化）。
-25. **going concern pq2 [657]–[661] 的兩個判讀點要使用者看**（Step 3.5）：SIVE.ST 的 ISA「betydande tvivel（significant doubt）」對到本欄 `substantial_doubt`；IQE.L 的 KPMG 第 4 節第三點模板句與第二點字面矛盾，判讀依第二點。美國三檔的 no_substantial_doubt 依據是「說明段不存在」。
+25. **going concern pq2 [657]–[661] 的兩個判讀點要使用者看**（Step 3.5）：SIVE.ST 的 ISA「betydande tvivel（significant doubt）」對到本欄 `substantial_doubt`；IQE.L 的 KPMG 第 4 節第三點模板句與第二點字面矛盾，判讀依第二點。美國三檔的 no_substantial_doubt 依據是「說明段不存在」。——**2026-09-30 使用者 go、五筆已寫入**（SIVE.ST 依 substantial_doubt 寫）。
 26. **請求路徑哨兵對 `webapp.materialize` 本身一直是瞎的**（3.6 審查評審 c0 的旁證）：既有五份 state fake 都經 `webapp.materialize` 組 payload，哨兵取 `before` 之前它就在 `sys.modules` 裡；3.6 補的測試只守「不得多預載」。要不要讓 fake 不經 materialize（直接寫 JSON 夾具）。
 27. **`test_watch_expiry.py::test_expired_structured_condition_is_not_re_registered_by_reconcile` 在一次全套跑紅、單跑與整檔跑都綠**（2026-09-29 3.6）：重現不出來，疑似順序或時間相依；Phase 3 結案前再觀察。
 28. **3.6 覆核的 non-blocking 殘留**（不影響本 Step 驗收）：APP rollup 段的缺席 kind 印原始代碼、沒經 `/meta` 字彙轉中文（心跳也印代碼，兩邊一致）；敘事 ledger 最新一行壞掉時 `select_brief` 退回上一版，那一列沒標「顯示的是較舊版」；freshness identity 只記 parse_errors 數量；daily ⑬ 若在單檔途中被截斷，候選板當天不更新（⑬ 實耗 282–298 秒、上限 25 分鐘）；同一個根因（thesis 來源觸及／到期）可能由 C3 或 Expiry 與連結滯留各報一次；`engine_b.disproof.current_briefs` 仍丟掉 ledger 的 parse errors（3.4 起）。
@@ -698,7 +698,7 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 40. **`get_wipeout_inputs`→`wipeout_flags` 的串接寫了兩次**（`alpha/providers/candidates.py` 與 `briefing/alpha_view/sources.py`；結案 G4）：同一組取數與判定函式、實測一致，但兩份串接日後會各自長。
 41. **`held` 不可宣告有兩道防線，測試分不出哪一道擋下**（結案 G2 變異：兩道都拿掉才紅）——各加一條只拆一道的測試，或刪掉其中一道。
 42. **同一份 v2 敘事裡兩條相同的 self 反證會登記兩筆同條件 watch**（結案 R2）：`v2_write_problems` 的 `live_by_condition` 只收 `thesis:`／`reading:` 來源，本版 `disproof[]` 之間不互比（暫存副本重現；真實 ledger 沒有）。修法候選：本版內 normalize(condition) 重複即拒收；活的 `brief:` 來源要不要一起比（跨公司同條件算不算重複）要使用者定義。
-43. **`{rel_return_30d}`／`{rel_return_90d}` 寫不進任何格**（結案 R2）：`SIMPLE_PLACEHOLDER` 是 `[a-z_]+`、不收數字，兩個登記的 placeholder 被當成格式錯誤；`priced_in` 的框架又要求組的兩行有值時一併引用。修 regex 之前先定 #44。
+43. **`{rel_return_30d}`／`{rel_return_90d}` 寫不進任何格**（結案 R2）：`SIMPLE_PLACEHOLDER` 是 `[a-z_]+`、不收數字，兩個登記的 placeholder 被當成格式錯誤；`priced_in` 的框架又要求組的兩行有值時一併引用。修 regex 之前先定 #44。**2026-09-30 [656] go 之後這條變成現行卡點**：組內 15 檔的 v2 敘事答 priced_in yes／no 時寫不進去（closeout §8）。
 44. **「首屏沒有價格報酬」沒有型別層強制**（結案 R2）：`現價 {price}` 放 demand、字面「賭對報酬 +50%」放 our_bet 都收（禁字表只有「隱含報酬」、只有 what_must_be_true 擋 `{price}`）；首屏卡另附收盤價走勢圖（2026-09-15 起）。今天 73 檔 0 命中。相對組漲幅能不能上首屏、走勢圖算不算首屏——**使用者決定**，之後才修 #43。
 45. **分部／產品線占比在 as-of 下洩漏未來**（結案 R2）：`engine_c/three_question_inputs.py::_segment_points` 沒有 T 過濾（as_of 是期末日不是可知日，要一併看 `recorded_at`）；今天被 view 的 `point_in_time_unavailable` 擋住。**是 #21 的前置條件**。
 46. **自家百分位「滿 3 年」只看頭尾跨度**（結案 R2）：LRCX 窗內 751 個交易日只有 314 個樣本（淨負債只有年報點，2–7 月全缺）仍給 98.4。至少把覆蓋率印進 detail；要不要設覆蓋率下限是新門檻，**使用者決定**。

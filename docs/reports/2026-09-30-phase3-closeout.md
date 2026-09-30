@@ -159,3 +159,30 @@
 | 10 | 心跳以讀寫模式開 Engine C 私有庫（09-17／09-19 既有）；`?mode=ro` 讀 WAL 庫仍會更新 `-shm` mtime（不能當「有人碰過」的訊號） | §14 #50 |
 | 11 | 殭屍 grep A–H 以（檔，組）為粒度會吸收同檔新命中（I 組已釘數）；掃描範圍不含 `fetchers/` 等；敘事寫入不記 ride 當時的 status（日後無法證偽「寫入當時現行」）；completion gate 只數函式、不清點斷言層級的翻面；CLI 的建模待補不印間接供應商（只有 APP 印、JS 無測試）；基準的函式名單 sha 無法重現 | §14 #51 |
 | 12 | SIVE.ST 敘事連結的四條 thesis 反證在 fired（Sivers 臨時股東會公告叫醒） | 已在 §6；下一個互動 session 判讀 11 筆（研究動作） |
+
+## 8. 結案後（2026-09-30 下午）：[656]–[661] go 與研究佇列
+
+**使用者 go [656]–[661]**，同日寫入：主題等權組 ledger `tc_35b0d5cd521656ea`（15 檔等權）、Engine C going concern 五筆
+（`mo_8d37…`、`mo_98d4…`、`mo_20aa…`、`mo_9266…`、`mo_bfce…`）。重跑 materialize（81/81）後逐行重數 73 份個股頁：
+
+- **④ 歸零旗標**：going concern 非灰 **0 → 5**。AXTI、COHR、IQE.L、LITE 是「沒有重大疑慮」；SIVE.ST 是「有重大疑慮」
+  （Deloitte 查核報告的 väsentlig osäkerhetsfaktor，未修改查核意見）。④ 現為 **67／70／30／5**。
+- **A2 主題等權組**：0 → **1 組**。相對組漲幅 30／90 天有值 **0 → 15**；**組中位數仍 0 檔有值**（10 檔是本檔已定價①缺席
+  連帶的 `upstream_unavailable`、5 檔 `insufficient_evidence`）——根因是非美國標的沒有財報歷史來源（§5 #14）。
+- **新發現的卡點（使用者決定 §5 #4／plan §14 #43–#44 從「潛在」變成「現行」）**：組內成員的 v2 敘事現在寫不進去。
+  寫入端要求相對組漲幅有值時 `priced_in` 必須引用 `{rel_return_30d}` 或 `{rel_return_90d}`，型別層的 placeholder
+  regex 卻不收數字、把它當格式錯誤——不引用被寫入端拒、引用被型別層拒。以 COHR 現行那一版原樣重演寫入檢查（不落地），被拒
+  「priced_in：相對組漲幅有值，這一格必須一併引用 {rel_return_30d} 或 {rel_return_90d}」。受影響的是組內 15 檔
+  （含 AXTI、SIVE.ST、COHR、LITE 的任何換版）。修 regex 等於讓相對漲幅上首屏，所以等使用者決定 #4，不自行改。
+
+**研究佇列（research-drain，同日；使用者中途指示「先不要每檔都跑、太花 token」而停止）：**
+
+- 待分流 8 → 0（2 go、6 no-go）。Sivers 臨時股東會召集公告叫醒的 11 筆語意 watch 逐條判「無關」，回 active；
+  `semantic_active` 回到 37（＝基準 36＋新登 1，§2 反證登記那一列的字面差距消失）。
+- 已核准線索 15 → 9：6 條 park、4 條「建議入圖但未經第二人核對」只加註記（仍在 pq1）、5 條沒追完（未改任何欄位）。
+  研究紀錄：[`2026-09-30-drain-trace-packets.md`](2026-09-30-drain-trace-packets.md)。
+  其中值得記的一手：存託銀行 Deutsche Bank 2026-09-29 以 F-6EF 註冊 Sivers ADR（1 ADS＝3 股），**不是**發行人掛牌或募資；
+  Sivers「2027 上半年」指的是**完成美國掛牌的準備**，不是完成掛牌（triage 理由讀過頭，park 紀錄已更正）。
+- 段 5 每檔閉環未動（69 檔）：其中 23 檔在 §5 #3 使用者決定前結構上收斂不了、11 檔卡 §5 #4。
+- 流程：一位唯讀 agent 用 curl 在 repo 根目錄寫了一個 215 bytes 的錯誤頁（`t.html`，BlobNotFound），
+  writer guard 因「工作區不乾淨」擋下後續寫入，確認是 agent 產物後刪除——guard 在這裡真的擋到了東西。
