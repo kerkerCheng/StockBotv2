@@ -416,14 +416,16 @@ def main(argv: list[str] | None = None) -> int:
         if missing:
             print(f"✗ --open-position 必須明給 {'、'.join(missing)}——新列沒有既有列可以核對，不猜", file=sys.stderr)
             return 2
-        cash_currency = {"cash_usd": "USD", "cash_twd": "TWD"}.get(args.cash_column.strip().lower())
-        if cash_currency and cash_currency != args.currency.strip().upper():
-            print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency}，成交幣別給的是 {args.currency}——"
-                  "金額會以錯的幣別扣款；幣別不同請給對應的現金欄或 --cash-column none", file=sys.stderr)
-            return 2
     args.broker = args.broker or "IB"
     args.currency = (args.currency or "USD").strip().upper()
     args.cash_column = args.cash_column if args.cash_column is not None else "cash_usd"
+    # 現金欄的幣別必須等於成交幣別——**兩條路徑都擋**（R2 2026-09-30 覆核 C1：原本只有建倉路徑檢查；既有列加碼日股／歐股
+    # 沒給 --cash-column 時，預設的 cash_usd 會把日圓／歐元金額當美元扣掉，--apply 就照寫）。--log-only 不碰現金格，不擋。
+    cash_currency = {"cash_usd": "USD", "cash_twd": "TWD"}.get(args.cash_column.strip().lower())
+    if not args.log_only and cash_currency and cash_currency != args.currency:
+        print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency}，成交幣別是 {args.currency}——"
+              "金額會以錯的幣別扣款；幣別不同請給對應的現金欄或 --cash-column none", file=sys.stderr)
+        return 2
     from fetchers import gsheets
 
     # 一筆成交只讀一次 Sheet（2026-09-30 使用者定案，plan §14 #38）：同一份原始格交給定位、硬擋與研究收據——

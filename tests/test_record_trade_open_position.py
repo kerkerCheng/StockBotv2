@@ -681,8 +681,8 @@ def test_japanese_spellings_are_the_same_listing_like_taiwanese_ones() -> None:
 
 
 def test_a_registry_spelled_japanese_listing_plans_like_any_other() -> None:
-    """名冊寫法的日股（6324.T＝Harmonic Drive，registry 的 research ticker）配 JPY 過得了白名單、規劃得出插入點——
-    這是改寫法的目的：建倉收據解析得到公司，不必走缺敘事 override。"""
+    """名冊寫法的日股（6324.T＝Harmonic Drive，registry 的 research ticker）配 JPY 過得了白名單、規劃得出插入點；
+    `TYO:` 寫法拒收並提示名冊寫法。（收據解析得到公司由下一條用真名冊守。）"""
     values, formulas = _grid()
     plan = gsheets.plan_new_position(values, formulas, broker="IB", symbol="6324.T", currency="JPY")
     assert plan["insert_at"] == 5                                       # IB 最後一列持股（第 4 列 NVDA）的下一列
@@ -728,3 +728,81 @@ def test_company_held_symbols_come_from_the_real_resolution_path(monkeypatch) ->
 
     out = _module()._research_inputs("TPE:9999", today=date(2026, 9, 30), sheet_rows=rows)
     assert out["held_company"] is True and out["company_held_symbols"] == ["FRA:2DG", "SIVE.ST"]
+
+
+# ---------------------------------------------------------------------------
+# 12. R2 覆核（2026-09-30，日股改用名冊寫法 ca4b012：GO＋順手修）
+# ---------------------------------------------------------------------------
+
+def test_registry_spelled_japanese_holdings_resolve_and_every_registry_listing_passes_the_whitelist() -> None:
+    """這次定案要守的效果（T2）：名冊寫法 `6324.T` 解析得到公司、舊寫法 `TYO:6324` 解析不到——Sheet 改成名冊寫法
+    才有意義；而且名冊裡每一檔日股的 research ticker 都要過得了建倉白名單（名冊加一檔公式抓不到的寫法時這裡先紅）。"""
+    from pathlib import Path
+
+    from identity.registry import get_registry
+    from portfolio.holdings import resolve_holding
+
+    registry = get_registry()
+    assert resolve_holding({"ticker": "6324.T"}, registry=registry)["company_id"] == "co:harmonic_drive_systems"
+    assert resolve_holding({"ticker": "TYO:6324"}, registry=registry)["company_id"] is None
+    companies = json.loads((Path(__file__).resolve().parents[1] / "config" / "company_identity.json")
+                           .read_text(encoding="utf-8"))["companies"]
+    japanese = [c["research_ticker"] for c in companies if c.get("execution_currency") == "JPY" and c.get("research_ticker")]
+    assert japanese, "名冊裡沒有日股——這條測試失去意義"
+    for ticker in japanese:
+        assert gsheets._symbol_currency_problem(ticker, "JPY") is None, ticker
+        assert gsheets.canonical_symbol(ticker) == ticker, ticker          # 名冊寫法就是比對的正規形
+
+
+def test_a_legacy_tyo_row_still_blocks_a_duplicate_registry_spelled_open() -> None:
+    """T1：使用者若照舊習慣手寫一列 `TYO:6324`，用名冊寫法 `6324.T` 在同券商建倉仍要判成同一檔、拒收（不開重複列）。"""
+    values, formulas = _grid()
+    values[2][2] = formulas[2][2] = "TYO:6324"
+    with pytest.raises(ValueError, match="第 3 列已經是"):
+        gsheets.plan_new_position(values, formulas, broker="IB", symbol="6324.T", currency="JPY")
+
+
+@pytest.mark.parametrize("symbol, currency, message", [
+    ("12345.T", "JPY", "認不得"),          # T3：白名單只收 4 碼數字（公式的 ^[0-9]+\.T$ 轉得出，但東證是 4 碼）
+    ("123.T", "JPY", "認不得"),
+    ("130A.T", "JPY", "認不得"),           # 東證英數代號：公式轉不出 TYO:，抓不到價
+    ("ABC.T", "JPY", "認不得"),
+    ("TYO:12345", "JPY", "認不得"),        # C4：不再提示一個又會被拒收的寫法
+    ("6324", "JPY", "寫成公司名冊的寫法 6324.T"),   # C4：裸 4 碼配 JPY 提示日股寫法，不是 .TW
+    ("tyo:6324", "JPY", "寫成公司名冊的寫法 6324.T"),
+    ("6324.t", "JPY", "大寫"),             # JP-CASE-1：公式分大小寫，小寫轉不成 TYO:
+    ("2330.tw", "TWD", "大寫"),            # 同一個洞的台股面（公式會拿到 TPE:2330.tw）
+    ("nvda", "USD", "大寫"),
+    (" NVDA", "USD", "大寫"),              # 寫進 Sheet 的是原字串：前後空白也讓 REGEXMATCH 失手
+])
+def test_whitelist_edges_and_case_are_rejected_before_anything_is_written(symbol, currency, message) -> None:
+    values, formulas = _grid()
+    with pytest.raises(ValueError, match=message):
+        gsheets.plan_new_position(values, formulas, broker="IB", symbol=symbol, currency=currency)
+
+
+@pytest.mark.parametrize("extra, currency", [([], "EUR"), (["--cash-column", "cash_twd"], "USD"), ([], "JPY")])
+def test_existing_row_path_also_refuses_a_cash_column_in_another_currency(monkeypatch, tmp_path, extra, currency) -> None:
+    """C1（R2 覆核，既有問題）：既有列加碼原本不檢查現金欄幣別——歐股／日股沒給 --cash-column 時，預設 cash_usd
+    會把外幣金額當美元扣掉。現在兩條路徑都擋，而且在讀 Sheet 之前。"""
+    from tests.test_record_trade import _module
+
+    from fetchers import gsheets as gs
+
+    reads = []
+    monkeypatch.setattr(gs, "read_portfolio_values", lambda **k: reads.append(k) or [["symbol"]])
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    argv = ["--symbol", "FRA:2DG", "--side", "buy", "--shares", "10", "--price", "3", "--executed-at",
+            "2026-09-30T10:00:00+02:00", "--broker", "IB", "--currency", currency, "--why", "x", *extra]
+    assert module.main(argv) == 2 and reads == [] and not module.TRADE_LOG.exists()
+    ok = argv + ["--cash-column", "none"] if not extra else [a if a != "cash_twd" else "none" for a in argv]
+    reached = []
+
+    def stop(**kwargs):
+        reached.append(kwargs)
+        raise RuntimeError("stop here")
+
+    monkeypatch.setattr(gs, "read_portfolio_values", stop)
+    module.main(ok)
+    assert reached, "給 --cash-column none 要過得了幣別檢查、走到讀 Sheet"

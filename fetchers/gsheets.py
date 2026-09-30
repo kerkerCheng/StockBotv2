@@ -338,10 +338,17 @@ def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
     s, cur = symbol.strip().upper(), currency.strip().upper()
     if cur not in SHEET_PRICED_CURRENCIES:
         return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
+    if cur == "JPY" and re.fullmatch(r"(?:TYO:)?[0-9]{4}", s):
+        # 日股（含裸 4 碼配 JPY）：提示名冊寫法——裸 4 碼若照台股的提示改成 .TW，會再被幣別擋一次（R2 覆核 C4）。
+        return f"日股代號請寫成公司名冊的寫法 {s.removeprefix('TYO:')}.T（Sheet 的日股一律用名冊的 .T 寫法）"
     if re.fullmatch(r"(?:TPE:)?[0-9]{4,6}[A-Z]?", s):
         return f"台股代號請寫成 Sheet 既有的寫法 {canonical_symbol(s)}（別的寫法公式也當台股，但 Sheet 的慣例是 .TW）"
-    if re.fullmatch(r"TYO:[0-9]+", s):
+    if re.fullmatch(r"TYO:[0-9]{4}", s):
         return f"日股代號請寫成公司名冊的寫法 {canonical_symbol(s)}（TYO: 公式也當日股，但 Sheet 一律用名冊的 .T）"
+    if symbol != s:
+        # 寫進 Sheet 的是原字串：公式的 REGEXMATCH／SUBSTITUTE 分大小寫，`6324.t` 轉不成 TYO:、`2330.tw` 轉成 TPE:2330.tw，
+        # 抓價會失敗（R2 覆核 JP-CASE-1）。只收緊：不自動改寫，請照 Sheet 的寫法重給。
+        return f"代號請用大寫、不含空白：{s}（Sheet 公式分大小寫，{symbol!r} 抓不到價）"
     for pattern, need, label in _SYMBOL_CURRENCY:
         if pattern.fullmatch(s):
             return None if cur == need else f"{symbol} 是{label}代號，幣別應該是 {need}（給的是 {cur}）"
