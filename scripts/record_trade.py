@@ -70,11 +70,27 @@ def _trade_id(payload: dict) -> str:
     return "tr_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
-def _already_recorded(trade_id: str) -> bool:
+def _trade_key(entry: dict) -> tuple | None:
+    """同一筆成交的正規化鍵：代號大寫、券商不分大小寫、成交時間換成 UTC、股數與價格轉數字（R2 2026-09-30：
+    原本比原始字串，`axti` 或換一種時區寫法重跑就繞過重跑防呆）。解析不了回 None（只比 trade_id）。"""
+    try:
+        when = datetime.fromisoformat(str(entry["executed_at"]).replace("Z", "+00:00"))
+        when = when.astimezone(timezone.utc).isoformat() if when.tzinfo else when.isoformat()
+        return (str(entry["symbol"]).strip().upper(), str(entry["broker"]).strip().casefold(),
+                str(entry["side"]).strip().lower(), float(entry["shares"]), float(entry["price"]), when)
+    except (KeyError, TypeError, ValueError):
+        return None
+
+
+def _already_recorded(trade_id: str, payload: dict | None = None) -> bool:
     if not TRADE_LOG.exists():
         return False
+    key = _trade_key(payload) if payload else None
     for line in TRADE_LOG.read_text(encoding="utf-8").splitlines():
-        if line.strip() and json.loads(line).get("trade_id") == trade_id:
+        if not line.strip():
+            continue
+        entry = json.loads(line)
+        if entry.get("trade_id") == trade_id or (key is not None and _trade_key(entry) == key):
             return True
     return False
 
@@ -92,11 +108,11 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--shares", required=True, type=float)
     ap.add_argument("--price", required=True, type=float)
     ap.add_argument("--executed-at", required=True, help="成交時間（ISO-8601，含時區）")
-    ap.add_argument("--broker", default="IB", help="Sheet 的 broker 欄值")
-    ap.add_argument("--currency", default="USD")
+    ap.add_argument("--broker", default=None, help="Sheet 的 broker 欄值（預設 IB；--open-position 時必須明給）")
+    ap.add_argument("--currency", default=None, help="成交幣別（預設 USD；--open-position 時必須明給）")
     ap.add_argument(
         "--cash-column",
-        default="cash_usd",
+        default=None,
         help="要扣款／入帳的現金欄名；傳 none 表示金流不經 Sheet 現金列（如台幣交割戶未入帳），只改股數與成本",
     )
     ap.add_argument("--account-ref", default="", help="遮蔽後的帳號，如 U****1599")
@@ -130,6 +146,8 @@ def build_parser() -> argparse.ArgumentParser:
                     help="首次建倉：Sheet 還沒有這一列（symbol＋broker）時新增一列；必須明確給，避免打錯代號就開出新列")
     ap.add_argument("--bucket", default=None, help="--open-position 必填：新列的 bucket（例：觀察、CORE、大盤）")
     ap.add_argument("--company", default=None, help="--open-position 可選：新列的公司名")
+    ap.add_argument("--also-at-other-broker", action="store_true",
+                    help="--open-position：這個代號已在別家券商有列、真的是在新券商建倉時才給（預設拒收：多半是 --broker 給錯）")
     return ap
 
 
@@ -371,9 +389,25 @@ def main(argv: list[str] | None = None) -> int:
     if args.open_position and (not (args.bucket or "").strip() or args.bucket.strip().upper() == "CASH"):
         print("✗ --open-position 必須給 --bucket（例：觀察、CORE、大盤；不能是 CASH）——不猜新列歸哪一格", file=sys.stderr)
         return 2
-    if not args.open_position and (args.bucket is not None or args.company is not None):
-        print("✗ --bucket／--company 只在 --open-position（首次建倉）時有意義", file=sys.stderr)
+    if not args.open_position and (args.bucket is not None or args.company is not None or args.also_at_other_broker):
+        print("✗ --bucket／--company／--also-at-other-broker 只在 --open-position（首次建倉）時有意義", file=sys.stderr)
         return 2
+    if args.open_position:
+        # 新列沒有既有的一列可以對：券商、幣別、現金欄的預設值會被照寫進 Sheet、灌進 NAV 公式（R2 2026-09-30 blocking：
+        # 台股代號配預設 USD，市值高估約 31 倍、回讀驗證抓不到）——所以建倉時三個都必須明給，跟 --bucket 同一個規則。
+        missing = [flag for flag, value in (("--broker", args.broker), ("--currency", args.currency),
+                                            ("--cash-column", args.cash_column)) if not (value or "").strip()]
+        if missing:
+            print(f"✗ --open-position 必須明給 {'、'.join(missing)}——新列沒有既有列可以核對，不猜", file=sys.stderr)
+            return 2
+        cash_currency = {"cash_usd": "USD", "cash_twd": "TWD"}.get(args.cash_column.strip().lower())
+        if cash_currency and cash_currency != args.currency.strip().upper():
+            print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency}，成交幣別給的是 {args.currency}——"
+                  "金額會以錯的幣別扣款；幣別不同請給對應的現金欄或 --cash-column none", file=sys.stderr)
+            return 2
+    args.broker = args.broker or "IB"
+    args.currency = (args.currency or "USD").strip().upper()
+    args.cash_column = args.cash_column if args.cash_column is not None else "cash_usd"
     from fetchers import gsheets
 
     # 一筆成交只讀一次 Sheet（2026-09-30 使用者定案，plan §14 #38）：同一份原始格交給定位、硬擋與研究收據——
@@ -401,7 +435,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.open_position:
             # 首次建倉（2026-09-30 使用者定案）：規劃要看公式原文——多讀一次公式，只拿來比對形狀，不做數字決定。
             formulas = gsheets.read_portfolio_values(formulas=True)
-            plan = gsheets.plan_new_position(sheet_values, formulas, broker=args.broker, symbol=args.symbol)
+            plan = gsheets.plan_new_position(sheet_values, formulas, broker=args.broker, symbol=args.symbol,
+                                             currency=args.currency, allow_other_broker=args.also_at_other_broker)
+            if args.bucket.strip() not in plan["buckets"]:
+                raise ValueError(f"bucket {args.bucket!r} 不在 Sheet 既有的值裡（{'、'.join(plan['buckets'])}）——"
+                                 "封閉字彙，不隨手開新的一格")
             shares_cell = cost_cell = None
             cash_cell = None if skip_cash else gsheets.locate_portfolio_cells([cash_request], values=sheet_values)[0]
             old_shares = old_cost = 0.0
@@ -418,8 +456,12 @@ def main(argv: list[str] | None = None) -> int:
             old_shares = _number(shares_cell["current"])
             old_cost = _number(cost_cell["current"])
     except ValueError as exc:
-        hint = ("\n  Sheet 還沒有這一列？首次建倉請加 --open-position --bucket <觀察／CORE／…>"
-                if not args.open_position and "命中 0 列" in str(exc) and "symbol" in str(exc) else "")
+        hint = ""
+        if not args.open_position and "命中 0 列" in str(exc) and "symbol" in str(exc):
+            elsewhere = sorted({str(r.get("broker") or "").strip() for r in (sheet_rows or [])
+                                if str(r.get("ticker") or "").strip().upper() == args.symbol.strip().upper()} - {""})
+            hint = (f"\n  {args.symbol} 在 {'、'.join(elsewhere)} 有列——是不是 --broker 沒給對？" if elsewhere else
+                    "\n  Sheet 還沒有這一列？首次建倉請加 --open-position --broker … --currency … --cash-column … --bucket …")
         print(f"✗ {'首次建倉：' if args.open_position else ''}{exc}{hint}", file=sys.stderr)
         return 2
     old_cash = 0.0 if skip_cash else _number(cash_cell["current"])
@@ -500,6 +542,12 @@ def main(argv: list[str] | None = None) -> int:
 
             today, today_problem = date.today(), f"排程時區讀不到（{type(exc).__name__}）——「今天」退回本機日期"
         inputs = _research_inputs(args.symbol, today=today, sheet_rows=sheet_rows, sheet_error=sheet_error)
+        if plan is not None and inputs.get("held_company"):
+            # 5% 單筆上限按代號加總：同一家公司換一個掛牌建倉會繞過它（R2 2026-09-30 non-blocking）。按公司合併是
+            # 資本規則、要使用者決定（Phase 4）；在那之前建倉這一條路 fail closed。
+            print(f"\n✗ 首次建倉：{inputs.get('company_id')} 在 Sheet 已經以別的代號持有——5% 上限只按代號加總，"
+                  "換代號建倉會繞過它。請用已持有那一列的代號記帳（不加 --open-position）。", file=sys.stderr)
+            return 2
         if today_problem:
             inputs["problems"].append(today_problem)
         brief = research_receipt.current_brief(inputs["records"], today=today)
@@ -532,11 +580,11 @@ def main(argv: list[str] | None = None) -> int:
             return EXIT_NARRATIVE
         receipt["research_receipt"] = research
 
-    if _already_recorded(trade_id):
+    if _already_recorded(trade_id, payload):
         print("\n⚠ 這筆成交已在 trade_log.jsonl 中；重複執行不會再寫事件紀錄。")
 
     if args.log_only:
-        if _already_recorded(trade_id):
+        if _already_recorded(trade_id, payload):
             print("\n這筆成交已在事件紀錄中，未重複寫入。")
             return 0
         _append_trade(
@@ -558,14 +606,19 @@ def main(argv: list[str] | None = None) -> int:
         print("  上方 diff 僅供對照，不是待執行的變更。")
         return 0
 
+    if not skip_cash and new_cash < 0:
+        print(f"\n⚠ 成交後現金會變負數（{new_cash:,.2f}）——確認是不是現金欄或幣別給錯")
     if not args.apply:
+        if _already_recorded(trade_id, payload):
+            print("\n（dry-run）這筆已在事件紀錄；加 --apply 會被拒絕（不重複寫 Sheet）。")
+            return 0
         print("\n（dry-run）確認無誤後加 --apply 實際寫入。")
         print("  若這筆你已手動改過 Sheet，改用 --log-only 只記事件、不重複計算。")
         return 0
 
     # 重跑 --apply 一律 fail closed（2026-09-30 使用者定案，plan §14 #34）：事件已記過，Sheet 再寫一次就是
     # 股數與現金重複計算（HEAD 起既有的洞：原本只印警告、照寫 Sheet）。要補改 Sheet 請手動。
-    if _already_recorded(trade_id):
+    if _already_recorded(trade_id, payload):
         print(f"\n✗ 這筆成交（{trade_id}）已在 {_shown(TRADE_LOG)}——重跑 --apply 會把 Sheet 的股數與現金再算一次。"
               "未寫入任何東西；Sheet 若需要更正請手動改。", file=sys.stderr)
         return 2
@@ -577,15 +630,28 @@ def main(argv: list[str] | None = None) -> int:
                 "base_currency": (plan.get("template_values") or {}).get("base_currency", "")}
         try:
             opened = gsheets.open_position_row(plan, fill)
-        except Exception as exc:  # noqa: BLE001 — batchUpdate 原子：失敗就沒有改動
-            print(f"\n✗ 新增列失敗（{type(exc).__name__}: {str(exc)[:160]}）——整批不生效，Sheet 沒有被改動。", file=sys.stderr)
+        except Exception as exc:  # noqa: BLE001 — 原子請求：驗證錯誤就沒改動；但 client 逾時不等於伺服器沒套用
+            print(f"\n✗ 新增列失敗（{type(exc).__name__}: {str(exc)[:160]}）", file=sys.stderr)
+            try:
+                landed = gsheets.symbol_at_row(plan["insert_at"])
+            except Exception as read_exc:  # noqa: BLE001
+                print(f"  ⚠⚠ 回讀也失敗（{type(read_exc).__name__}）——無法確認有沒有套用，請手動檢查 Sheet 第 "
+                      f"{plan['insert_at']} 列；事件紀錄沒有寫。", file=sys.stderr)
+                return 2
+            if landed == args.symbol.strip():
+                print("  回讀發現新列其實已經套用——刪掉還原：", file=sys.stderr)
+                return _rollback(gsheets, {"row": plan["insert_at"]}, args.symbol, plan)
+            print("  已回讀確認：Sheet 沒有被改動；事件紀錄沒有寫。", file=sys.stderr)
             return 2
-        problems = gsheets.verify_new_position(plan, fill)
+        try:
+            problems = gsheets.verify_new_position(plan, fill)
+        except Exception as exc:  # noqa: BLE001 — 回讀本身失敗（網路、429／5xx）＝沒驗過，照樣還原
+            problems = [f"回讀驗證失敗（{type(exc).__name__}: {str(exc)[:120]}）——沒驗過就不留"]
         if problems:
             print("\n✗ 新列寫完回讀沒通過，刪掉還原：", file=sys.stderr)
             for problem in problems:
                 print(f"  · {problem}", file=sys.stderr)
-            return _rollback(gsheets, opened, args.symbol)
+            return _rollback(gsheets, opened, args.symbol, plan)
         writes = []
     else:
         writes = [
@@ -598,7 +664,7 @@ def main(argv: list[str] | None = None) -> int:
         result = gsheets.write_portfolio_cells(writes)
     except Exception as exc:  # noqa: BLE001 — 逐格寫入前的重讀不符＝有人同時手改；建倉的新列一併還原
         print(f"\n✗ 寫入中止（{type(exc).__name__}: {str(exc)[:200]}）", file=sys.stderr)
-        return _rollback(gsheets, opened, args.symbol) if opened else 2
+        return _rollback(gsheets, opened, args.symbol, plan) if opened else 2
     written = list(opened["written"] if opened else []) + list(result["written"])
     _append_trade(
         {
@@ -630,10 +696,15 @@ def _shifted_a1(a1: str, insert_at: int | None) -> str:
     return f"{sheet}!{letters}{row + 1 if row >= insert_at else row}"
 
 
-def _rollback(gsheets, opened, symbol: str) -> int:
+def _rollback(gsheets, opened, symbol: str, plan=None) -> int:
     try:
-        gsheets.delete_position_row(opened, symbol)
-        print(f"  已刪掉第 {opened['row']} 列，Sheet 回到寫入前；事件紀錄沒有寫。", file=sys.stderr)
+        check = gsheets.delete_position_row(opened, symbol, expect=plan)
+        if check.get("verified"):
+            print(f"  已刪掉第 {opened['row']} 列並回讀確認 Sheet 回到寫入前（{check['detail']}）；事件紀錄沒有寫。",
+                  file=sys.stderr)
+        else:
+            print(f"  已刪掉第 {opened['row']} 列，但回讀**沒能確認**回到寫入前（{check.get('detail')}）——"
+                  "請手動看一眼 Sheet；事件紀錄沒有寫。", file=sys.stderr)
     except Exception as exc:  # noqa: BLE001 — 還原失敗要大聲說，不吞
         print(f"  ⚠⚠ 還原失敗（{type(exc).__name__}: {str(exc)[:200]}）——請手動檢查 Sheet 第 {opened['row']} 列；"
               "事件紀錄沒有寫。", file=sys.stderr)

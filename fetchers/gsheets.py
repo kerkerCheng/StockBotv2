@@ -295,9 +295,37 @@ def _cell(rows: list[list[Any]], headers: list[str], row: int, column: str) -> A
     return line[index] if index < len(line) else ""
 
 
+#: Sheet 抓價公式認得的幣別（market_usd／market_twd 的換算只寫了這四種；其他幣別乘數是 0）。
+SHEET_PRICED_CURRENCIES: frozenset[str] = frozenset({"USD", "TWD", "EUR", "JPY"})
+
+
+def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
+    """代號樣子與幣別對不上就回理由（R2 2026-09-30 blocking：台股代號配 USD，公式照樣抓台幣價、乘上 USD 的 1，
+    市值高估約 31 倍，而且市值 > 0 所以回讀驗證抓不到）。只擋認得出的組合，不猜其他。"""
+    s, cur = symbol.strip().upper(), currency.strip().upper()
+    if cur not in SHEET_PRICED_CURRENCIES:
+        return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
+    if s.endswith(".TWO"):
+        return "上櫃（.TWO）代號 Sheet 的抓價公式轉不出正確的 GOOGLEFINANCE 代號——要先改 Sheet 公式或手動建列"
+    if (s.endswith(".TW") or s.startswith("TPE:")) and cur != "TWD":
+        return f"{symbol} 是台股代號，幣別應該是 TWD（給的是 {cur}）"
+    if (s.startswith("TYO:") or s.endswith(".T")) and cur != "JPY":
+        return f"{symbol} 是日股代號，幣別應該是 JPY（給的是 {cur}）"
+    if s.startswith(("FRA:", "ETR:", "EPA:", "AMS:")) and cur != "EUR":
+        return f"{symbol} 是歐元區交易所代號，幣別應該是 EUR（給的是 {cur}）"
+    return None
+
+
 def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, broker: str,
-                      symbol: str) -> dict[str, Any]:
-    """純函式：決定新列插在哪、公式從哪一列複製；任何一項沒把握就 raise（不猜）。"""
+                      symbol: str, currency: str | None = None, allow_other_broker: bool = False) -> dict[str, Any]:
+    """純函式：決定新列插在哪、公式從哪一列複製；任何一項沒把握就 raise（不猜）。
+
+    `currency`：給了就先驗代號與幣別對不對得上、公式認不認得這個幣別（寫入前擋，不要寫完才被回讀驗證刪掉）。
+    `allow_other_broker`：這個代號已在別家券商有列時預設拒收——多半是 `--broker` 沒給對，不是在新券商建倉。"""
+    if currency is not None:
+        problem = _symbol_currency_problem(symbol, currency)
+        if problem:
+            raise ValueError(problem)
     if not values or not formulas:
         raise ValueError("Portfolio 分頁是空的")
     headers = [str(h).strip().lower() for h in values[0]]
@@ -311,9 +339,16 @@ def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, bro
     def val(r: int, c: str) -> str:
         return str(_cell(values, headers, r, c)).strip()
 
+    other_brokers: list[str] = []
     for r in range(2, last + 1):
-        if val(r, "symbol").casefold() == symbol.strip().casefold() and val(r, "broker").casefold() == broker.strip().casefold():
+        if val(r, "symbol").casefold() != symbol.strip().casefold():
+            continue
+        if val(r, "broker").casefold() == broker.strip().casefold():
             raise ValueError(f"第 {r} 列已經是 {symbol}（{broker}）——不是首次建倉，不要加 --open-position")
+        other_brokers.append(val(r, "broker"))
+    if other_brokers and not allow_other_broker:
+        raise ValueError(f"{symbol} 已在 {'、'.join(sorted(set(other_brokers)))} 有列——是不是 --broker 給錯了？"
+                         "真的是在新券商建倉才加 --also-at-other-broker")
     cash_rows = [r for r in range(2, last + 1) if val(r, "bucket").upper() == "CASH"]
     if not cash_rows:
         raise ValueError("找不到 CASH 列——新列要插在第一個 CASH 列上面，才落在 NAV 加總範圍內部")
@@ -343,28 +378,30 @@ def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, bro
         for r in all_positions:
             if r not in rows_:
                 exceptions.setdefault(r, []).append(column)
-    standard = [r for r in positions if r not in exceptions]
-    if not standard:
-        raise ValueError("第一個 CASH 列上面沒有公式是標準形狀的持股列可以當範本，中止")
-    same = [r for r in standard if val(r, "broker").casefold() == broker.strip().casefold()]
-    template = max(same) if same else max(standard)
     # 插在同券商最後一列持股的下一列（Sheet 照券商分組）；沒有同券商持股才插在第一個 CASH 列上面。
-    # 範本永遠在插入點上面，所以插列後範本的列號不變。
     same_any = [r for r in positions if val(r, "broker").casefold() == broker.strip().casefold()]
     insert_at = (max(same_any) + 1) if same_any else insert_at
+    # 範本只從插入點**以上**的標準列挑——插列後 API 照字面取來源索引，範本在下面就會複製到錯的一列（R2 non-blocking）。
+    standard = [r for r in positions if r not in exceptions and r < insert_at]
+    if not standard:
+        raise ValueError("插入點上面沒有公式是標準形狀的持股列可以當範本，中止")
+    same = [r for r in standard if val(r, "broker").casefold() == broker.strip().casefold()]
+    template = max(same) if same else max(standard)
     match = _NAV_RANGE.search(str(_cell(formulas, headers, template, "nav_base")))
     if not match:
         raise ValueError("nav_base 不是 SUM($X$a:$X$b) 形狀——插入後範圍會不會撐大無法判斷，中止")
     first, end = int(match.group(2)), int(match.group(4))
-    if end < last:
-        raise ValueError(f"nav_base 只加到第 {end} 列、資料到第 {last} 列——Sheet 的 NAV 本來就漏列，先修 Sheet")
+    if end < last or first > 2:
+        raise ValueError(f"nav_base 加總第 {first}–{end} 列、資料在第 2–{last} 列——Sheet 的 NAV 本來就漏列，先修 Sheet")
     if not first < insert_at <= end:
         raise ValueError(f"新列位置第 {insert_at} 列不在 NAV 加總範圍（{first}–{end}）內部——插入後範圍不會自動撐大，中止")
     template_values = {h: _cell(values, headers, template, h) for h in headers if h not in formula_columns}
     return {"headers": headers, "insert_at": insert_at, "template": template, "formula_columns": formula_columns,
             "shapes": shapes, "nav_range": (match.group(1), first, end), "last_row": last,
             "template_values": template_values,
-            "manual_exceptions": {r: exceptions[r] for r in sorted(exceptions)}}
+            "manual_exceptions": {r: exceptions[r] for r in sorted(exceptions)},
+            "other_brokers": sorted(set(other_brokers)),
+            "buckets": sorted({val(r, "bucket") for r in all_positions if val(r, "bucket")})}
 
 
 def _user_entered(value: Any) -> dict[str, Any]:
@@ -420,7 +457,8 @@ def verify_new_position(plan: Mapping[str, Any], fill: Mapping[str, Any], *, att
                         delay: float = 2.0, sleep: Any = None) -> list[str]:
     """寫完之後回讀：新列在、公式形狀同範本、NAV 範圍涵蓋到最後一列、整張表照樣讀得過、新列市值 > 0。
 
-    抓價公式剛寫完可能還在 Loading，所以重試幾次；回空 list＝通過。"""
+    抓價公式剛寫完可能還在 Loading，所以重試幾次（間隔倍增，上限 8 秒，合計約 30 秒）；回空 list＝通過。
+    ⚠ 讀取本身丟例外（網路、429／5xx）會往外拋——呼叫端必須接住並還原（R2 2026-09-30 blocking）。"""
     import time
 
     sleep = sleep or time.sleep
@@ -440,7 +478,7 @@ def verify_new_position(plan: Mapping[str, Any], fill: Mapping[str, Any], *, att
                     != _absolute_rows_loose(plan["shapes"][column]):
                 problems.append(f"新列的 {column} 公式形狀和其他持股列不同")
         nav = _NAV_RANGE.search(str(_cell(formulas, headers, row, "nav_base")))
-        if not nav or int(nav.group(2)) > 2 or int(nav.group(4)) < len(values):
+        if not nav or int(nav.group(2)) > int(plan["nav_range"][1]) or int(nav.group(4)) < len(values):
             problems.append("NAV 加總範圍沒有涵蓋到最後一列（新列可能沒被算進 NAV）")
         try:
             parsed = parse_portfolio(values, strict_operational=True)
@@ -455,21 +493,46 @@ def verify_new_position(plan: Mapping[str, Any], fill: Mapping[str, Any], *, att
         if not problems:
             return []
         if attempt + 1 < attempts:
-            sleep(delay)
+            sleep(min(delay * (2 ** attempt), 8.0))
     return problems
 
 
-def delete_position_row(opened: Mapping[str, Any], symbol: str) -> None:
-    """還原：刪掉剛新增的那一列——先確認那一列還是剛寫的代號，不是就不刪（避免刪到別人剛插的列）。"""
+def symbol_at_row(row: int) -> str | None:
+    """唯讀：第 `row` 列的 symbol（沒有那一列回 None）。開列請求丟例外時用它確認「到底有沒有套用」——
+    client 逾時不等於伺服器沒套用（R2 2026-09-30）。"""
+    values = read_portfolio_values()
+    headers = [str(h).strip().lower() for h in (values[0] if values else [])]
+    if "symbol" not in headers or row > len(values):
+        return None
+    return str(_cell(values, headers, row, "symbol")).strip() or None
+
+
+def delete_position_row(opened: Mapping[str, Any], symbol: str, *,
+                        expect: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """還原：刪掉剛新增的那一列——先確認那一列還是剛寫的代號，不是就不刪（避免刪到別人剛插的列）。
+
+    刪完回讀：列數回到寫入前、NAV 範圍終點回到原值才回 `verified=True`（`expect` 帶 plan 的 last_row 與
+    nav_range）；不對就照實回 False，呼叫端不得說「回到寫入前」。"""
     values = read_portfolio_values()
     headers = [str(h).strip().lower() for h in (values[0] if values else [])]
     row = int(opened["row"])
     if "symbol" not in headers or str(_cell(values, headers, row, "symbol")).strip() != symbol.strip():
         raise ValueError(f"要還原的第 {row} 列已不是 {symbol}——不刪，請手動檢查 Sheet")
     service = _get_service(writable=True)
+    sheet_id = opened.get("sheet_id")
+    sheet_id = int(sheet_id) if sheet_id is not None else _sheet_id(service, SHEET_NAME)
     service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID, body={"requests": [
-        {"deleteDimension": {"range": {"sheetId": int(opened["sheet_id"]), "dimension": "ROWS",
+        {"deleteDimension": {"range": {"sheetId": sheet_id, "dimension": "ROWS",
                                        "startIndex": row - 1, "endIndex": row}}}]}).execute()
+    if not expect:
+        return {"verified": False, "detail": "沒有寫入前的列數可比對"}
+    after, formulas = read_portfolio_values(), read_portfolio_values(formulas=True)
+    heads = [str(h).strip().lower() for h in (after[0] if after else [])]
+    nav = _NAV_RANGE.search(str(_cell(formulas, heads, 2, "nav_base"))) if "nav_base" in heads else None
+    ok = len(after) == int(expect["last_row"]) and nav is not None and int(nav.group(4)) == int(expect["nav_range"][2])
+    return {"verified": ok,
+            "detail": (f"列數 {len(after)}（寫入前 {expect['last_row']}）、NAV 範圍終點 "
+                       f"{nav.group(4) if nav else '讀不到'}（寫入前 {expect['nav_range'][2]}）")}
 
 
 def fetch_portfolio(
