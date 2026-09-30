@@ -182,9 +182,9 @@ def test_rollback_refuses_to_delete_a_row_that_is_not_ours(monkeypatch) -> None:
     values, _ = _grid()
     monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: values)
     with pytest.raises(ValueError, match="不刪"):
-        gsheets.delete_position_row({"row": 3, "sheet_id": 7}, "AXTI")   # 第 3 列是 TYO:7803
-    assert fake.bodies == []
-    gsheets.delete_position_row({"row": 3, "sheet_id": 7}, "TYO:7803")
+        gsheets.delete_position_row({"row": 3, "sheet_id": 7}, {"symbol": "AXTI", "broker": "IB", "shares": 10.0})
+    assert fake.bodies == []                                          # 第 3 列是 TYO:7803
+    gsheets.delete_position_row({"row": 3, "sheet_id": 7}, {"symbol": "TYO:7803", "broker": "IB", "shares": 10.0})
     assert fake.bodies[0]["requests"][0]["deleteDimension"]["range"]["startIndex"] == 2
 
 
@@ -193,7 +193,7 @@ def test_rollback_refuses_to_delete_a_row_that_is_not_ours(monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 def _wire_open(monkeypatch, tmp_path, *, verify=(), cash_fails=False, open_fails=False, verify_raises=False,
-               inputs=None, rows=None):
+               inputs=None, rows=None, cash_network=False):
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=rows or _sheet_rows(), inputs=inputs or _present_inputs())
     values, formulas = _grid()
     calls["reads"] = []
@@ -212,6 +212,8 @@ def _wire_open(monkeypatch, tmp_path, *, verify=(), cash_fails=False, open_fails
     def write(writes):
         if cash_fails:
             raise ValueError("現值不符")
+        if cash_network:
+            raise TimeoutError("讀取回應逾時")
         calls["writes"].append(writes)
         return {"written": [w["a1"] for w in writes]}
 
@@ -222,9 +224,14 @@ def _wire_open(monkeypatch, tmp_path, *, verify=(), cash_fails=False, open_fails
         return list(verify)
 
     monkeypatch.setattr(gsheets, "verify_new_position", verify_fn)
-    monkeypatch.setattr(gsheets, "delete_position_row", lambda opened, symbol, expect=None:
-                        calls["deleted"].append(opened["row"]) or {"verified": True, "detail": "測試"})
-    monkeypatch.setattr(gsheets, "symbol_at_row", lambda row: calls.get("landed"))
+    def delete(opened, fill, expect=None):
+        calls["deleted"].append(opened["row"])
+        calls["delete_expect"] = expect
+        return {"verified": True, "detail": "測試"}
+
+    monkeypatch.setattr(gsheets, "delete_position_row", delete)
+    monkeypatch.setattr(gsheets, "new_row_landed", lambda plan, fill: bool(calls.get("landed")))
+    monkeypatch.setattr(gsheets, "read_cell_value", lambda a1: calls.get("cash_now", "5000"))
     monkeypatch.setattr(gsheets, "write_portfolio_cells", write)
     return module, calls
 
@@ -340,6 +347,11 @@ def test_cash_column_currency_must_match_the_trade(monkeypatch, tmp_path) -> Non
     ("3081.TWO", "TWD", "上櫃"),
     ("SIVE.ST", "SEK", "只換算"),
     ("TYO:6324", "USD", "日股代號"),
+    ("2330", "USD", "寫成 Sheet 既有的寫法 2330.TW"),       # R2 覆核：裸 4 碼會被公式當台股
+    ("0050", "TWD", "寫成"),
+    ("LON:VWRA", "USD", "認不得"),                          # LON: 的 GBX 股票配 USD 高估百倍
+    ("SOI.PA", "EUR", "認不得"),
+    ("AXTI", "JPY", "美股代號"),
 ])
 def test_symbol_and_currency_are_checked_before_anything_is_written(symbol, currency, message) -> None:
     values, formulas = _grid()
@@ -379,7 +391,7 @@ def test_a_company_already_held_under_another_symbol_cannot_be_opened_again(monk
     assert calls["opened"] == [] and not module.TRADE_LOG.exists()
 
 
-@pytest.mark.parametrize("landed, deleted", [("AXTI", [5]), (None, [])])
+@pytest.mark.parametrize("landed, deleted", [(True, [5]), (False, [])])
 def test_an_open_request_that_errors_is_read_back_before_claiming_nothing_changed(
         monkeypatch, tmp_path, capsys, landed, deleted) -> None:
     """client 逾時不等於伺服器沒套用：回讀發現已套用就還原，沒套用才說「沒被改動」。"""
@@ -387,7 +399,7 @@ def test_an_open_request_that_errors_is_read_back_before_claiming_nothing_change
     calls["landed"] = landed
     assert module.main(_OPEN + ["--apply"]) == 2
     assert calls["deleted"] == deleted and not module.TRADE_LOG.exists()
-    if landed is None:
+    if not landed:
         assert "已回讀確認：Sheet 沒有被改動" in capsys.readouterr().err
 
 
@@ -458,3 +470,117 @@ def test_reapply_is_caught_even_when_the_same_trade_is_spelled_differently(monke
     assert module.main(_BUY + ["--apply"]) == 0
     assert module.main(variant(_BUY) + ["--apply"]) == 2
     assert len(calls["writes"]) == 1
+
+
+# ---------------------------------------------------------------------------
+# 9. R2 覆核（2026-09-30 第二輪）
+# ---------------------------------------------------------------------------
+
+OTHER = {"symbol": "0050.TW", "broker": "FUBON", "shares": 1000.0}
+
+
+def test_another_brokers_row_with_the_same_symbol_is_never_taken_for_ours(monkeypatch) -> None:
+    """blocking #1：只比代號時，插入點正是別家券商的同代號既有列（第 5 列 TAISHIN 0050.TW）會被當成新列刪掉。"""
+    values, formulas = _grid()
+    fake = _FakeService()
+    monkeypatch.setattr(gsheets, "_get_service", lambda *, writable=False: fake)
+    monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: values)
+    plan = {"insert_at": 5, "last_row": len(values)}
+    assert gsheets.new_row_landed(plan, OTHER) is False
+    with pytest.raises(ValueError, match="不刪"):
+        gsheets.delete_position_row({"row": 5, "sheet_id": 7}, OTHER)
+    assert fake.bodies == []
+
+
+def test_our_row_is_recognised_only_when_symbol_broker_and_shares_all_match(monkeypatch) -> None:
+    values, formulas = _grid()
+    plan = gsheets.plan_new_position(values, formulas, broker="IB", symbol="AXTI", currency="USD")
+    after_v, _ = _after(values, formulas, plan, FILL)
+    monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: after_v)
+    assert gsheets.new_row_landed(plan, FILL) is True
+    assert gsheets.new_row_landed(plan, {**FILL, "shares": 11.0}) is False
+    assert gsheets.new_row_landed(plan, {**FILL, "broker": "TAISHIN"}) is False
+
+
+def test_delete_says_it_could_not_confirm_when_the_readback_does_not_match(monkeypatch) -> None:
+    values, formulas = _grid()
+    plan = gsheets.plan_new_position(values, formulas, broker="IB", symbol="AXTI", currency="USD")
+    after_v, after_f = _after(values, formulas, plan, FILL)
+    fake = _FakeService()
+    monkeypatch.setattr(gsheets, "_get_service", lambda *, writable=False: fake)
+    reads = iter([after_v, after_v, after_f])                       # 刪前確認、刪後值、刪後公式（假：沒真的刪掉）
+    monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: next(reads))
+    check = gsheets.delete_position_row({"row": plan["insert_at"], "sheet_id": 7}, FILL, expect=plan)
+    assert check["verified"] is False and "寫入前" in check["detail"]
+
+
+def test_rollback_passes_the_plan_so_the_readback_can_be_checked(monkeypatch, tmp_path) -> None:
+    module, calls = _wire_open(monkeypatch, tmp_path, verify=("x",))
+    assert module.main(_OPEN + ["--apply"]) == 2
+    assert calls["delete_expect"] is not None and calls["delete_expect"]["insert_at"] == 5
+
+
+@pytest.mark.parametrize("cash_now, code, deleted, logged", [
+    ("3000", 0, [], True),            # 回讀已是新值：整筆其實寫完了 → 照常記事件
+    ("5000", 2, [5], False),          # 回讀仍是舊值：現金沒動 → 刪新列
+    ("4321", 2, [], False),           # 都不是：不刪、不記，大聲說
+])
+def test_a_cash_write_that_errors_is_read_back_before_deciding(monkeypatch, tmp_path, cash_now, code, deleted,
+                                                                logged) -> None:
+    """blocking #3：伺服器已套用後 client 才逾時，原本只刪列、現金沒還原，還印「回到寫入前」。"""
+    module, calls = _wire_open(monkeypatch, tmp_path, cash_network=True)
+    calls["cash_now"] = cash_now
+    assert module.main(_OPEN + ["--apply"]) == code
+    assert calls["deleted"] == deleted and module.TRADE_LOG.exists() is logged
+    if logged:
+        entry = json.loads(module.TRADE_LOG.read_text(encoding="utf-8").splitlines()[0])
+        assert "回讀確認已套用" in entry["sheet_write_note"]
+
+
+@pytest.mark.parametrize("argv", [
+    [a if a != "IB" else "" for a in _BUY],
+    [a if a != "2026-09-23T14:00:00-04:00" else "2026-09-23T14:00:00" for a in _BUY],
+])
+def test_blank_flags_and_timezone_less_times_are_refused_before_the_sheet(monkeypatch, tmp_path, argv) -> None:
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=_sheet_rows())
+    assert module.main(argv) == 2 and calls["reads"] == []
+
+
+def _eu(argv, broker="TAISHIN"):
+    """把 _OPEN 換成 FRA:2DG（alpha）在別家券商建倉：歐元、現金欄 none、給匯率。"""
+    out = [a if a != "AXTI" else "FRA:2DG" for a in argv]
+    out = [a if a not in ("USD", "cash_usd", "IB") else {"USD": "EUR", "cash_usd": "none", "IB": broker}[a] for a in out]
+    return out + ["--fx-to-base", "1.1"]
+
+
+def test_main_really_passes_the_currency_and_the_other_broker_flag_to_the_plan(monkeypatch, tmp_path, capsys) -> None:
+    """R2 覆核 non-blocking（N5／N6 變異存活）：純函式有測，但主流程的接線沒測。"""
+    module, calls = _wire_open(monkeypatch, tmp_path)
+    wrong = [a if a != "EUR" else "USD" for a in _eu(_OPEN)]
+    wrong = [a if a != "none" else "cash_usd" for a in wrong]
+    assert module.main(wrong) == 2
+    assert "歐元區交易所代號" in capsys.readouterr().err                 # 主流程把幣別傳進規劃
+    assert module.main(_eu(_OPEN)) == 2
+    assert "--also-at-other-broker" in capsys.readouterr().err          # FRA:2DG 已在 IB → 預設拒收
+    assert module.main(_eu(_OPEN) + ["--also-at-other-broker"]) == 0     # 明說才放（dry-run）
+    assert calls["opened"] == []
+
+
+def test_the_same_symbol_held_at_another_broker_is_not_called_a_different_symbol(monkeypatch, tmp_path) -> None:
+    held_same = [{**r, "ticker": "FRA:2DG", "shares": 5.0} if r["ticker"] == "AXTI" else r for r in _sheet_rows(AXTI=1_000.0)]
+    module, _calls = _wire_open(monkeypatch, tmp_path, rows=held_same, inputs={**_present_inputs(), "held_company": True})
+    assert module.main(_eu(_OPEN) + ["--also-at-other-broker"]) == 0      # 同代號：硬擋本來就跨券商按代號加總
+    held_other = _sheet_rows(AXTI=1_000.0)                              # 同公司、另一個代號 → 擋
+    module, _calls = _wire_open(monkeypatch, tmp_path, rows=held_other, inputs={**_present_inputs(), "held_company": True})
+    assert module.main(_eu(_OPEN) + ["--also-at-other-broker"]) == 2
+
+
+def test_a_bare_code_missing_row_hint_still_finds_the_dot_tw_row(monkeypatch, tmp_path, capsys) -> None:
+    rows = [{**r, "ticker": "0050.TW", "broker": "TAISHIN"} for r in _sheet_rows(X=1.0)]
+    module, _calls = _wire_sheet(monkeypatch, tmp_path, rows=rows)
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests, values=None: (_ for _ in ()).throw(
+        ValueError("比對條件 {'symbol': '0050', 'broker': 'IB'} 命中 0 列，必須恰好 1 列才可寫入")))
+    argv = [a if a != "AXTI" else "0050" for a in _BUY]
+    argv = argv[:argv.index("--why")]                                   # 0050 是 beta：不收研究旗標
+    assert module.main(argv) == 2
+    assert "TAISHIN" in capsys.readouterr().err

@@ -389,6 +389,17 @@ def main(argv: list[str] | None = None) -> int:
     if args.open_position and (not (args.bucket or "").strip() or args.bucket.strip().upper() == "CASH"):
         print("✗ --open-position 必須給 --bucket（例：觀察、CORE、大盤；不能是 CASH）——不猜新列歸哪一格", file=sys.stderr)
         return 2
+    blank = [flag for flag, value in (("--broker", args.broker), ("--currency", args.currency),
+                                      ("--cash-column", args.cash_column)) if value is not None and not value.strip()]
+    if blank:  # 給了空字串＝使用者以為給了（例：shell 變數展開成空）——不退回預設（3.8 R1 同一條規則）
+        print(f"✗ {'、'.join(blank)} 給了空字串——要用預設就別給這個旗標", file=sys.stderr)
+        return 2
+    try:
+        if datetime.fromisoformat(args.executed_at.replace("Z", "+00:00")).tzinfo is None:
+            raise ValueError("沒有時區")
+    except ValueError as exc:
+        print(f"✗ --executed-at 必須是含時區的 ISO-8601（例：2026-09-30T10:00:00-04:00）：{exc}", file=sys.stderr)
+        return 2
     if not args.open_position and (args.bucket is not None or args.company is not None or args.also_at_other_broker):
         print("✗ --bucket／--company／--also-at-other-broker 只在 --open-position（首次建倉）時有意義", file=sys.stderr)
         return 2
@@ -459,7 +470,8 @@ def main(argv: list[str] | None = None) -> int:
         hint = ""
         if not args.open_position and "命中 0 列" in str(exc) and "symbol" in str(exc):
             elsewhere = sorted({str(r.get("broker") or "").strip() for r in (sheet_rows or [])
-                                if str(r.get("ticker") or "").strip().upper() == args.symbol.strip().upper()} - {""})
+                                if gsheets.canonical_symbol(str(r.get("ticker") or "")) == gsheets.canonical_symbol(args.symbol)}
+                               - {""})
             hint = (f"\n  {args.symbol} 在 {'、'.join(elsewhere)} 有列——是不是 --broker 沒給對？" if elsewhere else
                     "\n  Sheet 還沒有這一列？首次建倉請加 --open-position --broker … --currency … --cash-column … --bucket …")
         print(f"✗ {'首次建倉：' if args.open_position else ''}{exc}{hint}", file=sys.stderr)
@@ -542,7 +554,12 @@ def main(argv: list[str] | None = None) -> int:
 
             today, today_problem = date.today(), f"排程時區讀不到（{type(exc).__name__}）——「今天」退回本機日期"
         inputs = _research_inputs(args.symbol, today=today, sheet_rows=sheet_rows, sheet_error=sheet_error)
-        if plan is not None and inputs.get("held_company"):
+        from fetchers.gsheets import canonical_symbol
+
+        same_symbol_held = any(canonical_symbol(str(r.get("ticker") or "")) == canonical_symbol(args.symbol)
+                               and (r.get("shares") or 0) > 0 for r in (sheet_rows or []))
+        # 同代號在別家券商持有不算：5% 硬擋本來就跨券商按代號加總（R2 覆核 non-blocking）。
+        if plan is not None and inputs.get("held_company") and not same_symbol_held:
             # 5% 單筆上限按代號加總：同一家公司換一個掛牌建倉會繞過它（R2 2026-09-30 non-blocking）。按公司合併是
             # 資本規則、要使用者決定（Phase 4）；在那之前建倉這一條路 fail closed。
             print(f"\n✗ 首次建倉：{inputs.get('company_id')} 在 Sheet 已經以別的代號持有——5% 上限只按代號加總，"
@@ -633,14 +650,14 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as exc:  # noqa: BLE001 — 原子請求：驗證錯誤就沒改動；但 client 逾時不等於伺服器沒套用
             print(f"\n✗ 新增列失敗（{type(exc).__name__}: {str(exc)[:160]}）", file=sys.stderr)
             try:
-                landed = gsheets.symbol_at_row(plan["insert_at"])
+                landed = gsheets.new_row_landed(plan, fill)
             except Exception as read_exc:  # noqa: BLE001
                 print(f"  ⚠⚠ 回讀也失敗（{type(read_exc).__name__}）——無法確認有沒有套用，請手動檢查 Sheet 第 "
                       f"{plan['insert_at']} 列；事件紀錄沒有寫。", file=sys.stderr)
                 return 2
-            if landed == args.symbol.strip():
-                print("  回讀發現新列其實已經套用——刪掉還原：", file=sys.stderr)
-                return _rollback(gsheets, {"row": plan["insert_at"]}, args.symbol, plan)
+            if landed:
+                print("  回讀發現新列其實已經套用（代號、券商、股數都對、列數多一列）——刪掉還原：", file=sys.stderr)
+                return _rollback(gsheets, {"row": plan["insert_at"]}, fill, plan)
             print("  已回讀確認：Sheet 沒有被改動；事件紀錄沒有寫。", file=sys.stderr)
             return 2
         try:
@@ -651,7 +668,7 @@ def main(argv: list[str] | None = None) -> int:
             print("\n✗ 新列寫完回讀沒通過，刪掉還原：", file=sys.stderr)
             for problem in problems:
                 print(f"  · {problem}", file=sys.stderr)
-            return _rollback(gsheets, opened, args.symbol, plan)
+            return _rollback(gsheets, opened, fill, plan)
         writes = []
     else:
         writes = [
@@ -660,11 +677,29 @@ def main(argv: list[str] | None = None) -> int:
         ]
     if not skip_cash:
         writes.append({"a1": cash_a1, "expected": cash_cell["current"], "value": new_cash})
+    confirmed_note = None
     try:
         result = gsheets.write_portfolio_cells(writes)
-    except Exception as exc:  # noqa: BLE001 — 逐格寫入前的重讀不符＝有人同時手改；建倉的新列一併還原
-        print(f"\n✗ 寫入中止（{type(exc).__name__}: {str(exc)[:200]}）", file=sys.stderr)
-        return _rollback(gsheets, opened, args.symbol, plan) if opened else 2
+    except ValueError as exc:  # 寫入前逐格比對不符＝一格都沒寫（先全部重讀才寫）；建倉的新列一併還原
+        print(f"\n✗ 寫入中止（{str(exc)[:200]}）", file=sys.stderr)
+        return _rollback(gsheets, opened, fill, plan) if opened else 2
+    except Exception as exc:  # noqa: BLE001 — 網路類：可能已套用、也可能沒有——回讀決定，不猜（R2 覆核 blocking #3）
+        print(f"\n✗ 寫入回應失敗（{type(exc).__name__}: {str(exc)[:200]}）", file=sys.stderr)
+        if not opened:
+            print("  ⚠ 既有列路徑沒有還原：部分儲存格可能已寫入——請手動核對 "
+                  + "、".join(w["a1"] for w in writes) + "；事件紀錄沒有寫。", file=sys.stderr)
+            return 2
+        outcome = _cash_outcome(gsheets, cash_a1, old=cash_cell["current"], new=new_cash)
+        if outcome == "old":
+            print("  回讀現金格仍是寫入前的值——現金沒動，刪掉新列還原：", file=sys.stderr)
+            return _rollback(gsheets, opened, fill, plan)
+        if outcome != "new":
+            print(f"  ⚠⚠ 無法確認：第 {opened['row']} 列新建倉已在，現金格 {cash_a1} 回讀是 {outcome!r}"
+                  f"（預期 {cash_cell['current']} 或 {new_cash}）。不刪、不記事件——請手動核對 Sheet。", file=sys.stderr)
+            return 2
+        confirmed_note = "現金寫入回應失敗，回讀確認已套用（新列與現金都寫進 Sheet）"
+        print(f"  {confirmed_note}——照常記事件。", file=sys.stderr)
+        result = {"written": [{"a1": cash_a1, "from": cash_cell["current"], "to": new_cash, "confirmed_by_readback": True}]}
     written = list(opened["written"] if opened else []) + list(result["written"])
     _append_trade(
         {
@@ -677,6 +712,7 @@ def main(argv: list[str] | None = None) -> int:
             "recorded_at": _now(),
             "sheet_writes": written,
             **({"sheet_opened_row": opened["row"]} if opened else {}),
+            **({"sheet_write_note": confirmed_note} if confirmed_note else {}),
             **receipt,
         }
     )
@@ -696,9 +732,26 @@ def _shifted_a1(a1: str, insert_at: int | None) -> str:
     return f"{sheet}!{letters}{row + 1 if row >= insert_at else row}"
 
 
-def _rollback(gsheets, opened, symbol: str, plan=None) -> int:
+def _cash_outcome(gsheets, a1: str, *, old: str, new: float) -> str:
+    """寫入丟例外後回讀現金格：`old`＝沒寫進去、`new`＝已寫進去、其他＝回傳讀到的原值（或讀不到的理由）。"""
     try:
-        check = gsheets.delete_position_row(opened, symbol, expect=plan)
+        now = gsheets.read_cell_value(a1)
+    except Exception as exc:  # noqa: BLE001
+        return f"讀不到（{type(exc).__name__}）"
+    try:
+        value = _number(now)
+    except ValueError:
+        return now
+    if abs(value - _number(old)) < 0.005:
+        return "old"
+    if abs(value - float(new)) < 0.005:
+        return "new"
+    return now
+
+
+def _rollback(gsheets, opened, fill, plan=None) -> int:
+    try:
+        check = gsheets.delete_position_row(opened, fill, expect=plan)
         if check.get("verified"):
             print(f"  已刪掉第 {opened['row']} 列並回讀確認 Sheet 回到寫入前（{check['detail']}）；事件紀錄沒有寫。",
                   file=sys.stderr)

@@ -299,21 +299,36 @@ def _cell(rows: list[list[Any]], headers: list[str], row: int, column: str) -> A
 SHEET_PRICED_CURRENCIES: frozenset[str] = frozenset({"USD", "TWD", "EUR", "JPY"})
 
 
+#: 建倉接受的代號寫法 → 必須的幣別（白名單；R2 覆核 2026-09-30：只擋「認得出的錯」會漏——裸 4 碼台股配 USD、
+#: LON: 的 GBX 股票、.ST／.PA 這類公式轉不出的寫法都會安靜算錯）。**認不得的寫法一律拒收，走手動建列。**
+#: 對齊 Sheet 市值公式：有冒號照原字串抓價；幣別 TWD 或 4 碼數字 → TPE:；JPY 且 `數字.T` → TYO:；其餘照原字串。
+_SYMBOL_CURRENCY = (
+    (re.compile(r"[0-9]{4}\.TW|[0-9]{4,6}[A-Z]?\.TW|TPE:[0-9]{4,6}[A-Z]?"), "TWD", "台股"),
+    (re.compile(r"TYO:[0-9]{4}|[0-9]{4}\.T"), "JPY", "日股"),
+    (re.compile(r"(?:FRA|ETR|EPA|AMS):[A-Z0-9]{1,6}"), "EUR", "歐元區交易所"),
+    (re.compile(r"[A-Z]{1,5}(?:\.[A-Z])?"), "USD", "美股"),
+)
+
+
+def canonical_symbol(symbol: str) -> str:
+    """比對同一檔用：大寫、裸 4 碼台股補成 `.TW`（Sheet 公式把兩者當同一檔，比對也要）。"""
+    s = symbol.strip().upper()
+    return f"{s}.TW" if re.fullmatch(r"[0-9]{4}", s) else s
+
+
 def _symbol_currency_problem(symbol: str, currency: str) -> str | None:
-    """代號樣子與幣別對不上就回理由（R2 2026-09-30 blocking：台股代號配 USD，公式照樣抓台幣價、乘上 USD 的 1，
-    市值高估約 31 倍，而且市值 > 0 所以回讀驗證抓不到）。只擋認得出的組合，不猜其他。"""
+    """代號寫法與幣別對不上就回理由（R2 2026-09-30 blocking：台股代號配 USD，公式照樣抓台幣價、乘上 USD 的 1，
+    市值高估約 31 倍，而且市值 > 0 所以回讀驗證抓不到）。白名單以外的寫法一律拒收。"""
     s, cur = symbol.strip().upper(), currency.strip().upper()
     if cur not in SHEET_PRICED_CURRENCIES:
         return f"Sheet 的抓價公式只換算 {sorted(SHEET_PRICED_CURRENCIES)}；{cur} 會被當成 0——要先改 Sheet 公式或手動建列"
-    if s.endswith(".TWO"):
-        return "上櫃（.TWO）代號 Sheet 的抓價公式轉不出正確的 GOOGLEFINANCE 代號——要先改 Sheet 公式或手動建列"
-    if (s.endswith(".TW") or s.startswith("TPE:")) and cur != "TWD":
-        return f"{symbol} 是台股代號，幣別應該是 TWD（給的是 {cur}）"
-    if (s.startswith("TYO:") or s.endswith(".T")) and cur != "JPY":
-        return f"{symbol} 是日股代號，幣別應該是 JPY（給的是 {cur}）"
-    if s.startswith(("FRA:", "ETR:", "EPA:", "AMS:")) and cur != "EUR":
-        return f"{symbol} 是歐元區交易所代號，幣別應該是 EUR（給的是 {cur}）"
-    return None
+    if re.fullmatch(r"[0-9]{4}", s):
+        return f"台股代號請寫成 Sheet 既有的寫法 {s}.TW（裸 4 碼會被公式當台股、比對同一檔時卻對不上）"
+    for pattern, need, label in _SYMBOL_CURRENCY:
+        if pattern.fullmatch(s):
+            return None if cur == need else f"{symbol} 是{label}代號，幣別應該是 {need}（給的是 {cur}）"
+    return (f"{symbol} 的寫法 Sheet 的抓價公式認不得（建倉只收台股 .TW／TPE:、日股 TYO:／.T、歐元區 FRA:／ETR:／EPA:／AMS:、"
+            "美股裸代號；上櫃 .TWO、LON:、.ST／.PA 等請手動建列）")
 
 
 def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, broker: str,
@@ -341,7 +356,7 @@ def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, bro
 
     other_brokers: list[str] = []
     for r in range(2, last + 1):
-        if val(r, "symbol").casefold() != symbol.strip().casefold():
+        if canonical_symbol(val(r, "symbol")) != canonical_symbol(symbol):
             continue
         if val(r, "broker").casefold() == broker.strip().casefold():
             raise ValueError(f"第 {r} 列已經是 {symbol}（{broker}）——不是首次建倉，不要加 --open-position")
@@ -497,27 +512,47 @@ def verify_new_position(plan: Mapping[str, Any], fill: Mapping[str, Any], *, att
     return problems
 
 
-def symbol_at_row(row: int) -> str | None:
-    """唯讀：第 `row` 列的 symbol（沒有那一列回 None）。開列請求丟例外時用它確認「到底有沒有套用」——
-    client 逾時不等於伺服器沒套用（R2 2026-09-30）。"""
-    values = read_portfolio_values()
+def read_cell_value(a1: str) -> str:
+    """唯讀：一格的現值（寫入丟例外後確認「到底寫進去沒有」用）。"""
+    service = _get_service()
+    got = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range=a1).execute().get("values", [[""]])
+    return str(got[0][0]) if got and got[0] else ""
+
+
+def _is_our_row(values: list[list[Any]], row: int, fill: Mapping[str, Any]) -> bool:
+    """第 `row` 列是不是剛寫的那一列：代號、券商、股數都要對（R2 覆核 2026-09-30 blocking：只比代號，
+    `--also-at-other-broker` 時插入點可能正是別家券商的同代號既有列，會被當成新列刪掉）。"""
     headers = [str(h).strip().lower() for h in (values[0] if values else [])]
-    if "symbol" not in headers or row > len(values):
-        return None
-    return str(_cell(values, headers, row, "symbol")).strip() or None
+    if not {"symbol", "broker", "shares"} <= set(headers) or not 1 < row <= len(values):
+        return False
+    try:
+        shares_ok = abs(float(str(_cell(values, headers, row, "shares")).replace(",", "") or 0)
+                        - float(fill.get("shares") or 0)) < 1e-9
+    except ValueError:
+        return False
+    return (str(_cell(values, headers, row, "symbol")).strip() == str(fill.get("symbol", "")).strip()
+            and str(_cell(values, headers, row, "broker")).strip().casefold()
+            == str(fill.get("broker", "")).strip().casefold()
+            and shares_ok)
 
 
-def delete_position_row(opened: Mapping[str, Any], symbol: str, *,
+def new_row_landed(plan: Mapping[str, Any], fill: Mapping[str, Any]) -> bool:
+    """唯讀：開列請求丟例外時確認「到底有沒有套用」——client 逾時不等於伺服器沒套用（R2 2026-09-30）。
+    列數剛好多一列、插入點那一列的代號＋券商＋股數都是剛寫的，才算套用。"""
+    values = read_portfolio_values()
+    return len(values) == int(plan["last_row"]) + 1 and _is_our_row(values, int(plan["insert_at"]), fill)
+
+
+def delete_position_row(opened: Mapping[str, Any], fill: Mapping[str, Any], *,
                         expect: Mapping[str, Any] | None = None) -> dict[str, Any]:
-    """還原：刪掉剛新增的那一列——先確認那一列還是剛寫的代號，不是就不刪（避免刪到別人剛插的列）。
+    """還原：刪掉剛新增的那一列——先確認那一列的代號、券商、股數都是剛寫的，不是就不刪（避免刪到別人的列）。
 
     刪完回讀：列數回到寫入前、NAV 範圍終點回到原值才回 `verified=True`（`expect` 帶 plan 的 last_row 與
     nav_range）；不對就照實回 False，呼叫端不得說「回到寫入前」。"""
     values = read_portfolio_values()
-    headers = [str(h).strip().lower() for h in (values[0] if values else [])]
     row = int(opened["row"])
-    if "symbol" not in headers or str(_cell(values, headers, row, "symbol")).strip() != symbol.strip():
-        raise ValueError(f"要還原的第 {row} 列已不是 {symbol}——不刪，請手動檢查 Sheet")
+    if not _is_our_row(values, row, fill):
+        raise ValueError(f"要還原的第 {row} 列已不是剛寫的 {fill.get('symbol')}（{fill.get('broker')}）——不刪，請手動檢查 Sheet")
     service = _get_service(writable=True)
     sheet_id = opened.get("sheet_id")
     sheet_id = int(sheet_id) if sheet_id is not None else _sheet_id(service, SHEET_NAME)
