@@ -29,9 +29,10 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 # 允許文件所列的 ``python fetchers/gsheets.py`` 直接入口；模組入口仍可照常使用。
 _REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -155,8 +156,29 @@ def _column_letter(index: int) -> str:
     return chr(ord("A") + index)
 
 
+def read_portfolio_values(*, formulas: bool = False, sheet: str | None = None) -> list[list[Any]]:
+    """一次讀整張分頁（A:Z 的原始格）。
+
+    `record_trade.py` 一筆成交只讀這一次，同一份交給定位、硬擋與研究收據（2026-09-30 使用者定案，
+    plan §14 #38）——三份不同時間點的快照會讓「收據的持有」與「硬擋的 NAV」不是同一份。
+    寫入前的逐格重讀（`write_portfolio_cells`）是另一件事：它防的是使用者同時手改，照留。
+    `formulas=True` 讀公式原文，只給新建倉比對公式形狀用，不拿來做任何數字決定。"""
+    if not SPREADSHEET_ID:
+        raise ValueError("請設定 GSHEETS_SPREADSHEET_ID 環境變數（Google Sheets URL 中段的 ID）。")
+    service = _get_service()
+    extra = {"valueRenderOption": "FORMULA"} if formulas else {}
+    return (
+        service.spreadsheets()
+        .values()
+        .get(spreadsheetId=SPREADSHEET_ID, range=f"{sheet or SHEET_NAME}!A:Z", **extra)
+        .execute()
+        .get("values", [])
+    )
+
+
 def locate_portfolio_cells(
-    requests: list[dict[str, Any]], *, sheet: str | None = None
+    requests: list[dict[str, Any]], *, sheet: str | None = None,
+    values: list[list[Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """依「欄名 + 列比對條件」定位儲存格，回傳 A1 位址與目前值。
 
@@ -171,14 +193,8 @@ def locate_portfolio_cells(
     不需要知道分頁。
     """
     sheet_name = sheet or SHEET_NAME
-    service = _get_service()
-    rows = (
-        service.spreadsheets()
-        .values()
-        .get(spreadsheetId=SPREADSHEET_ID, range=f"{sheet_name}!A:Z")
-        .execute()
-        .get("values", [])
-    )
+    # `values`：呼叫端已讀好的同一份（`read_portfolio_values()`）；沒給才自己讀一次。
+    rows = values if values is not None else read_portfolio_values(sheet=sheet_name)
     if not rows:
         raise ValueError(f"{sheet_name} 工作表是空的")
     headers = [h.strip().lower() for h in rows[0]]
@@ -248,7 +264,217 @@ def write_portfolio_cells(writes: list[dict[str, Any]]) -> dict[str, Any]:
     return {"status": "written", "written": written}
 
 
-def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]:
+# ---------------------------------------------------------------------------
+# 首次建倉：在 Portfolio 分頁新增一列（2026-09-30 使用者定案；資本路徑）
+#
+# 這張表有三種公式欄（2026-09-30 唯讀實測）：市值（GOOGLEFINANCE 抓價×匯率）、`market_value_base`（＝市值）、
+# `nav_base`（`=SUM($I$2:$I$25)`，**範圍寫死**）。新列若接在最後一列之後，NAV 不會算到它——5% 硬擋就用錯的分母。
+# 所以：①插在資料範圍**內部**（第一個 CASH 列上面；Sheets 會把跨過插入點的範圍自動撐大）；②公式從同券商的
+# 上一列複製（相對列號跟著移）；③插列、複製、填值在**同一個原子請求**裡（不會留下半列）；只寫新插的那一列，不碰任何既有列；
+# ④寫完立刻回讀驗證（公式形狀、NAV 範圍涵蓋新列、整張表照樣讀得過、新列市值 > 0），不過就刪掉那一列還原。
+# 公式只換算 USD／TWD／EUR／JPY，其他幣別乘數是 0——「市值 > 0」這一條就是在防它被安靜地吃成 0。
+# ---------------------------------------------------------------------------
+
+_NAV_RANGE = re.compile(r"SUM\(\$([A-Z]{1,2})\$(\d+):\$([A-Z]{1,2})\$(\d+)\)")
+_REQUIRED_FORMULA_COLUMNS = ("market_value_base", "nav_base")
+
+
+def _formula_shape(text: Any, row: int) -> str:
+    """公式把「指向自己這一列」的相對列號換成 #，其餘（絕對列號、字串）照留——不同列的同一個公式形狀相同。"""
+    return re.sub(rf"(?<![A-Za-z0-9$])(\$?[A-Z]{{1,2}}){row}(?![0-9])", r"\1#", str(text))
+
+
+def _absolute_rows_loose(shape: str) -> str:
+    """驗證用：`$I$2` 這類絕對列號也換成 #（插列會撐大範圍，列號變了不代表公式錯）。"""
+    return re.sub(r"(\$[A-Z]{1,2}\$)\d+", r"\1#", shape)
+
+
+def _cell(rows: list[list[Any]], headers: list[str], row: int, column: str) -> Any:
+    line = rows[row - 1] if 0 < row <= len(rows) else []
+    index = headers.index(column)
+    return line[index] if index < len(line) else ""
+
+
+def plan_new_position(values: list[list[Any]], formulas: list[list[Any]], *, broker: str,
+                      symbol: str) -> dict[str, Any]:
+    """純函式：決定新列插在哪、公式從哪一列複製；任何一項沒把握就 raise（不猜）。"""
+    if not values or not formulas:
+        raise ValueError("Portfolio 分頁是空的")
+    headers = [str(h).strip().lower() for h in values[0]]
+    if [str(h).strip().lower() for h in formulas[0]] != headers:
+        raise ValueError("兩次讀取之間欄位變了（可能正被手動編輯）——中止")
+    needed = {"broker", "bucket", "symbol", "shares", "avg_cost", "currency", *_REQUIRED_FORMULA_COLUMNS}
+    if needed - set(headers):
+        raise ValueError(f"找不到欄位 {sorted(needed - set(headers))}；現有欄位：{headers}")
+    last = len(values)
+
+    def val(r: int, c: str) -> str:
+        return str(_cell(values, headers, r, c)).strip()
+
+    for r in range(2, last + 1):
+        if val(r, "symbol").casefold() == symbol.strip().casefold() and val(r, "broker").casefold() == broker.strip().casefold():
+            raise ValueError(f"第 {r} 列已經是 {symbol}（{broker}）——不是首次建倉，不要加 --open-position")
+    cash_rows = [r for r in range(2, last + 1) if val(r, "bucket").upper() == "CASH"]
+    if not cash_rows:
+        raise ValueError("找不到 CASH 列——新列要插在第一個 CASH 列上面，才落在 NAV 加總範圍內部")
+    insert_at = min(cash_rows)
+    positions = [r for r in range(2, insert_at) if val(r, "bucket").upper() != "CASH"]
+    if not positions:
+        raise ValueError("第一個 CASH 列上面沒有任何持股列可以複製公式")
+    # 標準公式＝持股列裡的多數形狀；少數列是使用者的手動例外（2026-09-30 實測：TYO:7803 抓不到價，手寫市值），
+    # 照實列出、不中止——但範本只從標準列挑。多數不到三分之二就不猜，中止。
+    all_positions = [r for r in range(2, last + 1) if val(r, "bucket").upper() != "CASH"]
+    formula_columns = [h for h in headers
+                       if sum(str(_cell(formulas, headers, r, h)).startswith("=") for r in all_positions)
+                       * 3 >= len(all_positions) * 2]
+    missing = [c for c in _REQUIRED_FORMULA_COLUMNS if c not in formula_columns]
+    if missing:
+        raise ValueError(f"持股列的 {missing} 多數不是公式——不知道新列的市值／NAV 怎麼算，中止")
+    shapes: dict[str, str] = {}
+    exceptions: dict[int, list[str]] = {}
+    for column in formula_columns:
+        counts: dict[str, list[int]] = {}
+        for r in all_positions:
+            counts.setdefault(_formula_shape(_cell(formulas, headers, r, column), r), []).append(r)
+        shape, rows_ = max(counts.items(), key=lambda kv: len(kv[1]))
+        if len(rows_) * 3 < len(all_positions) * 2:
+            raise ValueError(f"{column} 各持股列的公式沒有一種占三分之二以上（{len(counts)} 種）——不猜要複製哪一種，中止")
+        shapes[column] = shape
+        for r in all_positions:
+            if r not in rows_:
+                exceptions.setdefault(r, []).append(column)
+    standard = [r for r in positions if r not in exceptions]
+    if not standard:
+        raise ValueError("第一個 CASH 列上面沒有公式是標準形狀的持股列可以當範本，中止")
+    same = [r for r in standard if val(r, "broker").casefold() == broker.strip().casefold()]
+    template = max(same) if same else max(standard)
+    # 插在同券商最後一列持股的下一列（Sheet 照券商分組）；沒有同券商持股才插在第一個 CASH 列上面。
+    # 範本永遠在插入點上面，所以插列後範本的列號不變。
+    same_any = [r for r in positions if val(r, "broker").casefold() == broker.strip().casefold()]
+    insert_at = (max(same_any) + 1) if same_any else insert_at
+    match = _NAV_RANGE.search(str(_cell(formulas, headers, template, "nav_base")))
+    if not match:
+        raise ValueError("nav_base 不是 SUM($X$a:$X$b) 形狀——插入後範圍會不會撐大無法判斷，中止")
+    first, end = int(match.group(2)), int(match.group(4))
+    if end < last:
+        raise ValueError(f"nav_base 只加到第 {end} 列、資料到第 {last} 列——Sheet 的 NAV 本來就漏列，先修 Sheet")
+    if not first < insert_at <= end:
+        raise ValueError(f"新列位置第 {insert_at} 列不在 NAV 加總範圍（{first}–{end}）內部——插入後範圍不會自動撐大，中止")
+    template_values = {h: _cell(values, headers, template, h) for h in headers if h not in formula_columns}
+    return {"headers": headers, "insert_at": insert_at, "template": template, "formula_columns": formula_columns,
+            "shapes": shapes, "nav_range": (match.group(1), first, end), "last_row": last,
+            "template_values": template_values,
+            "manual_exceptions": {r: exceptions[r] for r in sorted(exceptions)}}
+
+
+def _user_entered(value: Any) -> dict[str, Any]:
+    if value is None or (isinstance(value, str) and not value.strip()):
+        return {}
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return {"userEnteredValue": {"numberValue": float(value)}}
+    return {"userEnteredValue": {"stringValue": str(value)}}
+
+
+def _sheet_id(service: Any, title: str) -> int:
+    meta = service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID,
+                                      fields="sheets(properties(sheetId,title))").execute()
+    for sheet in meta.get("sheets", []):
+        if sheet["properties"]["title"] == title:
+            return int(sheet["properties"]["sheetId"])
+    raise ValueError(f"找不到分頁 {title!r}")
+
+
+def open_position_row(plan: Mapping[str, Any], fill: Mapping[str, Any]) -> dict[str, Any]:
+    """**一個** batchUpdate：插一列 → 從範本列貼上（公式與格式）→ 把每個非公式欄寫成 `fill` 的值（沒給的清空）。
+
+    原子：任何一步失敗整批不生效，不會留下一列範本的複本。"""
+    headers = list(plan["headers"])
+    service = _get_service(writable=True)
+    sheet_id = _sheet_id(service, SHEET_NAME)
+    row0, tpl0 = int(plan["insert_at"]) - 1, int(plan["template"]) - 1
+    width = len(headers)
+    requests: list[dict[str, Any]] = [
+        {"insertDimension": {"range": {"sheetId": sheet_id, "dimension": "ROWS", "startIndex": row0,
+                                       "endIndex": row0 + 1}, "inheritFromBefore": True}},
+        {"copyPaste": {"source": {"sheetId": sheet_id, "startRowIndex": tpl0, "endRowIndex": tpl0 + 1,
+                                  "startColumnIndex": 0, "endColumnIndex": width},
+                       "destination": {"sheetId": sheet_id, "startRowIndex": row0, "endRowIndex": row0 + 1,
+                                       "startColumnIndex": 0, "endColumnIndex": width},
+                       "pasteType": "PASTE_NORMAL"}},
+    ]
+    written = []
+    for index, column in enumerate(headers):
+        if column in plan["formula_columns"]:
+            continue
+        value = fill.get(column, "")
+        requests.append({"updateCells": {
+            "range": {"sheetId": sheet_id, "startRowIndex": row0, "endRowIndex": row0 + 1,
+                      "startColumnIndex": index, "endColumnIndex": index + 1},
+            "rows": [{"values": [_user_entered(value)]}], "fields": "userEnteredValue"}})
+        written.append({"a1": f"{SHEET_NAME}!{_column_letter(index)}{plan['insert_at']}", "from": "", "to": value})
+    service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID, body={"requests": requests}).execute()
+    return {"status": "opened", "row": int(plan["insert_at"]), "sheet_id": sheet_id, "written": written}
+
+
+def verify_new_position(plan: Mapping[str, Any], fill: Mapping[str, Any], *, attempts: int = 6,
+                        delay: float = 2.0, sleep: Any = None) -> list[str]:
+    """寫完之後回讀：新列在、公式形狀同範本、NAV 範圍涵蓋到最後一列、整張表照樣讀得過、新列市值 > 0。
+
+    抓價公式剛寫完可能還在 Loading，所以重試幾次；回空 list＝通過。"""
+    import time
+
+    sleep = sleep or time.sleep
+    row = int(plan["insert_at"])
+    problems: list[str] = []
+    for attempt in range(attempts):
+        problems = []
+        values, formulas = read_portfolio_values(), read_portfolio_values(formulas=True)
+        headers = [str(h).strip().lower() for h in (values[0] if values else [])]
+        if headers != list(plan["headers"]):
+            return ["欄位在寫入後變了——不確定新列落在哪，請手動檢查 Sheet"]
+        if str(_cell(values, headers, row, "symbol")).strip() != str(fill.get("symbol", "")).strip():
+            return [f"第 {row} 列不是剛寫的 {fill.get('symbol')}——可能有人同時插了列，請手動檢查 Sheet"]
+        for column in plan["formula_columns"]:
+            # 絕對列號也正規化：插列後 `SUM($I$2:$I$25)` 會撐成 `$I$26`——那是預期，範圍涵蓋另外一條驗。
+            if _absolute_rows_loose(_formula_shape(_cell(formulas, headers, row, column), row)) \
+                    != _absolute_rows_loose(plan["shapes"][column]):
+                problems.append(f"新列的 {column} 公式形狀和其他持股列不同")
+        nav = _NAV_RANGE.search(str(_cell(formulas, headers, row, "nav_base")))
+        if not nav or int(nav.group(2)) > 2 or int(nav.group(4)) < len(values):
+            problems.append("NAV 加總範圍沒有涵蓋到最後一列（新列可能沒被算進 NAV）")
+        try:
+            parsed = parse_portfolio(values, strict_operational=True)
+            mine = [p for p in parsed if p["ticker"] == str(fill.get("symbol", "")).strip().upper()
+                    and str(p.get("broker", "")).strip().casefold() == str(fill.get("broker", "")).strip().casefold()]
+            if len(mine) != 1:
+                problems.append(f"新列解析後找到 {len(mine)} 列 {fill.get('symbol')}（應該恰好 1 列）")
+            elif not mine[0]["market_value_base"] > 0:
+                problems.append("新列市值是 0——Sheet 的抓價公式不認得這個代號或幣別（公式只換算 USD／TWD／EUR／JPY）")
+        except ValueError as exc:
+            problems.append(f"整張表讀不過（抓價可能還在載入）：{exc}")
+        if not problems:
+            return []
+        if attempt + 1 < attempts:
+            sleep(delay)
+    return problems
+
+
+def delete_position_row(opened: Mapping[str, Any], symbol: str) -> None:
+    """還原：刪掉剛新增的那一列——先確認那一列還是剛寫的代號，不是就不刪（避免刪到別人剛插的列）。"""
+    values = read_portfolio_values()
+    headers = [str(h).strip().lower() for h in (values[0] if values else [])]
+    row = int(opened["row"])
+    if "symbol" not in headers or str(_cell(values, headers, row, "symbol")).strip() != symbol.strip():
+        raise ValueError(f"要還原的第 {row} 列已不是 {symbol}——不刪，請手動檢查 Sheet")
+    service = _get_service(writable=True)
+    service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID, body={"requests": [
+        {"deleteDimension": {"range": {"sheetId": int(opened["sheet_id"]), "dimension": "ROWS",
+                                       "startIndex": row - 1, "endIndex": row}}}]}).execute()
+
+
+def fetch_portfolio(
+    *, strict_operational: bool = False, values: list[list[Any]] | None = None,
+) -> list[dict[str, Any]]:
     """
     讀取 Google Sheets 工作表，回傳 list of dicts。
     每個 dict 包含：ticker, company, bucket, shares, avg_cost, currency, notes
@@ -256,23 +482,14 @@ def fetch_portfolio(*, strict_operational: bool = False) -> list[dict[str, Any]]
     strict_operational=True 時優先要求 market_value_base、nav_base、base_currency；
     舊表可完整退回 market_usd（逐列 mark-to-market），由 adapter 統一成 USD NAV。
     兩種契約都會嚴格驗證，欄位半套或格式錯誤直接失敗。
+    `values`：呼叫端已讀好的同一份原始格（`read_portfolio_values()`）；沒給才自己讀一次。
     """
-    if not SPREADSHEET_ID:
-        raise ValueError(
-            "請設定 GSHEETS_SPREADSHEET_ID 環境變數（Google Sheets URL 中段的 ID）。"
-        )
+    rows = values if values is not None else read_portfolio_values()
+    return parse_portfolio(rows, strict_operational=strict_operational)
 
-    service = _get_service()
-    # Read all columns — sheet may have broker, symbol, cash_twd, market_usd, etc.
-    range_name = f"{SHEET_NAME}!A:Z"
-    result = (
-        service.spreadsheets()
-        .values()
-        .get(spreadsheetId=SPREADSHEET_ID, range=range_name)
-        .execute()
-    )
 
-    rows = result.get("values", [])
+def parse_portfolio(rows: list[list[Any]], *, strict_operational: bool = False) -> list[dict[str, Any]]:
+    """把原始格（第一列是標題）轉成持股 dict——純函式，不連網（`fetch_portfolio` 與新建倉驗證共用）。"""
     if not rows:
         return []
 

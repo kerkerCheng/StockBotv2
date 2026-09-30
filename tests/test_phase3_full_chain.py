@@ -195,8 +195,9 @@ def test_the_new_pipeline_hands_each_stage_output_to_the_next(chain, monkeypatch
     monkeypatch.setenv("STOCKBOT_APP_STATE_DIR", str(chain["state_dir"]))
     from fetchers import gsheets
 
-    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False: _sheet_rows())
-    monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests: [
+    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False, values=None: _sheet_rows())
+    monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *, formulas=False, sheet=None: [["symbol"]])
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests, values=None: [
         {"a1": "B2", "current": "100"}, {"a1": "C2", "current": "10"}])
     monkeypatch.setattr(gsheets, "write_portfolio_cells", lambda writes: {"written": [w["a1"] for w in writes]})
     module = _record_trade()

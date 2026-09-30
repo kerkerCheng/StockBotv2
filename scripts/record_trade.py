@@ -6,7 +6,9 @@
    （股數、現金）與由它們算出的 `avg_cost`；不碰市值、不碰 NAV、不碰其他欄位。
 2. **人工編輯與程式寫入必須共存。** 因此按欄名定位（使用者會調欄序）、
    按內容比對定位列、且寫入前重讀確認現值——不符即整批中止。
-   永遠只寫指定儲存格，絕不寫整列或範圍。
+   永遠只寫指定儲存格，絕不寫整列或範圍。**唯一例外是首次建倉（`--open-position`，2026-09-30 使用者定案）**：
+   新插的那一列本來不存在、沒有使用者手填的值可蓋，公式從標準列複製、寫完回讀驗證，不過就刪掉還原（`fetchers/gsheets.py`）。
+   同一筆成交重跑 `--apply` 一律拒絕；一筆成交只讀一次 Sheet，同一份交給定位、硬擋與收據。
 3. **預設 dry-run。** 要實際寫入必須加 `--apply`，且會先印出完整 diff。
 4. **事件紀錄與持股狀態分開。** `library/trades/trade_log.jsonl` 是 append-only
    事件流（發生了什麼），不是持股真相（現在有多少）——後者永遠只有 Sheet。
@@ -124,6 +126,10 @@ def build_parser() -> argparse.ArgumentParser:
                     help="alpha 買進沒有現行 v2 敘事時放行，理由寫進收據；**不放行**硬擋（那要 --override）")
     ap.add_argument("--disproof-watch", default=None, metavar="WATCH_ID",
                     help="alpha 賣出：觸發這次賣出的反證 watch id（以來源歸屬驗它屬於這檔）")
+    ap.add_argument("--open-position", action="store_true",
+                    help="首次建倉：Sheet 還沒有這一列（symbol＋broker）時新增一列；必須明確給，避免打錯代號就開出新列")
+    ap.add_argument("--bucket", default=None, help="--open-position 必填：新列的 bucket（例：觀察、CORE、大盤）")
+    ap.add_argument("--company", default=None, help="--open-position 可選：新列的公司名")
     return ap
 
 
@@ -142,22 +148,19 @@ def _shown(path: Path) -> str:
         return str(path)
 
 
-def _research_inputs(symbol: str, *, today) -> dict:
+def _research_inputs(symbol: str, *, today, sheet_rows: list | None = None, sheet_error: str | None = None) -> dict:
     """研究收據的原料——**一次讀好**：Sheet 那一列（readonly，只為解析公司）、敘事 ledger、watch registry、
     thesis lifecycle、讀圖 ledger（騎的那幾份寫入當時的 result_digest）、當天的候選板與個股頁 artifact。
     全是本機檔案或 Sheet readonly——**不連 Neo4j、不打行情或 FX**（讀圖對圖與邊緣判定已在 materialize 算好）。
-    任何一項讀不到都記進 `problems`（或各自的 `*_error`），**不擋成交**（A3 不替 A5 做決定）。"""
+    任何一項讀不到都記進 `problems`（或各自的 `*_error`），**不擋成交**（A3 不替 A5 做決定）。
+    `sheet_rows`：`main` 讀好的**同一份**持股列（2026-09-30：一筆成交只讀一次 Sheet）；`None`＝那一份解析不了。"""
     from portfolio import research_receipt
 
     problems: list[str] = []
-    sheet_read = True
-    try:
-        from fetchers.gsheets import fetch_portfolio
-
-        rows = list(fetch_portfolio(strict_operational=True))
-    except Exception as exc:  # noqa: BLE001 — 讀不到就改由別名／registry 解析，照實記
-        rows, sheet_read = [], False
-        problems.append(f"Sheet 讀不到（{type(exc).__name__}）——公司改由 execution 別名／registry 解析")
+    sheet_read = sheet_rows is not None
+    rows = list(sheet_rows or [])
+    if not sheet_read:
+        problems.append(f"Sheet 讀不到（{sheet_error or '持股列解析失敗'}）——公司改由 execution 別名／registry 解析")
     key = symbol.strip().upper()
     row = next((r for r in rows if str(r.get("ticker") or "").strip().upper() == key), None) or {"ticker": symbol}
     try:
@@ -280,19 +283,16 @@ def _print_receipt(receipt: dict) -> None:
         print(f"  · {problem}")
 
 
-def _hard_cap_verdict(args: argparse.Namespace):
-    """買進前過兩道硬擋；讀 Sheet 持股列（readonly scope）。回 `HardCapVerdict`。"""
-    from fetchers.gsheets import fetch_portfolio
+def _hard_cap_verdict(args: argparse.Namespace, rows: list | None = None, rows_error: str | None = None):
+    """買進前過兩道硬擋；用 `main` 讀好的**同一份**持股列（readonly scope）。回 `HardCapVerdict`。"""
     from risk.hard_caps import check_trade_hard_caps, gross_in_base_currency
 
     if args.side != "buy":
         return check_trade_hard_caps(None, symbol=args.symbol, side=args.side, gross_base=None)
-    try:
-        rows = list(fetch_portfolio(strict_operational=True))
-    except Exception as exc:  # noqa: BLE001 — 讀不到就是量不到，交給 verdict fail closed
+    if rows is None:  # 讀不到或解析不了就是量不到，交給 verdict fail closed
         return check_trade_hard_caps(
             None, symbol=args.symbol, side=args.side, gross_base=None,
-            gross_reason=f"持股列讀取失敗：{type(exc).__name__}",
+            gross_reason=f"持股列讀取失敗：{rows_error or '未知'}",
         )
     base_currency = next(
         (str(r.get("base_currency") or "").strip().upper() for r in rows if r.get("base_currency")),
@@ -365,7 +365,29 @@ def main(argv: list[str] | None = None) -> int:
         if args.disproof_watch is not None and (args.side != "sell" or not args.disproof_watch.strip()):
             print("✗ --disproof-watch 只用在 alpha 賣出（觸發這次賣出的反證），而且要給 watch id", file=sys.stderr)
             return 2
-    from fetchers.gsheets import locate_portfolio_cells, write_portfolio_cells
+    if args.open_position and (args.side != "buy" or args.log_only):
+        print("✗ --open-position 只用在買進，而且要由本腳本寫 Sheet（不能配 --log-only）", file=sys.stderr)
+        return 2
+    if args.open_position and (not (args.bucket or "").strip() or args.bucket.strip().upper() == "CASH"):
+        print("✗ --open-position 必須給 --bucket（例：觀察、CORE、大盤；不能是 CASH）——不猜新列歸哪一格", file=sys.stderr)
+        return 2
+    if not args.open_position and (args.bucket is not None or args.company is not None):
+        print("✗ --bucket／--company 只在 --open-position（首次建倉）時有意義", file=sys.stderr)
+        return 2
+    from fetchers import gsheets
+
+    # 一筆成交只讀一次 Sheet（2026-09-30 使用者定案，plan §14 #38）：同一份原始格交給定位、硬擋與研究收據——
+    # 三份不同時間點的快照會讓收據的持有與硬擋的 NAV 不是同一份。寫入前的逐格重讀是防同時手改，照留。
+    try:
+        sheet_values = gsheets.read_portfolio_values()
+    except Exception as exc:  # noqa: BLE001 — 讀不到就什麼都不寫
+        print(f"✗ Google Sheet 讀不到（{type(exc).__name__}: {str(exc)[:160]}）——未寫入任何東西", file=sys.stderr)
+        return 2
+    try:
+        sheet_rows = list(gsheets.fetch_portfolio(strict_operational=True, values=sheet_values))
+        sheet_error = None
+    except Exception as exc:  # noqa: BLE001 — 解析不了：硬擋量不到（fail closed）、收據照實記
+        sheet_rows, sheet_error = None, f"{type(exc).__name__}: {str(exc)[:160]}"
 
     gross = round(args.shares * args.price, 2)
     signed_shares = args.shares if args.side == "buy" else -args.shares
@@ -373,19 +395,33 @@ def main(argv: list[str] | None = None) -> int:
     # 同一檔可能分屬多個券商（如 LON:VWRA 同時在 IB 與 FUBON），
     # 持股列必須用 symbol＋broker 一起定位，否則兩列即歧義中止。
     skip_cash = args.cash_column.strip().lower() in ("", "none")
-    requests = [
-        {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "shares"},
-        {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "avg_cost"},
-    ]
-    if not skip_cash:
-        requests.append(
-            {"match": {"broker": args.broker, "bucket": "CASH"}, "column": args.cash_column}
-        )
-    cells = locate_portfolio_cells(requests)
-    shares_cell, cost_cell = cells[0], cells[1]
-    cash_cell = None if skip_cash else cells[2]
-    old_shares = _number(shares_cell["current"])
-    old_cost = _number(cost_cell["current"])
+    cash_request = {"match": {"broker": args.broker, "bucket": "CASH"}, "column": args.cash_column}
+    plan = None
+    try:
+        if args.open_position:
+            # 首次建倉（2026-09-30 使用者定案）：規劃要看公式原文——多讀一次公式，只拿來比對形狀，不做數字決定。
+            formulas = gsheets.read_portfolio_values(formulas=True)
+            plan = gsheets.plan_new_position(sheet_values, formulas, broker=args.broker, symbol=args.symbol)
+            shares_cell = cost_cell = None
+            cash_cell = None if skip_cash else gsheets.locate_portfolio_cells([cash_request], values=sheet_values)[0]
+            old_shares = old_cost = 0.0
+        else:
+            requests = [
+                {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "shares"},
+                {"match": {"symbol": args.symbol, "broker": args.broker}, "column": "avg_cost"},
+            ]
+            if not skip_cash:
+                requests.append(cash_request)
+            cells = gsheets.locate_portfolio_cells(requests, values=sheet_values)
+            shares_cell, cost_cell = cells[0], cells[1]
+            cash_cell = None if skip_cash else cells[2]
+            old_shares = _number(shares_cell["current"])
+            old_cost = _number(cost_cell["current"])
+    except ValueError as exc:
+        hint = ("\n  Sheet 還沒有這一列？首次建倉請加 --open-position --bucket <觀察／CORE／…>"
+                if not args.open_position and "命中 0 列" in str(exc) and "symbol" in str(exc) else "")
+        print(f"✗ {'首次建倉：' if args.open_position else ''}{exc}{hint}", file=sys.stderr)
+        return 2
     old_cash = 0.0 if skip_cash else _number(cash_cell["current"])
 
     new_shares = old_shares + signed_shares
@@ -416,17 +452,31 @@ def main(argv: list[str] | None = None) -> int:
     print(f"成交：{args.side.upper()} {args.shares:g} {args.symbol} @ {args.price} "
           f"{args.currency}　總額 {gross:,.2f}")
     print(f"trade_id：{trade_id}")
-    print(f"\n將變更的儲存格（僅此{'兩' if skip_cash else '三'}格，其餘欄位不動）：")
-    print(f"  {shares_cell['a1']:<16} shares          {old_shares:g} → {new_shares:g}")
-    print(f"  {cost_cell['a1']:<16} avg_cost        {old_cost} → {new_cost}"
-          f"   ← 由本腳本計算，非通知逐字值")
-    if skip_cash:
-        print("  （現金列不改：--cash-column none，金流不經 Sheet 現金列，由使用者另行更新）")
+    cash_a1 = None if skip_cash else _shifted_a1(cash_cell["a1"], plan["insert_at"] if plan else None)
+    if plan is not None:
+        print(f"\n首次建倉：將在第 {plan['insert_at']} 列**新增一列**（公式與格式複製自第 {plan['template']} 列；"
+              f"NAV 加總範圍 {plan['nav_range'][1]}–{plan['nav_range'][2]} 列會自動涵蓋新列，寫完回讀驗證，不過就刪掉還原）：")
+        print(f"  broker {args.broker}｜bucket {args.bucket.strip()}｜symbol {args.symbol}｜shares {new_shares:g}"
+              f"｜avg_cost {new_cost}｜currency {args.currency}｜company {(args.company or '').strip() or '（空）'}")
+        for row, columns in (plan.get("manual_exceptions") or {}).items():
+            print(f"  （第 {row} 列的 {'、'.join(columns)} 是手寫公式，不當範本）")
+        if skip_cash:
+            print("  （現金列不改：--cash-column none，金流不經 Sheet 現金列，由使用者另行更新）")
+        else:
+            print(f"  {cash_a1:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}"
+                  f"{'   ← 插列後下移一列' if cash_a1 != cash_cell['a1'] else ''}")
     else:
-        print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
+        print(f"\n將變更的儲存格（僅此{'兩' if skip_cash else '三'}格，其餘欄位不動）：")
+        print(f"  {shares_cell['a1']:<16} shares          {old_shares:g} → {new_shares:g}")
+        print(f"  {cost_cell['a1']:<16} avg_cost        {old_cost} → {new_cost}"
+              f"   ← 由本腳本計算，非通知逐字值")
+        if skip_cash:
+            print("  （現金列不改：--cash-column none，金流不經 Sheet 現金列，由使用者另行更新）")
+        else:
+            print(f"  {cash_cell['a1']:<16} {args.cash_column:<15} {old_cash:,.2f} → {new_cash:,.2f}")
 
     # 兩道硬擋：dry-run 也擋（讓人在 --apply 之前就看到會被擋），override 留收據。
-    verdict = _hard_cap_verdict(args)
+    verdict = _hard_cap_verdict(args, sheet_rows, sheet_error)
     _print_verdict(verdict)
     receipt: dict = {"hard_cap_check": verdict.to_dict()}
     if not verdict.allows:
@@ -449,7 +499,7 @@ def main(argv: list[str] | None = None) -> int:
             from datetime import date
 
             today, today_problem = date.today(), f"排程時區讀不到（{type(exc).__name__}）——「今天」退回本機日期"
-        inputs = _research_inputs(args.symbol, today=today)
+        inputs = _research_inputs(args.symbol, today=today, sheet_rows=sheet_rows, sheet_error=sheet_error)
         if today_problem:
             inputs["problems"].append(today_problem)
         brief = research_receipt.current_brief(inputs["records"], today=today)
@@ -513,30 +563,81 @@ def main(argv: list[str] | None = None) -> int:
         print("  若這筆你已手動改過 Sheet，改用 --log-only 只記事件、不重複計算。")
         return 0
 
-    writes = [
-        {"a1": shares_cell["a1"], "expected": shares_cell["current"], "value": new_shares},
-        {"a1": cost_cell["a1"], "expected": cost_cell["current"], "value": new_cost},
-    ]
+    # 重跑 --apply 一律 fail closed（2026-09-30 使用者定案，plan §14 #34）：事件已記過，Sheet 再寫一次就是
+    # 股數與現金重複計算（HEAD 起既有的洞：原本只印警告、照寫 Sheet）。要補改 Sheet 請手動。
+    if _already_recorded(trade_id):
+        print(f"\n✗ 這筆成交（{trade_id}）已在 {_shown(TRADE_LOG)}——重跑 --apply 會把 Sheet 的股數與現金再算一次。"
+              "未寫入任何東西；Sheet 若需要更正請手動改。", file=sys.stderr)
+        return 2
+
+    opened = None
+    if plan is not None:
+        fill = {"broker": args.broker, "bucket": args.bucket.strip(), "symbol": args.symbol, "shares": new_shares,
+                "avg_cost": new_cost, "currency": args.currency, "company": (args.company or "").strip(),
+                "base_currency": (plan.get("template_values") or {}).get("base_currency", "")}
+        try:
+            opened = gsheets.open_position_row(plan, fill)
+        except Exception as exc:  # noqa: BLE001 — batchUpdate 原子：失敗就沒有改動
+            print(f"\n✗ 新增列失敗（{type(exc).__name__}: {str(exc)[:160]}）——整批不生效，Sheet 沒有被改動。", file=sys.stderr)
+            return 2
+        problems = gsheets.verify_new_position(plan, fill)
+        if problems:
+            print("\n✗ 新列寫完回讀沒通過，刪掉還原：", file=sys.stderr)
+            for problem in problems:
+                print(f"  · {problem}", file=sys.stderr)
+            return _rollback(gsheets, opened, args.symbol)
+        writes = []
+    else:
+        writes = [
+            {"a1": shares_cell["a1"], "expected": shares_cell["current"], "value": new_shares},
+            {"a1": cost_cell["a1"], "expected": cost_cell["current"], "value": new_cost},
+        ]
     if not skip_cash:
-        writes.append({"a1": cash_cell["a1"], "expected": cash_cell["current"], "value": new_cash})
-    result = write_portfolio_cells(writes)
-    if not _already_recorded(trade_id):
-        _append_trade(
-            {
-                "trade_id": trade_id,
-                **payload,
-                "currency": args.currency,
-                "gross_amount": gross,
-                "account_ref": args.account_ref,
-                "note": args.note,
-                "recorded_at": _now(),
-                "sheet_writes": result["written"],
-                **receipt,
-            }
-        )
-    print(f"\n✓ 已寫入 {len(result['written'])} 格，事件已記於 {_shown(TRADE_LOG)}")
+        writes.append({"a1": cash_a1, "expected": cash_cell["current"], "value": new_cash})
+    try:
+        result = gsheets.write_portfolio_cells(writes)
+    except Exception as exc:  # noqa: BLE001 — 逐格寫入前的重讀不符＝有人同時手改；建倉的新列一併還原
+        print(f"\n✗ 寫入中止（{type(exc).__name__}: {str(exc)[:200]}）", file=sys.stderr)
+        return _rollback(gsheets, opened, args.symbol) if opened else 2
+    written = list(opened["written"] if opened else []) + list(result["written"])
+    _append_trade(
+        {
+            "trade_id": trade_id,
+            **payload,
+            "currency": args.currency,
+            "gross_amount": gross,
+            "account_ref": args.account_ref,
+            "note": args.note,
+            "recorded_at": _now(),
+            "sheet_writes": written,
+            **({"sheet_opened_row": opened["row"]} if opened else {}),
+            **receipt,
+        }
+    )
+    print(f"\n✓ 已寫入 {len(written)} 格{f'（第 {opened["row"]} 列為新建倉）' if opened else ''}，"
+          f"事件已記於 {_shown(TRADE_LOG)}")
     print("  Sheet 仍是持股唯一權威；市值與 NAV 未被本腳本改動。")
     return 0
+
+
+def _shifted_a1(a1: str, insert_at: int | None) -> str:
+    """插一列之後，原本在插入點（含）以下的儲存格下移一列；插入點以上不動。"""
+    if insert_at is None:
+        return a1
+    sheet, _, ref = a1.rpartition("!")
+    letters = ref.rstrip("0123456789")
+    row = int(ref[len(letters):])
+    return f"{sheet}!{letters}{row + 1 if row >= insert_at else row}"
+
+
+def _rollback(gsheets, opened, symbol: str) -> int:
+    try:
+        gsheets.delete_position_row(opened, symbol)
+        print(f"  已刪掉第 {opened['row']} 列，Sheet 回到寫入前；事件紀錄沒有寫。", file=sys.stderr)
+    except Exception as exc:  # noqa: BLE001 — 還原失敗要大聲說，不吞
+        print(f"  ⚠⚠ 還原失敗（{type(exc).__name__}: {str(exc)[:200]}）——請手動檢查 Sheet 第 {opened['row']} 列；"
+              "事件紀錄沒有寫。", file=sys.stderr)
+    return 2
 
 
 if __name__ == "__main__":

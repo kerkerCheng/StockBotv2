@@ -741,7 +741,8 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 
 - `--apply`：實際寫入 Sheet 並記錄事件
 - `--log-only`：**Sheet 已由你手動更新過**時使用，只記事件不碰 Sheet。
-  腳本無法自行判斷 Sheet 是否已更新，重複 `--apply` 會把同一筆算兩次。
+- **重跑 `--apply` 一律拒絕（2026-09-30）**：這筆（trade_id）已在事件紀錄就 exit 2、不寫 Sheet——原本只印警告、照寫，股數與現金會重複計算。Sheet 需要更正請手動改。
+- **一筆成交只讀一次 Sheet（2026-09-30）**：同一份原始格交給定位、硬擋與研究收據；寫入前的逐格重讀（防你同時手改）照留。
 
 寫入的三個不變量（有測試守住）：按**欄名**定位（你調欄序不會寫錯欄）、
 **只寫指定儲存格**（不會蓋掉你手填的欄位）、**寫前比對現值**（不符即整批中止）。
@@ -764,7 +765,7 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
   會被拒（exit 2），不是默默忽略。
 - 順序：定位（恰好一列）→ 硬擋 → 收據；**dry-run 也組收據、也印、也擋**。exit code：2＝輸入錯、3＝硬擋、4＝缺敘事
   （缺敘事也含「敘事 ledger 讀不到／有壞行／registry 沒有 research ticker」＝`narrative: unreadable`——確認不了現行是哪一版）；
-  定位不到那一列是 traceback＋exit 1（見下方首次建倉）。旗標以「有沒有給」判斷：給了空字串（例：shell 變數展開成空）照樣拒絕。
+  定位不到那一列是 exit 2 並提示首次建倉的旗標（見下方首次建倉）。旗標以「有沒有給」判斷：給了空字串（例：shell 變數展開成空）照樣拒絕。
   **兩個放行互不放行**：`--override --reason`（硬擋）不放行缺敘事，`--no-narrative-override`（敘事）不放行硬擋。
 - 收據進那一筆事件的 `research_receipt`：`declared`（現行 v2 敘事的 brief_id、候選狀態、兩題答案、騎的讀圖與寫入當時的
   result_digest、歸屬本檔還在處理中的 watch）／`derived`（**當天**候選板 artifact 那一列、個股頁 artifact 的三題稽核行、成交前的
@@ -775,10 +776,9 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
   「成交前持有」記兩個層級：這一列（symbol＋broker）與公司層級（同一家公司任何一列）。
 - Sheet symbol → 公司：Sheet 列自己的 company_id → execution 別名（`FRA:2DG`→`SIVE.ST`）→ registry；都不中＝`narrative: unresolved`
   （不猜；要買就補 registry 或用 `--no-narrative-override`）。
-- **首次建倉：先在 Sheet 手動建好那一列**：symbol、broker、bucket、`currency`／`base_currency`（三碼幣別），shares 填 0，
-  `market_value_base`／`nav_base`（或舊表的 `market_usd`）要是數字或公式——持股列在嚴格讀取時每一列都要能轉成數字，否則整張表
-  讀不到、所有買進的硬擋變成量不到（exit 3）。腳本以 symbol＋broker 定位、必須恰好一列，沒有列就中止（traceback＋exit 1）；
-  它只改既有列的三格，從不新增列。
+- **首次建倉走對話（2026-09-30 使用者定案）**：跟 session 說一句「我在 IB 買了 AXTI 100 股、每股 12.3 美元，因為…」，由 session 跑
+  `--open-position --bucket <觀察／CORE／大盤…> [--company <公司名>]`。**旗標必須明給**——沒有列又沒給旗標是 exit 2＋提示，避免打錯代號就開出新列；已有那一列時給旗標也拒收。做法（`fetchers/gsheets.py` 的四個函式，公式形狀以 2026-09-30 唯讀實測為準）：
+  ①插在**同券商最後一列持股的下一列**（沒有同券商持股就插在第一個 CASH 列上面）——必須落在 `nav_base` 的 `SUM($I$2:$I$25)` 範圍**內部**，Sheets 才會把範圍撐大，新列才算進 NAV（接在最後一列之後，5% 硬擋就用錯分母）；②公式與格式從同券商一列**標準形狀**的持股列複製（多數列的形狀為準；手寫公式的列——例：TYO:7803 抓不到價、手寫市值——照實列出、不當範本；沒有一種占三分之二就中止）；③插列、複製、填值在**同一個原子請求**，只寫新插的那一列；④寫完立刻回讀：公式形狀、NAV 範圍涵蓋到最後一列、整張表照樣讀得過、**新列市值 > 0**（抓價公式只換算 USD／TWD／EUR／JPY，其他幣別或代號抓不到價會被吃成 0）——任何一項不過就刪掉那一列還原、不寫事件紀錄；現金那一格因插列下移一列，照樣逐格重讀比對後才寫。dry-run 會印新列的完整內容與插入位置。
 - 舊事件（3.8 之前的 2 筆）沒有 `research_receipt`：未來讀取端要把它當**缺席**，不是錯誤（plan §14）。
 
 事件紀錄在 tracked `library/trades/trade_log.jsonl`（append-only）。

@@ -170,7 +170,8 @@ def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, input
 
     calls: dict[str, list] = {"writes": []}
 
-    def locate(requests):
+    def locate(requests, values=None):
+        calls.setdefault("located_with", []).append(values)
         cells = [
             {"a1": "B2", "current": str(held_shares)},
             {"a1": "C2", "current": "100"},
@@ -185,13 +186,16 @@ def _wire_sheet(monkeypatch, tmp_path, *, rows, held_shares: float = 10.0, input
 
     monkeypatch.setattr(gsheets, "locate_portfolio_cells", locate)
     monkeypatch.setattr(gsheets, "write_portfolio_cells", write)
-    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False: rows)
+    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False, values=None: rows)
+    calls["reads"] = []
+    monkeypatch.setattr(gsheets, "read_portfolio_values",
+                        lambda *, formulas=False, sheet=None: calls["reads"].append(formulas) or [["symbol"]])
     module = _module()
     module.TRADE_LOG = tmp_path / "trade_log.jsonl"
     from datetime import date
 
     module._today = lambda: date(2026, 9, 30)
-    module._research_inputs = lambda symbol, *, today: dict(inputs if inputs is not None else _present_inputs())
+    module._research_inputs = lambda symbol, *, today, sheet_rows=None, sheet_error=None: dict(inputs if inputs is not None else _present_inputs())
     return module, calls
 
 
@@ -222,6 +226,7 @@ def test_override_without_reason_is_rejected_before_any_sheet_access(monkeypatch
 
     monkeypatch.setattr(gsheets, "locate_portfolio_cells", boom)
     monkeypatch.setattr(gsheets, "fetch_portfolio", boom)
+    monkeypatch.setattr(gsheets, "read_portfolio_values", boom)
     module = _module()
     module.TRADE_LOG = tmp_path / "trade_log.jsonl"
     assert module.main(_BUY + ["--override"]) == 2
@@ -255,7 +260,7 @@ def test_unreadable_holdings_is_unmeasurable_and_fails_closed(monkeypatch, tmp_p
 
     module, calls = _wire_sheet(monkeypatch, tmp_path, rows=[])
 
-    def fail(*, strict_operational=False):
+    def fail(*, strict_operational=False, values=None):
         raise RuntimeError("sheet down")
 
     monkeypatch.setattr(gsheets, "fetch_portfolio", fail)

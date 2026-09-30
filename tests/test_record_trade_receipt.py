@@ -115,8 +115,11 @@ def env(monkeypatch, tmp_path):
 
     monkeypatch.setattr(store.StateArtifactStore, "read", read_state)
     monkeypatch.setattr(store.ArtifactStore, "read", read_view)
-    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False: state["rows"])
-    monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests: [
+    monkeypatch.setattr(gsheets, "fetch_portfolio", lambda *, strict_operational=False, values=None: state["rows"])
+    state["reads"] = []
+    monkeypatch.setattr(gsheets, "read_portfolio_values",
+                        lambda *, formulas=False, sheet=None: state["reads"].append(formulas) or [["symbol"]])
+    monkeypatch.setattr(gsheets, "locate_portfolio_cells", lambda requests, values=None: [
         {"a1": "B2", "current": "100"}, {"a1": "C2", "current": "10"}]
         + ([{"a1": "D5", "current": "50000"}] if len(requests) == 3 else []))
 
@@ -266,6 +269,7 @@ def test_alpha_without_why_fails_before_touching_the_sheet(env, monkeypatch) -> 
 
     monkeypatch.setattr(gsheets, "locate_portfolio_cells", boom)
     monkeypatch.setattr(gsheets, "fetch_portfolio", boom)
+    monkeypatch.setattr(gsheets, "read_portfolio_values", boom)
     module = env["module"]
     assert module.main(_trade("FRA:2DG", "sell")) == 2
     assert module.main(_trade("FRA:2DG", "buy", "--why", "   ")) == 2
@@ -369,7 +373,8 @@ def test_alpha_beta_split_uses_the_public_hard_cap_function() -> None:
     assert "from risk.hard_caps import is_beta_symbol" in source
     assert "_instrument_for" not in source, "不得用私有判別"
     order = source.split("def main(", 1)[1]
-    assert order.index("locate_portfolio_cells(requests)") < order.index("_hard_cap_verdict(args)") \
+    assert order.index("locate_portfolio_cells(requests, values=sheet_values)") \
+        < order.index("_hard_cap_verdict(args, sheet_rows, sheet_error)") \
         < order.index("research_receipt.build_receipt("), "順序：locate → 硬擋 → 收據"
 
 
@@ -393,6 +398,7 @@ def test_empty_disproof_watch_is_rejected_not_ignored(env, monkeypatch) -> None:
         raise AssertionError("空的 --disproof-watch 要在碰 Sheet 之前就被拒")
 
     monkeypatch.setattr(gsheets, "locate_portfolio_cells", boom)
+    monkeypatch.setattr(gsheets, "read_portfolio_values", boom)
     module = env["module"]
     assert module.main(_trade("FRA:2DG", "sell", "--why", "x", "--disproof-watch", "", "--apply")) == 2
     assert env["writes"] == [] and not module.TRADE_LOG.exists()
