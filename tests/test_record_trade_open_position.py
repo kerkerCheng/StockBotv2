@@ -977,3 +977,31 @@ def test_the_fx_hint_names_the_sheets_base_currency_not_a_hardcoded_usd(monkeypa
     assert module.main(["--symbol", "AXTI", *_ROW]) == 2
     err = capsys.readouterr().err
     assert "--fx-to-base <1 JPY 等於多少 TWD>" in err and "等於多少 USD" not in err
+
+
+@pytest.mark.parametrize("row_currency, argv, want, unwanted", [
+    # 第五次覆核 NB-1：「不需要匯率」是「那一列＝基準幣」，不是「那一列＝USD」
+    ("USD", ["--currency", "TWD", "--cash-column", "none"], "--currency USD --fx-to-base <1 USD 等於多少 TWD>", None),
+    ("TWD", [], "--currency TWD --cash-column cash_twd 或 none", "--fx-to-base"),
+])
+def test_whether_the_hint_asks_for_fx_follows_the_base_currency(monkeypatch, tmp_path, capsys, row_currency, argv,
+                                                                 want, unwanted) -> None:
+    from tests.test_record_trade import _sheet_rows, _wire_sheet
+
+    rows = [dict(r, base_currency="TWD") for r in _sheet_rows(AXTI=0.0)]
+    module, calls = _wire_sheet(monkeypatch, tmp_path, rows=rows, row_currency=row_currency)
+    assert module.main(["--symbol", "AXTI", *_ROW, *argv]) == 2
+    err = capsys.readouterr().err
+    assert want in err and (unwanted is None or unwanted not in err)
+
+
+def test_opening_a_position_does_not_ask_to_check_a_row_that_does_not_exist_yet(monkeypatch, tmp_path, capsys) -> None:
+    """第五次覆核 NB-2：建倉時 Sheet 還沒有那一列——現金欄提示不叫人「確認那一列」。"""
+    from tests.test_record_trade import _module
+
+    module = _module()
+    module.TRADE_LOG = tmp_path / "trade_log.jsonl"
+    assert module.main(["--symbol", "6324.T", *_ROW, "--currency", "JPY", "--cash-column", "cash_usd",
+                        "--open-position", "--bucket", "觀察"]) == 2
+    err = capsys.readouterr().err
+    assert "請給 --cash-column none" in err and "Sheet 那一列一致" not in err

@@ -441,7 +441,8 @@ def main(argv: list[str] | None = None) -> int:
         fix = (f"請給 --cash-column cash_{args.currency.lower()} 或 none" if args.currency in ("USD", "TWD") else
                f"Sheet 沒有 {args.currency} 的現金欄——請給 --cash-column none（帳上的現金另行手動更新）")
         # 給了 --currency 卻給錯時，這裡還不知道 Sheet 那一列的幣別（還沒讀 Sheet）——提醒一併核對（第四次覆核 NB5）。
-        check = "（也請確認 --currency 與 Sheet 那一列一致）" if currency_given else ""
+        # 建倉時 Sheet 還沒有那一列，不提（第五次覆核 NB-2）。
+        check = "（也請確認 --currency 與 Sheet 那一列一致）" if currency_given and not args.open_position else ""
         print(f"✗ 現金欄 {args.cash_column} 是 {cash_currency[args.cash_column]}，成交幣別是 {args.currency}"
               f"{'' if currency_given else '（沒給 --currency，預設 USD）'}——金額會以錯的幣別扣款；{fix}{check}",
               file=sys.stderr)
