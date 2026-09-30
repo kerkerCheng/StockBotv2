@@ -439,12 +439,35 @@ def seat_readings_context(*, today: Any = None, as_of: Any = None) -> dict[str, 
     return {"seats": {co: sorted(nodes) for co, nodes in seats.items()}, "by_node": by_node}
 
 
-def seat_readings_for(context: Mapping[str, Any], company_id: str | None) -> dict[str, Any]:
+def demand_side_abstention(ticker: str, *, today: Any = None, directory: Path | None = None) -> Any:
+    """這檔現行的 `readings/demand_side` abstention（刻意不主張：它在需求側、不坐任何層）；沒有或讀不到回 `None`。
+
+    讀不到 ledger 時回 `None`（＝沒有宣告），面板照舊印原本的缺席——不因為讀不到而把 blocker 變 settled。"""
+    from datetime import date as _date
+
+    from alpha.abstention.contracts import select_abstention
+
+    from .abstentions import read_abstention_records
+
+    try:
+        records, _errors = read_abstention_records(ticker, directory=directory)
+    except OSError:
+        return None
+    return select_abstention(records, layer="readings", subject="demand_side", period_end=None, as_of=None,
+                             today=today or _date.today())
+
+
+def seat_readings_for(context: Mapping[str, Any], company_id: str | None, *,
+                      demand_side: Any = None) -> dict[str, Any]:
     """一家公司坐的節點與那些節點的現行讀圖（Phase 2 Step 2.7 的組法；3.7 起讀圖面板與 argument 鏈段共用）。
 
     `context`：`webapp.materialize.readings_context()` 的輸出（`{"seats", "by_node"}` 或 `{"absence"}`）。
     缺席分型由這裡宣告（L16）：讀不到圖／沒有 co: id＝`upstream_unavailable`；坐的節點都沒有讀圖＝交給消費端寫
-    `not_yet_recorded`。⚠ 由 `co:*` 推（INV-1），不靠讀圖紀錄裡的 ticker。"""
+    `not_yet_recorded`。⚠ 由 `co:*` 推（INV-1），不靠讀圖紀錄裡的 ticker。
+
+    `demand_side`：這檔現行的 `readings/demand_side` abstention（`demand_side_abstention()`；2026-09-30 使用者核准）。
+    **只在圖上沒有它坐的層時採用**——宣告 `deliberate_abstention`（settled），理由照抄那筆紀錄；
+    圖上有它坐的層時不採用（宣告和圖矛盾），照舊 `not_yet_recorded` 並在理由裡寫明。"""
     if context.get("absence"):
         return {"absence": dict(context["absence"])}
     if not company_id:
@@ -459,6 +482,14 @@ def seat_readings_for(context: Mapping[str, Any], company_id: str | None) -> dic
              if seats else
              {"kind": "upstream_unavailable",
               "reason": "圖上沒有它供貨或開發的層或插槽——讀圖寫在層與插槽上，要先補圖的供貨／開發邊，或判定它在需求側"})
+    if demand_side is not None:
+        declared = (f"刻意不主張：它在需求側、不坐任何層——{demand_side.reason}｜什麼會改寫：{demand_side.revisit_when}"
+                    f"｜宣告於 {demand_side.created_on.isoformat()}（{demand_side.abstention_id}）")
+        if not seats:
+            empty = {"kind": "deliberate_abstention", "reason": declared, "settled_by": demand_side.abstention_id}
+        else:
+            empty = {**empty, "reason": empty["reason"] + "｜⚠ 有一筆需求側宣告（" + demand_side.abstention_id
+                     + "）但圖上有它坐的層，和圖矛盾，不採用"}
     return {"seats": seats, "readings": readings, "empty": empty}
 
 

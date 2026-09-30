@@ -368,7 +368,8 @@ def _readings_panel(readings: Mapping[str, Any] | None) -> AnalystPanel:
                   or ("這家公司坐的層與插槽都還沒有讀圖（圖上它供貨或開發的節點："
                       + ("、".join(seats) if seats else "無") + "）"))
         return AnalystPanel(**base, status="missing", source_statuses={"structure_readings": "missing"},
-                            source_absence_kinds={"structure_readings": kind}, notes=notes,
+                            source_absence_kinds={"structure_readings": kind},
+                            source_settled_by={"structure_readings": declared.get("settled_by")}, notes=notes,
                             context={"available": False, "seats": seats}, reason=reason)
     lines = []
     for row in rows:

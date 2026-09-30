@@ -116,7 +116,7 @@ def cmd_analyst_view(args: argparse.Namespace) -> int:
     from .alpha_view.sources import fetch_alpha_investment_view
     from .analyst_view import build_analyst_view, render_analyst_view_markdown
 
-    from alpha.providers.structure_readings import seat_readings_context, seat_readings_for
+    from alpha.providers.structure_readings import demand_side_abstention, seat_readings_context, seat_readings_for
 
     as_of = date.fromisoformat(args.as_of) if args.as_of else None
     # Step 3.7：讀圖面板升核心、鏈段需求端讀讀圖——單檔 CLI 載一次，兩處共用（與 APP materialize 同一個組法）。
@@ -133,7 +133,8 @@ def cmd_analyst_view(args: argparse.Namespace) -> int:
     except AlphaError as exc:
         print(f"✗ {exc}", file=sys.stderr)
         return 2
-    analyst = build_analyst_view(view, readings=seat_readings_for(readings, view.identity.company_id))
+    analyst = build_analyst_view(view, readings=seat_readings_for(
+        readings, view.identity.company_id, demand_side=demand_side_abstention(str(view.identity.ticker))))
     if args.format == "json":
         text = json.dumps(analyst.to_dict(), ensure_ascii=False, indent=2)
     else:

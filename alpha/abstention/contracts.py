@@ -64,13 +64,19 @@ RECORD_VERSION = "abstention/v1"
 #: 消費端語意同步加在 `briefing/alpha_view/sources.py::downside_absence()`（與
 #: `variant_absence()` 並列）。**兩個 subject 刻意不互相頂替**：宣告「沒有可辯護的賭注」
 #: 不等於「說不出下檔」——前者是不下注，後者是連認錯的門檻都畫不出來。
-ABSTENTION_LAYERS: tuple[str, ...] = ("valuation", "research", "bet")
+#: - `readings`（2026-09-30 使用者核准，Phase 3 結案後）：**讀圖層，只開 `demand_side`**。讀圖寫在層與插槽上；
+#:   圖上沒有它供貨或開發的層的公司（AAPL、MSFT…23 檔），讀圖面板永遠是 `upstream_unavailable` blocker，
+#:   而它們多半本來就在需求側——研究的誠實終局是「它不坐任何層」，之前沒有地方寫（plan §14 #32）。
+#:   消費端語意在 `alpha/providers/structure_readings.py::seat_readings_for`：**只在圖上真的沒有它坐的層時採用**
+#:   （宣告 `deliberate_abstention`，settled）；圖上有它坐的層卻宣告需求側＝和圖矛盾，不採用、照舊要寫讀圖並寫明原因。
+ABSTENTION_LAYERS: tuple[str, ...] = ("valuation", "research", "bet", "readings")
 
 #: 每一層可宣告的主題（method.parameter 形式，與 `METHOD_PARAMETERS` 對齊）。
 ABSTENTION_SUBJECTS: Mapping[str, tuple[str, ...]] = {
     "valuation": ("forward_earnings_multiple.target_pe",),
     "research": ("axis.catalyst",),
     "bet": ("variant.overlay", "downside.overlay"),
+    "readings": ("demand_side",),
 }
 
 #: 欄位名任何一段命中即 import 失敗——abstention 結構上不得攜帶任何數值主張。

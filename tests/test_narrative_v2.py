@@ -200,6 +200,25 @@ def test_unmeasurable_only_when_the_audit_lines_are_all_absent(tmp_path: Path) -
     _write(tmp_path, rec, _ctx(tq=all_absent))
 
 
+def test_relative_group_return_stays_off_the_first_screen(tmp_path: Path) -> None:
+    """2026-09-30 使用者定案（plan §14 #43／#44）：相對組漲幅只在稽核區，不上首屏。
+
+    ①首屏字彙沒有它——寫進任何一格都拒收；②它有值時不再強迫已定價那格引用它（原本兩頭都擋：寫入端要引用、
+    型別層又不收，組內 15 檔的敘事寫不進去）；③它有值不讓 unmeasurable 變非法——那一題的主參照是自家歷史。"""
+    from alpha.narrative.contracts import placeholder_vocab
+
+    # 直接守字彙：格式檢查今天也會擋帶數字的鍵，但那是另一條規則——不能讓這條靠它（變異實測過會空轉）。
+    assert not {"rel_return_30d", "rel_return_90d"} & set(placeholder_vocab(RECORD_VERSION_V2))
+    for slot in ("priced", "wmbt"):
+        with pytest.raises(ContractViolation):
+            _record(slots=_slots(**{slot: "{own_history_pctile}，相對組 {rel_return_30d}"}))
+    only_rel = _tq(cohort_median="not_yet_recorded")                  # 相對組漲幅兩行有值、組中位數缺席
+    _write(tmp_path, _record(), _ctx(tq=only_rel))                    # 已定價那格沒引用相對漲幅 → 照樣寫得進去
+    absent_main = _tq(own_history_pctile="upstream_unavailable", cohort_median="upstream_unavailable")
+    _write(tmp_path / "b", _record(answers={"priced_in": "unmeasurable", "in_numbers": "yes"}),
+           _ctx(tq=absent_main))
+
+
 def test_declared_history_not_comparable_is_what_the_writer_checks_unmeasurable_against(tmp_path: Path) -> None:
     """R2-a N3（Step 3.6 接上）：宣告「歷史不可比」→ 寫入端用宣告後重算的三題驗 unmeasurable。"""
     rec = _record(answers={"priced_in": "unmeasurable", "in_numbers": "yes"},

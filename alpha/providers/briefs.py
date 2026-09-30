@@ -67,7 +67,8 @@ def append_brief_record(record: Mapping[str, Any], *, directory: Path | None = N
 OPEN_READING_KINDS: frozenset[str] = frozenset({"moat", "volume"})
 #: 讀圖「現行」＝這兩態：`stale_low` 只有低等級變動、不進重讀佇列——不算現行的話，可開會被一個修不回來的狀態打掉。
 CURRENT_READING_STATUSES: frozenset[str] = frozenset({"current", "stale_low"})
-_PRICED_IN_LINES = ("own_history_pctile", "cohort_median", "rel_return_30d", "rel_return_90d")
+#: 已定價那一格引用的稽核行。相對組漲幅（③）2026-09-30 起只在稽核區、不上首屏，所以不在這裡——它有值不強迫答 yes／no。
+_PRICED_IN_LINES = ("own_history_pctile", "cohort_median")
 _IN_NUMBERS_LINES = ("in_numbers_series",)
 
 
@@ -213,10 +214,6 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
         if (rows.get("cohort_median") or {}).get("absence_kind") is None and "cohort_median" in rows \
                 and "{cohort_median}" not in text:
             problems.append("priced_in：主題等權組中位數有值，這一格必須一併引用 {cohort_median}")
-        rel = [k for k in ("rel_return_30d", "rel_return_90d")
-               if k in rows and (rows.get(k) or {}).get("absence_kind") is None]
-        if rel and not any("{" + k + "}" in text for k in rel):
-            problems.append("priced_in：相對組漲幅有值，這一格必須一併引用 {rel_return_30d} 或 {rel_return_90d}")
 
     # ④ candidate_state：缺 X／等回落 → 本公司 wake_brief、active、kind 合法
     cs = parsed.candidate_state

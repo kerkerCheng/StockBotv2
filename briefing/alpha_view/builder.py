@@ -310,8 +310,6 @@ def _three_question_values(three_questions: Mapping[str, Any] | None) -> dict[st
         "own_history_pctile": (f"{float(own['value']):.0f}" if own else None),
         "own_history_basis": (own.get("basis") if own else None),
         "cohort_median": format_value("multiple", rows["cohort_median"]["value"]) if "cohort_median" in rows else None,
-        "rel_return_30d": format_value("ratio", rows["rel_return_30d"]["value"]) if "rel_return_30d" in rows else None,
-        "rel_return_90d": format_value("ratio", rows["rel_return_90d"]["value"]) if "rel_return_90d" in rows else None,
         "in_numbers_latest": format_value("ratio", yoy) if yoy is not None else None,
         "in_numbers_as_of": (str(as_of)[:10] if as_of else None),
     }

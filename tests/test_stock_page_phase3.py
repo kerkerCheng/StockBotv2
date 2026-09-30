@@ -532,6 +532,47 @@ def test_no_seat_on_the_graph_is_not_the_same_as_not_read_yet() -> None:
     assert seatless.absence_kind == "upstream_unavailable" and "圖上沒有它供貨或開發的層" in seatless.reason
 
 
+def _demand_side(tmp_path: Path, ticker: str, company: str, *, retract: bool = False):
+    from alpha.abstention.contracts import abstention_record
+    from alpha.providers.abstentions import append_abstention_record
+
+    rec = abstention_record(company_id=company, ticker=ticker, layer="readings", subject="demand_side",
+                            reason="它是 AI capex 的買方：圖上只有它買進的邊，沒有任何它供貨或開發的層",
+                            revisit_when="它開始對外賣自研晶片或光學元件（客戶端 filing 具名）",
+                            created_at=datetime(2026, 9, 30, tzinfo=timezone.utc))
+    append_abstention_record(rec, directory=tmp_path)
+    if retract:
+        again = abstention_record(company_id=company, ticker=ticker, layer="readings", subject="demand_side",
+                                  reason=rec["reason"], revisit_when=rec["revisit_when"], retracted=True,
+                                  supersedes_id=rec["abstention_id"],
+                                  created_at=datetime(2026, 9, 30, 1, tzinfo=timezone.utc))
+        append_abstention_record(again, directory=tmp_path)
+    return rec["abstention_id"]
+
+
+def test_a_demand_side_declaration_settles_the_readings_panel_only_when_the_graph_agrees(tmp_path: Path) -> None:
+    """2026-09-30 使用者核准（plan §14 #32）：需求側的公司可以寫「刻意不主張：它不坐任何層」讓讀圖面板結案——
+    **只在圖上真的沒有它坐的層時採用**；圖上有它坐的層卻宣告需求側＝和圖矛盾，照舊要寫讀圖並寫明不採用。"""
+    from alpha.providers.structure_readings import demand_side_abstention, seat_readings_for
+
+    ab = _demand_side(tmp_path, "AAPL", "co:apple")
+    declared = demand_side_abstention("AAPL", today=date(2026, 9, 30), directory=tmp_path)
+    assert declared is not None and declared.abstention_id == ab
+    ctx = {"seats": {CO: ["mat:inp_substrate"]}, "by_node": {}}
+    settled = build_analyst_view(_full_view(), readings=seat_readings_for(ctx, "co:apple", demand_side=declared)).readings
+    assert settled.absence_kind == "deliberate_abstention" and settled.absence_is_settled
+    assert "刻意不主張" in settled.reason and ab in settled.reason
+    assert settled.source_settled_by == {"structure_readings": ab}
+    contradicted = build_analyst_view(_full_view(), readings=seat_readings_for(ctx, CO, demand_side=declared)).readings
+    assert contradicted.absence_kind == "not_yet_recorded" and not contradicted.absence_is_settled
+    assert "和圖矛盾，不採用" in contradicted.reason
+    # 撤回之後就沒有宣告——面板回到「圖上沒有它的層」（不是 settled）
+    _demand_side(tmp_path / "r", "MSFT", "co:microsoft", retract=True)
+    assert demand_side_abstention("MSFT", today=date(2026, 9, 30), directory=tmp_path / "r") is None
+    # 讀不到 ledger（沒有檔）＝沒有宣告，不把 blocker 變 settled
+    assert demand_side_abstention("NOPE", today=date(2026, 9, 30), directory=tmp_path) is None
+
+
 def test_sheet_unreadable_means_held_is_suspended_not_not_held(monkeypatch) -> None:
     import alpha.providers.briefs as briefs_mod
     from alpha.providers import candidates as cand

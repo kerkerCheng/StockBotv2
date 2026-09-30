@@ -254,11 +254,15 @@ def readings_context(*, today: date | None = None, as_of: date | None = None) ->
     return seat_readings_context(today=today, as_of=as_of)
 
 
-def readings_input_for(context: Mapping[str, Any], company_id: str | None) -> dict[str, Any]:
-    """一檔的讀圖面板輸入（切片規則住 `alpha.providers.structure_readings.seat_readings_for`；L16）。"""
-    from alpha.providers.structure_readings import seat_readings_for
+def readings_input_for(context: Mapping[str, Any], company_id: str | None,
+                       ticker: str | None = None) -> dict[str, Any]:
+    """一檔的讀圖面板輸入（切片規則住 `alpha.providers.structure_readings.seat_readings_for`；L16）。
 
-    return seat_readings_for(context, company_id)
+    `ticker`：給了就讀它現行的 `readings/demand_side` abstention（2026-09-30），交給切片規則決定採不採用。"""
+    from alpha.providers.structure_readings import demand_side_abstention, seat_readings_for
+
+    declared = demand_side_abstention(ticker) if ticker else None
+    return seat_readings_for(context, company_id, demand_side=declared)
 
 
 def candidate_context(tickers: Sequence[str], *, as_of: date | None = None, board: bool = False) -> dict[str, Any]:
@@ -321,7 +325,8 @@ def materialize(ticker: str, *, as_of: date | None = None, scenario: str | None 
     view = fetch_alpha_investment_view(ticker, as_of=as_of, include_causal=False, scenario=scenario,
                                        seat_readings=context)
     candidate_ctx = candidates if candidates is not None else candidate_context([ticker], as_of=as_of)
-    analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id),
+    analyst = build_analyst_view(view, readings=readings_input_for(context, view.identity.company_id,
+                                                                        str(view.identity.ticker)),
                                  candidate=candidate_input_for(candidate_ctx, view))
     payload = materialize_view(analyst.to_dict(), generated_at=generated_at,
                                price_series=_close_series(ticker))

@@ -120,8 +120,11 @@ def test_layer_and_subject_are_contracts_not_free_text() -> None:
     # **這條刻意繼續數**——層數是 contract，多一層就要多一段消費端語意，偷偷長出新層必須變紅。
     # ⚠ 它在 2026-09-17 真的擋下過一次：Q2 的 `bet` 層加進去時這條立刻紅，
     # 逼著把消費端語意（籃子的 bet_state、心跳第 4 段的賭注帳）一起交出來才放行。
-    assert ABSTENTION_LAYERS == ("valuation", "research", "bet")
+    # 2026-09-30：加 readings 層（使用者核准，plan §14 #32）——消費端語意同 commit 交在
+    # `alpha/providers/structure_readings.py::seat_readings_for`（只在圖上沒有它坐的層時採用）。
+    assert ABSTENTION_LAYERS == ("valuation", "research", "bet", "readings")
     assert set(ABSTENTION_SUBJECTS) == set(ABSTENTION_LAYERS)
+    assert ABSTENTION_SUBJECTS["readings"] == ("demand_side",)
     # 每層只開資料支持的那幾個 subject：general 到資料支持的那一格為止（L17-4）
     assert ABSTENTION_SUBJECTS["research"] == ("axis.catalyst",)
     # D2（2026-09-18）：加 `downside.overlay`——「判斷錯了值多少」與賭注對稱，
