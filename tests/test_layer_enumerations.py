@@ -120,6 +120,54 @@ def test_registry_without_a_name_is_a_prerequisite_not_a_rejection(tmp_path: Pat
     assert "不授權入圖" in packet
 
 
+def test_names_shared_with_another_company_are_a_prerequisite_not_a_rejection(tmp_path: Path) -> None:
+    """R2-a N1：`co:openlight`／`co:openlight_photonics` 是同一家的兩個 id（plan §14 #11），名冊寫法全部共用——
+    比對對兩家都不算。引文逐字寫「OpenLight」仍比不到，這是 identity 待決，不是「引文沒具名」（L12：不得壓成同一個失敗）。"""
+    suppliers = ("co:axt", "co:openlight_photonics")
+    extraction = _extraction(suppliers=suppliers, quotes={"co:axt": "AXT ships.",
+                                                          "co:openlight_photonics": "OpenLight supplies the PIC."})
+    record = research_actions.create_action(_payload(extraction, [_enum(suppliers)]), root=tmp_path)
+    check = record["layer_enumeration_check"]
+    status = {row["company_id"]: row["status"] for row in check["results"][0]["suppliers"]}
+    assert status == {"co:axt": "named", "co:openlight_photonics": "registry_names_shared"}
+    assert check["rejections"] == [] and any("共用" in p for p in check["prerequisites"])
+    assert "identity 待決" in research_actions.render_review_packet(record)
+
+
+def test_stored_records_stay_readable_after_the_vocab_changes(tmp_path: Path, monkeypatch) -> None:
+    """R2-a N4：字彙檔日後改名或移除某個值，帶著它的舊紀錄照樣讀得出來（publish／status／complete-ra 都讀紀錄）；
+    新的 request 仍照當下字彙核對。"""
+    record = research_actions.create_action(_payload(_extraction(), [_enum()]), root=tmp_path)
+    applied = copy.deepcopy(record)
+    applied["state"] = "applied"
+    applied["execution"]["report"] = {"status": "complete"}
+    for item in applied["execution"]["documents"]:
+        item["status"] = "complete"
+    compacted = research_actions.compact_applied_payload(applied)
+    compacted["action_id"] = "ra_" + "1" * 32                     # 另存一筆壓縮後的（層列舉住在紀錄頂層）
+    research_actions.save_action(compacted, root=tmp_path)
+    original = research_actions._vocab_values
+
+    def renamed(key: str):
+        values = original(key)
+        return tuple(v for v in values if v != "supplies_to") + (("ships_to",) if key == "layer_enumeration_relations" else ())
+
+    monkeypatch.setattr(research_actions, "_vocab_values", renamed)
+    fresh = research_actions.read_action(record["action_id"], root=tmp_path)             # 層列舉在 payload 裡
+    assert fresh["payload"]["layer_enumerations"] == [_enum()]
+    assert research_actions.read_action(compacted["action_id"], root=tmp_path)["layer_enumerations"] == [_enum()]
+    with pytest.raises(ValueError, match="未登記"):
+        research_actions.validate_normalized_payload(_payload(_extraction(doc_id="layer_doc_new"), [_enum()]))
+
+
+def test_apply_report_prints_the_same_publisher_line_as_the_packet(tmp_path: Path) -> None:
+    """R2-a N8：packet 與 apply 寫出的報告共用同一個「發文者」行（兩處各寫一份就會不一致）。"""
+    record = research_actions.create_action(_payload(_extraction(), None), root=tmp_path)
+    line = "發文者：origin=Global Semi Research ｜ source_type=industry_report ｜ tier=3"
+    assert line in research_actions.render_review_packet(record)
+    assert line in research_actions._full_report(record)
+
+
 def test_origin_role_mismatch_only_warns(tmp_path: Path) -> None:
     # 宣告 industry_report，但發文者其實是列舉的供應商之一（AXT 自家文件）→ 只警告
     payload = _payload(_extraction(origin="AXT, Inc."), [_enum()])

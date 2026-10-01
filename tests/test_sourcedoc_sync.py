@@ -65,6 +65,25 @@ def test_drift_separates_rebuild_loss_from_graph_lag(tmp_path: Path) -> None:
     assert "重建會遺失或不確定 2" in summary_line(result) and "圖落後 JSON 2" in summary_line(result)
 
 
+def test_graph_without_json_and_unreadable_files_are_red_and_counted(tmp_path: Path) -> None:
+    """R2-a N7：圖上有、沒有任何抽取檔（整份重建不回來）與讀不了的抽取檔，都是「重建會遺失」——紅、而且計數（INV-3）；
+    圖落後 JSON 不紅。"""
+    from loader.sourcedoc_sync import is_red
+
+    _write(tmp_path, "lag.json", "lag", section="photonics", title="Parent")
+    lag_only = drift([{"id": "lag", "section": None, "title": "Parent"}], json_source_docs(tmp_path))
+    assert lag_only["stale"] and not is_red(lag_only)
+
+    no_json = drift([{"id": "lag", "section": "photonics", "title": "Parent"}, {"id": "ghost", "section": None,
+                                                                             "title": "x"}], json_source_docs(tmp_path))
+    assert no_json["danger"] == [] and no_json["graph_without_json"] == ["ghost"] and is_red(no_json)
+
+    (tmp_path / "broken.json").write_text("{not json", encoding="utf-8")
+    broken = drift([{"id": "lag", "section": "photonics", "title": "Parent"}], json_source_docs(tmp_path))
+    assert broken["unreadable_json"] == ["broken.json"] and broken["counts"]["unreadable_json"] == 1 and is_red(broken)
+    assert "讀不了的抽取檔 1" in summary_line(broken)
+
+
 def test_new_audit_check_is_registered() -> None:
     from audit import CHECKS_BY_NAME
 

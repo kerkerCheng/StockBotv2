@@ -224,6 +224,28 @@ def apply_graph(stale: list[Mapping[str, Any]], *, session, pq2: int, root: Path
             "manifest": manifest_path.relative_to(root).as_posix()}
 
 
+#: 本工具掛的 pq2 `manual` 項 ref_id 前綴（2026-10-01 掛的是 `sourcedoc-title-sync:2026-10-01`，[663]）。
+GRAPH_SYNC_REF_PREFIX = "sourcedoc-title-sync:"
+
+
+def check_graph_approval(n: int, *, pool_path: Path | None = None) -> dict:
+    """`--apply-graph` 寫圖之前的編號核對（R2-a N6）：[n] 存在且未結案、型別 `manual`、ref_id 是本工具掛的那種。
+
+    授權載體仍是使用者在對話中的明確 go；這一道只擋「打錯號照樣寫圖、manifest 記錯編號」。不過就 raise ValueError（沒有任何寫入）。
+    """
+    from engine_b import todo
+
+    pool = todo.load(pool_path or todo.DEFAULT_POOL_PATH)
+    try:
+        item = todo.get(pool, n)
+    except todo.TodoError as exc:
+        raise ValueError(f"[{n}] 不存在或已結案——--apply-graph 只接受本工具掛的、尚未結案的 pq2 編號") from exc
+    if item.get("type") != "manual" or not str(item.get("ref_id") or "").startswith(GRAPH_SYNC_REF_PREFIX):
+        raise ValueError(f"[{n}] 不是本工具掛的對齊項（type={item.get('type')}、ref_id={item.get('ref_id')}；"
+                         f"要 manual 且 ref_id 以 {GRAPH_SYNC_REF_PREFIX} 開頭）——沒有任何寫入")
+    return item
+
+
 def _driver():
     from dotenv import load_dotenv
     from neo4j import GraphDatabase
@@ -247,6 +269,12 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if args.apply_graph and args.pq2 is None:
         parser.error("--apply-graph 必須帶 --pq2（圖寫入要經使用者核准）")
+    if args.apply_graph:
+        try:
+            check_graph_approval(args.pq2)
+        except ValueError as exc:
+            print(f"✗ 拒絕：{exc}", file=sys.stderr)
+            return 2
 
     from neo4j import READ_ACCESS, WRITE_ACCESS
 

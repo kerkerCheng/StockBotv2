@@ -81,6 +81,10 @@ def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: da
     if record["state"] == "expired" or expired:
         raise ApplyRefused(f"{action_id} 已過期——重提請重跑 prepare（新 digest、新編號）")
     retry = record["state"] in _RETRY_STATES and bool(approval)
+    if record["state"] in _RETRY_STATES and not approval:
+        # 舊紀錄（入口上線前中斷的 apply）沒有任何戳記——沒有哪個編號能「沿用原核准重試」（R2-a N5）。
+        raise ApplyRefused(f"{action_id} 的狀態是 {record['state']}，但沒有核准戳記（入口上線前中斷的 apply）——"
+                           "沒有任何編號能重試它；重提請重跑 prepare（新 digest、新編號）")
     if record["state"] != "ready" and not retry:
         raise ApplyRefused(f"{action_id} 的狀態是 {record['state']}，不是 ready——已 apply 的請走 "
                            "commit_pending_intake.py／todo complete-ra；中斷的 apply 只能由原核准編號重試")
@@ -90,6 +94,11 @@ def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: da
             record = research_actions.read_action(action_id, root=root)    # 鎖內重讀，避免蓋到別人剛改的版本
             if record["action_digest"] != digest or record["state"] != "ready":
                 raise ApplyRefused(f"{action_id} 在檢查與蓋章之間被改動了——沒有任何寫入，請重跑")
+            # 鎖內也要重查戳記（R2-a N2）：兩個未結的編號指向同一筆紀錄、同時執行時，後到的不得覆蓋先到的戳記。
+            stamped_by = (record.get("execution") or {}).get("approval")
+            if stamped_by:
+                raise ApplyRefused(f"{action_id} 在檢查與蓋章之間已由 [{stamped_by.get('pq2_n')}] 蓋過核准戳記——"
+                                   "同一筆紀錄不能被兩個編號核准；沒有任何寫入")
             record["execution"]["approval"] = {"pq2_n": int(n), "digest": digest, "at": current.isoformat()}
             record = research_actions.save_action(record, root=root, now=current)
     return {"action_id": action_id, "record": record, "retry": retry}

@@ -149,6 +149,40 @@ def test_partial_apply_can_only_be_retried_by_the_same_number(env, monkeypatch) 
     assert research_actions.read_action(env["record"]["action_id"], root=env["root"])["state"] == "applied"
 
 
+def test_a_stamp_landing_between_check_and_lock_is_not_overwritten(env, monkeypatch) -> None:
+    """R2-a N2（TOCTOU）：兩個未結編號指向同一筆紀錄、同時執行——後到的在鎖內重讀時看到先到的戳記，必須拒絕、不覆蓋。"""
+    module, action_id = env["module"], env["record"]["action_id"]
+    real_lock = research_actions.action_lock
+
+    class _RaceLock:
+        def __init__(self, *args, **kwargs):
+            self._inner = real_lock(*args, **kwargs)
+
+        def __enter__(self):
+            token = self._inner.__enter__()
+            record = research_actions.read_action(action_id, root=env["root"])   # 另一個編號剛好先蓋了戳記
+            record["execution"]["approval"] = {"pq2_n": 4242, "digest": env["digest"], "at": "2026-10-01T00:00:00+00:00"}
+            research_actions.save_action(record, root=env["root"])
+            return token
+
+        def __exit__(self, *exc):
+            return self._inner.__exit__(*exc)
+
+    monkeypatch.setattr(research_actions, "action_lock", _RaceLock)
+    with pytest.raises(module.ApplyRefused, match=r"已由 \[4242\] 蓋過核准戳記"):
+        module.check_and_stamp(env["n"], env["digest"], pool_path=env["pool"], root=env["root"])
+    assert research_actions.read_action(action_id, root=env["root"])["execution"]["approval"]["pq2_n"] == 4242
+
+
+def test_unstamped_partial_record_says_re_prepare_not_retry(env) -> None:
+    """R2-a N5：入口上線前中斷的 apply（partial、沒有戳記）——沒有任何編號能「由原核准編號重試」，訊息要說重跑 prepare。"""
+    record = research_actions.read_action(env["record"]["action_id"], root=env["root"])
+    record["state"] = "partial"
+    research_actions.save_action(record, root=env["root"])
+    with pytest.raises(env["module"].ApplyRefused, match="沒有核准戳記.*重跑 prepare"):
+        env["module"].check_and_stamp(env["n"], env["digest"], pool_path=env["pool"], root=env["root"])
+
+
 def test_entry_is_interactive_only() -> None:
     """不進任何無人值守 allowlist：codex rules、daily 固定步驟、專案設定的 allow 清單（sandbox impact review 步驟 4）。"""
     rules = (ROOT / ".codex" / "rules" / "stockbot-automations.rules").read_text(encoding="utf-8")

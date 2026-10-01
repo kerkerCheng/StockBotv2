@@ -114,3 +114,23 @@ def test_apply_graph_only_touches_stale_fields_and_checks_the_current_value(tmp_
     assert manifest["pq2"] == 777 and manifest["writes"][0]["written"] is True
     with pytest.raises(ValueError, match="只准動"):
         mig.apply_graph([{**stale[0], "field": "origin_entity"}], session=_Session(), pq2=777, root=tmp_path)
+
+
+def test_apply_graph_refuses_a_number_that_is_not_this_tools_open_item(tmp_path: Path) -> None:
+    """R2-a N6：`--apply-graph` 寫圖前核對編號——不存在／已結案、型別不是 manual、ref_id 不是本工具掛的，一律拒絕（沒有寫入）。"""
+    from engine_b import todo
+
+    pool = todo.empty_pool()
+    mine = todo.upsert(pool, item_type="manual", ref_id="sourcedoc-title-sync:2026-10-01", title="對齊圖上 11 份 title")
+    other_manual = todo.upsert(pool, item_type="manual", ref_id="something-else", title="別的事")
+    ra = todo.upsert(pool, item_type="ra_admission", ref_id="ra_" + "0" * 32, title="RA")
+    pool_path = tmp_path / "todo_pool.json"
+    todo.save(pool, pool_path)
+    assert mig.check_graph_approval(mine["n"], pool_path=pool_path)["ref_id"] == "sourcedoc-title-sync:2026-10-01"
+    for n, message in ((9999, "不存在或已結案"), (other_manual["n"], "不是本工具掛的"), (ra["n"], "不是本工具掛的")):
+        with pytest.raises(ValueError, match=message):
+            mig.check_graph_approval(n, pool_path=pool_path)
+    todo.resolve(pool, mine["n"], "drop", reason="測試")
+    todo.save(pool, pool_path)
+    with pytest.raises(ValueError, match="不存在或已結案"):
+        mig.check_graph_approval(mine["n"], pool_path=pool_path)

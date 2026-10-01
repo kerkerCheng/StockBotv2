@@ -164,15 +164,18 @@ def _require_allowed_fields(
         raise ValueError(f"{label} fields invalid: {'; '.join(details)}")
 
 
-def _validate_focus_company_id(value: object) -> str:
-    """只接受 registry 登記過的 company_id；不接受自由字串。"""
+def _validate_focus_company_id(value: object, *, check_registry: bool = True) -> str:
+    """只接受 registry 登記過的 company_id；不接受自由字串。
+
+    `check_registry=False`：讀**已存的紀錄**時只驗形狀——名冊日後改了，舊紀錄不得因此讀不出來
+    （R2-a N4 的對稱面：讀舊紀錄不依賴當下的設定檔）。"""
 
     from identity.registry import get_registry
 
     if not isinstance(value, str) or not value.strip():
         raise ValueError("focus_company_id must be a non-empty string")
     company_id = value.strip()
-    if not get_registry().has_company(company_id):
+    if check_registry and not get_registry().has_company(company_id):
         raise ValueError(f"focus_company_id 未在 registry 登記：{company_id}")
     return company_id
 
@@ -190,16 +193,19 @@ def _vocab_values(key: str) -> tuple[str, ...]:
     return tuple(str(value) for value in values)
 
 
-def _validate_layer_enumerations(value: object) -> list[dict]:
+def _validate_layer_enumerations(value: object, *, check_vocab: bool = True) -> list[dict]:
     """`layer_enumerations[]` 的形狀與封閉字彙。**不查圖、不查名冊**——「在本包」的核對依賴當下的名冊，
-    只在 prepare 跑一次（`check_layer_enumerations`），否則名冊一改，舊紀錄的驗證就會失敗。"""
+    只在 prepare 跑一次（`check_layer_enumerations`），否則名冊一改，舊紀錄的驗證就會失敗。
+
+    `check_vocab=False`：讀**已存的紀錄**時只驗形狀（R2-a N4）——字彙檔日後改名或移除某個值，帶著它的舊紀錄
+    不得因此讀不出來（publish／status／complete-ra 都讀紀錄）。字彙核對在建立紀錄那一刻做過一次。"""
 
     if not isinstance(value, list) or not value:
         raise ValueError("layer_enumerations must be a non-empty list")
     if len(value) > MAX_LAYER_ENUMERATIONS:
         raise ValueError(f"layer_enumerations exceeds the {MAX_LAYER_ENUMERATIONS}-item limit")
-    relations = _vocab_values("layer_enumeration_relations")
-    roles = _vocab_values("origin_role")
+    relations = _vocab_values("layer_enumeration_relations") if check_vocab else None
+    roles = _vocab_values("origin_role") if check_vocab else None
     normalized: list[dict] = []
     seen: set[tuple[str, str]] = set()
     for index, item in enumerate(value):
@@ -216,10 +222,13 @@ def _validate_layer_enumerations(value: object) -> list[dict]:
             raise ValueError(f"{label}.suppliers must be a non-empty list of co:* ids")
         if len(set(suppliers)) != len(suppliers):
             raise ValueError(f"{label}.suppliers has duplicates")
-        if item["relation"] not in relations:
+        for field in ("relation", "origin_role"):
+            if not isinstance(item[field], str) or not item[field].strip():
+                raise ValueError(f"{label}.{field} must be a non-empty string")
+        if relations is not None and item["relation"] not in relations:
             raise ValueError(f"{label}.relation 未登記：{item['relation']!r}"
                              f"（schema/vocab.json layer_enumeration_relations：{list(relations)}）")
-        if item["origin_role"] not in roles:
+        if roles is not None and item["origin_role"] not in roles:
             raise ValueError(f"{label}.origin_role 未登記：{item['origin_role']!r}"
                              f"（schema/vocab.json origin_role：{list(roles)}）")
         key = (node, item["relation"])
@@ -236,8 +245,11 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
 
     每一筆列舉：node 與每家 supplier 都在本包的 nodes；每家至少一條 supplier→node、relation 相符的邊；那條邊
     `source_ids` 指到的任一段引文以 `query.bottleneck.quote_names_company`（名字比對唯一 owner）具名那一家。
-    失敗分兩種原因報（INV-3，不壓成一個布林）：
+    失敗分三種原因報（INV-3，不壓成一個布林）：
     - **名冊無名可比**（那家不在名冊，或沒有 display_name／name_aliases）→ 列進 packet 前置清單，**不拒收**；
+    - **名冊的每個寫法都與另一家共用**（`shared_name_forms`；例：`co:openlight`／`co:openlight_photonics` 是同一家的
+      兩個 id，plan §14 #11）→ 名字比對對兩家都不算，所以同樣是前置（identity 待決），**不拒收**（R2-a N1：
+      原本被當成「引文沒具名」拒收——L12 的形狀）；
     - **引文真的沒具名** → 拒收。
     origin_role 與那份文件 origin 的解析結果不符 → **只警告**。
     ⚠ 結果依賴當下的名冊，所以只在 prepare 跑一次、存成紀錄的收據（`layer_enumeration_check`）；**不得**放進
@@ -245,9 +257,10 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
     """
 
     from identity.registry import get_registry
-    from query.bottleneck import company_id_for_origin, company_name_forms, quote_names_company
+    from query.bottleneck import company_id_for_origin, company_name_forms, quote_names_company, shared_name_forms
 
     reg = registry if registry is not None else get_registry()
+    shared = shared_name_forms(reg)
     enumerations = payload.get("layer_enumerations") or []
     documents = payload.get("documents") or []
     nodes = {str(n.get("id")) for d in documents for n in (d["extraction"].get("nodes") or []) if n.get("id")}
@@ -269,15 +282,18 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
                 rows.append(row)
                 continue
             company = reg.company(supplier)
-            has_names = company is not None and bool(company_name_forms(company))
+            forms = company_name_forms(company) if company is not None else ()
+            has_names = bool(forms)
+            # 比對時共用寫法不算（`quote_names_company(..., registry=reg)`）；只剩共用寫法的公司永遠比不到。
+            has_own_names = any(form.casefold() not in shared for form in forms)
             for document in documents:
                 extraction = document["extraction"]
                 quotes = {str(s.get("id")): str(s.get("quote") or "") for s in extraction.get("sources") or []}
                 for edge in extraction.get("edges") or []:
                     if (edge.get("src_id") == supplier and edge.get("dst_id") == enum["node"]
                             and edge.get("relation") == enum["relation"]):
-                        named = has_names and any(quote_names_company(quotes.get(str(sid)), company, registry=reg)
-                                                  for sid in edge.get("source_ids") or [])
+                        named = has_own_names and any(quote_names_company(quotes.get(str(sid)), company, registry=reg)
+                                                      for sid in edge.get("source_ids") or [])
                         row["edges"].append({"doc_id": document["doc_id"], "edge_id": edge.get("id"), "named": named})
                         enum_docs[document["doc_id"]] = extraction.get("source_doc") or {}
             if not row["edges"]:
@@ -289,6 +305,10 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
                 prerequisites.append(f"{label}：{supplier} 在名冊沒有名字可比（不在名冊或沒有 display_name／name_aliases）"
                                      "——先補名冊再核對；不拒收")
                 row["status"] = "registry_has_no_name"
+            elif not has_own_names:
+                prerequisites.append(f"{label}：{supplier} 在名冊的每個寫法都與另一家共用（同一家公司兩個 id？）"
+                                     "——名字比對對兩家都不算；先解決 identity 再核對；不拒收")
+                row["status"] = "registry_names_shared"
             else:
                 docs = "、".join(sorted({edge["doc_id"] for edge in row["edges"]}))
                 rejections.append(f"{label}：{supplier} 那條邊的引文沒有具名它（{docs}）")
@@ -412,8 +432,10 @@ def parse_action_request(action_json: str) -> dict:
     return parsed
 
 
-def validate_normalized_payload(payload: object) -> dict:
-    """Validate the canonical internal payload produced by shared intake validation."""
+def validate_normalized_payload(payload: object, *, stored: bool = False) -> dict:
+    """Validate the canonical internal payload produced by shared intake validation.
+
+    `stored=True`：驗的是**已存紀錄**裡的 payload——只驗形狀，不依賴當下的名冊與字彙檔（R2-a N4）。"""
 
     if not isinstance(payload, dict):
         raise ValueError("normalized action payload must be an object")
@@ -425,9 +447,9 @@ def validate_normalized_payload(payload: object) -> dict:
     validate_action_slug(payload["action_slug"])
     _validate_report(payload["report"])
     if payload.get("focus_company_id") is not None:
-        _validate_focus_company_id(payload["focus_company_id"])
+        _validate_focus_company_id(payload["focus_company_id"], check_registry=not stored)
     if payload.get("layer_enumerations") is not None:
-        _validate_layer_enumerations(payload["layer_enumerations"])
+        _validate_layer_enumerations(payload["layer_enumerations"], check_vocab=not stored)
     documents = payload["documents"]
     if not isinstance(documents, list) or not 1 <= len(documents) <= MAX_DOCUMENTS:
         raise ValueError("normalized documents count is invalid")
@@ -614,7 +636,7 @@ def _validate_record(record: object) -> dict:
     if not isinstance(record.get("revision"), int) or record["revision"] < 1:
         raise ValueError("invalid Research Action revision")
     if record.get("payload") is not None:
-        validate_normalized_payload(record["payload"])
+        validate_normalized_payload(record["payload"], stored=True)
         if canonical_action_digest(record["payload"]) != record["action_digest"]:
             raise ValueError("Research Action payload digest mismatch")
     review = record.get("review")
@@ -629,7 +651,7 @@ def _validate_record(record: object) -> dict:
     # apply 後 payload 會被壓縮掉；層列舉與 prepare 當下的核對收據留在紀錄上（Phase 4 Step 4.2a）——
     # 驗收「至少 1 份 applied RA 帶 layer_enumerations 且核對通過」數的就是這兩欄。
     if record.get("layer_enumerations") is not None:
-        _validate_layer_enumerations(record["layer_enumerations"])
+        _validate_layer_enumerations(record["layer_enumerations"], check_vocab=False)
     check = record.get("layer_enumeration_check")
     if check is not None and (not isinstance(check, dict) or check.get("status") != "ok"):
         raise ValueError("Research Action layer enumeration check receipt is invalid")
@@ -809,7 +831,20 @@ def _next_action(state: str, git_status: str | None = None) -> str:
 _LAYER_STATUS_LABELS = {
     "named": "引文具名 ✓",
     "registry_has_no_name": "名冊無名可比（前置：先補名冊）",
+    "registry_names_shared": "名冊寫法都與另一家共用（前置：identity 待決）",
 }
+
+
+def _provenance_lines(document: dict) -> list[str]:
+    """文件清單的「發文者」一行（packet 與 apply 報告共用——R2-a N8：兩處各寫一份就會不一致）。
+    只在 manifest 帶這些鍵時印（Step 4.2 之後的新紀錄）；舊紀錄 render 逐字不變。"""
+
+    if not any(field in document for field in MANIFEST_PROVENANCE_FIELDS):
+        return []
+    return ["  - 發文者：origin=" + " ｜ ".join(
+        [str(document.get("origin_entity") or "未記錄"),
+         f"source_type={document.get('source_type') or '未記錄'}",
+         f"tier={document.get('evidence_tier') or '未記錄'}"])]
 
 
 def _render_layer_enumerations(record: dict) -> list[str]:
@@ -864,11 +899,7 @@ def render_review_packet(record: dict, *, now: datetime | None = None) -> str | 
             f"- `{document['doc_id']}` — {document['title']}; "
             f"storage=`{document['storage_permission']}`; {counts}"
         )
-        if any(field in document for field in MANIFEST_PROVENANCE_FIELDS):
-            lines.append("  - 發文者：origin=" + " ｜ ".join(
-                [str(document.get("origin_entity") or "未記錄"),
-                 f"source_type={document.get('source_type') or '未記錄'}",
-                 f"tier={document.get('evidence_tier') or '未記錄'}"]))
+        lines.extend(_provenance_lines(document))
         if document.get("url"):
             lines.append(f"  - URL: {document['url']}")
         for warning in document.get("validation_warnings") or []:
@@ -1215,6 +1246,7 @@ def _full_report(record: dict) -> str:
             f"- `{document['doc_id']}` — {document['title']}; "
             f"storage=`{document['storage_permission']}`; {counts}"
         )
+        lines.extend(_provenance_lines(document))
         if document.get("url"):
             lines.append(f"  - URL: {document['url']}")
         for warning in document.get("validation_warnings") or []:

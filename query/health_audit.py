@@ -395,11 +395,16 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 graph_lines.get("dup_url", []),
             )
         )
+        from loader.sourcedoc_sync import is_red as sourcedoc_is_red
         from loader.sourcedoc_sync import summary_line as sourcedoc_summary
 
         sync_lines = [f"- {sourcedoc_summary(sourcedoc_sync)}"] + [
             f"- ⛔ `{d['doc_id']}`.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
             for d in sourcedoc_sync["danger"]
+        ] + [
+            f"- ⛔ `{doc_id}`：圖上有、沒有任何抽取檔（重建不回來）" for doc_id in sourcedoc_sync["graph_without_json"]
+        ] + [
+            f"- ⛔ `extractions/{name}`：讀不了（重載時整份載不進去）" for name in sourcedoc_sync["unreadable_json"]
         ] + [
             f"- `{d['doc_id']}`.{d['field']}：圖＝{d['graph']!r} → JSON＝{d['json']!r}（重載即對齊）"
             for d in sourcedoc_sync["stale"]
@@ -407,7 +412,7 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
         report.extend(
             _section(
                 "SourceDoc 與抽取 JSON（L10：圖上的值要從 JSON 重建得回來）",
-                "red" if sourcedoc_sync["danger"] else ("yellow" if sourcedoc_sync["stale"] else "green"),
+                "red" if sourcedoc_is_red(sourcedoc_sync) else ("yellow" if sourcedoc_sync["stale"] else "green"),
                 sync_lines,
             )
         )

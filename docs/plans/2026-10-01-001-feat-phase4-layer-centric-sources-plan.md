@@ -190,7 +190,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 |---|---|---|---|---|
 | 4.0 | 基準快照（`docs/reports/2026-10-01-phase4-baseline.md`；凍結集合 `config/graph_baselines.json`） | ✅ | 執行模型 | 見 git log「Step 4.0」 |
 | 4.1 | 名冊與 origin 解析：Q8b-B → 名字比對函式 → `display_name` 100/100＋`name_aliases`＋`execution_symbol` → `_strip_annotation`／`_origin_mentions` 修 → enrichment 去除（R2-b：GO，non-blocking 處置見 §0.6 #5） | ✅ | 執行模型 | `09f192c`、`bae6870`＋收尾（見 git log「Step 4.1」） |
-| 4.2 | contract 批：packet `layer_enumerations`＋揭露；`source_type`／`origin_linkage`／`origin_role` 字彙；apply 入口；抽取 JSON section／title 回填＋`is_legit_multi_section` 共用（R2-a） | ○ | 執行模型 | |
+| 4.2 | contract 批：packet `layer_enumerations`＋揭露；`source_type`／`origin_linkage`／`origin_role` 字彙；apply 入口；抽取 JSON section／title 回填＋`is_legit_multi_section` 共用（R2-a：GO，non-blocking 處置見 §0.6 #9） | ✅ | 執行模型 | `a27036a`＋R2-a 收尾（見 git log「Step 4.2」） |
 | 4.3 | `config/publishers.json`＋`resolve_origin` 唯一 owner（`classify_evidence`／`verify_citations` 共用） | ○ | 執行模型 | |
 | 4.4 | 字表、`sub_language_in_quote`、三個常駐計數器（①②③）＋附屬計數器；走圖／結構表 artifact、心跳段 3、packet 警告 | ○ | 執行模型 | |
 | 4.5 | 走圖第 2 型記憶與終局；三個 skill 改寫＋`source_routes.json` 層文件 route＋skill 測試 | ○ | 執行模型 | |
@@ -220,6 +220,7 @@ Step 4.8 是研究步驟：執行者是強模型就直接做。每個 Step 一�
 | 7 | 4.2d | `scripts/apply_ra_admission.py --pq2 N --digest … [--leads …]`；第四道「紀錄 ready 且未過期」 | 沒有 `--leads`（apply 的 lead 同步沿用預設路徑）、多 `--pool`／`--root` 兩個測試用選項；同一個編號、同一個 digest 已蓋過戳記而中斷在 partial／applying 的紀錄也放行（重試） | apply 中斷時使用者要能用同一個核准重試，否則「只收 ready」會把唯一的重試路徑擋死；換編號仍拒絕（同一筆紀錄不能被兩個編號核准） |
 | 8 | 4.2e | `python -m audit invariants` 13 項 | 14 項（新增 `SourceDocSync`，INV-6） | plan §12 第 2 項「含新計數器」 |
 | 3 | 4.0 | 「凍結節點集合」「凍結的 assertion id 集合」存檔，未指定位置 | `config/graph_baselines.json` 的 `baselines.phase4_2026_10_01`（tracked、append-only、**只放 id 不放引文**；`.gitignore` 補白名單） | 4.4 的常駐計數器每天要對它算，scratchpad 只活一個 session；這份集合今天重取拿不回來（L10）；部分抽取檔受儲存權限限制不進 Git，所以引文全文只留 scratchpad |
+| 9 | 4.2 R2-a | （覆核 GO、blocking 0、non-blocking 8＋既有問題 1） | 當下處置 8 條：N1 名冊寫法全部與另一家共用（今天只有 OpenLight 兩個 id）→ 新狀態 `registry_names_shared`，列前置、不拒收（原本被當成「引文沒具名」拒收）；N2 蓋戳記在鎖內重查戳記（兩個未結編號同時跑，後到的不覆蓋）；N3 OPERATIONS 第 5 步改寫成實際跑過的那一次、repo 內串成一條的測試待 4.9；N4 讀**已存紀錄**時層列舉只驗形狀、不依賴當下字彙檔（對稱面：`focus_company_id` 也不再依賴當下名冊）；N5 沒戳記的舊 partial 拒絕訊息改說「重跑 prepare」；N6 `--apply-graph` 寫圖前核對編號（存在未結、`manual`、ref_id 以 `sourcedoc-title-sync:` 開頭；真實 [663] 通過、[662] 被擋）；N7 SourceDoc 計數器的紅燈判準收成一個 `is_red`：圖上有、沒有任何抽取檔與讀不了的抽取檔也算紅、而且計數（今天兩者 0、audit 照舊 PASS）；N8 apply 報告與 packet 共用同一個「發文者」行。新測試 7 條。既有問題（三張收據對不上任何現存或歸檔的抽取檔）記入 §14 #14 | 都在 10 行級、不動 contract（L17：當下修）；N1 會在 4.8／4.9 用到層 packet 之前誤拒，N6 守的正是 [663] 要走的那條寫圖路 |
 
 ## 0.7 反方驗證處置（2026-10-01；逐條原文在 workflow journal `wf_b64373a7-a95`，此處只列處置）
 
@@ -511,3 +512,4 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 11. **（4.1c 發現）`co:openlight` 與 `co:openlight_photonics` 是同一家公司的兩個 id**（OpenLight 自家新聞稿與 Tower 6-K 用後者、Semiconductor Today 那篇用前者）：合併是 identity 決定，本 Phase 不自行處理；名冊兩筆同名，名字比對對兩家都不算（`shared_name_forms`）。另：走圖第 9 型（重複節點）只掃非公司節點，所以沒抓到——要不要把公司節點納入。
 12. **（4.1c 發現）`co:nava_thailand` 疑似抽取錯誤**（Lumentum 法說逐字稿摘要的「Nava (Thailand)」可能是 Lumentum 泰國廠所在的 Navanakorn 工業區，不是公司）：它讓 `tech:cloud_transceiver_1_6t` 多了一家「供應商」；是研究題，名冊刻意不補名。
 13. **（4.1 R2-b）名字比對的潛在誤中（今天 0 筆）**：中日韓字整串比對「華星光」會比到「華星光電」（CSOT）；單字別名 `Sumitomo`／`Samsung` 會比到同集團其他公司；多詞寫法不分大小寫，小寫泛稱會比到公司名。要不要收緊（例：中文名要求後面不是「電」字、集團名要求接 Electric／Electronics）留待有誤中實例再決定（L17-4）。
+14. **（4.2 R2-a，既有、不是 4.2 造成）三張 graph completion 收據對不上任何現存或歸檔的抽取檔**：`poet_6_k_20260514`（188b17c9）、`sivers_ar_2025_photonics_excerpt`（97fca409）、`tower_marvell_coherent_pic_6k_2026_06_18`（a64e317f）——母檔在 a27036a 沒被改，問題更早就在。後果：日後要走更正走廊更正這三份，`intake/provenance.py::_supersede_completion_receipt` 會拒絕，而且是在寫圖**之後**才拒絕（[542] 的形狀）。要嘛找回舊版歸檔、要嘛登記這三張收據的處置；查證：R2-a 的 `task4b_receipts.py`（該次覆核 scratchpad）。

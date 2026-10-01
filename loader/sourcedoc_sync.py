@@ -75,18 +75,31 @@ def drift(graph_rows: Iterable[Mapping[str, Any]], json_docs: Mapping[str, list[
             else:
                 stale.append({"doc_id": doc_id, "field": field, "kind": "graph_behind_json",
                               "graph": graph_value, "json": json_value})
-    counts = {"danger": len(danger), "stale": len(stale), "graph_without_json": len(without_json)}
+    # 讀不了的抽取檔（`json_source_docs` 收在 `__unreadable__`）：重載時它整份載不進去——也是重建會遺失，必須計數（R2-a N7、INV-3）。
+    unreadable = sorted(str(f.get("file")) for f in json_docs.get("__unreadable__") or [])
+    counts = {"danger": len(danger), "stale": len(stale), "graph_without_json": len(without_json),
+              "unreadable_json": len(unreadable)}
     for name, items in (("danger", danger), ("stale", stale)):
         for field in FIELDS:
             counts[f"{name}_{field}"] = sum(1 for item in items if item["field"] == field)
-    return {"danger": danger, "stale": stale, "graph_without_json": sorted(without_json), "counts": counts}
+    return {"danger": danger, "stale": stale, "graph_without_json": sorted(without_json),
+            "unreadable_json": unreadable, "counts": counts}
+
+
+def is_red(result: Mapping[str, Any]) -> bool:
+    """紅燈（健康審查 🔴、audit FAIL）的唯一判準：重建會遺失或不確定。
+
+    三種都算（R2-a N7；L10「重新取一次拿不回來」）：欄位只在圖上或多份 JSON 互異（`danger`）、圖上有但**沒有任何**
+    抽取檔（最徹底的遺失：整份文件重建不回來）、抽取檔讀不了（重載時整份載不進去）。圖落後 JSON 不算（重載即對齊）。
+    """
+    return bool(result.get("danger") or result.get("graph_without_json") or result.get("unreadable_json"))
 
 
 def summary_line(result: Mapping[str, Any]) -> str:
     c = result["counts"]
     return (f"SourceDoc 與抽取 JSON：重建會遺失或不確定 {c['danger']}（section {c['danger_section']}／title "
             f"{c['danger_title']}）｜圖落後 JSON {c['stale']}（section {c['stale_section']}／title {c['stale_title']}）"
-            f"｜圖上有、沒有任何抽取檔 {c['graph_without_json']}")
+            f"｜圖上有、沒有任何抽取檔 {c['graph_without_json']}｜讀不了的抽取檔 {c.get('unreadable_json', 0)}")
 
 
-__all__ = ["FIELDS", "drift", "json_source_docs", "summary_line"]
+__all__ = ["FIELDS", "drift", "is_red", "json_source_docs", "summary_line"]

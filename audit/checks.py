@@ -188,20 +188,23 @@ def check_sourcedoc_sync() -> AuditResult:
     """SourceDoc 的 `section`／`title` 從抽取 JSON 重建得回來（L10；Phase 4 Step 4.2e 的常駐計數器）。
 
     算法只有一份：`loader/sourcedoc_sync.py`（健康審查同一份）。
-    - **FAIL**：重建會遺失或不確定——圖上有值、JSON 沒有；或同一個 doc_id 的多份 JSON 彼此互異（載入順序決定結果）。
+    - **FAIL**（`loader.sourcedoc_sync.is_red`，唯一判準）：重建會遺失或不確定——圖上有值、JSON 沒有；同一個 doc_id 的
+      多份 JSON 彼此互異（載入順序決定結果）；圖上有、沒有任何抽取檔；抽取檔讀不了（R2-a N7）。
     - **不算 FAIL、照列**：圖落後 JSON（JSON 是對的、圖還沒重載；重載即對齊）——把它算 FAIL 會讓「修好了 JSON、
       等核准改圖」的那段時間整份 audit 變紅，紅的卻不是風險（L15：gate 攔下的必須是它想攔的東西）。
     """
     def run() -> AuditResult:
-        from loader.sourcedoc_sync import drift, json_source_docs, summary_line
+        from loader.sourcedoc_sync import drift, is_red, json_source_docs, summary_line
 
         rows = sources.graph_rows(
             "MATCH (sd:SourceDoc) RETURN sd.id AS id, sd.section AS section, sd.title AS title")
         result = drift(rows, json_source_docs(ROOT / "extractions"))
-        danger = [f"⛔ {d['doc_id']}.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
-                  for d in result["danger"]]
+        danger = ([f"⛔ {d['doc_id']}.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
+                   for d in result["danger"]]
+                  + [f"⛔ {doc_id}：圖上有、沒有任何抽取檔（重建不回來）" for doc_id in result["graph_without_json"]]
+                  + [f"⛔ extractions/{name}：讀不了（重載時整份載不進去）" for name in result["unreadable_json"]])
         stale = [f"圖落後 JSON：{d['doc_id']}.{d['field']}：{d['graph']!r} → {d['json']!r}" for d in result["stale"]]
-        if danger:
+        if is_red(result):
             return fail("SourceDocSync", summary_line(result), _clip(danger + stale), len(rows))
         return ok("SourceDocSync", summary_line(result), len(rows), _clip(stale))
 

@@ -817,7 +817,7 @@ apply 沒完成（看輸出的 next_action）。私有函式 `intake.application
 | **2 skill／prompt／本檔** | `prompts/intake_protocol.md` §4.3、`skills/daily-brief/SKILL.md`、`skills/lead-intake/SKILL.md` 改指本入口；本節。 |
 | **3 最窄 rule** | **互動專用，沒有新增任何 rule**：不進 `.codex/rules`（仍是 0 條前綴）、不進 daily 固定步驟、不進 `.claude/settings.json` 的 allow。它落在本機 `.claude/settings.local.json` 既有的寬鬆放行 `Bash(python *)` 之下——補償控制是**四道檢查＋核准戳記＋`complete-ra` 比對戳記**（沒經過入口的 apply 結不了案）。 |
 | **4 permission contract test** | `tests/test_apply_ra_admission.py::test_entry_is_interactive_only`（rules／daily 步驟／專案 allow 都不含本入口）、四道拒絕不寫入、戳記先於 apply、partial 只能原編號重試；`tests/test_engine_b_todo.py::test_complete_ra_refuses_an_apply_that_bypassed_the_entry`。 |
-| **5 端到端 smoke** | 2026-10-01 夾具版（fake loader）由 prepare → 池裡 `ra_admission` → 本入口 → `complete-ra` 跑通（Step 4.9 full chain）；真資料只跑拒絕路徑（已結案的編號 exit 2、沒有寫入）。 |
+| **5 端到端 smoke** | 2026-10-01 R2-a 覆核者在暫存根目錄以夾具（fake loader）跑過 create → 池裡 `ra_admission` → 本入口 → `complete-ra`（經入口的那筆結得了案、繞過入口的被拒；腳本在該次覆核的 scratchpad）；**repo 裡串成一條的測試待 Step 4.9 full chain**（今天 `tests/test_apply_ra_admission.py` 停在 apply、complete-ra 的測試用 mock 紀錄）。真資料只跑拒絕路徑（已結案的編號 exit 2、沒有寫入）。 |
 
 ### 入圖收尾
 ```powershell
