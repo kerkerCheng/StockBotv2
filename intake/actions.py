@@ -257,7 +257,8 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
     """
 
     from identity.registry import get_registry
-    from query.bottleneck import company_id_for_origin, company_name_forms, quote_names_company, shared_name_forms
+    from query.bottleneck import company_name_forms, quote_names_company, shared_name_forms
+    from query.origin_resolution import resolve_origin
 
     reg = registry if registry is not None else get_registry()
     shared = shared_name_forms(reg)
@@ -318,8 +319,13 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
         origins = []
         for doc_id, source_doc in sorted(enum_docs.items()):
             origin = source_doc.get("origin_entity")
-            resolved = company_id_for_origin(origin, reg) if origin else None
-            origins.append({"doc_id": doc_id, "origin_entity": origin, "resolved": resolved})
+            # origin 解析走唯一 owner（Phase 4 Step 4.3 的 `resolve_origin`：名冊公司 → 登記的發布者 → 解析不到）。
+            # 2026-10-01 Step 4.8 實跑撞到：原本只認名冊公司，登記的產業研究（GSR）在 packet 上印成「解析不到」（L16）。
+            resolution = resolve_origin(origin, reg) if origin else None
+            resolved = resolution.id if resolution is not None and resolution.kind == "company" else None
+            origins.append({"doc_id": doc_id, "origin_entity": origin, "resolved": resolved,
+                            "origin_kind": resolution.kind if resolution is not None else None,
+                            "publisher_kind": resolution.publisher_kind if resolution is not None else None})
             if enum["origin_role"] == "supplier_self":
                 if resolved not in suppliers:
                     warnings.append(f"{label}：origin_role=supplier_self，但 {doc_id} 的 origin「{origin}」"
@@ -915,8 +921,10 @@ def _render_layer_enumerations(record: dict) -> list[str]:
             f"`{s}`（{_LAYER_STATUS_LABELS.get(status.get(s), status.get(s) or '未核對')}）" for s in enum["suppliers"])
         lines.append(f"- `{enum['node']}` ← {enum['relation']}：{suppliers}；發文者角色 `{enum['origin_role']}`")
         for origin in result.get("origins") or []:
-            lines.append(f"  - `{origin.get('doc_id')}` origin「{origin.get('origin_entity') or '未記錄'}」"
-                         f"→ {origin.get('resolved') or '解析不到'}")
+            # 舊收據沒有 origin_kind：照舊只印公司或「解析不到」（舊紀錄的 render 逐字不變）
+            shown = (f"登記的發布者（{origin.get('publisher_kind')}）" if origin.get("origin_kind") == "publisher"
+                     else origin.get("resolved") or "解析不到")
+            lines.append(f"  - `{origin.get('doc_id')}` origin「{origin.get('origin_entity') or '未記錄'}」→ {shown}")
     for prerequisite in check.get("prerequisites") or []:
         lines.append(f"- 前置：{prerequisite}")
     for warning in check.get("warnings") or []:

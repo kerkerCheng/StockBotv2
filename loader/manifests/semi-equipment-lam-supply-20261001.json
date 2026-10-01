@@ -1,0 +1,16 @@
+{
+  "_comment": "Phase 4 Step 4.8 第 3 項（lead_656e8e10664835d242e6985cd8354dbc；走圖第 2 型：tech:semiconductor_manufacturing_equipment 圖上只有 co:applied_materials 一家、證據只有它自己說）。WFE 是多家的市場：Lam 自己的 10-Q（2026-04-23）既有逐字 s4「Lam Research Corporation is a global supplier of innovative wafer fabrication equipment and services to the semiconductor industry.」支持它也供這一層。客戶端具名列舉查過不存在：GlobalFoundries 2026-02-27 20-F 全文（約 66 萬字）沒有具名任何設備商。TEL、ASML、KLA 不在名冊（要 onboard 才能入圖），本包不含。只引用該檔既有 sources、逐字一字不動；端點照抄圖上現值。入圖要 pq2 go（graph admission）。",
+  "additions": [
+    {
+      "file": "lrcx_10_q_20260423.json",
+      "edge": {
+        "src_id": "co:lam_research",
+        "relation": "supplies_to",
+        "dst_id": "tech:semiconductor_manufacturing_equipment",
+        "source_ids": ["lrcx_10_q_20260423_s4"],
+        "confidence": 0.8,
+        "attributes": {}
+      }
+    }
+  ]
+}

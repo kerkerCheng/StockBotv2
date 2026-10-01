@@ -71,6 +71,9 @@ SCOPE_JUDGE_MIN = 10
 ALWAYS_ON_RATE = 0.5
 #: lead 在這兩個狀態才算「正在研究的線索」（第 5 型母體；與佇列段 `triaged_go_leads` 同一組）。
 ACTIVE_LEAD_STATUSES = frozenset({"triaged_go", "researching"})
+#: 第 2 型的記憶算「還沒結」的：研究中＋研究包已備好等核准（`action_prepared`）。2026-10-01 Step 4.8 實跑撞到：
+#: 只借用上面那一組時，研究包掛 pq2 等 go 的 lead 不旁印，下一個 session 會在同一筆命中旁重鑄（L17：當下修）。
+OPEN_LEAD_STATUSES = ACTIVE_LEAD_STATUSES | {"action_prepared"}
 #: 讀圖狀態裡算「現行」的（第 2 型的記憶；`alpha.structure_reading.staleness.READING_STATUSES` 的字彙）。
 #: stale_low 只有證據等級變了——結構沒變，讀過的那一份仍算數。
 CURRENT_READING_STATUSES = frozenset({"current", "stale_low"})
@@ -79,8 +82,8 @@ CURRENT_READING_STATUSES = frozenset({"current", "stale_low"})
 def open_leads_by_subject(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[str, Any]]) -> dict[str, list[str]]:
     """走圖起的研究還在進行的 lead（refs `graph_walk_subject`；Phase 4 Step 4.5a）：節點 → lead id。
 
-    「進行中」＝ triaged_go／researching，或 parked 但追源狀態不是終局（等具名揭露、等存取……）。
-    parked 而終局（not_pursued、original_obtained…）＝已經有答案，不再旁印。
+    「還沒結」＝ triaged_go／researching／action_prepared（研究包掛 pq2 等 go），或 parked 但追源狀態不是終局
+    （等具名揭露、等存取……）。applied、parked 而終局（not_pursued、original_obtained…）＝已經有答案，不再旁印。
     """
     from engine_b.lead_refs import get_trace_status_registry
 
@@ -94,7 +97,7 @@ def open_leads_by_subject(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapp
             continue
         status = str(lead.get("status") or "")
         trace = str(refs.get("trace_status") or "").strip()
-        if status in ACTIVE_LEAD_STATUSES or (status == "parked" and not (trace and registry.is_terminal(trace))):
+        if status in OPEN_LEAD_STATUSES or (status == "parked" and not (trace and registry.is_terminal(trace))):
             out.setdefault(subject, []).append(str(lead.get("lead_id")))
     return {k: sorted(v) for k, v in out.items()}
 
@@ -651,7 +654,7 @@ if __name__ == "__main__":
 
 
 __all__ = [
-    "ACTIVE_LEAD_STATUSES", "ALWAYS_ON_RATE", "QUESTION_BY_KEY", "QUESTION_TYPES", "QUESTION_TYPE_KEYS",
+    "ACTIVE_LEAD_STATUSES", "ALWAYS_ON_RATE", "OPEN_LEAD_STATUSES", "QUESTION_BY_KEY", "QUESTION_TYPES", "QUESTION_TYPE_KEYS",
     "QuestionType", "SCOPE_JUDGE_MIN", "THIS_IS_NOT", "TITLE", "collect", "coverage_questions",
     "duplicate_questions", "fraction", "lead_not_in_graph", "layer_questions", "reading_stale",
     "render_markdown", "summary_line", "supplier_no_anchor", "walk",

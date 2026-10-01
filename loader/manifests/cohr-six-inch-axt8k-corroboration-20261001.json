@@ -1,0 +1,16 @@
+{
+  "_comment": "Phase 4 Step 4.8 第 4 項（lead_21765850ffd25e34a02986223be82825；走圖第 2 型：tech:six_inch_inp_production 圖上只有 co:coherent 一家、證據只有它自己說）。同一份 AXT 8-K（origin＝AXT，交易對手）既有的逐字 s2／s3 也支持 Coherent 在做 6 吋 InP 量產：AXT 依協議量產供應 6 吋 InP 基板給 Coherent、Coherent 預付 22,288,500 美元換 AXT 擴產。只引用該檔既有 sources、逐字一字不動；端點照抄圖上現值。入圖要 pq2 go（graph admission）。",
+  "additions": [
+    {
+      "file": "axti_8_k_20260702_coherent_inp_supply.json",
+      "edge": {
+        "src_id": "co:coherent",
+        "relation": "supplies_to",
+        "dst_id": "tech:six_inch_inp_production",
+        "source_ids": ["axti_8_k_20260702_coherent_inp_supply_s2", "axti_8_k_20260702_coherent_inp_supply_s3"],
+        "confidence": 0.8,
+        "attributes": {}
+      }
+    }
+  ]
+}

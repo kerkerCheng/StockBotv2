@@ -213,6 +213,21 @@ def test_new_manifest_carries_publisher_fields_and_packet_prints_them(tmp_path: 
     assert "## 層列舉" not in packet                                         # 沒宣告就整節不印
 
 
+def test_packet_resolves_the_origin_with_the_single_owner_so_a_registered_publisher_is_not_unresolved(
+        tmp_path: Path) -> None:
+    """2026-10-01 Step 4.8 實跑撞到：層列舉的 origin 原本只認名冊公司，登記的產業研究（Global Semi Research）在 packet 上
+    印成「解析不到」——審包的人會以為它不算印證。改走 `query.origin_resolution.resolve_origin`（4.3 的唯一 owner，L16）。"""
+    payload = _payload(_extraction(), [_enum()])
+    check = research_actions.check_layer_enumerations(payload)
+    origin = check["results"][0]["origins"][0]
+    assert (origin["origin_kind"], origin["publisher_kind"], origin["resolved"]) == (
+        "publisher", "industry_research", None)
+    record = research_actions.create_action(payload, root=tmp_path)
+    packet = research_actions.render_review_packet(record)
+    assert "origin「Global Semi Research」→ 登記的發布者（industry_research）" in packet
+    assert "origin「Global Semi Research」→ 解析不到" not in packet
+
+
 OLD_RECORD = {
     "action_id": "ra_" + "0" * 32,
     "action_digest": "a" * 64,

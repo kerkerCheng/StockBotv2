@@ -235,7 +235,8 @@ def test_a_socket_reading_does_not_silence_the_layer_question() -> None:
 
 
 def test_sole_supplier_hit_prints_the_open_lead_that_is_already_chasing_it() -> None:
-    """走圖起的研究還在進行（triaged_go／researching／parked 非終局）就旁印 lead id；終局的不印。"""
+    """走圖起的研究還沒結（triaged_go／researching／action_prepared／parked 非終局）就旁印 lead id；終局的不印。
+    action_prepared＝研究包掛 pq2 等 go（2026-10-01 Step 4.8 實跑撞到漏印，第 5 型的「正在研究」那組不動）。"""
     leads = {
         **fake_leads(),
         "G1": {"lead_id": "G1", "status": "researching", "refs": {"graph_walk_subject": "mat:sole"}},
@@ -244,9 +245,10 @@ def test_sole_supplier_hit_prints_the_open_lead_that_is_already_chasing_it() -> 
         "G3": {"lead_id": "G3", "status": "parked",
                "refs": {"graph_walk_subject": "mat:sole", "trace_status": "not_pursued"}},
         "G4": {"lead_id": "G4", "status": "applied", "refs": {"graph_walk_subject": "mat:sole"}},
+        "G5": {"lead_id": "G5", "status": "action_prepared", "refs": {"graph_walk_subject": "mat:sole"}},
     }
     hit = _q(run_walk(leads=leads), "sole_supplier_self_reported")["hits"][0]
-    assert hit["open_lead"] == ["G1", "G2"] and hit["reading"] is None
+    assert hit["open_lead"] == ["G1", "G2", "G5"] and hit["reading"] is None
     assert _q(run_walk(), "sole_supplier_self_reported")["hits"][0]["open_lead"] == []
 
 
