@@ -290,8 +290,7 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
 
 
 def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, *,
-               three_questions: Mapping[str, Any] | None, three_questions_note: str | None = None,
-               judgment_conditions: Sequence[Mapping[str, Any]] = ()) -> dict[str, Any]:
+               three_questions: Mapping[str, Any] | None, three_questions_note: str | None = None) -> dict[str, Any]:
     """個股頁首屏的候選狀態＋三個字、downside 的反證對 watch（Step 3.7）。**與候選板同一個 `derive_row`**——
     個股頁不另推一份（L16）。`three_questions`：這一頁 read model 已算好的那一份（與候選板同一個函式、同一個
     `history_not_comparable`）；沒有敘事也沒有持有時 `row` 是 None，三個字照印（會死嗎看燈；兩題「未答」）。"""
@@ -334,7 +333,6 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
             "downside": downside_rows(company_id, ticker, records=records, current_brief=v2,
                                       watches=context["watches"], lifecycle=context["lifecycle"],
                                       reading_rows=context["reading_rows"],
-                                      judgment_conditions=judgment_conditions,
                                       retracted_cells=context.get("retracted_cells") or ())}
 
 

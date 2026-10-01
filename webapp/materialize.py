@@ -295,13 +295,11 @@ def candidate_input_for(context: Mapping[str, Any], view: Any) -> dict[str, Any]
     else:
         three, note = {"will_it_die": list(tq.will_it_die), "priced_in": list(tq.priced_in),
                        "in_numbers": list(tq.in_numbers)}, None
-    judgments = [{"condition": c.condition, "check_frequency": c.check_frequency, "action": c.action_within_48h}
-                 for c in view.falsification.conditions]
     try:
         from alpha.providers.candidates import page_input
 
         return page_input(context, str(view.identity.ticker), view.identity.company_id, three_questions=three,
-                          three_questions_note=note, judgment_conditions=judgments)
+                          three_questions_note=note)
     except Exception as exc:  # noqa: BLE001 — 一檔推不出只讓這一檔的兩個選配面板說讀不到
         return {"absence": {"kind": "upstream_unavailable",
                             "reason": f"這一檔的候選狀態推不出來（{type(exc).__name__}: {str(exc)[:120]}）"}}

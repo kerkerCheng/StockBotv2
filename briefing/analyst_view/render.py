@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import Any, Iterable, Mapping, Sequence
 
-from briefing.alpha_view.contracts import BASIS_LABEL, CatalystItem, CheckpointItem, Datum, DisproofItem, EvidenceItem, RefreshItem
+from briefing.alpha_view.contracts import BASIS_LABEL, CatalystItem, CheckpointItem, Datum, EvidenceItem, RefreshItem
 from briefing.alpha_view.render import format_datum_value, render_datum_line, status_label
 from shared.markdown import markdown_text
 
@@ -174,18 +174,6 @@ def _catalyst_lines(catalysts: Sequence[CatalystItem], checkpoints: Sequence[Che
                        f" — 裁決：{markdown_text(point.decides)}〔`{point.source}`〕")
     if not out:
         out.append("- **無結構化催化劑與檢核點**——不是「沒有催化劑」，是這檔還沒有人把它們寫成結構化紀錄。")
-    out.append("")
-    return out
-
-
-def _disproof_lines(conditions: Sequence[DisproofItem]) -> list[str]:
-    if not conditions:
-        return ["- **無結構化 disproof**——出場靠 disproof，這一格空著就等於沒有出場條件。", ""]
-    out: list[str] = []
-    for item in conditions:
-        out.append(f"- {markdown_text(item.condition)}")
-        out.append(f"  - 核查頻率：{markdown_text(item.check_frequency)}｜"
-                   f"觸發後 48 小時：{markdown_text(item.action_within_48h)}")
     out.append("")
     return out
 
@@ -421,7 +409,8 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     lines += ["### 5.3 催化劑與檢核點", ""]
     lines += _catalyst_lines(research.catalysts, research.checkpoints)
     lines += ["### 5.4 什麼會推翻它（出場靠 disproof）", ""]
-    lines += _disproof_lines(research.disproofs)
+    # 2026-10-01 Phase 4 Step 4.7a：舊 session 判讀的反證退役（恆「未盯」）。反證只列反證登記涵蓋的來源，住 downside 面板。
+    lines += ["- 反證與盯它的 watch 在個股頁「錯了怎麼知道」面板（APP；本 CLI 不載 watch）。", ""]
     lines += ["### 5.5 生命週期與到期", ""]
     lines += _compact_table(_by_role(research, "lifecycle"))
     lines += ["### 5.6 需要重看的研究成果", ""]

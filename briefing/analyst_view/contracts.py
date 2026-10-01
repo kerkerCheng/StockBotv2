@@ -38,7 +38,7 @@ from typing import Any, Mapping, Sequence
 
 from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS, check_absence_kind
 from briefing.alpha_view.contracts import (
-    CatalystItem, CheckpointItem, Datum, DisproofItem, EvidenceItem, RefreshItem, _jsonable,
+    CatalystItem, CheckpointItem, Datum, EvidenceItem, RefreshItem, _jsonable,
 )
 
 SCHEMA_VERSION = "analyst-view/1"
@@ -405,7 +405,8 @@ class AnalystPanel:
     weak_inputs: tuple[WeakInput, ...] = ()
     catalysts: tuple[CatalystItem, ...] = ()
     checkpoints: tuple[CheckpointItem, ...] = ()
-    disproofs: tuple[DisproofItem, ...] = ()
+    # ⚠ `disproofs`（research 面板的舊 session 判讀反證）2026-10-01 Phase 4 Step 4.7a 退役：恆「未盯」的一欄。
+    # 反證住 downside 面板（只列反證登記涵蓋的來源）；判斷檔原樣留，alpha-card CLI 第 11 節照舊印 read model。
     evidence: tuple[EvidenceItem, ...] = ()
     attention: tuple[RefreshItem, ...] = ()
     #: `attention` 被篩過時，這裡逐字寫出**篩到剩下什麼**；`None`＝沒篩，就是全部。

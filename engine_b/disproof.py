@@ -455,26 +455,25 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
 DOWNSIDE_STATES: Mapping[str, str] = {
     "touched": "觸及待處置", "expired": "到期待複查", "fired": "醒來待判", "active": "在盯", "unwatched": "未盯",
 }
-#: 反證的出處（封閉字彙）。`judgment` 是舊 session assessor 判讀的反證：反證登記（thesis／讀圖／敘事）不涵蓋它，
-#: 系統沒有來源鍵對得回任何 watch——照實印「未盯」，不猜文字相似。
+#: 反證的出處（封閉字彙）。
+#: ⚠ 2026-10-01 Phase 4 Step 4.7a 退役 `judgment`（舊 session assessor 判讀的反證）：反證登記（thesis／讀圖／敘事）
+#: 不涵蓋它、沒有來源鍵對得回任何 watch，所以 4.0 基準 63 檔 240 條**永遠印「未盯」**——恆亮的一欄（L14-4）。
+#: 判斷檔原樣留（私有、不是 ledger）；要讓某條被盯，走反證登記，不是在這裡印。
 DOWNSIDE_SOURCES: Mapping[str, str] = {
     "brief": "敘事自己登記的反證", "link": "敘事連到既有來源的反證", "thesis": "thesis memo 的推翻條件",
     "reading": "押的那份讀圖的反證", "watch_only": "歸屬本檔、但條件不在現行來源裡的 watch",
-    "judgment": "舊判讀（session assessor）的反證——反證登記不涵蓋",
 }
 
 
 def downside_rows(company_id: str | None, ticker: str, *, records: Sequence[Any], current_brief: Any,
                   watches: Sequence[Mapping[str, Any]], lifecycle: Mapping[str, Any] | None,
-                  reading_rows: Mapping[tuple[str, str], Mapping[str, Any]],
-                  judgment_conditions: Sequence[Mapping[str, Any]] = (), root: Path | None = None,
+                  reading_rows: Mapping[tuple[str, str], Mapping[str, Any]], root: Path | None = None,
                   retracted_cells: Iterable[tuple[str, str | None]] = ()) -> dict[str, Any]:
     """個股頁 downside（Phase 3 Step 3.7）：這家公司名下**每一條反證** → 盯它的 watch id 與狀態；沒有 watch 印「未盯」。
 
     歸屬用 `engine_b.narrative_watches.attributed_watches`（plan §5 第 8 點，單一 SSOT）；條件落哪一格用
     `watch_category`、條件身分用 `condition_key`——與心跳段 2／audit 的反證計數同一套（L16）。
-    `current_brief`：現行 v2 敘事或 None；`judgment_conditions`：舊 session 判讀的反證（read model 的
-    `falsification.conditions`），每條 `{condition, check_frequency, action}`。"""
+    `current_brief`：現行 v2 敘事或 None。"""
     from engine_b.narrative_watches import attributed_watches, thesis_memos
     from thesis.memo_structure import disproof_items
 
@@ -581,9 +580,6 @@ def downside_rows(company_id: str | None, ticker: str, *, records: Sequence[Any]
         used.add(str(watch.get("watch_id")))
         rows.append(row("watch_only", str(watch.get("source_ref") or ""), str(watch.get("condition") or ""),
                         watch.get("check_frequency"), watch.get("action_48h"), cat, watch))
-    for item in judgment_conditions:
-        rows.append(row("judgment", None, str(item.get("condition") or ""), item.get("check_frequency"),
-                        item.get("action"), None, None))
     # 同一筆 watch 只印一列：敘事以來源鍵連到自家 thesis／騎的讀圖的反證時，兩個來源指的是同一個等待——
     # 印兩列會讓「在盯」多算一次（心跳段 2 的計數也不另算連結）。後到的來源併進 `also`，不丟（2026-09-30 真實資料試跑）。
     merged: list[dict[str, Any]] = []
@@ -604,9 +600,8 @@ def downside_rows(company_id: str | None, ticker: str, *, records: Sequence[Any]
     else:
         # 理由照事實組（3.7 覆核：原本寫死「沒有 v2 敘事」，有 v2 敘事但它沒寫反證、或騎的讀圖已換版時是錯的）。
         facts = ["沒有 thesis memo" if not thesis_memos(ticker, lifecycle) else "thesis memo 沒有推翻條件",
-                 ("v2 敘事沒有寫自己的反證" if getattr(current_brief, "record_version", None) else "沒有 v2 敘事"),
-                 "沒有舊判讀的反證"]
-        reason = "這家公司名下還沒有任何反證（" + "、".join(facts) + "）"
+                 ("v2 敘事沒有寫自己的反證" if getattr(current_brief, "record_version", None) else "沒有 v2 敘事")]
+        reason = "這家公司名下還沒有任何登記的反證（" + "、".join(facts) + "）"
         if rewrite_needed:
             reason += "；" + "、".join(rewrite_needed) + "——先重寫敘事"
         empty = {"kind": "not_yet_recorded", "reason": reason}

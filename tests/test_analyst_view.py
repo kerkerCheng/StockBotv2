@@ -117,7 +117,7 @@ def test_every_consumer_cell_is_the_same_object_as_the_read_model_cell() -> None
         )
     # 證據／催化劑／disproof／refresh item 也一樣是參照，不是重建
     assert all(item in view.evidence.index for item in analyst.argument.evidence)
-    assert analyst.research.disproofs == view.falsification.conditions
+    assert not hasattr(analyst.research, "disproofs"), "舊判讀反證 4.7a 退役：research 面板不再帶它"
     assert analyst.research.catalysts == view.catalysts.structured
     assert all(item in view.refresh_status.items for item in analyst.research.attention)
 

@@ -342,7 +342,7 @@ def test_view_contains_no_position_fields() -> None:
     # `to_dict()`，那是這條測試真正的主詞；退役後連那個 section 都不存在了。
     assert not hasattr(view, "entry_logic"), "退役的 section 不得復活"
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` section 隨 E 組（四價 overlay）退役。
-    # 反證那一端沒有退役——它在 research 面板的 disproofs（Phase 3 會讓每條連到一個 watch）。
+    # 反證那一端沒有退役——它在「錯了怎麼知道」（downside）面板，每條連到盯它的 watch（舊判讀的反證 4.7a 退役不印）。
     assert not hasattr(view, "downside"), "退役的 section 不得復活"
 
 
@@ -376,7 +376,7 @@ def test_missing_snapshot_makes_sections_missing_not_not_modeled() -> None:
     assert view.fundamentals.meta.status == "missing"
     assert view.consensus.meta.status == "missing"
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：`downside` section 隨 E 組（四價 overlay）退役。
-    # 反證那一端沒有退役——它在 research 面板的 disproofs（Phase 3 會讓每條連到一個 watch）。
+    # 反證那一端沒有退役——它在「錯了怎麼知道」（downside）面板，每條連到盯它的 watch（舊判讀的反證 4.7a 退役不印）。
     assert not hasattr(view, "downside"), "退役的 section 不得復活"
     price = next(d for d in view.fundamentals.items if d.key == "price")
     assert price.value is None and price.status == "missing"

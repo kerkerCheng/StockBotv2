@@ -216,7 +216,7 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
         status=worst_status(list(statuses.values())), optional=False,
         source_sections=("variant_view", "falsification", "catalysts", "refresh_status"),
         source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
-        catalysts=ct.structured, checkpoints=ct.checkpoints, disproofs=fs.conditions,
+        catalysts=ct.structured, checkpoints=ct.checkpoints,
         attention=_attention(view), attention_total=len(_attention(view)), risks=vv.risks,
         notes=tuple(ct.problems) + tuple(rs.notes),
         context={"has_signal": signal.has_signal, "judged_at": signal.judged_at,
@@ -470,7 +470,7 @@ def _downside_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
     與心跳段 2 的反證計數同一套）。本層照抄，一個字都不造。"""
     base = dict(key="downside", title="錯了怎麼知道：每條反證與盯它的 watch", questions=(), optional=True,
                 source_sections=("downside",))
-    notes = ("「未盯」＝條件寫了，但沒有 watch 會在它成真時叫醒你；舊判讀（session assessor）的反證不在反證登記範圍，一律未盯。",
+    notes = ("「未盯」＝條件寫了，但沒有 watch 會在它成真時叫醒你。",
              "反證用來決定何時認錯，不是進場的前置條件；觸及後要不要改 thesis 由你決定（thesis mutation 是人工 gate）。")
     if candidate is None:
         candidate = {"absence": {"kind": "upstream_unavailable",
@@ -485,7 +485,7 @@ def _downside_panel(candidate: Mapping[str, Any] | None) -> AnalystPanel:
     extra = tuple(downside.get("notes") or ())
     if not rows:
         # 空的是哪一種空由產生端宣告（`downside_rows` 的 `empty`）：來源讀不到時是 upstream_unavailable，不是「還沒有反證」。
-        declared = downside.get("empty") or {"kind": "not_yet_recorded", "reason": "這家公司名下還沒有任何反證"}
+        declared = downside.get("empty") or {"kind": "not_yet_recorded", "reason": "這家公司名下還沒有任何登記的反證"}
         return AnalystPanel(**base, status="missing", source_statuses={"downside": "missing"},
                             source_absence_kinds={"downside": declared.get("kind") or "not_yet_recorded"},
                             notes=extra + notes,

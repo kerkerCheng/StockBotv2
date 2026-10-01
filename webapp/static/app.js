@@ -504,20 +504,7 @@ function renderResearch(view) {
   const rows = (panel.lines || []).filter((line) => line.role === 'thesis' || line.role === 'lifecycle');
   if (rows.length) node.appendChild(renderRows(rows));
 
-  if (panel.disproofs && panel.disproofs.length) {
-    node.appendChild(el('div', 'group-title', '什麼會推翻它（disproof）'));
-    const list = el('ul', 'weak');
-    panel.disproofs.forEach((item) => {
-      const li = el('li', null, item.condition || item.label || JSON.stringify(item));
-      const bits = [];
-      if (item.check_frequency) bits.push('核查頻率 ' + item.check_frequency);
-      if (item.action_on_trigger) bits.push('觸發後 ' + item.action_on_trigger);
-      if (item.status) bits.push('狀態 ' + item.status);
-      if (bits.length) li.appendChild(el('span', 'rule', bits.join('｜')));
-      list.appendChild(li);
-    });
-    node.appendChild(list);
-  }
+  // 舊 session 判讀的反證（`panel.disproofs`）2026-10-01 Phase 4 Step 4.7a 退役：恆「未盯」。反證住「錯了怎麼知道」面板。
   if (panel.catalysts && panel.catalysts.length) {
     node.appendChild(group(`催化劑（${panel.catalysts.length}）`, () => listOf(
       panel.catalysts.map((c) => [c.description || c.label, c.expected_at || c.due, c.date_confidence, c.state]
@@ -657,7 +644,7 @@ function conclusionCard(payload, view) {
     node.appendChild(box);
   }
   // ⚠ 2026-09-23（Phase 0 Step 0b.1b）：目標價、隱含報酬、兩桿拆解、stance 橫幅、epistemics 一句話
-  // 隨估值鏈退役（C／H 組）；賭注／下檔的四價區塊已隨 E 組退役。反證那一端在 research 面板的 disproofs。
+  // 隨估值鏈退役（C／H 組）；賭注／下檔的四價區塊已隨 E 組退役。反證那一端在「錯了怎麼知道」面板（downside）。
   // D2（2026-09-18）：歸零旗標。它問「這家公司會不會直接歸零」。
   node.appendChild(wipeoutBlock(view));
   return node;
@@ -795,7 +782,7 @@ function blockerCard(payload) {
 
 /* 錯了怎麼知道（Phase 3 Step 3.7，論證層）：每一條反證連到盯它的 watch；沒有 watch 的印「未盯」。
    **全部照抄** downside 面板（歸屬＝`attributed_watches`、落格＝`watch_category`，與心跳段 2 同一套）；
-   本畫面不判、不算，連計數都是 materialize 端給的。舊判讀（session assessor）的反證不在反證登記範圍，一律未盯。 */
+   本畫面不判、不算，連計數都是 materialize 端給的。舊判讀（session assessor）的反證 2026-10-01 退役、不在這裡印。 */
 function downsideCard(view) {
   const panel = view.downside;
   if (!panel) return null;

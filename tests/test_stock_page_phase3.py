@@ -25,7 +25,7 @@ from briefing.analyst_view import build_analyst_view
 from briefing.analyst_view.compose import _readiness
 from briefing.analyst_view.contracts import BLOCKED, READY_WITH_FLAGS
 from engine_b import event_watch as ew
-from engine_b.disproof import DOWNSIDE_STATES, downside_rows, watch_category
+from engine_b.disproof import DOWNSIDE_SOURCES, DOWNSIDE_STATES, downside_rows, watch_category
 from tests.test_analyst_view import _bare_view, _full_view
 
 TODAY = date(2026, 9, 30)
@@ -95,9 +95,7 @@ def test_downside_links_every_disproof_to_its_watch_and_prints_unwatched(tmp_pat
         _sem("ew_other", "thesis:thesis/other.md#1", "別家的條件（不歸屬本檔）" * 3),
     ]
     out = downside_rows(CO, T, records=[brief], current_brief=brief, watches=watches, lifecycle=LIFECYCLE,
-                        reading_rows=READING_ROWS, root=_memo_root(tmp_path),
-                        judgment_conditions=[{"condition": "舊判讀的推翻條件", "check_frequency": "每季",
-                                              "action": "重看"}])
+                        reading_rows=READING_ROWS, root=_memo_root(tmp_path))
     rows = {(r["source"], r["condition"]): r for r in out["rows"]}
     assert rows[("thesis", MEMO_ITEMS[0])]["watch_id"] == "ew_memo" and rows[("thesis", MEMO_ITEMS[0])]["state"] == "active"
     assert rows[("thesis", MEMO_ITEMS[1])]["watch_id"] is None and rows[("thesis", MEMO_ITEMS[1])]["state_label"] == "未盯"
@@ -108,10 +106,10 @@ def test_downside_links_every_disproof_to_its_watch_and_prints_unwatched(tmp_pat
     assert ("reading", READ_COND) not in rows
     assert link["also"] == [{"source": "reading", "source_label": "押的那份讀圖的反證", "source_ref": f"reading:{READ}",
                              "condition": READ_COND}]
-    judged = rows[("judgment", "舊判讀的推翻條件")]
-    assert judged["watch_id"] is None and judged["state"] == "unwatched" and "不涵蓋" in judged["source_label"]
+    # 舊 session 判讀的反證 2026-10-01 Phase 4 Step 4.7a 退役（恆「未盯」）：來源字彙與列都沒有它
+    assert "judgment" not in DOWNSIDE_SOURCES and all(r["source"] != "judgment" for r in out["rows"])
     assert all(r["watch_id"] != "ew_other" for r in out["rows"]), "歸屬以來源判：別家 memo 的 watch 不算本檔"
-    assert out["counts"]["unwatched"] == 2 and out["counts"]["fired"] == 1 and out["counts"]["active"] == 2
+    assert out["counts"]["unwatched"] == 1 and out["counts"]["fired"] == 1 and out["counts"]["active"] == 2
     assert len([r for r in out["rows"] if r["watch_id"]]) == len({r["watch_id"] for r in out["rows"] if r["watch_id"]})
     assert set(out["counts"]) == set(DOWNSIDE_STATES) and out["notes"] == []
 
@@ -242,8 +240,8 @@ def test_candidate_input_hands_the_view_three_questions_to_the_same_derivation(m
 
     seen = {}
 
-    def spy(ctx, ticker, company_id, *, three_questions, three_questions_note, judgment_conditions):
-        seen.update(tq=three_questions, note=three_questions_note, judgments=judgment_conditions)
+    def spy(ctx, ticker, company_id, *, three_questions, three_questions_note):   # 多傳任何鍵都會 TypeError
+        seen.update(tq=three_questions, note=three_questions_note)
         return {"row": None}
 
     monkeypatch.setattr(cand, "page_input", spy)
@@ -251,7 +249,6 @@ def test_candidate_input_hands_the_view_three_questions_to_the_same_derivation(m
     candidate_input_for(_context(), view)
     assert seen["tq"] == {q: list(getattr(view.three_questions, q)) for q in ("will_it_die", "priced_in", "in_numbers")}
     assert seen["note"] is None
-    assert [j["condition"] for j in seen["judgments"]] == [c.condition for c in view.falsification.conditions]
     candidate_input_for(_context(), _full_view())                         # 三題取不到：交 None＋理由，不交空 dict
     assert seen["tq"] is None and seen["note"]
 
@@ -599,7 +596,7 @@ def test_legacy_narrative_gets_the_board_label_not_a_dash(monkeypatch) -> None:
 
 
 def test_page_input_hands_every_disproof_source_to_downside(tmp_path, monkeypatch) -> None:
-    """page_input → downside_rows 整段：舊判讀的 action 鍵、敘事自己的反證 watch、thesis 列的 L7 兩欄都要到（R1 變異存活處）。"""
+    """page_input → downside_rows 整段：敘事自己的反證 watch、thesis 列的 L7 兩欄都要到（R1 變異存活處）。"""
     import alpha.providers.briefs as briefs_mod
     import engine_b.disproof as disproof
     from alpha.providers import candidates as cand
@@ -609,10 +606,9 @@ def test_page_input_hands_every_disproof_source_to_downside(tmp_path, monkeypatc
     monkeypatch.setattr(disproof, "ROOT", _memo_root(tmp_path))
     watches = [_sem("ew_self", f"brief:{brief.brief_id}#1", SELF_COND),
                _sem("ew_memo", f"thesis:{MEMO}#1", MEMO_ITEMS[0], check_frequency="每季", action_48h="重讀 memo")]
-    page = cand.page_input(_context(watches=watches, lifecycle=LIFECYCLE), T, CO, three_questions=_tq(),
-                           judgment_conditions=[{"condition": "舊判讀條件", "check_frequency": "每季", "action": "重看"}])
+    page = cand.page_input(_context(watches=watches, lifecycle=LIFECYCLE), T, CO, three_questions=_tq())
     rows = {r["source"]: r for r in page["downside"]["rows"]}
-    assert rows["judgment"]["action_48h"] == "重看" and rows["judgment"]["state"] == "unwatched"
+    assert "judgment" not in rows
     assert rows["brief"]["watch_id"] == "ew_self"
     thesis = next(r for r in page["downside"]["rows"] if r["watch_id"] == "ew_memo")
     assert thesis["source"] == "thesis", "要走 memo 條目那條路（不是 watch_only）——否則 L7 兩欄本來就從 watch 來"
@@ -801,17 +797,17 @@ def test_shared_context_board_excludes_a_ticker_that_failed_to_materialize(board
     assert "FAILED1" not in board["universe"] and "AXTI" in board["universe"], "敘事 ledger 裡的照舊上板"
 
 
-def test_candidate_input_carries_the_judgment_action_under_the_key_downside_reads(monkeypatch) -> None:
+def test_candidate_input_no_longer_hands_the_old_judgment_disproofs_to_downside(monkeypatch) -> None:
+    """Phase 4 Step 4.7a：read model 仍有舊 session 判讀的反證（判斷檔原樣留），但不再交給 downside——它們恆「未盯」。"""
     from alpha.providers import candidates as cand
     from webapp.materialize import candidate_input_for
 
     seen = {}
     monkeypatch.setattr(cand, "page_input", lambda ctx, t, c, **kw: (seen.update(kw), {"row": None})[1])
     view = _full_view()
+    assert view.falsification.conditions, "夾具要有舊判讀的反證，這條測試才不是空跑"
     candidate_input_for(_context(), view)
-    first = view.falsification.conditions[0]
-    assert seen["judgment_conditions"][0] == {"condition": first.condition, "check_frequency": first.check_frequency,
-                                              "action": first.action_within_48h}
+    assert "judgment_conditions" not in seen and set(seen) == {"three_questions", "three_questions_note"}
 
 
 def test_cmd_materialize_shares_one_board_context_between_pages_and_board(tmp_path, monkeypatch) -> None:
