@@ -1,0 +1,174 @@
+{
+  "kind": "sourcedoc_graph_sync",
+  "at": "2026-10-01T23:02:03.843713+00:00",
+  "pq2": 663,
+  "writes": [
+    {
+      "doc_id": "agility_robotics_sec_investor_presentation_2026_06",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Agility Robotics Investor Presentation — June 2026——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+      "json": "Agility Robotics Investor Presentation — June 2026",
+      "written": true
+    },
+    {
+      "doc_id": "iqe_tower_inp_epiwafer_agreement_2026_06_15",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "IQE×Tower InP epiwafer 多年協議——substitutability addendum（[271] 授權研究）",
+      "json": "IQE and Tower Semiconductor announce multi-year InP epiwafer supply agreement",
+      "written": true
+    },
+    {
+      "doc_id": "lrcx_10_k_20250811",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+      "json": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure",
+      "written": true
+    },
+    {
+      "doc_id": "lrcx_10_q_20260423",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+      "json": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex",
+      "written": true
+    },
+    {
+      "doc_id": "meta_vistara_isca_2026",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+      "json": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",
+      "written": true
+    },
+    {
+      "doc_id": "mops_4979_annual_report_2025",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報——CW DFB substitutability addendum（自主研究迴圈第 1 輪）",
+      "json": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報（2025 財年）",
+      "written": true
+    },
+    {
+      "doc_id": "nvda_8k_ex991_20260826_q2fy27_pr",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+      "json": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作",
+      "written": true
+    },
+    {
+      "doc_id": "nvda_lumentum_partnership_pr_2026_03_02",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology——LITE→UHP laser sole_source 降級 addendum（自主研究迴圈第 8 輪）",
+      "json": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology",
+      "written": true
+    },
+    {
+      "doc_id": "nvidia_photonics_pr_2025_03_18",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches (GTC 2025-03-18) — Fabrinet addendum",
+      "json": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches to Scale AI Factories to Millions of GPUs",
+      "written": true
+    },
+    {
+      "doc_id": "poet_6_k_20260514",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+      "json": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)",
+      "written": true
+    },
+    {
+      "doc_id": "tsem_openlight_cadence_pdk_6k_2026_08_11",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform——Tower→PH18DA substitutability 判斷 addendum（[271]）",
+      "json": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform",
+      "written": true
+    }
+  ],
+  "planned": [
+    {
+      "doc_id": "agility_robotics_sec_investor_presentation_2026_06",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Agility Robotics Investor Presentation — June 2026——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+      "json": "Agility Robotics Investor Presentation — June 2026"
+    },
+    {
+      "doc_id": "iqe_tower_inp_epiwafer_agreement_2026_06_15",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "IQE×Tower InP epiwafer 多年協議——substitutability addendum（[271] 授權研究）",
+      "json": "IQE and Tower Semiconductor announce multi-year InP epiwafer supply agreement"
+    },
+    {
+      "doc_id": "lrcx_10_k_20250811",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+      "json": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure"
+    },
+    {
+      "doc_id": "lrcx_10_q_20260423",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+      "json": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex"
+    },
+    {
+      "doc_id": "meta_vistara_isca_2026",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+      "json": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment"
+    },
+    {
+      "doc_id": "mops_4979_annual_report_2025",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報——CW DFB substitutability addendum（自主研究迴圈第 1 輪）",
+      "json": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報（2025 財年）"
+    },
+    {
+      "doc_id": "nvda_8k_ex991_20260826_q2fy27_pr",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+      "json": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作"
+    },
+    {
+      "doc_id": "nvda_lumentum_partnership_pr_2026_03_02",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology——LITE→UHP laser sole_source 降級 addendum（自主研究迴圈第 8 輪）",
+      "json": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology"
+    },
+    {
+      "doc_id": "nvidia_photonics_pr_2025_03_18",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches (GTC 2025-03-18) — Fabrinet addendum",
+      "json": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches to Scale AI Factories to Millions of GPUs"
+    },
+    {
+      "doc_id": "poet_6_k_20260514",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+      "json": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)"
+    },
+    {
+      "doc_id": "tsem_openlight_cadence_pdk_6k_2026_08_11",
+      "field": "title",
+      "kind": "graph_behind_json",
+      "graph": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform——Tower→PH18DA substitutability 判斷 addendum（[271]）",
+      "json": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform"
+    }
+  ]
+}

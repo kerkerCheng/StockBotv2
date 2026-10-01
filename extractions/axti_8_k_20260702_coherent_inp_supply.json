@@ -51,6 +51,18 @@
         "axti_8_k_20260702_coherent_inp_supply_s4"
       ],
       "src_id": "co:coherent"
+    },
+    {
+      "src_id": "co:coherent",
+      "relation": "supplies_to",
+      "dst_id": "tech:six_inch_inp_production",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3"
+      ],
+      "confidence": 0.8,
+      "attributes": {},
+      "id": "add_edge:a4bc2"
     }
   ],
   "nodes": [
@@ -107,6 +119,25 @@
         "axti_8_k_20260702_coherent_inp_supply_s3"
       ],
       "type": "Material"
+    },
+    {
+      "type": "TechNode",
+      "name": "Six-inch InP wafer production line",
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "aliases": [
+        "six-inch indium phosphide line",
+        "6-inch InP"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "id": "tech:six_inch_inp_production",
+      "source_ids": [
+        "axti_8_k_20260702_coherent_inp_supply_s2",
+        "axti_8_k_20260702_coherent_inp_supply_s3"
+      ]
     }
   ],
   "schema_version": "0.1",

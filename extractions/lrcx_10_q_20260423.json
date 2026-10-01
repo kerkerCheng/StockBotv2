@@ -242,6 +242,26 @@
       "source_ids": [
         "lrcx_10_q_20260423_s11"
       ]
+    },
+    {
+      "type": "TechNode",
+      "name": "Semiconductor Manufacturing Equipment",
+      "abstraction_level": "equipment_epitaxy",
+      "role": null,
+      "aliases": [
+        "wafer fab equipment",
+        "WFE"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": 4,
+        "intrinsic_cycle_time_weeks": 52
+      },
+      "confidence": 0.9,
+      "id": "tech:semiconductor_manufacturing_equipment",
+      "source_ids": [
+        "lrcx_10_q_20260423_s4"
+      ]
     }
   ],
   "edges": [
@@ -365,6 +385,17 @@
       "source_ids": [
         "lrcx_10_q_20260423_s9"
       ]
+    },
+    {
+      "src_id": "co:lam_research",
+      "relation": "supplies_to",
+      "dst_id": "tech:semiconductor_manufacturing_equipment",
+      "source_ids": [
+        "lrcx_10_q_20260423_s4"
+      ],
+      "confidence": 0.8,
+      "attributes": {},
+      "id": "add_edge:7991c"
     }
   ],
   "claims": [
