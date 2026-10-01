@@ -59,23 +59,29 @@ def cap_label(value: Any) -> str | None:
 # ---------------------------------------------------------------------------
 
 def held_index(resolution: Mapping[str, Any] | None, *, is_beta: Callable[[str], bool],
-               failure: str | None = None) -> dict[str, Any]:
+               failure: str | None = None, ignored: Mapping[str, Mapping[str, Any]] | None = None,
+               ignored_problem: str | None = None) -> dict[str, Any]:
     """`portfolio.holdings.resolve_holdings()` 的結果 → 候選板用的「已持有」：**alpha、股數 > 0、解析得到**。
 
     - `resolution=None`＝Sheet 讀不到；**`rows` 是空的也一樣**（Sheet 分頁清空時 `fetch_portfolio` 回 [] 不丟例外；
       真實帳戶至少有現金列，空表只可能是讀取失敗——硬擋對同一份 [] 回 unmeasurable，這裡不得反過來判「持有 0」）。
       整板暫停已持有判定（`upstream_unavailable`），不得把「沒讀到」當成「沒持有」。
     - beta 由 `risk/hard_caps.py` 的公開判別排除（alpha／beta 同一條線）；beta 列、現金列、股數 0 的列解析不到
-      都不算進「解析不到」——它們不是要人決定的 identity 問題。"""
+      都不算進「解析不到」——它們不是要人決定的 identity 問題。
+    - `ignored`：`portfolio.holdings.load_ignored()` 的名單（使用者明確決定不研究，Phase 4 Step 4.7b）——解析不到的列
+      若在名單上，改列 `ignored[]`（附 reason／decided_at），也不算「解析不到」；`ignored_problem`（名單讀不到）照帶出去。"""
+    names = dict(ignored or {})
     rows = list((resolution or {}).get("rows") or ())
     if resolution is None or not rows:
         why = failure or ("Sheet 沒有任何可解析的持股列（連現金列都沒有）——視同讀不到" if resolution is not None
                           else "讀取失敗")
         return {"status": "upstream_unavailable",
                 "reason": f"持股未讀到，已持有判定暫停（{why}）——其餘列的宣告照印，但標「持股未驗」",
-                "by_company": {}, "unresolved": [], "beta_excluded": 0, "zero_shares": 0}
+                "by_company": {}, "unresolved": [], "ignored": [], "ignored_problem": ignored_problem,
+                "beta_excluded": 0, "zero_shares": 0}
     by_company: dict[str, dict[str, Any]] = {}
     unresolved: list[str] = []
+    skipped: dict[str, dict[str, Any]] = {}
     beta_excluded = zero_shares = 0
     for row in rows:
         if row.get("cash"):
@@ -87,10 +93,15 @@ def held_index(resolution: Mapping[str, Any] | None, *, is_beta: Callable[[str],
             zero_shares += 1
             continue
         if not row.get("company_id"):
-            unresolved.append(str(row.get("ticker")))
+            ticker = str(row.get("ticker"))
+            if ticker.upper() in names:
+                skipped[ticker.upper()] = dict(names[ticker.upper()])
+            else:
+                unresolved.append(ticker)
             continue
         by_company[str(row["company_id"])] = {"sheet_ticker": row.get("ticker"), "source": row.get("source")}
     return {"status": "ok", "reason": None, "by_company": by_company, "unresolved": sorted(set(unresolved)),
+            "ignored": [skipped[t] for t in sorted(skipped)], "ignored_problem": ignored_problem,
             "beta_excluded": beta_excluded, "zero_shares": zero_shares}
 
 
@@ -227,6 +238,8 @@ def assemble_board(rows: Sequence[Mapping[str, Any] | None], *, universe: Sequen
             "universe": sorted(universe),
             "holdings": {"status": held.get("status"), "reason": held.get("reason"),
                          "unresolved": list(held.get("unresolved") or ()),
+                         "ignored": [dict(i) for i in held.get("ignored") or ()],
+                         "ignored_problem": held.get("ignored_problem"),
                          "beta_excluded": held.get("beta_excluded"), "zero_shares": held.get("zero_shares")},
             "narrative_rewrite": [dict(b) for b in narrative_rewrite]}
 

@@ -292,7 +292,7 @@ def test_retired_panels_declare_an_absence_instead_of_disappearing(tmp_path: Pat
     changes = "\n".join(hb.build_changes(now=now, state_dir=state_dir, thesis_path=tmp_path / "nope.json").lines)
     positions = "\n".join(hb.build_positions(state_dir=state_dir).lines)
     assert "候選：可開 0｜缺 X 0｜等回落 1（最老 0 天）｜不要 0｜已持有 0" in changes, changes
-    assert "無敘事 2" in changes and "持股解析不到 1：7803.T" in changes
+    assert "無敘事 2" in changes and "持股解析不到 1（使用者決定不研究 0）：7803.T" in changes
     assert "三題（3 檔）：已定價① 有值 1／缺席 2" in changes and "不是結論" in changes
     # 盞數與有紅燈的檔分開、灰依 kind 分——灰不是綠（ARCHITECTURE §4.1 段 4）
     assert ("歸零旗標 3 檔 × 4 盞：紅 1｜黃 4｜綠 3｜**灰（沒量到）4**（insufficient_evidence 1、not_yet_recorded 3）"
@@ -316,6 +316,25 @@ def test_candidate_lines_say_held_is_unverified_when_the_sheet_was_unreadable(tm
     lines = hb._candidate_lines(tmp_path)
     assert "已持有 未驗（持股未讀到）" in lines[0] and "｜已持有 0" not in lines[0]
     assert any("持股未讀到，已持有判定暫停（upstream_unavailable）" in line for line in lines)
+
+
+@pytest.mark.parametrize("holdings, expected", [
+    ({"unresolved": [], "ignored": [], "ignored_problem": None}, "持股解析不到 0（使用者決定不研究 0）"),
+    ({"unresolved": [], "ignored": [{"sheet_ticker": "7803.T", "reason": "不研究", "decided_at": "2026-07-29"}],
+      "ignored_problem": None}, "持股解析不到 0（使用者決定不研究 1）"),
+    ({"unresolved": ["7803.T"]}, "持股解析不到 1（使用者決定不研究 未讀到）：7803.T"),     # 舊 artifact 沒有這一欄
+    ({"unresolved": ["7803.T"], "ignored": [], "ignored_problem": "holdings_coverage.json 第 1 筆缺 reason"},
+     "｜不研究名單讀不到（holdings_coverage.json 第 1 筆缺 reason）——全部照列解析不到"),
+])
+def test_holdings_line_is_a_standing_counter_that_separates_user_ignored(tmp_path: Path, holdings, expected) -> None:
+    """Phase 4 Step 4.7b：「持股解析不到 N（使用者決定不研究 M）」是常駐計數器——0 也印；沒有那一欄印「未讀到」不壓成 0。"""
+    from webapp.store import StateArtifactStore
+
+    from test_webapp_candidates import fake_candidates_payload
+
+    StateArtifactStore(tmp_path).write(fake_candidates_payload(
+        {"status": "ok", "reason": None, "beta_excluded": 3, "zero_shares": 0, **holdings}))
+    assert any(expected in line for line in hb._candidate_lines(tmp_path)), hb._candidate_lines(tmp_path)
 
 
 def test_snapshot_candidate_keys_are_read_from_the_artifact(tmp_path: Path) -> None:

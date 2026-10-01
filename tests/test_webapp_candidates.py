@@ -22,7 +22,7 @@ _ROW = {"ticker": "AXTI", "company_id": "co:axt", "brief_id": "ib_x", "record_ve
         "three_words": {"will_it_die": "黃（灰 1）", "priced_in": "是", "in_numbers": "是"}, "note": None}
 
 
-def fake_candidates_payload() -> dict:
+def fake_candidates_payload(holdings: dict | None = None) -> dict:
     board = {
         "today": "2026-09-29",
         "groups": {"open": [], "missing": [], "priced_wait": [dict(_ROW)], "pass": [], "held": []},
@@ -30,7 +30,9 @@ def fake_candidates_payload() -> dict:
         "counts": {"open": 0, "missing": 0, "priced_wait": 1, "pass": 0, "held": 0, "not_multiple": 0,
                    "edge_unmeasurable": 0, "legacy": 0, "precondition_failed": 0, "no_narrative": 2},
         "oldest_stall_days": {"open": None, "missing": None, "priced_wait": 0},
-        "holdings": {"status": "ok", "reason": None, "unresolved": ["7803.T"], "beta_excluded": 3, "zero_shares": 0},
+        "holdings": holdings if holdings is not None else {
+            "status": "ok", "reason": None, "unresolved": ["7803.T"], "ignored": [], "ignored_problem": None,
+            "beta_excluded": 3, "zero_shares": 0},
         "narrative_rewrite": [],
         "ledger": {"present": True, "tickers": 3, "parse_errors": 0, "parse_error_examples": []},
         "rollup": {"universe": 3, "lines": {},

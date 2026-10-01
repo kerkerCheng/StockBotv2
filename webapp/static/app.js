@@ -2916,8 +2916,17 @@ async function renderCandidates() {
     + `｜無敘事 ${counts.no_narrative ?? 0}（沒有敘事的不上板）`));
   if (holdings.status !== 'ok') {
     sec0.appendChild(el('p', 'warn', '▲ ' + (holdings.reason || '持股未讀到，已持有判定暫停')));
-  } else if ((holdings.unresolved || []).length) {
-    sec0.appendChild(el('p', 'note', `持股解析不到 ${holdings.unresolved.length}：${holdings.unresolved.join('、')}（不猜；要不要登記是 identity 的決定）`));
+  } else {
+    if ((holdings.unresolved || []).length) {
+      sec0.appendChild(el('p', 'note', `持股解析不到 ${holdings.unresolved.length}：${holdings.unresolved.join('、')}（不猜；要不要登記是 identity 的決定）`));
+    }
+    // 使用者決定不研究（config/holdings_coverage.json，Phase 4 Step 4.7b）：不算「解析不到」，另列並附理由與決定日。
+    (holdings.ignored || []).forEach((item) => {
+      sec0.appendChild(el('p', 'note', `使用者決定不研究：${item.sheet_ticker}（${item.reason}；${item.decided_at}）`));
+    });
+    if (holdings.ignored_problem) {
+      sec0.appendChild(el('p', 'warn', `▲ 不研究名單讀不到（${holdings.ignored_problem}）——全部照列解析不到`));
+    }
   }
   app.appendChild(sec0);
 

@@ -236,7 +236,7 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
     from engine_b import event_watch as ew
     from engine_b.disproof import load_lifecycle
     from identity.registry import get_registry
-    from portfolio.holdings import resolve_holdings
+    from portfolio.holdings import load_ignored, resolve_holdings
     from portfolio.policy import load_beta_policy
     from query.structure import _load_edges
     from risk.hard_caps import is_beta_symbol
@@ -274,7 +274,9 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
         resolution, failure = resolve_holdings(list(holdings_loader()), registry=registry), None
     except Exception as exc:  # noqa: BLE001 — Sheet 讀不到＝已持有判定暫停，不是「沒持有」
         resolution, failure = None, type(exc).__name__
-    held = held_index(resolution, is_beta=lambda s: is_beta_symbol(s, beta_policy), failure=failure)
+    ignored, ignored_problem = load_ignored()      # 使用者決定不研究的持股（config/holdings_coverage.json）
+    held = held_index(resolution, is_beta=lambda s: is_beta_symbol(s, beta_policy), failure=failure,
+                      ignored=ignored, ignored_problem=ignored_problem)
     # 只在 Sheet 持有、宇宙沒有的公司也要上板（已持有、缺敘事），三題與燈一樣要算——不是「未讀到」。
     extra: dict[str, str] = {}
     if board:

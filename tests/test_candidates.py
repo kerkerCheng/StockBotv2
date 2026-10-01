@@ -117,6 +117,45 @@ def test_held_is_alpha_with_shares_and_beta_never_counts() -> None:
     assert held["unresolved"] == ["7803.T"]
 
 
+def test_a_user_ignored_holding_is_listed_apart_not_as_unresolved(tmp_path) -> None:
+    """Phase 4 Step 4.7b：`config/holdings_coverage.json` 的不研究名單——解析不到的列若在名單上，另列 `ignored[]`
+    （附理由與決定日），不算「解析不到」；名單讀不到或壞掉 → 整份不採用、全部照列解析不到（fail safe）。"""
+    import json
+
+    from portfolio.holdings import load_ignored
+
+    cfg = tmp_path / "holdings_coverage.json"
+    entry = {"sheet_ticker": "7803.T", "reason": "使用者決定不研究", "decided_at": "2026-07-29"}
+    cfg.write_text(json.dumps({"schema_version": "holdings-coverage-v1", "ignored": [entry]}), encoding="utf-8")
+    names, problem = load_ignored(cfg)
+    assert problem is None and set(names) == {"7803.T"}
+    res = resolve_holdings([{"ticker": "7803.T", "shares": 10.0, "bucket": "觀察"},
+                            {"ticker": "9999.T", "shares": 1.0, "bucket": "觀察"}])
+    held = held_index(res, is_beta=is_beta_symbol, ignored=names)
+    assert held["unresolved"] == ["9999.T"] and held["ignored"] == [entry]
+    board = assemble_board([], universe=[], held=held, narrative_rewrite=[])
+    assert board["holdings"]["ignored"] == [entry] and board["holdings"]["unresolved"] == ["9999.T"]
+    # 名單壞掉：整份不採用、全部照列解析不到，讀取問題帶出去
+    cfg.write_text(json.dumps({"schema_version": "holdings-coverage-v1", "ignored": [{"sheet_ticker": "7803.T"}]}),
+                   encoding="utf-8")
+    names, problem = load_ignored(cfg)
+    assert names == {} and "第 1 筆" in problem
+    held = held_index(res, is_beta=is_beta_symbol, ignored=names, ignored_problem=problem)
+    assert held["unresolved"] == ["7803.T", "9999.T"] and held["ignored"] == [] and held["ignored_problem"] == problem
+    cfg.write_text(json.dumps({"schema_version": "holdings-coverage-v0", "ignored": []}), encoding="utf-8")
+    assert load_ignored(cfg) == ({}, "holdings_coverage.json 的 schema_version 不是 holdings-coverage-v1")
+    assert load_ignored(tmp_path / "missing.json")[1].startswith("missing.json 讀不到")
+
+
+def test_the_real_ignore_list_parses() -> None:
+    """真實設定讀得進來（筆數會變，不斷言是幾筆——現況數字會腐壞）。"""
+    from portfolio.holdings import load_ignored
+
+    names, problem = load_ignored()
+    assert problem is None, problem
+    assert all(v["reason"] and v["decided_at"] for v in names.values())
+
+
 @pytest.mark.parametrize("resolution, failure", [(None, "HttpError"), ({"rows": [], "unresolved": []}, None)])
 def test_unreadable_or_empty_sheet_suspends_held_instead_of_saying_not_held(resolution, failure) -> None:
     """讀不到，或回空表（分頁清空時 fetch_portfolio 回 [] 不丟例外）——都是「持股未驗」，不是「持有 0」；

@@ -636,9 +636,18 @@ def _candidate_lines(state_dir: Path | None) -> list[str]:
     holdings = board.get("holdings") or {}
     if holdings.get("status") != "ok":
         lines.append(f"  持股未讀到，已持有判定暫停（upstream_unavailable）：{holdings.get('reason')}")
-    elif holdings.get("unresolved"):
+    else:
+        # 常駐計數器（Phase 4 Step 4.7b）：0 也印。「使用者決定不研究」來自 config/holdings_coverage.json——
+        # 舊 artifact 沒有這一欄就印「未讀到」，不壓成 0（L12）。
         unresolved = list(holdings.get("unresolved") or ())
-        lines.append(f"  持股解析不到 {len(unresolved)}：{'、'.join(unresolved[:5])}（不猜；要不要登記是 identity 的決定）")
+        ignored = holdings.get("ignored")
+        line = (f"  持股解析不到 {len(unresolved)}"
+                f"（使用者決定不研究 {'未讀到' if ignored is None else len(ignored)}）")
+        if unresolved:
+            line += f"：{'、'.join(unresolved[:5])}（不猜；要不要登記是 identity 的決定）"
+        if holdings.get("ignored_problem"):
+            line += f"｜不研究名單讀不到（{holdings['ignored_problem']}）——全部照列解析不到"
+        lines.append(line)
     ledger = board.get("ledger") or {}
     if ledger and not ledger.get("present"):
         lines.append("  敘事 ledger 目錄不存在（upstream_unavailable）——「無敘事」是讀不到，不是真的沒有")

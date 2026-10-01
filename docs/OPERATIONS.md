@@ -1553,12 +1553,14 @@ weekly prompt 也不呼叫它——沒有呼叫端的提醒不是提醒。連同
   `thesis_lifecycle`（含 deferred）由 Daily Brief 顯示，hook 必須靜默。分工全表見上方
   「SessionStart hook 的分工」。
   新提醒只走 `additionalContext` 呈現一次。
-- **Sheet 持股覆蓋分類：** `portfolio/brief.py::build_sheet_only_items` 依 Sheet ticker
-  分三類——beta policy 涵蓋（`coverage=beta_policy`）、使用者明確不研究
-  （`coverage=user_ignored`，登記於 `config/holdings_coverage.json`）、其餘
-  `coverage=uncovered`。前兩類判 `MONITOR` ＋空 blockers，仍在 daily brief 現形但不占
-  pq2 編號。覆蓋設定檔讀取失敗一律 fail safe 退回 `REVIEW`。
-  beta universe 的 SSOT 只有 `config/beta_policy.json`。
+- **Sheet 持股的「解析不到」與「使用者決定不研究」（2026-10-01 Phase 4 Step 4.7b）：** 候選板的已持有判定
+  （`alpha/candidates.py::held_index`）先排除 beta（beta universe 的 SSOT 只有 `config/beta_policy.json`）、現金與股數 0 的列；
+  其餘解析不到 `co:*` 的列，Sheet 代號若登記在 `config/holdings_coverage.json` 的 `ignored`（使用者明確決定不研究；
+  每筆 `sheet_ticker`／`reason`／`decided_at`，讀者 `portfolio/holdings.py::load_ignored`）就另列「使用者決定不研究」、
+  不算解析不到；其餘列「解析不到」（不猜，要不要登記是 identity 的決定）。心跳段 2 常駐印
+  「持股解析不到 N（使用者決定不研究 M）」（0 也印），候選板頁首另列名單、理由與決定日。
+  設定檔讀不到、版本不對或任何一筆形狀不對 → 整份不採用、全部照列解析不到，並印讀取問題（fail safe：寧可多問一次）。
+  （舊的 daily brief 三分類讀者已於 2026-09-23 Phase 0 隨研究側退役，這份設定檔在 4.7b 之前沒有讀者。）
 - ~~**Decision gap dispatch**~~：2026-09-23（Phase 0 Step 0b.4） 退役——`decision_review` 的 go／dispatch／reassess 整組隨 decision_lab 研究側退役，
   legacy 項目只能 drop；pq1 budget 只給 lead。
 - **事件監控：** issuer 曝險 ≥20% 且對應 series 單日報酬首次跌破 −4% 才產 ephemeral

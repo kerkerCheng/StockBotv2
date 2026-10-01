@@ -17,12 +17,52 @@
 """
 from __future__ import annotations
 
+import json
+from datetime import date
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from shared.buckets import CASH_BUCKET_LABELS
 
 #: 解析來源的封閉字彙（寫進每一列，指得回是哪一條規則解出來的——L18）。
 RESOLUTION_SOURCES: tuple[str, ...] = ("sheet_company_id", "execution_alias", "registry_ticker")
+
+#: 使用者明確決定不做 alpha 研究的持股（Phase 4 Step 4.7b 接上讀者）：Sheet 代號在這裡的列不算「解析不到」，
+#: 改列「使用者決定不研究」——那不是要人決定的 identity 問題，使用者已經決定過了。
+HOLDINGS_COVERAGE_PATH = Path(__file__).resolve().parents[1] / "config" / "holdings_coverage.json"
+HOLDINGS_COVERAGE_SCHEMA = "holdings-coverage-v1"
+
+
+def load_ignored(path: Path | None = None) -> tuple[dict[str, dict[str, Any]], str | None]:
+    """→ `({Sheet 代號（大寫）: 那一筆登記}, 讀取問題或 None)`。
+
+    每筆要有 `sheet_ticker`、`reason`、`decided_at`（ISO 日期）。檔案讀不到、版本不對或任何一筆形狀不對 →
+    **整份不採用**、回空表＋理由（fail safe：什麼都不藏，全部照列「解析不到」——寧可多問一次，不可把該問的藏起來）。
+    """
+    path = HOLDINGS_COVERAGE_PATH if path is None else path
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        return {}, f"{path.name} 讀不到（{type(exc).__name__}）"
+    if not isinstance(data, Mapping) or data.get("schema_version") != HOLDINGS_COVERAGE_SCHEMA:
+        return {}, f"{path.name} 的 schema_version 不是 {HOLDINGS_COVERAGE_SCHEMA}"
+    entries = data.get("ignored")
+    if not isinstance(entries, list):
+        return {}, f"{path.name} 的 ignored 不是清單"
+    out: dict[str, dict[str, Any]] = {}
+    for n, entry in enumerate(entries, 1):
+        if not isinstance(entry, Mapping):
+            return {}, f"{path.name} 第 {n} 筆不是物件"
+        ticker = str(entry.get("sheet_ticker") or "").strip().upper()
+        reason = str(entry.get("reason") or "").strip()
+        try:
+            decided = date.fromisoformat(str(entry.get("decided_at") or "")[:10])
+        except ValueError:
+            decided = None
+        if not ticker or not reason or decided is None:
+            return {}, f"{path.name} 第 {n} 筆缺 sheet_ticker／reason／decided_at（ISO 日期）"
+        out[ticker] = {"sheet_ticker": ticker, "reason": reason, "decided_at": decided.isoformat()}
+    return out, None
 
 
 def _registry(registry: Any) -> Any:
@@ -80,4 +120,5 @@ def resolve_holdings(rows: Sequence[Mapping[str, Any]], *, registry: Any = None)
     return {"rows": resolved, "unresolved": unresolved, "cash_rows": sum(1 for r in resolved if r["cash"])}
 
 
-__all__ = ["RESOLUTION_SOURCES", "is_cash_row", "resolve_holding", "resolve_holdings"]
+__all__ = ["HOLDINGS_COVERAGE_PATH", "HOLDINGS_COVERAGE_SCHEMA", "RESOLUTION_SOURCES", "is_cash_row", "load_ignored",
+           "resolve_holding", "resolve_holdings"]
