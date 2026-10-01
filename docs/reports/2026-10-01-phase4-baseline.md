@@ -163,7 +163,8 @@ Sivers 的名冊 id 是 **`co:sivers_semiconductors`**（research_ticker `SIVE.S
 
 `library/leads/pending_leads.json` **1186 則**：triaged_no_go 597／parked 484／applied 85／triaged_go **20**（`python -m engine_b.cli counts`）。
 source 前綴前幾名：x 523、edgar 440、mfn 66、decompose 35（另有 `decompose-*`、`system_decompose` 等變體）、sivers 28、yahoo 26；`graph_walk:` 前綴 **0**（4.5／4.8 之後應出現）。
-`python -m engine_b.cli drain --limit 500 --json` → **21 項**，順序（kind、lead_id、priority 三欄）sha256 `a1dda4cba5228f465c89ee98284594d400de667e7cf275d6696443f01d7161d5`——**4.1 R2-b 的 pq1 排序逐位比對對這一份**。
+`python -m engine_b.cli drain --limit 500 --json` → **21 項**（20 條 lead＋1 筆 `fired_watch_pending`〔ew_0152_2026-09-30〕），順序（kind、lead_id、priority 三欄）sha256 `a1dda4cba5228f465c89ee98284594d400de667e7cf275d6696443f01d7161d5`——**4.1 R2-b 的 pq1 排序逐位比對對這一份**。
+算法（R2-b 指出要寫清楚，否則重算對不上）：每項一行 `f"{kind}\t{lead.lead_id}\t{priority}\n"`、tab 分隔、LF 換行；**缺欄位時寫 Python 的 `None`**（那一筆 watch 寫成 `fired_watch_pending\tNone\tNone`）。
 
 ## 9. 心跳
 

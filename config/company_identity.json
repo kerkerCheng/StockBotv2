@@ -8,7 +8,10 @@
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
       "display_name": "Aehr Test Systems",
-      "_display_name_source": "SEC 10-K 2026-07-27 封面 dei:EntityRegistrantName「AEHR TEST SYSTEMS」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
+      "_display_name_source": "SEC 10-K 2026-07-27 封面 dei:EntityRegistrantName「AEHR TEST SYSTEMS」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）",
+      "name_aliases": [
+        "Aehr"
+      ]
     },
     {
       "company_id": "co:aeva",
@@ -16,13 +19,19 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "Aeva Technologies, Inc."
+      "display_name": "Aeva Technologies, Inc.",
+      "name_aliases": [
+        "Aeva"
+      ]
     },
     {
       "company_id": "co:agility_robotics",
       "research_ticker": null,
       "display_name": "Agility Robotics, Inc.",
-      "_display_name_source": "CCXI S-4 逐字（庫內 library/raw/ccxi_s_4_20260904.txt）"
+      "_display_name_source": "CCXI S-4 逐字（庫內 library/raw/ccxi_s_4_20260904.txt）",
+      "name_aliases": [
+        "Agility"
+      ]
     },
     {
       "company_id": "co:all_space",
@@ -139,15 +148,19 @@
       "research_ticker": "CDNS",
       "market_currency": "USD",
       "display_name": "Cadence Design Systems, Inc.",
-      "_display_name_source": "SEC 10-Q 2026-07-29 封面 dei:EntityRegistrantName「CADENCE DESIGN SYSTEMS, INC.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
+      "_display_name_source": "SEC 10-Q 2026-07-29 封面 dei:EntityRegistrantName「CADENCE DESIGN SYSTEMS, INC.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）",
+      "name_aliases": [
+        "Cadence"
+      ]
     },
     {
       "company_id": "co:casela_technologies",
       "research_ticker": null,
-      "display_name": "Casela Technologies Corporation, Ltd.",
-      "_display_name_source": "AXT 8-K 逐字（庫內 library/raw/axti_8_k_20260617.txt）",
+      "display_name": "Nanjing Casela Technologies Corporation, Ltd.",
+      "_display_name_source": "AXT 8-K 逐字「Nanjing Casela Technologies Corporation, Ltd.」（庫內 library/raw/axti_8_k_20260617.txt；AXT 10-Q 同字）——R2-b 指出首版少了 Nanjing，2026-10-01 改成逐字",
       "name_aliases": [
-        "Casela"
+        "Casela",
+        "Casela Technologies"
       ]
     },
     {
@@ -194,7 +207,10 @@
       "research_ticker": "ENA.V",
       "market_currency": "CAD",
       "display_name": "Enablence Technologies Inc.",
-      "_display_name_source": "自家 boilerplate「Enablence Technologies Inc. is a publicly traded company listed on the TSX Venture Exchange」（三方聯合新聞稿 2026-03-17；newsfilecorp.com/release/288080；庫內 enablence_sivers_onet_ofc_pr_2026_03_17）"
+      "_display_name_source": "自家 boilerplate「Enablence Technologies Inc. is a publicly traded company listed on the TSX Venture Exchange」（三方聯合新聞稿 2026-03-17；newsfilecorp.com/release/288080；庫內 enablence_sivers_onet_ofc_pr_2026_03_17）",
+      "name_aliases": [
+        "Enablence"
+      ]
     },
     {
       "company_id": "co:ewellix",
@@ -214,7 +230,10 @@
       "company_id": "co:foci",
       "research_ticker": "3363.TWO",
       "market_currency": "TWD",
-      "display_name": "FOCI Fiber Optic Communications, Inc."
+      "display_name": "FOCI Fiber Optic Communications, Inc.",
+      "name_aliases": [
+        "FOCI"
+      ]
     },
     {
       "company_id": "co:globalfoundries",
@@ -241,7 +260,10 @@
       "execution_currency": "USD",
       "execution_venue": "NYSE",
       "display_name": "GXO Logistics, Inc.",
-      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「GXO Logistics, Inc.」"
+      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「GXO Logistics, Inc.」",
+      "name_aliases": [
+        "GXO"
+      ]
     },
     {
       "company_id": "co:harmonic_drive_systems",
@@ -264,7 +286,10 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "Himax Technologies, Inc."
+      "display_name": "Himax Technologies, Inc.",
+      "name_aliases": [
+        "Himax"
+      ]
     },
     {
       "company_id": "co:humanoid",
@@ -387,7 +412,7 @@
       "execution_currency": "CNY",
       "execution_venue": "SSE",
       "display_name": "Leader Harmonious Drive Systems Co., Ltd.",
-      "_display_name_source": "上交所 688017 英文名（stockanalysis.com/quote/sha/688017；公司 leaderdrive.cn）",
+      "_display_name_source": "上海證券交易所科創板 688017 上市公司英文名「Leader Harmonious Drive Systems Co.,Ltd」（只做排版正規化：逗號後加空白、Ltd 加句點）；中文名 绿的谐波",
       "name_aliases": [
         "Leaderdrive",
         "绿的谐波"
@@ -450,7 +475,10 @@
       "market_currency": "AUD",
       "execution_currency": "AUD",
       "execution_venue": "ASX",
-      "display_name": "Lynas Rare Earths Ltd."
+      "display_name": "Lynas Rare Earths Ltd.",
+      "name_aliases": [
+        "Lynas"
+      ]
     },
     {
       "company_id": "co:macom",
@@ -458,7 +486,10 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "MACOM Technology Solutions Holdings, Inc."
+      "display_name": "MACOM Technology Solutions Holdings, Inc.",
+      "name_aliases": [
+        "MACOM"
+      ]
     },
     {
       "company_id": "co:marvell_technology",
@@ -477,7 +508,10 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "Meta Platforms, Inc."
+      "display_name": "Meta Platforms, Inc.",
+      "name_aliases": [
+        "Meta"
+      ]
     },
     {
       "company_id": "co:micron_technology",
@@ -559,7 +593,10 @@
       "company_id": "co:niron_magnetics",
       "research_ticker": null,
       "display_name": "Niron Magnetics",
-      "_display_name_source": "官網頁尾「© 2026 Niron Magnetics」（nironmagnetics.com；頁尾沒有公司型態，照印）"
+      "_display_name_source": "官網頁尾「© 2026 Niron Magnetics」（nironmagnetics.com；頁尾沒有公司型態，照印）",
+      "name_aliases": [
+        "Niron"
+      ]
     },
     {
       "company_id": "co:novanta",
@@ -627,7 +664,10 @@
       "company_id": "co:poet_technologies",
       "research_ticker": "POET",
       "market_currency": "USD",
-      "display_name": "POET Technologies Inc."
+      "display_name": "POET Technologies Inc.",
+      "name_aliases": [
+        "POET"
+      ]
     },
     {
       "company_id": "co:proterial",
@@ -690,7 +730,10 @@
         "SIVEF"
       ],
       "display_name": "Sivers Semiconductors AB",
-      "execution_symbol": "FRA:2DG"
+      "execution_symbol": "FRA:2DG",
+      "name_aliases": [
+        "Sivers"
+      ]
     },
     {
       "company_id": "co:sk_hynix",
@@ -766,7 +809,10 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "Tower Semiconductor Ltd."
+      "display_name": "Tower Semiconductor Ltd.",
+      "name_aliases": [
+        "Tower"
+      ]
     },
     {
       "company_id": "co:tsmc",
@@ -821,7 +867,8 @@
       "_display_name_source": "櫃買 3105 英文名；中文法定名稱見自家年報 origin（庫內 mops_3105_annual_report_2025）",
       "name_aliases": [
         "穩懋半導體股份有限公司",
-        "穩懋"
+        "穩懋",
+        "WIN Semiconductor"
       ]
     },
     {
