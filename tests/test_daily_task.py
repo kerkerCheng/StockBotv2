@@ -852,7 +852,8 @@ def _run_claude(events, **kw) -> tuple[LlmOutcome, FakePopen]:
 def test_good_stream_is_ok_and_records_rate_limit_and_capabilities() -> None:
     outcome, popen = _run_claude([INIT_OK, RATE_OK, RESULT_OK])
     assert outcome.status == "ok" and outcome.structured == {"items": []}
-    assert outcome.rate_limit == {"status": "allowed", "rateLimitType": "five_hour", "utilization": 0.2}
+    assert outcome.rate_limit == {"status": "allowed", "rateLimitType": "five_hour", "utilization": 0.2,
+                                  "resetsAt": None}                      # 這個夾具沒帶重置時間
     record = outcome.as_record()
     assert record["init_capabilities"]["tools"] == ["StructuredOutput"]
     assert record["init_capabilities"]["memory_paths"] == "<absent>"
@@ -1199,3 +1200,17 @@ def test_dirty_count_is_not_truncated(tmp_path: Path) -> None:
     runner.git_status = "\n".join(f" M f{i}.py" for i in range(24))
     run, _ = _run(tmp_path, runner=runner)
     assert len(run.record["dirty_paths"]) == 20 and run.record["dirty_count"] == 24
+
+
+def test_rate_limit_keeps_reset_time_and_usage_from_the_real_event_shape() -> None:
+    """2026-10-01 探針的原樣（status allowed_warning）：頂層有 resetsAt 與 utilization，各窗底下也有。
+    原本只留 status／type／utilization，心跳印「重置 ?」——使用者看不出這是什麼問題。"""
+    real = {"status": "allowed_warning", "resetsAt": 1791212400, "rateLimitType": "seven_day", "utilization": 0.67,
+            "isUsingOverage": False,
+            "unifiedWindows": {"five_hour": {"utilization": 0.07, "resetsAt": 1790821800},
+                               "seven_day": {"utilization": 0.67, "resetsAt": 1791212400}}}
+    assert llm_step._rate_limit(real) == {"status": "allowed_warning", "rateLimitType": "seven_day",
+                                          "utilization": 0.67, "resetsAt": 1791212400}
+    only_window = {"status": "allowed", "rateLimitType": "five_hour",
+                   "unifiedWindows": {"five_hour": {"utilization": 0.2, "resetsAt": 1790821800}}}
+    assert llm_step._rate_limit(only_window)["resetsAt"] == 1790821800      # 頂層沒有就讀那一窗

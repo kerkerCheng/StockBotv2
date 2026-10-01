@@ -158,14 +158,20 @@ class LlmOutcome:
 
 
 def _rate_limit(info: Mapping[str, Any]) -> dict[str, Any]:
-    """`utilization` 實測不在頂層，在 `unifiedWindows.<rateLimitType>` 底下（2026-09-24 探針）。"""
+    """`utilization` 實測不在頂層，在 `unifiedWindows.<rateLimitType>` 底下（2026-09-24 探針）。
+
+    2026-10-01 探針（`status: allowed_warning` 時）：頂層有 `resetsAt`（Unix 秒）與 `utilization`，
+    `unifiedWindows.<窗>` 各自也帶 `utilization`／`resetsAt`——兩處都讀，頂層優先。原本丟了 `resetsAt`，
+    心跳只能印「重置 ?」、也看不出用了幾成（使用者 2026-10-01 問「LLM 額度是什麼問題」）。"""
     kind = info.get("rateLimitType")
     windows = info.get("unifiedWindows") or {}
     window = windows.get(kind) if isinstance(windows, Mapping) and kind else None
     utilization = info.get("utilization")
-    if utilization is None and isinstance(window, Mapping):
-        utilization = window.get("utilization")
-    return {"status": info.get("status"), "rateLimitType": kind, "utilization": utilization}
+    resets_at = info.get("resetsAt")
+    if isinstance(window, Mapping):
+        utilization = window.get("utilization") if utilization is None else utilization
+        resets_at = window.get("resetsAt") if resets_at is None else resets_at
+    return {"status": info.get("status"), "rateLimitType": kind, "utilization": utilization, "resetsAt": resets_at}
 
 
 def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str, str],

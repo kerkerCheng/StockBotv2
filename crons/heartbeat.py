@@ -1140,6 +1140,12 @@ def theme_scan_line(*, now: datetime) -> tuple[str, bool]:
     return (f"距上次掃題材 {days} 天（{scan['date']}；門檻 {threshold} 天）", False)
 
 
+#: `rate_limit_info.status` 與 `rateLimitType` 的人話（2026-10-01 探針實測的值；認不得的照印原字）。
+QUOTA_STATUS_WORDS: Mapping[str, str] = {"allowed_warning": "接近上限", "rejected": "已用完（本輪 LLM 步驟被擋）"}
+QUOTA_WINDOW_WORDS: Mapping[str, str] = {"seven_day": " 7 天", "five_hour": " 5 小時", "seven_day_opus": " 7 天（Opus）",
+                                         "seven_day_sonnet": " 7 天（Sonnet）"}
+
+
 def _prescreen_and_quota_lines(*, now: datetime, record_path: Path | None) -> list[str]:
     record, problem = _load_run_record(record_path, now=now)
     if record is None:
@@ -1160,12 +1166,28 @@ def _prescreen_and_quota_lines(*, now: datetime, record_path: Path | None) -> li
     else:
         step = apply or propose
         lines.append(f"預篩：本輪沒完成（{(step or {}).get('status')}：{(step or {}).get('reason') or (step or {}).get('error') or '—'}）")
+    # 額度：同一個狀態＋同一個窗只印一行（兩個 LLM 步驟看到的是同一個帳號額度），寫成人話：用了幾成、幾點重置、
+    # 用完會怎樣（2026-10-01 使用者問「LLM 額度是什麼問題」——原本只印 allowed_warning、seven_day、重置 ?）。
+    seen: dict[tuple[Any, Any], dict[str, Any]] = {}
     for key in ("07a_triage_propose", "10b_prescreen_propose"):
         for call in (rows.get(key) or {}).get("calls") or []:
             limit = (call or {}).get("rate_limit") or {}
             if limit and limit.get("status") not in (None, "allowed"):
-                lines.append(f"⚠ **LLM 額度 {limit.get('status')}**（{key}；{limit.get('rateLimitType') or '?'}"
-                             f"，重置 {limit.get('resetsAt') or '?'}）")
+                entry = seen.setdefault((limit.get("status"), limit.get("rateLimitType")), {"steps": [], **limit})
+                if key not in entry["steps"]:
+                    entry["steps"].append(key)
+    for (status, kind), entry in seen.items():
+        used = entry.get("utilization")
+        used_text = f"已用 {used:.0%}" if isinstance(used, (int, float)) else "用量沒回報"
+        reset = entry.get("resetsAt")
+        try:
+            reset_text = datetime.fromtimestamp(float(reset), timezone.utc).astimezone(now.tzinfo).strftime("%m-%d %H:%M")
+        except (TypeError, ValueError, OverflowError, OSError):
+            reset_text = "?"
+        lines.append(f"⚠ **LLM 額度{QUOTA_STATUS_WORDS.get(str(status), '')}**（{status}）：Claude 訂閱"
+                     f"{QUOTA_WINDOW_WORDS.get(str(kind), f' {kind or '?'} ')}額度{used_text}，{reset_text} 重置"
+                     f"（{'、'.join(entry['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類與預篩"
+                     "會暫停（記成 rate_limited），心跳照發")
     return lines
 
 

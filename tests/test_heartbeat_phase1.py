@@ -230,7 +230,7 @@ def test_prescreen_line_and_quota_come_from_the_run_record(tmp_path: Path) -> No
     path.write_text(json.dumps(record), encoding="utf-8")
     lines = hb._prescreen_and_quota_lines(now=NOW, record_path=path)
     assert lines[0].startswith("預篩 4｜標旗 3（可能觸及 1／無關 1／看不出 1）｜無全文 2｜無 fetcher 5")
-    assert "LLM 額度 allowed_warning" in lines[1]
+    assert "LLM 額度接近上限**（allowed_warning）" in lines[1] and "5 小時" in lines[1]
     missing = hb._prescreen_and_quota_lines(now=NOW, record_path=tmp_path / "nope.json")
     assert "執行紀錄" in missing[0]
 
@@ -326,3 +326,21 @@ def test_theme_scan_config_is_validated(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         load_theme_scan(path)
     assert load_theme_scan()["nudge_after_days"] == 7, "repo 的 config 要合法"
+
+
+def test_quota_line_says_how_much_is_used_when_it_resets_and_prints_once(tmp_path: Path) -> None:
+    """2026-10-01 使用者問「LLM 額度是什麼問題」：寫成人話——用了幾成、幾點重置（台北時間）、用完會怎樣；
+    兩個 LLM 步驟看到的是同一個帳號額度，只印一行。"""
+    limit = {"status": "allowed_warning", "rateLimitType": "seven_day", "utilization": 0.67, "resetsAt": 1791212400}
+    record = {"steps": [
+        {"key": "07a_triage_propose", "status": "ok", "calls": [{"rate_limit": limit}]},
+        {"key": "10b_prescreen_propose", "status": "ok", "calls": [{"rate_limit": limit}]},
+    ]}
+    path = tmp_path / "run.json"
+    path.write_text(json.dumps(record), encoding="utf-8")
+    taipei = NOW.astimezone(timezone(timedelta(hours=8)))
+    quota = [l for l in hb._prescreen_and_quota_lines(now=taipei, record_path=path) if "LLM 額度" in l]
+    assert len(quota) == 1
+    line = quota[0]
+    assert "7 天額度已用 67%" in line and "10-05 23:00 重置" in line
+    assert "07a_triage_propose、10b_prescreen_propose" in line and "心跳照發" in line
