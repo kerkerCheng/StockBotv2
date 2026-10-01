@@ -198,7 +198,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 4.7 | 四個小修：240 條退役不印；`ignored` 接 held_index／心跳；百分位覆蓋率；同敘事重複反證拒收（偏差見 §0.6 #15；驗收見 baseline 報告 §23） | ✅ | 執行模型 | 見 git log「Step 4.7」 |
 | 4.8 | 研究（強模型）：inp_substrate 資料工後重量；cw_dfb 層文件與誠實終局；AMAT／COHR 兩筆 lead 到終局（RA）；stale 讀圖與 SIVE.ST 敘事處置——**四件掛 pq2 等 go：[664]／[665]／[666]／[668]**；讀圖與敘事已寫入（收據 `docs/reports/2026-10-01-phase4-step48-research.md`；偏差見 §0.6 #16） | ✅ | **強模型** | 見 git log「Step 4.8」 |
 | 4.9 | 新管線 full chain 測試（層文件 packet → apply 入口 → 計數器動；`tests/test_layer_document_full_chain.py` 4 條） | ✅ | 執行模型 | 見 git log「Step 4.9」 |
-| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
+| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅——**等使用者對 pq2 [664]／[665]／[666]／[668] 的決定**：§11 的「走圖第 2 型 lead 到終局」「至少 1 份 applied RA 帶 `layer_enumerations`＋入口戳記」「① AMAT、COHR 各 −1」都要入圖後才成立。go 之後依序：[664]／[665] 照各自 hint 跑 `loader/migrate_relation_rejudge.py --additions …`、lead `advance … applied`、`todo resolve <n> --verb go --receipt …`；[666]／[668] 跑 `scripts/apply_ra_admission.py --pq2 <n> --digest <digest>` → publish → `todo complete-ra`；再 materialize、重算計數器（預期 ① 75→73、② 5→6、第 2 型命中 2→0）、寫 closeout、發結案 R2。2026-10-02 已先跑、不依賴 go 的：全套測試綠、`audit invariants` 14 PASS、殭屍 grep 三個 0、`AGENTS.md` 自 4.0 起 0 行變動、舊 Decision Store 三檔與 `trade_log.jsonl` sha256 ＝ 4.0 | ○ | 執行模型 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 
