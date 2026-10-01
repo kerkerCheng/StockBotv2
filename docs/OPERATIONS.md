@@ -165,7 +165,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **2 canonical skill／prompt／本檔** | 本節；本檔 Engine C 命令段。skill 不動 |
 | **3 最窄 rule** | **不進任何無人值守 allowlist**：daily 不跑它，`.codex/rules` 仍是 0 條。daily ②b 的既有命令不變；未遷移的庫上它只略過兩個新指標並計數（`summary.late_metrics_skipped`，daily 印得出來），其餘指標照寫——不會因 CHECK 而整批 `outcome=error`。落在本機既有的 `Bash(python *)` 之下，補償控制＝dry-run 預設＋writer lock＋備份對帳＋單交易 rollback |
 | **4 contract test** | `tests/test_engine_c_equity_issuance.py`（未遷移只略過並計數；備份／重建／對帳／冪等／不覆寫備份；對帳不符 rollback 且舊 CHECK 原樣；新 CHECK 收得下新指標）；`tests/test_engine_c_history.py::test_metric_vocabulary_is_the_same_in_sqlite_postgres_and_schema_sql`（SQLite DDL、`schema.sql`、Postgres 遷移檔三處字彙相等；Postgres 走版本化檔 `engine_c/migrations/20261001_add_equity_issued_value_metric.sql`，已套用的舊檔不改） |
-| **5 端到端 smoke** | 2026-10-01：正式庫 dry-run（5637 列、缺 2 個字彙）；正式庫 `--apply` 被執行環境的權限檢查擋下，**未遷移**。整條入口改在副本上跑完：`?mode=ro`＋backup API 複製 → `--db <副本>` dry-run → `--apply`（5637 列、摘要前後相同、table_info 指紋不變）→ 再跑一次印「不需要遷移」→ 非增量 EDGAR 回填兩輪（舊指標 5637 列逐列相同）→ 逐檔燈色（`docs/reports/2026-10-01-phase4-baseline.md` §22）。**正式庫待使用者執行上面 Engine C 段那三行**；在那之前 daily ②b 只略過新指標並計數，稀釋燈對國內申報人印「CHECK 尚未遷移」 |
+| **5 端到端 smoke** | 2026-10-01：正式庫 dry-run（5637 列、缺 2 個字彙）；正式庫 `--apply` 被執行環境的權限檢查擋下，**未遷移**。整條入口改在副本上跑完：`?mode=ro`＋backup API 複製 → `--db <副本>` dry-run → `--apply`（5637 列、摘要前後相同、table_info 指紋不變）→ 再跑一次印「不需要遷移」→ 非增量 EDGAR 回填兩輪（舊指標 5637 列逐列相同）→ 逐檔燈色（`docs/reports/2026-10-01-phase4-baseline.md` §22）。同日 23:25 經使用者授權，正式庫照同一順序跑完：`--apply`（5637 列、摘要前後相同，收據在 `library/private/engine_c/backups/`）→ 互動 writer lock 下非增量回填 → 舊指標逐列相同、逐檔燈色與副本 73 檔相同 |
 
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.1c：兩支唯讀 CLI 退役）
 

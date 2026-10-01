@@ -335,9 +335,16 @@ parked lead 有 ticker 的 405 則，`missing_rungs`（以 refs 的 `source_rout
 - 讀法：「沒有」的那一側約 6／36 其實有談，所以 102 偏高；打折後存量仍約四分之三的 sub 沒有可替代性措辭撐住——多數是法說／新聞稿的產品描述、產能、營收成長、「industry leader」「de facto standard」。
 - **不拿這批樣本改字表**（同一批資料考自己會讓準確率失真）；v2 候選記入 plan §14 #18，換一批新樣本再量。
 
-## 22. Step 4.6 稀釋燈與 CHECK 遷移（2026-10-01；**正式庫尚未遷移——數字來自唯讀副本**）
+## 22. Step 4.6 稀釋燈與 CHECK 遷移（2026-10-01；先在唯讀副本上跑，使用者授權後正式庫照跑、結果相同）
 
-⚠ 正式庫的 `python -m engine_c.migrate_fundamental_metrics --apply` 被執行環境的權限檢查擋下，本節全部在副本上跑：
+**正式庫（2026-10-01 23:25 台北，使用者授權後）**：`--apply` 收據 `library/private/engine_c/backups/…pre-metrics-20261001T152504Z.{db,json}`——
+5637 列、遷移前後內容摘要 `6a8c5aa2…` 相同；互動 writer lock 下非增量回填（EDGAR written 41／no_cik 29／lagging 3〔CDNS、TSM、UMC〕、
+拒寫 17 組、`irregular_period_facts` 4〔全是 CCXI：營業利益與發行金額各兩筆，2025-06-04 成立起算的 26 天、210 天期間〕、`late_metrics_skipped` 0）。
+對備份唯讀核對：舊 7 個指標 5637 列逐列相同（被改或被刪 0、新增 0）、封面股數 595 列相同、`PRAGMA table_info` 指紋仍是 §13 的 `ea99fbe2…`；
+新指標 263 列（季 193、年 70；17 檔；filed＝fetched 日期 0、filed 空 0；USD 262／CNY 1；衍生 FY−9M 45、FY−ΣQ1..Q3 13）；
+**正式庫逐檔燈色與下面副本的結果 73 檔完全相同**（R2-c 收尾的判色改動前後，副本 73 檔燈色與缺席種類也完全相同）。
+
+以下是使用者授權前的副本試跑（正式庫的 `--apply` 當時被執行環境的權限檢查擋下）：
 以 `?mode=ro` 連線、sqlite3 backup API 從正式庫複製（正式庫只讀、一字不寫）→ 對副本跑遷移 CLI（`--db <副本>`：dry-run → `--apply` → 再跑一次印「不需要遷移」）
 → 對副本跑非增量 EDGAR 回填（`--db <副本> --no-prices`，跑兩輪：第二輪驗新衍生路，`ON CONFLICT DO NOTHING` 只補新列）
 → 行程內把 Engine C 連線與市值正規化的庫路徑指向副本，逐檔走真正的串接點 `alpha.providers.wipeout.wipeout_for`。
@@ -376,3 +383,24 @@ parked lead 有 ticker 的 405 則，`missing_rungs`（以 refs 的 `source_rout
   公司另用自訂 tag 標的發行不在金額內（INTC）；10-Q 與 10-K 前後 tag 不一（CRWV FY2025 年度 6800 萬 < Q1'25 13.9 億；NVDA FY2024 年度有、三份 10-Q 沒有）。
 
 逐檔明細：scratchpad `p46_trial/lamps_after.json`（session 結束即消失；正式庫遷移後以 materialize 產物為準）。
+
+## 23. Step 4.7 四個小修的真實資料驗收（2026-10-01 23:27 materialize，daily ⑬ 同一行）
+
+改前＝今早 05:34 daily 的產物（`library/private/backups/20260930T213948Z/files.zip` 內的 analyst_view，與 §11 同一批；文字 digest 總值 `5f7211dc40a76414`）。
+
+| 驗收 | 改前 | 改後 |
+|---|---|---|
+| downside 面板 `source="judgment"` 列（4.7a） | 240（63 檔） | **0** |
+| research 面板 `disproofs`（4.7a，欄位退役） | 240（73 檔都有這一欄） | 0（0 檔有這一欄） |
+| downside 面板「有列／缺席」 | 63／10 | 4／69（有列的 4 檔＝AXTI、COHR、LITE、SIVE.ST，都是有登記反證的 v2 敘事；其餘 69 檔印「這家公司名下還沒有任何登記的反證（…）」） |
+| 候選板 `holdings`（4.7b） | `unresolved ["7803.T"]`、沒有 `ignored` 欄 | `unresolved []`（使用者白天刪了 Sheet 那一列）、`ignored []`、`ignored_problem null`——心跳照印「持股解析不到 0（使用者決定不研究 0）」 |
+| 自家歷史百分位印覆蓋率（4.7c） | 0 檔有 `coverage` | 31 檔 |
+| 敘事 ledger 同版重複反證（4.7d） | — | 現行 v2 敘事 4 份、連舊版 8 筆 v2 紀錄：重複 0（新規則不擋任何既有敘事） |
+
+**文字 digest**：總值 `5f7211dc40a76414` → `83a64c6612c12330`。brief／research 兩面板 73 檔文字逐字不變（research 面板 digest 只算敘事文字行，disproofs 清單不在內）；
+**argument 面板 17 檔變了——逐行比對（34 行全在鏈段 `argument:chain`），沒有一行來自 4.7**：
+① 8 檔公司名由 slug 換成名冊 display_name（6481.T、AMD、CCXI、IREN、SNDK、TSLA、XFAB.PA、XPEV；4.1c）；
+② 9 檔押的層讀圖狀態「現行」→「現行（圖上只有證據等級變了）」（2455.TW、3081.TWO、4979.TWO、5016.T、5802.T、AXTI、COHR、LITE、SIVE.ST——4.3 讓
+`mat:inp_substrate`、`tech:cw_dfb_laser` 兩層讀圖 stale_low）；SIVE.ST 另有 SuperNova 插槽「現行」→「圖變了、該重讀」（4.3 的 stale，4.8 第 5 項重讀）；
+LITE 另有「Pluggable turnkey ELS module」一條由「公司自己說的，但寫在正式申報文件裡」升為「有客戶或第三方印證」（4.3 登記發布者），句中順序跟著換。
+（先用「這 17 檔名下有沒有 4.1／4.3 改判的邊」去解釋，被資料推翻——9 檔名下沒有改判邊、20 檔有改判邊卻沒變；逐行比對才找到上面三種來源。）
