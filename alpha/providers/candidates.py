@@ -213,18 +213,12 @@ def board_rewrite(rows: Sequence[Mapping[str, Any] | None], breaks: Sequence[Map
 
 def _wipeout_and_three_questions(ticker: str, *, today: date, history_not_comparable: Mapping[str, Any] | None
                                  ) -> tuple[Mapping[str, Any] | None, str | None]:
-    """四盞燈（Engine C 取數＋`alpha.wipeout` 判色）＋三題。讀不到回 `(None, 理由)`——理由要帶出去（INV-3）。"""
-    from alpha.wipeout import wipeout_flags
-    from engine_c.checklist import get_wipeout_inputs
-
+    """四盞燈（唯一串接點 `alpha.providers.wipeout.wipeout_for`）＋三題。讀不到回 `(None, 理由)`——理由要帶出去（INV-3）。"""
     from .three_questions import three_questions_for
+    from .wipeout import wipeout_for
 
     try:
-        raw = get_wipeout_inputs(ticker)
-        flags = (wipeout_flags(runway=raw.get("runway"), shares_series=raw.get("shares_series"),
-                               going_concern=raw.get("going_concern"), today=today,
-                               shares_source=raw.get("shares_source")) if raw.get("status") == "ok" else None)
-        reason = None if flags is not None else str(raw.get("reason") or "Engine C 觀測不可用")
+        flags, reason = wipeout_for(ticker, today=today)
         return three_questions_for(ticker, today=today, wipeout=flags, wipeout_reason=reason,
                                    history_not_comparable=history_not_comparable), None
     except Exception as exc:  # noqa: BLE001 — 一檔讀不到記成「未讀到＋理由」，不帶走整板
@@ -349,7 +343,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
                context: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """讀真實資料組整板（materialize 用；**唯讀**：敘事 ledger、讀圖對圖、registry、Engine C、Sheet readonly）。
 
-    ⚠ Engine C：三題走 `?mode=ro`；四盞燈沿用 `engine_c.checklist.get_wipeout_inputs`（與單檔 materialize 同一條路，
+    ⚠ Engine C：三題走 `?mode=ro`；四盞燈走唯一串接點 `alpha.providers.wipeout.wipeout_for`（與單檔 materialize 同一條路，
     一般連線）；邊緣判定的市值正規化沿用 `alpha/providers/market_normalization.py`（FX 由 yfinance 取一次）。
     `tickers`：宇宙（APP 已 materialize 的那幾十檔）；敘事 ledger 裡有、宇宙沒有的也併進來——上板的依據是敘事。
     `context`：`candidate_context(tickers)` 的結果（沒給就自己載一次）。"""

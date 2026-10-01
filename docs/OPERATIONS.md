@@ -114,7 +114,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 
 | 步 | 結論 |
 |---|---|
-| **1 path／side effect／capability** | `python -m webapp materialize --candidates`：推導、**不寫任何 authority**——讀敘事 ledger（`library/private/alpha/briefs/`）、讀圖對圖（Neo4j bolt 本機，唯讀）、watch registry、thesis lifecycle、Engine C（三題走 `?mode=ro`；四盞燈沿用 `engine_c.checklist.get_wipeout_inputs`，與單檔 materialize 同一條一般連線，`get_conn` 開庫時會跑建表 DDL；邊緣判定的市值正規化 `alpha/providers/market_normalization.py` 另以 `sqlite3.connect` 開一般連線）、Google Sheet（`spreadsheets.readonly`，已持有判定）、邊緣判定的 FX（同一支 `market_normalization` 經 yfinance 取一次，與同一步 `--beta` 用的是同一個 `get_fx_snapshot`——單檔 materialize 不取 FX）；只寫 ignored derived cache `library/private/app/state/candidates.json`（atomic）。**無新增網路主機或憑證**：Sheet readonly 與 `--positions` 同一組、yfinance FX 與 `--beta` 同一組、Engine C 是本機檔（2026-09-29 3.6 審查 c9 與覆核更正：原稿把 Engine C 全寫成 `?mode=ro`、漏了 FX，覆核再抓到 FX 的同組來源寫錯）。`engine_b/cli.py::_held` 改呼叫共用的持股身分解析，語意不變（全部持股、含 beta、Sheet 讀不到 fail closed；2026-09-29 實測 pq1 排序對 3.0 基準 12 則逐位相同）。`risk/hard_caps.py` 只匯出判別函式（#17），硬擋行為不變。心跳只多讀一份 state artifact（零網路） |
+| **1 path／side effect／capability** | `python -m webapp materialize --candidates`：推導、**不寫任何 authority**——讀敘事 ledger（`library/private/alpha/briefs/`）、讀圖對圖（Neo4j bolt 本機，唯讀）、watch registry、thesis lifecycle、Engine C（三題走 `?mode=ro`；四盞燈走唯一串接點 `alpha.providers.wipeout.wipeout_for`（2026-10-01 Step 4.6a 合一；取數仍是 `engine_c.checklist.get_wipeout_inputs`），與單檔 materialize 同一條一般連線，`get_conn` 開庫時會跑建表 DDL；邊緣判定的市值正規化 `alpha/providers/market_normalization.py` 另以 `sqlite3.connect` 開一般連線）、Google Sheet（`spreadsheets.readonly`，已持有判定）、邊緣判定的 FX（同一支 `market_normalization` 經 yfinance 取一次，與同一步 `--beta` 用的是同一個 `get_fx_snapshot`）。Step 4.6 起稀釋燈要印「占市值 %」：新股發行金額有值時（只有 10-K／10-Q 國內申報人）`wipeout_for` 多經同一支 `market_normalization.screen_inputs` 讀本機快照與 registry——**結算幣別是 USD 就不取 FX**（2026-10-01 這 35 檔全是 USD 掛牌），所以單檔 materialize 實際仍不取 FX；哪天出現非 USD 的國內申報人，會走同一個 `get_fx_snapshot`（同一組主機，無新憑證）；只寫 ignored derived cache `library/private/app/state/candidates.json`（atomic）。**無新增網路主機或憑證**：Sheet readonly 與 `--positions` 同一組、yfinance FX 與 `--beta` 同一組、Engine C 是本機檔（2026-09-29 3.6 審查 c9 與覆核更正：原稿把 Engine C 全寫成 `?mode=ro`、漏了 FX，覆核再抓到 FX 的同組來源寫錯）。`engine_b/cli.py::_held` 改呼叫共用的持股身分解析，語意不變（全部持股、含 beta、Sheet 讀不到 fail closed；2026-09-29 實測 pq1 排序對 3.0 基準 12 則逐位相同）。`risk/hard_caps.py` 只匯出判別函式（#17），硬擋行為不變。心跳只多讀一份 state artifact（零網路） |
 | **2 canonical skill／prompt／本檔** | 本節與上方 materialize 命令；`skills/alpha-status`（pane 1 候選板照抄 artifact）、`skills/daily-brief`（持久畫面表加候選板、⑬ 命令同步）、`skills/lead-intake`（三題已落地）；`docs/ARCHITECTURE.md` state artifact 段；`CONCEPTS.md`「候選狀態板」 |
 | **3 最窄 rule** | daily ⑬ 的 argv 加一個旗標 `--candidates`（`tests/test_daily_task.py` 逐項相等）；不新增任何 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條。APP 多一個 GET 路由 `/api/v1/candidates`（沒有寫入端點；請求路徑測試四份清單都加了它，含 405 與斷網） |
 | **4 contract test** | `tests/test_candidates.py`（持股解析、已持有、五組＋附組、前提四條各一、連結斷了進佇列段、滯留不歸零、組內字母序、rollup 只數、`_held` 語意、`hard_caps` 匯出同一函式）；`tests/test_webapp_candidates.py`；`tests/test_webapp_request_path.py`；`tests/test_heartbeat.py`／`test_heartbeat_phase1.py`（候選行、三題行、歸零旗標彙總、新鍵首日） |
@@ -156,6 +156,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **3 最窄 rule** | Windows daily 不經 Codex，`.codex/rules` 仍是 0 條，不增不減；新命令字串只進 `DAILY_STEPS` 這一個封閉清單 |
 | **4 contract test** | `tests/test_daily_task.py::test_daily_steps_are_exactly_the_closed_list`（②b 逐項相等：argv、15 分鐘、writes、network）與 `::test_timeouts_fit_inside_the_task_time_limit`；`tests/test_engine_c_history.py`（PIT、冪等、分割、20-F 只有年度、拒寫原因、落後不寫） |
 | **5 端到端 smoke** | 2026-09-29 先對正式庫的 backup API 副本跑全體回填（73 檔價格、EDGAR 43 檔寫入／29 檔無 CIK／CDNS 落後 89 天不寫），再在 writer lock 下對正式庫跑；台股月營收以既有 `python -m engine_c.monthly_revenue --backfill 48` 補到 2022-09（TPEX 2022-10 一個月 MOPS 逾時，報告列出）。回填報告：`docs/reports/2026-09-29-phase3-step32-backfill.md` |
+
+### Sandbox impact review 結論（2026-10-01，Phase 4 Step 4.6：`fundamental_history` CHECK 遷移）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新入口 `python -m engine_c.migrate_fundamental_metrics`（**互動專用、一次性**；預設 dry-run 只印列數與缺的字彙）。`--apply`：先取互動 writer lock（被占用 exit 2，不等、不搶）→ sqlite3 backup API 把正式庫（WAL）整份備份到同目錄 `backups/<stem>.pre-metrics-<UTC>.db`（`quick_check`＋`fundamental_history` 列數與內容摘要相同才算備好；不覆寫既有備份）→ 一個 `BEGIN IMMEDIATE` 交易內建新表、整表複製、對帳、換名、補索引、再對帳——任何一步不符就 rollback，正式庫一字不動（exit 3）→ 收據 JSON 寫在備份旁。只動 `fundamental_history` 一張表的 CHECK；不寫人工 ledger、不寫任何 authority、不連網、不碰 `.git`、零 LLM、零憑證。冪等：已是新字彙就印「不需要遷移」 |
+| **2 canonical skill／prompt／本檔** | 本節；本檔 Engine C 命令段。skill 不動 |
+| **3 最窄 rule** | **不進任何無人值守 allowlist**：daily 不跑它，`.codex/rules` 仍是 0 條。daily ②b 的既有命令不變；未遷移的庫上它只略過兩個新指標並計數（`summary.late_metrics_skipped`，daily 印得出來），其餘指標照寫——不會因 CHECK 而整批 `outcome=error`。落在本機既有的 `Bash(python *)` 之下，補償控制＝dry-run 預設＋writer lock＋備份對帳＋單交易 rollback |
+| **4 contract test** | `tests/test_engine_c_equity_issuance.py`（未遷移只略過並計數；備份／重建／對帳／冪等／不覆寫備份；對帳不符 rollback 且舊 CHECK 原樣；新 CHECK 收得下新指標）；`tests/test_engine_c_history.py::test_metric_vocabulary_is_the_same_in_sqlite_postgres_and_schema_sql`（SQLite DDL、`schema.sql`、Postgres 遷移檔三處字彙相等；Postgres 走版本化檔 `engine_c/migrations/20261001_add_equity_issued_value_metric.sql`，已套用的舊檔不改） |
+| **5 端到端 smoke** | 2026-10-01：正式庫 dry-run（5637 列、缺 2 個字彙）；正式庫 `--apply` 被執行環境的權限檢查擋下，**未遷移**。整條入口改在副本上跑完：`?mode=ro`＋backup API 複製 → `--db <副本>` dry-run → `--apply`（5637 列、摘要前後相同、table_info 指紋不變）→ 再跑一次印「不需要遷移」→ 非增量 EDGAR 回填兩輪（舊指標 5637 列逐列相同）→ 逐檔燈色（`docs/reports/2026-10-01-phase4-baseline.md` §22）。**正式庫待使用者執行上面 Engine C 段那三行**；在那之前 daily ②b 只略過新指標並計數，稀釋燈對國內申報人印「CHECK 尚未遷移」 |
 
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.1c：兩支唯讀 CLI 退役）
 
@@ -718,6 +728,13 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --report <file.json>   # 全體回填（寫正式庫：先取 writer lock、不得與 daily 同時）
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --incremental          # daily ②b 跑的那一行
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --db <副本.db> --tickers AXTI   # 對暫存副本試跑（副本用 sqlite3 backup API 產生，正式庫是 WAL）
+# fundamental_history 的 metric CHECK 遷移（Phase 4 Step 4.6；新增指標時才用；預設 dry-run）
+& '.venv\Scripts\python.exe' -m engine_c.migrate_fundamental_metrics                # 印列數與 CHECK 缺哪些字彙
+& '.venv\Scripts\python.exe' -m engine_c.migrate_fundamental_metrics --apply        # 取 writer lock → 備份 → 單交易重建 → 對帳
+# 遷移後補新指標的歷史：daily ②b 的增量只在有新申報時重抓，舊申報裡的新指標要跑一次非增量回填
+& '.venv\Scripts\python.exe' scripts\writer_guard.py acquire --minutes 30 --purpose "EDGAR 非增量回填"
+& '.venv\Scripts\python.exe' -m engine_c.history_backfill --no-prices --report <file.json>
+& '.venv\Scripts\python.exe' scripts\writer_guard.py release
 ```
 
 ⚠ **寫入含 `$` 的金額字串不要經 PowerShell 傳參**——`US$71.3M` 會被當變數前綴展開成 `US.3M`，在 append-only ledger 造成需 supersede 才能更正的損毀。用 Python 或 heredoc。

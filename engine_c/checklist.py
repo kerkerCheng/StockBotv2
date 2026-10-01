@@ -347,6 +347,140 @@ def _cover_shares_series(connection, ticker: str, *, today) -> list | None:
     return series
 
 
+#: 稀釋燈的發行金額取數用到的兩個 metric（Phase 4 Step 4.6；`engine_c.history_backfill.LATE_METRICS`）。
+_EQUITY_QUARTER = "equity_issued_value_quarter"
+_EQUITY_ANNUAL = "equity_issued_value_annual"
+#: 窗尾（anchor）＝最新已申報季度的期末，只從**期末精確**的指標取：季度流量與資產負債表時點值。
+#: ⚠ 封面股數的日期不是期末（比期末晚 20–75 天，2026-10-01 正式庫 35 檔裡只有 AMAT 恰好等於期末）——拿它當窗尾，
+#: 年度那一列永遠對不上窗尾、四季窗也會整個往後推。
+_ANCHOR_METRICS = ("revenue_quarter", "operating_income_quarter", "cash", "total_debt", _EQUITY_QUARTER)
+#: 「最近四季」＝期末距窗尾**不到 320 天**的季度（含窗尾那一季）。相鄰季度期末相距 80–100 天（13／14 週季度；
+#: 與 `alpha/three_questions._QUARTER_GAP` 同一個判準），所以三季前最遠 300 天、四季前最近 320 天——日曆季與
+#: 52／53 週制都剛好四季。⚠ 不用 365 天：52 週制四季前那一季的期末離窗尾只有 364 天，會多加一季
+#: （2026-10-01 正式庫：LITE、AAPL、AMD、INTC、LRCX、MTSI 等 16 檔國內申報人是 52／53 週制）。
+_FOUR_QUARTERS_DAYS = 320
+
+
+def _equity_issuance(connection, ticker: str, *, today) -> dict:
+    """稀釋燈要的**新股發行金額**（`us-gaap:StockIssuedDuringPeriodValueNewIssues`；Phase 4 Step 4.6）——只取數、不判色。
+
+    - 不是 10-K／10-Q 國內申報人 → `method_not_applicable`（燈不判色，股數變化照印）。
+    - 表還存不下（CHECK 未遷移）、或整張表都還沒有這兩個指標（遷移後還沒回填）→ `upstream_unavailable`——
+      是我們這邊還沒準備好，**不得**說成「這家沒申報」（L12）。
+    - 5 年回填窗內這家一筆都沒有 → `provider_missing`（從來沒用這個 tag，或最後一次在窗外——兩者都說不出「沒增發」）。
+    - 否則 `ok`：最近四季＝期末落在（窗尾 − 320 天, 窗尾］的季度（`_FOUR_QUARTERS_DAYS`），窗尾＝今天已申報的
+      最新季度期末（`_ANCHOR_METRICS`）；每季取 as-of 今天已知的最新一列（含 FY−9M 衍生的第四季），年度期末正好
+      是窗尾就直接用年度那一列。**缺的季度不補 0**——列出找到幾季。
+    """
+    import sqlite3 as _sqlite3
+    from datetime import timedelta
+
+    from engine_c.history_backfill import filer_class, late_metrics_supported
+    from shared.as_of import latest_known_by_period
+
+    try:
+        klass, basis = filer_class(connection, ticker, today=today)
+    except _sqlite3.OperationalError:
+        return {"status": "upstream_unavailable", "reason": "歷史表不存在（舊庫）"}
+    if klass != "domestic_quarterly":
+        return {"status": "method_not_applicable", "filer_class": klass, "filer_basis": basis}
+    if not late_metrics_supported(connection):
+        return {"status": "upstream_unavailable", "filer_class": klass, "filer_basis": basis,
+                "reason": "fundamental_history 的 CHECK 尚未遷移，新股發行金額存不進來"
+                          "（python -m engine_c.migrate_fundamental_metrics --apply）"}
+    try:
+        rows = connection.execute(
+            "SELECT metric, period_start, period_end, filed, accession, value, currency, tag, derived "
+            "FROM fundamental_history WHERE ticker = ? AND metric IN (?, ?)",
+            (ticker, _EQUITY_QUARTER, _EQUITY_ANNUAL)).fetchall()
+        anchor_row = connection.execute(
+            "SELECT MAX(period_end) FROM fundamental_history WHERE ticker = ? AND filed <= ? "
+            f"AND metric IN ({', '.join('?' for _ in _ANCHOR_METRICS)})",
+            (ticker, today.isoformat(), *_ANCHOR_METRICS)).fetchone()
+        backfilled = rows or connection.execute(
+            "SELECT 1 FROM fundamental_history WHERE metric IN (?, ?) LIMIT 1",
+            (_EQUITY_QUARTER, _EQUITY_ANNUAL)).fetchone()
+    except _sqlite3.OperationalError:
+        return {"status": "upstream_unavailable", "reason": "fundamental_history 讀不到"}
+    if not backfilled:
+        return {"status": "upstream_unavailable", "filer_class": klass, "filer_basis": basis,
+                "reason": "新股發行金額還沒回填（整張表一列都沒有）——遷移後要跑一次非增量 EDGAR 回填"
+                          "（python -m engine_c.history_backfill --no-prices）"}
+    if not rows:
+        return {"status": "provider_missing", "filer_class": klass, "filer_basis": basis,
+                "reason": "5 年回填窗內 companyfacts 沒有 StockIssuedDuringPeriodValueNewIssues 的任何 10-K／10-Q fact"}
+    if not anchor_row or not anchor_row[0]:
+        return {"status": "upstream_unavailable",
+                "reason": "找不到最新已申報季度的期末（季度營收／營業利益、現金、債務、發行金額都沒有）"}
+    anchor = type(today).fromisoformat(str(anchor_row[0])[:10])
+    window_after = anchor - timedelta(days=_FOUR_QUARTERS_DAYS)
+    by_metric: dict[str, list[dict]] = {_EQUITY_QUARTER: [], _EQUITY_ANNUAL: []}
+    for metric, start, end, filed, accession, value, currency, tag, derived in rows:
+        by_metric[str(metric)].append({"period_start": start, "period_end": end, "filed": filed,
+                                       "accession": accession, "value": value, "currency": currency,
+                                       "tag": tag, "derived": derived})
+    quarters = latest_known_by_period(by_metric[_EQUITY_QUARTER], today)
+    annuals = latest_known_by_period(by_metric[_EQUITY_ANNUAL], today)
+    in_window = {end: row for end, row in quarters.items() if window_after < end <= anchor}
+    exact_year = annuals.get(anchor)
+    if exact_year is not None:
+        facts, basis_kind = [exact_year], "annual"
+    else:
+        facts, basis_kind = [in_window[end] for end in sorted(in_window)], "quarters"
+    currencies = sorted({str(f.get("currency")) for f in facts})
+    total = sum(float(f["value"]) for f in facts) if facts else 0.0
+    # 期末落在窗內的年度，若季度列加起來不到年度（缺季、前後兩年 tag 不一）：差額歸不到季——印出來，不補 0、
+    # 不硬塞進某一季（L12）。窗尾那個年度已直接用年度列的不算。2026-10-01 實測 AXTI FY2025 9355 萬三份 10-Q 都沒有。
+    unattributed = []
+    for fy_end, fy_row in sorted(annuals.items()):
+        if not (window_after < fy_end <= anchor) or (basis_kind == "annual" and fy_end == anchor):
+            continue
+        try:
+            fy_start = type(today).fromisoformat(str(fy_row.get("period_start"))[:10])
+        except ValueError:
+            continue
+        known = sum(float(q["value"]) for end, q in quarters.items() if fy_start < end <= fy_end)
+        remainder = float(fy_row["value"]) - known
+        if remainder > 0.5:                                    # 金額以元計；只防浮點誤差
+            unattributed.append({"fiscal_year_end": str(fy_end), "annual": float(fy_row["value"]),
+                                 "known_quarters": known, "remainder": remainder,
+                                 "accession": fy_row.get("accession")})
+    return {
+        "status": "ok", "filer_class": klass, "filer_basis": basis,
+        "window_after": window_after, "window_end": anchor, "basis": basis_kind,
+        "quarters_found": len(in_window), "trailing_total": total, "currencies": currencies,
+        "facts": [{**f, "period_end": str(f["period_end"])[:10], "filed": str(f["filed"])[:10]} for f in facts],
+        "tags": sorted({str(f.get("tag")) for f in facts}), "unattributed": unattributed,
+    }
+
+
+def _equity_authorizations(connection, ticker: str) -> list | None:
+    """人工欄位 `equity_issuance_authorizations`（ATM／shelf 授權，judgment、經 pq2 寫入）的生效紀錄——當脈絡印，不上色。"""
+    import json as _json
+    import sqlite3 as _sqlite3
+
+    from engine_c.manual_observations import live_observation_ids
+
+    try:
+        row = connection.execute(
+            "SELECT MAX(as_of) FROM manual_observations WHERE ticker = ? AND field_name = 'equity_issuance_authorizations'",
+            (ticker,)).fetchone()
+        if not row or not row[0]:
+            return None
+        out = []
+        for oid in live_observation_ids(connection, ticker, "equity_issuance_authorizations", str(row[0])):
+            rec = connection.execute(
+                "SELECT value, source_ref FROM manual_observations WHERE observation_id = ?", (oid,)).fetchone()
+            try:
+                value = _json.loads(rec[0])
+            except (TypeError, ValueError):
+                value = rec[0]
+            out.append({"value": value, "source": rec[1], "as_of": str(row[0]), "observation_id": oid})
+        return out or None
+    except _sqlite3.OperationalError:
+        return None
+
+
 def _going_concern_record(connection, ticker: str) -> dict | None:
     """`going_concern_opinion` 的生效紀錄：最新 as_of、supersedes 沒被指到的那一筆（Phase 3 Step 3.3）。
 
@@ -455,8 +589,17 @@ def get_wipeout_inputs(ticker: str, *, conn=None) -> dict:
             if cover is not None:
                 series, shares_source = cover, "sec_cover_shares"
         going_concern = None if is_pg else _going_concern_record(connection, ticker)
+        # 新股發行金額（Phase 4 Step 4.6）：稀釋燈的判色輸入。市值（只為印「占市值 %」）不在這裡取——
+        # 那是研究層的正規化（`alpha/providers/market_normalization.py`），資料層不往下游引用
+        # （串接點 `alpha.providers.wipeout.wipeout_for`）。
+        if is_pg:
+            issuance = {"status": "upstream_unavailable", "reason": "歷史表只在 SQLite（Postgres 尚未接）"}
+        else:
+            issuance = _equity_issuance(connection, ticker, today=_date.today())
+            issuance["authorizations"] = _equity_authorizations(connection, ticker)
         return {"ticker": ticker, "status": "ok", "runway": runway,
-                "shares_series": series, "shares_source": shares_source, "going_concern": going_concern}
+                "shares_series": series, "shares_source": shares_source, "going_concern": going_concern,
+                "issuance": issuance}
     except Exception as exc:  # noqa: BLE001 — 取不到就誠實說取不到，不回一組看起來合理的空值
         return {"ticker": ticker, "status": "unavailable", "reason": f"{type(exc).__name__}: {exc}"}
     finally:

@@ -41,6 +41,17 @@ def _series(days: int, *, change: float = 0.0):
     return [(start, 1_000_000.0), (TODAY, 1_000_000.0 * (1 + change))]
 
 
+def _issuance(total: float = 0.0, *, status: str = "ok", cap: float | None = 1_000_000_000.0,
+              currencies=("USD",), **extra):
+    """`engine_c.checklist._equity_issuance` 的形狀（Phase 4 Step 4.6）。"""
+    if status != "ok":
+        return {"status": status, "filer_class": extra.get("filer_class"), "reason": extra.get("reason")}
+    return {"status": "ok", "filer_class": "domestic_quarterly", "window_after": date(2025, 8, 14),
+            "window_end": date(2026, 6, 30), "basis": "quarters", "quarters_found": 4, "trailing_total": total,
+            "currencies": list(currencies), "facts": [], "tags": ["us-gaap:StockIssuedDuringPeriodValueNewIssues"],
+            "market_cap_usd": cap, "market_cap_absence": None, **extra}
+
+
 # ---------------------------------------------------------------------------
 # 1＋2. 灰不是綠；型別層擋得住兩種同形
 # ---------------------------------------------------------------------------
@@ -111,27 +122,84 @@ def test_debt_lamp_refuses_rather_than_guessing_when_an_input_is_missing() -> No
 # ---------------------------------------------------------------------------
 
 def test_dilution_never_turns_green_on_a_short_window() -> None:
-    """**沒看到增發不等於沒有增發。** 窗不滿一年時「沒增加」也不得判綠。"""
-    flag = dilution_flag(_series(FULL_YEAR_DAYS - 1, change=0.0), _runway(), today=TODAY)
+    """**沒看到增發不等於沒有增發。** 沒有發行紀錄、股數窗又不滿一年時，「沒增加」也不得判綠。"""
+    flag = dilution_flag(_series(FULL_YEAR_DAYS - 1, change=0.0), _runway(), today=TODAY, issuance=_issuance(0.0))
     assert flag["colour"] is None
     assert flag["absence_kind"] == "insufficient_evidence"
     assert flag["inputs"]["colour_available_on"] > TODAY        # 有到期的等待（INV-2）
 
 
-def test_dilution_colours_only_after_a_full_year_and_does_not_split_by_cash_burn() -> None:
-    """滿一年才判色；而且**不拿燒錢與否把黃切成紅**——那需要分辨員工股酬與真增發，
-    而那是量級問題，今天沒有非憑空的門檻可用（首版就是這樣被真實資料推翻的）。"""
+def test_a_leap_day_cover_date_still_gets_an_expiry() -> None:
+    """封面日是 2 月 29 日時，到期日照「滿 FULL_YEAR_DAYS 天」那把尺算（舊寫法 `replace(year=+1)` 會丟例外）。"""
+    series = [(date(2024, 2, 29), 100.0), (date(2024, 11, 1), 100.0)]
+    flag = dilution_flag(series, _runway(), today=date(2024, 12, 1), issuance=_issuance(0.0))
+    assert flag["absence_kind"] == "insufficient_evidence"
+    assert flag["inputs"]["colour_available_on"] == date(2025, 2, 28)
+
+
+def test_dilution_is_amber_on_an_issuance_record_and_does_not_split_by_cash_burn() -> None:
+    """Phase 4 Step 4.6：判色看**新股發行紀錄**，不看股數增加——股數增加同時承載員工股酬與真增發（L12；
+    4.0 基準國內申報人 30 檔亮黃 24 檔＝恆亮）。燒不燒錢都一樣（不拿量級切紅，INV-5）。"""
     burning = _runway(fcf=-10.0)
-    assert dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), burning, today=TODAY)["colour"] == "green"
-    assert dilution_flag(_series(FULL_YEAR_DAYS, change=0.15), burning, today=TODAY)["colour"] == "amber"
-    # 燒不燒錢都一樣是黃：顏色不因現金流符號而改變。
-    assert dilution_flag(_series(FULL_YEAR_DAYS, change=0.15), _runway(fcf=10.0),
-                         today=TODAY)["colour"] == "amber"
+    issued = _issuance(600_083_000.0, cap=2_000_000_000.0)
+    flag = dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), burning, today=TODAY, issuance=issued)
+    assert flag["colour"] == "amber"                                   # 股數沒變也是黃：發行是事實
+    assert flag["inputs"]["trailing_issued"] == 600_083_000.0
+    assert flag["inputs"]["pct_of_market_cap"] == pytest.approx(0.3000415)
+    assert dilution_flag(_series(30, change=0.0), _runway(fcf=10.0), today=TODAY,
+                         issuance=issued)["colour"] == "amber"          # 窗多短都算數（看到的是事實）
+    assert dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), burning, today=TODAY,
+                         issuance=_issuance(0.0))["colour"] == "green"
+
+
+def test_an_annual_issuance_the_quarters_cannot_place_never_lets_the_lamp_turn_green() -> None:
+    """年報有發行、季報加起來不到（缺季、tag 前後不一）：已知的季度為 0 時不判綠——說不出最近四季有沒有增發；
+    已知部分 > 0 照樣黃，差額印在稽核層（AXTI FY2025 型）。"""
+    gap = [{"fiscal_year_end": "2025-12-31", "annual": 93_550_000.0, "known_quarters": 0.0,
+            "remainder": 93_550_000.0, "accession": "FY25"}]
+    flag = dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), _runway(), today=TODAY,
+                         issuance=_issuance(0.0, unattributed=gap))
+    assert flag["colour"] is None and flag["absence_kind"] == "insufficient_evidence"
+    assert flag["inputs"]["unattributed"] == gap
+    amber = dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), _runway(), today=TODAY,
+                          issuance=_issuance(600_083_000.0, unattributed=gap))
+    assert amber["colour"] == "amber" and amber["inputs"]["unattributed"] == gap
+
+
+def test_shares_rising_without_an_issuance_record_is_not_coloured() -> None:
+    """股數增加了、窗內卻沒有發行紀錄 → 不上色，另印「股數 +X%（無新股發行紀錄）」：分不出員工股酬與沒標 tag 的增發。"""
+    flag = dilution_flag(_series(FULL_YEAR_DAYS, change=0.15), _runway(), today=TODAY, issuance=_issuance(0.0))
+    assert flag["colour"] is None and flag["absence_kind"] == "insufficient_evidence"
+    assert flag["inputs"]["outstanding_note"] == "股數 +15.0%（無新股發行紀錄）"
+
+
+@pytest.mark.parametrize("issuance, kind", [
+    (_issuance(status="method_not_applicable", filer_class="foreign_annual"), "method_not_applicable"),
+    (_issuance(status="provider_missing", reason="回填窗內沒有這個 tag"), "provider_missing"),
+    (_issuance(status="upstream_unavailable", reason="歷史表不存在"), "upstream_unavailable"),
+    (None, "upstream_unavailable"),
+])
+def test_dilution_exits_without_an_issuance_reading_are_grey_and_still_print_the_share_change(issuance, kind) -> None:
+    """其他申報人、沒用這個 tag、上游讀不到——都不判色（連「股數沒增加」也不判綠），股數變化照印在稽核層。"""
+    flag = dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), _runway(), today=TODAY, issuance=issuance)
+    assert flag["colour"] is None and flag["absence_kind"] == kind
+    assert flag["inputs"]["outstanding_note"] == "同期封面股數 +0.0%"
+
+
+def test_dilution_audit_inputs_carry_tag_market_cap_share_and_authorizations() -> None:
+    """金額、占市值 %、tag、授權只住稽核層；非美元金額不換算成占市值 %（不同幣別不得相除）。"""
+    auths = [{"value": {"kind": "ATM", "amount": 600_000_000}, "source": "424B5", "as_of": "2026-08-21"}]
+    flag = dilution_flag(_series(FULL_YEAR_DAYS), _runway(), today=TODAY,
+                         issuance=_issuance(1_999_700_000.0, authorizations=auths))
+    assert flag["inputs"]["tags"] == ["us-gaap:StockIssuedDuringPeriodValueNewIssues"]
+    assert flag["inputs"]["authorizations"] == auths
+    eur = dilution_flag(_series(FULL_YEAR_DAYS), _runway(), today=TODAY, issuance=_issuance(5.0, currencies=("EUR",)))
+    assert eur["colour"] == "amber" and eur["inputs"]["pct_of_market_cap"] is None
 
 
 def test_dilution_keeps_the_observed_change_in_inputs_even_when_it_refuses_to_colour() -> None:
     """不判色**不等於丟掉觀測**：窗內看到的變化照樣進稽核層，只是不拿它上色（INV-3）。"""
-    flag = dilution_flag(_series(60, change=0.153), _runway(), today=TODAY)
+    flag = dilution_flag(_series(60, change=0.153), _runway(), today=TODAY, issuance=_issuance(0.0))
     assert flag["colour"] is None
     assert flag["inputs"]["change"] == pytest.approx(0.153)
     assert flag["inputs"]["span_days"] == 60
@@ -169,12 +237,14 @@ def test_dilution_compares_a_trailing_year_not_the_whole_backfilled_series() -> 
     """回填把封面股數拉回五年：頭尾一比每一檔都會亮黃（員工股酬累積）——那是恆亮，不是稀釋（L14-4）。"""
     series = [(date(2021, 11, 1), 900_000.0), (date(2023, 11, 1), 950_000.0),
               (date(2025, 9, 1), 1_000_000.0), (date(2025, 12, 1), 1_000_000.0), (TODAY, 1_000_000.0)]
-    flag = dilution_flag(series, _runway(), today=TODAY, source="sec_cover")
+    flag = dilution_flag(series, _runway(), today=TODAY, source="sec_cover", issuance=_issuance(0.0))
     assert flag["colour"] == "green"
     assert flag["inputs"]["base_date"] == date(2025, 9, 1)            # 距最新一點 ≥365 天的最近一點
     assert flag["inputs"]["span_days"] >= FULL_YEAR_DAYS and flag["inputs"]["source"] == "sec_cover"
     grew = [*series[:-1], (TODAY, 1_200_000.0)]
-    assert dilution_flag(grew, _runway(), today=TODAY)["colour"] == "amber"
+    # 2026-10-01（Step 4.6）：股數增加不再單獨亮黃——沒有發行紀錄就是灰；有發行紀錄才黃。
+    assert dilution_flag(grew, _runway(), today=TODAY, issuance=_issuance(0.0))["colour"] is None
+    assert dilution_flag(grew, _runway(), today=TODAY, issuance=_issuance(1.0))["colour"] == "amber"
 
 
 # ---------------------------------------------------------------------------

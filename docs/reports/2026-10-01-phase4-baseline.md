@@ -334,3 +334,45 @@ parked lead 有 ticker 的 405 則，`missing_rungs`（以 refs 的 `source_rout
 - 寬版只多抓到 1 筆（GSR「three players control over 90%」），而那是集中度措辭，人判不算——所以 v1 用窄版。
 - 讀法：「沒有」的那一側約 6／36 其實有談，所以 102 偏高；打折後存量仍約四分之三的 sub 沒有可替代性措辭撐住——多數是法說／新聞稿的產品描述、產能、營收成長、「industry leader」「de facto standard」。
 - **不拿這批樣本改字表**（同一批資料考自己會讓準確率失真）；v2 候選記入 plan §14 #18，換一批新樣本再量。
+
+## 22. Step 4.6 稀釋燈與 CHECK 遷移（2026-10-01；**正式庫尚未遷移——數字來自唯讀副本**）
+
+⚠ 正式庫的 `python -m engine_c.migrate_fundamental_metrics --apply` 被執行環境的權限檢查擋下，本節全部在副本上跑：
+以 `?mode=ro` 連線、sqlite3 backup API 從正式庫複製（正式庫只讀、一字不寫）→ 對副本跑遷移 CLI（`--db <副本>`：dry-run → `--apply` → 再跑一次印「不需要遷移」）
+→ 對副本跑非增量 EDGAR 回填（`--db <副本> --no-prices`，跑兩輪：第二輪驗新衍生路，`ON CONFLICT DO NOTHING` 只補新列）
+→ 行程內把 Engine C 連線與市值正規化的庫路徑指向副本，逐檔走真正的串接點 `alpha.providers.wipeout.wipeout_for`。
+改前＝今天 05:34 daily 的 analyst_view 產物（§10 讀的同一批）。正式庫遷移後照 OPERATIONS「Engine C」段三行重跑，數字應與本節相同（同一批 companyfacts、同一段程式）。
+
+**遷移（副本）：** `fundamental_history` 5637 列，遷移前後列數與內容摘要相同（`6a8c5aa2…`）；CHECK 由 7 個字彙變 9 個（多 `equity_issued_value_quarter`／`_annual`）；
+索引 `idx_fundamental_history_asof` 重建；全部表的 `PRAGMA table_info` 指紋遷移前後都是 §13 的 `ea99fbe2…`（CHECK 不在 table_info 裡，欄位一欄不變）。
+**回填（副本）：** EDGAR written 41／no_cik 29／lagging 3（CDNS、TSM、UMC），`late_metrics_skipped` 0，拒寫 17 組全是舊指標。
+**舊 7 個指標 5637 列逐列相同**（含封面股數 595 列，摘要 `c9d94d3d…`）；新指標 263 列（季度 193、年度 70；17 檔；幣別 USD 262／CNY 1〔XPEV，外國申報人，不判色〕）；
+沒有任何一列的 `filed` 等於 `fetched_at` 的日期、沒有空 `filed`。第四季衍生：FY−9M 45 列、FY−ΣQ1..Q3 13 列（IREN FY2025、MRVL 各年度各版本）；營收／營業利益因新衍生路多出 **0** 列。
+
+**燈（國內申報人 35 檔）：黃 24／綠 6／灰 5 → 黃 11／綠 0／灰 24**（`provider_missing` 19、`insufficient_evidence` 5）；外國年報 8、台股月報 7、unknown 23 共 38 檔全部 `method_not_applicable`。
+
+| 黃（11） | 最近四季已知金額（只計這個 tag） | 占正規化市值 | 這筆是什麼 |
+|---|---|---|---|
+| AAOI | 1,351,351,000（四季都有） | 16.0% | 2025-Q3～2026-Q2 每季都有 |
+| AXTI | 600,083,000（Q2'26）＋**FY2025 9355 萬歸不到季** | 11.8% | FY2025 年報有、2025 年三份 10-Q 都沒有這個 tag 的 fact → `unattributed`，不補 0 |
+| COHR | 1,998,450,000（年度＝窗尾） | 3.5% | 10-Q（`0000820318-26-000013`）Note 12：2026-03-02 對 NVIDIA 私募 7,788,161 股、每股 $256.80、總額 $2B；權益表「Sale of shares net of issuance costs … 1,998,735」＝表內值（同一會計年度另有 Series B 特別股轉普通股 25.07 億，不是這個 tag、不在加總） |
+| INTC | 949,000,000（2 季） | 0.15% | 窗內四季只有 2026 年兩季有這個 tag 的 fact（2025-06-29～09-27、09-28～12-27 兩季沒有）——金額是「已知至少」 |
+| IREN | 3,058,036,000（年度＝窗尾） | 19.0% | — |
+| LITE | 1,999,700,000（1 季） | 2.3% | 10-Q（`0001628280-26-030777`）權益表：「Issuance of Series A Convertible Preferred Stock, net of issuance costs … 1,999.7」（可轉換特別股照黃） |
+| LRCX | 17,447,000（年度＝窗尾） | 0.004% | 每年小額、多季有值 |
+| META | 450,000,000（2025-Q3） | 0.03% | — |
+| MP | 724,209,000（2025-Q3） | 8.6% | — |
+| MRVL | 27,600,000（2 季，其一是 FY−ΣQ1..Q3 衍生的第四季） | 0.01% | 每年 Q2 約 5000 萬、型態像員工股票計畫 |
+| NVDA | 791,000,000（四季，兩季有值） | 0.01% | 每年 Q1、Q3 有值、型態像員工股票計畫 |
+
+- **由黃轉灰的 17 檔**：14 檔 `provider_missing`（AEHR、AEVA、AMD、ANET、AVGO、BX、FN、GLW、MTSI、MU、NOVT、ORCL、TSLA、TXN——5 年回填窗內沒有這個 tag 的 10-K／10-Q fact）；
+  3 檔 `insufficient_evidence`（APO 股數 +3.2%、GXO +0.2%、SNDK +0.8%——有 tag 但窗內為 0、股數卻增加，分不出員工股酬與沒標 tag 的增發）。
+- **由綠轉灰的 4 檔**：AAPL、AMAT、JBL、MSFT（從來沒有這個 tag → `provider_missing`；改前的綠是「股數沒增加」）。**由綠轉黃 2**：LRCX、NVDA。**由灰轉黃 2**：IREN、META。
+- **綠 0 的原因**：綠要「有 tag、窗內 0、股數窗滿一年且沒增加」三件同時成立；今天有 tag 且窗內 0 的 5 檔，股數不是增加就是窗不滿。這是規則照寫的結果，不是缺陷——`provider_missing` 不得冒充綠。
+- **「會死嗎」那個字變了 25 檔**（多數是灰燈數 +1；AMD、ANET、APO、MTSI、MU、NOVT、SNDK、TSLA 8 檔由黃變綠——稀釋那盞由黃轉灰後，其他三盞的最差色是綠；
+  LRCX、NVDA 由綠變黃；BX 由「黃（灰 3）」變「灰 4」；IREN、ORCL 仍是紅、灰燈數 ∓1）。
+  **候選板「可開」計數不會動**：`alpha/providers/candidates.py::open_preconditions` 的四個前提（讀圖現行、answers 稽核行、反證 watch、連結）都不讀四盞燈。
+- **剩下的已知限制**（plan §14 #19–#21）：大型股的這個 tag 多半是員工股票計畫（NVDA、MRVL、LRCX 型；燈照黃、占市值 % 印出來，INV-5 不設量級門檻）；
+  公司另用自訂 tag 標的發行不在金額內（INTC）；10-Q 與 10-K 前後 tag 不一（CRWV FY2025 年度 6800 萬 < Q1'25 13.9 億；NVDA FY2024 年度有、三份 10-Q 沒有）。
+
+逐檔明細：scratchpad `p46_trial/lamps_after.json`（session 結束即消失；正式庫遷移後以 materialize 產物為準）。

@@ -436,18 +436,11 @@ def fetch_alpha_investment_view(
 
     # D2（2026-09-18）歸零旗標：取數在 Engine C、判色在 `alpha.wipeout`、型別在 builder。
     # 取不到就帶著 reason 往下走——**燈滅與燈綠不得同形**（L12），所以這裡不回空 dict。
+    # 串接點只有一個（`alpha.providers.wipeout.wipeout_for`，Phase 4 Step 4.6a；候選板用同一個）。
     try:
-        from alpha.wipeout import wipeout_flags
-        from engine_c.checklist import get_wipeout_inputs
+        from alpha.providers.wipeout import wipeout_for
 
-        raw = get_wipeout_inputs(str(resolved_ticker))
-        if raw.get("status") == "ok":
-            wipeout = wipeout_flags(runway=raw.get("runway"), shares_series=raw.get("shares_series"),
-                                    going_concern=raw.get("going_concern"), today=today or date.today(),
-                                    shares_source=raw.get("shares_source"))
-            wipeout_reason = None
-        else:
-            wipeout, wipeout_reason = None, str(raw.get("reason") or "Engine C 觀測不可用")
+        wipeout, wipeout_reason = wipeout_for(str(resolved_ticker), today=today or date.today())
     except Exception as exc:  # noqa: BLE001
         wipeout, wipeout_reason = None, f"歸零旗標取數失敗：{type(exc).__name__}"
 

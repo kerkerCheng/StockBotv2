@@ -67,7 +67,18 @@ METRICS: tuple[str, ...] = (
     "revenue_quarter", "revenue_annual",
     "operating_income_quarter", "operating_income_annual",
     "cash", "total_debt", "shares_outstanding_cover",
+    # Phase 4 Step 4.6：新股發行金額（稀釋燈的輸入）。照營收的慣例拆季度／年度兩個名字，第四季同樣由
+    # 「年度 − 前三季累計」衍生。建表之後才加——舊庫的 CHECK 要先遷移（`engine_c.migrate_fundamental_metrics`）。
+    "equity_issued_value_quarter", "equity_issued_value_annual",
 )
+#: 建表之後才加進 `METRICS` 的指標。舊庫的 CHECK 還不認得它們時，`backfill_ticker_edgar` 只略過這幾個並計數，
+#: 營收／現金／封面股數照寫——一個新指標不得讓整批既有指標寫不進去（Step 4.6 的 L11-6 ④：CHECK 未遷移時
+#: 35 檔的 EDGAR 段會整批 error）。
+LATE_METRICS: frozenset[str] = frozenset({"equity_issued_value_quarter", "equity_issued_value_annual"})
+
+#: 新股發行金額的 tag（Phase 4 Step 4.6）：只收 us-gaap 這一個——稀釋燈只對國內申報人判色；
+#: `StockIssuedDuringPeriodSharesNewIssues`（股數版）是 plan 原指定、已被 4.0 量到只 10／35 檔有，不用。
+EQUITY_ISSUED_TAGS: tuple[str, ...] = ("StockIssuedDuringPeriodValueNewIssues",)
 
 #: 國內季度申報人的判定窗：最近 18 個月內有 10-Q。
 QUARTERLY_WINDOW_DAYS = 548
@@ -248,6 +259,29 @@ def _span_class(fact: _Fact) -> str | None:
     return None
 
 
+def _first_three_quarters(quarters: Iterable[_Fact], fy: _Fact) -> list[_Fact] | None:
+    """同一會計年度前三季的單季 fact（年報發出時已知的最新版本），從年度起日開始、首尾相接；湊不齊三季回 None。
+
+    第四季的第二條衍生路（Phase 4 Step 4.6）：companyfacts 沒有 9 個月累計時，「年度 − 前三季單季之和」與
+    「年度 − 9M」是同一個數。2026-10-01 實測：MRVL 四個會計年度與 IREN FY2025 的新股發行金額只有單季、沒有 9M。
+    ⚠ 缺季**不補 0**——湊不齊就不衍生：NVDA FY2024 年度 4.03 億（後來年報的比較欄），當年三份 10-Q 都沒有這個
+    tag，之後幾年同一行每季都有——缺席不等於沒發行（讀取端另把歸不到季的年度差額印出來）。
+    """
+    latest: dict[date, _Fact] = {}
+    for q in quarters:
+        if q.start is None or q.unit != fy.unit or q.filed > fy.filed or not (fy.start <= q.start and q.end < fy.end):
+            continue
+        prev = latest.get(q.end)
+        if prev is None or (q.filed, q.accession) > (prev.filed, prev.accession):
+            latest[q.end] = q
+    chain = [latest[end] for end in sorted(latest)]
+    if len(chain) != 3 or chain[0].start != fy.start:
+        return None
+    if any(b.start != a.end + timedelta(days=1) for a, b in zip(chain, chain[1:])):
+        return None
+    return chain
+
+
 def _flow_tags(concept: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
     from fetchers.edgar_xbrl import (
         IFRS_OPERATING_INCOME_TAGS, IFRS_REVENUE_TAGS, OPERATING_INCOME_TAGS, REVENUE_TAGS,
@@ -255,6 +289,8 @@ def _flow_tags(concept: str) -> tuple[tuple[str, tuple[str, ...]], ...]:
 
     if concept == "revenue":
         return (("us-gaap", REVENUE_TAGS), ("ifrs-full", IFRS_REVENUE_TAGS))
+    if concept == "equity_issued_value":
+        return (("us-gaap", EQUITY_ISSUED_TAGS),)
     return (("us-gaap", OPERATING_INCOME_TAGS), ("ifrs-full", IFRS_OPERATING_INCOME_TAGS))
 
 
@@ -319,7 +355,7 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
             "source": SOURCE_EDGAR, "fetched_at": fetched_at,
         })
 
-    for concept in ("revenue", "operating_income"):
+    for concept in ("revenue", "operating_income", "equity_issued_value"):
         candidates = [f for namespace, tags in _flow_tags(concept) for tag in tags
                       for f in _facts(facts, namespace, tag, forms=forms)]
         by_span: dict[str, list[_Fact]] = {}
@@ -350,6 +386,14 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
             nines = [n for n in nine.values()
                      if n.start == fy.start and n.end < fy.end and n.filed <= fy.filed and n.unit == fy.unit]
             if not nines:
+                # 沒有 9M 累計：前三季單季齊全才用「年度 − 三季之和」（同一個數；缺季不補 0）
+                three = _first_three_quarters(quarter.values(), fy)
+                if three is not None:
+                    emit(f"{concept}_quarter", fy, start=three[-1].end + timedelta(days=1),
+                         derived=(f"FY−ΣQ1..Q3：{fy.accession}（{fy.tag}）−"
+                                  + "−".join(q.accession for q in three)),
+                         filed=max([fy.filed, *(q.filed for q in three)]),
+                         value=fy.value - sum(q.value for q in three), tag=f"{fy.namespace}:{fy.tag}")
                 continue
             nm = max(nines, key=lambda n: (n.filed, n.end))
             emit(f"{concept}_quarter", fy, start=nm.end + timedelta(days=1),
@@ -458,6 +502,20 @@ def upsert_prices(conn: Any, rows: Sequence[Mapping[str, Any]], actions: Sequenc
     return len(rows)
 
 
+def late_metrics_supported(conn: Any) -> bool:
+    """這個庫的 `fundamental_history` CHECK 認不認得 `LATE_METRICS`。讀不到建表語句＝不認得（fail closed）。
+
+    只問 SQLite 的 `sqlite_master`：本模組的寫入路徑只走 SQLite（Postgres 由版本化遷移檔管，見 `engine_c/migrations/`）。
+    """
+    try:
+        row = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type = 'table' AND name = 'fundamental_history'").fetchone()
+    except Exception:  # noqa: BLE001 — 不是 SQLite 或讀不到：當成不認得，寧可少寫不可整批寫壞
+        return False
+    sql = str(row[0] or "") if row else ""
+    return all(f"'{metric}'" in sql for metric in LATE_METRICS)
+
+
 def insert_fundamentals(conn: Any, rows: Sequence[Mapping[str, Any]]) -> int:
     """一份申報的一個數永遠不變：唯一鍵（ticker, metric, period_end, accession）已存在就不動（冪等）。"""
     before = conn.execute("SELECT COUNT(*) FROM fundamental_history").fetchone()[0]
@@ -554,6 +612,14 @@ def backfill_ticker_edgar(conn: Any, ticker: str, cik: str | None, *, today: dat
         report.update(outcome="lagging", absence=lag.get("warning"))
         return report
     rows, rejected = build_fundamental_rows(facts, ticker=ticker, filer=filer, today=today, fetched_at=fetched_at)
+    if not late_metrics_supported(conn):
+        # 舊庫的 CHECK 還不認得新指標（Step 4.6）：只略過那幾個、計數進報告，其餘照寫（INV-3：不靜默丟）。
+        skipped = [r for r in rows if r["metric"] in LATE_METRICS]
+        if skipped:
+            report["late_metrics_skipped"] = {
+                "rows": len(skipped), "metrics": sorted({r["metric"] for r in skipped}),
+                "reason": "fundamental_history 的 CHECK 尚未遷移——跑 python -m engine_c.migrate_fundamental_metrics --apply"}
+        rows = [r for r in rows if r["metric"] not in LATE_METRICS]
     written = insert_fundamentals(conn, rows)
     report.update(outcome="written", rows_built=len(rows), rows_new=written, rejected=rejected,
                   lag_unknown=(lag.get("status") == "unknown"))
@@ -645,6 +711,9 @@ def summarize(report: Mapping[str, Any]) -> dict[str, Any]:
         "edgar": dict(Counter((e.get("edgar") or {}).get("outcome", "skipped") for e in tickers.values())),
         "filer_class": dict(Counter((e.get("edgar") or {}).get("filer_class", "—") for e in tickers.values())),
         "rejected_groups": sum(len((e.get("edgar") or {}).get("rejected") or ()) for e in tickers.values()),
+        # CHECK 未遷移時略過的新指標列數（Step 4.6）：daily 印出的 summary 就看得到，不只藏在逐檔報告裡（INV-3）
+        "late_metrics_skipped": sum(((e.get("edgar") or {}).get("late_metrics_skipped") or {}).get("rows", 0)
+                                    for e in tickers.values()),
     }
 
 

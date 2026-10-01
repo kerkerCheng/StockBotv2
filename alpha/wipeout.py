@@ -18,8 +18,10 @@
 
 ## 稀釋那盞刻意**不對稱**
 
-看到股數增加是**事實**（可證實，窗多短都算數）；沒看到增加**不等於沒有增發**（窗可能太短）。
-所以：增加 → 判色；沒增加且窗不滿一個完整會計年度 → 灰並帶到期日（INV-2：每個等待都必須有到期）。
+看到**新股發行紀錄**是**事實**（可證實，窗多短都算數）；沒看到**不等於沒有增發**（窗可能太短、公司可能沒標 tag）。
+所以：有發行紀錄 → 黃；沒有紀錄、股數也沒增加、窗滿一年 → 綠；其餘 → 灰並說是哪一種（INV-2：窗不滿的等待帶到期日）。
+⚠ 2026-10-01（Phase 4 Step 4.6）判色輸入由「封面股數有沒有增加」改成「新股發行金額」：股數增加同時承載員工股酬與
+真增發（L12），4.0 實測國內申報人 30 檔有 24 檔亮黃——那是恆亮（L14-4）。股數變化仍照印在稽核層。
 
 ## 燈只給顏色與一句話，數字住稽核層
 
@@ -28,7 +30,7 @@
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 from typing import Any, Mapping, Sequence
 
 #: 四盞燈的封閉清單。新增一盞＝改契約，不是加一個字串。
@@ -114,60 +116,102 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
 
 
 _DILUTION_RULE = (
-    f"trailing 一年窗：最新一點 vs 距它 ≥{FULL_YEAR_DAYS} 天的最近一點（不是整條序列的頭尾）；沒增加 → 綠；增加 → 黃。"
-    "股數逐檔只用**一個來源**（10-K／10-Q 國內申報人＝SEC 封面股數、分割調整到同一基準；其餘＝yfinance 快照序列），"
-    "兩個來源不混。**窗不滿就是灰**——「我沒看到增發」與「它沒有增發」是兩個不同的 claim，後者舉證責任高得多"
-    "（L11-5）。⚠ **刻意不用燒錢與否把黃再切成紅**：那需要分辨員工股酬與真增發，而那是量級問題，"
-    "今天沒有非憑空的門檻可用（實測見 docstring）"
+    "**10-K／10-Q 國內申報人**：最近四季（期末落在最新已申報季度期末往回 320 天內的季度——相鄰季度期末相距 80–100 天，"
+    "日曆季與 52／53 週制都剛好四季；年度期末正好是窗尾就用年度那一列）的新股發行金額"
+    "（us-gaap:StockIssuedDuringPeriodValueNewIssues，SEC companyfacts）加總 > 0 → 黃；已知的季度為 0、但期末落在窗內的年度"
+    "有歸不到季的發行（年報有、季報加起來不到）→ 灰（insufficient_evidence）；窗內沒有發行紀錄、同口徑股數也沒增加、"
+    f"股數觀測窗滿 {FULL_YEAR_DAYS} 天 → 綠；股數增加了卻沒有發行紀錄 → 灰（insufficient_evidence：分不出員工股酬與沒標 tag 的增發）；"
+    "股數窗不滿一年且沒有發行紀錄 → 灰（附到期日）。5 年回填窗內沒有這個 tag → 灰（provider_missing）；"
+    "其他申報人 → 灰（method_not_applicable）。金額、占正規化市值 %、tag、歸不到季的年度差額、同期股數變化與 ATM／shelf 授權"
+    "只印在稽核層、不參與判色；金額只計這一個 tag（公司另用自訂 tag 標的發行不在內）＝已知至少。"
+    "可轉換特別股的發行照算黃（tag 印出來，使用者可改判）；員工股票計畫若標在同一個 tag 也算黃（占市值 % 印出來）。"
+    "⚠ 刻意不用量級門檻把黃再切成紅或綠（INV-5：沒有非憑空的門檻）"
 )
 
 
-def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
-                  runway: Mapping[str, Any] | None, *, today: date, source: str | None = None) -> dict[str, Any]:
-    """`shares_series` 是**同口徑**的在外流通股數序列（日期遞增）。
+def _shares_window(shares_series: Sequence[tuple[date, float]] | None, *, today: date) -> dict[str, Any]:
+    """同口徑股數的 trailing 一年窗：最新一點 vs 距它 ≥365 天的最近一點（不是整條序列的頭尾）。
 
-    ⚠ 刻意不吃「會計年度稀釋股數 vs 今日在外流通股數」那一組：窗夠長但**口徑不同**
-    （diluted 含潛在股份、outstanding 不含），相減出來的數字沒有意義——那正是封閉字彙
-    `inputs_incompatible` 在描述的東西。
-
-    ⚠⚠ **首版被真實資料當場推翻，經過留在這裡**（2026-09-18）：第一版用「窗內有沒有增加」
-    ×「燒不燒錢」判紅黃，一跑 16 檔就看到 COHR **+0.10%**（54 天，員工股酬等級）與 LITE
-    **+15.30%**（53 天，量級完全不同）拿到同一組規則的顏色，IQE.L 更是靠 **+0.0044%** 亮紅。
-    那是 L12 的形狀：`change > 0` 這一個表示同時承載「員工股酬雜訊」與「靠發股補現金缺口」，
-    下游二選一而兩邊都錯。**修法不是設一個量級門檻**（那是憑空參數，INV-5），是把判不出來的
-    那一半留白：量級問題交給稽核層的數字，而「是不是靠外部資金活著」本來就由現金跑道與負債
-    那兩盞回答了——這盞燈在那個問題上沒有增加任何資訊。
+    ⚠ 2026-09-29（Phase 3 Step 3.3）：比頭尾會讓回填到 2021 的序列幾乎每一檔都亮黃（五年的員工股酬累積，L14-4）。
+    `span_days` 量的是觀測窗（比較的兩點之間），`days_since_last` 另印那段空白（序列還活著嗎，L12）。
+    ⚠ 欄位名不得含 `shares`（`alpha.contracts.FORBIDDEN_POSITION_TOKENS`：黑箱輸出不帶部位語意的欄位名）——
+    股數一律寫 `outstanding`。
     """
     rows = sorted((d, v) for d, v in (shares_series or ()) if isinstance(v, (int, float)) and v > 0)
-    fcf = (runway or {}).get("free_cash_flow_ttm")
     if len(rows) < 2:
-        return _flag(None, "同口徑的股數序列不足兩點，看不出增減", rule=_DILUTION_RULE,
-                     inputs={"n_points": len(rows), "source": source}, absence_kind="upstream_unavailable")
+        return {"n_points": len(rows), "eligible": False, "change": None}
     first, last = rows[0], rows[-1]
-    # ⚠ 2026-09-29（Phase 3 Step 3.3）：比較窗改成 **trailing 一年**——最新一點 vs 距它 ≥365 天的最近一點。
-    # 原本比整條序列的頭尾：回填把 SEC 封面股數拉回 2021 之後，頭尾一比幾乎每一檔都會亮黃（五年的員工股酬
-    # 累積），那是恆亮（L14-4），不是稀釋。
     eligible = [r for r in rows if (last[0] - r[0]).days >= FULL_YEAR_DAYS]
     base = eligible[-1] if eligible else first
-    span_days = (last[0] - base[0]).days
-    change = (last[1] - base[1]) / base[1]
-    # `span_days` 量的是**觀測窗**（比較的兩點之間），不是「從第一點到今天」——ETL 停了半年的話，
-    # 我們有的不是一年的觀測，是半年的觀測加半年的空白。`days_since_last` 把那段空白單獨印出來，
-    # 讓稽核層看得到「這條序列還活著嗎」，而不是讓它悄悄混進窗長裡（L12）。
-    inputs = {"n_points": len(rows), "distinct_values": len({v for _, v in rows}), "source": source,
-              "series_start": first[0], "base_date": base[0], "base_outstanding": base[1],
-              "last_date": last[0], "last_outstanding": last[1],
-              "span_days": span_days, "days_since_last": (today - last[0]).days,
-              "change": change, "free_cash_flow_ttm": fcf}
-    if eligible:
-        if change > 0:
-            return _flag("amber", "一個完整會計年度內同口徑股數增加了", rule=_DILUTION_RULE, inputs=inputs)
-        return _flag("green", "一個完整會計年度內同口徑股數沒有增加", rule=_DILUTION_RULE, inputs=inputs)
-    # 有到期的等待（INV-2：每個等待都必須有到期）：窗會自己長到一年，那天這盞燈自己判色，
-    # 不必有人記得回來。**窗內看到的變化照樣進 `inputs`**——稽核層看得到，只是不拿它上色。
-    inputs["colour_available_on"] = first[0].replace(year=first[0].year + 1)
-    return _flag(None, "同口徑的股數觀測窗還不滿一個完整會計年度，窗內的變化分不出員工股酬與增發",
-                 rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
+    out = {"n_points": len(rows), "distinct_values": len({v for _, v in rows}),
+           "series_start": first[0], "base_date": base[0], "base_outstanding": base[1],
+           "last_date": last[0], "last_outstanding": last[1], "span_days": (last[0] - base[0]).days,
+           "days_since_last": (today - last[0]).days, "change": (last[1] - base[1]) / base[1],
+           "eligible": bool(eligible)}
+    if not eligible:
+        # 與上面的判準同一把尺（≥ FULL_YEAR_DAYS 天）；`replace(year=+1)` 遇到 2 月 29 日的封面日會丟例外
+        out["colour_available_on"] = first[0] + timedelta(days=FULL_YEAR_DAYS)
+    return out
+
+
+def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
+                  runway: Mapping[str, Any] | None, *, today: date, source: str | None = None,
+                  issuance: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """稀釋燈。判色只看 `issuance`（新股發行金額，`engine_c.checklist._equity_issuance` 的形狀）；
+    `shares_series`（同口徑在外流通股數）只決定「沒有發行紀錄時能不能說沒稀釋」並印在稽核層。
+
+    ⚠⚠ **兩次被真實資料推翻，經過留在這裡**：
+    ① 2026-09-18 首版用「窗內股數有沒有增加」×「燒不燒錢」判紅黃——COHR **+0.10%**（員工股酬等級）與 LITE
+    **+15.30%** 拿到同一組顏色，IQE.L 靠 **+0.0044%** 亮紅（L12：`change > 0` 同時承載員工股酬與靠發股補缺口）。
+    ② 2026-10-01 4.0 基準：trailing 一年股數比較讓國內申報人 30 檔亮黃 24 檔——仍是同一個形狀（恆亮，L14-4）。
+    修法不是設量級門檻（INV-5），是換一個**只在真的發行新股時才有值**的輸入：companyfacts 的發行金額。
+    """
+    shares = _shares_window(shares_series, today=today)
+    issuance = dict(issuance or {})
+    status = issuance.get("status")
+    inputs: dict[str, Any] = {key: value for key, value in shares.items() if key != "eligible"}
+    inputs.update(source=source, free_cash_flow_ttm=(runway or {}).get("free_cash_flow_ttm"),
+                  issuance_status=status or "not_provided", filer_class=issuance.get("filer_class"),
+                  authorizations=issuance.get("authorizations"))
+    change = shares.get("change")
+    if isinstance(change, (int, float)):
+        inputs["outstanding_note"] = f"同期封面股數 {change:+.1%}"
+    if status == "method_not_applicable":
+        return _flag(None, "不是按季申報的美國國內申報人——新股發行金額這個方法不適用（股數變化照印在稽核層）",
+                     rule=_DILUTION_RULE, inputs=inputs, absence_kind="method_not_applicable")
+    if status == "provider_missing":
+        inputs["issuance_reason"] = issuance.get("reason")
+        return _flag(None, "回填窗內沒有新股發行金額的申報紀錄——說不出有沒有增發（股數變化照印在稽核層）",
+                     rule=_DILUTION_RULE, inputs=inputs, absence_kind="provider_missing")
+    if status != "ok":
+        inputs["issuance_reason"] = issuance.get("reason")
+        return _flag(None, "沒有讀到新股發行金額（上游缺席）", rule=_DILUTION_RULE, inputs=inputs,
+                     absence_kind="upstream_unavailable")
+    total = float(issuance.get("trailing_total") or 0.0)
+    currencies = list(issuance.get("currencies") or ())
+    cap = issuance.get("market_cap_usd")
+    inputs.update(window_after=issuance.get("window_after"), window_end=issuance.get("window_end"),
+                  issuance_basis=issuance.get("basis"), quarters_found=issuance.get("quarters_found"),
+                  trailing_issued=total, issued_currencies=currencies, tags=issuance.get("tags"),
+                  facts=issuance.get("facts"), unattributed=issuance.get("unattributed") or [],
+                  market_cap_usd=cap, market_cap_absence=issuance.get("market_cap_absence"),
+                  pct_of_market_cap=(total / cap if currencies == ["USD"] and isinstance(cap, (int, float)) and cap > 0
+                                     else None))
+    if total > 0:
+        return _flag("amber", "一個完整會計年度內有新股發行紀錄", rule=_DILUTION_RULE, inputs=inputs)
+    if issuance.get("unattributed"):
+        return _flag(None, "年報有新股發行、季報加起來不到——歸不到季，說不出最近四季有沒有增發",
+                     rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
+    if not shares.get("eligible"):
+        inputs["colour_available_on"] = shares.get("colour_available_on")
+        return _flag(None, "窗內沒有新股發行紀錄，但同口徑股數的觀測窗還不滿一個完整會計年度——說不出沒有增發",
+                     rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
+    if isinstance(change, (int, float)) and change > 0:
+        inputs["outstanding_note"] = f"股數 {change:+.1%}（無新股發行紀錄）"
+        return _flag(None, "同口徑股數增加了，但窗內沒有新股發行紀錄——分不出員工股酬與沒標 tag 的增發",
+                     rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
+    return _flag("green", "一個完整會計年度內沒有新股發行紀錄，同口徑股數也沒有增加", rule=_DILUTION_RULE,
+                 inputs=inputs)
 
 
 _GOING_CONCERN_RULE = (
@@ -211,12 +255,15 @@ def going_concern_flag(observation: Mapping[str, Any] | None) -> dict[str, Any]:
 def wipeout_flags(*, runway: Mapping[str, Any] | None,
                   shares_series: Sequence[tuple[date, float]] | None,
                   going_concern: Mapping[str, Any] | None,
-                  today: date, shares_source: str | None = None) -> dict[str, dict[str, Any]]:
-    """四盞燈一次算出。**每盞都回值**——少一盞與「那盞是綠的」不得同形（INV-3）。"""
+                  today: date, shares_source: str | None = None,
+                  issuance: Mapping[str, Any] | None = None) -> dict[str, dict[str, Any]]:
+    """四盞燈一次算出。**每盞都回值**——少一盞與「那盞是綠的」不得同形（INV-3）。
+
+    `issuance`：稀釋燈的新股發行金額（Phase 4 Step 4.6）；不給＝上游缺席（灰，不是綠）。"""
     out = {
         "cash_runway": cash_runway_flag(runway),
         "debt": debt_flag(runway),
-        "dilution": dilution_flag(shares_series, runway, today=today, source=shares_source),
+        "dilution": dilution_flag(shares_series, runway, today=today, source=shares_source, issuance=issuance),
         "going_concern": going_concern_flag(going_concern),
     }
     if tuple(out) != WIPEOUT_LANES:

@@ -130,7 +130,7 @@ CAP_INVESTOR_BRIEF = "investor_brief_v1"
 CAP_ARGUMENT = "argument_layer_v1"
 #: 2026-09-18（D2）：歸零旗標——四盞紅黃綠燈（現金跑道／負債／稀釋／going concern）。
 #: **量測不是訊號**：不參與排序、不決定尺寸。判色規則與「為什麼這盞不亮」住 `alpha/wipeout.py`。
-CAP_WIPEOUT_FLAGS = "wipeout_flags_v1"
+CAP_WIPEOUT_FLAGS = "wipeout_flags_v2"  # v2（2026-10-01 Phase 4 Step 4.6）：稀釋燈改以新股發行金額判色
 #: 2026-09-29（Phase 3 Step 3.3）：財務三題稽核區——會死嗎／已定價嗎／出現在數字裡了嗎。每行有值或缺席 kind，
 #: **沒有任何結論欄位**（是／否由敘事宣告）。判定住 `alpha/three_questions.py`，取數住 Engine C。
 CAP_THREE_QUESTIONS = "three_questions_v1"
