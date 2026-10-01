@@ -35,6 +35,7 @@ config/*.json
 !config/structural_event_kinds.json
 !config/standing_authorization.json
 !config/entity_aliases.json
+!config/graph_baselines.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*

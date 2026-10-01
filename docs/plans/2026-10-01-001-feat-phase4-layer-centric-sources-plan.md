@@ -157,9 +157,9 @@ plan_review: 反方驗證已做（2026-10-01，使用者對 12 題定案後以 w
 |---|---|
 | 原 roadmap | 旁支「本機 Research Action apply 入口」○；「重載會洗掉 SourceDoc 的分段標籤與標題」○（①`coalesce`，動 contract 先提案） |
 | 新觀察 | apply 前不存在 go 收據（bare go 被拒、`complete-ra` 在 apply 後）；`coalesce` 只救增量重載，全量重建 10 份 section 仍消失（不在可重建輸入，L10）、title first-wins 因檔名排序仍錯 |
-| proposed change | 併入 Step 4.2：apply 入口＝`scripts/apply_research_action.py --pq2 N --digest …`，驗 ①未結案 `ra_admission` ②`ref_id==action_id` ③digest==凍結 digest ④紀錄 ready 且未過期（drop 永久拒絕），通過後先把 `approval={pq2_n, digest, at}` 寫進 action 紀錄 `execution` 再 apply；不 publish、不 resolve；`complete-ra` 加比對 `approval.pq2_n==n`；授權載體仍是對話中的明確核准（AGENTS「使用者主動指示＝已授權」）。SourceDoc：以一次性 migrate 腳本把 10 份 section 寫回抽取 JSON（base 與 addendum 同值；`nvidia_photonics_pr_2025_03_18` 沒有抽取檔→補建或登記不可重建）、21 對 addendum 的 `source_doc.title` 改回母文件標題；loader 契約不動；常駐計數器改「圖上 section／title 與抽取 JSON 不一致的份數」10 → 0 |
+| proposed change | 併入 Step 4.2：apply 入口＝`scripts/apply_ra_admission.py --pq2 N --digest …`，驗 ①未結案 `ra_admission` ②`ref_id==action_id` ③digest==凍結 digest ④紀錄 ready 且未過期（drop 永久拒絕），通過後先把 `approval={pq2_n, digest, at}` 寫進 action 紀錄 `execution` 再 apply；不 publish、不 resolve；`complete-ra` 加比對 `approval.pq2_n==n`；授權載體仍是對話中的明確核准（AGENTS「使用者主動指示＝已授權」）。SourceDoc：以一次性 migrate 腳本把 10 份 section 寫回抽取 JSON（base 與 addendum 同值；`nvidia_photonics_pr_2025_03_18` 沒有抽取檔→補建或登記不可重建）、21 對 addendum 的 `source_doc.title` 改回母文件標題；loader 契約不動；常駐計數器改「圖上 section／title 與抽取 JSON 不一致的份數」10 → 0 |
 | why | 資料對齊輸入、不另做邏輯（使用者 09-30 的原則）；入口是 packet 核對唯一能掛收據的地方 |
-| impact | `scripts/apply_research_action.py`（新）、`intake/application.py`、`engine_b/todo.py`、`extractions/*.json`（21＋9 份）、`loader/`、`query/health_audit.py`、`audit/checks.py`、三個活文件 |
+| impact | `scripts/apply_ra_admission.py`（新）、`intake/application.py`、`engine_b/todo.py`、`extractions/*.json`（21＋9 份）、`loader/`、`query/health_audit.py`、`audit/checks.py`、三個活文件 |
 
 **A5｜「做什麼」欄用語同步（不改定義）**
 
@@ -188,7 +188,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
-| 4.0 | 基準快照（`docs/reports/2026-10-0x-phase4-baseline.md`） | ○ | 執行模型 | |
+| 4.0 | 基準快照（`docs/reports/2026-10-01-phase4-baseline.md`；凍結集合 `config/graph_baselines.json`） | ✅ | 執行模型 | 見 git log「Step 4.0」 |
 | 4.1 | 名冊與 origin 解析：Q8b-B → 名字比對函式 → `display_name` 100/100＋`name_aliases`＋`execution_symbol` → `_strip_annotation`／`_origin_mentions` 修 → enrichment 去除（R2-b） | ○ | 執行模型 | |
 | 4.2 | contract 批：packet `layer_enumerations`＋揭露；`source_type`／`origin_linkage`／`origin_role` 字彙；apply 入口；抽取 JSON section／title 回填＋`is_legit_multi_section` 共用（R2-a） | ○ | 執行模型 | |
 | 4.3 | `config/publishers.json`＋`resolve_origin` 唯一 owner（`classify_evidence`／`verify_citations` 共用） | ○ | 執行模型 | |
@@ -212,6 +212,9 @@ Step 4.8 是研究步驟：執行者是強模型就直接做。每個 Step 一�
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
+| 1 | 4.0（影響 4.2d、4.9、R2-a、結案 R2） | 4.2d 的新 apply 入口指定了一個與 Phase 2 退役的遠端寫入工具**同名**的檔名 | 改名 `scripts/apply_ra_admission.py`（「套用已核准的 pq2 `ra_admission`」）；本 plan 9 處同步改 | 殭屍 grep I 組以整詞比對那個工具名，plan 檔本身因此命中 9 處、驗收段「未列 1」；I 組 keep-list 只收 `historical_record`，一支新腳本不能列進去。不可越線 11「不得出現殭屍 grep 九組的新命中」——改名是唯一合規的路 |
+| 2 | 4.0（影響 4.2e） | 「`nvidia_photonics_pr_2025_03_18` 沒有抽取檔→補建或登記不可重建」；計數器「10＋21 → 0」 | 該 doc_id 有兩份抽取檔（`nvidia_photonics_ecosystem_pr_2025_03_18.json`、`nvidia_photonics_pr_2025_03_18_fabrinet_addendum.json`——檔名不等於 doc_id），直接寫回；計數器基準 section 11（只在圖上 10＋兩份 JSON 互異 1）＋title 19 | 4.0 實測（baseline §15、§19）：原量測以檔名找抽取檔；title 21 是「多檔 doc_id」數，其中 2 個標題本來一致 |
+| 3 | 4.0 | 「凍結節點集合」「凍結的 assertion id 集合」存檔，未指定位置 | `config/graph_baselines.json` 的 `baselines.phase4_2026_10_01`（tracked、append-only、**只放 id 不放引文**；`.gitignore` 補白名單） | 4.4 的常駐計數器每天要對它算，scratchpad 只活一個 session；這份集合今天重取拿不回來（L10）；部分抽取檔受儲存權限限制不進 Git，所以引文全文只留 scratchpad |
 
 ## 0.7 反方驗證處置（2026-10-01；逐條原文在 workflow journal `wf_b64373a7-a95`，此處只列處置）
 
@@ -230,7 +233,7 @@ Step 4.8 是研究步驟：執行者是強模型就直接做。每個 Step 一�
 4. **走圖第 2 型的 `scope_rule` 不動**；`hit_rule` 只加「且無現行層讀圖」一句（4.5），每次母體／命中變動逐筆列原因。
 5. **lead 不得由任何無人值守步驟鑄**；合成 URL 的 lead `published_at` 留 null、`first_seen` 記鑄號時間、refs 帶走圖命中的 `as_of`（INV-6、L11-5）。
 6. **`library/trades/trade_log.jsonl` 與 Google Sheet 不得在測試或試跑中寫入**；`record_trade.py` 試跑一律 dry-run（不帶 `--apply`、也不帶 `--log-only`）。
-7. **任何 `python -m <module>` 或 `scripts/*.py` 新入口 → sandbox impact review 五步**（ROADMAP 硬約束 10），同 commit 改測試。已知會撞：4.2（`scripts/apply_research_action.py`，互動專用、**不進任何無人值守 allowlist**，review 要寫明它落在 `.claude/settings.local.json` 的 `Bash(python *)` 之下、補償控制是四道檢查＋戳記）、4.4（新唯讀 CLI 若有）、4.6（daily 增量跟新 metric、遷移腳本）、4.5（`engine_b.cli triage` 若加 `--classified-by`）。
+7. **任何 `python -m <module>` 或 `scripts/*.py` 新入口 → sandbox impact review 五步**（ROADMAP 硬約束 10），同 commit 改測試。已知會撞：4.2（`scripts/apply_ra_admission.py`，互動專用、**不進任何無人值守 allowlist**，review 要寫明它落在 `.claude/settings.local.json` 的 `Bash(python *)` 之下、補償控制是四道檢查＋戳記）、4.4（新唯讀 CLI 若有）、4.6（daily 增量跟新 metric、遷移腳本）、4.5（`engine_b.cli triage` 若加 `--classified-by`）。
 8. **每刪一個測試檔或測試函式，八欄的 Blocking findings 列出它守的是什麼、現在由誰守。** 活機制的測試不可刪斷言。
 9. **每個 Step 動手前先答 L11-6 第④問：「如果這個改動是錯的，最先壞掉的是哪一筆現有資料或哪個活的呼叫端？」去看那一筆，寫進八欄。** 各 Step 已預填一個起點。
 10. **不排序、不打分、不設門檻**：計數器只印不判；`publishers.json` 的 `kind` 不是等級；字表命中數不是分數；lead 只按 lead 時間。
@@ -312,22 +315,22 @@ L11-6 ④：131 筆 pushed 紀錄的 `_validate_record` 再驗證——它是最
 **c｜`origin_linkage`（給 4.3 用的宣告欄）。** 改哪裡：`schema/intermediate_format.schema.json` source_doc 加選填 `origin_linkage ∈ {same_origin, independent}`（vocab 登記）；`loader/load_to_neo4j.py::MERGE_SOURCE_DOC` 寫入（缺＝null）；`prompts/extract_system.md` origin 段加一句「媒體文：轉述／改寫新聞稿＝same_origin；自己採訪或統計＝independent；不確定不填」。
 怎麼驗：schema 測試；loader 寫入測試（fake driver）。
 
-**d｜apply 入口。** 改哪裡：新 `scripts/apply_research_action.py --pq2 N --digest <sha256> [--leads …]`：讀池子，要求 ①`item.type=="ra_admission"` 且未 resolve（drop 永久拒絕）②`item.ref_id==action_id`（由紀錄反查）③digest==紀錄 `action_digest` ④紀錄 state ready 且未過期；通過後先把 `approval={"pq2_n": N, "digest": …, "at": …}` append 到 action 紀錄的 `execution`，再呼叫 `intake.application._apply_research_action_impl`；**不 publish、不 resolve**（`commit_pending_intake.py` 與 `complete-ra` 照舊；`engine_b/todo.py::complete_ra_admission` 加一行比對 `approval.pq2_n==n`、缺 approval 拒收）；刪 `intake/application.py::_finalize_research_action_impl` 與 `tests/test_intake.py` 的 10 處；`prompts/intake_protocol.md:100`、`skills/daily-brief/SKILL.md:700`、`skills/lead-intake/SKILL.md:155`、`docs/OPERATIONS.md` 改指入口（跑 `sync_agent_skills.py`）。
+**d｜apply 入口。** 改哪裡：新 `scripts/apply_ra_admission.py --pq2 N --digest <sha256> [--leads …]`：讀池子，要求 ①`item.type=="ra_admission"` 且未 resolve（drop 永久拒絕）②`item.ref_id==action_id`（由紀錄反查）③digest==紀錄 `action_digest` ④紀錄 state ready 且未過期；通過後先把 `approval={"pq2_n": N, "digest": …, "at": …}` append 到 action 紀錄的 `execution`，再呼叫 `intake.application._apply_research_action_impl`；**不 publish、不 resolve**（`commit_pending_intake.py` 與 `complete-ra` 照舊；`engine_b/todo.py::complete_ra_admission` 加一行比對 `approval.pq2_n==n`、缺 approval 拒收）；刪 `intake/application.py::_finalize_research_action_impl` 與 `tests/test_intake.py` 的 10 處；`prompts/intake_protocol.md:100`、`skills/daily-brief/SKILL.md:700`、`skills/lead-intake/SKILL.md:155`、`docs/OPERATIONS.md` 改指入口（跑 `sync_agent_skills.py`）。
 怎麼驗：四道 fail closed 各一條測試（編號不存在／型別不對／已 drop／digest 不符／已過期）；成功路徑在暫存紀錄上寫 approval 再 apply（fake）；`complete-ra` 缺 approval 拒收；**sandbox impact review 五步**（互動專用；落在 `Bash(python *)` 之下，補償控制＝四道檢查＋戳記；不進任何無人值守 allowlist）。
 L11-6 ④：7 筆 partial／expired 的 RA（對應 drop）——新入口全部拒絕是既有語意，第一次撞到會以為入口壞了，訊息要寫「重提請重跑 prepare」。
 
-**e｜抽取 JSON section／title 回填＋三處判準合一。** 改哪裡：一次性腳本 `loader/migrate_sourcedoc_json_section.py`（讀圖上 32 份有 section 的 doc，對 10 份只存在圖上的把 `source_doc.section` 寫回對應抽取 JSON——base 與 addendum 同值；`nvidia_photonics_pr_2025_03_18` 沒有抽取檔→從圖上 SourceDoc 與其 assertions 重建一份最小抽取檔或在 manifest 登記「不可重建、理由」；21 對 addendum 的 `source_doc.title` 改回母文件標題；manifest 記 before／after、只動這兩欄）；`loader/load_to_neo4j.py` 抽出公開 `is_legit_multi_section(sections) -> bool`（判準採 loader 的：全非空且兩兩互異），`query/health_audit.py:333-335` 與 `audit/checks.py:155-166` 改呼叫它、audit 改用 `normalize_url` 分組；常駐計數器「圖上 section／title 與抽取 JSON 不一致的份數」（住健康審查，今天 10＋21 → 0）；`docs/OPERATIONS.md:898-908` addendum 修復程序改成「以抽取 JSON 為準重載」。
+**e｜抽取 JSON section／title 回填＋三處判準合一。** 改哪裡：一次性腳本 `loader/migrate_sourcedoc_json_section.py`（讀圖上 32 份有 section 的 doc，對 10 份只存在圖上的把 `source_doc.section` 寫回對應抽取 JSON——base 與 addendum 同值；`nvidia_photonics_pr_2025_03_18` 沒有抽取檔→從圖上 SourceDoc 與其 assertions 重建一份最小抽取檔或在 manifest 登記「不可重建、理由」（**4.0 實測更正：它有兩份抽取檔、直接寫回；另有 `sivers_ar_2025_photonics_excerpt` 兩份 JSON 互異也要對齊——§0.6 #2**）；21 對 addendum 的 `source_doc.title` 改回母文件標題（**4.0 實測：title 不一致 19 個 doc_id**）；manifest 記 before／after、只動這兩欄）；`loader/load_to_neo4j.py` 抽出公開 `is_legit_multi_section(sections) -> bool`（判準採 loader 的：全非空且兩兩互異），`query/health_audit.py:333-335` 與 `audit/checks.py:155-166` 改呼叫它、audit 改用 `normalize_url` 分組；常駐計數器「圖上 section／title 與抽取 JSON 不一致的份數」（住健康審查，今天 10＋21 → 0）；`docs/OPERATIONS.md:898-908` addendum 修復程序改成「以抽取 JSON 為準重載」。
 怎麼驗：回填後重載 addendum 檔（fake driver 或暫存圖）section 仍在、title 是母文件；`is_legit_multi_section` 單元測試（放寬成 any → 紅）；計數器 → 0；`tests/test_load_dedup.py:72-79` 照綠。
 L11-6 ④：`meta_vistara_isca_2026`／`_counter_path` 那對（10-01 剛修好的）——回填後兩個 JSON 都要有各自 section，否則 `check_duplicate_url` 會 raise。
 
 **R2-a（常規 opt-in）WORK_REQUEST：**
 ```
 WORK_REQUEST（R2-a，Phase 4 Step 4.2）
-Target: 4.2 的 commit；intake/actions.py、intake/application.py、scripts/apply_research_action.py、engine_b/todo.py、schema/*、extract.py、loader/*、query/health_audit.py、audit/checks.py、extractions/（回填的 30 份）、prompts/intake_protocol.md
+Target: 4.2 的 commit；intake/actions.py、intake/application.py、scripts/apply_ra_admission.py、engine_b/todo.py、schema/*、extract.py、loader/*、query/health_audit.py、audit/checks.py、extractions/（回填的 30 份）、prompts/intake_protocol.md
 Claimed acceptance: layer_enumerations 是頂層選填、舊 139 筆 render 逐字不變、核對只看本包且區分兩種失敗；source_type 三處相等；apply 入口四道 fail closed 且 approval 先寫後 apply、不 publish 不 resolve、complete-ra 驗 approval；
                     抽取 JSON 回填後重載不洗掉 section／title、計數器 0；is_legit_multi_section 三處共用
 Do not trust: 上面那行是待驗證的宣稱
-Task: 自己跑相關測試；自造 6 個應拒收的 request 與 1 個應收的；對 2 筆舊 pushed 紀錄跑 render 比對；在暫存圖上重載 meta_vistara 兩份 JSON 看 section；確認 scripts/apply_research_action.py 不在任何無人值守 allowlist、sandbox review 五步寫齊
+Task: 自己跑相關測試；自造 6 個應拒收的 request 與 1 個應收的；對 2 筆舊 pushed 紀錄跑 render 比對；在暫存圖上重載 meta_vistara 兩份 JSON 看 section；確認 scripts/apply_ra_admission.py 不在任何無人值守 allowlist、sandbox review 五步寫齊
 Boundaries: 不改 code、不 commit、不寫 Neo4j 正式圖、不 apply 任何 RA、不核准 pq2
 ```
 
@@ -352,7 +355,7 @@ sandbox impact review 五步（materialize 旗標若新增）。
 怎麼驗：夾具：有現行層讀圖的單供應商節點不命中、讀圖過期後命中回來（會滅、會亮）；真實資料前後命中逐筆列原因。
 **b｜lead 鑄號路（互動）。** 改哪裡：`engine_b/leads.py::triage` 與 `engine_b/cli.py triage` 加選填 `--classified-by`（預設不變 `triage_semantic_v1`；research-drain 用 `interactive:graph_walk`），心跳「分類層本輪結果」與 `queue_segments` 把非 `triage_semantic_v1` 的分開計；`skills/research-drain/SKILL.md` 段 4 ②改寫：研究啟動那一刻 `engine_b.cli register --source graph_walk:sole_supplier_self_reported --url <真實文件 URL 或 graph-walk://sole_supplier_self_reported/<node>> --title "<人寫的研究問句>"` → `triage --go --classification … --classified-by interactive:graph_walk` → 以 lead-intake／source-trace 追源；終局三種：找到第二家或第三方印證 → RA（`applied`）；公開層文件找不到／只有付費 → `advance` 到 `parked` 且 trace_status `awaiting_named_disclosure`（trigger entities＝該層客戶或供應商，`advance()` 自動建追源 watch、到期 `watch_expired` 計數現形）或 `not_pursued` 附理由；圖上已多了第二家 → 命中自己消失，lead 若仍 open 由 drain 段 4 以 `not_pursued`（理由「已由入圖消解：<edge>」）收掉。**不加 trace_status 字彙。**
 怎麼驗：`tests/test_engine_b_leads.py` 的 `classified_by` 參數測試；skill 測試（`tests/test_skill_decision_contract.py` 可執行行）；sandbox review（CLI 旗標新增）。
-**c｜三個 skill。** 改哪裡：`skills/source-trace/SKILL.md`——**不改 claim 路由頂階**，在分流表之後加一節「輸入是層／節點時：客戶 filing 供應商段 → 產業報告 → 規格書／teardown → 供應商自己的文件；41-45 行的 transcript 優先仍成立」、tier 表加 datasheet／teardown；`config/source_routes.json` 登記 `layer_document` route（applies_to always、rung 介於 local_library 與 issuer_site、tier_cap 1、how 指向該節）＋`tests/test_source_routes.py` 一條（`missing_rungs` 對舊 parked lead 會多報一條「沒試」——預期，寫八欄）；`skills/company-onboard/SKILL.md`——Step 1「坐哪一層」改必答（節點 id 或「未知→先走 system-decompose／走圖」）、`TICKER_MAP` 改指 `config/company_identity.json`；Step 2 改一句指向 source-trace 層文件節＋各市場 fetcher（`--forms`、`python -m fetchers.mops`），不自己列清單；Step 3「N/3 才能生成」改「列出自報／客戶端／第三方各幾份，packet 必帶 `layer_enumerations`」不留數門檻；Step 4b 改 extract.py 真旗標；**Step 4d／5 改 `prepare_research_action.py` → pq2 `ra_admission` → `scripts/apply_research_action.py`**，刪直接 load；`skills/lead-intake/SKILL.md:125-128` 加一句層文件節也是 source-trace 的；`skills/research-drain/SKILL.md:169` 加括號指節名；新 `tests/test_company_onboard_skill.py`（可執行行不得出現 `loader/load_to_neo4j.py`、必須出現 `prepare_research_action`）；`tests/test_source_trace_skill.py` 加「直接去 transcript」那句仍在層文件節之前；跑 `python scripts/sync_agent_skills.py`。
+**c｜三個 skill。** 改哪裡：`skills/source-trace/SKILL.md`——**不改 claim 路由頂階**，在分流表之後加一節「輸入是層／節點時：客戶 filing 供應商段 → 產業報告 → 規格書／teardown → 供應商自己的文件；41-45 行的 transcript 優先仍成立」、tier 表加 datasheet／teardown；`config/source_routes.json` 登記 `layer_document` route（applies_to always、rung 介於 local_library 與 issuer_site、tier_cap 1、how 指向該節）＋`tests/test_source_routes.py` 一條（`missing_rungs` 對舊 parked lead 會多報一條「沒試」——預期，寫八欄）；`skills/company-onboard/SKILL.md`——Step 1「坐哪一層」改必答（節點 id 或「未知→先走 system-decompose／走圖」）、`TICKER_MAP` 改指 `config/company_identity.json`；Step 2 改一句指向 source-trace 層文件節＋各市場 fetcher（`--forms`、`python -m fetchers.mops`），不自己列清單；Step 3「N/3 才能生成」改「列出自報／客戶端／第三方各幾份，packet 必帶 `layer_enumerations`」不留數門檻；Step 4b 改 extract.py 真旗標；**Step 4d／5 改 `prepare_research_action.py` → pq2 `ra_admission` → `scripts/apply_ra_admission.py`**，刪直接 load；`skills/lead-intake/SKILL.md:125-128` 加一句層文件節也是 source-trace 的；`skills/research-drain/SKILL.md:169` 加括號指節名；新 `tests/test_company_onboard_skill.py`（可執行行不得出現 `loader/load_to_neo4j.py`、必須出現 `prepare_research_action`）；`tests/test_source_trace_skill.py` 加「直接去 transcript」那句仍在層文件節之前；跑 `python scripts/sync_agent_skills.py`。
 L11-6 ④：`tests/test_source_trace_skill.py:8-30` 鎖的固定字串。
 
 ## 7. Step 4.6 稀釋燈＋Engine C `METRICS` CHECK 遷移（Z2，R1 ＋ R2-c 常規 opt-in）
@@ -396,7 +399,7 @@ L11-6 ④：第 2 型兩筆命中消失後心跳段 3 的 diff 行；SIVE.ST 候
 
 ## 10. Step 4.9 新管線 full chain 測試（Z1，R1）
 
-夾具版端到端：一份 `origin_role=industry_report` 的層文件 request（`layer_enumerations` 2 家）→ prepare → 池裡 `ra_admission` → `scripts/apply_research_action.py --pq2 --digest`（fake driver）→ approval 戳記 → `complete-ra` → 計數器（夾具圖）②＋1、①−1；一份引文不具名的 request 被拒；一筆 media origin 文件不升級；走圖第 2 型對有現行讀圖的節點不問。`tests/test_full_chain_acceptance.py` 真 runtime 那份 27 條不動。
+夾具版端到端：一份 `origin_role=industry_report` 的層文件 request（`layer_enumerations` 2 家）→ prepare → 池裡 `ra_admission` → `scripts/apply_ra_admission.py --pq2 --digest`（fake driver）→ approval 戳記 → `complete-ra` → 計數器（夾具圖）②＋1、①−1；一份引文不具名的 request 被拒；一筆 media origin 文件不升級；走圖第 2 型對有現行讀圖的節點不問。`tests/test_full_chain_acceptance.py` 真 runtime 那份 27 條不動。
 
 ## 11. 驗收數的是哪一層（completion gate 第九項）
 
@@ -410,7 +413,7 @@ L11-6 ④：第 2 型兩筆命中消失後心跳段 3 的 diff 行；SIVE.ST 候
 | origin 解析 | 未解析 origin 73 → N；needs_review 113 → N；因 B／display_name／publishers 各自變動的邊逐條；因此 stale 的讀圖 id 與其處置 | 圖 × 讀圖 |
 | 稀釋燈 | 國內申報人黃 24 → N（逐檔來源與理由）；AXTI 黃；非國內 `method_not_applicable` 38 | 敘事（稽核區） |
 | 240 條退役 | downside／research 面板 `judgment` 列 240 → 0 | 敘事 |
-| section／title | 圖上與抽取 JSON 不一致 10＋21 → 0 | 圖 |
+| section／title | 圖上與抽取 JSON 不一致 10＋21 → 0（4.0 實測基準 11＋19，§0.6 #2） | 圖 |
 | ignored、覆蓋率、重複反證、`classified_by`、`layer_document` route | 符號與測試存在；變異會紅 | 機制 |
 
 **沒有任何一個是「幾檔通過某個 filter」。** 候選板「可開」數只印不驗收。
@@ -445,7 +448,7 @@ Task: 直接讀 repo，自己跑下列檢查，逐項 ✅／❌ 附實際輸出�
      抽 5 條升級邊確認 origin 真的是自產資料的第三方、引文逐字具名
   3. sub：對 4.0 凍結的 assertion 集合重算 sub_language_in_quote，與 artifact 相同；Phase 內新增的帶 sub assertion 逐筆看引文；library/resolutions/ 與 collapse_assertions 輸出 ＝ 4.0
   4. lead：本 Phase 鑄的 lead 逐筆狀態、trace_status、watch；走圖第 2 型對有現行讀圖的節點不問（自造夾具）
-  5. packet／apply：自造 6 個應拒收 request；對 4.8 的 RA 紀錄看 approval 戳記與 complete-ra；scripts/apply_research_action.py 不在任何無人值守 allowlist
+  5. packet／apply：自造 6 個應拒收 request；對 4.8 的 RA 紀錄看 approval 戳記與 complete-ra；scripts/apply_ra_admission.py 不在任何無人值守 allowlist
   6. 稀釋燈：AXTI、AAOI、LITE 對 companyfacts 手核；非國內 38 檔 method_not_applicable；CHECK 遷移前後列數
   7. 名冊：display_name 100/100 抽 10 家核來源；name_aliases／execution_symbol 不在 by_ticker；凍結區 0 diff；pq1 排序逐位
   8. python scripts/retired_mechanism_grep.py 三個 0；Decision Store 三檔、trade_log、AGENTS.md 不變；section／title 不一致計數器 0
