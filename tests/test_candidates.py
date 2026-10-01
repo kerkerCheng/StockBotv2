@@ -148,9 +148,11 @@ def test_held_semantics_of_the_pq1_key_are_unchanged(monkeypatch) -> None:
     from engine_b import cli
     from engine_b.cli import PriorityContextError
 
+    # 真實 Sheet 的形狀：不帶任何身分欄（2026-10-01 Phase 4 Step 4.1d 拿掉 enrichment 的 neo4j_id 注入）——
+    # Sivers 要靠名冊的 execution_symbol（FRA:2DG → SIVE.ST）解出來，pq1 的持股鍵才不變。
     monkeypatch.setattr(gs, "fetch_portfolio", lambda **_: [
-        {"ticker": "NVDA", "shares": 5.0, "bucket": "CORE", "neo4j_id": None},
-        {"ticker": "FRA:2DG", "shares": 1.0, "bucket": "觀察", "neo4j_id": "co:sivers_semiconductors"}])
+        {"ticker": "NVDA", "shares": 5.0, "bucket": "CORE"},
+        {"ticker": "FRA:2DG", "shares": 1.0, "bucket": "觀察"}])
     tickers, company_ids = cli._held(strict=True)
     assert {"NVDA", "FRA:2DG", "2DG", "SIVE.ST", "SIVE"} <= set(tickers)
     assert {"co:nvidia", "co:sivers_semiconductors"} <= set(company_ids)   # beta 持股仍在 pq1 的持股鍵裡

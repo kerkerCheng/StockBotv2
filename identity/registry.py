@@ -68,6 +68,15 @@ class CompanyIdentity:
     # 沒登記就是 None：呈現層改用 `company_id（ticker）`，**不從 ID 猜名字**
     # （`co:iqe` → 「Iqe」是編出來的，不是公司的名字）。
     display_name: str | None = None
+    # 名字的其他寫法：短名、中文名、引文常用的品牌名（2026-10-01 Phase 4 Step 4.1c）。
+    # **只給名字比對用**（`query.bottleneck.company_name_forms`／`quote_names_company`）；
+    # ⚠ **不進 `by_ticker`**：`company_id_for_ticker` 是資本歸屬路徑，不得被名字放寬（plan 不可越線 12）。
+    # 與 `aliases` 不同：那是交易代號（SIVEF），這是名字（「華星光」「Sumitomo」）。
+    name_aliases: tuple[str, ...] = ()
+    # 執行代號：Sheet／券商用的寫法（Sivers 的 `FRA:2DG`）。`identity.execution.get_execution_aliases()`
+    # 由它派生（2026-10-01 Phase 4 Step 4.1c；原本寫死在 `identity/execution.py`）。**不進 `by_ticker`**：
+    # 持股解析走 execution 別名反查那一條規則（`portfolio/holdings.py`），不是 ticker 比對。
+    execution_symbol: str | None = None
 
 
 class IdentityRegistry:
@@ -98,6 +107,23 @@ class IdentityRegistry:
                         f"alias {alias_key} already maps to {by_ticker[alias_key]}"
                     )
                 by_ticker[alias_key] = company.company_id
+        # 執行代號在 by_ticker 建完之後才比：後面才登記的公司的 research_ticker 也算衝突。
+        # ⚠ 衝突即 raise——寧可啟動失敗，也不要讓一個執行代號被反查成兩家之一（INV-1）。
+        by_execution: dict[str, str] = {}
+        for company in companies:
+            symbol = (company.execution_symbol or "").strip().upper()
+            if not symbol:
+                continue
+            if symbol in by_ticker:
+                raise ValueError(
+                    f"execution_symbol {symbol} of {company.company_id} collides with "
+                    f"research ticker／alias of {by_ticker[symbol]}"
+                )
+            if symbol in by_execution:
+                raise ValueError(
+                    f"execution_symbol {symbol} already belongs to {by_execution[symbol]}"
+                )
+            by_execution[symbol] = company.company_id
         self.version = version
         self._by_id: Mapping[str, CompanyIdentity] = MappingProxyType(by_id)
         self._by_ticker: Mapping[str, str] = MappingProxyType(by_ticker)
@@ -129,6 +155,14 @@ class IdentityRegistry:
                     for a in (item.get("aliases") or ())
                     if str(a).strip()
                 ),
+                # 名字保留原本的大小寫（比對規則分大小寫，見 `query.bottleneck._form_pattern`）。
+                name_aliases=tuple(
+                    str(a).strip()
+                    for a in (item.get("name_aliases") or ())
+                    if str(a).strip()
+                ),
+                execution_symbol=(str(item["execution_symbol"]).strip().upper() or None
+                                  if item.get("execution_symbol") is not None else None),
             )
             for item in raw_companies
         )
@@ -158,6 +192,15 @@ class IdentityRegistry:
         """全部已登記公司；只讀，供需要掃描整份 registry 的呼叫端使用。"""
 
         return tuple(self._by_id.values())
+
+    def execution_aliases(self) -> dict[str, str]:
+        """`{research_ticker: execution_symbol}`——`identity.execution.get_execution_aliases()` 的唯一來源。"""
+
+        return {
+            company.research_ticker: company.execution_symbol
+            for company in self._by_id.values()
+            if company.execution_symbol and company.research_ticker
+        }
 
 
 @lru_cache(maxsize=1)

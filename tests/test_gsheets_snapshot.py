@@ -28,6 +28,31 @@ def test_sheet_execution_alias_is_a_separate_reference_not_company_identity() ->
     assert get_execution_aliases()["SIVE.ST"] == "FRA:2DG"
 
 
+def test_parse_portfolio_injects_no_identity_and_names_come_from_the_registry() -> None:
+    """2026-10-01 Phase 4 Step 4.1d：Sheet 解析**不注入任何身分欄**（原本 enrichment 替 FRA:2DG 塞 `neo4j_id`）；
+    名稱只給人看——名冊解析得到的讀 `display_name`，ETF 查名稱表，都沒有就空字串（不猜）。"""
+    from portfolio.holdings import resolve_holding
+
+    rows = gsheets.parse_portfolio([
+        ["ticker", "bucket", "shares", "avg_cost", "company"],
+        ["FRA:2DG", "觀察", "100", "1.2", ""],
+        ["NVDA", "CORE", "5", "100", ""],
+        ["QQQ", "大盤", "1", "400", ""],
+        ["ZZZZ", "觀察", "1", "1", ""],
+        ["AXTI", "觀察", "1", "1", "Sheet 自己寫的名字"],
+    ])
+    by_ticker = {r["ticker"]: r for r in rows}
+    assert all("neo4j_id" not in r and "company_id" not in r for r in rows)
+    assert by_ticker["FRA:2DG"]["company"] == "Sivers Semiconductors AB"      # 名冊 display_name
+    assert by_ticker["NVDA"]["company"] == "NVIDIA Corporation"
+    assert by_ticker["QQQ"]["company"] == "Invesco QQQ Trust (Nasdaq-100)"  # ETF：名稱表
+    assert by_ticker["ZZZZ"]["company"] == ""                                # 不猜
+    assert by_ticker["AXTI"]["company"] == "Sheet 自己寫的名字"              # Sheet 有寫就不動
+    # 身分照樣解得出來——走名冊 execution_symbol 派生的別名，不是 Sheet 列上的欄位
+    resolved = resolve_holding(by_ticker["FRA:2DG"])
+    assert resolved["company_id"] == "co:sivers_semiconductors" and resolved["source"] == "execution_alias"
+
+
 def test_identity_mismatch_and_private_company_fail_closed_differently() -> None:
     mismatch = resolve_identity(
         company_id="co:sivers_semiconductors",

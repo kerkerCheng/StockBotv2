@@ -483,11 +483,16 @@ def test_lifecycle_unreadable_says_cannot_confirm_not_does_not_belong(env, capsy
 
 
 def test_registry_ticker_and_sheet_company_id_paths_are_both_exercised(env, monkeypatch) -> None:
-    """真實 Sheet 會帶 neo4j_id（`fetchers/gsheets.py` 的 enrichment）→ `sheet_company_id`；新建倉的公司走 registry。"""
+    """Sheet **自己帶** company_id 欄 → `sheet_company_id`；新建倉的公司走 registry。
+
+    ⚠ 2026-10-01（Phase 4 Step 4.1d）之前這裡寫「真實 Sheet 會帶 neo4j_id（enrichment）」——那是
+    `fetchers/gsheets.py` 替 FRA:2DG 注入的；注入拿掉後真實 Sheet 不再帶任何身分欄、FRA:2DG 走 `execution_alias`
+    （上面 `test_fra_2dg_buy_resolves_to_sive_and_the_receipt_has_both_halves`）。這條規則留著給「使用者在 Sheet 加了
+    company_id 欄」的情況，所以這裡模擬的是那種 Sheet。"""
     import alpha.providers.briefs as briefs_mod
 
     module = env["module"]
-    env["rows"][0]["neo4j_id"] = SIVERS
+    env["rows"][0]["company_id"] = SIVERS
     assert module.main(_trade("FRA:2DG", "buy", "--why", "x", "--apply")) == 0
     assert _entry(env)["research_receipt"]["resolution"] == "sheet_company_id"
     monkeypatch.setattr(briefs_mod, "BRIEF_DIR", env["tmp"] / "empty")

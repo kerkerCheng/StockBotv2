@@ -214,6 +214,7 @@ Step 4.8 是研究步驟：執行者是強模型就直接做。每個 Step 一�
 |---|---|---|---|---|
 | 1 | 4.0（影響 4.2d、4.9、R2-a、結案 R2） | 4.2d 的新 apply 入口指定了一個與 Phase 2 退役的遠端寫入工具**同名**的檔名 | 改名 `scripts/apply_ra_admission.py`（「套用已核准的 pq2 `ra_admission`」）；本 plan 9 處同步改 | 殭屍 grep I 組以整詞比對那個工具名，plan 檔本身因此命中 9 處、驗收段「未列 1」；I 組 keep-list 只收 `historical_record`，一支新腳本不能列進去。不可越線 11「不得出現殭屍 grep 九組的新命中」——改名是唯一合規的路 |
 | 2 | 4.0（影響 4.2e） | 「`nvidia_photonics_pr_2025_03_18` 沒有抽取檔→補建或登記不可重建」；計數器「10＋21 → 0」 | 該 doc_id 有兩份抽取檔（`nvidia_photonics_ecosystem_pr_2025_03_18.json`、`nvidia_photonics_pr_2025_03_18_fabrinet_addendum.json`——檔名不等於 doc_id），直接寫回；計數器基準 section 11（只在圖上 10＋兩份 JSON 互異 1）＋title 19 | 4.0 實測（baseline §15、§19）：原量測以檔名找抽取檔；title 21 是「多檔 doc_id」數，其中 2 個標題本來一致 |
+| 4 | 4.1c | 「`display_name` 100/100」；§0.2 模擬「16 條升 counterparty_joint、9 條降 self_reported」 | **99/100**：`co:nava_thailand` 刻意不補（唯一來源是 Lumentum 逐字稿摘要的「Thailand (Nava)」「Nava (Thailand)」，看不出是代工廠還是 Lumentum 泰國廠所在地，名冊 `_note` 記理由、測試把它列為唯一允許的缺口）；真實圖 class 變動 a 0／b 5／c 16 條（c：10 條聯合公告升 counterparty_joint、Hexagon／Nidec 自家文件 2 條改判自報、JL MAG 年報 2 條改判自報·filing、Hexagon 說 Schaeffler 供貨給它 2 條升外部印證），Sivers 自家 PR 0 條升級、`co:apollo` 假陽性 0、stale 讀圖 0 | 不可越線 12「display_name 只填 mechanical 來源、不從 slug 推名」——沒有來源的名字補了就是編的；模擬是在 4.1a 之前跑的，a 先做之後 Sivers 自家 PR 不再升級，正是 §13 第一條「順序是硬的」要的效果 |
 | 3 | 4.0 | 「凍結節點集合」「凍結的 assertion id 集合」存檔，未指定位置 | `config/graph_baselines.json` 的 `baselines.phase4_2026_10_01`（tracked、append-only、**只放 id 不放引文**；`.gitignore` 補白名單） | 4.4 的常駐計數器每天要對它算，scratchpad 只活一個 session；這份集合今天重取拿不回來（L10）；部分抽取檔受儲存權限限制不進 Git，所以引文全文只留 scratchpad |
 
 ## 0.7 反方驗證處置（2026-10-01；逐條原文在 workflow journal `wf_b64373a7-a95`，此處只列處置）
@@ -503,3 +504,5 @@ HUMAN SUMMARY 的「下一步」逐字印 `docs/plans/README.md`「每個 Phase 
 8. Phase 2／3 帶過來未併入的：`wake_reading` 以節點為單位（#14）、兩條叫不醒的語意 watch（#16）、`verify_test_nonvacuity.py` 失效突變、Phase 3 §14 其餘各題（§0.3 清單）。
 9. 「層文件只有付費」的 park 是否要有付費取得的 pq2 類別（AGENTS：任何付費永不列入常規授權）。
 10. 走圖第 1 型（薄層沒人讀）要不要也以「研究啟動時鑄 lead」接管道量測。
+11. **（4.1c 發現）`co:openlight` 與 `co:openlight_photonics` 是同一家公司的兩個 id**（OpenLight 自家新聞稿與 Tower 6-K 用後者、Semiconductor Today 那篇用前者）：合併是 identity 決定，本 Phase 不自行處理；名冊兩筆同名，名字比對對兩家都不算（`shared_name_forms`）。另：走圖第 9 型（重複節點）只掃非公司節點，所以沒抓到——要不要把公司節點納入。
+12. **（4.1c 發現）`co:nava_thailand` 疑似抽取錯誤**（Lumentum 法說逐字稿摘要的「Nava (Thailand)」可能是 Lumentum 泰國廠所在的 Navanakorn 工業區，不是公司）：它讓 `tech:cloud_transceiver_1_6t` 多了一家「供應商」；是研究題，名冊刻意不補名。

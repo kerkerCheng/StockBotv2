@@ -7,8 +7,11 @@
   判別函式排除（同一條 alpha／beta 界線，不另抄一份——L16）。
 
 解析順序（INV-1：ticker 不是 identity，**不猜**）：
-1. Sheet 列自己帶的 `company_id`／`neo4j_id`（registry 查得到才算）；
-2. execution 別名反查（`identity/execution.py`：`FRA:2DG` → `SIVE.ST`），再經 registry 嚴格比對；
+1. Sheet 列自己帶的 `company_id`／`neo4j_id`（registry 查得到才算）——⚠ **今天的 Sheet 沒有這兩欄**：
+   2026-10-01（Phase 4 Step 4.1d）之前 `fetchers/gsheets.py` 的 enrichment 表會替 FRA:2DG 注入 `neo4j_id`，
+   所以這條看起來有人走；拿掉注入後只有「Sheet 自己加了 company_id 欄」才會走到（測試會模擬這種 Sheet）；
+2. execution 別名反查（名冊 `execution_symbol` 派生的 `identity.execution.get_execution_aliases()`：
+   `FRA:2DG` → `SIVE.ST`），再經 registry 嚴格比對——FRA:2DG 現在走這條；
 3. Sheet 的 ticker 直接經 registry 嚴格比對（`company_id_for_ticker`）。
 三條都不中＝**解析不到**，列進計數、不猜。`bucket=CASH` 的列是現金，不是「解析不到」。
 """

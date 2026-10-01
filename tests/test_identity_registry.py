@@ -168,3 +168,75 @@ def test_alias_absent_keeps_previous_behaviour() -> None:
     assert registry.company("co:a").aliases == ()
     assert registry.company_id_for_ticker("AAA") == "co:a"
     assert registry.company_id_for_ticker("ZZZ") is None
+
+
+# ---------------------------------------------------------------------------
+# Phase 4 Step 4.1c：name_aliases（名字）與 execution_symbol（執行代號）——兩者都不進 by_ticker
+# ---------------------------------------------------------------------------
+
+def test_name_aliases_and_execution_symbol_never_widen_ticker_resolution() -> None:
+    """`company_id_for_ticker` 是資本歸屬路徑（plan 不可越線 12）：名字與執行代號都不得讓它多解析出任何東西。"""
+
+    from identity.registry import CompanyIdentity, IdentityRegistry
+
+    registry = IdentityRegistry(
+        version=1,
+        companies=(
+            CompanyIdentity(company_id="co:sivers_semiconductors", research_ticker="SIVE.ST",
+                            aliases=("SIVEF",), name_aliases=("Sivers",), execution_symbol="FRA:2DG"),
+        ),
+    )
+    assert registry.company_id_for_ticker("SIVE.ST") == "co:sivers_semiconductors"
+    assert registry.company_id_for_ticker("Sivers") is None
+    assert registry.company_id_for_ticker("FRA:2DG") is None
+    assert registry.execution_aliases() == {"SIVE.ST": "FRA:2DG"}
+
+
+def test_execution_symbol_collisions_fail_closed() -> None:
+    """執行代號撞到任何公司的 research ticker／ticker alias、或另一家的執行代號 → 啟動失敗，不靜默指錯（INV-1）。"""
+
+    import pytest
+
+    from identity.registry import CompanyIdentity, IdentityRegistry
+
+    cases = (
+        # 撞到「後面才登記」的那家 research ticker——by_ticker 要建完才比
+        (CompanyIdentity(company_id="co:a", research_ticker="AAA", execution_symbol="BBB"),
+         CompanyIdentity(company_id="co:b", research_ticker="BBB")),
+        (CompanyIdentity(company_id="co:a", research_ticker="AAA", execution_symbol="XB"),
+         CompanyIdentity(company_id="co:b", research_ticker="BBB", aliases=("XB",))),
+        (CompanyIdentity(company_id="co:a", research_ticker="AAA", execution_symbol="FRA:X"),
+         CompanyIdentity(company_id="co:b", research_ticker="BBB", execution_symbol="fra:x")),
+    )
+    for companies in cases:
+        with pytest.raises(ValueError, match="execution_symbol"):
+            IdentityRegistry(version=1, companies=companies)
+
+
+def test_registry_file_parses_new_fields_preserving_name_case(tmp_path) -> None:
+    from identity.registry import IdentityRegistry
+
+    path = tmp_path / "company_identity.json"
+    path.write_text(json.dumps({"version": 1, "companies": [
+        {"company_id": "co:luxnet", "research_ticker": "4979.TWO", "display_name": "LuxNet Corporation",
+         "name_aliases": ["華星光", " LuxNet ", ""], "execution_symbol": " tpe:4979 ",
+         "_display_name_source": "ignored by the loader"},
+    ]}), encoding="utf-8")
+    company = IdentityRegistry.from_path(path).company("co:luxnet")
+    assert company.name_aliases == ("華星光", "LuxNet")      # 名字保留大小寫、去空白、丟空字串
+    assert company.execution_symbol == "TPE:4979"            # 代號照 ticker 慣例大寫
+
+
+def test_real_registry_names_are_complete_except_documented_gaps() -> None:
+    """2026-10-01 Phase 4 Step 4.1c：100 家補到 99；唯一沒補的那家在 `_note` 寫了為什麼（不替疑似抽取錯誤編名字）。
+    共用寫法只准是已登記的那一對重複 id（名字比對對兩家都不算，見 `query.bottleneck.shared_name_forms`）。"""
+
+    from query.bottleneck import shared_name_forms
+
+    payload = json.loads((Path(__file__).resolve().parent.parent / "config" / "company_identity.json")
+                         .read_text(encoding="utf-8"))
+    missing = {c["company_id"]: c.get("_note") for c in payload["companies"] if not c.get("display_name")}
+    assert set(missing) <= {"co:nava_thailand"}, missing
+    assert all(missing.values()), "沒補 display_name 的公司必須在 _note 寫理由"
+    shared = shared_name_forms(get_registry())
+    assert shared <= {"openlight", "openlight photonics", "openlight photonics inc."}, shared

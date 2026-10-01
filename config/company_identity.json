@@ -6,7 +6,9 @@
       "research_ticker": "AEHR",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Aehr Test Systems",
+      "_display_name_source": "SEC 10-K 2026-07-27 封面 dei:EntityRegistrantName「AEHR TEST SYSTEMS」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:aeva",
@@ -18,43 +20,71 @@
     },
     {
       "company_id": "co:agility_robotics",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Agility Robotics, Inc.",
+      "_display_name_source": "CCXI S-4 逐字（庫內 library/raw/ccxi_s_4_20260904.txt）"
     },
     {
       "company_id": "co:all_space",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "ALL.SPACE Networks Limited",
+      "_display_name_source": "官網頁尾「©2026 ALL.SPACE Networks Limited」（all.space）",
+      "name_aliases": [
+        "ALL.SPACE"
+      ]
     },
     {
       "company_id": "co:amd",
       "research_ticker": "AMD",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Advanced Micro Devices, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「ADVANCED MICRO DEVICES, INC」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）",
+      "name_aliases": [
+        "AMD"
+      ]
     },
     {
       "company_id": "co:ansys",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "ANSYS, Inc.",
+      "_display_name_source": "SEC 10-Q 2025-04-30 封面 dei:EntityRegistrantName「ANSYS, Inc.」（CIK 1013462；2025-07 併入 Synopsys 後下市）",
+      "name_aliases": [
+        "Ansys"
+      ]
     },
     {
       "company_id": "co:anthropic",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Anthropic PBC",
+      "_display_name_source": "官網頁尾「© 2026 Anthropic PBC」（anthropic.com/company）",
+      "name_aliases": [
+        "Anthropic"
+      ]
     },
     {
       "company_id": "co:apollo",
       "research_ticker": "APO",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Apollo Global Management, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-10 封面 dei:EntityRegistrantName「APOLLO GLOBAL MANAGEMENT, INC.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:apple",
       "research_ticker": "AAPL",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Apple Inc.",
+      "_display_name_source": "SEC 10-Q 2026-07-31 封面 dei:EntityRegistrantName「Apple Inc.」"
     },
     {
       "company_id": "co:applied_materials",
       "research_ticker": "AMAT",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Applied Materials, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-20 封面 dei:EntityRegistrantName「APPLIED MATERIALS INC /DE」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:applied_optoelectronics",
@@ -67,7 +97,9 @@
     {
       "company_id": "co:arista",
       "research_ticker": "ANET",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Arista Networks, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「Arista Networks, Inc.」"
     },
     {
       "company_id": "co:axt",
@@ -79,16 +111,22 @@
     },
     {
       "company_id": "co:ayar_labs",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Ayar Labs, Inc.",
+      "_display_name_source": "官網頁尾（ayarlabs.com）"
     },
     {
       "company_id": "co:blackstone",
       "research_ticker": "BX",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Blackstone Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-07 封面 dei:EntityRegistrantName「Blackstone Inc.」"
     },
     {
       "company_id": "co:boston_dynamics",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Boston Dynamics",
+      "_display_name_source": "官網頁尾「©2026 Boston Dynamics」（bostondynamics.com；頁尾沒有公司型態，照印）"
     },
     {
       "company_id": "co:broadcom",
@@ -99,22 +137,33 @@
     {
       "company_id": "co:cadence",
       "research_ticker": "CDNS",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Cadence Design Systems, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-07-29 封面 dei:EntityRegistrantName「CADENCE DESIGN SYSTEMS, INC.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:casela_technologies",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Casela Technologies Corporation, Ltd.",
+      "_display_name_source": "AXT 8-K 逐字（庫內 library/raw/axti_8_k_20260617.txt）",
+      "name_aliases": [
+        "Casela"
+      ]
     },
     {
       "company_id": "co:celestial_ai",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Celestial AI, Inc.",
+      "_display_name_source": "Marvell 10-Q 逐字（庫內 library/raw/mrvl_10_q_20260828.txt）"
     },
     {
       "company_id": "co:churchill_capital_xi",
       "research_ticker": "CCXI",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Churchill Capital Corp XI",
+      "_display_name_source": "SEC 10-Q 2026-08-13 封面 dei:EntityRegistrantName「Churchill Capital Corp XI」"
     },
     {
       "company_id": "co:coherent",
@@ -129,21 +178,29 @@
       "research_ticker": "CRWV",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "CoreWeave, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-12 封面 dei:EntityRegistrantName「CoreWeave, Inc.」"
     },
     {
       "company_id": "co:corning",
       "research_ticker": "GLW",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Corning Inc.",
+      "_display_name_source": "SEC 10-Q 2026-07-29 封面 dei:EntityRegistrantName「CORNING INC /NY」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:enablence_technologies",
       "research_ticker": "ENA.V",
-      "market_currency": "CAD"
+      "market_currency": "CAD",
+      "display_name": "Enablence Technologies Inc.",
+      "_display_name_source": "自家 boilerplate「Enablence Technologies Inc. is a publicly traded company listed on the TSX Venture Exchange」（三方聯合新聞稿 2026-03-17；newsfilecorp.com/release/288080；庫內 enablence_sivers_onet_ofc_pr_2026_03_17）"
     },
     {
       "company_id": "co:ewellix",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Ewellix AB",
+      "_display_name_source": "Schaeffler 全球據點頁（schaeffler.com locations：Ewellix AB, Gothenburg）"
     },
     {
       "company_id": "co:fabrinet",
@@ -170,14 +227,21 @@
     {
       "company_id": "co:google",
       "research_ticker": "GOOGL",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Alphabet Inc.",
+      "_display_name_source": "SEC 10-Q 2026-07-23 封面 dei:EntityRegistrantName「Alphabet Inc.」",
+      "name_aliases": [
+        "Google"
+      ]
     },
     {
       "company_id": "co:gxo_logistics",
       "research_ticker": "GXO",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NYSE"
+      "execution_venue": "NYSE",
+      "display_name": "GXO Logistics, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「GXO Logistics, Inc.」"
     },
     {
       "company_id": "co:harmonic_drive_systems",
@@ -190,7 +254,9 @@
     {
       "company_id": "co:hexagon",
       "research_ticker": "HEXA-B.ST",
-      "market_currency": "SEK"
+      "market_currency": "SEK",
+      "display_name": "Hexagon AB",
+      "_display_name_source": "年報「Hexagon AB (publ)」（hexagon.com 2025 Annual and Sustainability Report，2026-03-23 公告）"
     },
     {
       "company_id": "co:himax",
@@ -202,31 +268,49 @@
     },
     {
       "company_id": "co:humanoid",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "SKL Robotics LTD",
+      "_display_name_source": "官網頁尾「Copyright © 2024-2026 SKL Robotics LTD.」（thehumanoid.ai；品牌名 Humanoid）",
+      "_note": "品牌名「Humanoid」刻意不放進 name_aliases：它是普通名詞，單字分大小寫也擋不住句首與標題（人形機器人層的引文到處是 Humanoid）。"
     },
     {
       "company_id": "co:hyperlight",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "HyperLight Corporation",
+      "_display_name_source": "HyperLight／UMC／Wavetek 聯合新聞稿逐字（庫內 evertiq_hyperlight_umc_wavetek_2026）"
     },
     {
       "company_id": "co:hyundai_mobis",
       "research_ticker": "012330.KS",
-      "market_currency": "KRW"
+      "market_currency": "KRW",
+      "display_name": "Hyundai Mobis Co., Ltd.",
+      "_display_name_source": "公司 IR／2025 Sustainability Report（mobis.com）"
     },
     {
       "company_id": "co:ime_cas",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Institute of Microelectronics of the Chinese Academy of Sciences",
+      "_display_name_source": "機構英文官網（english.ime.cas.cn）",
+      "name_aliases": [
+        "IMECAS",
+        "IME of Chinese Academy of Sciences"
+      ]
     },
     {
       "company_id": "co:intel",
       "research_ticker": "INTC",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Intel Corporation",
+      "_display_name_source": "SEC 10-Q 2026-07-24 封面 dei:EntityRegistrantName「INTEL CORPORATION」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:intelliepi",
       "research_ticker": "4971.TWO",
       "market_currency": "TWD",
-      "display_name": "IntelliEPI"
+      "display_name": "IntelliEPI",
+      "name_aliases": [
+        "英特磊"
+      ]
     },
     {
       "company_id": "co:iqe",
@@ -239,24 +323,40 @@
       "research_ticker": "IREN",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "IREN Limited",
+      "_display_name_source": "SEC 10-K 2026-08-27 封面 dei:EntityRegistrantName「IREN Limited」"
     },
     {
       "company_id": "co:jabil",
       "research_ticker": "JBL",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "Jabil Inc.",
+      "_display_name_source": "SEC 10-Q 2026-06-30 封面 dei:EntityRegistrantName「JABIL INC」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:jl_mag",
       "research_ticker": "6680.HK",
       "market_currency": "HKD",
       "execution_currency": "HKD",
-      "execution_venue": "HKEX"
+      "execution_venue": "HKEX",
+      "display_name": "JL MAG Rare-Earth Co., Ltd.",
+      "_display_name_source": "自家 HKEX 年報封面（庫內 jlmag_ar2022_hkex、jlmag_ar2025_hkex 逐字）",
+      "name_aliases": [
+        "JL MAG",
+        "金力永磁"
+      ]
     },
     {
       "company_id": "co:jx_advanced_metals",
       "research_ticker": "5016.T",
-      "market_currency": "JPY"
+      "market_currency": "JPY",
+      "display_name": "JX Advanced Metals Corporation",
+      "_display_name_source": "自家新聞稿頁尾「JX Advanced Metals Corporation All Rights Reserved」（庫內 jx_metals_inp_capacity_pr_2026_06_16）",
+      "name_aliases": [
+        "JX Metals",
+        "JX Nippon Mining & Metals"
+      ]
     },
     {
       "company_id": "co:lam_research",
@@ -272,27 +372,53 @@
       "market_currency": "TWD",
       "execution_currency": "TWD",
       "execution_venue": "TPEx",
-      "display_name": "LandMark Optoelectronics Corporation"
+      "display_name": "LandMark Optoelectronics Corporation",
+      "name_aliases": [
+        "LandMark",
+        "聯亞光電",
+        "聯亞",
+        "聯亞光電工業股份有限公司"
+      ]
     },
     {
       "company_id": "co:leaderdrive",
       "research_ticker": "688017.SS",
       "market_currency": "CNY",
       "execution_currency": "CNY",
-      "execution_venue": "SSE"
+      "execution_venue": "SSE",
+      "display_name": "Leader Harmonious Drive Systems Co., Ltd.",
+      "_display_name_source": "上交所 688017 英文名（stockanalysis.com/quote/sha/688017；公司 leaderdrive.cn）",
+      "name_aliases": [
+        "Leaderdrive",
+        "绿的谐波"
+      ]
     },
     {
       "company_id": "co:lessengers",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Lessengers Inc.",
+      "_display_name_source": "POET 財報逐字（庫內 library/raw/poet_q2fy2026_fs_20260813.txt）"
     },
     {
       "company_id": "co:lightium_ag",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "LIGHTIUM AG",
+      "_display_name_source": "Sivers 2025 年報逐字（庫內 sivers_ar_2025_photonics_excerpt）",
+      "name_aliases": [
+        "Lightium"
+      ]
     },
     {
       "company_id": "co:liteon",
       "research_ticker": "2301.TW",
-      "market_currency": "TWD"
+      "market_currency": "TWD",
+      "display_name": "LITE-ON Technology Corporation",
+      "_display_name_source": "公司年報頁（liteon.com/en/download/annual-reports）；TWSE 2301",
+      "name_aliases": [
+        "Lite-On",
+        "光寶科",
+        "光寶科技股份有限公司"
+      ]
     },
     {
       "company_id": "co:lumentum",
@@ -304,13 +430,19 @@
     },
     {
       "company_id": "co:lumilens",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Lumilens Inc.",
+      "_display_name_source": "POET MD&A 逐字（庫內 library/raw/poet_q2fy2026_mda_20260813.txt）"
     },
     {
       "company_id": "co:luxnet",
       "research_ticker": "4979.TWO",
       "market_currency": "TWD",
-      "display_name": "LuxNet Corporation"
+      "display_name": "LuxNet Corporation",
+      "name_aliases": [
+        "華星光",
+        "華星光通"
+      ]
     },
     {
       "company_id": "co:lynas",
@@ -334,7 +466,10 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "Marvell Technology, Inc."
+      "display_name": "Marvell Technology, Inc.",
+      "name_aliases": [
+        "Marvell"
+      ]
     },
     {
       "company_id": "co:meta",
@@ -357,18 +492,27 @@
       "research_ticker": "MSFT",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Microsoft Corporation",
+      "_display_name_source": "SEC 10-K 2026-07-29 封面 dei:EntityRegistrantName「MICROSOFT CORPORATION」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:mips_holding",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "MIPS Holding, Inc.",
+      "_display_name_source": "GlobalFoundries 20-F 逐字（庫內 gfs_20_f_20260227）",
+      "name_aliases": [
+        "MIPS"
+      ]
     },
     {
       "company_id": "co:mp_materials",
       "research_ticker": "MP",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NYSE"
+      "execution_venue": "NYSE",
+      "display_name": "MP Materials Corp.",
+      "_display_name_source": "SEC 10-Q 2026-08-07 封面 dei:EntityRegistrantName「MP Materials Corp. / DE」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:nabtesco",
@@ -380,65 +524,104 @@
     },
     {
       "company_id": "co:nava_thailand",
-      "research_ticker": null
+      "research_ticker": null,
+      "_note": "2026-10-01 Phase 4 Step 4.1c 刻意不補 display_name：唯一來源是 Lumentum 法說逐字稿摘要的「Thailand (Nava)」「Nava (Thailand)」（lumentum_q2fy26_cpo s8／s24），看不出是一家代工廠還是 Lumentum 泰國廠所在地（Navanakorn 工業區）——不替它編名字；是否為抽取錯誤待研究（Phase 4 結案待決清單）。"
     },
     {
       "company_id": "co:nebius",
       "research_ticker": "NBIS",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Nebius Group N.V.",
+      "_display_name_source": "SEC 20-F/A 2026-05-22 封面 dei:EntityRegistrantName「NEBIUS GROUP N.V.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:newphotonics",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "NewPhotonics Ltd.",
+      "_display_name_source": "自家新聞稿逐字（庫內 newphotonics_npc50506_2026_09_09）"
     },
     {
       "company_id": "co:nidec",
       "research_ticker": "6594.T",
       "market_currency": "JPY",
       "execution_currency": "JPY",
-      "execution_venue": "TSE"
+      "execution_venue": "TSE",
+      "display_name": "Nidec Corporation",
+      "_display_name_source": "Annual Securities Report 英譯（nidec.com IR library）",
+      "name_aliases": [
+        "Nidec Drive Technology"
+      ],
+      "_note": "name_aliases 的 Nidec Drive Technology 是 Nidec 全資子公司（前 Nidec-Shimpo；nidec.com Nidec Group Companies）。"
     },
     {
       "company_id": "co:niron_magnetics",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Niron Magnetics",
+      "_display_name_source": "官網頁尾「© 2026 Niron Magnetics」（nironmagnetics.com；頁尾沒有公司型態，照印）"
     },
     {
       "company_id": "co:novanta",
       "research_ticker": "NOVT",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Novanta Inc.",
+      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「NOVANTA INC.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:nvidia",
       "research_ticker": "NVDA",
       "market_currency": "USD",
-      "display_name": "NVIDIA Corporation"
+      "display_name": "NVIDIA Corporation",
+      "name_aliases": [
+        "Nvidia"
+      ]
     },
     {
       "company_id": "co:o_net_technologies",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "O-Net Technologies",
+      "_display_name_source": "自家 boilerplate「O-Net Technologies is a global leader…」（三方聯合新聞稿 2026-03-17；newsfilecorp.com/release/288080）"
     },
     {
       "company_id": "co:openai",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "OpenAI Group PBC",
+      "_display_name_source": "NVIDIA 10-Q 逐字（庫內 library/raw/nvda_10_q_20260826.txt）",
+      "name_aliases": [
+        "OpenAI"
+      ]
     },
     {
       "company_id": "co:openlight",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "OpenLight Photonics Inc.",
+      "_display_name_source": "官網頁尾「© 2026 OpenLight Photonics Inc.」（openlightphotonics.com）",
+      "name_aliases": [
+        "OpenLight"
+      ],
+      "_note": "與 co:openlight_photonics 是同一家公司（OpenLight 自家新聞稿與 Tower 6-K 用 co:openlight_photonics、Semiconductor Today 那篇用 co:openlight；2026-10-01 Phase 4 Step 4.1c 補名時發現）。合併是 identity 決定、不在名冊自行處理；兩筆同名期間名字比對對兩家都不算（query.bottleneck.shared_name_forms，不猜）。"
     },
     {
       "company_id": "co:openlight_photonics",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "OpenLight Photonics Inc.",
+      "_display_name_source": "官網頁尾「© 2026 OpenLight Photonics Inc.」（openlightphotonics.com）",
+      "name_aliases": [
+        "OpenLight"
+      ],
+      "_note": "見 co:openlight 的 _note（同一家公司的兩個 id）。"
     },
     {
       "company_id": "co:oracle",
       "research_ticker": "ORCL",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NYSE"
+      "execution_venue": "NYSE",
+      "display_name": "Oracle Corporation",
+      "_display_name_source": "SEC 10-Q 2026-09-11 封面 dei:EntityRegistrantName「Oracle Corporation」"
     },
     {
       "company_id": "co:poet_technologies",
@@ -448,35 +631,54 @@
     },
     {
       "company_id": "co:proterial",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Proterial, Ltd.",
+      "_display_name_source": "商號變更公告「Proterial, Ltd.: Notice Concerning Changed of Trade Name」（2023-01-04，前 Hitachi Metals, Ltd.）"
     },
     {
       "company_id": "co:samsung",
       "research_ticker": "005930.KS",
-      "market_currency": "KRW"
+      "market_currency": "KRW",
+      "display_name": "Samsung Electronics Co., Ltd.",
+      "_display_name_source": "Micron FY2025 10-K 逐字「Samsung Electronics Co., Ltd.」（庫內 mu_10_k_fy2025_20251003）",
+      "name_aliases": [
+        "Samsung"
+      ]
     },
     {
       "company_id": "co:sandisk",
       "research_ticker": "SNDK",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Sandisk Corporation",
+      "_display_name_source": "SEC 10-K 2026-08-17 封面 dei:EntityRegistrantName「Sandisk Corporation」"
     },
     {
       "company_id": "co:schaeffler",
       "research_ticker": "SHA0.DE",
-      "market_currency": "EUR"
+      "market_currency": "EUR",
+      "display_name": "Schaeffler AG",
+      "_display_name_source": "自家文件逐字（庫內 schaeffler_q1_2026_humanoid_actuator_platform）"
     },
     {
       "company_id": "co:seminex",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "SemiNex Corporation",
+      "_display_name_source": "Sivers×SemiNex 聯合新聞稿逐字（庫內 sivers_seminex_inp_program_2026_08_13）"
     },
     {
       "company_id": "co:shuanghuan_driveline",
       "research_ticker": "002472.SZ",
       "market_currency": "CNY",
       "execution_currency": "CNY",
-      "execution_venue": "SZSE"
+      "execution_venue": "SZSE",
+      "display_name": "Zhejiang Shuanghuan Driveline Co., Ltd.",
+      "_display_name_source": "公司官網英文名（gearsnet.com/en）；深交所 002472",
+      "name_aliases": [
+        "Shuanghuan Driveline",
+        "双环传动"
+      ]
     },
     {
       "company_id": "co:sivers_semiconductors",
@@ -487,7 +689,8 @@
       "aliases": [
         "SIVEF"
       ],
-      "display_name": "Sivers Semiconductors AB"
+      "display_name": "Sivers Semiconductors AB",
+      "execution_symbol": "FRA:2DG"
     },
     {
       "company_id": "co:sk_hynix",
@@ -503,41 +706,59 @@
     {
       "company_id": "co:soitec",
       "research_ticker": "SOI.PA",
-      "market_currency": "EUR"
+      "market_currency": "EUR",
+      "display_name": "Soitec",
+      "_display_name_source": "2025-2026 Universal Registration Document（soitec.com，2026-06-10 公告；法定名稱 Soitec，société anonyme）"
     },
     {
       "company_id": "co:spacexai",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "SpaceXAI",
+      "_display_name_source": "NVIDIA 8-K EX-99.1 逐字（庫內 nvda_8k_ex991_20260826_q2fy27_pr）；SpaceX 的 AI 事業（xAI 2026-02 併入 SpaceX、07 改名），不是獨立法人"
     },
     {
       "company_id": "co:sumitomo_electric",
       "research_ticker": "5802.T",
-      "market_currency": "JPY"
+      "market_currency": "JPY",
+      "display_name": "Sumitomo Electric Industries, Ltd.",
+      "_display_name_source": "公司 IR（sumitomoelectric.com/ir）；AAOI 10-K 逐字同名（庫內 aaoi_10_k_20260227_competition）",
+      "name_aliases": [
+        "Sumitomo Electric",
+        "Sumitomo"
+      ]
     },
     {
       "company_id": "co:tachyon_networks",
-      "research_ticker": null
+      "research_ticker": null,
+      "display_name": "Tachyon Networks Inc.",
+      "_display_name_source": "Sivers 新聞稿逐字（庫內 sivers_tachyon_60ghz_development_2026_05_06）"
     },
     {
       "company_id": "co:tesla",
       "research_ticker": "TSLA",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Tesla, Inc.",
+      "_display_name_source": "SEC 10-Q 2026-07-23 封面 dei:EntityRegistrantName「Tesla, Inc.」"
     },
     {
       "company_id": "co:texas_instruments",
       "research_ticker": "TXN",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NASDAQ"
+      "execution_venue": "NASDAQ",
+      "display_name": "Texas Instruments Incorporated",
+      "_display_name_source": "SEC 10-Q 2026-07-24 封面 dei:EntityRegistrantName「TEXAS INSTRUMENTS INCORPORATED」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
       "company_id": "co:thk",
       "research_ticker": "6481.T",
       "market_currency": "JPY",
       "execution_currency": "JPY",
-      "execution_venue": "TSE"
+      "execution_venue": "TSE",
+      "display_name": "THK CO., LTD.",
+      "_display_name_source": "決算短信英文版封面（thk.com）；東證 6481"
     },
     {
       "company_id": "co:tower_semiconductor",
@@ -551,30 +772,57 @@
       "company_id": "co:tsmc",
       "research_ticker": "TSM",
       "market_currency": "USD",
-      "display_name": "Taiwan Semiconductor Manufacturing Company Limited"
+      "display_name": "Taiwan Semiconductor Manufacturing Company Limited",
+      "name_aliases": [
+        "TSMC",
+        "台積電"
+      ]
     },
     {
       "company_id": "co:umc",
       "research_ticker": "UMC",
-      "market_currency": "USD"
+      "market_currency": "USD",
+      "display_name": "United Microelectronics Corporation",
+      "_display_name_source": "SEC 20-F 2026-04-30 封面 dei:EntityRegistrantName「United Microelectronics Corporation」",
+      "name_aliases": [
+        "UMC"
+      ]
     },
     {
       "company_id": "co:unitree",
       "research_ticker": "688836.SS",
       "market_currency": "CNY",
       "execution_currency": "CNY",
-      "execution_venue": "SSE"
+      "execution_venue": "SSE",
+      "display_name": "宇树科技股份有限公司",
+      "_display_name_source": "上交所 688836 上市公司名稱（2026-08-19 上市）",
+      "name_aliases": [
+        "Unitree",
+        "Unitree Robotics",
+        "宇树科技",
+        "宇樹科技"
+      ]
     },
     {
       "company_id": "co:vpec",
       "research_ticker": "2455.TW",
       "market_currency": "TWD",
-      "display_name": "Visual Photonics Epitaxy"
+      "display_name": "Visual Photonics Epitaxy",
+      "name_aliases": [
+        "VPEC",
+        "全新光電"
+      ]
     },
     {
       "company_id": "co:win_semiconductor",
       "research_ticker": "3105.TWO",
-      "market_currency": "TWD"
+      "market_currency": "TWD",
+      "display_name": "WIN Semiconductors Corp.",
+      "_display_name_source": "櫃買 3105 英文名；中文法定名稱見自家年報 origin（庫內 mops_3105_annual_report_2025）",
+      "name_aliases": [
+        "穩懋半導體股份有限公司",
+        "穩懋"
+      ]
     },
     {
       "company_id": "co:x_fab",
@@ -584,6 +832,11 @@
       "execution_venue": "EURONEXT",
       "aliases": [
         "XFAB"
+      ],
+      "display_name": "X-FAB Silicon Foundries SE",
+      "_display_name_source": "X-FAB Annual Report 2025（xfab.com Investor Relations）",
+      "name_aliases": [
+        "X-FAB"
       ]
     },
     {
@@ -591,12 +844,22 @@
       "research_ticker": "XPEV",
       "market_currency": "USD",
       "execution_currency": "USD",
-      "execution_venue": "NYSE"
+      "execution_venue": "NYSE",
+      "display_name": "XPeng Inc.",
+      "_display_name_source": "SEC 20-F 2026-04-16 封面 dei:EntityRegistrantName「XPeng Inc.」"
     },
     {
       "company_id": "co:zhongji_innolight",
       "research_ticker": "300308.SZ",
-      "market_currency": "CNY"
+      "market_currency": "CNY",
+      "display_name": "Zhongji Innolight Co., Ltd.",
+      "_display_name_source": "深交所 300308 英文名（中际旭创股份有限公司）",
+      "name_aliases": [
+        "InnoLight",
+        "Innolight",
+        "中际旭创",
+        "中際旭創"
+      ]
     }
   ]
 }

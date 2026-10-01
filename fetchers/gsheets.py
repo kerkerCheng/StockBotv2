@@ -96,25 +96,34 @@ _BUCKET_ALIASES: dict[str, str] = {
     "cash": "cash",
 }
 
-# Tickers that need enrichment — company name + Neo4j node ID (if in graph)
-# Exchange-prefixed tickers (FRA:, LON:) are not self-explanatory.
-_TICKER_ENRICHMENT: dict[str, dict] = {
-    "FRA:2DG":    {"company": "Sivers Semiconductors AB",              "neo4j_id": "co:sivers_semiconductors"},
-    "LON:VWRA":   {"company": "Vanguard FTSE All-World UCITS ETF (Acc)", "neo4j_id": None},
-    "00981A.TW":  {"company": "主動統一台股增長 ETF (統一投信)",          "neo4j_id": None},
-    "00631L.TW":  {"company": "元大台灣50正2 ETF",                      "neo4j_id": None},
-    "006208.TW":  {"company": "富邦台50 ETF",                           "neo4j_id": None},
-    "0050.TW":    {"company": "元大台灣50 ETF",                         "neo4j_id": None},
-    "2330.TW":    {"company": "台灣積體電路製造 (TSMC)",                  "neo4j_id": None},
-    "NVDA":       {"company": "NVIDIA Corporation",                    "neo4j_id": None},
-    "GOOGL":      {"company": "Alphabet Inc",                          "neo4j_id": None},
-    "MU":         {"company": "Micron Technology",                     "neo4j_id": None},
-    "TSLA":       {"company": "Tesla Inc",                             "neo4j_id": None},
-    "DRAM":       {"company": "Roundhill Memory ETF",                   "neo4j_id": None},
-    "QQQ":        {"company": "Invesco QQQ Trust (Nasdaq-100)",        "neo4j_id": None},
-    "SOXX":       {"company": "iShares Semiconductor ETF",             "neo4j_id": None},
-    "TQQQ":       {"company": "ProShares UltraPro QQQ (3x)",           "neo4j_id": None},
+#: Sheet 沒填 `company` 欄時給人看的名稱——**只給名字、不給身分**：ETF 與名冊沒有的代號才住這裡；
+#: 名冊解析得到的列（FRA:2DG、NVDA、GOOGL、MU、TSLA…）改讀名冊的 `display_name`（`_display_name_for`）。
+#: ⚠ 2026-10-01（Phase 4 Step 4.1d）之前這張表叫 `_TICKER_ENRICHMENT`，還替 FRA:2DG 注入 `neo4j_id`——
+#: 一張寫死的表在替持股決定身分（INV-1）。身分解析只住 `portfolio/holdings.py`（execution 別名反查＋registry 嚴格比對）。
+_TICKER_NAMES: dict[str, str] = {
+    "LON:VWRA":   "Vanguard FTSE All-World UCITS ETF (Acc)",
+    "00981A.TW":  "主動統一台股增長 ETF (統一投信)",
+    "00631L.TW":  "元大台灣50正2 ETF",
+    "006208.TW":  "富邦台50 ETF",
+    "0050.TW":    "元大台灣50 ETF",
+    "2330.TW":    "台灣積體電路製造 (TSMC)",
+    "DRAM":       "Roundhill Memory ETF",
+    "QQQ":        "Invesco QQQ Trust (Nasdaq-100)",
+    "SOXX":       "iShares Semiconductor ETF",
+    "TQQQ":       "ProShares UltraPro QQQ (3x)",
 }
+
+
+def _display_name_for(ticker: str) -> str:
+    """名冊解析得到 → `display_name`；否則查 `_TICKER_NAMES`；都沒有 → 空字串（不猜）。"""
+    from identity.registry import get_registry
+    from portfolio.holdings import resolve_holding
+
+    company_id = resolve_holding({"ticker": ticker})["company_id"]
+    company = get_registry().company(company_id) if company_id else None
+    if company is not None and company.display_name:
+        return company.display_name
+    return _TICKER_NAMES.get(ticker, "")
 
 
 def _get_service(*, writable: bool = False):
@@ -664,11 +673,9 @@ def parse_portfolio(rows: list[list[Any]], *, strict_operational: bool = False) 
             continue
         item["ticker"] = ticker
 
-        # Enrich with company name and Neo4j ID where known
-        enrichment = _TICKER_ENRICHMENT.get(ticker, {})
+        # 只補給人看的名稱；**不注入任何身分欄位**（Phase 4 Step 4.1d，見 `_TICKER_NAMES`）。
         if "company" not in item or not item.get("company"):
-            item["company"] = enrichment.get("company", "")
-        item["neo4j_id"] = enrichment.get("neo4j_id")
+            item["company"] = _display_name_for(ticker)
 
         # Type conversions
         try:
