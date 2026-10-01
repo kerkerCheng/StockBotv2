@@ -17,6 +17,14 @@ PLANS_README = ROOT / "docs" / "plans" / "README.md"
 _ROW = re.compile(r"^\|\s*(?P<phase>[^|]+?)\s*\|\s*(?P<plan>[^|]+?)\s*\|\s*(?P<status>[^|]+?)\s*\|\s*$")
 _LINK = re.compile(r"\]\(([^)]+)\)")
 _STEP = re.compile(r"^\|\s*(?P<step>[^|]+?)\s*\|\s*(?P<what>[^|]+?)\s*\|\s*(?P<state>[^|]+?)\s*\|")
+#: 狀態欄以封閉字彙開頭、後面常接括號註記（「active（2026-10-01；…）」）。
+#: ⚠ 2026-10-01 事發：原本比對 `== "active"`，Phase 4 那一列帶了註記就被當成「沒有 active plan」，
+#: hook 叫人去寫 Phase 5 的 plan——執行者照做就會停在一份其實在跑的 plan 前面。
+_ACTIVE_STATUS = re.compile(r"^active(?![A-Za-z_])")
+
+
+def _is_active(status: str) -> bool:
+    return bool(_ACTIVE_STATUS.match(status.strip()))
 
 
 def _phase_rows(text: str) -> list[dict[str, str]]:
@@ -69,13 +77,15 @@ def main() -> int:
         return 0
     if not rows:
         return 0
-    active = [r for r in rows if r["status"] == "active"]
+    active = [r for r in rows if _is_active(r["status"])]
     if len(active) == 1:
         plan = active[0]
         step = _next_step(ROOT / "docs" / "plans" / plan["plan"]) if plan["plan"] else None
+        # 狀態欄的註記照抄（例：Phase 4「執行者全程強模型」）——「建議模型：便宜」是對照表的預設分工，註記優先。
+        note = plan["status"].strip()[len("active"):].strip()
         msg = (
             f"🧭 Phase {plan['phase']} 執行中｜下一個 Step：{step or '（進度表讀不到，看 git log）'}"
-            "｜建議模型：便宜｜貼 /phase-run"
+            f"｜建議模型：便宜（對照表註記優先{'：' + note if note else ''}）｜貼 /phase-run"
         )
     elif len(active) > 1:
         msg = "🧭 對照表有兩份以上 active plan——先修 docs/plans/README.md 再開工"
