@@ -197,16 +197,20 @@ _LEGAL_SUFFIX_TOKENS = frozenset({
     "llc", "plc", "ag", "ab", "sa", "nv", "gmbh", "kk", "holding", "holdings", "group",
 })
 _TRAILING_ANNOTATION = re.compile(r"\s*[（(][^（）()]*[）)]\s*$")
+#: 逗號接 `with …` 的註解（「Sivers Semiconductors, with a named Tachyon Networks quotation」）——與尾端括號同一種東西：
+#: 研究者寫給人看的脈絡，不是發布者身分。2026-10-01 實測 3 個字串（Sivers ×2、Hexagon ×1）。
+_TRAILING_WITH = re.compile(r",\s*with\b.*$", re.IGNORECASE)
 
 
 def _strip_annotation(text: str) -> str:
-    """去掉 origin 尾端那一組括號註解：`Coherent（發行人官方新聞稿）` → `Coherent`。
+    """去掉 origin 尾端的註解：括號一組（`Coherent（發行人官方新聞稿）` → `Coherent`）與逗號接 `with …`。
 
     括號裡是研究者寫給人看的脈絡（發行人／客戶端／轉載），不是發布者身分的一部分；
     留著它會讓一份公司自家文件被當成解析不到的第三方（2026-09-16 實測 20 筆）。
     只去尾端一組；名稱中段的括號不動。
     """
-    return _TRAILING_ANNOTATION.sub("", str(text or "")).strip()
+    stripped = _TRAILING_ANNOTATION.sub("", str(text or "")).strip()
+    return _TRAILING_WITH.sub("", stripped).strip()
 
 
 def _core_name(text: str) -> str:
@@ -225,18 +229,99 @@ def _core_name(text: str) -> str:
     return " ".join(tokens).strip(" ,.;:-")
 
 
-def _name_variants(company) -> set[str]:
-    """一家公司可被比對的名稱：`display_name`、它的核心名稱、以及 registry 明列的 alias。
+def _core_name_cased(text: str) -> str:
+    """與 `_core_name` 同一套尾綴規則，但**保留原本的大小寫**——引文比對要分大小寫（見 `quote_names_company`）。"""
+    tokens = str(text or "").split()
+    while tokens:
+        tail = re.sub(r"[^0-9a-z]", "", tokens[-1].casefold())
+        if not tail or tail in _LEGAL_SUFFIX_TOKENS:
+            tokens.pop()
+            continue
+        break
+    return " ".join(tokens).strip(" ,.;:-")
 
+
+def company_name_forms(company) -> tuple[str, ...]:
+    """一家公司**被具名**時可能出現的寫法——名字比對的唯一來源（2026-10-01 Phase 4 Step 4.1b）。
+
+    ＝ 登記名稱 `display_name`、它去掉法律尾綴的核心名稱（保留大小寫）、`name_aliases`（短名、中文名）。
+    ⚠ **不含 `aliases`**：那是交易代號、住 `by_ticker`（`company_id_for_ticker` 的事），不是名字。
     ⚠ 讀的是 registry 真有的欄位。2026-09-16 之前這裡讀 `name`，而 `CompanyIdentity`
     從來沒有這個欄位（100 家 0 家有）——測試的假登記表有，所以測試全綠、production
     一家都解析不到（L17：機制只認得當初那個案例）。
     """
-    variants: set[str] = set()
-    display = getattr(company, "display_name", None)
+    forms: set[str] = set()
+    display = str(getattr(company, "display_name", None) or "").strip()
     if display:
-        variants.add(str(display))
-        variants.add(_core_name(display))
+        forms.add(display)
+        forms.add(_core_name_cased(display))
+    for alias in getattr(company, "name_aliases", None) or ():
+        forms.add(str(alias).strip())
+    return tuple(sorted(f for f in forms if f))
+
+
+#: 中日韓字元：這類名字沒有空白分詞，「整詞」比對會被前後的字擋掉（「穩懋半導體股份有限公司」裡的「穩懋半導體」）。
+_CJK = re.compile(r"[぀-ヿ㐀-䶿一-鿿豈-﫿가-힯]")
+
+
+def _form_pattern(form: str) -> re.Pattern[str]:
+    """一個寫法的比對式。
+
+    - 含中日韓字元 → 完整字串出現即算（沒有分詞可依）。
+    - 其餘 → **ASCII 整詞**（`(?<![A-Za-z0-9_])…(?![A-Za-z0-9_])`；不用 `\\b`——Python 把中文字算 word 字元，
+      「與AXT合作」會漏抓）；**單一個詞分大小寫**（`Coherent` 不比到「coherent optics」、`Humanoid` 不比到
+      「humanoid robots」），多個詞不分（`Tower Semiconductor` 在聯合公告裡常改寫大小寫，多詞也不會撞到普通名詞）。
+    """
+    if _CJK.search(form):
+        return re.compile(re.escape(form))
+    flags = 0 if len(form.split()) == 1 else re.IGNORECASE
+    return re.compile(r"(?<![A-Za-z0-9_])" + re.escape(form) + r"(?![A-Za-z0-9_])", flags)
+
+
+def shared_name_forms(registry) -> frozenset[str]:
+    """registry 裡**兩家以上共用**的寫法（casefold）——同一段字對到兩家時誰都不算（不猜，L15）。
+
+    例：`Foo Inc.` 與 `Foo Ltd.` 的核心名稱都是 `Foo`；引文裡的「Foo」不能同時算兩家具名
+    （那會把一個含糊的字抬成「雙方聯合」）。
+    """
+    owners: dict[str, set[str]] = defaultdict(set)
+    for company in registry.companies:
+        for form in company_name_forms(company):
+            owners[form.casefold()].add(company.company_id)
+    return frozenset(form for form, ids in owners.items() if len(ids) > 1)
+
+
+def quote_names_company(quote: str | None, company, *, registry=None) -> bool:
+    """這段文字（引文或 origin 字串）有沒有**具名**這家公司——名字比對的唯一 owner。
+
+    用在三處（同一個函式，不各寫一份——L16）：`_origin_mentions`（聯合公告偵測）、
+    RA packet 的 `layer_enumerations` 核對（Step 4.2a）、層文件計數器（Step 4.4）。
+    名字只來自 `company_name_forms`；registry 沒有名字的公司一律 False——**呼叫端要把
+    「名冊無名可比」與「引文真的沒具名」分開報**（`company_name_forms` 回空 tuple 就是前者）。
+    給了 `registry` 時，與另一家共用的寫法不算（`shared_name_forms`）。
+    ⚠ 2026-10-01 之前 `_origin_mentions` 用 casefold 子字串＋長度 ≥4 防誤中：會讓單字公司名撞到普通名詞，
+    又會讓 `AXT`／`IQE` 這種三個字母的名字永遠比不到。
+    """
+    text = str(quote or "")
+    if not text:
+        return False
+    return _named_by(text, company, shared_name_forms(registry) if registry is not None else frozenset())
+
+
+def _named_by(text: str, company, shared: frozenset[str]) -> bool:
+    """比對本體（`quote_names_company` 與 `_origin_mentions` 共用；`shared` 由呼叫端算一次）。"""
+    return any(_form_pattern(form).search(text)
+               for form in company_name_forms(company) if form.casefold() not in shared)
+
+
+def _name_variants(company) -> set[str]:
+    """`company_id_for_origin` 的**整串相等**比對用：名字寫法（`company_name_forms`）＋ registry 明列的 ticker alias。
+
+    與 `quote_names_company`（「有沒有提到」）是兩個問題：這裡問「整個 origin 是不是就是這家」，
+    所以多收 ticker（origin 寫成代號時也算）；比較端（`company_id_for_origin`）對每個寫法套 `_core_name`
+    去掉大小寫與法律尾綴。
+    """
+    variants: set[str] = set(company_name_forms(company))
     variants |= {str(a) for a in (getattr(company, "aliases", None) or ()) if str(a)}
     return {v for v in variants if v}
 
@@ -260,6 +345,15 @@ def company_id_for_origin(origin: str | None, registry) -> str | None:
     slug = "co:" + text.lower().replace(" ", "_").replace(".", "").replace(",", "")
     if registry.has_company(slug):
         return slug
+    # 整串就是某家的一個名字寫法（大小寫不計）——中文名走這條：`_core_name` 只認 ASCII，
+    # 會把「穩懋半導體股份有限公司」整個當標點丟掉（2026-10-01 Phase 4 Step 4.1b）。只增不減：
+    # 比不到才往下走核心名稱；兩家以上都比到就不猜。
+    exact = {c.company_id for c in registry.companies
+             if any(text.casefold() == str(v).casefold() for v in _name_variants(c))}
+    if len(exact) == 1:
+        return exact.pop()
+    if len(exact) > 1:
+        return None
     needle = _core_name(text)
     if not needle:
         return None
@@ -272,22 +366,17 @@ def company_id_for_origin(origin: str | None, registry) -> str | None:
 
 
 def _origin_mentions(origin: str, registry) -> set[str]:
-    """origin 字串中被具名的 registry 公司集合（word-boundary、名稱長度 ≥4 防誤中）。
+    """origin 字串中被具名的 registry 公司集合——比對規則就是 `quote_names_company`（唯一 owner）。
 
     供聯合公告偵測用：複合 origin（"IQE plc / Tower Semiconductor (joint announcement)"）
     無法整串解析成單一公司，但其中的具名仍是確定性可比對的。核心名稱（去尾綴）也算具名：
     `Tower Semiconductor Ltd.` 的登記名稱不會逐字出現在聯合公告的 origin 裡。
     """
-    text = str(origin)
-    hits: set[str] = set()
-    for company in registry.companies:
-        for name in _name_variants(company):
-            if len(name) < 4:
-                continue
-            if re.search(r"(?<!\w)" + re.escape(name) + r"(?!\w)", text, re.IGNORECASE):
-                hits.add(company.company_id)
-                break
-    return hits
+    text = str(origin or "")
+    if not text:
+        return set()
+    shared = shared_name_forms(registry)
+    return {company.company_id for company in registry.companies if _named_by(text, company, shared)}
 
 
 def classify_evidence(
@@ -300,9 +389,13 @@ def classify_evidence(
 
     `None` 同時可能是「真的第三方媒體」（schema §7 接受）與「沒解析出來的子公司／別名」
     （不接受）——兩者結論相反，不得壓成一個布林（L12）。解析失敗的 origin 再過一道
-    聯合公告偵測（字串內具名 ≥2 家 registry 公司且含 subject 以外者）才落 needs_review；
-    解析到主詞、但同一字串另具名他家 registry 公司者亦為 counterparty_joint（2026-09-16）。
+    聯合公告偵測（字串內具名 ≥2 家 registry 公司且含 subject 以外者）才落 needs_review。
     `filing_origins`：來自 source_type=='filing' 文件的 origin 集合（costly proxy）。
+
+    ⚠ 解析到主詞的 origin **一律是自報**（filing 出身才是 costly）——2026-10-01 Phase 4 Step 4.1a
+    （使用者定案 Q8b 替代案 B）拿掉了「解析到主詞、但同一字串另具名他家 → counterparty_joint」那支抬升：
+    「客戶高管在供應商新聞稿裡具名」仍是供應商發的稿，不是獨立的客戶端印證（L8）。拿掉當天真實圖命中 0 份
+    SourceDoc；它的連鎖要等名冊補 `display_name` 才會發生（Sivers 自家 PR 的 3 條邊會被抬成雙方聯合）。
     """
     seen = {o for o in origins if o}
     resolved = {o: company_id_for_origin(o, registry) for o in seen}
@@ -322,13 +415,8 @@ def classify_evidence(
                 _lift("counterparty_joint")
             else:
                 _lift("needs_review")
-        else:  # cid == subject：自報
-            # ⚠ 解析得到主詞不代表字串裡只有主詞。「Sivers 官方 PR，內含 Ayar Labs CTO 具名引述」
-            # 這類複合 origin 以前因為解析失敗落在 needs_review；解析歸位後若直接判自報，
-            # 會把研究者刻意寫進 origin 的對手方具名抹掉（2026-09-16）。
-            if _origin_mentions(origin, registry) - {subject}:
-                _lift("counterparty_joint")
-            elif origin in filing_origins:
+        else:  # cid == subject：自報（字串裡另具名誰都一樣——見 docstring 的 Q8b-B）
+            if origin in filing_origins:
                 _lift("self_reported_costly")
     return best
 

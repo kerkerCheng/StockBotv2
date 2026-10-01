@@ -43,7 +43,10 @@ Evidence tier determines how much a source contributes to `confidence` scoring.
 | `confidence` | **這個關係存在的信心** | 0–1；只在不同 `origin_event` 之間累加 |
 | `corroborating_origins` | **還有誰獨立說過同一件事**（L8 的獨立性計數） | `origin_entity` 集合，門檻 3 |
 
-`evidence_class` 五級的權威是 `query/bottleneck.py::EVIDENCE_RANK`；三級證據充分度
+`evidence_class` 五級的權威是 `query/bottleneck.py::EVIDENCE_RANK`（判定是同檔 `classify_evidence`）。
+`counterparty_joint` 只來自「origin 整串解析不到、且字串裡具名 ≥2 家名冊公司（含主詞以外）」的聯合公告；
+**origin 解析得到主詞自己就是自報**（filing 出身為 `self_reported_costly`），字串裡另具名他家（例：供應商新聞稿引述客戶高管）
+不改變這一點（2026-10-01 Phase 4，使用者定案 Q8b 替代案 B）。三級證據充分度
 （`corroborated` ／ `bounded_hypothesis` ／ `unknown`）的權威是 `shared/evidence_levels.py`。
 
 ⚠ **`confidence` 不是「這條因果鏈有多強」**，它只是「這個關係存在的信心」——兩者共用一個

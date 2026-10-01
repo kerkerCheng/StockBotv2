@@ -417,12 +417,21 @@ def test_joint_announcement_is_detected_through_core_names() -> None:
         classify_evidence("co:iqe", ["IQE plc / Tower Semiconductor (joint announcement)"], reg)
         == "counterparty_joint"
     )
-    # 解析得到主詞、但同一字串另具名他家 → 仍是聯合，不得因為「解析成功」就降成自報
+    # 解析得到主詞、即使同一字串另具名他家 → **自報**（2026-10-01 Phase 4 Step 4.1a，使用者定案 Q8b 替代案 B：
+    # 客戶高管在供應商新聞稿裡具名，仍是供應商發的稿，不是獨立的客戶端印證——L8）。原本這裡斷言 counterparty_joint。
     assert (
         classify_evidence(
             "co:coherent", ["Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"], reg
         )
-        == "counterparty_joint"
+        == "self_reported"
+    )
+    # filing 出身的同一種字串 → 自報·filing（costly proxy 照舊，不因為另具名他家而變）
+    assert (
+        classify_evidence(
+            "co:coherent", ["Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"], reg,
+            filing_origins={"Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"},
+        )
+        == "self_reported_costly"
     )
     # 只具名主詞自己（Hexagon 不在 registry）→ 仍待判定，不得升級
     assert (
