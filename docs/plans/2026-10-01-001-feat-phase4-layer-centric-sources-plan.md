@@ -197,7 +197,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 4.6 | 稀釋燈（`StockIssuedDuringPeriodValueNewIssues`）＋Engine C `METRICS` CHECK 遷移＋串接點合一（R2-c：GO，non-blocking 處置見 §0.6 #14；正式庫遷移＋回填 2026-10-01 23:25 經使用者授權完成，結果與副本相同——baseline 報告 §22） | ✅ | 執行模型 | `da789e4`、`4eac6c9`（見 git log「Step 4.6」） |
 | 4.7 | 四個小修：240 條退役不印；`ignored` 接 held_index／心跳；百分位覆蓋率；同敘事重複反證拒收（偏差見 §0.6 #15；驗收見 baseline 報告 §23） | ✅ | 執行模型 | 見 git log「Step 4.7」 |
 | 4.8 | 研究（強模型）：inp_substrate 資料工後重量；cw_dfb 層文件與誠實終局；AMAT／COHR 兩筆 lead 到終局（RA）；stale 讀圖與 SIVE.ST 敘事處置——**四件掛 pq2 等 go：[664]／[665]／[666]／[668]**；讀圖與敘事已寫入（收據 `docs/reports/2026-10-01-phase4-step48-research.md`；偏差見 §0.6 #16） | ✅ | **強模型** | 見 git log「Step 4.8」 |
-| 4.9 | 新管線 full chain 測試（層文件 packet → apply 入口 → 計數器動） | ○ | 執行模型 | |
+| 4.9 | 新管線 full chain 測試（層文件 packet → apply 入口 → 計數器動；`tests/test_layer_document_full_chain.py` 4 條） | ✅ | 執行模型 | 見 git log「Step 4.9」 |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
