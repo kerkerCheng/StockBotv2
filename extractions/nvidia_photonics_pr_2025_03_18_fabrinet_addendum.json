@@ -2,7 +2,8 @@
   "schema_version": "0.1",
   "source_doc": {
     "doc_id": "nvidia_photonics_pr_2025_03_18",
-    "title": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches (GTC 2025-03-18) — Fabrinet addendum",
+    "section": "announcement_main",
+    "title": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches to Scale AI Factories to Millions of GPUs",
     "source_type": "news",
     "evidence_tier": 1,
     "origin_entity": "NVIDIA",

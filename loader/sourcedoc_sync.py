@@ -1,0 +1,92 @@
+"""SourceDoc 的 `section`／`title` 跟抽取 JSON 一不一致——常駐計數器的唯一算法（Phase 4 Step 4.2e）。
+
+## 為什麼需要它
+
+抽取 JSON 是圖的可重建輸入（L10）：圖上任何一個值若不在 JSON 裡，下一次重載或全量重建就會靜默改變它。
+2026-10-01 實測兩種：① `section` 只存在圖上（10 份——當初用遷移工具直接改圖，JSON 沒跟上），重建時合法拆段的
+條件消失、`check_duplicate_url` 會擋下重載；② addendum 檔的 `source_doc.title` 與母文件不同，誰最後載入誰的
+title 就蓋上圖（19 個 doc_id 的 JSON 標題互異、11 份圖上掛的是 addendum 標題）。
+
+## 兩個方向分開報（L12：一個「不一致」承載兩種語意，下游二選一而兩邊都錯）
+
+- **danger**（紅）：重建會**遺失或不確定**的——圖上有值、JSON 沒有；或同一個 doc_id 的多份 JSON 彼此互異
+  （載入順序決定結果）。
+- **stale**（黃）：圖**落後** JSON——JSON 是對的、圖還沒重載；重載就會對齊。
+
+純函式＋讀本機 `extractions/*.json`；不連圖（圖上的值由呼叫端給）。`query/health_audit.py` 與 `audit/checks.py` 共用。
+"""
+from __future__ import annotations
+
+import json
+from collections import defaultdict
+from pathlib import Path
+from typing import Any, Iterable, Mapping
+
+ROOT = Path(__file__).resolve().parent.parent
+FIELDS: tuple[str, ...] = ("section", "title")
+
+
+def _norm(value: Any) -> str | None:
+    text = str(value).strip() if value is not None else ""
+    return text or None
+
+
+def json_source_docs(extraction_dir: Path | None = None) -> dict[str, list[dict[str, Any]]]:
+    """`doc_id → [{file, section, title}]`（同一個 doc_id 可能有 base＋addendum 多份檔案）。讀不了的檔案跳過並記錄。"""
+    directory = Path(extraction_dir) if extraction_dir else ROOT / "extractions"
+    out: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for path in sorted(directory.glob("*.json")):
+        try:
+            source_doc = json.loads(path.read_text(encoding="utf-8")).get("source_doc") or {}
+        except (OSError, json.JSONDecodeError):
+            out["__unreadable__"].append({"file": path.name, "section": None, "title": None})
+            continue
+        doc_id = source_doc.get("doc_id")
+        if doc_id:
+            out[str(doc_id)].append({"file": path.name, "section": _norm(source_doc.get("section")),
+                                     "title": _norm(source_doc.get("title"))})
+    return dict(out)
+
+
+def drift(graph_rows: Iterable[Mapping[str, Any]], json_docs: Mapping[str, list[Mapping[str, Any]]]) -> dict[str, Any]:
+    """逐份比對。回 `{danger: [...], stale: [...], graph_without_json: [...], counts: {...}}`，每筆帶 doc_id、欄位、兩邊的值。"""
+    danger: list[dict[str, Any]] = []
+    stale: list[dict[str, Any]] = []
+    without_json: list[str] = []
+    for row in sorted(graph_rows, key=lambda r: str(r.get("id"))):
+        doc_id = str(row.get("id"))
+        files = list(json_docs.get(doc_id) or [])
+        if not files:
+            without_json.append(doc_id)
+            continue
+        for field in FIELDS:
+            values = {f[field] for f in files}
+            graph_value = _norm(row.get(field))
+            if len(values) > 1:
+                danger.append({"doc_id": doc_id, "field": field, "kind": "json_files_disagree",
+                               "graph": graph_value, "json": {f["file"]: f[field] for f in files}})
+                continue
+            json_value = next(iter(values))
+            if graph_value == json_value:
+                continue
+            if graph_value is not None and json_value is None:
+                danger.append({"doc_id": doc_id, "field": field, "kind": "graph_only",
+                               "graph": graph_value, "json": None})
+            else:
+                stale.append({"doc_id": doc_id, "field": field, "kind": "graph_behind_json",
+                              "graph": graph_value, "json": json_value})
+    counts = {"danger": len(danger), "stale": len(stale), "graph_without_json": len(without_json)}
+    for name, items in (("danger", danger), ("stale", stale)):
+        for field in FIELDS:
+            counts[f"{name}_{field}"] = sum(1 for item in items if item["field"] == field)
+    return {"danger": danger, "stale": stale, "graph_without_json": sorted(without_json), "counts": counts}
+
+
+def summary_line(result: Mapping[str, Any]) -> str:
+    c = result["counts"]
+    return (f"SourceDoc 與抽取 JSON：重建會遺失或不確定 {c['danger']}（section {c['danger_section']}／title "
+            f"{c['danger_title']}）｜圖落後 JSON {c['stale']}（section {c['stale_section']}／title {c['stale_title']}）"
+            f"｜圖上有、沒有任何抽取檔 {c['graph_without_json']}")
+
+
+__all__ = ["FIELDS", "drift", "json_source_docs", "summary_line"]

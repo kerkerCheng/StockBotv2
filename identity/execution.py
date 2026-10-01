@@ -2,8 +2,8 @@
 
 ⚠ 2026-10-01（Phase 4 Step 4.1d）之前，`{"SIVE.ST": "FRA:2DG"}` 寫死在本檔，另有 `fetchers/gsheets.py` 的
 enrichment 表替 Sheet 列注入 `neo4j_id`——同一個身分事實住三個地方（L16）。現在執行代號是名冊的一欄，
-本檔只派生；`get_execution_aliases()` 的**名稱與 `{research_ticker: execution_symbol}` 形狀不變**——凍結區
-`decision_lab/adapters/holdings.py` 與 `shared.identity_resolution.resolve_identity` 都吃這個形狀。
+本檔只派生；`get_execution_aliases()` 的**名稱與 `{research_ticker: execution_symbol}` 形狀不變**——凍結區的
+持股 adapter（舊 Decision Store 那一側）與 `shared.identity_resolution.resolve_identity` 都吃這個形狀。
 """
 from __future__ import annotations
 

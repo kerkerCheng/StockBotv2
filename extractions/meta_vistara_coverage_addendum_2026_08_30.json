@@ -8,9 +8,10 @@
   "published_at": "2026-06-29",
   "publisher": "ISCA 2026",
   "retrieved_at": "2026-08-30",
+  "section": "asic_and_deployment",
   "source_type": "paper",
   "storage_permission": "repo_excerpt",
-  "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+  "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",
   "url": "https://aisystemcodesign.github.io/papers/isca26/vistara_camera_ready.pdf"
  },
  "sources": [

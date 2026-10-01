@@ -6,6 +6,7 @@
     "origin_entity": "NVIDIA",
     "permission_basis": "公司官方新聞稿(NVIDIA Newsroom 公開發布),僅保存有限逐字節錄與 canonical URL",
     "published_at": "2025-03-18",
+    "section": "announcement_main",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
     "title": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches to Scale AI Factories to Millions of GPUs",

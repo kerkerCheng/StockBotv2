@@ -93,7 +93,9 @@
             "industry_report",
             "paper",
             "news",
-            "social"
+            "social",
+            "teardown",
+            "datasheet"
           ]
         },
         "evidence_tier": {
@@ -115,6 +117,14 @@
           ],
           "pattern": "^[0-9a-f]{64}$",
           "description": "具名更正走廊（2026-09-11）：本份 extraction 要取代的**那一版**的 canonical hash。必須等於現存檔案的 hash——不能說「取代現在那份，不管它是什麼」。舊版由 intake/provenance.publish_provenance 歸檔到 extractions/superseded/，**兩份都留**。未填時 no-clobber 照舊：任何改寫都會被判成 conflict。"
+        },
+        "origin_linkage": {
+          "enum": [
+            "same_origin",
+            "independent",
+            null
+          ],
+          "description": "媒體文是不是轉述同一個 origin_event（2026-10-01 Phase 4 Step 4.2c）：same_origin＝轉述／改寫新聞稿；independent＝自己採訪或統計；不確定不填或 null。字彙住 schema/vocab.json origin_linkage。"
         }
       }
     },

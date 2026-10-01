@@ -797,6 +797,28 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 2026-09-16 D14 再確認：**Sheet 是部位真相**（含貸款額度、投入標的與現金），Decision Store 只留可選 receipt；
 alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加 gate**。
 
+### 入圖：apply 固定入口（2026-10-01 Phase 4 Step 4.2d）
+使用者在對話中明確核准 pq2 `ra_admission` [N] 之後（授權載體仍是那句核准）：
+```powershell
+& '.venv\Scripts\python.exe' scripts\apply_ra_admission.py --pq2 <N> --digest <action_digest>
+```
+四道 fail closed——①[N] 存在、型別 `ra_admission`、未結案（drop 的編號永久拒絕；要重提請重跑 prepare 取新編號）
+②[N] 的 ref_id 是一筆存在的 Research Action ③digest＝紀錄凍結的 `action_digest` ④紀錄 ready 且未過期，或同編號同 digest
+中斷在 partial／applying 的重試——通過後先把 `approval={pq2_n, digest, at}` 寫進紀錄的 execution，再 apply。
+**不 publish、不結案**：之後照下面「入圖收尾」publish，再 `python -m engine_b.todo complete-ra <N> --digest …`
+（它比對 approval 戳記——沒經過本入口的 apply 結不了案）。結束碼 0＝已 apply、2＝四道沒過（沒有任何寫入）、3＝已蓋戳記但
+apply 沒完成（看輸出的 next_action）。私有函式 `intake.application._apply_research_action_impl` 不再是操作入口。
+
+**sandbox impact review 五步（新增 `scripts/*.py` 入口）：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 讀 `library/leads/todo_pool.json` 與 `library/private/research_actions/`；寫入只有兩處：那一筆 RA 紀錄的 `execution.approval`（在 action lock 內）與既有 apply 的寫圖／provenance（沿用 `_apply_research_action_impl`，`NEO4J_ROUTINE_*` 憑證）。不 Git、不 publish、不 resolve pq2、不連外網。 |
+| **2 skill／prompt／本檔** | `prompts/intake_protocol.md` §4.3、`skills/daily-brief/SKILL.md`、`skills/lead-intake/SKILL.md` 改指本入口；本節。 |
+| **3 最窄 rule** | **互動專用，沒有新增任何 rule**：不進 `.codex/rules`（仍是 0 條前綴）、不進 daily 固定步驟、不進 `.claude/settings.json` 的 allow。它落在本機 `.claude/settings.local.json` 既有的寬鬆放行 `Bash(python *)` 之下——補償控制是**四道檢查＋核准戳記＋`complete-ra` 比對戳記**（沒經過入口的 apply 結不了案）。 |
+| **4 permission contract test** | `tests/test_apply_ra_admission.py::test_entry_is_interactive_only`（rules／daily 步驟／專案 allow 都不含本入口）、四道拒絕不寫入、戳記先於 apply、partial 只能原編號重試；`tests/test_engine_b_todo.py::test_complete_ra_refuses_an_apply_that_bypassed_the_entry`。 |
+| **5 端到端 smoke** | 2026-10-01 夾具版（fake loader）由 prepare → 池裡 `ra_admission` → 本入口 → `complete-ra` 跑通（Step 4.9 full chain）；真資料只跑拒絕路徑（已結案的編號 exit 2、沒有寫入）。 |
+
 ### 入圖收尾
 ```powershell
 & '.venv\Scripts\python.exe' scripts\commit_pending_intake.py --status | --dry-run
@@ -911,6 +933,13 @@ canonical 邊失去 assertion backing，`loader.edge_resolution project` 會以
   assertion；③重載修正後的 addendum；④重跑 `python -m loader.edge_resolution project`。
 - 同理 source id：addendum 引用原檔 source（如 `..._s1`）是刻意共用、安全；但**新增** quote 時
   source id 也要避開原檔已用的編號。
+- **addendum 的 `source_doc` 必須與母文件逐字相同的兩欄：`title`（母文件標題，不加「——addendum」字樣）與
+  `section`（2026-10-01 Phase 4 Step 4.2e）。** SourceDoc 每次載入都以那一份 JSON 直接覆寫（loader 契約：一手優先），
+  所以誰最後載入誰的值就蓋上圖；addendum 的說明寫進 `_note`，不寫進 title。不一致會出現在健康審查「SourceDoc 與
+  抽取 JSON」與 `python -m audit invariants` 的 `SourceDocSync`。修復程序：**以抽取 JSON 為準重載**——先讓所有
+  抽取檔對齊（`python loader/migrate_sourcedoc_json_section.py` dry-run → `--apply-json`；只動這兩欄、綁收據的
+  舊版先歸檔到 `extractions/superseded/`），圖上落後的值再經 pq2 核准後 `--apply-graph --pq2 <N>` 對齊（或重載）。
+  ⚠ 不要在圖上直接改 section／title 而不改 JSON——那正是「只存在圖上、重建就消失」的來源（L10）。
 
 ---
 

@@ -69,6 +69,7 @@
     "published_at": "2026-06-29",
     "publisher": "ISCA 2026",
     "retrieved_at": "2026-08-02",
+    "section": "asic_and_deployment",
     "source_type": "paper",
     "storage_permission": "repo_excerpt",
     "title": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment",

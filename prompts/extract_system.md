@@ -253,6 +253,11 @@ origin-diversity counter deduplicates by string; mixing formats double-counts
 the same organization. origin_entity = who ISSUED the document, not who it is
 about.
 
+**`source_doc.origin_linkage` (optional, media documents only):** if the media
+article merely relays or rewrites a company press release, set `"same_origin"`;
+if the outlet did its own reporting or statistics (interviews, its own survey or
+counts), set `"independent"`. If you cannot tell, omit it — do not guess.
+
 **`source_doc.url` and `published_at` (mandatory for remote loads):** remote
 loads bypass `library/raw/`, so the extraction JSON is the ONLY record of the
 document — without `url` the original can never be re-fetched for quote

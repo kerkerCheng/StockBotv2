@@ -772,7 +772,15 @@ def test_load_extraction_graph_failure_is_recoverable_with_identical_payload(
     assert retried["status"] == "loaded_or_already_complete"
 
 
-def test_pending_graph_document_cannot_finalize(tmp_path: Path, monkeypatch) -> None:
+def test_graph_failure_leaves_the_document_pending_graph(tmp_path: Path, monkeypatch) -> None:
+    """圖寫入失敗 → 文件停在 `pending_graph`，不算完成。
+
+    ⚠ 2026-10-01（Phase 4 Step 4.2d）由 `test_pending_graph_document_cannot_finalize` 拆出：原測試後半守的是遠端
+    finalize（`_finalize_research_action_impl`，production 0 呼叫端，已刪）；現行 publish 只發布 applied 的 Research
+    Action（`tests/test_action_publisher.py`），而 apply 遇到沒完成的文件會停在 partial
+    （`tests/test_research_actions.py::test_apply_partial_retry_skips_completed_document_and_compacts_payload`）。
+    前半這個「載入失敗＝pending_graph」的行為仍是活的，留在這裡守。
+    """
     monkeypatch.setattr(application, "_driver", lambda: _FakeDriver())
     monkeypatch.setattr(application, "_check_graph_write_readiness", lambda _driver: None)
     monkeypatch.setattr(
@@ -788,18 +796,8 @@ def test_pending_graph_document_cannot_finalize(tmp_path: Path, monkeypatch) -> 
         root=tmp_path,
     )
 
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "pending-doc",
-        "must not commit",
-        ["pending_doc"],
-        root=tmp_path,
-        enabled=True,
-    )
-
     assert pending["status"] == "pending_graph"
-    assert result["git_status"] == "not_committed"
-    assert "completion receipt" in result["reason"]
+    assert not hasattr(application, "_finalize_research_action_impl")
 
 
 def test_load_extraction_returns_conflicts_without_treating_document_as_failed(
@@ -867,221 +865,10 @@ def test_load_extraction_invalid_doc_id_and_permission_fail_before_graph(
     assert invalid_permission["status"] == "rejected"
 
 
-def _valid_report() -> str:
-    return """# Intake report
-
-## 為何此時入圖
-New primary evidence.
-
-## 文件清單
-Server will append verified metadata.
-
-## 搜尋過程摘要
-Traced from SEC and customer IR.
-
-## L8 確認備註
-Origins remain independently counted.
-"""
-
-
 def _ready_remote_repo(repo: Path, remote: Path) -> None:
     (repo / "baseline.txt").write_text("base", encoding="utf-8")
     _commit_all(repo)
     _add_bare_remote(repo, remote)
-
-
-def test_finalize_two_documents_creates_one_exact_commit_and_push(
-    tmp_git_repo: Path, tmp_path: Path
-) -> None:
-    _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    for doc_id in ("doc_a", "doc_b"):
-        _publish_loaded(doc_id, root=tmp_git_repo, raw_text=f"raw {doc_id}")
-
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "two-docs",
-        "record traced evidence",
-        ["doc_a", "doc_b"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-
-    assert result["git_status"] == "committed+pushed"
-    shown = subprocess.run(
-        ["git", "show", "--pretty=", "--name-only", "HEAD"],
-        cwd=tmp_git_repo,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.splitlines()
-    assert sorted(shown) == sorted(
-        [
-            "extractions/doc_a.json",
-            "extractions/doc_b.json",
-            "library/raw/doc_a.txt",
-            "library/raw/doc_b.txt",
-            result["report_path"],
-        ]
-    )
-    report = (tmp_git_repo / result["report_path"]).read_text(encoding="utf-8")
-    assert "repo_full" in report
-    assert "Official public filing" in report
-
-
-def test_finalize_is_manifest_scoped_and_warns_about_other_pending_files(
-    tmp_git_repo: Path, tmp_path: Path
-) -> None:
-    _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    for doc_id in ("leftover", "selected"):
-        _publish_loaded(doc_id, root=tmp_git_repo, raw_text=doc_id)
-
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "selected-only",
-        "record selected evidence",
-        ["selected"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-
-    assert result["git_status"] == "committed+pushed"
-    assert "extractions/leftover.json" in result["pending_warning"]["untracked"]
-    assert (tmp_git_repo / "extractions" / "leftover.json").exists()
-
-
-def test_finalize_preflight_failure_writes_no_report(
-    tmp_git_repo: Path, tmp_path: Path
-) -> None:
-    _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
-    (tmp_git_repo / "staged.txt").write_text("staged", encoding="utf-8")
-    subprocess.run(["git", "add", "staged.txt"], cwd=tmp_git_repo, check=True)
-
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "blocked",
-        "must not commit",
-        ["doc_a"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-
-    assert result["git_status"] == "not_committed"
-    assert result["reason"] == "index_not_clean"
-    assert not list((tmp_git_repo / "library" / "intake").glob("*.md"))
-
-
-def test_finalize_propagates_second_preflight_failure(
-    tmp_git_repo: Path, monkeypatch
-) -> None:
-    _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
-    monkeypatch.setattr(
-        application,
-        "git_preflight",
-        lambda **_kwargs: {"ok": True, "reason": None},
-    )
-    monkeypatch.setattr(
-        application,
-        "pending_intake_files",
-        lambda **_kwargs: {"untracked": [], "modified": [], "error": None},
-    )
-    monkeypatch.setattr(
-        application,
-        "commit_and_push",
-        lambda *_args, **_kwargs: {
-            "status": "not_committed",
-            "paths": [],
-            "preflight": {"ok": False, "reason": "head_not_synced", "detail": "moved"},
-        },
-    )
-
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "second-preflight",
-        "must remain pending",
-        ["doc_a"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-
-    assert result["git_status"] == "not_committed"
-    assert result["error"] == "head_not_synced"
-    assert result["detail"] == "moved"
-
-
-def test_finalize_rejects_malicious_slug_and_local_only_before_report(
-    tmp_git_repo: Path, tmp_path: Path
-) -> None:
-    _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    intake.publish_provenance(
-        "private_doc",
-        _extraction(
-            "private_doc",
-            permission="local_only",
-            basis="No third-party cloud storage permission",
-        ),
-        {"raw_text": "private"},
-        root=tmp_git_repo,
-    )
-
-    bad_slug = application._finalize_research_action_impl(
-        _valid_report(),
-        "../evil",
-        "must not commit",
-        ["private_doc"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-    assert bad_slug["git_status"] == "not_committed"
-
-    local_only = application._finalize_research_action_impl(
-        _valid_report(),
-        "private",
-        "must not commit",
-        ["private_doc"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-    assert local_only["git_status"] == "not_committed"
-    assert "local_only" in local_only["reason"]
-    assert not list((tmp_git_repo / "library" / "intake").glob("*.md"))
-
-
-def test_finalize_push_failure_keeps_local_commit(
-    tmp_git_repo: Path, tmp_path: Path
-) -> None:
-    _ready_remote_repo(tmp_git_repo, tmp_path / "remote.git")
-    _publish_loaded("doc_a", root=tmp_git_repo, raw_text="A")
-    subprocess.run(
-        ["git", "remote", "set-url", "--push", "origin", str(tmp_path / "missing.git")],
-        cwd=tmp_git_repo,
-        check=True,
-    )
-
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "push-fails",
-        "retain local commit",
-        ["doc_a"],
-        root=tmp_git_repo,
-        enabled=True,
-    )
-
-    assert result["git_status"] == "committed_not_pushed"
-    assert result["commit"]
-
-
-def test_finalize_is_disabled_by_default() -> None:
-    result = application._finalize_research_action_impl(
-        _valid_report(),
-        "disabled",
-        "must not run",
-        [],
-        enabled=False,
-    )
-
-    assert result["git_status"] == "not_committed"
-    assert result["reason"] == "remote_finalize_disabled"
 
 
 def test_local_intake_protocol_keeps_domain_rules() -> None:
@@ -1095,7 +882,9 @@ def test_local_intake_protocol_keeps_domain_rules() -> None:
     assert "Storage permission" in text
     assert "`partial`" in text
     assert "open_conflict_ids" in text
-    assert "scripts/prepare_research_action.py" in text or "scripts\prepare_research_action.py" in text
-    assert "_apply_research_action_impl" in text
+    assert "scripts/prepare_research_action.py" in text or r"scripts\prepare_research_action.py" in text
+    # apply 走固定入口（Phase 4 Step 4.2d），協定不得再叫人直接呼叫私有函式
+    assert "python scripts/apply_ra_admission.py --pq2" in text
+    assert "intake.application._apply_research_action_impl(" not in text
     assert "scripts/commit_pending_intake.py" in text
     assert "finalize_research_action(" not in text

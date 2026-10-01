@@ -147,21 +147,30 @@ def check_duplicates() -> AuditResult:
         except SourceUnavailable as exc:
             findings.append(f"⚠ cohort 面向未檢查：{exc}")
 
-        # 同 URL 且**同 section** 的 SourceDoc。
+        # 同一個（正規化）URL 的多份 SourceDoc，不是刻意拆段就是重複入庫。
         # ⚠ 同 URL 不同 section 是**設計**（一份年報拆 photonics／financials 兩節）。
         # 第一版忽略 section，12 組命中全是合法分段——同上，攔到的是格式。
+        # ⚠ 2026-10-01（Phase 4 Step 4.2e）：拆段判準改用唯一的 `loader.is_legit_multi_section`（每份都有非空且
+        # 兩兩互異的 section），URL 改用 `loader.normalize_url` 分組——原本這裡只擋「同 URL 且同 section」、用原始 URL，
+        # 與 loader／健康審查互異（一份有 section、一份沒有時這裡不報、健康審查報紅）。
         try:
+            from loader.load_to_neo4j import is_legit_multi_section, normalize_url
+
             rows = sources.graph_rows(
                 "MATCH (sd:SourceDoc) WHERE sd.url IS NOT NULL AND sd.url <> '' "
-                "WITH sd.url AS url, coalesce(sd.section, '') AS section, "
-                "     collect(sd.id) AS ids WHERE size(ids) > 1 "
-                "RETURN url, section, ids")
+                "RETURN sd.id AS id, sd.url AS url, sd.section AS section")
             examined += len(rows)
+            groups: dict[str, list[tuple[str, str | None]]] = {}
             for row in rows:
-                findings.append(
-                    f"URL {row['url']} 的 section={row['section'] or '（無）'} "
-                    f"有 {len(row['ids'])} 份 SourceDoc：{', '.join(row['ids'][:4])}"
-                    "——同一份文件的同一節被入庫兩次")
+                norm = normalize_url(row["url"])
+                if norm:
+                    groups.setdefault(norm, []).append((row["id"], row.get("section")))
+            for norm, members in sorted(groups.items()):
+                if len(members) > 1 and not is_legit_multi_section(sec for _, sec in members):
+                    findings.append(
+                        f"URL {norm} 有 {len(members)} 份 SourceDoc 而且不是刻意拆段"
+                        f"（section：{', '.join(f'{sid}={sec or '（無）'}' for sid, sec in sorted(members))}）"
+                        "——同一份文件被入庫兩次")
         except SourceUnavailable as exc:
             findings.append(f"⚠ SourceDoc 面向未檢查：{exc}")
 
@@ -173,6 +182,30 @@ def check_duplicates() -> AuditResult:
                   examined, _clip(findings))
 
     return _guard("Duplicates", run)
+
+
+def check_sourcedoc_sync() -> AuditResult:
+    """SourceDoc 的 `section`／`title` 從抽取 JSON 重建得回來（L10；Phase 4 Step 4.2e 的常駐計數器）。
+
+    算法只有一份：`loader/sourcedoc_sync.py`（健康審查同一份）。
+    - **FAIL**：重建會遺失或不確定——圖上有值、JSON 沒有；或同一個 doc_id 的多份 JSON 彼此互異（載入順序決定結果）。
+    - **不算 FAIL、照列**：圖落後 JSON（JSON 是對的、圖還沒重載；重載即對齊）——把它算 FAIL 會讓「修好了 JSON、
+      等核准改圖」的那段時間整份 audit 變紅，紅的卻不是風險（L15：gate 攔下的必須是它想攔的東西）。
+    """
+    def run() -> AuditResult:
+        from loader.sourcedoc_sync import drift, json_source_docs, summary_line
+
+        rows = sources.graph_rows(
+            "MATCH (sd:SourceDoc) RETURN sd.id AS id, sd.section AS section, sd.title AS title")
+        result = drift(rows, json_source_docs(ROOT / "extractions"))
+        danger = [f"⛔ {d['doc_id']}.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
+                  for d in result["danger"]]
+        stale = [f"圖落後 JSON：{d['doc_id']}.{d['field']}：{d['graph']!r} → {d['json']!r}" for d in result["stale"]]
+        if danger:
+            return fail("SourceDocSync", summary_line(result), _clip(danger + stale), len(rows))
+        return ok("SourceDocSync", summary_line(result), len(rows), _clip(stale))
+
+    return _guard("SourceDocSync", run)
 
 
 def check_graph_financial_join() -> AuditResult:

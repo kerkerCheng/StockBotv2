@@ -514,6 +514,8 @@ def test_complete_ra_validates_authorities_and_resolves(monkeypatch) -> None:
         "execution": {
             "documents": [{"doc_id": "doc_1", "status": "complete"}],
             "report": {"status": "complete"},
+            # apply 經固定入口時蓋的戳記（Phase 4 Step 4.2d）
+            "approval": {"pq2_n": 1, "digest": digest, "at": "2026-07-28T00:00:00+00:00"},
         },
     })
     monkeypatch.setattr(
@@ -542,6 +544,22 @@ def test_complete_ra_validates_authorities_and_resolves(monkeypatch) -> None:
     assert pool["items"][0]["completion_authority"]["company_id"] == "co:axt"
     assert "cohort_id" not in pool["items"][0]["completion_authority"]
     assert pool["log"][-1]["receipt"] == result["receipt"]
+
+
+@pytest.mark.parametrize("approval", [None, {"pq2_n": 2, "digest": "a" * 64}, {"pq2_n": 1, "digest": "c" * 64}])
+def test_complete_ra_refuses_an_apply_that_bypassed_the_entry(monkeypatch, approval) -> None:
+    """apply 沒經 `scripts/apply_ra_admission.py`（沒有戳記）、或戳記是別的編號／別的 digest → 不准結案（Step 4.2d）。"""
+    digest = "a" * 64
+    pool = _pool_with({"type": "ra_admission", "ref_id": "ra_abc", "title": "RA"})
+    execution = {"documents": [{"doc_id": "doc_1", "status": "complete"}], "report": {"status": "complete"}}
+    if approval is not None:
+        execution["approval"] = approval
+    monkeypatch.setattr(todo, "_read_action_for_completion", lambda action_id: {
+        "action_id": action_id, "action_digest": digest, "state": "pushed",
+        "git": {"status": "pushed", "commit": "b" * 40}, "execution": execution})
+    with pytest.raises(todo.TodoError, match="approval 戳記"):
+        todo.complete_ra_admission(pool, 1, action_digest=digest, leads_path="ignored.json")
+    assert len(todo.active_items(pool)) == 1
 
 
 def test_ra_lead_context_requires_matching_digest(tmp_path) -> None:

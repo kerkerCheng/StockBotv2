@@ -122,6 +122,10 @@ def _registry() -> tuple[AuditCheck, ...]:
         AuditCheck("Duplicates", "INV-1", ("F-04",), "Phase 3",
                    "alias 碰撞、同公司多 cohort、同 URL 多 SourceDoc",
                    run=checks.check_duplicates),
+        AuditCheck("SourceDocSync", "INV-6", (), "Phase 4",
+                   "SourceDoc 的 section／title 從抽取 JSON 重建得回來（圖上有、JSON 沒有或多份 JSON 互異＝FAIL；"
+                   "圖落後 JSON 只列）",
+                   run=checks.check_sourcedoc_sync),
         AuditCheck("Lifecycle", "INV-2", ("F-06", "F-07", "F-08"), "Phase 3",
                    "禁止 active-but-unreachable／expired-but-active；terminal 動詞語意正確",
                    run=checks.check_lifecycle),

@@ -1229,6 +1229,14 @@ def complete_ra_admission(
     action = _read_action_for_completion(action_id)
     if action.get("action_digest") != digest:
         raise TodoError("Research Action digest 不符 exact 核准內容")
+    # 2026-10-01 Phase 4 Step 4.2d：apply 只能經固定入口 `scripts/apply_ra_admission.py`，它在 apply 前把
+    # `approval={pq2_n, digest, at}` 寫進紀錄的 execution。這裡比對那個戳記——沒有戳記、或戳記上的編號／digest
+    # 不是這一個，就是 apply 繞過了入口（例：對話裡直接呼叫私有函式），不准結案。
+    approval = (action.get("execution") or {}).get("approval") or {}
+    if approval.get("pq2_n") != int(n) or approval.get("digest") != digest:
+        raise TodoError(
+            "Research Action 缺少本編號的 approval 戳記——apply 必須經 "
+            f"`python scripts/apply_ra_admission.py --pq2 {n} --digest <digest>`（編號與 digest 都要對上）")
 
     git = action.get("git") or {}
     if action.get("state") == "pushed" and git.get("status") == "pushed":

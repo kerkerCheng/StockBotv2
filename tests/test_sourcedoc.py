@@ -152,8 +152,20 @@ def test_load_creates_sourcedoc_and_cites_from_claim_and_assertion() -> None:
         "storage_permission": "repo_excerpt",
         "permission_basis": "Public filing; excerpt retained for verification.",
         "section": None,
+        "origin_linkage": None,   # 沒宣告＝null（不知道），不猜（Phase 4 Step 4.2c）
     }
     assert "sd.storage_permission" in source_query
+    assert "sd.origin_linkage = $origin_linkage" in source_query
+
+
+def test_declared_origin_linkage_is_written_to_the_sourcedoc() -> None:
+    """媒體文宣告 independent／same_origin 照寫進圖——Step 4.3 的 publishers 只讓宣告 independent 的媒體文升級。"""
+    session = RecordingSession()
+    doc = _document("doc_media")
+    doc["source_doc"]["origin_linkage"] = "independent"
+    load(doc, session)
+    _, params = next((q, p) for q, p in session.calls if "MERGE (sd:SourceDoc" in q)
+    assert params["origin_linkage"] == "independent"
 
     assertion_query = next(
         query for query, _ in session.calls if "MERGE (ea:EdgeAssertion" in query

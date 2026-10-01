@@ -94,14 +94,18 @@ prepare 只會在 ignored private store 建立 action；不寫 provenance ledger
 ### 4.3 只有明確核准該 ID，才 apply
 
 使用者必須明確核准顯示中的 action ID（pq2 `go`，或「OK，套用 ra_...」）。之後才可在本機 session
-用 prepare／status 回傳的完整 digest 呼叫：
+用那個 pq2 編號與 prepare／status 回傳的完整 digest 跑**固定入口**（2026-10-01 Phase 4 Step 4.2d；
+不再直接呼叫私有函式 `_apply_research_action_impl`）：
 
 ```text
-intake.application._apply_research_action_impl(action_id, action_digest)
+python scripts/apply_ra_admission.py --pq2 <編號> --digest <action_digest>
 ```
 
-這一次核准套用整個 action；程式會重新驗 digest、鎖定 action、逐文件 checkpoint、filesystem-first
-寫 provenance、冪等寫圖、投影 edge conflicts，最後依 permission 寫報告。它永遠不執行 Git。
+入口先過四道 fail closed（編號存在、型別 `ra_admission`、未結案〔drop 永久拒絕〕；編號的 ref_id 是這筆 action；
+digest 相符；紀錄 ready 且未過期——或同編號同 digest 中斷在 partial 的重試），通過後把核准戳記
+`approval={pq2_n, digest, at}` 寫進紀錄，再 apply。這一次核准套用整個 action；程式會重新驗 digest、
+鎖定 action、逐文件 checkpoint、filesystem-first 寫 provenance、冪等寫圖、投影 edge conflicts，最後依
+permission 寫報告。它永遠不執行 Git、也不結案（`complete-ra` 會比對戳記上的編號）。
 
 回傳處理：
 

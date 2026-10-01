@@ -168,6 +168,34 @@ def test_every_vocab_term_exists_in_the_json_schema_enum() -> None:
     )
 
 
+def test_source_type_vocabulary_is_identical_on_all_three_surfaces() -> None:
+    """`source_type` 三處**相等**（不只單向包含）：字彙檔＝schema enum＝`extract.py --source-type`。
+
+    2026-10-01 Phase 4 Step 4.2b 加 teardown／datasheet 時盤點：字彙有四份副本（字彙檔、schema enum、extract.py 硬編、
+    lead-intake skill 散文），既有測試只守「字彙檔 ⊆ schema」——extract.py 少了值也不會紅、schema 多了值也不會紅。
+    extract.py 改讀字彙檔、skill 散文改指向字彙檔後，剩下的就是這三處要相等。
+    """
+    import extract
+
+    vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))["source_type"]
+    schema = json.loads(
+        (ROOT / "schema" / "intermediate_format.schema.json").read_text(encoding="utf-8")
+    )["properties"]["source_doc"]["properties"]["source_type"]["enum"]
+    assert list(vocab) == list(schema) == list(extract.SOURCE_TYPES)
+    assert {"teardown", "datasheet"} <= set(vocab)
+    # 第四份副本已收掉：skill 散文指向字彙檔，不再自己列一份
+    skill = (ROOT / "skills" / "lead-intake" / "SKILL.md").read_text(encoding="utf-8")
+    assert "schema/vocab.json" in skill
+
+
+def test_origin_linkage_vocabulary_matches_the_schema() -> None:
+    vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))["origin_linkage"]
+    schema = json.loads(
+        (ROOT / "schema" / "intermediate_format.schema.json").read_text(encoding="utf-8")
+    )["properties"]["source_doc"]["properties"]["origin_linkage"]["enum"]
+    assert [v for v in schema if v is not None] == list(vocab) and None in schema
+
+
 def test_counter_path_relations_are_real_relations() -> None:
     vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
 

@@ -120,6 +120,12 @@ RETURN sd.id AS id, sd.url AS url, sd.section AS section
 ORDER BY sd.id
 """
 
+SOURCE_DOC_META_CYPHER = """
+MATCH (sd:SourceDoc)
+RETURN sd.id AS id, sd.section AS section, sd.title AS title
+ORDER BY sd.id
+"""
+
 SCHEMA_STATE_CYPHER = """
 OPTIONAL MATCH (state:GraphSchemaState {id: 'stockbotv2'})
 RETURN state.version AS version
@@ -320,7 +326,7 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
             # 重複 SourceDoc：同一份文件被以不同 doc_id 重複 onboard（URL 正規化後比對）。
             # 正當例外——同文件多段：同 URL 的 group 每個都有非空且互異的 section（見
             # loader.check_duplicate_url），視為刻意拆段，不報。
-            from loader.load_to_neo4j import normalize_url
+            from loader.load_to_neo4j import is_legit_multi_section, normalize_url
 
             by_norm_url: dict[str, list[tuple[str, str]]] = {}
             for row in session.run(SOURCE_DOC_URLS_CYPHER):
@@ -330,15 +336,16 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                         (row["id"], (row.get("section") or "").strip())
                     )
 
-            def _is_legit_multi_section(members: list[tuple[str, str]]) -> bool:
-                sections = [sec for _, sec in members]
-                return all(sections) and len(set(sections)) == len(sections)
-
+            # 拆段判準只有一份（`loader.is_legit_multi_section`，Phase 4 Step 4.2e）。
             graph_lines["dup_url"] = [
                 f"- `{norm}` ← {sorted(sid for sid, _ in members)}"
                 for norm, members in sorted(by_norm_url.items())
-                if len(members) > 1 and not _is_legit_multi_section(members)
+                if len(members) > 1 and not is_legit_multi_section(sec for _, sec in members)
             ]
+            # SourceDoc 的 section／title 跟抽取 JSON 一不一致（常駐計數器，Phase 4 Step 4.2e）。
+            from loader.sourcedoc_sync import drift, json_source_docs
+
+            sourcedoc_sync = drift(list(session.run(SOURCE_DOC_META_CYPHER)), json_source_docs())
             schema_version = session.run(SCHEMA_STATE_CYPHER).single()["version"]
             company_ids = [row["company_id"] for row in session.run(COMPANY_IDS_CYPHER)]
 
@@ -386,6 +393,22 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 "重複 SourceDoc（同 URL 不同 doc_id）",
                 "red" if graph_lines.get("dup_url") else "green",
                 graph_lines.get("dup_url", []),
+            )
+        )
+        from loader.sourcedoc_sync import summary_line as sourcedoc_summary
+
+        sync_lines = [f"- {sourcedoc_summary(sourcedoc_sync)}"] + [
+            f"- ⛔ `{d['doc_id']}`.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
+            for d in sourcedoc_sync["danger"]
+        ] + [
+            f"- `{d['doc_id']}`.{d['field']}：圖＝{d['graph']!r} → JSON＝{d['json']!r}（重載即對齊）"
+            for d in sourcedoc_sync["stale"]
+        ]
+        report.extend(
+            _section(
+                "SourceDoc 與抽取 JSON（L10：圖上的值要從 JSON 重建得回來）",
+                "red" if sourcedoc_sync["danger"] else ("yellow" if sourcedoc_sync["stale"] else "green"),
+                sync_lines,
             )
         )
         from intake.application import GRAPH_SCHEMA_VERSION

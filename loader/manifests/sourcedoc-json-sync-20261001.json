@@ -1,0 +1,605 @@
+{
+  "kind": "sourcedoc_json_sync",
+  "at": "2026-10-01T09:17:53.718568+00:00",
+  "plan": "docs/plans/2026-10-01-001 Step 4.2e",
+  "files": [
+    {
+      "file": "extractions/aaoi_10_k_20260227_competition.json",
+      "doc_id": "aaoi_10_k_20260227_competition",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "competition"
+        }
+      },
+      "file_sha256": {
+        "before": "7c640bd55e75090f04778814670ed9a62a04a9cdf3b26b4f226e3ada0806e210",
+        "after": "375ee5cf0d811e45a1070854a26cef4cc9c0234262051e8b831fe66325451a20"
+      },
+      "extraction_sha256": {
+        "before": "8ebdf31085a6f2a418515509360d83f886cab699313a1f3f87ced3603ce9c316",
+        "after": "5f8985795e610188e18edee528202bf0934193ab51df61a95164780aaaf41653"
+      },
+      "superseded_archive": "extractions/superseded/aaoi_10_k_20260227_competition.8ebdf310.json"
+    },
+    {
+      "file": "extractions/agility_raas_coverage_addendum_2026_08_30.json",
+      "doc_id": "agility_robotics_sec_investor_presentation_2026_06",
+      "changes": {
+        "title": {
+          "before": "Agility Robotics Investor Presentation — June 2026——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+          "after": "Agility Robotics Investor Presentation — June 2026"
+        }
+      },
+      "file_sha256": {
+        "before": "a29527b59104fab7c63c73b376fdb9f5fabd2ae7e01a28f3c275aeca0ef19aa8",
+        "after": "36600244e3ab831efde6484363ad2583dfce50fb01757296480ad9d8e08a4e1f"
+      },
+      "extraction_sha256": {
+        "before": "3920aec63f2b0a0fb6d81b542b9497ab3cbdc23d5bf8b8868e91ebd3c187304e",
+        "after": "866d45c20f400418ce41a9d328f876a5a1d71c89590ed9cbaefbe1b032847111"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/amat_10_k_coverage_addendum_2026_08_30.json",
+      "doc_id": "amat_10_k_20251212",
+      "changes": {
+        "title": {
+          "before": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+          "after": "Applied Materials FY2025 Form 10-K — Semiconductor Systems segments: foundry/logic leading vs non-leading edge (ICAPS: IoT/comms/auto/power/sensors), DRAM, NAND; backlog; China export exposure"
+        }
+      },
+      "file_sha256": {
+        "before": "d9154f353c566213ee91a9ca9295666cb7d1e0f3395dfb926c1c0b85bfa59566",
+        "after": "bb984f5c57027eb3504092cc343b85c04f4a98aeab3e098c4d8327ef98ccb059"
+      },
+      "extraction_sha256": {
+        "before": "97cc94a9a3a4a28155a189be81b01a92618f8bb36012d443eda89205fda019b0",
+        "after": "7c59a533ec177d49d2c251dd0a9f3df90be38cfa413414a0661d1176484a0eb4"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/broadcom_q2fy26_cpo_coverage_addendum_2026_08_30.json",
+      "doc_id": "Broadcom_q2fy26_cpo",
+      "changes": {
+        "title": {
+          "before": "Broadcom Q2 FY2026 Earnings Call — CPO/AI ASIC Segment——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+          "after": "Broadcom Q2 FY2026 Earnings Call — CPO/AI ASIC Segment"
+        }
+      },
+      "file_sha256": {
+        "before": "0d6dd67db6382ab818105e79a874e173194c95b595f9db46d3365b80bbd568ed",
+        "after": "61814af283043c30f38e7df1465c7f5a52ed5ac76a1b00785cb356f3dbe85bdc"
+      },
+      "extraction_sha256": {
+        "before": "f87b5b377cb5e169d48470eb62ee99c460e695c5072bfeb7dc16083ace4d943d",
+        "after": "c5b2f9d29e378febc363fc0999d7185687aa6c373512d01be52adebefaeabb06"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/cpo_paper_coverage_addendum_2026_08_30.json",
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "changes": {
+        "title": {
+          "before": "Electronic Chip Package and CPO Technology for Modern AI Era (Academic Paper)——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+          "after": "Electronic Chip Package and CPO Technology for Modern AI Era (Academic Paper)"
+        }
+      },
+      "file_sha256": {
+        "before": "e2146fc3bbe96551f52bb7bedaad435c5a3716548974edc7f6f03b0b7779620f",
+        "after": "1b0266a5c5a0d9bd40aacc3f958566567a89b6299cdee3473270f05eb879e3ba"
+      },
+      "extraction_sha256": {
+        "before": "94ff1dd822848fd50a95db8208cdfca4e69cb5c61e36045648fd939d32c94698",
+        "after": "fac2cfbb3f8c08ff6d9ab72e8b91bd2b191c045747d9fee5d92cd951e8d3d87a"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/cw_dfb_substitutability_addendum_2026_08_29.json",
+      "doc_id": "mops_4979_annual_report_2025",
+      "changes": {
+        "title": {
+          "before": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報——CW DFB substitutability addendum（自主研究迴圈第 1 輪）",
+          "after": "華星光通科技（LuxNet, 4979.TWO）114 年度股東會年報（2025 財年）"
+        }
+      },
+      "file_sha256": {
+        "before": "47750037b2a6b96a549fcb8d99a7d55e615c0b5260bc80642ffc6b2595a35700",
+        "after": "de5d19e033a12119551619b50763b3d23d34779bc458591f6d25843b6813b7fe"
+      },
+      "extraction_sha256": {
+        "before": "194b823af4cacf2b271cf2c70f8cdea2a2446e7034c73c55e864f84cb7a3e68b",
+        "after": "ee9c3adce26aae7ef5f4634c42a574db56c01d5ed72483dcf2232157408224ba"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/fas_dod_mp_partnership_2025_07_15.json",
+      "doc_id": "fas_dod_mp_partnership_2025_07_15",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "dod_deal_terms"
+        }
+      },
+      "file_sha256": {
+        "before": "74b8a11051f7c43e35e6ecccbaa46450a3b0290db129041d1681c8edce6248ff",
+        "after": "a3a5e01bbefba9db0b0f7de0b7b7b20eaea0762a87c1663211882ccb914188de"
+      },
+      "extraction_sha256": {
+        "before": "6384c604c380c966b88d5e5616e1050913db88448ef2ee0ce8737179b30432e5",
+        "after": "da1c43ac0ee7a455c9c35cfb2a7b8846598809f39d75a5373e91a2546021040f"
+      },
+      "superseded_archive": "extractions/superseded/fas_dod_mp_partnership_2025_07_15.6384c604.json"
+    },
+    {
+      "file": "extractions/gfs_20_f_coverage_addendum_2026_08_30.json",
+      "doc_id": "gfs_20_f_20260227",
+      "changes": {
+        "title": {
+          "before": "GlobalFoundries FY2025 Form 20-F — foundry customer perspective: capex/capacity plans, single-sourced design awards & LTAs, essential-chip (mature-node) capacity expansion under CHIPS Act, dependence on limited number of equipment suppliers with 12-month+ lead times——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+          "after": "GlobalFoundries FY2025 Form 20-F — foundry customer perspective: capex/capacity plans, single-sourced design awards & LTAs, essential-chip (mature-node) capacity expansion under CHIPS Act, dependence on limited number of equipment suppliers with 12-month+ lead times"
+        }
+      },
+      "file_sha256": {
+        "before": "dd6ae9c9363035bda8053264177809ed642c9381ac87b9b15b11aa6dff06b150",
+        "after": "c339b99d1bfcfcb8ec7ff6b063e8850f77c1fea8f551046257857de56550a754"
+      },
+      "extraction_sha256": {
+        "before": "2c6ee415b644713bdf204ab2f8f74835fb782910f0608cd2789111e067e9a250",
+        "after": "ca02a601695ba1acc64909f1f56ba3c3bb4c4fcffd42c43fb8d9b9875f109c2e"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/iqe_tower_epiwafer_sub_addendum_2026_08_30.json",
+      "doc_id": "iqe_tower_inp_epiwafer_agreement_2026_06_15",
+      "changes": {
+        "title": {
+          "before": "IQE×Tower InP epiwafer 多年協議——substitutability addendum（[271] 授權研究）",
+          "after": "IQE and Tower Semiconductor announce multi-year InP epiwafer supply agreement"
+        }
+      },
+      "file_sha256": {
+        "before": "59a792d62dea2bf5e71fa661343d75b992435752dbd11ec6362595569b852530",
+        "after": "fe481a1f894d3aeb93ac7d61ee9a26e0a764abe52b001ecb5c3b1f409141fec9"
+      },
+      "extraction_sha256": {
+        "before": "a79345523e70c92265764490d34e7bc40ae753a6f193128980ea7ac1ce614b51",
+        "after": "0ff78fa41e6d9e0fb4ba440ef0e5d423410fe584bd10426ea1e32a0fd8c3c780"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/jlmag_ar2022_hkex.json",
+      "doc_id": "jlmag_ar2022_hkex",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "operations_gbd"
+        }
+      },
+      "file_sha256": {
+        "before": "de3569c5272abe0f26bb911761a0fae65fdbdbf93d596b95dc087611b81499cf",
+        "after": "3e8ba35c84c17beddb4fa7842c5ec35399b5488d303af31e034b906591ad109a"
+      },
+      "extraction_sha256": {
+        "before": "03af667e3b7df6b6f1bf6b1f5e536cadeae70999ed0fe567f93c9a036c8f3dd1",
+        "after": "026e409e862f376cc3051993d448a2d3f81ed94645c04e80a222bc0c0192c0cc"
+      },
+      "superseded_archive": "extractions/superseded/jlmag_ar2022_hkex.03af667e.json"
+    },
+    {
+      "file": "extractions/lite_uhp_sole_source_downgrade_addendum_2026_08_30.json",
+      "doc_id": "nvda_lumentum_partnership_pr_2026_03_02",
+      "changes": {
+        "title": {
+          "before": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology——LITE→UHP laser sole_source 降級 addendum（自主研究迴圈第 8 輪）",
+          "after": "NVIDIA PR: NVIDIA Announces Strategic Partnership With Lumentum to Develop State-of-the-Art Optics Technology"
+        }
+      },
+      "file_sha256": {
+        "before": "c7fcd2ae398d351fe564ecc55a085ad4394a651193c6936918ec042ea6a3bc71",
+        "after": "57c3c9684bb3b66771d5cf04eec292393bed9dea73476c08592b663810c5cfd0"
+      },
+      "extraction_sha256": {
+        "before": "4e763a64477385eeb292764b90b1d0e8f0ba79d6cd368c9c5bb9c0c5f5999365",
+        "after": "4bb72de995e1e64d0908353252953e685e4983f897715d59465cc537195ceab2"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/lrcx_10_k_coverage_addendum_2026_08_30.json",
+      "doc_id": "lrcx_10_k_20250811",
+      "changes": {
+        "title": {
+          "before": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+          "after": "Lam Research FY2025 Form 10-K — deposition/etch/clean for leading & non-leading edge, DRAM/NAND demand, CSBG non-leading refurbished products, China exposure"
+        }
+      },
+      "file_sha256": {
+        "before": "08ef96dd1bb3e003c3a47affcbad3904f7380a664a5dddba52703ce4b95ad04f",
+        "after": "2578b56e6f2ff8d3f48416e6a5f6a7d516b987b2c664eb187ec6fa095914e2de"
+      },
+      "extraction_sha256": {
+        "before": "359b1479f629a540891dbfc33b30d3604dd2167a3bfa627f686ebbe2de4dca7c",
+        "after": "ccfc26d1a3b853103b7e32de5703d76806914592b7a384aa49883e2bdec5733f"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/lrcx_10_q_coverage_addendum_2026_08_30.json",
+      "doc_id": "lrcx_10_q_20260423",
+      "changes": {
+        "title": {
+          "before": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+          "after": "Lam Research Q3 FY2026 Form 10-Q — results by segment, non-leading edge, DRAM, China export controls, capex"
+        }
+      },
+      "file_sha256": {
+        "before": "5d9c724d0237f9c95457f4afb231863955e149c8908d8f4559a22f7cbe33848f",
+        "after": "d39b66a1af0ac67cf0dae25bfcf6fc67a21b27354f6234ae79312074eee64420"
+      },
+      "extraction_sha256": {
+        "before": "05d88e7915027f39169c4e8cafeb8cf54534011e875f312a48a4f9cda868f140",
+        "after": "4b97c0bc869e938644ebafa5c505bffe5fc2c8c27d1fb75d9f236def804b1cd9"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/lumentum_q2fy26_coverage_addendum_2026_08_30.json",
+      "doc_id": "lumentum_q2fy26_cpo",
+      "changes": {
+        "title": {
+          "before": "Lumentum Q2 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+          "after": "Lumentum Q2 FY2026 Earnings Call — ELS/CPO/UHP Laser Segment"
+        }
+      },
+      "file_sha256": {
+        "before": "838eb6c3b59ab4368dac3aa7f3a00d03cec62f17b7a06c0e24a9a10ae5d244d5",
+        "after": "994754cd7bb3eac9df09c2978f1a7cfb0d89c4aaf8a335ddb0bcace9016b2828"
+      },
+      "extraction_sha256": {
+        "before": "79b519033f8c3c357d019fa7498897c85f8a0ecf01fea3859ffb9ac6555f84a4",
+        "after": "41f286f30d3e63cf9d3df23d21ecd1e262b0a44ff0e4b24d94c744b687e7f83c"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/lynas_q1_fy26_quarterly_2025_10_30.json",
+      "doc_id": "lynas_q1_fy26_quarterly_2025_10_30",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "quarterly_main"
+        }
+      },
+      "file_sha256": {
+        "before": "38ba3bf3d3d60621958cd6838948ce9dfc642dd1d58e3386b777828ad882797f",
+        "after": "97c74e1cb7d3893075de2cd923bd5aa9c598d4215205f9ea6cdfa13117ec07b1"
+      },
+      "extraction_sha256": {
+        "before": "9cb5a35131bb546e5071376e44f6164004e77a9e6966f61675792d94ac0d336e",
+        "after": "2fabb73a2c7f2ba38a8e2e36465a032bcd39398d1b4081c40a01ed2a5949974a"
+      },
+      "superseded_archive": "extractions/superseded/lynas_q1_fy26_quarterly_2025_10_30.9cb5a351.json"
+    },
+    {
+      "file": "extractions/meta_vistara_coverage_addendum_2026_08_30.json",
+      "doc_id": "meta_vistara_isca_2026",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "asic_and_deployment"
+        },
+        "title": {
+          "before": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+          "after": "Vistara: Making CXL Real—Full Path from ASIC Design and OS Support to Hyperscale Deployment"
+        }
+      },
+      "file_sha256": {
+        "before": "706291d9daa52c07b0300ad5de90f3c36aa1993f0fd1c8af636d1b9fd25e981a",
+        "after": "de854dc3960667abd9e2c3674bff0f5686b4b1c0facba846163f111fc680bafd"
+      },
+      "extraction_sha256": {
+        "before": "ed673e45e61a1bb0ceddd622874c7ac65cea0d9e2ec40994c01e28d57e9d6747",
+        "after": "8dbe6413715c3e38bf99c7f34065b570fbc818d9d18c841b9b678505e5be8f94"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/meta_vistara_isca_2026.json",
+      "doc_id": "meta_vistara_isca_2026",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "asic_and_deployment"
+        }
+      },
+      "file_sha256": {
+        "before": "eba481f75092b0f5b725da5de09fb74f8263fa26c597fd78b4997cc0e314ce5f",
+        "after": "81496cab44bf1dea90f53febc3805402d1d97e7c23df8bbef20c655100b118b7"
+      },
+      "extraction_sha256": {
+        "before": "59697eb132a9ea3f21cae4c76d8f7b734aea41bf8e85340fa67dee845ea5a76a",
+        "after": "92216eaed3832c6c13c4db80809f83202f68b8c9734c6f2a6b2f39c2b2723a9d"
+      },
+      "superseded_archive": "extractions/superseded/meta_vistara_isca_2026.59697eb1.json"
+    },
+    {
+      "file": "extractions/miningweekly_lynas_terbium_2025_06_18.json",
+      "doc_id": "miningweekly_lynas_terbium_2025_06_18",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "terbium_production_news"
+        }
+      },
+      "file_sha256": {
+        "before": "2391e51ae80e9bfe3ce500297d77628b4dd763f91a00b0b1db2255bb5c05da34",
+        "after": "0906ddcfb6e5252ded3af26dfea998e94bd434d83722118e87074eefec04df3f"
+      },
+      "extraction_sha256": {
+        "before": "3e98c696ac90510a193bdf2a82069e5cb1d71be0ae19ed82cb2ff1709b85746c",
+        "after": "179b69d56d5b2321f0709664f0584cd88b9495a1fc7ee688b7e055787b164734"
+      },
+      "superseded_archive": "extractions/superseded/miningweekly_lynas_terbium_2025_06_18.3e98c696.json"
+    },
+    {
+      "file": "extractions/mu_10_q_coverage_addendum_2026_08_30.json",
+      "doc_id": "mu_10_q_q3fy2026_20260625",
+      "changes": {
+        "title": {
+          "before": "Micron Technology Q3 FY2026 Form 10-Q (quarterly period ended May 28, 2026)——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+          "after": "Micron Technology Q3 FY2026 Form 10-Q (quarterly period ended May 28, 2026)"
+        }
+      },
+      "file_sha256": {
+        "before": "ecbe0f8b0104080db26be1ce0e97fecc0e380bb57c1092b12474ad340154b2c3",
+        "after": "286870a6f3be4900b3e5620754a3e006fc69c23c344a69d93e428aabdfb6ac30"
+      },
+      "extraction_sha256": {
+        "before": "a33cabf03d432a5a1bbbc7f7902ed158367f4393835d634b5cdac4398ec67f93",
+        "after": "adb6d94cea9d94e77a4dbae3660ffa06c6851ca8eea0076a44e60d141e005ed8"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/nvda_8k_coverage_addendum_2026_08_30.json",
+      "doc_id": "nvda_8k_ex991_20260826_q2fy27_pr",
+      "changes": {
+        "title": {
+          "before": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+          "after": "NVIDIA Q2 FY2027 8-K EX-99.1 業績新聞稿 — Spectrum-6 CPO 出貨與 SK hynix memory 合作"
+        }
+      },
+      "file_sha256": {
+        "before": "fb128ce404197fb6b73f28b29dc2614be9c7e1c7e7f8bf9dae9d2503a1f53433",
+        "after": "33d0dea1cb8996906208e15fd4560669581659730a6366fb320ede20b71e69d5"
+      },
+      "extraction_sha256": {
+        "before": "fe44d3f74b80c303ea2cb7d3bbdce3671341b34f68419fa262f65a978d261b9d",
+        "after": "491ec24eb18db5af7f452b79573cfef15c68189efebcb51f674a8b55dec732b5"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/nvidia_photonics_ecosystem_pr_2025_03_18.json",
+      "doc_id": "nvidia_photonics_pr_2025_03_18",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "announcement_main"
+        }
+      },
+      "file_sha256": {
+        "before": "fd6a9450f44df93aace7d45fb4a03b8309e59663b9e7aab4be7ac6b4fc111ce5",
+        "after": "0896ddf6e74b8bcc18a9761b478c7dfd889d397edc53207918a01996e694d2ca"
+      },
+      "extraction_sha256": {
+        "before": "15367ed02048f955f7735bd4ee1ecef0d3abdc6432b0eaf3f4de3829ddb56880",
+        "after": "f2ca59070101c2784bfe432d5ac845d7cd2284cb430d7de0dfbd3c4f6d4dde2c"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/nvidia_photonics_pr_2025_03_18_fabrinet_addendum.json",
+      "doc_id": "nvidia_photonics_pr_2025_03_18",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "announcement_main"
+        },
+        "title": {
+          "before": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches (GTC 2025-03-18) — Fabrinet addendum",
+          "after": "NVIDIA Announces Spectrum-X Photonics, Co-Packaged Optics Networking Switches to Scale AI Factories to Millions of GPUs"
+        }
+      },
+      "file_sha256": {
+        "before": "fb8111502c5f4bab179f7e5470ba19abbc128f6507b650818d2cb3d6550f77bd",
+        "after": "0fbc83960b83a6f2408bd62976c53845039c1d2852cf18da7990947c36d4047c"
+      },
+      "extraction_sha256": {
+        "before": "f457451e2bbde1443adf03ac690400b5fb02c25805e3923576fa196ead37180b",
+        "after": "b02f6608e6a06138837c7a4e3ff97ea4479f8154aeb5de05db3eb8116d335cdb"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/nvidia_q1fy27_coverage_addendum_2026_08_30.json",
+      "doc_id": "Nvidia_q1fy27",
+      "changes": {
+        "title": {
+          "before": "NVIDIA Q1 FY2027 Earnings Call — CPO/Networking Segment——coverage-gap edges addendum wave 3（自主研究迴圈第 7 輪）",
+          "after": "NVIDIA Q1 FY2027 Earnings Call — CPO/Networking Segment"
+        }
+      },
+      "file_sha256": {
+        "before": "36e656af7703830e1c66e6dae83c57c2f344bea1e9dcb15c9e2f2eb8c1aab179",
+        "after": "6ac26e0a6087966265982e29df314470cc32fd0e8e086a748b0ab26773e3cc32"
+      },
+      "extraction_sha256": {
+        "before": "c54385dab6fabd16c68f189f2f9c6a168e2d30b166f5206c236a44bcdbaa0732",
+        "after": "bf7b3f96f24694bf22987141fe91faf7e928a2c621661de6a4b63758a18ce0f1"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/poet_6_k_coverage_addendum_2026_08_30.json",
+      "doc_id": "poet_6_k_20260514",
+      "changes": {
+        "title": {
+          "before": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)——coverage-gap edges addendum（自主研究迴圈第 5 輪）",
+          "after": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)"
+        }
+      },
+      "file_sha256": {
+        "before": "d6672cb675c3a262ef2627eb2fc500ba7574337e31d68bf7e1df46a412a5858e",
+        "after": "e009f8db5fecc6a61955e348631c87709187f60eb70f7ea96772a5e74f827adf"
+      },
+      "extraction_sha256": {
+        "before": "6a629fe9345870d63bb2bd33d4d22a7bb69264d7ff33fb7d24e2c657c6a92dda",
+        "after": "5699d6e1bb6b5358eb69a7a8b810737a1f788b3a5cd77f814420f055b6207bb4"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/poet_6_k_coverage_addendum_w2_2026_08_30.json",
+      "doc_id": "poet_6_k_20260514",
+      "changes": {
+        "title": {
+          "before": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)——coverage-gap edges addendum wave 2（自主研究迴圈第 6 輪）",
+          "after": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)"
+        }
+      },
+      "file_sha256": {
+        "before": "c4e67c5312595ec2dbe177842666bb13acd711b9c3e2419b22033c5097ef504d",
+        "after": "9316dc90a379b6b5a8277c62865e879d99fdb384d9c83a98e58c2c570d998c54"
+      },
+      "extraction_sha256": {
+        "before": "ee84c739a610806eeb5453ee2f69669d4db404ba7913a2bf3db5ca2f49d31bdc",
+        "after": "093b0ea9d081aea22558f5c3ba697d746d5fc9ee3de17011cb6366e7e40f0d2d"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/schaeffler_humanoid_partnership_pr_2026_01_13.json",
+      "doc_id": "schaeffler_humanoid_partnership_pr_2026_01_13",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "partnership_main"
+        }
+      },
+      "file_sha256": {
+        "before": "ccad3981036ff781b8af6829f62fde6c05676b8a7ce4b55591f2aa7ce5133264",
+        "after": "85e860e62dcfd89696daa7592e6ef0b07f1657c55c59df33b7f907c6e80af36f"
+      },
+      "extraction_sha256": {
+        "before": "3eca5b315d0a29d091ef7f4c1f350ee286b0f08400ef64d144a03ca8ec2727a9",
+        "after": "2746e0b86dce6fe4910b9227f46021168589b41f6e889d4b9d10b0de3d4a9d73"
+      },
+      "superseded_archive": "extractions/superseded/schaeffler_humanoid_partnership_pr_2026_01_13.3eca5b31.json"
+    },
+    {
+      "file": "extractions/sivers_ar_2025.json",
+      "doc_id": "sivers_ar_2025_photonics_excerpt",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "photonics"
+        }
+      },
+      "file_sha256": {
+        "before": "99cbc53a1804a2e10e444760a90c5b58ac65a513b8d7ca4bad65737edd2b066c",
+        "after": "3f5f55e74ebe8ff09ddb94ee774a321f0a684553dde6897a07118eb93a98ccd8"
+      },
+      "extraction_sha256": {
+        "before": "ae6f4f0e2e743eead9f9e62753b1bc76fba29b4e4a924f4ba0b2a2d064ad1183",
+        "after": "c1ccf2536411d911d19f2515d3ff63e9167edf0b7a7c8a0e6b4bb3c880d7f55b"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/svrc_state_of_robotics_2026_us.json",
+      "doc_id": "svrc_state_of_robotics_2026_us",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "overview"
+        }
+      },
+      "file_sha256": {
+        "before": "f5c9614c710bfd21a896f8aae82da4ef0f6360824093f1554221929a2ebc0bea",
+        "after": "eff8f03f9195e04142f71a61007c60ea6b40385c7a95bb4234b725582e8e9a34"
+      },
+      "extraction_sha256": {
+        "before": "43eb26032ef7af56cb5b3ca088966d92d9b3adae3c640c8fc8ab347d3c43700e",
+        "after": "f4e853da3a61b52a52774f4bc8961e46388c2bc063f13f17d2b869aec2b16622"
+      },
+      "superseded_archive": "extractions/superseded/svrc_state_of_robotics_2026_us.43eb2603.json"
+    },
+    {
+      "file": "extractions/thehumanoid_schaeffler_supply_deal_2026.json",
+      "doc_id": "thehumanoid_schaeffler_supply_deal_2026",
+      "changes": {
+        "section": {
+          "before": null,
+          "after": "deal_announcement"
+        }
+      },
+      "file_sha256": {
+        "before": "a2d0f502bbcc21bdec00cee1771a8acf53e9c14c75a4a84dc8aa647cbb31052f",
+        "after": "f3b8eceecb22c3e1a5b326c401f84d6f3eac4994db35cc74585708a133ae1af8"
+      },
+      "extraction_sha256": {
+        "before": "634ac2f9c95e887d83e61614e7a50224e47f70d7a2777cdb42a97bcc97f8c13e",
+        "after": "88c35b47648b00ab5d369b4e4d98e97df7b3b8c03688bf14d6bd9365bf311f18"
+      },
+      "superseded_archive": "extractions/superseded/thehumanoid_schaeffler_supply_deal_2026.634ac2f9.json"
+    },
+    {
+      "file": "extractions/tower_marvell_pic_sub_addendum_2026_08_30.json",
+      "doc_id": "tower_marvell_coherent_pic_6k_2026_06_18",
+      "changes": {
+        "title": {
+          "before": "Tower×Marvell coherent PIC 量產——substitutability addendum（[271] 授權研究）",
+          "after": "Tower Semiconductor and Marvell Ship Over Five Million Coherent Photonic ICs (Form 6-K)"
+        }
+      },
+      "file_sha256": {
+        "before": "b1874e44d9d4956e9b4122832d91b254e0cf4246561635e5d31f8c0f2e6c4425",
+        "after": "96e4ed506d3ed282610dbfdd327e99b93644ef1c62d68b8a19a146457f49e21c"
+      },
+      "extraction_sha256": {
+        "before": "ab59f113ee02083b952203868d613bf7bdcf7b5c6fa86bdaf1b799b5e32703f6",
+        "after": "26504f749d52402c13e4f8b37dfa50a31e8e9f78d8264b0e25b18e1758953ac7"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/tower_ph18da_sub_addendum_2026_08_31.json",
+      "doc_id": "tsem_openlight_cadence_pdk_6k_2026_08_11",
+      "changes": {
+        "title": {
+          "before": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform——Tower→PH18DA substitutability 判斷 addendum（[271]）",
+          "after": "Tower Semiconductor 6-K — OpenLight PDK available in Cadence EDA tools for PH18DA InP-on-silicon platform"
+        }
+      },
+      "file_sha256": {
+        "before": "8349ac9f5c6c5bdb0d511a2f96ac6960f213ea4901e89ca8835b2b97e02fd0bf",
+        "after": "84679e4d710663dc561f2ba542861d3b0e660ce112edc054e996ccc7693c323d"
+      },
+      "extraction_sha256": {
+        "before": "2849a34ae5a7aab718903c05443a58566d2f0637d90ec1caf51ac46518f38f3d",
+        "after": "bb1cf2e49042fbe4e5c967ca982f1dfb534950fdcfdb2cbb0d0367b1427c1936"
+      },
+      "superseded_archive": null
+    }
+  ],
+  "skipped": []
+}

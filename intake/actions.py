@@ -51,7 +51,11 @@ REQUEST_FIELDS = {"schema_version", "action_slug", "report", "documents"}
 # 選填：這個 graph delta 完成後，唯一要建立／沿用哪個 Decision cohort。
 # 從 lead 來的 RA 由綁定 lead 的 refs.focus_company_id 提供；從 decision gap
 # work order 來的 RA 沒有 lead 可綁，必須在這裡自己聲明。
-REQUEST_OPTIONAL_FIELDS = {"focus_company_id"}
+# `layer_enumerations`（2026-10-01 Phase 4 Step 4.2a）：「這一包列舉了哪一層的供應商集合、發文者是誰」。
+# ⚠ **頂層選填，不進 `report`**——`report` 是 exact fields，放進去會讓既有 138 筆紀錄的 `_validate_record` 全部失效。
+REQUEST_OPTIONAL_FIELDS = {"focus_company_id", "layer_enumerations"}
+LAYER_ENUMERATION_FIELDS = {"node", "suppliers", "relation", "origin_role"}
+MAX_LAYER_ENUMERATIONS = 20
 DOCUMENT_REQUIRED_FIELDS = {
     "extraction_json",
     "storage_permission",
@@ -173,6 +177,142 @@ def _validate_focus_company_id(value: object) -> str:
     return company_id
 
 
+def _vocab_values(key: str) -> tuple[str, ...]:
+    """`schema/vocab.json` 的封閉字彙（唯一來源；未登記一律拒收，L16）。讀不到就 fail closed。"""
+
+    try:
+        vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"schema/vocab.json 讀不到——{key} 無從核對：{exc}") from exc
+    values = vocab.get(key)
+    if not isinstance(values, list) or not values:
+        raise ValueError(f"schema/vocab.json 缺 {key}——無從核對（fail closed）")
+    return tuple(str(value) for value in values)
+
+
+def _validate_layer_enumerations(value: object) -> list[dict]:
+    """`layer_enumerations[]` 的形狀與封閉字彙。**不查圖、不查名冊**——「在本包」的核對依賴當下的名冊，
+    只在 prepare 跑一次（`check_layer_enumerations`），否則名冊一改，舊紀錄的驗證就會失敗。"""
+
+    if not isinstance(value, list) or not value:
+        raise ValueError("layer_enumerations must be a non-empty list")
+    if len(value) > MAX_LAYER_ENUMERATIONS:
+        raise ValueError(f"layer_enumerations exceeds the {MAX_LAYER_ENUMERATIONS}-item limit")
+    relations = _vocab_values("layer_enumeration_relations")
+    roles = _vocab_values("origin_role")
+    normalized: list[dict] = []
+    seen: set[tuple[str, str]] = set()
+    for index, item in enumerate(value):
+        label = f"layer_enumerations[{index}]"
+        if not isinstance(item, dict):
+            raise ValueError(f"{label} must be an object")
+        _require_exact_fields(item, LAYER_ENUMERATION_FIELDS, label)
+        node = item["node"]
+        if not isinstance(node, str) or ":" not in node or node.startswith("co:"):
+            raise ValueError(f"{label}.node must be a layer node id (prefix:slug, not co:*)")
+        suppliers = item["suppliers"]
+        if (not isinstance(suppliers, list) or not suppliers
+                or not all(isinstance(s, str) and s.startswith("co:") for s in suppliers)):
+            raise ValueError(f"{label}.suppliers must be a non-empty list of co:* ids")
+        if len(set(suppliers)) != len(suppliers):
+            raise ValueError(f"{label}.suppliers has duplicates")
+        if item["relation"] not in relations:
+            raise ValueError(f"{label}.relation 未登記：{item['relation']!r}"
+                             f"（schema/vocab.json layer_enumeration_relations：{list(relations)}）")
+        if item["origin_role"] not in roles:
+            raise ValueError(f"{label}.origin_role 未登記：{item['origin_role']!r}"
+                             f"（schema/vocab.json origin_role：{list(roles)}）")
+        key = (node, item["relation"])
+        if key in seen:
+            raise ValueError(f"{label} 與前面一筆重複列舉 {node}（{item['relation']}）")
+        seen.add(key)
+        normalized.append({"node": node, "suppliers": list(suppliers), "relation": item["relation"],
+                           "origin_role": item["origin_role"]})
+    return normalized
+
+
+def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
+    """prepare 當下的「在本包」核對（2026-10-01 Phase 4 Step 4.2a）——**不查 Neo4j**，只看這一包的抽取內容。
+
+    每一筆列舉：node 與每家 supplier 都在本包的 nodes；每家至少一條 supplier→node、relation 相符的邊；那條邊
+    `source_ids` 指到的任一段引文以 `query.bottleneck.quote_names_company`（名字比對唯一 owner）具名那一家。
+    失敗分兩種原因報（INV-3，不壓成一個布林）：
+    - **名冊無名可比**（那家不在名冊，或沒有 display_name／name_aliases）→ 列進 packet 前置清單，**不拒收**；
+    - **引文真的沒具名** → 拒收。
+    origin_role 與那份文件 origin 的解析結果不符 → **只警告**。
+    ⚠ 結果依賴當下的名冊，所以只在 prepare 跑一次、存成紀錄的收據（`layer_enumeration_check`）；**不得**放進
+    `_validate_record`。這是 A1 的機械輔助，**不授權任何入圖**（L15）：入圖仍經 pq2 `ra_admission`。
+    """
+
+    from identity.registry import get_registry
+    from query.bottleneck import company_id_for_origin, company_name_forms, quote_names_company
+
+    reg = registry if registry is not None else get_registry()
+    enumerations = payload.get("layer_enumerations") or []
+    documents = payload.get("documents") or []
+    nodes = {str(n.get("id")) for d in documents for n in (d["extraction"].get("nodes") or []) if n.get("id")}
+    rejections: list[str] = []
+    prerequisites: list[str] = []
+    warnings: list[str] = []
+    results: list[dict] = []
+    for index, enum in enumerate(enumerations):
+        label = f"layer_enumerations[{index}]（{enum['node']}，{enum['relation']}）"
+        if enum["node"] not in nodes:
+            rejections.append(f"{label}：node 不在本包的 nodes 裡")
+        rows: list[dict] = []
+        enum_docs: dict[str, dict] = {}
+        for supplier in enum["suppliers"]:
+            row: dict = {"company_id": supplier, "edges": [], "status": None}
+            if supplier not in nodes:
+                rejections.append(f"{label}：{supplier} 不在本包的 nodes 裡")
+                row["status"] = "not_in_package"
+                rows.append(row)
+                continue
+            company = reg.company(supplier)
+            has_names = company is not None and bool(company_name_forms(company))
+            for document in documents:
+                extraction = document["extraction"]
+                quotes = {str(s.get("id")): str(s.get("quote") or "") for s in extraction.get("sources") or []}
+                for edge in extraction.get("edges") or []:
+                    if (edge.get("src_id") == supplier and edge.get("dst_id") == enum["node"]
+                            and edge.get("relation") == enum["relation"]):
+                        named = has_names and any(quote_names_company(quotes.get(str(sid)), company, registry=reg)
+                                                  for sid in edge.get("source_ids") or [])
+                        row["edges"].append({"doc_id": document["doc_id"], "edge_id": edge.get("id"), "named": named})
+                        enum_docs[document["doc_id"]] = extraction.get("source_doc") or {}
+            if not row["edges"]:
+                rejections.append(f"{label}：本包沒有 {supplier} —{enum['relation']}→ {enum['node']} 的邊")
+                row["status"] = "no_edge"
+            elif any(edge["named"] for edge in row["edges"]):
+                row["status"] = "named"
+            elif not has_names:
+                prerequisites.append(f"{label}：{supplier} 在名冊沒有名字可比（不在名冊或沒有 display_name／name_aliases）"
+                                     "——先補名冊再核對；不拒收")
+                row["status"] = "registry_has_no_name"
+            else:
+                docs = "、".join(sorted({edge["doc_id"] for edge in row["edges"]}))
+                rejections.append(f"{label}：{supplier} 那條邊的引文沒有具名它（{docs}）")
+                row["status"] = "quote_does_not_name"
+            rows.append(row)
+        suppliers = set(enum["suppliers"])
+        origins = []
+        for doc_id, source_doc in sorted(enum_docs.items()):
+            origin = source_doc.get("origin_entity")
+            resolved = company_id_for_origin(origin, reg) if origin else None
+            origins.append({"doc_id": doc_id, "origin_entity": origin, "resolved": resolved})
+            if enum["origin_role"] == "supplier_self":
+                if resolved not in suppliers:
+                    warnings.append(f"{label}：origin_role=supplier_self，但 {doc_id} 的 origin「{origin}」"
+                                    f"沒有解析到列舉的任一家（{resolved or '解析不到'}）")
+            elif resolved in suppliers:
+                warnings.append(f"{label}：origin_role={enum['origin_role']}，但 {doc_id} 的 origin「{origin}」"
+                                f"就是列舉的供應商 {resolved}——那是供應商自己的文件")
+        results.append({"node": enum["node"], "relation": enum["relation"], "origin_role": enum["origin_role"],
+                        "suppliers": rows, "origins": origins})
+    return {"status": "rejected" if rejections else "ok", "rejections": rejections,
+            "prerequisites": prerequisites, "warnings": warnings, "results": results}
+
+
 def _validate_report(report: object) -> dict[str, str]:
     if not isinstance(report, dict):
         raise ValueError("report must be an object")
@@ -214,6 +354,11 @@ def parse_action_request(action_json: str) -> dict:
     focus_company_id = (
         _validate_focus_company_id(request["focus_company_id"])
         if request.get("focus_company_id") is not None
+        else None
+    )
+    layer_enumerations = (
+        _validate_layer_enumerations(request["layer_enumerations"])
+        if request.get("layer_enumerations") is not None
         else None
     )
     documents = request["documents"]
@@ -262,6 +407,8 @@ def parse_action_request(action_json: str) -> dict:
     }
     if focus_company_id is not None:
         parsed["focus_company_id"] = focus_company_id
+    if layer_enumerations is not None:
+        parsed["layer_enumerations"] = layer_enumerations
     return parsed
 
 
@@ -279,6 +426,8 @@ def validate_normalized_payload(payload: object) -> dict:
     _validate_report(payload["report"])
     if payload.get("focus_company_id") is not None:
         _validate_focus_company_id(payload["focus_company_id"])
+    if payload.get("layer_enumerations") is not None:
+        _validate_layer_enumerations(payload["layer_enumerations"])
     documents = payload["documents"]
     if not isinstance(documents, list) or not 1 <= len(documents) <= MAX_DOCUMENTS:
         raise ValueError("normalized documents count is invalid")
@@ -477,6 +626,13 @@ def _validate_record(record: object) -> dict:
                 raise ValueError("Research Action tombstone title is invalid")
         else:
             _validate_report(review)
+    # apply 後 payload 會被壓縮掉；層列舉與 prepare 當下的核對收據留在紀錄上（Phase 4 Step 4.2a）——
+    # 驗收「至少 1 份 applied RA 帶 layer_enumerations 且核對通過」數的就是這兩欄。
+    if record.get("layer_enumerations") is not None:
+        _validate_layer_enumerations(record["layer_enumerations"])
+    check = record.get("layer_enumeration_check")
+    if check is not None and (not isinstance(check, dict) or check.get("status") != "ok"):
+        raise ValueError("Research Action layer enumeration check receipt is invalid")
 
     manifest = record.get("document_manifest")
     if not isinstance(manifest, list) or not manifest:
@@ -599,6 +755,11 @@ def save_action(record: dict, *, root: Path = ROOT, now: datetime | None = None)
     return record
 
 
+#: 文件清單每行多印的發文者三欄（Phase 4 Step 4.2a）——取值與 `engine_b/todo.py::_ra_graph_impact` 同一條路
+#: （抽取 JSON 的 `source_doc`）。只有新紀錄的 manifest 帶這三個 key；舊紀錄沒有，packet 照原樣渲染（不印「未記錄」）。
+MANIFEST_PROVENANCE_FIELDS = ("origin_entity", "source_type", "evidence_tier")
+
+
 def _document_summary(document: dict) -> dict:
     source_doc = document["extraction"].get("source_doc") or {}
     return {
@@ -611,6 +772,7 @@ def _document_summary(document: dict) -> dict:
         "edge_count": len(document["extraction"].get("edges") or []),
         "claim_count": len(document["extraction"].get("claims") or []),
         "validation_warnings": list(document["validation_warnings"]),
+        **{field: source_doc.get(field) for field in MANIFEST_PROVENANCE_FIELDS},
     }
 
 
@@ -644,6 +806,38 @@ def _next_action(state: str, git_status: str | None = None) -> str:
     return "Inspect the local Research Action record."
 
 
+_LAYER_STATUS_LABELS = {
+    "named": "引文具名 ✓",
+    "registry_has_no_name": "名冊無名可比（前置：先補名冊）",
+}
+
+
+def _render_layer_enumerations(record: dict) -> list[str]:
+    """packet 的「層列舉」一節：宣告了什麼、prepare 當下核對的結果（沒有宣告就整節不印——舊紀錄 render 不變）。"""
+
+    enumerations = (record.get("payload") or {}).get("layer_enumerations") or record.get("layer_enumerations")
+    if not enumerations:
+        return []
+    check = record.get("layer_enumeration_check") or {}
+    by_key = {(r.get("node"), r.get("relation")): r for r in check.get("results") or []}
+    lines = ["", "## 層列舉（這一包列舉了哪一層的供應商集合）", ""]
+    for enum in enumerations:
+        result = by_key.get((enum["node"], enum["relation"])) or {}
+        status = {row.get("company_id"): row.get("status") for row in result.get("suppliers") or []}
+        suppliers = "、".join(
+            f"`{s}`（{_LAYER_STATUS_LABELS.get(status.get(s), status.get(s) or '未核對')}）" for s in enum["suppliers"])
+        lines.append(f"- `{enum['node']}` ← {enum['relation']}：{suppliers}；發文者角色 `{enum['origin_role']}`")
+        for origin in result.get("origins") or []:
+            lines.append(f"  - `{origin.get('doc_id')}` origin「{origin.get('origin_entity') or '未記錄'}」"
+                         f"→ {origin.get('resolved') or '解析不到'}")
+    for prerequisite in check.get("prerequisites") or []:
+        lines.append(f"- 前置：{prerequisite}")
+    for warning in check.get("warnings") or []:
+        lines.append(f"- ⚠ {warning}")
+    lines.append("- 核對只看本包、不查圖；它是機械輔助，**不授權入圖**——入圖仍要這個編號的明確核准。")
+    return lines
+
+
 def render_review_packet(record: dict, *, now: datetime | None = None) -> str | None:
     payload = record.get("payload")
     report = payload.get("report") if payload else record.get("review")
@@ -670,10 +864,16 @@ def render_review_packet(record: dict, *, now: datetime | None = None) -> str | 
             f"- `{document['doc_id']}` — {document['title']}; "
             f"storage=`{document['storage_permission']}`; {counts}"
         )
+        if any(field in document for field in MANIFEST_PROVENANCE_FIELDS):
+            lines.append("  - 發文者：origin=" + " ｜ ".join(
+                [str(document.get("origin_entity") or "未記錄"),
+                 f"source_type={document.get('source_type') or '未記錄'}",
+                 f"tier={document.get('evidence_tier') or '未記錄'}"]))
         if document.get("url"):
             lines.append(f"  - URL: {document['url']}")
         for warning in document.get("validation_warnings") or []:
             lines.append(f"  - Validation warning: {warning}")
+    lines.extend(_render_layer_enumerations(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
     lines.extend(
@@ -754,6 +954,12 @@ def create_action(
 
     current = now or _now()
     normalized = validate_normalized_payload(payload)
+    layer_check = None
+    if normalized.get("layer_enumerations"):
+        # 「在本包」核對在建立紀錄的這一刻跑一次、存成收據（依賴當下名冊，不得放進 `_validate_record`）。
+        layer_check = check_layer_enumerations(normalized)
+        if layer_check["status"] != "ok":
+            raise ValueError("layer_enumerations 核對失敗：" + "；".join(layer_check["rejections"]))
     payload_bytes = len(_canonical_bytes(normalized))
     parent = _action_root(root)
     with _exclusive_lock(parent / "locks" / ".store.lock", now=current):
@@ -808,6 +1014,8 @@ def create_action(
                 "commit": None,
             },
         }
+        if layer_check is not None:
+            record["layer_enumeration_check"] = layer_check
         _write_new_json(_action_path(action_id, root), record)
     return copy.deepcopy(record)
 
@@ -833,6 +1041,9 @@ def compact_applied_payload(record: dict) -> dict:
     # RA 還能回頭問 lead，decision gap 來的 RA 沒有 lead 可問，會直接卡死。
     if payload.get("focus_company_id"):
         record["focus_company_id"] = payload["focus_company_id"]
+    # 同一個理由：層列舉是「這一包列舉了哪一層」的收據，壓縮掉就再也驗不了 Phase 4 的驗收（packet 那一列）。
+    if payload.get("layer_enumerations"):
+        record["layer_enumerations"] = copy.deepcopy(payload["layer_enumerations"])
     record["payload"] = None
     record["compacted_at"] = _iso(_now())
     return record
@@ -1008,6 +1219,7 @@ def _full_report(record: dict) -> str:
             lines.append(f"  - URL: {document['url']}")
         for warning in document.get("validation_warnings") or []:
             lines.append(f"  - Validation warning: {warning}")
+    lines.extend(_render_layer_enumerations(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
 

@@ -110,7 +110,8 @@ description: >
   origin_event 查有無既有 `SourceDoc`(`MATCH (sd:SourceDoc) WHERE sd.url ...`),避免同一份文件被以不同
   `doc_id` 重複 onboard。`doc_id` 是自取的名字、不是文件身分;换個名字系統不會自動擋。loader 已有 URL 去重
   guard(同 URL 不同 doc_id 會 fail closed);`query/health_audit.py` 有「重複 SourceDoc」事後巡檢。
-- 判定原料的 `source_type`(social/news/transcript/filing/ir_deck/industry_report/paper)與初始 `evidence_tier`。
+- 判定原料的 `source_type`(字彙只住 `schema/vocab.json` 的 `source_type`;datasheet＝供應商自報、teardown＝第三方拆解,
+  tier 見 `skills/source-trace/SKILL.md`)與初始 `evidence_tier`。
 - 原始文字存進 `library/raw/`,給一個全域 `doc_id`(例:`tweet_<handle>_20260629`)。
 - **輸出:** 一筆 intake 紀錄(doc_id / source_type / tier / origin_entity / origin_event / 原文連結)。
 
@@ -152,7 +153,7 @@ description: >
 
 **核准邊界：** Step 4 的自動化終點是 `prepare_research_action` 回傳的、由程式產生的 review packet，
 不是 graph write。只有 Research Action 進入廣義 pq2；raw lead、triage PASS 與仍在追源／抽取的工作都留在
-pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可在本機 apply（`intake.application._apply_research_action_impl`）；`pending`／
+pq1。使用者對 action ID 明確回覆 `go` 後，另一個執行步驟才可在本機 apply（固定入口 `python scripts/apply_ra_admission.py --pq2 <編號> --digest <digest>`）；`pending`／
 `drop` 不得寫圖。同一輪不得 prepare 後自行 apply。
 
 ### Step 5 — 驗證並準備 Research Action（接既有 pipeline，不重造輪子）

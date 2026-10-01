@@ -46,18 +46,12 @@ from intake.provenance import (
     MAX_EXTRACTION_CHARS,
     ROOT as INTAKE_ROOT,
     canonical_extraction_hash,
-    commit_and_push,
-    git_preflight,
     inspect_provenance,
     mark_graph_complete,
-    pending_intake_files,
     publish_provenance,
-    resolve_action_paths,
     sanitize_source_url,
-    validate_action_slug,
     validate_doc_id,
     verify_graph_complete,
-    write_report,
 )
 from intake import actions as research_actions
 
@@ -497,6 +491,17 @@ def _prepare_research_action_impl(
     }
     if request.get("focus_company_id") is not None:
         payload["focus_company_id"] = request["focus_company_id"]
+    if request.get("layer_enumerations") is not None:
+        payload["layer_enumerations"] = request["layer_enumerations"]
+        # 先在這裡核對一次，把逐條原因回給呼叫端（create_action 會再擋一次——縱深防護）。
+        check = research_actions.check_layer_enumerations(payload)
+        if check["status"] != "ok":
+            return {
+                "status": "rejected",
+                "error": "layer_enumerations 核對失敗（引文真的沒具名、或不在本包）",
+                "problems": [_safe_error_message(item) for item in check["rejections"][:50]],
+                "prerequisites": [_safe_error_message(item) for item in check["prerequisites"][:50]],
+            }
     try:
         record = research_actions.create_action(payload, root=root)
     except (OSError, RuntimeError, ValueError) as exc:
@@ -937,112 +942,3 @@ def _verify_loaded_doc(driver, doc: dict) -> None:
     if problems:
         raise RuntimeError("graph reconciliation failed: " + "; ".join(problems))
 
-_REQUIRED_REPORT_SECTIONS = (
-    "為何此時入圖",
-    "文件清單",
-    "搜尋過程摘要",
-    "L8 確認備註",
-)
-
-def _finalize_research_action_impl(
-    report_markdown: str,
-    action_slug: str,
-    commit_headline: str,
-    doc_ids: list[str],
-    *,
-    root: Path = INTAKE_ROOT,
-    enabled: bool,
-) -> dict:
-    if not enabled:
-        return {
-            "git_status": "not_committed",
-            "reason": "remote_finalize_disabled",
-            "action": (
-                "Remote finalize has no caller since the remote entry point retired (2026-09-25); "
-                "publish locally with scripts/commit_pending_intake.py."
-            ),
-        }
-    try:
-        validate_action_slug(action_slug)
-    except ValueError as exc:
-        return {"git_status": "not_committed", "reason": str(exc)}
-    if not isinstance(commit_headline, str) or not commit_headline.strip():
-        return {"git_status": "not_committed", "reason": "commit_headline is required"}
-    if "\n" in commit_headline or "\r" in commit_headline:
-        return {
-            "git_status": "not_committed",
-            "reason": "commit_headline must be one line",
-        }
-    if not isinstance(doc_ids, list):
-        return {"git_status": "not_committed", "reason": "doc_ids must be a list"}
-    try:
-        manifest = resolve_action_paths(doc_ids, root=root)
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
-        return {"git_status": "not_committed", "reason": str(exc)}
-    if not manifest["paths"]:
-        return {
-            "git_status": "not_committed",
-            "reason": "no_pending_files",
-            "manifest": [],
-        }
-    missing_sections = [
-        section for section in _REQUIRED_REPORT_SECTIONS if section not in report_markdown
-    ]
-    if missing_sections:
-        return {
-            "git_status": "not_committed",
-            "reason": f"report missing required sections: {missing_sections}",
-        }
-
-    preflight = git_preflight(root=root)
-    if not preflight["ok"]:
-        return {
-            "git_status": "not_committed",
-            "reason": preflight["reason"],
-            "detail": preflight.get("detail"),
-        }
-    pending = pending_intake_files(root=root)
-    manifest_paths = set(manifest["paths"])
-    modified_manifest = sorted(manifest_paths & set(pending.get("modified") or []))
-    if modified_manifest:
-        return {
-            "git_status": "not_committed",
-            "reason": f"manifest contains modified tracked files: {modified_manifest}",
-        }
-    pending_warning = {
-        "untracked": sorted(set(pending.get("untracked") or []) - manifest_paths),
-        "modified": sorted(set(pending.get("modified") or []) - manifest_paths),
-        "error": pending.get("error"),
-    }
-
-    verified_lines = ["## Server-verified provenance manifest", ""]
-    for document in manifest["documents"]:
-        verified_lines.append(
-            f"- `{document['doc_id']}` — storage_permission=`{document['storage_permission']}`; "
-            f"URL={document.get('url') or 'n/a'}; permission_basis: "
-            f"{document['permission_basis']}"
-        )
-    final_report = report_markdown.rstrip() + "\n\n" + "\n".join(verified_lines) + "\n"
-    try:
-        report_path = write_report(action_slug, final_report, root=root)
-        report_relative = report_path.resolve().relative_to(root.resolve()).as_posix()
-    except (OSError, RuntimeError, ValueError) as exc:
-        return {"git_status": "not_committed", "reason": f"report write failed: {exc}"}
-
-    git_result = commit_and_push(
-        [*manifest["paths"], report_relative],
-        commit_headline,
-        root=root,
-    )
-    secondary_preflight = git_result.get("preflight") or {}
-    return {
-        "git_status": git_result["status"],
-        "commit": git_result.get("commit"),
-        "push_error": git_result.get("push_error"),
-        "error": git_result.get("error") or secondary_preflight.get("reason"),
-        "detail": git_result.get("detail") or secondary_preflight.get("detail"),
-        "report_path": report_relative,
-        "manifest": manifest["documents"],
-        "committed_paths": git_result.get("paths") or [],
-        "pending_warning": pending_warning,
-    }

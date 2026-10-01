@@ -697,7 +697,7 @@ pq1／apply；沒有完成 receipt 的 `go` 會失敗並留在池中。必須先
 依主要投資問題篩出的 cohort 目標，不等於 action 內唯一公司；使用者的 `go` 同時核准 exact graph delta
 與已揭露的 handoff。若 hint 顯示未聲明／多個 focus blocker，不得先 apply 再事後補選。
 
-**go 一個 prepared RA ＝入圖**：在本機 session 呼叫 `intake.application._apply_research_action_impl(<ra_id>, <digest>)`（一次確認；協定見 `prompts/intake_protocol.md`）
+**go 一個 prepared RA ＝入圖**：在本機 session 跑 `python scripts/apply_ra_admission.py --pq2 <編號> --digest <digest>`（固定入口：四道檢查＋核准戳記，2026-10-01 起；一次確認；協定見 `prompts/intake_protocol.md`）
 → `advance <lead> applied --ref research_action_id=<ra_id> --ref action_digest=<digest> --ref focus_company_id=co:x`
 → `scripts/commit_pending_intake.py` 完成 durable publication → 用同一個 deterministic completion point 驗證
 apply／publish 並自動建立（或沿用）Decision Shadow：

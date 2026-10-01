@@ -55,6 +55,15 @@ ROOT = Path(__file__).resolve().parent
 SYSTEM_PROMPT_FILE = ROOT / "prompts" / "extract_system.md"
 SAMPLE_FILE = ROOT / "samples" / "cpo_external_laser_source.json"
 
+#: `--source-type` 的選項——**讀 `schema/vocab.json`，不在這裡硬編**（2026-10-01 Phase 4 Step 4.2b；原本硬編 7 個值，
+#: 是 source_type 字彙的第三份副本）。`tests/test_robotics_ontology.py` 守「字彙檔＝schema enum＝這裡」三處相等。
+SOURCE_TYPES: tuple[str, ...] = tuple(
+    json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))["source_type"])
+#: 給人看的 tier 對照（不是驗證規則；tier 由 --evidence-tier 明給）。
+SOURCE_TYPE_TIER_HINT = (
+    "filing／transcript＝1；ir_deck、datasheet（產品規格書＝供應商自報）＝1–2；teardown（第三方拆解，"
+    "origin_entity＝拆解方）＝2；industry_report＝2–3；news＝3；paper 依期刊；social＝4")
+
 
 # ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -316,8 +325,8 @@ def main() -> int:
     )
     ap.add_argument(
         "--source-type", required=True,
-        choices=["filing", "transcript", "ir_deck", "industry_report", "paper", "news", "social"],
-        help="Document source type (must match schema/vocab.json source_type).",
+        choices=list(SOURCE_TYPES),
+        help=f"Document source type（schema/vocab.json source_type）。tier 對照：{SOURCE_TYPE_TIER_HINT}",
     )
     ap.add_argument(
         "--evidence-tier", required=True, type=int, choices=[1, 2, 3, 4],

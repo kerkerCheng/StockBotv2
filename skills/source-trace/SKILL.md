@@ -16,6 +16,13 @@ description: >
 搜尋摘要、LLM 摘要、無 locator 截圖、同源轉述、只有標題或「某券商說」都不算原文。
 `evidence_tier` 依實際取得的文件評，不繼承線索宣稱的來源等級。
 
+`source_type` 的字彙只住 `schema/vocab.json`（不在這裡抄一份）。2026-10-01 新增的兩型怎麼評：
+
+| source_type | 是誰說的 | tier |
+|---|---|---|
+| `datasheet`（產品規格書） | **供應商自報**——origin_entity＝出規格書的公司，不是印證 | 同 `ir_deck` |
+| `teardown`（第三方拆解報告） | 拆解方——origin_entity 寫拆解方，不是被拆的產品廠 | 2 |
+
 ## 先分流，不要把所有缺口都叫追源
 
 | 缺口 | 路由 |

@@ -170,7 +170,8 @@ SET sd.title = $title,
     sd.retrieved_at = coalesce($retrieved_at, sd.retrieved_at),
     sd.storage_permission = $storage_permission,
     sd.permission_basis = $permission_basis,
-    sd.section = $section
+    sd.section = $section,
+    sd.origin_linkage = $origin_linkage
 RETURN sd.id
 """
 
@@ -289,6 +290,18 @@ def normalize_url(url) -> str | None:
     return urlunsplit((parts.scheme.lower(), host, path, parts.query, ""))
 
 
+def is_legit_multi_section(sections) -> bool:
+    """同一個（正規化）URL 的多份 SourceDoc 是不是**刻意拆段**——唯一判準（Phase 4 Step 4.2e）。
+
+    ＝每一份都聲明了非空 `section`，而且兩兩互異。任一份缺 section、或兩份同 section → 不是拆段，是重複 onboard。
+    loader（入圖前擋）、`query/health_audit.py`（每日巡檢）、`audit/checks.py`（Duplicates）三處共用。
+    ⚠ 2026-10-01 之前三處各寫一份而且互異：audit 只擋「同 URL 且同 section」（一份有 section、一份沒有時不報）
+    又用原始 URL 分組；loader 只比「新的那份 vs 每份既有」；健康審查才是全組兩兩互異（L12：一個判準三份副本）。
+    """
+    values = [str(section or "").strip() for section in sections]
+    return all(values) and len(set(values)) == len(values)
+
+
 def check_duplicate_url(source_doc: dict, session, allow_dup_url: bool = False) -> list[str]:
     """Fail closed if another SourceDoc already owns this URL under a different doc_id.
 
@@ -318,9 +331,7 @@ def check_duplicate_url(source_doc: dict, session, allow_dup_url: bool = False) 
     if not same_url:
         return []
     clashes = sorted({sid for sid, _ in same_url})
-    legit_multi_section = bool(new_section) and all(
-        sec and sec != new_section for _, sec in same_url
-    )
+    legit_multi_section = is_legit_multi_section([new_section, *(sec for _, sec in same_url)])
     if legit_multi_section:
         print(
             f"[load] INFO: 同文件多段（section={new_section!r}），與 {clashes} 同 URL "
@@ -361,6 +372,9 @@ def load_source_doc(doc: dict, session) -> None:
         storage_permission=source_doc.get("storage_permission"),
         permission_basis=source_doc.get("permission_basis"),
         section=source_doc.get("section"),
+        # 媒體文是不是轉述同一個 origin_event（Phase 4 Step 4.2c；缺＝null＝不知道，不猜）。
+        # 與其他欄位同一條契約：以抽取 JSON 為準直接寫（L10：抽取 JSON 是可重建的輸入）。
+        origin_linkage=source_doc.get("origin_linkage"),
     )
 
     # ── 逐字（V1 / L18）──
