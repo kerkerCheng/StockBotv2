@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "version": 1,
+  "active": "narrow",
+  "_doc": "sub 引文含不含可替代性語言（`sub_language_in_quote`）的字表——唯一 owner 是 query/sub_language.py（Phase 4 Step 4.4a）。只印、不放閘：旗標不改任何 sub、不進 candidates。比對：ASCII 詞整詞、不分大小寫；中日韓字整串出現即算。⚠ L19：本字表不得出現在 prompts/、skills/（抽取端讀得到就會挑含這些字的引文，旗標恆亮）；tests/test_sub_language.py 守著。改字表＝升 version 並在 _history 記一行。",
+  "_history": [
+    {
+      "version": 1,
+      "date": "2026-10-01",
+      "active": "narrow",
+      "change": "初版：由 prompts/extract_system.md 的 Unsupported-attribute rule 三類語意擬——replaceability（可替代性）、qualification of alternatives（替代品的認證）、exclusivity（排他性）。寬窄兩版都存，只用 narrow：wide 另收市占／集中度措辭（market share、dominant、市占、寡占…），它描述的是集中度，不是可不可替換——抽取規則沒有把集中度列為可以填 sub 的理由。"
+    }
+  ],
+  "variants": {
+    "narrow": {
+      "replaceability": [
+        "replace", "replaced", "replaces", "replacing", "replacement", "replacements", "replaceable", "irreplaceable",
+        "substitute", "substitutes", "substituted", "substituting", "substitution", "substitutable",
+        "alternative supplier", "alternative suppliers", "alternative source", "alternative sources",
+        "alternative vendor", "alternative vendors",
+        "second source", "second sources", "second-source", "second-sourced", "second sourcing",
+        "dual source", "dual-source", "dual sourcing", "dual-sourcing",
+        "multi-source", "multi-sourced", "multi-sourcing", "multiple sources", "multiple suppliers",
+        "switch suppliers", "switching suppliers", "switching cost", "switching costs",
+        "drop-in", "interchangeable",
+        "no alternative", "no alternatives", "no substitute", "no substitutes", "no other supplier", "no other suppliers",
+        "替代", "取代", "替換", "可替換", "第二供應", "第二來源", "雙供應", "雙來源", "多供應", "轉換成本", "換供應商"
+      ],
+      "qualification": [
+        "qualify", "qualifies", "qualified", "qualifying", "qualification", "qualifications",
+        "requalify", "requalified", "requalification", "re-qualify", "re-qualification",
+        "design-in", "designed in", "designed-in", "design win", "design wins", "design-win", "design-wins",
+        "certified", "certification", "approved vendor", "approved supplier", "approved vendor list",
+        "認證", "驗證", "導入"
+      ],
+      "exclusivity": [
+        "sole source", "sole-source", "sole-sourced", "sole sourced", "sole supplier", "sole provider",
+        "single source", "single-source", "single-sourced", "single supplier", "single vendor",
+        "only supplier", "only source", "only provider", "only manufacturer", "only vendor", "only company",
+        "exclusive", "exclusively", "exclusivity", "monopoly", "captive",
+        "獨家", "唯一", "獨佔", "獨占", "壟斷", "專供"
+      ]
+    },
+    "wide": {
+      "extends": "narrow",
+      "concentration": [
+        "market share", "market shares", "share of the market", "dominant", "dominates", "dominate",
+        "leading supplier", "largest supplier", "largest suppliers", "oligopoly", "concentrated", "concentration",
+        "few suppliers", "handful of suppliers", "control over", "controls",
+        "市占", "市佔", "市場占有率", "市場佔有率", "寡占", "寡佔", "龍頭", "前三大", "集中"
+      ]
+    }
+  }
+}

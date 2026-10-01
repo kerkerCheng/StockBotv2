@@ -40,6 +40,7 @@ Evidence tier determines how much a source contributes to `confidence` scoring.
 | `evidence_tier` | **這份文件多可靠？**（來源型態） | 1–4，1 最強（見上） |
 | `evidence_class` | **誰在替這條邊背書？**（來源獨立性） | `externally_corroborated` ＞ `counterparty_joint` ＞ `self_reported_costly` ＞ `needs_review` ＝ `media_relay` ＞ `self_reported` |
 | `origin_linkage` | **這份媒體文是轉述還是自己採訪？**（SourceDoc 選填） | `same_origin`／`independent`／缺＝沒宣告 |
+| `sub_language_in_quote` | **撐住這個 sub 的引文有沒有在談可替代性？**（替代品認證、排他性也算） | true／false；只印、不放閘（唯一 owner `query/sub_language.py`，字表版本跟著每個數印） |
 | `demand_proof_level` | **需求端的證據到哪一層？** | `confirmed` ＞ `guided` ＞ `inferred` ＞ `speculative` |
 | `confidence` | **這個關係存在的信心** | 0–1；只在不同 `origin_event` 之間累加 |
 | `corroborating_origins` | **還有誰獨立說過同一件事**（L8 的獨立性計數） | `origin_entity` 集合，門檻 3 |

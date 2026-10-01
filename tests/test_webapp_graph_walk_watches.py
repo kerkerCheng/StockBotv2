@@ -68,6 +68,32 @@ def test_graph_walk_artifact_copies_every_type_and_adds_no_total() -> None:
     assert payload["this_is_not"] == result["this_is_not"]
 
 
+def _layer_stats(sole=("mat:x",), named=("mat:y",)) -> dict:
+    return {"baseline": "phase4_2026_10_01", "language": "v1·narrow",
+            "supply": {"frozen_n": 3, "frozen_on_graph": 3, "frozen_gone": [], "ns": {"0": 0, "1": 1, "2": 1, "3+": 1},
+                       "sole_self_reported": len(sole), "sole_self_reported_nodes": list(sole), "new_nodes": []},
+            "enumeration": {"layers": 3, "layers_with_suppliers": 3, "at_least_3": 1,
+                            "named_by_non_supplier": len(named), "named_by_non_supplier_layers": list(named),
+                            "hits": [], "at_least_3_all_held": 1, "at_least_3_all_held_layers": ["mat:y"],
+                            "unresolved_origin_sources": 0},
+            "sub_language": {"checked": 2, "stock_n": 2, "stock_unsupported": ["r2"], "stock_gone": [],
+                             "new_n": 0, "new_supported": 0, "new_unsupported": []},
+            "ec_quote_does_not_name_supplier": [], "summary": "層：測試用的一行"}
+
+
+def test_graph_walk_artifact_carries_layer_stats_verbatim_and_its_identity_follows_the_counters() -> None:
+    """Phase 4 Step 4.4c：層計數器跟著 graph_walk artifact 走（心跳段 3 與結構表頁首讀它）；
+    計數器的主要數字進 freshness identity——①②③ 變了，artifact 就算「認知變了」。"""
+    result = fake_walk_result()
+    payload = build_graph_walk_artifact(dict(result, layer_stats=_layer_stats()))
+    assert payload["layer_stats"] == _layer_stats() and payload["schema_version"].endswith("/2")
+    same = build_graph_walk_artifact(dict(result, layer_stats=dict(_layer_stats(), summary="改字")))
+    moved = build_graph_walk_artifact(dict(result, layer_stats=_layer_stats(sole=())))
+    assert same["freshness_identity"] == payload["freshness_identity"]          # 只改字不算
+    assert moved["freshness_identity"] != payload["freshness_identity"]         # ① 少一個節點算
+    assert fake_graph_walk_payload()["layer_stats"] is None                    # 純 walk() 沒算＝None，不是空的計數
+
+
 def test_duplicate_hits_keep_their_verbatim_on_both_sides() -> None:
     """L18：重複節點候選的逐字是這一型存在的全部理由——artifact 不得把它壓成 id。"""
     hit = next(q for q in fake_graph_walk_payload()["questions"] if q["key"] == "duplicate_node")["hits"][0]

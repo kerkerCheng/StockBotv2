@@ -907,6 +907,24 @@ def _graph_walk_line(questions: Sequence[Mapping[str, Any]], absence: Absence | 
     return line + "（consumer：research-drain 第三段）"
 
 
+def _layer_stats_line(walk: Mapping[str, Any], absence: Absence | None) -> str:
+    """「層：」一行——`graph_walk` artifact 的 `layer_stats.summary` 照抄（`query.layer_stats.summary_line` 是唯一格式）。
+
+    三種缺席分開說（INV-3）：artifact 讀不到、artifact 是舊版沒有這一段（請重跑 materialize）、計數器自己算不出來
+    （artifact 裡帶理由）。心跳不查圖、不重算。
+    """
+    if absence is not None:
+        return f"層：{absence.reason}（{absence.kind}）——不是 0"
+    layer = walk.get("layer_stats")
+    if layer is None:
+        return "層：graph_walk artifact 沒有 layer_stats（這份沒算層計數器）——請重跑 materialize --graph-walk；不是 0"
+    if layer.get("summary"):
+        return str(layer["summary"])
+    from query.layer_stats import summary_line
+
+    return summary_line(layer)
+
+
 def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
                 run_record_path: Path | None = None) -> Section:
     """新 lead N、**待 triage N（必印）**、pq1 可做 N、pq2 卡在你 N、expired N。
@@ -1005,6 +1023,8 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # consumer 是 research-drain（互動），不是 `engine_b.cli drain`，所以不加進 pq1 的數；但它是研究工作，
     # 不印在這裡會讓上一行的 0 被讀成「沒事做」。原本的「＋結構讀圖待重讀 N」由第 4 型承載。
     section.lines.append(_graph_walk_line(walk_questions, walk_absence))
+    # 層計數器（Phase 4 Step 4.4c）：ROADMAP Phase 4 ①②③ 每天自己出現（L14：防呆是常駐計數器），同一份 artifact。
+    section.lines.append(_layer_stats_line(walk, walk_absence))
     # 敘事該重寫（Phase 3 Step 3.4／3.6）：敘事來源 watch 醒來／觸及／到期未判＋敘事連結的反證來源已不在盯。
     # 研究工作（consumer＝research-drain），不加進 pq1；**0 也印**——不印會讓它安靜積著（L14）。
     rewrite = next((seg for seg in observation["segments"] if seg["key"] == "narrative_rewrite"), None)

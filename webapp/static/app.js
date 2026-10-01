@@ -1439,6 +1439,13 @@ function subCell(row) {
   cell.appendChild(el('span', 'sub-score', hasSub ? `${row.substitutability}/5` : '未填'));
   cell.appendChild(document.createTextNode(' '));
   cell.appendChild(soleSourceBadge(row.sole_source));
+  // Phase 4 Step 4.4b：撐住這個值的引文沒有任何一個字在談可替代性——只標、不改值（id 在滑鼠提示裡，指得回原文）。
+  const without = row.assertions_without_sub_language || [];
+  if (without.length) {
+    const flag = el('div', 'dim', `⚠ 引文沒談可替代性 ${without.length} 筆`);
+    flag.title = without.join('\n');
+    cell.appendChild(flag);
+  }
   return cell;
 }
 
@@ -1531,6 +1538,20 @@ async function renderStructureTable() {
     `EdgeAssertion ${cov.assertions} → canonical edge ${cov.canonical_edges}（去重收斂 ${cov.duplicate_collapse} 筆）` +
     `｜substitutability 有值 ${cov.edges_with_substitutability}/${cov.canonical_edges}` +
     `｜lead time 有值 ${cov.edges_with_lead_time} 條`));
+  const subLanguage = payload.sub_language;
+  limits.appendChild(el('p', 'note', subLanguage
+    ? `sub 引文不含可替代性語言 ${subLanguage.without}/${subLanguage.checked} 筆帶 sub 的 assertion（字表 ${subLanguage.language}；只印、不放閘——量的是措辭，不是 sub 對不對）`
+    : 'sub 引文不含可替代性語言：這份結構表沒有核對（請重跑 materialize --structure-table）'));
+  // 層計數器（Phase 4 Step 4.4c）：graph_walk artifact 的 layer_stats.summary 照抄——前端不重算、不重組（L16）。
+  try {
+    const walk = await getJSON(`${API}/graph-walk`);
+    const layer = walk.layer_stats;
+    limits.appendChild(el('p', 'note', layer && layer.summary
+      ? layer.summary
+      : '層：graph_walk artifact 沒有 layer_stats（請重跑 materialize --graph-walk）——不是 0'));
+  } catch (err) {
+    limits.appendChild(el('p', 'note', '層：讀不到 graph_walk artifact（upstream_unavailable）——不是 0'));
+  }
   app.appendChild(limits);
 
   // ② 結構表：全部列、沒有名次、沒有首選。

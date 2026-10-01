@@ -48,6 +48,24 @@ def test_walk_line_says_unread_instead_of_zero_when_the_artifact_is_missing(tmp_
     assert "0／" not in walk
 
 
+def test_layer_line_copies_the_artifact_summary_and_says_why_when_absent(tmp_path: Path) -> None:
+    """Phase 4 Step 4.4c：段 3 多一行「層：」——`layer_stats.summary` 照抄（不重算）；三種缺席分開說、都不印 0。"""
+    state = tmp_path / "state"
+    result = dict(run_walk(), layer_stats={"summary": "層：①獨家且全自報 7（凍結 186 個節點）", "supply": {}})
+    StateArtifactStore(state).write(build_graph_walk_artifact(result))
+    lines = hb.build_queue(state_dir=state, now=NOW).lines
+    assert "層：①獨家且全自報 7（凍結 186 個節點）" in lines
+    walk_index = next(i for i, line in enumerate(lines) if line.startswith("走圖："))
+    assert lines[walk_index + 1].startswith("層：")                           # 緊接在走圖那一行之後
+    no_stats = _state_with_walk(tmp_path / "plain")                          # 純 walk()：沒算層計數器
+    layer = next(line for line in hb.build_queue(state_dir=no_stats, now=NOW).lines if line.startswith("層："))
+    assert "沒有 layer_stats" in layer and "不是 0" in layer
+    empty = tmp_path / "empty"
+    empty.mkdir()
+    layer = next(line for line in hb.build_queue(state_dir=empty, now=NOW).lines if line.startswith("層："))
+    assert "upstream_unavailable" in layer and "不是 0" in layer
+
+
 def test_walk_line_flags_an_artifact_whose_types_differ_from_the_vocabulary() -> None:
     questions = [q for q in build_graph_walk_artifact(run_walk())["questions"] if q["key"] != "duplicate_node"]
     assert "不一致" in hb._graph_walk_line(questions, None)

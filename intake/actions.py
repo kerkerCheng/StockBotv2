@@ -333,6 +333,53 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
             "prerequisites": prerequisites, "warnings": warnings, "results": results}
 
 
+def check_sub_language(payload: dict, *, language=None) -> dict | None:
+    """prepare 當下：本包每條帶 `substitutability` 的邊，引文含不含可替代性語言（Phase 4 Step 4.4b）。
+
+    **只警告、不拒收**（旗標只印不放閘，L14）；判定問 `query.sub_language`（唯一 owner）。結果依賴當下的字表，
+    所以與層列舉同一個規矩：只在建立紀錄時跑一次、存成收據（`sub_language_check`），舊紀錄 render 不變。
+    本包沒有任何帶 sub 的邊 → None（不加這一欄）。
+    """
+    from query.sub_language import get_language, matched_terms, quote_has_sub_language
+
+    lang = language or get_language()
+    edges: list[dict] = []
+    for document in payload.get("documents") or []:
+        extraction = document["extraction"]
+        quotes = {str(s.get("id")): str(s.get("quote") or "") for s in extraction.get("sources") or []}
+        for edge in extraction.get("edges") or []:
+            value = (edge.get("attributes") or {}).get("substitutability")
+            if value is None or isinstance(value, bool):
+                continue
+            texts = [quotes.get(str(sid), "") for sid in edge.get("source_ids") or []]
+            edges.append({"doc_id": document["doc_id"], "edge_id": edge.get("id"), "src": edge.get("src_id"),
+                          "relation": edge.get("relation"), "dst": edge.get("dst_id"), "substitutability": value,
+                          "has_language": quote_has_sub_language(texts, language=lang),
+                          "matched": sorted({t for text in texts for t in matched_terms(text, language=lang)})})
+    if not edges:
+        return None
+    warnings = [f"`{e['doc_id']}` 的 {e['src']} —{e['relation']}→ {e['dst']}（sub {e['substitutability']}）："
+                "引文不含可替代性語言——只警告、不拒收；請確認這一段真的在談可替代性／替代品認證／排他性"
+                for e in edges if not e["has_language"]]
+    return {"language": lang.label, "edges": edges, "warnings": warnings}
+
+
+def _render_sub_language(record: dict) -> list[str]:
+    """packet 與 apply 報告共用的「sub 引文核對」一節（沒有收據就整節不印——舊紀錄 render 不變）。"""
+
+    check = record.get("sub_language_check")
+    if not check:
+        return []
+    edges = check.get("edges") or []
+    lines = ["", "## sub 引文核對（只警告、不拒收）", ""]
+    if check.get("warnings"):
+        lines += [f"- ⚠ {warning}" for warning in check["warnings"]]
+    else:
+        lines.append(f"- 帶 sub 的邊 {len(edges)} 條，引文都含可替代性語言（字表 {check.get('language')}）。")
+    lines.append("- 量的是引文措辭，不是 sub 對不對；它**不授權入圖**，也不改任何值。")
+    return lines
+
+
 def _validate_report(report: object) -> dict[str, str]:
     if not isinstance(report, dict):
         raise ValueError("report must be an object")
@@ -655,6 +702,11 @@ def _validate_record(record: object) -> dict:
     check = record.get("layer_enumeration_check")
     if check is not None and (not isinstance(check, dict) or check.get("status") != "ok"):
         raise ValueError("Research Action layer enumeration check receipt is invalid")
+    sub_check = record.get("sub_language_check")
+    if sub_check is not None and (
+            not isinstance(sub_check, dict) or not isinstance(sub_check.get("language"), str)
+            or not isinstance(sub_check.get("edges"), list) or not isinstance(sub_check.get("warnings"), list)):
+        raise ValueError("Research Action sub language check receipt is invalid")
 
     manifest = record.get("document_manifest")
     if not isinstance(manifest, list) or not manifest:
@@ -905,6 +957,7 @@ def render_review_packet(record: dict, *, now: datetime | None = None) -> str | 
         for warning in document.get("validation_warnings") or []:
             lines.append(f"  - Validation warning: {warning}")
     lines.extend(_render_layer_enumerations(record))
+    lines.extend(_render_sub_language(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
     lines.extend(
@@ -985,6 +1038,8 @@ def create_action(
 
     current = now or _now()
     normalized = validate_normalized_payload(payload)
+    # sub 引文核對（Phase 4 Step 4.4b）：只警告、不拒收；依賴當下字表，所以同樣在這一刻跑一次、存成收據。
+    sub_check = check_sub_language(normalized)
     layer_check = None
     if normalized.get("layer_enumerations"):
         # 「在本包」核對在建立紀錄的這一刻跑一次、存成收據（依賴當下名冊，不得放進 `_validate_record`）。
@@ -1047,6 +1102,8 @@ def create_action(
         }
         if layer_check is not None:
             record["layer_enumeration_check"] = layer_check
+        if sub_check is not None:
+            record["sub_language_check"] = sub_check
         _write_new_json(_action_path(action_id, root), record)
     return copy.deepcopy(record)
 
@@ -1252,6 +1309,7 @@ def _full_report(record: dict) -> str:
         for warning in document.get("validation_warnings") or []:
             lines.append(f"  - Validation warning: {warning}")
     lines.extend(_render_layer_enumerations(record))
+    lines.extend(_render_sub_language(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
 

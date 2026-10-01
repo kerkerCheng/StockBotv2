@@ -433,6 +433,9 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
     from query.duplicate_nodes import scan as scan_duplicates
     from query.structure import _classify_edges
 
+    from query.layer_stats import LAYER_NODES_CYPHER, LAYER_TYPES
+    from query.sub_language import fetch_all_quotes
+
     driver = _driver()
     try:
         with driver.session() as session:
@@ -441,6 +444,9 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
             graph_nodes = [r["id"] for r in session.run(_GRAPH_NODES_CYPHER)]
             coverage_rows = scan_coverage(session)
             duplicate_rows = scan_duplicates(session)
+            # 層計數器（Phase 4 Step 4.4c）要的兩樣：每筆 assertion 的逐字、與凍結集合同口徑的層節點清單。
+            quotes = fetch_all_quotes(session)
+            layer_nodes = [r["id"] for r in session.run(LAYER_NODES_CYPHER, types=list(LAYER_TYPES))]
     finally:
         driver.close()
     edges = _classify_edges(rows)
@@ -460,9 +466,27 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
         leads = leads_mod.load().get("leads") or {}
     except Exception:  # noqa: BLE001
         leads = None
-    return walk(edges=edges, graph_nodes=graph_nodes, reading_rows=reading_rows, leads=leads,
-                registry=get_registry(), coverage_rows=coverage_rows,
-                duplicate_buckets=duplicate_buckets, duplicate_node_total=len(duplicate_rows))
+    result = walk(edges=edges, graph_nodes=graph_nodes, reading_rows=reading_rows, leads=leads,
+                  registry=get_registry(), coverage_rows=coverage_rows,
+                  duplicate_buckets=duplicate_buckets, duplicate_node_total=len(duplicate_rows))
+    result["layer_stats"] = layer_stats_or_absence(edges=edges, rows=rows, quotes=quotes, layer_nodes=layer_nodes)
+    return result
+
+
+def layer_stats_or_absence(*, edges, rows, quotes, layer_nodes) -> dict[str, Any]:
+    """層計數器（`query.layer_stats`）；基準讀不到或算不出來就回帶理由的缺席——**不是 0**（INV-3）。
+    走圖九型照走：計數器壞了不帶走走圖。"""
+    try:
+        from identity.registry import get_registry
+        from query.layer_stats import compute_layer_stats, load_baseline, summary_line
+
+        stats = compute_layer_stats(edges=edges, rows=rows, quotes_by_assertion=quotes, layer_nodes=layer_nodes,
+                                    baseline=load_baseline(), registry=get_registry())
+        stats["summary"] = summary_line(stats)
+        return stats
+    except Exception as exc:  # noqa: BLE001
+        absence = {"kind": "upstream_unavailable", "reason": f"層計數器算不出來：{type(exc).__name__}: {str(exc)[:120]}"}
+        return {"absence": absence, "summary": f"層：{absence['reason']}（{absence['kind']}）——不是 0"}
 
 
 # ---------------------------------------------------------------------------
@@ -505,6 +529,12 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     out = [f"# {result['title']}", "",
            "> **零 LLM、零分數、不排序。** 九型各自「命中／母體」；型別順序是閱讀順序，不是價值判斷。", "",
            summary_line(result), ""]
+    if "layer_stats" in result:
+        # 層計數器（Phase 4 Step 4.4c）：同一行與心跳段 3、結構表頁首共用（`query.layer_stats.summary_line`）。
+        from query.layer_stats import summary_line as layer_summary
+
+        layer = result.get("layer_stats")
+        out += [layer.get("summary") if layer and layer.get("summary") else layer_summary(layer), ""]
     for q in result["questions"]:
         judged = ("（母體 <10，只印不判）" if not q["judged"] else
                   ("　⚠ **命中率 ≥50%：恆亮，要收窄母體**" if q["always_on"] else ""))

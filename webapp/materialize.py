@@ -485,6 +485,8 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
         # INV-3：母體定義是一個 filter，所以 input／accepted／excluded／reasons 跟著 artifact 走。
         # ⚠ 沒有門檻：2026-09-23 之前這裡是 `filter`／`filtered_rows`（substitutability ≥ 4 濾掉了誰）。
         "population": dict(result.get("population") or {}),
+        # sub 引文核對的總數（Phase 4 Step 4.4b；每列另有 `assertions_without_sub_language`）。None＝沒核對。
+        "sub_language": dict(result["sub_language"]) if result.get("sub_language") else None,
         # ⚠ 診斷，不是列上的欄位：`rows` 一字未動。
         "anchor_gaps": dict(result.get("anchor_gaps") or {}),
         "notes": {
@@ -533,6 +535,7 @@ def materialize_structure_table(*, as_of: date | None = None, store: StateArtifa
 
     from identity.registry import get_registry
     from query.bottleneck import fetch_assertions, project_assertions_as_of, structure_table
+    from query.sub_language import fetch_all_quotes, get_language, sub_language_flags
 
     load_dotenv()
     password = os.environ.get("NEO4J_PASSWORD")
@@ -551,7 +554,10 @@ def materialize_structure_table(*, as_of: date | None = None, store: StateArtifa
                 projection = project_assertions_as_of(raw_rows, as_of)
                 rows = list(projection.rows)
             registry = get_registry()
-            result = structure_table(rows, registry)
+            # sub 引文核對（Phase 4 Step 4.4b）：同一個 session 另取逐字，按 assertion id 對（不塞進 fetch_assertions）。
+            language = get_language()
+            flags = sub_language_flags(rows, fetch_all_quotes(session), language=language)
+            result = structure_table(rows, registry, sub_language_flags=flags, sub_language_label=language.label)
             # 節點的人話名字（同一個 session；與 `get_narrative_context` 同一條查詢）——畫面不再只印內部代號。
             node_names = {str(r["id"]): str(r["name"]) for r in session.run(
                 "MATCH (n) WHERE n.id IN $ids AND n.name IS NOT NULL RETURN n.id AS id, n.name AS name",
@@ -862,6 +868,9 @@ def build_graph_walk_artifact(result: Mapping[str, Any], *,
         "questions": questions,
         # 圖上全部節點 id：decompose 選題的「這個錨是不是已經在圖裡」讀它（原本讀 coverage 快照）。
         "graph_nodes": list(result["graph_nodes"]),
+        # 層計數器（Phase 4 Step 4.4c；`query.layer_stats`）：ROADMAP Phase 4 ①②③ 與附屬，只印不判。
+        # 心跳段 3 與結構表頁首讀這一段（`summary` 是同一行字，不在消費端重組）。沒有＝這份 artifact 沒算。
+        "layer_stats": (dict(result["layer_stats"]) if result.get("layer_stats") is not None else None),
         "rules": dict(result["rules"]),
         "this_is_not": list(result["this_is_not"]),
         "materializer": {
@@ -871,11 +880,18 @@ def build_graph_walk_artifact(result: Mapping[str, Any], *,
         },
     }
     payload = redact_private_paths(payload)
+    layer = payload.get("layer_stats") or {}
     payload["freshness_identity"] = state_freshness_identity(
         kind="graph_walk", as_of=None,
-        # 認知狀態＝每一型命中了誰（與母體多大）。問句文字改字不算認知變了。
-        identity={q["key"]: {"hits": sorted(str(h.get("subject")) for h in q["hits"]),
-                             "scope_n": q["scope_n"]} for q in questions})
+        # 認知狀態＝每一型命中了誰（與母體多大）＋層計數器的主要數字。問句文字改字不算認知變了。
+        identity={**{q["key"]: {"hits": sorted(str(h.get("subject")) for h in q["hits"]),
+                                "scope_n": q["scope_n"]} for q in questions},
+                  "layer_stats": (None if not layer.get("supply") else {
+                      "sole_self_reported": layer["supply"]["sole_self_reported_nodes"],
+                      "named_by_non_supplier": layer["enumeration"]["named_by_non_supplier_layers"],
+                      "stock_unsupported": layer["sub_language"]["stock_unsupported"],
+                      "new_unsupported": layer["sub_language"]["new_unsupported"],
+                      "language": layer.get("language")})})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 

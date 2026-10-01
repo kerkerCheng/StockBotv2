@@ -69,7 +69,8 @@ REQUIRED_FIELDS: tuple[str, ...] = (
 STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "structure_table": "stockbot-app/structure_table/1",
     "beta": "stockbot-app/beta/1",
-    "graph_walk": "stockbot-app/graph_walk/1",
+    # /2（2026-10-01 Phase 4 Step 4.4c）：多一段 `layer_stats`（層計數器 ①②③）。
+    "graph_walk": "stockbot-app/graph_walk/2",
     "watches": "stockbot-app/watches/1",
     "positions": "stockbot-app/positions/1",
     "structure_readings": "stockbot-app/structure_readings/1",

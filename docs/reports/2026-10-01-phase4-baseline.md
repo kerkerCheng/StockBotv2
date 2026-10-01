@@ -307,3 +307,30 @@ parked lead 有 ticker 的 405 則，`missing_rungs`（以 refs 的 `source_rout
 「如果這份基準是錯的，最先壞掉的是哪一筆」——A1 的 77 個節點與 A3 的 113 筆 id 若凍結錯，4.4 的計數器會對錯的集合算、結案驗收跟著錯。去看了：凍結的 186 個節點與 §1.1 Cypher 的 186 個逐一相同；
 113 筆非 null 的 sub assertion 收斂成 **89 條邊，恰好是 `edge_conflicts` 的 auto 81＋open 8**（0 條對不上），empty 15 條是只帶 null 的邊、不在母體——兩個來源一致。
 （初稿寫成「113 筆 → 104 條」，跑這條比對時被推翻、已更正：104 含 empty。）
+
+## 21. Step 4.4 常駐計數器的基準（A1／A2／A3；2026-10-01，4.1–4.3 之後）
+
+查證：`python -m webapp materialize --graph-walk` 後讀 `graph_walk` artifact 的 `layer_stats`；同一行字在心跳段 3 與結構表頁首（`python -m crons.heartbeat`、APP `#/structure-table`）。
+
+```
+層：①獨家且全自報 75（凍結 186 個節點；集合外新節點 0）｜②非供應商來源列舉 ≥2 家 5 層（≥3 家母體 10；每家撐住 9；origin 解析不到的來源 8）｜③a sub 引文不含可替代性語言 102／113（存量）｜③b 新增帶 sub supported 0／0（Phase 內還沒有新增帶 sub 的）｜外部印證但引文不具名供應商 15｜字表 v1·narrow
+```
+
+- **①（A1）＝ 75**：凍結 186 個節點 ns 分布 0／1／2／≥3 見 artifact；§2 的 77 是 4.0 當下。離開集合的兩個節點**都是 4.3 登記發布者造成的**（4.1 為 0）：`tech:els_pluggable_module`（Lumentum 唯一供貨邊，自報·filing → 外部印證，Cignal AI）、`tech:mrm_200g`（TSMC 唯一供貨邊，待判定 → 外部印證，TrendForce）——⚠ 後者是「外部印證但引文不具名供應商」15 條之一（§14 #2）：①少 1 有一半是靠一段沒點名 TSMC 的引文。結案驗收對 75 算，並照印這一條。查證：scratchpad `p44_a1_diff.py`。
+- **②（A2）＝ 5 層**：`mat:inp_substrate`（GSR、Reuters 各列舉 AXT／JX／Sumitomo）、`tech:external_laser_source`（Sivers 年報列 O-Net、POET）、`tech:rv_reducer`（Next Financial 列 Nabtesco、雙環）、`tech:tfln_platform`（Evertiq 轉載列 HyperLight、UMC）、`tech:uhp_laser`（Cignal AI 列 Coherent、Lumentum）。plan §9 第 1 項的兩個預期（Sumitomo／JX 兩條邊升為外部印證、②這一層由 0 變 1）在 4.3 登記 GSR 與 Reuters 時就已發生——Reuters 登記為媒體也算「非供應商來源」（列舉是列舉，證據強弱由 evidence 欄另說）；4.8 第 1 項剩下的是 Reuters 那份要不要宣告 `origin_linkage=independent`，它影響的是邊的證據等級，不影響②。
+- **③a（A3）＝ 102／113**：113 筆每一筆都有逐字（0 筆缺）；寬版字表是 97／113——寬窄差 5 筆，主因不是字表寬窄。
+
+### 準確率抽樣（只印，不放閘）
+
+樣本：`edge_conflicts` sub 為 open 的 8 條邊＋auto 前 20 條邊（edge 字典序）＝ 42 筆 assertion；執行者逐筆讀引文判「這段在談可替代性／替代品認證／排他性嗎」，再對照旗標。腳本與逐筆輸出在 scratchpad（`p44_sample.py`／`.out`）。
+
+| | 人判「有談」 | 人判「沒談」 |
+|---|---|---|
+| 旗標（窄版）有 | 6 | 0 |
+| 旗標（窄版）沒有 | 6（其中 2 筆是弱例：「找到 AXT 額外的基板供應」） | 30 |
+
+- **精確率 6／6**：旗標說「有」時都對（Reuters「不會輕易換供應商、換要很長的認證週期」、GF 20-F「不易替代」「single-sourced」）。
+- **召回 6／12**（排除兩個弱例 6／10）：漏掉的寫法——`supplier validation`／`sole reducer supplier`（Next Financial）、`the only active domestic producer`（FAS）、點名替代供應商＋市占（Next Financial 的雙環）、`a limited number of suppliers`（GF 20-F）、「再找額外的基板供應」（Lumentum 法說）。
+- 寬版只多抓到 1 筆（GSR「three players control over 90%」），而那是集中度措辭，人判不算——所以 v1 用窄版。
+- 讀法：「沒有」的那一側約 6／36 其實有談，所以 102 偏高；打折後存量仍約四分之三的 sub 沒有可替代性措辭撐住——多數是法說／新聞稿的產品描述、產能、營收成長、「industry leader」「de facto standard」。
+- **不拿這批樣本改字表**（同一批資料考自己會讓準確率失真）；v2 候選記入 plan §14 #18，換一批新樣本再量。

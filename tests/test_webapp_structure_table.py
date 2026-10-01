@@ -113,6 +113,19 @@ def test_numbers_are_copied_not_recomputed() -> None:
     assert payload["coverage"] == result["coverage"]
 
 
+def test_sub_language_check_travels_with_the_artifact_and_absent_stays_none() -> None:
+    """Phase 4 Step 4.4b：每列的 `assertions_without_sub_language`（id 列表）與總數照抄；沒核對＝None（不是 0 筆缺）。"""
+    rows = [dict(r, assertion_id=f"a{i}") for i, r in enumerate(_rows())]
+    flags = {"a0": False, "a2": True, "a3": True}
+    result = structure_table(rows, _LabelRegistry(), sub_language_flags=flags, sub_language_label="v1·narrow")
+    payload = build_structure_table_artifact(result, registry=_LabelRegistry())
+    assert payload["sub_language"]["without"] == 1 and payload["sub_language"]["language"] == "v1·narrow"
+    flagged = {r["company_id"]: r["assertions_without_sub_language"] for r in payload["rows"]}
+    assert flagged["co:coherent"] == ["a0"] and flagged["co:lumentum"] == []
+    plain = fake_table_payload()
+    assert plain["sub_language"] is None and all(r["assertions_without_sub_language"] is None for r in plain["rows"])
+
+
 def test_sole_source_three_state_survives() -> None:
     """None＝圖上沒人對這條邊發言過，**不是 False**。壓成 bool 是 2026-09-05 修掉的 bug。"""
     payload = fake_table_payload()

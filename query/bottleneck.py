@@ -303,7 +303,7 @@ def shared_name_forms(registry) -> frozenset[str]:
     return frozenset(form for form, ids in owners.items() if len(ids) > 1)
 
 
-def quote_names_company(quote: str | None, company, *, registry=None) -> bool:
+def quote_names_company(quote: str | None, company, *, registry=None, shared: frozenset[str] | None = None) -> bool:
     """這段文字（引文或 origin 字串）有沒有**具名**這家公司——名字比對的唯一 owner。
 
     用在三處（同一個函式，不各寫一份——L16）：`_origin_mentions`（聯合公告偵測）、
@@ -313,11 +313,14 @@ def quote_names_company(quote: str | None, company, *, registry=None) -> bool:
     給了 `registry` 時，與另一家共用的寫法不算（`shared_name_forms`）。
     ⚠ 2026-10-01 之前 `_origin_mentions` 用 casefold 子字串＋長度 ≥4 防誤中：會讓單字公司名撞到普通名詞，
     又會讓 `AXT`／`IQE` 這種三個字母的名字永遠比不到。
+    `shared`：呼叫端預先算好的 `shared_name_forms(registry)`（大量比對時不必每次重算；給了就不看 `registry`）。
     """
     text = str(quote or "")
     if not text:
         return False
-    return _named_by(text, company, shared_name_forms(registry) if registry is not None else frozenset())
+    if shared is None:
+        shared = shared_name_forms(registry) if registry is not None else frozenset()
+    return _named_by(text, company, shared)
 
 
 def _named_by(text: str, company, shared: frozenset[str]) -> bool:
@@ -716,8 +719,12 @@ def classify_anchor_gaps(
     }
 
 
-def _table_row(edge, registry, upward) -> dict[str, Any]:
-    """一條邊的結構事實。**每一格都是圖上的值或由圖上的值走出來的路徑**，沒有任何評分。"""
+def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None = None) -> dict[str, Any]:
+    """一條邊的結構事實。**每一格都是圖上的值或由圖上的值走出來的路徑**，沒有任何評分。
+
+    `without_sub_language`：這條邊上帶 sub、但引文不含可替代性語言的 assertion id（Phase 4 Step 4.4b；
+    `query.sub_language` 是唯一 owner）。None＝這次沒有核對（呼叫端沒給旗標），**不是**「全部都有」。
+    """
     # ⚠ 從**公司**往上走，不是從瓶頸節點。這一列問的是「這家公司的產出有沒有人
     # 在花錢買」，不是「這個材料有沒有人要」。首版從 `edge.dst` 走，於是
     # co:lumentum 那列的鏈路繞經 co:coherent——對 `mat:inp_substrate` 而言正確，
@@ -751,12 +758,17 @@ def _table_row(edge, registry, upward) -> dict[str, Any]:
         "chain": chain,
         "demand_anchor": chain[0] if chain else None,
         "demand_hops": (len(chain) - 1) if chain else None,
+        # 列表不是布林（plan §5 b）：讀的人要能指回是哪幾筆 assertion 的引文沒在談可替代性。
+        "assertions_without_sub_language": without_sub_language,
     }
 
 
 def structure_table(
     rows: Iterable[Mapping[str, Any]],
     registry,
+    *,
+    sub_language_flags: Mapping[str, bool] | None = None,
+    sub_language_label: str | None = None,
 ) -> dict[str, Any]:
     """輸出「公司 × 向下邊」的結構表，附鏈路、需求錨點與證據等級。**不排序、不設門檻、不給首選。**
 
@@ -766,9 +778,20 @@ def structure_table(
 
     列的順序是 `(company_id, relation, bottleneck)` 字典序——**索引，不是名次**。消費端不得把
     第一列讀成「最值得看」；要比較請看各自的格子。
+
+    `sub_language_flags`（Phase 4 Step 4.4b）：`query.sub_language.sub_language_flags` 的輸出（assertion id →
+    引文含不含可替代性語言）。給了，每列多一格 `assertions_without_sub_language`（id 列表）、結果多一段
+    `sub_language` 總數；沒給就是 None（沒核對）。**只印、不放閘**：不改任何一格、不改收斂、不改順序。
     """
     rows = list(rows)
     canonical = collapse_assertions(rows)
+    without_by_edge: dict[tuple, list[str]] | None = None
+    if sub_language_flags is not None:
+        without_by_edge = defaultdict(list)
+        for row in rows:
+            aid = str(row.get("assertion_id") or "")
+            if aid and sub_language_flags.get(aid) is False:
+                without_by_edge[(str(row.get("src")), str(row.get("relation")), str(row.get("dst")))].append(aid)
     edges = list(canonical.values())
     for edge in edges:
         edge.evidence = classify_evidence(
@@ -790,7 +813,10 @@ def structure_table(
             excluded.append({"company_id": edge.src, "relation": edge.relation,
                              "bottleneck": edge.dst, "reasons": ["not_company_source"]})
             continue
-        table.append(_table_row(edge, registry, upward))
+        table.append(_table_row(
+            edge, registry, upward,
+            without_sub_language=(sorted(without_by_edge.get((edge.src, edge.relation, edge.dst), ()))
+                                  if without_by_edge is not None else None)))
 
     # 索引序：公司、關係、節點。**不是排序鍵**——沒有任何一格參與。
     table.sort(key=lambda r: (str(r["company_id"]), str(r["relation"]), str(r["bottleneck"])))
@@ -833,6 +859,14 @@ def structure_table(
             ),
             "duplicate_collapse": len(rows) - len(canonical),
         },
+        # sub 引文核對的總數（Phase 4 Step 4.4b）。None＝這次沒核對——與「核對了、0 筆缺」不得同形（INV-3）。
+        "sub_language": (None if sub_language_flags is None else {
+            "language": sub_language_label,
+            "checked": len(sub_language_flags),
+            "without": sum(1 for v in sub_language_flags.values() if v is False),
+            "note": "帶 sub 的 assertion 裡，引文沒有任何一個字在談可替代性／替代品認證／排他性的筆數——"
+                    "量的是引文措辭，不是 sub 對不對；只印、不放閘（query/sub_language.py）。",
+        }),
     }
 
 
@@ -845,7 +879,8 @@ def fetch_assertions(session) -> list[dict[str, Any]]:
                e.attributes AS attributes, e.confidence AS confidence,
                d.origin_entity AS origin, d.source_type AS source_type,
                d.origin_linkage AS origin_linkage,
-               e.source_doc_id AS source_doc_id, d.published_at AS published_at
+               e.source_doc_id AS source_doc_id, d.published_at AS published_at,
+               e.id AS assertion_id
         """
     ).data()
 
@@ -986,6 +1021,12 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         f"｜其中僅供應商自報 {cov['self_reported_share']:.0%}"
     )
     out.append(f"- `structural_lead_time_weeks` 有值：{cov['edges_with_lead_time']} 條")
+    sub_language = result.get("sub_language")
+    out.append(
+        "- sub 引文不含可替代性語言：未核對（沒有給旗標）" if not sub_language else
+        f"- sub 引文不含可替代性語言：{sub_language['without']}／{sub_language['checked']} 筆帶 sub 的 assertion"
+        f"（字表 {sub_language['language']}；只印、不放閘——量的是措辭，不是 sub 對不對）"
+    )
     out.append(
         "\n🔴 **已知限制，解讀前必讀：**\n"
         + "".join(f"{i}. {text}\n" for i, text in enumerate(known_limitations(cov), 1))
@@ -1002,6 +1043,8 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         ticker = r["ticker"] or "—"
         sole = "｜sole_source" if r["sole_source"] else ""
         sub = "未填" if r["substitutability"] is None else f"{r['substitutability']}/5"
+        if r.get("assertions_without_sub_language"):
+            sub += f"｜⚠引文無可替代性語言 {len(r['assertions_without_sub_language'])}"
         out.append(
             f"| {r['company_id']}（{ticker}） | {r['relation']} → `{r['bottleneck']}` "
             f"| {sub}{sole} | {EVIDENCE_LABEL[r['evidence']]} "
@@ -1022,6 +1065,12 @@ def render_markdown(result: Mapping[str, Any]) -> str:
     if any(not r["demand_anchor"] for r in result["rows"]):
         out.append("\n> " + NO_ANCHOR_READING)
     out.append("\n" + STRUCTURE_TABLE_NOTE)
+    flagged = [r for r in result["rows"] if r.get("assertions_without_sub_language")]
+    if flagged:
+        out.append("\n## sub 引文不含可替代性語言的 assertion（逐條；只印、不放閘）\n")
+        for r in flagged:
+            out.append(f"- {r['company_id']} {r['relation']} `{r['bottleneck']}`（sub {r['substitutability']}）："
+                       + "、".join(f"`{aid}`" for aid in r["assertions_without_sub_language"]))
 
     # ⚠ 條件是 `population` 不是 `without_anchor`：用後者會讓「**全部都走得到錨**」與
     # 「**這段根本沒跑**」在輸出上同形，而那正是 L13-2 說的「成功與失敗在同一個訊號上」。
@@ -1189,12 +1238,18 @@ def main() -> int:
         os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
         auth=(os.environ.get("NEO4J_USER", "neo4j"), password),
     )
+    from query.sub_language import fetch_all_quotes, get_language, sub_language_flags
+
     try:
         with driver.session() as session:
             rows = fetch_assertions(session)
+            quotes = fetch_all_quotes(session)
     finally:
         driver.close()
-    result = structure_table(rows, get_registry())
+    language = get_language()
+    result = structure_table(rows, get_registry(), sub_language_flags=sub_language_flags(rows, quotes,
+                                                                                         language=language),
+                             sub_language_label=language.label)
     if args.what_if is not None:
         from engine_b.hypotheses import load_store, overlay_assertions
 

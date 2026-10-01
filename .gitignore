@@ -37,6 +37,7 @@ config/*.json
 !config/entity_aliases.json
 !config/graph_baselines.json
 !config/publishers.json
+!config/substitutability_language.json
 
 # Claude Code 本機設定（不共用）；project skills 轉接層需納入版本控制
 .claude/*
