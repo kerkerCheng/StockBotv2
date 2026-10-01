@@ -1,17 +1,195 @@
 {
+  "claims": [
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "NVIDIA/Broadcom 官方確認 CPO 出貨時程未變(如 Spectrum-6 如期量產出貨),或 SemiAnalysis 撤回/修正報告,或取得原報告全文顯示主張與轉述不符。",
+      "id": "gsr_cpo_not_delayed_2026_06_10_cl1",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s1",
+        "gsr_cpo_not_delayed_2026_06_10_s2",
+        "gsr_cpo_not_delayed_2026_06_10_s3"
+      ],
+      "statement": "反向 thesis 存證(honest passthrough,SemiAnalysis 原報告付費未獨立取得,主張依 GSR 轉述):SemiAnalysis「Powered Down, Lights Off」(2026-06-09)主張 CPO 時程延遲——scale-out 出貨下修至 2027、scale-up 推遲到 2029,Spectrum-6 系統級測試 insertion loss >3.5dB。此為對本圖 CPO 需求 thesis 的最強公開反駁,發布當日 LITE/COHR/AAOI 等光通股大跌。",
+      "subject_id": "tech:cpo"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "Spectrum-6 CPO 官方出貨時程正式下修 2 季以上,或 Coherent/Lumentum 撤回 2027 scale-up 出貨承諾/砍產能。",
+      "id": "gsr_cpo_not_delayed_2026_06_10_cl2",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s5",
+        "gsr_cpo_not_delayed_2026_06_10_s6",
+        "gsr_cpo_not_delayed_2026_06_10_s7"
+      ],
+      "statement": "GSR 反駁 SemiAnalysis 延遲論:CPO is not being delayed——供應端產能承諾與延遲敘事矛盾(Lumentum 不會為一個「明顯低於預期」的技術 book out 整條 FA 產線),且 SemiAnalysis 的 0.95^32≈19% 系統良率算法把良率凍結在悲觀單點、忽略良率學習曲線。",
+      "subject_id": "tech:cpo"
+    },
+    {
+      "confidence": 0.5,
+      "demand_proof_level": "inferred",
+      "disproof_condition": "後續供應鏈查核或公司揭露顯示 guidance 被下修/正常化,或證實 40M→100M 數字失實。",
+      "id": "gsr_cpo_not_delayed_2026_06_10_cl3",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "statement": "Dated observation(GSR 供應鏈查核,截至 2026-06-10):NVIDIA 對 Coherent 與 Lumentum 的 high-power CW 雷射 guidance 由 1 月約 40M 顆攀升至 4-5 月約 100M 顆——需求前置訊號,亦為 Coherent/Lumentum→NVIDIA 雷射供應關係的第一個非當事方(GSR)佐證。",
+      "subject_id": "co:nvidia"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "co:nvidia",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.5,
+      "dst_id": "co:nvidia",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "src_id": "co:lumentum"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e3",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "src_id": "co:coherent"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "src_id": "co:lumentum"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "co-packaged optics"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics (CPO)",
+      "role": null,
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s2",
+        "gsr_cpo_not_delayed_2026_06_10_s7"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVIDIA Corporation",
+        "NVDA",
+        "Nvidia"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Coherent Corp",
+        "COHR"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "co:coherent",
+      "name": "Coherent",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "Lumentum Holdings",
+        "LITE"
+      ],
+      "attributes": {},
+      "confidence": 0.55,
+      "id": "co:lumentum",
+      "name": "Lumentum",
+      "role": "bottleneck_supplier",
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4",
+        "gsr_cpo_not_delayed_2026_06_10_s5"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "role": null,
+      "source_ids": [
+        "gsr_cpo_not_delayed_2026_06_10_s4"
+      ],
+      "type": "TechNode"
+    }
+  ],
   "schema_version": "0.1",
   "source_doc": {
     "doc_id": "gsr_cpo_not_delayed_2026_06_10",
-    "title": "Global Semi Research: Co-Packaged Optics Is Not Delayed. SemiAnalysis Is Just Wrong — CPO 延遲論戰(含 SemiAnalysis「Powered Down, Lights Off」主張之轉述)",
-    "url": "https://globalsemiresearch.substack.com/p/co-packaged-optics-is-not-delayed",
+    "evidence_tier": 3,
     "origin_entity": "Global Semi Research",
-    "publisher": "Global Semi Research (Substack)",
-    "published_at": "2026-06-10",
-    "retrieved_at": "2026-07-21",
-    "storage_permission": "repo_excerpt",
     "permission_basis": "公開 Substack 文章;僅保存研究所需之有限逐字引文於 library/raw 與本 extraction。SemiAnalysis 原報告(2026-06-09)為付費內容且未獨立取得,其主張以本文轉述為準(honest passthrough,不得計為第二 origin)。",
+    "published_at": "2026-06-10",
+    "publisher": "Global Semi Research (Substack)",
+    "retrieved_at": "2026-07-21",
     "source_type": "industry_report",
-    "evidence_tier": 3
+    "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "cf4b951dd479437b56dae5497e2b65381c00b7c1ed477b2900b6de6b333cf18d",
+    "title": "Global Semi Research: Co-Packaged Optics Is Not Delayed. SemiAnalysis Is Just Wrong — CPO 延遲論戰(含 SemiAnalysis「Powered Down, Lights Off」主張之轉述)",
+    "url": "https://globalsemiresearch.substack.com/p/co-packaged-optics-is-not-delayed"
   },
   "sources": [
     {
@@ -48,101 +226,6 @@
       "id": "gsr_cpo_not_delayed_2026_06_10_s7",
       "locator": "GSR 結論",
       "quote": "CPO is not being delayed."
-    }
-  ],
-  "nodes": [
-    {
-      "id": "tech:cpo",
-      "type": "TechNode",
-      "name": "Co-Packaged Optics (CPO)",
-      "abstraction_level": "module_subsystem",
-      "role": null,
-      "aliases": ["CPO", "co-packaged optics"],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s2", "gsr_cpo_not_delayed_2026_06_10_s7"]
-    },
-    {
-      "id": "co:nvidia",
-      "type": "Company",
-      "name": "NVIDIA",
-      "abstraction_level": "network_systems",
-      "role": "leader",
-      "aliases": ["NVIDIA Corporation", "NVDA", "Nvidia"],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
-    },
-    {
-      "id": "co:coherent",
-      "type": "Company",
-      "name": "Coherent",
-      "abstraction_level": "device_chip",
-      "role": "bottleneck_supplier",
-      "aliases": ["Coherent Corp", "COHR"],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
-    },
-    {
-      "id": "co:lumentum",
-      "type": "Company",
-      "name": "Lumentum",
-      "abstraction_level": "device_chip",
-      "role": "bottleneck_supplier",
-      "aliases": ["Lumentum Holdings", "LITE"],
-      "attributes": {},
-      "confidence": 0.55,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4", "gsr_cpo_not_delayed_2026_06_10_s5"]
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "src_id": "co:coherent",
-      "dst_id": "co:nvidia",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.5,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
-    },
-    {
-      "id": "e2",
-      "src_id": "co:lumentum",
-      "dst_id": "co:nvidia",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.5,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
-    }
-  ],
-  "claims": [
-    {
-      "id": "gsr_cpo_not_delayed_2026_06_10_cl1",
-      "statement": "反向 thesis 存證(honest passthrough,SemiAnalysis 原報告付費未獨立取得,主張依 GSR 轉述):SemiAnalysis「Powered Down, Lights Off」(2026-06-09)主張 CPO 時程延遲——scale-out 出貨下修至 2027、scale-up 推遲到 2029,Spectrum-6 系統級測試 insertion loss >3.5dB。此為對本圖 CPO 需求 thesis 的最強公開反駁,發布當日 LITE/COHR/AAOI 等光通股大跌。",
-      "subject_id": "tech:cpo",
-      "demand_proof_level": "speculative",
-      "disproof_condition": "NVIDIA/Broadcom 官方確認 CPO 出貨時程未變(如 Spectrum-6 如期量產出貨),或 SemiAnalysis 撤回/修正報告,或取得原報告全文顯示主張與轉述不符。",
-      "confidence": 0.5,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s1", "gsr_cpo_not_delayed_2026_06_10_s2", "gsr_cpo_not_delayed_2026_06_10_s3"]
-    },
-    {
-      "id": "gsr_cpo_not_delayed_2026_06_10_cl2",
-      "statement": "GSR 反駁 SemiAnalysis 延遲論:CPO is not being delayed——供應端產能承諾與延遲敘事矛盾(Lumentum 不會為一個「明顯低於預期」的技術 book out 整條 FA 產線),且 SemiAnalysis 的 0.95^32≈19% 系統良率算法把良率凍結在悲觀單點、忽略良率學習曲線。",
-      "subject_id": "tech:cpo",
-      "demand_proof_level": "inferred",
-      "disproof_condition": "Spectrum-6 CPO 官方出貨時程正式下修 2 季以上,或 Coherent/Lumentum 撤回 2027 scale-up 出貨承諾/砍產能。",
-      "confidence": 0.5,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s5", "gsr_cpo_not_delayed_2026_06_10_s6", "gsr_cpo_not_delayed_2026_06_10_s7"]
-    },
-    {
-      "id": "gsr_cpo_not_delayed_2026_06_10_cl3",
-      "statement": "Dated observation(GSR 供應鏈查核,截至 2026-06-10):NVIDIA 對 Coherent 與 Lumentum 的 high-power CW 雷射 guidance 由 1 月約 40M 顆攀升至 4-5 月約 100M 顆——需求前置訊號,亦為 Coherent/Lumentum→NVIDIA 雷射供應關係的第一個非當事方(GSR)佐證。",
-      "subject_id": "co:nvidia",
-      "demand_proof_level": "inferred",
-      "disproof_condition": "後續供應鏈查核或公司揭露顯示 guidance 被下修/正常化,或證實 40M→100M 數字失實。",
-      "confidence": 0.5,
-      "source_ids": ["gsr_cpo_not_delayed_2026_06_10_s4"]
     }
   ]
 }
