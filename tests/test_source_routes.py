@@ -46,6 +46,22 @@ def test_every_ticker_has_at_least_the_always_routes() -> None:
         assert {"local_library", "issuer_site", "alternate_primary"} <= keys
 
 
+def test_layer_document_route_sits_between_the_library_and_the_issuer_site() -> None:
+    """Phase 4 Step 4.5c：「列舉這一層供應商集合的一手」登記成一格，排在先 grep 自家庫之後、發行人 newsroom 之前；
+    `how` 指向 source-trace 那一節（路徑表不另寫一份做法）。⚠ 預期副作用：舊的 parked lead 的「沒走」清單會多一格。"""
+    reg = routes.load()
+    layer = next(r for r in reg.routes if r.key == "layer_document")
+    library = next(r for r in reg.routes if r.key == "local_library")
+    issuer = next(r for r in reg.routes if r.key == "issuer_site")
+    assert layer.applies_to == "always" and layer.tier_cap == 1
+    assert library.rung < layer.rung < issuer.rung
+    assert "2b. 輸入是層／節點時" in layer.how
+    section = "### 2b. 輸入是層／節點時"
+    assert section in (Path(__file__).resolve().parents[1] / "skills" / "source-trace" / "SKILL.md").read_text(
+        encoding="utf-8"), "how 指的那一節必須真的存在"
+    assert "layer_document" in {r.key for r in reg.missing_rungs(["local_library"], ticker="AXTI")}
+
+
 def test_unverified_routes_are_listed_not_hidden() -> None:
     """未驗證的路徑要列出來讓缺口**具名**——『這條路還沒建』與『這檔拿不到』是兩回事。
 

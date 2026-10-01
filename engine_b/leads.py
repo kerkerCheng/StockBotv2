@@ -950,6 +950,13 @@ _PRIORITY_FLAG_KEYS = (
     "user_requested",
 )
 
+#: PASS 的分類是誰下的（`triage.classification.classified_by`；封閉字彙——它有行為後果，同義詞也拒收，L16）。
+#: `triage_semantic_v1`＝daily 的分類層（與舊資料同一個值）；`interactive:graph_walk`＝研究 session 從走圖問句
+#: 起研究時自己鑄、自己 triage 的 lead（Phase 4 Step 4.5b）。心跳的「分類層上次成功」與佇列段把後者分開計：
+#: 互動 session 下的判斷不是分類層跑過（L12：一個欄位兩種語意）。
+SEMANTIC_CLASSIFIER = "triage_semantic_v1"
+CLASSIFIED_BY = frozenset({SEMANTIC_CLASSIFIER, "interactive:graph_walk"})
+
 
 def triage(
     store: dict[str, Any],
@@ -962,8 +969,12 @@ def triage(
     classification: Mapping[str, Any] | None = None,
     decided_at: str | None = None,
     decided_by: str | None = None,
+    classified_by: str | None = None,
 ) -> dict[str, Any]:
     """對 pending lead 下 triage 判斷，轉入 triaged_go／triaged_no_go。
+
+    classified_by（可選，Phase 4 Step 4.5b）：PASS 分類是誰下的，封閉字彙 `CLASSIFIED_BY`；
+    不給＝`triage_semantic_v1`（行為與舊版相同）。只對有 classification 的 PASS 有意義。
 
     decided_by（可選，Phase 1 Step 1.2a）：誰下的判斷——`harvest:auto_no_go_forms`（機械 FILTER）、
     `claude-p:<session_id>`（daily 的分類層，Step 1.3）。舊資料沒有這欄＝legacy，讀取端不得要求它。
@@ -986,6 +997,10 @@ def triage(
         raise ValueError("triage 必須附 reason（含 no-go 也要記原因）")
     if not go and classification is not None:
         raise ValueError("FILTER／no-go 不應寫 classification")
+    if classified_by is not None and classified_by not in CLASSIFIED_BY:
+        raise ValueError(f"classified_by 未登記：{classified_by!r}（封閉字彙：{sorted(CLASSIFIED_BY)}）")
+    if classified_by is not None and classification is None:
+        raise ValueError("classified_by 只能配 PASS 的 classification 一起寫")
     lead = _require(store, lead_id)
     target = "triaged_go" if go else "triaged_no_go"
     if target not in ALLOWED_TRANSITIONS[lead["status"]]:
@@ -1001,7 +1016,7 @@ def triage(
         from engine_b import priority
 
         classification_record = priority.validate_classification(classification)
-        classification_record["classified_by"] = "triage_semantic_v1"
+        classification_record["classified_by"] = classified_by or SEMANTIC_CLASSIFIER
         classification_record["classified_at"] = stamp
         classification_record["reason"] = str(
             classification_record.get("reason") or reason

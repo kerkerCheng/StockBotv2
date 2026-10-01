@@ -315,7 +315,8 @@ def ingest_response(
 
 # ── CLI ────────────────────────────────────────────────────────────────────────
 
-def main() -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """CLI 定義（skill 裡寫的指令行由 `tests/test_company_onboard_skill.py` 拿它解析，旗標漂移會紅）。"""
     ap = argparse.ArgumentParser(
         description="從原始文件抽出供應鏈知識圖譜的中介 JSON（session-in-the-loop，不接 API）"
     )
@@ -348,7 +349,11 @@ def main() -> int:
         "--title",
         help="Human-readable document title. Defaults to the input filename stem.",
     )
-    args = ap.parse_args()
+    return ap
+
+
+def main() -> int:
+    args = build_parser().parse_args()
 
     # ⚠ 兩段互斥且各自必要——不給任何一段時**明確報錯，不預設走某一段**。
     # 這支從前是一個命令做完全部；沉默地挑一段會讓使用者以為抽取完成了。

@@ -401,6 +401,7 @@ def _cmd_triage(args: argparse.Namespace) -> int:
             go=args.go, tier=args.tier, reason=args.reason,
             priority_flags=flags,
             classification=classification,
+            classified_by=args.classified_by,
         )
     except (leads.LeadStateError, ValueError) as exc:
         print(f"triage 失敗：{exc}", file=sys.stderr)
@@ -920,6 +921,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_tri.add_argument("--contradiction", action="store_true", help="矛盾/反證價值（priority）")
     p_tri.add_argument("--novelty", action="store_true", help="新穎性（priority）")
     p_tri.add_argument("--independent", action="store_true", help="新 origin_entity/獨立來源（priority）")
+    p_tri.add_argument(
+        "--classified-by", choices=sorted(leads.CLASSIFIED_BY), default=None,
+        help="PASS 分類是誰下的（預設 triage_semantic_v1）；研究 session 從走圖起研究時用 interactive:graph_walk——"
+             "心跳的分類層計數與佇列段會把它分開計",
+    )
     p_tri.set_defaults(func=_cmd_triage)
 
     p_apply = sub.add_parser(

@@ -71,6 +71,32 @@ SCOPE_JUDGE_MIN = 10
 ALWAYS_ON_RATE = 0.5
 #: lead 在這兩個狀態才算「正在研究的線索」（第 5 型母體；與佇列段 `triaged_go_leads` 同一組）。
 ACTIVE_LEAD_STATUSES = frozenset({"triaged_go", "researching"})
+#: 讀圖狀態裡算「現行」的（第 2 型的記憶；`alpha.structure_reading.staleness.READING_STATUSES` 的字彙）。
+#: stale_low 只有證據等級變了——結構沒變，讀過的那一份仍算數。
+CURRENT_READING_STATUSES = frozenset({"current", "stale_low"})
+
+
+def open_leads_by_subject(leads: Mapping[str, Mapping[str, Any]] | Iterable[Mapping[str, Any]]) -> dict[str, list[str]]:
+    """走圖起的研究還在進行的 lead（refs `graph_walk_subject`；Phase 4 Step 4.5a）：節點 → lead id。
+
+    「進行中」＝ triaged_go／researching，或 parked 但追源狀態不是終局（等具名揭露、等存取……）。
+    parked 而終局（not_pursued、original_obtained…）＝已經有答案，不再旁印。
+    """
+    from engine_b.lead_refs import get_trace_status_registry
+
+    registry = get_trace_status_registry()
+    out: dict[str, list[str]] = {}
+    rows = leads.values() if isinstance(leads, Mapping) else leads
+    for lead in rows:
+        refs = lead.get("refs") or {}
+        subject = str(refs.get("graph_walk_subject") or "").strip()
+        if not subject:
+            continue
+        status = str(lead.get("status") or "")
+        trace = str(refs.get("trace_status") or "").strip()
+        if status in ACTIVE_LEAD_STATUSES or (status == "parked" and not (trace and registry.is_terminal(trace))):
+            out.setdefault(subject, []).append(str(lead.get("lead_id")))
+    return {k: sorted(v) for k, v in out.items()}
 
 
 @dataclass(frozen=True)
@@ -95,7 +121,8 @@ QUESTION_TYPES: tuple[QuestionType, ...] = (
     QuestionType(
         "sole_supplier_self_reported", "獨家且自報",
         "`{node}` 繞不過、圖上只有 `{co}` 一家，證據只有它自己說",
-        "需求側至少一條 sub≥4 的節點", "供給側恰 1 家，且那條邊的證據不是外部印證／雙方聯合",
+        "需求側至少一條 sub≥4 的節點",
+        "供給側恰 1 家，且那條邊的證據不是外部印證／雙方聯合，且這個節點沒有現行層讀圖（current／stale_low）",
         "從客戶端或第三方找第二家或印證（source-trace）"),
     QuestionType(
         "supply_unfilled", "供給側未填",
@@ -157,9 +184,23 @@ def _layer_nodes(edges: Sequence[CanonicalEdge]) -> list[str]:
 
 
 def layer_questions(edges: Sequence[CanonicalEdge], *,
-                    read_nodes: Iterable[str]) -> dict[str, dict[str, Any]]:
-    """第 1–3 型：需求側繞不過的節點，供給側長什麼樣。**邊一次載入、每個節點各建一次視角。**"""
+                    read_nodes: Iterable[str],
+                    current_layer_nodes: Iterable[str] = (),
+                    stale_layer_readings: Mapping[str, str] | None = None,
+                    open_leads: Mapping[str, Sequence[str]] | None = None) -> dict[str, dict[str, Any]]:
+    """第 1–3 型：需求側繞不過的節點，供給側長什麼樣。**邊一次載入、每個節點各建一次視角。**
+
+    第 2 型（獨家且自報）的記憶與終局（Phase 4 Step 4.5a）：
+    - `current_layer_nodes`：有**現行層讀圖**（`current`／`stale_low`）的節點——已經有人讀過這一層，問句不再亮；
+      讀圖過期或圖變到要重讀（`stale`／`expired`）就亮回來（會滅、會亮，L14-4）。
+    - 每筆命中旁印 `open_lead`（refs `graph_walk_subject` 指這個節點、還在進行的 lead）與 `reading`
+      （這個節點過期／該重讀的層讀圖 id）——讓「已經有人在追」「讀過但過期了」看得見，不是重問一次。
+    母體規則（`scope_rule`）不動。
+    """
     read = set(read_nodes)
+    layer_read = set(current_layer_nodes)
+    stale_reads = dict(stale_layer_readings or {})
+    leads_by_subject = {k: sorted(v) for k, v in (open_leads or {}).items()}
     thin: list[dict[str, Any]] = []
     sole: list[dict[str, Any]] = []
     unfilled: list[dict[str, Any]] = []
@@ -178,13 +219,15 @@ def layer_questions(edges: Sequence[CanonicalEdge], *,
         if 1 <= len(suppliers) <= THIN_LAYER_MAX_SUPPLIERS and node not in read:
             thin.append({"subject": node, "suppliers": suppliers, "demand": demand,
                          "text": QUESTION_BY_KEY["thin_layer_unread"].question.format(node=node, n=len(suppliers))})
-        if len(suppliers) == 1:
+        if len(suppliers) == 1 and node not in layer_read:
             evidence = {e.evidence for e in supply}
             if not evidence & CORROBORATED_EVIDENCE:
                 co = suppliers[0]
                 labels = "／".join(sorted(EVIDENCE_LABEL.get(str(v), str(v)) for v in evidence))
                 sole.append({"subject": node, "supplier": co, "evidence": sorted(str(v) for v in evidence),
                              "evidence_label": labels, "demand": demand,
+                             "open_lead": leads_by_subject.get(node, []),
+                             "reading": stale_reads.get(node),
                              "text": QUESTION_BY_KEY["sole_supplier_self_reported"].question.format(node=node, co=co)})
         if suppliers:
             scope_with_supply += 1
@@ -361,8 +404,15 @@ def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
     graph = sorted(set(graph_nodes))
     readings = list(reading_rows) if reading_rows is not None else None
     read_nodes = {str(r["node"]) for r in readings or () if r.get("reading_id")}
+    # 第 2 型的記憶（Phase 4 Step 4.5a）：現行層讀圖＝層單位、狀態 current／stale_low；stale／expired 的讀圖 id 旁印。
+    layer_rows = [r for r in readings or () if r.get("reading_id") and r.get("unit") == "layer"]
+    current_layer_nodes = {str(r["node"]) for r in layer_rows if r.get("status") in CURRENT_READING_STATUSES}
+    stale_layer_readings = {str(r["node"]): str(r["reading_id"]) for r in layer_rows
+                            if r.get("status") not in CURRENT_READING_STATUSES}
     parts: dict[str, dict[str, Any] | None] = {}
-    parts.update(layer_questions(edges, read_nodes=read_nodes))
+    parts.update(layer_questions(edges, read_nodes=read_nodes, current_layer_nodes=current_layer_nodes,
+                                 stale_layer_readings=stale_layer_readings,
+                                 open_leads=open_leads_by_subject(leads) if leads is not None else None))
     parts["reading_stale"] = reading_stale(readings) if readings is not None else None
     parts["lead_not_in_graph"] = (lead_not_in_graph(leads, graph_nodes=graph, registry=registry)
                                   if leads is not None else None)

@@ -553,6 +553,12 @@ def test_classification_line_reports_this_run_and_the_last_success(tmp_path: Pat
     assert "（2 天前）" in hb._classification_line(leads=requeued, now=now, record_path=_record(tmp_path))
     missing = hb._classification_line(leads={}, now=now, record_path=tmp_path / "nope.json")
     assert "今天沒有 daily 執行紀錄" in missing and "沒有任何 triage 紀錄" in missing
+    # 互動 session 從走圖起研究、自己 triage 的 lead（Phase 4 Step 4.5b）——不是分類層跑過，另計
+    walked = {**leads, "L5": {"triage": {"decided_at": "2026-09-24T06:00:00+00:00",
+                                         "classification": {"classified_by": "interactive:graph_walk"}}}}
+    line = hb._classification_line(leads=walked, now=now, record_path=_record(tmp_path))
+    assert "（2 天前）" in line and "互動 triage 1 則（不算分類層）" in line
+    assert "互動 triage 0 則" in hb._classification_line(leads=leads, now=now, record_path=_record(tmp_path))
 
 
 def test_every_non_ok_step_counts_as_failed_and_capability_violations_are_printed(tmp_path: Path) -> None:

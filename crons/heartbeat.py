@@ -1016,6 +1016,10 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     pq1 = sum(counts[key] for key in pq1_keys if counts.get(key) is not None)
     unread = [key for key in pq1_keys if counts.get(key) is None]
     line = f"pq1 可做 {pq1}｜機械段待清 {observation['mechanical_total']}"
+    # 研究 lead 裡有幾則是互動 session 從走圖起的（Phase 4 Step 4.5b；0 也印）——與分類層的分開計。
+    by_classifier = observation.get("triaged_go_by_classifier") or {}
+    line += "｜其中互動起的研究 lead " + str(sum(n for who, n in by_classifier.items()
+                                                 if who.startswith("interactive:")))
     if unread:
         line += f"｜⚠ 未讀到 {len(unread)} 段：" + "、".join(unread)
     section.lines.append(line)
@@ -1241,14 +1245,21 @@ def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path
             result = (f"**本輪失敗**（提議 {status}／套用 {apply.get('status')}"
                       + (f"：{detail}" if detail else "") + "）")
     from engine_b.event_watch import _triage_written_by_requeue
+    from engine_b.leads import SEMANTIC_CLASSIFIER
+    from engine_b.queue_segments import classifier_of
 
     stamps = []
+    interactive = 0
     for lead in leads.values():
         triage = (lead or {}).get("triage") or {}
-        # 兩種寫 triage 時間、卻不是分類層跑過的寫入者（L12：一個欄位兩種語意）：
-        # harvest 的機械 FILTER（Form 4，寫入端標 `harvest:`）與**舊式**追源重排（2026-09-26 前會把 receipt
-        # 改寫成排回那天；判別沿用 event_watch 的同一個函式，不另寫一份）。新式排回不寫 triage，不必排除。
+        # 三種寫 triage 時間、卻不是分類層跑過的寫入者（L12：一個欄位兩種語意）：
+        # harvest 的機械 FILTER（Form 4，寫入端標 `harvest:`）、**舊式**追源重排（2026-09-26 前會把 receipt
+        # 改寫成排回那天；判別沿用 event_watch 的同一個函式，不另寫一份）、互動 session 自己鑄自己 triage 的
+        # lead（`classified_by` 不是分類層，Phase 4 Step 4.5b）——後者另計、不算「分類層上次成功」。
         if str(triage.get("decided_by") or "").startswith("harvest:") or _triage_written_by_requeue(lead or {}):
+            continue
+        if classifier_of(lead or {}) not in (SEMANTIC_CLASSIFIER, "unclassified"):
+            interactive += 1
             continue
         raw = str(triage.get("decided_at") or "")
         stamp = _harvest_newest_at(raw) if raw else None
@@ -1260,6 +1271,8 @@ def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path
         tail = f"｜上次成功：{last.astimezone().strftime('%Y-%m-%d %H:%M')}（{days:.0f} 天前）"
     else:
         tail = "｜上次成功：沒有任何 triage 紀錄"
+    # 互動 triage 另計（0 也印——它不印，就分不出「分類層有在出貨」與「是 session 自己在鑄」）。
+    tail += f"｜互動 triage {interactive} 則（不算分類層）"
     return f"分類層：{result}{tail}"
 
 

@@ -210,6 +210,46 @@ def test_externally_corroborated_sole_supplier_is_not_asked() -> None:
     assert _q(run_walk(edges=edges), "sole_supplier_self_reported")["hits"] == []
 
 
+def _layer_reading(node, status, rid="sr_sole"):
+    return {"node": node, "unit": "layer", "reading_id": rid, "status": status,
+            "needs_reread_by_graph": status in ("stale", "expired"), "needs_reread": False, "reason": status}
+
+
+@pytest.mark.parametrize("status, lit", [("current", False), ("stale_low", False), ("stale", True), ("expired", True)])
+def test_sole_supplier_question_goes_dark_with_a_current_layer_reading_and_lights_up_when_it_lapses(status, lit) -> None:
+    """Phase 4 Step 4.5a：第 2 型有記憶——已經有現行層讀圖（current／stale_low）就不再問；讀圖該重讀或過期就亮回來，
+    並旁印那份讀圖的 id（會滅、會亮，L14-4）。母體不動。"""
+    sole = _q(run_walk(reading_rows=[*fake_readings(), _layer_reading("mat:sole", status)]),
+              "sole_supplier_self_reported")
+    assert sole["scope_n"] == 3                                                  # 母體規則不動
+    assert [h["subject"] for h in sole["hits"]] == (["mat:sole"] if lit else [])
+    if lit:
+        assert sole["hits"][0]["reading"] == "sr_sole"
+
+
+def test_a_socket_reading_does_not_silence_the_layer_question() -> None:
+    """插槽讀圖讀的是「客戶的這一格」，不是這一層——第 2 型只認層讀圖。"""
+    socket = {**_layer_reading("mat:sole", "current"), "unit": "socket"}
+    assert [h["subject"] for h in _q(run_walk(reading_rows=[*fake_readings(), socket]),
+                                     "sole_supplier_self_reported")["hits"]] == ["mat:sole"]
+
+
+def test_sole_supplier_hit_prints_the_open_lead_that_is_already_chasing_it() -> None:
+    """走圖起的研究還在進行（triaged_go／researching／parked 非終局）就旁印 lead id；終局的不印。"""
+    leads = {
+        **fake_leads(),
+        "G1": {"lead_id": "G1", "status": "researching", "refs": {"graph_walk_subject": "mat:sole"}},
+        "G2": {"lead_id": "G2", "status": "parked",
+               "refs": {"graph_walk_subject": "mat:sole", "trace_status": "awaiting_named_disclosure"}},
+        "G3": {"lead_id": "G3", "status": "parked",
+               "refs": {"graph_walk_subject": "mat:sole", "trace_status": "not_pursued"}},
+        "G4": {"lead_id": "G4", "status": "applied", "refs": {"graph_walk_subject": "mat:sole"}},
+    }
+    hit = _q(run_walk(leads=leads), "sole_supplier_self_reported")["hits"][0]
+    assert hit["open_lead"] == ["G1", "G2"] and hit["reading"] is None
+    assert _q(run_walk(), "sole_supplier_self_reported")["hits"][0]["open_lead"] == []
+
+
 def test_reading_stale_counts_the_graph_side_only_and_scope_is_current_readings() -> None:
     """watch 那一側（客戶出新文件）是 `fired_reading_reread` 段的事；這裡再算一次就是兩個計數器。"""
     q = _q(run_walk(), "reading_stale")

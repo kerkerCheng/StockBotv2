@@ -2,6 +2,16 @@
   "_comment": "Engine B pending lead refs 的唯一鍵名字彙。現有 authority 可保留任何已登記鍵；annotate／advance 拒絕未知鍵，避免 park_reason／parked_reason 這類靜默漂移。新增用途先在此登記，不用改 Python。",
   "version": 1,
   "categories": {
+    "graph_walk": {
+      "graph_walk_subject": {
+        "value_type": "string",
+        "description": "這則 lead 是從走圖哪個節點的問句起的研究（Phase 4 Step 4.5；走圖命中旁印 open_lead 就是對這一欄）"
+      },
+      "graph_walk_as_of": {
+        "value_type": "string",
+        "description": "起研究時那份走圖 artifact 的 generated_at（INV-6：這個問句是哪天的圖問出來的）"
+      }
+    },
     "graph_admission": {
       "action_digest": {
         "value_type": "string",

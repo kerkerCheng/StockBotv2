@@ -29,6 +29,16 @@
    "why": "L11 第 4 點：一手常常已 ingest 在手邊。跳過這一格會重抓已有的東西。"
   },
   {
+   "key": "layer_document",
+   "label": "層文件（列舉這一層供應商集合的一手）",
+   "rung": 2,
+   "applies_to": "always",
+   "tier_cap": 1,
+   "verified": true,
+   "how": "skills/source-trace「2b. 輸入是層／節點時」：客戶 filing 的供應商段 → 產業報告 → 規格書／teardown → 供應商自己的文件；找到就在 RA request 帶 layer_enumerations",
+   "why": "G4：一份文件列舉一層的供應商集合（Phase 4 Step 4.5c）。實例：GSR 的 InP 基板市占報告逐字列 AXT／JX／Sumitomo、Cignal AI 列 Coherent／Lumentum（層計數器②）。輸入是層、不是一句 claim 時才用這一格；claim 照舊先走法說逐字稿。"
+  },
+  {
    "key": "sec_edgar",
    "label": "SEC EDGAR",
    "rung": 2,

@@ -946,3 +946,43 @@ def test_one_broken_parked_lead_does_not_block_the_whole_triage(monkeypatch, tmp
                                  "decision_impact": "candidate_set", "reason": "x"})
     assert store["leads"][fresh]["status"] == "triaged_go"
     assert store["leads"][broken]["status"] == "parked", "壞掉那筆不該被硬拉回來"
+
+
+_PASS = {"content_type": "structural_fact", "decision_impact": "candidate_set", "reason": "走圖問句"}
+
+
+def test_classified_by_defaults_to_the_semantic_classifier_and_records_an_interactive_source() -> None:
+    """Phase 4 Step 4.5b：PASS 分類是誰下的寫進收據；不給＝分類層（與舊行為相同）。"""
+    store = leads.empty_store()
+    default, _ = leads.register(store, source="x:test", url="https://x.io/default")
+    walked, _ = leads.register(store, source="graph_walk:sole_supplier_self_reported",
+                               url="graph-walk://sole_supplier_self_reported/mat:x")
+    leads.triage(store, default, go=True, tier=4, reason="r", classification=_PASS)
+    leads.triage(store, walked, go=True, tier=4, reason="r", classification=_PASS,
+                 classified_by="interactive:graph_walk")
+    assert store["leads"][default]["triage"]["classification"]["classified_by"] == "triage_semantic_v1"
+    assert store["leads"][walked]["triage"]["classification"]["classified_by"] == "interactive:graph_walk"
+
+
+def test_classified_by_is_a_closed_vocabulary_and_needs_a_classification() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="x:test", url="https://x.io/typo")
+    with pytest.raises(ValueError, match="未登記"):
+        leads.triage(store, lead_id, go=True, tier=4, reason="r", classification=_PASS, classified_by="interactive")
+    with pytest.raises(ValueError, match="classification"):
+        leads.triage(store, lead_id, go=False, tier=4, reason="r", classified_by="interactive:graph_walk")
+    assert store["leads"][lead_id]["status"] == "pending"
+
+
+def test_queue_segments_count_interactive_research_leads_separately() -> None:
+    """佇列段 triaged_go_leads 按分類是誰下的分開計——互動起的研究不是分類層在出貨（L12）。"""
+    from engine_b import queue_segments
+
+    store = leads.empty_store()
+    for n, who in enumerate(("triage_semantic_v1", "interactive:graph_walk", "interactive:graph_walk", None)):
+        lead_id, _ = leads.register(store, source="x:test", url=f"https://x.io/q{n}")
+        leads.triage(store, lead_id, go=True, tier=4, reason="r",
+                     classification=None if who is None else _PASS, classified_by=who)
+    observed = queue_segments.observe(leads=store["leads"])
+    assert observed["triaged_go_by_classifier"] == {
+        "interactive:graph_walk": 2, "triage_semantic_v1": 1, "unclassified": 1}

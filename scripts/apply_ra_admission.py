@@ -104,14 +104,19 @@ def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: da
     return {"action_id": action_id, "record": record, "retry": retry}
 
 
-def main(argv: list[str] | None = None) -> int:
+def build_parser() -> argparse.ArgumentParser:
+    """CLI 定義（skill 裡寫的指令行由 `tests/test_company_onboard_skill.py` 拿它解析）。"""
     parser = argparse.ArgumentParser(
         description="套用一個已在對話中明確核准的 pq2 ra_admission（四道檢查、先蓋戳記再 apply；不 publish、不結案）")
     parser.add_argument("--pq2", type=int, required=True, help="pq2 編號（型別必須是 ra_admission、尚未結案）")
     parser.add_argument("--digest", required=True, help="使用者核准的那一份的完整 action_digest")
     parser.add_argument("--pool", default=None, help="（測試用）待辦池路徑；預設 library/leads/todo_pool.json")
     parser.add_argument("--root", default=None, help="（測試用）repo 根目錄；預設本 repo")
-    args = parser.parse_args(argv)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
 
     from engine_b.todo import DEFAULT_POOL_PATH
     from intake.application import _apply_research_action_impl

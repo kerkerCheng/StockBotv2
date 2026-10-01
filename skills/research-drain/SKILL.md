@@ -166,7 +166,27 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
    - **①薄層沒人讀**（`thin_layer_unread`）：`python -m query.structure <node> --quotes` → 寫讀圖
      （`python -m alpha structure-reading <node> --add spec.json`；兩半各至少一段引用，A2）。這是
      「集中需求灌進薄層」的研究入口；「只有 1–3 家」是問句母體，**不是瓶頸性證據**（量到的是我們讀了誰的文件）。
-   - **②獨家且自報**／**③供給側未填**：source-trace 找客戶端或第三方一手（層中心選源）；補 `substitutability`
+   - **②獨家且自報**（`sole_supplier_self_reported`；2026-10-01 Phase 4 Step 4.5 起有記憶與終局）：
+     命中旁印 `open_lead`（已經有人在追的 lead）與 `reading`（過期的層讀圖）——**有 `open_lead` 就接著那一則做，
+     不重鑄**；已有現行層讀圖的節點本來就不會命中。**研究啟動的那一刻**才鑄 lead（不是每一筆命中都鑄；
+     沒有任何無人值守步驟會鑄它）：
+     ```powershell
+     & '.venv\Scripts\python.exe' -m engine_b.cli register --source graph_walk:sole_supplier_self_reported --url "graph-walk://sole_supplier_self_reported/<node>" --title "<人寫的研究問句>"
+     & '.venv\Scripts\python.exe' -m engine_b.cli annotate <lead_id> --ref graph_walk_subject=<node> --ref graph_walk_as_of=<graph_walk artifact 的 generated_at>
+     & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier 4 --reason "<為什麼現在追>" --content-type structural_fact --decision-impact structure_change --classified-by interactive:graph_walk
+     ```
+     `--url` 有真實文件就用真實 URL；用合成 URL 時 `published_at` 留空（不編日期，INV-6）。`--classified-by` 讓心跳的
+     「分類層上次成功」不把它算成分類層跑過（另印「互動 triage N 則」）。接著以 lead-intake／source-trace 追源
+     （source-trace「輸入是層／節點時」那一節）。**終局只有三種**（不加 trace_status 字彙）：
+     ① 找到第二家供應商或客戶端／第三方印證 → 研究包走 pq2 `ra_admission`，核准後經 `scripts/apply_ra_admission.py`
+     入圖（lead 終局 `applied`）；
+     ② 公開的層文件找不到、或只有付費 → `advance <lead_id> parked --ref trace_status=awaiting_named_disclosure
+     --ref "trace_trigger_entities=co:x;co:y"`（該層的客戶或供應商，分號分隔；`advance` 會自動建追源 watch，到期由
+     `watch_expired` 計數現形），
+     或 `--ref trace_status=not_pursued --ref parked_reason=…`（附理由）；
+     ③ 圖上已經多了第二家（別的研究入圖了）→ 命中自己消失；lead 若仍 open，在這一段以 `not_pursued`
+     收掉，理由寫「已由入圖消解：<那條邊>」。
+   - **③供給側未填**：source-trace 找客戶端或第三方一手（source-trace「輸入是層／節點時」那一節）；補 `substitutability`
      或第二家供應商的研究包入圖仍走 pq2 `ra_admission`。
    - **④讀圖該重讀**（`reading_stale`；原段 3.5）：重跑 `python -m query.structure <node>`（插槽加 `--unit socket`）→
      重讀五個角度 → `alpha structure-reading <node> --add`（帶 `supersedes_id`）。

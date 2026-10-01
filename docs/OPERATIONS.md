@@ -487,7 +487,7 @@ python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授�
 & '.venv\Scripts\python.exe' crons\harvest_leads.py                 # 零 token；--dry-run 只印不寫
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired [--dry-run]  # 佇列段 1：fired 的追源 watch 排回 pq1（機械、零 token；drain 之前先跑）
 & '.venv\Scripts\python.exe' -m engine_b.cli drain                  # pq1 依 priority 的下一批（首行印段 0–1 計數器）
-& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier N --reason ... --content-type <type> --decision-impact <impact> [--payment-direction <direction>]
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier N --reason ... --content-type <type> --decision-impact <impact> [--payment-direction <direction>] [--classified-by interactive:graph_walk]
 & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --no-go --tier N --reason ...
 & '.venv\Scripts\python.exe' -m engine_b.cli classification-health # active 缺分類回 exit 2
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> <status> [--ref k=v]
@@ -982,6 +982,16 @@ atomic 寫本機 `library/leads/pending_leads.json`；`classification-health` �
 不連網、不碰 `.git`，所以留在 `workspace-write` sandbox，**不新增 unattended rule**。既有
 `engine_b.cli drain` 仍只用原 fixed entry 讀 Decision／Sheet／Neo4j context；新增的
 `withheld_unclassified_lead` 是本機 validation，沒有新增 capability 或副作用。
+
+**`engine_b.cli triage --classified-by` 的 sandbox impact review 五步（2026-10-01 Phase 4 Step 4.5b）：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 與既有 `triage` 同一個寫入：atomic 寫本機 `library/leads/pending_leads.json` 的 `triage.classification.classified_by`（封閉字彙 `engine_b.leads.CLASSIFIED_BY`，argparse 與函式兩層都拒收未登記值）。不讀 credential／private authority、不連網、不碰 `.git`、不開子行程。配套的 refs 鍵 `graph_walk_subject`／`graph_walk_as_of` 走既有 `annotate`（登記在 `config/lead_ref_keys.json`）。 |
+| **2 skill／prompt／本檔** | `skills/research-drain/SKILL.md` 段 4 ②（register → annotate → triage `--classified-by interactive:graph_walk`）；本節與上面的 Leads 指令表。 |
+| **3 最窄 rule** | **互動專用，沒有新增任何 rule**：daily 走的是 `triage-apply`（分類層），不是 `triage`；`.codex/rules` 與 daily 固定步驟都不含 `--classified-by`。落在本機既有的 `Bash(python *)` 之下，補償控制＝封閉字彙＋心跳把互動 triage 另計（「分類層上次成功」不算它、另印「互動 triage N 則」，pq1 行印「其中互動起的研究 lead N」）。 |
+| **4 permission contract test** | `tests/test_engine_b_cli.py::test_graph_walk_research_mints_a_lead_and_triages_it_as_interactive`（未登記值 exit 2）、`tests/test_engine_b_leads.py` 三條（預設值、封閉字彙、佇列段分開計）、`tests/test_company_onboard_skill.py::test_research_drain_graph_walk_lines_parse_with_the_real_cli`（skill 的三行指令拿真 parser 解析）。 |
+| **5 端到端 smoke** | 夾具版由 register → annotate → triage → 讀回 refs 與 `classified_by` 跑通（同上第一條測試）；真資料不跑（鑄 lead 只在 Step 4.8 研究啟動時）。 |
 
 ### Sandbox／private authority 排錯
 

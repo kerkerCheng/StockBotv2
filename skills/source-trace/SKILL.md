@@ -114,6 +114,23 @@ description: >
 
 ASR 只用來找 timestamp；數字、技術詞與 quote 必須回聽核對。
 
+### 2b. 輸入是層／節點時（走圖問句、層讀圖、「這一層還有誰」）
+
+輸入不是一句 claim、而是一個節點（例：`tech:cw_dfb_laser`）時，要找的是**列舉這一層供應商集合**的文件——
+一份文件逐字具名多家，比多讀一份供應商自述有用（G4）。上面「先查 filing 會落空，直接去 transcript」那條
+**對 claim 仍成立**；這一節只管「輸入是層」。選源順序：
+
+1. **客戶端申報的供應商段**：客戶 10-K／20-F／年報的原物料、主要供應商、single-source 風險段；台股年報
+   「最近二年度占進貨總額 10% 以上之供應商」。客戶說誰供它＝L8 要的交易對手方。
+2. **產業報告**：自己產生市占／出貨數據的研究機構——登記在 `config/publishers.json` 的自產資料類別才算外部印證；
+   媒體轉述同一份報告是 `same_origin`。
+3. **規格書／teardown**：teardown 是第三方拆解（tier 2）；datasheet 是供應商自報（見上表）。
+4. **供應商自己的文件**（年報競爭者段、法說）：可以列舉，但不算印證（L8：供應商自稱是弱主張）。
+
+找到 → RA request 帶 `layer_enumerations`（`origin_role` 照實填；prepare 會核對引文真的具名每一家）→ pq2 `ra_admission`。
+公開一手找不到、或只有付費 → lead 停在 `awaiting_named_disclosure`（trigger entities＝這一層的客戶或供應商），
+不要用再讀一份供應商自述去補（L8）。路徑表的 `layer_document` 那一格指的就是這一節。
+
 ### 3. access boundary
 
 遇到 paywall、login、CAPTCHA、anti-bot 或其他 access control 就停止。不得偽裝 Googlebot、偽造

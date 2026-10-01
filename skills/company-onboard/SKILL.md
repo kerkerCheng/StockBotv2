@@ -11,145 +11,103 @@ description: >
 
 ## 定位一句話
 
-**找文件 → 用戶確認來源獨立性 → extract → validate → load → 驗收。**
+**先答它坐哪一層 → 找文件 → 用戶看來源組成（L8）→ extract → validate → prepare → pq2 `ra_admission` → 核准後經 apply 入口入圖 → 驗收。**
 
-研究 agent（Claude Code / Codex）是搜尋與格式化引擎；用戶是獨立性的最終判官（L8 不能自動化）。
+研究 agent（Claude Code / Codex）是搜尋與格式化引擎；用戶是獨立性的最終判官（L8 不能自動化），
+入圖是四個人工 gate 之一——**本 skill 沒有任何一步直接寫 Neo4j**。
 
 ---
 
 ## 流程總覽（5 步）
 
 ```
-Step 1 — 確認公司基本資料（ticker / 市場 / 是否上市）
-Step 2 — 自動發現文件（EDGAR + Web + 學術）
-Step 3 — 用戶確認來源清單（L8 獨立性審查）
-Step 4 — extract → validate → load（自動化）
-Step 5 — 驗收：圖中節點/邊是否存在 + L8 gate 是否通過
+Step 1 — 它坐哪一層（必答）＋名冊登記
+Step 2 — 找文件（選源順序住 source-trace，不在這裡另列）
+Step 3 — 用戶確認來源組成（自報／客戶端／第三方各幾份；L8）
+Step 4 — extract → validate → prepare（凍結成 Research Action）
+Step 5 — pq2 ra_admission → 使用者核准 → apply 入口 → 驗收
 ```
 
 ---
 
-## Step 1 — 確認公司基本資料
+## Step 1 — 它坐哪一層（必答）＋名冊
 
-**問題：**
-- 公司名稱 / 常見 ticker（如有）
-- 上市市場（美股 / 台股 / 瑞典 / 未上市）
-- 在哪個 supply chain 位置（已知的話）
+**必答：這家公司坐在圖上的哪一層？** 寫出節點 id（例：`mat:inp_substrate`、`tech:cw_dfb_laser`）。
+不知道就寫「未知」，並**先**走 `skills/system-decompose`（由上而下拆一個真實系統）或走圖
+（`python -m query.graph_walk`）找它該掛的層——沒有層的公司入圖後只會變成走圖第 6 型「供貨走不到錨」，
+不是研究進展。
 
-**更新 TICKER_MAP：**
-若是上市公司，在 `loader/load_to_neo4j.py` 的 `TICKER_MAP` 補上 ticker：
-```python
-"co:<company_slug>": "TICKER",   # 美股直接用 ticker
-"co:<company_slug>": "TICK.XX",  # 非美股加交易所後綴（如 .ST .KS .TW）
-"co:<company_slug>": None,       # 私人公司明確設 None
-```
+**名冊：** `co:*` 的唯一權威是 `config/company_identity.json`（研究 ticker、`display_name`、`name_aliases`；
+私人公司 ticker 明確為 null，不猜）。新公司先在那裡登記，`display_name` 只填 mechanical 來源
+（年報封面／交易所公告名／EDGAR 註冊名），並寫 `_display_name_source`。圖上的 ticker 由名冊派生，
+不要改任何 loader 程式碼。
 
 ---
 
-## Step 2 — 自動發現文件
+## Step 2 — 找文件
 
-依上市市場走不同搜尋路徑，目標：找 ≥ 3 個不同 `origin_entity` 的一手來源。
-
-### 美股（有 EDGAR）
-
-```bash
-# 1. SEC EDGAR 最新 10-K / 10-Q
-python fetchers/edgar.py --ticker <TICKER> --type 10-K --max-chars 60000
-python fetchers/edgar.py --ticker <TICKER> --type 10-Q --max-chars 60000
-
-# 2. 近期 8-K（重大事件）
-python fetchers/edgar.py --ticker <TICKER> --type 8-K --max-chars 30000
-```
-
-**額外搜尋（獨立來源，不是公司自己的文件）：**
-- 客戶 / 夥伴公司的法說會 → 搜 `<company_name> site:sec.gov OR earnings transcript`
-- 第三方產業報告 → 搜 `<company_name> supply chain OR sole source OR design win`
-- 學術論文 → 搜 arXiv / Semantic Scholar（若是技術公司）
-- **下游客戶 M&A** → 搜 `<company_name> customer acquisition OR "<known_customer> acquired"` — M&A 往往揭露供應鏈關係
-- **Partnership / design-win 公告** → 搜 `<company_name> partnership OR collaboration OR design win 2025 2026`
-- **第三方聚合分析**（SubStack / Seeking Alpha / SemiAnalysis）→ 搜 `<company_name> analysis OR deep dive` — 這類文章通常已彙整多個一手來源，是找命名客戶的最短路徑
-- 每搜到一個新的命名客戶 → 立刻補到「命名客戶清單」，確認是否已在圖中
-
-### 台股
-
-```bash
-# MOPS 公開資訊觀測站月營收、法說會
-# 人工下載後放 library/raw/<company>_<period>.txt
-```
-
-搜尋建議：
-- MOPS 財報、法說會逐字稿
-- 上下游上市公司交叉驗證（客戶/供應商在台股的法說會）
-
-### 瑞典（Nasdaq First North）/ 其他歐股
-
-EDGAR 無資料。路徑：
-- 公司 IR 頁面（investor relations）下載年報 / 半年報
-- 上下游美股客戶法說會（EDGAR 可搜）
-- 第三方報告（Mordor Intelligence / IDC / LightCounting 等，若可免費取得）
-
-### 私人公司
-
-- 搜尋客戶/供應商在法說會中提到此公司的 quotes
-- LinkedIn / 公司官網技術文件 / 業界媒體報導
-- 專利（USPTO / Espacenet）
+選源順序照 `skills/source-trace` 的「2b. 輸入是層／節點時」（客戶 filing 的供應商段 → 產業報告 → 規格書／teardown →
+供應商自己的文件）；各市場的一手怎麼抓、哪幾條路徑還沒試，看同一份 skill 與 `config/source_routes.json`
+（例：`python -m fetchers.edgar --ticker <T> --forms 10-K,10-Q,8-K`、`python -m fetchers.mops --co-id <代號> --kind annual_report`）。
+本 skill 不另列一份清單——清單抄兩份就會開始偏離（L16）。
 
 ---
 
-## Step 3 — 用戶確認來源清單（L8 獨立性審查）
+## Step 3 — 用戶確認來源組成（L8 獨立性審查）
 
 找到文件後，**必須呈現給用戶審查**，不自動入庫。格式：
 
 ```
-發現以下 <N> 份文件，請確認 origin_entity 多樣性：
+發現以下 <N> 份文件：
 
-1. [文件名] origin_entity=<誰發出> evidence_tier=<tier> — <一句描述>
-2. [文件名] origin_entity=<誰發出> evidence_tier=<tier> — <一句描述>
-...
+1. [文件名] origin_entity=<誰發出> evidence_tier=<tier> source_type=<型別> — <一句描述>
+2. ...
 
-L8 獨立性狀態：
-- 不同 origin_entity 數量：<N>/3（需 ≥ 3 才能生成 Lane Memo）
-- 自我報告文件（供應商自己說）：<列出>
-- 獨立來源（客戶/第三方）：<列出>
+來源組成：
+- 供應商自報（origin＝它自己）：<份數>——<列出>
+- 客戶端（客戶的 filing／法說／新聞稿）：<份數>——<列出>
+- 第三方（登記在 config/publishers.json 的自產資料發布者、或名冊裡的其他公司）：<份數>——<列出>
+- 媒體轉述（同一事件的報導）：<份數>——不算印證，要追它轉述的一手
 
-建議：<若不足，建議找哪類文件>
+這一包對 Step 1 那一層列舉了哪幾家：<node> ← <supplier, ...>（origin_role＝customer_filing／industry_report／spec_or_teardown／supplier_self）
 
 確認入庫？(Y/n) 或 說明哪份文件不應入庫
 ```
 
+**不設份數門檻**：份數是讀了多少文件，不是證據強度（AGENTS「這個指標會隨我們多讀一份文件而單調上升嗎？」）。
+要說的是**缺哪一類**（例：只有自報、沒有客戶端）。
+
 **L8 判準提醒（每次都要說）：**
-- 供應商自己的法說會 / 年報 = 自我報告（`origin_entity` = 供應商本身）
-- 客戶法說會提到此供應商 = 獨立佐證
-- 第三方產業報告 = 獨立佐證（medium tier）
-- `sole_source` 主張需客戶端或第三方確認；供應商自稱 → `verified_by_absence`（弱）
+- 供應商自己的法說會／年報／規格書 = 自報（`origin_entity` = 供應商本身）
+- 客戶法說會或 filing 提到此供應商 = 獨立佐證
+- 產業研究、拆解、標準組織、政府、學術（`config/publishers.json` 登記的自產資料類別）= 獨立佐證；媒體不是
+- `sole_source` 主張需客戶端或第三方確認；供應商自稱是弱主張
 
 ---
 
-## Step 4 — Extract → Validate → Load
+## Step 4 — Extract → Validate → Prepare
 
 用戶確認後，逐一處理每份文件：
 
 ### 4a. 確認 raw 文件在 library/raw/
 
-若文件是 txt/pdf 摘要，放 `library/raw/<doc_name>.txt`。
-若是 EDGAR 直接下載，edgar.py 已輸出到 `library/raw/`。
+若文件是 txt/pdf 摘要，放 `library/raw/<doc_name>.txt`；fetcher 已輸出到 `library/raw/` 的直接用。
 
 ### 4b. Extract（對話式，主路線）
 
-把文件內容貼給研究 agent（或請 agent 用 Read 工具讀取），說：
-> 「請依照 prompts/extract_system.md 的格式抽取這份文件，doc_id 用 `<doc_id>`，origin_entity 是 `<誰發出>`」
+研究 agent 讀 `prompts/extract_system.md` 的完整規則，產生中介 JSON 寫入 `extractions/<doc_id>.json`，
+並立刻自我檢查：具體型號／公司名是否逐字出現在 quote（L6）。`origin_entity` 寫**真正發出這份文件的人**
+（研究機構名、論文作者所屬機構、客戶公司名）——**不要寫泛稱**（例：`Third-party Research`）：泛稱無法登記成發布者，
+那些邊會一直停在「待判定」（2026-10-01 Phase 4 Step 4.3 實測：一篇論文的 31 條邊就是這樣）。
 
-研究 agent 會：
-1. 讀 `prompts/extract_system.md` 取得完整抽取規則
-2. 按格式生成中介 JSON
-3. 寫入 `extractions/<doc_id>.json`
-4. 立刻自我檢查：具體型號/公司名是否逐字出現在 quote（L6 幻覺防護）
+兩段式 CLI（同一套規則，產生提示與收回 session 產出）：
 
-**備用路線（批次 / 自動化）：**
 ```bash
-python extract.py library/raw/<doc_name>.txt --out extractions/<doc_id>.json
+python extract.py --input library/raw/<doc_name>.txt --source-type <type> --evidence-tier <1-4> --scaffold <提示輸出路徑>
+python extract.py --input library/raw/<doc_name>.txt --source-type <type> --evidence-tier <1-4> --response <session 產出的 JSON> --out extractions/<doc_id>.json
 ```
-需要 `.env` 的 `ANTHROPIC_API_KEY`。日常對話不需要這條路線。
+
+`--source-type` 的字彙只住 `schema/vocab.json`（含 `datasheet`、`teardown`）。
 
 ### 4c. Validate
 
@@ -161,35 +119,45 @@ python loader/validate.py extractions/<doc_id>.json
 - 有 WARN: origin_entity 未填 → 手動補填
 - 全 OK → 繼續
 
-### 4d. Load
+### 4d. Prepare（凍結成 Research Action，不寫圖）
+
+把 request 寫到 `library/leads/action_drafts/<slug>.json`（六個 report 欄位、documents、`focus_company_id`＝這家公司、
+`layer_enumerations`＝Step 3 那一行；格式見 `prompts/intake_protocol.md` §4.1），然後：
 
 ```bash
-python loader/load_to_neo4j.py extractions/<doc_id>.json
+python scripts/prepare_research_action.py --action-file library/leads/action_drafts/<slug>.json
 ```
+
+prepare 會核對 `layer_enumerations`（每一家都在本包、引文逐字具名它）並對帶 `substitutability` 的邊印
+「sub 引文核對」——都在 packet 裡。成功回 action ID、完整 digest 與 packet。
 
 ---
 
-## Step 5 — 驗收
+## Step 5 — pq2 → 核准 → apply 入口 → 驗收
 
 ```bash
-# 1. 確認公司節點存在 + ticker 已注入
-python query/graph_context.py --company-id co:<company_slug>
-
-# 2. 確認 L8 gate 狀態
-python -c "
-from thesis.generate_lane_memo import _check_source_diversity
-ctx, passes = _check_source_diversity('co:<company_slug>')
-print(ctx)
-"
-
-# 3. (選用) 試 dry-run Lane Memo（不呼叫 API，只確認 gate）
-python thesis/generate_lane_memo.py --company-id co:<company_slug> --dry-run 2>&1 | head -20
+python -m engine_b.todo sync          # ready 的 Research Action 進 pq2，取得 ra_admission 編號
 ```
 
-**驗收標準：**
-- [ ] `graph_context.py` 回傳非空 context（節點 + 邊 + claims）
-- [ ] `origin_entity` 多樣性：distinct count 顯示，若 < 3 說明哪類文件還缺
-- [ ] Isolated nodes 檢查：`MATCH (n:Entity) WHERE NOT (n)-[]-() AND NOT n:Claim RETURN n.id` 應為空
+把**原樣 packet** 給使用者看，然後停下來等核准（pq2 `go`）。核准後才跑固定入口：
+
+```bash
+python scripts/apply_ra_admission.py --pq2 <編號> --digest <action_digest>
+```
+
+入口過四道 fail closed 後先蓋核准戳記再 apply；它不 publish、不結案——之後照 `prompts/intake_protocol.md` §6
+publish，再 `python -m engine_b.todo complete-ra <編號> --digest <action_digest>` 結案。
+
+**驗收（入圖之後）：**
+
+```bash
+python -m query.structure <Step 1 的節點> --quotes      # 這一層的供給側多了這家、每條邊的逐字與證據等級
+python -m query.graph_walk                               # 走圖：這家沒有落進「供貨走不到錨」；層的問句有沒有變
+```
+
+- [ ] 這家出現在 Step 1 那一層的供給側，且每條邊的逐字確實具名它
+- [ ] 證據等級照實（自報／外部印證／媒體轉述…），不是為了好看去挑來源
+- [ ] 沒有孤立節點、沒有落進「供貨走不到錨」
 
 ---
 
@@ -197,12 +165,7 @@ python thesis/generate_lane_memo.py --company-id co:<company_slug> --dry-run 2>&
 
 ### 法說會逐字稿不在 EDGAR
 
-EDGAR 只有 SEC 申報文件（10-K/10-Q/8-K），法說會逐字稿通常在：
-- Seeking Alpha（付費，人工摘錄）
-- 公司 IR 頁面（部分公司公開 PDF / webcast replay）
-- Rev.com / Motley Fool / The Street（可 web search 找摘要）
-
-策略：用 WebSearch 搜 `"<company name>" earnings transcript Q<N> <year>` 找可公開取得的版本。找到段落引文即可（不需要全文）。
+見 `skills/source-trace` 的「法說會 quote 專用路由」：先查 filing 多半落空，直接去 transcript；第三方轉錄 tier 最高 2。
 
 ### 文件是 PDF
 
@@ -216,8 +179,9 @@ EDGAR 只有 SEC 申報文件（10-K/10-Q/8-K），法說會逐字稿通常在�
 |---------|------------------|
 | Coherent 法說會 | `Coherent` |
 | Lumentum 提到 Coherent 的法說會 | `Lumentum` |
-| arXiv 論文 | `Third-party Research` |
-| 券商報告（Bernstein 等）| `Third-party Research` |
+| 產業研究報告 | 研究機構名（例：`TrendForce`、`Cignal AI`） |
+| 學術論文 | 作者所屬機構或論文團隊（不要寫 `Third-party Research`） |
+| 媒體報導 | 媒體名；轉述別人新聞稿的就照實，並在 `origin_linkage` 宣告 `same_origin` |
 | 客戶公司年報提到供應商 | `<客戶公司名>` |
 
 ---
@@ -227,6 +191,7 @@ EDGAR 只有 SEC 申報文件（10-K/10-Q/8-K），法說會逐字稿通常在�
 | 情況 | 用哪個 skill |
 |------|-------------|
 | 新公司入圖、找文件、跑 pipeline | 本 skill |
+| 不知道它坐哪一層 | `skills/system-decompose` |
 | 公司已在圖、問投資問題 | `skills/investment-research` |
 | 丟進來一條推文/新聞要入庫 | `skills/lead-intake` |
 | 找既有 thesis 的反駁角度 | `skills/blind-spot-audit` |

@@ -44,6 +44,34 @@ def test_register_is_url_idempotent(tmp_path, capsys) -> None:
     assert len(leads.load(path)["leads"]) == 1
 
 
+def test_graph_walk_research_mints_a_lead_and_triages_it_as_interactive(tmp_path, capsys) -> None:
+    """Phase 4 Step 4.5b 的鑄號路（research-drain 段 4 ②）：register → annotate 走圖節點與 as_of → triage
+    `--classified-by interactive:graph_walk`。走圖命中旁印 open_lead 就是對 `graph_walk_subject` 這一欄。"""
+    path = tmp_path / "pending_leads.json"
+    url = "graph-walk://sole_supplier_self_reported/tech:semiconductor_manufacturing_equipment"
+    assert cli.main(["--leads", str(path), "register", "--source", "graph_walk:sole_supplier_self_reported",
+                     "--url", url, "--title", "GF 依賴的半導體設備，除了 AMAT 還有誰？"]) == 0
+    lead_id = leads.lead_id_for(url)
+    assert cli.main(["--leads", str(path), "annotate", lead_id,
+                     "--ref", "graph_walk_subject=tech:semiconductor_manufacturing_equipment",
+                     "--ref", "graph_walk_as_of=2026-10-01T21:00:00+00:00"]) == 0
+    assert cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "4", "--reason", "走圖第 2 型",
+                     *PASS_CLASSIFICATION_ARGS, "--classified-by", "interactive:graph_walk"]) == 0
+    lead = leads.load(path)["leads"][lead_id]
+    assert lead["published_at"] is None                                   # 合成 URL：不編日期（INV-6、L11-5）
+    assert lead["refs"]["graph_walk_subject"] == "tech:semiconductor_manufacturing_equipment"
+    assert lead["triage"]["classification"]["classified_by"] == "interactive:graph_walk"
+    capsys.readouterr()
+    # 字彙外的值在 argparse 就被擋下
+    try:
+        cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "4", "--reason", "x",
+                  *PASS_CLASSIFICATION_ARGS, "--classified-by", "interactive"])
+    except SystemExit as exc:
+        assert exc.code == 2
+    else:
+        raise AssertionError("未登記的 --classified-by 必須被拒絕")
+
+
 def test_triage_then_advance_round_trip(tmp_path, capsys) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)

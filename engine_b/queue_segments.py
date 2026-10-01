@@ -200,6 +200,12 @@ validate_registry()
 # 逐筆分類（純函式）
 # ---------------------------------------------------------------------------
 
+def classifier_of(lead: Mapping[str, Any]) -> str:
+    """這則 lead 的 PASS 分類是誰下的（`triage.classification.classified_by`）；沒有分類記 `unclassified`。"""
+    classification = ((lead.get("triage") or {}).get("classification")) or {}
+    return str(classification.get("classified_by") or "").strip() or "unclassified"
+
+
 def classify_lead(lead: Mapping[str, Any]) -> str | None:
     """回傳段 key；不是工作回 `None`；狀態不認得回 `"unmapped:lead:<status>"`。"""
     status = str(lead.get("status") or "")
@@ -316,6 +322,7 @@ def observe(
     unmapped: list[str] = []
 
     lead_rows = leads.values() if isinstance(leads, Mapping) else leads
+    by_classifier: dict[str, int] = {}
     for lead in lead_rows:
         key = classify_lead(lead)
         if key is None:
@@ -326,6 +333,9 @@ def observe(
         counts[key] = (counts[key] or 0) + 1
         if len(examples[key]) < 3:
             examples[key].append(str(lead.get("lead_id", "?")))
+        if key == "triaged_go_leads":
+            who = classifier_of(lead)
+            by_classifier[who] = by_classifier.get(who, 0) + 1
 
     for watch in watches:
         key = classify_watch(watch)
@@ -394,6 +404,9 @@ def observe(
             for seg in SEGMENTS
         ],
         "unmapped": unmapped,
+        # triaged_go_leads 按「PASS 分類是誰下的」分開計（Phase 4 Step 4.5b）：分類層的與互動 session 從走圖起的
+        # 不是同一件事——混在一個數裡，讀的人分不出分類層有沒有在出貨（L12）。沒有分類的舊 lead 記 `unclassified`。
+        "triaged_go_by_classifier": dict(sorted(by_classifier.items())),
         "mechanical_total": sum(
             (counts[s.key] or 0) for s in SEGMENTS if s.cost == "mechanical"
         ),
@@ -424,6 +437,6 @@ def render(observation: Mapping[str, Any]) -> str:
 
 __all__ = [
     "DISPATCH_STATUSES", "LEAD_STATUSES", "NOT_WORK", "SEGMENTS", "SEGMENT_BY_KEY",
-    "Segment", "WATCH_STATUSES", "QueueSegmentError", "classify_lead", "classify_todo",
+    "Segment", "WATCH_STATUSES", "QueueSegmentError", "classifier_of", "classify_lead", "classify_todo",
     "classify_watch", "observe", "render", "validate_registry",
 ]
