@@ -350,10 +350,12 @@ def _cover_shares_series(connection, ticker: str, *, today) -> list | None:
 #: 稀釋燈的發行金額取數用到的兩個 metric（Phase 4 Step 4.6；`engine_c.history_backfill.LATE_METRICS`）。
 _EQUITY_QUARTER = "equity_issued_value_quarter"
 _EQUITY_ANNUAL = "equity_issued_value_annual"
-#: 窗尾（anchor）＝最新已申報季度的期末，只從**期末精確**的指標取：季度流量與資產負債表時點值。
+#: 窗尾（anchor）＝最新已申報季度的期末，只從**期末精確**的指標取：先取季度流量；這家一筆季度流量都沒有才退到
+#: 資產負債表時點值（R2-c 覆核 #5：期末之後的時點值——例如期後事項——會把窗整個往後推，讓最早那一季掉出窗外）。
 #: ⚠ 封面股數的日期不是期末（比期末晚 20–75 天，2026-10-01 正式庫 35 檔裡只有 AMAT 恰好等於期末）——拿它當窗尾，
 #: 年度那一列永遠對不上窗尾、四季窗也會整個往後推。
-_ANCHOR_METRICS = ("revenue_quarter", "operating_income_quarter", "cash", "total_debt", _EQUITY_QUARTER)
+_ANCHOR_FLOW_METRICS = ("revenue_quarter", "operating_income_quarter", _EQUITY_QUARTER)
+_ANCHOR_INSTANT_METRICS = ("cash", "total_debt")
 #: 「最近四季」＝期末距窗尾**不到 320 天**的季度（含窗尾那一季）。相鄰季度期末相距 80–100 天（13／14 週季度；
 #: 與 `alpha/three_questions._QUARTER_GAP` 同一個判準），所以三季前最遠 300 天、四季前最近 320 天——日曆季與
 #: 52／53 週制都剛好四季。⚠ 不用 365 天：52 週制四季前那一季的期末離窗尾只有 364 天，會多加一季
@@ -369,8 +371,10 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
       是我們這邊還沒準備好，**不得**說成「這家沒申報」（L12）。
     - 5 年回填窗內這家一筆都沒有 → `provider_missing`（從來沒用這個 tag，或最後一次在窗外——兩者都說不出「沒增發」）。
     - 否則 `ok`：最近四季＝期末落在（窗尾 − 320 天, 窗尾］的季度（`_FOUR_QUARTERS_DAYS`），窗尾＝今天已申報的
-      最新季度期末（`_ANCHOR_METRICS`）；每季取 as-of 今天已知的最新一列（含 FY−9M 衍生的第四季），年度期末正好
-      是窗尾就直接用年度那一列。**缺的季度不補 0**——列出找到幾季。
+      最新季度期末（`_ANCHOR_FLOW_METRICS`，沒有才退到時點值）；每季取 as-of 今天已知的最新一列（含衍生的第四季），
+      年度期末正好是窗尾就直接用年度那一列。**缺的季度不補 0**——列出找到幾季。
+    - `issued_total`＝窗內**正值**的加總（判色看它）；`trailing_total`＝淨加總，只印（R2-c 覆核 #1：負值多半是更正，
+      或年報與季報 tag 前後不一衍生出的負第四季——不得拿來抵銷真實發行）。前後不一另列 `inconsistent`。
     """
     import sqlite3 as _sqlite3
     from datetime import timedelta
@@ -393,10 +397,14 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
             "SELECT metric, period_start, period_end, filed, accession, value, currency, tag, derived "
             "FROM fundamental_history WHERE ticker = ? AND metric IN (?, ?)",
             (ticker, _EQUITY_QUARTER, _EQUITY_ANNUAL)).fetchall()
-        anchor_row = connection.execute(
-            "SELECT MAX(period_end) FROM fundamental_history WHERE ticker = ? AND filed <= ? "
-            f"AND metric IN ({', '.join('?' for _ in _ANCHOR_METRICS)})",
-            (ticker, today.isoformat(), *_ANCHOR_METRICS)).fetchone()
+        anchor_row = None
+        for group in (_ANCHOR_FLOW_METRICS, _ANCHOR_INSTANT_METRICS):
+            anchor_row = connection.execute(
+                "SELECT MAX(period_end) FROM fundamental_history WHERE ticker = ? AND filed <= ? "
+                f"AND metric IN ({', '.join('?' for _ in group)})",
+                (ticker, today.isoformat(), *group)).fetchone()
+            if anchor_row and anchor_row[0]:
+                break
         backfilled = rows or connection.execute(
             "SELECT 1 FROM fundamental_history WHERE metric IN (?, ?) LIMIT 1",
             (_EQUITY_QUARTER, _EQUITY_ANNUAL)).fetchone()
@@ -407,11 +415,14 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
                 "reason": "新股發行金額還沒回填（整張表一列都沒有）——遷移後要跑一次非增量 EDGAR 回填"
                           "（python -m engine_c.history_backfill --no-prices）"}
     if not rows:
+        # 措辭只說到資料支持的那一格（R2-c 覆核 #2、L11-5）：期間不是季／半年／9 個月／年的 fact（成立未滿一季、
+        # 會計年度變更）回填不存、只在回填報告計數——「沒有可存的」不等於「沒有任何」。
         return {"status": "provider_missing", "filer_class": klass, "filer_basis": basis,
-                "reason": "5 年回填窗內 companyfacts 沒有 StockIssuedDuringPeriodValueNewIssues 的任何 10-K／10-Q fact"}
+                "reason": "5 年回填窗內 companyfacts 沒有可存成季度或年度的 StockIssuedDuringPeriodValueNewIssues"
+                          "（10-K／10-Q）——期間長度不是季／半年／9 個月／年的 fact 不存，回填報告另計"}
     if not anchor_row or not anchor_row[0]:
         return {"status": "upstream_unavailable",
-                "reason": "找不到最新已申報季度的期末（季度營收／營業利益、現金、債務、發行金額都沒有）"}
+                "reason": "找不到最新已申報季度的期末（季度營收／營業利益／發行金額、現金、債務都沒有）"}
     anchor = type(today).fromisoformat(str(anchor_row[0])[:10])
     window_after = anchor - timedelta(days=_FOUR_QUARTERS_DAYS)
     by_metric: dict[str, list[dict]] = {_EQUITY_QUARTER: [], _EQUITY_ANNUAL: []}
@@ -429,6 +440,12 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
         facts, basis_kind = [in_window[end] for end in sorted(in_window)], "quarters"
     currencies = sorted({str(f.get("currency")) for f in facts})
     total = sum(float(f["value"]) for f in facts) if facts else 0.0
+    issued = sum(float(f["value"]) for f in facts if float(f["value"]) > 0)
+    # 年報與季報 tag 前後不一（R2-c 覆核 #1；CRWV FY2025 年度 6800 萬 < Q1'25 13.9 億）：衍生出負的第四季、或年度小於
+    # 該年度已知季度的加總——印出來，不拿來相減（相減會抵掉同窗的真實發行）。
+    inconsistent = [{"kind": "negative_derived_quarter", "period_end": str(f["period_end"])[:10],
+                     "value": float(f["value"]), "derived": f.get("derived")}
+                    for f in facts if f.get("derived") and float(f["value"]) < 0]
     # 期末落在窗內的年度，若季度列加起來不到年度（缺季、前後兩年 tag 不一）：差額歸不到季——印出來，不補 0、
     # 不硬塞進某一季（L12）。窗尾那個年度已直接用年度列的不算。2026-10-01 實測 AXTI FY2025 9355 萬三份 10-Q 都沒有。
     unattributed = []
@@ -439,43 +456,52 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
             fy_start = type(today).fromisoformat(str(fy_row.get("period_start"))[:10])
         except ValueError:
             continue
-        known = sum(float(q["value"]) for end, q in quarters.items() if fy_start < end <= fy_end)
+        # 負的衍生季已知是 tag 前後不一的產物（列在 inconsistent）——不算進「已知」，否則差額會被它灌大
+        known = sum(float(q["value"]) for end, q in quarters.items()
+                    if fy_start < end <= fy_end and not (q.get("derived") and float(q["value"]) < 0))
         remainder = float(fy_row["value"]) - known
+        entry = {"fiscal_year_end": str(fy_end), "annual": float(fy_row["value"]), "known_quarters": known,
+                 "remainder": remainder, "accession": fy_row.get("accession")}
         if remainder > 0.5:                                    # 金額以元計；只防浮點誤差
-            unattributed.append({"fiscal_year_end": str(fy_end), "annual": float(fy_row["value"]),
-                                 "known_quarters": known, "remainder": remainder,
-                                 "accession": fy_row.get("accession")})
+            unattributed.append(entry)
+        elif remainder < -0.5:
+            inconsistent.append({"kind": "annual_below_quarters", **entry})
     return {
         "status": "ok", "filer_class": klass, "filer_basis": basis,
         "window_after": window_after, "window_end": anchor, "basis": basis_kind,
-        "quarters_found": len(in_window), "trailing_total": total, "currencies": currencies,
+        # 年度＝窗尾時加總用的是年度列，窗內季度數不參與——不印，免得讀成「用了這幾季」（R2-c 覆核 #6d）
+        "quarters_found": len(in_window) if basis_kind == "quarters" else None,
+        "trailing_total": total, "issued_total": issued, "currencies": currencies,
         "facts": [{**f, "period_end": str(f["period_end"])[:10], "filed": str(f["filed"])[:10]} for f in facts],
         "tags": sorted({str(f.get("tag")) for f in facts}), "unattributed": unattributed,
+        "inconsistent": inconsistent,
     }
 
 
 def _equity_authorizations(connection, ticker: str) -> list | None:
-    """人工欄位 `equity_issuance_authorizations`（ATM／shelf 授權，judgment、經 pq2 寫入）的生效紀錄——當脈絡印，不上色。"""
+    """人工欄位 `equity_issuance_authorizations`（ATM／shelf 授權，judgment、經 pq2 寫入）的生效紀錄——當脈絡印，不上色。
+
+    每個 as_of 各取生效的那幾筆、新的在前（R2-c 覆核 #6d：只取最新那一天會藏掉不同日登記、同時有效的授權；
+    授權到期與否由讀的人看 as_of 與原文判斷，這裡不猜）。"""
     import json as _json
     import sqlite3 as _sqlite3
 
     from engine_c.manual_observations import live_observation_ids
 
     try:
-        row = connection.execute(
-            "SELECT MAX(as_of) FROM manual_observations WHERE ticker = ? AND field_name = 'equity_issuance_authorizations'",
-            (ticker,)).fetchone()
-        if not row or not row[0]:
-            return None
+        days = [str(r[0]) for r in connection.execute(
+            "SELECT DISTINCT substr(as_of, 1, 10) FROM manual_observations "
+            "WHERE ticker = ? AND field_name = 'equity_issuance_authorizations' ORDER BY 1 DESC", (ticker,))]
         out = []
-        for oid in live_observation_ids(connection, ticker, "equity_issuance_authorizations", str(row[0])):
-            rec = connection.execute(
-                "SELECT value, source_ref FROM manual_observations WHERE observation_id = ?", (oid,)).fetchone()
-            try:
-                value = _json.loads(rec[0])
-            except (TypeError, ValueError):
-                value = rec[0]
-            out.append({"value": value, "source": rec[1], "as_of": str(row[0]), "observation_id": oid})
+        for day in days:
+            for oid in live_observation_ids(connection, ticker, "equity_issuance_authorizations", day):
+                rec = connection.execute(
+                    "SELECT value, source_ref FROM manual_observations WHERE observation_id = ?", (oid,)).fetchone()
+                try:
+                    value = _json.loads(rec[0])
+                except (TypeError, ValueError):
+                    value = rec[0]
+                out.append({"value": value, "source": rec[1], "as_of": day, "observation_id": oid})
         return out or None
     except _sqlite3.OperationalError:
         return None

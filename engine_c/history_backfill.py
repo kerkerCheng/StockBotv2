@@ -90,6 +90,8 @@ FOREIGN_ANNUAL_FORMS: tuple[str, ...] = ("20-F", "40-F")
 #: 期間長度（天）。13 週季度約 91 天、14 週季度 98 天都落在季度窗內；52／53 週制年度落在年度窗內。
 _QUARTER_DAYS = (75, 105)
 _NINE_MONTH_DAYS = (250, 290)
+#: 半年累計（Q2 10-Q 的 YTD）：預期內、刻意不存（單季已有）——不算「期間不規則」。
+_SIX_MONTH_DAYS = (160, 200)
 _ANNUAL_DAYS = (300, 400)
 
 #: 存量（instant）指標的白名單：**每個 namespace 只放一個 tag**——現金與債務各家的拆法不同，
@@ -359,10 +361,20 @@ def build_fundamental_rows(facts: Mapping[str, Any], *, ticker: str, filer: str,
         candidates = [f for namespace, tags in _flow_tags(concept) for tag in tags
                       for f in _facts(facts, namespace, tag, forms=forms)]
         by_span: dict[str, list[_Fact]] = {}
+        irregular: set[tuple] = set()
         for fact in candidates:
             span = _span_class(fact)
             if span in ("quarter", "nine_month", "annual"):
                 by_span.setdefault(span, []).append(fact)
+            elif span is None and fact.end >= horizon \
+                    and not _SIX_MONTH_DAYS[0] <= (fact.end - fact.start).days <= _SIX_MONTH_DAYS[1]:
+                irregular.add((fact.start, fact.end, fact.accession, fact.value))
+        # 期間長度不是季／半年／9 個月／年的 fact（成立未滿一季、會計年度變更）：不存，但**計數進報告**——
+        # 不得靜默丟（R2-c 覆核 #2、INV-3：CCXI 的兩筆發行金額 fact 原本無聲消失，讀取端還說「沒有任何 fact」）
+        for start, end, accession, value in sorted(irregular):
+            rejected.append({"metric": concept, "kind": "irregular_period",
+                             "key": [start.isoformat(), end.isoformat(), accession],
+                             "reason": f"期間 {(end - start).days} 天不是季／半年／9 個月／年——不存（值 {value:,.0f}）"})
         key = lambda f: (f.start, f.end, f.accession)  # noqa: E731
         reason = "白名單 tag 對同一期間給出不同的數"
         annual = _resolve_groups(by_span.get("annual", ()), key, label=f"{concept}_annual",
@@ -710,7 +722,10 @@ def summarize(report: Mapping[str, Any]) -> dict[str, Any]:
         "prices": dict(Counter((e.get("prices") or {}).get("outcome", "skipped") for e in tickers.values())),
         "edgar": dict(Counter((e.get("edgar") or {}).get("outcome", "skipped") for e in tickers.values())),
         "filer_class": dict(Counter((e.get("edgar") or {}).get("filer_class", "—") for e in tickers.values())),
-        "rejected_groups": sum(len((e.get("edgar") or {}).get("rejected") or ()) for e in tickers.values()),
+        "rejected_groups": sum(1 for e in tickers.values() for r in (e.get("edgar") or {}).get("rejected") or ()
+                               if r.get("kind") != "irregular_period"),
+        "irregular_period_facts": sum(1 for e in tickers.values() for r in (e.get("edgar") or {}).get("rejected") or ()
+                                      if r.get("kind") == "irregular_period"),
         # CHECK 未遷移時略過的新指標列數（Step 4.6）：daily 印出的 summary 就看得到，不只藏在逐檔報告裡（INV-3）
         "late_metrics_skipped": sum(((e.get("edgar") or {}).get("late_metrics_skipped") or {}).get("rows", 0)
                                     for e in tickers.values()),

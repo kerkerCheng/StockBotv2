@@ -118,14 +118,16 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
 _DILUTION_RULE = (
     "**10-K／10-Q 國內申報人**：最近四季（期末落在最新已申報季度期末往回 320 天內的季度——相鄰季度期末相距 80–100 天，"
     "日曆季與 52／53 週制都剛好四季；年度期末正好是窗尾就用年度那一列）的新股發行金額"
-    "（us-gaap:StockIssuedDuringPeriodValueNewIssues，SEC companyfacts）加總 > 0 → 黃；已知的季度為 0、但期末落在窗內的年度"
-    "有歸不到季的發行（年報有、季報加起來不到）→ 灰（insufficient_evidence）；窗內沒有發行紀錄、同口徑股數也沒增加、"
-    f"股數觀測窗滿 {FULL_YEAR_DAYS} 天 → 綠；股數增加了卻沒有發行紀錄 → 灰（insufficient_evidence：分不出員工股酬與沒標 tag 的增發）；"
-    "股數窗不滿一年且沒有發行紀錄 → 灰（附到期日）。5 年回填窗內沒有這個 tag → 灰（provider_missing）；"
-    "其他申報人 → 灰（method_not_applicable）。金額、占正規化市值 %、tag、歸不到季的年度差額、同期股數變化與 ATM／shelf 授權"
-    "只印在稽核層、不參與判色；金額只計這一個 tag（公司另用自訂 tag 標的發行不在內）＝已知至少。"
-    "可轉換特別股的發行照算黃（tag 印出來，使用者可改判）；員工股票計畫若標在同一個 tag 也算黃（占市值 % 印出來）。"
-    "⚠ 刻意不用量級門檻把黃再切成紅或綠（INV-5：沒有非憑空的門檻）"
+    "（us-gaap:StockIssuedDuringPeriodValueNewIssues，SEC companyfacts）**任何一筆 > 0** → 黃（淨加總只印：負值多半是更正，"
+    "或年報與季報 tag 前後不一衍生出的負第四季——不拿來抵銷真實發行）；窗內沒有正值、但期末落在窗內的年度有歸不到季的發行"
+    "（年報有、季報加起來不到），或 tag 前後不一（負的衍生季、年度小於季度加總）→ 灰（insufficient_evidence）；"
+    f"窗內沒有發行紀錄、同口徑股數也沒增加、股數觀測窗滿 {FULL_YEAR_DAYS} 天 → 綠；"
+    "股數增加了卻沒有發行紀錄 → 灰（insufficient_evidence：分不出員工股酬與沒標 tag 的增發）；"
+    "股數窗不滿一年且沒有發行紀錄 → 灰（附到期日）。5 年回填窗內沒有可存的這個 tag → 灰（provider_missing）；"
+    "其他申報人 → 灰（method_not_applicable）。金額、占正規化市值 %、tag、歸不到季的年度差額、前後不一、同期股數變化與"
+    " ATM／shelf 授權只印在稽核層、不參與判色；金額只計這一個 tag（公司另用自訂 tag 標的發行不在內）＝已知至少。"
+    "可轉換特別股的發行照算黃——companyfacts 分不出普通股或特別股，稽核層的 accession 指得回申報原文，讀原文可改判；"
+    "員工股票計畫若標在同一個 tag 也算黃（占市值 % 印出來）。⚠ 刻意不用量級門檻把黃再切成紅或綠（INV-5：沒有非憑空的門檻）"
 )
 
 
@@ -188,19 +190,25 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
         return _flag(None, "沒有讀到新股發行金額（上游缺席）", rule=_DILUTION_RULE, inputs=inputs,
                      absence_kind="upstream_unavailable")
     total = float(issuance.get("trailing_total") or 0.0)
+    # 判色看窗內正值的加總（R2-c 覆核 #1：淨加總會被負值——更正或 tag 前後不一的負第四季——抵掉真實發行）
+    issued = float(issuance["issued_total"]) if issuance.get("issued_total") is not None else max(total, 0.0)
+    unattributed, inconsistent = list(issuance.get("unattributed") or ()), list(issuance.get("inconsistent") or ())
     currencies = list(issuance.get("currencies") or ())
     cap = issuance.get("market_cap_usd")
     inputs.update(window_after=issuance.get("window_after"), window_end=issuance.get("window_end"),
                   issuance_basis=issuance.get("basis"), quarters_found=issuance.get("quarters_found"),
-                  trailing_issued=total, issued_currencies=currencies, tags=issuance.get("tags"),
-                  facts=issuance.get("facts"), unattributed=issuance.get("unattributed") or [],
+                  trailing_issued=total, issued_total=issued, issued_currencies=currencies, tags=issuance.get("tags"),
+                  facts=issuance.get("facts"), unattributed=unattributed, inconsistent=inconsistent,
                   market_cap_usd=cap, market_cap_absence=issuance.get("market_cap_absence"),
-                  pct_of_market_cap=(total / cap if currencies == ["USD"] and isinstance(cap, (int, float)) and cap > 0
+                  pct_of_market_cap=(issued / cap if currencies == ["USD"] and isinstance(cap, (int, float)) and cap > 0
                                      else None))
-    if total > 0:
+    if issued > 0:
         return _flag("amber", "一個完整會計年度內有新股發行紀錄", rule=_DILUTION_RULE, inputs=inputs)
-    if issuance.get("unattributed"):
-        return _flag(None, "年報有新股發行、季報加起來不到——歸不到季，說不出最近四季有沒有增發",
+    if unattributed or inconsistent:
+        why = "；".join(x for x in ("年報有新股發行、季報加起來不到——歸不到季" if unattributed else "",
+                                   "年報與季報的 tag 前後不一（負的衍生季或年度小於季度加總）" if inconsistent else "")
+                       if x)
+        return _flag(None, f"{why}——說不出最近四季有沒有增發",
                      rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if not shares.get("eligible"):
         inputs["colour_available_on"] = shares.get("colour_available_on")

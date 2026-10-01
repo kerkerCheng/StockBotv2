@@ -48,7 +48,8 @@ def _issuance(total: float = 0.0, *, status: str = "ok", cap: float | None = 1_0
         return {"status": status, "filer_class": extra.get("filer_class"), "reason": extra.get("reason")}
     return {"status": "ok", "filer_class": "domestic_quarterly", "window_after": date(2025, 8, 14),
             "window_end": date(2026, 6, 30), "basis": "quarters", "quarters_found": 4, "trailing_total": total,
-            "currencies": list(currencies), "facts": [], "tags": ["us-gaap:StockIssuedDuringPeriodValueNewIssues"],
+            "issued_total": max(total, 0.0), "currencies": list(currencies), "facts": [],
+            "tags": ["us-gaap:StockIssuedDuringPeriodValueNewIssues"], "unattributed": [], "inconsistent": [],
             "market_cap_usd": cap, "market_cap_absence": None, **extra}
 
 
@@ -302,3 +303,12 @@ def test_lamp_reasons_do_not_leak_company_numbers() -> None:
     for lane, flag in flags.items():
         assert not re.search(r"\d", str(flag["reason"])), f"{lane} 的理由句帶了數字：{flag['reason']}"
         assert flag["inputs"] is not None
+
+
+def test_a_negative_correction_does_not_cancel_a_real_issuance() -> None:
+    """R2-c #1（F2 反例）：窗內 −194,000 的更正加 150,000 的發行——淨加總 < 0，但判色看正值：黃；占市值 % 用正值。"""
+    flag = dilution_flag(_series(FULL_YEAR_DAYS, change=0.0), _runway(), today=TODAY,
+                         issuance=_issuance(-44_000.0, issued_total=150_000.0, cap=1_500_000_000.0))
+    assert flag["colour"] == "amber"
+    assert flag["inputs"]["trailing_issued"] == -44_000.0 and flag["inputs"]["issued_total"] == 150_000.0
+    assert flag["inputs"]["pct_of_market_cap"] == pytest.approx(0.0001)

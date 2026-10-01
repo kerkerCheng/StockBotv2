@@ -311,3 +311,155 @@ def test_both_consumers_go_through_the_one_wiring_point(monkeypatch) -> None:
     assert flags["dilution"]["inputs"]["pct_of_market_cap"] == pytest.approx(0.3)
     monkeypatch.setattr(checklist, "get_wipeout_inputs", lambda t: {"status": "unavailable", "reason": "DB 不可用"})
     assert wipeout_for("AXTI", today=TODAY) == (None, "DB 不可用")
+
+
+# ---------------------------------------------------------------------------
+# R2-c 覆核收尾（2026-10-01）
+# ---------------------------------------------------------------------------
+
+def test_a_negative_fourth_quarter_from_inconsistent_tags_cannot_cancel_a_real_issuance() -> None:
+    """R2-c #1（CRWV 型＋F1 反例，走真正的 build_fundamental_rows → _equity_issuance → dilution_flag）：年度 6800 萬
+    小於 9 個月累計 14.59 億 → 衍生出 −13.9 億的第四季；同窗 Q1'26 有 5 億真實發行。判色看窗內正值 → 黃；
+    負的衍生季列進 inconsistent；淨加總只印。"""
+    from alpha.wipeout import dilution_flag
+    from engine_c.checklist import _equity_issuance
+
+    facts = _companyfacts({("us-gaap", TAG): [
+        _fact("2025-01-01", "2025-03-31", 1_391_515_000.0, "Q1", "10-Q", "2025-05-15"),
+        _fact("2025-04-01", "2025-06-30", 67_669_000.0, "Q2", "10-Q", "2025-08-13"),
+        _fact("2025-01-01", "2025-09-30", 1_459_184_000.0, "Q3", "10-Q", "2025-11-13"),
+        _fact("2025-01-01", "2025-12-31", 68_000_000.0, "FY", "10-K", "2026-03-02"),
+        _fact("2026-01-01", "2026-03-31", 500_000_000.0, "Q1-26", "10-Q", "2026-05-14")]})
+    rows, _ = hb.build_fundamental_rows(facts, ticker="XYZ", filer="domestic_quarterly", today=TODAY,
+                                        fetched_at=FETCHED)
+    got = _equity_issuance(_reader_conn(rows), "XYZ", today=TODAY)
+    assert got["issued_total"] == 567_669_000.0 and got["trailing_total"] < 0
+    # 兩種前後不一都標出：負的衍生第四季、年度（6800 萬）小於已知季度（Q1＋Q2 14.59 億）
+    assert [i["kind"] for i in got["inconsistent"]] == ["negative_derived_quarter", "annual_below_quarters"]
+    series = [(date(2025, 6, 1), 100.0), (date(2026, 7, 1), 100.0)]
+    flag = dilution_flag(series, {"status": "manual_required"}, today=TODAY, issuance=got)
+    assert flag["colour"] == "amber"
+
+
+def test_tag_inconsistency_without_a_positive_fact_is_grey_not_green() -> None:
+    """R2-c #1：窗內只有負的衍生季（沒有任何正值）→ 灰（insufficient_evidence），不得因淨加總 ≤ 0 判綠。"""
+    from alpha.wipeout import dilution_flag
+    from engine_c.checklist import _equity_issuance
+
+    conn = _reader_conn([
+        _row("revenue_quarter", end="2026-03-31", start="2026-01-01", filed="2026-05-14", accn="Q1-26"),
+        _row("equity_issued_value_quarter", end="2025-12-31", start="2025-10-01", filed="2026-03-02", accn="FY",
+             value=-1_391_184_000.0, form="10-K") | {"derived": "FY−9M：FY − Q3"},
+        _row("equity_issued_value_annual", end="2025-12-31", start="2025-01-01", filed="2026-03-02", accn="FY",
+             value=68_000_000.0, form="10-K")])
+    got = _equity_issuance(conn, "XYZ", today=TODAY)
+    assert got["issued_total"] == 0.0 and [i["kind"] for i in got["inconsistent"]] == ["negative_derived_quarter"]
+    # 負的衍生季不算「已知」：FY2025 的 6800 萬整筆歸不到季（不是被灌大成 14.59 億）
+    assert [(u["annual"], u["known_quarters"], u["remainder"]) for u in got["unattributed"]] == [
+        (68_000_000.0, 0.0, 68_000_000.0)]
+    series = [(date(2025, 6, 1), 100.0), (date(2026, 7, 1), 100.0)]
+    flag = dilution_flag(series, {"status": "manual_required"}, today=TODAY, issuance=got)
+    assert flag["colour"] is None and flag["absence_kind"] == "insufficient_evidence" and "前後不一" in flag["reason"]
+
+
+def test_tag_inconsistency_alone_is_grey_even_when_nothing_is_unattributed() -> None:
+    """R2-c #1 的另一條路（變異檢查抓到上一條測試同時觸發 unattributed）：季度加回來剛好等於年度、沒有差額，
+    但 9 個月累計與單季不一致衍生出負的第四季，窗內又沒有正值 → 只靠 inconsistent 判灰。"""
+    from alpha.wipeout import dilution_flag
+    from engine_c.checklist import _equity_issuance
+
+    conn = _reader_conn([
+        _row("revenue_quarter", end="2026-06-30", start="2026-04-01", filed="2026-08-01", accn="Q2-26"),
+        _row("equity_issued_value_quarter", end="2025-03-31", start="2025-01-01", filed="2025-05-01", accn="Q1",
+             value=30_000_000.0),
+        _row("equity_issued_value_quarter", end="2025-06-30", start="2025-04-01", filed="2025-08-01", accn="Q2",
+             value=38_000_000.0),
+        _row("equity_issued_value_quarter", end="2025-12-31", start="2025-10-01", filed="2026-03-02", accn="FY",
+             value=-1_391_184_000.0, form="10-K") | {"derived": "FY−9M：FY − Q3"},
+        _row("equity_issued_value_annual", end="2025-12-31", start="2025-01-01", filed="2026-03-02", accn="FY",
+             value=68_000_000.0, form="10-K")])
+    got = _equity_issuance(conn, "XYZ", today=TODAY)
+    assert got["issued_total"] == 0 and got["unattributed"] == []
+    assert [i["kind"] for i in got["inconsistent"]] == ["negative_derived_quarter"]
+    series = [(date(2025, 6, 1), 100.0), (date(2026, 7, 1), 100.0)]
+    flag = dilution_flag(series, {"status": "manual_required"}, today=TODAY, issuance=got)
+    assert flag["colour"] is None and flag["absence_kind"] == "insufficient_evidence" and "前後不一" in flag["reason"]
+
+
+def test_the_window_end_comes_from_flow_periods_before_balance_sheet_instants() -> None:
+    """R2-c #5：期末之後的時點值（例：期後事項的債務）不得把窗尾往後推；這家沒有任何季度流量時才退到時點值。"""
+    from engine_c.checklist import _equity_issuance
+
+    late_instant = _row("total_debt", end="2026-08-29", start=None, filed="2026-09-01", accn="8K")
+    conn = _reader_conn(_domestic_rows(late_instant, _row(
+        "equity_issued_value_quarter", end="2025-09-30", start="2025-07-01", filed="2025-11-01", accn="Q3-25",
+        value=300.0)))
+    got = _equity_issuance(conn, "XYZ", today=TODAY)
+    assert got["window_end"] == date(2026, 6, 30) and got["issued_total"] == 300.0
+    only_instants = _reader_conn([                               # 沒有任何季度流量（例：尚無營收的公司）
+        _row("cash", end="2026-03-31", start=None, filed="2026-05-01", accn="Q3", form="10-Q"),
+        _row("cash", end="2026-06-30", start=None, filed="2026-08-20", accn="FY", form="10-K"),
+        _row("equity_issued_value_annual", end="2026-06-30", start="2025-07-01", filed="2026-08-20", accn="FY",
+             value=10.0, form="10-K")])
+    fallback = _equity_issuance(only_instants, "XYZ", today=TODAY)
+    assert fallback["window_end"] == date(2026, 6, 30) and fallback["basis"] == "annual"
+    assert fallback["quarters_found"] is None                     # 年度當基礎時不印窗內季數（R2-c #6d）
+
+
+def test_irregular_period_facts_are_counted_not_silently_dropped() -> None:
+    """R2-c #2（CCXI 型：成立未滿一季的 26 天、210 天期間）：不存，但進拒寫清單並在 summary 計數；
+    半年累計（Q2 10-Q 的 YTD）是預期內的不存，不計。"""
+    facts = _companyfacts({("us-gaap", TAG): [
+        _fact("2025-06-04", "2025-06-30", 25_000.0, "Q", "10-Q", "2026-08-13"),
+        _fact("2025-06-04", "2025-12-31", 24_999.0, "K", "10-K", "2026-03-26"),
+        _fact("2026-01-01", "2026-06-30", 7.0, "H1", "10-Q", "2026-08-13")]})
+    rows, rejected = hb.build_fundamental_rows(facts, ticker="CCXI", filer="domestic_quarterly", today=TODAY,
+                                               fetched_at=FETCHED)
+    irregular = [r for r in rejected if r.get("kind") == "irregular_period"]
+    assert len(irregular) == 2 and all("不存" in r["reason"] for r in irregular)
+    assert not [r for r in rows if r["metric"].startswith("equity_issued_value")]
+    summary = hb.summarize({"tickers": {"CCXI": {"edgar": {"rejected": rejected}}}})
+    assert summary["irregular_period_facts"] == 2 and summary["rejected_groups"] == len(rejected) - 2
+
+
+def test_migration_refuses_a_table_whose_columns_it_does_not_know(tmp_path) -> None:
+    """R2-c #4：新表 DDL 只有這 14 欄——舊表多一欄時重建會把那一欄連資料丟掉、對帳卻看不出來 → 不動它。"""
+    db = _old_db(tmp_path / "extra.db", rows=[_row()])
+    conn = sqlite3.connect(str(db), isolation_level=None)
+    conn.execute("ALTER TABLE fundamental_history ADD COLUMN note TEXT")
+    conn.execute("UPDATE fundamental_history SET note = 'keep me'")
+    with pytest.raises(mig.MigrationError, match="欄位"):
+        mig.migrate(conn)
+    assert conn.execute("SELECT note FROM fundamental_history").fetchone()[0] == "keep me"
+    assert mig.missing_metrics(conn)                                # CHECK 原樣、沒重建
+
+
+def test_migration_cli_refuses_a_missing_db_and_leaves_a_users_lock_alone(tmp_path, monkeypatch) -> None:
+    """R2-c #4：打錯 --db 不得建出 0 位元組的空庫；使用者先用 writer_guard 取得的同 owner 鎖，遷移不續期、不釋放。"""
+    from engine_b import writer_lock
+
+    missing = tmp_path / "typo.db"
+    assert mig.main(["--db", str(missing)]) == 2 and not missing.exists()
+    monkeypatch.setattr(writer_lock, "LOCK_PATH", tmp_path / ".writer_lock.json")
+    writer_lock.acquire(writer_lock.INTERACTIVE_OWNER, ttl_minutes=30, purpose="使用者的回填")
+    before = writer_lock.holder()
+    db = _old_db(tmp_path / "prod.db", rows=[_row()])
+    assert mig.main(["--db", str(db), "--apply"]) == 0
+    assert writer_lock.holder() == before                           # 沒續期（TTL 不變）、也沒拆
+    writer_lock.release(writer_lock.INTERACTIVE_OWNER)
+    db2 = _old_db(tmp_path / "prod2.db", rows=[_row()])
+    assert mig.main(["--db", str(db2), "--apply"]) == 0 and writer_lock.holder() is None   # 自己取的鎖自己還
+
+
+def test_authorizations_registered_on_different_days_are_all_shown() -> None:
+    """R2-c #6d：不同日登記、同時有效的授權都要印（原本只取最新那一天）。"""
+    from engine_c.checklist import _equity_authorizations
+
+    conn = _reader_conn([])
+    for oid, as_of, kind in (("o1", "2026-03-01", "ATM"), ("o2", "2026-08-21", "shelf")):
+        conn.execute("INSERT INTO manual_observations (observation_id, ticker, field_name, value, source_ref, as_of, "
+                     "author, supersedes_id, recorded_at, payload_digest) VALUES (?, 'XYZ', "
+                     "'equity_issuance_authorizations', ?, '424B5', ?, 'test', NULL, ?, ?)",
+                     (oid, f'{{"kind": "{kind}"}}', as_of, as_of, f"digest-{oid}"))
+    got = _equity_authorizations(conn, "XYZ")
+    assert [(a["as_of"], a["value"]["kind"]) for a in got] == [("2026-08-21", "shelf"), ("2026-03-01", "ATM")]

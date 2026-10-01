@@ -731,7 +731,9 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 # fundamental_history 的 metric CHECK 遷移（Phase 4 Step 4.6；新增指標時才用；預設 dry-run）
 & '.venv\Scripts\python.exe' -m engine_c.migrate_fundamental_metrics                # 印列數與 CHECK 缺哪些字彙
 & '.venv\Scripts\python.exe' -m engine_c.migrate_fundamental_metrics --apply        # 取 writer lock → 備份 → 單交易重建 → 對帳
-# 遷移後補新指標的歷史：daily ②b 的增量只在有新申報時重抓，舊申報裡的新指標要跑一次非增量回填
+# 遷移後**立刻**補新指標的歷史：daily ②b 的增量只在有新申報時重抓，舊申報裡的新指標要跑一次非增量回填；
+# 跑完看報告裡逐檔的 edgar outcome——不是 written 的那幾檔（unavailable／lagging／error）還沒有新指標，
+# 讀取端分不出「還沒重抓」與「真的沒有」（plan §14 #23），下一次非增量回填前它們的稀釋燈理由不可盡信
 & '.venv\Scripts\python.exe' scripts\writer_guard.py acquire --minutes 30 --purpose "EDGAR 非增量回填"
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --no-prices --report <file.json>
 & '.venv\Scripts\python.exe' scripts\writer_guard.py release

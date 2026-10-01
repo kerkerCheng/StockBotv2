@@ -107,6 +107,11 @@ def migrate(conn: sqlite3.Connection) -> dict[str, Any]:
         return {"status": "already_current", "rows": before[0], "sha256": before[1], "added": []}
     checklist = ", ".join(f"'{m}'" for m in METRICS)
     cols = ", ".join(COLUMNS)
+    # 新表的 DDL 是本工具寫死的那 14 欄：舊表多一欄（或少一欄）時重建會把那一欄連同資料丟掉，而對帳只看這 14 欄
+    # 看不出來——形狀不是預期的就不動它（R2-c 覆核 #4）。
+    actual = [str(r[1]) for r in conn.execute(f"PRAGMA table_info({TABLE})")]
+    if actual != list(COLUMNS):
+        raise MigrationError(f"{TABLE} 的欄位 {actual} 與本工具認得的 {list(COLUMNS)} 不同——重建會丟欄，不動它")
     conn.execute("BEGIN IMMEDIATE")
     try:
         conn.execute(f"""CREATE TABLE {TABLE}__new (
@@ -153,27 +158,42 @@ def main(argv: list[str] | None = None) -> int:
     from engine_c.db import sqlite_path
 
     db_path = Path(args.db) if args.db else sqlite_path()
+    if not db_path.is_file():
+        # sqlite3.connect 會替不存在的路徑建一個空檔——不得因為打錯路徑而多出一個 0 位元組的「庫」（R2-c 覆核 #4）
+        print(f"✗ 找不到資料庫：{db_path}", file=sys.stderr)
+        return 2
     conn = sqlite3.connect(str(db_path), isolation_level=None)
     try:
         missing = missing_metrics(conn)
         rows, digest = table_fingerprint(conn)
-        print(f"{db_path}｜{TABLE} {rows} 列｜CHECK 缺 {missing or '無'}")
+        columns = [str(r[1]) for r in conn.execute(f"PRAGMA table_info({TABLE})")]
+        print(f"{db_path}｜{TABLE} {rows} 列｜CHECK 缺 {missing or '無'}"
+              + ("" if columns == list(COLUMNS) else f"｜⚠ 欄位與本工具認得的不同：{columns}（--apply 會拒絕）"))
         if not args.apply:
             print("（dry-run；加 --apply 才備份並遷移）")
             return 0
         if not missing:
             print("✓ 已是新字彙，不需要遷移")
             return 0
+    except MigrationError as exc:
+        print(f"✗ {exc}", file=sys.stderr)
+        return 3
     finally:
         conn.close()
 
-    from engine_b.writer_lock import INTERACTIVE_OWNER, WriterLockHeld, acquire, release
+    from engine_b.writer_lock import INTERACTIVE_OWNER, WriterLockHeld, acquire, holder, is_stale, release
 
-    try:
-        acquire(INTERACTIVE_OWNER, ttl_minutes=15, purpose="Engine C fundamental_history CHECK 遷移（Phase 4 Step 4.6）")
-    except WriterLockHeld as exc:
-        print(f"✗ 拒絕：writer lock 被占用（daily 正在跑？）——{exc}", file=sys.stderr)
-        return 2
+    # 互動 session 已先用 writer_guard 取得同一個 owner 的鎖：不續期（會改掉對方設的 TTL）、結束也不釋放
+    # ——拆掉的是使用者自己的鎖（R2-c 覆核 #4）。
+    current = holder()
+    already_held = bool(current and current.get("owner") == INTERACTIVE_OWNER and not is_stale(current))
+    if not already_held:
+        try:
+            acquire(INTERACTIVE_OWNER, ttl_minutes=15,
+                    purpose="Engine C fundamental_history CHECK 遷移（Phase 4 Step 4.6）")
+        except WriterLockHeld as exc:
+            print(f"✗ 拒絕：writer lock 被占用（daily 正在跑？）——{exc}", file=sys.stderr)
+            return 2
     try:
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         backup = backup_database(db_path, db_path.parent / "backups" / f"{db_path.stem}.pre-metrics-{stamp}.db")
@@ -191,7 +211,8 @@ def main(argv: list[str] | None = None) -> int:
         print(f"✗ 遷移中止（正式庫未改動）：{exc}", file=sys.stderr)
         return 3
     finally:
-        release(INTERACTIVE_OWNER)
+        if not already_held:
+            release(INTERACTIVE_OWNER)
 
 
 if __name__ == "__main__":
