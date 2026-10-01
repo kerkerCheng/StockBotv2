@@ -165,12 +165,22 @@ _LATER = (TODAY + timedelta(days=400)).isoformat()
     ({"disproof": [_disproof(link_source_ref="reading:sr_" + "c" * 16 + "#9")]}, "沒有在盯的 watch"),
     ({"disproof": [_disproof(source="sr_" + "c" * 16)]}, "不是任何讀圖 id"),
     ({"rides": [{"node": "tech:x", "unit": "layer", "reading_id": "sr_" + "b" * 16}]}, "現行讀圖不是"),
+    # Phase 4 Step 4.7d（Phase 3 R2 探針）：同一版裡兩條反證只差空白——正規化後相同，拒收並指出是第幾條
+    ({"disproof": [_disproof(), _disproof(condition="若 JX 在  2026-12-31 前宣布新產能投產則供給缺口消失，本敘事的量的賭注不成立 ")]},
+     r"disproof\[2\]：與 disproof\[1\] 是同一個條件"),
 ])
 def test_write_time_disproof_and_ride_checks_refuse_with_the_reason(tmp_path: Path, record_kw, message) -> None:
     """R2-a N7：寫入端這幾條原本只有手動驗過。"""
     with pytest.raises(ContractViolation, match=message):
         _write(tmp_path, _record(**record_kw), _ctx())
     assert not (tmp_path / "briefs").exists()
+
+
+def test_two_different_disproofs_in_one_version_are_accepted(tmp_path: Path) -> None:
+    """4.7d 的對照組：條件不同就照寫入（去重只比正規化後的條件文字，不比相似度）。"""
+    other = _disproof(condition="若客戶在 2026-12-31 前公告第二家基板供應商通過驗證，本敘事的量的賭注不成立")
+    out = _write(tmp_path, _record(disproof=[_disproof(), other]), _ctx())
+    assert len(out["registered"]) == 2
 
 
 def test_retracting_a_v2_closes_its_active_watches(tmp_path: Path) -> None:

@@ -178,7 +178,15 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
                 and str(w.get("source_ref") or "").startswith(("thesis:", "reading:")):
             live_by_condition[normalize(w.get("condition"))] = str(w.get("source_ref"))
     live_refs = {str(w.get("source_ref")) for w in watches if w.get("status") in ("active", "fired")}
+    #: 同一版敘事內正規化後相同的條件（Phase 4 Step 4.7d）：判準同 `register-disproof` 的去重（`engine_b.disproof.normalize`）
+    #: ——同一個條件登記兩次就會被叫醒兩次、複查兩筆一起續盯。只比本版自己的 disproof[]，跨公司不比。
+    first_seen: dict[str, int] = {}
     for n, item in enumerate(parsed.disproof, 1):
+        key = normalize(item.condition)
+        if key in first_seen:
+            problems.append(f"disproof[{n}]：與 disproof[{first_seen[key]}] 是同一個條件（正規化後相同）——同一版敘事不登記兩次")
+        else:
+            first_seen[key] = n
         if item.expires <= ctx.today:
             problems.append(f"disproof[{n}]：expires {item.expires} 必須晚於今天")
         written = ew.condition_dates(item.condition)
