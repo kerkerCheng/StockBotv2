@@ -138,6 +138,25 @@ def test_history_samples_skip_days_whose_ttm_has_gone_stale() -> None:
     assert stopped["detail"]["samples"] < fresh["detail"]["samples"]
 
 
+def test_own_history_prints_coverage_as_samples_over_trading_days_without_a_threshold() -> None:
+    """Phase 4 Step 4.7c（LRCX 型：751 個交易日只有 314 個樣本）：窗內倍數算不出來的日子不是樣本——覆蓋率＝
+    樣本／同一窗內的交易日，只印；百分位照算、照印（不設門檻、沒有布林結論）。"""
+    gappy = _quarters(date(2022, 3, 31), 18)
+    del gappy[7:10]                                    # 中間三季沒申報：那段 TTM 過期或不連續，算不出倍數
+    full = tq.own_history(_domestic(), today=TODAY)
+    holed = tq.own_history(_domestic(revenue_quarters=gappy), today=TODAY)
+    bars = [d for d, _ in _domestic()["price_bars"]]
+    for row in (full, holed):
+        detail = row["detail"]
+        first, last = date.fromisoformat(detail["window_start"]), date.fromisoformat(detail["window_end"])
+        days = sum(1 for d in bars if first <= d <= last)               # 獨立重算，不信產生端
+        assert detail["trading_days_in_window"] == days
+        assert detail["coverage"] == round(detail["samples"] / days, 2)
+    assert full["detail"]["coverage"] == 1.0
+    assert holed["detail"]["coverage"] < 1.0 and holed["value"] is not None and holed["absence_kind"] is None
+    assert "覆蓋率" in holed["rule"] and "不設門檻" in holed["rule"]
+
+
 def test_own_history_percentile_on_a_rising_price_with_flat_revenue_is_near_the_top() -> None:
     row = tq.own_history(_domestic(), today=TODAY)
     assert row["absence_kind"] is None and row["basis"] == "EV/S"

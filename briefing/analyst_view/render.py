@@ -377,10 +377,14 @@ def render_analyst_view_markdown(view: AnalystView) -> str:
     if tq.lines:
         for line in tq.lines:
             datum, deps = line.datum, (line.datum.dependencies or {})
+            detail = deps.get("detail") or {}
             where = "｜".join(x for x in (
                 f"來源 {deps.get('source')}" if deps.get("source") else "",
                 f"as of {datum.as_of.isoformat()}" if datum.as_of else "",
-                f"口徑 {deps.get('basis')}" if deps.get("basis") else "") if x)
+                f"口徑 {deps.get('basis')}" if deps.get("basis") else "",
+                # 自家歷史百分位的覆蓋率（Phase 4 Step 4.7c）：只印，不設門檻
+                (f"樣本 {detail.get('samples')}／窗內交易日 {detail['trading_days_in_window']}"
+                 f"（覆蓋率 {detail.get('coverage')}）") if detail.get("trading_days_in_window") else "") if x)
             reason = (f" — `{markdown_text(datum.absence_kind)}`：{markdown_text(datum.reason or '')}"
                       if not datum.is_known else "")
             lines.append(f"- **{markdown_text(line.display_label)}**：{markdown_text(_plain_value(datum)) if datum.is_known else _plain_value(datum)}"

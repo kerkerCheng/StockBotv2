@@ -48,7 +48,8 @@ _RULE_OWN = (
     "每個交易日 d：市值＝當天 raw 收盤 ×（d 之前最新一份封面股數 × 其後到 d 的分割比例）；"
     "TTM 營收＝d 之前已申報（filed ≤ d）的最近四個連續季度；EV＝市值＋（同一期末的債務 − 現金）。"
     "口徑由今天決定、整條序列同一口徑：今天 TTM 營業利益 ≥ 0 且有同期淨負債 → EV/S，否則 P/S。"
-    "百分位＝窗內（今天往前 3 年）比今天低的樣本占全部樣本的比例 ×100。**不設門檻**——幾分算「已定價」由寫的人判斷")
+    "百分位＝窗內（今天往前 3 年）比今天低的樣本占全部樣本的比例 ×100。**不設門檻**——幾分算「已定價」由寫的人判斷。"
+    "另印樣本數／窗內交易日數＝覆蓋率（倍數算不出來的日子不是樣本；只印，不設門檻）")
 _RULE_COHORT = ("主題等權組成員（本檔除外）今天的倍數，只取與本檔同口徑、有值的成員取中位數並印 n；"
                 "只印，不比較、不算差")
 _RULE_REL = ("本檔最近 N 個交易日的調整後收盤報酬（當地幣別）− 成員（本檔除外）各自最近 N 個交易日報酬的等權平均；"
@@ -247,7 +248,12 @@ def own_history(inp: Mapping[str, Any], *, today: date,
     window_days = (series[-1][0] - series[0][0]).days
     today_value = series[-1][1]
     past = [v for _, v in series[:-1]]
+    # 覆蓋率（Phase 4 Step 4.7c）：百分位只用得到「當天倍數算得出來」的日子——同一窗內有收盤卻沒有樣本的天
+    # （TTM 過期、股數缺）不會出現在百分位裡。只印、**不設門檻**（多少算夠由讀的人判斷）。
+    trading_days = sum(1 for d, _ in bars if series[0][0] <= d <= series[-1][0])
     detail = {"multiple_today": round(today_value, 4), "basis_reason": basis_reason, "samples": len(series),
+              "trading_days_in_window": trading_days,
+              "coverage": round(len(series) / trading_days, 2) if trading_days else None,
               "window_start": series[0][0].isoformat(), "window_end": series[-1][0].isoformat(),
               "window_days": window_days, "min": round(min(v for _, v in series), 4),
               "median": round(median(v for _, v in series), 4), "max": round(max(v for _, v in series), 4),

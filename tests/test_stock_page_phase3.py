@@ -734,6 +734,16 @@ def test_markdown_renders_every_new_panel_and_no_python_repr(monkeypatch) -> Non
     assert "核心四段" not in text
 
 
+def test_markdown_prints_the_own_history_coverage_on_the_audit_line() -> None:
+    """Phase 4 Step 4.7c：CLI 稽核行印「樣本 N／窗內交易日 M（覆蓋率 X）」——LRCX 型 314／751 → 0.42；不設門檻。"""
+    from briefing.analyst_view import render_analyst_view_markdown
+
+    raw = _raw_tq()
+    raw["priced_in"][0]["detail"] = {"samples": 314, "trading_days_in_window": 751, "coverage": 0.42}
+    text = render_analyst_view_markdown(build_analyst_view(_full_view(three_questions=raw)))
+    assert r"樣本 314／窗內交易日 751（覆蓋率 0\.42）" in text                 # markdown 轉義小數點（同 88\.5）
+
+
 def test_frontend_series_points_cover_all_three_shapes_and_the_lamp_label_fallback() -> None:
     source = (Path(__file__).resolve().parents[1] / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
     point = source.split("const TQ_POINT_KEYS", 1)[1].split("function threeQuestionsCard", 1)[0]
