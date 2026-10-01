@@ -61,6 +61,7 @@ DEMAND_UNAVOIDABLE_MIN_SUB = 4
 #: 「薄層」＝供給側 1–3 家（第 1 型）。0 家是第 7 型的事，不在這裡重複問。
 THIN_LAYER_MAX_SUPPLIERS = 3
 #: 外部印證的證據等級（`query.bottleneck.classify_evidence` 的字彙；不在這裡重判）。
+#: ⚠ 不含 `media_relay`（媒體轉述，Step 4.3）：只有媒體轉述的獨家邊仍要問「從客戶端或第三方找印證」。
 CORROBORATED_EVIDENCE = frozenset({"externally_corroborated", "counterparty_joint"})
 #: 「往下供貨」的對象前綴（第 6 型母體）。
 DOWNSTREAM_PREFIXES = ("tech:", "mat:", "prod:")

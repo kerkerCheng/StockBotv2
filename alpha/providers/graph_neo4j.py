@@ -54,6 +54,7 @@ _EVIDENCE_CLASS_TIER: Mapping[str, int] = {
     "counterparty_joint": 2,
     "self_reported_costly": 2,
     "needs_review": 3,
+    "media_relay": 3,   # 與 needs_review 同級（Step 4.3）
     "self_reported": 4,
 }
 

@@ -38,15 +38,20 @@ Evidence tier determines how much a source contributes to `confidence` scoring.
 | 欄位 | 回答什麼 | 值域 |
 |---|---|---|
 | `evidence_tier` | **這份文件多可靠？**（來源型態） | 1–4，1 最強（見上） |
-| `evidence_class` | **誰在替這條邊背書？**（來源獨立性） | `externally_corroborated` ＞ `counterparty_joint` ＞ `self_reported_costly` ＞ `needs_review` ＞ `self_reported` |
+| `evidence_class` | **誰在替這條邊背書？**（來源獨立性） | `externally_corroborated` ＞ `counterparty_joint` ＞ `self_reported_costly` ＞ `needs_review` ＝ `media_relay` ＞ `self_reported` |
+| `origin_linkage` | **這份媒體文是轉述還是自己採訪？**（SourceDoc 選填） | `same_origin`／`independent`／缺＝沒宣告 |
 | `demand_proof_level` | **需求端的證據到哪一層？** | `confirmed` ＞ `guided` ＞ `inferred` ＞ `speculative` |
 | `confidence` | **這個關係存在的信心** | 0–1；只在不同 `origin_event` 之間累加 |
 | `corroborating_origins` | **還有誰獨立說過同一件事**（L8 的獨立性計數） | `origin_entity` 集合，門檻 3 |
 
-`evidence_class` 五級的權威是 `query/bottleneck.py::EVIDENCE_RANK`（判定是同檔 `classify_evidence`）。
-`counterparty_joint` 只來自「origin 整串解析不到、且字串裡具名 ≥2 家名冊公司（含主詞以外）」的聯合公告；
+`evidence_class` 各級的權威是 `query/bottleneck.py::EVIDENCE_RANK`（判定是同檔 `classify_evidence`；
+origin 是誰由 `query/origin_resolution.py::resolve_origin` 唯一判定：名冊公司 → 登記的發布者 → 解析不到）。
+`counterparty_joint` 只來自「origin 整串解析不到、且去註解後的字串裡具名 ≥2 家名冊公司（含主詞以外）」的聯合公告；
 **origin 解析得到主詞自己就是自報**（filing 出身為 `self_reported_costly`），字串裡另具名他家（例：供應商新聞稿引述客戶高管）
-不改變這一點（2026-10-01 Phase 4，使用者定案 Q8b 替代案 B）。三級證據充分度
+不改變這一點（2026-10-01 Phase 4，使用者定案 Q8b 替代案 B）。
+發布者登記在 `config/publishers.json`：自產資料的類別（產業研究、拆解、標準組織、政府、學術）算外部印證；
+**媒體一律是 `media_relay`（媒體轉述）**，除非那份文件宣告 `origin_linkage=independent`；任何發布者宣告 `same_origin` 的文件也是轉述。
+`media_relay` 與 `needs_review` 同級——不是升降級，只是把「不知道是誰」與「知道是誰、但它是轉述」分開（2026-10-01 Phase 4 Step 4.3）。三級證據充分度
 （`corroborated` ／ `bounded_hypothesis` ／ `unknown`）的權威是 `shared/evidence_levels.py`。
 
 ⚠ **`confidence` 不是「這條因果鏈有多強」**，它只是「這個關係存在的信心」——兩者共用一個

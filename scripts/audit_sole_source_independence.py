@@ -38,6 +38,7 @@ from neo4j import GraphDatabase  # noqa: E402
 
 from identity.registry import get_registry  # noqa: E402
 from query.bottleneck import company_id_for_origin  # noqa: E402
+from query.origin_resolution import publisher_lifts, resolve_origin  # noqa: E402
 
 WEAK = "weak"
 WEAK_CONFIDENCE_CAP = 0.5
@@ -56,6 +57,26 @@ def _attrs(raw) -> dict:
 # origin → co:* 的解析只有一份（2026-09-16 收斂）：先前本檔自抄一份，與排序權威各自漂移
 # ——兩份都讀了 registry 沒有的 `name` 欄位（L16：同一分類兩份，後改的那份不會回頭更新前一份）。
 _company_id_for = company_id_for_origin
+
+
+def _sort_origins(origins: dict[str, set], subject: str, registry) -> dict[str, list[str]]:
+    """逐個 origin 經唯一 owner（`query.origin_resolution`，Step 4.3）分組。
+
+    ⚠ 本檔問的是「**所有** origin 是不是都是供應商自己」（schema §7 的 L8 規則），不是邊的最高證據等級——
+    所以不呼叫 `classify_evidence`（那裡 filing 自報 rank 2 會蓋過媒體轉述 rank 1，答的是另一個問題）。
+    共用的是「這個 origin 是誰」：登記的自產資料發布者算外部、媒體轉述不算外部也不算本人。
+    """
+    groups: dict[str, list[str]] = {"external": [], "relay": [], "unresolved": [], "self": []}
+    for origin, linkages in sorted(origins.items()):
+        resolution = resolve_origin(origin, registry)
+        if resolution.kind == "company":
+            groups["self" if resolution.id == subject else "external"].append(
+                origin if resolution.id == subject else str(resolution.id))
+        elif resolution.kind == "publisher":
+            groups["external" if publisher_lifts(resolution, linkages) else "relay"].append(origin)
+        else:
+            groups["unresolved"].append(origin)
+    return groups
 
 
 def main() -> int:
@@ -80,7 +101,8 @@ def main() -> int:
             RETURN e.id AS aid, e.edge_key AS edge_key, e.src_id AS src,
                    e.relation AS rel, e.dst_id AS dst, e.attributes AS attrs,
                    e.confidence AS conf, e.source_doc_id AS doc,
-                   d.origin_entity AS origin, d.evidence_tier AS tier
+                   d.origin_entity AS origin, d.evidence_tier AS tier,
+                   d.origin_linkage AS origin_linkage
             """
         ).data()
 
@@ -94,23 +116,27 @@ def main() -> int:
         if not any(g["attrs"].get("sole_source") is True for g in group):
             continue
         subject = group[0]["src"]
-        origins = {g["origin"] for g in group if g["origin"]}
-        resolved = {o: _company_id_for(o, registry) for o in origins}
-        unresolved = sorted(o for o, cid in resolved.items() if cid is None)
-        external_companies = sorted(
-            {cid for cid in resolved.values() if cid and cid != subject}
-        )
+        origin_linkages: dict[str, set] = {}
+        for g in group:
+            if g["origin"]:
+                origin_linkages.setdefault(g["origin"], set()).add(g.get("origin_linkage") or None)
+        origins = set(origin_linkages)
+        groups = _sort_origins(origin_linkages, subject, registry)
+        unresolved = groups["unresolved"]
+        external_companies = sorted(set(groups["external"]))
 
         # ⚠ 三分，不是二分。`None` 同時可能是「真的第三方媒體」與「沒解析出來的
         # 子公司／別名」——兩者對本檢查的意義相反（L12）。首版用
         # `resolved == {subject}` 判定，於是任何無法解析的 origin 都會讓集合不等於
         # {subject}，**自動被當成外部佐證通過**。那正是本檔 docstring 說不得發生的事。
-        # 現在改成：只有解析到「不同公司」才算已印證；只剩無法解析者一律 needs_review，
-        # 由人決定它是第三方（schema §7 接受）還是同源別名（不接受）。
+        # 現在改成：只有解析到「不同公司」或登記的自產資料發布者才算已印證；無法解析者 needs_review，
+        # 由人決定它是第三方（schema §7 接受）還是同源別名（不接受）；只剩媒體轉述者 media_relay（不是本人，也不是印證）。
         if external_companies:
             verdict = "externally_corroborated"
         elif unresolved:
             verdict = "needs_review"
+        elif groups["relay"]:
+            verdict = "media_relay"
         else:
             verdict = "self_reported"
 
@@ -135,9 +161,11 @@ def main() -> int:
 
     to_fix = [f for f in findings if f["self_reported"]]
     needs_review = [f for f in findings if f["verdict"] == "needs_review"]
+    relays = [f for f in findings if f["verdict"] == "media_relay"]
     marks = {
-        "externally_corroborated": "✅ 已有外部公司印證",
+        "externally_corroborated": "✅ 已有外部公司或第三方印證",
         "needs_review": "🟡 待人工判定",
+        "media_relay": "🟡 只有媒體轉述（追它轉述的一手）",
         "self_reported": "🔴 供應商自報",
     }
     for f in findings:
@@ -147,7 +175,7 @@ def main() -> int:
         print(f"    confidence={f['max_confidence']}"
               f"{'  → 應降至 ≤0.5' if f['self_reported'] else ''}")
         if f["external_companies"]:
-            print(f"    外部佐證公司：{f['external_companies']}")
+            print(f"    外部佐證（名冊公司或登記的第三方）：{f['external_companies']}")
         if f["unresolved_origins"]:
             print(f"    ⚠ 無法解析成 co:* 的 origin：{f['unresolved_origins']}")
             if f["verdict"] == "needs_review":
@@ -156,8 +184,8 @@ def main() -> int:
                       "不得自動放行。請人工判定後，或登記進 registry、或標為第三方。")
         print()
 
-    print(f"需降級：{len(to_fix)} 條｜待人工判定：{len(needs_review)} 條｜"
-          f"已印證：{len(findings) - len(to_fix) - len(needs_review)} 條")
+    print(f"需降級：{len(to_fix)} 條｜待人工判定：{len(needs_review)} 條｜只有媒體轉述：{len(relays)} 條｜"
+          f"已印證：{len(findings) - len(to_fix) - len(needs_review) - len(relays)} 條")
 
     if args.all_bottleneck:
         print("\n## 擴大統計：所有帶 substitutability 的邊（A3 lens）\n")

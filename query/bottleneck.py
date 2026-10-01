@@ -152,11 +152,18 @@ DEMAND_ANCHORS = load_demand_anchors()
 # filing 裡也有行銷語，但法律責任使其系統性更貴——proxy 的限制明講，不假裝是語意判斷。
 # `counterparty_joint`：聯合公告的複合 origin（"IQE plc / Tower Semiconductor"）單一字串
 # 解析必然失敗，先前整級掉到 needs_review——雙方具名的公告證據力僅次於純客戶端，修正之。
+# `media_relay`（2026-10-01 Phase 4 Step 4.3）：origin 是登記的媒體（`config/publishers.json`）、或任何發布者
+# 宣告 `origin_linkage=same_origin` 的轉述文件。**與 needs_review 同級**——它不是升級，只是把 None 的兩義拆開（L12）：
+# 「不知道是誰」與「知道是誰、但它是轉述」是兩件事，後者再追也不會變成第三方印證，要找的是它轉述的那份一手。
+# ⚠ 任何列舉等級的表（`EVIDENCE_LABEL`、`alpha.narrative.argument.EVIDENCE_CLASS_PLAIN`、
+# `alpha.evidence_quality.EVIDENCE_CLASS_TO_LEVEL`、`alpha.providers.graph_neo4j._EVIDENCE_CLASS_TIER`）key 集合必須等於本表
+# （`tests/test_origin_resolution.py` 守著）；`query.graph_walk.CORROBORATED_EVIDENCE` 是子集、不含它。
 EVIDENCE_RANK = {
     "externally_corroborated": 4,
     "counterparty_joint": 3,
     "self_reported_costly": 2,
     "needs_review": 1,
+    "media_relay": 1,
     "self_reported": 0,
 }
 EVIDENCE_LABEL = {
@@ -164,8 +171,13 @@ EVIDENCE_LABEL = {
     "counterparty_joint": "雙方聯合",
     "self_reported_costly": "自報·filing",
     "needs_review": "待判定",
+    "media_relay": "媒體轉述",
     "self_reported": "供應商自報",
 }
+#: 同級時誰勝出（只有 needs_review／media_relay 同級）：一條邊同時有「解析不到」與「媒體轉述」的 origin 時印**待判定**——
+#: 還有一個沒認出來的來源，它仍可能是獨立第三方；印媒體轉述會讓人以為已經知道每一份是誰。
+#: 結果不得取決於 origin 字串的迭代順序（新增一份文件不該讓標籤來回翻）。
+_TIE_WINS = frozenset({"needs_review"})
 QUALIFICATION_RANK = {"qualified": 3, "qualifying": 2, "designed_in": 2, "sampling": 1}
 
 
@@ -384,40 +396,56 @@ def classify_evidence(
     origins: Iterable[str | None],
     registry,
     filing_origins: frozenset | set = frozenset(),
+    origin_linkages: Mapping[str, Iterable[str | None]] | None = None,
+    *,
+    publishers=None,
 ) -> str:
-    """五分，取各 origin 所能支持的最高等級。
+    """六分（五個等級＋與 needs_review 同級的 media_relay），取各 origin 所能支持的最高等級。
 
-    `None` 同時可能是「真的第三方媒體」（schema §7 接受）與「沒解析出來的子公司／別名」
-    （不接受）——兩者結論相反，不得壓成一個布林（L12）。解析失敗的 origin 再過一道
-    聯合公告偵測（字串內具名 ≥2 家 registry 公司且含 subject 以外者）才落 needs_review。
+    每個 origin 先經 `query.origin_resolution.resolve_origin`（唯一 owner）分成三態：
+    - **名冊公司**：不是主詞 → 外部印證；是主詞 → 自報（filing 出身為 costly）。
+    - **登記的發布者**（`config/publishers.json`）：`publisher_lifts` 說算 → 外部印證；否則 → 媒體轉述。
+      自產資料的類別（產業研究、拆解、標準、政府、學術）算，除非那份文件宣告 `same_origin`；
+      媒體只有宣告 `independent` 的那份算（`origin_linkages`：origin → 引用這條邊的各份文件的宣告）。
+    - **解析不到**：再過一道聯合公告偵測（**去註解後**的字串具名 ≥2 家名冊公司且含主詞以外者）→ 雙方聯合；
+      否則待判定。`None` 同時可能是「真第三方」與「沒解析出來的別名」，不得壓成布林（L12）——
+      所以未登記就留在待判定，不猜。
     `filing_origins`：來自 source_type=='filing' 文件的 origin 集合（costly proxy）。
+    `publishers`：測試用；預設讀正式設定。
 
     ⚠ 解析到主詞的 origin **一律是自報**（filing 出身才是 costly）——2026-10-01 Phase 4 Step 4.1a
     （使用者定案 Q8b 替代案 B）拿掉了「解析到主詞、但同一字串另具名他家 → counterparty_joint」那支抬升：
-    「客戶高管在供應商新聞稿裡具名」仍是供應商發的稿，不是獨立的客戶端印證（L8）。拿掉當天真實圖命中 0 份
-    SourceDoc；它的連鎖要等名冊補 `display_name` 才會發生（Sivers 自家 PR 的 3 條邊會被抬成雙方聯合）。
+    「客戶高管在供應商新聞稿裡具名」仍是供應商發的稿，不是獨立的客戶端印證（L8）。
+    ⚠ 聯合公告偵測讀**去掉尾端註解**的字串（Step 4.3）：註解是研究者寫的脈絡（「轉載 A／B 聯合新聞稿」
+    「內含 X 具名引述」），不是發布者身分——讀原字串會讓註解驅動證據等級（R2-b 轉來的 non-blocking）。
     """
-    seen = {o for o in origins if o}
-    resolved = {o: company_id_for_origin(o, registry) for o in seen}
+    from query.origin_resolution import get_publishers, publisher_lifts, resolve_origin
+
+    pubs = publishers if publishers is not None else get_publishers()
+    linkages = origin_linkages or {}
     best = "self_reported"
 
     def _lift(level: str) -> None:
         nonlocal best
-        if EVIDENCE_RANK[level] > EVIDENCE_RANK[best]:
+        if (EVIDENCE_RANK[level], level in _TIE_WINS) > (EVIDENCE_RANK[best], best in _TIE_WINS):
             best = level
 
-    for origin, cid in resolved.items():
-        if cid and cid != subject:
-            _lift("externally_corroborated")
-        elif cid is None:
-            mentions = _origin_mentions(origin, registry)
+    for origin in {o for o in origins if o}:
+        resolution = resolve_origin(origin, registry, publishers=pubs)
+        if resolution.kind == "company":
+            if resolution.id != subject:
+                _lift("externally_corroborated")
+            elif origin in filing_origins:  # 主詞自己：自報（字串裡另具名誰都一樣——見上面的 Q8b-B）
+                _lift("self_reported_costly")
+        elif resolution.kind == "publisher":
+            _lift("externally_corroborated" if publisher_lifts(resolution, linkages.get(origin) or ())
+                  else "media_relay")
+        else:
+            mentions = _origin_mentions(_strip_annotation(origin), registry)
             if len(mentions) >= 2 and (mentions - {subject}):
                 _lift("counterparty_joint")
             else:
                 _lift("needs_review")
-        else:  # cid == subject：自報（字串裡另具名誰都一樣——見 docstring 的 Q8b-B）
-            if origin in filing_origins:
-                _lift("self_reported_costly")
     return best
 
 
@@ -435,6 +463,9 @@ class CanonicalEdge:
     documents: int = 0
     origins: set = field(default_factory=set)
     filing_origins: set = field(default_factory=set)
+    #: origin → 引用這條邊、出自該 origin 的各份 SourceDoc 的 `origin_linkage` 宣告集合（缺＝None）。
+    #: ⚠ 逐份記、不是一個布林：同一家媒體的兩份文件可能一份 independent、一份 same_origin（Step 4.3）。
+    origin_linkages: dict = field(default_factory=dict)
     evidence: str = "self_reported"
     #: 引用到的 SourceDoc id → 它的 `published_at`（字串或 None）。
     #: ⚠ 這是 point-in-time 的唯一時間線索：canonical edge 本身沒有時間欄位，
@@ -488,6 +519,7 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
             edge.origins.add(str(row["origin"]))
             if str(row.get("source_type") or "") == "filing":
                 edge.filing_origins.add(str(row["origin"]))
+            edge.origin_linkages.setdefault(str(row["origin"]), set()).add(row.get("origin_linkage") or None)
 
         sub = attrs.get("substitutability")
         _take(key, edge, "substitutability",
@@ -740,7 +772,8 @@ def structure_table(
     edges = list(canonical.values())
     for edge in edges:
         edge.evidence = classify_evidence(
-            edge.src, edge.origins, registry, filing_origins=edge.filing_origins
+            edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
+            origin_linkages=edge.origin_linkages,
         )
 
     upward = build_upward_index(edges)
@@ -811,6 +844,7 @@ def fetch_assertions(session) -> list[dict[str, Any]]:
         RETURN e.src_id AS src, e.relation AS relation, e.dst_id AS dst,
                e.attributes AS attributes, e.confidence AS confidence,
                d.origin_entity AS origin, d.source_type AS source_type,
+               d.origin_linkage AS origin_linkage,
                e.source_doc_id AS source_doc_id, d.published_at AS published_at
         """
     ).data()

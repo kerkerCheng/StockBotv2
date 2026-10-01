@@ -25,6 +25,7 @@ EVIDENCE_CLASS_PLAIN: Mapping[str, str] = {
     "self_reported_costly": "公司自己說的，但寫在正式申報文件裡",
     "self_reported": "只有公司自己說",
     "needs_review": "還沒判定誰說的",
+    "media_relay": "媒體轉述的，不算第三方印證",
 }
 RELATION_PLAIN: Mapping[str, str] = {
     "supplies_to": "供應", "depends_on": "依賴", "also_supplied_by": "也由別人供應", "partnership_with": "合作",
@@ -32,7 +33,8 @@ RELATION_PLAIN: Mapping[str, str] = {
 QUALIFICATION_PLAIN: Mapping[str, str] = {
     "designed_in": "已被設計進客戶產品", "qualified": "已通過客戶驗證", "qualifying": "驗證中", "unqualified": "尚未驗證",
 }
-WEAK_CLASSES: frozenset[str] = frozenset({"self_reported", "needs_review"})
+#: 弱證據＝等級不高於「待判定」的那幾級（`query.bottleneck.EVIDENCE_RANK` ≤ needs_review；測試守著）。
+WEAK_CLASSES: frozenset[str] = frozenset({"self_reported", "needs_review", "media_relay"})
 
 
 def _name(node_id: str | None, names: Mapping[str, str]) -> str:

@@ -402,7 +402,10 @@ def test_socket_view_says_out_loud_when_the_graph_cannot_tell_maker_from_supplie
     view = build_socket_view(SOCKET, edges, quotes, registry=get_registry())
     assert view.makers == [] and view.maker_absence == SOCKET_NO_MAKER
     assert view.customer_quotes == [] and view.customer_absence == SOCKET_NO_CUSTOMER_QUOTE
-    assert view.sources == [{"doc": "substack_post", "tier": 3, "origin": "silicon_matter_substack", "company": None}], \
+    # `resolved_as`（2026-10-01 Phase 4 Step 4.3）：silicon_matter_substack 登記為媒體（`config/publishers.json`），
+    # 來源清單說「媒體轉述」而不是「解析不到」——三種缺席分開說（L12）。
+    assert view.sources == [{"doc": "substack_post", "tier": 3, "origin": "silicon_matter_substack", "company": None,
+                             "resolved_as": "媒體轉述"}], \
         "沒有客戶端原文時要列出現有來源的等級（例：SuperNova 只有一篇 tier 3 substack）"
 
 

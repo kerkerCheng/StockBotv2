@@ -64,13 +64,15 @@ def _norm(text: Any) -> str:
 
 
 def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, str], Sequence[Mapping[str, Any]]],
-                     *, registry: Any = None) -> list[str]:
+                     *, registry: Any = None, publishers: Any = None) -> list[str]:
     """v3 引用的寫入端核對（plan A2）：回傳問題清單，空＝全部核對得到。**不查圖**——`quotes` 必須與
     紀錄的快照出自同一次查詢（`fetch_structure_snapshot_with_quotes`）。
 
     每一條引用：①邊在紀錄快照的那個角度裡；②片段（去空白正規化）是那條邊某段逐字的子字串，且那段逐字
     出自 `source_id` 那份文件；③標 `independent` 的，那份文件的 `origin_entity` 經
-    `query.bottleneck.company_id_for_origin`（唯一 owner，不重造）解析得到、且不是那條邊的主詞（供應商自己）。
+    `query.origin_resolution.resolve_origin`（唯一 owner，與邊的證據等級同一個；Step 4.3）解析成：
+    名冊公司且不是那條邊的主詞（供應商自己），或**算印證的發布者**（`publisher_lifts`：自產資料的類別、
+    或宣告 `origin_linkage=independent` 的媒體文；宣告 same_origin 的一律不算）。解析不到的不算。
     """
     parsed = parse_structure_reading_record(record)
     problems: list[str] = []
@@ -80,7 +82,7 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
         from identity.registry import get_registry
 
         registry = get_registry()
-    from query.bottleneck import company_id_for_origin
+    from query.origin_resolution import publisher_lifts, resolve_origin
 
     # 插槽的「不是供應商自己」＝不是**這個插槽的任何一家供應商**（與插槽視角的「客戶端原文」同一個定義；
     # plan 待決 #12，Step 2.5 定案）。實測：`prod:els_8ch_module` 用同插槽另一家供應商 Enablence 發的聯合新聞稿
@@ -108,17 +110,41 @@ def verify_citations(record: Mapping[str, Any], quotes: Mapping[tuple[str, str, 
                             f"（這條邊的逐字來自 {docs or '（沒有任何逐字）'}）")
             continue
         if citation.independent:
-            origins = {str(q.get("origin") or "") for q in hits}
-            resolved = {company_id_for_origin(o, registry) for o in origins}
-            if None in resolved or not resolved:
-                problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 的 origin_entity "
-                                f"{sorted(origins)} 解析不到任何 co:*——解析不到的不算外部印證（L8、INV-1）")
-            elif edge[0] in resolved:
-                problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 就是 {edge[0]} 自己——"
+            problems.extend(_independence_problems(label, citation.source_id, edge[0], hits, socket_suppliers,
+                                                   registry=registry, publishers=publishers,
+                                                   resolve_origin=resolve_origin, publisher_lifts=publisher_lifts))
+    return problems
+
+
+def _independence_problems(label: str, source_id: str, subject: str, hits: Sequence[Mapping[str, Any]],
+                           socket_suppliers: set[str], *, registry: Any, publishers: Any,
+                           resolve_origin: Any, publisher_lifts: Any) -> list[str]:
+    """一條標 `independent` 的引用，它那份文件的 origin 撐不撐得住「不是供應商自己」。
+
+    `hits` 都出自同一份文件（`source_id`），所以通常只有一個 origin；逐個 origin 判，任何一個撐不住就說出來。
+    """
+    problems: list[str] = []
+    by_origin: dict[str, set] = {}
+    for q in hits:
+        by_origin.setdefault(str(q.get("origin") or ""), set()).add(q.get("origin_linkage") or None)
+    for origin, linkages in sorted(by_origin.items()):
+        resolution = resolve_origin(origin, registry, publishers=publishers)
+        if resolution.kind == "company":
+            if resolution.id == subject:
+                problems.append(f"{label}：標了 independent，但來源 {source_id} 就是 {subject} 自己——"
                                 "供應商自稱是弱主張（L8）")
-            elif resolved & socket_suppliers:
-                problems.append(f"{label}：標了 independent，但來源 {citation.source_id} 是這個插槽的另一家供應商 "
-                                f"{sorted(resolved & socket_suppliers)}——同插槽的聯合公告方不是客戶端（L8；plan 待決 #12）")
+            elif resolution.id in socket_suppliers:
+                problems.append(f"{label}：標了 independent，但來源 {source_id} 是這個插槽的另一家供應商 "
+                                f"{resolution.id}——同插槽的聯合公告方不是客戶端（L8；plan 待決 #12）")
+        elif resolution.kind == "publisher":
+            if not publisher_lifts(resolution, linkages):
+                problems.append(
+                    f"{label}：標了 independent，但來源 {source_id} 的 origin_entity {origin!r} 是"
+                    f"{'宣告為轉述（same_origin）的' if 'same_origin' in linkages else '沒宣告 independent 的媒體'}文件"
+                    "——轉述不是第三方印證（L11-3）；要追它轉述的那份一手")
+        else:
+            problems.append(f"{label}：標了 independent，但來源 {source_id} 的 origin_entity "
+                            f"{origin!r} 解析不到任何 co:* 或登記的發布者——解析不到的不算外部印證（L8、INV-1）")
     return problems
 
 

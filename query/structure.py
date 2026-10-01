@@ -65,7 +65,7 @@ if str(ROOT) not in sys.path:
 from identity.registry import get_registry  # noqa: E402
 from query.bottleneck import (  # noqa: E402
     DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
-    classify_evidence, collapse_assertions, company_id_for_origin, demand_chain, fetch_assertions,
+    classify_evidence, collapse_assertions, demand_chain, fetch_assertions,
 )
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
@@ -252,7 +252,7 @@ class SocketView:
 
 def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
                       quotes: Mapping[tuple[str, str, str], Iterable[Mapping[str, Any]]],
-                      registry: Any = None) -> SocketView:
+                      registry: Any = None, *, publishers: Any = None) -> SocketView:
     """插槽（客戶的產品 × 那一格零件）要多問的兩件事：**這是誰的產品**、**有沒有客戶端的原文**。
 
     ⚠ **這兩段都不進 `result_digest`**：
@@ -262,7 +262,11 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
       由自報升成外部印證），插槽的讀圖分級把這種變動算高等級（`alpha.structure_reading.staleness`）。
     - 製造者（`develops`／`deploys`）不在五個角度裡，是**讀法**的輔助；它變了由重讀時看見，不觸發 stale。
     缺席一律明說（INV-3）：分不出製造者、沒有客戶端原文，都印出來，不印空白。
+    「可解析第三方」＝ origin 經 `query.origin_resolution`（唯一 owner）解析成**算印證的發布者**（Step 4.3）——
+    與讀圖 `independent` 核對（`verify_citations`）同一個判準：那邊收得下的引文，這裡就要列得出來。
     """
+    from query.origin_resolution import publisher_lifts, resolve_origin
+
     if registry is None:
         registry = get_registry()
     edges = list(edges)
@@ -283,12 +287,17 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
             continue
         for q in found:
             origin = q.get("origin")
-            company = company_id_for_origin(origin, registry)
+            resolution = resolve_origin(origin, registry, publishers=publishers)
+            company = resolution.id if resolution.kind == "company" else None
+            third_party = (resolution.kind == "publisher"
+                           and publisher_lifts(resolution, (q.get("origin_linkage"),)))
             doc = str(q.get("doc") or "")
-            docs.setdefault(doc, {"doc": doc, "tier": q.get("tier"), "origin": origin, "company": company})
-            if company is not None and company not in suppliers:
+            docs.setdefault(doc, {"doc": doc, "tier": q.get("tier"), "origin": origin, "company": company,
+                                  "resolved_as": _resolved_as(resolution, third_party)})
+            if (company is not None and company not in suppliers) or third_party:
                 view.customer_quotes.append({"edge": list(edge_key), "quote": q.get("quote"), "doc": doc,
-                                             "tier": q.get("tier"), "origin": origin, "company": company})
+                                             "tier": q.get("tier"), "origin": origin, "company": company,
+                                             "publisher": resolution.id if third_party else None})
     view.sources = sorted(docs.values(), key=lambda d: d["doc"])
     if not view.customer_quotes:
         view.customer_absence = SOCKET_NO_CUSTOMER_QUOTE
@@ -307,13 +316,24 @@ def render_socket_markdown(socket: SocketView) -> str:
     out.append("\n## 插槽：客戶端或可解析第三方的原文（不進 digest）\n")
     if socket.customer_quotes:
         for q in socket.customer_quotes:
+            who = f"`{q['company']}`" if q.get("company") else f"第三方 {q.get('publisher')}"
             out.append(f"- `{q['edge'][0]}` {q['edge'][1]} `{q['edge'][2]}`：«{str(q['quote'])[:200]}»"
-                       f"　`{q['doc']}`（tier {q['tier']}｜{q['origin']} → `{q['company']}`）")
+                       f"　`{q['doc']}`（tier {q['tier']}｜{q['origin']} → {who}）")
     else:
         levels = "、".join(f"`{d['doc']}`（tier {d['tier']}｜{d['origin']}"
-                          f"{'' if d['company'] else '｜解析不到'}）" for d in socket.sources) or "（這個節點的邊沒有任何逐字）"
+                          f"{'' if d['company'] else '｜' + str(d.get('resolved_as') or '解析不到')}）"
+                          for d in socket.sources) or "（這個節點的邊沒有任何逐字）"
         out.append(f"⚠ {socket.customer_absence}——現有來源：{levels}")
     return "\n".join(out)
+
+
+def _resolved_as(resolution: Any, third_party: bool) -> str | None:
+    """來源清單上印的那幾個字：公司不印（印 co:* 就夠）、算印證的發布者、轉述、解析不到——三種缺席分開說（L12）。"""
+    if resolution.kind == "company":
+        return None
+    if resolution.kind == "publisher":
+        return f"第三方·{resolution.publisher_kind}" if third_party else "媒體轉述"
+    return "解析不到"
 
 
 def _sub_distribution(rows: Iterable[EdgeView]) -> str:
@@ -402,7 +422,7 @@ WHERE ea.src_id = $node OR ea.dst_id = $node
 OPTIONAL MATCH (ea)-[:CITES]->(d:SourceDoc)
 RETURN ea.src_id AS src, ea.relation AS relation, ea.dst_id AS dst,
        s.quote AS quote, s.locator AS locator,
-       d.id AS doc, d.evidence_tier AS tier, d.origin_entity AS origin
+       d.id AS doc, d.evidence_tier AS tier, d.origin_entity AS origin, d.origin_linkage AS origin_linkage
 """
 
 
@@ -433,6 +453,8 @@ def fetch_quotes(session, node: str) -> dict[tuple[str, str, str], list[dict[str
             "doc": r["doc"],
             "tier": r["tier"],
             "origin": r["origin"],
+            # 媒體文宣告 independent 才算第三方（Step 4.3）；讀圖引用核對與插槽視角都讀這一欄。
+            "origin_linkage": r.get("origin_linkage"),
         })
     return out
 
@@ -509,7 +531,8 @@ def _classify_edges(rows) -> list[CanonicalEdge]:
     registry = get_registry()
     for edge in edges:
         edge.evidence = classify_evidence(
-            edge.src, edge.origins, registry, filing_origins=edge.filing_origins
+            edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
+            origin_linkages=edge.origin_linkages,
         )
     return edges
 

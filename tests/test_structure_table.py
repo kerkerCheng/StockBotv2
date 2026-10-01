@@ -226,8 +226,14 @@ def test_evidence_is_three_way_and_unresolved_origin_does_not_auto_pass() -> Non
     )
     # 唯一的非本人 origin 無法解析 → 待人工判定，不得自動當成外部佐證
     assert (
-        classify_evidence("co:coherent", ["Coherent", "The Next Platform"], reg)
+        classify_evidence("co:coherent", ["Coherent", "Some Unregistered Blog"], reg)
         == "needs_review"
+    )
+    # 登記為媒體的 origin（`config/publishers.json`）→ 媒體轉述：與待判定同級，同樣不得當成外部佐證
+    # （2026-10-01 Phase 4 Step 4.3：原本這裡用 The Next Platform 斷言 needs_review——None 的兩義拆開後它是轉述）
+    assert (
+        classify_evidence("co:coherent", ["Coherent", "The Next Platform"], reg)
+        == "media_relay"
     )
 
 
