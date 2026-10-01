@@ -97,10 +97,9 @@ _BUCKET_ALIASES: dict[str, str] = {
 }
 
 # Tickers that need enrichment — company name + Neo4j node ID (if in graph)
-# Exchange-prefixed tickers (FRA:, LON:) and numeric codes (7803.T) are not self-explanatory.
+# Exchange-prefixed tickers (FRA:, LON:) are not self-explanatory.
 _TICKER_ENRICHMENT: dict[str, dict] = {
     "FRA:2DG":    {"company": "Sivers Semiconductors AB",              "neo4j_id": "co:sivers_semiconductors"},
-    "7803.T":     {"company": "Bushiroad Inc",                         "neo4j_id": None},   # 2026-09-30 前 Sheet 寫 TYO:7803
     "LON:VWRA":   {"company": "Vanguard FTSE All-World UCITS ETF (Acc)", "neo4j_id": None},
     "00981A.TW":  {"company": "主動統一台股增長 ETF (統一投信)",          "neo4j_id": None},
     "00631L.TW":  {"company": "元大台灣50正2 ETF",                      "neo4j_id": None},
