@@ -6,6 +6,7 @@ fixture 全部離線（不連 Neo4j、不讀真實 ledger）：這一層的責�
 from __future__ import annotations
 
 import ast
+from datetime import date
 from pathlib import Path
 
 import pytest
@@ -157,6 +158,30 @@ def test_summary_line_prints_zero_and_absence_differently() -> None:
     # 讀不到 ledger 就不能宣稱「沒人讀過」——第 1 型一起降級，不是 0。
     assert "薄層沒人讀 upstream_unavailable" in gw.summary_line(result)
     assert _q(result, "reading_stale")["hit_n"] is None
+    # 對稱面（Phase 5 Step 5.1，#33）：第 2 型的記憶也住讀圖——讀不到時不得把記憶當空的照算。
+    # 變異：拿掉 walk() 裡第 2 型的降級 → 這兩行紅。
+    assert "獨家且自報 upstream_unavailable" in gw.summary_line(result)
+    sole = _q(result, "sole_supplier_self_reported")
+    assert (sole["hit_n"], sole["scope_n"], sole["absence"]["kind"]) == (None, None, "upstream_unavailable")
+
+
+def test_a_reading_ledger_with_a_bad_line_degrades_like_an_unreadable_one(monkeypatch) -> None:
+    """壞行不是「少一筆」：那一行可能就是某節點的現行讀圖（#33）。壞行與讀不到同形＝None；乾淨的照回列。"""
+    import alpha.providers.structure_readings as provider
+
+    monkeypatch.setattr(provider, "reading_status_rows", lambda *a, **k: ([{"reading_id": "sr_x"}], []))
+    assert gw.reading_rows_or_none([], today=date(2026, 10, 2)) == [{"reading_id": "sr_x"}]
+    monkeypatch.setattr(provider, "reading_status_rows",
+                        lambda *a, **k: ([{"reading_id": "sr_x"}], ["mat_x.jsonl:3: bad line"]))
+    assert gw.reading_rows_or_none([], today=date(2026, 10, 2)) is None
+
+    def boom(*a, **k):
+        raise OSError("ledger 目錄讀不到")
+
+    monkeypatch.setattr(provider, "reading_status_rows", boom)
+    assert gw.reading_rows_or_none([], today=date(2026, 10, 2)) is None
+    monkeypatch.setattr(provider, "reading_status_rows", lambda *a, **k: ([], []))
+    assert gw.reading_rows_or_none([], today=date(2026, 10, 2)) == []          # 空 ledger 是 0 筆，不是缺席
 
 
 def test_query_layer_imports_alpha_only_in_the_graph_walk_composition() -> None:

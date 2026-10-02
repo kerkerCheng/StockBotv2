@@ -425,6 +425,9 @@ def walk(*, edges: Sequence[CanonicalEdge], graph_nodes: Iterable[str],
     if readings is None:
         # 第 1 型的「沒有現行讀圖」要讀 ledger；讀不到就不能宣稱「沒人讀過」。
         parts["thin_layer_unread"] = None
+        # 對稱面（Phase 5 Step 5.1，#33）：第 2 型的記憶也住讀圖（「該節點沒有現行層讀圖」才命中）——讀不到時
+        # 照算會把記憶當成空的、把已經讀過的節點又印成命中。與第 1 型同形：母體與命中都不印數字。
+        parts["sole_supplier_self_reported"] = None
 
     questions = []
     for order, qt in enumerate(QUESTION_TYPES, start=1):
@@ -505,13 +508,7 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
     edges = _classify_edges(rows)
     duplicate_buckets = bucketize(pair_candidates(duplicate_rows), entities.load())
 
-    reading_rows: list[dict[str, Any]] | None
-    try:
-        from alpha.providers.structure_readings import reading_status_rows
-
-        reading_rows, _errors = reading_status_rows(edges, today=today or date.today(), as_of=as_of)
-    except Exception:  # noqa: BLE001 — 讀圖 ledger 讀不到只讓第 1、4 型降級，其餘照走
-        reading_rows = None
+    reading_rows = reading_rows_or_none(edges, today=today or date.today(), as_of=as_of)
     leads: Mapping[str, Mapping[str, Any]] | None
     try:
         from engine_b import leads as leads_mod
@@ -524,6 +521,25 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
                   duplicate_buckets=duplicate_buckets, duplicate_node_total=len(duplicate_rows))
     result["layer_stats"] = layer_stats_or_absence(edges=edges, rows=rows, quotes=quotes, layer_nodes=layer_nodes)
     return result
+
+
+def reading_rows_or_none(edges, *, today: date, as_of: date | None = None,
+                         directory: Path | None = None) -> list[dict[str, Any]] | None:
+    """走圖要的讀圖列；**讀不到、或任何一本 ledger 有壞行，都回 `None`**——讓依賴讀圖的型別（第 1、2、4 型）降級。
+
+    ⚠ 壞行不是「少一筆」：那一行可能正是某個節點的現行讀圖，照算的話第 1 型會說「沒人讀過」、第 2 型會把記憶當空的
+    （Phase 5 Step 5.1，#33）。所以壞行與讀不到同形：印 `upstream_unavailable`，不印殘缺資料算出的數。"""
+    try:
+        from alpha.providers.structure_readings import reading_status_rows
+
+        rows, errors = reading_status_rows(edges, today=today, as_of=as_of, directory=directory)
+    except Exception:  # noqa: BLE001 — 讀圖 ledger 讀不到只讓依賴它的型別降級，其餘照走
+        return None
+    if errors:
+        print(f"⚠ 讀圖 ledger 有 {len(errors)} 行壞行（例：{errors[0][:120]}）——第 1、2、4 型降級為 upstream_unavailable",
+              file=sys.stderr)
+        return None
+    return rows
 
 
 def layer_stats_or_absence(*, edges, rows, quotes, layer_nodes) -> dict[str, Any]:
