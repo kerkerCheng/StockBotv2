@@ -130,7 +130,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 5.5 | 計分表接主題等權組基準（第三個基準＋NaN 收盤＋APP 計分表頁；真實資料見 baseline §18；偏差見 §0.6 #23–#27） | ✅ | 執行模型 | 見 git log「Step 5.5」 |
 | 5.6 | 候選狀態每日序列（2026-10-02 交付；第一行與 artifact 計數相同，見 baseline §19；偏差見 §0.6 #28–#29） | ✅ | 執行模型 | 見 git log「Step 5.6」 |
 | 5.7 | 新管線 full chain 測試（夾具版；三條鏈、7 種中段打斷全紅，見 baseline §20；偏差見 §0.6 #30） | ✅ | 執行模型 | 見 git log「Step 5.7」 |
-| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅（回查改由心跳常駐計數器承載，§0.6 #31） | ▶ | 執行模型 | |
+| 結案 | completion gate ✅ ＋ closeout ✅ ＋ R2 **CONDITIONAL_GO**（B1：驗收②回查載體待使用者定，closeout §9）＋ ROADMAP ✅（待 B1） | ▶ | 執行模型 | 見 git log「Phase 5 結案」 |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 
@@ -174,7 +174,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 28 | 5.6 | §7「同日重跑只留最後一筆（照 `_persist_aggregate` 的做法，壞行只跳過）」 | 同日去重照做；但**壞行原樣保留**，不丟。整檔寫到暫存檔再 `os.replace`（原子改寫）；artifact 寫完才記，artifact 寫失敗那一輪不記 | `_persist_aggregate` 的「跳過」在改寫時等於把壞行刪掉。這份序列今天重抓拿不回昨天的值（L10：拿不回來的只能 append），壞掉的那一行也是一筆紀錄的殘骸，留著才看得到它壞了。非原子改寫在寫到一半時會截掉整串 |
 | 29 | 5.6 | §7「新 `library/private/measurement/`（目錄由程式建）」 | 只有**預設** state 目錄寫這個路徑；其他 state 目錄（測試、`--dir`、`STOCKBOT_APP_STATE_DIR`）寫在那個目錄裡的 `measurement/` | 試跑與測試不得碰到真實序列；「同一天只留最後一筆」會讓一次試跑蓋掉當天的真實那一行 |
 | 30 | 5.7 | §8「`prediction_table` → `structure_readings` artifact 的 `predictions` 段」；「`build_scorecard` 的籃子格」 | 讀圖鏈的夾具經**真的寫入端**（`append_reading_record`：契約＋引文逐字核對）進 ledger，再跑真的 `materialize_structure_readings`；計分表鏈跑真的 `materialize_account_scorecard`；三條鏈都多斷言 APP 的 GET 照抄同一個數字。追蹤表鏈照 plan 走 `collect()` → `build_positions_artifact`（`materialize_positions` 會開舊店、讀 Sheet 與 NAV，夾具化太脆） | 斷言要落在真的組裝函式之後，才量得到「數字有沒有流到下游」（L13）；APP 是第三個消費者 |
-| 31 | 結案 | §0.1 #4「登記 date watch 回查（最早讀圖到期 2026-12-24）」；§12 #7「結案登記的回查 date watch 有到期」；§0 第 1 條的唯一例外 | **沒有登記 date watch、沒有鑄 pq2**。回查的載體改為已經每天自己出現的心跳常駐計數器：段 4「圖預測」行的「現行最早到期 2026-12-24」，加上快照鍵 `predictions.held`、`predictions.wrong`、`predictions.expired_unread`（第一次從 0 變非 0 的那天，Daily 的「較昨變動」會自己印出來）。兩份現行讀圖 12-24 到期當天就會進走圖第 4 型「讀圖該重讀」——那是研究的佇列（重讀＝研究），不是開發項。Event Watch registry 本 Phase 0 筆寫入 | date watch 的喚醒目標只能是 pq2／假設／lead／敘事四選一（`engine_b/event_watch.py::add_watch`；`wake_reading` 只收 `entity_filing_signal`）。驗收②的回查是 ROADMAP 驗收（開發項），而 AGENTS「開發項不走 pq2」。Phase 1 結案撞過**同一個衝突**，使用者 2026-09-25 定案「用心跳計數器，不另建等待」（Phase 1 closeout §2）。plan 寫 #4 時沒有對到這個前例。可逆：使用者若仍要 watch，closeout §7 附三行指令 |
+| 31 | 結案（**待使用者定**；結案 R2 B1） | §0.1 #4「登記 date watch 回查（最早讀圖到期 2026-12-24）」；§11 第 ② 列；§12 #7 | 結案時**沒有登記 date watch、也沒有鑄 pq2**；在使用者決定之前，回查暫由已經每天自己出現的心跳計數器承載（段 4「圖預測…｜現行最早到期 2026-12-24」與快照鍵 `predictions.held`／`predictions.wrong`／`predictions.expired_unread`）。§11、§12 原文**不改**——改它就是改 ROADMAP Phase 5 的驗收定義（AGENTS 停止條件④）；結案 R2 B1 也要求先取得使用者的選擇 | date watch 的喚醒目標只能是 pq2／假設／lead／敘事四選一（`engine_b/event_watch.py::add_watch`；`wake_reading` 只收 `entity_filing_signal`）；回查是 ROADMAP 驗收（開發項），而 AGENTS「開發項不走 pq2」。Phase 1 結案撞過**同一個衝突**，程序是「結案時向使用者提出，使用者選」（當時選心跳計數器，Phase 1 closeout §2）。plan 寫 #4 時沒有對到這個前例。兩個選項與五欄 amendment 草案在 closeout §9 |
 
 ---
 
@@ -319,7 +319,7 @@ L11-6 ④：最先壞的是 `materialize --candidates` 的 request path 哨兵�
 | 驗收 | 數的東西 | 層 |
 |---|---|---|
 | ROADMAP ① 追蹤表印籃子超額 | paper／live 每列與 lane 聚合的 `excess_theme_cohort` 有值或有缺席 kind；history 不要求（它不是判斷） | 追蹤表 |
-| ROADMAP ② 圖預測表有第一筆對／錯，每筆「錯」標明種類 | `predictions` 的 `held + reversed + disproof_touched + retracted` ≥ 1 且每筆錯有種類；**結案時若為 0**：夾具測試證明機制、closeout 寫「已交付、未生效」、回查由心跳常駐計數器承載（「現行最早到期 2026-12-24」與 `predictions.*` 快照鍵；不登記 date watch，§0.6 #31） | 讀圖 × 等待 registry |
+| ROADMAP ② 圖預測表有第一筆對／錯，每筆「錯」標明種類 | `predictions` 的 `held + reversed + disproof_touched + retracted` ≥ 1 且每筆錯有種類；**結案時若為 0**：夾具測試證明機制、closeout 寫「已交付、未生效」、登記 date watch 回查（到期日＝`earliest_open_expiry`，今天是 2026-12-24） | 讀圖 × 等待 registry |
 | ROADMAP ③ 計分表印量測起始日與樣本數 | 既有 `measurement_start`／`named_calls` 照印；新加籃子格的 `n` 與 `members_priced` | 計分表 |
 | 三條 lane | history 22 列：錨點 digest 與 5.0 相同、同一份價格上 rows／power_law 逐位相同（§0.6 #4）；paper 4 列、錨點 2026-09-29、三量每格有值或「還沒有分母」；live 0 列（或使用者回填後的 N 列，逐筆附指令時間）＋「beta 事件 2 不進 lane」 | 追蹤表 |
 | 候選狀態序列 | `candidate_state_series.jsonl` 行數＝結案日 − 5.6 交付日 ＋ 1（daily 每天一行） | 追蹤表 |
@@ -336,7 +336,7 @@ L11-6 ④：最先壞的是 `materialize --candidates` 的 request path 哨兵�
 4. 無新 dual authority：三量與等權只有 `outcome_if_settled_today.py` 的兩個純函式（三 lane、APP、心跳共用）；籃子報酬只有一個函式（追蹤表與計分表共用——放 `alpha/theme_cohort.py` 或新模組，兩個消費端 import 同一個）；預測終局只有 `predictions.py`；alpha 判別沿 `risk/hard_caps` 既有函式；symbol → 公司只走 `resolve_holding`。
 5. 無 silent drop：每條 lane 空時印「還沒有列」；分母 0 印「還沒有分母」；籃子缺價成員逐檔印；預測表 `undated` 與 `upstream_unavailable` 分開；截斷的 symbol 印出。
 6. Point-in-time：錨點價是錨點日或之前的收盤（測試）；預測表種類只看 `published_at`；`audit PointInTime` PASS。
-7. lifecycle 可達：回查的常駐計數器每天出現（§0.6 #31；原寫「結案登記的回查 date watch 有到期」）；`QueueLiveness`、`Expiry` 綠。
+7. lifecycle 可達：結案登記的回查 date watch 有到期；`QueueLiveness` 綠。
 8. executable protection：回填旗標七種拒收、lane 混算變異紅、`supply_added` 接入變異紅、入口缺 token fail closed、`_persist_aggregate` 四欄不變的測試；殭屍 grep 九組三個 0。
 9. 驗收數的是 §11 的層。
 
