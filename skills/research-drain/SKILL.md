@@ -176,7 +176,9 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
      & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier 4 --reason "<為什麼現在追>" --content-type structural_fact --decision-impact structure_change --classified-by interactive:graph_walk
      ```
      `--url` 有真實文件就用真實 URL；用合成 URL 時 `published_at` 留空（不編日期，INV-6）。`--classified-by` 讓心跳的
-     「分類層上次成功」不把它算成分類層跑過（另印「互動 triage N 則」）。接著以 lead-intake／source-trace 追源
+     「分類層上次成功」不把它算成分類層跑過（另印「互動 triage N 則」）。**不是走圖命中**、而是使用者點名或 plan 指定
+     題目起的互動研究，鑄號時來源寫 `directed:<出處>`、`--classified-by interactive:directed`（量測要分得出「走圖的產出」
+     與「點名的產出」，不要借用 `interactive:graph_walk`）。接著以 lead-intake／source-trace 追源
      （source-trace「輸入是層／節點時」那一節）。**終局只有三種**（不加 trace_status 字彙）：
      ① 找到第二家供應商或客戶端／第三方印證 → 研究包走 pq2 `ra_admission`，核准後經 `scripts/apply_ra_admission.py`
      入圖（lead 終局 `applied`）；

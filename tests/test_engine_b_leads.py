@@ -979,10 +979,25 @@ def test_queue_segments_count_interactive_research_leads_separately() -> None:
     from engine_b import queue_segments
 
     store = leads.empty_store()
-    for n, who in enumerate(("triage_semantic_v1", "interactive:graph_walk", "interactive:graph_walk", None)):
+    for n, who in enumerate(("triage_semantic_v1", "interactive:graph_walk", "interactive:graph_walk",
+                             "interactive:directed", None)):
         lead_id, _ = leads.register(store, source="x:test", url=f"https://x.io/q{n}")
         leads.triage(store, lead_id, go=True, tier=4, reason="r",
                      classification=None if who is None else _PASS, classified_by=who)
     observed = queue_segments.observe(leads=store["leads"])
     assert observed["triaged_go_by_classifier"] == {
-        "interactive:graph_walk": 2, "triage_semantic_v1": 1, "unclassified": 1}
+        "interactive:graph_walk": 2, "interactive:directed": 1, "triage_semantic_v1": 1, "unclassified": 1}
+
+
+def test_directed_research_is_its_own_classifier_not_a_graph_walk_hit() -> None:
+    """Phase 5 Step 5.1（#34）：使用者點名／plan 指定的互動研究有自己的值——不再借用 graph_walk（量測時來源標籤要
+    分得出「走圖產出」與「點名產出」）。字彙仍是封閉的：同義詞照擋，既有值照收。"""
+    store = leads.empty_store()
+    directed, _ = leads.register(store, source="directed:phase5-test", url="https://x.io/directed")
+    leads.triage(store, directed, go=True, tier=4, reason="使用者點名", classification=_PASS,
+                 classified_by="interactive:directed")
+    assert store["leads"][directed]["triage"]["classification"]["classified_by"] == "interactive:directed"
+    for synonym in ("interactive:user", "directed", "interactive:Directed"):
+        lead_id, _ = leads.register(store, source="x:test", url=f"https://x.io/{synonym}")
+        with pytest.raises(ValueError, match="未登記"):
+            leads.triage(store, lead_id, go=True, tier=4, reason="r", classification=_PASS, classified_by=synonym)

@@ -952,10 +952,12 @@ _PRIORITY_FLAG_KEYS = (
 
 #: PASS 的分類是誰下的（`triage.classification.classified_by`；封閉字彙——它有行為後果，同義詞也拒收，L16）。
 #: `triage_semantic_v1`＝daily 的分類層（與舊資料同一個值）；`interactive:graph_walk`＝研究 session 從走圖問句
-#: 起研究時自己鑄、自己 triage 的 lead（Phase 4 Step 4.5b）。心跳的「分類層上次成功」與佇列段把後者分開計：
-#: 互動 session 下的判斷不是分類層跑過（L12：一個欄位兩種語意）。
+#: 起研究時自己鑄、自己 triage 的 lead（Phase 4 Step 4.5b）；`interactive:directed`＝研究 session 照使用者點名或
+#: plan 指定的題目起研究、自己鑄自己 triage 的 lead——**不是走圖命中**（Phase 5 Step 5.1，#34：cw_dfb 那則來源是
+#: `directed:`，卻只能標成 graph_walk，量測時會把它算成走圖的產出）。心跳的「分類層上次成功」與佇列段把
+#: `interactive:*` 分開計：互動 session 下的判斷不是分類層跑過（L12：一個欄位兩種語意）。
 SEMANTIC_CLASSIFIER = "triage_semantic_v1"
-CLASSIFIED_BY = frozenset({SEMANTIC_CLASSIFIER, "interactive:graph_walk"})
+CLASSIFIED_BY = frozenset({SEMANTIC_CLASSIFIER, "interactive:graph_walk", "interactive:directed"})
 
 
 def triage(

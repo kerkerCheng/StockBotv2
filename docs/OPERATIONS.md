@@ -492,7 +492,8 @@ python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授�
 & '.venv\Scripts\python.exe' crons\harvest_leads.py                 # 零 token；--dry-run 只印不寫
 & '.venv\Scripts\python.exe' -m engine_b.cli consume-fired [--dry-run]  # 佇列段 1：fired 的追源 watch 排回 pq1（機械、零 token；drain 之前先跑）
 & '.venv\Scripts\python.exe' -m engine_b.cli drain                  # pq1 依 priority 的下一批（首行印段 0–1 計數器）
-& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier N --reason ... --content-type <type> --decision-impact <impact> [--payment-direction <direction>] [--classified-by interactive:graph_walk]
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier N --reason ... --content-type <type> --decision-impact <impact> [--payment-direction <direction>] [--classified-by interactive:graph_walk|interactive:directed]
+#   --classified-by：互動 session 自己鑄、自己 triage 的 lead——走圖命中起的用 interactive:graph_walk，使用者點名或 plan 指定題目起的用 interactive:directed（不是走圖產出，量測要分得出來）
 & '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --no-go --tier N --reason ...
 & '.venv\Scripts\python.exe' -m engine_b.cli classification-health # active 缺分類回 exit 2
 & '.venv\Scripts\python.exe' -m engine_b.cli advance <lead_id> <status> [--ref k=v]
@@ -1018,6 +1019,13 @@ atomic 寫本機 `library/leads/pending_leads.json`；`classification-health` �
 | **3 最窄 rule** | **互動專用，沒有新增任何 rule**：daily 走的是 `triage-apply`（分類層），不是 `triage`；`.codex/rules` 與 daily 固定步驟都不含 `--classified-by`。落在本機既有的 `Bash(python *)` 之下，補償控制＝封閉字彙＋心跳把互動 triage 另計（「分類層上次成功」不算它、另印「互動 triage N 則」，pq1 行印「其中互動起的研究 lead N」）。 |
 | **4 permission contract test** | `tests/test_engine_b_cli.py::test_graph_walk_research_mints_a_lead_and_triages_it_as_interactive`（未登記值 exit 2）、`tests/test_engine_b_leads.py` 三條（預設值、封閉字彙、佇列段分開計）、`tests/test_company_onboard_skill.py::test_research_drain_graph_walk_lines_parse_with_the_real_cli`（skill 的三行指令拿真 parser 解析）。 |
 | **5 端到端 smoke** | 夾具版由 register → annotate → triage → 讀回 refs 與 `classified_by` 跑通（同上第一條測試）；真資料不跑（鑄 lead 只在 Step 4.8 研究啟動時）。 |
+
+**2026-10-02 Phase 5 Step 5.1（#34）增補：字彙多一個值 `interactive:directed`**（使用者點名或 plan 指定題目起的互動研究，不是走圖命中）。
+五步逐條對照：①path／side effect／capability 不變（同一個寫入、同一個欄位，只是封閉字彙多一個值）；②skill：`skills/research-drain/SKILL.md` 段 4 ② 補一句點名研究用這個值，本節與上面的指令表同步；
+③rule 不變（互動專用、不進任何無人值守 allowlist；daily 的 `triage-apply` 不帶 `--classified-by`）；補償控制照舊——心跳的「互動 triage N 則」與「其中互動起的研究 lead N」都以 `interactive:` 前綴計，新值自動分開計；
+④測試：`tests/test_engine_b_leads.py::test_directed_research_is_its_own_classifier_not_a_graph_walk_hit`（新值收、三個同義詞擋）、佇列段分開計那條補新值、
+`tests/test_engine_b_cli.py::test_directed_research_triages_as_interactive_directed_through_the_cli`、`tests/test_heartbeat.py` 分類層那條補新值；⑤夾具 smoke 同上；真資料不跑。
+既有 cw_dfb 那則（來源 `directed:phase4-plan-4.8`、標 `interactive:graph_walk`）與三則 `directed:sub_backfill`（標成預設的 `triage_semantic_v1`）**不改寫**——lead registry 是 authority，改資料走 pq2（plan §14）。
 
 ### Sandbox／private authority 排錯
 

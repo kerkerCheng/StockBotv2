@@ -72,6 +72,19 @@ def test_graph_walk_research_mints_a_lead_and_triages_it_as_interactive(tmp_path
         raise AssertionError("未登記的 --classified-by 必須被拒絕")
 
 
+def test_directed_research_triages_as_interactive_directed_through_the_cli(tmp_path, capsys) -> None:
+    """Phase 5 Step 5.1（#34）：照使用者點名或 plan 指定的題目起研究——argparse 收 `interactive:directed`。"""
+    path = tmp_path / "pending_leads.json"
+    url = "https://example.com/layer-document"
+    assert cli.main(["--leads", str(path), "register", "--source", "directed:phase5-test",
+                     "--url", url, "--title", "使用者點名的層文件"]) == 0
+    lead_id = leads.lead_id_for(url)
+    assert cli.main(["--leads", str(path), "triage", lead_id, "--go", "--tier", "4", "--reason", "使用者點名",
+                     *PASS_CLASSIFICATION_ARGS, "--classified-by", "interactive:directed"]) == 0
+    assert leads.load(path)["leads"][lead_id]["triage"]["classification"]["classified_by"] == "interactive:directed"
+    capsys.readouterr()
+
+
 def test_triage_then_advance_round_trip(tmp_path, capsys) -> None:
     path = tmp_path / "pending_leads.json"
     lead_id = _seed(path)

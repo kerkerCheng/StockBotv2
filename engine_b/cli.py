@@ -923,8 +923,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_tri.add_argument("--independent", action="store_true", help="新 origin_entity/獨立來源（priority）")
     p_tri.add_argument(
         "--classified-by", choices=sorted(leads.CLASSIFIED_BY), default=None,
-        help="PASS 分類是誰下的（預設 triage_semantic_v1）；研究 session 從走圖起研究時用 interactive:graph_walk——"
-             "心跳的分類層計數與佇列段會把它分開計",
+        help="PASS 分類是誰下的（預設 triage_semantic_v1）；研究 session 從走圖起研究時用 interactive:graph_walk，"
+             "照使用者點名或 plan 指定的題目起研究時用 interactive:directed——心跳的分類層計數與佇列段會把它們分開計",
     )
     p_tri.set_defaults(func=_cmd_triage)
 

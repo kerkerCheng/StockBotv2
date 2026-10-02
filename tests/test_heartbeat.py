@@ -577,6 +577,11 @@ def test_classification_line_reports_this_run_and_the_last_success(tmp_path: Pat
                                          "classification": {"classified_by": "interactive:graph_walk"}}}}
     line = hb._classification_line(leads=walked, now=now, record_path=_record(tmp_path))
     assert "（2 天前）" in line and "互動 triage 1 則（不算分類層）" in line
+    # 點名起的互動研究（Phase 5 Step 5.1，#34）同樣不是分類層跑過
+    directed = {**walked, "L6": {"triage": {"decided_at": "2026-09-30T06:00:00+00:00",
+                                            "classification": {"classified_by": "interactive:directed"}}}}
+    line = hb._classification_line(leads=directed, now=now, record_path=_record(tmp_path))
+    assert "（2 天前）" in line and "互動 triage 2 則（不算分類層）" in line
     assert "互動 triage 0 則" in hb._classification_line(leads=leads, now=now, record_path=_record(tmp_path))
 
 
