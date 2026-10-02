@@ -426,3 +426,16 @@ scratchpad `p52_collect_real.py`（`collect()` 唯讀；跑前跑後兩個聚合
 - 心跳段 5 與 §3 逐行對照：第二行變成 `完整表（每個帳號的量測窗、點名數、超額報酬、追源成功率）在 APP 帳號計分表頁｜已知偏差 4 條（也在 APP）｜主題等權組基準：有`（「已知偏差 3 條」→ 4 條、行尾多那一格）；第一行只差計分表 as-of。
 - headless Edge 在臨時實例（127.0.0.1:8798，驗完即關）渲染 `#/account-scorecard`：首段印主題等權組 `tc_35b0d5cd521656ea`（成員 15、取得到價 15、缺價 —）與「為主題等權組多抓」7 檔；帳號表三個基準並排（30 天：QQQ −0.6%、SOXX −0.1%、主題等權組 −6.4%，n=790）；四條已知偏差在頁尾；沒有殘留「載入中」
 - 變異（worktree）：拿掉 NaN 過濾、不排除本檔、成員排在點名之前、組缺席壓成 0、心跳不看缺席一律印有、freshness 不看組、組報酬改中位數——7 種全紅；路由守門：meta 漏列、`STATE_ROUTES` 漏列、request path 叫 `build_scorecard`——3 種全紅。還原後全綠。
+
+## 19. Step 5.6 候選狀態每日序列的真實資料驗收（2026-10-02 16:57 台北）
+
+- 跑前 `library/private/measurement/` 不存在；`python -m webapp materialize --candidates` → `candidates.json`（28,183 bytes；可開 0／缺 X 0／等回落 1／不要 0／已持有 2／無敘事 69），序列出現**第一行**：
+
+```json
+{"counts": {"held": 2, "missing": 0, "open": 0, "pass": 0, "priced_wait": 1}, "date": "2026-10-02", "generated_at": "2026-10-02T08:57:42.718288+00:00", "no_narrative": 69, "oldest_stall_days": {"missing": null, "open": null, "priced_wait": 3}, "side": {"edge_unmeasurable": 0, "legacy": 0, "not_multiple": 1, "precondition_failed": 0}}
+```
+
+- 與 artifact 對照：`counts`＋`side`＋`no_narrative` 合起來＝artifact 的 `counts`，`date`＝artifact 的 `today`，`oldest_stall_days` 相同；檔案被 `.gitignore` 的 `library/private/` 涵蓋。
+- 心跳與 5.5 那次逐行對照：沒有新行（序列只寫不讀）。候選行「已持有 1→2、非倍率候選 2→1」是當天 Sheet 補上 COHR 之後重新 materialize 的結果，不是 5.6 造成的；備份的「之後變動未備份」95→96，新檔在備份範圍內。
+- 結案驗收（plan §11）：行數＝結案日 − 2026-10-02 ＋ 1。
+- 變異（worktree）：同日不去重、壞行照 `_persist_aggregate` 丟掉、試跑寫真實序列、寫失敗上拋、`held` 缺席壓成 0、artifact 寫之前就記——6 種全紅，還原後全綠（變異跑在 worktree，寫進的是 worktree 自己的 `library/private/measurement/`，跑完已刪）。

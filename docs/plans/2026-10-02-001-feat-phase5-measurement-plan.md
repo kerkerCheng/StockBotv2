@@ -128,7 +128,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 5.3 | `record_trade.py --backfill-before-receipts`（R2-a：CONDITIONAL_GO → 條件修正 → 窄範圍覆核 GO；偏差見 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 5.3」 |
 | 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行；真實資料＝baseline §5.2 手算逐筆相同，見 baseline §17；偏差見 §0.6 #18–#22） | ✅ | 執行模型 | 見 git log「Step 5.4」 |
 | 5.5 | 計分表接主題等權組基準（第三個基準＋NaN 收盤＋APP 計分表頁；真實資料見 baseline §18；偏差見 §0.6 #23–#27） | ✅ | 執行模型 | 見 git log「Step 5.5」 |
-| 5.6 | 候選狀態每日序列 | ○ | 執行模型 | |
+| 5.6 | 候選狀態每日序列（2026-10-02 交付；第一行與 artifact 計數相同，見 baseline §19；偏差見 §0.6 #28–#29） | ✅ | 執行模型 | 見 git log「Step 5.6」 |
 | 5.7 | 新管線 full chain 測試（夾具版） | ○ | 執行模型 | |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ ＋ 回查 watch | ○ | 執行模型 | |
 
@@ -171,6 +171,8 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 25 | 5.5 | §6「成員 ticker 併進 `wanted`（仍受 `MAX_PRICED_SYMBOLS`，被截的印出）」 | 截斷順序定為基準 → 點名標的 → 成員；`price_budget` 多 `theme_cohort_added`（為組多抓的那幾檔） | 多一個基準不得把既有的點名擠出取價清單（既有五欄同一份價格上逐位不變）；「`requested` 增量＝新增檔數」要能機械核對 |
 | 26 | 5.5 | §6 心跳「籃子基準：有／無」；schema 未提；`freshness_identity`「加籃子格有沒有值」 | 心跳那一格叫「主題等權組基準：有／無（kind）」，artifact 早於 5.5 時印「計分表 artifact 早於這一格」；schema `account_scorecard/2`；`freshness_identity` 多 `[cohort_id, 缺席 kind]`（格有沒有值本來就在每個帳號的 key 清單裡） | §0 第 9 條命名規則（殭屍 grep）；舊 artifact 沒有這一段與「無」是兩種沒有（L12）；換一組是認知變化 |
 | 27 | 5.5 | §6 驗收「同一份價格上…污染的格逐格列出改前改後」 | 今天抓到的價格**沒有** NaN（16／16 格逐位相同、污染 0 格），所以另以同一份價格重放 10-01 的形狀（五檔歐股 10-01 收盤換成 NaN）逐格比對：改前 7／10 格被污染，改後的值＝乾淨價格的值 | 污染不只讓那一格變 NaN：中位數排序被 NaN 打亂，**看起來正常的格也被靜默算錯**（「30 天 vs QQQ」乾淨 −0.63%、重放污染 −34.27%；早上 daily 那份 artifact 印的是 −43.57%）。逐格見 baseline §18 |
+| 28 | 5.6 | §7「同日重跑只留最後一筆（照 `_persist_aggregate` 的做法，壞行只跳過）」 | 同日去重照做；但**壞行原樣保留**，不丟。整檔寫到暫存檔再 `os.replace`（原子改寫）；artifact 寫完才記，artifact 寫失敗那一輪不記 | `_persist_aggregate` 的「跳過」在改寫時等於把壞行刪掉。這份序列今天重抓拿不回昨天的值（L10：拿不回來的只能 append），壞掉的那一行也是一筆紀錄的殘骸，留著才看得到它壞了。非原子改寫在寫到一半時會截掉整串 |
+| 29 | 5.6 | §7「新 `library/private/measurement/`（目錄由程式建）」 | 只有**預設** state 目錄寫這個路徑；其他 state 目錄（測試、`--dir`、`STOCKBOT_APP_STATE_DIR`）寫在那個目錄裡的 `measurement/` | 試跑與測試不得碰到真實序列；「同一天只留最後一筆」會讓一次試跑蓋掉當天的真實那一行 |
 
 ---
 
@@ -302,7 +304,7 @@ L11-6 ④：最先壞的是 `price_budget` 截斷邏輯（基準永遠留著的�
 ## 7. Step 5.6 候選狀態每日序列（Z1，R1）
 
 **改哪裡：** `webapp/materialize.py::materialize_candidates`、新 `library/private/measurement/`（目錄由程式建）、`tests/test_webapp_candidates*.py`、`docs/OPERATIONS.md`（sandbox impact review：materialize 新寫入路徑）。
-**怎麼改：** artifact 寫完後 append `{"date", "counts": {open, missing, priced_wait, pass, held}, "side": {not_multiple, edge_unmeasurable, legacy, precondition_failed}, "no_narrative", "oldest_stall_days", "generated_at"}`；同日重跑只留最後一筆（照 `_persist_aggregate` 的做法，壞行只跳過）；只寫不讀；寫失敗不讓 materialize 失敗（印警告）。
+**怎麼改：** artifact 寫完後 append `{"date", "counts": {open, missing, priced_wait, pass, held}, "side": {not_multiple, edge_unmeasurable, legacy, precondition_failed}, "no_narrative", "oldest_stall_days", "generated_at"}`；同日重跑只留最後一筆（照 `_persist_aggregate` 的做法；壞行**原樣保留**、原子改寫，§0.6 #28）；只寫不讀；預設以外的 state 目錄寫在那個目錄裡的 `measurement/`（§0.6 #29）；寫失敗不讓 materialize 失敗（印警告）。
 **怎麼驗：** 暫存目錄：兩次同日 → 1 行；跨日 → 2 行；壞行不吞掉整檔。真實跑一次 materialize 後檔案出現第一行、`counts` 與 artifact 的 `counts` 相同。
 L11-6 ④：最先壞的是 `materialize --candidates` 的 request path 哨兵（`tests/test_webapp_request_path.py`）——新寫入必須在 materialize 端、不在任何 request path。
 

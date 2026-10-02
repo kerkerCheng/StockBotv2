@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.6：候選狀態每日序列）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的 `python -m webapp materialize --candidates` **多一個寫入、讀取不變**：候選板 artifact 寫完之後，改寫 `library/private/measurement/candidate_state_series.jsonl`（目錄由程式建；ignored、private）。做法是讀既有行、同日那一行換掉、壞行原樣留著，整檔寫到同目錄的 `.tmp` 再 `os.replace`。**只寫不讀**：心跳與 APP 都不吃它。**沒有新讀取、沒有新網路主機或憑證**。寫失敗只印警告，候選板 artifact 照寫。預設以外的 state 目錄（測試、`--dir`、`STOCKBOT_APP_STATE_DIR`）寫在那個目錄裡的 `measurement/`，試跑碰不到真實序列 |
+| **2 canonical skill／prompt／本檔** | 本節；plan §7。這份序列是量測的原料，結案與之後的 Phase 才會讀它；在那之前沒有任何 skill 或 prompt 需要知道它 |
+| **3 最窄 rule** | daily ⑬ 的 argv **不變**（`tests/test_daily_task.py` 逐項相等照過）；不新增 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條。新寫入點在 `library/private/` 之下（已 ignored，`git ls-files library/private` 仍為空），與 ⑬ 既有的寫入（`library/private/app/state/`）是同一棵樹、同一個 writer。request path 不碰它：寫入只在 `materialize_candidates`，serve 端三個模組不得 import materialize（`tests/test_webapp_request_path.py`） |
+| **4 contract test** | `tests/test_webapp_candidates_series.py` 涵蓋：同日重跑 1 行、跨日 2 行、壞行原樣保留且前後好行都在、計數照抄 artifact（`held` 讀不到是 null）、只有預設 state 目錄寫真實路徑、真的走 `materialize_candidates`、寫失敗不擋候選板 |
+| **5 端到端 smoke** | 2026-10-02 真實 `materialize --candidates`：序列出現第一行，`counts`／`side`／`no_narrative`、`date`、`oldest_stall_days` 與 artifact 相同；心跳逐行對照沒有新行（候選行的變動是當天 Sheet 補了 COHR）；備份的「之後變動未備份」多 1 檔，代表新檔在備份範圍內 |
+
 ### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.5：計分表接主題等權組基準＋APP 計分表頁）
 
 | 步 | 結論 |
