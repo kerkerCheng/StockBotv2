@@ -1432,7 +1432,77 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
     _attach_ride_node_names(board)
     payload = build_candidates_artifact(board, generated_at=generated_at)
     target = store or StateArtifactStore()
-    return target.write(payload), payload
+    written = target.write(payload)
+    # Phase 5 Step 5.6：artifact 寫完才記序列（artifact 寫失敗＝這一輪沒有板，不記）。序列寫失敗只印警告——
+    # 候選板照樣有（plan §7）；序列漏一天會在「行數＝天數」的驗收上現形，不會安靜地消失。
+    try:
+        append_candidate_series(payload, path=candidate_series_path(target))
+    except Exception as exc:  # noqa: BLE001
+        print(f"⚠ 候選狀態序列沒寫進去（{type(exc).__name__}: {str(exc)[:160]}）——候選板 artifact 照寫",
+              file=sys.stderr)
+    return written, payload
+
+
+#: 候選狀態每日序列（Phase 5 Step 5.6；plan §7）。預設 state 目錄時寫 `library/private/measurement/`；給了別的
+#: state 目錄（測試、`--dir`、`STOCKBOT_APP_STATE_DIR`）就寫在**那個目錄裡**的 `measurement/`——試跑碰不到真實序列。
+CANDIDATE_SERIES_NAME = "candidate_state_series.jsonl"
+DEFAULT_MEASUREMENT_DIR = Path(__file__).resolve().parents[1] / "library" / "private" / "measurement"
+
+
+def candidate_series_path(store: StateArtifactStore) -> Path:
+    from .store import DEFAULT_STATE_DIR
+
+    directory = Path(store.directory)
+    if directory.resolve() == DEFAULT_STATE_DIR.resolve():
+        return DEFAULT_MEASUREMENT_DIR / CANDIDATE_SERIES_NAME
+    return directory / "measurement" / CANDIDATE_SERIES_NAME
+
+
+def candidate_series_row(payload: Mapping[str, Any]) -> dict[str, Any]:
+    """候選板 artifact → 序列的一行：五組與四個附組的檔數、無敘事數、最老滯留天數。**照抄 artifact 的 `counts`**，
+    不另算一份（`held` 在持股讀不到時是 `None`——照抄成 `null`，不是 0）。"""
+    from alpha.candidates import GROUPS, SIDE_GROUPS
+
+    counts = payload.get("counts") or {}
+    return {
+        "date": str(payload.get("today") or date.today().isoformat()),
+        "counts": {group: counts.get(group) for group in GROUPS},
+        "side": {side: counts.get(side) for side in SIDE_GROUPS},
+        "no_narrative": counts.get("no_narrative"),
+        "oldest_stall_days": dict(payload.get("oldest_stall_days") or {}),
+        "generated_at": payload.get("generated_at"),
+    }
+
+
+def append_candidate_series(payload: Mapping[str, Any], *, path: Path) -> dict[str, Any]:
+    """append 一行；同一天重跑只留最後一筆（以 `date` 去重，照 `_persist_aggregate`）。**只寫不讀**——心跳與 APP 不吃它。
+
+    ⚠ 與 `_persist_aggregate` 不同的一點：**壞行原樣保留**、不丟。這份序列今天重抓拿不回昨天的值（L10：拿不回來的只能
+    append），壞掉的那一行也是一筆紀錄的殘骸，留著才看得到它壞了。整檔以暫存檔＋`os.replace` 原子改寫。"""
+    row = candidate_series_row(payload)
+    kept: list[str] = []
+    replaced = 0
+    bad = 0
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                old = json.loads(line)
+            except ValueError:
+                bad += 1
+                kept.append(line)
+                continue
+            if isinstance(old, Mapping) and str(old.get("date")) == row["date"]:
+                replaced += 1
+                continue
+            kept.append(line)
+    kept.append(json.dumps(row, ensure_ascii=False, sort_keys=True))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temp = path.with_name(path.name + ".tmp")
+    temp.write_text("".join(line + "\n" for line in kept), encoding="utf-8")
+    os.replace(temp, path)
+    return {"path": str(path), "lines": len(kept), "replaced_same_day": replaced, "bad_lines_kept": bad}
 
 
 def _graph_node_names(ids: Sequence[str]) -> dict[str, str]:
@@ -1652,5 +1722,7 @@ __all__ = ["BETA_MATERIALIZER_VERSION", "BETA_THIS_IS_NOT", "GRAPH_WALK_MATERIAL
            "materialize_watches", "POSITIONS_MATERIALIZER_VERSION", "POSITIONS_THIS_IS_NOT",
            "build_positions_artifact", "materialize_positions",
            "build_candidates_artifact", "materialize_candidates",
+           "CANDIDATE_SERIES_NAME", "DEFAULT_MEASUREMENT_DIR", "append_candidate_series", "candidate_series_path",
+           "candidate_series_row",
            "redact_private_paths", "write_vocabularies",
            "materialize_account_scorecard"]
