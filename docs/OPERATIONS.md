@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.2：追蹤表三條 lane＋主題等權組基準）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑤ `scripts/outcome_if_settled_today.py` 與 ⑬ `python -m webapp materialize --positions` 共用的 `collect()` **讀取變多、寫入不變**：多讀 `library/trades/trade_log.jsonl`（live lane）、敘事 ledger `library/private/alpha/briefs/`（paper lane）、`library/leads/pending_leads.json`（首次點名它的 lead）、主題等權組 ledger、`config/beta_policy.json`（alpha 判別）與名冊（持股解析）——全是本機檔、唯讀。**網路**：history lane 的 22 檔與 2 個基準沿用原路徑；新 lane 多抓 paper／live 與主題等權組成員的收盤（yfinance，**同一組主機、無新憑證**），去重後受程式裡的上限 `MAX_LANE_SYMBOLS`（60，基準永遠留著）約束、截掉的印在報表與 artifact 的 `price_budget`；2026-10-02 實際 17 檔（2 基準＋4 paper＋15 成員，重疊 4）。**寫入**：⑤ 仍只寫 `library/private/decision_lab/outcome_aggregate.json`／`.jsonl`（既有四欄＝history，一字不動；新資料只住 `lanes`／`theme_cohort` 兩個新鍵）；**帶 `--no-benchmark` 的診斷跑法改為不寫**（以前會把當天那一行的超額蓋成 null，plan §0.6 #1）。⑬ 仍只呼叫 `collect()`、不寫聚合檔，只寫 ignored derived cache `positions.json`（schema `/2`） |
+| **2 canonical skill／prompt／本檔** | 本節；plan §3；APP positions 頁頁首的三條 lane 說明與 `this_is_not` 新句 |
+| **3 最窄 rule** | daily ⑤ 與 ⑬ 的 argv **不變**（`tests/test_daily_task.py` 逐項相等照過）；不新增 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條；APP 不新增路由（positions 同一個 GET，artifact 多 `lanes`） |
+| **4 contract test** | `tests/test_measurement_lanes.py`（主題等權組排除本檔與缺價列出、NaN 收盤不收、live 收據照抄與 backfilled 標記、賣出 FIFO、幣別不一致缺席、paper 錨第一份 v2、GBp 結算、三條 lane 分母分開、組缺席／多組、取價上限截斷、空 lane 印「還沒有列」、聚合檔四欄不變＋同日去重、`--no-benchmark` 不寫、artifact v2 照抄、freshness 跟成員不跟價、心跳段 4 與快照鍵、舊 artifact 缺 lanes 印缺席）；`tests/test_webapp_positions.py`（materialize 只呼叫 collect）；`tests/test_heartbeat*.py` |
+| **5 端到端 smoke** | 2026-10-02 真實資料：`collect()` → live 0 列（beta 事件 2 不進 lane）、paper 4 列（錨點 2026-09-29，SIVE.ST 用第一份 v2）、history 22 列錨點指紋 `6ea352ed…7b93` 與 5.0 相同；同一份價格上改前（HEAD 版）與改後 history 的 rows／三量／等權逐位相同；`materialize --positions` 後聚合檔指紋不變、artifact `/2`；心跳段 4 與 5.0 逐行對照只在 lane 行變；headless Edge 在臨時實例（8798）實際渲染 `#/positions` 的三條 lane 與 paper 表。⚠ 2026-09-10 起長駐的 APP 行程用的是當時的程式，要重啟才讀得到 `/2`（它對 09-10 之後新增的結構表、走圖、讀圖、候選板也一直回 404） |
+
 ### Sandbox impact review 結論（2026-09-30，Phase 3 Step 3.7：個股頁首屏、稽核區、readiness、downside）
 
 | 步 | 結論 |

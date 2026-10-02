@@ -157,5 +157,64 @@ def select_current(records: Sequence[ThemeCohort], *, as_of: date | None = None)
     return sorted(visible, key=lambda r: (r.created_at, r.cohort_id))[-1]
 
 
-__all__ = ["RECORD_VERSION", "SPEC_FIELDS", "CohortMember", "ThemeCohort", "cohort_record", "new_cohort_id",
-           "parse_cohort_record", "select_current", "spec_digest", "validate_spec"]
+# ---------------------------------------------------------------------------
+# 量測基準（Phase 5 Step 5.2；決定紀錄 §4.2：「已定價嗎」的對照組與 G9 量測基準共用同一個組）
+# ---------------------------------------------------------------------------
+
+def _usable_close(value: Any) -> bool:
+    """收盤能不能用：數字、不是 NaN、正數。yfinance 會對尚未收盤的歐洲標的回一根 NaN 收盤（2026-10-01：IQE.L、SIVE.ST…），
+    混進來的話等權平均與中位數都會被靜默污染（NaN 不等於自己，排序結果不確定）。"""
+    return isinstance(value, (int, float)) and not isinstance(value, bool) and value == value and value > 0
+
+
+def close_on_or_before(series: Mapping[date, float] | None, day: date) -> tuple[date, float] | None:
+    """`day` 或之前最近的一根**可用**收盤（INV-6：錨點不得用之後的價）。沒有就 `None`。"""
+    candidates = [d for d, v in (series or {}).items() if d <= day and _usable_close(v)]
+    if not candidates:
+        return None
+    best = max(candidates)
+    return best, float((series or {})[best])
+
+
+def series_return(series: Mapping[date, float] | None, start: date, end: date) -> float | None:
+    """同一條收盤序列 `start`→`end` 的報酬：兩端各取該日或之前最近的可用收盤；**同序列相除，報價單位自動相消**
+    （GBp 不必先換成 GBP）。任一端取不到、或起點那根晚於終點那根，回 `None`——不是 0。"""
+    a = close_on_or_before(series, start)
+    b = close_on_or_before(series, end)
+    if a is None or b is None or a[0] > b[0]:
+        return None
+    return b[1] / a[1] - 1.0
+
+
+def cohort_return(cohort: ThemeCohort, *, start: date, end: date, series: Mapping[str, Mapping[date, float]],
+                  exclude_company: str | None = None, exclude_ticker: str | None = None) -> dict[str, Any]:
+    """主題等權組（**排除本檔**）在 `start`→`end` 的等權報酬——追蹤表與計分表共用這一支（plan §12 #4：一個函式）。
+
+    每個成員用自己的序列算 `series_return`，取不到的成員**列出、不進平均**；本檔以 `company_id`（INV-1）或研究 ticker
+    比對排除。回 `{return, members_total, members_used, missing, excluded}`——`members_total` 是排除本檔之後的成員數；
+    一個都取不到時 `return` 是 `None`（缺席），不是 0。**只算、不比、不設門檻**（plan 不可越線 4）。"""
+    company = str(exclude_company or "")
+    ticker = str(exclude_ticker or "").strip().upper()
+    excluded = [m.ticker for m in cohort.members
+                if (company and m.company_id == company) or (ticker and m.ticker.upper() == ticker)]
+    pool = [m for m in cohort.members if m.ticker not in excluded]
+    returns: list[float] = []
+    missing: list[str] = []
+    for member in pool:
+        value = series_return(series.get(member.ticker), start, end)
+        if value is None:
+            missing.append(member.ticker)
+        else:
+            returns.append(value)
+    return {
+        "return": (sum(returns) / len(returns)) if returns else None,
+        "members_total": len(pool),
+        "members_used": len(returns),
+        "missing": missing,
+        "excluded": excluded,
+    }
+
+
+__all__ = ["RECORD_VERSION", "SPEC_FIELDS", "CohortMember", "ThemeCohort", "close_on_or_before", "cohort_record",
+           "cohort_return", "new_cohort_id", "parse_cohort_record", "select_current", "series_return", "spec_digest",
+           "validate_spec"]

@@ -2578,6 +2578,103 @@ const LIVE_COLUMNS = [
   { title: '同檔 shadow', cell: (row) => returnCell(row.shadow_return) },
 ];
 
+/* 三條 lane（Phase 5 Step 5.2）：live＝我們真的買的、paper＝我們寫下判斷的、history＝舊店入圖日（凍結）。
+   **分母分開**——壓成一張表就是 L12。每一格照抄 artifact，不重算、不比、不排序；空 lane 印「還沒有列」，不印 0%。 */
+const LANE_ORDER = ['live', 'paper', 'history'];
+const LANE_TITLES = {
+  live: 'live：我們真的買的（trade_log 的成交；起算＝成交價）',
+  paper: 'paper：我們寫下判斷的（每檔第一份 v2 敘事那天；起算＝那天收盤）',
+  history: 'history：舊店入圖日（凍結只印；起算＝claim 進圖那天，不含判斷）',
+};
+
+function signedPct(value) {
+  const text = fmtRatioPct(value, 1);
+  return text === null ? '—' : (value > 0 ? '+' : '') + text;
+}
+
+const PAPER_LANE_COLUMNS = [
+  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
+  { title: '寫下判斷那天', cell: (row) => el('td', 'nowrap', row.anchor_date || '—') },
+  { title: '當時 → 現在的候選狀態', cell: (row) => el('td', 'nowrap', `${row.anchor_state || '—'} → ${row.current_state || '—'}`) },
+  { title: '寫下前 30 天', cell: (row) => returnCell(row.pre_anchor_return) },
+  { title: '寫下後到現在', cell: (row) => returnCell(row.absolute_return) },
+  { title: '同期比 QQQ 多／少', cell: (row) => returnCell(row.excess_QQQ) },
+  { title: '比主題等權組（排除本檔）', cell: (row) => returnCell(row.excess_theme_cohort) },
+  { title: '最早點名它的來源', cell: (row) => el('td', null, row.first_named_by
+      ? `${row.first_named_by.source}（${String(row.first_named_by.first_seen || '').slice(0, 10)}）`
+      : (row.first_named_absence || '—')) },
+];
+
+const LIVE_LANE_COLUMNS = [
+  { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
+  { title: '成交代號', cell: (row) => el('td', 'nowrap', row.execution_symbol || '—') },
+  { title: '成交日', cell: (row) => el('td', 'nowrap', row.anchor_date || '—') },
+  { title: '成交價', cell: (row) => el('td', 'nowrap', fmtQuantity(row.anchor_raw, row.trade_currency) || '—') },
+  { title: '現在或賣出', cell: (row) => el('td', 'nowrap', fmtQuantity(row.current_price, row.anchor_ccy) || '—') },
+  { title: '成交後到現在', cell: (row) => returnCell(row.absolute_return) },
+  { title: '同期比 QQQ 多／少', cell: (row) => returnCell(row.excess_QQQ) },
+  { title: '比主題等權組（排除本檔）', cell: (row) => returnCell(row.excess_theme_cohort) },
+  { title: '當時的收據', cell: (row) => el('td', null, (row.receipt && row.receipt.label) || '—') },
+];
+
+function laneSummaryText(entry) {
+  const agg = entry.aggregate || {};
+  const ex = entry.theme_cohort_excess || {};
+  const pl = entry.power_law || {};
+  return [`${entry.n} 列（算得出報酬 ${entry.measured}）`, `量測起始 ${entry.measurement_start || '—'}`,
+    `等權 ${signedPct(agg.absolute)}`, `比 ${agg.benchmark || 'QQQ'} ${signedPct(agg.excess)}`,
+    ex.n ? `比主題等權組 ${signedPct(ex.mean)}（${ex.n}/${ex.of} 列）` : '比主題等權組：還沒有值',
+    `曾達 2 倍 ${pl.reached_2x_ever ?? '—'}/${pl.n ?? '—'}（現價仍達 ${pl.reached_2x_now ?? '—'}）`].join('｜');
+}
+
+function renderPositionLanes(payload, detailSet) {
+  const sec = el('section', 'panel callout');
+  sec.appendChild(el('h2', null, '三條 lane：我們真的買的、我們寫下判斷的、舊店的歷史'));
+  const lanes = payload.lanes;
+  if (!lanes) {
+    sec.appendChild(el('p', 'note', '這份 artifact 還沒有三條 lane——跑一次 `python -m webapp materialize --positions` 產生（不是 0）。'));
+    return sec;
+  }
+  sec.appendChild(mdParagraph((payload.notes || {}).lanes || ''));
+  const cohort = payload.theme_cohort || {};
+  if (cohort.absence) {
+    sec.appendChild(el('p', 'warn', `主題等權組：${cohort.absence.reason}（${cohort.absence.kind}）——比主題等權組那一格全部缺席，不是 0。`));
+  } else {
+    const missing = cohort.missing_members || [];
+    sec.appendChild(el('p', 'note', `主題等權組 ${cohort.cohort_id}（${cohort.theme}，${cohort.decided_on} 定，${cohort.members_total} 檔；每列排除本檔）`
+      + `｜取不到價的成員 ${missing.length}${missing.length ? '：' + missing.join('、') : ''}`));
+  }
+  const budget = payload.price_budget || {};
+  if ((budget.truncated || []).length) {
+    sec.appendChild(el('p', 'warn', `取價超過上限 ${budget.cap} 檔，截掉 ${budget.truncated.length} 檔：${budget.truncated.join('、')}——那幾格是缺席，不是沒有價。`));
+  }
+  for (const lane of LANE_ORDER) {
+    const entry = lanes[lane] || {};
+    sec.appendChild(el('h3', null, LANE_TITLES[lane]));
+    if (entry.absence) {
+      sec.appendChild(el('p', 'warn', `▲ ${entry.absence.reason}（${entry.absence.kind}）——不是 0，也不是「還沒有列」。`));
+      continue;
+    }
+    if (lane === 'live') {
+      sec.appendChild(el('p', 'note', `beta 事件 ${entry.beta_events ?? '—'} 不進 lane。`
+        + ((entry.unmatched_sells || []).length ? `配對不到的賣出：${entry.unmatched_sells.join('；')}` : '')
+        + ((entry.problems || []).length ? `▲ ${entry.problems.join('；')}` : '')));
+    }
+    if (!entry.n) {
+      sec.appendChild(el('p', 'note', entry.empty_text || '還沒有列'));
+      continue;
+    }
+    sec.appendChild(el('p', null, laneSummaryText(entry)));
+    if (lane === 'paper') sec.appendChild(rankTable(entry.rows || [], PAPER_LANE_COLUMNS, detailSet));
+    if (lane === 'live') sec.appendChild(rankTable(entry.rows || [], LIVE_LANE_COLUMNS, detailSet));
+    if (lane === 'history') sec.appendChild(el('p', 'note', '逐檔在下面那張表（舊店的列；凍結只印、不再新增）。'));
+    for (const bias of ((entry.power_law || {}).known_biases || []).slice(-1)) {
+      sec.appendChild(el('p', 'note', `▲ ${bias}`));
+    }
+  }
+  return sec;
+}
+
 async function renderPositions() {
   markNav('positions');
   let payload;
@@ -2605,13 +2702,16 @@ async function renderPositions() {
   head.appendChild(badges);
   app.appendChild(head);
 
-  // ① 真實部位在最前面——那才是「你的錢在哪」。
-  const sec0 = el('section', 'panel callout');
-  sec0.appendChild(el('h2', null, `真實成交的部位（${(live.tickers || []).length} 檔）`));
+  // ⓪ 三條 lane（Phase 5）：我們真的買的、我們寫下判斷的、舊店的歷史——分母分開。
+  app.appendChild(renderPositionLanes(payload, detailSet));
+
+  // ① 舊店的真實成交紀錄（凍結；live lane 讀 trade_log）。
+  const sec0 = el('section', 'panel');
+  sec0.appendChild(el('h2', null, `舊店的真實成交紀錄（${(live.tickers || []).length} 檔；凍結唯讀，live lane 讀 trade_log）`));
   if ((live.rows || []).length) {
     sec0.appendChild(rankTable(live.rows, LIVE_COLUMNS, detailSet));
   } else {
-    sec0.appendChild(el('p', 'note', '目前沒有任何真實成交的部位——所有 cohort 都只有 paper 記分板。'));
+    sec0.appendChild(el('p', 'note', '舊店沒有任何真實成交紀錄——所有 cohort 都只有入圖錨點。'));
   }
   sec0.appendChild(mdParagraph(notes.two_anchors || ''));
   if ((live.tickers || []).length < 3) {
@@ -2619,7 +2719,7 @@ async function renderPositions() {
       `▲ live 樣本僅 ${(live.tickers || []).length} 檔，不足以回答「系統準不準」。`
       + '這個數字只有靠累積真實下單才會變大，時間經過不會讓它自己滿足。'));
   }
-  sec0.appendChild(el('p', 'note', `只有 paper 的 cohort：${(live.paper_only || []).length} 個。`));
+  sec0.appendChild(el('p', 'note', `只有入圖錨點的 cohort：${(live.paper_only || []).length} 個。`));
   // Phase 3 Step 3.6：這裡是錢在哪；「已持有」的敘事與候選狀態在候選板的已持有組。
   const toBoard = el('p', 'note');
   toBoard.appendChild(document.createTextNode('已持有的 alpha 標的（敘事宣告、三題、在等什麼）見 '));

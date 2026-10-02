@@ -1048,11 +1048,13 @@ def materialize_watches(*, store: StateArtifactStore | None = None,
 # state artifact：`positions`（部位與問責；照抄 outcome 腳本與 Decision Store 計數器）
 # ---------------------------------------------------------------------------
 
-POSITIONS_MATERIALIZER_VERSION = "webapp-materialize-positions/1"
+POSITIONS_MATERIALIZER_VERSION = "webapp-materialize-positions/2"
 
 POSITIONS_THIS_IS_NOT = (
     "**不是績效報告。** 「shadow 報酬」的錨點是**入圖日**——那天的語意是「這家公司的 claim 進圖了」，"
     "不是「那天該買」。它不含任何進場時點判斷，**不構成選股能力的證據**。",
+    # Phase 5 Step 5.2（plan §3）：三條 lane 的錨點語意各不相同，壓成一個數字就是 L12。
+    "paper lane 的錨點是**我們寫下判斷那天**，量的是判斷不是進場；live lane 才是買得準不準。三條 lane 分母分開，不得合併讀。",
     "「live 報酬」才以實際成交價為錨點；兩者語意不同，不得混為同一個數字。",
     "不是回測：各檔錨點日不同，等權重聚合是跨持有期的粗聚合。",
     "樣本效度先於數字：錨點跨度短就不得視為 N 個獨立樣本——同一段行情被相關標的複製多次時，有效 n 接近 1。",
@@ -1097,8 +1099,15 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                              paper_only: Sequence[str], counters: Mapping[str, Any],
                              benchmarks: tuple[str, str],
                              generated_at: datetime | None = None,
-                             nav_exposure: Mapping[str, Any] | None = None) -> dict[str, Any]:
-    """outcome 腳本的結果 ＋ Decision Store 計數器 → `positions` state artifact。**純函式**。"""
+                             nav_exposure: Mapping[str, Any] | None = None,
+                             lanes: Mapping[str, Any] | None = None,
+                             theme_cohort: Mapping[str, Any] | None = None,
+                             price_budget: Mapping[str, Any] | None = None) -> dict[str, Any]:
+    """outcome 腳本的結果 ＋ Decision Store 計數器 → `positions` state artifact。**純函式**。
+
+    v2（Phase 5 Step 5.2）：多 `lanes`（live／paper／history 各自的摘要；live 與 paper 帶逐列）、`theme_cohort`、
+    `price_budget`。`rows` 仍是 history lane 的列——舊讀者不壞；history 的列不在 `lanes` 裡複製第二份。
+    `lanes=None`＝這次沒算（舊呼叫端），不是「三條 lane 都是空的」。"""
     primary, reference = benchmarks
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     rows = [_position_row(r, benchmark=primary, reference=reference) for r in results]
@@ -1155,6 +1164,10 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
         "live": {"rows": live, "measured": measured_live,
                  "tickers": sorted({row["ticker"] for row in live}),
                  "paper_only": sorted(paper_only)},
+        # 三條 lane（Phase 5 Step 5.2）：outcome 腳本 `lanes_payload` 的摘要照抄＋live／paper 的逐列。
+        "lanes": None if lanes is None else _jsonable_lanes(lanes),
+        "theme_cohort": None if theme_cohort is None else _jsonable_lanes(theme_cohort),
+        "price_budget": None if price_budget is None else dict(price_budget),
         "notes": {
             "two_anchors": "「live 報酬」以**實際成交價**為錨點，「shadow 報酬」以**入圖日**為錨點。"
                            "兩者語意不同：後者不含任何進場時點判斷，不構成選股能力的證據。",
@@ -1180,6 +1193,12 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                                "是讓錨點帶有進場判斷（`record-choice --user-sized` 的 `decided_at`）。",
             "monitoring": "alpha live 部位目前**不在** `event_search_requests` 的自動監控範圍"
                           "（那條只走 beta instruments）——有 live 部位時沒有人在自動看跌幅。",
+            "lanes": "三條 lane 各算各的分母（Phase 5）：**live**＝trade_log 的 alpha 成交（錨＝成交價，量買得準不準）；"
+                     "**paper**＝每檔第一份 v2 敘事寫下那天（錨＝那天收盤，量判斷準不準；列上帶當時與現行的候選狀態、"
+                     "首次點名它的 lead）；**history**＝舊店入圖日（凍結只印）。對主題等權組的超額每列排除本檔，"
+                     "缺價的成員列出、不進平均——只印不比、不排序、不設門檻。",
+            "legacy_live": "上面 `live` 那一段是**舊店**的 live fill（凍結唯讀）；`lanes.live` 讀的是 trade_log——"
+                           "部位真相是 Google Sheet、收據跟著成交事件走（2026-09-16／09-22 定案）。",
         },
         "this_is_not": list(POSITIONS_THIS_IS_NOT),
         "materializer": {
@@ -1197,9 +1216,24 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                   "measured": sorted(str(r["ticker"]) for r in rows if r["absolute_return"] is not None),
                   "live": sorted({str(row["ticker"]) for row in live}),
                   "counters": {k: payload["counters"][k] for k in
-                               ("eligible_cohorts", "total_cohorts", "live_choices", "live_fills")}})
+                               ("eligible_cohorts", "total_cohorts", "live_choices", "live_fills")},
+                  # 三條 lane 的成員與量測起始日（價格變動不算認知變化，plan §3）。
+                  "lanes": None if lanes is None else {
+                      lane: {"tickers": sorted(str(r.get("ticker")) for r in (entry.get("rows") or ())),
+                             "n": entry.get("n"), "measurement_start": entry.get("measurement_start")}
+                      for lane, entry in payload["lanes"].items()},
+                  "theme_cohort": (theme_cohort or {}).get("cohort_id")})
     payload["content_digest"] = canonical_digest(payload)
     return payload
+
+
+def _jsonable_lanes(value: Any) -> Any:
+    """lane 摘要與逐列裡的 `date` → ISO 字串；只轉型別、不改結構（同 outcome 腳本的 `_jsonable`）。"""
+    if isinstance(value, Mapping):
+        return {str(k): _jsonable_lanes(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_jsonable_lanes(v) for v in value]
+    return _iso(value)
 
 
 def nav_exposure_summary(exposure: Mapping[str, Any]) -> dict[str, Any]:
@@ -1251,7 +1285,10 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
     outcome = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(outcome)
 
-    results, unavailable, benchmarks = outcome.collect()
+    collected = outcome.collect()
+    results = collected["lanes"]["history"]["rows"]
+    unavailable = collected["lanes"]["history"]["unavailable"]
+    benchmarks = collected["benchmarks"]
     from decision_lab.bootstrap import open_readonly_store
 
     store_handle = open_readonly_store()
@@ -1268,9 +1305,33 @@ def materialize_positions(*, store: StateArtifactStore | None = None,
         health=outcome.anchor_health(results),
         live_rows=live_rows, paper_only=paper_only, counters=counters,
         benchmarks=(outcome.PRIMARY_BENCHMARK, outcome.REFERENCE_BENCHMARK),
-        generated_at=generated_at, nav_exposure=_nav_exposure())
+        generated_at=generated_at, nav_exposure=_nav_exposure(),
+        lanes=positions_lanes(outcome, collected), theme_cohort=collected["theme_cohort"],
+        price_budget=collected["price_budget"])
     target = store or StateArtifactStore()
     return target.write(payload), payload
+
+
+def positions_lanes(outcome: Any, collected: Mapping[str, Any]) -> dict[str, Any]:
+    """三條 lane → artifact 的 `lanes`：摘要照抄 outcome 腳本的 `lanes_payload`（不另算一份）；live／paper 附逐列，
+    history 的列就是 artifact 的 `rows`（不複製第二份）。"""
+    summaries = outcome.lanes_payload(collected)
+    out: dict[str, Any] = {}
+    for lane in outcome.LANE_KEYS:
+        entry = dict(summaries[lane])
+        entry["empty_text"] = outcome.LANE_EMPTY[lane]
+        if lane == "history":
+            entry["rows_in"] = "rows"
+        else:
+            entry["rows"] = [dict(row) for row in collected["lanes"][lane]["rows"]]
+        if lane == "live":
+            live = collected["lanes"]["live"]
+            entry.update(beta_events=live.get("beta_events", 0), unmatched_sells=list(live.get("unmatched_sells") or ()),
+                         problems=list(live.get("problems") or ()), skipped=list(live.get("skipped") or ()))
+        if lane == "paper":
+            entry["filter"] = dict(collected["lanes"]["paper"].get("filter") or {})
+        out[lane] = entry
+    return out
 
 
 # ⚠ 2026-09-23（Phase 0 Step 0b.3）：`materialize_basket`（V3 籃子頁：ranking × overview × positions 的 join，

@@ -360,3 +360,22 @@ decision_lab.db sha256=e99d1c79fd22dbe1099f30c4e06f2d1188f26a8cbfa987a27cd884253
 **模擬 [666] 重試**（記憶體裡只把 Reuters 那份 11 筆 assertion 的 `origin_linkage` 改成 `independent`，不碰圖）：**重寫 4**＝`_e1`、`_e2`、`_e9`、`_e10`，4／4 含字表語言——
 正是 Phase 4 closeout §2 ③ 預言的那 4 筆；改前的計數器對同一個情境會印 0／0（成功與失敗同形，L13）。
 變異：把重寫判定換成空集合 → `tests/test_layer_stats.py` 2 條紅；還原 11 條綠。
+
+## 16. Step 5.2 三條 lane 的真實資料驗收（2026-10-02 15:3x–16:2x 台北）
+
+scratchpad `p52_collect_real.py`（`collect()` 唯讀；跑前跑後兩個聚合檔指紋不變）：
+
+| lane | 列 | 算得出報酬 | 量測起始 | 等權 | 對 QQQ 超額 | 對主題等權組超額 | 前已漲 |
+|---|---|---|---|---|---|---|---|
+| live | **0**（beta 事件 2 不進 lane；配對不到的賣出 0、壞行 0） | 0 | — | — | — | 還沒有值 | — |
+| paper | **4**（AXTI、COHR、LITE、SIVE.ST；ledger 4 本、沒有 v2 0、壞行 0） | 4 | **2026-09-29** | +5.67% | +5.12% | +3.71%（4/4） | 敘事前已漲 3/4 |
+| history | 22 | 22 | 2026-07-21 | +8.94% | +4.29% | −2.51%（22/22） | 入圖前已漲 8/22 |
+
+- paper 的錨點全是第一份 v2（AXTI `ib_b6b3…`、COHR `ib_9a58…`、LITE `ib_78d7…`、SIVE.ST `ib_84e5…`——**不是** 10-01 換版那份）；當時→現行狀態：AXTI priced_wait→priced_wait、COHR／LITE pass→pass、SIVE.ST missing→missing；首次點名：AXTI／COHR／LITE 是 `edgar:` 的 lead（07-22），SIVE.ST 是 `x:aleabitoreddit`（07-25）。
+- 主題等權組 `tc_35b0d5cd521656ea`：15 檔、缺價 0；每列排除本檔（paper 四檔都是成員 → 各比 14 檔）。取價要 17 檔、抓 17 檔（上限 60、截掉 0）。
+- **history 錨點指紋** `6ea352ed…7b93`＝§2（跨日穩定）；**同一份價格上**改前（git HEAD 版腳本）與改後的 history rows（拿掉新加的主題等權組三個鍵）、三量、等權**逐位相同**（scratchpad `p52_history_same_prices.py`：rows digest `a77673f6…` 兩邊相同）。
+- `python -m webapp materialize --positions` → `stockbot-app/positions/2`（88,913 bytes），聚合檔指紋不變（materialize 不寫它）。
+- 心跳段 4 與 §3 逐行對照：新增「追蹤表 history 22｜paper 4｜live 0（beta 事件 2 不進 lane）｜主題等權組 tc_35b0d5cd521656ea（2026-09-30 定）」、history 那行多「對主題等權組超額」、「入圖前已漲」旁多「敘事前已漲（paper）3/4」、新增 paper 與 live 兩行；其餘數字變動來自盤中價格與使用者白天整理過的 Sheet（NAV 15→16 檔＝補上 COHR）。其他段只差標頭時間與「首日 5 項」（新快照鍵）。
+- headless Edge 在臨時實例（127.0.0.1:8798，驗完即關）渲染 `#/positions`：三條 lane 區塊在最前、paper 表 4 列、live 印「還沒有列」、樣本效度仍在聚合數字之前。
+- ⚠ **長駐 APP（PID 15956，2026-09-10 23:13 起跑）用的是 09-10 的程式**：`/api/v1/positions` 回 503（schema `/2` 不認得），結構表、走圖、讀圖、候選板四個 GET 本來就回 404——重啟它是使用者動作（plan §14 #11）。
+- 變異：lane 混算、組不排除本檔、幣別不一致仍算、取價不濾 NaN、`--no-benchmark` 照寫、paper 錨改用現行敘事、live 讀壞不降級——7 種全紅，還原後全綠。

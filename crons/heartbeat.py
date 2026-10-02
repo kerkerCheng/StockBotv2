@@ -1324,15 +1324,23 @@ def build_positions(*, state_dir: Path | None) -> Section:
     else:
         aggregate = positions.get("aggregate") or {}
         counters = positions.get("counters") or {}
+        lanes = positions.get("lanes")
+        # 三條 lane（Phase 5 Step 5.2）：分母分開——live 量買得準不準、paper 量判斷準不準、history 只是歷史。
+        section.lines.append(_lane_count_line(lanes, positions.get("theme_cohort")))
+        history_excess = ((lanes or {}).get("history") or {}).get("theme_cohort_excess") or {}
         section.lines.append(
             f"追蹤表 {aggregate.get('n', '?')} 檔｜等權絕對 {_pct(aggregate.get('absolute'))}"
             f"｜對 {aggregate.get('benchmark', '?')} 超額 {_pct(aggregate.get('excess'))}"
-            f"｜正式結算過 {counters.get('measured_outcomes', '?')} 筆"
+            + (f"｜對主題等權組超額 {_cohort_excess_text(history_excess)}" if lanes is not None else "")
+            + f"｜正式結算過 {counters.get('measured_outcomes', '?')} 筆"
         )
         health = positions.get("anchor_health") or {}
         if health:
+            paper_chase = ((lanes or {}).get("paper") or {}).get("chase")
             section.lines.append(
                 f"入圖前已漲（chasing）{health.get('chasing', '?')}/{health.get('paired', '?')} 檔"
+                + (f"｜敘事前已漲（paper）{paper_chase.get('chasing', '?')}/{paper_chase.get('paired', '?')} 檔"
+                   if paper_chase else "")
             )
 
     # ⚠ 2026-09-22（Phase 0 Step 0a.2）：這裡原本有四行，全部讀籃子／多年視角 artifact——
@@ -1407,6 +1415,11 @@ def build_positions(*, state_dir: Path | None) -> Section:
                 f"／其餘 {top.get('rest_n', '?')} 檔 {_pct(top.get('rest_contribution'))}"
                 f"｜曾達 2 倍 {power.get('reached_2x_ever', '?')}/{power.get('n', '?')}"
                 f"（現價仍達 {power.get('reached_2x_now', '?')}）｜{maturity_text}")
+        # paper／live 各一行三量＋對主題等權組超額（history 就是上面那一行）。空 lane 印「還沒有列」，不印 0%。
+        lanes = positions.get("lanes")
+        if lanes is not None:
+            for lane in ("paper", "live"):
+                section.lines.append(_lane_power_line(lane, (lanes or {}).get(lane)))
 
     # 賭注收斂（V4，2026-09-19）：**不依賴賣出的驗證序列**。等權報酬與 power-law 都以股價
     # 為錨點，而本圖標的同漲同跌；共識修正不受 beta 污染，也不需要賣出就能驗證。
@@ -1448,6 +1461,64 @@ def build_positions(*, state_dir: Path | None) -> Section:
                 "尺寸仍由使用者決定）")
 
     return section
+
+
+#: 段 4 的 lane 名稱（人讀）。**定義住 outcome 腳本的 `LANE_LABELS`**，這裡只是一行裡的短標。
+_LANE_SHORT = {"history": "history（舊店入圖日）", "paper": "paper（第一份 v2 敘事日起）", "live": "live（trade_log 成交）"}
+
+
+def _lane_count_line(lanes: Mapping[str, Any] | None, cohort: Mapping[str, Any] | None) -> str:
+    """「追蹤表 history N｜paper N｜live N」——三條 lane 的列數一行；artifact 沒有 `lanes` 是缺席，不是 0。"""
+    if lanes is None:
+        return "追蹤表三條 lane：這份 positions artifact 還沒有 lanes（下一次 materialize --positions 補上；不是 0）"
+    live = lanes.get("live") or {}
+
+    def count(lane: str) -> str:
+        entry = lanes.get(lane) or {}
+        return "讀不到" if entry.get("absence") else str(entry.get("n", "?"))
+
+    text = (f"追蹤表 history {count('history')}｜paper {count('paper')}"
+            f"｜live {count('live')}（beta 事件 {live.get('beta_events', '?')} 不進 lane）")
+    cohort = cohort or {}
+    if cohort.get("absence"):
+        text += f"｜主題等權組：{cohort['absence'].get('kind')}（超額缺席，不是 0）"
+    elif cohort.get("cohort_id"):
+        text += f"｜主題等權組 {cohort.get('cohort_id')}（{cohort.get('decided_on')} 定）"
+    return text
+
+
+def _cohort_excess_text(excess: Mapping[str, Any]) -> str:
+    if not excess or not excess.get("n"):
+        return f"還沒有值（{(excess or {}).get('of', 0)} 列量得到報酬）"
+    return f"{_pct(excess.get('mean'))}（{excess.get('n')}/{excess.get('of')} 列）"
+
+
+def _lane_power_line(lane: str, entry: Mapping[str, Any] | None) -> str:
+    """一條 lane 一行：三量（D15）＋對主題等權組的超額。空 lane 印 outcome 腳本給的那句「還沒有列」。"""
+    label = _LANE_SHORT[lane]
+    if not entry:
+        return f"{label}：artifact 沒有這條 lane（upstream_unavailable）——不是 0"
+    if entry.get("absence"):
+        absence = entry["absence"]
+        return f"{label}：{absence.get('reason')}（{absence.get('kind')}）——不是 0，也不是「還沒有列」"
+    if not entry.get("n"):
+        return f"{label}：{entry.get('empty_text') or '還沒有列'}"
+    power = entry.get("power_law") or {}
+    if not power.get("n"):
+        return (f"{label}：{entry.get('n')} 列、量得到報酬的 0 列（缺席：{'、'.join(entry.get('absences') or ()) or '—'}）"
+                "——不是 0%")
+    top = power.get("top_contributor") or {}
+    m12 = (power.get("maturity") or {}).get("12m") or {}
+    maturity_text = (f"12 個月內達 2 倍 {m12.get('reached_2x', 0)}/{m12.get('matured')}（{_pct(m12.get('share'))}）"
+                     if m12.get("matured") else
+                     f"還沒有一檔滿 12 個月（最長持有 {power.get('max_days_held', '?')} 天）")
+    return (f"{label}：{power.get('n')} 檔｜量測起始 {power.get('measurement_start', '?')}"
+            f"｜等權總報酬 {_pct(power.get('basket_total_return'))}"
+            f"｜最大單檔 {top.get('ticker', '?')} {_pct(top.get('contribution'))}"
+            f"／其餘 {top.get('rest_n', '?')} 檔 {_pct(top.get('rest_contribution'))}"
+            f"｜曾達 2 倍 {power.get('reached_2x_ever', '?')}/{power.get('n', '?')}"
+            f"（現價仍達 {power.get('reached_2x_now', '?')}）｜{maturity_text}"
+            f"｜對主題等權組超額 {_cohort_excess_text(entry.get('theme_cohort_excess') or {})}")
 
 
 def _nav_line(nav: Mapping[str, Any] | None) -> str:
@@ -1539,6 +1610,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     **{f"candidate.{g}": f"候選 {CANDIDATE_GROUP_LABELS[g]}" for g in CANDIDATE_GROUPS},
     **{f"candidate.{g}": f"候選 {CANDIDATE_SIDE_LABELS[g]}" for g in CANDIDATE_SIDE_GROUPS},
     "candidate.no_narrative": "候選 無敘事",
+    # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
+    "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
+    **{f"positions.lane.{lane}.reached_2x_ever": f"{lane} 曾達 2 倍" for lane in ("history", "paper", "live")},
 }
 #: 較昨變動一行最多列幾項（其餘寫「另 N 項」）。
 DIFF_LIMIT = 12
@@ -1644,8 +1718,22 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         counts = board.get("counts") or {}
         return {f"candidate.{k}": counts.get(k) for k in (*CANDIDATE_GROUPS, *CANDIDATE_SIDE_GROUPS, "no_narrative")}
 
+    def positions() -> dict[str, Any]:
+        payload, absence = _load_state(state_dir, "positions")
+        lanes = None if absence is not None else payload.get("lanes")
+        if not lanes:
+            return {}                        # 舊 artifact 沒有 lanes：讀不到＝None，不是 0
+        def read(lane: str) -> Mapping[str, Any]:
+            entry = lanes.get(lane) or {}
+            return {} if entry.get("absence") else entry     # 組不出來的 lane：None（未讀到），不是 0
+
+        out: dict[str, Any] = {f"positions.lane.{lane}.n": read(lane).get("n") for lane in ("paper", "live")}
+        out.update({f"positions.lane.{lane}.reached_2x_ever": (read(lane).get("power_law") or {}).get("reached_2x_ever")
+                    for lane in ("history", "paper", "live")})
+        return out
+
     for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, prescreen, captures, tiers,
-               candidates):
+               candidates, positions):
         guard(fn)
     return values
 

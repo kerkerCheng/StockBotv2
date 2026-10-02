@@ -37,8 +37,10 @@ import argparse
 import json
 import sqlite3
 import sys
-from datetime import date, timedelta
+from collections import defaultdict
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any, Callable, Mapping, Sequence
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -264,13 +266,11 @@ def _at_or_before(series: dict[date, float], target: date) -> tuple[date, float]
     return best, series[best]
 
 
-def collect(*, no_benchmark: bool = False) -> tuple[list[dict], list[dict], dict]:
-    """把資料收集段與 render 分開，讓 APP 的 `positions` artifact 能拿到同一份結果。
+def _history_rows() -> tuple[list[dict], list[dict]]:
+    """history lane（舊店 observed shadow 的入圖日錨點；凍結只印、不再新增）。
 
-    ⚠ **這是純抽取，不是行為改動**：`main()` 仍是「collect → render」，輸出逐位元組不變
-    （驗收條件就是這句話——它是 daily 排程在跑的腳本，`.codex/rules` 有 exact entry）。
-    抽出來的理由是 L13 的正面版：同一份計算要有第二個消費端時，讓兩邊讀**同一個函式**，
-    而不是讓 APP 端另算一份——第二份會立刻開始偏離。
+    ⚠ **這是原 `collect()` 的逐列計算，一字不動地搬進自己的函式**（Phase 5 Step 5.2，plan §3：「程式路徑不動，只改名
+    與分段」）。基準那段迴圈抽成 `_apply_benchmarks`，三條 lane 共用。回 `(results, unavailable)`。
     """
     shadows = _load_shadows()
     observed = [s for s in shadows if s["status"] == "observed"]
@@ -366,15 +366,12 @@ def collect(*, no_benchmark: bool = False) -> tuple[list[dict], list[dict], dict
 
             results.append(row)
 
-    # 基準
-    benchmarks: dict[str, dict[date, float]] = {}
-    dated = [r for r in results if r.get("anchor_date") and r.get("current_date")]
-    if not no_benchmark and dated:
-        start = min(r["anchor_date"] for r in dated)
-        end = max(r["current_date"] for r in dated)
-        benchmarks = _benchmark_series([PRIMARY_BENCHMARK, REFERENCE_BENCHMARK], start, end)
+    return results, unavailable
 
-    for row in results:
+
+def _apply_benchmarks(rows: list[dict], benchmarks: Mapping[str, Mapping[date, float]]) -> None:
+    """每列對 QQQ／SOXX 的同期報酬與超額。**原 `collect()` 的那段迴圈原樣搬出**，三條 lane 共用（一份算法）。"""
+    for row in rows:
         for symbol in (PRIMARY_BENCHMARK, REFERENCE_BENCHMARK):
             series = benchmarks.get(symbol)
             if not series or not row.get("anchor_date") or row.get("absolute_return") is None:
@@ -385,16 +382,537 @@ def collect(*, no_benchmark: bool = False) -> tuple[list[dict], list[dict], dict
                 row[f"bench_{symbol}"] = b[1] / a[1] - 1.0
                 row[f"excess_{symbol}"] = row["absolute_return"] - row[f"bench_{symbol}"]
 
-    return results, unavailable, benchmarks
+
+# ---------------------------------------------------------------------------
+# 三條 lane（Phase 5 Step 5.2；plan §0.4 A1）：「買得準不準」與「判斷準不準」要兩個分母（L12）
+# ---------------------------------------------------------------------------
+
+#: 新 lane（paper＋live）＋主題等權組成員＋基準，去重後一輪最多取價幾檔——**這是無人值守的網路 surface 上限**
+#: （daily 步驟 05 跑本腳本；照 `engine_b/account_scorecard.py::MAX_PRICED_SYMBOLS` 的做法）：超過就截斷、截掉的印出來，
+#: 基準永遠留著。history lane 的 22 檔沿用原路徑、不在這個上限裡（plan §3 sandbox impact review）。
+MAX_LANE_SYMBOLS = 60
+
+TRADE_LOG = ROOT / "library" / "trades" / "trade_log.jsonl"
+LEADS_PATH = ROOT / "library" / "leads" / "pending_leads.json"
+
+#: 三條 lane。**分印、分母分開**——壓成一張表就是 L12（一個表示承載兩種語意）。
+LANE_KEYS: tuple[str, ...] = ("live", "paper", "history")
+LANE_LABELS: Mapping[str, str] = {
+    "live": "我們真的買的：trade_log 的 alpha 成交（錨＝成交價、成交日）",
+    "paper": "我們寫下判斷的：每檔第一份 v2 敘事寫下那天（錨＝那天收盤）",
+    "history": "舊店入圖日：凍結只印、不再新增（錨＝claim 進圖那天，不含判斷）",
+}
+#: 各 lane 的錨點偏差，跟著 power-law 三量走（取代 history 那條「錨點是入圖日」——那句話對另兩條 lane 是錯的）。
+LANE_ANCHOR_BIAS: Mapping[str, str] = {
+    "history": "錨點是入圖日，不含任何進場時點判斷——這張表量的是「排序有沒有選到會漲的」，"
+               "不是「我們買得準不準」。",
+    "paper": "錨點是我們寫下判斷那天（第一份 v2 敘事）的收盤——量的是**判斷**不是進場；美股與歐股在台北下午寫下時"
+             "還沒收盤，錨點含當天盤中的變動（同日內的前視，最多一個交易日）。",
+    "live": "錨點是真實成交價——量的是買得準不準；樣本只有真實下單才會變大，時間經過不會讓它自己滿足。",
+}
+#: lane 空時印這句，不印 0%（L12：「還沒有列」與「有列但是 0」是相反的結論）。
+LANE_EMPTY: Mapping[str, str] = {
+    "live": "還沒有列——trade_log 還沒有任何 alpha 成交事件（舊成交由使用者用 `record_trade.py --backfill-before-receipts` 回填）",
+    "paper": "還沒有列——還沒有任何一檔寫下 v2 敘事",
+    "history": "還沒有列——舊店沒有 observed 的 shadow 錨點",
+}
+
+
+def _local_day(stamp: Any) -> date | None:
+    """排程時區的日期（UTC 時戳不直接取 `.date()`）。規則與收據同一支：`portfolio.research_receipt._local_date`。"""
+    from portfolio.research_receipt import _local_date
+
+    return _local_date(stamp)
+
+
+def _read_trade_log(path: Path) -> tuple[list[dict], list[str]]:
+    """trade_log（append-only）。檔案不存在＝還沒有任何成交（不是讀不到）；壞行列進 problems，不靜默丟棄（INV-3）。"""
+    if not path.is_file():
+        return [], []
+    events: list[dict] = []
+    problems: list[str] = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip():
+            continue
+        try:
+            event = json.loads(line)
+        except ValueError:
+            problems.append(f"trade_log 第 {number} 行解析失敗——live lane 可能少列，不靜默當成沒有")
+            continue
+        if isinstance(event, dict):
+            events.append(event)
+        else:
+            problems.append(f"trade_log 第 {number} 行不是 object")
+    return events, problems
+
+
+def _receipt_summary(receipt: Any) -> dict:
+    """成交事件的研究收據 → live lane 的那一格（照抄，不重讀今天的敘事——不拿今天的判斷冒充當時）。"""
+    if not isinstance(receipt, Mapping):
+        return {"status": "receipt_absent",
+                "label": "收據機制上線（2026-09-30）前的事件，沒有收據"}
+    narrative = str(receipt.get("narrative") or "")
+    if narrative == "backfilled":
+        return {"status": "backfilled", "label": "回填：成交早於收據機制上線，當時沒有收據",
+                "reason": receipt.get("backfill_reason")}
+    declared = receipt.get("declared") if isinstance(receipt.get("declared"), Mapping) else {}
+    state = declared.get("candidate_state")
+    return {"status": narrative or "unknown", "label": receipt.get("narrative_label"),
+            "brief_id": declared.get("brief_id"),
+            "candidate_state": state.get("state") if isinstance(state, Mapping) else state,
+            "answers": declared.get("answers")}
+
+
+def live_lane_plan(events: Sequence[Mapping[str, Any]], *, is_beta: Callable[[str], bool],
+                   resolve: Callable[[Mapping[str, Any]], Mapping[str, Any]]) -> dict:
+    """trade_log → live lane 的列（**每一筆 alpha 買進一列**）。純函式，不取價。
+
+    - alpha 判別只走 `risk.hard_caps.is_beta_symbol`（`beta_policy.json` 的 `sheet_aliases`；不自己再寫一份）。beta 事件
+      只計數（「beta 事件 N 不進 lane」）。
+    - 成交 symbol → 公司只走 `portfolio.holdings.resolve_holding`（INV-1）；`ticker` 是研究 ticker（解析不到才用成交代號）。
+    - 賣出：同 symbol＋broker 的 FIFO，把最早一筆還沒結的買進列標 `closed`（賣出價＝終點）。股數不配對（plan §14 #7）。
+    """
+    buys: list[Mapping[str, Any]] = []
+    sells: list[Mapping[str, Any]] = []
+    beta_events = 0
+    skipped: list[str] = []
+    for event in sorted(events, key=lambda e: str(e.get("executed_at") or "")):
+        symbol = str(event.get("symbol") or "").strip().upper()
+        side = event.get("side")
+        if not symbol or side not in ("buy", "sell"):
+            skipped.append(f"{event.get('trade_id') or '?'}：symbol／side 不完整")
+            continue
+        if is_beta(symbol):
+            beta_events += 1
+            continue
+        (buys if side == "buy" else sells).append(event)
+    rows: list[dict] = []
+    for event in buys:
+        symbol = str(event["symbol"]).strip().upper()
+        holding = resolve({"ticker": symbol}) or {}
+        rows.append({
+            "lane": "live",
+            "ticker": holding.get("research_ticker") or symbol,
+            "execution_symbol": symbol,
+            "company_id": holding.get("company_id"),
+            "research_ticker": holding.get("research_ticker"),
+            "resolution": holding.get("source"),
+            "trade_id": event.get("trade_id"),
+            "broker": event.get("broker"),
+            "executed_at": event.get("executed_at"),
+            "anchor_date": _local_day(event.get("executed_at")),
+            "anchor_raw": event.get("price"),
+            "trade_currency": event.get("currency"),
+            "shares": event.get("shares"),
+            "receipt": _receipt_summary(event.get("research_receipt")),
+            "closed": None,
+            "note": [],
+        })
+    queues: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    for row in rows:
+        queues[(row["execution_symbol"], str(row.get("broker") or ""))].append(row)
+    unmatched: list[str] = []
+    for event in sells:
+        key = (str(event["symbol"]).strip().upper(), str(event.get("broker") or ""))
+        queue = [r for r in queues.get(key, []) if r["closed"] is None]
+        if not queue:
+            unmatched.append(f"{event.get('trade_id') or '?'}（{key[0]}／{key[1]}）找不到可配對的買進")
+            continue
+        queue[0]["closed"] = {"trade_id": event.get("trade_id"), "executed_at": event.get("executed_at"),
+                              "date": _local_day(event.get("executed_at")), "price": event.get("price"),
+                              "currency": event.get("currency")}
+        if event.get("shares") != queue[0].get("shares"):
+            queue[0]["note"].append("賣出股數與這筆買進不同——只做 FIFO 配對、不做加權（plan §14 #7）")
+    return {"rows": rows, "beta_events": beta_events, "unmatched_sells": unmatched, "skipped": skipped}
+
+
+def _price_live_row(row: dict, *, series: Mapping[date, float], provider_unit: str | None, today: date) -> None:
+    """live 列的報酬：錨＝成交價（成交幣別）；終點＝賣出價（已結）或**成交代號**的 provider 序列 today 或之前的收盤。
+    兩端結算幣別必須相同——不同就 `currency_mismatch` 缺席，**不猜匯率**。"""
+    from alpha.theme_cohort import close_on_or_before
+
+    anchor = row.get("anchor_date")
+    anchor_val, anchor_ccy = _to_settlement(row.get("anchor_raw"), row.get("trade_currency"))
+    if anchor is None or anchor_val is None or anchor_val <= 0:
+        row["absence_kind"] = "quote_unit_unresolved"
+        row["note"].append(f"成交價或成交幣別無法解析（{row.get('anchor_raw')} {row.get('trade_currency')!r}）→ fail closed")
+        return
+    row.update(anchor_price=anchor_val, anchor_ccy=anchor_ccy,
+               anchor_source=f"live@{anchor}（{row.get('trade_id')}；{row.get('anchor_raw')} {row.get('trade_currency')}）")
+    closed = row.get("closed")
+    if closed:
+        end_day, end_raw, end_unit = closed.get("date"), closed.get("price"), closed.get("currency")
+        row["realized"] = True
+    else:
+        bar = close_on_or_before(series, today) if series else None
+        if bar is None:
+            row["absence_kind"] = "no_price_series"
+            row["note"].append(f"provider 沒有 {row.get('execution_symbol')} 的收盤序列 → 不計算")
+            return
+        end_day, end_raw, end_unit = bar[0], bar[1], provider_unit
+        row["realized"] = False
+    end_val, end_ccy = _to_settlement(end_raw, end_unit)
+    if end_val is None:
+        row["absence_kind"] = "quote_unit_unresolved"
+        row["note"].append(f"終點報價單位無法解析（{end_unit!r}）→ fail closed")
+        return
+    if end_ccy != anchor_ccy:
+        row["absence_kind"] = "currency_mismatch"
+        row["note"].append(f"結算幣別不一致（成交 {anchor_ccy} / 終點 {end_ccy}）→ fail closed，不猜匯率")
+        return
+    row.update(current_date=end_day, current_raw=end_raw, current_price=end_val,
+               absolute_return=end_val / anchor_val - 1.0)
+    if series:
+        window = {d: v for d, v in series.items() if end_day is None or d <= end_day}
+        peak_raw, peak_date = _peak_since(window, anchor)
+        peak_val, peak_ccy = _to_settlement(peak_raw, provider_unit)
+        if peak_val is not None and peak_ccy == anchor_ccy:
+            row["peak_return"] = max(peak_val, end_val) / anchor_val - 1.0
+            row["peak_date"] = peak_date
+        row["pre_anchor_return"] = _pre_anchor_return(series, anchor)
+
+
+def _read_briefs(directory: Path | None = None) -> dict[str, tuple[list, list[str]]]:
+    """敘事 ledger 每一本 → `(紀錄, 壞行)`。"""
+    from alpha.providers.briefs import BRIEF_DIR, read_brief_records
+
+    root = directory or BRIEF_DIR
+    if not root.is_dir():
+        return {}
+    return {path.name[:-len(".jsonl")].upper(): read_brief_records(path.name[:-len(".jsonl")], directory=root)
+            for path in sorted(root.glob("*.jsonl"))}
+
+
+def first_named_by(company_id: str | None, leads: Mapping[str, Mapping[str, Any]]) -> dict | None:
+    """最早點名本公司的 lead（`entities.company_ids` 含它、`first_seen` 最早者）：來源標籤跟著走到量測（AGENTS 量測段）。
+    沒有回 `None`（呈現為 `no_lead_named`）。`first_seen` 是我們看到它的時間；`published_at` 另印、空就是空（INV-6）。"""
+    if not company_id:
+        return None
+    hits = [lead for lead in leads.values()
+            if company_id in (((lead or {}).get("entities") or {}).get("company_ids") or ())]
+    if not hits:
+        return None
+    first = min(hits, key=lambda lead: (str(lead.get("first_seen") or "9999"), str(lead.get("lead_id") or "")))
+    return {"lead_id": first.get("lead_id"), "source": first.get("source"), "first_seen": first.get("first_seen"),
+            "published_at": first.get("published_at") or None}
+
+
+def paper_lane_plan(briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]], *, today: date,
+                    leads: Mapping[str, Mapping[str, Any]] | None) -> tuple[list[dict], dict]:
+    """每檔**最早一筆未撤回的 `investor-brief/v2`**＝paper 錨點（不是 `select_brief` 的現行那筆）。純函式，不取價。
+
+    回 `(rows, filter_report)`——每個 filter 都報 input／accepted／filtered／reasons（INV-3）：沒有 v2 的檔不是 paper 列；
+    ledger 有壞行的檔照列但標 `ledger_unreadable` 缺席（壞的那行可能正是第一份 v2，錨點認不準）。"""
+    from alpha.narrative.contracts import RECORD_VERSION_V1, RECORD_VERSION_V2, select_brief
+
+    rows: list[dict] = []
+    report = {"input": len(briefs), "accepted": 0, "filtered": {"no_v2": [], "ledger_unreadable": []}}
+    for ticker, (records, errors) in sorted(briefs.items()):
+        v2 = sorted((r for r in records if r.record_version == RECORD_VERSION_V2 and not r.retracted),
+                    key=lambda r: (r.created_at, r.brief_id))
+        if not v2 and not errors:
+            report["filtered"]["no_v2"].append(ticker)
+            continue
+        report["accepted"] += 1
+        if errors:
+            report["filtered"]["ledger_unreadable"].append(ticker)
+        first = v2[0] if v2 else None
+        current = select_brief(list(records), as_of=None, today=today)
+        v1 = [r for r in records if r.record_version == RECORD_VERSION_V1]
+        cs = first.candidate_state if first is not None else None
+        current_state = ("retracted" if current is None
+                         else current.candidate_state.state if current.candidate_state is not None else "legacy_v1")
+        company_id = first.company_id if first is not None else (records[0].company_id if records else None)
+        row = {
+            "lane": "paper", "ticker": ticker, "research_ticker": ticker, "company_id": company_id,
+            "brief_id": first.brief_id if first else None,
+            "anchor_at": first.created_at.isoformat() if first else None,
+            "anchor_date": _local_day(first.created_at.isoformat()) if first else None,
+            "anchor_state": cs.state if cs is not None else None,
+            "current_brief_id": current.brief_id if current is not None else None,
+            "current_state": current_state,
+            "v2_records": len(v2),
+            "earliest_v1": min(r.created_at for r in v1).isoformat() if v1 else None,
+            "note": [],
+        }
+        # 首次點名它的 lead：lead registry 讀不到＝缺席（不是「沒人點名」）；讀得到但沒有＝no_lead_named。
+        named = first_named_by(company_id, leads) if leads is not None else None
+        row["first_named_by"] = named
+        row["first_named_absence"] = ("upstream_unavailable" if leads is None
+                                      else None if named else "no_lead_named")
+        if errors:
+            row["absence_kind"] = "ledger_unreadable"
+            row["note"].append(f"敘事 ledger 有 {len(errors)} 行壞行——第一份 v2 認不準，不算報酬（INV-3）")
+        rows.append(row)
+    return rows, report
+
+
+def _price_paper_row(row: dict, *, series: Mapping[date, float], quote_unit: str | None, today: date) -> None:
+    """paper 列的報酬：錨點＝研究 ticker 的 provider 序列在錨點日或之前最近的收盤；終點＝today 或之前最近的收盤。
+    兩端同一條序列、同一個報價單位，各自經 `_to_settlement`（GBp 不是 GBP）。"""
+    from alpha.theme_cohort import close_on_or_before
+
+    if row.get("absence_kind"):
+        return
+    anchor = row.get("anchor_date")
+    if not series:
+        row["absence_kind"] = "no_price_series"
+        row["note"].append("provider 沒有這檔的收盤序列 → 不計算")
+        return
+    at = close_on_or_before(series, anchor) if anchor else None
+    bar = close_on_or_before(series, today)
+    if at is None or bar is None:
+        row["absence_kind"] = "no_close_on_or_before_anchor"
+        row["note"].append(f"錨點日 {anchor} 或之前沒有可用收盤 → 不計算（INV-6：不拿之後的價當錨）")
+        return
+    anchor_val, anchor_ccy = _to_settlement(at[1], quote_unit)
+    current_val, current_ccy = _to_settlement(bar[1], quote_unit)
+    if anchor_val is None or current_val is None or anchor_val <= 0 or anchor_ccy != current_ccy:
+        row["absence_kind"] = "quote_unit_unresolved"
+        row["note"].append(f"報價單位無法解析（registry={quote_unit!r}）→ fail closed，不計算")
+        return
+    row.update(anchor_bar_date=at[0], anchor_raw=at[1], anchor_price=anchor_val, anchor_ccy=anchor_ccy,
+               current_date=bar[0], current_raw=bar[1], current_price=current_val,
+               absolute_return=current_val / anchor_val - 1.0,
+               anchor_source=(f"paper@{anchor}（{row.get('brief_id')}；{at[0]} 收盤 {at[1]} {quote_unit}"
+                              f" → {anchor_val:.4f} {anchor_ccy}）"),
+               pre_anchor_return=_pre_anchor_return(series, anchor))
+    peak_raw, peak_date = _peak_since({d: v for d, v in series.items() if d <= bar[0]}, anchor)
+    peak_val, peak_ccy = _to_settlement(peak_raw, quote_unit)
+    if peak_val is not None and peak_ccy == anchor_ccy:
+        row["peak_return"] = peak_val / anchor_val - 1.0
+        row["peak_date"] = peak_date
+
+
+def _provider_close_series(symbol: str, start: date) -> tuple[dict[date, float], str | None]:
+    """新 lane 的取價：provider 已收盤序列＋它自報的報價單位（yfinance `history_metadata.currency`）。NaN 與非正數不收
+    （歐洲標的會回 NaN 的未完成 K 棒）。抓不到回 `({}, None)`，由呼叫端標缺席。"""
+    try:
+        import yfinance as yf
+
+        handle = yf.Ticker(symbol)
+        hist = handle.history(start=start.isoformat(), auto_adjust=True)["Close"].dropna()
+        unit = (getattr(handle, "history_metadata", None) or {}).get("currency")
+    except Exception as exc:  # noqa: BLE001 — 單檔失敗只讓那一格缺席
+        print(f"  ⚠ {symbol} 收盤序列抓取失敗：{type(exc).__name__}: {exc}", file=sys.stderr)
+        return {}, None
+    series = {ts.date(): float(close) for ts, close in hist.items() if close == close and float(close) > 0}
+    return series, (str(unit) if unit else None)
+
+
+def _apply_theme_cohort(rows: Sequence[dict], cohort: Any, series: Mapping[str, Mapping[date, float]]) -> None:
+    """每列對主題等權組（排除本檔）的超額。共用 `alpha.theme_cohort.cohort_return`（追蹤表與計分表同一支）。**只印不比。**"""
+    from alpha.theme_cohort import cohort_return
+
+    if cohort is None:
+        return
+    for row in rows:
+        if row.get("absolute_return") is None or not row.get("anchor_date") or not row.get("current_date"):
+            continue
+        result = cohort_return(cohort, start=row["anchor_date"], end=row["current_date"], series=series,
+                               exclude_company=row.get("company_id"),
+                               exclude_ticker=row.get("research_ticker") or row.get("ticker"))
+        row["theme_cohort"] = result
+        if result["return"] is not None:
+            row["theme_cohort_return"] = result["return"]
+            row["excess_theme_cohort"] = row["absolute_return"] - result["return"]
+
+
+def chase_count(rows: Sequence[Mapping[str, Any]]) -> dict:
+    """錨點前 30 日漲幅大於錨點後的列數——history 叫「入圖前已漲」、paper 叫「敘事前已漲」。純函式。"""
+    paired = [r for r in rows if r.get("pre_anchor_return") is not None and r.get("absolute_return") is not None]
+    chasing = [r for r in paired if r["pre_anchor_return"] > r["absolute_return"]]
+    return {"paired": len(paired), "chasing": len(chasing),
+            "tickers": [str(r.get("ticker")) for r in chasing]}
+
+
+def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
+    """一條 lane 的三量＋等權＋對主題等權組的超額。**每條 lane 各算、分母分開**；空 lane 回 n 0（呈現端印「還沒有列」）。"""
+    measured = [r for r in rows if r.get("absolute_return") is not None]
+    excess = [r["excess_theme_cohort"] for r in measured if r.get("excess_theme_cohort") is not None]
+    anchors = [r["anchor_date"] for r in measured if r.get("anchor_date")]
+    return {
+        "lane": lane, "label": LANE_LABELS[lane], "n": len(rows), "measured": len(measured),
+        "measurement_start": min(anchors).isoformat() if anchors else None,
+        "aggregate": equal_weight_aggregate(list(rows)),
+        "power_law": power_law_aggregate(list(rows), lane=lane),
+        "theme_cohort_excess": {"n": len(excess), "mean": (sum(excess) / len(excess)) if excess else None,
+                                "of": len(measured)},
+        "chase": chase_count(rows),
+        "absences": sorted({str(r["absence_kind"]) for r in rows if r.get("absence_kind")}),
+    }
+
+
+def _theme_cohort_info(cohorts: Sequence[Any], errors: Sequence[str]) -> tuple[Any, dict]:
+    """現行主題等權組 → (組或 None, 呈現用的資訊)。0 組 `not_yet_recorded`；多於 1 組不猜哪一組適用（`ambiguous_cohort`）。"""
+    info: dict[str, Any] = {"parse_errors": list(errors), "absence": None}
+    if not cohorts:
+        info["absence"] = {"kind": "not_yet_recorded", "reason": "主題等權組未定義（pq2 complete-theme-cohort 才寫得進來）"}
+        return None, info
+    if len(cohorts) > 1:
+        info["absence"] = {"kind": "ambiguous_cohort",
+                           "reason": f"現行主題等權組有 {len(cohorts)} 組——哪一組適用哪一列不由程式猜"}
+        info["cohort_ids"] = [c.cohort_id for c in cohorts]
+        return None, info
+    cohort = cohorts[0]
+    info.update(cohort_id=cohort.cohort_id, theme=cohort.theme, decided_on=cohort.decided_on.isoformat(),
+                members=[m.ticker for m in cohort.members], members_total=len(cohort.members))
+    return cohort, info
+
+
+def collect(*, no_benchmark: bool = False, today: date | None = None,
+            price_loader: Callable[[str, date], tuple[dict[date, float], str | None]] | None = None,
+            history_loader: Callable[[], tuple[list[dict], list[dict]]] | None = None,
+            benchmark_loader: Callable[[list[str], date, date], dict[str, dict[date, float]]] | None = None,
+            trade_log_path: Path | None = None, brief_dir: Path | None = None,
+            briefs: Mapping[str, tuple[Sequence[Any], Sequence[str]]] | None = None,
+            leads: Mapping[str, Mapping[str, Any]] | None = None,
+            cohorts: tuple[Sequence[Any], Sequence[str]] | None = None,
+            is_beta: Callable[[str], bool] | None = None,
+            resolve: Callable[[Mapping[str, Any]], Mapping[str, Any]] | None = None,
+            quote_unit_for: Callable[[str | None, str | None], str | None] | None = None,
+            max_symbols: int = MAX_LANE_SYMBOLS) -> dict[str, Any]:
+    """三條 lane 的資料收集（Phase 5 Step 5.2）。**render 與 APP 讀同一個函式**——APP 端另算一份會立刻開始偏離（L13）。
+
+    回 `{"lanes": {live, paper, history}, "benchmarks", "theme_cohort", "price_budget", "today"}`：每條 lane 的 `rows`
+    各自帶錨點、報酬、對 QQQ／SOXX 與主題等權組的超額；history 的逐列計算是原 `collect()` 一字不動（`_history_rows`）。
+    所有外部輸入都可注入（測試不打網路、不讀舊店）；預設值就是正式資料源。**本函式不寫任何東西**——寫聚合檔的是 render。
+    """
+    today = today or _local_day(datetime.now(timezone.utc).isoformat()) or date.today()
+    results, unavailable = (history_loader or _history_rows)()
+
+    # ⚠ 新 lane 的任何一步讀壞（beta 政策檔、名冊、敘事 ledger、組 ledger），只讓**那一條 lane** 缺席——history 照走：
+    # daily 步驟 05 在 5.2 之前不依賴這些檔，不得因為多了 lane 就整步失敗（L13：一格壞了其餘照發）。
+    # 缺席帶理由、與「還沒有列」分開印（L12）。
+
+    # live：trade_log
+    try:
+        events, log_problems = _read_trade_log(trade_log_path or TRADE_LOG)
+        if is_beta is None:
+            from risk.hard_caps import is_beta_symbol, load_beta_policy
+
+            policy = load_beta_policy()
+            is_beta = lambda symbol: is_beta_symbol(symbol, policy)  # noqa: E731
+        if resolve is None:
+            from portfolio.holdings import resolve_holding as resolve
+        live = live_lane_plan(events, is_beta=is_beta, resolve=resolve)
+        live["problems"] = log_problems
+        live["absence"] = None
+    except Exception as exc:  # noqa: BLE001
+        reason = f"live lane 組不出來（{type(exc).__name__}: {str(exc)[:120]}）"
+        live = {"rows": [], "beta_events": None, "unmatched_sells": [], "skipped": [], "problems": [reason],
+                "absence": {"kind": "upstream_unavailable", "reason": reason}}
+
+    # paper：敘事 ledger
+    if leads is None:
+        try:
+            leads = (json.loads(LEADS_PATH.read_text(encoding="utf-8")).get("leads") or {})
+        except (OSError, ValueError):
+            leads = None                     # 讀不到＝first_named_by 缺席（upstream_unavailable），不是「沒人點名」
+    try:
+        paper_rows, paper_filter = paper_lane_plan(briefs if briefs is not None else _read_briefs(brief_dir),
+                                                   today=today, leads=leads)
+        paper_absence = None
+    except Exception as exc:  # noqa: BLE001
+        paper_rows, paper_filter = [], {"input": None, "accepted": 0, "filtered": {}}
+        paper_absence = {"kind": "upstream_unavailable",
+                         "reason": f"paper lane 組不出來（{type(exc).__name__}: {str(exc)[:120]}）"}
+
+    # 主題等權組
+    try:
+        if cohorts is None:
+            from alpha.providers.theme_cohorts import current_cohorts
+
+            cohorts = current_cohorts()
+        cohort, cohort_info = _theme_cohort_info(*cohorts)
+    except Exception as exc:  # noqa: BLE001
+        cohort = None
+        cohort_info = {"parse_errors": [], "absence": {
+            "kind": "upstream_unavailable", "reason": f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
+
+    # 取價（新 lane＋組成員；有上限）。最早需要的起點＝各列錨點往前 PRE_ANCHOR_DAYS＋15 天。
+    wanted: dict[str, date] = {}
+
+    def want(symbol: str | None, anchor: date | None) -> None:
+        if not symbol:
+            return
+        start = (anchor or today) - timedelta(days=PRE_ANCHOR_DAYS + 15)
+        wanted[symbol] = min(start, wanted.get(symbol, start))
+
+    from identity.execution import yfinance_symbol
+
+    for row in live["rows"]:
+        want(yfinance_symbol(row["execution_symbol"]), row.get("anchor_date"))
+    for row in paper_rows:
+        want(row["ticker"], row.get("anchor_date"))
+    all_anchors = [r["anchor_date"] for r in (*results, *paper_rows, *live["rows"]) if r.get("anchor_date")]
+    earliest = min(all_anchors) if all_anchors else today
+    if cohort is not None:
+        for member in cohort.members:
+            want(member.ticker, earliest)
+    always = [PRIMARY_BENCHMARK, REFERENCE_BENCHMARK]
+    order = always + [s for s in wanted if s not in always]
+    keep = order[:max(max_symbols, len(always))]
+    truncated = order[len(keep):]
+    loader = price_loader or _provider_close_series
+    series: dict[str, dict[date, float]] = {}
+    units: dict[str, str | None] = {}
+    for symbol in keep:
+        if symbol in always:
+            continue                         # 基準由 `_benchmark_series` 抓（既有路徑），這裡只算進額度
+        series[symbol], units[symbol] = loader(symbol, wanted[symbol])
+    budget = {"cap": max_symbols, "requested": len(order), "fetched": len(keep), "truncated": truncated,
+              "note": "history lane 的 22 檔沿用原路徑、不在這個上限裡"}
+
+    unit_of = quote_unit_for or _market_quote_unit
+    for row in live["rows"]:
+        symbol = yfinance_symbol(row["execution_symbol"])
+        if symbol in truncated:
+            row["absence_kind"] = "truncated"
+            row["note"].append(f"取價超過上限 {max_symbols} 檔被截掉——不是沒有價")
+            continue
+        _price_live_row(row, series=series.get(symbol) or {}, provider_unit=units.get(symbol), today=today)
+    for row in paper_rows:
+        if row["ticker"] in truncated:
+            row.setdefault("absence_kind", "truncated")
+            row["note"].append(f"取價超過上限 {max_symbols} 檔被截掉——不是沒有價")
+            continue
+        _price_paper_row(row, series=series.get(row["ticker"]) or {},
+                         quote_unit=unit_of(row.get("company_id"), row["ticker"]), today=today)
+
+    # 基準（三條 lane 一次抓，窗＝全部錨點最早一天到今天）
+    benchmarks: dict[str, dict[date, float]] = {}
+    lane_rows = (results, paper_rows, live["rows"])
+    dated = [r for rows in lane_rows for r in rows if r.get("anchor_date") and r.get("current_date")]
+    if not no_benchmark and dated:
+        start = min(r["anchor_date"] for r in dated)
+        end = max(r["current_date"] for r in dated)
+        benchmarks = (benchmark_loader or _benchmark_series)([PRIMARY_BENCHMARK, REFERENCE_BENCHMARK], start, end)
+    for rows in lane_rows:
+        _apply_benchmarks(rows, benchmarks)
+        _apply_theme_cohort(rows, cohort, series)
+    if cohort is not None:
+        cohort_info["missing_members"] = sorted(m.ticker for m in cohort.members if not series.get(m.ticker))
+
+    return {
+        "lanes": {"history": {"rows": results, "unavailable": unavailable, "absence": None},
+                  "paper": {"rows": paper_rows, "filter": paper_filter, "absence": paper_absence},
+                  "live": live},
+        "benchmarks": benchmarks,
+        "theme_cohort": cohort_info,
+        "price_budget": budget,
+        "today": today,
+    }
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--no-benchmark", action="store_true", help="不連外抓基準")
+    parser.add_argument("--no-benchmark", action="store_true",
+                        help="不連外抓基準（診斷用：帶它時不寫聚合檔——當天那一行只由 daily 的完整跑法寫）")
     args = parser.parse_args()
 
-    results, unavailable, benchmarks = collect(no_benchmark=args.no_benchmark)
-    _render(results, unavailable, bool(benchmarks))
+    collected = collect(no_benchmark=args.no_benchmark)
+    _render(collected, persist=not args.no_benchmark)
     return 0
 
 
@@ -429,7 +947,7 @@ DOUBLE_THRESHOLD = 1.0  # 報酬率 +100% ＝ 2 倍
 MATURITY_DAYS = {"12m": 365, "24m": 730}
 
 
-def power_law_aggregate(results: list[dict]) -> dict:
+def power_law_aggregate(results: list[dict], *, lane: str = "history") -> dict:
     """D15 的三個 power-law 統計量：**12／24 個月內達 2 倍的比例、最大單檔貢獻、籃子總報酬**。
 
     ⚠ 純函式，與 `equal_weight_aggregate` 並列；markdown、`outcome_aggregate.json`
@@ -517,8 +1035,9 @@ def power_law_aggregate(results: list[dict]) -> dict:
             "未滿 12／24 個月的檔數不進 `maturity` 的分母——分母小的時候那個比例是雜訊，"
             "不是結論；`reached_2x_ever` 則是進行中的下界，只增不減，**系統性低估**。",
             "各檔錨點日不同，這是跨持有期的粗聚合、不是回測；錨點跨度短時有效 n 遠小於檔數。",
-            "錨點是入圖日，不含任何進場時點判斷——這張表量的是「排序有沒有選到會漲的」，"
-            "不是「我們買得準不準」。",
+            # 第三條跟著 lane 走（Phase 5 Step 5.2）：history 的「錨點是入圖日」對 paper／live 是錯的（L12）。
+            # history 的字一個不改——`outcome_aggregate.jsonl` 的歷史行與它逐字相同。
+            LANE_ANCHOR_BIAS[lane],
         ],
     }
 
@@ -740,7 +1259,13 @@ def anchor_health(results: list[dict]) -> dict | None:
     }
 
 
-def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> None:
+def _render(collected: Mapping[str, Any], *, persist: bool = True) -> None:
+    """history lane 的表與三量（原樣）→ 三條 lane 分段。`persist=False`（`--no-benchmark` 的診斷跑法）不寫聚合檔：
+    當天那一行只由 daily 的完整跑法寫——診斷跑法會把超額寫成 null、蓋掉當天的值（Phase 5 plan §0.6 #1）。"""
+    lanes = collected["lanes"]
+    results = lanes["history"]["rows"]
+    unavailable = lanes["history"]["unavailable"]
+    has_bench = bool(collected.get("benchmarks"))
     print(f"# 若今天結算（{date.today().isoformat()}）— 唯讀，未寫入任何 authority\n")
     header = (
         f"| {'標的':9} | {'錨點日':10} | {'現價日':10} "
@@ -792,17 +1317,117 @@ def _render(results: list[dict], unavailable: list[dict], has_bench: bool) -> No
         power = power_law_aggregate(results)
         for text in render_power_law(power):
             print(text)
-        _persist_aggregate(n=aggregate["n"], ew_abs=aggregate["absolute"],
-                           ew_excess=aggregate["excess"], power=power, convergence=convergence)
+        if persist:
+            _persist_aggregate(n=aggregate["n"], ew_abs=aggregate["absolute"],
+                               ew_excess=aggregate["excess"], power=power, convergence=convergence,
+                               lanes=lanes_payload(collected), theme_cohort=collected.get("theme_cohort"))
     for text in render_bet_convergence(convergence):
         print(text)
 
     _render_live_lane(results, _live_fills())
     _render_chase_check(results)
+    for text in render_lanes(collected):
+        print(text)
+
+
+def lanes_payload(collected: Mapping[str, Any]) -> dict:
+    """三條 lane 的摘要（JSON 可序列化）——聚合檔的 `lanes`、APP artifact、心跳讀同一份（L16：呈現不重算）。
+    lane 組不出來時 `absence` 帶理由：消費端印它，不印「還沒有列」（L12）。"""
+    out = {}
+    for lane in LANE_KEYS:
+        summary = lane_summary(collected["lanes"][lane]["rows"], lane=lane)
+        summary["absence"] = collected["lanes"][lane].get("absence")
+        out[lane] = _jsonable(summary)
+    return out
+
+
+def render_lanes(collected: Mapping[str, Any]) -> list[str]:
+    """三條 lane 分段印（Phase 5 Step 5.2）。**只印不比、不排序、不設門檻**；空 lane 印「還沒有列」，不印 0%。"""
+    out = ["", "## 三條 lane——分母分開，不得合併讀（live 量買得準不準、paper 量判斷準不準、history 只是歷史）"]
+    cohort = collected.get("theme_cohort") or {}
+    if cohort.get("absence"):
+        out.append(f"- 主題等權組：{cohort['absence']['reason']}（{cohort['absence']['kind']}）——超額那一格全部缺席，不是 0")
+    else:
+        missing = cohort.get("missing_members") or []
+        out.append(f"- 主題等權組：`{cohort.get('cohort_id')}`（{cohort.get('theme')}，{cohort.get('decided_on')} 定，"
+                   f"{cohort.get('members_total')} 檔；每列排除本檔）｜取不到價的成員 {len(missing)}"
+                   + (f"：{'、'.join(missing)}" if missing else ""))
+    if cohort.get("parse_errors"):
+        out.append(f"- ⚠ 主題等權組 ledger 有 {len(cohort['parse_errors'])} 行壞行（不靜默丟棄）："
+                   + "；".join(cohort["parse_errors"][:3]))
+    budget = collected.get("price_budget") or {}
+    out.append(f"- 取價：要 {budget.get('requested')} 檔、抓 {budget.get('fetched')} 檔（上限 {budget.get('cap')}）"
+               + (f"｜**截掉 {len(budget['truncated'])} 檔：{'、'.join(budget['truncated'])}**" if budget.get("truncated") else "")
+               + "｜history 的 22 檔沿用原路徑、不在這個上限裡")
+    for lane in LANE_KEYS:
+        rows = collected["lanes"][lane]["rows"]
+        summary = lane_summary(rows, lane=lane)
+        out.append("")
+        out.append(f"### {lane}：{LANE_LABELS[lane]}")
+        absence = collected["lanes"][lane].get("absence")
+        if absence:
+            out.append(f"- ⚠ {absence['reason']}（{absence['kind']}）——不是 0，也不是「還沒有列」")
+            continue
+        if lane == "live":
+            live = collected["lanes"]["live"]
+            out.append(f"- beta 事件 {live.get('beta_events', 0)} 不進 lane"
+                       + (f"｜⚠ 配對不到的賣出：{'；'.join(live['unmatched_sells'])}" if live.get("unmatched_sells") else "")
+                       + (f"｜⚠ {'；'.join(live['problems'])}" if live.get("problems") else ""))
+        if lane == "paper":
+            report = collected["lanes"]["paper"].get("filter") or {}
+            filtered = report.get("filtered") or {}
+            out.append(f"- 敘事 ledger {report.get('input', 0)} 本：進 lane {report.get('accepted', 0)}｜沒有 v2 "
+                       f"{len(filtered.get('no_v2') or [])}｜ledger 有壞行 {len(filtered.get('ledger_unreadable') or [])}")
+        if not rows:
+            out.append(f"- {LANE_EMPTY[lane]}")
+            continue
+        if lane != "history":
+            out.extend(_lane_table(rows, lane=lane))
+        excess = summary["theme_cohort_excess"]
+        out.append(f"- 等權絕對 {_pct(summary['aggregate']['absolute'])}｜對 {PRIMARY_BENCHMARK} 超額 "
+                   f"{_pct(summary['aggregate']['excess'])}｜對主題等權組超額 "
+                   + (f"{_pct(excess['mean'])}（{excess['n']}/{excess['of']} 列有值）" if excess["n"]
+                      else f"還沒有值（{excess['of']} 列量得到報酬）"))
+        chase = summary["chase"]
+        label = {"history": "入圖前已漲", "paper": "敘事前已漲", "live": "成交前已漲"}[lane]
+        out.append(f"- {label}：{chase['chasing']}/{chase['paired']}"
+                   + (f"（{'、'.join(chase['tickers'])}）" if chase["tickers"] else ""))
+        if lane != "history":
+            out.extend(render_power_law(summary["power_law"]))
+        if summary["absences"]:
+            out.append(f"- 缺席：{'、'.join(summary['absences'])}（逐列理由在上表的註記）")
+    return out
+
+
+def _lane_table(rows: Sequence[Mapping[str, Any]], *, lane: str) -> list[str]:
+    out = ["", f"| 標的 | 錨點日 | {'收據' if lane == 'live' else '當時→現行'} | 錨點前30日 | 絕對報酬 | "
+               f"對 {PRIMARY_BENCHMARK} | 對主題等權組 | {'成交' if lane == 'live' else '首次點名'} |",
+           "|---|---|---|---|---|---|---|---|"]
+    for row in sorted(rows, key=lambda r: (str(r.get("anchor_date") or ""), str(r.get("ticker")))):
+        if lane == "live":
+            third = (row.get("receipt") or {}).get("status") or "—"
+            last = f"{row.get('execution_symbol')} {row.get('anchor_raw')} {row.get('trade_currency')}" + (
+                "（已賣出）" if row.get("closed") else "")
+        else:
+            third = f"{row.get('anchor_state') or '—'}→{row.get('current_state') or '—'}"
+            named = row.get("first_named_by") or {}
+            last = (f"{named.get('source')} {str(named.get('first_seen') or '')[:10]}" if named
+                    else row.get("first_named_absence") or "—")
+        cohort = row.get("theme_cohort") or {}
+        cohort_cell = (_pct(row.get("excess_theme_cohort")) + f"（{cohort.get('members_used')}/{cohort.get('members_total')}）"
+                       if row.get("excess_theme_cohort") is not None else "—")
+        out.append(f"| {row.get('ticker')} | {row.get('anchor_date') or '—'} | {third} | "
+                   f"{_pct(row.get('pre_anchor_return'))} | {_pct(row.get('absolute_return'))} | "
+                   f"{_pct(row.get(f'excess_{PRIMARY_BENCHMARK}'))} | {cohort_cell} | {last} |")
+    notes = [(r.get("ticker"), n) for r in rows for n in r.get("note") or []]
+    for ticker, note in notes:
+        out.append(f"- **{ticker}**：{note}")
+    return out
 
 
 def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None,
-                       power: dict | None = None, convergence: dict | None = None) -> None:
+                       power: dict | None = None, convergence: dict | None = None,
+                       lanes: dict | None = None, theme_cohort: Mapping[str, Any] | None = None) -> None:
     """把最新聚合值落成狀態檔 **＋ append 一筆時序**（2026-09-11 補時序）。
 
     ⚠ **為什麼要兩個檔**：`.json` 是 brief 首屏的最新值（既有消費端，形狀不動）；
@@ -832,6 +1457,12 @@ def _persist_aggregate(*, n: int, ew_abs: float, ew_excess: float | None,
     # power-law 問「排序有沒有選到會漲的」（依賴股價），V4 問「共識有沒有朝我們移動」（不依賴賣出）。
     if convergence is not None:
         payload["bet_convergence"] = _jsonable(convergence)
+    # Phase 5 Step 5.2：三條 lane 各自的三量與超額。**既有四欄＝history lane，一字不動**（序列不斷）；
+    # 新資料只住 `lanes`，主題等權組的 id 跟著走（組換了看得出斷點，plan §14 #6）。
+    if lanes is not None:
+        payload["lanes"] = lanes
+    if theme_cohort is not None:
+        payload["theme_cohort"] = {k: theme_cohort.get(k) for k in ("cohort_id", "decided_on", "absence")}
     out = Path("library/private/decision_lab/outcome_aggregate.json")
     try:
         out.parent.mkdir(parents=True, exist_ok=True)
@@ -914,17 +1545,17 @@ def _render_live_lane(results: list[dict], fills: dict[str, list[dict]]) -> None
     才是「系統準不準」的證據，前者不是（§7）。混在同一張表會讓兩個問題共用一個數字。
     """
 
-    print("\n## Live 部位 vs 只有 paper 的 cohort\n")
+    print("\n## 舊店的 live fill vs 只有入圖錨點的 cohort（history lane；凍結只印）\n")
 
     rows, paper_only = live_lane_rows(results, fills)
     live_tickers = sorted({row["ticker"] for row in rows})
 
     if not live_tickers:
         print(
-            "- **live fill：0 筆。** 目前所有 cohort 都只有 paper 記分板，"
+            "- **舊店 live fill：0 筆。** 目前所有 cohort 都只有入圖錨點，"
             "「系統的建議準不準」還沒有任何真實資本的證據。"
         )
-        print(f"- 只有 paper 的 cohort：{len(paper_only)} 個。")
+        print(f"- 只有入圖錨點的 cohort：{len(paper_only)} 個。")
         return
 
     header = (
@@ -951,7 +1582,7 @@ def _render_live_lane(results: list[dict], fills: dict[str, list[dict]]) -> None
 
     print(
         f"\n- **有 live fill：{len(live_tickers)} 檔（已算出報酬 {measured} 筆）"
-        f"｜只有 paper：{len(paper_only)} 個 cohort。**"
+        f"｜只有入圖錨點：{len(paper_only)} 個 cohort。**"
     )
     print(
         "- 「live 報酬」以**實際成交價**為錨點，「shadow 報酬」以**入圖日**為錨點。"

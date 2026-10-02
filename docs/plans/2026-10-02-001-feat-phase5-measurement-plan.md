@@ -124,7 +124,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 |---|---|---|---|---|
 | 5.0 | 基準快照（`docs/reports/2026-10-02-phase5-baseline.md`；偏差見 §0.6 #1–#5：§5 改寫規則修正、追蹤表查證命令改不寫檔、計分表 NaN、跨日只比錨點、watch 實際形狀） | ✅ | 執行模型 | 見 git log「Step 5.0」 |
 | 5.1 | Phase 4 尾巴：#29 ③b 認 supersede、#33 第 2 型降級、#34 `classified_by` 字彙、stash 預熱清單＋對稱測試、apply 入口 `db.propertyKeys()` 檢查（偏差見 §0.6 #6–#9；驗收見 baseline 報告 §15） | ✅ | 執行模型 | 見 git log「Step 5.1」（5.1a–5.1d） |
-| 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review） | ○ | 執行模型 | |
+| 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review；偏差見 §0.6 #10–#15） | ✅ | 執行模型 | 見 git log「Step 5.2」 |
 | 5.3 | `record_trade.py --backfill-before-receipts`（R2-a） | ○ | 執行模型 | |
 | 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行） | ○ | 執行模型 | |
 | 5.5 | 計分表接主題等權組基準 | ○ | 執行模型 | |
@@ -153,6 +153,12 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 7 | 5.1（#33） | 「讀圖 ledger 讀不到／有壞行時第 2 型與第 1 型同形」 | 新 `reading_rows_or_none`：讀不到或有壞行都回 `None`——第 1、2、**4** 型一起降級（第 4 型原本在壞行時拿殘缺資料照算，`collect()` 把壞行清單丟掉） | 壞行與讀不到同形才不會有「第 1、2 型降級、第 4 型照算」的半套；今天 ledger 沒有壞行，九型數字逐字不變 |
 | 8 | 5.1（stash、apply 入口） | 「與 loader 會寫的屬性名集合比對」；stash 的對稱測試自帶 regex | 「loader 會寫的屬性名」收成 `loader.load_to_neo4j.written_property_names()` 唯一一份（38 個＝預熱 37＋`id`），對稱測試與入口都讀它；token 檢查用 apply 寫圖的同一組 routine 憑證；Phase 4 的 `tests/test_layer_document_full_chain.py` 經 `main()` 呼叫入口，補一行注入假檢查（否則它會連真的 Neo4j） | 兩份 regex 會漂開（L16）；用別的憑證查會看到不同的權限世界；測試不該依賴圖開著（以錯的 `NEO4J_URI` 重跑兩個入口測試檔仍 15 條綠） |
 | 9 | 5.1（#34） | 「既有 cw_dfb lead 的紀錄不改寫…登記 §14」 | 照做；另查到 3 則 `directed:sub_backfill` 的 lead 被互動 session 鑄號、卻標成預設的 `triage_semantic_v1`（同一個形狀，計入「分類層上次成功」的候選），一併登記 §14 #3、不改寫 | lead registry 是 authority，改資料走 pq2 |
+| 10 | 5.2 | 「`collect()` 回 `{"lanes": {...}, "benchmarks": ...}`」 | 回 `{lanes, benchmarks, theme_cohort, price_budget, today}`；所有外部輸入可注入（`price_loader`、`history_loader`、`benchmark_loader`、`trade_log_path`、`briefs`、`leads`、`cohorts`、`is_beta`、`resolve`、`quote_unit_for`、`max_symbols`）；history 的逐列計算原樣搬進 `_history_rows`，基準迴圈抽成三條 lane 共用的 `_apply_benchmarks` | 夾具要能不打網路、不開舊店；同一份算法給三條 lane（L16）。同一份價格上改前（HEAD 版）與改後 history 的 rows／三量／等權逐位相同 |
+| 11 | 5.2 | 「`equal_weight_aggregate`、`power_law_aggregate`（既有純函式直接套）」 | `power_law_aggregate` 多一個 `lane` 參數，只換 `known_biases` 的第三條（錨點偏差）；history 那句一字不改 | 原第三條「錨點是入圖日…不是我們買得準不準」對 paper／live 是錯的——直接套就是讓一句話承載三種語意（L12） |
+| 12 | 5.2 | （未提） | 舊店那一段的「只有 paper 的 cohort」改成「只有入圖錨點的 cohort」、標題改「舊店的 live fill…（history lane；凍結只印）」；APP 同步；artifact 鍵名 `live.paper_only` 不改 | 「paper」不得同時指「舊店沒有 live fill 的 cohort」與新的 paper lane（L12）；鍵名不改是讓舊讀者不壞 |
+| 13 | 5.2 | 「幣別必須等於成交幣別」 | live 列的 provider 報價單位取 yfinance `history_metadata.currency`（2DG.F→EUR）；paper 列沿用名冊的報價單位 | 名冊只知道研究 ticker 的報價單位（SIVE.ST＝SEK），不知道成交所的（FRA:2DG＝EUR）——拿名冊比會把正確的成交判成幣別不一致 |
+| 14 | 5.2 | paper「錨＝那天收盤」 | 照做，並把偏差寫進 paper 的 `known_biases`：美股與歐股在台北下午寫下時還沒收盤，錨點含當天盤中變動（同日內前視、最多一個交易日） | 定案 #1 的取捨保留，但讓偏差跟著數字走 |
+| 15 | 5.2 | 「`first_named_by`＝最早 lead 的 `source`＋日期」 | 以 `first_seen`（我們看到它的時間）取最早，`published_at` 另印、空就是空；lead registry 讀不到時印 `upstream_unavailable`，不是 `no_lead_named` | 「首次點名」問的是管道何時把它帶到我們面前；兩個日期不互相冒充（INV-6） |
 
 ---
 
@@ -380,3 +386,5 @@ R2 回 GO 後：ROADMAP Phase 5 標 ✅、`docs/plans/README.md` 對照表本列
 8. 回填：FRA:2DG 的成交日與價由使用者提供；COHR 2026-08-18 10 股 @316.23（舊店 `ib-cohr-2026-08-18-10sh`）。
 9. 預測表要不要納入 thesis memo 的反證觸及（今天 thesis 來源的語意 watch 16 筆）——ROADMAP 寫的是「讀圖斷言」，本 Phase 只做讀圖。
 10. 計分表的籃子基準對 2026-09-30 之前的點名是回溯（已印在 `KNOWN_BIASES`）；要不要對每則點名記「點名時組是否已定義」。
+11. （5.2 發現）**長駐 APP 用的是 2026-09-10 的程式**（PID 15956，`python -m webapp serve`，開機由 `stockbot-graph-services.vbs` 啟動）：09-10 之後新增的結構表、走圖、讀圖、候選板四個 GET 一直回 404，positions 自 5.2（schema `/2`）起回 503——重啟它是使用者動作。要不要讓 APP 自己偵測「程式比載入時新」並在首頁現形（L14：會自己出現的計數器，不是要人記得重啟）。
+12. （5.2 發現）在台北白天互動跑追蹤表，歐洲與台股會取到**盤中尚未收盤**的當日 K 棒（yfinance 會回進行中的值）；daily 05:30 各市場都已收盤所以不受影響。要不要在取價端排除當日未收盤的 bar（history 的 `_provider_series` 與新 lane 的 `_provider_close_series` 都是）。
