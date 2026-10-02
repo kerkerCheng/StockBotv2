@@ -439,3 +439,16 @@ scratchpad `p52_collect_real.py`（`collect()` 唯讀；跑前跑後兩個聚合
 - 心跳與 5.5 那次逐行對照：沒有新行（序列只寫不讀）。候選行「已持有 1→2、非倍率候選 2→1」是當天 Sheet 補上 COHR 之後重新 materialize 的結果，不是 5.6 造成的；備份的「之後變動未備份」95→96，新檔在備份範圍內。
 - 結案驗收（plan §11）：行數＝結案日 − 2026-10-02 ＋ 1。
 - 變異（worktree）：同日不去重、壞行照 `_persist_aggregate` 丟掉、試跑寫真實序列、寫失敗上拋、`held` 缺席壓成 0、artifact 寫之前就記——6 種全紅，還原後全綠（變異跑在 worktree，寫進的是 worktree 自己的 `library/private/measurement/`，跑完已刪）。
+
+## 20. Step 5.7 新管線 full chain 測試（2026-10-02 台北）
+
+`tests/test_measurement_full_chain.py` 三條：夾具輸入 → 真的組裝函式 → state artifact → 心跳文字與 APP 的 GET，斷言的數字都由夾具手算。
+
+| 鏈 | 走過的函式 | 下游斷言（手算） |
+|---|---|---|
+| 追蹤表 | `collect()` → `build_positions_artifact` → `StateArtifactStore` → `hb.build_positions` → `/api/v1/positions` | paper 兩列 AAA＋20%、GGG.L＋25%（GBp 同序列相除）；對組超額各＋15%（AAA 排除本檔；MEM2 10-02 的 NaN 退回前一根）；心跳「paper（第一份 v2 敘事日起）：2 檔｜量測起始 2026-09-29｜等權總報酬 22.50%」「對主題等權組超額 15.00%（2/2 列）」 |
+| 圖預測 | 五份讀圖經 `append_reading_record` 進 ledger → `materialize_structure_readings` → 心跳 → `/api/v1/structure-readings` | 對 1（同版、digest 變、多一份來源）／錯 2（判觸及、lead 晚於讀圖＝之後才出現；翻成 neither、沒有新來源＝未定日）／現行 1／非斷言 1；心跳整行逐字相等，含「現行最早到期 2026-12-31」 |
+| 計分表 | `materialize_account_scorecard` → `build_scorecard`（夾具 lead、登記表、名冊、組、注入價格）→ 心跳段 5 → `/api/v1/account-scorecard` | 對組超額＝161/131 − 1 − ((130.5/115.5 − 1)＋(222/162 − 1))/2；成員與點名同一次取價；心跳行尾「已知偏差 4 條（也在 APP）｜主題等權組基準：有」 |
+
+變異（worktree，每條鏈中段打斷一處）：`positions_lanes` 沒接、心跳印錯 lane 的值、預測表沒接進 artifact、SourceDoc 日期沒接、watch 沒傳、
+組沒傳進 `score_account`、成員沒併進取價——7 種全紅，還原後全綠。全測試 **3303 passed、1 skipped**。既有 `tests/test_full_chain_acceptance.py` 0 行變動。

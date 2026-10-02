@@ -129,7 +129,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行；真實資料＝baseline §5.2 手算逐筆相同，見 baseline §17；偏差見 §0.6 #18–#22） | ✅ | 執行模型 | 見 git log「Step 5.4」 |
 | 5.5 | 計分表接主題等權組基準（第三個基準＋NaN 收盤＋APP 計分表頁；真實資料見 baseline §18；偏差見 §0.6 #23–#27） | ✅ | 執行模型 | 見 git log「Step 5.5」 |
 | 5.6 | 候選狀態每日序列（2026-10-02 交付；第一行與 artifact 計數相同，見 baseline §19；偏差見 §0.6 #28–#29） | ✅ | 執行模型 | 見 git log「Step 5.6」 |
-| 5.7 | 新管線 full chain 測試（夾具版） | ○ | 執行模型 | |
+| 5.7 | 新管線 full chain 測試（夾具版；三條鏈、7 種中段打斷全紅，見 baseline §20；偏差見 §0.6 #30） | ✅ | 執行模型 | 見 git log「Step 5.7」 |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ ＋ 回查 watch | ○ | 執行模型 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
@@ -173,6 +173,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 27 | 5.5 | §6 驗收「同一份價格上…污染的格逐格列出改前改後」 | 今天抓到的價格**沒有** NaN（16／16 格逐位相同、污染 0 格），所以另以同一份價格重放 10-01 的形狀（五檔歐股 10-01 收盤換成 NaN）逐格比對：改前 7／10 格被污染，改後的值＝乾淨價格的值 | 污染不只讓那一格變 NaN：中位數排序被 NaN 打亂，**看起來正常的格也被靜默算錯**（「30 天 vs QQQ」乾淨 −0.63%、重放污染 −34.27%；早上 daily 那份 artifact 印的是 −43.57%）。逐格見 baseline §18 |
 | 28 | 5.6 | §7「同日重跑只留最後一筆（照 `_persist_aggregate` 的做法，壞行只跳過）」 | 同日去重照做；但**壞行原樣保留**，不丟。整檔寫到暫存檔再 `os.replace`（原子改寫）；artifact 寫完才記，artifact 寫失敗那一輪不記 | `_persist_aggregate` 的「跳過」在改寫時等於把壞行刪掉。這份序列今天重抓拿不回昨天的值（L10：拿不回來的只能 append），壞掉的那一行也是一筆紀錄的殘骸，留著才看得到它壞了。非原子改寫在寫到一半時會截掉整串 |
 | 29 | 5.6 | §7「新 `library/private/measurement/`（目錄由程式建）」 | 只有**預設** state 目錄寫這個路徑；其他 state 目錄（測試、`--dir`、`STOCKBOT_APP_STATE_DIR`）寫在那個目錄裡的 `measurement/` | 試跑與測試不得碰到真實序列；「同一天只留最後一筆」會讓一次試跑蓋掉當天的真實那一行 |
+| 30 | 5.7 | §8「`prediction_table` → `structure_readings` artifact 的 `predictions` 段」；「`build_scorecard` 的籃子格」 | 讀圖鏈的夾具經**真的寫入端**（`append_reading_record`：契約＋引文逐字核對）進 ledger，再跑真的 `materialize_structure_readings`；計分表鏈跑真的 `materialize_account_scorecard`；三條鏈都多斷言 APP 的 GET 照抄同一個數字。追蹤表鏈照 plan 走 `collect()` → `build_positions_artifact`（`materialize_positions` 會開舊店、讀 Sheet 與 NAV，夾具化太脆） | 斷言要落在真的組裝函式之後，才量得到「數字有沒有流到下游」（L13）；APP 是第三個消費者 |
 
 ---
 
