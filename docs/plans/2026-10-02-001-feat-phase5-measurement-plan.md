@@ -45,6 +45,8 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 
 ## 0.2 現況實測（2026-10-02；**現況數字會腐壞，引用前重跑查證命令**）
 
+> 5.0 實測的更正（讀圖鏈 digest、watch 形狀、Sheet 已有 COHR 列、`origin_linkage` token 已存在、計分表 NaN、`--no-benchmark` 會寫檔、跨日只比錨點）見 [`docs/reports/2026-10-02-phase5-baseline.md`](../reports/2026-10-02-phase5-baseline.md) §13；本表保留寫 plan 當時的快照。
+
 | 事實 | 數字 | 查證 |
 |---|---|---|
 | 追蹤表（`positions` kind） | **22 列，錨點全是舊 Decision Store 的入圖日**（量測起始 2026-07-21、最長 72 天）；三量：籃子總報酬 +8.66%、最大單檔 AXTI（等權貢獻 +4.15%／其餘 21 檔 +4.51%）、曾達 2 倍 1/22（現價仍達 0）、12 個月分母 0；對 QQQ 超額 +4.05%；「入圖前已漲」8/22 | `library/private/app/state/positions.json`（`rows`、`power_law`、`anchor_health`）；`python scripts/outcome_if_settled_today.py --no-benchmark` |
@@ -120,7 +122,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
-| 5.0 | 基準快照（`docs/reports/2026-10-xx-phase5-baseline.md`） | ○ | 執行模型 | |
+| 5.0 | 基準快照（`docs/reports/2026-10-02-phase5-baseline.md`；偏差見 §0.6 #1–#5：§5 改寫規則修正、追蹤表查證命令改不寫檔、計分表 NaN、跨日只比錨點、watch 實際形狀） | ✅ | 執行模型 | 見 git log「Step 5.0」 |
 | 5.1 | Phase 4 尾巴：#29 ③b 認 supersede、#33 第 2 型降級、#34 `classified_by` 字彙、stash 預熱清單＋對稱測試、apply 入口 `db.propertyKeys()` 檢查 | ○ | 執行模型 | |
 | 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review） | ○ | 執行模型 | |
 | 5.3 | `record_trade.py --backfill-before-receipts`（R2-a） | ○ | 執行模型 | |
@@ -142,7 +144,11 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
-| | | | | |
+| 1 | 5.0（影響 5.2、結案 R2） | §1 第 2 項與結案 R2 第 2 項：「`python scripts/outcome_if_settled_today.py --no-benchmark` 全文存檔」 | 5.0 以 scratchpad 包裝取全文（同一個 `main()`，`_persist_aggregate` 換成 no-op；兩個聚合檔指紋跑前跑後相同）；**5.2 根除**：`--no-benchmark` 是診斷旗標，帶它時 `_render` 不寫聚合檔（daily 步驟 05 的 argv 不帶它，序列照舊）；結案 R2 第 2 項因此可直接用 CLI | CLI 的 render 會覆寫當日那一行，`--no-benchmark` 時 `equal_weight_excess` 被寫成 null（今天 daily 寫的是 0.0403）——違反不可越線 #3；「記得用包裝」是要人記得的段落，根除只要一個條件 |
+| 2 | 5.0（影響 5.4） | §5 `rewritten`＝有後繼、同 digest、r 未到期；否則同 kind＝`held`（對）。§0.2「其餘是 schema 升版、digest 相同」 | `rewritten` 加條件②：**同 kind** 的後繼若 schema 版本不同、或沒有帶來 r 沒引用過的來源（`new_sources` 為空），也是改寫；**不同 kind 不套②**；r 已到期照舊不是改寫。真實資料：原規則 held 5／rewritten 4 → 修正後 held 0／rewritten 9（逐筆見 baseline §5） | 實測 inp／cw 兩鏈有 5 個同 kind 環節 digest 不同，快照差異全對得上 `query/structure.py` 的 commit（需求走訪加 constrained_by、證據欄修正、反向路徑只收 competes_with）與 schema 升版，沒有一個是供給側增減。原規則會把它們算成 5 筆「對」＝§5 L11-6 ④點名的「改寫被算成驗證」，並讓 ROADMAP ② 在 5.4 當天被假性滿足。定案 #3 的原句是「同 kind 取代且**圖有變**或已到期＝對」——查法變了不是圖變了；`result_digest` 一個表示承載兩種語意（L12），修的是機械代理不是定案。「新來源」與「錯的種類」用同一個 `new_sources`（一個 owner） |
+| 3 | 5.0（影響 5.2、5.5） | §6 驗收「五欄既有值逐位不變」 | 5.5 加：`_yfinance_closes` 濾 NaN 收盤；驗收改「同一份價格上，被 NaN 污染的格以外逐位不變，污染的格逐格列出改前改後」。5.2 的主題等權組報酬函式同樣濾 NaN（照 `_provider_series` 的 `.dropna()`＋`close == close`） | 計分表「點名後 90 天 vs SOXX」今天是 NaN：yfinance 對 5 檔歐洲標的（IQE.L、SHA0.DE、SIVE.ST、SOI.PA、XFAB.PA）在 10-01 回了 NaN 收盤，計分表取價沒濾；NaN 混進中位數時排序結果不確定，同一批值算出的 QQQ 格也可能被靜默算錯，而 NaN 不等於自己、「逐位不變」對它無法成立。十行內、不動 contract（L17 當下修），住 5.5 本來就要改的檔 |
+| 4 | 5.0（影響 5.2、§11、§12、結案 R2） | §3「真實資料：history 22 列與 5.0 逐位相同（`rows` 與 `power_law` 的 digest）」 | 分兩層：**同一份價格**（注入同一個 loader 或同一次抓取）跑改前／改後兩份 `collect()`，history 的 `rows`／`power_law` digest 逐位相同；**跨日**只比錨點 digest（baseline §2：`sorted((ticker, company_id, anchor_date, anchor_price, anchor_currency))` 的 sha256＝`6ea352ed…7b93`） | 每列帶現價，三次各自抓價在第 4 位小數就不同（daily 05:3x、materialize 07:14、5.0 14:5x）；跨日比 rows digest 必然不同，那不是回歸 |
+| 5 | 5.0（影響 5.4） | §5 輸入「來源為 `reading:<r.reading_id>` 的語意 watch `judgment.touches == "yes"`」；種類「標旗／判定引用的那份文件的 `published_at`」 | 照實際形狀寫進 §5：`kind == "semantic_condition"`；`source_ref` 是 `reading:<id>#<第幾條>`（比對去掉 `#n`）；觸及只看**單數** `judgment`（判無關 append 在複數 `judgments`）；文件日期＝`judgment.lead_id` → lead registry 那則的 `published_at`（空→`undated`）；`record_touched`（pq2 `watch_decision`）那條路 `lead_id` 是 null → `undated` | §13 要求「5.0 先查清楚再寫 5.4」；照原文的 `reading:<id>` 全等比對會 0 命中且不報錯（成功與失敗同形，L13） |
 
 ---
 
@@ -170,7 +176,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 寫 `docs/reports/2026-10-xx-phase5-baseline.md`，每個數字附命令：
 
 1. `python -m pytest -q` 總數、測試檔數、函式層級名單（`git grep -n -E "^\s*(async )?def test_" HEAD -- 'tests/*.py' | wc -l`）；`python -m audit invariants`。
-2. 追蹤表：`python scripts/outcome_if_settled_today.py --no-benchmark` 全文存檔（22 列、三量、錨點體檢、live 段）；`positions.json` 的 `content_digest`、`aggregate`、`power_law`、`anchor_health`、`counters`；`outcome_aggregate.jsonl` 行數與最後一行。
+2. 追蹤表：`python scripts/outcome_if_settled_today.py --no-benchmark` 全文存檔（22 列、三量、錨點體檢、live 段；5.0 實際以不寫檔的包裝跑，§0.6 #1）；`positions.json` 的 `content_digest`、`aggregate`、`power_law`、`anchor_health`、`counters`；`outcome_aggregate.jsonl` 行數與最後一行。
 3. 心跳：`python -m crons.heartbeat --out <scratchpad>/hb_base.md`，段 4 逐行存檔；`SNAPSHOT_KEYS` 清單。
 4. 敘事：4 檔 v2 第一份的 `brief_id`／`created_at`／`candidate_state.state`；v1 最早日期。
 5. 讀圖：15 筆的 `reading_id`／`node`／`unit`／`kind`／`created_at`／`expires`／`supersedes_id`／`result_digest`／`retracted`；按 §5 的規則**手算**一次預測表（預期：斷言 2 筆 `open`、非斷言、`rewritten` 若干、對／錯 0）——這份手算是 5.4 的對照答案。
@@ -218,9 +224,11 @@ L11-6 ④：#29 若判錯，最先壞的是結案時 Phase 4 的 ③b 數字（0
 
 **網路上限：** 新常數 `MAX_LANE_SYMBOLS`（例 60）：paper＋live＋籃子成員＋基準去重後超過就截斷、**把截掉的印出來**（同 `MAX_PRICED_SYMBOLS`）。
 
+**5.0 帶進來的三件（§0.6 #1、#3、#4）：** ①`--no-benchmark`（診斷旗標）時 `_render` 不呼叫 `_persist_aggregate`——daily 的 argv 不帶它，序列照舊；②主題等權組報酬函式取價濾 NaN（照 `_provider_series` 的 `.dropna()`＋`close == close`；IQE.L、SIVE.ST 今天就有 10-01 的 NaN 收盤）；③`current_cohorts()` 回（組清單, 壞行清單）兩項，壞行數印在 lane 層（INV-3）。
+
 **sandbox impact review（同 commit 寫進 OPERATIONS 既有那一節）：** `05_outcome` 步驟 argv 不變；網路 surface 由「22 檔＋2 基準」變「上限 `MAX_LANE_SYMBOLS`」；寫入仍只有 `library/private/decision_lab/outcome_aggregate.json(l)`；`materialize --positions` 仍只呼叫 `collect()`（不寫聚合檔）。
 
-**怎麼驗：** 夾具 trade_log（1 筆 alpha 有收據、1 筆 backfilled、1 筆 beta、1 筆賣出）＋夾具敘事 ledger（2 檔 v2、其中 1 檔有 v1 在前）＋夾具組＋注入價格 loader → 三 lane 列數、錨點、三量、籃子超額、缺席 kind 逐格斷言；真實資料：history 22 列與 5.0 逐位相同（`rows` 與 `power_law` 的 digest）、paper 4 列錨點 2026-09-29（SIVE.ST 以第一份 v2 09-29 為準，不是 10-01 換版）、live 0 列＋「beta 事件 2 不進 lane」；心跳段 4 與 5.0 逐行對照只在預期處變；變異：lane 混算（paper 進 history 分母）→ 紅；成員不排除本檔 → 紅；幣別不一致仍算 → 紅。
+**怎麼驗：** 夾具 trade_log（1 筆 alpha 有收據、1 筆 backfilled、1 筆 beta、1 筆賣出）＋夾具敘事 ledger（2 檔 v2、其中 1 檔有 v1 在前）＋夾具組＋注入價格 loader → 三 lane 列數、錨點、三量、籃子超額、缺席 kind 逐格斷言；真實資料：同一份價格上 history 22 列與改前逐位相同（`rows` 與 `power_law` 的 digest）、跨日錨點 digest＝baseline §2 的 `6ea352ed…7b93`（§0.6 #4）、paper 4 列錨點 2026-09-29（SIVE.ST 以第一份 v2 09-29 為準，不是 10-01 換版）、live 0 列＋「beta 事件 2 不進 lane」；心跳段 4 與 5.0 逐行對照只在預期處變；變異：lane 混算（paper 進 history 分母）→ 紅；成員不排除本檔 → 紅；幣別不一致仍算 → 紅；籃子取價不濾 NaN → 紅；`--no-benchmark` 寫了聚合檔 → 紅。
 L11-6 ④：最先壞的是 `outcome_aggregate.jsonl` 的歷史四欄（既有消費端 `_outcome_series`）——跑完後讀最後一行，四欄的值必須等於 history lane 的值。
 
 ## 4. Step 5.3 `record_trade.py --backfill-before-receipts`（Z2，R1 ＋ R2-a 常規 opt-in）
@@ -240,7 +248,7 @@ L11-6 ④：最先壞的是現行 `--log-only` 的正常路徑（它仍要讀今
 
 **改哪裡：** 新 `alpha/structure_reading/predictions.py`（純函式）、`webapp/materialize.py::materialize_structure_readings`（讀 ledger 的那支；加 `predictions` 段、schema `structure_readings/2`）、`webapp/contracts.py`、讀圖頁 `app.js`、`crons/heartbeat.py` 段 4 一行、新 `tests/test_reading_predictions.py`。
 
-**輸入：** 每個節點 ledger 的全部紀錄（含撤回）、語意 watch（來源 `reading:` 的）、SourceDoc `published_at` 對照表（`materialize` 那次連線以唯讀 Cypher 取 `doc_id → published_at`；Neo4j 讀不到 → 種類欄整段 `upstream_unavailable`，終局欄照算）、today。
+**輸入：** 每個節點 ledger 的全部紀錄（含撤回）、語意 watch（`kind == "semantic_condition"`、`source_ref` 以 `reading:<reading_id>#` 開頭——格式是 `reading:<id>#<第幾條>`，§0.6 #5）、lead registry 的 `published_at`（`disproof_touched` 的種類用）、SourceDoc `published_at` 對照表（`materialize` 那次連線以唯讀 Cypher 取 `doc_id → published_at`；Neo4j 讀不到 → 種類欄整段 `upstream_unavailable`，終局欄照算）、today。
 
 **每一筆讀圖 r 的終局（封閉字彙，一筆恰好一格）：**
 
@@ -248,10 +256,10 @@ L11-6 ④：最先壞的是現行 `--log-only` 的正常路徑（它仍要讀今
 |---|---|---|
 | `non_assertion` | `r.kind ∉ {moat, volume}`（neither／undecided） | 母體，不判 |
 | `retracted` | `r.retracted` | 錯；種類依撤回它的那筆（若有 supersedes 指向它的紀錄）多出的 citation 算，沒有 → `undated` |
-| `rewritten` | 有後繼 s（`s.supersedes_id == r.reading_id`）且 `s.result_digest == r.result_digest` 且 r 在 `s.created_on` 當天未到期 | 改寫（schema 升版、補引文），不算對錯 |
+| `rewritten` | 有後繼 s（`s.supersedes_id == r.reading_id`）、r 在 `s.created_on` 當天未到期，且下列任一：①`s.result_digest == r.result_digest`；②`s.kind == r.kind`，而 `s.record_version != r.record_version` 或 `new_sources(s, r)`（定義見 `reversed` 列）為空。**不同 kind 不套②**（§0.6 #2） | 改寫（schema 升版、補引文、查詢程式改版後重存快照、同一輪研究內補寫），不算對錯 |
 | `held` | 有後繼 s、不是 `rewritten`、`s.kind == r.kind` | 對 |
 | `reversed` | 有後繼 s、不是 `rewritten`、`s.kind != r.kind`（含翻成 neither／undecided） | 錯；種類：`new_sources = {c.source_id for c in s.citations} − {… for c in r.citations}`，取它們的 `published_at` 最小值：`< r.created_on` → `already_available`（當時已有反例＝讀得不夠）；全部 `≥` → `emerged_later`（之後才出現＝判斷錯）；沒有新來源或都沒日期 → `undated` |
-| `disproof_touched` | 沒有後繼，且任一來源為 `reading:<r.reading_id>` 的語意 watch `judgment.touches == "yes"` | 錯；種類：標旗／判定引用的那份文件的 `published_at`（5.0 第 6 項查到的欄位）對 `r.created_on`，同上三分 |
+| `disproof_touched` | 沒有後繼，且任一 `source_ref` 為 `reading:<r.reading_id>#n` 的語意 watch 帶**單數** `judgment` 且 `judgment.touches == "yes"`（判無關寫在複數 `judgments`，不算） | 錯；種類：`judgment.lead_id` → lead registry 那則的 `published_at` 對 `r.created_on`，同上三分；`lead_id` 為 null（`record_touched` 那條路）或 `published_at` 空 → `undated`（baseline §6） |
 | `expired_unread` | 沒有後繼、未觸及、`today > r.expires` | 到期未重讀（與走圖第 4 型同一件事，這裡只是終局視角） |
 | `open` | 其餘 | 現行 |
 
@@ -259,14 +267,14 @@ L11-6 ④：最先壞的是現行 `--log-only` 的正常路徑（它仍要讀今
 **心跳段 4 一行：** `圖預測：對 N｜錯 M（當時已有 a／之後才出現 b／未定日 c）｜現行 K｜到期未重讀 J｜改寫 R｜非斷言 Z`；`SNAPSHOT_KEYS` 加對／錯／到期未重讀。
 **讀圖頁：** 一張表，終局與種類用字彙的中文；每列連到那筆讀圖。
 
-**怎麼驗：** 夾具 ledger：鏈 A（volume → 同日 v3 改寫 → 圖變後 volume）＝`rewritten`＋`held`；鏈 B（moat → 到期後 neither，新 citation 的文件 `published_at` 早於舊讀圖）＝`reversed/already_available`；鏈 C（volume，watch 觸及、文件晚於讀圖）＝`disproof_touched/emerged_later`；鏈 D（undecided）＝`non_assertion`；鏈 E（撤回）＝`retracted/undated`；真實資料：與 5.0 第 5 項的手算逐筆相同（預期對／錯 0、`open` 2、`rewritten` 若干、`non_assertion` 若干、SuperNova 09-25 那筆＝`non_assertion`）；變異：把 `supply_added` 接進來 → 紅（測試斷言 staleness 的變化不改終局）；`published_at` 缺時壓成 `emerged_later` → 紅。
-L11-6 ④：最先壞的是 inp 鏈的 09-17 三筆（同日 v1 改寫、digest 相同）——若規則把它們判成 `held`，那是改寫被算成驗證；5.0 的手算必須先標出它們。
+**怎麼驗：** 夾具 ledger：鏈 A（volume → 同日 v3 改寫 → 圖變後 volume、帶一份新來源）＝`rewritten`＋`held`；鏈 A'（同 kind、digest 變了但沒有新來源；另一條 v2→v3 digest 變）＝兩筆都 `rewritten`（§0.6 #2 的負向對照）；鏈 B（moat → 到期後 neither，新 citation 的文件 `published_at` 早於舊讀圖）＝`reversed/already_available`；鏈 C（volume，watch 觸及、文件晚於讀圖）＝`disproof_touched/emerged_later`；鏈 D（undecided）＝`non_assertion`；鏈 E（撤回）＝`retracted/undated`；真實資料：與 baseline §5.2 的修正後手算逐筆相同（`held` 0、錯 0、`rewritten` 9、`open` 2、`non_assertion` 4；SuperNova 09-25 那筆＝`non_assertion`）；變異：把 `supply_added` 接進來 → 紅（測試斷言 staleness 的變化不改終局）；`published_at` 缺時壓成 `emerged_later` → 紅；拿掉條件②（同 kind 只看 digest）→ 真實資料 `held` 變 5、紅；`source_ref` 改回全等比對 → 鏈 C 的觸及 0 命中、紅。
+L11-6 ④：最先壞的是 inp 鏈 `sr_88340b81…`、`sr_6ad5c884…`、`sr_ad503ae8…` 與 cw 鏈 `sr_a6762186…`、`sr_a181641d…` 五筆（digest 變了，但變的是查法不是圖，baseline §5.1）——若規則把它們判成 `held`，那是改寫被算成驗證。
 
 ## 6. Step 5.5 計分表接主題等權組基準（Z1，R1）
 
 **改哪裡：** `engine_b/account_scorecard.py`（`score_account`、`build_scorecard`、`render`）、APP 計分表頁、`tests/test_account_scorecard.py`、`crons/heartbeat.py` 段 5（只加「籃子基準：有／無」一格，不印數字）。
-**怎麼改：** 讀現行主題等權組（0 組 → 每個籃子格 `not_yet_recorded`）；成員 ticker 併進 `wanted`（仍受 `MAX_PRICED_SYMBOLS`，被截的印出）；對每則點名、每個 horizon 算 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 成員（排除本檔）等權報酬；`metrics` 多這幾格（`Metric`，缺席同既有 `insufficient_sample`／`revisit_after` 規則）；payload 多 `theme_cohort: {cohort_id, decided_on, members_total, members_priced, missing[]}`；`KNOWN_BIASES` 加一條「籃子成分是 2026-09-30 定的、對更早的點名是回溯」；`render` 與 APP 各印；`freshness_identity` 加籃子格有沒有值。
-**怎麼驗：** 注入 loader 的夾具：兩個成員＋一檔點名 → 籃子超額等於手算；本檔是成員時被排除；組缺席 → `not_yet_recorded`；真實資料：`price_budget.requested` 增加的數＝成員數，五欄既有值逐位不變。
+**怎麼改：** 先修取價：`_yfinance_closes` 跳過 NaN 收盤（§0.6 #3；今天「點名後 90 天 vs SOXX」＝NaN）。讀現行主題等權組（0 組 → 每個籃子格 `not_yet_recorded`）；成員 ticker 併進 `wanted`（仍受 `MAX_PRICED_SYMBOLS`，被截的印出）；對每則點名、每個 horizon 算 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 成員（排除本檔）等權報酬；`metrics` 多這幾格（`Metric`，缺席同既有 `insufficient_sample`／`revisit_after` 規則）；payload 多 `theme_cohort: {cohort_id, decided_on, members_total, members_priced, missing[]}`；`KNOWN_BIASES` 加一條「籃子成分是 2026-09-30 定的、對更早的點名是回溯」；`render` 與 APP 各印；`freshness_identity` 加籃子格有沒有值。
+**怎麼驗：** 注入 loader 的夾具：兩個成員＋一檔點名 → 籃子超額等於手算；本檔是成員時被排除；組缺席 → `not_yet_recorded`；真實資料：`price_budget.requested` 增加的數＝成員中原本不在取價清單的檔數（`wanted` 是集合、會去重）；同一份價格上五欄既有值除被 NaN 污染的格以外逐位不變，污染的格逐格列出改前改後（§0.6 #3）；變異：拿掉 NaN 過濾 → 夾具（一檔終點是 NaN 收盤）紅。
 L11-6 ④：最先壞的是 `price_budget` 截斷邏輯（基準永遠留著的那段）——籃子成員不是基準、可被截，截掉就整格缺席並印出，不得讓基準被擠掉。
 
 ## 7. Step 5.6 候選狀態每日序列（Z1，R1）
@@ -287,7 +295,7 @@ L11-6 ④：最先壞的是 `materialize --candidates` 的 request path 哨兵�
 | ROADMAP ① 追蹤表印籃子超額 | paper／live 每列與 lane 聚合的 `excess_theme_cohort` 有值或有缺席 kind；history 不要求（它不是判斷） | 追蹤表 |
 | ROADMAP ② 圖預測表有第一筆對／錯，每筆「錯」標明種類 | `predictions` 的 `held + reversed + disproof_touched + retracted` ≥ 1 且每筆錯有種類；**結案時若為 0**：夾具測試證明機制、closeout 寫「已交付、未生效」、登記 date watch 回查（到期日＝`earliest_open_expiry`，今天是 2026-12-24） | 讀圖 × 等待 registry |
 | ROADMAP ③ 計分表印量測起始日與樣本數 | 既有 `measurement_start`／`named_calls` 照印；新加籃子格的 `n` 與 `members_priced` | 計分表 |
-| 三條 lane | history 22 列與 5.0 逐位相同；paper 4 列、錨點 2026-09-29、三量每格有值或「還沒有分母」；live 0 列（或使用者回填後的 N 列，逐筆附指令時間）＋「beta 事件 2 不進 lane」 | 追蹤表 |
+| 三條 lane | history 22 列：錨點 digest 與 5.0 相同、同一份價格上 rows／power_law 逐位相同（§0.6 #4）；paper 4 列、錨點 2026-09-29、三量每格有值或「還沒有分母」；live 0 列（或使用者回填後的 N 列，逐筆附指令時間）＋「beta 事件 2 不進 lane」 | 追蹤表 |
 | 候選狀態序列 | `candidate_state_series.jsonl` 行數＝結案日 − 5.6 交付日 ＋ 1（daily 每天一行） | 追蹤表 |
 | Phase 4 尾巴 | ③b 的 `new`／`superseded` 兩格印出且今天 superseded 0；第 2 型降級夾具；`classified_by` 新值；stash 為空；入口對缺 token 的夾具 fail closed | 機制存在與否 |
 | 回填旗標 | 七種拒收一種放行的測試；真實 trade_log sha 與 5.0 相同（或列出使用者回填的事件） | 機制存在與否 |
@@ -298,7 +306,7 @@ L11-6 ④：最先壞的是 `materialize --candidates` 的 request path 哨兵�
 
 1. `pytest -q` 全綠；測試檔數差＝新增－退役；函式層級以 5.0 名單比對，拿掉的每一個寫去向。
 2. `python -m audit invariants` 綠。
-3. 無未解釋語意 diff：心跳與 5.0 逐行對照，只在段 4（lane 行、預測行）、段 5（籃子基準格）預期處變；個股頁核心面板 digest 0 檔變（本 Phase 不碰敘事與讀圖）；history lane 的 22 列與三量逐位相同。
+3. 無未解釋語意 diff：心跳與 5.0 逐行對照，只在段 4（lane 行、預測行）、段 5（籃子基準格）預期處變；個股頁核心面板 digest 0 檔變（本 Phase 不碰敘事與讀圖）；history lane 的 22 列錨點 digest 與 5.0 相同、同一份價格上三量逐位相同（§0.6 #4）。
 4. 無新 dual authority：三量與等權只有 `outcome_if_settled_today.py` 的兩個純函式（三 lane、APP、心跳共用）；籃子報酬只有一個函式（追蹤表與計分表共用——放 `alpha/theme_cohort.py` 或新模組，兩個消費端 import 同一個）；預測終局只有 `predictions.py`；alpha 判別沿 `risk/hard_caps` 既有函式；symbol → 公司只走 `resolve_holding`。
 5. 無 silent drop：每條 lane 空時印「還沒有列」；分母 0 印「還沒有分母」；籃子缺價成員逐檔印；預測表 `undated` 與 `upstream_unavailable` 分開；截斷的 symbol 印出。
 6. Point-in-time：錨點價是錨點日或之前的收盤（測試）；預測表種類只看 `published_at`；`audit PointInTime` PASS。
@@ -320,7 +328,7 @@ Claimed acceptance: Phase 5 completion gate 九項全過、ROADMAP Phase 5 驗�
 Do not trust: 上面那行是待驗證的宣稱，不是事實
 Task: 直接讀 repo，自己跑下列檢查，逐項 ✅／❌ 附實際輸出，回 REVIEW（含 verdict）
   1. python -m pytest -q；python -m audit invariants；測試函式層級增刪自己比（5.0 commit 起）
-  2. 追蹤表：python scripts/outcome_if_settled_today.py --no-benchmark；history 22 列與 5.0 的 baseline 逐位比；paper 4 列的錨點日與第一份 v2 敘事的 created_at 逐筆核；
+  2. 追蹤表：python scripts/outcome_if_settled_today.py --no-benchmark（5.2 起它不寫聚合檔）；history 22 列的錨點 digest 與 5.0 baseline §2 比（現價跨日會變，不比 rows digest）；paper 4 列的錨點日與第一份 v2 敘事的 created_at 逐筆核；
      三量用自己寫的十行腳本重算一次；籃子超額抽 2 列手算（成員排除本檔、缺價成員列出）；outcome_aggregate.jsonl 既有四欄與舊行逐位不變
   3. 預測表：對 15 筆真實讀圖自己依 plan §5 的表手判一次，與 artifact 逐筆比；自造夾具鏈（含 supply_added 不得判錯）；Neo4j 關掉時種類欄是 upstream_unavailable 不是 undated
   4. 計分表：籃子格的 n 與 members_priced；五欄既有值逐位不變；price_budget 的增量＝成員數
@@ -343,8 +351,9 @@ R2 回 GO 後：ROADMAP Phase 5 標 ✅、`docs/plans/README.md` 對照表本列
 - **敘事「第一份 v2」不是 `select_brief`**：`select_brief` 取現行最新；錨點要的是最早的 v2——自己走一遍紀錄、跳過撤回；v1 只印日期不當錨。
 - **`created_at` 是 UTC**：日期用排程時區（`engine_b.event_watch._local_timezone()`，沿 `research_receipt._local_date` 的退回規則）。
 - **主題等權組成員 ticker 是 registry 的研究 ticker**：yfinance 對 `.TWO`／`.TW`／`.ST`／`.L` 都取得到，但要逐檔試（5.0 第 7 項），取不到的成員必須印出。成員含本檔時排除；組變動（supersede）時籃子跟著現行組，列上印 `cohort_id` 讓讀者看得出換過。
-- **讀圖 supersede 鏈的同日改寫**：inp 鏈 09-17 三筆、09-18 兩筆 digest 相同——是 `rewritten` 不是 `held`；v3 升版（09-25）也是 `rewritten`；SuperNova 09-25→10-01 digest 不同但兩筆都是 undecided → 前者 `non_assertion`（不是 `held`）。
-- **`judgment.touches` 的值是字串 `"yes"`／`"no"`**（不是布林）；語意 watch 的 `source_ref` 格式與 `semantic_flag` 指到文件的欄位在 5.0 先查清楚再寫 5.4。
+- **讀圖 supersede 鏈的改寫**（5.0 實測更正，§0.6 #2）：digest 相同的環節只有 4 個（inp `sr_81832cb3…→sr_88340b81…`、`sr_bc1ccb56…→sr_ad503ae8…`，cw `sr_caac0aca…→sr_d0767997…`、`sr_d0767997…→sr_d49b81b6…`）；另有 5 個同 kind 環節 digest 不同，但差異來自查詢程式改版與 schema 升版、兩邊都沒有新來源——修正後的規則照樣判 `rewritten`；SuperNova 09-25→10-01 digest 不同但兩筆都是 undecided → 前者 `non_assertion`（不是 `held`）。
+- **`judgment.touches` 的值是字串 `"yes"`／`"no"`**（不是布林）；觸及在單數 `judgment`、判無關在複數 `judgments`；`source_ref` 是 `reading:<id>#n`；文件日期走 `judgment.lead_id` → lead 的 `published_at`（baseline §6）。
+- **yfinance 對歐洲標的會回一根 NaN 收盤**（2026-10-01：IQE.L、SHA0.DE、SIVE.ST、SOI.PA、XFAB.PA）——任何新取價都要濾（`.dropna()`＋`close == close`），否則中位數與等權平均被靜默污染（baseline §8）。
 - **SourceDoc `published_at` 有 13 份未定日**（PointInTime 207／220）：反例文件落在那 13 份 → `undated`，不猜。
 - **心跳段 4／段 5 的格式被 `tests/test_heartbeat.py` 釘住**；`SNAPSHOT_KEYS` 是封閉清單，加鍵要同 commit 改測試；舊快照沒有新鍵時 diff 印「首日」不印變動。
 - **`STATE_SCHEMA_VERSIONS` 升版後舊 artifact 會觸發「型別不一致」警告一天**（Phase 4 同）。
