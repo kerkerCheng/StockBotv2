@@ -347,3 +347,17 @@ prepare 多一次 READ session（`intake.application._merge_side_effect_receipt`
 | `Apollo` | 4 段：Broadcom Q2 FY26 s3／s4（Apollo Global Management）、**`google_apollo_ocs_2022` s1／s2「The Apollo OCS platform…」「…in the Apollo layer」（Google 的專案代號）** | 有 2 段不是在講這家公司 | **不加**（plan §4 6.3a 規則；§0.6 #6）——`co:apollo invests_in co:broadcom` 在 6.4 之後會是「未具名」，6.8 處理 |
 
 證據等級變動（舊規則、改前＝HEAD、改後＝工作樹；`evidence_diff.py`）：**0 條**——寫法只在 6.4 的逐來源具名規則與層計數器 ② 起作用。
+
+### 17.2 GSR → media（6.3b）
+
+`config/publishers.json` 的 `Global Semi Research`：`industry_research`／`corroborates: true` → **`media`／`false`**（移到 media 組；note 記定案日期與理由——
+[668] RA 的「反向證據與缺口」逐字「②GSR 是付費研究的公開摘錄，單位數字的出處沒寫」；與 Next Financial／damnang／primetrading／silicon_matter 四個 Substack 一致）。載入檢查通過（34 筆）。
+證據等級變動（舊規則；`evidence_diff.py` 改前＝6.3a 的 commit）**3 條**＝§3 的 GSR 預測逐條：
+
+| 邊 | 改前 → 改後 | 原因 |
+|---|---|---|
+| `co:axt supplies_to mat:inp_substrate` | 外部印證 → 自報·filing | GSR 不再撐；剩 AXT 自己的 10-K |
+| `co:coherent supplies_to tech:cw_dfb_laser` | 外部印證 → 媒體轉述 | GSR 不再撐（[668] 那一句） |
+| `co:lumentum supplies_to tech:cw_dfb_laser` | 外部印證 → 媒體轉述 | 同上 |
+
+另外 4 條原本由 GSR 撐的（JX／住友 → InP、兩條競爭邊）由宣告 independent 的 Reuters s3 撐住，不變。

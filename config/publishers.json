@@ -12,7 +12,6 @@
   "publishers": [
     {"origin": "Cignal AI", "kind": "industry_research", "corroborates": true, "seen_in": "cignal_cpo_elsfp_1q26_2026_04_01", "note": "光通訊市場研究機構"},
     {"origin": "Counterpoint Research", "kind": "industry_research", "corroborates": true, "seen_in": "counterpoint_mrvl_celestial_2025_12_22", "note": "市場研究機構"},
-    {"origin": "Global Semi Research", "kind": "industry_research", "corroborates": true, "seen_in": "gsr_inp_substrate_market_2026_05_16", "note": "InP 基板市占報告（Substack 發布，自產市占數字；plan §9 第 1 項）"},
     {"origin": "SVRC Research", "kind": "industry_research", "corroborates": true, "seen_in": "svrc_state_of_robotics_2026_us", "note": "Robotics Center of Silicon Valley 的產業報告"},
     {"origin": "SemiconductorX", "kind": "industry_research", "corroborates": true, "seen_in": "semiconductorx_ft_sensor_ics_2026q1", "note": "半導體供應鏈分析"},
     {"origin": "TrendForce", "kind": "industry_research", "corroborates": true, "seen_in": "trendforce_tsmc_pic_capacity_2026_07_08", "note": "市場研究機構（自產出貨與價格數據）"},
@@ -25,6 +24,7 @@
     {"origin": "Calcalist", "kind": "media", "corroborates": false, "seen_in": "calcalist_tower_photonics_2026_01_29", "note": "以色列財經媒體"},
     {"origin": "DigiTimes", "kind": "media", "corroborates": false, "seen_in": "digitimes_foci_cpo_2026_03_13", "note": "台灣產業媒體"},
     {"origin": "Evertiq", "kind": "media", "corroborates": false, "seen_in": "evertiq_hyperlight_umc_wavetek_2026", "note": "產業媒體；庫內那份是轉載 HyperLight／UMC／Wavetek 聯合新聞稿"},
+    {"origin": "Global Semi Research", "kind": "media", "corroborates": false, "seen_in": "gsr_inp_substrate_market_2026_05_16", "note": "Substack 個人分析通訊（與 Next Financial／damnang／primetrading／silicon_matter 四個 Substack 一致）。2026-10-03 Phase 6 Step 6.3b 由 industry_research 改登記（使用者定案 §0.1 #5）：InP 基板市占報告的「單位數字的出處沒寫」（[668] RA review），不能當自產市占數字；某一份確有自己的數據時逐份宣告 origin_linkage=independent"},
     {"origin": "Hunterbrook Media", "kind": "media", "corroborates": false, "seen_in": "hntrbrk_himax_coupe_2026_03_12", "note": "調查報導媒體；自己採訪的文要在 SourceDoc 宣告 origin_linkage=independent"},
     {"origin": "IEEE Spectrum", "kind": "media", "corroborates": false, "seen_in": "ieee_spectrum_cpo_2025_03_25", "note": "IEEE 旗下雜誌"},
     {"origin": "Impact Lab", "kind": "media", "corroborates": false, "seen_in": "impactlab_rollerscrew_2025_04_27", "note": "轉載 Fast Company 報導"},
