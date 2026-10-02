@@ -379,3 +379,20 @@ scratchpad `p52_collect_real.py`（`collect()` 唯讀；跑前跑後兩個聚合
 - headless Edge 在臨時實例（127.0.0.1:8798，驗完即關）渲染 `#/positions`：三條 lane 區塊在最前、paper 表 4 列、live 印「還沒有列」、樣本效度仍在聚合數字之前。
 - ⚠ **長駐 APP（PID 15956，2026-09-10 23:13 起跑）用的是 09-10 的程式**：`/api/v1/positions` 回 503（schema `/2` 不認得），結構表、走圖、讀圖、候選板四個 GET 本來就回 404——重啟它是使用者動作（plan §14 #11）。
 - 變異：lane 混算、組不排除本檔、幣別不一致仍算、取價不濾 NaN、`--no-benchmark` 照寫、paper 錨改用現行敘事、live 讀壞不降級——7 種全紅，還原後全綠。
+
+## 17. Step 5.4 圖預測對錯表的真實資料驗收（2026-10-02 16:4x 台北）
+
+- `python -m webapp materialize --structure-readings` → `stockbot-app/structure_readings/2`（53,390 bytes；現行 2／stale 0／低級 2／過期 0）。
+- 預測段與 §5.2 的修正後手算**逐筆相同**（15 筆；scratchpad `p54_real_check.py`）：
+
+| held | reversed | disproof_touched | retracted | rewritten | open | expired_unread | non_assertion | 合計 |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 0 | 0 | 0 | 9 | 2 | 0 | 4 | 15 |
+
+  `earliest_open_expiry` ＝ **2026-12-24**；`unreadable_nodes` 空、`retraction_markers` 0、as-of 缺席不適用（現行視角）。
+  ROADMAP ②（「圖預測表有第一筆對／錯」）今天**仍是 0**——照 §0.1 #4：機制由夾具證明，結案寫「已交付、未生效」並登記 2026-12-24 的回查 date watch。
+- 心跳與 5.2 那次（`hb_52.md`）逐行對照：段 4 只多一行
+  `圖預測：對 0｜錯 0（當時已有 0／之後才出現 0／未定日 0）｜現行 2｜到期未重讀 0｜改寫 9｜非斷言 4｜現行最早到期 2026-12-24`；
+  「首日 5 項」→「首日 8 項」（新快照鍵 `predictions.held`、`predictions.wrong`、`predictions.expired_unread`）；其餘差異是兩次之間的盤中價格。
+- headless Edge 在臨時實例（127.0.0.1:8798，驗完即關）渲染 `#/structure-readings`：「圖預測對錯表：讀圖說的，後來對了嗎」區塊印出 對 0／錯 0（當時已有 0／之後才出現 0／未定日 0）／現行 2（最早 2026-12-24 到期）／改寫／非斷言 9／4，沒有殘留「載入中」。
+- 變異（worktree）：拿掉條件②、沒日期壓成之後才出現、`source_ref` 全等比對、判無關也算觸及、接進 staleness、撤回當改寫——6 種全紅，還原後全綠。

@@ -126,7 +126,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 5.1 | Phase 4 尾巴：#29 ③b 認 supersede、#33 第 2 型降級、#34 `classified_by` 字彙、stash 預熱清單＋對稱測試、apply 入口 `db.propertyKeys()` 檢查（偏差見 §0.6 #6–#9；驗收見 baseline 報告 §15） | ✅ | 執行模型 | 見 git log「Step 5.1」（5.1a–5.1d） |
 | 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review；偏差見 §0.6 #10–#15） | ✅ | 執行模型 | 見 git log「Step 5.2」 |
 | 5.3 | `record_trade.py --backfill-before-receipts`（R2-a：CONDITIONAL_GO → 條件修正 → 窄範圍覆核 GO；偏差見 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 5.3」 |
-| 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行） | ○ | 執行模型 | |
+| 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行；真實資料＝baseline §5.2 手算逐筆相同，見 baseline §17；偏差見 §0.6 #18–#22） | ✅ | 執行模型 | 見 git log「Step 5.4」 |
 | 5.5 | 計分表接主題等權組基準 | ○ | 執行模型 | |
 | 5.6 | 候選狀態每日序列 | ○ | 執行模型 | |
 | 5.7 | 新管線 full chain 測試（夾具版） | ○ | 執行模型 | |
@@ -161,6 +161,11 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 15 | 5.2 | 「`first_named_by`＝最早 lead 的 `source`＋日期」 | 以 `first_seen`（我們看到它的時間）取最早，`published_at` 另印、空就是空；lead registry 讀不到時印 `upstream_unavailable`，不是 `no_lead_named` | 「首次點名」問的是管道何時把它帶到我們面前；兩個日期不互相冒充（INV-6） |
 | 16 | 5.3 | §4「`build_receipt` 的回填分支」；⑦「賣出回填不要求 `--disproof-watch`」；拒收列五種 | 回填收據是另一支 `build_backfill_receipt`，參數裡沒有任何判斷輸入；`--disproof-watch` 改為**拒收**；另拒 `--apply` 與 `--no-narrative-override`，入口拒收共七種 | 放在 `build_receipt` 裡當分支，「不讀判斷」就只靠分支條件守；另開一支、不收判斷參數，才是結構上讀不到。watch 的來源歸屬核對要讀今天的 registry，等於讀今天的判斷；另兩個旗標在回填路徑沒有意義，收下來卻不作用，會讓使用者以為生效了 |
 | 17 | 5.3（R2-a CONDITIONAL_GO） | （未提） | C1：OPERATIONS 補 5.3 的 sandbox impact review。C2：5% 測試的夾具持股合計改成等於 NAV，並斷言擋下理由是「超過單筆上限」。C3：刪掉 OPERATIONS「乾跑看收據」那句，改成「回填沒有乾跑」。NB3：名冊讀不到改 fail closed（exit 2）。NB4：日期閘門讀不到排程時區改為拒收 | C2：原夾具其實是被「市值合計≠NAV（量不到）」擋下，上限放寬到 99% 照綠（L13）。C3：回填沒有預覽路徑，第一次成功就寫進 append-only。NB3：吞成 `company_id: None` 會讓「讀不到」與「名冊沒有這家」在收據裡同形，而那一行改不掉（L12）。NB4：閘門的輸入不得靜默換來源。三個變異（上限 99%、退回本機時區、名冊例外吞掉）全紅。窄範圍覆核（乾淨 context）GO；non-blocking：`engine_b.event_watch._local_timezone` 有 `lru_cache`，同一行程讀過一次之後設定檔變得讀不到也不會拒收——CLI 每次是新行程不受影響，長駐行程若日後依賴這道 fail closed 要另想 |
+| 18 | 5.4 | §5 `retracted`「`r.retracted`」 | 撤回紀錄是一筆**標記**（`retracted: true`、`supersedes_id` 指向被撤回的那份），不是一份讀圖：不進列、只計 `retraction_markers`；被它指向的那份讀圖的終局是 `retracted`，種類照 §5 用標記多出的引用算（沒有 → `undated`）。同一份讀圖有多筆後繼（分岔）時取最早那筆，列上印 `branches` | 照字面判「`r.retracted`」會把標記本身判成「錯」，而真正被撤回的讀圖反而因為「有後繼、同 kind」落到改寫或對——錯記在錯的那一筆上。分岔今天 0 筆，但取哪一筆必須是確定的，數量要印出來 |
+| 19 | 5.4 | （未提） | 某個節點的 ledger 有壞行：那個節點**整個不進表**，列進 `unreadable_nodes`（節點＋壞行數），讀圖頁照印 | 壞掉的那一行可能正是某份讀圖的後繼；照算會把「錯」印成「現行」，與 5.1 #33 同一條規則（壞行與讀不到同形） |
+| 20 | 5.4 | （未提） | as-of 視角（`materialize --structure-readings --as-of`）的預測段明確回缺席 `point_in_time_unavailable` | ledger 與 watch 都只有「現在」的一份；拿現在冒充 T 是前視（INV-6） |
+| 21 | 5.4 | §5 心跳行 `圖預測：對 N｜錯 M（…）｜現行 K｜到期未重讀 J｜改寫 R｜非斷言 Z` | 行尾多「｜現行最早到期 <日期>」（今天 2026-12-24） | 結案登記的回查 date watch 用這一天；讓它每天自己出現，不必有人記得去查（L14） |
+| 22 | 5.4 | §5「沒有新來源或都沒日期 → `undated`」 | `published_at` 只有年月（`YYYY-MM`）時取那個月的第一天到最後一天：整個月都早於讀圖日＝`already_available`、整個月都不早於＝`emerged_later`，**跨過讀圖那一天＝`undated`** | 年月精度的文件在 SourceDoc 裡存在；壓成月初會把「同月稍後才出現」判成「當時已有」——不猜 |
 
 ---
 
@@ -267,7 +272,7 @@ L11-6 ④：最先壞的是現行 `--log-only` 的正常路徑（它仍要讀今
 | 終局 | 判準 | 算什麼 |
 |---|---|---|
 | `non_assertion` | `r.kind ∉ {moat, volume}`（neither／undecided） | 母體，不判 |
-| `retracted` | `r.retracted` | 錯；種類依撤回它的那筆（若有 supersedes 指向它的紀錄）多出的 citation 算，沒有 → `undated` |
+| `retracted` | r 被一筆撤回標記（`retracted: true`、`supersedes_id == r.reading_id`）指向；標記本身不是讀圖、不進列（計 `retraction_markers`，§0.6 #18） | 錯；種類依撤回標記多出的 citation 算，沒有 → `undated` |
 | `rewritten` | 有後繼 s（`s.supersedes_id == r.reading_id`）、r 在 `s.created_on` 當天未到期，且下列任一：①`s.result_digest == r.result_digest`；②`s.kind == r.kind`，而 `s.record_version != r.record_version` 或 `new_sources(s, r)`（定義見 `reversed` 列）為空。**不同 kind 不套②**（§0.6 #2） | 改寫（schema 升版、補引文、查詢程式改版後重存快照、同一輪研究內補寫），不算對錯 |
 | `held` | 有後繼 s、不是 `rewritten`、`s.kind == r.kind` | 對 |
 | `reversed` | 有後繼 s、不是 `rewritten`、`s.kind != r.kind`（含翻成 neither／undecided） | 錯；種類：`new_sources = {c.source_id for c in s.citations} − {… for c in r.citations}`，取它們的 `published_at` 最小值：`< r.created_on` → `already_available`（當時已有反例＝讀得不夠）；全部 `≥` → `emerged_later`（之後才出現＝判斷錯）；沒有新來源或都沒日期 → `undated` |
