@@ -259,7 +259,8 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
     - 逐字篇數會隨我們多讀一份文件而單調上升（`AGENTS.md`「已知會失焦的指標」）——進了 digest，
       插槽讀圖的 staleness 就會恆亮（L14-4）。
     - 「客戶第一次具名」已經由 digest 裡那條供貨邊的 `evidence` 欄位捕捉到（`classify_evidence`
-      由自報升成外部印證），插槽的讀圖分級把這種變動算高等級（`alpha.structure_reading.staleness`）。
+      由自報升成外部印證），插槽的讀圖分級把這種**跨級**變動算高等級、同級互換算低等級
+      （`alpha.structure_reading.staleness`；Phase 6 Step 6.1）。
     - 製造者（`develops`／`deploys`）不在五個角度裡，是**讀法**的輔助；它變了由重讀時看見，不觸發 stale。
     缺席一律明說（INV-3）：分不出製造者、沒有客戶端原文，都印出來，不印空白。
     「可解析第三方」＝ origin 經 `query.origin_resolution`（唯一 owner）解析成**算印證的發布者**（Step 4.3）——

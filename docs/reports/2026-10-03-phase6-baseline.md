@@ -274,3 +274,16 @@ pq2 池全部 669 項（含已結案）裡，沒有任何 tier 型別的項目�
 ## 14. 本 Step 新增的待決（併進 closeout §14）
 
 - 更正走廊的 `raw_excerpt` 若帶著寫入端自己的「Source URL／Excerpt:」表頭會重複（§0 附帶發現）——在 `create_action` 拒收或在草稿工具去表頭；不在本 Phase 範圍。
+
+## 15. Step 6.1 插槽讀圖同級互換的真實資料驗收（2026-10-03 06:2x 台北）
+
+改動：`alpha/structure_reading/staleness.py::_evidence_change`——插槽讀圖供給側的 evidence 變動，前後 rank（`query.bottleneck.EVIDENCE_RANK`，呼叫端以 `evidence_rank=` 注入、沒有預設）
+相同＝`evidence`（low，detail 註「同級互換」）、不同＝`supply_evidence`（high）；rank 表查不到的標籤照跨級算。層讀圖一字不動。
+
+- **4 份現行讀圖 `--check` 的 status 與 §5 逐份相同**（inp stale_low 4×evidence、cw stale_low 3×evidence、SuperNova current、ELS current；scratchpad `p61_replay.py` ①）。
+- **L11-6 ④ 重放**：`prod:supernova` 09-25 那份（`sr_268d2fd79db629ff`）的快照對 10-01 那份（`sr_d85d672998445c50`）的快照＝Phase 4 Step 4.3 拆出媒體轉述的那次變動：
+  新程式 → **stale_low**（`co:sivers_semiconductors→prod:supernova` needs_review → media_relay「同級互換」＋需求側一條 evidence，兩條都 low）；
+  同一份資料以「每個標籤各自一級」（＝6.1 之前的行為）重算 → stale **high**（`supply_evidence`）——就是當時被推進重讀佇列的那一次。
+- 測試：`tests/test_structure_reading_v3.py` 新增同級互換 low、查不到 rank 照跨級、`reading_status` 沒有預設 rank 三條；兩個既有 helper 補 `evidence_rank=`。
+  變異：把 rank 比較拿掉（`if rank_before == rank_after:` → `if False:`）→ `test_a_same_rank_swap_on_a_socket_supply_edge_is_low` 紅（scratchpad `mutate.py`，跑完還原）。
+  全測試 3306 passed／1 skipped。

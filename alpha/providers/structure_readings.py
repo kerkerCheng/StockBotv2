@@ -331,6 +331,15 @@ def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]
     return reasons
 
 
+def evidence_rank() -> Mapping[str, int]:
+    """證據等級的 rank——唯一 owner 是 `query.bottleneck.EVIDENCE_RANK`，這裡只是把它遞給不能 import `query` 的
+    讀圖 staleness（`alpha.structure_reading.staleness.reading_status` 的 `evidence_rank=`；Phase 6 Step 6.1）。
+    回傳的就是那一份物件，不是副本。"""
+    from query.bottleneck import EVIDENCE_RANK
+
+    return EVIDENCE_RANK
+
+
 def ew_label(text: Any) -> str:
     from engine_b.event_watch import condition_label
 
@@ -354,6 +363,7 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
 
     from ..structure_reading import needs_reread, reading_status, select_readings
 
+    rank = evidence_rank()
     rows: list[dict[str, Any]] = []
     parse_errors: list[str] = []
     for node in known_nodes(directory=directory):
@@ -372,7 +382,7 @@ def reading_status_rows(edges: Sequence[Any], *, today: Any, as_of: Any = None,
             rows.append({"node": node, "unit": unit, "status": None, "reading_id": None,
                          "reason": f"這個節點的 {unit} 讀圖有紀錄但目前沒有現行的那一筆（已全部撤回）"})
         for unit, reading in current.items():
-            status = reading_status(reading, view.as_dict(), today=today)
+            status = reading_status(reading, view.as_dict(), today=today, evidence_rank=rank)
             by_graph = needs_reread(status)
             # 讀圖頁要印得出「判讀憑哪一段原文」與「每條反證登記成哪一筆 watch」（Step 2.7；L18：標籤指得回原始證據）。
             # watch 以 `reading:<id>#<序>` 指回（`register_reading_watches` 的鍵）；沒登記到就是 None，照實印。
@@ -540,8 +550,9 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
     return nodes
 
 
-__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "fetch_structure_snapshot_with_quotes",
-           "fetch_structure_snapshot", "known_nodes", "ledger_path", "read_reading_records",
+__all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "evidence_rank",
+           "fetch_structure_snapshot_with_quotes", "fetch_structure_snapshot", "known_nodes", "ledger_path",
+           "read_reading_records",
            "register_reading_watches", "reread_reasons", "seat_readings_context", "seat_readings_for",
            "verify_citations",
            "verify_disproof_sources"]

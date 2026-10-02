@@ -370,15 +370,61 @@ def _after_with_supply_evidence(node: str, evidence: str) -> dict:
 def test_supply_evidence_change_is_high_for_a_socket_and_low_for_a_layer() -> None:
     """客戶第一次具名（evidence 由待判定升成外部印證）：插槽賭注的確認事件＝高等級；層讀圖不變＝低級。"""
     from alpha.structure_reading.staleness import reading_status
+    from query.bottleneck import EVIDENCE_RANK
 
     after = _after_with_supply_evidence(SOCKET, "externally_corroborated")
     socket = parse_structure_reading_record(_v3(SOCKET, unit="socket"))
     layer = parse_structure_reading_record(_v3(SOCKET, unit="layer"))
-    s = reading_status(socket, after, today=TODAY)
-    l_ = reading_status(layer, after, today=TODAY)
+    s = reading_status(socket, after, today=TODAY, evidence_rank=EVIDENCE_RANK)
+    l_ = reading_status(layer, after, today=TODAY, evidence_rank=EVIDENCE_RANK)
     assert s["status"] == "stale" and s["highest_grade"] == "high"
     assert [c["kind"] for c in s["changes"]] == ["supply_evidence"]
     assert l_["status"] == "stale_low" and [c["kind"] for c in l_["changes"]] == ["evidence"], "層的分級一字不動"
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 Step 6.1：插槽的供貨邊證據「同級互換」算低等級（rank 由呼叫端注入，唯一 owner 是 EVIDENCE_RANK）
+# ---------------------------------------------------------------------------
+
+def test_a_same_rank_swap_on_a_socket_supply_edge_is_low() -> None:
+    """待判定 ↔ 媒體轉述 rank 都是 1：證據強度沒變，只是換了標籤——不得把插槽讀圖推進重讀佇列。
+
+    事發（Phase 4 Step 4.3）：拆出媒體轉述讓 `prod:supernova` 的插槽讀圖被標 stale high。變異檢查：
+    把 `_evidence_change` 的 rank 比較拿掉（一律 supply_evidence）→ 這條紅。"""
+    from alpha.structure_reading.staleness import needs_reread, reading_status
+    from query.bottleneck import EVIDENCE_RANK
+
+    assert EVIDENCE_RANK["needs_review"] == EVIDENCE_RANK["media_relay"], "夾具的前提：兩者同級"
+    after = _after_with_supply_evidence(SOCKET, "media_relay")
+    socket = parse_structure_reading_record(_v3(SOCKET, unit="socket"))
+    status = reading_status(socket, after, today=TODAY, evidence_rank=EVIDENCE_RANK)
+    assert status["status"] == "stale_low" and status["highest_grade"] == "low"
+    assert [c["kind"] for c in status["changes"]] == ["evidence"]
+    assert "同級互換" in status["changes"][0]["detail"], "同級互換要說出來，不是安靜地降級"
+    assert not needs_reread(status)
+    layer = parse_structure_reading_record(_v3(SOCKET, unit="layer"))
+    assert reading_status(layer, after, today=TODAY, evidence_rank=EVIDENCE_RANK)["status"] == "stale_low"
+
+
+def test_a_label_missing_from_the_rank_table_counts_as_a_cross_rank_change() -> None:
+    """rank 表查不到的標籤分不出是不是同級——照跨級算（多叫一次重讀）並說出來，不靜默當成同級（INV-3）。"""
+    from alpha.structure_reading.staleness import reading_status
+    from query.bottleneck import EVIDENCE_RANK
+
+    after = _after_with_supply_evidence(SOCKET, "some_future_label")
+    socket = parse_structure_reading_record(_v3(SOCKET, unit="socket"))
+    status = reading_status(socket, after, today=TODAY, evidence_rank=EVIDENCE_RANK)
+    assert status["status"] == "stale" and [c["kind"] for c in status["changes"]] == ["supply_evidence"]
+    assert "不在 rank 表" in status["changes"][0]["detail"]
+
+
+def test_reading_status_has_no_default_rank_table() -> None:
+    """rank 沒有預設：漏傳就丟例外——不在 alpha 抄一份 rank，也不悄悄退回舊的「一律高等級」（L16）。"""
+    from alpha.structure_reading.staleness import reading_status
+
+    socket = parse_structure_reading_record(_v3(SOCKET, unit="socket"))
+    with pytest.raises(TypeError):
+        reading_status(socket, _after_with_supply_evidence(SOCKET, "media_relay"), today=TODAY)  # type: ignore[call-arg]
 
 
 def _canonical(rows):

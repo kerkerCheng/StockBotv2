@@ -773,7 +773,10 @@ query.structure <node>  ──result_digest──▶  ledger（sr_*：angles 快
 ```
 
 **分級（`staleness.py`）**：供給側增減／sub 變動＝`high`；下一層／反向路徑／需求錨＝`normal`；
-只有 evidence＝`low`（記錄，不進佇列）。⚠ **binary 的 stale 會恆亮，而恆亮＝零鑑別力（L14-4）。**
+只有 evidence＝`low`（記錄，不進佇列）。**插槽讀圖**的供貨邊 evidence **跨級**變動＝`high`（`supply_evidence`：客戶或第三方第一次具名）；
+**同級互換**（rank 相同，例：待判定 ↔ 媒體轉述）＝`low`、detail 註「同級互換」（2026-10-03 Phase 6 Step 6.1）。rank 的唯一 owner 是
+`query.bottleneck.EVIDENCE_RANK`，由呼叫端以 `evidence_rank=` 注入（`alpha/` 不 import `query`；`alpha.providers.structure_readings.evidence_rank()`
+遞同一個物件），沒有預設；rank 表查不到的標籤照跨級算。⚠ **binary 的 stale 會恆亮，而恆亮＝零鑑別力（L14-4）。**
 `documents` 計數在更上游就被擋掉（`EdgeView.key()` 不含它）——它是研究量的函數，
 讓它觸發重讀等於讓「我們讀得多」自己製造工作。
 

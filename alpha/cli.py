@@ -477,7 +477,7 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
     from datetime import date, datetime, timezone
 
     from .providers.structure_readings import (
-        append_reading_record, fetch_structure_snapshot, fetch_structure_snapshot_with_quotes,
+        append_reading_record, evidence_rank, fetch_structure_snapshot, fetch_structure_snapshot_with_quotes,
         read_reading_records, register_reading_watches,
     )
     from .structure_reading import (
@@ -556,7 +556,8 @@ def cmd_structure_reading(args: argparse.Namespace) -> int:
             print("✗ 沒有現行的讀圖紀錄可以比對", file=sys.stderr)
             return 2
         snapshot = fetch_structure_snapshot(node)
-        statuses = {u: reading_status(r, snapshot, today=today) for u, r in current_by_unit.items()}
+        rank = evidence_rank()
+        statuses = {u: reading_status(r, snapshot, today=today, evidence_rank=rank) for u, r in current_by_unit.items()}
 
     shown = [r for r in records if r.unit in units]
     if args.format == "json":

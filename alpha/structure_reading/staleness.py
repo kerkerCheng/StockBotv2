@@ -12,7 +12,14 @@
 | 下一層變了 | 可能（會改變「更卡的在哪一層」） | `normal` |
 | 反向路徑新增或消失 | 可能，**而且它本來就是 disproof 的來源** | `normal`（另標 `disproof`） |
 | 只有 evidence 等級變 | 不改變結構，改變的是可下注性 | `low` |
-| **插槽讀圖**的供貨邊 evidence 變（v3） | 會——客戶或第三方第一次具名就是插槽賭注的確認或推翻 | `high`（`supply_evidence`） |
+| **插槽讀圖**的供貨邊 evidence **跨級**變（v3） | 會——客戶或第三方第一次具名就是插槽賭注的確認或推翻 | `high`（`supply_evidence`） |
+| **插槽讀圖**的供貨邊 evidence **同級互換**（rank 相同，例：待判定 ↔ 媒體轉述） | 不會——證據強度沒變，只是換了標籤 | `low`（`evidence`，detail 註「同級互換」） |
+
+⚠ 「同級」由 rank 判，rank 只有一個 owner（`query.bottleneck.EVIDENCE_RANK`）：本模組不得 import `query`
+（`tests/test_layer_separation.py`），所以由呼叫端以 `evidence_rank=` 注入，**沒有預設**——不在這裡抄一份 rank
+（抄的那份會在下一次加等級時靜默過時，L16）。rank 表查不到的標籤照**跨級**算（寧可多叫一次重讀）並在 detail 說出來。
+事發（2026-10-01 Phase 4 Step 4.3）：把待判定拆出媒體轉述（同級）讓 `prod:supernova` 的插槽讀圖被標成 stale high、
+進了重讀佇列，而那條供貨邊的證據強度一個位元都沒變（Phase 6 Step 6.1）。
 
 ## `documents` 為什麼不在上表裡
 
@@ -69,10 +76,11 @@ CHANGE_KINDS: Mapping[str, tuple[str, str]] = {
     # 共用時 `mat:inp_substrate` 在 Step 2.2 移出 constrained_by 後被標成「同時是 disproof 觸發」，心跳照數。
     "counter_path_removed": ("normal", "反向路徑消失——替代路線少了一條，不是反證觸發"),
     "anchor": ("normal", "需求錨可達性變了——走不走得到有人花錢的地方"),
-    "evidence": ("low", "只有 evidence 等級變——不改變結構，改變的是可下注性"),
+    "evidence": ("low", "只有 evidence 等級變（或插槽供貨邊的同級互換）——不改變結構，改變的是可下注性"),
     # v3（Phase 2 Step 2.4）：插槽讀圖的供貨邊證據變動是高等級。插槽賭的是「客戶的這一格指定了誰」，
     # 客戶或第三方第一次具名（evidence 由自報升成外部印證）本身就是確認或推翻事件；層讀圖的分級一字不動。
-    "supply_evidence": ("high", "插槽的供貨邊證據等級變了——客戶或第三方第一次具名，是插槽賭注的確認或推翻事件"),
+    # Phase 6 Step 6.1：只有**跨級**（rank 不同）才是；同級互換走 `evidence`（low）。
+    "supply_evidence": ("high", "插槽的供貨邊證據等級跨級變了——客戶或第三方第一次具名，是插槽賭注的確認或推翻事件"),
 }
 
 #: 哪些變化**同時**是既有 disproof 機制的觸發來源（§6b ④）。
@@ -118,8 +126,23 @@ def _rows_by_identity(rows: Iterable[Sequence[Any]]) -> dict[tuple[str, str, str
     return {_identity(r): list(r) for r in rows}
 
 
+def _evidence_change(angle: str, label: str, before: Any, after: Any, *, unit: str,
+                     evidence_rank: Mapping[str, int]) -> StructureChange:
+    """一條邊只有 evidence 變了：層讀圖一律 low；插槽的供給側跨級才 high、同級互換 low（Phase 6 Step 6.1）。"""
+    detail = f"{label} 的 evidence：{before} → {after}"
+    if not (unit == "socket" and angle == "supply_side"):
+        return StructureChange(angle, "evidence", detail)
+    rank_before, rank_after = evidence_rank.get(str(before)), evidence_rank.get(str(after))
+    if rank_before is None or rank_after is None:
+        # 查不到 rank＝分不出是不是同級：照跨級算（多叫一次重讀），並說出來——不靜默當成同級（INV-3）
+        return StructureChange(angle, "supply_evidence", detail + "（等級不在 rank 表，照跨級算）")
+    if rank_before == rank_after:
+        return StructureChange(angle, "evidence", detail + "（同級互換：證據強度沒變，只是換了標籤）")
+    return StructureChange(angle, "supply_evidence", detail)
+
+
 def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[Sequence[Any]],
-                   *, unit: str = "layer") -> list[StructureChange]:
+                   *, unit: str = "layer", evidence_rank: Mapping[str, int]) -> list[StructureChange]:
     member_kind, attr_kind = _ANGLE_TO_KINDS[angle]
     old = _rows_by_identity(before)
     new = _rows_by_identity(after)
@@ -145,19 +168,20 @@ def _angle_changes(angle: str, before: Iterable[Sequence[Any]], after: Iterable[
                 changes.append(StructureChange(
                     angle, attr_kind, f"{label} 的 {name}：{before_row[index]} → {after_row[index]}"))
         if before_row[_EVID] != after_row[_EVID]:
-            kind = "supply_evidence" if (unit == "socket" and angle == "supply_side") else "evidence"
-            changes.append(StructureChange(
-                angle, kind, f"{label} 的 evidence：{before_row[_EVID]} → {after_row[_EVID]}"))
+            changes.append(_evidence_change(angle, label, before_row[_EVID], after_row[_EVID], unit=unit,
+                                            evidence_rank=evidence_rank))
     return changes
 
 
 def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
                   after_structure: Mapping[str, Any],
-                  *, before_anchor: Sequence[str] | None = None, unit: str) -> list[StructureChange]:
+                  *, before_anchor: Sequence[str] | None = None, unit: str,
+                  evidence_rank: Mapping[str, int]) -> list[StructureChange]:
     """快照 vs 現在的圖 → 逐項分級的變化清單。**純函式，不查圖。**
 
     `after_structure` 吃 `query.structure.StructureView.as_dict()`。
-    `unit` 沒有預設（v3）：同一個變化對層與插槽的意義不同——插槽的供貨邊證據變動是高等級。
+    `unit` 沒有預設（v3）：同一個變化對層與插槽的意義不同——插槽的供貨邊證據**跨級**變動是高等級。
+    `evidence_rank` 沒有預設（Phase 6 Step 6.1）：`query.bottleneck.EVIDENCE_RANK`，由呼叫端注入（本模組不 import `query`）。
     """
     after_angles = after_structure.get("angles") or {}
     changes: list[StructureChange] = []
@@ -168,7 +192,8 @@ def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
              e.get("qualification_status"), e.get("evidence")]
             for e in after_angles.get(angle, ())
         ]
-        changes += _angle_changes(angle, before_angles.get(angle) or (), after_rows, unit=unit)
+        changes += _angle_changes(angle, before_angles.get(angle) or (), after_rows, unit=unit,
+                                  evidence_rank=evidence_rank)
 
     after_anchor = list(after_structure.get("anchor_chain") or [])
     if list(before_anchor or []) != after_anchor:
@@ -178,17 +203,19 @@ def grade_changes(before_angles: Mapping[str, Sequence[Sequence[Any]]],
     return changes
 
 
-def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, today: date) -> dict[str, Any]:
+def reading_status(reading: Any, after_structure: Mapping[str, Any] | None, *, today: date,
+                   evidence_rank: Mapping[str, int]) -> dict[str, Any]:
     """一份讀圖紀錄現在是什麼狀態，以及**憑什麼**。
 
     `after_structure=None` ＝ 這次沒讀到圖（例如 Neo4j 沒開）：回 `None` 狀態並說明，
     **不得回 `current`**——「沒查」與「查過沒變」不得同形（L13-2）。
+    `evidence_rank`：證據等級的 rank（唯一 owner `query.bottleneck.EVIDENCE_RANK`；呼叫端注入、沒有預設——見檔頭）。
     """
     if after_structure is None:
         return {"status": None, "reason": "這次沒有讀到圖，無法比對（不是 current）",
                 "changes": [], "expired": reading.is_expired(today)}
     changes = grade_changes(reading.angles, after_structure, before_anchor=reading.anchor_chain,
-                            unit=reading.unit)
+                            unit=reading.unit, evidence_rank=evidence_rank)
     digest_changed = str(after_structure.get("result_digest") or "") != reading.result_digest
     grades = {c.grade for c in changes}
     if reading.is_expired(today):

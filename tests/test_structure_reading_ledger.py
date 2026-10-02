@@ -27,6 +27,7 @@ from alpha.structure_reading import (
     READING_KINDS, needs_reread, reading_status, select_reading, structure_reading_record,
 )
 from engine_b import queue_segments as qs
+from query.bottleneck import EVIDENCE_RANK
 from webapp.structure_readings import build_structure_readings_artifact
 
 NODE = "tech:cw_dfb_laser"
@@ -157,7 +158,7 @@ def test_known_nodes_reads_the_real_node_not_the_slug(tmp_path: Path) -> None:
 def _status(after, *, today=TODAY, record=None):
     reading = record or _record()
     from alpha.structure_reading.contracts import parse_structure_reading_record
-    return reading_status(parse_structure_reading_record(reading), after, today=today)
+    return reading_status(parse_structure_reading_record(reading), after, today=today, evidence_rank=EVIDENCE_RANK)
 
 
 def test_nothing_changed_is_current() -> None:
