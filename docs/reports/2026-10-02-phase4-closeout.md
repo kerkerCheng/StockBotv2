@@ -5,7 +5,7 @@
 > 4.8 收據：[`2026-10-01-phase4-step48-research.md`](2026-10-01-phase4-step48-research.md)。
 > 本檔每個數字都附查證命令；數的是**圖、讀圖、敘事、等待 registry、追蹤表、走圖問句、RA 紀錄、機制存在與否**（plan §11），
 > 沒有一個是「幾檔通過某個 filter」——候選板「可開」只印不驗收。
-> 量測時點：2026-10-02 07:14–07:40（台北），pq2 [663]／[664]／[665]／[668] 入圖之後、以 daily ⑬ 同一行 materialize 一次（`webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard --candidates`，81/81）。
+> 量測時點：2026-10-02 07:14–07:31（台北；07:31 是本報告初版 commit `f92846f`；R2 N9 更正），pq2 [663]／[664]／[665]／[668] 入圖之後、以 daily ⑬ 同一行 materialize 一次（`webapp materialize --tracked --registry-listed --structure-table --beta --graph-walk --watches --positions --structure-readings --scorecard --candidates`，81/81）。
 > 「4.0」＝`c1cae28` 當下的資料與程式；個股頁與結構表的 4.0 批次＝`library/private/backups/20260930T213948Z/files.zip`（與 baseline §11 同一批；逐面板 digest 與 4.0 記下的 292 個面板鍵 0 不符）。
 
 ## 0. Phase 4 做了什麼（20 個 Step commit＋3 個結案 commit，2026-10-01 → 10-02）
@@ -49,14 +49,17 @@
 
 ## 2. ROADMAP Phase 4 驗收①②③（A1–A3）與 §11 其他列
 
+**驗收結論（R2 C1 更正）：①（A1）77→73、②（A2）5→6 成立；③（A3）未量到——③a 102／113 只印、③b 0／0 沒有母體，不寫成成立。**
+初版 commit `f92846f` 的標題與結案 WORK_REQUEST 寫「驗收①②③」成立，以本段為準。
+
 | # | 驗收 | 結果 | 層 | 查證 |
 |---|---|---|---|---|
 | ①（A1） | 對 4.0 凍結的 186 個節點，ns==1 且供貨邊全部自報的節點數 → 下降 | ✅ **77 → 75 → 73**：4.3 −2（`tech:els_pluggable_module` Cignal AI、`tech:mrm_200g` TrendForce——後者是「外部印證但引文不具名供應商」15 條之一，§5 #2）；4.8 −2（`tech:six_inch_inp_production`：Coherent 那條多一份交易對手 AXT 8-K 來源＝[664]；`tech:semiconductor_manufacturing_equipment`：由 1 家變 2 家＝[665]）。supply_side 絕對數 ns 0／1／2／≥3＝72／82／22／10（4.4 時 72／83／21／10；集合外新節點 0） | 圖 | `graph_walk` artifact `layer_stats.supply`；heartbeat 段 3「層：」行 |
 | ②（A2） | 至少一份非供應商 origin、引文逐字具名該層 ≥2 家供應商的層數 → 上升 | ✅ **5 → 6 層**（4.4 計數器上線時 5；計數器在 4.0 還不存在——它的 origin 解析是 4.3 的 owner，`mat:inp_substrate` 等層在 4.3 登記 GSR／Reuters 時已計入，baseline §21）。結案新增 `tech:cw_dfb_laser`：Global Semi Research（登記的產業研究）同一句具名 Coherent 與 Lumentum＝[668]。「≥3 家」母體 10、「每家撐住」9、origin 解析不到的來源 8（只印） | 圖 | `layer_stats.enumeration`（`named_by_non_supplier_layers`、`hits`） |
-| ③（A3） | ③a 存量帶 sub 引文不含字表語言（只印）；③b Phase 內新增／supersede 的帶 sub assertion 中含字表語言的比例（目標 100%） | ③a **102／113**（存量，只印；v1 字表召回約一半，讀成上限——§5 #18）。③b **0／0——無母體**：Phase 內入圖的 4 筆 assertion（[664] 1、[665] 1、[668] 2）都不帶 sub，所以「100%」不成立也不失敗；照實印 0／0，不寫成達成 | 圖 | `layer_stats.sub_language` |
+| ③（A3） | ③a 存量帶 sub 引文不含字表語言（只印）；③b Phase 內新增／supersede 的帶 sub assertion 中含字表語言的比例（目標 100%） | ⚪ **未量到——不算成立**（R2 C1）。③a **102／113**（存量，只印；v1 字表召回約一半，讀成上限——§6 #18）。③b **0／0——無母體**：Phase 內入圖的 4 筆新 assertion（[664] 1、[665] 1、[668] 2）都不帶 sub、Phase 內被重寫的 13 筆既有 assertion 也都不帶 sub（R2 逐筆核），所以「100%」既沒達成也沒失敗。**計數器盲點（R2 C2）**：`layer_stats` 以「assertion id 不在凍結集合」判「新」，而更正走廊重套一份文件會沿用原 id（[668] 的 GSR e1／e2 就是），所以 A3 定義裡的「supersede」它看不到——Phase 4 實際影響 0，但 [666] 若重試會重寫 4 筆帶 sub 的斷言（e1／e2／e9／e10，packet 旗標 4／4 含字表語言），③b 仍會印「0／0（Phase 內還沒有新增帶 sub 的）」（§6 #29） | 圖 | `layer_stats.sub_language` |
 | 走圖第 2 型 | 命中逐筆＋旁印 open lead；本 Phase 鑄的 lead ≥2 筆各到終局 | ✅ 命中 **2 → 0**（AMAT＝SME 層、COHR＝六吋 InP 層，兩筆都因入圖消失）；lead 3 筆全部 `applied`（§1 gate 7） | 走圖 × lead registry | `python -m query.graph_walk --json`；`pending_leads.json` |
 | packet | 至少 1 份 applied RA 帶 `layer_enumerations` 且核對通過；入口戳記存在 | ✅ [668] `ra_637a70ee…`：`layer_enumerations[0].origin_role=industry_report`、核對通過（兩家引文具名、origin 經 owner 解析為登記的產業研究）、`execution.approval={pq2_n:668, digest:55d97c0b…}`、`complete-ra` 收據帶 commit `abb0105` | RA 紀錄 | `library/private/research_actions/ra_637a70ee0dfd81040f59f834bce574e6.json` |
-| origin 解析 | 未解析 origin 73 → N；needs_review 113 → N；class 變動邊逐條；stale 的讀圖與處置 | ✅ **SourceDoc 220 份：公司 155／發布者 49／解析不到 16**（4.0 只有名冊公司一種解析：73；4.1 後 65、4.3 後 16——與 4.3 commit 當時量的相同）。剩下 16 份：聯合公告 12（news，§5 #3）、`Third-party Research` 泛稱 1（§5 #16）等。**evidence 分布** 4.0 外部印證 217／needs_review 113／自報 100／自報·filing 106（536 條）→ 結案 外部印證 244／media_relay 37／needs_review 37／自報 104／自報·filing 107／counterparty_joint 8（537 條）。**逐條歸因**：同一份現在的圖，4.0 程式 vs 現在程式 **80 條**變動＝4.1 的 21 條（a 0／b 5／c 16，§0.6 #4）＋4.3 的 59 條（a7a8df8 commit message 逐類列）；資料造成的變動＝4.8 入圖 4 條（[664] Coherent→六吋 自報→外部印證、[665] Lam→SME 新邊 自報·filing、[668] Coherent／Lumentum→cw_dfb 自報→外部印證）。讀圖：4.3 造成 3 份 stale（inp_substrate、cw_dfb 層 stale_low；SuperNova 插槽 stale high→4.8 重讀 `sr_d85d672998445c50`）；現在「該重讀 0」 | 圖 × 讀圖 | `classdiff_close.json`（scratchpad `p4_classdiff_close.py --base-rev c1cae28`）；`p4_graph_close.py`；`p4_origin_owner_close.py` |
+| origin 解析 | 未解析 origin 73 → N；needs_review 113 → N；class 變動邊逐條；stale 的讀圖與處置 | ✅ **SourceDoc 220 份：公司 155／發布者 49／解析不到 16**（4.0 只有名冊公司一種解析：73；4.1 後 65、4.3 後 16——與 4.3 commit 當時量的相同）。剩下 16 份＝**聯合公告 8**（AMD／Anthropic、GF／MPS、IQE／Quintessent、IQE／Tower、Lumentum／Ayar、Marvell／Lumentum、Sivers／SemiNex、Tower／OpenLight——§6 #3）＋名冊外公司 5（Credo、Noveon、Sojitz、Telescent、USA Rare Earth）＋Novanta／ATI、Soitec management（Reuters 訪談）、`Third-party Research` 泛稱（§6 #16）各 1；其中 source_type＝news 的 12 份（R2 C3-b 更正：初版把 news 份數寫成聯合公告數）。**evidence 分布** 4.0 外部印證 217／needs_review 113／自報 100／自報·filing 106（536 條）→ 結案 外部印證 244／media_relay 37／needs_review 37／自報 104／自報·filing 107／counterparty_joint 8（537 條）。**逐條歸因**（R2 C3-c 更正）：同一份現在的圖，4.0 程式 vs 現在程式直接比 **80 條**。審查者對同一份圖快照逐版本歸因：4.1b（09f192c）5 條、4.1c（bae6870）16 條、4.3（a7a8df8）**61 條**、其餘版本 0。其中 UMC 兩條（Evertiq 轉載的聯合稿）在 4.1c 與 4.3 各變一次（needs_review → counterparty_joint → media_relay），直接比只算一次；cw_dfb 兩條（Coherent／Lumentum）要有 [668] 的資料，4.3 的分類才會改到它們（GSR 登記為產業研究）——5＋16＋61−2＝80。a7a8df8 commit 當時記的 59 條是對當時的圖（還沒有 [668]）。4.0 程式下由資料造成的變動＝4.8 入圖 4 條（[664] Coherent→六吋 自報→外部印證、[665] Lam→SME 新邊 自報·filing、[668] Coherent／Lumentum→cw_dfb 自報→待判定〔4.0 程式不認得 GSR〕）。讀圖：4.3 造成 3 份 stale（inp_substrate、cw_dfb 層 stale_low；SuperNova 插槽 stale high→4.8 重讀 `sr_d85d672998445c50`）；現在「該重讀 0」 | 圖 × 讀圖 | `classdiff_close.json`（scratchpad `p4_classdiff_close.py --base-rev c1cae28`）；`p4_graph_close.py`；`p4_origin_owner_close.py`；R2 逐版本歸因 |
 | 稀釋燈 | 國內申報人黃 24 → N（逐檔來源與理由）；AXTI 黃；非國內 `method_not_applicable` 38 | ✅ **黃 24 → 11**（AAOI、AXTI、COHR、INTC、IREN、LITE、LRCX、META、MP、MRVL、NVDA——逐檔金額、占市值、權益表原文在 baseline §22）；**AXTI 黃**（2026-04-01～06-30 600,083,000）；`method_not_applicable` **38**；`provider_missing` 19、`insufficient_evidence` 5；正式庫遷移 5637 列前後相同、新增 263 列 | 敘事（稽核區） | `overview.wipeout.lanes[lane=dilution]`；baseline §22 |
 | 240 條退役 | downside／research 面板 judgment 列 240 → 0 | ✅ **0**（`"source": "judgment"` 0 檔、`disproofs` 欄 0 檔） | 敘事 | `grep -l '"source": *"judgment"' library/private/app/analyst_view/*.json` |
 | section／title | 圖上與抽取 JSON 不一致 10＋21 → 0 | ✅ **0＋0**：4.2e 寫回抽取 JSON 後「重建會遺失」30 → 0；「圖落後 JSON」11 由 pq2 [663] 經 `loader/sourcedoc_sync.py --apply-graph` 寫 11 筆 → 0（收據 `loader/manifests/sourcedoc-graph-sync-20261001.json`） | 圖 | `python -m audit invariants --only SourceDocSync` |
@@ -98,13 +101,13 @@
 | [666] | ⛔ **未完成，等使用者決定**——見下 | — |
 
 **[666] 卡在哪：**
-1. 入口四道檢查通過、戳記寫入（`approval={pq2_n:666, digest:26924126…, at:2026-10-01T23:08:31Z}`），apply 寫第一份文件時 Neo4j 回 `Neo.ClientError.Security.Forbidden`：*Creating new property name on database 'neo4j' is not allowed for user 'cloud_routine' with roles [PUBLIC, routine_writer]*。RA 紀錄 `state=partial`、`graph_mutated=false`——**圖一筆都沒動**；更正走廊的新抽取檔與 raw 檔已寫在工作樹（`extractions/reuters_inp_export_controls_2026_06_11.json`、`library/raw/reuters_inp_export_controls_2026_06_11.txt`，未 commit；daily 心跳段 1 會印「開跑時工作區不乾淨（2 個路徑）」）。RA 到期 2026-10-31，期限內可用原編號、原 digest 重試。
+1. 入口四道檢查通過、戳記寫入（`approval={pq2_n:666, digest:26924126…, at:2026-10-01T23:08:31Z}`），apply 寫第一份文件時 Neo4j 回 `Neo.ClientError.Security.Forbidden`：*Creating new property name on database 'neo4j' is not allowed for user 'cloud_routine' with roles [PUBLIC, routine_writer]*。RA 紀錄 `state=partial`、`graph_mutated=false`——**圖一筆都沒動**；更正走廊的新抽取檔與 raw 檔已寫在工作樹（`extractions/reuters_inp_export_controls_2026_06_11.json`、`library/raw/reuters_inp_export_controls_2026_06_11.txt`，未 commit；daily 心跳段 1 會印「開跑時工作區不乾淨（2 個路徑）」；daily 沒有 git 寫入步驟，不會把它們 commit 掉）。**它實際上不會到期**（R2 C3-a 更正：初版寫「2026-10-31 到期」）——`expires_at` 只對 `ready` 生效（`intake/actions.py::_effective_state`、`_compact_expired_actions`），入口對「同編號同 digest 的 partial」也不看到期（`scripts/apply_ra_admission.py` 第 80 行）；兜底是心跳的「pq2 球在你手上」計數器與 QueueLiveness 的 14 天。
 2. 根因：`loader/load_to_neo4j.py::MERGE_SOURCE_DOC` 在 4.2 加了 `sd.origin_linkage = $origin_linkage`，`schema/neo4j_setup.cypher` 的 1b 預熱沒補；之前每份都寫 null（不建 token），[666] 是第一份宣告 `origin_linkage=independent` 的 RA。loader 會寫的 38 個屬性名裡只缺這一個。4.9 full chain 用 fake loader、R2-a 也只在夾具上跑，所以沒撞到（L13：驗收是產出出現在下游，不是元件會動）。
 3. 已做：依既有規範（`docs/archive/2026-09-25-remote-access-architecture.md:112`「新增 SourceDoc 欄位後須由 admin 重跑 setup 預熱 token；`cloud_routine` 不應取得 `CREATE NEW PROPERTY NAME`」）以 admin 執行 setup 1b 預熱敘述（sentinel 建立後即刪、殘留 0），`origin_linkage` token 已存在；`routine_writer` 權限**沒有**任何變動。
 4. 用原編號重試時，執行環境的自動權限分類器以「Security Weaken」拒絕；依其規則不換方式繞過，留給使用者。對應的程式修正（setup 1b 預熱擴成 loader 會寫的全部屬性名＋一條「loader SET 的屬性名 ⊆ 預熱清單」測試，變異：刪掉 `origin_linkage` 那行 → 紅）**沒有 commit**，停放在 `git stash`（`stash@{0}`：「等使用者決定：neo4j_setup 1b 預熱補 loader 全部屬性名＋對稱測試」）。
-5. 對結案驗收的影響：0——[666] 的效果是 Reuters 那份 11 條斷言中引文具名供應商的由「媒體轉述」升為外部印證，**不動 ②**（inp_substrate 在 4.3 已計入，baseline §21）、不動 ①／走圖第 2 型／packet 驗收（那三格由 [664]／[665]／[668] 滿足）。
+5. 對結案驗收的影響：0——R2 在記憶體裡模擬它入圖（不碰圖）：6 條邊升為外部印證（Reuters 那份引文具名供應商的由「媒體轉述」升級，**另有 2 條由「自報·filing」升外部印證**——初版只寫了前者，R2 N4），但 ① 73、② 6、③b 0、「外部印證但引文不具名」15 **全部不變**；packet 驗收由 [668] 滿足。另注意：重試會重寫 4 筆帶 sub 的斷言，而 ③b 計數器看不到 supersede（§2 ③、§6 #29）。
 
-## 6. Phase 5 要決定的問題（plan §14 #1–#28；#26–#28 是結案新增，照實帶到下一個 plan session）
+## 6. Phase 5 要決定的問題（plan §14 #1–#34；#26–#28 是結案新增、#29–#34 來自結案 R2 的條件與 non-blocking，照實帶到下一個 plan session）
 
 **要使用者決定（契約、判準、identity、權限）：**
 
@@ -123,14 +126,46 @@
 | **26** | **（結案新增）[666] 怎麼收尾**：①核准用原編號重試（token 已存在；`python scripts/apply_ra_admission.py --pq2 666 --digest 26924126cf54ca581410ddd47bbe41a647327a5590cbf22f40af0a9bbd7ee50d` → `scripts/commit_pending_intake.py` → `python -m engine_b.todo complete-ra 666 --digest …`），並決定 stash 裡的預熱清單＋對稱測試要不要 commit（`git stash show -p stash@{0}`）；或 ②drop [666]（工作樹那兩個檔要還原）。**「admin 預熱 token」這一步本身要不要成為入圖流程的固定前置**（例：入口在 apply 前比對 loader 會寫的屬性名與 `db.propertyKeys()`，缺就 fail closed 並指路 admin 預熱），也一併決定 | 權限面：routine writer 0 變動；token 已由 admin 預熱 |
 | **27** | **（結案新增）結構表需求錨是「公司層單一最短錨」**：[665] 讓 Lam 的 8 列（含供先進封裝、3D NAND 的列）整批由 `ai_switch` 換到 `dram_technology`。要不要改成逐列（瓶頸節點側）或印多錨 | 2026-09-18 實測過改成 dst 側會讓多數列失去錨（`demand_chain` docstring）；今天只有 Lam 一家受影響 |
 | **28** | **（結案新增）圖遷移的事前匯出沒有單一官方命令**：`loader/migrate_relation_rejudge.py` 等 live 遷移要求 backup-dir 內事先有非空 `neo4j_export.json`，但只有 `backup_private.py run`（整包）會產生它；本次與 `migrate_611`–`615` 都是另寫小腳本呼叫 `export_neo4j_payload`。要不要給 `backup_private.py` 一個只匯出圖到指定目錄的子命令（daily ⑯ 用的工具＝要做 sandbox impact review），或讓遷移工具自己匯出 | pq2 hint 也應寫出這一步 |
+| **30** | **（R2 N1）媒體／研究機構「整家」升級，轉述公司說法也被抬成外部印證**：Cignal AI 對 LITE ELS 的兩段引文是「Lumentum announced…」「Both Lumentum and Coherent recently stated…」，卻讓 LITE 個股頁印「有客戶或第三方印證」，也是 ① 在 4.3 少 2 的其中之一（closeout 初版只點名了 `tech:mrm_200g`）。根因：`publishers.json` 依類別整家升級、不逐份；220 份 SourceDoc 宣告 `origin_linkage` 的 0 份。要不要逐份宣告（例如 industry_research 也要 `origin_linkage=independent` 才升） | 與 #2（引文不具名供應商 15 條）是同一個判準家族 |
+| **31** | **（R2 N2）GSR 的登記類別**：`globalsemiresearch.substack.com` 登記為 industry_research（plan §9 第 1 項預定），另 4 個 Substack 都登記為 media；[668] 的 RA review 自己寫了「單位數字的出處沒寫」。② 的 +1 不受類別影響，但 cw_dfb 兩條邊升外部印證取決於它 | 由互動 session 維護 publishers，類別是判斷 |
 
-**不需要使用者決定、下一個 plan 照列的：** #5（`name_aliases` 中文名覆蓋、`yfinance_symbol`）、#6（可轉換特別股算黃；員工行權等三類股數來源）、#7（本 Phase 鑄的 lead 進不進第 5 型母體；`graph_walk:*` 來源標籤走到 Phase 5 量測）、#8（Phase 2／3 帶過來未併入的）、#9（「層文件只有付費」的 park 要不要有付費取得的 pq2 類別——付費永不列入常規授權）、#10（第 1 型也以研究啟動時鑄 lead）、#12（`co:nava_thailand` 疑似抽取錯誤）、#13（名字比對潛在誤中，今天 0 筆）、#15（Evertiq 轉載聯合稿的 origin／publisher 應改資料）、#16（`Third-party Research` 泛稱掛 31 條邊）、#18（字表 v2 要換新樣本再量）、#19（`proceeds_equity` 稽核欄）、#21（金額只計一個 tag＝已知至少）、#22（✅ 正式庫遷移已完成，紀律留著）、#24（資料層 `date.today()`，接 as-of 時改由呼叫端傳入）。
+**不需要使用者決定、下一個 plan 照列的（結案新增，R2 non-blocking）：**
+- **#29（R2 C2）③b 計數器看不到 supersede**：`layer_stats` 以「assertion id 不在凍結集合」判「新」，更正走廊沿用原 id，所以 A3 定義的「supersede」量不到。Phase 4 影響 0；[666] 重試後會讀錯（4 筆帶 sub 被重寫、仍印 0／0）。要在 [666] 重試前或同時修（L13：成功與失敗同形）。
+- **#32（R2 N3）入圖副作用 packet 沒揭露**：[668] 讓 `co:nvidia.abstraction_level` 由 device_chip 變 network_systems、co:nvidia 與 co:lumentum aliases 聯集；[664] co:axt 與 mat:inp_substrate aliases 聯集；[665] 讓 `lrcx_10_q_20260423.retrieved_at` 由 08-30 倒退到 07-19。根源：21 個多檔 doc_id 有 18 個 `retrieved_at` 各檔互異、取值看載入順序（與 4.2e 的 section／title 同一類，SourceDocSync 沒涵蓋）；loader 對節點的 `abstraction_level` 是最後載入者覆寫。讀者只有覆蓋掃描顯示與 PointInTime，影響低；`co:nvidia` 那一格改回要走圖寫入（pq2）。
+- **#33（R2 N5）走圖第 2 型沒有降級**：讀圖 ledger 讀不到時第 1 型降級為 `upstream_unavailable`，第 2 型卻照算、把記憶當空的（對稱面，`tests/test_graph_walk.py:152-159` 只守第 1 型）。
+- **#34（R2 N6）cw_dfb lead 的標籤不一致**：來源 `directed:phase4-plan-4.8`，卻帶 `classified_by=interactive:graph_walk`、`graph-walk://` URL 與 `graph_walk_subject`；`classified_by` 封閉字彙沒有「互動、但不是走圖命中」的值（L16）。
+- **#26 補記（R2 N7）**：repo 的 setup 1b 仍只預熱 2 個屬性名（修正在 stash）；現庫 38 個 token 都已存在、失敗方式是 fail closed，所以只是要盡快決定。
+
+**不需要使用者決定、下一個 plan 照列的（plan §14 既有）：** #5（`name_aliases` 中文名覆蓋、`yfinance_symbol`）、#6（可轉換特別股算黃；員工行權等三類股數來源）、#7（本 Phase 鑄的 lead 進不進第 5 型母體；`graph_walk:*` 來源標籤走到 Phase 5 量測）、#8（Phase 2／3 帶過來未併入的）、#9（「層文件只有付費」的 park 要不要有付費取得的 pq2 類別——付費永不列入常規授權）、#10（第 1 型也以研究啟動時鑄 lead）、#12（`co:nava_thailand` 疑似抽取錯誤）、#13（名字比對潛在誤中，今天 0 筆）、#15（Evertiq 轉載聯合稿的 origin／publisher 應改資料）、#16（`Third-party Research` 泛稱掛 31 條邊）、#18（字表 v2 要換新樣本再量）、#19（`proceeds_equity` 稽核欄）、#21（金額只計一個 tag＝已知至少）、#22（✅ 正式庫遷移已完成，紀律留著）、#24（資料層 `date.today()`，接 as-of 時改由呼叫端傳入）。
 
 ## 7. 使用者動作（非阻擋）
 
-- **[666]**：見 §6 #26（重試或 drop 二擇一；RA 2026-10-31 到期）。
+- **[666]**：見 §6 #26（重試或 drop 二擇一；partial 的 RA 實際不會到期，見 §5 第 1 點）。
 - 題材掃描已 12 天未跑（門檻 7 天）；sivers memo 超過複查週期（34／30 天）；pq1 triaged_go 20 條——都是既有計數器，與本 Phase 無關。
 
 ## 8. 結案 R2（使用者已常規 opt-in）
 
-（R2 回報後補上 verdict 與處置。）
+一位乾淨 context 的唯讀審查者，對 HEAD `f92846f` 跑 plan §12 的八項＋[666] 判斷（在 repo 外以 `git archive` 匯出 9 個版本、單一 READ transaction 抓一份圖快照，所有比較對同一份快照；結束時 `git status --porcelain --ignored`、stash、HEAD 與開始時逐位元組相同）。
+
+**verdict：CONDITIONAL_GO，blocking 0。** 八項全部 ✅，並獨立重現：A1 路徑 77→75→73（4.0 程式＋4.0 資料／現在程式＋4.0 資料／現在程式＋現在資料）、layer_stats 逐段相同、evidence 分布與 80 條逐條轉移相同、資料面只有 4.8 入圖（695 筆凍結 assertion 除 `updated_at` 外 0 欄變動）、③a 102／113（獨立重寫旗標）、`collapse_assertions` 對「凍結 695 列」與「現在全部列」兩種輸入都 0 差異、`edge_conflicts` sub 狀態與 4.0 相同、走圖第 2 型夾具 15／15、9 個應拒收 request 全拒、入口 8 種拒絕都無寫入、稀釋燈三檔對 SEC companyfacts 手核、CHECK 遷移 5637 列逐列未改＋新增 263、`by_ticker` 兩版完全相同、pq1 20 條逐位相同、名冊 12 家來源成立、`routine_writer` 權限未放寬（唯讀 SHOW PRIVILEGES）。[666]：「不影響 completion gate」成立、不擋結案。
+
+| 條件／發現 | 內容 | 處置 |
+|---|---|---|
+| **C1** | ③（A3）是 0／0 沒有母體，不得寫成「成立」 | 本報告 §2 開頭改寫驗收結論、③ 列標「未量到」；ROADMAP ✅ 時同句註明 |
+| **C2** | ③b 計數器以 id 判新、看不到更正走廊的 supersede；[666] 重試會讓它讀錯 | §2 ③ 列、§5 第 5 點寫明；plan §14 #29 |
+| **C3-a** | 「RA 2026-10-31 到期」與程式不符（到期只對 `ready`） | §5 第 1 點、§7 更正（執行者對照 `intake/actions.py:859`、入口第 80 行確認） |
+| **C3-b** | 「聯合公告 12」應為 8（12 是 news 份數） | §2 origin 列逐份列出 16 份（執行者重跑 owner 解析確認） |
+| **C3-c** | 「80＝21＋59」：現在的圖上 4.3 改 61 條，UMC 兩條與 4.1 重疊、cw_dfb 兩條要 [668] 資料 | §2 origin 列改寫逐版本歸因（執行者在 `classdiff_close.json` 確認那四條） |
+| N1 | Cignal AI 轉述被抬成外部印證（LITE ELS；① 在 4.3 少 2 之一） | §6 #30 |
+| N2 | GSR（Substack）登記為 industry_research，另 4 個 Substack 是 media | §6 #31 |
+| N3 | 入圖副作用 packet 沒揭露（`co:nvidia.abstraction_level`、aliases 聯集、`retrieved_at` 倒退） | §6 #32 |
+| N4 | [666] 另有 2 條自報·filing 會升外部印證 | §5 第 5 點 |
+| N5 | 走圖第 2 型讀圖 ledger 讀不到時不降級 | §6 #33 |
+| N6 | cw_dfb lead 的 `classified_by`／URL 標籤與 directed 來源不一致 | §6 #34 |
+| N7 | repo setup 1b 仍只預熱 2 個（修正在 stash） | §6 #26 補記 |
+| N8 | ROADMAP「做什麼」欄寫 `display_name` 100/100，實際 99/100 | ROADMAP ✅ 時註明 |
+| N9 | 量測時點寫 07:14–07:40，commit 是 07:31 | 報告開頭更正為 07:14–07:31 |
+
+需要改程式的一律不在結案 R2 之後動（同 Phase 3 結案的處置），都登記成 §6 的題。
+
+**覆核**（條件修正後由同一位審查者只核 C1–C3 是否落實）：見下一次 commit。
