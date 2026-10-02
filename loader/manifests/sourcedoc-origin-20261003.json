@@ -29,5 +29,14 @@
       "why": "Chen et al., Micromachines 2025, 16(4), 431（MDPI Review）——期刊綜述，轉述廠商公開資料（Figure 1「based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」）；「Third-party Research」不是發布者身分。兩份抽取檔（cpo_chip_package_paper、cpo_paper_coverage_addendum_2026_08_30）同一個 doc_id，要同一個值。發布者 MDPI Micromachines 已登記為 media（6.3e）。",
       "source": "library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt；https://www.mdpi.com/2072-666X/16/4/431"
     }
+  ],
+  "publishers_add": [
+    {
+      "origin": "MDPI Micromachines",
+      "kind": "media",
+      "corroborates": false,
+      "seen_in": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "note": "期刊綜述（Chen et al., Micromachines 2025, 16(4), 431, MDPI Review）——轉述廠商公開資料：原文 Figure 1「based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」（library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt）。Phase 6 Step 6.3e，隨 6.3d 的更正一起登記（使用者定案 §0.1 #6）"
+    }
   ]
 }

@@ -147,6 +147,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6 | 6.3a（影響 6.4、6.8） | 名冊三個寫法：`co:apollo` 加「Apollo」、`co:arista` 加「Arista」、`co:globalfoundries` 加「GF」 | 只加 Arista、GF；**Apollo 不加** | 全圖逐字整詞比對：「Apollo」4 段裡 2 段是 Google 的「Apollo OCS platform」（專案代號）——plan 本節的規則「有任何一筆不是在講這家公司 → 不加那個寫法、寫進偏差」；`co:apollo invests_in co:broadcom` 在 6.4 之後進 `corroboration_withheld.unnamed`，6.8 讀原文決定（baseline §17.1） |
 | 7 | 6.3e | `MDPI Micromachines`：`seen_in: cpo_chip_package_paper` | `seen_in: Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era` | `seen_in` 的契約是「讓這筆被登記的那份 **SourceDoc id**」（`query/origin_resolution.py::Publisher`）；`cpo_chip_package_paper` 是抽取檔的檔名，SourceDoc id 是後者（baseline §6） |
 | 8 | 6.3d | Soitec 那份的新 origin「`Soitec（Reuters 訪談逐字）`」 | 「`Soitec（管理層受 Reuters 訪談所述）`」 | 摘錄（`library/raw/reuters_soitec_capacity_reservations_2026_08_31.txt`）是 Reuters 法文報導的轉述，不是管理層逐字——措辭精度本身是 claim（L11-1）；去註解後同樣解析成 `co:soitec` |
+| 9 | 6.3e（影響 [671]） | 6.3e 單獨一項：`config/publishers.json` 登記 `MDPI Micromachines` | 條目寫進更正 manifest 的 `publishers_add`，由 `--corrections --apply`（[671] go 之後）在 origin 更正落地後**同一步**登記；publishers.json 先撤回 | `tests/test_origin_resolution.py::test_every_registration_spells_the_origin_of_the_document_it_came_from` 要求登記對得上 `seen_in` 那份文件**現在**的 origin（L18）——先登記就是一筆指不回原文的登記（初版 commit `e9e53620` 這樣做、全測試紅了一條） |
 
 ---
 

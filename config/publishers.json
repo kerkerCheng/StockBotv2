@@ -28,7 +28,6 @@
     {"origin": "Hunterbrook Media", "kind": "media", "corroborates": false, "seen_in": "hntrbrk_himax_coupe_2026_03_12", "note": "調查報導媒體；自己採訪的文要在 SourceDoc 宣告 origin_linkage=independent"},
     {"origin": "IEEE Spectrum", "kind": "media", "corroborates": false, "seen_in": "ieee_spectrum_cpo_2025_03_25", "note": "IEEE 旗下雜誌"},
     {"origin": "Impact Lab", "kind": "media", "corroborates": false, "seen_in": "impactlab_rollerscrew_2025_04_27", "note": "轉載 Fast Company 報導"},
-    {"origin": "MDPI Micromachines", "kind": "media", "corroborates": false, "seen_in": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era", "note": "期刊綜述（Chen et al., Micromachines 2025, 16(4), 431, MDPI Review）——轉述廠商公開資料：原文 Figure 1「based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」（library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt）。2026-10-03 Phase 6 Step 6.3e 登記（使用者定案 §0.1 #6）；SourceDoc origin 由「Third-party Research」更正為本字串要等 6.3d 的 pq2"},
     {"origin": "Mining Weekly", "kind": "media", "corroborates": false, "seen_in": "miningweekly_lynas_terbium_2025_06_18", "note": "礦業媒體"},
     {"origin": "Next Financial", "kind": "media", "corroborates": false, "seen_in": "nextfinancial_joint_problem_2026_06_02", "note": "個人分析通訊（Substack）"},
     {"origin": "Optica Publishing Group", "kind": "media", "corroborates": false, "seen_in": "optica_opn_marvell_celestial_2025", "note": "庫內那份是 Optics & Photonics News（會員雜誌報導），不是期刊論文；抽取檔是私有檔"},

@@ -220,11 +220,11 @@ def test_packet_resolves_the_origin_with_the_single_owner_so_a_registered_publis
     payload = _payload(_extraction(), [_enum()])
     check = research_actions.check_layer_enumerations(payload)
     origin = check["results"][0]["origins"][0]
-    assert (origin["origin_kind"], origin["publisher_kind"], origin["resolved"]) == (
-        "publisher", "industry_research", None)
+    # GSR 2026-10-03 起登記為 media（Phase 6 Step 6.3b）——本測試守的是「登記的發布者不得印成解析不到」，類別照實印
+    assert (origin["origin_kind"], origin["publisher_kind"], origin["resolved"]) == ("publisher", "media", None)
     record = research_actions.create_action(payload, root=tmp_path)
     packet = research_actions.render_review_packet(record)
-    assert "origin「Global Semi Research」→ 登記的發布者（industry_research）" in packet
+    assert "origin「Global Semi Research」→ 登記的發布者（media）" in packet
     assert "origin「Global Semi Research」→ 解析不到" not in packet
 
 

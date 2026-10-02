@@ -318,22 +318,89 @@ def plan_corrections(manifest: Mapping[str, Any], json_docs: Mapping[str, list[M
     return {"edits": edits, "skipped": [], "graph": graph_items}
 
 
-def correction_evidence_changes(rows: list[Mapping[str, Any]], manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
-    """更正 origin_entity 之後，哪些邊的證據等級會變（現在的名冊與 publishers、現在的規則，前後各算一次）。"""
+PUBLISHERS_PATH = ROOT / "config" / "publishers.json"
+
+
+def plan_publishers_add(manifest: Mapping[str, Any], *, publishers_path: Path | None = None) -> list[dict[str, Any]]:
+    """manifest 的 `publishers_add`：要**跟著這次更正一起**登記的發布者。
+
+    為什麼不先登記：發布者登記必須對得上它 `seen_in` 那份文件的 origin（`tests/test_origin_resolution.py::
+    test_every_registration_spells_the_origin_of_the_document_it_came_from`，L18）——那份文件的 origin 要等這次更正才變，
+    先登記就是一筆指不回原文的登記（2026-10-03 Step 6.3e 先登記、全測試紅了才撤回）。所以核對的是「更正**之後**」的 origin。"""
+    from query.bottleneck import _strip_annotation
+    from query.origin_resolution import PUBLISHER_KINDS, load_publishers
+
+    entries = [dict(e) for e in manifest.get("publishers_add") or ()]
+    existing = load_publishers(publishers_path or PUBLISHERS_PATH)
+    after = {str(c["doc_id"]): str(c["after"]) for c in manifest["corrections"] if c["field"] == "origin_entity"}
+    for e in entries:
+        origin, kind = str(e.get("origin") or "").strip(), e.get("kind")
+        if not origin or kind not in PUBLISHER_KINDS or e.get("corroborates") is not PUBLISHER_KINDS[kind]:
+            raise ValueError(f"publishers_add：{e} 的 origin／kind／corroborates 不合規（類別決定算不算印證）")
+        if existing.get(origin) is not None:
+            raise ValueError(f"publishers_add：{origin} 已登記")
+        seen_in = str(e.get("seen_in") or "")
+        if seen_in not in after or _strip_annotation(after[seen_in]).casefold() != origin.casefold():
+            raise ValueError(f"publishers_add：{origin} 的 seen_in={seen_in!r} 不是這次更正後 origin 去註解等於它的那份文件")
+    return entries
+
+
+def insert_publishers(raw: str, entries: list[Mapping[str, Any]]) -> str:
+    """publishers.json 一筆一行的排版：每筆插在**同類別的最後一行之後**，其餘逐位不動；插完解析驗證。"""
+    newline = "\r\n" if "\r\n" in raw else "\n"
+    lines = raw.split(newline)
+    for entry in entries:
+        rows = [i for i, line in enumerate(lines) if f'"kind": "{entry["kind"]}"' in line and '"origin":' in line]
+        if not rows:
+            raise ValueError(f"publishers.json 沒有 {entry['kind']} 類別的列可以對齊排版")
+        anchor = rows[-1]
+        if not lines[anchor].rstrip().endswith(","):
+            lines[anchor] = lines[anchor].rstrip() + ","
+            new = "    " + json.dumps(entry, ensure_ascii=False)
+        else:
+            new = "    " + json.dumps(entry, ensure_ascii=False) + ","
+        lines.insert(anchor + 1, new)
+    out = newline.join(lines)
+    data = json.loads(out)
+    added = {e["origin"] for e in entries}
+    if not added <= {p["origin"] for p in data["publishers"]}:
+        raise ValueError("插入之後解析不到新條目——中止，沒有寫入")
+    return out
+
+
+def publishers_with(entries: list[Mapping[str, Any]], *, publishers_path: Path | None = None):
+    """記憶體裡的 publishers（現在的設定＋這次要登記的），走 `load_publishers` 同一套驗證。"""
+    import tempfile
+
+    from query.origin_resolution import load_publishers
+
+    raw = (publishers_path or PUBLISHERS_PATH).read_text(encoding="utf-8")
+    with tempfile.TemporaryDirectory() as tmp:
+        path = Path(tmp) / "publishers.json"
+        path.write_text(insert_publishers(raw, list(entries)) if entries else raw, encoding="utf-8")
+        return load_publishers(path)
+
+
+def correction_evidence_changes(rows: list[Mapping[str, Any]], manifest: Mapping[str, Any], *,
+                                publishers_after: Any = None) -> list[dict[str, Any]]:
+    """更正 origin_entity（與跟著登記的發布者）之後，哪些邊的證據等級會變——現在的名冊、現在的規則，前後各算一次。
+    `publishers_after`：更正之後的 publishers（含 `publishers_add`）；不給＝與現在相同。"""
     from identity.registry import get_registry
     from query.bottleneck import classify_evidence, collapse_assertions
+    from query.origin_resolution import get_publishers
 
     new_origin = {str(c["doc_id"]): c["after"] for c in manifest["corrections"] if c["field"] == "origin_entity"}
     after_rows = [dict(r, origin=new_origin[str(r.get("source_doc_id"))]) if str(r.get("source_doc_id")) in new_origin
                   else dict(r) for r in rows]
     registry = get_registry()
 
-    def classes(source_rows):
+    def classes(source_rows, pubs):
         return {k: classify_evidence(e.src, e.origins, registry, filing_origins=e.filing_origins,
-                                     origin_linkages=e.origin_linkages)
+                                     origin_linkages=e.origin_linkages, publishers=pubs)
                 for k, e in collapse_assertions(source_rows).items()}
 
-    before, after = classes(rows), classes(after_rows)
+    before = classes(rows, get_publishers())
+    after = classes(after_rows, publishers_after if publishers_after is not None else get_publishers())
     return [{"edge": list(k), "before": before.get(k), "after": after.get(k)}
             for k in sorted(set(before) | set(after)) if before.get(k) != after.get(k)]
 
@@ -365,11 +432,14 @@ def _run_corrections(args, driver) -> int:
         assertions = session.execute_read(lambda tx: fetch_assertions(tx))
     json_docs = json_source_docs(ROOT / "extractions")
     planned = plan_corrections(manifest, json_docs, rows)
-    changes = correction_evidence_changes(assertions, manifest)
+    new_publishers = plan_publishers_add(manifest)
+    changes = correction_evidence_changes(assertions, manifest, publishers_after=publishers_with(new_publishers))
     for edit in planned["edits"]:
         print(f"- extractions/{edit['file']}｜{edit['doc_id']}.{edit['field']}：{edit['before']!r} → {edit['after']!r}")
     for item in planned["graph"]:
         print(f"- 圖 SourceDoc {item['doc_id']}.{item['field']}：{item['graph']!r} → {item['json']!r}")
+    for entry in new_publishers:
+        print(f"- config/publishers.json 登記 {entry['origin']}（{entry['kind']}；seen_in={entry['seen_in']}）")
     print(f"- 證據等級會變的邊 {len(changes)} 條：")
     for change in changes:
         print(f"  - {' '.join(change['edge'])}：{change['before']} → {change['after']}")
@@ -386,6 +456,9 @@ def _run_corrections(args, driver) -> int:
         with driver.session(default_access_mode=WRITE_ACCESS) as session:
             graph_result = apply_graph(planned["graph"], session=session, pq2=args.pq2,
                                        manifest_name=f"sourcedoc-corrections-{stamp:%Y%m%d}.graph-sync.json")
+        if new_publishers:      # 同一步登記：origin 更正落地之後，登記才指得回原文
+            raw = PUBLISHERS_PATH.read_bytes().decode("utf-8")
+            PUBLISHERS_PATH.write_bytes(insert_publishers(raw, new_publishers).encode("utf-8"))
     finally:
         release(INTERACTIVE_OWNER)
     with driver.session(default_access_mode=READ_ACCESS) as session:

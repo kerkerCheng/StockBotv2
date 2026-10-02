@@ -397,12 +397,19 @@ prepare 多一次 READ session（`intake.application._merge_side_effect_receipt`
 `usar_stillwater_phase1a_2026_03_26`（「successful commissioning of its commercial magnet production line (Phase 1a)…」）的引文講的是**它們自己**做磁鐵，卻掛在 `co:mp_materials supplies_to mat:rare_earth_magnets`——引文裡沒有 MP。
 舊規則下這條邊另有來源、等級本來就是外部印證，所以 0 條變動；6.4 之後這兩個 origin 會進 `corroboration_withheld.unnamed`。可能的正解是 Noveon／USAR 各自的供貨邊（新的知識主張＝RA，pq2）。
 
-### 17.4 綜述論文的期刊登記（6.3e）
+### 17.4 綜述論文的期刊登記（6.3e）——**延後到 [671] 的 apply 同一步登記**（§0.6 #9）
 
 `config/publishers.json` 加 `MDPI Micromachines`（`media`）：原文核對（`library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt`）——
 Figure 1「which is based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」，是綜述轉述廠商公開資料，不是自產數據。
 `seen_in`＝SourceDoc id `Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era`（§0.6 #7）。登記後 `MDPI Micromachines（Chen et al. 2025 綜述）` 解析成媒體；
 **今天證據等級變動 0 條**——那份 SourceDoc 的 origin 仍是「Third-party Research」，更正要等 6.3d 的 pq2（之後它的 34 條邊由待判定變媒體轉述，同級）。
+
+⚠ **更正（同日）**：初版在這一步就把 MDPI Micromachines 寫進 publishers.json（commit e9e53620），全測試紅了一條
+`tests/test_origin_resolution.py::test_every_registration_spells_the_origin_of_the_document_it_came_from[MDPI Micromachines]`——
+登記必須對得上 `seen_in` 那份文件**現在**的 origin（L18：標籤要指得回原文），而那份文件的 origin 要等 [671] 才變。
+改成：從 publishers.json 撤回；條目寫進更正 manifest 的 `publishers_add`，由 `--corrections --apply` 在 origin 更正落地之後同一步登記
+（dry-run 的證據等級預告照「登記之後」算，仍是 32 條）。同一輪也修了兩條把 GSR 寫死成產業研究的舊測試（改用 TrendForce／照實印 media）。
+
 
 ### 17.5 SourceDoc origin 更正（6.3d）——**pq2 [671] 等 go**
 

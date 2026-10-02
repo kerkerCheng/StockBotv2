@@ -149,7 +149,10 @@ def test_registered_media_origin_stays_a_relay_on_the_real_config() -> None:
     assert classify_evidence("co:sumitomo_electric", ["Reuters"], reg) == "media_relay"
     assert classify_evidence("co:sumitomo_electric", ["Reuters"], reg,
                              origin_linkages={"Reuters": {"independent"}}) == "externally_corroborated"
-    assert classify_evidence("co:sumitomo_electric", ["Global Semi Research"], reg) == "externally_corroborated"
+    # Global Semi Research 2026-10-03 起登記為 media（Phase 6 Step 6.3b）：沒宣告 independent 就是轉述
+    assert classify_evidence("co:sumitomo_electric", ["Global Semi Research"], reg) == "media_relay"
+    # 自產資料的類別照樣算外部印證（真設定上的產業研究）
+    assert classify_evidence("co:sumitomo_electric", ["TrendForce"], reg) == "externally_corroborated"
 
 
 # ---------------------------------------------------------------------------
