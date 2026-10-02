@@ -125,7 +125,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 5.0 | 基準快照（`docs/reports/2026-10-02-phase5-baseline.md`；偏差見 §0.6 #1–#5：§5 改寫規則修正、追蹤表查證命令改不寫檔、計分表 NaN、跨日只比錨點、watch 實際形狀） | ✅ | 執行模型 | 見 git log「Step 5.0」 |
 | 5.1 | Phase 4 尾巴：#29 ③b 認 supersede、#33 第 2 型降級、#34 `classified_by` 字彙、stash 預熱清單＋對稱測試、apply 入口 `db.propertyKeys()` 檢查（偏差見 §0.6 #6–#9；驗收見 baseline 報告 §15） | ✅ | 執行模型 | 見 git log「Step 5.1」（5.1a–5.1d） |
 | 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review；偏差見 §0.6 #10–#15） | ✅ | 執行模型 | 見 git log「Step 5.2」 |
-| 5.3 | `record_trade.py --backfill-before-receipts`（R2-a） | ○ | 執行模型 | |
+| 5.3 | `record_trade.py --backfill-before-receipts`（R2-a：CONDITIONAL_GO → 條件修正 → 窄範圍覆核 GO；偏差見 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 5.3」 |
 | 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行） | ○ | 執行模型 | |
 | 5.5 | 計分表接主題等權組基準 | ○ | 執行模型 | |
 | 5.6 | 候選狀態每日序列 | ○ | 執行模型 | |
@@ -160,7 +160,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 14 | 5.2 | paper「錨＝那天收盤」 | 照做，並把偏差寫進 paper 的 `known_biases`：美股與歐股在台北下午寫下時還沒收盤，錨點含當天盤中變動（同日內前視、最多一個交易日） | 定案 #1 的取捨保留，但讓偏差跟著數字走 |
 | 15 | 5.2 | 「`first_named_by`＝最早 lead 的 `source`＋日期」 | 以 `first_seen`（我們看到它的時間）取最早，`published_at` 另印、空就是空；lead registry 讀不到時印 `upstream_unavailable`，不是 `no_lead_named` | 「首次點名」問的是管道何時把它帶到我們面前；兩個日期不互相冒充（INV-6） |
 | 16 | 5.3 | §4「`build_receipt` 的回填分支」；⑦「賣出回填不要求 `--disproof-watch`」；拒收列五種 | 回填收據是另一支 `build_backfill_receipt`，參數裡沒有任何判斷輸入；`--disproof-watch` 改為**拒收**；另拒 `--apply` 與 `--no-narrative-override`，入口拒收共七種 | 放在 `build_receipt` 裡當分支，「不讀判斷」就只靠分支條件守；另開一支、不收判斷參數，才是結構上讀不到。watch 的來源歸屬核對要讀今天的 registry，等於讀今天的判斷；另兩個旗標在回填路徑沒有意義，收下來卻不作用，會讓使用者以為生效了 |
-| 17 | 5.3（R2-a CONDITIONAL_GO） | （未提） | C1：OPERATIONS 補 5.3 的 sandbox impact review。C2：5% 測試的夾具持股合計改成等於 NAV，並斷言擋下理由是「超過單筆上限」。C3：刪掉 OPERATIONS「乾跑看收據」那句，改成「回填沒有乾跑」。NB3：名冊讀不到改 fail closed（exit 2）。NB4：日期閘門讀不到排程時區改為拒收 | C2：原夾具其實是被「市值合計≠NAV（量不到）」擋下，上限放寬到 99% 照綠（L13）。C3：回填沒有預覽路徑，第一次成功就寫進 append-only。NB3：吞成 `company_id: None` 會讓「讀不到」與「名冊沒有這家」在收據裡同形，而那一行改不掉（L12）。NB4：閘門的輸入不得靜默換來源。三個變異（上限 99%、退回本機時區、名冊例外吞掉）全紅 |
+| 17 | 5.3（R2-a CONDITIONAL_GO） | （未提） | C1：OPERATIONS 補 5.3 的 sandbox impact review。C2：5% 測試的夾具持股合計改成等於 NAV，並斷言擋下理由是「超過單筆上限」。C3：刪掉 OPERATIONS「乾跑看收據」那句，改成「回填沒有乾跑」。NB3：名冊讀不到改 fail closed（exit 2）。NB4：日期閘門讀不到排程時區改為拒收 | C2：原夾具其實是被「市值合計≠NAV（量不到）」擋下，上限放寬到 99% 照綠（L13）。C3：回填沒有預覽路徑，第一次成功就寫進 append-only。NB3：吞成 `company_id: None` 會讓「讀不到」與「名冊沒有這家」在收據裡同形，而那一行改不掉（L12）。NB4：閘門的輸入不得靜默換來源。三個變異（上限 99%、退回本機時區、名冊例外吞掉）全紅。窄範圍覆核（乾淨 context）GO；non-blocking：`engine_b.event_watch._local_timezone` 有 `lru_cache`，同一行程讀過一次之後設定檔變得讀不到也不會拒收——CLI 每次是新行程不受影響，長駐行程若日後依賴這道 fail closed 要另想 |
 
 ---
 
