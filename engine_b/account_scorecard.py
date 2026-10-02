@@ -23,11 +23,19 @@
 3. **不動 tier。** 本模組只算數字。tier 升降是一季一次的 pq2 manual（D5）——
    計分表是那個決定的輸入，不是那個決定。
 
-## ⚠ 三個已知偏差（必須印在表上，D5／§6）
+## ⚠ 四個已知偏差（必須印在表上，D5／§6）
 
 - **倖存者**：帳號是因為「感覺對過」才被選進登記表的，計分表量的是一個已經被選過的樣本。
 - **後見之明**：回溯評分用的是今天才知道的價格序列。
 - **單邊上漲**：2026 年光互連整體單邊上漲，所以**必須同時對 SOXX 算超額**，只對 QQQ 會高估。
+- **主題等權組是回溯基準**（Phase 5 Step 5.5）：第三個基準的成分是某一天才定的，對更早的點名是拿今天的組回頭比。
+
+## 第三個基準：主題等權組（Phase 5 Step 5.5）
+
+每則點名、每個持有期多一格 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 組（**排除本檔**）等權報酬。組報酬只有一個函式
+（`alpha.theme_cohort.cohort_return`，追蹤表共用），「哪一組是基準」也只有一個（`measurement_cohort`）。0 組＝
+`not_yet_recorded`、多組＝`ambiguous_cohort`、讀不到＝`upstream_unavailable`——三種缺席都不是 0。
+成員併進取價清單、排在點名標的之後（可被 `MAX_PRICED_SYMBOLS` 截掉，截掉的照印）。
 """
 from __future__ import annotations
 
@@ -50,11 +58,14 @@ HORIZONS_DAYS: tuple[int, ...] = (30, 90)
 #: 點名前要看的回顧期（日曆天）——回答「是不是漲完才點名」。
 LOOKBACK_DAYS = 30
 
-#: 三個已知偏差，逐字印在表上。**不是註腳，是欄位。**
+#: 已知偏差，逐字印在表上。**不是註腳，是欄位。**
 KNOWN_BIASES: tuple[str, ...] = (
     "倖存者偏差：帳號是因為「感覺對過」才被選進登記表的，這裡量的是一個已經被選過的樣本。",
     "後見之明偏差：回溯評分用的是今天才知道的價格序列，當時並沒有這些後續資料。",
     "單邊上漲偏差：2026 年光互連整體單邊上漲——所以同時對 SOXX 算超額，只看 QQQ 會高估。",
+    # Phase 5 Step 5.5（plan §6）：第三個基準是主題等權組——它的成分是某一天才定的。
+    "主題等權組是回溯基準：成分在 `theme_cohort.decided_on` 那天才定，對更早的點名是拿今天的組回頭比"
+    "（組裡的公司本身也是因為「後來看起來對」才被選進去的）。",
 )
 
 #: 一輪最多對幾檔取價。**這是無人值守的網路 surface 上限，不是效能參數**：
@@ -218,6 +229,25 @@ def _pct_change(series: Mapping[date, float], start: date, end: date) -> float |
     return finish / begin - 1.0
 
 
+#: 第三個基準的名字（`excess_{h}d_vs_theme_cohort`）。主題等權組不是指數，不在 `BENCHMARKS`（它不參與取價額度的保留）。
+THEME_COHORT_BENCHMARK = "theme_cohort"
+
+
+def _median_or_absence(values: Sequence[float], report: "FilterReport", *, horizon: int, first_call_day: date | None,
+                       unpriced: str = "沒有任何一則點名同時有標的與基準的價格") -> Metric:
+    """有值＝中位數；沒有＝缺席，而「持有期還沒走完」要帶到期日（INV-2）。三個基準共用這一段，不各寫一份。"""
+    if values:
+        return Metric(value=statistics.median(values), n=len(values))
+    horizon_not_elapsed = report.reasons.get("horizon_not_elapsed") == report.input_count
+    return Metric(
+        n=0, absence_kind=ABSENCE_INSUFFICIENT,
+        # 「持有期還沒走完」是**等時間**，而等時間必須有到期日：
+        # 最早的那一則點名走完 horizon 的那天，就是這一格該有值的日子。
+        revisit_after=((first_call_day + timedelta(days=horizon)).isoformat()
+                       if horizon_not_elapsed and first_call_day else None),
+        reason=(f"{horizon} 天持有期在樣本裡一次都沒有走完" if horizon_not_elapsed else unpriced))
+
+
 def score_account(
     calls: Sequence[NamedCall],
     *,
@@ -225,8 +255,13 @@ def score_account(
     today: date,
     no_go_rate: Metric,
     trace_metric: Metric,
+    cohort: Any = None,
+    cohort_absence: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """具名點名 → 五欄。價格序列由呼叫端注入（測試不打網路）。"""
+    """具名點名 → 五欄。價格序列由呼叫端注入（測試不打網路）。
+
+    `cohort`（Phase 5 Step 5.5）：現行主題等權組；每則點名多一格 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 組（排除本檔）
+    等權報酬，組報酬共用 `alpha.theme_cohort.cohort_return`（與追蹤表同一支）。沒有組＝`cohort_absence` 的缺席，不是 0。"""
     # 等時間的缺席要算得出到期日，靠的是**最早那一則點名**：它走完 horizon 的那天，
     # 這一格就該有第一個值。沒有任何點名時留 None（那時缺的不是時間，是樣本）。
     first_call_day = min((call.called_on for call in calls), default=None)
@@ -259,20 +294,42 @@ def score_account(
                 report.accepted_count += 1
                 values.append(own_return - base_return)
             horizon_reports[key] = report.as_dict()
-            if values:
-                excess[key] = Metric(value=statistics.median(values), n=len(values))
-            else:
-                horizon_not_elapsed = (
-                    report.reasons.get("horizon_not_elapsed") == report.input_count)
-                excess[key] = Metric(
-                    n=0, absence_kind=ABSENCE_INSUFFICIENT,
-                    # 「持有期還沒走完」是**等時間**，而等時間必須有到期日：
-                    # 最早的那一則點名走完 horizon 的那天，就是這一格該有值的日子。
-                    revisit_after=((first_call_day + timedelta(days=horizon)).isoformat()
-                                   if horizon_not_elapsed and first_call_day else None),
-                    reason=(f"{horizon} 天持有期在樣本裡一次都沒有走完"
-                            if horizon_not_elapsed
-                            else "沒有任何一則點名同時有標的與基準的價格"))
+            excess[key] = _median_or_absence(values, report, horizon=horizon, first_call_day=first_call_day)
+        # 第三個基準：主題等權組（排除本檔；Phase 5 Step 5.5）。
+        key = f"excess_{horizon}d_vs_{THEME_COHORT_BENCHMARK}"
+        report = FilterReport()
+        if cohort is None:
+            absence = cohort_absence or {"kind": "not_yet_recorded", "reason": "主題等權組未定義"}
+            excess[key] = Metric(n=0, absence_kind=str(absence.get("kind")), reason=str(absence.get("reason")))
+            horizon_reports[key] = report.as_dict()
+            continue
+        from alpha.theme_cohort import cohort_return
+
+        values = []
+        for call in calls:
+            report.input_count += 1
+            end = call.called_on + timedelta(days=horizon)
+            if end > today:
+                report.reject("horizon_not_elapsed")
+                continue
+            own = prices.get(call.symbol)
+            if not own:
+                report.reject("no_price_series")
+                continue
+            own_return = _pct_change(own, call.called_on, end)
+            if own_return is None:
+                report.reject("price_gap_at_endpoint")
+                continue
+            group = cohort_return(cohort, start=call.called_on, end=end, series=prices,
+                                  exclude_company=call.company_id, exclude_ticker=call.symbol)
+            if group["return"] is None:
+                report.reject("theme_cohort_unpriced")
+                continue
+            report.accepted_count += 1
+            values.append(own_return - group["return"])
+        horizon_reports[key] = report.as_dict()
+        excess[key] = _median_or_absence(values, report, horizon=horizon, first_call_day=first_call_day,
+                                         unpriced="沒有任何一則點名同時有標的與主題等權組的價格")
 
     prior_report = FilterReport()
     prior_values: list[float] = []
@@ -357,8 +414,10 @@ def build_scorecard(
     leads_path: Path | None = None,
     today: date | None = None,
     price_loader: Callable[[Sequence[str], date, date], Mapping[str, Mapping[date, float]]] | None = None,
+    cohorts: tuple[Sequence[Any], Sequence[str]] | None = None,
 ) -> dict[str, Any]:
-    """整張計分表。`price_loader` 可注入——測試不打網路，正式跑用 yfinance。"""
+    """整張計分表。`price_loader` 與 `cohorts`（`current_cohorts()` 的形狀）可注入——測試不打網路、不讀 ledger，
+    正式跑用 yfinance 與主題等權組 ledger。"""
     from identity.registry import get_registry
 
     from .signal_source_registry import load as load_sources
@@ -369,6 +428,22 @@ def build_scorecard(
     leads: Mapping[str, Mapping[str, Any]] = payload.get("leads") or {}
     registry = load_sources()
     ticker_map = dict(get_registry().ticker_map)
+
+    # 第三個基準：主題等權組（Phase 5 Step 5.5）。「哪一組是基準」與追蹤表同一支（`measurement_cohort`）；
+    # 讀壞只讓那幾格缺席（upstream_unavailable），計分表其餘照算——不得因為多了一個基準就整張表消失（L13）。
+    try:
+        from alpha.theme_cohort import measurement_cohort
+
+        if cohorts is None:
+            from alpha.providers.theme_cohorts import current_cohorts
+
+            cohorts = current_cohorts()
+        cohort, cohort_info = measurement_cohort(*cohorts)
+    except Exception as exc:  # noqa: BLE001
+        cohort = None
+        cohort_info = {"parse_errors": [], "absence": {
+            "kind": "upstream_unavailable", "reason": f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
+    member_tickers: list[str] = list(cohort.tickers) if cohort is not None else []
 
     accounts: list[dict[str, Any]] = []
     all_symbols: set[str] = set()
@@ -384,21 +459,27 @@ def build_scorecard(
     earliest = min((c.called_on for calls in per_account_calls.values() for c in calls), default=None)
     prices: Mapping[str, Mapping[date, float]] = {}
     price_note = ""
-    price_budget = {"requested": 0, "fetched": 0, "cap": MAX_PRICED_SYMBOLS, "truncated": []}
+    price_budget: dict[str, Any] = {"requested": 0, "fetched": 0, "cap": MAX_PRICED_SYMBOLS, "truncated": [],
+                                    "theme_cohort_added": []}
     if all_symbols and earliest is not None:
         loader = price_loader or _yfinance_closes
         start = earliest - timedelta(days=LOOKBACK_DAYS + 10)
-        wanted = sorted(all_symbols | set(BENCHMARKS))
-        price_budget["requested"] = len(wanted)
-        if len(wanted) > MAX_PRICED_SYMBOLS:
-            # 基準永遠留著（沒有基準就算不出超額），其餘按字母序截斷並**把被截掉的印出來**。
-            keep = [s for s in wanted if s in BENCHMARKS]
-            keep += [s for s in wanted if s not in BENCHMARKS][:MAX_PRICED_SYMBOLS - len(keep)]
-            price_budget["truncated"] = [s for s in wanted if s not in keep]
-            wanted = keep
+        # 截斷的優先序：基準 → 點名標的 → 主題等權組成員。基準永遠留著（沒有基準就算不出超額）；
+        # 成員是第三個基準的**成分**、不是基準本身，可被截——截掉的照印，該成員進 `theme_cohort.missing`。
+        # 成員排在點名之後：多一個基準不得把既有的點名擠出取價清單（既有五欄同一份價格上逐位不變）。
+        call_symbols = sorted(all_symbols - set(BENCHMARKS))
+        added_members = sorted(set(member_tickers) - set(BENCHMARKS) - all_symbols)
+        ordered = list(BENCHMARKS) + call_symbols + added_members
+        price_budget["requested"] = len(ordered)
+        price_budget["theme_cohort_added"] = added_members
+        keep = ordered
+        if len(ordered) > MAX_PRICED_SYMBOLS:
+            keep = ordered[:max(MAX_PRICED_SYMBOLS, len(BENCHMARKS))]
+            price_budget["truncated"] = ordered[len(keep):]
             price_note = (f"取價檔數上限 {MAX_PRICED_SYMBOLS} 已觸及："
-                          f"{len(price_budget['truncated'])} 檔沒有取價，"
-                          f"它們的點名會以 no_price_series 出現在 filter reasons 裡")
+                          f"{len(price_budget['truncated'])} 檔沒有取價——點名標的會以 no_price_series 出現在 "
+                          f"filter reasons 裡，主題等權組成員列在 theme_cohort.missing")
+        wanted = sorted(keep)
         price_budget["fetched"] = len(wanted)
         try:
             prices = loader(wanted, start, day)
@@ -410,11 +491,11 @@ def build_scorecard(
         no_go = no_go_share(leads, harvest_key=source.harvest_key)
         scored = score_account(
             calls, prices=prices, today=day, no_go_rate=no_go,
-            trace_metric=trace_success(calls))
+            trace_metric=trace_success(calls), cohort=cohort, cohort_absence=cohort_info.get("absence"))
         deduped = first_call_per_symbol(calls)
         scored_first = score_account(
             deduped, prices=prices, today=day, no_go_rate=no_go,
-            trace_metric=trace_success(deduped))
+            trace_metric=trace_success(deduped), cohort=cohort, cohort_absence=cohort_info.get("absence"))
         called_days = [c.called_on for c in calls]
         accounts.append({
             "source_id": source.source_id,
@@ -433,9 +514,27 @@ def build_scorecard(
             "stamps": [c.stamp(prices) for c in calls],
         })
 
+    # 主題等權組這一格的來歷：哪一組、哪天定的、幾個成員、幾個取得到價、缺誰（逐檔列，不平均掉；INV-3）。
+    from alpha.theme_cohort import close_on_or_before
+
+    priced = [t for t in member_tickers if close_on_or_before(prices.get(t), day) is not None]
+    theme_cohort_block: dict[str, Any] = {
+        "cohort_id": cohort_info.get("cohort_id"),
+        "theme": cohort_info.get("theme"),
+        "decided_on": cohort_info.get("decided_on"),
+        "members_total": len(member_tickers),
+        "members_priced": len(priced),
+        "missing": [t for t in member_tickers if t not in priced],
+        "absence": cohort_info.get("absence"),
+        "parse_errors": list(cohort_info.get("parse_errors") or []),
+    }
+    if cohort_info.get("cohort_ids"):
+        theme_cohort_block["cohort_ids"] = list(cohort_info["cohort_ids"])
+
     payload: dict[str, Any] = {
         "kind": "account_scorecard",
-        "schema_version": "stockbot-app/account_scorecard/1",
+        # /2（2026-10-02 Phase 5 Step 5.5）：多 `theme_cohort` 段與每個 horizon 的 `excess_{h}d_vs_theme_cohort` 格。
+        "schema_version": "stockbot-app/account_scorecard/2",
         "title": "帳號計分表：哪個來源歷史上產出贏家",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "as_of": day.isoformat(),
@@ -449,10 +548,11 @@ def build_scorecard(
                      "價格是 yfinance 歷史收盤。**本表不改 tier**——tier 升降是一季一次的 pq2 manual。"),
         },
         "materializer": {
-            "version": "account-scorecard/1",
+            "version": "account-scorecard/2",
             "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
         },
         "benchmarks": list(BENCHMARKS),
+        "theme_cohort": theme_cohort_block,
         "horizons_days": list(HORIZONS_DAYS),
         "lookback_days": LOOKBACK_DAYS,
         "known_biases": list(KNOWN_BIASES),
@@ -462,7 +562,7 @@ def build_scorecard(
         "accounts": accounts,
         "this_is_not": (
             "這不是勝率、也不是投資建議。它量的是「這個來源點名的標的後來相對大盤如何」，"
-            "樣本以個位數月計，且三個已知偏差都還在。"
+            "樣本以個位數月計，且已知偏差都還在。"
             "⚠ tier 升降是一季一次的 pq2 manual——本表是那個決定的輸入，不是那個決定。"
         ),
     }
@@ -472,11 +572,14 @@ def build_scorecard(
         kind="account_scorecard", as_of=payload["as_of"],
         # 認知狀態＝每個帳號的 tier、可計分點名數、五欄各自有沒有值。
         # ⚠ 報酬數字本身的小數變動**不算**認知變化——否則每天重抓價格都會讓它看起來「變了」。
+        # 主題等權組格「有沒有值」已在每個帳號的那兩份 key 清單裡；換了組（cohort_id）或組缺席的種類變了也算認知變化。
         identity={"accounts": [[a["source_id"], a["tier"], a["named_calls"], a["distinct_symbols"],
                                 sorted((a["metrics"].get("excess_returns") or {}).keys()),
                                 [k for k, v in (a["metrics"].get("excess_returns") or {}).items()
                                  if v.get("value") is not None]]
-                               for a in accounts]})
+                               for a in accounts],
+                  "theme_cohort": [theme_cohort_block["cohort_id"],
+                                   (theme_cohort_block["absence"] or {}).get("kind")]})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 
@@ -500,9 +603,16 @@ def _yfinance_closes(
         series: dict[date, float] = {}
         for stamp, value in frame["Close"].items():
             try:
-                series[stamp.date()] = float(value)
+                close = float(value)
+                day = stamp.date()
             except (AttributeError, TypeError, ValueError):
                 continue
+            # ⚠ Phase 5 Step 5.5（plan §0.6 #3）：yfinance 對尚未收盤的歐洲標的會回一根 NaN 收盤（2026-10-01：IQE.L、
+            # SIVE.ST…）。NaN 進了序列，`_pct_change` 就算出 NaN 報酬，中位數的排序結果不確定——同一批值算出的格
+            # 也可能被靜默算錯。跳過它＝該日視同沒有收盤，端點退回前一根（與 `_provider_series` 的 dropna 同一規則）。
+            if close != close:
+                continue
+            series[day] = close
         if series:
             out[symbol] = series
     return out
@@ -513,6 +623,7 @@ def render(scorecard: Mapping[str, Any]) -> str:
     lines = [f"# 帳號計分表（as-of {scorecard['as_of']}）"]
     counts = scorecard.get("tier_counts") or {}
     lines.append("tier 分佈：" + "／".join(f"{k} {v}" for k, v in counts.items()))
+    lines.append(theme_cohort_line(scorecard))
     if scorecard.get("price_note"):
         lines.append(f"⚠ {scorecard['price_note']}")
     for account in scorecard.get("accounts") or []:
@@ -542,11 +653,26 @@ def render(scorecard: Mapping[str, Any]) -> str:
         lines.append(f"- 假設命中率：{_cell(metrics['hypothesis_hit_rate'])}")
         lines.append(f"- no-go 率：{_cell(metrics['no_go_rate'])}")
     lines.append("")
-    lines.append("**三個已知偏差（不是註腳，是這張表的一部分）：**")
+    lines.append("**已知偏差（不是註腳，是這張表的一部分）：**")
     for bias in scorecard.get("known_biases") or []:
         lines.append(f"- {bias}")
     lines.append(f"⚠ {scorecard.get('this_is_not', '')}")
     return "\n".join(lines)
+
+
+def theme_cohort_line(scorecard: Mapping[str, Any]) -> str:
+    """第三個基準的來歷一行：哪一組、哪天定的、成員幾個、取得到價幾個、缺誰（逐檔）。組缺席就印缺席的種類與理由。
+    **只印不比**：不設門檻、不說「夠不夠」（plan 不可越線 4）。artifact 早於 Step 5.5 時沒有這一段——照實說。"""
+    block = scorecard.get("theme_cohort")
+    if not isinstance(block, Mapping):
+        return "主題等權組基準：這份計分表早於這一格（重跑 `python -m webapp materialize --scorecard`）"
+    absence = block.get("absence")
+    if absence:
+        return f"主題等權組基準：無（{absence.get('kind')}）——{absence.get('reason')}"
+    missing = list(block.get("missing") or [])
+    return (f"主題等權組基準：`{block.get('cohort_id')}`（{block.get('theme')}，決定於 {block.get('decided_on')}）"
+            f"｜成員 {block.get('members_total')}、取得到價 {block.get('members_priced')}"
+            f"｜缺價：{'、'.join(missing) if missing else '—'}")
 
 
 def _cell(cell: Mapping[str, Any]) -> str:

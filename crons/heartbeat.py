@@ -1601,8 +1601,21 @@ def build_scorecard(*, state_dir: Path | None = None, previous: Mapping[str, Any
     section.lines.append(line)
     biases = list(card.get("known_biases") or [])
     section.lines.append("完整表（每個帳號的量測窗、點名數、超額報酬、追源成功率）在 APP 帳號計分表頁"
-                         + (f"｜已知偏差 {len(biases)} 條（也在 APP）" if biases else ""))
+                         + (f"｜已知偏差 {len(biases)} 條（也在 APP）" if biases else "")
+                         + f"｜{_scorecard_cohort_cell(card)}")
     return section
+
+
+def _scorecard_cohort_cell(card: Mapping[str, Any]) -> str:
+    """段 5 的一格（Phase 5 Step 5.5）：計分表的第三個基準（主題等權組）**有沒有**——不印數字（數字在 APP）。
+    「無」帶缺席種類；artifact 早於 5.5 沒有這一段＝照實說，不壓成「無」（L12：兩種沒有不同形）。"""
+    block = card.get("theme_cohort")
+    if not isinstance(block, Mapping):
+        return "主題等權組基準：計分表 artifact 早於這一格"
+    absence = block.get("absence")
+    if absence:
+        return f"主題等權組基準：無（{(absence or {}).get('kind')}）"
+    return "主題等權組基準：有"
 
 
 # ---------------------------------------------------------------------------

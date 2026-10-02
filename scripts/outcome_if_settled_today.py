@@ -744,20 +744,11 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
 
 
 def _theme_cohort_info(cohorts: Sequence[Any], errors: Sequence[str]) -> tuple[Any, dict]:
-    """現行主題等權組 → (組或 None, 呈現用的資訊)。0 組 `not_yet_recorded`；多於 1 組不猜哪一組適用（`ambiguous_cohort`）。"""
-    info: dict[str, Any] = {"parse_errors": list(errors), "absence": None}
-    if not cohorts:
-        info["absence"] = {"kind": "not_yet_recorded", "reason": "主題等權組未定義（pq2 complete-theme-cohort 才寫得進來）"}
-        return None, info
-    if len(cohorts) > 1:
-        info["absence"] = {"kind": "ambiguous_cohort",
-                           "reason": f"現行主題等權組有 {len(cohorts)} 組——哪一組適用哪一列不由程式猜"}
-        info["cohort_ids"] = [c.cohort_id for c in cohorts]
-        return None, info
-    cohort = cohorts[0]
-    info.update(cohort_id=cohort.cohort_id, theme=cohort.theme, decided_on=cohort.decided_on.isoformat(),
-                members=[m.ticker for m in cohort.members], members_total=len(cohort.members))
-    return cohort, info
+    """現行主題等權組 → (組或 None, 呈現用的資訊)。**Step 5.5 起搬到 `alpha.theme_cohort.measurement_cohort`**——
+    計分表也要回答「哪一組是基準」，兩邊各寫一份就是兩個答案（plan §12 #4）。這裡只轉呼叫。"""
+    from alpha.theme_cohort import measurement_cohort
+
+    return measurement_cohort(cohorts, errors)
 
 
 def collect(*, no_benchmark: bool = False, today: date | None = None,

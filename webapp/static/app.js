@@ -3201,6 +3201,133 @@ async function renderCandidates() {
 
 /* ---------- 路由 ---------- */
 
+/* ---------- 帳號計分表（account_scorecard state；Phase 5 Step 5.5） ----------
+   一格一個數或一個「為什麼沒有」，原文照抄；不排序帳號（照登記表 source_id 順序）、不加總、不換算——
+   百分比的 ×100 只是排版。三個基準（QQQ／SOXX／主題等權組）並排，**不得只印一個**（單邊上漲偏差）。 */
+
+const SCORECARD_BENCHMARK_LABELS = { QQQ: 'QQQ', SOXX: 'SOXX', theme_cohort: '主題等權組（排除本檔）' };
+
+function scorecardCell(cell) {
+  if (!cell) return '—';
+  if (cell.value === null || cell.value === undefined) {
+    const bits = [`沒有值（${cell.absence_kind || '—'}）`];
+    if (cell.reason) bits.push(cell.reason);
+    if (cell.revisit_after) bits.push(`${cell.revisit_after} 回來看`);
+    return bits.join('——');
+  }
+  return `${fmtPercent(cell.value)}（n=${cell.n}）`;
+}
+
+function scorecardExcessTable(account, payload) {
+  const box = el('div', 'table-view');
+  const table = el('table');
+  const head = el('thead');
+  const hr = el('tr');
+  ['持有期', '比較基準', '全部點名', '每檔只算最早一次'].forEach((t) => hr.appendChild(el('th', null, t)));
+  head.appendChild(hr);
+  table.appendChild(head);
+  const body = el('tbody');
+  const all = (account.metrics || {}).excess_returns || {};
+  const first = ((account.metrics_first_call_per_symbol || {}).excess_returns) || {};
+  const benches = [...(payload.benchmarks || []), 'theme_cohort'];
+  (payload.horizons_days || []).forEach((h) => {
+    benches.forEach((b) => {
+      const key = `excess_${h}d_vs_${b}`;
+      if (!(key in all)) return;          // 早於 5.5 的 artifact 沒有主題等權組那兩格——不補、不寫 0
+      const tr = el('tr');
+      [`點名後 ${h} 天`, SCORECARD_BENCHMARK_LABELS[b] || b, scorecardCell(all[key]), scorecardCell(first[key])]
+        .forEach((t) => tr.appendChild(el('td', null, t)));
+      body.appendChild(tr);
+    });
+  });
+  table.appendChild(body);
+  box.appendChild(table);
+  return box;
+}
+
+async function renderScorecard() {
+  markNav('account-scorecard');
+  let payload;
+  try {
+    payload = await getJSON(`${API}/account-scorecard`);
+  } catch (err) {
+    renderStateError(err, '讀不到帳號計分表');
+    return;
+  }
+  app.textContent = '';
+  footerWarning.textContent = payload.correlation_warning || '';
+
+  const head = el('div', 'detail-head');
+  head.appendChild(el('h1', null, payload.title));
+  const badges = el('div', 'badges');
+  if (payload.freshness && payload.freshness.state === 'stale') {
+    const b = el('span', 'badge badge-stale', 'stale'); b.title = payload.freshness.rule; badges.appendChild(b);
+  }
+  head.appendChild(badges);
+  app.appendChild(head);
+
+  const sec0 = el('section', 'panel callout');
+  sec0.appendChild(el('h2', null, '這張表量什麼'));
+  sec0.appendChild(el('p', 'note', payload.this_is_not || ''));
+  const counts = payload.tier_counts || {};
+  sec0.appendChild(el('p', null, `as-of ${payload.as_of}｜tier 分佈：`
+    + Object.keys(counts).map((t) => `${t} ${counts[t]}`).join('／')));
+  const cohort = payload.theme_cohort;
+  if (!cohort) {
+    sec0.appendChild(el('p', 'warn', '主題等權組基準：這份 artifact 早於這一格——跑 `python -m webapp materialize --scorecard` 重算（不是 0）。'));
+  } else if (cohort.absence) {
+    sec0.appendChild(el('p', 'warn', `主題等權組基準：無（${cohort.absence.kind}）——${cohort.absence.reason}。對組的那幾格全部缺席，不是 0。`));
+  } else {
+    const missing = cohort.missing || [];
+    sec0.appendChild(el('p', 'note', `主題等權組基準：${cohort.cohort_id}（${cohort.theme}，決定於 ${cohort.decided_on}）`
+      + `｜成員 ${cohort.members_total}、取得到價 ${cohort.members_priced}｜缺價：${missing.length ? missing.join('、') : '—'}`));
+  }
+  const budget = payload.price_budget || {};
+  sec0.appendChild(el('p', 'note', `取價：要 ${budget.requested ?? '—'} 檔、抓 ${budget.fetched ?? '—'} 檔（上限 ${budget.cap ?? '—'}）`
+    + ((budget.theme_cohort_added || []).length ? `｜為主題等權組多抓 ${budget.theme_cohort_added.join('、')}` : '')));
+  if ((budget.truncated || []).length) {
+    sec0.appendChild(el('p', 'warn', `取價超過上限，截掉 ${budget.truncated.length} 檔：${budget.truncated.join('、')}——那幾格是缺席，不是沒有價。`));
+  }
+  if (payload.price_note) sec0.appendChild(el('p', 'warn', '▲ ' + payload.price_note));
+  app.appendChild(sec0);
+
+  (payload.accounts || []).forEach((account) => {
+    const sec = el('section', 'panel');
+    sec.appendChild(el('h2', null, `${account.harvest_key}｜tier ${account.tier}（pq1 加分 +${account.pq1_priority_bonus}）`));
+    const f = account.lead_filter || {};
+    sec.appendChild(el('p', null, `量測期間 ${account.measurement_start || '—'} → ${account.measurement_end || '—'}｜`
+      + `具名點名 ${account.named_calls} 則／${account.distinct_symbols} 檔（貼文 ${f.input ?? '—'} 則，可計分 ${f.accepted ?? '—'}、濾掉 ${f.filtered ?? '—'}）`));
+    const reasons = f.reasons || {};
+    if (Object.keys(reasons).length) {
+      sec.appendChild(el('p', 'note', '濾掉的理由：' + Object.keys(reasons).map((r) => `${r} ${reasons[r]}`).join('｜')));
+    }
+    sec.appendChild(scorecardExcessTable(account, payload));
+    const m = account.metrics || {};
+    const firstM = account.metrics_first_call_per_symbol || {};
+    const list = el('ul', 'weak');
+    [
+      [`點名前 ${payload.lookback_days} 天漲幅中位數`, m.prior_30d_move, firstM.prior_30d_move],
+      ['追源成功率', m.trace_success_rate, null],
+      ['假設命中率', m.hypothesis_hit_rate, null],
+      ['no-go 率', m.no_go_rate, null],
+    ].forEach(([label, cell, firstCell]) => {
+      const li = el('li');
+      li.appendChild(el('div', null, `${label}：${scorecardCell(cell)}`));
+      if (firstCell) li.appendChild(el('span', 'rule', `每檔只算最早一次：${scorecardCell(firstCell)}`));
+      list.appendChild(li);
+    });
+    sec.appendChild(list);
+    app.appendChild(sec);
+  });
+
+  const secB = el('section', 'panel');
+  secB.appendChild(el('h2', null, '已知偏差（不是註腳，是這張表的一部分）'));
+  const biases = el('ul', 'weak');
+  (payload.known_biases || []).forEach((b) => biases.appendChild(el('li', null, b)));
+  secB.appendChild(biases);
+  app.appendChild(secB);
+}
+
 async function route() {
   const hash = window.location.hash || '#/';
   const target = decodeURIComponent(hash.replace(/^#\/?/, ''));
@@ -3221,6 +3348,8 @@ async function route() {
     else if (target === 'watches') await renderWatches();
     else if (target === 'positions') await renderPositions();
     else if (target === 'candidates') await renderCandidates();
+    // 2026-10-02（Phase 5 Step 5.5）：帳號計分表頁——心跳段 5 一直寫「完整表在 APP」，這一頁之前其實不存在。
+    else if (target === 'account-scorecard') await renderScorecard();
     else if (target) await renderDetail(target);
     else await renderList();
   } catch (err) {

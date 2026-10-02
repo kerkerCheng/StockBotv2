@@ -35,9 +35,24 @@ from test_webapp_graph_walk_watches import fake_graph_walk_payload, fake_watches
 from test_webapp_positions import fake_positions_payload
 from test_webapp_candidates import fake_candidates_payload
 from test_webapp_structure_table import fake_table_payload
+from test_account_scorecard import fake_scorecard_payload
+from webapp.structure_readings import build_structure_readings_artifact
 
 ROOT = Path(__file__).resolve().parents[1]
 PKG = ROOT / "webapp"
+
+#: 每一個跨標的 state 路由（path → artifact 的 kind）。下面四種證明都走**這一份**，而且有一條測試守它與路由表相等——
+#: 2026-10-02（Step 5.5）之前這四份清單是各自手寫的，`/structure-readings`（Phase 1 加的）從來沒被四種證明走過（L17）。
+STATE_ROUTES: dict[str, str] = {
+    "/api/v1/structure-table": "structure_table",
+    "/api/v1/beta": "beta",
+    "/api/v1/graph-walk": "graph_walk",
+    "/api/v1/watches": "watches",
+    "/api/v1/positions": "positions",
+    "/api/v1/structure-readings": "structure_readings",
+    "/api/v1/candidates": "candidates",
+    "/api/v1/account-scorecard": "account_scorecard",
+}
 
 #: serve 端的三個模組。`materialize.py` 與 `__main__.py` **不在此列**——它們本來就會跑模型。
 SERVE_MODULES = ("api.py", "store.py", "contracts.py")
@@ -94,6 +109,8 @@ def app_dir(tmp_path):
     StateArtifactStore(tmp_path / "state").write(fake_watches_payload())
     StateArtifactStore(tmp_path / "state").write(fake_positions_payload())
     StateArtifactStore(tmp_path / "state").write(fake_candidates_payload())
+    StateArtifactStore(tmp_path / "state").write(build_structure_readings_artifact(rows=[]))
+    StateArtifactStore(tmp_path / "state").write(fake_scorecard_payload(tmp_path / "scorecard_inputs"))
     return tmp_path
 
 
@@ -156,8 +173,7 @@ def test_a_full_request_round_imports_no_model_module(served) -> None:
     before = set(sys.modules)
     for path in ("/api/v1/health", "/api/v1/meta", "/api/v1/stocks",
                  "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/stocks/PENCE",
-                 "/api/v1/stocks/NOPE", "/api/v1/structure-table", "/api/v1/beta", "/api/v1/graph-walk",
-                 "/api/v1/watches", "/api/v1/positions", "/api/v1/candidates", "/", "/static/app.js"):
+                 "/api/v1/stocks/NOPE", *STATE_ROUTES, "/", "/static/app.js"):
         client.get(path)
     added = set(sys.modules) - before
     leaked = sorted(m for m in added
@@ -204,9 +220,8 @@ def test_tree_digest_actually_notices_a_change(tmp_path) -> None:
 def test_requests_change_not_a_single_byte_on_disk(served) -> None:
     client, directory = served
     before = _tree_digest(directory)
-    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", "/api/v1/structure-table", "/api/v1/beta",
-                 "/api/v1/graph-walk", "/api/v1/watches", "/api/v1/positions", "/api/v1/candidates"):
-        assert client.get(path).status_code == 200
+    for path in ("/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/stocks/ABSTAIN", *STATE_ROUTES):
+        assert client.get(path).status_code == 200, path
     assert _tree_digest(directory) == before
 
 
@@ -276,12 +291,8 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
         # ⚠ 2026-09-23（Step 0b.1）：`overview.implied_return` 退役；改問仍在的現價。
         assert body["overview"]["price"]["value"] is not None
         assert client.get("/api/v1/stocks").json()["count"] == 3
-        assert client.get("/api/v1/structure-table").json()["kind"] == "structure_table"
-        assert client.get("/api/v1/beta").json()["kind"] == "beta"
-        assert client.get("/api/v1/graph-walk").json()["kind"] == "graph_walk"
-        assert client.get("/api/v1/watches").json()["kind"] == "watches"
-        assert client.get("/api/v1/positions").json()["kind"] == "positions"
-        assert client.get("/api/v1/candidates").json()["kind"] == "candidates"
+        for path, kind in STATE_ROUTES.items():
+            assert client.get(path).json()["kind"] == kind, path
         assert client.get("/api/v1/stocks/NEVERBUILT").status_code == 503
 
 
@@ -290,12 +301,21 @@ def test_requests_still_work_with_networking_completely_disabled(app_dir, monkey
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
-@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", "/api/v1/structure-table", "/api/v1/beta",
-                                  "/api/v1/graph-walk", "/api/v1/watches",
-                                  "/api/v1/positions", "/api/v1/candidates", "/"])
+@pytest.mark.parametrize("path", ["/api/v1/stocks", "/api/v1/stocks/READY", *STATE_ROUTES, "/"])
 def test_no_mutation_verb_is_routed_anywhere(served, method: str, path: str) -> None:
     client, _ = served
     assert getattr(client, method)(path).status_code == 405
+
+
+def test_every_api_route_is_in_meta_and_walked_by_the_four_proofs(served) -> None:
+    """路由表、`/meta` 的 endpoints 清單、上面四種證明走的 `STATE_ROUTES`——三者必須一致。
+    新增一個路由卻忘了加進證明，那個路由就沒被證明過是「只讀一次檔」（`/structure-readings` 曾經就是這樣）。"""
+    client, _ = served
+    routed = {route.path for route in client.app.routes if route.path.startswith("/api/v1/")}
+    listed = {entry.split(" ", 1)[1] for entry in client.get("/api/v1/meta").json()["endpoints"]}
+    assert routed == listed, {"沒列進 meta": sorted(routed - listed), "meta 多列": sorted(listed - routed)}
+    fixed = {"/api/v1/health", "/api/v1/meta", "/api/v1/stocks", "/api/v1/stocks/{ticker}"}
+    assert routed - fixed == set(STATE_ROUTES), sorted((routed - fixed) ^ set(STATE_ROUTES))
 
 
 def test_api_response_is_semantically_equal_to_the_artifact(served) -> None:

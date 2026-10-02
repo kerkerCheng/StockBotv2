@@ -185,10 +185,12 @@ def test_no_go_rate_excludes_undecided_leads() -> None:
 
 
 def test_known_biases_are_a_field_not_a_footnote() -> None:
-    """三個偏差必須在 artifact 裡，而且逐字包含 SOXX 那一條的理由。"""
-    assert len(sc.KNOWN_BIASES) == 3
+    """偏差必須在 artifact 裡，而且逐字包含 SOXX 那一條的理由。
+    Phase 5 Step 5.5 起第四條：主題等權組是回溯基準（成分是某一天才定的）。刻意硬編條數——加一條就該紅一次。"""
+    assert len(sc.KNOWN_BIASES) == 4
     assert any("SOXX" in b for b in sc.KNOWN_BIASES)
     assert any("倖存者" in b for b in sc.KNOWN_BIASES)
+    assert any("主題等權組" in b and "回溯" in b for b in sc.KNOWN_BIASES)
 
 
 def test_stamp_records_close_or_declares_why_not() -> None:
@@ -290,3 +292,246 @@ def test_time_bound_absence_carries_a_revisit_date_and_capability_absence_does_n
     assert hypothesis["absence_kind"] == "capability_absent"
     assert "revisit_after" not in hypothesis, "要建能力的缺席不得假裝只是等時間"
     assert "ROADMAP" in hypothesis["reason"], "capability_absent 必須指出要建什麼"
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 Step 5.5：第三個基準＝主題等權組（plan §6）
+# ---------------------------------------------------------------------------
+
+def _cohort(*members: str, cohort_id: str = "tc_test", decided_on: str = "2026-09-30"):
+    from datetime import datetime, timezone
+
+    from alpha.theme_cohort import CohortMember, ThemeCohort
+
+    return ThemeCohort(cohort_id=cohort_id, theme="ai_capex_optical",
+                       members=tuple(CohortMember(t, f"co:{t}", "test") for t in members),
+                       excluded=(), reason="test", decided_on=date.fromisoformat(decided_on), pq2_ref=1,
+                       created_at=datetime(2026, 9, 30, tzinfo=timezone.utc))
+
+
+#: 2026-07-01 起 130 天的線性序列：AAA 每天 +1、BBB +0.5、CCC +2、QQQ +0.3、SOXX +0.8。
+_SERIES = {"AAA": (1.0, 100.0), "BBB": (0.5, 100.0), "CCC": (2.0, 100.0), "QQQ": (0.3, 100.0), "SOXX": (0.8, 100.0)}
+
+
+def _prices(*symbols: str):
+    return {s: _flat_series("2026-07-01", 130, *_SERIES[s]) for s in symbols}
+
+
+def _ret(symbol: str, start: str, end: str) -> float:
+    series = _prices(symbol)[symbol]
+    return series[date.fromisoformat(end)] / series[date.fromisoformat(start)] - 1.0
+
+
+def test_theme_cohort_excess_equals_the_hand_computation() -> None:
+    """兩個成員＋一檔點名 → 對組的超額＝本檔報酬 − 兩個成員報酬的等權平均（手算）。"""
+    scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "BBB", "CCC", "QQQ", "SOXX"),
+                              today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
+                              cohort=_cohort("BBB", "CCC"))
+    expected = _ret("AAA", "2026-08-01", "2026-08-31") - (
+        _ret("BBB", "2026-08-01", "2026-08-31") + _ret("CCC", "2026-08-01", "2026-08-31")) / 2
+    cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] == pytest.approx(expected) and cell["n"] == 1
+    ninety = scored["excess_returns"]["excess_90d_vs_theme_cohort"]
+    assert ninety["value"] == pytest.approx(_ret("AAA", "2026-08-01", "2026-10-30") - (
+        _ret("BBB", "2026-08-01", "2026-10-30") + _ret("CCC", "2026-08-01", "2026-10-30")) / 2)
+    # QQQ／SOXX 兩格照舊：第三個基準是**加**一格，不取代任何一格
+    assert scored["excess_returns"]["excess_30d_vs_QQQ"]["value"] == pytest.approx(
+        _ret("AAA", "2026-08-01", "2026-08-31") - _ret("QQQ", "2026-08-01", "2026-08-31"))
+
+
+def test_the_called_symbol_is_excluded_from_its_own_theme_cohort() -> None:
+    """本檔是成員時從組裡排除——不然它一部分是在跟自己比。"""
+    scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "BBB", "QQQ", "SOXX"),
+                              today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
+                              cohort=_cohort("AAA", "BBB"))
+    cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] == pytest.approx(
+        _ret("AAA", "2026-08-01", "2026-08-31") - _ret("BBB", "2026-08-01", "2026-08-31"))
+
+
+def test_absent_cohort_is_not_yet_recorded_not_zero() -> None:
+    """沒有組 → 每一格是 `not_yet_recorded` 缺席（附理由），不是 0、也不是「樣本不足」。"""
+    scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "QQQ", "SOXX"),
+                              today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
+                              cohort=None, cohort_absence={"kind": "not_yet_recorded", "reason": "主題等權組未定義"})
+    for horizon in sc.HORIZONS_DAYS:
+        cell = scored["excess_returns"][f"excess_{horizon}d_vs_theme_cohort"]
+        assert cell["value"] is None and cell["absence_kind"] == "not_yet_recorded" and cell["reason"]
+
+
+def test_unpriced_cohort_is_insufficient_sample_with_its_own_reason() -> None:
+    """組在、成員一檔都取不到價 → 缺席，filter reasons 寫 `theme_cohort_unpriced`（不與「標的沒價」混成一條）。"""
+    scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "QQQ", "SOXX"),
+                              today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
+                              cohort=_cohort("BBB"))
+    cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] is None and cell["absence_kind"] == sc.ABSENCE_INSUFFICIENT
+    assert scored["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {"theme_cohort_unpriced": 1}
+
+
+@pytest.fixture()
+def scorecard_env(monkeypatch, tmp_path):
+    """一個帳號（`x:acct`）、一則點名 AAA（2026-08-01）、名冊只認得 AAA——不讀真的 lead registry、登記表、名冊。"""
+    import identity.registry as registry_mod
+
+    source_path = _write_registry(tmp_path, [
+        {"source_id": "acct", "platform": "x", "handle": "acct", "status": "active", "tier": "probation",
+         "research_priority": 1, "auto_capture": True}])
+    real_load = ssr.load
+    monkeypatch.setattr(ssr, "load", lambda path=None: real_load(source_path))
+
+    class _Registry:
+        ticker_map = {"co:AAA": "AAA"}
+
+    monkeypatch.setattr(registry_mod, "get_registry", lambda: _Registry())
+    leads = tmp_path / "pending_leads.json"
+    leads.write_text(json.dumps({"leads": {"lead_1": {
+        "lead_id": "lead_1", "source": "x:acct", "published_at": "2026-08-01T12:00:00Z", "status": "parked",
+        "entities": {"company_ids": ["co:AAA"], "tickers": ["AAA"]}, "refs": {}}}}), encoding="utf-8")
+    asked: list[list[str]] = []
+
+    def loader(wanted, start, end):
+        asked.append(list(wanted))
+        return _prices(*[s for s in wanted if s in _SERIES])
+
+    return {"leads": leads, "loader": loader, "asked": asked}
+
+
+def _build(env, **kw):
+    return sc.build_scorecard(leads_path=env["leads"], today=date(2026, 10, 31), price_loader=env["loader"], **kw)
+
+
+def fake_scorecard_payload(directory) -> dict:
+    """給 APP request path 測試用的計分表 artifact：**真的 `build_scorecard`**（出貨的登記表與名冊、空的 lead 檔、
+    不抓價、沒有組）——形狀跟著真的 materializer 走，不另手寫一份會漂開的假 payload。"""
+    from pathlib import Path
+
+    directory = Path(directory)
+    directory.mkdir(parents=True, exist_ok=True)
+    leads = directory / "pending_leads.json"
+    leads.write_text(json.dumps({"leads": {}}), encoding="utf-8")
+    return sc.build_scorecard(leads_path=leads, today=date(2026, 10, 2), price_loader=lambda *_: {},
+                              cohorts=([], []))
+
+
+def test_build_adds_cohort_members_to_the_price_list_and_reports_the_block(scorecard_env) -> None:
+    """成員併進取價清單（集合、去重）：`requested` 增加的數＝成員中原本不在清單的檔數；payload 印組的來歷。"""
+    card = _build(scorecard_env, cohorts=([_cohort("AAA", "BBB", "CCC", "QQQ")], []))
+    budget = card["price_budget"]
+    assert budget["theme_cohort_added"] == ["BBB", "CCC"]           # AAA（點名）與 QQQ（基準）本來就在
+    assert budget["requested"] == 2 + 1 + 2 and budget["truncated"] == []
+    assert scorecard_env["asked"] == [["AAA", "BBB", "CCC", "QQQ", "SOXX"]]
+    block = card["theme_cohort"]
+    assert block == {"cohort_id": "tc_test", "theme": "ai_capex_optical", "decided_on": "2026-09-30",
+                     "members_total": 4, "members_priced": 4, "missing": [], "absence": None, "parse_errors": []}
+    cell = card["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] == pytest.approx(_ret("AAA", "2026-08-01", "2026-08-31") - sum(
+        _ret(s, "2026-08-01", "2026-08-31") for s in ("BBB", "CCC", "QQQ")) / 3)
+    assert card["schema_version"] == "stockbot-app/account_scorecard/2"
+
+
+def test_truncation_cuts_cohort_members_before_calls_and_never_benchmarks(scorecard_env, monkeypatch) -> None:
+    """L11-6 ④：最先壞的是截斷——成員不是基準、可被截，但不得把基準或點名標的擠掉；被截的照印、該格缺席。"""
+    monkeypatch.setattr(sc, "MAX_PRICED_SYMBOLS", 3)
+    card = _build(scorecard_env, cohorts=([_cohort("BBB", "CCC")], []))
+    assert card["price_budget"]["truncated"] == ["BBB", "CCC"]
+    assert scorecard_env["asked"] == [["AAA", "QQQ", "SOXX"]]
+    assert card["theme_cohort"]["missing"] == ["BBB", "CCC"] and card["theme_cohort"]["members_priced"] == 0
+    metrics = card["accounts"][0]["metrics"]["excess_returns"]
+    assert metrics["excess_30d_vs_QQQ"]["value"] is not None and metrics["excess_30d_vs_SOXX"]["value"] is not None
+    assert metrics["excess_30d_vs_theme_cohort"]["value"] is None
+    assert "theme_cohort.missing" in card["price_note"]
+
+
+@pytest.mark.parametrize("cohorts, kind", [
+    (([], []), "not_yet_recorded"),
+    (None, "upstream_unavailable"),
+])
+def test_cohort_absence_kinds_reach_the_payload(scorecard_env, monkeypatch, cohorts, kind) -> None:
+    """0 組 → `not_yet_recorded`；ledger 讀不到 → `upstream_unavailable`（計分表其餘照算）；多組另見下一條。"""
+    import alpha.providers.theme_cohorts as provider
+
+    def broken(**_kw):
+        raise OSError("ledger unreadable")
+
+    monkeypatch.setattr(provider, "current_cohorts", broken)
+    card = _build(scorecard_env, cohorts=cohorts)
+    assert card["theme_cohort"]["absence"]["kind"] == kind
+    cell = card["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] is None and cell["absence_kind"] == kind
+    assert card["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_QQQ"]["value"] is not None
+    assert card["price_budget"]["theme_cohort_added"] == []
+
+
+def test_more_than_one_current_cohort_is_ambiguous_not_guessed(scorecard_env) -> None:
+    card = _build(scorecard_env, cohorts=([_cohort("BBB", cohort_id="tc_a"), _cohort("CCC", cohort_id="tc_b")], []))
+    assert card["theme_cohort"]["absence"]["kind"] == "ambiguous_cohort"
+    assert card["theme_cohort"]["cohort_ids"] == ["tc_a", "tc_b"]
+
+
+def test_freshness_follows_the_cohort_not_the_prices(scorecard_env) -> None:
+    """換一組（cohort_id）＝認知變化；同一組、價格小數變動＝不是。"""
+    first = _build(scorecard_env, cohorts=([_cohort("BBB")], []))
+    shifted = dict(_SERIES, BBB=(0.6, 101.0))
+    original = scorecard_env["loader"]
+
+    def other_prices(wanted, start, end):
+        original(wanted, start, end)
+        return {s: _flat_series("2026-07-01", 130, *shifted[s]) for s in wanted if s in shifted}
+
+    scorecard_env["loader"] = other_prices
+    repriced = _build(scorecard_env, cohorts=([_cohort("BBB")], []))
+    other = _build(scorecard_env, cohorts=([_cohort("BBB", cohort_id="tc_other")], []))
+    assert first["freshness_identity"] == repriced["freshness_identity"]
+    assert first["freshness_identity"] != other["freshness_identity"]
+
+
+def test_render_and_heartbeat_show_the_cohort_cell(scorecard_env, tmp_path) -> None:
+    """render 印組的來歷與每格；心跳段 5 只印「有／無」一格，不印數字。"""
+    from crons import heartbeat as hb
+    from webapp.store import StateArtifactStore
+
+    card = _build(scorecard_env, cohorts=([_cohort("BBB", "CCC")], []))
+    text = sc.render(card)
+    assert "主題等權組基準：`tc_test`（ai_capex_optical，決定於 2026-09-30）｜成員 2、取得到價 2｜缺價：—" in text
+    assert "excess_30d_vs_theme_cohort" in text and "**已知偏差" in text
+    StateArtifactStore(tmp_path / "state").write(card)
+    line = hb.build_scorecard(state_dir=tmp_path / "state").lines[-1]
+    assert line.endswith("｜主題等權組基準：有"), line
+
+    absent = _build(scorecard_env, cohorts=([], []))
+    assert "主題等權組基準：無（not_yet_recorded）" in sc.render(absent)
+    StateArtifactStore(tmp_path / "state").write(absent)
+    assert hb.build_scorecard(state_dir=tmp_path / "state").lines[-1].endswith("主題等權組基準：無（not_yet_recorded）")
+    assert sc.theme_cohort_line({}) .startswith("主題等權組基準：這份計分表早於這一格")
+
+
+def test_yfinance_nan_close_is_skipped_so_the_endpoint_falls_back(monkeypatch) -> None:
+    """§0.6 #3：yfinance 對尚未收盤的歐洲標的回 NaN 收盤——跳過它，端點退回前一根；不跳就算出 NaN 報酬。"""
+    import sys
+    import types
+    from datetime import datetime as _dt, timedelta as _td
+
+    days = [_dt(2026, 9, 1) + _td(days=i) for i in range(40)]
+    closes = [100.0 + i for i in range(40)]
+    closes[-1] = float("nan")                                    # 終點那一天是 NaN
+
+    class _Column:
+        def items(self):
+            return zip(days, closes)
+
+    class _Frame:
+        empty = False
+
+        def __contains__(self, key):
+            return key == "Close"
+
+        def __getitem__(self, key):
+            return _Column()
+
+    fake = types.SimpleNamespace(Ticker=lambda symbol: types.SimpleNamespace(history=lambda **kw: _Frame()))
+    monkeypatch.setitem(sys.modules, "yfinance", fake)
+    series = sc._yfinance_closes(["IQE.L"], date(2026, 9, 1), date(2026, 10, 10))["IQE.L"]
+    assert days[-1].date() not in series and len(series) == 39
+    move = sc._pct_change(series, date(2026, 9, 1), days[-1].date())
+    assert move == pytest.approx(138.0 / 100.0 - 1.0)            # 退回前一根，不是 NaN

@@ -76,7 +76,8 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "positions": "stockbot-app/positions/2",
     # /2（2026-10-02 Phase 5 Step 5.4）：多 `predictions`（圖預測對錯表）。
     "structure_readings": "stockbot-app/structure_readings/2",
-    "account_scorecard": "stockbot-app/account_scorecard/1",
+    # /2（2026-10-02 Phase 5 Step 5.5）：多 `theme_cohort` 段與 `excess_{h}d_vs_theme_cohort` 格（第三個基準）。
+    "account_scorecard": "stockbot-app/account_scorecard/2",
     "candidates": "stockbot-app/candidates/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)

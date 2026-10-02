@@ -161,6 +161,25 @@ def select_current(records: Sequence[ThemeCohort], *, as_of: date | None = None)
 # 量測基準（Phase 5 Step 5.2；決定紀錄 §4.2：「已定價嗎」的對照組與 G9 量測基準共用同一個組）
 # ---------------------------------------------------------------------------
 
+def measurement_cohort(cohorts: Sequence[ThemeCohort], errors: Sequence[str]) -> tuple[ThemeCohort | None, dict]:
+    """現行主題等權組 → (組或 None, 呈現用的資訊)。追蹤表與計分表共用這一支（plan §12 #4：「哪一組是基準」只有一個答案）。
+
+    0 組 → `not_yet_recorded`；多於 1 組**不猜**哪一組適用（`ambiguous_cohort`）；壞行原樣帶出（INV-3）。"""
+    info: dict[str, Any] = {"parse_errors": list(errors), "absence": None}
+    if not cohorts:
+        info["absence"] = {"kind": "not_yet_recorded", "reason": "主題等權組未定義（pq2 complete-theme-cohort 才寫得進來）"}
+        return None, info
+    if len(cohorts) > 1:
+        info["absence"] = {"kind": "ambiguous_cohort",
+                           "reason": f"現行主題等權組有 {len(cohorts)} 組——哪一組適用哪一列不由程式猜"}
+        info["cohort_ids"] = [c.cohort_id for c in cohorts]
+        return None, info
+    cohort = cohorts[0]
+    info.update(cohort_id=cohort.cohort_id, theme=cohort.theme, decided_on=cohort.decided_on.isoformat(),
+                members=[m.ticker for m in cohort.members], members_total=len(cohort.members))
+    return cohort, info
+
+
 def _usable_close(value: Any) -> bool:
     """收盤能不能用：數字、不是 NaN、正數。yfinance 會對尚未收盤的歐洲標的回一根 NaN 收盤（2026-10-01：IQE.L、SIVE.ST…），
     混進來的話等權平均與中位數都會被靜默污染（NaN 不等於自己，排序結果不確定）。"""
@@ -216,5 +235,5 @@ def cohort_return(cohort: ThemeCohort, *, start: date, end: date, series: Mappin
 
 
 __all__ = ["RECORD_VERSION", "SPEC_FIELDS", "CohortMember", "ThemeCohort", "close_on_or_before", "cohort_record",
-           "cohort_return", "new_cohort_id", "parse_cohort_record", "select_current", "series_return", "spec_digest",
-           "validate_spec"]
+           "cohort_return", "measurement_cohort", "new_cohort_id", "parse_cohort_record", "select_current",
+           "series_return", "spec_digest", "validate_spec"]

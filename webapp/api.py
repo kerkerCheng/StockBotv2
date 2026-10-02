@@ -101,6 +101,10 @@ async def meta(request: Request) -> Response:
             f"GET /api/{API_VERSION}/structure-readings",
             f"GET /api/{API_VERSION}/watches",
             f"GET /api/{API_VERSION}/positions",
+            # 2026-10-02（Step 5.5）：/candidates（Phase 3 Step 3.6 加的路由）一直漏在這張清單外；
+            # 清單與路由表的一致性改由 tests/test_webapp_request_path.py 守（不再靠人記得）。
+            f"GET /api/{API_VERSION}/candidates",
+            f"GET /api/{API_VERSION}/account-scorecard",
         ],
         "not_offered": [
             "沒有任何寫入端點：不下單、不記錄選擇、不改 thesis、不入圖、不核准 pq2。",
@@ -296,6 +300,18 @@ async def positions(request: Request) -> Response:
     return await _serve_state(request, "positions")
 
 
+# 2026-10-02（Phase 5 Step 5.5）：計分表 artifact 自 Phase 3 就 materialize，心跳段 5 也一直寫「完整表在 APP」，
+# 但 APP 從來沒有這個路由——補上。照抄 `build_scorecard` 的輸出，不重算（價格是 materialize 抓的，request path 不抓）。
+_STATE_NOTES["account_scorecard"] = (
+    "python -m webapp materialize --scorecard",
+    "「artifact 讀不到」與「某一格沒有值」是兩件事——後者會以 200 ＋ 該格的 absence_kind 與理由回。")
+
+
+async def account_scorecard(request: Request) -> Response:
+    """帳號計分表：哪個來源歷史上產出贏家（五欄＋三個基準＋已知偏差；照抄，不排序帳號、不給 tier 建議）。"""
+    return await _serve_state(request, "account_scorecard")
+
+
 async def index(request: Request) -> Response:
     return _static_file("index.html")
 
@@ -382,6 +398,7 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         Route(f"/api/{API_VERSION}/positions", positions, methods=["GET"]),
         Route(f"/api/{API_VERSION}/structure-readings", structure_readings, methods=["GET"]),
         Route(f"/api/{API_VERSION}/candidates", candidates, methods=["GET"]),
+        Route(f"/api/{API_VERSION}/account-scorecard", account_scorecard, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks", stocks, methods=["GET"]),
         Route(f"/api/{API_VERSION}/stocks/{{ticker}}", stock_detail, methods=["GET"]),
     ]
