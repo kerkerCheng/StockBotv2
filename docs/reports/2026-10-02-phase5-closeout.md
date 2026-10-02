@@ -27,7 +27,7 @@
 | 4 | 無新 dual authority | ✅ 三量與等權只有 `scripts/outcome_if_settled_today.py` 的 `power_law_aggregate`／`equal_weight_aggregate`（三條 lane、APP 的 `positions_lanes`、心跳讀 artifact 共用）；主題等權組報酬只有 `alpha.theme_cohort.cohort_return`、「哪一組是基準」只有 `measurement_cohort`（追蹤表與計分表共用，5.5 把追蹤表那份搬過來）；預測終局只有 `alpha/structure_reading/predictions.py`；alpha 判別只走 `risk/hard_caps` 的 `is_beta_symbol`；symbol → 公司只走 `resolve_holding`（live lane 與回填共用） | 各模組 docstring 與 `tests/test_measurement_full_chain.py` |
 | 5 | 無 silent drop | ✅ 空 lane 印「還沒有列」（live 今天就是）；未滿 12 個月印「還沒有一檔滿 12 個月」不印 0%；組缺價成員逐檔列（`theme_cohort.missing`）；預測表 `undated` 與 `upstream_unavailable` 分開、壞行節點列在 `unreadable_nodes`；被截掉的取價列在 `price_budget.truncated`；序列壞行原樣保留 | `tests/test_measurement_lanes.py`、`tests/test_reading_predictions.py`、`tests/test_account_scorecard.py`、`tests/test_webapp_candidates_series.py` |
 | 6 | Point-in-time | ✅ 錨點價取錨點日或之前的可用收盤（`test_series_return_skips_nan_and_never_looks_ahead`）；預測表錯的種類只看 `published_at`，不拿 `retrieved_at`／`first_seen` 冒充；as-of 視角的預測段明確回 `point_in_time_unavailable`；`audit PointInTime` PASS | `python -m audit invariants --only PointInTime` |
-| 7 | lifecycle 可達 | ⚪ QueueLiveness、Expiry PASS；**驗收②的回查載體待使用者定**（結案 R2 B1；plan §0.6 #31；兩個選項與五欄草案在 §9）：date watch 只能叫醒 pq2／假設／lead／敘事，回查是開發項而 AGENTS「開發項不走 pq2」——Phase 1 結案撞過同一個衝突、使用者選了心跳計數器。在你決定之前，回查暫由每天自己出現的計數器承載：心跳段 4「圖預測…｜現行最早到期 2026-12-24」與快照鍵 `predictions.held`／`predictions.wrong`／`predictions.expired_unread`；兩份現行讀圖 12-24 到期當天進走圖第 4 型。要改登記 watch 的指令在 §7 | `python -m crons.heartbeat`；`crons/heartbeat.py::SNAPSHOT_KEYS` |
+| 7 | lifecycle 可達 | ✅ QueueLiveness、Expiry PASS；**驗收②的回查由心跳常駐計數器承載**（結案 R2 B1 → 使用者 2026-10-02 選 A，ROADMAP amendment A4；plan §0.6 #31；§9）：date watch 只能叫醒 pq2／假設／lead／敘事，回查是開發項而 AGENTS「開發項不走 pq2」——Phase 1 結案撞過同一個衝突、使用者選了心跳計數器。回查由每天自己出現的計數器承載：心跳段 4「圖預測…｜現行最早到期 2026-12-24」與快照鍵 `predictions.held`／`predictions.wrong`／`predictions.expired_unread`；兩份現行讀圖 12-24 到期當天進走圖第 4 型 | `python -m crons.heartbeat`；`crons/heartbeat.py::SNAPSHOT_KEYS` |
 | 8 | executable protection | ✅ 回填旗標：七種拒收逐字斷言理由＋排程時區讀不到拒收＋名冊讀不到 fail closed＋一種放行（`tests/test_record_trade_receipt.py` §7）；lane 混算變異紅（5.2）；`supply_added` 接進預測表的變異紅（5.4）；apply 入口缺 token fail closed（`tests/test_apply_ra_admission.py`）；聚合檔既有四欄不變（`test_persist_keeps_the_four_fields_and_adds_lanes`）；請求路徑四種證明改走同一份 `STATE_ROUTES`，另有守門測試（5.5）；**殭屍 grep 未列 0／腐壞 0／不合法 0** | `python scripts/retired_mechanism_grep.py` |
 | 9 | 驗收數的是 §11 的層 | ✅ §2 每個數字都是追蹤表、讀圖、等待 registry、計分表或機制存在與否；沒有任何一個是「幾檔通過某個 filter」 | — |
 
@@ -45,7 +45,7 @@
 | 驗收 | 數的東西 | 結果 |
 |---|---|---|
 | ① 追蹤表印主題等權組超額 | paper／live 每列與 lane 聚合的 `excess_theme_cohort` 有值或有缺席 kind | ✅ paper **4／4 列有值**（positions artifact：平均 +4.07%；17:1x 以當下價格重算 +4.93%——只差價格時點）；live **0 列**＝「還沒有列」（不是 0%）；history 22／22（−2.42%）。主題等權組 `tc_35b0d5cd521656ea`（AI 光互連／CPO，09-30 定）15 檔、缺價 0；每列排除本檔 |
-| ② 圖預測表有第一筆對／錯，每筆錯標明種類 | `predictions` 的 held＋reversed＋disproof_touched＋retracted | ⚪ **已交付、未生效**（照 §0.1 #4）：真實 15 筆＝對 0／錯 0／改寫 9／現行 2／非斷言 4，與 baseline §5.2 手算逐筆相同；機制由夾具證明（`tests/test_reading_predictions.py` 11 條、full chain 1 條：對 1／錯 2 種類各一）。現行最早到期 **2026-12-24**；回查載體**待使用者定**（§9） |
+| ② 圖預測表有第一筆對／錯，每筆錯標明種類 | `predictions` 的 held＋reversed＋disproof_touched＋retracted | ⚪ **已交付、未生效**（照 §0.1 #4）：真實 15 筆＝對 0／錯 0／改寫 9／現行 2／非斷言 4，與 baseline §5.2 手算逐筆相同；機制由夾具證明（`tests/test_reading_predictions.py` 11 條、full chain 1 條：對 1／錯 2 種類各一）。現行最早到期 **2026-12-24**；回查由心跳常駐計數器承載（使用者 2026-10-02 選 A，amendment A4） |
 | ③ 計分表印量測起始日與樣本數 | `measurement_start`／`named_calls`；新加的組格 `n` 與 `members_priced` | ✅ `x:aleabitoreddit`：量測期間 2026-06-29 → 10-01、具名點名 991 則／40 檔；對組超額 30 天 n=790、90 天 n=116（每檔最早一次 39／29）；`members_priced` 15／15 |
 | 三條 lane | history 錨點與 5.0 相同；paper 錨點 09-29；live 0 列＋beta 事件不進 lane | ✅ history 22 列錨點 digest＝5.0；paper 4 列錨點全是第一份 v2（AXTI `ib_b6b3…`、COHR `ib_9a58…`、LITE `ib_78d7…`、SIVE.ST `ib_84e5…`，09-29）、三量每格有值或印「還沒有一檔滿 12 個月」；live 0 列、beta 事件 2 不進 lane、配對不到的賣出 0 |
 | 候選狀態序列 | 行數＝結案日 − 5.6 交付日 ＋ 1 | ✅ 1 行（10-02 交付、10-02 結案；與 artifact 計數逐鍵相同，baseline §19） |
@@ -87,7 +87,7 @@
 | 12 | 白天互動跑追蹤表會取到歐股與台股**盤中尚未收盤**的當日 K 棒；要不要在取價端排除 |
 | 14 | 本機 gitignored 的 `.claude/settings.local.json` 有 `Bash(python *)`：互動 session 不經提示就能跑會寫 trade_log（`--apply` 時還寫 Sheet）的 `record_trade.py`；要不要收窄 |
 | 15 | 過去的計分表數字可能被 NaN 靜默算錯，之前存下的 artifact 沒有歷史版本——若 tier 升降曾引用過，要重看 |
-| **16** | **（結案新增）驗收②的回查載體**：照 Phase 1 前例用心跳常駐計數器（本次做法），或改登記 date watch（要先鑄一個 manual pq2 當喚醒目標——與「開發項不走 pq2」衝突，所以需要你明說）。**結案 R2 B1：決定前 ROADMAP Phase 5 不標 ✅**；兩個選項與五欄草案在 §9 |
+| **16** | ✅ **已定（2026-10-02 使用者選 A：心跳常駐計數器；ROADMAP amendment A4）**——**（結案新增）驗收②的回查載體**：照 Phase 1 前例用心跳常駐計數器（本次做法），或改登記 date watch（要先鑄一個 manual pq2 當喚醒目標——與「開發項不走 pq2」衝突，所以需要你明說）。**結案 R2 B1：決定前 ROADMAP Phase 5 不標 ✅**；兩個選項與五欄草案在 §9 |
 | **18** | **（結案 R2 N2）改寫規則①（同 digest＝改寫）不分 kind、也不限同日**：同一張圖、不同 kind 的後繼（例 volume→neither 純改判）會記成「改寫」而不是「錯」；定案 #3 的原句是「同 digest 的**同日**改寫」。今天 0 筆。要不要把①收窄成「同 kind 或同日」 |
 
 **不需要使用者決定、下一個 plan 照列的：**
@@ -132,12 +132,7 @@
    FRA:2DG 照同一個樣子，換成你的成交日與價，另加 `--currency EUR --fx-to-base <1 EUR = ? USD>`。
 3. **重啟兩個長駐 APP**：PID 15956（127.0.0.1:8790，2026-09-10 23:13 起）與 PID 6992（127.0.0.1:8799，2026-10-01 21:19 起）都跑 Phase 5 之前的程式，讀不到 positions／structure_readings／account_scorecard 的 `/2`，也沒有計分表頁。
 4. **§5「改寫」規則的收據**（5.0）：同 kind 的後繼若 schema 版本不同、或沒有帶來新來源，也算改寫——真實資料「對」5→0。你可以否決，否決就改回原規則。
-5. **驗收②的回查**（§5 #16）：若要改登記 date watch，指令依序是：
-   ```powershell
-   python -m engine_b.todo add "回查 Phase 5 驗收②：圖預測表第一筆對／錯（兩份讀圖 12-24 到期）" --ref docs/reports/2026-10-02-phase5-closeout.md
-   python -m engine_b.event_watch add --kind date --until 2026-12-24 --expires 2027-01-07 --wake-pq2 <上一步的編號>
-   python -m engine_b.todo resolve <編號> --verb pending --trigger "2026-12-24 兩份讀圖到期" --watch <上一步的 ew_id>
-   ```
+5. **驗收②的回查**（§5 #16）：已定——使用者 2026-10-02 選 A（心跳常駐計數器），不登記 date watch、不鑄 pq2。
 6. **本機權限**（§5 #14）：要不要把 `.claude/settings.local.json` 的 `Bash(python *)` 收窄。
 
 ## 8. 結案 R2（使用者已常規 opt-in）
@@ -168,12 +163,15 @@
 改成心跳計數器、ROADMAP 沒改——等於改了 ROADMAP 的驗收定義（停止條件④），也偏離 §0.1 #4。Phase 1 前例的程序是「結案時向使用者提出，使用者選」。
 修法：先取得使用者對 §5 #16 的選擇——(a) 選心跳計數器：同一個 commit 以五欄 amendment 改 ROADMAP 驗收②那句話（草案在 §9）；(b) 選 date watch：照 §7 #5
 的三行指令登記，`python -m audit invariants --only Expiry` PASS。選定並完成之後不需要再覆核。
-**處置（執行者）：** plan §11、§12 #7 已還原原文，§0.6 #31 改寫成「待使用者定」；ROADMAP 與 plans README 不動；`AWAITING_HUMAN`。
+**處置（執行者）：** plan §11、§12 #7 先還原原文、§0.6 #31 改寫成「待使用者定」、ROADMAP 與 plans README 不動、`AWAITING_HUMAN`。
+**B1 解除（2026-10-02）：** 使用者選 A（「A 繼續吧」）。同一個 commit：ROADMAP Phase 5 列以五欄 amendment A4 改寫驗收②那一句並標 ✅、plan §0.4 A4／§11／§12 #7／§0.6 #31／進度表與 frontmatter、`docs/plans/README.md` 本列 completed。依 B1 修法原文，選定並完成之後不需要再覆核。
 
 **Non-blocking（都進 §5）：** N1 心跳「N 天前」四捨五入（既有程式）；N2 改寫規則①不分 kind、也不限同日（定案 #3 原句是「同 digest 的**同日**改寫」）；
 N3 預測表的讀圖日期用 UTC、paper lane 用排程時區；N4 殭屍 grep 以（檔，組）計，已登記的檔裡新增的命中抓不到（手掃 Phase 5 新增行 2 處，都在既有 keep 理由內）。
 
-## 9. 待使用者定：驗收②的回查載體（結案 R2 B1；§5 #16）
+## 9. 驗收②的回查載體（結案 R2 B1；§5 #16）——**使用者 2026-10-02 定案：A**
+
+**定案：(a) 心跳常駐計數器。** 下面的五欄已原樣成為 plan §0.4 的 amendment A4，ROADMAP Phase 5 列同一個 commit 改寫。
 
 兩份現行讀圖（inp 層、cw_dfb 層）2026-12-24 到期。驗收②「圖預測表有第一筆對／錯」今天是 0，回查要有一個會自己出現的載體。
 
