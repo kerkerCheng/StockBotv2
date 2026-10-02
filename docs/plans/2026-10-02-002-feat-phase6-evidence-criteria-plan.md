@@ -118,7 +118,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.0 | [666] 收尾（10-02 的 go；10-03 apply／publish／結案，6 條升外部印證）＋基準快照（`docs/reports/2026-10-03-phase6-baseline.md`；證據等級凍結進 `config/graph_baselines.json` 的 `evidence_classes_2026_10_03`；偏差見 §0.6 #1–#3） | ✅ | 執行模型 | 見 git log「Step 6.0」 |
 | 6.1 | 插槽讀圖 staleness：同級標籤互換算低等級（任何改分類之前；rank 由呼叫端注入、沒有預設；真實資料見 baseline §15） | ✅ | 執行模型 | 見 git log「Step 6.1」 |
 | 6.2 | 身分清理：OpenLight 合併、nava 定案（Lumentum 自有 Navanakorn 廠→退役）；遷移與 RA packet 印入圖副作用（#32）；R2-a GO（兩條非阻擋觀察補防線）；**pq2 [670] 等 go，apply 在 go 之後**（baseline §16；偏差 §0.6 #4–#5） | ✅ | 執行模型 | 見 git log「Step 6.2」 |
-| 6.3 | 證據資料：名冊三個寫法、GSR→media、名冊新公司、SourceDoc origin 更正（pq2）、綜述論文登記、四則 lead 標籤（pq2） | ○ | 執行模型 | |
+| 6.3 | 證據資料：名冊兩個寫法（Arista、GF；Apollo 誤中不加）、GSR→media（3 條）、名冊新公司 5 家（2 條升級附引文）、`origin_entity` 進 SourceDoc 同步欄位（iqe 對齊）、綜述論文期刊登記 media；**pq2 [671]（SourceDoc origin 三筆）、[672]（四則 lead 標籤）等 go**（baseline §17；偏差 §0.6 #6–#8） | ✅ | 執行模型 | 見 git log「Step 6.3」 |
 | 6.4 | 分類規則：逐來源具名＋轉述字表（唯一 owner）、所有消費端改走它、計數器改口徑、packet 印「入圖後證據等級會變的邊」 | ○ | 執行模型 | |
 | 6.5 | sub 旗標跟著值走到消費端（不進 digest） | ○ | 執行模型 | |
 | 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）；R2-b | ○ | 執行模型 | |
@@ -146,6 +146,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 5 | 6.2d | 「`scripts/prepare_research_action.py` 產 packet 時以唯讀 session 比對…」 | 照做（`intake.application._merge_side_effect_receipt`）；另把 `tests/test_research_actions.py::test_prepare_validates_every_document_without_graph_or_publication` 改寫成 `…_reads_the_graph_read_only_and_never_publishes`（假 driver 擋寫入 Cypher） | 舊測試守的「prepare 不開圖」從來沒被守住：同 URL 多段檢查本來就開圖，並以 `except Exception: pass` 吞掉 AssertionError 絆線；6.2d 起 prepare 本來就要唯讀查圖，守的東西收窄成「只讀、不寫、不 publish」（plan 不可越線 11：刪改測試要寫它守的是什麼、現在由誰守） |
 | 6 | 6.3a（影響 6.4、6.8） | 名冊三個寫法：`co:apollo` 加「Apollo」、`co:arista` 加「Arista」、`co:globalfoundries` 加「GF」 | 只加 Arista、GF；**Apollo 不加** | 全圖逐字整詞比對：「Apollo」4 段裡 2 段是 Google 的「Apollo OCS platform」（專案代號）——plan 本節的規則「有任何一筆不是在講這家公司 → 不加那個寫法、寫進偏差」；`co:apollo invests_in co:broadcom` 在 6.4 之後進 `corroboration_withheld.unnamed`，6.8 讀原文決定（baseline §17.1） |
 | 7 | 6.3e | `MDPI Micromachines`：`seen_in: cpo_chip_package_paper` | `seen_in: Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era` | `seen_in` 的契約是「讓這筆被登記的那份 **SourceDoc id**」（`query/origin_resolution.py::Publisher`）；`cpo_chip_package_paper` 是抽取檔的檔名，SourceDoc id 是後者（baseline §6） |
+| 8 | 6.3d | Soitec 那份的新 origin「`Soitec（Reuters 訪談逐字）`」 | 「`Soitec（管理層受 Reuters 訪談所述）`」 | 摘錄（`library/raw/reuters_soitec_capacity_reservations_2026_08_31.txt`）是 Reuters 法文報導的轉述，不是管理層逐字——措辭精度本身是 claim（L11-1）；去註解後同樣解析成 `co:soitec` |
 
 ---
 

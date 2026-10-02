@@ -427,5 +427,5 @@ dry-run 預告**證據等級會變 32 條**：論文 31 條待判定 → 媒體�
 ### 17.7 本 Step 的 L11-6 ④（層計數器 ②）
 
 同一份圖、6.3 之前（`9362764f`）與之後的名冊＋publishers 各算一次（scratchpad `layer_stats_diff.py`）：
-①獨家且全自報 73 → 73（離開 0、進入 0）；②非供應商來源列舉 ≥2 家 6 → 6 層（層集合不變；母體 10、每家撐住 9 不變）；**origin 解析不到的來源 8 → 5**（Credo、Noveon、Sojitz、USAR、Novanta 之外的那幾份有掛供給側邊的）；
+①獨家且全自報 73 → 73（離開 0、進入 0）；②非供應商來源列舉 ≥2 家 6 → 6 層（層集合不變；母體 10、每家撐住 9 不變）；**origin 解析不到的來源 8 → 5**（解析得到的 3 份＝Noveon、USA Rare Earth、Sojitz——都掛在供給側邊上；Credo 那份掛的是 competes_with、不在這個母體；Novanta 要等 [671]）；
 舊計數器「外部印證但引文不具名供應商」15 → 13（`co:arista enables tech:xpo_form_factor`、`co:globalfoundries develops prod:gf_scale`——新寫法讓引文具名）。②不是本 Phase 的驗收，照實列出。
