@@ -192,6 +192,32 @@ def test_apply_needs_a_non_empty_graph_export(tmp_path: Path) -> None:
         mic.check_backup(tmp_path)
 
 
+def test_an_export_of_a_different_graph_is_refused(tmp_path: Path) -> None:
+    """匯出必須是**現在**這張圖：counts 與當下圖不同就拒絕（R2-a 非阻擋觀察 1）。"""
+    payload = {"node_count": 2, "relationship_count": 1, "nodes": [{"id": 1}, {"id": 2}], "relationships": [{"id": 9}]}
+    (tmp_path / "neo4j_export.json").write_text(json.dumps(payload), encoding="utf-8")
+    assert mic.check_backup(tmp_path, live_counts=(2, 1)) == (2, 1)
+    with pytest.raises(mic.IdentityCleanupError, match="不是現在的圖"):
+        mic.check_backup(tmp_path, live_counts=(3, 1))
+
+
+def test_an_extraction_changed_after_review_is_refused(tmp_path: Path) -> None:
+    """審查當時的抽取檔指紋不符＝e27／e28 這種 local id 可能已經是別的邊——apply 前拒絕（R2-a 非阻擋觀察 2）。"""
+    from intake.provenance import canonical_extraction_hash
+
+    (tmp_path / "extractions").mkdir()
+    doc = _semitoday()
+    (tmp_path / "extractions" / "news.json").write_text(json.dumps(doc), encoding="utf-8")
+    good = {"extractions": [{"file": "news.json", "expect_extraction_sha256": canonical_extraction_hash(doc)}]}
+    mic.check_extraction_fingerprints(good, root=tmp_path)
+    doc["edges"][0]["dst_id"] = "co:someone_else"
+    (tmp_path / "extractions" / "news.json").write_text(json.dumps(doc), encoding="utf-8")
+    with pytest.raises(mic.IdentityCleanupError, match="審查之後被改過"):
+        mic.check_extraction_fingerprints(good, root=tmp_path)
+    with pytest.raises(mic.IdentityCleanupError, match="沒有 expect_extraction_sha256"):
+        mic.check_extraction_fingerprints({"extractions": [{"file": "news.json"}]}, root=tmp_path)
+
+
 def test_apply_without_pq2_or_backup_is_a_usage_error() -> None:
     with pytest.raises(SystemExit):
         mic.main(["--apply"])

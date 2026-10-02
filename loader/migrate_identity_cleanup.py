@@ -428,7 +428,15 @@ def plan(manifest: Mapping[str, Any], *, driver, root: Path = ROOT, pq2: int | N
 
     origin_checks = {origin: company_id_for_origin(origin, reg_after)
                      for origin in ("OpenLight", "OpenLight Photonics", "OpenLight Photonics Inc.", "Lumentum")}
+    from intake.provenance import canonical_extraction_hash
+
+    fingerprints = {spec["file"]: {"expected": spec.get("expect_extraction_sha256"),
+                                   "current": canonical_extraction_hash(files[spec["file"]])}
+                    for spec in manifest["extractions"]}
+    for item in fingerprints.values():
+        item["match"] = item["expected"] == item["current"]
     return {
+        "extraction_fingerprints": fingerprints,
         "manifest": manifest.get("date"), "pq2_ref": manifest["pq2_ref"], "old_ids": gone,
         "extractions": extraction_report, "edited_docs": edited,
         "side_effects": side,
@@ -463,13 +471,43 @@ def check_approval(n: int, manifest: Mapping[str, Any], *, pool_path: Path | Non
     return item
 
 
-def check_backup(backup_dir: str | Path) -> tuple[int, int]:
+def check_backup(backup_dir: str | Path, *, live_counts: tuple[int, int] | None = None) -> tuple[int, int]:
+    """匯出檔存在、非空、counts 自洽；給了 `live_counts`（現在圖上的節點數、關係數）就要**逐位相等**——
+    一份舊匯出救不回 apply 之前的這張圖（R2-a 非阻擋觀察 1；遷移前後只有本工具寫圖，所以剛匯出的必然相等）。"""
     from scripts.backup_private import verify_neo4j_export
 
     export = Path(backup_dir) / "neo4j_export.json"
     if not export.is_file() or export.stat().st_size == 0:
         raise IdentityCleanupError(f"找不到 Neo4j 匯出或為空：{export}（先用 scripts/backup_private.py 的 export_neo4j_payload 匯出）")
-    return verify_neo4j_export(export)
+    counts = verify_neo4j_export(export)
+    if live_counts is not None and tuple(counts) != tuple(live_counts):
+        raise IdentityCleanupError(f"匯出（節點 {counts[0]}、關係 {counts[1]}）不是現在的圖（節點 {live_counts[0]}、"
+                                   f"關係 {live_counts[1]}）——apply 前重新匯出；沒有任何寫入")
+    return counts
+
+
+def _live_counts(driver) -> tuple[int, int]:
+    import neo4j
+
+    with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
+        nodes = session.run("MATCH (n) RETURN count(n) AS c").single()["c"]
+        rels = session.run("MATCH ()-[r]->() RETURN count(r) AS c").single()["c"]
+    return int(nodes), int(rels)
+
+
+def check_extraction_fingerprints(manifest: Mapping[str, Any], *, root: Path = ROOT) -> None:
+    """manifest 每個檔的 `expect_extraction_sha256`（審查當時的 `canonical_extraction_hash`）必須等於現在的檔——
+    核准與執行之間抽取檔被改過，`e27`／`e28` 這種 local id 可能已經是別的邊（R2-a 非阻擋觀察 2）。"""
+    from intake.provenance import canonical_extraction_hash
+
+    for spec in manifest["extractions"]:
+        expected = spec.get("expect_extraction_sha256")
+        if not expected:
+            raise IdentityCleanupError(f"manifest 的 {spec['file']} 沒有 expect_extraction_sha256——不知道審查的是哪一版")
+        current = canonical_extraction_hash(json.loads((root / "extractions" / spec["file"]).read_text(encoding="utf-8")))
+        if current != expected:
+            raise IdentityCleanupError(f"{spec['file']} 在審查之後被改過（{expected[:12]}… → {current[:12]}…）——"
+                                       "重跑 dry-run、重新審查；沒有任何寫入")
 
 
 def _write_extraction(path: Path, doc: Mapping[str, Any], *, root: Path) -> dict[str, Any]:
@@ -497,7 +535,8 @@ def apply(manifest: Mapping[str, Any], *, pq2: int, backup_dir: str | Path, driv
     from loader.merge_side_effects import as_loaded
 
     check_approval(pq2, manifest)
-    nodes_n, rels_n = check_backup(backup_dir)
+    check_extraction_fingerprints(manifest, root=root)
+    nodes_n, rels_n = check_backup(backup_dir, live_counts=_live_counts(driver))
     planned = plan(manifest, driver=driver, root=root, pq2=pq2)
     if any(r.get("status") != "checked" or r.get("node_overwrites") or r.get("source_doc_conflicts")
            for r in planned["side_effects"].values()):

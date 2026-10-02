@@ -34,11 +34,13 @@
   "extractions": [
     {
       "file": "semitoday_ph18da_volume_2026_03_20.json",
+      "expect_extraction_sha256": "9e0d70005ba6842437129bf2a8bbd3a5523f5eaa364affd5792c6eeb2f4eba17",
       "rename_ids": {"co:openlight": "co:openlight_photonics"},
       "align_nodes_to_graph": true
     },
     {
       "file": "lumentum_q2fy26_cpo.json",
+      "expect_extraction_sha256": "55c486d3d7512c4093a815b4f1c3fb0e2c33b7e7f7100302d575541b5722a5b3",
       "delete_edges": ["e27"],
       "merge_edges": [{"id": "e28", "into": "e7"}],
       "delete_nodes": ["co:nava_thailand"],
