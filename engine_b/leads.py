@@ -960,6 +960,30 @@ SEMANTIC_CLASSIFIER = "triage_semantic_v1"
 CLASSIFIED_BY = frozenset({SEMANTIC_CLASSIFIER, "interactive:graph_walk", "interactive:directed"})
 
 
+def correct_classified_by(store: dict[str, Any], lead_id: str, value: str, *, pq2: int, reason: str,
+                          at: str | None = None) -> dict[str, Any]:
+    """更正一則已分類 lead 的 `triage.classification.classified_by`（Phase 6 Step 6.3f；**只在使用者對 pq2 go 之後呼叫**）。
+
+    為什麼要有它：Phase 4 Step 4.5b 之前，互動 session 下的 PASS 一律記成 `triage_semantic_v1`（分類層的值），
+    `interactive:directed` 在 Phase 5 Step 5.1 才進字彙——舊紀錄會讓心跳「分類層上次成功」與佇列段把互動判斷算成分類層的產出（L12）。
+    只改這一個欄位；舊值與更正收據記在同一個 classification 上（`classified_by_correction`），不刪任何東西。
+    值仍走封閉字彙 `CLASSIFIED_BY`（同義詞拒收）；沒有 classification 的 lead 拒收（那不是更正，是補分類）。
+    """
+    if value not in CLASSIFIED_BY:
+        raise ValueError(f"classified_by 未登記：{value!r}（封閉字彙：{sorted(CLASSIFIED_BY)}）")
+    if not (reason or "").strip():
+        raise ValueError("更正必須附 reason")
+    lead = _require(store, lead_id)
+    classification = (lead.get("triage") or {}).get("classification")
+    if not isinstance(classification, dict):
+        raise LeadStateError(f"{lead_id} 沒有 classification——那不是更正 classified_by，是補分類")
+    before = classification.get("classified_by")
+    classification["classified_by"] = value
+    classification["classified_by_correction"] = {"from": before, "to": value, "pq2": int(pq2),
+                                                  "reason": reason.strip(), "at": at or _now()}
+    return {"lead_id": lead_id, "from": before, "to": value}
+
+
 def triage(
     store: dict[str, Any],
     lead_id: str,

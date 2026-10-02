@@ -229,8 +229,17 @@ chain 全是 `tech:dram_technology → tech:semiconductor_manufacturing_equipmen
 
 ## 8. 四則 lead 的 `classified_by`（6.3f 的舊值）
 
-`library/leads/pending_leads.json`（1201 則）：`lead_198ada57ea4366384b6e4f9855826998`、`lead_3238fc77ac974944b52a2916205b98a6`、`lead_39841af82ef4211a19116d249331dd5d`、`lead_cbd50ac57aa511c2d6c4e531b759f7a7`——
-四則 `classified_by` **都是 null**（欄位不存在）、`classified_at` null、`status` applied。
+`library/leads/pending_leads.json`（1201 則），四則都是 `status` applied，`triage.classification.classified_by` 現值：
+
+| lead | classified_by | classified_at | 分類理由（節錄） |
+|---|---|---|---|
+| `lead_198ada57ea4366384b6e4f9855826998` | `interactive:graph_walk` | 2026-10-01 | Phase 4 Step 4.8 第 2 項（plan 點名）：CW DFB 層文件——**plan 點名，不是走圖命中**（Phase 5 #34） |
+| `lead_3238fc77ac974944b52a2916205b98a6` | `triage_semantic_v1` | 2026-08-31 | 決定 MP 進不進稀土組（互動 session 判斷） |
+| `lead_39841af82ef4211a19116d249331dd5d` | `triage_semantic_v1` | 2026-08-31 | 填上 sub 會讓機器人產業群長出來（[325]） |
+| `lead_cbd50ac57aa511c2d6c4e531b759f7a7` | `triage_semantic_v1` | 2026-08-31 | 稀土產業群（USGS Substitutes 段） |
+
+⚠ **更正（2026-10-03 Step 6.3f 撞到）**：本節初版寫「四則 `classified_by` 都是 null（欄位不存在）」——那是收集腳本讀了 lead 的**頂層**鍵；欄位實際住在
+`triage.classification.classified_by`。「我讀不到」不是「它不存在」（L11-5）。
 
 ## 9. Phase 5 #15（tier 決定有沒有引用過舊計分表數字）——**結案**
 
@@ -394,3 +403,29 @@ prepare 多一次 READ session（`intake.application._merge_side_effect_receipt`
 Figure 1「which is based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」，是綜述轉述廠商公開資料，不是自產數據。
 `seen_in`＝SourceDoc id `Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era`（§0.6 #7）。登記後 `MDPI Micromachines（Chen et al. 2025 綜述）` 解析成媒體；
 **今天證據等級變動 0 條**——那份 SourceDoc 的 origin 仍是「Third-party Research」，更正要等 6.3d 的 pq2（之後它的 34 條邊由待判定變媒體轉述，同級）。
+
+### 17.5 SourceDoc origin 更正（6.3d）——**pq2 [671] 等 go**
+
+- `loader/sourcedoc_sync.py::FIELDS` 加 `origin_entity`（它決定證據等級）；圖那一側的查詢 `GRAPH_CYPHER` 收成一份（audit、健康審查、遷移工具三處原本各寫一條）。
+  加上去的當下抓到 **1 筆既有不一致**：`iqe_tower_inp_epiwafer_agreement_2026_06_15` 的兩份抽取檔 origin 互異（主檔「IQE plc and Tower Semiconductor (joint announcement with named executives from both parties)」、
+  addendum 與圖「IQE plc / Tower Semiconductor (joint announcement)」）→ `--apply-json` 把主檔對齊圖上現值（只動 JSON；舊版歸檔 `extractions/superseded/…30a05e7a.json`；收據 `loader/manifests/sourcedoc-json-sync-20261002.json`）；
+  兩種寫法都判雙方聯合，證據等級 0 變動。之後 `python -m audit invariants --only SourceDocSync`：重建會遺失 0（section 0／title 0／origin 0）｜圖落後 0。
+- 三筆更正寫成宣告式 manifest `loader/manifests/sourcedoc-origin-20261003.json`（每筆 before／after／why／source），工具新模式 `--corrections`（apply 要 ref_id 逐字相符的 pq2）：
+
+| SourceDoc | before → after | 依據 |
+|---|---|---|
+| `reuters_soitec_capacity_reservations_2026_08_31` | `Soitec management (Reuters interview)` → `Soitec（管理層受 Reuters 訪談所述）` | 抽取的 claim「Soitec management states…」；摘錄不是逐字，所以不寫「逐字」（plan 原寫「Reuters 訪談逐字」，§0.6 #8）；沒有掛邊 |
+| `novanta_humanoid_ft_2026` | `Novanta/ATI（供應商官方應用頁）` → `Novanta（子公司 ATI Industrial Automation 官方應用頁）` | novanta.com 自家頁；Novanta 8-K 2021-07-19 宣布收購 ATI、2021-08-31 交割 |
+| `Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era`（兩份抽取檔同值） | `Third-party Research` → `MDPI Micromachines（Chen et al. 2025 綜述）` | §17.4 |
+
+dry-run 預告**證據等級會變 32 條**：論文 31 條待判定 → 媒體轉述（同級；另 3 條另有解析不到的來源，同級時待判定優先，不變）、`co:novanta supplies_to tech:force_torque_sensor` 待判定 → 供應商自報（那一頁就是 Novanta 自己）。
+
+### 17.6 四則 lead 的 classified_by（6.3f）——**pq2 [672] 等 go**
+
+現值見 §8（更正後）：1 則 `interactive:graph_walk`、3 則 `triage_semantic_v1`，都改 `interactive:directed`。執行函式 `engine_b.leads.correct_classified_by`（只改那一欄、舊值與 pq2 收據記在同一格；值走封閉字彙；沒有 classification 的拒收）。
+
+### 17.7 本 Step 的 L11-6 ④（層計數器 ②）
+
+同一份圖、6.3 之前（`9362764f`）與之後的名冊＋publishers 各算一次（scratchpad `layer_stats_diff.py`）：
+①獨家且全自報 73 → 73（離開 0、進入 0）；②非供應商來源列舉 ≥2 家 6 → 6 層（層集合不變；母體 10、每家撐住 9 不變）；**origin 解析不到的來源 8 → 5**（Credo、Noveon、Sojitz、USAR、Novanta 之外的那幾份有掛供給側邊的）；
+舊計數器「外部印證但引文不具名供應商」15 → 13（`co:arista enables tech:xpo_form_factor`、`co:globalfoundries develops prod:gf_scale`——新寫法讓引文具名）。②不是本 Phase 的驗收，照實列出。

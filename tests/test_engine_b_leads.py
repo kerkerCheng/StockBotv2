@@ -974,6 +974,37 @@ def test_classified_by_is_a_closed_vocabulary_and_needs_a_classification() -> No
     assert store["leads"][lead_id]["status"] == "pending"
 
 
+def test_correct_classified_by_changes_only_that_field_and_keeps_the_old_value() -> None:
+    """Phase 6 Step 6.3f：已分類 lead 的 classified_by 更正——只改那一欄、舊值與 pq2 收據記在同一個 classification 上。"""
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="x:test", url="https://x.io/legacy")
+    leads.triage(store, lead_id, go=True, tier=4, reason="r", classification=_PASS)
+    before = json.loads(json.dumps(store["leads"][lead_id]))
+    out = leads.correct_classified_by(store, lead_id, "interactive:directed", pq2=671, reason="互動判斷，不是分類層",
+                                      at="2026-10-03T00:00:00+00:00")
+    assert out == {"lead_id": lead_id, "from": "triage_semantic_v1", "to": "interactive:directed"}
+    cls = store["leads"][lead_id]["triage"]["classification"]
+    assert cls["classified_by"] == "interactive:directed"
+    assert cls["classified_by_correction"] == {"from": "triage_semantic_v1", "to": "interactive:directed", "pq2": 671,
+                                               "reason": "互動判斷，不是分類層", "at": "2026-10-03T00:00:00+00:00"}
+    after = json.loads(json.dumps(store["leads"][lead_id]))
+    after["triage"]["classification"].pop("classified_by_correction")
+    after["triage"]["classification"]["classified_by"] = "triage_semantic_v1"
+    assert after == before, "除了那一欄與收據，其他一個字都不動"
+    from engine_b import priority
+
+    priority.validate_classification(cls, require_receipt=True)   # 收據鍵不擋既有驗證
+
+
+def test_correct_classified_by_refuses_unknown_values_and_unclassified_leads() -> None:
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="x:test", url="https://x.io/raw")
+    with pytest.raises(ValueError, match="未登記"):
+        leads.correct_classified_by(store, lead_id, "interactive", pq2=1, reason="r")
+    with pytest.raises(leads.LeadStateError, match="補分類"):
+        leads.correct_classified_by(store, lead_id, "interactive:directed", pq2=1, reason="r")
+
+
 def test_queue_segments_count_interactive_research_leads_separately() -> None:
     """佇列段 triaged_go_leads 按分類是誰下的分開計——互動起的研究不是分類層在出貨（L12）。"""
     from engine_b import queue_segments
