@@ -333,3 +333,17 @@ prepare 多一次 READ session（`intake.application._merge_side_effect_receipt`
 ⚠ 順帶發現：既有測試 `test_prepare_validates_every_document_without_graph_or_publication` 守的「prepare 不開圖」從來沒被守住——同 URL 多段檢查本來就開圖，並以 `except Exception: pass` 吞掉測試的 AssertionError 絆線。
 改寫成 `test_prepare_reads_the_graph_read_only_and_never_publishes`（假 driver 擋任何寫入 Cypher、斷言 READ session 真的跑了）；新程式的兩處例外處理對 AssertionError 一律往外丟。
 同型的絆線在 `tests/test_intake.py`（`forbidden_driver` 兩處）可能一樣空跑——不在本 Step 範圍，記進 closeout 待決。
+
+## 17. Step 6.3 證據資料（2026-10-03）
+
+### 17.1 名冊三個寫法（6.3a）——加 Arista、GF；**Apollo 不加**
+
+全圖逐字整詞比對（`query.bottleneck._form_pattern`，單一個詞分大小寫；scratchpad `p63a_alias_scan.py`）：
+
+| 寫法 | 命中 | 判讀 | 決定 |
+|---|---|---|---|
+| `Arista` | 1 段：Coherent OFC 2026-03-17 s18「This was announced by Arista and ourselves and a bunch of other partners」 | 講的是 Arista Networks | 加進 `co:arista.name_aliases` |
+| `GF` | 8 段：GF 20-F s9、optics.org ×2、Semiconductor Today ×2、Sivers 新聞稿 ×3（s1 原文「GlobalFoundries (NASDAQ: GFS) (GF)」） | 全部講 GlobalFoundries | 加進 `co:globalfoundries.name_aliases` |
+| `Apollo` | 4 段：Broadcom Q2 FY26 s3／s4（Apollo Global Management）、**`google_apollo_ocs_2022` s1／s2「The Apollo OCS platform…」「…in the Apollo layer」（Google 的專案代號）** | 有 2 段不是在講這家公司 | **不加**（plan §4 6.3a 規則；§0.6 #6）——`co:apollo invests_in co:broadcom` 在 6.4 之後會是「未具名」，6.8 處理 |
+
+證據等級變動（舊規則、改前＝HEAD、改後＝工作樹；`evidence_diff.py`）：**0 條**——寫法只在 6.4 的逐來源具名規則與層計數器 ② 起作用。

@@ -108,7 +108,11 @@
       "research_ticker": "ANET",
       "market_currency": "USD",
       "display_name": "Arista Networks, Inc.",
-      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「Arista Networks, Inc.」"
+      "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「Arista Networks, Inc.」",
+      "name_aliases": [
+        "Arista"
+      ],
+      "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3a：Coherent OFC 2026-03-17 法說逐字「This was announced by Arista and ourselves and a bunch of other partners」（coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17 s18）；全圖逐字整詞比對「Arista」命中 1 段、講的都是 Arista Networks（docs/reports/2026-10-03-phase6-baseline.md §17）"
     },
     {
       "company_id": "co:axt",
@@ -241,7 +245,11 @@
       "market_currency": "USD",
       "execution_currency": "USD",
       "execution_venue": "NASDAQ",
-      "display_name": "GlobalFoundries Inc."
+      "display_name": "GlobalFoundries Inc.",
+      "name_aliases": [
+        "GF"
+      ],
+      "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3a：Sivers 2026-06-02 新聞稿逐字「a strategic collaboration with GlobalFoundries (NASDAQ: GFS) (GF)」（sivers_gf_pr_2026_06_02 s1）——公司自己定義的簡稱；全圖逐字整詞比對「GF」命中 8 段、講的都是 GlobalFoundries（baseline §17）"
     },
     {
       "company_id": "co:google",
