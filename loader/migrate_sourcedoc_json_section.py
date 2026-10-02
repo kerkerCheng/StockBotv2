@@ -7,11 +7,18 @@
 誰最後載入誰的 title 就蓋上圖。修法是**讓輸入對齊**，不是在 loader 加 coalesce（coalesce 只救增量重載，全量重建時
 只存在圖上的值仍會消失）。判讀一致性的唯一算法是 `loader/sourcedoc_sync.py`。
 
-## 三個模式
+## 四個模式
 
     python loader/migrate_sourcedoc_json_section.py                 # dry-run：只印計畫（圖 READ、讀 extractions）
     python loader/migrate_sourcedoc_json_section.py --apply-json    # 寫回抽取 JSON
     python loader/migrate_sourcedoc_json_section.py --apply-graph --pq2 N   # 圖落後 JSON 的值對齊 JSON
+    python loader/migrate_sourcedoc_json_section.py --corrections <manifest> [--apply --pq2 N]   # 逐份宣告的更正（JSON 與圖同一次）
+
+同步欄位只有一份：`loader.sourcedoc_sync.FIELDS`（2026-10-03 Phase 6 Step 6.3d 加 `origin_entity`——它決定證據等級）。
+- `origin_entity` 的對齊規則：同一個 doc_id 的多份 JSON 互異時對齊**圖上現值**（只在圖上的值正好是其中一份的寫法時；否則不猜）。
+- `--corrections`：manifest（`kind: sourcedoc_corrections`、`pq2_ref`、每筆 doc_id／field／before／after／why）宣告「這份文件的這一欄
+  其實是什麼」；dry-run 印計畫與**證據等級會變的邊**；`--apply --pq2 N`（編號的 ref_id 要逐字等於 `pq2_ref`）先核對每份抽取檔與
+  圖上現值都等於 `before`，再改 JSON（綁收據的先歸檔）、圖上 compare-and-set，最後重跑一致性核對。
 
 - `--apply-json`：只動 `source_doc.section`／`source_doc.title` 兩欄；**文字層級只換那一個值或插一行**（各檔排版
   不同，整份重寫會產生無關 diff），改完解析驗證「結果＝原內容只改這兩欄」。綁了 graph completion 收據的
@@ -39,6 +46,8 @@ from typing import Any, Mapping
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+
+from loader.sourcedoc_sync import FIELDS as SYNC_FIELDS  # noqa: E402  欄位清單只有一份
 
 ADDENDUM =re.compile(r"addendum|——.*(第 \d+ 輪|授權研究)", re.IGNORECASE)
 _STRING = r'"(?:[^"\\]|\\.)*"'
@@ -81,6 +90,16 @@ def plan_json_edits(graph_rows: list[Mapping[str, Any]], json_docs: Mapping[str,
             else:
                 edits += [{"file": f["file"], "doc_id": doc_id, "field": "title", "before": f["title"],
                            "after": target} for f in files if f["title"] != target]
+        # origin_entity（Phase 6 Step 6.3d）：同一個 doc_id 的多份 JSON 互異時，對齊**圖上現值**（它是現在決定證據等級的那個）
+        # ——只有圖上的值正好是其中一份 JSON 的寫法才對齊；否則不猜。JSON 一致、圖落後的那種是 --apply-graph 的事。
+        origins = {f.get("origin_entity") for f in files}
+        if len(origins) > 1:
+            graph_origin = (str(row.get("origin_entity")).strip() or None) if row.get("origin_entity") is not None else None
+            if graph_origin in origins:
+                edits += [{"file": f["file"], "doc_id": doc_id, "field": "origin_entity", "before": f.get("origin_entity"),
+                           "after": graph_origin} for f in files if f.get("origin_entity") != graph_origin]
+            else:
+                skipped.append(f"{doc_id}：抽取檔之間 origin_entity 互異、圖上的值不是其中任何一個——不猜")
     return {"edits": edits, "skipped": skipped}
 
 
@@ -151,7 +170,9 @@ def _sha(text: str) -> str:
 
 
 def apply_json(plan: Mapping[str, Any], *, root: Path = ROOT, receipts_dir: Path | None = None,
-               now: datetime | None = None) -> dict:
+               now: datetime | None = None, manifest_name: str | None = None,
+               plan_label: str = "docs/plans/2026-10-01-001 Step 4.2e") -> dict:
+    """`manifest_name`：收據檔名（不給＝`sourcedoc-json-sync-<日期>.json`）——同一天跑兩次不同的對齊時要分開，免得後者蓋掉前者。"""
     from intake.provenance import canonical_extraction_hash
 
     receipts = {p.stem for p in (receipts_dir or root / "library" / "private" / "intake_state").glob("*.json")}
@@ -185,36 +206,36 @@ def apply_json(plan: Mapping[str, Any], *, root: Path = ROOT, receipts_dir: Path
                         "extraction_sha256": {"before": old_hash, "after": canonical_extraction_hash(after)},
                         "superseded_archive": archive})
     stamp = (now or datetime.now(timezone.utc))
-    manifest = {"kind": "sourcedoc_json_sync", "at": stamp.isoformat(), "plan": "docs/plans/2026-10-01-001 Step 4.2e",
+    manifest = {"kind": "sourcedoc_json_sync", "at": stamp.isoformat(), "plan": plan_label,
                 "files": results, "skipped": list(plan["skipped"])}
-    manifest_path = root / "loader" / "manifests" / f"sourcedoc-json-sync-{stamp:%Y%m%d}.json"
+    manifest_path = root / "loader" / "manifests" / (manifest_name or f"sourcedoc-json-sync-{stamp:%Y%m%d}.json")
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return {"files": len(results), "manifest": manifest_path.relative_to(root).as_posix(),
             "archived": [r["superseded_archive"] for r in results if r["superseded_archive"]]}
 
 
-#: 只准動這兩欄，各一條明確的 Cypher（欄位名不從資料來）；寫前比對圖上現值＝計畫時看到的值。
+#: 只准動 `loader.sourcedoc_sync.FIELDS` 那幾欄，各一條明確的 Cypher（欄位名不從資料來）；寫前比對圖上現值＝計畫時看到的值。
 GRAPH_WRITES = {
     field: (f"MATCH (sd:SourceDoc {{id: $doc_id}}) "
             f"WHERE coalesce(sd.{field}, '') = coalesce($expected_before, '') "
             f"SET sd.{field} = $value RETURN sd.{field} AS value")
-    for field in ("section", "title")
+    for field in SYNC_FIELDS
 }
 
 
 def apply_graph(stale: list[Mapping[str, Any]], *, session, pq2: int, root: Path = ROOT,
-                now: datetime | None = None) -> dict:
+                now: datetime | None = None, manifest_name: str | None = None) -> dict:
     """只對齊「圖落後 JSON」那幾筆；寫前比對圖上現值等於計畫時看到的值（被別人改過就跳過、不覆蓋）。"""
     stamp = now or datetime.now(timezone.utc)
     manifest = {"kind": "sourcedoc_graph_sync", "at": stamp.isoformat(), "pq2": int(pq2), "writes": []}
-    manifest_path = root / "loader" / "manifests" / f"sourcedoc-graph-sync-{stamp:%Y%m%d}.json"
+    manifest_path = root / "loader" / "manifests" / (manifest_name or f"sourcedoc-graph-sync-{stamp:%Y%m%d}.json")
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     manifest_path.write_text(json.dumps({**manifest, "planned": list(stale)}, ensure_ascii=False, indent=2) + "\n",
                              encoding="utf-8")
     for item in stale:
         if item["field"] not in GRAPH_WRITES:
-            raise ValueError(f"只准動 section／title：{item['field']}")
+            raise ValueError(f"只准動 {'／'.join(SYNC_FIELDS)}：{item['field']}")
         rows = list(session.run(GRAPH_WRITES[item["field"]], doc_id=item["doc_id"],
                                 expected_before=item["graph"], value=item["json"]))
         manifest["writes"].append({**dict(item), "written": bool(rows)})
@@ -228,9 +249,11 @@ def apply_graph(stale: list[Mapping[str, Any]], *, session, pq2: int, root: Path
 GRAPH_SYNC_REF_PREFIX = "sourcedoc-title-sync:"
 
 
-def check_graph_approval(n: int, *, pool_path: Path | None = None) -> dict:
-    """`--apply-graph` 寫圖之前的編號核對（R2-a N6）：[n] 存在且未結案、型別 `manual`、ref_id 是本工具掛的那種。
+def check_graph_approval(n: int, *, pool_path: Path | None = None, ref_id: str | None = None) -> dict:
+    """寫圖之前的編號核對（R2-a N6）：[n] 存在且未結案、型別 `manual`、ref_id 是本工具掛的那種。
 
+    `ref_id` 給了就要**逐字相等**（`--corrections` 模式：等於 manifest 的 `pq2_ref`）；不給就照舊要求
+    `sourcedoc-title-sync:` 前綴（`--apply-graph` 模式）。
     授權載體仍是使用者在對話中的明確 go；這一道只擋「打錯號照樣寫圖、manifest 記錯編號」。不過就 raise ValueError（沒有任何寫入）。
     """
     from engine_b import todo
@@ -239,11 +262,80 @@ def check_graph_approval(n: int, *, pool_path: Path | None = None) -> dict:
     try:
         item = todo.get(pool, n)
     except todo.TodoError as exc:
-        raise ValueError(f"[{n}] 不存在或已結案——--apply-graph 只接受本工具掛的、尚未結案的 pq2 編號") from exc
-    if item.get("type") != "manual" or not str(item.get("ref_id") or "").startswith(GRAPH_SYNC_REF_PREFIX):
-        raise ValueError(f"[{n}] 不是本工具掛的對齊項（type={item.get('type')}、ref_id={item.get('ref_id')}；"
-                         f"要 manual 且 ref_id 以 {GRAPH_SYNC_REF_PREFIX} 開頭）——沒有任何寫入")
+        raise ValueError(f"[{n}] 不存在或已結案——只接受本工具掛的、尚未結案的 pq2 編號") from exc
+    actual = str(item.get("ref_id") or "")
+    matches = actual == ref_id if ref_id is not None else actual.startswith(GRAPH_SYNC_REF_PREFIX)
+    if item.get("type") != "manual" or not matches:
+        want = f"＝{ref_id}" if ref_id is not None else f"以 {GRAPH_SYNC_REF_PREFIX} 開頭"
+        raise ValueError(f"[{n}] 不是本工具掛的項（type={item.get('type')}、ref_id={actual}；要 manual 且 ref_id {want}）"
+                         "——沒有任何寫入")
     return item
+
+
+# ---------------------------------------------------------------------------
+# `--corrections`：逐份宣告的 SourceDoc 欄位更正（Phase 6 Step 6.3d；JSON 與圖同一次改，要 pq2 go）
+# ---------------------------------------------------------------------------
+
+def load_corrections(path: Path) -> dict[str, Any]:
+    manifest = json.loads(Path(path).read_text(encoding="utf-8"))
+    if manifest.get("kind") != "sourcedoc_corrections" or not str(manifest.get("pq2_ref") or "").strip():
+        raise ValueError(f"{path}：kind 必須是 sourcedoc_corrections、要有 pq2_ref")
+    for index, item in enumerate(manifest.get("corrections") or (), 1):
+        if item.get("field") not in SYNC_FIELDS or not item.get("doc_id") or "before" not in item or "after" not in item:
+            raise ValueError(f"{path}：第 {index} 筆缺 doc_id／field（{SYNC_FIELDS}）／before／after")
+        if not str(item.get("why") or "").strip():
+            raise ValueError(f"{path}：第 {index} 筆沒有寫理由")
+    if not manifest.get("corrections"):
+        raise ValueError(f"{path}：corrections 是空的")
+    return manifest
+
+
+def plan_corrections(manifest: Mapping[str, Any], json_docs: Mapping[str, list[Mapping[str, Any]]],
+                     graph_rows: list[Mapping[str, Any]]) -> dict[str, Any]:
+    """每筆更正 → 那個 doc_id 的**每一份**抽取檔都要改（base＋addendum 同一個值，否則 SourceDocSync 紅），圖上那一筆也要改。
+
+    前置（不過就 raise，沒有任何寫入）：每份抽取檔現值＝`before`、圖上現值＝`before`——宣告的就是要取代的那一版。"""
+    graph = {str(r.get("id")): r for r in graph_rows}
+    edits: list[dict[str, Any]] = []
+    graph_items: list[dict[str, Any]] = []
+    for item in manifest["corrections"]:
+        doc_id, field = str(item["doc_id"]), str(item["field"])
+        files = list(json_docs.get(doc_id) or [])
+        if not files:
+            raise ValueError(f"{doc_id}：沒有任何抽取檔")
+        for f in files:
+            if f.get(field) != (str(item["before"]).strip() or None):
+                raise ValueError(f"{doc_id}：extractions/{f['file']} 的 {field} 是 {f.get(field)!r}，不是宣告的 before {item['before']!r}")
+            edits.append({"file": f["file"], "doc_id": doc_id, "field": field, "before": f.get(field), "after": item["after"]})
+        row = graph.get(doc_id)
+        if row is None:
+            raise ValueError(f"{doc_id}：圖上沒有這份 SourceDoc")
+        graph_value = (str(row.get(field)).strip() or None) if row.get(field) is not None else None
+        if graph_value != (str(item["before"]).strip() or None):
+            raise ValueError(f"{doc_id}：圖上的 {field} 是 {graph_value!r}，不是宣告的 before {item['before']!r}")
+        graph_items.append({"doc_id": doc_id, "field": field, "kind": "declared_correction",
+                            "graph": graph_value, "json": item["after"]})
+    return {"edits": edits, "skipped": [], "graph": graph_items}
+
+
+def correction_evidence_changes(rows: list[Mapping[str, Any]], manifest: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """更正 origin_entity 之後，哪些邊的證據等級會變（現在的名冊與 publishers、現在的規則，前後各算一次）。"""
+    from identity.registry import get_registry
+    from query.bottleneck import classify_evidence, collapse_assertions
+
+    new_origin = {str(c["doc_id"]): c["after"] for c in manifest["corrections"] if c["field"] == "origin_entity"}
+    after_rows = [dict(r, origin=new_origin[str(r.get("source_doc_id"))]) if str(r.get("source_doc_id")) in new_origin
+                  else dict(r) for r in rows]
+    registry = get_registry()
+
+    def classes(source_rows):
+        return {k: classify_evidence(e.src, e.origins, registry, filing_origins=e.filing_origins,
+                                     origin_linkages=e.origin_linkages)
+                for k, e in collapse_assertions(source_rows).items()}
+
+    before, after = classes(rows), classes(after_rows)
+    return [{"edge": list(k), "before": before.get(k), "after": after.get(k)}
+            for k in sorted(set(before) | set(after)) if before.get(k) != after.get(k)]
 
 
 def _driver():
@@ -258,17 +350,72 @@ def _driver():
                                 auth=(os.environ.get("NEO4J_USER", "neo4j"), password))
 
 
-def main(argv: list[str] | None = None) -> int:
-    from loader.sourcedoc_sync import drift, json_source_docs, summary_line
+def _run_corrections(args, driver) -> int:
+    """`--corrections PATH`：dry-run 印計畫與證據等級變動；`--apply --pq2 N` 才寫（JSON 與圖同一次）。"""
+    from neo4j import READ_ACCESS, WRITE_ACCESS
 
-    parser = argparse.ArgumentParser(description="SourceDoc 的 section／title 寫回抽取 JSON；圖落後的部分經 pq2 核准後對齊")
+    from loader.sourcedoc_sync import GRAPH_CYPHER, drift, json_source_docs, summary_line
+    from query.bottleneck import fetch_assertions
+
+    manifest = load_corrections(Path(args.corrections))
+    if args.apply:
+        check_graph_approval(args.pq2, ref_id=manifest["pq2_ref"])
+    with driver.session(default_access_mode=READ_ACCESS) as session:
+        rows = [dict(r) for r in session.run(GRAPH_CYPHER)]
+        assertions = session.execute_read(lambda tx: fetch_assertions(tx))
+    json_docs = json_source_docs(ROOT / "extractions")
+    planned = plan_corrections(manifest, json_docs, rows)
+    changes = correction_evidence_changes(assertions, manifest)
+    for edit in planned["edits"]:
+        print(f"- extractions/{edit['file']}｜{edit['doc_id']}.{edit['field']}：{edit['before']!r} → {edit['after']!r}")
+    for item in planned["graph"]:
+        print(f"- 圖 SourceDoc {item['doc_id']}.{item['field']}：{item['graph']!r} → {item['json']!r}")
+    print(f"- 證據等級會變的邊 {len(changes)} 條：")
+    for change in changes:
+        print(f"  - {' '.join(change['edge'])}：{change['before']} → {change['after']}")
+    if not args.apply:
+        print(f"（dry-run：{len(planned['edits'])} 個抽取檔、{len(planned['graph'])} 份 SourceDoc；加 --apply --pq2 N 才寫）")
+        return 0
+    from engine_b.writer_lock import INTERACTIVE_OWNER, acquire, release
+
+    stamp = datetime.now(timezone.utc)
+    acquire(INTERACTIVE_OWNER, ttl_minutes=15, purpose=f"SourceDoc 欄位更正（pq2 [{args.pq2}]）")
+    try:
+        json_result = apply_json(planned, manifest_name=f"sourcedoc-corrections-{stamp:%Y%m%d}.json-sync.json",
+                                 plan_label=str(manifest.get("plan") or ""))
+        with driver.session(default_access_mode=WRITE_ACCESS) as session:
+            graph_result = apply_graph(planned["graph"], session=session, pq2=args.pq2,
+                                       manifest_name=f"sourcedoc-corrections-{stamp:%Y%m%d}.graph-sync.json")
+    finally:
+        release(INTERACTIVE_OWNER)
+    with driver.session(default_access_mode=READ_ACCESS) as session:
+        state = drift([dict(r) for r in session.run(GRAPH_CYPHER)], json_source_docs(ROOT / "extractions"))
+    print(summary_line(state))
+    print(json.dumps({"json": json_result, "graph": graph_result, "evidence_changes": changes},
+                     ensure_ascii=False, indent=2))
+    left = [s for s in state["stale"] + state["danger"] if s["doc_id"] in {c["doc_id"] for c in manifest["corrections"]}]
+    if graph_result["written"] != len(planned["graph"]) or left:
+        print(f"✗ 更正沒有全部對齊：寫了 {graph_result['written']}／{len(planned['graph'])}；仍不一致 {left}", file=sys.stderr)
+        return 3
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    from loader.sourcedoc_sync import GRAPH_CYPHER, drift, json_source_docs, summary_line
+
+    parser = argparse.ArgumentParser(description="SourceDoc 的 section／title／origin_entity 寫回抽取 JSON；圖落後的部分經 pq2 核准後對齊")
     mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--apply-json", action="store_true", help="寫回抽取 JSON（只動 source_doc.section／title）")
+    mode.add_argument("--apply-json", action="store_true", help="寫回抽取 JSON（只動 source_doc 的同步欄位）")
     mode.add_argument("--apply-graph", action="store_true", help="寫 Neo4j：圖落後 JSON 的值對齊 JSON（要 --pq2）")
-    parser.add_argument("--pq2", type=int, default=None, help="--apply-graph 必填：使用者明確 go 的 pq2 編號")
+    mode.add_argument("--corrections", default=None,
+                      help="逐份宣告的欄位更正 manifest（dry-run；加 --apply --pq2 N 才寫 JSON 與圖）")
+    parser.add_argument("--apply", action="store_true", help="配 --corrections：寫（要 --pq2）")
+    parser.add_argument("--pq2", type=int, default=None, help="--apply-graph／--corrections --apply 必填：使用者明確 go 的 pq2 編號")
     args = parser.parse_args(argv)
-    if args.apply_graph and args.pq2 is None:
-        parser.error("--apply-graph 必須帶 --pq2（圖寫入要經使用者核准）")
+    if (args.apply_graph or args.apply) and args.pq2 is None:
+        parser.error("寫圖必須帶 --pq2（圖寫入要經使用者核准）")
+    if args.apply and not args.corrections:
+        parser.error("--apply 只配 --corrections")
     if args.apply_graph:
         try:
             check_graph_approval(args.pq2)
@@ -280,9 +427,14 @@ def main(argv: list[str] | None = None) -> int:
 
     driver = _driver()
     try:
+        if args.corrections:
+            try:
+                return _run_corrections(args, driver)
+            except ValueError as exc:
+                print(f"✗ 拒絕：{exc}", file=sys.stderr)
+                return 2
         with driver.session(default_access_mode=READ_ACCESS) as session:
-            rows = [dict(r) for r in session.run(
-                "MATCH (sd:SourceDoc) RETURN sd.id AS id, sd.section AS section, sd.title AS title")]
+            rows = [dict(r) for r in session.run(GRAPH_CYPHER)]
         json_docs = json_source_docs(ROOT / "extractions")
         state = drift(rows, json_docs)
         print(summary_line(state))

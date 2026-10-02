@@ -1,0 +1,27 @@
+{
+  "kind": "sourcedoc_json_sync",
+  "at": "2026-10-02T23:05:10.188628+00:00",
+  "plan": "docs/plans/2026-10-01-001 Step 4.2e",
+  "files": [
+    {
+      "file": "extractions/iqe_tower_inp_epiwafer_agreement_2026_06_15.json",
+      "doc_id": "iqe_tower_inp_epiwafer_agreement_2026_06_15",
+      "changes": {
+        "origin_entity": {
+          "before": "IQE plc and Tower Semiconductor (joint announcement with named executives from both parties)",
+          "after": "IQE plc / Tower Semiconductor (joint announcement)"
+        }
+      },
+      "file_sha256": {
+        "before": "e9622119293da94f86bdef4d7b7a5991d455a8efb8b5ef07884e22c9b93acc86",
+        "after": "758a1e5176d4d4b9de0bc8e21aa8640a258a741e30df5458db9b7220b7ad2c21"
+      },
+      "extraction_sha256": {
+        "before": "30a05e7af032cce6355d0e9a3ee881cfc9d56798138373531afa85d0527acd74",
+        "after": "24895f72730bb98d7bca693abb1006a5837dbcd843606f289b435bc7c9b4c8e3"
+      },
+      "superseded_archive": "extractions/superseded/iqe_tower_inp_epiwafer_agreement_2026_06_15.30a05e7a.json"
+    }
+  ],
+  "skipped": []
+}

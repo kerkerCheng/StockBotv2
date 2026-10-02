@@ -934,6 +934,16 @@ apply 沒完成（看輸出的 next_action）。私有函式 `intake.application
 & '.venv\Scripts\python.exe' scripts\commit_pending_intake.py      # 每 action 一 commit、整批一 push
 ```
 
+### SourceDoc 欄位更正（2026-10-03 Phase 6 Step 6.3d：`origin_entity` 進同步欄位）
+```powershell
+& '.venv\Scripts\python.exe' loader\migrate_sourcedoc_json_section.py --corrections loader\manifests\sourcedoc-origin-20261003.json            # dry-run：計畫＋證據等級會變的邊
+& '.venv\Scripts\python.exe' loader\migrate_sourcedoc_json_section.py --corrections loader\manifests\sourcedoc-origin-20261003.json --apply --pq2 <N>   # 使用者 go 之後
+```
+同步欄位只有一份（`loader.sourcedoc_sync.FIELDS`＝section／title／origin_entity；圖那一側的查詢 `GRAPH_CYPHER` 也住那裡，audit 與健康審查共用）。
+更正 manifest 每筆宣告 doc_id／field／before／after／why／source；apply 前核對每份抽取檔（base＋addendum）與圖上現值都等於 before，
+pq2 項的 ref_id 要逐字等於 manifest 的 `pq2_ref`；JSON 先改（綁收據的舊版歸檔）、圖 compare-and-set、最後重跑一致性核對（不一致 exit 3）。
+sandbox impact review：互動專用（不進 rules／daily）；與既有 `--apply-graph` 同一個寫入面（`SourceDoc` 的同步欄位）與同一套編號核對＋writer lock，沒有新增 capability。
+
 ### 身分清理遷移（2026-10-03 Phase 6 Step 6.2：OpenLight 合併、nava 退役）
 ```powershell
 & '.venv\Scripts\python.exe' loader\migrate_identity_cleanup.py                 # dry-run（唯讀；印計畫 JSON：抽取檔逐項改動、名冊 diff、入圖副作用、證據等級會變的邊、活的引用）

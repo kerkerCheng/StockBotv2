@@ -1,0 +1,33 @@
+{
+  "kind": "sourcedoc_corrections",
+  "date": "2026-10-03",
+  "plan": "docs/plans/2026-10-02-002-feat-phase6-evidence-criteria-plan.md Step 6.3d（使用者定案 §0.1 #6）",
+  "pq2_ref": "sourcedoc-origin-sync:2026-10-03",
+  "tool": "python loader/migrate_sourcedoc_json_section.py --corrections loader/manifests/sourcedoc-origin-20261003.json [--apply --pq2 N]",
+  "corrections": [
+    {
+      "doc_id": "reuters_soitec_capacity_reservations_2026_08_31",
+      "field": "origin_entity",
+      "before": "Soitec management (Reuters interview)",
+      "after": "Soitec（管理層受 Reuters 訪談所述）",
+      "why": "抽取的 claim 是「Soitec management states that the company is entering more than ten multi-year wafer-supply and capacity-reservation agreements…」——發話者是 Soitec 管理層，Reuters 轉述（摘錄不是逐字，所以不寫「逐字」；plan 原寫「Reuters 訪談逐字」，§0.6 #8）；原字串「Soitec management (Reuters interview)」整串解析不到（`management` 不是名冊寫法），改成名冊名＋尾端註解後解析成 co:soitec（自報）。這份文件沒有掛任何邊。",
+      "source": "library/raw/reuters_soitec_capacity_reservations_2026_08_31.txt（Reuters／Boursorama 轉載：Soitec signs multi-year customer contracts as AI wafer demand surges）"
+    },
+    {
+      "doc_id": "novanta_humanoid_ft_2026",
+      "field": "origin_entity",
+      "before": "Novanta/ATI（供應商官方應用頁）",
+      "after": "Novanta（子公司 ATI Industrial Automation 官方應用頁）",
+      "why": "頁面在 novanta.com（Novanta 自己的人型機器人應用頁），力／扭矩感測器是子公司 ATI 的產品；「Novanta/ATI」整串解析不到。ATI Industrial Automation 是 Novanta 的子公司：Novanta 2021-07-19 8-K 宣布收購、2021-08-31 交割。",
+      "source": "https://novanta.com/robotics-automation/application/humanoid/（library/raw/novanta_humanoid_ft_2026.txt）；Novanta 8-K 2021-07-19 Exhibit 99（https://www.sec.gov/Archives/edgar/data/1076930/000156459021036958/novt-ex991_6.htm）"
+    },
+    {
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "field": "origin_entity",
+      "before": "Third-party Research",
+      "after": "MDPI Micromachines（Chen et al. 2025 綜述）",
+      "why": "Chen et al., Micromachines 2025, 16(4), 431（MDPI Review）——期刊綜述，轉述廠商公開資料（Figure 1「based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」）；「Third-party Research」不是發布者身分。兩份抽取檔（cpo_chip_package_paper、cpo_paper_coverage_addendum_2026_08_30）同一個 doc_id，要同一個值。發布者 MDPI Micromachines 已登記為 media（6.3e）。",
+      "source": "library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt；https://www.mdpi.com/2072-666X/16/4/431"
+    }
+  ]
+}

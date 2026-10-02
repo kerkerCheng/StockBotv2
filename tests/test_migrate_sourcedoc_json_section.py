@@ -80,7 +80,8 @@ def test_apply_json_archives_receipt_bound_versions_and_reload_keeps_section_and
     receipts = tmp_path / "library" / "private" / "intake_state"
     receipts.mkdir(parents=True)
     (receipts / "split.json").write_text("{}", encoding="utf-8")
-    rows = [{"id": "split", "section": "asic", "title": "Parent——coverage-gap addendum"}]
+    # 圖那一列也帶 origin_entity（Phase 6 Step 6.3d 起它是同步欄位；與 JSON 同值＝這一欄沒有落差）
+    rows = [{"id": "split", "section": "asic", "title": "Parent——coverage-gap addendum", "origin_entity": "Issuer"}]
     plan = mig.plan_json_edits(rows, json_source_docs(ext))
     result = mig.apply_json(plan, root=tmp_path, receipts_dir=receipts)
 
@@ -112,8 +113,91 @@ def test_apply_graph_only_touches_stale_fields_and_checks_the_current_value(tmp_
     assert params == {"doc_id": "split", "expected_before": "Parent——addendum", "value": "Parent"}
     manifest = json.loads((tmp_path / result["manifest"]).read_text(encoding="utf-8"))
     assert manifest["pq2"] == 777 and manifest["writes"][0]["written"] is True
+    # 只准動 sourcedoc_sync.FIELDS（section／title／origin_entity——後者 Phase 6 Step 6.3d 起）；清單外的一律拒絕
     with pytest.raises(ValueError, match="只准動"):
-        mig.apply_graph([{**stale[0], "field": "origin_entity"}], session=_Session(), pq2=777, root=tmp_path)
+        mig.apply_graph([{**stale[0], "field": "url"}], session=_Session(), pq2=777, root=tmp_path)
+    session = _Session()
+    mig.apply_graph([{**stale[0], "field": "origin_entity", "graph": "Old", "json": "New"}], session=session, pq2=777,
+                    root=tmp_path, manifest_name="origin.json")
+    assert "SET sd.origin_entity = $value" in session.calls[0][0]
+
+
+def test_origin_entity_disagreeing_across_files_aligns_to_the_graph_value() -> None:
+    """同一個 doc_id 的兩份抽取檔 origin 互異（重建時載入順序決定結果）：對齊圖上現值；圖上的值不是其中之一就不猜。"""
+    json_docs = {"iqe": [{"file": "iqe.json", "section": None, "title": "T", "origin_entity": "A and B (long note)"},
+                         {"file": "iqe_addendum.json", "section": None, "title": "T", "origin_entity": "A / B (joint)"}],
+                 "odd": [{"file": "odd.json", "section": None, "title": "T", "origin_entity": "X"},
+                         {"file": "odd_addendum.json", "section": None, "title": "T", "origin_entity": "Y"}]}
+    rows = [{"id": "iqe", "section": None, "title": "T", "origin_entity": "A / B (joint)"},
+            {"id": "odd", "section": None, "title": "T", "origin_entity": "Z"}]
+    plan = mig.plan_json_edits(rows, json_docs)
+    assert [(e["file"], e["field"], e["after"]) for e in plan["edits"]] == [("iqe.json", "origin_entity", "A / B (joint)")]
+    assert any("odd" in line and "不猜" in line for line in plan["skipped"])
+
+
+def test_drift_counts_origin_entity_and_the_graph_query_follows_fields(tmp_path: Path) -> None:
+    from loader.sourcedoc_sync import FIELDS, GRAPH_CYPHER, summary_line
+
+    assert "origin_entity" in FIELDS and all(f"sd.{f} AS {f}" in GRAPH_CYPHER for f in FIELDS)
+    for name, origin in (("a.json", "One"), ("a_addendum.json", "Two")):
+        (tmp_path / name).write_text(json.dumps({"source_doc": {"doc_id": "a", "title": "T", "origin_entity": origin}}),
+                                     encoding="utf-8")
+    (tmp_path / "b.json").write_text(json.dumps({"source_doc": {"doc_id": "b", "title": "T", "origin_entity": "New"}}),
+                                     encoding="utf-8")
+    state = drift([{"id": "a", "title": "T", "origin_entity": "One"}, {"id": "b", "title": "T", "origin_entity": "Old"}],
+                  json_source_docs(tmp_path))
+    assert [(d["doc_id"], d["field"], d["kind"]) for d in state["danger"]] == [("a", "origin_entity", "json_files_disagree")]
+    assert [(d["doc_id"], d["field"]) for d in state["stale"]] == [("b", "origin_entity")]
+    assert "origin 1" in summary_line(state)
+
+
+def _corrections(tmp_path: Path) -> dict:
+    path = tmp_path / "c.json"
+    path.write_text(json.dumps({"kind": "sourcedoc_corrections", "pq2_ref": "sourcedoc-origin-sync:test", "corrections": [
+        {"doc_id": "paper", "field": "origin_entity", "before": "Third-party Research",
+         "after": "MDPI Micromachines（綜述）", "why": "期刊綜述"}]}), encoding="utf-8")
+    return mig.load_corrections(path)
+
+
+def test_corrections_edit_every_file_of_the_doc_and_require_the_declared_before(tmp_path: Path) -> None:
+    """base＋addendum 兩份都要改成同一個值（否則 SourceDocSync 紅）；任何一份或圖上的現值不是宣告的 before 就拒收。"""
+    manifest = _corrections(tmp_path)
+    json_docs = {"paper": [{"file": "paper.json", "origin_entity": "Third-party Research"},
+                           {"file": "paper_addendum.json", "origin_entity": "Third-party Research"}]}
+    rows = [{"id": "paper", "origin_entity": "Third-party Research"}]
+    planned = mig.plan_corrections(manifest, json_docs, rows)
+    assert [e["file"] for e in planned["edits"]] == ["paper.json", "paper_addendum.json"]
+    assert planned["graph"] == [{"doc_id": "paper", "field": "origin_entity", "kind": "declared_correction",
+                                 "graph": "Third-party Research", "json": "MDPI Micromachines（綜述）"}]
+    with pytest.raises(ValueError, match="不是宣告的 before"):
+        mig.plan_corrections(manifest, json_docs, [{"id": "paper", "origin_entity": "Somebody else"}])
+    drifted = {"paper": [dict(json_docs["paper"][0]), {"file": "paper_addendum.json", "origin_entity": "Other"}]}
+    with pytest.raises(ValueError, match="不是宣告的 before"):
+        mig.plan_corrections(manifest, drifted, rows)
+
+
+def test_corrections_need_the_exact_pq2_ref(tmp_path: Path) -> None:
+    from engine_b import todo
+
+    pool = todo.empty_pool()
+    mine = todo.upsert(pool, item_type="manual", ref_id="sourcedoc-origin-sync:test", title="更正")
+    title_sync = todo.upsert(pool, item_type="manual", ref_id="sourcedoc-title-sync:2026-10-01", title="title")
+    pool_path = tmp_path / "todo_pool.json"
+    todo.save(pool, pool_path)
+    assert mig.check_graph_approval(mine["n"], pool_path=pool_path, ref_id="sourcedoc-origin-sync:test")
+    with pytest.raises(ValueError, match="不是本工具掛的"):
+        mig.check_graph_approval(title_sync["n"], pool_path=pool_path, ref_id="sourcedoc-origin-sync:test")
+
+
+def test_correction_evidence_changes_reclassify_with_the_new_origin(tmp_path: Path) -> None:
+    """更正 origin 之後重算證據等級：解析不到 → 登記的媒體＝媒體轉述（同級）——預告要逐條列出來。"""
+    manifest = _corrections(tmp_path)
+    rows = [{"src": "tech:a", "relation": "enables", "dst": "tech:b", "attributes": "{}", "confidence": 0.8,
+             "origin": "Third-party Research", "source_type": "paper", "origin_linkage": None,
+             "source_doc_id": "paper", "published_at": None, "assertion_id": "paper_e1"}]
+    manifest["corrections"][0]["after"] = "MDPI Micromachines（Chen et al. 2025 綜述）"
+    changes = mig.correction_evidence_changes(rows, manifest)
+    assert changes == [{"edge": ["tech:a", "enables", "tech:b"], "before": "needs_review", "after": "media_relay"}]
 
 
 def test_apply_graph_refuses_a_number_that_is_not_this_tools_open_item(tmp_path: Path) -> None:

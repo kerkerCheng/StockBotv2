@@ -185,7 +185,8 @@ def check_duplicates() -> AuditResult:
 
 
 def check_sourcedoc_sync() -> AuditResult:
-    """SourceDoc 的 `section`／`title` 從抽取 JSON 重建得回來（L10；Phase 4 Step 4.2e 的常駐計數器）。
+    """SourceDoc 的 `section`／`title`／`origin_entity` 從抽取 JSON 重建得回來（L10；Phase 4 Step 4.2e 的常駐計數器；
+    `origin_entity` Phase 6 Step 6.3d 起，欄位清單與圖那一側的查詢都住 `loader.sourcedoc_sync`）。
 
     算法只有一份：`loader/sourcedoc_sync.py`（健康審查同一份）。
     - **FAIL**（`loader.sourcedoc_sync.is_red`，唯一判準）：重建會遺失或不確定——圖上有值、JSON 沒有；同一個 doc_id 的
@@ -194,10 +195,9 @@ def check_sourcedoc_sync() -> AuditResult:
       等核准改圖」的那段時間整份 audit 變紅，紅的卻不是風險（L15：gate 攔下的必須是它想攔的東西）。
     """
     def run() -> AuditResult:
-        from loader.sourcedoc_sync import drift, is_red, json_source_docs, summary_line
+        from loader.sourcedoc_sync import GRAPH_CYPHER, drift, is_red, json_source_docs, summary_line
 
-        rows = sources.graph_rows(
-            "MATCH (sd:SourceDoc) RETURN sd.id AS id, sd.section AS section, sd.title AS title")
+        rows = sources.graph_rows(GRAPH_CYPHER)
         result = drift(rows, json_source_docs(ROOT / "extractions"))
         danger = ([f"⛔ {d['doc_id']}.{d['field']}（{d['kind']}）：圖＝{d['graph']!r}；JSON＝{d['json']!r}"
                    for d in result["danger"]]

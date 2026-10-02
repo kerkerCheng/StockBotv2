@@ -1,4 +1,5 @@
-"""SourceDoc 的 `section`／`title` 跟抽取 JSON 一不一致——常駐計數器的唯一算法（Phase 4 Step 4.2e）。
+"""SourceDoc 的 `section`／`title`／`origin_entity` 跟抽取 JSON 一不一致——常駐計數器的唯一算法（Phase 4 Step 4.2e；
+`origin_entity` 2026-10-03 Phase 6 Step 6.3d 加入）。
 
 ## 為什麼需要它
 
@@ -23,7 +24,12 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 ROOT = Path(__file__).resolve().parent.parent
-FIELDS: tuple[str, ...] = ("section", "title")
+#: 要求圖與抽取 JSON 一致的 SourceDoc 欄位。`origin_entity`（Phase 6 Step 6.3d）：它決定證據等級（`classify_evidence`
+#: 讀的就是它），同一個 doc_id 的兩份抽取檔若寫法互異，重建時誰最後載入誰贏——2026-10-03 實測 1 份
+#: （`iqe_tower_inp_epiwafer_agreement_2026_06_15`）。
+FIELDS: tuple[str, ...] = ("section", "title", "origin_entity")
+#: 圖那一側的唯一一條查詢（audit、健康審查、遷移工具共用——欄位跟著 FIELDS 走，不各寫一份；L16）。
+GRAPH_CYPHER = "MATCH (sd:SourceDoc) RETURN sd.id AS id, " + ", ".join(f"sd.{f} AS {f}" for f in FIELDS)
 
 
 def _norm(value: Any) -> str | None:
@@ -32,19 +38,18 @@ def _norm(value: Any) -> str | None:
 
 
 def json_source_docs(extraction_dir: Path | None = None) -> dict[str, list[dict[str, Any]]]:
-    """`doc_id → [{file, section, title}]`（同一個 doc_id 可能有 base＋addendum 多份檔案）。讀不了的檔案跳過並記錄。"""
+    """`doc_id → [{file, <FIELDS>…}]`（同一個 doc_id 可能有 base＋addendum 多份檔案）。讀不了的檔案跳過並記錄。"""
     directory = Path(extraction_dir) if extraction_dir else ROOT / "extractions"
     out: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for path in sorted(directory.glob("*.json")):
         try:
             source_doc = json.loads(path.read_text(encoding="utf-8")).get("source_doc") or {}
         except (OSError, json.JSONDecodeError):
-            out["__unreadable__"].append({"file": path.name, "section": None, "title": None})
+            out["__unreadable__"].append({"file": path.name, **{f: None for f in FIELDS}})
             continue
         doc_id = source_doc.get("doc_id")
         if doc_id:
-            out[str(doc_id)].append({"file": path.name, "section": _norm(source_doc.get("section")),
-                                     "title": _norm(source_doc.get("title"))})
+            out[str(doc_id)].append({"file": path.name, **{f: _norm(source_doc.get(f)) for f in FIELDS}})
     return dict(out)
 
 
@@ -97,9 +102,14 @@ def is_red(result: Mapping[str, Any]) -> bool:
 
 def summary_line(result: Mapping[str, Any]) -> str:
     c = result["counts"]
-    return (f"SourceDoc 與抽取 JSON：重建會遺失或不確定 {c['danger']}（section {c['danger_section']}／title "
-            f"{c['danger_title']}）｜圖落後 JSON {c['stale']}（section {c['stale_section']}／title {c['stale_title']}）"
-            f"｜圖上有、沒有任何抽取檔 {c['graph_without_json']}｜讀不了的抽取檔 {c.get('unreadable_json', 0)}")
+
+    def split(kind: str) -> str:
+        return "／".join(f"{_LABELS.get(f, f)} {c.get(f'{kind}_{f}', 0)}" for f in FIELDS)
+
+    return (f"SourceDoc 與抽取 JSON：重建會遺失或不確定 {c['danger']}（{split('danger')}）｜圖落後 JSON {c['stale']}"
+            f"（{split('stale')}）｜圖上有、沒有任何抽取檔 {c['graph_without_json']}｜讀不了的抽取檔 {c.get('unreadable_json', 0)}")
 
 
-__all__ = ["FIELDS", "drift", "is_red", "json_source_docs", "summary_line"]
+_LABELS = {"section": "section", "title": "title", "origin_entity": "origin"}
+
+__all__ = ["FIELDS", "GRAPH_CYPHER", "drift", "is_red", "json_source_docs", "summary_line"]

@@ -120,12 +120,6 @@ RETURN sd.id AS id, sd.url AS url, sd.section AS section
 ORDER BY sd.id
 """
 
-SOURCE_DOC_META_CYPHER = """
-MATCH (sd:SourceDoc)
-RETURN sd.id AS id, sd.section AS section, sd.title AS title
-ORDER BY sd.id
-"""
-
 SCHEMA_STATE_CYPHER = """
 OPTIONAL MATCH (state:GraphSchemaState {id: 'stockbotv2'})
 RETURN state.version AS version
@@ -342,10 +336,11 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
                 for norm, members in sorted(by_norm_url.items())
                 if len(members) > 1 and not is_legit_multi_section(sec for _, sec in members)
             ]
-            # SourceDoc 的 section／title 跟抽取 JSON 一不一致（常駐計數器，Phase 4 Step 4.2e）。
-            from loader.sourcedoc_sync import drift, json_source_docs
+            # SourceDoc 的 section／title／origin_entity 跟抽取 JSON 一不一致（常駐計數器，Phase 4 Step 4.2e；
+            # 欄位與查詢都住 loader.sourcedoc_sync——Phase 6 Step 6.3d 起不在這裡另寫一份）。
+            from loader.sourcedoc_sync import GRAPH_CYPHER, drift, json_source_docs
 
-            sourcedoc_sync = drift(list(session.run(SOURCE_DOC_META_CYPHER)), json_source_docs())
+            sourcedoc_sync = drift(list(session.run(GRAPH_CYPHER)), json_source_docs())
             schema_version = session.run(SCHEMA_STATE_CYPHER).single()["version"]
             company_ids = [row["company_id"] for row in session.run(COMPANY_IDS_CYPHER)]
 
