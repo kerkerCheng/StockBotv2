@@ -283,7 +283,9 @@ decision_lab.db sha256=e99d1c79fd22dbe1099f30c4e06f2d1188f26a8cbfa987a27cd884253
 
 ## 10. Phase 4 尾巴
 
-- **pq2 [666]**：`ra_admission`、`ref_id` `ra_b98730bb2721d909a9cf3f3746fec135`、池中未結案（`resolution` null）；RA 紀錄 `state=partial`、沒有 `approval` 戳記、`expires_at` 2026-10-31T15:48:56Z。標題「Reuters 2026-06-11 InP 出口管制報導宣告 origin_linkage=independent」。心跳「pq2 球在你手上 1」＝[666]。
+- **pq2 [666]**：`ra_admission`、`ref_id` `ra_b98730bb2721d909a9cf3f3746fec135`、池中未結案（`resolution` null）；RA 紀錄 `state=partial`、`action_digest` `26924126…e50d`（與 plan §0.5 的重試指令相同）、
+  **核准戳記在 `execution.approval`**＝`{pq2_n: 666, digest: 26924126…e50d, at: 2026-10-01T23:08:31Z}`（初版誤讀頂層欄位寫成「沒有戳記」，2026-10-02 更正）——所以重試走 apply 入口的「同編號同 digest 重試」路徑，四道檢查會過；
+  `execution.last_error`＝`document_not_complete`：以 `cloud_routine`（routine_writer）身分寫 Neo4j 時 `Creating new property name … not allowed`、`graph_mutated=false`。`expires_at` 2026-10-31T15:48:56Z。標題「Reuters 2026-06-11 InP 出口管制報導宣告 origin_linkage=independent」。心跳「pq2 球在你手上 1」＝[666]。
 - **Neo4j property token（唯讀 `CALL db.propertyKeys()`）**：56 個；**`origin_linkage` 已存在**；stash 版 setup 1b 預熱清單 37 個屬性名**全部已有 token、缺 0**。
   ⚠ Phase 4 結案時 [666] 正是缺 `origin_linkage` 被 Forbidden 擋下——現在 token 已在，[666] 重試不會再撞同一道（token 怎麼建的不在本報告的量測範圍；本 session 沒有任何寫入）。
 - **`stash@{0}`**「等使用者決定：neo4j_setup 1b 預熱補 loader 全部屬性名＋對稱測試（pq2 [666] Forbidden origin_linkage）」：`schema/neo4j_setup.cypher` +41／−1（預熱 sentinel 由 2 個屬性名擴成 37 個，附註解）、`tests/test_robotics_ontology.py` +20（`test_neo4j_setup_prewarms_every_property_the_loader_sets`：loader 所有 Cypher 常數 SET 的屬性名 ⊆ 預熱清單，`id` 除外；先斷言 `origin_linkage` 在解析結果裡，空集合不得冒充通過）。
