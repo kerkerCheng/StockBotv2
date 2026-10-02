@@ -115,7 +115,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
-| 6.0 | [666] 收尾（10-02 的 go）＋基準快照（`docs/reports/2026-10-xx-phase6-baseline.md`；證據等級凍結進 `config/graph_baselines.json` 新鍵） | ○ | 執行模型 | |
+| 6.0 | [666] 收尾（10-02 的 go；10-03 apply／publish／結案，6 條升外部印證）＋基準快照（`docs/reports/2026-10-03-phase6-baseline.md`；證據等級凍結進 `config/graph_baselines.json` 的 `evidence_classes_2026_10_03`；偏差見 §0.6 #1–#3） | ✅ | 執行模型 | 見 git log「Step 6.0」 |
 | 6.1 | 插槽讀圖 staleness：同級標籤互換算低等級（任何改分類之前） | ○ | 執行模型 | |
 | 6.2 | 身分清理：OpenLight 合併、nava 定案；遷移與 RA packet 印入圖副作用（#32）；R2-a；pq2 | ○ | 執行模型 | |
 | 6.3 | 證據資料：名冊三個寫法、GSR→media、名冊新公司、SourceDoc origin 更正（pq2）、綜述論文登記、四則 lead 標籤（pq2） | ○ | 執行模型 | |
@@ -139,6 +139,9 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 
 | # | Step | plan 原文 | 實際 | 為什麼 |
 |---|---|---|---|---|
+| 1 | 6.0 | （plan commit `8c7cc574`）`docs/plans/README.md` 對照表 Phase 6 的狀態格寫 `**active**（…）` | 改成 `active（…）`（與其他列同一個寫法） | 加粗讓狀態格不以封閉字彙開頭：`tests/test_phase_status_hint.py::test_real_readme_status_cells_start_with_a_known_word` 紅、SessionStart hook 報「沒有 active plan」（10-03 session 開頭就是這樣錯的）。維持營運，不算進展（baseline §1） |
+| 2 | 6.0（影響 6.4、6.8、結案 R2） | §5 owner：發布者過 `publisher_lifts` 後「要有一段具名主詞、而且不含轉述字表任何一個詞」的引文；§13「6.4 的轉述檢查也套在那份 Reuters 的引文上（若是「AXT said…」型就不升）」 | **宣告 `origin_linkage=independent` 的文件不套轉述檢查**（具名照樣要）；轉述與具名都在過 `publisher_lifts` 的那幾份文件裡逐份判。§5、§13 改寫 | ROADMAP Phase 6 列與 §0.1 #4 都寫「翻案靠逐份宣告 `origin_linkage=independent`」，6.8 第 1 項的 `relay` 補救也是「宣告 independent 的 RA」——只有 §13 的註記相反；依檔頭「衝突時以 ROADMAP 為準」。照 §13 的讀法，[666] 的 6 條會全部退回（Reuters s1「AXT … said」是轉述，但 s2「…, the person said」是 Reuters 自己採訪、s5 是 SemiAnalysis 分析師，草案字表三段都判轉述）＝抵銷使用者 10-02 核准的宣告（baseline §3） |
+| 3 | 6.0（影響 §11、6.3b、6.3e） | §0.2／§11「外部印證 244 → N」；§0.2 GSR 連鎖 7 條；6.3e 綜述論文「31 條邊」 | 以 [666] 之後的 **250** 起算（凍結鍵 `evidence_classes_2026_10_03`）；GSR→media 只掉 **3** 條（另 4 條由宣告 independent 的 Reuters s3 撐住）；論文掛 **34** 條 distinct edge_key | [666] 在 6.0a 先落地；規則那一半（未具名 12、轉述 2、名冊無名 1）與 §0.2 逐條相同（baseline §3、§6、§12） |
 
 ---
 
@@ -239,7 +242,7 @@ L11-6 ④：最先壞的是 `co:openlight_photonics partnership_with co:tower_se
 | b GSR → media | `config/publishers.json` | `Global Semi Research` 的 `kind: media`、`corroborates: false`，`note` 寫定案日期與理由（[668] RA review「單位數字的出處沒寫」；與另 4 個 Substack 一致） | 載入檢查通過；證據等級變動逐條（預期 7 條，§0.2） |
 | c 名冊新公司 | `config/company_identity.json` | Credo、Noveon Magnetics、Sojitz、Telescent、USA Rare Earth：先查圖上有沒有既有 `co:*` 節點（有就用那個 id）；`display_name` 附一手出處（申報封面或官網）；上市的填 `research_ticker`（CRDO、2768.T、USAR），私人公司明確 `null`（L9） | 名冊載入無衝突；每家的 origin 解析由「解析不到」變「公司」；**Sojitz 是客戶端，它的邊可能升外部印證——逐條列出那段引文**（§0 第 2 條） |
 | d SourceDoc origin 更正（pq2） | 抽取檔 `source_doc.origin_entity`＋圖（`loader/sourcedoc_sync.py::FIELDS` 加 `origin_entity`；`loader/migrate_sourcedoc_json_section.py --apply-graph --pq2 N` 寫圖） | 三份：`Soitec management (Reuters interview)` → `Soitec（Reuters 訪談逐字）`；`Novanta/ATI（供應商官方應用頁）` → `Novanta（子公司 ATI Industrial Automation 官方應用頁）`；`Third-party Research` → `MDPI Micromachines（Chen et al. 2025 綜述）`——**`cpo_chip_package_paper.json` 與 `cpo_paper_coverage_addendum_2026_08_30.json` 兩份要同一個值**（同一 doc_id 多份 JSON 互異＝SourceDocSync 紅）；先鑄 manual pq2（hint 附逐份舊值→新值與原文出處），go 之後才改 JSON 與圖，同一次做完 | SourceDocSync 兩個方向 0＋0；三份的 origin 解析分別是公司 co:soitec／公司 co:novanta／發布者 MDPI Micromachines；證據等級變動逐條 |
-| e 綜述論文登記 | `config/publishers.json` | `MDPI Micromachines`：`kind: media`（綜述，轉述廠商公開資料——原文「based on data from OpenAI and Broadcom's official reports」「adapted from semiconductor-related websites」），`seen_in: cpo_chip_package_paper` | 它的 31 條邊由待判定變媒體轉述（同級，6.1 之後只會讓讀圖 stale_low）；②「origin 解析不到的來源」減少 |
+| e 綜述論文登記 | `config/publishers.json` | `MDPI Micromachines`：`kind: media`（綜述，轉述廠商公開資料——原文「based on data from OpenAI and Broadcom's official reports」「adapted from semiconductor-related websites」），`seen_in: cpo_chip_package_paper` | 它的 34 條邊（baseline §6；plan 原寫 31，§0.6 #3）由待判定變媒體轉述（同級，6.1 之後只會讓讀圖 stale_low）；②「origin 解析不到的來源」減少 |
 | f 四則 lead 的 `classified_by`（pq2） | `library/leads/pending_leads.json`（authority） | 鑄一個 manual pq2（hint 列四則、舊值→新值 `interactive:directed`）；go 之後在 writer lock 下、先備份、只改這四則的這一個欄位，收據記舊值與新值 | 四則的值；心跳「分類層上次成功」不再被它們冒充（6.0 的值對照） |
 
 L11-6 ④：最先壞的是 `layer_stats.enumeration`（②「非供應商來源列舉 ≥2 家」）——名冊新公司與新寫法會改變「誰算非供應商來源」與「引文具名幾家」，②的層數可能變；逐層列出變化與原因，不得把它當驗收進展報（它不是本 Phase 的驗收）。
@@ -252,6 +255,7 @@ L11-6 ④：最先壞的是 `layer_stats.enumeration`（②「非供應商來源
 - **名冊公司、不是主詞**：主詞是名冊公司時，這個 origin 至少一段引文具名主詞（`quote_names_company`）才給「外部印證」；主詞在名冊沒有任何寫法 → `no_name_forms`（待判定）；有寫法但引文沒具名 → `unnamed`（待判定）。主詞不是名冊公司（技術節點之間的邊）→ 照舊。
 - **名冊公司、是主詞**：照舊（自報；filing 出身為自報·filing）。
 - **發布者**：先過 `publisher_lifts`（類別與逐份宣告，照舊）；過了之後，主詞是名冊公司時要有一段「具名主詞、而且不含轉述字表任何一個詞」的引文才給外部印證，否則 `relay`（有具名但都是轉述句）或 `unnamed`／`no_name_forms` → 媒體轉述；沒過 `publisher_lifts` → 媒體轉述（照舊）。
+  **逐份文件判**：只在過了 `publisher_lifts` 的那幾份文件裡找引文；**那份文件宣告 `origin_linkage=independent` 時不套轉述檢查**（具名照樣要）——ROADMAP「翻案靠逐份宣告 `origin_linkage=independent`」（§0.6 #2）。
 - **解析不到**：照舊（聯合公告偵測 → 雙方聯合；否則待判定）。
 - 取各 origin 能支持的最高等級（照舊）。
 
@@ -362,7 +366,7 @@ Claimed acceptance: Phase 6 completion gate 九項全過、ROADMAP Phase 6 驗�
 Do not trust: 上面那行是待驗證的宣稱，不是事實
 Task: 直接讀 repo，自己跑下列檢查，逐項 ✅／❌ 附實際輸出，回 REVIEW（含 verdict）
   1. python -m pytest -q；python -m audit invariants；測試函式層級增刪自己比（6.0 commit 起）
-  2. 證據等級：對今天的圖自己寫十行腳本，逐條外部印證邊、逐 origin 核對「引文具名主詞」與「發布者引文不是轉述句」（字表讀 config/relay_language.json），違反應為 0；
+  2. 證據等級：對今天的圖自己寫十行腳本，逐條外部印證邊、逐 origin 核對「引文具名主詞」與「發布者引文不是轉述句」（字表讀 config/relay_language.json；宣告 origin_linkage=independent 的文件不套轉述——plan §0.6 #2），違反應為 0；
      與 config/graph_baselines.json 的 6.0 基準鍵逐條比，每條升降都歸得到一個事件（規則／資料更正／身分合併／[666]／補引文 RA）；抽 3 條升級的邊讀原文
   3. 身分：名冊沒有 co:openlight；圖上沒有 co:openlight 節點；OpenLight 這個 origin 解析到 co:openlight_photonics；nava 的處置與收據原文一致
   4. staleness：同級互換夾具判 low；4 份現行讀圖的 result_digest 不受 6.5 的旗標影響（拿 6.5 前後的程式各算一次）
@@ -393,7 +397,7 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 - **sub 旗標與字表版本不得進 digest**（§0 第 6 條）；`query.structure` 的 `as_dict` 若被拿去算 digest，附加欄位要放在 digest 範圍外（照插槽視角「附加段不進 digest」的做法）。
 - **轉述字表的 L19**：不得出現在 `prompts/`、`skills/`；`intake` 的 packet 可以印「這段被判轉述」的結果，但不得把字表本身印給抽取端。
 - **GSR 改 media 不回頭重驗既有讀圖**：讀圖 ledger append-only；舊讀圖若以 GSR 當 independent 引用，它在寫入當時是合法的；新規則只管新寫的（6.8 重讀）。
-- **[666] 與本 Phase 互相影響**：它把一份 Reuters 宣告為 independent，InP 那幾條邊會由 Reuters 撐住外部印證；6.4 的轉述檢查也套在那份 Reuters 的引文上（若是「AXT said…」型就不升）。
+- **[666] 與本 Phase 互相影響**：它把一份 Reuters 宣告為 independent，InP 那幾條邊由 Reuters 撐住外部印證（[666] 之後外部印證 250，baseline §0）；**宣告 independent 的文件不套轉述檢查**（§0.6 #2：ROADMAP「翻案靠逐份宣告」；原註記寫「轉述檢查也套在那份 Reuters 上」，與 ROADMAP 衝突），具名照樣要——s2／s3／s5 都具名主詞，6 條保住；s1「AXT … said」的同源性由 [666] RA 的 L8 備註承載（宣告是文件層級的）。
 - **EDGAR**：`rate_sleep()` 與 User-Agent 照 `fetchers/edgar.py`；submissions 的 `recent` 只保證最近約一年或 1000 筆，申報多的大型股（NVDA）在窗內仍夠，但要測；8-K 的 `items` 是逗號分隔字串（例 `"1.01,3.02,9.01"`）。
 - **COHR、LITE 的發行是私募**：配的是 8-K 第 3.02 項，不是 424B；配不到就是判色寫錯，不是它們沒募資。
 - **yfinance 的交易時段**：`history_metadata` 有時缺 `currentTradingPeriod`；缺就保留那根並計數「收盤狀態未知」，不靜默丟。

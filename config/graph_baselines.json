@@ -1730,6 +1730,2276 @@
      "zacks_aaoi_800g_ramp_2026_e1": "0b094d85eb1d7aea"
     }
    }
+  },
+  "evidence_classes_2026_10_03": {
+   "taken_at": "2026-10-02T21:52:12.875549+00:00",
+   "head": "06350d0b",
+   "report": "docs/reports/2026-10-03-phase6-baseline.md",
+   "plan": "docs/plans/2026-10-02-002-feat-phase6-evidence-criteria-plan.md",
+   "scope": "全圖 canonical 邊（query.structure._classify_edges＝collapse_assertions＋classify_evidence，Phase 6 改規則前；[666] 之後）",
+   "assertions": 699,
+   "canonical_edges": 537,
+   "distribution": {
+    "externally_corroborated": 250,
+    "self_reported_costly": 105,
+    "self_reported": 104,
+    "needs_review": 37,
+    "media_relay": 33,
+    "counterparty_joint": 8
+   },
+   "classes": {
+    "co:aehr_test_systems supplies_to tech:cpo_full_stack_test": "self_reported_costly",
+    "co:aeva supplies_to tech:near_package_optics": "self_reported_costly",
+    "co:agility_robotics constrained_by comp:humanoid_precision_actuators": "externally_corroborated",
+    "co:agility_robotics develops prod:digit": "self_reported",
+    "co:agility_robotics develops prod:digit_v5": "self_reported",
+    "co:agility_robotics supplies_to tech:robotics_as_a_service": "self_reported",
+    "co:ansys enables tech:cpo": "needs_review",
+    "co:anthropic deploys prod:amd_helios_mi450": "counterparty_joint",
+    "co:anthropic enables tech:ai_compute_buildout": "externally_corroborated",
+    "co:apollo invests_in co:broadcom": "externally_corroborated",
+    "co:applied_materials develops prod:amat_ags": "self_reported_costly",
+    "co:applied_materials develops prod:amat_semiconductor_systems": "self_reported_costly",
+    "co:applied_materials supplies_to prod:amat_ags": "self_reported_costly",
+    "co:applied_materials supplies_to prod:amat_semiconductor_systems": "self_reported_costly",
+    "co:applied_materials supplies_to tech:200mm_equipment": "self_reported_costly",
+    "co:applied_materials supplies_to tech:advanced_packaging": "self_reported_costly",
+    "co:applied_materials supplies_to tech:dram": "self_reported_costly",
+    "co:applied_materials supplies_to tech:dram_manufacturing": "self_reported_costly",
+    "co:applied_materials supplies_to tech:icaps": "self_reported_costly",
+    "co:applied_materials supplies_to tech:leading_edge_logic_foundry": "self_reported_costly",
+    "co:applied_materials supplies_to tech:nand": "self_reported_costly",
+    "co:applied_materials supplies_to tech:semiconductor_manufacturing_equipment": "self_reported_costly",
+    "co:applied_optoelectronics competes_with co:coherent": "self_reported_costly",
+    "co:applied_optoelectronics competes_with co:lumentum": "self_reported_costly",
+    "co:applied_optoelectronics constrained_by prod:aaoi_400mw_narrow_linewidth_pump_laser": "self_reported",
+    "co:applied_optoelectronics develops prod:aaoi_400mw_narrow_linewidth_pump_laser": "self_reported",
+    "co:applied_optoelectronics supplies_to tech:pluggable_transceiver": "media_relay",
+    "co:applied_optoelectronics supplies_to tech:transceiver_1_6t": "self_reported",
+    "co:arista enables tech:xpo_form_factor": "externally_corroborated",
+    "co:axt competes_with co:jx_advanced_metals": "externally_corroborated",
+    "co:axt supplies_to co:casela_technologies": "self_reported_costly",
+    "co:axt supplies_to co:coherent": "externally_corroborated",
+    "co:axt supplies_to co:landmark_optoelectronics": "externally_corroborated",
+    "co:axt supplies_to co:lumentum": "externally_corroborated",
+    "co:axt supplies_to co:vpec": "externally_corroborated",
+    "co:axt supplies_to mat:gaas_substrate": "self_reported_costly",
+    "co:axt supplies_to mat:germanium_substrate": "self_reported_costly",
+    "co:axt supplies_to mat:inp_substrate": "externally_corroborated",
+    "co:ayar_labs develops prod:supernova": "externally_corroborated",
+    "co:blackstone invests_in co:broadcom": "externally_corroborated",
+    "co:boston_dynamics develops prod:atlas_humanoid_robot": "self_reported",
+    "co:broadcom depends_on tech:coupe": "self_reported",
+    "co:broadcom develops prod:apple_broadcom_custom_asic_program": "self_reported_costly",
+    "co:broadcom develops prod:jericho3": "self_reported",
+    "co:broadcom develops prod:jericho4": "self_reported",
+    "co:broadcom develops prod:th6_davisson": "self_reported",
+    "co:broadcom develops prod:tomahawk6": "self_reported",
+    "co:broadcom supplies_to co:anthropic": "self_reported",
+    "co:broadcom supplies_to co:apple": "self_reported_costly",
+    "co:broadcom supplies_to co:google": "self_reported",
+    "co:broadcom supplies_to co:meta": "media_relay",
+    "co:broadcom supplies_to co:openai": "self_reported",
+    "co:broadcom supplies_to tech:ai_switch": "self_reported",
+    "co:broadcom supplies_to tech:broadcom_3d_silicon_cpo": "needs_review",
+    "co:broadcom supplies_to tech:cpo": "externally_corroborated",
+    "co:broadcom supplies_to tech:dsp_1p6t": "self_reported",
+    "co:broadcom supplies_to tech:xpu": "self_reported",
+    "co:cadence enables tech:cpo": "needs_review",
+    "co:casela_technologies depends_on mat:inp_substrate": "externally_corroborated",
+    "co:celestial_ai develops tech:photonic_fabric": "externally_corroborated",
+    "co:coherent constrained_by tech:inp_dfb_laser": "self_reported",
+    "co:coherent depends_on mat:inp_substrate": "externally_corroborated",
+    "co:coherent depends_on tech:inp_6inch_fab": "externally_corroborated",
+    "co:coherent enables std:oif_hd_form_factor": "self_reported",
+    "co:coherent enables std:open_cpx": "self_reported",
+    "co:coherent partnership_with co:nvidia": "externally_corroborated",
+    "co:coherent supplies_to co:nvidia": "externally_corroborated",
+    "co:coherent supplies_to tech:cpo": "self_reported",
+    "co:coherent supplies_to tech:cpo_fiber_attach": "externally_corroborated",
+    "co:coherent supplies_to tech:cw_dfb_laser": "externally_corroborated",
+    "co:coherent supplies_to tech:dci_transceiver": "self_reported",
+    "co:coherent supplies_to tech:eml": "self_reported",
+    "co:coherent supplies_to tech:external_laser_source": "externally_corroborated",
+    "co:coherent supplies_to tech:fiber_attach_unit": "self_reported",
+    "co:coherent supplies_to tech:fiber_collimator_array": "self_reported",
+    "co:coherent supplies_to tech:garnet_faraday_rotator": "self_reported",
+    "co:coherent supplies_to tech:inp_cpo": "self_reported",
+    "co:coherent supplies_to tech:isolator": "self_reported",
+    "co:coherent supplies_to tech:microlens_array": "self_reported",
+    "co:coherent supplies_to tech:module_assembly": "self_reported",
+    "co:coherent supplies_to tech:multi_rail": "self_reported",
+    "co:coherent supplies_to tech:near_package_optics": "self_reported",
+    "co:coherent supplies_to tech:ocs": "self_reported",
+    "co:coherent supplies_to tech:optical_circulator": "self_reported",
+    "co:coherent supplies_to tech:photodiode": "self_reported",
+    "co:coherent supplies_to tech:pluggable_transceiver": "self_reported",
+    "co:coherent supplies_to tech:pm_fiber": "self_reported",
+    "co:coherent supplies_to tech:silicon_photonics_pic": "self_reported",
+    "co:coherent supplies_to tech:six_inch_inp_production": "externally_corroborated",
+    "co:coherent supplies_to tech:tec": "self_reported",
+    "co:coherent supplies_to tech:thermal_solutions": "self_reported",
+    "co:coherent supplies_to tech:uhp_laser": "externally_corroborated",
+    "co:coherent supplies_to tech:vcsel": "self_reported",
+    "co:coherent supplies_to tech:xpo_form_factor": "self_reported",
+    "co:coreweave deploys prod:vera_verarubin": "externally_corroborated",
+    "co:corning develops mat:glass_substrate": "needs_review",
+    "co:corning supplies_to tech:glass_cpo": "needs_review",
+    "co:enablence_technologies supplies_to prod:els_8ch_module": "self_reported",
+    "co:ewellix supplies_to tech:planetary_roller_screw": "media_relay",
+    "co:fabrinet partnership_with co:nvidia": "externally_corroborated",
+    "co:fabrinet supplies_to co:nvidia": "self_reported_costly",
+    "co:fabrinet supplies_to tech:cpo": "self_reported",
+    "co:fabrinet supplies_to tech:cpo_packaging_assembly": "externally_corroborated",
+    "co:foci supplies_to tech:fiber_attach_unit": "self_reported_costly",
+    "co:globalfoundries competes_with co:intel": "self_reported_costly",
+    "co:globalfoundries competes_with co:samsung": "self_reported_costly",
+    "co:globalfoundries competes_with co:texas_instruments": "self_reported_costly",
+    "co:globalfoundries competes_with co:tsmc": "self_reported_costly",
+    "co:globalfoundries competes_with co:umc": "self_reported_costly",
+    "co:globalfoundries depends_on mat:gallium_nitride": "self_reported_costly",
+    "co:globalfoundries depends_on mat:photoresist": "self_reported_costly",
+    "co:globalfoundries depends_on mat:rare_earth_metals": "self_reported_costly",
+    "co:globalfoundries depends_on mat:silicon_wafer": "self_reported_costly",
+    "co:globalfoundries depends_on tech:semiconductor_manufacturing_equipment": "self_reported_costly",
+    "co:globalfoundries develops prod:gf_scale": "externally_corroborated",
+    "co:globalfoundries invests_in co:mips_holding": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:advanced_packaging_gf": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:essential_chips_mature_node": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:fd_soi": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:power_gan": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:rf_gan": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:rf_soi": "self_reported_costly",
+    "co:globalfoundries supplies_to tech:silicon_photonics": "self_reported_costly",
+    "co:google deploys prod:vera_verarubin": "externally_corroborated",
+    "co:google develops prod:palomar_ocs": "self_reported",
+    "co:gxo_logistics deploys prod:digit": "self_reported",
+    "co:harmonic_drive_systems supplies_to tech:strain_wave_gear": "media_relay",
+    "co:hexagon develops prod:hexagon_aeon": "self_reported",
+    "co:himax partnership_with co:foci": "self_reported_costly",
+    "co:himax supplies_to tech:cpo": "self_reported_costly",
+    "co:humanoid supplies_to co:schaeffler": "self_reported",
+    "co:hyperlight supplies_to tech:tfln_platform": "self_reported",
+    "co:hyundai_mobis partnership_with co:boston_dynamics": "externally_corroborated",
+    "co:hyundai_mobis supplies_to co:boston_dynamics": "externally_corroborated",
+    "co:ime_cas supplies_to tech:ime_silicon_cpo": "needs_review",
+    "co:intel develops mat:glass_substrate": "needs_review",
+    "co:intel supplies_to tech:intel_foveros": "needs_review",
+    "co:intel supplies_to tech:intel_glass_cpo": "needs_review",
+    "co:intelliepi competes_with co:iqe": "self_reported_costly",
+    "co:intelliepi competes_with co:vpec": "self_reported_costly",
+    "co:intelliepi supplies_to tech:photodiode": "self_reported_costly",
+    "co:intelliepi supplies_to tech:vcsel": "self_reported_costly",
+    "co:iqe constrained_by mat:inp_substrate": "self_reported_costly",
+    "co:iqe supplies_to co:macom": "externally_corroborated",
+    "co:iqe supplies_to co:tower_semiconductor": "externally_corroborated",
+    "co:iqe supplies_to prod:quantum_dot_laser_epiwafer": "needs_review",
+    "co:jabil develops prod:jabil_sivers_1_6t_lro_module": "externally_corroborated",
+    "co:jl_mag supplies_to mat:rare_earth_magnets": "self_reported_costly",
+    "co:jl_mag supplies_to tech:grain_boundary_diffusion": "self_reported_costly",
+    "co:jx_advanced_metals supplies_to co:lumentum": "externally_corroborated",
+    "co:jx_advanced_metals supplies_to mat:inp_substrate": "externally_corroborated",
+    "co:lam_research develops prod:altus_family": "self_reported_costly",
+    "co:lam_research develops prod:reliant": "self_reported_costly",
+    "co:lam_research develops prod:sabre_family": "self_reported_costly",
+    "co:lam_research develops prod:vector_family": "self_reported_costly",
+    "co:lam_research supplies_to prod:reliant": "self_reported_costly",
+    "co:lam_research supplies_to tech:3d_nand_manufacturing": "self_reported_costly",
+    "co:lam_research supplies_to tech:3d_scaling": "self_reported_costly",
+    "co:lam_research supplies_to tech:advanced_packaging": "self_reported_costly",
+    "co:lam_research supplies_to tech:deposition_etch_clean": "self_reported_costly",
+    "co:lam_research supplies_to tech:dram_manufacturing": "self_reported_costly",
+    "co:lam_research supplies_to tech:foundry_logic": "self_reported_costly",
+    "co:lam_research supplies_to tech:nand": "self_reported_costly",
+    "co:lam_research supplies_to tech:semiconductor_manufacturing_equipment": "self_reported_costly",
+    "co:landmark_optoelectronics competes_with co:intelliepi": "self_reported_costly",
+    "co:landmark_optoelectronics competes_with co:iqe": "self_reported_costly",
+    "co:landmark_optoelectronics supplies_to tech:cw_dfb_laser": "self_reported_costly",
+    "co:leaderdrive competes_with co:harmonic_drive_systems": "media_relay",
+    "co:leaderdrive supplies_to tech:strain_wave_gear": "media_relay",
+    "co:lessengers develops prod:1_6t_dr4_transceiver": "externally_corroborated",
+    "co:lumentum competes_with co:sivers_semiconductors": "media_relay",
+    "co:lumentum depends_on mat:inp_substrate": "externally_corroborated",
+    "co:lumentum depends_on tech:cw_dfb_laser": "self_reported",
+    "co:lumentum develops prod:1p6t_transceiver": "self_reported",
+    "co:lumentum develops prod:800g_transceiver": "self_reported",
+    "co:lumentum develops prod:els_module": "self_reported",
+    "co:lumentum develops prod:uhp_laser": "self_reported",
+    "co:lumentum develops tech:cw_dfb_laser": "self_reported",
+    "co:lumentum partnership_with co:nvidia": "externally_corroborated",
+    "co:lumentum supplies_to co:ayar_labs": "counterparty_joint",
+    "co:lumentum supplies_to co:nava_thailand": "self_reported",
+    "co:lumentum supplies_to co:nvidia": "externally_corroborated",
+    "co:lumentum supplies_to tech:cloud_transceiver": "self_reported",
+    "co:lumentum supplies_to tech:cloud_transceiver_1_6t": "self_reported",
+    "co:lumentum supplies_to tech:cw_dfb_laser": "externally_corroborated",
+    "co:lumentum supplies_to tech:dci_transceiver": "self_reported",
+    "co:lumentum supplies_to tech:els_pluggable_module": "externally_corroborated",
+    "co:lumentum supplies_to tech:eml": "self_reported",
+    "co:lumentum supplies_to tech:external_laser_source": "self_reported",
+    "co:lumentum supplies_to tech:narrow_linewidth_laser": "self_reported",
+    "co:lumentum supplies_to tech:ocs": "self_reported_costly",
+    "co:lumentum supplies_to tech:optical_scale_up": "self_reported",
+    "co:lumentum supplies_to tech:pump_laser": "self_reported",
+    "co:lumentum supplies_to tech:scale_across": "self_reported",
+    "co:lumentum supplies_to tech:scale_up_network": "counterparty_joint",
+    "co:lumentum supplies_to tech:transceiver_1_6t": "self_reported",
+    "co:lumentum supplies_to tech:uhp_laser": "externally_corroborated",
+    "co:lumentum supplies_to tech:wss": "self_reported_costly",
+    "co:luxnet supplies_to tech:cw_dfb_laser": "self_reported_costly",
+    "co:lynas supplies_to mat:rare_earth_magnets": "self_reported_costly",
+    "co:lynas supplies_to mat:separated_heavy_reo": "needs_review",
+    "co:macom develops tech:inp_dfb_laser": "self_reported",
+    "co:macom invests_in co:iqe": "externally_corroborated",
+    "co:macom supplies_to tech:inp_dfb_laser": "self_reported",
+    "co:marvell_technology acquired co:celestial_ai": "externally_corroborated",
+    "co:marvell_technology develops prod:google_marvell_custom_semiconductors": "self_reported_costly",
+    "co:marvell_technology develops tech:photonic_fabric": "externally_corroborated",
+    "co:marvell_technology partnership_with co:nvidia": "self_reported_costly",
+    "co:marvell_technology supplies_to co:google": "self_reported_costly",
+    "co:marvell_technology supplies_to tech:cpo": "self_reported_costly",
+    "co:marvell_technology supplies_to tech:lpo": "self_reported_costly",
+    "co:marvell_technology supplies_to tech:scale_up_network": "counterparty_joint",
+    "co:marvell_technology supplies_to tech:tia_driver": "self_reported_costly",
+    "co:meta develops prod:vistara": "self_reported",
+    "co:meta develops tech:cxl_memory_tiering": "self_reported",
+    "co:micron_technology supplies_to tech:dram_technology": "self_reported_costly",
+    "co:micron_technology supplies_to tech:hbm": "self_reported_costly",
+    "co:microsoft deploys prod:vera_verarubin": "externally_corroborated",
+    "co:mp_materials supplies_to mat:rare_earth_magnets": "externally_corroborated",
+    "co:mp_materials supplies_to mat:separated_heavy_reo": "externally_corroborated",
+    "co:mp_materials supplies_to tech:ndfeb_metal_alloy": "self_reported_costly",
+    "co:nabtesco supplies_to tech:rv_reducer": "media_relay",
+    "co:nava_thailand supplies_to tech:cloud_transceiver_1_6t": "externally_corroborated",
+    "co:nebius deploys prod:vera_verarubin": "externally_corroborated",
+    "co:newphotonics depends_on prod:ph18da": "media_relay",
+    "co:newphotonics develops prod:newphotonics_npc50506": "self_reported",
+    "co:nidec supplies_to tech:strain_wave_gear": "self_reported",
+    "co:niron_magnetics develops mat:iron_nitride_magnet": "self_reported",
+    "co:novanta supplies_to tech:force_torque_sensor": "needs_review",
+    "co:nvidia depends_on tech:mrm_200g": "externally_corroborated",
+    "co:nvidia develops prod:blackwell": "self_reported",
+    "co:nvidia develops prod:dsx_ai_factory_platform": "self_reported_costly",
+    "co:nvidia develops prod:lpx": "self_reported_costly",
+    "co:nvidia develops prod:quantum_x_photonics": "self_reported",
+    "co:nvidia develops prod:spectrum_6": "self_reported_costly",
+    "co:nvidia develops prod:spectrum_x": "self_reported",
+    "co:nvidia develops prod:vera_verarubin": "self_reported",
+    "co:nvidia develops tech:micro_ring_modulator": "media_relay",
+    "co:nvidia invests_in co:coherent": "externally_corroborated",
+    "co:nvidia invests_in co:lumentum": "externally_corroborated",
+    "co:nvidia invests_in co:marvell_technology": "externally_corroborated",
+    "co:nvidia partnership_with co:sk_hynix": "self_reported_costly",
+    "co:nvidia partnership_with co:tsmc": "self_reported",
+    "co:nvidia supplies_to co:anthropic": "self_reported",
+    "co:nvidia supplies_to co:openai": "self_reported_costly",
+    "co:nvidia supplies_to prod:blackwell": "self_reported",
+    "co:nvidia supplies_to prod:spectrum_x": "self_reported",
+    "co:nvidia supplies_to prod:vera_verarubin": "self_reported",
+    "co:nvidia supplies_to tech:acie_segment": "self_reported",
+    "co:o_net_technologies develops prod:els_8ch_module": "externally_corroborated",
+    "co:o_net_technologies supplies_to prod:els_8ch_module": "externally_corroborated",
+    "co:o_net_technologies supplies_to tech:external_laser_source": "externally_corroborated",
+    "co:openai enables tech:ai_compute_buildout": "externally_corroborated",
+    "co:openlight supplies_to co:newphotonics": "media_relay",
+    "co:openlight_photonics develops prod:ph18da": "externally_corroborated",
+    "co:openlight_photonics partnership_with co:cadence": "needs_review",
+    "co:openlight_photonics partnership_with co:tower_semiconductor": "externally_corroborated",
+    "co:openlight_photonics supplies_to co:newphotonics": "externally_corroborated",
+    "co:oracle deploys prod:vera_verarubin": "externally_corroborated",
+    "co:poet_technologies develops prod:1_6t_dr4_transceiver": "self_reported_costly",
+    "co:poet_technologies develops prod:blazar": "self_reported_costly",
+    "co:poet_technologies develops prod:poet_optical_engine": "self_reported_costly",
+    "co:poet_technologies develops tech:external_laser_source": "self_reported_costly",
+    "co:poet_technologies develops tech:poet_optical_interposer": "self_reported_costly",
+    "co:poet_technologies partnership_with co:liteon": "self_reported_costly",
+    "co:poet_technologies supplies_to co:celestial_ai": "self_reported_costly",
+    "co:poet_technologies supplies_to co:lumilens": "self_reported_costly",
+    "co:poet_technologies supplies_to prod:blazar": "media_relay",
+    "co:poet_technologies supplies_to prod:starlight": "media_relay",
+    "co:poet_technologies supplies_to tech:external_laser_source": "externally_corroborated",
+    "co:poet_technologies supplies_to tech:light_source_chip_to_chip": "self_reported_costly",
+    "co:proterial develops prod:proterial_nmx_hf": "self_reported",
+    "co:proterial supplies_to mat:rare_earth_magnets": "self_reported",
+    "co:proterial supplies_to tech:grain_boundary_diffusion": "self_reported",
+    "co:samsung competes_with co:micron_technology": "externally_corroborated",
+    "co:samsung supplies_to mat:silicon_interposer": "needs_review",
+    "co:samsung supplies_to tech:icube4": "needs_review",
+    "co:samsung supplies_to tech:samsung_xcube": "needs_review",
+    "co:schaeffler acquired co:ewellix": "media_relay",
+    "co:schaeffler deploys prod:hexagon_aeon": "externally_corroborated",
+    "co:schaeffler develops prod:schaeffler_humanoid_actuator_ces2026": "media_relay",
+    "co:schaeffler develops prod:schaeffler_rotary_actuator_platform": "self_reported",
+    "co:schaeffler supplies_to co:hexagon": "externally_corroborated",
+    "co:schaeffler supplies_to co:humanoid": "externally_corroborated",
+    "co:schaeffler supplies_to comp:humanoid_precision_actuators": "externally_corroborated",
+    "co:seminex develops prod:sivers_seminex_inp_light_source_program": "counterparty_joint",
+    "co:shuanghuan_driveline competes_with co:harmonic_drive_systems": "media_relay",
+    "co:shuanghuan_driveline supplies_to tech:rv_reducer": "media_relay",
+    "co:sivers_semiconductors develops prod:sivers_60ghz_mmwave_transceiver": "self_reported",
+    "co:sivers_semiconductors develops prod:sivers_ka_band_bfic": "self_reported",
+    "co:sivers_semiconductors develops prod:sivers_seminex_inp_light_source_program": "counterparty_joint",
+    "co:sivers_semiconductors develops tech:ew_star_wideband_array": "self_reported",
+    "co:sivers_semiconductors partnership_with co:globalfoundries": "self_reported",
+    "co:sivers_semiconductors partnership_with co:seminex": "counterparty_joint",
+    "co:sivers_semiconductors partnership_with co:tachyon_networks": "self_reported",
+    "co:sivers_semiconductors supplies_to co:all_space": "self_reported",
+    "co:sivers_semiconductors supplies_to co:ayar_labs": "media_relay",
+    "co:sivers_semiconductors supplies_to co:globalfoundries": "media_relay",
+    "co:sivers_semiconductors supplies_to co:jabil": "self_reported",
+    "co:sivers_semiconductors supplies_to co:lightium_ag": "self_reported_costly",
+    "co:sivers_semiconductors supplies_to co:o_net_technologies": "self_reported_costly",
+    "co:sivers_semiconductors supplies_to co:poet_technologies": "self_reported_costly",
+    "co:sivers_semiconductors supplies_to co:tachyon_networks": "self_reported",
+    "co:sivers_semiconductors supplies_to prod:els_8ch_module": "externally_corroborated",
+    "co:sivers_semiconductors supplies_to prod:gf_scale": "media_relay",
+    "co:sivers_semiconductors supplies_to prod:supernova": "media_relay",
+    "co:sivers_semiconductors supplies_to tech:cw_dfb_laser": "externally_corroborated",
+    "co:sivers_semiconductors supplies_to tech:dwdm_laser_array": "self_reported_costly",
+    "co:sivers_semiconductors supplies_to tech:lidar": "self_reported_costly",
+    "co:sivers_semiconductors supplies_to tech:wdm_laser_16ch": "self_reported",
+    "co:sk_hynix competes_with co:micron_technology": "externally_corroborated",
+    "co:sk_hynix supplies_to tech:hbm": "self_reported",
+    "co:soitec supplies_to co:globalfoundries": "externally_corroborated",
+    "co:spacexai deploys prod:vera_verarubin": "externally_corroborated",
+    "co:sumitomo_electric competes_with co:axt": "externally_corroborated",
+    "co:sumitomo_electric supplies_to co:lumentum": "externally_corroborated",
+    "co:sumitomo_electric supplies_to co:meta": "media_relay",
+    "co:sumitomo_electric supplies_to co:nvidia": "externally_corroborated",
+    "co:sumitomo_electric supplies_to mat:inp_substrate": "externally_corroborated",
+    "co:tower_semiconductor competes_with co:globalfoundries": "self_reported_costly",
+    "co:tower_semiconductor develops prod:ph18da": "needs_review",
+    "co:tower_semiconductor supplies_to co:marvell_technology": "self_reported_costly",
+    "co:tower_semiconductor supplies_to prod:ph18da": "externally_corroborated",
+    "co:tower_semiconductor supplies_to tech:advanced_packaging": "self_reported",
+    "co:tower_semiconductor supplies_to tech:coherent_pic": "self_reported_costly",
+    "co:tower_semiconductor supplies_to tech:sige_platform": "self_reported",
+    "co:tower_semiconductor supplies_to tech:silicon_photonics_pic": "media_relay",
+    "co:tower_semiconductor supplies_to tech:tia_driver": "self_reported",
+    "co:tsmc supplies_to mat:silicon_interposer": "needs_review",
+    "co:tsmc supplies_to tech:coupe": "externally_corroborated",
+    "co:tsmc supplies_to tech:cowos": "needs_review",
+    "co:tsmc supplies_to tech:cpo": "media_relay",
+    "co:tsmc supplies_to tech:info_packaging": "needs_review",
+    "co:tsmc supplies_to tech:mrm_200g": "externally_corroborated",
+    "co:tsmc supplies_to tech:silicon_photonics_chiplet": "externally_corroborated",
+    "co:umc partnership_with co:hyperlight": "media_relay",
+    "co:umc supplies_to tech:tfln_platform": "media_relay",
+    "co:unitree develops prod:unitree_g1": "externally_corroborated",
+    "co:vpec competes_with co:iqe": "self_reported_costly",
+    "co:vpec competes_with co:landmark_optoelectronics": "self_reported_costly",
+    "co:vpec supplies_to tech:cw_dfb_laser": "self_reported_costly",
+    "co:vpec supplies_to tech:photodiode": "self_reported_costly",
+    "co:win_semiconductor supplies_to co:sivers_semiconductors": "externally_corroborated",
+    "co:zhongji_innolight supplies_to tech:silicon_photonics": "self_reported",
+    "co:zhongji_innolight supplies_to tech:transceiver_1_6t": "self_reported",
+    "co:zhongji_innolight supplies_to tech:transceiver_800g": "self_reported",
+    "comp:humanoid_precision_actuators depends_on mat:rare_earth_magnets": "externally_corroborated",
+    "comp:humanoid_precision_actuators is_component_of tech:humanoid_robot_systems": "externally_corroborated",
+    "mat:inp_substrate is_component_of prod:uhp_laser": "externally_corroborated",
+    "mat:inp_substrate is_component_of tech:cw_dfb_laser": "externally_corroborated",
+    "mat:inp_substrate is_component_of tech:eml": "externally_corroborated",
+    "mat:inp_substrate is_component_of tech:uhp_laser": "externally_corroborated",
+    "mat:iron_nitride_magnet competes_with mat:rare_earth_magnets": "externally_corroborated",
+    "mat:rare_earth_magnets depends_on mat:separated_heavy_reo": "externally_corroborated",
+    "mat:rare_earth_magnets depends_on tech:grain_boundary_diffusion": "media_relay",
+    "mat:silicon_wafer is_component_of tech:essential_chips_mature_node": "externally_corroborated",
+    "prod:aaoi_400mw_narrow_linewidth_pump_laser is_component_of tech:cpo": "externally_corroborated",
+    "prod:altus_family is_variant_of tech:deposition_etch_clean": "externally_corroborated",
+    "prod:amd_instinct_mi455x is_component_of prod:amd_helios_mi450": "counterparty_joint",
+    "prod:blackwell competes_with prod:lpx": "externally_corroborated",
+    "prod:blazar competes_with tech:cw_dfb_laser": "media_relay",
+    "prod:digit is_variant_of tech:logistics_tote_transfer": "externally_corroborated",
+    "prod:digit offered_under tech:robotics_as_a_service": "externally_corroborated",
+    "prod:digit_v5 offered_under tech:robotics_as_a_service": "externally_corroborated",
+    "prod:els_8ch_module is_component_of tech:cpo": "externally_corroborated",
+    "prod:els_module is_component_of tech:cpo": "externally_corroborated",
+    "prod:gf_scale is_component_of tech:cpo": "externally_corroborated",
+    "prod:jericho3 is_variant_of tech:ai_switch": "externally_corroborated",
+    "prod:jericho4 is_variant_of tech:ai_switch": "externally_corroborated",
+    "prod:newphotonics_npc50506 is_component_of tech:near_package_optics": "externally_corroborated",
+    "prod:nxn_star_coupler is_component_of prod:els_8ch_module": "externally_corroborated",
+    "prod:palomar_ocs depends_on tech:mems_mirror_array": "externally_corroborated",
+    "prod:poet_optical_engine depends_on tech:wafer_level_photonic_integration": "externally_corroborated",
+    "prod:poet_optical_engine is_component_of tech:chip_to_chip_optical": "externally_corroborated",
+    "prod:quantum_x_photonics depends_on tech:serdes": "externally_corroborated",
+    "prod:quantum_x_photonics is_variant_of tech:scale_out_cpo": "externally_corroborated",
+    "prod:reliant is_variant_of tech:deposition_etch_clean": "externally_corroborated",
+    "prod:reliant is_variant_of tech:non_leading_edge_fab": "externally_corroborated",
+    "prod:sabre_family is_variant_of tech:deposition_etch_clean": "externally_corroborated",
+    "prod:schaeffler_rotary_actuator_platform is_component_of tech:humanoid_robot_systems": "externally_corroborated",
+    "prod:spectrum_6 depends_on tech:cpo": "externally_corroborated",
+    "prod:spectrum_6 depends_on tech:pluggable_transceiver": "externally_corroborated",
+    "prod:spectrum_6 is_component_of prod:vera_verarubin": "externally_corroborated",
+    "prod:spectrum_x is_variant_of tech:ai_switch": "externally_corroborated",
+    "prod:teraphy_chiplet depends_on prod:supernova": "media_relay",
+    "prod:tomahawk6 is_variant_of tech:ai_switch": "externally_corroborated",
+    "prod:uhp_laser is_component_of tech:cpo": "externally_corroborated",
+    "prod:uhp_laser is_component_of tech:npo": "externally_corroborated",
+    "prod:unitree_g1 depends_on tech:strain_wave_gear": "externally_corroborated",
+    "prod:vector_family is_variant_of tech:deposition_etch_clean": "externally_corroborated",
+    "prod:vistara constrained_by tech:cxl_memory_tiering": "externally_corroborated",
+    "std:chips_science_act enables co:globalfoundries": "externally_corroborated",
+    "tech:3d_scaling enables tech:deposition_etch_clean": "externally_corroborated",
+    "tech:acie_segment enables tech:ai_compute_buildout": "externally_corroborated",
+    "tech:advanced_packaging enables tech:deposition_etch_clean": "externally_corroborated",
+    "tech:agentic_ai enables prod:vera_verarubin": "externally_corroborated",
+    "tech:agentic_ai enables tech:ai_compute_buildout": "externally_corroborated",
+    "tech:ai_compute_buildout enables co:lumentum": "externally_corroborated",
+    "tech:ai_compute_buildout enables mat:inp_substrate": "externally_corroborated",
+    "tech:ai_compute_buildout enables prod:1_6t_dr4_transceiver": "externally_corroborated",
+    "tech:ai_compute_buildout enables prod:blackwell": "externally_corroborated",
+    "tech:ai_compute_buildout enables prod:poet_optical_engine": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:3d_nand_manufacturing": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:advanced_packaging": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:ai_switch": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:chip_to_chip_optical": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:cloud_transceiver": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:cloud_transceiver_1_6t": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:cowos": "needs_review",
+    "tech:ai_compute_buildout enables tech:cpo": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:dci_transceiver": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:deposition_etch_clean": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:dram_manufacturing": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:essential_chips_mature_node": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:foundry_logic": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:hbm": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:icube4": "needs_review",
+    "tech:ai_compute_buildout enables tech:leading_edge_logic_foundry": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:multi_rail": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:npo": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:ocs": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:optical_scale_up": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:pluggable_transceiver": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:poet_optical_interposer": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:scale_across_components": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:scale_up_cpo": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:scale_up_network": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:silicon_photonics": "externally_corroborated",
+    "tech:ai_compute_buildout enables tech:silicon_photonics_pic": "externally_corroborated",
+    "tech:ai_switch enables tech:ai_compute_buildout": "externally_corroborated",
+    "tech:ai_switch enables tech:cpo": "externally_corroborated",
+    "tech:broadcom_3d_silicon_cpo is_component_of tech:ai_switch": "needs_review",
+    "tech:broadcom_3d_silicon_cpo is_variant_of tech:cpo": "needs_review",
+    "tech:cloud_transceiver depends_on tech:cw_dfb_laser": "externally_corroborated",
+    "tech:coherent_pic is_component_of tech:dci_transceiver": "externally_corroborated",
+    "tech:coupe is_variant_of tech:cpo": "needs_review",
+    "tech:cowos competes_with tech:icube4": "needs_review",
+    "tech:cowos depends_on mat:silicon_interposer": "needs_review",
+    "tech:cowos depends_on tech:hbm": "needs_review",
+    "tech:cpo competes_with tech:pluggable_transceiver": "externally_corroborated",
+    "tech:cpo constrained_by tech:cpo_full_stack_test": "media_relay",
+    "tech:cpo constrained_by tech:external_laser_source": "media_relay",
+    "tech:cpo constrained_by tech:fiber_attach_unit": "media_relay",
+    "tech:cpo depends_on tech:external_laser_source": "externally_corroborated",
+    "tech:cpo is_component_of tech:ai_switch": "externally_corroborated",
+    "tech:cpo_fiber_attach is_component_of tech:scale_out_cpo": "externally_corroborated",
+    "tech:cw_dfb_laser depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:cw_dfb_laser depends_on tech:six_inch_inp_production": "externally_corroborated",
+    "tech:cw_dfb_laser is_component_of tech:cloud_transceiver_1_6t": "externally_corroborated",
+    "tech:cw_dfb_laser is_component_of tech:cpo": "externally_corroborated",
+    "tech:cw_dfb_laser is_component_of tech:external_laser_source": "externally_corroborated",
+    "tech:cw_dfb_laser is_component_of tech:tfln_platform": "externally_corroborated",
+    "tech:cw_dfb_laser is_component_of tech:transceiver_1_6t": "externally_corroborated",
+    "tech:dram enables prod:amat_semiconductor_systems": "externally_corroborated",
+    "tech:dram_manufacturing enables tech:deposition_etch_clean": "externally_corroborated",
+    "tech:dram_technology enables tech:ai_compute_buildout": "externally_corroborated",
+    "tech:dram_technology enables tech:semiconductor_manufacturing_equipment": "externally_corroborated",
+    "tech:dsp_1p6t is_component_of tech:cpo": "externally_corroborated",
+    "tech:dwdm_laser_array is_component_of tech:external_laser_source": "externally_corroborated",
+    "tech:els_pluggable_module is_component_of tech:cpo": "externally_corroborated",
+    "tech:eml competes_with tech:silicon_photonics": "externally_corroborated",
+    "tech:eml depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:eml depends_on tech:six_inch_inp_production": "externally_corroborated",
+    "tech:eml is_component_of tech:cloud_transceiver": "externally_corroborated",
+    "tech:eml is_component_of tech:cloud_transceiver_1_6t": "externally_corroborated",
+    "tech:eml is_component_of tech:cpo": "externally_corroborated",
+    "tech:external_laser_source is_component_of tech:cpo": "externally_corroborated",
+    "tech:fiber_attach_unit is_component_of tech:cpo": "externally_corroborated",
+    "tech:force_torque_sensor is_component_of comp:humanoid_precision_actuators": "externally_corroborated",
+    "tech:foundry_logic enables prod:amat_semiconductor_systems": "externally_corroborated",
+    "tech:foundry_logic enables tech:semiconductor_manufacturing_equipment": "externally_corroborated",
+    "tech:glass_cpo depends_on mat:glass_substrate": "needs_review",
+    "tech:glass_cpo is_variant_of tech:cpo": "needs_review",
+    "tech:hbm is_variant_of tech:dram": "externally_corroborated",
+    "tech:icube4 depends_on tech:hbm": "needs_review",
+    "tech:ime_silicon_cpo depends_on mat:silicon_interposer": "needs_review",
+    "tech:info_packaging supplies_to co:apple": "needs_review",
+    "tech:inp_6inch_fab depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:inp_cpo competes_with tech:cpo": "externally_corroborated",
+    "tech:inp_cpo depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:inp_dfb_laser depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:intel_foveros competes_with tech:samsung_xcube": "needs_review",
+    "tech:intel_glass_cpo depends_on mat:glass_substrate": "needs_review",
+    "tech:intel_glass_cpo is_variant_of tech:cpo": "needs_review",
+    "tech:internal_laser_module is_variant_of tech:cpo": "externally_corroborated",
+    "tech:isolator is_component_of tech:external_laser_source": "externally_corroborated",
+    "tech:mems_mirror_array is_component_of tech:ocs": "externally_corroborated",
+    "tech:micro_ring_modulator is_component_of tech:cpo": "externally_corroborated",
+    "tech:microlens_array is_component_of tech:fiber_attach_unit": "externally_corroborated",
+    "tech:module_integrated_laser_source competes_with tech:external_laser_source": "externally_corroborated",
+    "tech:module_integrated_laser_source is_component_of tech:internal_laser_module": "externally_corroborated",
+    "tech:mrm_200g is_component_of tech:coupe": "externally_corroborated",
+    "tech:nand enables prod:amat_semiconductor_systems": "externally_corroborated",
+    "tech:nand enables tech:deposition_etch_clean": "externally_corroborated",
+    "tech:nand enables tech:semiconductor_manufacturing_equipment": "externally_corroborated",
+    "tech:narrow_linewidth_laser is_component_of tech:scale_across": "externally_corroborated",
+    "tech:ndfeb_metal_alloy is_component_of mat:rare_earth_magnets": "externally_corroborated",
+    "tech:near_package_optics competes_with tech:cpo": "needs_review",
+    "tech:npo enables tech:cpo": "externally_corroborated",
+    "tech:optical_circulator is_component_of tech:ocs": "externally_corroborated",
+    "tech:optical_scale_up enables tech:cpo": "externally_corroborated",
+    "tech:photodiode depends_on tech:six_inch_inp_production": "externally_corroborated",
+    "tech:photonic_fabric competes_with tech:cpo": "media_relay",
+    "tech:pluggable_transceiver depends_on tech:cw_dfb_laser": "externally_corroborated",
+    "tech:pluggable_transceiver depends_on tech:tia_driver": "externally_corroborated",
+    "tech:pm_fiber is_component_of tech:fiber_attach_unit": "externally_corroborated",
+    "tech:poet_optical_interposer depends_on tech:wafer_level_photonic_integration": "externally_corroborated",
+    "tech:poet_optical_interposer is_component_of prod:1_6t_dr4_transceiver": "externally_corroborated",
+    "tech:poet_optical_interposer is_component_of prod:poet_optical_engine": "externally_corroborated",
+    "tech:poet_optical_interposer is_component_of tech:external_laser_source": "externally_corroborated",
+    "tech:poet_optical_interposer is_component_of tech:light_source_chip_to_chip": "externally_corroborated",
+    "tech:pump_laser is_component_of tech:scale_across": "externally_corroborated",
+    "tech:robotic_actuator is_component_of prod:atlas_humanoid_robot": "externally_corroborated",
+    "tech:rv_reducer is_component_of comp:humanoid_precision_actuators": "externally_corroborated",
+    "tech:scale_out_cpo depends_on tech:cpo_packaging_assembly": "externally_corroborated",
+    "tech:scale_out_cpo depends_on tech:silicon_photonics_chiplet": "externally_corroborated",
+    "tech:scale_up_cpo depends_on tech:uhp_laser": "externally_corroborated",
+    "tech:scale_up_cpo is_variant_of tech:cpo": "externally_corroborated",
+    "tech:scale_up_network enables tech:cpo": "externally_corroborated",
+    "tech:silicon_photonics is_component_of tech:cloud_transceiver_1_6t": "externally_corroborated",
+    "tech:silicon_photonics_chiplet is_component_of tech:cpo": "externally_corroborated",
+    "tech:silicon_photonics_pic enables tech:tia_driver": "externally_corroborated",
+    "tech:silicon_photonics_pic is_component_of tech:cpo": "externally_corroborated",
+    "tech:six_inch_inp_production depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:sovereign_ai enables tech:ai_compute_buildout": "externally_corroborated",
+    "tech:strain_wave_gear is_component_of comp:humanoid_precision_actuators": "externally_corroborated",
+    "tech:strain_wave_gear is_component_of tech:robotic_actuator": "externally_corroborated",
+    "tech:tec is_component_of tech:external_laser_source": "externally_corroborated",
+    "tech:tfln_platform is_component_of tech:pluggable_transceiver": "externally_corroborated",
+    "tech:uhp_laser depends_on mat:inp_substrate": "externally_corroborated",
+    "tech:uhp_laser is_component_of tech:cpo": "externally_corroborated",
+    "tech:us_export_controls depends_on co:applied_materials": "externally_corroborated",
+    "tech:us_export_controls depends_on co:lam_research": "externally_corroborated",
+    "tech:vcsel is_component_of tech:cpo": "externally_corroborated",
+    "tech:vcsel is_component_of tech:near_package_optics": "externally_corroborated",
+    "tech:xpu depends_on tech:ai_switch": "externally_corroborated",
+    "tech:xpu enables tech:ai_compute_buildout": "externally_corroborated"
+   },
+   "origins": {
+    "co:aehr_test_systems supplies_to tech:cpo_full_stack_test": [
+     "Aehr Test Systems"
+    ],
+    "co:aeva supplies_to tech:near_package_optics": [
+     "Aeva Technologies"
+    ],
+    "co:agility_robotics constrained_by comp:humanoid_precision_actuators": [
+     "SVRC Research (Robotics Center of Silicon Valley)"
+    ],
+    "co:agility_robotics develops prod:digit": [
+     "Agility Robotics"
+    ],
+    "co:agility_robotics develops prod:digit_v5": [
+     "Agility Robotics"
+    ],
+    "co:agility_robotics supplies_to tech:robotics_as_a_service": [
+     "Agility Robotics"
+    ],
+    "co:ansys enables tech:cpo": [
+     "Third-party Research"
+    ],
+    "co:anthropic deploys prod:amd_helios_mi450": [
+     "AMD and Anthropic"
+    ],
+    "co:anthropic enables tech:ai_compute_buildout": [
+     "NVIDIA"
+    ],
+    "co:apollo invests_in co:broadcom": [
+     "Broadcom"
+    ],
+    "co:applied_materials develops prod:amat_ags": [
+     "Applied Materials"
+    ],
+    "co:applied_materials develops prod:amat_semiconductor_systems": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to prod:amat_ags": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to prod:amat_semiconductor_systems": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:200mm_equipment": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:advanced_packaging": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:dram": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:dram_manufacturing": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:icaps": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:leading_edge_logic_foundry": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:nand": [
+     "Applied Materials"
+    ],
+    "co:applied_materials supplies_to tech:semiconductor_manufacturing_equipment": [
+     "Applied Materials"
+    ],
+    "co:applied_optoelectronics competes_with co:coherent": [
+     "Applied Optoelectronics"
+    ],
+    "co:applied_optoelectronics competes_with co:lumentum": [
+     "Applied Optoelectronics"
+    ],
+    "co:applied_optoelectronics constrained_by prod:aaoi_400mw_narrow_linewidth_pump_laser": [
+     "Applied Optoelectronics"
+    ],
+    "co:applied_optoelectronics develops prod:aaoi_400mw_narrow_linewidth_pump_laser": [
+     "Applied Optoelectronics"
+    ],
+    "co:applied_optoelectronics supplies_to tech:pluggable_transceiver": [
+     "Applied Optoelectronics",
+     "Zacks Investment Research",
+     "primetrading_substack"
+    ],
+    "co:applied_optoelectronics supplies_to tech:transceiver_1_6t": [
+     "Applied Optoelectronics"
+    ],
+    "co:arista enables tech:xpo_form_factor": [
+     "Coherent"
+    ],
+    "co:axt competes_with co:jx_advanced_metals": [
+     "Global Semi Research",
+     "Reuters"
+    ],
+    "co:axt supplies_to co:casela_technologies": [
+     "AXT"
+    ],
+    "co:axt supplies_to co:coherent": [
+     "AXT",
+     "AXT, Inc.",
+     "Reuters"
+    ],
+    "co:axt supplies_to co:landmark_optoelectronics": [
+     "Reuters"
+    ],
+    "co:axt supplies_to co:lumentum": [
+     "AXT",
+     "AXT, Inc.",
+     "Lumentum Holdings Inc."
+    ],
+    "co:axt supplies_to co:vpec": [
+     "Reuters"
+    ],
+    "co:axt supplies_to mat:gaas_substrate": [
+     "AXT"
+    ],
+    "co:axt supplies_to mat:germanium_substrate": [
+     "AXT"
+    ],
+    "co:axt supplies_to mat:inp_substrate": [
+     "AXT",
+     "Global Semi Research"
+    ],
+    "co:ayar_labs develops prod:supernova": [
+     "Sivers Semiconductors（官方 PR,內含 Ayar Labs CTO 具名引述——聯合發布,夥伴端 origin 實質互異）",
+     "silicon_matter_substack"
+    ],
+    "co:blackstone invests_in co:broadcom": [
+     "Broadcom"
+    ],
+    "co:boston_dynamics develops prod:atlas_humanoid_robot": [
+     "Boston Dynamics"
+    ],
+    "co:broadcom depends_on tech:coupe": [
+     "Broadcom"
+    ],
+    "co:broadcom develops prod:apple_broadcom_custom_asic_program": [
+     "Broadcom Inc."
+    ],
+    "co:broadcom develops prod:jericho3": [
+     "Broadcom"
+    ],
+    "co:broadcom develops prod:jericho4": [
+     "Broadcom"
+    ],
+    "co:broadcom develops prod:th6_davisson": [
+     "Broadcom"
+    ],
+    "co:broadcom develops prod:tomahawk6": [
+     "Broadcom"
+    ],
+    "co:broadcom supplies_to co:anthropic": [
+     "Broadcom"
+    ],
+    "co:broadcom supplies_to co:apple": [
+     "Broadcom Inc."
+    ],
+    "co:broadcom supplies_to co:google": [
+     "Broadcom"
+    ],
+    "co:broadcom supplies_to co:meta": [
+     "Broadcom",
+     "The Next Platform"
+    ],
+    "co:broadcom supplies_to co:openai": [
+     "Broadcom"
+    ],
+    "co:broadcom supplies_to tech:ai_switch": [
+     "Broadcom"
+    ],
+    "co:broadcom supplies_to tech:broadcom_3d_silicon_cpo": [
+     "Third-party Research"
+    ],
+    "co:broadcom supplies_to tech:cpo": [
+     "Broadcom",
+     "Meta（客戶端自著論文,NextPlatform 逐字轉載;canonical=ECOC 2025 presentation 167）",
+     "The Next Platform"
+    ],
+    "co:broadcom supplies_to tech:dsp_1p6t": [
+     "Broadcom"
+    ],
+    "co:broadcom supplies_to tech:xpu": [
+     "Broadcom"
+    ],
+    "co:cadence enables tech:cpo": [
+     "Third-party Research"
+    ],
+    "co:casela_technologies depends_on mat:inp_substrate": [
+     "AXT"
+    ],
+    "co:celestial_ai develops tech:photonic_fabric": [
+     "Marvell Technology"
+    ],
+    "co:coherent constrained_by tech:inp_dfb_laser": [
+     "Coherent Corp."
+    ],
+    "co:coherent depends_on mat:inp_substrate": [
+     "AXT",
+     "Reuters"
+    ],
+    "co:coherent depends_on tech:inp_6inch_fab": [
+     "Coherent",
+     "NVIDIA",
+     "Semiconductor Today"
+    ],
+    "co:coherent enables std:oif_hd_form_factor": [
+     "Coherent"
+    ],
+    "co:coherent enables std:open_cpx": [
+     "Coherent"
+    ],
+    "co:coherent partnership_with co:nvidia": [
+     "NVIDIA"
+    ],
+    "co:coherent supplies_to co:nvidia": [
+     "Coherent",
+     "Global Semi Research",
+     "NVIDIA"
+    ],
+    "co:coherent supplies_to tech:cpo": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:cpo_fiber_attach": [
+     "NVIDIA"
+    ],
+    "co:coherent supplies_to tech:cw_dfb_laser": [
+     "Coherent",
+     "Global Semi Research"
+    ],
+    "co:coherent supplies_to tech:dci_transceiver": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:eml": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:external_laser_source": [
+     "Coherent",
+     "NVIDIA"
+    ],
+    "co:coherent supplies_to tech:fiber_attach_unit": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:fiber_collimator_array": [
+     "Coherent（發行人新聞稿,經 gurufocus 轉載,原稿 403）"
+    ],
+    "co:coherent supplies_to tech:garnet_faraday_rotator": [
+     "Coherent（供應商官方產品 datasheet）"
+    ],
+    "co:coherent supplies_to tech:inp_cpo": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:isolator": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:microlens_array": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:module_assembly": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:multi_rail": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:near_package_optics": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:ocs": [
+     "Coherent",
+     "Coherent（發行人官方新聞稿）"
+    ],
+    "co:coherent supplies_to tech:optical_circulator": [
+     "Coherent（發行人官方新聞稿）"
+    ],
+    "co:coherent supplies_to tech:photodiode": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:pluggable_transceiver": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:pm_fiber": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:silicon_photonics_pic": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:six_inch_inp_production": [
+     "AXT",
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:tec": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:thermal_solutions": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:uhp_laser": [
+     "Cignal AI"
+    ],
+    "co:coherent supplies_to tech:vcsel": [
+     "Coherent"
+    ],
+    "co:coherent supplies_to tech:xpo_form_factor": [
+     "Coherent"
+    ],
+    "co:coreweave deploys prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "co:corning develops mat:glass_substrate": [
+     "Third-party Research"
+    ],
+    "co:corning supplies_to tech:glass_cpo": [
+     "Third-party Research"
+    ],
+    "co:enablence_technologies supplies_to prod:els_8ch_module": [
+     "Enablence Technologies"
+    ],
+    "co:ewellix supplies_to tech:planetary_roller_screw": [
+     "Impact Lab（轉載 Fast Company 記者報導,含 Morgan Stanley 2025-02 報告轉述與具名引述）",
+     "Power & Motion（獨立產業媒體，非 Schaeffler 自家發布）"
+    ],
+    "co:fabrinet partnership_with co:nvidia": [
+     "NVIDIA"
+    ],
+    "co:fabrinet supplies_to co:nvidia": [
+     "Fabrinet",
+     "optics.org"
+    ],
+    "co:fabrinet supplies_to tech:cpo": [
+     "Fabrinet"
+    ],
+    "co:fabrinet supplies_to tech:cpo_packaging_assembly": [
+     "NVIDIA"
+    ],
+    "co:foci supplies_to tech:fiber_attach_unit": [
+     "DigiTimes",
+     "FOCI (上詮精密光學)",
+     "Hunterbrook Media"
+    ],
+    "co:globalfoundries competes_with co:intel": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries competes_with co:samsung": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries competes_with co:texas_instruments": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries competes_with co:tsmc": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries competes_with co:umc": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries depends_on mat:gallium_nitride": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries depends_on mat:photoresist": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries depends_on mat:rare_earth_metals": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries depends_on mat:silicon_wafer": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries depends_on tech:semiconductor_manufacturing_equipment": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries develops prod:gf_scale": [
+     "Sivers Semiconductors"
+    ],
+    "co:globalfoundries invests_in co:mips_holding": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:advanced_packaging_gf": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:essential_chips_mature_node": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:fd_soi": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:power_gan": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:rf_gan": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:rf_soi": [
+     "GlobalFoundries"
+    ],
+    "co:globalfoundries supplies_to tech:silicon_photonics": [
+     "GlobalFoundries"
+    ],
+    "co:google deploys prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "co:google develops prod:palomar_ocs": [
+     "Google (Apollo/Palomar 團隊自著論文)"
+    ],
+    "co:gxo_logistics deploys prod:digit": [
+     "GXO Logistics"
+    ],
+    "co:harmonic_drive_systems supplies_to tech:strain_wave_gear": [
+     "Harmonic Drive Systems Inc.",
+     "Harmonic Drive Systems（供應商官方產品頁）",
+     "Next Financial (Substack)"
+    ],
+    "co:hexagon develops prod:hexagon_aeon": [
+     "Hexagon AB, with named Schaeffler management statements"
+    ],
+    "co:himax partnership_with co:foci": [
+     "Himax Technologies"
+    ],
+    "co:himax supplies_to tech:cpo": [
+     "Himax Technologies"
+    ],
+    "co:humanoid supplies_to co:schaeffler": [
+     "Humanoid（機器人開發商，即採購方自家公告——客戶端文件）"
+    ],
+    "co:hyperlight supplies_to tech:tfln_platform": [
+     "HyperLight"
+    ],
+    "co:hyundai_mobis partnership_with co:boston_dynamics": [
+     "Boston Dynamics"
+    ],
+    "co:hyundai_mobis supplies_to co:boston_dynamics": [
+     "Boston Dynamics"
+    ],
+    "co:ime_cas supplies_to tech:ime_silicon_cpo": [
+     "Third-party Research"
+    ],
+    "co:intel develops mat:glass_substrate": [
+     "Third-party Research"
+    ],
+    "co:intel supplies_to tech:intel_foveros": [
+     "Third-party Research"
+    ],
+    "co:intel supplies_to tech:intel_glass_cpo": [
+     "Third-party Research"
+    ],
+    "co:intelliepi competes_with co:iqe": [
+     "IntelliEPI"
+    ],
+    "co:intelliepi competes_with co:vpec": [
+     "IntelliEPI"
+    ],
+    "co:intelliepi supplies_to tech:photodiode": [
+     "IntelliEPI"
+    ],
+    "co:intelliepi supplies_to tech:vcsel": [
+     "IntelliEPI"
+    ],
+    "co:iqe constrained_by mat:inp_substrate": [
+     "IQE plc"
+    ],
+    "co:iqe supplies_to co:macom": [
+     "IQE plc",
+     "MACOM Technology Solutions Inc."
+    ],
+    "co:iqe supplies_to co:tower_semiconductor": [
+     "IQE plc / Tower Semiconductor (joint announcement)",
+     "Tower Semiconductor"
+    ],
+    "co:iqe supplies_to prod:quantum_dot_laser_epiwafer": [
+     "IQE plc / Quintessent Inc. joint announcement"
+    ],
+    "co:jabil develops prod:jabil_sivers_1_6t_lro_module": [
+     "Sivers Semiconductors"
+    ],
+    "co:jl_mag supplies_to mat:rare_earth_magnets": [
+     "JL MAG Rare-Earth"
+    ],
+    "co:jl_mag supplies_to tech:grain_boundary_diffusion": [
+     "JL MAG Rare-Earth"
+    ],
+    "co:jx_advanced_metals supplies_to co:lumentum": [
+     "Reuters"
+    ],
+    "co:jx_advanced_metals supplies_to mat:inp_substrate": [
+     "Global Semi Research",
+     "Reuters"
+    ],
+    "co:lam_research develops prod:altus_family": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research develops prod:reliant": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research develops prod:sabre_family": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research develops prod:vector_family": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to prod:reliant": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:3d_nand_manufacturing": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:3d_scaling": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:advanced_packaging": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:dram_manufacturing": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:foundry_logic": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:nand": [
+     "Lam Research Corporation"
+    ],
+    "co:lam_research supplies_to tech:semiconductor_manufacturing_equipment": [
+     "Lam Research Corporation"
+    ],
+    "co:landmark_optoelectronics competes_with co:intelliepi": [
+     "LandMark Optoelectronics"
+    ],
+    "co:landmark_optoelectronics competes_with co:iqe": [
+     "LandMark Optoelectronics"
+    ],
+    "co:landmark_optoelectronics supplies_to tech:cw_dfb_laser": [
+     "LandMark Optoelectronics",
+     "LandMark Optoelectronics Corporation"
+    ],
+    "co:leaderdrive competes_with co:harmonic_drive_systems": [
+     "Next Financial (Substack)"
+    ],
+    "co:leaderdrive supplies_to tech:strain_wave_gear": [
+     "Next Financial (Substack)"
+    ],
+    "co:lessengers develops prod:1_6t_dr4_transceiver": [
+     "POET Technologies"
+    ],
+    "co:lumentum competes_with co:sivers_semiconductors": [
+     "silicon_matter_substack"
+    ],
+    "co:lumentum depends_on mat:inp_substrate": [
+     "Lumentum",
+     "Lumentum Holdings Inc.",
+     "Lumentum（客戶端法定年報,審計級）",
+     "Reuters"
+    ],
+    "co:lumentum depends_on tech:cw_dfb_laser": [
+     "Lumentum"
+    ],
+    "co:lumentum develops prod:1p6t_transceiver": [
+     "Lumentum Holdings Inc."
+    ],
+    "co:lumentum develops prod:800g_transceiver": [
+     "Lumentum Holdings Inc."
+    ],
+    "co:lumentum develops prod:els_module": [
+     "Lumentum Holdings Inc."
+    ],
+    "co:lumentum develops prod:uhp_laser": [
+     "Lumentum Holdings Inc."
+    ],
+    "co:lumentum develops tech:cw_dfb_laser": [
+     "Lumentum Holdings Inc."
+    ],
+    "co:lumentum partnership_with co:nvidia": [
+     "NVIDIA"
+    ],
+    "co:lumentum supplies_to co:ayar_labs": [
+     "Lumentum Holdings Inc. / Ayar Labs (joint press release)"
+    ],
+    "co:lumentum supplies_to co:nava_thailand": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to co:nvidia": [
+     "Global Semi Research",
+     "NVIDIA"
+    ],
+    "co:lumentum supplies_to tech:cloud_transceiver": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:cloud_transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:cw_dfb_laser": [
+     "Global Semi Research",
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:dci_transceiver": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:els_pluggable_module": [
+     "Cignal AI",
+     "Lumentum",
+     "Lumentum Holdings Inc."
+    ],
+    "co:lumentum supplies_to tech:eml": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:external_laser_source": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:narrow_linewidth_laser": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:ocs": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:optical_scale_up": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:pump_laser": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:scale_across": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:scale_up_network": [
+     "Marvell/Lumentum（雙發行人聯合官方新聞稿,Marvell IR 頁載）"
+    ],
+    "co:lumentum supplies_to tech:transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "co:lumentum supplies_to tech:uhp_laser": [
+     "Lumentum",
+     "NVIDIA"
+    ],
+    "co:lumentum supplies_to tech:wss": [
+     "Lumentum"
+    ],
+    "co:luxnet supplies_to tech:cw_dfb_laser": [
+     "Borecraft (NewMaxx)",
+     "LuxNet (華星光通科技)"
+    ],
+    "co:lynas supplies_to mat:rare_earth_magnets": [
+     "Lynas Rare Earths",
+     "Lynas Rare Earths（受監管揭露之雙邊契約條款；對手方 JARE=JOGMEC+Sojitz SPV）",
+     "Mining Weekly"
+    ],
+    "co:lynas supplies_to mat:separated_heavy_reo": [
+     "Sojitz Corporation（客戶端）"
+    ],
+    "co:macom develops tech:inp_dfb_laser": [
+     "MACOM Technology Solutions"
+    ],
+    "co:macom invests_in co:iqe": [
+     "IQE plc",
+     "MACOM Technology Solutions Inc."
+    ],
+    "co:macom supplies_to tech:inp_dfb_laser": [
+     "MACOM Technology Solutions"
+    ],
+    "co:marvell_technology acquired co:celestial_ai": [
+     "Optica Publishing Group",
+     "POET Technologies"
+    ],
+    "co:marvell_technology develops prod:google_marvell_custom_semiconductors": [
+     "Marvell Technology, Inc."
+    ],
+    "co:marvell_technology develops tech:photonic_fabric": [
+     "Counterpoint Research",
+     "Marvell Technology"
+    ],
+    "co:marvell_technology partnership_with co:nvidia": [
+     "Marvell Technology, Inc."
+    ],
+    "co:marvell_technology supplies_to co:google": [
+     "Marvell Technology, Inc."
+    ],
+    "co:marvell_technology supplies_to tech:cpo": [
+     "Marvell Technology, Inc."
+    ],
+    "co:marvell_technology supplies_to tech:lpo": [
+     "Marvell Technology, Inc."
+    ],
+    "co:marvell_technology supplies_to tech:scale_up_network": [
+     "Marvell/Lumentum（雙發行人聯合官方新聞稿,Marvell IR 頁載）"
+    ],
+    "co:marvell_technology supplies_to tech:tia_driver": [
+     "Marvell Technology, Inc."
+    ],
+    "co:meta develops prod:vistara": [
+     "Meta Platforms"
+    ],
+    "co:meta develops tech:cxl_memory_tiering": [
+     "Meta Platforms"
+    ],
+    "co:micron_technology supplies_to tech:dram_technology": [
+     "Micron Technology, Inc."
+    ],
+    "co:micron_technology supplies_to tech:hbm": [
+     "Micron Technology, Inc."
+    ],
+    "co:microsoft deploys prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "co:mp_materials supplies_to mat:rare_earth_magnets": [
+     "Apple",
+     "Federation of American Scientists",
+     "MP Materials",
+     "Noveon Magnetics",
+     "USA Rare Earth"
+    ],
+    "co:mp_materials supplies_to mat:separated_heavy_reo": [
+     "U.S. Geological Survey (美國政府第三方統計，非任何生產商)"
+    ],
+    "co:mp_materials supplies_to tech:ndfeb_metal_alloy": [
+     "MP Materials"
+    ],
+    "co:nabtesco supplies_to tech:rv_reducer": [
+     "Nabtesco",
+     "Nabtesco（供應商官方產品頁,市占為自估）",
+     "Next Financial (Substack)"
+    ],
+    "co:nava_thailand supplies_to tech:cloud_transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "co:nebius deploys prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "co:newphotonics depends_on prod:ph18da": [
+     "Semiconductor Today"
+    ],
+    "co:newphotonics develops prod:newphotonics_npc50506": [
+     "NewPhotonics"
+    ],
+    "co:nidec supplies_to tech:strain_wave_gear": [
+     "Nidec Drive Technology（供應商官方產品頁,前 Nidec-Shimpo）"
+    ],
+    "co:niron_magnetics develops mat:iron_nitride_magnet": [
+     "Niron Magnetics（公司自家新聞稿）",
+     "Niron Magnetics（公司自家新聞稿；但引述的投資方為汽車 OEM＝需求端）"
+    ],
+    "co:novanta supplies_to tech:force_torque_sensor": [
+     "Novanta/ATI（供應商官方應用頁）"
+    ],
+    "co:nvidia depends_on tech:mrm_200g": [
+     "TrendForce"
+    ],
+    "co:nvidia develops prod:blackwell": [
+     "NVIDIA"
+    ],
+    "co:nvidia develops prod:dsx_ai_factory_platform": [
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia develops prod:lpx": [
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia develops prod:quantum_x_photonics": [
+     "NVIDIA"
+    ],
+    "co:nvidia develops prod:spectrum_6": [
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia develops prod:spectrum_x": [
+     "NVIDIA"
+    ],
+    "co:nvidia develops prod:vera_verarubin": [
+     "NVIDIA"
+    ],
+    "co:nvidia develops tech:micro_ring_modulator": [
+     "IEEE Spectrum",
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia invests_in co:coherent": [
+     "Coherent",
+     "NVIDIA"
+    ],
+    "co:nvidia invests_in co:lumentum": [
+     "Lumentum",
+     "NVIDIA"
+    ],
+    "co:nvidia invests_in co:marvell_technology": [
+     "Marvell Technology, Inc."
+    ],
+    "co:nvidia partnership_with co:sk_hynix": [
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia partnership_with co:tsmc": [
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia supplies_to co:anthropic": [
+     "NVIDIA"
+    ],
+    "co:nvidia supplies_to co:openai": [
+     "NVIDIA",
+     "NVIDIA Corporation"
+    ],
+    "co:nvidia supplies_to prod:blackwell": [
+     "NVIDIA"
+    ],
+    "co:nvidia supplies_to prod:spectrum_x": [
+     "NVIDIA"
+    ],
+    "co:nvidia supplies_to prod:vera_verarubin": [
+     "NVIDIA"
+    ],
+    "co:nvidia supplies_to tech:acie_segment": [
+     "NVIDIA"
+    ],
+    "co:o_net_technologies develops prod:els_8ch_module": [
+     "Enablence Technologies"
+    ],
+    "co:o_net_technologies supplies_to prod:els_8ch_module": [
+     "Enablence Technologies"
+    ],
+    "co:o_net_technologies supplies_to tech:external_laser_source": [
+     "Sivers Semiconductors"
+    ],
+    "co:openai enables tech:ai_compute_buildout": [
+     "NVIDIA"
+    ],
+    "co:openlight supplies_to co:newphotonics": [
+     "Semiconductor Today"
+    ],
+    "co:openlight_photonics develops prod:ph18da": [
+     "OpenLight"
+    ],
+    "co:openlight_photonics partnership_with co:cadence": [
+     "Tower Semiconductor / OpenLight (joint press release)"
+    ],
+    "co:openlight_photonics partnership_with co:tower_semiconductor": [
+     "OpenLight",
+     "Tower Semiconductor / OpenLight (joint press release)"
+    ],
+    "co:openlight_photonics supplies_to co:newphotonics": [
+     "OpenLight"
+    ],
+    "co:oracle deploys prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "co:poet_technologies develops prod:1_6t_dr4_transceiver": [
+     "POET Technologies"
+    ],
+    "co:poet_technologies develops prod:blazar": [
+     "POET Technologies Inc."
+    ],
+    "co:poet_technologies develops prod:poet_optical_engine": [
+     "POET Technologies",
+     "POET Technologies Inc."
+    ],
+    "co:poet_technologies develops tech:external_laser_source": [
+     "POET Technologies Inc."
+    ],
+    "co:poet_technologies develops tech:poet_optical_interposer": [
+     "POET Technologies",
+     "POET Technologies Inc."
+    ],
+    "co:poet_technologies partnership_with co:liteon": [
+     "POET Technologies"
+    ],
+    "co:poet_technologies supplies_to co:celestial_ai": [
+     "POET Technologies",
+     "Semiconductor Today"
+    ],
+    "co:poet_technologies supplies_to co:lumilens": [
+     "POET Technologies",
+     "POET Technologies Inc."
+    ],
+    "co:poet_technologies supplies_to prod:blazar": [
+     "damnang_substack"
+    ],
+    "co:poet_technologies supplies_to prod:starlight": [
+     "damnang_substack"
+    ],
+    "co:poet_technologies supplies_to tech:external_laser_source": [
+     "Sivers Semiconductors"
+    ],
+    "co:poet_technologies supplies_to tech:light_source_chip_to_chip": [
+     "POET Technologies"
+    ],
+    "co:proterial develops prod:proterial_nmx_hf": [
+     "Proterial"
+    ],
+    "co:proterial supplies_to mat:rare_earth_magnets": [
+     "Proterial"
+    ],
+    "co:proterial supplies_to tech:grain_boundary_diffusion": [
+     "Proterial"
+    ],
+    "co:samsung competes_with co:micron_technology": [
+     "Micron Technology"
+    ],
+    "co:samsung supplies_to mat:silicon_interposer": [
+     "Third-party Research"
+    ],
+    "co:samsung supplies_to tech:icube4": [
+     "Third-party Research"
+    ],
+    "co:samsung supplies_to tech:samsung_xcube": [
+     "Third-party Research"
+    ],
+    "co:schaeffler acquired co:ewellix": [
+     "Power & Motion（獨立產業媒體，非 Schaeffler 自家發布）"
+    ],
+    "co:schaeffler deploys prod:hexagon_aeon": [
+     "Hexagon AB, with named Schaeffler management statements"
+    ],
+    "co:schaeffler develops prod:schaeffler_humanoid_actuator_ces2026": [
+     "all-about-industries（獨立產業媒體，報導 CES 2026 發表）"
+    ],
+    "co:schaeffler develops prod:schaeffler_rotary_actuator_platform": [
+     "Schaeffler"
+    ],
+    "co:schaeffler supplies_to co:hexagon": [
+     "Hexagon AB, with named Schaeffler management statements"
+    ],
+    "co:schaeffler supplies_to co:humanoid": [
+     "Humanoid（客戶端）",
+     "Humanoid（機器人開發商，即採購方自家公告——客戶端文件）"
+    ],
+    "co:schaeffler supplies_to comp:humanoid_precision_actuators": [
+     "Humanoid（機器人開發商，即採購方自家公告——客戶端文件）"
+    ],
+    "co:seminex develops prod:sivers_seminex_inp_light_source_program": [
+     "Sivers Semiconductors and SemiNex Corporation"
+    ],
+    "co:shuanghuan_driveline competes_with co:harmonic_drive_systems": [
+     "Next Financial (Substack)"
+    ],
+    "co:shuanghuan_driveline supplies_to tech:rv_reducer": [
+     "Next Financial (Substack)"
+    ],
+    "co:sivers_semiconductors develops prod:sivers_60ghz_mmwave_transceiver": [
+     "Sivers Semiconductors, with a named Tachyon Networks quotation"
+    ],
+    "co:sivers_semiconductors develops prod:sivers_ka_band_bfic": [
+     "Sivers Semiconductors, with a named ALL.SPACE customer quotation"
+    ],
+    "co:sivers_semiconductors develops prod:sivers_seminex_inp_light_source_program": [
+     "Sivers Semiconductors and SemiNex Corporation"
+    ],
+    "co:sivers_semiconductors develops tech:ew_star_wideband_array": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors partnership_with co:globalfoundries": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors partnership_with co:seminex": [
+     "Sivers Semiconductors and SemiNex Corporation"
+    ],
+    "co:sivers_semiconductors partnership_with co:tachyon_networks": [
+     "Sivers Semiconductors, with a named Tachyon Networks quotation"
+    ],
+    "co:sivers_semiconductors supplies_to co:all_space": [
+     "Sivers Semiconductors, with a named ALL.SPACE customer quotation"
+    ],
+    "co:sivers_semiconductors supplies_to co:ayar_labs": [
+     "Semiconductor Today",
+     "Sivers Semiconductors（新聞稿，內含 Ayar Labs CEO Mark Wade 具名引述）",
+     "aleabitoreddit"
+    ],
+    "co:sivers_semiconductors supplies_to co:globalfoundries": [
+     "Semiconductor Today",
+     "Sivers Semiconductors",
+     "optics.org"
+    ],
+    "co:sivers_semiconductors supplies_to co:jabil": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to co:lightium_ag": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to co:o_net_technologies": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to co:poet_technologies": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to co:tachyon_networks": [
+     "Sivers Semiconductors, with a named Tachyon Networks quotation"
+    ],
+    "co:sivers_semiconductors supplies_to prod:els_8ch_module": [
+     "Enablence Technologies"
+    ],
+    "co:sivers_semiconductors supplies_to prod:gf_scale": [
+     "Semiconductor Today",
+     "Sivers Semiconductors",
+     "optics.org"
+    ],
+    "co:sivers_semiconductors supplies_to prod:supernova": [
+     "Sivers Semiconductors（官方 PR,內含 Ayar Labs CTO 具名引述——聯合發布,夥伴端 origin 實質互異）",
+     "silicon_matter_substack"
+    ],
+    "co:sivers_semiconductors supplies_to tech:cw_dfb_laser": [
+     "LuxNet (華星光通科技)",
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to tech:dwdm_laser_array": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to tech:lidar": [
+     "Sivers Semiconductors"
+    ],
+    "co:sivers_semiconductors supplies_to tech:wdm_laser_16ch": [
+     "Sivers Semiconductors（官方 PR,內含 Ayar Labs CTO 具名引述——聯合發布,夥伴端 origin 實質互異）"
+    ],
+    "co:sk_hynix competes_with co:micron_technology": [
+     "Micron Technology"
+    ],
+    "co:sk_hynix supplies_to tech:hbm": [
+     "SK hynix"
+    ],
+    "co:soitec supplies_to co:globalfoundries": [
+     "GlobalFoundries"
+    ],
+    "co:spacexai deploys prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "co:sumitomo_electric competes_with co:axt": [
+     "Global Semi Research",
+     "Reuters"
+    ],
+    "co:sumitomo_electric supplies_to co:lumentum": [
+     "Reuters"
+    ],
+    "co:sumitomo_electric supplies_to co:meta": [
+     "Reuters"
+    ],
+    "co:sumitomo_electric supplies_to co:nvidia": [
+     "NVIDIA"
+    ],
+    "co:sumitomo_electric supplies_to mat:inp_substrate": [
+     "Global Semi Research",
+     "Reuters"
+    ],
+    "co:tower_semiconductor competes_with co:globalfoundries": [
+     "Tower Semiconductor"
+    ],
+    "co:tower_semiconductor develops prod:ph18da": [
+     "Tower Semiconductor / OpenLight (joint press release)"
+    ],
+    "co:tower_semiconductor supplies_to co:marvell_technology": [
+     "Tower Semiconductor"
+    ],
+    "co:tower_semiconductor supplies_to prod:ph18da": [
+     "OpenLight",
+     "Semiconductor Today",
+     "Tower Semiconductor / OpenLight (joint press release)"
+    ],
+    "co:tower_semiconductor supplies_to tech:advanced_packaging": [
+     "Tower Semiconductor"
+    ],
+    "co:tower_semiconductor supplies_to tech:coherent_pic": [
+     "Tower Semiconductor"
+    ],
+    "co:tower_semiconductor supplies_to tech:sige_platform": [
+     "Tower Semiconductor"
+    ],
+    "co:tower_semiconductor supplies_to tech:silicon_photonics_pic": [
+     "Calcalist",
+     "Tower Semiconductor"
+    ],
+    "co:tower_semiconductor supplies_to tech:tia_driver": [
+     "Tower Semiconductor"
+    ],
+    "co:tsmc supplies_to mat:silicon_interposer": [
+     "Third-party Research"
+    ],
+    "co:tsmc supplies_to tech:coupe": [
+     "Broadcom",
+     "Third-party Research"
+    ],
+    "co:tsmc supplies_to tech:cowos": [
+     "Third-party Research"
+    ],
+    "co:tsmc supplies_to tech:cpo": [
+     "TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）"
+    ],
+    "co:tsmc supplies_to tech:info_packaging": [
+     "Third-party Research"
+    ],
+    "co:tsmc supplies_to tech:mrm_200g": [
+     "TrendForce"
+    ],
+    "co:tsmc supplies_to tech:silicon_photonics_chiplet": [
+     "NVIDIA"
+    ],
+    "co:umc partnership_with co:hyperlight": [
+     "Evertiq（轉載 HyperLight/UMC/Wavetek 聯合新聞稿,含 UMC 高管具名引述）"
+    ],
+    "co:umc supplies_to tech:tfln_platform": [
+     "Evertiq（轉載 HyperLight/UMC/Wavetek 聯合新聞稿,含 UMC 高管具名引述）"
+    ],
+    "co:unitree develops prod:unitree_g1": [
+     "Harper Adams University 研究團隊（獨立學術第三方,非 Unitree 非減速器供應商）"
+    ],
+    "co:vpec competes_with co:iqe": [
+     "Visual Photonics Epitaxy"
+    ],
+    "co:vpec competes_with co:landmark_optoelectronics": [
+     "Visual Photonics Epitaxy"
+    ],
+    "co:vpec supplies_to tech:cw_dfb_laser": [
+     "Visual Photonics Epitaxy"
+    ],
+    "co:vpec supplies_to tech:photodiode": [
+     "Visual Photonics Epitaxy"
+    ],
+    "co:win_semiconductor supplies_to co:sivers_semiconductors": [
+     "Sivers Semiconductors",
+     "aleabitoreddit",
+     "穩懋半導體股份有限公司"
+    ],
+    "co:zhongji_innolight supplies_to tech:silicon_photonics": [
+     "Zhongji Innolight"
+    ],
+    "co:zhongji_innolight supplies_to tech:transceiver_1_6t": [
+     "Zhongji Innolight"
+    ],
+    "co:zhongji_innolight supplies_to tech:transceiver_800g": [
+     "Zhongji Innolight"
+    ],
+    "comp:humanoid_precision_actuators depends_on mat:rare_earth_magnets": [
+     "Niron Magnetics（替代磁材開發商官方新聞頁）",
+     "SVRC Research (Robotics Center of Silicon Valley)"
+    ],
+    "comp:humanoid_precision_actuators is_component_of tech:humanoid_robot_systems": [
+     "SVRC Research（獨立第三方產業報告）",
+     "Schaeffler"
+    ],
+    "mat:inp_substrate is_component_of prod:uhp_laser": [
+     "Lumentum Holdings Inc."
+    ],
+    "mat:inp_substrate is_component_of tech:cw_dfb_laser": [
+     "Coherent",
+     "Lumentum"
+    ],
+    "mat:inp_substrate is_component_of tech:eml": [
+     "Lumentum"
+    ],
+    "mat:inp_substrate is_component_of tech:uhp_laser": [
+     "Lumentum"
+    ],
+    "mat:iron_nitride_magnet competes_with mat:rare_earth_magnets": [
+     "Niron Magnetics（公司自家新聞稿）"
+    ],
+    "mat:rare_earth_magnets depends_on mat:separated_heavy_reo": [
+     "U.S. Geological Survey (美國政府第三方統計，非任何生產商)"
+    ],
+    "mat:rare_earth_magnets depends_on tech:grain_boundary_diffusion": [
+     "Rare Earth Exchanges（獨立產業媒體，非磁材廠也非礦商）"
+    ],
+    "mat:silicon_wafer is_component_of tech:essential_chips_mature_node": [
+     "GlobalFoundries"
+    ],
+    "prod:aaoi_400mw_narrow_linewidth_pump_laser is_component_of tech:cpo": [
+     "Applied Optoelectronics"
+    ],
+    "prod:altus_family is_variant_of tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "prod:amd_instinct_mi455x is_component_of prod:amd_helios_mi450": [
+     "AMD and Anthropic"
+    ],
+    "prod:blackwell competes_with prod:lpx": [
+     "NVIDIA"
+    ],
+    "prod:blazar competes_with tech:cw_dfb_laser": [
+     "damnang_substack"
+    ],
+    "prod:digit is_variant_of tech:logistics_tote_transfer": [
+     "GXO Logistics"
+    ],
+    "prod:digit offered_under tech:robotics_as_a_service": [
+     "GXO Logistics"
+    ],
+    "prod:digit_v5 offered_under tech:robotics_as_a_service": [
+     "Agility Robotics"
+    ],
+    "prod:els_8ch_module is_component_of tech:cpo": [
+     "Enablence Technologies"
+    ],
+    "prod:els_module is_component_of tech:cpo": [
+     "Lumentum Holdings Inc."
+    ],
+    "prod:gf_scale is_component_of tech:cpo": [
+     "Sivers Semiconductors"
+    ],
+    "prod:jericho3 is_variant_of tech:ai_switch": [
+     "Broadcom"
+    ],
+    "prod:jericho4 is_variant_of tech:ai_switch": [
+     "Broadcom"
+    ],
+    "prod:newphotonics_npc50506 is_component_of tech:near_package_optics": [
+     "NewPhotonics"
+    ],
+    "prod:nxn_star_coupler is_component_of prod:els_8ch_module": [
+     "Enablence Technologies"
+    ],
+    "prod:palomar_ocs depends_on tech:mems_mirror_array": [
+     "Google (Apollo/Palomar 團隊自著論文)"
+    ],
+    "prod:poet_optical_engine depends_on tech:wafer_level_photonic_integration": [
+     "POET Technologies Inc."
+    ],
+    "prod:poet_optical_engine is_component_of tech:chip_to_chip_optical": [
+     "POET Technologies Inc."
+    ],
+    "prod:quantum_x_photonics depends_on tech:serdes": [
+     "NVIDIA"
+    ],
+    "prod:quantum_x_photonics is_variant_of tech:scale_out_cpo": [
+     "NVIDIA"
+    ],
+    "prod:reliant is_variant_of tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "prod:reliant is_variant_of tech:non_leading_edge_fab": [
+     "Lam Research Corporation"
+    ],
+    "prod:sabre_family is_variant_of tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "prod:schaeffler_rotary_actuator_platform is_component_of tech:humanoid_robot_systems": [
+     "Schaeffler"
+    ],
+    "prod:spectrum_6 depends_on tech:cpo": [
+     "NVIDIA Corporation"
+    ],
+    "prod:spectrum_6 depends_on tech:pluggable_transceiver": [
+     "NVIDIA Corporation"
+    ],
+    "prod:spectrum_6 is_component_of prod:vera_verarubin": [
+     "NVIDIA Corporation"
+    ],
+    "prod:spectrum_x is_variant_of tech:ai_switch": [
+     "NVIDIA"
+    ],
+    "prod:teraphy_chiplet depends_on prod:supernova": [
+     "silicon_matter_substack"
+    ],
+    "prod:tomahawk6 is_variant_of tech:ai_switch": [
+     "Broadcom"
+    ],
+    "prod:uhp_laser is_component_of tech:cpo": [
+     "Lumentum Holdings Inc."
+    ],
+    "prod:uhp_laser is_component_of tech:npo": [
+     "Lumentum Holdings Inc."
+    ],
+    "prod:unitree_g1 depends_on tech:strain_wave_gear": [
+     "Harper Adams University 研究團隊（獨立學術第三方,非 Unitree 非減速器供應商）"
+    ],
+    "prod:vector_family is_variant_of tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "prod:vistara constrained_by tech:cxl_memory_tiering": [
+     "Meta Platforms"
+    ],
+    "std:chips_science_act enables co:globalfoundries": [
+     "GlobalFoundries"
+    ],
+    "tech:3d_scaling enables tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "tech:acie_segment enables tech:ai_compute_buildout": [
+     "NVIDIA"
+    ],
+    "tech:advanced_packaging enables tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "tech:agentic_ai enables prod:vera_verarubin": [
+     "NVIDIA"
+    ],
+    "tech:agentic_ai enables tech:ai_compute_buildout": [
+     "NVIDIA"
+    ],
+    "tech:ai_compute_buildout enables co:lumentum": [
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables mat:inp_substrate": [
+     "AXT"
+    ],
+    "tech:ai_compute_buildout enables prod:1_6t_dr4_transceiver": [
+     "POET Technologies"
+    ],
+    "tech:ai_compute_buildout enables prod:blackwell": [
+     "NVIDIA"
+    ],
+    "tech:ai_compute_buildout enables prod:poet_optical_engine": [
+     "POET Technologies Inc."
+    ],
+    "tech:ai_compute_buildout enables tech:3d_nand_manufacturing": [
+     "Lam Research Corporation"
+    ],
+    "tech:ai_compute_buildout enables tech:advanced_packaging": [
+     "Applied Materials",
+     "Third-party Research"
+    ],
+    "tech:ai_compute_buildout enables tech:ai_switch": [
+     "Coherent",
+     "Sivers Semiconductors"
+    ],
+    "tech:ai_compute_buildout enables tech:chip_to_chip_optical": [
+     "POET Technologies Inc."
+    ],
+    "tech:ai_compute_buildout enables tech:cloud_transceiver": [
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables tech:cloud_transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables tech:cowos": [
+     "Third-party Research"
+    ],
+    "tech:ai_compute_buildout enables tech:cpo": [
+     "Coherent",
+     "Lumentum",
+     "Lumentum Holdings Inc.",
+     "Third-party Research"
+    ],
+    "tech:ai_compute_buildout enables tech:dci_transceiver": [
+     "Coherent"
+    ],
+    "tech:ai_compute_buildout enables tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "tech:ai_compute_buildout enables tech:dram_manufacturing": [
+     "Lam Research Corporation"
+    ],
+    "tech:ai_compute_buildout enables tech:essential_chips_mature_node": [
+     "GlobalFoundries"
+    ],
+    "tech:ai_compute_buildout enables tech:foundry_logic": [
+     "Applied Materials",
+     "Lam Research Corporation"
+    ],
+    "tech:ai_compute_buildout enables tech:hbm": [
+     "Applied Materials"
+    ],
+    "tech:ai_compute_buildout enables tech:icube4": [
+     "Third-party Research"
+    ],
+    "tech:ai_compute_buildout enables tech:leading_edge_logic_foundry": [
+     "Applied Materials"
+    ],
+    "tech:ai_compute_buildout enables tech:multi_rail": [
+     "Coherent"
+    ],
+    "tech:ai_compute_buildout enables tech:npo": [
+     "Lumentum Holdings Inc."
+    ],
+    "tech:ai_compute_buildout enables tech:ocs": [
+     "Coherent",
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables tech:optical_scale_up": [
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables tech:pluggable_transceiver": [
+     "Coherent",
+     "Sivers Semiconductors"
+    ],
+    "tech:ai_compute_buildout enables tech:poet_optical_interposer": [
+     "POET Technologies"
+    ],
+    "tech:ai_compute_buildout enables tech:scale_across_components": [
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables tech:scale_up_cpo": [
+     "Lumentum"
+    ],
+    "tech:ai_compute_buildout enables tech:scale_up_network": [
+     "Coherent"
+    ],
+    "tech:ai_compute_buildout enables tech:silicon_photonics": [
+     "GlobalFoundries"
+    ],
+    "tech:ai_compute_buildout enables tech:silicon_photonics_pic": [
+     "Calcalist",
+     "Tower Semiconductor"
+    ],
+    "tech:ai_switch enables tech:ai_compute_buildout": [
+     "Broadcom"
+    ],
+    "tech:ai_switch enables tech:cpo": [
+     "Coherent",
+     "Sivers Semiconductors"
+    ],
+    "tech:broadcom_3d_silicon_cpo is_component_of tech:ai_switch": [
+     "Third-party Research"
+    ],
+    "tech:broadcom_3d_silicon_cpo is_variant_of tech:cpo": [
+     "Third-party Research"
+    ],
+    "tech:cloud_transceiver depends_on tech:cw_dfb_laser": [
+     "Lumentum"
+    ],
+    "tech:coherent_pic is_component_of tech:dci_transceiver": [
+     "Tower Semiconductor"
+    ],
+    "tech:coupe is_variant_of tech:cpo": [
+     "Third-party Research"
+    ],
+    "tech:cowos competes_with tech:icube4": [
+     "Third-party Research"
+    ],
+    "tech:cowos depends_on mat:silicon_interposer": [
+     "Third-party Research"
+    ],
+    "tech:cowos depends_on tech:hbm": [
+     "Third-party Research"
+    ],
+    "tech:cpo competes_with tech:pluggable_transceiver": [
+     "Coherent",
+     "Sivers Semiconductors",
+     "The Next Platform"
+    ],
+    "tech:cpo constrained_by tech:cpo_full_stack_test": [
+     "TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）"
+    ],
+    "tech:cpo constrained_by tech:external_laser_source": [
+     "TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）"
+    ],
+    "tech:cpo constrained_by tech:fiber_attach_unit": [
+     "TechNews 科技新報（轉述台積電徐國晉於 SEMI／矽光子產業協會「矽光子國際論壇」之公開演講；未取得官方逐字稿）"
+    ],
+    "tech:cpo depends_on tech:external_laser_source": [
+     "Coherent",
+     "Lumentum",
+     "Sivers Semiconductors"
+    ],
+    "tech:cpo is_component_of tech:ai_switch": [
+     "Broadcom"
+    ],
+    "tech:cpo_fiber_attach is_component_of tech:scale_out_cpo": [
+     "NVIDIA"
+    ],
+    "tech:cw_dfb_laser depends_on mat:inp_substrate": [
+     "Coherent"
+    ],
+    "tech:cw_dfb_laser depends_on tech:six_inch_inp_production": [
+     "Coherent"
+    ],
+    "tech:cw_dfb_laser is_component_of tech:cloud_transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "tech:cw_dfb_laser is_component_of tech:cpo": [
+     "Broadcom",
+     "Coherent"
+    ],
+    "tech:cw_dfb_laser is_component_of tech:external_laser_source": [
+     "Coherent"
+    ],
+    "tech:cw_dfb_laser is_component_of tech:tfln_platform": [
+     "Sivers Semiconductors"
+    ],
+    "tech:cw_dfb_laser is_component_of tech:transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "tech:dram enables prod:amat_semiconductor_systems": [
+     "Applied Materials"
+    ],
+    "tech:dram_manufacturing enables tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "tech:dram_technology enables tech:ai_compute_buildout": [
+     "Applied Materials"
+    ],
+    "tech:dram_technology enables tech:semiconductor_manufacturing_equipment": [
+     "Applied Materials"
+    ],
+    "tech:dsp_1p6t is_component_of tech:cpo": [
+     "Broadcom"
+    ],
+    "tech:dwdm_laser_array is_component_of tech:external_laser_source": [
+     "Sivers Semiconductors"
+    ],
+    "tech:els_pluggable_module is_component_of tech:cpo": [
+     "Lumentum"
+    ],
+    "tech:eml competes_with tech:silicon_photonics": [
+     "Lumentum"
+    ],
+    "tech:eml depends_on mat:inp_substrate": [
+     "Coherent",
+     "Lumentum"
+    ],
+    "tech:eml depends_on tech:six_inch_inp_production": [
+     "Coherent"
+    ],
+    "tech:eml is_component_of tech:cloud_transceiver": [
+     "Lumentum"
+    ],
+    "tech:eml is_component_of tech:cloud_transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "tech:eml is_component_of tech:cpo": [
+     "Broadcom"
+    ],
+    "tech:external_laser_source is_component_of tech:cpo": [
+     "Coherent",
+     "Lumentum",
+     "Lumentum Holdings Inc.",
+     "Sivers Semiconductors"
+    ],
+    "tech:fiber_attach_unit is_component_of tech:cpo": [
+     "Coherent"
+    ],
+    "tech:force_torque_sensor is_component_of comp:humanoid_precision_actuators": [
+     "SemiconductorX（獨立半導體供應鏈分析，非感測器廠也非機器人商）"
+    ],
+    "tech:foundry_logic enables prod:amat_semiconductor_systems": [
+     "Applied Materials"
+    ],
+    "tech:foundry_logic enables tech:semiconductor_manufacturing_equipment": [
+     "Applied Materials"
+    ],
+    "tech:glass_cpo depends_on mat:glass_substrate": [
+     "Third-party Research"
+    ],
+    "tech:glass_cpo is_variant_of tech:cpo": [
+     "Third-party Research"
+    ],
+    "tech:hbm is_variant_of tech:dram": [
+     "Applied Materials"
+    ],
+    "tech:icube4 depends_on tech:hbm": [
+     "Third-party Research"
+    ],
+    "tech:ime_silicon_cpo depends_on mat:silicon_interposer": [
+     "Third-party Research"
+    ],
+    "tech:info_packaging supplies_to co:apple": [
+     "Third-party Research"
+    ],
+    "tech:inp_6inch_fab depends_on mat:inp_substrate": [
+     "Coherent"
+    ],
+    "tech:inp_cpo competes_with tech:cpo": [
+     "Coherent"
+    ],
+    "tech:inp_cpo depends_on mat:inp_substrate": [
+     "Coherent"
+    ],
+    "tech:inp_dfb_laser depends_on mat:inp_substrate": [
+     "MACOM Technology Solutions"
+    ],
+    "tech:intel_foveros competes_with tech:samsung_xcube": [
+     "Third-party Research"
+    ],
+    "tech:intel_glass_cpo depends_on mat:glass_substrate": [
+     "Third-party Research"
+    ],
+    "tech:intel_glass_cpo is_variant_of tech:cpo": [
+     "Third-party Research"
+    ],
+    "tech:internal_laser_module is_variant_of tech:cpo": [
+     "Open CPX MSA"
+    ],
+    "tech:isolator is_component_of tech:external_laser_source": [
+     "Coherent"
+    ],
+    "tech:mems_mirror_array is_component_of tech:ocs": [
+     "Google (Apollo/Palomar 團隊自著論文)"
+    ],
+    "tech:micro_ring_modulator is_component_of tech:cpo": [
+     "NVIDIA Corporation"
+    ],
+    "tech:microlens_array is_component_of tech:fiber_attach_unit": [
+     "Coherent"
+    ],
+    "tech:module_integrated_laser_source competes_with tech:external_laser_source": [
+     "Open CPX MSA"
+    ],
+    "tech:module_integrated_laser_source is_component_of tech:internal_laser_module": [
+     "Open CPX MSA"
+    ],
+    "tech:mrm_200g is_component_of tech:coupe": [
+     "TrendForce"
+    ],
+    "tech:nand enables prod:amat_semiconductor_systems": [
+     "Applied Materials"
+    ],
+    "tech:nand enables tech:deposition_etch_clean": [
+     "Lam Research Corporation"
+    ],
+    "tech:nand enables tech:semiconductor_manufacturing_equipment": [
+     "Applied Materials"
+    ],
+    "tech:narrow_linewidth_laser is_component_of tech:scale_across": [
+     "Lumentum"
+    ],
+    "tech:ndfeb_metal_alloy is_component_of mat:rare_earth_magnets": [
+     "MP Materials"
+    ],
+    "tech:near_package_optics competes_with tech:cpo": [
+     "Credo Semiconductor"
+    ],
+    "tech:npo enables tech:cpo": [
+     "Lumentum Holdings Inc."
+    ],
+    "tech:optical_circulator is_component_of tech:ocs": [
+     "Google (Apollo/Palomar 團隊自著論文)"
+    ],
+    "tech:optical_scale_up enables tech:cpo": [
+     "Lumentum"
+    ],
+    "tech:photodiode depends_on tech:six_inch_inp_production": [
+     "Coherent"
+    ],
+    "tech:photonic_fabric competes_with tech:cpo": [
+     "Optica Publishing Group"
+    ],
+    "tech:pluggable_transceiver depends_on tech:cw_dfb_laser": [
+     "Sivers Semiconductors"
+    ],
+    "tech:pluggable_transceiver depends_on tech:tia_driver": [
+     "Tower Semiconductor"
+    ],
+    "tech:pm_fiber is_component_of tech:fiber_attach_unit": [
+     "Coherent"
+    ],
+    "tech:poet_optical_interposer depends_on tech:wafer_level_photonic_integration": [
+     "POET Technologies"
+    ],
+    "tech:poet_optical_interposer is_component_of prod:1_6t_dr4_transceiver": [
+     "POET Technologies"
+    ],
+    "tech:poet_optical_interposer is_component_of prod:poet_optical_engine": [
+     "POET Technologies",
+     "POET Technologies Inc."
+    ],
+    "tech:poet_optical_interposer is_component_of tech:external_laser_source": [
+     "Sivers Semiconductors"
+    ],
+    "tech:poet_optical_interposer is_component_of tech:light_source_chip_to_chip": [
+     "POET Technologies"
+    ],
+    "tech:pump_laser is_component_of tech:scale_across": [
+     "Lumentum"
+    ],
+    "tech:robotic_actuator is_component_of prod:atlas_humanoid_robot": [
+     "Boston Dynamics"
+    ],
+    "tech:rv_reducer is_component_of comp:humanoid_precision_actuators": [
+     "SVRC Research（獨立第三方產業報告）"
+    ],
+    "tech:scale_out_cpo depends_on tech:cpo_packaging_assembly": [
+     "NVIDIA"
+    ],
+    "tech:scale_out_cpo depends_on tech:silicon_photonics_chiplet": [
+     "NVIDIA"
+    ],
+    "tech:scale_up_cpo depends_on tech:uhp_laser": [
+     "Lumentum"
+    ],
+    "tech:scale_up_cpo is_variant_of tech:cpo": [
+     "Lumentum"
+    ],
+    "tech:scale_up_network enables tech:cpo": [
+     "Coherent"
+    ],
+    "tech:silicon_photonics is_component_of tech:cloud_transceiver_1_6t": [
+     "Lumentum"
+    ],
+    "tech:silicon_photonics_chiplet is_component_of tech:cpo": [
+     "Sivers Semiconductors"
+    ],
+    "tech:silicon_photonics_pic enables tech:tia_driver": [
+     "Tower Semiconductor"
+    ],
+    "tech:silicon_photonics_pic is_component_of tech:cpo": [
+     "Coherent"
+    ],
+    "tech:six_inch_inp_production depends_on mat:inp_substrate": [
+     "Coherent"
+    ],
+    "tech:sovereign_ai enables tech:ai_compute_buildout": [
+     "NVIDIA"
+    ],
+    "tech:strain_wave_gear is_component_of comp:humanoid_precision_actuators": [
+     "SVRC Research（獨立第三方產業報告）"
+    ],
+    "tech:strain_wave_gear is_component_of tech:robotic_actuator": [
+     "Harmonic Drive Systems Inc."
+    ],
+    "tech:tec is_component_of tech:external_laser_source": [
+     "Coherent"
+    ],
+    "tech:tfln_platform is_component_of tech:pluggable_transceiver": [
+     "Sivers Semiconductors"
+    ],
+    "tech:uhp_laser depends_on mat:inp_substrate": [
+     "Lumentum"
+    ],
+    "tech:uhp_laser is_component_of tech:cpo": [
+     "Lumentum"
+    ],
+    "tech:us_export_controls depends_on co:applied_materials": [
+     "Applied Materials"
+    ],
+    "tech:us_export_controls depends_on co:lam_research": [
+     "Lam Research Corporation"
+    ],
+    "tech:vcsel is_component_of tech:cpo": [
+     "Coherent"
+    ],
+    "tech:vcsel is_component_of tech:near_package_optics": [
+     "Coherent"
+    ],
+    "tech:xpu depends_on tech:ai_switch": [
+     "Broadcom"
+    ],
+    "tech:xpu enables tech:ai_compute_buildout": [
+     "Broadcom"
+    ]
+   }
   }
  }
 }

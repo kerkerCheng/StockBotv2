@@ -31,7 +31,7 @@
 | 3 候選狀態加三題 | [2026-09-26-001](2026-09-26-001-feat-phase3-candidate-states-three-questions-plan.md) | completed（2026-09-30；closeout `docs/reports/2026-09-30-phase3-closeout.md`；R2 GO） |
 | 4 層中心來源 | [2026-10-01-001](2026-10-01-001-feat-phase4-layer-centric-sources-plan.md) | completed（2026-10-02；closeout `docs/reports/2026-10-02-phase4-closeout.md`；R2 兩輪條件修正後 GO；pq2 [666] 待使用者決定） |
 | 5 量測 | [2026-10-02-001](2026-10-02-001-feat-phase5-measurement-plan.md) | completed（2026-10-02；closeout `docs/reports/2026-10-02-phase5-closeout.md`；R2 CONDITIONAL_GO 後使用者選 A＝驗收②回查由心跳計數器承載，amendment A4） |
-| 6 證據判準 | [2026-10-02-002](2026-10-02-002-feat-phase6-evidence-criteria-plan.md) | **active**（2026-10-02 使用者定案 15 題；ROADMAP amendment A1 新增 Phase 6 列；執行者全程 opus 5.5） |
+| 6 證據判準 | [2026-10-02-002](2026-10-02-002-feat-phase6-evidence-criteria-plan.md) | active（2026-10-02 使用者定案 15 題；ROADMAP amendment A1 新增 Phase 6 列；執行者全程 opus 5.5） |
 
 ---
 
