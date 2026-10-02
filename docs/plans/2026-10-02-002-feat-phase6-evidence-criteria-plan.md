@@ -117,7 +117,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 |---|---|---|---|---|
 | 6.0 | [666] 收尾（10-02 的 go；10-03 apply／publish／結案，6 條升外部印證）＋基準快照（`docs/reports/2026-10-03-phase6-baseline.md`；證據等級凍結進 `config/graph_baselines.json` 的 `evidence_classes_2026_10_03`；偏差見 §0.6 #1–#3） | ✅ | 執行模型 | 見 git log「Step 6.0」 |
 | 6.1 | 插槽讀圖 staleness：同級標籤互換算低等級（任何改分類之前；rank 由呼叫端注入、沒有預設；真實資料見 baseline §15） | ✅ | 執行模型 | 見 git log「Step 6.1」 |
-| 6.2 | 身分清理：OpenLight 合併、nava 定案；遷移與 RA packet 印入圖副作用（#32）；R2-a；pq2 | ○ | 執行模型 | |
+| 6.2 | 身分清理：OpenLight 合併、nava 定案（Lumentum 自有 Navanakorn 廠→退役）；遷移與 RA packet 印入圖副作用（#32）；R2-a GO（兩條非阻擋觀察補防線）；**pq2 [670] 等 go，apply 在 go 之後**（baseline §16；偏差 §0.6 #4–#5） | ✅ | 執行模型 | 見 git log「Step 6.2」 |
 | 6.3 | 證據資料：名冊三個寫法、GSR→media、名冊新公司、SourceDoc origin 更正（pq2）、綜述論文登記、四則 lead 標籤（pq2） | ○ | 執行模型 | |
 | 6.4 | 分類規則：逐來源具名＋轉述字表（唯一 owner）、所有消費端改走它、計數器改口徑、packet 印「入圖後證據等級會變的邊」 | ○ | 執行模型 | |
 | 6.5 | sub 旗標跟著值走到消費端（不進 digest） | ○ | 執行模型 | |
