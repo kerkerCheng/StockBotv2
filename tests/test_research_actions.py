@@ -432,14 +432,50 @@ def test_malformed_same_version_record_fails_closed(tmp_path: Path) -> None:
         research_actions.read_action(record["action_id"], root=tmp_path)
 
 
-def test_prepare_validates_every_document_without_graph_or_publication(
+class _ReadOnlyGraph:
+    """假 driver：只准開 READ session、只准跑唯讀 Cypher；記下每一條查詢（Phase 6 Step 6.2d 的契約）。"""
+
+    _WRITE_WORDS = ("MERGE", "CREATE", "SET ", "DELETE", "REMOVE", "DETACH")
+
+    def __init__(self, nodes: dict | None = None) -> None:
+        self.modes: list = []
+        self.queries: list[str] = []
+        self.nodes = nodes or {}
+
+    def session(self, *, default_access_mode=None):
+        self.modes.append(default_access_mode)
+        return self
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_exc) -> None:
+        return None
+
+    def run(self, query: str, **params):
+        upper = query.upper()
+        assert not any(word in upper for word in self._WRITE_WORDS), f"prepare 跑了寫入的 Cypher：{query}"
+        self.queries.append(query)
+        if "n.id IN $ids" in query:
+            return [dict(self.nodes[i], id=i) for i in params.get("ids") or () if i in self.nodes]
+        return []
+
+    def close(self) -> None:
+        return None
+
+
+def test_prepare_reads_the_graph_read_only_and_never_publishes(
     tmp_path: Path, monkeypatch
 ) -> None:
-    monkeypatch.setattr(
-        application,
-        "_driver",
-        lambda: (_ for _ in ()).throw(AssertionError("graph must not be opened")),
-    )
+    """prepare 不寫圖、不 publish；**可以**開唯讀 session 核對入圖副作用（Phase 6 Step 6.2d）。
+
+    ⚠ 2026-10-03 之前這條是 `…_without_graph_or_publication`：`_driver` 被換成「一開就 AssertionError」，守的是
+    「prepare 不碰圖」。6.2d 起 prepare 要以唯讀 session 比對節點與 SourceDoc 的現值——守的東西收窄成「只讀、只用
+    READ session、不跑任何寫入 Cypher、不 publish」，由下面的假 driver 逐條斷言。"""
+    import neo4j
+
+    graph = _ReadOnlyGraph()
+    monkeypatch.setattr(application, "_driver", lambda: graph)
     monkeypatch.setattr(
         application,
         "publish_provenance",
@@ -457,6 +493,52 @@ def test_prepare_validates_every_document_without_graph_or_publication(
     assert prepared["action_id"] in prepared["review_packet"]
     assert not (tmp_path / "extractions").exists()
     assert not (tmp_path / "library" / "raw").exists()
+    # 副作用核對開的是 READ session（同 URL 多段檢查另開 session、本來就只跑 MATCH——兩者的 Cypher 都由假 driver
+    # 逐條擋寫入字眼）；任何一條寫入 Cypher 都會在 `_ReadOnlyGraph.run` 當場 AssertionError
+    assert neo4j.READ_ACCESS in graph.modes, "副作用核對要開 READ session"
+    assert any("n.id IN $ids" in q for q in graph.queries), "唯讀核對真的跑了"
+    record = research_actions.read_action(prepared["action_id"], root=tmp_path)
+    assert [d["status"] for d in record["merge_side_effect_check"]["documents"]] == ["checked", "checked"]
+    assert "入圖副作用" in prepared["review_packet"]
+
+
+def test_prepare_says_side_effects_are_unknown_when_the_graph_is_unreachable(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """讀不到圖：prepare 照樣成功，但每份都記 `upstream_unavailable`、packet 印「副作用無法核對」——不是「無副作用」（L13）。"""
+
+    def _down():
+        raise OSError("connection refused")
+
+    monkeypatch.setattr(application, "_driver", _down)
+    prepared = application._prepare_research_action_impl(_request_for_docs("first_doc"), root=tmp_path)
+    assert prepared["status"] == "ready"
+    record = research_actions.read_action(prepared["action_id"], root=tmp_path)
+    assert [d["status"] for d in record["merge_side_effect_check"]["documents"]] == ["upstream_unavailable"]
+    assert "副作用無法核對" in prepared["review_packet"]
+    assert "不會改到圖上任何既有" not in prepared["review_packet"]
+
+
+def test_prepare_prints_which_existing_values_the_load_would_overwrite(
+    tmp_path: Path, monkeypatch
+) -> None:
+    """圖上已有的節點，本包的宣告會直接 SET 它的 type／abstraction_level／role——packet 要逐欄印出來（Phase 4 #32）。"""
+    request = json.loads(_request_for_docs("first_doc"))
+    extraction = json.loads(request["documents"][0]["extraction_json"])
+    sid = f"{extraction['source_doc']['doc_id']}_s1"
+    extraction["sources"] = [{"id": sid, "locator": "p1", "quote": "Test layer is a material."}]
+    node = {"id": "mat:test_layer", "type": "Material", "name": "Test layer", "abstraction_level": "materials_substrate",
+            "confidence": 0.9, "source_ids": [sid]}
+    extraction["nodes"] = [node]
+    request["documents"][0]["extraction_json"] = json.dumps(extraction)
+    graph = _ReadOnlyGraph(nodes={node["id"]: {
+        "type": node["type"], "name": node["name"], "abstraction_level": "a_different_level",
+        "role": node.get("role"), "aliases": ["Kept Alias"], "attrs": "{}", "confidence": 0.99}})
+    monkeypatch.setattr(application, "_driver", lambda: graph)
+    prepared = application._prepare_research_action_impl(json.dumps(request), root=tmp_path)
+    assert prepared["status"] == "ready"
+    packet = prepared["review_packet"]
+    assert f"節點 `{node['id']}` 的 `abstraction_level` 會被覆寫：'a_different_level'" in packet
 
 
 def test_prepare_rejects_whole_action_when_later_document_is_invalid(

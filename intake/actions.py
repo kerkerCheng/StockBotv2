@@ -88,6 +88,9 @@ ACTIONABLE_STATES = {
     "applied",
     "committed_not_pushed",
 }
+#: prepare 當下的入圖副作用核對（Phase 6 Step 6.2d；`loader.merge_side_effects` 是唯一 owner）每份文件的狀態。
+#: `upstream_unavailable`＝讀不到圖，**不是**「無副作用」（L13）。
+MERGE_SIDE_EFFECT_STATUSES = frozenset({"checked", "upstream_unavailable"})
 
 
 class ActionBusyError(RuntimeError):
@@ -713,6 +716,12 @@ def _validate_record(record: object) -> dict:
             not isinstance(sub_check, dict) or not isinstance(sub_check.get("language"), str)
             or not isinstance(sub_check.get("edges"), list) or not isinstance(sub_check.get("warnings"), list)):
         raise ValueError("Research Action sub language check receipt is invalid")
+    side_check = record.get("merge_side_effect_check")
+    if side_check is not None and (
+            not isinstance(side_check, dict) or not isinstance(side_check.get("documents"), list)
+            or not all(isinstance(d, dict) and isinstance(d.get("doc_id"), str)
+                       and d.get("status") in MERGE_SIDE_EFFECT_STATUSES for d in side_check["documents"])):
+        raise ValueError("Research Action merge side effect receipt is invalid")
 
     manifest = record.get("document_manifest")
     if not isinstance(manifest, list) or not manifest:
@@ -933,6 +942,22 @@ def _render_layer_enumerations(record: dict) -> list[str]:
     return lines
 
 
+def _render_merge_side_effects(record: dict) -> list[str]:
+    """packet 的「入圖副作用」一節（Phase 6 Step 6.2d）：入圖時會改到圖上哪些**既有**值。沒有收據就整節不印（舊紀錄 render 不變）。"""
+
+    check = record.get("merge_side_effect_check")
+    if not check:
+        return []
+    from loader.merge_side_effects import render_lines
+
+    lines = ["", "## 入圖副作用（prepare 當下對圖核對；只印、不放閘）", ""]
+    for document in check.get("documents") or []:
+        lines.extend(render_lines(document, doc_id=document.get("doc_id")))
+    lines.append("- 「會被覆寫」＝載入時以本包的節點宣告／SourceDoc 欄位直接 SET 圖上既有值（最後載入者贏）；"
+                 "讀不到圖時印「副作用無法核對」，不是「無副作用」。")
+    return lines
+
+
 def render_review_packet(record: dict, *, now: datetime | None = None) -> str | None:
     payload = record.get("payload")
     report = payload.get("report") if payload else record.get("review")
@@ -966,6 +991,7 @@ def render_review_packet(record: dict, *, now: datetime | None = None) -> str | 
             lines.append(f"  - Validation warning: {warning}")
     lines.extend(_render_layer_enumerations(record))
     lines.extend(_render_sub_language(record))
+    lines.extend(_render_merge_side_effects(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
     lines.extend(
@@ -1040,9 +1066,14 @@ def _quota_usage(root: Path) -> tuple[int, int]:
 
 
 def create_action(
-    payload: dict, *, root: Path = ROOT, now: datetime | None = None
+    payload: dict, *, root: Path = ROOT, now: datetime | None = None,
+    merge_side_effects: dict | None = None,
 ) -> dict:
-    """Persist a validated immutable action and return its full record."""
+    """Persist a validated immutable action and return its full record.
+
+    `merge_side_effects`：prepare 當下對圖算的入圖副作用收據（`intake.application._merge_side_effect_receipt`；
+    Phase 6 Step 6.2d）。**不進 payload、不進 digest**——它依賴當下的圖（同 sub 引文核對的收據）；只印、不放閘。
+    """
 
     current = now or _now()
     normalized = validate_normalized_payload(payload)
@@ -1112,6 +1143,9 @@ def create_action(
             record["layer_enumeration_check"] = layer_check
         if sub_check is not None:
             record["sub_language_check"] = sub_check
+        if merge_side_effects is not None:
+            record["merge_side_effect_check"] = merge_side_effects
+        _validate_record(record)
         _write_new_json(_action_path(action_id, root), record)
     return copy.deepcopy(record)
 
@@ -1318,6 +1352,7 @@ def _full_report(record: dict) -> str:
             lines.append(f"  - Validation warning: {warning}")
     lines.extend(_render_layer_enumerations(record))
     lines.extend(_render_sub_language(record))
+    lines.extend(_render_merge_side_effects(record))
     for field in ("search_summary", "l8_notes", "counterevidence_and_gaps"):
         lines.extend(["", f"## {REPORT_HEADINGS[field]}", "", report[field]])
 

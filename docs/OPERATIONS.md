@@ -934,6 +934,27 @@ apply 沒完成（看輸出的 next_action）。私有函式 `intake.application
 & '.venv\Scripts\python.exe' scripts\commit_pending_intake.py      # 每 action 一 commit、整批一 push
 ```
 
+### 身分清理遷移（2026-10-03 Phase 6 Step 6.2：OpenLight 合併、nava 退役）
+```powershell
+& '.venv\Scripts\python.exe' loader\migrate_identity_cleanup.py                 # dry-run（唯讀；印計畫 JSON：抽取檔逐項改動、名冊 diff、入圖副作用、證據等級會變的邊、活的引用）
+& '.venv\Scripts\python.exe' loader\migrate_identity_cleanup.py --apply --pq2 <N> --backup-dir library\private\backups\<name>   # 使用者對 [N] go 之後
+```
+manifest 住 `loader/manifests/identity-cleanup-20261003.json`（宣告式：每個決定附理由與一手原文；`pq2_ref` 是 pq2 項的 `ref_id`）。
+`--apply` 的順序：pq2 編號核對（存在、未結案、`manual`、`ref_id`＝`pq2_ref`）→ backup-dir 的 `neo4j_export.json` 非空且 counts 自洽 →
+重算計畫、改後抽取檔重載的入圖副作用必須為 0 → **先寫圖**（管理員憑證：scoped 重載、刪舊 id 的 assertion 與節點、重投影）→ 再寫抽取檔
+（舊版歸檔 `extractions/superseded/`）與名冊 → 對真的圖逐條重算證據等級，必須等於 dry-run 的預告 → 結果寫 `…result.json`。
+**Neo4j 回 Forbidden 就停下問使用者，不換憑證重試。** 事前匯出：`scripts/backup_private.py` 的 `export_neo4j_payload()` 寫進 backup-dir。
+
+**sandbox impact review 五步（新增 `loader/migrate_identity_cleanup.py`；`scripts/prepare_research_action.py` 多一次唯讀查圖）：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 遷移工具：dry-run 只讀（`NEO4J_*` 的 READ session、讀 `extractions/`、名冊、四份 authority 檔找活的引用）；`--apply` 寫 Neo4j（管理員憑證，與既有 `migrate_*.py` 同）、兩份抽取檔、`extractions/superseded/` 歸檔、`config/company_identity.json`、`loader/manifests/…result.json`。prepare：多一個 READ session（routine 憑證，原本就為同 URL 檢查開過），只跑 MATCH；寫入面不變（RA 紀錄多一個收據欄位）。都不連外網、不 Git。 |
+| **2 skill／prompt／本檔** | 本節；上面 prepare 那一段；`docs/ARCHITECTURE.md` 不需改（遷移工具是一次性）。skill 不必改：RA 的 packet 是 server 端 render，skill 照舊「把 packet 原文給使用者」。 |
+| **3 最窄 rule** | **沒有新增任何 rule**：兩者都是互動專用——不進 `.codex/rules`、不進 daily 固定步驟、不進 `.claude/settings.json` 的 allow。遷移工具的補償控制是 pq2 編號核對＋事前匯出＋writer lock＋副作用 0 才寫＋寫後逐條重算。 |
+| **4 permission contract test** | `tests/test_identity_cleanup.py`（編號核對、備份核對、`--apply` 缺參數是用法錯誤、照抄後副作用 0／不照抄有副作用）；`tests/test_research_actions.py::test_prepare_reads_the_graph_read_only_and_never_publishes`（假 driver 擋任何寫入 Cypher）與讀不到圖印「無法核對」。 |
+| **5 端到端 smoke** | 真資料只跑 dry-run（2026-10-03：8 條證據等級變動，與 baseline §3 的模擬相同；兩份檔照抄後副作用 0；什麼都沒寫——`git status` 與圖都不變）。`--apply` 在 pq2 go 之後跑。 |
+
 ### Skill 轉接層
 ```powershell
 & '.venv\Scripts\python.exe' scripts\sync_agent_skills.py           # 新增 skill 或改 name/description 後
@@ -1121,7 +1142,7 @@ atomic 寫本機 `library/leads/pending_leads.json`；`classification-health` �
 4. 新增或改名 unattended command 時，同一 commit 更新 rule、skill／prompt、本文與 permission test；測試要同時斷言相鄰高權限動詞仍未放行。
 5. 用 scheduled task 相同的 `workspace-write`＋首次 `require_escalated` exact command 做 smoke test。只有 rule 已存在但載入版本仍舊時才需要重啟。
 
-Research Action prepare 的固定入口是 `.venv\Scripts\python.exe scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead>.json`。draft 目錄已 ignore；CLI 只接受該目錄下的 JSON，重跑 server-side validation 並寫 private staging，不 apply、不寫 Neo4j。`engine_b.cli list --by-priority` 與 `drain` 在 default store 讀不到 Decision／Sheet／Neo4j context 時 exit 2，不再把持股 silently 降成空集合。
+Research Action prepare 的固定入口是 `.venv\Scripts\python.exe scripts\prepare_research_action.py --action-file library\leads\action_drafts\<lead>.json`。draft 目錄已 ignore；CLI 只接受該目錄下的 JSON，重跑 server-side validation 並寫 private staging，不 apply、不寫 Neo4j。**它會唯讀查圖**：同 URL 多段檢查（既有），以及 2026-10-03（Phase 6 Step 6.2d）起的入圖副作用核對——READ session 比對本包要 MERGE 的節點與 SourceDoc 的現值，收據存在 RA 紀錄的 `merge_side_effect_check`、packet 印「入圖副作用」一節（會被覆寫的節點欄位、別名聯集、SourceDoc 欄位衝突與日期倒退）；讀不到圖記 `upstream_unavailable`（印「副作用無法核對」，不是「無副作用」）。只印、不放閘。`engine_b.cli list --by-priority` 與 `drain` 在 default store 讀不到 Decision／Sheet／Neo4j context 時 exit 2，不再把持股 silently 降成空集合。
 
 Daily Brief 通知由 `.venv\Scripts\python.exe scripts\publish_daily_brief.py --brief-file <private-brief.md> --summary "..."` 發送；
 Codex 與本機 Claude Code 共用同一支 publisher。它只接受 stdin／私有 brief 檔，不提供 Discord inbound

@@ -440,6 +440,39 @@ def _safe_load_result(result: dict) -> dict:
         ]
     return safe
 
+def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) -> dict:
+    """prepare 當下：本包每份抽取檔入圖時會改到圖上哪些既有值（Phase 6 Step 6.2d；唯一 owner `loader.merge_side_effects`）。
+
+    唯讀 session；連不上圖時每份都記 `upstream_unavailable`——**不得**記成「無副作用」（L13：成功與失敗不得同形）。
+    只印、不放閘：副作用多寡不擋 prepare（入圖仍要這個編號的明確核准）。
+    """
+    from loader.merge_side_effects import side_effects
+
+    results: list[dict] = []
+    try:
+        driver = (driver_factory or _driver)()
+    except AssertionError:
+        raise                       # 測試的絆線（「這裡不該開圖」）不得被當成「連不上圖」吞掉
+    except Exception as exc:  # noqa: BLE001
+        reason = f"連不上圖（{type(exc).__name__}）——副作用無法核對"
+        return {"documents": [{"doc_id": d["doc_id"], "status": "upstream_unavailable", "reason": reason}
+                              for d in documents]}
+    try:
+        with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
+            for document in documents:
+                results.append({"doc_id": document["doc_id"], **side_effects(document["extraction"], session)})
+    except AssertionError:
+        raise
+    except Exception as exc:  # noqa: BLE001
+        reason = f"讀圖失敗（{type(exc).__name__}）——副作用無法核對"
+        done = {r["doc_id"] for r in results}
+        results += [{"doc_id": d["doc_id"], "status": "upstream_unavailable", "reason": reason}
+                    for d in documents if d["doc_id"] not in done]
+    finally:
+        driver.close()
+    return {"documents": results}
+
+
 def _prepare_research_action_impl(
     action_json: str, *, root: Path = INTAKE_ROOT
 ) -> dict:
@@ -503,7 +536,8 @@ def _prepare_research_action_impl(
                 "prerequisites": [_safe_error_message(item) for item in check["prerequisites"][:50]],
             }
     try:
-        record = research_actions.create_action(payload, root=root)
+        record = research_actions.create_action(
+            payload, root=root, merge_side_effects=_merge_side_effect_receipt(normalized_documents))
     except (OSError, RuntimeError, ValueError) as exc:
         return {"status": "rejected", "error": _safe_error_message(exc)}
     return {

@@ -1,0 +1,56 @@
+{
+  "kind": "identity_cleanup",
+  "date": "2026-10-03",
+  "plan": "docs/plans/2026-10-02-002-feat-phase6-evidence-criteria-plan.md Step 6.2（使用者定案 §0.1 #2）",
+  "pq2_ref": "identity-cleanup:2026-10-03",
+  "tool": "loader/migrate_identity_cleanup.py",
+  "decisions": {
+    "co:openlight": {
+      "action": "merge_into",
+      "into": "co:openlight_photonics",
+      "why": "同一家公司的兩個 id：名冊兩筆 display_name 同為「OpenLight Photonics Inc.」、name_aliases 同為「OpenLight」（2026-10-01 Phase 4 Step 4.1c 補名時發現）。co:openlight 只來自 semitoday_ph18da_volume_2026_03_20 一份抽取（1 條邊）；OpenLight 自家新聞稿與 Tower 6-K 用 co:openlight_photonics（4 條邊）——留後者。兩筆同名期間名字比對對兩家都不算（shared_name_forms），OpenLight 自己的新聞稿因此被算成另一個代號的外部印證（3 條）。"
+    },
+    "co:nava_thailand": {
+      "action": "retire_into_owner",
+      "into": "co:lumentum",
+      "why": "「Nava」是 Lumentum 自己在泰國 Navanakorn（Nava Nakorn）工業區的製造廠，不是一家代工廠：抽取檔把法說摘要的「Thailand (Nava)」誤建成一家公司（名稱還寫成 contract manufacturer）。對自己供貨的邊沒有意義；它供 1.6T 光模組的那條邊同檔已有 co:lumentum 的同一條（e7，同一段 s8）。",
+      "evidence": [
+        {
+          "source": "SEC DEF 14A（Lumentum Holdings Inc.，2023-09-22 申報），Sustainability 段",
+          "url": "https://www.sec.gov/Archives/edgar/data/1633978/000130817923000998/llite2023_def14a.htm",
+          "quote": "We started solar panel installations at our San Jose, California corporate headquarters and our largest manufacturing facility in Navanakorn, Thailand, with an estimated completion date in the first half of fiscal 2024."
+        },
+        {
+          "source": "Lumentum FY2026 10-K Item 2 Properties（庫內 library/raw/lite_10_k_fy2026_20260817.txt）",
+          "quote": "our leased and owned properties in total are approximately 3,100,000 square feet, of which we own approximately 2,136,000 square feet, including the 1,173,000 square feet manufacturing sites in Thailand"
+        },
+        {
+          "source": "Lumentum Q2 FY2026 法說摘要（庫內 extractions/lumentum_q2fy26_cpo.json 的 s8、s23）",
+          "quote": "Transceiver revenue grew ~$50M sequentially, leveraging expanded manufacturing capacity in Thailand (Nava)"
+        }
+      ]
+    }
+  },
+  "extractions": [
+    {
+      "file": "semitoday_ph18da_volume_2026_03_20.json",
+      "rename_ids": {"co:openlight": "co:openlight_photonics"},
+      "align_nodes_to_graph": true
+    },
+    {
+      "file": "lumentum_q2fy26_cpo.json",
+      "delete_edges": ["e27"],
+      "merge_edges": [{"id": "e28", "into": "e7"}],
+      "delete_nodes": ["co:nava_thailand"],
+      "align_nodes_to_graph": true
+    }
+  ],
+  "registry": {
+    "remove": ["co:openlight", "co:nava_thailand"],
+    "set": {
+      "co:openlight_photonics": {
+        "_note": "2026-10-03 Phase 6 Step 6.2 合併：co:openlight（Semiconductor Today 2026-03-20 那篇抽取用的代號，同名同別名、同一家）併入本 id——名冊刪 co:openlight、抽取檔 semitoday_ph18da_volume_2026_03_20 改指本 id、圖上 scoped 重載後刪舊節點（pq2 [{pq2}]；loader/manifests/identity-cleanup-20261003.json）。"
+      }
+    }
+  }
+}

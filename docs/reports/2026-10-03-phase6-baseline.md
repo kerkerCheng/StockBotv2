@@ -287,3 +287,49 @@ pq2 池全部 669 項（含已結案）裡，沒有任何 tier 型別的項目�
 - 測試：`tests/test_structure_reading_v3.py` 新增同級互換 low、查不到 rank 照跨級、`reading_status` 沒有預設 rank 三條；兩個既有 helper 補 `evidence_rank=`。
   變異：把 rank 比較拿掉（`if rank_before == rank_after:` → `if False:`）→ `test_a_same_rank_swap_on_a_socket_supply_edge_is_low` 紅（scratchpad `mutate.py`，跑完還原）。
   全測試 3306 passed／1 skipped。
+
+## 16. Step 6.2 身分清理（2026-10-03）
+
+### 16.1 nava 定案（6.2a；研究收據）
+
+**結論：「Nava」是 Lumentum 自己在泰國 Navanakorn（Nava Nakorn）工業區的製造廠，不是一家代工廠 → 退役 `co:nava_thailand`、那條供貨邊改掛 `co:lumentum`。**
+
+| 來源 | 逐字 | 判讀 |
+|---|---|---|
+| SEC DEF 14A，Lumentum Holdings Inc.，2023-09-22 申報（https://www.sec.gov/Archives/edgar/data/1633978/000130817923000998/llite2023_def14a.htm），Sustainability 段 | "We started solar panel installations at our San Jose, California corporate headquarters and our largest manufacturing facility in Navanakorn, Thailand, with an estimated completion date in the first half of fiscal 2024." | 一手（公司自己的法定申報）：Navanakorn 是**Lumentum 自己最大的製造廠** |
+| Lumentum FY2026 10-K Item 2 Properties（庫內 `library/raw/lite_10_k_fy2026_20260817.txt`） | "…of which we own approximately 2,136,000 square feet, including the 1,173,000 square feet manufacturing sites in Thailand…" | 一手：泰國的製造廠是**自有** |
+| Lumentum Q2 FY2026 法說摘要（`library/raw/lumentum_q2fy26_cpo.txt` Passage 4／10） | "Transceiver revenue grew ~$50M sequentially, leveraging expanded manufacturing capacity in Thailand (Nava)"；"stepping on the gas at Nava (Thailand)" | 與上兩者一致：「Nava」＝泰國那座自有廠的地名簡稱；抽取時把它建成一家公司（name 還寫成 contract manufacturer） |
+
+旁證（媒體、不當依據）：Semiconductor Today 2022-02-04 轉述 Lumentum 新聞稿 "Lumentum's Thailand Navanacorn factory"；Lumentum 官方 X 帳號 "expansion of its production facility in Nava"。
+10-K 另寫 "Our significant contract manufacturing partners are located primarily in Thailand, Taiwan, Malaysia and the Philippines"——泰國也有代工夥伴，但沒有任何來源把「Nava」指向代工廠；DEF 14A 那句把 Navanakorn 明寫成 "our … manufacturing facility"。
+
+### 16.2 遷移工具 dry-run（6.2c；`python loader/migrate_identity_cleanup.py`，唯讀）
+
+- 抽取檔：`semitoday_ph18da_volume_2026_03_20.json`——`co:openlight` → `co:openlight_photonics`（節點宣告＋`ph3` 的 src）；
+  `lumentum_q2fy26_cpo.json`（local_only、不進 Git）——刪 `e27`（`co:lumentum supplies_to co:nava_thailand`）、`e28`（`co:nava_thailand supplies_to tech:cloud_transceiver_1_6t`）併入同檔既有的 `e7`
+  （`co:lumentum supplies_to tech:cloud_transceiver_1_6t`，s8 早已在 e7 的 source_ids，**併入 0 個新來源**；e28 的 `qualification_status: qualified` 不併——s8 原文只講泰國產能，e7 的 `designed_in` 留著）、刪節點宣告。
+- **入圖副作用（Phase 4 #32）**：兩份檔原樣重載時，`co:newphotonics` 的 `abstraction_level` 會被覆寫（module_subsystem → device_chip）、`role`（disruptor → null）——
+  所以兩份檔**每個在圖上已存在的節點**都照抄圖上現值（`align_nodes_to_graph`；plan 原文只寫改名那一個，§0.6 #4）；照抄後兩份檔的副作用 **0**（只剩 `co:openlight_photonics` 的別名聯集「OpenLight」）。
+- 名冊：100 → 98 家（刪 `co:openlight`、`co:nava_thailand`；`co:openlight_photonics._note` 改寫成合併紀錄，pq2 編號鑄號後填）。合併後 origin「OpenLight」「OpenLight Photonics」「OpenLight Photonics Inc.」都解析到 `co:openlight_photonics`。
+- 圖上指著舊 id 的 assertion 只有 3 筆（`lumentum_q2fy26_cpo_e27`、`_e28`、`semitoday_ph18da_volume_2026_03_20_ph3`），全在 manifest 的兩份文件裡；claim 0；活的引用（lead registry、event_watches、hypotheses、讀圖、敘事 ledger）0；
+  `library/leads/todo_pool.json` 一處提到 `co:openlight`——已結案項目的歷史文字，不改。
+- **證據等級會變的邊（8 條；與 §3 `sim_b_merge` 逐條相同，另加 nava 兩條消失）**：
+
+| 邊 | 改前 → 改後 |
+|---|---|
+| `co:lumentum supplies_to co:nava_thailand` | 供應商自報 → （邊消失） |
+| `co:nava_thailand supplies_to tech:cloud_transceiver_1_6t` | 外部印證 → （邊消失；併入 Lumentum 自己的那條，等級不變） |
+| `co:openlight supplies_to co:newphotonics` | 媒體轉述 → （邊消失；併入 canonical） |
+| `co:openlight_photonics develops prod:ph18da` | 外部印證 → 供應商自報 |
+| `co:openlight_photonics partnership_with co:tower_semiconductor` | 外部印證 → **雙方聯合**（plan 的 L11-6 ④：Tower／OpenLight 聯合 6-K） |
+| `co:openlight_photonics supplies_to co:newphotonics` | 外部印證 → 媒體轉述 |
+| `co:openlight_photonics partnership_with co:cadence` | 待判定 → 雙方聯合（升級：資料更正——聯合 6-K 的 origin 合併後具名兩家不共用寫法的名冊公司） |
+| `co:tower_semiconductor develops prod:ph18da` | 待判定 → 雙方聯合（同上） |
+
+### 16.3 RA packet 的入圖副作用（6.2d）
+
+prepare 多一次 READ session（`intake.application._merge_side_effect_receipt` → `loader.merge_side_effects.side_effects`，與遷移 dry-run 同一個 owner），收據存在 RA 紀錄 `merge_side_effect_check`，packet 與 apply 報告都印「入圖副作用」一節；讀不到圖印「副作用無法核對」。
+「入圖後證據等級會變的邊」那一段在 6.4 owner 落地後補（plan 原文）。
+⚠ 順帶發現：既有測試 `test_prepare_validates_every_document_without_graph_or_publication` 守的「prepare 不開圖」從來沒被守住——同 URL 多段檢查本來就開圖，並以 `except Exception: pass` 吞掉測試的 AssertionError 絆線。
+改寫成 `test_prepare_reads_the_graph_read_only_and_never_publishes`（假 driver 擋任何寫入 Cypher、斷言 READ session 真的跑了）；新程式的兩處例外處理對 AssertionError 一律往外丟。
+同型的絆線在 `tests/test_intake.py`（`forbidden_driver` 兩處）可能一樣空跑——不在本 Step 範圍，記進 closeout 待決。
