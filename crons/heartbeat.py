@@ -1420,6 +1420,8 @@ def build_positions(*, state_dir: Path | None) -> Section:
         if lanes is not None:
             for lane in ("paper", "live"):
                 section.lines.append(_lane_power_line(lane, (lanes or {}).get(lane)))
+    # 圖預測對錯表（Phase 5 Step 5.4）：讀圖 artifact 的 `predictions` 照抄一行；只印不判、不排序。
+    section.lines.append(_predictions_line(state_dir))
 
     # 賭注收斂（V4，2026-09-19）：**不依賴賣出的驗證序列**。等權報酬與 power-law 都以股價
     # 為錨點，而本圖標的同漲同跌；共識修正不受 beta 污染，也不需要賣出就能驗證。
@@ -1521,6 +1523,35 @@ def _lane_power_line(lane: str, entry: Mapping[str, Any] | None) -> str:
             f"｜對主題等權組超額 {_cohort_excess_text(entry.get('theme_cohort_excess') or {})}")
 
 
+_WRONG_OUTCOMES = ("reversed", "disproof_touched", "retracted")
+
+
+def _predictions_line(state_dir: Path | None) -> str:
+    """「圖預測：對 N｜錯 M（當時已有 a／之後才出現 b／未定日 c）｜現行 K｜到期未重讀 J｜改寫 R｜非斷言 Z」。
+    讀不到 artifact、artifact 還沒有這段、as-of 視角拒絕——三種缺席各自說，都不印 0（INV-3）。"""
+    payload, absence = _load_state(state_dir, "structure_readings")
+    if absence is not None:
+        return f"圖預測：{absence.reason}（{absence.kind}）"
+    table = payload.get("predictions")
+    if table is None:
+        return "圖預測：這份 structure_readings artifact 還沒有 predictions（下一次 materialize --structure-readings 補上；不是 0）"
+    if table.get("absence"):
+        return f"圖預測：{table['absence'].get('reason')}（{table['absence'].get('kind')}）——不是 0"
+    counts = table.get("counts") or {}
+    kinds = {k: sum(int((counts.get(o) or {}).get(k) or 0) for o in _WRONG_OUTCOMES)
+             for k in ("already_available", "emerged_later", "undated", "upstream_unavailable")}
+    text = (f"圖預測：對 {counts.get('held', 0)}｜錯 {table.get('wrong_total', 0)}（當時已有 {kinds['already_available']}"
+            f"／之後才出現 {kinds['emerged_later']}／未定日 {kinds['undated']}"
+            + (f"／日期讀不到 {kinds['upstream_unavailable']}" if kinds["upstream_unavailable"] else "") + "）"
+            f"｜現行 {counts.get('open', 0)}｜到期未重讀 {counts.get('expired_unread', 0)}"
+            f"｜改寫 {counts.get('rewritten', 0)}｜非斷言 {counts.get('non_assertion', 0)}")
+    if table.get("earliest_open_expiry"):
+        text += f"｜現行最早到期 {table['earliest_open_expiry']}"
+    if table.get("unreadable_nodes"):
+        text += f"｜⚠ ledger 有壞行的節點 {len(table['unreadable_nodes'])} 個不在表內"
+    return text
+
+
 def _nav_line(nav: Mapping[str, Any] | None) -> str:
     if nav is None:
         return "NAV：這份 positions artifact 還沒有 nav_exposure（upstream_unavailable；下一次 materialize --positions 補上）"
@@ -1613,6 +1644,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     # 追蹤表三條 lane（Phase 5 Step 5.2）：列數與曾達 2 倍——較昨 diff 看得到第一筆回填、第一份新敘事、第一個 2 倍。
     "positions.lane.paper.n": "追蹤表 paper 列數", "positions.lane.live.n": "追蹤表 live 列數",
     **{f"positions.lane.{lane}.reached_2x_ever": f"{lane} 曾達 2 倍" for lane in ("history", "paper", "live")},
+    # 圖預測對錯表（Phase 5 Step 5.4）：第一筆對／錯出現的那天，較昨 diff 看得到。
+    "predictions.held": "圖預測 對", "predictions.wrong": "圖預測 錯",
+    "predictions.expired_unread": "圖預測 到期未重讀",
 }
 #: 較昨變動一行最多列幾項（其餘寫「另 N 項」）。
 DIFF_LIMIT = 12
@@ -1732,8 +1766,17 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
                     for lane in ("history", "paper", "live")})
         return out
 
+    def predictions() -> dict[str, Any]:
+        payload, absence = _load_state(state_dir, "structure_readings")
+        table = None if absence is not None else payload.get("predictions")
+        if not table or table.get("absence"):
+            return {}                        # 讀不到／舊 artifact／as-of 拒絕：None（未讀到），不是 0
+        counts = table.get("counts") or {}
+        return {"predictions.held": counts.get("held"), "predictions.wrong": table.get("wrong_total"),
+                "predictions.expired_unread": counts.get("expired_unread")}
+
     for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, prescreen, captures, tiers,
-               candidates, positions):
+               candidates, positions, predictions):
         guard(fn)
     return values
 

@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.4：圖預測對錯表）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的 `python -m webapp materialize --structure-readings` **讀取變多、寫入不變**：多讀每個節點讀圖 ledger 的全部紀錄（含被取代的；本來就讀）、`library/leads/pending_leads.json`（判觸及引用文件的 `published_at`）、同一個 Neo4j bolt 本機連線上一條**唯讀** Cypher（`MATCH (d:SourceDoc) RETURN d.id, d.published_at`，`READ_ACCESS` session、用完即關）。**無新增網路主機或憑證**（Neo4j 本機與既有 `_graph_driver` 同一組）。只寫 ignored derived cache `structure_readings.json`（schema `/2`）。Neo4j 讀不到時錯的種類整段 `upstream_unavailable`、終局照算；as-of 視角明確拒絕（`point_in_time_unavailable`） |
+| **2 canonical skill／prompt／本檔** | 本節；plan §5；讀圖頁的預測表與 `this_is_not` 新句 |
+| **3 最窄 rule** | daily ⑬ 的 argv **不變**；不新增 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條；APP 不新增路由（structure-readings 同一個 GET，artifact 多 `predictions`） |
+| **4 contract test** | `tests/test_reading_predictions.py`（夾具鏈 A／A'／B／C／D／E 逐筆終局、改寫不算對、staleness 不是判定、沒日期與年月精度是未定日、讀不到圖是 upstream_unavailable、判觸及只看單數 judgment 與 `#n` 後綴、到期後重讀同讀法＝對、真實 15 筆的形狀、artifact v2、心跳一行與三種缺席、快照鍵） |
+| **5 端到端 smoke** | 見 baseline §17（真實資料 materialize、預測表與 5.0 手算逐筆相同、心跳逐行對照、headless Edge 渲染讀圖頁） |
+
 ### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.3：`record_trade.py --backfill-before-receipts`）
 
 | 步 | 結論 |

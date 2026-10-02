@@ -74,7 +74,8 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "watches": "stockbot-app/watches/1",
     # /2（2026-10-02 Phase 5 Step 5.2）：多 `lanes`（live／paper／history）、`theme_cohort`、`price_budget`；`rows` 仍是 history。
     "positions": "stockbot-app/positions/2",
-    "structure_readings": "stockbot-app/structure_readings/1",
+    # /2（2026-10-02 Phase 5 Step 5.4）：多 `predictions`（圖預測對錯表）。
+    "structure_readings": "stockbot-app/structure_readings/2",
     "account_scorecard": "stockbot-app/account_scorecard/1",
     "candidates": "stockbot-app/candidates/1",
 }

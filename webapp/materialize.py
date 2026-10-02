@@ -1512,8 +1512,65 @@ def materialize_structure_readings(*, store: StateArtifactStore | None = None,
     # 算法住 provider（Step 2.6 搬出）：走圖第 4 型用同一份，不各算一次（L16）。
     rows, parse_errors = reading_status_rows(edges, today=today, as_of=as_of, watches=watches)
     payload = build_structure_readings_artifact(rows=rows, parse_errors=parse_errors,
-                                                generated_at=generated_at, as_of=as_of)
+                                                generated_at=generated_at, as_of=as_of,
+                                                predictions=_prediction_table(today=today, as_of=as_of,
+                                                                              watches=watches))
     return target.write(payload), payload
+
+
+def _prediction_table(*, today: date, as_of: date | None, watches: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """圖預測對錯表（Phase 5 Step 5.4）：讀圖 ledger 全部紀錄＋語意 watch＋兩張日期對照表 → `prediction_rows`。
+
+    - as-of 視角：明確拒絕（`point_in_time_unavailable`）——ledger 與 watch 都是「現在」的，拿現在冒充 T 會是前視（INV-6）。
+    - 某個節點的 ledger 有壞行：那個節點**整個不進表**、列進 `unreadable_nodes`——壞的那行可能正是後繼，照算會把錯印成現行。
+    - SourceDoc 日期：同一次 materialize 以唯讀 Cypher 取全部 `published_at`；讀不到＝`None`，錯的種類整段
+      `upstream_unavailable`、終局照算。lead registry 讀不到同理（判觸及那一種）。"""
+    from alpha.providers.structure_readings import known_nodes, read_reading_records
+    from alpha.structure_reading.predictions import prediction_rows
+
+    if as_of is not None:
+        return {"absence": {"kind": "point_in_time_unavailable",
+                            "reason": "預測表只有現在的視角：ledger 與 watch 判定都是現在的狀態，as-of 會是前視"}}
+    records: dict[str, list[Any]] = {}
+    unreadable: list[dict[str, Any]] = []
+    for node in known_nodes():
+        recs, errors = read_reading_records(node)
+        if errors:
+            unreadable.append({"node": node, "bad_lines": len(errors)})
+        else:
+            records[node] = list(recs)
+    try:
+        source_published: dict[str, Any] | None = _source_doc_published()
+    except Exception:  # noqa: BLE001 — 讀不到圖：錯的種類缺席，終局照算
+        source_published = None
+    try:
+        from engine_b import leads as leads_mod
+
+        lead_published: dict[str, Any] | None = {
+            str(lid): (lead or {}).get("published_at") for lid, lead in (leads_mod.load().get("leads") or {}).items()}
+    except Exception:  # noqa: BLE001
+        lead_published = None
+    table = prediction_rows(records, today=today, watches=watches, source_published=source_published,
+                            lead_published=lead_published)
+    table["unreadable_nodes"] = unreadable
+    table["source_dates"] = "available" if source_published is not None else "upstream_unavailable"
+    table["lead_dates"] = "available" if lead_published is not None else "upstream_unavailable"
+    return table
+
+
+def _source_doc_published() -> dict[str, Any]:
+    """SourceDoc id → `published_at`（唯讀；空就是空，不拿 retrieved_at 冒充——INV-6）。"""
+    from neo4j import READ_ACCESS
+
+    from query.structure import _graph_driver
+
+    driver = _graph_driver()
+    try:
+        with driver.session(default_access_mode=READ_ACCESS) as session:
+            return {str(r["id"]): r["published_at"] for r in session.run(
+                "MATCH (d:SourceDoc) WHERE d.id IS NOT NULL RETURN d.id AS id, d.published_at AS published_at")}
+    finally:
+        driver.close()
 
 
 def _outcome_series(limit: int = 180) -> dict[str, Any]:

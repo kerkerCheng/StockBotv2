@@ -27,7 +27,7 @@ from typing import Any, Mapping, Sequence
 
 from .contracts import canonical_digest, state_freshness_identity
 
-STRUCTURE_READINGS_MATERIALIZER_VERSION = "webapp-materialize-structure-readings/1"
+STRUCTURE_READINGS_MATERIALIZER_VERSION = "webapp-materialize-structure-readings/2"
 
 STRUCTURE_READINGS_THIS_IS_NOT: tuple[str, ...] = (
     "不是新的判讀：每一列的 kind 與理由都是研究 session 當時寫進 ledger 的，本層一個字都不改。",
@@ -35,6 +35,9 @@ STRUCTURE_READINGS_THIS_IS_NOT: tuple[str, ...] = (
     "維護的是「讀圖跟圖還一不一致」，不是「讀圖對不對」——一份跟圖一致但判斷錯誤的讀圖，"
     "這裡永遠是 current。對不對要靠 outcome 量測，兩件事不得混為一談。",
     "不 gate 任何東西：不濾候選、不改排序、不給尺寸（L15-2：LLM 可以解析與提議，不可以授權）。",
+    # Phase 5 Step 5.4：「對不對」的那一半住 `predictions`——判定只來自兩種既有的人工紀錄。
+    "預測表的「對／錯」只來自讀圖 ledger 的 supersede 鏈與互動 session 判定的反證觸及；"
+    "供給側多一家、多讀一份文件、任何 LLM 判讀都不是判定。只印不判、不排序、不設門檻。",
 )
 
 
@@ -48,8 +51,12 @@ def _row_label(row: Mapping[str, Any]) -> str:
 def build_structure_readings_artifact(
     *, rows: Sequence[Mapping[str, Any]], parse_errors: Sequence[str] = (),
     generated_at: datetime | None = None, as_of: date | None = None,
+    predictions: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """逐節點的狀態列 → state artifact。**純函式**：不查圖、不讀 ledger。"""
+    """逐節點的狀態列 → state artifact。**純函式**：不查圖、不讀 ledger。
+
+    v2（Phase 5 Step 5.4）：多 `predictions`（圖預測對錯表，`alpha.structure_reading.predictions` 的輸出照抄＋字彙的中文）。
+    `predictions=None`＝這次沒算（舊呼叫端），不是「沒有任何斷言」。"""
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
     counts: dict[str, int] = {"current": 0, "stale": 0, "stale_low": 0, "expired": 0, "unknown": 0}
     for row in rows:
@@ -57,7 +64,7 @@ def build_structure_readings_artifact(
     needs = [r for r in rows if r.get("needs_reread")]
     triggers = [r for r in rows if r.get("disproof_triggers")]
     payload: dict[str, Any] = {
-        "schema_version": "stockbot-app/structure_readings/1",
+        "schema_version": "stockbot-app/structure_readings/2",
         "kind": "structure_readings",
         "title": "結構讀圖：每一份讀圖跟圖還一不一致",
         "generated_at": stamp.isoformat(),
@@ -87,6 +94,7 @@ def build_structure_readings_artifact(
                               "note": "供給側多一家／反向路徑變動本來就是量的賭注的 disproof 條件（§6b ④）。"
                                       "**這裡只標記**——thesis mutation 是四個人工 gate 之一，不自動寫。"},
         "parse_errors": list(parse_errors),
+        "predictions": None if predictions is None else _predictions_section(predictions, needs_n=len(needs)),
         "this_is_not": list(STRUCTURE_READINGS_THIS_IS_NOT),
         "materializer": {
             "version": STRUCTURE_READINGS_MATERIALIZER_VERSION,
@@ -96,10 +104,24 @@ def build_structure_readings_artifact(
     }
     payload["freshness_identity"] = state_freshness_identity(
         kind="structure_readings", as_of=payload["as_of"],
-        # 認知狀態＝每個節點現在是什麼狀態、現行讀圖是哪一筆。變化明細的措辭不算。
-        identity={"rows": [[r.get("node"), r.get("status"), r.get("reading_id")] for r in rows]})
+        # 認知狀態＝每個節點現在是什麼狀態、現行讀圖是哪一筆；預測表每一筆的終局與錯的種類（Phase 5 Step 5.4）。
+        identity={"rows": [[r.get("node"), r.get("status"), r.get("reading_id")] for r in rows],
+                  "predictions": None if predictions is None else [
+                      [p.get("reading_id"), p.get("outcome"), p.get("wrong_kind")]
+                      for p in predictions.get("rows") or ()]})
     payload["content_digest"] = canonical_digest(payload)
     return payload
+
+
+def _predictions_section(predictions: Mapping[str, Any], *, needs_n: int) -> dict[str, Any]:
+    """預測表照抄＋字彙的中文（呈現只有一份：讀圖頁與心跳都讀這裡）。供給側變了但還沒重讀的**不在這張表**——
+    那是 staleness 的事，只印一句指過去（plan §5）。"""
+    from alpha.structure_reading.predictions import OUTCOMES, WRONG_KINDS
+
+    section = dict(predictions)
+    section["labels"] = {"outcomes": dict(OUTCOMES), "wrong_kinds": dict(WRONG_KINDS)}
+    section["stale_note"] = f"圖變了、還沒重讀的 {needs_n} 份不在這張表（那是 staleness 的事）——見上面「該重讀」"
+    return section
 
 
 __all__ = ["STRUCTURE_READINGS_MATERIALIZER_VERSION", "STRUCTURE_READINGS_THIS_IS_NOT",

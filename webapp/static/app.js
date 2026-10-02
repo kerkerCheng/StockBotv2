@@ -2349,6 +2349,64 @@ function readingRow(row) {
   return li;
 }
 
+/* 圖預測對錯表（Phase 5 Step 5.4）：每一份讀圖斷言一個機械的終局。判定只來自 supersede 鏈與互動判定的反證觸及；
+   錯的分「當時已有反例」與「之後才出現」。只印不判、不排序（列序＝節點字典序、同節點按寫下時間）。 */
+const PREDICTION_COLUMNS = [
+  { title: '節點', cell: (row) => el('td', 'nowrap', row.unit === 'socket' ? `${row.node}［插槽］` : row.node) },
+  { title: '讀法', cell: (row) => el('td', 'nowrap', row.kind) },
+  { title: '寫下', cell: (row) => el('td', 'nowrap', row.created_on) },
+  { title: '到期', cell: (row) => el('td', 'nowrap', row.expires) },
+  { title: '終局', cell: (row, labels) => el('td', null, (labels.outcomes || {})[row.outcome] || row.outcome) },
+  { title: '錯的種類', cell: (row, labels) => el('td', null, row.wrong_kind ? ((labels.wrong_kinds || {})[row.wrong_kind] || row.wrong_kind) : '—') },
+  { title: '依據', cell: (row) => el('td', 'nowrap', row.basis || '—') },
+];
+
+function renderPredictions(table) {
+  const sec = el('section', 'panel');
+  sec.appendChild(el('h2', null, '圖預測對錯表：讀圖說的，後來對了嗎'));
+  if (!table) {
+    sec.appendChild(el('p', 'note', '這份 artifact 還沒有預測表——跑一次 `python -m webapp materialize --structure-readings` 產生（不是 0）。'));
+    return sec;
+  }
+  if (table.absence) {
+    sec.appendChild(el('p', 'warn', `▲ ${table.absence.reason}（${table.absence.kind}）——不是 0。`));
+    return sec;
+  }
+  const c = table.counts || {};
+  const wrongBy = (kind) => ['reversed', 'disproof_touched', 'retracted'].reduce((n, o) => n + ((c[o] || {})[kind] || 0), 0);
+  sec.appendChild(kpiRow([
+    { label: '對', value: String(c.held || 0), sub: '同讀法、圖有變（帶新來源）或已到期後重讀' },
+    { label: '錯', value: String(table.wrong_total || 0),
+      sub: `當時已有 ${wrongBy('already_available')}／之後才出現 ${wrongBy('emerged_later')}／未定日 ${wrongBy('undated')}` },
+    { label: '現行', value: String(c.open || 0), sub: table.earliest_open_expiry ? `最早 ${table.earliest_open_expiry} 到期` : '—' },
+    { label: '改寫／非斷言', value: `${c.rewritten || 0}／${c.non_assertion || 0}`, sub: '不算對錯' },
+  ]));
+  const labels = table.labels || {};
+  const rows = table.rows || [];
+  const wrap = el('div', 'table-wrap');
+  const t = el('table', 'rank');
+  const head = el('thead');
+  const hr = el('tr');
+  PREDICTION_COLUMNS.forEach((col) => hr.appendChild(th(col.title)));
+  head.appendChild(hr);
+  t.appendChild(head);
+  const body = el('tbody');
+  rows.forEach((row) => {
+    const tr = el('tr');
+    PREDICTION_COLUMNS.forEach((col) => tr.appendChild(col.cell(row, labels)));
+    body.appendChild(tr);
+  });
+  t.appendChild(body);
+  wrap.appendChild(t);
+  sec.appendChild(wrap);
+  if ((table.unreadable_nodes || []).length) {
+    sec.appendChild(el('p', 'warn', `▲ ledger 有壞行的節點不在表內：${table.unreadable_nodes.map((n) => n.node).join('、')}`));
+  }
+  if (table.source_dates !== 'available') sec.appendChild(el('p', 'warn', '▲ SourceDoc 日期這次讀不到：錯的種類是「日期讀不到」，不是未定日。'));
+  sec.appendChild(el('p', 'note', table.stale_note || ''));
+  return sec;
+}
+
 async function renderStructureReadings() {
   markNav('structure-readings');
   let payload;
@@ -2387,6 +2445,8 @@ async function renderStructureReadings() {
     sec1.appendChild(el('p', 'note', '有紀錄但已全部撤回：' + withdrawn.map((r) => `${r.node}（${r.unit || '全部單位'}）`).join('、')));
   }
   app.appendChild(sec1);
+
+  app.appendChild(renderPredictions(payload.predictions));
 
   app.appendChild(stateFooter(payload, '讀圖頁不是什麼'));
   window.scrollTo(0, 0);
