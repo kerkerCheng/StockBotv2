@@ -94,7 +94,7 @@
     },
     {
       "ticker": "DRAM",
-      "sheet_aliases": ["DRAM"],
+      "sheet_aliases": ["DRAM", "BATS:DRAM"],
       "provider_symbol": "DRAM",
       "benchmark_key": "dram",
       "benchmark_symbol": "DRAM",
