@@ -361,3 +361,29 @@ prepare 多一次 READ session（`intake.application._merge_side_effect_receipt`
 | `co:lumentum supplies_to tech:cw_dfb_laser` | 外部印證 → 媒體轉述 | 同上 |
 
 另外 4 條原本由 GSR 撐的（JX／住友 → InP、兩條競爭邊）由宣告 independent 的 Reuters s3 撐住，不變。
+
+### 17.3 名冊新公司（6.3c）
+
+圖上沒有這 5 家的 `co:*` 節點（§6），id 新起；`display_name` 都附一手出處；名字寫法先對全圖逐字整詞比對（`Credo`、`Credo Semiconductor`、`Noveon Magnetics`、`Sojitz Corporation`、`Telescent`、`USA Rare Earth` 命中 0；`Noveon` 1 段、`Sojitz` 2 段，都講本公司）：
+
+| id | display_name（出處） | research_ticker | name_aliases |
+|---|---|---|---|
+| `co:credo` | Credo Technology Group Holding Ltd（10-K FY2026 封面「CREDO TECHNOLOGY GROUP HOLDING LTD」） | CRDO（NASDAQ） | Credo（官網頁尾「©2026 Credo, Inc.」）、Credo Semiconductor（10-K Exhibit 21.1 子公司「Credo Semiconductor Inc.」，California） |
+| `co:noveon_magnetics` | Noveon Magnetics, Inc.（官網新聞稿首句） | null（私人） | Noveon（同稿自訂簡稱） |
+| `co:sojitz` | Sojitz Corporation（官網頁尾「© Sojitz Corporation.」） | 2768.T（TSE） | Sojitz（同頁自稱） |
+| `co:telescent` | Telescent Inc.（官網頁尾「TELESCENT Inc. …Irvine CA」） | null（私人） | （核心名稱 Telescent 已足夠） |
+| `co:usa_rare_earth` | USA Rare Earth, Inc.（10-K FY2025 封面，CIK 1970622） | USAR（NASDAQ） | — |
+
+名冊 100 → 105（[670] go 之後 103）；載入無衝突、沒有新的共用寫法。5 份文件的 origin 由「解析不到」變「公司」（`resolve_origin`）。
+⚠ 有 research_ticker 的 3 家（CRDO、2768.T、USAR）會進 `TICKER_MAP`——下一次 daily 會多 3 份個股頁（`--registry-listed`）與 Engine C 的行情／財報列；這是名冊條目的正常後果，不是新機制。
+
+證據等級變動（舊規則）**2 條，都是升級——資料更正（名冊新公司）**，逐條附引文（plan 不可越線 2、L18）：
+
+| 邊 | 改前 → 改後 | 撐住的那段引文（origin） |
+|---|---|---|
+| `co:lynas supplies_to mat:separated_heavy_reo` | 待判定 → 外部印證 | 「Sojitz has begun the import of heavy rare earths (HREs) produced by Australia-based Lynas Rare Earths Ltd into Japan.」（Sojitz，客戶端；引文具名 Lynas——6.4 之後照樣撐得住） |
+| `tech:near_package_optics competes_with tech:cpo` | 待判定 → 外部印證 | 「NPO is being evaluated as a practical architectural option…」等 3 段（Credo 官網部落格；主詞是技術節點，具名規則不套——⚠ Credo 自己在推 NPO，是利益相關的技術比較） |
+
+⚠ **順帶發現（抽取錯誤，6.8 的對象）**：`noveon_series_c_2026_01_19`（「Noveon was the first company to reshore full-scale production of sintered rare earth magnets…」）與
+`usar_stillwater_phase1a_2026_03_26`（「successful commissioning of its commercial magnet production line (Phase 1a)…」）的引文講的是**它們自己**做磁鐵，卻掛在 `co:mp_materials supplies_to mat:rare_earth_magnets`——引文裡沒有 MP。
+舊規則下這條邊另有來源、等級本來就是外部印證，所以 0 條變動；6.4 之後這兩個 origin 會進 `corroboration_withheld.unnamed`。可能的正解是 Noveon／USAR 各自的供貨邊（新的知識主張＝RA，pq2）。

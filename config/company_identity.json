@@ -207,6 +207,20 @@
       "_display_name_source": "SEC 10-Q 2026-07-29 封面 dei:EntityRegistrantName「CORNING INC /NY」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
+      "company_id": "co:credo",
+      "research_ticker": "CRDO",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "Credo Technology Group Holding Ltd",
+      "_display_name_source": "SEC 10-K FY2026（期末 2026-05-02）封面 Exact name of registrant「CREDO TECHNOLOGY GROUP HOLDING LTD」（https://www.sec.gov/Archives/edgar/data/0001807794/000162828026043303/crdo-20260502.htm）；只做排版正規化",
+      "name_aliases": [
+        "Credo",
+        "Credo Semiconductor"
+      ],
+      "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3c：官網 credosemi.com 頁尾「©2026 Credo, Inc.」、全頁自稱「Credo」；10-K Exhibit 21.1 子公司「Credo Semiconductor Inc.（California）」（https://www.sec.gov/Archives/edgar/data/0001807794/000162828026043303/a211subsidiariesoftheregis.htm）——庫內 credo_npo_vs_cpo_20260821 的 origin 就是這個寫法；全圖逐字兩個寫法命中 0（baseline §17.3）"
+    },
+    {
       "company_id": "co:enablence_technologies",
       "research_ticker": "ENA.V",
       "market_currency": "CAD",
@@ -616,6 +630,16 @@
       "_display_name_source": "SEC 10-Q 2026-08-05 封面 dei:EntityRegistrantName「NOVANTA INC.」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
+      "company_id": "co:noveon_magnetics",
+      "research_ticker": null,
+      "display_name": "Noveon Magnetics, Inc.",
+      "_display_name_source": "官網新聞稿首句「Noveon Magnetics, Inc. (Noveon), a leading U.S. manufacturer of sintered rare earth permanent magnets…」（https://noveon.co/noveon-completes-series-c）；私人公司，research_ticker 明確 null（L9）",
+      "name_aliases": [
+        "Noveon"
+      ],
+      "_name_aliases_source": "同一份新聞稿自訂簡稱「(Noveon)」；全圖逐字整詞比對「Noveon」命中 1 段（noveon_series_c_2026_01_19 s1），講的是本公司（baseline §17.3）"
+    },
+    {
       "company_id": "co:nvidia",
       "research_ticker": "NVDA",
       "market_currency": "USD",
@@ -762,6 +786,19 @@
       "_display_name_source": "2025-2026 Universal Registration Document（soitec.com，2026-06-10 公告；法定名稱 Soitec，société anonyme）"
     },
     {
+      "company_id": "co:sojitz",
+      "research_ticker": "2768.T",
+      "market_currency": "JPY",
+      "execution_currency": "JPY",
+      "execution_venue": "TSE",
+      "display_name": "Sojitz Corporation",
+      "_display_name_source": "官網頁尾「© Sojitz Corporation. All Rights Reserved.」（https://www.sojitz.com/en/news/article/topics-20251030.html）",
+      "name_aliases": [
+        "Sojitz"
+      ],
+      "_name_aliases_source": "同一頁自稱「Sojitz has begun the import of heavy rare earths…」；全圖逐字整詞比對「Sojitz」命中 2 段（sojitz_hre_import_2025_10_30 s1／s2），都講本公司（baseline §17.3）"
+    },
+    {
       "company_id": "co:spacexai",
       "research_ticker": null,
       "display_name": "SpaceXAI",
@@ -783,6 +820,12 @@
       "research_ticker": null,
       "display_name": "Tachyon Networks Inc.",
       "_display_name_source": "Sivers 新聞稿逐字（庫內 sivers_tachyon_60ghz_development_2026_05_06）"
+    },
+    {
+      "company_id": "co:telescent",
+      "research_ticker": null,
+      "display_name": "Telescent Inc.",
+      "_display_name_source": "官網頁尾「TELESCENT Inc. 16832 Red Hill Avenue, Irvine CA 92606, USA」（telescent.com）；只做排版正規化；私人公司，research_ticker 明確 null（L9）"
     },
     {
       "company_id": "co:tesla",
@@ -856,6 +899,15 @@
         "宇树科技",
         "宇樹科技"
       ]
+    },
+    {
+      "company_id": "co:usa_rare_earth",
+      "research_ticker": "USAR",
+      "market_currency": "USD",
+      "execution_currency": "USD",
+      "execution_venue": "NASDAQ",
+      "display_name": "USA Rare Earth, Inc.",
+      "_display_name_source": "SEC 10-K FY2025 封面 Exact name of registrant「USA Rare Earth, Inc.」（CIK 1970622；https://www.sec.gov/Archives/edgar/data/1970622/000197062226000021/usar-20251231.htm）"
     },
     {
       "company_id": "co:vpec",
