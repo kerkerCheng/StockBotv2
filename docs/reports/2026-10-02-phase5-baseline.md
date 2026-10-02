@@ -339,3 +339,24 @@ decision_lab.db sha256=e99d1c79fd22dbe1099f30c4e06f2d1188f26a8cbfa987a27cd884253
 ②對 5 個 digest 變動的環節逐一找出兩筆之間的 commit——5 個都找得到（若有一個環節期間沒有任何查詢程式 commit、且供給側真的多了一家，修正後的規則就該讓它算 `held`；今天沒有這種環節）；
 ③確認沒有分岔（每筆最多一個後繼）、沒有撤回、沒有判觸及——所以 `reversed`／`retracted`／`disproof_touched` 三格今天必然是 0，與規則版本無關。
 **追蹤表的歷史四欄**：跑包裝前後兩個聚合檔 sha256 相同，證明本 Step 沒有寫進那條序列。
+
+## 15. Step 5.1 #29：③b 的內容基準與真實資料驗收（2026-10-02 15:14 台北）
+
+**內容基準**：`config/graph_baselines.json` 新鍵 `assertion_content_2026_10_02`（append-only；`git diff` 只有新增 708 行、0 行刪改——4.0 的鍵逐位不變）。
+由唯讀 session 對今天的圖算：`query.layer_stats.content_digests(fetch_assertions, fetch_all_quotes, ids=4.0 凍結的 assertion 集合)`，
+指紋＝`assertion_content_digest`（邊＋`source_doc_id`＋逐字＋sub＋`origin`／`source_type`／`origin_linkage`，sha256 前 16 碼；不含 `published_at`、`confidence`）。
+產生腳本 scratchpad `p51_content_baseline.py`（乾跑印統計、`--write` 才寫；寫前驗格式可逐位重現、寫後驗既有鍵相同）。
+
+| 量 | 值 |
+|---|---|
+| 圖上 EdgeAssertion | 699 |
+| 4.0 凍結 695 筆今天在圖上 | 695（不見的 0）→ 內容基準 **695 筆** |
+| 不在凍結集合的 | 4（`axti_8_k_20260702_coherent_inp_supply_add_edge:a4bc2`、`gsr_cpo_not_delayed_2026_06_10_e3`／`_e4`、`lrcx_10_q_20260423_add_edge:7991c`——Phase 4 的 [664]／[665]／[668]，都不帶 sub） |
+| 帶 sub 的 | 113（全部在凍結集合內） |
+| 檔指紋 | 改前 `adb1c88d…6d8a` → 改後 `ad52cbac…a2cc` |
+
+**真實資料**（scratchpad `p51_layer_real.py`，唯讀）：今天 ③b **新增 0、重寫 0**——「③b 新增或重寫的帶 sub supported 0／0（還沒有新增或重寫帶 sub 的）」；
+①73、②6 層、③a 102／113、外部印證不具名 15 與心跳（§3）相同。
+**模擬 [666] 重試**（記憶體裡只把 Reuters 那份 11 筆 assertion 的 `origin_linkage` 改成 `independent`，不碰圖）：**重寫 4**＝`_e1`、`_e2`、`_e9`、`_e10`，4／4 含字表語言——
+正是 Phase 4 closeout §2 ③ 預言的那 4 筆；改前的計數器對同一個情境會印 0／0（成功與失敗同形，L13）。
+變異：把重寫判定換成空集合 → `tests/test_layer_stats.py` 2 條紅；還原 11 條綠。

@@ -531,10 +531,11 @@ def layer_stats_or_absence(*, edges, rows, quotes, layer_nodes) -> dict[str, Any
     走圖九型照走：計數器壞了不帶走走圖。"""
     try:
         from identity.registry import get_registry
-        from query.layer_stats import compute_layer_stats, load_baseline, summary_line
+        from query.layer_stats import compute_layer_stats, load_baseline, load_content_baseline, summary_line
 
         stats = compute_layer_stats(edges=edges, rows=rows, quotes_by_assertion=quotes, layer_nodes=layer_nodes,
-                                    baseline=load_baseline(), registry=get_registry())
+                                    baseline=load_baseline(), registry=get_registry(),
+                                    content_baseline=load_content_baseline())
         stats["summary"] = summary_line(stats)
         return stats
     except Exception as exc:  # noqa: BLE001

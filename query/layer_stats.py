@@ -11,7 +11,9 @@
   一層的供應商集合）。另印母體（≥3 家的層數）、稽核（≥3 家且每家撐住：引文具名它或 origin 就是它）、
   origin 解析不到的來源數（解析不到不能算「非供應商」，不猜）。
 - ③（A3）③a 存量：Step 4.0 凍結的 113 筆帶 sub assertion 裡，引文不含可替代性語言的筆數與 id（只印、當歷史）；
-  ③b Phase 內新增或 supersede 的帶 sub assertion（不在 4.0 凍結的 assertion id 集合）中 supported 的比例。
+  ③b 新增或重寫的帶 sub assertion 中 supported 的比例——**兩種分開計**（Phase 5 Step 5.1，#29）：「新增」＝id 不在
+  4.0 凍結的 assertion id 集合；「重寫」＝id 在集合、但內容指紋（`assertion_content_digest`）與內容基準不同。
+  ⚠ 只看 id 會漏掉更正走廊：重套一份文件沿用原 id，被重寫的斷言在 id 集合裡「看起來沒動」——成功與失敗同形（L13）。
 
 附屬：「外部印證但引文不具名供應商」的邊數（plan §4 L11-6 ④；§14 #2 的量測）、字表版本。
 
@@ -20,6 +22,7 @@
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -28,6 +31,9 @@ from typing import Any, Iterable, Mapping, Sequence
 ROOT = Path(__file__).resolve().parent.parent
 BASELINES_PATH = ROOT / "config" / "graph_baselines.json"
 BASELINE_KEY = "phase4_2026_10_01"
+#: ③b 判「重寫」的內容基準（Phase 5 Step 5.1，#29）。4.0 凍結只存 id；這一份由 5.1 當下的圖算
+#: （Phase 4 結案後、[666] 重試前），append-only 的另一個鍵——4.0 的鍵一個字都不改。
+CONTENT_BASELINE_KEY = "assertion_content_2026_10_02"
 #: 與 Step 4.0 凍結節點集合同一個口徑（`frozen_nodes.scope`）。
 LAYER_TYPES: tuple[str, ...] = ("TechNode", "Product", "Material")
 LAYER_NODES_CYPHER = "MATCH (t) WHERE t.type IN $types AND t.id IS NOT NULL RETURN t.id AS id"
@@ -41,6 +47,48 @@ def load_baseline(path: Path | None = None, *, key: str = BASELINE_KEY) -> dict[
             for name in ("frozen_nodes", "frozen_assertions", "sub_assertions")}
 
 
+def load_content_baseline(path: Path | None = None, *, key: str = CONTENT_BASELINE_KEY) -> dict[str, str] | None:
+    """內容基準（assertion id → 內容指紋）。檔案裡沒有這個鍵回 `None`——呼叫端印「重寫量不到」，不是 0（INV-3）；
+    檔案本身讀不到照樣丟例外（與 `load_baseline` 同一條缺席路）。"""
+    data = json.loads((path or BASELINES_PATH).read_text(encoding="utf-8"))
+    entry = (data.get("baselines") or {}).get(key)
+    if not entry:
+        return None
+    return {str(k): str(v) for k, v in ((entry.get("assertion_digests") or {}).get("digests") or {}).items()}
+
+
+def assertion_content_digest(row: Mapping[str, Any], quotes: Iterable[str] | None) -> str:
+    """一筆 EdgeAssertion 的內容指紋：**邊（src／relation／dst）＋來源文件 id＋逐字＋sub＋決定證據等級的三個欄位**
+    （`origin`、`source_type`、`origin_linkage`——`query.bottleneck.classify_evidence` 讀的就是它們）。
+
+    ⚠ 刻意不含 `published_at`、`confidence`、`documents`：補日期或多讀一份文件不是「重寫了這筆主張」，算進來的話
+    ③b 的分母會隨研究量上升（AGENTS「已知會失焦的指標」）。[666] 這種只宣告 `origin_linkage` 的重套也要算重寫——
+    它改的是這筆斷言的證據等級。"""
+    from query.sub_language import sub_value
+
+    body = {"edge": [str(row.get("src")), str(row.get("relation")), str(row.get("dst"))],
+            "source_doc_id": row.get("source_doc_id"),
+            "quotes": sorted({str(q) for q in (quotes or ()) if q}),
+            "sub": sub_value(row),
+            "origin": row.get("origin"), "source_type": row.get("source_type"),
+            "origin_linkage": row.get("origin_linkage")}
+    canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+def content_digests(rows: Iterable[Mapping[str, Any]], quotes_by_assertion: Mapping[str, Sequence[str]], *,
+                    ids: Iterable[str] | None = None) -> dict[str, str]:
+    """`rows`（`fetch_assertions`）＋逐字 → `{assertion id: 內容指紋}`；給 `ids` 就只算那些。內容基準與每日比對共用這一支。"""
+    wanted = None if ids is None else {str(i) for i in ids}
+    out: dict[str, str] = {}
+    for row in rows:
+        aid = str(row.get("assertion_id") or "")
+        if not aid or (wanted is not None and aid not in wanted):
+            continue
+        out[aid] = assertion_content_digest(row, quotes_by_assertion.get(aid))
+    return out
+
+
 def _supply_side(node: str, edges: Sequence[Any]) -> list[Any]:
     from query.structure import build_structure
 
@@ -51,9 +99,12 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
                         quotes_by_assertion: Mapping[str, Sequence[str]], layer_nodes: Iterable[str],
                         baseline: Mapping[str, frozenset[str]], registry: Any,
                         language: Any = None, publishers: Any = None,
-                        baseline_key: str = BASELINE_KEY) -> dict[str, Any]:
+                        baseline_key: str = BASELINE_KEY,
+                        content_baseline: Mapping[str, str] | None = None,
+                        content_baseline_key: str = CONTENT_BASELINE_KEY) -> dict[str, Any]:
     """①②③＋附屬。`edges` 要已分過證據等級（`query.structure._classify_edges`）；`rows` 是 `fetch_assertions` 的列
-    （帶 `assertion_id`、`source_doc_id`、`origin`）；`quotes_by_assertion` 是 `query.sub_language.fetch_all_quotes`。"""
+    （帶 `assertion_id`、`source_doc_id`、`origin`）；`quotes_by_assertion` 是 `query.sub_language.fetch_all_quotes`。
+    `content_baseline`（`load_content_baseline`）是 ③b「重寫」的基準；`None`＝沒有基準，重寫那一格印缺席、不印 0。"""
     from query.bottleneck import quote_names_company, shared_name_forms
     from query.graph_walk import CORROBORATED_EVIDENCE
     from query.origin_resolution import resolve_origin
@@ -138,8 +189,16 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
     stock = baseline["sub_assertions"]
     stock_unsupported = sorted(a for a in stock if flags.get(a) is False)
     stock_gone = sorted(a for a in stock if a not in flags)
-    new = sorted(a for a in flags if a not in baseline["frozen_assertions"])
+    frozen_assertions = baseline["frozen_assertions"]
+    new = sorted(a for a in flags if a not in frozen_assertions)
     new_unsupported = sorted(a for a in new if not flags[a])
+    # 重寫（#29）：id 在 4.0 凍結集合裡、內容指紋與內容基準不同。基準裡沒有這個 id（5.1 當下不在圖上、後來又出現）
+    # 也算重寫——它不是新 id，但內容沒有可比的舊版。沒有內容基準＝量不到（None），不是 0。
+    superseded: list[str] | None = None
+    if content_baseline is not None:
+        now = content_digests(rows, quotes_by_assertion, ids=[a for a in flags if a in frozen_assertions])
+        superseded = sorted(a for a in now if content_baseline.get(a) != now[a])
+    superseded_unsupported = None if superseded is None else sorted(a for a in superseded if not flags[a])
 
     # 附屬：外部印證但引文不具名供應商（§14 #2 的量測；cw_dfb 讀圖指出的華星光案例）
     ec_unnamed: list[str] = []
@@ -184,6 +243,12 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
             "new_n": len(new),
             "new_supported": len(new) - len(new_unsupported),
             "new_unsupported": new_unsupported,
+            "content_baseline": content_baseline_key if content_baseline is not None else None,
+            "superseded": superseded,
+            "superseded_n": None if superseded is None else len(superseded),
+            "superseded_supported": (None if superseded is None
+                                     else len(superseded) - len(superseded_unsupported or ())),
+            "superseded_unsupported": superseded_unsupported,
         },
         "ec_quote_does_not_name_supplier": sorted(ec_unnamed),
     }
@@ -197,14 +262,26 @@ def summary_line(stats: Mapping[str, Any] | None) -> str:
         absence = stats["absence"]
         return f"層：{absence.get('reason')}（{absence.get('kind')}）——不是 0"
     supply, enum, sub = stats["supply"], stats["enumeration"], stats["sub_language"]
-    new_ratio = (f"{sub['new_supported']}／{sub['new_n']}" if sub["new_n"] else "0／0（Phase 內還沒有新增帶 sub 的）")
     return (f"層：①獨家且全自報 {supply['sole_self_reported']}（凍結 {supply['frozen_n']} 個節點；集合外新節點 "
             f"{len(supply['new_nodes'])}）｜②非供應商來源列舉 ≥2 家 {enum['named_by_non_supplier']} 層（≥3 家母體 "
             f"{enum['at_least_3']}；每家撐住 {enum['at_least_3_all_held']}；origin 解析不到的來源 "
             f"{enum['unresolved_origin_sources']}）｜③a sub 引文不含可替代性語言 {len(sub['stock_unsupported'])}／"
-            f"{sub['stock_n']}（存量）｜③b 新增帶 sub supported {new_ratio}｜外部印證但引文不具名供應商 "
+            f"{sub['stock_n']}（存量）｜{_sub_b_fragment(sub)}｜外部印證但引文不具名供應商 "
             f"{len(stats['ec_quote_does_not_name_supplier'])}｜字表 {stats['language']}")
 
 
-__all__ = ["BASELINE_KEY", "LAYER_NODES_CYPHER", "LAYER_TYPES", "compute_layer_stats", "load_baseline",
-           "summary_line"]
+def _sub_b_fragment(sub: Mapping[str, Any]) -> str:
+    """③b 那一格。新增與重寫各印一個數、分母是兩者之和；沒有內容基準時重寫印缺席（不是 0）。"""
+    new_n, new_ok = int(sub["new_n"]), int(sub["new_supported"])
+    if sub.get("superseded_n") is None:
+        ratio = f"{new_ok}／{new_n}" if new_n else "0／0（還沒有新增帶 sub 的）"
+        return f"③b 新增帶 sub supported {ratio}；重寫量不到（沒有內容基準，不是 0）"
+    sup_n, sup_ok = int(sub["superseded_n"]), int(sub["superseded_supported"])
+    total = new_n + sup_n
+    if not total:
+        return "③b 新增或重寫的帶 sub supported 0／0（還沒有新增或重寫帶 sub 的）"
+    return f"③b 新增或重寫的帶 sub supported {new_ok + sup_ok}／{total}（新增 {new_n}、重寫 {sup_n}）"
+
+
+__all__ = ["BASELINE_KEY", "CONTENT_BASELINE_KEY", "LAYER_NODES_CYPHER", "LAYER_TYPES", "assertion_content_digest",
+           "compute_layer_stats", "content_digests", "load_baseline", "load_content_baseline", "summary_line"]

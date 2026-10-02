@@ -12,7 +12,9 @@ from pathlib import Path
 import pytest
 
 from query.bottleneck import classify_evidence, collapse_assertions
-from query.layer_stats import compute_layer_stats, summary_line
+from query.layer_stats import (BASELINE_KEY, BASELINES_PATH, CONTENT_BASELINE_KEY, assertion_content_digest,
+                               compute_layer_stats, content_digests, load_baseline, load_content_baseline,
+                               summary_line)
 from query.origin_resolution import PUBLISHER_KINDS, load_publishers
 from query.sub_language import SubLanguage
 
@@ -152,5 +154,85 @@ def test_summary_line_prints_every_number_and_absence_is_not_zero(stats) -> None
                      "origin 解析不到的來源 1", "③a sub 引文不含可替代性語言 1／2", "③b 新增帶 sub supported 1／2",
                      "外部印證但引文不具名供應商 1", "字表 v1·test"):
         assert fragment in line, fragment
+    # 夾具沒給內容基準：重寫那一格量不到——印缺席，不印 0（INV-3）。
+    assert stats["sub_language"]["superseded_n"] is None and "重寫量不到（沒有內容基準，不是 0）" in line
     assert "不是 0" in summary_line(None)
     assert "不是 0" in summary_line({"absence": {"kind": "upstream_unavailable", "reason": "基準讀不到"}})
+
+
+# ---------------------------------------------------------------------------
+# ③b 認得「重寫」（Phase 5 Step 5.1，#29）：更正走廊沿用原 id 重寫，只看 id 會看不到
+# ---------------------------------------------------------------------------
+
+def _stats_with(rows, quotes, tmp_path: Path, *, content_baseline) -> dict:
+    edges = list(collapse_assertions(rows).values())
+    for edge in edges:
+        edge.evidence = "self_reported"
+    return compute_layer_stats(edges=edges, rows=rows, quotes_by_assertion=quotes, layer_nodes=LAYER_NODES,
+                               baseline=BASELINE, registry=_Registry(), language=LANG,
+                               publishers=load_publishers(_empty_publishers(tmp_path)),
+                               content_baseline=content_baseline)
+
+
+def test_three_b_counts_a_rewritten_assertion_under_its_old_id(tmp_path: Path) -> None:
+    """同 id 換引文、或只宣告 origin_linkage（[666] 的形狀）→ 進 ③b 分母，與「新增」分開計。
+
+    變異：把重寫的判定拿掉（只看 id 在不在凍結集合）→ 這條紅（重寫 0、分母只剩新增 2）。"""
+    content = content_digests(ROWS, QUOTES, ids=BASELINE["frozen_assertions"])
+    unchanged = _stats_with(ROWS, QUOTES, tmp_path, content_baseline=content)["sub_language"]
+    assert (unchanged["superseded"], unchanged["superseded_n"]) == ([], 0)          # 沒動就不是重寫
+    rows = []
+    for row in ROWS:
+        if row["assertion_id"] in ("r1", "r8"):
+            # r1 帶 sub、只宣告 origin_linkage（[666] 的形狀）；r8 不帶 sub——改了也不進 ③b
+            row = dict(row, origin_linkage="independent")
+        rows.append(row)
+    quotes = dict(QUOTES, r2=["Beta is the sole supplier of Y wafers"])           # r2 同 id、換一段引文
+    stats = _stats_with(rows, quotes, tmp_path, content_baseline=content)
+    sub = stats["sub_language"]
+    assert sub["superseded"] == ["r1", "r2"] and sub["superseded_n"] == 2
+    assert (sub["superseded_supported"], sub["superseded_unsupported"]) == (2, [])
+    assert (sub["new_n"], sub["new_supported"]) == (2, 1)                          # 新增照舊、分開計
+    assert sub["content_baseline"] == CONTENT_BASELINE_KEY
+    assert "③b 新增或重寫的帶 sub supported 3／4（新增 2、重寫 2）" in summary_line(stats)
+
+
+def test_three_b_rewrite_of_an_id_missing_from_the_content_baseline_still_counts(tmp_path: Path) -> None:
+    """凍結集合裡有、內容基準裡沒有（5.1 當下不在圖上、後來又出現）→ 沒有可比的舊版，算重寫，不靜默當沒動。"""
+    content = content_digests(ROWS, QUOTES, ids=BASELINE["frozen_assertions"] - {"r2"})
+    assert _stats_with(ROWS, QUOTES, tmp_path, content_baseline=content)["sub_language"]["superseded"] == ["r2"]
+
+
+def test_content_digest_moves_with_the_claim_not_with_research_volume() -> None:
+    """指紋跟著主張走：引文、sub、證據三欄、邊、來源文件變了才變；補日期、改 confidence、引文順序不變。"""
+    row = dict(ROWS[0], published_at="2026-06-01")
+    base = assertion_content_digest(row, ["b quote", "a quote"])
+    assert assertion_content_digest(dict(row, published_at=None, confidence=0.1), ["a quote", "b quote"]) == base
+    for changed in (dict(row, origin_linkage="independent"), dict(row, source_type="filing"),
+                    dict(row, origin="Someone Else"), dict(row, dst="mat:other"),
+                    dict(row, source_doc_id="d_other"), dict(row, attributes=json.dumps({"substitutability": 2}))):
+        assert assertion_content_digest(changed, ["a quote", "b quote"]) != base
+    assert assertion_content_digest(row, ["a quote"]) != base
+
+
+def test_content_baseline_lives_under_its_own_key_and_absence_is_none(tmp_path: Path) -> None:
+    """append-only：內容基準是另一個鍵；檔案沒有這個鍵＝None（呼叫端印缺席），不是空 dict。"""
+    path = tmp_path / "graph_baselines.json"
+    path.write_text(json.dumps({"baselines": {BASELINE_KEY: {name: {"ids": ["x"]} for name in
+                                                             ("frozen_nodes", "frozen_assertions", "sub_assertions")}}}),
+                    encoding="utf-8")
+    assert load_content_baseline(path) is None
+    data = json.loads(path.read_text(encoding="utf-8"))
+    data["baselines"][CONTENT_BASELINE_KEY] = {"assertion_digests": {"digests": {"x": "abc"}}}
+    path.write_text(json.dumps(data), encoding="utf-8")
+    assert load_content_baseline(path) == {"x": "abc"} and load_baseline(path)["frozen_assertions"] == {"x"}
+
+
+def test_the_real_content_baseline_covers_the_frozen_assertions_still_on_the_graph() -> None:
+    """正式檔：內容基準的 id 都屬於 4.0 凍結的 assertion 集合（它是同一個母體的內容快照，不是另一個母體）。"""
+    content = load_content_baseline()
+    assert content is not None and content, "config/graph_baselines.json 缺內容基準（Phase 5 Step 5.1）"
+    entry = json.loads(BASELINES_PATH.read_text(encoding="utf-8"))["baselines"][CONTENT_BASELINE_KEY]
+    assert entry["assertion_digests"]["n"] == len(content)
+    assert set(content) <= load_baseline()["frozen_assertions"]
+    assert all(len(v) == 16 for v in content.values())

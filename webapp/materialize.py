@@ -889,6 +889,8 @@ def build_graph_walk_artifact(result: Mapping[str, Any], *,
                       "named_by_non_supplier": layer["enumeration"]["named_by_non_supplier_layers"],
                       "stock_unsupported": layer["sub_language"]["stock_unsupported"],
                       "new_unsupported": layer["sub_language"]["new_unsupported"],
+                      # ③b 的「重寫」（Phase 5 Step 5.1，#29）：更正走廊沿用原 id 重寫，也算認知變了。
+                      "superseded_unsupported": layer["sub_language"].get("superseded_unsupported"),
                       "language": layer.get("language")})})
     payload["content_digest"] = canonical_digest(payload)
     return payload
