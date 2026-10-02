@@ -354,16 +354,11 @@ python scripts/backfill_source_dating.py --doc-id <id> --value 2026-02-03 `
 `--dry-run` 只驗不寫；已有值時要改必須 `--supersede`（舊值會留在 basis 裡）。
 回填紀錄留在 `loader/manifests/sourcedoc-dating-backfill-<date>.json`（可重放）。
 
-### 排序前段 vs 後段的等權報酬
+### 排序前段 vs 後段的等權報酬（已退役）
 
-```powershell
-python scripts/rank_forward_returns.py                   # 預設 3 期、90 天
-python scripts/rank_forward_returns.py --epochs 2026-03-01 2026-06-01 --horizon 60 --json
-```
-
-排序取自 **as-of 投影**（不偷看未來），價格走 yfinance 已收盤序列。
-⚠ 輸出是**研究判斷的檢核，不是回測勝率**：期數個位數、標的高度集中在 AI 光互連。
-逐檔報酬與「這期主要由誰決定」是強制輸出——實測第一期幾乎全由 `SOI.PA` 一檔決定。
+`scripts/rank_forward_returns.py` 已於 2026-09-23 Phase 0 Step 0b.3（`7db4e1f`）隨排序退役刪除，**沒有替代命令**。
+當時的實測：期數個位數、標的高度集中在 AI 光互連，第一期幾乎全由 `SOI.PA` 一檔決定。
+報酬回測不重建，理由見 ROADMAP Phase 5（2026-10-02 amendment）。
 問得太早時 as-of 保險絲會拒絕該期，那是正確行為，輸出會列出被拒的期數。
 
 ### Writer lock（雙向互斥，2026-09-02）
@@ -1372,7 +1367,7 @@ rule 缺漏時不得把重啟當修復。詳細五步見上方「Sandbox／priva
 | 入口 | side effect | OS／network capability | 判定 |
 |---|---|---|---|
 | `scripts/backfill_source_dating.py` | 寫 Neo4j 的 SourceDoc metadata（白名單兩個日期欄位） | Neo4j bolt（本機），不碰 identity／ACL／credential | **互動專用**。它會寫圖，就算欄位再窄也不該無人值守跑 |
-| `scripts/rank_forward_returns.py` | 唯讀；讀 Neo4j ＋ yfinance | 對外網路（yfinance） | **互動專用**。它是研究檢核，不是排程產出 |
+| `scripts/rank_forward_returns.py` | 唯讀；讀 Neo4j ＋ yfinance | 對外網路（yfinance） | **互動專用**。它是研究檢核，不是排程產出（2026-09-23 已隨排序退役刪除，`7db4e1f`） |
 | `portfolio/alpha_exposure.py` | 純函式，無 I/O | 無 | 不是 CLI，無 surface |
 
 查證（三者都不該出現在 rules）：

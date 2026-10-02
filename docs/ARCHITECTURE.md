@@ -240,11 +240,12 @@ alpha 不得自建第二套結構評分；「下一個研究誰」由圖報洞�
    ⚠ 2026-09-16 D11：市值與 `analyst_count` 仍不進排序，但它們是**篩選層 filter 的輸入**（覆蓋厚薄＝候選門檻，
    不限上市地；非英語 filing 是加分不是門檻）。filter 只過濾、不打分（ROADMAP Phase 4）。
 
-### 排序驗證（Phase 6）
+### 排序驗證（已退役）
 
-`alpha/backtest.py`＋`scripts/rank_forward_returns.py`：把 as-of 排序切前後段算等權
-報酬。⚠ 它是**研究判斷的檢核，不是回測勝率**——期數個位數、標的高度集中在 AI 光互連，
-前後段都不是獨立賭注；輸出強制列逐檔報酬與「這期主要由誰決定」。
+`alpha/backtest.py`＋`scripts/rank_forward_returns.py`（把 as-of 排序切前後段算等權報酬）已於 2026-09-23
+Phase 0 Step 0b.3（`7db4e1f`）隨排序退役刪除。當時就註明它是研究判斷的檢核、不是回測勝率（期數個位數、
+標的集中在 AI 光互連）。報酬回測不重建：圖裡的公司是回頭挑的，回測量到的是選樣——理由與替代的前向量測見
+ROADMAP Phase 5（2026-10-02 amendment）。
 
 ---
 
