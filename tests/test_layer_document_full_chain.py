@@ -174,8 +174,12 @@ def test_a_layer_document_travels_the_whole_pipeline_and_moves_the_counters(tmp_
     todo.save(pool, pool_path)
     monkeypatch.setattr(application, "_load_extraction_impl", _graph_loader(rows, quotes, action_id=record["action_id"]))
     entry = _entry()
+    # 入口在蓋戳記前查圖上的屬性名 token（Phase 5 Step 5.1）——夾具圖不是 Neo4j，換成只記次數的假檢查（不連真圖）。
+    token_checks: list[str] = []
+    monkeypatch.setattr(entry, "check_property_tokens", lambda **_k: token_checks.append("checked"))
     assert entry.main(["--pool", str(pool_path), "--root", str(tmp_path), "--pq2", str(item["n"]),
                        "--digest", record["action_digest"]]) == 0
+    assert token_checks == ["checked"]
     applied = research_actions.read_action(record["action_id"], root=tmp_path)
     assert applied["state"] == "applied"
     assert applied["execution"]["approval"]["pq2_n"] == item["n"]

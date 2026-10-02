@@ -16,13 +16,19 @@
 3. `--digest` 等於那筆紀錄凍結的 `action_digest`（使用者核准的就是這一份）；
 4. 紀錄 `ready` 且未過期——或同一個編號、同一個 digest 先前已蓋過戳記、apply 中斷在 `partial`／`applying`（重試）。
 
+四道過了，**蓋戳記之前**再做一道唯讀的 token 檢查（2026-10-02 Phase 5 Step 5.1）：以 apply 實際寫圖的 routine 憑證
+`CALL db.propertyKeys()`，與 loader 會寫的屬性名（`loader.load_to_neo4j.written_property_names`，唯一一份）比對——
+缺任何一個就拒絕並印「缺 X，請 admin 執行 setup 1b 預熱」；讀不到圖就拒絕並印 `upstream_unavailable`。兩種都**不留戳記**。
+事發：pq2 [666] 蓋了戳記才在寫圖時被 `Creating new property name … not allowed` 擋下（routine writer 不能建新屬性名）——
+「新增欄位後記得重跑 setup」是要人記得的段落，這道檢查讓它在寫入前自己現形。
+
 通過後先把 `approval={pq2_n, digest, at}` 寫進紀錄的 `execution`，再呼叫 apply。**不 publish、不 resolve**：
 publish 走 `scripts/commit_pending_intake.py`，結案走 `python -m engine_b.todo complete-ra <N> --digest …`
 （它會比對 `approval.pq2_n`——沒經過本入口的 apply 結不了案）。
 
 ⚠ **互動專用，不進任何無人值守 allowlist**（sandbox impact review 見 `docs/OPERATIONS.md`「Research Action apply 入口」）。
 
-結束碼：0＝已 apply；2＝四道檢查沒過（**沒有任何寫入**）；3＝已蓋戳記但 apply 沒有完成（看輸出的 next_action）。
+結束碼：0＝已 apply；2＝檢查沒過（四道或 token 檢查；**沒有任何寫入**）；3＝已蓋戳記但 apply 沒有完成（看輸出的 next_action）。
 """
 from __future__ import annotations
 
@@ -31,6 +37,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any, Callable
 
 ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
@@ -41,11 +48,44 @@ _RETRY_STATES = frozenset({"partial", "applying"})
 
 
 class ApplyRefused(RuntimeError):
-    """四道檢查沒過——沒有任何寫入。"""
+    """檢查沒過——沒有任何寫入。"""
 
 
-def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: datetime | None = None) -> dict:
-    """四道檢查＋蓋核准戳記。回 `{action_id, record, retry}`；不過就 raise ApplyRefused（此時沒有任何寫入）。"""
+def check_property_tokens(*, driver_factory: Callable[[], Any] | None = None,
+                          required: frozenset[str] | None = None) -> None:
+    """唯讀：apply 要寫的每個屬性名在圖上都已有 token。缺就 raise（訊息列出缺哪些）；讀不到圖也 raise——fail closed。
+
+    `driver_factory` 預設是 apply 寫圖用的同一個 driver（`intake.application._driver`，routine 憑證）——用別的憑證查
+    會看到不同的權限世界。`required` 預設是 `loader.load_to_neo4j.written_property_names()`（唯一一份）。"""
+    from loader.load_to_neo4j import written_property_names
+
+    needed = frozenset(required if required is not None else written_property_names())
+    try:
+        import neo4j
+
+        if driver_factory is None:
+            from intake.application import _driver as driver_factory
+        driver = driver_factory()
+        try:
+            with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
+                keys = {str(record["propertyKey"]) for record in session.run("CALL db.propertyKeys()")}
+        finally:
+            driver.close()
+    except Exception as exc:  # noqa: BLE001 — 讀不到圖就不能宣稱「token 都在」
+        raise ApplyRefused(f"upstream_unavailable：讀不到圖上的屬性名清單（{type(exc).__name__}: {str(exc)[:160]}）"
+                           "——沒有任何寫入，請確認 Neo4j 開著後重跑") from exc
+    missing = sorted(needed - keys)
+    if missing:
+        raise ApplyRefused(f"圖上缺 {len(missing)} 個屬性名的 token：{', '.join(missing)}——routine writer 不能建新屬性名，"
+                           "請 admin 執行 schema/neo4j_setup.cypher 的 1b 預熱後再重跑；沒有任何寫入")
+
+
+def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: datetime | None = None,
+                    preflight: Callable[[], None] | None = None) -> dict:
+    """四道檢查＋（給了就跑的）`preflight`＋蓋核准戳記。回 `{action_id, record, retry}`；不過就 raise ApplyRefused（此時沒有任何寫入）。
+
+    `preflight` 在四道都過之後、蓋戳記之前跑（重試路徑同樣要跑——戳記已在、但這次寫圖前一樣要先確認 token）；
+    `main()` 一律傳 `check_property_tokens`。"""
 
     from engine_b import todo
     from intake import actions as research_actions
@@ -88,6 +128,8 @@ def check_and_stamp(n: int, digest: str, *, pool_path: Path, root: Path, now: da
     if record["state"] != "ready" and not retry:
         raise ApplyRefused(f"{action_id} 的狀態是 {record['state']}，不是 ready——已 apply 的請走 "
                            "commit_pending_intake.py／todo complete-ra；中斷的 apply 只能由原核准編號重試")
+    if preflight is not None:
+        preflight()          # 缺 token／讀不到圖 → ApplyRefused，此時還沒有任何寫入（戳記在下面才蓋）
 
     if not approval:
         with research_actions.action_lock(action_id, root=root):
@@ -124,11 +166,12 @@ def main(argv: list[str] | None = None) -> int:
     root = Path(args.root) if args.root else ROOT
     pool_path = Path(args.pool) if args.pool else DEFAULT_POOL_PATH
     try:
-        stamped = check_and_stamp(args.pq2, args.digest, pool_path=pool_path, root=root)
+        stamped = check_and_stamp(args.pq2, args.digest, pool_path=pool_path, root=root,
+                                  preflight=lambda: check_property_tokens())
     except ApplyRefused as exc:
         print(f"✗ 拒絕：{exc}", file=sys.stderr)
         return EXIT_REFUSED
-    print(f"✓ [{args.pq2}] → {stamped['action_id']}：四道檢查通過，核准戳記已寫入"
+    print(f"✓ [{args.pq2}] → {stamped['action_id']}：四道檢查與 token 檢查通過，核准戳記已寫入"
           f"{'（重試：沿用原戳記）' if stamped['retry'] else ''}；開始 apply", file=sys.stderr)
     result = _apply_research_action_impl(stamped["action_id"], args.digest.strip().lower(), root=root)
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))

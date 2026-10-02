@@ -123,7 +123,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
 | 5.0 | 基準快照（`docs/reports/2026-10-02-phase5-baseline.md`；偏差見 §0.6 #1–#5：§5 改寫規則修正、追蹤表查證命令改不寫檔、計分表 NaN、跨日只比錨點、watch 實際形狀） | ✅ | 執行模型 | 見 git log「Step 5.0」 |
-| 5.1 | Phase 4 尾巴：#29 ③b 認 supersede、#33 第 2 型降級、#34 `classified_by` 字彙、stash 預熱清單＋對稱測試、apply 入口 `db.propertyKeys()` 檢查 | ○ | 執行模型 | |
+| 5.1 | Phase 4 尾巴：#29 ③b 認 supersede、#33 第 2 型降級、#34 `classified_by` 字彙、stash 預熱清單＋對稱測試、apply 入口 `db.propertyKeys()` 檢查（偏差見 §0.6 #6–#9；驗收見 baseline 報告 §15） | ✅ | 執行模型 | 見 git log「Step 5.1」（5.1a–5.1d） |
 | 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review） | ○ | 執行模型 | |
 | 5.3 | `record_trade.py --backfill-before-receipts`（R2-a） | ○ | 執行模型 | |
 | 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行） | ○ | 執行模型 | |
@@ -149,6 +149,10 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 3 | 5.0（影響 5.2、5.5） | §6 驗收「五欄既有值逐位不變」 | 5.5 加：`_yfinance_closes` 濾 NaN 收盤；驗收改「同一份價格上，被 NaN 污染的格以外逐位不變，污染的格逐格列出改前改後」。5.2 的主題等權組報酬函式同樣濾 NaN（照 `_provider_series` 的 `.dropna()`＋`close == close`） | 計分表「點名後 90 天 vs SOXX」今天是 NaN：yfinance 對 5 檔歐洲標的（IQE.L、SHA0.DE、SIVE.ST、SOI.PA、XFAB.PA）在 10-01 回了 NaN 收盤，計分表取價沒濾；NaN 混進中位數時排序結果不確定，同一批值算出的 QQQ 格也可能被靜默算錯，而 NaN 不等於自己、「逐位不變」對它無法成立。十行內、不動 contract（L17 當下修），住 5.5 本來就要改的檔 |
 | 4 | 5.0（影響 5.2、§11、§12、結案 R2） | §3「真實資料：history 22 列與 5.0 逐位相同（`rows` 與 `power_law` 的 digest）」 | 分兩層：**同一份價格**（注入同一個 loader 或同一次抓取）跑改前／改後兩份 `collect()`，history 的 `rows`／`power_law` digest 逐位相同；**跨日**只比錨點 digest（baseline §2：`sorted((ticker, company_id, anchor_date, anchor_price, anchor_currency))` 的 sha256＝`6ea352ed…7b93`） | 每列帶現價，三次各自抓價在第 4 位小數就不同（daily 05:3x、materialize 07:14、5.0 14:5x）；跨日比 rows digest 必然不同，那不是回歸 |
 | 5 | 5.0（影響 5.4） | §5 輸入「來源為 `reading:<r.reading_id>` 的語意 watch `judgment.touches == "yes"`」；種類「標旗／判定引用的那份文件的 `published_at`」 | 照實際形狀寫進 §5：`kind == "semantic_condition"`；`source_ref` 是 `reading:<id>#<第幾條>`（比對去掉 `#n`）；觸及只看**單數** `judgment`（判無關 append 在複數 `judgments`）；文件日期＝`judgment.lead_id` → lead registry 那則的 `published_at`（空→`undated`）；`record_touched`（pq2 `watch_decision`）那條路 `lead_id` 是 null → `undated` | §13 要求「5.0 先查清楚再寫 5.4」；照原文的 `reading:<id>` 全等比對會 0 命中且不報錯（成功與失敗同形，L13） |
+| 6 | 5.1（#29） | 「凍結集合要補存當時的內容 digest（phase4 集合只存 id：5.1 補一份 `assertion_digests`）」；內容＝「quote＋sub＋evidence 的 canonical」；L11-6 ④「`new` 必須與 closeout §2 相同（4 筆）」 | 內容基準住**另一個鍵** `assertion_content_2026_10_02`（695 筆，不寫進 phase4 那個鍵）；指紋另含邊（src／relation／dst）與 `source_doc_id`；`new`（帶 sub、不在凍結集合）今天是 **0**——closeout 的「4 筆」是 Phase 4 新入圖、都不帶 sub 的 assertion 總數，兩者分開核（baseline §15：集合外 4 筆、帶 sub 的 0） | `config/graph_baselines.json` 自己的規則是「新的基準加一個鍵，既有鍵一個字都不改」；同 id 被重套到另一條邊或另一份文件也是重寫；L11-6 ④ 的兩個數口徑不同，混著比會讓對的計數器看起來錯 |
+| 7 | 5.1（#33） | 「讀圖 ledger 讀不到／有壞行時第 2 型與第 1 型同形」 | 新 `reading_rows_or_none`：讀不到或有壞行都回 `None`——第 1、2、**4** 型一起降級（第 4 型原本在壞行時拿殘缺資料照算，`collect()` 把壞行清單丟掉） | 壞行與讀不到同形才不會有「第 1、2 型降級、第 4 型照算」的半套；今天 ledger 沒有壞行，九型數字逐字不變 |
+| 8 | 5.1（stash、apply 入口） | 「與 loader 會寫的屬性名集合比對」；stash 的對稱測試自帶 regex | 「loader 會寫的屬性名」收成 `loader.load_to_neo4j.written_property_names()` 唯一一份（38 個＝預熱 37＋`id`），對稱測試與入口都讀它；token 檢查用 apply 寫圖的同一組 routine 憑證；Phase 4 的 `tests/test_layer_document_full_chain.py` 經 `main()` 呼叫入口，補一行注入假檢查（否則它會連真的 Neo4j） | 兩份 regex 會漂開（L16）；用別的憑證查會看到不同的權限世界；測試不該依賴圖開著（以錯的 `NEO4J_URI` 重跑兩個入口測試檔仍 15 條綠） |
+| 9 | 5.1（#34） | 「既有 cw_dfb lead 的紀錄不改寫…登記 §14」 | 照做；另查到 3 則 `directed:sub_backfill` 的 lead 被互動 session 鑄號、卻標成預設的 `triage_semantic_v1`（同一個形狀，計入「分類層上次成功」的候選），一併登記 §14 #3、不改寫 | lead registry 是 authority，改資料走 pq2 |
 
 ---
 
@@ -368,7 +372,7 @@ R2 回 GO 後：ROADMAP Phase 5 標 ✅、`docs/plans/README.md` 對照表本列
 
 1. **證據判準 brainstorm（結案後開，使用者 2026-10-02 定案延後）**：Phase 4 closeout §6 #1（sub 消費端忽略 `sub_language_in_quote=false`）、#2（外部印證要求引文具名）、#3（`counterparty_joint` 320 分支）、#4（`same_origin` 機械偵測）、#11（`co:openlight` 兩個 id）、#17（插槽 staleness 比 rank）、#20（稀釋燈分員工計畫）、#27（結構表單一最短錨）、#30（發布者整家升級）、#31（GSR 類別）——結案時各附當天量到的數字。
 2. Phase 4 closeout §6 其餘資料口徑題照帶：#5、#6、#7（`graph_walk:*` 來源標籤走到量測——本 Phase paper lane 的 `first_named_by` 是第一步，lead 來源與走圖型別的對照留這裡）、#8、#9、#10、#12、#13、#14、#15、#16、#18、#19、#21、#23、#24、#25、#28、#32。
-3. #34 的既有 cw_dfb lead 紀錄（`classified_by=interactive:graph_walk` 與 `directed:` 來源不一致）要不要改資料（lead registry 是 authority，走 pq2）。
+3. #34 的既有 cw_dfb lead 紀錄（`classified_by=interactive:graph_walk` 與 `directed:` 來源不一致）要不要改資料（lead registry 是 authority，走 pq2）。5.1 另查到同形的 3 則：`directed:sub_backfill` 的 `lead_3238fc77…`、`lead_39841af8…`、`lead_cbd50ac5…`（互動鑄號、標成預設 `triage_semantic_v1`）；5.1 起字彙有 `interactive:directed` 可用。
 4. Phase 3 closeout §5 #14（Engine C 口徑）、#15（三題 as-of 視角）照帶。
 5. history lane 什麼時候退役（它的三量在 paper／live 有足夠樣本前仍是唯一有歷史長度的序列）。
 6. 主題等權組 supersede 時籃子序列的斷點怎麼呈現（本 Phase 只印 `cohort_id`）。

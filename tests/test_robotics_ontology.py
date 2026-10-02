@@ -18,6 +18,24 @@ def test_neo4j_setup_prewarms_every_relation_in_vocab() -> None:
     assert {relation.upper() for relation in vocab["relation"]} <= prewarmed
 
 
+def test_neo4j_setup_prewarms_every_property_the_loader_sets() -> None:
+    """關係型別預熱的對稱面：routine writer 也不能建立新的 property name。
+
+    事發（2026-10-02 pq2 [666]）：`MERGE_SOURCE_DOC` 加了 `origin_linkage`，setup 沒補；
+    之前每份都寫 null 不建 token，第一份非 null 的 RA apply 被 Forbidden 擋下。
+    """
+    from loader.load_to_neo4j import written_property_names
+
+    # 唯一一份「loader 會寫的屬性名」（apply 入口的 token 檢查讀同一份，Phase 5 Step 5.1）。
+    loader_sets = set(written_property_names())
+    setup = (ROOT / "schema" / "neo4j_setup.cypher").read_text(encoding="utf-8")
+    prewarmed = set(re.findall(r"\bprewarm\.([a-z_][a-z0-9_]*)\s*=", setup))
+
+    assert "origin_linkage" in loader_sets  # 解析沒失效（空集合不得冒充通過）
+    # `id` 是 sentinel 的 MERGE key，本身就註冊了 token。
+    assert loader_sets - {"id"} <= prewarmed
+
+
 def test_robotics_mini_slice_is_in_all_vocab_surfaces(tmp_path: Path) -> None:
     vocab = json.loads((ROOT / "schema" / "vocab.json").read_text(encoding="utf-8"))
     schema = json.loads(

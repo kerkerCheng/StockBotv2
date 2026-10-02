@@ -831,7 +831,11 @@ alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加
 ```
 四道 fail closed——①[N] 存在、型別 `ra_admission`、未結案（drop 的編號永久拒絕；要重提請重跑 prepare 取新編號）
 ②[N] 的 ref_id 是一筆存在的 Research Action ③digest＝紀錄凍結的 `action_digest` ④紀錄 ready 且未過期，或同編號同 digest
-中斷在 partial／applying 的重試——通過後先把 `approval={pq2_n, digest, at}` 寫進紀錄的 execution，再 apply。
+中斷在 partial／applying 的重試——四道過了、**蓋戳記之前**再做一道唯讀 token 檢查（2026-10-02 Phase 5 Step 5.1）：以 apply 寫圖的
+routine 憑證 `CALL db.propertyKeys()`，與 `loader.load_to_neo4j.written_property_names()`（loader 會 SET 的屬性名，唯一一份）比對，
+缺任何一個就拒絕（exit 2、印缺哪些、請 admin 跑 `schema/neo4j_setup.cypher` 的 1b 預熱——routine writer 不能建新屬性名，
+pq2 [666] 就是蓋了戳記才在寫圖時被 Forbidden 擋下）；讀不到圖也拒絕（`upstream_unavailable`）。兩種都不留戳記——
+通過後先把 `approval={pq2_n, digest, at}` 寫進紀錄的 execution，再 apply。
 **不 publish、不結案**：之後照下面「入圖收尾」publish，再 `python -m engine_b.todo complete-ra <N> --digest …`
 （它比對 approval 戳記——沒經過本入口的 apply 結不了案）。結束碼 0＝已 apply、2＝四道沒過（沒有任何寫入）、3＝已蓋戳記但
 apply 沒完成（看輸出的 next_action）。私有函式 `intake.application._apply_research_action_impl` 不再是操作入口。
@@ -845,6 +849,13 @@ apply 沒完成（看輸出的 next_action）。私有函式 `intake.application
 | **3 最窄 rule** | **互動專用，沒有新增任何 rule**：不進 `.codex/rules`（仍是 0 條前綴）、不進 daily 固定步驟、不進 `.claude/settings.json` 的 allow。它落在本機 `.claude/settings.local.json` 既有的寬鬆放行 `Bash(python *)` 之下——補償控制是**四道檢查＋核准戳記＋`complete-ra` 比對戳記**（沒經過入口的 apply 結不了案）。 |
 | **4 permission contract test** | `tests/test_apply_ra_admission.py::test_entry_is_interactive_only`（rules／daily 步驟／專案 allow 都不含本入口）、四道拒絕不寫入、戳記先於 apply、partial 只能原編號重試；`tests/test_engine_b_todo.py::test_complete_ra_refuses_an_apply_that_bypassed_the_entry`。 |
 | **5 端到端 smoke** | 2026-10-01 R2-a 覆核者在暫存根目錄以夾具（fake loader）跑過 create → 池裡 `ra_admission` → 本入口 → `complete-ra`（經入口的那筆結得了案、繞過入口的被拒；腳本在該次覆核的 scratchpad）；**repo 裡串成一條的測試待 Step 4.9 full chain**（今天 `tests/test_apply_ra_admission.py` 停在 apply、complete-ra 的測試用 mock 紀錄）。真資料只跑拒絕路徑（已結案的編號 exit 2、沒有寫入）。 |
+
+**2026-10-02 Phase 5 Step 5.1 增補：蓋戳記前的 token 檢查。** ①capability：多一次**唯讀** Neo4j 讀取（`CALL db.propertyKeys()`，`READ_ACCESS` session、用完即關），
+憑證就是 apply 本來就用的 `NEO4J_ROUTINE_*`（`intake.application._driver`）——本入口原本就會連圖寫入，沒有新增 capability；寫入面不變（缺 token 時連戳記都不寫）。
+②skill／本檔：本節；`schema/neo4j_setup.cypher` 1b 預熱清單同 Step 補齊 37 個屬性名（`tests/test_robotics_ontology.py` 的對稱測試：預熱 ⊇ loader 會 SET 的，`id` 除外）。
+③rule 不變（互動專用、不進任何無人值守 allowlist）。④測試：`tests/test_apply_ra_admission.py` 缺 token 拒絕且無戳記、讀不到圖拒絕、全在照舊、重試路徑缺 token 戳記不動，
+四道沒過時不連圖；變異：拿掉 preflight → 4 條紅。⑤真資料：只跑唯讀的 `check_property_tokens()`——今天的圖通過（routine 憑證讀得到 56 個 key）；
+要求一個不存在的名時正確拒絕。入口本身不在真資料上跑（[666] 重試是使用者動作）。
 
 ### 入圖收尾
 ```powershell

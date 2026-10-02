@@ -21,9 +21,49 @@ FOR (sd:SourceDoc) REQUIRE sd.id IS UNIQUE;
 // Neo4j Enterprise 的 SET PROPERTY 權限不等於 CREATE NEW PROPERTY NAME。
 // 由 admin 跑 setup 時先建立 token，再刪掉 sentinel；不要把建立任意
 // property name 的權限授給 cloud_routine。
+// ⚠ 清單＝loader/load_to_neo4j.py 所有 Cypher 常數 SET 的屬性名（property key 是全域的，
+// 掛在哪個 label 的 sentinel 上都一樣）。2026-10-02 pq2 [666]：Phase 4 加了 `origin_linkage`
+// 卻沒補這裡，之前每份都寫 null 不建 token，第一份非 null 的 RA apply 就被 Forbidden 擋下。
+// 「新增欄位後記得重跑 setup」是要人記得的段落；`tests/test_robotics_ontology.py` 的
+// 屬性名預熱測試才是剎車（與關係型別預熱測試對稱）。
 MERGE (prewarm:SourceDoc {id: '__schema_token_prewarm__'})
 SET prewarm.storage_permission = 'local_only',
-    prewarm.permission_basis = 'schema token pre-registration'
+    prewarm.permission_basis = 'schema token pre-registration',
+    prewarm.origin_linkage = 'prewarm',
+    prewarm.section = 'prewarm',
+    prewarm.title = 'prewarm',
+    prewarm.source_type = 'prewarm',
+    prewarm.evidence_tier = 'prewarm',
+    prewarm.origin_entity = 'prewarm',
+    prewarm.url = 'prewarm',
+    prewarm.publisher = 'prewarm',
+    prewarm.published_at = 'prewarm',
+    prewarm.retrieved_at = 'prewarm',
+    prewarm.locator = 'prewarm',
+    prewarm.quote = 'prewarm',
+    prewarm.source_doc_id = 'prewarm',
+    prewarm.source_doc_ids = 'prewarm',
+    prewarm.source_ids = 'prewarm',
+    prewarm.local_id = 'prewarm',
+    prewarm.edge_key = 'prewarm',
+    prewarm.src_id = 'prewarm',
+    prewarm.relation = 'prewarm',
+    prewarm.dst_id = 'prewarm',
+    prewarm.attributes = 'prewarm',
+    prewarm.confidence = 'prewarm',
+    prewarm.updated_at = 'prewarm',
+    prewarm.admitted_at = 'prewarm',
+    prewarm.name = 'prewarm',
+    prewarm.aliases = 'prewarm',
+    prewarm.type = 'prewarm',
+    prewarm.abstraction_level = 'prewarm',
+    prewarm.role = 'prewarm',
+    prewarm.statement = 'prewarm',
+    prewarm.demand_proof_level = 'prewarm',
+    prewarm.disproof_condition = 'prewarm',
+    prewarm.subject_kind = 'prewarm',
+    prewarm.subject_node_id = 'prewarm',
+    prewarm.subject_edge_key = 'prewarm'
 WITH prewarm
 DETACH DELETE prewarm;
 

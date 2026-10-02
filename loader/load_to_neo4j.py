@@ -274,6 +274,20 @@ RETURN cl.id
 """
 
 
+def written_property_names() -> frozenset[str]:
+    """本模組所有 Cypher 常數 `SET` 的屬性名——**唯一一份**（Phase 5 Step 5.1）。
+
+    兩個消費端讀同一份：`schema/neo4j_setup.cypher` 1b 預熱清單的對稱測試（預熱 ⊇ 這份，`id` 除外——它是 sentinel
+    的 MERGE key）、`scripts/apply_ra_admission.py` 的 token 檢查（圖上 `db.propertyKeys()` ⊇ 這份，否則缺 token 時
+    routine writer 會在寫到一半被 Forbidden 擋下，2026-10-02 pq2 [666]）。新增一個 `SET x.foo` 就自動進兩邊。
+    """
+    names: set[str] = set()
+    for name, value in globals().items():
+        if name.isupper() and isinstance(value, str) and re.search(r"\bSET\b", value):
+            names |= set(re.findall(r"\b[a-z]+\.([a-z_][a-z0-9_]*)\s*=(?!=)", value))
+    return frozenset(names)
+
+
 class DuplicateUrlError(RuntimeError):
     """Raised when a different doc_id already owns the same canonical source URL."""
 

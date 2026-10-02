@@ -44,15 +44,21 @@ def _payload(doc_id: str = "entry_doc") -> dict:
 
 
 @pytest.fixture()
-def env(tmp_path: Path):
+def env(tmp_path: Path, monkeypatch):
     record = research_actions.create_action(_payload(), root=tmp_path)
     pool = todo.empty_pool()
     item = todo.upsert(pool, item_type="ra_admission", ref_id=record["action_id"], title="RA")
     other = todo.upsert(pool, item_type="manual", ref_id="m1", title="手動項")
     pool_path = tmp_path / "todo_pool.json"
     todo.save(pool, pool_path)
+    module = _entry()
+    # token 檢查（Phase 5 Step 5.1）預設換成只記次數的假檢查——測試不連圖；要測檢查本身的測試自己換回真的。
+    token_checks: list[str] = []
+    real_check = module.check_property_tokens
+    monkeypatch.setattr(module, "check_property_tokens", lambda **_k: token_checks.append("checked"))
     return {"root": tmp_path, "record": record, "n": item["n"], "manual_n": other["n"], "pool": pool_path,
-            "digest": record["action_digest"], "module": _entry()}
+            "digest": record["action_digest"], "module": module, "token_checks": token_checks,
+            "real_check": real_check}
 
 
 def _fake_loader(calls: list[str], *, root: Path, action_id: str, fail_once: bool = False):
@@ -103,6 +109,7 @@ def test_refusals_write_nothing(env, monkeypatch) -> None:
     todo.save(pool, env["pool"])
     assert _run(env, "--pq2", str(n), "--digest", digest) == 2                 # ① 已 drop：永久拒絕
     _unchanged(env)
+    assert env["token_checks"] == []        # 四道沒過就停：連圖查 token 都不必（檢查在四道之後、戳記之前）
 
 
 def test_expired_record_is_refused_and_says_re_prepare(env, capsys) -> None:
@@ -124,6 +131,7 @@ def test_success_stamps_before_apply_and_neither_publishes_nor_resolves(env, mon
     assert approval["pq2_n"] == env["n"] and approval["digest"] == env["digest"]
     assert record["git"]["status"] == "pending"                                # 不 publish
     assert [i["n"] for i in todo.active_items(todo.load(env["pool"]))] == [env["n"], env["manual_n"]]  # 不結案
+    assert env["token_checks"] == ["checked"]                                  # main() 一律跑 token 檢查
     # 已 apply 的再跑一次 → 拒絕（請走 publish／complete-ra）
     assert _run(env, "--pq2", str(env["n"]), "--digest", env["digest"]) == 2
 
@@ -181,6 +189,108 @@ def test_unstamped_partial_record_says_re_prepare_not_retry(env) -> None:
     research_actions.save_action(record, root=env["root"])
     with pytest.raises(env["module"].ApplyRefused, match="沒有核准戳記.*重跑 prepare"):
         env["module"].check_and_stamp(env["n"], env["digest"], pool_path=env["pool"], root=env["root"])
+
+
+# ---------------------------------------------------------------------------
+# token 檢查（Phase 5 Step 5.1）：缺 token／讀不到圖都在蓋戳記之前拒絕
+# ---------------------------------------------------------------------------
+
+class _FakeSession:
+    def __init__(self, driver):
+        self._driver = driver
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def run(self, query):
+        assert query == "CALL db.propertyKeys()"
+        return [{"propertyKey": key} for key in self._driver.keys]
+
+
+class _FakeDriver:
+    def __init__(self, keys):
+        self.keys, self.modes, self.closed = set(keys), [], False
+
+    def session(self, *, default_access_mode=None):
+        self.modes.append(default_access_mode)
+        return _FakeSession(self)
+
+    def close(self):
+        self.closed = True
+
+
+def _with_graph(env, monkeypatch, keys=None, *, error: Exception | None = None) -> list[_FakeDriver]:
+    """把入口的 token 檢查換回**真的**檢查，只把 driver 換成夾具（keys＝圖上已有的屬性名）。"""
+    drivers: list[_FakeDriver] = []
+
+    def factory():
+        if error is not None:
+            raise error
+        drivers.append(_FakeDriver(keys))
+        return drivers[-1]
+
+    monkeypatch.setattr(env["module"], "check_property_tokens",
+                        lambda **_k: env["real_check"](driver_factory=factory))
+    return drivers
+
+
+def test_a_missing_property_token_refuses_before_the_stamp(env, monkeypatch, capsys) -> None:
+    """[666] 的形狀：loader 要寫 `origin_linkage`、圖上沒有那個 token → 拒絕（exit 2）、沒有戳記、沒碰 loader。
+
+    變異：把 `main()` 的 preflight 拿掉 → 戳記會先蓋上、loader 被叫到，這條紅。"""
+    from loader.load_to_neo4j import written_property_names
+    import neo4j
+
+    def boom(*_a, **_k):
+        raise AssertionError("缺 token 時不得走到 loader")
+
+    monkeypatch.setattr(application, "_load_extraction_impl", boom)
+    drivers = _with_graph(env, monkeypatch, written_property_names() - {"origin_linkage"})
+    assert _run(env, "--pq2", str(env["n"]), "--digest", env["digest"]) == 2
+    err = capsys.readouterr().err
+    assert "origin_linkage" in err and "1b 預熱" in err
+    _unchanged(env)
+    assert drivers[0].modes == [neo4j.READ_ACCESS] and drivers[0].closed        # 唯讀、用完即關
+
+
+def test_an_unreadable_graph_refuses_as_upstream_unavailable(env, monkeypatch, capsys) -> None:
+    """讀不到圖就不能宣稱 token 都在——fail closed，沒有戳記。"""
+    monkeypatch.setattr(application, "_load_extraction_impl", lambda *a, **k: (_ for _ in ()).throw(AssertionError()))
+    _with_graph(env, monkeypatch, error=OSError("connection refused"))
+    assert _run(env, "--pq2", str(env["n"]), "--digest", env["digest"]) == 2
+    assert "upstream_unavailable" in capsys.readouterr().err
+    _unchanged(env)
+
+
+def test_all_tokens_present_applies_as_before(env, monkeypatch) -> None:
+    from loader.load_to_neo4j import written_property_names
+
+    calls: list[str] = []
+    monkeypatch.setattr(application, "_load_extraction_impl",
+                        _fake_loader(calls, root=env["root"], action_id=env["record"]["action_id"]))
+    _with_graph(env, monkeypatch, set(written_property_names()) | {"unrelated_key"})
+    assert _run(env, "--pq2", str(env["n"]), "--digest", env["digest"]) == 0
+    assert calls == ["entry_doc"]
+
+
+def test_a_retry_with_a_missing_token_keeps_the_original_stamp_and_does_not_apply(env, monkeypatch) -> None:
+    """重試路徑（partial、原編號的戳記已在）同樣先查 token：缺就拒絕，戳記與狀態都不動、不叫 loader。"""
+    from loader.load_to_neo4j import written_property_names
+
+    calls: list[str] = []
+    monkeypatch.setattr(application, "_load_extraction_impl",
+                        _fake_loader(calls, root=env["root"], action_id=env["record"]["action_id"], fail_once=True))
+    assert _run(env, "--pq2", str(env["n"]), "--digest", env["digest"]) == 3          # 第一次中斷在 partial
+    before = research_actions.read_action(env["record"]["action_id"], root=env["root"])
+    _with_graph(env, monkeypatch, written_property_names() - {"origin_linkage"})
+    assert _run(env, "--pq2", str(env["n"]), "--digest", env["digest"]) == 2
+    after = research_actions.read_action(env["record"]["action_id"], root=env["root"])
+    assert (after["state"], after["execution"]["approval"], after["revision"]) == (
+        "partial", before["execution"]["approval"], before["revision"])
+    assert calls == ["entry_doc"]                                                       # 只有第一次那一叫
 
 
 def test_entry_is_interactive_only() -> None:
