@@ -789,6 +789,22 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 #   賣出：--why 必填；--disproof-watch <watch_id>（可選，觸發賣出的反證，以來源歸屬驗）
 ```
 
+**回填收據機制上線（2026-09-30）前的舊 alpha 成交（2026-10-02，Phase 5 Step 5.3）**——Sheet 已有、trade_log 沒有的那幾筆：
+
+```powershell
+& '.venv\Scripts\python.exe' scripts\record_trade.py --symbol COHR --side buy `
+    --shares 10 --price 316.23 --currency USD --executed-at 2026-08-18T11:02:30-04:00 --broker IB `
+    --why "<一句：當時為什麼買>" --log-only `
+    --backfill-before-receipts "Sheet 已有這筆、trade_log 沒有（收據機制上線前的成交）"
+#   歐元成交（FRA:2DG）另給 --currency EUR --fx-to-base <1 EUR = ? USD>（硬擋要量得到）；先不帶 --log-only 以外的寫入旗標乾跑看收據
+```
+
+- **只准配 `--log-only`**（Sheet 已是現況，不再改）；成交日（排程時區）**必須早於 2026-09-30**——那天或之後的成交走正常路徑；
+  **只收 alpha**（beta 本來就不需要收據）；**必附理由**；不能配 `--apply`／`--no-narrative-override`／`--disproof-watch`。
+  七種拒收都在碰 Sheet 之前、exit 2、什麼都不寫。
+- 收據寫 `narrative: backfilled`、`declared`／`derived` 都是 `null`：**不讀敘事、候選板、個股頁**——今天的判斷不得冒充當時（INV-6）。
+  公司身分照解析（`resolve_holding`）。硬擋照算（`--log-only` 語意：不碰現金格、照算 5% 與 ETF cap，超過照擋）；同一筆重跑不重寫。
+- 追蹤表的 live lane（`scripts/outcome_if_settled_today.py`）照抄這個標記，印「回填、無當時收據」。
 - alpha／beta 只由 `risk/hard_caps.py` 的公開判別決定（賣出也判）。beta（QQQ 等）不要收據、行為不變；給 beta 帶 `--why`
   會被拒（exit 2），不是默默忽略。
 - 順序：定位（恰好一列）→ 硬擋 → 收據；**dry-run 也組收據、也印、也擋**。exit code：2＝輸入錯、3＝硬擋、4＝缺敘事

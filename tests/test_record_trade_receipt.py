@@ -546,3 +546,124 @@ def test_an_unreadable_schedule_timezone_never_blocks_the_trade(env, monkeypatch
     assert module.main(_trade("FRA:2DG", "sell", "--why", "時區設定壞了也要記得下來", "--apply")) == 0
     receipt = _entry(env)["research_receipt"]
     assert any("排程時區讀不到" in p for p in receipt["input_problems"])
+
+
+# ---------------------------------------------------------------------------
+# 7. 回填收據機制上線前的舊成交（Phase 5 Step 5.3；plan §4、使用者定案 #2）
+# ---------------------------------------------------------------------------
+
+BACKFILL_REASON = "Sheet 已有這筆、trade_log 沒有（收據機制上線前的成交）"
+
+
+def _old_trade(symbol: str, side: str = "buy", *extra: str,
+               executed_at: str = "2026-08-18T11:02:30-04:00") -> list[str]:
+    """收據機制上線（2026-09-30）之前的一筆成交——COHR 那一筆的形狀。"""
+    return ["--symbol", symbol, "--side", side, "--shares", "10", "--price", "316.23", "--currency", "USD",
+            "--executed-at", executed_at, "--broker", "IB", *extra]
+
+
+@pytest.fixture()
+def no_judgment_reads(env, monkeypatch):
+    """回填路徑**不得**讀今天的判斷：敘事 ledger、候選板、個股頁——**記下每一次呼叫**再斷言是 0
+    （只丟例外不夠：收據的讀取端本來就會把例外吞成 `problems`，那樣變異會靜默通過；plan §4 的變異：讀了敘事 → 紅）。"""
+    import alpha.providers.briefs as briefs_mod
+    import webapp.store as store
+
+    calls: list[str] = []
+
+    def spy(name):
+        def read(*a, **k):
+            calls.append(name)
+            raise AssertionError(f"回填不得讀 {name}")
+        return read
+
+    monkeypatch.setattr(briefs_mod, "read_brief_records", spy("敘事 ledger"))
+    monkeypatch.setattr(store.StateArtifactStore, "read", spy("候選板"))
+    monkeypatch.setattr(store.ArtifactStore, "read", spy("個股頁"))
+    env["judgment_reads"] = calls
+    return env
+
+
+def test_backfill_records_a_labelled_receipt_and_never_touches_the_sheet(no_judgment_reads) -> None:
+    env = no_judgment_reads
+    module = env["module"]
+    assert module.main(_old_trade("FRA:2DG", "buy", "--why", "SuperNova 插槽", "--log-only",
+                                  "--backfill-before-receipts", BACKFILL_REASON)) == 0
+    entry = _entry(env)
+    assert entry["research_receipt"] == {
+        "version": "research-receipt/v1", "side": "buy", "why": "SuperNova 插槽", "sheet_symbol": "FRA:2DG",
+        "company_id": SIVERS, "research_ticker": "SIVE.ST", "resolution": "execution_alias",
+        "narrative": "backfilled", "narrative_label": "回填：成交早於收據機制上線（2026-09-30），當時沒有收據",
+        "backfill_reason": BACKFILL_REASON, "declared": None, "derived": None}
+    assert entry["sheet_writes"] == [] and entry["sheet_update"] == "manual_by_user"
+    assert env["writes"] == []                                                # Sheet 零寫入
+    assert entry["hard_cap_check"]["status"] == "pass"                       # 硬擋照算（--log-only 語意）
+    assert env["judgment_reads"] == []                                        # 沒讀任何今天的判斷
+    # 同一筆重跑：不重寫（--log-only 既有語意）
+    assert module.main(_old_trade("FRA:2DG", "buy", "--why", "SuperNova 插槽", "--log-only",
+                                  "--backfill-before-receipts", BACKFILL_REASON)) == 0
+    assert len(env["module"].TRADE_LOG.read_text(encoding="utf-8").splitlines()) == 1
+
+
+@pytest.mark.parametrize("case, why", [
+    ("no_log_only", "只准配 --log-only"),
+    ("on_or_after_epoch", "不早於收據機制上線日 2026-09-30"),
+    ("beta", "是 beta：beta 本來就不需要研究收據"),
+    ("blank_reason", "必須附理由"),
+    ("with_apply", "--apply 在這裡沒有意義"),
+    ("with_narrative_override", "回填不讀今天的敘事與 watch"),
+    ("with_disproof_watch", "回填不讀今天的敘事與 watch"),
+])
+def test_backfill_refusals_write_nothing(no_judgment_reads, monkeypatch, capsys, case, why) -> None:
+    """七種拒收都在碰 Sheet 之前、什麼都不寫——**斷言拒收的理由本身**：只看 exit 2 的話，
+    「讀 Sheet 失敗」也回 2，拿掉檢查的變異會靜默通過（成功與失敗同形，L13）。"""
+    from fetchers import gsheets
+
+    env = no_judgment_reads
+    sheet_reads: list[str] = []
+    monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *a, **k: sheet_reads.append("read") or [["symbol"]])
+    base = ["--why", "x", "--log-only", "--backfill-before-receipts", BACKFILL_REASON]
+    argv = {
+        "no_log_only": _old_trade("FRA:2DG", "buy", "--why", "x", "--backfill-before-receipts", BACKFILL_REASON),
+        # 2026-09-30T09:00+08:00＝排程時區的 09-30：不早於上線日 → 走正常路徑
+        "on_or_after_epoch": _old_trade("FRA:2DG", "buy", *base, executed_at="2026-09-30T09:00:00+08:00"),
+        "beta": _old_trade("QQQ", "buy", "--log-only", "--backfill-before-receipts", BACKFILL_REASON),
+        "blank_reason": _old_trade("FRA:2DG", "buy", "--why", "x", "--log-only", "--backfill-before-receipts", "  "),
+        "with_apply": _old_trade("FRA:2DG", "buy", *base, "--apply"),
+        "with_narrative_override": _old_trade("FRA:2DG", "buy", *base, "--no-narrative-override", "理由"),
+        "with_disproof_watch": _old_trade("FRA:2DG", "sell", *base, "--disproof-watch", "ew_x"),
+    }[case]
+    assert env["module"].main(argv) == 2
+    err = capsys.readouterr().err
+    assert "✗ --backfill-before-receipts：" in err and why in err, err
+    assert sheet_reads == [] and not env["module"].TRADE_LOG.exists() and env["judgment_reads"] == []
+
+
+def test_backfill_still_obeys_the_five_percent_cap(no_judgment_reads) -> None:
+    """第八種：硬擋照擋——回填不是放行硬擋的路（要放行仍是 --override --reason）。"""
+    env = no_judgment_reads
+    env["rows"] = _sheet_rows(**{"FRA:2DG": 6_000.0})                       # 已占 NAV 6%，超過 5%
+    assert env["module"].main(_old_trade("FRA:2DG", "buy", "--why", "x", "--log-only",
+                                         "--backfill-before-receipts", BACKFILL_REASON)) == env["module"].EXIT_HARD_CAP
+    assert not env["module"].TRADE_LOG.exists()
+
+
+def test_backfilled_sell_needs_no_disproof_watch(no_judgment_reads) -> None:
+    env = no_judgment_reads
+    assert env["module"].main(_old_trade("FRA:2DG", "sell", "--why", "停損", "--log-only",
+                                         "--backfill-before-receipts", BACKFILL_REASON)) == 0
+    assert _entry(env)["research_receipt"]["narrative"] == "backfilled"
+
+
+def test_plain_log_only_still_reads_the_narrative_and_is_present(env) -> None:
+    """L11-6 ④：最先壞的是不帶旗標的 --log-only 正常路徑——它仍要讀今天的敘事建收據。"""
+    assert env["module"].main(_trade("FRA:2DG", "buy", "--why", "x", "--log-only")) == 0
+    assert _entry(env)["research_receipt"]["narrative"] == "present"
+
+
+def test_narrative_states_is_a_closed_vocabulary() -> None:
+    """刻意硬編：加一個值就該讓這條紅一次，逼人答「追蹤表的 live lane 怎麼印它」（封閉字彙）。"""
+    from portfolio.research_receipt import NARRATIVE_STATES, RECEIPT_EPOCH
+
+    assert set(NARRATIVE_STATES) == {"present", "legacy_v1", "absent", "unresolved", "unreadable", "backfilled"}
+    assert RECEIPT_EPOCH == date(2026, 9, 30)

@@ -24,6 +24,10 @@
    `--no-narrative-override "<理由>"` 放行並留收據；它與硬擋的 `--override` **互不放行**。賣出可附
    `--disproof-watch <id>`（以來源歸屬驗它屬於這檔）。收據路徑只讀檔案與 Sheet readonly——不連 Neo4j、不打行情或 FX；
    artifact 缺席或過期只記 `derived: upstream_unavailable`，不擋成交（A3 不替 A5 做決定）。beta 行為不變。
+7. **回填舊成交（2026-10-02，Phase 5 Step 5.3；使用者定案 #2）。** 收據機制上線（2026-09-30）之前的 alpha 成交，
+   用 `--log-only --backfill-before-receipts "<理由>"` 補進 trade_log：成交日必須早於上線日、只收 alpha、必附理由；
+   收據寫 `narrative: backfilled`，**不讀敘事、候選板、個股頁**（不拿今天的判斷冒充當時，INV-6）。硬擋照算
+   （`--log-only` 語意）；`--apply`／`--open-position`／Sheet 讀寫路徑一行不動。回填哪幾筆由使用者照 Sheet 下指令。
 
 用法：
     python scripts/record_trade.py --symbol QQQ --side buy --shares 10 \\
@@ -154,6 +158,9 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--company", default=None, help="--open-position 可選：新列的公司名")
     ap.add_argument("--also-at-other-broker", action="store_true",
                     help="--open-position：這個代號已在別家券商有列、真的是在新券商建倉時才給（預設拒收：多半是 --broker 給錯）")
+    ap.add_argument("--backfill-before-receipts", default=None, metavar="理由",
+                    help="回填收據機制上線（2026-09-30）前的舊 alpha 成交：只准配 --log-only、成交日要早於上線日、必附理由；"
+                         "收據標 backfilled、不讀今天的敘事")
     return ap
 
 
@@ -272,6 +279,46 @@ def _research_inputs(symbol: str, *, today, sheet_rows: list | None = None, shee
     return out
 
 
+def _backfill_refusal(args: argparse.Namespace, *, is_beta: bool) -> str | None:
+    """`--backfill-before-receipts` 的入口檢查（碰 Sheet 之前；Phase 5 Step 5.3）。回拒收理由，或 None。
+
+    只收「收據機制上線前的舊 alpha 成交、Sheet 已是現況」：成交日（排程時區）早於 `RECEIPT_EPOCH`、配 `--log-only`、
+    附理由；不收 beta（本來就不需要收據）、不配任何會去讀今天判斷的旗標。"""
+    if args.backfill_before_receipts is None:
+        return None
+    from portfolio.research_receipt import RECEIPT_EPOCH, _local_date
+
+    if not args.backfill_before_receipts.strip():
+        return "必須附理由（例：「Sheet 已有這筆、trade_log 沒有」）——沒有理由的回填不留收據"
+    if is_beta:
+        return f"{args.symbol} 是 beta：beta 本來就不需要研究收據，直接用 --log-only 記事件"
+    if not args.log_only:
+        return "只准配 --log-only（回填的是 Sheet 上已經有的舊成交，不再改 Sheet）"
+    if args.apply:
+        return "--log-only 不寫 Sheet，--apply 在這裡沒有意義；拿掉 --apply 重跑"
+    if args.no_narrative_override is not None or args.disproof_watch is not None:
+        return "回填不讀今天的敘事與 watch——--no-narrative-override／--disproof-watch 在這裡沒有意義"
+    executed_on = _local_date(args.executed_at)
+    if executed_on is None or executed_on >= RECEIPT_EPOCH:
+        return (f"成交日 {executed_on}（排程時區）不早於收據機制上線日 {RECEIPT_EPOCH}——這筆應該走正常路徑"
+                "（照常 --log-only，收據會讀當時的敘事）")
+    return None
+
+
+def _backfill_identity(symbol: str, sheet_rows: list | None) -> dict:
+    """回填只解析公司身分（INV-1：走 `resolve_holding`，與正常收據同一支）；registry 讀不到＝解析不到，照實記、不猜。"""
+    key = symbol.strip().upper()
+    row = next((r for r in (sheet_rows or []) if str(r.get("ticker") or "").strip().upper() == key), None) \
+        or {"ticker": symbol}
+    try:
+        from identity.registry import get_registry
+        from portfolio.holdings import resolve_holding
+
+        return resolve_holding(row, registry=get_registry())
+    except Exception:  # noqa: BLE001
+        return {"company_id": None, "research_ticker": None, "source": None}
+
+
 def _print_receipt(receipt: dict) -> None:
     from portfolio.research_receipt import NARRATIVE_STATES
 
@@ -279,6 +326,10 @@ def _print_receipt(receipt: dict) -> None:
           f"（{NARRATIVE_STATES[receipt['narrative']]}）｜公司 {receipt.get('company_id') or '解析不到'}"
           f"（{receipt.get('research_ticker') or '—'}；解析 {receipt.get('resolution') or '—'}）")
     print(f"  why：{receipt['why']}")
+    if receipt["narrative"] == "backfilled":
+        print(f"  回填理由：{receipt.get('backfill_reason')}")
+        print("  declared／derived：不補（當時沒有收據機制；不拿今天的敘事與候選板冒充當時）")
+        return
     declared = receipt.get("declared")
     if declared:
         cs = declared.get("candidate_state") or {}
@@ -413,6 +464,10 @@ def main(argv: list[str] | None = None) -> int:
             raise ValueError("沒有時區")
     except ValueError as exc:
         print(f"✗ --executed-at 必須是含時區的 ISO-8601（例：2026-09-30T10:00:00-04:00）：{exc}", file=sys.stderr)
+        return 2
+    refused = _backfill_refusal(args, is_beta=is_beta)
+    if refused:
+        print(f"✗ --backfill-before-receipts：{refused}——未讀 Sheet、未寫入任何東西", file=sys.stderr)
         return 2
     if not args.open_position and (args.bucket is not None or args.company is not None or args.also_at_other_broker):
         print("✗ --bucket／--company／--also-at-other-broker 只在 --open-position（首次建倉）時有意義", file=sys.stderr)
@@ -605,7 +660,20 @@ def main(argv: list[str] | None = None) -> int:
 
     # 研究收據（alpha；Phase 3 Step 3.8）。順序：locate → 硬擋 → 收據；dry-run 也組、也印、也擋。
     # 兩個放行互不放行：硬擋的 --override 不放行缺敘事，--no-narrative-override 不放行硬擋（上面已先過硬擋）。
-    if not is_beta:
+    if not is_beta and args.backfill_before_receipts is not None:
+        # 回填（Phase 5 Step 5.3）：只解析公司身分（今天也拿得回來的事實），**不讀敘事、候選板、個股頁**——
+        # 那些是今天的判斷，填進一筆收據機制上線前的成交就是冒充當時（INV-6）。也不跑「缺 v2 就擋」那一道：
+        # 當時根本沒有收據機制，缺的是紀錄本身。
+        from portfolio import research_receipt
+
+        identity = _backfill_identity(args.symbol, sheet_rows)
+        research = research_receipt.build_backfill_receipt(
+            side=args.side, why=(args.why or "").strip(), symbol=args.symbol,
+            company_id=identity["company_id"], research_ticker=identity["research_ticker"],
+            resolution=identity["source"], reason=args.backfill_before_receipts.strip())
+        _print_receipt(research)
+        receipt["research_receipt"] = research
+    elif not is_beta:
         from portfolio import research_receipt
 
         try:

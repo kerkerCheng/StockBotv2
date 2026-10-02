@@ -26,13 +26,20 @@ from typing import Any, Mapping, Sequence
 
 RECEIPT_VERSION = "research-receipt/v1"
 
-#: 敘事狀態 → 人讀（收據與 CLI 輸出同一份字）。
+#: 收據機制上線日（Phase 3 Step 3.8 交付，2026-09-30）。這天之前的成交**沒有、也不可能有**當時的收據——
+#: `scripts/record_trade.py --backfill-before-receipts` 只收這些（Phase 5 Step 5.3）；這天或之後的成交一律走正常路徑。
+#: 常數，不從 trade_log 推（trade_log 在 5.3 時沒有任何收據事件可推，plan §13）。
+RECEIPT_EPOCH = date(2026, 9, 30)
+
+#: 敘事狀態 → 人讀（收據與 CLI 輸出同一份字）。封閉字彙：加一個值就要多一段消費端語意（追蹤表 live lane 照抄它）。
 NARRATIVE_STATES: Mapping[str, str] = {
     "present": "有現行 v2 敘事",
     "legacy_v1": "現行敘事是舊版 v1（沒有候選狀態）——視同缺 v2",
     "absent": "沒有敘事",
     "unresolved": "Sheet symbol 解析不到公司（INV-1：不猜）",
     "unreadable": "敘事 ledger 讀不到或有壞行（或 registry 沒有 research ticker 可對）——確認不了現行是哪一版，視同缺 v2",
+    # Phase 5 Step 5.3：回填的舊成交——缺的是紀錄本身（那時候還沒有收據機制），不是「我們沒讀到」。
+    "backfilled": "回填：成交早於收據機制上線（2026-09-30），當時沒有收據",
 }
 
 
@@ -259,5 +266,22 @@ def build_receipt(*, side: str, why: str, symbol: str, today: date, inputs: Mapp
     return receipt
 
 
-__all__ = ["NARRATIVE_STATES", "RECEIPT_VERSION", "attributed", "build_receipt", "check_disproof_watch",
+def build_backfill_receipt(*, side: str, why: str, symbol: str, company_id: str | None,
+                           research_ticker: str | None, resolution: str | None, reason: str) -> dict[str, Any]:
+    """回填舊成交的收據（Phase 5 Step 5.3；plan §4）。
+
+    **不讀敘事、不讀候選板、不讀個股頁**：拿今天的判斷填進一筆 2026-08 的成交，就是讓收據回答一個它當時答不出的問題
+    （INV-6：答不出「T 時刻我知道什麼」就明確拒絕，不得靜默回傳當前值）。所以 `declared`／`derived` 一律 `None`，
+    `narrative` 是 `backfilled`——追蹤表的 live lane 照抄它、印「回填、無當時收據」。公司身分照解析（INV-1），那是
+    今天也拿得回來的事實，不是判斷。"""
+    return {
+        "version": RECEIPT_VERSION, "side": side, "why": why, "sheet_symbol": symbol,
+        "company_id": company_id, "research_ticker": research_ticker, "resolution": resolution,
+        "narrative": "backfilled", "narrative_label": NARRATIVE_STATES["backfilled"],
+        "backfill_reason": reason, "declared": None, "derived": None,
+    }
+
+
+__all__ = ["NARRATIVE_STATES", "RECEIPT_EPOCH", "RECEIPT_VERSION", "attributed", "build_backfill_receipt",
+           "build_receipt", "check_disproof_watch",
            "current_brief", "declared_half", "derived_half", "narrative_state"]
