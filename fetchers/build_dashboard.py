@@ -1,14 +1,15 @@
-"""Dashboard v5 — 從 Portfolio 分頁重建 Google Sheet 的 Dashboard 分頁（股數／均價／市值全是即時公式）。
+"""Dashboard v6 — 從 Portfolio 分頁重建 Google Sheet 的 Dashboard 分頁；持股表由公式自己列出標的。
 
-什麼時候要跑：Portfolio **新增或移除一檔**之後（標的清單是建表時寫死的，股數與市值才是即時公式）。
-怎麼跑：`python fetchers/build_dashboard.py`（讀 `.env` 的 service account；寫入 scope）。
+什麼時候要跑：**版面或公式要改**的時候。Portfolio 新增／移除一檔**不用跑**——v6 起持股表的標的清單是
+`UNIQUE(FILTER(Portfolio!symbol…))` 動態列出來的，股數／均價／市值／成本／損益全是 ARRAYFORMULA，容量 57 檔。
+怎麼跑：`python fetchers/build_dashboard.py`（讀 `.env` 的 service account；寫入 scope；互動專用）。
 
-v5（2026-10-02）改了什麼：
-- **可重跑**：重建前先刪掉 Dashboard 既有的圖表與條件格式——v4 每跑一次就疊一層（實測 20 條條件格式、多張圓餅圖）。
-- **分母改含現金的 NAV**：v4 的「% of Total」分母只算非現金、CASH 列又算進去，五格加起來 107%。AGENTS：`bucket=CASH` 計入 NAV 不計曝險。
-- 槓桿 ETF 印**名目**與**有效曝險**兩行（倍數讀 `config/beta_policy.json`，AGENTS：兩個槓桿指標不得混用、不得寫成模糊的「名目槓桿」）。
-- 現金另列原幣（USD／TWD）；持股表按 bucket 再按市值排；列數不夠自動加列。
-- 這張表只呈現，不給任何建議、不排名（bucket 內按市值只是閱讀順序）。
+v5（2026-10-02）：可重跑（重建前刪舊條件格式與圖表——v4 每跑一次疊一層）；分母改含現金的 NAV（v4 的「% of Total」
+五格加起來 107%；AGENTS：`bucket=CASH` 計入 NAV 不計曝險）；槓桿 ETF 印名目與有效曝險兩行（倍數讀 `config/beta_policy.json`，
+AGENTS：兩個槓桿指標不得混用）；現金另列原幣；持股按 bucket 再按市值。
+v6（2026-10-02）：持股表改動態（隱藏的 M:O 是輔助欄：不排序的標的清單、bucket 順序鍵、市值）；槓桿 ETF 列舉 beta_policy
+裡全部倍數 > 1 的代號（Sheet 上沒有的算 0），日後買進也自動算進去。
+這張表只呈現，不給任何建議、不排名（bucket 內按市值只是閱讀順序）。
 """
 from __future__ import annotations
 
@@ -31,8 +32,12 @@ svc = build("sheets", "v4", credentials=creds)
 SID = os.environ["GSHEETS_SPREADSHEET_ID"]
 PORTFOLIO = os.environ.get("GSHEETS_SHEET_NAME", "Portfolio")
 DASHBOARD = "Dashboard"
-#: Portfolio 的資料範圍上限（列）。公式用它，不用整欄：整欄會把 Dashboard 自己的格也算進去的風險沒有，但 SUMPRODUCT 整欄很慢。
+#: Portfolio 的資料範圍上限（列）。公式用它、不用整欄（整欄的 SUMPRODUCT／MMULT 很慢）。
 LAST_ROW = 100
+#: 持股表容量（列數）。超過要改這裡重跑。
+HOLDINGS_CAPACITY = 57
+#: bucket 的閱讀順序；不在表上的排最後。
+BUCKET_ORDER = ["大盤", "CORE", "槓桿", "觀察"]
 
 meta = svc.spreadsheets().get(
     spreadsheetId=SID,
@@ -40,99 +45,40 @@ meta = svc.spreadsheets().get(
 sheets = {s["properties"]["title"]: s for s in meta["sheets"]}
 dashboard = sheets[DASHBOARD]
 dashboard_id = dashboard["properties"]["sheetId"]
+grid = dashboard["properties"].get("gridProperties", {})
 
-
-# ── 讀 Portfolio（UNFORMATTED：數字是數字、字串是字串）────────────────────────
-def read_vals(rng: str) -> list[list]:
-    return svc.spreadsheets().values().get(
-        spreadsheetId=SID, range=rng, valueRenderOption="UNFORMATTED_VALUE").execute().get("values", [])
-
-
-val_rows = read_vals(f"{PORTFOLIO}!A1:Z{LAST_ROW}")
-headers = [str(h).strip().lower() for h in val_rows[0]]
+# ── 讀 Portfolio 標題列（只為了把欄名換成欄字母——使用者調欄序不會寫錯欄）────────
+header_row = svc.spreadsheets().values().get(
+    spreadsheetId=SID, range=f"{PORTFOLIO}!A1:Z1").execute().get("values", [[]])[0]
+headers = [str(h).strip().lower() for h in header_row]
 print("Headers:", headers)
 
 
-def vi(name: str) -> int:
-    return headers.index(name)
-
-
 def col_letter(name: str) -> str:
-    return chr(ord("A") + vi(name))
+    return chr(ord("A") + headers.index(name))
 
 
-MKT = col_letter("market_usd")
-BKT = col_letter("bucket")
-SYM = col_letter("symbol")
-SHR = col_letter("shares")
-COST = col_letter("avg_cost")
-CASH_TWD = col_letter("cash_twd")
-CASH_USD = col_letter("cash_usd")
-print(f"market_usd→{MKT}  bucket→{BKT}  symbol→{SYM}  shares→{SHR}  avg_cost→{COST}")
+MKT, BKT, SYM = col_letter("market_usd"), col_letter("bucket"), col_letter("symbol")
+SHR, COST, CUR, COMPANY = col_letter("shares"), col_letter("avg_cost"), col_letter("currency"), col_letter("company")
+CASH_TWD, CASH_USD = col_letter("cash_twd"), col_letter("cash_usd")
+print(f"market_usd→{MKT}  bucket→{BKT}  symbol→{SYM}  shares→{SHR}  avg_cost→{COST}  currency→{CUR}  company→{COMPANY}")
 
 
-def rng(col: str, absolute: bool = False) -> str:
-    c = f"${col}$" if absolute else col
-    return f"{PORTFOLIO}!{c}2:{c}{LAST_ROW}" if absolute else f"{PORTFOLIO}!{col}2:{col}{LAST_ROW}"
+def rng(col: str) -> str:
+    return f"{PORTFOLIO}!{col}2:{col}{LAST_ROW}"
 
 
-# ── 收集各 ticker 的 metadata（哪些標的出現、顯示用的 bucket／幣別／公司名）──────
-# 股數、均價、市值由 Sheet 公式即時算；這裡只決定「有哪些列」。
-tickers: dict[str, dict] = {}
-for row in val_rows[1:]:
-    padded = list(row) + [""] * (len(headers) - len(row))
-    sym = str(padded[vi("symbol")]).strip()
-    bucket = str(padded[vi("bucket")]).strip()
-    if not sym or sym == "—" or bucket.upper() == "CASH":
-        continue
-    try:
-        market = float(padded[vi("market_usd")] or 0)
-    except (TypeError, ValueError):
-        market = 0.0
-    entry = tickers.setdefault(sym, {"symbol": sym, "company": str(padded[vi("company")]), "bucket": bucket,
-                                     "currency": str(padded[vi("currency")]).strip().upper(), "market": 0.0})
-    entry["market"] += market
-
-BUCKET_ORDER = {"大盤": 0, "CORE": 1, "槓桿": 2, "觀察": 3}
-agg = sorted(tickers.values(), key=lambda x: (BUCKET_ORDER.get(x["bucket"], 9), -x["market"], x["symbol"]))
-print(f"Tickers: {len(agg)}")
-
-# ── 槓桿 ETF 倍數（SSOT：config/beta_policy.json；只取 Sheet 上真的有的）────────
+# ── 槓桿 ETF 倍數（SSOT：config/beta_policy.json；全部列舉，Sheet 上沒有的算 0）──────
 policy = json.loads((ROOT / "config" / "beta_policy.json").read_text(encoding="utf-8"))
-leveraged: list[tuple[str, float]] = []
+leveraged: list[tuple[str, float]] = []          # (Sheet 別名, 倍數)——公式逐別名加總
+leveraged_labels: list[str] = []                 # 標籤每個標的只印一次（別名不重複列）
 for inst in policy.get("instruments", []):
     multiple = float(inst.get("leverage_multiple") or 1.0)
-    if multiple <= 1.0:
-        continue
-    for alias in inst.get("sheet_aliases", []):
-        if alias in tickers:
+    if multiple > 1.0:
+        leveraged_labels.append(f"{inst.get('ticker')} ×{multiple:g}")
+        for alias in inst.get("sheet_aliases", []):
             leveraged.append((alias, multiple))
-print("Leveraged on sheet:", leveraged)
-
-
-# ── 公式 ──────────────────────────────────────────────────────────────────────
-def sumif_symbol(sym: str, col: str) -> str:
-    return f'=SUMIF({rng(SYM)},"{sym}",{rng(col)})'
-
-
-def shares_f(dr: int) -> str:
-    return f"=SUMIF({rng(SYM, True)},A{dr},{rng(SHR, True)})"
-
-
-def wac_f(dr: int) -> str:
-    return f"=IFERROR(SUMPRODUCT(({rng(SYM, True)}=A{dr})*{rng(SHR, True)}*{rng(COST, True)})/D{dr},0)"
-
-
-def cost_usd_f(dr: int, ccy: str) -> str:
-    sh, wac = f"D{dr}", f"E{dr}"
-    if ccy == "TWD":
-        return f'={sh}*{wac}/GOOGLEFINANCE("CURRENCY:USDTWD")'
-    if ccy == "EUR":
-        return f'={sh}*{wac}*GOOGLEFINANCE("CURRENCY:EURUSD")'
-    if ccy == "JPY":
-        return f'={sh}*{wac}/GOOGLEFINANCE("CURRENCY:USDJPY")'
-    return f"={sh}*{wac}"       # USD；其他幣別也照 USD 算並在備註點名
-
+print("Leveraged aliases (beta_policy):", leveraged)
 
 # ── 清掉上一版：值、條件格式、圖表（v4 沒清，會疊層）────────────────────────────
 cleanup: list[dict] = []
@@ -150,9 +96,9 @@ batches: list[dict] = []
 _r = [1]
 
 
-def add(cells: list, row: int | None = None) -> int:
+def add(cells: list, row: int | None = None, col: str = "A") -> int:
     r = row if row is not None else _r[0]
-    batches.append({"range": f"{DASHBOARD}!A{r}", "values": [cells]})
+    batches.append({"range": f"{DASHBOARD}!{col}{r}", "values": [cells]})
     if row is None:
         _r[0] += 1
     return r
@@ -176,7 +122,7 @@ add(["已投入（非現金，USD）", f'=SUMIF({rng(BKT)},"<>CASH",{rng(MKT)})'
 CASH_ROW = _r[0]
 add(["現金（USD 等值）", f'=SUMIF({rng(BKT)},"CASH",{rng(MKT)})'])
 TOTAL_COST_ROW = _r[0]
-add(["已投入的成本*（USD）", ""])
+add(["已投入的成本*（USD）", ""])          # 回填（要知道持股表的範圍）
 PNL_ROW = _r[0]
 add(["未實現損益（USD）", f"=B{INVESTED_ROW}-B{TOTAL_COST_ROW}"])
 RET_ROW = _r[0]
@@ -189,60 +135,76 @@ add(["ALLOCATION BY BUCKET"])
 ALLOC_COL_HDR = _r[0]
 add(["Bucket", "Market USD", "% of NAV（含現金）"])
 ALLOC_DATA_START = _r[0]
-for bkt in ["大盤", "CORE", "槓桿", "觀察", "CASH"]:
+for bkt in [*BUCKET_ORDER, "CASH"]:
     br = _r[0]
     add([bkt, f'=SUMIF({rng(BKT)},"{bkt}",{rng(MKT)})', f'=IF(B{NAV_ROW}=0,"",B{br}/B{NAV_ROW})'])
 ALLOC_DATA_END = _r[0] - 1
-# 槓桿 ETF：名目（投入的錢）與有效曝險（乘倍數）分兩行，不混。
-LEV_START = _r[0]
+LEV_END = ALLOC_DATA_END
 if leveraged:
     nominal = "+".join(f'SUMIF({rng(SYM)},"{sym}",{rng(MKT)})' for sym, _m in leveraged)
     effective = "+".join(f'SUMIF({rng(SYM)},"{sym}",{rng(MKT)})*{m:g}' for sym, m in leveraged)
-    labels = "、".join(f"{sym} ×{m:g}" for sym, m in leveraged)
+    labels = "、".join(leveraged_labels)
     lr = _r[0]
     add([f"槓桿 ETF 名目占 NAV（{labels}）", f"={nominal}", f'=IF(B{NAV_ROW}=0,"",B{lr}/B{NAV_ROW})'])
     lr = _r[0]
     add(["槓桿 ETF 有效曝險占 NAV（名目 × 倍數）", f"={effective}", f'=IF(B{NAV_ROW}=0,"",B{lr}/B{NAV_ROW})'])
-LEV_END = _r[0] - 1
+    LEV_END = _r[0] - 1
 CASH_START = _r[0]
 add(["現金 USD（原幣）", f'=SUMIF({rng(BKT)},"CASH",{rng(CASH_USD)})'])
 add(["現金 TWD（原幣）", f'=SUMIF({rng(BKT)},"CASH",{rng(CASH_TWD)})'])
 CASH_END = _r[0] - 1
 skip()
 
-# ── Holdings ──────────────────────────────────────────────────────────────────
+# ── Holdings（動態：標的清單與每一欄都是 ARRAYFORMULA；M:O 是隱藏的輔助欄）───────
 HOLDINGS_HDR = _r[0]
 add(["Symbol", "Company", "Bucket", "Shares", "Avg Cost", "Ccy", "Market USD", "Cost USD*", "P&L USD", "Return %", "% of NAV"])
-HOLDINGS_DATA_START = _r[0]
-for a in agg:
-    dr = _r[0]
-    add([
-        a["symbol"], a["company"], a["bucket"],
-        shares_f(dr), wac_f(dr), a["currency"],
-        sumif_symbol(a["symbol"], MKT),
-        cost_usd_f(dr, a["currency"]),
-        f"=G{dr}-H{dr}",
-        f'=IF(H{dr}=0,"",I{dr}/H{dr})',
-        f'=IF($B${NAV_ROW}=0,"",G{dr}/$B${NAV_ROW})',
-    ])
-HOLDINGS_DATA_END = _r[0] - 1
-skip()
-odd = sorted(a["symbol"] for a in agg if a["currency"] not in {"USD", "TWD", "EUR", "JPY"})
+S = _r[0]                              # 第一列資料
+E = S + HOLDINGS_CAPACITY - 1          # 容量的最後一列
+A, F = f"A{S}:A{E}", f"F{S}:F{E}"
+M, N_, O = f"M{S}:M{E}", f"N{S}:N{E}", f"O{S}:O{E}"
+order_list = ";".join(f'"{b}"' for b in BUCKET_ORDER)
+# 輔助欄：M＝不排序的標的清單（非現金、非空、非「—」）；N＝bucket 順序鍵；O＝市值（排序用）
+add([f'=IFERROR(UNIQUE(FILTER({rng(SYM)},{rng(BKT)}<>"CASH",{rng(SYM)}<>"",{rng(SYM)}<>"—")),"")'], row=S, col="M")
+add([f'=ARRAYFORMULA(IF({M}="","",IFERROR(MATCH(VLOOKUP({M},{{{rng(SYM)},{rng(BKT)}}},2,FALSE),{{{order_list}}},0),9)))'],
+    row=S, col="N")
+add([f'=ARRAYFORMULA(IF({M}="","",SUMIF({rng(SYM)},{M},{rng(MKT)})))'], row=S, col="O")
+# 主表：A 依 bucket 順序、再依市值由大到小
+add([f'=IFERROR(SORT(FILTER({M},{M}<>""),FILTER({N_},{M}<>""),TRUE,FILTER({O},{M}<>""),FALSE),"")'], row=S, col="A")
+add([f'=ARRAYFORMULA(IF({A}="","",IFERROR(VLOOKUP({A},{{{rng(SYM)},{rng(COMPANY)}}},2,FALSE),"")))'], row=S, col="B")
+add([f'=ARRAYFORMULA(IF({A}="","",IFERROR(VLOOKUP({A},{{{rng(SYM)},{rng(BKT)}}},2,FALSE),"")))'], row=S, col="C")
+add([f'=ARRAYFORMULA(IF({A}="","",SUMIF({rng(SYM)},{A},{rng(SHR)})))'], row=S, col="D")
+# 加權平均成本＝Σ(股數×成本)／Σ股數；Σ(股數×成本) 用 MMULT 對每個標的一次算完（SUMPRODUCT 不能逐列展開）
+weighted = (f"MMULT(({A}=TRANSPOSE({rng(SYM)}))*1,"
+            f"IF(ISNUMBER({rng(SHR)}),{rng(SHR)},0)*IF(ISNUMBER({rng(COST)}),{rng(COST)},0))")
+add([f'=ARRAYFORMULA(IF({A}="","",IFERROR({weighted}/D{S}:D{E},0)))'], row=S, col="E")
+add([f'=ARRAYFORMULA(IF({A}="","",IFERROR(VLOOKUP({A},{{{rng(SYM)},{rng(CUR)}}},2,FALSE),"")))'], row=S, col="F")
+add([f'=ARRAYFORMULA(IF({A}="","",SUMIF({rng(SYM)},{A},{rng(MKT)})))'], row=S, col="G")
+fx = (f'IF({F}="USD",1,IF({F}="TWD",1/GOOGLEFINANCE("CURRENCY:USDTWD"),'
+      f'IF({F}="EUR",GOOGLEFINANCE("CURRENCY:EURUSD"),IF({F}="JPY",1/GOOGLEFINANCE("CURRENCY:USDJPY"),1))))')
+add([f'=ARRAYFORMULA(IF({A}="","",D{S}:D{E}*E{S}:E{E}*{fx}))'], row=S, col="H")
+add([f'=ARRAYFORMULA(IF({A}="","",G{S}:G{E}-H{S}:H{E}))'], row=S, col="I")
+add([f'=ARRAYFORMULA(IF({A}="","",IF(H{S}:H{E}=0,"",I{S}:I{E}/H{S}:H{E})))'], row=S, col="J")
+add([f'=ARRAYFORMULA(IF({A}="","",IF($B${NAV_ROW}=0,"",G{S}:G{E}/$B${NAV_ROW})))'], row=S, col="K")
+_r[0] = E + 2
 NOTE_ROW = _r[0]
-add(["* 成本以當前即時匯率折算 USD（非購入時匯率）；市值由 Portfolio 的 GOOGLEFINANCE 公式即時取得，抓不到價的標的在 Portfolio 的 notes 欄會註明。",
-     ("⚠ 成本未換算幣別：" + "、".join(odd)) if odd else ""])
-# 回填成本加總
-batches.append({"range": f"{DASHBOARD}!B{TOTAL_COST_ROW}",
-                "values": [[f"=SUM(H{HOLDINGS_DATA_START}:H{HOLDINGS_DATA_END})"]]})
+add(["* 成本以當前即時匯率折算 USD（非購入時匯率）；市值由 Portfolio 的 GOOGLEFINANCE 公式即時取得，抓不到價的標的在 Portfolio 的 notes 欄會註明。"
+     f"　持股表最多 {HOLDINGS_CAPACITY} 檔，新標的會自動出現。",
+     f'=IFERROR("⚠ 成本未換算幣別："&TEXTJOIN("、",TRUE,FILTER({A},{A}<>"",NOT(REGEXMATCH({F},"^(USD|TWD|EUR|JPY)$")))),"")'])
+batches.append({"range": f"{DASHBOARD}!B{TOTAL_COST_ROW}", "values": [[f"=SUM(H{S}:H{E})"]]})
 
-#: 圓餅圖放在摘要右邊（E3 起，摘要與配置表只用到 A–C 欄），不用往下捲就看得到——沿用使用者原本手放的位置。
+#: 圓餅圖放在摘要右邊（E3 起，摘要與配置表只用到 A–C 欄），不用往下捲就看得到。
 PIE_ANCHOR_ROW, PIE_ANCHOR_COL = SUMMARY_HDR, 5
-NEEDED_ROWS = HOLDINGS_DATA_END + 6
-current_rows = int(dashboard["properties"].get("gridProperties", {}).get("rowCount") or 0)
-if current_rows < NEEDED_ROWS:
-    svc.spreadsheets().batchUpdate(spreadsheetId=SID, body={"requests": [{"appendDimension": {
-        "sheetId": dashboard_id, "dimension": "ROWS", "length": NEEDED_ROWS - current_rows}}]}).execute()
-    print(f"Rows {current_rows} → {NEEDED_ROWS}")
+NEEDED_ROWS, NEEDED_COLS = NOTE_ROW + 3, 15
+dims: list[dict] = []
+if int(grid.get("rowCount") or 0) < NEEDED_ROWS:
+    dims.append({"appendDimension": {"sheetId": dashboard_id, "dimension": "ROWS",
+                                     "length": NEEDED_ROWS - int(grid.get("rowCount") or 0)}})
+if int(grid.get("columnCount") or 0) < NEEDED_COLS:
+    dims.append({"appendDimension": {"sheetId": dashboard_id, "dimension": "COLUMNS",
+                                     "length": NEEDED_COLS - int(grid.get("columnCount") or 0)}})
+if dims:
+    svc.spreadsheets().batchUpdate(spreadsheetId=SID, body={"requests": dims}).execute()
+    print(f"Grid → rows ≥ {NEEDED_ROWS}, cols ≥ {NEEDED_COLS}")
 
 svc.spreadsheets().values().batchUpdate(
     spreadsheetId=SID, body={"valueInputOption": "USER_ENTERED", "data": batches}).execute()
@@ -280,26 +242,20 @@ rc(ALLOC_COL_HDR, 1, ALLOC_COL_HDR, 3, "backgroundColor,textFormat",
 rc(NAV_ROW, 1, NAV_ROW, 2, "textFormat", textFormat={"bold": True})
 rc(HOLDINGS_HDR, 1, HOLDINGS_HDR, 11, "backgroundColor,textFormat,horizontalAlignment",
    backgroundColor=rgb(55, 71, 79), textFormat={"bold": True, "foregroundColor": WHITE}, horizontalAlignment="CENTER")
-for idx in range(HOLDINGS_DATA_END - HOLDINGS_DATA_START + 1):
-    dr = HOLDINGS_DATA_START + idx
-    bg = rgb(245, 247, 250) if idx % 2 == 0 else WHITE
-    fmt.append({"repeatCell": {"range": cr(dr, 1, dr, 11), "cell": {"userEnteredFormat": {"backgroundColor": bg}},
-                               "fields": "userEnteredFormat.backgroundColor"}})
 rc(NOTE_ROW, 1, NOTE_ROW, 2, "textFormat", textFormat={"italic": True, "fontSize": 9})
 
-# 數字格式
+# 數字格式（持股表整個容量都套，列會自己長出來）
 rc(NAV_ROW, 2, TOTAL_COST_ROW, 2, "numberFormat", numberFormat={"type": "NUMBER", "pattern": '"$"#,##0'})
 rc(PNL_ROW, 2, PNL_ROW, 2, "numberFormat", numberFormat={"type": "NUMBER", "pattern": '"+$"#,##0;"-$"#,##0'})
 rc(RET_ROW, 2, RET_ROW, 2, "numberFormat", numberFormat={"type": "PERCENT", "pattern": "0.00%"})
-rc(ALLOC_DATA_START, 2, LEV_END if leveraged else ALLOC_DATA_END, 2, "numberFormat",
-   numberFormat={"type": "NUMBER", "pattern": '"$"#,##0'})
-rc(ALLOC_DATA_START, 3, LEV_END if leveraged else ALLOC_DATA_END, 3, "numberFormat",
-   numberFormat={"type": "PERCENT", "pattern": "0.0%"})
+rc(ALLOC_DATA_START, 2, LEV_END, 2, "numberFormat", numberFormat={"type": "NUMBER", "pattern": '"$"#,##0'})
+rc(ALLOC_DATA_START, 3, LEV_END, 3, "numberFormat", numberFormat={"type": "PERCENT", "pattern": "0.0%"})
 rc(CASH_START, 2, CASH_END, 2, "numberFormat", numberFormat={"type": "NUMBER", "pattern": "#,##0"})
-rc(HOLDINGS_DATA_START, 7, HOLDINGS_DATA_END, 9, "numberFormat", numberFormat={"type": "NUMBER", "pattern": '"$"#,##0.00'})
-rc(HOLDINGS_DATA_START, 10, HOLDINGS_DATA_END, 11, "numberFormat", numberFormat={"type": "PERCENT", "pattern": "0.00%"})
-rc(HOLDINGS_DATA_START, 4, HOLDINGS_DATA_END, 4, "numberFormat", numberFormat={"type": "NUMBER", "pattern": "#,##0"})
-rc(HOLDINGS_DATA_START, 5, HOLDINGS_DATA_END, 5, "numberFormat", numberFormat={"type": "NUMBER", "pattern": "#,##0.0000"})
+rc(S, 4, E, 4, "numberFormat", numberFormat={"type": "NUMBER", "pattern": "#,##0"})
+rc(S, 5, E, 5, "numberFormat", numberFormat={"type": "NUMBER", "pattern": "#,##0.0000"})
+rc(S, 7, E, 9, "numberFormat", numberFormat={"type": "NUMBER", "pattern": '"$"#,##0.00'})
+rc(S, 10, E, 11, "numberFormat", numberFormat={"type": "PERCENT", "pattern": "0.00%"})
+rc(S, 15, E, 15, "numberFormat", numberFormat={"type": "NUMBER", "pattern": '"$"#,##0'})
 
 
 def cw(c1: int, c2: int, px: int) -> None:
@@ -311,18 +267,27 @@ def cw(c1: int, c2: int, px: int) -> None:
 cw(1, 1, 150); cw(2, 2, 215); cw(3, 3, 110); cw(4, 4, 80)
 cw(5, 5, 100); cw(6, 6, 45); cw(7, 8, 120); cw(9, 9, 110)
 cw(10, 10, 80); cw(11, 11, 80)
+# 輔助欄 M:O 隱藏（值仍在，公式讀得到）
+fmt.append({"updateDimensionProperties": {
+    "range": {"sheetId": dashboard_id, "dimension": "COLUMNS", "startIndex": 12, "endIndex": 15},
+    "properties": {"hiddenByUser": True}, "fields": "hiddenByUser"}})
 
-# 條件格式：P&L（I）與 Return %（J）正綠負紅——重建前已清掉舊規則，所以只會有這四條
-pnl_rng = [cr(HOLDINGS_DATA_START, 9, HOLDINGS_DATA_END, 9)]
-ret_rng = [cr(HOLDINGS_DATA_START, 10, HOLDINGS_DATA_END, 10)]
-for index, (ranges, kind, style) in enumerate([
-    (pnl_rng, "NUMBER_GREATER", {"backgroundColor": rgb(232, 245, 233), "textFormat": {"foregroundColor": rgb(27, 136, 70), "bold": True}}),
-    (pnl_rng, "NUMBER_LESS", {"backgroundColor": rgb(255, 235, 238), "textFormat": {"foregroundColor": rgb(183, 28, 28), "bold": True}}),
-    (ret_rng, "NUMBER_GREATER", {"textFormat": {"foregroundColor": rgb(27, 136, 70), "bold": True}}),
-    (ret_rng, "NUMBER_LESS", {"textFormat": {"foregroundColor": rgb(183, 28, 28), "bold": True}}),
-]):
-    fmt.append({"addConditionalFormatRule": {"rule": {"ranges": ranges, "booleanRule": {
-        "condition": {"type": kind, "values": [{"userEnteredValue": "0"}]}, "format": style}}, "index": index}})
+# 條件格式：斑馬紋（只套有標的的列）、P&L（I）與 Return %（J）正綠負紅——重建前已清掉舊規則
+rules: list[tuple[list[dict], dict, dict]] = [
+    ([cr(S, 1, E, 11)], {"type": "CUSTOM_FORMULA", "values": [{"userEnteredValue": f'=AND($A{S}<>"",ISEVEN(ROW()))'}]},
+     {"backgroundColor": rgb(245, 247, 250)}),
+    ([cr(S, 9, E, 9)], {"type": "NUMBER_GREATER", "values": [{"userEnteredValue": "0"}]},
+     {"backgroundColor": rgb(232, 245, 233), "textFormat": {"foregroundColor": rgb(27, 136, 70), "bold": True}}),
+    ([cr(S, 9, E, 9)], {"type": "NUMBER_LESS", "values": [{"userEnteredValue": "0"}]},
+     {"backgroundColor": rgb(255, 235, 238), "textFormat": {"foregroundColor": rgb(183, 28, 28), "bold": True}}),
+    ([cr(S, 10, E, 10)], {"type": "NUMBER_GREATER", "values": [{"userEnteredValue": "0"}]},
+     {"textFormat": {"foregroundColor": rgb(27, 136, 70), "bold": True}}),
+    ([cr(S, 10, E, 10)], {"type": "NUMBER_LESS", "values": [{"userEnteredValue": "0"}]},
+     {"textFormat": {"foregroundColor": rgb(183, 28, 28), "bold": True}}),
+]
+for index, (ranges, condition, style) in enumerate(rules):
+    fmt.append({"addConditionalFormatRule": {"rule": {"ranges": ranges, "booleanRule": {"condition": condition, "format": style}},
+                                             "index": index}})
 
 # 圓餅圖：五個 bucket（含 CASH）占 NAV
 fmt.append({"addChart": {"chart": {
@@ -342,5 +307,5 @@ fmt.append({"updateSheetProperties": {"properties": {"sheetId": dashboard_id, "g
 
 svc.spreadsheets().batchUpdate(spreadsheetId=SID, body={"requests": fmt}).execute()
 print(f"Done ✓  Summary {SUMMARY_HDR}–{RET_ROW}, allocation {ALLOC_DATA_START}–{CASH_END}, "
-      f"holdings {HOLDINGS_DATA_START}–{HOLDINGS_DATA_END}, pie at E{PIE_ANCHOR_ROW}")
-print("Shares／WAC／market 是對 Portfolio 的即時公式；只有新增或移除一檔時才需要重跑本腳本。")
+      f"holdings {S}–{E}（動態，容量 {HOLDINGS_CAPACITY}）, note {NOTE_ROW}, pie at E{PIE_ANCHOR_ROW}")
+print("持股表由公式自己列標的：Portfolio 新增／移除一檔不用重跑本腳本；只有版面或公式要改才跑。")

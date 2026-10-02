@@ -811,12 +811,14 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 2026-09-16 D14 再確認：**Sheet 是部位真相**（含貸款額度、投入標的與現金），Decision Store 只留可選 receipt；
 alpha 原則上不用貸款資金是使用者自己的紀律，本腳本**不加 gate**。
 
-### Google Sheet 的 Dashboard 分頁（2026-10-02 v5）
+### Google Sheet 的 Dashboard 分頁（2026-10-02 v6）
 
-- Dashboard 的股數／均價／市值都是對 Portfolio 的即時公式；**標的清單是建表時寫死的**，所以 Portfolio **新增或移除一檔**之後要重跑一次：
+- Dashboard 整頁都是對 Portfolio 的即時公式——**持股表的標的清單也是**（`UNIQUE(FILTER(...))`，隱藏的 M:O 是輔助欄，容量 57 檔），
+  所以 Portfolio **新增或移除一檔不用做任何事**；只有**版面或公式要改**才重跑：
   `& '.venv\Scripts\python.exe' fetchers\build_dashboard.py`（讀 `.env` 的 service account、寫入 scope；**互動專用**，不進任何無人值守步驟）。
 - 它會整頁清掉重建——值、條件格式、圖表都重來（v4 每跑一次疊一層，2026-10-02 實測疊到 20 條條件格式）；分母是**含現金的 NAV**
-  （AGENTS：`bucket=CASH` 計入 NAV 不計曝險；v4 的「% of Total」五格加起來 107%）；槓桿 ETF 印名目與有效曝險兩行（倍數讀 `config/beta_policy.json`）。
+  （AGENTS：`bucket=CASH` 計入 NAV 不計曝險；v4 的「% of Total」五格加起來 107%）；槓桿 ETF 印名目與有效曝險兩行
+  （倍數讀 `config/beta_policy.json`，列舉全部倍數 > 1 的代號，Sheet 上沒有的算 0）。
 - 2026-10-02 整理紀錄：Portfolio 補回 COHR 列（IB 觀察 10 股 @316.23，2026-08-18 成交、Sheet 漏列）；`DRAM` 改寫成 `BATS:DRAM`
   （GOOGLEFINANCE 的「DRAM」是 Defiance Memory UCITS，市值少算約 $3,300），`config/beta_policy.json` 的 `sheet_aliases` 同步加 `BATS:DRAM`。
   COHR 與 FRA:2DG 都還沒有 trade_log 事件——Phase 5 Step 5.3 的 `--backfill-before-receipts` 做好後，由使用者照 Sheet 回填。
