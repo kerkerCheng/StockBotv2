@@ -29,7 +29,7 @@
 | 1 等待與心跳 | [2026-09-24-001](2026-09-24-001-feat-phase1-waiting-heartbeat-plan.md) | completed（2026-09-25；closeout `docs/reports/2026-09-25-phase1-closeout.md`；R2 GO） |
 | 2 讀圖兩種單位加走圖 | [2026-09-25-001](2026-09-25-001-feat-phase2-reading-units-graph-walk-plan.md) | completed（2026-09-26；closeout `docs/reports/2026-09-26-phase2-closeout.md`；R2 GO） |
 | 3 候選狀態加三題 | [2026-09-26-001](2026-09-26-001-feat-phase3-candidate-states-three-questions-plan.md) | completed（2026-09-30；closeout `docs/reports/2026-09-30-phase3-closeout.md`；R2 GO） |
-| 4 層中心來源 | [2026-10-01-001](2026-10-01-001-feat-phase4-layer-centric-sources-plan.md) | active（2026-10-01；12 題定案＋反方驗證後 8 處改定案見 §0.1；執行者全程強模型） |
+| 4 層中心來源 | [2026-10-01-001](2026-10-01-001-feat-phase4-layer-centric-sources-plan.md) | completed（2026-10-02；closeout `docs/reports/2026-10-02-phase4-closeout.md`；R2 兩輪條件修正後 GO；pq2 [666] 待使用者決定） |
 | 5 量測 | 尚無 | — |
 
 ---
@@ -60,4 +60,4 @@
 | [Phase 3 候選狀態加三題 (2026-09-26)](2026-09-26-001-feat-phase3-candidate-states-three-questions-plan.md) | 短評 v2（七格改題、`rides[]`／`disproof[]` 自動登記／`answers`／`candidate_state` 與「可開」前提驗證）；三題稽核區（Engine C 機械歷史回填、EV/S 或 P/S 自家三年百分位、主題等權組、going concern 結構化欄位）；候選狀態板 `candidates` kind 與心跳計數；個股頁首屏／稽核區／readiness 核心換；`record_trade.py` 收據；強模型寫四份 v2 敘事；驗收＝敘事 ledger、watch 連結、三題每檔有值或缺席 kind、收據 | completed（2026-09-30；closeout `docs/reports/2026-09-30-phase3-closeout.md`；R2 GO） |
 | [Phase 4 層中心來源 (2026-10-01)](2026-10-01-001-feat-phase4-layer-centric-sources-plan.md) | 名冊補齊與 origin 解析唯一 owner（`display_name` 100/100、`name_aliases`／`execution_symbol`、`publishers.json`、客戶高管具名併 `self_reported`）；packet `layer_enumerations[]`＋`source_type` 字彙＋apply 入口＋SourceDoc section／title 寫回抽取 JSON；sub 字表與 `sub_language_in_quote`、驗收①②③的常駐計數器；走圖第 2 型以讀圖為記憶、lead 只在互動研究啟動時鑄；三個 skill 改寫與 `layer_document` route；稀釋燈改讀新股發行金額＋Engine C CHECK 遷移；四個小修；強模型研究（inp_substrate 資料工、cw_dfb 層文件、AMAT／COHR 兩筆到終局）；驗收＝圖（供給側分布與 evidence class、sub 旗標、origin 解析、section 一致）、走圖、lead registry、RA 紀錄、稽核區稀釋燈 | active（2026-10-01；反方驗證 workflow 跑了 6 位反方、覆核由作者自做；三處 R2 常規 opt-in） |
 
-**目前 active plan：Phase 4（`2026-10-01-001`）——貼 `/phase-run`（執行者全程強模型，使用者 2026-10-01 定案）。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active plan：Phase 4 已結案（2026-10-02），Phase 5 還沒有 plan——切 fable 貼 `/phase-plan`。** 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。

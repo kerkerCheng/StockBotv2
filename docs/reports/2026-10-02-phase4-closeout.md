@@ -176,4 +176,6 @@
 
 執行者對照 `audit/checks.py`（`dispatch_status in {queued, researching}`／`awaiting_approval` 才檢查）確認 C3-a' 後，逐字替換 9 處（替換腳本要求每個舊字串恰好出現一次，否則整批不寫）。
 
-**覆核二**（只核覆核一的三條逐字替換）：見下一次 commit。
+**覆核二**（另一位乾淨 context 的唯讀審查者，只核 `git diff 268e7fe b3aaa58` 的三條逐字替換與其依據）：**GO，blocking 0**。C1'（第 52、57 行與 plan §11:425、baseline §21:319 一致）、C3-a'（`check_queue_liveness` 只對 `dispatch_status` 為 queued／researching／awaiting_approval 的項目檢查；todo_pool 的 [666] 沒有這個欄位；`engine_b/todo.py::actionable_items` 與心跳確實每天逐筆列出它）、C3-b'（8＋5＋3＝16）逐條 ✅；全檔殘留的舊數字只出現在更正紀錄的引用裡；§6 #2／#27／#28／#30 引用都指得到；結束時 `git status --short` 與開始相同。
+
+**結論：結案 R2 經兩輪條件修正後 GO**（第一輪 CONDITIONAL_GO → 覆核一 CONDITIONAL_GO → 覆核二 GO；所有條件都只改文件，沒有任何程式或 authority 在 R2 之後變動）。

@@ -1,7 +1,7 @@
 ---
 date: 2026-10-01
 topic: phase4-layer-centric-sources
-status: active
+status: completed
 derived_from: docs/ROADMAP.md（Phase 4 列＋旁支「Phase 4 plan 的使用者定案輸入」「本機 Research Action apply 入口」「重載會洗掉 SourceDoc 的分段標籤與標題」）、docs/brainstorms/2026-09-22-graph-first-direction-decision.md（G4；§1.1、§5 Fisher scuttlebutt、§6.1）、docs/reports/2026-09-30-phase3-closeout.md §5、docs/reports/2026-09-26-phase2-closeout.md §5、docs/plans/2026-09-26-001-feat-phase3-candidate-states-three-questions-plan.md §14
 plan_review: 反方驗證已做（2026-10-01，使用者對 12 題定案後以 workflow 跑：4 位反方各帶一個子系統切片帶程式碼推翻 3 題＋2 個橫切視角〔authority／Goodhart、過度工程〕，共 12 條 amend、0 條 wrong、12 條 blocking finding；覆核由 plan 作者逐條對照程式碼做〔第二層 25 位覆核者與補漏者撞額度未跑〕）；處置見 §0.7，改變原定案的 8 處由使用者 2026-10-01 確認（§0.1 第二張表）
 ---
@@ -198,7 +198,7 @@ Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Ste
 | 4.7 | 四個小修：240 條退役不印；`ignored` 接 held_index／心跳；百分位覆蓋率；同敘事重複反證拒收（偏差見 §0.6 #15；驗收見 baseline 報告 §23） | ✅ | 執行模型 | 見 git log「Step 4.7」 |
 | 4.8 | 研究（強模型）：inp_substrate 資料工後重量；cw_dfb 層文件與誠實終局；AMAT／COHR 兩筆 lead 到終局（RA）；stale 讀圖與 SIVE.ST 敘事處置——**四件掛 pq2 等 go：[664]／[665]／[666]／[668]**；讀圖與敘事已寫入（收據 `docs/reports/2026-10-01-phase4-step48-research.md`；偏差見 §0.6 #16） | ✅ | **強模型** | 見 git log「Step 4.8」 |
 | 4.9 | 新管線 full chain 測試（層文件 packet → apply 入口 → 計數器動；`tests/test_layer_document_full_chain.py` 4 條） | ✅ | 執行模型 | 見 git log「Step 4.9」 |
-| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅——使用者 2026-10-02「664 665 666 668 663 go」：[663]／[664]／[665]／[668] 入圖完成，計數器照預期（① 75→73、② 5→6、第 2 型命中 2→0）；**[666] 被 Neo4j 權限擋下（`origin_linkage` 屬性名沒有 token），圖未動、等使用者決定**（偏差 #17、§14 #26）；closeout `docs/reports/2026-10-02-phase4-closeout.md`；結案 R2：CONDITIONAL_GO（blocking 0；C1–C3 只改文件，已修；non-blocking 登記 §14 #29–#34）→ 條件修正後覆核 | ○ | 執行模型 | `081f8c6`、`abb0105`＋closeout（見 git log「Phase 4 結案」） |
+| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅——使用者 2026-10-02「664 665 666 668 663 go」：[663]／[664]／[665]／[668] 入圖完成，計數器照預期（① 75→73、② 5→6、第 2 型命中 2→0）；**[666] 被 Neo4j 權限擋下（`origin_linkage` 屬性名沒有 token），圖未動、等使用者決定**（偏差 #17、§14 #26）；closeout `docs/reports/2026-10-02-phase4-closeout.md`；結案 R2：CONDITIONAL_GO（blocking 0；C1–C3 只改文件，已修；non-blocking 登記 §14 #29–#34）→ 覆核一 CONDITIONAL_GO（C1'／C3-a'／C3-b' 逐字替換）→ 覆核二 GO；驗收 ①（A1）75→73、②（A2）5→6 成立，③（A3）未量到（③a 102／113 只印、③b 0／0 無母體） | ✅ | 執行模型 | `081f8c6`、`abb0105`、`f92846f`、`268e7fe`、`b3aaa58`＋R2 GO 後 commit |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 
