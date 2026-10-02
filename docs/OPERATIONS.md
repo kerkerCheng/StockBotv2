@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.5：計分表接主題等權組基準＋APP 計分表頁）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的 `python -m webapp materialize --scorecard` **讀取變多、寫入不變**：多讀主題等權組 ledger `library/private/alpha/theme_cohorts/*.jsonl`（本機、唯讀；「哪一組是基準」與追蹤表同一支 `alpha.theme_cohort.measurement_cohort`）。**網路**：yfinance 多抓「組成員中原本不在取價清單的」那幾檔（2026-10-02：42 → 49 檔，多 7 檔），**同一組主機、無新憑證**；仍受程式裡的上限 `MAX_PRICED_SYMBOLS`（200）約束，截斷順序是基準 → 點名標的 → 成員（基準永遠留著、成員先被截），截掉的印在 artifact 的 `price_budget.truncated` 與 `theme_cohort.missing`。取價改為跳過 NaN 收盤（§0.6 #3）。**寫入**：仍只寫 ignored derived cache `account_scorecard.json`（schema `/2`）。**APP**：多一個 GET `/api/v1/account-scorecard`，只讀這份 artifact、照抄，不重算、不抓價、不寫任何東西。心跳段 5 讀同一份 artifact，多印一格「主題等權組基準：有／無」，零網路 |
+| **2 canonical skill／prompt／本檔** | 本節；plan §6；`docs/ARCHITECTURE.md` 心跳段 5 那一段（四個已知偏差、第三個基準、APP 頁）。`skills/daily-brief` 的畫面表不變：它照抄心跳段 5，那一格已在心跳裡 |
+| **3 最窄 rule** | daily ⑬ 的 argv **不變**（`tests/test_daily_task.py` 逐項相等照過）；不新增 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條。APP 多一個**只讀**路由（仍只綁 127.0.0.1、仍在 Cloudflare Access 後面、沒有寫入端點）：請求路徑的四種證明改走同一份 `STATE_ROUTES`，另有一條測試守「路由表＝`/meta` 的 endpoints＝四種證明走的清單」——順手補上一直沒被證明過的 `/structure-readings` 與 `/meta` 漏列的 `/candidates` |
+| **4 contract test** | `tests/test_account_scorecard.py`（對組的超額＝手算、本檔被排除、組缺席三種 kind 不是 0、成員取不到價有自己的 reason、成員併進取價清單且 `requested` 增量＝新增檔數、截斷先截成員不擠掉基準與點名、多組不猜、freshness 跟組不跟價、render 與心跳那一格、NaN 收盤被跳過端點退回前一根、第四條已知偏差）；`tests/test_webapp_request_path.py`（`STATE_ROUTES`＋守門測試）；`tests/test_heartbeat.py` |
+| **5 端到端 smoke** | 見 baseline §18：同一份真實價格上改前（master）與改後逐格比對 16／16 相同；重放 10-01 的 NaN 收盤 7／10 格被污染、改後＝乾淨價格；真實 `materialize --scorecard`；心跳段 5 逐行對照只多那一格；headless Edge 在臨時實例渲染 `#/account-scorecard` |
+
 ### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.4：圖預測對錯表）
 
 | 步 | 結論 |

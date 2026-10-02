@@ -127,7 +127,7 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 5.2 | 量測層三條 lane＋主題等權組籃子基準（`collect()` 重建、positions artifact v2、心跳段 4、APP positions 頁；sandbox impact review；偏差見 §0.6 #10–#15） | ✅ | 執行模型 | 見 git log「Step 5.2」 |
 | 5.3 | `record_trade.py --backfill-before-receipts`（R2-a：CONDITIONAL_GO → 條件修正 → 窄範圍覆核 GO；偏差見 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 5.3」 |
 | 5.4 | 圖預測對錯表（純函式＋`structure_readings` artifact v2＋讀圖頁＋心跳段 4 一行；真實資料＝baseline §5.2 手算逐筆相同，見 baseline §17；偏差見 §0.6 #18–#22） | ✅ | 執行模型 | 見 git log「Step 5.4」 |
-| 5.5 | 計分表接主題等權組基準 | ○ | 執行模型 | |
+| 5.5 | 計分表接主題等權組基準（第三個基準＋NaN 收盤＋APP 計分表頁；真實資料見 baseline §18；偏差見 §0.6 #23–#27） | ✅ | 執行模型 | 見 git log「Step 5.5」 |
 | 5.6 | 候選狀態每日序列 | ○ | 執行模型 | |
 | 5.7 | 新管線 full chain 測試（夾具版） | ○ | 執行模型 | |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ ＋ 回查 watch | ○ | 執行模型 | |
@@ -166,6 +166,11 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 20 | 5.4 | （未提） | as-of 視角（`materialize --structure-readings --as-of`）的預測段明確回缺席 `point_in_time_unavailable` | ledger 與 watch 都只有「現在」的一份；拿現在冒充 T 是前視（INV-6） |
 | 21 | 5.4 | §5 心跳行 `圖預測：對 N｜錯 M（…）｜現行 K｜到期未重讀 J｜改寫 R｜非斷言 Z` | 行尾多「｜現行最早到期 <日期>」（今天 2026-12-24） | 結案登記的回查 date watch 用這一天；讓它每天自己出現，不必有人記得去查（L14） |
 | 22 | 5.4 | §5「沒有新來源或都沒日期 → `undated`」 | `published_at` 只有年月（`YYYY-MM`）時取那個月的第一天到最後一天：整個月都早於讀圖日＝`already_available`、整個月都不早於＝`emerged_later`，**跨過讀圖那一天＝`undated`** | 年月精度的文件在 SourceDoc 裡存在；壓成月初會把「同月稍後才出現」判成「當時已有」——不猜 |
+| 23 | 5.5 | §6「改哪裡：APP 計分表頁」（當成既有頁） | APP **從來沒有**計分表頁（心跳段 5 自 Phase 1 起印「完整表在 APP 帳號計分表頁」，那一句一直不成立）。新做最小的一頁：唯讀 GET `/api/v1/account-scorecard`＋`#/account-scorecard`＋導覽列。請求路徑的四種證明改走同一份 `STATE_ROUTES`，加一條守門測試（路由表＝`/meta`＝證明清單），順手補上 `/structure-readings`（Phase 1 加的路由，四種證明一直沒走過它）與 `/meta` 漏列的 `/candidates` | 不做這一頁，「render 與 APP 各印」的 APP 那一半無處可印，而心跳那句話繼續說謊；手寫的四份清單已經漏過一次，L17 當下修（不動 contract） |
+| 24 | 5.5 | （未提） | 「現行組是哪一組」（0 組 `not_yet_recorded`、多組 `ambiguous_cohort`）從追蹤表腳本的 `_theme_cohort_info` 搬到 `alpha.theme_cohort.measurement_cohort`，腳本只轉呼叫；組讀不到＝`upstream_unavailable` | 計分表也要回答「哪一組是基準」；兩邊各寫一份就是兩個答案（§12 #4） |
+| 25 | 5.5 | §6「成員 ticker 併進 `wanted`（仍受 `MAX_PRICED_SYMBOLS`，被截的印出）」 | 截斷順序定為基準 → 點名標的 → 成員；`price_budget` 多 `theme_cohort_added`（為組多抓的那幾檔） | 多一個基準不得把既有的點名擠出取價清單（既有五欄同一份價格上逐位不變）；「`requested` 增量＝新增檔數」要能機械核對 |
+| 26 | 5.5 | §6 心跳「籃子基準：有／無」；schema 未提；`freshness_identity`「加籃子格有沒有值」 | 心跳那一格叫「主題等權組基準：有／無（kind）」，artifact 早於 5.5 時印「計分表 artifact 早於這一格」；schema `account_scorecard/2`；`freshness_identity` 多 `[cohort_id, 缺席 kind]`（格有沒有值本來就在每個帳號的 key 清單裡） | §0 第 9 條命名規則（殭屍 grep）；舊 artifact 沒有這一段與「無」是兩種沒有（L12）；換一組是認知變化 |
+| 27 | 5.5 | §6 驗收「同一份價格上…污染的格逐格列出改前改後」 | 今天抓到的價格**沒有** NaN（16／16 格逐位相同、污染 0 格），所以另以同一份價格重放 10-01 的形狀（五檔歐股 10-01 收盤換成 NaN）逐格比對：改前 7／10 格被污染，改後的值＝乾淨價格的值 | 污染不只讓那一格變 NaN：中位數排序被 NaN 打亂，**看起來正常的格也被靜默算錯**（「30 天 vs QQQ」乾淨 −0.63%、重放污染 −34.27%；早上 daily 那份 artifact 印的是 −43.57%）。逐格見 baseline §18 |
 
 ---
 
@@ -289,7 +294,7 @@ L11-6 ④：最先壞的是 inp 鏈 `sr_88340b81…`、`sr_6ad5c884…`、`sr_ad
 
 ## 6. Step 5.5 計分表接主題等權組基準（Z1，R1）
 
-**改哪裡：** `engine_b/account_scorecard.py`（`score_account`、`build_scorecard`、`render`）、APP 計分表頁、`tests/test_account_scorecard.py`、`crons/heartbeat.py` 段 5（只加「籃子基準：有／無」一格，不印數字）。
+**改哪裡：** `engine_b/account_scorecard.py`（`score_account`、`build_scorecard`、`render`）、APP 計分表頁、`tests/test_account_scorecard.py`、`crons/heartbeat.py` 段 5（只加「主題等權組基準：有／無」一格，不印數字；§0.6 #26）；APP 計分表頁是本 Step **新做**的（§0.6 #23）。
 **怎麼改：** 先修取價：`_yfinance_closes` 跳過 NaN 收盤（§0.6 #3；今天「點名後 90 天 vs SOXX」＝NaN）。讀現行主題等權組（0 組 → 每個籃子格 `not_yet_recorded`）；成員 ticker 併進 `wanted`（仍受 `MAX_PRICED_SYMBOLS`，被截的印出）；對每則點名、每個 horizon 算 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 成員（排除本檔）等權報酬；`metrics` 多這幾格（`Metric`，缺席同既有 `insufficient_sample`／`revisit_after` 規則）；payload 多 `theme_cohort: {cohort_id, decided_on, members_total, members_priced, missing[]}`；`KNOWN_BIASES` 加一條「籃子成分是 2026-09-30 定的、對更早的點名是回溯」；`render` 與 APP 各印；`freshness_identity` 加籃子格有沒有值。
 **怎麼驗：** 注入 loader 的夾具：兩個成員＋一檔點名 → 籃子超額等於手算；本檔是成員時被排除；組缺席 → `not_yet_recorded`；真實資料：`price_budget.requested` 增加的數＝成員中原本不在取價清單的檔數（`wanted` 是集合、會去重）；同一份價格上五欄既有值除被 NaN 污染的格以外逐位不變，污染的格逐格列出改前改後（§0.6 #3）；變異：拿掉 NaN 過濾 → 夾具（一檔終點是 NaN 收盤）紅。
 L11-6 ④：最先壞的是 `price_budget` 截斷邏輯（基準永遠留著的那段）——籃子成員不是基準、可被截，截掉就整格缺席並印出，不得讓基準被擠掉。
@@ -398,3 +403,4 @@ R2 回 GO 後：ROADMAP Phase 5 標 ✅、`docs/plans/README.md` 對照表本列
 12. （5.2 發現）在台北白天互動跑追蹤表，歐洲與台股會取到**盤中尚未收盤**的當日 K 棒（yfinance 會回進行中的值）；daily 05:30 各市場都已收盤所以不受影響。要不要在取價端排除當日未收盤的 bar（history 的 `_provider_series` 與新 lane 的 `_provider_close_series` 都是）。
 13. （5.3 R2-a NB7）在既有 `--log-only` 語意下，有兩種舊成交回填不了：全數出清的賣出（持股會變負數而中止），以及 Sheet 已刪掉那一列的成交（定位不到；提示指向 `--open-position`，但它不能配 `--log-only`）。COHR、FRA:2DG 都還持有，今天不受影響（L17：等有資料）。
 14. （5.3 R2-a）使用者本機、gitignored 的 `.claude/settings.local.json` 有 `Bash(python *)`。互動 session 因此不經提示就能跑任何 `scripts/*.py`，包括會寫 trade_log（`--apply` 時還寫 Sheet）的 `record_trade.py`。這條權限早於 Phase 5，本 Phase 不動權限檔；要不要收窄由使用者決定。
+15. （5.5 發現）計分表過去的數字可能被 NaN 收盤靜默算錯：daily 2026-10-02 那份 artifact 的「30 天 vs QQQ」印 −43.57%，同一份價格重放的乾淨值是 −0.63%（baseline §18）。5.5 起取價跳過 NaN；之前存下的計分表 artifact 沒有歷史版本，它的數字不得拿來當「帳號表現」的證據——tier 升降（一季一次的 pq2）若曾引用過，要重看。
