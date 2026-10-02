@@ -639,13 +639,71 @@ def test_backfill_refusals_write_nothing(no_judgment_reads, monkeypatch, capsys,
     assert sheet_reads == [] and not env["module"].TRADE_LOG.exists() and env["judgment_reads"] == []
 
 
-def test_backfill_still_obeys_the_five_percent_cap(no_judgment_reads) -> None:
-    """第八種：硬擋照擋——回填不是放行硬擋的路（要放行仍是 --override --reason）。"""
+def test_backfill_still_obeys_the_five_percent_cap(no_judgment_reads, capsys) -> None:
+    """第八種：硬擋照擋——回填不是放行硬擋的路（要放行仍是 --override --reason）。
+
+    ⚠ R2-a C2：夾具的持股市值合計必須等於 NAV（CASH 同步扣），否則擋下它的是「市值合計≠NAV（量不到）」而不是 5%——
+    把上限放寬到 99% 這條照綠（成功與失敗同形，L13）。所以斷言擋下的**理由**是單筆上限。"""
     env = no_judgment_reads
-    env["rows"] = _sheet_rows(**{"FRA:2DG": 6_000.0})                       # 已占 NAV 6%，超過 5%
+    env["rows"] = _sheet_rows(**{"FRA:2DG": 6_000.0, "CASH": 73_500.0})    # 已占 NAV 6%，超過 5%；合計仍＝NAV
+    assert sum(r["market_value_base"] for r in env["rows"]) == 100_000.0
     assert env["module"].main(_old_trade("FRA:2DG", "buy", "--why", "x", "--log-only",
                                          "--backfill-before-receipts", BACKFILL_REASON)) == env["module"].EXIT_HARD_CAP
+    out = capsys.readouterr()
+    assert "超過單筆上限" in out.out + out.err, out
+    assert "量不到" not in out.out + out.err, out
     assert not env["module"].TRADE_LOG.exists()
+
+
+def test_backfill_refuses_when_the_schedule_timezone_is_unreadable(no_judgment_reads, monkeypatch, capsys) -> None:
+    """R2-a NB4：日期閘門讀不到排程時區就拒收（碰 Sheet 之前）——不靜默退回本機時區。"""
+    import engine_b.event_watch as ew
+    from fetchers import gsheets
+
+    env = no_judgment_reads
+    sheet_reads: list[str] = []
+    monkeypatch.setattr(gsheets, "read_portfolio_values", lambda *a, **k: sheet_reads.append("read") or [["symbol"]])
+
+    def broken():
+        raise OSError("schedule config unreadable")
+
+    monkeypatch.setattr(ew, "_local_timezone", broken)
+    assert env["module"].main(_old_trade("FRA:2DG", "buy", "--why", "x", "--log-only",
+                                         "--backfill-before-receipts", BACKFILL_REASON)) == 2
+    err = capsys.readouterr().err
+    assert "排程時區讀不到" in err and "不退回本機時區" in err, err
+    assert sheet_reads == [] and not env["module"].TRADE_LOG.exists()
+
+
+def test_backfill_fails_closed_when_the_registry_is_unreadable(no_judgment_reads, monkeypatch, capsys) -> None:
+    """R2-a NB3：名冊讀不到 → exit 2、什麼都不寫。吞成 `company_id: None` 的話，「讀不到」與「名冊沒有這家」
+    在 append-only 的收據裡同形（L12）。對照：名冊讀得到、只是沒有這家 → 照實記 None（下一條）。"""
+    import identity.registry as registry_mod
+
+    env = no_judgment_reads
+
+    def broken():
+        raise OSError("company_identity.json unreadable")
+
+    monkeypatch.setattr(registry_mod, "get_registry", broken)
+    assert env["module"].main(_old_trade("FRA:2DG", "buy", "--why", "x", "--log-only",
+                                         "--backfill-before-receipts", BACKFILL_REASON)) == 2
+    err = capsys.readouterr().err
+    assert "名冊讀不到" in err, err
+    assert not env["module"].TRADE_LOG.exists() and env["writes"] == []
+
+
+def test_backfill_records_none_when_the_registry_simply_lacks_the_company(no_judgment_reads) -> None:
+    """名冊讀得到、只是沒有這家：照實記 `company_id: None`（不猜）——與「讀不到」分開（上一條）。"""
+    env = no_judgment_reads
+    env["rows"] = [*_sheet_rows()[:-1],
+                   {"ticker": "ZZZZ", "bucket": "觀察", "market_value_base": 1_000.0, "nav_base": 100_000.0,
+                    "base_currency": "USD", "currency": "USD", "shares": 10.0},
+                   {**_sheet_rows()[-1], "market_value_base": 77_500.0}]
+    assert env["module"].main(_old_trade("ZZZZ", "buy", "--why", "x", "--log-only",
+                                         "--backfill-before-receipts", BACKFILL_REASON)) == 0
+    receipt = _entry(env)["research_receipt"]
+    assert receipt["narrative"] == "backfilled" and receipt["company_id"] is None
 
 
 def test_backfilled_sell_needs_no_disproof_watch(no_judgment_reads) -> None:

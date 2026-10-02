@@ -159,6 +159,8 @@ derived_from: docs/ROADMAP.md（Phase 5 列＋2026-10-02 amendment A1「不做�
 | 13 | 5.2 | 「幣別必須等於成交幣別」 | live 列的 provider 報價單位取 yfinance `history_metadata.currency`（2DG.F→EUR）；paper 列沿用名冊的報價單位 | 名冊只知道研究 ticker 的報價單位（SIVE.ST＝SEK），不知道成交所的（FRA:2DG＝EUR）——拿名冊比會把正確的成交判成幣別不一致 |
 | 14 | 5.2 | paper「錨＝那天收盤」 | 照做，並把偏差寫進 paper 的 `known_biases`：美股與歐股在台北下午寫下時還沒收盤，錨點含當天盤中變動（同日內前視、最多一個交易日） | 定案 #1 的取捨保留，但讓偏差跟著數字走 |
 | 15 | 5.2 | 「`first_named_by`＝最早 lead 的 `source`＋日期」 | 以 `first_seen`（我們看到它的時間）取最早，`published_at` 另印、空就是空；lead registry 讀不到時印 `upstream_unavailable`，不是 `no_lead_named` | 「首次點名」問的是管道何時把它帶到我們面前；兩個日期不互相冒充（INV-6） |
+| 16 | 5.3 | §4「`build_receipt` 的回填分支」；⑦「賣出回填不要求 `--disproof-watch`」；拒收列五種 | 回填收據是另一支 `build_backfill_receipt`，參數裡沒有任何判斷輸入；`--disproof-watch` 改為**拒收**；另拒 `--apply` 與 `--no-narrative-override`，入口拒收共七種 | 放在 `build_receipt` 裡當分支，「不讀判斷」就只靠分支條件守；另開一支、不收判斷參數，才是結構上讀不到。watch 的來源歸屬核對要讀今天的 registry，等於讀今天的判斷；另兩個旗標在回填路徑沒有意義，收下來卻不作用，會讓使用者以為生效了 |
+| 17 | 5.3（R2-a CONDITIONAL_GO） | （未提） | C1：OPERATIONS 補 5.3 的 sandbox impact review。C2：5% 測試的夾具持股合計改成等於 NAV，並斷言擋下理由是「超過單筆上限」。C3：刪掉 OPERATIONS「乾跑看收據」那句，改成「回填沒有乾跑」。NB3：名冊讀不到改 fail closed（exit 2）。NB4：日期閘門讀不到排程時區改為拒收 | C2：原夾具其實是被「市值合計≠NAV（量不到）」擋下，上限放寬到 99% 照綠（L13）。C3：回填沒有預覽路徑，第一次成功就寫進 append-only。NB3：吞成 `company_id: None` 會讓「讀不到」與「名冊沒有這家」在收據裡同形，而那一行改不掉（L12）。NB4：閘門的輸入不得靜默換來源。三個變異（上限 99%、退回本機時區、名冊例外吞掉）全紅 |
 
 ---
 
@@ -243,10 +245,10 @@ L11-6 ④：最先壞的是 `outcome_aggregate.jsonl` 的歷史四欄（既有�
 
 ## 4. Step 5.3 `record_trade.py --backfill-before-receipts`（Z2，R1 ＋ R2-a 常規 opt-in）
 
-**改哪裡：** `scripts/record_trade.py`、`portfolio/research_receipt.py`（`NARRATIVE_STATES` 加 `backfilled`、`build_receipt` 的回填分支）、`tests/test_record_trade_receipt.py`、`tests/test_record_trade.py`、`docs/OPERATIONS.md`（記成交那一節補「回填舊成交」）。
+**改哪裡：** `scripts/record_trade.py`、`portfolio/research_receipt.py`（`NARRATIVE_STATES` 加 `backfilled`、另一支 `build_backfill_receipt`——不收任何判斷參數，§0.6 #16）、`tests/test_record_trade_receipt.py`、`tests/test_record_trade.py`、`docs/OPERATIONS.md`（記成交那一節補「回填舊成交」）。
 
 **怎麼改：**
-- 新旗標 `--backfill-before-receipts "<理由>"`：①必須同時給 `--log-only`（Sheet 已是現況，不碰）；②`executed_at` 的日期必須早於 `RECEIPT_EPOCH = 2026-09-30`（收據機制上線日，常數＋註解；等於或之後一律拒收「這筆應該走正常路徑」）；③只收 alpha（beta 本來不需要收據 → 拒收並說明）；④收據＝`{"version": RECEIPT_VERSION, "side", "why", "sheet_symbol", "company_id", "research_ticker", "resolution", "narrative": "backfilled", "narrative_label": "回填：成交早於收據機制上線，當時沒有收據", "backfill_reason": <理由>, "declared": None, "derived": None}`——**不讀敘事、不讀候選板、不讀個股頁**（不拿今天的判斷冒充當時）；⑤硬擋照跑（`--log-only` 既有語意：不碰現金格、照算 5% 與 ETF cap）；⑥同 `trade_id` 重跑照舊 fail closed；⑦賣出回填不要求 `--disproof-watch`。
+- 新旗標 `--backfill-before-receipts "<理由>"`：①必須同時給 `--log-only`（Sheet 已是現況，不碰）；②`executed_at` 的日期必須早於 `RECEIPT_EPOCH = 2026-09-30`（收據機制上線日，常數＋註解；等於或之後一律拒收「這筆應該走正常路徑」）；③只收 alpha（beta 本來不需要收據 → 拒收並說明）；④收據＝`{"version": RECEIPT_VERSION, "side", "why", "sheet_symbol", "company_id", "research_ticker", "resolution", "narrative": "backfilled", "narrative_label": "回填：成交早於收據機制上線，當時沒有收據", "backfill_reason": <理由>, "declared": None, "derived": None}`——**不讀敘事、不讀候選板、不讀個股頁**（不拿今天的判斷冒充當時）；⑤硬擋照跑（`--log-only` 既有語意：不碰現金格、照算 5% 與 ETF cap）；⑥同 `trade_id` 重跑照舊 fail closed；⑦賣出回填不收 `--disproof-watch`（拒收：watch 歸屬核對要讀今天的 registry），`--apply`／`--no-narrative-override` 同樣拒收（§0.6 #16）；⑧排程時區讀不到拒收、名冊讀不到 fail closed（R2-a NB3／NB4，§0.6 #17）。
 - 不改 `--open-position`、`--apply` 任何路徑；不改 Sheet 讀寫。
 
 **怎麼驗：** 假 Sheet＋暫存 trade_log：合法回填一筆 → 事件帶 `research_receipt.narrative == "backfilled"`、Sheet 零寫入；缺 `--log-only` 拒；日期 ≥ epoch 拒；beta 拒；沒理由拒；硬擋超 5% 仍擋；變異：回填分支讀了敘事 ledger → 紅（夾具不給 ledger 路徑，讀就炸）。真實 trade_log sha 不變。
@@ -384,7 +386,10 @@ R2 回 GO 後：ROADMAP Phase 5 標 ✅、`docs/plans/README.md` 對照表本列
 6. 主題等權組 supersede 時籃子序列的斷點怎麼呈現（本 Phase 只印 `cohort_id`）。
 7. live lane 的賣出配對只做同 symbol＋broker 的 FIFO；分批買進、部分賣出的加權要不要做（今天 0 筆，L17：等有資料）。
 8. 回填：FRA:2DG 的成交日與價由使用者提供；COHR 2026-08-18 10 股 @316.23（舊店 `ib-cohr-2026-08-18-10sh`）。
+   （5.3 R2-a NB1／NB2）成交時間若落在台北 2026-09-30 00:00 到 07:06（收據機制 commit `be73d4e` 之前），旗標會拒收，因為以日期為界是 §4 ② 的規格；屆時由使用者決定走正常路徑或改規格。硬擋量的是**今天**的 Sheet：那一列今天的市值若已超過 NAV 5%，回填會被擋（exit 3），要 `--override --reason`。
 9. 預測表要不要納入 thesis memo 的反證觸及（今天 thesis 來源的語意 watch 16 筆）——ROADMAP 寫的是「讀圖斷言」，本 Phase 只做讀圖。
 10. 計分表的籃子基準對 2026-09-30 之前的點名是回溯（已印在 `KNOWN_BIASES`）；要不要對每則點名記「點名時組是否已定義」。
 11. （5.2 發現）**長駐 APP 用的是 2026-09-10 的程式**（PID 15956，`python -m webapp serve`，開機由 `stockbot-graph-services.vbs` 啟動）：09-10 之後新增的結構表、走圖、讀圖、候選板四個 GET 一直回 404，positions 自 5.2（schema `/2`）起回 503——重啟它是使用者動作。要不要讓 APP 自己偵測「程式比載入時新」並在首頁現形（L14：會自己出現的計數器，不是要人記得重啟）。
 12. （5.2 發現）在台北白天互動跑追蹤表，歐洲與台股會取到**盤中尚未收盤**的當日 K 棒（yfinance 會回進行中的值）；daily 05:30 各市場都已收盤所以不受影響。要不要在取價端排除當日未收盤的 bar（history 的 `_provider_series` 與新 lane 的 `_provider_close_series` 都是）。
+13. （5.3 R2-a NB7）在既有 `--log-only` 語意下，有兩種舊成交回填不了：全數出清的賣出（持股會變負數而中止），以及 Sheet 已刪掉那一列的成交（定位不到；提示指向 `--open-position`，但它不能配 `--log-only`）。COHR、FRA:2DG 都還持有，今天不受影響（L17：等有資料）。
+14. （5.3 R2-a）使用者本機、gitignored 的 `.claude/settings.local.json` 有 `Bash(python *)`。互動 session 因此不經提示就能跑任何 `scripts/*.py`，包括會寫 trade_log（`--apply` 時還寫 Sheet）的 `record_trade.py`。這條權限早於 Phase 5，本 Phase 不動權限檔；要不要收窄由使用者決定。

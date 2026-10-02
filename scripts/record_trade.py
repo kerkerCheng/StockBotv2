@@ -286,7 +286,7 @@ def _backfill_refusal(args: argparse.Namespace, *, is_beta: bool) -> str | None:
     附理由；不收 beta（本來就不需要收據）、不配任何會去讀今天判斷的旗標。"""
     if args.backfill_before_receipts is None:
         return None
-    from portfolio.research_receipt import RECEIPT_EPOCH, _local_date
+    from portfolio.research_receipt import RECEIPT_EPOCH
 
     if not args.backfill_before_receipts.strip():
         return "必須附理由（例：「Sheet 已有這筆、trade_log 沒有」）——沒有理由的回填不留收據"
@@ -298,25 +298,36 @@ def _backfill_refusal(args: argparse.Namespace, *, is_beta: bool) -> str | None:
         return "--log-only 不寫 Sheet，--apply 在這裡沒有意義；拿掉 --apply 重跑"
     if args.no_narrative_override is not None or args.disproof_watch is not None:
         return "回填不讀今天的敘事與 watch——--no-narrative-override／--disproof-watch 在這裡沒有意義"
-    executed_on = _local_date(args.executed_at)
+    # 日期閘門用排程時區、**讀不到就拒收**（R2-a NB4）：正常路徑的 `_local_date` 會退回本機時區（不讓成交 crash），
+    # 但這裡是一道閘——回填不趕時間，閘門的輸入不得靜默換一個來源。
+    try:
+        from engine_b import event_watch as ew
+
+        zone = ew._local_timezone()
+    except Exception as exc:  # noqa: BLE001
+        return f"排程時區讀不到（{type(exc).__name__}）——回填的日期閘門不退回本機時區；修好再跑"
+    try:
+        executed_on = datetime.fromisoformat(str(args.executed_at)).astimezone(zone).date()
+    except (TypeError, ValueError):
+        executed_on = None
     if executed_on is None or executed_on >= RECEIPT_EPOCH:
         return (f"成交日 {executed_on}（排程時區）不早於收據機制上線日 {RECEIPT_EPOCH}——這筆應該走正常路徑"
-                "（照常 --log-only，收據會讀當時的敘事）")
+                "（照常 --log-only，收據會讀記錄當下的現行敘事）")
     return None
 
 
 def _backfill_identity(symbol: str, sheet_rows: list | None) -> dict:
-    """回填只解析公司身分（INV-1：走 `resolve_holding`，與正常收據同一支）；registry 讀不到＝解析不到，照實記、不猜。"""
+    """回填只解析公司身分（INV-1：走 `resolve_holding`，與正常收據同一支）。
+
+    名冊**讀不到就讓例外上拋**、由呼叫端 fail closed（R2-a NB3）：吞成 `company_id: None` 的話，「名冊讀不到」與
+    「名冊真的沒有這家」在 append-only 的收據裡同形（L12），而那一行之後改不了。名冊讀得到、只是沒有這家＝照實記 None。"""
+    from identity.registry import get_registry
+    from portfolio.holdings import resolve_holding
+
     key = symbol.strip().upper()
     row = next((r for r in (sheet_rows or []) if str(r.get("ticker") or "").strip().upper() == key), None) \
         or {"ticker": symbol}
-    try:
-        from identity.registry import get_registry
-        from portfolio.holdings import resolve_holding
-
-        return resolve_holding(row, registry=get_registry())
-    except Exception:  # noqa: BLE001
-        return {"company_id": None, "research_ticker": None, "source": None}
+    return resolve_holding(row, registry=get_registry())
 
 
 def _print_receipt(receipt: dict) -> None:
@@ -666,7 +677,13 @@ def main(argv: list[str] | None = None) -> int:
         # 當時根本沒有收據機制，缺的是紀錄本身。
         from portfolio import research_receipt
 
-        identity = _backfill_identity(args.symbol, sheet_rows)
+        try:
+            identity = _backfill_identity(args.symbol, sheet_rows)
+        except Exception as exc:  # noqa: BLE001 — 名冊讀不到：fail closed（R2-a NB3），什麼都還沒寫
+            print(f"✗ --backfill-before-receipts：名冊讀不到（{type(exc).__name__}: {str(exc)[:120]}）——"
+                  "「讀不到」與「名冊沒有這家」寫進 append-only 的收據會同形；回填不趕時間，修好再跑——"
+                  "Sheet 只讀過、未寫入任何東西", file=sys.stderr)
+            return 2
         research = research_receipt.build_backfill_receipt(
             side=args.side, why=(args.why or "").strip(), symbol=args.symbol,
             company_id=identity["company_id"], research_ticker=identity["research_ticker"],

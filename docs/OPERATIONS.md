@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.3：`record_trade.py --backfill-before-receipts`）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 只在互動 session 由使用者跑。**網路**：Google Sheet 讀一次，與 `--log-only` 同一組呼叫（`read_portfolio_values`、`fetch_portfolio`、`locate_portfolio_cells`）；Sheet 寫入函式 **0 呼叫**，因為旗標強制 `--log-only`，配 `--apply` 會被拒收。**寫入**：只有 `library/trades/trade_log.jsonl` append 一行（A5，append-only）；同一筆重跑不重寫。**讀**：`config/beta_policy.json`、`config/investment_policy.json`、名冊、排程時區設定。**不讀**今天的判斷：敘事 ledger、候選板、個股頁、watch、lifecycle 都不碰（R2-a 用記次替身與開檔稽核實測為 0）。**fail closed**：七種入口拒收與「排程時區讀不到」都在碰 Sheet 之前；「名冊讀不到」在讀 Sheet 之後、寫入之前。三者都是 exit 2、什麼都不寫。**無新增網路主機或憑證** |
+| **2 canonical skill／prompt／本檔** | 本節；本檔「記一筆成交」的回填段；plan §4。`skills/investment-research` 只指到 `scripts/record_trade.py`，不必改 |
+| **3 最窄 rule** | 不進任何無人值守路徑：`record_trade` 在 `.claude/**`（tracked）、`.codex/**`、`crons/**`、`config/**` 都是 0 命中。tracked 的 `.claude/settings.json` 沒有 allow 條目，`.codex/rules` 0 條。⚠ **使用者本機、gitignored 的 `.claude/settings.local.json` 有 `Bash(python *)`**：互動 session 不經提示就能跑這條，也就是直接 append trade_log。這條寬權限早於 5.3，對每一支 `scripts/*.py` 都一樣，包括既有的 `--log-only`／`--apply`。本 Step 不改權限檔；要不要收窄由使用者決定（plan §14） |
+| **4 contract test** | `tests/test_record_trade_receipt.py` §7 涵蓋：七種拒收逐字斷言理由，且 Sheet 0 讀、trade_log 不建檔、判斷讀取 0；排程時區讀不到也拒收；名冊讀不到 fail closed；名冊沒有這家照實記 None；放行一筆時收據形狀逐鍵相等、Sheet 0 寫、重跑不重寫；5% 上限的夾具持股合計＝NAV，並斷言擋下理由是「超過單筆上限」（R2-a C2，上限放寬到 99% 的變異會紅）；回填賣出不要 watch；不帶旗標的 `--log-only` 照讀敘事；`NARRATIVE_STATES` 封閉。live lane 照抄 `backfilled` 標記的測試在 `tests/test_measurement_lanes.py` |
+| **5 端到端 smoke** | 沒有真實跑：回填寫的是 append-only authority，屬於使用者動作（plan §14 #3）。R2-a 的獨立 harness 跑 132 項檢查、0 失敗：Sheet 呼叫記次、socket 全擋、開檔稽核、真實 trade_log 指紋 `861d2008…d5` 前後不變。條件修正後另跑窄範圍覆核 |
+
 ### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.2：追蹤表三條 lane＋主題等權組基準）
 
 | 步 | 結論 |
@@ -796,12 +806,17 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
     --shares 10 --price 316.23 --currency USD --executed-at 2026-08-18T11:02:30-04:00 --broker IB `
     --why "<一句：當時為什麼買>" --log-only `
     --backfill-before-receipts "Sheet 已有這筆、trade_log 沒有（收據機制上線前的成交）"
-#   歐元成交（FRA:2DG）另給 --currency EUR --fx-to-base <1 EUR = ? USD>（硬擋要量得到）；先不帶 --log-only 以外的寫入旗標乾跑看收據
+#   歐元成交（FRA:2DG）另給 --currency EUR --fx-to-base <1 EUR = ? USD>（硬擋要量得到）
 ```
 
+- ⚠ **回填沒有乾跑**：通過入口檢查與硬擋就直接寫進 append-only 的 trade_log，寫錯改不掉。跑之前先拿券商成交通知與 Sheet 那一列，
+  核對股數、價格、幣別、成交時間（含時區）。拿掉 `--log-only` 不會變成預覽，只會被拒收（R2-a C3）。
 - **只准配 `--log-only`**（Sheet 已是現況，不再改）；成交日（排程時區）**必須早於 2026-09-30**——那天或之後的成交走正常路徑；
   **只收 alpha**（beta 本來就不需要收據）；**必附理由**；不能配 `--apply`／`--no-narrative-override`／`--disproof-watch`。
-  七種拒收都在碰 Sheet 之前、exit 2、什麼都不寫。
+  七種拒收與「排程時區讀不到」都在碰 Sheet 之前、exit 2、什麼都不寫。名冊讀不到也 exit 2，發生在讀 Sheet 之後、寫入之前，
+  不會吞成「解析不到」：「讀不到」與「名冊沒有這家」寫進 append-only 的收據會同形。
+- 以**日期**為界（plan §4 ②）：台北 2026-09-30 00:00 之後的成交一律拒收，即使早於收據機制 commit 的 07:06。
+  硬擋量的是**今天**的 Sheet：那一列今天的市值若已超過 NAV 5%，回填會被擋（exit 3）；確定要記就加 `--override --reason`。
 - 收據寫 `narrative: backfilled`、`declared`／`derived` 都是 `null`：**不讀敘事、候選板、個股頁**——今天的判斷不得冒充當時（INV-6）。
   公司身分照解析（`resolve_holding`）。硬擋照算（`--log-only` 語意：不碰現金格、照算 5% 與 ETF cap，超過照擋）；同一筆重跑不重寫。
 - 追蹤表的 live lane（`scripts/outcome_if_settled_today.py`）照抄這個標記，印「回填、無當時收據」。
