@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.6：稀釋燈只認募資文件）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ②b `python -m engine_c.history_backfill --incremental` 的 **argv、主機、請求數都不變**：落後檢查本來就為每檔（已有財報列者）抓一次 `data.sec.gov/submissions`，`fetchers/edgar.py` 拆成「抓一次」（`fetch_submissions`）＋「依表單篩」（`filings_from_submissions`），同一份清單順帶寫進 Engine C 的**兩張新表** `equity_offering_filings`／`equity_offering_checks`（私有 SQLite；開庫時 `CREATE TABLE IF NOT EXISTS`，**不動既有表與 CHECK**）。`get_filings` 行為不變（多回 `items`、`accession_dashed` 兩個鍵）。非增量的互動回填會為清單補抓一次（每檔多 1 次請求，同一組主機；daily 不走這條）。⑬ materialize 經同一支 `get_wipeout_inputs` 的連線多讀兩張表（唯讀 SELECT）；稀釋燈的判色變了、理由句換新，artifact 形狀不變（inputs 多 `offerings`／`offering_summary`／`context_summary`） |
+| **2 canonical skill／prompt／本檔** | 本節與上面歷史回填那幾行；`docs/ARCHITECTURE.md` 三題那一列；稀釋燈規則全文住 `alpha/wipeout.py::_DILUTION_RULE`（印在稽核層）；封閉清單住 `engine_c/offerings.py`。skill 不需要改：沒有任何 skill 描述稀釋燈怎麼判色 |
+| **3 最窄 rule** | daily ②b 與 ⑬ 的 argv **不變**（`tests/test_daily_task.py` 逐項相等照過）；不新增 step、allowlist、APP 路由；Postgres 以 `engine_c/migrations/20261003_add_equity_offering_filings.sql`＋`schema.sql` 同步（只建表，寫入照舊只接 SQLite） |
+| **4 contract test** | `tests/test_dilution_offerings.py`（plan §7 五個夾具、封閉清單逐表單、以申報日落窗、as-of 之後不可見、清單涵蓋不到窗＝灰、找到了照樣黃、沒有金額不上色、**增量不多抓一次** submissions、`get_filings` 舊鍵不變）；`tests/test_wipeout_flags.py`、`tests/test_engine_c_equity_issuance.py` 的金額那一半照守 |
+| **5 端到端 smoke** | 見 baseline §20：正式庫以檔案複製到 scratchpad（當下 WAL 0 位元組）、對副本跑 `--incremental --no-prices`：43 檔寫入清單、3 檔這輪沒抓（沒有既存財報列）、30 檔不是 SEC 申報人；11 檔黃燈逐檔前後對照（10 黃、LRCX 轉灰）並手核 AXTI／COHR／NVDA／INTC 的文件封面；正式庫 sha256 前後相同、沒有新表（上線後由 daily 建表與寫入） |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.5：sub 旗標跟著值走到消費端）
 
 | 步 | 結論 |
@@ -794,6 +804,9 @@ materialize 用**，不動 `discover_tracked_tickers`——那會連帶擴大 ED
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --report <file.json>   # 全體回填（寫正式庫：先取 writer lock、不得與 daily 同時）
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --incremental          # daily ②b 跑的那一行
 & '.venv\Scripts\python.exe' -m engine_c.history_backfill --db <副本.db> --tickers AXTI   # 對暫存副本試跑（副本用 sqlite3 backup API 產生，正式庫是 WAL）
+# 募資文件清單（Phase 6 Step 6.6；稀釋燈的判色依據，表與封閉清單住 engine_c/offerings.py）：增量時落後檢查本來就抓一次
+# submissions，同一份清單順帶寫進 equity_offering_filings／equity_offering_checks（請求數不變）；報告的 summary.offerings
+# 印 written／not_fetched（這檔還沒有財報列，下一輪才順帶）／unavailable。非增量回填會為它補抓一次。
 # fundamental_history 的 metric CHECK 遷移（Phase 4 Step 4.6；新增指標時才用；預設 dry-run）
 & '.venv\Scripts\python.exe' -m engine_c.migrate_fundamental_metrics                # 印列數與 CHECK 缺哪些字彙
 & '.venv\Scripts\python.exe' -m engine_c.migrate_fundamental_metrics --apply        # 取 writer lock → 備份 → 單交易重建 → 對帳

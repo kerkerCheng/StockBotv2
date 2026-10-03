@@ -33,6 +33,11 @@
 - companyfacts 比 EDGAR submissions 舊（`fetchers.edgar_xbrl.companyfacts_lag_status`）→ 這一檔**這一輪不寫**、
   記缺席；抓不到 submissions → 照寫並記「落後未知」（不是「沒落後」）。
 
+## 募資文件清單（Phase 6 Step 6.6；表與判定住 `engine_c/offerings.py`）
+
+稀釋燈要的「窗內有沒有募資文件」順帶在這裡更新：增量時落後檢查本來就抓一次 submissions，**同一份清單**寫進
+`equity_offering_filings`／`equity_offering_checks`——daily 的請求數不變。非增量（互動回填）會為它補抓一次。
+
 ## 這支不做的事
 
 不換匯、不猜 ADR 比率、不回推台股歷史股數（沒有機械來源就記缺席）、不寫人工 ledger、不判讀任何東西。
@@ -643,12 +648,55 @@ def revenue_whitelist() -> set[tuple[str, str]]:
     return {(namespace, tag) for namespace, tags in _flow_tags("revenue") for tag in tags}
 
 
-def _submissions_latest(cik: str, forms: Sequence[str]) -> date | None:
-    from fetchers.edgar import get_filings
+def _latest_filed(filings: Sequence[Mapping[str, Any]], forms: Sequence[str]) -> date | None:
+    """`fetchers.edgar.recent_filings` 的清單裡，指定表單最新那一份的申報日（與 `get_filings(cik, forms, 1)` 同一個篩法）。"""
+    wanted = {str(f).upper() for f in forms}
+    for filing in filings:                      # SEC 給的順序是新的在前；取第一份＝`get_filings(..., 1)`
+        if str(filing.get("form_type") or "").upper() in wanted:
+            return _as_date(filing.get("filed_date"))
+    return None
 
-    filed = [_as_date(f.get("filed_date")) for f in get_filings(cik, list(forms), 1, raise_on_error=True)]
-    filed = [d for d in filed if d is not None]
-    return max(filed) if filed else None
+
+def _caching_submissions_latest(cache: dict[str, list[dict]]) -> Callable[[str, Sequence[str]], date | None]:
+    """增量用的 `submissions_latest`：抓一次 submissions（**請求數與改前相同**），清單留在 `cache` 給募資文件用
+    （Phase 6 Step 6.6——同一次抓取同時給落後檢查與稀釋燈，daily 的 EDGAR 步驟不多抓）。"""
+    def latest(cik: str, forms: Sequence[str]) -> date | None:
+        from fetchers.edgar import fetch_submissions, recent_filings
+
+        filings = recent_filings(fetch_submissions(cik), cik)
+        cache[cik] = filings
+        return _latest_filed(filings, forms)
+
+    return latest
+
+
+def _store_offerings(conn: Any, ticker: str, cik: str, cache: dict[str, list[dict]], *, incremental: bool,
+                     fetched_at: str) -> dict[str, Any]:
+    """這一檔的募資文件清單寫進 `equity_offering_*`（`engine_c.offerings`）。每一條路都落到一個具名結局（INV-3）。
+
+    - 增量：只用這一輪落後檢查已經抓到的那份清單——**不為它多抓**；沒抓到（這檔沒有既存財報列、或抓取失敗）就記
+      `not_fetched`，上次的清單留著、消費端看 `checked_at` 判斷涵蓋到哪一天。
+    - 非增量（互動回填）：補抓一次（多 1 次請求；daily 不走這條）。"""
+    from engine_c.offerings import coverage_from, store_offerings
+
+    filings = cache.pop(cik, None)
+    if filings is None and not incremental:
+        try:
+            from fetchers.edgar import fetch_submissions, recent_filings
+
+            filings = recent_filings(fetch_submissions(cik), cik)
+        except Exception as exc:  # noqa: BLE001 — 抓不到就照實記，不寫「沒有募資文件」
+            return {"outcome": "unavailable", "absence": f"submissions 抓不到：{type(exc).__name__}"}
+    if filings is None:
+        return {"outcome": "not_fetched",
+                "absence": "增量只在這一檔已有財報列、而且抓得到 submissions 時順帶更新——這一輪沒抓，沿用上次的清單"}
+    try:
+        written = store_offerings(conn, filings, ticker=ticker, cik=cik, fetched_at=fetched_at)
+        conn.commit()
+    except Exception as exc:  # noqa: BLE001
+        conn.rollback()
+        return {"outcome": "error", "absence": f"{type(exc).__name__}: {exc}"[:300]}
+    return {"outcome": "written", "rows": written, "recent_count": len(filings), "coverage_from": coverage_from(filings)}
 
 
 def run(conn: Any, *, tickers: Sequence[str] | None = None, incremental: bool = False, today: date | None = None,
@@ -667,6 +715,9 @@ def run(conn: Any, *, tickers: Sequence[str] | None = None, incremental: bool = 
                               "fetched_at": fetched_at, "tickers": {}}
     cik_map: dict[str, str] | None = None
     cik_error = None
+    #: 這一輪抓到的 submissions 清單（CIK → recent_filings），落後檢查與募資文件共用同一次請求（Phase 6 Step 6.6）
+    submissions_cache: dict[str, list[dict]] = {}
+    submissions_latest = _caching_submissions_latest(submissions_cache)
     if edgar:
         try:
             from fetchers.edgar import ticker_cik_map
@@ -700,13 +751,16 @@ def run(conn: Any, *, tickers: Sequence[str] | None = None, incremental: bool = 
                 try:
                     entry["edgar"] = backfill_ticker_edgar(
                         conn, ticker, cik, today=today, incremental=incremental, fetched_at=fetched_at,
-                        submissions_latest=_submissions_latest)
+                        submissions_latest=submissions_latest)
                     conn.commit()
                 except Exception as exc:  # noqa: BLE001
                     conn.rollback()
                     entry["edgar"] = {"cik": cik, "outcome": "error", "absence": f"{type(exc).__name__}: {exc}"[:300]}
                 entry["edgar"]["metrics"] = _metric_summary(conn, ticker)
                 if cik:
+                    # 募資文件清單（稀釋燈；Phase 6 Step 6.6）：用同一份 submissions，不多抓
+                    entry["offerings"] = _store_offerings(conn, ticker, cik, submissions_cache,
+                                                          incremental=incremental, fetched_at=fetched_at)
                     time.sleep(sleep)
         report["tickers"][ticker] = entry
     report["summary"] = summarize(report)
@@ -721,6 +775,8 @@ def summarize(report: Mapping[str, Any]) -> dict[str, Any]:
         "tickers": len(tickers),
         "prices": dict(Counter((e.get("prices") or {}).get("outcome", "skipped") for e in tickers.values())),
         "edgar": dict(Counter((e.get("edgar") or {}).get("outcome", "skipped") for e in tickers.values())),
+        # 募資文件清單（Phase 6 Step 6.6）：寫了幾檔、沒抓（增量沒順帶到）、抓不到——daily 印的 summary 看得到（INV-3）
+        "offerings": dict(Counter((e.get("offerings") or {}).get("outcome", "skipped") for e in tickers.values())),
         "filer_class": dict(Counter((e.get("edgar") or {}).get("filer_class", "—") for e in tickers.values())),
         "rejected_groups": sum(1 for e in tickers.values() for r in (e.get("edgar") or {}).get("rejected") or ()
                                if r.get("kind") != "irregular_period"),

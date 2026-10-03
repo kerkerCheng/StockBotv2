@@ -547,3 +547,39 @@ dry-run 預告**證據等級會變 32 條**：論文 31 條待判定 → 媒體�
   「贏家的旗標」那條紅（`mutate.py`，跑完還原）。
 - APP（重 materialize `--graph-walk --structure-table` 後，headless Edge `--dump-dom`）：結構表頁「這個值的引文沒談可替代性」**57 處＝artifact 的 57**、
   逐筆計數照舊 58 處、頁首印 6.4 的層計數行；走圖頁 4 個第 1 型命中（扣掉已讀）各帶旁註；兩頁都沒有「無法載入」。
+
+## 20. Step 6.6 稀釋燈只認募資文件（2026-10-03 11:xx 台北）
+
+改動（plan §7；偏差 §0.6 #13–#14）：金額 > 0 還要**窗內一份募資文件**才黃。封閉清單與兩張新表住 `engine_c/offerings.py`
+（424B1–5／424B7、S-1／F-1（含 /A）、8-K／8-K/A 含第 3.02 項；S-8 與 S-3／F-3／S-3ASR 只存不算）；窗＝發行金額那幾季中最早一筆的期初
+到窗尾那一季報告的申報日（EDGAR `filingDate` 落窗、as-of 只取 `filed ≤ today`）；清單涵蓋不到窗或從沒抓過 → 灰（upstream_unavailable）；
+金額 > 0 但窗內沒有募資文件 → 灰（insufficient_evidence，理由另列、窗內的 S-8／S-3 印在稽核層）。daily ②b 的增量以落後檢查**同一次**
+submissions 順帶寫清單（請求數不變；`tests/test_dilution_offerings.py::test_incremental_refresh_reuses_the_lag_checks_fetch`）。
+
+**真實資料（正式庫的檔案副本 `engine_c_copy66.db`——複製當下 WAL 0 位元組；正式庫 sha256 `85b14e4a…` 前後相同、沒有新表）：**
+對副本跑 `python -m engine_c.history_backfill --db <副本> --incremental --no-prices`：清單寫入 43 檔、這輪沒抓 3 檔（CDNS 的 companyfacts 落後、
+CRDO／USAR 是 6.3c 新進名冊、這輪才第一次存財報列——增量只在已有財報列時順帶抓，下一輪補上）、不是 SEC 申報人 30 檔。
+用與個股頁同一條路（`get_wipeout_inputs` → `wipeout_flags`）逐檔算（`p66_dilution.py`，改前讀正式庫、改後讀副本）：**黃 11 → 10**。
+
+| 檔 | 前 → 後 | 配到的募資文件（窗內） | 窗內不算的登記 | 手核 |
+|---|---|---|---|---|
+| AAOI | 黃 → 黃 | 424B5 ×5（2025-08-27 起，ATM） | S-8／S-8 POS（2026-06-09） | — |
+| AXTI | 黃 → 黃 | 424B5 2026-04-20、04-21 | S-3ASR 2026-04-20 | ✅ 封面「We are offering … shares of our common stock … to certain institutional investors」 |
+| COHR | 黃 → 黃 | 8-K 2026-03-02（第 3.02 項） | S-3ASR 2025-12-16 | ✅ ITEM INFORMATION：Unregistered Sales of Equity Securities（對 NVIDIA 的私募；plan L11-6 ④） |
+| INTC | 黃 → 黃 | 8-K 2025-12-29（3.02）、424B7 2026-01-23、424B5 2026-04-27／04-29 | S-3ASR、S-8 | ✅ 8-K 第 3.02 項 Unregistered Sales of Equity Securities |
+| IREN | 黃 → 黃 | 8-K ×3（3.02）、424B5 ×3、424B7 | S-8 ×2 | — |
+| LITE | 黃 → 黃 | 8-K 2026-03-02、04-08、06-01（3.02） | — | —（plan L11-6 ④：可轉換特別股，配到 8-K 3.02） |
+| **LRCX** | **黃 → 灰** | （無） | S-3ASR 2025-08-11、S-8／S-8 POS 2025-11-06 | 「只有發行金額、窗內沒有募資文件」——發行額 1745 萬美元＝員工計畫等級 |
+| META | 黃 → 黃 | 424B2 ×4（2025-10-30 起） | S-8、S-3ASR | ⚠ 2026-04-30 那份封面是 **Senior Notes**（公司債）——已知限制 |
+| MP | 黃 → 黃 | 8-K 2025-07-10（3.02）、424B5 07-16／07-18、424B7 08-15 | S-8 | —（窗從第三季期初 07-01 算起才配得到 7 月的文件） |
+| MRVL | 黃 → 黃 | 8-K ×4（3.02，含 8-K/A）、424B7 ×4、424B5、424B2 | S-8 ×2 | —（收購付股的未註冊出售） |
+| NVDA | 黃 → 黃 | 424B5 2026-06-15、06-17 | — | ⚠ 封面是七檔 **Notes due 2028–2056**（公司債）——已知限制 |
+
+⚠ **已知限制（照實寫，不自行改清單）**：`424B2`／`424B5` 也用來發公司債；NVDA、META 這兩檔配到的都是 Notes，所以它們的黃燈仍不是股權募資。
+submissions JSON 沒有任何欄位分得出股權或債（`primaryDocDescription` 只寫 424B5／PROSPECTUS SUPPLEMENT；p66_fields.py 實查），要分就得多抓
+文件本身（每份新的 424B 多 1–2 次請求）——那違反 plan「請求數不變」，是使用者的題（plan §14 #10）。稽核層逐份印 form／日期／accession，點得回原文。
+
+- 測試：`tests/test_dilution_offerings.py` 26 條；既有 `tests/test_wipeout_flags.py` 的金額那一半照守（夾具預設帶一份窗內募資文件、前提寫明）、
+  `tests/test_engine_c_equity_issuance.py` 兩條補上募資文件（串接點那條給假輸入、走正式路徑那條先 `store_offerings`）。
+- 變異：把 S-8 加進募資清單 → 「只有 S-8 是灰」與「增量不多抓」兩條紅；拿掉日期窗 → 「只算窗內」那條紅（`mutate.py`，跑完還原）。
+- 理由句不帶數字（D2：紅黃綠不給數字）——表單代號、申報日在稽核層的 `offering_summary`／`context_summary`／`offerings`。

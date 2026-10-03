@@ -224,3 +224,25 @@ CREATE TABLE IF NOT EXISTS fundamental_history (
 
 CREATE INDEX IF NOT EXISTS idx_fundamental_history_asof
     ON fundamental_history (ticker, metric, period_end, filed);
+
+-- 募資文件清單（Phase 6 Step 6.6；migrations/20261003_add_equity_offering_filings.sql）
+CREATE TABLE IF NOT EXISTS equity_offering_filings (
+    accession VARCHAR(32) PRIMARY KEY,
+    ticker VARCHAR(32) NOT NULL,
+    cik VARCHAR(16) NOT NULL,
+    form VARCHAR(16) NOT NULL,
+    items TEXT,
+    filed DATE NOT NULL,
+    fetched_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_equity_offering_filings_ticker
+    ON equity_offering_filings (ticker, filed);
+
+CREATE TABLE IF NOT EXISTS equity_offering_checks (
+    ticker VARCHAR(32) PRIMARY KEY,
+    cik VARCHAR(16) NOT NULL,
+    checked_at TIMESTAMPTZ NOT NULL,
+    coverage_from DATE,
+    recent_count INTEGER NOT NULL
+);

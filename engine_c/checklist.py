@@ -375,6 +375,8 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
       年度期末正好是窗尾就直接用年度那一列。**缺的季度不補 0**——列出找到幾季。
     - `issued_total`＝窗內**正值**的加總（判色看它）；`trailing_total`＝淨加總，只印（R2-c 覆核 #1：負值多半是更正，
       或年報與季報 tag 前後不一衍生出的負第四季——不得拿來抵銷真實發行）。前後不一另列 `inconsistent`。
+    - `offerings`（Phase 6 Step 6.6）：同一個窗裡的募資文件與不算募資的登記表單（`_offering_documents`）——
+      稀釋燈只在窗內有募資文件時才亮黃。
     """
     import sqlite3 as _sqlite3
     from datetime import timedelta
@@ -466,8 +468,11 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
             unattributed.append(entry)
         elif remainder < -0.5:
             inconsistent.append({"kind": "annual_below_quarters", **entry})
+    offerings = _offering_documents(connection, ticker, facts=facts, window_after=window_after, anchor=anchor,
+                                    today=today)
     return {
         "status": "ok", "filer_class": klass, "filer_basis": basis,
+        "offerings": offerings,
         "window_after": window_after, "window_end": anchor, "basis": basis_kind,
         # 年度＝窗尾時加總用的是年度列，窗內季度數不參與——不印，免得讀成「用了這幾季」（R2-c 覆核 #6d）
         "quarters_found": len(in_window) if basis_kind == "quarters" else None,
@@ -476,6 +481,33 @@ def _equity_issuance(connection, ticker: str, *, today) -> dict:
         "tags": sorted({str(f.get("tag")) for f in facts}), "unattributed": unattributed,
         "inconsistent": inconsistent,
     }
+
+
+def _offering_documents(connection, ticker: str, *, facts: list, window_after, anchor, today) -> dict:
+    """發行金額那個窗裡的募資文件（Phase 6 Step 6.6；清單與判定住 `engine_c.offerings`）。
+
+    窗＝**發行金額那個窗的期間**到**最新一份定期報告的申報日**（INV-6；plan §7）：起點是窗內最早那一季（或年度列）的
+    期初——金額是那幾季發生的，募資文件可能在季初就申報（2026-10-03 實測 MP：7 月 10 日的 8-K 3.02、7 月 16／18 日的
+    424B5 都在第三季期初之後、期末窗下界 8 月 14 日之前）；終點是窗尾那一季的報告申報日（金額由它揭露）。
+    窗內沒有可用的期初就退回期末下界。只回清單與涵蓋狀態，**不判色**（判色在 `alpha.wipeout.dilution_flag`）。
+    """
+    from engine_c.offerings import offerings_in_window
+
+    starts = []
+    for fact in facts:
+        try:
+            starts.append(type(today).fromisoformat(str(fact.get("period_start"))[:10]))
+        except (TypeError, ValueError):
+            continue
+    start = min(starts) if starts else window_after
+    row = connection.execute(
+        "SELECT MAX(filed) FROM fundamental_history WHERE ticker = ? AND period_end = ? AND filed <= ?",
+        (ticker, anchor.isoformat(), today.isoformat())).fetchone()
+    try:
+        end = type(today).fromisoformat(str(row[0])[:10]) if row and row[0] else anchor
+    except ValueError:
+        end = anchor
+    return offerings_in_window(connection, ticker, start=start, end=end, today=today)
 
 
 def _equity_authorizations(connection, ticker: str) -> list | None:

@@ -300,10 +300,13 @@ def test_both_consumers_go_through_the_one_wiring_point(monkeypatch) -> None:
     from alpha.providers import market_normalization
     from alpha.providers.wipeout import wipeout_for
 
+    # Phase 6 Step 6.6 起金額 > 0 還要窗內一份募資文件才黃（本條守的是串接點，所以假輸入帶一份）
+    offerings = {"status": "ok", "complete": True, "gaps": [], "context": [],
+                 "documents": [{"form": "424B5", "items": "", "filed": "2026-04-20", "accession": "A-1"}]}
     monkeypatch.setattr(checklist, "get_wipeout_inputs", lambda t: {
         "status": "ok", "runway": {"status": "manual_required"}, "shares_series": [], "going_concern": None,
         "issuance": {"status": "ok", "filer_class": "domestic_quarterly", "trailing_total": 600.0,
-                     "currencies": ["USD"], "quarters_found": 1}})
+                     "currencies": ["USD"], "quarters_found": 1, "offerings": offerings}})
     monkeypatch.setattr(market_normalization, "screen_inputs",
                         lambda tickers, **_: {tickers[0]: {"market_cap_usd": 2000.0, "market_cap_absence": None}})
     flags, reason = wipeout_for("AXTI", today=TODAY)
@@ -332,8 +335,17 @@ def test_a_negative_fourth_quarter_from_inconsistent_tags_cannot_cancel_a_real_i
         _fact("2026-01-01", "2026-03-31", 500_000_000.0, "Q1-26", "10-Q", "2026-05-14")]})
     rows, _ = hb.build_fundamental_rows(facts, ticker="XYZ", filer="domestic_quarterly", today=TODAY,
                                         fetched_at=FETCHED)
-    got = _equity_issuance(_reader_conn(rows), "XYZ", today=TODAY)
+    conn = _reader_conn(rows)
+    # Phase 6 Step 6.6：窗內一份私募公告（8-K 第 3.02 項）——走正式的寫入路徑，判色才走得到黃那一支
+    from engine_c.offerings import store_offerings
+
+    store_offerings(conn, [{"form_type": "8-K", "filed_date": "2026-02-10", "accession_dashed": "8K-1",
+                            "items": "1.01,3.02,9.01"},
+                           {"form_type": "10-K", "filed_date": "2020-01-01", "accession_dashed": "OLD"}],
+                    ticker="XYZ", cik="0000000009", fetched_at=FETCHED)
+    got = _equity_issuance(conn, "XYZ", today=TODAY)
     assert got["issued_total"] == 567_669_000.0 and got["trailing_total"] < 0
+    assert [d["accession"] for d in got["offerings"]["documents"]] == ["8K-1"]
     # 兩種前後不一都標出：負的衍生第四季、年度（6800 萬）小於已知季度（Q1＋Q2 14.59 億）
     assert [i["kind"] for i in got["inconsistent"]] == ["negative_derived_quarter", "annual_below_quarters"]
     series = [(date(2025, 6, 1), 100.0), (date(2026, 7, 1), 100.0)]

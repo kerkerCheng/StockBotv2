@@ -151,6 +151,8 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 10 | 6.4 | `collapse_assertions` 多記 `origin_assertions: {origin: set(assertion_id)}`；`classify_evidence` 多收 `quotes_by_assertion`（必填） | `origin_assertions: {origin: [(assertion_id, doc, linkage)]}`，**取代** `CanonicalEdge.origin_linkages`（退役）；`classify_evidence` 多收**兩個**必填關鍵字（`quotes_by_assertion`、`origin_assertions`），原本的 `origin_linkages` 參數拿掉；另加 `edge_corroborations`（每個 origin 的判定，`layer_stats` 讀 `withheld`）與 `best_evidence` | §0.6 #2 的轉述豁免與 `publisher_lifts` 都是**文件層級**的宣告——只記 assertion id 就不知道每段逐字出自哪份、那份宣告了什麼；兩個欄位並存＝同一個宣告兩種表示（L12），拿掉舊的那個，所有呼叫端被迫重看一次 |
 | 11 | 6.4 | `build_socket_view` 的 `third_party` 改問 owner；客戶端原文照印，旁註「未具名供應商」 | 發布者的引文**過了 `publisher_lifts`** 就列（與改前相同的母體），沒具名或轉述句同樣旁註（`Corroboration.publisher_lifted`、`withheld`）；不只撐得住外部印證的才列 | 只列撐得住的會讓改前列得出的第三方原文靜默消失（INV-3）；「`verify_citations` 收得下的引文這裡要列得出來」仍成立（收得下 ⊆ 列出）；旁註就是在說「列出來不等於撐得住」。待決見 §14 #8 |
 | 12 | 6.4 | §13：「名冊無名可比」＝`company_name_forms` 回空 tuple | 另含「每個寫法都與另一家共用」（`query.bottleneck.usable_name_forms` 空；名字比對 `_named_by` 與 owner 共用這一個 helper） | 第一版把 OpenLight 3 條判成 `unnamed`——6.8 會被導去讀原文，而原文寫的「OpenLight」對兩個代號都不算、永遠比不到；補救是身分清理（[670]），與 `no_name_forms` 同一種。6.0 的模擬（`sim_b0`）本來就這樣判 |
+| 13 | 6.6 | 新表 `equity_offering_filings`（ticker、cik、form、items、filed、accession 主鍵、fetched_at） | 照建，**另加** `equity_offering_checks`（每檔最後一次抓清單的時間、清單涵蓋起點、筆數）；清單之外也存 S-8／S-3 等「不算募資」的登記表單（判定在讀取端，表裡不存判定） | 只有一張表時「抓過、窗內沒有」與「從沒抓過」同形（L12、INV-3）；submissions 的 `recent` 只給最近約 1000 筆，沒有涵蓋起點就說不出窗內「沒有」（INV-6）。存 S-8／S-3 是為了讓灰燈印得出「窗內只有員工計畫登記」 |
+| 14 | 6.6 | 灰燈理由「只有發行金額、窗內沒有募資文件（S-8 員工計畫不算募資）」 | 「只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資（窗內有哪些申報在稽核層）」；黃燈理由同樣不帶表單代號與日期 | 既有契約 D2「紅黃綠不給數字」：理由句不得帶數字（`tests/test_wipeout_flags.py::test_lamp_reasons_do_not_leak_company_numbers`）——「S-8」「424B5」與申報日都帶數字；代號與日期改住稽核層的 inputs |
 
 ---
 
@@ -293,9 +295,9 @@ L11-6 ④：最先壞的是 `query.structure` 的 `--digest` 輸出（staleness 
 
 ## 7. Step 6.6 稀釋燈只認募資文件（Z2，R1 ＋ R2-b 常規 opt-in）
 
-**改哪裡：** `fetchers/edgar.py`（`get_filings` 多回 `items`；或拆成「抓一次 submissions JSON」與「依表單篩」兩段，讓同一次抓取同時給落後檢查與募資文件——**不增加請求數**）、daily 步驟 `02b_history_incremental`（`python -m engine_c.history_backfill --incremental`；argv、timeout、連網宣告由 `tests/test_daily_task.py` 逐項斷言，argv 不得變）、Engine C 新表 `equity_offering_filings`（`ticker`、`cik`、`form`、`items`、`filed`、`accession` 主鍵、`fetched_at`；`CREATE TABLE IF NOT EXISTS`，**不動既有表的 CHECK**）、`engine_c/checklist.py::_equity_issuance`（讀窗內募資文件）、`alpha/wipeout.py::dilution_flag` 與 `_DILUTION_RULE`、個股頁稽核區、`docs/OPERATIONS.md`（sandbox impact review）、測試。
+**改哪裡：** `fetchers/edgar.py`（`get_filings` 多回 `items`；或拆成「抓一次 submissions JSON」與「依表單篩」兩段，讓同一次抓取同時給落後檢查與募資文件——**不增加請求數**）、daily 步驟 `02b_history_incremental`（`python -m engine_c.history_backfill --incremental`；argv、timeout、連網宣告由 `tests/test_daily_task.py` 逐項斷言，argv 不得變）、Engine C 新表 `equity_offering_filings`（`ticker`、`cik`、`form`、`items`、`filed`、`accession` 主鍵、`fetched_at`；`CREATE TABLE IF NOT EXISTS`，**不動既有表的 CHECK**）與 `equity_offering_checks`（每檔最後一次抓清單的時間與涵蓋起點；§0.6 #13）、`engine_c/checklist.py::_equity_issuance`（讀窗內募資文件）、`alpha/wipeout.py::dilution_flag` 與 `_DILUTION_RULE`、個股頁稽核區、`docs/OPERATIONS.md`（sandbox impact review）、測試。
 **募資文件（封閉清單，寫成常數＋註解）：** `424B1`–`424B5`、`424B7`、`S-1`、`S-1/A`、`F-1`、`F-1/A`；`8-K` 且 `items` 含 `3.02`（未註冊股權出售＝私募）。**不算**：`S-8`（員工計畫）、`S-3`／`F-3`／`S-3ASR`（只是授權——授權已是人工欄位 `equity_issuance_authorizations`，照舊只印）。
-**判色：** 窗內新股發行金額 > 0 **且** 窗內有一份募資文件（`filed` 落在發行金額那個窗的期間到最新一份定期報告申報日之間，INV-6）→ 黃，稽核區印那份文件（form、日期、accession、items）；發行金額 > 0 但窗內沒有募資文件 → **不上色**，`absence_kind=insufficient_evidence`，理由「只有發行金額、窗內沒有募資文件（S-8 員工計畫不算募資）」，另列；其餘分支照舊。抓不到 submissions → `upstream_unavailable`，不判綠也不判黃。
+**判色：** 窗內新股發行金額 > 0 **且** 窗內有一份募資文件（`filed` 落在發行金額那個窗的期間到最新一份定期報告申報日之間，INV-6）→ 黃，稽核區印那份文件（form、日期、accession、items）；發行金額 > 0 但窗內沒有募資文件 → **不上色**，`absence_kind=insufficient_evidence`，理由「只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資」（理由句不帶數字，§0.6 #14），另列；其餘分支照舊。抓不到 submissions → `upstream_unavailable`，不判綠也不判黃。
 **sandbox impact review：** daily EDGAR 步驟 argv 不變、請求數不變（同一份 submissions）、多寫 Engine C 一張新表（私有庫）；互動回填（若需要）在 writer lock 下跑。
 **怎麼驗：** 夾具：金額＋424B5 → 黃；金額＋只有 S-8 → 不上色另列；金額＋8-K 3.02 → 黃；金額＋S-3 → 不上色（授權不是募資）；抓取失敗 → `upstream_unavailable`。**真實資料：11 檔逐檔前後對照**，每檔印配到的文件或「沒有募資文件」，並抽 4 檔（AXTI、COHR、NVDA、INTC）到 EDGAR 網頁手核；黃燈每一檔都指得出一份文件。變異：把 S-8 加進清單 → 夾具紅；不看日期窗 → 夾具（窗外的 424B5）紅。
 **R2-b `WORK_REQUEST`**：審查者對 11 檔自己查 EDGAR submissions 核對配到的文件與窗、確認請求數沒變、新表不影響既有表、`_DILUTION_RULE` 文字與程式一致；Boundaries 同 R2-a，另「不寫 Engine C 正式庫」。
@@ -429,3 +431,6 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 8. （6.4）插槽視角：發布者過了 `publisher_lifts` 但沒具名或只是轉述的引文照列並旁註（§0.6 #11）——讀的人若覺得雜訊多，再議要不要只列撐得住的。
 9. （6.0–6.3 帶進來的，見 baseline §14、§16.3、§17.3）更正走廊 `raw_excerpt` 表頭重複；`tests/test_intake.py` 的 `forbidden_driver` 絆線可能空跑；
    Noveon／USA Rare Earth 那兩段引文掛在 MP 的邊上是否抽取錯置；`co:apollo` 的名字寫法（「Apollo」在圖上一半是 Google 的專案代號）。
+10. （6.6）**424B2／424B5 分不出股權或債**：NVDA、META 的黃燈配到的是公司債說明書（手核封面：Notes／Senior Notes，baseline §20）。
+    要分有兩條路：①每份**新出現**的 424B 多抓一次文件或申報費用附件判股權／債（daily 偶爾多 1–2 次請求，違反本 Phase「請求數不變」）；
+    ②維持現狀、讀的人看稽核層的文件代號自己判。這是使用者的題（改清單或請求數都動到 §0.1 #9 的定案）。

@@ -41,11 +41,20 @@ def _series(days: int, *, change: float = 0.0):
     return [(start, 1_000_000.0), (TODAY, 1_000_000.0 * (1 + change))]
 
 
+#: 窗內有一份募資文件、清單涵蓋整個窗（Phase 6 Step 6.6 起金額 > 0 還要這個才黃）。本檔守的是**金額那一半**的規則，
+#: 所以預設帶它、把前提寫明；募資文件那一半（沒有文件、只有 S-8、清單讀不到…）在 tests/test_dilution_offerings.py。
+OFFERING_IN_WINDOW = {"status": "ok", "window": {"start": "2025-07-01", "end": "2026-08-05"}, "complete": True,
+                      "gaps": [], "checked_at": "2026-10-03T00:00:00+00:00", "coverage_from": "2020-01-01",
+                      "documents": [{"form": "424B5", "items": "", "filed": "2025-12-29",
+                                     "accession": "0001213900-25-125583"}], "context": []}
+
+
 def _issuance(total: float = 0.0, *, status: str = "ok", cap: float | None = 1_000_000_000.0,
               currencies=("USD",), **extra):
-    """`engine_c.checklist._equity_issuance` 的形狀（Phase 4 Step 4.6）。"""
+    """`engine_c.checklist._equity_issuance` 的形狀（Phase 4 Step 4.6；Phase 6 Step 6.6 多 `offerings`）。"""
     if status != "ok":
         return {"status": status, "filer_class": extra.get("filer_class"), "reason": extra.get("reason")}
+    extra.setdefault("offerings", OFFERING_IN_WINDOW)
     return {"status": "ok", "filer_class": "domestic_quarterly", "window_after": date(2025, 8, 14),
             "window_end": date(2026, 6, 30), "basis": "quarters", "quarters_found": 4, "trailing_total": total,
             "issued_total": max(total, 0.0), "currencies": list(currencies), "facts": [],

@@ -118,16 +118,23 @@ def debt_flag(runway: Mapping[str, Any] | None) -> dict[str, Any]:
 _DILUTION_RULE = (
     "**10-K／10-Q 國內申報人**：最近四季（期末落在最新已申報季度期末往回 320 天內的季度——相鄰季度期末相距 80–100 天，"
     "日曆季與 52／53 週制都剛好四季；年度期末正好是窗尾就用年度那一列）的新股發行金額"
-    "（us-gaap:StockIssuedDuringPeriodValueNewIssues，SEC companyfacts）**任何一筆 > 0** → 黃（淨加總只印：負值多半是更正，"
-    "或年報與季報 tag 前後不一衍生出的負第四季——不拿來抵銷真實發行）；窗內沒有正值、但期末落在窗內的年度有歸不到季的發行"
+    "（us-gaap:StockIssuedDuringPeriodValueNewIssues，SEC companyfacts）**任何一筆 > 0、而且窗內有一份募資文件** → 黃"
+    "（淨加總只印：負值多半是更正，或年報與季報 tag 前後不一衍生出的負第四季——不拿來抵銷真實發行）。募資文件＝424B1–424B5、"
+    "424B7、S-1、F-1（含 /A）、8-K 且含第 3.02 項（未註冊股權出售）；S-8（員工計畫）與 S-3／F-3／S-3ASR（只是授權）不算"
+    "（封閉清單：engine_c.offerings）。窗＝發行金額那幾季的期初到最新一份定期報告的申報日，以 EDGAR 申報日落窗（INV-6）。"
+    "金額 > 0 但窗內沒有募資文件 → 灰（insufficient_evidence，理由另列、窗內的 S-8／S-3 照印）；申報清單讀不到、或只涵蓋到"
+    "窗的一部分（submissions 只給最近約 1000 筆、最後一次抓取早於窗尾）→ 灰（upstream_unavailable）。"
+    "⚠ 已知限制：424B2／424B5 也用來發公司債，清單分不出股權或債（2026-10-03 手核 NVDA、META 配到的是 Notes）——"
+    "配到的文件逐份印在稽核層，點得回原文。窗內沒有正值、但期末落在窗內的年度有歸不到季的發行"
     "（年報有、季報加起來不到），或 tag 前後不一（負的衍生季、年度小於季度加總）→ 灰（insufficient_evidence）；"
     f"窗內沒有發行紀錄、同口徑股數也沒增加、股數觀測窗滿 {FULL_YEAR_DAYS} 天 → 綠；"
     "股數增加了卻沒有發行紀錄 → 灰（insufficient_evidence：分不出員工股酬與沒標 tag 的增發）；"
     "股數窗不滿一年且沒有發行紀錄 → 灰（附到期日）。5 年回填窗內沒有可存的這個 tag → 灰（provider_missing）；"
     "其他申報人 → 灰（method_not_applicable）。金額、占正規化市值 %、tag、歸不到季的年度差額、前後不一、同期股數變化與"
     " ATM／shelf 授權只印在稽核層、不參與判色；金額只計這一個 tag（公司另用自訂 tag 標的發行不在內）＝已知至少。"
-    "可轉換特別股的發行照算黃——companyfacts 分不出普通股或特別股，稽核層的 accession 指得回申報原文，讀原文可改判；"
-    "員工股票計畫若標在同一個 tag 也算黃（占市值 % 印出來）。⚠ 刻意不用量級門檻把黃再切成紅或綠（INV-5：沒有非憑空的門檻）"
+    "可轉換特別股的發行有募資文件就照算黃——companyfacts 分不出普通股或特別股，稽核層的 accession 指得回申報原文，讀原文可改判；"
+    "員工股票計畫若標在同一個 tag、窗內又沒有募資文件 → 灰（不再算黃）。⚠ 刻意不用量級門檻把黃再切成紅或綠"
+    "（INV-5：沒有非憑空的門檻）"
 )
 
 
@@ -156,6 +163,17 @@ def _shares_window(shares_series: Sequence[tuple[date, float]] | None, *, today:
     return out
 
 
+def _document_text(documents: Sequence[Mapping[str, Any]], *, limit: int = 3) -> str:
+    """幾份申報的一句話：form＋申報日（8-K 帶項目）；超過 `limit` 份印「等 N 份」——accession 在稽核層 inputs 裡。"""
+    def one(d: Mapping[str, Any]) -> str:
+        # 8-K 只會因為第 3.02 項（未註冊股權出售）進募資文件清單——只印那一項，其他項目在稽核層 inputs 裡
+        item = "（第 3.02 項：未註冊股權出售）" if str(d.get("form") or "").upper().startswith("8-K") else ""
+        return f"{d.get('form')} {d.get('filed')}{item}"
+
+    shown = "、".join(one(d) for d in documents[:limit])
+    return shown + (f" 等 {len(documents)} 份" if len(documents) > limit else "")
+
+
 def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
                   runway: Mapping[str, Any] | None, *, today: date, source: str | None = None,
                   issuance: Mapping[str, Any] | None = None) -> dict[str, Any]:
@@ -167,6 +185,9 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
     **+15.30%** 拿到同一組顏色，IQE.L 靠 **+0.0044%** 亮紅（L12：`change > 0` 同時承載員工股酬與靠發股補缺口）。
     ② 2026-10-01 4.0 基準：trailing 一年股數比較讓國內申報人 30 檔亮黃 24 檔——仍是同一個形狀（恆亮，L14-4）。
     修法不是設量級門檻（INV-5），是換一個**只在真的發行新股時才有值**的輸入：companyfacts 的發行金額。
+    ③ 2026-10-02 Phase 4 baseline：11 檔黃裡 5 檔的發行額不到市值 0.15%——金額本身也承載員工計畫配股（L12）。
+    Phase 6 Step 6.6 再要一份**只在真的募資時才存在**的文件：`issuance["offerings"]`（`engine_c.checklist._offering_documents`，
+    清單與判定在 `engine_c.offerings`）——窗內有募資文件才黃；沒有就灰並說出窗內只有什麼；清單讀不到或涵蓋不到窗也是灰。
     """
     shares = _shares_window(shares_series, today=today)
     issuance = dict(issuance or {})
@@ -195,15 +216,37 @@ def dilution_flag(shares_series: Sequence[tuple[date, float]] | None,
     unattributed, inconsistent = list(issuance.get("unattributed") or ()), list(issuance.get("inconsistent") or ())
     currencies = list(issuance.get("currencies") or ())
     cap = issuance.get("market_cap_usd")
+    offerings = dict(issuance.get("offerings") or {})
     inputs.update(window_after=issuance.get("window_after"), window_end=issuance.get("window_end"),
                   issuance_basis=issuance.get("basis"), quarters_found=issuance.get("quarters_found"),
                   trailing_issued=total, issued_total=issued, issued_currencies=currencies, tags=issuance.get("tags"),
                   facts=issuance.get("facts"), unattributed=unattributed, inconsistent=inconsistent,
                   market_cap_usd=cap, market_cap_absence=issuance.get("market_cap_absence"),
                   pct_of_market_cap=(issued / cap if currencies == ["USD"] and isinstance(cap, (int, float)) and cap > 0
-                                     else None))
+                                     else None),
+                  offerings=offerings or None)
     if issued > 0:
-        return _flag("amber", "一個完整會計年度內有新股發行紀錄", rule=_DILUTION_RULE, inputs=inputs)
+        # Phase 6 Step 6.6（使用者定案 §0.1 #9）：金額 > 0 同時承載「靠發股補錢」與「員工計畫配股」（L12）——
+        # 再要一份**只在真的募資時才存在**的文件：窗內有募資文件才亮黃（清單與判定：`engine_c.offerings`）。
+        # ⚠ 理由句不帶數字（D2：紅黃綠不給數字）——表單代號、申報日、accession 住稽核層的 inputs。
+        documents = list(offerings.get("documents") or ())
+        context = list(offerings.get("context") or ())
+        inputs.update(offering_summary=_document_text(documents) if documents else None,
+                      context_summary=_document_text(context) if context else None)
+        if documents:
+            return _flag("amber", "一個完整會計年度內有新股發行紀錄，窗內也有募資文件（增資說明書或私募公告，逐份在稽核層）",
+                         rule=_DILUTION_RULE, inputs=inputs)
+        if offerings.get("status") != "ok":
+            inputs["offering_reason"] = offerings.get("reason")
+            return _flag(None, "有新股發行金額，但募資文件清單讀不到——不判黃也不判綠",
+                         rule=_DILUTION_RULE, inputs=inputs, absence_kind="upstream_unavailable")
+        if not offerings.get("complete"):
+            return _flag(None, "有新股發行金額、窗內沒找到募資文件，但申報清單涵蓋不到整個窗——不判黃也不判綠"
+                         "（涵蓋到哪裡在稽核層）",
+                         rule=_DILUTION_RULE, inputs=inputs, absence_kind="upstream_unavailable")
+        inputs["issued_without_offering"] = True
+        return _flag(None, "只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資（窗內有哪些申報在稽核層）",
+                     rule=_DILUTION_RULE, inputs=inputs, absence_kind="insufficient_evidence")
     if unattributed or inconsistent:
         why = "；".join(x for x in ("年報有新股發行、季報加起來不到——歸不到季" if unattributed else "",
                                    "年報與季報的 tag 前後不一（負的衍生季或年度小於季度加總）" if inconsistent else "")

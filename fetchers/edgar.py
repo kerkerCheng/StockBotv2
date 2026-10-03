@@ -127,46 +127,64 @@ def get_cik(ticker: str) -> str | None:
     return None
 
 
-def get_filings(cik: str, form_types: list[str], n: int, *, raise_on_error: bool = False) -> list[dict]:
-    """取最近 n 份指定 form_type 的 filing metadata。
+def fetch_submissions(cik: str) -> dict:
+    """`data.sec.gov/submissions/CIK##########.json` 一次（**一次請求**）。抓不到就 raise——呼叫端決定要不要吞。
 
-    `raise_on_error=True`：抓不到就 raise，而不是回 `[]`——`[]` 同時代表「抓不到」與「沒有這種申報」，
-    需要分辨兩者的呼叫端（companyfacts 落後檢查，2026-09-29 Phase 3 Step 3.2）要帶它。
+    拆出來是為了讓同一次抓取同時供兩件事用（Phase 6 Step 6.6）：companyfacts 落後檢查要的「最新定期報告申報日」與
+    稀釋燈要的「募資文件清單」——daily 的 EDGAR 步驟因此**不增加請求數**。
     """
-    url = f"{EDGAR_SUBMISSIONS}/CIK{cik}.json"
-    headers = _build_headers()
     rate_sleep()
-    try:
-        resp = requests.get(url, headers=headers, timeout=15)
-        resp.raise_for_status()
-        data = resp.json()
-    except Exception as e:
-        if raise_on_error:
-            raise
-        print(f"[edgar] submissions fetch failed for CIK {cik}: {e}", file=sys.stderr)
-        return []
+    resp = requests.get(f"{EDGAR_SUBMISSIONS}/CIK{cik}.json", headers=_build_headers(), timeout=15)
+    resp.raise_for_status()
+    return resp.json()
 
-    filings = []
+
+def recent_filings(data: dict, cik: str = "") -> list[dict]:
+    """submissions JSON 的 `filings.recent` → 每份申報一個 dict（純函式；順序照 SEC 給的，新的在前）。
+
+    ⚠ `recent` 只保證最近約一年或 1000 筆（申報多的大型股可能不到一年）——呼叫端要用 `filed` 的最小值當涵蓋起點，
+    不得把「清單裡沒有」讀成「那段時間沒有申報」（INV-6）。`items` 是 8-K 的項目編號、逗號分隔（例 "1.01,3.02,9.01"）。
+    """
     recent = data.get("filings", {}).get("recent", {})
     forms = recent.get("form", [])
     dates = recent.get("filingDate", [])
     accessions = recent.get("accessionNumber", [])
     primary_docs = recent.get("primaryDocument", [])
+    items = recent.get("items", [])
     company_name = data.get("name", "")
+    return [{
+        "form_type": form,
+        "filed_date": dates[i],
+        "accession": accessions[i].replace("-", ""),
+        "accession_dashed": accessions[i],
+        "items": items[i] if i < len(items) else "",
+        "primary_doc": primary_docs[i] if i < len(primary_docs) else "",
+        "company_name": company_name,
+        "cik": cik,
+    } for i, form in enumerate(forms)]
 
-    form_types_upper = [f.upper() for f in form_types]
-    for i, form in enumerate(forms):
-        if form.upper() in form_types_upper and len(filings) < n:
-            acc = accessions[i].replace("-", "")
-            filings.append({
-                "form_type": form,
-                "filed_date": dates[i],
-                "accession": acc,
-                "primary_doc": primary_docs[i] if i < len(primary_docs) else "",
-                "company_name": company_name,
-                "cik": cik,
-            })
-    return filings
+
+def filings_from_submissions(data: dict, cik: str, form_types: list[str], n: int) -> list[dict]:
+    """`recent_filings` 裡最近 n 份指定 form_type 的（純函式；與 `get_filings` 同一個篩法）。"""
+    wanted = {f.upper() for f in form_types}
+    return [f for f in recent_filings(data, cik) if f["form_type"].upper() in wanted][:n]
+
+
+def get_filings(cik: str, form_types: list[str], n: int, *, raise_on_error: bool = False) -> list[dict]:
+    """取最近 n 份指定 form_type 的 filing metadata（＝`fetch_submissions` 一次＋`filings_from_submissions`）。
+
+    `raise_on_error=True`：抓不到就 raise，而不是回 `[]`——`[]` 同時代表「抓不到」與「沒有這種申報」，
+    需要分辨兩者的呼叫端（companyfacts 落後檢查，2026-09-29 Phase 3 Step 3.2）要帶它。
+    每筆多帶 `items`（8-K 項目）與 `accession_dashed`（Phase 6 Step 6.6）；既有的鍵不變。
+    """
+    try:
+        data = fetch_submissions(cik)
+    except Exception as e:
+        if raise_on_error:
+            raise
+        print(f"[edgar] submissions fetch failed for CIK {cik}: {e}", file=sys.stderr)
+        return []
+    return filings_from_submissions(data, cik, form_types, n)
 
 
 def fetch_filing_text(cik: str, accession: str, primary_doc: str) -> str | None:
