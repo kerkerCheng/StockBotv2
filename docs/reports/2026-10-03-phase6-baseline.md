@@ -682,3 +682,6 @@ owner：`alpha/providers/close_series.py::bar_state`／`closed_points`——最�
 - 優先序的依據：skill 的 schema 對 `permissions.ask` 的定義是「List of permission rules that should **always** prompt for confirmation」——即使 allow 命中也照問，所以不必刪 `Bash(python *)`。
 - 不影響 daily 的保險檢查：`crons/daily_task.py` 比的是同一輪每個 LLM 步驟前後的 sha256，不是存檔基準。
 - **待使用者確認**：下一次真的跑這兩支腳本時會不會被問（auto mode 與設定重新載入的行為以實際為準）。
+- ⚠ **2026-10-03／04 實測與後續**：pq2 [673]–[676] 批次時 `apply_ra_admission.py` 每次都跳確認（規則生效，已確認）；使用者隨後明說
+  「拿掉那條 ask 規則」（指入圖確認）→ 2026-10-04 刪掉 `apply_ra_admission.py` 的 8 條，`record_trade.py` 的 8 條（資本／live 收據）保留——ask 現為 8 條。
+  入圖的授權載體仍是 pq2 go，補償控制仍是入口的四道檢查＋核准戳記＋`complete-ra` 比對戳記（OPERATIONS「入圖：apply 固定入口」）。原檔備份在 session scratchpad。

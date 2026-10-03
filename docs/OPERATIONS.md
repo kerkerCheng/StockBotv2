@@ -1009,6 +1009,9 @@ canonical hash 相等的檔（`intake.provenance._superseded_extraction_archive`
 寫入面不變；②本節；③rule 不變（入口仍互動專用、`apply_ra_admission.py` 仍是 ask）；④`tests/test_intake_completion_corridor.py` 兩條：舊式命名、
 內容相符 → 收據跟上且舊收據歸檔；同 doc_id、內容不符 → 照樣拒絕（變異：撤掉修法前者紅）；⑤真資料：[673] 以同編號同 digest 重試 → applied。
 
+**2026-10-04 本機 ask 規則：** 6.7e 在 `.claude/settings.local.json` 對本入口加的 8 條 `permissions.ask` 已依使用者明說拿掉（`record_trade.py` 的 8 條保留）。
+本入口回到 step 3 表格寫的狀態：落在本機既有的寬鬆放行之下，補償控制是四道檢查＋核准戳記＋`complete-ra` 比對戳記；授權載體仍是使用者在對話中對 pq2 的 `go`。
+
 ### 入圖收尾
 ```powershell
 & '.venv\Scripts\python.exe' scripts\commit_pending_intake.py --status | --dry-run
