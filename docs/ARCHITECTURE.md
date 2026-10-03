@@ -121,6 +121,12 @@ RA packet 的「入圖後證據等級會變的邊」（`loader.merge_side_effect
 兩支遷移工具的前後對照。**規則只會讓標籤變保守**；會升級的只有資料更正（名冊寫法、名冊新公司、publishers、SourceDoc origin、
 身分合併、補回的引文）。不排序、不打分、不是 gate。
 
+**sub 旗標跟著值走**（2026-10-03 Phase 6 Step 6.5）：`collapse_assertions` 逐屬性取最高 confidence 時記下贏得 sub 值的那一筆
+（`CanonicalEdge.sub_assertion_id`），一條邊的 `sub_language_in_quote` 就是那一筆的旗標（`query.sub_language.canonical_sub_language`，
+唯一 owner）；沒有 sub 或沒核對是 None。消費端：結構表一格、`query.structure` 五個角度的邊、走圖第 1 型的「需求側 sub≥4 其中引文撐得住 N」、
+個股讀取模型「替代難度」的旁註。**只印**：不改任何 sub、不改走圖母體、不進 Q1；**不進 `EdgeView.key()`**，所以不進讀圖的
+`result_digest` 與 staleness 快照列——字表升版或補一段引文不會讓讀圖變 stale。
+
 ---
 
 ## 4. 管道層（Engine B discovery → 入庫）

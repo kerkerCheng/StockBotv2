@@ -528,3 +528,22 @@ dry-run 預告**證據等級會變 32 條**：論文 31 條待判定 → 媒體�
 
 - 轉述字表的 `states` 會誤中「United States」（今天 0 筆受影響；只會讓標籤變保守）——換字表時（plan §14 #6）一起量。
 - 插槽視角：發布者過了 `publisher_lifts` 但沒具名或只是轉述的引文**照列並旁註**（§0.6 #11）——讀的人若覺得雜訊多，再議。
+
+## 19. Step 6.5 sub 旗標跟著值走到消費端（2026-10-03 08:4x 台北）
+
+改動（plan §6）：`collapse_assertions` 記下贏得 sub 值的那一筆（`sub_assertion_id`）；一條邊的旗標＝那一筆的旗標
+（`query.sub_language.canonical_sub_language`，唯一 owner；沒有 sub／沒核對＝None）。消費端：結構表一格（`sub_language_in_quote`，
+逐筆的 `assertions_without_sub_language` 照留）、`query.structure` 五個角度的邊、走圖第 1 型旁註、個股讀取模型「替代難度」的「註」、APP 結構表頁與走圖頁照抄。
+**只印**：不改任何 sub、不改走圖母體、不進 Q1、**不進 `EdgeView.key()`**。
+
+- **L11-6 ④（`--digest` 與讀圖 status）**：改前（HEAD `153bd093`）與改後各跑一次 scratchpad `p65_reading_status.py`——4 份現行讀圖
+  （InP stale_low、CW DFB stale_low、SuperNova current、ELS current）的 status／分級／變化清單／digest **逐位相同**（`cmp` 無差異）；
+  `python -m query.structure <node> --digest` 4 個節點也逐位相同。
+- 真實圖（`p65_real.py`）：結構表 224 列、66 列帶 sub——贏得值那一筆的引文**撐得住 9／撐不住 57**；全圖帶 sub 的 canonical 邊 89 條（10／79）。
+  sub≥4 而撐不住的例：`co:coherent→co:nvidia`（5）、`co:coherent→tech:cw_dfb_laser`（5）、`co:broadcom→tech:cpo`（5）、`co:axt→co:lumentum`（4）。
+  量的是引文措辭（字表 v1·narrow，召回約一半——Phase 4 #18），不是 sub 對不對。
+- 走圖第 1 型（不扣已讀時 5 個命中）每個都帶旁註，例：`mat:inp_substrate`「需求側 sub≥4 有 8 條，其中引文撐得住 1 條」。
+- 測試 `tests/test_sub_language_consumers.py` 5 條；變異：旗標放進 `EdgeView.key()` → 「不進 digest」那條紅；改成「挑同一條邊上撐得住的那一筆」→
+  「贏家的旗標」那條紅（`mutate.py`，跑完還原）。
+- APP（重 materialize `--graph-walk --structure-table` 後，headless Edge `--dump-dom`）：結構表頁「這個值的引文沒談可替代性」**57 處＝artifact 的 57**、
+  逐筆計數照舊 58 處、頁首印 6.4 的層計數行；走圖頁 4 個第 1 型命中（扣掉已讀）各帶旁註；兩頁都沒有「無法載入」。

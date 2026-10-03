@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.5：sub 旗標跟著值走到消費端）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ 的 materialize **讀取與寫入都不變**：旗標由 6.4 起已在同一個唯讀 transaction 取得的 assertion 列與逐字算出（`query.sub_language.sub_language_flags`，本機字表），沒有新查詢、沒有新主機或憑證。artifact 欄位變多：結構表每列 `sub_assertion_id`／`sub_language_in_quote`、走圖第 1 型命中 `demand_quote`／`demand_quote_note`、個股讀取模型「替代難度」的 `reason`；讀圖 artifact 的五個角度的邊多 `sub_language_in_quote`（不進 digest） |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` §3「sub 旗標跟著值走」；`CONCEPTS.md` `sub_language_in_quote` 一列。skill／prompt 不改（字表不得出現在 `prompts/`、`skills/`——L19） |
+| **3 最窄 rule** | daily ⑬ argv 不變；不新增 step、allowlist、APP 路由；APP 只多照抄兩格（結構表那一格、走圖那一句） |
+| **4 contract test** | `tests/test_sub_language_consumers.py`（贏家的旗標、缺不是 false、不進 digest／快照列且讀圖仍 current、走圖第 1 型旁註、「替代難度」旁註且值與 Q1 不變） |
+| **5 端到端 smoke** | 見 baseline §19：4 份現行讀圖的 status／分級／變化清單／digest 改前改後逐位相同（CLI `--digest` 也相同）；真實圖結構表 66 列帶 sub（撐得住 9／撐不住 57） |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.4：證據等級讀逐字——逐來源具名＋轉述字表）
 
 | 步 | 結論 |

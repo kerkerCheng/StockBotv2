@@ -136,14 +136,19 @@ class Neo4jGraphResearchProvider:
         """
         from identity.registry import get_registry
         from query.bottleneck import project_assertions_as_of, structure_table
+        from query.sub_language import get_language, sub_language_flags
 
         if as_of is None:
             if self._table_cache is None:
                 rows, quotes = self._graph()
+                language = get_language()
+                # sub 旗標跟著值走（Phase 6 Step 6.5）：列上多 `sub_language_in_quote`，「替代難度」那一格旁註讀它
                 self._table_cache = structure_table(
                     rows,
                     self.registry or get_registry(),
                     quotes_by_assertion=quotes,
+                    sub_language_flags=sub_language_flags(rows, quotes, language=language),
+                    sub_language_label=language.label,
                 )
             return self._table_cache
 
@@ -172,10 +177,13 @@ class Neo4jGraphResearchProvider:
             )
         # 逐字跟著 assertion id 走：投影只留 as-of 當時可見的 assertion，讀的是它們**現在**的逐字——與屬性值同一個近似
         # （投影過濾的是 assertion，不重建更正走廊改寫之前的版本）。
+        language = get_language()
         table = dict(structure_table(
             projection.rows,
             self.registry or get_registry(),
             quotes_by_assertion=quotes,
+            sub_language_flags=sub_language_flags(projection.rows, quotes, language=language),
+            sub_language_label=language.label,
         ))
         # 投影自己的計數必須跟著資料走（L16），否則消費端會把
         # 「as-of 篩掉一半」讀成「這家公司本來就沒幾條邊」。
@@ -288,6 +296,7 @@ class Neo4jGraphResearchProvider:
                 target_id=target,
                 inputs=ScarcityInputs(
                     substitutability=substitutability,
+                    substitutability_quote_supported=row.get("sub_language_in_quote"),
                     sole_source=row.get("sole_source"),
                     qualification_status=row.get("qualification_status"),
                     qualification_lead_time_weeks=row.get("lead_time_weeks"),

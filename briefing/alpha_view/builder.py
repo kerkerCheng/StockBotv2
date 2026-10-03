@@ -1123,11 +1123,17 @@ def build_alpha_investment_view(
     scarcity = context.structural
     scarcity_refs = _refs(scarcity.evidence)
     graph_as_of = context.as_of
+    # 「替代難度」旁註（Phase 6 Step 6.5）：撐住這個值的那段引文有沒有在談可替代性——旗標跟著值走（贏得值的那一筆）；
+    # 只印、不改值、不進 Q1。None（沒有 sub 或沒核對）不印任何字，不寫成「撐不住」。
+    sub_note = {True: "撐住這個值的那段引文有在談可替代性／替代品認證／排他性",
+                False: "⚠ 撐住這個值的那段引文沒有在談可替代性／替代品認證／排他性——值照印，讀的人自己判斷要不要信它"
+                }.get(scarcity.substitutability_quote_supported)
     scarcity_inputs = tuple(
         _observation(key, label, value, authority=A_STRUCTURE, unit=unit, as_of=graph_as_of,
                      freshness=None, evidence_refs=scarcity_refs,
                      method="已經 graph admission gate 核准的邊屬性；provider 取最強的一條邊，不平均",
-                     missing_reason="圖上這條邊沒有這個屬性（未填≠否；結構表自 2026-09-05 起保留三態）")
+                     missing_reason="圖上這條邊沒有這個屬性（未填≠否；結構表自 2026-09-05 起保留三態）",
+                     reason=sub_note if key == "substitutability" else None)
         for key, label, value, unit in (
             ("substitutability", "替代難度", scarcity.substitutability, "ordinal_1_5"),
             ("sole_source", "獨家供應", scarcity.sole_source, "bool"),

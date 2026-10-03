@@ -136,8 +136,13 @@ def test_structure_table_lists_ids_and_changes_no_other_cell() -> None:
     by_company = {r["company_id"]: r["assertions_without_sub_language"] for r in flagged["rows"]}
     assert by_company == {"co:a": ["e2"], "co:b": []}
     assert flagged["sub_language"]["checked"] == 3 and flagged["sub_language"]["without"] == 1
-    # 其餘每一格一字不動（只印、不放閘）
-    strip = lambda result: [{k: v for k, v in r.items() if k != "assertions_without_sub_language"}  # noqa: E731
+    # Phase 6 Step 6.5：canonical 那一格＝贏得 sub 值那一筆的旗標（co:a 的值是 confidence 0.8 的 e1 給的，不是 e2）
+    canonical = {r["company_id"]: r["sub_language_in_quote"] for r in flagged["rows"]}
+    assert canonical == {"co:a": True, "co:b": True}
+    assert all(r["sub_language_in_quote"] is None for r in plain["rows"])                # 沒核對＝None，不是 False
+    # 其餘每一格一字不動（只印、不放閘）——兩個旗標格都是同一份旗標的消費端，其餘不得跟著變
+    flag_cells = {"assertions_without_sub_language", "sub_language_in_quote"}
+    strip = lambda result: [{k: v for k, v in r.items() if k not in flag_cells}  # noqa: E731
                             for r in result["rows"]]
     assert strip(plain) == strip(flagged) and plain["coverage"] == flagged["coverage"]
     md = render_markdown(flagged)

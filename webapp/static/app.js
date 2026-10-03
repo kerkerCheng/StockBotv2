@@ -1426,10 +1426,16 @@ function subCell(row) {
   cell.appendChild(el('span', 'sub-score', hasSub ? `${row.substitutability}/5` : '未填'));
   cell.appendChild(document.createTextNode(' '));
   cell.appendChild(soleSourceBadge(row.sole_source));
-  // Phase 4 Step 4.4b：撐住這個值的引文沒有任何一個字在談可替代性——只標、不改值（id 在滑鼠提示裡，指得回原文）。
+  // Phase 6 Step 6.5：**這個值本身**（贏得 sub 值的那一筆）的引文撐不撐得住——旗標跟著值走，只標、不改值。
+  if (row.sub_language_in_quote === false) {
+    const own = el('div', 'dim', '⚠ 這個值的引文沒談可替代性');
+    own.title = row.sub_assertion_id || '';
+    cell.appendChild(own);
+  }
+  // Phase 4 Step 4.4b：這條邊上帶 sub 的每一筆裡，引文沒有任何一個字在談可替代性的筆數（id 在滑鼠提示裡，指得回原文）。
   const without = row.assertions_without_sub_language || [];
   if (without.length) {
-    const flag = el('div', 'dim', `⚠ 引文沒談可替代性 ${without.length} 筆`);
+    const flag = el('div', 'dim', `引文沒談可替代性 ${without.length} 筆`);
     flag.title = without.join('\n');
     cell.appendChild(flag);
   }
@@ -2221,6 +2227,8 @@ function walkHitList(q) {
       li.appendChild(el('span', 'rule', `首見 ${hit.first_seen}${hit.title ? '｜' + hit.title : ''}`));
     }
     if (hit.demand && hit.demand.length) li.appendChild(el('span', 'rule', '需求側：' + hit.demand.join('；')));
+    // Phase 6 Step 6.5：撐住需求側 sub 值的引文有沒有在談可替代性——artifact 給的那一句照抄，前端不重算（L16）
+    if (hit.demand_quote_note) li.appendChild(el('span', 'rule', hit.demand_quote_note));
     list.appendChild(li);
   });
   return list;

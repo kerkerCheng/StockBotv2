@@ -391,6 +391,9 @@ class ScarcityInputs:
     """Q1 的結構輸入。全部來自 Engine A，全部帶 evidence。"""
 
     substitutability: int | None = None
+    #: 撐住這個 substitutability 值的那段引文有沒有在談可替代性（Phase 6 Step 6.5；`query.sub_language` 的旗標，
+    #: 贏得值的那一筆）。None＝沒有 sub 或沒核對——**不是 False**。**只印**：不進 Q1、不改值（只印不放閘，L14）。
+    substitutability_quote_supported: bool | None = None
     sole_source: bool | None = None
     qualification_status: str | None = None
     qualification_lead_time_weeks: int | None = None

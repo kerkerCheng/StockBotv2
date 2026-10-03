@@ -9,6 +9,10 @@
   「引文措辭」，不是「sub 對不對」（L14：先量測後放閘；準確率抽樣見 Step 4.4 的八欄）。
 - 消費端：結構表每條邊的 `assertions_without_sub_language`（`query.bottleneck.structure_table`）、層計數器 ③
   （`query.layer_stats`）、RA packet 的警告（`intake.actions.check_sub_language`）——都問這裡，不各寫一份（L16）。
+  Phase 6 Step 6.5 起旗標**跟著值**走到消費端（`canonical_sub_language`：贏得 sub 值的那一筆）：結構表的
+  `sub_language_in_quote` 一格、`query.structure` 五個角度的邊、走圖第 1 型的「需求側 sub≥4 其中引文撐得住 N」、
+  個股讀取模型「替代難度」的旁註。⚠ 旗標與字表版本都**不進**讀圖的 `result_digest` 與 staleness 快照列——
+  字表升版不能讓讀圖變 stale（量到的會是我們的程式改版，不是圖）。
 - ⚠ L19：字表**不得**出現在 `prompts/`、`skills/`——抽取端讀得到字表，就會挑含這些字的引文，旗標就恆亮
   （`tests/test_sub_language.py` 守著）。
 """
@@ -150,6 +154,20 @@ def sub_value(row: Mapping[str, Any]) -> Any:
     return value
 
 
+def canonical_sub_language(edge: Any, flags: Mapping[str, bool] | None) -> bool | None:
+    """一條 canonical 邊的 sub 旗標＝**贏得 sub 值的那筆 assertion**（`CanonicalEdge.sub_assertion_id`）的旗標
+    （Phase 6 Step 6.5：旗標跟著值走——印的 sub 是哪一筆給的，就印那一筆的引文撐不撐得住）。
+
+    同一條邊另一筆引文撐得住、但 confidence 較低（沒贏得值）→ 仍印贏家那筆的旗標，不挑好看的那一筆。
+    回 None 而不是 False 的三種情況：這條邊沒有 sub、這次沒核對（`flags` 是 None）、贏家那筆沒有 id（對不到引文）——
+    「沒有旗標」與「引文不撐」不得同形（L12）。**只印、不改值、不進讀圖 digest**（plan §0 第 6 條）。
+    """
+    if flags is None or getattr(edge, "substitutability", None) is None:
+        return None
+    aid = getattr(edge, "sub_assertion_id", None)
+    return flags.get(str(aid)) if aid else None
+
+
 def sub_language_flags(rows: Iterable[Mapping[str, Any]], quotes_by_assertion: Mapping[str, Iterable[str]], *,
                        language: SubLanguage | None = None) -> dict[str, bool]:
     """每一筆**帶 sub 的** assertion → 它的引文有沒有可替代性語言（`sub_language_in_quote`）。
@@ -170,6 +188,6 @@ def sub_language_flags(rows: Iterable[Mapping[str, Any]], quotes_by_assertion: M
 
 
 __all__ = [
-    "LANGUAGE_PATH", "LanguageConfigError", "SubLanguage", "fetch_all_quotes", "get_language", "load_language",
-    "matched_terms", "quote_has_sub_language", "sub_language_flags", "sub_value",
+    "LANGUAGE_PATH", "LanguageConfigError", "SubLanguage", "canonical_sub_language", "fetch_all_quotes",
+    "get_language", "load_language", "matched_terms", "quote_has_sub_language", "sub_language_flags", "sub_value",
 ]

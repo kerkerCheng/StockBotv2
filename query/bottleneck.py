@@ -517,6 +517,12 @@ class CanonicalEdge:
     #: 豁免都是**文件層級**的宣告：同一家媒體的兩份文件可能一份 independent、一份 same_origin（Step 4.3、Phase 6 Step 6.4）。
     #: ⚠ 2026-10-03 之前這裡是 `origin_linkages`（origin → 宣告集合）：逐 origin 收成一個集合，就分不出是哪一份宣告的。
     origin_assertions: dict = field(default_factory=dict)
+    #: 贏得 `substitutability` 值的那筆 assertion（逐屬性取最高 confidence；同分時先到者贏——與值的決定同一步）。
+    #: sub 旗標跟著**值**走（Phase 6 Step 6.5）：這條邊印的 sub 是哪一筆給的，就印那一筆的引文撐不撐得住。
+    sub_assertion_id: str | None = None
+    #: 撐住這個 sub 值的那段引文有沒有在談可替代性（`query.sub_language.canonical_sub_language`）。
+    #: None＝這條邊沒有 sub、這次沒核對、或贏家那筆沒有 id——**不是 False**。只印、不改值、不進讀圖 digest。
+    sub_language_in_quote: bool | None = None
     evidence: str = "self_reported"
     #: 引用到的 SourceDoc id → 它的 `published_at`（字串或 None）。
     #: ⚠ 這是 point-in-time 的唯一時間線索：canonical edge 本身沒有時間欄位，
@@ -539,13 +545,15 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
     # 正確語意是「對這個屬性發言過的文件裡，最可信的那一份怎麼說」。
     attr_conf: dict[tuple, dict[str, float]] = defaultdict(dict)
 
-    def _take(key: tuple, edge: CanonicalEdge, name: str, value: Any, conf: float) -> None:
+    def _take(key: tuple, edge: CanonicalEdge, name: str, value: Any, conf: float) -> bool:
+        """這一筆贏得這個屬性就寫進邊、回 True（呼叫端據此記下是哪一筆贏的）。"""
         if value is None:
-            return
+            return False
         if conf <= attr_conf[key].get(name, -1.0):
-            return
+            return False
         attr_conf[key][name] = conf
         setattr(edge, name, value)
+        return True
 
     for row in rows:
         src, rel, dst = row.get("src"), row.get("relation"), row.get("dst")
@@ -574,9 +582,10 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
                 (row.get("assertion_id") or None, doc_id or None, row.get("origin_linkage") or None))
 
         sub = attrs.get("substitutability")
-        _take(key, edge, "substitutability",
-              int(sub) if isinstance(sub, (int, float)) and not isinstance(sub, bool) else None,
-              conf)
+        if _take(key, edge, "substitutability",
+                 int(sub) if isinstance(sub, (int, float)) and not isinstance(sub, bool) else None,
+                 conf):
+            edge.sub_assertion_id = str(row["assertion_id"]) if row.get("assertion_id") else None
         ramp = attrs.get("ramp_execution")
         _take(key, edge, "ramp_execution",
               int(ramp) if isinstance(ramp, (int, float)) and not isinstance(ramp, bool) else None,
@@ -768,11 +777,14 @@ def classify_anchor_gaps(
     }
 
 
-def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None = None) -> dict[str, Any]:
+def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None = None,
+               sub_language_in_quote: bool | None = None) -> dict[str, Any]:
     """一條邊的結構事實。**每一格都是圖上的值或由圖上的值走出來的路徑**，沒有任何評分。
 
     `without_sub_language`：這條邊上帶 sub、但引文不含可替代性語言的 assertion id（Phase 4 Step 4.4b；
     `query.sub_language` 是唯一 owner）。None＝這次沒有核對（呼叫端沒給旗標），**不是**「全部都有」。
+    `sub_language_in_quote`：**贏得這一列 sub 值的那筆**引文撐不撐得住（Phase 6 Step 6.5；
+    `query.sub_language.canonical_sub_language`）。None＝沒有 sub 或沒核對（看結果的 `sub_language` 是不是 None 分得出）。
     """
     # ⚠ 從**公司**往上走，不是從瓶頸節點。這一列問的是「這家公司的產出有沒有人
     # 在花錢買」，不是「這個材料有沒有人要」。首版從 `edge.dst` 走，於是
@@ -809,6 +821,9 @@ def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None
         "demand_hops": (len(chain) - 1) if chain else None,
         # 列表不是布林（plan §5 b）：讀的人要能指回是哪幾筆 assertion 的引文沒在談可替代性。
         "assertions_without_sub_language": without_sub_language,
+        # 這一列印的 sub 是哪一筆給的、那一筆的引文撐不撐得住（只印、不改 sub、不改順序）。
+        "sub_assertion_id": edge.sub_assertion_id,
+        "sub_language_in_quote": sub_language_in_quote,
     }
 
 
@@ -834,7 +849,11 @@ def structure_table(
     `sub_language` 總數；沒給就是 None（沒核對）。**只印、不放閘**：不改任何一格、不改收斂、不改順序。
     `quotes_by_assertion`（**必填**，Phase 6 Step 6.4）：`query.sub_language.fetch_all_quotes` 的輸出——證據等級的
     逐來源具名核對讀它（`classify_evidence`）。
+    給了 `sub_language_flags`，每列另多一格 `sub_language_in_quote`：**贏得這一列 sub 值的那筆**引文撐不撐得住
+    （Phase 6 Step 6.5；旗標跟著值走，不挑同一條邊上另一筆好看的）。
     """
+    from query.sub_language import canonical_sub_language
+
     rows = list(rows)
     canonical = collapse_assertions(rows)
     without_by_edge: dict[tuple, list[str]] | None = None
@@ -869,7 +888,8 @@ def structure_table(
         table.append(_table_row(
             edge, registry, upward,
             without_sub_language=(sorted(without_by_edge.get((edge.src, edge.relation, edge.dst), ()))
-                                  if without_by_edge is not None else None)))
+                                  if without_by_edge is not None else None),
+            sub_language_in_quote=canonical_sub_language(edge, sub_language_flags)))
 
     # 索引序：公司、關係、節點。**不是排序鍵**——沒有任何一格參與。
     table.sort(key=lambda r: (str(r["company_id"]), str(r["relation"]), str(r["bottleneck"])))
@@ -1096,8 +1116,11 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         ticker = r["ticker"] or "—"
         sole = "｜sole_source" if r["sole_source"] else ""
         sub = "未填" if r["substitutability"] is None else f"{r['substitutability']}/5"
+        # 這個值本身（贏得值的那一筆）撐不撐得住——Phase 6 Step 6.5；跟逐筆清單分開說（一個是值、一個是全部帶 sub 的筆數）
+        if r.get("sub_language_in_quote") is False:
+            sub += "｜⚠這個值的引文沒談可替代性"
         if r.get("assertions_without_sub_language"):
-            sub += f"｜⚠引文無可替代性語言 {len(r['assertions_without_sub_language'])}"
+            sub += f"｜引文無可替代性語言 {len(r['assertions_without_sub_language'])} 筆"
         out.append(
             f"| {r['company_id']}（{ticker}） | {r['relation']} → `{r['bottleneck']}` "
             f"| {sub}{sole} | {EVIDENCE_LABEL[r['evidence']]} "

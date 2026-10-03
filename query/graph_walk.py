@@ -186,6 +186,15 @@ def _layer_nodes(edges: Sequence[CanonicalEdge]) -> list[str]:
     return sorted({n for e in edges for n in (e.src, e.dst) if n.startswith(DOWNSTREAM_PREFIXES)})
 
 
+def demand_quote_note(n: int, held: int, unchecked: int) -> str:
+    """第 1 型命中旁的一句（Phase 6 Step 6.5）：需求側 sub≥4 的那幾條，**撐住值的那段引文**有沒有在談可替代性。
+
+    量的是引文措辭，不是 sub 對不對；只印、不改母體、不改命中（`query.sub_language` 的旗標只印不放閘）。
+    沒核對的另計，不併進「撐不住」（L12）。"""
+    note = f"需求側 sub≥{DEMAND_UNAVOIDABLE_MIN_SUB} 有 {n} 條，其中引文撐得住 {held} 條"
+    return note + (f"、{unchecked} 條沒核對" if unchecked else "")
+
+
 def layer_questions(edges: Sequence[CanonicalEdge], *,
                     read_nodes: Iterable[str],
                     current_layer_nodes: Iterable[str] = (),
@@ -220,7 +229,12 @@ def layer_questions(edges: Sequence[CanonicalEdge], *,
         suppliers = sorted({e.src for e in supply})
         demand = [f"{e.src} {e.relation} {e.dst}（sub {e.substitutability}）" for e in hard]
         if 1 <= len(suppliers) <= THIN_LAYER_MAX_SUPPLIERS and node not in read:
+            # 需求側 sub≥4 那幾條，撐住值的引文有沒有在談可替代性（Phase 6 Step 6.5；只印、不改母體、不改命中）
+            held = sum(1 for e in hard if e.sub_language_in_quote is True)
+            unchecked = sum(1 for e in hard if e.sub_language_in_quote is None)
             thin.append({"subject": node, "suppliers": suppliers, "demand": demand,
+                         "demand_quote": {"n": len(hard), "held": held, "unchecked": unchecked},
+                         "demand_quote_note": demand_quote_note(len(hard), held, unchecked),
                          "text": QUESTION_BY_KEY["thin_layer_unread"].question.format(node=node, n=len(suppliers))})
         if len(suppliers) == 1 and node not in layer_read:
             evidence = {e.evidence for e in supply}
@@ -619,6 +633,8 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             continue
         for hit in q["hits"]:
             out.append(f"- {hit['text']}")
+            if hit.get("demand_quote_note"):
+                out.append(f"  - {hit['demand_quote_note']}")
             if q["key"] == "duplicate_node":
                 out += _duplicate_hit_lines(hit)
         extra = q.get("extra") or {}

@@ -67,7 +67,7 @@ from query.bottleneck import (  # noqa: E402
     DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
     classify_evidence, collapse_assertions, demand_chain, fetch_assertions, shared_name_forms,
 )
-from query.sub_language import fetch_all_quotes  # noqa: E402
+from query.sub_language import canonical_sub_language, fetch_all_quotes, sub_language_flags  # noqa: E402
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
 #: 真的問出答案的四次查詢，第五個是排序本來就有的可達性檢查。
@@ -124,6 +124,10 @@ class EdgeView:
     qualification_status: str | None
     evidence: str | None
     documents: int
+    #: 撐住這條邊 sub 值的那段引文有沒有在談可替代性（Phase 6 Step 6.5；`query.sub_language.canonical_sub_language`）。
+    #: None＝沒有 sub 或沒核對。⚠ **不進 `key()`**：字表升版或補一段引文都會讓它變，進了 digest 每一份讀圖都會在
+    #: 部署那天變 stale——量到的是我們的程式，不是圖（plan §0 第 6 條；與 `documents` 同一個理由）。
+    sub_language_in_quote: bool | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -131,10 +135,14 @@ class EdgeView:
             "substitutability": self.substitutability, "sole_source": self.sole_source,
             "qualification_status": self.qualification_status,
             "evidence": self.evidence, "documents": self.documents,
+            "sub_language_in_quote": self.sub_language_in_quote,
         }
 
     def key(self) -> tuple:
-        """進 digest 的欄位——**值變了就算變**，不只是邊在不在。"""
+        """進 digest 的欄位——**值變了就算變**，不只是邊在不在。
+
+        ⚠ 刻意不含 `documents` 與 `sub_language_in_quote`：前者是研究量、後者是引文措辭的機械旗標（字表會升版）；
+        讀圖快照列（`alpha.structure_reading.contracts`）與 staleness 比對也只讀這七格。"""
         return (self.src, self.relation, self.dst, self.substitutability,
                 self.sole_source, self.qualification_status, self.evidence)
 
@@ -181,6 +189,7 @@ def _view(edge: CanonicalEdge) -> EdgeView:
         substitutability=edge.substitutability, sole_source=edge.sole_source,
         qualification_status=edge.qualification_status,
         evidence=edge.evidence, documents=edge.documents,
+        sub_language_in_quote=edge.sub_language_in_quote,
     )
 
 
@@ -408,8 +417,10 @@ def render_markdown(view: StructureView,
         out.append("| 邊 | sub | sole | 合格狀態 | 證據 | 文件 |")
         out.append("|---|---|---|---|---|---|")
         for e in sorted(rows, key=lambda r: -(r.substitutability or 0)):
+            # 這個 sub 值的引文撐不撐得住（Phase 6 Step 6.5）：只印、不改值；不進 digest
+            sub_note = "（⚠引文沒談可替代性）" if e.sub_language_in_quote is False else ""
             out.append(
-                f"| `{e.src}` {e.relation} `{e.dst}` | {e.substitutability if e.substitutability is not None else '—'} "
+                f"| `{e.src}` {e.relation} `{e.dst}` | {e.substitutability if e.substitutability is not None else '—'}{sub_note} "
                 f"| {'✓' if e.sole_source else ('✗' if e.sole_source is False else '—')} "
                 f"| {e.qualification_status or '—'} | {e.evidence or '—'} | {e.documents} |"
             )
@@ -559,11 +570,14 @@ def _classify_edges(rows, quotes_by_assertion: Mapping[str, Iterable[str]]) -> l
     # 修法是**去用既有的唯一 owner**，不是在這裡重造一套判定（L16）。
     registry = get_registry()
     shared = shared_name_forms(registry)
+    # sub 旗標跟著值走（Phase 6 Step 6.5）：同一份 rows／逐字算一次，canonical 邊取贏得 sub 值那一筆的旗標。
+    flags = sub_language_flags(rows, quotes_by_assertion)
     for edge in edges:
         edge.evidence = classify_evidence(
             edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
             quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions, shared=shared,
         )
+        edge.sub_language_in_quote = canonical_sub_language(edge, flags)
     return edges
 
 
