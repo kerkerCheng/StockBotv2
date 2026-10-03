@@ -154,6 +154,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 13 | 6.6 | 新表 `equity_offering_filings`（ticker、cik、form、items、filed、accession 主鍵、fetched_at） | 照建，**另加** `equity_offering_checks`（每檔最後一次抓清單的時間、清單涵蓋起點、筆數）；清單之外也存 S-8／S-3 等「不算募資」的登記表單（判定在讀取端，表裡不存判定） | 只有一張表時「抓過、窗內沒有」與「從沒抓過」同形（L12、INV-3）；submissions 的 `recent` 只給最近約 1000 筆，沒有涵蓋起點就說不出窗內「沒有」（INV-6）。存 S-8／S-3 是為了讓灰燈印得出「窗內只有員工計畫登記」 |
 | 14 | 6.6 | 灰燈理由「只有發行金額、窗內沒有募資文件（S-8 員工計畫不算募資）」 | 「只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資（窗內有哪些申報在稽核層）」；黃燈理由同樣不帶表單代號與日期 | 既有契約 D2「紅黃綠不給數字」：理由句不得帶數字（`tests/test_wipeout_flags.py::test_lamp_reasons_do_not_leak_company_numbers`）——「S-8」「424B5」與申報日都帶數字；代號與日期改住稽核層的 inputs |
 | 15 | 6.6（R2-b CONDITIONAL_GO） | （未提） | C1：已知限制補 MRVL（424B5 `0001193125-26-142958`、424B2 `0001193125-26-147640` 是 Senior Notes）——`_DILUTION_RULE`、baseline §20、§14 #10 三處。C2（可選，照做）：規則文字的表單清單補「8-K（含 8-K/A）」與 S-8 POS、S-3／F-3 家族的 /A、ASR、MEF 變體 | C1：初版的「已知限制」只寫手核過的 NVDA、META，MRVL 的 424B5／424B2 沒讀封面就沒寫——自己引用的限制要套同一套追源紀律（L11-2）；判色不變（MRVL 另有 8-K 3.02 ×4 與 424B7）。C2：文字寫的比程式少，讀規則的人會以為 8-K/A 不算。兩項都只動文字，不動判定；窄範圍覆核（乾淨 context）見進度表 |
+| 16 | 6.7a（影響結案 §12 第 3 項） | 改哪裡：`structure_table`、APP 結構表頁、心跳「前三錨」 | 另把 `anchor_basis` 帶到 alpha provider（`ScarcityInputs.demand_anchor_basis`、邊表）、個股頁「需求錨點／距需求端跳數」旁註與邊表「（公司層）」、session assessor 的輸入；心跳那一行多「公司層 N 列」（舊 artifact 印「錨是公司側」） | 列上的 `demand_anchor` 一改成逐列，凡是印它的地方都承載兩種問題——只改 plan 列的三處，個股頁的同一格就是 L12 的形狀（L16：分類跟著資料走）。實測 provider 同公司順序只有 GFS 變、Q1 取到的邊 0 家變，但 Q1 那條邊的錨 3 家、跳數 9 家會變——**結案的個股頁逐檔歸因多一個來源「6.7a 逐列錨」**（AXTI、COHR 的稽核區兩格；baseline §21a） |
 
 ---
 
@@ -356,7 +357,7 @@ L11-6 ④：最先壞的是 AXTI 敘事押的 InP 層讀圖——它的 `rides[]
 
 1. `pytest -q` 全綠；測試檔數差＝新增－退役；函式層級以 6.0 名單比對，拿掉的每一個寫去向。
 2. `python -m audit invariants` 綠（含 SourceDocSync、PointInTime、QueueLiveness、Expiry）。
-3. 無未解釋語意 diff：心跳與 6.0 逐行對照，只在段 3「層：」行（新計數器）、前三錨、稀釋燈相關的歸零旗標計數、[666]／6.2／6.3 入圖造成的變動處變；個股頁面板 digest 對 6.0 批次逐檔歸因（證據標籤變動、敘事新版、稀釋燈）；**讀圖 `result_digest` 的變動只來自圖真的變了**（不是 6.5 的旗標）。
+3. 無未解釋語意 diff：心跳與 6.0 逐行對照，只在段 3「層：」行（新計數器）、前三錨、稀釋燈相關的歸零旗標計數、[666]／6.2／6.3 入圖造成的變動處變；個股頁面板 digest 對 6.0 批次逐檔歸因（證據標籤變動、敘事新版、稀釋燈、6.7a 逐列錨〔§0.6 #16〕）；**讀圖 `result_digest` 的變動只來自圖真的變了**（不是 6.5 的旗標）。
 4. 無新 dual authority：「算不算外部印證」只有 owner 一個函式（列出全部呼叫端）；名字比對只有 `quote_names_company`；轉述字表只有一個 loader；募資文件判定只有 `_equity_issuance`→`dilution_flag` 一條路；需求錨只有 `demand_chain`。
 5. 無 silent drop：沒升外部印證的每條邊帶三種理由之一；名冊無名可比與引文沒具名分開；Neo4j／EDGAR 讀不到印 `upstream_unavailable`；未收盤 K 棒拿掉的與「收盤狀態未知」的都計數。
 6. Point-in-time：募資文件以 `filed` 落窗；`audit PointInTime` PASS；as-of 視角沒有拿現在的申報清單冒充。
