@@ -124,7 +124,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）：真實 11 檔黃 → 10（LRCX 轉灰）、每盞黃燈指得出窗內一份募資文件；daily 請求數不變；R2-b CONDITIONAL_GO（已知限制漏寫 MRVL 的兩份公司債說明書）→ 條件修正 → 窄範圍覆核 GO（baseline §20；偏差 §0.6 #13–#15；待決 §14 #10） | ✅ | 執行模型 | 見 git log「Step 6.6」 |
 | 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則——a 有錨 211 → 213（改前有錨改後沒錨 0；Lam 9 列 6 列逐列、3 列公司層；「公司層」跟著錨走到個股頁）；b 頁面頂端「請重啟」橫幅（headless Edge 三種情況）；c 盤中 K 棒拿掉並計數（同一份價格上追蹤表逐欄相同、計分表只差時間戳記）；d 真實 15 筆預測終局不變；e ask 16 條（下一次跑請使用者確認會被問）（baseline §21；偏差 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 6.7」 |
 | 6.8 | 研究：降級 22 條逐條有去向——補引文 RA 6 條（**pq2 [673]–[676] 等 go**；[677]／[678] 作廢建議 drop）、身分修正 4（[670]）、6.3b 定案 3、維持降級 8、延後 1；重讀 InP、CW DFB（仍 volume，四份讀圖全 current）；四檔敘事：LITE 改一句＋重押讀圖、AXTI／COHR／SIVE 只重押讀圖（收據 `docs/reports/2026-10-03-phase6-step68-research.md`；偏差 §0.6 #18；待決 §14 #11–#13） | ✅ | 執行模型 | 見 git log「Step 6.8」 |
-| 6.9 | 新管線 full chain 測試（證據鏈與稀釋燈鏈） | ○ | 執行模型 | |
+| 6.9 | 新管線 full chain 測試（證據鏈與稀釋燈鏈）：`tests/test_evidence_criteria_full_chain.py` 3 支——證據鏈五種夾具情形（不具名、轉述、具名非轉述、名冊新寫法、身分合併前後）一路到結構表、插槽旁註、層計數器、走圖第 2 型、心跳兩行與讀圖引用核對；稀釋燈鏈到個股頁首屏那一格與稽核區（三題面板）那一列；五個變異（owner 轉述判定、層計數器的字、引用核對未具名分支、稽核區灰燈 detail、募資文件封閉清單）各自轉紅；既有三支 full chain 不動。執行中曾以為灰燈 inputs 沒到個股頁、查正式 73 個 artifact 稽核區每盞灰燈都帶，未改程式 | ✅ | 執行模型 | 見 git log「Step 6.9」 |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
