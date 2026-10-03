@@ -4,7 +4,7 @@
 > 基準：[`2026-10-03-phase6-baseline.md`](2026-10-03-phase6-baseline.md)（§0–§14 是 6.0 快照，§15–§21 是各 Step 的真實資料驗收）；
 > 研究收據：[`2026-10-03-phase6-step68-research.md`](2026-10-03-phase6-step68-research.md)。
 > 執行者全程 opus 5.5。本報告的數字都是 2026-10-03 13:5x–14:3x 台北量的（星期六，各市場休市）；**現況數字會腐壞，引用前重跑各列的查證命令**。
-> **狀態：使用者 2026-10-03 對 [670]–[676] go、[677]／[678] drop，全部執行完畢（§6）；結案 R2 的 B1 由 [670] apply＋C1 五項解除（§8）。**
+> **狀態：使用者 2026-10-03 對 [670]–[676] go、[677]／[678] drop，全部執行完畢（§6）；結案 R2 的 B1 由 [670] apply＋C1 五項解除，C1＋C2 窄範圍覆核 GO（§8）——ROADMAP Phase 6 ✅（2026-10-04）。**
 > 量測前以 HEAD（`839d48a7`）重跑 materialize（6.0 同一行：`--tracked --registry-listed --structure-table --graph-walk --structure-readings --candidates`，80/80），
 > 量測腳本與全文在 scratchpad（`p6c_*.py`、`p6_close.json`、`p6_stockpage_close.json`、`hb_close.md`、`invariants_close.out`），全部唯讀。
 
@@ -153,7 +153,7 @@
   - [670] → 事前全圖匯出（`library/private/backups/pq2-670-20261003T153755Z/neo4j_export.json`，2698 nodes／6107 relationships，verify 通過）→
     dry-run（副作用只剩一個別名聯集、8 條、活的引用 0、兩份抽取檔指紋相符）→ `loader/migrate_identity_cleanup.py --apply --pq2 670 --backup-dir …`
     → `evidence_mismatch_vs_dry_run`＝[]；收據 `loader/manifests/identity-cleanup-20261003.result.json`；authority receipt `graph_migration`。
-  - 三條把 go 前真實資料寫成前提的測試改用暫存名冊副本／虛構刊名重建前提、斷言不動（commit `dfa6d8c9`；全套 3445＋3 → 全綠）。
+  - 三條把 go 前真實資料寫成前提的測試改用暫存名冊副本／虛構刊名重建前提、斷言不動（commit `dfa6d8c9`；修前全套 3 failed／3445 passed，修後 **3448 passed, 1 skipped**）。
 - **這一批 go 之後（同晚量）**：全圖 canonical 邊 537 → 534、**外部印證 230 → 236**；沒升外部印證 未具名 13 → 8、名冊無名 4 → 0、轉述 2 → 1；
   對 6.0 凍結鍵 升 4（6.3c 2＋[670] 雙方聯合 2）／降 16（22 − RA 補回 6 − nava 那條併掉 1 ＋ [671] 的 Novanta 1）／同級互換 31（[671] 的論文）／消失 3（[670]），
   逐條歸得到事件；個股頁 COHR「6-inch InP Fab」、LITE「Pluggable turnkey ELS module」回到「有客戶或第三方印證」；讀圖現行 4、stale 0（這批沒讓任何讀圖變舊）；
@@ -190,3 +190,9 @@
   C1＋C2 交給一個新的窄範圍審查者一起覆核（結果見本節最後）。
 - **C2（已改，本 commit）**：gate 3 與 §1.2 改寫——每頁來源補上 `price_series`（`fetch_close_series`，6.7c）；個股頁寫成「四個維度＋程式 hunk 內無未解釋 diff；面板級對 6.0 無法驗證」。機械驗法：本檔 grep 得到 `price_series`／`close_series` 與「面板級」。C1＋C2 在 [670] apply 之後由一個新的窄範圍審查者一起覆核（plan §0.5 #14 的做法）。
 - **非阻擋與處置**：N1 正式庫兩張空表與 sha 變動 → 寫進 §2 ④；N2 NVDA／META 公司債 → §2 ④ 註明「照封閉清單的字面成立」、實質見 §5 #10；N3 Fabrinet 的 Navanakorn 廠區 → §2 ② 勘誤、baseline §16.1 補更正註記；N4 敘事格層仍指舊讀圖 → §5 #16；N5 full chain 測試的呼叫改寫漏寫一支 → §3 更正；N6 UHP 延後的重問 → §5 #11 寫明；N7 independent 規則空的成立 → §2 ③ 寫明；N8 審查者唯讀連線碰到 -shm 旁檔（`decision_lab.db-shm`、Engine C 的 -shm）、兩個主 DB 的 sha 與 mtime 不變——照實記錄於此。
+- **C1＋C2 窄範圍覆核（新的 sonnet 審查者、乾淨 context、唯讀；HEAD `914a42dd`）：Verdict GO。** C1 ①名冊 103 家、兩個 id 不在 ②Cypher 節點數 0
+  ③OpenLight → `co:openlight_photonics` ④`evidence_changes` 8、`evidence_mismatch_vs_dry_run`＝[]（另讀 `loader/migrate_identity_cleanup.py` 的收尾：
+  apply 對真圖重算、逐條比 dry-run，不等就中止、不會寫出乾淨的 result）⑤invariants 14 PASS（覆核當下 5459 筆，與 §8 記的 5462 差 3 筆＝會腐壞的佇列／watch 計數快照）；
+  pq2 [670]–[678] 9／9 到終局（[673]–[676] receipt 的 commit 與 git log 逐筆相符）；C2 grep 命中 `price_series`／`close_series` 與「面板級」、
+  gate 3 個股頁是 ⚪ 不是無條件 ✅。非阻擋三句：PointInTime 13 份未定日（已知限制）、GateDiscrimination 40／64 樣本不足（audit 自己標不判）、§5／§7 的後續事項。
+  → ROADMAP Phase 6 ✅、`docs/plans/README.md` completed、plan status completed（2026-10-04）。

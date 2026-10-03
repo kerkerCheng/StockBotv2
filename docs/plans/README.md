@@ -31,7 +31,7 @@
 | 3 候選狀態加三題 | [2026-09-26-001](2026-09-26-001-feat-phase3-candidate-states-three-questions-plan.md) | completed（2026-09-30；closeout `docs/reports/2026-09-30-phase3-closeout.md`；R2 GO） |
 | 4 層中心來源 | [2026-10-01-001](2026-10-01-001-feat-phase4-layer-centric-sources-plan.md) | completed（2026-10-02；closeout `docs/reports/2026-10-02-phase4-closeout.md`；R2 兩輪條件修正後 GO；pq2 [666] 待使用者決定） |
 | 5 量測 | [2026-10-02-001](2026-10-02-001-feat-phase5-measurement-plan.md) | completed（2026-10-02；closeout `docs/reports/2026-10-02-phase5-closeout.md`；R2 CONDITIONAL_GO 後使用者選 A＝驗收②回查由心跳計數器承載，amendment A4） |
-| 6 證據判準 | [2026-10-02-002](2026-10-02-002-feat-phase6-evidence-criteria-plan.md) | active（2026-10-02 使用者定案 15 題；ROADMAP amendment A1 新增 Phase 6 列；執行者全程 opus 5.5） |
+| 6 證據判準 | [2026-10-02-002](2026-10-02-002-feat-phase6-evidence-criteria-plan.md) | completed（2026-10-04；closeout `docs/reports/2026-10-03-phase6-closeout.md`；R2 CONDITIONAL_GO（B1：驗收②等 [670]）→ 使用者 10-03 批次 go → C1＋C2 窄範圍覆核 GO） |
 
 ---
 
@@ -63,4 +63,4 @@
 | [Phase 5 量測 (2026-10-02)](2026-10-02-001-feat-phase5-measurement-plan.md) | 追蹤表三條 lane（live＝trade_log 成交、paper＝第一份 v2 敘事日、history＝舊店入圖日凍結）各印三量與對主題等權組的超額；`record_trade.py --backfill-before-receipts`；圖預測對錯表（終局封閉字彙、錯分「當時已有／之後才出現／未定日」）；計分表接主題等權組基準；候選狀態每日序列；Phase 4 尾巴小修；驗收＝追蹤表、讀圖、計分表、等待 registry、機制存在與否 | completed（2026-10-02） |
 | [Phase 6 證據判準 (2026-10-02)](2026-10-02-002-feat-phase6-evidence-criteria-plan.md) | 「算不算外部印證」收成一個 owner（印證來源自己的引文逐字具名主詞、發布者引文不是轉述句；讀圖 independent 核對、插槽視角、層計數器、RA packet 共用）；OpenLight 合併與 nava 定案（scoped 遷移、pq2）；GSR 與 CPO 綜述論文改 `media`、名冊三個寫法與新公司、SourceDoc origin 更正（pq2）；插槽讀圖同級互換算低等級；sub 旗標跟著值走（不進 digest）；稀釋燈只認募資文件（EDGAR 申報清單、Engine C 新表）；結構表逐列錨、APP 自偵舊程式、未收盤 K 棒、預測表改寫規則①、本機 ask 規則、四則 lead 標籤；研究（補具名引文 RA、重讀 stale 讀圖、四檔敘事）；驗收＝圖（逐來源違反 0、降級逐條去向、身分 2 → 0）、讀圖、敘事、稽核區稀釋燈、registry | active |
 
-**目前 active 的 Phase plan：Phase 6 證據判準**（[2026-10-02-002](2026-10-02-002-feat-phase6-evidence-criteria-plan.md)；續工貼 `/phase-run`）。Phase 5 量測已於 2026-10-02 結案（closeout `docs/reports/2026-10-02-phase5-closeout.md`）。 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
+**目前沒有 active 的 Phase plan：** Phase 6 證據判準已於 2026-10-04 結案（closeout `docs/reports/2026-10-03-phase6-closeout.md`）；ROADMAP 沒有 Phase 7——下一個 Phase 開工前照本檔「每個 Phase 開工前要有一份 plan」那段寫 plan。 以下為歷史狀態： Portfolio Risk Policy Redesign、Daily Beta Technical Monitor v1、Household Capital Authority Phase II-A 與 Daily Approval Loop v1.0/v1.1 程式面均完成；退休貸款政策維持約 30 年退休淨終值導向的 manual contract，不另開 Phase II-B engine。現行 v1.3 runbook 由 Codex desktop 本機排程執行（daily 台北 06:30；weekly 週日 04:00，兩者錯開）。L9 財務核驗缺口已補齊。
