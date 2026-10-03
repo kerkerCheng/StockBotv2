@@ -153,6 +153,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 12 | 6.4 | §13：「名冊無名可比」＝`company_name_forms` 回空 tuple | 另含「每個寫法都與另一家共用」（`query.bottleneck.usable_name_forms` 空；名字比對 `_named_by` 與 owner 共用這一個 helper） | 第一版把 OpenLight 3 條判成 `unnamed`——6.8 會被導去讀原文，而原文寫的「OpenLight」對兩個代號都不算、永遠比不到；補救是身分清理（[670]），與 `no_name_forms` 同一種。6.0 的模擬（`sim_b0`）本來就這樣判 |
 | 13 | 6.6 | 新表 `equity_offering_filings`（ticker、cik、form、items、filed、accession 主鍵、fetched_at） | 照建，**另加** `equity_offering_checks`（每檔最後一次抓清單的時間、清單涵蓋起點、筆數）；清單之外也存 S-8／S-3 等「不算募資」的登記表單（判定在讀取端，表裡不存判定） | 只有一張表時「抓過、窗內沒有」與「從沒抓過」同形（L12、INV-3）；submissions 的 `recent` 只給最近約 1000 筆，沒有涵蓋起點就說不出窗內「沒有」（INV-6）。存 S-8／S-3 是為了讓灰燈印得出「窗內只有員工計畫登記」 |
 | 14 | 6.6 | 灰燈理由「只有發行金額、窗內沒有募資文件（S-8 員工計畫不算募資）」 | 「只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資（窗內有哪些申報在稽核層）」；黃燈理由同樣不帶表單代號與日期 | 既有契約 D2「紅黃綠不給數字」：理由句不得帶數字（`tests/test_wipeout_flags.py::test_lamp_reasons_do_not_leak_company_numbers`）——「S-8」「424B5」與申報日都帶數字；代號與日期改住稽核層的 inputs |
+| 15 | 6.6（R2-b CONDITIONAL_GO） | （未提） | C1：已知限制補 MRVL（424B5 `0001193125-26-142958`、424B2 `0001193125-26-147640` 是 Senior Notes）——`_DILUTION_RULE`、baseline §20、§14 #10 三處。C2（可選，照做）：規則文字的表單清單補「8-K（含 8-K/A）」與 S-8 POS、S-3／F-3 家族的 /A、ASR、MEF 變體 | C1：初版的「已知限制」只寫手核過的 NVDA、META，MRVL 的 424B5／424B2 沒讀封面就沒寫——自己引用的限制要套同一套追源紀律（L11-2）；判色不變（MRVL 另有 8-K 3.02 ×4 與 424B7）。C2：文字寫的比程式少，讀規則的人會以為 8-K/A 不算。兩項都只動文字，不動判定；窄範圍覆核（乾淨 context）見進度表 |
 
 ---
 
@@ -431,6 +432,7 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 8. （6.4）插槽視角：發布者過了 `publisher_lifts` 但沒具名或只是轉述的引文照列並旁註（§0.6 #11）——讀的人若覺得雜訊多，再議要不要只列撐得住的。
 9. （6.0–6.3 帶進來的，見 baseline §14、§16.3、§17.3）更正走廊 `raw_excerpt` 表頭重複；`tests/test_intake.py` 的 `forbidden_driver` 絆線可能空跑；
    Noveon／USA Rare Earth 那兩段引文掛在 MP 的邊上是否抽取錯置；`co:apollo` 的名字寫法（「Apollo」在圖上一半是 Google 的專案代號）。
-10. （6.6）**424B2／424B5 分不出股權或債**：NVDA、META 的黃燈配到的是公司債說明書（手核封面：Notes／Senior Notes，baseline §20）。
+10. （6.6）**424B2／424B5 分不出股權或債**：NVDA、META 的黃燈配到的是公司債說明書（手核封面：Notes／Senior Notes，baseline §20）；
+    MRVL 配到的 10 份裡 424B5、424B2 各一份也是 Senior Notes（R2-b 手核；它另有 8-K 第 3.02 項與 424B7 的股權文件，黃燈不受影響）。
     要分有兩條路：①每份**新出現**的 424B 多抓一次文件或申報費用附件判股權／債（daily 偶爾多 1–2 次請求，違反本 Phase「請求數不變」）；
     ②維持現狀、讀的人看稽核層的文件代號自己判。這是使用者的題（改清單或請求數都動到 §0.1 #9 的定案）。
