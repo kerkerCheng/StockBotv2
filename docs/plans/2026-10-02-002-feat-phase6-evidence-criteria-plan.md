@@ -125,7 +125,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則——a 有錨 211 → 213（改前有錨改後沒錨 0；Lam 9 列 6 列逐列、3 列公司層；「公司層」跟著錨走到個股頁）；b 頁面頂端「請重啟」橫幅（headless Edge 三種情況）；c 盤中 K 棒拿掉並計數（同一份價格上追蹤表逐欄相同、計分表只差時間戳記）；d 真實 15 筆預測終局不變；e ask 16 條（下一次跑請使用者確認會被問）（baseline §21；偏差 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 6.7」 |
 | 6.8 | 研究：降級 22 條逐條有去向——補引文 RA 6 條（**pq2 [673]–[676] 等 go**；[677]／[678] 作廢建議 drop）、身分修正 4（[670]）、6.3b 定案 3、維持降級 8、延後 1；重讀 InP、CW DFB（仍 volume，四份讀圖全 current）；四檔敘事：LITE 改一句＋重押讀圖、AXTI／COHR／SIVE 只重押讀圖（收據 `docs/reports/2026-10-03-phase6-step68-research.md`；偏差 §0.6 #18；待決 §14 #11–#13） | ✅ | 執行模型 | 見 git log「Step 6.8」 |
 | 6.9 | 新管線 full chain 測試（證據鏈與稀釋燈鏈）：`tests/test_evidence_criteria_full_chain.py` 3 支——證據鏈五種夾具情形（不具名、轉述、具名非轉述、名冊新寫法、身分合併前後）一路到結構表、插槽旁註、層計數器、走圖第 2 型、心跳兩行與讀圖引用核對；稀釋燈鏈到個股頁首屏那一格與稽核區（三題面板）那一列；五個變異（owner 轉述判定、層計數器的字、引用核對未具名分支、稽核區灰燈 detail、募資文件封閉清單）各自轉紅；既有三支 full chain 不動。執行中曾以為灰燈 inputs 沒到個股頁、查正式 73 個 artifact 稽核區每盞灰燈都帶，未改程式 | ✅ | 執行模型 | 見 git log「Step 6.9」 |
-| 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
+| 結案 | completion gate ✅ ＋ closeout ✅（`docs/reports/2026-10-03-phase6-closeout.md`）＋ R2 **CONDITIONAL_GO**（B1：驗收②等 [670] go——§0.5「6.2 的編號未 go 就停在 AWAITING_HUMAN」；C2 已改 closeout 並過機械驗法；C1 五項在 [670] apply 之後核，C1＋C2 由一個新的窄範圍審查者一起覆核，closeout §8）＋ ROADMAP ✅（待 B1） | ▶ | 執行模型 | 見 git log「Phase 6 結案」 |
 
 **開工／續工指令：貼 `/phase-run` 即可**（不能用 skill 時貼這段原文）：
 
@@ -452,3 +452,6 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
     所以 `onboard-candidates`「被點名未登記」仍列它（111 個裡的 1 個；同一份 lead 以 6.0 名冊重算是 112，差的是 CRDO）。照「資料對齊名冊」改 lead 的字串——改 lead registry 要 pq2（6.3f 先例）。
 15. （6.9）**wipeout 面板沒點亮的那幾格不帶規則與 inputs**（點亮的才帶）：APP 稽核區走三題面板、每盞灰燈都帶 detail，資訊沒有遺失；
     只有 markdown 版分析視角（`briefing/alpha_view/render.py`）看不到灰燈的 inputs。對稱化會讓 76 頁 digest 全變、消費端零增益——建議不改。
+16. （結案 R2 N4）**新版敘事裡仍有被取代讀圖的 id**：6.8 照 Phase 4 Step 4.8 的先例只換 `rides[]` 與反證連結，格層 `evidence_refs` 沒換
+    （最新一行：AXTI 指舊 InP `sr_bac985…` 7 處、COHR／LITE 指舊 CW DFB `sr_d49b81…` 各 4 處、SIVE.ST 指 `sr_d49b81…` 6 處與 `sr_268d2f…` 4 處）。
+    ref 仍解析得到，但點進去是舊讀圖（L18）。要不要在重押讀圖時一併換格層 ref（動到敘事寫入的契約）——使用者的題。

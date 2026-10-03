@@ -4,6 +4,7 @@
 > 基準：[`2026-10-03-phase6-baseline.md`](2026-10-03-phase6-baseline.md)（§0–§14 是 6.0 快照，§15–§21 是各 Step 的真實資料驗收）；
 > 研究收據：[`2026-10-03-phase6-step68-research.md`](2026-10-03-phase6-step68-research.md)。
 > 執行者全程 opus 5.5。本報告的數字都是 2026-10-03 13:5x–14:3x 台北量的（星期六，各市場休市）；**現況數字會腐壞，引用前重跑各列的查證命令**。
+> **狀態：結案 R2 CONDITIONAL_GO（§8）——驗收②等 pq2 [670] 的 go（plan §0.5），ROADMAP Phase 6 尚未標 ✅。**
 > 量測前以 HEAD（`839d48a7`）重跑 materialize（6.0 同一行：`--tracked --registry-listed --structure-table --graph-walk --structure-readings --candidates`，80/80），
 > 量測腳本與全文在 scratchpad（`p6c_*.py`、`p6_close.json`、`p6_stockpage_close.json`、`hb_close.md`、`invariants_close.out`），全部唯讀。
 
@@ -30,7 +31,7 @@
 |---|---|---|---|
 | 1 | `pytest -q` 全綠；測試檔數差＝新增－退役；函式層級拿掉的每一個有去向 | ✅ **3445 passed, 1 skipped**（6.0：3303 passed, 1 skipped）；測試檔 **211 → 221**＝＋10（`test_identity_cleanup`、`test_merge_side_effects`、`test_corroboration`、`test_relay_language`、`test_sub_language_consumers`、`test_dilution_offerings`、`test_row_demand_anchor`、`test_webapp_code_freshness`、`test_closing_bars`、`test_evidence_criteria_full_chain`），退役 0；函式 **2673 → 2791**，新增 120、**拿掉 2，各有去向**（§3） | `python -m pytest -q`；`git grep -n -E "^\s*(async )?def test_" <rev> -- 'tests/*.py'`（6.0 名單 sha `c1db1da2…` 重建一致；scratchpad `p6c_testfns.py`） |
 | 2 | `python -m audit invariants` 綠 | ✅ **14 PASS／0 FAIL（共檢查 5476 筆）**；SourceDocSync「重建會遺失 0（section 0／title 0／origin 0）｜圖落後 JSON 0」（origin 是 6.3d 加進同步欄位的）；PointInTime 207/220、681/699（＝6.0）；QueueLiveness 204 項；Expiry 127 個等待全部有到期；Lifecycle「待辦池 678 項結案狀態一致；watch 171 筆」 | `python -m audit invariants` |
-| 3 | 無未解釋語意 diff | ✅ **心跳**與 6.0 的 `hb_base.md` 逐行對照（64 → 74 行），每一處都歸得到來源（§1.1）。**個股頁** 73 → 76 份（＋2768.T、CRDO、USAR：6.3c 新進名冊的上市公司），舊 73 份的 `content_digest` **73／73 變**——6.6 的規則文字與 inputs 住在每一頁的歸零燈與三題稽核列，所以每一頁都會變；逐檔歸因見 §1.2。**讀圖 `result_digest`**：變的只有 6.8 重讀的兩份（新紀錄，因為標籤變了）；SuperNova、ELS 兩份 id 與 ledger 指紋＝6.0；sub 旗標不進 digest（`test_the_flag_never_reaches_the_reading_digest_or_snapshot_rows`；6.5 實測四份 status 與 digest 改前改後逐位相同，baseline §19） | `python -m crons.heartbeat --out <檔>`（不帶 `--write-snapshot`）；scratchpad `p6c_compare.py`、`p6c_chain_show.py`、`p6c_watches.py`、`p6c_onboard.py` |
+| 3 | 無未解釋語意 diff | ✅ **心跳**與 6.0 的 `hb_base.md` 逐行對照（64 → 74 行），每一處都歸得到來源（§1.1；R2 逐條驗過）。⚪ **個股頁：四個維度＋程式 hunk 內無未解釋 diff；面板級對 6.0 無法驗證**（plan §0.6 #19：6.0 沒存逐面板 digest）——73 → 76 份（＋2768.T、CRDO、USAR：6.3c 新進名冊的上市公司），舊 73 份的 `content_digest` **73／73 變**，但這個數沒有分辨力：6.6 的規則文字與 inputs 住在每一頁的歸零燈與三題稽核列，另外每一頁的 `price_series`（`webapp/materialize.py` → `alpha/providers/close_series.fetch_close_series`，6.7c 改過、每次 materialize 重抓）也是每頁都有的來源，6.0 沒存這份序列；四個維度之外的面板若有預期外的變動會被一起蓋掉（R2 C2）。逐檔歸因與限制見 §1.2。**讀圖 `result_digest`**：變的只有 6.8 重讀的兩份（新紀錄，因為標籤變了）；SuperNova、ELS 兩份 id 與 ledger 指紋＝6.0；sub 旗標不進 digest（`test_the_flag_never_reaches_the_reading_digest_or_snapshot_rows`；6.5 實測四份 status 與 digest 改前改後逐位相同，baseline §19） | `python -m crons.heartbeat --out <檔>`（不帶 `--write-snapshot`）；scratchpad `p6c_compare.py`、`p6c_chain_show.py`、`p6c_watches.py`、`p6c_onboard.py` |
 | 4 | 無新 dual authority | ✅ 「算不算外部印證」只有 `query.origin_resolution.corroboration`——呼叫端 `query/bottleneck.py:450`（`edge_corroborations`→結構表與 `_classify_edges`）、`query/structure.py:306`（插槽視角）、`alpha/providers/structure_readings.py:138`（讀圖 independent 引用核對）、`scripts/audit_sole_source_independence.py:75`；名字比對只有 `quote_names_company`（owner、RA packet 顯示 `intake/actions.py:299`、層計數器的「違反」重算 `query/layer_stats.py:177`——後者刻意不經 owner 直接重算，L14-2 gate 本身也要驗，只計數不判定）；轉述字表只有 `get_relay_language` 一個 loader（owner 與層計數器）；募資文件判定只有 `_equity_issuance`（`engine_c/checklist.py:656`）→ `dilution_flag`（`alpha/wipeout.py:318`）；需求錨只有 `demand_chain`（結構表、走圖、讀圖快照） | `git grep -n "corroboration(\|quote_names_company(\|get_relay_language(\|dilution_flag(\|_equity_issuance(\|demand_chain(" -- '*.py' ':!tests/'` |
 | 5 | 無 silent drop | ✅ 沒升外部印證的每條邊帶三種理由之一（`test_withheld_reasons_are_a_closed_vocabulary`、`test_edges_that_did_not_rise_are_listed_by_reason_with_their_documents`；真實圖 未具名 13／名冊無名 4／轉述 2＝19＋GSR 資料更正 3＝降 22）；名冊無名可比與引文沒具名分開（`test_3_subject_without_usable_name_forms_is_no_name_forms_not_unnamed`）；讀不到 → `upstream_unavailable`（`test_an_unreadable_filing_list_is_upstream_unavailable_not_green_or_amber`、`test_prepare_says_side_effects_are_unknown_when_the_graph_is_unreachable`、`test_8_callers_that_do_not_pass_quotes_fail_loudly`）；未收盤 K 棒拿掉的與「收盤狀態未知」的都計數（`test_the_tracker_counts_what_its_default_fetchers_dropped`、`test_without_a_trading_period_the_bar_is_kept_and_called_unknown`）。**今天正式資料上就有一例**：11 盞稀釋燈因正式庫還沒有募資文件清單印「募資文件清單讀不到——不判黃也不判綠」，沒有被靜默算成綠或黃（§2 ④） | 各測試檔；`python -m crons.heartbeat` 段 4 |
 | 6 | Point-in-time | ✅ 募資文件以 EDGAR `filed` 落窗、只取 `filed ≤ today`（`test_only_filings_inside_the_window_and_known_by_today_count`）；清單涵蓋不到窗就說不出「沒有」（`test_a_list_that_does_not_reach_back_to_the_window_cannot_say_none`）；`audit PointInTime` PASS；as-of 投影只讀 as-of 當時可見的 assertion（`alpha/providers/graph_neo4j.py` 的註解寫明逐字讀的是現在版本——與屬性值同一個近似） | `python -m audit invariants --only PointInTime` |
@@ -63,8 +64,9 @@
 - **證據標籤參照 1／73 變**：LITE `co:lumentum/supplies_to/tech:uhp_laser` 外部印證 → 待判定（6.4）。
 - **稀釋燈**：6.0 點亮 11 盞黃 → 結案 0 盞（11 檔改印「募資文件清單讀不到」＝6.6 過渡狀態，§2 ④）。
 - **敘事新版**（6.8）：AXTI、COHR、LITE、SIVE.ST 各一筆（ledger 前綴不變、各多 1 行）。
-- **程式 hunk**（`git diff 06350d0b HEAD`）：`briefing/` 只有 6.5（替代難度旁註）與 6.7a（錨的來處欄位與註）兩組；`alpha/providers/graph_neo4j.py` 是 6.4（逐字跟著 assertion 走進分類）、6.5（sub 旗標）、6.7a（`demand_anchor_basis`）；`alpha/wipeout.py`＋`engine_c/` 是 6.6；**`webapp/materialize.py::materialize_view`／`build_overview` 0 個 hunk**（materialize 的 hunk 全在結構表與走圖 artifact）。
-  所以 73／73 的 digest 變動＝6.6 規則文字與 inputs（每一頁）＋上列逐檔項；有結構邊的頁另多 `demand_anchor_basis` 欄位（6.7a）與有 sub 的邊的「替代難度」旁註（6.5）。
+- **程式 hunk**（`git diff 06350d0b HEAD`）：`briefing/` 只有 6.5（替代難度旁註）與 6.7a（錨的來處欄位與註）兩組；`alpha/providers/graph_neo4j.py` 是 6.4（逐字跟著 assertion 走進分類）、6.5（sub 旗標）、6.7a（`demand_anchor_basis`）；`alpha/wipeout.py`＋`engine_c/` 是 6.6；`alpha/providers/close_series.py` 是 6.7c——**每一頁的 `price_series`**（`webapp/materialize.py` 的 `_close_series` → `fetch_close_series`）走它，而且每次 materialize 都重抓 yfinance（R2 C2 補上；初版漏列）；**`webapp/materialize.py::materialize_view`／`build_overview` 0 個 hunk**（materialize 的 hunk 全在結構表與走圖 artifact）。
+  所以 73／73 的 digest 變動＝6.6 規則文字與 inputs（每一頁）＋每頁的 `price_series`（6.7c 的程式；週六兩次 materialize 都在各市場收盤後，預期不變，但 6.0 沒存這份序列、**無法驗**）＋上列逐檔項；有結構邊的頁另多 `demand_anchor_basis` 欄位（6.7a）與有 sub 的邊的「替代難度」旁註（6.5）。
+- **結論（照 R2 C2 改寫）**：上面四個維度與程式 hunk 範圍內，無未解釋 diff；**面板級（三題數值、其他三盞燈、稽核列、替代難度旁註、錨的來處、價格序列）對 6.0 無法驗證**——不寫成無條件的 ✅。機械的補法有兩條：①以 `06350d0b` 與 HEAD 兩版程式對同一份輸入各 materialize 一次到暫存目錄、逐面板比（worktree 讀不到 `library/private`，要明確指路徑）；②下一個 Phase 的基準快照加跑 `scripts/analyst_view_text_digest.py --per-panel`（plan §0.6 #19）。
 
 **另核對（plan §12）：**
 - 舊店三個 `*.db`：sha256 與 6.0 **逐字相同** ✅（`e887b3d4…`、`af3dc690…`、`e99d1c79…`）。
@@ -82,9 +84,9 @@
 | 驗收 | 數的東西 | 結果 |
 |---|---|---|
 | ①（A1）外部印證名副其實 | 逐來源違反數；降級的每一條在收據有去向；另印外部印證、①、走圖第 2 型 | ✅ **違反 0**（`ec_without_naming_quote`＝0，逐來源口徑）。外部印證 **250 → 230**（升 2：6.3c 名冊新公司——`co:lynas supplies_to mat:separated_heavy_reo`、`tech:near_package_optics competes_with tech:cpo`；降 22：GSR 資料更正 3＋規則 19〔未具名 13／名冊無名 4／轉述 2〕；同級互換 0；新增 0、消失 0）；**降級 22 條逐條有去向**（收據 §1：補引文 RA 6 條 [673]–[676]、身分修正 4 條 [670]、6.3b 定案 3、維持降級附理由 8、延後附到期 1）；①獨家且全自報 73 → **77**（誠實的回升，與 §0.2 預測相同）；走圖第 2 型命中 0／13 → **0／13**（圖） |
-| ② 身分 | 同一家兩個代號、不是公司的公司節點 | ⚪ **已交付、未生效：2 → 2**——遷移工具與 dry-run 完成（R2-a GO）、nava 定案（Lumentum 自有泰國 Navanakorn 廠 → 退役，baseline §16.1），**apply 在 [670] go 之後**；go 後 `co:openlight`、`co:nava_thailand` 兩個節點消失（圖＋名冊 105 → 103） |
-| ③ 讀圖與敘事跟上 | stale 讀圖各有新一筆或延後且有到期；四檔 v2 敘事各有新版或不換版理由 | ✅ 6.0 時 stale_low 的兩份（InP、CW DFB）各有新一筆（6.8，現行、到期都是 90 天）；四份讀圖全部 current、「該重讀 0」；四檔敘事各有新版：LITE 改一句＋重押讀圖、AXTI／COHR／SIVE.ST 七格文字不改只重押讀圖，不改字的理由逐檔寫在收據 §4（讀圖、敘事） |
-| ④ 稀釋燈 | 亮黃的每一檔指得出窗內一份募資文件；11 檔逐檔前後對照 | ✅ **機制與逐檔對照（正式庫的檔案副本）**：黃 11 → 10、每盞黃燈指得出窗內一份募資文件、LRCX 轉灰並印理由（baseline §20；R2-b 覆核過）。⚪ **正式 APP 要等 10-04 05:30 的 daily**：6.6 刻意沒寫正式庫（正式庫 sha256 前後相同），清單由 daily ②b（`engine_c.history_backfill --incremental`）用落後檢查同一次 submissions 順帶寫入（開庫即建表，`engine_c.db._ensure_sqlite_schema` → `ensure_offering_schema`）；在那之前 11 檔印「有新股發行金額，但募資文件清單讀不到——不判黃也不判綠」（fail closed，不是退步）。**10-04 的核對**：心跳段 4 的「黃」應由 33 回到約 43（CRDO、USAR 第一輪才存財報列、第二輪才抓清單，6.6 實測）；若仍是 33，就是 ②b 沒寫進清單（L13），查當天 daily 報告的 02b 段（稽核區） |
+| ② 身分 | 同一家兩個代號、不是公司的公司節點 | ⚪ **已交付、未生效：2 → 2**——遷移工具與 dry-run 完成（R2-a GO）、nava 定案（Lumentum 自有泰國 Navanakorn 廠 → 退役，baseline §16.1），**apply 在 [670] go 之後**；go 後 `co:openlight`、`co:nava_thailand` 兩個節點消失（圖＋名冊 105 → 103）。**plan §0.5：6.2 的編號未 go 就停在 `AWAITING_HUMAN`——這是結案 R2 的 B1（§8）**。⚠ 勘誤（R2 N3）：baseline §16.1 寫「沒有任何來源把『Nava』指向代工廠」不精確——庫內 `library/raw/fn_10_k_20260818.txt`（Fabrinet 10-K）寫 Fabrinet「acquiring an 8-acre campus in Navanakorn, Thailand in May 2026」；處置不受影響：Lumentum 那次法說（Q2 FY2026，2026-02-03）早於 Fabrinet 買廠，DEF 14A 也逐字寫 Navanakorn 是 Lumentum「our largest manufacturing facility」（R2 重抓 SEC 原文核過） |
+| ③ 讀圖與敘事跟上 | stale 讀圖各有新一筆或延後且有到期；四檔 v2 敘事各有新版或不換版理由 | ✅ 6.0 時 stale_low 的兩份（InP、CW DFB）各有新一筆（6.8，現行、到期都是 90 天）；四份讀圖全部 current、「該重讀 0」；兩份新讀圖跑 `verify_citations` 0 個問題——但兩份都沒有標 independent 的引用，所以「過新的 independent 規則」是**空的成立**（R2 N7）；四檔敘事各有新版：LITE 改一句＋重押讀圖、AXTI／COHR／SIVE.ST 七格文字不改只重押讀圖，不改字的理由逐檔寫在收據 §4（讀圖、敘事） |
+| ④ 稀釋燈 | 亮黃的每一檔指得出窗內一份募資文件；11 檔逐檔前後對照 | ✅ **機制與逐檔對照（正式庫的檔案副本）**：黃 11 → 10、每盞黃燈指得出窗內一份募資文件、LRCX 轉灰並印理由（baseline §20；R2-b 覆核過；結案 R2 自己抓 11 檔 EDGAR submissions、自己寫封閉清單重算，逐份相同）。這是**照封閉清單的字面成立**——NVDA、META 配到的是公司債說明書，實質要等 §5 #10（R2 N2）。⚪ **正式 APP 要等 10-04 05:30 的 daily**：6.6 量測期間沒寫正式庫（正式庫 sha256 前後相同）；清單由 daily ②b（`engine_c.history_backfill --incremental`）用落後檢查同一次 submissions 順帶寫入（`history_backfill.py` 的落後檢查快取 → `_store_offerings`；11 檔都有財報列，R2 核過）。**之後的正式庫（R2 N1）**：10-03 12:23（6.7 執行期間）第一次以新程式開庫時，`_ensure_sqlite_schema` → `ensure_offering_schema` 建了兩張新表、**0 列**（每次開庫都跑，讀取路徑也會建表；CREATE IF NOT EXISTS）——正式庫 sha256 `85b14e4a…` → `bcd71318…`、mtime 12:23:15。在 daily 寫入之前，11 檔印「有新股發行金額，但募資文件清單讀不到——不判黃也不判綠」（稽核區的 `offering_reason` 逐字是「這一檔還沒抓過 EDGAR 申報清單（daily 的 EDGAR 增量在有既存財報列時才抓）」；fail closed，不是退步）。**10-04 的核對**：心跳段 4 的「黃」應由 33 回到約 43（CRDO、USAR 第一輪才存財報列、第二輪才抓清單，6.6 實測）；若仍是 33，就是 ②b 沒寫進清單（L13），查當天 daily 報告的 02b 段（稽核區） |
 | 另印：解析不到的 SourceDoc | 16 → N | ✅ **16 → 11**（Credo、Noveon、Sojitz、Telescent、USA Rare Earth 那 5 份解析成名冊公司；6.3c）；[671] go 後再少 3（Soitec、Novanta、綜述論文） |
 | 另印：sub 旗標出現在消費端的處數 | 處數 | ✅ **4 處**：結構表、五個角度的邊、走圖第 1 型、個股頁「替代難度」旁註（6.5；真實結構表 66 列帶 sub：撐得住 9／撐不住 57） |
 | 另印：staleness 同級互換、[666] 的證據等級變動 | 機制；邊 | ✅ 同級互換＝低等級（6.1，三條測試；真實資料 baseline §15）；[666] 升外部印證 6 條（baseline §0） |
@@ -98,7 +100,7 @@
 - `tests/test_research_actions.py::test_prepare_validates_every_document_without_graph_or_publication` → 6.2d 改寫成 `test_prepare_reads_the_graph_read_only_and_never_publishes`（假 driver 擋寫入 Cypher），另加 `test_prepare_says_side_effects_are_unknown_when_the_graph_is_unreachable`、`test_prepare_prints_which_existing_values_the_load_would_overwrite`（plan §0.6 #5：舊測試守的「prepare 不開圖」從來沒被守住）。
 
 **新增 120 個**：`test_identity_cleanup` 15、`test_closing_bars` 14、`test_corroboration` 14、`test_merge_side_effects` 12、`test_dilution_offerings` 11、`test_row_demand_anchor` 10、`test_migrate_sourcedoc_json_section` 7、`test_webapp_code_freshness` 7、`test_relay_language` 6、`test_sub_language_consumers` 5、`test_layer_stats` 4、`test_evidence_criteria_full_chain` 3、`test_research_actions` 3、`test_structure_reading_v3` 3、`test_engine_b_leads` 2、`test_origin_resolution` 2、`test_alpha_as_of_projection` 1、`test_reading_predictions` 1。
-既有三支 full chain（`test_full_chain_acceptance`、`test_layer_document_full_chain`、`test_measurement_full_chain`）的斷言 0 處變動（`test_measurement_full_chain` 只在 6.7c 讓假取價函式多收 `states=None`）。
+既有三支 full chain（`test_full_chain_acceptance`、`test_layer_document_full_chain`、`test_measurement_full_chain`）的斷言 0 處變動；有改的是呼叫：`test_layer_document_full_chain` 的 helper `_classified` 在 6.4 多收 `quotes`（`classify_evidence` 的必填參數），`test_measurement_full_chain` 在 6.7c 讓假取價函式多收 `states=None`（R2 N5 更正：初版只寫了後者）。R2 另掃了既有測試檔裡被刪的 assert 行，全部是 `classify_evidence` 必填參數造成的呼叫改寫或 GSR → media 的期望值更新，沒有斷言被拿掉。
 
 ## 4. 執行中發現、實際做了什麼（偏差摘要；全文 plan §0.6）
 
@@ -114,11 +116,11 @@
 - **結案（#19）**：個股頁逐面板 digest 無法對 6.0 重建（6.0 沒存），改以四個維度＋程式 hunk 歸因（§1.2）。
 - **6.9 的 L11-6**：一度以為灰燈的 inputs 沒送到個股頁；查正式 73 頁，APP 稽核區（三題面板）每盞灰燈都帶 detail——撤回修法，測試改斷言 APP 真正渲染的那一列。
 
-## 5. 下一步要決定的問題（plan §14 #1–#13；結案新增 #14–#15）
+## 5. 下一步要決定的問題（plan §14 #1–#13；結案新增 #14–#16）
 
 **要你決定（使用者的題）：**
 - **#10 424B2／424B5 分不出股權或債**：NVDA、META 的黃燈與 MRVL 的兩份配到的是公司債說明書。①每份新出現的 424B 多抓一次文件判股權／債（daily 偶爾多 1–2 次請求，動到「請求數不變」）；②維持現狀，讀的人看稽核區的文件代號自己判。
-- **#11 同一個 doc_id 有兩份抽取檔**（`co:lumentum supplies_to tech:uhp_laser` 住附錄檔，更正走廊改不到，所以 UHP 那條的補引文延後）：①把附錄併進主抽取檔（一次遷移）；②讓更正走廊認得附錄檔（改 intake 契約）。
+- **#11 同一個 doc_id 有兩份抽取檔**（`co:lumentum supplies_to tech:uhp_laser` 住附錄檔，更正走廊改不到，所以 UHP 那條的補引文延後）：①把附錄併進主抽取檔（一次遷移）；②讓更正走廊認得附錄檔（改 intake 契約）。收據 §1.5 的延後「到期＝結案當天」就在這裡重問（到期是重問不是丟；它是開發題，載體是下一份 plan 讀的這張清單，不進 pq2——R2 N6）。
 - **#12 BD 官網上的 Hyundai Mobis 新聞稿算誰說的**：origin 是 Boston Dynamics，內文是「Hyundai Mobis announced…」——要不要把 origin 改成 Hyundai Mobis（更正走廊或 6.3d 式的 origin 更正）。
 - **#13 策展摘錄的標籤指不回原文**（L18）：要不要掃一次「摘錄裡的方括號／改寫框架」有多少份。
 - **#7 Phase 7 候選**：旁支「海外財報來源」（邊緣候選 22 檔裡 18 檔缺「已定價」的主參照）。
@@ -129,12 +131,13 @@
 - #5 轉述偵測只套發布者；#6 字表 v1 是否漏常見寫法（另：`states` 會誤中「United States」，0 筆受影響）；#8 插槽視角照列撐不住的發布者引文是否雜訊太多；#9 更正走廊 `raw_excerpt` 表頭重複、`forbidden_driver` 絆線可能空跑、Noveon／USAR 引文掛在 MP 的邊上是否錯置、`co:apollo` 的名字寫法。
 - **#14（結案新增）人工 lead 的代號字串對不上名冊**：Sojitz 已登記（2768.T），但那則 lead 記的是「Sojitz Corporation (2768.T)」，所以「被點名未登記」清單仍列它（111 個裡的 1 個）。照「資料對齊名冊」改 lead 的字串——改 lead registry 要 pq2（6.3f 先例）。
 - **#15（6.9 新增）wipeout 面板沒點亮的那幾格不帶規則與 inputs**（點亮的才帶）：APP 稽核區走三題面板、資訊沒遺失；只有 markdown 版分析視角看不到灰燈的 inputs。要對稱就是 76 頁 digest 全變、消費端零增益——建議不改。
+- **#16（結案 R2 N4）四檔新版敘事裡仍有被取代讀圖的 id**：6.8 照 Phase 4 Step 4.8 的先例只換 `rides[]` 與反證連結，格層的 `evidence_refs` 沒換——最新一行裡 AXTI 指舊 InP `sr_bac985…` 7 處、COHR／LITE 指舊 CW DFB `sr_d49b81…` 各 4 處、SIVE.ST 指 `sr_d49b81…` 6 處與 `sr_268d2f…` 4 處。ref 仍解析得到，但讀的人點進去看到的是舊讀圖（L18：標籤要指得回原始證據）。要不要在重押讀圖時一併換格層 ref（動到敘事寫入的契約）——使用者的題。
 
 ## 6. pq2 go 的執行紀錄
 
 - **本 Phase 執行的 go：[666]**（使用者 10-02 的 go）——6.0a 經 `scripts/apply_ra_admission.py` 入口 apply、`commit_pending_intake.py`（commit `06350d0b`）、`complete-ra 666`；6 條升外部印證（baseline §0）。
 - **本 Phase 鑄、等你決定的 9 個**（全部在池中、心跳逐筆列出；決策區塊見結案回覆）：
-  - [670] 身分遷移（manual）——go 後 `loader/migrate_identity_cleanup.py` 帶 `--pq2 670` 與非空的圖匯出 apply（先寫圖再寫檔、可續跑）。
+  - [670] 身分遷移（manual）——go 後 `loader/migrate_identity_cleanup.py` 帶 `--pq2 670` 與非空的圖匯出 apply（先寫圖再寫檔、可續跑）。**結案擋在這一個**（plan §0.5；R2 B1）。apply 之後跑 R2 C1 的五項機械核對（§8），再由一個新的窄範圍審查者一起覆核 C1＋C2，GO 才標 ROADMAP ✅。nava 的處置另見 §2 ② 的勘誤（Fabrinet 2026-05 在 Navanakorn 買的廠區與 Lumentum 2026-02 法說講的廠無關）。
   - [671] SourceDoc origin 更正三筆（manual）——go 後 `--corrections --apply`，同一步登記發布者 MDPI Micromachines。
   - [672] 4 則 lead 的 `classified_by` 更正（manual）——go 後 `engine_b.leads.correct_classified_by`。
   - [673]–[676] 補具名引文的 Research Action（ra_admission）——go 後各自經 `scripts/apply_ra_admission.py --pq2 <N> --digest <digest>`、`commit_pending_intake.py`、`complete-ra`（digest 見收據 §2 表）。
@@ -149,4 +152,21 @@
 
 ## 8. 結案 R2（使用者已常規 opt-in）
 
-（R2 回報後補上。）
+乾淨 context、唯讀的審查者（2026-10-03 14:1x 起；中途撞到額度上限、17:3x 從中斷處接續；各版程式以 `git archive` 匯出、沒有建 worktree；
+腳本與輸出在 scratchpad `r2close/`）。**Verdict：CONDITIONAL_GO。**
+
+| 項 | 結果（審查者自己的命令） |
+|---|---|
+| 1 測試／invariants／函式增刪 | ✅ 3445 passed, 1 skipped；14 PASS；2673 → 2791（新增 120、拿掉 2、重複 0；6.0 名單 sha 與基準相同） |
+| 2 證據等級 | ✅ 自己寫轉述比對與 `publisher_lifts`（只沿用 `resolve_origin`、`quote_names_company`）：外部印證 230、**違反 0**、反向檢查 0；對凍結鍵以「同一份圖換程式版本或 config」的反事實逐條歸因：只換 publishers 降 3（6.3b）、只換名冊升 2（6.3c）、只換程式降 19（6.4：未具名 13／名冊無名 4／轉述 2）、規則從不讓邊升級；合計升 2／降 22；圖上最新 `updated_at` 是 [666]，本 Phase 0 次寫圖；升級邊讀原文 3 條（Sojitz→Lynas、Credo→NPO、[666] 的 Sumitomo→Lumentum 重抓 mining.com 原網頁逐字找到） |
+| 3 身分 | ❌ 字面不成立（名冊與圖上兩個代號都在）——[670] 未 go 的預期狀態；dry-run 預告的 apply 後狀態符合（105 → 103、OpenLight 三種寫法解析到 `co:openlight_photonics`、8 條、副作用只剩一個別名聯集）；nava 處置與收據一致（DEF 14A 重抓 SEC 原文逐字相符） |
+| 4 staleness | ✅ 同級互換三條測試；SuperNova 真實重放判 stale_low；153bd093／d46c9e66／HEAD 三版程式對同一份圖快照，278 個節點的 `result_digest` 逐位相同；四份讀圖 ledger 存的 digest＝今天算出的值 |
+| 5 稀釋燈 | ✅ 11 檔 EDGAR submissions 各抓 1 次、自己寫封閉清單：10 黃、LRCX 灰，窗與文件與正式路徑、基準 §20 逐份相同；「正式 APP 要等 10-04 daily」與程式一致 |
+| 6 研究收據 | ✅ `corroboration_withheld.unnamed` 13 條逐條有去向（合計 22）；四個 RA digest 相符；兩份重讀的讀圖 `verify_citations` 0 問題（independent 規則空的成立）；四檔敘事前綴 sha＝基準、LITE 只改一句、其餘三檔七格逐字不變 |
+| 7 心跳 | ✅ 自己跑的 74 行與 `hb_close.md` 只差標題時間；§1.1 逐條驗過（112 → 111＝CRDO、四盞非灰 3 → 0＝AXTI／COHR／LITE 的稀釋燈、304 盞的組成）；備份行 91 → 105 只能粗驗（6.0 沒存逐檔 mtime）；`SNAPSHOT_KEYS` 64＝64 |
+| 8 殭屍 grep 與不變的東西 | ✅ 三個 0；trade_log、舊店三檔、主題等權組 ledger、AGENTS.md 的 sha＝基準；Sheet 0 寫入；字表不在 prompts／skills |
+
+- **B1（阻擋）→ `AWAITING_HUMAN`**：ROADMAP ② 未生效；plan §0.5「結案前若 6.2 的編號仍未 go：停在 `AWAITING_HUMAN`（驗收②靠它，這是使用者的決定）」。所以 **ROADMAP Phase 6 不標 ✅、plans README 不改 completed**。
+- **C1（解 B1，[670] go 並 apply 之後）**，五項全部成立才標 ✅：名冊 JSON 沒有 `co:openlight`、`co:nava_thailand`，共 103 家；唯讀 Cypher `MATCH (n) WHERE n.id IN ['co:openlight','co:nava_thailand'] RETURN count(n)`＝0；`company_id_for_origin('OpenLight', get_registry())`＝`co:openlight_photonics`；apply 的事後重算等於 dry-run 預告的 8 條；`python -m audit invariants` 14 PASS。使用者若明說要在 ② 未生效的情況下結案，記下這個決定、② 維持「未生效」。
+- **C2（已改，本 commit）**：gate 3 與 §1.2 改寫——每頁來源補上 `price_series`（`fetch_close_series`，6.7c）；個股頁寫成「四個維度＋程式 hunk 內無未解釋 diff；面板級對 6.0 無法驗證」。機械驗法：本檔 grep 得到 `price_series`／`close_series` 與「面板級」。C1＋C2 在 [670] apply 之後由一個新的窄範圍審查者一起覆核（plan §0.5 #14 的做法）。
+- **非阻擋與處置**：N1 正式庫兩張空表與 sha 變動 → 寫進 §2 ④；N2 NVDA／META 公司債 → §2 ④ 註明「照封閉清單的字面成立」、實質見 §5 #10；N3 Fabrinet 的 Navanakorn 廠區 → §2 ② 勘誤、baseline §16.1 補更正註記；N4 敘事格層仍指舊讀圖 → §5 #16；N5 full chain 測試的呼叫改寫漏寫一支 → §3 更正；N6 UHP 延後的重問 → §5 #11 寫明；N7 independent 規則空的成立 → §2 ③ 寫明；N8 審查者唯讀連線碰到 -shm 旁檔（`decision_lab.db-shm`、Engine C 的 -shm）、兩個主 DB 的 sha 與 mtime 不變——照實記錄於此。

@@ -312,6 +312,11 @@ pq2 池全部 669 項（含已結案）裡，沒有任何 tier 型別的項目�
 旁證（媒體、不當依據）：Semiconductor Today 2022-02-04 轉述 Lumentum 新聞稿 "Lumentum's Thailand Navanacorn factory"；Lumentum 官方 X 帳號 "expansion of its production facility in Nava"。
 10-K 另寫 "Our significant contract manufacturing partners are located primarily in Thailand, Taiwan, Malaysia and the Philippines"——泰國也有代工夥伴，但沒有任何來源把「Nava」指向代工廠；DEF 14A 那句把 Navanakorn 明寫成 "our … manufacturing facility"。
 
+⚠ **更正（2026-10-03 結案 R2 N3 撞到）**：上一句「沒有任何來源把『Nava』指向代工廠」不精確——庫內 `library/raw/fn_10_k_20260818.txt`（Fabrinet 10-K）逐字寫
+"We most recently expanded our manufacturing capacity by acquiring an 8-acre campus in Navanakorn, Thailand in May 2026"，另有 Navanakorn campus 自 2027-08 起的租稅優惠。
+6.2a 追源前沒有先 grep 自家庫（L11-4）。**處置不受影響**：「Nava」出自 Lumentum Q2 FY2026 法說（2026-02-03），早於 Fabrinet 2026-05 買下那個廠區；
+DEF 14A 把 Navanakorn 寫成 Lumentum 自己的 "largest manufacturing facility"（R2 重抓 SEC 原文逐字核過），FY2026 10-K Properties 也寫泰國製造廠是自有。
+
 ### 16.2 遷移工具 dry-run（6.2c；`python loader/migrate_identity_cleanup.py`，唯讀）
 
 - 抽取檔：`semitoday_ph18da_volume_2026_03_20.json`——`co:openlight` → `co:openlight_photonics`（節點宣告＋`ph3` 的 src）；
