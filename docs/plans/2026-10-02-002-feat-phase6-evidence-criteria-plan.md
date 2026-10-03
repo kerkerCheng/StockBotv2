@@ -121,7 +121,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.3 | 證據資料：名冊兩個寫法（Arista、GF；Apollo 誤中不加）、GSR→media（3 條）、名冊新公司 5 家（2 條升級附引文）、`origin_entity` 進 SourceDoc 同步欄位（iqe 對齊）、綜述論文期刊登記 media；**pq2 [671]（SourceDoc origin 三筆）、[672]（四則 lead 標籤）等 go**（baseline §17；偏差 §0.6 #6–#8） | ✅ | 執行模型 | 見 git log「Step 6.3」 |
 | 6.4 | 分類規則：逐來源具名＋轉述字表（唯一 owner `corroboration`）、所有消費端改走它、計數器改口徑、packet 印「入圖後證據等級會變的邊」；真實圖外部印證 250 → 230（升 2〔6.3c〕、降 22〔6.3b GSR 3＋規則 19：未具名 13／名冊無名 4／轉述 2〕）、違反 0、①73 → 77（與 §0.2 預測相同）；[670] hint 依新規則更新（baseline §18；偏差 §0.6 #10–#12） | ✅ | 執行模型 | 見 git log「Step 6.4」 |
 | 6.5 | sub 旗標跟著值走到消費端（不進 digest）：贏得 sub 值那一筆的旗標印在結構表、五個角度的邊、走圖第 1 型、「替代難度」旁註；4 份現行讀圖 status 與 digest 改前改後逐位相同；真實結構表 66 列帶 sub（撐得住 9／撐不住 57）（baseline §19） | ✅ | 執行模型 | 見 git log「Step 6.5」 |
-| 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）；R2-b | ○ | 執行模型 | |
+| 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）：真實 11 檔黃 → 10（LRCX 轉灰）、每盞黃燈指得出窗內一份募資文件；daily 請求數不變；R2-b CONDITIONAL_GO（已知限制漏寫 MRVL 的兩份公司債說明書）→ 條件修正 → 窄範圍覆核 GO（baseline §20；偏差 §0.6 #13–#15；待決 §14 #10） | ✅ | 執行模型 | 見 git log「Step 6.6」 |
 | 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則 | ○ | 執行模型 | |
 | 6.8 | 研究（強模型）：補具名引文（RA，pq2）、重讀 stale 的讀圖、四檔敘事換版或不換版理由（收據 `docs/reports/2026-10-xx-phase6-step68-research.md`） | ○ | 執行模型 | |
 | 6.9 | 新管線 full chain 測試（證據鏈與稀釋燈鏈） | ○ | 執行模型 | |
