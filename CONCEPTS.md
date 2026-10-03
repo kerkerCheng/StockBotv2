@@ -41,6 +41,7 @@ Evidence tier determines how much a source contributes to `confidence` scoring.
 | `evidence_class` | **誰在替這條邊背書？**（來源獨立性） | `externally_corroborated` ＞ `counterparty_joint` ＞ `self_reported_costly` ＞ `needs_review` ＝ `media_relay` ＞ `self_reported` |
 | `origin_linkage` | **這份媒體文是轉述還是自己採訪？**（SourceDoc 選填） | `same_origin`／`independent`／缺＝沒宣告 |
 | `sub_language_in_quote` | **撐住這個 sub 的引文有沒有在談可替代性？**（替代品認證、排他性也算） | true／false／缺；只印、不放閘（唯一 owner `query/sub_language.py`，字表版本跟著每個數印）。一條邊的旗標＝**贏得 sub 值的那一筆**的旗標（2026-10-03 Phase 6 Step 6.5：旗標跟著值走，不挑同一條邊上另一筆好看的）；沒有 sub 或沒核對是「缺」，不是 false。不進讀圖 digest |
+| `anchor_basis` | **結構表這一列的需求錨是從哪裡走出來的？** | `row`（這一列的瓶頸節點自己走得到需求錨）／`company`（節點走不到、退回從公司走，畫面印「公司層」）／缺＝兩邊都走不到。2026-10-03 Phase 6 Step 6.7a 起錨逐列（之前一律從公司走）；跳數跟著它讀（節點離錨／公司離錨）。唯一走法 `query.bottleneck.demand_chain` |
 | `demand_proof_level` | **需求端的證據到哪一層？** | `confirmed` ＞ `guided` ＞ `inferred` ＞ `speculative` |
 | `confidence` | **這個關係存在的信心** | 0–1；只在不同 `origin_event` 之間累加 |
 | `corroborating_origins` | **還有誰獨立說過同一件事**（L8 的獨立性計數） | `origin_entity` 集合，門檻 3 |

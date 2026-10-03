@@ -275,6 +275,8 @@ def build_packet(build: Any) -> JudgmentPacket:
             "qualification_status": context.structural.qualification_status,
             "dependency_depth": context.structural.dependency_depth,
             "demand_anchor": str(context.structural.demand_anchor or "") or None,
+            # 錨與跳數的來處（Phase 6 Step 6.7a）：row＝這條邊的瓶頸節點自己接到的、company＝節點走不到、退回公司。
+            "demand_anchor_basis": context.structural.demand_anchor_basis,
         },
         "fundamentals": _public(context.fundamentals),
         "market": _public(context.market),

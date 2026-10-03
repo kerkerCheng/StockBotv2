@@ -584,3 +584,46 @@ submissions JSON 沒有任何欄位分得出股權或債（`primaryDocDescriptio
   `tests/test_engine_c_equity_issuance.py` 兩條補上募資文件（串接點那條給假輸入、走正式路徑那條先 `store_offerings`）。
 - 變異：把 S-8 加進募資清單 → 「只有 S-8 是灰」與「增量不多抓」兩條紅；拿掉日期窗 → 「只算窗內」那條紅（`mutate.py`，跑完還原）。
 - 理由句不帶數字（D2：紅黃綠不給數字）——表單代號、申報日在稽核層的 `offering_summary`／`context_summary`／`offerings`。
+
+## 21. Step 6.7 小修（2026-10-03 台北）
+
+### 21a. 結構表逐列需求錨（Phase 5 #27）
+
+改前：`structure_table` 一律從**公司**往上走，同一家公司的每一列印同一個錨（Lam 的 9 列全是 `tech:dram_technology`），心跳「前三錨」數的是公司不是邊。
+改後：每列先從**這一列的瓶頸節點**走 `demand_chain`，走不到才退回公司，列上 `anchor_basis` ∈ {row, company}（兩邊都走不到＝null）；退回的那格印「公司層」。
+`demand_chain` 本身沒改（只改呼叫端）。
+
+真實圖（唯讀，worktree 新程式；scratchpad `p67a_real.py`）：
+
+| 量 | 改前（從公司走） | 改後（逐列） |
+|---|---|---|
+| 有錨的列（共 224） | 211 | **213**（改前有錨、改後沒錨 **0** 列——09-18 的教訓守住） |
+| basis | — | row 146／company 67／兩邊都走不到 11 |
+| 需求錨個數（含「走不到錨」那一格，心跳口徑） | 9 | 10 |
+| 前三錨 | `tech:ai_switch` 102、`tech:optical_scale_up` 39、`tech:essential_chips_mature_node` 29 | `tech:ai_switch` 126、`tech:optical_scale_up` 29、`tech:essential_chips_mature_node` 21 |
+
+Lam Research 9 列（改前全是 `tech:dram_technology`／2 跳）：
+
+| 列 | 改後的錨（跳數；basis） |
+|---|---|
+| supplies_to → `prod:reliant` | `tech:dram_technology`（2；**公司層**） |
+| supplies_to → `tech:3d_nand_manufacturing` | `tech:ai_switch`（2；row） |
+| supplies_to → `tech:3d_scaling` | `tech:dram_technology`（2；**公司層**） |
+| supplies_to → `tech:advanced_packaging` | `tech:ai_switch`（2；row） |
+| supplies_to → `tech:deposition_etch_clean` | `tech:ai_switch`（2；row） |
+| supplies_to → `tech:dram_manufacturing` | `tech:ai_switch`（2；row） |
+| supplies_to → `tech:foundry_logic` | `tech:ai_switch`（2；row） |
+| supplies_to → `tech:nand` | `tech:dram_technology`（2；**公司層**） |
+| supplies_to → `tech:semiconductor_manufacturing_equipment` | `tech:dram_technology`（1；row） |
+
+心跳部位段那一行（改後）：「結構表 224 條邊分佈在 10 個需求錨（前三：tech:ai_switch 126、tech:optical_scale_up 29、tech:essential_chips_mature_node 21；公司層 67 列）——**N 檔不等於 N 個獨立機會**」。
+列上沒有 `anchor_basis` 的舊 artifact 印「錨是公司側（artifact 早於逐列錨）」，不印成「公司層 0 列」。
+
+**下游（plan 原本只列結構表、APP、心跳；L16 讓來處跟著值走到每個印錨的地方）**：alpha provider 的 `ScarcityInputs.demand_anchor_basis`、
+`get_company_structural_context` 邊表的 `demand_anchor_basis`、個股頁「需求錨點／距需求端跳數」的旁註（只標公司層）、邊表的「（公司層）」、
+session assessor 的 LLM 輸入。實測 provider（sub≥4，17 家）：同公司內呈現順序只有 **GFS** 變（`demand_hops` 是最後一個 tie-break）、
+**Q1 取到的邊 0 家變**、Q1 那條邊的錨變 3 家（AXT `tech:optical_scale_up`→`tech:ai_switch`、Coherent `tech:ai_switch`→`tech:optical_scale_up`、
+Micron `tech:dram_technology`→`tech:hbm`）、跳數變 9 家；`alpha/closure.py` 的產業組 **0 家變**。
+⇒ 結案 §12 第 3 項的個股頁逐檔歸因多一個來源「6.7a 逐列錨」（AXTI、COHR 的稽核區那兩格會變；四檔的鏈段落不讀 `demand_anchor`，Phase 3 Step 3.7）。
+
+- 測試 `tests/test_row_demand_anchor.py` 10 條；變異五個全紅（一律從公司走、只從節點走不退回、provider 不帶 basis、個股頁不加註、心跳不分舊 artifact）。

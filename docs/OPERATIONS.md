@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7a：結構表逐列需求錨）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize（結構表與個股頁）**讀取不變**：同一份 assertion 列與逐字，`demand_chain` 每列多走一次節點側（純記憶體），沒有新查詢、主機或憑證。值逐列重算：`demand_anchor`／`chain`／`demand_hops`（先節點、走不到才退回公司）；欄位變多：結構表每列 `anchor_basis`／`anchor_basis_label`、`notes.anchor_column`、`vocab.anchor_basis`，個股讀取模型 `ScarcityInputs.demand_anchor_basis`、邊表的 `demand_anchor_basis`、「需求錨點／距需求端跳數」的 `reason`；心跳部位段「前三錨」那一行多「公司層 N 列」。`python -m query.bottleneck` 的欄名與表後讀法換新 |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` structure_table kind 那段；`CONCEPTS.md` `anchor_basis` 一列。skill／prompt 沒有描述需求錨的走法——不改。`alpha/models/session_assessor.py` 的 LLM 輸入多一個鍵 `demand_anchor_basis`（只在互動 session 跑，不在 daily） |
+| **3 最窄 rule** | daily argv 不變（`tests/test_daily_task.py`）；不新增 step、allowlist、APP 路由 |
+| **4 contract test** | `tests/test_row_demand_anchor.py`（先節點後公司、有錨只多不少、同公司可不同錨、markdown 只標退回那格、artifact 字彙／讀法／identity、心跳「公司層 N 列」與舊 artifact 不印 0、provider 與個股頁帶 basis、白話對照 key 集合相同）；變異五個全紅（一律從公司走、只從節點走、provider 不帶、個股頁不加註、心跳不分舊 artifact） |
+| **5 端到端 smoke** | 真實圖（唯讀，worktree 新程式）：224 列、有錨 211 → 213、改前有錨改後沒錨 0；basis row 146／company 67／兩邊都走不到 11；Lam 9 列 6 列 row、3 列公司層；前三錨 `tech:ai_switch` 102 → 126、`tech:optical_scale_up` 39 → 29、`tech:essential_chips_mature_node` 29 → 21。provider（sub≥4，17 家）：同公司內順序只有 GFS 變、Q1 取到的邊 0 家變、Q1 那條邊的錨變 3 家（AXT、Coherent、Micron）、跳數變 9 家；產業組 0 家變（baseline §21） |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.6：稀釋燈只認募資文件）
 
 | 步 | 結論 |

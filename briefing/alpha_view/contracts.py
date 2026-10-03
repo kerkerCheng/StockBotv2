@@ -378,6 +378,8 @@ class StructuralEdgeItem:
     demand_hops: int | None
     evidence_class: str | None
     purpose: str = "actionable"             # actionable／structural_only_not_actionable
+    #: 錨與跳數的來處（Phase 6 Step 6.7a）：row／company（退回公司）；None＝沒有錨。
+    demand_anchor_basis: str | None = None
 
 
 @dataclass(frozen=True, slots=True)

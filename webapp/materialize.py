@@ -406,7 +406,8 @@ def _company_label(registry: Any, company_id: str) -> str | None:
 
 def _project_table_row(row: Mapping[str, Any], *, registry: Any,
                        evidence_label: Mapping[str, str],
-                       node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
+                       node_names: Mapping[str, str] | None = None,
+                       anchor_basis_label: Mapping[str, str] | None = None) -> dict[str, Any]:
     """一列的投影：**每一格照抄**，只加上公司名、節點名與證據標籤——沒有任何算術，也沒有名次。
 
     節點名（2026-09-30 使用者回饋：結構表滿是 `tech:cpo_full_stack_test` 這種內部代號）取自圖裡節點的 `name`；
@@ -418,6 +419,9 @@ def _project_table_row(row: Mapping[str, Any], *, registry: Any,
     out["demand_anchor_name"] = names.get(str(row["demand_anchor"])) if row.get("demand_anchor") else None
     out["chain_names"] = [names.get(str(n)) for n in (row.get("chain") or ())]
     out["evidence_label"] = evidence_label.get(str(row.get("evidence")), str(row.get("evidence")))
+    # 錨的來處（Phase 6 Step 6.7a）：字彙照抄 `query.bottleneck.ANCHOR_BASIS`；整列沒有錨＝None。
+    basis = row.get("anchor_basis")
+    out["anchor_basis_label"] = (anchor_basis_label or {}).get(str(basis)) if basis else None
     return out
 
 
@@ -450,12 +454,13 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
     那裡是唯一一份（L16）。
     """
     from query.bottleneck import (
-        EVIDENCE_LABEL, NO_ANCHOR_CHAIN_NOTE, NO_ANCHOR_READING, ORDER_NOTE, STRUCTURE_TABLE_NOTE,
-        STRUCTURE_TABLE_TITLE, known_limitations,
+        ANCHOR_BASIS, ANCHOR_COLUMN_NOTE, EVIDENCE_LABEL, NO_ANCHOR_CHAIN_NOTE, NO_ANCHOR_READING, ORDER_NOTE,
+        STRUCTURE_TABLE_NOTE, STRUCTURE_TABLE_TITLE, known_limitations,
     )
 
     stamp = (generated_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
-    rows = [_project_table_row(r, registry=registry, evidence_label=EVIDENCE_LABEL, node_names=node_names)
+    rows = [_project_table_row(r, registry=registry, evidence_label=EVIDENCE_LABEL, node_names=node_names,
+                               anchor_basis_label=ANCHOR_BASIS)
             for r in (result.get("rows") or ())]
     coverage = dict(result["coverage"])
     payload: dict[str, Any] = {
@@ -492,9 +497,13 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
             "table": STRUCTURE_TABLE_NOTE,
             "no_anchor_chain": NO_ANCHOR_CHAIN_NOTE,
             "no_anchor_reading": NO_ANCHOR_READING if any(not r.get("demand_anchor") for r in rows) else None,
+            # 「需求錨」那一欄的讀法（Phase 6 Step 6.7a：逐列、退回公司的標「公司層」）。
+            "anchor_column": ANCHOR_COLUMN_NOTE,
         },
         "vocab": {
             "evidence_labels": dict(EVIDENCE_LABEL),
+            # 列上 `anchor_basis` 的封閉字彙（row／company；整列沒有錨時是 null）。
+            "anchor_basis": dict(ANCHOR_BASIS),
             "sole_source_states": {
                 "true": "有文件說這條邊是唯一來源（強弱看 evidence：供應商自稱只算弱印證）",
                 "false": "有文件說有第二來源",
@@ -513,9 +522,10 @@ def build_structure_table_artifact(result: Mapping[str, Any], *, registry: Any,
         kind="structure_table", as_of=payload["as_of"],
         # 認知狀態＝每列的結構／證據欄位；`documents`（多讀一份文件）與 `confidence`
         # 不算——那是注意力指標，變了不代表我們對結構的判斷變了（L12 兩個 digest 分開的理由）。
+        # 錨的來處（`anchor_basis`）跟錨一起算：同一個錨從「公司層」變成「這個節點自己接得到」也是認知變了。
         identity={"rows": [[r["company_id"], r["relation"], r["bottleneck"], r["substitutability"],
                             r["sole_source"], r["evidence"], r["qualification_status"],
-                            r["demand_anchor"]] for r in rows],
+                            r["demand_anchor"], r.get("anchor_basis")] for r in rows],
                   "canonical_edges": coverage.get("canonical_edges")})
     payload["content_digest"] = canonical_digest(payload)
     return payload

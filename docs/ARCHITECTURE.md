@@ -621,7 +621,7 @@ alpha／beta 界線用 `risk/hard_caps.py` 匯出的 `beta_instrument_for`／`is
 （沿用 `alpha.three_questions.rollup`）、燈的**盞數**（紅／黃／綠／**灰＝沒量到**，灰依 kind 分）與有紅燈的檔、讀不到的檔與理由——
 心跳段 2 與段 4 只讀這一份（⚠ 不取「每檔最差色」：一綠三灰會被算成綠）。沒有敘事、不上板的檔另列 `no_narrative[]`（2026-09-30：原本只有計數；每檔帶三個字，與 `counts.no_narrative` 同一個來源——`derive_row` 回 None 的那幾檔；不是第六組）。**組內按 ticker 字母，不排序、不打分、不給尺寸。**`python -m webapp materialize --structure-table`
 走與 `python -m query.bottleneck` **同一條路**（同一個 driver、`fetch_assertions`、registry），把 `structure_table()` 的逐邊事實
-**照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；每列另帶圖裡節點的 `name`（`bottleneck_name`／`demand_anchor_name`／`chain_names`；同一個 session 查，圖裡沒有名字就是 None、不從 ID 猜），`layers[]` 是畫面「只看某一層」的選項（依名字字母，選單排列不是名次；app.js 不排序）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。
+**照抄**成 artifact——不排序、不加權、不設門檻、不給首選（G1）；每列另帶圖裡節點的 `name`（`bottleneck_name`／`demand_anchor_name`／`chain_names`；同一個 session 查，圖裡沒有名字就是 None、不從 ID 猜）。**需求錨逐列**（2026-10-03 Phase 6 Step 6.7a；之前一律從公司走，同一家公司每列同一個錨）：`structure_table` 先從這一列的瓶頸節點走 `demand_chain`、走不到才退回公司，列上 `anchor_basis` ∈ {row, company}（兩邊都走不到＝null），字彙 `query.bottleneck.ANCHOR_BASIS` 隨 artifact 的 `vocab.anchor_basis`、讀法 `notes.anchor_column`；退回公司的那一格在結構表、心跳「前三錨」那一行（「公司層 N 列」）、alpha provider（`ScarcityInputs.demand_anchor_basis`）與個股頁（「需求錨點／距需求端跳數」旁註、邊表的「（公司層）」）都標出來——個股頁 builder 不得 import `query`，白話對照 `ANCHOR_BASIS_NOTE` 由測試守 key 集合相同。`layers[]` 是畫面「只看某一層」的選項（依名字字母，選單排列不是名次；app.js 不排序）；`GET /api/v1/structure-table` 與單檔同一套紀律：讀不到 503 ＋ remedy。
 （2026-09-08 至 09-23 之間這裡是 `ranking` kind：兩份排序＋`top_pick`；隨 G1 退役，見 plan §0.6 #40。）
 
 **`beta` kind（2026-09-08 B2）：** `python -m webapp materialize --beta` 以 `--no-refresh --no-record-risk` 純讀呼叫

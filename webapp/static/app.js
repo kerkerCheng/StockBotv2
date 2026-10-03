@@ -1446,7 +1446,11 @@ function anchorCell(row) {
   const cell = el('td', 'rank-anchor');
   if (row.demand_anchor) {
     cell.appendChild(nodeLabel(row.demand_anchor_name, row.demand_anchor));
-    cell.appendChild(el('div', 'dim', `離它 ${row.demand_hops} 步`));
+    // Phase 6 Step 6.7a：錨逐列——這一列的節點走不到、退回從公司走的，標「公司層」（字彙在滑鼠提示，來自 artifact）。
+    const company = row.anchor_basis === 'company';
+    const hops = el('div', 'dim', company ? `公司層｜公司離它 ${row.demand_hops} 步` : `離它 ${row.demand_hops} 步`);
+    if (row.anchor_basis_label) hops.title = row.anchor_basis_label;
+    cell.appendChild(hops);
   } else {
     cell.appendChild(el('span', 'badge badge-blocked', '🔴 找不到誰在花錢'));
   }
@@ -1593,6 +1597,8 @@ async function renderStructureTable() {
   } else {
     sec1.appendChild(el('p', 'empty', '（母體為空：沒有任何公司→向下的邊）'));
   }
+  // 「需求錨」那一欄的讀法跟著表走（Phase 6 Step 6.7a；文字住 query.bottleneck.ANCHOR_COLUMN_NOTE）。
+  if (notes.anchor_column) sec1.appendChild(mdParagraph(notes.anchor_column));
   if (notes.no_anchor_reading) sec1.appendChild(mdParagraph(notes.no_anchor_reading));
   if (notes.table) sec1.appendChild(mdParagraph(notes.table));
   app.appendChild(sec1);
@@ -1639,7 +1645,7 @@ async function renderStructureTable() {
 
   // ⑤ 需求鏈
   const sec4 = el('section', 'panel');
-  sec4.appendChild(el('h2', null, '需求鏈（誰在花錢 → 這家公司）'));
+  sec4.appendChild(el('h2', null, '需求鏈（誰在花錢 → 這一列卡在哪的節點；公司層的列 → 這家公司）'));
   sec4.appendChild(drill(`展開：每一列的鏈路（${rows.length}）`, () => {
     const ul = el('ul', 'notes');
     rows.forEach((row) => {
@@ -1649,7 +1655,7 @@ async function renderStructureTable() {
       const sub = el('div', 'dim');
       if (row.chain && row.chain.length) {
         sub.textContent = row.chain.map((id, i) => (row.chain_names || [])[i] || id).join(' → ')
-          + `　（距需求端 ${row.demand_hops} 跳）`;
+          + `　（距需求端 ${row.demand_hops} 跳${row.anchor_basis === 'company' ? '；公司層' : ''}）`;
         sub.title = row.chain.join(' → ');
       }
       else sub.appendChild(mdInline(notes.no_anchor_chain || ''));

@@ -1387,8 +1387,15 @@ def build_positions(*, state_dir: Path | None) -> Section:
             )
         top = sorted(anchors.items(), key=lambda kv: -kv[1])[:3]
         shape = "、".join(f"{k} {v}" for k, v in top)
+        # Phase 6 Step 6.7a：錨逐列（先從瓶頸節點走、走不到才退回公司）。退回公司的列數跟著印，
+        # 讓「這個錨是節點自己接到的」與「只是公司接到的」不在同一個計數裡同形（L12）；
+        # 列上沒有 `anchor_basis` 的舊 artifact 照實說是公司側，不印成「公司層 0 列」。
+        if rows and not any("anchor_basis" in row for row in rows):
+            basis = "；錨是公司側（artifact 早於逐列錨）"
+        else:
+            basis = f"；公司層 {sum(1 for row in rows if row.get('anchor_basis') == 'company')} 列"
         section.lines.append(
-            f"結構表 {len(rows)} 條邊分佈在 {len(anchors)} 個需求錨（前三：{shape}）"
+            f"結構表 {len(rows)} 條邊分佈在 {len(anchors)} 個需求錨（前三：{shape}{basis}）"
             f"——**N 檔不等於 N 個獨立機會**"
         )
 

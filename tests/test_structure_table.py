@@ -600,8 +600,8 @@ def test_anchor_gap_diagnosis_does_not_touch_the_table() -> None:
     """診斷是**另一段輸出**，不改列上任何一格。
 
     「瓶頸節點接不接得到錢」與「這家公司的產出有沒有人在花錢買」是兩個問題——
-    2026-09-18 實測過把列上的錨改成前者會讓多數列失去錨。本測試鎖住：加了診斷之後，
-    列上一個欄位都沒有動。
+    2026-09-18 實測過把列上的錨**只**改成前者會讓多數列失去錨；Phase 6 Step 6.7a 起列上先走節點、
+    走不到才退回公司（`anchor_basis`，tests/test_row_demand_anchor.py）。本測試鎖住：診斷不滲進列。
     """
     from query.bottleneck import classify_anchor_gaps
 
@@ -613,7 +613,7 @@ def test_anchor_gap_diagnosis_does_not_touch_the_table() -> None:
     result = structure_table(rows, _FakeRegistry(), quotes_by_assertion={})
 
     assert "anchor_gaps" in result
-    # 表本身：rows 的每一列都還帶著公司側的錨，診斷沒有把它換成節點側的。
+    # 表本身：診斷沒有在列上加任何欄位（列上的錨是逐列的，與診斷各自算）。
     for row in result["rows"]:
         assert "anchor_gap" not in row, "診斷不得滲進表的列"
     axt = [r for r in result["rows"] if r["company_id"] == "co:axt"]

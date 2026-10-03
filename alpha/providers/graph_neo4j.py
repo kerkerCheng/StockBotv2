@@ -215,6 +215,8 @@ class Neo4jGraphResearchProvider:
         # 兩者在排序退役前跟著 rank_bottlenecks 的列序走，這裡把那個「同一家公司內」的順序明寫下來，
         # read model 三面板文字才一字不變（2026-09-23 實測：不排會讓 AXTI／LITE 的 Q1 同分取到
         # 另一條邊、四檔的鏈段落換序）。
+        # ⚠ Phase 6 Step 6.7a 起錨逐列：`demand_hops` 跟著 `anchor_basis` 讀（節點離錨／公司離錨），這裡仍照值比
+        # （最後一個 tie-break）。實測 6.7a 前後：sub≥4 的 17 家裡只有 GFS 的同公司內順序變了，Q1 取到的邊 0 家變。
         rows.sort(key=lambda r: (
             str(r.get("company_id")),
             0 if r.get("demand_anchor") else 1,
@@ -302,6 +304,8 @@ class Neo4jGraphResearchProvider:
                     qualification_lead_time_weeks=row.get("lead_time_weeks"),
                     dependency_depth=row.get("demand_hops"),
                     demand_anchor=_entity_or_none(anchor),
+                    # 錨與跳數的來處（Phase 6 Step 6.7a）：row＝這條邊的節點自己接得到、company＝退回公司。
+                    demand_anchor_basis=row.get("anchor_basis"),
                     evidence=evidence,
                 ),
                 demand_anchor=_entity_or_none(anchor),
@@ -326,6 +330,7 @@ class Neo4jGraphResearchProvider:
                 "qualification_status": r.get("qualification_status"),
                 "demand_anchor": r.get("demand_anchor"),
                 "demand_hops": r.get("demand_hops"),
+                "demand_anchor_basis": r.get("anchor_basis"),
                 "evidence_class": r.get("evidence"),
             } for r in rows),
             claims=(),

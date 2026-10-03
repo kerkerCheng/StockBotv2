@@ -399,6 +399,9 @@ class ScarcityInputs:
     qualification_lead_time_weeks: int | None = None
     dependency_depth: int | None = None
     demand_anchor: EntityId | None = None
+    #: 這個錨（與 `dependency_depth`）是從哪裡走出來的（Phase 6 Step 6.7a；`query.bottleneck.ANCHOR_BASIS`）：
+    #: `row`＝這條邊的瓶頸節點自己接得到、`company`＝節點走不到、退回從公司走。None＝沒有錨或 provider 沒給。**只印。**
+    demand_anchor_basis: str | None = None
     evidence: tuple[EvidenceRef, ...] = ()
 
 

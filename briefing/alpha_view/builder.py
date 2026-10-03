@@ -86,6 +86,14 @@ A_CATALYST_STATE = "shared://catalyst_state.assess_entry"
 # Causal Fundamental Model（Phase 2，2026-09-05）：假設、橋、比較各自是 authority，read model 只選取。
 A_REFRESH = "alpha://refresh/resolver"
 
+#: 錨的來處 → 給人讀的註（Phase 6 Step 6.7a）。key 集合必須與 `query.bottleneck.ANCHOR_BASIS` 相同——測試守著；
+#: builder 不得 import `query`（`tests/test_alpha_view_render.py`），同 `alpha.narrative.argument.EVIDENCE_CLASS_PLAIN` 的作法。
+#: `row` 是這兩格的預設讀法（這條邊的瓶頸節點自己接到的錨），不加註；只有退回公司的那一條要說出來。
+ANCHOR_BASIS_NOTE: Mapping[str, str | None] = {
+    "row": None,
+    "company": "公司層：這條邊的瓶頸節點走不到需求錨，錨與跳數是退回從公司往上走的",
+}
+
 #: refresh state → Datum status。`current`／`recalculate` 在 read model 裡都是「有、可用」（確定性成果每次
 #: build 都重算）；`stale`／`review_required`／`invalidated` 各自是一個 status（L12：不壓成一個 stale）。
 _REFRESH_TO_STATUS: Mapping[str, str] = {
@@ -1128,12 +1136,15 @@ def build_alpha_investment_view(
     sub_note = {True: "撐住這個值的那段引文有在談可替代性／替代品認證／排他性",
                 False: "⚠ 撐住這個值的那段引文沒有在談可替代性／替代品認證／排他性——值照印，讀的人自己判斷要不要信它"
                 }.get(scarcity.substitutability_quote_supported)
+    # 「需求錨點」「距需求端跳數」旁註（Phase 6 Step 6.7a）：錨逐列，退回公司的那一條標「公司層」——來處跟著值走。
+    anchor_note = ANCHOR_BASIS_NOTE.get(str(scarcity.demand_anchor_basis or ""))
     scarcity_inputs = tuple(
         _observation(key, label, value, authority=A_STRUCTURE, unit=unit, as_of=graph_as_of,
                      freshness=None, evidence_refs=scarcity_refs,
                      method="已經 graph admission gate 核准的邊屬性；provider 取最強的一條邊，不平均",
                      missing_reason="圖上這條邊沒有這個屬性（未填≠否；結構表自 2026-09-05 起保留三態）",
-                     reason=sub_note if key == "substitutability" else None)
+                     reason=(sub_note if key == "substitutability"
+                             else anchor_note if key in ("dependency_depth", "demand_anchor") else None))
         for key, label, value, unit in (
             ("substitutability", "替代難度", scarcity.substitutability, "ordinal_1_5"),
             ("sole_source", "獨家供應", scarcity.sole_source, "bool"),
@@ -1154,6 +1165,7 @@ def build_alpha_investment_view(
             qualification_status=e.get("qualification_status"),
             demand_anchor=e.get("demand_anchor"), demand_hops=e.get("demand_hops"),
             evidence_class=e.get("evidence_class"), purpose="actionable",
+            demand_anchor_basis=e.get("demand_anchor_basis"),
         ) for e in context.graph.edges
     ) + tuple(
         StructuralEdgeItem(

@@ -641,11 +641,11 @@ def demand_chain(
 ) -> list[str] | None:
     """從 `target` 往上走到**明確登記的需求錨點**，回傳最短的一條鏈；走不到回 None。
 
-    ⚠ **`target` 傳誰，決定了這條鏈在回答哪個問題。** `structure_table` 一律傳**公司**
-    （`edge.src`），所以輸出的 `demand_anchor` 是「這家公司的產出有沒有人在花錢買」，
-    **同一家公司的每一列都相同**；傳瓶頸節點（`edge.dst`）問的是另一件事。
-    2026-09-18 實測過換成 dst 的後果：accepted 列有一批會失去錨（圖裡沒有人記錄過誰需要那些節點），
-    排序因此變差。這個欄位的名字容易被讀成後者——讀法已寫進 `render_markdown` 的表後註。
+    ⚠ **`target` 傳誰，決定了這條鏈在回答哪個問題。** 傳瓶頸節點（`edge.dst`）問「這個節點接不接得到錢」，
+    傳公司（`edge.src`）問「這家公司的產出有沒有人在花錢買」。`structure_table` 自 Phase 6 Step 6.7a 起
+    **先傳這一列的瓶頸節點、走不到才退回公司**，並在列上標 `anchor_basis`（`ANCHOR_BASIS`）——
+    2026-09-18 實測過「只傳 dst」會讓一批列失去錨（圖裡沒有人記錄過誰需要那些節點），退回公司那一步就是為它留的；
+    在那之前一律傳公司，於是同一家公司的每一列都印同一個錨（Lam 的 9 列）。本函式自己不分這兩種，只回最短鏈。
 
     用 BFS 取最短路徑而非 DFS 取最長：最短路徑是「這個瓶頸離錢最近有幾層」，
     可解釋；最長路徑在有環的圖上只是亂走（首版的教訓，見 DEMAND_ANCHORS 註解）。
@@ -688,12 +688,21 @@ EXCLUSION_REASONS: Mapping[str, str] = {
 }
 
 
+#: 列上的需求錨是從哪裡走出來的（封閉字彙；Phase 6 Step 6.7a，Phase 5 #27）。
+#: ⚠ **錨的值與它的來處必須一起走**：同一格 `demand_anchor` 現在承載兩種問題（這個節點接到哪裡／這家公司接到哪裡），
+#: 不帶 basis 的消費端就是 L12 的形狀。整列沒有錨時 basis 是 None（兩邊都走不到），不是第三個值。
+ANCHOR_BASIS: Mapping[str, str] = {
+    "row": "這一列的瓶頸節點往上走得到需求錨",
+    "company": "公司層：這一列的瓶頸節點走不到需求錨，退回從公司往上走（瓶頸節點自己的缺口見「瓶頸節點走不到需求錨」那一段）",
+}
+
+
 #: 「**瓶頸節點自己**走不到需求錨」的成因（封閉字彙）。
 #:
 #: ⚠ **這不是 `EXCLUSION_REASONS`，兩者問的不是同一件事。** 後者講的是
 #: 「這條邊為什麼不在母體裡」；本字彙講的是「這個**節點**接不接得到有人花錢的地方」。
-#: 列上的 `demand_anchor` 是從**公司**側走的（見 `demand_chain` 的 docstring），
-#: 所以一條列可以同時「公司側有錨」而「瓶頸節點側沒有錨」——後者是診斷，不改列上任何一格。
+#: 列上的 `demand_anchor` 先從瓶頸節點走、走不到才退回公司（`anchor_basis`，Phase 6 Step 6.7a），
+#: 所以本段數到的節點，在列上就是 `anchor_basis=company`（或整列沒有錨）——本段是診斷，不改列上任何一格。
 #:
 #: ⚠ **三種成因刻意不壓成一句「走不到錨」**（ROADMAP Phase 4 驗收條件逐字要求）：
 #: 它們的下一步完全不同——一個要先拆封閉字彙、一個是研究、一個要等前兩個解完。
@@ -770,9 +779,9 @@ def classify_anchor_gaps(
         "nodes": by_cause,
         "cause_labels": dict(ANCHOR_GAP_CAUSES),
         "this_is_not": (
-            "這**不是**列上的欄位，也不是排除理由。列上的 `demand_anchor` 是從**公司**側走的，"
-            "問「這家公司的產出有沒有人在花錢買」；本段問的是「這個**瓶頸節點**接不接得到錢」。"
-            "兩者是不同問題，2026-09-18 實測過把列上的錨改成後者會讓多數列失去錨。"
+            "這**不是**列上的欄位，也不是排除理由。列上的錨先從這一列的瓶頸節點走、走不到才退回公司"
+            "（那一格印「公司層」）；本段數的就是**走不到、只好退回公司**的那些瓶頸節點，"
+            "讓「這個節點自己接不接得到錢」有一個會自己出現的計數，而不是藏在「公司層」三個字後面。"
         ),
     }
 
@@ -786,11 +795,13 @@ def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None
     `sub_language_in_quote`：**贏得這一列 sub 值的那筆**引文撐不撐得住（Phase 6 Step 6.5；
     `query.sub_language.canonical_sub_language`）。None＝沒有 sub 或沒核對（看結果的 `sub_language` 是不是 None 分得出）。
     """
-    # ⚠ 從**公司**往上走，不是從瓶頸節點。這一列問的是「這家公司的產出有沒有人
-    # 在花錢買」，不是「這個材料有沒有人要」。首版從 `edge.dst` 走，於是
-    # co:lumentum 那列的鏈路繞經 co:coherent——對 `mat:inp_substrate` 而言正確，
-    # 但那不是這一列在問的問題。
-    chain = demand_chain(edge.src, upward)
+    # ⚠ 先從**這一列的瓶頸節點**往上走，走不到才退回公司（Phase 6 Step 6.7a；使用者 10-02 定案 #27）。
+    # 在那之前一律從公司走，同一家公司的每一列都印同一個錨（Lam 的 9 列），心跳「前三錨」因此數的是公司不是邊。
+    # 只從節點走在 2026-09-18 量過會讓一批列失去錨（圖裡沒人記過誰需要那些節點）——退回公司那一步就是為它留的，
+    # 所以「有錨」的列只會多不會少；退回的那一格由 `anchor_basis` 標明（`ANCHOR_BASIS`），不讓兩種問題同形（L12）。
+    # 例：co:lumentum depends_on mat:inp_substrate 那列，鏈現在繞經 co:coherent——答的是「InP 這層接到哪裡」。
+    row_chain = demand_chain(edge.dst, upward)
+    chain = row_chain or demand_chain(edge.src, upward)
     return {
         "company_id": edge.src,
         "ticker": registry.research_ticker(edge.src),
@@ -818,7 +829,9 @@ def _table_row(edge, registry, upward, *, without_sub_language: list[str] | None
             (str(v) for v in edge.source_docs.values() if v), default=None),
         "chain": chain,
         "demand_anchor": chain[0] if chain else None,
+        # 跳數從鏈的起點算：basis=row 是瓶頸節點離錨幾跳，basis=company 是公司離錨幾跳——跟著 basis 讀。
         "demand_hops": (len(chain) - 1) if chain else None,
+        "anchor_basis": ("row" if row_chain else "company") if chain else None,
         # 列表不是布林（plan §5 b）：讀的人要能指回是哪幾筆 assertion 的引文沒在談可替代性。
         "assertions_without_sub_language": without_sub_language,
         # 這一列印的 sub 是哪一筆給的、那一筆的引文撐不撐得住（只印、不改 sub、不改順序）。
@@ -1069,6 +1082,15 @@ NO_ANCHOR_READING = (
 #: 表的順序是什麼、不是什麼——供消費端原樣呈現，讓「第一列」永遠不被讀成「第一名」。
 ORDER_NOTE = "列依 (company_id, relation, bottleneck) 字典序——**索引，不是名次**；沒有任何一格參與順序。"
 
+#: 「需求錨」那一欄的讀法（Phase 6 Step 6.7a）。markdown 與 APP 都從這裡拿（L16）。
+ANCHOR_COLUMN_NOTE = (
+    "**「需求錨」逐列**：先從這一列「卡在哪」的那個節點往上走最短路徑；那個節點走不到任何錨，才退回從標的公司走，"
+    "那一格標「公司層」。所以同一家公司的不同列可以接到不同的錨。"
+    "「公司層」的列回答的是「這家公司的產出有沒有人在花錢買」，不是「這個節點接不接得到錢」——"
+    "後者走不到的節點逐個列在「瓶頸節點走不到需求錨」那一段（研究缺口訊號）。"
+    "跳數跟著來處讀：一般列是瓶頸節點離錨幾跳，公司層的列是公司離錨幾跳。"
+)
+
 
 def known_limitations(coverage: Mapping[str, Any]) -> list[str]:
     """結構表的三條已知限制，**隨輸出常駐**（模組 docstring 的要求）。任何消費端都從這裡拿。"""
@@ -1110,7 +1132,7 @@ def render_markdown(result: Mapping[str, Any]) -> str:
         return "\n".join(out)
 
     out.append(f"\n> {ORDER_NOTE}\n")
-    out.append("| 標的 | 卡在哪 | 替代難度 | 證據 | 合格狀態 | 文件 | 公司側需求錨 |")
+    out.append("| 標的 | 卡在哪 | 替代難度 | 證據 | 合格狀態 | 文件 | 需求錨（逐列） |")
     out.append("|---|---|---|---|---|---|---|")
     for r in result["rows"]:
         ticker = r["ticker"] or "—"
@@ -1121,23 +1143,18 @@ def render_markdown(result: Mapping[str, Any]) -> str:
             sub += "｜⚠這個值的引文沒談可替代性"
         if r.get("assertions_without_sub_language"):
             sub += f"｜引文無可替代性語言 {len(r['assertions_without_sub_language'])} 筆"
+        anchor = r["demand_anchor"] or "🔴 無"
+        if r.get("anchor_basis") == "company":
+            anchor += "（公司層）"
         out.append(
             f"| {r['company_id']}（{ticker}） | {r['relation']} → `{r['bottleneck']}` "
             f"| {sub}{sole} | {EVIDENCE_LABEL[r['evidence']]} "
             f"| {r['qualification_status'] or '—'} | {r['documents']} "
-            f"| {r['demand_anchor'] or '🔴 無'} |"
+            f"| {anchor} |"
         )
 
     # ⚠ 這一欄的讀法必須跟著表走，否則每個讀者都會重造一份自己的理解（L16 的形狀）。
-    out.append(
-        "\n> **「公司側需求錨」是從標的公司往上走最短路徑找到的，不是從「卡在哪」那個節點走。**"
-        "所以**同一家公司的每一列都是同一個錨**——它回答「這家公司的產出有沒有人在花錢買」，"
-        "不回答「這條邊的瓶頸節點接不接得到錢」。"
-        "\n> ⚠ 改成從瓶頸節點走**已經量過是錯的**（2026-09-18）：多數列（`tech:isolator`、"
-        "`tech:eml`、`tech:ocs` 等）會**直接失去錨**，因為圖裡沒有人記錄過「誰需要它們」。"
-        "**那個「瓶頸節點走不到錨」是研究缺口訊號**（同 ROADMAP Phase 4 成因③「真的沒有需求方邊」），"
-        "不是一個該加進列上的欄位。"
-    )
+    out.append("\n> " + ANCHOR_COLUMN_NOTE)
     if any(not r["demand_anchor"] for r in result["rows"]):
         out.append("\n> " + NO_ANCHOR_READING)
     out.append("\n" + STRUCTURE_TABLE_NOTE)
@@ -1199,13 +1216,14 @@ def render_markdown(result: Mapping[str, Any]) -> str:
 
     out.extend(render_population_report(result))
 
-    out.append("\n## 需求鏈（誰在花錢 → 這家公司）\n")
+    out.append("\n## 需求鏈（誰在花錢 → 這一列卡在哪的節點；公司層的列 → 這家公司）\n")
     for r in result["rows"]:
         out.append(
             f"- **{r['company_id']}** {r['relation']} `{r['bottleneck']}`"
         )
         if r["chain"]:
-            out.append(f"   {' → '.join(r['chain'])}　（距需求端 {r['demand_hops']} 跳）")
+            basis = "；公司層" if r.get("anchor_basis") == "company" else ""
+            out.append(f"   {' → '.join(r['chain'])}　（距需求端 {r['demand_hops']} 跳{basis}）")
         else:
             out.append("   " + NO_ANCHOR_CHAIN_NOTE)
     return "\n".join(out)

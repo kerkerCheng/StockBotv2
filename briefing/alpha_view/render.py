@@ -520,6 +520,9 @@ def _edge_row(e: StructuralEdgeItem) -> str:
         return markdown_text(value)
 
     anchor = f"{_cell(e.demand_anchor)}／{_cell(e.demand_hops)}"
+    # Phase 6 Step 6.7a：錨逐列；這條邊的節點走不到、退回公司的標「公司層」（來處跟著值走）。
+    if e.demand_anchor_basis == "company":
+        anchor += "（公司層）"
     return (f"| {markdown_text(e.relation)} | {markdown_text(e.target)} | {_cell(e.substitutability)} | "
             f"{_cell(e.sole_source)} | {_cell(e.qualification_status)} | {anchor} | "
             f"{_cell(e.evidence_class)} | {markdown_text(e.purpose)} |")
