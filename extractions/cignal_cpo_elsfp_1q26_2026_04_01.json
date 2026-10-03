@@ -33,7 +33,8 @@
       "relation": "supplies_to",
       "source_ids": [
         "cignal_cpo_elsfp_1q26_2026_04_01_s1",
-        "cignal_cpo_elsfp_1q26_2026_04_01_s3"
+        "cignal_cpo_elsfp_1q26_2026_04_01_s3",
+        "cignal_cpo_elsfp_1q26_2026_04_01_s5"
       ],
       "src_id": "co:lumentum"
     },
@@ -53,13 +54,18 @@
     {
       "abstraction_level": "device_chip",
       "aliases": [
-        "LITE"
+        "LITE",
+        "Lumentum Holdings"
       ],
-      "attributes": {},
+      "attributes": {
+        "concentration_score": null,
+        "ramp_difficulty_intrinsic": 5,
+        "ticker": "LITE"
+      },
       "confidence": 0.85,
       "id": "co:lumentum",
       "name": "Lumentum",
-      "role": null,
+      "role": "bottleneck_supplier",
       "source_ids": [
         "cignal_cpo_elsfp_1q26_2026_04_01_s1"
       ],
@@ -68,13 +74,17 @@
     {
       "abstraction_level": "device_chip",
       "aliases": [
-        "COHR"
+        "COHR",
+        "Coherent Corp"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "ticker": "COHR"
+      },
       "confidence": 0.85,
       "id": "co:coherent",
       "name": "Coherent",
-      "role": null,
+      "role": "bottleneck_supplier",
       "source_ids": [
         "cignal_cpo_elsfp_1q26_2026_04_01_s1"
       ],
@@ -83,9 +93,14 @@
     {
       "abstraction_level": "module_subsystem",
       "aliases": [
+        "ELS module",
+        "turnkey ELS module",
+        "turnkey ELS",
         "ELSFP"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
       "confidence": 0.85,
       "id": "tech:els_pluggable_module",
       "name": "Pluggable turnkey ELS module",
@@ -99,12 +114,16 @@
       "abstraction_level": "device_chip",
       "aliases": [
         "UHP laser",
+        "ultra-high-power laser",
+        "400mW laser",
         "high-power laser"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
       "confidence": 0.85,
       "id": "tech:uhp_laser",
-      "name": "Ultra-high-power laser",
+      "name": "Ultra-high-power laser chip",
       "role": null,
       "source_ids": [
         "cignal_cpo_elsfp_1q26_2026_04_01_s1"
@@ -123,6 +142,7 @@
     "retrieved_at": "2026-08-30",
     "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "400760cb6eec878981a8f50817831fb286bfa9e7612fc3ce08070792ad5d9aec",
     "title": "Cignal AI: CPO and ELSFP – 1Q26 Update",
     "url": "https://cignal.ai/2026/04/cpo-and-elsfp-1q26-update/"
   },
@@ -146,6 +166,11 @@
       "id": "cignal_cpo_elsfp_1q26_2026_04_01_s4",
       "locator": "volume caveat",
       "quote": "All told, there is a lot of noise in the market, but no products shipping in volume yet."
+    },
+    {
+      "id": "cignal_cpo_elsfp_1q26_2026_04_01_s5",
+      "locator": "Key takeaways（Cignal AI 自己的分析；付費牆『Clients log in』之前的公開段）",
+      "quote": "Some of the most vertically integrated vendors, such as Coherent and Lumentum, are already pivoting to supplying other component parts (e.g. ELSFPs) into CPO."
     }
   ]
 }
