@@ -673,7 +673,11 @@ renderer 都還在那個 details 裡。
 `ready` 的說明逐字寫著「不是『可以買』的意思」。
 
 **單檔走勢圖：** `alpha/providers/close_series.py` 取 180 個**已收盤**交易日（不含今天的盤中 bar，L12），
-在 materialize 端抓、存進 artifact 的 `price_series`。它是**脈絡不是訊號**：不參與排序、不決定尺寸、
+在 materialize 端抓、存進 artifact 的 `price_series`。「最後一根收盤了沒」的**唯一 owner** 也住這支（2026-10-03 Phase 6 Step 6.7c；
+Phase 5 #12）：`bar_state`／`closed_points`——日期＝**交易所當地**今天、且現在早於 yfinance `currentTradingPeriod.regular.end`
+→ 拿掉並計數；拿不到交易時段 → 保留並計數「收盤狀態未知」。追蹤表三支取價（`_provider_series`／`_provider_close_series`／
+`_benchmark_series`）與計分表（`_yfinance_closes`）共用，計數在 `price_budget.closing_bars`（報告那一句 `closing_bars_line` 兩邊共用、
+APP 部位頁與計分表頁有才印）。在此之前本檔只丟「日期＝台北今天」那根——美股盤中（台北凌晨）的當日 K 棒日期是美東昨天，照樣混進來。它是**脈絡不是訊號**：不參與排序、不決定尺寸、
 不畫任何均線或動能指標（`tests/test_webapp_api.py` 掃這段程式碼）；`freshness_identity` 不含它——
 價格動了不算認知變了。抓失敗只是沒有折線，不讓整份 artifact 失敗。
 **UI 只改資訊階層，不產生任何新的 summary judgment**：頭條那句話取自

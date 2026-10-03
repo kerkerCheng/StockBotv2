@@ -641,3 +641,22 @@ Micron `tech:dram_technology`→`tech:hbm`）、跳數變 9 家；`alpha/closure
 
 順帶：結構表 artifact 以 6.7a 的程式重 materialize（derived cache）之後，APP 結構表頁渲染出 **67** 格「公司層」（與 basis=company 的 67 列相同）。
 - 測試 `tests/test_webapp_code_freshness.py` 7 條；`tests/test_webapp_request_path.py` 照綠（health 只多 stat，不寫、不連網、不 import 新模組）。
+
+### 21c. 排除未收盤 K 棒（Phase 5 #12）
+
+owner：`alpha/providers/close_series.py::bar_state`／`closed_points`——最後一根的日期＝**交易所當地**今天、且現在早於 yfinance
+`history_metadata.currentTradingPeriod.regular.end` → 拿掉並計數；收盤後 → 保留；拿不到交易時段 → 保留並計數「收盤狀態未知」。
+追蹤表三支（`_provider_series`、`_provider_close_series`、`_benchmark_series`——基準是 plan 沒列的對稱面：歐股收盤後、美股盤中時指數的當日值同樣是進行中的）、
+計分表 `_yfinance_closes`、`fetch_close_series`（走勢折線、事件監控）全部走它；計數住 `price_budget.closing_bars`。
+在此之前 `fetch_close_series` 只丟「日期＝台北今天」那根：美股盤中（台北凌晨）的當日 K 棒日期是美東昨天，照樣混進來。
+
+實測 yfinance 的交易時段（2026-10-03 03:51 UTC＝美東週五 23:51、台北週六 11:51）：AAPL／LITE／^GSPC 的 `regular` 仍是週五 13:30–20:00 UTC
+（沒有提早滾到週一）→ 週五那根判已收；台股、日股、歐股的最後一根是週五、當地已是週六 → 已收。SIVE.ST、SOI.PA 週五那根收盤是 NaN（既有 NaN 規則先跳過）。
+
+**同一份價格逐位不變**（plan 驗收；同一個 process 裡 git HEAD 的舊程式與新程式各跑一次，yfinance 回應第一次真抓、之後重播，87 個快取鍵）：
+追蹤表 `collect()` 舊 vs 新**逐欄相同**（history 22 列；扣新加的 `closing_bars`），舊程式真抓 vs 重播也相同（快取本身不造成差異）；
+計分表 `build_scorecard()` 舊 vs 新只差 `generated_at`／`content_digest`。新程式今天 checked 32＋49 檔、拿掉 0、未知 0。
+（與 05:30 daily 的 artifact 有差：計分表是 `day` 的 UTC 日期 10-02 → 10-03；部位頁的差異沒有逐項追——同一份價格上舊新相同，所以不是本 Step 的程式。）
+
+- 測試 `tests/test_closing_bars.py` 15 條；變異五個全紅（永遠不拿掉、用台北的今天、沒有交易時段當已收盤、追蹤表不收狀態、計分表不收狀態）。
+- `tests/test_measurement_full_chain.py` 一處假取價函式的簽名多收 `states=None`（照新契約；斷言不動）。

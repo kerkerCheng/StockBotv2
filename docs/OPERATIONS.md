@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7c：排除未收盤 K 棒）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑤ `scripts/outcome_if_settled_today.py` 與 ⑬ materialize（部位頁、計分表、個股頁的走勢折線、brief 的事件監控）的**請求、主機、寫入都不變**：同一個 `yf.Ticker(...).history(...)`，多讀同一個 handle 上已經回來的 `history_metadata`（不多打請求）。判定收進 `alpha/providers/close_series.py`（`bar_state`／`closed_points`）：交易所當地今天＋盤中 → 拿掉那一根；拿不到交易時段 → 保留。輸出多一格 `price_budget.closing_bars`（checked、拿掉的檔、收盤狀態未知的檔、字彙）；報告與 APP **有才印**。`fetch_close_series` 的 `today` 參數（沒有呼叫端用）換成 `now`／`states` |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` 單檔走勢圖那段（owner）。skill／prompt 不描述取價——不改 |
+| **3 最窄 rule** | daily argv 不變（`tests/test_daily_task.py`、`tests/test_codex_daily_permissions.py`）；不新增 step、allowlist、APP 路由 |
+| **4 contract test** | `tests/test_closing_bars.py`（盤中拿掉、收盤後保留、交易所當地今天而不是台北的今天、10-03 實測的收盤後週五那根、沒有交易時段＝未知、交易時段滾到下一段＝已收、時戳無時區＝未知、NaN 先跳過、五個取價點都走 owner 且逐檔記狀態、追蹤表與計分表把計數放進輸出且報告那一句共用、APP 兩頁有才印）；變異五個全紅 |
+| **5 端到端 smoke** | 同一份價格（同一個 process，yfinance 回應第一次真抓、之後重播）：git HEAD 的舊程式 vs 新程式——追蹤表 `collect()` **逐欄相同**（history 22 列；扣新加的 `closing_bars`），計分表 `build_scorecard()` 只差 `generated_at`／`content_digest`；今天（週六）新程式 checked 32＋49 檔、拿掉 0、未知 0。與今天 05:30 daily 的 artifact 有不同（部位頁的報酬聚合、計分表的 30／90 日窗走滿筆數），但同一份價格上舊新相同，所以不是本 Step 的程式；計分表那部分的來源是 `day`（05:30 跑時 UTC 日期是 10-02、現在是 10-03），部位頁那部分沒有逐項追 |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7b：APP 自偵舊程式）
 
 | 步 | 結論 |

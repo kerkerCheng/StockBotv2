@@ -200,7 +200,7 @@ def test_scorecard_cohort_cell_reaches_the_artifact_the_heartbeat_and_the_api(tm
     monkeypatch.setattr(cohort_provider, "current_cohorts", lambda **_kw: ([cohort], []))
     asked: list[list[str]] = []
 
-    def prices(symbols, start, end):
+    def prices(symbols, start, end, states=None):  # Phase 6 Step 6.7c：預設取價多一個可選的 states（收盤狀態收集器）
         asked.append(list(symbols))
         return {s: SCORE_PRICES[s] for s in symbols if s in SCORE_PRICES}
 

@@ -187,22 +187,28 @@ def _snapshots(conn: sqlite3.Connection, ticker: str) -> list[sqlite3.Row]:
     ).fetchall()
 
 
-def _provider_series(ticker: str, start: date) -> dict[date, float]:
+def _provider_series(ticker: str, start: date, *, states: dict[str, str | None] | None = None) -> dict[date, float]:
     """provider 已收盤序列 {交易日: 收盤價}，單位為 provider 報價單位。
 
     一次抓足回看窗與現價，避免同一檔重複請求。單位不在此正規化——本序列的兩個用途
     （現價、錨點前漲幅）一個之後會正規化、一個是同序列相除，比值自動消單位。
+    盤中未收盤的當日 K 棒由 `alpha.providers.close_series.closed_points` 拿掉（Phase 6 Step 6.7c）；`states` 記最後一根的狀態。
     """
+    from alpha.providers.close_series import closed_points
+
     try:
         import yfinance as yf
 
-        hist = yf.Ticker(ticker).history(
-            start=start.isoformat(), auto_adjust=True
-        )["Close"].dropna()
+        handle = yf.Ticker(ticker)
+        hist = handle.history(start=start.isoformat(), auto_adjust=True)["Close"]
+        metadata = getattr(handle, "history_metadata", None)
     except Exception as exc:  # noqa: BLE001
         print(f"  ⚠ {ticker} 收盤序列抓取失敗：{type(exc).__name__}: {exc}", file=sys.stderr)
         return {}
-    return {ts.date(): float(close) for ts, close in hist.items() if close == close}
+    points, state = closed_points(hist.items(), metadata)
+    if states is not None:
+        states[ticker] = state
+    return {ts.date(): close for ts, close in points}
 
 
 def _peak_since(series: dict[date, float], anchor: date | None) -> tuple[float | None, date | None]:
@@ -235,7 +241,12 @@ def _pre_anchor_return(series: dict[date, float], anchor: date) -> float | None:
     return at[1] / before[1] - 1.0
 
 
-def _benchmark_series(symbols: list[str], start: date, end: date) -> dict[str, dict[date, float]]:
+def _benchmark_series(symbols: list[str], start: date, end: date, *,
+                      states: dict[str, str | None] | None = None) -> dict[str, dict[date, float]]:
+    """基準收盤序列。⚠ 盤中未收盤的當日 K 棒同樣拿掉（Phase 6 Step 6.7c）：歐股收盤後、美股盤中跑時，
+    基準指數的當日值是進行中的——拿它算超額就是把半天的漲跌當成終點（對稱面，L17）。"""
+    from alpha.providers.close_series import closed_points
+
     try:
         import yfinance as yf
     except ImportError:
@@ -243,16 +254,16 @@ def _benchmark_series(symbols: list[str], start: date, end: date) -> dict[str, d
     out: dict[str, dict[date, float]] = {}
     for symbol in symbols:
         try:
-            hist = yf.Ticker(symbol).history(
+            handle = yf.Ticker(symbol)
+            hist = handle.history(
                 start=(start - timedelta(days=7)).isoformat(),
                 end=(end + timedelta(days=2)).isoformat(),
                 auto_adjust=True,
             )
-            out[symbol] = {
-                ts.date(): float(close)
-                for ts, close in hist["Close"].items()
-                if close == close  # NaN guard
-            }
+            points, state = closed_points(hist["Close"].items(), getattr(handle, "history_metadata", None))
+            if states is not None:
+                states[symbol] = state
+            out[symbol] = {ts.date(): close for ts, close in points}
         except Exception as exc:  # noqa: BLE001 — 基準抓不到只降級，不中斷報表
             print(f"  ⚠ benchmark {symbol} 抓取失敗：{type(exc).__name__}: {exc}", file=sys.stderr)
     return out
@@ -266,11 +277,12 @@ def _at_or_before(series: dict[date, float], target: date) -> tuple[date, float]
     return best, series[best]
 
 
-def _history_rows() -> tuple[list[dict], list[dict]]:
+def _history_rows(*, states: dict[str, str | None] | None = None) -> tuple[list[dict], list[dict]]:
     """history lane（舊店 observed shadow 的入圖日錨點；凍結只印、不再新增）。
 
     ⚠ **這是原 `collect()` 的逐列計算，一字不動地搬進自己的函式**（Phase 5 Step 5.2，plan §3：「程式路徑不動，只改名
     與分段」）。基準那段迴圈抽成 `_apply_benchmarks`，三條 lane 共用。回 `(results, unavailable)`。
+    `states`（Phase 6 Step 6.7c）：取價時逐檔記最後一根 K 棒的收盤狀態，`collect()` 計數；逐列計算不動。
     """
     shadows = _load_shadows()
     observed = [s for s in shadows if s["status"] == "observed"]
@@ -301,6 +313,7 @@ def _history_rows() -> tuple[list[dict], list[dict]]:
                 _provider_series(
                     ticker,
                     (anchor_date or date.today()) - timedelta(days=PRE_ANCHOR_DAYS + 15),
+                    states=states,
                 )
                 if ticker
                 else {}
@@ -684,19 +697,27 @@ def _price_paper_row(row: dict, *, series: Mapping[date, float], quote_unit: str
         row["peak_date"] = peak_date
 
 
-def _provider_close_series(symbol: str, start: date) -> tuple[dict[date, float], str | None]:
+def _provider_close_series(symbol: str, start: date, *,
+                           states: dict[str, str | None] | None = None) -> tuple[dict[date, float], str | None]:
     """新 lane 的取價：provider 已收盤序列＋它自報的報價單位（yfinance `history_metadata.currency`）。NaN 與非正數不收
-    （歐洲標的會回 NaN 的未完成 K 棒）。抓不到回 `({}, None)`，由呼叫端標缺席。"""
+    （歐洲標的會回 NaN 的未完成 K 棒）；盤中未收盤的當日 K 棒由 `closed_points` 拿掉（Phase 6 Step 6.7c）。
+    抓不到回 `({}, None)`，由呼叫端標缺席。"""
+    from alpha.providers.close_series import closed_points
+
     try:
         import yfinance as yf
 
         handle = yf.Ticker(symbol)
-        hist = handle.history(start=start.isoformat(), auto_adjust=True)["Close"].dropna()
-        unit = (getattr(handle, "history_metadata", None) or {}).get("currency")
+        hist = handle.history(start=start.isoformat(), auto_adjust=True)["Close"]
+        metadata = getattr(handle, "history_metadata", None) or {}
+        unit = metadata.get("currency")
     except Exception as exc:  # noqa: BLE001 — 單檔失敗只讓那一格缺席
         print(f"  ⚠ {symbol} 收盤序列抓取失敗：{type(exc).__name__}: {exc}", file=sys.stderr)
         return {}, None
-    series = {ts.date(): float(close) for ts, close in hist.items() if close == close and float(close) > 0}
+    points, state = closed_points(hist.items(), metadata)
+    if states is not None:
+        states[symbol] = state
+    series = {ts.date(): close for ts, close in points if close > 0}
     return series, (str(unit) if unit else None)
 
 
@@ -768,9 +789,16 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
     回 `{"lanes": {live, paper, history}, "benchmarks", "theme_cohort", "price_budget", "today"}`：每條 lane 的 `rows`
     各自帶錨點、報酬、對 QQQ／SOXX 與主題等權組的超額；history 的逐列計算是原 `collect()` 一字不動（`_history_rows`）。
     所有外部輸入都可注入（測試不打網路、不讀舊店）；預設值就是正式資料源。**本函式不寫任何東西**——寫聚合檔的是 render。
+    `price_budget.closing_bars`（Phase 6 Step 6.7c）：預設取價那幾支（含 history 與基準）逐檔記下的最後一根 K 棒狀態——
+    盤中拿掉的、收盤狀態未知的各是哪幾檔（`alpha.providers.close_series.summarize_bar_states`；注入的 loader 不記）。
     """
+    from functools import partial
+
+    from alpha.providers.close_series import summarize_bar_states
+
     today = today or _local_day(datetime.now(timezone.utc).isoformat()) or date.today()
-    results, unavailable = (history_loader or _history_rows)()
+    bar_states: dict[str, str | None] = {}
+    results, unavailable = (history_loader or partial(_history_rows, states=bar_states))()
 
     # ⚠ 新 lane 的任何一步讀壞（beta 政策檔、名冊、敘事 ledger、組 ledger），只讓**那一條 lane** 缺席——history 照走：
     # daily 步驟 05 在 5.2 之前不依賴這些檔，不得因為多了 lane 就整步失敗（L13：一格壞了其餘照發）。
@@ -845,7 +873,7 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
     order = always + [s for s in wanted if s not in always]
     keep = order[:max(max_symbols, len(always))]
     truncated = order[len(keep):]
-    loader = price_loader or _provider_close_series
+    loader = price_loader or partial(_provider_close_series, states=bar_states)
     series: dict[str, dict[date, float]] = {}
     units: dict[str, str | None] = {}
     for symbol in keep:
@@ -878,7 +906,8 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
     if not no_benchmark and dated:
         start = min(r["anchor_date"] for r in dated)
         end = max(r["current_date"] for r in dated)
-        benchmarks = (benchmark_loader or _benchmark_series)([PRIMARY_BENCHMARK, REFERENCE_BENCHMARK], start, end)
+        benchmarks = (benchmark_loader or partial(_benchmark_series, states=bar_states))(
+            [PRIMARY_BENCHMARK, REFERENCE_BENCHMARK], start, end)
     for rows in lane_rows:
         _apply_benchmarks(rows, benchmarks)
         _apply_theme_cohort(rows, cohort, series)
@@ -891,7 +920,8 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
                   "live": live},
         "benchmarks": benchmarks,
         "theme_cohort": cohort_info,
-        "price_budget": budget,
+        # 取價那一段多一格 `closing_bars`（Phase 6 Step 6.7c）：基準也抓完了才算，所以在這裡補進去。
+        "price_budget": {**budget, "closing_bars": summarize_bar_states(bar_states)},
         "today": today,
     }
 
@@ -1350,6 +1380,12 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
     out.append(f"- 取價：要 {budget.get('requested')} 檔、抓 {budget.get('fetched')} 檔（上限 {budget.get('cap')}）"
                + (f"｜**截掉 {len(budget['truncated'])} 檔：{'、'.join(budget['truncated'])}**" if budget.get("truncated") else "")
                + "｜history 的 22 檔沿用原路徑、不在這個上限裡")
+    # Phase 6 Step 6.7c：盤中跑時才會有東西（daily 05:30 各市場都已收盤）——有才印，檔名逐一列出（句子住 owner）。
+    from alpha.providers.close_series import closing_bars_line
+
+    bars_line = closing_bars_line(budget.get("closing_bars"))
+    if bars_line:
+        out.append(f"- {bars_line}")
     for lane in LANE_KEYS:
         rows = collected["lanes"][lane]["rows"]
         summary = lane_summary(rows, lane=lane)

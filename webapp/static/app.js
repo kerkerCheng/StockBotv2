@@ -28,6 +28,22 @@ async function getJSON(path) {
   return body;
 }
 
+/* ---------- 未收盤 K 棒（Phase 6 Step 6.7c） ---------- */
+
+/* 取價端拿掉的盤中 K 棒、說不出收盤了沒的——有才印（daily 05:30 各市場都已收盤，平常是空的）。
+   判定住 alpha.providers.close_series（追蹤表與計分表同一支）；字彙跟著 artifact 的 closing_bars.labels，前端不另存一份。 */
+function closingBarsNote(budget) {
+  const bars = (budget || {}).closing_bars || {};
+  const dropped = bars.dropped_unfinished || [];
+  const unknown = bars.close_unknown || [];
+  if (!dropped.length && !unknown.length) return null;
+  const note = el('p', 'warn', `未收盤 K 棒：拿掉 ${dropped.length} 檔${dropped.length ? '（' + dropped.join('、') + '）' : ''}`
+    + `——那幾檔的現價是前一個收盤；收盤狀態未知 ${unknown.length} 檔${unknown.length ? '（' + unknown.join('、') + '，照用最後一根）' : ''}`);
+  const labels = bars.labels || {};
+  note.title = [labels.dropped_unfinished, labels.close_unknown].filter(Boolean).join('\n');
+  return note;
+}
+
 /* ---------- APP 自己的程式新不新（Phase 6 Step 6.7b） ---------- */
 
 /* 長駐的 APP 會一直跑啟動時載入的程式（Phase 5 實測：09-10 起跑的 APP 一路用 09-10 的程式，新頁面全回 404，
@@ -2752,6 +2768,8 @@ function renderPositionLanes(payload, detailSet) {
   if ((budget.truncated || []).length) {
     sec.appendChild(el('p', 'warn', `取價超過上限 ${budget.cap} 檔，截掉 ${budget.truncated.length} 檔：${budget.truncated.join('、')}——那幾格是缺席，不是沒有價。`));
   }
+  const barsNote = closingBarsNote(budget);
+  if (barsNote) sec.appendChild(barsNote);
   for (const lane of LANE_ORDER) {
     const entry = lanes[lane] || {};
     sec.appendChild(el('h3', null, LANE_TITLES[lane]));
@@ -3332,6 +3350,8 @@ async function renderScorecard() {
   if ((budget.truncated || []).length) {
     sec0.appendChild(el('p', 'warn', `取價超過上限，截掉 ${budget.truncated.length} 檔：${budget.truncated.join('、')}——那幾格是缺席，不是沒有價。`));
   }
+  const barsNote = closingBarsNote(budget);
+  if (barsNote) sec0.appendChild(barsNote);
   if (payload.price_note) sec0.appendChild(el('p', 'warn', '▲ ' + payload.price_note));
   app.appendChild(sec0);
 

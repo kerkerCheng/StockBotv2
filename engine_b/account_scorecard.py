@@ -43,6 +43,7 @@ import json
 import statistics
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta, timezone
+from functools import partial
 from pathlib import Path
 from typing import Any, Callable, Mapping, Sequence
 
@@ -418,6 +419,7 @@ def build_scorecard(
 ) -> dict[str, Any]:
     """整張計分表。`price_loader` 與 `cohorts`（`current_cohorts()` 的形狀）可注入——測試不打網路、不讀 ledger，
     正式跑用 yfinance 與主題等權組 ledger。"""
+    from alpha.providers.close_series import summarize_bar_states
     from identity.registry import get_registry
 
     from .signal_source_registry import load as load_sources
@@ -461,8 +463,10 @@ def build_scorecard(
     price_note = ""
     price_budget: dict[str, Any] = {"requested": 0, "fetched": 0, "cap": MAX_PRICED_SYMBOLS, "truncated": [],
                                     "theme_cohort_added": []}
+    # 每檔最後一根 K 棒的收盤狀態（Phase 6 Step 6.7c；預設取價才記，注入的 loader 不記）→ `price_budget.closing_bars`。
+    bar_states: dict[str, str | None] = {}
     if all_symbols and earliest is not None:
-        loader = price_loader or _yfinance_closes
+        loader = price_loader or partial(_yfinance_closes, states=bar_states)
         start = earliest - timedelta(days=LOOKBACK_DAYS + 10)
         # 截斷的優先序：基準 → 點名標的 → 主題等權組成員。基準永遠留著（沒有基準就算不出超額）；
         # 成員是第三個基準的**成分**、不是基準本身，可被截——截掉的照印，該成員進 `theme_cohort.missing`。
@@ -485,6 +489,7 @@ def build_scorecard(
             prices = loader(wanted, start, day)
         except Exception as exc:  # noqa: BLE001 — 取價失敗不得讓整張表消失
             price_note = f"價格取得失敗（{type(exc).__name__}: {exc}）——超額報酬與點名前漲幅因此無值"
+    price_budget["closing_bars"] = summarize_bar_states(bar_states)
 
     for source in sorted(registry.sources.values(), key=lambda s: s.source_id):
         calls = per_account_calls[source.source_id]
@@ -585,32 +590,39 @@ def build_scorecard(
 
 
 def _yfinance_closes(
-    symbols: Sequence[str], start: date, end: date
+    symbols: Sequence[str], start: date, end: date, *, states: dict[str, str | None] | None = None,
 ) -> dict[str, dict[date, float]]:
-    """yfinance 日線收盤。**逐檔抓**（批次 API 的欄位形狀會隨檔數變，逐檔比較好除錯）。"""
+    """yfinance 日線收盤。**逐檔抓**（批次 API 的欄位形狀會隨檔數變，逐檔比較好除錯）。
+
+    哪些點算已收盤由 `alpha.providers.close_series.closed_points` 判（追蹤表同一支，Phase 6 Step 6.7c）：
+    ⚠ Phase 5 Step 5.5（plan §0.6 #3）：yfinance 對尚未收盤的歐洲標的會回一根 NaN 收盤（2026-10-01：IQE.L、
+    SIVE.ST…）。NaN 進了序列，`_pct_change` 就算出 NaN 報酬，中位數的排序結果不確定——同一批值算出的格
+    也可能被靜默算錯。跳過它＝該日視同沒有收盤，端點退回前一根；有值但盤中未收盤的當日 K 棒同樣拿掉。
+    `states` 給了就逐檔記最後一根的狀態（拿掉的、說不出的由 `build_scorecard` 計數）。
+    """
     import yfinance as yf
+
+    from alpha.providers.close_series import closed_points
 
     out: dict[str, dict[date, float]] = {}
     for symbol in symbols:
         try:
-            frame = yf.Ticker(symbol).history(
+            handle = yf.Ticker(symbol)
+            frame = handle.history(
                 start=start.isoformat(), end=(end + timedelta(days=1)).isoformat(),
                 auto_adjust=True)
         except Exception:  # noqa: BLE001 — 單檔失敗不得讓整張表消失
             continue
         if frame is None or frame.empty or "Close" not in frame:
             continue
+        points, state = closed_points(frame["Close"].items(), getattr(handle, "history_metadata", None))
+        if states is not None:
+            states[symbol] = state
         series: dict[date, float] = {}
-        for stamp, value in frame["Close"].items():
+        for stamp, close in points:
             try:
-                close = float(value)
                 day = stamp.date()
             except (AttributeError, TypeError, ValueError):
-                continue
-            # ⚠ Phase 5 Step 5.5（plan §0.6 #3）：yfinance 對尚未收盤的歐洲標的會回一根 NaN 收盤（2026-10-01：IQE.L、
-            # SIVE.ST…）。NaN 進了序列，`_pct_change` 就算出 NaN 報酬，中位數的排序結果不確定——同一批值算出的格
-            # 也可能被靜默算錯。跳過它＝該日視同沒有收盤，端點退回前一根（與 `_provider_series` 的 dropna 同一規則）。
-            if close != close:
                 continue
             series[day] = close
         if series:
@@ -626,6 +638,12 @@ def render(scorecard: Mapping[str, Any]) -> str:
     lines.append(theme_cohort_line(scorecard))
     if scorecard.get("price_note"):
         lines.append(f"⚠ {scorecard['price_note']}")
+    # Phase 6 Step 6.7c：盤中跑才會有東西；句子與追蹤表同一支（alpha.providers.close_series.closing_bars_line）。
+    from alpha.providers.close_series import closing_bars_line
+
+    bars_line = closing_bars_line((scorecard.get("price_budget") or {}).get("closing_bars"))
+    if bars_line:
+        lines.append(f"⚠ {bars_line}")
     for account in scorecard.get("accounts") or []:
         metrics = account["metrics"]
         lines.append("")
