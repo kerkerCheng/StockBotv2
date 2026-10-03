@@ -123,7 +123,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.5 | sub 旗標跟著值走到消費端（不進 digest）：贏得 sub 值那一筆的旗標印在結構表、五個角度的邊、走圖第 1 型、「替代難度」旁註；4 份現行讀圖 status 與 digest 改前改後逐位相同；真實結構表 66 列帶 sub（撐得住 9／撐不住 57）（baseline §19） | ✅ | 執行模型 | 見 git log「Step 6.5」 |
 | 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）：真實 11 檔黃 → 10（LRCX 轉灰）、每盞黃燈指得出窗內一份募資文件；daily 請求數不變；R2-b CONDITIONAL_GO（已知限制漏寫 MRVL 的兩份公司債說明書）→ 條件修正 → 窄範圍覆核 GO（baseline §20；偏差 §0.6 #13–#15；待決 §14 #10） | ✅ | 執行模型 | 見 git log「Step 6.6」 |
 | 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則——a 有錨 211 → 213（改前有錨改後沒錨 0；Lam 9 列 6 列逐列、3 列公司層；「公司層」跟著錨走到個股頁）；b 頁面頂端「請重啟」橫幅（headless Edge 三種情況）；c 盤中 K 棒拿掉並計數（同一份價格上追蹤表逐欄相同、計分表只差時間戳記）；d 真實 15 筆預測終局不變；e ask 16 條（下一次跑請使用者確認會被問）（baseline §21；偏差 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 6.7」 |
-| 6.8 | 研究（強模型）：補具名引文（RA，pq2）、重讀 stale 的讀圖、四檔敘事換版或不換版理由（收據 `docs/reports/2026-10-xx-phase6-step68-research.md`） | ○ | 執行模型 | |
+| 6.8 | 研究：降級 22 條逐條有去向——補引文 RA 6 條（**pq2 [673]–[676] 等 go**；[677]／[678] 作廢建議 drop）、身分修正 4（[670]）、6.3b 定案 3、維持降級 8、延後 1；重讀 InP、CW DFB（仍 volume，四份讀圖全 current）；四檔敘事：LITE 改一句＋重押讀圖、AXTI／COHR／SIVE 只重押讀圖（收據 `docs/reports/2026-10-03-phase6-step68-research.md`；偏差 §0.6 #18；待決 §14 #11–#13） | ✅ | 執行模型 | 見 git log「Step 6.8」 |
 | 6.9 | 新管線 full chain 測試（證據鏈與稀釋燈鏈） | ○ | 執行模型 | |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
 
@@ -156,6 +156,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 15 | 6.6（R2-b CONDITIONAL_GO） | （未提） | C1：已知限制補 MRVL（424B5 `0001193125-26-142958`、424B2 `0001193125-26-147640` 是 Senior Notes）——`_DILUTION_RULE`、baseline §20、§14 #10 三處。C2（可選，照做）：規則文字的表單清單補「8-K（含 8-K/A）」與 S-8 POS、S-3／F-3 家族的 /A、ASR、MEF 變體 | C1：初版的「已知限制」只寫手核過的 NVDA、META，MRVL 的 424B5／424B2 沒讀封面就沒寫——自己引用的限制要套同一套追源紀律（L11-2）；判色不變（MRVL 另有 8-K 3.02 ×4 與 424B7）。C2：文字寫的比程式少，讀規則的人會以為 8-K/A 不算。兩項都只動文字，不動判定；窄範圍覆核（乾淨 context）見進度表 |
 | 16 | 6.7a（影響結案 §12 第 3 項） | 改哪裡：`structure_table`、APP 結構表頁、心跳「前三錨」 | 另把 `anchor_basis` 帶到 alpha provider（`ScarcityInputs.demand_anchor_basis`、邊表）、個股頁「需求錨點／距需求端跳數」旁註與邊表「（公司層）」、session assessor 的輸入；心跳那一行多「公司層 N 列」（舊 artifact 印「錨是公司側」） | 列上的 `demand_anchor` 一改成逐列，凡是印它的地方都承載兩種問題——只改 plan 列的三處，個股頁的同一格就是 L12 的形狀（L16：分類跟著資料走）。實測 provider 同公司順序只有 GFS 變、Q1 取到的邊 0 家變，但 Q1 那條邊的錨 3 家、跳數 9 家會變——**結案的個股頁逐檔歸因多一個來源「6.7a 逐列錨」**（AXTI、COHR 的稽核區兩格；baseline §21a） |
 | 17 | 6.7c | owner 讓「追蹤表兩支與計分表一支共用」 | 另接上追蹤表的**第三支** `_benchmark_series`（基準）與 owner 自己的 `fetch_close_series`（走勢折線、事件監控）；計數住 `price_budget.closing_bars`（追蹤表、計分表、APP 兩頁有才印）；`fetch_close_series` 的 `today` 參數（沒有呼叫端用）換成 `now`／`states` | 基準是對稱面（L17）：歐股收盤後、美股盤中時，指數的當日值同樣是進行中的，拿它算超額會把半天的漲跌當終點；`fetch_close_series` 原本「丟日期＝台北今天那根」是同一個問題的第二套規則——同一個模組留兩套「收盤了沒」就是 dual authority，而且美股盤中的當日 K 棒日期是美東昨天、舊規則照樣放行。daily 05:30 各市場都已收盤，同一份價格上追蹤表逐欄相同、計分表只差時間戳記（baseline §21c） |
+| 18 | 6.8 | §9 第 4 項：敘事「依賴就寫新版、不依賴就在收據寫不換版理由」；§9 第 1 項的預期候選含「NVIDIA×Lumentum 合作新聞稿（兩條）」 | 四檔都寫了新版：LITE 改一句措辭＋重押讀圖；AXTI／COHR／SIVE.ST **七格文字不改、只重押讀圖**（文字不依賴舊標籤的判斷照寫在收據）。NVIDIA×Lumentum 只補了 Lumentum→NVIDIA，UHP 那條延後（§14 #11）；RA 第一版兩份作廢（[677]／[678]，節點覆寫與日期倒退） | `rides[]` 釘著讀圖 id，讀圖換版後論證段的需求端會印「要等敘事重寫才說得出來」、候選判定只認 current／stale_low——照 Phase 4 Step 4.8 的先例重押。UHP 那條住另一份抽取檔，更正走廊改不到。作廢兩份是 prepare 時才看到的副作用（第一版沒有先對齊圖上節點與 SourceDoc 日期）；action 沒有撤回狀態，只能由 pq2 drop |
 
 ---
 
@@ -438,3 +439,11 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
     MRVL 配到的 10 份裡 424B5、424B2 各一份也是 Senior Notes（R2-b 手核；它另有 8-K 第 3.02 項與 424B7 的股權文件，黃燈不受影響）。
     要分有兩條路：①每份**新出現**的 424B 多抓一次文件或申報費用附件判股權／債（daily 偶爾多 1–2 次請求，違反本 Phase「請求數不變」）；
     ②維持現狀、讀的人看稽核層的文件代號自己判。這是使用者的題（改清單或請求數都動到 §0.1 #9 的定案）。
+11. （6.8）**同一個 doc_id 有兩份抽取檔**：`co:lumentum supplies_to tech:uhp_laser` 住 `extractions/lite_uhp_sole_source_downgrade_addendum_2026_08_30.json`
+    （doc_id 是 `nvda_lumentum_partnership_pr_2026_03_02`、檔名不是）。更正走廊以 `extractions/<doc_id>.json` 定位改不到它，所以這條的補引文延後（收據 §1.5）。
+    要補有兩條路：①把附錄併進主抽取檔（同一個本地 id 搬過去、附錄檔退役——要一次遷移，像 6.2 的遷移工具）；②讓更正走廊認得附錄檔（改 intake 契約）。使用者的題。
+12. （6.8）**BD 官網上的 Hyundai Mobis 新聞稿算誰說的**：`boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07` 的 origin 是 Boston Dynamics，
+    但內文是「Hyundai Mobis announced…／The company stated…」——主張的發出者是供應商（L8）。要不要把 origin 改成 Hyundai Mobis（更正走廊或 6.3d 式的 origin 更正）。
+13. （6.8）**策展摘錄的標籤指不回原文**（L18）：`nvda_lumentum_partnership_pr_2026_03_02_s3`（high-performance lasers…）出自新聞稿的「About Lumentum」
+    （Lumentum 自己的簡介），locator 卻寫「PR body, Lumentum role」、`library/raw` 寫成「Lumentum will provide …」；NVIDIA 矽光子部落格的摘錄把表頭名單寫成方括號註記、
+    抽取時只抄了冒號後半句（6.8 以 [673] 補）。要不要掃一次「摘錄裡的方括號／改寫框架」有多少份。
