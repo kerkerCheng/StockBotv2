@@ -51,16 +51,21 @@
         "semitoday_ph18da_volume_2026_03_20_s1",
         "semitoday_ph18da_volume_2026_03_20_s3"
       ],
-      "src_id": "co:openlight"
+      "src_id": "co:openlight_photonics"
     }
   ],
   "nodes": [
     {
       "abstraction_level": "foundry_packaging",
       "aliases": [
-        "TSEM"
+        "TSEM",
+        "TowerJazz",
+        "Tower",
+        "Tower Semiconductor Ltd."
       ],
-      "attributes": {},
+      "attributes": {
+        "ticker": "TSEM"
+      },
       "confidence": 0.85,
       "id": "co:tower_semiconductor",
       "name": "Tower Semiconductor",
@@ -73,26 +78,31 @@
     {
       "abstraction_level": "device_chip",
       "aliases": [
+        "OpenLight Photonics",
         "OpenLight"
       ],
-      "attributes": {},
+      "attributes": {
+        "ticker": null
+      },
       "confidence": 0.85,
-      "id": "co:openlight",
-      "name": "OpenLight Photonics",
-      "role": null,
+      "id": "co:openlight_photonics",
+      "name": "OpenLight",
+      "role": "disruptor",
       "source_ids": [
         "semitoday_ph18da_volume_2026_03_20_s1"
       ],
       "type": "Company"
     },
     {
-      "abstraction_level": "device_chip",
+      "abstraction_level": "module_subsystem",
       "aliases": [],
-      "attributes": {},
+      "attributes": {
+        "ticker": null
+      },
       "confidence": 0.8,
       "id": "co:newphotonics",
       "name": "NewPhotonics",
-      "role": null,
+      "role": "disruptor",
       "source_ids": [
         "semitoday_ph18da_volume_2026_03_20_s3"
       ],

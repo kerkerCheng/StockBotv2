@@ -189,7 +189,12 @@ def test_corrections_need_the_exact_pq2_ref(tmp_path: Path) -> None:
         mig.check_graph_approval(title_sync["n"], pool_path=pool_path, ref_id="sourcedoc-origin-sync:test")
 
 
-def _media_entry(seen_in: str = "paper", origin: str = "MDPI Micromachines") -> dict:
+#: 夾具刊名用虛構的：⚠ 2026-10-03 起真實 `config/publishers.json` 已登記 MDPI Micromachines（pq2 [671] apply），
+#: 原本用 MDPI 的兩條會先撞「已登記」、走不到要測的檢查——這裡測的是機制，不是現在登記了誰。
+FICTIONAL_JOURNAL = "Ficticia Micromachines"
+
+
+def _media_entry(seen_in: str = "paper", origin: str = FICTIONAL_JOURNAL) -> dict:
     return {"origin": origin, "kind": "media", "corroborates": False, "seen_in": seen_in, "note": "測試"}
 
 
@@ -199,7 +204,7 @@ def test_correction_evidence_changes_reclassify_with_the_new_origin_and_pending_
     rows = [{"src": "tech:a", "relation": "enables", "dst": "tech:b", "attributes": "{}", "confidence": 0.8,
              "origin": "Third-party Research", "source_type": "paper", "origin_linkage": None,
              "source_doc_id": "paper", "published_at": None, "assertion_id": "paper_e1"}]
-    manifest["corrections"][0]["after"] = "MDPI Micromachines（Chen et al. 2025 綜述）"
+    manifest["corrections"][0]["after"] = f"{FICTIONAL_JOURNAL}（Chen et al. 2025 綜述）"
     manifest["publishers_add"] = [_media_entry()]
     pending = mig.plan_publishers_add(manifest)
     changes = mig.correction_evidence_changes(rows, manifest, quotes_by_assertion={},
@@ -212,7 +217,7 @@ def test_correction_evidence_changes_reclassify_with_the_new_origin_and_pending_
 def test_publishers_add_must_match_the_corrected_origin_and_is_not_registered_early(tmp_path: Path) -> None:
     """登記必須對得上 seen_in 那份文件**更正後**的 origin（L18）；已登記、類別亂寫、對不上的一律拒收。"""
     manifest = _corrections(tmp_path)
-    manifest["corrections"][0]["after"] = "MDPI Micromachines（Chen et al. 2025 綜述）"
+    manifest["corrections"][0]["after"] = f"{FICTIONAL_JOURNAL}（Chen et al. 2025 綜述）"
     for bad, message in (({**_media_entry(), "corroborates": True}, "不合規"),
                          (_media_entry(seen_in="elsewhere"), "不是這次更正後"),
                          (_media_entry(origin="Reuters"), "已登記")):

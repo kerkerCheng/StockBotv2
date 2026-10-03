@@ -1,0 +1,84 @@
+{
+  "kind": "sourcedoc_json_sync",
+  "at": "2026-10-03T15:36:31.584832+00:00",
+  "plan": "docs/plans/2026-10-02-002-feat-phase6-evidence-criteria-plan.md Step 6.3d（使用者定案 §0.1 #6）",
+  "files": [
+    {
+      "file": "extractions/cpo_chip_package_paper.json",
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "changes": {
+        "origin_entity": {
+          "before": "Third-party Research",
+          "after": "MDPI Micromachines（Chen et al. 2025 綜述）"
+        }
+      },
+      "file_sha256": {
+        "before": "c34e7acbd46d20f880588bd1c5337db2afbc00d98d68fa99f3d54e12b3d88031",
+        "after": "47df33911e944b24c677a7459257ee195b6fb75203181c63bfc733ed632365bb"
+      },
+      "extraction_sha256": {
+        "before": "b955ba61384ced95d03130e4bb0645625f98b3fd4b5d9f9701a858267803c1e2",
+        "after": "fab609a9e153b18b4dcd62898bbeb25259f4e8cc9b909b0e4aae5de08f46e704"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/cpo_paper_coverage_addendum_2026_08_30.json",
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "changes": {
+        "origin_entity": {
+          "before": "Third-party Research",
+          "after": "MDPI Micromachines（Chen et al. 2025 綜述）"
+        }
+      },
+      "file_sha256": {
+        "before": "1b0266a5c5a0d9bd40aacc3f958566567a89b6299cdee3473270f05eb879e3ba",
+        "after": "f6382160685b2036aefb0c63a04de55d55b44382a354a51a6984117fd1896b42"
+      },
+      "extraction_sha256": {
+        "before": "fac2cfbb3f8c08ff6d9ab72e8b91bd2b191c045747d9fee5d92cd951e8d3d87a",
+        "after": "62ebdd589a8c7a641e0cc4dbf2361cc68d002240c40e7fecac1fd2779c3c2482"
+      },
+      "superseded_archive": null
+    },
+    {
+      "file": "extractions/novanta_humanoid_ft_2026.json",
+      "doc_id": "novanta_humanoid_ft_2026",
+      "changes": {
+        "origin_entity": {
+          "before": "Novanta/ATI（供應商官方應用頁）",
+          "after": "Novanta（子公司 ATI Industrial Automation 官方應用頁）"
+        }
+      },
+      "file_sha256": {
+        "before": "8073d68e7e3597cbb8e63f404f1754853a32bf4d71cb40d9581ec5cb76a705d3",
+        "after": "01a19ebce0a7d77cb0e8a261bb58960249d4b8d654b24248b70417ac78a26f9e"
+      },
+      "extraction_sha256": {
+        "before": "c3f5911e165719ba90b3d50d5692233278e92c9c16f806be5390cc2e206fb51e",
+        "after": "d645a6b539c591d9dc236c8b64c2373ec194201a75c6aeb9695a76c77658c9e7"
+      },
+      "superseded_archive": "extractions/superseded/novanta_humanoid_ft_2026.c3f5911e.json"
+    },
+    {
+      "file": "extractions/reuters_soitec_capacity_reservations_2026_08_31.json",
+      "doc_id": "reuters_soitec_capacity_reservations_2026_08_31",
+      "changes": {
+        "origin_entity": {
+          "before": "Soitec management (Reuters interview)",
+          "after": "Soitec（管理層受 Reuters 訪談所述）"
+        }
+      },
+      "file_sha256": {
+        "before": "1e76259307c73507d637fd99be67e70a492d95ce6d0086b4852c55df956d2f18",
+        "after": "af6e4d74d863df2f11268d7dfe085fe0777a09663a0667d129db6b4601810949"
+      },
+      "extraction_sha256": {
+        "before": "63097c845b6e123316e77167ee6c10f0a93f6e370723a83db835b5fd4acc6d4f",
+        "after": "477b6d86334d38a7dbf4c9d99fcbb732ccd36ff22e93b88ba4717cda5956cfa2"
+      },
+      "superseded_archive": "extractions/superseded/reuters_soitec_capacity_reservations_2026_08_31.63097c84.json"
+    }
+  ],
+  "skipped": []
+}

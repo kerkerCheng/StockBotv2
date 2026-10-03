@@ -1,0 +1,155 @@
+{
+  "kind": "identity_cleanup_result",
+  "at": "2026-10-03T15:38:29.860169+00:00",
+  "pq2": 670,
+  "backup": {
+    "dir": "library/private/backups/pq2-670-20261003T153755Z",
+    "nodes": 2698,
+    "relationships": 6107
+  },
+  "extractions_written": [
+    {
+      "file": "extractions/semitoday_ph18da_volume_2026_03_20.json",
+      "superseded_archive": "extractions/superseded/semitoday_ph18da_volume_2026_03_20.9e0d7000.json",
+      "extraction_sha256": {
+        "before": "9e0d70005ba6842437129bf2a8bbd3a5523f5eaa364affd5792c6eeb2f4eba17",
+        "after": "13a691bce4a6d72c3b0e25e098db163719ca078317b0ff52f570536c33452477"
+      },
+      "file_sha256": {
+        "before": "dec634b02362b29696bafee2c312b17d458d19149e6ff750734f63683f7593f4"
+      }
+    },
+    {
+      "file": "extractions/lumentum_q2fy26_cpo.json",
+      "superseded_archive": "extractions/superseded/lumentum_q2fy26_cpo.55c486d3.json",
+      "extraction_sha256": {
+        "before": "55c486d3d7512c4093a815b4f1c3fb0e2c33b7e7f7100302d575541b5722a5b3",
+        "after": "0d5f8096a76770c69c83b440ed28cd3473a028aeedde071c9ca9d4bbe098c9a7"
+      },
+      "file_sha256": {
+        "before": "109a13660d7b477c78a921c719a60e110bcac7bdd87193177382e747188fa753"
+      }
+    }
+  ],
+  "registry_changes": [
+    {
+      "op": "remove",
+      "company": "co:openlight",
+      "entry": {
+        "company_id": "co:openlight",
+        "research_ticker": null,
+        "display_name": "OpenLight Photonics Inc.",
+        "_display_name_source": "官網頁尾「© 2026 OpenLight Photonics Inc.」（openlightphotonics.com）",
+        "name_aliases": [
+          "OpenLight"
+        ],
+        "_note": "與 co:openlight_photonics 是同一家公司（OpenLight 自家新聞稿與 Tower 6-K 用 co:openlight_photonics、Semiconductor Today 那篇用 co:openlight；2026-10-01 Phase 4 Step 4.1c 補名時發現）。合併是 identity 決定、不在名冊自行處理；兩筆同名期間名字比對對兩家都不算（query.bottleneck.shared_name_forms，不猜）。"
+      }
+    },
+    {
+      "op": "remove",
+      "company": "co:nava_thailand",
+      "entry": {
+        "company_id": "co:nava_thailand",
+        "research_ticker": null,
+        "_note": "2026-10-01 Phase 4 Step 4.1c 刻意不補 display_name：唯一來源是 Lumentum 法說逐字稿摘要的「Thailand (Nava)」「Nava (Thailand)」（lumentum_q2fy26_cpo s8／s24），看不出是一家代工廠還是 Lumentum 泰國廠所在地（Navanakorn 工業區）——不替它編名字；是否為抽取錯誤待研究（Phase 4 結案待決清單）。"
+      }
+    },
+    {
+      "op": "set",
+      "company": "co:openlight_photonics",
+      "field": "_note",
+      "before": "見 co:openlight 的 _note（同一家公司的兩個 id）。",
+      "after": "2026-10-03 Phase 6 Step 6.2 合併：co:openlight（Semiconductor Today 2026-03-20 那篇抽取用的代號，同名同別名、同一家）併入本 id——名冊刪 co:openlight、抽取檔 semitoday_ph18da_volume_2026_03_20 改指本 id、圖上 scoped 重載後刪舊節點（pq2 [670]；loader/manifests/identity-cleanup-20261003.json）。"
+    }
+  ],
+  "dropped_assertions": 2,
+  "dropped_nodes": 2,
+  "projection": {
+    "status": "projected",
+    "edges": 32,
+    "open_conflict_ids": [],
+    "stale_resolution_ids": []
+  },
+  "evidence_changes": [
+    {
+      "edge": [
+        "co:lumentum",
+        "supplies_to",
+        "co:nava_thailand"
+      ],
+      "before": "self_reported",
+      "after": null
+    },
+    {
+      "edge": [
+        "co:nava_thailand",
+        "supplies_to",
+        "tech:cloud_transceiver_1_6t"
+      ],
+      "before": "needs_review",
+      "after": null
+    },
+    {
+      "edge": [
+        "co:openlight",
+        "supplies_to",
+        "co:newphotonics"
+      ],
+      "before": "media_relay",
+      "after": null
+    },
+    {
+      "edge": [
+        "co:openlight_photonics",
+        "develops",
+        "prod:ph18da"
+      ],
+      "before": "needs_review",
+      "after": "self_reported"
+    },
+    {
+      "edge": [
+        "co:openlight_photonics",
+        "partnership_with",
+        "co:cadence"
+      ],
+      "before": "needs_review",
+      "after": "counterparty_joint"
+    },
+    {
+      "edge": [
+        "co:openlight_photonics",
+        "partnership_with",
+        "co:tower_semiconductor"
+      ],
+      "before": "needs_review",
+      "after": "counterparty_joint"
+    },
+    {
+      "edge": [
+        "co:openlight_photonics",
+        "supplies_to",
+        "co:newphotonics"
+      ],
+      "before": "needs_review",
+      "after": "media_relay"
+    },
+    {
+      "edge": [
+        "co:tower_semiconductor",
+        "develops",
+        "prod:ph18da"
+      ],
+      "before": "needs_review",
+      "after": "counterparty_joint"
+    }
+  ],
+  "evidence_mismatch_vs_dry_run": [],
+  "origin_resolution_after": {
+    "OpenLight": "co:openlight_photonics",
+    "OpenLight Photonics": "co:openlight_photonics",
+    "OpenLight Photonics Inc.": "co:openlight_photonics",
+    "Lumentum": "co:lumentum"
+  }
+}

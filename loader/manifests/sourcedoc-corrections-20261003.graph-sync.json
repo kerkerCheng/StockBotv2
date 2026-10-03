@@ -1,0 +1,54 @@
+{
+  "kind": "sourcedoc_graph_sync",
+  "at": "2026-10-03T15:36:31.585572+00:00",
+  "pq2": 671,
+  "writes": [
+    {
+      "doc_id": "reuters_soitec_capacity_reservations_2026_08_31",
+      "field": "origin_entity",
+      "kind": "declared_correction",
+      "graph": "Soitec management (Reuters interview)",
+      "json": "Soitec（管理層受 Reuters 訪談所述）",
+      "written": true
+    },
+    {
+      "doc_id": "novanta_humanoid_ft_2026",
+      "field": "origin_entity",
+      "kind": "declared_correction",
+      "graph": "Novanta/ATI（供應商官方應用頁）",
+      "json": "Novanta（子公司 ATI Industrial Automation 官方應用頁）",
+      "written": true
+    },
+    {
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "field": "origin_entity",
+      "kind": "declared_correction",
+      "graph": "Third-party Research",
+      "json": "MDPI Micromachines（Chen et al. 2025 綜述）",
+      "written": true
+    }
+  ],
+  "planned": [
+    {
+      "doc_id": "reuters_soitec_capacity_reservations_2026_08_31",
+      "field": "origin_entity",
+      "kind": "declared_correction",
+      "graph": "Soitec management (Reuters interview)",
+      "json": "Soitec（管理層受 Reuters 訪談所述）"
+    },
+    {
+      "doc_id": "novanta_humanoid_ft_2026",
+      "field": "origin_entity",
+      "kind": "declared_correction",
+      "graph": "Novanta/ATI（供應商官方應用頁）",
+      "json": "Novanta（子公司 ATI Industrial Automation 官方應用頁）"
+    },
+    {
+      "doc_id": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era",
+      "field": "origin_entity",
+      "kind": "declared_correction",
+      "graph": "Third-party Research",
+      "json": "MDPI Micromachines（Chen et al. 2025 綜述）"
+    }
+  ]
+}

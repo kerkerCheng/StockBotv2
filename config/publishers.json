@@ -43,7 +43,8 @@
     {"origin": "damnang_substack", "kind": "media", "corroborates": false, "seen_in": "damnang_poet_ofc2026_review_2026_03", "note": "個人分析通訊（Substack）；抽取檔是私有檔"},
     {"origin": "optics.org", "kind": "media", "corroborates": false, "seen_in": "opticsorg_sivers_gf_2026_06_02", "note": "產業媒體"},
     {"origin": "primetrading_substack", "kind": "media", "corroborates": false, "seen_in": "primetrading_aaoi_deepdive_2026_02_27", "note": "個人分析通訊（Substack）"},
-    {"origin": "silicon_matter_substack", "kind": "media", "corroborates": false, "seen_in": "silicon_matter_sivers_ayar_2026_03_14", "note": "個人分析通訊（Substack）；抽取檔是私有檔"}
+    {"origin": "silicon_matter_substack", "kind": "media", "corroborates": false, "seen_in": "silicon_matter_sivers_ayar_2026_03_14", "note": "個人分析通訊（Substack）；抽取檔是私有檔"},
+    {"origin": "MDPI Micromachines", "kind": "media", "corroborates": false, "seen_in": "Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era", "note": "期刊綜述（Chen et al., Micromachines 2025, 16(4), 431, MDPI Review）——轉述廠商公開資料：原文 Figure 1「based on data from OpenAI and Broadcom's official reports」、Figure 2「adapted from semiconductor-related websites」（library/raw/Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era.txt）。Phase 6 Step 6.3e，隨 6.3d 的更正一起登記（使用者定案 §0.1 #6）"}
   ],
   "_not_registered": "2026-10-01 刻意不登記（維持待判定；圖上 16 個字串）：8 個聯合公告（交給「整串解析不到、具名 ≥2 家」那條規則）、5 家名冊外公司（Credo、Noveon、Sojitz、Telescent、USA Rare Earth——是公司不是發布者）、Novanta/ATI 與 Soitec management（公司自己或經媒體轉述的公司說法）、Third-party Research（泛稱——掛在一篇學術論文的 31 條邊上，用泛稱當登記鍵會讓日後任何寫成這樣的文件都被當成印證；該修的是那份抽取檔的 origin_entity）"
 }

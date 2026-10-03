@@ -120,9 +120,23 @@ def test_registry_without_a_name_is_a_prerequisite_not_a_rejection(tmp_path: Pat
     assert "不授權入圖" in packet
 
 
-def test_names_shared_with_another_company_are_a_prerequisite_not_a_rejection(tmp_path: Path) -> None:
-    """R2-a N1：`co:openlight`／`co:openlight_photonics` 是同一家的兩個 id（plan §14 #11），名冊寫法全部共用——
-    比對對兩家都不算。引文逐字寫「OpenLight」仍比不到，這是 identity 待決，不是「引文沒具名」（L12：不得壓成同一個失敗）。"""
+def test_names_shared_with_another_company_are_a_prerequisite_not_a_rejection(tmp_path: Path, monkeypatch) -> None:
+    """R2-a N1：同一家公司在名冊有兩個 id（當時是 `co:openlight`／`co:openlight_photonics`，plan §14 #11），名冊寫法全部共用——
+    比對對兩家都不算。引文逐字寫「OpenLight」仍比不到，這是 identity 待決，不是「引文沒具名」（L12：不得壓成同一個失敗）。
+
+    ⚠ 2026-10-03：真實名冊在 pq2 [670] 合併後已沒有共用寫法的公司——改以暫存名冊副本重建「兩個 id 同名」的前提
+    （複製 `co:openlight_photonics` 的全部寫法給另一個 id），斷言不變。"""
+    import identity.registry as identity_registry
+
+    source = json.loads(Path(identity_registry._DEFAULT_REGISTRY_PATH).read_text(encoding="utf-8"))
+    canonical = next(c for c in source["companies"] if c["company_id"] == "co:openlight_photonics")
+    source["companies"].append({"company_id": "co:openlight_duplicate", "research_ticker": None,
+                                **{k: canonical[k] for k in ("display_name", "name_aliases") if k in canonical}})
+    path = tmp_path / "company_identity.json"
+    path.write_text(json.dumps(source, ensure_ascii=False), encoding="utf-8")
+    shared = identity_registry.IdentityRegistry.from_path(path)
+    monkeypatch.setattr(identity_registry, "get_registry", lambda: shared)
+
     suppliers = ("co:axt", "co:openlight_photonics")
     extraction = _extraction(suppliers=suppliers, quotes={"co:axt": "AXT ships.",
                                                           "co:openlight_photonics": "OpenLight supplies the PIC."})

@@ -579,11 +579,6 @@
       "display_name": "Nabtesco Corporation"
     },
     {
-      "company_id": "co:nava_thailand",
-      "research_ticker": null,
-      "_note": "2026-10-01 Phase 4 Step 4.1c 刻意不補 display_name：唯一來源是 Lumentum 法說逐字稿摘要的「Thailand (Nava)」「Nava (Thailand)」（lumentum_q2fy26_cpo s8／s24），看不出是一家代工廠還是 Lumentum 泰國廠所在地（Navanakorn 工業區）——不替它編名字；是否為抽取錯誤待研究（Phase 4 結案待決清單）。"
-    },
-    {
       "company_id": "co:nebius",
       "research_ticker": "NBIS",
       "market_currency": "USD",
@@ -664,16 +659,6 @@
       ]
     },
     {
-      "company_id": "co:openlight",
-      "research_ticker": null,
-      "display_name": "OpenLight Photonics Inc.",
-      "_display_name_source": "官網頁尾「© 2026 OpenLight Photonics Inc.」（openlightphotonics.com）",
-      "name_aliases": [
-        "OpenLight"
-      ],
-      "_note": "與 co:openlight_photonics 是同一家公司（OpenLight 自家新聞稿與 Tower 6-K 用 co:openlight_photonics、Semiconductor Today 那篇用 co:openlight；2026-10-01 Phase 4 Step 4.1c 補名時發現）。合併是 identity 決定、不在名冊自行處理；兩筆同名期間名字比對對兩家都不算（query.bottleneck.shared_name_forms，不猜）。"
-    },
-    {
       "company_id": "co:openlight_photonics",
       "research_ticker": null,
       "display_name": "OpenLight Photonics Inc.",
@@ -681,7 +666,7 @@
       "name_aliases": [
         "OpenLight"
       ],
-      "_note": "見 co:openlight 的 _note（同一家公司的兩個 id）。"
+      "_note": "2026-10-03 Phase 6 Step 6.2 合併：co:openlight（Semiconductor Today 2026-03-20 那篇抽取用的代號，同名同別名、同一家）併入本 id——名冊刪 co:openlight、抽取檔 semitoday_ph18da_volume_2026_03_20 改指本 id、圖上 scoped 重載後刪舊節點（pq2 [670]；loader/manifests/identity-cleanup-20261003.json）。"
     },
     {
       "company_id": "co:oracle",
