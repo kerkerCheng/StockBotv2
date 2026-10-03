@@ -116,7 +116,7 @@
 - **結案（#19）**：個股頁逐面板 digest 無法對 6.0 重建（6.0 沒存），改以四個維度＋程式 hunk 歸因（§1.2）。
 - **6.9 的 L11-6**：一度以為灰燈的 inputs 沒送到個股頁；查正式 73 頁，APP 稽核區（三題面板）每盞灰燈都帶 detail——撤回修法，測試改斷言 APP 真正渲染的那一列。
 
-## 5. 下一步要決定的問題（plan §14 #1–#13；結案新增 #14–#16）
+## 5. 下一步要決定的問題（plan §14 #1–#13；結案新增 #14–#17）
 
 **要你決定（使用者的題）：**
 - **#10 424B2／424B5 分不出股權或債**：NVDA、META 的黃燈與 MRVL 的兩份配到的是公司債說明書。①每份新出現的 424B 多抓一次文件判股權／債（daily 偶爾多 1–2 次請求，動到「請求數不變」）；②維持現狀，讀的人看稽核區的文件代號自己判。
@@ -132,6 +132,11 @@
 - **#14（結案新增）人工 lead 的代號字串對不上名冊**：Sojitz 已登記（2768.T），但那則 lead 記的是「Sojitz Corporation (2768.T)」，所以「被點名未登記」清單仍列它（111 個裡的 1 個）。照「資料對齊名冊」改 lead 的字串——改 lead registry 要 pq2（6.3f 先例）。
 - **#15（6.9 新增）wipeout 面板沒點亮的那幾格不帶規則與 inputs**（點亮的才帶）：APP 稽核區走三題面板、資訊沒遺失；只有 markdown 版分析視角看不到灰燈的 inputs。要對稱就是 76 頁 digest 全變、消費端零增益——建議不改。
 - **#16（結案 R2 N4）四檔新版敘事裡仍有被取代讀圖的 id**：6.8 照 Phase 4 Step 4.8 的先例只換 `rides[]` 與反證連結，格層的 `evidence_refs` 沒換——最新一行裡 AXTI 指舊 InP `sr_bac985…` 7 處、COHR／LITE 指舊 CW DFB `sr_d49b81…` 各 4 處、SIVE.ST 指 `sr_d49b81…` 6 處與 `sr_268d2f…` 4 處。ref 仍解析得到，但讀的人點進去看到的是舊讀圖（L18：標籤要指得回原始證據）。要不要在重押讀圖時一併換格層 ref（動到敘事寫入的契約）——使用者的題。
+- **#17（pq2 批次執行時發現）巢狀的 writer lock 會被內層工具拆掉**：`loader/migrate_sourcedoc_json_section.py`（兩處）與 `loader/migrate_identity_cleanup.py`
+  在 apply 時自己 `acquire(INTERACTIVE_OWNER, ttl_minutes=15／30)`、`finally` 裡 `release`——同 owner 的外層 session 鎖（`scripts/writer_guard.py acquire`）
+  會先被續期成較短的 TTL、最後被刪掉（`engine_b/writer_lock.py`：同 owner 再 acquire＝續期、release＝直接刪）。2026-10-03 [671] 結束時外層鎖被拆，
+  [672] 寫 lead registry 那一刻沒有持鎖（§6）。修法：內層工具先看 `holder()`，同 owner 的未過期鎖在就不 acquire、不 release（或在 `writer_lock` 加一個
+  會看巢狀的 context manager）——L17「只認得當初那個案例」，下一個 session 當下修（daily 不跑這兩支工具）。
 
 ## 6. pq2 go 的執行紀錄
 
@@ -149,7 +154,8 @@
     一致性核對通過；收據 `loader/manifests/sourcedoc-corrections-20261003.{graph,json}-sync.json`；authority receipt `graph_sourcedoc_origin_sync`。
   - [672] → 先備份 `library/leads/pending_leads.json`（`library/private/backups/pq2-672-20261003T153708Z/`）、對 4 則呼叫 `correct_classified_by`
     （1 則 `interactive:graph_walk`、3 則 `triage_semantic_v1` → `interactive:directed`；舊值與編號記在 `classified_by_correction`、狀態不動）；
-    authority receipt `lead_registry_correction`。
+    authority receipt `lead_registry_correction`。⚠ 這一步**實際沒有持 writer lock**：[671] 的工具結束時把同 owner 的外層 session 鎖一起釋放了（§5 #17）；
+    當時沒有其他 writer（daily 在 05:30、這是唯一的 session），實際沒有衝突，但與 hint 的「writer lock 下」不符，照實記錄。
   - [670] → 事前全圖匯出（`library/private/backups/pq2-670-20261003T153755Z/neo4j_export.json`，2698 nodes／6107 relationships，verify 通過）→
     dry-run（副作用只剩一個別名聯集、8 條、活的引用 0、兩份抽取檔指紋相符）→ `loader/migrate_identity_cleanup.py --apply --pq2 670 --backup-dir …`
     → `evidence_mismatch_vs_dry_run`＝[]；收據 `loader/manifests/identity-cleanup-20261003.result.json`；authority receipt `graph_migration`。

@@ -455,3 +455,5 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 16. （結案 R2 N4）**新版敘事裡仍有被取代讀圖的 id**：6.8 照 Phase 4 Step 4.8 的先例只換 `rides[]` 與反證連結，格層 `evidence_refs` 沒換
     （最新一行：AXTI 指舊 InP `sr_bac985…` 7 處、COHR／LITE 指舊 CW DFB `sr_d49b81…` 各 4 處、SIVE.ST 指 `sr_d49b81…` 6 處與 `sr_268d2f…` 4 處）。
     ref 仍解析得到，但點進去是舊讀圖（L18）。要不要在重押讀圖時一併換格層 ref（動到敘事寫入的契約）——使用者的題。
+17. （pq2 批次執行時）**巢狀的 writer lock 會被內層工具拆掉**：兩支遷移工具 apply 時自己 acquire／release 同 owner（`interactive`）的鎖，
+    外層 session 鎖被縮短 TTL 再刪掉——[671] 之後 [672] 寫 lead registry 時實際沒有持鎖（closeout §6、§5 #17）。下一個 session 當下修（L17）。
