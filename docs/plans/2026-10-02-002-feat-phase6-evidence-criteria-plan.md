@@ -157,6 +157,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 16 | 6.7a（影響結案 §12 第 3 項） | 改哪裡：`structure_table`、APP 結構表頁、心跳「前三錨」 | 另把 `anchor_basis` 帶到 alpha provider（`ScarcityInputs.demand_anchor_basis`、邊表）、個股頁「需求錨點／距需求端跳數」旁註與邊表「（公司層）」、session assessor 的輸入；心跳那一行多「公司層 N 列」（舊 artifact 印「錨是公司側」） | 列上的 `demand_anchor` 一改成逐列，凡是印它的地方都承載兩種問題——只改 plan 列的三處，個股頁的同一格就是 L12 的形狀（L16：分類跟著資料走）。實測 provider 同公司順序只有 GFS 變、Q1 取到的邊 0 家變，但 Q1 那條邊的錨 3 家、跳數 9 家會變——**結案的個股頁逐檔歸因多一個來源「6.7a 逐列錨」**（AXTI、COHR 的稽核區兩格；baseline §21a） |
 | 17 | 6.7c | owner 讓「追蹤表兩支與計分表一支共用」 | 另接上追蹤表的**第三支** `_benchmark_series`（基準）與 owner 自己的 `fetch_close_series`（走勢折線、事件監控）；計數住 `price_budget.closing_bars`（追蹤表、計分表、APP 兩頁有才印）；`fetch_close_series` 的 `today` 參數（沒有呼叫端用）換成 `now`／`states` | 基準是對稱面（L17）：歐股收盤後、美股盤中時，指數的當日值同樣是進行中的，拿它算超額會把半天的漲跌當終點；`fetch_close_series` 原本「丟日期＝台北今天那根」是同一個問題的第二套規則——同一個模組留兩套「收盤了沒」就是 dual authority，而且美股盤中的當日 K 棒日期是美東昨天、舊規則照樣放行。daily 05:30 各市場都已收盤，同一份價格上追蹤表逐欄相同、計分表只差時間戳記（baseline §21c） |
 | 18 | 6.8 | §9 第 4 項：敘事「依賴就寫新版、不依賴就在收據寫不換版理由」；§9 第 1 項的預期候選含「NVIDIA×Lumentum 合作新聞稿（兩條）」 | 四檔都寫了新版：LITE 改一句措辭＋重押讀圖；AXTI／COHR／SIVE.ST **七格文字不改、只重押讀圖**（文字不依賴舊標籤的判斷照寫在收據）。NVIDIA×Lumentum 只補了 Lumentum→NVIDIA，UHP 那條延後（§14 #11）；RA 第一版兩份作廢（[677]／[678]，節點覆寫與日期倒退） | `rides[]` 釘著讀圖 id，讀圖換版後論證段的需求端會印「要等敘事重寫才說得出來」、候選判定只認 current／stale_low——照 Phase 4 Step 4.8 的先例重押。UHP 那條住另一份抽取檔，更正走廊改不到。作廢兩份是 prepare 時才看到的副作用（第一版沒有先對齊圖上節點與 SourceDoc 日期）；action 沒有撤回狀態，只能由 pq2 drop |
+| 19 | 結案（§12 第 3 項） | 「個股頁面板 digest 對 6.0 批次逐檔歸因」 | 6.0 只存了逐檔整份 `content_digest`、鏈段文字、證據標籤參照與點亮的稀釋燈，**沒有存逐面板 digest** → 以這四個維度逐檔比＋程式 hunk 歸因（closeout §1.2）：鏈段 11／73、標籤 1／73、稀釋燈 11 盞、敘事 4 檔逐檔歸得到 Step；整份 digest 73／73 變（6.6 的規則文字與 inputs 住每一頁的歸零燈與三題稽核列）；`materialize_view`／`build_overview` 0 個 hunk | 面板級 diff 無法對 6.0 重建——照實寫限制，不寫成「逐面板比過」（沒量就說沒量，L11-5）；下一個 Phase 的基準快照應加跑 `scripts/analyst_view_text_digest.py --per-panel` |
 
 ---
 
@@ -447,3 +448,7 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 13. （6.8）**策展摘錄的標籤指不回原文**（L18）：`nvda_lumentum_partnership_pr_2026_03_02_s3`（high-performance lasers…）出自新聞稿的「About Lumentum」
     （Lumentum 自己的簡介），locator 卻寫「PR body, Lumentum role」、`library/raw` 寫成「Lumentum will provide …」；NVIDIA 矽光子部落格的摘錄把表頭名單寫成方括號註記、
     抽取時只抄了冒號後半句（6.8 以 [673] 補）。要不要掃一次「摘錄裡的方括號／改寫框架」有多少份。
+14. （結案）**人工 lead 的代號字串對不上名冊**：Sojitz 已登記（2768.T，6.3c），但那則 lead 記的是「Sojitz Corporation (2768.T)」，
+    所以 `onboard-candidates`「被點名未登記」仍列它（111 個裡的 1 個；同一份 lead 以 6.0 名冊重算是 112，差的是 CRDO）。照「資料對齊名冊」改 lead 的字串——改 lead registry 要 pq2（6.3f 先例）。
+15. （6.9）**wipeout 面板沒點亮的那幾格不帶規則與 inputs**（點亮的才帶）：APP 稽核區走三題面板、每盞灰燈都帶 detail，資訊沒有遺失；
+    只有 markdown 版分析視角（`briefing/alpha_view/render.py`）看不到灰燈的 inputs。對稱化會讓 76 頁 digest 全變、消費端零增益——建議不改。
