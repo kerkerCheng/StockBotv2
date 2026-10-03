@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7b：APP 自偵舊程式）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | `python -m webapp serve` 的 request path 只多一件事：`/api/v1/health` 對 `webapp/` 套件目錄做本機 `os.walk`＋`stat`（約十個檔），比對啟動時記下的指紋；**不讀檔案內容、不寫、不跑 subprocess、不連網路、不 import 新模組**（`webapp/api.py` 的 import allowlist 不變，指紋函式住 `webapp/contracts.py`，那裡原本就允許 `os`／`datetime`）。health 多一格 `code`（stale、啟動時間、前後檔數與最新改動時間；**沒有路徑**）。前端每次換頁多一次 `GET /api/v1/health`。daily 不跑 serve，不受影響 |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` §6.9。skill／prompt 不描述 APP 的健康檢查——不改 |
+| **3 最窄 rule** | 不新增路由（health 原本就在）、不新增 allowlist、不改 Cloudflare 邊界；重啟仍是使用者動作 |
+| **4 contract test** | `tests/test_webapp_code_freshness.py`（剛啟動不 stale、改一支 .py 就 stale、多一支 mtime 舊的檔也 stale、`__pycache__` 與 static 以外的非 .py 不算、static 任何檔都算、health 不透露路徑、預設根是 webapp 套件、前端每次換頁問 health 且伺服器比畫面舊也印）；`tests/test_webapp_request_path.py` 照綠 |
+| **5 端到端 smoke** | headless Edge（8799）：①舊伺服器（6.7b 之前起跑）＋新畫面 → 頂端印「APP 跑的程式比這個畫面舊（健康檢查沒有程式指紋）——請重啟」；②重啟後 `stale: false`、橫幅隱藏；③只改 `webapp/static/styles.css` 的 mtime → 結構表頁頂端印「APP 跑的是 2026-10-03T12:21+08:00 的程式，之後程式有更新——請重啟」 |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7a：結構表逐列需求錨）
 
 | 步 | 結論 |

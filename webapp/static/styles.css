@@ -179,6 +179,14 @@ details[open] > summary::before { content: "▾ "; }
 }
 .error code { background: var(--surface-2); padding: 1px 5px; border-radius: 5px; font-size: 12px; }
 
+/* APP 跑的是舊程式（Phase 6 Step 6.7b）：頁面最上方、每一頁都在，直到重啟。 */
+.code-banner {
+  max-width: 908px; margin: 12px auto 0; padding: 10px 14px;
+  background: var(--surface); border: 1px solid var(--blocked); border-radius: var(--radius);
+  color: var(--text); font-weight: 600; font-size: 14px;
+}
+.code-banner[hidden] { display: none; }
+
 .footer { max-width: 940px; margin: 24px auto 0; padding: 14px 16px 28px;
           border-top: 1px solid var(--border); color: var(--dim); font-size: 12px; }
 .footer p { margin: 4px 0; }

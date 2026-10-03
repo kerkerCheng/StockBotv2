@@ -627,3 +627,17 @@ Micron `tech:dram_technology`→`tech:hbm`）、跳數變 9 家；`alpha/closure
 ⇒ 結案 §12 第 3 項的個股頁逐檔歸因多一個來源「6.7a 逐列錨」（AXTI、COHR 的稽核區那兩格會變；四檔的鏈段落不讀 `demand_anchor`，Phase 3 Step 3.7）。
 
 - 測試 `tests/test_row_demand_anchor.py` 10 條；變異五個全紅（一律從公司走、只從節點走不退回、provider 不帶 basis、個股頁不加註、心跳不分舊 artifact）。
+
+### 21b. APP 自偵舊程式（Phase 5 #11）
+
+`create_app` 啟動時記一次程式指紋（`webapp/**/*.py` 與 `webapp/static/*` 的最大 mtime＋檔數；今天 10 個檔），`/api/v1/health` 的 `code`
+每次比對（只做本機 stat）；前端每次換頁問一次。headless Edge（127.0.0.1:8799）實測三種情況：
+
+| 情況 | 頁面頂端 |
+|---|---|
+| 舊伺服器（6.7b 之前起跑）＋新畫面（static 每次從磁碟讀） | 「APP 跑的程式比這個畫面舊（健康檢查沒有程式指紋）——請重啟」 |
+| 重啟後（`stale: false`） | 橫幅隱藏 |
+| 只改 `webapp/static/styles.css` 的 mtime（內容不動） | 「APP 跑的是 2026-10-03T12:21+08:00 的程式，之後程式有更新——請重啟」（滑鼠提示：啟動時／現在的檔數與最新改動時間） |
+
+順帶：結構表 artifact 以 6.7a 的程式重 materialize（derived cache）之後，APP 結構表頁渲染出 **67** 格「公司層」（與 basis=company 的 67 列相同）。
+- 測試 `tests/test_webapp_code_freshness.py` 7 條；`tests/test_webapp_request_path.py` 照綠（health 只多 stat，不寫、不連網、不 import 新模組）。

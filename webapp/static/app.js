@@ -28,6 +28,36 @@ async function getJSON(path) {
   return body;
 }
 
+/* ---------- APP 自己的程式新不新（Phase 6 Step 6.7b） ---------- */
+
+/* 長駐的 APP 會一直跑啟動時載入的程式（Phase 5 實測：09-10 起跑的 APP 一路用 09-10 的程式，新頁面全回 404，
+   畫面上沒有任何東西說「我是舊的」）。每次換頁問一次 /health：伺服器比對啟動時與現在的程式指紋（只做本機 stat）。
+   ⚠ health 沒有 `code` 這一格＝伺服器比這份 app.js 舊（static 每次從磁碟讀，新畫面會先跑在舊伺服器上）——也要印。 */
+async function checkCodeFreshness() {
+  let banner = document.getElementById('code-banner');
+  if (!banner) {
+    banner = el('div', 'code-banner');
+    banner.id = 'code-banner';
+    banner.hidden = true;
+    app.parentNode.insertBefore(banner, app);
+  }
+  let health;
+  try {
+    health = await getJSON(`${API}/health`);
+  } catch (err) {
+    return;  // 健康檢查讀不到：頁面本身的載入錯誤會說話，這裡不另印
+  }
+  const code = health && health.code;
+  let text = null;
+  if (!code) text = 'APP 跑的程式比這個畫面舊（健康檢查沒有程式指紋）——請重啟';
+  else if (code.stale) text = `APP 跑的是 ${code.started_at} 的程式，之後程式有更新——請重啟`;
+  banner.textContent = text || '';
+  banner.title = (text && code)
+    ? `啟動時 ${code.loaded.files} 個檔、最新改動 ${code.loaded.newest_at}｜現在 ${code.current.files} 個檔、最新改動 ${code.current.newest_at}（${code.scope}）`
+    : '';
+  banner.hidden = !text;
+}
+
 /* ---------- 格式化（只排版，不換算） ---------- */
 
 /* 顯示精度：**只截尾，不換算**。minimumFractionDigits=0 讓 223.6035 印成「223.6」而不是
@@ -3347,6 +3377,7 @@ async function route() {
   const target = decodeURIComponent(hash.replace(/^#\/?/, ''));
   app.textContent = '';
   app.appendChild(el('p', 'loading', '載入中…'));
+  checkCodeFreshness();  // 不 await：橫幅與頁面各自載入，健康檢查慢不擋畫面
   try {
     if (!VOCAB) {
       const meta = await getJSON(`${API}/meta`);

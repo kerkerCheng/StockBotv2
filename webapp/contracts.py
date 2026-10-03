@@ -190,6 +190,53 @@ def freshness_of(generated_at: datetime, *, now: datetime | None = None,
                      generated_at=generated_at, max_age_hours=limit)
 
 
+# ---------------------------------------------------------------------------
+# APP 自己的程式新不新（Phase 6 Step 6.7b；Phase 5 #11）
+# ---------------------------------------------------------------------------
+# 事發（2026-10-02 Phase 5 Step 5.2）：長駐 APP（09-10 起跑）一直用 09-10 的程式——之後加的四個 GET 回 404、
+# positions 自 schema /2 起回 503，畫面上沒有任何東西說「我是舊的」。重啟是使用者動作，但「該重啟了」必須
+# 會自己出現（L14：常駐計數器，不是要人記得的段落）。
+# ⚠ **request path 規則**：每次比對只做本機 `stat`——不跑 subprocess、不讀網路、不讀檔案內容、不 import 任何東西。
+
+#: 指紋的範圍（照 plan 字面）：serve 載入的 Python 在 `webapp/**/*.py`；`static/*` 雖然每次請求都從磁碟讀，
+#: 但新的 app.js 常常要新的 API 才跑得對，一起算（多一次不必要的重啟，成本比少一次低）。
+CODE_FINGERPRINT_SCOPE = "webapp/**/*.py（略過 __pycache__）與 webapp/static/*：最大 mtime＋檔數（只做本機 stat）"
+
+
+def code_fingerprint(root: str) -> dict[str, Any]:
+    """`root`（webapp 套件目錄）的程式指紋：最大 mtime 與檔數。檔數抓得到「多了一支 mtime 舊的新檔」（從別處複製進來）。"""
+    static_dir = os.path.normpath(os.path.join(root, "static"))
+    newest, count = 0.0, 0
+    for dirpath, dirnames, filenames in os.walk(root):
+        dirnames[:] = [name for name in dirnames if name != "__pycache__"]
+        in_static = os.path.normpath(dirpath) == static_dir
+        for name in filenames:
+            if not (in_static or name.endswith(".py")):
+                continue
+            try:
+                mtime = os.stat(os.path.join(dirpath, name)).st_mtime
+            except OSError:
+                continue          # 走訪途中被刪的檔不算進來——檔數因此變了，照樣抓得到
+            newest, count = max(newest, mtime), count + 1
+    return {"files": count, "newest_mtime": newest,
+            "newest_at": datetime.fromtimestamp(newest).astimezone().isoformat(timespec="minutes") if count else None}
+
+
+def code_snapshot(root: str) -> dict[str, Any]:
+    """APP 啟動時記一次：指紋＋啟動時間（本地時區、到分）。"""
+    return {**code_fingerprint(root), "started_at": datetime.now().astimezone().isoformat(timespec="minutes")}
+
+
+def code_status(loaded: Mapping[str, Any], root: str) -> dict[str, Any]:
+    """現在的指紋 vs 啟動時記下的：檔數或最大 mtime 不同 ＝ 程式在 APP 啟動之後更新過（`stale`），要重啟。"""
+    current = code_fingerprint(root)
+    stale = (current["files"], current["newest_mtime"]) != (loaded.get("files"), loaded.get("newest_mtime"))
+    return {"stale": stale, "started_at": loaded.get("started_at"),
+            "loaded": {"files": loaded.get("files"), "newest_at": loaded.get("newest_at")},
+            "current": {"files": current["files"], "newest_at": current["newest_at"]},
+            "scope": CODE_FINGERPRINT_SCOPE}
+
+
 def validate_artifact(ticker: str, payload: Any) -> Mapping[str, Any]:
     """讀取端的 fail-closed 檢查。通過才回 payload；否則 `ArtifactUnavailable`＋逐字理由。"""
     if not isinstance(payload, Mapping):

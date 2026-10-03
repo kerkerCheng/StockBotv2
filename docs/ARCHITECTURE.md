@@ -594,6 +594,10 @@ cache-miss 自動重建）；④**socket 封殺**（request 期間 `connect`／`
 - fail closed：解析失敗／版本不符／digest 不合／缺必要欄位 → `ArtifactUnavailable` → **503**。
   ⚠ **「artifact 讀不到」（503）與「這檔沒有研究結論」（200 ＋ `readiness=blocked`）是兩件事，不得同形。**
 - **stale 是狀態不是錯誤**：過期照樣回，明確標年齡，**絕不重建**。
+- **APP 自己的程式新不新**（2026-10-03 Phase 6 Step 6.7b；Phase 5 #11：長駐 APP 一路用 09-10 的程式、新頁面全 404 而沒有任何畫面說它舊）：
+  `create_app` 啟動時記一次程式指紋（`webapp/**/*.py` 與 `webapp/static/*` 的最大 mtime＋檔數，`webapp.contracts.code_fingerprint`），
+  `/api/v1/health` 的 `code` 每次比對（只做本機 stat，不讀內容、不透露路徑）；前端每次換頁問一次，stale 就在頁面頂端印
+  「APP 跑的是 <啟動時間> 的程式，之後程式有更新——請重啟」，health 沒有 `code`（伺服器比畫面舊）也印。重啟仍是使用者動作。
 
 **overview 是選取不是計算。** 清單卡片要的那幾格全部照抄 `AnalystView`——沒有百分比換算、沒有幣別換算、
 沒有 gap 重算。單位原樣帶著走（GBp 與 GBP 差 100 倍，`dependencies.quote_unit` 是欄位不是要 parse 的句子）。

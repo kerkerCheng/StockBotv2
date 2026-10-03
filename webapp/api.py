@@ -31,11 +31,13 @@ from starlette.requests import Request
 from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.routing import Route
 
-from .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, max_age_hours
+from .contracts import ARTIFACT_SCHEMA_VERSION, ArtifactUnavailable, code_snapshot, code_status, max_age_hours
 from .store import ArtifactStore, StateArtifactStore, resolve_state_dir
 
 API_VERSION = "v1"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+#: 程式指紋的根（Phase 6 Step 6.7b）：本套件目錄。測試可另給一個目錄。
+CODE_ROOT = Path(__file__).resolve().parent
 
 #: 這些 header 讓私人研究內容不被中介／瀏覽器快取或被別的站嵌入。
 _SECURITY_HEADERS = {
@@ -78,6 +80,8 @@ async def health(request: Request) -> Response:
         "materialized_count": len(store.tickers()),
         "state_kinds": _state(request).kinds(),
         "request_path": "read-only：no LLM、no authority write、no external fetch、no model execution",
+        # Phase 6 Step 6.7b：這個 process 跑的程式是不是啟動之後又改過（只做本機 stat）。首頁頂端據此印橫幅。
+        "code": code_status(request.app.state.code_loaded, request.app.state.code_root),
     })
 
 
@@ -381,10 +385,12 @@ _SAFE_MESSAGES = {
 }
 
 
-def create_app(directory: Path | None = None, state_directory: Path | None = None) -> Starlette:
+def create_app(directory: Path | None = None, state_directory: Path | None = None,
+               code_root: Path | None = None) -> Starlette:
     """建立 read-only app。`methods=["GET"]` 讓任何寫入動詞在路由層就是 405。
 
     state 目錄不另猜：`resolve_state_dir` 是唯一規則（明示 > analyst 目錄下的 `state/` > 預設）。
+    `code_root`：程式指紋的根（預設本套件目錄；測試用）。啟動時記一次，`/health` 每次比對（Phase 6 Step 6.7b）。
     """
     routes = [
         Route("/", index, methods=["GET"]),
@@ -406,6 +412,8 @@ def create_app(directory: Path | None = None, state_directory: Path | None = Non
         HTTPException: http_error, Exception: unhandled_error})
     app.state.store = ArtifactStore(directory)
     app.state.state_store = StateArtifactStore(resolve_state_dir(directory, state_directory))
+    app.state.code_root = str(code_root or CODE_ROOT)
+    app.state.code_loaded = code_snapshot(app.state.code_root)
     return app
 
 
