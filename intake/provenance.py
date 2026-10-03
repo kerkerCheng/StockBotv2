@@ -401,6 +401,18 @@ def _superseded_extraction_archive(doc_id: str, old_hash: str, root: Path) -> Pa
         archive = extraction_path.parent / "superseded" / f"{doc_id}.{old_hash[:8]}.json"
         if archive.is_file():
             return archive
+    # ⚠ 2026-10-03（使用者已 go 的 pq2 [673] 撞到）：走廊上線（09-11）之前的歸檔以舊檔**原始位元組**的 sha256 命名
+    # （`nvidia_sipho_blog_partner_roles.c48feb4b.json`；內容的 canonical hash 才是收據記的 8189ac4b）——只認檔名，
+    # 就把確實歸檔過的那一版判成沒歸檔。改以內容核對：同一個 superseded/ 目錄裡、內容的 canonical hash 等於
+    # 收據那一版的檔才算；檔名不當證據（L17）。放行條件沒有變寬：仍要「收據那一版確實在 superseded/ 裡」。
+    for permission in ("repo_full", "local_only"):
+        extraction_path, _ = _target_paths(doc_id, permission, root)
+        for candidate in sorted((extraction_path.parent / "superseded").glob(f"{doc_id}.*.json")):
+            try:
+                if canonical_extraction_hash(json.loads(candidate.read_text(encoding="utf-8"))) == old_hash:
+                    return candidate
+            except (OSError, ValueError):
+                continue
     return None
 
 

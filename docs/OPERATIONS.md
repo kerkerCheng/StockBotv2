@@ -1001,6 +1001,14 @@ apply 沒完成（看輸出的 next_action）。私有函式 `intake.application
 四道沒過時不連圖；變異：拿掉 preflight → 4 條紅。⑤真資料：只跑唯讀的 `check_property_tokens()`——今天的圖通過（routine 憑證讀得到 56 個 key）；
 要求一個不存在的名時正確拒絕。入口本身不在真資料上跑（[666] 重試是使用者動作）。
 
+**2026-10-03 增補（使用者已 go 的 pq2 [673] 撞到）：完成收據走廊的歸檔證據改以內容核對。** 改寫 `library/private/intake_state/<doc_id>.json`
+的條件仍是「現存收據指的那一版 extraction 已歸檔在 `superseded/`」；先前只認 `<doc_id>.<canonical hash 前 8 碼>.json` 這個檔名，
+走廊上線（2026-09-11）前的歸檔以**原始位元組** sha256 命名（`nvidia_sipho_blog_partner_roles.c48feb4b.json`，內容的 canonical hash 才是收據記的
+`8189ac4b`），於是確實歸檔過的那一版被判成沒歸檔、[673] 停在 partial（圖已寫入）。現在檔名找不到時，在同一個 `superseded/` 目錄裡找內容
+canonical hash 相等的檔（`intake.provenance._superseded_extraction_archive`）。sandbox impact review：①capability 不變——多讀同一目錄的既有歸檔檔，
+寫入面不變；②本節；③rule 不變（入口仍互動專用、`apply_ra_admission.py` 仍是 ask）；④`tests/test_intake_completion_corridor.py` 兩條：舊式命名、
+內容相符 → 收據跟上且舊收據歸檔；同 doc_id、內容不符 → 照樣拒絕（變異：撤掉修法前者紅）；⑤真資料：[673] 以同編號同 digest 重試 → applied。
+
 ### 入圖收尾
 ```powershell
 & '.venv\Scripts\python.exe' scripts\commit_pending_intake.py --status | --dry-run

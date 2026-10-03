@@ -92,6 +92,45 @@ def test_receipt_follows_the_extraction_through_a_legal_correction(tmp_path) -> 
     provenance.verify_graph_complete(doc_id, second, root=tmp_path)
 
 
+def _legacy_archive(root, doc_id: str, doc: dict) -> "object":
+    """走廊上線前的歸檔：以檔案**原始位元組**的 sha256 命名（2026-09-01 那一份就是這樣）。"""
+    import hashlib
+
+    text = json.dumps(doc, ensure_ascii=False, indent=2)
+    name = f"{doc_id}.{hashlib.sha256(text.encode('utf-8')).hexdigest()[:8]}.json"
+    path = root / "extractions" / "superseded" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+    return path
+
+
+def test_a_pre_corridor_archive_named_by_raw_bytes_still_proves_the_old_version(tmp_path) -> None:
+    """2026-10-03 使用者已 go 的 pq2 [673] 撞到：收據記 canonical hash（8189ac4b），那一版確實歸檔過，
+    但檔名是原始位元組的 sha（c48feb4b）——只認檔名就判成沒歸檔，編號停在 partial。證據改以內容核對。"""
+    doc_id = "test_doc_20261003"
+    first = _extraction(doc_id, revision=1)
+    old_hash = provenance.canonical_extraction_hash(first)
+    provenance.mark_graph_complete(doc_id, first, root=tmp_path)
+    legacy = _legacy_archive(tmp_path, doc_id, first)
+    assert legacy.name != f"{doc_id}.{old_hash[:8]}.json"          # 名字對不上、內容對得上
+
+    second = _extraction(doc_id, revision=2)
+    result = provenance.mark_graph_complete(doc_id, second, root=tmp_path)
+
+    assert _receipt(tmp_path, doc_id)["extraction_sha256"] == provenance.canonical_extraction_hash(second)
+    assert result["archived_previous_receipt"], "舊收據照樣歸檔，兩份都留"
+
+
+def test_a_legacy_named_archive_of_another_version_does_not_count(tmp_path) -> None:
+    """收緊面：superseded/ 裡有同 doc_id 的檔、但內容不是收據那一版 → 照樣拒絕（檔名與「有檔」都不是證據）。"""
+    doc_id = "test_doc_20261003"
+    provenance.mark_graph_complete(doc_id, _extraction(doc_id, revision=1), root=tmp_path)
+    _legacy_archive(tmp_path, doc_id, _extraction(doc_id, revision=9))
+
+    with pytest.raises(ValueError, match="not archived under superseded"):
+        provenance.mark_graph_complete(doc_id, _extraction(doc_id, revision=2), root=tmp_path)
+
+
 def test_same_extraction_twice_is_idempotent_and_archives_nothing(tmp_path) -> None:
     """冪等路徑不得被走廊改壞：同一版重寫一次，不該產生假的 superseded 檔。"""
     doc_id = "test_doc_20260912"
