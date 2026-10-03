@@ -57,7 +57,8 @@
       "relation": "depends_on",
       "source_ids": [
         "nvidia_blog_coherent_texas_2026_06_16_s2",
-        "nvidia_blog_coherent_texas_2026_06_16_s3"
+        "nvidia_blog_coherent_texas_2026_06_16_s3",
+        "nvidia_blog_coherent_texas_2026_06_16_s6"
       ],
       "src_id": "co:coherent"
     }
@@ -66,40 +67,56 @@
     {
       "abstraction_level": "device_chip",
       "aliases": [
-        "COHR"
+        "COHR",
+        "Coherent Corp"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "ticker": "COHR"
+      },
       "confidence": 0.85,
       "id": "co:coherent",
       "name": "Coherent",
-      "role": null,
+      "role": "bottleneck_supplier",
       "source_ids": [
         "nvidia_blog_coherent_texas_2026_06_16_s1"
       ],
       "type": "Company"
     },
     {
-      "abstraction_level": "end_demand",
+      "abstraction_level": "network_systems",
       "aliases": [
-        "NVDA"
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
       ],
-      "attributes": {},
+      "attributes": {
+        "ticker": "NVDA"
+      },
       "confidence": 0.85,
       "id": "co:nvidia",
       "name": "NVIDIA",
-      "role": null,
+      "role": "leader",
       "source_ids": [
         "nvidia_blog_coherent_texas_2026_06_16_s1"
       ],
       "type": "Company"
     },
     {
-      "abstraction_level": "module_subsystem",
+      "abstraction_level": "device_chip",
       "aliases": [
         "ELS",
+        "pluggable laser source",
+        "external light source engine",
+        "external laser sources",
+        "light engines",
+        "External Laser Small Form Factor Pluggable",
+        "ELSFP",
         "external laser module"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
       "confidence": 0.85,
       "id": "tech:external_laser_source",
       "name": "External Laser Source",
@@ -112,9 +129,13 @@
     {
       "abstraction_level": "foundry_packaging",
       "aliases": [
+        "6-inch InP lines",
+        "6-inch production",
         "6-inch indium phosphide fab"
       ],
-      "attributes": {},
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
       "confidence": 0.85,
       "id": "tech:inp_6inch_fab",
       "name": "6-inch InP Fab",
@@ -136,6 +157,7 @@
     "retrieved_at": "2026-08-30",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "d91337391ed37259337dcf7ec07fa3a568a8b84601dfed4abbb39626b5e2835d",
     "title": "NVIDIA Blog: Coherent Breaks Ground on Expanded Texas Facility, Scaling AI's Optical Backbone",
     "url": "https://blogs.nvidia.com/blog/coherent-texas-ai-optical/"
   },
@@ -164,6 +186,11 @@
       "id": "nvidia_blog_coherent_texas_2026_06_16_s5",
       "locator": "groundbreaking",
       "quote": "Coherent broke ground today on an expanded manufacturing building in Sherman, Texas."
+    },
+    {
+      "id": "nvidia_blog_coherent_texas_2026_06_16_s6",
+      "locator": "Article deck（標題下的導言，NVIDIA 自己寫的）",
+      "quote": "Coherent’s expansion at its Sherman, Texas, campus scales what it calls the world’s first volume production 6-inch indium phosphide fab, a key supplier across NVIDIA’s AI stack."
     }
   ]
 }
