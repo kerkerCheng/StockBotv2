@@ -202,10 +202,11 @@ def test_correction_evidence_changes_reclassify_with_the_new_origin_and_pending_
     manifest["corrections"][0]["after"] = "MDPI Micromachines（Chen et al. 2025 綜述）"
     manifest["publishers_add"] = [_media_entry()]
     pending = mig.plan_publishers_add(manifest)
-    changes = mig.correction_evidence_changes(rows, manifest, publishers_after=mig.publishers_with(pending))
+    changes = mig.correction_evidence_changes(rows, manifest, quotes_by_assertion={},
+                                              publishers_after=mig.publishers_with(pending))
     assert changes == [{"edge": ["tech:a", "enables", "tech:b"], "before": "needs_review", "after": "media_relay"}]
     # 沒有跟著登記：新 origin 仍解析不到，等級不變——預告不得假裝已經登記了
-    assert mig.correction_evidence_changes(rows, manifest) == []
+    assert mig.correction_evidence_changes(rows, manifest, quotes_by_assertion={}) == []
 
 
 def test_publishers_add_must_match_the_corrected_origin_and_is_not_registered_early(tmp_path: Path) -> None:

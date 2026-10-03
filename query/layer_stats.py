@@ -15,7 +15,18 @@
   4.0 凍結的 assertion id 集合；「重寫」＝id 在集合、但內容指紋（`assertion_content_digest`）與內容基準不同。
   ⚠ 只看 id 會漏掉更正走廊：重套一份文件沿用原 id，被重寫的斷言在 id 集合裡「看起來沒動」——成功與失敗同形（L13）。
 
-附屬：「外部印證但引文不具名供應商」的邊數（plan §4 L11-6 ④；§14 #2 的量測）、字表版本。
+附屬（Phase 6 Step 6.4 起；ROADMAP Phase 6 ①「外部印證名副其實」的常駐計數器）：
+- `corroboration_withheld`：沒升外部印證的邊，依理由分三格（`unnamed`／`no_name_forms`／`relay`——
+  `query.origin_resolution.WITHHELD_REASONS`；三種補救不同，不得壓成一格，L12）。每條帶邊、origin、文件——這就是
+  研究 Step 補具名引文的清單。判定只問 `corroboration`（唯一 owner），這裡只收集。
+- `ec_without_naming_quote`：外部印證、主詞是公司，但**沒有任何一個非主詞、解析得到的 origin 自己的引文**具名主詞的邊——
+  逐來源口徑的違反數，**應恆為 0；非 0＝bug**（用名字比對與 origin 解析直接重算，不經 owner，所以它驗得到 owner）。
+- `evidence_vs_baseline`：每條邊的證據等級對 6.0 凍結鍵（`config/graph_baselines.json` 的 `evidence_classes_2026_10_03`）
+  的升、降、同級互換逐條——每一條變動都要歸得到一個事件（規則、資料更正、身分合併、補引文；plan 檔頭）。
+- 字表版本（sub 字表與轉述字表各印一個）。
+⚠ 2026-10-03 退役 `ec_quote_does_not_name_supplier`（「外部印證但引文不具名供應商」）：它的口徑是「這條邊**任何一段**引文
+具名」——供應商自己的引文也算，所以漏掉 Sivers→CW DFB（撐它的是華星光年報，那段沒提 Sivers）；新規則下它結構上恆 0，
+由上面三個取代。
 
 ⚠ 已知會失焦（AGENTS「這個指標會隨我們多讀一份文件而單調上升嗎？」）：②的母體「≥3 家」會隨多讀文件單調上升，
 所以它**只印**；驗收數的是②本身（一份文件列舉多家），不是母體。
@@ -34,6 +45,8 @@ BASELINE_KEY = "phase4_2026_10_01"
 #: ③b 判「重寫」的內容基準（Phase 5 Step 5.1，#29）。4.0 凍結只存 id；這一份由 5.1 當下的圖算
 #: （Phase 4 結案後、[666] 重試前），append-only 的另一個鍵——4.0 的鍵一個字都不改。
 CONTENT_BASELINE_KEY = "assertion_content_2026_10_02"
+#: 證據等級的比較基準（Phase 6 Step 6.0 凍結；append-only 的另一個鍵）。
+EVIDENCE_BASELINE_KEY = "evidence_classes_2026_10_03"
 #: 與 Step 4.0 凍結節點集合同一個口徑（`frozen_nodes.scope`）。
 LAYER_TYPES: tuple[str, ...] = ("TechNode", "Product", "Material")
 LAYER_NODES_CYPHER = "MATCH (t) WHERE t.type IN $types AND t.id IS NOT NULL RETURN t.id AS id"
@@ -55,6 +68,36 @@ def load_content_baseline(path: Path | None = None, *, key: str = CONTENT_BASELI
     if not entry:
         return None
     return {str(k): str(v) for k, v in ((entry.get("assertion_digests") or {}).get("digests") or {}).items()}
+
+
+def load_evidence_baseline(path: Path | None = None, *, key: str = EVIDENCE_BASELINE_KEY) -> dict[str, str] | None:
+    """6.0 凍結的證據等級（邊 `"src relation dst"` → 等級）。檔案裡沒有這個鍵回 `None`——呼叫端印「基準讀不到」，
+    不是 0（INV-3）；檔案本身讀不到照樣丟例外（與 `load_baseline` 同一條缺席路）。"""
+    data = json.loads((path or BASELINES_PATH).read_text(encoding="utf-8"))
+    entry = (data.get("baselines") or {}).get(key)
+    if not entry:
+        return None
+    return {str(k): str(v) for k, v in (entry.get("classes") or {}).items()}
+
+
+def evidence_vs_baseline(edges: Sequence[Any], baseline: Mapping[str, str]) -> dict[str, Any]:
+    """每條邊的證據等級對基準：升、降、同級互換（`needs_review`↔`media_relay`）、新邊、不在了——逐條，不只總數。"""
+    from query.bottleneck import EVIDENCE_RANK
+
+    now = {f"{e.src} {e.relation} {e.dst}": str(e.evidence) for e in edges}
+    up: list[dict[str, str]] = []
+    down: list[dict[str, str]] = []
+    same_rank: list[dict[str, str]] = []
+    for edge in sorted(set(now) & set(baseline)):
+        before, after = baseline[edge], now[edge]
+        if before == after:
+            continue
+        entry = {"edge": edge, "from": before, "to": after}
+        rank_before, rank_after = EVIDENCE_RANK.get(before, -1), EVIDENCE_RANK.get(after, -1)
+        (up if rank_after > rank_before else down if rank_after < rank_before else same_rank).append(entry)
+    return {"up": up, "down": down, "same_rank": same_rank,
+            "new": [{"edge": e, "to": now[e]} for e in sorted(set(now) - set(baseline))],
+            "gone": [{"edge": e, "from": baseline[e]} for e in sorted(set(baseline) - set(now))]}
 
 
 def assertion_content_digest(row: Mapping[str, Any], quotes: Iterable[str] | None) -> str:
@@ -98,19 +141,23 @@ def _supply_side(node: str, edges: Sequence[Any]) -> list[Any]:
 def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any]],
                         quotes_by_assertion: Mapping[str, Sequence[str]], layer_nodes: Iterable[str],
                         baseline: Mapping[str, frozenset[str]], registry: Any,
-                        language: Any = None, publishers: Any = None,
+                        language: Any = None, publishers: Any = None, relay: Any = None,
                         baseline_key: str = BASELINE_KEY,
                         content_baseline: Mapping[str, str] | None = None,
-                        content_baseline_key: str = CONTENT_BASELINE_KEY) -> dict[str, Any]:
+                        content_baseline_key: str = CONTENT_BASELINE_KEY,
+                        evidence_baseline: Mapping[str, str] | None = None,
+                        evidence_baseline_key: str = EVIDENCE_BASELINE_KEY) -> dict[str, Any]:
     """①②③＋附屬。`edges` 要已分過證據等級（`query.structure._classify_edges`）；`rows` 是 `fetch_assertions` 的列
     （帶 `assertion_id`、`source_doc_id`、`origin`）；`quotes_by_assertion` 是 `query.sub_language.fetch_all_quotes`。
-    `content_baseline`（`load_content_baseline`）是 ③b「重寫」的基準；`None`＝沒有基準，重寫那一格印缺席、不印 0。"""
-    from query.bottleneck import quote_names_company, shared_name_forms
+    `content_baseline`（`load_content_baseline`）是 ③b「重寫」的基準；`None`＝沒有基準，重寫那一格印缺席、不印 0。
+    `evidence_baseline`（`load_evidence_baseline`）是證據等級升降的基準；`None`＝讀不到，那一格印缺席、不印 0。"""
+    from query.bottleneck import edge_corroborations, quote_names_company, shared_name_forms
     from query.graph_walk import CORROBORATED_EVIDENCE
-    from query.origin_resolution import resolve_origin
+    from query.origin_resolution import WITHHELD_REASONS, get_relay_language, resolve_origin
     from query.sub_language import get_language, sub_language_flags
 
     lang = language or get_language()
+    relay_language = relay if relay is not None else get_relay_language()
     rows = list(rows)
     shared = shared_name_forms(registry)
     current_layers = sorted(set(layer_nodes))
@@ -200,17 +247,38 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
         superseded = sorted(a for a in now if content_baseline.get(a) != now[a])
     superseded_unsupported = None if superseded is None else sorted(a for a in superseded if not flags[a])
 
-    # 附屬：外部印證但引文不具名供應商（§14 #2 的量測；cw_dfb 讀圖指出的華星光案例）
-    ec_unnamed: list[str] = []
+    # 附屬（Phase 6 Step 6.4）：沒升外部印證的邊與理由——判定只問 owner（`edge_corroborations`→`corroboration`）。
+    withheld: dict[str, list[dict[str, Any]]] = {reason: [] for reason in WITHHELD_REASONS}
+    for edge in edges:
+        if edge.evidence == "externally_corroborated":
+            continue
+        for verdict in edge_corroborations(edge.src, edge.origins, registry, edge.filing_origins,
+                                           quotes_by_assertion=quotes_by_assertion,
+                                           origin_assertions=edge.origin_assertions,
+                                           publishers=publishers, relay=relay_language, shared=shared):
+            if verdict.withheld:
+                entry = {"edge": f"{edge.src} {edge.relation} {edge.dst}", "evidence": edge.evidence,
+                         "origin": verdict.origin, "docs": list(verdict.docs)}
+                if verdict.relay_terms:
+                    entry["relay_terms"] = list(verdict.relay_terms)
+                withheld[verdict.withheld].append(entry)
+
+    # 附屬：逐來源口徑的違反數（應恆為 0）——**不經 owner**，用 origin 解析與名字比對直接重算：外部印證、主詞是公司，
+    # 但沒有任何一個「不是主詞、解析得到」的 origin 自己的引文具名主詞。
+    violations: list[str] = []
     for edge in edges:
         if edge.evidence != "externally_corroborated" or not str(edge.src).startswith("co:"):
             continue
-        if registry.company(edge.src) is None:
-            continue
-        quotes = [q for row in rows_by_edge.get((edge.src, edge.relation, edge.dst), ())
-                  for q in quotes_by_assertion.get(str(row.get("assertion_id") or "")) or ()]
-        if not names(quotes, edge.src):
-            ec_unnamed.append(f"{edge.src} {edge.relation} {edge.dst}")
+        held = False
+        for row in rows_by_edge.get((edge.src, edge.relation, edge.dst), ()):
+            resolution = resolve(row.get("origin"))
+            if resolution.kind == "unresolved" or (resolution.kind == "company" and resolution.id == edge.src):
+                continue
+            if names(quotes_by_assertion.get(str(row.get("assertion_id") or "")) or (), edge.src):
+                held = True
+                break
+        if not held:
+            violations.append(f"{edge.src} {edge.relation} {edge.dst}")
 
     return {
         "baseline": baseline_key,
@@ -250,7 +318,13 @@ def compute_layer_stats(*, edges: Sequence[Any], rows: Iterable[Mapping[str, Any
                                      else len(superseded) - len(superseded_unsupported or ())),
             "superseded_unsupported": superseded_unsupported,
         },
-        "ec_quote_does_not_name_supplier": sorted(ec_unnamed),
+        "relay_language": relay_language.label,
+        "corroboration_withheld": {reason: sorted(items, key=lambda i: (i["edge"], i["origin"]))
+                                   for reason, items in withheld.items()},
+        "ec_without_naming_quote": sorted(violations),
+        "evidence_baseline": evidence_baseline_key if evidence_baseline is not None else None,
+        "evidence_vs_baseline": (None if evidence_baseline is None
+                                 else evidence_vs_baseline(edges, evidence_baseline)),
     }
 
 
@@ -262,12 +336,26 @@ def summary_line(stats: Mapping[str, Any] | None) -> str:
         absence = stats["absence"]
         return f"層：{absence.get('reason')}（{absence.get('kind')}）——不是 0"
     supply, enum, sub = stats["supply"], stats["enumeration"], stats["sub_language"]
+    withheld = stats["corroboration_withheld"]
     return (f"層：①獨家且全自報 {supply['sole_self_reported']}（凍結 {supply['frozen_n']} 個節點；集合外新節點 "
             f"{len(supply['new_nodes'])}）｜②非供應商來源列舉 ≥2 家 {enum['named_by_non_supplier']} 層（≥3 家母體 "
             f"{enum['at_least_3']}；每家撐住 {enum['at_least_3_all_held']}；origin 解析不到的來源 "
             f"{enum['unresolved_origin_sources']}）｜③a sub 引文不含可替代性語言 {len(sub['stock_unsupported'])}／"
-            f"{sub['stock_n']}（存量）｜{_sub_b_fragment(sub)}｜外部印證但引文不具名供應商 "
-            f"{len(stats['ec_quote_does_not_name_supplier'])}｜字表 {stats['language']}")
+            f"{sub['stock_n']}（存量）｜{_sub_b_fragment(sub)}｜外部印證違反 {len(stats['ec_without_naming_quote'])}"
+            f"｜沒升外部印證：未具名 {len(withheld['unnamed'])}／名冊無名 {len(withheld['no_name_forms'])}／轉述 "
+            f"{len(withheld['relay'])}（轉述字表 {stats['relay_language']}）｜{_evidence_fragment(stats)}"
+            f"｜字表 {stats['language']}")
+
+
+def _evidence_fragment(stats: Mapping[str, Any]) -> str:
+    """證據等級對 6.0 基準那一格。基準讀不到印缺席（不是 0）；新邊、不在了的只在有的時候印。"""
+    vs = stats.get("evidence_vs_baseline")
+    if vs is None:
+        return "證據等級較 6.0：基準讀不到（不是 0）"
+    extra = "、".join(part for part in (f"新邊 {len(vs['new'])}" if vs["new"] else "",
+                                       f"不在了 {len(vs['gone'])}" if vs["gone"] else "") if part)
+    return (f"證據等級較 6.0：升 {len(vs['up'])}／降 {len(vs['down'])}／同級互換 {len(vs['same_rank'])}"
+            + (f"（{extra}）" if extra else ""))
 
 
 def _sub_b_fragment(sub: Mapping[str, Any]) -> str:
@@ -283,5 +371,6 @@ def _sub_b_fragment(sub: Mapping[str, Any]) -> str:
     return f"③b 新增或重寫的帶 sub supported {new_ok + sup_ok}／{total}（新增 {new_n}、重寫 {sup_n}）"
 
 
-__all__ = ["BASELINE_KEY", "CONTENT_BASELINE_KEY", "LAYER_NODES_CYPHER", "LAYER_TYPES", "assertion_content_digest",
-           "compute_layer_stats", "content_digests", "load_baseline", "load_content_baseline", "summary_line"]
+__all__ = ["BASELINE_KEY", "CONTENT_BASELINE_KEY", "EVIDENCE_BASELINE_KEY", "LAYER_NODES_CYPHER", "LAYER_TYPES",
+           "assertion_content_digest", "compute_layer_stats", "content_digests", "evidence_vs_baseline",
+           "load_baseline", "load_content_baseline", "load_evidence_baseline", "summary_line"]

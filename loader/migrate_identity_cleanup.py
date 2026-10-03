@@ -297,13 +297,18 @@ def rows_after_edit(rows: list[Mapping[str, Any]], quotes: Mapping[str, list[str
     return new_rows, new_quotes
 
 
-def evidence_by_edge(rows: Iterable[Mapping[str, Any]], registry: Any) -> dict[tuple[str, str, str], str]:
-    from query.bottleneck import classify_evidence, collapse_assertions
+def evidence_by_edge(rows: Iterable[Mapping[str, Any]], registry: Any,
+                     quotes_by_assertion: Mapping[str, Iterable[str]]) -> dict[tuple[str, str, str], str]:
+    """全圖每條 canonical 邊的證據等級——與正式分類同一條路（`classify_evidence`；逐來源具名核對讀逐字，
+    Phase 6 Step 6.4）。`quotes_by_assertion` 必填：改前用圖上的逐字、改後用 `rows_after_edit` 回的那一份。"""
+    from query.bottleneck import classify_evidence, collapse_assertions, shared_name_forms
 
+    shared = shared_name_forms(registry)
     out: dict[tuple[str, str, str], str] = {}
     for key, edge in collapse_assertions(rows).items():
         out[key] = classify_evidence(edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
-                                     origin_linkages=edge.origin_linkages)
+                                     quotes_by_assertion=quotes_by_assertion,
+                                     origin_assertions=edge.origin_assertions, shared=shared)
     return out
 
 
@@ -419,10 +424,10 @@ def plan(manifest: Mapping[str, Any], *, driver, root: Path = ROOT, pq2: int | N
     registry_new, registry_changes = plan_registry_edit(registry_now, manifest["registry"], pq2=pq2)
     reg_before = registry_from_json(registry_now)
     reg_after = registry_from_json(registry_new)
-    before = evidence_by_edge(graph["rows"], reg_before)
-    rows_new, _quotes_new = rows_after_edit(graph["rows"], graph["quotes"],
-                                            {doc_id: (docs[doc_id], edited[doc_id]) for doc_id in edited}, gone)
-    after = evidence_by_edge(rows_new, reg_after)
+    before = evidence_by_edge(graph["rows"], reg_before, graph["quotes"])
+    rows_new, quotes_new = rows_after_edit(graph["rows"], graph["quotes"],
+                                           {doc_id: (docs[doc_id], edited[doc_id]) for doc_id in edited}, gone)
+    after = evidence_by_edge(rows_new, reg_after, quotes_new)
 
     from query.bottleneck import company_id_for_origin
 
@@ -582,11 +587,12 @@ def apply(manifest: Mapping[str, Any], *, pq2: int, backup_dir: str | Path, driv
 
     from identity.registry import IdentityRegistry
     from query.bottleneck import fetch_assertions
+    from query.sub_language import fetch_all_quotes
 
     with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
-        rows_real = session.execute_read(lambda tx: fetch_assertions(tx))
+        rows_real, quotes_real = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
     real_after = {" ".join(k): v for k, v in evidence_by_edge(
-        rows_real, IdentityRegistry.from_path(registry_path)).items()}
+        rows_real, IdentityRegistry.from_path(registry_path), quotes_real).items()}
     # dry-run 的「改後」那一邊——**全圖逐條**比，不只比預告會變的那幾條（沒預告到的變動一樣是錯）
     predicted = planned["evidence_after"]
     mismatched = [{"edge": k, "predicted": predicted.get(k), "real": real_after.get(k)}

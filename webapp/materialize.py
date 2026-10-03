@@ -545,17 +545,19 @@ def materialize_structure_table(*, as_of: date | None = None, store: StateArtifa
     )
     try:
         with driver.session() as session:
-            raw_rows = fetch_assertions(session)
+            # 邊與逐字同一個唯讀 transaction，按 assertion id 對（不塞進 fetch_assertions）：sub 引文核對（Phase 4
+            # Step 4.4b）與證據等級的逐來源具名核對（Phase 6 Step 6.4）讀同一份逐字。
+            raw_rows, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
             projection = None
             rows: Sequence[Mapping[str, Any]] = raw_rows
             if as_of is not None:
                 projection = project_assertions_as_of(raw_rows, as_of)
                 rows = list(projection.rows)
             registry = get_registry()
-            # sub 引文核對（Phase 4 Step 4.4b）：同一個 session 另取逐字，按 assertion id 對（不塞進 fetch_assertions）。
             language = get_language()
-            flags = sub_language_flags(rows, fetch_all_quotes(session), language=language)
-            result = structure_table(rows, registry, sub_language_flags=flags, sub_language_label=language.label)
+            flags = sub_language_flags(rows, quotes, language=language)
+            result = structure_table(rows, registry, quotes_by_assertion=quotes, sub_language_flags=flags,
+                                     sub_language_label=language.label)
             # 節點的人話名字（同一個 session；與 `get_narrative_context` 同一條查詢）——畫面不再只印內部代號。
             node_names = {str(r["id"]): str(r["name"]) for r in session.run(
                 "MATCH (n) WHERE n.id IN $ids AND n.name IS NOT NULL RETURN n.id AS id, n.name AS name",
@@ -891,7 +893,17 @@ def build_graph_walk_artifact(result: Mapping[str, Any], *,
                       "new_unsupported": layer["sub_language"]["new_unsupported"],
                       # ③b 的「重寫」（Phase 5 Step 5.1，#29）：更正走廊沿用原 id 重寫，也算認知變了。
                       "superseded_unsupported": layer["sub_language"].get("superseded_unsupported"),
-                      "language": layer.get("language")})})
+                      "language": layer.get("language"),
+                      # 證據判準（Phase 6 Step 6.4）：哪幾條邊因為哪個理由沒升、違反、對 6.0 基準的升降——標籤變了就是認知變了。
+                      "corroboration_withheld": {reason: sorted(f"{i['edge']}｜{i['origin']}" for i in items)
+                                                 for reason, items in (layer.get("corroboration_withheld")
+                                                                       or {}).items()},
+                      "ec_without_naming_quote": layer.get("ec_without_naming_quote"),
+                      "evidence_changes": (None if layer.get("evidence_vs_baseline") is None else sorted(
+                          f"{c['edge']}｜{c.get('from')}→{c.get('to')}"
+                          for part in ("up", "down", "same_rank", "new", "gone")
+                          for c in layer["evidence_vs_baseline"][part])),
+                      "relay_language": layer.get("relay_language")})})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 

@@ -9,6 +9,12 @@
 - 計算是純函式（`compute_side_effects`），合併規則照抄 loader：name／attributes／aliases 走 `preserve_existing_node_fields`
   （同一個函式，不重寫）、confidence 取大、`published_at`／`retrieved_at` 是 coalesce（抽取檔沒帶就保留圖上值）、其餘直接覆寫。
 - 讀不到圖：`side_effects()` 回 `status=upstream_unavailable`——**不得印成「無副作用」**（成功與失敗同形，L13）。
+
+**入圖後證據等級會變的邊**（Phase 6 Step 6.4）：`evidence_after_load` 把本包的抽取照 loader 的 MERGE 語意併進當下的
+assertion 列與逐字（`rows_after_load`），用分類的唯一 owner（`query.bottleneck.classify_evidence`→`corroboration`）在記憶體裡
+前後各算一次。MERGE 語意照抄：assertion 以 `evidence_id` 覆寫（舊版有、新版沒有的 assertion **留著**）、SourceDoc 欄位直接
+SET（同一份文件的舊 assertion 也跟著換 origin／宣告——[666] 就是這樣升級的）、`published_at` coalesce、Source 的逐字 coalesce、
+`QUOTES` 連結只增不減。
 """
 from __future__ import annotations
 
@@ -142,6 +148,118 @@ def side_effects(doc: Mapping[str, Any], session: Any) -> dict[str, Any]:
     return compute_side_effects(loaded, graph)
 
 
+#: 證據等級預告要的另外兩樣現值：每筆 assertion 連到哪幾段 Source、每段 Source 的逐字（`fetch_all_quotes` 只給逐字，
+#: 模擬「這份文件改了 s3 的逐字」要知道誰連著 s3）。
+_LINKS_CYPHER = "MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source) RETURN ea.id AS id, collect(DISTINCT s.id) AS sources"
+_SOURCE_QUOTES_CYPHER = "MATCH (s:Source) WHERE s.quote IS NOT NULL RETURN s.id AS id, s.quote AS quote"
+
+
+def fetch_evidence_state(tx: Any) -> dict[str, Any]:
+    """證據等級預告的圖現值（唯讀；同一個 transaction 裡取三樣）：assertion 列、逐字連結、Source 逐字。"""
+    from query.bottleneck import fetch_assertions
+
+    return {"rows": fetch_assertions(tx),
+            "links": {str(r["id"]): sorted(str(s) for s in r["sources"] or ()) for r in tx.run(_LINKS_CYPHER)},
+            "source_quotes": {str(r["id"]): str(r["quote"]) for r in tx.run(_SOURCE_QUOTES_CYPHER)}}
+
+
+def quotes_by_assertion(links: Mapping[str, Any], source_quotes: Mapping[str, str]) -> dict[str, list[str]]:
+    """assertion id → 它連到的 Source 的逐字（與 `query.sub_language.fetch_all_quotes` 同一個口徑：去重、沒逐字的不算）。"""
+    out: dict[str, list[str]] = {}
+    for aid, sources in links.items():
+        texts = sorted({source_quotes[s] for s in sources if source_quotes.get(s)})
+        if texts:
+            out[str(aid)] = texts
+    return out
+
+
+def rows_after_load(rows: list[Mapping[str, Any]], links: Mapping[str, Any], source_quotes: Mapping[str, str],
+                    documents: list[Mapping[str, Any]]) -> tuple[list[dict[str, Any]], dict[str, list[str]]]:
+    """`fetch_assertions` 的列＋逐字連結 → 依序載入 `documents`（已 `as_loaded`）之後會長的樣子（純函式）。"""
+    from loader.load_to_neo4j import evidence_id
+
+    after = {str(r.get("assertion_id") or f"#{i}"): dict(r) for i, r in enumerate(rows)}
+    link_after = {str(k): set(v) for k, v in links.items()}
+    quotes_after = dict(source_quotes)
+    for doc in documents:
+        source_doc = dict(doc.get("source_doc") or {})
+        doc_id = str(source_doc.get("doc_id") or "")
+        if not doc_id:
+            continue
+        for row in after.values():
+            if str(row.get("source_doc_id") or "") == doc_id:
+                row.update(origin=source_doc.get("origin_entity"), source_type=source_doc.get("source_type"),
+                           origin_linkage=source_doc.get("origin_linkage"),
+                           published_at=source_doc.get("published_at") or row.get("published_at"))
+        template = next((r for r in after.values() if str(r.get("source_doc_id") or "") == doc_id), {})
+        for source in doc.get("sources") or ():
+            if source.get("id") and source.get("quote") is not None:
+                quotes_after[str(source["id"])] = str(source["quote"])
+        for edge in doc.get("edges") or ():
+            aid = evidence_id(doc_id, str(edge["id"]))
+            after[aid] = {
+                "src": edge["src_id"], "relation": edge["relation"], "dst": edge["dst_id"],
+                "attributes": json.dumps(edge.get("attributes") or {}, ensure_ascii=False),
+                "confidence": edge.get("confidence"), "origin": source_doc.get("origin_entity"),
+                "source_type": source_doc.get("source_type"), "origin_linkage": source_doc.get("origin_linkage"),
+                "source_doc_id": doc_id,
+                "published_at": source_doc.get("published_at") or template.get("published_at"),
+                "assertion_id": aid,
+            }
+            link_after.setdefault(aid, set()).update(str(s) for s in edge.get("source_ids") or ())
+    return list(after.values()), quotes_by_assertion(link_after, quotes_after)
+
+
+def evidence_after_load(state: Mapping[str, Any], documents: list[Mapping[str, Any]], registry: Any, *,
+                        publishers: Any = None, relay: Any = None) -> list[dict[str, Any]]:
+    """入圖後證據等級會變的邊：`state`（`fetch_evidence_state`）前後各算一次；新邊 `before=None`。
+    `after_withheld`：改後那一邊沒升外部印證的理由（`corroboration` 的 `withheld`，去重排序）——RA 補引文看得出補到了沒。"""
+    from query.bottleneck import best_evidence, collapse_assertions, edge_corroborations, shared_name_forms
+
+    shared = shared_name_forms(registry)
+
+    def verdicts(rows, quotes):
+        return {key: edge_corroborations(edge.src, edge.origins, registry, edge.filing_origins,
+                                         quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions,
+                                         publishers=publishers, relay=relay, shared=shared)
+                for key, edge in collapse_assertions(rows).items()}
+
+    loaded = [as_loaded(doc) for doc in documents]
+    before = verdicts(state["rows"], quotes_by_assertion(state["links"], state["source_quotes"]))
+    after = verdicts(*rows_after_load(list(state["rows"]), state["links"], state["source_quotes"], loaded))
+    changes: list[dict[str, Any]] = []
+    for key in sorted(after):
+        old = best_evidence(c.level for c in before[key]) if key in before else None
+        new = best_evidence(c.level for c in after[key])
+        if old != new:
+            changes.append({"edge": list(key), "before": old, "after": new,
+                            "after_withheld": sorted({c.withheld for c in after[key] if c.withheld})})
+    return changes
+
+
+def evidence_lines(check: Mapping[str, Any] | None) -> list[str]:
+    """「入圖後證據等級會變的邊」那幾行（RA packet；遷移工具有自己的全圖比對）。沒有收據＝不印（舊紀錄 render 不變）。"""
+    if not check:
+        return []
+    from query.bottleneck import EVIDENCE_LABEL
+    from query.origin_resolution import WITHHELD_LABELS
+
+    if check.get("status") != "checked":
+        return [f"- 證據等級預告無法核對（{check.get('status') or 'upstream_unavailable'}）：{check.get('reason') or ''}"
+                "——不是「不會變」"]
+    changes = check.get("changes") or []
+    if not changes:
+        return ["- 入圖後沒有任何一條邊的證據等級會變"]
+    lines = [f"- 入圖後證據等級會變的邊 {len(changes)} 條："]
+    for change in changes:
+        before = EVIDENCE_LABEL.get(str(change.get("before")), "新邊") if change.get("before") else "新邊"
+        after = EVIDENCE_LABEL.get(str(change.get("after")), str(change.get("after")))
+        withheld = [WITHHELD_LABELS.get(str(w), str(w)) for w in change.get("after_withheld") or ()]
+        note = f"（沒升外部印證：{'、'.join(withheld)}）" if withheld else ""
+        lines.append(f"  - `{' '.join(change['edge'])}`：{before} → {after}{note}")
+    return lines
+
+
 def has_side_effects(result: Mapping[str, Any]) -> bool | None:
     """有沒有會改到既有值的副作用（新節點、新 SourceDoc 不算）。讀不到圖＝None（不知道），不是 False。"""
     if result.get("status") != "checked":
@@ -171,4 +289,5 @@ def render_lines(result: Mapping[str, Any], *, doc_id: str | None = None) -> lis
 
 
 __all__ = ["NODE_OVERWRITE_FIELDS", "SOURCE_DOC_COALESCE_FIELDS", "SOURCE_DOC_OVERWRITE_FIELDS", "as_loaded",
-           "compute_side_effects", "fetch_graph_state", "has_side_effects", "render_lines", "side_effects"]
+           "compute_side_effects", "evidence_after_load", "evidence_lines", "fetch_evidence_state", "fetch_graph_state",
+           "has_side_effects", "quotes_by_assertion", "render_lines", "rows_after_load", "side_effects"]

@@ -52,6 +52,23 @@ class _Registry:
     def has_company(self, cid):
         return any(c.company_id == cid for c in self._c)
 
+    def company(self, cid):
+        return next((c for c in self._c if c.company_id == cid), None)
+
+
+def _cls(subject, origins, reg, *, quotes=None, linkages=None, **kw):
+    """`classify_evidence` 的測試捷徑（Phase 6 Step 6.4 起逐字必填）：每個 origin 的每個宣告各一份文件；
+    `quotes`＝origin → 它在這條邊上的逐字（每份文件都帶同一組）；`linkages`＝origin → 宣告集合（缺＝一份沒宣告的）。"""
+    quotes, linkages = quotes or {}, linkages or {}
+    origin_assertions, by_aid = {}, {}
+    for i, origin in enumerate(origins):
+        for j, linkage in enumerate(sorted(linkages.get(origin) or {None}, key=str)):
+            aid = f"a{i}_{j}"
+            origin_assertions.setdefault(origin, []).append((aid, f"doc{i}_{j}", linkage))
+            by_aid[aid] = list(quotes.get(origin, ()))
+    return classify_evidence(subject, origins, reg, quotes_by_assertion=by_aid, origin_assertions=origin_assertions,
+                             **kw)
+
 
 def _write_publishers(tmp_path: Path, entries: list[dict], *, kinds: dict | None = None) -> Path:
     path = tmp_path / "publishers.json"
@@ -146,13 +163,17 @@ def test_registered_media_origin_stays_a_relay_on_the_real_config() -> None:
     from identity.registry import get_registry
 
     reg = get_registry()
-    assert classify_evidence("co:sumitomo_electric", ["Reuters"], reg) == "media_relay"
-    assert classify_evidence("co:sumitomo_electric", ["Reuters"], reg,
-                             origin_linkages={"Reuters": {"independent"}}) == "externally_corroborated"
+    named = ["Sumitomo Electric is the second qualified supplier of 6-inch InP substrates"]
+    assert _cls("co:sumitomo_electric", ["Reuters"], reg, quotes={"Reuters": named}) == "media_relay"
+    assert _cls("co:sumitomo_electric", ["Reuters"], reg, quotes={"Reuters": named},
+                linkages={"Reuters": {"independent"}}) == "externally_corroborated"
     # Global Semi Research 2026-10-03 起登記為 media（Phase 6 Step 6.3b）：沒宣告 independent 就是轉述
-    assert classify_evidence("co:sumitomo_electric", ["Global Semi Research"], reg) == "media_relay"
-    # 自產資料的類別照樣算外部印證（真設定上的產業研究）
-    assert classify_evidence("co:sumitomo_electric", ["TrendForce"], reg) == "externally_corroborated"
+    assert _cls("co:sumitomo_electric", ["Global Semi Research"], reg,
+                quotes={"Global Semi Research": named}) == "media_relay"
+    # 自產資料的類別照樣算外部印證（真設定上的產業研究）——Phase 6 Step 6.4 起它自己的引文要具名主詞
+    assert _cls("co:sumitomo_electric", ["TrendForce"], reg, quotes={"TrendForce": named}) == "externally_corroborated"
+    assert _cls("co:sumitomo_electric", ["TrendForce"], reg,
+                quotes={"TrendForce": ["InP substrate supply is tight"]}) == "media_relay"
 
 
 # ---------------------------------------------------------------------------
@@ -162,41 +183,45 @@ def test_registered_media_origin_stays_a_relay_on_the_real_config() -> None:
 def test_classify_evidence_uses_the_publisher_registry(tmp_path) -> None:
     reg, pubs = _Registry(), _pubs(tmp_path)
     s = "co:sivers_semiconductors"
-    assert classify_evidence(s, ["TrendForce"], reg, publishers=pubs) == "externally_corroborated"
-    assert classify_evidence(s, ["TrendForce"], reg, publishers=pubs,
-                             origin_linkages={"TrendForce": {"same_origin"}}) == "media_relay"
-    assert classify_evidence(s, ["Reuters"], reg, publishers=pubs) == "media_relay"
-    assert classify_evidence(s, ["Reuters"], reg, publishers=pubs,
-                             origin_linkages={"Reuters": {"independent"}}) == "externally_corroborated"
-    assert classify_evidence(s, ["Reuters"], reg, publishers=pubs,
-                             origin_linkages={"Reuters": {"same_origin"}}) == "media_relay"
+    named = {"TrendForce": ["Sivers holds most of the CW laser array share"],
+             "Reuters": ["Sivers is the only qualified supplier, two people said"]}
+    assert _cls(s, ["TrendForce"], reg, quotes=named, publishers=pubs) == "externally_corroborated"
+    assert _cls(s, ["TrendForce"], reg, quotes=named, publishers=pubs,
+                linkages={"TrendForce": {"same_origin"}}) == "media_relay"
+    assert _cls(s, ["Reuters"], reg, quotes=named, publishers=pubs) == "media_relay"
+    assert _cls(s, ["Reuters"], reg, quotes=named, publishers=pubs,
+                linkages={"Reuters": {"independent"}}) == "externally_corroborated"
+    assert _cls(s, ["Reuters"], reg, quotes=named, publishers=pubs,
+                linkages={"Reuters": {"same_origin"}}) == "media_relay"
     # 自報·filing（rank 2）仍高於媒體轉述（rank 1）
-    assert classify_evidence(s, ["Sivers", "Reuters"], reg, publishers=pubs,
-                             filing_origins={"Sivers"}) == "self_reported_costly"
+    assert _cls(s, ["Sivers", "Reuters"], reg, quotes=named, publishers=pubs,
+                filing_origins={"Sivers"}) == "self_reported_costly"
 
 
 def test_unknown_origin_wins_the_tie_with_a_media_relay_regardless_of_order(tmp_path) -> None:
     """同級（rank 1）時印待判定：還有一個沒認出來的來源，它仍可能是獨立第三方。結果不得隨迭代順序翻。"""
     reg, pubs = _Registry(), _pubs(tmp_path)
     for origins in (["Reuters", "Some Blog"], ["Some Blog", "Reuters"], ["Zeta Blog", "Reuters"]):
-        assert classify_evidence("co:coherent", origins, reg, publishers=pubs) == "needs_review", origins
+        assert _cls("co:coherent", origins, reg, publishers=pubs) == "needs_review", origins
 
 
 def test_joint_detection_reads_the_origin_without_its_annotation(tmp_path) -> None:
     """註解是研究者寫的脈絡，不是發布者身分：「某部落格（轉述 Sivers 與 Ayar Labs）」不是聯合公告（R2-b 轉來）。"""
     reg, pubs = _Registry(), _pubs(tmp_path)
-    assert classify_evidence("co:sivers_semiconductors", ["Some Blog（轉述 Sivers 與 Ayar Labs）"], reg,
-                             publishers=pubs) == "needs_review"
-    assert classify_evidence("co:sivers_semiconductors", ["Sivers / Ayar Labs (joint announcement)"], reg,
-                             publishers=pubs) == "counterparty_joint"
+    assert _cls("co:sivers_semiconductors", ["Some Blog（轉述 Sivers 與 Ayar Labs）"], reg,
+                publishers=pubs) == "needs_review"
+    assert _cls("co:sivers_semiconductors", ["Sivers / Ayar Labs (joint announcement)"], reg,
+                publishers=pubs) == "counterparty_joint"
 
 
 def test_collapse_keeps_each_documents_linkage_per_origin() -> None:
+    """逐份記（Phase 6 Step 6.4 起連 assertion id 一起記：轉述豁免與 publisher_lifts 都是文件層級的宣告）。"""
     rows = [{"src": "co:a", "relation": "supplies_to", "dst": "tech:x", "confidence": 0.5, "attributes": "{}",
-             "origin": "Reuters", "origin_linkage": linkage, "source_doc_id": doc}
+             "origin": "Reuters", "origin_linkage": linkage, "source_doc_id": doc, "assertion_id": f"a_{doc}"}
             for doc, linkage in (("d1", "independent"), ("d2", None), ("d3", "same_origin"))]
     edge = collapse_assertions(rows)[("co:a", "supplies_to", "tech:x")]
-    assert edge.origin_linkages == {"Reuters": {"independent", None, "same_origin"}}
+    assert edge.origin_assertions == {"Reuters": [("a_d1", "d1", "independent"), ("a_d2", "d2", None),
+                                                  ("a_d3", "d3", "same_origin")]}
 
 
 # ---------------------------------------------------------------------------
@@ -230,7 +255,7 @@ DEMAND_Q = "Every 1.6T transceiver needs a continuous-wave DFB laser as its ligh
 SUPPLY_Q = "Sivers ships continuous-wave DFB laser arrays to transceiver makers in volume"
 
 
-def _layer_record(origin_doc: str):
+def _layer_record(origin_doc: str, supply_quote: str = SUPPLY_Q):
     from alpha.structure_reading.contracts import structure_reading_record
 
     structure = {"node": LAYER, "result_digest": "e" * 64, "anchor_chain": None, "angles": {
@@ -244,7 +269,7 @@ def _layer_record(origin_doc: str):
     citations = [
         {"angle": "demand_side", "edge": ["tech:transceiver_1_6t", "depends_on", LAYER], "quote": DEMAND_Q,
          "source_id": "doc_demand", "independent": False},
-        {"angle": "supply_side", "edge": [SUPPLIER, "supplies_to", LAYER], "quote": SUPPLY_Q,
+        {"angle": "supply_side", "edge": [SUPPLIER, "supplies_to", LAYER], "quote": supply_quote,
          "source_id": origin_doc, "independent": True},
     ]
     disproof = [{"condition": "任一 1.6T 光模組廠在正式文件宣布改用不需要 CW DFB 雷射的光源並量產",
@@ -279,8 +304,31 @@ def test_edge_class_and_citation_check_agree_on_the_same_origin(tmp_path, origin
     }
     problems = verify_citations(_layer_record("doc_x"), quotes, registry=reg, publishers=pubs)
     citation_ok = not any("independent" in p for p in problems)
-    edge_class = classify_evidence(SUPPLIER, [origin], reg, publishers=pubs,
-                                   origin_linkages={origin: {linkage}})
+    edge_class = _cls(SUPPLIER, [origin], reg, publishers=pubs, quotes={origin: [SUPPLY_Q]},
+                      linkages={origin: {linkage}})
+    assert citation_ok == (edge_class == "externally_corroborated"), (origin, linkage, edge_class, problems)
+
+
+@pytest.mark.parametrize("origin, linkage, quote", [
+    ("Ayar Labs", None, "Ayar Labs buys continuous-wave DFB laser arrays for its optical chiplets"),   # 沒具名
+    ("TrendForce", None, "Sivers announced volume shipments of continuous-wave DFB laser arrays"),     # 轉述句
+    ("Reuters", "independent", "Sivers announced volume shipments, two people familiar said"),        # 宣告 independent：不套轉述
+])
+def test_edge_class_and_citation_check_agree_on_naming_and_relay(tmp_path, origin, linkage, quote) -> None:
+    """Phase 6 Step 6.4：具名與轉述兩條新規則，邊的等級與讀圖引用核對同樣給同一個答案（同一個 owner）。"""
+    from alpha.providers.structure_readings import verify_citations
+
+    reg, pubs = _Registry(), _pubs(tmp_path)
+    quotes = {
+        ("tech:transceiver_1_6t", "depends_on", LAYER): [
+            {"quote": DEMAND_Q, "doc": "doc_demand", "origin": "Ayar Labs", "origin_linkage": None}],
+        (SUPPLIER, "supplies_to", LAYER): [
+            {"quote": quote, "doc": "doc_x", "origin": origin, "origin_linkage": linkage}],
+    }
+    problems = verify_citations(_layer_record("doc_x", quote), quotes, registry=reg, publishers=pubs)
+    citation_ok = not any("independent" in p for p in problems)
+    edge_class = _cls(SUPPLIER, [origin], reg, publishers=pubs, quotes={origin: [quote]},
+                      linkages={origin: {linkage}})
     assert citation_ok == (edge_class == "externally_corroborated"), (origin, linkage, edge_class, problems)
 
 
@@ -310,6 +358,29 @@ def test_socket_view_lists_a_corroborating_publisher_but_not_a_media_relay(tmp_p
     assert "｜媒體轉述" in render_socket_markdown(view)
 
 
+def test_socket_view_prints_unnamed_and_relayed_quotes_with_a_note_not_as_corroboration(tmp_path) -> None:
+    """Phase 6 Step 6.4：插槽的第三方判定問 owner。客戶端原文照印、沒具名供應商旁註；發布者過了 publisher_lifts 的
+    同樣列出，但沒具名或轉述句旁註——列出來不等於撐得住外部印證（不靜默拿掉，INV-3）。"""
+    from query.bottleneck import CanonicalEdge
+    from query.structure import build_socket_view, render_socket_markdown
+
+    reg, pubs = _Registry(), _pubs(tmp_path)
+    socket = "prod:supernova"
+    edges = [CanonicalEdge(src=SUPPLIER, relation="supplies_to", dst=socket)]
+    quotes = {(SUPPLIER, "supplies_to", socket): [
+        {"quote": "Ayar Labs uses an external laser array in SuperNova", "doc": "ayar_pr", "tier": 1,
+         "origin": "Ayar Labs", "origin_linkage": None},
+        {"quote": "Sivers announced SuperNova laser array volume shipments", "doc": "tf_note", "tier": 3,
+         "origin": "TrendForce", "origin_linkage": None}]}
+    view = build_socket_view(socket, edges, quotes, registry=reg, publishers=pubs)
+    assert [(q["company"], q["publisher"], q["withheld"]) for q in view.customer_quotes] == [
+        ("co:ayar_labs", None, "unnamed"), (None, "TrendForce", "relay")]
+    text = render_socket_markdown(view)
+    assert "引文沒具名主詞——不撐外部印證" in text and "轉述句（announced）——不撐外部印證" in text
+    # 來源清單印的是發布者類別（過了 publisher_lifts），不是「媒體轉述」
+    assert [d["resolved_as"] for d in view.sources] == [None, "第三方·industry_research"]
+
+
 # ---------------------------------------------------------------------------
 # 手動 L8 稽核：逐個 origin 走同一個 owner
 # ---------------------------------------------------------------------------
@@ -319,10 +390,14 @@ def test_sole_source_audit_sorts_origins_with_the_same_owner(monkeypatch, tmp_pa
     from scripts.audit_sole_source_independence import _sort_origins
 
     monkeypatch.setattr(owner, "get_publishers", lambda: _pubs(tmp_path))
-    groups = _sort_origins({"Sivers": {None}, "TrendForce": {None}, "Reuters": {None}, "Some Blog": {None},
-                            "Ayar Labs": {None}}, SUPPLIER, _Registry())
+    origins = ("Sivers", "TrendForce", "Reuters", "Some Blog", "Ayar Labs", "Coherent")
+    entries = {origin: [(f"a{i}", f"d{i}", None)] for i, origin in enumerate(origins)}
+    quotes = {"a0": ["Sivers is the sole supplier"], "a1": ["Sivers holds most of the share"],
+              "a2": ["Sivers is the sole supplier"], "a3": ["x"], "a4": ["Ayar Labs sources lasers from Sivers"],
+              "a5": ["Coherent also makes CW lasers"]}
+    groups = _sort_origins(entries, SUPPLIER, _Registry(), quotes)
     assert groups == {"external": ["co:ayar_labs", "TrendForce"], "relay": ["Reuters"],
-                      "unresolved": ["Some Blog"], "self": ["Sivers"]}
+                      "unresolved": ["Some Blog"], "self": ["Sivers"], "withheld": ["Coherent（unnamed）"]}
 
 
 # ---------------------------------------------------------------------------

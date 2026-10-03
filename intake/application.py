@@ -445,8 +445,11 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
 
     唯讀 session；連不上圖時每份都記 `upstream_unavailable`——**不得**記成「無副作用」（L13：成功與失敗不得同形）。
     只印、不放閘：副作用多寡不擋 prepare（入圖仍要這個編號的明確核准）。
+    `evidence`（Phase 6 Step 6.4）：入圖後證據等級會變的邊（`loader.merge_side_effects.evidence_after_load`——本包併進當下的
+    assertion 與逐字、用分類的唯一 owner 前後各算一次）；讀不到同樣記 `upstream_unavailable`，不是「不會變」。
     """
-    from loader.merge_side_effects import side_effects
+    from identity.registry import get_registry
+    from loader.merge_side_effects import evidence_after_load, fetch_evidence_state, side_effects
 
     results: list[dict] = []
     try:
@@ -456,11 +459,22 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
     except Exception as exc:  # noqa: BLE001
         reason = f"連不上圖（{type(exc).__name__}）——副作用無法核對"
         return {"documents": [{"doc_id": d["doc_id"], "status": "upstream_unavailable", "reason": reason}
-                              for d in documents]}
+                              for d in documents],
+                "evidence": {"status": "upstream_unavailable", "reason": reason}}
+    evidence: dict = {"status": "upstream_unavailable", "reason": "沒有算到（讀圖在副作用那一步就失敗了）"}
     try:
         with driver.session(default_access_mode=neo4j.READ_ACCESS) as session:
             for document in documents:
                 results.append({"doc_id": document["doc_id"], **side_effects(document["extraction"], session)})
+            try:
+                state = session.execute_read(fetch_evidence_state)
+                evidence = {"status": "checked", "changes": evidence_after_load(
+                    state, [d["extraction"] for d in documents], get_registry())}
+            except AssertionError:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                evidence = {"status": "upstream_unavailable",
+                            "reason": f"證據等級預告算不出來（{type(exc).__name__}: {str(exc)[:160]}）"}
     except AssertionError:
         raise
     except Exception as exc:  # noqa: BLE001
@@ -470,7 +484,7 @@ def _merge_side_effect_receipt(documents: list[dict], *, driver_factory=None) ->
                     for d in documents if d["doc_id"] not in done]
     finally:
         driver.close()
-    return {"documents": results}
+    return {"documents": results, "evidence": evidence}
 
 
 def _prepare_research_action_impl(

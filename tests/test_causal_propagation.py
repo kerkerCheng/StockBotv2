@@ -217,7 +217,7 @@ def test_as_of_still_raises_when_the_projection_does_not_exist() -> None:
     """
     from alpha.errors import PointInTimeUnsupported
 
-    undated = Neo4jGraphResearchProvider(driver=None, _assertion_rows=[
+    undated = Neo4jGraphResearchProvider(driver=None, _quotes_by_assertion={}, _assertion_rows=[
         {"src": "co:coherent", "relation": "depends_on", "dst": "mat:inp_substrate",
          "attributes": {"substitutability": 5}, "confidence": 0.9,
          "source_doc_id": "sd_1", "published_at": None},

@@ -109,17 +109,18 @@ def publishers(tmp_path: Path):
     return load_publishers(path)
 
 
-def _classified(rows: list[dict], publishers) -> list:
+def _classified(rows: list[dict], quotes: dict, publishers) -> list:
     reg = _Registry()
     edges = list(collapse_assertions(rows).values())
     for edge in edges:
         edge.evidence = classify_evidence(edge.src, edge.origins, reg, filing_origins=edge.filing_origins,
-                                          origin_linkages=edge.origin_linkages, publishers=publishers)
+                                          quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions,
+                                          publishers=publishers)
     return edges
 
 
 def _counters(rows: list[dict], quotes: dict, publishers) -> tuple[list[str], list[str]]:
-    stats = compute_layer_stats(edges=_classified(rows, publishers), rows=rows, quotes_by_assertion=quotes,
+    stats = compute_layer_stats(edges=_classified(rows, quotes, publishers), rows=rows, quotes_by_assertion=quotes,
                                 layer_nodes=["mat:x"], baseline=BASELINE, registry=_Registry(), language=LANG,
                                 publishers=publishers)
     return stats["supply"]["sole_self_reported_nodes"], stats["enumeration"]["named_by_non_supplier_layers"]
@@ -217,8 +218,9 @@ def test_a_media_origin_document_does_not_upgrade_the_edge(publishers) -> None:
         {"assertion_id": "m2", "src": "co:b", "relation": "supplies_to", "dst": "mat:x", "confidence": 0.7,
          "attributes": "{}", "origin": "Reuters", "source_doc_id": "d_rt", "source_type": "news"}]
     quotes = {**BASE_QUOTES, "m1": ["Alpha and Beta make X"], "m2": ["Alpha and Beta make X"]}
-    before = next(e for e in _classified([dict(r) for r in BASE_ROWS], publishers) if e.src == "co:a").evidence
-    by_src = {e.src: e.evidence for e in _classified(rows, publishers)}
+    before = next(e for e in _classified([dict(r) for r in BASE_ROWS], BASE_QUOTES, publishers)
+                  if e.src == "co:a").evidence
+    by_src = {e.src: e.evidence for e in _classified(rows, quotes, publishers)}
     assert by_src["co:a"] == before != "externally_corroborated"         # 多一份媒體轉述，等級不動
     assert by_src["co:b"] == "media_relay"                               # 只有媒體來源的那條：媒體轉述，不是印證
     assert _counters(rows, quotes, publishers)[1] == ["mat:x"]

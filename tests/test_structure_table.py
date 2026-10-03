@@ -54,11 +54,26 @@ class _FakeRegistry:
     def has_company(self, cid):
         return any(c.company_id == cid for c in self._c)
 
+    def company(self, cid):
+        return next((c for c in self._c if c.company_id == cid), None)
+
     def research_ticker(self, cid):
         for c in self._c:
             if c.company_id == cid:
                 return c.research_ticker_
         return None
+
+
+def _cls(subject, origins, reg, *, quotes=None, **kw):
+    """`classify_evidence` 的測試捷徑：每個 origin 一份文件、一筆 assertion；`quotes`＝origin → 它在這條邊上的逐字。
+
+    Phase 6 Step 6.4 起分類讀逐字（逐來源具名）且逐字必填——沒給 `quotes` 的 origin 就是「沒有引文」。
+    """
+    quotes = quotes or {}
+    origin_assertions = {o: [(f"a{i}", f"doc{i}", None)] for i, o in enumerate(origins)}
+    by_aid = {f"a{i}": list(quotes.get(o, ())) for i, o in enumerate(origins)}
+    return classify_evidence(subject, origins, reg, quotes_by_assertion=by_aid, origin_assertions=origin_assertions,
+                             **kw)
 
 
 def _row(src, rel, dst, *, conf, attrs=None, origin=None):
@@ -219,20 +234,22 @@ def test_dependency_relations_stay_consistent_with_the_other_two_direction_table
 def test_evidence_is_three_way_and_unresolved_origin_does_not_auto_pass() -> None:
     """`None` 同時是「真第三方」與「沒解析出的別名」，不得壓成布林（L12）。"""
     reg = _FakeRegistry()
-    assert classify_evidence("co:coherent", ["Coherent"], reg) == "self_reported"
+    assert _cls("co:coherent", ["Coherent"], reg) == "self_reported"
     assert (
-        classify_evidence("co:coherent", ["Coherent", "NVIDIA"], reg)
+        _cls("co:coherent", ["Coherent", "NVIDIA"], reg, quotes={"NVIDIA": ["NVIDIA buys lasers from Coherent"]})
         == "externally_corroborated"
     )
+    # Phase 6 Step 6.4：客戶 origin 自己的引文沒具名主詞 → 待判定（不是外部印證）
+    assert _cls("co:coherent", ["Coherent", "NVIDIA"], reg, quotes={"NVIDIA": ["NVIDIA buys lasers"]}) == "needs_review"
     # 唯一的非本人 origin 無法解析 → 待人工判定，不得自動當成外部佐證
     assert (
-        classify_evidence("co:coherent", ["Coherent", "Some Unregistered Blog"], reg)
+        _cls("co:coherent", ["Coherent", "Some Unregistered Blog"], reg)
         == "needs_review"
     )
     # 登記為媒體的 origin（`config/publishers.json`）→ 媒體轉述：與待判定同級，同樣不得當成外部佐證
     # （2026-10-01 Phase 4 Step 4.3：原本這裡用 The Next Platform 斷言 needs_review——None 的兩義拆開後它是轉述）
     assert (
-        classify_evidence("co:coherent", ["Coherent", "The Next Platform"], reg)
+        _cls("co:coherent", ["Coherent", "The Next Platform"], reg)
         == "media_relay"
     )
 
@@ -252,7 +269,7 @@ def test_claim_nodes_are_excluded_from_the_table() -> None:
             _row("co:axt", "supplies_to", "co:coherent", conf=0.5,
                  attrs={"substitutability": 4}),
         ],
-        _FakeRegistry(),
+        _FakeRegistry(), quotes_by_assertion={},
     )
     assert [r["company_id"] for r in result["rows"]] == ["co:axt"]
     assert result["coverage"]["canonical_edges"] == 1 and result["population"]["input"] == 1
@@ -263,7 +280,7 @@ def test_coverage_limits_are_always_reported() -> None:
     result = structure_table(
         [_row("co:axt", "supplies_to", "co:coherent", conf=0.5,
               attrs={"substitutability": 4})],
-        _FakeRegistry(),
+        _FakeRegistry(), quotes_by_assertion={},
     )
     cov = result["coverage"]
     for key in (
@@ -284,6 +301,8 @@ def test_table_order_is_an_index_not_a_signal() -> None:
     """
 
     class _Reg:
+        companies = ()          # 名字比對要掃名冊（Phase 6 Step 6.4）；這張表的列沒有 origin，用不到
+
         def research_ticker(self, company_id):
             return {"co:a": "AAA", "co:b": "BBB"}.get(company_id)
 
@@ -293,9 +312,10 @@ def test_table_order_is_an_index_not_a_signal() -> None:
     weak_a = {"src": "co:a", "relation": "supplies_to", "dst": "co:b",
               "substitutability": 2, "sole_source": False, "qualification_status": "sampling",
               "confidence": 0.8, "origin_entity": "third_party", "doc_id": "d2"}
-    forward = structure_table([strong_b, weak_a], _Reg())
+    forward = structure_table([strong_b, weak_a], _Reg(), quotes_by_assertion={})
     flipped = structure_table([dict(weak_a, substitutability=5, sole_source=True),
-                               dict(strong_b, substitutability=2, sole_source=False)], _Reg())
+                               dict(strong_b, substitutability=2, sole_source=False)], _Reg(),
+                              quotes_by_assertion={})
     assert [r["company_id"] for r in forward["rows"]] == ["co:a", "co:b"]
     assert [r["company_id"] for r in flipped["rows"]] == ["co:a", "co:b"]
     assert "structural_rows" not in forward and "filter" not in forward
@@ -310,26 +330,27 @@ def test_evidence_five_level_costly_and_joint() -> None:
     reg = _FakeRegistry()
     # 自報＋出自 filing → costly
     assert (
-        classify_evidence(
+        _cls(
             "co:coherent", ["Coherent"], reg, filing_origins={"Coherent"}
         )
         == "self_reported_costly"
     )
     # 自報＋非 filing 維持最低級
-    assert classify_evidence("co:coherent", ["Coherent"], reg) == "self_reported"
+    assert _cls("co:coherent", ["Coherent"], reg) == "self_reported"
     # 聯合公告：單串含 subject 與另一家 registry 公司 → counterparty_joint
     assert (
-        classify_evidence(
+        _cls(
             "co:coherent", ["Coherent / NVIDIA (joint announcement)"], reg
         )
         == "counterparty_joint"
     )
-    # 外部印證仍最高：同時有他公司單獨 origin 時勝過 joint 與 costly
+    # 外部印證仍最高：同時有他公司單獨 origin（引文具名主詞）時勝過 joint 與 costly
     assert (
-        classify_evidence(
+        _cls(
             "co:coherent",
             ["NVIDIA", "Coherent / NVIDIA (joint announcement)"],
             reg,
+            quotes={"NVIDIA": ["NVIDIA qualified Coherent as a supplier"]},
             filing_origins={"Coherent"},
         )
         == "externally_corroborated"
@@ -352,7 +373,7 @@ def test_presentation_text_has_one_home_and_the_markdown_prints_it() -> None:
         _row("co:axt", "supplies_to", "co:coherent", conf=0.8,
              attrs={"substitutability": 4}, origin="AXT"),
     ]
-    result = structure_table(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry(), quotes_by_assertion={})
     md = render_markdown(result)
     assert STRUCTURE_TABLE_TITLE in md
     for text in known_limitations(result["coverage"]):
@@ -371,7 +392,7 @@ def test_render_markdown_has_no_rank_column_and_no_top_pick() -> None:
         _row("co:coherent", "supplies_to", "mat:nowhere", conf=0.9,
              attrs={"substitutability": 5, "sole_source": True}, origin="NVIDIA"),
     ]
-    md = render_markdown(structure_table(rows, _FakeRegistry()))
+    md = render_markdown(structure_table(rows, _FakeRegistry(), quotes_by_assertion={}))
     body = md.split(chr(10), 1)[1]                 # 標題那一句「不給首選」是禁止句，不算
     assert "| # |" not in body
     for banned in ("首選", "可行動排序", "純結構排序", "排序鍵", "現在要投"):
@@ -406,9 +427,9 @@ def test_origin_resolution_reads_the_registry_field_that_exists() -> None:
     assert company_id_for_origin("MACOM Technology Solutions", reg) == "co:macom"
     assert company_id_for_origin("MACOM Technology Solutions Inc.", reg) == "co:macom"
     assert company_id_for_origin("Coherent（發行人官方新聞稿）", reg) == "co:coherent"
-    assert classify_evidence("co:coherent", ["Coherent（發行人官方新聞稿）"], reg) == "self_reported"
+    assert _cls("co:coherent", ["Coherent（發行人官方新聞稿）"], reg) == "self_reported"
     assert (
-        classify_evidence(
+        _cls(
             "co:coherent", ["Coherent（發行人官方新聞稿）"], reg,
             filing_origins={"Coherent（發行人官方新聞稿）"},
         )
@@ -420,20 +441,20 @@ def test_joint_announcement_is_detected_through_core_names() -> None:
     """IQE×Tower 聯合公告的 origin 不會逐字印 `Tower Semiconductor Ltd.`；核心名稱要算具名。"""
     reg = _NamedRegistry()
     assert (
-        classify_evidence("co:iqe", ["IQE plc / Tower Semiconductor (joint announcement)"], reg)
+        _cls("co:iqe", ["IQE plc / Tower Semiconductor (joint announcement)"], reg)
         == "counterparty_joint"
     )
     # 解析得到主詞、即使同一字串另具名他家 → **自報**（2026-10-01 Phase 4 Step 4.1a，使用者定案 Q8b 替代案 B：
     # 客戶高管在供應商新聞稿裡具名，仍是供應商發的稿，不是獨立的客戶端印證——L8）。原本這裡斷言 counterparty_joint。
     assert (
-        classify_evidence(
+        _cls(
             "co:coherent", ["Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"], reg
         )
         == "self_reported"
     )
     # filing 出身的同一種字串 → 自報·filing（costly proxy 照舊，不因為另具名他家而變）
     assert (
-        classify_evidence(
+        _cls(
             "co:coherent", ["Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"], reg,
             filing_origins={"Coherent（官方 PR，內含 Tower Semiconductor 具名引述）"},
         )
@@ -441,7 +462,7 @@ def test_joint_announcement_is_detected_through_core_names() -> None:
     )
     # 只具名主詞自己（Hexagon 不在 registry）→ 仍待判定，不得升級
     assert (
-        classify_evidence(
+        _cls(
             "co:schaeffler", ["Hexagon AB, with named Schaeffler management statements"], reg
         )
         == "needs_review"
@@ -455,7 +476,7 @@ def test_ambiguous_core_name_does_not_guess() -> None:
     reg = _FakeRegistry()
     reg._c = [reg._C("co:foo_a", "Foo Inc.", "FOOA"), reg._C("co:foo_b", "Foo Ltd.", "FOOB")]
     assert company_id_for_origin("Foo", reg) is None
-    assert classify_evidence("co:foo_a", ["Foo"], reg) == "needs_review"
+    assert _cls("co:foo_a", ["Foo"], reg) == "needs_review"
 
 
 def test_single_stray_mention_cannot_lift_evidence() -> None:
@@ -465,8 +486,8 @@ def test_single_stray_mention_cannot_lift_evidence() -> None:
 
     reg = _NamedRegistry()
     assert company_id_for_origin("Coherent Market Insights", reg) is None
-    assert classify_evidence("co:iqe", ["Coherent Market Insights"], reg) == "needs_review"
-    assert classify_evidence("co:coherent", ["Coherent Market Insights"], reg) == "needs_review"
+    assert _cls("co:iqe", ["Coherent Market Insights"], reg) == "needs_review"
+    assert _cls("co:coherent", ["Coherent Market Insights"], reg) == "needs_review"
 
 
 # ---------------------------------------------------------------------------
@@ -497,7 +518,7 @@ def test_no_threshold_low_and_unfilled_substitutability_stay_on_the_table() -> N
         _sub_edge("co:coherent", "tech:x", 2),
         _sub_edge("co:nvidia", "tech:x", None),
     ]
-    result = structure_table(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry(), quotes_by_assertion={})
     by_company = {r["company_id"]: r["substitutability"] for r in result["rows"]}
     assert by_company == {"co:axt": 5, "co:coherent": 2, "co:nvidia": None}
     assert result["population"] == {**result["population"], "input": 3, "accepted": 3, "excluded": 0}
@@ -514,7 +535,7 @@ def test_population_rule_reports_input_accepted_excluded_and_reasons() -> None:
         _sub_edge("tech:x", "tech:y", 4, relation="is_component_of"),       # 不是向下
         _sub_edge("tech:cpo", "tech:ai_switch", 5),                          # src 不是公司
     ]
-    result = structure_table(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry(), quotes_by_assertion={})
 
     report = result["population"]
     assert report["input"] == 3 and report["accepted"] == 1 and report["excluded"] == 2
@@ -589,7 +610,7 @@ def test_anchor_gap_diagnosis_does_not_touch_the_table() -> None:
         _row("co:coherent", "is_component_of", "tech:ai_switch", conf=0.9),
         _row("co:nvidia", "depends_on", "tech:lonely", conf=0.9, attrs={"substitutability": 4}),
     ]
-    result = structure_table(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry(), quotes_by_assertion={})
 
     assert "anchor_gaps" in result
     # 表本身：rows 的每一列都還帶著公司側的錨，診斷沒有把它換成節點側的。
@@ -617,7 +638,7 @@ def test_anchor_gap_section_prints_even_when_nothing_is_missing() -> None:
         _row("co:axt", "supplies_to", "co:coherent", conf=0.9, attrs={"substitutability": 5}),
         _row("co:coherent", "is_component_of", "tech:ai_switch", conf=0.9),
     ]
-    result = structure_table(rows, _FakeRegistry())
+    result = structure_table(rows, _FakeRegistry(), quotes_by_assertion={})
     assert result["anchor_gaps"]["without_anchor"] == 0
     assert result["anchor_gaps"]["population"] > 0
 
@@ -627,7 +648,7 @@ def test_anchor_gap_section_prints_even_when_nothing_is_missing() -> None:
 
     # 母體真的是 0（沒有任何向下邊）時才可以不印——那時是真的沒東西可算。
     empty = structure_table(
-        [_row("co:axt", "is_component_of", "tech:ai_switch", conf=0.9)], _FakeRegistry()
+        [_row("co:axt", "is_component_of", "tech:ai_switch", conf=0.9)], _FakeRegistry(), quotes_by_assertion={}
     )
     assert empty["anchor_gaps"]["population"] == 0
     assert "瓶頸節點走不到需求錨" not in render_markdown(empty)

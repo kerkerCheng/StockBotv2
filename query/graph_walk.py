@@ -496,16 +496,17 @@ def collect(*, today: date | None = None, as_of: date | None = None) -> dict[str
     try:
         with driver.session() as session:
             # 同一個 session 掃四題：邊、全部節點 id、coverage、重複節點——只連一次圖。
-            rows = fetch_assertions(session)
+            # 邊與每筆 assertion 的逐字在同一個唯讀 transaction：證據等級的逐來源具名核對（Phase 6 Step 6.4）
+            # 與層計數器（Phase 4 Step 4.4c）都讀它，要對同一份快照。
+            rows, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
             graph_nodes = [r["id"] for r in session.run(_GRAPH_NODES_CYPHER)]
             coverage_rows = scan_coverage(session)
             duplicate_rows = scan_duplicates(session)
-            # 層計數器（Phase 4 Step 4.4c）要的兩樣：每筆 assertion 的逐字、與凍結集合同口徑的層節點清單。
-            quotes = fetch_all_quotes(session)
+            # 層計數器要的另一樣：與凍結集合同口徑的層節點清單。
             layer_nodes = [r["id"] for r in session.run(LAYER_NODES_CYPHER, types=list(LAYER_TYPES))]
     finally:
         driver.close()
-    edges = _classify_edges(rows)
+    edges = _classify_edges(rows, quotes)
     duplicate_buckets = bucketize(pair_candidates(duplicate_rows), entities.load())
 
     reading_rows = reading_rows_or_none(edges, today=today or date.today(), as_of=as_of)
@@ -547,11 +548,13 @@ def layer_stats_or_absence(*, edges, rows, quotes, layer_nodes) -> dict[str, Any
     走圖九型照走：計數器壞了不帶走走圖。"""
     try:
         from identity.registry import get_registry
-        from query.layer_stats import compute_layer_stats, load_baseline, load_content_baseline, summary_line
+        from query.layer_stats import (compute_layer_stats, load_baseline, load_content_baseline,
+                                       load_evidence_baseline, summary_line)
 
         stats = compute_layer_stats(edges=edges, rows=rows, quotes_by_assertion=quotes, layer_nodes=layer_nodes,
                                     baseline=load_baseline(), registry=get_registry(),
-                                    content_baseline=load_content_baseline())
+                                    content_baseline=load_content_baseline(),
+                                    evidence_baseline=load_evidence_baseline())
         stats["summary"] = summary_line(stats)
         return stats
     except Exception as exc:  # noqa: BLE001

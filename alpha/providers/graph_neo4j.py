@@ -104,15 +104,27 @@ class Neo4jGraphResearchProvider:
     #: 注入的原始 assertion（測試用的縫）。**as-of 投影必須在 assertion 上做**，
     #: 所以 `_table_cache` 那個縫不夠——注入表的測試無法驗投影。
     _assertion_rows: Sequence[Mapping[str, Any]] | None = None
+    #: 注入 assertion 時一併注入的逐字（assertion id → 逐字；Phase 6 Step 6.4：證據等級的逐來源具名核對讀它）。
+    #: ⚠ 只注入 assertion、不注入逐字＝丟例外：預設成空 dict 會把每條邊靜默降級（L13）。
+    _quotes_by_assertion: Mapping[str, Sequence[str]] | None = None
+    _graph_cache: tuple[list[Mapping[str, Any]], Mapping[str, Sequence[str]]] | None = None
 
     # ---- 內部：建一次結構表，快取在 instance 上（不落地成第二個 authority）----
-    def _assertions(self) -> list[Mapping[str, Any]]:
+    def _graph(self) -> tuple[list[Mapping[str, Any]], Mapping[str, Sequence[str]]]:
+        """(assertion 列, 逐字)——同一個唯讀 transaction 取（逐字另查、不 join 進 `fetch_assertions`）。"""
         from query.bottleneck import fetch_assertions
+        from query.sub_language import fetch_all_quotes
 
         if self._assertion_rows is not None:
-            return list(self._assertion_rows)
-        with self.driver.session() as session:
-            return fetch_assertions(session)
+            if self._quotes_by_assertion is None:
+                raise ValueError("注入 _assertion_rows 時也要注入 _quotes_by_assertion（證據等級讀逐字；"
+                                 "預設空的會把每條邊靜默降級——L13）")
+            return list(self._assertion_rows), self._quotes_by_assertion
+        if self._graph_cache is None:
+            with self.driver.session() as session:
+                rows, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
+            self._graph_cache = (rows, quotes)
+        return list(self._graph_cache[0]), self._graph_cache[1]
 
     def _table(self, as_of: date | None = None) -> Mapping[str, Any]:
         """`as_of=None` ＝ 當前視角；給日期則走 as-of 投影。
@@ -127,9 +139,11 @@ class Neo4jGraphResearchProvider:
 
         if as_of is None:
             if self._table_cache is None:
+                rows, quotes = self._graph()
                 self._table_cache = structure_table(
-                    self._assertions(),
+                    rows,
                     self.registry or get_registry(),
+                    quotes_by_assertion=quotes,
                 )
             return self._table_cache
 
@@ -138,7 +152,8 @@ class Neo4jGraphResearchProvider:
         if as_of in self._projections:
             return self._projections[as_of]
 
-        projection = project_assertions_as_of(self._assertions(), as_of)
+        rows, quotes = self._graph()
+        projection = project_assertions_as_of(rows, as_of)
         if projection.dated_total < _MIN_DATED_FOR_PROJECTION:
             # **保險絲仍然在。** 它從「as-of 一律拒絕」換成「投影不存在時拒絕」，
             # 不是拿掉——L13：成功與失敗若在同一個訊號上同形，回測會靜默看到未來。
@@ -155,9 +170,12 @@ class Neo4jGraphResearchProvider:
                 f"已定日 assertion 全部晚於它（另有 {projection.excluded_undated} 條未定日）。"
                 "回傳空排序會與『那天沒有任何瓶頸』同形，所以這裡拒絕"
             )
+        # 逐字跟著 assertion id 走：投影只留 as-of 當時可見的 assertion，讀的是它們**現在**的逐字——與屬性值同一個近似
+        # （投影過濾的是 assertion，不重建更正走廊改寫之前的版本）。
         table = dict(structure_table(
             projection.rows,
             self.registry or get_registry(),
+            quotes_by_assertion=quotes,
         ))
         # 投影自己的計數必須跟著資料走（L16），否則消費端會把
         # 「as-of 篩掉一半」讀成「這家公司本來就沒幾條邊」。

@@ -34,13 +34,23 @@ def _assertion(dst: str, published: str | None, *, sub: int = 5,
     }
 
 
-def _provider(*rows) -> Neo4jGraphResearchProvider:
-    return Neo4jGraphResearchProvider(driver=object(), _assertion_rows=list(rows))
+def _provider(*rows, quotes: dict | None = None) -> Neo4jGraphResearchProvider:
+    # 注入 assertion 就要一併注入逐字（Phase 6 Step 6.4：證據等級的逐來源具名核對讀它；沒給是例外，不是空的）
+    return Neo4jGraphResearchProvider(driver=object(), _assertion_rows=list(rows),
+                                      _quotes_by_assertion=dict(quotes or {}))
 
 
 # ---------------------------------------------------------------------------
 # 1. 驗收條件本身：T 之後發表的東西在 T 看不到
 # ---------------------------------------------------------------------------
+
+def test_injecting_assertions_without_their_quotes_is_refused_not_silently_downgraded() -> None:
+    """Phase 6 Step 6.4：證據等級讀逐字。注入縫若在沒給逐字時預設成空的，每條邊會被靜默降級——
+    而那與「規則真的降了它們」同形（L13）。所以只注入 assertion 是例外。"""
+    provider = Neo4jGraphResearchProvider(driver=object(), _assertion_rows=[_assertion("mat:inp_substrate", None)])
+    with pytest.raises(ValueError, match="_quotes_by_assertion"):
+        provider.get_bottlenecks()
+
 
 def test_evidence_published_after_as_of_is_invisible() -> None:
     """ROADMAP Phase 6 的 exit criterion，逐字。
@@ -434,10 +444,12 @@ def test_within_company_edge_order_is_evidence_first_and_across_companies_is_jus
     """
     weak = _assertion("mat:aaa_weak", "2026-01-05", doc="sd_w")                       # origin 解析不到 → needs_review
     strong = _assertion("tech:zzz_strong", "2026-01-05", doc="sd_s")
-    strong["origin"] = "NVIDIA"                                                        # 客戶端 origin → externally_corroborated
+    strong["origin"] = "NVIDIA"                                                        # 客戶端 origin、引文具名 → externally_corroborated
+    strong["assertion_id"] = "a_strong"
     other = _assertion("tech:zzz_strong", "2026-01-05", doc="sd_o", src="co:axt")     # 另一家公司，證據最弱
     other["origin"] = "AXT"
-    provider = _provider(weak, strong, other)
+    provider = _provider(weak, strong, other,
+                         quotes={"a_strong": ["NVIDIA sources the strong part from Coherent in volume"]})
     rows = provider.get_bottlenecks()
     assert [(str(r.company_id), str(r.target_id)) for r in rows] == [
         ("co:axt", "tech:zzz_strong"),            # 公司之間：只按 company_id，證據弱也排前（不是名次）

@@ -306,8 +306,9 @@ def shared_name_forms(registry) -> frozenset[str]:
 def quote_names_company(quote: str | None, company, *, registry=None, shared: frozenset[str] | None = None) -> bool:
     """這段文字（引文或 origin 字串）有沒有**具名**這家公司——名字比對的唯一 owner。
 
-    用在三處（同一個函式，不各寫一份——L16）：`_origin_mentions`（聯合公告偵測）、
-    RA packet 的 `layer_enumerations` 核對（Step 4.2a）、層文件計數器（Step 4.4）。
+    用在四處（同一個函式，不各寫一份——L16）：`_origin_mentions`（聯合公告偵測）、
+    RA packet 的 `layer_enumerations` 核對（Step 4.2a）、層文件計數器（Step 4.4）、證據等級的逐來源具名
+    （`query.origin_resolution.corroboration`，Phase 6 Step 6.4；含它的違反數計數器）。
     名字只來自 `company_name_forms`；registry 沒有名字的公司一律 False——**呼叫端要把
     「名冊無名可比」與「引文真的沒具名」分開報**（`company_name_forms` 回空 tuple 就是前者）。
     給了 `registry` 時，與另一家共用的寫法不算（`shared_name_forms`）。
@@ -323,10 +324,18 @@ def quote_names_company(quote: str | None, company, *, registry=None, shared: fr
     return _named_by(text, company, shared)
 
 
+def usable_name_forms(company, shared: frozenset[str]) -> tuple[str, ...]:
+    """這家公司**比得到**的寫法：`company_name_forms` 扣掉與另一家共用的（`shared_name_forms`）。
+
+    回空 tuple＝「名冊無名可比」——沒有任何寫法，或每個寫法都與另一家共用（同一家公司兩個 id：2026-10-03 的
+    `co:openlight`／`co:openlight_photonics`）。兩種補救都是名冊／身分，不是讀原文（Phase 6 Step 6.4 的 `no_name_forms`）。
+    """
+    return tuple(form for form in company_name_forms(company) if form.casefold() not in shared)
+
+
 def _named_by(text: str, company, shared: frozenset[str]) -> bool:
     """比對本體（`quote_names_company` 與 `_origin_mentions` 共用；`shared` 由呼叫端算一次）。"""
-    return any(_form_pattern(form).search(text)
-               for form in company_name_forms(company) if form.casefold() not in shared)
+    return any(_form_pattern(form).search(text) for form in usable_name_forms(company, shared))
 
 
 def _name_variants(company) -> set[str]:
@@ -394,27 +403,89 @@ def _origin_mentions(origin: str, registry) -> set[str]:
     return {company.company_id for company in registry.companies if _named_by(text, company, shared)}
 
 
+def origin_docs(entries: Iterable[tuple[Any, Any, Any]],
+                quotes_by_assertion: Mapping[str, Iterable[str]]) -> tuple:
+    """一個 origin 在一條邊上的 `(assertion_id, source_doc_id, origin_linkage)` 列 → 逐份文件的 `OriginDoc`（含逐字）。
+
+    逐字只認 assertion id 對得到的（`query.sub_language.fetch_all_quotes`）；沒有 id 的列只帶出文件與宣告、沒有逐字
+    （沒有引文就沒有具名——不是「不知道」）。文件與引文都排序：結果不得取決於圖的回傳順序。
+    """
+    from query.origin_resolution import OriginDoc
+
+    by_doc: dict[tuple[str | None, str | None], set[str]] = {}
+    for assertion_id, doc_id, linkage in entries:
+        bucket = by_doc.setdefault((str(doc_id) if doc_id else None, linkage or None), set())
+        if assertion_id:
+            bucket.update(str(q) for q in quotes_by_assertion.get(str(assertion_id)) or () if q)
+    return tuple(OriginDoc(doc_id=doc, linkage=linkage, quotes=tuple(sorted(quotes)))
+                 for (doc, linkage), quotes in sorted(by_doc.items(), key=lambda kv: (str(kv[0][0] or ""),
+                                                                                    str(kv[0][1] or ""))))
+
+
+def edge_corroborations(
+    subject: str,
+    origins: Iterable[str | None],
+    registry,
+    filing_origins: frozenset | set = frozenset(),
+    *,
+    quotes_by_assertion: Mapping[str, Iterable[str]],
+    origin_assertions: Mapping[str, Iterable[tuple[Any, Any, Any]]],
+    publishers=None,
+    relay=None,
+    shared: frozenset[str] | None = None,
+) -> list:
+    """一條邊每個 origin 的判定（`query.origin_resolution.Corroboration`，依 origin 字串排序）——`classify_evidence`
+    取它們的最高等級；`query.layer_stats` 讀 `withheld`（沒升的理由）。判定本身只在 `corroboration`（唯一 owner）。
+
+    `quotes_by_assertion`、`origin_assertions` **必填**（Phase 6 Step 6.4；plan §5）：呼叫端沒給逐字就丟例外——
+    靜默當成「沒有引文」會把全部邊降級，而那與「規則真的降了它們」同形（L13）。
+    `origin_assertions`：`CanonicalEdge.origin_assertions`（origin → 引用這條邊的 `(assertion_id, doc, linkage)`）。
+    """
+    from query.origin_resolution import corroboration, get_publishers
+
+    if quotes_by_assertion is None or origin_assertions is None:
+        raise TypeError("classify_evidence／edge_corroborations 需要 quotes_by_assertion 與 origin_assertions"
+                        "（逐來源具名核對讀逐字；沒給就丟例外，不得靜默把全部邊降級——L13）")
+    pubs = publishers if publishers is not None else get_publishers()
+    return [corroboration(origin, subject, origin_docs(origin_assertions.get(origin) or (), quotes_by_assertion),
+                          registry, filing=origin in filing_origins, publishers=pubs, relay=relay, shared=shared)
+            for origin in sorted({str(o) for o in origins if o})]
+
+
+def best_evidence(levels: Iterable[str]) -> str:
+    """取最高等級（同級時 `_TIE_WINS` 勝出——結果不得取決於迭代順序）；一個都沒有＝供應商自報。"""
+    best = "self_reported"
+    for level in levels:
+        if (EVIDENCE_RANK[level], level in _TIE_WINS) > (EVIDENCE_RANK[best], best in _TIE_WINS):
+            best = level
+    return best
+
+
 def classify_evidence(
     subject: str,
     origins: Iterable[str | None],
     registry,
     filing_origins: frozenset | set = frozenset(),
-    origin_linkages: Mapping[str, Iterable[str | None]] | None = None,
     *,
+    quotes_by_assertion: Mapping[str, Iterable[str]],
+    origin_assertions: Mapping[str, Iterable[tuple[Any, Any, Any]]],
     publishers=None,
+    relay=None,
+    shared: frozenset[str] | None = None,
 ) -> str:
     """六分（五個等級＋與 needs_review 同級的 media_relay），取各 origin 所能支持的最高等級。
 
-    每個 origin 先經 `query.origin_resolution.resolve_origin`（唯一 owner）分成三態：
-    - **名冊公司**：不是主詞 → 外部印證；是主詞 → 自報（filing 出身為 costly）。
-    - **登記的發布者**（`config/publishers.json`）：`publisher_lifts` 說算 → 外部印證；否則 → 媒體轉述。
-      自產資料的類別（產業研究、拆解、標準、政府、學術）算，除非那份文件宣告 `same_origin`；
-      媒體只有宣告 `independent` 的那份算（`origin_linkages`：origin → 引用這條邊的各份文件的宣告）。
+    每個 origin 的等級只由 `query.origin_resolution.corroboration`（唯一 owner）判——先經 `resolve_origin` 分成三態：
+    - **名冊公司**：是主詞 → 自報（filing 出身為 costly）；不是主詞 → 主詞是公司時，**這個 origin 自己的引文**要
+      逐字具名主詞才是外部印證（否則待判定，Phase 6 Step 6.4）；主詞不是公司 → 外部印證。
+    - **登記的發布者**（`config/publishers.json`）：`publisher_lifts` 逐份說算的那幾份文件裡，主詞是公司時要有一段
+      具名主詞、不是轉述句（宣告 `independent` 的文件不套轉述）的引文 → 外部印證；否則 → 媒體轉述。
     - **解析不到**：再過一道聯合公告偵測（**去註解後**的字串具名 ≥2 家名冊公司且含主詞以外者）→ 雙方聯合；
       否則待判定。`None` 同時可能是「真第三方」與「沒解析出來的別名」，不得壓成布林（L12）——
       所以未登記就留在待判定，不猜。
     `filing_origins`：來自 source_type=='filing' 文件的 origin 集合（costly proxy）。
-    `publishers`：測試用；預設讀正式設定。
+    `quotes_by_assertion`、`origin_assertions`：**必填**（見 `edge_corroborations`）。
+    `publishers`、`relay`：測試用；預設讀正式設定與正式轉述字表。
 
     ⚠ 解析到主詞的 origin **一律是自報**（filing 出身才是 costly）——2026-10-01 Phase 4 Step 4.1a
     （使用者定案 Q8b 替代案 B）拿掉了「解析到主詞、但同一字串另具名他家 → counterparty_joint」那支抬升：
@@ -422,34 +493,9 @@ def classify_evidence(
     ⚠ 聯合公告偵測讀**去掉尾端註解**的字串（Step 4.3）：註解是研究者寫的脈絡（「轉載 A／B 聯合新聞稿」
     「內含 X 具名引述」），不是發布者身分——讀原字串會讓註解驅動證據等級（R2-b 轉來的 non-blocking）。
     """
-    from query.origin_resolution import get_publishers, publisher_lifts, resolve_origin
-
-    pubs = publishers if publishers is not None else get_publishers()
-    linkages = origin_linkages or {}
-    best = "self_reported"
-
-    def _lift(level: str) -> None:
-        nonlocal best
-        if (EVIDENCE_RANK[level], level in _TIE_WINS) > (EVIDENCE_RANK[best], best in _TIE_WINS):
-            best = level
-
-    for origin in {o for o in origins if o}:
-        resolution = resolve_origin(origin, registry, publishers=pubs)
-        if resolution.kind == "company":
-            if resolution.id != subject:
-                _lift("externally_corroborated")
-            elif origin in filing_origins:  # 主詞自己：自報（字串裡另具名誰都一樣——見上面的 Q8b-B）
-                _lift("self_reported_costly")
-        elif resolution.kind == "publisher":
-            _lift("externally_corroborated" if publisher_lifts(resolution, linkages.get(origin) or ())
-                  else "media_relay")
-        else:
-            mentions = _origin_mentions(_strip_annotation(origin), registry)
-            if len(mentions) >= 2 and (mentions - {subject}):
-                _lift("counterparty_joint")
-            else:
-                _lift("needs_review")
-    return best
+    return best_evidence(c.level for c in edge_corroborations(
+        subject, origins, registry, filing_origins, quotes_by_assertion=quotes_by_assertion,
+        origin_assertions=origin_assertions, publishers=publishers, relay=relay, shared=shared))
 
 
 @dataclass
@@ -466,9 +512,11 @@ class CanonicalEdge:
     documents: int = 0
     origins: set = field(default_factory=set)
     filing_origins: set = field(default_factory=set)
-    #: origin → 引用這條邊、出自該 origin 的各份 SourceDoc 的 `origin_linkage` 宣告集合（缺＝None）。
-    #: ⚠ 逐份記、不是一個布林：同一家媒體的兩份文件可能一份 independent、一份 same_origin（Step 4.3）。
-    origin_linkages: dict = field(default_factory=dict)
+    #: origin → 引用這條邊的 assertion：`[(assertion_id, source_doc_id, origin_linkage), …]`（缺＝None）。
+    #: 逐來源具名核對要知道每個 origin 的逐字（逐字掛在 assertion 上）與各出自哪份文件——`publisher_lifts` 與轉述檢查的
+    #: 豁免都是**文件層級**的宣告：同一家媒體的兩份文件可能一份 independent、一份 same_origin（Step 4.3、Phase 6 Step 6.4）。
+    #: ⚠ 2026-10-03 之前這裡是 `origin_linkages`（origin → 宣告集合）：逐 origin 收成一個集合，就分不出是哪一份宣告的。
+    origin_assertions: dict = field(default_factory=dict)
     evidence: str = "self_reported"
     #: 引用到的 SourceDoc id → 它的 `published_at`（字串或 None）。
     #: ⚠ 這是 point-in-time 的唯一時間線索：canonical edge 本身沒有時間欄位，
@@ -522,7 +570,8 @@ def collapse_assertions(rows: Iterable[Mapping[str, Any]]) -> dict[tuple, Canoni
             edge.origins.add(str(row["origin"]))
             if str(row.get("source_type") or "") == "filing":
                 edge.filing_origins.add(str(row["origin"]))
-            edge.origin_linkages.setdefault(str(row["origin"]), set()).add(row.get("origin_linkage") or None)
+            edge.origin_assertions.setdefault(str(row["origin"]), []).append(
+                (row.get("assertion_id") or None, doc_id or None, row.get("origin_linkage") or None))
 
         sub = attrs.get("substitutability")
         _take(key, edge, "substitutability",
@@ -767,6 +816,7 @@ def structure_table(
     rows: Iterable[Mapping[str, Any]],
     registry,
     *,
+    quotes_by_assertion: Mapping[str, Iterable[str]],
     sub_language_flags: Mapping[str, bool] | None = None,
     sub_language_label: str | None = None,
 ) -> dict[str, Any]:
@@ -782,6 +832,8 @@ def structure_table(
     `sub_language_flags`（Phase 4 Step 4.4b）：`query.sub_language.sub_language_flags` 的輸出（assertion id →
     引文含不含可替代性語言）。給了，每列多一格 `assertions_without_sub_language`（id 列表）、結果多一段
     `sub_language` 總數；沒給就是 None（沒核對）。**只印、不放閘**：不改任何一格、不改收斂、不改順序。
+    `quotes_by_assertion`（**必填**，Phase 6 Step 6.4）：`query.sub_language.fetch_all_quotes` 的輸出——證據等級的
+    逐來源具名核對讀它（`classify_evidence`）。
     """
     rows = list(rows)
     canonical = collapse_assertions(rows)
@@ -793,10 +845,11 @@ def structure_table(
             if aid and sub_language_flags.get(aid) is False:
                 without_by_edge[(str(row.get("src")), str(row.get("relation")), str(row.get("dst")))].append(aid)
     edges = list(canonical.values())
+    shared = shared_name_forms(registry)
     for edge in edges:
         edge.evidence = classify_evidence(
             edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
-            origin_linkages=edge.origin_linkages,
+            quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions, shared=shared,
         )
 
     upward = build_upward_index(edges)
@@ -1242,13 +1295,13 @@ def main() -> int:
 
     try:
         with driver.session() as session:
-            rows = fetch_assertions(session)
-            quotes = fetch_all_quotes(session)
+            # 邊與逐字在同一個唯讀 transaction（證據等級的逐來源具名核對要對同一份快照——Phase 6 Step 6.4）。
+            rows, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
     finally:
         driver.close()
     language = get_language()
-    result = structure_table(rows, get_registry(), sub_language_flags=sub_language_flags(rows, quotes,
-                                                                                         language=language),
+    result = structure_table(rows, get_registry(), quotes_by_assertion=quotes,
+                             sub_language_flags=sub_language_flags(rows, quotes, language=language),
                              sub_language_label=language.label)
     if args.what_if is not None:
         from engine_b.hypotheses import load_store, overlay_assertions
@@ -1257,7 +1310,7 @@ def main() -> int:
         if not hyp_rows:
             print("（沒有 active 假設可疊加；先用 python -m engine_b.hypotheses add 建立）")
             return 0
-        overlaid = structure_table(list(rows) + hyp_rows, get_registry())
+        overlaid = structure_table(list(rows) + hyp_rows, get_registry(), quotes_by_assertion=quotes)
         print(render_what_if(result, overlaid, hyp_rows))
     else:
         print(render_markdown(result))

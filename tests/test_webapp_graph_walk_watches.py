@@ -78,7 +78,10 @@ def _layer_stats(sole=("mat:x",), named=("mat:y",)) -> dict:
                             "unresolved_origin_sources": 0},
             "sub_language": {"checked": 2, "stock_n": 2, "stock_unsupported": ["r2"], "stock_gone": [],
                              "new_n": 0, "new_supported": 0, "new_unsupported": []},
-            "ec_quote_does_not_name_supplier": [], "summary": "層：測試用的一行"}
+            # Phase 6 Step 6.4：`ec_quote_does_not_name_supplier` 退役，換成逐來源口徑的三個鍵
+            "relay_language": "v1·base", "corroboration_withheld": {"unnamed": [], "no_name_forms": [], "relay": []},
+            "ec_without_naming_quote": [], "evidence_baseline": None, "evidence_vs_baseline": None,
+            "summary": "層：測試用的一行"}
 
 
 def test_graph_walk_artifact_carries_layer_stats_verbatim_and_its_identity_follows_the_counters() -> None:
@@ -91,6 +94,16 @@ def test_graph_walk_artifact_carries_layer_stats_verbatim_and_its_identity_follo
     moved = build_graph_walk_artifact(dict(result, layer_stats=_layer_stats(sole=())))
     assert same["freshness_identity"] == payload["freshness_identity"]          # 只改字不算
     assert moved["freshness_identity"] != payload["freshness_identity"]         # ① 少一個節點算
+    # Phase 6 Step 6.4：哪條邊因為哪個理由沒升外部印證、對 6.0 基準的升降——證據標籤變了就是認知變了
+    withheld = dict(_layer_stats(), corroboration_withheld={
+        "unnamed": [{"edge": "co:a supplies_to mat:x", "origin": "NVIDIA", "docs": ["d"], "evidence": "needs_review"}],
+        "no_name_forms": [], "relay": []})
+    changed = dict(_layer_stats(), evidence_vs_baseline={
+        "up": [], "down": [{"edge": "co:a supplies_to mat:x", "from": "externally_corroborated", "to": "needs_review"}],
+        "same_rank": [], "new": [], "gone": []})
+    for layer in (withheld, changed):
+        assert build_graph_walk_artifact(dict(result, layer_stats=layer))["freshness_identity"] != \
+            payload["freshness_identity"]
     assert fake_graph_walk_payload()["layer_stats"] is None                    # 純 walk() 沒算＝None，不是空的計數
 
 

@@ -457,11 +457,23 @@ class _ReadOnlyGraph:
         assert not any(word in upper for word in self._WRITE_WORDS), f"prepare 跑了寫入的 Cypher：{query}"
         self.queries.append(query)
         if "n.id IN $ids" in query:
-            return [dict(self.nodes[i], id=i) for i in params.get("ids") or () if i in self.nodes]
-        return []
+            return _Result(dict(self.nodes[i], id=i) for i in params.get("ids") or () if i in self.nodes)
+        return _Result()
+
+    def execute_read(self, work):
+        """唯讀 transaction（證據等級預告在同一個 transaction 裡讀 assertion、逐字連結、Source 逐字；Phase 6 Step 6.4）。"""
+        self.modes.append("execute_read")
+        return work(self)
 
     def close(self) -> None:
         return None
+
+
+class _Result(list):
+    """neo4j Result 的最小形狀：可迭代、`.data()` 回 list。"""
+
+    def data(self):
+        return list(self)
 
 
 def test_prepare_reads_the_graph_read_only_and_never_publishes(
@@ -500,6 +512,12 @@ def test_prepare_reads_the_graph_read_only_and_never_publishes(
     record = research_actions.read_action(prepared["action_id"], root=tmp_path)
     assert [d["status"] for d in record["merge_side_effect_check"]["documents"]] == ["checked", "checked"]
     assert "入圖副作用" in prepared["review_packet"]
+    # Phase 6 Step 6.4：同一個 READ session 的唯讀 transaction 裡算「入圖後證據等級會變的邊」（夾具文件沒有邊：
+    # 核對了、一條都不變——與「沒核對」不同形；有變動的情況由 tests/test_merge_side_effects.py 守）
+    evidence = record["merge_side_effect_check"]["evidence"]
+    assert evidence == {"status": "checked", "changes": []}
+    assert "execute_read" in graph.modes and any("QUOTES" in q for q in graph.queries)
+    assert "入圖後沒有任何一條邊的證據等級會變" in prepared["review_packet"]
 
 
 def test_prepare_says_side_effects_are_unknown_when_the_graph_is_unreachable(
@@ -517,6 +535,10 @@ def test_prepare_says_side_effects_are_unknown_when_the_graph_is_unreachable(
     assert [d["status"] for d in record["merge_side_effect_check"]["documents"]] == ["upstream_unavailable"]
     assert "副作用無法核對" in prepared["review_packet"]
     assert "不會改到圖上任何既有" not in prepared["review_packet"]
+    # 證據等級預告同一條缺席路：讀不到不是「不會變」（Phase 6 Step 6.4）
+    assert record["merge_side_effect_check"]["evidence"]["status"] == "upstream_unavailable"
+    assert "證據等級預告無法核對" in prepared["review_packet"] and "沒有任何一條邊的證據等級會變" not in \
+        prepared["review_packet"]
 
 
 def test_prepare_prints_which_existing_values_the_load_would_overwrite(

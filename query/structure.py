@@ -65,8 +65,9 @@ if str(ROOT) not in sys.path:
 from identity.registry import get_registry  # noqa: E402
 from query.bottleneck import (  # noqa: E402
     DEMAND_PULL_RELATIONS, DEPENDENCY_RELATIONS, CanonicalEdge, build_upward_index,
-    classify_evidence, collapse_assertions, demand_chain, fetch_assertions,
+    classify_evidence, collapse_assertions, demand_chain, fetch_assertions, shared_name_forms,
 )
+from query.sub_language import fetch_all_quotes  # noqa: E402
 
 #: 五個角度是**封閉清單**，而且不是憑空設計的——前四個直接來自 2026-09-17 那次
 #: 真的問出答案的四次查詢，第五個是排序本來就有的可達性檢查。
@@ -265,11 +266,15 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
     缺席一律明說（INV-3）：分不出製造者、沒有客戶端原文，都印出來，不印空白。
     「可解析第三方」＝ origin 經 `query.origin_resolution`（唯一 owner）解析成**算印證的發布者**（Step 4.3）——
     與讀圖 `independent` 核對（`verify_citations`）同一個判準：那邊收得下的引文，這裡就要列得出來。
+    每段引文的判定只問 `query.origin_resolution.corroboration`（Phase 6 Step 6.4；主詞＝那條邊的 `src`）：
+    客戶端原文照印，沒具名供應商的旁註 `withheld`（「未具名供應商」）；發布者的引文過了 `publisher_lifts` 才列，
+    沒具名或只是轉述句的同樣旁註——**列出來不等於它撐得住外部印證**，旁註就是在說這件事。
     """
-    from query.origin_resolution import publisher_lifts, resolve_origin
+    from query.origin_resolution import OriginDoc, corroboration
 
     if registry is None:
         registry = get_registry()
+    shared = shared_name_forms(registry)
     edges = list(edges)
     makers = sorted({(e.src, e.relation) for e in edges if e.dst == node and e.relation in _MAKER_RELATIONS})
     # 「零件供應商」＝ supplies_to 的公司**扣掉製造者**（plan 待決 #22，[654] 入圖後成立）：O-Net 對 ELS 同時是
@@ -288,17 +293,22 @@ def build_socket_view(node: str, edges: Iterable[CanonicalEdge],
             continue
         for q in found:
             origin = q.get("origin")
-            resolution = resolve_origin(origin, registry, publishers=publishers)
-            company = resolution.id if resolution.kind == "company" else None
-            third_party = (resolution.kind == "publisher"
-                           and publisher_lifts(resolution, (q.get("origin_linkage"),)))
             doc = str(q.get("doc") or "")
+            verdict = corroboration(str(origin or ""), edge_key[0],
+                                    (OriginDoc(doc_id=doc or None, linkage=q.get("origin_linkage"),
+                                               quotes=(str(q.get("quote") or ""),)),),
+                                    registry, publishers=publishers, shared=shared)
+            resolution = verdict.resolution
+            company = resolution.id if resolution.kind == "company" else None
+            third_party = verdict.publisher_lifted
             docs.setdefault(doc, {"doc": doc, "tier": q.get("tier"), "origin": origin, "company": company,
-                                  "resolved_as": _resolved_as(resolution, third_party)})
+                                  "resolved_as": _resolved_as(verdict)})
             if (company is not None and company not in suppliers) or third_party:
                 view.customer_quotes.append({"edge": list(edge_key), "quote": q.get("quote"), "doc": doc,
                                              "tier": q.get("tier"), "origin": origin, "company": company,
-                                             "publisher": resolution.id if third_party else None})
+                                             "publisher": resolution.id if third_party else None,
+                                             "withheld": verdict.withheld,
+                                             "relay_terms": list(verdict.relay_terms)})
     view.sources = sorted(docs.values(), key=lambda d: d["doc"])
     if not view.customer_quotes:
         view.customer_absence = SOCKET_NO_CUSTOMER_QUOTE
@@ -318,8 +328,9 @@ def render_socket_markdown(socket: SocketView) -> str:
     if socket.customer_quotes:
         for q in socket.customer_quotes:
             who = f"`{q['company']}`" if q.get("company") else f"第三方 {q.get('publisher')}"
+            note = _withheld_note(q.get("withheld"), q.get("relay_terms") or ())
             out.append(f"- `{q['edge'][0]}` {q['edge'][1]} `{q['edge'][2]}`：«{str(q['quote'])[:200]}»"
-                       f"　`{q['doc']}`（tier {q['tier']}｜{q['origin']} → {who}）")
+                       f"　`{q['doc']}`（tier {q['tier']}｜{q['origin']} → {who}）{note}")
     else:
         levels = "、".join(f"`{d['doc']}`（tier {d['tier']}｜{d['origin']}"
                           f"{'' if d['company'] else '｜' + str(d.get('resolved_as') or '解析不到')}）"
@@ -328,13 +339,25 @@ def render_socket_markdown(socket: SocketView) -> str:
     return "\n".join(out)
 
 
-def _resolved_as(resolution: Any, third_party: bool) -> str | None:
-    """來源清單上印的那幾個字：公司不印（印 co:* 就夠）、算印證的發布者、轉述、解析不到——三種缺席分開說（L12）。"""
+def _resolved_as(verdict: Any) -> str | None:
+    """來源清單上印的那幾個字：公司不印（印 co:* 就夠）、算印證的發布者、轉述、解析不到——三種缺席分開說（L12）。
+    「算印證的發布者」＝過了 `publisher_lifts`（`verdict.publisher_lifted`，owner 給的）；撐不撐得住外部印證另看 `withheld`。"""
+    resolution = verdict.resolution
     if resolution.kind == "company":
         return None
     if resolution.kind == "publisher":
-        return f"第三方·{resolution.publisher_kind}" if third_party else "媒體轉述"
+        return f"第三方·{resolution.publisher_kind}" if verdict.publisher_lifted else "媒體轉述"
     return "解析不到"
+
+
+def _withheld_note(withheld: str | None, relay_terms: Iterable[str] = ()) -> str:
+    """插槽視角的旁註：`Corroboration.withheld` 的人話（`query.origin_resolution.WITHHELD_LABELS`，與 RA packet 同一份）。"""
+    from query.origin_resolution import WITHHELD_LABELS
+
+    if not withheld:
+        return ""
+    terms = "、".join(relay_terms)
+    return f"　⚠ {WITHHELD_LABELS[withheld]}{('（' + terms + '）') if withheld == 'relay' and terms else ''}——不撐外部印證"
 
 
 def _sub_distribution(rows: Iterable[EdgeView]) -> str:
@@ -500,24 +523,29 @@ def load_snapshot_with_quotes(node: str) -> tuple[StructureView, dict[tuple[str,
     driver = _graph_driver()
     try:
         with driver.session() as session:
-            rows, quotes = session.execute_read(
-                lambda tx: (fetch_assertions(tx), fetch_quotes(tx, node)))
+            # 全部逐字（證據等級的逐來源具名核對，Phase 6 Step 6.4）與這個節點的逐字（附出處）同一個 transaction。
+            rows, all_quotes, quotes = session.execute_read(
+                lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx), fetch_quotes(tx, node)))
     finally:
         driver.close()
-    return build_structure(node, _classify_edges(rows)), quotes
+    return build_structure(node, _classify_edges(rows, all_quotes)), quotes
 
 
 def _load_edges() -> list[CanonicalEdge]:
+    """全圖 canonical 邊、已分過證據等級。邊與逐字在**同一個唯讀 transaction**（Phase 6 Step 6.4：證據等級讀逐字；
+    `fetch_all_quotes` 另查、不 join 進 `fetch_assertions`——會灌大 `documents`）。"""
     driver = _graph_driver()
     try:
         with driver.session() as session:
-            rows = fetch_assertions(session)
+            rows, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
     finally:
         driver.close()
-    return _classify_edges(rows)
+    return _classify_edges(rows, quotes)
 
 
-def _classify_edges(rows) -> list[CanonicalEdge]:
+def _classify_edges(rows, quotes_by_assertion: Mapping[str, Iterable[str]]) -> list[CanonicalEdge]:
+    """`collapse_assertions`＋`classify_evidence`。`quotes_by_assertion`（`fetch_all_quotes`）**必填**：
+    證據等級的逐來源具名核對讀它；沒給就丟例外，不靜默把全部邊降級（L13）。"""
     # ⚠ 共用 `collapse_assertions`，不自己收斂——否則結構讀圖與排序會對同一條邊
     # 給出不同的值，而那是 L16 說的「每個消費端重造一份，重造品立刻開始偏離」。
     edges = list(collapse_assertions(rows).values())
@@ -530,10 +558,11 @@ def _classify_edges(rows) -> list[CanonicalEdge]:
     # 供應商自報」——**預設值偽裝成觀測**，而且「還沒算」與「算出來就是自報」同形（L12）。
     # 修法是**去用既有的唯一 owner**，不是在這裡重造一套判定（L16）。
     registry = get_registry()
+    shared = shared_name_forms(registry)
     for edge in edges:
         edge.evidence = classify_evidence(
             edge.src, edge.origins, registry, filing_origins=edge.filing_origins,
-            origin_linkages=edge.origin_linkages,
+            quotes_by_assertion=quotes_by_assertion, origin_assertions=edge.origin_assertions, shared=shared,
         )
     return edges
 

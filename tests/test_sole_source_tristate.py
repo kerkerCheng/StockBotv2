@@ -50,7 +50,7 @@ def test_structure_table_keeps_unknown_sole_source_as_none_not_false() -> None:
         _assertion("co:b", "tech:ai_switch", attrs={"substitutability": 5, "sole_source": False}),
         _assertion("co:c", "tech:ai_switch", attrs={"substitutability": 5}),
     ]
-    by_company = {r["company_id"]: r for r in structure_table(rows, _Reg())["rows"]}
+    by_company = {r["company_id"]: r for r in structure_table(rows, _Reg(), quotes_by_assertion={})["rows"]}
     assert by_company["co:a"]["sole_source"] is True
     assert by_company["co:b"]["sole_source"] is False
     assert by_company["co:c"]["sole_source"] is None, "未填必須是 None，不是 False"
@@ -63,7 +63,8 @@ def test_table_order_ignores_sole_source_because_it_is_an_index() -> None:
         _assertion("co:c", "tech:ai_switch", attrs={"substitutability": 5}),
         _assertion("co:a", "tech:ai_switch", attrs={"substitutability": 5, "sole_source": True}),
     ]
-    assert [r["company_id"] for r in structure_table(rows, _Reg())["rows"]] == ["co:a", "co:b", "co:c"]
+    table = structure_table(rows, _Reg(), quotes_by_assertion={})
+    assert [r["company_id"] for r in table["rows"]] == ["co:a", "co:b", "co:c"]
 
 
 def test_structural_diff_treats_unknown_to_true_and_true_to_unknown_honestly() -> None:

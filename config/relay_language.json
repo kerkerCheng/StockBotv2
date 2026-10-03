@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "version": 1,
+  "active": "base",
+  "_doc": "發布者的引文是不是轉述句（「X announced／said…」）的字表——唯一 loader 是 query/origin_resolution.py::get_relay_language（形狀與比對規則與 config/substitutability_language.json 同一套：query.sub_language.load_language；ASCII 詞整詞、不分大小寫；中日韓字整串出現即算）。只用在「發布者 origin、主詞是名冊公司」那一格（Phase 6 Step 6.4，使用者定案 §0.1 #4）：過了 publisher_lifts 的文件裡，要有一段具名主詞、而且不含任何一個詞的引文才算外部印證；**那份文件宣告 origin_linkage=independent 時不套**（ROADMAP「翻案靠逐份宣告」）。偵測只會讓標籤變保守。⚠ L19：本字表不得出現在 prompts/、skills/（抽取端讀得到，就會挑不含這些字的引文，旗標恆滅）；tests/test_relay_language.py 守著。改字表＝升 version 並在 _history 記一行。",
+  "_history": [
+    {
+      "version": 1,
+      "date": "2026-10-03",
+      "active": "base",
+      "change": "初版（plan 2026-10-02-002 §5）：報導動詞 announced／announces／said／says／stated／states、according to、表示、宣布。刻意不收 unveiled／launched／introduced（事實陳述還是轉述，要換樣本量過再改——plan §14 #6）。"
+    }
+  ],
+  "variants": {
+    "base": {
+      "reporting_verbs": [
+        "announced", "announces", "said", "says", "stated", "states", "according to", "表示", "宣布"
+      ]
+    }
+  }
+}

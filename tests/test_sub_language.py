@@ -128,9 +128,9 @@ def _rows():
 def test_structure_table_lists_ids_and_changes_no_other_cell() -> None:
     from query.bottleneck import render_markdown, structure_table
 
-    plain = structure_table(_rows(), _Registry())
-    flagged = structure_table(_rows(), _Registry(), sub_language_flags={"e1": True, "e2": False, "e3": True},
-                              sub_language_label="v1·test")
+    plain = structure_table(_rows(), _Registry(), quotes_by_assertion={})
+    flagged = structure_table(_rows(), _Registry(), quotes_by_assertion={},
+                              sub_language_flags={"e1": True, "e2": False, "e3": True}, sub_language_label="v1·test")
     assert plain["sub_language"] is None
     assert all(r["assertions_without_sub_language"] is None for r in plain["rows"])      # 沒核對＝None，不是 []
     by_company = {r["company_id"]: r["assertions_without_sub_language"] for r in flagged["rows"]}

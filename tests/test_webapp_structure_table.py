@@ -52,31 +52,39 @@ def _attrs(**kw):
 
 def _rows():
     return [
-        # 外部印證（origin 是 NVIDIA ≠ src）、sub 5、sole、距錨 2 跳
+        # 外部印證（origin 是 NVIDIA ≠ src、NVIDIA 那段引文具名 Coherent）、sub 5、sole、距錨 2 跳
         {"src": "co:coherent", "relation": "supplies_to", "dst": "co:nvidia", "confidence": 0.9,
          "attributes": _attrs(substitutability=5, sole_source=True, qualification_status="qualified"),
-         "origin": "NVIDIA", "source_doc_id": "doc_nvda_call", "published_at": "2026-06-01"},
+         "origin": "NVIDIA", "source_doc_id": "doc_nvda_call", "published_at": "2026-06-01", "assertion_id": "a0"},
         {"src": "co:nvidia", "relation": "supplies_to", "dst": "tech:ai_switch", "confidence": 0.9,
          "attributes": _attrs(), "origin": "NVIDIA", "source_doc_id": "doc_nvda_call",
-         "published_at": "2026-06-01"},
+         "published_at": "2026-06-01", "assertion_id": "a1"},
         # sub 5、sole、直接接錨（1 跳）——但 origin 解析不到 registry，證據最弱
         {"src": "co:lumentum", "relation": "supplies_to", "dst": "tech:ai_switch", "confidence": 0.8,
          "attributes": _attrs(substitutability=5, sole_source=True, qualification_status="designed_in"),
-         "origin": "Lumentum", "source_doc_id": "doc_lite_pr", "published_at": "2026-05-01"},
-        # sole_source **未填**（None）——三態要活著；origin 是 Coherent ≠ src → 外部印證
+         "origin": "Lumentum", "source_doc_id": "doc_lite_pr", "published_at": "2026-05-01", "assertion_id": "a2"},
+        # sole_source **未填**（None）——三態要活著；origin 是 Coherent ≠ src，但這份名冊沒有 AXT 的寫法可比
+        # → 待判定（Phase 6 Step 6.4 的 no_name_forms）
         {"src": "co:axt", "relation": "supplies_to", "dst": "co:coherent", "confidence": 0.8,
          "attributes": _attrs(substitutability=4, qualification_status="qualified"),
-         "origin": "Coherent", "source_doc_id": "doc_cohr_10k", "published_at": "2026-04-01"},
+         "origin": "Coherent", "source_doc_id": "doc_cohr_10k", "published_at": "2026-04-01", "assertion_id": "a3"},
     ]
 
 
-def fake_result(rows=None):
-    return structure_table(rows if rows is not None else _rows(), _LabelRegistry())
+def _quotes():
+    """每筆 assertion 的逐字（證據等級的逐來源具名核對讀它；Phase 6 Step 6.4）。"""
+    return {"a0": ["NVIDIA qualified Coherent as the laser supplier for its switches"],
+            "a3": ["Coherent buys InP substrates from AXT"]}
 
 
-def fake_table_payload(rows=None, **kw):
+def fake_result(rows=None, quotes=None):
+    return structure_table(rows if rows is not None else _rows(), _LabelRegistry(),
+                           quotes_by_assertion=_quotes() if quotes is None else quotes)
+
+
+def fake_table_payload(rows=None, quotes=None, **kw):
     """一份最小但形狀正確的 `structure_table` artifact（給本檔與 request-path 證明共用）。"""
-    return build_structure_table_artifact(fake_result(rows), registry=_LabelRegistry(), **kw)
+    return build_structure_table_artifact(fake_result(rows, quotes), registry=_LabelRegistry(), **kw)
 
 
 
@@ -117,7 +125,8 @@ def test_sub_language_check_travels_with_the_artifact_and_absent_stays_none() ->
     """Phase 4 Step 4.4b：每列的 `assertions_without_sub_language`（id 列表）與總數照抄；沒核對＝None（不是 0 筆缺）。"""
     rows = [dict(r, assertion_id=f"a{i}") for i, r in enumerate(_rows())]
     flags = {"a0": False, "a2": True, "a3": True}
-    result = structure_table(rows, _LabelRegistry(), sub_language_flags=flags, sub_language_label="v1·narrow")
+    result = structure_table(rows, _LabelRegistry(), quotes_by_assertion=_quotes(), sub_language_flags=flags,
+                             sub_language_label="v1·narrow")
     payload = build_structure_table_artifact(result, registry=_LabelRegistry())
     assert payload["sub_language"]["without"] == 1 and payload["sub_language"]["language"] == "v1·narrow"
     flagged = {r["company_id"]: r["assertions_without_sub_language"] for r in payload["rows"]}
@@ -177,7 +186,8 @@ def test_company_label_comes_from_registry_never_guessed() -> None:
 
 def test_empty_table_is_honest_not_silent() -> None:
     """母體為空時 rows=[]、population 計數為 0，artifact 仍合法——「排不出來」那句隨首選退役。"""
-    empty = build_structure_table_artifact(structure_table([], _LabelRegistry()), registry=_LabelRegistry())
+    empty = build_structure_table_artifact(structure_table([], _LabelRegistry(), quotes_by_assertion={}),
+                                           registry=_LabelRegistry())
     assert empty["rows"] == [] and empty["population"]["input"] == 0
     assert empty["anchor_gaps"]["population"] == 0
     validate_state_artifact("structure_table", empty)
@@ -227,17 +237,17 @@ def test_freshness_identity_tracks_cognition_not_document_counts() -> None:
     assert docs(b)["co:coherent"] == docs(a)["co:coherent"] + 1
     assert b["freshness_identity"] == a["freshness_identity"]
     assert b["content_digest"] != a["content_digest"]
-    # 證據等級變了（lumentum 拿到客戶端 origin）→ 那一格變 → 認知狀態變（順序不變，它是索引）
-    rows = _rows()
-    rows[2] = dict(rows[2], origin="NVIDIA")
-    c = fake_table_payload(rows=rows)
+    # 證據等級變了（客戶那段引文不再具名 Coherent：外部印證 → 待判定，Phase 6 Step 6.4）→ 那一格變 → 認知狀態變
+    # （順序不變，它是索引）。原本這裡換 lumentum 的 origin 成 NVIDIA；新規則下沒具名的客戶 origin 不升，改用拿掉引文表達同一件事。
+    c = fake_table_payload(quotes={})
+    assert [r["evidence"] for r in c["rows"] if r["company_id"] == "co:coherent"] == ["needs_review"]
     assert c["freshness_identity"] != a["freshness_identity"]
     assert [r["company_id"] for r in c["rows"]] == [r["company_id"] for r in a["rows"]]
 
 
 def test_as_of_projection_counts_are_carried_not_dropped() -> None:
     projection = project_assertions_as_of(_rows(), date(2026, 5, 15))
-    result = structure_table(list(projection.rows), _LabelRegistry())
+    result = structure_table(list(projection.rows), _LabelRegistry(), quotes_by_assertion=_quotes())
     payload = build_structure_table_artifact(result, registry=_LabelRegistry(),
                                              as_of=date(2026, 5, 15), projection=projection)
     assert payload["as_of"] == "2026-05-15"

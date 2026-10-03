@@ -112,3 +112,86 @@ def test_as_loaded_compares_the_canonical_ids_the_loader_will_merge() -> None:
     loaded = as_loaded(doc)
     assert loaded["nodes"][0]["id"] == canonical
     assert doc["nodes"][0]["id"] == alias, "原 doc 不得被改（resolve_document 會原地改，所以先拷貝）"
+
+
+# ---------------------------------------------------------------------------
+# 入圖後證據等級會變的邊（Phase 6 Step 6.4）：照 loader 的 MERGE 語意在記憶體裡併進當下的圖
+# ---------------------------------------------------------------------------
+
+def _graph_rows() -> list[dict]:
+    base = {"attributes": "{}", "confidence": 0.8, "source_type": "news", "published_at": "2026-06-01"}
+    return [
+        {**base, "assertion_id": "d_e1", "src": "co:lumentum", "relation": "supplies_to", "dst": "tech:x",
+         "origin": "NVIDIA", "origin_linkage": None, "source_doc_id": "d"},
+        {**base, "assertion_id": "d_e2", "src": "co:lumentum", "relation": "supplies_to", "dst": "tech:y",
+         "origin": "NVIDIA", "origin_linkage": None, "source_doc_id": "d"},
+        {**base, "assertion_id": "o_e1", "src": "co:nvidia", "relation": "depends_on", "dst": "tech:x",
+         "origin": "NVIDIA", "origin_linkage": None, "source_doc_id": "o"},
+    ]
+
+
+def _packet_doc() -> dict:
+    """同一份文件 d 的更正版：e1 多連一段具名 Lumentum 的逐字、s1 逐字改寫；e2 不在新版（舊 assertion 留著）；新邊 e3。"""
+    return {"source_doc": {"doc_id": "d", "title": "T", "source_type": "press_release", "evidence_tier": 2,
+                           "origin_entity": "NVIDIA", "url": "https://example.com/d", "origin_linkage": None},
+            "sources": [{"id": "d_s1", "quote": "NVIDIA signed a multiyear supply agreement"},
+                        {"id": "d_s3", "quote": "NVIDIA will purchase lasers from Lumentum"}],
+            "nodes": [],
+            "edges": [{"id": "e1", "src_id": "co:lumentum", "relation": "supplies_to", "dst_id": "tech:x",
+                       "confidence": 0.9, "attributes": {}, "source_ids": ["d_s1", "d_s3"]},
+                      {"id": "e3", "src_id": "co:lumentum", "relation": "supplies_to", "dst_id": "tech:z",
+                       "confidence": 0.9, "attributes": {}, "source_ids": ["d_s3"]}],
+            "claims": []}
+
+
+def test_rows_after_load_follow_the_loader_merge_semantics() -> None:
+    """assertion 以 evidence_id 覆寫、舊版有新版沒有的留著、SourceDoc 欄位直接 SET 到同一份文件的每一筆、
+    Source 逐字 coalesce、QUOTES 連結只增不減——與 `loader.load_to_neo4j.load` 同一套（預告不得比真的載入樂觀）。"""
+    from loader.merge_side_effects import rows_after_load
+
+    links = {"d_e1": ["d_s1"], "d_e2": ["d_s2"], "o_e1": ["o_s1"]}
+    source_quotes = {"d_s1": "old wording", "d_s2": "NVIDIA buys lasers", "o_s1": "NVIDIA needs lasers"}
+    doc = _packet_doc()
+    doc["source_doc"]["origin_linkage"] = "independent"
+    rows, quotes = rows_after_load(_graph_rows(), links, source_quotes, [doc])
+    by_id = {r["assertion_id"]: r for r in rows}
+    assert set(by_id) == {"d_e1", "d_e2", "o_e1", "d_e3"}                       # e2 留著、e3 新增
+    assert by_id["d_e2"]["origin_linkage"] == "independent"                      # SourceDoc SET 到同一份文件的舊 assertion
+    assert by_id["d_e2"]["source_type"] == "press_release" and by_id["o_e1"]["source_type"] == "news"
+    assert by_id["d_e1"]["published_at"] == "2026-06-01"                         # 抽取檔沒帶日期：coalesce 留圖上值
+    assert quotes["d_e1"] == ["NVIDIA signed a multiyear supply agreement", "NVIDIA will purchase lasers from Lumentum"]
+    assert quotes["d_e2"] == ["NVIDIA buys lasers"] and quotes["d_e3"] == ["NVIDIA will purchase lasers from Lumentum"]
+
+
+def test_evidence_after_load_lists_every_edge_whose_label_would_change() -> None:
+    """補回一段具名引文 → 那條邊待判定 → 外部印證；新邊 before=None；沒動的邊不列。"""
+    from identity.registry import CompanyIdentity, IdentityRegistry
+    from loader.merge_side_effects import evidence_after_load
+
+    registry = IdentityRegistry(version=1, companies=(
+        CompanyIdentity("co:lumentum", "LITE", display_name="Lumentum Holdings Inc.", name_aliases=("Lumentum",)),
+        CompanyIdentity("co:nvidia", "NVDA", display_name="NVIDIA Corporation", name_aliases=("NVIDIA",))))
+    state = {"rows": _graph_rows(), "links": {"d_e1": ["d_s1"], "d_e2": ["d_s2"], "o_e1": ["o_s1"]},
+             "source_quotes": {"d_s1": "old wording", "d_s2": "NVIDIA buys lasers", "o_s1": "NVIDIA needs lasers"}}
+    changes = evidence_after_load(state, [_packet_doc()], registry)
+    assert changes == [
+        {"edge": ["co:lumentum", "supplies_to", "tech:x"], "before": "needs_review",
+         "after": "externally_corroborated", "after_withheld": []},
+        {"edge": ["co:lumentum", "supplies_to", "tech:z"], "before": None, "after": "externally_corroborated",
+         "after_withheld": []},
+    ]
+
+
+def test_evidence_lines_say_unknown_out_loud_and_print_each_change() -> None:
+    from loader.merge_side_effects import evidence_lines
+
+    assert evidence_lines(None) == []                                             # 舊紀錄沒有這一段：不印
+    unknown = evidence_lines({"status": "upstream_unavailable", "reason": "連不上圖"})
+    assert len(unknown) == 1 and "無法核對" in unknown[0] and "不是「不會變」" in unknown[0]
+    assert evidence_lines({"status": "checked", "changes": []}) == ["- 入圖後沒有任何一條邊的證據等級會變"]
+    lines = evidence_lines({"status": "checked", "changes": [
+        {"edge": ["co:a", "supplies_to", "tech:x"], "before": "externally_corroborated", "after": "needs_review",
+         "after_withheld": ["unnamed"]},
+        {"edge": ["co:a", "supplies_to", "tech:z"], "before": None, "after": "self_reported", "after_withheld": []}]})
+    assert lines[0] == "- 入圖後證據等級會變的邊 2 條："
+    assert "外部印證 → 待判定（沒升外部印證：引文沒具名主詞）" in lines[1] and "新邊 → 供應商自報" in lines[2]

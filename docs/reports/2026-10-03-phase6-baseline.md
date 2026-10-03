@@ -436,3 +436,95 @@ dry-run 預告**證據等級會變 32 條**：論文 31 條待判定 → 媒體�
 同一份圖、6.3 之前（`9362764f`）與之後的名冊＋publishers 各算一次（scratchpad `layer_stats_diff.py`）：
 ①獨家且全自報 73 → 73（離開 0、進入 0）；②非供應商來源列舉 ≥2 家 6 → 6 層（層集合不變；母體 10、每家撐住 9 不變）；**origin 解析不到的來源 8 → 5**（解析得到的 3 份＝Noveon、USA Rare Earth、Sojitz——都掛在供給側邊上；Credo 那份掛的是 competes_with、不在這個母體；Novanta 要等 [671]）；
 舊計數器「外部印證但引文不具名供應商」15 → 13（`co:arista enables tech:xpo_form_factor`、`co:globalfoundries develops prod:gf_scale`——新寫法讓引文具名）。②不是本 Phase 的驗收，照實列出。
+
+## 18. Step 6.4 分類規則：逐來源具名＋轉述字表（2026-10-03 08:0x–08:2x 台北）
+
+改動（plan §5；偏差 §0.6 #10–#12）：「這個 origin 對這條邊算不算外部印證」只在 `query/origin_resolution.py::corroboration` 判——
+名冊公司、不是主詞：**它自己的**引文要逐字具名主詞；發布者：過了 `publisher_lifts` 的那幾份文件裡要有一段具名主詞、不是轉述句
+（`config/relay_language.json` v1·base；宣告 `independent` 的文件不套轉述）；沒升的帶 `unnamed`／`no_name_forms`／`relay` 之一。
+`classify_evidence` 的逐字必填（沒給丟 `TypeError`）；`CanonicalEdge.origin_assertions` 逐筆記 `(assertion_id, doc, linkage)`、取代
+`origin_linkages`。消費端全部問 owner：結構表、`_classify_edges`（走圖、讀圖快照、`_load_edges`）、插槽視角、`verify_citations`、
+`scripts/audit_sole_source_independence.py`、`query/layer_stats.py`、RA packet、兩支遷移工具（全清單：`git grep -n "corroboration(\|edge_corroborations(\|classify_evidence("`）。
+
+### 18.1 真實圖（新規則；唯讀，scratchpad `p64_real.py`／`p64_layer.py`／`p64_sole_diff.py`／`p64_walk_diff.py`）
+
+537 條 canonical 邊：外部印證 **230**／自報·filing 108／供應商自報 104／待判定 48／媒體轉述 39／雙方聯合 8。
+對 6.0 凍結鍵 `evidence_classes_2026_10_03`（250 條外部印證）：**升 2／降 22／同級互換 0／新邊 0／不在了 0**，每一條歸得到一個事件：
+
+| 事件 | 條數 | 邊 |
+|---|---|---|
+| 6.3c 名冊新公司（資料更正，§17.3 已附引文） | 升 2 | `co:lynas supplies_to mat:separated_heavy_reo`（Sojitz）、`tech:near_package_optics competes_with tech:cpo`（Credo） |
+| 6.3b GSR → media（資料更正，§17.2） | 降 3 | `co:axt supplies_to mat:inp_substrate`（→自報·filing）、`co:coherent`／`co:lumentum supplies_to tech:cw_dfb_laser`（→媒體轉述） |
+| **6.4 規則：`unnamed`（13）** | 降 13 | 下表 |
+| **6.4 規則：`no_name_forms`（4）** | 降 4 | OpenLight 3 條（`co:openlight` 與 `co:openlight_photonics` 共用每個寫法，名字比對對兩家都不算——[670] 合併後解）、`co:nava_thailand supplies_to tech:cloud_transceiver_1_6t`（nava 沒有名字——[670] 退役後解） |
+| **6.4 規則：`relay`（2）** | 降 2 | Cignal AI 那份：`co:lumentum supplies_to tech:els_pluggable_module`（announced、stated → 自報·filing）、`co:coherent supplies_to tech:uhp_laser`（announced → 媒體轉述） |
+
+`unnamed` 13 條（每條：邊｜現在的等級｜沒升的 origin｜文件——**6.8 補具名引文的清單**）：
+
+| 邊 | 現在 | origin | 文件 |
+|---|---|---|---|
+| `co:lumentum supplies_to co:nvidia` | 待判定 | NVIDIA | `nvda_lumentum_partnership_pr_2026_03_02` |
+| `co:lumentum supplies_to tech:uhp_laser` | 待判定 | NVIDIA | `nvda_lumentum_partnership_pr_2026_03_02` |
+| `co:sumitomo_electric supplies_to co:nvidia` | 待判定 | NVIDIA | `nvidia_sipho_blog_partner_roles` |
+| `co:coherent supplies_to tech:cpo_fiber_attach` | 待判定 | NVIDIA | `nvidia_sipho_blog_partner_roles` |
+| `co:fabrinet supplies_to tech:cpo_packaging_assembly` | 待判定 | NVIDIA | `nvidia_sipho_blog_partner_roles` |
+| `co:coherent depends_on tech:inp_6inch_fab` | 待判定 | NVIDIA | `nvidia_blog_coherent_texas_2026_06_16` |
+| `co:broadcom supplies_to tech:cpo` | 待判定 | Meta（Bailly 論文） | `meta_bailly_ecoc2025_via_nextplatform` |
+| `co:apollo invests_in co:broadcom` | 待判定 | Broadcom | `Broadcom_q2fy26_cpo`（「Apollo」不進名冊——§17.1、§0.6 #6） |
+| `co:hyundai_mobis supplies_to co:boston_dynamics` | 待判定 | Boston Dynamics | `boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07` |
+| `co:sivers_semiconductors supplies_to tech:cw_dfb_laser` | 自報·filing | LuxNet（華星光年報） | `mops_4979_annual_report_2025` |
+| `co:agility_robotics constrained_by comp:humanoid_precision_actuators` | 媒體轉述 | SVRC Research | `svrc_state_of_robotics_2026_us` |
+| `co:mp_materials supplies_to mat:separated_heavy_reo` | 媒體轉述 | USGS | `usgs_mcs2026_rare_earths_heavy` |
+| `co:tsmc supplies_to tech:mrm_200g` | 媒體轉述 | TrendForce | `trendforce_tsmc_pic_capacity_2026_07_08` |
+
+**與 6.0 的模擬（§3 `sim_b0`：規則那一半、6.3 之前的資料，20 條）逐條對照**：18 條相同；`co:arista enables tech:xpo_form_factor`、
+`co:globalfoundries develops prod:gf_scale` 被 6.3a 的名冊寫法救回（§17.1）；多 4 條＝GSR 3 條（6.3b）＋`co:lumentum supplies_to co:nvidia`——
+`sim_b0` 裡撐它的是 GSR 那段（「Nvidia's guidance to Coherent and Lumentum…」，具名、產業研究），6.3b 改 media 之後只剩 NVIDIA 新聞稿，
+那兩段（「…multibillion purchase commitment…」「high-performance lasers, modules…」）沒寫 Lumentum——plan L11-6 ④ 預期的那條。
+250 ＋2 −22 ＝ **230**。理由分佈與 `sim_b0` 相同（OpenLight 3 條在模擬裡也是 `no_name_forms`）。
+
+⚠ 實作過程撞到的一次錯（L11-6 ⑥）：第一版把「每個寫法都與另一家共用」判成 `unnamed`（OpenLight 3 條）——那會把 6.8 導去讀原文，而原文寫的
+「OpenLight」永遠比不到。改成 `usable_name_forms` 空＝`no_name_forms`（名字比對 `_named_by` 與 owner 共用這一個 helper）。
+
+- `ec_without_naming_quote`（逐來源口徑的違反數，不經 owner 直接重算）：**0**。
+- ①獨家且全自報 73 → **77**：多 `tech:cpo_fiber_attach`、`tech:cpo_packaging_assembly`、`tech:els_pluggable_module`、`tech:mrm_200g`——**與 plan §0.2 預測的 4 個節點相同**，沒有其他節點進出。
+- 走圖九型：以 6.0 等級與新等級各跑一次 `walk()`，**九型命中逐型相同**（第 2 型「獨家且自報」0／13 → 0／13：①多出的 4 個節點需求側都沒有 sub≥4，
+  不在第 2 型的母體裡——scratchpad `p64_type2.py` 逐節點核對）。
+- 讀圖 status：兩邊都是 `mat:inp_substrate` stale_low、`tech:cw_dfb_laser` stale_low（層讀圖的 evidence 變動一律 low——6.1 的分級；兩份在 6.0 就已 stale_low）、兩份插槽讀圖 current。6.8 重讀前兩份。
+- 心跳段 3／結構表頁首（重 materialize `--graph-walk --structure-table` 後，`python -m crons.heartbeat --out` 逐字）：
+  `…｜外部印證違反 0｜沒升外部印證：未具名 13／名冊無名 4／轉述 2（轉述字表 v1·base）｜證據等級較 6.0：升 2／降 22／同級互換 0｜字表 v1·narrow`
+- 成本：全圖分類 0.46 秒、層計數器 0.59 秒（多一條唯讀 Cypher 讀全部逐字）。
+- daily ⑬ 同一條 argv 加 `--dir <scratchpad>/app64` 實跑（`materialize64.log`）：**84／84 完成、exit 0**——讀圖現行 2／低級 2／stale 0；
+  候選板可開 0／缺 X 0／等回落 1／不要 0／已持有 2／無敘事 72（6.0 是 69：6.3c 名冊新增的上市公司 3 家多了個股頁）。真實 APP 目錄只重
+  materialize `--graph-walk --structure-table`；其餘 kind（個股頁、讀圖、候選板）在 10-04 05:30 的 daily 換成新規則。
+- RA packet 的預告不無中生有：圖上 4 份文件**原樣**重載的預告都是 0 條（`p64_preview_noop.py`）。
+- `python -m audit invariants`：14 項 PASS（SourceDocSync、PointInTime、QueueLiveness、Expiry 都在內）。
+
+### 18.2 pq2 [670]／[671] 的預告在新規則下重算（dry-run，唯讀）
+
+- [670] `loader/migrate_identity_cleanup.py`：仍是 8 條、**改後的等級與 §16.2 逐條相同**；差在改前——OpenLight 3 條與 nava→1.6T 在 6.4 起已是待判定（名冊無名可比），
+  不再是外部印證。[670] 的 hint 已照實更新（同一個 ref、編號不變；scratchpad `todo_pool.before64.json` 是更新前的備份）。
+- [671] `--corrections` dry-run：32 條、與 §17.5 逐條相同（論文那 31 條與 Novanta 那條都不受具名規則影響：主詞是技術節點，或 origin 就是主詞自己）。
+
+### 18.3 測試與變異
+
+新 `tests/test_corroboration.py`（plan §5 九個夾具＋Sivers 舊口徑對照＋逐份豁免＋收斂記錄）、`tests/test_relay_language.py`（形狀、比對、L19 守門與偵測器自測）；
+`tests/test_layer_stats.py`（三種理由、違反數的自測、基準升降、`summary_line`）、`tests/test_merge_side_effects.py`（MERGE 語意模擬、預告、缺席）、
+`tests/test_research_actions.py`（prepare 的預告收據與讀不到的缺席）、`tests/test_origin_resolution.py`（具名／轉述兩條新規則下邊的等級＝讀圖引用核對）。
+退役 1 個測試函式：`test_layer_stats.py::test_corroborated_edges_whose_quote_never_names_the_supplier_are_listed`（守舊計數器的口徑），
+現在由 `test_edges_that_did_not_rise_are_listed_by_reason_with_their_documents` 與 `test_the_violation_counter_catches_a_corroboration_label_the_quotes_do_not_support` 守。
+
+| 變異（scratchpad `mutate.py`，跑完一定還原） | 結果 |
+|---|---|
+| 拿掉轉述檢查（`terms = []`） | 紅：④、⑤、⑨ |
+| 具名改成「這條邊任何一段引文」（舊口徑） | 紅：Sivers 夾具 |
+| `classify_evidence` 的逐字給預設空 dict | 紅：⑧ |
+
+### 18.4 L11-6 ④
+
+「如果這個規則是錯的，最先壞的是 Sivers→CW DFB 與 Lumentum→NVIDIA」：前者 → **自報·filing**（華星光年報那段沒提 Sivers）、後者 → **待判定＋`unnamed`**（NVIDIA 新聞稿那兩段沒寫 Lumentum），都進了 `corroboration_withheld.unnamed`——與預期相同。
+
+### 18.5 本 Step 新增的待決（併進 closeout §14）
+
+- 轉述字表的 `states` 會誤中「United States」（今天 0 筆受影響；只會讓標籤變保守）——換字表時（plan §14 #6）一起量。
+- 插槽視角：發布者過了 `publisher_lifts` 但沒具名或只是轉述的引文**照列並旁註**（§0.6 #11）——讀的人若覺得雜訊多，再議。

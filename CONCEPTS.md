@@ -45,8 +45,15 @@ Evidence tier determines how much a source contributes to `confidence` scoring.
 | `confidence` | **這個關係存在的信心** | 0–1；只在不同 `origin_event` 之間累加 |
 | `corroborating_origins` | **還有誰獨立說過同一件事**（L8 的獨立性計數） | `origin_entity` 集合，門檻 3 |
 
-`evidence_class` 各級的權威是 `query/bottleneck.py::EVIDENCE_RANK`（判定是同檔 `classify_evidence`；
-origin 是誰由 `query/origin_resolution.py::resolve_origin` 唯一判定：名冊公司 → 登記的發布者 → 解析不到）。
+`evidence_class` 各級的權威是 `query/bottleneck.py::EVIDENCE_RANK`（邊的等級是同檔 `classify_evidence` 取各 origin 的最高；
+origin 是誰由 `query/origin_resolution.py::resolve_origin` 唯一判定：名冊公司 → 登記的發布者 → 解析不到；
+**每個 origin 算不算外部印證**只由同檔 `corroboration` 判）。
+
+**外部印證（`externally_corroborated`）＝另一個實體自己的引文、逐字具名這家、而且不是在轉述這家的話**（2026-10-03 Phase 6 Step 6.4）：
+印證來源必須不是主詞自己（名冊公司）或是過了 `publisher_lifts` 的發布者；主詞是公司時，**那個來源自己的引文**要有一段逐字具名主詞
+（寫法只來自名冊，產品名不算）；發布者的那段還不得是轉述句（`config/relay_language.json`；那份文件宣告 `origin_linkage=independent`
+時不套）。沒升的邊帶三種理由之一——`unnamed`（引文沒具名）、`no_name_forms`（名冊無名可比，含兩個代號共用寫法）、`relay`（轉述句），
+三種補救不同、不得壓成一格。主詞不是公司（技術節點之間的邊）不套具名。它**不排序、不打分、不是 gate**：標籤變保守是讓「有客戶或第三方印證」可以信。
 `counterparty_joint` 只來自「origin 整串解析不到、且去註解後的字串裡具名 ≥2 家名冊公司（含主詞以外）」的聯合公告；
 **origin 解析得到主詞自己就是自報**（filing 出身為 `self_reported_costly`），字串裡另具名他家（例：供應商新聞稿引述客戶高管）
 不改變這一點（2026-10-01 Phase 4，使用者定案 Q8b 替代案 B）。

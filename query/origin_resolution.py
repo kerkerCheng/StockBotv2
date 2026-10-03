@@ -14,6 +14,13 @@
 - `alpha.providers.structure_readings.verify_citations`：讀圖引用的 `independent` 核對。
 - `query.structure.build_socket_view`：插槽的「客戶端或可解析第三方的原文」。
 - `scripts/audit_sole_source_independence.py`：手動 L8 稽核。
+
+**「這個 origin 對這條邊算不算外部印證」的唯一 owner 是 `corroboration`**（2026-10-03 Phase 6 Step 6.4；使用者定案
+plan §0.1 #3、#4）：上面四個消費端、`query.layer_stats`、RA packet 全部問它。它在解析之上多問兩件事——
+印證來源**自己的**引文有沒有逐字具名主詞（主詞是公司時）、發布者的那段引文是不是在轉述（`config/relay_language.json`）。
+2026-10-03 落地時（6.0 凍結 250 條外部印證、6.3 的資料更正之後）：這條規則擋下 19 條——引文沒具名 13、名冊無名可比 4、
+轉述句 2（baseline 報告 §18）；舊計數器只抓得到其中一部分，因為它認「這條邊任何一段引文具名」、連供應商自己的也算
+（Sivers→CW DFB：撐它的是華星光年報，那段沒提 Sivers）。
 """
 from __future__ import annotations
 
@@ -25,6 +32,8 @@ from typing import Any, Iterable, Mapping
 
 ROOT = Path(__file__).resolve().parent.parent
 PUBLISHERS_PATH = ROOT / "config" / "publishers.json"
+#: 轉述字表（版本化；形狀與比對規則同 `config/substitutability_language.json`，同一個 `load_language`）。
+RELAY_LANGUAGE_PATH = ROOT / "config" / "relay_language.json"
 
 #: 發布者類別 → 算不算外部印證。**封閉字彙，寫死在程式裡**：設定檔每一筆的 `corroborates` 必須等於這裡
 #: （載入時核對），所以把一筆媒體改成 `corroborates: true` 會在載入時就失敗——**媒體不得整類升級**
@@ -185,3 +194,147 @@ def publisher_lifts(resolution: OriginResolution, linkages: Iterable[str | None]
     if resolution.corroborates:
         return any(value != SAME_ORIGIN for value in declared)
     return any(value == INDEPENDENT for value in declared)
+
+
+# ---------------------------------------------------------------------------
+# 逐來源具名＋轉述（Phase 6 Step 6.4）
+# ---------------------------------------------------------------------------
+
+#: 沒升外部印證的三種理由（封閉；`query.layer_stats` 的 `corroboration_withheld` 三個鍵）。
+#: **三種不得壓成一格**（L12；`quote_names_company` docstring）——補救各不相同：
+#: - `unnamed`：主詞在名冊有寫法，但這個來源自己的引文沒有逐字具名它 → 從同一份文件補具名引文（RA，pq2）。
+#: - `no_name_forms`：主詞在名冊**沒有比得到的寫法**（沒有任何寫法，或每個寫法都與另一家共用——同一家公司兩個 id）
+#:   → 名冊補寫法或身分清理；讀原文補引文也比不到（`query.bottleneck.usable_name_forms`）。
+#: - `relay`：發布者的引文有具名主詞，但每一段都是轉述句 → 找它轉述的那份一手，或那份文件確有自己的數據時
+#:   逐份宣告 `origin_linkage=independent`（pq2）。
+WITHHELD_REASONS: tuple[str, ...] = ("unnamed", "no_name_forms", "relay")
+#: 三種理由給人看的字（插槽視角旁註、RA packet 的證據等級預告共用一份——L16）。
+WITHHELD_LABELS: Mapping[str, str] = {
+    "unnamed": "引文沒具名主詞",
+    "no_name_forms": "名冊無名可比",
+    "relay": "轉述句",
+}
+
+
+@lru_cache(maxsize=1)
+def get_relay_language():
+    """正式轉述字表（每個行程讀一次；唯一 loader）。測試要換字表請把 `relay=` 傳進消費端，不要改這裡。
+
+    ⚠ L19：字表不得出現在 `prompts/`、`skills/`（`tests/test_relay_language.py` 守著）。
+    """
+    from query.sub_language import load_language
+
+    return load_language(RELAY_LANGUAGE_PATH)
+
+
+@dataclass(frozen=True)
+class OriginDoc:
+    """一個 origin 引用一條邊的**一份**文件：它的 `origin_linkage` 宣告（缺＝None）與它在這條邊上的逐字。
+
+    逐份、不是逐 origin：轉述檢查的豁免（宣告 `independent`）與 `publisher_lifts` 都是文件層級的宣告
+    （plan §0.6 #2：同一家媒體一份自己採訪、一份轉述，兩份的結論不同）。
+    """
+
+    doc_id: str | None
+    linkage: str | None = None
+    quotes: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class Corroboration:
+    """一個 origin 對一條邊能支持的證據等級（`query.bottleneck.EVIDENCE_RANK` 的鍵），與沒升外部印證的理由。
+
+    `withheld` 只在「本來會因為這個 origin 升外部印證、被具名或轉述規則擋下」時有值（`WITHHELD_REASONS`）；
+    其餘一律 None（自報、媒體沒宣告、解析不到——那些照舊，不是這條規則擋的）。
+    `docs`：判定讀的那幾份文件（`withheld` 時就是補引文要讀的清單——L18：指得回文件）。
+    `quote`：撐住外部印證的那段具名引文（主詞是公司時才有）；`relay_terms`：判轉述憑的是哪幾個字。
+    `publisher_lifted`：發布者至少一份文件過了 `publisher_lifts`（類別與逐份宣告）——**不等於**撐得住外部印證
+    （過了之後仍可能因沒具名或轉述被擋）；非發布者一律 False。插槽視角的來源清單印「第三方·類別」還是「媒體轉述」讀它。
+    """
+
+    origin: str
+    resolution: OriginResolution
+    level: str
+    withheld: str | None = None
+    docs: tuple[str, ...] = ()
+    quote: str | None = None
+    relay_terms: tuple[str, ...] = ()
+    publisher_lifted: bool = False
+
+
+def corroboration(origin: str, subject: str, docs: Iterable[OriginDoc], registry: Any, *,
+                  filing: bool = False, publishers: PublisherRegistry | None = None,
+                  relay: Any = None, shared: frozenset[str] | None = None) -> Corroboration:
+    """「這個 origin 對這條邊算不算外部印證」的唯一 owner（Phase 6 Step 6.4）。
+
+    `subject`：邊的主詞（`src`）；`docs`：這個 origin 引用這條邊的每一份文件（`OriginDoc`）；
+    `filing`：這個 origin 有沒有 filing 出身的文件（costly proxy）；`relay`：轉述字表（預設正式字表）；
+    `shared`：`shared_name_forms(registry)`（大量呼叫時由呼叫端算一次）。規則：
+
+    - **名冊公司、是主詞** → 自報（filing 出身為自報·filing）。照舊。
+    - **名冊公司、不是主詞**：主詞是公司（`co:*`）時，這個 origin **自己的**引文至少一段逐字具名主詞
+      （`query.bottleneck.quote_names_company`——名字比對的唯一 owner）才給外部印證；主詞在名冊沒有比得到的寫法
+      （`usable_name_forms` 空）→ 待判定＋`no_name_forms`；有寫法但沒具名 → 待判定＋`unnamed`。主詞不是公司
+      （技術節點之間的邊）→ 外部印證，照舊。
+    - **登記的發布者**：只在過了 `publisher_lifts` 的那幾份文件裡找（逐份）；一份都沒過 → 媒體轉述（照舊）。
+      主詞是公司時要有一段「具名主詞、而且不是轉述句」的引文才給外部印證——**那份文件宣告 `independent` 時不套
+      轉述檢查**（具名照樣要；ROADMAP「翻案靠逐份宣告」，plan §0.6 #2）；否則媒體轉述＋`relay`（有具名、都是轉述）
+      或 `unnamed`／`no_name_forms`。
+    - **解析不到**：聯合公告偵測（去註解後的字串具名 ≥2 家名冊公司、含主詞以外者）→ 雙方聯合；否則待判定。照舊。
+
+    ⚠ **只會讓標籤變保守**（plan 不可越線 2）：與 Phase 6 之前的規則相比，每一支要嘛照舊、要嘛多一個條件。
+    ⚠ 轉述偵測只套發布者：公司 origin 轉述另一家的說法（「Coherent announced…」寫在 NVIDIA 部落格）今天沒有資料撐這一格
+    （plan §0.3；L17：機制只 general 到資料支持的那一格）。
+    """
+    from query.bottleneck import (_origin_mentions, _strip_annotation, quote_names_company, shared_name_forms,
+                                  usable_name_forms)
+    from query.sub_language import matched_terms
+
+    docs = tuple(sorted(docs, key=lambda d: str(d.doc_id or "")))
+    resolution = resolve_origin(origin, registry, publishers=publishers)
+    lifted = False
+
+    def result(level: str, withheld: str | None = None, *, considered: Iterable[OriginDoc] = docs,
+               quote: str | None = None, terms: Iterable[str] = ()) -> Corroboration:
+        return Corroboration(origin=origin, resolution=resolution, level=level, withheld=withheld,
+                             docs=tuple(sorted({str(d.doc_id) for d in considered if d.doc_id})),
+                             quote=quote, relay_terms=tuple(sorted(set(terms))), publisher_lifted=lifted)
+
+    if resolution.kind == "unresolved":
+        mentions = _origin_mentions(_strip_annotation(origin), registry)
+        return result("counterparty_joint" if len(mentions) >= 2 and (mentions - {subject}) else "needs_review")
+    if resolution.kind == "company" and resolution.id == subject:
+        return result("self_reported_costly" if filing else "self_reported")
+
+    if resolution.kind == "publisher":
+        considered = tuple(d for d in (docs or (OriginDoc(None),)) if publisher_lifts(resolution, (d.linkage,)))
+        if not considered:
+            return result("media_relay")
+        lifted = True
+        fallback = "media_relay"
+    else:
+        considered = docs
+        fallback = "needs_review"
+    if not str(subject or "").startswith("co:"):
+        return result("externally_corroborated", considered=considered)
+
+    company = registry.company(subject) if registry.has_company(subject) else None
+    if shared is None:
+        shared = shared_name_forms(registry)
+    if company is None or not usable_name_forms(company, shared):
+        return result(fallback, "no_name_forms", considered=considered)
+    relay_language = relay if relay is not None else get_relay_language()
+    relay_terms: list[str] = []
+    for doc in considered:
+        for quote in doc.quotes:
+            if not quote_names_company(quote, company, shared=shared):
+                continue
+            if resolution.kind == "company" or doc.linkage == INDEPENDENT:
+                return result("externally_corroborated", considered=considered, quote=quote)
+            terms = matched_terms(quote, language=relay_language)
+            if not terms:
+                return result("externally_corroborated", considered=considered, quote=quote)
+            relay_terms.extend(terms)
+    if relay_terms:
+        return result(fallback, "relay", considered=considered, terms=relay_terms)
+    return result(fallback, "unnamed", considered=considered)

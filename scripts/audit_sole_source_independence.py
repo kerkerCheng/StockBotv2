@@ -37,8 +37,9 @@ from dotenv import load_dotenv  # noqa: E402
 from neo4j import GraphDatabase  # noqa: E402
 
 from identity.registry import get_registry  # noqa: E402
-from query.bottleneck import company_id_for_origin  # noqa: E402
-from query.origin_resolution import publisher_lifts, resolve_origin  # noqa: E402
+from query.bottleneck import company_id_for_origin, origin_docs  # noqa: E402
+from query.origin_resolution import corroboration  # noqa: E402
+from query.sub_language import fetch_all_quotes  # noqa: E402
 
 WEAK = "weak"
 WEAK_CONFIDENCE_CAP = 0.5
@@ -59,21 +60,28 @@ def _attrs(raw) -> dict:
 _company_id_for = company_id_for_origin
 
 
-def _sort_origins(origins: dict[str, set], subject: str, registry) -> dict[str, list[str]]:
-    """逐個 origin 經唯一 owner（`query.origin_resolution`，Step 4.3）分組。
+def _sort_origins(origin_entries: dict[str, list[tuple]], subject: str, registry,
+                  quotes_by_assertion) -> dict[str, list[str]]:
+    """逐個 origin 問唯一 owner（`query.origin_resolution.corroboration`，Phase 6 Step 6.4）分組。
 
     ⚠ 本檔問的是「**所有** origin 是不是都是供應商自己」（schema §7 的 L8 規則），不是邊的最高證據等級——
     所以不呼叫 `classify_evidence`（那裡 filing 自報 rank 2 會蓋過媒體轉述 rank 1，答的是另一個問題）。
-    共用的是「這個 origin 是誰」：登記的自產資料發布者算外部、媒體轉述不算外部也不算本人。
+    共用的是「這個 origin 對這條邊算不算印證」：撐得住外部印證的才算外部；客戶或第三方的引文沒具名主詞、
+    或發布者只是轉述句的，另成一組 `withheld`（附理由）——它不是本人，也還不是印證，補具名引文才算。
+    `origin_entries`：origin → `(assertion_id, doc, origin_linkage)` 列（`query.bottleneck.origin_docs` 的輸入）。
     """
-    groups: dict[str, list[str]] = {"external": [], "relay": [], "unresolved": [], "self": []}
-    for origin, linkages in sorted(origins.items()):
-        resolution = resolve_origin(origin, registry)
-        if resolution.kind == "company":
-            groups["self" if resolution.id == subject else "external"].append(
-                origin if resolution.id == subject else str(resolution.id))
+    groups: dict[str, list[str]] = {"external": [], "relay": [], "unresolved": [], "self": [], "withheld": []}
+    for origin, entries in sorted(origin_entries.items()):
+        verdict = corroboration(origin, subject, origin_docs(entries, quotes_by_assertion), registry)
+        resolution = verdict.resolution
+        if verdict.level == "externally_corroborated":
+            groups["external"].append(str(resolution.id) if resolution.kind == "company" else origin)
+        elif verdict.withheld:
+            groups["withheld"].append(f"{origin}（{verdict.withheld}）")
+        elif resolution.kind == "company":
+            groups["self"].append(origin)
         elif resolution.kind == "publisher":
-            groups["external" if publisher_lifts(resolution, linkages) else "relay"].append(origin)
+            groups["relay"].append(origin)
         else:
             groups["unresolved"].append(origin)
     return groups
@@ -94,7 +102,8 @@ def main() -> int:
     registry = get_registry()
 
     with driver.session() as session:
-        assertions = session.run(
+        # 逐來源具名核對讀逐字（Phase 6 Step 6.4）：與 assertion 同一個唯讀 transaction，另查、不 join。
+        assertions, quotes = session.execute_read(lambda tx: (tx.run(
             """
             MATCH (e:EdgeAssertion)
             OPTIONAL MATCH (d:SourceDoc {id: e.source_doc_id})
@@ -104,7 +113,7 @@ def main() -> int:
                    d.origin_entity AS origin, d.evidence_tier AS tier,
                    d.origin_linkage AS origin_linkage
             """
-        ).data()
+        ).data(), fetch_all_quotes(tx)))
 
     rows = [{**a, "attrs": _attrs(a["attrs"])} for a in assertions]
     by_edge: dict[str, list[dict]] = defaultdict(list)
@@ -116,24 +125,25 @@ def main() -> int:
         if not any(g["attrs"].get("sole_source") is True for g in group):
             continue
         subject = group[0]["src"]
-        origin_linkages: dict[str, set] = {}
+        origin_entries: dict[str, list[tuple]] = {}
         for g in group:
             if g["origin"]:
-                origin_linkages.setdefault(g["origin"], set()).add(g.get("origin_linkage") or None)
-        origins = set(origin_linkages)
-        groups = _sort_origins(origin_linkages, subject, registry)
+                origin_entries.setdefault(g["origin"], []).append((g["aid"], g["doc"], g.get("origin_linkage")))
+        origins = set(origin_entries)
+        groups = _sort_origins(origin_entries, subject, registry, quotes)
         unresolved = groups["unresolved"]
+        withheld = groups["withheld"]
         external_companies = sorted(set(groups["external"]))
 
         # ⚠ 三分，不是二分。`None` 同時可能是「真的第三方媒體」與「沒解析出來的
         # 子公司／別名」——兩者對本檢查的意義相反（L12）。首版用
         # `resolved == {subject}` 判定，於是任何無法解析的 origin 都會讓集合不等於
         # {subject}，**自動被當成外部佐證通過**。那正是本檔 docstring 說不得發生的事。
-        # 現在改成：只有解析到「不同公司」或登記的自產資料發布者才算已印證；無法解析者 needs_review，
-        # 由人決定它是第三方（schema §7 接受）還是同源別名（不接受）；只剩媒體轉述者 media_relay（不是本人，也不是印證）。
+        # 現在改成：只有撐得住外部印證（owner 判）的 origin 才算已印證；無法解析者、以及引文沒具名主詞或只是
+        # 轉述句的非本人 origin（`withheld`）needs_review，由人決定或補具名引文；只剩媒體轉述者 media_relay。
         if external_companies:
             verdict = "externally_corroborated"
-        elif unresolved:
+        elif unresolved or withheld:
             verdict = "needs_review"
         elif groups["relay"]:
             verdict = "media_relay"
@@ -147,6 +157,7 @@ def main() -> int:
             "origins": sorted(origins),
             "external_companies": external_companies,
             "unresolved_origins": unresolved,
+            "withheld_origins": withheld,
             "verdict": verdict,
             "self_reported": verdict == "self_reported",
             "max_confidence": max(float(g["conf"] or 0) for g in group),
@@ -176,6 +187,9 @@ def main() -> int:
               f"{'  → 應降至 ≤0.5' if f['self_reported'] else ''}")
         if f["external_companies"]:
             print(f"    外部佐證（名冊公司或登記的第三方）：{f['external_companies']}")
+        if f["withheld_origins"]:
+            print(f"    ⚠ 非本人但撐不住印證（unnamed＝引文沒具名主詞／no_name_forms＝名冊無名可比／relay＝轉述句）："
+                  f"{f['withheld_origins']}")
         if f["unresolved_origins"]:
             print(f"    ⚠ 無法解析成 co:* 的 origin：{f['unresolved_origins']}")
             if f["verdict"] == "needs_review":

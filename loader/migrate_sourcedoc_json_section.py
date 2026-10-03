@@ -382,21 +382,25 @@ def publishers_with(entries: list[Mapping[str, Any]], *, publishers_path: Path |
 
 
 def correction_evidence_changes(rows: list[Mapping[str, Any]], manifest: Mapping[str, Any], *,
+                                quotes_by_assertion: Mapping[str, Any],
                                 publishers_after: Any = None) -> list[dict[str, Any]]:
     """更正 origin_entity（與跟著登記的發布者）之後，哪些邊的證據等級會變——現在的名冊、現在的規則，前後各算一次。
-    `publishers_after`：更正之後的 publishers（含 `publishers_add`）；不給＝與現在相同。"""
+    `quotes_by_assertion`（必填；`fetch_all_quotes`）：證據等級的逐來源具名核對讀它（Phase 6 Step 6.4）——更正只改
+    origin，逐字前後相同。`publishers_after`：更正之後的 publishers（含 `publishers_add`）；不給＝與現在相同。"""
     from identity.registry import get_registry
-    from query.bottleneck import classify_evidence, collapse_assertions
+    from query.bottleneck import classify_evidence, collapse_assertions, shared_name_forms
     from query.origin_resolution import get_publishers
 
     new_origin = {str(c["doc_id"]): c["after"] for c in manifest["corrections"] if c["field"] == "origin_entity"}
     after_rows = [dict(r, origin=new_origin[str(r.get("source_doc_id"))]) if str(r.get("source_doc_id")) in new_origin
                   else dict(r) for r in rows]
     registry = get_registry()
+    shared = shared_name_forms(registry)
 
     def classes(source_rows, pubs):
         return {k: classify_evidence(e.src, e.origins, registry, filing_origins=e.filing_origins,
-                                     origin_linkages=e.origin_linkages, publishers=pubs)
+                                     quotes_by_assertion=quotes_by_assertion,
+                                     origin_assertions=e.origin_assertions, publishers=pubs, shared=shared)
                 for k, e in collapse_assertions(source_rows).items()}
 
     before = classes(rows, get_publishers())
@@ -423,17 +427,19 @@ def _run_corrections(args, driver) -> int:
 
     from loader.sourcedoc_sync import GRAPH_CYPHER, drift, json_source_docs, summary_line
     from query.bottleneck import fetch_assertions
+    from query.sub_language import fetch_all_quotes
 
     manifest = load_corrections(Path(args.corrections))
     if args.apply:
         check_graph_approval(args.pq2, ref_id=manifest["pq2_ref"])
     with driver.session(default_access_mode=READ_ACCESS) as session:
         rows = [dict(r) for r in session.run(GRAPH_CYPHER)]
-        assertions = session.execute_read(lambda tx: fetch_assertions(tx))
+        assertions, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
     json_docs = json_source_docs(ROOT / "extractions")
     planned = plan_corrections(manifest, json_docs, rows)
     new_publishers = plan_publishers_add(manifest)
-    changes = correction_evidence_changes(assertions, manifest, publishers_after=publishers_with(new_publishers))
+    changes = correction_evidence_changes(assertions, manifest, quotes_by_assertion=quotes,
+                                          publishers_after=publishers_with(new_publishers))
     for edit in planned["edits"]:
         print(f"- extractions/{edit['file']}｜{edit['doc_id']}.{edit['field']}：{edit['before']!r} → {edit['after']!r}")
     for item in planned["graph"]:

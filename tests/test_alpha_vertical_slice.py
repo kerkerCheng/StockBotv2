@@ -399,7 +399,7 @@ def test_concrete_graph_provider_refuses_as_of_when_the_graph_has_no_dates() -> 
     from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
 
     provider = Neo4jGraphResearchProvider(
-        driver=object(), _assertion_rows=[_UNDATED_ASSERTION])
+        driver=object(), _assertion_rows=[_UNDATED_ASSERTION], _quotes_by_assertion={})
     with pytest.raises(PointInTimeUnsupported, match="沒有任何一條"):
         provider.get_bottlenecks(as_of=date(2026, 6, 30))
 
@@ -409,7 +409,7 @@ def test_as_of_before_the_earliest_evidence_raises_instead_of_returning_empty() 
     from alpha.errors import PointInTimeUnsupported
     from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
 
-    provider = Neo4jGraphResearchProvider(driver=object(), _assertion_rows=[
+    provider = Neo4jGraphResearchProvider(driver=object(), _quotes_by_assertion={}, _assertion_rows=[
         {**_UNDATED_ASSERTION, "published_at": "2026-06-02"}])
     with pytest.raises(PointInTimeUnsupported, match="早於圖上最早的證據"):
         provider.get_bottlenecks(as_of=date(2020, 1, 1))
@@ -421,6 +421,6 @@ def test_structural_changes_still_raise_when_the_projection_is_unavailable() -> 
     from alpha.providers.graph_neo4j import Neo4jGraphResearchProvider
 
     provider = Neo4jGraphResearchProvider(
-        driver=object(), _assertion_rows=[_UNDATED_ASSERTION])
+        driver=object(), _assertion_rows=[_UNDATED_ASSERTION], _quotes_by_assertion={})
     with pytest.raises(PointInTimeUnsupported):
         provider.get_structural_changes_since(date(2026, 1, 1))

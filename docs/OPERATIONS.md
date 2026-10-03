@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.4：證據等級讀逐字——逐來源具名＋轉述字表）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 證據等級的分類（`query.bottleneck.classify_evidence`）**多讀全部逐字**，所以每個會分類的入口在**同一個唯讀 transaction** 裡多跑一條唯讀 Cypher（`query.sub_language.fetch_all_quotes`：`MATCH (ea:EdgeAssertion)-[:QUOTES]->(s:Source) RETURN …`）：daily ⑬ 的 `materialize --structure-table`（本來就讀，改成與邊同一個 transaction）、`--graph-walk`（同上）、`--structure-readings`／`--candidates`／個股頁（經 `query.structure._load_edges` 與 `alpha.providers.graph_neo4j`，新多一條）；互動入口 `python -m query.bottleneck`、`python -m query.structure`、`scripts/audit_sole_source_independence.py`、兩支遷移工具的 dry-run 同樣多讀一次。`scripts/prepare_research_action.py` 在既有的 READ session 裡多讀三樣（assertion 列、`QUOTES` 連結、`Source` 逐字）算「入圖後證據等級會變的邊」，寫進 RA 紀錄既有的 `merge_side_effect_check` 收據。新讀一個 tracked 設定檔 `config/relay_language.json`。**寫入面不變**（artifact 欄位變多：`graph_walk.layer_stats` 的 `corroboration_withheld`／`ec_without_naming_quote`／`evidence_vs_baseline`／`relay_language`，`ec_quote_does_not_name_supplier` 退役）；**無新網路主機、無新憑證**（本機 Neo4j bolt，與既有 `_graph_driver` 同一組）、不碰 `.git` |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` §3「證據等級」；`CONCEPTS.md`「外部印證」；closed-vocabulary registry 登記轉述字表。**skill／prompt 刻意不改**：轉述字表與具名規則不得出現在 `prompts/`、`skills/`（L19；plan 不可越線 7）——抽取端讀得到就會挑不含那些字的引文 |
+| **3 最窄 rule** | daily ⑬ 的 argv **不變**（`tests/test_daily_task.py` 逐項相等照過）；不新增 step、不進任何新的 allowlist；`.codex/rules` 仍是 0 條；APP 不新增路由、request path 不跑分類（只讀 artifact）。prepare 的多讀與既有的唯讀查圖同一個 session、同一組憑證 |
+| **4 contract test** | `tests/test_corroboration.py`（plan §5 九個夾具＋Sivers 舊口徑對照＋逐份豁免）、`tests/test_relay_language.py`（字表形狀、比對、L19 守門與偵測器自測）、`tests/test_layer_stats.py`（三種理由、違反數、基準升降、`summary_line`）、`tests/test_research_actions.py`（packet 的證據等級預告與讀不到時的缺席）、`tests/test_merge_side_effects.py`（MERGE 語意的模擬） |
+| **5 端到端 smoke** | 見 baseline §18：真實圖上新規則 230 條外部印證（6.0 基準 250：升 2〔6.3c 名冊新公司〕、降 22〔6.3b GSR 3＋規則 19：未具名 13／名冊無名 4／轉述 2〕），逐條與 6.0 模擬對照；`ec_without_naming_quote` 0；①獨家且全自報 73 → 77（與 plan §0.2 預測的 4 個節點相同）；走圖九型命中不變；分類全圖 0.5 秒。daily ⑬ 的**同一條 argv** 加 `--dir <scratchpad>` 實跑一次（真實 APP 狀態與候選序列不動）：84／84 完成、exit 0；真實目錄只重 materialize `--graph-walk --structure-table`，心跳段 3 印出新的那一行 |
+
 ### Sandbox impact review 結論（2026-10-02，Phase 5 Step 5.6：候選狀態每日序列）
 
 | 步 | 結論 |

@@ -131,6 +131,7 @@ def _graph_rows() -> list[dict]:
     from neo4j import GraphDatabase
     from identity.registry import get_registry
     from query.bottleneck import fetch_assertions, structure_table
+    from query.sub_language import fetch_all_quotes
 
     driver = GraphDatabase.driver(
         os.environ.get("NEO4J_URI", "bolt://localhost:7687"),
@@ -138,8 +139,9 @@ def _graph_rows() -> list[dict]:
     )
     try:
         with driver.session() as session:
-            assertions = fetch_assertions(session)
-            table = structure_table(assertions, get_registry())
+            # 證據等級讀逐字（Phase 6 Step 6.4）：與邊同一個唯讀 transaction。
+            assertions, quotes = session.execute_read(lambda tx: (fetch_assertions(tx), fetch_all_quotes(tx)))
+            table = structure_table(assertions, get_registry(), quotes_by_assertion=quotes)
     finally:
         driver.close()
     return [dict(r) for r in table["rows"]]

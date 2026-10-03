@@ -103,6 +103,24 @@ canonical edge **沒有時間欄位**——唯一時間線索是 `CITES → Sour
 未定日一律排除**並計數**。圖上完全沒有日期、或 `as_of` 早於最早證據時，
 `Neo4jGraphResearchProvider` 拋 `PointInTimeUnsupported` 而不是回空 list。
 
+### 證據等級（`evidence_class`）：一個 owner、逐來源、讀逐字（2026-10-03 Phase 6 Step 6.4）
+
+邊的等級＝各 origin 能支持的最高（`query/bottleneck.py::classify_evidence`；同級時待判定勝出）；**每個 origin 的判定只在
+`query/origin_resolution.py::corroboration`**：先 `resolve_origin` 三態（名冊公司／登記的發布者／解析不到），再問兩件事——
+那個來源**自己的**引文有沒有逐字具名主詞（主詞是公司時；名字比對只走 `quote_names_company`，寫法只來自名冊、扣掉兩家共用的）、
+發布者的那段是不是轉述句（`config/relay_language.json`，唯一 loader `get_relay_language`；宣告 `origin_linkage=independent`
+的文件不套）。`publisher_lifts` 與轉述豁免都是**文件層級**的宣告，所以 `CanonicalEdge.origin_assertions` 逐筆記
+`(assertion_id, doc, linkage)`、逐字另查（`query.sub_language.fetch_all_quotes`，與 `fetch_assertions` 同一個唯讀 transaction，
+不 join——會灌大 `documents`）。**逐字是必填**：`classify_evidence`／`structure_table`／`_classify_edges` 沒給就丟例外——
+靜默當成「沒有引文」會把全部邊降級，而那與「規則真的降了它們」同形（L13）。
+
+消費端全部問 owner（L16）：結構表、走圖／讀圖快照（`query.structure._classify_edges`）、插槽視角（客戶端原文照印、沒具名旁註）、
+讀圖 `independent` 引用核對（`verify_citations`：被引用的那段要具名、發布者的不得是轉述）、`scripts/audit_sole_source_independence.py`、
+層計數器（`corroboration_withheld` 三種理由、`ec_without_naming_quote` 應恆 0、`evidence_vs_baseline` 對 6.0 凍結鍵）、
+RA packet 的「入圖後證據等級會變的邊」（`loader.merge_side_effects.evidence_after_load`：照 loader 的 MERGE 語意在記憶體裡併進當下的圖）、
+兩支遷移工具的前後對照。**規則只會讓標籤變保守**；會升級的只有資料更正（名冊寫法、名冊新公司、publishers、SourceDoc origin、
+身分合併、補回的引文）。不排序、不打分、不是 gate。
+
 ---
 
 ## 4. 管道層（Engine B discovery → 入庫）

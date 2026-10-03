@@ -119,7 +119,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.1 | 插槽讀圖 staleness：同級標籤互換算低等級（任何改分類之前；rank 由呼叫端注入、沒有預設；真實資料見 baseline §15） | ✅ | 執行模型 | 見 git log「Step 6.1」 |
 | 6.2 | 身分清理：OpenLight 合併、nava 定案（Lumentum 自有 Navanakorn 廠→退役）；遷移與 RA packet 印入圖副作用（#32）；R2-a GO（兩條非阻擋觀察補防線）；**pq2 [670] 等 go，apply 在 go 之後**（baseline §16；偏差 §0.6 #4–#5） | ✅ | 執行模型 | 見 git log「Step 6.2」 |
 | 6.3 | 證據資料：名冊兩個寫法（Arista、GF；Apollo 誤中不加）、GSR→media（3 條）、名冊新公司 5 家（2 條升級附引文）、`origin_entity` 進 SourceDoc 同步欄位（iqe 對齊）、綜述論文期刊登記 media；**pq2 [671]（SourceDoc origin 三筆）、[672]（四則 lead 標籤）等 go**（baseline §17；偏差 §0.6 #6–#8） | ✅ | 執行模型 | 見 git log「Step 6.3」 |
-| 6.4 | 分類規則：逐來源具名＋轉述字表（唯一 owner）、所有消費端改走它、計數器改口徑、packet 印「入圖後證據等級會變的邊」 | ○ | 執行模型 | |
+| 6.4 | 分類規則：逐來源具名＋轉述字表（唯一 owner `corroboration`）、所有消費端改走它、計數器改口徑、packet 印「入圖後證據等級會變的邊」；真實圖外部印證 250 → 230（升 2〔6.3c〕、降 22〔6.3b GSR 3＋規則 19：未具名 13／名冊無名 4／轉述 2〕）、違反 0、①73 → 77（與 §0.2 預測相同）；[670] hint 依新規則更新（baseline §18；偏差 §0.6 #10–#12） | ✅ | 執行模型 | 見 git log「Step 6.4」 |
 | 6.5 | sub 旗標跟著值走到消費端（不進 digest） | ○ | 執行模型 | |
 | 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）；R2-b | ○ | 執行模型 | |
 | 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則 | ○ | 執行模型 | |
@@ -148,6 +148,9 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 7 | 6.3e | `MDPI Micromachines`：`seen_in: cpo_chip_package_paper` | `seen_in: Electronic_Chip_Package_and_CPO_Technology_for_Modern_AI_Era` | `seen_in` 的契約是「讓這筆被登記的那份 **SourceDoc id**」（`query/origin_resolution.py::Publisher`）；`cpo_chip_package_paper` 是抽取檔的檔名，SourceDoc id 是後者（baseline §6） |
 | 8 | 6.3d | Soitec 那份的新 origin「`Soitec（Reuters 訪談逐字）`」 | 「`Soitec（管理層受 Reuters 訪談所述）`」 | 摘錄（`library/raw/reuters_soitec_capacity_reservations_2026_08_31.txt`）是 Reuters 法文報導的轉述，不是管理層逐字——措辭精度本身是 claim（L11-1）；去註解後同樣解析成 `co:soitec` |
 | 9 | 6.3e（影響 [671]） | 6.3e 單獨一項：`config/publishers.json` 登記 `MDPI Micromachines` | 條目寫進更正 manifest 的 `publishers_add`，由 `--corrections --apply`（[671] go 之後）在 origin 更正落地後**同一步**登記；publishers.json 先撤回 | `tests/test_origin_resolution.py::test_every_registration_spells_the_origin_of_the_document_it_came_from` 要求登記對得上 `seen_in` 那份文件**現在**的 origin（L18）——先登記就是一筆指不回原文的登記（初版 commit `e9e53620` 這樣做、全測試紅了一條） |
+| 10 | 6.4 | `collapse_assertions` 多記 `origin_assertions: {origin: set(assertion_id)}`；`classify_evidence` 多收 `quotes_by_assertion`（必填） | `origin_assertions: {origin: [(assertion_id, doc, linkage)]}`，**取代** `CanonicalEdge.origin_linkages`（退役）；`classify_evidence` 多收**兩個**必填關鍵字（`quotes_by_assertion`、`origin_assertions`），原本的 `origin_linkages` 參數拿掉；另加 `edge_corroborations`（每個 origin 的判定，`layer_stats` 讀 `withheld`）與 `best_evidence` | §0.6 #2 的轉述豁免與 `publisher_lifts` 都是**文件層級**的宣告——只記 assertion id 就不知道每段逐字出自哪份、那份宣告了什麼；兩個欄位並存＝同一個宣告兩種表示（L12），拿掉舊的那個，所有呼叫端被迫重看一次 |
+| 11 | 6.4 | `build_socket_view` 的 `third_party` 改問 owner；客戶端原文照印，旁註「未具名供應商」 | 發布者的引文**過了 `publisher_lifts`** 就列（與改前相同的母體），沒具名或轉述句同樣旁註（`Corroboration.publisher_lifted`、`withheld`）；不只撐得住外部印證的才列 | 只列撐得住的會讓改前列得出的第三方原文靜默消失（INV-3）；「`verify_citations` 收得下的引文這裡要列得出來」仍成立（收得下 ⊆ 列出）；旁註就是在說「列出來不等於撐得住」。待決見 §14 #8 |
+| 12 | 6.4 | §13：「名冊無名可比」＝`company_name_forms` 回空 tuple | 另含「每個寫法都與另一家共用」（`query.bottleneck.usable_name_forms` 空；名字比對 `_named_by` 與 owner 共用這一個 helper） | 第一版把 OpenLight 3 條判成 `unnamed`——6.8 會被導去讀原文，而原文寫的「OpenLight」對兩個代號都不算、永遠比不到；補救是身分清理（[670]），與 `no_name_forms` 同一種。6.0 的模擬（`sim_b0`）本來就這樣判 |
 
 ---
 
@@ -267,9 +270,9 @@ L11-6 ④：最先壞的是 `layer_stats.enumeration`（②「非供應商來源
 
 **轉述字表 `config/relay_language.json`：** 形狀照 `config/substitutability_language.json`（`schema_version`、`version`、`active`、`variants`、`_history`、`_doc`）；v1 的詞：`announced`、`announces`、`said`、`says`、`stated`、`states`、`according to`、`表示`、`宣布`；比對規則同 sub 字表（ASCII 整詞不分大小寫、中日韓整串）。**不得出現在 `prompts/`、`skills/`**（§0 第 7 條；測試照 `tests/test_sub_language.py` 的守門寫）。改字表＝升 version 並在 `_history` 記一行。
 
-**資料流：** `collapse_assertions` 多記 `origin_assertions: {origin: set(assertion_id)}`；`classify_evidence` 多收 `quotes_by_assertion`（**必填**——呼叫端沒給就丟例外，不得靜默把全部降級，L13）；三個呼叫端（`structure_table`、`_classify_edges`、`_snapshot`／`_load_edges`）在**同一個 transaction** 裡多跑 `query.sub_language.fetch_all_quotes`（不得 join 進 `fetch_assertions`：會灌大 `documents`）。
+**資料流：** `collapse_assertions` 多記 `origin_assertions: {origin: [(assertion_id, doc, linkage)]}`（取代 `origin_linkages`；§0.6 #10）；`classify_evidence` 多收 `quotes_by_assertion`、`origin_assertions`（**必填**——呼叫端沒給就丟例外，不得靜默把全部降級，L13）；三個呼叫端（`structure_table`、`_classify_edges`、`_snapshot`／`_load_edges`）在**同一個 transaction** 裡多跑 `query.sub_language.fetch_all_quotes`（不得 join 進 `fetch_assertions`：會灌大 `documents`）。
 **讀圖引用核對：** `_independence_problems` 改問 owner——標了 `independent` 的引用，那段**被引用的逐字**必須具名主詞（公司 origin 與發布者都是）、發布者的那段不得是轉述句；違反時訊息照三種理由分開寫。既有讀圖不回頭重驗（append-only），6.8 的重讀要過新規則。
-**插槽視角：** `build_socket_view` 的 `third_party` 改問 owner；客戶端原文照印，旁註「未具名供應商」。
+**插槽視角：** `build_socket_view` 的 `third_party` 改問 owner；客戶端原文照印，旁註「未具名供應商」；發布者過了 `publisher_lifts` 的引文照列、沒具名或轉述同樣旁註（§0.6 #11）。
 **計數器：** `layer_stats` 的 `ec_quote_does_not_name_supplier` 退役（新規則下結構上恆 0），換成 `corroboration_withheld: {unnamed: [...], no_name_forms: [...], relay: [...]}`（每條：邊、origin、文件——這就是 6.8 的補引文清單）＋ `ec_without_naming_quote`（逐來源口徑的違反數，應恆為 0；非 0＝bug）＋ 證據等級對 6.0 基準鍵的升降數與逐條（`evidence_vs_baseline`）。`summary_line` 改成「…｜外部印證違反 0｜沒升：未具名 a／名冊無名 b／轉述 c｜證據等級較 6.0：升 x／降 y」；結構表頁首與心跳段 3 讀同一行（L16）。
 **RA packet：** 6.2d 的副作用段補「入圖後證據等級會變的邊」（把 packet 的抽取併進當下的 rows 與逐字，用 owner 在記憶體裡算前後）。
 
@@ -393,7 +396,7 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 - **`fetch_assertions` 不得 join 逐字**（會灌大 `documents`，`query/sub_language.py::fetch_all_quotes` 的註解）；逐字另查、在 Python 端以 assertion id 對。
 - **分類的呼叫端不只一個**：`query/bottleneck.py::structure_table`（第 797 行附近，materialize 結構表用）、`query/structure.py::_classify_edges`（走圖、讀圖快照、`_load_edges`）、`verify_citations`、`build_socket_view`、`scripts/audit_sole_source_independence.py`、`intake/actions.py`（packet 的 origin 顯示）。動手前 `git grep -n "classify_evidence(\|_classify_edges(\|publisher_lifts(\|resolve_origin("` 列全，逐個改或寫明為何不改。
 - **舊計數器的口徑錯在「任何一段引文」**：它把供應商自己的引文也算成具名，所以 Sivers→CW DFB（華星光年報）漏掉。新口徑一律逐來源。
-- **「名冊無名可比」不等於「引文沒具名」**：`company_name_forms` 回空 tuple 是前者（`co:nava_thailand` 今天就是），要分開報（`quote_names_company` docstring）。
+- **「名冊無名可比」不等於「引文沒具名」**：`company_name_forms` 回空 tuple 是前者（`co:nava_thailand` 今天就是），**每個寫法都與另一家共用也是**（`usable_name_forms` 空；OpenLight 兩個代號——§0.6 #12），要分開報（`quote_names_company` docstring）。
 - **單字與兩個字母的寫法誤中風險最高**（`Apollo`、`Arista` 是單一個詞，比對分大小寫；`GF` 兩個字母）：6.3a 要對全部引文掃一次、逐筆看命中；`shared_name_forms` 只防名冊內兩家共用，防不了普通字。
 - **OpenLight 合併後的解析順序**：`company_id_for_origin` 先 ticker、再 slug（`co:openlight` 今天就是靠 slug 命中的）、再整串名字、再核心名稱；名冊刪掉 `co:openlight` 之後要靠 `name_aliases` 的整串比對解析到 canonical——測試釘住。
 - **scoped 重載會用抽取檔的節點宣告覆寫圖上的節點屬性**（`MERGE_NODE` 是 `SET`，最後載入者贏；`migrate_entity_dedup_20260904.py` 檔頭的「順帶發現」）：改 id 時節點宣告照抄圖上 canonical 的現值。
@@ -421,4 +424,8 @@ R2 回 GO 後：ROADMAP Phase 6 標 ✅、`docs/plans/README.md` 對照表本列
 4. Phase 3 closeout §5 #14（Engine C 口徑）、#15（三題 as-of 視角）照帶。
 5. 轉述偵測只套發布者（§0.3）：若之後出現公司 origin 轉述另一家公司說法的案例，再擴（L17）。
 6. 字表 v1 的轉述詞是否漏掉常見寫法（`unveiled`、`launched`、`introduced` 是事實陳述還是轉述，本 Phase 刻意不收）——要換樣本量過再改。
+   另一面（6.4 實作時發現）：`states` 會誤中「United States」（2026-10-03 真實資料 0 筆受影響；只會讓標籤變保守）——同一次量。
 7. Phase 7 候選：旁支「海外財報來源」（邊緣候選 22 檔裡 18 檔缺「已定價」的主參照）。
+8. （6.4）插槽視角：發布者過了 `publisher_lifts` 但沒具名或只是轉述的引文照列並旁註（§0.6 #11）——讀的人若覺得雜訊多，再議要不要只列撐得住的。
+9. （6.0–6.3 帶進來的，見 baseline §14、§16.3、§17.3）更正走廊 `raw_excerpt` 表頭重複；`tests/test_intake.py` 的 `forbidden_driver` 絆線可能空跑；
+   Noveon／USA Rare Earth 那兩段引文掛在 MP 的邊上是否抽取錯置；`co:apollo` 的名字寫法（「Apollo」在圖上一半是 Google 的專案代號）。

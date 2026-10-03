@@ -324,6 +324,8 @@ def check_layer_enumerations(payload: dict, *, registry=None) -> dict:
             origin = source_doc.get("origin_entity")
             # origin 解析走唯一 owner（Phase 4 Step 4.3 的 `resolve_origin`：名冊公司 → 登記的發布者 → 解析不到）。
             # 2026-10-01 Step 4.8 實跑撞到：原本只認名冊公司，登記的產業研究（GSR）在 packet 上印成「解析不到」（L16）。
+            # 這裡問的是「這份文件是誰」（顯示與 origin_role 核對），不是「它算不算外部印證」——後者只問
+            # `query.origin_resolution.corroboration`（Phase 6 Step 6.4；入圖後的證據等級預告在副作用那一節）。
             resolution = resolve_origin(origin, reg) if origin else None
             resolved = resolution.id if resolution is not None and resolution.kind == "company" else None
             origins.append({"doc_id": doc_id, "origin_entity": origin, "resolved": resolved,
@@ -720,7 +722,8 @@ def _validate_record(record: object) -> dict:
     if side_check is not None and (
             not isinstance(side_check, dict) or not isinstance(side_check.get("documents"), list)
             or not all(isinstance(d, dict) and isinstance(d.get("doc_id"), str)
-                       and d.get("status") in MERGE_SIDE_EFFECT_STATUSES for d in side_check["documents"])):
+                       and d.get("status") in MERGE_SIDE_EFFECT_STATUSES for d in side_check["documents"])
+            or not _valid_evidence_receipt(side_check.get("evidence"))):
         raise ValueError("Research Action merge side effect receipt is invalid")
 
     manifest = record.get("document_manifest")
@@ -942,19 +945,39 @@ def _render_layer_enumerations(record: dict) -> list[str]:
     return lines
 
 
+def _valid_evidence_receipt(evidence: object) -> bool:
+    """`merge_side_effect_check.evidence`（Phase 6 Step 6.4）：缺＝舊紀錄（合法）；有就要形狀對。"""
+    if evidence is None:
+        return True
+    if not isinstance(evidence, dict) or evidence.get("status") not in MERGE_SIDE_EFFECT_STATUSES:
+        return False
+    if evidence["status"] != "checked":
+        return True
+    changes = evidence.get("changes")
+    return isinstance(changes, list) and all(
+        isinstance(c, dict) and isinstance(c.get("edge"), list) and len(c["edge"]) == 3
+        and isinstance(c.get("after"), str) and (c.get("before") is None or isinstance(c.get("before"), str))
+        and isinstance(c.get("after_withheld"), list) for c in changes)
+
+
 def _render_merge_side_effects(record: dict) -> list[str]:
-    """packet 的「入圖副作用」一節（Phase 6 Step 6.2d）：入圖時會改到圖上哪些**既有**值。沒有收據就整節不印（舊紀錄 render 不變）。"""
+    """packet 的「入圖副作用」一節（Phase 6 Step 6.2d）：入圖時會改到圖上哪些**既有**值。沒有收據就整節不印（舊紀錄 render 不變）。
+    Phase 6 Step 6.4 起多印「入圖後證據等級會變的邊」（收據沒有 `evidence` 的舊紀錄不印這一段）。"""
 
     check = record.get("merge_side_effect_check")
     if not check:
         return []
-    from loader.merge_side_effects import render_lines
+    from loader.merge_side_effects import evidence_lines, render_lines
 
     lines = ["", "## 入圖副作用（prepare 當下對圖核對；只印、不放閘）", ""]
     for document in check.get("documents") or []:
         lines.extend(render_lines(document, doc_id=document.get("doc_id")))
+    lines.extend(evidence_lines(check.get("evidence")))
     lines.append("- 「會被覆寫」＝載入時以本包的節點宣告／SourceDoc 欄位直接 SET 圖上既有值（最後載入者贏）；"
                  "讀不到圖時印「副作用無法核對」，不是「無副作用」。")
+    if check.get("evidence") is not None:
+        lines.append("- 證據等級預告＝本包照 loader 的 MERGE 語意併進當下的圖，用分類的唯一 owner 前後各算一次"
+                     "（逐來源具名＋轉述）；它是預告，入圖後以真的圖重算為準。")
     return lines
 
 

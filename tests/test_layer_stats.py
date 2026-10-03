@@ -2,7 +2,8 @@
 
 夾具：凍結集合 {mat:x, mat:y, mat:gone}；mat:x 只有 Alpha 一家且只有它自己說（①）；mat:y 有 Alpha／Beta／Gamma 三家，
 一份 TrendForce 報告逐字列舉三家（②），一篇解析不到的部落格另列兩家（不算、但計數）；tech:new 是集合外的新節點，
-掛兩筆 Phase 內新增的帶 sub assertion（③b）；Beta→Customer 是外部印證但引文沒點名 Beta（附屬）。
+掛兩筆 Phase 內新增的帶 sub assertion（③b）。附屬（Phase 6 Step 6.4）：Beta→Customer 的客戶引文沒點名 Beta（`unnamed`）、
+TrendForce 對 Alpha→mat:v 只是轉述句（`relay`）、Anon 在名冊沒有任何寫法（`no_name_forms`）——三條都沒升外部印證。
 """
 from __future__ import annotations
 
@@ -12,9 +13,9 @@ from pathlib import Path
 import pytest
 
 from query.bottleneck import classify_evidence, collapse_assertions
-from query.layer_stats import (BASELINE_KEY, BASELINES_PATH, CONTENT_BASELINE_KEY, assertion_content_digest,
-                               compute_layer_stats, content_digests, load_baseline, load_content_baseline,
-                               summary_line)
+from query.layer_stats import (BASELINE_KEY, BASELINES_PATH, CONTENT_BASELINE_KEY, EVIDENCE_BASELINE_KEY,
+                               assertion_content_digest, compute_layer_stats, content_digests, load_baseline,
+                               load_content_baseline, load_evidence_baseline, summary_line)
 from query.origin_resolution import PUBLISHER_KINDS, load_publishers
 from query.sub_language import SubLanguage
 
@@ -30,7 +31,8 @@ class _Registry:
     def __init__(self):
         self._c = {c.company_id: c for c in (
             _Company("co:a", "Alpha Corp", "Alpha"), _Company("co:b", "Beta Inc.", "Beta"),
-            _Company("co:c", "Gamma Ltd.", "Gamma"), _Company("co:cust", "Customer Co"))}
+            _Company("co:c", "Gamma Ltd.", "Gamma"), _Company("co:cust", "Customer Co"),
+            _Company("co:anon", None))}
 
     @property
     def companies(self):
@@ -62,6 +64,8 @@ ROWS = [
     _row("r7", "co:a", "tech:new", "Alpha Corp", "d_a2", sub=2),
     _row("r8", "co:b", "co:cust", "Customer Co", "d_cust"),
     _row("r9", "co:c", "mat:w", "TrendForce", "d_tf_w"),      # 只有一家、但有第三方印證 → 不算 ①
+    _row("r10", "co:a", "mat:v", "TrendForce", "d_tf_v"),     # 第三方只是轉述 Alpha 的話（不在層節點清單）
+    _row("r11", "co:anon", "mat:u", "Customer Co", "d_cust_u"),   # 名冊沒有 Anon 的任何寫法
 ]
 QUOTES = {
     "r1": ["Alpha is the sole supplier of X substrates"],
@@ -73,6 +77,8 @@ QUOTES = {
     "r7": ["Alpha ships the new part"],
     "r8": ["We buy wafers from a Korean vendor"],
     "r9": ["Gamma supplies W to every module maker"],
+    "r10": ["Alpha announced a second V line"],
+    "r11": ["We buy U parts from a startup"],
 }
 BASELINE = {"frozen_nodes": frozenset({"mat:x", "mat:y", "mat:w", "mat:gone"}),
             "frozen_assertions": frozenset({"r1", "r2", "r3", "r4", "r5", "r8", "r9"}),
@@ -88,13 +94,18 @@ def stats(tmp_path: Path) -> dict:
         "publishers": [{"origin": "TrendForce", "kind": "industry_research", "corroborates": True, "seen_in": "d_tf"}],
     }), encoding="utf-8")
     pubs, reg = load_publishers(path), _Registry()
-    edges = list(collapse_assertions(ROWS).values())
-    for edge in edges:
-        edge.evidence = classify_evidence(edge.src, edge.origins, reg, filing_origins=edge.filing_origins,
-                                          origin_linkages=edge.origin_linkages, publishers=pubs)
-    return compute_layer_stats(edges=edges, rows=ROWS, quotes_by_assertion=QUOTES,
+    return compute_layer_stats(edges=_classified(ROWS, QUOTES, reg, pubs), rows=ROWS, quotes_by_assertion=QUOTES,
                                layer_nodes=LAYER_NODES, baseline=BASELINE, registry=reg,
                                language=LANG, publishers=pubs)
+
+
+def _classified(rows, quotes, reg, pubs):
+    edges = list(collapse_assertions(rows).values())
+    for edge in edges:
+        edge.evidence = classify_evidence(edge.src, edge.origins, reg, filing_origins=edge.filing_origins,
+                                          quotes_by_assertion=quotes, origin_assertions=edge.origin_assertions,
+                                          publishers=pubs)
+    return edges
 
 
 def test_one_supply_distribution_over_the_frozen_set(stats) -> None:
@@ -144,18 +155,74 @@ def test_three_splits_stock_from_new_sub_assertions(stats) -> None:
     assert (sub["new_n"], sub["new_supported"], sub["new_unsupported"]) == (2, 1, ["r7"])
 
 
-def test_corroborated_edges_whose_quote_never_names_the_supplier_are_listed(stats) -> None:
-    assert stats["ec_quote_does_not_name_supplier"] == ["co:b supplies_to co:cust"]
+def test_edges_that_did_not_rise_are_listed_by_reason_with_their_documents(stats) -> None:
+    """Phase 6 Step 6.4：沒升外部印證的邊依理由分三格（補救不同，不得壓成一格——L12），每條帶 origin 與文件。
+    取代 2026-10-03 退役的 `ec_quote_does_not_name_supplier`（口徑「任何一段引文具名」，連供應商自己的也算）。"""
+    withheld = stats["corroboration_withheld"]
+    assert [(i["edge"], i["origin"], i["docs"], i["evidence"]) for i in withheld["unnamed"]] == [
+        ("co:b supplies_to co:cust", "Customer Co", ["d_cust"], "needs_review")]
+    assert [(i["edge"], i["origin"], i["relay_terms"]) for i in withheld["relay"]] == [
+        ("co:a supplies_to mat:v", "TrendForce", ["announced"])]
+    assert [(i["edge"], i["origin"]) for i in withheld["no_name_forms"]] == [("co:anon supplies_to mat:u", "Customer Co")]
+    assert "ec_quote_does_not_name_supplier" not in stats
+    assert stats["ec_without_naming_quote"] == []
+
+
+def test_the_violation_counter_catches_a_corroboration_label_the_quotes_do_not_support(tmp_path: Path) -> None:
+    """gate 本身也要驗（L14-2）：計數器不經 owner、直接重算——一條被誤標成外部印證、引文卻沒具名主詞的邊必須被抓到。"""
+    reg = _Registry()
+    pubs = load_publishers(_empty_publishers(tmp_path))
+    edges = _classified(ROWS, QUOTES, reg, pubs)
+    for edge in edges:
+        if (edge.src, edge.dst) == ("co:b", "co:cust"):
+            edge.evidence = "externally_corroborated"                 # 模擬一個沒走 owner 的消費端
+    out = compute_layer_stats(edges=edges, rows=ROWS, quotes_by_assertion=QUOTES, layer_nodes=LAYER_NODES,
+                              baseline=BASELINE, registry=reg, language=LANG, publishers=pubs)
+    assert out["ec_without_naming_quote"] == ["co:b supplies_to co:cust"]
+    assert "外部印證違反 1" in summary_line(out)
+
+
+def test_evidence_changes_against_the_frozen_baseline_are_listed_edge_by_edge(tmp_path: Path) -> None:
+    reg = _Registry()
+    pubs = load_publishers(_empty_publishers(tmp_path))
+    edges = _classified(ROWS, QUOTES, reg, pubs)
+    now = {f"{e.src} {e.relation} {e.dst}": e.evidence for e in edges}
+    baseline = dict(now)
+    baseline["co:b supplies_to co:cust"] = "externally_corroborated"           # 現在待判定 → 降
+    baseline["co:b supplies_to mat:y"] = "media_relay"                         # 現在待判定 → 同級互換
+    baseline["co:c supplies_to mat:w"] = "self_reported"                       # 現在待判定（publishers 空）→ 升
+    baseline["co:z supplies_to mat:gone"] = "self_reported"                    # 不在了
+    del baseline["co:a supplies_to mat:v"]                                     # 新邊
+    out = compute_layer_stats(edges=edges, rows=ROWS, quotes_by_assertion=QUOTES, layer_nodes=LAYER_NODES,
+                              baseline=BASELINE, registry=reg, language=LANG, publishers=pubs,
+                              evidence_baseline=baseline)
+    vs = out["evidence_vs_baseline"]
+    assert vs["down"] == [{"edge": "co:b supplies_to co:cust", "from": "externally_corroborated", "to": "needs_review"}]
+    assert vs["same_rank"] == [{"edge": "co:b supplies_to mat:y", "from": "media_relay", "to": "needs_review"}]
+    assert [c["edge"] for c in vs["up"]] == ["co:c supplies_to mat:w"]
+    assert vs["new"] == [{"edge": "co:a supplies_to mat:v", "to": now["co:a supplies_to mat:v"]}]
+    assert vs["gone"] == [{"edge": "co:z supplies_to mat:gone", "from": "self_reported"}]
+    assert out["evidence_baseline"] == EVIDENCE_BASELINE_KEY
+    assert "證據等級較 6.0：升 1／降 1／同級互換 1（新邊 1、不在了 1）" in summary_line(out)
+
+
+def test_the_real_evidence_baseline_is_the_frozen_6_0_key() -> None:
+    """正式檔：6.0 凍結鍵讀得到、是 537 條 canonical 邊（[666] 之後、改規則之前；baseline 報告 §0）。"""
+    classes = load_evidence_baseline()
+    assert classes is not None and len(classes) == 537
+    assert sum(1 for v in classes.values() if v == "externally_corroborated") == 250
 
 
 def test_summary_line_prints_every_number_and_absence_is_not_zero(stats) -> None:
     line = summary_line(stats)
     for fragment in ("①獨家且全自報 1", "集合外新節點 1", "②非供應商來源列舉 ≥2 家 1 層", "≥3 家母體 1", "每家撐住 1",
                      "origin 解析不到的來源 1", "③a sub 引文不含可替代性語言 1／2", "③b 新增帶 sub supported 1／2",
-                     "外部印證但引文不具名供應商 1", "字表 v1·test"):
+                     "外部印證違反 0", "沒升外部印證：未具名 1／名冊無名 1／轉述 1", "轉述字表 v1·base", "字表 v1·test"):
         assert fragment in line, fragment
     # 夾具沒給內容基準：重寫那一格量不到——印缺席，不印 0（INV-3）。
     assert stats["sub_language"]["superseded_n"] is None and "重寫量不到（沒有內容基準，不是 0）" in line
+    # 夾具沒給證據基準：同樣印缺席，不印「升 0／降 0」
+    assert stats["evidence_vs_baseline"] is None and "證據等級較 6.0：基準讀不到（不是 0）" in line
     assert "不是 0" in summary_line(None)
     assert "不是 0" in summary_line({"absence": {"kind": "upstream_unavailable", "reason": "基準讀不到"}})
 
