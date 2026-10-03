@@ -272,3 +272,30 @@ def test_heartbeat_prints_one_line_and_three_absences_never_zero(tmp_path) -> No
                                  leads_path=tmp_path / "none.json", thesis_path=tmp_path / "none.json",
                                  run_record_path=None, capture_dir=None)
     assert (values["predictions.held"], values["predictions.wrong"], values["predictions.expired_unread"]) == (1, 3, 0)
+
+
+def test_rule_one_same_digest_rewrite_needs_the_same_kind_or_the_same_day() -> None:
+    """①（Phase 6 Step 6.7d；使用者 10-02 原句「同 digest 的同日改寫」）：同 digest 的後繼只有同 kind 或同一天才是改寫。
+
+    圖沒變（digest 相同）、隔天以後卻換了讀法——沒有新的圖可以怪，是讀法自己翻了 → reversed（沒有新來源＝undated）。
+    改前這三條全部是 rewritten：第一條就是「錯被算成改寫」的洞。
+    """
+    next_day = [
+        _reading("sr_r1", "mat:r", "moat", "2026-09-20", "2026-12-20", digest="r1", cites=["doc_a"]),
+        _reading("sr_r2", "mat:r", "volume", "2026-09-21", "2026-12-20", digest="r1", cites=["doc_a"],
+                 supersedes="sr_r1"),
+    ]
+    same_day = [
+        _reading("sr_s1", "mat:s", "moat", "2026-09-20", "2026-12-20", digest="s1", cites=["doc_a"]),
+        _reading("sr_s2", "mat:s", "volume", "2026-09-20", "2026-12-20", digest="s1", cites=["doc_a"],
+                 supersedes="sr_s1"),
+    ]
+    same_kind = [
+        _reading("sr_t1", "mat:t", "volume", "2026-09-20", "2026-12-20", digest="t1", cites=["doc_a"]),
+        _reading("sr_t2", "mat:t", "volume", "2026-09-25", "2026-12-20", digest="t1", cites=["doc_a"],
+                 supersedes="sr_t1"),
+    ]
+    got = _outcomes(_table(next_day, same_day, same_kind))
+    assert got["sr_r1"] == ("reversed", "undated")       # 圖沒變、隔天換了讀法：讀法自己翻了
+    assert got["sr_s1"] == ("rewritten", None)           # 同一天內換讀法：研究當下的更正
+    assert got["sr_t1"] == ("rewritten", None)           # 圖沒變、同讀法、隔幾天：改寫

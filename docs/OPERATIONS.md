@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7d：預測表改寫規則①）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize 讀圖 artifact 的 `predictions`：只改一個判定分支（同 `result_digest` 的後繼要**同 kind 或同一天**才算改寫，否則落到 reversed）；讀取、寫入、查詢都不變 |
+| **2 canonical skill／prompt／本檔** | 本節；規則全文住 `alpha/structure_reading/predictions.py` 模組 docstring。skill／prompt 不描述預測表終局——不改 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由 |
+| **4 contract test** | `tests/test_reading_predictions.py::test_rule_one_same_digest_rewrite_needs_the_same_kind_or_the_same_day`（同 digest 不同 kind 隔日＝reversed、同日＝改寫、同 kind 隔日＝改寫）；變異兩個全紅 |
+| **5 端到端 smoke** | 真實讀圖 ledger（同一個 process，git HEAD 規則 vs 新規則）：15 筆終局逐筆相同、受影響 0；計數＝對 0／錯 0／改寫 9／現行 2／非斷言 4，與 Phase 5 結案相同 |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7c：排除未收盤 K 棒）
 
 | 步 | 結論 |

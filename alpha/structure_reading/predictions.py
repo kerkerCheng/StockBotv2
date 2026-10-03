@@ -17,6 +17,8 @@ staleness 的 `supply_added`、`documents` 增加、任何 LLM 判讀**都不是
 `result_digest` 會因為**查詢程式改版**而變（需求走訪加 constrained_by、證據欄修正、反向路徑只收 competes_with），
 不只因為圖變了。所以同 kind 的後繼必須**同一版 schema、帶來 r 沒引用過的來源**才算「圖有變」→ 對；否則是改寫。
 `new_sources` 與「錯的種類」用同一支（一個 owner）。
+① 同 `result_digest` 的後繼只有在**同 kind 或同一天**時算改寫（2026-10-03 Phase 6 Step 6.7d；使用者 10-02 原句「同 digest 的同日改寫」）：
+圖沒變、隔天以後換了讀法＝讀法自己翻了 → reversed（錯）；同一天內換讀法是研究當下的更正 → 改寫。
 
 ## 錯的種類
 
@@ -180,7 +182,10 @@ def _row(reading: StructureReading, records: Sequence[StructureReading], *, toda
         elif successor.created_on > reading.expires:
             # 到期之後才重讀：同讀法＝對（已到期＝對，定案 #3）、不同讀法＝錯；不再問 digest 或新來源
             row["outcome"] = "held" if successor.kind == reading.kind else "reversed"
-        elif successor.result_digest == reading.result_digest:
+        elif successor.result_digest == reading.result_digest and (
+                successor.kind == reading.kind or successor.created_on == reading.created_on):
+            # ①（Phase 6 Step 6.7d；使用者 10-02 原句「同 digest 的同日改寫」）：圖一樣、讀法也一樣，或同一天內改寫＝改寫；
+            # 圖一樣、隔天以後卻換了讀法——沒有新的圖可以怪，是讀法自己翻了——不在這裡收，落到下面的 reversed
             row["outcome"] = "rewritten"
         elif successor.kind == reading.kind:
             # 同讀法：只有同一版 schema、帶來新來源才算「圖有變」（5.0 修正）；否則查法改版或補寫＝改寫

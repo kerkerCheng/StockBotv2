@@ -660,3 +660,11 @@ owner：`alpha/providers/close_series.py::bar_state`／`closed_points`——最�
 
 - 測試 `tests/test_closing_bars.py` 15 條；變異五個全紅（永遠不拿掉、用台北的今天、沒有交易時段當已收盤、追蹤表不收狀態、計分表不收狀態）。
 - `tests/test_measurement_full_chain.py` 一處假取價函式的簽名多收 `states=None`（照新契約；斷言不動）。
+
+### 21d. 預測表改寫規則①（Phase 5 #18）
+
+`alpha/structure_reading/predictions.py::_row`：同 `result_digest` 的後繼原本一律算「改寫」；改成**同 kind 或同一天**才算（使用者 10-02 原句「同 digest 的同日改寫」）。
+圖沒變、隔天以後換了讀法 → 落到 reversed（沒有新來源＝`undated`）——改前這種「讀法自己翻了」會被算成改寫、不進錯的計數。
+真實 ledger（同一個 process，git HEAD 規則 vs 新規則；scratchpad `p67d_ab.py`）：**15 筆終局逐筆相同、受影響 0**；計數＝對 0／錯 0／改寫 9／現行 2／非斷言 4，
+與 Phase 5 結案（closeout ②）相同。
+- 測試：`tests/test_reading_predictions.py` 多 1 條（同 digest 不同 kind 隔日＝reversed、同日＝改寫、同 kind 隔日＝改寫）；變異兩個全紅（退回只看 digest、只認同 kind 不認同日）。
