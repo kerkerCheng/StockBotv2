@@ -122,7 +122,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 6.4 | 分類規則：逐來源具名＋轉述字表（唯一 owner `corroboration`）、所有消費端改走它、計數器改口徑、packet 印「入圖後證據等級會變的邊」；真實圖外部印證 250 → 230（升 2〔6.3c〕、降 22〔6.3b GSR 3＋規則 19：未具名 13／名冊無名 4／轉述 2〕）、違反 0、①73 → 77（與 §0.2 預測相同）；[670] hint 依新規則更新（baseline §18；偏差 §0.6 #10–#12） | ✅ | 執行模型 | 見 git log「Step 6.4」 |
 | 6.5 | sub 旗標跟著值走到消費端（不進 digest）：贏得 sub 值那一筆的旗標印在結構表、五個角度的邊、走圖第 1 型、「替代難度」旁註；4 份現行讀圖 status 與 digest 改前改後逐位相同；真實結構表 66 列帶 sub（撐得住 9／撐不住 57）（baseline §19） | ✅ | 執行模型 | 見 git log「Step 6.5」 |
 | 6.6 | 稀釋燈只認募資文件（EDGAR 申報清單、新表、sandbox impact review）：真實 11 檔黃 → 10（LRCX 轉灰）、每盞黃燈指得出窗內一份募資文件；daily 請求數不變；R2-b CONDITIONAL_GO（已知限制漏寫 MRVL 的兩份公司債說明書）→ 條件修正 → 窄範圍覆核 GO（baseline §20；偏差 §0.6 #13–#15；待決 §14 #10） | ✅ | 執行模型 | 見 git log「Step 6.6」 |
-| 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則 | ○ | 執行模型 | |
+| 6.7 | 小修：結構表逐列錨、APP 自偵舊程式、排除未收盤 K 棒、預測表改寫規則①、本機 ask 規則——a 有錨 211 → 213（改前有錨改後沒錨 0；Lam 9 列 6 列逐列、3 列公司層；「公司層」跟著錨走到個股頁）；b 頁面頂端「請重啟」橫幅（headless Edge 三種情況）；c 盤中 K 棒拿掉並計數（同一份價格上追蹤表逐欄相同、計分表只差時間戳記）；d 真實 15 筆預測終局不變；e ask 16 條（下一次跑請使用者確認會被問）（baseline §21；偏差 §0.6 #16–#17） | ✅ | 執行模型 | 見 git log「Step 6.7」 |
 | 6.8 | 研究（強模型）：補具名引文（RA，pq2）、重讀 stale 的讀圖、四檔敘事換版或不換版理由（收據 `docs/reports/2026-10-xx-phase6-step68-research.md`） | ○ | 執行模型 | |
 | 6.9 | 新管線 full chain 測試（證據鏈與稀釋燈鏈） | ○ | 執行模型 | |
 | 結案 | completion gate ＋ closeout ＋ R2 ＋ ROADMAP ✅ | ○ | 執行模型 | |
@@ -155,6 +155,7 @@ derived_from: docs/ROADMAP.md（Phase 6 列；本 plan §0.4 amendment A1 新增
 | 14 | 6.6 | 灰燈理由「只有發行金額、窗內沒有募資文件（S-8 員工計畫不算募資）」 | 「只有發行金額、窗內沒有募資文件——員工計畫登記與增資授權不算募資（窗內有哪些申報在稽核層）」；黃燈理由同樣不帶表單代號與日期 | 既有契約 D2「紅黃綠不給數字」：理由句不得帶數字（`tests/test_wipeout_flags.py::test_lamp_reasons_do_not_leak_company_numbers`）——「S-8」「424B5」與申報日都帶數字；代號與日期改住稽核層的 inputs |
 | 15 | 6.6（R2-b CONDITIONAL_GO） | （未提） | C1：已知限制補 MRVL（424B5 `0001193125-26-142958`、424B2 `0001193125-26-147640` 是 Senior Notes）——`_DILUTION_RULE`、baseline §20、§14 #10 三處。C2（可選，照做）：規則文字的表單清單補「8-K（含 8-K/A）」與 S-8 POS、S-3／F-3 家族的 /A、ASR、MEF 變體 | C1：初版的「已知限制」只寫手核過的 NVDA、META，MRVL 的 424B5／424B2 沒讀封面就沒寫——自己引用的限制要套同一套追源紀律（L11-2）；判色不變（MRVL 另有 8-K 3.02 ×4 與 424B7）。C2：文字寫的比程式少，讀規則的人會以為 8-K/A 不算。兩項都只動文字，不動判定；窄範圍覆核（乾淨 context）見進度表 |
 | 16 | 6.7a（影響結案 §12 第 3 項） | 改哪裡：`structure_table`、APP 結構表頁、心跳「前三錨」 | 另把 `anchor_basis` 帶到 alpha provider（`ScarcityInputs.demand_anchor_basis`、邊表）、個股頁「需求錨點／距需求端跳數」旁註與邊表「（公司層）」、session assessor 的輸入；心跳那一行多「公司層 N 列」（舊 artifact 印「錨是公司側」） | 列上的 `demand_anchor` 一改成逐列，凡是印它的地方都承載兩種問題——只改 plan 列的三處，個股頁的同一格就是 L12 的形狀（L16：分類跟著資料走）。實測 provider 同公司順序只有 GFS 變、Q1 取到的邊 0 家變，但 Q1 那條邊的錨 3 家、跳數 9 家會變——**結案的個股頁逐檔歸因多一個來源「6.7a 逐列錨」**（AXTI、COHR 的稽核區兩格；baseline §21a） |
+| 17 | 6.7c | owner 讓「追蹤表兩支與計分表一支共用」 | 另接上追蹤表的**第三支** `_benchmark_series`（基準）與 owner 自己的 `fetch_close_series`（走勢折線、事件監控）；計數住 `price_budget.closing_bars`（追蹤表、計分表、APP 兩頁有才印）；`fetch_close_series` 的 `today` 參數（沒有呼叫端用）換成 `now`／`states` | 基準是對稱面（L17）：歐股收盤後、美股盤中時，指數的當日值同樣是進行中的，拿它算超額會把半天的漲跌當終點；`fetch_close_series` 原本「丟日期＝台北今天那根」是同一個問題的第二套規則——同一個模組留兩套「收盤了沒」就是 dual authority，而且美股盤中的當日 K 棒日期是美東昨天、舊規則照樣放行。daily 05:30 各市場都已收盤，同一份價格上追蹤表逐欄相同、計分表只差時間戳記（baseline §21c） |
 
 ---
 

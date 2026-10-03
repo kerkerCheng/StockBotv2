@@ -668,3 +668,12 @@ owner：`alpha/providers/close_series.py::bar_state`／`closed_points`——最�
 真實 ledger（同一個 process，git HEAD 規則 vs 新規則；scratchpad `p67d_ab.py`）：**15 筆終局逐筆相同、受影響 0**；計數＝對 0／錯 0／改寫 9／現行 2／非斷言 4，
 與 Phase 5 結案（closeout ②）相同。
 - 測試：`tests/test_reading_predictions.py` 多 1 條（同 digest 不同 kind 隔日＝reversed、同日＝改寫、同 kind 隔日＝改寫）；變異兩個全紅（退回只看 digest、只認同 kind 不認同日）。
+
+### 21e. 本機 ask 規則（Phase 5 #14）
+
+`.claude/settings.local.json`（gitignored；照 update-config skill：先讀、合併、不換掉既有陣列）多一段 `permissions.ask` **16 條**：
+`scripts/record_trade.py` 與 `scripts/apply_ra_admission.py` × Bash（`python`、`.venv/Scripts/python.exe`）與 PowerShell（`python`、
+`.venv\Scripts\python.exe`、文件裡的呼叫運算子寫法 `& '.venv\Scripts\python.exe' …`，正反斜線各一）。allow 52 條一條不動（`Bash(python *)` 照留）。
+- 優先序的依據：skill 的 schema 對 `permissions.ask` 的定義是「List of permission rules that should **always** prompt for confirmation」——即使 allow 命中也照問，所以不必刪 `Bash(python *)`。
+- 不影響 daily 的保險檢查：`crons/daily_task.py` 比的是同一輪每個 LLM 步驟前後的 sha256，不是存檔基準。
+- **待使用者確認**：下一次真的跑這兩支腳本時會不會被問（auto mode 與設定重新載入的行為以實際為準）。
