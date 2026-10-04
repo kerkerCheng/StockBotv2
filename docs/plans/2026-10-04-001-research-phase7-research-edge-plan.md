@@ -126,7 +126,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ✅（五題對照唯一一份 `FIRST_SCREEN_QUESTIONS` 經 `.meta.json`、app.js 不留第二份；`shared_bet` 只呈現、依 ticker 字母列、缺席分型由產生端宣告；改前改後各 materialize 76 頁——拿掉新欄位、時間戳與價格脈絡後 76/76 逐字相同、`freshness_identity` 76/76 相同；Edge 實點四頁五題 5/5、COHR 與 SIVE.ST 互列 CW DFB 層；變異六個紅；偏差 #13–#14） | 執行模型 | 見 git log「Step 7.0e」 |
 | 7.0f | 外部雷達：daily 只開 WebSearch 的 LLM 步驟、八週試驗（R2-b；sandbox impact review） | ✅（探針：不放行時 WebSearch 被拒、卻回 `is_error: false`＋空結果→一律判失敗；最窄放行＝`permissions.allow`；雷達 init 與零工具那份只差 `tools`；daily ①b–①e、`radar.enabled`（沒有那一段＝關閉）；網址必須出自同一次搜尋〔程式從 stream 收〕、去重且已登記的不碰、每日 5 則、secondary、不喚醒語意 watch；triage 批次雷達排最後〔偏差 #16〕；真資料試跑：搜尋 16 次、148 網址、提議 0；變異八個紅；**R2-b GO**〔11 種網址變體無一繞過、找不到多拿能力的路徑、prompt 無持股〕；偏差 #15–#18；**第一輪真實排程 2026-10-05 05:30——看心跳段 3 那一行與 `radar_2026-10-05.json`（ROADMAP 驗收⑦）**） | 執行模型 | 見 git log「Step 7.0f」 |
 | 7.1 | Wave 1 研究（約 4 週）：積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 | ○ | 強模型 | |
-| 7.2 | 回放：R1 已定價、R3 漏網稽核（機械）；R2 parked 回查、R4 輸家驗屍（研究） | ○ | 執行模型（R1、R3）＋強模型（R2、R4） | |
+| 7.2 | 回放：R1 已定價、R3 漏網稽核（機械）；R2 parked 回查、R4 輸家驗屍（研究） | ✅（四份 `docs/reports/phase7/replay-*.md`，產生程式碼逐字附錄、偏差標註齊全。R1：124 格有值 10、PIT 違規 0，H9 兩個子群都「不足」（#12 價格歷史深度）；R3 第一窗：Q3 前四分之一逐檔有 `first_seen` 或「沒有接觸」（#13 名冊新增後 lead 身分不重掃；第二窗在 7.5）；R2：36 則證實 1（CCXI S-4）、H2 的 X2 部分「不足」、與 P3 合併判（#15 park 等的東西出現了卻沒接回；「無法判」「不適用」兩類是回查時加的，報告已註明不影響判讀）；R4：五檔全部「證據不足以判」（#14 反證做成被評公司的供貨邊）） | 執行模型（R1、R3）＋強模型（R2、R4） | 見 git log「Step 7.2」 |
 | 7.3 | 中迴路裁決（Q3 財報季；到點插隊）：AXTI、COHR、LITE、SIVE.ST＋新鏈有裁決點的 | ○ | 強模型 | |
 | 7.4 | Wave 2 研究（約 4–6 週）：二階瓶頸三個 case、800VDC 回看、依 failure log 選題 | ○ | 強模型 | |
 | 7.5 | 檢查點（2026-12-22）：決定紀錄 §10＋假說證據帳＋failure log 排序＋雷達停止條件＋T1 manifest＋R2＋下一期 | ○ | 執行模型＋強模型 | |
