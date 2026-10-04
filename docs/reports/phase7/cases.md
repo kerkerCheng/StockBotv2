@@ -184,6 +184,7 @@
 
 - 登記：registration §2 P3（開題 2026-10-04）
 - 研究產出：（尚無）
+  - 2026-10-04｜（給 7.4 的指向，不是裁決）NVIDIA 部落格「NVIDIA, Partners Drive Next-Gen Efficient Gigawatt AI Factories in Buildup for Vera Rubin」（blogs.nvidia.com，2025 OCP）逐字列 800 VDC 夥伴——silicon：ADI、AOS、EPC、Infineon、Innoscience、MPS、Navitas、onsemi、Power Integrations、Renesas、Richtek、ROHM、STMicroelectronics、Texas Instruments；power system components：BizLink、Delta、Flex、GE Vernova、Lead Wealth、LITEON、Megmeet；data center power systems：ABB、Eaton、GE Vernova、Heron Power、Hitachi Energy、Mitsubishi Electric、Schneider Electric、Siemens、Vertiv。是客戶端（平台方）的生態名單——對五則的 park 理由（例：「ecosystem membership is not a supply contract」）正好是那個理由描述的東西，回看時要分清「名單」與「供貨」
 - 逐則（park 理由今天站不站得住；H2 的「證實」定義）：（尚無）
 - failure log：（尚無）
 
@@ -198,6 +199,8 @@
   - 2026-10-04｜使用者 go：[690] 入圖（intake commit `32d81f4a`）
   - 2026-10-04｜pq1 drain 冷板題 lead_5b8cc7e2 → `ra_cfa47fbc9d74f2a53ba98c1c86b01d1d` → pq2 **[693]**：**NVIDIA 自己的 COMPUTEX 2024 新聞稿（客戶端）**點名散熱夥伴並刊出高管引言——AVC「providing efficient cooling for its AI hardware」→ AVC supplies_to NVIDIA；Danfoss「high-performance quick disconnect … couplings」→ 快接頭層（新節點）；Dover 的 CPC「connector technology … liquid-cooled NVIDIA GPUs」→ Dover supplies_to NVIDIA；健策 2026-05-29 自述 GPU／CPU cold plates、liquid distribution manifolds → 冷板層、manifold（新節點）。名冊四筆隨包（奇鋐 3017.TW、健策 3653.TW、Danfoss null、Dover DOV）。**邊緣判定（yfinance 2026-10-04）：冷板層被點名的都不是邊緣**——健策約新台幣 1.0 兆／11 位、奇鋐約 1.35 兆／17 位、台達約 4.9 兆、Dover 約 255 億美元；第二線富世達（快接頭，約 1,580 億／9 位）、高力（CDU，約 1,400 億／7 位）是邊緣，留給快接頭、CDU 兩題。Digitimes 說 NVIDIA 在 GTC 2026 點名四家 Vera Rubin 冷板供應商（AVC、Cooler Master、健策、台達）——NVIDIA 原文找不到，只當媒體轉述
   - 2026-10-04｜pq1 drain manifold 題 lead_1345d45b → `ra_c0a5eac2241398fb6b4418a57db8e88b` → pq2 **[694]**：NVIDIA 技術部落格 2025-05-16（MGX）——`co:nvidia depends_on` 冷板、manifold、快接頭三層（需求側第一次有真正的客戶），**並逐字說「Diverse sourcing options within the MGX ecosystem … avoiding vendor lock-in … a broad array of certified components」**：客戶自己刻意多源——**C1 登記的 failure mode（快接頭／冷板是競爭層的先入為主）第一次有客戶端原文支持，不是只靠開放規格目錄**；它同時意味這三層的倍率不靠護城河，只能靠量（讀圖時照實寫）
+  - 2026-10-04｜pq1 drain 快接頭題 lead_6698f145 → `ra_ee1d0eef3fd7e0d3f03c02aa1ef632cd` → pq2 **[695]**：**富世達（6805.TW，邊緣：約新台幣 1,580 億、9 位）**2025 年報（MOPS，2026-05-07）自述 UQD「通過水冷供應認證並切入 GB200/GB300」、「冷水板+UQD」切入北美四大 CSP、「已通過 Rubin 測試並挑戰國際大廠壟斷地位」；伺服器產品組件營收 5.31% → 36.29%（含滑軌，快接頭占比未揭露）；集團母公司奇鋐（e2）。題目要找的反例（NVIDIA 指定盲插件只有少數幾家通過）**沒找到客戶端一手**——供應商說既有國際大廠寡占、NVIDIA 說刻意多源，形狀是少數認證廠＋新進者；折疊手機轉軸仍占 56%，快接頭不是主業（進主題組前要先判斷）
+  - 2026-10-04｜pq1 drain CDU 題 lead_f96bfb99 → `ra_7601b10717ea4855869caeb026e380c6` → pq2 **[696]**：**高力（8996.TW，邊緣：約新台幣 1,400 億、7 位）**2025 年報（股東會後修訂本，MOPS 2026-08-06）自述液冷「分岐管和冷卻液分配裝置，成功攻入 GB200 供應鏈名單」、子公司高力熱能科技「積極投入高效能 Manifold、CDU、Radiator…並透過取得主要客戶之產品認證」（認證仍在進行，所以 qualification 不填）；分歧管改真空爐硬焊「能突破產能瓶頸」；合併營業比重板式熱交換器 26.28%、熱能產品 73.72%（液冷與燃料電池零件沒拆開——燃料電池那塊年報說受惠美國電力市場，是另一條 AI 電力題）。至此 C1 的四個 decompose 題都到終局（[693]–[696] 待核准），散熱兩層讀圖等這幾包入圖後再寫
   - 2026-10-04｜讀圖**刻意延後**：`tech:coolant_distribution_unit`、`tech:liquid_cooling_cold_plate` 兩層各只有 1 條需求接線與 1 條供貨（CoolIT，非上市），現在寫只會是空的 undecided——為了驗收①的計數補格子正是 L19 的形狀。等 lead_f96bfb99（CDU）／lead_5b8cc7e2（冷板）的供給側研究有實料再讀；驗收①的散熱這一條目前未成立
   - 主題等權組：還沒定——組員要能在名冊解析（INV-1），台股散熱公司目前 0 家在名冊；組員等選源找出各層坐了誰再定（仍早於本鏈第一份敘事）
 - 主題等權組（散熱；必須早於本鏈第一份敘事）：（尚無）
