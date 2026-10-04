@@ -1,0 +1,181 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jfe_jsw_india_goes_expansion_pr_2025_08_04",
+    "title": "JFE Steel：Regarding the Expansion of Electrical Steel Manufacturing Capacity in India（2025-08-04）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "JFE Steel Corporation",
+    "publisher": "JFE Steel Corporation（News Release）",
+    "url": "https://www.jfe-steel.co.jp/en/release/2025/08/250804.html",
+    "published_at": "2025-08-04",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄。"
+  },
+  "sources": [
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_s1",
+      "locator": "新聞稿第 1 段（兩家合資公司的定義）",
+      "quote": "JSW JFE Electrical Steel Nashik Private Limited (formerly thyssenkrupp Electrical Steel India Private Limited, hereinafter referred to as 'J2ES Nashik'). Both are grain-oriented electrical steel sheet (GOES) manufacturing and sales companies which are established with a 50:50 equity ratio."
+    },
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_s2",
+      "locator": "新聞稿第 2 段（產能）",
+      "quote": "In this expansion plan, we will double the manufacturing capacity of the J2ES Vijayanagar site from the initial plan, to 100,000 tonnes per year and increase the current manufacturing capacity of the J2ES Nashik site fivefold, from 50,000 tonnes per year to 250,000 tonnes per year."
+    },
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_s3",
+      "locator": "新聞稿第 2 段（需求）",
+      "quote": "the demand for GOES is rapidly increasing due to rising power demand linked to economic growth, expansion of renewable energy use, improvements in transformer efficiency, and an increase in the number of data centers"
+    },
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_s4",
+      "locator": "新聞稿第 2 段（時程）",
+      "quote": "The J2ES Vijayanagar site is scheduled to start full production within the year 2027, as planned. The expansion of the J2ES Nashik site will be carried out gradually starting in the year 2028, with completion expected in the year 2030."
+    },
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5",
+      "locator": "文末【Overview of JSW JFE Electrical Steel Nashik Private Limited】",
+      "quote": "JSW JFE Electrical Steel Nashik Private Limited Location : Nashik City, Maharashtra, India Business Activities : Manufacturing and sales of grain-oriented electrical steel sheets Shareholding Ratio : JFE Steel Corporation: 50%, JSW Steel Limited: 50%"
+    },
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_s6",
+      "locator": "新聞稿第 4 段",
+      "quote": "we will enhance our presence in the growing Indian market as the only fully integrated manufacturer of GOES in India"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "mat:grain_oriented_electrical_steel",
+      "type": "Material",
+      "name": "Grain-Oriented Electrical Steel (GOES)",
+      "aliases": [
+        "GOES",
+        "grain-oriented electrical steel",
+        "Grain-oriented Silicon Electrical Steel",
+        "HI-B"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s1",
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s3"
+      ]
+    },
+    {
+      "id": "co:jsw_jfe_electrical_steel_nashik",
+      "type": "Company",
+      "name": "JSW JFE Electrical Steel Nashik",
+      "aliases": [
+        "J2ES Nashik",
+        "JSW JFE Electrical Steel Nashik Private Limited"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s1",
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5"
+      ]
+    },
+    {
+      "id": "co:jfe_holdings",
+      "type": "Company",
+      "name": "JFE Holdings",
+      "aliases": [
+        "JFE Holdings",
+        "JFE Steel",
+        "JFE Steel Corporation"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "5411.T"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5"
+      ]
+    },
+    {
+      "id": "co:jsw_steel",
+      "type": "Company",
+      "name": "JSW Steel",
+      "aliases": [
+        "JSW Steel",
+        "JSW Steel Limited"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "JSWSTEEL.NS"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:jsw_jfe_electrical_steel_nashik",
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s1",
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:jfe_holdings",
+      "dst_id": "co:jsw_jfe_electrical_steel_nashik",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:jsw_steel",
+      "dst_id": "co:jsw_jfe_electrical_steel_nashik",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s5"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.75,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s2",
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s4",
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s6"
+      ],
+      "statement": "JFE says the JSW–JFE joint ventures will lift India GOES capacity to 350,000 t/yr: J2ES Nashik (formerly thyssenkrupp Electrical Steel India) from 50,000 to 250,000 t/yr, phased 2028–2030, and J2ES Vijayanagar to 100,000 t/yr with full production in 2027 — aimed at the Indian market ('the only fully integrated manufacturer of GOES in India'). Issuer plan, dated context (L4); not evidence of supply to U.S. LPT makers.",
+      "disproof_condition": "條件：JFE 或 JSW 公告印度 GOES 擴產延後、縮小或取消，或 J2ES Vijayanagar 到 2027 年底沒有全面量產。核查頻率：每半年（JFE Holdings 法說與新聞稿、JSW Steel 交易所公告）。觸發後 48 小時：本 claim 加註，重讀 GOES 層的供給側。"
+    },
+    {
+      "id": "jfe_jsw_india_goes_expansion_pr_2025_08_04_cl2",
+      "subject_id": "e1",
+      "demand_proof_level": "inferred",
+      "confidence": 0.5,
+      "source_ids": [
+        "jfe_jsw_india_goes_expansion_pr_2025_08_04_s3"
+      ],
+      "statement": "JFE attributes India's rapidly rising GOES demand to power demand from economic growth, renewables, transformer efficiency and 'an increase in the number of data centers' — the supplier's own demand framing, one of four drivers, India only (L8: weak).",
+      "disproof_condition": "條件：JFE 後續說明改寫印度 GOES 需求的成長來源而不再提資料中心，或印度 GOES 擴產因需求不足延後。核查頻率：每半年（JFE Holdings 法說）。觸發後 48 小時：本 claim 加註。"
+    }
+  ]
+}

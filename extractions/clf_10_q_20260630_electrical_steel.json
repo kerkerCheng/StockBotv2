@@ -1,0 +1,104 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "clf_10_q_20260630_electrical_steel",
+    "title": "Cleveland-Cliffs Inc. Form 10-Q（quarter ended 2026-06-30）— MD&A Overview：電工鋼與變壓器短缺",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Cleveland-Cliffs Inc.",
+    "publisher": "SEC EDGAR",
+    "url": "https://www.sec.gov/Archives/edgar/data/764065/000076406526000100/clf-20260630.htm",
+    "published_at": "2026-07-23",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR 公開 filing；只保留研究必要的逐字摘錄（locator 指段落），全文不入本包。"
+  },
+  "sources": [
+    {
+      "id": "clf_10_q_20260630_electrical_steel_s1",
+      "locator": "Item 2 MD&A——Overview（產品清單）",
+      "quote": "A sampling of our offering includes advanced high-strength steel, hot-dipped galvanized, aluminized, galvalume, electrogalvanized, galvanneal, HRC, cold-rolled coil, plate, GOES, NOES, stainless steels, tool and die, stamped components and slabs."
+    },
+    {
+      "id": "clf_10_q_20260630_electrical_steel_s2",
+      "locator": "Item 2 MD&A——Overview（電工鋼）",
+      "quote": "We are a leading producer of electrical steels in the U.S., which we believe will be critical for the modernization of the electrical grid."
+    },
+    {
+      "id": "clf_10_q_20260630_electrical_steel_s3",
+      "locator": "Item 2 MD&A——Overview（變壓器短缺與 AI）",
+      "quote": "Transformers are in short supply, and that shortage stifles economic growth across the country. The shortage will continue to be exacerbated by the anticipated widespread adoption of AI in virtually all sectors of the economy, which will exponentially increase the consumption of electricity in the U.S. and worldwide."
+    },
+    {
+      "id": "clf_10_q_20260630_electrical_steel_s4",
+      "locator": "Item 2 MD&A——Overview（電工鋼獲利展望）",
+      "quote": "Because of these industry dynamics and our current customer base, our electrical steel business is expected to continue to achieve strong profitability in the coming years."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "mat:grain_oriented_electrical_steel",
+      "type": "Material",
+      "name": "Grain-Oriented Electrical Steel (GOES)",
+      "aliases": [
+        "GOES",
+        "grain-oriented electrical steel",
+        "Grain-oriented Silicon Electrical Steel",
+        "HI-B"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "clf_10_q_20260630_electrical_steel_s1"
+      ]
+    },
+    {
+      "id": "co:cleveland_cliffs",
+      "type": "Company",
+      "name": "Cleveland-Cliffs",
+      "aliases": [
+        "Cleveland-Cliffs",
+        "Cleveland-Cliffs Inc.",
+        "CLF"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "CLF"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "clf_10_q_20260630_electrical_steel_s1",
+        "clf_10_q_20260630_electrical_steel_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:cleveland_cliffs",
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "clf_10_q_20260630_electrical_steel_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "clf_10_q_20260630_electrical_steel_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "clf_10_q_20260630_electrical_steel_s2",
+        "clf_10_q_20260630_electrical_steel_s3",
+        "clf_10_q_20260630_electrical_steel_s4"
+      ],
+      "statement": "Supplier view (Cliffs' own 10-Q, 2026-07-23): it calls itself a leading U.S. producer of electrical steels, says transformers are in short supply and the shortage will be exacerbated by AI-driven electricity consumption, and expects its electrical steel business to keep strong profitability. Self-interested framing (L8: weak); the paragraph speaks of distribution transformers, not LPTs specifically.",
+      "disproof_condition": "條件：Cliffs 後續 10-Q／10-K 刪掉這段或改稱電工鋼需求轉弱、價格下滑，或揭露電工鋼產線閒置。核查頻率：每季（CLF 10-Q／10-K）。觸發後 48 小時：本 claim 加註，LPT 讀圖 sr_a884792198990379 的反證②一併檢查。"
+    }
+  ]
+}

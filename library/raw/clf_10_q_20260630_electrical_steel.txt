@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/764065/000076406526000100/clf-20260630.htm
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Cleveland-Cliffs Inc. Form 10-Q（quarter ended 2026-06-30）— MD&A Overview：電工鋼與變壓器短缺
+Source: https://www.sec.gov/Archives/edgar/data/764065/000076406526000100/clf-20260630.htm
+Published: 2026-07-23 | Origin: Cleveland-Cliffs Inc. | Retrieved: 2026-10-04
+
+Item 2 MD&A——Overview（產品清單）："A sampling of our offering includes advanced high-strength steel, hot-dipped galvanized, aluminized, galvalume, electrogalvanized, galvanneal, HRC, cold-rolled coil, plate, GOES, NOES, stainless steels, tool and die, stamped components and slabs."
+Item 2 MD&A——Overview（電工鋼）："We are a leading producer of electrical steels in the U.S., which we believe will be critical for the modernization of the electrical grid."
+Item 2 MD&A——Overview（變壓器短缺與 AI）："Transformers are in short supply, and that shortage stifles economic growth across the country. The shortage will continue to be exacerbated by the anticipated widespread adoption of AI in virtually all sectors of the economy, which will exponentially increase the consumption of electricity in the U.S. and worldwide."
+Item 2 MD&A——Overview（電工鋼獲利展望）："Because of these industry dynamics and our current customer base, our electrical steel business is expected to continue to achieve strong profitability in the coming years."
