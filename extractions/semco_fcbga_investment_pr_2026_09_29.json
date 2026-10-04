@@ -1,0 +1,111 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "semco_fcbga_investment_pr_2026_09_29",
+    "title": "Samsung Electro-Mechanics Press Release 2026-09-29：Sejong KRW 4.27 trillion · Vietnam subsidiary KRW 2.51 trillion FCBGA expansion",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "Samsung Electro-Mechanics",
+    "publisher": "Samsung Electro-Mechanics Newsroom",
+    "url": "https://www.samsungsem.com/global/newsroom/news/view.do?id=10562",
+    "published_at": "2026-09-29",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄，全文不入 repo。"
+  },
+  "sources": [
+    {
+      "id": "semco_fcbga_investment_pr_2026_09_29_s1",
+      "locator": "摘要第一點",
+      "quote": "Investment of KRW 4.27 trillion to expand high-performance semiconductor substrate (FCBGA) production at the Sejong business site in Korea"
+    },
+    {
+      "id": "semco_fcbga_investment_pr_2026_09_29_s2",
+      "locator": "內文第 1 段",
+      "quote": "Samsung Electro-Mechanics is making a total investment of approximately KRW 6.78 trillion at its Sejong business site and Vietnam subsidiary to respond to the growing demand in the FCBGA (Flip Chip-Ball Grid Array) market for AI servers."
+    },
+    {
+      "id": "semco_fcbga_investment_pr_2026_09_29_s3",
+      "locator": "「Rapid Growth in Demand for High-Performance FCBGA Driven by AI Market Expansion」段",
+      "quote": "FCBGA is a highly integrated semiconductor substrate that connects high-performance semiconductors such as AI accelerators, GPUs, and CPUs to the mainboard, supplying electrical signals and power."
+    },
+    {
+      "id": "semco_fcbga_investment_pr_2026_09_29_s4",
+      "locator": "「Establishing FCBGA Production System to Meet Global Big Tech Customer Demand」段",
+      "quote": "In particular, this investment is being pursued based on mid- to long-term cooperation with global big tech and semiconductor customers. As the investment includes customer funding support and mid- to long-term volume guarantees, the company expects to strengthen the competitiveness of its FCBGA business based on a stable demand foundation."
+    },
+    {
+      "id": "semco_fcbga_investment_pr_2026_09_29_s5",
+      "locator": "摘要第二點",
+      "quote": "Global customer funding support resolves risks of new facility investment (CAPEX)"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:samsung_electro_mechanics",
+      "type": "Company",
+      "name": "Samsung Electro-Mechanics",
+      "aliases": [
+        "Samsung Electro-Mechanics",
+        "Samsung Electro-Mechanics Co., Ltd."
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "009150.KS"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "semco_fcbga_investment_pr_2026_09_29_s2"
+      ]
+    },
+    {
+      "id": "mat:ic_package_substrate",
+      "type": "Material",
+      "name": "IC Package Substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "semco_fcbga_investment_pr_2026_09_29_s3",
+        "semco_fcbga_investment_pr_2026_09_29_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:samsung_electro_mechanics",
+      "dst_id": "mat:ic_package_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "semco_fcbga_investment_pr_2026_09_29_s2",
+        "semco_fcbga_investment_pr_2026_09_29_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "semco_fcbga_investment_pr_2026_09_29_cl1",
+      "statement": "Samsung Electro-Mechanics (supplier press release) is expanding FCBGA substrate capacity for AI servers at Sejong (mass production from September 2028) and in Vietnam, and says the investment 'includes customer funding support and mid- to long-term volume guarantees' from 'global big tech and semiconductor customers' — none named. It is a second first-hand-verifiable supplier on this layer, and the customer funding is a supplier claim only; media reports naming NVIDIA as a funder are tier-3 and are not used (no SEMCO→customer edge).",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：DART 出現신규시설투자 정정公告縮減或撤回世宗投資，或 SEMCO 法說稱客戶出資沒有到位、量產延後。核查頻率：每季（SEMCO 財報與 DART）。觸發後 48 小時：本 claim 降級，重看 e1 是否只剩產能自述，並更新 mat:ic_package_substrate 層讀圖。",
+      "confidence": 0.75,
+      "source_ids": [
+        "semco_fcbga_investment_pr_2026_09_29_s4",
+        "semco_fcbga_investment_pr_2026_09_29_s5",
+        "semco_fcbga_investment_pr_2026_09_29_s1"
+      ]
+    }
+  ]
+}

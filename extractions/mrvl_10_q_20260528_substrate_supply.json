@@ -1,0 +1,125 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mrvl_10_q_20260528_substrate_supply",
+    "title": "Marvell Technology 10-Q（Q1 FY2027，期末 2026-05-02）— Item 1A 吃緊清單＋季後簽約鎖定 wafer／substrate 產能",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Marvell Technology, Inc.",
+    "publisher": "SEC EDGAR",
+    "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000019/mrvl-20260502.htm",
+    "published_at": "2026-05-28",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR 公開 filing；只保留研究必要的逐字摘錄（locator 指段落），全文不入本包。"
+  },
+  "sources": [
+    {
+      "id": "mrvl_10_q_20260528_substrate_supply_s1",
+      "locator": "Part II Item 1A Risk Factors（製造夥伴與地理集中風險段）",
+      "quote": "For example, there has and continues to be a tight supply environment for AI related components and manufacturing resources, such as advanced wafer fabrication, advanced packaging, and large body substrates which have in the past and may continue to result in increased lead times, inability to meet demand, and increased costs."
+    },
+    {
+      "id": "mrvl_10_q_20260528_substrate_supply_s2",
+      "locator": "Notes to Condensed Consolidated Financial Statements, Note 9 – Commitments and Contingencies（capacity reservation agreements 段末；MD&A Liquidity 有同義句）",
+      "quote": "Subsequent to quarter end, the Company entered into agreements to secure wafer and substrate manufacturing capacity through fiscal years 2030 and 2033, respectively. In connection with these agreements, the Company committed to pay deposits totaling $ 870.0 million, payable in quarterly installments from the second quarter of fiscal 2027 through the second quarter of fiscal 2028."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:marvell_technology",
+      "type": "Company",
+      "name": "Marvell Technology",
+      "aliases": [
+        "MRVL"
+      ],
+      "abstraction_level": "device_chip",
+      "attributes": {
+        "ticker": "MRVL"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "mrvl_10_q_20260528_substrate_supply_s1"
+      ]
+    },
+    {
+      "id": "mat:ic_package_substrate",
+      "type": "Material",
+      "name": "IC Package Substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mrvl_10_q_20260528_substrate_supply_s1",
+        "mrvl_10_q_20260528_substrate_supply_s2"
+      ]
+    },
+    {
+      "id": "tech:advanced_packaging",
+      "type": "TechNode",
+      "name": "Advanced packaging chip integration",
+      "aliases": [
+        "advanced packaging",
+        "heterogeneous integration",
+        "3D chiplet integration"
+      ],
+      "abstraction_level": "foundry_packaging",
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mrvl_10_q_20260528_substrate_supply_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:marvell_technology",
+      "dst_id": "mat:ic_package_substrate",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "mrvl_10_q_20260528_substrate_supply_s1",
+        "mrvl_10_q_20260528_substrate_supply_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:marvell_technology",
+      "dst_id": "tech:advanced_packaging",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "mrvl_10_q_20260528_substrate_supply_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mrvl_10_q_20260528_substrate_supply_cl1",
+      "statement": "Customer capital commitment on this layer (Marvell's own 10-Q, Q1 FY2027): after quarter end Marvell signed agreements to secure wafer and substrate manufacturing capacity through FY2030 and FY2033 respectively, with deposits payable quarterly from Q2 FY2027 to Q2 FY2028. The supplier is not named, and the combined deposit covers wafers plus substrates — it cannot be attributed to AT&S or any single supplier (L6). The dollar figure is dated context in the quote, not a graph attribute (L4).",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Marvell 後續 10-Q／10-K 揭露 substrate 產能協議終止或縮減，或「Prepayments on supply capacity reservation agreements」不再隨押金分期增加、被沖回。核查頻率：每季（MRVL 10-Q／10-K）。觸發後 48 小時：本 claim 加註並降 confidence，重看 e1 是否只剩風險因子措辭；更新 mat:ic_package_substrate 層讀圖。",
+      "confidence": 0.8,
+      "source_ids": [
+        "mrvl_10_q_20260528_substrate_supply_s2",
+        "mrvl_10_q_20260528_substrate_supply_s1"
+      ]
+    }
+  ]
+}

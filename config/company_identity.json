@@ -115,6 +115,17 @@
       "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3a：Coherent OFC 2026-03-17 法說逐字「This was announced by Arista and ourselves and a bunch of other partners」（coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17 s18）；全圖逐字整詞比對「Arista」命中 1 段、講的都是 Arista Networks（docs/reports/2026-10-03-phase6-baseline.md §17）"
     },
     {
+      "company_id": "co:ats",
+      "research_ticker": "ATS.VI",
+      "market_currency": "EUR",
+      "display_name": "AT&S Austria Technologie & Systemtechnik Aktiengesellschaft",
+      "_display_name_source": "ats.net 新聞頁頁尾「© AT&S Austria Technologie & Systemtechnik Aktiengesellschaft」；2026-09-22 EQS Corporate News 公司欄「AT&S Austria Technologie & Systemtechnik AG」",
+      "name_aliases": [
+        "AT&S",
+        "AT&S Austria Technologie & Systemtechnik AG"
+      ]
+    },
+    {
       "company_id": "co:axt",
       "research_ticker": "AXTI",
       "market_currency": "USD",
@@ -710,6 +721,17 @@
       "_display_name_source": "Micron FY2025 10-K 逐字「Samsung Electronics Co., Ltd.」（庫內 mu_10_k_fy2025_20251003）",
       "name_aliases": [
         "Samsung"
+      ]
+    },
+    {
+      "company_id": "co:samsung_electro_mechanics",
+      "research_ticker": "009150.KS",
+      "market_currency": "KRW",
+      "display_name": "Samsung Electro-Mechanics Co., Ltd.",
+      "_display_name_source": "samsungsem.com 2026-09-29 FCBGA 投資新聞稿同頁的個資告知「Samsung Electro-Mechanics Co., Ltd. (hereinafter referred to as \"SEM\")」",
+      "_note": "不是 co:samsung（005930.KS Samsung Electronics）。co:samsung 的別名「Samsung」會在「Samsung Electro-Mechanics」裡整詞命中——名字比對對含本公司全名的引文會兩家都算具名（2026-10-04 記入 Phase 7 failure-log）。",
+      "name_aliases": [
+        "Samsung Electro-Mechanics"
       ]
     },
     {

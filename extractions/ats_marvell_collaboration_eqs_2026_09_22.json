@@ -1,0 +1,140 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ats_marvell_collaboration_eqs_2026_09_22",
+    "title": "AT&S EQS Corporate News 2026-09-22：AT&S and Marvell Technology expand collaboration to support next-generation AI infrastructure",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "AT&S",
+    "publisher": "AT&S Investor Relations（EQS Group 發布）",
+    "url": "https://ats.net/en/ir-news/ats-and-marvell-technology-expand-collaboration-to-support-next-generation-ai-infrastructure/",
+    "published_at": "2026-09-22",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄，全文不入 repo。"
+  },
+  "sources": [
+    {
+      "id": "ats_marvell_collaboration_eqs_2026_09_22_s1",
+      "locator": "第 1 段",
+      "quote": "Leoben, September 22, 2026 – AT&S today announced an expanded collaboration with Silicon Valley company Marvell Technology, a leading provider of data infrastructure semiconductor solutions, to increase advanced IC substrate capacity for next-generation AI and cloud infrastructure."
+    },
+    {
+      "id": "ats_marvell_collaboration_eqs_2026_09_22_s2",
+      "locator": "第 1 段後半",
+      "quote": "The agreement builds on the companies’ existing relationship and supports Marvell Technology’s growing demand for advanced substrates as AI deployments continue to scale. Marvell Technology is the additional customer identified in AT&S’s previously announced expansion of its Kulim manufacturing site."
+    },
+    {
+      "id": "ats_marvell_collaboration_eqs_2026_09_22_s3",
+      "locator": "「Building a long-term partnership」段，Marvell SVP & Chief Supply Chain Officer Vinay Krishna 具名引述",
+      "quote": "Our expanded collaboration with AT&S further strengthens our supply chain foundation and positions us to scale increasingly complex semiconductor solutions, helping us meet the significant growth opportunities driven by the rapid adoption of AI infrastructure."
+    },
+    {
+      "id": "ats_marvell_collaboration_eqs_2026_09_22_s4",
+      "locator": "文末公司簡介",
+      "quote": "AT&S is a global technology company and leading manufacturer of high-end IC substrates and complex printed circuit boards."
+    },
+    {
+      "id": "ats_marvell_collaboration_eqs_2026_09_22_s5",
+      "locator": "第 2 段",
+      "quote": "Supported by long-term customer commitments, the investment will provide additional capacity to meet growing demand for advanced IC substrates and packaging."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:ats",
+      "type": "Company",
+      "name": "AT&S",
+      "aliases": [
+        "AT&S",
+        "AT&S Austria Technologie & Systemtechnik AG"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "ATS.VI"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ats_marvell_collaboration_eqs_2026_09_22_s4"
+      ]
+    },
+    {
+      "id": "co:marvell_technology",
+      "type": "Company",
+      "name": "Marvell Technology",
+      "aliases": [
+        "MRVL"
+      ],
+      "abstraction_level": "device_chip",
+      "attributes": {
+        "ticker": "MRVL"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ats_marvell_collaboration_eqs_2026_09_22_s1"
+      ]
+    },
+    {
+      "id": "mat:ic_package_substrate",
+      "type": "Material",
+      "name": "IC Package Substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ats_marvell_collaboration_eqs_2026_09_22_s4",
+        "ats_marvell_collaboration_eqs_2026_09_22_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:ats",
+      "dst_id": "mat:ic_package_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ats_marvell_collaboration_eqs_2026_09_22_s4",
+        "ats_marvell_collaboration_eqs_2026_09_22_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:ats",
+      "dst_id": "co:marvell_technology",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "ats_marvell_collaboration_eqs_2026_09_22_s2",
+        "ats_marvell_collaboration_eqs_2026_09_22_s1",
+        "ats_marvell_collaboration_eqs_2026_09_22_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "ats_marvell_collaboration_eqs_2026_09_22_cl1",
+      "statement": "AT&S (supplier-issued EQS news) says Marvell Technology is the 'additional customer' behind its customer-supported Kulim expansion, and that the agreement builds on an 'existing relationship' and supports Marvell's growing demand for advanced substrates; Marvell's SVP & Chief Supply Chain Officer is quoted by name in the release. Marvell's own filings do not name AT&S, so the edge rests on the supplier's document (L8: no sole_source; qualification_status and substitutability not stated).",
+      "subject_id": "e2",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：AT&S 或 Marvell 公告協議終止、縮減，或 AT&S 半年報／年報不再提 Marvell 擴產協議、Kulim Plant 2 延後。核查頻率：每季（AT&S 季報與 ad-hoc 公告）＋每季（Marvell 10-Q）。觸發後 48 小時：e2 標 review_required（降 confidence 或提撤回），重讀原文並更新 co:ats 的敘事。",
+      "confidence": 0.85,
+      "source_ids": [
+        "ats_marvell_collaboration_eqs_2026_09_22_s2",
+        "ats_marvell_collaboration_eqs_2026_09_22_s3",
+        "ats_marvell_collaboration_eqs_2026_09_22_s5"
+      ]
+    }
+  ]
+}

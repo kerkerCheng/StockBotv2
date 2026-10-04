@@ -1,0 +1,172 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ats_kulim_expansion_pr_2026_06_15",
+    "title": "AT&S Press 2026-06-15：AT&S expands Kulim site to support long-term customer demand and deepen strategic technology partnerships",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "AT&S",
+    "publisher": "AT&S Press",
+    "url": "https://ats.net/en/press/ats-expands-kulim-site-to-support-long-term-customer-demand-and-deepen-strategic-technology-partnerships/",
+    "published_at": "2026-06-15",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄，全文不入 repo。"
+  },
+  "sources": [
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_s1",
+      "locator": "第 1 段",
+      "quote": "Leoben, June 15, 2026 – AT&S announced the expansion of its Kulim manufacturing site, based on agreements with its customer AMD and another leading technology company."
+    },
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_s2",
+      "locator": "「Financial discipline and risk mitigation」段",
+      "quote": "Based on agreed upon key terms, the € 1.5 to 2.0 billion investment is fully supported and financed by long-term customer commitments."
+    },
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_s3",
+      "locator": "「Increased outlook」段",
+      "quote": "Key financial elements of the agreements, which remain subject to final negotiation and execution, include payments from customers, which are expected to positively impact revenue and earnings in the current year."
+    },
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_s4",
+      "locator": "「Increased outlook」段末（AT&S 身為買方對上游材料的陳述）",
+      "quote": "The forecast assumes no significant deterioration of the geopolitical situation or in the currently tight supply of key materials such as fiberglass mats."
+    },
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_s5",
+      "locator": "文末公司簡介",
+      "quote": "AT&S is a global technology company and leading manufacturer of high-end IC substrates and complex printed circuit boards."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:ats",
+      "type": "Company",
+      "name": "AT&S",
+      "aliases": [
+        "AT&S",
+        "AT&S Austria Technologie & Systemtechnik AG"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "ATS.VI"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s5"
+      ]
+    },
+    {
+      "id": "co:amd",
+      "type": "Company",
+      "name": "Advanced Micro Devices",
+      "aliases": [
+        "AMD"
+      ],
+      "abstraction_level": "device_chip",
+      "attributes": {
+        "ticker": "AMD"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s1"
+      ]
+    },
+    {
+      "id": "mat:ic_package_substrate",
+      "type": "Material",
+      "name": "IC Package Substrate",
+      "aliases": [
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s5"
+      ]
+    },
+    {
+      "id": "mat:fiberglass_mat",
+      "type": "Material",
+      "name": "Fiberglass Mat",
+      "aliases": [
+        "fiberglass mats"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s4"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:ats",
+      "dst_id": "co:amd",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:ats",
+      "dst_id": "mat:fiberglass_mat",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s4"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:ats",
+      "dst_id": "mat:ic_package_substrate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s5"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_cl1",
+      "statement": "AT&S (supplier press release) says its Kulim expansion is based on agreements with its customer AMD and 'another leading technology company' (named as Marvell on 2026-09-22), that the investment is 'fully supported and financed by long-term customer commitments', and that the agreements include 'payments from customers' — but as of 2026-06-15 the key financial elements 'remain subject to final negotiation and execution'. The investment range and outlook figures are dated context for Engine C, not graph attributes (L4).",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：AT&S 公告 Kulim 協議沒有完成 final execution、終止或縮減，或後續半年報／年報沒有認列客戶付款（合約負債或預收款）。核查頻率：每季（AT&S 季報與 ad-hoc 公告）。觸發後 48 小時：本 claim 降為 inferred，e1 標 review_required 並重讀原文。",
+      "confidence": 0.75,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s1",
+        "ats_kulim_expansion_pr_2026_06_15_s2",
+        "ats_kulim_expansion_pr_2026_06_15_s3"
+      ]
+    },
+    {
+      "id": "ats_kulim_expansion_pr_2026_06_15_cl2",
+      "statement": "Buyer-side statement about the layer upstream of IC substrates: AT&S's raised outlook assumes no deterioration in 'the currently tight supply of key materials such as fiberglass mats' (dated 2026-06-15). No fiberglass-mat supplier is named — mat:fiberglass_mat enters with zero suppliers, which is a graph hole to research, not a finding that the layer is thin.",
+      "subject_id": "e2",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：AT&S 後續季報或財測假設不再提 fiberglass mats 供給吃緊，或改稱已緩解。核查頻率：每季（AT&S 季報）。觸發後 48 小時：e2 降 confidence（改成歷史 dated claim），並更新 mat:fiberglass_mat 的走圖洞註記。",
+      "confidence": 0.7,
+      "source_ids": [
+        "ats_kulim_expansion_pr_2026_06_15_s4"
+      ]
+    }
+  ]
+}
