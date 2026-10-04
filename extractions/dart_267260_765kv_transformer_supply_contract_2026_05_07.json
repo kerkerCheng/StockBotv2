@@ -1,0 +1,124 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "dart_267260_765kv_transformer_supply_contract_2026_05_07",
+    "title": "HD현대일렉트릭 단일판매ㆍ공급계약체결（2026-05-07）：765KV 초고압 변압기 및 리액터",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "HD Hyundai Electric Co., Ltd.",
+    "publisher": "DART（韓國金融監督院電子公示）",
+    "url": "https://dart.fss.or.kr/dsaf001/main.do?rcpNo=20260507800238",
+    "published_at": "2026-05-07",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "韓國法定公示（DART）；只保留研究必要的逐字摘錄。"
+  },
+  "sources": [
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_s1",
+      "locator": "公告標題與 1. 판매ㆍ공급계약 구분",
+      "quote": "HD현대일렉트릭/단일판매ㆍ공급계약체결/(2026.05.07)단일판매ㆍ공급계약체결 단일판매ㆍ공급계약 체결 1. 판매ㆍ공급계약 구분 상품공급 - 체결계약명 765KV 초고압 변압기 및 리액터"
+    },
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_s2",
+      "locator": "2. 계약내역",
+      "quote": "계약금액(원) 173,000,000,000 최근매출액(원) 4,079,500,000,000 매출액대비(%) 4.24"
+    },
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_s3",
+      "locator": "3.–5. 계약상대／지역／기간",
+      "quote": "3. 계약상대 HD Hyundai Electric America Corporation - 회사와의 관계 자회사 4. 판매ㆍ공급지역 미국 5. 계약기간 시작일 2026-05-06 종료일 2029-08-31"
+    },
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_s4",
+      "locator": "6. 주요 계약조건",
+      "quote": "계약금ㆍ선급금 유무 유 대금지급 조건 등 공급계약 진행에 따른 청구 및 지급"
+    },
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_s5",
+      "locator": "9. 기타 투자판단과 관련한 중요사항 第 1 點",
+      "quote": "상기 계약은 당사의 미국 아틀란타법인(HD Hyundai Electric America Corporation)이 미국 MISO·SPP 권역의 765kV급 송전망 기반 대형 유틸리티 기업로부터 수주받은 후 당사로 재 발주한 공급계약임."
+    },
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_s6",
+      "locator": "9. 第 4 點",
+      "quote": "상기 계약금액은 계약액 USD 117,639,663를 원화환산하여 기재하였음."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:large_power_transformer",
+      "type": "TechNode",
+      "name": "Large Power Transformer (LPT)",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s1"
+      ]
+    },
+    {
+      "id": "co:hd_hyundai_electric",
+      "type": "Company",
+      "name": "HD Hyundai Electric",
+      "aliases": [
+        "HD Hyundai Electric",
+        "HD현대일렉트릭",
+        "Hyundai Power Transformer",
+        "Hyundai Power Transformers USA",
+        "HD Hyundai Power Transformers USA",
+        "HD Hyundai Electric America Corporation"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {
+        "ticker": "267260.KS"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s1",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:hd_hyundai_electric",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s1",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s5"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "dart_267260_765kv_transformer_supply_contract_2026_05_07_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.85,
+      "source_ids": [
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s1",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s2",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s3",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s4",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s5",
+        "dart_267260_765kv_transformer_supply_contract_2026_05_07_s6"
+      ],
+      "statement": "HD Hyundai Electric's DART single-supply-contract filing (2026-05-07): 765 kV extra-high-voltage transformers and reactors, KRW 173.0 billion (USD 117,639,663; 4.24% of 2025 consolidated revenue), booked via its U.S. subsidiary from a large utility running a 765 kV transmission network in the MISO/SPP region (customer not named); term 2026-05-06 to 2029-08-31; contract deposit/advance payment: yes ('계약금ㆍ선급금 유무 유'), billed as the contract progresses. A customer advance on long-lead equipment — common practice for EHV units, so read as a weak capital commitment. Grid buildout, no AI or data-center wording. Dated context (L4).",
+      "disproof_condition": "條件：HD 現代電氣後續公告這張合約解除或金額大幅下修（정정공시），或分期付款條件改為無預付。核查頻率：每季（DART 公告與分季報告的수주상황）。觸發後 48 小時：e1 降 confidence，LPT 讀圖需求側重讀。"
+    }
+  ]
+}

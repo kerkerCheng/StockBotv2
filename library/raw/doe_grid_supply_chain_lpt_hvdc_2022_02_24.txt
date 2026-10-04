@@ -1,23 +1,21 @@
 Source URL: https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf
 
 Excerpt:
-[EXCERPT — 美國政府公開報告之有限逐字引文] U.S. DOE, Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems
+[EXCERPT — 公開文件之有限逐字引文] U.S. DOE — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems（2022-02-24；LPT 章）; §2.1.4.1 U.S. LPT manufacturers, imports, GOES complaints
 Source: https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf
-Published: 2022-02-24（封面「February 24, 2022」）| Origin: U.S. Department of Energy | Retrieved: 2026-10-04
+Published: 2022-02-24 | Origin: U.S. Department of Energy | Retrieved: 2026-10-04
 
-報告 p.9（PDF 第 24 頁）2.1.2.1 Large Power Transformers："Cores, also known as laminations, are made from high-permeability and domain-refined GOES (Waukesha Transformers, 2022)."
-報告 p.11（PDF 第 26 頁）2.1.2.3 Continuously Transposed Conductor："This is the final product and is referred to as CTC at this point which is used to create the winding of an LPT."
-報告 p.11（PDF 第 26 頁）2.1.2.5 Tap Changers："A transformer tap changer is a component designed to change the output voltage of a transformer by changing the turns ratio between the primary and secondary winding."
-報告 p.12（PDF 第 27 頁）2.1.2.6 Bushings："Bushings provide the electrical connection between a transformer and the electrical transmission network."
-報告 p.12（PDF 第 27 頁）2.1.2.7 Insulating Material："The most common insulating material in LPTs is pressboard."
-報告 p.20（PDF 第 35 頁）2.1.6 Transformer Supply Chain Bottlenecks in the United States："Currently, there are two major bottlenecks in the LPT supply chain. The first one is in the U.S. GOES production capacity. The second one is in the testing capacity of LPT manufacturers."
-報告 p.21（PDF 第 36 頁）2.1.6（續）："Of those, only Japan, South Korea, and Germany can produce the GOES at the specifications outlined by current Department of Energy (DOE) standards"
-報告 p.21（PDF 第 36 頁）2.1.6（續）："Test space can be a key limiting factor in LPT production capability when each facility/manufacturer only has 1 – 2 test beds to produce various ratings of power transformers."
-報告 p.15（PDF 第 30 頁）2.1.4.1 GOES："leaving Cleveland-Cliffs with manufacturing facilities in Zanesville, Ohio and Butler, Pennsylvania as the sole GOES producer in the United States"
-報告 p.14（PDF 第 29 頁）2.1.4.1 U.S. LPT 製造商清單："Hyosung Heavy Industries (HICO) acquired Mitsubishi facility in Memphis, Tennessee in 2019 (Walton, 2019). They have capability up to 1000 MVA and 765 kV"
-報告 p.21（PDF 第 36 頁）2.1.6（續）："Stakeholders indicated that tap changers could also be a bottle neck. There are three domestic suppliers and one reliable supplier from Germany. However, German tap changers are much more costly and have a longer lead time."
-報告 p.21（PDF 第 36 頁）2.1.6（續）："It has been observed that high-voltage bushings often have a long lead time of up to five months (U.S. Department of Energy, 2014)."
-報告 p.21（PDF 第 36 頁）2.1.6（續）："Imports account for 82% of the consumption of LPTs in 2019."
-報告 p.20（PDF 第 35 頁）2.1.6："Some interviewees estimated that domestic supply meets about 20% of domestic demand"
-報告 p.11（PDF 第 26 頁）2.1.2.2（續）："HI-B grade with domain-refined grade is highly demanded by LPT manufacturers because of its low core loss to reduce LPT weight."
-（PDF 文字層有字間空格殘影；引文照頁面字形，2026-10-04 逐頁讀圖核對）
+報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——LPT 廠名單（依字母序）："LPTs: The major transformer manufacturers with production capabilities in the United States by alphabetical order include Delta Star, Hitachi Energy, HICO, Hyundai Power Transformers USA, Niagara Power Transformer, Pennsylvania Transformer Technology, SPX Transformers (acquired by GE), and Virginia Transformers (formerly EFACEC)"
+報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——Delta Star："Delta Star has three transformer manufacturing locations including San Carlos, California, Lynchburg, Virginia and Saint-Jean-sur-Richelieu near Montreal, Quebec (Delta Star, 2021). This company can manufacture power transformers up to 200 MVA and 345 kV."
+報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——Hitachi Energy（截在公司名那一句；全句含「United States」，見 failure log #8）："Hitachi Energy, formerly known as Hitachi ABB, has one LPT facility"
+報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——Hitachi Energy（全句，只掛 claim）："Hitachi Energy, formerly known as Hitachi ABB, has one LPT facility in the United States in South Boston, Virginia with a maximum range of 230 kV and 150 MVA as indicated through stakeholder engagement. In addition, this company has a facility in Varennes, Quebec which can supply transformers for traditional and specialty applications (including HVDC) up to 765 kV and 1400 MVA."
+報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Hyundai Power Transformer："Hyundai Power Transformer has a manufacturing plant in Montgomery, Alabama with capacity up to 750 MVA and 500 kV (Hyundai Power Transformers USA, 2012)."
+報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Niagara Power Transformer："Niagara Power Transformer is in Buffalo, New York. Its base rating is 50 to 60 MVA with the top rating of 100 MVA and 138 kV (Niagara Power Transformer, 2021)."
+報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Pennsylvania Transformer Technology："Pennsylvania Transformer Technology can produce up to 600 MVA and 345 kV at its Canonsburg facility in Pennsylvania (Pennsylvania Transformer Technology, 2020)."
+報告 p.14（PDF 第 29 頁）2.1.4.1（續）——SPX Transformer Solutions（GE Prolec）："SPX Transformer Solutions plant is based in Waukesha, Wisconsin with capabilities up to 1200 MVA for autotransformers and 345 kV (SPX Transformer Solutions, 2021). In late 2021, SPX was acquired by GE Prolec, a subsidiary of a 50/50 joint venture between GE and a Mexico-based private company named Xignux (General Electric, 2021)."
+報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Virginia Transformer Technology："Virginia Transformer Technology has two LPT facilities including Roanoke, Virginia and Rincon, Georgia which can manufacture liquid-type transformers up to 1400 MVA and 500 kV class (Virginia Transformer, 2017)."
+報告 p.14（PDF 第 29 頁）2.1.4.1（續）——頁尾（接 p.15）："In 2019, 137 LPTs were produced domestically while"
+報告 p.15（PDF 第 30 頁）——頁首（接 p.14）："617 units were imported and four units were exported (U.S. Department of Commerce, 2020). Based on the LPT capacity utilization of ~ 40% (U.S. Department of Commerce, 2020), a total capacity of ~343 LPTs/year was derived for domestic capacity."
+報告 p.15（PDF 第 30 頁）——進口來源國："In 2020, out of $3 billion spent on “Power/distribution/specialty Transformers” imported into the United States with the North American Industry Classification System (NAICS) code 335311, 45% of these transformers came from Mexico, 15% from Canada, 7% from China, 5% from South Korea, 4% from Germany, and 3% from the Netherlands (USA Trade Online, 2021)."
+報告 p.15（PDF 第 30 頁）——GOES 段："Two main complaints with domestic GOES are: (1) insufficient quantity and (2) insufficient quality including narrow width and heavy thickness. Both aspects point to the fact that Cleveland-Cliffs technology is outdated and unable to keep up with more stringent requirement from updated standards (U.S. Department of Commerce, 2020)."
+報告 p.15（PDF 第 30 頁）——GOES 進口來源："In 2020, out of $29 million spent on GOES imports into the United States under the aforementioned HS code, 85% of imports came from South Korea, 6% came from Brazil, and 4% came from Russia (USA Trade Online, 2021)."

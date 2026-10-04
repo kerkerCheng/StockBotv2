@@ -1,17 +1,588 @@
 {
+  "claims": [
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：更新的一手（DOE／商務部報告、GOES 生產者的 10-K／法說）顯示美國 GOES 產能已能滿足大部分國內需求，或不再把 GOES 列為 LPT 瓶頸。核查頻率：每半年（DOE／商務部報告；Cleveland-Cliffs 10-K／10-Q）。觸發後 48 小時：重跑 python -m query.structure tech:large_power_transformer，e6 降 confidence 或改成歷史 dated claim，並重讀該層。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl1",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
+      ],
+      "statement": "DOE (Feb 2022, third-party government assessment) names two major bottlenecks in the U.S. LPT supply chain: GOES production capacity and LPT testing capacity. Cleveland-Cliffs is the sole U.S. GOES producer and domestic supply meets about 20% of domestic demand; of 13 GOES makers abroad, only Japan, South Korea and Germany meet DOE specifications. Dated snapshot from before AI data-center demand — the numbers are context, not attributes (L4).",
+      "subject_id": "e6"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：一手揭露 LPT 製造商大幅擴充試驗台、或測試不再被列為產能限制。核查頻率：每半年（DOE／商務部報告、LPT 製造商法說）。觸發後 48 小時：e7 降 confidence，重讀 tech:large_power_transformer 層。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl2",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
+      ],
+      "statement": "Testing is the second named LPT bottleneck: each facility or manufacturer has only 1–2 test beds and testing takes about a week per LPT (DOE, Feb 2022).",
+      "subject_id": "e7"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：一手具名那家德國供應商並顯示分接開關供給已不吃緊，或出現多家新的合格供應商。核查頻率：每年（DOE／商務部報告、變壓器廠法說）。觸發後 48 小時：本 claim 加註，e3 的層讀圖重寫供給側。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl3",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3"
+      ],
+      "statement": "Stakeholders told DOE that tap changers could also be a bottleneck: three domestic suppliers and one reliable supplier from Germany (not named), with German tap changers costlier and on longer lead times (Feb 2022).",
+      "subject_id": "e3"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：一手顯示高壓套管交期回到正常（數週）或供給明顯擴充。核查頻率：每年（DOE／商務部報告、套管製造商公告）。觸發後 48 小時：本 claim 加註，重讀 tech:transformer_bushing。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl4",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4"
+      ],
+      "statement": "High-voltage bushings often carry lead times of up to five months; DOE notes limited non-China porcelain sources (U.S., Japan, Poland) (Feb 2022).",
+      "subject_id": "e4"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：曉星重工的年報／公告顯示 Memphis 廠停產、出售或不再生產 765 kV 級 LPT。核查頻率：每年（曉星重工事業報告、DART 公告）。觸發後 48 小時：e9 降 confidence 或提撤回，重讀 tech:large_power_transformer。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl5",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13"
+      ],
+      "statement": "Hyosung Heavy Industries (HICO) bought Mitsubishi's Memphis plant in 2019 and can build up to 1000 MVA / 765 kV LPTs in the U.S.; imports supplied 82% of U.S. LPT consumption in 2019 (DOE, Feb 2022). Capability, not volume or customers — no demand anchor is attached in this package.",
+      "subject_id": "e9"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：DOE 或商務部更新版的美國 LPT 廠名單與本份不同（有廠退出、新增或易主），或任一家在自家文件寫明停產大型電力變壓器。核查頻率：每年（DOE／DOC 供應鏈報告）＋各廠新聞。觸發後 48 小時：對應供貨邊加註或提撤回，重讀 LPT 層。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl6",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s16",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s17",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s19",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s20",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s21",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s22",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s23",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s24"
+      ],
+      "statement": "DOE (Feb 2022, third-party government assessment) lists eight manufacturers with U.S. LPT production capability, by alphabetical order: Delta Star (200 MVA/345 kV), Hitachi Energy (U.S. plant 230 kV/150 MVA; Quebec up to 765 kV/1400 MVA), HICO (1000 MVA/765 kV), Hyundai Power Transformers USA (750 MVA/500 kV), Niagara Power Transformer (100 MVA/138 kV), Pennsylvania Transformer Technology (600 MVA/345 kV), SPX Transformer Solutions — acquired by GE Prolec in late 2021 (1200 MVA autotransformers/345 kV), and Virginia Transformer (1400 MVA/500 kV). Capability ratings, not output or customers; 2022 snapshot (L4).",
+      "subject_id": "tech:large_power_transformer"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：較新的官方統計（DOE／DOC／USITC）顯示美國 LPT 國產比例或進口來源結構大幅改變。核查頻率：每年。觸發後 48 小時：本 claim 加註，LPT 讀圖的供給側重讀。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl7",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s25",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s26",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s27"
+      ],
+      "statement": "DOE (Feb 2022): in 2019 the U.S. produced 137 LPTs, imported 617 and exported four; at ~40% utilization domestic capacity was put at ~343 LPTs/year. Of $3 billion of 2020 power/distribution/specialty transformer imports, 45% came from Mexico, 15% Canada, 7% China, 5% South Korea, 4% Germany, 3% Netherlands. Dated context before AI data-center demand (L4).",
+      "subject_id": "tech:large_power_transformer"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Cliffs 申報或官方報告寫出國內 GOES 的寬度／厚度／等級已達更新標準，或進口來源結構大幅改變。核查頻率：每年（DOC／DOE 報告）＋每季 Cliffs 申報。觸發後 48 小時：e6 加註，LPT 讀圖的下一層重讀。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl8",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s28",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s29"
+      ],
+      "statement": "Why LPTs are constrained by GOES (DOE, Feb 2022): the two main complaints about domestic GOES are insufficient quantity and insufficient quality (narrow width, heavy thickness), pointing to Cleveland-Cliffs' technology being outdated against updated standards; of $29 million of 2020 U.S. GOES imports, 85% came from South Korea, 6% Brazil, 4% Russia. Dated context (L4).",
+      "subject_id": "e6"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e1",
+      "relation": "is_component_of",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15"
+      ],
+      "src_id": "mat:grain_oriented_electrical_steel"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.9,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2"
+      ],
+      "src_id": "mat:ctc_copper_conductor"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3"
+      ],
+      "src_id": "tech:transformer_tap_changer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e4",
+      "relation": "is_component_of",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4"
+      ],
+      "src_id": "tech:transformer_bushing"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e5",
+      "relation": "is_component_of",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5"
+      ],
+      "src_id": "mat:transformer_insulation"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "id": "e6",
+      "relation": "constrained_by",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14"
+      ],
+      "src_id": "tech:large_power_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "tech:lpt_factory_testing",
+      "id": "e7",
+      "relation": "constrained_by",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
+      ],
+      "src_id": "tech:large_power_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "id": "e8",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s28"
+      ],
+      "src_id": "co:cleveland_cliffs"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e9",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10"
+      ],
+      "src_id": "co:hyosung_heavy_industries"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e10",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s17"
+      ],
+      "src_id": "co:delta_star"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e11",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s18"
+      ],
+      "src_id": "co:hitachi"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e12",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s20"
+      ],
+      "src_id": "co:hd_hyundai_electric"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e13",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s21"
+      ],
+      "src_id": "co:niagara_power_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e14",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s22"
+      ],
+      "src_id": "co:pennsylvania_transformer_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e15",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s23"
+      ],
+      "src_id": "co:prolec_ge"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.8,
+      "dst_id": "tech:large_power_transformer",
+      "id": "e16",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s24"
+      ],
+      "src_id": "co:virginia_transformer"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:large_power_transformer",
+      "name": "Large Power Transformer (LPT)",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s16",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s25",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s26",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s27"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "GOES",
+        "grain-oriented electrical steel",
+        "Grain-oriented Silicon Electrical Steel",
+        "HI-B"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:grain_oriented_electrical_steel",
+      "name": "Grain-Oriented Electrical Steel (GOES)",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:ctc_copper_conductor",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "tap changer",
+        "tap changers",
+        "on-load tap changers",
+        "LTC",
+        "LTCs"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:transformer_tap_changer",
+      "name": "Transformer Tap Changer",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "bushings",
+        "OIP bushings",
+        "high-voltage bushings"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:transformer_bushing",
+      "name": "Transformer Bushing (OIP)",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "pressboard",
+        "transformer board",
+        "insulating material"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:transformer_insulation",
+      "name": "Transformer Insulating Material (pressboard)",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "test_yield",
+      "aliases": [
+        "test beds",
+        "testing capacity"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "tech:lpt_factory_testing",
+      "name": "LPT Factory Testing Capacity (test beds)",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Cleveland-Cliffs",
+        "Cleveland-Cliffs Inc.",
+        "CLF"
+      ],
+      "attributes": {
+        "ticker": "CLF"
+      },
+      "confidence": 0.95,
+      "id": "co:cleveland_cliffs",
+      "name": "Cleveland-Cliffs",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Hyosung Heavy Industries",
+        "HICO",
+        "298040.KS"
+      ],
+      "attributes": {
+        "ticker": "298040.KS"
+      },
+      "confidence": 0.95,
+      "id": "co:hyosung_heavy_industries",
+      "name": "Hyosung Heavy Industries",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Delta Star"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:delta_star",
+      "name": "Delta Star",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s17"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Hitachi Energy",
+        "Hitachi ABB"
+      ],
+      "attributes": {
+        "ticker": "6501.T"
+      },
+      "confidence": 0.9,
+      "id": "co:hitachi",
+      "name": "Hitachi",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s18"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "HD Hyundai Electric",
+        "HD현대일렉트릭",
+        "Hyundai Power Transformer",
+        "Hyundai Power Transformers USA",
+        "HD Hyundai Power Transformers USA",
+        "HD Hyundai Electric America Corporation"
+      ],
+      "attributes": {
+        "ticker": "267260.KS"
+      },
+      "confidence": 0.9,
+      "id": "co:hd_hyundai_electric",
+      "name": "HD Hyundai Electric",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s20"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Niagara Power Transformer"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:niagara_power_transformer",
+      "name": "Niagara Power Transformer",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s21"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Pennsylvania Transformer Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:pennsylvania_transformer_technology",
+      "name": "Pennsylvania Transformer Technology",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s22"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "GE Prolec",
+        "Prolec GE",
+        "SPX Transformer Solutions",
+        "SPX Transformers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:prolec_ge",
+      "name": "Prolec GE",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s23"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "Virginia Transformer",
+        "Virginia Transformers",
+        "Virginia Transformer Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "co:virginia_transformer",
+      "name": "Virginia Transformer",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s24"
+      ],
+      "type": "Company"
+    }
+  ],
   "schema_version": "0.1",
   "source_doc": {
     "doc_id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24",
-    "title": "U.S. DOE — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems（2022-02-24；LPT 章）",
-    "source_type": "industry_report",
     "evidence_tier": 1,
     "origin_entity": "U.S. Department of Energy",
-    "publisher": "U.S. Department of Energy",
-    "url": "https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf",
+    "permission_basis": "美國聯邦政府公開報告；只保留研究必要的逐字摘錄（頁碼 locator），全文不入 repo。",
     "published_at": "2022-02-24",
+    "publisher": "U.S. Department of Energy",
     "retrieved_at": "2026-10-04",
+    "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
-    "permission_basis": "美國聯邦政府公開報告；只保留研究必要的逐字摘錄（頁碼 locator），全文不入 repo。"
+    "supersedes_extraction_sha256": "2e2dddddda443f86ccc7eaf07d6b83fd70f14f35c0aa037d6a124bf6a5bf44d6",
+    "title": "U.S. DOE — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems（2022-02-24；LPT 章）; §2.1.4.1 U.S. LPT manufacturers, imports, GOES complaints",
+    "url": "https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf"
   },
   "sources": [
     {
@@ -88,335 +659,76 @@
       "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15",
       "locator": "報告 p.11（PDF 第 26 頁）2.1.2.2（續）",
       "quote": "HI-B grade with domain-refined grade is highly demanded by LPT manufacturers because of its low core loss to reduce LPT weight."
-    }
-  ],
-  "nodes": [
-    {
-      "id": "tech:large_power_transformer",
-      "type": "TechNode",
-      "name": "Large Power Transformer (LPT)",
-      "aliases": [
-        "LPT",
-        "LPTs",
-        "large power transformer",
-        "large power transformers"
-      ],
-      "abstraction_level": "network_systems",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13"
-      ]
     },
     {
-      "id": "mat:grain_oriented_electrical_steel",
-      "type": "Material",
-      "name": "Grain-Oriented Electrical Steel (GOES)",
-      "aliases": [
-        "GOES",
-        "grain-oriented electrical steel",
-        "Grain-oriented Silicon Electrical Steel",
-        "HI-B"
-      ],
-      "abstraction_level": "materials_substrate",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s16",
+      "locator": "報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——LPT 廠名單（依字母序）",
+      "quote": "LPTs: The major transformer manufacturers with production capabilities in the United States by alphabetical order include Delta Star, Hitachi Energy, HICO, Hyundai Power Transformers USA, Niagara Power Transformer, Pennsylvania Transformer Technology, SPX Transformers (acquired by GE), and Virginia Transformers (formerly EFACEC)"
     },
     {
-      "id": "mat:ctc_copper_conductor",
-      "type": "Material",
-      "name": "Continuously Transposed Conductor (CTC) copper wire",
-      "aliases": [
-        "CTC",
-        "CTC copper wire",
-        "Continuously Transposed Conductor"
-      ],
-      "abstraction_level": "materials_substrate",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s17",
+      "locator": "報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——Delta Star",
+      "quote": "Delta Star has three transformer manufacturing locations including San Carlos, California, Lynchburg, Virginia and Saint-Jean-sur-Richelieu near Montreal, Quebec (Delta Star, 2021). This company can manufacture power transformers up to 200 MVA and 345 kV."
     },
     {
-      "id": "tech:transformer_tap_changer",
-      "type": "TechNode",
-      "name": "Transformer Tap Changer",
-      "aliases": [
-        "tap changer",
-        "tap changers",
-        "on-load tap changers",
-        "LTC",
-        "LTCs"
-      ],
-      "abstraction_level": "module_subsystem",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s18",
+      "locator": "報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——Hitachi Energy（截在公司名那一句；全句含「United States」，見 failure log #8）",
+      "quote": "Hitachi Energy, formerly known as Hitachi ABB, has one LPT facility"
     },
     {
-      "id": "tech:transformer_bushing",
-      "type": "TechNode",
-      "name": "Transformer Bushing (OIP)",
-      "aliases": [
-        "bushings",
-        "OIP bushings",
-        "high-voltage bushings"
-      ],
-      "abstraction_level": "module_subsystem",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s19",
+      "locator": "報告 p.13（PDF 第 28 頁）2.1.4.1 Production Capabilities——Hitachi Energy（全句，只掛 claim）",
+      "quote": "Hitachi Energy, formerly known as Hitachi ABB, has one LPT facility in the United States in South Boston, Virginia with a maximum range of 230 kV and 150 MVA as indicated through stakeholder engagement. In addition, this company has a facility in Varennes, Quebec which can supply transformers for traditional and specialty applications (including HVDC) up to 765 kV and 1400 MVA."
     },
     {
-      "id": "mat:transformer_insulation",
-      "type": "Material",
-      "name": "Transformer Insulating Material (pressboard)",
-      "aliases": [
-        "pressboard",
-        "transformer board",
-        "insulating material"
-      ],
-      "abstraction_level": "materials_substrate",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s20",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Hyundai Power Transformer",
+      "quote": "Hyundai Power Transformer has a manufacturing plant in Montgomery, Alabama with capacity up to 750 MVA and 500 kV (Hyundai Power Transformers USA, 2012)."
     },
     {
-      "id": "tech:lpt_factory_testing",
-      "type": "TechNode",
-      "name": "LPT Factory Testing Capacity (test beds)",
-      "aliases": [
-        "test beds",
-        "testing capacity"
-      ],
-      "abstraction_level": "test_yield",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s21",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Niagara Power Transformer",
+      "quote": "Niagara Power Transformer is in Buffalo, New York. Its base rating is 50 to 60 MVA with the top rating of 100 MVA and 138 kV (Niagara Power Transformer, 2021)."
     },
     {
-      "id": "co:cleveland_cliffs",
-      "type": "Company",
-      "name": "Cleveland-Cliffs",
-      "aliases": [
-        "Cleveland-Cliffs",
-        "Cleveland-Cliffs Inc.",
-        "CLF"
-      ],
-      "abstraction_level": "materials_substrate",
-      "attributes": {
-        "ticker": "CLF"
-      },
-      "confidence": 0.95,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s22",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Pennsylvania Transformer Technology",
+      "quote": "Pennsylvania Transformer Technology can produce up to 600 MVA and 345 kV at its Canonsburg facility in Pennsylvania (Pennsylvania Transformer Technology, 2020)."
     },
     {
-      "id": "co:hyosung_heavy_industries",
-      "type": "Company",
-      "name": "Hyosung Heavy Industries",
-      "aliases": [
-        "Hyosung Heavy Industries",
-        "HICO",
-        "298040.KS"
-      ],
-      "abstraction_level": "network_systems",
-      "attributes": {
-        "ticker": "298040.KS"
-      },
-      "confidence": 0.95,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10"
-      ]
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "src_id": "mat:grain_oriented_electrical_steel",
-      "dst_id": "tech:large_power_transformer",
-      "relation": "is_component_of",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s23",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1（續）——SPX Transformer Solutions（GE Prolec）",
+      "quote": "SPX Transformer Solutions plant is based in Waukesha, Wisconsin with capabilities up to 1200 MVA for autotransformers and 345 kV (SPX Transformer Solutions, 2021). In late 2021, SPX was acquired by GE Prolec, a subsidiary of a 50/50 joint venture between GE and a Mexico-based private company named Xignux (General Electric, 2021)."
     },
     {
-      "id": "e2",
-      "src_id": "mat:ctc_copper_conductor",
-      "dst_id": "tech:large_power_transformer",
-      "relation": "is_component_of",
-      "attributes": {},
-      "confidence": 0.9,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s24",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1（續）——Virginia Transformer Technology",
+      "quote": "Virginia Transformer Technology has two LPT facilities including Roanoke, Virginia and Rincon, Georgia which can manufacture liquid-type transformers up to 1400 MVA and 500 kV class (Virginia Transformer, 2017)."
     },
     {
-      "id": "e3",
-      "src_id": "tech:transformer_tap_changer",
-      "dst_id": "tech:large_power_transformer",
-      "relation": "is_component_of",
-      "attributes": {},
-      "confidence": 0.85,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s25",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1（續）——頁尾（接 p.15）",
+      "quote": "In 2019, 137 LPTs were produced domestically while"
     },
     {
-      "id": "e4",
-      "src_id": "tech:transformer_bushing",
-      "dst_id": "tech:large_power_transformer",
-      "relation": "is_component_of",
-      "attributes": {},
-      "confidence": 0.85,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s26",
+      "locator": "報告 p.15（PDF 第 30 頁）——頁首（接 p.14）",
+      "quote": "617 units were imported and four units were exported (U.S. Department of Commerce, 2020). Based on the LPT capacity utilization of ~ 40% (U.S. Department of Commerce, 2020), a total capacity of ~343 LPTs/year was derived for domestic capacity."
     },
     {
-      "id": "e5",
-      "src_id": "mat:transformer_insulation",
-      "dst_id": "tech:large_power_transformer",
-      "relation": "is_component_of",
-      "attributes": {},
-      "confidence": 0.85,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s27",
+      "locator": "報告 p.15（PDF 第 30 頁）——進口來源國",
+      "quote": "In 2020, out of $3 billion spent on “Power/distribution/specialty Transformers” imported into the United States with the North American Industry Classification System (NAICS) code 335311, 45% of these transformers came from Mexico, 15% from Canada, 7% from China, 5% from South Korea, 4% from Germany, and 3% from the Netherlands (USA Trade Online, 2021)."
     },
     {
-      "id": "e6",
-      "src_id": "tech:large_power_transformer",
-      "dst_id": "mat:grain_oriented_electrical_steel",
-      "relation": "constrained_by",
-      "attributes": {},
-      "confidence": 0.8,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14"
-      ]
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s28",
+      "locator": "報告 p.15（PDF 第 30 頁）——GOES 段",
+      "quote": "Two main complaints with domestic GOES are: (1) insufficient quantity and (2) insufficient quality including narrow width and heavy thickness. Both aspects point to the fact that Cleveland-Cliffs technology is outdated and unable to keep up with more stringent requirement from updated standards (U.S. Department of Commerce, 2020)."
     },
     {
-      "id": "e7",
-      "src_id": "tech:large_power_transformer",
-      "dst_id": "tech:lpt_factory_testing",
-      "relation": "constrained_by",
-      "attributes": {},
-      "confidence": 0.75,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
-      ]
-    },
-    {
-      "id": "e8",
-      "src_id": "co:cleveland_cliffs",
-      "dst_id": "mat:grain_oriented_electrical_steel",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.85,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
-      ]
-    },
-    {
-      "id": "e9",
-      "src_id": "co:hyosung_heavy_industries",
-      "dst_id": "tech:large_power_transformer",
-      "relation": "supplies_to",
-      "attributes": {},
-      "confidence": 0.85,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10"
-      ]
-    }
-  ],
-  "claims": [
-    {
-      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl1",
-      "subject_id": "e6",
-      "demand_proof_level": "confirmed",
-      "confidence": 0.8,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
-      ],
-      "statement": "DOE (Feb 2022, third-party government assessment) names two major bottlenecks in the U.S. LPT supply chain: GOES production capacity and LPT testing capacity. Cleveland-Cliffs is the sole U.S. GOES producer and domestic supply meets about 20% of domestic demand; of 13 GOES makers abroad, only Japan, South Korea and Germany meet DOE specifications. Dated snapshot from before AI data-center demand — the numbers are context, not attributes (L4).",
-      "disproof_condition": "條件：更新的一手（DOE／商務部報告、GOES 生產者的 10-K／法說）顯示美國 GOES 產能已能滿足大部分國內需求，或不再把 GOES 列為 LPT 瓶頸。核查頻率：每半年（DOE／商務部報告；Cleveland-Cliffs 10-K／10-Q）。觸發後 48 小時：重跑 python -m query.structure tech:large_power_transformer，e6 降 confidence 或改成歷史 dated claim，並重讀該層。"
-    },
-    {
-      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl2",
-      "subject_id": "e7",
-      "demand_proof_level": "confirmed",
-      "confidence": 0.75,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
-      ],
-      "statement": "Testing is the second named LPT bottleneck: each facility or manufacturer has only 1–2 test beds and testing takes about a week per LPT (DOE, Feb 2022).",
-      "disproof_condition": "條件：一手揭露 LPT 製造商大幅擴充試驗台、或測試不再被列為產能限制。核查頻率：每半年（DOE／商務部報告、LPT 製造商法說）。觸發後 48 小時：e7 降 confidence，重讀 tech:large_power_transformer 層。"
-    },
-    {
-      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl3",
-      "subject_id": "e3",
-      "demand_proof_level": "confirmed",
-      "confidence": 0.7,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3"
-      ],
-      "statement": "Stakeholders told DOE that tap changers could also be a bottleneck: three domestic suppliers and one reliable supplier from Germany (not named), with German tap changers costlier and on longer lead times (Feb 2022).",
-      "disproof_condition": "條件：一手具名那家德國供應商並顯示分接開關供給已不吃緊，或出現多家新的合格供應商。核查頻率：每年（DOE／商務部報告、變壓器廠法說）。觸發後 48 小時：本 claim 加註，e3 的層讀圖重寫供給側。"
-    },
-    {
-      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl4",
-      "subject_id": "e4",
-      "demand_proof_level": "confirmed",
-      "confidence": 0.7,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4"
-      ],
-      "statement": "High-voltage bushings often carry lead times of up to five months; DOE notes limited non-China porcelain sources (U.S., Japan, Poland) (Feb 2022).",
-      "disproof_condition": "條件：一手顯示高壓套管交期回到正常（數週）或供給明顯擴充。核查頻率：每年（DOE／商務部報告、套管製造商公告）。觸發後 48 小時：本 claim 加註，重讀 tech:transformer_bushing。"
-    },
-    {
-      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl5",
-      "subject_id": "e9",
-      "demand_proof_level": "confirmed",
-      "confidence": 0.8,
-      "source_ids": [
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10",
-        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13"
-      ],
-      "statement": "Hyosung Heavy Industries (HICO) bought Mitsubishi's Memphis plant in 2019 and can build up to 1000 MVA / 765 kV LPTs in the U.S.; imports supplied 82% of U.S. LPT consumption in 2019 (DOE, Feb 2022). Capability, not volume or customers — no demand anchor is attached in this package.",
-      "disproof_condition": "條件：曉星重工的年報／公告顯示 Memphis 廠停產、出售或不再生產 765 kV 級 LPT。核查頻率：每年（曉星重工事業報告、DART 公告）。觸發後 48 小時：e9 降 confidence 或提撤回，重讀 tech:large_power_transformer。"
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s29",
+      "locator": "報告 p.15（PDF 第 30 頁）——GOES 進口來源",
+      "quote": "In 2020, out of $29 million spent on GOES imports into the United States under the aforementioned HS code, 85% of imports came from South Korea, 6% came from Brazil, and 4% came from Russia (USA Trade Online, 2021)."
     }
   ]
 }

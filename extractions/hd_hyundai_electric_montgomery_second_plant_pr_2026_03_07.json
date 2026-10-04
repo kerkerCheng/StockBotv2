@@ -1,0 +1,117 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07",
+    "title": "HD Hyundai Electric Expands U.S. Production Subsidiary, Solidifies Leadership in North American Extra High Voltage Power Transformer Market（2026-03-07）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "HD Hyundai Electric Co., Ltd.",
+    "publisher": "PR Newswire（news provided by HD Hyundai）",
+    "url": "https://www.prnewswire.com/news-releases/hd-hyundai-electric-expands-us-production-subsidiary-solidifies-leadership-in-north-american-extra-high-voltage-power-transformer-market-302707507.html",
+    "published_at": "2026-03-07",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄。"
+  },
+  "sources": [
+    {
+      "id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s1",
+      "locator": "新聞稿第 2 段",
+      "quote": "HD Hyundai Electric will invest approximately $200 million to increase extra high voltage power transformer production capacity by 50% and establish manufacturing and testing capabilities for 765-kilovolt-class transformers"
+    },
+    {
+      "id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s2",
+      "locator": "新聞稿第 1 段",
+      "quote": "a second plant at its North American production base, HD Hyundai Power Transformers USA, in Montgomery, Alabama"
+    },
+    {
+      "id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s3",
+      "locator": "新聞稿第 3 段",
+      "quote": "This localized production base has significantly reduced supply lead times and enhanced customer responsiveness, strengthening trust and order competitiveness in the North American market."
+    },
+    {
+      "id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s4",
+      "locator": "新聞稿第 1 段",
+      "quote": "will be constructed within the site of the North American production subsidiary, with completion targeted for April next year."
+    },
+    {
+      "id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s5",
+      "locator": "新聞稿第 3 段",
+      "quote": "Revenue increased from approximately $100 million in 2017 to about $400 million in 2025."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:large_power_transformer",
+      "type": "TechNode",
+      "name": "Large Power Transformer (LPT)",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers",
+        "초고압 변압기",
+        "extra high voltage power transformer",
+        "extra high voltage power transformers"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s1"
+      ]
+    },
+    {
+      "id": "co:hd_hyundai_electric",
+      "type": "Company",
+      "name": "HD Hyundai Electric",
+      "aliases": [
+        "HD Hyundai Electric",
+        "HD현대일렉트릭",
+        "Hyundai Power Transformer",
+        "Hyundai Power Transformers USA",
+        "HD Hyundai Power Transformers USA",
+        "HD Hyundai Electric America Corporation"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {
+        "ticker": "267260.KS"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s1",
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:hd_hyundai_electric",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s1",
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.7,
+      "source_ids": [
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s1",
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s3",
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s4",
+        "hd_hyundai_electric_montgomery_second_plant_pr_2026_03_07_s5"
+      ],
+      "statement": "Issuer plan (2026-03-07): HD Hyundai Electric is investing about $200 million in a second plant at HD Hyundai Power Transformers USA (Montgomery, Alabama) to raise extra-high-voltage power transformer capacity by 50% and add 765 kV-class manufacturing and testing, completion targeted for April 2027; it says the localized base 'significantly reduced supply lead times', and the subsidiary's revenue grew from about $100 million (2017) to about $400 million (2025). Supply is being added — the volume window for this layer narrows when it lands. Self-report (L8: weak); dated (L4).",
+      "disproof_condition": "條件：HD 現代電氣公告 Montgomery 第二廠延後、縮小或取消，或 2027 年中仍未取得 765kV 級試驗能力。核查頻率：每季（DART、公司新聞稿）。觸發後 48 小時：本 claim 加註，LPT 讀圖重估量的窗口。"
+    }
+  ]
+}
