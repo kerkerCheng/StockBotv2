@@ -17,6 +17,7 @@
 | [`2026-09-17-structural-reading-layer.md`](2026-09-17-structural-reading-layer.md) | G5 擴充它（加插槽讀圖 kind）；實作前要讀 |
 | [`2026-09-18-verbatim-never-reaches-the-decision.md`](2026-09-18-verbatim-never-reaches-the-decision.md) | L18 的量測與架構；走圖與讀圖必須消費逐字 |
 | [`2026-08-31-event-watch-module-requirements.md`](2026-08-31-event-watch-module-requirements.md) | G7 擴充它（加語意條件 kind）；實作前要讀 |
+| [`2026-10-04-phase7-research-edge-proposal.md`](2026-10-04-phase7-research-edge-proposal.md) | Phase 7（研究使用與量測）的能力盤點、failure analysis、十個 edge 假說、回放與前瞻評估設計、campaign 驗證集、§13 決策流程（APP 的組織原則）；使用者 2026-10-04 定案，Phase 7 plan 從它導出 |
 
 ## 歷史證據（只在引用實測數字時讀）
 
