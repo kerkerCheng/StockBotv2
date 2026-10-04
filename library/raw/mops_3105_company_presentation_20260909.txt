@@ -1,0 +1,14 @@
+Source URL: https://mopsov.twse.com.tw/nas/STR/310520260909E001.pdf
+
+Excerpt:
+[EXCERPT — MOPS 法說簡報之有限逐字引文] 穩懋（WIN Semiconductors, 3105.TWO）Company Presentation Aug – Sept 2026
+Source: https://mopsov.twse.com.tw/nas/STR/310520260909E001.pdf（MOPS t100sb07_1：召開法人說明會日期 115/09/14，UBS Taiwan Summit 2026；檔名日期 2026-09-09，同日重大訊息公告受邀參加）
+Published: 2026-09-09 | Origin: WIN Semiconductors | Retrieved: 2026-10-04
+
+p.1 封面："WIN Semiconductors Company Presentation Aug – Sept 2026"
+p.23「Optical Device from Datacom to Telecom」（文字層；圖例對應 2026-10-04 讀頁面核對：實心圓＝Mass Production＝VCSEL、InP PIC；空心圓＝Ongoing Qualification＝CW-DFB、EML；PD 無圓點）："Optical Device from Datacom to Telecom <100m CW-DFB VCSEL EML InP PIC PD >10km Datacom Telecom Mass Production Ongoing Qualification"
+p.24「CW-DFB Development Roadmap」（雷射功率由 70 到 400 mW 的路線圖，縱軸 Laser power、橫軸 Data rate/lane）："CW-DFB Development Roadmap Data rate/lane Laser power 70 mW 100 mW 200 mW 400 mW"
+p.26「WIN’s advantages in 6-inch process capability from GaAs to InP」："By leveraging the technology and experience from 6-inch GaAs capability, WIN is now developing 6-inch InP capability with the following advantages:"
+p.26 第三點（發行人自述，L8 弱主張）："Limited capex required (Leveraging existing 6-inch equipments and facilities)"
+p.26 第一句（發行人自述，L8 弱主張）："WIN possesses the world’s largest GaAs 6-inch wafer capacity, technology, and expertise."
+（p.23 的圓點圖例在圖片內，2026-10-04 逐頁讀圖核對）
