@@ -77,7 +77,7 @@ def test_only_the_default_state_dir_writes_the_real_series(tmp_path) -> None:
 def fake_board(monkeypatch):
     import alpha.providers.candidates as cand
 
-    def fake_load(universe, context=None):
+    def fake_load(universe, context=None, structure=None):
         payload = fake_candidates_payload()
         return {k: payload[k] for k in ("groups", "side_groups", "counts", "oldest_stall_days", "holdings",
                                         "narrative_rewrite", "ledger", "rollup", "universe", "today", "no_narrative")}

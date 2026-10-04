@@ -286,6 +286,24 @@ PLAIN_PRICED_IN = (
     "這一格有沒有區分力還在量（Phase 7 已定價回放 R1）。"
 )
 
+#: 個股頁首屏的既有元件（封閉字彙；Phase 7 Step 7.0e）。五題只**重排**它們，不新增判斷、不改任何 Datum：
+#: 三個字（候選面板）、歸零燈（wipeout 面板）、反證列（downside 面板）、加碼條件與「是不是新賭注」（候選狀態那一份）。
+FIRST_SCREEN_PARTS: tuple[str, ...] = (
+    "priced_in", "in_numbers", "will_it_die", "wipeout", "disproof", "confirm", "shared_bet",
+)
+
+#: 個股頁首屏五題（Phase 7 Step 7.0e；使用者 2026-10-04 A1）。**標題與「哪一格放哪一題」只有這一份**——
+#: materialize 寫進 `.meta.json`，APP 照這個順序排，app.js 不留第二份（L16）。`slots`＝v2 短評的格（依序；七格各放一次），
+#: `parts`＝`FIRST_SCREEN_PARTS` 的元件。只是呈現順序：不排序、不打分、不進候選狀態的前提（plan §0 第 3 條）。
+FIRST_SCREEN_QUESTIONS: tuple[Mapping[str, Any], ...] = (
+    {"key": "what_bet", "title": "① 這一檔押的是什麼", "slots": ("our_bet", "bottleneck", "position"), "parts": ()},
+    {"key": "big_enough", "title": "② 押對了夠大嗎", "slots": ("what_must_be_true", "demand", "priced_in"),
+     "parts": ("priced_in", "in_numbers")},
+    {"key": "how_wrong", "title": "③ 錯了怎麼知道、哪天知道", "slots": ("when",), "parts": ("disproof", "confirm")},
+    {"key": "will_it_die", "title": "④ 會不會死", "slots": (), "parts": ("will_it_die", "wipeout")},
+    {"key": "new_bet", "title": "⑤ 是不是新賭注", "slots": (), "parts": ("shared_bet",)},
+)
+
 PRICE_SERIES_NOTE = (
     "這是這檔自己的收盤價（provider 報價單位原值，未換算幣別）。"
     "它是**脈絡不是訊號**——系統不用它排序、不用它決定買多少，也不從中推導任何進出場建議。"
@@ -624,6 +642,7 @@ def readiness_class(status: str) -> str:
 
 
 __all__ = [
+    "FIRST_SCREEN_PARTS", "FIRST_SCREEN_QUESTIONS",
     "PLAIN_ABSENCE_SHORT",
     "PLAIN_BET_UNITS",
     "PLAIN_LINE_LABELS",

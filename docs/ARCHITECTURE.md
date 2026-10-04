@@ -456,7 +456,7 @@ AnalystView ── headline   （現在多少錢：只有現價｜refresh／revi
             ├─ research   （Q6 Q1–Q5／thesis／催化劑／disproof／missing・stale・review_required）
             ├─ wipeout    （歸零旗標四盞：只給燈不給數字；灰＝沒量到）
             ├─ readings   （讀圖：坐的層／插槽的現行讀圖＋狀態；3.7 起核心，stale→review_required）
-            ├─ candidate      （**optional，注入**：首屏末行——候選狀態＋三題三個字，與候選板同一個 derive_row）
+            ├─ candidate      （**optional，注入**：首屏末行——候選狀態＋三題三個字＋加碼條件＋是不是新賭注〔`shared_bet`〕，與候選板同一個 derive_row）
             ├─ downside       （**optional，注入**：每條反證→盯它的 watch id 與狀態；沒有的印「未盯」）
             ├─ bet            （**optional**：純文字——our_bet＋騎的層／插槽＋什麼必須為真）
             ├─ three_questions（**optional**：稽核區——三題每行的值、來源、as_of、口徑、rule 或缺席分型）
@@ -745,6 +745,18 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
   （`confirm_rows`；每條要印的那一句由 `confirm_line` 在 materialize 端組好、前端照印——`app.js` 的全檔部位用語禁字檢查不放寬，
   這類字只住封閉字彙旁邊）。為什麼不另開 `confirm_ref` 欄位：用 `disproof_ref` 的地方有八處，另開欄位漏改任何一處，加碼條件就會叫不醒、
   沒人消費（INV-4）；標錯字的代價比等待消失小。
+- **首屏五題（2026-10-04 Phase 7 Step 7.0e，使用者 A1）**：v2 短評的首屏照五題排——①這一檔押的是什麼 ②押對了夠大嗎
+  ③錯了怎麼知道、哪天知道 ④會不會死 ⑤是不是新賭注。**標題與「哪一格放哪一題」只有一份**
+  （`briefing/analyst_view/contracts.py::FIRST_SCREEN_QUESTIONS`，七格各放一次；`FIRST_SCREEN_PARTS` 是題下既有元件的封閉字彙：
+  三個字、歸零燈、反證列、加碼條件、是不是新賭注），經 `.meta.json` 給 APP，app.js 不留第二份；只**重排**既有句子與燈，不改任何
+  Datum、不改 ledger。帶不齊對照表每一格的頁（v1 短評、舊 `.meta.json`）照舊版面。
+- **是不是新賭注（同上，使用者 A3）**：候選推導多一格 `shared_bet`——這一檔和每一檔**持有的 alpha 檔**（`held_index`）共用的需求錨與
+  層／插槽，依 ticker 字母列，**不打分、不排序、不加權、不進候選狀態前提**。需求錨只取結構表逐列的 `demand_anchor`／`anchor_basis`
+  （唯一來源；materialize 讀**同一輪** `--structure-table` 寫下的 artifact——`webapp/materialize.py::bet_structure`，不另開連線重算），
+  錨的來處跟著值走（任一邊是退回公司才走到的標「公司層」）；層與插槽取 `alpha/providers/structure_readings.py::seats_from_edges`
+  （讀圖面板同一個函式）。比對索引在 `candidate_context` 一次建好（`bet_index`），候選板與個股頁同一個 `derive_row`。缺席由產生端宣告：
+  Sheet 讀不到＝持有判定暫停（`upstream_unavailable`，不是「沒有共用」）；結構表讀不到＝需求錨這半邊沒比、層照比；走不到任何需求錨照實寫。
+  欄位名不帶部位語彙（個股頁的 key 掃描：`held`、`holdings` 不得當欄位名）——「持有」只以 `state` 的值出現，與候選狀態同一個字。
 
 **為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
 讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。

@@ -59,12 +59,124 @@ def open_preconditions(brief: InvestorBrief, *, reading_rows: Mapping[tuple[str,
     return failed
 
 
+# ---------------------------------------------------------------------------
+# 是不是新賭注（Phase 7 Step 7.0e；使用者 2026-10-04 A3）
+# ---------------------------------------------------------------------------
+
+def bet_index(structure: Mapping[str, Any] | None, seats: Mapping[str, Sequence[str]], *,
+              node_names: Mapping[str, str] | None = None) -> dict[str, Any]:
+    """首屏「是不是新賭注」的比對輸入——**一次**建好，候選板與個股頁共用（同一個 `candidate_context`）。
+
+    - 需求錨：結構表的逐列錨（`query.bottleneck.structure_table` 的 `demand_anchor`／`anchor_basis`，**唯一來源**；
+      這裡收的是 materialize 同一輪寫下的 `structure_table` artifact 照抄的那幾格）。同一家公司同一個錨，任一列由節點
+      自己走到（`row`）就記 `row`，全部是退回公司才走到的才記 `company`——錨的值與它的來處一起走（L12）。
+    - 層與插槽：`structure_readings.seats_from_edges`（讀圖面板同一個函式）。
+    `structure` 是 None 或 `{"absence": …}` → 需求錨這半邊 `upstream_unavailable`（層照比）——不是「沒有共用」。"""
+    anchors: dict[str, dict[str, str]] = {}
+    names: dict[str, str] = {}
+    absence: dict[str, Any] | None = None
+    if structure is None:
+        absence = {"kind": "upstream_unavailable", "reason": "這次沒有載入結構表"}
+    elif structure.get("absence"):
+        absence = dict(structure["absence"])
+    else:
+        for r in structure.get("rows") or ():
+            if r.get("bottleneck") and r.get("bottleneck_name"):
+                names.setdefault(str(r["bottleneck"]), str(r["bottleneck_name"]))
+            company, anchor = str(r.get("company_id") or ""), str(r.get("demand_anchor") or "")
+            if not company or not anchor:
+                continue
+            mine = anchors.setdefault(company, {})
+            if mine.get(anchor) != "row":
+                mine[anchor] = str(r.get("anchor_basis") or "")
+            if r.get("demand_anchor_name"):
+                names.setdefault(anchor, str(r["demand_anchor_name"]))
+    for node, name in (node_names or {}).items():
+        if name:
+            names.setdefault(str(node), str(name))
+    return {"anchors": anchors, "anchors_absence": absence,
+            "anchors_as_of": None if absence else (structure or {}).get("generated_at"),
+            "layers": {str(co): list(nodes) for co, nodes in seats.items()}, "names": names}
+
+
+def shared_bet(company_id: str | None, ticker: str, *, held: Mapping[str, Any], bets: Mapping[str, Any] | None,
+               registry: Any = None) -> dict[str, Any]:
+    """首屏⑤：這一檔和每一檔**持有的 alpha 檔**（`held_index`：Sheet、alpha、股數 > 0）共用的需求錨與層／插槽。
+    依 ticker 字母列（索引，不是名次）——**不打分、不排序、不加權**，也不進候選狀態的前提（plan §0 第 3 條）；沒有共用的持股不列。
+
+    缺席由這裡宣告（L16）：Sheet 讀不到＝持有判定暫停（`upstream_unavailable`，不是「沒有共用」）；沒載入比對輸入同；
+    結構表讀不到＝需求錨這半邊沒比（`anchors_absence`，層照比）；這檔走不到任何需求錨＝照實寫。
+    每一句（`lines`）在這裡組好，候選板與個股頁照印（前端不組字）。欄位名不帶部位語彙（個股頁的 key 掃描）——
+    「持有」只以 `state` 的值出現，與候選狀態同一個字彙。"""
+    out: dict[str, Any] = {"rows": [], "absence": None, "anchors_absence": None, "anchors_as_of": None, "lines": []}
+    if held.get("status") != "ok" or bets is None:
+        reason = (str(held.get("reason") or "持股未讀到，已持有判定暫停") if held.get("status") != "ok"
+                  else "這次沒有載入需求錨與層的比對輸入")
+        out["absence"] = {"kind": "upstream_unavailable", "reason": reason}
+        out["lines"] = [f"是不是新賭注：比不出來——{reason}"]
+        return out
+    names = bets.get("names") or {}
+    anchors = bets.get("anchors") or {}
+    layers = bets.get("layers") or {}
+    out["anchors_absence"] = dict(bets["anchors_absence"]) if bets.get("anchors_absence") else None
+    out["anchors_as_of"] = bets.get("anchors_as_of")
+    me = str(company_id or "")
+    my_anchors = anchors.get(me) or {}
+    my_layers = set(layers.get(me) or ())
+    rows: list[dict[str, Any]] = []
+    for peer, info in (held.get("by_company") or {}).items():
+        if str(peer) == me:
+            continue
+        theirs = anchors.get(str(peer)) or {}
+        common_anchors = [{"node": a, "name": names.get(a), "basis": {"this": my_anchors[a], "other": theirs[a]}}
+                          for a in sorted(set(my_anchors) & set(theirs))]
+        common_layers = [{"node": n, "name": names.get(n)} for n in sorted(my_layers & set(layers.get(str(peer)) or ()))]
+        if common_anchors or common_layers:
+            label = (registry.research_ticker(peer) if registry is not None else None) or info.get("sheet_ticker")
+            rows.append({"ticker": str(label or peer), "company_id": str(peer), "state": "held",
+                         "shared_anchors": common_anchors, "shared_layers": common_layers})
+    out["rows"] = sorted(rows, key=lambda r: (r["ticker"], r["company_id"]))
+    out["lines"] = _shared_bet_lines(out, has_anchor=bool(my_anchors), has_layer=bool(my_layers))
+    return out
+
+
+def _shared_bet_lines(out: Mapping[str, Any], *, has_anchor: bool, has_layer: bool) -> list[str]:
+    """`shared_bet` 要印的句子。錨是退回公司才走到的（任一邊）標「公司層」——與結構表那一格同一個標法。"""
+    lines: list[str] = []
+    for r in out["rows"]:
+        bits = []
+        if r["shared_anchors"]:
+            bits.append("需求錨 " + "、".join(
+                f"{a['name'] or a['node']}{'（公司層）' if 'company' in a['basis'].values() else ''}"
+                for a in r["shared_anchors"]))
+        if r["shared_layers"]:
+            bits.append("同一層／插槽 " + "、".join(str(n["name"] or n["node"]) for n in r["shared_layers"]))
+        lines.append(f"和持有的 {r['ticker']} 共用：" + "；".join(bits))
+    if not out["rows"]:
+        lines.append("和目前持有的 alpha 檔沒有共用的層" if out["anchors_absence"]
+                     else "和目前持有的 alpha 檔沒有共用的需求錨或層")
+    if out["anchors_absence"]:
+        lines.append(f"需求錨這半邊沒比：{out['anchors_absence'].get('reason') or '結構表讀不到'}")
+    elif not has_anchor:
+        lines.append("這檔在結構表走不到任何需求錨——需求錨無從比對，只比了層")
+    if not has_layer:
+        lines.append("這檔在圖上沒有坐任何層或插槽——同一層無從比對")
+    as_of = str(out.get("anchors_as_of") or "")[:10]
+    if as_of and any(r["shared_anchors"] for r in out["rows"]):
+        lines.append(f"（需求錨取自 {as_of} 的結構表逐列錨）")
+    return lines
+
+
 def derive_row(ticker: str, company_id: str | None, *, records: Sequence[InvestorBrief], today: date,
                reading_rows: Mapping[tuple[str, str], Mapping[str, Any]], watches: Sequence[Mapping[str, Any]],
                lifecycle: Mapping[str, Any] | None, edge: Mapping[str, Any] | None,
                three_questions: Mapping[str, Any] | None, held: Mapping[str, Any],
-               three_questions_note: str | None = None) -> dict[str, Any] | None:
+               three_questions_note: str | None = None, bets: Mapping[str, Any] | None = None,
+               registry: Any = None) -> dict[str, Any] | None:
     """一檔的候選狀態。沒有敘事、也沒有持有 → None（不上板，計數另印「無敘事」）。
+
+    `bets`／`registry`：首屏「是不是新賭注」的比對輸入（`bet_index`，Phase 7 Step 7.0e）——只呈現在 `shared_bet`，
+    **不進任何狀態判斷**；沒給就由 `shared_bet` 宣告缺席。
 
     `rewrite[]`（**每一列都算，不論宣告哪一態、落哪一組**）：連結斷了（附為什麼斷）、敘事來源 watch 醒來／觸及／
     到期未判（plan §5 第 6 點：候選板印「敘事該重寫：<watch id> <狀態>」）、缺 X／等回落在等的 watch 已失效。"""
@@ -94,6 +206,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "rides": [], "watch": None, "since": None, "stall_days": None,
         # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
         "confirm": [],
+        # 是不是新賭注（Phase 7 Step 7.0e）：和持有的 alpha 檔共用的需求錨與層——只呈現，不進任何狀態判斷
+        "shared_bet": shared_bet(company_id, ticker, held=held, bets=bets, registry=registry),
         "three_words": three_words(three_questions, brief, not_read=f"未讀到（{three_questions_note}）"
                                    if three_questions_note else "未讀到"),
         "note": None,
@@ -232,12 +346,14 @@ def _wipeout_and_three_questions(ticker: str, *, today: date, history_not_compar
 
 def candidate_context(tickers: Sequence[str], *, today: date | None = None,
                       holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
-                      board: bool = True) -> dict[str, Any]:
+                      board: bool = True, structure: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """候選狀態推導的共用輸入——**一次載入**，候選板與個股頁 materialize 共用（Step 3.7 接回偏差 21）。
 
     唯讀：敘事 ledger 目錄、讀圖對圖、watch registry、thesis lifecycle、registry、Engine C（邊緣判定）、Sheet readonly。
     `board=True`（候選板）：宇宙併入敘事 ledger 裡有的與只在 Sheet 持有的——上板的依據是敘事與持有；
-    `board=False`（個股頁）：只算傳進來那幾檔的邊緣判定（頁面不需要別檔）。Sheet 讀不到＝已持有判定暫停，不是「沒持有」。"""
+    `board=False`（個股頁）：只算傳進來那幾檔的邊緣判定（頁面不需要別檔）。Sheet 讀不到＝已持有判定暫停，不是「沒持有」。
+    `structure`：結構表的逐列錨（`webapp.materialize.bet_structure` 讀同一輪的 `structure_table` artifact；Phase 7 Step 7.0e）
+    ——與讀圖對圖同一份邊算出的坐的層，一起建成「是不是新賭注」的比對索引 `bets`（`bet_index`）。沒給＝需求錨這半邊缺席。"""
     from engine_b import event_watch as ew
     from engine_b.disproof import load_lifecycle
     from identity.registry import get_registry
@@ -248,7 +364,7 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
 
     from . import briefs as briefs_provider
     from .edge import edge_states
-    from .structure_readings import reading_status_rows
+    from .structure_readings import reading_status_rows, seats_from_edges
 
     today = today or ew._today()
     registry = get_registry()
@@ -264,7 +380,8 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
     universe = sorted({research(t) for t in tickers} | ({t.upper() for t in ledger_tickers} if board else set()))
     watches = list(ew.load_watches().get("watches") or ())
     lifecycle = load_lifecycle()
-    rows_raw, reading_errors = reading_status_rows(_load_edges(), today=today, watches=watches)
+    graph_edges = _load_edges()
+    rows_raw, reading_errors = reading_status_rows(graph_edges, today=today, watches=watches)
     reading_rows = {(r.get("node"), r.get("unit")): r for r in rows_raw if r.get("reading_id")}
     # 有紀錄但沒有現行的格子＝全部撤回（`reading_status_rows` 的兩種 reading_id=None 列；整個節點撤回時 unit 是 None）。
     retracted_cells = sorted({(str(r.get("node")), r.get("unit")) for r in rows_raw if not r.get("reading_id")},
@@ -293,7 +410,8 @@ def candidate_context(tickers: Sequence[str], *, today: date | None = None,
             "lifecycle": lifecycle, "reading_rows": reading_rows, "reading_errors": list(reading_errors),
             "retracted_cells": retracted_cells,
             "held": held, "edges": edge_states(sorted(set(universe) | set(extra))),
-            "ledger_present": ledger_present, "ledger_tickers": ledger_tickers}
+            "ledger_present": ledger_present, "ledger_tickers": ledger_tickers,
+            "bets": bet_index(structure, seats_from_edges(graph_edges))}
 
 
 def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, *,
@@ -310,7 +428,8 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
     row = derive_row(ticker, company_id, records=records, today=today, reading_rows=context["reading_rows"],
                      watches=context["watches"], lifecycle=context["lifecycle"],
                      edge=(context.get("edges") or {}).get(str(ticker).upper()), three_questions=three_questions,
-                     held=context["held"], three_questions_note=three_questions_note)
+                     held=context["held"], three_questions_note=three_questions_note,
+                     bets=context.get("bets"), registry=context.get("registry"))
     brief = select_brief(records, as_of=None, today=today)
     v2 = brief if brief is not None and brief.record_version == RECORD_VERSION_V2 else None
     words = (row["three_words"] if row is not None else
@@ -345,22 +464,24 @@ def page_input(context: Mapping[str, Any], ticker: str, company_id: str | None, 
 
 def load_board(tickers: Sequence[str], *, today: date | None = None,
                holdings_loader: Callable[[], Sequence[Mapping[str, Any]]] | None = None,
-               context: Mapping[str, Any] | None = None) -> dict[str, Any]:
+               context: Mapping[str, Any] | None = None,
+               structure: Mapping[str, Any] | None = None) -> dict[str, Any]:
     """讀真實資料組整板（materialize 用；**唯讀**：敘事 ledger、讀圖對圖、registry、Engine C、Sheet readonly）。
 
     ⚠ Engine C：三題走 `?mode=ro`；四盞燈走唯一串接點 `alpha.providers.wipeout.wipeout_for`（與單檔 materialize 同一條路，
     一般連線）；邊緣判定的市值正規化沿用 `alpha/providers/market_normalization.py`（FX 由 yfinance 取一次）。
     `tickers`：宇宙（APP 已 materialize 的那幾十檔）；敘事 ledger 裡有、宇宙沒有的也併進來——上板的依據是敘事。
-    `context`：`candidate_context(tickers)` 的結果（沒給就自己載一次）。"""
+    `context`：`candidate_context(tickers)` 的結果（沒給就自己載一次，`structure` 照傳）。"""
     from engine_b.disproof import current_briefs
     from engine_b.narrative_watches import link_breaks
 
     from . import briefs as briefs_provider
 
     ctx = context if context is not None else candidate_context(tickers, today=today,
-                                                                 holdings_loader=holdings_loader)
+                                                                 holdings_loader=holdings_loader, structure=structure)
     today = ctx["today"]
     registry = ctx["registry"]
+    bets = ctx.get("bets")
     universe, extra, edges, held = ctx["universe"], ctx["extra"], ctx["edges"], ctx["held"]
     if context is not None:
         # 共用 context 是在 materialize **之前**以（要跑的 ∪ store 已有的）載的超集；組板的宇宙仍以呼叫端給的 `tickers`
@@ -399,7 +520,7 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         cid = extra.get(ticker) or registry.company_id_for_ticker(ticker)
         row = derive_row(ticker, cid, records=records, today=today, reading_rows=reading_rows,
                          watches=watches, lifecycle=lifecycle, edge=edges.get(ticker), three_questions=tq,
-                         held=held, three_questions_note=note)
+                         held=held, three_questions_note=note, bets=bets, registry=registry)
         rows.append(row)
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,
@@ -410,7 +531,8 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
             rows.append(derive_row(str(info.get("sheet_ticker")), cid, records=[], today=today,
                                    reading_rows=reading_rows, watches=watches, lifecycle=lifecycle, edge=None,
                                    three_questions=None, held=held,
-                                   three_questions_note="registry 沒有這家公司的 research ticker"))
+                                   three_questions_note="registry 沒有這家公司的 research ticker",
+                                   bets=bets, registry=registry))
     board = assemble_board(rows, universe=board_universe, held=held,
                            narrative_rewrite=board_rewrite(rows, link_breaks(current_briefs(), watches=watches),
                                                            watches=watches, company_ticker=company_ticker,
@@ -428,5 +550,5 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
 
 
 __all__ = ["ANSWER_WORDS", "CANDIDATES_THIS_IS_NOT", "GROUPS", "GROUP_LABELS", "SIDE_GROUPS", "SIDE_LABELS",
-           "UNANSWERED", "assemble_board", "board_rewrite", "candidate_context", "derive_row", "held_index",
-           "load_board", "open_preconditions", "page_input", "rollup", "stall_since", "three_words"]
+           "UNANSWERED", "assemble_board", "bet_index", "board_rewrite", "candidate_context", "derive_row", "held_index",
+           "load_board", "open_preconditions", "page_input", "rollup", "shared_bet", "stall_since", "three_words"]

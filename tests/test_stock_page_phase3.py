@@ -867,7 +867,9 @@ def test_frontend_guards_for_the_second_review_round() -> None:
     assert "x >= 0 && x <= 1" in point, "占比只對 0–1 的數字 ×100（金額不得印成百分比）"
     card = source.split("function downsideCard", 1)[1].split("\nfunction ", 1)[0]
     assert "c.description" in card and "c.expected_at" in card and "c.label, c.due, c.state" not in card
-    assert "point_in_time_unavailable" in card
+    # 沒有反證列時的標題（含回看那天不推）在 Phase 7 Step 7.0e 抽成一個函式，卡片與首屏③共用（L16）
+    head = source.split("function downsideAbsenceHead", 1)[1].split("\nfunction ", 1)[0]
+    assert "downsideAbsenceHead(panel)" in card and "point_in_time_unavailable" in head
     readiness = source.split("function renderReadiness", 1)[1].split("\nfunction ", 1)[0]
     assert "plainPanel(key" in readiness and "沒有 entry 判準" not in readiness
     tq = source.split("function threeQuestionsCard", 1)[1].split("\nfunction ", 1)[0]

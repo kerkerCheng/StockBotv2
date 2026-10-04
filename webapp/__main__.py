@@ -158,9 +158,9 @@ def cmd_materialize(args: argparse.Namespace) -> int:
     # （宇宙＝這一輪要 materialize 的 ∪ store 已有的，等於組板時的 `store.tickers()`；另併敘事 ledger 與只在 Sheet 的持有）。
     shared = None
     if tickers and getattr(args, "candidates", False) and as_of is None:
-        shared = candidate_context(sorted(set(tickers) | set(store.tickers())), board=True)
+        shared = candidate_context(sorted(set(tickers) | set(store.tickers())), board=True, state_store=state_store)
     if tickers:
-        results = materialize_many(tickers, as_of=as_of, store=store, candidates=shared)
+        results = materialize_many(tickers, as_of=as_of, store=store, candidates=shared, state_store=state_store)
         vocab_path = write_vocabularies(store)
         total += len(results)
         for ticker, path, reason in results:

@@ -839,10 +839,8 @@ function downsideCard(view) {
   const lines = (panel.lines || []).filter((line) => line.role === 'downside');
   if (!lines.length) {
     const box = el('div', 'attention flags');
-    // 「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1）：標題跟著產生端宣告的分型走。
-    const head = el('div', 'attention-head',
-      panel.absence_kind === 'not_yet_recorded' ? '名下還沒有反證　'
-        : (panel.absence_kind === 'point_in_time_unavailable' ? '回看的那天不推反證與 watch　' : '這次沒讀到反證的來源　'));
+    // 「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1）：標題跟著產生端宣告的分型走（首屏③同一個函式）。
+    const head = el('div', 'attention-head', downsideAbsenceHead(panel) + '　');
     const badge = absenceBadge(panel.absence_kind);
     if (badge) head.appendChild(badge);
     box.appendChild(head);
@@ -1068,17 +1066,18 @@ function briefCard(payload, view) {
   }
   // ⚠ 2026-09-23（Phase 0 Step 0b.1）：「目標價到了」那個徽章退役（`target_reached` 隨目標價退役）。
   // AGENTS D3 的判準沒有退役——`realized` 只提醒、不觸發出場；它現在的家是心跳段 2 的候選狀態板。
-  if (panel && panel.context && panel.context.available) {
+  // Phase 7 Step 7.0e：v2 短評照五題排（對照表只住 contracts，經 `.meta.json` 帶來）；其餘照舊一格一行。
+  const available = Boolean(panel && panel.context && panel.context.available);
+  const questions = available ? firstScreenQuestions(panel) : null;
+  if (questions) {
+    node.appendChild(fiveQuestions(view, panel, questions));
+  } else if (available) {
     const story = el('div', 'story');
-    (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0).forEach((line) => {
-      const row = el('div', 'story-row');
-      row.appendChild(el('div', 'story-label', plainLine(line.key, line.display_label)));
-      const text = el('div', 'story-text', String(line.datum.value || ''));
-      if (line.datum.status === 'partial' && line.datum.reason) text.title = line.datum.reason;
-      row.appendChild(text);
-      story.appendChild(row);
-    });
+    (panel.lines || []).filter((line) => line.key.indexOf('brief:') === 0)
+      .forEach((line) => story.appendChild(storyRow(line)));
     node.appendChild(story);
+  }
+  if (available) {
     const rides = view.bet && lineMap(view.bet).rides;
     if (rides && Array.isArray(rides.datum.value) && rides.datum.value.length) {
       const glossary = unitGlossary();
@@ -1094,11 +1093,60 @@ function briefCard(payload, view) {
   // ROADMAP「個股頁」對照表把它們列進「拿掉」：尺上是現價／沒賭對／賭對／判斷錯了，
   // 計算框問的是「這個結構允不允許翻倍」——兩者都建在估值鏈與多年反向橋上。
   // 接手的是末行候選狀態與財務三題三個字（Phase 3 Step 3.7，下面這一行）。
-  const line = candidateLine(view);
+  const line = candidateLine(view, Boolean(questions));
   if (line) node.appendChild(line);
   // 走勢圖留下來：它是**脈絡**不是訊號（AGENTS「量測、訊號、脈絡三分」）。
   node.appendChild(priceCard(payload));
   return node;
+}
+
+/** 短評的一格（標籤＋句子；partial 的理由放 title）。舊版面與五題版面共用。 */
+function storyRow(line) {
+  const row = el('div', 'story-row');
+  row.appendChild(el('div', 'story-label', plainLine(line.key, line.display_label)));
+  const text = el('div', 'story-text', String(line.datum.value || ''));
+  if (line.datum.status === 'partial' && line.datum.reason) text.title = line.datum.reason;
+  row.appendChild(text);
+  return row;
+}
+
+/** 首屏五題（Phase 7 Step 7.0e；使用者 2026-10-04 A1）：標題與「哪一格放哪一題」**只有 contracts 那一份**
+ * （`.meta.json` 的 `first_screen_questions`；app.js 不留第二份，L16）。這一頁的短評帶齊對照表放的每一格才用五題版面——
+ * v1 短評（格不同）與還沒有對照表的舊 `.meta.json` 照舊版面，不猜、不補。 */
+function firstScreenQuestions(panel) {
+  const table = (VOCAB && VOCAB.first_screen_questions) || null;
+  if (!Array.isArray(table) || !table.length) return null;
+  const keys = new Set((panel.lines || []).map((line) => line.key));
+  return table.every((q) => (q.slots || []).every((slot) => keys.has('brief:' + slot))) ? table : null;
+}
+
+/** 五題依序：每題底下先放短評的那幾格（對照表的順序），再放既有的元件（`parts`，封閉字彙）。不改任何一格、不加字。 */
+function fiveQuestions(view, panel, table) {
+  const lines = lineMap(panel);
+  const box = el('div', 'five-questions');
+  table.forEach((q) => {
+    const section = el('div', 'fq');
+    section.appendChild(el('h3', 'fq-title', q.title));
+    const story = el('div', 'story');
+    (q.slots || []).forEach((slot) => { if (lines['brief:' + slot]) story.appendChild(storyRow(lines['brief:' + slot])); });
+    if (story.childNodes.length) section.appendChild(story);
+    (q.parts || []).forEach((part) => questionPart(view, part).forEach((n) => section.appendChild(n)));
+    box.appendChild(section);
+  });
+  return box;
+}
+
+/** 五題裡的既有元件（字全由 materialize 端給）。認不得的元件名照印出來，不靜默略過（INV-3）。 */
+function questionPart(view, part) {
+  const lines = view.candidate ? lineMap(view.candidate) : {};
+  const state = lines['candidate:state'] && lines['candidate:state'].datum;
+  const row = state && state.value;
+  if (part === 'priced_in' || part === 'in_numbers' || part === 'will_it_die') return wordsBlock(view, [part]);
+  if (part === 'wipeout') return [lampsBlock(view, true)].filter(Boolean);
+  if (part === 'disproof') return disproofBrief(view);
+  if (part === 'confirm') return confirmLines(row);
+  if (part === 'shared_bet') return sharedBetLines(row);
+  return [el('div', 'row-reason', `（這一題的元件 ${part} 這版畫面還不認得）`)];
 }
 
 /* 首屏末行（Phase 3 Step 3.7）：候選狀態＋財務三題三個字。**全部照抄** candidate 面板——字由 materialize 端給
@@ -1138,18 +1186,19 @@ function confirmLines(row, tag) {
   });
 }
 
-/** 會死嗎不是綠的那幾盞：燈名＋顏色＋理由，照抄 wipeout 面板（與稽核區同一份）。全綠就不印。 */
-function lampsNotGreen(view) {
+/** 歸零燈：燈名＋顏色＋理由，照抄 wipeout 面板（與稽核區同一份）。`withGreen`＝綠燈也列（五題的④逐盞列；
+ * 舊版面只列不是綠的那幾盞，全綠就不印）。灰＝沒量到，不是綠。 */
+function lampsBlock(view, withGreen) {
   const panel = view.wipeout;
   if (!panel) return null;
   const items = [];
   (panel.lines || []).filter((line) => line.role === 'wipeout').forEach((line) => {
     const d = line.datum || {};
     const value = d.value || {};
-    if (value.colour === 'green') return;
+    if (value.colour === 'green' && !withGreen) return;
     const colour = WIPEOUT_COLOURS[value.colour];
     const name = plainLine(line.key, line.display_label).replace(/^歸零旗標：/, '');
-    const why = value.reason || d.reason || absenceLabel(d.absence_kind) || '';
+    const why = value.colour === 'green' ? '' : (value.reason || d.reason || absenceLabel(d.absence_kind) || '');
     items.push(`${colour ? colour.mark + ' ' + colour.word + '　' + name : '⬜ 灰　' + name + '（沒量到，不是綠）'}${why ? '：' + why : ''}`);
   });
   if (!items.length) return null;
@@ -1158,7 +1207,58 @@ function lampsNotGreen(view) {
   return box;
 }
 
-function candidateLine(view) {
+/** 財務三題的三個字（可點：打開稽核區、跳到那一題）。`questions`＝印哪幾題（舊版面三個一起；五題版面分到②④）。
+ * 「已定價嗎」在的時候，白話緊跟在後——首屏只有這一處印白話。 */
+function wordsBlock(view, questions) {
+  const panel = view.candidate;
+  if (!panel || !(panel.lines || []).length) return [];
+  const lines = lineMap(panel);
+  const words = el('div', 'candidate-words');
+  CANDIDATE_WORDS.filter((entry) => questions.indexOf(entry[2]) >= 0).forEach(([key, label, question]) => {
+    const d = lines[key] && lines[key].datum;
+    const word = el('button', 'word word-link', `${label}　${d && d.value ? d.value : '—'} ↓`);
+    word.type = 'button';
+    word.title = '打開下面的稽核區，跳到這一題的數字';
+    word.addEventListener('click', () => jumpToAudit(question));
+    words.appendChild(word);
+  });
+  const out = [words];
+  if (questions.indexOf('priced_in') >= 0) {
+    const plain = pricedInPlain();
+    if (plain) out.push(plain);
+  }
+  return out;
+}
+
+/** ③ 每條反證與盯它的 watch 狀態——照抄 downside 面板（論證層那張卡同一份；這裡只印條件與狀態，細節在那張卡）。 */
+function disproofBrief(view) {
+  const panel = view.downside;
+  if (!panel) return [];
+  const lines = (panel.lines || []).filter((line) => line.role === 'downside');
+  if (!lines.length) {
+    return [el('div', 'row-reason', downsideAbsenceHead(panel) + (panel.reason ? '：' + panel.reason : ''))];
+  }
+  return lines.map((line) => {
+    const r = line.datum.value || {};
+    return el('div', 'row-reason', `反證：${r.condition || ''}｜${r.state_label || '—'}${r.until ? `（到期 ${r.until}）` : ''}`);
+  });
+}
+
+/** downside 沒有任何一列時的標題：「名下還沒有反證」與「這次沒讀到反證的來源」下一步不同（3.7 R1），跟著產生端宣告的分型走。 */
+function downsideAbsenceHead(panel) {
+  if (panel.absence_kind === 'not_yet_recorded') return '名下還沒有反證';
+  return panel.absence_kind === 'point_in_time_unavailable' ? '回看的那天不推反證與 watch' : '這次沒讀到反證的來源';
+}
+
+/** ⑤ 那一題的元件：和持有的 alpha 檔共用的需求錨與層（Phase 7 Step 7.0e）。**整句由 materialize 端組好**
+ * （`alpha/providers/candidates.py::shared_bet`），這裡照印——不打分、不排序（依 ticker 字母）、不加權。 */
+function sharedBetLines(row, tag) {
+  const bet = row && row.shared_bet;
+  if (!bet) return [];
+  return (bet.lines || []).map((text) => el(tag || 'div', 'row-reason', text));
+}
+
+function candidateLine(view, inQuestions) {
   const panel = view.candidate;
   if (!panel) return null;      // 3.7 之前 materialize 的 artifact 沒有這個面板
   const lines = lineMap(panel);
@@ -1182,22 +1282,14 @@ function candidateLine(view) {
   node.appendChild(head);
   if (row && row.reason) node.appendChild(el('div', 'row-reason', '理由：' + row.reason));
   if (row && row.watch) node.appendChild(candidateWatchLine(row.watch));
-  confirmLines(row).forEach((line) => node.appendChild(line));
-  if ((panel.lines || []).length) {
-    const words = el('div', 'candidate-words');
-    CANDIDATE_WORDS.forEach(([key, label, question]) => {
-      const d = lines[key] && lines[key].datum;
-      const word = el('button', 'word word-link', `${label}　${d && d.value ? d.value : '—'} ↓`);
-      word.type = 'button';
-      word.title = '打開下面的稽核區，跳到這一題的數字';
-      word.addEventListener('click', () => jumpToAudit(question));
-      words.appendChild(word);
-    });
-    node.appendChild(words);
-    const plain = pricedInPlain();
-    if (plain) node.appendChild(plain);
-    const lamps = lampsNotGreen(view);
-    if (lamps) node.appendChild(lamps);
+  // 五題版面：confirm 條件、三個字與白話、燈已放在③②④底下（Phase 7 Step 7.0e），這一行只留候選狀態本身。
+  if (!inQuestions) {
+    confirmLines(row).forEach((line) => node.appendChild(line));
+    if ((panel.lines || []).length) {
+      wordsBlock(view, CANDIDATE_WORDS.map((entry) => entry[2])).forEach((n) => node.appendChild(n));
+      const lamps = lampsBlock(view, false);
+      if (lamps) node.appendChild(lamps);
+    }
   }
   if (row) {
     (row.preconditions || []).forEach((text) => node.appendChild(el('div', 'row-reason', '前提失效：' + text)));
@@ -3116,6 +3208,7 @@ function candidateRow(row, detailSet) {
   if (row.note) li.appendChild(el('span', 'rule', row.note));
   if (row.held_source) li.appendChild(el('span', 'rule', `Sheet：${row.held_source.sheet_ticker}（解析：${row.held_source.source}）`));
   confirmLines(row, 'span').forEach((line) => li.appendChild(line));
+  sharedBetLines(row, 'span').forEach((line) => li.appendChild(line));
   (row.preconditions || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 前提失效：' + p)));
   (row.rewrite || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 該重寫：' + p)));
   if (row.holdings_verified === false) li.appendChild(el('span', 'warn', '持股未驗（可能其實已持有）'));

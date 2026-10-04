@@ -354,6 +354,13 @@ table.rank.compare td:first-child { color: var(--muted); }
 .brief-card .story-label { font-weight: 600; opacity: .8; line-height: 1.5; }
 .brief-card .story-text { line-height: 1.6; }
 @media (max-width: 640px) { .brief-card .story-row { grid-template-columns: 1fr; gap: .15rem; } }
+/* 首屏五題（Phase 7 Step 7.0e）：每題一段，題目在上、既有句子與燈在下；不加任何分數或名次樣式。 */
+.brief-card .five-questions { margin-top: .4rem; }
+.brief-card .fq { padding: .55rem 0 .35rem; border-top: 1px solid var(--border); }
+.brief-card .fq:first-child { border-top: 0; }
+.brief-card .fq-title { font-size: 15px; margin: 0 0 .15rem; }
+.brief-card .fq .story { margin-top: .15rem; }
+.brief-card .fq .candidate-words { margin: .25rem 0; }
 .numbers-strip .headline-numbers .num-value { font-size: 19px; }
 .brief-card .badge-light { margin-left: .5rem; }
 .card-brief { margin: .4rem 0 .2rem; font-size: .92rem; line-height: 1.45; opacity: .9; }

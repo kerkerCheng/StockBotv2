@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0e：個股頁首屏五題＋是不是新賭注）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ materialize（argv 不變）：候選輸入（`candidate_context`）多讀**同一輪**剛寫的 `structure_table` state artifact（`webapp/materialize.py::bet_structure`；`--dir`／`--state-dir` 時讀那個目錄的），層與插槽用候選輸入原本就載的那一份邊（`seats_from_edges`，不多查一次）；另一次唯讀 Neo4j 查節點名（只查持有那幾家坐的、結構表沒帶名字的層；fail-soft）。個股頁 artifact 與候選板多一格 `shared_bet`、`.meta.json` 多 `first_screen_questions`。不寫任何 authority、沒有新網路來源、request path 不變（APP 只讀 artifact） |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` §6.11 與 AnalystView 面板樹。不動任何 skill、prompt |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點；`.codex/rules` 的 fixed entry 數不變 |
+| **4 contract test** | `tests/test_five_questions_shared_bet.py`（五題七格各放一次且照 plan 對照、元件封閉、`.meta.json` 帶唯一一份、app.js 不留標題、每個元件前端都認得、帶不齊每一格照舊版面；坐的層與讀圖面板同一個函式；互相列出與錨的來處、row 勝過 company、字母序不是共用多寡、自己不列、沒共用是答案、Sheet 讀不到暫停、結構表讀不到只比層、走不到錨照實寫、沒載輸入是缺席、沒有分數名次部位欄位名；候選板與個股頁同一份且候選狀態照宣告；`bet_structure` 讀與缺席）。變異六個（錨的來處一律 row、照共用多寡排、Sheet 讀不到照算、結構表讀不到當成沒錨、自己也列、前端不檢查帶齊）各自轉紅。request path 四種證明照綠 |
+| **5 端到端 smoke** | 真資料：改前（HEAD）與改後各 materialize 一次到暫存目錄（`--dir`，`--tracked --registry-listed --structure-table --candidates`，各 78/78）逐頁比對——76 頁 `freshness_identity` 76/76 相同；拿掉 `shared_bet`、時間戳與價格脈絡後 76/76 逐字相同（19 頁的價格序列差在小數點後幾位，是兩次抓行情的浮點差；`content_digest` 本來就含 `generated_at`，每次都會變，不能拿它歸因）；候選板除 4 列的 `shared_bet` 外相同、結構表相同、`.meta.json` 只多 `first_screen_questions`、候選狀態序列那一行相同。headless Edge 實點 AXTI／COHR／LITE／SIVE.ST：五題 5/5、七格都在、COHR 與 SIVE.ST 互列「同一層／插槽 High-power CW DFB laser」、首屏沒有分數名次字樣；AAPL（無敘事）照舊版面；候選板印 6 句共用 |
+
 ### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0d：敘事加碼條件 `confirm[]`）
 
 | 步 | 結論 |

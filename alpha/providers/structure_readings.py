@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Mapping, Sequence
+from typing import Any, Iterable, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
@@ -467,10 +467,6 @@ def seat_readings_context(*, today: Any = None, as_of: Any = None) -> dict[str, 
     except Exception as exc:  # noqa: BLE001 — 讀不到圖只讓讀圖面板與鏈段需求端說讀不到，其餘照走
         return {"absence": {"kind": "upstream_unavailable",
                             "reason": f"這次沒讀到圖或讀圖 ledger（{type(exc).__name__}）——不是「沒有讀圖」"}}
-    seats: dict[str, set[str]] = {}
-    for edge in edges:
-        if edge.src.startswith("co:") and edge.relation in SEAT_RELATIONS and not edge.dst.startswith("co:"):
-            seats.setdefault(edge.src, set()).add(edge.dst)
     by_node: dict[str, list[dict[str, Any]]] = {}
     for row in rows:
         if not row.get("reading_id"):
@@ -489,7 +485,18 @@ def seat_readings_context(*, today: Any = None, as_of: Any = None) -> dict[str, 
             "reading": row.get("reading"), "needs_reread": row.get("needs_reread"),
             "demand_customers": list(row.get("demand_customers") or ()),
         })
-    return {"seats": {co: sorted(nodes) for co, nodes in seats.items()}, "by_node": by_node}
+    return {"seats": seats_from_edges(edges), "by_node": by_node}
+
+
+def seats_from_edges(edges: Iterable[Any]) -> dict[str, list[str]]:
+    """`co:*` → 它 `supplies_to`／`develops` 到的非公司節點（讀圖只寫在層與插槽上）。**唯一一份**：讀圖面板
+    （`seat_readings_context`）與首屏「是不是新賭注」的同一層比對（`alpha.providers.candidates.bet_index`，Phase 7 Step 7.0e）
+    都用它——坐在哪一層不得兩邊各算一份（L16）。"""
+    seats: dict[str, set[str]] = {}
+    for edge in edges:
+        if edge.src.startswith("co:") and edge.relation in SEAT_RELATIONS and not edge.dst.startswith("co:"):
+            seats.setdefault(edge.src, set()).add(edge.dst)
+    return {co: sorted(nodes) for co, nodes in seats.items()}
 
 
 def demand_side_abstention(ticker: str, *, today: Any = None, directory: Path | None = None) -> Any:
@@ -570,6 +577,6 @@ def known_nodes(*, directory: Path | None = None) -> list[str]:
 __all__ = ["STRUCTURE_READING_DIR", "append_reading_record", "demand_side_customers", "evidence_rank",
            "fetch_structure_snapshot_with_quotes", "fetch_structure_snapshot", "known_nodes", "ledger_path",
            "read_reading_records",
-           "register_reading_watches", "reread_reasons", "seat_readings_context", "seat_readings_for",
+           "register_reading_watches", "reread_reasons", "seat_readings_context", "seat_readings_for", "seats_from_edges",
            "verify_citations",
            "verify_disproof_sources"]

@@ -28,7 +28,7 @@ from typing import Any, Mapping, Sequence
 
 from .structure_readings import build_structure_readings_artifact
 from .contracts import (
-    ARTIFACT_SCHEMA_VERSION, STATE_SCHEMA_VERSIONS, canonical_digest, freshness_identity,
+    ARTIFACT_SCHEMA_VERSION, STATE_SCHEMA_VERSIONS, ArtifactUnavailable, canonical_digest, freshness_identity,
     state_freshness_identity,
 )
 from .store import ArtifactStore, StateArtifactStore
@@ -265,21 +265,59 @@ def readings_input_for(context: Mapping[str, Any], company_id: str | None,
     return seat_readings_for(context, company_id, demand_side=declared)
 
 
-def candidate_context(tickers: Sequence[str], *, as_of: date | None = None, board: bool = False) -> dict[str, Any]:
+def bet_structure(state_store: Any = None) -> dict[str, Any]:
+    """首屏「是不是新賭注」的需求錨來源（Phase 7 Step 7.0e）：`structure_table` state artifact 的逐列錨——
+    `query.bottleneck.structure_table` 的輸出照抄，**唯一來源**；daily 的 materialize 同一輪先寫它（`--structure-table`
+    排在個股頁與候選板之前），所以這裡讀到的是同一輪的那一份，不再連一次圖重算。只帶這一步讀的欄位。
+    讀不到＝需求錨這半邊 `upstream_unavailable`（層照比），不是「沒有共用」。"""
+    store = state_store or StateArtifactStore()
+    try:
+        payload, _freshness = store.read("structure_table")
+    except ArtifactUnavailable as exc:
+        return {"absence": {"kind": "upstream_unavailable",
+                            "reason": f"結構表讀不到（{getattr(exc, 'reason', None) or exc}）"}}
+    keep = ("company_id", "bottleneck", "bottleneck_name", "demand_anchor", "demand_anchor_name", "anchor_basis")
+    return {"rows": [{k: r.get(k) for k in keep} for r in payload.get("rows") or ()],
+            "generated_at": payload.get("generated_at")}
+
+
+def _attach_bet_names(context: Mapping[str, Any]) -> None:
+    """「是不是新賭注」會印到的層／插槽補上節點名（只補持有那幾家坐的、結構表沒帶到名字的，例如 `develops` 的插槽）。
+    **fail-soft**：圖讀不到就不補——畫面照印 ID；名字只是顯示，不是認知狀態（與 `_attach_ride_node_names` 同一個理由）。"""
+    bets = context.get("bets") if isinstance(context, Mapping) else None
+    held = (context.get("held") or {}) if isinstance(context, Mapping) else {}
+    if not bets or held.get("status") != "ok":
+        return
+    names = bets.setdefault("names", {})
+    layers = bets.get("layers") or {}
+    wanted = sorted({n for cid in (held.get("by_company") or {}) for n in layers.get(str(cid), ())} - set(names))
+    try:
+        found = _graph_node_names(wanted)
+    except Exception:  # noqa: BLE001 — 名字補不上不擋 materialize
+        return
+    for node, name in found.items():
+        names.setdefault(node, name)
+
+
+def candidate_context(tickers: Sequence[str], *, as_of: date | None = None, board: bool = False,
+                      state_store: Any = None) -> dict[str, Any]:
     """個股頁候選狀態＋downside 的共用輸入（Phase 3 Step 3.7；接回偏差 21）：**一次**載入 watch registry、thesis
     lifecycle、讀圖對圖、Sheet（readonly）、邊緣判定——與候選板同一個載入函式（`alpha.providers.candidates`）。
 
     as-of 視角不推：watch registry、Sheet、讀圖對圖都只有「現在」（INV-6：答不出 T 時刻的就明確拒絕）。
     讀不到＝`upstream_unavailable`，不是「不上板」（INV-3）。
     `board=True`：同一輪也要組候選板時載**候選板的超集**，一份同時交給個股頁與 `materialize_candidates`——
-    否則同一輪兩次讀 Sheet／FX，兩份快照（3.7 R1 實測：SIVE.ST 的市值兩邊差一次 FX）。"""
+    否則同一輪兩次讀 Sheet／FX，兩份快照（3.7 R1 實測：SIVE.ST 的市值兩邊差一次 FX）。
+    `state_store`：「是不是新賭注」讀哪一份結構表（Phase 7 Step 7.0e；`bet_structure`）——與這一輪寫 state 的是同一個目錄。"""
     if as_of is not None:
         return {"absence": {"kind": "point_in_time_unavailable",
                             "reason": "as-of 視角不推候選狀態與反證 watch——watch registry、Sheet、讀圖對圖都只有現在（INV-6）"}}
     try:
         from alpha.providers.candidates import candidate_context as load
 
-        return load(list(tickers), board=board)
+        context = load(list(tickers), board=board, structure=bet_structure(state_store))
+        _attach_bet_names(context)
+        return context
     except Exception as exc:  # noqa: BLE001 — 讀不到只讓兩個選配面板說讀不到，其餘照走
         return {"absence": {"kind": "upstream_unavailable",
                             "reason": f"候選狀態的輸入沒讀到（{type(exc).__name__}: {str(exc)[:120]}）——不是「不上板」"}}
@@ -348,14 +386,16 @@ def _close_series(ticker: str, *, sessions: int = 180) -> list[dict[str, Any]]:
 
 def materialize_many(tickers: Sequence[str], *, as_of: date | None = None,
                      store: ArtifactStore | None = None,
-                     candidates: Mapping[str, Any] | None = None) -> list[tuple[str, Path | None, str | None]]:
-    """一次 materialize 多檔。**一檔失敗不影響其他檔**——失敗以理由現形，不靜默跳過（INV-3）。"""
+                     candidates: Mapping[str, Any] | None = None,
+                     state_store: StateArtifactStore | None = None) -> list[tuple[str, Path | None, str | None]]:
+    """一次 materialize 多檔。**一檔失敗不影響其他檔**——失敗以理由現形，不靜默跳過（INV-3）。
+    `state_store`：沒給 `candidates` 時，候選輸入讀哪一份結構表（「是不是新賭注」；Phase 7 Step 7.0e）。"""
     target = store or ArtifactStore()
     results: list[tuple[str, Path | None, str | None]] = []
     # 讀圖面板的輸入只載一次（節點數會長，查詢次數不該跟著檔數長）；候選狀態的輸入同理（Sheet、watch、讀圖對圖）。
     readings = readings_context(as_of=as_of) if tickers else None
     if candidates is None and tickers:
-        candidates = candidate_context(tickers, as_of=as_of)
+        candidates = candidate_context(tickers, as_of=as_of, state_store=state_store)
     for ticker in tickers:
         try:
             path, _ = materialize(ticker, as_of=as_of, store=target, readings=readings, candidates=candidates)
@@ -1450,7 +1490,8 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
     # `context`：同一輪個股頁用的那一份（`candidate_context(..., board=True)`）；載入失敗的缺席 context 不能拿來組板，
     # 就照舊自己載一次（失敗會原樣拋出，由呼叫端印理由）。
     shared = context if context is not None and not context.get("absence") else None
-    board = load_board(universe, context=shared)
+    # 自己載的那一次也讀同一個 state 目錄的結構表（「是不是新賭注」；Phase 7 Step 7.0e）
+    board = load_board(universe, context=shared, structure=None if shared is not None else bet_structure(store))
     _attach_ride_node_names(board)
     payload = build_candidates_artifact(board, generated_at=generated_at)
     target = store or StateArtifactStore()
@@ -1696,8 +1737,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     """
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
-        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT, PLAIN_BET_UNITS,
-        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS,
+        ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, FIRST_SCREEN_QUESTIONS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT,
+        PLAIN_BET_UNITS, PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS,
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
     )
@@ -1716,6 +1757,9 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_bet_units": dict(PLAIN_BET_UNITS),
         # 「已定價嗎」的白話（Phase 7 Step 7.0c）：首屏三個字底下與稽核區那一題的標題旁各印一次，APP 不留第二份
         "plain_priced_in": PLAIN_PRICED_IN,
+        # 個股頁首屏五題（Phase 7 Step 7.0e）：標題與「哪一格放哪一題」只有 contracts 那一份，APP 照這個順序排
+        "first_screen_questions": [{**q, "slots": list(q["slots"]), "parts": list(q["parts"])}
+                                   for q in FIRST_SCREEN_QUESTIONS],
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
         # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：plain_stance／plain_driver_labels／plain_multiple_derivation
         # 三份白話層隨估值鏈退役。

@@ -123,7 +123,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 7.0b | 開發 gate 落地（development-flow 範圍欄）＋兩個當下修：巢狀 writer lock（Phase 6 #17）、thesis 逾期提醒量錯 | ✅（INTAKE 加 `Case` 行＋`Zoom / Review` 重抄；`writer_lock.hold` 一個 owner，四支遷移工具改用；逾期只看 `is_due`——SessionStart 兩則假逾期 → 0、10-30 照報 axt_inp＋sivers；偏差 #5–#8） | 執行模型 | 見 git log「Step 7.0b」 |
 | 7.0c | 敘事範本：「要翻倍需要什麼」＋兩個 placeholder（市值、近四季營收）＋「已定價」白話＋重押讀圖換格層引用（Phase 6 #16） | ✅（題目與字彙；`market_cap_settlement`——IQE.L 換成 7.3 億 GBP；「已定價」白話一份、首屏與稽核區各一次〔Edge 實點〕；寫入端第 ⑦ 項；四檔敘事 8 格逐字相同；偏差 #9–#11） | 執行模型 | 見 git log「Step 7.0c」 |
 | 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ✅（v2 選填欄、只在非空時進 id——真實 ledger 20 行重算逐位相同；watch `brief:<id>#c<n>`＋`condition_role=confirm`，判斷只住 `is_confirm`，反證計數、downside、可開都不吃〔變異紅〕；觸及與到期進 `narrative_rewrite`、以 `confirmed` 處置、候選狀態不自動改；心跳一行＋三個快照鍵、候選板與個股頁逐條列〔句子在 materialize 端組好、前端照印〕；**R2-a GO**〔獨立重算 20/20、兩個變異紅、consumer 逐處盤點無漏〕；偏差 #12） | 執行模型 | 見 git log「Step 7.0d」 |
-| 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ○ | 執行模型 | |
+| 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ✅（五題對照唯一一份 `FIRST_SCREEN_QUESTIONS` 經 `.meta.json`、app.js 不留第二份；`shared_bet` 只呈現、依 ticker 字母列、缺席分型由產生端宣告；改前改後各 materialize 76 頁——拿掉新欄位、時間戳與價格脈絡後 76/76 逐字相同、`freshness_identity` 76/76 相同；Edge 實點四頁五題 5/5、COHR 與 SIVE.ST 互列 CW DFB 層；變異六個紅；偏差 #13–#14） | 執行模型 | 見 git log「Step 7.0e」 |
 | 7.0f | 外部雷達：daily 只開 WebSearch 的 LLM 步驟、八週試驗（R2-b；sandbox impact review） | ○ | 執行模型 | |
 | 7.1 | Wave 1 研究（約 4 週）：積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 | ○ | 強模型 | |
 | 7.2 | 回放：R1 已定價、R3 漏網稽核（機械）；R2 parked 回查、R4 輸家驗屍（研究） | ○ | 執行模型（R1、R3）＋強模型（R2、R4） | |
@@ -156,6 +156,8 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 10 | 7.0c | §3 第 2 項「`market_cap`（Engine C 快照的市值，含幣別與 as_of）」 | read model 既有的 `market_cap` 是「price × shares、未正規化」——builder 另組一格 `market_cap_settlement`（同一份快照 × 名冊報價單位的換算係數——係數由 sources 從 `identity.currency` 查好注入，builder 是純函式不碰 identity；不做匯率；報價單位未登記 fail closed），placeholder 選它；原格語意不動 | 直接用未正規化那格，IQE.L 會填出「729.5 億」（便士）——真資料核對：換算後 7.3 億 GBP。一格不承載兩種語意（L12） |
 | 11 | 7.0c | §3 第 3 項的白話「拿今天的倍數（EV/S，虧損時 P/S）」 | 照 `alpha/three_questions.py::decide_basis` 寫：「有獲利、而且有同一期的淨負債資料時用 EV/S；其餘（虧損、台股、資料不齊）用 P/S」，其餘照 plan 的意思 | P/S 不只在虧損時用（COHR 是因為營業利益資料停在 2024 年中）；自己寫給人讀的事實套同一套追源紀律（L11-2） |
 | 12 | 7.0d | §4 第 2 項「登記一筆 `semantic_condition` watch，來源鍵與反證分得開……類別是 `confirm`（`watch_category` 加一類）」 | 照做；**怎麼分**：watch 多一個 `condition_role=confirm`（判斷只住 `engine_b/event_watch.py::is_confirm`），`disproof_ref` 照舊當「指回原文的來源鍵」（＝`source_ref`），不另開 `confirm_ref` 欄位；寫入端另加兩條拒收（同版重複、與反證同一條件） | 用 `disproof_ref` 認「語意 watch」的地方有八處（喚醒、佇列、待辦、liveness、audit、變動偵測）——另開欄位漏改一處，加碼條件就叫不醒、沒人消費（INV-4）；沿用它的代價是名字不貼切，分角色的地方（計數、downside、可開、判定標籤、audit 解析）逐一改並有測試＋變異。交 R2-a 挑戰——**R2-a 判定不構成 L12**：「算不算反證」另開封閉欄位，`disproof_ref` 仍只承載「指回原文的來源鍵」一種語意；代價只是名字不貼切 |
+| 13 | 7.0e | §5 第 1 項「每檔輸出 `shared_with_holdings: [{held_ticker, shared_anchors[], shared_layers[]}]`」 | 欄位叫 `shared_bet`：`{rows: [{ticker, company_id, state: "held", shared_anchors[], shared_layers[]}], absence, anchors_absence, anchors_as_of, lines[]}`——「持有」只以 `state` 的值出現；每一句在 `alpha/providers/candidates.py::shared_bet` 組好，候選板與個股頁照印 | 個股頁有兩道既有的欄位名掃描（`tests/test_stock_page_phase3.py`、`tests/test_analyst_view.py`：`held`、`holdings` 不得當欄位名——分析畫面不帶部位欄位），plan 的名字兩個都會被攔；換同義字繞過是 L16 明文禁止的，所以把「持有」放回候選狀態既有的值字彙。缺席有兩種分型（Sheet 讀不到、結構表讀不到；L16 由產生端宣告），所以外面包一層而不是裸 list |
+| 14 | 7.0e | §5 第 1 項「materialize 一次載入（同一個 session）……需求錨取自結構表的逐列錨（`query.bottleneck.structure_table`……唯一來源）」 | 讀**同一輪** `--structure-table` 寫下的 `structure_table` artifact（`webapp/materialize.py::bet_structure`；artifact 是 `structure_table()` 輸出照抄），不另開 Neo4j 連線重算；有共用錨時句子標「需求錨取自 <日期> 的結構表逐列錨」；讀不到＝需求錨這半邊 `upstream_unavailable`、層照比 | 「載入結構表」已有三個 owner（`query.bottleneck` CLI、`materialize_structure_table`、graph provider 的快取），再開第四個就是 L16；daily 的 materialize 同一輪先寫結構表（`--structure-table` 排在個股頁與候選板之前），讀它＝同一份、少一次全圖查詢，個股頁與結構表頁的錨保證是同一份 |
 
 ---
 
@@ -270,7 +272,7 @@ L11-6 ④：最先壞的是心跳「反證：在盯／觸及」的計數與 `blo
 
 1. **共用需求錨**（A3）：materialize 一次載入（同一個 session，**不在 request path 算**）——每檔的需求錨取自結構表的逐列錨（`query.bottleneck.structure_table` 的 `demand_anchor`／`anchor_basis`，
    **唯一來源**），坐的層與插槽取自 `seat_readings_context`；已持有的 alpha 檔取自 `held_index`（Sheet、alpha、股數 > 0）。每檔輸出
-   `shared_with_holdings: [{held_ticker, shared_anchors[], shared_layers[]}]`，依 ticker 字母列、**不打分、不排序、不加權**。缺席分型由產生端宣告：Sheet 讀不到＝持有判定暫停（`upstream_unavailable`）；
+   `shared_with_holdings: [{held_ticker, shared_anchors[], shared_layers[]}]`（實作名 `shared_bet`，偏差 #13；需求錨讀同一輪的結構表 artifact，偏差 #14），依 ticker 字母列、**不打分、不排序、不加權**。缺席分型由產生端宣告：Sheet 讀不到＝持有判定暫停（`upstream_unavailable`）；
    走不到任何需求錨＝照實寫。注入候選板列與個股頁（與 `candidate`／`downside` 面板同一種「來源不在 read model」的注入例外）。
 2. **首屏五題**（A1）：`webapp/static/app.js::briefCard` 依序排五題，各題底下放既有句子與燈，**不改任何 `Datum`、不改 ledger**：
    ①這一檔押的是什麼（`our_bet`；`bottleneck`、`position` 收在題下）②押對了夠大嗎（`what_must_be_true` 的翻倍條件、`demand`、「已定價嗎」與白話、「出現在數字裡了嗎」）

@@ -107,7 +107,7 @@ def test_materialize_candidates_keeps_an_explicit_empty_universe(monkeypatch, tm
 
     seen = []
 
-    def fake_load(universe, context=None):
+    def fake_load(universe, context=None, structure=None):
         seen.append(list(universe))
         payload = fake_candidates_payload()
         return {k: payload[k] for k in ("groups", "side_groups", "counts", "oldest_stall_days", "holdings",
