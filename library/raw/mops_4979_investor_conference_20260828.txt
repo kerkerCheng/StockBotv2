@@ -1,0 +1,12 @@
+Source URL: https://mopsov.twse.com.tw/nas/STR/497920260828M001.pdf
+
+Excerpt:
+[EXCERPT — MOPS 法說簡報之有限逐字引文] 華星光通（LuxNet, 4979.TWO）2026-08-28 法人說明會簡報
+Source: https://mopsov.twse.com.tw/nas/STR/497920260828M001.pdf（E001.pdf byte 相同）
+Published: 2026-08-28（法說會日期，MOPS t100sb07_1「召開法人說明會日期：115/08/28」）| Origin: LuxNet | Retrieved: 2026-10-04
+
+p.4 主要產品及服務："LD & PD/APD . OSA, Optical Engine, ELS, CoC. Transceiver. OEM /ODM & JDM / Foundry Business"
+p.24："High-value CW/EML Chip Foundry service" / "Scaling chip production capacity with technology advancement" / "3K wafers 2025" "6K wafers 2026WE" "14 KK Chips 2025" "30 KK Chips 2026E"
+p.25「EML Chip in the process」：EPI wafers — "OPTOWAY 誼虹科技股份有限公司 OPTOWAY TECHNOLOGY INC. (10.6% shareholder of LuxNet)" "R&D team from SOURCE PHOTONICS" → EML chips — "LuxNet processes EPI wafers into EML chips and optical modules" → EML laser — "OPTOWAY TECHNOLOGY INC." → "A global leader in high-speed optical interconnect solutions"
+p.25 底部："Potential to become one of few APAC suppliers of high-speed EML chips" / "Initial shipments expected from 2H26, with meaningful volume ramp anticipated in 2027"
+（p.24、p.25 的字在圖片內，2026-10-04 逐頁讀圖核對）

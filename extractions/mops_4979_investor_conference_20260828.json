@@ -1,0 +1,219 @@
+{
+  "claims": [
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：到 2027-06-30 為止，華星光的月營收說明、2026Q4／2027 法說或 2026 年報（約 2027-05）都沒有揭露 EML 晶片出貨，或揭露 EML 產線延後／取消。核查頻率：每月（月營收說明）＋每季（法說簡報）。觸發後 48 小時：重跑 python -m query.structure tech:eml，把 e1 降 confidence 或提撤回，並在 tech:eml 層讀圖註記 pre-ramp 未兌現。",
+      "id": "mops_4979_investor_conference_20260828_cl1",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s3",
+        "mops_4979_investor_conference_20260828_s5",
+        "mops_4979_investor_conference_20260828_s6"
+      ],
+      "statement": "LuxNet's 2026-08-28 investor deck shows an EML line in pre-ramp: Optoway (誼虹, 10.6% shareholder, private) supplies EPI wafers, LuxNet processes them into EML chips, Optoway makes the EML laser, for an unnamed 'global leader in high-speed optical interconnect solutions'; initial shipments 2H26, volume ramp 2027 (issuer guidance). If realized it would add a third supply-side entrant to tech:eml beside Coherent and Lumentum — self-reported by the issuer only (L8: no sole_source, confidence capped).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：後續法說或年報改稱 CW 晶片以自有品牌銷售、不再提代工，或揭露代工客戶終止。核查頻率：每季（法說簡報）＋每年（年報約 5 月）。觸發後 48 小時：重跑 python -m query.structure co:luxnet 與 tech:cw_dfb_laser，更新本 claim 與 CW DFB 層讀圖（sr_00e18cf604cc66b9 或其現行版）。",
+      "id": "mops_4979_investor_conference_20260828_cl2",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s2",
+        "mops_4979_investor_conference_20260828_s1"
+      ],
+      "statement": "LuxNet sells CW/EML chips as a 'Chip Foundry service' (p.24) and lists 'Foundry Business' among its main products (p.4); the design-side customers are not named. The capacity figures on p.24 (3K wafers 2025 → 6K 2026WE; 14KK chips 2025 → 30KK 2026E) are issuer estimates kept here as dated context only — not graph attributes (L4).",
+      "subject_id": "e4"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：華星光年報的主要股東名單不再列誼虹，或持股降到 5% 以下，或董事長不再同一人。核查頻率：每年（年報約 5 月）。觸發後 48 小時：e3 降 confidence 或提撤回，cl3 加註關係人關係已變。",
+      "id": "mops_4979_investor_conference_20260828_cl3",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s4"
+      ],
+      "statement": "Optoway Technology (誼虹科技, private) is a 10.6% shareholder of LuxNet (deck p.25). LuxNet's FY2025 annual report (mops_4979_annual_report_2025) lists 誼虹科技股份有限公司 with 15,130,000 shares (10.63%, as of 115/3/31) and states that LuxNet's chairman is also Optoway's chairman — the EML flow is a related-party (captive) arrangement, not an arm's-length customer commitment.",
+      "subject_id": "e3"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.65,
+      "dst_id": "tech:eml",
+      "id": "e1",
+      "relation": "develops",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s3",
+        "mops_4979_investor_conference_20260828_s5"
+      ],
+      "src_id": "co:luxnet"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "co:luxnet",
+      "id": "e2",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s4",
+        "mops_4979_investor_conference_20260828_s3"
+      ],
+      "src_id": "co:optoway"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "co:luxnet",
+      "id": "e3",
+      "relation": "invests_in",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s4"
+      ],
+      "src_id": "co:optoway"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:cw_dfb_laser",
+      "id": "e4",
+      "relation": "supplies_to",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s2",
+        "mops_4979_investor_conference_20260828_s1"
+      ],
+      "src_id": "co:luxnet"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "華星光",
+        "4979.TWO"
+      ],
+      "attributes": {
+        "ticker": "4979.TWO"
+      },
+      "confidence": 0.9,
+      "id": "co:luxnet",
+      "name": "LuxNet",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s3"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "誼虹科技股份有限公司",
+        "誼虹科技",
+        "OPTOWAY"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:optoway",
+      "name": "Optoway Technology Inc.",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s4",
+        "mops_4979_investor_conference_20260828_s6"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "EML",
+        "EML laser",
+        "InP EML",
+        "200-gig EML",
+        "differential EML",
+        "Electro-absorption Modulated Laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:eml",
+      "name": "Electro-absorption Modulated Laser",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s3"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "device_chip",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:cw_dfb_laser",
+      "name": "High-power CW DFB laser",
+      "source_ids": [
+        "mops_4979_investor_conference_20260828_s2"
+      ],
+      "type": "TechNode"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_4979_investor_conference_20260828",
+    "evidence_tier": 1,
+    "origin_entity": "LuxNet (華星光通科技)",
+    "permission_basis": "MOPS 公開資訊觀測站公開的法說會簡報；只保留研究必要的逐字摘錄（頁碼 locator），全文不入 repo。",
+    "published_at": "2026-08-28",
+    "publisher": "MOPS 公開資訊觀測站",
+    "retrieved_at": "2026-10-04",
+    "source_type": "ir_deck",
+    "storage_permission": "repo_excerpt",
+    "title": "華星光通（LuxNet, 4979.TWO）2026-08-28 法人說明會簡報（MOPS）",
+    "url": "https://mopsov.twse.com.tw/nas/STR/497920260828M001.pdf"
+  },
+  "sources": [
+    {
+      "id": "mops_4979_investor_conference_20260828_s1",
+      "locator": "p.4 公司簡介——主要產品及服務（文字層）",
+      "quote": "LD & PD/APD . OSA, Optical Engine, ELS, CoC. Transceiver. OEM /ODM & JDM / Foundry Business"
+    },
+    {
+      "id": "mops_4979_investor_conference_20260828_s2",
+      "locator": "p.24 標題與副標（圖內文字，2026-10-04 讀頁面核對）",
+      "quote": "High-value CW/EML Chip Foundry service ... Scaling chip production capacity with technology advancement"
+    },
+    {
+      "id": "mops_4979_investor_conference_20260828_s3",
+      "locator": "p.25「EML Chip in the process」流程圖第二欄（EML chips）",
+      "quote": "LuxNet processes EPI wafers into EML chips and optical modules"
+    },
+    {
+      "id": "mops_4979_investor_conference_20260828_s4",
+      "locator": "p.25 流程圖第一欄（EPI wafers）",
+      "quote": "OPTOWAY 誼虹科技股份有限公司 OPTOWAY TECHNOLOGY INC. (10.6% shareholder of LuxNet)"
+    },
+    {
+      "id": "mops_4979_investor_conference_20260828_s5",
+      "locator": "p.25 底部右框",
+      "quote": "Initial shipments expected from 2H26, with meaningful volume ramp anticipated in 2027"
+    },
+    {
+      "id": "mops_4979_investor_conference_20260828_s6",
+      "locator": "p.25 流程圖第三、四欄（EML laser → 終端）",
+      "quote": "EML laser ... OPTOWAY TECHNOLOGY INC. ... A global leader in high-speed optical interconnect solutions"
+    },
+    {
+      "id": "mops_4979_investor_conference_20260828_s7",
+      "locator": "p.25 底部左框（發行人自述，L8 弱主張）",
+      "quote": "Potential to become one of few APAC suppliers of high-speed EML chips"
+    }
+  ]
+}
