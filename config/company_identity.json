@@ -214,6 +214,17 @@
       "display_name": "Coherent Corp."
     },
     {
+      "company_id": "co:coolit_systems",
+      "research_ticker": null,
+      "display_name": "CoolIT Systems",
+      "_display_name_source": "Ecolab 8-K Ex.99.1（2026-03-20）「acquire CoolIT Systems」",
+      "_note": "2026-07-02 起是 Ecolab（co:ecolab）的子公司（Ecolab IR 交割新聞稿）；非上市，研究 ticker 明確 null（INV-1）",
+      "name_aliases": [
+        "CoolIT",
+        "CoolIT Systems"
+      ]
+    },
+    {
       "company_id": "co:coreweave",
       "research_ticker": "CRWV",
       "market_currency": "USD",
@@ -242,6 +253,16 @@
         "Credo Semiconductor"
       ],
       "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3c：官網 credosemi.com 頁尾「©2026 Credo, Inc.」、全頁自稱「Credo」；10-K Exhibit 21.1 子公司「Credo Semiconductor Inc.（California）」（https://www.sec.gov/Archives/edgar/data/0001807794/000162828026043303/a211subsidiariesoftheregis.htm）——庫內 credo_npo_vs_cpo_20260821 的 origin 就是這個寫法；全圖逐字兩個寫法命中 0（baseline §17.3）"
+    },
+    {
+      "company_id": "co:ecolab",
+      "research_ticker": "ECL",
+      "market_currency": "USD",
+      "display_name": "Ecolab Inc.",
+      "_display_name_source": "SEC EDGAR 申報人名稱 ECOLAB INC.（CIK 0000031462）",
+      "name_aliases": [
+        "Ecolab"
+      ]
     },
     {
       "company_id": "co:enablence_technologies",

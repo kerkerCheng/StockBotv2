@@ -1,0 +1,264 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ecolab_coolit_acquisition_8k_2026_03_20",
+    "title": "Ecolab 8-K Ex.99.1（2026-03-20）：Ecolab to Acquire CoolIT Systems, a Global Leader in Advanced Liquid Cooling for Next-Gen AI Data Centers",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Ecolab Inc.",
+    "publisher": "SEC EDGAR",
+    "url": "https://www.sec.gov/Archives/edgar/data/31462/000110465926032446/tm269446d1_ex99-1.htm",
+    "published_at": "2026-03-20",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR 公開 filing 的新聞稿附件；只保留研究必要的逐字摘錄。"
+  },
+  "sources": [
+    {
+      "id": "ecolab_coolit_acquisition_8k_2026_03_20_s1",
+      "locator": "Ex.99.1 第 3 段（CoolIT 簡介）",
+      "quote": "CoolIT is a pure-play data center liquid cooling company with end-to-end capabilities that designs and manufactures high-performance liquid cooling systems, including coolant distribution units (CDUs), cold plates and direct-to-chip cooling technologies."
+    },
+    {
+      "id": "ecolab_coolit_acquisition_8k_2026_03_20_s2",
+      "locator": "Ex.99.1 第 3 段",
+      "quote": "As data centers shift from air cooling to liquid cooling to support rising compute demands, CoolIT’s mission-critical technologies provide the performance needed for advanced AI workloads."
+    },
+    {
+      "id": "ecolab_coolit_acquisition_8k_2026_03_20_s3",
+      "locator": "Ex.99.1 第 5 段",
+      "quote": "CoolIT also contributes advanced engineering, design and validation capabilities, highlighted by custom-designed solutions for leading AI chip developers, including NVIDIA and AMD"
+    },
+    {
+      "id": "ecolab_coolit_acquisition_8k_2026_03_20_s4",
+      "locator": "Ex.99.1 第 1 段",
+      "quote": "Ecolab announced today that it has entered into a definitive agreement to acquire CoolIT Systems, a high-growth, high-margin leader in liquid cooling technology for next-gen AI data centers."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:coolant_distribution_unit",
+      "type": "TechNode",
+      "name": "Coolant Distribution Unit (CDU)",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_cold_plate",
+      "type": "TechNode",
+      "name": "Liquid-cooling cold plate (direct-to-chip)",
+      "aliases": [
+        "cold plate",
+        "cold plates",
+        "direct-to-chip cooling"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "abstraction_level": "end_demand",
+      "role": null,
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s2",
+        "ecolab_coolit_acquisition_8k_2026_03_20_s4"
+      ]
+    },
+    {
+      "id": "co:coolit_systems",
+      "type": "Company",
+      "name": "CoolIT Systems",
+      "aliases": [
+        "CoolIT",
+        "CoolIT Systems"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1",
+        "ecolab_coolit_acquisition_8k_2026_03_20_s4"
+      ]
+    },
+    {
+      "id": "co:ecolab",
+      "type": "Company",
+      "name": "Ecolab",
+      "aliases": [
+        "Ecolab",
+        "Ecolab Inc.",
+        "ECL"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "ECL"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s4"
+      ]
+    },
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s3"
+      ]
+    },
+    {
+      "id": "co:amd",
+      "type": "Company",
+      "name": "Advanced Micro Devices",
+      "aliases": [
+        "AMD"
+      ],
+      "abstraction_level": "device_chip",
+      "attributes": {
+        "ticker": "AMD"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:coolit_systems",
+      "dst_id": "tech:coolant_distribution_unit",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:coolit_systems",
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:coolit_systems",
+      "dst_id": "co:nvidia",
+      "relation": "partnership_with",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s3"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:coolit_systems",
+      "dst_id": "co:amd",
+      "relation": "partnership_with",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s3"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s2",
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1"
+      ]
+    },
+    {
+      "id": "e6",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:coolant_distribution_unit",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s2",
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "ecolab_coolit_acquisition_8k_2026_03_20_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s1",
+        "ecolab_coolit_acquisition_8k_2026_03_20_s2"
+      ],
+      "statement": "Ecolab's 8-K describes CoolIT as a pure-play data-center liquid-cooling company that designs and manufactures CDUs, cold plates and direct-to-chip cooling, serving hyperscale and colocation operators, with liquid cooling framed as needed for advanced AI workloads. Acquirer's description of its target (not independent of the deal); no substitutability or sole-source claim.",
+      "disproof_condition": "條件：Ecolab 後續 10-Q／10-K 揭露 CoolIT 的 CDU 或冷板業務出售、停產，或 AI 資料中心液冷營收占比大降。核查頻率：每季（Ecolab 10-Q／10-K）。觸發後 48 小時：e1、e2 降 confidence，重讀冷板與 CDU 兩層。"
+    },
+    {
+      "id": "ecolab_coolit_acquisition_8k_2026_03_20_cl2",
+      "subject_id": "e3",
+      "demand_proof_level": "guided",
+      "confidence": 0.55,
+      "source_ids": [
+        "ecolab_coolit_acquisition_8k_2026_03_20_s3"
+      ],
+      "statement": "The 8-K says CoolIT contributes 'custom-designed solutions for leading AI chip developers, including NVIDIA and AMD'. Modeled as partnership_with, not supplies_to: the sentence does not say NVIDIA or AMD buy from CoolIT, and no NVIDIA- or AMD-side confirmation is in the library (L8: weak).",
+      "disproof_condition": "條件：NVIDIA／AMD 的參考設計或合作夥伴清單公開而沒有 CoolIT，或 Ecolab 後續揭露改寫這句。核查頻率：每半年（NVIDIA／AMD 合作夥伴頁、Ecolab 申報）。觸發後 48 小時：e3、e4 降 confidence 或提撤回。"
+    }
+  ]
+}

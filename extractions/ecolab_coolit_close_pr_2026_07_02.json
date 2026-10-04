@@ -1,0 +1,91 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ecolab_coolit_close_pr_2026_07_02",
+    "title": "Ecolab Closes CoolIT Acquisition and Expands AI Cooling Platform as Global High Tech Business Targets $4 Billion by 2030（2026-07-02）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "Ecolab Inc.",
+    "publisher": "Ecolab Investor Relations（Business Wire）",
+    "url": "https://investor.ecolab.com/news/news-details/2026/Ecolab-Closes-CoolIT-Acquisition-and-Expands-AI-Cooling-Platform-as-Global-High-Tech-Business-Targets-4-Billion-by-2030/default.aspx",
+    "published_at": "2026-07-02",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人公開新聞稿；只保留研究必要的逐字摘錄。"
+  },
+  "sources": [
+    {
+      "id": "ecolab_coolit_close_pr_2026_07_02_s1",
+      "locator": "新聞稿第 1 段（Business Wire，2026-07-02）",
+      "quote": "Ecolab today announced the close of its acquisition of CoolIT Systems, a leader in direct liquid cooling for high‑density data centers."
+    },
+    {
+      "id": "ecolab_coolit_close_pr_2026_07_02_s2",
+      "locator": "新聞稿第 1 段",
+      "quote": "Ecolab acquired CoolIT for approximately $4.75 billion."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:ecolab",
+      "type": "Company",
+      "name": "Ecolab",
+      "aliases": [
+        "Ecolab",
+        "Ecolab Inc.",
+        "ECL"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "ECL"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_close_pr_2026_07_02_s1"
+      ]
+    },
+    {
+      "id": "co:coolit_systems",
+      "type": "Company",
+      "name": "CoolIT Systems",
+      "aliases": [
+        "CoolIT",
+        "CoolIT Systems"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_close_pr_2026_07_02_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:ecolab",
+      "dst_id": "co:coolit_systems",
+      "relation": "acquired",
+      "attributes": {},
+      "confidence": 0.95,
+      "source_ids": [
+        "ecolab_coolit_close_pr_2026_07_02_s1",
+        "ecolab_coolit_close_pr_2026_07_02_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "ecolab_coolit_close_pr_2026_07_02_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.9,
+      "source_ids": [
+        "ecolab_coolit_close_pr_2026_07_02_s1",
+        "ecolab_coolit_close_pr_2026_07_02_s2"
+      ],
+      "statement": "Ecolab closed its acquisition of CoolIT Systems on 2026-07-02 for about $4.75 billion — the leading pure-play direct-liquid-cooling supplier now sits inside a large-cap; for the C1 case this removes CoolIT as an investable edge company on the CDU / cold-plate layers.",
+      "disproof_condition": "條件：Ecolab 公告分拆或出售 CoolIT。核查頻率：每季（Ecolab 申報）。觸發後 48 小時：e1 加註，重讀冷板與 CDU 兩層的供給側。"
+    }
+  ]
+}
