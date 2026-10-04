@@ -1,0 +1,115 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "poet_lumilens_supply_agreement_pr_2026_05_14",
+    "title": "POET Technologies and Lumilens Advance Wafer-Level Photonic Integration for Next-Generation AI Optical Networks（POET 6-K Ex.99.1，2026-05-14 聯合新聞稿）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "POET Technologies and Lumilens (joint press release)",
+    "publisher": "SEC EDGAR（POET 6-K Exhibit 99.1）",
+    "url": "https://www.sec.gov/Archives/edgar/data/1437424/000117184326003413/exh_991.htm",
+    "published_at": "2026-05-14",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR 公開 filing 的新聞稿附件；只保留研究必要的逐字摘錄，全文不入本包。"
+  },
+  "sources": [
+    {
+      "id": "poet_lumilens_supply_agreement_pr_2026_05_14_s1",
+      "locator": "第 1 段",
+      "quote": "POET Technologies Inc. (\"POET\" or the \"Company\") (NASDAQ: POET), a leader in highly integrated optical engines and light sources for AI networks, and Lumilens Inc. (\"Lumilens\"), an emerging leader in high-performance scale-up and scale-out optical interconnects for AI workloads, today announced they have entered into a supply agreement that establishes a strategic joint development and commercial technology partnership"
+    },
+    {
+      "id": "poet_lumilens_supply_agreement_pr_2026_05_14_s2",
+      "locator": "供貨協議與初始訂單段",
+      "quote": "Lumilens has placed an initial purchase order with POET for the manufacturing of EOI-based engines valued at $50 million. This purchase order represents the first phase of a broader supplier relationship that could scale to $500+ million in cumulative purchases from POET over five years."
+    },
+    {
+      "id": "poet_lumilens_supply_agreement_pr_2026_05_14_s3",
+      "locator": "認股權證段",
+      "quote": "In connection with the supply agreement, and to align both companies to the long-term value created through the partnership, POET has granted Lumilens a warrant to purchase up to 22,921,408 common shares. The warrant is immediately exercisable for 2,292,140 shares, with the remaining shares vesting and becoming exercisable in tranches based on cumulative payments by Lumilens toward future purchase orders totaling up to $500 million. The warrant is exercisable over nine years at an exercise price of $8.25 per share."
+    },
+    {
+      "id": "poet_lumilens_supply_agreement_pr_2026_05_14_s4",
+      "locator": "路線圖與時程段",
+      "quote": "Fulfilment of the purchase orders and associated revenues is subject to the successful development and ultimate qualification of the modules, as well as the successful scaling of manufacturing capability. Engineering samples from this joint development program are expected in late 2026, with production ramp aligned to hyperscaler customer deployments in 2027."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:poet_technologies",
+      "type": "Company",
+      "name": "POET Technologies Inc.",
+      "aliases": [
+        "POET",
+        "POET Technologies"
+      ],
+      "abstraction_level": "device_chip",
+      "role": "disruptor",
+      "attributes": {
+        "ticker": "POET",
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s1"
+      ]
+    },
+    {
+      "id": "co:lumilens",
+      "type": "Company",
+      "name": "Lumilens",
+      "aliases": [],
+      "abstraction_level": "module_subsystem",
+      "role": "adjacent_silicon",
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s1"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:poet_technologies",
+      "dst_id": "co:lumilens",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s1",
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s2",
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "poet_lumilens_supply_agreement_pr_2026_05_14_cl1",
+      "statement": "Payment direction on this supply relationship runs supplier → customer: POET granted Lumilens a warrant for up to 22,921,408 POET shares (2,292,140 immediately exercisable; the rest vests with Lumilens' cumulative payments toward up to $500 million of purchase orders; $8.25 strike, nine years). The supplier pays equity to win orders — the opposite of a customer capital commitment (ARCHITECTURE §6, dimension 3), so this edge is not evidence that POET is a bottleneck for Lumilens.",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：一手揭露 Lumilens 或其他客戶對 POET 做反方向的資本承諾（預付、入股、產能保留押金），或認股權證被取消、改成不與訂單掛鉤。核查頻率：每季（POET 季報 6-K 與 MD&A 的 share capital／warrants 附註）。觸發後 48 小時：重寫 POET 敘事的付錢方向那一句並重評候選狀態；本 claim 加註。",
+      "confidence": 0.85,
+      "source_ids": [
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s3",
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s2"
+      ]
+    },
+    {
+      "id": "poet_lumilens_supply_agreement_pr_2026_05_14_cl2",
+      "statement": "The $50 million initial purchase order is conditional: fulfilment and revenue are 'subject to the successful development and ultimate qualification of the modules, as well as the successful scaling of manufacturing capability'; engineering samples are expected in late 2026 and the production ramp is tied to hyperscaler deployments in 2027 (joint release, both parties).",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：到 2027-06-30 為止，POET 季報沒有揭露交付 Lumilens 工程樣品或量產出貨，或揭露訂單取消／延後。核查頻率：每季（POET 季報 6-K）。觸發後 48 小時：e1 降 confidence，POET 敘事的時程那一格重寫。",
+      "confidence": 0.8,
+      "source_ids": [
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s4",
+        "poet_lumilens_supply_agreement_pr_2026_05_14_s2"
+      ]
+    }
+  ]
+}
