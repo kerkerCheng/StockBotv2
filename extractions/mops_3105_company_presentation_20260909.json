@@ -1,0 +1,253 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3105_company_presentation_20260909",
+    "title": "穩懋（WIN Semiconductors, 3105.TWO）Company Presentation Aug – Sept 2026（UBS Taiwan Summit 2026 法說簡報，MOPS）",
+    "source_type": "ir_deck",
+    "evidence_tier": 1,
+    "origin_entity": "WIN Semiconductors",
+    "publisher": "MOPS 公開資訊觀測站",
+    "url": "https://mopsov.twse.com.tw/nas/STR/310520260909E001.pdf",
+    "published_at": "2026-09-09",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "MOPS 公開資訊觀測站公開的法說會簡報；只保留研究必要的逐字摘錄（頁碼 locator），全文不入 repo。"
+  },
+  "sources": [
+    {
+      "id": "mops_3105_company_presentation_20260909_s1",
+      "locator": "p.1 封面",
+      "quote": "WIN Semiconductors Company Presentation Aug – Sept 2026"
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_s2",
+      "locator": "p.23「Optical Device from Datacom to Telecom」（文字層；圖例對應 2026-10-04 讀頁面核對：實心圓＝Mass Production＝VCSEL、InP PIC；空心圓＝Ongoing Qualification＝CW-DFB、EML；PD 無圓點）",
+      "quote": "Optical Device from Datacom to Telecom <100m CW-DFB VCSEL EML InP PIC PD >10km Datacom Telecom Mass Production Ongoing Qualification"
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_s3",
+      "locator": "p.24「CW-DFB Development Roadmap」（雷射功率由 70 到 400 mW 的路線圖，縱軸 Laser power、橫軸 Data rate/lane）",
+      "quote": "CW-DFB Development Roadmap Data rate/lane Laser power 70 mW 100 mW 200 mW 400 mW"
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_s4",
+      "locator": "p.26「WIN’s advantages in 6-inch process capability from GaAs to InP」",
+      "quote": "By leveraging the technology and experience from 6-inch GaAs capability, WIN is now developing 6-inch InP capability with the following advantages:"
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_s5",
+      "locator": "p.26 第三點（發行人自述，L8 弱主張）",
+      "quote": "Limited capex required (Leveraging existing 6-inch equipments and facilities)"
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_s6",
+      "locator": "p.26 第一句（發行人自述，L8 弱主張）",
+      "quote": "WIN possesses the world’s largest GaAs 6-inch wafer capacity, technology, and expertise."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:win_semiconductor",
+      "type": "Company",
+      "name": "Win Semiconductor",
+      "aliases": [
+        "WIN Semi",
+        "WIN Semiconductors",
+        "3105.TWO",
+        "穩懋",
+        "穩懋半導體股份有限公司",
+        "Win Semiconductor"
+      ],
+      "abstraction_level": "foundry_packaging",
+      "role": "foundry",
+      "attributes": {
+        "ticker": "3105.TWO"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s1",
+        "mops_3105_company_presentation_20260909_s4"
+      ]
+    },
+    {
+      "id": "tech:cw_dfb_laser",
+      "type": "TechNode",
+      "name": "High-power CW DFB laser",
+      "aliases": [
+        "CW laser",
+        "internal laser diode",
+        "high-power CW laser",
+        "CW DFB",
+        "CW DFB laser",
+        "DFB laser",
+        "high-power DFB laser"
+      ],
+      "abstraction_level": "device_chip",
+      "role": null,
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2",
+        "mops_3105_company_presentation_20260909_s3"
+      ]
+    },
+    {
+      "id": "tech:eml",
+      "type": "TechNode",
+      "name": "Electro-absorption Modulated Laser",
+      "aliases": [
+        "EML",
+        "EML laser",
+        "InP EML",
+        "200-gig EML",
+        "differential EML",
+        "Electro-absorption Modulated Laser"
+      ],
+      "abstraction_level": "device_chip",
+      "role": null,
+      "attributes": {
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2"
+      ]
+    },
+    {
+      "id": "tech:vcsel",
+      "type": "TechNode",
+      "name": "VCSEL laser",
+      "aliases": [
+        "VCSEL",
+        "200G VCSEL",
+        "400G VCSEL",
+        "2D VCSEL array",
+        "200 gig VCSEL"
+      ],
+      "abstraction_level": "device_chip",
+      "role": null,
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2"
+      ]
+    },
+    {
+      "id": "tech:six_inch_inp_production",
+      "type": "TechNode",
+      "name": "Six-inch InP wafer production line",
+      "aliases": [
+        "six-inch indium phosphide line",
+        "6-inch InP"
+      ],
+      "abstraction_level": "foundry_packaging",
+      "role": null,
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s4"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:win_semiconductor",
+      "dst_id": "tech:cw_dfb_laser",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2",
+        "mops_3105_company_presentation_20260909_s3",
+        "mops_3105_company_presentation_20260909_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:win_semiconductor",
+      "dst_id": "tech:eml",
+      "relation": "supplies_to",
+      "attributes": {
+        "qualification_status": "qualifying"
+      },
+      "confidence": 0.55,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2",
+        "mops_3105_company_presentation_20260909_s1"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:win_semiconductor",
+      "dst_id": "tech:vcsel",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2",
+        "mops_3105_company_presentation_20260909_s1"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:win_semiconductor",
+      "dst_id": "tech:six_inch_inp_production",
+      "relation": "develops",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s4",
+        "mops_3105_company_presentation_20260909_s5",
+        "mops_3105_company_presentation_20260909_s6",
+        "mops_3105_company_presentation_20260909_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_3105_company_presentation_20260909_cl1",
+      "statement": "WIN Semiconductors' own Aug–Sept 2026 deck marks CW-DFB as 'Ongoing Qualification' — not yet 'Mass Production' — on its datacom-to-telecom optical device map (p.23), next to a CW-DFB roadmap from 70 mW to 400 mW (p.24). As a pure-play foundry its CW-DFB customers are not named on these pages (Sivers' outsourcing to WIN is the existing co:win_semiconductor supplies_to co:sivers_semiconductors edge). Issuer self-report (L8): qualification stage only, no volume or customer qualification evidence.",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：到 2027-06-30 為止，穩懋法說簡報仍把 CW-DFB 標為 Ongoing Qualification（沒有進 Mass Production），或不再列 CW-DFB。核查頻率：每季（穩懋法說簡報，MOPS t100sb07_1）。觸發後 48 小時：重跑 python -m query.structure tech:cw_dfb_laser，e1 降 confidence（或改成 develops），並在 CW DFB 層讀圖與 co:sivers_semiconductors 的敘事註記代工端仍未量產。",
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2",
+        "mops_3105_company_presentation_20260909_s3"
+      ]
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_cl2",
+      "statement": "WIN says it 'is now developing 6-inch InP capability', leveraging its 6-inch GaAs base ('world's largest GaAs 6-inch wafer capacity') with 'Limited capex required (Leveraging existing 6-inch equipments and facilities)' (p.26). If realized it is a second entrant beside Coherent on tech:six_inch_inp_production; today it is development only (issuer self-report, L8).",
+      "subject_id": "e4",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：後續簡報或年報不再提 6-inch InP，或改稱以 4 吋 InP 為主；或到 2027-12-31 仍只寫 developing、沒有任何 6 吋 InP 量產或客戶驗證的揭露。核查頻率：每季（穩懋法說簡報）＋每年（年報約 5 月）。觸發後 48 小時：e4 降 confidence 或提撤回，並更新 tech:six_inch_inp_production 層讀圖（目前圖上只有 Coherent）。",
+      "confidence": 0.65,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s4",
+        "mops_3105_company_presentation_20260909_s5",
+        "mops_3105_company_presentation_20260909_s6"
+      ]
+    },
+    {
+      "id": "mops_3105_company_presentation_20260909_cl3",
+      "statement": "The same p.23 map marks EML as 'Ongoing Qualification' at WIN — a potential foundry entrant on tech:eml beside Coherent, Lumentum and the LuxNet pre-ramp line; VCSEL and InP PIC are marked 'Mass Production'. Issuer self-report (L8); no EML customer named.",
+      "subject_id": "e2",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：到 2027-06-30 為止，穩懋簡報仍把 EML 標為 Ongoing Qualification，或不再列 EML。核查頻率：每季（穩懋法說簡報）。觸發後 48 小時：e2 降 confidence 或提撤回，更新 tech:eml 層讀圖。",
+      "confidence": 0.55,
+      "source_ids": [
+        "mops_3105_company_presentation_20260909_s2"
+      ]
+    }
+  ]
+}
