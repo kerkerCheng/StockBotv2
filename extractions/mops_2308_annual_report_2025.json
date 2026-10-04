@@ -1,0 +1,143 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_2308_annual_report_2025",
+    "title": "台達電子（2308）2025 年度股東會年報",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Delta Electronics, Inc.",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=2308&filename=2025_2308_20260528F04.pdf",
+    "published_at": "2026-05-08",
+    "retrieved_at": "2026-10-05",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "台灣上市公司法定申報（股東會年報）；只保留研究必要的逐字摘錄。published_at 取 MOPS 列表上傳時間 115/05/08 17:56:31（民國年轉西元）。PDF 文字層有字中空格，引文照頁面寫法、去空白比對。"
+  },
+  "sources": [
+    {
+      "id": "mops_2308_annual_report_2025_s1",
+      "locator": "伍‧營運概況——二、市場及產銷概況（一）市場分析 1. 電源及零組件（壹‧致股東報告書另有同一段，括號為全形）",
+      "quote": "台達之液冷解決方案由板端冷板模組延伸至系統端冷卻架構，透過採用先進微通道設計之液冷冷板，搭配內建直流泵浦(DC Pump)與高效能冷卻液分配控制器(CDU)，在高負載運算條件下維持穩定且均衡的冷卻液流量，滿足高功率 AI 晶片之散熱需求。隨著液冷應用由單點部署走向規模化導入，台達持續強化板端至機櫃端的整合能力，提升液冷機櫃於實際運行環境中的效能與穩定性。配合市場對 AI 伺服器與高密度機櫃需求成長，相關液冷散熱產品亦持續擴大於資料中心場域之應用與出貨。"
+    },
+    {
+      "id": "mops_2308_annual_report_2025_s2",
+      "locator": "伍‧營運概況——二、市場及產銷概況（一）市場分析 4. 基礎設施",
+      "quote": "隨著資料中心液冷需求快速成長，相關系統業務亦成為 114 年台達最重要的成長動能之一。台達所提供之液冷解決方案以完整系統形式交付，涵蓋冷卻架構設計、系統整合與現場部署支援，能有效支援高密度運算環境之穩定運行與後續擴充需求。"
+    },
+    {
+      "id": "mops_2308_annual_report_2025_s3",
+      "locator": "伍‧營運概況——二、市場及產銷概況（二）主要產品之重要用途——電源及零組件－風扇暨熱傳導 5.",
+      "quote": "5. 水冷散熱解決方案：完整水冷產品解決方案，包含 CDU、分流器、管路及水冷板。可廣泛應用於 AI 運算機器、雲端設備、伺服器、通訊及工業設備等。"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:delta_electronics",
+      "type": "Company",
+      "name": "Delta Electronics",
+      "aliases": [
+        "Delta Electronics",
+        "Delta Electronics, Inc.",
+        "台達",
+        "台達電"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "2308.TW"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s2"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_cold_plate",
+      "type": "TechNode",
+      "name": "Liquid-cooling cold plate (direct-to-chip)",
+      "aliases": [
+        "cold plate",
+        "cold plates",
+        "direct-to-chip cooling"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s3"
+      ]
+    },
+    {
+      "id": "tech:coolant_distribution_unit",
+      "type": "TechNode",
+      "name": "Coolant Distribution Unit (CDU)",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:delta_electronics",
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s3"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:delta_electronics",
+      "dst_id": "tech:coolant_distribution_unit",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_2308_annual_report_2025_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s2",
+        "mops_2308_annual_report_2025_s3"
+      ],
+      "statement": "Delta's own annual report: its liquid-cooling solutions extend 'from board-level cold-plate modules to system-level cooling architecture', using microchannel liquid cold plates with built-in DC pumps and coolant distribution controllers (CDU); 'related liquid-cooling products continue to expand in data-center application and shipments'; its product list includes 'CDU, 分流器, tubing and water-cooling plates'. The liquid-cooling systems business was 'one of Delta's most important growth drivers in 2025' (dated, L4). Self-report in a statutory filing (L8: weak, costly); no customer named; qualification_status left unset (shipments stated, customers unnamed).",
+      "disproof_condition": "條件：台達後續年報、季報或法說改寫成液冷冷板未量產或停止出貨，或客戶端一手顯示 AI 平台冷板供應商不含台達。核查頻率：每季（台達季報、法說）。觸發後 48 小時：e1 降 confidence，重讀冷板層。"
+    },
+    {
+      "id": "mops_2308_annual_report_2025_cl2",
+      "subject_id": "e2",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_2308_annual_report_2025_s1",
+        "mops_2308_annual_report_2025_s3"
+      ],
+      "statement": "Same filing: Delta pairs its cold plates with 'high-efficiency coolant distribution controllers (CDU)' and lists CDU in its water-cooling product line; liquid-cooling products are shipping in data centers (self-report, no customer named). 分流器 in the product list is not modeled as a manifold edge: the same report also uses 分流器 for current shunts in battery disconnect units.",
+      "disproof_condition": "條件：台達後續年報、季報或法說改寫成 CDU 未出貨或退出，或客戶端一手顯示 CDU 供應商不含台達。核查頻率：每季（台達季報、法說）。觸發後 48 小時：e2 降 confidence，重讀 CDU 層。"
+    }
+  ]
+}
