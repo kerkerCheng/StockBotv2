@@ -669,6 +669,16 @@
       "_note": "2026-10-03 Phase 6 Step 6.2 合併：co:openlight（Semiconductor Today 2026-03-20 那篇抽取用的代號，同名同別名、同一家）併入本 id——名冊刪 co:openlight、抽取檔 semitoday_ph18da_volume_2026_03_20 改指本 id、圖上 scoped 重載後刪舊節點（pq2 [670]；loader/manifests/identity-cleanup-20261003.json）。"
     },
     {
+      "company_id": "co:optoway",
+      "research_ticker": null,
+      "display_name": "Optoway Technology Inc.",
+      "_display_name_source": "華星光（4979.TWO）2026-08-28 法說簡報 p.25 逐字「OPTOWAY TECHNOLOGY INC.」「誼虹科技股份有限公司」；非上市（年報主要股東名單只列公司名、無股票代號），research_ticker 明確 null（L9）。條目隨入圖包 staged，drop 即回退（co:proterial 先例）",
+      "name_aliases": [
+        "誼虹科技股份有限公司",
+        "誼虹科技"
+      ]
+    },
+    {
       "company_id": "co:oracle",
       "research_ticker": "ORCL",
       "market_currency": "USD",
