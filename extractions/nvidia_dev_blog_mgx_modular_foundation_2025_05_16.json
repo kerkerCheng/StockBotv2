@@ -1,0 +1,193 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16",
+    "title": "NVIDIA Technical Blog：Building the Modular Foundation for AI Factories with NVIDIA MGX（2025-05-16）",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "origin_entity": "NVIDIA Corporation",
+    "publisher": "NVIDIA Developer Blog",
+    "url": "https://developer.nvidia.com/blog/building-the-modular-foundation-for-ai-factories-with-nvidia-mgx/",
+    "published_at": "2025-05-16",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "公司公開技術部落格；只保留研究必要的逐字摘錄。published_at 取頁面 datePublished（2025-05-16T15:00Z）。"
+  },
+  "sources": [
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s1",
+      "locator": "「Standardized building blocks」段——冷卻元件",
+      "quote": "The MGX Coldplate provides efficient liquid cooling for GPUs, maintaining optimal operating temperatures."
+    },
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s2",
+      "locator": "同段",
+      "quote": "The MGX 44RU Manifold manages coolant distribution within the rack."
+    },
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s3",
+      "locator": "同段",
+      "quote": "Quick disconnects, such as the MGX NVQD (NVIDIA quick disconnect) and MGX UQD (Universal quick disconnect), enable fast and secure connections for liquid cooling lines, simplifying maintenance and minimizing downtime."
+    },
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s4",
+      "locator": "「Why modular architecture matters now」——多源",
+      "quote": "Diverse sourcing options within the MGX ecosystem minimize investment risks, shorten lead times, and reduce uncertainty by allowing flexible selection of components and avoiding vendor lock-in. By enabling partners to choose from a broad array of certified components, MGX empowers organizations to optimize their data center builds for cost, performance, and supply chain resilience."
+    },
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s5",
+      "locator": "開頭段落——功率密度與冷卻",
+      "quote": "MGX addresses power density and cooling demands with liquid-cooled busbars and manifolds that enable a coolant temperature differential of less than 15°C even under 1400A loads, supporting up to 120 kW per rack for NVIDIA Blackwell GPUs."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s3",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s5"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_cold_plate",
+      "type": "TechNode",
+      "name": "Liquid-cooling cold plate (direct-to-chip)",
+      "aliases": [
+        "cold plate",
+        "cold plates",
+        "direct-to-chip cooling"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s1"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_manifold",
+      "type": "TechNode",
+      "name": "Liquid-cooling distribution manifold",
+      "aliases": [
+        "manifold",
+        "manifolds",
+        "liquid distribution manifold",
+        "liquid distribution manifolds",
+        "rear manifold"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s2",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s5"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_quick_disconnect",
+      "type": "TechNode",
+      "name": "Liquid-cooling quick disconnect (UQD/UQDB)",
+      "aliases": [
+        "quick disconnect",
+        "quick disconnects",
+        "UQD",
+        "UQDB",
+        "liquid cooling quick disconnect"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:nvidia",
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "relation": "depends_on",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:nvidia",
+      "dst_id": "tech:liquid_cooling_manifold",
+      "relation": "depends_on",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s2",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s5"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:nvidia",
+      "dst_id": "tech:liquid_cooling_quick_disconnect",
+      "relation": "depends_on",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_cl1",
+      "subject_id": "e2",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s2",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s4",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s5"
+      ],
+      "statement": "NVIDIA's own MGX write-up (2025-05-16) says 'Diverse sourcing options within the MGX ecosystem … allowing flexible selection of components and avoiding vendor lock-in' and 'enabling partners to choose from a broad array of certified components'. The customer/platform owner designs these liquid-cooling parts to be multi-sourced — customer-side evidence that suppliers on this layer are substitutable (a competition layer), not an argument for any one supplier's moat. For the manifold: 'The MGX 44RU Manifold manages coolant distribution within the rack'; MGX's liquid-cooled busbars and manifolds support up to 120 kW per rack for Blackwell (dated context, L4).",
+      "disproof_condition": "條件：NVIDIA 後續的 MGX／Vera Rubin 文件改成單一指定供應商（不再寫多源、認證元件），或任何一家 manifold 供應商的一手寫出它是 NVIDIA 指定的唯一來源並得到 NVIDIA 端印證。核查頻率：每半年（GTC、COMPUTEX、OCP）。觸發後 48 小時：重讀 manifold 層的供給側判讀。"
+    },
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_cl2",
+      "subject_id": "e3",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s3",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s4"
+      ],
+      "statement": "NVIDIA's own MGX write-up (2025-05-16) says 'Diverse sourcing options within the MGX ecosystem … allowing flexible selection of components and avoiding vendor lock-in' and 'enabling partners to choose from a broad array of certified components'. The customer/platform owner designs these liquid-cooling parts to be multi-sourced — customer-side evidence that suppliers on this layer are substitutable (a competition layer), not an argument for any one supplier's moat. For quick disconnects: MGX names two families, NVQD (NVIDIA quick disconnect) and UQD (Universal quick disconnect) — the open UQD spec is one more sign this layer is built to be multi-sourced.",
+      "disproof_condition": "條件：NVIDIA 文件把 NVQD 改成單一廠商供應、或 UQD 退出 MGX 規格。核查頻率：每半年。觸發後 48 小時：重讀快接頭層的供給側判讀。"
+    },
+    {
+      "id": "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_cl3",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.75,
+      "source_ids": [
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s1",
+        "nvidia_dev_blog_mgx_modular_foundation_2025_05_16_s4"
+      ],
+      "statement": "NVIDIA's own MGX write-up (2025-05-16) says 'Diverse sourcing options within the MGX ecosystem … allowing flexible selection of components and avoiding vendor lock-in' and 'enabling partners to choose from a broad array of certified components'. The customer/platform owner designs these liquid-cooling parts to be multi-sourced — customer-side evidence that suppliers on this layer are substitutable (a competition layer), not an argument for any one supplier's moat. For cold plates: 'The MGX Coldplate provides efficient liquid cooling for GPUs' (spelled Coldplate in the original; mapped to the cold-plate layer).",
+      "disproof_condition": "條件：NVIDIA 文件把 GPU 冷板改成單一指定供應商。核查頻率：每半年。觸發後 48 小時：重讀冷板層的供給側判讀。"
+    }
+  ]
+}

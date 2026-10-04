@@ -1,0 +1,12 @@
+Source URL: https://developer.nvidia.com/blog/building-the-modular-foundation-for-ai-factories-with-nvidia-mgx/
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] NVIDIA Technical Blog：Building the Modular Foundation for AI Factories with NVIDIA MGX（2025-05-16）
+Source: https://developer.nvidia.com/blog/building-the-modular-foundation-for-ai-factories-with-nvidia-mgx/
+Published: 2025-05-16 | Origin: NVIDIA Corporation | Retrieved: 2026-10-04
+
+「Standardized building blocks」段——冷卻元件："The MGX Coldplate provides efficient liquid cooling for GPUs, maintaining optimal operating temperatures."
+同段："The MGX 44RU Manifold manages coolant distribution within the rack."
+同段："Quick disconnects, such as the MGX NVQD (NVIDIA quick disconnect) and MGX UQD (Universal quick disconnect), enable fast and secure connections for liquid cooling lines, simplifying maintenance and minimizing downtime."
+「Why modular architecture matters now」——多源："Diverse sourcing options within the MGX ecosystem minimize investment risks, shorten lead times, and reduce uncertainty by allowing flexible selection of components and avoiding vendor lock-in. By enabling partners to choose from a broad array of certified components, MGX empowers organizations to optimize their data center builds for cost, performance, and supply chain resilience."
+開頭段落——功率密度與冷卻："MGX addresses power density and cooling demands with liquid-cooled busbars and manifolds that enable a coolant temperature differential of less than 15°C even under 1400A loads, supporting up to 120 kW per rack for NVIDIA Blackwell GPUs."
