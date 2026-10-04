@@ -1,0 +1,422 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24",
+    "title": "U.S. DOE — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems（2022-02-24；LPT 章）",
+    "source_type": "industry_report",
+    "evidence_tier": 1,
+    "origin_entity": "U.S. Department of Energy",
+    "publisher": "U.S. Department of Energy",
+    "url": "https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf",
+    "published_at": "2022-02-24",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "美國聯邦政府公開報告；只保留研究必要的逐字摘錄（頁碼 locator），全文不入 repo。"
+  },
+  "sources": [
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+      "locator": "報告 p.9（PDF 第 24 頁）2.1.2.1 Large Power Transformers",
+      "quote": "Cores, also known as laminations, are made from high-permeability and domain-refined GOES (Waukesha Transformers, 2022)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2",
+      "locator": "報告 p.11（PDF 第 26 頁）2.1.2.3 Continuously Transposed Conductor",
+      "quote": "This is the final product and is referred to as CTC at this point which is used to create the winding of an LPT."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3",
+      "locator": "報告 p.11（PDF 第 26 頁）2.1.2.5 Tap Changers",
+      "quote": "A transformer tap changer is a component designed to change the output voltage of a transformer by changing the turns ratio between the primary and secondary winding."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4",
+      "locator": "報告 p.12（PDF 第 27 頁）2.1.2.6 Bushings",
+      "quote": "Bushings provide the electrical connection between a transformer and the electrical transmission network."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5",
+      "locator": "報告 p.12（PDF 第 27 頁）2.1.2.7 Insulating Material",
+      "quote": "The most common insulating material in LPTs is pressboard."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+      "locator": "報告 p.20（PDF 第 35 頁）2.1.6 Transformer Supply Chain Bottlenecks in the United States",
+      "quote": "Currently, there are two major bottlenecks in the LPT supply chain. The first one is in the U.S. GOES production capacity. The second one is in the testing capacity of LPT manufacturers."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+      "locator": "報告 p.21（PDF 第 36 頁）2.1.6（續）",
+      "quote": "Of those, only Japan, South Korea, and Germany can produce the GOES at the specifications outlined by current Department of Energy (DOE) standards"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8",
+      "locator": "報告 p.21（PDF 第 36 頁）2.1.6（續）",
+      "quote": "Test space can be a key limiting factor in LPT production capability when each facility/manufacturer only has 1 – 2 test beds to produce various ratings of power transformers."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9",
+      "locator": "報告 p.15（PDF 第 30 頁）2.1.4.1 GOES",
+      "quote": "leaving Cleveland-Cliffs with manufacturing facilities in Zanesville, Ohio and Butler, Pennsylvania as the sole GOES producer in the United States"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10",
+      "locator": "報告 p.14（PDF 第 29 頁）2.1.4.1 U.S. LPT 製造商清單",
+      "quote": "Hyosung Heavy Industries (HICO) acquired Mitsubishi facility in Memphis, Tennessee in 2019 (Walton, 2019). They have capability up to 1000 MVA and 765 kV"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11",
+      "locator": "報告 p.21（PDF 第 36 頁）2.1.6（續）",
+      "quote": "Stakeholders indicated that tap changers could also be a bottle neck. There are three domestic suppliers and one reliable supplier from Germany. However, German tap changers are much more costly and have a longer lead time."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12",
+      "locator": "報告 p.21（PDF 第 36 頁）2.1.6（續）",
+      "quote": "It has been observed that high-voltage bushings often have a long lead time of up to five months (U.S. Department of Energy, 2014)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13",
+      "locator": "報告 p.21（PDF 第 36 頁）2.1.6（續）",
+      "quote": "Imports account for 82% of the consumption of LPTs in 2019."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14",
+      "locator": "報告 p.20（PDF 第 35 頁）2.1.6",
+      "quote": "Some interviewees estimated that domestic supply meets about 20% of domestic demand"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15",
+      "locator": "報告 p.11（PDF 第 26 頁）2.1.2.2（續）",
+      "quote": "HI-B grade with domain-refined grade is highly demanded by LPT manufacturers because of its low core loss to reduce LPT weight."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:large_power_transformer",
+      "type": "TechNode",
+      "name": "Large Power Transformer (LPT)",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13"
+      ]
+    },
+    {
+      "id": "mat:grain_oriented_electrical_steel",
+      "type": "Material",
+      "name": "Grain-Oriented Electrical Steel (GOES)",
+      "aliases": [
+        "GOES",
+        "grain-oriented electrical steel",
+        "Grain-oriented Silicon Electrical Steel",
+        "HI-B"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15"
+      ]
+    },
+    {
+      "id": "mat:ctc_copper_conductor",
+      "type": "Material",
+      "name": "Continuously Transposed Conductor (CTC) copper wire",
+      "aliases": [
+        "CTC",
+        "CTC copper wire",
+        "Continuously Transposed Conductor"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2"
+      ]
+    },
+    {
+      "id": "tech:transformer_tap_changer",
+      "type": "TechNode",
+      "name": "Transformer Tap Changer",
+      "aliases": [
+        "tap changer",
+        "tap changers",
+        "on-load tap changers",
+        "LTC",
+        "LTCs"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11"
+      ]
+    },
+    {
+      "id": "tech:transformer_bushing",
+      "type": "TechNode",
+      "name": "Transformer Bushing (OIP)",
+      "aliases": [
+        "bushings",
+        "OIP bushings",
+        "high-voltage bushings"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12"
+      ]
+    },
+    {
+      "id": "mat:transformer_insulation",
+      "type": "Material",
+      "name": "Transformer Insulating Material (pressboard)",
+      "aliases": [
+        "pressboard",
+        "transformer board",
+        "insulating material"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5"
+      ]
+    },
+    {
+      "id": "tech:lpt_factory_testing",
+      "type": "TechNode",
+      "name": "LPT Factory Testing Capacity (test beds)",
+      "aliases": [
+        "test beds",
+        "testing capacity"
+      ],
+      "abstraction_level": "test_yield",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
+      ]
+    },
+    {
+      "id": "co:cleveland_cliffs",
+      "type": "Company",
+      "name": "Cleveland-Cliffs",
+      "aliases": [
+        "Cleveland-Cliffs",
+        "Cleveland-Cliffs Inc.",
+        "CLF"
+      ],
+      "abstraction_level": "materials_substrate",
+      "attributes": {
+        "ticker": "CLF"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
+      ]
+    },
+    {
+      "id": "co:hyosung_heavy_industries",
+      "type": "Company",
+      "name": "Hyosung Heavy Industries",
+      "aliases": [
+        "Hyosung Heavy Industries",
+        "HICO",
+        "298040.KS"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {
+        "ticker": "298040.KS"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "mat:grain_oriented_electrical_steel",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s1",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s15"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "mat:ctc_copper_conductor",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s2"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "tech:transformer_tap_changer",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "tech:transformer_bushing",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "mat:transformer_insulation",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "is_component_of",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s5"
+      ]
+    },
+    {
+      "id": "e6",
+      "src_id": "tech:large_power_transformer",
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14"
+      ]
+    },
+    {
+      "id": "e7",
+      "src_id": "tech:large_power_transformer",
+      "dst_id": "tech:lpt_factory_testing",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
+      ]
+    },
+    {
+      "id": "e8",
+      "src_id": "co:cleveland_cliffs",
+      "dst_id": "mat:grain_oriented_electrical_steel",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
+      ]
+    },
+    {
+      "id": "e9",
+      "src_id": "co:hyosung_heavy_industries",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl1",
+      "subject_id": "e6",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s7",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s14",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s9"
+      ],
+      "statement": "DOE (Feb 2022, third-party government assessment) names two major bottlenecks in the U.S. LPT supply chain: GOES production capacity and LPT testing capacity. Cleveland-Cliffs is the sole U.S. GOES producer and domestic supply meets about 20% of domestic demand; of 13 GOES makers abroad, only Japan, South Korea and Germany meet DOE specifications. Dated snapshot from before AI data-center demand — the numbers are context, not attributes (L4).",
+      "disproof_condition": "條件：更新的一手（DOE／商務部報告、GOES 生產者的 10-K／法說）顯示美國 GOES 產能已能滿足大部分國內需求，或不再把 GOES 列為 LPT 瓶頸。核查頻率：每半年（DOE／商務部報告；Cleveland-Cliffs 10-K／10-Q）。觸發後 48 小時：重跑 python -m query.structure tech:large_power_transformer，e6 降 confidence 或改成歷史 dated claim，並重讀該層。"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl2",
+      "subject_id": "e7",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.75,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s6",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s8"
+      ],
+      "statement": "Testing is the second named LPT bottleneck: each facility or manufacturer has only 1–2 test beds and testing takes about a week per LPT (DOE, Feb 2022).",
+      "disproof_condition": "條件：一手揭露 LPT 製造商大幅擴充試驗台、或測試不再被列為產能限制。核查頻率：每半年（DOE／商務部報告、LPT 製造商法說）。觸發後 48 小時：e7 降 confidence，重讀 tech:large_power_transformer 層。"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl3",
+      "subject_id": "e3",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.7,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s3"
+      ],
+      "statement": "Stakeholders told DOE that tap changers could also be a bottleneck: three domestic suppliers and one reliable supplier from Germany (not named), with German tap changers costlier and on longer lead times (Feb 2022).",
+      "disproof_condition": "條件：一手具名那家德國供應商並顯示分接開關供給已不吃緊，或出現多家新的合格供應商。核查頻率：每年（DOE／商務部報告、變壓器廠法說）。觸發後 48 小時：本 claim 加註，e3 的層讀圖重寫供給側。"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl4",
+      "subject_id": "e4",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.7,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s4"
+      ],
+      "statement": "High-voltage bushings often carry lead times of up to five months; DOE notes limited non-China porcelain sources (U.S., Japan, Poland) (Feb 2022).",
+      "disproof_condition": "條件：一手顯示高壓套管交期回到正常（數週）或供給明顯擴充。核查頻率：每年（DOE／商務部報告、套管製造商公告）。觸發後 48 小時：本 claim 加註，重讀 tech:transformer_bushing。"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl5",
+      "subject_id": "e9",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.8,
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s10",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s13"
+      ],
+      "statement": "Hyosung Heavy Industries (HICO) bought Mitsubishi's Memphis plant in 2019 and can build up to 1000 MVA / 765 kV LPTs in the U.S.; imports supplied 82% of U.S. LPT consumption in 2019 (DOE, Feb 2022). Capability, not volume or customers — no demand anchor is attached in this package.",
+      "disproof_condition": "條件：曉星重工的年報／公告顯示 Memphis 廠停產、出售或不再生產 765 kV 級 LPT。核查頻率：每年（曉星重工事業報告、DART 公告）。觸發後 48 小時：e9 降 confidence 或提撤回，重讀 tech:large_power_transformer。"
+    }
+  ]
+}

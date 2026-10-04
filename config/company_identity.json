@@ -194,6 +194,18 @@
       "_display_name_source": "SEC 10-Q 2026-08-13 封面 dei:EntityRegistrantName「Churchill Capital Corp XI」"
     },
     {
+      "company_id": "co:cleveland_cliffs",
+      "research_ticker": "CLF",
+      "market_currency": "USD",
+      "display_name": "Cleveland-Cliffs Inc.",
+      "_display_name_source": "SEC EDGAR 申報人名稱 CLEVELAND-CLIFFS INC.（CIK 0000764065）",
+      "_note": "「AK Steel」別名：DOE 2022 原文「Cleveland-Cliffs (previously known as AK Steel)」（AK Steel 於 2020 年併入 Cliffs）",
+      "name_aliases": [
+        "Cleveland-Cliffs",
+        "AK Steel"
+      ]
+    },
+    {
       "company_id": "co:coherent",
       "research_ticker": "COHR",
       "market_currency": "USD",
@@ -330,6 +342,17 @@
       "display_name": "SKL Robotics LTD",
       "_display_name_source": "官網頁尾「Copyright © 2024-2026 SKL Robotics LTD.」（thehumanoid.ai；品牌名 Humanoid）",
       "_note": "品牌名「Humanoid」刻意不放進 name_aliases：它是普通名詞，單字分大小寫也擋不住句首與標題（人形機器人層的引文到處是 Humanoid）。"
+    },
+    {
+      "company_id": "co:hyosung_heavy_industries",
+      "research_ticker": "298040.KS",
+      "market_currency": "KRW",
+      "display_name": "Hyosung Heavy Industries Corporation",
+      "_display_name_source": "yfinance longName（2026-10-04）；DOE 2022 原文「Hyosung Heavy Industries (HICO)」",
+      "name_aliases": [
+        "Hyosung Heavy Industries",
+        "HICO"
+      ]
     },
     {
       "company_id": "co:hyperlight",
