@@ -224,7 +224,14 @@
 
 - 登記：registration §2 X2、§7.3（樣本 36 則＝registration 附錄 C）
 - 報告：（尚無；`replay-r2-parked.md`）
+  - 2026-10-05｜[`replay-r2-parked.md`](replay-r2-parked.md)：36 則（附錄 C 程式重算逐則相同）**證實 1**、未證實 11、無法判 2（registry 沒寫 park 理由）、**不適用 22**（park 理由本來就不是缺證據：例行 Form 4、行事曆、重複、非上市標的）；
+    依層母體加權的證實比例 1.93%（全樣本為分母）／12.91%（排除不適用與無法判）。唯一證實：`lead_6e6000e1`（缺 Agility 歷史財報 → CCXI S-4 2026-09-04 含經審計財報），
+    CCXI park→證實 −4.9%、證實→量測 −10.5%（機器人鏈組未定義，只印絕對報酬；n＝1 不進判讀線）。EDGAR 層 10 則裡 9 則不適用——這個母體量到的主要是「例行申報被正確 park」
+  - 撞到的事：①2 則 parked 沒有 park 理由也沒有觸發條件（`lead_e590eca7`、`lead_27625bd1`）；②同一份 S-4 讓四則 park 等的東西出現，四則今天仍是 parked、沒有接回
+    （S-4/A 本身已走 EDGAR feed 入圖成 [683]）——`original_obtained` 是終局值、park 時不自動建 watch，母體 353 則裡有 watch 在等的只有 9 則
+- H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
 - failure log：（尚無）
+  - #15（park 缺的那一樣出現了、文件也進來了，卻沒有接回那則 park；一份 S-4、四則）
 
 ## X3 漏網稽核（R3）
 
