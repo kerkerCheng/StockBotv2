@@ -11,6 +11,7 @@
 
 | case | 被評的判斷（id） | 結構斷言：證實／推翻／尚未到裁決點 | 錨點 | 對該鏈組超額（量測日） | 格 |
 |---|---|---|---|---|---|
+| O3 | `ib_b36ecf9dc00459d9`（不要：不是瓶頸） | 證實（依既有證據：付錢方向一手，2026-10-04） | 2026-10-04 | 7.5 記 | 待 7.5 |
 
 ---
 
@@ -35,6 +36,9 @@
 - 研究產出：（尚無）
   - 2026-10-04｜lead_f1694626 → `ra_b85b2836cd650508c1c0ca9ffdbce88d` → pq2 **[680]**（華星光 EML 2H26 初始出貨、CW／EML 晶片代工、誼虹關係人流程；SourceDoc `mops_4979_investor_conference_20260828`）；舊版 [679] 待 drop（failure log #3）
   - 2026-10-04｜lead_43890d74 → `ra_08f8b529fc5e049dde9a5c0439e7451b` → pq2 **[682]**（Sivers 的代工穩懋：CW-DFB、EML 標「Ongoing Qualification」、6 吋 InP developing；SourceDoc `mops_3105_company_presentation_20260909`）
+  - 2026-10-04｜使用者 go：[680] 入圖（intake commit `c842321b`）、[682] 入圖（`6c119121`）；[679] drop（舊版重複號）
+  - 2026-10-04｜[682] 入圖讓 CW DFB 層讀圖 stale（`supply_added` co:win_semiconductor，**同時觸發反證①「供給側出現第七家」**）→ 重讀 `sr_3a4fe5719994dfdc`（取代 `sr_00e18cf604cc66b9`）：維持 volume、**窗口變短**——第七家是 Sivers 自己的代工穩懋、CW-DFB 仍在合格（代工產能進場＝量被補上的形狀，不是新的設計對手）；反證①改寫成「第八家」、新增⑦「穩懋 CW-DFB 改標量產或客戶具名其代工的 CW DFB 進量產」，其餘五條沿用；watch 新登 7（`ew_0177`–`ew_0183_2026-10-04`，⑦是 `ew_0183`）、收舊 6
+  - 2026-10-04｜押這一層的三份敘事換版：SIVE.ST `ib_23cd73accba5a2d9`（rides 換新讀圖；position／our_bet「六家」改「七家」；bottleneck 補「它的 CW DFB 由穩懋代工，穩懋 2026 年 8–9 月簡報仍標合格中」；反證⑤連到新讀圖 #6；SuperNova 插槽舊引用 `sr_268d2fd79db629ff` 被 7.0c 規則擋下、換成現行 `sr_d85d672998445c50`）、COHR `ib_6b25ffb22bdf93fb`、LITE `ib_36704076dae600d4`（只換讀圖與「六家」）；候選狀態、answers、反證條件都不變
 - 裁決：（尚無）
   - 2026-10-04｜Jabil 8-K Ex.99.1（Q4 FY26，申報 2026-09-30）｜`ew_0108` 的 Jabil 條件未觸及（全文 Sivers、photonic 都是 0 處）｜—（H7：未觸及不記列）
   - 2026-10-04｜`mops_3105_company_presentation_20260909` p.23｜代工端 CW-DFB 到 2026-09 仍「Ongoing Qualification」——是敘事②（ELS 年底前量產）時程的脈絡，不是裁決；裁決點照舊（Q3 2026-11-26、ELS readiness 2026-12-31）｜—
@@ -48,9 +52,13 @@
 - 研究產出：（尚無）
   - 2026-10-04｜定向 lead_99ae527d（`directed:phase7-7.1-O3`）→ `ra_db4d61204188fe02647edd6309e5ecea` → pq2 **[684]**：POET×Lumilens 聯合新聞稿（POET 6-K Ex.99.1，accession 0001171843-26-003413）——「POET has granted Lumilens a warrant to purchase up to 22,921,408 common shares」，依 Lumilens 對訂單的累計付款分批 vest；5,000 萬美元訂單「subject to the successful development and ultimate qualification of the modules」。**v2 敘事等 [684] 入圖後再寫**：敘事每格只能引用圖上的證據，而「不要」的理由（付錢方向）原本在圖上沒有一手
   - 2026-10-04 更正（不改登記本身，registration §0 第 4 條）：登記「開題時已知」把認股權證的出處寫成 `ra_353d5e662ef996de0a8f0f649e599819`——那其實是 Schaeffler 人形致動器那一包，只拿 POET 當類比；ARCHITECTURE §6 的「2,292 萬份認股權證」數字本身經上述一手核對無誤（22,921,408）
+  - 2026-10-04｜使用者 go：[684] 入圖（intake commit `bf533d2c`）——供貨邊多一份聯合新聞稿 SourceDoc `poet_lumilens_supply_agreement_pr_2026_05_14` 與兩條 claim（cl1 付錢方向、cl2 訂單附開發與合格條件）
+  - 2026-10-04｜v2 敘事 `ib_b36ecf9dc00459d9`：候選狀態「不要」，理由寫「不是瓶頸」（供應商拿股權換訂單），不是「非邊緣」——它是邊緣公司（寫入時市值約 13.5 億美元、分析師 1 位，兩條都在門檻內）；answers：已定價＝量不到（20-F／40-F 申報者的既有 fail-closed 規則，不是缺資料）、出現在數字裡＝否（最新一年營收年增 +2494.6% 是從極小基數起跳，訂單還沒進營收）；rides 空（POET 不在任何現行讀圖的供給側；它的雷射站在 CW DFB 層的反向路徑上，引 `sr_00e18cf604cc66b9`）；反證 1 條登記成 `ew_0173_2026-10-04`（客戶端／第三方具名唯一或關鍵供應商，或客戶掏錢；到期 2027-06-30）。materialize 後首屏七句渲染，「已定價」那格印「（尚無）」並標 partial
 - 付錢方向（H10）：供應商掏錢（登記時已知）
 - 裁決：（尚無）
+  - 2026-10-04｜`poet_lumilens_supply_agreement_pr_2026_05_14`（POET×Lumilens 聯合新聞稿，published 2026-05-14）｜付錢方向＝供應商掏錢，一手證實；敘事的結構結論「不是瓶頸」依既有證據成立（登記：既有證據即可結案）｜—（不是錯）
 - 2×2：尚未到裁決點
+  - 2026-10-04｜列＝結構結論成立（付錢方向，一手）；錨＝敘事日 2026-10-04；欄＝照登記在 7.5 記（光通訊組超額）
 - failure log：（尚無）
 
 ## O4 AAOI
@@ -149,6 +157,8 @@
   - 2026-10-04｜研究題目（pq1，`decompose:lpt-345kv-2026-10-04`，triaged_go）：lead_7b63986b（LPT 整機：進口來源、交期、客戶端資本承諾）；P2 的五題見下
   - 2026-10-04｜第一份層文件入圖包 pq2 **[687]**（定向 lead_c1a91083 → `ra_c6cf9c678063f86f9015d868a8423ec7`）：DOE 2022 LPT 供應鏈深度評估（政府報告、對公司是第三方；`config/publishers.json` 隨包加 DOE）——新節點 `tech:large_power_transformer` 與五個元件層、`constrained_by` GOES／測試產能兩條、`co:cleveland_cliffs`（CLF）→ GOES、`co:hyosung_heavy_industries`（298040.KS）→ LPT；名冊兩筆隨包 staged。**[688] 取代 [687]**（第一版沒聲明 focus_company_id、被 sync 標 BLOCKER；補 co:hyosung_heavy_industries 重新 prepare 成 `ra_ed8e3518b20d6d20ec577fea7900b748`；[687] 請 drop，failure log #3 第 2 次）。⚠ 2022 年快照、不接 AI 資料中心需求錨（入圖後走圖會報「走不到錨」，那是對的提醒）；failure log #8
   - 2026-10-04｜需求端接線入圖包 pq2 **[689]**（定向 lead_775a39b4 → `ra_eb76b41fb28879e307d0eea82fefcee5`）：IREN FY2026 10-K（AI 資料中心營運商＝買方端）——`co:iren depends_on` LPT 與新節點 `tech:hv_circuit_breaker`（交期 16–72／15–113 週），`tech:ai_compute_buildout enables tech:large_power_transformer`（「capacity-constrained supply chains for AI infrastructure」）；補上 [688] 走不到 AI 需求錨的缺口
+  - 2026-10-04｜使用者 go：[688] 入圖（intake commit `832a244e`）、[689] 入圖（`9a682aab`）；[687] drop（舊版缺 focus_company_id）
+  - 2026-10-04｜**電力鏈第一份讀圖** `sr_a884792198990379`（`tech:large_power_transformer`，層）：**undecided**——需求側讀得出繞不過（IREN 10-K：高壓變壓器／開關設備單點故障、交期 16–72 週且在增加，買方端但只有一家），供給側讀不出形狀（圖上只有 HICO 一家且是能力不是出貨；同一份 DOE 說 2019 年 82% 靠進口——**已知至少 1 家，不是薄層**）；DOE 點名的兩個瓶頸（GOES 產能、測試台）在下一層，形狀指向量（B）但是 2022 年快照、不宣告。缺：供給側列舉（lead_7b63986b）、任一條供貨邊的替代難度、2026 年現況。反證 2 條登記：`ew_0174_2026-10-04`（IREN 交期鬆動）、`ew_0175_2026-10-04`（GOES／測試瓶頸解除），另客戶重讀 `ew_0176_2026-10-04`（IREN 出新文件 → 本層該重讀）。驗收①（光通訊以外的鏈有現行讀圖＋≥1 條登記反證）電力這一條成立
 - 主題等權組（電力；必須早於本鏈第一份敘事）：（尚無）
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
@@ -178,6 +188,8 @@
   - 2026-10-04｜**decompose 收據**——系統：GB300 NVL72 機櫃的直接液冷迴路；選題理由：plan §0.1 Q2「散熱（小規模，台股液冷）」；一手來源：Lenovo Press LP2357（2026-08-30，整機廠規格書：「The liquid cooling solution consists of a CDU, rear manifold, quick disconnects, and cold plates for the CPUs, GPUs, ConnectX-8 network adapters, and all NVSwitch components」——WebFetch 摘要轉出，入圖前要逐字重核）、OCP 產品目錄（UQD 開放規格，至少 7 家上架）。拆出 6 層：冷板、機櫃後置 manifold（304L／316L）、快接頭（UQD／UQDB）、CDU（液對液熱交換＋泵）、冷卻液（去離子水／PG25，大宗品）、廠務水側。三題：幾家能做——快接頭 OCP 目錄至少 7 家（SITELIN、CEJN、Stäubli、JPC、Parker、BEEHE、Danfoss Hansen），其餘未知；換掉要多久、客戶資本承諾——全部未知。對照圖：只有泛稱的 `tech:thermal_solutions`（Coherent 一條邊，指光模組熱管理），冷板／manifold／快接頭／CDU 都沒有；名冊 0 家台股散熱公司——**收斂：拆出 6 層（冷卻液不出題）｜✅ 0｜🟡 0｜🔴 5**。⚠ 先入為主的風險（登記的 failure mode）：快接頭「開放規格＋多家上架」支持 08-29 的「競爭層」結論，題目刻意寫成找反例（NVIDIA 指定的盲插件有幾家通過）
   - 2026-10-04｜研究題目（pq1，`decompose:gb300-nvl72-dlc-2026-10-04`，triaged_go）：lead_5b8cc7e2（冷板）、lead_1345d45b（manifold）、lead_6698f145（快接頭）、lead_f96bfb99（CDU）
   - 2026-10-04｜第一份層文件入圖包 pq2 **[690]**（定向 lead_ba882ac7 → `ra_c6bd011413367fec896f89429c605404`）：Ecolab 8-K（收購 CoolIT 協議，2026-03-20）＋交割新聞稿（2026-07-02）——新節點 `tech:coolant_distribution_unit`、`tech:liquid_cooling_cold_plate`，CoolIT（非上市）供這兩層、`tech:ai_compute_buildout enables` 兩層、Ecolab acquired CoolIT、CoolIT partnership_with NVIDIA／AMD；名冊 co:ecolab（ECL）、co:coolit_systems（null）隨包 staged。⚠ 兩層供給側只畫了一家，不得讀成薄層；Eaton 申報對 Boyd 沒有液冷字樣，不建邊。題材掃描 lead_f7c61cbb 已 park（由 [690] 承接）
+  - 2026-10-04｜使用者 go：[690] 入圖（intake commit `32d81f4a`）
+  - 2026-10-04｜讀圖**刻意延後**：`tech:coolant_distribution_unit`、`tech:liquid_cooling_cold_plate` 兩層各只有 1 條需求接線與 1 條供貨（CoolIT，非上市），現在寫只會是空的 undecided——為了驗收①的計數補格子正是 L19 的形狀。等 lead_f96bfb99（CDU）／lead_5b8cc7e2（冷板）的供給側研究有實料再讀；驗收①的散熱這一條目前未成立
   - 主題等權組：還沒定——組員要能在名冊解析（INV-1），台股散熱公司目前 0 家在名冊；組員等選源找出各層坐了誰再定（仍早於本鏈第一份敘事）
 - 主題等權組（散熱；必須早於本鏈第一份敘事）：（尚無）
 - 裁決：（尚無）
