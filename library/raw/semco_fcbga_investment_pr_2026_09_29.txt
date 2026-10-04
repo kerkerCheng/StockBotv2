@@ -1,0 +1,12 @@
+Source URL: https://www.samsungsem.com/global/newsroom/news/view.do?id=10562
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Samsung Electro-Mechanics Press Release 2026-09-29：Sejong KRW 4.27 trillion · Vietnam subsidiary KRW 2.51 trillion FCBGA expansion
+Source: https://www.samsungsem.com/global/newsroom/news/view.do?id=10562
+Published: 2026-09-29 | Origin: Samsung Electro-Mechanics | Retrieved: 2026-10-04
+
+摘要第一點："Investment of KRW 4.27 trillion to expand high-performance semiconductor substrate (FCBGA) production at the Sejong business site in Korea"
+內文第 1 段："Samsung Electro-Mechanics is making a total investment of approximately KRW 6.78 trillion at its Sejong business site and Vietnam subsidiary to respond to the growing demand in the FCBGA (Flip Chip-Ball Grid Array) market for AI servers."
+「Rapid Growth in Demand for High-Performance FCBGA Driven by AI Market Expansion」段："FCBGA is a highly integrated semiconductor substrate that connects high-performance semiconductors such as AI accelerators, GPUs, and CPUs to the mainboard, supplying electrical signals and power."
+「Establishing FCBGA Production System to Meet Global Big Tech Customer Demand」段："In particular, this investment is being pursued based on mid- to long-term cooperation with global big tech and semiconductor customers. As the investment includes customer funding support and mid- to long-term volume guarantees, the company expects to strengthen the competitiveness of its FCBGA business based on a stable demand foundation."
+摘要第二點："Global customer funding support resolves risks of new facility investment (CAPEX)"

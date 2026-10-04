@@ -35,6 +35,17 @@
       ],
       "statement": "Marvell separately grants warrants to customers (Fiscal 2025: up to 4.2 million shares at $87.77; Fiscal 2026: total grant-date fair value $55.4 million, none vested as of August 1, 2026) that vest on the customer's revenue milestones and are recognized as a reduction to revenue — a supplier-pays-customer incentive direction that coexists with, and must not be conflated with, NVIDIA's customer-side capital commitment.",
       "subject_id": "co:marvell_technology"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：Marvell 下一份 10-Q（Q3 FY2027，約 2026-12 上旬）或 FY2027 10-K 的 Item 1A 從吃緊清單移除 large body substrates，或改稱供給已正常化。核查頻率：每季（MRVL 10-Q／10-K 申報）。觸發後 48 小時：重跑 python -m query.structure mat:ic_package_substrate，e3 降 confidence 或提撤回（改成歷史 dated claim），並在該層讀圖註記客戶端吃緊已解除。",
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_cl4",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s7"
+      ],
+      "statement": "Customer-side (Marvell's own 10-Q, Q2 FY2027): Marvell says it is 'currently in a supply constrained environment' that has limited its ability to fully satisfy demand, naming large body substrates alongside advanced wafer fabrication and advanced packaging as the tight AI manufacturing resources, with present-tense 'results in ... inability to meet demand' (the Q1 FY2027 10-Q wording was 'have in the past and may continue to result in'). The filing does not name any substrate supplier.",
+      "subject_id": "e3"
     }
   ],
   "edges": [
@@ -60,40 +71,108 @@
         "mrvl_10q_nvidia_preferred_2026_08_28_s2"
       ],
       "src_id": "co:marvell_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "mat:ic_package_substrate",
+      "id": "e3",
+      "relation": "constrained_by",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s7"
+      ],
+      "src_id": "co:marvell_technology"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.85,
+      "dst_id": "tech:advanced_packaging",
+      "id": "e4",
+      "relation": "constrained_by",
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s7"
+      ],
+      "src_id": "co:marvell_technology"
     }
   ],
   "nodes": [
     {
       "abstraction_level": "device_chip",
       "aliases": [
-        "Marvell",
         "MRVL"
       ],
-      "attributes": {},
-      "confidence": 0.9,
+      "attributes": {
+        "ticker": "MRVL"
+      },
+      "confidence": 0.95,
       "id": "co:marvell_technology",
       "name": "Marvell Technology",
-      "role": "adjacent_silicon",
+      "role": null,
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s1",
+        "mrvl_10q_nvidia_preferred_2026_08_28_s7"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "network_systems",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "id": "co:nvidia",
+      "name": "NVIDIA",
+      "role": "leader",
       "source_ids": [
         "mrvl_10q_nvidia_preferred_2026_08_28_s1"
       ],
       "type": "Company"
     },
     {
-      "abstraction_level": "end_demand",
+      "abstraction_level": "materials_substrate",
       "aliases": [
-        "NVDA",
-        "NVIDIA Corporation"
+        "large body substrates",
+        "IC substrates",
+        "advanced IC substrates",
+        "high-end IC substrates",
+        "FCBGA",
+        "Flip Chip-Ball Grid Array"
       ],
       "attributes": {},
       "confidence": 0.9,
-      "id": "co:nvidia",
-      "name": "NVIDIA",
+      "id": "mat:ic_package_substrate",
+      "name": "IC Package Substrate",
       "role": null,
       "source_ids": [
-        "mrvl_10q_nvidia_preferred_2026_08_28_s1"
+        "mrvl_10q_nvidia_preferred_2026_08_28_s7"
       ],
-      "type": "Company"
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "foundry_packaging",
+      "aliases": [
+        "advanced packaging",
+        "heterogeneous integration",
+        "3D chiplet integration"
+      ],
+      "attributes": {
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null,
+        "ramp_difficulty_intrinsic": 4
+      },
+      "confidence": 0.9,
+      "id": "tech:advanced_packaging",
+      "name": "Advanced packaging chip integration",
+      "role": null,
+      "source_ids": [
+        "mrvl_10q_nvidia_preferred_2026_08_28_s7"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -107,7 +186,8 @@
     "retrieved_at": "2026-08-29",
     "source_type": "filing",
     "storage_permission": "repo_excerpt",
-    "title": "Marvell 10-Q (Q2 FY2027) — NVIDIA $2.0B Series A Preferred investment and strategic partnership",
+    "supersedes_extraction_sha256": "81aa630ff586f8f679fc67e57175adc8ef6041c72354122d5c9941955212f450",
+    "title": "Marvell 10-Q (Q2 FY2027) — NVIDIA $2.0B Series A Preferred investment and strategic partnership; Item 1A supply constraints (large body substrates, advanced packaging)",
     "url": "https://www.sec.gov/Archives/edgar/data/1835632/000183563226000025/mrvl-20260801.htm"
   },
   "sources": [
@@ -140,6 +220,11 @@
       "id": "mrvl_10q_nvidia_preferred_2026_08_28_s6",
       "locator": "Revenue note, Fiscal 2026 warrant fair value",
       "quote": "The grant date fair value of the warrant was determined to be $53.02 per share and a total fair value of $55.4 million using the Black-Scholes option pricing model. None of the Fiscal 2026 Warrant Shares have vested as of August 1, 2026."
+    },
+    {
+      "id": "mrvl_10q_nvidia_preferred_2026_08_28_s7",
+      "locator": "Part II Item 1A Risk Factors「We rely on our manufacturing partners…」段（接在 TSMC 產能保留之後）",
+      "quote": "We are currently in a supply constrained environment. These supply challenges have limited our ability to fully satisfy demand for some of our products. For example, there continues to be a tight supply environment for AI related components and manufacturing resources, such as advanced wafer fabrication, advanced packaging, and large body substrates which results in increased lead times, inability to meet demand, and increased costs."
     }
   ]
 }

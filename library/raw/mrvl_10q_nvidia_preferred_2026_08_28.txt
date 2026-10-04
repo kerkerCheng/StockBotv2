@@ -2,3 +2,5 @@ Source URL: https://www.sec.gov/Archives/edgar/data/1835632/000183563226000025/m
 
 Excerpt:
 Marvell 10-Q (Q2 FY2027): On March 31, 2026 NVIDIA purchased 2.0M shares of Marvell Series A Convertible Preferred for $2.0 billion cash, convertible into ~21.8M common shares at ~$91.84, alongside a strategic partnership connecting Marvell custom XPUs and scale-up networking with NVIDIA's AI infrastructure ecosystem. The same filing discloses customer warrants (FY2025: 4.2M shares at $87.77; FY2026: $55.4M fair value) vesting on customer revenue milestones and recognized as a reduction to revenue.
+
+[2026-10-04 追加——更正走廊，舊摘錄以上逐字保留] Part II Item 1A Risk Factors："We are currently in a supply constrained environment. These supply challenges have limited our ability to fully satisfy demand for some of our products. For example, there continues to be a tight supply environment for AI related components and manufacturing resources, such as advanced wafer fabrication, advanced packaging, and large body substrates which results in increased lead times, inability to meet demand, and increased costs."
