@@ -1,0 +1,269 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "ccxi_s_4a_agility_robotics_2026_09_30",
+    "title": "Churchill Capital Corp XI Form S-4/A（2026-09-30）— Information About Agility Robotics：客戶、策略投資人、技術夥伴、零組件風險",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Agility Robotics",
+    "publisher": "SEC EDGAR",
+    "url": "https://www.sec.gov/Archives/edgar/data/2074973/000121390026105334/ea0297114-05.htm",
+    "published_at": "2026-09-30",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR 公開 filing；只保留研究必要的逐字摘錄（locator 指段落），全文不入本包。"
+  },
+  "sources": [
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s1",
+      "locator": "Information About Agility（業務段）——commercial customers",
+      "quote": "Our commercial customers include leading global enterprises such as Schaeffler, GXO, Toyota Motor Manufacturing Canada and Mercado Libre, where Digit performs useful physical labor within active manufacturing, distribution and logistics operations."
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s2",
+      "locator": "Information About Agility（業務段）——客戶部署成果",
+      "quote": "At Schaeffler, Digit v4 has been deployed across multiple facilities supporting material handling and logistics workflows, achieving approximately 98% operational accuracy while moving approximately 25,000 totes. Following these deployments, Schaeffler has committed to scaling its use of Digit 5, moving from pilot to full-scale integration across its manufacturing footprint."
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s3",
+      "locator": "Information About Agility（業務段）——GXO 部署",
+      "quote": "At GXO, Digit has automated tote fulfillment and handling workflows, reaching a cumulative 100,000 tote milestone in November 2025"
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s4",
+      "locator": "Information About Agility（業務段）——strategic investors",
+      "quote": "Our strategic investors include industry leaders such as NVIDIA, Amazon, SoftBank, Schaeffler, ABICO Group and Foxconn, among others, whose investments provide strategic alignment and reflect a shared conviction in the long-term potential of humanoid robotics and physical AI."
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s5",
+      "locator": "Information About Agility（業務段）——technology partners",
+      "quote": "In 2026, NVIDIA selected Digit 5 as the inaugural humanoid launch partner for its NVIDIA Halos for Robotics platform, pairing Agility’s systems with NVIDIA IGX Thor and Halos Core infrastructure"
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s6",
+      "locator": "Risk Factors（Agility 營運風險）——零組件供應",
+      "quote": "Agility relies on third-party suppliers for the provision and development of many key components and materials used in its products, including semiconductors, batteries, sensors, actuators, computing hardware, and specialty alloys. Some of the components used in Digit may have to be purchased from a single source or limited number of sources."
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_s7",
+      "locator": "Risk Factors（Agility 營運風險）——產品時程",
+      "quote": "securing critical components (including actuators, sensors, batteries and computing hardware)"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:agility_robotics",
+      "type": "Company",
+      "name": "Agility Robotics",
+      "aliases": [],
+      "abstraction_level": "robot_system",
+      "role": null,
+      "attributes": {
+        "ticker": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s1"
+      ]
+    },
+    {
+      "id": "co:schaeffler",
+      "type": "Company",
+      "name": "Schaeffler",
+      "aliases": [
+        "SHA0.DE",
+        "Schaeffler AG"
+      ],
+      "abstraction_level": "robot_subsystem",
+      "role": null,
+      "attributes": {
+        "ticker": "SHA0.DE"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s2",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s4"
+      ]
+    },
+    {
+      "id": "co:gxo_logistics",
+      "type": "Company",
+      "name": "GXO Logistics",
+      "aliases": [
+        "GXO"
+      ],
+      "abstraction_level": "deployment_workflow",
+      "role": "robot_operator",
+      "attributes": {
+        "ticker": "GXO"
+      },
+      "confidence": 0.75,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s3"
+      ]
+    },
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s4",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s5"
+      ]
+    },
+    {
+      "id": "prod:digit",
+      "type": "Product",
+      "name": "Digit",
+      "aliases": [],
+      "abstraction_level": "robot_system",
+      "role": null,
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s1",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s2"
+      ]
+    },
+    {
+      "id": "comp:humanoid_precision_actuators",
+      "type": "TechNode",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "abstraction_level": "robot_subsystem",
+      "role": null,
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s6",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s7"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:schaeffler",
+      "dst_id": "prod:digit",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s2",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:schaeffler",
+      "dst_id": "co:agility_robotics",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s4"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:nvidia",
+      "dst_id": "co:agility_robotics",
+      "relation": "invests_in",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s4"
+      ]
+    },
+    {
+      "id": "e4",
+      "src_id": "co:agility_robotics",
+      "dst_id": "co:nvidia",
+      "relation": "partnership_with",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s5"
+      ]
+    },
+    {
+      "id": "e5",
+      "src_id": "co:gxo_logistics",
+      "dst_id": "prod:digit",
+      "relation": "deploys",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s3",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s1"
+      ]
+    },
+    {
+      "id": "e6",
+      "src_id": "co:agility_robotics",
+      "dst_id": "comp:humanoid_precision_actuators",
+      "relation": "constrained_by",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s7",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s6"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_cl1",
+      "statement": "Agility's S-4/A business section (filed by Churchill Capital Corp XI, 2026-09-30) names Schaeffler, GXO, Toyota Motor Manufacturing Canada and Mercado Libre as commercial customers, and says Schaeffler — also a strategic investor — deployed Digit v4 across multiple facilities and 'has committed to scaling its use of Digit 5, moving from pilot to full-scale integration across its manufacturing footprint'. This is the supplier's statement about its customer in a registration statement; no Schaeffler-side confirmation is in the library (L8: weak). Toyota Motor Manufacturing Canada and Mercado Libre are not in the registry, so no edges are drawn for them (INV-1).",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：到 2027-06-30 為止，Schaeffler 自己的季報／年報或新聞稿都沒有提到 Digit 5 擴大導入，或合併後的 proxy／10-K 刪掉這句、改成仍在試點。核查頻率：每季（Schaeffler 季報；CCXI／Agility 的 SEC 申報）。觸發後 48 小時：e1 降 confidence，本 claim 加註；若已有 CCXI 敘事，把「客戶擴大導入」那一句改回試點。",
+      "confidence": 0.7,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s2",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s1",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s4"
+      ]
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_cl2",
+      "statement": "Agility's risk factors (S-4/A) say it relies on third-party suppliers for key components including actuators, that some Digit components 'may have to be purchased from a single source or limited number of sources', and that securing critical components (including actuators) could delay Digit programs. This is the first costly (registration-statement) origin for the existing co:agility_robotics constrained_by comp:humanoid_precision_actuators edge, which until now rested on a media relay; the filing says 'actuators' generically and names no supplier.",
+      "subject_id": "e6",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：合併後的 10-K／10-Q 風險因子不再把 actuators 列為關鍵或可能卡住時程的零組件，或揭露已有多源長約。核查頻率：每季（Agility／CCXI 的 SEC 申報）。觸發後 48 小時：e6 降 confidence，更新人形致動器層讀圖。",
+      "confidence": 0.6,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s7",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s6"
+      ]
+    },
+    {
+      "id": "ccxi_s_4a_agility_robotics_2026_09_30_cl3",
+      "statement": "Agility lists NVIDIA, Amazon, SoftBank, Schaeffler, ABICO Group and Foxconn among strategic investors, and says NVIDIA selected Digit 5 as the inaugural humanoid launch partner for NVIDIA Halos for Robotics (IGX Thor, Halos Core). Only NVIDIA and Schaeffler are in the registry, so only their investment edges are drawn; investment sizes are not disclosed in these passages.",
+      "subject_id": "e3",
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：合併後的 proxy／10-K 股東名單或關係人揭露不再列 NVIDIA／Schaeffler，或 NVIDIA Halos 合作終止。核查頻率：每季（SEC 申報）。觸發後 48 小時：e2／e3／e4 降 confidence 或提撤回。",
+      "confidence": 0.75,
+      "source_ids": [
+        "ccxi_s_4a_agility_robotics_2026_09_30_s4",
+        "ccxi_s_4a_agility_robotics_2026_09_30_s5"
+      ]
+    }
+  ]
+}
