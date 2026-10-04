@@ -120,7 +120,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | Step | 內容 | 狀態 | 執行者 | commit |
 |---|---|---|---|---|
 | 7.0a | 預先登記（十個假說與殺死條件、驗證集、裁決規則、failure log、開發 gate、漏網稽核母體）＋T0 凍結 | ✅（`docs/reports/phase7/` 四檔：registration——H1–H10 各附殺死條件與最小 n、16 個 case〔附錄 A 14＋二階 O1-U、O6〕、R3 母體〔光通訊組 15＋觀察名單 43〕、S1 框架 40 則、R2 樣本 36 則；T0 manifest `library/private/measurement/phase7/T0-2026-10-04.json`〔07:09:14Z，計數與當日心跳一致〕；偏差 #1–#4） | 強模型 | 見 git log「Step 7.0a」 |
-| 7.0b | 開發 gate 落地（development-flow 範圍欄）＋兩個當下修：巢狀 writer lock（Phase 6 #17）、thesis 逾期提醒量錯 | ○ | 執行模型 | |
+| 7.0b | 開發 gate 落地（development-flow 範圍欄）＋兩個當下修：巢狀 writer lock（Phase 6 #17）、thesis 逾期提醒量錯 | ✅（INTAKE 加 `Case` 行＋`Zoom / Review` 重抄；`writer_lock.hold` 一個 owner，四支遷移工具改用；逾期只看 `is_due`——SessionStart 兩則假逾期 → 0、10-30 照報 axt_inp＋sivers；偏差 #5–#8） | 執行模型 | 見 git log「Step 7.0b」 |
 | 7.0c | 敘事範本：「要翻倍需要什麼」＋兩個 placeholder（市值、近四季營收）＋「已定價」白話＋重押讀圖換格層引用（Phase 6 #16） | ○ | 執行模型 | |
 | 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ○ | 執行模型 | |
 | 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ○ | 執行模型 | |
@@ -148,6 +148,10 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 2 | 7.0a | §8 R2「抽樣規則先寫進 replay 報告再看結果」 | 抽樣規則與**樣本本身（36 則 lead id）**在 7.0a 就固定進 registration §7.3／附錄 C（分層、不按比例、合併時依層母體加權；層內順序＝lead id 加固定前綴後的 sha256，程式見 registration 附錄 C；排除 P3 的五則）；§8 R2 那一段已補指向 | 比「寫進 replay 報告」更早凍結，7.2 的執行者沒有選樣裁量；EDGAR 237／348 照比例抽會讓樣本幾乎只剩例行申報，所以不按比例、合併時加權 |
 | 3 | 7.0a | §1 第 2 項 T0 manifest 的內容清單 | 照清單全做，另加四類：**逐邊證據等級**（534 條，與走圖／心跳同一條路 `_classify_edges`）、S1 框架 40 則、parked×`original_obtained` id 清單、追蹤表 history／paper 名單、舊店三檔與 trade_log 的 sha256；07:06:17Z 先產過一版（沒有逐邊等級），**在任何使用之前刪除重產**（07:09:14Z） | H3／H4 的分組要以 T0 的證據等級為準（之後的升降不得改分組），不凍結就會被之後的更正污染；S1、R2 的框架在看結果之前凍結；§11 第 7 項「另核對」要比對舊店與 trade_log 的 sha256 |
 | 4 | 7.0a | §7 第 3 項 S1「每則……寫進截圖假說層」 | registration §6：主張類型封閉四選一（結構／財務／價格／無可否證主張）；**只有結構與財務型寫進截圖假說層**；價格型只記價格路徑；無可否證主張（只點名、情緒、問句）只計數、在 `cases.md` 記裁決「不適用」 | 把沒有可否證陳述的點名寫進假說層，會變成一條永遠叫不醒的等待（INV-2）；ROADMAP 驗收④「40 則各有裁決或到期」照算——「不適用」是預先登記的裁決之一，筆數照印 |
+| 5 | 7.0b | §2 第 2 項「`loader/migrate_sourcedoc_json_section.py`（兩處）與 `loader/migrate_identity_cleanup.py` 改用它」 | 三支照做，另把 `engine_c/migrate_fundamental_metrics.py` 自己寫的同一套「同 owner 未過期就不取不放」也換成 `writer_lock.hold` | 那是同一個判斷的第二個 owner（development-flow INTAKE 第 2 問）；L17 三問的「對稱面做了嗎」。行為不變，既有的巢狀測試照綠 |
+| 6 | 7.0b | §2 第 3 項「以 max(memo 生成日, last_checked) 對 check_interval_days（或直接用 `is_due`，一個 owner）……另印一行『沒有 lifecycle 的舊 memo N 份』；變異：把 last_checked 拿掉 → 真逾期要被報」 | 取 `is_due` 當唯一 owner：「memo 生成日」那一套整段拿掉；`max(memo 生成日, last_checked)` 只用來印天數。舊 memo 那一行**只在 hook 有話要說時附上**，健康審查「Memo 新鮮度」節每天照列；lifecycle 讀不到時 hook 明講。變異改成「拿掉 last_checked **與** next_check → 要報」（`is_due` 下只拿掉 last_checked，next_check 仍是出口、本來就不該報），另加兩個變異（`check` 不看 `is_due`、拿掉「讀不到要說」） | 一個 owner（`thesis/lifecycle_schedule.py` 自稱「什麼時候該重看的唯一權威」）；舊 memo 那行若單獨每天亮，就是把一個恆亮換成另一個恆亮（L14）；拿掉 memo 日期那套之後，「讀不到」不能靜默（INV-3） |
+| 7 | 7.0b | （plan 沒寫） | `DATE_RE` 認得「`**生成日期：** 2026-08-04`」的粗體寫法（L17 當下修，三行） | 先前三份新格式 memo 全退回檔案 mtime；現在只影響「幾天沒核查」的天數呈現 |
+| 8 | 7.0b | §2 第 1 項「八欄的範圍欄（或 STEP_RESULT 對應欄）加『暴露它的案例』」 | 八欄沒有「範圍」欄：INTAKE 加一行 `Case:`（範圍判定就在這裡做），收尾在 `Zoom / Review` 重抄；`docs/AGENT_WORKFLOW.md` 同步；不開第九欄 | `tests/test_agent_workflow.py` 數 STEP_RESULT 剛好八欄；新測試釘住 `Case` 行（刪掉它不會讓任何東西變紅，系統只會安靜地回到「想到就做」） |
 
 ---
 

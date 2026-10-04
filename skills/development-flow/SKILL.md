@@ -58,13 +58,18 @@ graph-write 提案才鑄 pq2 編號等核准；「改走圖的問句、改心跳
 
 答不出第 2 題就是還沒 triage 完——先 `grep` 一次那個責任的字串，不要用印象作答。
 
-輸出一個 `INTAKE` 區塊（三行就夠，不要寫成報告）：
+輸出一個 `INTAKE` 區塊（四行就夠，不要寫成報告）：
 
 ```
 INTAKE
 Zoom: Z1（理由：只動 webapp/api.py 的 renderer，無 contract 變更）
 Review: R0（不命中 R2 六條 trigger）
+Case: P1 第 2 次（另見 C1）——或「使用者指示」／「L17 當下修」
 ```
+
+**`Case` 是開發 gate 的落點**（`AGENTS.md`「開發項不走 pq2」2026-10-04：系統主動提出的開發項，「為什麼」必須指得出
+暴露它的真實案例與重複次數）：寫 failure log 的 case id 與第幾次出現；使用者直接指示的寫「使用者指示」；
+十行內、不動 contract 的當下修寫「L17 當下修」。**系統主動提出、又寫不出 case 的，不做**——寫進 failure log 等第二個 case。
 
 ## Step 2｜依 Zoom 決定下一步
 
@@ -256,7 +261,7 @@ HUMAN SUMMARY
 STEP_RESULT
 Current Phase:        
 Current Step:         
-Zoom / Review:        （實際用了哪一級；與 INTAKE 不同時要說明為什麼）
+Zoom / Review:        （實際用了哪一級；與 INTAKE 不同時要說明為什麼；開發項重抄 INTAKE 的 Case）
 Verdict:              GO / CONDITIONAL_GO / NO_GO / HUMAN_REQUIRED
 Acceptance status:    逐條 success criteria ✅／❌，附查證命令；每個數字註明數的是哪一層（圖／讀圖／敘事／registry／追蹤表），數 filter 通過檔數 → NO_GO
 Blocking findings:    

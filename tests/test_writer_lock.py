@@ -12,6 +12,7 @@ import pytest
 from engine_b.writer_lock import (
     WriterLockHeld,
     acquire,
+    hold,
     holder,
     is_stale,
     mark_run_finished,
@@ -70,6 +71,49 @@ def test_anyone_can_clear_stale_lock(lock_path) -> None:
     past = datetime.now(timezone.utc) - timedelta(hours=3)
     acquire("scheduled", ttl_minutes=1, path=lock_path, now=past)
     assert release("interactive", path=lock_path) is True
+    assert holder(lock_path) is None
+
+
+def test_nested_hold_leaves_the_outer_session_lock_untouched(lock_path) -> None:
+    """Phase 6 #17：外層 session 先用 writer_guard 取得 interactive 鎖，工具內部再進 hold——
+    結束後外層的鎖要原封不動（TTL 不縮短、不被拆）。修前的工具自己 acquire（續期成 15 分）再 release（刪檔），
+    2026-10-03 [671] 結束時把使用者的鎖拆了，[672] 寫 lead registry 時沒有持鎖。"""
+    outer = acquire("interactive", ttl_minutes=120, purpose="使用者的 session", path=lock_path)
+    with hold("interactive", ttl_minutes=15, purpose="遷移工具", path=lock_path) as acquired:
+        assert acquired is False
+        assert holder(lock_path) == outer
+    assert holder(lock_path) == outer
+
+
+def test_standalone_hold_acquires_and_releases(lock_path) -> None:
+    with hold("interactive", ttl_minutes=15, purpose="遷移工具", path=lock_path) as acquired:
+        assert acquired is True
+        assert holder(lock_path)["purpose"] == "遷移工具"
+    assert holder(lock_path) is None
+
+
+def test_hold_releases_its_own_lock_even_when_the_body_fails(lock_path) -> None:
+    with pytest.raises(RuntimeError):
+        with hold("interactive", path=lock_path):
+            raise RuntimeError("遷移中止")
+    assert holder(lock_path) is None
+
+
+def test_hold_still_blocks_another_owner(lock_path) -> None:
+    daily = acquire("scheduled", purpose="daily", path=lock_path)
+    with pytest.raises(WriterLockHeld):
+        with hold("interactive", path=lock_path):
+            pass  # pragma: no cover — 進不來
+    assert holder(lock_path) == daily
+
+
+def test_hold_takes_over_a_stale_lock_of_the_same_owner(lock_path) -> None:
+    """過期的同 owner 鎖不算「外層還在」——照常接手、結束釋放（否則一把崩潰留下的鎖會讓工具永遠不持鎖）。"""
+    past = datetime.now(timezone.utc) - timedelta(hours=3)
+    acquire("interactive", ttl_minutes=1, path=lock_path, now=past)
+    with hold("interactive", path=lock_path) as acquired:
+        assert acquired is True
+        assert not is_stale(holder(lock_path))
     assert holder(lock_path) is None
 
 

@@ -168,7 +168,7 @@ APP 可持久讀取的狀態`）。使用者不必記得自己的編號系統—
 ```
 Current Phase        現在在哪個 Phase
 Current Step         現在哪個 Step
-Zoom / Review        本 Step 實際用了哪一級（不是原本 routing 說要用哪級）
+Zoom / Review        本 Step 實際用了哪一級（不是原本 routing 說要用哪級）；開發項另寫暴露它的案例（INTAKE 的 Case）
 Verdict              GO / CONDITIONAL_GO / NO_GO / HUMAN_REQUIRED
 Acceptance status    逐條 success criteria 的達成與否（含查證命令）
 Blocking findings    擋住 verdict 的發現
@@ -179,6 +179,10 @@ Suggested next Step  ＋它的 success criteria（**只是建議**）
 ⚠ **`Zoom / Review` 欄不是裝飾。** 依 L16（分類已有 SSOT 時要讓它跟著資料走到需要它的地方），
 使用者必須不用回頭讀 transcript 就知道「這個結論是自己看自己看出來的，還是有人獨立驗過」。
 實際使用的等級與原本 routing 判定不同時，要寫出來並說明為什麼。
+
+⚠ **開發項的案例跟著同一欄走（2026-10-04，Phase 7 Step 7.0b）。** `AGENTS.md`「開發項不走 pq2」：系統主動提出的開發項，
+「為什麼」必須指得出暴露它的真實案例與重複次數，指不出來的不排程（L17 的當下修除外）。INTAKE 的 `Case` 行寫
+failure log 的 case id 與第幾次（或「使用者指示」「L17 當下修」），收尾在 `Zoom / Review` 重抄——不另開第九欄。
 
 ---
 

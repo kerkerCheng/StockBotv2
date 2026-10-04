@@ -30,9 +30,10 @@ import json
 import os
 import socket
 import tempfile
+from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterator
 
 _ROOT = Path(__file__).resolve().parent.parent
 LOCK_PATH = _ROOT / "library" / "leads" / ".writer_lock.json"
@@ -166,6 +167,35 @@ def release(owner: str, *, path: Path | None = None) -> bool:
         return False
     p.unlink(missing_ok=True)
     return True
+
+
+@contextmanager
+def hold(
+    owner: str,
+    *,
+    ttl_minutes: float = DEFAULT_TTL_MINUTES,
+    purpose: str = "",
+    path: Path | None = None,
+) -> Iterator[bool]:
+    """工具內部要持鎖時用這個，不要自己 acquire／release（Phase 6 待決 #17）。
+
+    同 owner 的未過期鎖已經在（外層 session 先用 `scripts/writer_guard.py acquire` 取得）→
+    **不 acquire、不續期、不 release**：外層的鎖連 TTL 都原封不動。先前三支遷移工具自己
+    `acquire` 再 `release`，同 owner 再 acquire＝把外層的 TTL 改成較短的那個、release＝直接刪檔，
+    於是 2026-10-03 [671] 跑完時把使用者的 session 鎖一起拆了，[672] 寫 lead registry 那一刻沒有持鎖。
+    沒有外層鎖 → 照常 acquire、結束 release；異 owner 的未過期鎖照舊 raise `WriterLockHeld`（fail closed）。
+    yield 的值＝這一層是否自己取得了鎖。
+    """
+    p = path or LOCK_PATH
+    current = holder(p)
+    nested = bool(current and current.get("owner") == owner and not is_stale(current))
+    if not nested:
+        acquire(owner, ttl_minutes=ttl_minutes, purpose=purpose, path=p)
+    try:
+        yield not nested
+    finally:
+        if not nested:
+            release(owner, path=p)
 
 
 # ---------------------------------------------------------------------------

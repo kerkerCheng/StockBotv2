@@ -452,11 +452,11 @@ def _run_corrections(args, driver) -> int:
     if not args.apply:
         print(f"（dry-run：{len(planned['edits'])} 個抽取檔、{len(planned['graph'])} 份 SourceDoc；加 --apply --pq2 N 才寫）")
         return 0
-    from engine_b.writer_lock import INTERACTIVE_OWNER, acquire, release
+    from engine_b.writer_lock import INTERACTIVE_OWNER, hold
 
     stamp = datetime.now(timezone.utc)
-    acquire(INTERACTIVE_OWNER, ttl_minutes=15, purpose=f"SourceDoc 欄位更正（pq2 [{args.pq2}]）")
-    try:
+    # 外層 session 已持同 owner 的鎖時不續期、不拆（Phase 6 #17）
+    with hold(INTERACTIVE_OWNER, ttl_minutes=15, purpose=f"SourceDoc 欄位更正（pq2 [{args.pq2}]）"):
         json_result = apply_json(planned, manifest_name=f"sourcedoc-corrections-{stamp:%Y%m%d}.json-sync.json",
                                  plan_label=str(manifest.get("plan") or ""))
         with driver.session(default_access_mode=WRITE_ACCESS) as session:
@@ -465,8 +465,6 @@ def _run_corrections(args, driver) -> int:
         if new_publishers:      # 同一步登記：origin 更正落地之後，登記才指得回原文
             raw = PUBLISHERS_PATH.read_bytes().decode("utf-8")
             PUBLISHERS_PATH.write_bytes(insert_publishers(raw, new_publishers).encode("utf-8"))
-    finally:
-        release(INTERACTIVE_OWNER)
     with driver.session(default_access_mode=READ_ACCESS) as session:
         state = drift([dict(r) for r in session.run(GRAPH_CYPHER)], json_source_docs(ROOT / "extractions"))
     print(summary_line(state))
@@ -521,14 +519,12 @@ def main(argv: list[str] | None = None) -> int:
             if state["danger"]:
                 print("✗ 還有「重建會遺失或不確定」的不一致——先 --apply-json，不碰圖", file=sys.stderr)
                 return 2
-            from engine_b.writer_lock import INTERACTIVE_OWNER, acquire, release  # 只有寫圖才需要
+            from engine_b.writer_lock import INTERACTIVE_OWNER, hold  # 只有寫圖才需要
 
-            acquire(INTERACTIVE_OWNER, ttl_minutes=15, purpose=f"SourceDoc section／title 對齊 JSON（pq2 [{args.pq2}]）")
-            try:
+            with hold(INTERACTIVE_OWNER, ttl_minutes=15,
+                      purpose=f"SourceDoc section／title 對齊 JSON（pq2 [{args.pq2}]）"):
                 with driver.session(default_access_mode=WRITE_ACCESS) as session:
                     result = apply_graph(state["stale"], session=session, pq2=args.pq2)
-            finally:
-                release(INTERACTIVE_OWNER)
             print(json.dumps(result, ensure_ascii=False, indent=2))
             return 0
         plan = plan_json_edits(rows, json_docs)

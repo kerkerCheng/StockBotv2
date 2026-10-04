@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0b：巢狀 writer lock、thesis 逾期提醒只看 lifecycle）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | ①`engine_b/writer_lock.hold`（新 context manager）：同 owner 的未過期鎖已在 → 不 acquire、不續期、不 release（鎖檔一個 byte 都不寫）；否則照常 acquire／release；異 owner 照舊 fail closed。改用它的四支都是**互動專用**的遷移工具（`loader/migrate_sourcedoc_json_section.py` 兩處、`loader/migrate_identity_cleanup.py`、`engine_c/migrate_fundamental_metrics.py`），daily 的 `scheduled` acquire／release 不動。②`crons/thesis_freshness_check.py`（SessionStart hook）：讀的檔不變（`thesis/lifecycle.json`、`thesis/*_lane_memo.md`、`library/leads/todo_pool.json`）、不寫任何檔；拿掉「memo 生成日＋週期」那一套（到期只委派 `thesis.lifecycle_schedule.is_due`），lifecycle 讀不到改成明講，「沒有 lifecycle 的舊 memo N 份」只在 hook 有話要說時附上。③daily 的健康審查（`python -m query.health_audit --json`）：「Memo 新鮮度」那一節改吃同一個 `check()`（`is_due`）並多一行舊 memo 清單；讀取、寫入、節數（14）都不變。④`engine_b/todo.py` 的 pq2 收集器呼叫的 `lifecycle_due_detail` 多一個選填 `today`，預設行為不變 |
+| **2 canonical skill／prompt／本檔** | 本節；上面「Writer lock」段補一句；`skills/development-flow/SKILL.md` 的 INTAKE 多一行 `Case`、`docs/AGENT_WORKFLOW.md` 的 `Zoom / Review`（開發 gate 的落點，與本節的程式無關） |
+| **3 最窄 rule** | daily argv 不變、不新增 step／allowlist；SessionStart hook 的命令字串不變；四支遷移工具仍是互動專用、不進任何無人值守清單 |
+| **4 contract test** | `tests/test_writer_lock.py`（巢狀不動外層鎖與 TTL、單獨跑照常取放、本體失敗也釋放、異 owner 照擋、過期的同 owner 鎖照常接手）；`tests/test_engine_c_equity_issuance.py::test_migration_cli_refuses_a_missing_db_and_leaves_a_users_lock_alone`（既有）；`tests/test_lifecycle_hook.py`（複查過的 thesis 到 next_check 才報、沒有 lifecycle 的 memo 只列不報、沒有排程出口的照報、10-04 的 hook 安靜、說話時附舊 memo、lifecycle 讀不到要說、粗體生成日期讀得到）；`tests/test_agent_workflow.py::test_intake_carries_the_case_that_exposed_a_development_item`。變異：`hold` 一律取放 → 2 紅；`check` 不看 `is_due` → 2 紅；拿掉「讀不到要說」→ 1 紅 |
+| **5 端到端 smoke** | 真資料：SessionStart hook 2026-10-04 安靜（exit 0、沒有輸出）；舊程式同日的 `check()`＝`[('cpo', 91), ('sivers', 36)]` → 新程式 `[]`（兩則假逾期 → 0）；真 lifecycle 三筆：10-04 都不到期、10-30 axt_inp（Q3 催化劑，推估日）＋sivers（next_check 10-29）、12-01 再加 coherent_cpo；健康審查 14 節全綠，「Memo 新鮮度」只剩「不算逾期的舊 memo 6 份」 |
+
 ### Sandbox impact review 結論（2026-10-03，Phase 6 Step 6.7d：預測表改寫規則①）
 
 | 步 | 結論 |
@@ -496,6 +506,8 @@ python scripts/backfill_source_dating.py --doc-id <id> --value 2026-02-03 `
   收尾 `release`；`check` 同時看排程時間窗與鎖（鎖補上時間窗防不了的延遲開跑——
   2026-08-29 排程 08:21 才收尾的那種）。互動手跑 harvest 時用
   `STOCKBOT_WRITER_OWNER=interactive` 表明身分，避免與自己持有的鎖互撞。
+  **工具內部要持鎖一律用 `with writer_lock.hold(...)`**，不要自己 acquire／release：同 owner 的外層 session 鎖已在時
+  它不續期、不拆（2026-10-03 [671] 的遷移工具自己 release，把使用者的 session 鎖一起拆了——Phase 6 #17，2026-10-04 修）。
 - **stale-tolerant**：鎖過期或損毀即可被接手（新鎖記 `superseded` 供稽核）；
   崩潰的 session 最多卡別人一個 TTL。不得手動拆別人的**未過期**鎖。
 - **Sandbox impact review 結論（2026-09-19）：** 鎖檔是 repo 內一般檔案（workspace-write

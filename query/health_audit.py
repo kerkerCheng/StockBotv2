@@ -483,14 +483,18 @@ def run_local_audit(*, today: date | None = None) -> str:  # pragma: no cover - 
         _section("L7 欄位完整性（核查頻率 + 48h 動作）", "yellow" if l7_lines else "green", l7_lines)
     )
 
-    from crons.thesis_freshness_check import check as stale_memos
+    from crons.thesis_freshness_check import check as stale_memos, legacy_memos
 
-    stale = stale_memos()
+    # 到期判斷只委派 lifecycle_schedule.is_due（Phase 7 Step 7.0b）；沒有 lifecycle 的舊 memo 不算逾期、照列（INV-3）
+    stale = stale_memos(today, lifecycle=lifecycle or None)
+    legacy = legacy_memos(lifecycle or None)
     report.extend(
         _section(
             MEMO_FRESHNESS_TITLE,
             "yellow" if stale else "green",
-            [f"- {company}：{days} 天未核查" for company, days in stale],
+            [f"- {thesis_id}：{f'{days} 天未核查' if days >= 0 else '到期（沒有 memo 日期也沒有 last_checked，天數未知）'}"
+             for thesis_id, days in stale]
+            + ([f"- （不算逾期）沒有 lifecycle 的舊 memo {len(legacy)} 份：{'、'.join(legacy)}"] if legacy else []),
         )
     )
 

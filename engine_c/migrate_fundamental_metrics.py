@@ -181,38 +181,31 @@ def main(argv: list[str] | None = None) -> int:
     finally:
         conn.close()
 
-    from engine_b.writer_lock import INTERACTIVE_OWNER, WriterLockHeld, acquire, holder, is_stale, release
+    from engine_b.writer_lock import INTERACTIVE_OWNER, WriterLockHeld, hold
 
     # 互動 session 已先用 writer_guard 取得同一個 owner 的鎖：不續期（會改掉對方設的 TTL）、結束也不釋放
-    # ——拆掉的是使用者自己的鎖（R2-c 覆核 #4）。
-    current = holder()
-    already_held = bool(current and current.get("owner") == INTERACTIVE_OWNER and not is_stale(current))
-    if not already_held:
-        try:
-            acquire(INTERACTIVE_OWNER, ttl_minutes=15,
-                    purpose="Engine C fundamental_history CHECK 遷移（Phase 4 Step 4.6）")
-        except WriterLockHeld as exc:
-            print(f"✗ 拒絕：writer lock 被占用（daily 正在跑？）——{exc}", file=sys.stderr)
-            return 2
+    # ——拆掉的是使用者自己的鎖（R2-c 覆核 #4）。這條判斷自 Phase 7 Step 7.0b 起只住 `writer_lock.hold`。
     try:
-        stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        backup = backup_database(db_path, db_path.parent / "backups" / f"{db_path.stem}.pre-metrics-{stamp}.db")
-        conn = sqlite3.connect(str(db_path), isolation_level=None)
-        try:
-            result = migrate(conn)
-        finally:
-            conn.close()
-        receipt = {"migrated_at": stamp, "db": str(db_path), "backup": backup, "result": result}
-        (db_path.parent / "backups" / f"{db_path.stem}.pre-metrics-{stamp}.json").write_text(
-            json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        print(json.dumps(receipt, ensure_ascii=False, indent=2))
-        return 0
+        with hold(INTERACTIVE_OWNER, ttl_minutes=15,
+                  purpose="Engine C fundamental_history CHECK 遷移（Phase 4 Step 4.6）"):
+            stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+            backup = backup_database(db_path, db_path.parent / "backups" / f"{db_path.stem}.pre-metrics-{stamp}.db")
+            conn = sqlite3.connect(str(db_path), isolation_level=None)
+            try:
+                result = migrate(conn)
+            finally:
+                conn.close()
+            receipt = {"migrated_at": stamp, "db": str(db_path), "backup": backup, "result": result}
+            (db_path.parent / "backups" / f"{db_path.stem}.pre-metrics-{stamp}.json").write_text(
+                json.dumps(receipt, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+            print(json.dumps(receipt, ensure_ascii=False, indent=2))
+            return 0
+    except WriterLockHeld as exc:
+        print(f"✗ 拒絕：writer lock 被占用（daily 正在跑？）——{exc}", file=sys.stderr)
+        return 2
     except MigrationError as exc:
         print(f"✗ 遷移中止（正式庫未改動）：{exc}", file=sys.stderr)
         return 3
-    finally:
-        if not already_held:
-            release(INTERACTIVE_OWNER)
 
 
 if __name__ == "__main__":

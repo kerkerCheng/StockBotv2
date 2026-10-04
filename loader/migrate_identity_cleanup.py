@@ -638,13 +638,11 @@ def main(argv: list[str] | None = None) -> int:
         if not args.apply:
             print(json.dumps(_summary(plan(manifest, driver=driver)), ensure_ascii=False, indent=2, default=str))
             return 0
-        from engine_b.writer_lock import INTERACTIVE_OWNER, acquire, release
+        from engine_b.writer_lock import INTERACTIVE_OWNER, hold
 
-        acquire(INTERACTIVE_OWNER, ttl_minutes=30, purpose=f"身分清理遷移（pq2 [{args.pq2}]）")
-        try:
+        # 外層 session 已持同 owner 的鎖時不續期、不拆（Phase 6 #17）
+        with hold(INTERACTIVE_OWNER, ttl_minutes=30, purpose=f"身分清理遷移（pq2 [{args.pq2}]）"):
             result = apply(manifest, pq2=args.pq2, backup_dir=args.backup_dir, driver=driver)
-        finally:
-            release(INTERACTIVE_OWNER)
         print(json.dumps(result, ensure_ascii=False, indent=2, default=str))
         return 0
     except IdentityCleanupError as exc:

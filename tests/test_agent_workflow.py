@@ -211,6 +211,22 @@ def test_the_declared_step_result_count_matches_the_actual_block() -> None:
     assert "八欄" in heading, f"標題宣告的欄數與實際不符：{heading!r}"
 
 
+def test_intake_carries_the_case_that_exposed_a_development_item() -> None:
+    """開發 gate（AGENTS「開發項不走 pq2」2026-10-04）要有落點：INTAKE 的 `Case` 行，收尾在 `Zoom / Review` 重抄。
+
+    這一行被刪掉時不會有任何東西壞掉——系統只會安靜地回到「想到就做」，而 09-22 → 10-04 七個 Phase 的
+    開發引力正是 Phase 7 要防的事（Phase 7 Step 7.0b；不另開第九欄，八欄的計數測試照舊）。
+    """
+    runner = DEV_FLOW.read_text(encoding="utf-8")
+    model = WORKFLOW.read_text(encoding="utf-8")
+    intake = runner.split("## Step 1｜INTAKE", 1)[1].split("## Step 2", 1)[0]
+    assert "\nCase:" in intake, "INTAKE 區塊少了 Case 行"
+    assert "使用者指示" in intake and "L17 當下修" in intake, "Case 行要說明兩個例外的寫法"
+    assert "開發項重抄 INTAKE 的 Case" in runner, "STEP_RESULT 的 Zoom / Review 要重抄 Case"
+    assert "INTAKE 的 Case" in model, "模型檔的 Zoom / Review 要寫到 Case"
+    assert "暴露它的真實案例與重複次數" in AGENTS.read_text(encoding="utf-8"), "AGENTS 那一句判準不見了"
+
+
 HUMAN_SUMMARY_LINES = ("做了什麼", "為什麼重要", "現在在哪", "下一步")
 NEXT_STEP_SEGMENTS = ("What", "Why now", "After this")
 
