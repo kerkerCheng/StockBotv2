@@ -122,7 +122,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 7.0a | 預先登記（十個假說與殺死條件、驗證集、裁決規則、failure log、開發 gate、漏網稽核母體）＋T0 凍結 | ✅（`docs/reports/phase7/` 四檔：registration——H1–H10 各附殺死條件與最小 n、16 個 case〔附錄 A 14＋二階 O1-U、O6〕、R3 母體〔光通訊組 15＋觀察名單 43〕、S1 框架 40 則、R2 樣本 36 則；T0 manifest `library/private/measurement/phase7/T0-2026-10-04.json`〔07:09:14Z，計數與當日心跳一致〕；偏差 #1–#4） | 強模型 | 見 git log「Step 7.0a」 |
 | 7.0b | 開發 gate 落地（development-flow 範圍欄）＋兩個當下修：巢狀 writer lock（Phase 6 #17）、thesis 逾期提醒量錯 | ✅（INTAKE 加 `Case` 行＋`Zoom / Review` 重抄；`writer_lock.hold` 一個 owner，四支遷移工具改用；逾期只看 `is_due`——SessionStart 兩則假逾期 → 0、10-30 照報 axt_inp＋sivers；偏差 #5–#8） | 執行模型 | 見 git log「Step 7.0b」 |
 | 7.0c | 敘事範本：「要翻倍需要什麼」＋兩個 placeholder（市值、近四季營收）＋「已定價」白話＋重押讀圖換格層引用（Phase 6 #16） | ✅（題目與字彙；`market_cap_settlement`——IQE.L 換成 7.3 億 GBP；「已定價」白話一份、首屏與稽核區各一次〔Edge 實點〕；寫入端第 ⑦ 項；四檔敘事 8 格逐字相同；偏差 #9–#11） | 執行模型 | 見 git log「Step 7.0c」 |
-| 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ○ | 執行模型 | |
+| 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ✅（v2 選填欄、只在非空時進 id——真實 ledger 20 行重算逐位相同；watch `brief:<id>#c<n>`＋`condition_role=confirm`，判斷只住 `is_confirm`，反證計數、downside、可開都不吃〔變異紅〕；觸及與到期進 `narrative_rewrite`、以 `confirmed` 處置、候選狀態不自動改；心跳一行＋三個快照鍵、候選板與個股頁逐條列〔句子在 materialize 端組好、前端照印〕；**R2-a GO**〔獨立重算 20/20、兩個變異紅、consumer 逐處盤點無漏〕；偏差 #12） | 執行模型 | 見 git log「Step 7.0d」 |
 | 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ○ | 執行模型 | |
 | 7.0f | 外部雷達：daily 只開 WebSearch 的 LLM 步驟、八週試驗（R2-b；sandbox impact review） | ○ | 執行模型 | |
 | 7.1 | Wave 1 研究（約 4 週）：積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 | ○ | 強模型 | |
@@ -155,7 +155,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 9 | 7.0c | §3 第 2 項「`revenue_ttm`（近四季營收，Engine C 機械歷史表，含口徑與 as_of）」 | 選取 read model **既有**的 `revenue_ttm`（Engine C 快照的 TTM，財報幣別）；填值寫成「近四季，快照 <日期>」 | 同一項要求「先確認兩個值在 read model 裡已有 Datum」——它已在，而且稽核區印的就是這一格；另從機械歷史表組一格會讓同一頁出現兩個營收數（L12、L16）。快照的日期是取數日、不是財報期末，所以字面寫「快照」（INV-6） |
 | 10 | 7.0c | §3 第 2 項「`market_cap`（Engine C 快照的市值，含幣別與 as_of）」 | read model 既有的 `market_cap` 是「price × shares、未正規化」——builder 另組一格 `market_cap_settlement`（同一份快照 × 名冊報價單位的換算係數——係數由 sources 從 `identity.currency` 查好注入，builder 是純函式不碰 identity；不做匯率；報價單位未登記 fail closed），placeholder 選它；原格語意不動 | 直接用未正規化那格，IQE.L 會填出「729.5 億」（便士）——真資料核對：換算後 7.3 億 GBP。一格不承載兩種語意（L12） |
 | 11 | 7.0c | §3 第 3 項的白話「拿今天的倍數（EV/S，虧損時 P/S）」 | 照 `alpha/three_questions.py::decide_basis` 寫：「有獲利、而且有同一期的淨負債資料時用 EV/S；其餘（虧損、台股、資料不齊）用 P/S」，其餘照 plan 的意思 | P/S 不只在虧損時用（COHR 是因為營業利益資料停在 2024 年中）；自己寫給人讀的事實套同一套追源紀律（L11-2） |
-| 12 | 7.0d | §4 第 2 項「登記一筆 `semantic_condition` watch，來源鍵與反證分得開……類別是 `confirm`（`watch_category` 加一類）」 | 照做；**怎麼分**：watch 多一個 `condition_role=confirm`（判斷只住 `engine_b/event_watch.py::is_confirm`），`disproof_ref` 照舊當「指回原文的來源鍵」（＝`source_ref`），不另開 `confirm_ref` 欄位；寫入端另加兩條拒收（同版重複、與反證同一條件） | 用 `disproof_ref` 認「語意 watch」的地方有八處（喚醒、佇列、待辦、liveness、audit、變動偵測）——另開欄位漏改一處，加碼條件就叫不醒、沒人消費（INV-4）；沿用它的代價是名字不貼切，分角色的地方（計數、downside、可開、判定標籤、audit 解析）逐一改並有測試＋變異。交 R2-a 挑戰 |
+| 12 | 7.0d | §4 第 2 項「登記一筆 `semantic_condition` watch，來源鍵與反證分得開……類別是 `confirm`（`watch_category` 加一類）」 | 照做；**怎麼分**：watch 多一個 `condition_role=confirm`（判斷只住 `engine_b/event_watch.py::is_confirm`），`disproof_ref` 照舊當「指回原文的來源鍵」（＝`source_ref`），不另開 `confirm_ref` 欄位；寫入端另加兩條拒收（同版重複、與反證同一條件） | 用 `disproof_ref` 認「語意 watch」的地方有八處（喚醒、佇列、待辦、liveness、audit、變動偵測）——另開欄位漏改一處，加碼條件就叫不醒、沒人消費（INV-4）；沿用它的代價是名字不貼切，分角色的地方（計數、downside、可開、判定標籤、audit 解析）逐一改並有測試＋變異。交 R2-a 挑戰——**R2-a 判定不構成 L12**：「算不算反證」另開封閉欄位，`disproof_ref` 仍只承載「指回原文的來源鍵」一種語意；代價只是名字不貼切 |
 
 ---
 
