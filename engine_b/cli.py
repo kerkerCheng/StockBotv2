@@ -126,15 +126,21 @@ def _cmd_list(args: argparse.Namespace) -> int:
     # 不印跳過數的話，暴量那天看起來會跟平常一模一樣。
     skipped = 0
     if getattr(args, "triage_batch", False):
+        from .radar import is_radar_lead
         from .routine_config import triage_daily_limit
 
         limit = triage_daily_limit()
         total = len(rows)
+        # 外部雷達的 lead（Phase 7 Step 7.0f，二手、tier 4）排在所有非雷達 lead 之後才截上限——它提到持股時 relevance 會
+        # 排到前面，不這樣做暴量那天會擠掉 harvest 的 lead（plan §6 L11-6 ④）。兩邊各自的順序照原排序不動。
+        radar_rows = [lead for lead in rows if is_radar_lead(lead)]
+        rows = [lead for lead in rows if not is_radar_lead(lead)] + radar_rows
         rows = rows[:limit]
         skipped = total - len(rows)
         note = (f"（分類層每日上限 {limit}：本批 {len(rows)} 則"
                 + (f"，**還有 {skipped} 則沒進本批**，明天或互動 session 再處理）" if skipped
-                   else "，未達上限）"))
+                   else "，未達上限）")
+                + (f"；外部雷達 {len(radar_rows)} 則排在最後" if radar_rows else ""))
         # json 模式印到 stderr，不污染 stdout 的 JSON（呼叫端可能直接 pipe 給 jq）
         print(note, file=sys.stderr if args.json else sys.stdout)
     if args.json:

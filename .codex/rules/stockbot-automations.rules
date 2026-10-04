@@ -2,7 +2,8 @@
 #
 # 無人值守只剩一條路：Windows 工作 StockBotv2-Daily → crons/daily_task.py（封閉步驟清單，程式寫死，
 # 由 tests/test_daily_task.py 逐項守）。它不經 Codex，所以這份 rules 對它不適用；daily 裡的 LLM 步驟
-# 是 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位，寫入由程式驗證後做。
+# 是 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位，寫入由程式驗證後做——唯一例外是 2026-10-04 起的外部雷達
+# （Phase 7 Step 7.0f）：多開一個 `WebSearch`、放行只用 `--settings` 的 permissions.allow，其餘同一套；本檔照舊 0 條。
 # **Codex 不在任何無人值守步驟裡**；兩個 Codex automation（Daily Brief、Weekly Scan）由使用者停用。
 #
 # 為什麼清為 0 而不是留著：P0 plan review 第 2、3 輪（plan §0.7 X1、R3-1、R3-2）實測 Codex 的唯讀證明不了

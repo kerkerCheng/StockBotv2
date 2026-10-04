@@ -2,7 +2,12 @@
 
 ⑦a（triage 提議）與 Step 1.4 的 ⑩b（語意預篩）**共用這一組**：同一組 argv、同一份環境變數白名單、
 同一個能力檢查。LLM 只產出提議，寫入由程式驗證後做（L15）；所以 LLM 手上不該有任何東西可越界——
-這件事**每次執行都機械驗證**，不是一次性實測：
+這件事**每次執行都機械驗證**，不是一次性實測。
+**唯一的例外是 Phase 7 Step 7.0f 的外部雷達（①c）**：它多開**一個**工具 `WebSearch`（`radar_argv`），其餘同一套——
+同一份白名單、同一個能力檢查（期望工具＝{StructuredOutput, WebSearch}）、同一個殺行程規則；放行只用 `--settings` 的
+`permissions.allow: ["WebSearch"]`（2026-10-04 探針：不放行時 `-p` 會拒絕 WebSearch，而且照樣回 `is_error: false`＋
+空結果——所以權限被拒一律判失敗，不得當成「沒有重要變化」）。搜尋結果的網址由程式從 stream 收（`SearchCollector`），
+不信 LLM 自己報：
 
 - argv 寫死（list、`shell=False`）：`--tools ""`（只剩 `--json-schema` 帶進來的 `StructuredOutput`）、
   `--strict-mcp-config`（擋 claude.ai connector）、`--setting-sources ""`（不載入專案與使用者層的 hook、plugin）、
@@ -45,6 +50,14 @@ FORBIDDEN_LLM_FLAGS: tuple[str, ...] = (
     "--allowed-tools", "--mcp-config", "--add-dir", "--plugin-dir", "--plugin-url", "--agents",
     "--worktree", "--no-session-persistence",
 )
+#: 零工具步驟（triage、預篩）init 的 `tools` 期望值。
+ZERO_TOOLS: tuple[str, ...] = ("StructuredOutput",)
+#: 外部雷達（Phase 7 Step 7.0f）的期望值：只多一個 `WebSearch`——`WebFetch`、Bash、檔案工具一律不得出現。
+RADAR_TOOLS: tuple[str, ...] = ("StructuredOutput", "WebSearch")
+#: 雷達唯一的放行：`permissions.allow` 只列 `WebSearch`（不用 `--allowedTools`／`--permission-mode`，它們在禁用清單裡）。
+RADAR_SETTINGS_JSON = '{"disableAllHooks":true,"autoMemoryEnabled":false,"permissions":{"allow":["WebSearch"]}}'
+#: 雷達自己的禁用清單：零工具那一份全部照禁，另加 `--permission-prompt-tool`（把權限詢問轉給別的工具）。
+RADAR_FORBIDDEN_FLAGS: tuple[str, ...] = (*FORBIDDEN_LLM_FLAGS, "--permission-prompt-tool")
 
 
 def llm_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]:
@@ -63,6 +76,15 @@ def llm_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]
         "--include-hook-events",
         "--json-schema", schema_text,
     ]
+
+
+def radar_argv(claude_path: Path | str, model: str, schema_text: str) -> list[str]:
+    """外部雷達（Phase 7 Step 7.0f）的 argv：與 `llm_argv` 只差兩格——`--tools WebSearch` 與放行 `WebSearch` 的
+    `--settings`。其餘（`--strict-mcp-config`、`--setting-sources ""`、關 hook、關 slash command、stream＋hook 事件）照舊。"""
+    argv = llm_argv(claude_path, model, schema_text)
+    argv[argv.index("--tools") + 1] = "WebSearch"
+    argv[argv.index("--settings") + 1] = RADAR_SETTINGS_JSON
+    return argv
 
 
 def llm_env(parent: Mapping[str, str] | None = None) -> dict[str, str]:
@@ -92,13 +114,19 @@ CAPABILITY_CHECKS: tuple[tuple[str, Callable[[Any], bool]], ...] = (
 )
 
 
-def capability_violations(init: Mapping[str, Any] | None) -> list[str]:
+def capability_violations(init: Mapping[str, Any] | None, *, tools: Sequence[str] = ZERO_TOOLS) -> list[str]:
+    """`tools`：這一步期望的工具（不分順序、恰好這幾個）。零工具步驟用預設；雷達傳 `RADAR_TOOLS`——
+    其餘五欄與 `memory_paths` 對每一步都一樣。"""
     if not isinstance(init, Mapping):
         return ["init 事件缺席"]
     out = []
     for key, ok in CAPABILITY_CHECKS:
         if key not in init:
             out.append(f"{key}: 缺席")
+        elif key == "tools":
+            value = init[key]
+            if not isinstance(value, list) or sorted(str(v) for v in value) != sorted(tools):
+                out.append(f"{key}: {value!r}")
         elif not ok(init[key]):
             out.append(f"{key}: {init[key]!r}")
     if "memory_paths" in init:  # 反向的一欄：出現就代表自動記憶又載入了
@@ -140,6 +168,9 @@ class LlmOutcome:
     rate_limit: dict[str, Any] | None = None
     error: str | None = None
     killed_before_result: bool = False
+    #: 工具權限被拒的次數（stream 的 `permission_denied` 事件與 result 的 `permission_denials` 取大者）。
+    #: 被拒時 CLI 照樣回 `is_error: false`——不判失敗，「被擋住沒做」就會和「做了、沒東西」同形（L13）。
+    permission_denials: int = 0
 
     def as_record(self) -> dict[str, Any]:
         init = self.init or {}
@@ -151,7 +182,7 @@ class LlmOutcome:
             "num_turns": self.num_turns, "is_error": self.is_error, "exit": self.exit,
             "seconds": round(self.seconds, 1), "rate_limit": self.rate_limit, "error": self.error,
             "violations": list(self.violations), "hook_events": self.hook_events,
-            "killed_before_result": self.killed_before_result,
+            "killed_before_result": self.killed_before_result, "permission_denials": self.permission_denials,
             # init 能力欄位的原值逐字記下（R2-a 與結案 gate 8 要看）
             "init_capabilities": capabilities,
         }
@@ -176,8 +207,12 @@ def _rate_limit(info: Mapping[str, Any]) -> dict[str, Any]:
 
 def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str, str],
                timeout_minutes: float, popen: Callable[..., Any] = subprocess.Popen,
-               kill: Callable[[Any], None] = kill_tree) -> LlmOutcome:
-    """跑一次 `claude -p`。prompt 以 UTF-8 bytes 從 stdin 餵（不經 PowerShell 管線）。"""
+               kill: Callable[[Any], None] = kill_tree, tools: Sequence[str] = ZERO_TOOLS,
+               observe: Callable[[Mapping[str, Any]], None] | None = None) -> LlmOutcome:
+    """跑一次 `claude -p`。prompt 以 UTF-8 bytes 從 stdin 餵（不經 PowerShell 管線）。
+
+    `tools`：init 能力檢查期望的工具（零工具步驟用預設；雷達傳 `RADAR_TOOLS`）。
+    `observe`：每個解析得到的 stream 事件都交給它（雷達的 `SearchCollector.observe`）；它只看、不改判定。"""
     outcome = LlmOutcome()
     begun = time.monotonic()
     try:
@@ -210,13 +245,19 @@ def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str,
                 event = json.loads(line)
             except ValueError:
                 continue
+            if not isinstance(event, dict):
+                continue
+            if observe is not None:
+                observe(event)
             etype, subtype = event.get("type"), event.get("subtype")
+            if etype == "system" and subtype == "permission_denied":
+                outcome.permission_denials += 1
             if etype == "system" and subtype == "init":
                 outcome.init = dict(event)
                 outcome.session_id = event.get("session_id")
                 outcome.claude_code_version = event.get("claude_code_version")
                 outcome.model = event.get("model")
-                violations = capability_violations(event)
+                violations = capability_violations(event, tools=tools)
                 if outcome.hook_events:
                     violations.append(f"hook 事件 {outcome.hook_events} 筆（在 init 之前）")
                 if violations:
@@ -267,6 +308,13 @@ def run_claude(prompt: str, *, argv: Sequence[str], cwd: Path, env: Mapping[str,
         outcome.status = "rate_limited" if rate_status not in (None, "allowed") else "failed"
         outcome.error = (f"is_error={outcome.is_error!r}（subtype={result.get('subtype')!r}）："
                          + str(result.get("result") or "")[:300])
+        return outcome
+    denied = result.get("permission_denials")
+    outcome.permission_denials = max(outcome.permission_denials, len(denied) if isinstance(denied, list) else 0)
+    if outcome.permission_denials:
+        # 2026-10-04 探針：WebSearch 沒放行時 CLI 拒絕呼叫，result 卻是 is_error false＋空結果——判失敗，不得當成「沒東西」
+        names = sorted({str(d.get("tool_name")) for d in denied or () if isinstance(d, Mapping)})
+        outcome.error = f"工具權限被拒 {outcome.permission_denials} 次（{'、'.join(names) or '?'}）——結果作廢"
         return outcome
     if outcome.exit not in (0, None):
         outcome.error = f"exit {outcome.exit}"
@@ -365,4 +413,68 @@ def compose_prescreen_prompt(items: Sequence[Mapping[str, Any]], *, max_chars: i
     return "\n\n".join([
         PRESCREEN_PROMPT.read_text(encoding="utf-8").strip(),
         f"## 本輪批次（{len(items)} 筆）\n\n{DATA_START}\n{data}\n{DATA_END}",
+    ]) + "\n"
+
+
+# ---------------------------------------------------------------------------
+# 外部雷達（①c；Phase 7 Step 7.0f）：只開 WebSearch——網址必須出自同一次執行的搜尋結果（由程式從 stream 收）
+# ---------------------------------------------------------------------------
+
+RADAR_PROMPT = ROOT / "crons" / "radar_prompt.md"
+RADAR_SCHEMA = ROOT / "crons" / "radar_schema.json"
+
+
+class SearchCollector:
+    """從 `claude -p` 的 stream 收 WebSearch 的搜尋結果（2026-10-04 探針的形狀）。
+
+    只認兩種事件：assistant 的 `tool_use`（name＝WebSearch，記下它的 id 與 query），以及 user 事件頂層的
+    `tool_use_result`——而且那個事件的 `tool_result.tool_use_id` 必須是前面記下的 WebSearch id。網址只取
+    `tool_use_result.results[*].content[*].url`（CLI 自己產的結構化結果）；`results` 裡的字串是 WebSearch 內部模型寫的
+    摘要，**裡面的網址不收**——那是模型的話，不是搜尋結果（L18）。權限被拒時 `tool_use_result` 是字串，自然收不到東西。"""
+
+    def __init__(self) -> None:
+        self.search_ids: set[str] = set()
+        self.queries: list[str] = []
+        self.searches = 0
+        self.titles: dict[str, str] = {}
+
+    def observe(self, event: Mapping[str, Any]) -> None:
+        etype = event.get("type")
+        content = (event.get("message") or {}).get("content") if isinstance(event.get("message"), Mapping) else None
+        if etype == "assistant":
+            for block in content or ():
+                if isinstance(block, Mapping) and block.get("type") == "tool_use" and block.get("name") == "WebSearch":
+                    self.search_ids.add(str(block.get("id")))
+                    query = (block.get("input") or {}).get("query") if isinstance(block.get("input"), Mapping) else None
+                    if query:
+                        self.queries.append(str(query))
+            return
+        if etype != "user":
+            return
+        ids = {str(b.get("tool_use_id")) for b in content or () if isinstance(b, Mapping) and b.get("type") == "tool_result"}
+        result = event.get("tool_use_result")
+        if not ids & self.search_ids or not isinstance(result, Mapping):
+            return
+        count = result.get("searchCount")
+        self.searches += int(count) if isinstance(count, int) and not isinstance(count, bool) else 0
+        for entry in result.get("results") or ():
+            if not isinstance(entry, Mapping):
+                continue
+            for hit in entry.get("content") or ():
+                if isinstance(hit, Mapping) and isinstance(hit.get("url"), str) and hit["url"].strip():
+                    self.titles.setdefault(hit["url"].strip(), str(hit.get("title") or "").strip())
+
+    def as_record(self) -> dict[str, Any]:
+        """寫進雷達結果檔的 `search`：⑥ 套用時拿它驗網址（`urls`）、拿搜尋結果的標題當 lead 標題（`titles`）。"""
+        return {"queries": list(self.queries), "searches": self.searches, "urls": sorted(self.titles),
+                "titles": dict(sorted(self.titles.items()))}
+
+
+def compose_radar_prompt(requests: Sequence[Mapping[str, Any]]) -> str:
+    """雷達的 prompt：固定指示（`crons/radar_prompt.md`）＋程式組的資料（主題與關鍵字、在盯的條件原文與實體）。
+    **資料只來自 `engine_b.radar.prepare` 的批次**——不讀 Sheet、持股、NAV、私人路徑（測試以哨兵證明）。"""
+    data = json.dumps(list(requests), ensure_ascii=False, indent=1)
+    return "\n\n".join([
+        RADAR_PROMPT.read_text(encoding="utf-8").strip(),
+        f"## 本輪資料\n\n{DATA_START}\n{data}\n{DATA_END}",
     ]) + "\n"

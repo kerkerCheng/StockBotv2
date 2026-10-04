@@ -164,6 +164,27 @@ def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str
     return resolved
 
 
+def load_radar(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
+    """`radar` 區塊（外部雷達，Phase 7 Step 7.0f）：`enabled`、`max_items`（每日上限，1..20）、`timeout_minutes`。
+
+    **沒有這一段＝關閉**：這是新增的無人值守能力，要明寫打開才跑（也是回滾開關之一；另一個是 `llm.executor=none`）。
+    ⚠ 與 `triage_daily_limit` 的方向相反是刻意的：那裡讀不到就退回有上限的預設（拆煞車最危險）；這裡讀不到就不開能力。
+    寫了但不合法就 raise——打錯的數字比沒有更危險，因為它看起來像有設定。"""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    radar = payload.get("radar")
+    if radar is None:
+        return {"enabled": False, "max_items": 5, "timeout_minutes": 10.0, "configured": False}
+    if not isinstance(radar, dict):
+        raise ValueError("radar 區塊必須是 object")
+    if not isinstance(radar.get("enabled"), bool):
+        raise ValueError("radar.enabled 必須是 true 或 false")
+    max_items = radar.get("max_items")
+    if isinstance(max_items, bool) or not isinstance(max_items, int) or not 1 <= max_items <= 20:
+        raise ValueError(f"radar.max_items 必須是 1..20 的整數：{max_items!r}")
+    timeout = _positive_number(radar, "timeout_minutes", "radar")
+    return {"enabled": radar["enabled"], "max_items": max_items, "timeout_minutes": float(timeout), "configured": True}
+
+
 #: 分類層每日上限的預設值——**config 沒寫 `triage` 整段時用它**。
 #: ⚠ 刻意不是「無上限」：拿不到設定時退回無上限，等於在最不確定的時候拆掉煞車。
 DEFAULT_TRIAGE_LIMIT = 30

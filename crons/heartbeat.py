@@ -1022,6 +1022,11 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         section.lines.extend(_prescreen_and_quota_lines(now=moment, record_path=run_record_path))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"預篩：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
+    # 外部雷達（Phase 7 Step 7.0f）：每天一行，沒跑也照印理由（八週試驗的停止條件要數它）
+    try:
+        section.lines.append(_radar_line(now=moment, record_path=run_record_path))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"外部雷達：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
 
     # ⚠ `None` 是「本次沒讀到那個 authority」，不是 0——把它加成 0 會讓「沒讀到」與「真的沒有」
     # 同形（INV-3）。所以先分開，再讓沒讀到的段自己現形。
@@ -1206,7 +1211,7 @@ def _prescreen_and_quota_lines(*, now: datetime, record_path: Path | None) -> li
     # 額度：同一個狀態＋同一個窗只印一行（兩個 LLM 步驟看到的是同一個帳號額度），寫成人話：用了幾成、幾點重置、
     # 用完會怎樣（2026-10-01 使用者問「LLM 額度是什麼問題」——原本只印 allowed_warning、seven_day、重置 ?）。
     seen: dict[tuple[Any, Any], dict[str, Any]] = {}
-    for key in ("07a_triage_propose", "10b_prescreen_propose"):
+    for key in ("01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose"):
         for call in (rows.get(key) or {}).get("calls") or []:
             limit = (call or {}).get("rate_limit") or {}
             if limit and limit.get("status") not in (None, "allowed"):
@@ -1223,9 +1228,37 @@ def _prescreen_and_quota_lines(*, now: datetime, record_path: Path | None) -> li
             reset_text = "?"
         lines.append(f"⚠ **LLM 額度{QUOTA_STATUS_WORDS.get(str(status), '')}**（{status}）：Claude 訂閱"
                      f"{QUOTA_WINDOW_WORDS.get(str(kind), f' {kind or '?'} ')}額度{used_text}，{reset_text} 重置"
-                     f"（{'、'.join(entry['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類與預篩"
+                     f"（{'、'.join(entry['steps'])}）——整個帳號的用量，含互動 session；用完時 daily 的分類、預篩與外部雷達"
                      "會暫停（記成 rate_limited），心跳照發")
     return lines
+
+
+def radar_rejected(summary: Mapping[str, Any]) -> int:
+    """外部雷達「拒收」的件數＝欄位不合法＋網址不在搜尋結果＋超過上限（**重複另計**，不算拒收）。段 3 那一行與快照共用。"""
+    return sum(int(summary.get(k) or 0) for k in ("invalid", "url_not_in_search", "over_cap"))
+
+
+def _radar_line(*, now: datetime, record_path: Path | None) -> str:
+    """段 3「外部雷達：新 N｜重複 a｜拒收 b（網址不在搜尋結果 c、超過上限 d）｜提到在盯的條件 K｜沒有重要變化／沒跑（理由）」
+    （Phase 7 Step 7.0f）。讀 daily 執行紀錄的套用步驟（①e 印出的 summary）；心跳不重跑、不讀 lead registry。"""
+    record, problem = _load_run_record(record_path, now=now)
+    if record is None:
+        return f"外部雷達：{problem}"
+    rows = {str(r.get("key")): r for r in record.get("steps") or [] if isinstance(r, Mapping)}
+    apply = rows.get("01e_radar_apply")
+    if apply is None and "01b_radar_prepare" not in rows:
+        return "外部雷達：執行紀錄裡沒有雷達步驟"
+    if apply is not None and apply.get("status") == "ok" and isinstance(apply.get("summary"), Mapping):
+        s = apply["summary"]
+        tail = "｜沒有重要變化" if s.get("no_material_change") and not s.get("new") else ""
+        return (f"外部雷達：新 {s.get('new', '?')}｜重複 {s.get('duplicate', '?')}｜拒收 {radar_rejected(s)}"
+                f"（網址不在搜尋結果 {s.get('url_not_in_search', '?')}、超過上限 {s.get('over_cap', '?')}"
+                f"、欄位不合法 {s.get('invalid', '?')}）｜提到在盯的條件 {s.get('related', '?')}{tail}"
+                f"｜搜尋 {s.get('searches', '?')} 次（只寫 secondary lead，不喚醒 watch）")
+    step = next((rows[k] for k in ("01e_radar_apply", "01c_radar_propose", "01b_radar_prepare")
+                 if k in rows and rows[k].get("status") != "ok"), None) or apply or {}
+    return (f"外部雷達：沒跑（{step.get('key') or '?'} {step.get('status')}："
+            f"{step.get('reason') or step.get('error') or '—'}）")
 
 
 def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path: Path | None) -> str:
@@ -1662,6 +1695,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "confirm.watching": "加碼條件在盯", "confirm.touched_pending": "加碼條件觸及待處置",
     "confirm.expired_pending": "加碼條件到期待重寫",
     "prescreen.no_text": "預篩無全文", "prescreen.no_fetcher": "預篩無 fetcher",
+    # 外部雷達（Phase 7 Step 7.0f）：上線那天與八週試驗期間，較昨 diff 看得到它每天收了幾則、拒了幾則
+    "radar.new": "外部雷達新 lead", "radar.duplicate": "外部雷達重複", "radar.rejected": "外部雷達拒收",
+    "radar.related": "外部雷達提到在盯的條件",
     "health.red": "健康紅燈", "invariants.fail": "invariants FAIL",
     **{f"tier.{t}": f"帳號 {t}" for t in SCORECARD_TIERS},
     # 候選板（Phase 3 Step 3.6）：每一組一鍵——由候選推導的封閉字彙導出，不抄一份（L16）。
@@ -1764,6 +1800,17 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         summary = (step or {}).get("summary") or {}
         return {"prescreen.no_text": summary.get("no_text"), "prescreen.no_fetcher": summary.get("no_fetcher")}
 
+    def radar() -> dict[str, Any]:
+        # Phase 7 Step 7.0f：外部雷達的四格（與段 3 那一行讀同一個套用步驟的 summary）；沒跑＝缺席，不是 0
+        record, _problem = _load_run_record(run_record_path, now=now)
+        step = next((r for r in (record or {}).get("steps") or []
+                     if isinstance(r, Mapping) and r.get("key") == "01e_radar_apply"), None)
+        summary = (step or {}).get("summary") if (step or {}).get("status") == "ok" else None
+        if not isinstance(summary, Mapping):
+            return {}
+        return {"radar.new": summary.get("new"), "radar.duplicate": summary.get("duplicate"),
+                "radar.rejected": radar_rejected(summary), "radar.related": summary.get("related")}
+
     def captures() -> dict[str, Any]:
         out: dict[str, Any] = {}
         health, problem = _capture("health", now=now, capture_dir=capture_dir)
@@ -1811,7 +1858,7 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         return {"predictions.held": counts.get("held"), "predictions.wrong": table.get("wrong_total"),
                 "predictions.expired_unread": counts.get("expired_unread")}
 
-    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, confirm_counts, prescreen, captures,
+    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, confirm_counts, prescreen, radar, captures,
                tiers, candidates, positions, predictions):
         guard(fn)
     return values

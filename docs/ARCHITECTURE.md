@@ -183,6 +183,8 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > （舊兩個工作與舊入口 `crons/heartbeat_task.py` 於 2026-09-25 Step 1.2b 刪除；上面 09-17 那段的查證命令已查不到東西）。
 > **daily 的目標：心跳不靠 LLM；其他步驟可以用 LLM，但 LLM 只產出提議，由程式驗證後寫入**（C4）。分類（triage）與語意預篩
 > 是 daily 裡的兩步，一律 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位（Step 1.3、1.4 接上；在那之前 `llm.executor=none`）。
+> **2026-10-04（Phase 7 Step 7.0f，使用者 Q5）多一步外部雷達**——唯一多開一個工具（`WebSearch`）的 LLM 步驟，其餘同一套
+> （白名單、能力檢查期望 {StructuredOutput, WebSearch}、權限被拒判失敗）；只產出 secondary lead 的提議，由 `engine_b/radar.py` 驗證後寫。
 > 失敗長相與改時間的唯一做法見 OPERATIONS「Daily」節。查證：`schtasks /Query /TN StockBotv2-Daily /FO LIST /V`、
 > `python crons/daily_task.py --dry-run`。
 
@@ -190,6 +192,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 |---|---|---|---|
 | **心跳** | Windows daily 的 ⑱（純 Python，從 state 檔與 daily 執行紀錄組出），⑲ 推到既有 Discord publisher | 零 | 固定五段，每段可以只有一行 |
 | **分類／語意預篩** | Windows daily 的兩步：`claude -p` 零工具提議、程式驗證後寫入（Step 1.3／1.4 接上） | 每日硬上限（由 CLI 截斷，不靠 prompt） | 失敗不阻斷；印「未 triage N」與分類層本輪結果 |
+| **外部雷達**（2026-10-04 Phase 7 Step 7.0f） | Windows daily 的 ①b–①e（harvest 之後、triage 批次之前）：①c `claude -p` **只開 WebSearch**（`crons/llm_step.py::radar_argv`；放行只用 `--settings` 的 `permissions.allow`），①e `engine_b/radar.py` 驗證後寫 | 每日上限 `radar.max_items`（程式截，不靠 prompt）；`radar.enabled`／`llm.executor=none` 都能關 | 網址必須出自**同一次執行**的搜尋結果（程式從 stream 收 `tool_use_result` 的連結，不信 LLM 自報）；正規化後與 lead registry 去重（已登記的不碰）；寫成 `web_radar:<主題>`、`source_class=secondary`；**不喚醒語意 watch**（T0 只認一手）；triage 批次裡排在所有非雷達 lead 之後；心跳段 3 每天一行、收據 `radar_<日期>.json`。**它不是 last30days**：ROADMAP 硬約束 8 擋的是「輸出沒有 provenance 契約」的東西進無人值守管線——雷達的契約是每一則都指得回這一次搜尋結果裡的網址，指不回就拒收。八週試驗與停止條件見 ROADMAP Phase 7 |
 | **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零 |
 
 > **2026-09-24（Phase 1 Step 1.8）心跳改版**：五段不增不減。段 2 第一行是**較昨變動**——⑱ 帶 `--write-snapshot` 寫

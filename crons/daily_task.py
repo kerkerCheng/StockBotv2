@@ -8,8 +8,9 @@
 
 - **步驟清單是程式寫死的封閉清單 `DAILY_STEPS`**——LLM 不決定跑什麼。清單相等由
   `tests/test_daily_task.py` 逐項斷言（守門：不得出現 `webapp serve`、任意欄位寫入者、git 寫入、LLM CLI）。
-- LLM 步驟只有 triage 的提議（⑦a）；它與寫入（⑦b，程式驗證後寫）分開，Step 1.3 才接上。
-  `llm.executor=none` 時兩者記 `skipped`，這也是 R2-a 的回滾開關。
+- LLM 步驟只有三個提議：triage（⑦a）、語意預篩（⑩b）、外部雷達（①c，Phase 7 Step 7.0f——唯一多開一個工具
+  `WebSearch` 的，見 `crons/llm_step.py`）；各自與寫入（程式驗證後寫）分開。
+  `llm.executor=none` 時提議與套用都記 `skipped`，這也是 R2-a 的回滾開關；雷達另有 `radar.enabled`（沒有那一段＝關閉）。
 - 每步獨立 subprocess（`shell=False`、venv python、cwd＝repo root）＋timeout，**失敗記錄後繼續**（fail-soft）。
 
 ## 「LLM 失敗心跳照發」怎麼在同一個排程裡成立（`crons/heartbeat_task.py` 的第一條理由，Step 1.2b 刪檔時搬來）
@@ -123,17 +124,34 @@ class DailyStep:
     capture: str | None = None
     #: 前置步驟（它不是 ok 就跳過這一步：LLM 不拿舊批次去跑、套用不套沒成功的提議）。
     requires: str | None = None
-    #: LLM 步驟的任務（`triage`｜`prescreen`）——決定 prompt、schema、批次與結果檔、timeout 與分批大小。
+    #: LLM 步驟的任務（`triage`｜`prescreen`｜`radar`）——決定 prompt、schema、批次與結果檔、timeout 與分批大小。
     llm_task: str | None = None
+    #: 這一步只在 config 的 `<switch>.enabled` 為 true 時跑（Phase 7 Step 7.0f：`radar`）；關閉時記 skipped。
+    switch: str | None = None
 
 
 #: ⚠ **封閉清單**：順序、argv、timeout、寫入與連網宣告都由 `tests/test_daily_task.py` 逐項斷言。
 #: 改這裡＝改無人值守可執行面 → 同一個 change 做 sandbox impact review 五步（`docs/OPERATIONS.md`）。
 #: 刻意不列：`catalyst_watch.py`、`engine_b.cli trace-backlog`、`harvest-health`（唯一消費者是退役的
-#: LLM brief；心跳自己讀 harvest_log）、`event_watch sweep`（WebSearch 是研究，互動 session 做）。
+#: LLM brief；心跳自己讀 harvest_log）、`event_watch sweep`（拿 WebSearch 判 watch 是研究，互動 session 做）。
+#: ⚠ ①b–①e 外部雷達（Phase 7 Step 7.0f；使用者 Q5）是唯一用 WebSearch 的無人值守步驟，而且**只產出 secondary lead 的提議**：
+#: 不判 watch、不喚醒語意 watch、不寫研究判斷——網址必須出自同一次搜尋結果，其餘由 `engine_b/radar.py` 驗證後寫。
 DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("01_harvest", "harvest（X／EDGAR／MOPS／feeds）",
               ("crons/harvest_leads.py",), 20, True, True),
+    # ①b–①e 外部雷達：harvest 之後、⑥ triage 批次之前（同一輪就進 triage，排在所有非雷達 lead 之後）。
+    # ①b 只寫 library/private 的批次檔（不寫共用 state，所以不取鎖）；①e 寫 lead registry。
+    DailyStep("01b_radar_prepare", "外部雷達：組主題與在盯的條件（不讀持股）",
+              ("-m", "engine_b.radar", "prepare", "--run-id", "{run_id}", "--out", "{radar_batch}"),
+              2, False, False, switch="radar"),
+    DailyStep("01c_radar_propose", "外部雷達提議（claude -p 只開 WebSearch、只回 JSON）",
+              (), 10, False, True, kind="llm", requires="01b_radar_prepare", llm_task="radar", switch="radar"),
+    DailyStep("01d_integrity_after_radar", "保險檢查（LLM 步驟前後指紋）",
+              (), 1, False, False, kind="integrity", essential=True),
+    DailyStep("01e_radar_apply", "外部雷達套用（網址須出自同一次搜尋、去重、每日上限後寫 secondary lead）",
+              ("-m", "engine_b.radar", "apply", "--file", "{radar_result}", "--batch", "{radar_batch}",
+               "--run-id", "{run_id}"),
+              2, True, False, kind="apply", requires="01c_radar_propose", switch="radar"),
     DailyStep("02_engine_c_etl", "Engine C 行情與財務 ETL",
               ("engine_c/etl_yfinance.py",), 15, True, True),
     # ②b（Phase 3 Step 3.2，使用者定案 #15）：機械歷史表增量——價格整段重抓（股利會回頭改 adjusted）、
@@ -215,16 +233,19 @@ def essential_reserve_minutes(steps: Sequence[DailyStep] = DAILY_STEPS) -> float
     return sum(s.timeout_minutes for s in steps if s.essential) + RESERVE_SLACK_MINUTES
 
 
-def step_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None) -> float:
-    """LLM 步驟的 timeout 住 config（`llm.<task>_timeout_minutes`）；其餘寫死在清單。"""
+def step_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None,
+                         radar: Mapping[str, Any] | None = None) -> float:
+    """LLM 步驟的 timeout 住 config（`llm.<task>_timeout_minutes`；雷達住 `radar.timeout_minutes`）；其餘寫死在清單。"""
+    if step.kind == "llm" and step.llm_task == "radar":
+        return float((radar or {}).get("timeout_minutes") or step.timeout_minutes)
     if step.kind == "llm" and llm is not None and step.llm_task:
         return float(llm.get(f"{step.llm_task}_timeout_minutes") or step.timeout_minutes)
     return step.timeout_minutes
 
 
 def total_timeout_minutes(steps: Sequence[DailyStep] = DAILY_STEPS,
-                          llm: Mapping[str, Any] | None = None) -> float:
-    return sum(step_timeout_minutes(s, llm) for s in steps)
+                          llm: Mapping[str, Any] | None = None, radar: Mapping[str, Any] | None = None) -> float:
+    return sum(step_timeout_minutes(s, llm, radar) for s in steps)
 
 
 # ---------------------------------------------------------------------------
@@ -277,6 +298,8 @@ class DailyRun:
     record: dict[str, Any] = field(default_factory=dict)
     schedule: dict[str, Any] | None = None
     llm: dict[str, Any] | None = None
+    #: `radar` 區塊（Phase 7 Step 7.0f）；讀壞了是 None，只讓雷達三步記 skipped（同 LLM 設定壞掉的處理）。
+    radar: dict[str, Any] | None = None
     lock_ok: bool = False
     lock_reason: str | None = None
     fingerprint_before: dict[str, Any] | None = None
@@ -337,6 +360,8 @@ class DailyRun:
             "triage_result": str(self.out_dir / f"triage_{self.date}.json"),
             "prescreen_batch": str(self.out_dir / f"prescreen_batch_{self.date}.json"),
             "prescreen_result": str(self.out_dir / f"prescreen_{self.date}.json"),
+            "radar_batch": str(self.out_dir / f"radar_batch_{self.date}.json"),
+            "radar_result": str(self.out_dir / f"radar_proposals_{self.date}.json"),
         }
 
     def _expand(self, argv: Sequence[str]) -> list[str]:
@@ -417,6 +442,13 @@ class DailyRun:
             self.llm = None
             self.record["llm_executor"] = None
             self.record["llm_config_error"] = str(exc)
+        try:
+            self.radar = routine_config.load_radar(self.config_path)
+            self.record["radar"] = {k: self.radar[k] for k in ("enabled", "max_items", "configured")}
+        except (ValueError, OSError) as exc:
+            # 雷達設定壞掉只停雷達三步（同 LLM 設定壞掉的處理）：其餘步驟與它無關，不陪葬。
+            self.radar = None
+            self.record["radar_config_error"] = str(exc)
         started = datetime.fromisoformat(self.record["started_at"])
         limit = float(self.schedule["execution_time_limit_minutes"])
         self.deadline = started + timedelta(minutes=limit - essential_reserve_minutes(self.steps))
@@ -513,6 +545,12 @@ class DailyRun:
             return self.aborted
         if not step.essential and self.deadline is not None and now >= self.deadline:
             return "deadline：已到全域 deadline，跳過非必要步驟"
+        if step.switch == "radar":
+            if self.radar is None:
+                return f"radar_config_error：{self.record.get('radar_config_error')}"
+            if not self.radar.get("enabled"):
+                return ("radar.enabled=false" if self.radar.get("configured")
+                        else "config 沒有 radar 區塊（＝關閉）")
         if step.kind in ("llm", "apply"):
             if self.llm is None:
                 return f"llm_config_error：{self.record.get('llm_config_error')}"
@@ -561,7 +599,7 @@ class DailyRun:
         if step.kind == "llm":
             self._llm_propose(step, now)
             return
-        timeout = step_timeout_minutes(step, self.llm)
+        timeout = step_timeout_minutes(step, self.llm, self.radar)
         if not step.essential and self.deadline is not None:
             remaining = (self.deadline - now).total_seconds() / 60
             timeout = max(0.5, min(timeout, remaining))
@@ -611,11 +649,19 @@ class DailyRun:
         self.log(f"{step.key} {row['status']}（exit={row.get('exit')}，{seconds:.0f}s）")
 
     def _llm_task(self, task: str) -> dict[str, Any]:
-        """兩個 LLM 任務的差異全部集中在這裡；呼叫、白名單、能力檢查與丟棄規則是同一套（C6）。"""
+        """三個 LLM 任務的差異全部集中在這裡；呼叫、白名單、能力檢查與丟棄規則是同一套（C6）。
+        雷達（Phase 7 Step 7.0f）多三格：自己的 argv（只開 WebSearch）、期望工具、搜尋結果收集器。"""
         from crons import llm_step
 
         paths = self._templates()
         assert self.llm is not None
+        if task == "radar":
+            return {"batch": Path(paths["radar_batch"]), "result": Path(paths["radar_result"]),
+                    "batch_key": "requests", "out_key": "items", "schema": llm_step.RADAR_SCHEMA,
+                    "compose": llm_step.compose_radar_prompt, "chunk": 1,
+                    "argv": llm_step.radar_argv, "tools": llm_step.RADAR_TOOLS,
+                    "collector": llm_step.SearchCollector,
+                    "stamp": lambda item, session: {**item, "session_id": session}}
         if task == "triage":
             return {"batch": Path(paths["triage_batch"]), "result": Path(paths["triage_result"]),
                     "batch_key": "payload", "out_key": "items", "schema": llm_step.TRIAGE_SCHEMA,
@@ -670,19 +716,28 @@ class DailyRun:
                              if (p / name).is_file()]
         if instruction_files:
             return fail("failed", f"llm.cwd 或上層目錄有指令檔 {instruction_files[:3]}——`agents-md@builtin` 會載入它們（R2-a NB-11）")
-        argv = llm_step.llm_argv(self.llm["claude_path_resolved"], str(self.llm["claude_model"]),
-                                 llm_step.schema_text(spec["schema"]))
+        argv = spec.get("argv", llm_step.llm_argv)(self.llm["claude_path_resolved"], str(self.llm["claude_model"]),
+                                                    llm_step.schema_text(spec["schema"]))
         env = llm_step.llm_env(self.parent_env)
         runner = self.llm_runner or llm_step.run_claude
-        timeout = step_timeout_minutes(step, self.llm)
+        timeout = step_timeout_minutes(step, self.llm, self.radar)
         if self.deadline is not None:
             timeout = max(0.5, min(timeout, (self.deadline - now).total_seconds() / 60))
         size = spec["chunk"]
         calls: list[dict[str, Any]] = []
         proposals: list[dict[str, Any]] = []
+        # 雷達：期望工具＋搜尋結果收集器（網址由程式從 stream 收，⑥ 套用拿它驗）；triage／預篩不帶，呼叫與以前逐字相同
+        collector = spec["collector"]() if spec.get("collector") else None
+        extra_kwargs: dict[str, Any] = {}
+        if spec.get("tools"):
+            extra_kwargs["tools"] = spec["tools"]
+        if collector is not None:
+            extra_kwargs["observe"] = collector.observe
+        extra: dict[str, Any] = {}
         for start in range(0, len(batch), size):
             chunk = batch[start:start + size]
-            outcome = runner(spec["compose"](chunk), argv=argv, cwd=cwd, env=env, timeout_minutes=timeout)
+            outcome = runner(spec["compose"](chunk), argv=argv, cwd=cwd, env=env, timeout_minutes=timeout,
+                             **extra_kwargs)
             calls.append(outcome.as_record())
             row["calls"] = calls
             if outcome.status == "capability_violation":
@@ -697,16 +752,22 @@ class DailyRun:
             for item in structured[spec["out_key"]]:
                 if isinstance(item, dict):
                     proposals.append(spec["stamp"](item, outcome.session_id))
+            if collector is not None and "no_material_change" in structured:
+                extra["no_material_change"] = bool(structured["no_material_change"])
+        if collector is not None:
+            extra["search"] = collector.as_record()
+            row.update(searches=extra["search"]["searches"], search_urls=len(extra["search"]["urls"]))
         self._write_llm_result(result_path, spec["out_key"], proposals,
-                               sessions=[c["session_id"] for c in calls])
+                               sessions=[c["session_id"] for c in calls], extra=extra)
         row.update(status="ok", proposed=len(proposals), batch=len(batch),
                    session_id=",".join(str(c["session_id"]) for c in calls))
         self.log(f"{step.key} ok：{len(batch)} 則、{len(calls)} 次呼叫")
 
     def _write_llm_result(self, path: Path, out_key: str, proposals: list[dict[str, Any]],
-                          sessions: list[Any] | None = None) -> None:
+                          sessions: list[Any] | None = None, extra: Mapping[str, Any] | None = None) -> None:
+        """`extra`：雷達的搜尋證據（`search`：程式從 stream 收的網址與標題）與 `no_material_change`；其他任務沒有。"""
         payload = {"schema": "llm-result-v1", "run_id": self.run_id, "run_date": self.date,
-                   "sessions": sessions or [], out_key: proposals}
+                   "sessions": sessions or [], **dict(extra or {}), out_key: proposals}
         path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     def _integrity_step(self, step: DailyStep) -> None:
@@ -823,7 +884,11 @@ def dry_run_text(config_path: Path = CONFIG_PATH) -> str:
                      f"｜工作 {schedule['task_name']}｜時限 {schedule['execution_time_limit_minutes']} 分鐘"
                      f"｜預估 {schedule['expected_duration_minutes']} 分鐘")
         lines.append(f"LLM：executor={llm['executor']}｜model={llm['claude_model']}｜cwd={llm['cwd_path']}")
-        lines.append(f"各步 timeout 加總 {total_timeout_minutes(DAILY_STEPS, llm):g} 分鐘"
+        radar = routine_config.load_radar(config_path)
+        lines.append(f"外部雷達：{'開' if radar['enabled'] else '關'}"
+                     f"{'' if radar['configured'] else '（config 沒有 radar 區塊）'}｜每日上限 {radar['max_items']} 則"
+                     f"｜timeout {radar['timeout_minutes']:g} 分鐘｜只開 WebSearch")
+        lines.append(f"各步 timeout 加總 {total_timeout_minutes(DAILY_STEPS, llm, radar):g} 分鐘"
                      f"｜必要步驟保留 {essential_reserve_minutes():g} 分鐘")
     except Exception as exc:  # noqa: BLE001
         lines.append(f"⚠ config 讀不到：{type(exc).__name__}: {exc}")

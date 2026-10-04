@@ -18,7 +18,9 @@
 ```
 Daily   Windows 工作 StockBotv2-Daily（時間只住 config/daily_routine.json 的 schedule，現為 05:30）
           → crons/daily_task.py：固定步驟清單 DAILY_STEPS（程式寫死；LLM 不決定跑什麼）
-             ① harvest → ② Engine C ETL → ③ FX 同步 → ④ beta 快照 → ⑤ outcome
+             ① harvest → ①b–①e 外部雷達（準備 → claude -p 只開 WebSearch 提議 → 保險檢查 → 程式驗證後寫 secondary lead；
+                            radar.enabled 控制；Phase 7 Step 7.0f）
+             → ② Engine C ETL → ③ FX 同步 → ④ beta 快照 → ⑤ outcome
              → ⑥ triage 批次 → ⑦a triage 提議（claude -p 零工具；Step 1.3 接上）→ ⑧ 保險檢查
              → ⑦b triage 套用（程式驗證後寫入；Step 1.3 接上）→ classification-health
              → ⑨ consume-fired → ⑩ todo sync → ⑪ standing-go → ⑫ XBRL 基期補值 → ⑬ materialize
@@ -99,6 +101,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
+
+### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0f：外部雷達）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily 多四步（harvest 之後、⑥ triage 批次之前）：①b `python -m engine_b.radar prepare`——唯讀 `config/themes.txt`、watch registry、identity registry，只寫 `library/private/heartbeat/radar_batch_<日期>.json`；①c `claude -p`——**能力變更：多開一個 `WebSearch`**（搜尋走 Anthropic 的伺服器端工具；Python 這邊沒有新的連線主機），環境變數白名單、repo 外的 cwd、hook／記憶／MCP／plugin 全關照舊，結果寫 `radar_proposals_<日期>.json`（含程式從 stream 收的 `search`）；①d 指紋保險；①e `python -m engine_b.radar apply`——**寫 lead registry**（`leads.register`＋`annotate_refs`，新鍵登記在 `config/lead_ref_keys.json` 的 `web_radar`）與收據 `radar_<日期>.json`。另外 ⑥ `engine_b.cli list --triage-batch` 的選取把雷達的 lead 排到所有非雷達 lead 之後才截上限；心跳段 3 多一行、`SNAPSHOT_KEYS` 多四鍵（讀執行紀錄）。不喚醒語意 watch、不發通知、不寫任何 authority 以外的 state |
+| **2 canonical skill／prompt／本檔** | `crons/radar_prompt.md`（新）、`crons/radar_schema.json`（strict，新）；`config/daily_routine.json` 的 `radar` 區塊與 `_doc`；`docs/ARCHITECTURE.md` §4.1 的層表（加雷達一列、寫明它不是 last30days）；本節與「Daily」流程圖、Routine 分工；`skills/daily-brief/SKILL.md` 的 daily 組成句；`.codex/rules/stockbot-automations.rules` 的註解（daily LLM 步驟零工具的唯一例外）；`config/themes.txt` 加 `power`、`cooling`（只有關鍵字，核心公司 7.1 再定） |
+| **3 最窄 rule** | 放行只有 `--settings` 的 `permissions.allow: ["WebSearch"]`——`--allowedTools`、`--permission-mode`、`--dangerously-skip-permissions`、`--permission-prompt-tool` 都在雷達自己的禁用清單（`RADAR_FORBIDDEN_FLAGS`）；每一輪 init 檢查工具**恰為** {StructuredOutput, WebSearch}，多一個少一個都殺行程、整步丟棄；權限被拒判失敗（探針：被拒時 CLI 回 `is_error: false`＋空結果）。`.codex/rules` 仍是 0 條；Codex 不在任何無人值守步驟裡；APP 不加路由。回滾：`radar.enabled=false`（或刪掉整段＝關閉）、`llm.executor=none` |
+| **4 contract test** | `tests/test_radar.py`（34 條）：argv 與零工具那份只差兩個值、錄下的雷達 init 只在雷達工具集合下通過、其他工具集合一律不符、收集器只收 CLI 的搜尋結果（摘要文字與其他工具的網址不收）、權限被拒＝失敗、零工具 init 一到就殺；prepare 的哨兵（不讀 Sheet／持股、prompt 沒有私人路徑）；apply：網址不在搜尋結果拒收、寫成 secondary＋搜尋結果的標題＋LLM 那句另放 `refs.radar_fact`、已登記的不碰、上限由程式截、published_at 讀不懂或未來＝null、未知主題→new、未知 watch id 丟棄並計數、壞欄位拒收、搜尋結果裡的壞網址不進允許清單也不弄垮整輪、舊 run_id 拒絕、不喚醒語意 watch；triage 批次雷達排最後（提到持股也不擠掉 harvest 的）；daily 整條流程（結果檔的網址是程式收的）、三種關閉理由、`executor=none`、時限；心跳那一行與四個快照鍵。`tests/test_daily_task.py` 的封閉清單、LLM 步驟清單、跳過集合跟著改。**變異八個各自轉紅**：多開 WebFetch、收集器抓摘要網址、權限被拒不判失敗、不驗網址出處、上限不截、未來日期照收、triage 不排最後、開關不擋 |
+| **5 端到端 smoke** | 探針（2026-10-04）：A 不放行——WebSearch 被拒、stream 出 `permission_denied`、result `is_error: false`＋`items: []`（＝現在判失敗的那個同形）；B 只加 `permissions.allow`——正常搜尋，init 與零工具那份**只差 `tools`**（存成 `tests/fixtures/claude_init_radar_ok.json`）。真資料試跑（真主題 5、在盯條件 36 → 真的 `claude -p` → apply 寫進 lead registry **副本**）：status ok、權限被拒 0、搜尋 16 次（prompt 建議 6 次以內——次數每天印在心跳那一行，八週試驗一起看）、148 個網址、18 turns、95.6 秒，提議 0 則（`no_material_change`），寫入 0。`python crons/daily_task.py --dry-run`：四步在清單裡、timeout 加總 224 < 240 分鐘。**第一輪真實排程 2026-10-05 05:30**：看心跳段 3 那一行與 `radar_2026-10-05.json`（ROADMAP Phase 7 驗收⑦「第一輪收據」） |
 
 ### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0e：個股頁首屏五題＋是不是新賭注）
 
@@ -547,7 +559,7 @@ python scripts/backfill_source_dating.py --doc-id <id> --value 2026-02-03 `
   `tests/test_daily_state_finalizer.py`。
 
 **Routine 分工：**
-- daily（Windows `StockBotv2-Daily` → `crons/daily_task.py`，2026-09-24 起）＝harvest ＋ ETL ＋ beta monitor ＋ triage（`claude -p` 零工具提議、程式寫入）＋ 機械段 ＋ materialize ＋ 健康審查 ＋ invariants ＋ 備份 ＋ 心跳；互動 session 說「daily brief」才組含 pq2 建議的長版。~~`crons/daily_brief_prompt.md`~~ 已封存
+- daily（Windows `StockBotv2-Daily` → `crons/daily_task.py`，2026-09-24 起）＝harvest ＋ 外部雷達（2026-10-05 起；`claude -p` 只開 WebSearch 提議、程式驗證後寫 secondary lead）＋ ETL ＋ beta monitor ＋ triage（`claude -p` 零工具提議、程式寫入）＋ 機械段 ＋ materialize ＋ 健康審查 ＋ invariants ＋ 備份 ＋ 心跳；互動 session 說「daily brief」才組含 pq2 建議的長版。~~`crons/daily_brief_prompt.md`~~ 已封存
 - ~~weekly~~（2026-09-24 Phase 1 Step 1.9 退役）：題材掃描改互動 skill `skills/theme-scan`（說「掃題材」），報告 `docs/reports/theme_scan_<日期>.md`；健康審查、thesis 唯讀提醒、投組風險快照由 Windows daily 接手；舊 prompt 封存於 `docs/archive/2026-09-24-weekly-scan-prompt-v1.2.md`
 
 兩者刻意錯開，且都不替使用者寫 thesis 結論、入圖或建立 live facts。

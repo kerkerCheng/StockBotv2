@@ -68,6 +68,21 @@
     ],
     "daily_limit": 30
   },
+  "radar": {
+    "_doc": [
+      "外部雷達（Phase 7 Step 7.0f；使用者 2026-10-04 Q5）：daily ①b–①e，在 harvest 之後、triage 批次之前。",
+      "①c 跑一次只開 WebSearch 的 `claude -p`（其餘與 triage／預篩同一套白名單與能力檢查），只產出提議；",
+      "①e 由程式驗證後寫成 secondary lead（`source=web_radar:<主題>`）：網址必須出自同一次執行的搜尋結果、",
+      "正規化後與 lead registry 去重、每日最多 max_items 則（超過的計數不寫）、published_at 讀不懂就 null。",
+      "不喚醒語意 watch、不另發通知；triage 批次裡排在所有非雷達 lead 之後（不擠掉 harvest 的 lead）。",
+      "enabled：false＝三步都記 skipped（回滾開關；`llm.executor=none` 也會讓提議與套用跳過）。**沒有這一段＝關閉。**",
+      "八週試驗：2026-10-05 首輪起 56 天；7.5 檢查點數「雷達 lead 中 triaged_go 且追到一手文件或入圖、",
+      "沒有別的管道更早登記同一個網址或同一事件」的筆數，0 就退役（ROADMAP Phase 7）。合法範圍：max_items 1..20。"
+    ],
+    "enabled": true,
+    "max_items": 5,
+    "timeout_minutes": 10
+  },
   "theme_scan": {
     "_doc": [
       "Phase 1 Step 1.8／1.9：weekly 退役後題材掃描只在互動 session 發起（skills/theme-scan）。",

@@ -271,6 +271,36 @@
         "value_type": "string",
         "description": "`python -m sourcing.routes <TICKER> --attempted a,b` 產生的收據。park 時若 trace_status 屬「我沒拿到」型（見 config/source_routes.json 的park_requires_receipt_when_trace_status_in），這一欄必填——它記的是**哪幾條路真的走過**，不是執行者說他走過。"
       }
+    },
+    "web_radar": {
+      "radar_run": {
+        "value_type": "string",
+        "description": "外部雷達登記這則 lead 的 daily run_id（Phase 7 Step 7.0f；收據 library/private/heartbeat/radar_<日期>.json）"
+      },
+      "radar_fact": {
+        "value_type": "string",
+        "description": "雷達 LLM 寫的一句事實摘要——**是 LLM 的話，不是原文**（L18）；原文要追 url"
+      },
+      "radar_why": {
+        "value_type": "string",
+        "description": "雷達 LLM 說為什麼值得看的一句話（LLM 的話）"
+      },
+      "radar_publisher": {
+        "value_type": "string",
+        "description": "雷達 LLM 報的發布者（LLM 的話，未驗）"
+      },
+      "relates_to": {
+        "value_type": "string_list",
+        "description": "雷達認為這則碰到的在盯條件 watch_id（只收批次裡真的在盯的 id；**不喚醒**——語意 watch 的 T0 只認一手）"
+      },
+      "radar_entities": {
+        "value_type": "string_list",
+        "description": "雷達 LLM 報的公司名原字（解析不到的也留著）"
+      },
+      "radar_company_ids": {
+        "value_type": "string_list",
+        "description": "radar_entities 以名冊寫法完全相符解析到的 co:*（query.bottleneck.company_name_forms；共用寫法不算）"
+      }
     }
   }
 }

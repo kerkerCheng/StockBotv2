@@ -37,6 +37,13 @@ ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_STEPS = (
     # (key, argv, timeout, writes, network, kind, essential, capture, requires, llm_task)
     ("01_harvest", ("crons/harvest_leads.py",), 20, True, True, "command", False, None, None, None),
+    # Phase 7 Step 7.0f 外部雷達（使用者 Q5）：只開 WebSearch 的提議＋程式驗證後寫 secondary lead
+    ("01b_radar_prepare", ("-m", "engine_b.radar", "prepare", "--run-id", "{run_id}", "--out", "{radar_batch}"),
+     2, False, False, "command", False, None, None, None),
+    ("01c_radar_propose", (), 10, False, True, "llm", False, None, "01b_radar_prepare", "radar"),
+    ("01d_integrity_after_radar", (), 1, False, False, "integrity", True, None, None, None),
+    ("01e_radar_apply", ("-m", "engine_b.radar", "apply", "--file", "{radar_result}", "--batch", "{radar_batch}",
+                         "--run-id", "{run_id}"), 2, True, False, "apply", False, None, "01c_radar_propose", None),
     ("02_engine_c_etl", ("engine_c/etl_yfinance.py",), 15, True, True, "command", False, None, None, None),
     ("02b_history_incremental", ("-m", "engine_c.history_backfill", "--incremental"), 15, True, True,
      "command", False, None, None, None),
@@ -106,10 +113,13 @@ def test_no_forbidden_command_in_the_list(forbidden: str) -> None:
 
 
 def test_llm_steps_have_no_argv_in_the_list() -> None:
-    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有 ⑦a。"""
+    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有這三個。"""
     llm = [s for s in DAILY_STEPS if s.kind == "llm"]
-    assert [s.key for s in llm] == ["07a_triage_propose", "10b_prescreen_propose"]
+    assert [s.key for s in llm] == ["01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose"]
     assert all(s.argv == () for s in llm)
+    # 雷達三步跟著 `radar.enabled`（Phase 7 Step 7.0f）；其他步驟沒有開關
+    assert {s.key for s in DAILY_STEPS if s.switch} == {"01b_radar_prepare", "01c_radar_propose", "01e_radar_apply"}
+    assert {s.switch for s in DAILY_STEPS if s.switch} == {"radar"}
 
 
 def test_timeouts_fit_inside_the_task_time_limit() -> None:
@@ -221,7 +231,9 @@ def _status(run: DailyRun) -> dict[str, str]:
 def test_happy_path_runs_every_step_and_records_them(tmp_path: Path) -> None:
     run, runner = _run(tmp_path)
     status = _status(run)
-    llm_keys = ("07a_triage_propose", "07b_triage_apply", "10b_prescreen_propose", "10c_prescreen_apply")
+    # 測試用的 config 沒有 radar 區塊＝雷達關閉（Phase 7 Step 7.0f），三步與 executor=none 的 LLM 步驟一起記 skipped
+    llm_keys = ("07a_triage_propose", "07b_triage_apply", "10b_prescreen_propose", "10c_prescreen_apply",
+                "01b_radar_prepare", "01c_radar_propose", "01e_radar_apply")
     assert all(status[k] == "skipped" for k in llm_keys), status
     assert all(v == "ok" for k, v in status.items() if k not in llm_keys), status
     assert run.record["status"] == "completed"
@@ -371,7 +383,9 @@ def test_foreign_lock_skips_every_write_step_but_heartbeat_still_runs(tmp_path: 
     for step in DAILY_STEPS:
         if step.writes:
             assert rows[step.key]["status"] == "skipped", step.key
-            assert rows[step.key]["reason"].startswith(("writer_lock", "executor=none")), rows[step.key]
+            # 雷達關閉（測試 config 沒有 radar 區塊）先於鎖判定——關閉的步驟本來就不會跑（Phase 7 Step 7.0f）
+            assert rows[step.key]["reason"].startswith(("writer_lock", "executor=none", "config 沒有 radar 區塊")), \
+                rows[step.key]
     assert run.record["writer_lock"]["acquired"] is False
     assert rows["18_heartbeat"]["status"] == "ok" and rows["19_publish"]["status"] == "ok"
     assert not runner.ran("crons/harvest_leads.py")

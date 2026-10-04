@@ -17,6 +17,7 @@ description: >
 > ## ⚠ 2026-09-24（Phase 1 Step 1.3）：本 skill **只在互動 session** 被叫
 >
 > **無人值守的每日訊息是 Windows daily**（`StockBotv2-Daily` → `crons/daily_task.py`）：它每天抓資料、跑機械段、
+> 外部雷達（2026-10-05 起：`claude -p` 只開 WebSearch 提議、程式驗證後寫 secondary lead）、
 > triage（`claude -p` 零工具提議、程式驗證後寫入）、materialize、組零 LLM 的心跳並發 Discord——**每天一則**。
 > Codex 不在任何無人值守步驟裡；舊的 Codex daily prompt 逐字封存於
 > `docs/archive/2026-09-24-codex-daily-brief-prompt-v1.8.md`（不得再執行）。
