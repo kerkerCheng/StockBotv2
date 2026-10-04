@@ -1,0 +1,122 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "jentech_nvidia_mgx_ecosystem_post_2026_05_29",
+    "title": "Jentech：NVIDIA AI Factory MGX Ecosystem (Jentech)（2026-05-29）",
+    "source_type": "news",
+    "evidence_tier": 2,
+    "origin_entity": "Jentech Precision Industrial Co., Ltd.",
+    "publisher": "Jentech 官網",
+    "url": "https://www.jentech.com.tw/post/nvidia-ai-factory-mgx-ecosystem-jentech",
+    "published_at": "2026-05-29",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "發行人官網公開文章；只保留研究必要的逐字摘錄。published_at 取頁面 JSON-LD datePublished（2026-05-29T02:53Z）。"
+  },
+  "sources": [
+    {
+      "id": "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s1",
+      "locator": "文章「Our MGX Ecosystem Contribution」段",
+      "quote": "As an NVIDIA MGX ecosystem partner, Jentech specializes in delivering advanced liquid cooling solutions and critical thermal components for next-generation AI systems."
+    },
+    {
+      "id": "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s2",
+      "locator": "同段產品清單",
+      "quote": "Our portfolio includes: ● High-performance GPU and CPU cold plates ● NVLink and switch tray cooling solutions ● Liquid distribution manifolds."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:jentech_precision",
+      "type": "Company",
+      "name": "Jentech Precision Industrial",
+      "aliases": [
+        "Jentech",
+        "Jentech Precision Industrial",
+        "健策"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "3653.TW"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s1"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_cold_plate",
+      "type": "TechNode",
+      "name": "Liquid-cooling cold plate (direct-to-chip)",
+      "aliases": [
+        "cold plate",
+        "cold plates",
+        "direct-to-chip cooling"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s2"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_manifold",
+      "type": "TechNode",
+      "name": "Liquid-cooling distribution manifold",
+      "aliases": [
+        "manifold",
+        "manifolds",
+        "liquid distribution manifold",
+        "liquid distribution manifolds",
+        "rear manifold"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:jentech_precision",
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s1",
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:jentech_precision",
+      "dst_id": "tech:liquid_cooling_manifold",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s1",
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "jentech_nvidia_mgx_ecosystem_post_2026_05_29_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s1",
+        "jentech_nvidia_mgx_ecosystem_post_2026_05_29_s2"
+      ],
+      "statement": "Jentech's own post (2026-05-29) calls itself an NVIDIA MGX ecosystem partner whose portfolio includes 'High-performance GPU and CPU cold plates', NVLink/switch-tray cooling and 'Liquid distribution manifolds'. Self-report (L8: weak). A Digitimes report (2026-03-18) says NVIDIA named four Vera Rubin cold-plate suppliers including Jentech — media relay, no NVIDIA document found, not in this package.",
+      "disproof_condition": "條件：健策年報或法說揭露液冷冷板營收不再成長或失去 NVIDIA 平台案；或 NVIDIA 的 Vera Rubin 冷板供應商一手（若公開）不含健策。核查頻率：每季（健策月營收與法說）。觸發後 48 小時：e1 降 confidence，重讀冷板層。"
+    }
+  ]
+}

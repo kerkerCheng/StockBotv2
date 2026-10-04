@@ -1,0 +1,11 @@
+Source URL: https://nvidianews.nvidia.com/news/computer-industry-ai-factories-data-centers/
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] NVIDIA：Computer Industry Joins NVIDIA to Build AI Factories and Data Centers for the Next Industrial Revolution（COMPUTEX，2024-06-02）
+Source: https://nvidianews.nvidia.com/news/computer-industry-ai-factories-data-centers/
+Published: 2024-06-02 | Origin: NVIDIA Corporation | Retrieved: 2026-10-04
+
+新聞稿正文（40+ global electronics makers 那段）："These include manufacturing innovations such as server racks, power delivery, cooling solutions and more from companies such as Amphenol, Asia Vital Components (AVC), Cooler Master, Colder Products Company (CPC), Danfoss, Delta Electronics and LITEON."
+夥伴引言——Spencer Shen, chairman and CEO at AVC："AVC plays a key role in NVIDIA products, providing efficient cooling for its AI hardware, including the latest Grace Blackwell Superchip."
+夥伴引言——Kim Fausing, CEO at Danfoss："Danfoss’ focus on innovative, high-performance quick disconnect and fluid power designs makes our couplings valuable for enabling efficient, reliable and safe operation in data centers."
+夥伴引言——Janel Wittmayer, president of Dover Corporation’s CPC："Janel Wittmayer, president of Dover Corporation’s CPC: “CPC’s innovative, purpose-built connector technology enables the easy and reliable connection of liquid-cooled NVIDIA GPUs in AI systems. With a shared vision of performance and quality, CPC has the capacity and expertise to supply critical technological components to support NVIDIA’s incredible growth and progress."

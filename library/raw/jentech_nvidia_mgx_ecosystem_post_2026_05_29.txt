@@ -1,0 +1,9 @@
+Source URL: https://www.jentech.com.tw/post/nvidia-ai-factory-mgx-ecosystem-jentech
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Jentech：NVIDIA AI Factory MGX Ecosystem (Jentech)（2026-05-29）
+Source: https://www.jentech.com.tw/post/nvidia-ai-factory-mgx-ecosystem-jentech
+Published: 2026-05-29 | Origin: Jentech Precision Industrial Co., Ltd. | Retrieved: 2026-10-04
+
+文章「Our MGX Ecosystem Contribution」段："As an NVIDIA MGX ecosystem partner, Jentech specializes in delivering advanced liquid cooling solutions and critical thermal components for next-generation AI systems."
+同段產品清單："Our portfolio includes: ● High-performance GPU and CPU cold plates ● NVLink and switch tray cooling solutions ● Liquid distribution manifolds."

@@ -1,0 +1,203 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "nvidia_computex_2024_ai_factories_pr_2024_06_02",
+    "title": "NVIDIA：Computer Industry Joins NVIDIA to Build AI Factories and Data Centers for the Next Industrial Revolution（COMPUTEX，2024-06-02）",
+    "source_type": "news",
+    "evidence_tier": 1,
+    "origin_entity": "NVIDIA Corporation",
+    "publisher": "NVIDIA Newsroom",
+    "url": "https://nvidianews.nvidia.com/news/computer-industry-ai-factories-data-centers/",
+    "published_at": "2024-06-02",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "公開新聞稿；只保留研究必要的逐字摘錄。"
+  },
+  "sources": [
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+      "locator": "新聞稿正文（40+ global electronics makers 那段）",
+      "quote": "These include manufacturing innovations such as server racks, power delivery, cooling solutions and more from companies such as Amphenol, Asia Vital Components (AVC), Cooler Master, Colder Products Company (CPC), Danfoss, Delta Electronics and LITEON."
+    },
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_s2",
+      "locator": "夥伴引言——Spencer Shen, chairman and CEO at AVC",
+      "quote": "AVC plays a key role in NVIDIA products, providing efficient cooling for its AI hardware, including the latest Grace Blackwell Superchip."
+    },
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_s3",
+      "locator": "夥伴引言——Kim Fausing, CEO at Danfoss",
+      "quote": "Danfoss’ focus on innovative, high-performance quick disconnect and fluid power designs makes our couplings valuable for enabling efficient, reliable and safe operation in data centers."
+    },
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_s4",
+      "locator": "夥伴引言——Janel Wittmayer, president of Dover Corporation’s CPC",
+      "quote": "Janel Wittmayer, president of Dover Corporation’s CPC: “CPC’s innovative, purpose-built connector technology enables the easy and reliable connection of liquid-cooled NVIDIA GPUs in AI systems. With a shared vision of performance and quality, CPC has the capacity and expertise to supply critical technological components to support NVIDIA’s incredible growth and progress."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:nvidia",
+      "type": "Company",
+      "name": "NVIDIA",
+      "aliases": [
+        "NVDA",
+        "NVIDIA Corporation",
+        "Nvidia"
+      ],
+      "abstraction_level": "network_systems",
+      "role": "leader",
+      "attributes": {
+        "ticker": "NVDA"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s2"
+      ]
+    },
+    {
+      "id": "co:asia_vital_components",
+      "type": "Company",
+      "name": "Asia Vital Components",
+      "aliases": [
+        "Asia Vital Components",
+        "AVC",
+        "奇鋐"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "3017.TW"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s2"
+      ]
+    },
+    {
+      "id": "co:danfoss",
+      "type": "Company",
+      "name": "Danfoss",
+      "aliases": [
+        "Danfoss"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s3"
+      ]
+    },
+    {
+      "id": "co:dover",
+      "type": "Company",
+      "name": "Dover",
+      "aliases": [
+        "Dover Corporation",
+        "Colder Products Company"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "DOV"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s4"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_quick_disconnect",
+      "type": "TechNode",
+      "name": "Liquid-cooling quick disconnect (UQD/UQDB)",
+      "aliases": [
+        "quick disconnect",
+        "quick disconnects",
+        "UQD",
+        "UQDB",
+        "liquid cooling quick disconnect"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s3"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:asia_vital_components",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:danfoss",
+      "dst_id": "tech:liquid_cooling_quick_disconnect",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s3"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:dover",
+      "dst_id": "co:nvidia",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s4"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.7,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s2"
+      ],
+      "statement": "NVIDIA's own COMPUTEX release (2024-06-02) names AVC among the makers of 'server racks, power delivery, cooling solutions and more' and carries AVC's chairman: 'AVC plays a key role in NVIDIA products, providing efficient cooling for its AI hardware, including the latest Grace Blackwell Superchip.' Customer's document carrying the supplier's words — stronger than a self-report, weaker than a customer filing; no product (cold plate etc.) named.",
+      "disproof_condition": "條件：NVIDIA 後續的生態夥伴清單或參考設計文件不再列 AVC，或 AVC 揭露失去 NVIDIA 平台的散熱業務。核查頻率：每半年（NVIDIA GTC／COMPUTEX 新聞稿、AVC 年報）。觸發後 48 小時：e1 降 confidence，重讀冷板層。"
+    },
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_cl2",
+      "subject_id": "e2",
+      "demand_proof_level": "guided",
+      "confidence": 0.7,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s3"
+      ],
+      "statement": "Danfoss is named in NVIDIA's release and its CEO says Danfoss' 'high-performance quick disconnect and fluid power designs make our couplings valuable … in data centers' and calls Danfoss 'a vital part of NVIDIA's AI ecosystem'. Supplier's words inside the customer's release; Danfoss is privately held.",
+      "disproof_condition": "條件：NVIDIA 的 MGX／Vera Rubin 液冷規格或夥伴清單不再列 Danfoss 的快接頭。核查頻率：每半年。觸發後 48 小時：e2 降 confidence，重讀快接頭層。"
+    },
+    {
+      "id": "nvidia_computex_2024_ai_factories_pr_2024_06_02_cl3",
+      "subject_id": "e3",
+      "demand_proof_level": "guided",
+      "confidence": 0.65,
+      "source_ids": [
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s1",
+        "nvidia_computex_2024_ai_factories_pr_2024_06_02_s4"
+      ],
+      "statement": "Colder Products Company (CPC), a Dover company, is named in NVIDIA's release; its president says CPC's 'purpose-built connector technology enables the easy and reliable connection of liquid-cooled NVIDIA GPUs' and that CPC 'has the capacity and expertise to supply critical technological components to support NVIDIA's … growth'. Connector type not spelled out (quick-disconnect class); Dover is a large conglomerate (CPC a small part).",
+      "disproof_condition": "條件：Dover 申報或 NVIDIA 文件顯示 CPC 不再供應 NVIDIA 液冷接頭。核查頻率：每半年。觸發後 48 小時：e3 降 confidence。"
+    }
+  ]
+}
