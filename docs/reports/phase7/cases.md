@@ -183,10 +183,22 @@
   - 2026-10-04｜decompose 收據見 P1（同一次拆解）；本段的研究題目（pq1，triaged_go）：lead_21b7830d（GOES）、lead_188e1fa1（測試產能）、lead_e0948fc0（有載分接開關；德國那一家要具名）、lead_857be4a6（高壓套管）、lead_bf2fb4a7（CTC 銅導線）
   - 2026-10-04｜補一題 lead_de46bc48（變壓器絕緣材料；買方端一手：Forgent S-1「we rely on a single supplier for certain specialized insulation material used in our transformer products」）；[687] 把 GOES、CTC、分接開關、套管、絕緣材料、測試產能六個上游層建成節點（供給側只有 GOES 一家美國廠，其餘零供應商＝走圖的洞）
   - 2026-10-04｜pq1 drain 第一條 lead_21b7830d（GOES）→ `ra_a4864a6a92163da08b4f6eb529081fab` → pq2 **[691]**：JFE 2025-08-04 新聞稿（JSW JFE 印度合資：前 thyssenkrupp 印度廠、5 萬 → 25 萬噸／年 2028–2030，另一廠 10 萬噸 2027）＋Cliffs 2026 Q2 10-Q（產品清單逐字含 GOES；「Transformers are in short supply … exacerbated by the anticipated widespread adoption of AI」）；名冊三筆隨包（合資 null、co:jfe_holdings 5411.T、co:jsw_steel JSWSTEEL.NS）。查無一手：題材掃描說的 Cliffs Weirton 變壓器廠（10-Q 只有 Weirton tinplate 停產）、現代製鐵 2026-04 北美 GOES 協議（只見市場研究稿、韓文新聞 0 則）。**對 H5 (ii) 的初步證據：GOES 供給側是鋼鐵巨頭（Cliffs、JFE、JSW）與私人合資，沒有看到非共識、可投資的標的**（7.4 寫結論）；美國 LPT 用的 DOE 規格級 GOES（日韓德）的具名廠商與其美國客戶仍未入圖
+  - 2026-10-05｜使用者 go：[691] 入圖（intake commit `8d02fc72`，名冊 `eeaa5bfa`）。
+  - 2026-10-05｜四條 DOE 元件題合成一次 DOE 更正（[692] 之後第二次，舊內容逐字保留）→ `ra_75938cdde252742d00f98b3fcb5b8ee6` → pq2 **[699]**：
+    ①CTC（lead_bf2fb4a7）：stakeholder 說北美 3 家、美國只有 2 家；Sam Dong「manufactures CTC at its Rogersville, Tennessee facility」→ 供貨邊；
+    Essex Furukawa（DOE：「it remains unclear if CTC can be produced at any of the domestic facilities」）與 REA（Fort Wayne 廠有能力，引 2008 年文獻；
+    單字「REA」在電網文件常指 Rural Electrification Administration，放名冊會誤中）只進 claim。②絕緣（lead_de46bc48）：「a potential supply concern due to a lack of
+    domestic manufacturing」，Weidmann、Cindus → 兩條供貨邊；DuPont（Nomex）是 stakeholder 轉述，只進 claim；**Forgent 10-K 的單一供應商不接 LPT 絕緣層**——
+    它的產品是配電級（dry type、liquid filled）與中壓設備，全文沒有 power transformer，那家供應商也沒具名（L12）。③分接開關（lead_e0948fc0）：
+    「could also be a bottle neck」→ LPT constrained_by 分接開關；三家國內與一家德國廠都沒具名，「是誰」仍開著。④套管（lead_857be4a6）：只有引自 2014 年的
+    「up to five months」→ 帶日期 claim；lead park（partial，自動建 watch 等 2026 年一手）。**撤回**：該 lead 標題的「非中國瓷件只剩美日波蘭」在 DOE 全文找不到
+    （porcelain 只在儀用變壓器與開關段，Poland 只在 GOES 廠清單）——10-04 decompose 時寫錯。名冊三筆隨包 staged（Sam Dong、Weidmann、Cindus，皆私人、null）。
+    ⚠ 決策區塊的「圖影響」印 +19 節點、20 邊、12 claims，實際新增 3 節點、4 邊、4 claims（failure log #17）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
+  - #17（[699] 的圖影響行把整份更正文件當成增量）
 
 ## P3 800VDC 擱置五則回看
 
