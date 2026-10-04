@@ -166,6 +166,7 @@
 - 2×2：尚未到裁決點
 - failure log：（尚無）
   - #9（11 條 decompose 題目缺分類被 drain withheld；回填腳本吃不下 `triage: None`——當下修）
+  - #11（[689] IREN 的 depends_on 印 self_reported_costly——買方自述被當成供應商自報；與 C1 [694] 同形）
 
 ## P2 變壓器上游：電工鋼、套管、分接開關、測試產能（二階）
 
@@ -195,6 +196,8 @@
   - 2026-10-04｜研究題目（pq1，`decompose:gb300-nvl72-dlc-2026-10-04`，triaged_go）：lead_5b8cc7e2（冷板）、lead_1345d45b（manifold）、lead_6698f145（快接頭）、lead_f96bfb99（CDU）
   - 2026-10-04｜第一份層文件入圖包 pq2 **[690]**（定向 lead_ba882ac7 → `ra_c6bd011413367fec896f89429c605404`）：Ecolab 8-K（收購 CoolIT 協議，2026-03-20）＋交割新聞稿（2026-07-02）——新節點 `tech:coolant_distribution_unit`、`tech:liquid_cooling_cold_plate`，CoolIT（非上市）供這兩層、`tech:ai_compute_buildout enables` 兩層、Ecolab acquired CoolIT、CoolIT partnership_with NVIDIA／AMD；名冊 co:ecolab（ECL）、co:coolit_systems（null）隨包 staged。⚠ 兩層供給側只畫了一家，不得讀成薄層；Eaton 申報對 Boyd 沒有液冷字樣，不建邊。題材掃描 lead_f7c61cbb 已 park（由 [690] 承接）
   - 2026-10-04｜使用者 go：[690] 入圖（intake commit `32d81f4a`）
+  - 2026-10-04｜pq1 drain 冷板題 lead_5b8cc7e2 → `ra_cfa47fbc9d74f2a53ba98c1c86b01d1d` → pq2 **[693]**：**NVIDIA 自己的 COMPUTEX 2024 新聞稿（客戶端）**點名散熱夥伴並刊出高管引言——AVC「providing efficient cooling for its AI hardware」→ AVC supplies_to NVIDIA；Danfoss「high-performance quick disconnect … couplings」→ 快接頭層（新節點）；Dover 的 CPC「connector technology … liquid-cooled NVIDIA GPUs」→ Dover supplies_to NVIDIA；健策 2026-05-29 自述 GPU／CPU cold plates、liquid distribution manifolds → 冷板層、manifold（新節點）。名冊四筆隨包（奇鋐 3017.TW、健策 3653.TW、Danfoss null、Dover DOV）。**邊緣判定（yfinance 2026-10-04）：冷板層被點名的都不是邊緣**——健策約新台幣 1.0 兆／11 位、奇鋐約 1.35 兆／17 位、台達約 4.9 兆、Dover 約 255 億美元；第二線富世達（快接頭，約 1,580 億／9 位）、高力（CDU，約 1,400 億／7 位）是邊緣，留給快接頭、CDU 兩題。Digitimes 說 NVIDIA 在 GTC 2026 點名四家 Vera Rubin 冷板供應商（AVC、Cooler Master、健策、台達）——NVIDIA 原文找不到，只當媒體轉述
+  - 2026-10-04｜pq1 drain manifold 題 lead_1345d45b → `ra_c0a5eac2241398fb6b4418a57db8e88b` → pq2 **[694]**：NVIDIA 技術部落格 2025-05-16（MGX）——`co:nvidia depends_on` 冷板、manifold、快接頭三層（需求側第一次有真正的客戶），**並逐字說「Diverse sourcing options within the MGX ecosystem … avoiding vendor lock-in … a broad array of certified components」**：客戶自己刻意多源——**C1 登記的 failure mode（快接頭／冷板是競爭層的先入為主）第一次有客戶端原文支持，不是只靠開放規格目錄**；它同時意味這三層的倍率不靠護城河，只能靠量（讀圖時照實寫）
   - 2026-10-04｜讀圖**刻意延後**：`tech:coolant_distribution_unit`、`tech:liquid_cooling_cold_plate` 兩層各只有 1 條需求接線與 1 條供貨（CoolIT，非上市），現在寫只會是空的 undecided——為了驗收①的計數補格子正是 L19 的形狀。等 lead_f96bfb99（CDU）／lead_5b8cc7e2（冷板）的供給側研究有實料再讀；驗收①的散熱這一條目前未成立
   - 主題等權組：還沒定——組員要能在名冊解析（INV-1），台股散熱公司目前 0 家在名冊；組員等選源找出各層坐了誰再定（仍早於本鏈第一份敘事）
 - 主題等權組（散熱；必須早於本鏈第一份敘事）：（尚無）
@@ -203,6 +206,7 @@
 - failure log：（尚無）
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
+  - #11（[694] NVIDIA 自己的 depends_on 被預告成「供應商自報」——買方自述與供應商自誇共用一個值）
 
 ## X1 已定價回放（R1）
 
