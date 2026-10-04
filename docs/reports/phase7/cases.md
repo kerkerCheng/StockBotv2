@@ -239,6 +239,11 @@
     CCXI park→證實 −4.9%、證實→量測 −10.5%（機器人鏈組未定義，只印絕對報酬；n＝1 不進判讀線）。EDGAR 層 10 則裡 9 則不適用——這個母體量到的主要是「例行申報被正確 park」
   - 撞到的事：①2 則 parked 沒有 park 理由也沒有觸發條件（`lead_e590eca7`、`lead_27625bd1`）；②同一份 S-4 讓四則 park 等的東西出現，四則今天仍是 parked、沒有接回
     （S-4/A 本身已走 EDGAR feed 入圖成 [683]）——`original_obtained` 是終局值、park 時不自動建 watch，母體 353 則裡有 watch 在等的只有 9 則
+  - 2026-10-05｜T2 輪詢補跑（研究段第 7 段 `pollable_watches` 自 09-21 沒人跑；15 條全查、各一次搜尋）：**2 條等的一手早已出現**——
+    `ew_0020`：NVDA 8-K 2026-08-17 Item 1.01 已揭露對 OpenAI 租約的 residual value guaranties（10-Q 寫上限 $105B），`lead_2f5aebfb` 等了 49 天才接回（#15 第 2 次）；
+    `ew_0032`：FCC 26-50（Third Report and Order，07-22 通過、Federal Register 09-11 刊出、10-13 生效）已出，但 FCC 自己寫主要光模組廠都不在 Covered List，
+    不滿足 `lead_7f66b743` 的原主張（「禁中國光模組」）。另登記 `lead_8e5a2815`（Silex Microsystems 據二手代工 Google OCS 的 MEMS 微鏡，一手路徑是上市公開說明書；待 triage），
+    兩則 lead 補了一手路徑（`lead_85a70a23`：「Elazr」應為聯鈞 3450.TW；`lead_9258d25d`：鴻騰董事長的短缺說法只有二手）；其餘 10 條未命中
 - H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
 - failure log：（尚無）
   - #15（park 缺的那一樣出現了、文件也進來了，卻沒有接回那則 park；一份 S-4、四則）
