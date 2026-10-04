@@ -273,6 +273,13 @@
     `ew_0032`：FCC 26-50（Third Report and Order，07-22 通過、Federal Register 09-11 刊出、10-13 生效）已出，但 FCC 自己寫主要光模組廠都不在 Covered List，
     不滿足 `lead_7f66b743` 的原主張（「禁中國光模組」）。另登記 `lead_8e5a2815`（Silex Microsystems 據二手代工 Google OCS 的 MEMS 微鏡，一手路徑是上市公開說明書；待 triage），
     兩則 lead 補了一手路徑（`lead_85a70a23`：「Elazr」應為聯鈞 3450.TW；`lead_9258d25d`：鴻騰董事長的短缺說法只有二手）；其餘 10 條未命中
+  - 2026-10-05｜Silex 後續：`lead_8e5a2815`（PhotonCap 二手指路）被 daily 分流 no-go——判斷本身沒錯（二手、沒有原文），錯在我登記的是指路而不是一手；
+    改登記定向 `lead_3dae07ce` 追到一手：Silex Microsystems（SILEX.ST，2026-05-07 掛牌，約 190 億克朗、4 位分析師）SFSA 核准的公開說明書 p.23
+    「Silex manufactures MEMS for AI applications, such as optical circuit switches in data centres」、p.73 技術含「micro-mirror arrays」→ pq2 **[700]**
+    （`tech:mems_mirror_array` 第一家供應商，自報·filing）；客戶集中度（最大客戶 2025 全年 25%）與 SMEI 持股 45.2% 進帶日期 claim。
+    Q2 法說的「only MEMS foundry producing OCS」「10 OCS customers … one in high volume production」只有模型轉述（原文 403），不入圖。客戶未具名
+  - 2026-10-05｜雷達第一次無人值守運行（daily 05:30）：搜尋 15 次、新增 1 則（Sivers 人事的二手轉寫，標題「Shepherd Glasgow Fab Into Mass Production」不是原文）
+    ——追到 Sivers 09-24 一手公告後 park：Photonics CTO（CST Global 共同創辦人）退休、Amkor 出身的工程副總 10-31 到任；留給 10-29 thesis 複查
 - H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
 - failure log：（尚無）
   - #15（park 缺的那一樣出現了、文件也進來了，卻沒有接回那則 park；一份 S-4、四則）
