@@ -239,4 +239,6 @@
 
 - 登記：registration §2 X4、§7.4
 - 報告：（尚無；`replay-r4-losers.md`）
+  - 2026-10-05｜[`replay-r4-losers.md`](replay-r4-losers.md)：**AEVA、MP、Lynas、Nidec、JL Mag 五檔全部「證據不足以判」**——入圖後到 10-02 沒有任何一手回頭碰到入圖時的結構主張（AEVA、MP 在 EDGAR 入圖後 0 份非內部人申報；Lynas 入圖後唯一的一手是 10-01 換股收購 Meteoric——資本配置；JL Mag 只有股東會與股息公告；Nidec 入圖時唯一一條 assertion 沒有發表日、投影是空的）。不構成 H1／H3 的反例。描述（不判讀）：三檔稀土同期一起跌；MP 客戶資本承諾最齊全仍 −20%（窗口太短，不進 H10）；JL Mag 入圖時的證據全是 2022 年報
 - failure log：（尚無）
+  - #14（反證以被評公司的供貨 assertion 形式入圖：MP 磁材邊上的 Noveon、USA Rare Earth 文件，引文沒有 MP）
