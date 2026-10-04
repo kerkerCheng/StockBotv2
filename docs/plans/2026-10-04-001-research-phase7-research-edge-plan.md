@@ -121,7 +121,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 |---|---|---|---|---|
 | 7.0a | 預先登記（十個假說與殺死條件、驗證集、裁決規則、failure log、開發 gate、漏網稽核母體）＋T0 凍結 | ✅（`docs/reports/phase7/` 四檔：registration——H1–H10 各附殺死條件與最小 n、16 個 case〔附錄 A 14＋二階 O1-U、O6〕、R3 母體〔光通訊組 15＋觀察名單 43〕、S1 框架 40 則、R2 樣本 36 則；T0 manifest `library/private/measurement/phase7/T0-2026-10-04.json`〔07:09:14Z，計數與當日心跳一致〕；偏差 #1–#4） | 強模型 | 見 git log「Step 7.0a」 |
 | 7.0b | 開發 gate 落地（development-flow 範圍欄）＋兩個當下修：巢狀 writer lock（Phase 6 #17）、thesis 逾期提醒量錯 | ✅（INTAKE 加 `Case` 行＋`Zoom / Review` 重抄；`writer_lock.hold` 一個 owner，四支遷移工具改用；逾期只看 `is_due`——SessionStart 兩則假逾期 → 0、10-30 照報 axt_inp＋sivers；偏差 #5–#8） | 執行模型 | 見 git log「Step 7.0b」 |
-| 7.0c | 敘事範本：「要翻倍需要什麼」＋兩個 placeholder（市值、近四季營收）＋「已定價」白話＋重押讀圖換格層引用（Phase 6 #16） | ○ | 執行模型 | |
+| 7.0c | 敘事範本：「要翻倍需要什麼」＋兩個 placeholder（市值、近四季營收）＋「已定價」白話＋重押讀圖換格層引用（Phase 6 #16） | ✅（題目與字彙；`market_cap_settlement`——IQE.L 換成 7.3 億 GBP；「已定價」白話一份、首屏與稽核區各一次〔Edge 實點〕；寫入端第 ⑦ 項；四檔敘事 8 格逐字相同；偏差 #9–#11） | 執行模型 | 見 git log「Step 7.0c」 |
 | 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ○ | 執行模型 | |
 | 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ○ | 執行模型 | |
 | 7.0f | 外部雷達：daily 只開 WebSearch 的 LLM 步驟、八週試驗（R2-b；sandbox impact review） | ○ | 執行模型 | |
@@ -152,6 +152,9 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 6 | 7.0b | §2 第 3 項「以 max(memo 生成日, last_checked) 對 check_interval_days（或直接用 `is_due`，一個 owner）……另印一行『沒有 lifecycle 的舊 memo N 份』；變異：把 last_checked 拿掉 → 真逾期要被報」 | 取 `is_due` 當唯一 owner：「memo 生成日」那一套整段拿掉；`max(memo 生成日, last_checked)` 只用來印天數。舊 memo 那一行**只在 hook 有話要說時附上**，健康審查「Memo 新鮮度」節每天照列；lifecycle 讀不到時 hook 明講。變異改成「拿掉 last_checked **與** next_check → 要報」（`is_due` 下只拿掉 last_checked，next_check 仍是出口、本來就不該報），另加兩個變異（`check` 不看 `is_due`、拿掉「讀不到要說」） | 一個 owner（`thesis/lifecycle_schedule.py` 自稱「什麼時候該重看的唯一權威」）；舊 memo 那行若單獨每天亮，就是把一個恆亮換成另一個恆亮（L14）；拿掉 memo 日期那套之後，「讀不到」不能靜默（INV-3） |
 | 7 | 7.0b | （plan 沒寫） | `DATE_RE` 認得「`**生成日期：** 2026-08-04`」的粗體寫法（L17 當下修，三行） | 先前三份新格式 memo 全退回檔案 mtime；現在只影響「幾天沒核查」的天數呈現 |
 | 8 | 7.0b | §2 第 1 項「八欄的範圍欄（或 STEP_RESULT 對應欄）加『暴露它的案例』」 | 八欄沒有「範圍」欄：INTAKE 加一行 `Case:`（範圍判定就在這裡做），收尾在 `Zoom / Review` 重抄；`docs/AGENT_WORKFLOW.md` 同步；不開第九欄 | `tests/test_agent_workflow.py` 數 STEP_RESULT 剛好八欄；新測試釘住 `Case` 行（刪掉它不會讓任何東西變紅，系統只會安靜地回到「想到就做」） |
+| 9 | 7.0c | §3 第 2 項「`revenue_ttm`（近四季營收，Engine C 機械歷史表，含口徑與 as_of）」 | 選取 read model **既有**的 `revenue_ttm`（Engine C 快照的 TTM，財報幣別）；填值寫成「近四季，快照 <日期>」 | 同一項要求「先確認兩個值在 read model 裡已有 Datum」——它已在，而且稽核區印的就是這一格；另從機械歷史表組一格會讓同一頁出現兩個營收數（L12、L16）。快照的日期是取數日、不是財報期末，所以字面寫「快照」（INV-6） |
+| 10 | 7.0c | §3 第 2 項「`market_cap`（Engine C 快照的市值，含幣別與 as_of）」 | read model 既有的 `market_cap` 是「price × shares、未正規化」——builder 另組一格 `market_cap_settlement`（同一份快照 × 名冊報價單位的換算係數——係數由 sources 從 `identity.currency` 查好注入，builder 是純函式不碰 identity；不做匯率；報價單位未登記 fail closed），placeholder 選它；原格語意不動 | 直接用未正規化那格，IQE.L 會填出「729.5 億」（便士）——真資料核對：換算後 7.3 億 GBP。一格不承載兩種語意（L12） |
+| 11 | 7.0c | §3 第 3 項的白話「拿今天的倍數（EV/S，虧損時 P/S）」 | 照 `alpha/three_questions.py::decide_basis` 寫：「有獲利、而且有同一期的淨負債資料時用 EV/S；其餘（虧損、台股、資料不齊）用 P/S」，其餘照 plan 的意思 | P/S 不只在虧損時用（COHR 是因為營業利益資料停在 2024 年中）；自己寫給人讀的事實套同一套追源紀律（L11-2） |
 
 ---
 

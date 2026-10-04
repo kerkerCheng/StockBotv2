@@ -277,6 +277,15 @@ PLAIN_BET_UNITS: Mapping[str, str] = {
             "那份讀圖變了，賭注的前提就要重看。",
 }
 
+#: 「已定價嗎」的白話（Phase 7 Step 7.0c；使用者 2026-10-04：「已定價」讀不懂）。口徑規則照 `alpha/three_questions.py::decide_basis`。
+#: **只有這一份**——materialize 寫進 `.meta.json`，APP 首屏與稽核區照抄（L16）。它是脈絡不是否決：不設門檻、不排序。
+PLAIN_PRICED_IN = (
+    "已定價嗎＝拿今天的營收倍數跟它自己過去三年比，落在第幾百分位——回答「市場是不是已經對它重新評價過」。"
+    "倍數用 EV/S（有獲利、而且有同一期的淨負債資料時）或 P/S（其餘：虧損、台股、資料不齊），這一檔用哪一個寫在稽核區。"
+    "它不是「太貴」，也不是目標價：高百分位代表價格已經假設好消息會持續——不代表不能再漲，代表好消息一斷會跌得比較深。"
+    "這一格有沒有區分力還在量（Phase 7 已定價回放 R1）。"
+)
+
 PRICE_SERIES_NOTE = (
     "這是這檔自己的收盤價（provider 報價單位原值，未換算幣別）。"
     "它是**脈絡不是訊號**——系統不用它排序、不用它決定買多少，也不從中推導任何進出場建議。"
@@ -619,6 +628,7 @@ __all__ = [
     "PLAIN_BET_UNITS",
     "PLAIN_LINE_LABELS",
     "PLAIN_PANEL_TITLES",
+    "PLAIN_PRICED_IN",
     "PLAIN_READINESS",
     "PRICE_SERIES_NOTE",
     "ACCOUNTING_BASIS_DISPLAY", "AnalystBlocker", "accounting_basis_display",

@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0c：敘事「要翻倍需要什麼」、翻倍起點、「已定價」白話）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily ⑬ `python -m webapp materialize`：讀取、寫入、查詢都不變——read model 的財報觀測多一格 `market_cap_settlement`（同一份快照的 price × shares × 名冊報價單位的換算係數——係數由 `briefing/alpha_view/sources.py::identity_mapping` 從 `identity.currency` 查好注入，builder 是純函式、不碰 identity；不打匯率），敘事的兩個新 placeholder 只**選取**它與既有的 `revenue_ttm`；`.meta.json` 的字彙多一個鍵 `plain_priced_in`。個股頁 artifact 不收財報觀測那一節，所以四檔真資料的 artifact 除 `generated_at` 逐位相同。互動寫入端（`python -m alpha brief <T> --add`）多一條拒收（重押讀圖時格層引用指向被取代的讀圖），不碰任何新檔 |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` 敘事 v2 段與 §6.6「已定價嗎」那句；研究 session 的題目由 packet 的 `brief_frame` 帶（`BRIEF_FRAME_V2`），skill 不另抄題目——不改 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_narrative_doubling.py`（新題目與字彙、`{price}`／已定價數字在這一格照拒、sources 從名冊字彙查換算係數、GBp 換成 GBP 而且不打匯率、報價單位未登記 fail closed、起點印金額＋幣別＋日期或不給值、填值與舊紀錄不變、被取代的讀圖拒收並列出該換的 id、現行讀圖與別的單位放行）；`tests/test_webapp_api.py::test_priced_in_is_explained_from_one_string_on_both_places`。變異：拿掉第 ⑦ 項 → 1 紅；市值不換單位 → 1 紅 |
+| **5 端到端 smoke** | 真資料：重新 materialize AXTI／COHR／LITE／SIVE.ST——敘事四檔各 8 格逐字相同、artifact 除 `generated_at` 逐位相同、`.meta.json` 只多 `plain_priced_in`；headless Edge 開 `#/AXTI`：頁面渲染、白話出現兩次（首屏、稽核區）；`python -m alpha research AXTI` 的 packet 印新題目；市值換算：IQE.L 729.5 億 GBp → **7.3 億 GBP**、AXTI 56.3 億 USD、SIVE.ST 106.1 億 SEK、300308.SZ 9,016.0 億 CNY；20 行敘事 ledger 解析 0 失敗 |
+
 ### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0b：巢狀 writer lock、thesis 逾期提醒只看 lifecycle）
 
 | 步 | 結論 |

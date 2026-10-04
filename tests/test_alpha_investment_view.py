@@ -162,7 +162,9 @@ def _view(*, with_signal: bool = True, fundamentals: _FakeFundamentals | None = 
         thesis_lifecycle={"status": "active", "ticker": "COHR", "next_check": "2026-10-15",
                           "last_checked": "2026-07-17"},
         identity=identity or {"market_currency": "USD", "market_quote_unit": "USD",
-                              "execution_venue": "NYSE"},
+                              "execution_venue": "NYSE",
+                              # Phase 7 Step 7.0c：sources 從 identity.currency 查好注入的換算（builder 不碰 identity）
+                              "settlement_currency": "USD", "quote_to_settlement_factor": 1.0},
         today=today, **kwargs,
     )
 

@@ -968,6 +968,10 @@ function threeQuestionsCard(view) {
     const title = el('div', 'group-title', TQ_QUESTIONS[question]);
     title.id = 'tq-' + question;
     node.appendChild(title);
+    if (question === 'priced_in') {
+      const plain = pricedInPlain();
+      if (plain) node.appendChild(plain);
+    }
     const box = el('div', 'rows');
     rows.forEach((line) => {
       const d = line.datum;
@@ -1179,6 +1183,8 @@ function candidateLine(view) {
       words.appendChild(word);
     });
     node.appendChild(words);
+    const plain = pricedInPlain();
+    if (plain) node.appendChild(plain);
     const lamps = lampsNotGreen(view);
     if (lamps) node.appendChild(lamps);
   }
@@ -1192,6 +1198,12 @@ function candidateLine(view) {
   link.href = '#/candidates';
   node.appendChild(link);
   return node;
+}
+
+/** 「已定價嗎」的白話（Phase 7 Step 7.0c；字串由 materialize 從 contracts 的 PLAIN_PRICED_IN 帶來；沒有就不印，不自己補一份）。 */
+function pricedInPlain() {
+  const text = (VOCAB && VOCAB.plain_priced_in) || '';
+  return text ? el('div', 'row-reason priced-in-plain', text) : null;
 }
 
 /** 層／插槽／押在哪一格的白話（字彙由 materialize 從 contracts 的 PLAIN_BET_UNITS 帶來；沒有就不印，不自己補一份）。 */

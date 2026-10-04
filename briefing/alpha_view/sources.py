@@ -26,6 +26,7 @@ from alpha.providers import briefs as brief_ledger
 from alpha.providers import abstentions as abstention_ledger
 from alpha.narrative import select_brief
 from alpha.narrative.contracts import RECORD_VERSION_V2
+from identity.currency import resolve_quote_unit
 from identity.registry import get_registry
 
 from .builder import DecisionFacts, build_alpha_investment_view, compact_card
@@ -263,6 +264,22 @@ def _read_abstentions(ticker: str) -> list[Any]:
 # （由排序前段挑 Alpha Card 的標的）隨跨檔排序退役（G1／L19）。
 
 
+def identity_mapping(company: Any) -> dict[str, Any]:
+    """注入 builder 的身分欄位。報價單位 → 結算幣別的換算係數在**這裡**查（Phase 7 Step 7.0c）：`identity.currency` 會讀
+    設定檔，builder 是純函式、不碰 identity（`tests/test_alpha_view_render.py::test_builder_does_not_touch_io_layers`）。
+    報價單位未登記 → 兩格都是 None，builder 那一格 fail closed（不猜，AGENTS「報價單位 ≠ 結算幣別」）。"""
+    raw_unit = getattr(company, "market_quote_unit", None)
+    unit = resolve_quote_unit(raw_unit) if raw_unit else None
+    return {
+        "market_currency": getattr(company, "market_currency", None),
+        "market_quote_unit": raw_unit,
+        "execution_venue": getattr(company, "execution_venue", None),
+        "display_name": getattr(company, "display_name", None),
+        "settlement_currency": unit.currency if unit is not None else None,
+        "quote_to_settlement_factor": unit.factor if unit is not None else None,
+    }
+
+
 def fetch_alpha_investment_view(
     ticker: str,
     *,
@@ -295,12 +312,7 @@ def fetch_alpha_investment_view(
     resolved_ticker, company_id = resolve_company(ticker)
     registry = get_registry()
     company = registry.company(str(company_id))
-    identity = {
-        "market_currency": getattr(company, "market_currency", None),
-        "market_quote_unit": getattr(company, "market_quote_unit", None),
-        "execution_venue": getattr(company, "execution_venue", None),
-        "display_name": getattr(company, "display_name", None),
-    }
+    identity = identity_mapping(company)
 
     owns_graph = graph_provider is None
     if graph_provider is None:

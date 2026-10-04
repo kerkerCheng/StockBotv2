@@ -485,6 +485,19 @@ def test_layer_and_socket_are_explained_from_one_vocabulary(client) -> None:
     assert "VOCAB.plain_bet_units" in source and "騎" not in source
 
 
+def test_priced_in_is_explained_from_one_string_on_both_places(client) -> None:
+    """Phase 7 Step 7.0c（使用者 2026-10-04：「已定價」讀不懂）：白話只有一份（contracts → `.meta.json` → API），
+    首屏三個字底下與稽核區那一題的標題旁各印一次；APP 不留第二份字串。"""
+    from briefing.analyst_view.contracts import PLAIN_PRICED_IN
+
+    text = client.get("/api/v1/meta").json()["vocabularies"]["plain_priced_in"]
+    assert text == PLAIN_PRICED_IN
+    assert "不是「太貴」" in text and "目標價" in text and "自己過去三年" in text and "EV/S" in text and "P/S" in text
+    source = (ROOT / "webapp" / "static" / "app.js").read_text(encoding="utf-8")
+    assert "VOCAB.plain_priced_in" in source and "太貴" not in source
+    assert source.count("= pricedInPlain();") == 2        # 首屏一次、稽核區一次（不數函式定義那一行）
+
+
 def test_stock_page_three_words_jump_to_the_audit_rows_on_the_same_page() -> None:
     """2026-09-30 使用者回饋（「這三個字是要我去候選板看詳細嗎？」）：細節在同一頁的稽核區——三個字可以點，
     稽核區與每一題都有錨點；連到候選板的那一句不再暗示細節在那裡。"""

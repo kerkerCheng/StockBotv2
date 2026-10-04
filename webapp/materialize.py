@@ -1697,7 +1697,7 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
     from alpha.absence import ABSENCE_KINDS, SETTLED_ABSENCE_KINDS
     from briefing.analyst_view.contracts import (
         ACCOUNTING_BASIS_DISPLAY, CORE_PANELS, OPTIONAL_PANELS, PLAIN_ABSENCE_SHORT, PLAIN_BET_UNITS,
-        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_READINESS,
+        PLAIN_LINE_LABELS, PLAIN_PANEL_TITLES, PLAIN_PRICED_IN, PLAIN_READINESS,
         PRICE_SERIES_NOTE, QUESTIONS,
         WEAK_INPUT_RULES,
     )
@@ -1714,6 +1714,8 @@ def write_vocabularies(store: ArtifactStore | None = None) -> Path:
         "plain_line_labels": dict(PLAIN_LINE_LABELS),
         "plain_absence_short": dict(PLAIN_ABSENCE_SHORT),
         "plain_bet_units": dict(PLAIN_BET_UNITS),
+        # 「已定價嗎」的白話（Phase 7 Step 7.0c）：首屏三個字底下與稽核區那一題的標題旁各印一次，APP 不留第二份
+        "plain_priced_in": PLAIN_PRICED_IN,
         "plain_readiness": {k: dict(v) for k, v in PLAIN_READINESS.items()},
         # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：plain_stance／plain_driver_labels／plain_multiple_derivation
         # 三份白話層隨估值鏈退役。

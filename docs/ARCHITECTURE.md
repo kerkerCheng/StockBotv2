@@ -432,7 +432,8 @@ digest 殘餘差異只能整批標 `context_digest`；行情 as-of 仍以 `bar_d
 Analyst View 的頭條那把尺、q4／q7 兩個問句、`briefing valuation／implied-return／entry` 三個子命令整組退役（G3：財務只回答三題，
 不得長回估值模型）。三本 ledger（估值假設／horizon／entry 判準）的檔案留在 `library/private/alpha/`（L10），不再消費；
 `CurrentPrice` 搬進 `market` section（現價是 A2 觀測，與估值無關）。**「已定價嗎」由 Phase 3 財務三題回答**，主參照是
-自己的歷史、不設門檻。三節原文逐字封存於 [`archive/2026-09-23-phase0-retired-sections.md`](archive/2026-09-23-phase0-retired-sections.md)。
+自己的歷史、不設門檻；給人讀的白話只有一份（`briefing/analyst_view/contracts.py::PLAIN_PRICED_IN` → `.meta.json` → 個股頁首屏與稽核區，
+Phase 7 Step 7.0c）。三節原文逐字封存於 [`archive/2026-09-23-phase0-retired-sections.md`](archive/2026-09-23-phase0-retired-sections.md)。
 
 ### 6.7 Analyst Consumer（`briefing/analyst_view/`，2026-09-07 Phase 2 Step 3.5 v1）
 
@@ -720,12 +721,17 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
 - 七格：`demand`／**`position`**（原 `supply`）／`bottleneck`／**`priced_in`**（原 `market_view`，必含 `{own_history_pctile}`）／`our_bet`／
   **`what_must_be_true`**（原 `if_right_if_wrong`，不得有價格或報酬）／`when`——**題目變了的格換 key**（L12）。placeholder 字彙拿掉已退役估值鏈的九個
   與帶參數的兩種，加三題稽核區的七個（`alpha/narrative/contracts.py::PLACEHOLDERS_V2`）。
+  **2026-10-04（Phase 7 Step 7.0c）**：`what_must_be_true` 的題目加「要翻倍需要什麼」（營收、出貨、產能或毛利要到多少、什麼時候——
+  回答五題的「押對了夠大嗎」而不用目標價），字彙加翻倍的起點兩個：`market_cap`（read model 的 `market_cap_settlement`：快照的 price × shares
+  × 名冊報價單位的換算係數——係數由 sources 從 `identity/currency.py` 查好注入，builder 不碰 identity；不做匯率）與 `revenue_ttm`（快照 TTM，日期是取數日）；`{price}` 與已定價的數字仍不得出現在這一格（型別層）。
+  不改 `record_version`、不改 id 欄位集合——既有紀錄逐位相同。
 - 結構化欄位（全部進 v2 的 id 欄位集合；v1 的集合一個字不動）：`rides[]`（騎的讀圖）、`disproof[]`（寫入即登記成 `brief:<id>#n` 語意 watch；
   已在盯的只以來源鍵 `link_source_ref` 連結）、`answers`（已定價嗎／出現在數字裡了嗎：yes／no／unmeasurable）、`candidate_state`
   （open／missing／priced_wait／pass；**held 不收**，由 Sheet 推導）、`history_not_comparable`、`acknowledged_touched[]`。
 - **寫入當下才成立的檢查只放寫入端**（`alpha/providers/briefs.py::v2_write_problems`）：讀圖現行（current／stale_low）、本公司在讀圖快照供給側、
-  answers 與稽核行一致、缺 X／等回落指向本公司 active 的 `wake_brief` watch、可開三前提、該重寫的 watch 逐條處置。放在 parse 路徑，
-  舊紀錄日後會解析失敗、從候選板安靜消失。
+  answers 與稽核行一致、缺 X／等回落指向本公司 active 的 `wake_brief` watch、可開三前提、該重寫的 watch 逐條處置、
+  **重押讀圖時格層 `evidence_refs` 不得指向同一節點同一單位已被取代的讀圖**（Phase 7 Step 7.0c；只拒收並列出該換成哪個 id，不自動改寫）。
+  放在 parse 路徑，舊紀錄日後會解析失敗、從候選板安靜消失。
 - **敘事來源的等待**：`wake_brief=<co:*>`（缺 X／等回落在等的事）與 `brief:` 語意 watch 醒來、觸及、到期都進佇列段 `narrative_rewrite`
   （`expiry_class=rewrite`，不鑄 pq2、不進假設對照）；換版與撤回只收 active 的。**watch 歸屬的唯一 SSOT** 是
   `engine_b/narrative_watches.py::attributed_watches`（以來源判，不以 entities；`candidate_state.watch_id` 不構成歸屬）。

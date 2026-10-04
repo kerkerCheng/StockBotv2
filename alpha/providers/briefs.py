@@ -257,6 +257,19 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
                                      current_brief=parsed, acknowledged=acked)
         if blocking:
             problems.append("open：還有待處置的反證 watch——" + "；".join(blocking))
+
+    # ⑦ 重押讀圖時格層引用跟著換（Phase 6 待決 #16，L18；Phase 7 Step 7.0c）：rides[] 押的是某節點、某單位的現行讀圖，
+    #   任何一格的 evidence_refs 就不得指向**同一節點同一單位**已被取代的讀圖——讀的人點進去會看到舊讀圖。
+    #   只拒收、列出是哪幾格與該換成哪一個 id；**不自動改寫 session 的文字或引用**。既有紀錄不動（append-only）。
+    current_by_ride = {(ride.node, ride.unit): ride.reading_id for ride in parsed.rides}
+    for slot in parsed.slots:
+        for ref in slot.evidence_refs:
+            old = ctx.readings_by_id.get(ref) if str(ref).startswith("sr_") else None
+            node, unit = getattr(old, "node", None), getattr(old, "unit", None)
+            current = current_by_ride.get((node, unit)) if node else None
+            if current and ref != current:
+                problems.append(f"{slot.key}：evidence_refs 的 {ref} 是 {node}（{unit}）已被取代的讀圖——"
+                                f"這版押的是 {current}，請換成它（不自動改寫）")
     return problems
 
 

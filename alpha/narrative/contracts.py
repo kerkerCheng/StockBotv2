@@ -156,9 +156,15 @@ BRIEF_FRAME_V2: Mapping[str, Mapping[str, str]] = {
         "do_not": "⚠ 賭的是一件可被反證的事，不是一個價格。",
     },
     "what_must_be_true": {
-        "question": "什麼必須為真？錯的訊號是什麼？",
-        "look_at": "disproof[]（每條都會自動登記成 watch）、讀圖與 thesis 的反證",
-        "do_not": "⚠ **不得有價格或報酬**（不得用 {price}、不得寫目標價）。⚠ 錯的訊號要是可觀測的條件，不是『情況變差』。",
+        # Phase 7 Step 7.0c（使用者 2026-10-04 Q6／A1 定案）：五題的第②題「押對了夠大嗎」住這一格——要翻倍，
+        # 營業數字要到多少、在什麼時候。它回答「押對了夠大嗎」，**不用目標價**。
+        "question": "什麼必須為真？**要翻倍需要什麼**（營收、出貨、產能或毛利要到多少、在什麼時候）？錯的訊號是什麼？",
+        "look_at": "disproof[]（每條都會自動登記成 watch）、讀圖與 thesis 的反證；翻倍的起點：{market_cap}（市值）、"
+                   "{revenue_ttm}（近四季營收）",
+        "do_not": "翻倍的起點可以用 {market_cap}；條件用營業數字（營收、出貨、產能、毛利）。"
+                  "⚠ **不寫目標價、股價、報酬率**；{price}、{own_history_pctile}、{cohort_median} 仍不得出現在這一格。"
+                  "⚠ 不算「倍數回到三年中位數時營收要多少才翻倍」——那一步會把贏家說服走（AXTI 照這樣算會得出要 40 倍營收）。"
+                  "⚠ 錯的訊號要是可觀測的條件，不是『情況變差』。",
     },
     "when": {
         "question": "什麼時候知道？（最近的裁決點）",
@@ -199,6 +205,9 @@ PLACEHOLDERS_V2: Mapping[str, str] = {
     # 只在個股頁稽核區印（`three_questions` 各行）；首屏要談就用文字描述，不引用數字。
     "in_numbers_latest": "出現在數字裡了嗎：序列最新一點的**年增率**（YoY；不是營收本身——寫「年增 {in_numbers_latest}」；最新一點沒有年增〔例：分部占比序列〕時印（尚無））",
     "in_numbers_as_of": "出現在數字裡了嗎：最新一點的日期",
+    # Phase 7 Step 7.0c：「要翻倍需要什麼」的起點。只給起點、不給目標——條件由寫敘事的人用營業數字寫在文字裡。
+    "market_cap": "翻倍的起點：市值（Engine C 快照的現價 × 流通股數，報價單位換成結算幣別、不做匯率換算；含幣別與日期）",
+    "revenue_ttm": "近四季營收（Engine C 快照的 TTM，財報幣別；日期是快照的取數日，不是財報期末）",
 }
 #: `what_must_be_true` 不得出現的 placeholder：價格與已定價的數字（「對了值多少」已退役，那一格只談條件）。
 WHAT_MUST_BE_TRUE_FORBIDDEN: frozenset[str] = frozenset({

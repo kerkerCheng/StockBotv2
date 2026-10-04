@@ -323,10 +323,21 @@ def _three_question_values(three_questions: Mapping[str, Any] | None) -> dict[st
     }
 
 
+def _dated_money(datum: Datum | None, currency: str | None, *, basis: str | None = None) -> str | None:
+    """金額＋幣別＋日期（「37.6 億 USD（2026-10-02）」）。**幣別答不出來就不給值**——沒有幣別的金額會差 100 倍
+    （AGENTS「報價單位 ≠ 結算幣別」），寧可印「（尚無）」。"""
+    if datum is None or datum.value is None or not currency:
+        return None
+    when = datum.as_of.isoformat() if isinstance(datum.as_of, date) else "日期未知"
+    return f"{format_value('money', datum.value, unit=currency)}（{basis + ' ' if basis else ''}{when}）"
+
+
 def _brief_values(*, price: Datum, consensus: ConsensusSection,
                   catalysts: CatalystSection, today: date,
                   gap: ExpectationGapSection | None = None,
-                  three_questions: Mapping[str, Any] | None = None) -> dict[str, str | None]:
+                  three_questions: Mapping[str, Any] | None = None,
+                  fundamentals: Sequence[Datum] = (),
+                  reporting_currency: str | None = None) -> dict[str, str | None]:
     """placeholder → 已格式化字串。**純選取＋格式化**：每個值都指得回一個既有 Datum。
 
     ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：`base_target`／`base_return`／`value_date` 的來源
@@ -363,6 +374,12 @@ def _brief_values(*, price: Datum, consensus: ConsensusSection,
                      and isinstance(gap.gap_closure.value, Mapping) else None)
     values["gap_closure"] = closure_phrase(closure_value)
     values.update(_three_question_values(three_questions))
+    # 「要翻倍需要什麼」的起點（Phase 7 Step 7.0c）：選取財報觀測既有的兩格，不在這裡算
+    fund = {d.key: d for d in fundamentals}
+    cap = fund.get("market_cap_settlement")
+    values["market_cap"] = _dated_money(cap, cap.unit if cap is not None else None)
+    # 營收的日期是快照的取數日，不是財報期末——寫明「快照」，不讓它看起來像期末日（INV-6）
+    values["revenue_ttm"] = _dated_money(fund.get("revenue_ttm"), reporting_currency, basis="近四季，快照")
     return values
 
 
@@ -373,6 +390,8 @@ def _investor_brief_section(
     refresh_overall: str, gap: ExpectationGapSection | None = None,
     three_questions: Mapping[str, Any] | None = None,
     names: Mapping[str, str] | None = None,
+    fundamentals: Sequence[Datum] = (),
+    reporting_currency: str | None = None,
 ) -> InvestorBriefSection:
     # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：那把尺（現價／沒賭對／賭對／判斷錯了）整格退役。**
     # ROADMAP「個股頁／首屏」那一列明文「拿掉」。它是這個 section 唯一讀 `ir`／`payoff`／`downside`
@@ -395,7 +414,8 @@ def _investor_brief_section(
                                     brief_id=None, is_not=BRIEF_IS_NOT,
                                     rides=_rides_datum(None, names or {}, reason=why))
     values = _brief_values(price=price, consensus=consensus, catalysts=catalysts, today=today, gap=gap,
-                           three_questions=three_questions)
+                           three_questions=three_questions, fundamentals=fundamentals,
+                           reporting_currency=reporting_currency)
     filled, absent = fill_brief(brief, values)
     labels = slot_labels(brief.record_version)
     slots: list[Datum] = []
@@ -1274,6 +1294,12 @@ def build_alpha_investment_view(
     fund_as_of = _freshness_as_of(build, "fundamentals")
     market_as_of = m.bar_date or _freshness_as_of(build, "market")
     quote_price_unit = f"quote_unit（{quote_unit or '未知'}）"
+    # 市值換成結算幣別（Phase 7 Step 7.0c，敘事「要翻倍需要什麼」的起點）：係數由 sources 從 identity.currency 查好注入
+    # （GBp → 0.01；builder 是純函式，不碰 identity）——報價單位未登記就沒有係數、fail closed，不猜、不做 FX。
+    settlement_currency = identity.get("settlement_currency")
+    factor = identity.get("quote_to_settlement_factor")
+    market_cap_settlement = (m.market_cap * float(factor)
+                             if factor is not None and settlement_currency and m.market_cap is not None else None)
     fundamentals_items = (
         _observation("price", "價格", m.price, authority=A_SNAP, unit=quote_price_unit,
                      as_of=market_as_of, freshness=market_fresh, evidence_refs=market_refs,
@@ -1288,6 +1314,12 @@ def build_alpha_investment_view(
                      freshness=market_fresh, evidence_refs=market_refs,
                      method="provider 導出：price × shares_outstanding；報價單位≠結算幣別時會差 100 倍",
                      missing_reason="缺 price 或 shares_outstanding"),
+        _observation("market_cap_settlement", "市值（結算幣別）", market_cap_settlement,
+                     authority=A_SNAP, unit=settlement_currency,
+                     as_of=market_as_of, freshness=market_fresh, evidence_refs=market_refs,
+                     method="上一格 × 名冊報價單位的換算係數（identity.currency，由 sources 注入）；不做匯率換算",
+                     missing_reason=("缺 price 或 shares_outstanding" if m.market_cap is None
+                                     else f"報價單位 {quote_unit or '（名冊沒有）'} 未登記——不猜（fail closed）")),
         _observation("gross_margin", "毛利率（TTM）", f.gross_margin, authority=A_SNAP,
                      unit="ratio", as_of=fund_as_of, freshness=fund_fresh,
                      evidence_refs=snapshot_refs),
@@ -1874,6 +1906,7 @@ def build_alpha_investment_view(
         price=market_section.price, consensus=consensus_section, catalysts=catalyst_section,
         refresh_overall=refresh_section.overall, gap=expectation_gap_section,
         three_questions=three_questions, names=dict((narrative_context or {}).get("node_names") or {}),
+        fundamentals=fundamentals_section.items, reporting_currency=reporting_currency,
         )
 
     return AlphaInvestmentView(
