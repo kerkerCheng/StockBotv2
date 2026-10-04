@@ -137,10 +137,11 @@ def _cmd_list(args: argparse.Namespace) -> int:
         rows = [lead for lead in rows if not is_radar_lead(lead)] + radar_rows
         rows = rows[:limit]
         skipped = total - len(rows)
+        radar_in_batch = sum(1 for lead in rows if is_radar_lead(lead))
         note = (f"（分類層每日上限 {limit}：本批 {len(rows)} 則"
                 + (f"，**還有 {skipped} 則沒進本批**，明天或互動 session 再處理）" if skipped
                    else "，未達上限）")
-                + (f"；外部雷達 {len(radar_rows)} 則排在最後" if radar_rows else ""))
+                + (f"；外部雷達 {len(radar_rows)} 則排在最後（進本批 {radar_in_batch} 則）" if radar_rows else ""))
         # json 模式印到 stderr，不污染 stdout 的 JSON（呼叫端可能直接 pipe 給 jq）
         print(note, file=sys.stderr if args.json else sys.stdout)
     if args.json:

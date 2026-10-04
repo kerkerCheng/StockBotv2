@@ -319,7 +319,7 @@ def test_the_triage_batch_puts_radar_leads_after_every_other_lead_before_the_cap
     out = capsys.readouterr()
     rows = json.loads(out.out)
     assert code == 0 and [r["source"] for r in rows] == ["rss:x", "rss:x", "rss:x"]   # 提到持股也不擠掉 harvest 的
-    assert "外部雷達 1 則排在最後" in out.err and "還有 1 則沒進本批" in out.err
+    assert "外部雷達 1 則排在最後（進本批 0 則）" in out.err and "還有 1 則沒進本批" in out.err   # R2-b：印實際進批數
 
 
 # ---------------------------------------------------------------------------
