@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1437424/000117184326003413/exh_991.htm
+
+Excerpt:
+[EXCERPT — SEC filing 新聞稿附件之有限逐字引文] POET 6-K Exhibit 99.1（accession 0001171843-26-003413）
+Source: https://www.sec.gov/Archives/edgar/data/1437424/000117184326003413/exh_991.htm
+Published: 2026-05-14 | Origin: POET Technologies and Lumilens (joint press release) | Retrieved: 2026-10-04
+
+第 1 段："POET Technologies Inc. ("POET" or the "Company") (NASDAQ: POET), a leader in highly integrated optical engines and light sources for AI networks, and Lumilens Inc. ("Lumilens"), an emerging leader in high-performance scale-up and scale-out optical interconnects for AI workloads, today announced they have entered into a supply agreement that establishes a strategic joint development and commercial technology partnership"
+供貨協議與初始訂單段："Lumilens has placed an initial purchase order with POET for the manufacturing of EOI-based engines valued at $50 million. This purchase order represents the first phase of a broader supplier relationship that could scale to $500+ million in cumulative purchases from POET over five years."
+認股權證段："In connection with the supply agreement, and to align both companies to the long-term value created through the partnership, POET has granted Lumilens a warrant to purchase up to 22,921,408 common shares. The warrant is immediately exercisable for 2,292,140 shares, with the remaining shares vesting and becoming exercisable in tranches based on cumulative payments by Lumilens toward future purchase orders totaling up to $500 million. The warrant is exercisable over nine years at an exercise price of $8.25 per share."
+路線圖與時程段："Fulfilment of the purchase orders and associated revenues is subject to the successful development and ultimate qualification of the modules, as well as the successful scaling of manufacturing capability. Engineering samples from this joint development program are expected in late 2026, with production ramp aligned to hyperscaler customer deployments in 2027."
