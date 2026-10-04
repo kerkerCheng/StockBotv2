@@ -172,9 +172,11 @@
 - 研究產出：（尚無）
   - 2026-10-04｜decompose 收據見 P1（同一次拆解）；本段的研究題目（pq1，triaged_go）：lead_21b7830d（GOES）、lead_188e1fa1（測試產能）、lead_e0948fc0（有載分接開關；德國那一家要具名）、lead_857be4a6（高壓套管）、lead_bf2fb4a7（CTC 銅導線）
   - 2026-10-04｜補一題 lead_de46bc48（變壓器絕緣材料；買方端一手：Forgent S-1「we rely on a single supplier for certain specialized insulation material used in our transformer products」）；[687] 把 GOES、CTC、分接開關、套管、絕緣材料、測試產能六個上游層建成節點（供給側只有 GOES 一家美國廠，其餘零供應商＝走圖的洞）
+  - 2026-10-04｜pq1 drain 第一條 lead_21b7830d（GOES）→ `ra_a4864a6a92163da08b4f6eb529081fab` → pq2 **[691]**：JFE 2025-08-04 新聞稿（JSW JFE 印度合資：前 thyssenkrupp 印度廠、5 萬 → 25 萬噸／年 2028–2030，另一廠 10 萬噸 2027）＋Cliffs 2026 Q2 10-Q（產品清單逐字含 GOES；「Transformers are in short supply … exacerbated by the anticipated widespread adoption of AI」）；名冊三筆隨包（合資 null、co:jfe_holdings 5411.T、co:jsw_steel JSWSTEEL.NS）。查無一手：題材掃描說的 Cliffs Weirton 變壓器廠（10-Q 只有 Weirton tinplate 停產）、現代製鐵 2026-04 北美 GOES 協議（只見市場研究稿、韓文新聞 0 則）。**對 H5 (ii) 的初步證據：GOES 供給側是鋼鐵巨頭（Cliffs、JFE、JSW）與私人合資，沒有看到非共識、可投資的標的**（7.4 寫結論）；美國 LPT 用的 DOE 規格級 GOES（日韓德）的具名廠商與其美國客戶仍未入圖
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
 - failure log：（尚無）
   - #9（同 P1）
+  - #10（[691] 合資股東的新聞稿被分類成外部印證；與 C1 [690] 同形）
 
 ## P3 800VDC 擱置五則回看
 
@@ -199,6 +201,7 @@
 - 2×2：尚未到裁決點
 - failure log：（尚無）
   - #9（同 P1）
+  - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
 
 ## X1 已定價回放（R1）
 
