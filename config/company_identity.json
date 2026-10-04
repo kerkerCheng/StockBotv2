@@ -115,6 +115,19 @@
       "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3a：Coherent OFC 2026-03-17 法說逐字「This was announced by Arista and ourselves and a bunch of other partners」（coherent-corp-cohr-discusses-photonics-innovation-and-data-center-communications-at-ofc_march_17 s18）；全圖逐字整詞比對「Arista」命中 1 段、講的都是 Arista Networks（docs/reports/2026-10-03-phase6-baseline.md §17）"
     },
     {
+      "company_id": "co:asia_vital_components",
+      "research_ticker": "3017.TW",
+      "market_currency": "TWD",
+      "display_name": "Asia Vital Components Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-04）；NVIDIA 新聞稿「Asia Vital Components (AVC)」",
+      "_note": "別名含 AVC（NVIDIA 引言只寫 AVC）",
+      "name_aliases": [
+        "Asia Vital Components",
+        "AVC",
+        "奇鋐"
+      ]
+    },
+    {
       "company_id": "co:ats",
       "research_ticker": "ATS.VI",
       "market_currency": "EUR",
@@ -255,6 +268,52 @@
       "_name_aliases_source": "2026-10-03 Phase 6 Step 6.3c：官網 credosemi.com 頁尾「©2026 Credo, Inc.」、全頁自稱「Credo」；10-K Exhibit 21.1 子公司「Credo Semiconductor Inc.（California）」（https://www.sec.gov/Archives/edgar/data/0001807794/000162828026043303/a211subsidiariesoftheregis.htm）——庫內 credo_npo_vs_cpo_20260821 的 origin 就是這個寫法；全圖逐字兩個寫法命中 0（baseline §17.3）"
     },
     {
+      "company_id": "co:danfoss",
+      "research_ticker": null,
+      "display_name": "Danfoss",
+      "_display_name_source": "NVIDIA 新聞稿 2024-06-02「Kim Fausing, CEO at Danfoss」",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）",
+      "name_aliases": [
+        "Danfoss"
+      ]
+    },
+    {
+      "company_id": "co:delta_electronics",
+      "research_ticker": "2308.TW",
+      "market_currency": "TWD",
+      "display_name": "Delta Electronics, Inc.",
+      "_display_name_source": "yfinance longName（2026-10-05）；年報「台達」",
+      "_note": "不放單字別名「Delta」：名冊已有 co:delta_star（Delta Star），整詞比對會誤中（Phase 7 failure log #4 的形狀）",
+      "name_aliases": [
+        "Delta Electronics",
+        "Delta Electronics, Inc.",
+        "台達",
+        "台達電"
+      ]
+    },
+    {
+      "company_id": "co:delta_star",
+      "research_ticker": null,
+      "display_name": "Delta Star",
+      "_display_name_source": "DOE 2022 Electric Grid Supply Chain Review p.13 逐字",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）",
+      "name_aliases": [
+        "Delta Star"
+      ]
+    },
+    {
+      "company_id": "co:dover",
+      "research_ticker": "DOV",
+      "market_currency": "USD",
+      "display_name": "Dover Corporation",
+      "_display_name_source": "yfinance longName（2026-10-04）；NVIDIA 新聞稿「Dover Corporation’s CPC」",
+      "_note": "Colder Products Company（CPC）以別名併入母公司（比照 HICO）；不放單詞「CPC」",
+      "name_aliases": [
+        "Dover Corporation",
+        "Colder Products Company"
+      ]
+    },
+    {
       "company_id": "co:ecolab",
       "research_ticker": "ECL",
       "market_currency": "USD",
@@ -295,6 +354,18 @@
       "display_name": "FOCI Fiber Optic Communications, Inc.",
       "name_aliases": [
         "FOCI"
+      ]
+    },
+    {
+      "company_id": "co:fositek",
+      "research_ticker": "6805.TW",
+      "market_currency": "TWD",
+      "display_name": "Fositek Corp.",
+      "_display_name_source": "yfinance longName（2026-10-04）；年報「富世達」",
+      "_note": "奇鋐（co:asia_vital_components）是集團母公司（年報自述）",
+      "name_aliases": [
+        "Fositek",
+        "富世達"
       ]
     },
     {
@@ -340,6 +411,22 @@
       "display_name": "Harmonic Drive Systems Inc."
     },
     {
+      "company_id": "co:hd_hyundai_electric",
+      "research_ticker": "267260.KS",
+      "market_currency": "KRW",
+      "display_name": "HD Hyundai Electric Co., Ltd.",
+      "_display_name_source": "HD Hyundai 新聞稿 2026-03-07；DART 公告 HD현대일렉트릭",
+      "_note": "美國子公司 HD Hyundai Power Transformers USA（DOE 寫 Hyundai Power Transformers USA）與 HD Hyundai Electric America Corporation 以別名併入（比照 co:hyosung_heavy_industries／HICO）",
+      "name_aliases": [
+        "HD Hyundai Electric",
+        "HD현대일렉트릭",
+        "Hyundai Power Transformer",
+        "Hyundai Power Transformers USA",
+        "HD Hyundai Power Transformers USA",
+        "HD Hyundai Electric America Corporation"
+      ]
+    },
+    {
       "company_id": "co:hexagon",
       "research_ticker": "HEXA-B.ST",
       "market_currency": "SEK",
@@ -355,6 +442,18 @@
       "display_name": "Himax Technologies, Inc.",
       "name_aliases": [
         "Himax"
+      ]
+    },
+    {
+      "company_id": "co:hitachi",
+      "research_ticker": "6501.T",
+      "market_currency": "JPY",
+      "display_name": "Hitachi, Ltd.",
+      "_display_name_source": "DOE 2022 p.13「Hitachi Energy, formerly known as Hitachi ABB」——Hitachi Energy 是 Hitachi, Ltd. 的子公司",
+      "_note": "Hitachi Energy 以別名併入上市母公司；不放單詞「Hitachi」（前 Hitachi Metals＝co:proterial 等會誤中）",
+      "name_aliases": [
+        "Hitachi Energy",
+        "Hitachi ABB"
       ]
     },
     {
@@ -437,6 +536,31 @@
       "_display_name_source": "SEC 10-Q 2026-06-30 封面 dei:EntityRegistrantName「JABIL INC」；只做排版正規化（大小寫照公司自身用法、去 EDGAR 州別尾綴）"
     },
     {
+      "company_id": "co:jentech_precision",
+      "research_ticker": "3653.TW",
+      "market_currency": "TWD",
+      "display_name": "Jentech Precision Industrial Co., Ltd",
+      "_display_name_source": "yfinance longName（2026-10-04）",
+      "name_aliases": [
+        "Jentech",
+        "Jentech Precision Industrial",
+        "健策"
+      ]
+    },
+    {
+      "company_id": "co:jfe_holdings",
+      "research_ticker": "5411.T",
+      "market_currency": "JPY",
+      "display_name": "JFE Holdings, Inc.",
+      "_display_name_source": "JFE Holdings IR（電工鋼事業策略簡報 2024-10-24 版權列「JFE Holdings, Inc.」）",
+      "_note": "營運子公司 JFE Steel Corporation（100%）以別名併入（比照 co:hyosung_heavy_industries／HICO）；不放單詞「JFE」以免合資公司名誤中",
+      "name_aliases": [
+        "JFE Holdings",
+        "JFE Steel",
+        "JFE Steel Corporation"
+      ]
+    },
+    {
       "company_id": "co:jl_mag",
       "research_ticker": "6680.HK",
       "market_currency": "HKD",
@@ -450,6 +574,29 @@
       ]
     },
     {
+      "company_id": "co:jsw_jfe_electrical_steel_nashik",
+      "research_ticker": null,
+      "display_name": "JSW JFE Electrical Steel Nashik Private Limited",
+      "_display_name_source": "JFE Steel 新聞稿 2025-08-04 逐字",
+      "_note": "JFE Steel 50%／JSW Steel 50% 的印度 GOES 合資公司；前身 thyssenkrupp Electrical Steel India（2025-01 被收購）；非上市，研究 ticker 明確 null（INV-1）",
+      "name_aliases": [
+        "J2ES Nashik",
+        "JSW JFE Electrical Steel Nashik Private Limited"
+      ]
+    },
+    {
+      "company_id": "co:jsw_steel",
+      "research_ticker": "JSWSTEEL.NS",
+      "market_currency": "INR",
+      "display_name": "JSW Steel Limited",
+      "_display_name_source": "JFE Steel 新聞稿 2025-08-04 持股表「JSW Steel Limited: 50%」",
+      "_note": "不放單詞「JSW」以免合資公司名誤中（failure log #4 的形狀）",
+      "name_aliases": [
+        "JSW Steel",
+        "JSW Steel Limited"
+      ]
+    },
+    {
       "company_id": "co:jx_advanced_metals",
       "research_ticker": "5016.T",
       "market_currency": "JPY",
@@ -458,6 +605,17 @@
       "name_aliases": [
         "JX Metals",
         "JX Nippon Mining & Metals"
+      ]
+    },
+    {
+      "company_id": "co:kaori",
+      "research_ticker": "8996.TW",
+      "market_currency": "TWD",
+      "display_name": "Kaori Heat Treatment Co., Ltd.",
+      "_display_name_source": "yfinance longName（2026-10-04）；年報「高力」",
+      "name_aliases": [
+        "Kaori",
+        "高力"
       ]
     },
     {
@@ -649,6 +807,16 @@
       "_display_name_source": "自家新聞稿逐字（庫內 newphotonics_npc50506_2026_09_09）"
     },
     {
+      "company_id": "co:niagara_power_transformer",
+      "research_ticker": null,
+      "display_name": "Niagara Power Transformer",
+      "_display_name_source": "DOE 2022 p.14 逐字",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）",
+      "name_aliases": [
+        "Niagara Power Transformer"
+      ]
+    },
+    {
       "company_id": "co:nidec",
       "research_ticker": "6594.T",
       "market_currency": "JPY",
@@ -743,12 +911,35 @@
       "_display_name_source": "SEC 10-Q 2026-09-11 封面 dei:EntityRegistrantName「Oracle Corporation」"
     },
     {
+      "company_id": "co:pennsylvania_transformer_technology",
+      "research_ticker": null,
+      "display_name": "Pennsylvania Transformer Technology",
+      "_display_name_source": "DOE 2022 p.14 逐字",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）",
+      "name_aliases": [
+        "Pennsylvania Transformer Technology"
+      ]
+    },
+    {
       "company_id": "co:poet_technologies",
       "research_ticker": "POET",
       "market_currency": "USD",
       "display_name": "POET Technologies Inc.",
       "name_aliases": [
         "POET"
+      ]
+    },
+    {
+      "company_id": "co:prolec_ge",
+      "research_ticker": null,
+      "display_name": "Prolec GE",
+      "_display_name_source": "DOE 2022 p.14「acquired by GE Prolec」；圖 7 標「GE Prolec (SPX)」",
+      "_note": "DOE 2022：GE 與 Xignux 50/50 合資的子公司，2021 年底收購 SPX Transformer Solutions（以別名併入收購方）；之後的股權變動未核實，研究 ticker null",
+      "name_aliases": [
+        "GE Prolec",
+        "Prolec GE",
+        "SPX Transformer Solutions",
+        "SPX Transformers"
       ]
     },
     {
@@ -969,6 +1160,18 @@
       "execution_venue": "NASDAQ",
       "display_name": "USA Rare Earth, Inc.",
       "_display_name_source": "SEC 10-K FY2025 封面 Exact name of registrant「USA Rare Earth, Inc.」（CIK 1970622；https://www.sec.gov/Archives/edgar/data/1970622/000197062226000021/usar-20251231.htm）"
+    },
+    {
+      "company_id": "co:virginia_transformer",
+      "research_ticker": null,
+      "display_name": "Virginia Transformer",
+      "_display_name_source": "DOE 2022 p.13–14 逐字（Virginia Transformers／Virginia Transformer Technology）",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）；DOE 寫前身 EFACEC",
+      "name_aliases": [
+        "Virginia Transformer",
+        "Virginia Transformers",
+        "Virginia Transformer Technology"
+      ]
     },
     {
       "company_id": "co:vpec",
