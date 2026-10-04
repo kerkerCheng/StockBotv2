@@ -185,6 +185,10 @@
 - 登記：registration §2 P3（開題 2026-10-04）
 - 研究產出：（尚無）
   - 2026-10-04｜（給 7.4 的指向，不是裁決）NVIDIA 部落格「NVIDIA, Partners Drive Next-Gen Efficient Gigawatt AI Factories in Buildup for Vera Rubin」（blogs.nvidia.com，2025 OCP）逐字列 800 VDC 夥伴——silicon：ADI、AOS、EPC、Infineon、Innoscience、MPS、Navitas、onsemi、Power Integrations、Renesas、Richtek、ROHM、STMicroelectronics、Texas Instruments；power system components：BizLink、Delta、Flex、GE Vernova、Lead Wealth、LITEON、Megmeet；data center power systems：ABB、Eaton、GE Vernova、Heron Power、Hitachi Energy、Mitsubishi Electric、Schneider Electric、Siemens、Vertiv。是客戶端（平台方）的生態名單——對五則的 park 理由（例：「ecosystem membership is not a supply contract」）正好是那個理由描述的東西，回看時要分清「名單」與「供貨」
+  - 2026-10-05｜（給 7.4 的指向，不是裁決）題材掃描 lead_b050a3ee（台達 2026-09-29 PR Newswire：800 VDC In-Row Power「for the fast deployment and scalability of AI data centers based on
+    NVIDIA Vera Rubin architecture」、keynote 談「Delta Electronics' collaboration with NVIDIA and the roadmap for 800VDC power architecture」）→ park（`original_obtained`，觸發欄寫「無」）：
+    供應商自報的產品發表與合作字樣，**不補 lead_fa672a29 的缺口**（supplier relationship not proven）；台達 2025 年報同樣只寫已發展 19 吋 90kW DC/DC 機架式電源
+    （800VDC 降 50／48VDC）與列間 1MW 800VDC 電源系統，沒有具名客戶。PR 的散熱段轉給 C1（[697]）
 - 逐則（park 理由今天站不站得住；H2 的「證實」定義）：（尚無）
 - failure log：（尚無）
 
@@ -202,6 +206,11 @@
   - 2026-10-04｜pq1 drain 快接頭題 lead_6698f145 → `ra_ee1d0eef3fd7e0d3f03c02aa1ef632cd` → pq2 **[695]**：**富世達（6805.TW，邊緣：約新台幣 1,580 億、9 位）**2025 年報（MOPS，2026-05-07）自述 UQD「通過水冷供應認證並切入 GB200/GB300」、「冷水板+UQD」切入北美四大 CSP、「已通過 Rubin 測試並挑戰國際大廠壟斷地位」；伺服器產品組件營收 5.31% → 36.29%（含滑軌，快接頭占比未揭露）；集團母公司奇鋐（e2）。題目要找的反例（NVIDIA 指定盲插件只有少數幾家通過）**沒找到客戶端一手**——供應商說既有國際大廠寡占、NVIDIA 說刻意多源，形狀是少數認證廠＋新進者；折疊手機轉軸仍占 56%，快接頭不是主業（進主題組前要先判斷）
   - 2026-10-04｜pq1 drain CDU 題 lead_f96bfb99 → `ra_7601b10717ea4855869caeb026e380c6` → pq2 **[696]**：**高力（8996.TW，邊緣：約新台幣 1,400 億、7 位）**2025 年報（股東會後修訂本，MOPS 2026-08-06）自述液冷「分岐管和冷卻液分配裝置，成功攻入 GB200 供應鏈名單」、子公司高力熱能科技「積極投入高效能 Manifold、CDU、Radiator…並透過取得主要客戶之產品認證」（認證仍在進行，所以 qualification 不填）；分歧管改真空爐硬焊「能突破產能瓶頸」；合併營業比重板式熱交換器 26.28%、熱能產品 73.72%（液冷與燃料電池零件沒拆開——燃料電池那塊年報說受惠美國電力市場，是另一條 AI 電力題）。至此 C1 的四個 decompose 題都到終局（[693]–[696] 待核准），散熱兩層讀圖等這幾包入圖後再寫
   - 2026-10-04｜讀圖**刻意延後**：`tech:coolant_distribution_unit`、`tech:liquid_cooling_cold_plate` 兩層各只有 1 條需求接線與 1 條供貨（CoolIT，非上市），現在寫只會是空的 undecided——為了驗收①的計數補格子正是 L19 的形狀。等 lead_f96bfb99（CDU）／lead_5b8cc7e2（冷板）的供給側研究有實料再讀；驗收①的散熱這一條目前未成立
+  - 2026-10-05｜冷板、CDU 兩層的供給側補大型股：定向 lead_a03a034a → `ra_0f423ab9e5cf9d9fef9c6c28335682c5` → pq2 **[697]**：**台達（2308.TW，大型股，約新台幣 4.9 兆，不是候選）**
+    2025 年報（MOPS 2026-05-08）自述液冷「由板端冷板模組延伸至系統端冷卻架構…搭配…冷卻液分配控制器(CDU)」「相關液冷散熱產品亦持續擴大於資料中心場域之應用與出貨」、
+    液冷系統業務是「114 年台達最重要的成長動能之一」→ 冷板、CDU 各一條自報供貨邊；名冊 `co:delta_electronics` 隨包 staged（**不放單字別名 Delta**：名冊已有 co:delta_star，#4 的形狀）。
+    為什麼補大型股：讀圖的兩半引用與走圖的「薄層沒人讀」「供給側未填」都數圖上的供給側——只有 CoolIT 和邊緣廠時兩層會被算薄（高力包 [696] 寫的「讀圖時不得讀成薄層」是要人記得的段落；入圖才會自己出現）。
+    ⚠ [698] 是同一包重跑 prepare 的重複號（digest 相同），請 drop（failure log #3 第 3 次）。指路：題材掃描 lead_b050a3ee（台達 2026-09-29 PR：VR NVL72 專用冷板、HVDC 3.6MW in-row CDU——同一家自報的產品展示，不另入）；CDU 層的 Vertiv 等仍未入，讀圖寫「已知至少」
   - 主題等權組：還沒定——組員要能在名冊解析（INV-1），台股散熱公司目前 0 家在名冊；組員等選源找出各層坐了誰再定（仍早於本鏈第一份敘事）
 - 主題等權組（散熱；必須早於本鏈第一份敘事）：（尚無）
 - 裁決：（尚無）
@@ -210,6 +219,7 @@
   - #9（同 P1）
   - #10（[690] CoolIT 的兩條供貨邊印 externally_corroborated——文件是收購方 Ecolab 發的）
   - #11（[694] NVIDIA 自己的 depends_on 被預告成「供應商自報」——買方自述與供應商自誇共用一個值）
+  - #3（[698] 是 [697] 重跑 prepare 的重複號，內容逐位相同）
 
 ## X1 已定價回放（R1）
 
