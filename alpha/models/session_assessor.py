@@ -225,7 +225,7 @@ def _brief_frame() -> dict[str, Any]:
             "link_source_ref）、answers（已定價嗎／出現在數字裡了嗎）、candidate_state（缺 X／等回落要先用 "
             "`python -m engine_b.event_watch add --wake-brief <co:*> …` 建好 watch）、confirm[]（**加碼條件**：「這件事發生＝"
             "結構被確認了」——客戶自己的文件點名它、合格走到量產、數字出現在營收裡；寫入即登記成 watch、有到期；觸及只提醒，"
-            "**不是買進訊號、不改候選狀態**；選填）。存檔：python -m alpha brief <T> --add spec.json"),
+            "**不是買進訊號、不改候選狀態**；契約上是選填欄，但持有或可開的敘事要寫——ROADMAP Phase 7 驗收②）。存檔：python -m alpha brief <T> --add spec.json"),
         "slots": [{"key": k, "label": v, **BRIEF_FRAME_V2[k]} for k, v in BRIEF_SLOTS_V2],
         "placeholders": dict(PLACEHOLDERS_V2),
         "forbidden_terms": list(FORBIDDEN_TERMS),

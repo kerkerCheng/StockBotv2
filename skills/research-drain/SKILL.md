@@ -115,7 +115,7 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 - ⓓ **加碼條件**（`confirm[]`、watch 帶 `condition_role=confirm`，2026-10-04 Phase 7 Step 7.0d）也走這一段：
   **觸及＝「結構確認了」的提醒，不是買進訊號**——新的一版以 `confirmed` 處置，在敘事裡寫明確認了什麼、候選狀態換不換
   （系統不自動改）；**到期沒觸及**＝「確認事件沒在期限內發生」，本身就是資訊，照實處置（`still_holds`／`thesis_changed`／`retired`）。
-  它不是反證：不算進「反證：在盯／觸及」，也不擋可開。它是選填欄，寫不寫由研究判斷（形狀見 packet 的 `brief_frame.spec_shape`）。
+  它不是反證：不算進「反證：在盯／觸及」，也不擋可開。契約上是選填欄（寫入端不擋），但**持有或可開的敘事要寫**——ROADMAP Phase 7 驗收②「持有或可開的另有加碼條件」；形狀見 packet 的 `brief_frame.spec_shape`。
 
 以下是**三段固定**：
 
