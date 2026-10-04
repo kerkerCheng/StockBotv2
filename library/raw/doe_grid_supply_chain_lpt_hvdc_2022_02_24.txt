@@ -1,0 +1,23 @@
+Source URL: https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf
+
+Excerpt:
+[EXCERPT — 美國政府公開報告之有限逐字引文] U.S. DOE, Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems
+Source: https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf
+Published: 2022-02-24（封面「February 24, 2022」）| Origin: U.S. Department of Energy | Retrieved: 2026-10-04
+
+報告 p.9（PDF 第 24 頁）2.1.2.1 Large Power Transformers："Cores, also known as laminations, are made from high-permeability and domain-refined GOES (Waukesha Transformers, 2022)."
+報告 p.11（PDF 第 26 頁）2.1.2.3 Continuously Transposed Conductor："This is the final product and is referred to as CTC at this point which is used to create the winding of an LPT."
+報告 p.11（PDF 第 26 頁）2.1.2.5 Tap Changers："A transformer tap changer is a component designed to change the output voltage of a transformer by changing the turns ratio between the primary and secondary winding."
+報告 p.12（PDF 第 27 頁）2.1.2.6 Bushings："Bushings provide the electrical connection between a transformer and the electrical transmission network."
+報告 p.12（PDF 第 27 頁）2.1.2.7 Insulating Material："The most common insulating material in LPTs is pressboard."
+報告 p.20（PDF 第 35 頁）2.1.6 Transformer Supply Chain Bottlenecks in the United States："Currently, there are two major bottlenecks in the LPT supply chain. The first one is in the U.S. GOES production capacity. The second one is in the testing capacity of LPT manufacturers."
+報告 p.21（PDF 第 36 頁）2.1.6（續）："Of those, only Japan, South Korea, and Germany can produce the GOES at the specifications outlined by current Department of Energy (DOE) standards"
+報告 p.21（PDF 第 36 頁）2.1.6（續）："Test space can be a key limiting factor in LPT production capability when each facility/manufacturer only has 1 – 2 test beds to produce various ratings of power transformers."
+報告 p.15（PDF 第 30 頁）2.1.4.1 GOES："leaving Cleveland-Cliffs with manufacturing facilities in Zanesville, Ohio and Butler, Pennsylvania as the sole GOES producer in the United States"
+報告 p.14（PDF 第 29 頁）2.1.4.1 U.S. LPT 製造商清單："Hyosung Heavy Industries (HICO) acquired Mitsubishi facility in Memphis, Tennessee in 2019 (Walton, 2019). They have capability up to 1000 MVA and 765 kV"
+報告 p.21（PDF 第 36 頁）2.1.6（續）："Stakeholders indicated that tap changers could also be a bottle neck. There are three domestic suppliers and one reliable supplier from Germany. However, German tap changers are much more costly and have a longer lead time."
+報告 p.21（PDF 第 36 頁）2.1.6（續）："It has been observed that high-voltage bushings often have a long lead time of up to five months (U.S. Department of Energy, 2014)."
+報告 p.21（PDF 第 36 頁）2.1.6（續）："Imports account for 82% of the consumption of LPTs in 2019."
+報告 p.20（PDF 第 35 頁）2.1.6："Some interviewees estimated that domestic supply meets about 20% of domestic demand"
+報告 p.11（PDF 第 26 頁）2.1.2.2（續）："HI-B grade with domain-refined grade is highly demanded by LPT manufacturers because of its low core loss to reduce LPT weight."
+（PDF 文字層有字間空格殘影；引文照頁面字形，2026-10-04 逐頁讀圖核對）
