@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/31462/000110465926032446/tm269446d1_ex99-1.htm
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] Ecolab 8-K Ex.99.1（2026-03-20）：Ecolab to Acquire CoolIT Systems, a Global Leader in Advanced Liquid Cooling for Next-Gen AI Data Centers
+Source: https://www.sec.gov/Archives/edgar/data/31462/000110465926032446/tm269446d1_ex99-1.htm
+Published: 2026-03-20 | Origin: Ecolab Inc. | Retrieved: 2026-10-04
+
+Ex.99.1 第 3 段（CoolIT 簡介）："CoolIT is a pure-play data center liquid cooling company with end-to-end capabilities that designs and manufactures high-performance liquid cooling systems, including coolant distribution units (CDUs), cold plates and direct-to-chip cooling technologies."
+Ex.99.1 第 3 段："As data centers shift from air cooling to liquid cooling to support rising compute demands, CoolIT’s mission-critical technologies provide the performance needed for advanced AI workloads."
+Ex.99.1 第 5 段："CoolIT also contributes advanced engineering, design and validation capabilities, highlighted by custom-designed solutions for leading AI chip developers, including NVIDIA and AMD"
+Ex.99.1 第 1 段："Ecolab announced today that it has entered into a definitive agreement to acquire CoolIT Systems, a high-growth, high-margin leader in liquid cooling technology for next-gen AI data centers."
