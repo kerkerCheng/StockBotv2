@@ -100,6 +100,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0d：敘事加碼條件 `confirm[]`）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 互動寫入端 `python -m alpha brief <T> --add`：spec 多收 `confirm[]`；寫入後多登記 `condition_role=confirm` 的語意 watch（同一個 registry 檔、同一條 `add_watch`、同一個寫入前預演）。daily 會跑的消費端只**多讀一個欄位**：⑬ materialize（候選板與個股頁多一份 `confirm` 列）、⑱ 心跳段 2 多一行與三個快照鍵、健康審查與 `audit invariants`（Orphans 對 `#c<n>` 解析到敘事的 `confirm[]`）。語意預篩、T0 喚醒、佇列分段、到期與 liveness 照 `disproof_ref` 走，不分角色——讀取、寫入、查詢、網路都不變 |
+| **2 canonical skill／prompt／本檔** | 本節；`docs/ARCHITECTURE.md` §6.11；`skills/research-drain/SKILL.md` 段 `narrative_rewrite` 的 ⓒⓓ（`confirmed` 處置、觸及只提醒）；研究 packet 的 `brief_frame`（`_how_to_use`、`spec_shape`）。預篩 prompt 本來就寫「反證或確認條件」——不改 |
+| **3 最窄 rule** | daily argv 不變；不新增 step、allowlist、APP 路由；APP 仍無寫入端點 |
+| **4 contract test** | `tests/test_narrative_confirm.py`（選填欄不進 id、真實 ledger 每一行 id 重算逐位相同、三件套與實體與出處、寫入端四條拒收、登記成 `brief:<id>#c1`＋`condition_role`、角色封閉且只限敘事來源、不被算成反證〔計數、downside、可開〕、觸及進 `narrative_rewrite` 且下一版以 `confirmed` 處置、候選狀態照宣告、到期也進重寫、候選板列〔每句由 `confirm_line` 在 materialize 端組好、`app.js` 照印不組字——它的全檔部位用語禁字檢查不放寬〕、心跳那一行與快照鍵、audit 解析到 `confirm[]`）。變異三個：加碼條件被算成反證 → 1 紅；可開不跳過它＋id 欄位無條件放進 `confirm` → 3 紅 |
+| **5 端到端 smoke** | 真資料：心跳段 2「反證：在盯 37（其中叫不醒 3）｜觸及待處置 0…」與今天 05:30 的心跳逐字相同、新的一行「加碼條件：在盯 0｜觸及待處置 0｜到期待重寫 0」；20 行敘事 ledger 的 `brief_id` 重算 20 行逐位相同；`audit invariants` 14 PASS |
+
 ### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0c：敘事「要翻倍需要什麼」、翻倍起點、「已定價」白話）
 
 | 步 | 結論 |

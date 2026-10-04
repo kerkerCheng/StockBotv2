@@ -1128,6 +1128,16 @@ function candidateWatchLine(watch) {
   return line;
 }
 
+/** 敘事的 confirm 條件（Phase 7 Step 7.0d）：每條一句，**整句由 materialize 端組好**（`engine_b/disproof.py::confirm_line`），
+ * 這裡照印不組字。觸及＝「結構確認了」的提醒，不是買進訊號，也不改候選狀態；沒有 confirm 條件就不印。候選板與個股頁共用這一個。 */
+function confirmLines(row, tag) {
+  return ((row && row.confirm) || []).map((c) => {
+    const line = el(tag || 'div', c.state === 'touched' ? 'warn' : 'row-reason', c.line || c.condition);
+    if (c.watch_id) line.title = 'watch ' + c.watch_id;
+    return line;
+  });
+}
+
 /** 會死嗎不是綠的那幾盞：燈名＋顏色＋理由，照抄 wipeout 面板（與稽核區同一份）。全綠就不印。 */
 function lampsNotGreen(view) {
   const panel = view.wipeout;
@@ -1172,6 +1182,7 @@ function candidateLine(view) {
   node.appendChild(head);
   if (row && row.reason) node.appendChild(el('div', 'row-reason', '理由：' + row.reason));
   if (row && row.watch) node.appendChild(candidateWatchLine(row.watch));
+  confirmLines(row).forEach((line) => node.appendChild(line));
   if ((panel.lines || []).length) {
     const words = el('div', 'candidate-words');
     CANDIDATE_WORDS.forEach(([key, label, question]) => {
@@ -3104,6 +3115,7 @@ function candidateRow(row, detailSet) {
   if (row.reason) li.appendChild(el('span', 'rule', '理由：' + row.reason));
   if (row.note) li.appendChild(el('span', 'rule', row.note));
   if (row.held_source) li.appendChild(el('span', 'rule', `Sheet：${row.held_source.sheet_ticker}（解析：${row.held_source.source}）`));
+  confirmLines(row, 'span').forEach((line) => li.appendChild(line));
   (row.preconditions || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 前提失效：' + p)));
   (row.rewrite || []).forEach((p) => li.appendChild(el('span', 'warn', '▲ 該重寫：' + p)));
   if (row.holdings_verified === false) li.appendChild(el('span', 'warn', '持股未驗（可能其實已持有）'));

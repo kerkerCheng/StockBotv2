@@ -155,6 +155,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 9 | 7.0c | §3 第 2 項「`revenue_ttm`（近四季營收，Engine C 機械歷史表，含口徑與 as_of）」 | 選取 read model **既有**的 `revenue_ttm`（Engine C 快照的 TTM，財報幣別）；填值寫成「近四季，快照 <日期>」 | 同一項要求「先確認兩個值在 read model 裡已有 Datum」——它已在，而且稽核區印的就是這一格；另從機械歷史表組一格會讓同一頁出現兩個營收數（L12、L16）。快照的日期是取數日、不是財報期末，所以字面寫「快照」（INV-6） |
 | 10 | 7.0c | §3 第 2 項「`market_cap`（Engine C 快照的市值，含幣別與 as_of）」 | read model 既有的 `market_cap` 是「price × shares、未正規化」——builder 另組一格 `market_cap_settlement`（同一份快照 × 名冊報價單位的換算係數——係數由 sources 從 `identity.currency` 查好注入，builder 是純函式不碰 identity；不做匯率；報價單位未登記 fail closed），placeholder 選它；原格語意不動 | 直接用未正規化那格，IQE.L 會填出「729.5 億」（便士）——真資料核對：換算後 7.3 億 GBP。一格不承載兩種語意（L12） |
 | 11 | 7.0c | §3 第 3 項的白話「拿今天的倍數（EV/S，虧損時 P/S）」 | 照 `alpha/three_questions.py::decide_basis` 寫：「有獲利、而且有同一期的淨負債資料時用 EV/S；其餘（虧損、台股、資料不齊）用 P/S」，其餘照 plan 的意思 | P/S 不只在虧損時用（COHR 是因為營業利益資料停在 2024 年中）；自己寫給人讀的事實套同一套追源紀律（L11-2） |
+| 12 | 7.0d | §4 第 2 項「登記一筆 `semantic_condition` watch，來源鍵與反證分得開……類別是 `confirm`（`watch_category` 加一類）」 | 照做；**怎麼分**：watch 多一個 `condition_role=confirm`（判斷只住 `engine_b/event_watch.py::is_confirm`），`disproof_ref` 照舊當「指回原文的來源鍵」（＝`source_ref`），不另開 `confirm_ref` 欄位；寫入端另加兩條拒收（同版重複、與反證同一條件） | 用 `disproof_ref` 認「語意 watch」的地方有八處（喚醒、佇列、待辦、liveness、audit、變動偵測）——另開欄位漏改一處，加碼條件就叫不醒、沒人消費（INV-4）；沿用它的代價是名字不貼切，分角色的地方（計數、downside、可開、判定標籤、audit 解析）逐一改並有測試＋變異。交 R2-a 挑戰 |
 
 ---
 

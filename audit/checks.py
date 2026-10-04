@@ -824,9 +824,16 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
             if owner is None:
                 findings.append(f"watch {wid}（「{label}」）的 disproof_ref 指向敘事 {brief_id}，任何 ledger 裡都沒有這一份")
                 continue
-            entries = tuple(owner[1].disproof or ())
-            if not 1 <= index <= len(entries) or disproof.normalize(entries[index - 1].condition) != text:
-                findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在那份敘事的 disproof[] 對不到它的條件")
+            if ew.is_confirm(watch):
+                # 加碼條件（Phase 7 Step 7.0d）：來源鍵 `brief:<id>#c<n>`，對那份敘事的 confirm[]，不對 disproof[]
+                entries = tuple(getattr(owner[1], "confirm", ()) or ())
+                c_index = int(index_text[1:]) if index_text.startswith("c") and index_text[1:].isdigit() else 0
+                if not 1 <= c_index <= len(entries) or disproof.normalize(entries[c_index - 1].condition) != text:
+                    findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在那份敘事的 confirm[] 對不到它的條件")
+            else:
+                entries = tuple(owner[1].disproof or ())
+                if not 1 <= index <= len(entries) or disproof.normalize(entries[index - 1].condition) != text:
+                    findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在那份敘事的 disproof[] 對不到它的條件")
             # 還在等（active）卻不是現行敘事的＝換版／撤回沒收；fired／觸及／到期的舊版是「該重寫」的工作，合法地留著。
             if status == "active" and brief_id not in current_brief_ids:
                 findings.append(f"watch {wid}（「{label}」）還在等，來源敘事 {brief_id} 卻不是 {owner[0]} 的現行敘事"

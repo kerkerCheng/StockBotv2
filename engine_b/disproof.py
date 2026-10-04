@@ -340,11 +340,12 @@ def _close(watch: dict[str, Any], note: str) -> None:
 # ---------------------------------------------------------------------------
 
 _PRIORITY = {"touched": 3, "expired": 2, "watching": 1}
+#: 加碼條件那一類（Phase 7 Step 7.0d）：**不在 `_PRIORITY` 裡**——它不是反證，反證計數、downside、可開前提都不吃它。
+CONFIRM = "confirm"
 
 
-def watch_category(watch: Mapping[str, Any]) -> str | None:
-    """一筆語意 watch 在反證計數裡落哪一格（`touched`／`expired`／`watching`；不在處理中回 None）。
-    **心跳段 2、audit、個股頁 downside 共用這一個判定**（Phase 3 Step 3.7 由 `disproof_counts` 抽出；L16）。"""
+def _semantic_state(watch: Mapping[str, Any]) -> str | None:
+    """語意 watch 的處理狀態（`touched`／`expired`／`watching`；不在處理中回 None）——反證與加碼條件同一套轉換。"""
     if watch.get("kind") != ew.SEMANTIC_KIND:
         return None
     if _touched_pending(watch):
@@ -354,6 +355,73 @@ def watch_category(watch: Mapping[str, Any]) -> str | None:
     if watch.get("status") in ("active", "fired"):
         return "watching"
     return None
+
+
+def watch_category(watch: Mapping[str, Any]) -> str | None:
+    """一筆語意 watch 在反證計數裡落哪一格（`touched`／`expired`／`watching`；不在處理中回 None）。
+    **心跳段 2、audit、個股頁 downside 共用這一個判定**（Phase 3 Step 3.7 由 `disproof_counts` 抽出；L16）。
+    加碼條件（`ew.is_confirm`，Phase 7 Step 7.0d）在處理中時一律落 `CONFIRM`——呼叫端只要不認得這一格就不會把它當反證；
+    它自己的三態問 `confirm_state`。"""
+    state = _semantic_state(watch)
+    if state is None:
+        return None
+    return CONFIRM if ew.is_confirm(watch) else state
+
+
+def confirm_state(watch: Mapping[str, Any]) -> str | None:
+    """加碼條件的處理狀態（`touched`／`expired`／`watching`；不是加碼條件或不在處理中回 None）。"""
+    return _semantic_state(watch) if ew.is_confirm(watch) else None
+
+
+#: 個股頁與候選板上每條加碼條件的狀態（封閉字彙；Phase 7 Step 7.0d）。**觸及只提醒，不是買進訊號、不改候選狀態**。
+CONFIRM_STATES: Mapping[str, str] = {
+    "touched": "加碼條件已觸及——提醒，不是買進訊號", "expired": "到期沒發生（該重寫）", "fired": "醒來待判",
+    "active": "在盯", "closed": "已收", "unwatched": "未盯",
+}
+
+
+def confirm_counts(watches: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    """心跳段 2 的「加碼條件」一行：在盯（含醒來待判）／觸及待處置／到期待重寫。以 watch 為單位（加碼條件不連結既有 watch，
+    一條就是一筆）。"""
+    states = [confirm_state(w) for w in watches]
+    return {"watching": states.count("watching"), "touched_pending": states.count("touched"),
+            "expired_pending": states.count("expired")}
+
+
+def confirm_rows(current_brief: Any, watches: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
+    """現行敘事每一條加碼條件與它的 watch 狀態（候選板列與個股頁共用）。沒有 watch 的印「未盯」（INV-3）。"""
+    if current_brief is None:
+        return []
+    by_ref = {str(w.get("source_ref") or ""): w for w in watches if ew.is_confirm(w)}
+    rows: list[dict[str, Any]] = []
+    for index, item in enumerate(getattr(current_brief, "confirm", ()) or (), 1):
+        ref = f"brief:{current_brief.brief_id}#c{index}"
+        watch = by_ref.get(ref)
+        state = confirm_state(watch) if watch is not None else None
+        if watch is None:
+            key = "unwatched"
+        elif state == "watching":
+            key = "fired" if watch.get("status") == "fired" else "active"
+        else:
+            key = state or "closed"
+        judgment = (watch or {}).get("judgment") or {}
+        until = (watch or {}).get("expires")
+        touched_at = str(judgment.get("at"))[:10] if key == "touched" and judgment.get("at") else None
+        rows.append({"index": index, "source_ref": ref, "condition": item.condition,
+                     "check_frequency": item.check_frequency, "action_48h": item.action_48h,
+                     "watch_id": (watch or {}).get("watch_id"), "watch_status": (watch or {}).get("status"),
+                     "until": until, "state": key, "state_label": CONFIRM_STATES[key], "touched_at": touched_at,
+                     "line": confirm_line(item.condition, key, until=until, touched_at=touched_at)})
+    return rows
+
+
+def confirm_line(condition: str, state: str, *, until: Any = None, touched_at: str | None = None) -> str:
+    """一條加碼條件在候選板列與個股頁上印的那一句（plan §4 第 3 項的字）。**整句在這裡組好，前端照印**——
+    APP 的 `app.js` 有全檔的部位用語禁字檢查（`tests/test_webapp_beta.py`），前端不自己組這類字，字只住這個封閉字彙旁邊。"""
+    if state == "touched":
+        return f"加碼條件已觸及：{condition}（{touched_at or '日期不明'}）——提醒，不是買進訊號"
+    when = f"（最晚 {until} 到期重問）" if until else ""
+    return f"加碼條件：{condition}｜{CONFIRM_STATES[state]}{when}"
 
 
 def condition_key(watch: Mapping[str, Any]) -> tuple[str, str]:
@@ -418,7 +486,7 @@ def disproof_counts(watches: Sequence[Mapping[str, Any]], *, lifecycle: Mapping[
     orphan_touched = 0
     for watch in watches:
         cat = watch_category(watch)
-        if cat is None:
+        if cat is None or cat == CONFIRM:    # 加碼條件不是反證（Phase 7 Step 7.0d）——它的計數是 `confirm_counts`
             continue
         key = condition_key(watch)
         if lifecycle is None and key[0].startswith("thesis:"):
@@ -483,7 +551,7 @@ def downside_rows(company_id: str | None, ticker: str, *, records: Sequence[Any]
     mine = (attributed_watches(str(company_id), ticker, watches=watches, lifecycle=lifecycle,
                                brief_ids=brief_ids, current_brief=current_brief) if company_id else [])
     ranked = [(watch_category(w), w) for w in mine]
-    ranked = [(c, w) for c, w in ranked if c is not None]
+    ranked = [(c, w) for c, w in ranked if c is not None and c != CONFIRM]   # downside 只列反證（Phase 7 Step 7.0d）
 
     def rank(cat: str, watch: Mapping[str, Any]) -> tuple[int, int]:
         # 同一格內醒來待判優先於在盯（同分時不得看 registry 順序；3.7 覆核）。
@@ -655,7 +723,8 @@ def frozen_history_count() -> int | None:
     return sum(1 for row in rows if str(row.get("disproof") or "").strip())
 
 
-__all__ = ["DOWNSIDE_SOURCES", "DOWNSIDE_STATES", "after_thesis_review", "condition_key", "current_readings",
+__all__ = ["CONFIRM", "CONFIRM_STATES", "DOWNSIDE_SOURCES", "DOWNSIDE_STATES", "after_thesis_review", "condition_key",
+           "confirm_counts", "confirm_line", "confirm_rows", "confirm_state", "current_readings",
            "disproof_counts", "downside_rows", "frozen_history_count", "load_lifecycle",
            "memo_ref", "normalize", "reconcile_thesis_disproof", "review_horizon", "source_is_current",
            "watch_category"]

@@ -92,6 +92,10 @@ def blocking_for_open(company_id: str, ticker: str, *, watches: Sequence[Mapping
     for w in attributed_watches(company_id, ticker, watches=watches, lifecycle=lifecycle, brief_ids=brief_ids,
                                 current_brief=current_brief):
         wid = str(w.get("watch_id"))
+        if ew.is_confirm(w):
+            # 加碼條件（Phase 7 Step 7.0d）不是反證：觸及只提醒「結構確認了」，不擋可開（plan §4 第 2 點）。
+            # 它醒來／觸及／到期照樣是 `narrative_rewrite` 的工作（`pending_rewrite`），只是不在這裡擋。
+            continue
         if is_narrative_watch(w):
             state = narrative_rewrite_state(w)
             if state is not None and wid not in acked:
@@ -226,10 +230,12 @@ def _apply_ack(data: dict[str, Any], watch_id: str, disposition: str, note: str,
 
 
 def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_ids: Iterable[str]) -> dict[str, list[str]]:
-    """一筆敘事紀錄 append 成功之後：①換版／撤回收掉舊版還 active 的 `brief:` watch（只收 active）；
+    """一筆敘事紀錄 append 成功之後：①換版／撤回收掉舊版還 active 的 `brief:` watch（只收 active；加碼條件同一條）；
     ②`acknowledged_touched` 逐條寫處置收據；③這一版 `disproof[]` 沒有 `link_source_ref` 的每條登記一筆語意 watch
-    （`brief:<brief_id>#<n>`；同鍵已存在就不重登）。`record` 是已解析的 `InvestorBrief`。"""
-    summary: dict[str, list[str]] = {"registered": [], "consumed": [], "acknowledged": [], "linked": []}
+    （`brief:<brief_id>#<n>`；同鍵已存在就不重登）；④這一版 `confirm[]` 每條登記一筆加碼條件的語意 watch
+    （`brief:<brief_id>#c<n>`、`condition_role=confirm`；Phase 7 Step 7.0d）。`record` 是已解析的 `InvestorBrief`。"""
+    summary: dict[str, list[str]] = {"registered": [], "consumed": [], "acknowledged": [], "linked": [],
+                                     "confirm_registered": []}
     brief_id = str(record.brief_id)
     older = [b for b in company_brief_ids if b != brief_id]
     if record.retracted:
@@ -254,6 +260,17 @@ def register_brief_watches(record: Any, *, data: dict[str, Any], company_brief_i
             action_48h=item.action_48h, quote_locator=f"narrative disproof[{index}]（source {item.source}）",
             note=f"敘事 {brief_id}（{record.ticker}）的第 {index} 條反證")
         summary["registered"].append(str(watch["watch_id"]))
+    for index, item in enumerate(getattr(record, "confirm", ()) or (), 1):
+        ref = f"brief:{brief_id}#c{index}"
+        if any(_src(w) == ref for w in data["watches"]):
+            continue
+        watch = ew.add_watch(
+            data, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref, expires=item.expires.isoformat(),
+            entities=list(item.entities), condition=item.condition, check_frequency=item.check_frequency,
+            action_48h=item.action_48h, quote_locator=f"narrative confirm[{index}]（source {item.source}）",
+            note=f"敘事 {brief_id}（{record.ticker}）的第 {index} 條加碼條件——觸及只提醒，不是買進訊號",
+            condition_role=ew.CONFIRM_ROLE)
+        summary["confirm_registered"].append(str(watch["watch_id"]))
     return summary
 
 

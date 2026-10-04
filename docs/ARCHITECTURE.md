@@ -735,6 +735,16 @@ AnalystView.brief（optional）→ APP 首屏 briefCard；六張卡收進「為�
 - **敘事來源的等待**：`wake_brief=<co:*>`（缺 X／等回落在等的事）與 `brief:` 語意 watch 醒來、觸及、到期都進佇列段 `narrative_rewrite`
   （`expiry_class=rewrite`，不鑄 pq2、不進假設對照）；換版與撤回只收 active 的。**watch 歸屬的唯一 SSOT** 是
   `engine_b/narrative_watches.py::attributed_watches`（以來源判，不以 entities；`candidate_state.watch_id` 不構成歸屬）。
+- **加碼條件 `confirm[]`（2026-10-04 Phase 7 Step 7.0d，使用者 A2）**：「這件事發生＝結構被確認了」。v2 的**選填**欄——只在非空時
+  進 payload 與 id 欄位集合（既有紀錄 id 逐位不變）；L7 三件套＋實體＋到期＋出處，寫入即登記成語意 watch（`brief:<id>#c<n>`）。
+  watch 帶 `condition_role=confirm`；`disproof_ref` 照舊是「指回原文的來源鍵」（＝`source_ref`），所以喚醒、預篩、佇列、liveness、
+  到期的管線不分角色——**分角色的只有「算不算反證」，判斷只住 `engine_b/event_watch.py::is_confirm`**：`watch_category` 讓它落
+  `confirm` 一類，反證計數（心跳「反證：在盯／觸及」、audit）、downside 面板、`blocking_for_open`（可開前提③）都不吃它；圖預測表
+  只看讀圖來源，本來就不吃。觸及與到期照樣進 `narrative_rewrite`（新一版以 `confirmed` 等處置）；**觸及只提醒，不是買進訊號、
+  不改候選狀態**。心跳段 2 另一行「加碼條件：在盯｜觸及待處置｜到期待重寫」（`confirm_counts`），候選板列與個股頁逐條列出
+  （`confirm_rows`；每條要印的那一句由 `confirm_line` 在 materialize 端組好、前端照印——`app.js` 的全檔部位用語禁字檢查不放寬，
+  這類字只住封閉字彙旁邊）。為什麼不另開 `confirm_ref` 欄位：用 `disproof_ref` 的地方有八處，另開欄位漏改任何一處，加碼條件就會叫不醒、
+  沒人消費（INV-4）；標錯字的代價比等待消失小。
 
 **為什麼數字用 placeholder：** session 打的數字會過期、會錯、會與 authority 不一致；placeholder 讓句子永遠
 讀到 materialize 當下的值，而且填不到時那一格自己現形（`partial`＋理由），不是留白。

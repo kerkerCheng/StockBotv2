@@ -301,7 +301,8 @@ CANDIDATE_STATES: tuple[str, ...] = (*CANDIDATE_STATES_DECLARABLE, "held")
 ANSWER_KEYS: tuple[str, ...] = ("priced_in", "in_numbers")
 ANSWER_VALUES: tuple[str, ...] = ("yes", "no", "unmeasurable")
 #: 醒來／觸及／到期的敘事來源 watch 在下一版的處置（對到 watch 既有的封閉收據字彙，§5 第 6 點）。
-ACK_DISPOSITIONS: tuple[str, ...] = ("still_holds", "thesis_changed", "retired")
+#: `confirmed`（Phase 7 Step 7.0d）：加碼條件被觸及＝「結構確認了」——**提醒，不是買進訊號**；處置它的那一版照樣自己判候選狀態。
+ACK_DISPOSITIONS: tuple[str, ...] = ("still_holds", "thesis_changed", "retired", "confirmed")
 RIDE_UNITS: tuple[str, ...] = ("layer", "socket")
 #: 反證的 `source`：自己寫的（self）、thesis 的 claim／memo 條目、或讀圖 id——**指得回原文**（L18）。
 DISPROOF_SOURCE_PREFIXES: tuple[str, ...] = ("self", "thesis:", "claim:", "sr_")
@@ -363,6 +364,38 @@ class NarrativeDisproof:
         return {"condition": self.condition, "check_frequency": self.check_frequency, "action_48h": self.action_48h,
                 "entities": sorted(self.entities), "expires": self.expires.isoformat(), "source": self.source,
                 "link_source_ref": self.link_source_ref}
+
+
+@dataclass(frozen=True, slots=True)
+class NarrativeConfirm:
+    """敘事的一條**加碼條件**（Phase 7 Step 7.0d；使用者 2026-10-04 A2）：「這件事發生，代表結構被確認了」
+    （客戶自己的文件點名它、合格狀態走到量產、數字出現在營收裡……）。
+
+    與反證對稱：L7 三件套＋實體＋到期＋出處，寫入即登記成語意 watch（`brief:<id>#c<n>`、`condition_role=confirm`）、
+    到期是重問。**觸及只提醒「結構確認了」，不是買進訊號、不改候選狀態**；觸及與到期都進 `narrative_rewrite`。
+    不連結既有 watch（沒有 `link_source_ref`）：加碼條件是這一版敘事自己的主張。"""
+
+    condition: str
+    check_frequency: str
+    action_48h: str
+    entities: tuple[str, ...]
+    expires: date
+    source: str
+
+    def __post_init__(self) -> None:
+        _nonempty(self.condition, "confirm[].condition")
+        _nonempty(self.check_frequency, "confirm[].check_frequency（L7：核查頻率）")
+        _nonempty(self.action_48h, "confirm[].action_48h（L7：觸及後 48 小時動作）")
+        if not any(str(e).startswith("co:") for e in self.entities):
+            raise ContractViolation("confirm[].entities 至少一個 co:*（語意 watch 只認 co:*；INV-1）")
+        if not isinstance(self.expires, date):
+            raise ContractViolation("confirm[].expires 必須是日期")
+        if not str(self.source).startswith(DISPROOF_SOURCE_PREFIXES):
+            raise ContractViolation(f"confirm[].source 必須是 {DISPROOF_SOURCE_PREFIXES} 之一開頭（指得回原文，L18）")
+
+    def as_dict(self) -> dict[str, Any]:
+        return {"condition": self.condition, "check_frequency": self.check_frequency, "action_48h": self.action_48h,
+                "entities": sorted(self.entities), "expires": self.expires.isoformat(), "source": self.source}
 
 
 @dataclass(frozen=True, slots=True)
@@ -451,6 +484,8 @@ class InvestorBrief:
     candidate_state: CandidateState | None = None
     history_not_comparable: HistoryNotComparable | None = None
     acknowledged_touched: tuple[Acknowledgement, ...] = ()
+    #: 加碼條件（Phase 7 Step 7.0d）：v2 的**選填**欄，沒寫就是空——它只在非空時進 id 欄位集合，既有紀錄的 id 一位都不變。
+    confirm: tuple[NarrativeConfirm, ...] = ()
 
     def __post_init__(self) -> None:
         if self.record_version not in RECORD_VERSIONS:
@@ -472,7 +507,7 @@ class InvestorBrief:
         if self.record_version == RECORD_VERSION_V2:
             self._check_v2_static()
         elif (self.rides or self.disproof or self.answers or self.candidate_state
-              or self.history_not_comparable or self.acknowledged_touched):
+              or self.history_not_comparable or self.acknowledged_touched or self.confirm):
             raise ContractViolation("v1 紀錄不得帶 v2 的結構化欄位——v1 照讀、不補寫")
 
     def _check_v2_static(self) -> None:
@@ -527,8 +562,15 @@ _ID_FIELDS_V2 = (*_ID_FIELDS, "record_version", "rides", "disproof", "answers", 
                  "history_not_comparable", "acknowledged_touched")
 
 
+#: 只在**非空**時才進 v2 id 欄位集合的選填欄（Phase 7 Step 7.0d）。⚠ 直接加進 `_ID_FIELDS_V2` 會讓既有每一行的 id
+#: 都變——`payload.get(k)` 對缺席的鍵取 None，None 也會被寫進 canonical JSON（plan §13 已知陷阱）。
+_ID_FIELDS_V2_OPTIONAL = ("confirm",)
+
+
 def new_brief_id(payload: Mapping[str, Any]) -> str:
     fields = _ID_FIELDS_V2 if payload.get("record_version") == RECORD_VERSION_V2 else _ID_FIELDS
+    if payload.get("record_version") == RECORD_VERSION_V2:
+        fields = (*fields, *(k for k in _ID_FIELDS_V2_OPTIONAL if payload.get(k)))
     body = {k: payload.get(k) for k in fields}
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "ib_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
@@ -552,6 +594,7 @@ def brief_record(
     candidate_state: Mapping[str, Any] | None = None,
     history_not_comparable: Mapping[str, Any] | None = None,
     acknowledged_touched: Sequence[Mapping[str, Any]] = (),
+    confirm: Sequence[Mapping[str, Any]] = (),
 ) -> dict[str, Any]:
     """建一筆可寫進 ledger 的紀錄（先經 `InvestorBrief` 驗證，驗不過就不產生）。
 
@@ -585,7 +628,7 @@ def brief_record(
     if record_version == RECORD_VERSION_V2:
         payload.update(_v2_payload(rides=rides, disproof=disproof, answers=answers, candidate_state=candidate_state,
                                    history_not_comparable=history_not_comparable,
-                                   acknowledged_touched=acknowledged_touched))
+                                   acknowledged_touched=acknowledged_touched, confirm=confirm))
     payload["brief_id"] = new_brief_id(payload)
     parse_brief_record(payload)          # 驗證；不合法就在這裡炸，不會寫進 ledger
     return payload
@@ -616,12 +659,13 @@ def parse_brief_record(raw: Mapping[str, Any]) -> InvestorBrief:
 
 
 def _v2_payload(*, rides, disproof, answers, candidate_state, history_not_comparable,
-                acknowledged_touched) -> dict[str, Any]:
-    """v2 結構化欄位 → 正規化的 payload（先建型別物件驗證、再轉回 dict——id 由正規化後的 dict 算，決定論）。"""
+                acknowledged_touched, confirm=()) -> dict[str, Any]:
+    """v2 結構化欄位 → 正規化的 payload（先建型別物件驗證、再轉回 dict——id 由正規化後的 dict 算，決定論）。
+    `confirm` 只在非空時才出現在 payload（也才進 id）——沒寫加碼條件的紀錄與 7.0d 之前逐位相同。"""
     parsed = _parse_v2_fields({"rides": list(rides), "disproof": list(disproof), "answers": answers,
                                "candidate_state": candidate_state, "history_not_comparable": history_not_comparable,
-                               "acknowledged_touched": list(acknowledged_touched)})
-    return {
+                               "acknowledged_touched": list(acknowledged_touched), "confirm": list(confirm)})
+    out = {
         "rides": [r.as_dict() for r in parsed["rides"]],
         "disproof": [d.as_dict() for d in parsed["disproof"]],
         "answers": parsed["answers"].as_dict() if parsed["answers"] else None,
@@ -630,6 +674,9 @@ def _v2_payload(*, rides, disproof, answers, candidate_state, history_not_compar
                                    if parsed["history_not_comparable"] else None),
         "acknowledged_touched": [a.as_dict() for a in parsed["acknowledged_touched"]],
     }
+    if parsed["confirm"]:
+        out["confirm"] = [c.as_dict() for c in parsed["confirm"]]
+    return out
 
 
 def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
@@ -660,8 +707,14 @@ def _parse_v2_fields(raw: Mapping[str, Any]) -> dict[str, Any]:
                if isinstance(hnc, Mapping) else None)
     acks = tuple(Acknowledgement(watch_id=str(a.get("watch_id") or ""), disposition=str(a.get("disposition") or ""),
                                  note=str(a.get("note") or "")) for a in seq("acknowledged_touched"))
+    confirm = tuple(NarrativeConfirm(
+        condition=str(c.get("condition") or ""), check_frequency=str(c.get("check_frequency") or ""),
+        action_48h=str(c.get("action_48h") or ""),
+        entities=tuple(sorted({str(e).strip() for e in (c.get("entities") or ()) if str(e).strip()})),
+        expires=_iso_day(c.get("expires"), "confirm[].expires"), source=str(c.get("source") or ""))
+        for c in seq("confirm"))
     return {"rides": rides, "disproof": disproof, "answers": answers, "candidate_state": candidate,
-            "history_not_comparable": history, "acknowledged_touched": acks}
+            "history_not_comparable": history, "acknowledged_touched": acks, "confirm": confirm}
 
 
 def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today: date) -> InvestorBrief | None:
@@ -677,7 +730,8 @@ def select_brief(records: Sequence[InvestorBrief], *, as_of: date | None, today:
 __all__ = [
     "ACK_DISPOSITIONS", "ANSWER_KEYS", "ANSWER_VALUES", "Acknowledgement", "Answers", "BRIEF_FRAME_V2",
     "BRIEF_SLOTS_V2", "CANDIDATE_STATES", "CANDIDATE_STATES_DECLARABLE", "CandidateState", "HistoryNotComparable",
-    "NarrativeDisproof", "PLACEHOLDERS_V2", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS", "RIDE_UNITS",
+    "NarrativeConfirm", "NarrativeDisproof", "PLACEHOLDERS_V2", "RECORD_VERSION_V1", "RECORD_VERSION_V2", "RECORD_VERSIONS",
+    "RIDE_UNITS",
     "Ride", "SLOT_KEYS_V2", "SLOT_LABELS_V2", "WHAT_MUST_BE_TRUE_FORBIDDEN", "placeholder_vocab", "slot_keys",
     "slot_labels",
     "BRIEF_FRAME", "BRIEF_SLOTS", "FORBIDDEN_TERMS", "PARAM_PLACEHOLDER", "PLACEHOLDERS", "RECORD_VERSION",

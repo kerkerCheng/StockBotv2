@@ -205,6 +205,28 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
             if existing_ref:
                 problems.append(f"disproof[{n}]：這條已在盯（{existing_ref}）——只填 link_source_ref，不重登")
 
+    # ②b confirm（加碼條件，Phase 7 Step 7.0d）：與反證對稱的寫入當下檢查；同一個條件不得既是反證又是加碼條件
+    disproof_keys = {normalize(d.condition): n for n, d in enumerate(parsed.disproof, 1)}
+    first_confirm: dict[str, int] = {}
+    for n, item in enumerate(parsed.confirm, 1):
+        key = normalize(item.condition)
+        if key in first_confirm:
+            problems.append(f"confirm[{n}]：與 confirm[{first_confirm[key]}] 是同一個條件（正規化後相同）")
+        else:
+            first_confirm[key] = n
+        if key in disproof_keys:
+            problems.append(f"confirm[{n}]：與 disproof[{disproof_keys[key]}] 是同一個條件——一件事發生不會既確認又推翻結構")
+        if item.expires <= ctx.today:
+            problems.append(f"confirm[{n}]：expires {item.expires} 必須晚於今天")
+        written = ew.condition_dates(item.condition)
+        if written and item.expires < max(written):
+            problems.append(f"confirm[{n}]：expires {item.expires} 早於條件自己寫的日期 {max(written)}")
+        unknown = [e for e in item.entities if str(e).startswith("co:") and not _registry(ctx).has_company(e)]
+        if unknown:
+            problems.append(f"confirm[{n}]：entities 有 registry 解析不到的 co:*（INV-1）：{unknown}")
+        if item.source.startswith("sr_") and item.source not in ctx.readings_by_id:
+            problems.append(f"confirm[{n}]：source {item.source} 不是任何讀圖 id")
+
     # ③ answers：unmeasurable 只在對應稽核行全是缺席時允許；yes／no 時組的兩行有值就要一併引用
     tq = ctx.three_questions
     rows = {r["key"]: r for q in ("priced_in", "in_numbers") for r in (tq or {}).get(q) or ()}

@@ -793,6 +793,10 @@ def _disproof_lines() -> list[str]:
     lines.append(f"反證：在盯 {c['watching']}（其中叫不醒 {unreachable}）｜**觸及待處置 {c['touched_pending']}**{waits}"
                  f"｜到期待複查 {c['expired_pending']}（併進 thesis 複查／節點重讀）"
                  f"｜未盯 {c['unwatched']}{orphan}（v1 讀圖散文 {c['v1_prose_readings']} 份不可機械數；凍結歷史 {frozen} 不盯）")
+    # 加碼條件（Phase 7 Step 7.0d）：與反證分開數——它不是反證；觸及只提醒「結構確認了」，不是買進訊號
+    k = disproof.confirm_counts(data.get("watches") or [])
+    lines.append(f"加碼條件：在盯 {k['watching']}｜**觸及待處置 {k['touched_pending']}**（提醒，不是買進訊號）"
+                 f"｜到期待重寫 {k['expired_pending']}（觸及與到期都進敘事重寫）")
     mismatch = c["thesis_sidecar_mismatch"]
     if mismatch:
         lines.append(f"⚠ **thesis sidecar 與 memo 不符 {len(mismatch)}**：{'、'.join(mismatch)}——memo 在 sidecar 產生之後"
@@ -1654,6 +1658,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "disproof.watching": "反證在盯", "disproof.unreachable": "反證叫不醒",
     "disproof.touched_pending": "反證觸及待處置", "disproof.expired_pending": "反證到期待複查",
     "disproof.unwatched": "反證未盯", "thesis.sidecar_mismatch": "thesis sidecar 不符",
+    # 加碼條件（Phase 7 Step 7.0d）：與反證分開——第一條加碼條件寫下、第一次觸及的那天，較昨 diff 看得到
+    "confirm.watching": "加碼條件在盯", "confirm.touched_pending": "加碼條件觸及待處置",
+    "confirm.expired_pending": "加碼條件到期待重寫",
     "prescreen.no_text": "預篩無全文", "prescreen.no_fetcher": "預篩無 fetcher",
     "health.red": "健康紅燈", "invariants.fail": "invariants FAIL",
     **{f"tier.{t}": f"帳號 {t}" for t in SCORECARD_TIERS},
@@ -1741,6 +1748,15 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
                 "disproof.touched_pending": c["touched_pending"], "disproof.expired_pending": c["expired_pending"],
                 "disproof.unwatched": c["unwatched"], "thesis.sidecar_mismatch": len(c["thesis_sidecar_mismatch"])}
 
+    def confirm_counts() -> dict[str, Any]:
+        # Phase 7 Step 7.0d：加碼條件三格（與段 2 那一行同一個函式）；不吃 lifecycle，讀不到 registry 才缺席
+        from engine_b import disproof
+        from engine_b import event_watch as ew
+
+        k = disproof.confirm_counts(ew.load_watches().get("watches") or [])
+        return {"confirm.watching": k["watching"], "confirm.touched_pending": k["touched_pending"],
+                "confirm.expired_pending": k["expired_pending"]}
+
     def prescreen() -> dict[str, Any]:
         record, _problem = _load_run_record(run_record_path, now=now)
         step = next((r for r in (record or {}).get("steps") or []
@@ -1795,8 +1811,8 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         return {"predictions.held": counts.get("held"), "predictions.wrong": table.get("wrong_total"),
                 "predictions.expired_unread": counts.get("expired_unread")}
 
-    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, prescreen, captures, tiers,
-               candidates, positions, predictions):
+    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, confirm_counts, prescreen, captures,
+               tiers, candidates, positions, predictions):
         guard(fn)
     return values
 

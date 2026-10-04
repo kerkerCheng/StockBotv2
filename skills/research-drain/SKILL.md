@@ -109,9 +109,13 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
   `disproof[].link_source_ref` 連到的 watch 已不在盯，並寫出為什麼斷——來源已收掉（讀圖重讀、memo 換版）就把那條改成新來源鍵
   （新讀圖的 `reading:<新 id>#n`）或改為新登；來源被判觸及／到期未判就先看來源那一邊（thesis 複查、節點重讀）怎麼處置，再改寫這份敘事；
 - ⓒ 寫新的一版 `python -m alpha brief <T> --add spec.json`，`acknowledged_touched[]` **逐條處置本公司名下
-  所有**該重寫的 watch（`still_holds`／`thesis_changed`／`retired`＋一句 note）——**不列就拒收**；
+  所有**該重寫的 watch（`still_holds`／`thesis_changed`／`retired`／`confirmed`＋一句 note）——**不列就拒收**；
   換版與撤回都不會吞掉它們（已過到期日但 daily 還沒標記的，寫入端會先照日期轉成到期）。處置寫成 watch 既有的收據
   （fired → consumed、觸及 → `judgment.handled`、到期 → `expiry_resolution: narrative_rewritten`）。
+- ⓓ **加碼條件**（`confirm[]`、watch 帶 `condition_role=confirm`，2026-10-04 Phase 7 Step 7.0d）也走這一段：
+  **觸及＝「結構確認了」的提醒，不是買進訊號**——新的一版以 `confirmed` 處置，在敘事裡寫明確認了什麼、候選狀態換不換
+  （系統不自動改）；**到期沒觸及**＝「確認事件沒在期限內發生」，本身就是資訊，照實處置（`still_holds`／`thesis_changed`／`retired`）。
+  它不是反證：不算進「反證：在盯／觸及」，也不擋可開。它是選填欄，寫不寫由研究判斷（形狀見 packet 的 `brief_frame.spec_shape`）。
 
 以下是**三段固定**：
 

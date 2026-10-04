@@ -92,6 +92,8 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
         "held_source": dict(held_info) if held_info else None,
         "holdings_verified": held.get("status") == "ok",
         "rides": [], "watch": None, "since": None, "stall_days": None,
+        # 加碼條件（Phase 7 Step 7.0d）：每條與它的 watch 狀態；觸及只提醒，不是買進訊號、不改候選狀態
+        "confirm": [],
         "three_words": three_words(three_questions, brief, not_read=f"未讀到（{three_questions_note}）"
                                    if three_questions_note else "未讀到"),
         "note": None,
@@ -123,6 +125,9 @@ def derive_row(ticker: str, company_id: str | None, *, records: Sequence[Investo
             row.update(side="legacy")
         return row
     brief_ids = [r.brief_id for r in records]
+    from engine_b.disproof import confirm_rows
+
+    row["confirm"] = confirm_rows(brief, watches)
     breaks = link_breaks([brief], watches=watches)
     row["rewrite"].extend(f"連結 {b['link_source_ref']}：{b.get('label')}" for b in breaks)
     pending = pending_rewrite(str(company_id), watches=watches, brief_ids=brief_ids)

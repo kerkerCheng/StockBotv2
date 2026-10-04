@@ -63,6 +63,17 @@ SEMANTIC_MIN_CONDITION_CHARS = 20
 SEMANTIC_SOURCE_PREFIXES: tuple[str, ...] = ("thesis:", "reading:", "brief:")
 #: `wake_brief` 可以掛的 kind：敘事在等的日子（date）或某家公司的新文件（entity_filing／related_entity）。
 WAKE_BRIEF_KINDS = frozenset({"date", "entity_filing_signal", "related_entity_signal"})
+#: 語意 watch 的條件角色（Phase 7 Step 7.0d）：沒寫＝反證（既有紀錄一筆都不改）；`confirm`＝敘事的**加碼條件**
+#: （「這件事發生＝結構被確認了」，來源鍵 `brief:<id>#c<n>`）。`disproof_ref` 照舊是「指回原文的來源鍵」，喚醒、佇列、
+#: liveness 的管線不分角色；**分角色的只有「算不算反證」**——判斷只住 `is_confirm`，反證計數、downside、可開前提、
+#: 判定佇列的標籤都問它（L16）。
+CONFIRM_ROLE = "confirm"
+CONDITION_ROLES: frozenset[str] = frozenset({CONFIRM_ROLE})
+
+
+def is_confirm(watch: Mapping[str, Any]) -> bool:
+    """這筆語意 watch 是加碼條件（不是反證）。唯一判斷——不解析來源鍵的 `#c`（L16）。"""
+    return watch.get("condition_role") == CONFIRM_ROLE
 
 #: watch 狀態的封閉字彙（contract；`audit` 的 Lifecycle 據此驗，Phase 1 Step 1.10）。
 #: active → fired（被叫醒）→ consumed（處理完）；active → expired（到期，處置記在 `expiry_resolution`）。
@@ -291,6 +302,7 @@ def add_watch(
     node: str = "",
     today: date | None = None,
     wake_brief: str = "",
+    condition_role: str = "",
 ) -> dict[str, Any]:
     if kind not in WATCH_KINDS:
         raise EventWatchError(f"未知 watch kind：{kind}（封閉字彙 {sorted(WATCH_KINDS)}）")
@@ -325,6 +337,12 @@ def add_watch(
         raise EventWatchError("wake_reading 只用在 entity_filing_signal（等需求側客戶的一手文件）")
     if (kind == SEMANTIC_KIND) != bool(disproof_ref):
         raise EventWatchError("semantic_condition 的喚醒目標必須是 disproof_ref，其他 kind 不得用它")
+    if condition_role:
+        # 加碼條件只來自敘事（Phase 7 Step 7.0d）：thesis／讀圖寫的條件一律是反證
+        if condition_role not in CONDITION_ROLES:
+            raise EventWatchError(f"condition_role 未登記：{condition_role!r}（封閉字彙 {sorted(CONDITION_ROLES)}）")
+        if kind != SEMANTIC_KIND or not str(source_ref).startswith("brief:"):
+            raise EventWatchError("condition_role 只用在敘事來源（brief:…）的 semantic_condition")
     if kind == SEMANTIC_KIND:
         _validate_semantic(condition=condition, entities=list(entities), source_ref=source_ref,
                            disproof_ref=disproof_ref, check_frequency=check_frequency,
@@ -372,6 +390,8 @@ def add_watch(
             "action_48h": action_48h,
             "node": node or None,
         })
+        if condition_role:
+            watch["condition_role"] = condition_role
     data["watches"].append(watch)
     return watch
 
@@ -869,7 +889,9 @@ def counters(data: Mapping[str, Any], *, coverage: frozenset[str] | None = None)
         # 醒了、還沒判定＝待檢（有沒有預篩標旗都算；預篩只標旗、不減少未檢）
         "semantic_pending_check": len(pending),
         "semantic_flagged": sum(1 for w in pending if flag_for_current(w) is not None),
-        "wake_disproof": sum(1 for w in active if w.get("disproof_ref")),
+        "wake_disproof": sum(1 for w in active if w.get("disproof_ref") and not is_confirm(w)),
+        # Phase 7 Step 7.0d：加碼條件分開數——它不是反證
+        "wake_confirm": sum(1 for w in active if is_confirm(w)),
         "wake_reading": sum(1 for w in active if w.get("wake_reading")),
         # Phase 3 Step 3.4：敘事宣告「缺 X」「已定價等回落」在等的事（醒來／到期＝該重寫敘事）
         "wake_brief": sum(1 for w in active if w.get("wake_brief")),
@@ -1089,6 +1111,10 @@ def wake_target(watch: Mapping[str, Any]) -> dict[str, Any]:
         return {"kind": "pq2", "ref": watch["wake_pq2"], "label": f"pq2 [{watch['wake_pq2']}]"}
     if watch.get("wake_lead"):
         return {"kind": "lead", "ref": watch["wake_lead"], "label": f"lead {watch['wake_lead']}"}
+    if watch.get("disproof_ref") and is_confirm(watch):
+        # 加碼條件（Phase 7 Step 7.0d）：判定 yes＝「結構確認了」——提醒，不是買進訊號；進 narrative_rewrite
+        return {"kind": "confirm", "ref": watch["disproof_ref"],
+                "label": f"加碼條件 {watch['disproof_ref']}（互動判定；觸及只提醒，不是買進訊號）"}
     if watch.get("disproof_ref"):
         return {"kind": "disproof", "ref": watch["disproof_ref"],
                 "label": f"反證 {watch['disproof_ref']}（互動判定）"}
