@@ -1,0 +1,169 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "iren_10_k_fy2026_power_equipment_20260827",
+    "title": "IREN Ltd Form 10-K（fiscal year ended 2026-06-30）— Item 1A：高壓變壓器、開關設備、高壓斷路器的交期與單點故障",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "IREN Ltd",
+    "publisher": "SEC EDGAR",
+    "url": "https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm",
+    "published_at": "2026-08-27",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "SEC EDGAR 公開 filing；只保留研究必要的逐字摘錄（locator 指段落），全文不入本包。"
+  },
+  "sources": [
+    {
+      "id": "iren_10_k_fy2026_power_equipment_20260827_s1",
+      "locator": "Item 1A Risk Factors——單點故障設備",
+      "quote": "These include, but are not limited to, the high voltage transformers, low voltage transformers and switchgear, all of which currently have estimated lead times ranging from 16 to 72 weeks, and are subject to increase."
+    },
+    {
+      "id": "iren_10_k_fy2026_power_equipment_20260827_s2",
+      "locator": "Item 1A Risk Factors——高壓斷路器",
+      "quote": "Any failure of a high-voltage circuit breaker would result in the site being non-operational. We estimate that the current lead time required to replace the various circuit breakers is 15 to 113 weeks, which lead time could increase."
+    },
+    {
+      "id": "iren_10_k_fy2026_power_equipment_20260827_s3",
+      "locator": "前瞻陳述／風險摘要",
+      "quote": "our reliance on trusted suppliers for equipment with long and unpredictable lead times, driven by capacity-constrained supply chains for AI infrastructure"
+    },
+    {
+      "id": "iren_10_k_fy2026_power_equipment_20260827_s4",
+      "locator": "Item 1 Business",
+      "quote": "We are an NVIDIA Cloud Partner and secured NVIDIA Preferred Partner status during fiscal year 2026."
+    }
+  ],
+  "nodes": [
+    {
+      "id": "tech:large_power_transformer",
+      "type": "TechNode",
+      "name": "Large Power Transformer (LPT)",
+      "aliases": [
+        "LPT",
+        "LPTs",
+        "large power transformer",
+        "large power transformers"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s1"
+      ]
+    },
+    {
+      "id": "tech:ai_compute_buildout",
+      "type": "TechNode",
+      "name": "AI training/inference cluster buildout",
+      "aliases": [
+        "AI data center buildout",
+        "AI system performance drive",
+        "AI frontier lab compute",
+        "AI XPU platform",
+        "HPC AI cluster",
+        "hyperscale AI infrastructure",
+        "AI factory buildout",
+        "agentic AI infrastructure"
+      ],
+      "abstraction_level": "end_demand",
+      "role": null,
+      "attributes": {
+        "ramp_difficulty_intrinsic": null,
+        "concentration_score": null,
+        "intrinsic_cycle_time_weeks": null
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s3"
+      ]
+    },
+    {
+      "id": "co:iren",
+      "type": "Company",
+      "name": "IREN",
+      "aliases": [
+        "IREN",
+        "IREN Ltd",
+        "IREN Limited"
+      ],
+      "abstraction_level": "deployment_workflow",
+      "attributes": {
+        "ticker": "IREN"
+      },
+      "confidence": 0.95,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s4",
+        "iren_10_k_fy2026_power_equipment_20260827_s1"
+      ]
+    },
+    {
+      "id": "tech:hv_circuit_breaker",
+      "type": "TechNode",
+      "name": "High-voltage circuit breaker",
+      "aliases": [
+        "high-voltage circuit breaker",
+        "high-voltage circuit breakers",
+        "circuit breakers"
+      ],
+      "abstraction_level": "network_systems",
+      "attributes": {},
+      "confidence": 0.85,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:iren",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "depends_on",
+      "attributes": {},
+      "confidence": 0.75,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s1"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:iren",
+      "dst_id": "tech:hv_circuit_breaker",
+      "relation": "depends_on",
+      "attributes": {},
+      "confidence": 0.8,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s2"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "tech:ai_compute_buildout",
+      "dst_id": "tech:large_power_transformer",
+      "relation": "enables",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s3",
+        "iren_10_k_fy2026_power_equipment_20260827_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "iren_10_k_fy2026_power_equipment_20260827_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.75,
+      "source_ids": [
+        "iren_10_k_fy2026_power_equipment_20260827_s1",
+        "iren_10_k_fy2026_power_equipment_20260827_s2",
+        "iren_10_k_fy2026_power_equipment_20260827_s3"
+      ],
+      "statement": "Buyer-side (an AI data-center operator's own 10-K, FY2026): IREN names high-voltage transformers, low-voltage transformers and switchgear as single points of failure with estimated lead times of 16–72 weeks and rising, and high-voltage circuit breakers at 15–113 weeks; it attributes long, unpredictable lead times to capacity-constrained supply chains for AI infrastructure. Lead times are dated context, not attributes (L4). Mapping 'high voltage transformers' at its substations to tech:large_power_transformer is a modeling judgment (the 10-K gives no MVA rating).",
+      "disproof_condition": "條件：IREN 下一份 10-K／10-Q 的風險因子把變壓器／斷路器交期改成明顯縮短，或不再列為單點故障的長交期設備。核查頻率：每季（IREN 10-Q／10-K）。觸發後 48 小時：e1、e2、e3 降 confidence，重讀 tech:large_power_transformer 的需求側。"
+    }
+  ]
+}
