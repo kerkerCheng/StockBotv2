@@ -357,7 +357,9 @@ def check_duplicate_url(source_doc: dict, session, allow_dup_url: bool = False) 
         raise DuplicateUrlError(
             f"SourceDoc URL 已存在於 doc_id {clashes}（正規化 URL: {norm}）。"
             f"這很可能是同一份文件被以不同 doc_id 重複 onboard。"
-            f"若為同一文件的不同段落，請為各段填不同的 source_doc.section 再載入；"
+            f"若為同一文件的不同段落，請為各段填不同的 source_doc.section 再載入（既有那份也要有 section）；"
+            f"若是同一份文件要補新段落、而既有那份沒有 section，沿用既有 doc_id 走更正走廊"
+            f"（source_doc.supersedes_extraction_sha256＝現存抽取檔的 hash，舊內容逐字保留；intake/provenance.py）；"
             f"若確為不同文件，重跑並加 --allow-dup-url。"
         )
     print(

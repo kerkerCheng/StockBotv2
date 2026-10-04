@@ -72,11 +72,14 @@ def test_legit_multi_section_passes() -> None:
 def test_multi_section_but_existing_missing_section_raises() -> None:
     # 新 doc 有 section，但既有同 URL doc 沒 section → 不算合法多段 → fail closed。
     existing = [{"id": "doc_a", "url": _URL, "section": None}]
-    with pytest.raises(DuplicateUrlError):
+    with pytest.raises(DuplicateUrlError) as raised:
         check_duplicate_url(
             {"doc_id": "doc_b", "url": _URL, "section": "photonics"},
             _FakeSession(existing),
         )
+    # 既有那份沒有 section 時「填 section」走不通、--allow-dup-url 是給不同文件的——訊息必須指出更正走廊
+    # （2026-10-04 Phase 7 failure log #6：MRVL Q2 10-Q 補 Item 1A 段）。
+    assert "supersedes_extraction_sha256" in str(raised.value)
 
 
 def test_same_section_value_raises() -> None:
