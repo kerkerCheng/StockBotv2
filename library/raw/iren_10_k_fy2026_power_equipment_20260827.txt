@@ -1,0 +1,11 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm
+
+Excerpt:
+[EXCERPT — SEC filing 之有限逐字引文] IREN Ltd Form 10-K（FY2026，accession 0001878848-26-000052）
+Source: https://www.sec.gov/Archives/edgar/data/1878848/000187884826000052/iren-20260630.htm
+Published: 2026-08-27 | Origin: IREN Ltd | Retrieved: 2026-10-04
+
+Item 1A Risk Factors——單點故障設備："These include, but are not limited to, the high voltage transformers, low voltage transformers and switchgear, all of which currently have estimated lead times ranging from 16 to 72 weeks, and are subject to increase."
+Item 1A Risk Factors——高壓斷路器："Any failure of a high-voltage circuit breaker would result in the site being non-operational. We estimate that the current lead time required to replace the various circuit breakers is 15 to 113 weeks, which lead time could increase."
+前瞻陳述／風險摘要："our reliance on trusted suppliers for equipment with long and unpredictable lead times, driven by capacity-constrained supply chains for AI infrastructure"
+Item 1 Business："We are an NVIDIA Cloud Partner and secured NVIDIA Preferred Partner status during fiscal year 2026."
