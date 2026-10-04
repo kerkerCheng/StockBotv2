@@ -66,3 +66,30 @@ def test_active_backfill_restores_history_and_applies_audited_packet(
     # 完全相同的 migration packet 可安全重跑；不得把 idempotent replay 當覆寫衝突。
     assert backfill.main() == 0
     assert "本次補分類 0" in capsys.readouterr().out
+
+
+def test_semantic_backfill_accepts_lead_advanced_without_triage(tmp_path, monkeypatch) -> None:
+    """`advance` 直接推進到 triaged_go 的 lead 帶 `triage: None`（鍵在、值是 None）——classification-health
+    指名本腳本當它的消費端，所以本腳本必須吃得下這種 lead（2026-10-04 decompose 的 11 條在這裡 TypeError）。"""
+    leads_path = tmp_path / "pending_leads.json"
+    packet_path = tmp_path / "decompose_backfill.json"
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="decompose:test", url="decompose://test/layer")
+    leads.advance(store, lead_id, "triaged_go")
+    assert store["leads"][lead_id]["triage"] is None
+    assert leads.classification_gaps(store)
+    leads.save(store, leads_path)
+    packet_path.write_text(json.dumps({lead_id: {
+        "content_type": "structural_fact", "decision_impact": "candidate_set", "reason": "未知層：誰供應它",
+    }}), encoding="utf-8")
+
+    monkeypatch.setattr(sys, "argv", [
+        "backfill_lead_classification.py", "--leads", str(leads_path), "--from-json", str(packet_path), "--apply",
+    ])
+    assert backfill.main() == 0
+
+    reloaded = leads.load(leads_path)
+    record = reloaded["leads"][lead_id]["triage"]["classification"]
+    assert record["decision_impact"] == "candidate_set"
+    assert record["classified_by"] == "backfill_semantic_v1"
+    assert leads.classification_gaps(reloaded) == []

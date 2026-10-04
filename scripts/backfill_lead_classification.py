@@ -41,6 +41,14 @@ def is_form4(lead: dict) -> bool:
     )
 
 
+def _triage(lead: dict) -> dict:
+    """lead 的 triage dict。`advance` 直接推進的 lead 帶 `triage: None`（鍵在、值是 None），
+    `setdefault` 只補缺鍵、會把 None 交回來（2026-10-04 decompose 的 11 條在這裡 TypeError）。"""
+    if not isinstance(lead.get("triage"), dict):
+        lead["triage"] = {}
+    return lead["triage"]
+
+
 def _validate(tags: dict) -> None:
     """字彙外的值一律拒絕。語意判斷可以錯，字彙不能自創——否則排序會靜默降級。"""
 
@@ -67,7 +75,7 @@ def _restore_active_history(store: dict, *, now: str) -> int:
             )
             restored["restored_at"] = now
             restored["restored_by"] = "backfill_history_restore_v1"
-            lead.setdefault("triage", {})["classification"] = restored
+            _triage(lead)["classification"] = restored
             changed += 1
             break
     return changed
@@ -103,8 +111,7 @@ def main() -> int:
     for lead in store["leads"].values():
         if not is_form4(lead) or priority.classification(lead):
             continue
-        triage = lead.setdefault("triage", {})
-        triage["classification"] = {
+        _triage(lead)["classification"] = {
             "content_type": "insider_transaction",
             "decision_impact": "confidence_only",
             "classified_by": "backfill_deterministic_v1",
@@ -145,7 +152,7 @@ def main() -> int:
             record["classified_at"] = now
             record["backfill_ref"] = Path(args.from_json).name
             record = priority.validate_classification(record, require_receipt=True)
-            lead.setdefault("triage", {})["classification"] = record
+            _triage(lead)["classification"] = record
             changed += 1
 
     total = len(store["leads"])

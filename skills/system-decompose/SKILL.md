@@ -106,6 +106,14 @@ python -m query.bottleneck           # 既有邊的結構表（確認該層是�
 
 題目形態：「誰供應 `tech:X`？」「`tech:X` 有幾家能做、換掉要多久？」
 
+登記一律走 `triage`（**分類在登記當下寫進去**），不要用 `advance … triaged_go` 直接推進——那條路不寫分類，
+drain 會把它 withheld（2026-10-04 實測 11 條）：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.cli register --source decompose:<slug> --url "decompose://<slug>/<node>" --title "<人寫的研究問句>"
+& '.venv\Scripts\python.exe' -m engine_b.cli triage <lead_id> --go --tier 4 --reason "<為什麼現在追>" --content-type structural_fact --decision-impact candidate_set --classified-by interactive:directed
+```
+
 ## Step 6 — 留 receipt
 
 選了哪個系統、為什麼、一手來源清單與各自 tier、拆出幾層、三堆各幾個。
