@@ -1,0 +1,152 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_8996_annual_report_2025",
+    "title": "高力（8996）2025 年度股東會年報（股東會後修訂本）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Kaori Heat Treatment Co., Ltd.",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=8996&filename=2025_8996_20260529F11.pdf",
+    "published_at": "2026-08-06",
+    "retrieved_at": "2026-10-04",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "台灣上市公司法定申報（股東會年報）；只保留研究必要的逐字摘錄。published_at 取 MOPS 列表上傳時間 115/08/06 11:00:43（民國年轉西元）。PDF 文字層有字中空格，引文照頁面寫法、去空白比對。"
+  },
+  "sources": [
+    {
+      "id": "mops_8996_annual_report_2025_s1",
+      "locator": "營運概況——產業概況（液冷）",
+      "quote": "2025 年散熱產業受惠於 GB200 液冷出貨放量，這一波輝達 GB200 能源、散熱成為產業核心議題，高力散熱團隊開發出液冷散熱的分岐管和冷卻液分配裝置，成功攻入 GB200 供應鏈名單。"
+    },
+    {
+      "id": "mops_8996_annual_report_2025_s2",
+      "locator": "致股東報告書——未來發展策略",
+      "quote": "子公司高力熱能科技將專注於 AI 資料中心散熱領域，積極投入高效能 Manifold、CDU、Radiator 等產品之設計與開發，並透過取得主要客戶之產品認證，強化市場導入速度。"
+    },
+    {
+      "id": "mops_8996_annual_report_2025_s3",
+      "locator": "營運概況——產能規劃",
+      "quote": "本公司為提升競爭力掌握市場契機，在產能規劃方面，改以真空爐硬焊的方式產製分歧管(CDM)，其生產效率及良率較傳統氬焊的方式高，能突破產能瓶頸，高力持續爭取國內 ODM（原廠委託設計代工）廠及美國 CSP（大型雲端服務供應商）客戶訂單。"
+    },
+    {
+      "id": "mops_8996_annual_report_2025_s4",
+      "locator": "營運概況——114 年度主要產品之營業收入及比重（合併財報，單位：新台幣仟元；%）",
+      "quote": "板式熱交換器 1,506,653 37.70 1,729,076 26.28 熱能產品 2,489,371 62.30 4,851,547 73.72"
+    },
+    {
+      "id": "mops_8996_annual_report_2025_s5",
+      "locator": "致股東報告書——研究發展",
+      "quote": "熱能事業處在決能源效率和散熱難題方面擁有豐富的經驗，憑藉先進的液冷和浸沒式系統散熱產品陸續獲得客戶認證並出貨"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:kaori",
+      "type": "Company",
+      "name": "Kaori Heat Treatment",
+      "aliases": [
+        "Kaori",
+        "高力"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "8996.TW"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s1",
+        "mops_8996_annual_report_2025_s3"
+      ]
+    },
+    {
+      "id": "tech:coolant_distribution_unit",
+      "type": "TechNode",
+      "name": "Coolant Distribution Unit (CDU)",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s2"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_manifold",
+      "type": "TechNode",
+      "name": "Liquid-cooling distribution manifold",
+      "aliases": [
+        "manifold",
+        "manifolds",
+        "liquid distribution manifold",
+        "liquid distribution manifolds",
+        "rear manifold"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:kaori",
+      "dst_id": "tech:coolant_distribution_unit",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s1",
+        "mops_8996_annual_report_2025_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:kaori",
+      "dst_id": "tech:liquid_cooling_manifold",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s1",
+        "mops_8996_annual_report_2025_s2",
+        "mops_8996_annual_report_2025_s3"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_8996_annual_report_2025_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.55,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s1",
+        "mops_8996_annual_report_2025_s2",
+        "mops_8996_annual_report_2025_s5"
+      ],
+      "statement": "Kaori's own annual report: its cooling team developed liquid-cooling manifolds and coolant distribution units and 'successfully entered the GB200 supply-chain list'; its subsidiary 高力熱能科技 is developing Manifold, CDU and Radiator products and 'obtaining product certification from main customers' (still in progress); liquid and immersion cooling products 'progressively obtained customer certification and shipped'. Self-report in a statutory filing (L8: weak, costly); no customer named; qualification_status left unset because the two sentences disagree on how far certification has gone.",
+      "disproof_condition": "條件：高力後續年報、季報或法說改寫成未進 GB200／Rubin 供應鏈、或 CDU 認證失敗；或客戶端一手顯示 CDU 供應商不含高力。核查頻率：每季（高力月營收、季報、法說）。觸發後 48 小時：e1 降 confidence，重讀 CDU 層。"
+    },
+    {
+      "id": "mops_8996_annual_report_2025_cl2",
+      "subject_id": "e2",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_8996_annual_report_2025_s3",
+        "mops_8996_annual_report_2025_s4"
+      ],
+      "statement": "Kaori switched manifold (CDM) production to vacuum-furnace brazing to 'break through the capacity bottleneck' and is pursuing domestic ODM and U.S. CSP orders. Revenue mix 2025 (consolidated, NT$ thousands): plate heat exchangers 1,729,076 (26.28%), thermal products 4,851,547 (73.72%) — liquid cooling is not split out from fuel-cell parts. Dated context (L4).",
+      "disproof_condition": "條件：高力揭露分歧管產線擴產取消，或液冷營收在拆分後占比很低。核查頻率：每季。觸發後 48 小時：本 claim 加註，敘事的「出現在數字裡了嗎」重看。"
+    }
+  ]
+}
