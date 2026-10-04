@@ -1,0 +1,14 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/2074973/000121390026105334/ea0297114-05.htm
+
+Excerpt:
+[EXCERPT — SEC filing 之有限逐字引文] Churchill Capital Corp XI Form S-4/A（accession 0001213900-26-105334）— Information About Agility Robotics
+Source: https://www.sec.gov/Archives/edgar/data/2074973/000121390026105334/ea0297114-05.htm
+Published: 2026-09-30 | Origin: Agility Robotics（業務段；登記人 Churchill Capital Corp XI） | Retrieved: 2026-10-04
+
+Information About Agility（業務段）——commercial customers："Our commercial customers include leading global enterprises such as Schaeffler, GXO, Toyota Motor Manufacturing Canada and Mercado Libre, where Digit performs useful physical labor within active manufacturing, distribution and logistics operations."
+Information About Agility（業務段）——客戶部署成果："At Schaeffler, Digit v4 has been deployed across multiple facilities supporting material handling and logistics workflows, achieving approximately 98% operational accuracy while moving approximately 25,000 totes. Following these deployments, Schaeffler has committed to scaling its use of Digit 5, moving from pilot to full-scale integration across its manufacturing footprint."
+Information About Agility（業務段）——GXO 部署："At GXO, Digit has automated tote fulfillment and handling workflows, reaching a cumulative 100,000 tote milestone in November 2025"
+Information About Agility（業務段）——strategic investors："Our strategic investors include industry leaders such as NVIDIA, Amazon, SoftBank, Schaeffler, ABICO Group and Foxconn, among others, whose investments provide strategic alignment and reflect a shared conviction in the long-term potential of humanoid robotics and physical AI."
+Information About Agility（業務段）——technology partners："In 2026, NVIDIA selected Digit 5 as the inaugural humanoid launch partner for its NVIDIA Halos for Robotics platform, pairing Agility’s systems with NVIDIA IGX Thor and Halos Core infrastructure"
+Risk Factors（Agility 營運風險）——零組件供應："Agility relies on third-party suppliers for the provision and development of many key components and materials used in its products, including semiconductors, batteries, sensors, actuators, computing hardware, and specialty alloys. Some of the components used in Digit may have to be purchased from a single source or limited number of sources."
+Risk Factors（Agility 營運風險）——產品時程："securing critical components (including actuators, sensors, batteries and computing hardware)"
