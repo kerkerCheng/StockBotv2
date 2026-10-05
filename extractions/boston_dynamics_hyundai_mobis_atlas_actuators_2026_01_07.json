@@ -11,6 +11,18 @@
       ],
       "statement": "Boston Dynamics 客戶端官方頁面確認 Hyundai Mobis 將為 Atlas 供應 actuators。",
       "subject_id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e1"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Boston Dynamics 或現代摩比斯宣布合作終止，或 Atlas 的致動器改由其他來源供應。核查頻率：每半年（Boston Dynamics 新聞、現代摩比斯財報與公告）。觸發後 48 小時：e5 降 confidence 或提撤回，重讀人形機器人致動器層。",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_cl2",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2",
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s3"
+      ],
+      "statement": "Boston Dynamics' own news page (customer side): Hyundai Mobis 'will supply actuators for Atlas, Boston Dynamics's next-generation humanoid robot', and the collaboration 'will help accelerate Boston Dynamics and HMG's mass production plans for Atlas'. This places Hyundai Mobis on the humanoid precision-actuator layer as a second named supplier (Schaeffler is the other). Caveats: the supply sentence is relayed ('The company stated'), Hyundai Mobis and Boston Dynamics are both Hyundai Motor Group affiliates (not an arm's-length customer), and no volume, price or prepayment is disclosed.",
+      "subject_id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e5"
     }
   ],
   "edges": [
@@ -57,6 +69,20 @@
       "relation": "partnership_with",
       "source_ids": [
         "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s1"
+      ],
+      "src_id": "co:hyundai_mobis"
+    },
+    {
+      "attributes": {
+        "qualification_status": "designed_in"
+      },
+      "confidence": 0.75,
+      "dst_id": "comp:humanoid_precision_actuators",
+      "id": "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_e5",
+      "relation": "supplies_to",
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2",
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s3"
       ],
       "src_id": "co:hyundai_mobis"
     }
@@ -117,6 +143,24 @@
         "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "robot_subsystem",
+      "aliases": [
+        "precision actuators",
+        "series elastic actuators",
+        "quasi-direct-drive motors",
+        "precision reducers"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "comp:humanoid_precision_actuators",
+      "name": "Humanoid precision actuators (series elastic / quasi-direct-drive / precision reducers)",
+      "role": null,
+      "source_ids": [
+        "boston_dynamics_hyundai_mobis_atlas_actuators_2026_01_07_s2"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -130,6 +174,7 @@
     "retrieved_at": "2026-07-29",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "5629200931d9cde73944884b8cd51973aa819973bb342374d0827629e10e6ac2",
     "title": "Hyundai Mobis Forms Strategic Collaboration Framework with Boston Dynamics",
     "url": "https://bostondynamics.com/news/hyundai-mobis-forms-strategic-collaboration-framework-with-boston-dynamics/"
   },

@@ -1,8 +1,10 @@
 Source URL: https://bostondynamics.com/news/hyundai-mobis-forms-strategic-collaboration-framework-with-boston-dynamics/
 
 Excerpt:
-[press release, opening paragraph] Hyundai Mobis announced that it has formed a strategic collaboration with Boston Dynamics, a global leader in robotics, at CES 2026 in Las Vegas.
+[EXCERPT — 公開文件之有限逐字引文] Hyundai Mobis Forms Strategic Collaboration Framework with Boston Dynamics
+Source: https://bostondynamics.com/news/hyundai-mobis-forms-strategic-collaboration-framework-with-boston-dynamics/
+Published: 2026-01-07 | Origin: Boston Dynamics | Retrieved: 2026-07-29
 
-[press release, opening paragraph] The company stated on the 7th that it will supply actuators for Atlas, Boston Dynamics’s next-generation humanoid robot.
-
-[press release, opening paragraph] the collaboration with Hyundai Mobis will help accelerate Boston Dynamics and HMG’s mass production plans for Atlas.
+press release, opening paragraph："Hyundai Mobis announced that it has formed a strategic collaboration with Boston Dynamics, a global leader in robotics, at CES 2026 in Las Vegas."
+press release, opening paragraph："The company stated on the 7th that it will supply actuators for Atlas, Boston Dynamics’s next-generation humanoid robot."
+press release, opening paragraph："the collaboration with Hyundai Mobis will help accelerate Boston Dynamics and HMG’s mass production plans for Atlas."
