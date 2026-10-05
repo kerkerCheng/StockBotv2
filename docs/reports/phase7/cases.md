@@ -90,6 +90,7 @@
   - 價格照登記在 7.5 記（推翻日 2026-09-19 起對光通訊組超額；脈絡列：thesis memo 2026-07-17 → 2026-09-19）
   - 2026-10-05｜research-drain 段 5：CPO 層讀圖 `sr_e8161208a37aa915`（neither：需求側有 pluggable、NPO、銅可選，台積電的人說瓶頸在雷射、光纖、連接器與測試——在下一層）；矽光子兩節點讀圖 `sr_3ad043cb553dfc94`、`sr_9ee10fb4ef6dd06e`（volume，讀成量：Tower 6-K 客戶預付 2.9 億美元保留 2027 產能）；敘事 AVGO `ib_845f22ec395d69dd`、TSM `ib_e30d810241bf6f8d`、TSEM `ib_af02a0f36157286b`、GFS `ib_a43c94cc33417379`（皆非邊緣的不要）；Soitec 坐上 Photonics-SOI 基板層的入圖包 pq2 **[706]**
   - 2026-10-05｜research-drain 段 5（CPO 鏈續）：CPO 層供給側三檔——FN `ib_10c81951aab63573`、MRVL `ib_54f0fb5339cfe7cf`（皆非邊緣的不要）、HIMX `ib_ccda271575147a0b`（不要：讀不出卡在它——晶圓級光學還在合作開發、客戶沒具名；出現在數字裡 no）；中際旭創 300308.SZ `ib_0ef521433d4bf145`（非邊緣的不要，押矽光子讀圖）；CPO 全堆疊測試層讀圖 `sr_6f781528583b68af`（undecided：需求側只有台積電主管一句轉述、供給側只有 Aehr 自報，晶圓級燒機只是全堆疊測試的一段）＋AEHR `ib_cd56ea272f1cf77f`（缺 X，`ew_0231`：供給側列舉與客戶端具名；已定價 yes＝自家三年 P/S 第 96.8 百分位，X 補上後也是等回落）
+  - 2026-10-05｜research-drain 段 5（CPO 鏈的邊緣檔）：外部光源層 `sr_879ba9bc8ad69222`（undecided：NVIDIA 自己的部落格點名 Coherent 供 ELS 模組、Lumentum 剛拿到第一張 ELS 模組單〔2027 下半年交貨〕，但缺的在下一層雷射；Open CPX MSA v1.0 允許模組內建光源，是反向路徑）——POET 的讀圖格因此到終局；FAU 層 `sr_4c83c85cdb490db9`（undecided）＋上詮 `ib_7f2b578b1255a438`（缺 X，`ew_0248`：FAU 客戶與量；EV／營收約 31 倍）；NPO 層 `sr_f004cdb4639c6441`（undecided，沒有需求側）＋AEVA `ib_336f1ed819a1a757`（不要：NPO 只在聯合開發，2027 下半年初次部署）；Enablence `ib_5951751518182665`（不要：會死嗎——現金跑道約 1.3 個月、總負債約 6,147 萬美元，押 ELS 8 通道插槽）。⚠ FAU 讀圖第一次送出時把 Hunterbrook 標成 independent，被拒（媒體轉述不是第三方印證，L11-3），已改
 - failure log：（尚無）
 
 ## O6 光通訊磊晶與 MOCVD 產能（二階）
@@ -98,6 +99,7 @@
 - 研究產出：（尚無）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
   - 2026-10-05｜research-drain 段 5：光二極體層讀圖 `sr_1de9b7868a235363`（undecided：圖上沒有需求側）；英特磊 `ib_fcc9cb3a94644c63`（不要：磷化銦主力在高頻、國防、量子運算，不在 AI 光互連路徑上；會死嗎兩盞紅燈）
+  - 2026-10-05｜IQE：補記 Engine C 兩筆（H1 2026 期中結果 `mo_cff71545649a72f530ff7e0ddc704829`、分部占比第二點 `mo_27e86e110a827d67b59fc763d59a46f7`，出處 2026-09-07 半年報：營收年增 43%、Photonics 年增 45%〔一部分是美國國防資金釋出〕、調整後淨現金 3,020 萬英鎊）；量子點雷射磊晶層 `sr_99a7ed3847bc398e`（undecided：一家供應、一個私人買方）；敘事 `ib_da0aabd997e48b44`（缺 X，`ew_0249`：**InP 磊晶在圖上還不是一層**——IQE 的 InP 磊晶邊接在 Tower、MACOM 公司上，LandMark、VPEC、IntelliEPI 是它的競爭者但沒有層節點；這正是本 case 要建的層）
 - failure log：（尚無）
 
 ## S1 X 帳號 40 則首次點名的 claim 裁決
