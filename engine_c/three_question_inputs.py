@@ -14,7 +14,8 @@
   `fundamental_history` 的**全部列（每份申報各一列）**——逐日 as-of 由三題那一層用 `shared.as_of` 取。
 - `monthly_revenue`／`monthly_conflicts`：`engine_c.history.monthly_revenue_as_of`（可用日＝法定期限）。
 - `segment_shares`：`segment_revenue_share`／`product_line_revenue_share` 人工觀測（每個觀測日一點）。
-- `gate`：這一檔的已定價①在取數這一層就知道算不了的（台股沒有歷史股數、非美非台沒有歷史來源…）——
+- 台股：`shares_cover` 改取 `tw_share_capital_observations`（季報股本換算、可知日＝法定期限；`shares_rejected` 帶核對沒過的季）。
+- `gate`：這一檔的已定價①在取數這一層就知道算不了的（台股一筆可用的季報股數都沒有、非美非台沒有歷史來源…）——
   `{absence_kind, reason}`，由產生缺席的這段程式自己宣告（L16）。
 """
 from __future__ import annotations
@@ -110,13 +111,22 @@ def get_three_question_inputs(ticker: str, *, conn: Any, today: date, company_id
     for metric, key in _METRIC_KEYS.items():
         inp[key] = _rows(conn, ticker, metric)
     if ticker.endswith((".TW", ".TWO")):
+        from engine_c.history import tw_shares_as_of
+
         mr = monthly_revenue_as_of(conn, ticker, as_of=today)
+        shares = tw_shares_as_of(conn, ticker, as_of=today)
         inp.update(filer_class="taiwan_monthly", revenue_kind="monthly", monthly_revenue=mr["months"],
-                   monthly_conflicts=mr["conflicts"],
-                   source="engine_c：price_history＋monthly_revenue_observations（MOPS）")
-        # 台股歷史股數沒有機械來源（Step 3.2 回填報告）：市值序列組不出來，已定價①整列缺席——不用今天的股數回推。
-        inp["gate"] = {"absence_kind": "upstream_unavailable",
-                       "reason": "台股歷史股數沒有機械來源（TWSE／TPEx 只有當期股本），市值序列組不出來；不用今天的股數回推"}
+                   monthly_conflicts=mr["conflicts"], shares_cover=shares["cover"], shares_rejected=shares["rejected"],
+                   source=("engine_c：price_history＋monthly_revenue_observations（MOPS 月營收）"
+                           "＋tw_share_capital_observations（MOPS 季報股本）"))
+        # 股數＝當時已知的季報股本（可知日＝法定期限，`engine_c.tw_share_capital`）。一筆可用的都沒有時，
+        # 市值序列組不出來，已定價①整列缺席——仍然不用今天的股數回推。
+        if not shares["cover"]:
+            bad = len(shares["rejected"])
+            inp["gate"] = {"absence_kind": "upstream_unavailable",
+                           "reason": ("台股季報股數還沒有可用的觀測（`python -m engine_c.tw_share_capital --backfill 14`）"
+                                      + (f"；交叉核對沒過或同季衝突 {bad} 筆" if bad else "")
+                                      + "——市值序列組不出來，不用今天的股數回推")}
         return inp
     klass, basis = filer_class(conn, ticker, today=today)
     inp["filer_class"] = klass

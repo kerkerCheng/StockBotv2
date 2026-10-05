@@ -7,6 +7,8 @@
 - `monthly_revenue_observations`：只收 **`disclosure_deadline ≤ T`**（法定公告期限，次月 10 日）。它是可機械推導的
   **上界**，不是實際公告日（`published_at` 恆 NULL，`published_at_basis=statutory_deadline_only`）；
   用上界表示「最晚這天全市場都知道了」，寧可晚幾天也不提早看到。
+- `tw_share_capital_observations`（台股季報股數，2026-10-05）：只收 **`available_on ≤ T`**（一般業季後 45 日、年報 3 個月
+  的法定期限），同樣是上界；交叉核對沒過或同一季兩個數字的整季不用。
 - `price_history`：`bar_date ≤ T`。
 
 本檔只取數、不判讀：百分位、TTM、口徑選擇在三題那一層（`alpha/three_questions.py`，Step 3.3）。
@@ -69,6 +71,66 @@ def monthly_revenue_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[
                        "unit_scale": first[3], "currency": first[4], "available_on": first[5],
                        "sources": sorted({str(g[6]) for g in group})})
     return {"months": months, "conflicts": conflicts}
+
+
+def tw_shares_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, Any]:
+    """as-of T 的台股季報股數：`{"cover": [...], "rejected": [...]}`（`period_end` 升序）。
+
+    只收 **`available_on ≤ T`**（法定期限，見 `engine_c.tw_share_capital`）。交叉核對不是 `ok` 的列**整季不用**、
+    列進 `rejected`（帶理由）；同一季兩個不同的 `ok` 股數（重抓時 MOPS 改過數字）也整季不用——不挑一個
+    （同月營收衝突的守則；改過的那個版本哪天公開沒有來源，用法定期限頂替會提早看到）。
+    `cover` 的形狀對齊 `fundamental_history` 的封面股數列（`period_end`／`filed`／`value`），三題的 `shares_on` 直接吃。
+    ⚠ **期末之後、可知日之前（含）有分割**（`corporate_actions`；yfinance 把台股配股記成分割）的季也整季不用：股本可能已含
+    那筆待分配股票股利，收進來會被 `shares_on` 再乘一次分割比例——配股小於核對門檻（≤2%）時核對攔不下，所以不靠門檻
+    （2026-10-05 R2 N1）；由前一季股數乘分割比例接續。
+    ⚠ 唯讀連線上表可能還沒建（三題 provider 刻意不在讀取路徑建表）——「表不存在」＝還沒有任何觀測。
+    """
+    import sqlite3
+
+    try:
+        rows = conn.execute(
+            """SELECT period_end, available_on, shares_outstanding, cross_check_status, cross_check_reason,
+                      observation_id, source
+               FROM tw_share_capital_observations
+               WHERE ticker = ? AND available_on <= ?
+               ORDER BY period_end, fetched_at""",
+            (ticker, _iso(as_of))).fetchall()
+    except sqlite3.OperationalError as exc:
+        if "no such table" not in str(exc):
+            raise
+        return {"cover": [], "rejected": []}
+    try:
+        splits = sorted(str(r[0])[:10] for r in conn.execute(
+            "SELECT action_date FROM corporate_actions WHERE ticker = ? AND kind = 'split'", (ticker,)).fetchall())
+    except sqlite3.OperationalError as exc:
+        if "no such table" not in str(exc):
+            raise
+        splits = []
+    by_period: dict[str, list[tuple]] = {}
+    for r in rows:
+        by_period.setdefault(str(r[0]), []).append(r)
+    cover: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    for period in sorted(by_period):
+        group = by_period[period]
+        bad = [g for g in group if g[3] != "ok"]
+        values = {g[2] for g in group if g[3] == "ok"}
+        if bad or len(values) > 1:
+            rejected.extend({"period_end": period, "status": g[3], "reason": g[4], "observation_id": g[5]} for g in bad)
+            if len(values) > 1:
+                rejected.append({"period_end": period, "status": "conflict",
+                                 "reason": f"同一季有 {len(values)} 個不同股數：{sorted(values)}", "observation_id": None})
+            continue
+        first = group[0]
+        clash = [s for s in splits if period < s <= str(first[1])[:10]]
+        if clash:
+            rejected.append({"period_end": period, "status": "split_in_window", "observation_id": first[5],
+                             "reason": (f"期末 {period} 之後、可知日 {str(first[1])[:10]} 之前（含）有分割／配股除權 "
+                                        f"{'、'.join(clash)}——股本是否已含那筆配股分不出來，整季不用，由前一季股數乘分割比例接續")})
+            continue
+        cover.append({"period_end": period, "filed": first[1], "accession": first[5], "value": float(first[2]),
+                      "currency": None, "source": first[6]})
+    return {"cover": cover, "rejected": rejected}
 
 
 def price_series(conn: Any, ticker: str, *, as_of: date | str, start: date | str | None = None

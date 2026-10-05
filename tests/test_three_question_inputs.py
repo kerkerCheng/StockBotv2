@@ -83,7 +83,7 @@ def test_taiwan_and_non_us_gates_are_declared_where_the_absence_is_known() -> No
     conn = _conn()
     tw = get_three_question_inputs("3081.TWO", conn=conn, today=TODAY, company_id=None)
     assert tw["revenue_kind"] == "monthly" and tw["gate"]["absence_kind"] == "upstream_unavailable"
-    assert "台股歷史股數" in tw["gate"]["reason"]
+    assert "台股季報股數" in tw["gate"]["reason"] and "不用今天的股數回推" in tw["gate"]["reason"]
     eu = get_three_question_inputs("IQE.L", conn=conn, today=TODAY)
     assert eu["filer_class"] == "unknown" and "非美國" in eu["gate"]["reason"]
     assert eu["price_quote_unit"] == "GBp" and eu["price_to_settlement"] == 0.01   # minor unit 由 registry 解析

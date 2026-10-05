@@ -1539,6 +1539,39 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 串接。寫成隱式串接時整份 allowlist 載入失敗，11 個 execpolicy 測試同時變紅（與 2026-09-10
 那次同形，這次是測試先攔下來的）。
 
+
+### 台股季報股數（Phase 7 旁支開發「台股歷史股數」，2026-10-05 完成 sandbox impact review）
+
+已定價①（自家三年 P/S 百分位）要「當天的市值」＝當天收盤 × **當時已知的**股數；TWSE／TPEx 開放資料只有當期股本，
+所以台股的這一格到 2026-10-05 一律缺席。來源是 MOPS 資產負債表彙總 `ajax_t163sb05`（一季一份、全市場），
+**與月營收同性質**（按季永久可查，漏抓補得回來，L10）→ **互動式入口**，不進無人值守；心跳第 1 段印最舊哪一季、落後幾季、
+核對沒過幾筆。
+
+```powershell
+# 每季法定期限（5/15、8/14、11/14、次年 3/31）過後跑一次 --sync 就跟得上；重跑冪等
+& '.venv\Scripts\python.exe' -m engine_c.tw_share_capital --ticker 3081.TWO
+& '.venv\Scripts\python.exe' -m engine_c.tw_share_capital --sync
+& '.venv\Scripts\python.exe' -m engine_c.tw_share_capital --backfill 14
+```
+
+- **股數**＝股本（千元）×1000 ÷ 面額 10 元 − 母公司暨子公司持有之庫藏股；**交叉核對**：權益（歸屬母公司業主；表上是「--」
+  而且沒有非控制權益時用權益總計）÷ 每股參考淨值。差 >2% → `mismatch`：照寫進表、讀取端整季不用、`--ticker` 與回補報表逐筆印
+  ——面額不是 10 元的公司在這裡現形，不會被靜默算錯十倍。
+- **版型**：只收一般業（23 欄）與異業（22 欄，「權益總額」）——表頭逐字比對（`fetchers.mops_open_data.BALANCE_SHEET_TEMPLATES`）。
+  銀行、金控、保險、證券期貨的半年報期限比一般業晚，套一般業期限會提早看到（INV-6）→ 拒收、回補報表列出；表頭變了同樣拒收。
+- **可知日**＝一般業法定期限（季後 45 日、年報 3 個月；`available_on_basis=statutory_deadline_only`），是上界、不是公告日。
+- 季與季之間的配股由 `corporate_actions` 的 split（yfinance 記成分割）乘上去（`alpha.three_questions.shares_on`）。
+
+**sandbox impact review 五步：**
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 新端點 `mopsov.twse.com.tw/mops/web/ajax_t163sb05`（POST、公開、無憑證；主機已是月營收在用的那一台）。寫 Engine C SQLite 的 `tw_share_capital_observations`（ignored private runtime、可重建）。**不在無人值守路徑上**；心跳只讀本機。 |
+| **2 skill／prompt／本檔** | 不動 daily prompt；本節。plan（2026-10-05-001）原寫「S3 daily 接線」——照月營收先例改成互動式＋心跳計數器，比排程窄。 |
+| **3 最窄 rule** | **沒有新增任何 rule**。要改成排程必須重做一次本 review。 |
+| **4 permission contract test** | `test_tw_share_capital_stays_an_interactive_entry`（rules 與 harvest 都不得出現）、`test_heartbeat_monthly_revenue_line_reads_no_network`（擴充：`sync_latest`／`fetch_balance_sheet` 不得出現在心跳）。 |
+| **5 端到端 smoke** | 2026-10-05 實跑：`--backfill 14` 寫入 12 檔 × 14 季＝168 筆、失敗 0；交叉核對攔下 4 筆（3081.TWO 2026Q2 股本含待分配股票股利、3017.TW 三季）；月營收 `--backfill 48` 補到 2022-10；12 檔台股已定價① 12/12 由缺席變有值（第 88–100 百分位，窗 1,087–1,092 天、覆蓋率 1.0）。R2 另抽線上 115Q2：上市收 1,053 列、拒 31 列（銀行、金控、保險、證券），上櫃收 884、拒 7（證券期貨）。 |
+
 ---
 
 ## 遠端操作
