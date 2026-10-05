@@ -8,6 +8,7 @@
 """
 from __future__ import annotations
 
+import json
 import sqlite3
 from pathlib import Path
 
@@ -254,3 +255,19 @@ def test_pnl_identity_only_applies_to_fiscal_year_results() -> None:
     from engine_c.manual_observations import _require_pnl_sign_convention
 
     _require_pnl_sign_convention("segment_revenue_share", _fy(62678000.0))
+
+
+def test_share_fields_reject_top_level_numbers_that_are_not_shares() -> None:
+    """占比欄位頂層的每個數值鍵都會被讀成一個分部的占比（`_segment_revenue_share`）。
+
+    事發（2026-10-05）：42 筆占比觀測裡 11 筆把總額寫成頂層數值（`total_usd`、`total_eur_m`…），
+    讀取端就多出一個「占比 548.7」的分部。總額要放進物件裡。"""
+    from engine_c.manual_observations import _require_machine_comparable_if_mechanical as check
+
+    for field in ("segment_revenue_share", "product_line_revenue_share"):
+        with pytest.raises(ValueError, match="total_eur_m"):
+            check(field, json.dumps({"Microelectronics": 0.6264, "Electronics Solutions": 0.3736, "total_eur_m": 548.7}))
+        check(field, json.dumps({"Microelectronics": 0.6264, "Electronics Solutions": 0.3736, "fiscal_period": "Q1",
+                                 "_amounts_eur_m": {"Microelectronics": 343.7, "_total": 548.7}}))
+    # 抵減行（GOOGL 的避險損益）是負的小比例，合法
+    check("segment_revenue_share", json.dumps({"Google Services": 0.72, "Hedging gains (losses)": -0.0003}))

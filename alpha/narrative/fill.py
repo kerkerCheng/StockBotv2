@@ -15,11 +15,15 @@ ABSENT = "（尚無）"
 
 
 def format_value(kind: str, value: Any, *, unit: str | None = None) -> str | None:
-    """authority 值 → 人讀的字串。`kind`：price／currency／ratio／multiple／count／date／raw。"""
+    """authority 值 → 人讀的字串。`kind`：price／currency／ratio／share／multiple／count／date／raw。
+
+    `ratio` 是變動率（帶正負號）；`share` 是占比（不帶正號——「+62.6%」會被讀成成長）。"""
     if value is None:
         return None
     if kind == "ratio":
         return f"{float(value) * 100:+.1f}%".replace("-", "−")
+    if kind == "share":
+        return f"{float(value) * 100:.1f}%".replace("-", "−")
     if kind == "multiple":
         return f"{float(value):.1f} 倍"
     if kind == "count":

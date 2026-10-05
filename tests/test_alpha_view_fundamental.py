@@ -164,6 +164,28 @@ def test_snapshot_values_are_labelled_with_the_snapshot_currency_not_the_base_ob
     assert units(snapshot_only) and all("TWD" in u for u in units(snapshot_only)), units(snapshot_only)
 
 
+def test_in_numbers_latest_prints_the_segment_mix_when_the_series_is_a_revenue_mix() -> None:
+    """序列是分部／產品線占比時沒有年增率，`{in_numbers_latest}` 不得因此印「（尚無）」——答 yes 卻印尚無是自相矛盾。
+
+    事發（2026-10-05，ATS.VI）：第一檔有兩點分部占比的公司。只印 -1..1 的數值鍵（說明欄位與總額不是占比）。"""
+    from briefing.alpha_view.builder import _three_question_values
+
+    mix = {"Microelectronics": 0.6264, "Electronics Solutions": 0.3736, "fiscal_period": "Q1 2026/27",
+           "total_usd": 50001000, "_amounts_eur_m": {"Microelectronics": 343.7}}
+    tq = {"in_numbers": [{"key": "in_numbers_series", "absence_kind": None,
+                          "value": [{"as_of": "2025-06-30", "revenue_mix": {"Microelectronics": 0.4537}},
+                                    {"as_of": "2026-06-30", "revenue_mix": mix}]}]}
+    values = _three_question_values(tq)
+    latest = values["in_numbers_latest"]
+    assert latest and latest.index("Microelectronics") < latest.index("Electronics Solutions"), latest
+    assert "62.6%" in latest and "+" not in latest, latest      # 占比不帶正號——「+62.6%」會被讀成成長
+    assert "fiscal_period" not in latest and "total_usd" not in latest, latest
+    assert values["in_numbers_as_of"] == "2026-06-30"
+    yoy = _three_question_values({"in_numbers": [{"key": "in_numbers_series", "absence_kind": None,
+                                                  "value": [{"period_end": "2026-06-30", "yoy": 0.25}]}]})
+    assert yoy["in_numbers_latest"] and "25" in yoy["in_numbers_latest"]       # 年增率那條路不變
+
+
 def test_assumption_basis_vocabulary_is_a_subset_of_the_read_model_vocabulary() -> None:
     """假設的知識種類是 read model `Basis` 的**子集**，刻意沒有 `deterministic`——輸入假設永遠不是確定性事實。
     （原本住在 `test_fundamental_model.py`；橋退役，這條守 ledger 契約的判準留下。）"""

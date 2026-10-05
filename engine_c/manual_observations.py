@@ -93,6 +93,9 @@ def _numeric_leaves(payload: Any) -> int:
     return 0
 
 
+_SHARE_FIELDS = ("segment_revenue_share", "product_line_revenue_share")
+
+
 def _require_machine_comparable_if_mechanical(field_name: str, value: str) -> None:
     """`verifiability=mechanical` 的欄位，value 必須是可機械比對的 JSON 數值。
 
@@ -128,6 +131,16 @@ def _require_machine_comparable_if_mechanical(field_name: str, value: str) -> No
             f"{field_name} 是 verifiability=mechanical 欄位，value 至少要有一個數值——"
             "沒有數字就沒有可比對的東西"
         )
+    # 占比欄位：頂層每個數值鍵都會被讀成一個分部的占比（alpha/providers/fundamentals.py `_segment_revenue_share`），
+    # 所以契約寫的「0..1 的小數」要在這裡擋。2026-10-05：42 筆裡 11 筆把總額寫成頂層數值（total_usd 等）。
+    if field_name in _SHARE_FIELDS and isinstance(payload, Mapping):
+        out = sorted(str(k) for k, v in payload.items()
+                     if isinstance(v, (int, float)) and not isinstance(v, bool) and not -1.0 <= v <= 1.0)
+        if out:
+            raise ValueError(
+                f"{field_name} 的頂層數值必須是佔總營收的比例（-1..1；負值只給抵減行）——{out} 超出範圍。"
+                "總額或金額請放進一個物件（例 \"_amounts\": {…}）：頂層的每個數值鍵都會被讀成一個分部的占比"
+            )
 
 
 #: 損益恆等式的相對容差。表上的數字是四捨五入後的百萬／千元，所以不能要求完全相等；
