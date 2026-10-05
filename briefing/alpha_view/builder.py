@@ -827,11 +827,14 @@ def build_alpha_investment_view(
     # 兩者相同的美股看不出來；不同的 5 檔全部標錯：XFAB.PA（USD 財報／EUR 報價）、
     # HEXA-B.ST（EUR／SEK）、6680.HK（CNY／HKD）、XPEV（CNY／USD）、
     # **IQE.L（GBP／GBp）——那是 minor unit，讀成報表幣別會差 100 倍**。
-    # 身分來源只能是財報自己：基期觀測宣告的 currency，其次是快照的 financial_currency。
+    # 身分來源只能是財報自己。⚠ 2026-10-05：這個標籤掛的全是**快照**的數（營收、FCF、現金、負債、營收共識），
+    # 所以先取快照自己宣告的 `financial_currency`——原本讀的 `.currency` 在 `FundamentalsSnapshot` 上不存在，
+    # 這條退路從沒生效（26 檔印「未知」）；而基期觀測可能是 20-F 的美元便利換算（TSM、UMC），
+    # 套到台幣的快照數上會差 30 倍。基期觀測宣告的 currency 只在快照沒宣告時補位。
     # ⚠ **不得回退到 `market_currency`**——那正是這個 bug；答不出來就寫「未知」（L12 先分開再各自定規則）。
     reporting_currency = (
-        (getattr(base_actuals, "currency", None) if base_actuals is not None else None)
-        or getattr(context.fundamentals, "currency", None)
+        getattr(context.fundamentals, "financial_currency", None)
+        or (getattr(base_actuals, "currency", None) if base_actuals is not None else None)
     )
 
     # as-of 模式：Engine A／C 有時點投影，Decision Store 與 thesis 檔沒有。沒有投影的來源

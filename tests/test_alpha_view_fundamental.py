@@ -140,6 +140,30 @@ def test_reporting_currency_label_comes_from_the_filing_not_from_the_quote_curre
                if (item.unit or "").startswith("reporting_currency"))
 
 
+def test_snapshot_values_are_labelled_with_the_snapshot_currency_not_the_base_observation_currency() -> None:
+    """標籤掛的是**快照**的數，身分先取快照自己宣告的 `financial_currency`。
+
+    事發（2026-10-05，UMC）：基期觀測是 20-F 的美元便利換算（每 ADS），快照的近四季營收是新台幣——
+    標籤取了基期的 USD，敘事印出「2,507 億 USD」（實際約 78 億美元，差 32 倍）；同時 26 檔快照有宣告幣別、
+    卻因為讀了不存在的 `.currency` 屬性而印「未知」。"""
+    from dataclasses import replace
+
+    from tests.test_alpha_investment_view import _FakeFundamentals
+
+    class _TwdSnapshot(_FakeFundamentals):
+        def fundamentals(self, ticker, *, as_of=None):
+            snap, fresh = super().fundamentals(ticker, as_of=as_of)
+            return replace(snap, financial_currency="TWD"), fresh
+
+    def units(view):
+        return {item.unit for item in view.fundamentals.items if (item.unit or "").startswith("reporting_currency")}
+
+    with_base = _with_engine_c(fundamentals=_TwdSnapshot())     # 基期觀測宣告 USD（便利換算的形狀）
+    assert units(with_base) and all("TWD" in u and "USD" not in u for u in units(with_base)), units(with_base)
+    snapshot_only = _view(fundamentals=_TwdSnapshot())           # 沒有基期觀測：不得印「未知」
+    assert units(snapshot_only) and all("TWD" in u for u in units(snapshot_only)), units(snapshot_only)
+
+
 def test_assumption_basis_vocabulary_is_a_subset_of_the_read_model_vocabulary() -> None:
     """假設的知識種類是 read model `Basis` 的**子集**，刻意沒有 `deterministic`——輸入假設永遠不是確定性事實。
     （原本住在 `test_fundamental_model.py`；橋退役，這條守 ledger 契約的判準留下。）"""
