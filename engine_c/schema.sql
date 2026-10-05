@@ -174,6 +174,43 @@ CREATE TABLE IF NOT EXISTS monthly_revenue_observations (
 CREATE INDEX IF NOT EXISTS idx_monthly_revenue_ticker_month
     ON monthly_revenue_observations (ticker, data_month DESC, fetched_at DESC);
 
+-- 台股季報股數（Phase 7 旁支開發，2026-10-05）：可重建 ETL 觀測；股數＝股本÷面額－庫藏股，以 權益÷每股淨值 交叉核對；
+-- available_on＝一般業法定期限（上界）。SQLite 對應的建表住 engine_c/tw_share_capital.py（遷移 20261005_add_tw_share_capital.sql）。
+CREATE TABLE IF NOT EXISTS tw_share_capital_observations (
+    observation_id VARCHAR(64) PRIMARY KEY,
+    ticker VARCHAR(32) NOT NULL,
+    market VARCHAR(8) NOT NULL CHECK (market IN ('twse', 'tpex')),
+    company_code VARCHAR(16) NOT NULL,
+    company_name TEXT,
+    fiscal_year INTEGER NOT NULL,
+    quarter INTEGER NOT NULL CHECK (quarter BETWEEN 1 AND 4),
+    period_end DATE NOT NULL,
+    template VARCHAR(32) NOT NULL,
+    share_capital BIGINT,
+    equity_parent BIGINT,
+    equity_total BIGINT,
+    non_controlling BIGINT,
+    bvps NUMERIC(18,6),
+    treasury_shares BIGINT,
+    par_value INTEGER NOT NULL,
+    shares_issued BIGINT,
+    shares_outstanding BIGINT,
+    shares_implied_by_equity BIGINT,
+    cross_check_diff NUMERIC(18,10),
+    cross_check_status VARCHAR(16) NOT NULL,
+    cross_check_reason TEXT,
+    currency VARCHAR(8) NOT NULL,
+    unit_scale INTEGER NOT NULL CHECK (unit_scale > 0),
+    available_on DATE NOT NULL,
+    available_on_basis VARCHAR(64) NOT NULL,
+    source TEXT NOT NULL,
+    fetched_at TIMESTAMPTZ NOT NULL,
+    payload_digest VARCHAR(64) NOT NULL UNIQUE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_tw_share_capital_ticker_period
+    ON tw_share_capital_observations (ticker, period_end DESC, fetched_at DESC);
+
 -- 機械歷史表（Phase 3 Step 3.2）：價格 raw／adjusted＋分割事件、EDGAR 基本面（每份申報各一列）。
 -- 可重建的 ETL 觀測，不是 append-only judgment ledger（L10：今天重取一次拿得回來）。
 -- 財報數字的可用日是 filed（EDGAR 申報日），不是會計期末、更不是 fetched_at（INV-6）；

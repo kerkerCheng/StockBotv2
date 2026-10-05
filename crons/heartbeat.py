@@ -257,6 +257,12 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
     except Exception as exc:  # noqa: BLE001
         absence = Absence("upstream_unavailable", f"月營收盤點失敗：{type(exc).__name__}")
         section.lines.append(f"台股月營收：{absence.reason}（{absence.kind}）")
+    # (c1) 台股季報股數（2026-10-05）：同月營收——MOPS 按季永久可查，所以不排程，心跳印落後幾季。
+    try:
+        section.lines.append(_tw_share_capital_line(now=now))
+    except Exception as exc:  # noqa: BLE001
+        absence = Absence("upstream_unavailable", f"季報股數盤點失敗：{type(exc).__name__}")
+        section.lines.append(f"台股季報股數：{absence.reason}（{absence.kind}）")
 
     # (c2) FX 觀測新鮮度（2026-09-19）。**它是一個已知會過期、而且沒有人在補的東西**：
     # 四筆 fx_rate 觀測的 `_note` 逐字寫著「現價 bar_date 換了就要補新的一筆」，
@@ -563,6 +569,50 @@ def _monthly_revenue_line(*, now: datetime) -> str:
         line += f"｜**{len(empty)} 檔一筆都沒有**：" + "、".join(empty)
     line += (f"｜⚠ 落後 {lag} 個月（跑 `python -m engine_c.monthly_revenue --sync`）"
              if lag else "｜已跟上公告期限")
+    return line
+
+
+def _tw_share_capital_line(*, now: datetime) -> str:
+    """台股季報股數的新鮮度（已定價①的市值序列靠它）。零網路——只讀本機 Engine C。
+
+    `落後` 相對**法定期限**算（一般業季後 45 日、年報 3 個月）：8 月 10 日還沒有 Q2 是正常的，8 月 20 日還沒有才是落後。
+    交叉核對沒過的列不算「有」——它們讀取端不用，所以照印筆數，不讓「有抓」與「能用」同形（L13-2）。
+    """
+
+    from engine_c.db import get_conn
+    from engine_c.monthly_revenue import registry_taiwan_tickers
+    from engine_c.tw_share_capital import latest_due_quarter, share_capital_series
+
+    tickers = registry_taiwan_tickers()
+    if not tickers:
+        return "台股季報股數：registry 裡沒有台股（capability_absent）"
+    today = now.astimezone().date()
+    due_year, due_q = latest_due_quarter(today)
+    conn = get_conn()
+    try:
+        latest: dict[str, tuple[int, int]] = {}
+        not_ok = 0
+        for ticker in tickers:
+            rows = share_capital_series(conn, ticker)
+            not_ok += sum(1 for r in rows if r["cross_check_status"] != "ok")
+            ok = [(int(r["fiscal_year"]), int(r["quarter"])) for r in rows if r["cross_check_status"] == "ok"]
+            if ok:
+                latest[ticker] = max(ok)
+    finally:
+        conn.close()
+    if not latest:
+        return (f"台股季報股數 {len(tickers)} 檔｜**一筆可用的都沒有**"
+                "（跑 `python -m engine_c.tw_share_capital --backfill 14`）")
+    oldest = min(latest.values())
+    lag = (due_year * 4 + due_q) - (oldest[0] * 4 + oldest[1])
+    empty = sorted(set(tickers) - set(latest))
+    line = f"台股季報股數 {len(latest)}/{len(tickers)} 檔｜最舊 {oldest[0]}Q{oldest[1]}"
+    if empty:
+        line += f"｜**{len(empty)} 檔一筆可用的都沒有**：" + "、".join(empty)
+    if not_ok:
+        line += f"｜交叉核對沒過 {not_ok} 筆（不用）"
+    line += (f"｜⚠ 落後 {lag} 季（跑 `python -m engine_c.tw_share_capital --sync`）" if lag > 0
+             else "｜已跟上法定期限")
     return line
 
 

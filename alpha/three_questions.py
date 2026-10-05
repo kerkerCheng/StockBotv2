@@ -258,6 +258,9 @@ def own_history(inp: Mapping[str, Any], *, today: date,
               "window_days": window_days, "min": round(min(v for _, v in series), 4),
               "median": round(median(v for _, v in series), 4), "max": round(max(v for _, v in series), 4),
               "days_since_last": days_since}
+    if inp.get("shares_rejected"):
+        # 台股：交叉核對沒過或同季衝突的季整季不用——稽核區逐筆印出，不讓「少了一段樣本」看起來像沒事（INV-3）。
+        detail["shares_rejected"] = list(inp["shares_rejected"])
     if window_days < 365 * HISTORY_YEARS - HISTORY_SLACK_DAYS:
         return line(key, label, rule=_RULE_OWN, basis=basis, absence_kind="insufficient_evidence",
                     reason=f"窗只有 {window_days} 天（{series[0][0].isoformat()} 起），不滿 {HISTORY_YEARS} 年",

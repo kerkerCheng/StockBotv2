@@ -8,12 +8,14 @@ mops_open_data.py — 公開資訊觀測站（MOPS）的**結構化開放資料*
 - **本檔**抓的是**已經結構化的數字與公告**，不經 LLM 抽取：月營收是帶時戳的財務觀測，
   依 A1「圖不含時變數字」直接進 Engine C；重訊是 Engine B 的 lead 原料。
 
-三個來源（全部於 2026-09-17 實測過，不是照文件抄的）：
+五個來源（1–4 於 2026-09-17、5 於 2026-10-05 實測過，不是照文件抄的）：
 
 1. 當期月營收（上市）`https://openapi.twse.com.tw/v1/opendata/t187ap05_L`
 2. 當期月營收（上櫃）`https://www.tpex.org.tw/openapi/v1/mopsfin_t187ap05_O`
 3. 歷史月營收        `https://mopsov.twse.com.tw/nas/t21/{sii|otc}/t21sc03_{roc_year}_{month}_0.html`
 4. 當日重大訊息      `.../t187ap04_L`（上市）與 `.../mopsfin_t187ap04_O`（上櫃）
+5. 資產負債表彙總    `https://mopsov.twse.com.tw/mops/web/ajax_t163sb05`（POST；一季一份、全市場；UTF-8）——
+   台股**歷史股數**唯一的機械來源（換算與交叉核對在 `engine_c.tw_share_capital`）
 
 **五個坑，每一個都實測撞過：**
 
@@ -77,6 +79,34 @@ ANNOUNCEMENT_URL: dict[str, str] = {
 }
 REVENUE_HISTORY_URL = "https://mopsov.twse.com.tw/nas/t21/{segment}/t21sc03_{year}_{month}_{kind}.html"
 
+BALANCE_SHEET_URL = "https://mopsov.twse.com.tw/mops/web/ajax_t163sb05"
+
+#: 資產負債表彙總（t163sb05）一季一份回應、每個產業版型一張表。**只收已登記的兩種版型**——表頭逐字相同才算
+#: （2026-10-05 實測：上市／上櫃 112Q1 與 115Q2 的表頭一字不差，MOPS 用現行版型重出舊季）。
+#: 銀行、金控、保險、證券期貨的半年報法定期限與一般業不同，套一般業期限會**提早**看到（INV-6），所以拒收、
+#: 回報裡列出，不猜。表頭變了的新版型同樣拒收（L16：字彙有行為後果就要強制）。
+BALANCE_SHEET_TEMPLATES: dict[str, tuple[str, ...]] = {
+    "general": (
+        "公司代號", "公司名稱", "流動資產", "非流動資產", "資產總計", "流動負債", "非流動負債", "負債總計", "股本",
+        "權益─具證券性質之虛擬通貨", "資本公積", "保留盈餘", "其他權益", "庫藏股票", "歸屬於母公司業主之權益合計",
+        "共同控制下前手權益", "合併前非屬共同控制股權", "非控制權益", "權益總計", "待註銷股本股數（單位：股）",
+        "預收股款（權益項下）之約當發行股數（單位：股）", "母公司暨子公司所持有之母公司庫藏股股數（單位：股）", "每股參考淨值"),
+    "conglomerate": (
+        "公司代號", "公司名稱", "流動資產", "非流動資產", "資產總計", "流動負債", "非流動負債", "負債總計", "股本",
+        "權益－具證券性質之虛擬通貨", "資本公積", "保留盈餘", "其他權益", "庫藏股票", "歸屬於母公司業主之權益合計",
+        "共同控制下前手權益", "非控制權益", "權益總額", "待註銷股本股數（單位：股）",
+        "預收股款（權益項下）之約當發行股數（單位：股）", "母公司暨子公司所持有之母公司庫藏股股數（單位：股）", "每股參考淨值"),
+}
+#: 欄位 → 已登記版型裡的欄名（兩種版型只差「權益總計／權益總額」）。單位：股本與權益是千元、庫藏股是股、每股淨值是元。
+_BALANCE_SHEET_COLUMNS: dict[str, tuple[str, ...]] = {
+    "share_capital": ("股本",),
+    "equity_parent": ("歸屬於母公司業主之權益合計",),
+    "equity_total": ("權益總計", "權益總額"),
+    "non_controlling": ("非控制權益",),
+    "treasury_shares": ("母公司暨子公司所持有之母公司庫藏股股數（單位：股）",),
+    "bvps": ("每股參考淨值",),
+}
+
 #: 歷史頁末尾那個數字是**註冊地**，不是流水號：`0` 本國企業、`1` 外國企業（KY 股）。
 #: 事發（2026-09-17）：只抓 `_0` 時 4971.TWO（IET-KY）在 24 個月回補裡一筆都沒有，
 #: 而當期 API 有它——**同一家公司在兩個來源一個有一個沒有**，正是 L17「機制只認得
@@ -86,6 +116,7 @@ REVENUE_HISTORY_KINDS: tuple[str, ...] = ("0", "1")
 _CODE = re.compile(r"^\d{4,6}$")
 _CELL = re.compile(r"<t[dh][^>]*>(.*?)</t[dh]>", re.IGNORECASE | re.DOTALL)
 _ROW = re.compile(r"<tr[^>]*>(.*?)</tr>", re.IGNORECASE | re.DOTALL)
+_TABLE = re.compile(r"<table[^>]*>(.*?)</table>", re.IGNORECASE | re.DOTALL)
 _TAG = re.compile(r"<[^>]+>")
 
 
@@ -211,6 +242,17 @@ def _get(url: str, *, timeout: int = 40) -> requests.Response:
     return response
 
 
+def _post(url: str, data: Mapping[str, str], *, timeout: int = 60) -> requests.Response:
+    try:
+        response = requests.post(url, data=dict(data), headers=build_headers(), timeout=timeout)
+    except requests.RequestException as exc:  # pragma: no cover - 網路
+        raise MopsOpenDataError(f"{url} 取得失敗：{type(exc).__name__}: {exc}") from exc
+    if response.status_code != 200:
+        raise MopsOpenDataError(f"{url} 回應 {response.status_code}")
+    rate_sleep(0.5)
+    return response
+
+
 def _validate_market(market: str) -> str:
     cleaned = str(market or "").strip().lower()
     if cleaned not in MARKETS:
@@ -323,6 +365,66 @@ def fetch_monthly_revenue_month(market: str, year: int, month: int) -> list[dict
         raise MopsOpenDataError(
             f"{market} {data_month} 兩份歷史頁都解析不到任何公司列（{detail}）")
     return out
+
+
+def parse_balance_sheet(body: str, *, market: str, year: int, quarter: int,
+                        source_url: str) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """一份 t163sb05 回應 → `(已登記版型的列, 拒收的列)`。拒收的列只帶身分與版型（欄數），不帶數字。"""
+
+    rows: list[dict[str, Any]] = []
+    rejected: list[dict[str, Any]] = []
+    for table in _TABLE.findall(body):
+        trs = _ROW.findall(table)
+        if not trs:
+            continue
+        head = tuple(_text(cell) for cell in _CELL.findall(trs[0]))
+        template = next((name for name, sig in BALANCE_SHEET_TEMPLATES.items() if head == sig), None)
+        index = {name: i for i, name in enumerate(head)}
+        for tr in trs[1:]:
+            cells = [_text(cell) for cell in _CELL.findall(tr)]
+            if not cells or not _CODE.fullmatch(cells[0]):
+                continue
+            base = {"market": market, "company_code": cells[0], "ticker": ticker_for(market, cells[0]),
+                    "company_name": cells[1] if len(cells) > 1 else None, "fiscal_year": int(year),
+                    "quarter": int(quarter), "source_url": source_url}
+            if template is None or len(cells) != len(head):
+                rejected.append({**base, "template": (f"unregistered:{len(head)}欄" if template is None
+                                                      else f"{template}:欄數 {len(cells)}≠{len(head)}")})
+                continue
+
+            def pick(field: str) -> str | None:
+                name = next((n for n in _BALANCE_SHEET_COLUMNS[field] if n in index), None)
+                return cells[index[name]] if name is not None else None
+
+            rows.append({**base, "template": template,
+                         "share_capital": _int(pick("share_capital")), "equity_parent": _int(pick("equity_parent")),
+                         "equity_total": _int(pick("equity_total")), "non_controlling": _int(pick("non_controlling")),
+                         "treasury_shares": _int(pick("treasury_shares")), "bvps": _float(pick("bvps"))})
+    return rows, rejected
+
+
+def fetch_balance_sheet_quarter(market: str, year: int, quarter: int
+                                ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """資產負債表彙總（一季一張、全市場）→ `(已登記版型的列, 拒收的列)`。股數不在表上——換算住
+    `engine_c.tw_share_capital`（面額、庫藏股、交叉核對），這裡只把數字搬過來（千元原樣，不先乘開）。"""
+
+    market = _validate_market(market)
+    if int(quarter) not in (1, 2, 3, 4):
+        raise MopsOpenDataError(f"季別不合法：{quarter}")
+    roc_year = int(year) - 1911
+    if roc_year <= 0:
+        raise MopsOpenDataError(f"年份不合法：{year}")
+    segment = _MARKET_SEGMENT[market]
+    data = {"encodeURIComponent": "1", "step": "1", "firstin": "1", "off": "1", "isQuery": "Y",
+            "TYPEK": segment, "year": str(roc_year), "season": f"{int(quarter):02d}"}
+    source = f"{BALANCE_SHEET_URL}（POST TYPEK={segment}&year={roc_year}&season={int(quarter):02d}）"
+    body = _post(BALANCE_SHEET_URL, data).content.decode("utf-8", errors="replace")
+    rows, rejected = parse_balance_sheet(body, market=market, year=year, quarter=quarter, source_url=source)
+    if not rows:
+        # 「這一季還沒出表」「版型變了」「一般業那張表不見了」都在這裡——不回空集合（L13-2）。
+        raise MopsOpenDataError(f"{market} {year}Q{quarter} 解析不到已登記版型的公司列"
+                                f"（拒收 {len(rejected)} 列；可能還沒出表或版型變了）")
+    return rows, rejected
 
 
 def _announcement_row(

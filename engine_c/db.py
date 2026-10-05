@@ -205,10 +205,13 @@ def _ensure_sqlite_schema(conn: sqlite3.Connection) -> None:
     from engine_c.manual_observations import ensure_manual_observation_schema
     from engine_c.monthly_revenue import ensure_monthly_revenue_schema
     from engine_c.technical import ensure_technical_schema
+    from engine_c.tw_share_capital import ensure_share_capital_schema
 
     ensure_manual_observation_schema(conn)
     ensure_technical_schema(conn)
     ensure_monthly_revenue_schema(conn)
+    # 台股季報股數（Phase 7 旁支開發，2026-10-05）：可重建 ETL 表，只 CREATE IF NOT EXISTS。
+    ensure_share_capital_schema(conn)
     # Phase 3 Step 3.2：價格／分割／EDGAR 基本面的機械歷史表（只 CREATE IF NOT EXISTS，不動既有表）。
     ensure_history_schema(conn)
     # Phase 6 Step 6.6：募資文件清單（稀釋燈的判色依據；新表，只 CREATE IF NOT EXISTS，不動既有表的 CHECK）。
