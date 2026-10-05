@@ -104,6 +104,56 @@
       ],
       "statement": "Why LPTs are constrained by GOES (DOE, Feb 2022): the two main complaints about domestic GOES are insufficient quantity and insufficient quality (narrow width, heavy thickness), pointing to Cleveland-Cliffs' technology being outdated against updated standards; of $29 million of 2020 U.S. GOES imports, 85% came from South Korea, 6% Brazil, 4% Russia. Dated context (L4).",
       "subject_id": "e6"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：較新的官方或客戶端文件寫出北美 CTC 廠的家數或產能與本份不同（新增、退出或擴產），或 Essex Furukawa／REA 確認在美國量產 CTC。核查頻率：每年（DOE／DOC 供應鏈報告）＋各廠新聞。觸發後 48 小時：CTC 層供給側補邊或加註，LPT 讀圖的下一層重讀。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl9",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s30",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s31",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s32",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s33"
+      ],
+      "statement": "DOE (Feb 2022): stakeholders said three manufacturers produce CTC in North America but only two in the U.S.; literature review named three potential U.S. companies — Sam Dong (makes CTC at Rogersville, TN), Essex Furukawa (unclear whether CTC can be produced at its domestic facilities) and REA (its Fort Wayne, IN location has the capability per 2008 literature). Only Sam Dong is modeled as a supplier: Essex Furukawa is explicitly unclear, and REA rests on 2008 literature while the bare alias 'REA' collides with the Rural Electrification Administration in grid documents. Dated 2022 snapshot (L4).",
+      "subject_id": "mat:ctc_copper_conductor"
+    },
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：較新的官方或廠商文件寫出美國 LPT 絕緣材料有新廠或擴產，或進口依賴明顯下降。核查頻率：每年。觸發後 48 小時：本 claim 加註，LPT 讀圖的下一層重讀。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl10",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s34",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s35",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s36",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s37"
+      ],
+      "statement": "DOE (Feb 2022): industry engagement flagged insulating material as a potential supply concern due to a lack of domestic manufacturing; only a few domestic suppliers of LPT insulating material — Weidmann (part of its product line at Urbana, OH) and Cindus Corporation (Cincinnati, OH); DuPont 'was reported by a stakeholder' to make Nomex in the U.S. (hearsay, not modeled as a supplier). Dated 2022 snapshot (L4).",
+      "subject_id": "mat:transformer_insulation"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：較新的官方報告或 LPT 廠申報寫出分接開關供應不再吃緊（交期回落、國內新增產能），或具名供應商的一手揭露擴產到位。核查頻率：每年。觸發後 48 小時：e20 降 confidence 或提撤回，LPT 讀圖的下一層重讀。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl11",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11"
+      ],
+      "statement": "DOE (Feb 2022): stakeholders indicated tap changers could also be a bottleneck — three domestic suppliers and one reliable supplier from Germany, none named in the report; German tap changers are much more costly with a longer lead time. Stakeholder view, dated 2022 (L4).",
+      "subject_id": "e20"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：較新的一手（套管廠商申報、DOE／NERC／商務部更新）寫出 2026 年的高壓套管交期。核查頻率：每年。觸發後 48 小時：本 claim 加註為過時，套管題重開。",
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_cl12",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s12"
+      ],
+      "statement": "DOE (Feb 2022), citing a 2014 DOE source: high-voltage bushings often have a long lead time of up to five months. A 2014 data point, not a 2026 condition (L4); no bushing supplier is named in the report.",
+      "subject_id": "tech:transformer_bushing"
     }
   ],
   "edges": [
@@ -287,6 +337,52 @@
         "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s24"
       ],
       "src_id": "co:virginia_transformer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:ctc_copper_conductor",
+      "id": "e17",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s31"
+      ],
+      "src_id": "co:sam_dong"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:transformer_insulation",
+      "id": "e18",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s34",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s35"
+      ],
+      "src_id": "co:weidmann"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:transformer_insulation",
+      "id": "e19",
+      "relation": "supplies_to",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s34",
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s36"
+      ],
+      "src_id": "co:cindus"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:transformer_tap_changer",
+      "id": "e20",
+      "relation": "constrained_by",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s11"
+      ],
+      "src_id": "tech:large_power_transformer"
     }
   ],
   "nodes": [
@@ -567,6 +663,51 @@
         "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s24"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Sam Dong",
+        "Samdong"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:sam_dong",
+      "name": "Sam Dong",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s31"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Weidmann",
+        "Weidmann Electrical Technology"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:weidmann",
+      "name": "Weidmann",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s35"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Cindus",
+        "Cindus Corporation"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "co:cindus",
+      "name": "Cindus Corporation",
+      "source_ids": [
+        "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s36"
+      ],
+      "type": "Company"
     }
   ],
   "schema_version": "0.1",
@@ -580,8 +721,8 @@
     "retrieved_at": "2026-10-04",
     "source_type": "industry_report",
     "storage_permission": "repo_excerpt",
-    "supersedes_extraction_sha256": "2e2dddddda443f86ccc7eaf07d6b83fd70f14f35c0aa037d6a124bf6a5bf44d6",
-    "title": "U.S. DOE — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems（2022-02-24；LPT 章）; §2.1.4.1 U.S. LPT manufacturers, imports, GOES complaints",
+    "supersedes_extraction_sha256": "878d577a99dcbf5ce525b4d77236539fc59af2dc72e95e71ba0470546a5ed8bc",
+    "title": "U.S. DOE — Electric Grid Supply Chain Review: Large Power Transformers and High Voltage Direct Current Systems（2022-02-24；LPT 章）; §2.1.4.1 U.S. LPT manufacturers, imports, GOES complaints; §2.1.4.1 CTC and insulating-material suppliers; §2.1.6 tap changers, bushings",
     "url": "https://www.energy.gov/sites/default/files/2022-02/Electric%20Grid%20Supply%20Chain%20Report%20-%20Final.pdf"
   },
   "sources": [
@@ -729,6 +870,46 @@
       "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s29",
       "locator": "報告 p.15（PDF 第 30 頁）——GOES 進口來源",
       "quote": "In 2020, out of $29 million spent on GOES imports into the United States under the aforementioned HS code, 85% of imports came from South Korea, 6% came from Brazil, and 4% came from Russia (USA Trade Online, 2021)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s30",
+      "locator": "報告 p.15（PDF 第 30 頁） 2.1.4.1——CTC copper（家數）",
+      "quote": "CTC copper: According to stakeholder outreach there are three total manufacturers producing CTC in North America, but only two companies in the United States producing CTC copper wire. However, through literature review, instead of two, three potential U.S. companies were identified: (1) Sam Dong, (2) Essex Furukawa, and (3) REA."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s31",
+      "locator": "報告 p.15（PDF 第 30 頁） 2.1.4.1——CTC copper：Sam Dong",
+      "quote": "Sam Dong manufactures CTC at its Rogersville, Tennessee facility (Sam Dong, 2012)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s32",
+      "locator": "報告 p.15（PDF 第 30 頁） 2.1.4.1——CTC copper：Essex Furukawa（只掛 claim）",
+      "quote": "Essex Furukawa has multiple wire manufacturing facilities in the United States including Fort Wayne and Franklin in Indiana, and Franklin in Tennessee (Essex Furukawa, 2021), but it remains unclear if CTC can be produced at any of the domestic facilities."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s33",
+      "locator": "報告 p.15（PDF 第 30 頁） 2.1.4.1——CTC copper：REA（只掛 claim）",
+      "quote": "Lastly, REA has four domestic manufacturing facilities including Fort Wayne and Lafayette in Indiana, Guilford in Connecticut, and Ashland in Virginia (REA, 2021). Literature has shown that the Fort Wayne, Indiana location possesses the capability to produce CTC copper wire (Gorman, 2008)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s34",
+      "locator": "報告 p.16（PDF 第 31 頁） 2.1.4.1——Insulating material（截在「for LPTs」：全句接「in the United States」，見 failure log #8）",
+      "quote": "Industry engagement indicated that insulating material was a potential supply concern due to a lack of domestic manufacturing. Additional industry stakeholders and literature review showed that there are only a few domestic suppliers for insulating material for LPTs"
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s35",
+      "locator": "報告 p.16（PDF 第 31 頁） 2.1.4.1——Insulating material：Weidmann",
+      "quote": "Weidmann manufactures part of its product line at its Urbana, Ohio facility (Weidmann, 2022)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s36",
+      "locator": "報告 p.16（PDF 第 31 頁） 2.1.4.1——Insulating material：Cindus",
+      "quote": "Cindus Corporation manufactures insulating material in its Cincinnati, Ohio facility (Cindus Corporation, 2022)."
+    },
+    {
+      "id": "doe_grid_supply_chain_lpt_hvdc_2022_02_24_s37",
+      "locator": "報告 p.16（PDF 第 31 頁） 2.1.4.1——Insulating material：DuPont（stakeholder 轉述，只掛 claim）",
+      "quote": "DuPont was reported by a stakeholder to manufacture its Nomex insulating material in the United States."
     }
   ]
 }
