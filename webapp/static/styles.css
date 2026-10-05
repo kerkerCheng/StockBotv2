@@ -131,12 +131,19 @@ main { padding: 16px; max-width: 940px; margin: 0 auto; }
 .onesentence .src { display: block; color: var(--dim); font-size: 11px; margin-top: 5px; }
 
 .rows { display: grid; gap: 8px; margin-top: 4px; }
-.row { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; align-items: baseline;
+/* 兩欄都允許縮到 0（2026-10-05 手機回報：稽核區整列被撐出螢幕）——格線子項預設 min-width:auto，
+   一段沒有斷點的長字串（`keyValueList` 的 JSON、snake_case 鍵）會把 1fr 那欄撐得比畫面寬，連帶同一列的規則文字一起溢出。 */
+.row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto); gap: 6px 12px; align-items: baseline;
        padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+.row > * { min-width: 0; }
 .row:last-child { border-bottom: none; padding-bottom: 0; }
-.row-label { font-size: 13px; }
-.row-value { font-variant-numeric: tabular-nums; font-size: 14px; text-align: right; }
-.row-reason { grid-column: 1 / -1; color: var(--muted); font-size: 12px; }
+.row-label { font-size: 13px; overflow-wrap: anywhere; }
+.row-value { font-variant-numeric: tabular-nums; font-size: 14px; text-align: right; overflow-wrap: anywhere; }
+.row-reason { grid-column: 1 / -1; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+/* 三題稽核列的「規則：…」原本沒有樣式，會被自動塞進第一欄；讓它跨整列、跟其他地方的 .rule 一樣是小字灰色。 */
+.row > .rule { grid-column: 1 / -1; color: var(--dim); font-size: 11px; overflow-wrap: anywhere; }
+.row > ul.weak { grid-column: 1 / -1; }
+.weak li, .note, .attention-body { overflow-wrap: anywhere; }
 .row-absent .row-value { color: var(--dim); font-style: italic; }
 
 .group-title { color: var(--dim); font-size: 11px; text-transform: uppercase;
