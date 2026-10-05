@@ -244,15 +244,51 @@ def test_quote_unit_is_settled_on_both_ends_gbp_pence_is_not_pounds(collected) -
     assert ggg["first_named_absence"] == "no_lead_named"
 
 
-def test_each_lane_carries_its_own_theme_cohort_excess(collected) -> None:
+def test_each_row_compares_only_with_its_own_cohort_and_non_members_are_named(collected) -> None:
+    """多主題等權組 S1（選項 A）：組員跟自己的組比（排除本檔）；不是組員的列印 `not_in_any_cohort`，不借別的題材的組。
+
+    變異：把 `cohort_for_row` 改回「只有一組就每列都比」→ LIVEX 會有對組超額（三家都比），這條紅。"""
     aaa = _row(collected, "paper", "AAA")
     assert aaa["theme_cohort"]["members_total"] == 2 and aaa["theme_cohort_return"] == pytest.approx(0.05)
+    assert aaa["theme_cohort"]["cohort_id"] == "tc_test"
     assert aaa["excess_theme_cohort"] == pytest.approx(0.20 - 0.05)
     assert aaa["excess_QQQ"] == pytest.approx(0.20 - 0.01)
     live_row = _row(collected, "live", "LIVEX")
-    assert live_row["theme_cohort"]["members_total"] == 3                    # LIVEX 不是成員：三家都比
+    assert live_row["theme_cohort_absence"]["kind"] == "not_in_any_cohort"
+    assert "excess_theme_cohort" not in live_row and "theme_cohort" not in live_row
+    assert live_row["excess_QQQ"] is not None                                # QQQ／SOXX 的超額照印
     info = collected["theme_cohort"]
-    assert (info["cohort_id"], info["decided_on"], info["missing_members"]) == ("tc_test", "2026-09-30", [])
+    assert info["mode"] == "per_row" and info["absence"] is None
+    assert [(c["cohort_id"], c["decided_on"], c["missing_members"]) for c in info["cohorts"]] == [
+        ("tc_test", "2026-09-30", [])]
+    live = OIST.lanes_payload(collected)["live"]["theme_cohort_excess"]
+    assert live["absent"] == {"not_in_any_cohort": ["LIVEX"]} and live["n"] == 0   # 缺席逐檔列名（INV-3）
+    assert "對組超額缺席 1 列（not_in_any_cohort）：LIVEX" in "\n".join(OIST.render_lanes(collected))
+
+
+COHORT_COOLING = ThemeCohort(
+    cohort_id="tc_cool", theme="散熱",
+    members=(CohortMember("GGG.L", "co:ggg", "成員"), CohortMember("MEM3", "co:mem3", "成員")),
+    excluded=(), reason="測試", decided_on=date(2026, 10, 1), pq2_ref=2,
+    created_at=datetime(2026, 10, 1, tzinfo=timezone.utc))
+
+
+def test_a_second_cohort_leaves_the_first_cohorts_rows_untouched(tmp_path, collected) -> None:
+    """驗收①：加第二組之後，第一組的組員列逐列相同；第二組的組員用自己的組；兩組都不是的照舊缺席。
+
+    變異：讓每一列都拿「第一組」比 → GGG.L 會變成對光通訊組的超額，這條紅。"""
+    prices = {**PRICES, "MEM3": _series(date(2026, 9, 25), [8, 8, 8, 8, 8, 8.4, 8.8, 8.8])}   # 09-29 → 10-02 ＋10%
+    both = _collect(tmp_path, cohorts=([COHORT, COHORT_COOLING], []),
+                    price_loader=lambda symbol, start: (dict(prices.get(symbol) or {}), UNITS.get(symbol, "USD")))
+    before, after = _row(collected, "paper", "AAA"), _row(both, "paper", "AAA")
+    assert after["excess_theme_cohort"] == pytest.approx(before["excess_theme_cohort"])
+    assert after["theme_cohort"] == before["theme_cohort"]
+    ggg = _row(both, "paper", "GGG.L")
+    assert ggg["theme_cohort"]["cohort_id"] == "tc_cool" and ggg["theme_cohort"]["excluded"] == ["GGG.L"]
+    assert ggg["excess_theme_cohort"] == pytest.approx((55 / 44 - 1) - 0.10)
+    assert "excess_theme_cohort" not in _row(collected, "paper", "GGG.L")     # 只有一組時它不是組員
+    assert _row(both, "live", "LIVEX")["theme_cohort_absence"]["kind"] == "not_in_any_cohort"
+    assert [c["cohort_id"] for c in both["theme_cohort"]["cohorts"]] == ["tc_test", "tc_cool"]
 
 
 def test_lanes_keep_separate_denominators(tmp_path, monkeypatch) -> None:
@@ -281,8 +317,31 @@ def test_missing_cohort_is_not_yet_recorded_and_excess_stays_absent(tmp_path, co
     empty = _collect(tmp_path, cohorts=([], []))
     assert empty["theme_cohort"]["absence"]["kind"] == "not_yet_recorded"
     assert all("excess_theme_cohort" not in r for r in empty["lanes"]["paper"]["rows"])
-    two = _collect(tmp_path, cohorts=([COHORT, COHORT], []))
-    assert two["theme_cohort"]["absence"]["kind"] == "ambiguous_cohort"
+    assert {r["theme_cohort_absence"]["kind"] for r in empty["lanes"]["paper"]["rows"]} == {"not_yet_recorded"}
+
+
+def test_a_member_of_two_cohorts_is_ambiguous_not_guessed(tmp_path, collected) -> None:
+    """同一家公司同時是兩組的組員 → 那一列 `ambiguous_membership`（列出兩組 id），不猜；其他列不受影響。"""
+    other = ThemeCohort(cohort_id="tc_other", theme="另一個題材",
+                        members=(CohortMember("AAA", "co:aaa", "成員"), CohortMember("MEM2", "co:mem2", "成員")),
+                        excluded=(), reason="測試", decided_on=date(2026, 9, 30), pq2_ref=3,
+                        created_at=datetime(2026, 9, 30, tzinfo=timezone.utc))
+    two = _collect(tmp_path, cohorts=([COHORT, other], []))
+    aaa = _row(two, "paper", "AAA")
+    assert aaa["theme_cohort_absence"]["kind"] == "ambiguous_membership"
+    assert aaa["theme_cohort_absence"]["cohort_ids"] == ["tc_test", "tc_other"] and "excess_theme_cohort" not in aaa
+    assert two["theme_cohort"]["absence"] is None
+
+
+def test_unreadable_ledger_is_upstream_unavailable_on_every_row_not_not_in_any_cohort(tmp_path) -> None:
+    """組 ledger 讀不到＝上游缺席：每一列照抄 `upstream_unavailable`，**不得**變成「不是組員」（L12：兩種沒有不同形）。"""
+    class _Broken(tuple):
+        def __getitem__(self, index):
+            raise OSError("ledger unreadable")
+
+    broken = _collect(tmp_path, cohorts=_Broken())
+    assert broken["theme_cohort"]["absence"]["kind"] == "upstream_unavailable"
+    assert {r["theme_cohort_absence"]["kind"] for r in broken["lanes"]["paper"]["rows"]} == {"upstream_unavailable"}
 
 
 def test_price_cap_truncates_members_first_and_prints_what_was_cut(tmp_path, collected) -> None:
@@ -319,7 +378,8 @@ def test_persist_keeps_the_four_fields_and_adds_lanes(tmp_path, monkeypatch, col
     assert {k: row[k] for k in ("n", "equal_weight_absolute", "equal_weight_excess", "benchmark")} == {
         "n": 22, "equal_weight_absolute": 0.0870, "equal_weight_excess": 0.0410, "benchmark": "QQQ"}
     assert set(row["lanes"]) == {"live", "paper", "history"} and row["lanes"]["paper"]["n"] == 2
-    assert row["theme_cohort"]["cohort_id"] == "tc_test"
+    assert row["theme_cohort"] == {"mode": "per_row", "absence": None,
+                                   "cohorts": [{"cohort_id": "tc_test", "theme": "測試題材", "decided_on": "2026-09-30"}]}
 
 
 # ---------------------------------------------------------------------------
@@ -340,13 +400,14 @@ def test_positions_artifact_v2_carries_the_three_lanes_verbatim(collected) -> No
 
     payload = _artifact(collected)
     validate_state_artifact("positions", payload)
-    assert payload["schema_version"] == "stockbot-app/positions/2"
+    assert payload["schema_version"] == "stockbot-app/positions/3"
     lanes = payload["lanes"]
     assert set(lanes) == {"live", "paper", "history"} and lanes["history"]["rows_in"] == "rows"
     assert [r["ticker"] for r in lanes["paper"]["rows"]] == ["AAA", "GGG.L"]
     assert lanes["paper"]["rows"][0]["anchor_date"] == "2026-09-29"                # 日期序列化，值照抄
     assert lanes["live"]["beta_events"] == 1 and lanes["paper"]["filter"]["filtered"]["no_v2"] == ["OLD"]
-    assert payload["theme_cohort"]["cohort_id"] == "tc_test"
+    assert [c["cohort_id"] for c in payload["theme_cohort"]["cohorts"]] == ["tc_test"]
+    assert lanes["live"]["rows"][0]["theme_cohort_absence"]["kind"] == "not_in_any_cohort"   # 非組員的理由跟著列走到 APP
     assert any("paper lane 的錨點是**我們寫下判斷那天**" in s for s in payload["this_is_not"])
 
 
@@ -372,7 +433,7 @@ def test_heartbeat_section_four_prints_each_lane_and_snapshot_keys(tmp_path, col
     StateArtifactStore(state_dir).write(_artifact(collected))
     text = "\n".join(hb.build_positions(state_dir=state_dir).lines)
     # 夾具的 history lane 是 0 列（舊店的列住 artifact 的 `rows`，由別的夾具給）
-    assert "追蹤表 history 0｜paper 2｜live 3（beta 事件 1 不進 lane）｜主題等權組 tc_test（2026-09-30 定）" in text
+    assert "追蹤表 history 0｜paper 2｜live 3（beta 事件 1 不進 lane）｜主題等權組 1 組（每列只比自己的組）" in text
     assert "敘事前已漲（paper）" in text
     assert "paper（第一份 v2 敘事日起）：2 檔｜量測起始 2026-09-29" in text and "對主題等權組超額" in text
     # live 3 列只有 1 列算得出報酬（另兩列缺席）：三量的分母是 1，不是 3

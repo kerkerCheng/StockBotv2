@@ -71,3 +71,13 @@ Why local patch is insufficient: 「這一列跟哪個組比」是量測口徑�
 - **B 維持現狀**：組員用自己的組，非組員一律對光通訊組——不建議（L12：同一欄兩種語意，下游讀不出差別）。
 - **C 每一列宣告自己的題材**（例：組 spec 多一個「適用範圍」名單，或由該檔座位走到需求錨所屬的題材）——語意最準，但是新字彙、
   範圍超出 S1，要另起一格。
+
+## 使用者 2026-10-06：選 A → S1 實作
+
+- **驗收①改寫（選 A）**：組員列逐列不變；非組員列由「對光通訊組的超額」改為具名缺席 `not_in_any_cohort`，**列數與名單照印**
+  （追蹤表每條 lane 的 `theme_cohort_excess.absent`、計分表每格的 filter reasons）。
+- **實作**：`alpha/providers/theme_cohorts.py`（以紀錄的題材分組挑現行組；寫入沿用該題材既有檔，新題材檔名＝slug＋題材 sha1 前 8 碼）；
+  `alpha/theme_cohort.py`（`cohort_for_row`＋`summarize_cohorts` 取代 `measurement_cohort`，缺席種類 `ROW_COHORT_ABSENCES`）；
+  追蹤表 `scripts/outcome_if_settled_today.py`、計分表 `engine_b/account_scorecard.py`、APP（positions／account_scorecard 契約各升 /3）、心跳兩格。
+- **四個變異都紅**：以檔挑現行組、檔名改回 slug、只有一組就每列都比、非組員點名不計理由。
+- **真實資料驗收與 R2**：見 STEP_RESULT（本檔不重抄）。

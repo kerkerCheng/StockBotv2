@@ -6,6 +6,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 
@@ -60,14 +61,16 @@ def test_complete_writes_exactly_the_frozen_spec_and_closes_with_a_receipt(tmp_p
     result = todo.complete_theme_cohort(pool, item["n"], at="2026-09-30T02:00:00+00:00", directory=tmp_path)
     assert result["receipt"] == f"authority:theme_cohort;ref:{result['cohort_id']}"
     assert item["resolution"] == "go" and item["resolved_at"]
-    lines = (tmp_path / "ai_capex.jsonl").read_text(encoding="utf-8").splitlines()
+    # 新題材的檔名＝slug＋題材雜湊（多主題等權組 S1：「電力」「散熱」的 slug 都是 `__`，不能再靠 slug 當檔名）
+    ledger = tmp_path / f"ai_capex_{hashlib.sha1('ai_capex'.encode('utf-8')).hexdigest()[:8]}.jsonl"
+    lines = ledger.read_text(encoding="utf-8").splitlines()
     assert len(lines) == 1
     record = json.loads(lines[0])
     assert record["pq2_ref"] == item["n"] and record["decided_on"] == "2026-09-30"
     assert [m["ticker"] for m in record["members"]] == ["AXTI", "AAOI", "SIVE.ST"]
     with pytest.raises(todo.TodoError, match="已處理|已結案"):
         todo.complete_theme_cohort(pool, item["n"], directory=tmp_path)
-    assert len((tmp_path / "ai_capex.jsonl").read_text(encoding="utf-8").splitlines()) == 1
+    assert len(ledger.read_text(encoding="utf-8").splitlines()) == 1
 
 
 def test_a_spec_edited_after_minting_is_refused_and_nothing_is_written(tmp_path: Path) -> None:

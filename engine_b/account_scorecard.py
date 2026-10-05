@@ -32,10 +32,11 @@
 
 ## 第三個基準：主題等權組（Phase 5 Step 5.5）
 
-每則點名、每個持有期多一格 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 組（**排除本檔**）等權報酬。組報酬只有一個函式
-（`alpha.theme_cohort.cohort_return`，追蹤表共用），「哪一組是基準」也只有一個（`measurement_cohort`）。0 組＝
-`not_yet_recorded`、多組＝`ambiguous_cohort`、讀不到＝`upstream_unavailable`——三種缺席都不是 0。
-成員併進取價清單、排在點名標的之後（可被 `MAX_PRICED_SYMBOLS` 截掉，截掉的照印）。
+每則點名、每個持有期多一格 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − **本檔所屬的組**（排除本檔）等權報酬。組報酬只有一個
+函式（`alpha.theme_cohort.cohort_return`，追蹤表共用），「這一則跟哪一組比」也只有一個（`cohort_for_row`，以 company_id 比對組員）。
+多主題等權組 S1（2026-10-06，plan 2026-10-05-002 選項 A）起：不是任何組員的點名進 filter reasons（`not_in_any_cohort`；
+同時是兩組組員＝`ambiguous_membership`），**不借別的題材的組**；一組都沒有＝`not_yet_recorded`、讀不到＝`upstream_unavailable`
+——缺席都不是 0。所有組的成員併進取價清單、排在點名標的之後（可被 `MAX_PRICED_SYMBOLS` 截掉，截掉的照印）。
 """
 from __future__ import annotations
 
@@ -65,8 +66,8 @@ KNOWN_BIASES: tuple[str, ...] = (
     "後見之明偏差：回溯評分用的是今天才知道的價格序列，當時並沒有這些後續資料。",
     "單邊上漲偏差：2026 年光互連整體單邊上漲——所以同時對 SOXX 算超額，只看 QQQ 會高估。",
     # Phase 5 Step 5.5（plan §6）：第三個基準是主題等權組——它的成分是某一天才定的。
-    "主題等權組是回溯基準：成分在 `theme_cohort.decided_on` 那天才定，對更早的點名是拿今天的組回頭比"
-    "（組裡的公司本身也是因為「後來看起來對」才被選進去的）。",
+    "主題等權組是回溯基準：每一組的成分在各自的 `decided_on` 那天才定，對更早的點名是拿今天的組回頭比"
+    "（組裡的公司本身也是因為「後來看起來對」才被選進去的）；只有組員的點名有這一格。",
 )
 
 #: 一輪最多對幾檔取價。**這是無人值守的網路 surface 上限，不是效能參數**：
@@ -256,13 +257,14 @@ def score_account(
     today: date,
     no_go_rate: Metric,
     trace_metric: Metric,
-    cohort: Any = None,
+    cohorts: Sequence[Any] = (),
     cohort_absence: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """具名點名 → 五欄。價格序列由呼叫端注入（測試不打網路）。
 
-    `cohort`（Phase 5 Step 5.5）：現行主題等權組；每則點名多一格 `excess_{h}d_vs_theme_cohort`＝本檔報酬 − 組（排除本檔）
-    等權報酬，組報酬共用 `alpha.theme_cohort.cohort_return`（與追蹤表同一支）。沒有組＝`cohort_absence` 的缺席，不是 0。"""
+    `cohorts`（Phase 5 Step 5.5；多主題等權組 S1 起是**全部**現行組）：每則點名多一格 `excess_{h}d_vs_theme_cohort`＝
+    本檔報酬 − **本檔所屬的組**（排除本檔）等權報酬；哪一組由 `cohort_for_row` 以 company_id 決定，不是組員的點名進
+    filter reasons。組報酬共用 `alpha.theme_cohort.cohort_return`（與追蹤表同一支）。一組都沒有＝`cohort_absence` 的缺席，不是 0。"""
     # 等時間的缺席要算得出到期日，靠的是**最早那一則點名**：它走完 horizon 的那天，
     # 這一格就該有第一個值。沒有任何點名時留 None（那時缺的不是時間，是樣本）。
     first_call_day = min((call.called_on for call in calls), default=None)
@@ -299,16 +301,23 @@ def score_account(
         # 第三個基準：主題等權組（排除本檔；Phase 5 Step 5.5）。
         key = f"excess_{horizon}d_vs_{THEME_COHORT_BENCHMARK}"
         report = FilterReport()
-        if cohort is None:
+        if not cohorts:
             absence = cohort_absence or {"kind": "not_yet_recorded", "reason": "主題等權組未定義"}
             excess[key] = Metric(n=0, absence_kind=str(absence.get("kind")), reason=str(absence.get("reason")))
             horizon_reports[key] = report.as_dict()
             continue
-        from alpha.theme_cohort import cohort_return
+        from alpha.theme_cohort import ROW_COHORT_ABSENCES, cohort_for_row, cohort_return
 
         values = []
+        member_days: list[date] = []
         for call in calls:
             report.input_count += 1
+            # 先問「這一則是哪一組的組員」：不是組員是**永久**的理由（等多久都不會有值），排在等時間之前。
+            cohort, membership = cohort_for_row(cohorts, company_id=call.company_id)
+            if membership is not None:
+                report.reject(str(membership["kind"]))
+                continue
+            member_days.append(call.called_on)
             end = call.called_on + timedelta(days=horizon)
             if end > today:
                 report.reject("horizon_not_elapsed")
@@ -329,8 +338,20 @@ def score_account(
             report.accepted_count += 1
             values.append(own_return - group["return"])
         horizon_reports[key] = report.as_dict()
-        excess[key] = _median_or_absence(values, report, horizon=horizon, first_call_day=first_call_day,
-                                         unpriced="沒有任何一則點名同時有標的與主題等權組的價格")
+        if report.input_count and not member_days:
+            # 一則組員點名都沒有：缺席種類照實寫（全是同一種就用那一種），不壓成「樣本不足」——等多久都不會有值。
+            kinds = sorted(k for k in report.reasons if k in ROW_COHORT_ABSENCES)
+            excess[key] = Metric(
+                n=0, absence_kind=kinds[0] if len(kinds) == 1 else "not_in_any_cohort",
+                reason=(f"{report.input_count} 則點名沒有一則是主題等權組的組員（"
+                        + "、".join(f"{k} {report.reasons[k]}" for k in kinds) + "）——不借別的題材的組"))
+            continue
+        # 等時間的判斷只看組員點名：非組員的點名不該讓「持有期還沒走完」的到期日消失（INV-2）。
+        members_only = FilterReport(input_count=len(member_days), accepted_count=report.accepted_count,
+                                    reasons={k: v for k, v in report.reasons.items() if k not in ROW_COHORT_ABSENCES})
+        excess[key] = _median_or_absence(values, members_only, horizon=horizon,
+                                         first_call_day=min(member_days) if member_days else first_call_day,
+                                         unpriced="沒有任何一則組員點名同時有標的與主題等權組的價格")
 
     prior_report = FilterReport()
     prior_values: list[float] = []
@@ -431,21 +452,24 @@ def build_scorecard(
     registry = load_sources()
     ticker_map = dict(get_registry().ticker_map)
 
-    # 第三個基準：主題等權組（Phase 5 Step 5.5）。「哪一組是基準」與追蹤表同一支（`measurement_cohort`）；
+    # 第三個基準：主題等權組（Phase 5 Step 5.5）。多主題等權組 S1（2026-10-06）：每則點名跟**自己所屬的組**比，
+    # 「有哪些組」與追蹤表同一支（`summarize_cohorts`）、「這一則屬於哪一組」也同一支（`cohort_for_row`）；
     # 讀壞只讓那幾格缺席（upstream_unavailable），計分表其餘照算——不得因為多了一個基準就整張表消失（L13）。
+    cohort_list: list[Any] = []
     try:
-        from alpha.theme_cohort import measurement_cohort
+        from alpha.theme_cohort import summarize_cohorts
 
         if cohorts is None:
             from alpha.providers.theme_cohorts import current_cohorts
 
             cohorts = current_cohorts()
-        cohort, cohort_info = measurement_cohort(*cohorts)
+        cohort_list = list(cohorts[0])
+        cohort_info = summarize_cohorts(*cohorts)
     except Exception as exc:  # noqa: BLE001
-        cohort = None
-        cohort_info = {"parse_errors": [], "absence": {
+        cohort_list = []
+        cohort_info = {"mode": "per_row", "cohorts": [], "parse_errors": [], "absence": {
             "kind": "upstream_unavailable", "reason": f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
-    member_tickers: list[str] = list(cohort.tickers) if cohort is not None else []
+    member_tickers: list[str] = sorted({t for c in cohort_list for t in c.tickers})
 
     accounts: list[dict[str, Any]] = []
     all_symbols: set[str] = set()
@@ -496,11 +520,11 @@ def build_scorecard(
         no_go = no_go_share(leads, harvest_key=source.harvest_key)
         scored = score_account(
             calls, prices=prices, today=day, no_go_rate=no_go,
-            trace_metric=trace_success(calls), cohort=cohort, cohort_absence=cohort_info.get("absence"))
+            trace_metric=trace_success(calls), cohorts=cohort_list, cohort_absence=cohort_info.get("absence"))
         deduped = first_call_per_symbol(calls)
         scored_first = score_account(
             deduped, prices=prices, today=day, no_go_rate=no_go,
-            trace_metric=trace_success(deduped), cohort=cohort, cohort_absence=cohort_info.get("absence"))
+            trace_metric=trace_success(deduped), cohorts=cohort_list, cohort_absence=cohort_info.get("absence"))
         called_days = [c.called_on for c in calls]
         accounts.append({
             "source_id": source.source_id,
@@ -519,27 +543,24 @@ def build_scorecard(
             "stamps": [c.stamp(prices) for c in calls],
         })
 
-    # 主題等權組這一格的來歷：哪一組、哪天定的、幾個成員、幾個取得到價、缺誰（逐檔列，不平均掉；INV-3）。
+    # 主題等權組這一格的來歷：**每一組**哪天定的、幾個成員、幾個取得到價、缺誰（逐檔列，不平均掉；INV-3）。
     from alpha.theme_cohort import close_on_or_before
 
-    priced = [t for t in member_tickers if close_on_or_before(prices.get(t), day) is not None]
+    priced = {t for t in member_tickers if close_on_or_before(prices.get(t), day) is not None}
     theme_cohort_block: dict[str, Any] = {
-        "cohort_id": cohort_info.get("cohort_id"),
-        "theme": cohort_info.get("theme"),
-        "decided_on": cohort_info.get("decided_on"),
-        "members_total": len(member_tickers),
-        "members_priced": len(priced),
-        "missing": [t for t in member_tickers if t not in priced],
+        "mode": "per_row",
+        "cohorts": [{"cohort_id": c.cohort_id, "theme": c.theme, "decided_on": c.decided_on.isoformat(),
+                     "members_total": len(c.tickers), "members_priced": sum(1 for t in c.tickers if t in priced),
+                     "missing": [t for t in c.tickers if t not in priced]} for c in cohort_list],
         "absence": cohort_info.get("absence"),
         "parse_errors": list(cohort_info.get("parse_errors") or []),
     }
-    if cohort_info.get("cohort_ids"):
-        theme_cohort_block["cohort_ids"] = list(cohort_info["cohort_ids"])
 
     payload: dict[str, Any] = {
         "kind": "account_scorecard",
         # /2（2026-10-02 Phase 5 Step 5.5）：多 `theme_cohort` 段與每個 horizon 的 `excess_{h}d_vs_theme_cohort` 格。
-        "schema_version": "stockbot-app/account_scorecard/2",
+        # /3（2026-10-06 多主題等權組 S1）：`theme_cohort` 改成 `{mode, cohorts: [...], absence}`——每則點名跟自己所屬的組比。
+        "schema_version": "stockbot-app/account_scorecard/3",
         "title": "帳號計分表：哪個來源歷史上產出贏家",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "as_of": day.isoformat(),
@@ -553,7 +574,7 @@ def build_scorecard(
                      "價格是 yfinance 歷史收盤。**本表不改 tier**——tier 升降是一季一次的 pq2 manual。"),
         },
         "materializer": {
-            "version": "account-scorecard/2",
+            "version": "account-scorecard/3",
             "note": "artifact 是 derived cache，不是 authority——刪掉重跑就會回來（L10）",
         },
         "benchmarks": list(BENCHMARKS),
@@ -583,7 +604,7 @@ def build_scorecard(
                                 [k for k, v in (a["metrics"].get("excess_returns") or {}).items()
                                  if v.get("value") is not None]]
                                for a in accounts],
-                  "theme_cohort": [theme_cohort_block["cohort_id"],
+                  "theme_cohort": [[entry["cohort_id"] for entry in theme_cohort_block["cohorts"]],
                                    (theme_cohort_block["absence"] or {}).get("kind")]})
     payload["content_digest"] = canonical_digest(payload)
     return payload
@@ -679,18 +700,25 @@ def render(scorecard: Mapping[str, Any]) -> str:
 
 
 def theme_cohort_line(scorecard: Mapping[str, Any]) -> str:
-    """第三個基準的來歷一行：哪一組、哪天定的、成員幾個、取得到價幾個、缺誰（逐檔）。組缺席就印缺席的種類與理由。
-    **只印不比**：不設門檻、不說「夠不夠」（plan 不可越線 4）。artifact 早於 Step 5.5 時沒有這一段——照實說。"""
+    """第三個基準的來歷：每一組哪天定的、成員幾個、取得到價幾個、缺誰（逐檔）；每則點名只跟自己所屬的組比。
+    組缺席就印缺席的種類與理由。**只印不比**：不設門檻、不說「夠不夠」（plan 不可越線 4）。
+    artifact 早於 Step 5.5（沒有這一段）或早於多組格式（/2：沒有 `cohorts`）時照實說，不猜舊形狀。"""
     block = scorecard.get("theme_cohort")
     if not isinstance(block, Mapping):
         return "主題等權組基準：這份計分表早於這一格（重跑 `python -m webapp materialize --scorecard`）"
     absence = block.get("absence")
     if absence:
         return f"主題等權組基準：無（{absence.get('kind')}）——{absence.get('reason')}"
-    missing = list(block.get("missing") or [])
-    return (f"主題等權組基準：`{block.get('cohort_id')}`（{block.get('theme')}，決定於 {block.get('decided_on')}）"
-            f"｜成員 {block.get('members_total')}、取得到價 {block.get('members_priced')}"
-            f"｜缺價：{'、'.join(missing) if missing else '—'}")
+    entries = block.get("cohorts")
+    if not isinstance(entries, list):
+        return "主題等權組基準：這份計分表早於「每則點名跟自己所屬的組比」（重跑 `python -m webapp materialize --scorecard`）"
+    parts = []
+    for entry in entries:
+        missing = list(entry.get("missing") or [])
+        parts.append(f"`{entry.get('cohort_id')}`（{entry.get('theme')}，決定於 {entry.get('decided_on')}）"
+                     f"｜成員 {entry.get('members_total')}、取得到價 {entry.get('members_priced')}"
+                     f"｜缺價：{'、'.join(missing) if missing else '—'}")
+    return f"主題等權組基準 {len(entries)} 組（每則點名只跟自己所屬的組比）：" + "；".join(parts)
 
 
 def _cell(cell: Mapping[str, Any]) -> str:

@@ -37,7 +37,8 @@ def _text(section) -> str:
 def test_lane_numbers_reach_the_positions_artifact_the_heartbeat_and_the_api(tmp_path, monkeypatch) -> None:
     """paper 兩列（夾具價格手算）：AAA 09-29 收 100 → 10-02 收 120＝＋20%；GGG.L 44 → 55 GBp＝＋25%（同序列相除，單位相消）。
     主題等權組（MEM1 10 → 11＝＋10%；MEM2 50 → 10-02 是 NaN、退回 10-01 的 50＝0%；AAA ＋20%）排除本檔：
-    AAA 對組＝20% − (10%+0%)/2＝＋15%；GGG.L 不是成員＝25% − (20%+10%+0%)/3＝＋15% → paper 對組超額平均 15.00%。"""
+    AAA 對組＝20% − (10%+0%)/2＝＋15%；GGG.L 不是成員＝不比（`not_in_any_cohort`，多主題等權組 S1 選項 A：不借別的題材的組）
+    → paper 對組超額平均 15.00%（1/2 列）。"""
     import engine_b.event_watch as ew
     from webapp.materialize import build_positions_artifact, positions_lanes
 
@@ -61,14 +62,16 @@ def test_lane_numbers_reach_the_positions_artifact_the_heartbeat_and_the_api(tmp
     assert by_ticker["AAA"]["absolute_return"] == pytest.approx(0.20)
     assert by_ticker["GGG.L"]["absolute_return"] == pytest.approx(0.25)
     assert by_ticker["AAA"]["excess_theme_cohort"] == pytest.approx(0.15)
-    assert by_ticker["GGG.L"]["excess_theme_cohort"] == pytest.approx(0.15)
-    assert paper["theme_cohort_excess"]["mean"] == pytest.approx(0.15) and paper["theme_cohort_excess"]["n"] == 2
+    assert by_ticker["GGG.L"].get("excess_theme_cohort") is None
+    assert by_ticker["GGG.L"]["theme_cohort_absence"]["kind"] == "not_in_any_cohort"
+    assert paper["theme_cohort_excess"]["mean"] == pytest.approx(0.15) and paper["theme_cohort_excess"]["n"] == 1
+    assert paper["theme_cohort_excess"]["absent"] == {"not_in_any_cohort": ["GGG.L"]}
 
     # 心跳段 4：同一個數字出現在人讀的那一行
     text = _text(hb.build_positions(state_dir=state))
     assert "paper（第一份 v2 敘事日起）：2 檔｜量測起始 2026-09-29｜等權總報酬 22.50%" in text, text
-    assert "對主題等權組超額 15.00%（2/2 列）" in text, text
-    assert "追蹤表 history 0｜paper 2｜live 3（beta 事件 1 不進 lane）｜主題等權組 tc_test（2026-09-30 定）" in text
+    assert "對主題等權組超額 15.00%（1/2 列）" in text, text
+    assert "追蹤表 history 0｜paper 2｜live 3（beta 事件 1 不進 lane）｜主題等權組 1 組（每列只比自己的組）" in text
 
     # APP：同一個數字照抄（API 不重算）
     body = TestClient(create_app(tmp_path)).get("/api/v1/positions").json()
@@ -193,8 +196,10 @@ def test_scorecard_cohort_cell_reaches_the_artifact_the_heartbeat_and_the_api(tm
         "lead_id": "lead_1", "source": "x:acct", "published_at": "2026-08-01T12:00:00Z", "status": "parked",
         "entities": {"company_ids": ["co:AAA"], "tickers": ["AAA"]}, "refs": {}}}}), encoding="utf-8")
     monkeypatch.setattr(sc, "DEFAULT_LEADS_PATH", leads)
+    # 點名的 AAA 是組員（多主題等權組 S1：不是組員的點名不比）；組報酬排除本檔，所以手算式不變。
     cohort = ThemeCohort(cohort_id="tc_chain", theme="測試題材",
-                         members=(CohortMember("BBB", "co:BBB", "成員"), CohortMember("CCC", "co:CCC", "成員")),
+                         members=(CohortMember("AAA", "co:AAA", "成員"), CohortMember("BBB", "co:BBB", "成員"),
+                                  CohortMember("CCC", "co:CCC", "成員")),
                          excluded=(), reason="測試", decided_on=date(2026, 9, 30), pq2_ref=1,
                          created_at=_dt(2026, 9, 30, tzinfo=timezone.utc))
     monkeypatch.setattr(cohort_provider, "current_cohorts", lambda **_kw: ([cohort], []))
@@ -213,10 +218,12 @@ def test_scorecard_cohort_cell_reaches_the_artifact_the_heartbeat_and_the_api(tm
     cell = payload["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]
     assert cell["value"] == pytest.approx(expected) and cell["n"] == 1
     assert asked == [["AAA", "BBB", "CCC", "QQQ", "SOXX"]]                    # 成員併進同一次取價
-    assert payload["theme_cohort"]["members_priced"] == 2 and payload["price_budget"]["theme_cohort_added"] == ["BBB", "CCC"]
+    entry = payload["theme_cohort"]["cohorts"][0]
+    assert (entry["members_total"], entry["members_priced"]) == (3, 3)
+    assert payload["price_budget"]["theme_cohort_added"] == ["BBB", "CCC"]
 
     line = hb.build_scorecard(state_dir=state).lines[-1]
-    assert line.endswith("已知偏差 4 條（也在 APP）｜主題等權組基準：有"), line
+    assert line.endswith("已知偏差 4 條（也在 APP）｜主題等權組基準：有（1 組，每則點名只比自己的組）"), line
 
     body = TestClient(create_app(tmp_path)).get("/api/v1/account-scorecard").json()
     got = body["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]["value"]

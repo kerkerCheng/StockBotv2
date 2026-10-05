@@ -1589,8 +1589,11 @@ def _lane_count_line(lanes: Mapping[str, Any] | None, cohort: Mapping[str, Any] 
     cohort = cohort or {}
     if cohort.get("absence"):
         text += f"｜主題等權組：{cohort['absence'].get('kind')}（超額缺席，不是 0）"
-    elif cohort.get("cohort_id"):
-        text += f"｜主題等權組 {cohort.get('cohort_id')}（{cohort.get('decided_on')} 定）"
+    elif isinstance(cohort.get("cohorts"), list):
+        # 多主題等權組 S1（2026-10-06）：每一列只跟自己所屬的組比——這一格只印「有幾組」，組名與缺席名單在 APP。
+        text += f"｜主題等權組 {len(cohort['cohorts'])} 組（每列只比自己的組）"
+    elif cohort:
+        text += "｜主題等權組：artifact 早於每列分組（下一次 materialize --positions 補上）"
     return text
 
 
@@ -1720,7 +1723,9 @@ def _scorecard_cohort_cell(card: Mapping[str, Any]) -> str:
     absence = block.get("absence")
     if absence:
         return f"主題等權組基準：無（{(absence or {}).get('kind')}）"
-    return "主題等權組基準：有"
+    if not isinstance(block.get("cohorts"), list):
+        return "主題等權組基準：計分表 artifact 早於每則點名分組（下一次 materialize --scorecard 補上）"
+    return f"主題等權組基準：有（{len(block['cohorts'])} 組，每則點名只比自己的組）"
 
 
 # ---------------------------------------------------------------------------

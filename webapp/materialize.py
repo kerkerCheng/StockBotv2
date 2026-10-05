@@ -1110,7 +1110,7 @@ def materialize_watches(*, store: StateArtifactStore | None = None,
 # state artifact：`positions`（部位與問責；照抄 outcome 腳本與 Decision Store 計數器）
 # ---------------------------------------------------------------------------
 
-POSITIONS_MATERIALIZER_VERSION = "webapp-materialize-positions/2"
+POSITIONS_MATERIALIZER_VERSION = "webapp-materialize-positions/3"
 
 POSITIONS_THIS_IS_NOT = (
     "**不是績效報告。** 「shadow 報酬」的錨點是**入圖日**——那天的語意是「這家公司的 claim 進圖了」，"
@@ -1284,7 +1284,8 @@ def build_positions_artifact(results: Sequence[Mapping[str, Any]],
                       lane: {"tickers": sorted(str(r.get("ticker")) for r in (entry.get("rows") or ())),
                              "n": entry.get("n"), "measurement_start": entry.get("measurement_start")}
                       for lane, entry in payload["lanes"].items()},
-                  "theme_cohort": (theme_cohort or {}).get("cohort_id")})
+                  # 有哪些組（多主題等權組 S1）：多一組或換一組＝認知變化；組員的價格變動不是。
+                  "theme_cohort": [entry.get("cohort_id") for entry in (theme_cohort or {}).get("cohorts") or []]})
     payload["content_digest"] = canonical_digest(payload)
     return payload
 

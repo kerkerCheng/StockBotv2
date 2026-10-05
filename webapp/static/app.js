@@ -2827,6 +2827,23 @@ function signedPct(value) {
   return text === null ? '—' : (value > 0 ? '+' : '') + text;
 }
 
+/* 多主題等權組 S1（2026-10-06）：每一列只跟自己所屬的組比；不是組員的列印「為什麼沒有」，不印 0、不印空白。
+   種類由產生缺席的程式宣告（`alpha.theme_cohort.cohort_for_row`），這裡只翻成人話（L16：不從 reason 猜）。 */
+const COHORT_ABSENCE_LABELS = {
+  not_in_any_cohort: '不是任何組的組員',
+  ambiguous_membership: '同時屬於多組，不猜',
+  identity_unresolved: '身分未解析',
+  not_yet_recorded: '還沒有組',
+  upstream_unavailable: '組讀不到',
+};
+
+function cohortExcessCell(row) {
+  if (row.excess_theme_cohort !== null && row.excess_theme_cohort !== undefined) return returnCell(row.excess_theme_cohort);
+  const kind = (row.theme_cohort_absence || {}).kind;
+  if (kind) return el('td', 'note', `不比（${COHORT_ABSENCE_LABELS[kind] || kind}）`);
+  return returnCell(null);
+}
+
 const PAPER_LANE_COLUMNS = [
   { title: '標的', cell: (row, set) => companyCell({ ticker: row.ticker, company_id: row.company_id }, set) },
   { title: '寫下判斷那天', cell: (row) => el('td', 'nowrap', row.anchor_date || '—') },
@@ -2834,7 +2851,7 @@ const PAPER_LANE_COLUMNS = [
   { title: '寫下前 30 天', cell: (row) => returnCell(row.pre_anchor_return) },
   { title: '寫下後到現在', cell: (row) => returnCell(row.absolute_return) },
   { title: '同期比 QQQ 多／少', cell: (row) => returnCell(row.excess_QQQ) },
-  { title: '比主題等權組（排除本檔）', cell: (row) => returnCell(row.excess_theme_cohort) },
+  { title: '比自己所屬的主題等權組（排除本檔）', cell: (row) => cohortExcessCell(row) },
   { title: '最早點名它的來源', cell: (row) => el('td', null, row.first_named_by
       ? `${row.first_named_by.source}（${String(row.first_named_by.first_seen || '').slice(0, 10)}）`
       : (row.first_named_absence || '—')) },
@@ -2848,7 +2865,7 @@ const LIVE_LANE_COLUMNS = [
   { title: '現在或賣出', cell: (row) => el('td', 'nowrap', fmtQuantity(row.current_price, row.anchor_ccy) || '—') },
   { title: '成交後到現在', cell: (row) => returnCell(row.absolute_return) },
   { title: '同期比 QQQ 多／少', cell: (row) => returnCell(row.excess_QQQ) },
-  { title: '比主題等權組（排除本檔）', cell: (row) => returnCell(row.excess_theme_cohort) },
+  { title: '比自己所屬的主題等權組（排除本檔）', cell: (row) => cohortExcessCell(row) },
   { title: '當時的收據', cell: (row) => el('td', null, (row.receipt && row.receipt.label) || '—') },
 ];
 
@@ -2856,9 +2873,12 @@ function laneSummaryText(entry) {
   const agg = entry.aggregate || {};
   const ex = entry.theme_cohort_excess || {};
   const pl = entry.power_law || {};
+  const absent = Object.entries(ex.absent || {}).map(([kind, tickers]) =>
+    `${COHORT_ABSENCE_LABELS[kind] || kind} ${tickers.length} 列`);
   return [`${entry.n} 列（算得出報酬 ${entry.measured}）`, `量測起始 ${entry.measurement_start || '—'}`,
     `等權 ${signedPct(agg.absolute)}`, `比 ${agg.benchmark || 'QQQ'} ${signedPct(agg.excess)}`,
-    ex.n ? `比主題等權組 ${signedPct(ex.mean)}（${ex.n}/${ex.of} 列）` : '比主題等權組：還沒有值',
+    (ex.n ? `比自己所屬的組 ${signedPct(ex.mean)}（${ex.n}/${ex.of} 列）` : '比自己所屬的組：還沒有值')
+      + (absent.length ? `（不比：${absent.join('、')}）` : ''),
     `曾達 2 倍 ${pl.reached_2x_ever ?? '—'}/${pl.n ?? '—'}（現價仍達 ${pl.reached_2x_now ?? '—'}）`].join('｜');
 }
 
@@ -2874,10 +2894,15 @@ function renderPositionLanes(payload, detailSet) {
   const cohort = payload.theme_cohort || {};
   if (cohort.absence) {
     sec.appendChild(el('p', 'warn', `主題等權組：${cohort.absence.reason}（${cohort.absence.kind}）——比主題等權組那一格全部缺席，不是 0。`));
+  } else if (!Array.isArray(cohort.cohorts)) {
+    sec.appendChild(el('p', 'note', '這份 artifact 早於「每一列只跟自己所屬的組比」——跑一次 `python -m webapp materialize --positions` 重算（不是 0）。'));
   } else {
-    const missing = cohort.missing_members || [];
-    sec.appendChild(el('p', 'note', `主題等權組 ${cohort.cohort_id}（${cohort.theme}，${cohort.decided_on} 定，${cohort.members_total} 檔；每列排除本檔）`
-      + `｜取不到價的成員 ${missing.length}${missing.length ? '：' + missing.join('、') : ''}`));
+    sec.appendChild(el('p', 'note', `主題等權組 ${cohort.cohorts.length} 組：每一列只跟自己所屬的組比（排除本檔）；不是組員的列印「不比」，不借別的題材的組。`));
+    cohort.cohorts.forEach((entry) => {
+      const missing = entry.missing_members || [];
+      sec.appendChild(el('p', 'note', `・${entry.cohort_id}（${entry.theme}，${entry.decided_on} 定，${entry.members_total} 檔）`
+        + `｜取不到價的成員 ${missing.length}${missing.length ? '：' + missing.join('、') : ''}`));
+    });
   }
   const budget = payload.price_budget || {};
   if ((budget.truncated || []).length) {
@@ -3456,10 +3481,15 @@ async function renderScorecard() {
     sec0.appendChild(el('p', 'warn', '主題等權組基準：這份 artifact 早於這一格——跑 `python -m webapp materialize --scorecard` 重算（不是 0）。'));
   } else if (cohort.absence) {
     sec0.appendChild(el('p', 'warn', `主題等權組基準：無（${cohort.absence.kind}）——${cohort.absence.reason}。對組的那幾格全部缺席，不是 0。`));
+  } else if (!Array.isArray(cohort.cohorts)) {
+    sec0.appendChild(el('p', 'warn', '主題等權組基準：這份 artifact 早於「每則點名只跟自己所屬的組比」——跑 `python -m webapp materialize --scorecard` 重算（不是 0）。'));
   } else {
-    const missing = cohort.missing || [];
-    sec0.appendChild(el('p', 'note', `主題等權組基準：${cohort.cohort_id}（${cohort.theme}，決定於 ${cohort.decided_on}）`
-      + `｜成員 ${cohort.members_total}、取得到價 ${cohort.members_priced}｜缺價：${missing.length ? missing.join('、') : '—'}`));
+    sec0.appendChild(el('p', 'note', `主題等權組基準 ${cohort.cohorts.length} 組：每則點名只跟自己所屬的組比；不是組員的點名列在每格的「濾掉」理由裡。`));
+    cohort.cohorts.forEach((entry) => {
+      const missing = entry.missing || [];
+      sec0.appendChild(el('p', 'note', `・${entry.cohort_id}（${entry.theme}，決定於 ${entry.decided_on}）`
+        + `｜成員 ${entry.members_total}、取得到價 ${entry.members_priced}｜缺價：${missing.length ? missing.join('、') : '—'}`));
+    });
   }
   const budget = payload.price_budget || {};
   sec0.appendChild(el('p', 'note', `取價：要 ${budget.requested ?? '—'} 檔、抓 ${budget.fetched ?? '—'} 檔（上限 ${budget.cap ?? '—'}）`

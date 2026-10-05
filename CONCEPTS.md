@@ -421,6 +421,7 @@ bear case 的毛病不是它悲觀，是它指不出根據。缺席同樣分兩�
 
 ### 主題等權組（Theme cohort）
 「已定價嗎」②③的對照組，也是 Phase 5 量測的基準（決定紀錄 §4.2、G9 共用同一個定義）。成分是判斷：研究步驟把 spec 凍結進一個 pq2 編號，使用者 go 之後由 `python -m engine_b.todo complete-theme-cohort <n>` 比對 digest 才寫；append-only、等權、不排序。`python -m alpha theme-cohort` 只讀。
+可以有很多組（一個題材一組，以紀錄的題材認組、不以檔名）；量測時**每一列只跟自己所屬的組比**（以 company_id 比對組員），不是組員就印缺席 `not_in_any_cohort`，不借別的題材的組（2026-10-06 起，`alpha.theme_cohort.cohort_for_row`）。
 *Avoid:* 籃子（Phase 0 退役的 filter 的字）、權重、「組內最強」
 
 ### 邊緣判定（Edge）

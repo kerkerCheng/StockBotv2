@@ -73,11 +73,14 @@ STATE_SCHEMA_VERSIONS: dict[str, str] = {
     "graph_walk": "stockbot-app/graph_walk/2",
     "watches": "stockbot-app/watches/1",
     # /2（2026-10-02 Phase 5 Step 5.2）：多 `lanes`（live／paper／history）、`theme_cohort`、`price_budget`；`rows` 仍是 history。
-    "positions": "stockbot-app/positions/2",
+    # /3（2026-10-06 多主題等權組 S1）：`theme_cohort` 改成 `{mode, cohorts: [...], absence}`；每一列只跟自己所屬的組比，
+    # 非組員列帶 `theme_cohort_absence`，lane 摘要的 `theme_cohort_excess.absent` 依缺席種類逐檔列名。
+    "positions": "stockbot-app/positions/3",
     # /2（2026-10-02 Phase 5 Step 5.4）：多 `predictions`（圖預測對錯表）。
     "structure_readings": "stockbot-app/structure_readings/2",
     # /2（2026-10-02 Phase 5 Step 5.5）：多 `theme_cohort` 段與 `excess_{h}d_vs_theme_cohort` 格（第三個基準）。
-    "account_scorecard": "stockbot-app/account_scorecard/2",
+    # /3（2026-10-06 多主題等權組 S1）：`theme_cohort` 改成 `{mode, cohorts: [...], absence}`；每則點名只跟自己所屬的組比。
+    "account_scorecard": "stockbot-app/account_scorecard/3",
     "candidates": "stockbot-app/candidates/1",
 }
 STATE_KINDS: tuple[str, ...] = tuple(STATE_SCHEMA_VERSIONS)

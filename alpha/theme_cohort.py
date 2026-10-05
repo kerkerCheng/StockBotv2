@@ -158,26 +158,53 @@ def select_current(records: Sequence[ThemeCohort], *, as_of: date | None = None)
 
 
 # ---------------------------------------------------------------------------
-# 量測基準（Phase 5 Step 5.2；決定紀錄 §4.2：「已定價嗎」的對照組與 G9 量測基準共用同一個組）
+# 量測基準：每一列用自己所屬的組（多主題等權組 S1，plan 2026-10-05-002 選項 A，使用者 2026-10-06）
 # ---------------------------------------------------------------------------
 
-def measurement_cohort(cohorts: Sequence[ThemeCohort], errors: Sequence[str]) -> tuple[ThemeCohort | None, dict]:
-    """現行主題等權組 → (組或 None, 呈現用的資訊)。追蹤表與計分表共用這一支（plan §12 #4：「哪一組是基準」只有一個答案）。
+#: 「這一列跟哪一組比」答不出來時的缺席種類——追蹤表與計分表共用，由這一支宣告（L16），消費端不得從 reason 猜。
+#: 先前（Phase 5 Step 5.2–5.5）是「全域一組」：只有一組時每一列都跟它比、多於一組整格 `ambiguous_cohort`——
+#: 非組員（稀土、機器人、記憶體）也拿光通訊籃子當基準，一個欄位承載「同題材比較」與「跨題材比較」兩種語意（L12）。
+ROW_COHORT_ABSENCES: Mapping[str, str] = {
+    "not_yet_recorded": "主題等權組一組都還沒定義（pq2 complete-theme-cohort 才寫得進來）",
+    "not_in_any_cohort": "這一檔不是任何主題等權組的組員——不借別的題材的組；補的路是替它的題材定組（研究）",
+    "ambiguous_membership": "這一檔同時是兩組以上的組員——哪一組適用不由程式猜",
+    "identity_unresolved": "這一列沒有 company_id——不拿 ticker 猜組員（INV-1）",
+}
 
-    0 組 → `not_yet_recorded`；多於 1 組**不猜**哪一組適用（`ambiguous_cohort`）；壞行原樣帶出（INV-3）。"""
-    info: dict[str, Any] = {"parse_errors": list(errors), "absence": None}
+
+def summarize_cohorts(cohorts: Sequence[ThemeCohort], errors: Sequence[str]) -> dict[str, Any]:
+    """現行各組的來歷（追蹤表與計分表共用）：`{mode, cohorts: [{cohort_id, theme, decided_on, members, members_total}],
+    absence, parse_errors}`。一組都沒有＝`not_yet_recorded`；壞行原樣帶出（INV-3）。**哪一列用哪一組不在這裡**——
+    那是 `cohort_for_row` 的事，這裡只說「有哪些組」。"""
+    info: dict[str, Any] = {
+        "mode": "per_row",
+        "cohorts": [{"cohort_id": c.cohort_id, "theme": c.theme, "decided_on": c.decided_on.isoformat(),
+                     "members": [m.ticker for m in c.members], "members_total": len(c.members)} for c in cohorts],
+        "absence": None, "parse_errors": list(errors)}
     if not cohorts:
-        info["absence"] = {"kind": "not_yet_recorded", "reason": "主題等權組未定義（pq2 complete-theme-cohort 才寫得進來）"}
-        return None, info
-    if len(cohorts) > 1:
-        info["absence"] = {"kind": "ambiguous_cohort",
-                           "reason": f"現行主題等權組有 {len(cohorts)} 組——哪一組適用哪一列不由程式猜"}
-        info["cohort_ids"] = [c.cohort_id for c in cohorts]
-        return None, info
-    cohort = cohorts[0]
-    info.update(cohort_id=cohort.cohort_id, theme=cohort.theme, decided_on=cohort.decided_on.isoformat(),
-                members=[m.ticker for m in cohort.members], members_total=len(cohort.members))
-    return cohort, info
+        info["absence"] = {"kind": "not_yet_recorded", "reason": ROW_COHORT_ABSENCES["not_yet_recorded"]}
+    return info
+
+
+def cohort_for_row(cohorts: Sequence[ThemeCohort], *, company_id: str | None
+                   ) -> tuple[ThemeCohort | None, dict[str, Any] | None]:
+    """這一列跟哪一組比：以 `company_id` 比對組員（INV-1：ticker 不是 identity）。追蹤表與計分表共用這一支
+    （plan §12 #4：「哪一組是基準」只有一個答案——答案從「全域一組」縮到「這一列」）。
+
+    1 組＝`(組, None)`；0 組＝`not_in_any_cohort`；≥2 組＝`ambiguous_membership`（列出組 id，不猜）；
+    沒有 company_id＝`identity_unresolved`；一組都還沒定義＝`not_yet_recorded`。"""
+    if not cohorts:
+        return None, {"kind": "not_yet_recorded", "reason": ROW_COHORT_ABSENCES["not_yet_recorded"]}
+    cid = str(company_id or "").strip()
+    if not cid:
+        return None, {"kind": "identity_unresolved", "reason": ROW_COHORT_ABSENCES["identity_unresolved"]}
+    hits = [c for c in cohorts if any(m.company_id == cid for m in c.members)]
+    if len(hits) == 1:
+        return hits[0], None
+    if not hits:
+        return None, {"kind": "not_in_any_cohort", "reason": ROW_COHORT_ABSENCES["not_in_any_cohort"]}
+    return None, {"kind": "ambiguous_membership", "reason": ROW_COHORT_ABSENCES["ambiguous_membership"],
+                  "cohort_ids": [c.cohort_id for c in hits]}
 
 
 def _usable_close(value: Any) -> bool:
@@ -234,6 +261,6 @@ def cohort_return(cohort: ThemeCohort, *, start: date, end: date, series: Mappin
     }
 
 
-__all__ = ["RECORD_VERSION", "SPEC_FIELDS", "CohortMember", "ThemeCohort", "close_on_or_before", "cohort_record",
-           "cohort_return", "measurement_cohort", "new_cohort_id", "parse_cohort_record", "select_current",
-           "series_return", "spec_digest", "validate_spec"]
+__all__ = ["RECORD_VERSION", "ROW_COHORT_ABSENCES", "SPEC_FIELDS", "CohortMember", "ThemeCohort", "close_on_or_before",
+           "cohort_for_row", "cohort_record", "cohort_return", "new_cohort_id", "parse_cohort_record", "select_current",
+           "series_return", "spec_digest", "summarize_cohorts", "validate_spec"]

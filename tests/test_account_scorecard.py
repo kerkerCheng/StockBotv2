@@ -323,10 +323,10 @@ def _ret(symbol: str, start: str, end: str) -> float:
 
 
 def test_theme_cohort_excess_equals_the_hand_computation() -> None:
-    """兩個成員＋一檔點名 → 對組的超額＝本檔報酬 − 兩個成員報酬的等權平均（手算）。"""
+    """點名的 AAA 是組員、另兩個成員 → 對組的超額＝本檔報酬 − 另兩個成員報酬的等權平均（手算；本檔排除）。"""
     scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "BBB", "CCC", "QQQ", "SOXX"),
                               today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
-                              cohort=_cohort("BBB", "CCC"))
+                              cohorts=[_cohort("AAA", "BBB", "CCC")])
     expected = _ret("AAA", "2026-08-01", "2026-08-31") - (
         _ret("BBB", "2026-08-01", "2026-08-31") + _ret("CCC", "2026-08-01", "2026-08-31")) / 2
     cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
@@ -343,7 +343,7 @@ def test_the_called_symbol_is_excluded_from_its_own_theme_cohort() -> None:
     """本檔是成員時從組裡排除——不然它一部分是在跟自己比。"""
     scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "BBB", "QQQ", "SOXX"),
                               today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
-                              cohort=_cohort("AAA", "BBB"))
+                              cohorts=[_cohort("AAA", "BBB")])
     cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
     assert cell["value"] == pytest.approx(
         _ret("AAA", "2026-08-01", "2026-08-31") - _ret("BBB", "2026-08-01", "2026-08-31"))
@@ -353,20 +353,51 @@ def test_absent_cohort_is_not_yet_recorded_not_zero() -> None:
     """沒有組 → 每一格是 `not_yet_recorded` 缺席（附理由），不是 0、也不是「樣本不足」。"""
     scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "QQQ", "SOXX"),
                               today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
-                              cohort=None, cohort_absence={"kind": "not_yet_recorded", "reason": "主題等權組未定義"})
+                              cohorts=(), cohort_absence={"kind": "not_yet_recorded", "reason": "主題等權組未定義"})
     for horizon in sc.HORIZONS_DAYS:
         cell = scored["excess_returns"][f"excess_{horizon}d_vs_theme_cohort"]
         assert cell["value"] is None and cell["absence_kind"] == "not_yet_recorded" and cell["reason"]
 
 
 def test_unpriced_cohort_is_insufficient_sample_with_its_own_reason() -> None:
-    """組在、成員一檔都取不到價 → 缺席，filter reasons 寫 `theme_cohort_unpriced`（不與「標的沒價」混成一條）。"""
+    """組在、本檔是組員、其他成員一檔都取不到價 → 缺席，filter reasons 寫 `theme_cohort_unpriced`（不與「標的沒價」混成一條）。"""
     scored = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "QQQ", "SOXX"),
                               today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
-                              cohort=_cohort("BBB"))
+                              cohorts=[_cohort("AAA", "BBB")])
     cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
     assert cell["value"] is None and cell["absence_kind"] == sc.ABSENCE_INSUFFICIENT
     assert scored["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {"theme_cohort_unpriced": 1}
+
+
+def test_a_call_on_a_non_member_is_filtered_and_named_never_borrows_another_cohort() -> None:
+    """多主題等權組 S1（選項 A）：點名的標的不是任何組的組員 → 那一格 `not_in_any_cohort`（filter reasons 照計），
+    QQQ／SOXX 兩格照算。只有組員點名時才比；組員與非組員混在一起時只算組員那幾則。
+
+    變異：讓非組員也拿現有那一組比 → 這一格會有值，這條紅。"""
+    only_outsider = sc.score_account([_call("AAA", "2026-08-01")], prices=_prices("AAA", "BBB", "CCC", "QQQ", "SOXX"),
+                                     today=date(2026, 10, 31), no_go_rate=sc.Metric(), trace_metric=sc.Metric(),
+                                     cohorts=[_cohort("BBB", "CCC")])
+    cell = only_outsider["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] is None and cell["absence_kind"] == "not_in_any_cohort" and "1 則點名" in cell["reason"]
+    assert only_outsider["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {"not_in_any_cohort": 1}
+    assert only_outsider["excess_returns"]["excess_30d_vs_QQQ"]["value"] is not None
+    mixed = sc.score_account([_call("AAA", "2026-08-01"), _call("BBB", "2026-08-01")],
+                             prices=_prices("AAA", "BBB", "CCC", "QQQ", "SOXX"), today=date(2026, 10, 31),
+                             no_go_rate=sc.Metric(), trace_metric=sc.Metric(), cohorts=[_cohort("BBB", "CCC")])
+    cell = mixed["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["n"] == 1 and cell["value"] == pytest.approx(
+        _ret("BBB", "2026-08-01", "2026-08-31") - _ret("CCC", "2026-08-01", "2026-08-31"))
+    assert mixed["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {"not_in_any_cohort": 1}
+
+
+def test_waiting_member_calls_keep_their_revisit_date_even_with_non_members_around() -> None:
+    """INV-2：組員點名的持有期還沒走完 → `revisit_after` 照算；旁邊多一則非組員點名不得讓到期日消失。"""
+    scored = sc.score_account([_call("AAA", "2026-10-20"), _call("CCC", "2026-08-01")],
+                              prices=_prices("AAA", "BBB", "CCC", "QQQ", "SOXX"), today=date(2026, 10, 31),
+                              no_go_rate=sc.Metric(), trace_metric=sc.Metric(), cohorts=[_cohort("AAA", "BBB")])
+    cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] is None and cell["absence_kind"] == sc.ABSENCE_INSUFFICIENT
+    assert cell["revisit_after"] == "2026-11-19"
 
 
 @pytest.fixture()
@@ -422,21 +453,23 @@ def test_build_adds_cohort_members_to_the_price_list_and_reports_the_block(score
     assert budget["requested"] == 2 + 1 + 2 and budget["truncated"] == []
     assert scorecard_env["asked"] == [["AAA", "BBB", "CCC", "QQQ", "SOXX"]]
     block = card["theme_cohort"]
-    assert block == {"cohort_id": "tc_test", "theme": "ai_capex_optical", "decided_on": "2026-09-30",
-                     "members_total": 4, "members_priced": 4, "missing": [], "absence": None, "parse_errors": []}
+    assert block == {"mode": "per_row", "absence": None, "parse_errors": [],
+                     "cohorts": [{"cohort_id": "tc_test", "theme": "ai_capex_optical", "decided_on": "2026-09-30",
+                                  "members_total": 4, "members_priced": 4, "missing": []}]}
     cell = card["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]
     assert cell["value"] == pytest.approx(_ret("AAA", "2026-08-01", "2026-08-31") - sum(
         _ret(s, "2026-08-01", "2026-08-31") for s in ("BBB", "CCC", "QQQ")) / 3)
-    assert card["schema_version"] == "stockbot-app/account_scorecard/2"
+    assert card["schema_version"] == "stockbot-app/account_scorecard/3"
 
 
 def test_truncation_cuts_cohort_members_before_calls_and_never_benchmarks(scorecard_env, monkeypatch) -> None:
     """L11-6 ④：最先壞的是截斷——成員不是基準、可被截，但不得把基準或點名標的擠掉；被截的照印、該格缺席。"""
     monkeypatch.setattr(sc, "MAX_PRICED_SYMBOLS", 3)
-    card = _build(scorecard_env, cohorts=([_cohort("BBB", "CCC")], []))
+    card = _build(scorecard_env, cohorts=([_cohort("AAA", "BBB", "CCC")], []))
     assert card["price_budget"]["truncated"] == ["BBB", "CCC"]
     assert scorecard_env["asked"] == [["AAA", "QQQ", "SOXX"]]
-    assert card["theme_cohort"]["missing"] == ["BBB", "CCC"] and card["theme_cohort"]["members_priced"] == 0
+    entry = card["theme_cohort"]["cohorts"][0]
+    assert entry["missing"] == ["BBB", "CCC"] and entry["members_priced"] == 1        # 只剩點名的 AAA 自己有價
     metrics = card["accounts"][0]["metrics"]["excess_returns"]
     assert metrics["excess_30d_vs_QQQ"]["value"] is not None and metrics["excess_30d_vs_SOXX"]["value"] is not None
     assert metrics["excess_30d_vs_theme_cohort"]["value"] is None
@@ -463,10 +496,20 @@ def test_cohort_absence_kinds_reach_the_payload(scorecard_env, monkeypatch, coho
     assert card["price_budget"]["theme_cohort_added"] == []
 
 
-def test_more_than_one_current_cohort_is_ambiguous_not_guessed(scorecard_env) -> None:
-    card = _build(scorecard_env, cohorts=([_cohort("BBB", cohort_id="tc_a"), _cohort("CCC", cohort_id="tc_b")], []))
-    assert card["theme_cohort"]["absence"]["kind"] == "ambiguous_cohort"
-    assert card["theme_cohort"]["cohort_ids"] == ["tc_a", "tc_b"]
+def test_several_cohorts_coexist_and_each_call_uses_its_own(scorecard_env) -> None:
+    """多組並存不再整格缺席：每則點名用自己所屬的組；同時是兩組組員的點名 `ambiguous_membership`（不猜）。
+
+    變異：改回「多於一組就整格 `ambiguous_cohort`」→ 第一張卡的那一格會缺席，這條紅。"""
+    card = _build(scorecard_env, cohorts=([_cohort("AAA", "BBB", cohort_id="tc_a"), _cohort("CCC", "DDD", cohort_id="tc_b")], []))
+    assert card["theme_cohort"]["absence"] is None
+    assert [e["cohort_id"] for e in card["theme_cohort"]["cohorts"]] == ["tc_a", "tc_b"]
+    cell = card["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] == pytest.approx(_ret("AAA", "2026-08-01", "2026-08-31") - _ret("BBB", "2026-08-01", "2026-08-31"))
+    both = _build(scorecard_env, cohorts=([_cohort("AAA", "BBB", cohort_id="tc_a"), _cohort("AAA", "CCC", cohort_id="tc_b")], []))
+    cell = both["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] is None and cell["absence_kind"] == "ambiguous_membership"
+    assert both["accounts"][0]["metrics"]["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {
+        "ambiguous_membership": 1}
 
 
 def test_freshness_follows_the_cohort_not_the_prices(scorecard_env) -> None:
@@ -493,11 +536,12 @@ def test_render_and_heartbeat_show_the_cohort_cell(scorecard_env, tmp_path) -> N
 
     card = _build(scorecard_env, cohorts=([_cohort("BBB", "CCC")], []))
     text = sc.render(card)
-    assert "主題等權組基準：`tc_test`（ai_capex_optical，決定於 2026-09-30）｜成員 2、取得到價 2｜缺價：—" in text
+    assert ("主題等權組基準 1 組（每則點名只跟自己所屬的組比）：`tc_test`（ai_capex_optical，決定於 2026-09-30）"
+            "｜成員 2、取得到價 2｜缺價：—") in text
     assert "excess_30d_vs_theme_cohort" in text and "**已知偏差" in text
     StateArtifactStore(tmp_path / "state").write(card)
     line = hb.build_scorecard(state_dir=tmp_path / "state").lines[-1]
-    assert line.endswith("｜主題等權組基準：有"), line
+    assert line.endswith("｜主題等權組基準：有（1 組，每則點名只比自己的組）"), line
 
     absent = _build(scorecard_env, cohorts=([], []))
     assert "主題等權組基準：無（not_yet_recorded）" in sc.render(absent)
