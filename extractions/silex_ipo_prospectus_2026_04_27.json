@@ -1,0 +1,132 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "silex_ipo_prospectus_2026_04_27",
+    "title": "Silex Microsystems AB (publ) — Invitation to acquire ordinary shares（IPO 公開說明書，SFSA 2026-04-27 核准）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Silex Microsystems AB (publ)",
+    "publisher": "Silex Microsystems AB（Finansinspektionen 核准的公開說明書；本份取 nyemissioner.se 的轉載副本）",
+    "url": "https://nyemissioner.se/wp-content/uploads/silex-ipo-prospekt.pdf",
+    "published_at": "2026-04-27",
+    "retrieved_at": "2026-10-05",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "瑞典 Finansinspektionen 核准的 IPO 公開說明書（法定文件，第 4 頁：「This Prospectus was approved by the SFSA on 27 April 2026」）；只保留研究必要的逐字摘錄。published_at＝核准日，與 MFN 公告 2026-04-27 06:30 同日。官方網站的副本在 JS 聲明頁後面，本份取 nyemissioner.se 的轉載 PDF（230 頁）。"
+  },
+  "sources": [
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_s1",
+      "locator": "PDF 第 23 頁——Risk factors（AI 產業風險）",
+      "quote": "Silex manufactures MEMS for AI applications, such as optical circuit switches in data centres"
+    },
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_s2",
+      "locator": "PDF 第 73 頁——Business overview（技術範圍；主詞是前句的「The Company’s … manufacturing capabilities」）",
+      "quote": "encompass the entire spectrum and broad array of MEMS technologies including micro-mirror arrays, RF components, and next-generation microphones"
+    },
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_s3",
+      "locator": "PDF 第 92 頁——Business overview（高價值區段的客戶關係；泛論、非專指 OCS）",
+      "quote": "Products in the high-value technology segments are also less of a commodity, and due to complexity of the processes, Silex is often in the position to serve its customers as the single source."
+    },
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_s4",
+      "locator": "PDF 第 7 頁——Summary（風險：客戶集中度）",
+      "quote": "While Silex generates revenue from approximately 85 customers worldwide, Silex’s ten largest customers accounted for approxi- mately 75 percent of Silex’s net sales, and the largest customer accounted for 23 percent of Silex’s net sales for three months ended 31 March 2026, and Silex’s ten largest customers accounted for approximately 77 percent of Silex’s net sales, and the largest customer accounted for 25 percent of Silex’s net sales for the year ended 31 December 2025."
+    },
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_s5",
+      "locator": "PDF 第 29 頁——Risk factors（股東：SMEI 持股）",
+      "quote": "As of the date of the Prospectus, SMEI remains as an owner with 45.2 percent of the shares in Silex through its subsidiaries, GAE and Beijing Silex"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:silex_microsystems",
+      "type": "Company",
+      "name": "Silex Microsystems",
+      "aliases": [
+        "Silex Microsystems",
+        "Silex Microsystems AB",
+        "Silex"
+      ],
+      "abstraction_level": "device_chip",
+      "attributes": {
+        "ticker": "SILEX.ST"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "silex_ipo_prospectus_2026_04_27_s1",
+        "silex_ipo_prospectus_2026_04_27_s4"
+      ]
+    },
+    {
+      "id": "tech:mems_mirror_array",
+      "type": "TechNode",
+      "name": "3D MEMS mirror array (OCS optical core)",
+      "aliases": [
+        "MEMS OCS core",
+        "MEMS mirror array"
+      ],
+      "abstraction_level": "device_chip",
+      "attributes": {},
+      "confidence": 0.85,
+      "role": null,
+      "source_ids": [
+        "silex_ipo_prospectus_2026_04_27_s1",
+        "silex_ipo_prospectus_2026_04_27_s2"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:silex_microsystems",
+      "dst_id": "tech:mems_mirror_array",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "silex_ipo_prospectus_2026_04_27_s1",
+        "silex_ipo_prospectus_2026_04_27_s2"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "silex_ipo_prospectus_2026_04_27_s1",
+        "silex_ipo_prospectus_2026_04_27_s2",
+        "silex_ipo_prospectus_2026_04_27_s3"
+      ],
+      "statement": "Silex's own FI-approved prospectus: it 'manufactures MEMS for AI applications, such as optical circuit switches in data centres', and its manufacturing capabilities include 'micro-mirror arrays'; it also says that in high-value segments Silex 'is often in the position to serve its customers as the single source' (a general statement, not specific to OCS). The OCS customer is not named. Modeled to the OCS MEMS core node (tech:mems_mirror_array): the prospectus pairs MEMS-for-OCS with micro-mirror arrays but never says the two in one sentence. Self-report in a statutory prospectus (L8: weak, costly).",
+      "disproof_condition": "條件：Silex 季報、年報或法說改寫成 OCS 客戶流失或 OCS 業務縮減，或客戶端一手顯示 OCS 的 MEMS 鏡陣列由別家代工。核查頻率：每季（Silex 季報、法說）。觸發後 48 小時：e1 降 confidence，重讀 MEMS 鏡陣列層。"
+    },
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_cl2",
+      "subject_id": "co:silex_microsystems",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.85,
+      "source_ids": [
+        "silex_ipo_prospectus_2026_04_27_s4"
+      ],
+      "statement": "Customer concentration (prospectus): about 85 customers; ten largest ≈75% of net sales and the largest customer 23% for the three months to 31 March 2026; ten largest ≈77% and the largest 25% for FY2025. The largest customer is not named or tied to OCS in the prospectus. Dated (L4).",
+      "disproof_condition": "條件：之後的年報或季報揭露的客戶集中度與此大幅不同（最大客戶占比升到 40% 以上或降到 15% 以下）。核查頻率：每年（年報）＋每季。觸發後 48 小時：本 claim 加註，重讀 Silex 在 MEMS 鏡陣列層的位置。"
+    },
+    {
+      "id": "silex_ipo_prospectus_2026_04_27_cl3",
+      "subject_id": "co:silex_microsystems",
+      "demand_proof_level": "confirmed",
+      "confidence": 0.9,
+      "source_ids": [
+        "silex_ipo_prospectus_2026_04_27_s5"
+      ],
+      "statement": "Ownership (prospectus, as of its date): SMEI (Sai MicroElectronics, Beijing) remains an owner with 45.2% of the shares through GAE and Beijing Silex International after the IPO. Dated ownership context (L4); a geopolitical risk for a supplier to U.S. data-centre OCS.",
+      "disproof_condition": "條件：Silex 揭露 SMEI 持股降到 20% 以下或出清，或美國主管機關因中國持股對 Silex 採取限制（出口管制、實體清單、投資審查）。核查頻率：每季（Silex 公告、股東名冊）。觸發後 48 小時：本 claim 加註；若是限制措施，重讀 MEMS 鏡陣列層並查 OCS 客戶的替代來源。"
+    }
+  ]
+}

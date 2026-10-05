@@ -1,0 +1,12 @@
+Source URL: https://nyemissioner.se/wp-content/uploads/silex-ipo-prospekt.pdf
+
+Excerpt:
+[EXCERPT — 法定公開說明書之有限逐字引文] Silex Microsystems AB (publ) — Invitation to acquire ordinary shares（IPO 公開說明書，SFSA 2026-04-27 核准）
+Source: https://nyemissioner.se/wp-content/uploads/silex-ipo-prospekt.pdf
+Published: 2026-04-27 | Origin: Silex Microsystems AB (publ) | Retrieved: 2026-10-05
+
+PDF 第 23 頁——Risk factors（AI 產業風險）："Silex manufactures MEMS for AI applications, such as optical circuit switches in data centres"
+PDF 第 73 頁——Business overview（技術範圍；主詞是前句的「The Company’s … manufacturing capabilities」）："encompass the entire spectrum and broad array of MEMS technologies including micro-mirror arrays, RF components, and next-generation microphones"
+PDF 第 92 頁——Business overview（高價值區段的客戶關係；泛論、非專指 OCS）："Products in the high-value technology segments are also less of a commodity, and due to complexity of the processes, Silex is often in the position to serve its customers as the single source."
+PDF 第 7 頁——Summary（風險：客戶集中度）："While Silex generates revenue from approximately 85 customers worldwide, Silex’s ten largest customers accounted for approxi- mately 75 percent of Silex’s net sales, and the largest customer accounted for 23 percent of Silex’s net sales for three months ended 31 March 2026, and Silex’s ten largest customers accounted for approximately 77 percent of Silex’s net sales, and the largest customer accounted for 25 percent of Silex’s net sales for the year ended 31 December 2025."
+PDF 第 29 頁——Risk factors（股東：SMEI 持股）："As of the date of the Prospectus, SMEI remains as an owner with 45.2 percent of the shares in Silex through its subsidiaries, GAE and Beijing Silex"
