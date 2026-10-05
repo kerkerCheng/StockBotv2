@@ -41,7 +41,10 @@ def _rows(conn: Any, ticker: str, metric: str) -> list[dict[str, Any]]:
 
 
 def _segment_points(conn: Any, ticker: str) -> list[dict[str, Any]]:
-    """分部／產品線占比：每個 (欄位, as_of) 取生效那一筆（supersedes 沒被指到的）；解析不了的不收。"""
+    """分部／產品線占比：每個 (欄位, as_of) 取生效那一筆（supersedes 沒被指到的）；解析不了的不收。
+
+    同一 (欄位, as_of) 有多筆生效 → `{"conflict": [...]}`，不挑一個、也不默默丟（INV-3；同 going-concern 的前例）。
+    """
     from engine_c.manual_observations import live_observation_ids
 
     out = []
@@ -51,6 +54,9 @@ def _segment_points(conn: Any, ticker: str) -> list[dict[str, Any]]:
             (ticker, field)).fetchall()]
         for as_of in dates:
             live = live_observation_ids(conn, ticker, field, as_of)
+            if len(live) > 1:
+                out.append({"as_of": str(as_of)[:10], "field": field, "conflict": sorted(live)})
+                continue
             if len(live) != 1:
                 continue
             row = conn.execute("SELECT value FROM manual_observations WHERE observation_id = ?",

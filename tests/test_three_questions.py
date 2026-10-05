@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import json
 from datetime import date, timedelta
 
 import pytest
@@ -267,6 +268,40 @@ def test_segment_and_product_line_points_never_make_one_series() -> None:
                          today=TODAY)
     assert "月營收" in rows[0]["basis"]
     assert [r["key"] for r in rows[1:]] == ["in_numbers_structure", "in_numbers_structure"]
+
+
+def test_a_conflicted_observation_day_is_printed_and_never_becomes_a_series_point() -> None:
+    """2026-10-05 SOI.PA：FY2026 分部占比兩筆都生效（更正那筆沒填 supersedes_id），讀取端曾默默跳過那一天。"""
+    conflict = {"as_of": "2026-03-31", "field": "segment_revenue_share", "conflict": ["mo_a", "mo_b"]}
+    one = {"as_of": "2025-03-31", "value": {"a": 0.24}, "field": "segment_revenue_share"}
+    rows = tq.in_numbers({"revenue_kind": "annual", "segment_shares": [one, conflict]}, today=TODAY)
+    assert rows[0]["absence_kind"] == "upstream_unavailable"
+    assert [r["key"] for r in rows[1:]] == ["in_numbers_structure", "in_numbers_conflict"]
+    assert rows[2]["absence_kind"] == "insufficient_evidence" and rows[2]["detail"]["conflict"] == ["mo_a", "mo_b"]
+    two = [one, {"as_of": "2025-09-30", "value": {"a": 0.3}, "field": "segment_revenue_share"}, conflict]
+    rows = tq.in_numbers({"revenue_kind": "annual", "segment_shares": two}, today=TODAY)
+    assert [p["as_of"] for p in rows[0]["value"]] == ["2025-03-31", "2025-09-30"]
+    assert rows[-1]["key"] == "in_numbers_conflict"
+
+
+def test_the_reader_marks_a_day_with_two_live_observations_instead_of_dropping_it(tmp_path) -> None:
+    import sqlite3
+
+    from engine_c.db import _ensure_sqlite_schema
+    from engine_c.manual_observations import append_manual_observation, ensure_manual_observation_schema
+    from engine_c.three_question_inputs import _segment_points
+
+    conn = sqlite3.connect(tmp_path / "engine_c.db")
+    conn.row_factory = sqlite3.Row
+    _ensure_sqlite_schema(conn)
+    ensure_manual_observation_schema(conn)
+    kw = {"ticker": "SOI.PA", "field_name": "segment_revenue_share", "source_ref": "fixture://urd", "author": "t"}
+    ids = [append_manual_observation(conn, value=json.dumps({"a": v}), as_of="2026-03-31", allow_parallel=True, **kw)
+           for v in (0.1165, 0.1166)]
+    append_manual_observation(conn, value=json.dumps({"a": 0.14}), as_of="2025-03-31", **kw)
+    pts = _segment_points(conn, "SOI.PA")
+    assert [p["as_of"] for p in pts] == ["2025-03-31", "2026-03-31"]
+    assert pts[1] == {"as_of": "2026-03-31", "field": "segment_revenue_share", "conflict": sorted(ids)}
 
 
 def test_a_stale_latest_point_is_not_today_s_number() -> None:

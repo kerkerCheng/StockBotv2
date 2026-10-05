@@ -364,7 +364,15 @@ def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     # 分部占比與產品線占比是兩種切法（口徑不同）：**同一個欄位**有 ≥2 個觀測日才成序列，不跨欄位湊點（L12）。
     by_field: dict[str, list[Mapping[str, Any]]] = {}
+    conflicts = []
     for seg in inp.get("segment_shares") or ():
+        if seg.get("conflict"):
+            conflicts.append(line(
+                "in_numbers_conflict", "出現在數字裡了嗎：同一觀測日有多筆生效紀錄", source=str(seg.get("field")),
+                as_of=seg.get("as_of"), rule="同一 (欄位, 觀測日) 只能有一筆生效；多筆就不挑一個，這一點不進序列（INV-3）",
+                absence_kind="insufficient_evidence", detail={"conflict": list(seg["conflict"])},
+                reason=f"{seg.get('as_of')} 有 {len(seg['conflict'])} 筆生效紀錄（{'、'.join(seg['conflict'])}），不挑一個"))
+            continue
         by_field.setdefault(str(seg.get("field")), []).append(seg)
     series_field = next((f for f, pts in sorted(by_field.items()) if len(pts) >= 2), None)
     if series_field is not None:
@@ -372,10 +380,10 @@ def in_numbers(inp: Mapping[str, Any], *, today: date) -> list[dict[str, Any]]:
         out.append(line(key, label, value=[{"as_of": p.get("as_of"), "revenue_mix": p["value"]} for p in pts[-4:]],
                         source=series_field, as_of=pts[-1].get("as_of"), basis="分部／產品線營收占比（同一欄位）",
                         rule=_RULE_NUMBERS))
-        return out
+        return out + conflicts
     contexts = [line("in_numbers_structure", "出現在數字裡了嗎：結構脈絡（只有一點）", value=pts[0]["value"],
                      source=f, as_of=pts[0].get("as_of"), rule="這個欄位只有一個觀測日——當結構脈絡印，不佔序列位置")
-                for f, pts in sorted(by_field.items())]
+                for f, pts in sorted(by_field.items())] + conflicts
     months = [m for m in (inp.get("monthly_revenue") or ())
               if (_iso(m.get("available_on")) or date.max) <= today and m.get("revenue") is not None]
     if len(months) >= 2:
