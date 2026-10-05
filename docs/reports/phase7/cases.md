@@ -91,7 +91,14 @@
   - 2026-10-05｜research-drain 段 5：CPO 層讀圖 `sr_e8161208a37aa915`（neither：需求側有 pluggable、NPO、銅可選，台積電的人說瓶頸在雷射、光纖、連接器與測試——在下一層）；矽光子兩節點讀圖 `sr_3ad043cb553dfc94`、`sr_9ee10fb4ef6dd06e`（volume，讀成量：Tower 6-K 客戶預付 2.9 億美元保留 2027 產能）；敘事 AVGO `ib_845f22ec395d69dd`、TSM `ib_e30d810241bf6f8d`、TSEM `ib_af02a0f36157286b`、GFS `ib_a43c94cc33417379`（皆非邊緣的不要）；Soitec 坐上 Photonics-SOI 基板層的入圖包 pq2 **[706]**
   - 2026-10-05｜research-drain 段 5（CPO 鏈續）：CPO 層供給側三檔——FN `ib_10c81951aab63573`、MRVL `ib_54f0fb5339cfe7cf`（皆非邊緣的不要）、HIMX `ib_ccda271575147a0b`（不要：讀不出卡在它——晶圓級光學還在合作開發、客戶沒具名；出現在數字裡 no）；中際旭創 300308.SZ `ib_0ef521433d4bf145`（非邊緣的不要，押矽光子讀圖）；CPO 全堆疊測試層讀圖 `sr_6f781528583b68af`（undecided：需求側只有台積電主管一句轉述、供給側只有 Aehr 自報，晶圓級燒機只是全堆疊測試的一段）＋AEHR `ib_cd56ea272f1cf77f`（缺 X，`ew_0231`：供給側列舉與客戶端具名；已定價 yes＝自家三年 P/S 第 96.8 百分位，X 補上後也是等回落）
   - 2026-10-05｜research-drain 段 5（CPO 鏈的邊緣檔）：外部光源層 `sr_879ba9bc8ad69222`（undecided：NVIDIA 自己的部落格點名 Coherent 供 ELS 模組、Lumentum 剛拿到第一張 ELS 模組單〔2027 下半年交貨〕，但缺的在下一層雷射；Open CPX MSA v1.0 允許模組內建光源，是反向路徑）——POET 的讀圖格因此到終局；FAU 層 `sr_4c83c85cdb490db9`（undecided）＋上詮 `ib_7f2b578b1255a438`（缺 X，`ew_0248`：FAU 客戶與量；EV／營收約 31 倍）；NPO 層 `sr_f004cdb4639c6441`（undecided，沒有需求側）＋AEVA `ib_336f1ed819a1a757`（不要：NPO 只在聯合開發，2027 下半年初次部署）；Enablence `ib_5951751518182665`（不要：會死嗎——現金跑道約 1.3 個月、總負債約 6,147 萬美元，押 ELS 8 通道插槽）。⚠ FAU 讀圖第一次送出時把 Hunterbrook 標成 independent，被拒（媒體轉述不是第三方印證，L11-3），已改
+  - 2026-10-05｜使用者 go [706] [708] 入圖之後：Photonics-SOI 基板層（新節點）第一份讀圖 `sr_f0f03b1e543dc73a`（undecided：鎖產能的說法只有
+    Soitec 自己、沒拆到這一層；供給側只讀了它一家）；可插拔層重讀 `sr_5bb7fd1ac509a55b`、CPO 層重讀 `sr_d909737c0809a580`（判讀不變；光寶是開發邊、不進供給側）；
+    AAOI、AVGO、FN、HIMX、MRVL、TSM 六份敘事改押。Soitec SOI.PA `ib_598ed7484b941868`（缺 X，`ew_0270`：矽光子代工廠談 Photonics-SOI 的一手＋已定價主參照；
+    11/18 H1'27 業績叫醒）——寫之前補 Engine C mechanical 三筆：FY2024-25 分部占比 `mo_528c25876a644d9d82a53ae2997d8a8e`（URD 比較欄）、
+    Q1'27 營收 `mo_cdf9ed0095729b3551848732f1c1ef51`（一手 PDF：Edge & Cloud AI 6,500 萬歐元、固定匯率年增 46%，Photonics-SOI「sales doubling」）、
+    FY27 指引 `mo_336a965dfca0eebd7bceba03f227b0f2`（Photonics-SOI 營收倍增以上）；光寶 2301.TW `ib_f496cf15e39a2f7a`（非邊緣的不要，約 201 億美元；研究判斷沿用 09 月版）
 - failure log：（尚無）
+  - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
 
 ## O6 光通訊磊晶與 MOCVD 產能（二階）
 
@@ -258,6 +265,9 @@
   - 2026-10-05｜⚠ **違反 plan 7.1 ④：本鏈第一份 v2 敘事（上面四份，2026-10-05 04:28 UTC）寫在主題等權組落地之前**——閉環佇列照 NEXT_PICK_RULE 排到散熱四檔，執行者（本 session）沒有先讀本段的前置條件。錨日因此是 2026-10-05。緩解：組員候選（奇鋐、健策、高力、富世達）在敘事之前已寫進本段（commit `afdb4698`，2026-10-04 23:16 UTC，早約 5 小時）——組成不是事後挑的；正式落地仍待 #16。7.5 量本鏈的組超額時以那份候選名單當組成，並標明是本段事後補記。電力鏈（P1）的敘事一律等主題組落地後才寫（failure log #26）
   - 2026-10-05｜閉環：奇鋐（3017.TW）讀圖格 upstream_unavailable（圖上只有「供貨給 NVIDIA」的公司對公司邊）→ 入圖包 pq2 **[710]**（`ra_ebe8b7c611c92719dc4f3def70fa1584`，lead_d96c6c89）：英文版年報逐字——2025 是 AVC 的「Inaugural Year of Liquid Cooling」、長期投入 Cold Plates 與 CDU、擴產聚焦 critical cold plate components、擴充 manifold systems 產能 → 冷板、CDU、manifold 三條自報供貨邊；副作用：不改任何既有節點。⚠ 中文版通篇寫「本公司」，prepare 的層列舉具名檢查拒收（未寫入、未鑄號），改用同日上傳的英文版（FE4，doc_id 照 3081／4979 慣例加 `_fe4`）。媒體（Digitimes 2026-03-18，付費）報導 NVIDIA 在 GTC 點名 Vera Rubin 四家冷板供應商（奇鋐、Cooler Master、健策、台達）——NVIDIA 網域找不到名單，沒有逐字，不進包
   - 2026-10-05｜Dover（DOV）的層邊**不做**：10-K 只寫「thermal connectors used in liquid cooling of data centers」（Pumps & Process Solutions 的有機成長來源），沒有逐字 quick disconnect；10-04 快接頭讀圖對 NVIDIA 新聞稿那句同樣具體程度的話已判「不接到層」（L6），同一把尺。CPC 自己的「Everis UQD／UQDB」頁面與 2025-07 新聞稿是那個逐字，但官網與轉載站都擋腳本（403），這輪拿不到。DOV 留在未到終局
+  - 2026-10-05｜使用者 go [710] 入圖之後：冷板 `sr_7d2a979f43e3fc92`、CDU `sr_7f07d59f15b6e8dc`、manifold `sr_baee167c3dfb3b71` 三層重讀
+    （供給側各多奇鋐一家，判讀都不變：undecided——自報、沒有買方說缺，奇鋐擴冷板與歧管產能是供給在追）；台達、健策、高力三份敘事改押；
+    奇鋐 3017.TW 研究判斷＋敘事 `ib_0267a789158134ca`（非邊緣的不要：約 425 億美元、16 位）。主題等權組仍延後：多主題等權組的開發使用者已 go，落地後才鑄號
 - 主題等權組（散熱；必須早於本鏈第一份敘事）：（尚無）
   - 2026-10-05｜候選：奇鋐（3017.TW）、健策（3653.TW）、高力（8996.TW）、富世達（6805.TW；伺服器產品占營收 36%，年報說「已成為公司主要獲利引擎」——判斷入組）；
     台達（主業電源）、Ecolab、Dover（多角化）、CoolIT、Danfoss（非上市）、雙鴻、Vertiv（不在名冊）排除。四檔在 Engine C 都有價格。**延後**：同 P1，failure log #16
@@ -314,6 +324,8 @@
   - 2026-10-05｜第一窗 [`replay-r3-missed-q3.md`](replay-r3-missed-q3.md)：58 檔全有價格、光通訊組 Q3 等權 +1.0%、前四分之一 15 檔。**照官方比對法「系統沒有接觸」6 檔：健策（+101%）、雙鴻（+51%）、奇鋐（+32%）、南亞科（+24%）、上詮、英特磊**——後兩檔是比對法的問題（上詮 08-24 X 帳號與 08-25 decompose 的 lead 沒有公司身分；英特磊 09-17 已經年報進圖、09-30 入組，但定義不含「進圖」「入組」）；**窗口內接觸卻沒研究 8 檔**（全新 09-17 park、LandMark 讀圖 09-17〔字串比對另見 08-26 中央社〕、晶豪科 08-27 X 帳號反覆點名後 park、華星光 09-24 park、LITE、AXTI、IQE、韓美）；窗口後才接觸 1 檔（CLF，10-04 電力鏈開題）。「接觸早於窗口起點」第一窗無法觀測（lead registry 07-22 開機，晚於窗口起點 07-01）
   - 7.5 failure log 候選（不是條目）：健策、雙鴻、奇鋐（散熱：Q2 選題前沒有任何管道）、南亞科（記憶體：「刻意不做」的代價）
   - 2026-10-05｜research-drain 段 5（每檔閉環）碰到一組**母體外的贏家**：IC 載板兩檔——AT&S（ATS.VI）由 2025-02 低點約 €11 到 2026-06-22 高點 €239（約 22 倍）、三星電機（009150.KS）由 2025-04 低點約 ₩11 萬到 2026-06-19 高點 ₩227 萬（約 21 倍）（Engine C 日線）。§5.2 的 43 檔觀察名單有「先進封裝／測試」類、沒有 IC 載板類，第一窗看不到它們。載板層 2026-10-04 才入圖（[681]；lead 來自 2026-09-30 一則 X 推文），已在漲勢尾端；而買方的缺貨原文 2026-05-28 就公開了（Marvell Q1 10-Q：大尺寸載板供給吃緊＋8.7 億美元訂金鎖產能）。依 §5.3 第 2 點，看得到價格之後才追加的成分不進已過的窗口。研究產出：讀圖 `sr_229707b4d4cd4f82`（volume）；敘事 ATS.VI `ib_6f4af1dbbf5e1b56`（缺 X：已定價的主參照量不到，補上後最可能是等回落）、009150.KS `ib_498e2bc68d1a77ad`（非邊緣的不要）
+  - 2026-10-05｜使用者 go [711]：R3 母體追加 IC 載板類 6 檔（ATS.VI、009150.KS、4062.T、3037.TW、3189.TW、8046.TW），從第二窗起；
+    第一窗不重算（registration、cohort-changes 已記，commit `8a059096`）
   - 7.5 failure log 候選：R3 的母體只看得到事先想到的類別——這一組真正漏掉的贏家，結構上在分母之外（「我找不到」與「它不存在」是兩個 claim，L11-5）；另外 05-28 的買方原文到 10-04 才進圖，中間沒有任何管道把它送進研究
 - failure log：（尚無）
   - #13（lead 實體不隨名冊重算：LandMark、上詮照官方比對法變成「沒有 lead」）
@@ -332,6 +344,14 @@
       （不要：量只對中國以外成立，金力在中國側）。MP、LYC.AX 非邊緣（覆蓋 15、13 位）；6680.HK 邊緣但快照市值只算 H 股
   - 2026-10-05｜research-drain 段 5（機器人鏈續）：RV 減速器層 `sr_697ae401ae6935a7`（undecided：Nabtesco 自估工業機器人關節六成，人形用不用 RV 沒有一手）、人形機器人致動器層 `sr_ae3ca36af2a1cc15`（undecided：供給側只讀到 Schaeffler，唯一客戶具名是互惠交易）；研究判斷檔 6268.T、SHA0.DE；敘事 Nabtesco `ib_50de584aea2b6198`、雙環 `ib_0a869635854d456e`、Schaeffler `ib_989c75cb4e73914a`（皆不要：讀不出卡在它／量太小）；現代摩比斯坐上致動器層的入圖包 pq2 **[707]**
   - 2026-10-05｜research-drain 段 5（機器人鏈續）：綠的諧波 688017.SS `ib_12123549c9ea634a`（不要：讀不出卡在它——諧波層至少三家、它是追趕的中國廠，人形客戶只有二手；押諧波層 `sr_2dd5e99d68a4d0b7`）
+  - 2026-10-05｜使用者 go [705] [707] 入圖、[704] drop（被 [705] 取代）之後：
+    - 稀土磁材層重讀 `sr_4ef39c5afa160b75`（仍 volume、只對中國以外）：USA Rare Earth 第一次以自己的供貨邊坐上這一層——10-Q 寫 Stillwater
+      「has commenced commercial production; however, we have not begun generating revenue」，中國以外的新產能在開、還沒有營收，反證②沒有觸發；
+      Noveon 的新聞稿仍掛在 MP 的供貨邊上（failure log #14 未解）
+    - USAR 研究判斷＋敘事 `ib_5b0e62610b7ee01a`（缺 X，`ew_0257`：自己的買方承諾、磁材營收、已定價主參照；11 月 10-Q 後重寫）；
+      MP `ib_4c4dd0d12a6c9f1d`（已定價等回落，`ew_0203`）、6680.HK `ib_677c6eba7d7d4276`（不要）改押新讀圖，判讀沒變
+    - 致動器層重讀 `sr_14456dc4d147f3f3`（undecided）：現代摩比斯供 Atlas 致動器是集團內採購、Schaeffler 綁的是互惠交易——兩條客戶端具名都不算獨立印證；
+      現代摩比斯 `ib_c8e5e572872abec6`（非邊緣的不要：約 252 億美元、28 位）；SHA0.DE `ib_3671da7bf86f5edc` 改押
   - 2026-10-05｜Nidec 入圖後的一手補查（R4 報告原寫「未查」）：窗口內（09-01 入圖 → 10-02）唯一的一手是 2026-09-30 延遲發布的 FY2025 決算摘要——第三方委員會確認多起管理層參與的不當會計、6,321 億日圓減損、營業虧損 5,190 億日圓；東證特別注意銘柄指定在 2025-10-28（早於入圖）。這是治理／會計事件，**沒有觸及入圖時的結構主張**（FLEXWAVE），R4 結論不變（證據不足以判）；只記事實、不做「它為什麼跌」的因果歸因（L14）。觀測 `mo_b35ec2d6cdd9154e1be5d12cb1a67e3b`；敘事 Nidec `ib_96330eed2aea24c9`（非邊緣的不要，治理風險記在 our_bet）、宇樹 688836.SS `ib_68f7e54c0de8e0a2`（非邊緣的不要；只坐自家整機 G1，failure log #22 第二型）
 - failure log：（尚無）
   - #14（反證以被評公司的供貨 assertion 形式入圖：MP 磁材邊上的 Noveon、USA Rare Earth 文件，引文沒有 MP）
