@@ -42,6 +42,10 @@
 - 裁決：（尚無）
   - 2026-10-04｜Jabil 8-K Ex.99.1（Q4 FY26，申報 2026-09-30）｜`ew_0108` 的 Jabil 條件未觸及（全文 Sivers、photonic 都是 0 處）｜—（H7：未觸及不記列）
   - 2026-10-04｜`mops_3105_company_presentation_20260909` p.23｜代工端 CW-DFB 到 2026-09 仍「Ongoing Qualification」——是敘事②（ELS 年底前量產）時程的脈絡，不是裁決；裁決點照舊（Q3 2026-11-26、ELS readiness 2026-12-31）｜—
+  - 2026-10-05｜research-drain 段 5：同層四檔台股第一份敘事（都押 `sr_3a4fe5719994dfdc`）——聯亞 `ib_30cb4f95b4afd196`、華星光 `ib_cf97b7317300793a`、
+    全新 `ib_a731593be71a5745` 宣告「缺 X」：已定價嗎的主參照（台股歷史股數沒有機械來源；全新另缺 CW 雷射量產，年報只寫 115 年研發計畫），wake `ew_0210`–`ew_0212`
+    （10-12）；穩懋 `ib_502f00c21da9f504`「不要」（非邊緣，13 位分析師；照 LITE 前例）。台股歷史股數一格的 PLAN_PROPOSAL：
+    `docs/plans/2026-10-05-001-feat-tw-historical-shares-proposal.md`（MOPS t163sb05 已驗證）
 - 2×2：尚未到裁決點
 - failure log：（尚無）
   - #1（lead_f1694626 被排回）、#3（[679]／[680] 重複號）
