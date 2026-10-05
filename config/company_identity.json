@@ -207,6 +207,17 @@
       "_display_name_source": "SEC 10-Q 2026-08-13 封面 dei:EntityRegistrantName「Churchill Capital Corp XI」"
     },
     {
+      "company_id": "co:cindus",
+      "research_ticker": null,
+      "display_name": "Cindus Corporation",
+      "_display_name_source": "DOE 2022 §2.1.4.1 逐字",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）",
+      "name_aliases": [
+        "Cindus",
+        "Cindus Corporation"
+      ]
+    },
+    {
       "company_id": "co:cleveland_cliffs",
       "research_ticker": "CLF",
       "market_currency": "USD",
@@ -949,6 +960,17 @@
       "_display_name_source": "商號變更公告「Proterial, Ltd.: Notice Concerning Changed of Trade Name」（2023-01-04，前 Hitachi Metals, Ltd.）"
     },
     {
+      "company_id": "co:sam_dong",
+      "research_ticker": null,
+      "display_name": "Sam Dong",
+      "_display_name_source": "DOE 2022 §2.1.4.1 逐字（韓國 삼동）",
+      "_note": "DART 只見外部稽核報告（감사보고서），未見上市代號——研究 ticker 明確 null（INV-1）",
+      "name_aliases": [
+        "Sam Dong",
+        "Samdong"
+      ]
+    },
+    {
       "company_id": "co:samsung",
       "research_ticker": "005930.KS",
       "market_currency": "KRW",
@@ -1002,6 +1024,19 @@
       "name_aliases": [
         "Shuanghuan Driveline",
         "双环传动"
+      ]
+    },
+    {
+      "company_id": "co:silex_microsystems",
+      "research_ticker": "SILEX.ST",
+      "market_currency": "SEK",
+      "display_name": "Silex Microsystems AB (publ)",
+      "_display_name_source": "yfinance longName（2026-10-05）；公開說明書封面",
+      "_note": "單字別名「Silex」：澳洲上市的 Silex Systems（鈾濃縮）同名——若在 lead 誤中，改成只留全名",
+      "name_aliases": [
+        "Silex Microsystems",
+        "Silex Microsystems AB",
+        "Silex"
       ]
     },
     {
@@ -1181,6 +1216,17 @@
       "name_aliases": [
         "VPEC",
         "全新光電"
+      ]
+    },
+    {
+      "company_id": "co:weidmann",
+      "research_ticker": null,
+      "display_name": "Weidmann",
+      "_display_name_source": "DOE 2022 §2.1.4.1 逐字",
+      "_note": "私人公司（研究 ticker 明確 null，INV-1）；單字別名「Weidmann」可能誤中人名，出現誤中時改成全名",
+      "name_aliases": [
+        "Weidmann",
+        "Weidmann Electrical Technology"
       ]
     },
     {
