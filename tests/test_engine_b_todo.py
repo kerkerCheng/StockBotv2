@@ -700,6 +700,30 @@ def test_cli_add_and_batch(tmp_path, capsys) -> None:
     assert todo.active_items(todo.load(path)) == []
 
 
+def test_cli_add_company_id_feeds_closure_defer(tmp_path, capsys) -> None:
+    """手動項帶 company_id、使用者 pending 之後，每檔閉環認得它是 defer（Phase 7 failure log #18）。
+
+    事發（2026-10-05）：每檔閉環把 ROADMAP 明定「HBM 不主動 onboarding」的 SK 海力士排第一；defer 的讀取端只認
+    結構化的 company_id／ticker，而 `todo add` 鑄的手動項沒有這個欄位，decision_lab 退役後也沒有別的產生端。
+    """
+    from alpha.closure import deferred_tickers
+
+    path = str(tmp_path / "todo_pool.json")
+    assert todo.main(["--pool", path, "add", "HBM 不主動 onboarding：SK 海力士往後排", "--company-id", "co:sk_hynix"]) == 0
+    capsys.readouterr()
+    item = todo.load(path)["items"][0]
+    assert item["company_id"] == "co:sk_hynix"
+    assert todo.main(["--pool", path, "resolve", str(item["n"]), "--verb", "pending",
+                      "--trigger", "檢查點重看", "--until", "2026-12-22"]) == 0
+    assert deferred_tickers(todo.load(path), {"co:sk_hynix": "000660.KS"}.get) == frozenset({"000660.KS"})
+
+
+def test_cli_add_rejects_company_id_outside_registry(tmp_path, capsys) -> None:
+    path = str(tmp_path / "todo_pool.json")
+    assert todo.main(["--pool", path, "add", "不在名冊的公司", "--company-id", "co:no_such_company_xyz"]) == 2
+    assert todo.load(path)["items"] == []
+
+
 def _ready_action(action_id: str, *, focus: str | None = None) -> dict:
     payload: dict = {"report": {"title": "RA 標題"}}
     if focus is not None:

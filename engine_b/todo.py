@@ -2332,6 +2332,8 @@ def main(argv: list[str] | None = None) -> int:
     p_add.add_argument("title")
     p_add.add_argument("--hint", default="")
     p_add.add_argument("--ref", default="")
+    p_add.add_argument("--company-id", default="",
+                       help="co:*（名冊）；帶了之後 pending 會被每檔閉環認成使用者 defer（alpha.closure.deferred_tickers）")
 
     args = ap.parse_args(argv)
     pool = load(args.pool)
@@ -2571,6 +2573,14 @@ def main(argv: list[str] | None = None) -> int:
         return 0 if not outcome["failed"] else 1
 
     if args.command == "add":
+        # 每檔閉環的「使用者已 defer」只讀結構化的 company_id／ticker；decision_lab 退役後沒有任何產生端會寫它
+        # （Phase 7 failure log #18）。身分走名冊（INV-1），讀不到就不寫。
+        if args.company_id:
+            from identity.registry import get_registry
+
+            if not get_registry().has_company(args.company_id):
+                print(f"✗ --company-id {args.company_id} 不在名冊（INV-1）；沒有寫入", file=sys.stderr)
+                return 2
         before_next_n = int(pool["next_n"])
         was = {it["n"]: (it["title"], it.get("hint") or "") for it in pool["items"]}
         item = upsert(
@@ -2578,6 +2588,8 @@ def main(argv: list[str] | None = None) -> int:
             ref_id=args.ref or f"manual:{pool['next_n']}",
             title=args.title, hint=args.hint, source="manual",
         )
+        if args.company_id:
+            item["company_id"] = args.company_id
         save(pool, args.pool)
         if int(pool["next_n"]) == before_next_n:
             # upsert 是冪等的（同 type+ref_id 未 resolve 就更新原項），但那代表**沒有鑄新號**，

@@ -621,6 +621,7 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 & '.venv\Scripts\python.exe' -m engine_b.todo sync          # 同步後列出（＝「待辦事項統整」）
 & '.venv\Scripts\python.exe' -m engine_b.todo resolve <n> --verb go|drop|pending [--reason ...] [--receipt ...]
 & '.venv\Scripts\python.exe' -m engine_b.todo resolve <n> --verb pending --until 2026-08-27 --trigger "Q2 財報"
+& '.venv\Scripts\python.exe' -m engine_b.todo add "<標題>" [--hint ...] [--company-id co:x]   # 手動項；帶 company_id（名冊驗證）再 pending，每檔閉環才認得是使用者 defer（2026-10-05）
 & '.venv\Scripts\python.exe' -m engine_b.todo dispatch <n>  # source_trace_review → pq1 job（decision_review 已於 2026-09-23 退役，legacy 只能 drop）
 & '.venv\Scripts\python.exe' -m engine_b.todo work <n> --to researching|completed|parked --receipt ...
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-ra <n> --digest <sha256> [--company-id ...]
