@@ -1,0 +1,188 @@
+{
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "mops_3017_annual_report_2025_fe4",
+    "title": "Asia Vital Components (3017) 2025 Annual Report（英文版股東會年報）",
+    "source_type": "filing",
+    "evidence_tier": 1,
+    "origin_entity": "Asia Vital Components Co., Ltd.",
+    "publisher": "公開資訊觀測站（MOPS 電子書）",
+    "url": "https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3017&filename=2025_3017_20260602FE4.pdf",
+    "published_at": "2026-05-13",
+    "retrieved_at": "2026-10-05",
+    "storage_permission": "repo_excerpt",
+    "permission_basis": "台灣上市公司法定申報（英文版股東會年報，與中文版同日上傳）；只保留研究必要的逐字摘錄。published_at 取 MOPS 列表上傳時間 115/05/13 17:27:04（民國年轉西元）。PDF 文字層有斷字空格，引文照頁面寫法、去空白比對。"
+  },
+  "sources": [
+    {
+      "id": "mops_3017_annual_report_2025_fe4_s1",
+      "locator": "Letter to Shareholders——opening",
+      "quote": "The year 2025 marks the “Inaugural Year of Liquid Cooling” for AVC, where we have successfully achieved large-scale, high-reliability production of liquid cooling solutions for the AI sector."
+    },
+    {
+      "id": "mops_3017_annual_report_2025_fe4_s2",
+      "locator": "Letter to Shareholders——4. Impact of the external competitive, regulatory and overall operating environment",
+      "quote": "Through our long-term investment in Cold Plates and Coolant Distribution Units (CDU), the company has secured a first-mover advantage."
+    },
+    {
+      "id": "mops_3017_annual_report_2025_fe4_s3",
+      "locator": "Operational Highlights——4.1.1.1 The main operational categories of the company",
+      "quote": "AVC’s main products can be categorized into thermal products, chassis and cabinets, system assembly, and hinge products. Among them, thermal products include fans, heatsinks, heat exchangers, heat pipes/vapor chambers, 3D vapor chambers, water cooling plates, and comprehensive liquid cooling solutions."
+    },
+    {
+      "id": "mops_3017_annual_report_2025_fe4_s4",
+      "locator": "Operational Highlights——market position and capacity",
+      "quote": "Following the “Inaugural Year of Liquid Cooling” for AVC in 2025, we are actively pursuing large-scale capacity expansion and global deployment to consolidate and expand our market share, with a specific focus on increasing production capacity for critical cold plate components."
+    },
+    {
+      "id": "mops_3017_annual_report_2025_fe4_s5",
+      "locator": "Operational Highlights——4.1.4.1 Short-term Business Development Plan (2)",
+      "quote": "(2).Capacity Expansion: Progressively increase production capacity for liquid cooling modules, manifold systems, and other AI server-related components to meet the rapidly accelerating demands of customers."
+    },
+    {
+      "id": "mops_3017_annual_report_2025_fe4_s6",
+      "locator": "Operational Highlights——4.1.1.2 The net sales proportion of the main product of the business（UNIT: NT$ thousand; %）",
+      "quote": "3C Electronic Products 139,639,362 100%"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "co:asia_vital_components",
+      "type": "Company",
+      "name": "Asia Vital Components",
+      "aliases": [
+        "Asia Vital Components",
+        "AVC",
+        "奇鋐"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {
+        "ticker": "3017.TW"
+      },
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s1",
+        "mops_3017_annual_report_2025_fe4_s3"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_cold_plate",
+      "type": "TechNode",
+      "name": "Liquid-cooling cold plate (direct-to-chip)",
+      "aliases": [
+        "cold plate",
+        "cold plates",
+        "direct-to-chip cooling"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s3",
+        "mops_3017_annual_report_2025_fe4_s4"
+      ]
+    },
+    {
+      "id": "tech:coolant_distribution_unit",
+      "type": "TechNode",
+      "name": "Coolant Distribution Unit (CDU)",
+      "aliases": [
+        "CDU",
+        "CDUs",
+        "coolant distribution unit",
+        "coolant distribution units"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s2"
+      ]
+    },
+    {
+      "id": "tech:liquid_cooling_manifold",
+      "type": "TechNode",
+      "name": "Liquid-cooling distribution manifold",
+      "aliases": [
+        "manifold",
+        "manifolds",
+        "liquid distribution manifold",
+        "liquid distribution manifolds",
+        "rear manifold"
+      ],
+      "abstraction_level": "module_subsystem",
+      "attributes": {},
+      "confidence": 0.9,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s5"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "src_id": "co:asia_vital_components",
+      "dst_id": "tech:liquid_cooling_cold_plate",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.7,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s3",
+        "mops_3017_annual_report_2025_fe4_s4",
+        "mops_3017_annual_report_2025_fe4_s2"
+      ]
+    },
+    {
+      "id": "e2",
+      "src_id": "co:asia_vital_components",
+      "dst_id": "tech:coolant_distribution_unit",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.65,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s2",
+        "mops_3017_annual_report_2025_fe4_s1"
+      ]
+    },
+    {
+      "id": "e3",
+      "src_id": "co:asia_vital_components",
+      "dst_id": "tech:liquid_cooling_manifold",
+      "relation": "supplies_to",
+      "attributes": {},
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s5",
+        "mops_3017_annual_report_2025_fe4_s1"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "mops_3017_annual_report_2025_fe4_cl1",
+      "subject_id": "e1",
+      "demand_proof_level": "guided",
+      "confidence": 0.6,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s1",
+        "mops_3017_annual_report_2025_fe4_s2",
+        "mops_3017_annual_report_2025_fe4_s3",
+        "mops_3017_annual_report_2025_fe4_s4"
+      ],
+      "statement": "AVC's own annual report: 2025 was AVC's 'Inaugural Year of Liquid Cooling' with large-scale, high-reliability production of AI liquid-cooling solutions; its thermal products include water cooling plates; it has 'long-term investment in Cold Plates and Coolant Distribution Units (CDU)' and is focusing capacity expansion on 'critical cold plate components'. Self-report in a statutory filing (L8: weak, costly); no customer named in these passages.",
+      "disproof_condition": "條件：奇鋐後續年報、季報或法說寫出冷板擴產取消或延後；或客戶端一手顯示冷板供應商不含奇鋐。核查頻率：每季（奇鋐月營收、季報、法說）。觸發後 48 小時：e1 降 confidence，重讀冷板層。"
+    },
+    {
+      "id": "mops_3017_annual_report_2025_fe4_cl2",
+      "subject_id": "e3",
+      "demand_proof_level": "guided",
+      "confidence": 0.55,
+      "source_ids": [
+        "mops_3017_annual_report_2025_fe4_s5",
+        "mops_3017_annual_report_2025_fe4_s6"
+      ],
+      "statement": "AVC plans to progressively increase capacity for liquid cooling modules and manifold systems for AI servers. Its 2025 net-sales table shows a single line, '3C Electronic Products' NT$139,639,362 thousand (100%) — liquid cooling is not split out. Dated context (L4).",
+      "disproof_condition": "條件：奇鋐揭露歧管擴產取消，或液冷營收在拆分後占比很低。核查頻率：每季。觸發後 48 小時：本 claim 加註，重讀 manifold 層。"
+    }
+  ]
+}
