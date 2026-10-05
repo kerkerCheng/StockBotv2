@@ -12,9 +12,57 @@
       ],
       "statement": "Soitec's official FY26 results quantify the Photonics-SOI business at above $100m revenue with volumes already shipping for CPO industry qualifications ahead of the ramp. This upgrades the August capacity-reservation narrative from a Reuters interview to the company's regulated financial communication, and quantifies the segment. Still supplier self-report: no customer is named anywhere, so external corroboration remains missing — the upgrade path stays a named customer or statutory contract-liabilities disclosure tied to the reservation deposits.",
       "subject_id": "co:soitec"
+    },
+    {
+      "confidence": 0.7,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：Soitec FY27 半年報（約 2026 年 11 月）的 Photonics-SOI 營收沒有較 FY26 成長，或 CPO 驗證出貨沒有轉成量產訂單，或客戶端／第三方一手文件寫出另一家 SOI 晶圓廠在 Photonics-SOI 量產供貨。核查頻率：每半年（Soitec 半年報與年報）。觸發後 48 小時：e1 降 confidence，重讀 Photonics-SOI 層。",
+      "id": "soitec_fy26_results_2026_05_27_cl2",
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s1",
+        "soitec_fy26_results_2026_05_27_s2",
+        "soitec_fy26_results_2026_05_27_s3"
+      ],
+      "statement": "Soitec's own FY26 results release: Photonics-SOI revenue was 'above $100m in FY26', driven by 'increasing Photonics-SOI penetration in high-speed pluggable transceivers and growing volumes shipped for co-packaged optics (CPOs) industry qualifications, in preparation for the upcoming ramp-up'. Modeled as Soitec supplying a Photonics-SOI substrate layer that is a component of pluggable transceivers and (in qualification) CPO. Supplier self-report (L8): no customer is named. Whether other SOI wafer makers supply Photonics-SOI at volume was not searched in this package — 'not found' is not 'does not exist' (L11-5).",
+      "subject_id": "e1"
     }
   ],
-  "edges": [],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.75,
+      "dst_id": "mat:photonics_soi_wafer",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s1",
+        "soitec_fy26_results_2026_05_27_s3"
+      ],
+      "src_id": "co:soitec"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "tech:pluggable_transceiver",
+      "id": "e2",
+      "relation": "is_component_of",
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s2"
+      ],
+      "src_id": "mat:photonics_soi_wafer"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:cpo",
+      "id": "e3",
+      "relation": "is_component_of",
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s2"
+      ],
+      "src_id": "mat:photonics_soi_wafer"
+    }
+  ],
   "nodes": [
     {
       "abstraction_level": "materials_substrate",
@@ -26,11 +74,74 @@
       "confidence": 0.9,
       "id": "co:soitec",
       "name": "Soitec",
-      "role": null,
+      "role": "bottleneck_supplier",
       "source_ids": [
-        "soitec_fy26_results_2026_05_27_s1"
+        "soitec_fy26_results_2026_05_27_s1",
+        "soitec_fy26_results_2026_05_27_s3"
       ],
       "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "Photonics-SOI",
+        "photonics SOI wafer"
+      ],
+      "attributes": {},
+      "confidence": 0.85,
+      "id": "mat:photonics_soi_wafer",
+      "name": "Photonics-SOI substrate (silicon-on-insulator wafer for silicon photonics)",
+      "role": null,
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s1",
+        "soitec_fy26_results_2026_05_27_s2"
+      ],
+      "type": "Material"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "pluggable transceivers",
+        "800G transceiver",
+        "1.6T transceiver",
+        "1.6T transceivers",
+        "OSFP",
+        "Pluggable Transceivers",
+        "pluggables",
+        "pluggable optical interconnects",
+        "optical pluggables"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:pluggable_transceiver",
+      "name": "Pluggable optical transceiver",
+      "role": null,
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s2"
+      ],
+      "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "CPO",
+        "co-packaged optics",
+        "NPO",
+        "near packaged optics"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 5
+      },
+      "confidence": 0.95,
+      "id": "tech:cpo",
+      "name": "Co-Packaged Optics",
+      "role": null,
+      "source_ids": [
+        "soitec_fy26_results_2026_05_27_s2"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -44,6 +155,7 @@
     "retrieved_at": "2026-09-01",
     "source_type": "news",
     "storage_permission": "repo_excerpt",
+    "supersedes_extraction_sha256": "690eeb60f5252326896d46fa356a244b1f4fb7c0d5b8cef102135a70043378f8",
     "title": "Soitec Reports Fiscal 2026 Full-Year Results (official PR)",
     "url": "https://www.soitec.com/home/group/newsroom/press-releases/content/2026/05/27/soitec-reports-fiscal-2026-full-year-results"
   },
