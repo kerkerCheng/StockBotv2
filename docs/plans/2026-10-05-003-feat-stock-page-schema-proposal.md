@@ -1,7 +1,7 @@
 # 個股頁 schema（十二塊、防 overfit、慢慢磨）——PLAN_PROPOSAL
 
 > 狀態：**AWAITING_HUMAN**（2026-10-05）。設計與盤點：[`docs/brainstorms/2026-10-05-stock-page-schema.md`](../brainstorms/2026-10-05-stock-page-schema.md)。
-> 樣稿：<https://claude.ai/artifact/Q5TL6rQyYp87uYgXgG3vfH>（第八輪九張板，Version 14）。
+> 樣稿：<https://claude.ai/artifact/Q5TL6rQyYp87uYgXgG3vfH>（第九輪九張板，Version 16）。
 
 ```
 INTAKE
