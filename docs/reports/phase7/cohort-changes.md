@@ -24,3 +24,9 @@
 - **新監看來源**：外部雷達 `web_radar:<主題>`（daily ①b–①e：`claude -p` 只開 WebSearch 提議、`engine_b/radar.py` 驗證後寫 secondary lead；每日上限 5 則；網址必須出自同一次執行的搜尋結果）。**2026-10-05 首輪起量、不回溯**；八週試驗到 2026-11-29（56 天），停止條件見 ROADMAP Phase 7（7.5 數「雷達 lead 中 triaged_go 且追到一手或入圖、而且沒有別的管道更早登記同一個網址或同一事件」的筆數，0 就退役）。
 - **題材**：`config/themes.txt` 3 → 5 個主題（加 `power`、`cooling`；只有描述與關鍵字，**核心公司 7.1 的 decompose 再定**，所以 tracked 不變），sha256 `aa650297882f685ab4abd41f5c45a6f19ca9c4b16640736c18d99dc6c87e02ab`（T0 是 `898c9813…2556`）。
 - **影響哪些量測**：lead 的主題標記（`leads._themes_for`）從這個 commit 起對新登記的 lead 生效、舊 lead 不回溯；H6 的判讀線不吃雷達的 lead（registration H6：雷達是「一般資訊」的對照組，7.5 只並列印出）；triage 批次的選取順序（雷達排在所有非雷達 lead 之後，plan 偏差 #16）；T1 manifest 的 `sources_config` 對 `themes.txt` 的差異歸因到這一筆。
+
+## 2026-10-05　R3 母體追加 IC 載板類 6 檔（pq2 [711]）
+
+- **改了什麼**：R3 母體（registration §5）追加 ATS.VI、009150.KS、4062.T、3037.TW、3189.TW、8046.TW——登記文件檔尾「更正與追加」同日一筆。
+- **為什麼**：載板層兩檔 2026 年各漲約 20 倍，而 T0 的 43 檔觀察名單沒有 IC 載板類（cases X3 2026-10-05）。
+- **影響哪些量測**：R3 從第二個窗口（2026-10-01 →）起分母 58 → 64；第一個窗口不追溯。不進任何研究佇列、不入圖、不建主題等權組。
