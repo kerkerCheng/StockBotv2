@@ -1,0 +1,13 @@
+Source URL: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3017&filename=2025_3017_20260602FE4.pdf
+
+Excerpt:
+[EXCERPT — 法定申報之有限逐字引文] Asia Vital Components (3017) 2025 Annual Report（英文版股東會年報）
+Source: https://doc.twse.com.tw/server-java/t57sb01?step=9&kind=F&co_id=3017&filename=2025_3017_20260602FE4.pdf
+Published: 2026-05-13 | Origin: Asia Vital Components Co., Ltd. | Retrieved: 2026-10-05
+
+Letter to Shareholders——opening："The year 2025 marks the “Inaugural Year of Liquid Cooling” for AVC, where we have successfully achieved large-scale, high-reliability production of liquid cooling solutions for the AI sector."
+Letter to Shareholders——4. Impact of the external competitive, regulatory and overall operating environment："Through our long-term investment in Cold Plates and Coolant Distribution Units (CDU), the company has secured a first-mover advantage."
+Operational Highlights——4.1.1.1 The main operational categories of the company："AVC’s main products can be categorized into thermal products, chassis and cabinets, system assembly, and hinge products. Among them, thermal products include fans, heatsinks, heat exchangers, heat pipes/vapor chambers, 3D vapor chambers, water cooling plates, and comprehensive liquid cooling solutions."
+Operational Highlights——market position and capacity："Following the “Inaugural Year of Liquid Cooling” for AVC in 2025, we are actively pursuing large-scale capacity expansion and global deployment to consolidate and expand our market share, with a specific focus on increasing production capacity for critical cold plate components."
+Operational Highlights——4.1.4.1 Short-term Business Development Plan (2)："(2).Capacity Expansion: Progressively increase production capacity for liquid cooling modules, manifold systems, and other AI server-related components to meet the rapidly accelerating demands of customers."
+Operational Highlights——4.1.1.2 The net sales proportion of the main product of the business（UNIT: NT$ thousand; %）："3C Electronic Products 139,639,362 100%"
