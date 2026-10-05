@@ -576,10 +576,14 @@ def _tw_share_capital_line(*, now: datetime) -> str:
     """台股季報股數的新鮮度（已定價①的市值序列靠它）。零網路——只讀本機 Engine C。
 
     `落後` 相對**法定期限**算（一般業季後 45 日、年報 3 個月）：8 月 10 日還沒有 Q2 是正常的，8 月 20 日還沒有才是落後。
-    交叉核對沒過的列不算「有」——它們讀取端不用，所以照印筆數，不讓「有抓」與「能用」同形（L13-2）。
+    ⚠ 「還沒抓」與「抓到了但不能用」是兩件事、修法不同（L13-2）：落後由**已抓到的最新一季**（不分能不能用）算——只有
+    `--sync` 修得了的才叫落後；最新一季被讀取端拒收的（核對沒過、同季衝突、期間內有分割）另列一句，`--sync` 修不了，
+    讀取端接著用前一季。能不能用由 `engine_c.history.tw_shares_as_of` 判（與三題同一支，L16），這裡不另寫一套。
+    （2026-10-05 R2 C1：舊版只看能用的列，3081.TWO 2026Q2 一被拒就每天假亮「落後 1 季」。）
     """
 
     from engine_c.db import get_conn
+    from engine_c.history import tw_shares_as_of
     from engine_c.monthly_revenue import registry_taiwan_tickers
     from engine_c.tw_share_capital import latest_due_quarter, share_capital_series
 
@@ -591,26 +595,33 @@ def _tw_share_capital_line(*, now: datetime) -> str:
     conn = get_conn()
     try:
         latest: dict[str, tuple[int, int]] = {}
-        not_ok = 0
+        latest_unusable: list[str] = []
+        rejected = 0
         for ticker in tickers:
             rows = share_capital_series(conn, ticker)
-            not_ok += sum(1 for r in rows if r["cross_check_status"] != "ok")
-            ok = [(int(r["fiscal_year"]), int(r["quarter"])) for r in rows if r["cross_check_status"] == "ok"]
-            if ok:
-                latest[ticker] = max(ok)
+            if not rows:
+                continue
+            year, quarter, period = max((int(r["fiscal_year"]), int(r["quarter"]), str(r["period_end"])[:10]) for r in rows)
+            latest[ticker] = (year, quarter)
+            known = tw_shares_as_of(conn, ticker, as_of=today)
+            rejected += len({r["period_end"] for r in known["rejected"]})
+            if period not in {str(c["period_end"])[:10] for c in known["cover"]}:
+                latest_unusable.append(f"{ticker} {year}Q{quarter}")
     finally:
         conn.close()
     if not latest:
-        return (f"台股季報股數 {len(tickers)} 檔｜**一筆可用的都沒有**"
+        return (f"台股季報股數 {len(tickers)} 檔｜**一筆都沒有**"
                 "（跑 `python -m engine_c.tw_share_capital --backfill 14`）")
     oldest = min(latest.values())
     lag = (due_year * 4 + due_q) - (oldest[0] * 4 + oldest[1])
     empty = sorted(set(tickers) - set(latest))
     line = f"台股季報股數 {len(latest)}/{len(tickers)} 檔｜最舊 {oldest[0]}Q{oldest[1]}"
     if empty:
-        line += f"｜**{len(empty)} 檔一筆可用的都沒有**：" + "、".join(empty)
-    if not_ok:
-        line += f"｜交叉核對沒過 {not_ok} 筆（不用）"
+        line += f"｜**{len(empty)} 檔一筆都沒有**：" + "、".join(empty)
+    if latest_unusable:
+        line += "｜最新一季不能用（`--sync` 修不了，接著用前一季）：" + "、".join(latest_unusable)
+    if rejected:
+        line += f"｜不用的季共 {rejected} 筆"
     line += (f"｜⚠ 落後 {lag} 季（跑 `python -m engine_c.tw_share_capital --sync`）" if lag > 0
              else "｜已跟上法定期限")
     return line

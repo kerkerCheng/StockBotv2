@@ -13,9 +13,11 @@ tw_share_capital.py — 台股季報股數：Engine C 的可重建觀測（Phase
 - **交叉核對**：`權益 ÷ 每股參考淨值` 也是一個股數（權益取歸屬母公司業主；表上是「--」且沒有非控制權益時取權益總計）。
   兩者相對差超過 `CROSS_CHECK_TOLERANCE` 就 **fail closed**：那一列照寫進表（`cross_check_status='mismatch'`）、讀取端
   不用、報表逐筆列出——面額不是 10 元的公司會在這裡現形，不會被「股本 ÷ 10」靜默算錯十倍。
-  2026-10-05 首次回補（12 檔 × 14 季）攔下的 4 筆都不是面額：**股本含待分配股票股利**（股東會決議後、除權前就記進股本；
-  3081.TWO 2026Q2 正好 +10%，那筆配股 07-15 除權、`corporate_actions` 記成 1.1 的分割——收了這一季會被 `shares_on` 再乘一次），
-  以及奇鋐三季（+4%～+29%，可轉債換股等尚未變成流通在外的股本）。被拒的季由前一季股數接著用，配股由分割比例補上。
+  2026-10-05 首次回補（12 檔 × 14 季）攔下的 4 筆都不是面額：3081.TWO 2026Q2 是**股本含待分配股票股利**（股東會決議後、
+  除權前就記進股本；正好 +10%，那筆配股 07-15 除權、`corporate_actions` 記成 1.1 的分割——收了這一季會被 `shares_on` 再乘一次）；
+  奇鋐三季（+4%～+29%）**成因沒查證**（2023Q1 的股本比下一季高 23.6%，下一季反而減少，不是單純的轉換）。被拒的季由前一季股數
+  接著用，配股由分割比例補上。⚠ 配股小於門檻（≤2%）時核對攔不下——所以「期末後、可知日前（含）有分割」的季由讀取端
+  （`engine_c.history.tw_shares_as_of`）整季不用，不靠門檻（2026-10-05 R2 N1）。
 
 **為什麼是 ETL 表不是 append-only ledger（L10）：** MOPS 按季永久可查，今天重抓拿得回來——與
 `monthly_revenue_observations` 同類：可重建、零核准、不是 pq2 的 judgment ledger。
@@ -23,7 +25,8 @@ tw_share_capital.py — 台股季報股數：Engine C 的可重建觀測（Phase
 **可知日＝法定期限，不是抓取日（INV-6）：** 一般業 Q1 5/15、Q2 8/14、Q3 11/14、年報次年 3/31（季後 45 日、年後 3 個月）。
 `available_on_basis='statutory_deadline_only'` 自己宣告為什麼不是實際公告日（L16）。⚠ **金融業的半年報期限不同**——
 所以只收已登記的兩種版型（一般業、異業；`fetchers.mops_open_data.BALANCE_SHEET_TEMPLATES`），銀行、金控、保險、證券期貨
-與任何未登記的新版型都在抓取層拒收、列進報表，不套一般業的期限。
+與任何未登記的新版型都在抓取層拒收、列進報表，不套一般業的期限。⚠ 已知限制：回補拿到的是 MOPS **現在**的版本——某季若曾重編、
+或公司逾期才申報，現在的數字仍標成原期限可知（`statutory_deadline_only` 的上界只管「最晚何時」，管不到「後來改過」）。
 
 用法::
 
@@ -151,9 +154,9 @@ def build_observation(row: Mapping[str, Any], *, fetched_at: datetime | None = N
     if not str(row.get("source_url") or "").strip():
         raise ShareCapitalError(f"{ticker} {year}Q{quarter} 缺 source")
     capital = row.get("share_capital")
-    treasury = row.get("treasury_shares") or 0
+    treasury = row.get("treasury_shares")           # 「--」＝None：不是 0（Missing ≠ Zero），下面判 not_checkable
     issued = (int(capital) * UNIT_SCALE // PAR_VALUE) if capital else None
-    outstanding = (issued - int(treasury)) if issued is not None else None
+    outstanding = (issued - int(treasury)) if issued is not None and treasury is not None else None
     # 每股參考淨值的分子：歸屬母公司業主權益；表上是「--」而且沒有非控制權益時，權益總計就是它。
     equity = row.get("equity_parent")
     if equity is None and not row.get("non_controlling"):
@@ -161,7 +164,9 @@ def build_observation(row: Mapping[str, Any], *, fetched_at: datetime | None = N
     bvps = row.get("bvps")
     usable = equity is not None and equity > 0 and bvps is not None and bvps > 0
     implied = int(round(float(equity) * UNIT_SCALE / float(bvps))) if usable else None
-    if outstanding is None or outstanding <= 0:
+    if treasury is None:
+        status, diff, reason = "not_checkable", None, "庫藏股股數欄是「--」——流通在外股數無從確定（不當成 0）"
+    elif outstanding is None or outstanding <= 0:
         status, diff, reason = "not_checkable", None, "股本缺或換算後股數不為正"
     elif implied is None:
         status, diff, reason = "not_checkable", None, "權益或每股參考淨值缺、不為正，或權益分不出歸屬母公司的部分——無從核對"
@@ -169,7 +174,8 @@ def build_observation(row: Mapping[str, Any], *, fetched_at: datetime | None = N
         diff = round(abs(outstanding - implied) / implied, 6)
         if diff > CROSS_CHECK_TOLERANCE:
             status, reason = "mismatch", (f"股本÷{PAR_VALUE} 元扣庫藏股＝{outstanding:,} 股，權益÷每股淨值＝{implied:,} 股，"
-                                          f"差 {diff:.2%}（> {CROSS_CHECK_TOLERANCE:.0%}；面額可能不是 {PAR_VALUE} 元）")
+                                          f"差 {diff:.2%}（> {CROSS_CHECK_TOLERANCE:.0%}：股本與流通在外股數口徑不一致——"
+                                          "面額不是 10 元、股本含待分配股票股利或還沒變成流通在外的股本都會這樣）")
         else:
             status, reason = "ok", None
     stamp = (fetched_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
@@ -217,17 +223,21 @@ def _fetch_and_write(conn, year: int, quarter: int, watched: list[str], report: 
     from fetchers.mops_open_data import MARKETS, MopsOpenDataError, fetch_balance_sheet_quarter, select_tickers
 
     entry: dict[str, Any] = {"quarter": f"{year}Q{quarter}", "seen": 0, "written": 0, "rejected_templates": {},
-                             "not_ok": []}
+                             "not_ok": [], "missing": []}
     before = _row_count(conn)
+    found: set[str] = set()
+    failed_markets: set[str] = set()
     for market in MARKETS:
         try:
             rows, rejected = fetch_balance_sheet_quarter(market, year, quarter)
         except MopsOpenDataError as exc:
             # 「這一季還沒出表」與「版型變了」都會走到這裡——記下來，不與「沒有我們的公司」同形（L13-2）。
             report["failed"].append({"market": market, "quarter": entry["quarter"], "reason": str(exc)})
+            failed_markets.add(market)
             continue
         accepted, _counts = select_tickers(rows, watched)
         watched_rejected = [r for r in rejected if str(r.get("ticker") or "").upper() in watched]
+        found.update(str(r.get("ticker") or "").upper() for r in (*accepted, *watched_rejected))
         for r in watched_rejected:
             entry["rejected_templates"][r["ticker"]] = r["template"]
         for row in accepted:
@@ -238,6 +248,11 @@ def _fetch_and_write(conn, year: int, quarter: int, watched: list[str], report: 
                 entry["not_ok"].append({"ticker": obs["ticker"], "status": obs["cross_check_status"],
                                         "reason": obs["cross_check_reason"]})
     conn.commit()
+    # INV-3：名冊上的標的在這一季兩張表都沒出現（還沒掛牌、轉市場、逾期申報）——點名，不與「抓到了」同形。
+    # 整個市場抓失敗的不算進來（那已經在 `failed`）。
+    from fetchers.mops_open_data import market_for_ticker
+
+    entry["missing"] = sorted(t for t in watched if t not in found and market_for_ticker(t) not in failed_markets)
     entry["written"] = _row_count(conn) - before
     report["quarters"].append(entry)
     report["written"] += entry["written"]
@@ -307,7 +322,9 @@ def main(argv: list[str] | None = None) -> int:
                 print(json.dumps(report, ensure_ascii=False, indent=2) if args.json else
                       f"寫入 {report['written']} 筆｜看到 {report['seen']}｜失敗 {len(report['failed'])} 次｜核對不一致 {len(bad)} 筆"
                       + "".join(f"\n  ⚠ {x['ticker']} {x['status']}：{x['reason']}" for x in bad)
-                      + "".join(f"\n  ✗ {f['market']} {f['quarter']}：{f['reason']}" for f in report["failed"]))
+                      + "".join(f"\n  ✗ {f['market']} {f['quarter']}：{f['reason']}" for f in report["failed"])
+                      + "".join(f"\n  ∅ {q['quarter']} 表上沒有：{'、'.join(q['missing'])}" for q in report["quarters"]
+                                if q.get("missing")))
         if args.ticker:
             rows = share_capital_series(conn, args.ticker)
             print(json.dumps(rows, ensure_ascii=False, indent=2, default=str) if args.json else _format(args.ticker.upper(), rows))

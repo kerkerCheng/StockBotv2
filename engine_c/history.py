@@ -80,6 +80,9 @@ def tw_shares_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, A
     列進 `rejected`（帶理由）；同一季兩個不同的 `ok` 股數（重抓時 MOPS 改過數字）也整季不用——不挑一個
     （同月營收衝突的守則；改過的那個版本哪天公開沒有來源，用法定期限頂替會提早看到）。
     `cover` 的形狀對齊 `fundamental_history` 的封面股數列（`period_end`／`filed`／`value`），三題的 `shares_on` 直接吃。
+    ⚠ **期末之後、可知日之前（含）有分割**（`corporate_actions`；yfinance 把台股配股記成分割）的季也整季不用：股本可能已含
+    那筆待分配股票股利，收進來會被 `shares_on` 再乘一次分割比例——配股小於核對門檻（≤2%）時核對攔不下，所以不靠門檻
+    （2026-10-05 R2 N1）；由前一季股數乘分割比例接續。
     ⚠ 唯讀連線上表可能還沒建（三題 provider 刻意不在讀取路徑建表）——「表不存在」＝還沒有任何觀測。
     """
     import sqlite3
@@ -96,6 +99,13 @@ def tw_shares_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, A
         if "no such table" not in str(exc):
             raise
         return {"cover": [], "rejected": []}
+    try:
+        splits = sorted(str(r[0])[:10] for r in conn.execute(
+            "SELECT action_date FROM corporate_actions WHERE ticker = ? AND kind = 'split'", (ticker,)).fetchall())
+    except sqlite3.OperationalError as exc:
+        if "no such table" not in str(exc):
+            raise
+        splits = []
     by_period: dict[str, list[tuple]] = {}
     for r in rows:
         by_period.setdefault(str(r[0]), []).append(r)
@@ -112,6 +122,12 @@ def tw_shares_as_of(conn: Any, ticker: str, *, as_of: date | str) -> dict[str, A
                                  "reason": f"同一季有 {len(values)} 個不同股數：{sorted(values)}", "observation_id": None})
             continue
         first = group[0]
+        clash = [s for s in splits if period < s <= str(first[1])[:10]]
+        if clash:
+            rejected.append({"period_end": period, "status": "split_in_window", "observation_id": first[5],
+                             "reason": (f"期末 {period} 之後、可知日 {str(first[1])[:10]} 之前（含）有分割／配股除權 "
+                                        f"{'、'.join(clash)}——股本是否已含那筆配股分不出來，整季不用，由前一季股數乘分割比例接續")})
+            continue
         cover.append({"period_end": period, "filed": first[1], "accession": first[5], "value": float(first[2]),
                       "currency": None, "source": first[6]})
     return {"cover": cover, "rejected": rejected}

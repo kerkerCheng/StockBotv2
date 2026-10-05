@@ -1,6 +1,6 @@
 # 台股歷史股數（海外財報來源 ① 格）——PLAN_PROPOSAL
 
-> **狀態：PLAN_PROPOSAL → AWAITING_HUMAN**（2026-10-05）。Zoom **Z2**（Engine C 多一個 A2 觀測來源、三題對台股的輸出由缺席變有值）；
+> **狀態：已實作**（2026-10-05 使用者 go；結果與 S3 的偏離見文末「實作結果」）。原狀態 PLAN_PROPOSAL → AWAITING_HUMAN。Zoom **Z2**（Engine C 多一個 A2 觀測來源、三題對台股的輸出由缺席變有值）；
 > Review **R2**（命中「financial identity・PIT・units」；Phase 7 plan Q7：開發 Step 命中 trigger 的 R2 常規 opt-in）。
 > 出處：ROADMAP「海外財報來源」列（2026-10-04 使用者：研究撞到哪個市場就做那一格，範圍大或有要使用者選的就停下問）；
 > Phase 7 failure log #19。**沒有要你選的技術問題**——下面「已替你決定」那幾條照既有先例；停下來只因為它是 Z2。
@@ -61,3 +61,16 @@ MOPS 資產負債表彙總 `https://mopsov.twse.com.tw/mops/web/ajax_t163sb05`�
 ## 不在這一格
 
 日本 EDINET（要你本人申請 key）、韓國 DART、港、澳、20-F 股數——各自一格，研究撞到再做。
+
+## 實作結果（2026-10-05：使用者 go → 分支 `feat/tw-historical-shares` → R2 CONDITIONAL_GO → 條件修正 → 覆核後合併）
+
+- S1：`fetchers.mops_open_data.fetch_balance_sheet_quarter`（只收已登記的一般業、異業版型；表頭逐字比對）、`engine_c.tw_share_capital`
+  （換算、交叉核對、法定期限、回補 CLI）、Postgres 遷移 `20261005_add_tw_share_capital.sql`。回補 168 筆、拒收 4。
+- S2：`engine_c.history.tw_shares_as_of`（只收可知日 ≤ T；核對沒過、同季衝突、**期末後可知日前有配股除權**的季整季不用）、
+  三題台股分支改吃季報股數。驗收①：12 檔台股（不只提案點名的 7 檔）12/12 有值；驗收②：拿掉可知日過濾即紅；驗收③：4 筆逐筆列出。
+- **S3 的偏離**：plan 寫「daily 接線：每季法定期限過後抓新一季」，實作照月營收先例（2026-09-17 sandbox impact review）留**互動式入口**
+  ＋心跳第 1 段的落後計數——資料可重建、漏抓補得回來，不需要無人值守的網路權限；比排程窄，沒有新增任何 rule（OPERATIONS「台股季報股數」）。
+- R2（乾淨 context）：CONDITIONAL_GO，條件兩條——C1 心跳把「最新一季被拒」印成「落後」（`--sync` 修不了卻叫人跑）、C2 2% 門檻沒有測試釘住；
+  另 11 條非阻斷。條件與其中 N1（配股 ≤2% 會被乘兩次 → 讀取端改成期間內有分割就整季不用）、N2、N3、N4、N5、N8、N9、N10、N11 已修；
+  N7（光通訊組 5 檔的②組中位數跟著有值）是 S2 的預期效果。
+- 驗收④（三份「缺 X」敘事重寫）：研究 session 做，不在本 change。

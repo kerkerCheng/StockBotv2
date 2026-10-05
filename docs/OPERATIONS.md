@@ -1570,7 +1570,7 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json          # 03_
 | **2 skill／prompt／本檔** | 不動 daily prompt；本節。plan（2026-10-05-001）原寫「S3 daily 接線」——照月營收先例改成互動式＋心跳計數器，比排程窄。 |
 | **3 最窄 rule** | **沒有新增任何 rule**。要改成排程必須重做一次本 review。 |
 | **4 permission contract test** | `test_tw_share_capital_stays_an_interactive_entry`（rules 與 harvest 都不得出現）、`test_heartbeat_monthly_revenue_line_reads_no_network`（擴充：`sync_latest`／`fetch_balance_sheet` 不得出現在心跳）。 |
-| **5 端到端 smoke** | 見 `docs/reports/phase7/failure-log.md` #19 的處置與 ROADMAP「台股歷史股數」列（回補季數、核對結果、已定價①由缺席變有值的檔數）。 |
+| **5 端到端 smoke** | 2026-10-05 實跑：`--backfill 14` 寫入 12 檔 × 14 季＝168 筆、失敗 0；交叉核對攔下 4 筆（3081.TWO 2026Q2 股本含待分配股票股利、3017.TW 三季）；月營收 `--backfill 48` 補到 2022-10；12 檔台股已定價① 12/12 由缺席變有值（第 88–100 百分位，窗 1,087–1,092 天、覆蓋率 1.0）。R2 另抽線上 115Q2：上市收 1,053 列、拒 31 列（銀行、金控、保險、證券），上櫃收 884、拒 7（證券期貨）。 |
 
 ---
 

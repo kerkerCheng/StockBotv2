@@ -101,6 +101,20 @@ def test_a_par_value_that_is_not_ten_dollars_fails_closed_instead_of_scaling_by_
     assert obs["cross_check_status"] == "mismatch" and "面額" in obs["cross_check_reason"]
 
 
+def test_the_two_percent_threshold_itself_is_pinned() -> None:
+    """R2 C2（2026-10-05）：門檻本身也要驗（L14-②）——權益÷每股淨值＝1 億股，股本換算差 2.5% 拒、差 1.5% 收。"""
+    base = {"equity_total": 1_000_000, "bvps": 10.0}
+    assert tsc.build_observation(_row(share_capital=1_025_000, **base))["cross_check_status"] == "mismatch"
+    assert tsc.build_observation(_row(share_capital=1_015_000, **base))["cross_check_status"] == "ok"
+
+
+def test_treasury_shares_shown_as_dashes_are_not_zero() -> None:
+    """R2 N5：庫藏股欄「--」＝不知道，不是 0（Missing ≠ Zero）。"""
+    obs = tsc.build_observation(_row(treasury_shares=None))
+    assert obs["cross_check_status"] == "not_checkable" and obs["shares_outstanding"] is None
+    assert "庫藏股" in obs["cross_check_reason"]                 # 理由要說出是哪一格不知道，不是泛稱「股本缺」
+
+
 def test_without_a_usable_book_value_nothing_is_checkable() -> None:
     assert tsc.build_observation(_row(bvps=None))["cross_check_status"] == "not_checkable"
     # 歸屬母公司業主權益是「--」卻有非控制權益：權益總計不是每股淨值的分子
@@ -149,6 +163,98 @@ def test_quarters_that_fail_the_check_or_disagree_are_never_used() -> None:
                                                                          ("2026-06-30", "conflict")]
 
 
+def _split(conn, ticker: str, day: str, ratio: float) -> None:
+    conn.execute("INSERT INTO corporate_actions VALUES (?, ?, 'split', ?, 'fixture', '2026-10-05T00:00:00+00:00')",
+                 (ticker, day, ratio))
+
+
+def test_the_landmark_case_never_counts_the_stock_dividend_twice() -> None:
+    """R2 C2（2026-10-05）：3081.TWO 的真實形狀——Q2 股本已含 10% 待分配股票股利、07-15 除權記成 1.1 的分割。
+    Q2 必須被拒，08-14 之後的股數＝Q1 × 1.1（不是 × 1.1²）。"""
+    conn = _db()
+    tsc.append_share_capital(conn, tsc.build_observation(_row(quarter=1, share_capital=925_173, equity_total=3_881_853,
+                                                              bvps=41.96)))
+    q2 = tsc.build_observation(_row(share_capital=1_017_690, equity_total=3_881_853, bvps=41.96))
+    assert q2["cross_check_status"] == "mismatch"
+    tsc.append_share_capital(conn, q2)
+    _split(conn, "3081.TWO", "2026-07-15", 1.1)
+    got = tw_shares_as_of(conn, "3081.TWO", as_of="2026-09-01")
+    assert [c["period_end"] for c in got["cover"]] == ["2026-03-31"]
+    shares = tq.shares_on(got["cover"], [(date(2026, 7, 15), 1.1)], date(2026, 9, 1))
+    assert shares == pytest.approx(92_517_300 * 1.1)
+
+
+def test_a_small_stock_dividend_that_passes_the_check_is_still_not_counted_twice() -> None:
+    """R2 N1：配股 1.5% 過得了 2% 核對——期末後、可知日前（含）有分割的季由讀取端整季不用，不靠門檻。"""
+    conn = _db()
+    tsc.append_share_capital(conn, tsc.build_observation(_row(quarter=1, share_capital=1_000_000, equity_total=1_000_000,
+                                                              bvps=10.0)))
+    q2 = tsc.build_observation(_row(share_capital=1_015_000, equity_total=1_000_000, bvps=10.0))
+    assert q2["cross_check_status"] == "ok"
+    tsc.append_share_capital(conn, q2)
+    _split(conn, "3081.TWO", "2026-07-15", 1.015)
+    got = tw_shares_as_of(conn, "3081.TWO", as_of="2026-09-01")
+    assert [c["period_end"] for c in got["cover"]] == ["2026-03-31"]
+    assert [(r["period_end"], r["status"]) for r in got["rejected"]] == [("2026-06-30", "split_in_window")]
+    assert tq.shares_on(got["cover"], [(date(2026, 7, 15), 1.015)], date(2026, 9, 1)) == pytest.approx(101_500_000)
+
+
+def test_securities_template_is_rejected_even_though_it_is_23_columns_with_current_assets() -> None:
+    """R2 N2：證券期貨業的表頭與一般業只差四個措辭，但它的半年報期限是 8/31——必須拒收（實測 115Q2 上市三家、上櫃七家）。"""
+    securities = ("公司代號", "公司名稱", "流動資產", "非流動資產", "資產總計", "流動負債", "非流動負債", "負債總計", "股本",
+                  "權益－具證券性質之虛擬通貨", "資本公積", "保留盈餘（或累積虧損）", "其他權益", "庫藏股票", "歸屬於母公司業主權益合計",
+                  "共同控制下前手權益", "合併前非屬共同控制股權", "非控制權益", "權益總計", "待註銷股本股數（單位：股）",
+                  "預收股款（權益項下）之約當發行股數（單位：股）", "母公司暨子公司持有之母公司庫藏股股數（單位：股）", "每股參考淨值")
+    assert securities not in mod.BALANCE_SHEET_TEMPLATES.values()
+    rows, rejected = mod.parse_balance_sheet(_table(securities, [_cells(securities, **{"公司代號": "2855", "公司名稱": "統一證"})]),
+                                             market="twse", year=2026, quarter=2, source_url="fixture://t163")
+    assert rows == [] and rejected[0]["company_code"] == "2855"
+
+
+def test_backfill_names_watched_tickers_missing_from_a_quarter(monkeypatch) -> None:
+    """R2 N4（INV-3）：名冊上的標的在某一季兩張表都沒出現，回補報表要點名，不與「抓到了」同形。"""
+    def fake(market, year, quarter):
+        if market == "tpex":
+            return [_row()], []
+        return [], [{"ticker": "2801.TW", "template": "unregistered:61欄"}]
+
+    monkeypatch.setattr(mod, "fetch_balance_sheet_quarter", fake)
+    conn = _db()
+    report = tsc.backfill(conn, 1, tickers=["3081.TWO", "4979.TWO", "2301.TW"], today=date(2026, 10, 5))
+    assert report["quarters"][0]["missing"] == ["2301.TW", "4979.TWO"]
+    assert report["seen"] == 1
+
+
+def test_heartbeat_does_not_call_a_rejected_latest_quarter_a_lag(monkeypatch) -> None:
+    """R2 C1：最新一季抓到了但被拒（3081.TWO 2026Q2）——不是落後、`--sync` 修不了，要另列；真的沒抓才叫落後。"""
+    from datetime import datetime, timezone
+
+    from crons import heartbeat as hb
+
+    class _KeepOpen:                       # 心跳每次都會 close()；測試要在兩次呼叫之間共用同一個記憶體庫
+        def __init__(self, inner):
+            self._inner = inner
+
+        def close(self) -> None:
+            pass
+
+        def __getattr__(self, name):
+            return getattr(self._inner, name)
+
+    conn = _KeepOpen(_db())
+    monkeypatch.setattr("engine_c.db.get_conn", lambda *a, **k: conn)
+    monkeypatch.setattr("engine_c.monthly_revenue.registry_taiwan_tickers", lambda: ["3081.TWO"])
+    now = datetime(2026, 10, 5, 6, 0, tzinfo=timezone.utc)
+    tsc.append_share_capital(conn, tsc.build_observation(_row(quarter=1, share_capital=925_173, equity_total=3_881_853,
+                                                              bvps=41.96)))
+    behind = hb._tw_share_capital_line(now=now)
+    assert "落後 1 季" in behind
+    tsc.append_share_capital(conn, tsc.build_observation(_row(share_capital=1_017_690, equity_total=3_881_853, bvps=41.96)))
+    line = hb._tw_share_capital_line(now=now)
+    assert "落後" not in line and "已跟上法定期限" in line
+    assert "最新一季不能用" in line and "3081.TWO 2026Q2" in line
+
+
 def test_a_readonly_connection_without_the_table_means_no_observations(tmp_path) -> None:
     path = tmp_path / "engine_c.db"
     sqlite3.connect(path).close()
@@ -179,10 +285,13 @@ def test_own_history_for_a_taiwan_ticker_switches_shares_on_the_deadline_not_the
         y, m = nxt
     cover = [{"period_end": "2023-03-31", "filed": "2023-05-15", "value": 10_000_000.0},
              {"period_end": "2026-06-30", "filed": "2026-08-14", "value": 20_000_000.0}]
+    rejected = [{"period_end": "2025-06-30", "status": "mismatch", "reason": "fixture", "observation_id": "tsc_x"}]
     inp = {"price_bars": bars, "revenue_kind": "monthly", "monthly_revenue": months, "shares_cover": cover,
-           "splits": [], "price_settlement_currency": "TWD", "price_to_settlement": 1.0, "source": "fixture"}
+           "splits": [], "price_settlement_currency": "TWD", "price_to_settlement": 1.0, "source": "fixture",
+           "shares_rejected": rejected}
     row = tq.own_history(inp, today=today)
     assert row["absence_kind"] is None and row["basis"] == "P/S"
+    assert row["detail"]["shares_rejected"] == rejected          # R2 N11：被拒的季要走到稽核區（INV-3）
     days_before = sum(1 for d, _ in bars[:-1] if d < date(2026, 8, 14) and d >= today - timedelta(days=365 * 3))
     past = sum(1 for d, _ in bars[:-1] if d >= today - timedelta(days=365 * 3))
     assert row["value"] == round(100.0 * days_before / past, 1)
