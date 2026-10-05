@@ -165,6 +165,8 @@
     ②替代難度仍空白，所以是「讀成量」不是「證實是量」，沒有任何一家讀得成 A。765 kV 那一段在美國本土仍薄（2022 年名單裡寫到 765 kV 能力的只有 HICO）。
     坐在這層的上市公司曉星重工（298040.KS，約 25.9 兆韓元、19 位分析師）、HD 現代電氣（267260.KS，約 24.4 兆韓元、22 位）都是大型股——這層讀成量，不代表有可開的邊緣公司。
     反證 3 條在盯（沿用：需求側鬆動、上游瓶頸解除；新增：量的窗口關閉——預付消失、交期縮短或 765 kV 新產能到位）
+  - 2026-10-05｜[699] 入圖後 LPT 讀圖 stale（下一層多一條 constrained_by 分接開關）→ 第二次重讀 `sr_711f7130aba5d5b8`：判讀不變（volume），
+    下一層補一句「分接開關也可能是瓶頸」與 CTC、絕緣兩層的供給側（皆私人）
 - 主題等權組（電力；必須早於本鏈第一份敘事）：（尚無）
   - 2026-10-04｜還不能定：照光通訊組的選員準則（主業就是這一層、名冊解析得到、有價格歷史；需求端與綜合集團不入組），名冊上的電力鏈上市公司只有曉星重工（298040.KS）合格——Cleveland-Cliffs（CLF）主業是汽車用鋼、電工鋼只是業務之一（判斷，未量化占比，同住友電工被排除的理由），IREN 是需求端。合格 1 家、不到 2 家下限；等 lead_7b63986b 等供給側研究把 LPT／開關設備的上市供應商補進名冊再定（本鏈還沒有敘事，前瞻要求仍守得住）
   - 2026-10-05｜[692] 入圖後合格的是曉星重工、HD 現代電氣兩檔（主業是電力設備、名冊解析得到、Engine C 已有價格），湊到下限；**仍延後**：
@@ -194,6 +196,7 @@
     「up to five months」→ 帶日期 claim；lead park（partial，自動建 watch 等 2026 年一手）。**撤回**：該 lead 標題的「非中國瓷件只剩美日波蘭」在 DOE 全文找不到
     （porcelain 只在儀用變壓器與開關段，Poland 只在 GOES 廠清單）——10-04 decompose 時寫錯。名冊三筆隨包 staged（Sam Dong、Weidmann、Cindus，皆私人、null）。
     ⚠ 決策區塊的「圖影響」印 +19 節點、20 邊、12 claims，實際新增 3 節點、4 邊、4 claims（failure log #17）
+  - 2026-10-05｜使用者 go：[699] 入圖（intake commit `5c689235`，名冊 `62e32880`）；CTC、絕緣兩層的讀圖照 plan 留給 7.4 的二階 case（P2 結論 7.4 寫）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
 - failure log：（尚無）
   - #9（同 P1）
@@ -278,6 +281,9 @@
     「Silex manufactures MEMS for AI applications, such as optical circuit switches in data centres」、p.73 技術含「micro-mirror arrays」→ pq2 **[700]**
     （`tech:mems_mirror_array` 第一家供應商，自報·filing）；客戶集中度（最大客戶 2025 全年 25%）與 SMEI 持股 45.2% 進帶日期 claim。
     Q2 法說的「only MEMS foundry producing OCS」「10 OCS customers … one in high volume production」只有模型轉述（原文 403），不入圖。客戶未具名
+    → 使用者 go，[700] 入圖（intake commit `d9c54b7c`，名冊 `62e32880`）。**MEMS 鏡陣列層讀圖 `sr_87952c233a4e591b`（undecided）**：「一家已知代工＋集中客戶」
+    的形狀只有自報；客戶端原文（Google Apollo 論文）說晶片「inherently inexpensive due to fabrication within a silicon wafer process」、Google 換過供應方——
+    可替代性證據指向不高；缺：客戶端或第三方點名 OCS 的 MEMS 代工、能量產的代工有幾家。Silex 的敘事等 Engine C 有它的價格與財報（名冊今天才進）再寫
   - 2026-10-05｜雷達第一次無人值守運行（daily 05:30）：搜尋 15 次、新增 1 則（Sivers 人事的二手轉寫，標題「Shepherd Glasgow Fab Into Mass Production」不是原文）
     ——追到 Sivers 09-24 一手公告後 park：Photonics CTO（CST Global 共同創辦人）退休、Amkor 出身的工程副總 10-31 到任；留給 10-29 thesis 複查
 - H2（X2 的部分）：**不足**（證實 1 < 4）；與 P3（7.4）合併判
