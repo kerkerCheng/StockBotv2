@@ -199,6 +199,33 @@ def test_a_small_stock_dividend_that_passes_the_check_is_still_not_counted_twice
     assert tq.shares_on(got["cover"], [(date(2026, 7, 15), 1.015)], date(2026, 9, 1)) == pytest.approx(101_500_000)
 
 
+def test_split_window_boundaries_match_shares_on() -> None:
+    """覆核非阻斷 #1：拒收窗 (期末, 可知日] 與 `shares_on` 的 (期末, d] 對稱——分割剛好在期末那天＝期末股本已含，收、不再乘；
+    剛好在可知日那天＝在窗內，整季不用、由前一季乘分割比例接續。"""
+    on_end = _db()
+    tsc.append_share_capital(on_end, tsc.build_observation(_row(share_capital=1_000_000, equity_total=1_000_000, bvps=10.0)))
+    _split(on_end, "3081.TWO", "2026-06-30", 1.05)
+    got = tw_shares_as_of(on_end, "3081.TWO", as_of="2026-09-01")
+    assert [c["period_end"] for c in got["cover"]] == ["2026-06-30"]
+    assert tq.shares_on(got["cover"], [(date(2026, 6, 30), 1.05)], date(2026, 9, 1)) == pytest.approx(100_000_000)
+    on_deadline = _db()
+    tsc.append_share_capital(on_deadline, tsc.build_observation(_row(quarter=1, share_capital=1_000_000,
+                                                                     equity_total=1_000_000, bvps=10.0)))
+    tsc.append_share_capital(on_deadline, tsc.build_observation(_row(share_capital=1_000_000, equity_total=1_000_000,
+                                                                     bvps=10.0)))
+    _split(on_deadline, "3081.TWO", "2026-08-14", 1.05)
+    got = tw_shares_as_of(on_deadline, "3081.TWO", as_of="2026-09-01")
+    assert [c["period_end"] for c in got["cover"]] == ["2026-03-31"]
+    assert tq.shares_on(got["cover"], [(date(2026, 8, 14), 1.05)], date(2026, 9, 1)) == pytest.approx(105_000_000)
+
+
+def test_exactly_two_percent_is_accepted_and_just_above_is_not() -> None:
+    """覆核非阻斷 #3：判準是「> 2%」——剛好 2.000% 收、2.01% 拒。"""
+    base = {"equity_total": 1_000_000, "bvps": 10.0}
+    assert tsc.build_observation(_row(share_capital=1_020_000, **base))["cross_check_status"] == "ok"
+    assert tsc.build_observation(_row(share_capital=1_020_100, **base))["cross_check_status"] == "mismatch"
+
+
 def test_securities_template_is_rejected_even_though_it_is_23_columns_with_current_assets() -> None:
     """R2 N2：證券期貨業的表頭與一般業只差四個措辭，但它的半年報期限是 8/31——必須拒收（實測 115Q2 上市三家、上櫃七家）。"""
     securities = ("公司代號", "公司名稱", "流動資產", "非流動資產", "資產總計", "流動負債", "非流動負債", "負債總計", "股本",
@@ -223,6 +250,19 @@ def test_backfill_names_watched_tickers_missing_from_a_quarter(monkeypatch) -> N
     report = tsc.backfill(conn, 1, tickers=["3081.TWO", "4979.TWO", "2301.TW"], today=date(2026, 10, 5))
     assert report["quarters"][0]["missing"] == ["2301.TW", "4979.TWO"]
     assert report["seen"] == 1
+
+
+def test_a_whole_market_failure_is_reported_once_not_also_as_missing_tickers(monkeypatch) -> None:
+    """覆核非阻斷 #4：上櫃整張抓失敗——那個市場的標的只在 `failed` 出現一次，不再被點名成「表上沒有」。"""
+    def fake(market, year, quarter):
+        if market == "tpex":
+            raise mod.MopsOpenDataError("fixture：上櫃逾時")
+        return [], [{"ticker": "2801.TW", "template": "unregistered:61欄"}]
+
+    monkeypatch.setattr(mod, "fetch_balance_sheet_quarter", fake)
+    report = tsc.backfill(_db(), 1, tickers=["3081.TWO", "2301.TW"], today=date(2026, 10, 5))
+    assert [f["market"] for f in report["failed"]] == ["tpex"]
+    assert report["quarters"][0]["missing"] == ["2301.TW"]
 
 
 def test_heartbeat_does_not_call_a_rejected_latest_quarter_a_lag(monkeypatch) -> None:
@@ -253,6 +293,33 @@ def test_heartbeat_does_not_call_a_rejected_latest_quarter_a_lag(monkeypatch) ->
     line = hb._tw_share_capital_line(now=now)
     assert "落後" not in line and "已跟上法定期限" in line
     assert "最新一季不能用" in line and "3081.TWO 2026Q2" in line
+
+
+def test_heartbeat_names_tickers_with_nothing_and_says_so_when_the_table_is_empty(monkeypatch) -> None:
+    """覆核非阻斷 #2：一筆都沒有、部分檔沒有——兩種「沒有」都要自己說話（L14：會自己出現的計數器）。"""
+    from datetime import datetime, timezone
+
+    from crons import heartbeat as hb
+
+    class _KeepOpen:
+        def __init__(self, inner):
+            self._inner = inner
+
+        def close(self) -> None:
+            pass
+
+        def __getattr__(self, name):
+            return getattr(self._inner, name)
+
+    conn = _KeepOpen(_db())
+    monkeypatch.setattr("engine_c.db.get_conn", lambda *a, **k: conn)
+    monkeypatch.setattr("engine_c.monthly_revenue.registry_taiwan_tickers", lambda: ["3081.TWO", "4979.TWO"])
+    now = datetime(2026, 10, 5, 6, 0, tzinfo=timezone.utc)
+    assert "**一筆都沒有**" in hb._tw_share_capital_line(now=now)
+    tsc.append_share_capital(conn, tsc.build_observation(_row(quarter=1, share_capital=925_173, equity_total=3_881_853,
+                                                              bvps=41.96)))
+    line = hb._tw_share_capital_line(now=now)
+    assert "1/2 檔" in line and "**1 檔一筆都沒有**：4979.TWO" in line and "落後 1 季" in line
 
 
 def test_a_readonly_connection_without_the_table_means_no_observations(tmp_path) -> None:
