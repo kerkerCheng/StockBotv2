@@ -304,5 +304,13 @@
 - 登記：registration §2 X4、§7.4
 - 報告：（尚無；`replay-r4-losers.md`）
   - 2026-10-05｜[`replay-r4-losers.md`](replay-r4-losers.md)：**AEVA、MP、Lynas、Nidec、JL Mag 五檔全部「證據不足以判」**——入圖後到 10-02 沒有任何一手回頭碰到入圖時的結構主張（AEVA、MP 在 EDGAR 入圖後 0 份非內部人申報；Lynas 入圖後唯一的一手是 10-01 換股收購 Meteoric——資本配置；JL Mag 只有股東會與股息公告；Nidec 入圖時唯一一條 assertion 沒有發表日、投影是空的）。不構成 H1／H3 的反例。描述（不判讀）：三檔稀土同期一起跌；MP 客戶資本承諾最齊全仍 −20%（窗口太短，不進 H10）；JL Mag 入圖時的證據全是 2022 年報
+  - 2026-10-05｜research-drain 段 5（每檔閉環）把驗屍的五檔接成讀圖＋敘事（不是裁決，裁決點不變）：
+    - 諧波減速器層 `sr_2dd5e99d68a4d0b7`（undecided；Nidec、HDS、綠的同層）；6324.T 敘事 `ib_6fd7f9b9e5dbe451`（不要：讀不出卡住誰）
+    - 稀土磁材層 `sr_b38b36acdfdfeddc`（volume，**只對中國以外**：買方的包銷、保底價、預付鎖的是非中國供給）；分離重稀土層 `sr_a0bb6b6fe6cb3050`
+      （moat，中國以外、時間領先：Lynas 是唯一在商業量產的；MP 的分離廠還在蓋）。反證 watch `ew_0198`–`ew_0202`
+    - MP `ib_f7742f86bcb0bb00`（已定價等回落，`ew_0203`；自家三年 P/S 第 58.7 百分位但結構證據全是 2025-07 公開頭條）；
+      LYC.AX `ib_3980aa5b40612922`（缺 X，`ew_0204`：重稀土實際出貨量＋澳洲申報人量不到財報）；6680.HK `ib_7456aa56a3e881d8`
+      （不要：量只對中國以外成立，金力在中國側）。MP、LYC.AX 非邊緣（覆蓋 15、13 位）；6680.HK 邊緣但快照市值只算 H 股
 - failure log：（尚無）
   - #14（反證以被評公司的供貨 assertion 形式入圖：MP 磁材邊上的 Noveon、USA Rare Earth 文件，引文沒有 MP）
+  - #19（海外財報缺口：6324.T、LYC.AX、6680.HK 的已定價嗎與出現在數字裡都量不到）、#20（A＋H 檔快照市值只算 H 股）
