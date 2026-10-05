@@ -1,0 +1,137 @@
+{
+  "claims": [
+    {
+      "confidence": 0.75,
+      "demand_proof_level": "guided",
+      "disproof_condition": "條件：之後的 10-Q／10-K 寫出 Stillwater 停擺或延後、Blacksburg 計畫取消，或到 2026 年底仍沒有磁材營收。核查頻率：每季（10-Q）。觸發後 48 小時：e1 降 confidence，重讀稀土磁材層（中國以外的產能時程）。",
+      "id": "usar_10_q_20260810_cl1",
+      "source_ids": [
+        "usar_10_q_20260810_s2",
+        "usar_10_q_20260810_s3",
+        "usar_10_q_20260810_s4"
+      ],
+      "statement": "USA Rare Earth's Q2 2026 10-Q: the Stillwater, Oklahoma magnet facility 'has recently been commissioned and has commenced commercial production; however, we have not begun generating revenue from sintered neodymium-iron-boron (NdFeB) permanent magnets' — the March release's Q2 order-fulfilment target did not show up as magnet revenue in Q2. Planned: a Blacksburg, South Carolina facility 'expected to produce 6,400 metric tons per annum' of sintered NdFeB magnets; with the Stillwater expansion, 'approximately 10,000 tpa of NdFeB magnets' domestic capacity. Plans, not output (L4: dated).",
+      "subject_id": "e1"
+    },
+    {
+      "confidence": 0.8,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：USA Rare Earth 申報該包銷協議終止、先決條件未達成，或保底價被重談。核查頻率：每季（10-Q、8-K）。觸發後 48 小時：本 claim 加註，重讀稀土磁材層讀圖的「中國以外的買方在鎖量」一段。",
+      "id": "usar_10_q_20260810_cl2",
+      "source_ids": [
+        "usar_10_q_20260810_s5"
+      ],
+      "statement": "USA Rare Earth's Q2 2026 10-Q, on its Serra Verde (Brazil) acquisition — pending as of the 10-Q ('if completed'): Serra Verde has a '15-year offtake agreement with a special purpose vehicle capitalized by the U.S. Government, which features contractual price floors covering 100% of Serra Verde's Phase 1 production of neodymium, praseodymium, dysprosium and terbium'. Another government-backed, price-floored offtake for non-China rare earth supply (cf. DoD–MP, JARE–Lynas). Serra Verde's output is feedstock, not separated oxides or magnets.",
+      "subject_id": "co:usa_rare_earth"
+    },
+    {
+      "confidence": 0.85,
+      "demand_proof_level": "confirmed",
+      "disproof_condition": "條件：訴訟和解、撤回或判決（任一方的申報）。核查頻率：每季（雙方 10-Q）。觸發後 48 小時：本 claim 加註結果；若禁制令影響 USAR 磁材營運，重讀稀土磁材層。",
+      "id": "usar_10_q_20260810_cl3",
+      "source_ids": [
+        "usar_10_q_20260810_s6"
+      ],
+      "statement": "Litigation (10-Q legal proceedings): on May 22, 2026 MP Materials and two MP subsidiaries sued USA Rare Earth, its Director of Magnet Operations and FOM Technologies in the Texas Business Court, 'alleging misappropriation of trade secrets'. Allegations only, not a ruling; it shows the two are direct competitors in U.S. magnet making and is a legal risk to USAR's magnet operations.",
+      "subject_id": "co:usa_rare_earth"
+    }
+  ],
+  "edges": [
+    {
+      "attributes": {},
+      "confidence": 0.7,
+      "dst_id": "mat:rare_earth_magnets",
+      "id": "e1",
+      "relation": "supplies_to",
+      "source_ids": [
+        "usar_10_q_20260810_s1",
+        "usar_10_q_20260810_s2",
+        "usar_10_q_20260810_s3"
+      ],
+      "src_id": "co:usa_rare_earth"
+    }
+  ],
+  "nodes": [
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "USA Rare Earth",
+        "USAR"
+      ],
+      "attributes": {
+        "ticker": "USAR"
+      },
+      "confidence": 0.9,
+      "id": "co:usa_rare_earth",
+      "name": "USA Rare Earth",
+      "role": null,
+      "source_ids": [
+        "usar_10_q_20260810_s1",
+        "usar_10_q_20260810_s2"
+      ],
+      "type": "Company"
+    },
+    {
+      "abstraction_level": "materials_substrate",
+      "aliases": [
+        "NdFeB"
+      ],
+      "attributes": {},
+      "confidence": 0.9,
+      "id": "mat:rare_earth_magnets",
+      "name": "Rare earth magnets (neodymium, samarium-cobalt)",
+      "role": null,
+      "source_ids": [
+        "usar_10_q_20260810_s2",
+        "usar_10_q_20260810_s3"
+      ],
+      "type": "Material"
+    }
+  ],
+  "schema_version": "0.1",
+  "source_doc": {
+    "doc_id": "usar_10_q_20260810",
+    "evidence_tier": 1,
+    "origin_entity": "USA Rare Earth, Inc.",
+    "permission_basis": "SEC 法定申報（公開）；只保留研究必要的逐字摘錄。published_at＝EDGAR 申報日（2026-08-10）。",
+    "published_at": "2026-08-10",
+    "publisher": "SEC EDGAR",
+    "retrieved_at": "2026-10-05",
+    "source_type": "filing",
+    "storage_permission": "repo_excerpt",
+    "title": "USA Rare Earth, Inc. — Form 10-Q for the quarter ended June 30, 2026",
+    "url": "https://www.sec.gov/Archives/edgar/data/1970622/000197062226000057/usar-20260630.htm"
+  },
+  "sources": [
+    {
+      "id": "usar_10_q_20260810_s1",
+      "locator": "Notes to Condensed Consolidated Financial Statements——Note 1. Organization（第一句）",
+      "quote": "USA Rare Earth, Inc. (collectively with its subsidiaries, the “Company,” “USARE,” “we,” “us,” or “our”) is building a leading global rare earth value chain, from mine to magnet and beyond."
+    },
+    {
+      "id": "usar_10_q_20260810_s2",
+      "locator": "Risk factors 摘要——Stillwater 磁材廠（現況）",
+      "quote": "Our magnet manufacturing facility in Stillwater, Oklahoma (“Stillwater Facility”) has recently been commissioned and has commenced commercial production; however, we have not begun generating revenue from sintered neodymium-iron-boron (“NdFeB”) permanent magnets (also referred to as neo magnets)"
+    },
+    {
+      "id": "usar_10_q_20260810_s3",
+      "locator": "MD&A——Blacksburg 廠的設計產能",
+      "quote": "The state-of-the-art facility is expected to produce 6,400 metric tons per annum (tpa) of sintered neodymium-iron-boron (NdFeB) rare earth magnets and 5,000 tpa of strip-cast metals and alloys."
+    },
+    {
+      "id": "usar_10_q_20260810_s4",
+      "locator": "MD&A——加上 Stillwater 擴產後的美國總產能（規劃）",
+      "quote": "When combined with the planned expansion of our Stillwater Facility, total domestic capacity is expected to reach approximately 10,000 tpa of NdFeB magnets"
+    },
+    {
+      "id": "usar_10_q_20260810_s5",
+      "locator": "MD&A——Serra Verde 收購（10-Q 時尚未完成）與它的包銷",
+      "quote": "Serra Verde's strategic importance is further evidenced by its 15-year offtake agreement with a special purpose vehicle capitalized by the U.S. Government, which features contractual price floors covering 100% of Serra Verde's Phase 1 production of neodymium, praseodymium, dysprosium and terbium."
+    },
+    {
+      "id": "usar_10_q_20260810_s6",
+      "locator": "Legal proceedings——MP Materials 的訴訟（指控，未判決）",
+      "quote": "On May 22, 2026, MP Materials Corp., MP Magnetics LLC, and MP Mine Operations LLC (collectively, “Plaintiffs”) filed an action in the Business Court of Texas, Eighth Division against USA Rare Earth, Inc., its Director of Magnet Operations, Kevin Elkins, and FOM Technologies Inc. (Case No. 26-BC08A-0018), alleging misappropriation of trade secrets"
+    }
+  ]
+}

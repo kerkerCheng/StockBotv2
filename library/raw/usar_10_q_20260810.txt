@@ -1,0 +1,13 @@
+Source URL: https://www.sec.gov/Archives/edgar/data/1970622/000197062226000057/usar-20260630.htm
+
+Excerpt:
+[EXCERPT — 公開文件之有限逐字引文] USA Rare Earth, Inc. — Form 10-Q for the quarter ended June 30, 2026
+Source: https://www.sec.gov/Archives/edgar/data/1970622/000197062226000057/usar-20260630.htm
+Published: 2026-08-10 | Origin: USA Rare Earth, Inc. | Retrieved: 2026-10-05
+
+Notes to Condensed Consolidated Financial Statements——Note 1. Organization（第一句）："USA Rare Earth, Inc. (collectively with its subsidiaries, the “Company,” “USARE,” “we,” “us,” or “our”) is building a leading global rare earth value chain, from mine to magnet and beyond."
+Risk factors 摘要——Stillwater 磁材廠（現況）："Our magnet manufacturing facility in Stillwater, Oklahoma (“Stillwater Facility”) has recently been commissioned and has commenced commercial production; however, we have not begun generating revenue from sintered neodymium-iron-boron (“NdFeB”) permanent magnets (also referred to as neo magnets)"
+MD&A——Blacksburg 廠的設計產能："The state-of-the-art facility is expected to produce 6,400 metric tons per annum (tpa) of sintered neodymium-iron-boron (NdFeB) rare earth magnets and 5,000 tpa of strip-cast metals and alloys."
+MD&A——加上 Stillwater 擴產後的美國總產能（規劃）："When combined with the planned expansion of our Stillwater Facility, total domestic capacity is expected to reach approximately 10,000 tpa of NdFeB magnets"
+MD&A——Serra Verde 收購（10-Q 時尚未完成）與它的包銷："Serra Verde's strategic importance is further evidenced by its 15-year offtake agreement with a special purpose vehicle capitalized by the U.S. Government, which features contractual price floors covering 100% of Serra Verde's Phase 1 production of neodymium, praseodymium, dysprosium and terbium."
+Legal proceedings——MP Materials 的訴訟（指控，未判決）："On May 22, 2026, MP Materials Corp., MP Magnetics LLC, and MP Mine Operations LLC (collectively, “Plaintiffs”) filed an action in the Business Court of Texas, Eighth Division against USA Rare Earth, Inc., its Director of Magnet Operations, Kevin Elkins, and FOM Technologies Inc. (Case No. 26-BC08A-0018), alleging misappropriation of trade secrets"
