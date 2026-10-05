@@ -21,6 +21,7 @@
 - 研究產出：（尚無）
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
+  - 2026-10-05｜research-drain 段 5：InP 基板層的兩家日本大廠第一份敘事（押 `sr_b8b405c96d8747c1`，不要：非邊緣）——住友電工 `ib_456a9bf890f61d5c`、JX 金屬 `ib_eab1aee5a0c458ce`；會死嗎先用一手決算短信補 runway 觀測（`mo_4083f561…`、`mo_a200134b…`：現金跑道綠、負債黃）
 - failure log：（尚無）
 
 ## O1-U InP 上游：銦、晶體生長、出口管制（二階）
@@ -84,6 +85,7 @@
   - 2026-10-04｜`coherent_q3fy26_cpo_e10`（Coherent 自己的 Q3 FY26 法說；抽取檔在 `.gitignore` 第 96 行、沒有 git 歷史）｜當時 `sole_source=true` 的出處是**發行人自報**——L8 要客戶端或第三方印證；2026-09-19 [627] 改成 false。現行的保護：`loader/validate.py` 的 G5 對受益方自報的 sole_source 發 WARN（不擋），v2 敘事 bottleneck 格的 do_not「供應商自己說的獨家不算，要說出是誰印證的」——本 case 不另開 failure log｜（脈絡，不是另一個裁決）
 - 2×2：尚未填（錨＝2026-09-19）
   - 價格照登記在 7.5 記（推翻日 2026-09-19 起對光通訊組超額；脈絡列：thesis memo 2026-07-17 → 2026-09-19）
+  - 2026-10-05｜research-drain 段 5：CPO 層讀圖 `sr_e8161208a37aa915`（neither：需求側有 pluggable、NPO、銅可選，台積電的人說瓶頸在雷射、光纖、連接器與測試——在下一層）；矽光子兩節點讀圖 `sr_3ad043cb553dfc94`、`sr_9ee10fb4ef6dd06e`（volume，讀成量：Tower 6-K 客戶預付 2.9 億美元保留 2027 產能）；敘事 AVGO `ib_845f22ec395d69dd`、TSM `ib_e30d810241bf6f8d`、TSEM `ib_af02a0f36157286b`、GFS `ib_a43c94cc33417379`（皆非邊緣的不要）；Soitec 坐上 Photonics-SOI 基板層的入圖包 pq2 **[706]**
 - failure log：（尚無）
 
 ## O6 光通訊磊晶與 MOCVD 產能（二階）
@@ -91,6 +93,7 @@
 - 登記：registration §2 O6（開題 2026-10-04）
 - 研究產出：（尚無）
 - 結論（H5 的 (i)(ii)，7.4 寫）：（尚無）
+  - 2026-10-05｜research-drain 段 5：光二極體層讀圖 `sr_1de9b7868a235363`（undecided：圖上沒有需求側）；英特磊 `ib_fcc9cb3a94644c63`（不要：磷化銦主力在高頻、國防、量子運算，不在 AI 光互連路徑上；會死嗎兩盞紅燈）
 - failure log：（尚無）
 
 ## S1 X 帳號 40 則首次點名的 claim 裁決
