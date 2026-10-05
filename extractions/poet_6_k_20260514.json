@@ -21,6 +21,17 @@
       ],
       "statement": "POET is moving production capacity from China to Malaysia, representing a significant manufacturing geography shift for its photonic integration platform.",
       "subject_id": "co:poet_technologies"
+    },
+    {
+      "confidence": 0.6,
+      "demand_proof_level": "speculative",
+      "disproof_condition": "條件：POET 或光寶宣布合作終止，或到 2027 年 6 月仍沒有共同開發的模組送樣或出貨。核查頻率：每半年（POET 6-K、光寶法說）。觸發後 48 小時：e13 撤回提案，光寶的讀圖座位重新檢查。",
+      "id": "poet_6_k_20260514_cl3",
+      "source_ids": [
+        "poet_6_k_20260514_s4"
+      ],
+      "statement": "POET's 6-K (2026-05-14): a strategic collaboration with LITEON Technology that 'aims to co-develop next-generation optical communication modules built on POET's patented optical interposer technology'. Modeled as LITEON developing pluggable optical transceivers (co-development stage). No product, customer, volume or date is disclosed; the statement is POET's, not LITEON's. LITEON's larger AI-capex exposure (e.g. server power supplies) is not in the graph.",
+      "subject_id": "e13"
     }
   ],
   "edges": [
@@ -163,6 +174,17 @@
         "poet_6_k_20260514_s5"
       ],
       "src_id": "tech:ai_compute_buildout"
+    },
+    {
+      "attributes": {},
+      "confidence": 0.6,
+      "dst_id": "tech:pluggable_transceiver",
+      "id": "e13",
+      "relation": "develops",
+      "source_ids": [
+        "poet_6_k_20260514_s4"
+      ],
+      "src_id": "co:liteon"
     }
   ],
   "nodes": [
@@ -323,6 +345,31 @@
         "poet_6_k_20260514_s9"
       ],
       "type": "TechNode"
+    },
+    {
+      "abstraction_level": "module_subsystem",
+      "aliases": [
+        "pluggable transceivers",
+        "800G transceiver",
+        "1.6T transceiver",
+        "1.6T transceivers",
+        "OSFP",
+        "Pluggable Transceivers",
+        "pluggables",
+        "pluggable optical interconnects",
+        "optical pluggables"
+      ],
+      "attributes": {
+        "ramp_difficulty_intrinsic": 3
+      },
+      "confidence": 0.9,
+      "id": "tech:pluggable_transceiver",
+      "name": "Pluggable optical transceiver",
+      "role": null,
+      "source_ids": [
+        "poet_6_k_20260514_s4"
+      ],
+      "type": "TechNode"
     }
   ],
   "schema_version": "0.1",
@@ -334,6 +381,7 @@
     "published_at": "2026-05-14",
     "source_type": "filing",
     "storage_permission": "repo_full",
+    "supersedes_extraction_sha256": "4e4b0ec3e2d5cd8f78ab336426c13e6113808027f0616a78bffa767d3b8e759d",
     "title": "POET Technologies Q1 2026 Results (6-K Ex-99.1, 2026-05-14)",
     "url": "https://www.sec.gov/Archives/edgar/data/1410172/000121390026043870/exh_991.htm"
   },
