@@ -145,3 +145,95 @@ def test_revenue_pairs_absence_is_declared(tmp_path) -> None:
     assert pairs is None and "data_checks" in why
     ok = {"data_checks": {"revenue_magnitude": {"pairs": {"UMC": {}}}}}
     assert cli._revenue_magnitude_pairs(_Store(ok)) == ({"UMC": {}}, None)
+
+
+# ---- materialize 端的取數（alpha/providers/data_checks.py）----
+
+class _FakeSnap:
+    def __init__(self, revenue, currency):
+        self.revenue_ttm = revenue
+        self.financial_currency = currency
+
+
+class _FakeActuals:
+    def __init__(self, revenue, currency):
+        self.revenue = revenue
+        self.currency = currency
+
+
+class _FakeProvider:
+    def __init__(self, table):
+        self.table = table
+
+    def fundamentals(self, ticker):
+        snap, _act, _why = self.table[str(ticker)]
+        if isinstance(snap, Exception):
+            raise snap
+        return snap, None
+
+    def fiscal_year_results(self, ticker):
+        _snap, act, why = self.table[str(ticker)]
+        return act, why
+
+
+_RATES = {"TWD": 1 / 31.37, "USD": 1.0}
+
+
+def _fake_to_usd(amount, currency, cache):
+    cache[currency] = _RATES.get(currency)
+    return None if cache[currency] is None else amount * cache[currency]
+
+
+def test_pairs_use_the_same_label_rule_as_the_stock_page() -> None:
+    from alpha.providers.data_checks import revenue_magnitude_pairs
+
+    provider = _FakeProvider({
+        # 修法後：快照宣告 TWD → 標籤 TWD，換匯後與 20-F 基期接近
+        "UMC": (_FakeSnap(_UMC_SNAPSHOT_REVENUE_TWD, "TWD"), _FakeActuals(_UMC_BASE_REVENUE_USD, "USD"), None),
+        # 快照沒宣告幣別 → 規則由基期補位（USD）——值其實是新台幣：這就是 #23 的形狀，檢查要抓得到
+        "OLD": (_FakeSnap(_UMC_SNAPSHOT_REVENUE_TWD, None), _FakeActuals(_UMC_BASE_REVENUE_USD, "USD"), None),
+    })
+    pairs = revenue_magnitude_pairs(["UMC", "OLD"], provider=provider, to_usd=_fake_to_usd)
+    assert pairs["UMC"]["printed_currency"] == "TWD" and pairs["UMC"]["missing"] is None
+    assert pairs["OLD"]["printed_currency"] == "USD"
+    assert [r[0] for r in closure.revenue_magnitude_mismatches(pairs)] == ["OLD"]
+
+
+def test_pairs_declare_why_a_page_cannot_be_compared() -> None:
+    from alpha.providers.data_checks import revenue_magnitude_pairs
+
+    provider = _FakeProvider({
+        "NOBASE": (_FakeSnap(1e9, "USD"), None, "Engine C 無 NOBASE 的 fiscal_year_results 觀測（scripts/…）"),
+        "TSM": (_FakeSnap(4.44e12, "TWD"), None, "TSM 同一年度有 2 筆生效的 fiscal_year_results，而且幣別不一致：mo_1、mo_2"),
+        "BAD": (RuntimeError("boom"), None, None),
+        "NOFX": (_FakeSnap(1e9, "KRW"), _FakeActuals(1e9, "KRW"), None),
+        "NOREV": (_FakeSnap(None, "USD"), _FakeActuals(1e9, "USD"), None),
+    })
+    pairs = revenue_magnitude_pairs(list(provider.table), provider=provider, to_usd=_fake_to_usd)
+    got = dict(closure.revenue_magnitude_uncompared(pairs))
+    assert got["NOBASE"] == "沒有生效基期觀測"
+    assert got["TSM"].startswith("TSM 同一年度有 2 筆生效") and "mo_1" not in got["TSM"]
+    assert got["BAD"] == "讀不到（RuntimeError）"
+    assert "缺匯率 KRW/USD" in got["NOFX"]
+    assert got["NOREV"] == "快照沒有近四季營收"
+
+
+def test_the_stock_page_and_the_check_share_one_label_function() -> None:
+    """L16：檢查驗的是個股頁那張標籤——兩邊各寫一份規則，檢查就驗不到 builder 的回歸。"""
+    import alpha.contracts as contracts
+    import briefing.alpha_view.builder as builder
+
+    assert builder.reporting_currency_for is contracts.reporting_currency_for
+    assert contracts.reporting_currency_for(_FakeSnap(1, "TWD"), _FakeActuals(1, "USD")) == "TWD"
+    assert contracts.reporting_currency_for(_FakeSnap(1, None), _FakeActuals(1, "USD")) == "USD"
+    assert contracts.reporting_currency_for(_FakeSnap(1, None), None) is None
+
+
+def test_data_checks_ride_the_candidates_artifact_without_touching_its_identity() -> None:
+    from webapp.materialize import build_candidates_artifact
+
+    base = {"today": "2026-10-07", "groups": {}, "side_groups": {}, "counts": {}, "universe": ["UMC"]}
+    a = build_candidates_artifact({**base, "data_checks": {"revenue_magnitude": {"pairs": {"UMC": {"printed_usd": 1.0}}}}})
+    b = build_candidates_artifact({**base, "data_checks": {"revenue_magnitude": {"pairs": {"UMC": {"printed_usd": 2.0}}}}})
+    assert a["data_checks"]["revenue_magnitude"]["pairs"]["UMC"]["printed_usd"] == 1.0
+    assert a["freshness_identity"] == b["freshness_identity"]

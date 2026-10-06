@@ -29,7 +29,7 @@ from typing import Any, Mapping, Sequence
 
 from alpha.causal import CausalPath, CompanyImpact, StructuralEvent
 from alpha.context import ContextBuild
-from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score
+from alpha.contracts import AXES, AlphaSignal, EvidenceRef, Score, reporting_currency_for
 from alpha.fundamental.assumptions import select_assumptions
 from alpha.provider import SupplyExposure
 from alpha.wipeout import LANE_LABELS as WIPEOUT_LANE_LABELS, WIPEOUT_LANES, tally as wipeout_tally
@@ -838,10 +838,8 @@ def build_alpha_investment_view(
     # 這條退路從沒生效（26 檔印「未知」）；而基期觀測可能是 20-F 的美元便利換算（TSM、UMC），
     # 套到台幣的快照數上會差 30 倍。基期觀測宣告的 currency 只在快照沒宣告時補位。
     # ⚠ **不得回退到 `market_currency`**——那正是這個 bug；答不出來就寫「未知」（L12 先分開再各自定規則）。
-    reporting_currency = (
-        getattr(context.fundamentals, "financial_currency", None)
-        or (getattr(base_actuals, "currency", None) if base_actuals is not None else None)
-    )
+    # 2026-10-07（7.0g-1）：規則抽到 `alpha.contracts.reporting_currency_for`——資料檢查驗的就是這張標籤，必須同一個函式。
+    reporting_currency = reporting_currency_for(context.fundamentals, base_actuals)
 
     # as-of 模式：Engine A／C 有時點投影，Decision Store 與 thesis 檔沒有。沒有投影的來源
     # 一律 `not_applicable` 並說明，不拿當前值冒充 T 時刻（INV-6）。builder 自己強制，

@@ -384,6 +384,8 @@ def _revenue_magnitude_pairs(state_store: "StateArtifactStore") -> tuple[dict | 
     block = (payload.get("data_checks") or {}).get("revenue_magnitude")
     if not isinstance(block, dict):
         return None, "materialize 還沒算這一項（候選板 artifact 沒有 data_checks.revenue_magnitude）"
+    if block.get("absence"):
+        return None, f"materialize 算這一項時失敗：{block['absence']}"
     pairs = block.get("pairs")
     return (pairs if isinstance(pairs, dict) else None), (None if isinstance(pairs, dict) else "pairs 缺或型別不對")
 

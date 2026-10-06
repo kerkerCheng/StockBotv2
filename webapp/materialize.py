@@ -1446,6 +1446,9 @@ def build_candidates_artifact(board: Mapping[str, Any], *, generated_at: datetim
         "readings": dict(board.get("readings") or {}),
         "rollup": dict(board.get("rollup") or {}),
         "universe": list(board.get("universe") or ()),
+        # Phase 7 Step 7.0g-1：資料檢查的取數（closure-gate 讀它印）。**不進 freshness_identity**——資料品質不是認知，
+        # 而且匯率每天在動；放進去會讓 Daily 天天以為「認知變了」。
+        "data_checks": dict(board.get("data_checks") or {}),
         "this_is_not": list(CANDIDATES_THIS_IS_NOT),
         "materializer": {
             "version": CANDIDATES_MATERIALIZER_VERSION,
@@ -1494,6 +1497,16 @@ def materialize_candidates(*, tickers: Sequence[str] | None = None, store: State
     # 自己載的那一次也讀同一個 state 目錄的結構表（「是不是新賭注」；Phase 7 Step 7.0e）
     board = load_board(universe, context=shared, structure=None if shared is not None else bet_structure(store))
     _attach_ride_node_names(board)
+    # Phase 7 Step 7.0g-1：資料檢查（營收量級）——母體＝本輪全部個股頁，不跟閉環母體走；要換匯，所以只在這裡算
+    # （closure-gate 每輪都跑，只讀結果）。失敗只記理由、候選板照寫——它不是候選狀態的前提。
+    try:
+        from alpha.closure import REVENUE_MAGNITUDE_BAND
+        from alpha.providers.data_checks import revenue_magnitude_pairs
+
+        board["data_checks"] = {"revenue_magnitude": {
+            "band": list(REVENUE_MAGNITUDE_BAND), "pairs": revenue_magnitude_pairs(sorted({str(t) for t in universe}))}}
+    except Exception as exc:  # noqa: BLE001
+        board["data_checks"] = {"revenue_magnitude": {"absence": f"{type(exc).__name__}: {str(exc)[:160]}"}}
     payload = build_candidates_artifact(board, generated_at=generated_at)
     target = store or StateArtifactStore()
     written = target.write(payload)

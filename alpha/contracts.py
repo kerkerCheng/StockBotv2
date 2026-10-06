@@ -431,6 +431,19 @@ class FundamentalsSnapshot:
     evidence: tuple[EvidenceRef, ...] = ()
 
 
+def reporting_currency_for(fundamentals: Any, base_actuals: Any) -> str | None:
+    """個股頁上**快照**金額（營收、FCF、現金、負債、營收共識）的幣別標籤——唯一 owner。
+
+    先取快照自己宣告的 `financial_currency`；快照沒宣告時才由基期觀測宣告的 `currency` 補位。
+    ⚠ 不得回退到報價幣別（`market_currency`）——那正是 2026-09-13 的 bug。⚠ 2026-10-05（failure log #23）：原本先取基期幣別，
+    UMC／TSM 的基期是 20-F 的美元便利換算，套到新台幣的快照數上差 30 倍。
+    2026-10-07（Phase 7 Step 7.0g-1）由 `briefing/alpha_view/builder.py` 抽出：資料檢查（`alpha/providers/data_checks.py`）
+    驗的就是這張標籤，兩邊必須是同一個函式（L16）。答不出來回 None——呼叫端寫「未知」，不猜。
+    """
+    return (getattr(fundamentals, "financial_currency", None)
+            or (getattr(base_actuals, "currency", None) if base_actuals is not None else None))
+
+
 @dataclass(frozen=True, slots=True)
 class MarketSnapshot:
     price: float | None = None

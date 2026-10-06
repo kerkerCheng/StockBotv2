@@ -708,8 +708,11 @@ def render_revenue_magnitude(
     else:
         head = (f"營收量級對不上：0 檔（帶子 [{low}, {high}]；EUR、GBP 對 USD 這類 1.1–1.4 倍的標錯在帶子內，抓不到）")
     if uncompared:
+        groups: dict[str, list[str]] = {}
+        for ticker, why in uncompared:
+            groups.setdefault(why, []).append(ticker)
         cover = (f"營收量級覆蓋：比了 {compared} 檔；比不了 {len(uncompared)} 檔——"
-                 + "、".join(f"{t}（{why}）" for t, why in uncompared))
+                 + "；".join(f"{why} {len(ts)} 檔：{'、'.join(ts)}" for why, ts in groups.items()))
     else:
         cover = f"營收量級覆蓋：全部個股頁 {compared} 檔都比得了"
     return [head, cover]
