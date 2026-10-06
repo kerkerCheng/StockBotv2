@@ -11,7 +11,8 @@ Engine D 的 `brief.py` 之所以曾長成 1,462 行的全系統儀表板，是�
 
 ⚠ 2026-09-23（Phase 0 Step 0b.4）：decision brief 的組裝（`today.py`／`public_view.py`／
 `render_today_markdown`）隨 decision_lab 研究側退役；`briefing/` 現在只剩 `alpha_view/`（個股頁 read model）、
-`analyst_view/`、`sources.py`（備份狀態／outcome aggregate／position events 取數）與 `render.py`（備份計數器）。
+`analyst_view/` 與 `sources.py`（備份狀態／outcome aggregate／position events 取數）。備份計數器的渲染
+`render.py` 已於 2026-10-06 刪除——它早已沒有呼叫端，活的那份是心跳段 1（`crons/heartbeat.py`）。
 
 ## 這一層的紀律
 

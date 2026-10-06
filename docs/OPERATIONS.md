@@ -53,6 +53,8 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | 互動 session 持有 writer lock | 段 1「⚠ 沒拿到 writer lock」，所有寫入步驟跳過 |
 | 排程設定與 config 不一致／讀不到 | 段 1「⚠ 排程設定與 config 不一致」＋修正命令；讀不到印 unknown |
 | harvest 超過 `harvest_stale_hours` 沒跑 | 段 1 ⚠；段 3「harvest N 天沒跑——0 不代表沒有新文件」 |
+| ⑯ Drive 上傳失敗（`auth_expired`／`delivery_failed`） | 段 1「失敗 1：16_backup」＋備份行 ⚠「Drive <狀態>（最後成功上傳：N 天前）」；本機那份照留、⑯b 照驗。修好後 `python scripts\backup_private.py upload` 補傳（token 過期先 `auth`） |
+| T2 輪詢超過 `min_recheck_days` 沒人跑、而有該查的 | 段 3「⚠ T2 輪詢：…最後一次 <日期>（N 天前）」＋摘要行「T2 輪詢 N 天沒跑」；sweep 沒有排程，在互動 session 跑 `python -m engine_b.event_watch sweep` |
 | 開跑時工作區不乾淨 | 段 1 ⚠ 列出路徑（照跑） |
 | 保險檢查觸發（LLM 步驟前後指紋變了） | **沒有心跳也沒有 Discord**（心跳會 import 被改的檔）；開 session 時 `crons/routine_hint.py` 第一句說出來 |
 | daily 根本沒跑 | 開 session 時 `crons/routine_hint.py`：「今天沒有 daily 執行紀錄」 |
@@ -101,6 +103,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
+
+### Sandbox impact review 結論（2026-10-06：daily ⑯ 含 Drive 異地、⑯b 還原驗證；心跳備份行三格與 T2 輪詢行）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | ⑯ 的 argv 由 `scripts/backup_private.py run --no-drive` 改成 `run`（**同一支既有入口拿掉一個旗標，不是新入口**）。新連網主機：`oauth2.googleapis.com`（refresh token 換 access token）、`www.googleapis.com`（Drive v3 `files.list`／`files.create`／`files.update` 移垃圾桶）。憑證是既有的 OAuth user credential `library/private/gdrive_oauth/token.json`——scope 只有 `drive.file`（只看得到本 app 建的檔）；10-06 實測 09-10 發的 refresh token 仍可用，consent screen 早已不是 Testing。上傳成功後寫回同一個 token 檔（access token 更新）。上傳內容＝當天那份本機備份的 zip（10-06 實測 79 MB、15 秒；`gdrive_oauth/` 不進任何備份），雲端只動 `StockBotv2-backups` 資料夾裡自己命名前綴的檔，留 8 份、超出移垃圾桶（30 天可救）。⑯b `verify-restore`：新的 daily 步、既有入口，純本機（10-06 實測 3 秒），寫 `library/private/backups_verify_tmp/`（驗完刪）與 `backups/last_backup.json`。不寫 tracked 檔、不碰 `.git`、不寫任何 authority。心跳仍零網路，只多讀 `config/event_watch.json` 與 watch registry（T2 行）。 |
+| **2 canonical skill／prompt／本檔** | 本節；「Daily」失敗長相表（加 Drive 一列）；「Private authority 備份」節；「事件監看」節的 T2 段（無人值守 sweep 的舊敘述改成現況）；`docs/ARCHITECTURE.md` §4.1；`scripts/backup_private.py` 檔頭。 |
+| **3 最窄 rule** | Windows daily 不經 Codex，`.codex/rules` 仍是 0 條。放行只有兩個 argv：拿掉 `--no-drive`、多一步 `verify-restore`。Drive 能碰到什麼由 OAuth scope `drive.file` 限住，不是由 rule。回滾：⑯ 加回 `--no-drive`（同一個 commit 改 `tests/test_daily_task.py`）。 |
+| **4 contract test** | `tests/test_daily_task.py` 逐項相等（⑯ 連網、⑯b 新步）；`tests/test_backup_entrypoint.py`：「曾經驗過」與「這一份驗過」分開、最後一次成功上傳跨失敗保留；`tests/test_heartbeat_phase1.py`：備份行三格各自現形、三格都成立才不亮、摘要行同一份判定、T2 行與旗標隨「有沒有人輪詢」亮滅、T2 計數與 `sweep` 同一份篩選。 |
+| **5 端到端 smoke** | 2026-10-06 實跑：`backup_private.py upload`（`stockbotv2_backup_20261005T214555Z.zip`、79 MB、15 秒，雲端 4 份）→ `verify-restore`（decision_lab 19 表、engine_c 13 表、files.zip 1,402 成員、Neo4j 3,066 nodes／6,927 rels 一致）→ 心跳試跑：段 1「Drive 已上傳｜還原驗證 這份有」、段 3「T2 輪詢：可輪詢 16｜該查 1｜最後一次 2026-10-05（1 天前）」、摘要行無備份旗標；時間快轉到 10-09 不跑 sweep，T2 行亮、摘要行出「T2 輪詢 4 天沒跑」。⚠ 端到端驗收是 10-07 05:30 **真正的排程觸發**那一輪（L13-1：手動觸發不算）。 |
 
 ### Sandbox impact review 結論（2026-10-04，Phase 7 Step 7.0f：外部雷達）
 
@@ -373,7 +385,7 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 
 | 步 | 結論 |
 |---|---|
-| **1 path／side effect／capability** | **可執行面＝`crons/daily_task.py` 的 `DAILY_STEPS` 這份封閉清單**（程式寫死、無 LLM 選命令；1.2a 時兩個 LLM 步驟由 `llm.executor=none` 記 skipped）。每步 `shell=False`、venv python、cwd＝repo root。**連網主機與憑證與原 Codex daily 相同**：X API、SEC（`www.sec.gov`、`data.sec.gov`）、TWSE／TPEx／MOPS（harvest 的重訊 watcher：`openapi.twse.com.tw`、`www.tpex.org.tw`、`mopsov.twse.com.tw`，公開、無憑證；月營收刻意不在 daily——歷史頁永久可查，維持互動入口）、Yahoo／yfinance（含 `webapp materialize --scorecard` 取價；上限 `MAX_PRICED_SYMBOLS` 由 `engine_b/account_scorecard.py` 在程式裡執行，不只寫在這裡）、Google Sheet（`spreadsheets.readonly`；⑥ 的 `--by-priority` 也讀它）、Discord webhook、X 圖片快取 `pbs.twimg.com`（harvest `cache_media`，寫 `library/private/lead_media/`；R2-a NB-4 補列，舊 rules 的 justification 也漏了它）、本機 Neo4j bolt（`NEO4J_PASSWORD`，只讀：⑬ materialize、⑭ 健康審查、⑮ invariants、⑯ 備份匯出）、harvest 的 feed 主機（`crons/harvest_config.json` 的 `feeds[].url`：`mfn.se`、`www.sivers-semiconductors.com`、`feeds.finance.yahoo.com`）；**不含 Drive**（`backup_private.py run --no-drive`）。Anthropic（`claude -p`）要到 Step 1.3 才加。**寫入範圍**：`library/leads/` 四份 state 與鎖／收工標記、Engine C private runtime（etl、FX、beta technical、XBRL 基期補值四支，不新增寫入者）、`library/private/decision_lab/` 的 `portfolio_risk_snapshots.jsonl` 與 `outcome_aggregate.json`／`.jsonl`（**不含任何 `*.db`**）、`library/private/app/`、`library/private/backups/`、`library/private/heartbeat/`（執行紀錄、心跳、capture 檔、log）。**不寫 git、不寫任何 tracked 檔**（保險檢查只讀 git，且一律帶 `-c core.fsmonitor=false`）。**Discord 發送授權**由 Windows daily 持有（原本授權給 Codex daily automation）；每一條限制由 `notifications/publisher.py` 強制（host、logical channel `private-investing`、content class `full_private`），不靠 prompt。⚠ publisher 擋不住「`.env` 的 webhook 被換成另一個 Discord webhook」——所以保險檢查比對 `.env` 指紋。 |
+| **1 path／side effect／capability** | **可執行面＝`crons/daily_task.py` 的 `DAILY_STEPS` 這份封閉清單**（程式寫死、無 LLM 選命令；1.2a 時兩個 LLM 步驟由 `llm.executor=none` 記 skipped）。每步 `shell=False`、venv python、cwd＝repo root。**連網主機與憑證與原 Codex daily 相同**：X API、SEC（`www.sec.gov`、`data.sec.gov`）、TWSE／TPEx／MOPS（harvest 的重訊 watcher：`openapi.twse.com.tw`、`www.tpex.org.tw`、`mopsov.twse.com.tw`，公開、無憑證；月營收刻意不在 daily——歷史頁永久可查，維持互動入口）、Yahoo／yfinance（含 `webapp materialize --scorecard` 取價；上限 `MAX_PRICED_SYMBOLS` 由 `engine_b/account_scorecard.py` 在程式裡執行，不只寫在這裡）、Google Sheet（`spreadsheets.readonly`；⑥ 的 `--by-priority` 也讀它）、Discord webhook、X 圖片快取 `pbs.twimg.com`（harvest `cache_media`，寫 `library/private/lead_media/`；R2-a NB-4 補列，舊 rules 的 justification 也漏了它）、本機 Neo4j bolt（`NEO4J_PASSWORD`，只讀：⑬ materialize、⑭ 健康審查、⑮ invariants、⑯ 備份匯出）、harvest 的 feed 主機（`crons/harvest_config.json` 的 `feeds[].url`：`mfn.se`、`www.sivers-semiconductors.com`、`feeds.finance.yahoo.com`）；**不含 Drive**（`backup_private.py run --no-drive`；2026-10-06 起含 Drive，見該日的 review）。Anthropic（`claude -p`）要到 Step 1.3 才加。**寫入範圍**：`library/leads/` 四份 state 與鎖／收工標記、Engine C private runtime（etl、FX、beta technical、XBRL 基期補值四支，不新增寫入者）、`library/private/decision_lab/` 的 `portfolio_risk_snapshots.jsonl` 與 `outcome_aggregate.json`／`.jsonl`（**不含任何 `*.db`**）、`library/private/app/`、`library/private/backups/`、`library/private/heartbeat/`（執行紀錄、心跳、capture 檔、log）。**不寫 git、不寫任何 tracked 檔**（保險檢查只讀 git，且一律帶 `-c core.fsmonitor=false`）。**Discord 發送授權**由 Windows daily 持有（原本授權給 Codex daily automation）；每一條限制由 `notifications/publisher.py` 強制（host、logical channel `private-investing`、content class `full_private`），不靠 prompt。⚠ publisher 擋不住「`.env` 的 webhook 被換成另一個 Discord webhook」——所以保險檢查比對 `.env` 指紋。 |
 | **2 canonical skill／prompt／本檔** | 本節與上面兩節；`docs/ARCHITECTURE.md` §4.1；`config/daily_routine.json` 的 `schedule._doc`（唯一時間來源）與新的 `llm` 區塊；`crons/daily_brief_prompt.md` 在 Step 1.3 封存（使用者停用 Codex automation 之前它維持 PAUSED）。 |
 | **3 最窄 rule** | Windows daily **不經 Codex**，`.codex/rules` 對它不適用；本 Step 不增不減任何 rule（1.3 清為 0 條）。新增的無人值守入口只有 `crons/daily_task.py` 一支；它呼叫的全部是既有腳本，新增旗標只有 `query/health_audit.py --json`（同一組檢查的機器可讀版，不新增任何連線或寫入）。 |
 | **4 contract test** | `tests/test_daily_task.py`：`DAILY_STEPS` 與預期 tuple **逐項相等**；清單不得出現 serve、任意欄位寫入者、git、LLM CLI、catalyst_watch、trace-backlog、harvest-health、sweep、drain；各步 timeout 加總 < `execution_time_limit_minutes`；fail-soft、心跳一定跑、exit 0；進迴圈前例外仍組心跳並發送；保險檢查五個 fixture（tracked 檔、HEAD、`.env`、`.git/config`、`.claude/settings.local.json`）各自中止其後全部步驟；`.git/config` 變了不啟動任何 git 子行程；鎖續期（拿掉續期這條測試會紅，已實測）；外人鎖跳過寫入；自我比對三態；register 產的 XML 讀回與 config 相同。 |
@@ -645,9 +657,9 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 ### Private authority 備份（本機＋Google Drive 異地）
 
 ```powershell
-python scripts/backup_private.py run             # 完整備份：SQLite＋Neo4j＋private files＋Engine B state＋Drive
+python scripts/backup_private.py run             # 完整備份：SQLite＋Neo4j＋private files＋Engine B state＋Drive（daily ⑯）
 python scripts/backup_private.py run --no-drive  # 只做本機備份
-python scripts/backup_private.py verify-restore  # restore 到暫存＋checksum／integrity 驗證
+python scripts/backup_private.py verify-restore  # restore 到暫存＋checksum／integrity 驗證（daily ⑯b）
 python scripts/backup_private.py upload          # auth 修好後補上傳最新一份本機備份
 python scripts/backup_private.py status          # 印出 last_backup.json
 python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授權（換 client 或 token 失效時重跑）
@@ -657,16 +669,24 @@ python scripts/backup_private.py auth            # 一次性 OAuth 瀏覽器授�
   authority（`runtime_pointer.json` 指向）、Neo4j 全圖，以及四份 Engine B 本機 state。
   其餘 private 檔案進 `files.zip`；Engine B state 與其指名的 raw provenance 進
   `engine_b_state.zip`。排除 `models/`（可重下載）、`lead_media/`、`gdrive_oauth/`（金鑰不出境）。
-- **本機**留 `library/private/backups/`（rotation 3 份，manifest 全 checksum）；**Drive**
+- **本機**留 `library/private/backups/`（rotation 7 份，manifest 全 checksum）；**Drive**
   留 `StockBotv2-backups` 資料夾（rotation 8 份，超出移垃圾桶 30 天可救）。
+- **無人值守（2026-10-06 起）：daily ⑯ 跑 `run`（含 Drive）、⑯b 跑 `verify-restore`。** 在那之前 ⑯ 一直是
+  `run --no-drive`（Phase 1 Step 1.2a 怕 Testing 模式 token 7 天過期而不自動上傳，待決 #5 之後沒人再決定），
+  結果 09-10 之後沒有任何一份上 Drive、心跳天天印 `Drive skipped` 卻不亮；10-06 實測 09-10 的 refresh token
+  仍可用——consent screen 早已不是 Testing。
 - **Drive 憑證是 OAuth user credentials**：`library/private/gdrive_oauth/client_secret.json`
   （Cloud Console `my-project-stockbot` 的 Desktop client）＋`token.json`（`auth` 產生）。
   ⚠ **service account 走不通，不要再試**——2026-08-29 實測 `files.create` 回 403
   「Service Accounts do not have storage quota」，兩條官方出路都要 Workspace。
-- ⚠ **consent screen 停在 Testing 模式時 refresh token 7 天過期**；過期不會安靜壞掉，
-  brief 首屏計數器會亮 `auth_expired` 🔴，重跑 `auth` 即恢復。發布 Production 後 token 長效。
-- 「最後一次備份：N 天前」常駐在 daily brief 首屏（資料源 `backups/last_backup.json`）；
-  從未備份、狀態檔壞掉、超過 7 天、Drive 未上傳都會 🔴 現形。
+- ⚠ **consent screen 停在 Testing 模式時 refresh token 7 天過期**；過期不會安靜壞掉：⑯ exit 3（本機那份照留）、
+  心跳段 1 備份行亮 `auth_expired`，重跑 `auth` 再 `upload` 補傳。發布 Production 後 token 長效。
+- **心跳段 1 的備份行三格**（2026-10-06）：最後備份 N 天前（超過 7 天亮）｜Drive（不是 `uploaded` 就亮，附最後一次
+  **成功**上傳幾天前——`drive_last_uploaded` 跨 run 保留）｜還原驗證（**這一份**沒驗過就亮，附最後一次驗是幾天前）。
+  從未備份、狀態檔讀不懂也亮。三格的判定只有一份（`crons/heartbeat.py::_backup_problems`），Discord 摘要行用同一份。
+  「之後變動未備份 N 檔」只印不亮（daily 自己的執行紀錄在備份之後才寫，平常就不是 0）。
+  ⚠ 2026-10-06 之前只有「超過 7 天」會亮：會亮 Drive 與還原驗證的舊 renderer（`briefing/render.py`）早已沒有呼叫端，
+  本節原本描述的是它——同一個狀態兩份渲染、規則不同（L16），舊的已刪。
 
 > ⚠ **`decision_review` 的 `go`（全函數：dispatch／reassess／assessment-gap）已於 2026-09-23（Phase 0 Step 0b.4） 隨 decision_lab 研究側退役**：
 > `decision_review`／`sheet_only_holding` 是 legacy 型，`go` 一律被拒，歷史項目只能 drop。原文（含三條內部路徑與 `--intent` 註記）
@@ -1176,16 +1196,12 @@ manifest 住 `loader/manifests/identity-cleanup-20261003.json`（宣告式：每
   fired watch 把 pq2 項的 waiting_on 翻回「等你決定」＋`watch_wake` 稽核，**不自動 go**。
 - T2 力度旋鈕在 `config/event_watch.json`（`sweep_budget_per_run` 調 0＝退回純被動，
   系統照常運作）。互動 session／自主迴圈可直接 sweep。
-- **無人值守 sweep 已於 2026-08-31 完成 sandbox impact review 並放行**：
-  ①命令 surface：`python -m engine_b.event_watch sweep [--mark-checked]`——讀
-  `config/event_watch.json`＋`library/leads/event_watches.json`、寫後者（同目錄
-  tempfile 原子替換）；無網路、無憑證、無 identity/ACL、無 private authority、無 `.git`
-  ——**完全在 workspace-write sandbox 內，不需（也不得新增）outside-sandbox rule**；
-  ②WebSearch 由 daily agent 既有能力執行（同事件監控先例），每輪 ≤`sweep_budget_per_run`
-  次、每 watch 一次；③命中只 register lead 交下輪 triage，不直接喚醒 pq2、不寫 authority；
-  ④contract test：`tests/test_codex_daily_permissions.py::test_event_watch_sweep_is_in_sandbox_not_escalated`
-  鎖「rules 不得出現 event_watch」與「daily prompt 必帶 sweep 步驟與 cap」；
-  ⑤smoke：以 PowerShell exact 命令實跑 sweep＋`--mark-checked` 驗證 `last_checked` 落檔。
+- ⚠ **T2 目前沒有排程，只在互動 session 跑。** 2026-08-31 曾放行由 Codex daily agent 無人值守跑 sweep；2026-09-24
+  （Phase 1 Step 1.2a）換成 Windows daily 時 sweep 刻意不列（`tests/test_daily_task.py` 的禁用字含 `sweep`），
+  那份 review 引用的測試也已不在。之後沒有任何 skill 叫人跑它，心跳也拿掉了「本輪該查」——registry 的
+  `last_checked` 在 08-31 與 10-05 之間沒有任何日期，10-05 補跑時兩條在等的一手早已出現（NVDA 擔保 8-K 是 08-17）。
+  **2026-10-06 起心跳段 3 每天印「T2 輪詢：可輪詢 N｜該查 M（最久 D 天沒查）｜最後一次 <日期>」**，有該查的、卻超過
+  `min_recheck_days` 沒有任何一次輪詢就粗體並進 Discord 摘要行（計數與 `sweep` 同一份篩選：`event_watch.t2_status`）。
 - 給 pq2 項設等待時：能結構化的一律建 watch（散文 `--trigger` 只給人讀）；
   `expires` 必填，過期自動歸檔留稽核。
 

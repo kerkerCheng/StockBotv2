@@ -1,7 +1,8 @@
-"""備份入口（scripts/backup_private.py）與 brief 備份計數器的測試。
+"""備份入口（scripts/backup_private.py）與備份計數器 payload 的測試。
 
 不測 decision_lab/backup.py 本體（test_private_backup_restore.py 已涵蓋），
-只測新增的三塊：status payload 三分語意、renderer 現形規則、files.zip 排除清單。
+只測：status payload 三分語意、還原驗證兩件事分開、Drive 最後成功上傳跨 run 保留、files.zip 排除清單。
+渲染（現形規則）只有心跳段 1 一份，測試在 `tests/test_heartbeat_phase1.py`（舊 `briefing/render.py` 2026-10-06 刪除）。
 """
 from __future__ import annotations
 
@@ -18,7 +19,6 @@ import pytest
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from briefing.render import render_backup_status  # noqa: E402
 from briefing.sources import load_backup_status as _backup_status_payload  # noqa: E402
 from engine_b.state_files import STATE_PATHS, StateFileError  # noqa: E402
 
@@ -67,7 +67,9 @@ def test_payload_ok_reports_age_drive_and_verification(tmp_path):
             "backup_id": "20260820T000000Z",
             "created_at": "2026-08-20T00:00:00+00:00",
             "drive": {"status": "uploaded"},
-            "restore_verification": {"verified_at": "2026-08-20T01:00:00+00:00"},
+            "drive_last_uploaded": {"name": "z.zip", "uploaded_at": "2026-08-20T00:30:00+00:00"},
+            "restore_verification": {"backup_id": "20260820T000000Z",
+                                     "verified_at": "2026-08-20T01:00:00+00:00"},
         },
     )
     payload = _backup_status_payload(NOW, private_root=tmp_path)
@@ -76,10 +78,43 @@ def test_payload_ok_reports_age_drive_and_verification(tmp_path):
         "age_days": 10,
         "backup_id": "20260820T000000Z",
         "drive_status": "uploaded",
-        "restore_verified": True,
+        "drive_last_uploaded_days": 10,
+        "restore_verified_current": True,
+        "restore_verified_days": 10,
         "unbacked_files": 0,
         "unbacked_sample": [],
     }
+
+
+def test_verification_of_an_older_backup_is_not_this_backup(tmp_path):
+    """⚠ 2026-10-06 實測：唯一一次 restore 驗證是 09-19 那份（早已輪替掉），心跳卻每天印「還原驗證 有」。
+    「曾經驗過」與「這一份驗過」是兩件事（L12）。"""
+    _write_status(
+        tmp_path,
+        {
+            "backup_id": "20260829T000000Z",
+            "created_at": "2026-08-29T00:00:00+00:00",
+            "drive": {"status": "skipped"},
+            "restore_verification": {"backup_id": "20260819T000000Z",
+                                     "verified_at": "2026-08-19T01:00:00+00:00"},
+        },
+    )
+    payload = _backup_status_payload(NOW, private_root=tmp_path)
+    assert payload["restore_verified_current"] is False
+    assert payload["restore_verified_days"] == 11
+    # 從沒成功上傳過：None（「本機沒有紀錄」），不是 0 天
+    assert payload["drive_status"] == "skipped" and payload["drive_last_uploaded_days"] is None
+
+
+def test_last_successful_upload_survives_a_failed_run():
+    entrypoint = _load_entrypoint()
+    ok = {"status": "uploaded", "name": "a.zip", "file_id": "f1", "uploaded_at": "2026-10-06T00:00:00+00:00",
+          "bytes": 1, "rotated_out": []}
+    first = entrypoint._last_uploaded(ok, {})
+    assert first == {"name": "a.zip", "file_id": "f1", "uploaded_at": "2026-10-06T00:00:00+00:00"}
+    # 下一次 auth 過期：drive 記這次的失敗，最後成功那份照留（否則「異地那份多舊」答不出來）
+    assert entrypoint._last_uploaded({"status": "auth_expired"}, {"drive_last_uploaded": first}) == first
+    assert entrypoint._last_uploaded({"status": "skipped"}, {}) is None
 
 
 def test_a_file_created_after_the_last_backup_is_counted_as_not_covered(tmp_path):
@@ -111,50 +146,6 @@ def test_a_file_created_after_the_last_backup_is_counted_as_not_covered(tmp_path
     payload = _backup_status_payload(NOW, private_root=tmp_path)
     assert payload["unbacked_files"] == 1
     assert payload["unbacked_sample"] == ["alpha/valuation/COHR.jsonl"]
-    line = next(line for line in _render(payload).splitlines() if "最後一次備份" in line)
-    assert "🔴" in line and "1 個 private authority 檔不在這份備份裡" in line
-
-
-def _render(backup_status) -> str:
-    # 2026-09-23（Phase 0 Step 0b.4）：today brief 的 Markdown 組裝退役，備份計數器的渲染器獨立留下。
-    return "\n".join(render_backup_status(backup_status))
-
-
-def test_renderer_never_and_invalid_are_red_and_visible():
-    assert "🔴 最後一次備份：從未備份" in _render({"status": "never"})
-    assert "🔴 最後一次備份：狀態檔無法解讀" in _render({"status": "invalid"})
-    # surface 不提供（None）→ 整行略過，不與「從未備份」混用
-    assert "備份" not in _render(None)
-
-
-def test_renderer_fresh_verified_uploaded_backup_is_not_red():
-    line = next(
-        line
-        for line in _render(
-            {
-                "status": "ok",
-                "age_days": 1,
-                "drive_status": "uploaded",
-                "restore_verified": True,
-            }
-        ).splitlines()
-        if "最後一次備份" in line
-    )
-    assert "🔴" not in line
-    assert "Drive ✓" in line and "restore 已驗證" in line
-
-
-def test_renderer_stale_or_undelivered_backup_is_red():
-    stale = _render(
-        {"status": "ok", "age_days": 8, "drive_status": "uploaded", "restore_verified": True}
-    )
-    assert "🔴 最後一次備份：8 天前" in stale
-    undelivered = _render(
-        {"status": "ok", "age_days": 0, "drive_status": "auth_expired", "restore_verified": True}
-    )
-    # markdown_text 會轉義底線，斷言轉義後的實際輸出
-    assert "Drive 🔴 auth\\_expired" in undelivered
-    assert "🔴 最後一次備份：0 天前" in undelivered
 
 
 def test_files_zip_members_exclude_recoverable_and_live(tmp_path):

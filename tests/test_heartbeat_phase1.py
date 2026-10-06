@@ -91,20 +91,85 @@ def test_collect_snapshot_never_raises_and_unread_is_none(tmp_path: Path) -> Non
 # 段 1：備份、健康審查、invariants
 # ---------------------------------------------------------------------------
 
+_HEALTHY_BACKUP = {"status": "ok", "age_days": 0, "backup_id": "b1", "drive_status": "uploaded",
+                   "drive_last_uploaded_days": 0, "restore_verified_current": True, "restore_verified_days": 0,
+                   "unbacked_files": 3}
+
+
 @pytest.mark.parametrize("status,expected", [
     (None, "method_not_applicable"),
     ({"status": "never"}, "從來沒有備份過"),
     ({"status": "invalid"}, "讀不懂"),
-    ({"status": "ok", "age_days": 2, "backup_id": "b1", "drive_status": "skipped", "restore_verified": True,
-      "unbacked_files": 3}, "最後 2 天前"),
-    ({"status": "ok", "age_days": 9, "backup_id": "b1", "drive_status": "ok", "restore_verified": False,
-      "unbacked_files": 0}, "超過 7 天"),
+    (dict(_HEALTHY_BACKUP, age_days=2), "最後 2 天前"),
+    (dict(_HEALTHY_BACKUP, age_days=9), "超過 7 天"),
+    # 2026-10-06：Drive 沒上傳、這份沒驗還原各自現形（原本只有「超過 7 天」會亮）
+    (dict(_HEALTHY_BACKUP, drive_status="skipped", drive_last_uploaded_days=None),
+     "Drive skipped（最後成功上傳：本機沒有紀錄）"),
+    (dict(_HEALTHY_BACKUP, drive_status="auth_expired", drive_last_uploaded_days=3), "最後成功上傳：3 天前"),
+    (dict(_HEALTHY_BACKUP, restore_verified_current=False, restore_verified_days=17),
+     "還原驗證 這份沒有（最後一次 17 天前）"),
+    (dict(_HEALTHY_BACKUP, restore_verified_current=False, restore_verified_days=None), "這份沒有（從來沒有）"),
 ])
 def test_backup_line_says_which_kind_of_state(monkeypatch, status, expected) -> None:
     import briefing.sources as sources
 
     monkeypatch.setattr(sources, "load_backup_status", lambda now=None: status)
     assert expected in hb._backup_line(now=NOW)
+
+
+def test_backup_line_is_quiet_only_when_all_three_hold(monkeypatch) -> None:
+    """正常的一天（daily ⑯ 含 Drive、⑯b 驗還原）三格都不亮；任一格不成立就粗體＋⚠，問題逐項寫出。"""
+    import briefing.sources as sources
+
+    monkeypatch.setattr(sources, "load_backup_status", lambda now=None: _HEALTHY_BACKUP)
+    healthy = hb._backup_line(now=NOW)
+    assert not healthy.startswith("⚠") and "Drive 已上傳" in healthy and "還原驗證 這份有" in healthy
+    broken = dict(_HEALTHY_BACKUP, drive_status="skipped", restore_verified_current=False)
+    monkeypatch.setattr(sources, "load_backup_status", lambda now=None: broken)
+    line = hb._backup_line(now=NOW)
+    assert line.startswith("⚠ **") and line.endswith("——Drive 沒有這份、這份沒驗還原**")
+
+
+def _t2_registry(path: Path, rows: list[dict]) -> None:
+    path.write_text(json.dumps({"schema_version": 1, "watches": rows}), encoding="utf-8")
+
+
+def _pollable(watch_id: str, *, created: str, checked: str | None, status: str = "active") -> dict:
+    return {"watch_id": watch_id, "status": status, "kind": "related_entity_signal", "created_at": created,
+            "poll": {"eligible": True, "last_checked": checked}}
+
+
+def test_t2_line_and_flag_follow_whether_anyone_polled(monkeypatch) -> None:
+    """2026-10-06 實測：sweep 移出 daily 後 35 天沒人跑，也沒有任何地方印。該查的存在、且超過
+    min_recheck_days 沒有任何一次輪詢 → 粗體＋摘要行旗標；跑過之後就滅。"""
+    from engine_b import event_watch as ew
+
+    rows = [_pollable("ew_a", created="2026-08-31", checked="2026-09-01"),
+            _pollable("ew_b", created="2026-09-20", checked=None),
+            _pollable("ew_c", created="2026-08-31", checked="2026-09-01", status="consumed")]
+    _t2_registry(ew.WATCHES_PATH, rows)
+    line = hb._t2_line(now=NOW)
+    assert line.startswith("⚠ **T2 輪詢：可輪詢 2｜該查 2（最久 24 天沒查）")
+    assert f"最後一次 2026-09-01（{(TODAY - date(2026, 9, 1)).days} 天前）" in line
+    assert "沒有排程，只在互動 session 跑" in line
+
+    rows[0]["poll"]["last_checked"] = TODAY.isoformat()
+    _t2_registry(ew.WATCHES_PATH, rows)
+    line = hb._t2_line(now=NOW)
+    assert not line.startswith("⚠") and "該查 1（" in line and "（0 天前）" in line
+
+
+def test_t2_status_shares_the_sweep_filter() -> None:
+    """心跳的「該查」與 `sweep` 給出的清單是同一份篩選（L16）——sweep 只是再截每輪上限。"""
+    from engine_b import event_watch as ew
+
+    data = {"watches": [_pollable(f"ew_{i}", created="2026-09-01", checked=None) for i in range(5)]
+            + [_pollable("ew_fresh", created="2026-09-01", checked="2026-09-24")]}
+    status = ew.t2_status(data, today=date(2026, 9, 25))
+    due = ew.sweep_due(data, today=date(2026, 9, 25))
+    assert status["due"] == 5 and status["eligible"] == 6
+    assert len(due) == min(status["due"], status["budget"])
+    assert {w["watch_id"] for w in due} <= {f"ew_{i}" for i in range(5)}
 
 
 def _capture(tmp_path: Path, name: str, payload) -> None:
@@ -279,7 +344,11 @@ def test_nav_exposure_summary_is_pure_and_keeps_failures() -> None:
 def test_summary_line_flags(tmp_path: Path, monkeypatch) -> None:
     import briefing.sources as sources
 
-    monkeypatch.setattr(sources, "load_backup_status", lambda now=None: {"status": "ok", "age_days": 9})
+    monkeypatch.setattr(sources, "load_backup_status",
+                        lambda now=None: dict(_HEALTHY_BACKUP, age_days=9, drive_status="skipped"))
+    from engine_b import event_watch as ew
+
+    _t2_registry(ew.WATCHES_PATH, [_pollable("ew_a", created="2026-08-31", checked="2026-09-01")])
     leads_path = tmp_path / "leads.json"
     leads_path.write_text(json.dumps({"harvest_log": []}), encoding="utf-8")
     record = tmp_path / "run.json"
@@ -292,7 +361,8 @@ def test_summary_line_flags(tmp_path: Path, monkeypatch) -> None:
                            theme_line="**距上次掃題材 9 天**（2026-09-16；門檻 7 天）")
     assert line.startswith(f"Daily {TODAY.isoformat()}｜球在你 4")
     for flag in ("harvest 沒跑", "daily 失敗 1 步", "LLM 關閉（executor=none）", "排程不一致",
-                 "反證觸及待處置 1", "健康紅燈 2", "距上次掃題材 9 天", "備份過舊"):
+                 "反證觸及待處置 1", "健康紅燈 2", "距上次掃題材 9 天", "備份：超過 7 天、Drive 沒有這份",
+                 f"T2 輪詢 {(TODAY - date(2026, 9, 1)).days} 天沒跑"):
         assert f"｜⚠ {flag}" in line, flag
 
 

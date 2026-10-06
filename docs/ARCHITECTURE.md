@@ -179,7 +179,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > **2026-09-24（Phase 1 Step 1.2a；A1、C1、C4、C6）：無人值守收斂成一個 Windows daily。**
 > Windows 工作 `StockBotv2-Daily`（時間只住 `config/daily_routine.json` 的 `schedule`，由 `scripts/register_daily_task.py`
 > 導出、`crons/daily_task.py` 每次開跑比對）跑一份**程式寫死的封閉步驟清單** `DAILY_STEPS`：抓資料、機械段、materialize、
-> 健康審查、invariants、本機備份、心跳、發送。它取代 Codex daily automation、`StockBotv2-Heartbeat` 與 `StockBotv2-FxSync`
+> 健康審查、invariants、備份（2026-10-06 起含 Drive 異地與還原驗證 ⑯b）、心跳、發送。它取代 Codex daily automation、`StockBotv2-Heartbeat` 與 `StockBotv2-FxSync`
 > （舊兩個工作與舊入口 `crons/heartbeat_task.py` 於 2026-09-25 Step 1.2b 刪除；上面 09-17 那段的查證命令已查不到東西）。
 > **daily 的目標：心跳不靠 LLM；其他步驟可以用 LLM，但 LLM 只產出提議，由程式驗證後寫入**（C4）。分類（triage）與語意預篩
 > 是 daily 裡的兩步，一律 `claude -p` 零工具、只回 JSON、每次檢查 init 能力欄位（Step 1.3、1.4 接上；在那之前 `llm.executor=none`）。
@@ -204,6 +204,9 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > （每天印；≥ `theme_scan.nudge_after_days` 時粗體並移到訊息第一行）；段 4 加 NAV（bucket 分布、最大單筆；producer 是
 > `materialize --positions` 的 `nav_exposure`）；段 5 **每天印** tier 分布＋較昨，完整表在 APP（`--weekly` 拿掉）。
 > ⑱ 另寫 Discord 摘要行 `heartbeat_<日期>.summary.txt`（`Daily <日期>｜球在你 N`＋紅旗），⑲ 帶進 `publish --summary`。
+> **2026-10-06**：段 1 備份行三格各自會亮（超過 7 天／Drive 不是 `uploaded`／**這一份**沒驗還原；判定只有 `_backup_problems`
+> 一份，摘要行共用），舊 renderer `briefing/render.py` 刪除；段 3 加「T2 輪詢」行（可輪詢／該查／最後一次；計數與 `sweep`
+> 同一份篩選 `event_watch.t2_status`；超過 `min_recheck_days` 沒人輪詢就亮並進摘要行），快照鍵加 `t2.due`。
 
 心跳固定五段：
 1. **資料新鮮**：每個 harvest 來源 ok／fail、行情最新交易日、APP 今天是否 materialize、**台股月營收最新月份與落後幾個月**（2026-09-17 Phase 6：月營收**刻意不進無人值守**——歷史頁按年月永久可查、漏抓補得回來（L10），與「只有前一營業日、漏一天永久漏」的重訊性質相反。所以它不需要排程，需要的是**該補的時候自己說話**；`lag` 相對**法定公告期限**（次月 10 日）算，不是相對今天，否則每個月前 10 天都會誤報落後）。

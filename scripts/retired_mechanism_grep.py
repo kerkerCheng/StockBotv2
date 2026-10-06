@@ -224,7 +224,6 @@ KEEP: dict[tuple[str,str],str] = {
     ('briefing/alpha_view/builder.py','G'): 'legacy_key: A_COVERAGE 等 authority 字串 decision_lab://…（read model 的 authority 標籤，指向凍結歷史）',
     ('briefing/alpha_view/contracts.py','G'): 'legacy_key: authority 字串 decision_lab://coverage_assessments 的契約說明；attention 由已退役 today 計算的註記',
     ('briefing/alpha_view/sources.py','G'): 'kept_file: 唯讀 mode=ro 讀 decision_lab.coverage_queries.company_decision_facts（research 面板的 catalyst／disproof／expiry）',
-    ('briefing/render.py','G'): 'retirement_note: render_today_markdown 退役註記',
     ('briefing/sources.py','G'): 'kept_file: outcome_aggregate.json 住 library/private/decision_lab/（檔案路徑，量測層 Phase 5 前不動）',
     ('config/authority_tokens.json','G'): 'retirement_note: _history 與 _frozen_mapping_note 記 AXIS_REFERENCE_AUTHORITIES 已隨五軸退役',
     ('config/decision_blockers.json','G'): 'legacy_key: blocker 碼字彙只服務讀凍結 payload；next_step 已標 reassess 退役',

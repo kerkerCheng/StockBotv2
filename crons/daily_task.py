@@ -212,8 +212,13 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("15_invariants", "六條 invariant",
               ("-m", "audit", "invariants", "--json"),
               5, False, False, kind="capture", capture="invariants_{date}.json"),
-    DailyStep("16_backup", "本機備份（不含 Drive）",
-              ("scripts/backup_private.py", "run", "--no-drive"), 15, True, False),
+    # ⑯ 含 Drive 異地（2026-10-06 使用者指示；原本是 `--no-drive`，09-10 之後沒有任何一份上 Drive）：
+    # 上傳失敗時本機備份照留、exit 3，這一步記失敗、心跳段 1 與摘要行現形。⑯b 驗這一份能不能還原——
+    # 沒驗過的備份不算備份；不設 requires：Drive 失敗不該連累本機那份的驗證。
+    DailyStep("16_backup", "本機備份＋Drive 異地（上傳失敗 exit 3，本機照留）",
+              ("scripts/backup_private.py", "run"), 15, True, True),
+    DailyStep("16b_backup_verify", "備份還原驗證（restore 到暫存、checksum／integrity／逐表筆數）",
+              ("scripts/backup_private.py", "verify-restore"), 5, True, False),
     DailyStep("17_finalize", "收尾（驗 state、釋放鎖、收工標記）",
               ("scripts/finalize_daily_state.py",), 2, True, False, essential=True),
     # ⑱ 同時寫 Discord 摘要行與今天的快照（Phase 1 Step 1.8）：兩者都在 library/private/heartbeat/，derived、不是 authority。

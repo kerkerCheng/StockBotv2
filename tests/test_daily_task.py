@@ -82,8 +82,10 @@ EXPECTED_STEPS = (
      "health_{date}.json", None, None),
     ("15_invariants", ("-m", "audit", "invariants", "--json"), 5, False, False, "capture", False,
      "invariants_{date}.json", None, None),
-    ("16_backup", ("scripts/backup_private.py", "run", "--no-drive"), 15, True, False, "command", False, None,
-     None, None),
+    # 2026-10-06：⑯ 含 Drive（連網：oauth2／www.googleapis.com）、⑯b 還原驗證（純本機）
+    ("16_backup", ("scripts/backup_private.py", "run"), 15, True, True, "command", False, None, None, None),
+    ("16b_backup_verify", ("scripts/backup_private.py", "verify-restore"), 5, True, False, "command", False,
+     None, None, None),
     ("17_finalize", ("scripts/finalize_daily_state.py",), 2, True, False, "command", True, None, None, None),
     ("18_heartbeat", ("-m", "crons.heartbeat", "--out", "{brief}", "--summary-out", "{summary_file}",
                       "--write-snapshot"), 3, False, False, "heartbeat", True, None,

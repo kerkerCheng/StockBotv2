@@ -50,7 +50,8 @@ def load_outcome_aggregate(private_root: Path | None = None) -> dict[str, Any] |
 def load_backup_status(
     now: datetime | None = None, private_root: Path | None = None
 ) -> dict[str, Any] | None:
-    """讀 `scripts/backup_private.py` 寫的 status 檔，轉成首屏計數器 payload。
+    """讀 `scripts/backup_private.py` 寫的 status 檔，轉成計數器 payload。唯一消費端是心跳
+    （`crons/heartbeat.py` 的段 1 備份行與 Discord 摘要行，共用 `_backup_problems` 一份判定）。
 
     回傳值三分（L12——別把不同語意壓進同一訊號）：
     - ``None``：這個 surface 沒有 private root，renderer 整行略過；
@@ -76,18 +77,30 @@ def load_backup_status(
         created = created.replace(tzinfo=timezone.utc)
     current = now or datetime.now(timezone.utc)
     drive = raw.get("drive") if isinstance(raw.get("drive"), dict) else {}
+    last_uploaded = (
+        raw.get("drive_last_uploaded")
+        if isinstance(raw.get("drive_last_uploaded"), dict)
+        else {}
+    )
     verification = (
         raw.get("restore_verification")
         if isinstance(raw.get("restore_verification"), dict)
         else {}
     )
+    backup_id = str(raw.get("backup_id") or "")
     newer, sample = _files_newer_than(private_root, created)
     return {
         "status": "ok",
         "age_days": max(0, (current - created).days),
-        "backup_id": str(raw.get("backup_id") or ""),
+        "backup_id": backup_id,
         "drive_status": str((drive or {}).get("status") or "unknown"),
-        "restore_verified": bool((verification or {}).get("verified_at")),
+        # 這次沒上傳時，異地那份有多舊（跨 run 保留的最後一次成功；None＝本機沒有紀錄）。
+        "drive_last_uploaded_days": _days_since(last_uploaded.get("uploaded_at"), current),
+        # ⚠ 還原驗證是兩件事（L12）：**這一份**驗過沒有、最後一次驗是幾天前。原本只有一個
+        # 「曾經驗過」的 bool——2026-10-06 實測它指的是 09-19 那份早已輪替掉的備份，卻每天印「有」。
+        "restore_verified_current": bool(verification.get("verified_at"))
+        and str(verification.get("backup_id") or "") == backup_id,
+        "restore_verified_days": _days_since(verification.get("verified_at"), current),
         # ⚠ 2026-09-07 實測補上：「N 天前備份」答不出「**這幾個檔有沒有被收進去**」。
         # 當天的實況是 alpha 的三本假設 ledger（fair value 223.60 的唯一來源）建立於
         # 09-05／09-06，而最後一次備份是 09-04——備份年齡只有 3 天，覆蓋卻是 0。
@@ -95,6 +108,19 @@ def load_backup_status(
         "unbacked_files": newer,
         "unbacked_sample": sample,
     }
+
+
+def _days_since(raw: Any, now: datetime) -> int | None:
+    """ISO 時戳距 `now` 幾天；沒有或讀不懂回 None（「沒有紀錄」不是 0 天）。"""
+    if not raw:
+        return None
+    try:
+        moment = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return max(0, (now - moment).days)
 
 
 #: 掃描時略過的頂層目錄——與 `scripts/backup_private.py` 的 `EXCLUDE_TOP_DIRS` 對齊

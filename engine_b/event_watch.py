@@ -826,6 +826,13 @@ def sweep_due(data: Mapping[str, Any], *, today: date | None = None) -> list[dic
     if not cfg["enabled"] or cfg["sweep_budget_per_run"] <= 0:
         return []
     today = today or _today()
+    return [dict(w) for _, w in _t2_candidates(data, cfg, today)[: cfg["sweep_budget_per_run"]]]
+
+
+def _t2_candidates(data: Mapping[str, Any], cfg: Mapping[str, Any],
+                   today: date) -> list[tuple[int, Mapping[str, Any]]]:
+    """該主動查的 watch：active＋`poll.eligible`、且距上次查 ≥ `min_recheck_days`（沒查過的一律算）。
+    回 (等了幾天, watch)，等最久的在前。`sweep_due` 與 `t2_status` 共用這一份（L16）。"""
     candidates = []
     for watch in data["watches"]:
         if watch.get("status") != "active" or not (watch.get("poll") or {}).get("eligible"):
@@ -845,7 +852,46 @@ def sweep_due(data: Mapping[str, Any], *, today: date | None = None) -> list[dic
             pass
         candidates.append((waited, watch))
     candidates.sort(key=lambda pair: -pair[0])
-    return [dict(w) for _, w in candidates[: cfg["sweep_budget_per_run"]]]
+    return candidates
+
+
+def t2_status(data: Mapping[str, Any], *, today: date | None = None) -> dict[str, Any]:
+    """T2 主動輪詢的常駐計數（心跳段 3）：可輪詢幾條、該查幾條、最久幾天沒查、最後一次是哪天。
+
+    ⚠ 2026-10-06 實測：1.2a 把 sweep 移出 daily 時，心跳一併拿掉了「本輪該查」——之後 registry 的
+    `last_checked` 只有 08-31 與 10-05 兩個日期，10-05 補跑時兩條在等的一手早已出現（NVDA 擔保 8-K 是 08-17）。
+    「最後一次」＝任何 watch 的 `poll.last_checked` 最大值（只有 `mark_checked` 會寫它）。
+    `stale`＝有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢——輪詢沒在跑，不是配額不夠。
+    """
+    cfg = load_config()
+    today = today or _today()
+    due = _t2_candidates(data, cfg, today)
+
+    def _day(raw: Any) -> date | None:
+        try:
+            return date.fromisoformat(str(raw)[:10])
+        except (TypeError, ValueError):
+            return None
+
+    waits = [today - d for _, w in due
+             if (d := _day((w.get("poll") or {}).get("last_checked") or w.get("created_at"))) is not None]
+    checked = [d for w in data["watches"]
+               if (d := _day((w.get("poll") or {}).get("last_checked"))) is not None]
+    last_run = max(checked, default=None)
+    last_run_days = None if last_run is None else (today - last_run).days
+    enabled = bool(cfg["enabled"]) and cfg["sweep_budget_per_run"] > 0
+    return {
+        "enabled": enabled,
+        "budget": cfg["sweep_budget_per_run"],
+        "min_recheck_days": cfg["min_recheck_days"],
+        "eligible": sum(1 for w in data["watches"]
+                        if w.get("status") == "active" and (w.get("poll") or {}).get("eligible")),
+        "due": len(due),
+        "oldest_due_days": max(waits).days if waits else None,
+        "last_run": None if last_run is None else last_run.isoformat(),
+        "last_run_days": last_run_days,
+        "stale": enabled and bool(due) and (last_run_days is None or last_run_days > cfg["min_recheck_days"]),
+    }
 
 
 def mark_checked(data: dict[str, Any], watch_id: str, *, today: date | None = None) -> None:

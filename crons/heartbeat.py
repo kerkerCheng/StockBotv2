@@ -299,9 +299,32 @@ def build_freshness(*, now: datetime, state_dir: Path | None, leads_path: Path,
 BACKUP_STALE_DAYS = 7
 
 
+def _backup_problems(status: Mapping[str, Any] | None) -> list[str]:
+    """備份哪裡不對——段 1 那一行與 Discord 摘要行共用這一份判定（L16）。`None`＝這台沒有 private root，不算問題。
+
+    ⚠ 2026-10-06 實測：原本只有「超過 7 天」會亮，於是 Drive `skipped` 連續 26 天、「還原驗證 有」指著一份
+    早已輪替掉的備份，每天照印不亮（L14-4 恆亮）。會亮紅的舊 renderer（`briefing/render.py`）當時已沒有呼叫端，
+    OPERATIONS 寫的「Drive 未上傳 🔴」描述的是它——同一個狀態兩份渲染、規則不同（L16），已刪掉舊的那份。
+    """
+    if status is None:
+        return []
+    if status.get("status") == "never":
+        return ["從來沒有備份過"]
+    if status.get("status") != "ok":
+        return ["狀態檔讀不懂"]
+    problems = []
+    if int(status.get("age_days") or 0) > BACKUP_STALE_DAYS:
+        problems.append(f"超過 {BACKUP_STALE_DAYS} 天")
+    if status.get("drive_status") != "uploaded":
+        problems.append("Drive 沒有這份")
+    if not status.get("restore_verified_current"):
+        problems.append("這份沒驗還原")
+    return problems
+
+
 def _backup_line(*, now: datetime) -> str:
-    """`scripts/backup_private.py` 的狀態（Phase 1 Step 1.8）。loader 是 `briefing.sources.load_backup_status`——
-    APP 首屏用同一支（L16：不另寫一份）。"""
+    """`scripts/backup_private.py` 的狀態（Phase 1 Step 1.8）。loader 是 `briefing.sources.load_backup_status`；
+    渲染只有這一份。daily ⑯ 備份（含 Drive）、⑯b 驗還原，所以正常的一天三格都不亮。"""
     from briefing.sources import load_backup_status
 
     status = load_backup_status(now=now)
@@ -312,10 +335,21 @@ def _backup_line(*, now: datetime) -> str:
     if status.get("status") != "ok":
         return "⚠ **備份：狀態檔讀不懂**（upstream_unavailable）——視同沒有備份"
     age = int(status.get("age_days") or 0)
-    line = (f"備份：最後 {age} 天前（{status.get('backup_id') or '?'}）｜Drive {status.get('drive_status')}"
-            f"｜還原驗證 {'有' if status.get('restore_verified') else '沒有'}"
+    drive = str(status.get("drive_status") or "unknown")
+    if drive == "uploaded":
+        drive_text = "Drive 已上傳"
+    else:
+        last = status.get("drive_last_uploaded_days")
+        drive_text = f"Drive {drive}（最後成功上傳：{'本機沒有紀錄' if last is None else f'{last} 天前'}）"
+    if status.get("restore_verified_current"):
+        verify_text = "還原驗證 這份有"
+    else:
+        days = status.get("restore_verified_days")
+        verify_text = f"還原驗證 這份沒有（{'從來沒有' if days is None else f'最後一次 {days} 天前'}）"
+    line = (f"備份：最後 {age} 天前（{status.get('backup_id') or '?'}）｜{drive_text}｜{verify_text}"
             f"｜之後變動未備份 {status.get('unbacked_files', '?')} 檔")
-    return (f"⚠ **{line}——超過 {BACKUP_STALE_DAYS} 天**" if age > BACKUP_STALE_DAYS else line)
+    problems = _backup_problems(status)
+    return f"⚠ **{line}——{'、'.join(problems)}**" if problems else line
 
 
 def _capture(name: str, *, now: datetime, capture_dir: Path | None) -> tuple[Any, str | None]:
@@ -1088,6 +1122,11 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         section.lines.append(_radar_line(now=moment, record_path=run_record_path))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"外部雷達：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
+    # T2 主動輪詢（2026-10-06 使用者指示）：1.2a 把 sweep 移出 daily 時這一格一起不見，之後 35 天沒人跑也沒有任何地方印。
+    try:
+        section.lines.append(_t2_line(now=moment))
+    except Exception as exc:  # noqa: BLE001
+        section.lines.append(f"T2 輪詢：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
 
     # ⚠ `None` 是「本次沒讀到那個 authority」，不是 0——把它加成 0 會讓「沒讀到」與「真的沒有」
     # 同形（INV-3）。所以先分開，再讓沒讀到的段自己現形。
@@ -1328,6 +1367,23 @@ def _radar_line(*, now: datetime, record_path: Path | None) -> str:
                  if k in rows and rows[k].get("status") != "ok"), None) or apply or {}
     return (f"外部雷達：沒跑（{step.get('key') or '?'} {step.get('status')}："
             f"{step.get('reason') or step.get('error') or '—'}）")
+
+
+def _t2_line(*, now: datetime) -> str:
+    """段 3「T2 輪詢：可輪詢 N｜該查 M（最久 D 天沒查）｜最後一次 <日期>（K 天前）｜每輪上限 B」。
+
+    判定由 `engine_b.event_watch.t2_status` 給（與 `sweep` 同一份篩選，L16）。`stale`（有該查的、卻超過
+    `min_recheck_days` 沒有任何一次輪詢）時粗體並進 Discord 摘要行。sweep 目前沒有排程，只在互動 session 跑。"""
+    from engine_b import event_watch as ew
+
+    s = ew.t2_status(ew.load_watches(), today=now.astimezone().date())
+    if not s["enabled"]:
+        return "T2 輪詢：關閉（`config/event_watch.json` 的 enabled／sweep_budget_per_run）"
+    last = "從來沒有" if s["last_run"] is None else f"{s['last_run']}（{s['last_run_days']} 天前）"
+    oldest = f"（最久 {s['oldest_due_days']} 天沒查）" if s["due"] and s["oldest_due_days"] is not None else ""
+    line = (f"T2 輪詢：可輪詢 {s['eligible']}｜該查 {s['due']}{oldest}｜最後一次 {last}｜每輪上限 {s['budget']}"
+            "｜沒有排程，只在互動 session 跑（`python -m engine_b.event_watch sweep`）")
+    return f"⚠ **{line}**" if s["stale"] else line
 
 
 def _classification_line(*, leads: Mapping[str, Any], now: datetime, record_path: Path | None) -> str:
@@ -1756,6 +1812,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "watch.consumed": "watch 已收",
     "semantic.active": "語意 watch 在盯", "semantic.pending_check": "語意 watch 未檢",
     "semantic.flagged": "語意 watch 標旗",
+    # T2 主動輪詢該查幾條（2026-10-06）：sweep 跑過那天降、之後每天回升——較昨 diff 看得到它有沒有在跑。
+    "t2.due": "T2 該查",
     "pq2.open": "pq2 未結案", "pq2.actionable": "pq2 球在你",
     # 等你提供的文件（2026-10-06 使用者指示；Phase 7 failure log #29）：拿不到的來源要開口、不 park，
     # 開了口的住 pq2 `source_trace_review`——第一次有人開口的那天，較昨 diff 看得到。
@@ -1814,6 +1872,12 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         out.update({"semantic.active": c["semantic_active"], "semantic.pending_check": c["semantic_pending_check"],
                     "semantic.flagged": c["semantic_flagged"]})
         return out
+
+    def t2() -> dict[str, Any]:
+        # 獨立一組：T2 設定讀壞了不該把整組 watch 鍵一起拖成「未讀到」
+        from engine_b import event_watch as ew
+
+        return {"t2.due": ew.t2_status(ew.load_watches(), today=now.astimezone().date())["due"]}
 
     def pq2() -> dict[str, Any]:
         from engine_b import todo as todo_mod
@@ -1937,8 +2001,8 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         return {"predictions.held": counts.get("held"), "predictions.wrong": table.get("wrong_total"),
                 "predictions.expired_unread": counts.get("expired_unread")}
 
-    for fn in (watches, pq2, lead_states, readings, walk, thesis, disproof_counts, confirm_counts, prescreen, radar, captures,
-               tiers, candidates, positions, predictions):
+    for fn in (watches, t2, pq2, lead_states, readings, walk, thesis, disproof_counts, confirm_counts, prescreen, radar,
+               captures, tiers, candidates, positions, predictions):
         guard(fn)
     return values
 
@@ -2149,11 +2213,20 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
     try:
         from briefing.sources import load_backup_status
 
-        backup = load_backup_status(now=now)
-        if backup is not None and (backup.get("status") != "ok" or int(backup.get("age_days") or 0) > BACKUP_STALE_DAYS):
-            flags.append("備份過舊" if backup.get("status") == "ok" else "沒有可用的備份")
+        problems = _backup_problems(load_backup_status(now=now))
+        if problems:
+            flags.append("備份：" + "、".join(problems))
     except Exception:  # noqa: BLE001
         flags.append("備份狀態讀不到")
+    try:
+        from engine_b import event_watch as ew
+
+        t2 = ew.t2_status(ew.load_watches(), today=now.astimezone().date())
+        if t2["stale"]:
+            flags.append("T2 輪詢從沒跑過" if t2["last_run_days"] is None
+                         else f"T2 輪詢 {t2['last_run_days']} 天沒跑")
+    except Exception:  # noqa: BLE001
+        flags.append("T2 輪詢狀態讀不到")
     return head + "".join(f"｜⚠ {flag}" for flag in flags)
 
 

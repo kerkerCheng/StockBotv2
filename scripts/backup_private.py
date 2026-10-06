@@ -22,10 +22,14 @@
   verify-restore  restore 到暫存位置＋checksum／integrity 驗證（沒驗證過的備份不算備份）
   status          印出 ``last_backup.json``
 
-Drive 上傳失敗不回滾本機備份，但 exit code 非零且寫入 status——daily brief 首屏的
-「最後一次備份」計數器會現形（L14：真正的防呆是會自己出現的常駐計數器）。
+Drive 上傳失敗不回滾本機備份，但 exit code 非零且寫入 status——心跳段 1 的備份行與
+Discord 摘要行會現形（L14：真正的防呆是會自己出現的常駐計數器）。
 refresh token 若因 consent screen 停在 Testing 模式而 7 天過期，會以
 ``auth_expired`` 現形，不會安靜停掉。
+
+無人值守（2026-10-06 起）：Windows daily ⑯ 跑 ``run``（含 Drive）、⑯b 跑 ``verify-restore``。
+在那之前 ⑯ 一直是 ``run --no-drive``（Phase 1 Step 1.2a 以「Testing 模式 token 7 天過期」為由不自動上傳），
+結果 09-10 之後沒有任何一份上 Drive；10-06 實測 09-10 發的 refresh token 仍可用——consent screen 早已不是 Testing。
 """
 from __future__ import annotations
 
@@ -408,6 +412,15 @@ def _load_status() -> dict:
         return {}
 
 
+def _last_uploaded(result: dict, previous: dict) -> dict | None:
+    """最後一次**成功**上傳（跨 run 保留，同 restore_verification）：這次失敗或跳過時，
+    心跳仍答得出「異地那份有多舊」——`drive` 只記這一次的結果，每次 run 都會被覆寫。"""
+    if result.get("status") == "uploaded":
+        return {key: result.get(key) for key in ("name", "file_id", "uploaded_at")}
+    last = previous.get("drive_last_uploaded")
+    return last if isinstance(last, dict) else None
+
+
 def _write_status(status: dict) -> None:
     STATUS_PATH.parent.mkdir(parents=True, exist_ok=True)
     STATUS_PATH.write_text(
@@ -491,6 +504,7 @@ def run_backup(*, drive: bool = True) -> int:
         "files_zip_members": member_count,
         "engine_b_state_members": engine_b_member_count,
         "drive": drive_result,
+        "drive_last_uploaded": _last_uploaded(drive_result, previous),
         # 「至少驗證過一次 restore」的紀錄跨 run 保留；當前備份是否驗過另看 backup_id。
         "restore_verification": previous.get("restore_verification"),
     }
@@ -532,6 +546,7 @@ def run_upload() -> int:
     finally:
         outer_zip.unlink(missing_ok=True)
     status["drive"] = result
+    status["drive_last_uploaded"] = _last_uploaded(result, status)
     _write_status(status)
     if result.get("status") == "uploaded":
         print(f"Drive 上傳完成：{result.get('name')}（file_id={result.get('file_id')}）")
