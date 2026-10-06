@@ -59,8 +59,9 @@ WATCH_KINDS = frozenset({
 #: （`source_class`／`company_id`／`form_type`，harvest 登記當下寫的），**不看 triage 的 tier 或 go**。
 SEMANTIC_KIND = "semantic_condition"
 SEMANTIC_MIN_CONDITION_CHARS = 20
-#: 語意 watch 的來源（封閉）：thesis memo 條目、讀圖反證、敘事反證（Phase 3 Step 3.4，`brief:<brief_id>#<n>`）。
-SEMANTIC_SOURCE_PREFIXES: tuple[str, ...] = ("thesis:", "reading:", "brief:")
+#: 語意 watch 的來源（封閉）：thesis memo 條目、讀圖反證、敘事反證（Phase 3 Step 3.4，`brief:<brief_id>#<n>`）、
+#: 層說明的主張（2026-10-07 個股頁 plan S4a，`layer_note:<note_id>#<n>`；到期走「重讀」，見 `expiry_class`）。
+SEMANTIC_SOURCE_PREFIXES: tuple[str, ...] = ("thesis:", "reading:", "brief:", "layer_note:")
 #: `wake_brief` 可以掛的 kind：敘事在等的日子（date）或某家公司的新文件（entity_filing／related_entity）。
 WAKE_BRIEF_KINDS = frozenset({"date", "entity_filing_signal", "related_entity_signal"})
 #: 語意 watch 的條件角色（Phase 7 Step 7.0d）：沒寫＝反證（既有紀錄一筆都不改）；`confirm`＝敘事的**加碼條件**
@@ -353,9 +354,9 @@ def add_watch(
         _validate_semantic(condition=condition, entities=list(entities), source_ref=source_ref,
                            disproof_ref=disproof_ref, check_frequency=check_frequency,
                            action_48h=action_48h, expires=expires, today=today or _today())
-        if str(source_ref).startswith("reading:") and not str(node or "").strip():
-            # 讀圖來源必帶節點（R2-b 第三輪 NB3-4）：重讀理由（reread_reasons）以節點認，沒有 node 只剩計數
-            raise EventWatchError("讀圖來源的語意 watch 必須帶 node（--node <節點>）")
+        if str(source_ref).startswith(("reading:", "layer_note:")) and not str(node or "").strip():
+            # 讀圖與層說明來源必帶節點（R2-b 第三輪 NB3-4）：重讀理由（reread_reasons）以節點認，沒有 node 只剩計數
+            raise EventWatchError("讀圖或層說明來源的語意 watch 必須帶 node（--node <節點>）")
     watch = {
         "watch_id": f"ew_{len(data['watches']) + 1:04d}_{_today().isoformat()}",
         "created_at": created_at or _now(),
@@ -411,7 +412,7 @@ def _validate_semantic(*, condition: str, entities: list[str], source_ref: str, 
         raise EventWatchError("L7 三件套缺件：check_frequency 與 action_48h 都必填")
     if not source_ref.startswith(SEMANTIC_SOURCE_PREFIXES) or "#" not in source_ref:
         raise EventWatchError(
-            "source_ref 必須是 thesis:<memo 路徑>#<n>、reading:<reading_id>#<n> 或 brief:<brief_id>#<n>")
+            "source_ref 必須是 thesis:<memo 路徑>#<n>、reading:<reading_id>#<n>、brief:<brief_id>#<n> 或 layer_note:<note_id>#<n>")
     if disproof_ref != source_ref:
         raise EventWatchError("disproof_ref 必須等於 source_ref（喚醒時指回原文）")
     companies = [e for e in entities if str(e).startswith("co:")]
@@ -611,7 +612,7 @@ def expiry_class(watch: Mapping[str, Any]) -> str:
 
     - `pq2`：它指向的編號翻回球在你｜`trace`：lead 轉終局並計數｜`reading`（`wake_reading`）：只記處置
     - `thesis_review`：thesis 來源的語意條件——**不鑄號**，列進那份 thesis 的複查項目，複查（go／drop）時續盯
-    - `reread`：讀圖來源的語意條件——**不鑄號**，列進該節點的重讀理由，重讀時收掉換新
+    - `reread`：讀圖或層說明來源的語意條件——**不鑄號**，列進該節點的重讀理由，重讀（換版）時收掉換新
     - `decision`：其餘（假設型等**沒有自己複查週期**的等待）→ pq2 `watch_decision`
     """
     if watch.get("wake_pq2"):
@@ -626,7 +627,8 @@ def expiry_class(watch: Mapping[str, Any]) -> str:
         ref = str(watch.get("source_ref") or "")
         if ref.startswith("thesis:"):
             return "thesis_review"
-        if ref.startswith("reading:"):
+        if ref.startswith(("reading:", "layer_note:")):
+            # 層說明的主張到期＝那份層說明該重讀（2026-10-07 S4a）
             return "reread"
         if ref.startswith("brief:"):
             return "rewrite"

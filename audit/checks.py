@@ -731,6 +731,11 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
     except SourceUnavailable as exc:
         briefs = None
         soft.append(f"⚠ 敘事來源的反證與 wake_brief 未檢查：{exc}")
+    try:
+        layer_notes = sources.layer_note_ledgers()
+    except SourceUnavailable as exc:
+        layer_notes = None
+        soft.append(f"⚠ 層說明來源的主張 watch 未檢查：{exc}")
     brief_by_id = {r.brief_id: (t, r) for t, led in (briefs or {}).items() for r in led["records"]}
     current_brief_ids: set[str] = set()
     for _t, led in (briefs or {}).items():
@@ -858,6 +863,26 @@ def _semantic_source_orphans(watches: list[dict]) -> tuple[list[str], list[str],
             if waiting and getattr(current, "reading_id", None) != reading_id:
                 findings.append(f"watch {wid}（「{label}」）還在等，來源讀圖 {reading_id} 卻不是 {node} 的現行讀圖"
                                 "——重讀後舊條件沒收")
+        elif base.startswith("layer_note:"):
+            # 層說明的主張（2026-10-07 S4a）：與讀圖同一套三問——指得回那一份、第 k 條就是它的條件、還在等的是現行那一份
+            if layer_notes is None:
+                continue
+            examined += 1
+            note_id = base[len("layer_note:"):]
+            node = str(watch.get("node") or "")
+            record = next((r for r in (layer_notes.get(node) or {}).get("records", [])
+                           if r.note_id == note_id), None)
+            if record is None:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref 指向層說明 {note_id}，"
+                                f"節點 {node or '（沒寫 node）'} 的 ledger 裡沒有這一份")
+                continue
+            claims = tuple(record.claims or ())
+            if not 1 <= index <= len(claims) or disproof.normalize(claims[index - 1].condition) != text:
+                findings.append(f"watch {wid}（「{label}」）的 disproof_ref={ref} 在層說明的 claims[] 對不到它的條件")
+            current = (layer_notes.get(node) or {}).get("current")
+            if waiting and getattr(current, "note_id", None) != note_id:
+                findings.append(f"watch {wid}（「{label}」）還在等，來源層說明 {note_id} 卻不是 {node} 的現行層說明"
+                                "——換版後舊條件沒收")
     return findings, soft, examined
 
 

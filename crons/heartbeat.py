@@ -873,7 +873,8 @@ def _disproof_lines() -> list[str]:
     except Exception:  # noqa: BLE001 — 涵蓋面算不出來就是「未算」，不是 0
         coverage = None
     c = disproof.disproof_counts(data.get("watches") or [], readings=disproof.current_readings(),
-                                 coverage=coverage, frozen_history=disproof.frozen_history_count())
+                                 coverage=coverage, frozen_history=disproof.frozen_history_count(),
+                                 layer_notes=disproof.current_layer_notes())
     unreachable = "未算" if c["unreachable"] is None else c["unreachable"]
     frozen = "讀不到" if c["frozen_history"] is None else c["frozen_history"]
     waits = f"（等：{'、'.join(c['touched_waits_on'])}）" if c.get("touched_waits_on") else ""
@@ -1956,7 +1957,7 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         except Exception:  # noqa: BLE001
             coverage = None
         c = disproof.disproof_counts(ew.load_watches().get("watches") or [], readings=disproof.current_readings(),
-                                     coverage=coverage)
+                                     coverage=coverage, layer_notes=disproof.current_layer_notes())
         if c.get("lifecycle_unreadable"):
             return {}
         return {"disproof.watching": c["watching"], "disproof.unreachable": c["unreachable"],

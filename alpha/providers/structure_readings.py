@@ -338,13 +338,16 @@ def reread_reasons(node: str, watches: Sequence[Mapping[str, Any]]) -> list[str]
             reasons.append(f"客戶 {','.join(woken.get('shared_entities') or watch.get('entities') or [])}"
                            f" 出了新文件 {woken.get('lead_id')}")
         judgment = watch.get("judgment") or {}
-        if watch.get("node") != node or not str(watch.get("source_ref") or "").startswith("reading:"):
+        source_ref = str(watch.get("source_ref") or "")
+        if watch.get("node") != node or not source_ref.startswith(("reading:", "layer_note:")):
             continue
+        # 層說明的主張（2026-10-07 S4a）：同一個節點一起重讀——理由寫明是層說明，人分得出要改哪一份
+        what = "層說明主張" if source_ref.startswith("layer_note:") else "反證"
         if judgment.get("touches") == "yes" and not judgment.get("handled"):
-            reasons.append(f"反證被判觸及：{ew_label(watch.get('condition'))}")
+            reasons.append(f"{what}被判觸及：{ew_label(watch.get('condition'))}")
         elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
-            # 設計 B（Phase 1 Step 1.7）：讀圖來源的條件到期不鑄 pq2——重讀就是它的重問
-            reasons.append(f"反證等滿一輪都沒發生：{ew_label(watch.get('condition'))}（重讀時換新一批）")
+            # 設計 B（Phase 1 Step 1.7）：讀圖／層說明來源的條件到期不鑄 pq2——重讀就是它的重問
+            reasons.append(f"{what}等滿一輪都沒發生：{ew_label(watch.get('condition'))}（重讀時換新一批）")
     return reasons
 
 

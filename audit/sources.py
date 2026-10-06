@@ -145,6 +145,23 @@ def reading_ledgers() -> dict[str, dict]:
     return out
 
 
+def layer_note_ledgers() -> dict[str, dict]:
+    """層說明 ledger（private；2026-10-07 個股頁 plan S4a）：`node → {"records": [...], "current": 現行那一份或 None, "errors": [...]}`。
+
+    ⚠ 與 `reading_ledgers` 刻意不同：目錄還不存在＝還沒有任何層說明（第一份寫入時才建），回空的，不丟例外。
+    若真有 `layer_note:` watch 卻找不到紀錄，由 `_semantic_source_orphans` 逐筆報出來——不會安靜。"""
+    from alpha.layer_note.contracts import select_current
+    from alpha.providers.layer_notes import LAYER_NOTE_DIR, all_nodes, read_note_records
+
+    if not LAYER_NOTE_DIR.is_dir():
+        return {}
+    out: dict[str, dict] = {}
+    for node in all_nodes():
+        records, errors = read_note_records(node)
+        out[node] = {"records": records, "errors": errors, "current": select_current(records)}
+    return out
+
+
 # ---------------------------------------------------------------------------
 # identity registry
 # ---------------------------------------------------------------------------

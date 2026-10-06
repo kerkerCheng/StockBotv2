@@ -12,7 +12,7 @@ from typing import Any, Mapping, Sequence
 
 from shared.redaction import sensitive_payload_path
 
-from ..narrative.contracts import InvestorBrief, parse_brief_record
+from ..narrative.contracts import LINKABLE_SOURCE_PREFIXES, InvestorBrief, parse_brief_record
 from ..errors import ContractViolation
 
 _ROOT = Path(__file__).resolve().parents[2]
@@ -175,7 +175,7 @@ def v2_write_problems(parsed: InvestorBrief, *, ctx: WriteContext, existing: Seq
     live_by_condition = {}
     for w in watches:
         if w.get("kind") == ew.SEMANTIC_KIND and w.get("status") in ("active", "fired") \
-                and str(w.get("source_ref") or "").startswith(("thesis:", "reading:")):
+                and str(w.get("source_ref") or "").startswith(LINKABLE_SOURCE_PREFIXES):
             live_by_condition[normalize(w.get("condition"))] = str(w.get("source_ref"))
     live_refs = {str(w.get("source_ref")) for w in watches if w.get("status") in ("active", "fired")}
     #: 同一版敘事內正規化後相同的條件（Phase 4 Step 4.7d）：判準同 `register-disproof` 的去重（`engine_b.disproof.normalize`）

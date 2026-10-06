@@ -642,6 +642,99 @@ def cmd_theme_cohort(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_layer_note(args: argparse.Namespace) -> int:
+    """層說明 ledger 的讀寫入口（個股頁 plan S4a；2026-10-07）——一個薄層或技術轉換一份，同層每一頁共用。
+
+    - `--list`（預設）：列出這個節點的全部紀錄（含已撤回、已被取代者；標出現行那一份）。
+    - `--add spec.json`：append 一筆。spec：`unit`（layer／transition）、`title`、`expires`（重讀日）、`reread_reason`、
+      `sections`（physics／variants／selection，各 `text`＋`citations`）、`claims[]`（L7 三件套＋`entities`＋`evidence`＋`citations`）、
+      選填 `supersedes_id`（換版）、`body_ref`（全文 markdown）。出處只認 `raw:<SourceDoc id>`／`lead:<id>`，寫入端核對指得回去；
+      成功後每條主張登記一筆語意 watch（`layer_note:<note_id>#<n>`），換版時舊版的條件收掉。
+    - `--retract <note_id>`：append 一筆撤回紀錄（它的 watch 一併收掉）。
+    - `--register-watches`：以現行那一份冪等重跑 watch 登記（append 之後登記失敗時用）。
+
+    ⚠ 它**不 gate 任何東西**：不濾候選、不排序、不給尺寸（AGENTS 消費契約：讀圖與敘事是研究判斷）。
+    """
+    from datetime import datetime, timezone
+
+    from .layer_note import EVIDENCE_LABELS, SECTION_LABELS, layer_note_record, select_current
+    from .providers.layer_notes import append_note_record, ledger_path, read_note_records, register_note_watches
+
+    node = str(args.node)
+    records, errors = read_note_records(node)
+
+    def _register(record: dict) -> int:
+        try:
+            summary = register_note_watches(record)
+        except Exception as exc:  # noqa: BLE001 — 紀錄已寫進去；登記失敗要說清楚怎麼補，不得安靜（INV-3）
+            print(f"⚠ 紀錄已寫入，但 watch 登記失敗（{type(exc).__name__}: {exc}）——修好後跑 "
+                  f"`python -m alpha layer-note {node} --register-watches`", file=sys.stderr)
+            return 1
+        print(f"  主張 watch 新登 {len(summary['registered'])}、舊版條件收掉 {len(summary['consumed'])}")
+        return 0
+
+    if args.add or args.retract:
+        stamp = datetime.now(timezone.utc)
+        if args.add:
+            spec = json.loads(Path(args.add).read_text(encoding="utf-8"))
+            if spec.get("node") and str(spec["node"]) != node:
+                print(f"✗ spec 的 node（{spec['node']}）與命令列（{node}）不一致——節點只寫在命令列", file=sys.stderr)
+                return 2
+            try:
+                record = layer_note_record({**spec, "node": node}, created_at=stamp,
+                                           author=str(spec.get("author") or "session"))
+            except (KeyError, ValueError, TypeError, AlphaError) as exc:
+                print(f"✗ 層說明不合法：{exc}", file=sys.stderr)
+                return 2
+        else:
+            target = next((r for r in records if r.note_id == args.retract), None)
+            if target is None:
+                print(f"✗ ledger 裡沒有 {args.retract}", file=sys.stderr)
+                return 2
+            record = layer_note_record({"node": node, "unit": target.unit, "title": target.title, "retracted": True,
+                                        "supersedes_id": target.note_id, "sections": {}, "claims": []},
+                                       created_at=stamp, author=target.author)
+        try:
+            path = append_note_record(record)
+        except AlphaError as exc:
+            print(f"✗ {exc}", file=sys.stderr)
+            return 2
+        print(f"✓ {record['note_id']}（{record['unit']}）→ {path}")
+        return _register(record)
+
+    if getattr(args, "register_watches", False):
+        current = select_current(records)
+        if current is None:
+            print("✗ 沒有現行的層說明可以登記", file=sys.stderr)
+            return 2
+        path = ledger_path(node)
+        raw = next(json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+                   if line.strip() and json.loads(line).get("note_id") == current.note_id)
+        return _register(raw)
+
+    current = select_current(records)
+    if args.format == "json":
+        path = ledger_path(node)
+        lines = [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()
+                 if line.strip()] if path.is_file() else []
+        print(json.dumps({"node": node, "current": current.note_id if current else None, "records": lines,
+                          "parse_errors": errors}, ensure_ascii=False, indent=2))
+        return 0
+    print(f"# 層說明：{node}（{len(records)} 筆；現行 {current.note_id if current else '—'}）")
+    for r in records:
+        mark = "▶ 現行" if current is not None and r.note_id == current.note_id else (
+            "撤回" if r.retracted else "已被取代")
+        if r.retracted:
+            print(f"- {r.note_id}｜{r.created_at[:10]}｜{mark}（撤回 {r.supersedes_id}）")
+            continue
+        levels = sorted({c.evidence for s in r.sections.values() for c in s.citations})
+        print(f"- {r.note_id}｜{r.created_at[:10]}｜{mark}｜{r.title}｜重讀日 {r.expires}｜主張 {len(r.claims)} 條｜"
+              f"段：{'、'.join(SECTION_LABELS[k] for k in r.sections)}｜證據等級：{'、'.join(EVIDENCE_LABELS[x] for x in levels)}")
+    if errors:
+        print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))
+    return 0
+
+
 # ⚠ **2026-09-23（Phase 0 Step 0b.1b）：`cmd_entry_criterion` 與 `entry-criterion` 子命令退役（F 組）。**
 # EntryCriterion ledger 的讀寫入口。ledger 檔案本身留在 `library/private/alpha/entry_criteria/`
 # （private append-only，L10：拿不回來的只能 append），但**沒有任何消費端**——進場靠判斷。
@@ -668,6 +761,17 @@ def build_parser() -> argparse.ArgumentParser:
                          help="只看這個單位（層／插槽，v3）；預設兩種都列。--add 的單位寫在 spec 裡")
     reading.add_argument("--format", choices=("markdown", "json"), default="markdown")
     reading.set_defaults(func=cmd_structure_reading)
+
+    note = sub.add_parser(
+        "layer-note",
+        help="層說明 ledger：--list／--add spec.json／--retract <id>／--register-watches（個股頁 plan S4a；同層每頁共用）")
+    note.add_argument("node", help="節點或轉換 id，例如 mat:inp_epiwafer（不是 ticker）")
+    note.add_argument("--list", action="store_true", help="（預設）列出 ledger")
+    note.add_argument("--add", help="append 一筆（JSON spec；出處核對與主張 watch 登記由本命令做）")
+    note.add_argument("--retract", help="append 一筆撤回紀錄（指定 note_id）")
+    note.add_argument("--register-watches", action="store_true", help="以現行那一份冪等重跑主張 watch 登記")
+    note.add_argument("--format", choices=("markdown", "json"), default="markdown")
+    note.set_defaults(func=cmd_layer_note)
 
     cohort = sub.add_parser(
         "theme-cohort", help="主題等權組（唯讀）：列出現行的組／查一檔屬於哪幾組；寫入只經 pq2 complete-theme-cohort")

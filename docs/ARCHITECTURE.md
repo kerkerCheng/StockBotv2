@@ -859,6 +859,31 @@ thesis 要不要改由人決定（thesis mutation 是四個人工 gate 之一）
 ⚠ **A/B 判準表刻意還沒機械化**：先讓它以文字形式產出幾十份、看它講得準不準，再談要不要寫成程式
 （INV-5：未量測的機制不得享有默認信任）。所以 `kind` 是**寫的人宣告的**，型別層只驗字彙。
 
+### 6.15 層說明（`alpha/layer_note/`，2026-10-07 個股頁 plan S4a）
+
+**角色一句話：深度住在層，不住在檔。** 一個薄層（或一個技術轉換）一份研究說明，主鍵是節點或轉換 id，
+同層每一頁共用、個股頁只引用它（個股頁 brainstorm §5.5 B4、規則 1）。它是研究判斷（A3）：append-only、可換版、
+**不 gate 任何東西**——不濾候選、不排序、不給尺寸（Phase 7 plan A4「深度在層、廣度在檔」）。
+
+```
+研究 session 寫 spec（三段＋主張）
+        ▼
+python -m alpha layer-note <node> --add spec.json  → library/private/alpha/layer_notes/<node>.jsonl（append-only，ln_*）
+        │  型別層：段鍵封閉（physics／variants／selection）、證據等級封閉（一手／學理／產業報告／推一步／共識／媒體／沒有）、
+        │          主張帶 L7 三件套與 co:* 實體、整份有重讀日（INV-2）
+        │  寫入端：出處只認 raw:<SourceDoc id>（library/raw 找得到同名檔）或 lead:<id>（registry 找得到）——指不回去就整筆拒收（L18）
+        ▼
+每條主張 → 語意 watch `layer_note:<note_id>#<n>`（帶 node；到期走「重讀」：不鑄號、列進節點重讀理由）
+        │  換版或撤回：同節點舊那一份還在盯的條件收掉（與讀圖同一條規則）
+        ▼
+心跳段 2 的反證計數把現行層說明的主張算進「預期」（`disproof_counts(layer_notes=…)`）；敘事的反證可以 link 到它（不重登）
+```
+
+**四段與 B4 元素的對照**（兩份規格只能有一份對照，L16）：①物理與變體（`physics`）＝做什麼、為什麼難、示意圖；
+②各家變體與階段（`variants`）＝轉換時需求怎麼變、瓶頸在哪一步形成；③客戶為什麼選、什麼會換掉（`selection`）＝在系統裡多重要；
+④主張（`claims[]`）＝B4 沒有、L7 三件套。之後加段是**加字**（`SECTION_KEYS`），不是搬資料（L2）。
+全文（長的 markdown）住 `library/private/research_notes/layer_notes/`，ledger 以 `body_ref` 指過去；閱讀頁照印 ledger（個股頁 plan S4b）。
+
 ## 7. Engine D（Decision Lab）——frozen 2026-09-22（G12）
 
 - 研究側（signal intake → context 凍結 → coverage → decision → action card → live choice／fill）於 2026-09-23（Phase 0 Step 0b.4） 整組退役。
