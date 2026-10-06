@@ -148,6 +148,53 @@ def test_a_file_created_after_the_last_backup_is_counted_as_not_covered(tmp_path
     assert payload["unbacked_sample"] == ["alpha/valuation/COHR.jsonl"]
 
 
+def test_outer_zip_clears_leftovers_from_a_killed_upload(tmp_path, monkeypatch):
+    """R2 2026-10-06 Finding B：上傳途中被 daily 的 timeout 強殺時 `finally` 不會跑，那份 zip 會留下、
+    rotation 又只掃目錄——下一輪打包前先清掉同前綴的殘留，別的檔不碰。"""
+    entrypoint = _load_entrypoint()
+    backups = tmp_path / "backups"
+    backup_dir = backups / "20261007T000000Z"
+    backup_dir.mkdir(parents=True)
+    (backup_dir / "manifest.json").write_text("{}", encoding="utf-8")
+    leftover = backups / f"{entrypoint.DRIVE_ZIP_PREFIX}20261006T000000Z.zip"
+    leftover.write_bytes(b"partial")
+    unrelated = backups / "keep.zip"
+    unrelated.write_bytes(b"x")
+    monkeypatch.setattr(entrypoint, "BACKUPS", backups)
+
+    built = entrypoint._build_outer_zip(backup_dir)
+
+    assert not leftover.exists() and unrelated.exists()
+    with zipfile.ZipFile(built) as archive:
+        assert archive.namelist() == ["20261007T000000Z/manifest.json"]
+
+
+def test_token_write_back_is_atomic(tmp_path, monkeypatch):
+    """R2 2026-10-06 Finding C：寫到一半被殺不得留下壞掉的 token——換檔前被打斷時舊 token 原封不動。"""
+    entrypoint = _load_entrypoint()
+    token = tmp_path / "token.json"
+    token.write_text('{"refresh_token": "old"}', encoding="utf-8")
+    monkeypatch.setattr(entrypoint, "TOKEN_PATH", token)
+
+    class _Creds:
+        def to_json(self):
+            return '{"refresh_token": "new"}'
+
+    def _killed(*_args):
+        raise KeyboardInterrupt("換檔前被強殺")
+
+    # 只換掉這個 module 物件自己的 `os`（入口是獨立載入的），不動全域 os.replace
+    monkeypatch.setattr(entrypoint, "os", type("_Os", (), {"replace": staticmethod(_killed)}))
+    with pytest.raises(KeyboardInterrupt):
+        entrypoint._write_token(_Creds())
+    assert json.loads(token.read_text(encoding="utf-8")) == {"refresh_token": "old"}
+
+    monkeypatch.setattr(entrypoint, "os", os)
+    entrypoint._write_token(_Creds())
+    assert json.loads(token.read_text(encoding="utf-8")) == {"refresh_token": "new"}
+    assert not token.with_name("token.json.tmp").exists()
+
+
 def test_files_zip_members_exclude_recoverable_and_live(tmp_path):
     entrypoint = _load_entrypoint()
     (tmp_path / "models").mkdir()

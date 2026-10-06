@@ -284,10 +284,18 @@ def run_auth() -> int:
         print("⚠ 沒拿到 refresh token——這通常代表之前授權過；到"
               " https://myaccount.google.com/permissions 移除本 app 的存取權後重跑。")
         return 1
-    TOKEN_PATH.write_text(creds.to_json(), encoding="utf-8")
+    _write_token(creds)
     print(f"OAuth token 已存：{TOKEN_PATH}")
     print("提醒：consent screen 若停在 Testing 模式，這把 refresh token 7 天後過期。")
     return 0
+
+
+def _write_token(creds) -> None:
+    """同目錄暫存檔＋`os.replace`（原子）。daily ⑯ 有 15 分鐘硬 timeout，直接覆寫時被強殺會留下壞掉的 JSON，
+    之後無人值守與手動都只能整套重跑互動式 `auth`（R2 2026-10-06 Finding C）。殘留的 `.tmp` 無害，下次覆寫。"""
+    tmp = TOKEN_PATH.with_name(TOKEN_PATH.name + ".tmp")
+    tmp.write_text(creds.to_json(), encoding="utf-8")
+    os.replace(tmp, TOKEN_PATH)
 
 
 def _drive_service():
@@ -365,7 +373,7 @@ def upload_backup_to_drive(zip_path: Path) -> dict:
             service.files().update(fileId=stale["id"], body={"trashed": True}).execute()
             trashed.append(stale["name"])
         # 存回可能已 refresh 的 access token；refresh token 不變。
-        TOKEN_PATH.write_text(creds.to_json(), encoding="utf-8")
+        _write_token(creds)
         return {
             "status": "uploaded",
             "file_id": uploaded["id"],
@@ -387,9 +395,11 @@ def upload_backup_to_drive(zip_path: Path) -> dict:
 
 def _build_outer_zip(backup_dir: Path) -> Path:
     """把整個備份目錄打成單一 zip 供上傳；上傳後即刪，本機真相仍是目錄本身。"""
+    # 上一輪若在上傳途中被 daily 的 timeout 強殺，呼叫端的 `finally` 不會執行、zip 會留下；rotation 只掃目錄，
+    # 所以每次先清掉自己命名前綴的殘留（R2 2026-10-06 Finding B）。這個前綴的 zip 只有這裡會產生。
+    for stale in BACKUPS.glob(f"{DRIVE_ZIP_PREFIX}*.zip"):
+        stale.unlink(missing_ok=True)
     zip_path = BACKUPS / f"{DRIVE_ZIP_PREFIX}{backup_dir.name}.zip"
-    if zip_path.exists():
-        zip_path.unlink()
     with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(backup_dir.iterdir()):
             # 讀取 WAL 模式的快照會在旁邊長出空 -shm/-wal，不屬於備份內容。
