@@ -54,7 +54,8 @@ Get-Content library\private\heartbeat\daily_run_<YYYY-MM-DD>.json    # 每步 st
 | 排程設定與 config 不一致／讀不到 | 段 1「⚠ 排程設定與 config 不一致」＋修正命令；讀不到印 unknown |
 | harvest 超過 `harvest_stale_hours` 沒跑 | 段 1 ⚠；段 3「harvest N 天沒跑——0 不代表沒有新文件」 |
 | ⑯ Drive 上傳失敗（`auth_expired`／`delivery_failed`） | 段 1「失敗 1：16_backup」＋備份行 ⚠「Drive <狀態>（最後成功上傳：N 天前）」；本機那份照留、⑯b 照驗。修好後 `python scripts\backup_private.py upload` 補傳（token 過期先 `auth`） |
-| T2 輪詢超過 `min_recheck_days` 沒人跑、而有該查的 | 段 3「⚠ T2 輪詢：…最後一次 <日期>（N 天前）」＋摘要行「T2 輪詢 N 天沒跑」；sweep 沒有排程，在互動 session 跑 `python -m engine_b.event_watch sweep` |
+| T2 輪詢（⑩d–⑩g）沒跑完或一直「沒真的查」 | 段 3「T2 輪詢：本輪沒跑完（<步驟> <狀態>：<理由>）」或拒收裡「沒真的查 N」；有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢時整行 ⚠＋摘要行「T2 輪詢 N 天沒跑」。回滾：`config/event_watch.json` 的 `sweep_budget_per_run` 調 0（或 `llm.executor=none` 連同其他 LLM 步驟一起停） |
+| T2 命中掛著沒人判定 | 段 3「**命中待檢 N**（最老 D 天）」；超過兩週 `audit invariants` 的 QueueLiveness 亮紅。判定：`python -m engine_b.watch_poll queue` → `judge` |
 | 開跑時工作區不乾淨 | 段 1 ⚠ 列出路徑（照跑） |
 | 保險檢查觸發（LLM 步驟前後指紋變了） | **沒有心跳也沒有 Discord**（心跳會 import 被改的檔）；開 session 時 `crons/routine_hint.py` 第一句說出來 |
 | daily 根本沒跑 | 開 session 時 `crons/routine_hint.py`：「今天沒有 daily 執行紀錄」 |
@@ -103,6 +104,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 ~~無人值守進入點 `crons/heartbeat_task.py`＋工作 `StockBotv2-Heartbeat`（07:00）~~——2026-09-24 Phase 1 Step 1.2a 起由
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
+
+### Sandbox impact review 結論（2026-10-06：daily ⑩d–⑩g T2 輪詢；總時限 240 → 300；多批次 LLM 步驟每批重算 deadline）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | daily 多四步（⑩ sync 與預篩之後、⑪ 之前）：⑩d `python -m engine_b.watch_poll prepare`——唯讀 watch registry、lead registry（只取線索標題）、identity registry，只寫 `library/private/heartbeat/watch_poll_batch_<日期>.json`；⑩e `claude -p`——**能力與雷達相同**（`radar_argv`：只多開 `WebSearch`、`--settings` 的 `permissions.allow` 放行；init 工具恰為 {StructuredOutput, WebSearch}），不是新能力；搜尋走 Anthropic 的伺服器端工具，Python 這邊沒有新的連線主機；結果寫 `watch_poll_proposals_<日期>.json`（含程式從 stream 收的查詢詞與網址）；⑩f 保險檢查；⑩g `python -m engine_b.watch_poll apply`——只寫 `library/leads/event_watches.json` 的 `poll.last_checked` 與 `poll.hits`（**不改 status、不叫醒、不寫 lead**），收據 `watch_poll_<日期>.json`。prompt 的資料只來自批次（封閉欄位集，測試斷言），不讀 Sheet、持股、NAV、私人路徑。另：`_llm_propose` 每一批各自重算到 deadline 的剩餘時間（原本只在步驟開頭算一次）。 |
+| **2 canonical skill／prompt／本檔** | `crons/poll_prompt.md`、`crons/poll_schema.json`（strict，新）；`config/event_watch.json`（`sweep_budget_per_run` 2 → 20、`poll_hits_per_watch` 3）與 `config/daily_routine.json`（`llm.poll_timeout_minutes`／`poll_chunk_size`、`schedule.execution_time_limit_minutes` 300）的 `_doc`；本節、「Daily」失敗長相表、「事件監看」節；`docs/ARCHITECTURE.md` §4.1 層表；`skills/research-drain/SKILL.md`（段 `poll_hits_pending` 的判定）。 |
+| **3 最窄 rule** | `.codex/rules` 仍是 0 條；Codex 不在任何無人值守步驟裡。T2 的放行與雷達同一份（`RADAR_FORBIDDEN_FLAGS` 照禁），不放寬零工具那三步。回滾：`sweep_budget_per_run` 調 0（⑩d 給空批次、⑩e 不呼叫模型）或 `llm.executor=none`；時限改回要同時改 config 並重跑 `register_daily_task.py --apply`。 |
+| **4 contract test** | `tests/test_daily_task.py` 逐項相等（四步、LLM 步驟四個）；`tests/test_watch_poll.py`：prepare 與 sweep 同一份挑法、欄位封閉集（隱私哨兵）、apply 只記查過與掛命中、查詢詞沒真的送出→不算查過、網址不在搜尋結果拒收、去重、每條上限、未來日期記 null、無法歸屬的回答拒收、run_id 不符拒套、判定觸及才叫醒且走 consume-fired（理由帶 T2 網址）、語意 watch 不走這裡、daily 用雷達那組 argv／工具／收集器；`tests/test_queue_segments.py`（段 7 改成命中待檢）；`tests/test_audit_waiting.py`（命中兩週沒判→QueueLiveness 紅）；`tests/test_heartbeat_phase1.py`（T2 行兩問分開答）。 |
+| **5 端到端 smoke** | 2026-10-06 走 daily 同一條路徑只跑 ⑩d–⑩g（真資料、真 `claude -p`；輸出、鎖、收據指到暫存目錄，apply 寫 registry **副本**；`--today 2026-10-08` 讓 16 條全部到期）：⑩d 16 條 → ⑩e 4 次呼叫（149／60／118／47 秒）、搜尋 46 次、權限被拒 0、能力違規 0 → ⑩f ok → ⑩g 16 條全部「真的查過」、2 條掛上 4 則、拒收 0。品質：NVDA 擔保那條的 3 則都是它在等的一手（8-K 08-17、8-K 附件、SB Energy S-1 09-01）；Sivers 漲價那條回的是 CIOE 新產品報導——`waiting_for` 對這類只寫「等某公司的新動靜」，模型照字面放寬了。**prompt 改成「以 `query_hint`／`fact` 為準」後重跑那兩條**：Sivers `found=false`、NVDA 仍找到一手（10-Q 揭露同一筆擔保）。⚠ 端到端驗收是 10-07 05:30 起真正的排程觸發（L13-1）。 |
 
 ### Sandbox impact review 結論（2026-10-06：daily ⑯ 含 Drive 異地、⑯b 還原驗證；心跳備份行三格與 T2 輪詢行）
 
@@ -1187,21 +1198,30 @@ manifest 住 `loader/manifests/identity-cleanup-20261003.json`（宣告式：每
 
 ```powershell
 & '.venv\Scripts\python.exe' -m engine_b.event_watch list        # 全部 watch＋計數器
-& '.venv\Scripts\python.exe' -m engine_b.event_watch sweep       # 本輪 T2 該查的 K 個（agent 拿 query hint 去 WebSearch）
+& '.venv\Scripts\python.exe' -m engine_b.event_watch sweep       # 互動版 T2：本輪該查的 K 個（agent 拿 query hint 去 WebSearch）
 & '.venv\Scripts\python.exe' -m engine_b.event_watch sweep --mark-checked   # 查完標記
+& '.venv\Scripts\python.exe' -m engine_b.watch_poll queue        # daily 的 T2 查到、待判定的命中（標題、網址、模型摘要、判定命令）
+& '.venv\Scripts\python.exe' -m engine_b.watch_poll judge <watch_id> --url <網址> --touches yes --note "…" --quote "文件逐字"
+& '.venv\Scripts\python.exe' -m engine_b.watch_poll judge <watch_id> --url <網址> --touches no --note "為什麼無關"
 & '.venv\Scripts\python.exe' -m engine_b.event_watch add --kind entity_filing_signal --wake-pq2 <N> --expires YYYY-MM-DD --entities "co:x,TICK" [--poll --query-hint "..."]
 ```
 
 - T0（新 tier-1 PASS lead 比對具名標的）與 T1（until 日期）在每次 `todo sync` 自動檢查；
   fired watch 把 pq2 項的 waiting_on 翻回「等你決定」＋`watch_wake` 稽核，**不自動 go**。
-- T2 力度旋鈕在 `config/event_watch.json`（`sweep_budget_per_run` 調 0＝退回純被動，
-  系統照常運作）。互動 session／自主迴圈可直接 sweep。
-- ⚠ **T2 目前沒有排程，只在互動 session 跑。** 2026-08-31 曾放行由 Codex daily agent 無人值守跑 sweep；2026-09-24
-  （Phase 1 Step 1.2a）換成 Windows daily 時 sweep 刻意不列（`tests/test_daily_task.py` 的禁用字含 `sweep`），
-  那份 review 引用的測試也已不在。之後沒有任何 skill 叫人跑它，心跳也拿掉了「本輪該查」——registry 的
-  `last_checked` 在 08-31 與 10-05 之間沒有任何日期，10-05 補跑時兩條在等的一手早已出現（NVDA 擔保 8-K 是 08-17）。
-  **2026-10-06 起心跳段 3 每天印「T2 輪詢：可輪詢 N｜該查 M（最久 D 天沒查）｜最後一次 <日期>」**，有該查的、卻超過
-  `min_recheck_days` 沒有任何一次輪詢就粗體並進 Discord 摘要行（計數與 `sweep` 同一份篩選：`event_watch.t2_status`）。
+- T2 力度旋鈕在 `config/event_watch.json`：`sweep_budget_per_run`（每天最多查幾條，daily 與互動 sweep 共用；
+  2026-10-06 由 2 放寬到 20）、`min_recheck_days`（同一條至少隔幾天再查）、`poll_hits_per_watch`（每條每輪最多掛幾則）。
+  `sweep_budget_per_run` 調 0 或 `enabled=false`＝退回純被動，系統照常運作。
+- **T2 的歷史（2026-10-06 補記）**：2026-08-31 起由 Codex daily agent 無人值守跑 sweep；2026-09-24（Phase 1 Step 1.2a）
+  換成 Windows daily 時 sweep 刻意不列、改成「互動 session 跑」，之後沒有任何 skill 叫人跑它，心跳也拿掉了「本輪該查」。
+  09-21 之後兩週沒人輪詢（Phase 7 cases.md），10-05 補跑時兩條在等的一手早已出現（NVDA 擔保 8-K 是 08-17，那則線索等了
+  49 天才接回）。⚠ `last_checked` 每查一次就覆寫，registry 看不出空窗多長——歷史看 daily 的收據。
+- **2026-10-06 起 daily ⑩d–⑩g 每天跑 T2**（`engine_b/watch_poll.py`）：挑法與互動 sweep 同一份；`claude -p` 只開
+  WebSearch（與雷達同一組 argv）；程式驗證「回報的查詢詞真的送出過」與「網址出自同一次搜尋」後，**只記查過、只把命中掛在
+  那條等待上，不改狀態、不寫 lead**。判定只在互動（`watch_poll queue` → `judge`）：觸及＝叫醒那條等待（`woken_by.kind=poll_hit`），
+  之後照喚醒目標走既有的路（追源線索 `consume-fired` 排回 pq1、pq2 型 `todo sync` 翻回球在你、假設型進段 0b）；無關＝只記判定。
+  收據 `library/private/heartbeat/watch_poll_<日期>.json`。
+- 心跳段 3「T2 輪詢」一行：本輪查了幾條、新命中幾則、拒收（逐項）、**命中待檢 N**、可輪詢／該查／最後一次。有該查的、卻超過
+  `min_recheck_days` 沒有任何一次輪詢就粗體並進 Discord 摘要行；命中待檢超過兩週沒人判定，`audit invariants` 的 QueueLiveness 亮紅。
 - 給 pq2 項設等待時：能結構化的一律建 watch（散文 `--trigger` 只給人讀）；
   `expires` 必填，過期自動歸檔留稽核。
 

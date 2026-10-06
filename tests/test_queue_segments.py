@@ -69,9 +69,16 @@ def test_fired_watch_is_split_by_wake_target() -> None:
     assert qs.classify_watch({"status": "fired"}) == "fired_hypothesis_check"
 
 
-def test_active_watch_is_work_only_when_pollable() -> None:
+def test_active_watch_is_work_only_when_a_poll_hit_waits_for_judgment() -> None:
+    """2026-10-06：「查」由 daily ⑩d–⑩g 做；可輪詢本身不再算人的工作，有待判定的命中才算。"""
     assert qs.classify_watch({"status": "active"}) is None
-    assert qs.classify_watch({"status": "active", "poll": {"eligible": True}}) == "pollable_watches"
+    assert qs.classify_watch({"status": "active", "poll": {"eligible": True}}) is None
+    pending = {"status": "active", "poll": {"eligible": True, "hits": [{"url": "https://x.test/a"}]}}
+    assert qs.classify_watch(pending) == "poll_hits_pending"
+    judged = {"status": "active", "poll": {"eligible": True, "hits": [{"url": "https://x.test/a",
+                                                                       "judged": {"touches": "no"}}]}}
+    assert qs.classify_watch(judged) is None
+    assert "pollable_watches" not in {s.key for s in qs.SEGMENTS}
     assert qs.classify_watch({"status": "consumed"}) is None
     assert qs.classify_watch({"status": "expired"}) is None
     assert qs.classify_watch({"status": "zombie"}) == "unmapped:watch:zombie"
@@ -100,7 +107,8 @@ def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
         watches=[
             {"watch_id": "w1", "status": "fired", "wake_lead": "c"},
             {"watch_id": "w2", "status": "fired", "wake_pq2": 5},
-            {"watch_id": "w3", "status": "active", "poll": {"eligible": True}},
+            {"watch_id": "w3", "status": "active", "poll": {"eligible": True, "hits": [{"url": "https://x.test/a"}]}},
+            {"watch_id": "w4", "status": "active", "poll": {"eligible": True}},
         ],
         todo_items=[
             {"n": 5, "dispatch_status": "queued"},
@@ -115,7 +123,7 @@ def test_observe_counts_per_segment_and_keeps_none_distinct_from_zero() -> None:
     assert by_key["triaged_go_leads"] == 1
     assert by_key["fired_lead_requeue"] == 1
     assert by_key["fired_pq2_wake"] == 1
-    assert by_key["pollable_watches"] == 1
+    assert by_key["poll_hits_pending"] == 1             # 只有掛著待判定命中的 w3；可輪詢但沒命中的 w4 不算
     assert by_key["approved_work_orders"] == 1
     assert "reassess_stale" not in by_key
     assert by_key["forward_view_backlog"] is None      # 沒讀到 ≠ 0

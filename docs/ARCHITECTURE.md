@@ -193,6 +193,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 | **心跳** | Windows daily 的 ⑱（純 Python，從 state 檔與 daily 執行紀錄組出），⑲ 推到既有 Discord publisher | 零 | 固定五段，每段可以只有一行 |
 | **分類／語意預篩** | Windows daily 的兩步：`claude -p` 零工具提議、程式驗證後寫入（Step 1.3／1.4 接上） | 每日硬上限（由 CLI 截斷，不靠 prompt） | 失敗不阻斷；印「未 triage N」與分類層本輪結果 |
 | **外部雷達**（2026-10-04 Phase 7 Step 7.0f） | Windows daily 的 ①b–①e（harvest 之後、triage 批次之前）：①c `claude -p` **只開 WebSearch**（`crons/llm_step.py::radar_argv`；放行只用 `--settings` 的 `permissions.allow`），①e `engine_b/radar.py` 驗證後寫 | 每日上限 `radar.max_items`（程式截，不靠 prompt）；`radar.enabled`／`llm.executor=none` 都能關 | 網址必須出自**同一次執行**的搜尋結果（程式從 stream 收 `tool_use_result` 的連結，不信 LLM 自報）；正規化後與 lead registry 去重（已登記的不碰）；寫成 `web_radar:<主題>`、`source_class=secondary`；**不喚醒語意 watch**（T0 只認一手）；triage 批次裡排在所有非雷達 lead 之後；心跳段 3 每天一行、收據 `radar_<日期>.json`。**它不是 last30days**：ROADMAP 硬約束 8 擋的是「輸出沒有 provenance 契約」的東西進無人值守管線——雷達的契約是每一則都指得回這一次搜尋結果裡的網址，指不回就拒收。八週試驗與停止條件見 ROADMAP Phase 7 |
+| **T2 輪詢**（2026-10-06 使用者指示） | Windows daily 的 ⑩d–⑩g（⑩ sync 與預篩之後）：⑩d `engine_b/watch_poll.py` 挑到期該查的等待（與互動 `event_watch sweep` 同一份挑法），⑩e `claude -p` **與雷達同一組 argv**（只開 WebSearch），⑩g 驗證後寫 | 每日上限 `config/event_watch.json` 的 `sweep_budget_per_run`（20）；`poll_hits_per_watch`（每條每輪 3 則）；調 0 或 `llm.executor=none` 都能關 | 回報的查詢詞至少一個真的送出過（程式從 stream 收），否則那條不算查過；網址必須出自同一次搜尋；**只記 `poll.last_checked`、只把命中掛在 `poll.hits`——不改 watch 狀態、不叫醒、不寫 lead**；判定只在互動（`watch_poll queue` → `judge`；觸及＝叫醒那條等待，之後照喚醒目標走既有的路）。心跳段 3 每天一行（本輪做了什麼＋命中待檢）、收據 `watch_poll_<日期>.json`；命中兩週沒判，QueueLiveness 亮紅 |
 | **研究** | 互動 session 手動 research-drain | 有 | daily 的 `drain_limit_per_run` 歸零 |
 
 > **2026-09-24（Phase 1 Step 1.8）心跳改版**：五段不增不減。段 2 第一行是**較昨變動**——⑱ 帶 `--write-snapshot` 寫
@@ -205,8 +206,10 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > `materialize --positions` 的 `nav_exposure`）；段 5 **每天印** tier 分布＋較昨，完整表在 APP（`--weekly` 拿掉）。
 > ⑱ 另寫 Discord 摘要行 `heartbeat_<日期>.summary.txt`（`Daily <日期>｜球在你 N`＋紅旗），⑲ 帶進 `publish --summary`。
 > **2026-10-06**：段 1 備份行三格各自會亮（超過 7 天／Drive 不是 `uploaded`／**這一份**沒驗還原；判定只有 `_backup_problems`
-> 一份，摘要行共用），舊 renderer `briefing/render.py` 刪除；段 3 加「T2 輪詢」行（可輪詢／該查／最後一次；計數與 `sweep`
-> 同一份篩選 `event_watch.t2_status`；超過 `min_recheck_days` 沒人輪詢就亮並進摘要行），快照鍵加 `t2.due`。
+> 一份，摘要行共用），舊 renderer `briefing/render.py` 刪除；段 3 加「T2 輪詢」行——兩問分開答：今天 daily ⑩d–⑩g 做了什麼
+> （執行紀錄的 ⑩g summary）、等待登記的狀態（命中待檢／可輪詢／該查／最後一次；計數與 `sweep` 同一份篩選 `event_watch.t2_status`；
+> 超過 `min_recheck_days` 沒人輪詢就亮並進摘要行），快照鍵加 `t2.due`、`t2.hits_pending`。佇列段 7 由「可輪詢的 watch」
+> （恆為可輪詢總數、從沒印出來）改成「T2 命中待檢」（`poll_hits_pending`；「待檢」的定義只住 `event_watch.pending_hits`）。
 
 心跳固定五段：
 1. **資料新鮮**：每個 harvest 來源 ok／fail、行情最新交易日、APP 今天是否 materialize、**台股月營收最新月份與落後幾個月**（2026-09-17 Phase 6：月營收**刻意不進無人值守**——歷史頁按年月永久可查、漏抓補得回來（L10），與「只有前一營業日、漏一天永久漏」的重訊性質相反。所以它不需要排程，需要的是**該補的時候自己說話**；`lag` 相對**法定公告期限**（次月 10 日）算，不是相對今天，否則每個月前 10 天都會誤報落後）。

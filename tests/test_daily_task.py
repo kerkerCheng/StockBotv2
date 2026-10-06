@@ -71,6 +71,13 @@ EXPECTED_STEPS = (
     ("10c_prescreen_apply", ("-m", "engine_b.event_watch", "prescreen-apply", "--file", "{prescreen_result}",
                              "--batch", "{prescreen_batch}", "--run-id", "{run_id}"), 3, True, False, "apply",
      False, None, "10b_prescreen_propose", None),
+    # 2026-10-06 T2 輪詢（使用者指示）：只開 WebSearch 的提議＋程式驗證後只記查過、只掛命中
+    ("10d_poll_prepare", ("-m", "engine_b.watch_poll", "prepare", "--run-id", "{run_id}", "--out", "{poll_batch}"),
+     2, False, False, "command", False, None, None, None),
+    ("10e_poll_propose", (), 10, False, True, "llm", False, None, "10d_poll_prepare", "poll"),
+    ("10f_integrity_after_poll", (), 1, False, False, "integrity", True, None, None, None),
+    ("10g_poll_apply", ("-m", "engine_b.watch_poll", "apply", "--file", "{poll_result}", "--batch", "{poll_batch}",
+                        "--run-id", "{run_id}"), 3, True, False, "apply", False, None, "10e_poll_propose", None),
     ("11_standing_go", ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False, "command", False, None,
      None, None),
     ("12_fiscal_year_backfill", ("scripts/backfill_fiscal_year_results.py", "--write"), 10, True, True,
@@ -115,9 +122,10 @@ def test_no_forbidden_command_in_the_list(forbidden: str) -> None:
 
 
 def test_llm_steps_have_no_argv_in_the_list() -> None:
-    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有這三個。"""
+    """LLM 呼叫的 argv 不住清單（由 1.3 的呼叫端與測試另守）；清單裡的 LLM 步驟只有這四個。"""
     llm = [s for s in DAILY_STEPS if s.kind == "llm"]
-    assert [s.key for s in llm] == ["01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose"]
+    assert [s.key for s in llm] == ["01c_radar_propose", "07a_triage_propose", "10b_prescreen_propose",
+                                    "10e_poll_propose"]
     assert all(s.argv == () for s in llm)
     # 雷達三步跟著 `radar.enabled`（Phase 7 Step 7.0f）；其他步驟沒有開關
     assert {s.key for s in DAILY_STEPS if s.switch} == {"01b_radar_prepare", "01c_radar_propose", "01e_radar_apply"}
@@ -235,7 +243,8 @@ def test_happy_path_runs_every_step_and_records_them(tmp_path: Path) -> None:
     status = _status(run)
     # 測試用的 config 沒有 radar 區塊＝雷達關閉（Phase 7 Step 7.0f），三步與 executor=none 的 LLM 步驟一起記 skipped
     llm_keys = ("07a_triage_propose", "07b_triage_apply", "10b_prescreen_propose", "10c_prescreen_apply",
-                "01b_radar_prepare", "01c_radar_propose", "01e_radar_apply")
+                "01b_radar_prepare", "01c_radar_propose", "01e_radar_apply",
+                "10e_poll_propose", "10g_poll_apply")        # T2 輪詢（2026-10-06）：提議與套用跟著 executor=none
     assert all(status[k] == "skipped" for k in llm_keys), status
     assert all(v == "ok" for k, v in status.items() if k not in llm_keys), status
     assert run.record["status"] == "completed"

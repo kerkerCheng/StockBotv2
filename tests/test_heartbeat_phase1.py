@@ -139,8 +139,8 @@ def _pollable(watch_id: str, *, created: str, checked: str | None, status: str =
             "poll": {"eligible": True, "last_checked": checked}}
 
 
-def test_t2_line_and_flag_follow_whether_anyone_polled(monkeypatch) -> None:
-    """2026-10-06 實測：sweep 移出 daily 後 35 天沒人跑，也沒有任何地方印。該查的存在、且超過
+def test_t2_line_and_flag_follow_whether_anyone_polled(tmp_path: Path) -> None:
+    """2026-10-06 實測：sweep 移出 daily 後，09-21 之後兩週沒人跑，也沒有任何地方印。該查的存在、且超過
     min_recheck_days 沒有任何一次輪詢 → 粗體＋摘要行旗標；跑過之後就滅。"""
     from engine_b import event_watch as ew
 
@@ -148,15 +148,41 @@ def test_t2_line_and_flag_follow_whether_anyone_polled(monkeypatch) -> None:
             _pollable("ew_b", created="2026-09-20", checked=None),
             _pollable("ew_c", created="2026-08-31", checked="2026-09-01", status="consumed")]
     _t2_registry(ew.WATCHES_PATH, rows)
-    line = hb._t2_line(now=NOW)
-    assert line.startswith("⚠ **T2 輪詢：可輪詢 2｜該查 2（最久 24 天沒查）")
+    no_record = tmp_path / "missing_run.json"
+    line = hb._t2_line(now=NOW, record_path=no_record)
+    assert line.startswith("⚠ **T2 輪詢：本輪：今天沒有 daily 執行紀錄")
+    assert "命中待檢 0｜可輪詢 2｜該查 2（最久 24 天沒查）" in line
     assert f"最後一次 2026-09-01（{(TODAY - date(2026, 9, 1)).days} 天前）" in line
-    assert "沒有排程，只在互動 session 跑" in line
 
     rows[0]["poll"]["last_checked"] = TODAY.isoformat()
     _t2_registry(ew.WATCHES_PATH, rows)
-    line = hb._t2_line(now=NOW)
+    line = hb._t2_line(now=NOW, record_path=no_record)
     assert not line.startswith("⚠") and "該查 1（" in line and "（0 天前）" in line
+
+
+def test_t2_line_reports_todays_run_and_pending_hits(tmp_path: Path) -> None:
+    """兩個問題分開答：今天 daily 的 ⑩g 做了什麼（執行紀錄）、命中待檢幾則（registry）——命中只掛在等待上，判定在互動。"""
+    from engine_b import event_watch as ew
+
+    hit = {"url": "https://www.sec.gov/x", "title": "8-K", "at": "2026-09-23T21:40:00+00:00"}
+    watch = _pollable("ew_a", created="2026-08-31", checked=TODAY.isoformat())
+    watch["poll"]["hits"] = [hit, dict(hit, url="https://www.sec.gov/y", judged={"touches": "no"})]
+    _t2_registry(ew.WATCHES_PATH, [watch])
+    record = tmp_path / "run.json"
+    record.write_text(json.dumps({"steps": [
+        {"key": "10d_poll_prepare", "status": "ok"}, {"key": "10e_poll_propose", "status": "ok", "proposed": 1},
+        {"key": "10g_poll_apply", "status": "ok", "summary": {
+            "batch": 3, "checked": 2, "hits_new": 1, "rejected": 2, "not_searched": 1, "url_not_in_search": 1,
+            "duplicate_hit": 0, "over_cap": 0, "searches": 7}}]}), encoding="utf-8")
+    line = hb._t2_line(now=NOW, record_path=record)
+    assert line.startswith("T2 輪詢：本輪查 2／3 條｜新命中 1 則｜拒收 2（沒真的查 1、網址不在搜尋結果 1、重複 0、超過上限 0）")
+    assert "**命中待檢 1**（1 條等待；最老 1 天；" in line            # 已判定的那則不算
+    record.write_text(json.dumps({"steps": [
+        {"key": "10d_poll_prepare", "status": "ok"},
+        {"key": "10e_poll_propose", "status": "failed", "error": "工具權限被拒 1 次（WebSearch）——結果作廢"},
+        {"key": "10g_poll_apply", "status": "skipped", "reason": "llm_not_ok：10e_poll_propose 沒有成功"}]}),
+        encoding="utf-8")
+    assert "本輪沒跑完（10e_poll_propose failed：工具權限被拒" in hb._t2_line(now=NOW, record_path=record)
 
 
 def test_t2_status_shares_the_sweep_filter() -> None:

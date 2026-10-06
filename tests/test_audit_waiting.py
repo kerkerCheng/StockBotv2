@@ -378,6 +378,20 @@ def test_fired_semantic_watch_left_unjudged_is_stalled(world) -> None:
     assert checks.check_queue_liveness().status.name == "PASS"
 
 
+def test_t2_poll_hit_left_unjudged_for_two_weeks_is_stalled(world) -> None:
+    """2026-10-06：daily 的 T2 輪詢只掛命中、判定在互動——兩週沒人判定＝查了等於沒查（段 poll_hits_pending 沒人取）。"""
+    def polled(at: str, **hit) -> dict:
+        return _watch("ew_p", poll={"eligible": True, "hits": [{"url": "https://www.sec.gov/x", "at": at, **hit}]})
+
+    world["watches"] = [polled(_ago(days=20))]
+    result = checks.check_queue_liveness()
+    assert result.status.name == "FAIL" and "T2 命中掛了 20 天還沒判定" in _findings(result)
+    world["watches"] = [polled(_ago(days=3))]
+    assert checks.check_queue_liveness().status.name == "PASS"
+    world["watches"] = [polled(_ago(days=20), judged={"touches": "no", "note": "舊聞"})]
+    assert checks.check_queue_liveness().status.name == "PASS"
+
+
 def test_watch_decision_pointing_at_a_missing_watch_is_stalled(world) -> None:
     world["items"] = [_item(11, "watch_decision", ref_id=f"ew_gone@{PAST}")]
     result = checks.check_queue_liveness()

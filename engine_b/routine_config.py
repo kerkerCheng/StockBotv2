@@ -111,6 +111,8 @@ def load_schedule(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
 
 #: `llm.executor` 的封閉字彙。一個開關同時管 triage 與語意預篩，也是 R2-a 的回滾開關。
 LLM_EXECUTORS = ("none", "claude")
+#: T2 輪詢（daily ⑩e）的每次呼叫 timeout 與每次幾條等待；config 沒寫時用這兩個值。
+POLL_LLM_DEFAULTS: dict[str, Any] = {"poll_timeout_minutes": 10, "poll_chunk_size": 5}
 
 
 def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str, Any]:
@@ -131,9 +133,14 @@ def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str
     model = llm.get("claude_model")
     if not isinstance(model, str) or not model.strip():
         raise ValueError("llm.claude_model 不可為空（模型只住這裡）")
-    for key in ("triage_timeout_minutes", "prescreen_timeout_minutes"):
+    llm = dict(llm)
+    # T2 輪詢（2026-10-06）的兩格沒寫就用預設：缺它們不該讓 triage 與預篩一起停（LLM 設定壞掉會停掉全部 LLM 步驟）；
+    # 寫了就照下面同一套驗——打錯的數字比沒有更危險。
+    for key, default in POLL_LLM_DEFAULTS.items():
+        llm.setdefault(key, default)
+    for key in ("triage_timeout_minutes", "prescreen_timeout_minutes", "poll_timeout_minutes"):
         _positive_number(llm, key, "llm")
-    for key in ("triage_chunk_size", "prescreen_chunk_size"):
+    for key in ("triage_chunk_size", "prescreen_chunk_size", "poll_chunk_size"):
         chunk = llm.get(key)
         if isinstance(chunk, bool) or not isinstance(chunk, int) or chunk < 1:
             raise ValueError(f"llm.{key} 必須是 ≥1 的整數")

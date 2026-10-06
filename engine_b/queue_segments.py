@@ -127,9 +127,11 @@ SEGMENTS: tuple[Segment, ...] = (
         "它不是分數、不排序、不在任何人讀的畫面上當成一個數字印（心跳與 APP 一律九格各自印）。"
         "母體 ≥10 的型別命中率 ≥50% 就是恆亮（L14-4），走圖自己會標出來。",
     ),
+    # ⚠ 2026-10-06：原本是 `pollable_watches`（每一條可輪詢的 active watch 都算一筆「要人去查」的工作）——數字恆為
+    # 可輪詢總數（16）、從沒印在心跳上，09-21 之後兩週沒人查也不會變。daily ⑩d–⑩g 接手「查」之後，人要做的只剩**判定命中**。
     Segment(
-        "pollable_watches", 7, "stalled 且可主動輪詢的 watch（被動層不會再醒）",
-        "research", "python -m engine_b.event_watch sweep（budget 見 config/event_watch.json）",
+        "poll_hits_pending", 7, "T2 輪詢查到、還沒判定的命中（daily 只掛在等待上，不改狀態）",
+        "research", "python -m engine_b.watch_poll queue → judge（觸及＝叫醒那條等待；無關＝只記判定）",
     ),
     # 下面兩段是 2026-09-10 新增的偵測。它們**必須有一個會自己出現的地方**，否則
     # 就只是「要人讀的段落」（L14）——而 `engine_b.todo work` 是 daily 的 fixed entry，
@@ -257,10 +259,11 @@ def classify_watch(watch: Mapping[str, Any]) -> str | None:
         if watch.get("wake_reading"):
             return "fired_reading_reread"
         return "fired_hypothesis_check"
-    if status == "active" and (watch.get("poll") or {}).get("eligible"):
-        # 可輪詢的 active watch 才是「要人主動去查」的工作；其餘 active 只是等。
-        # 是否 stalled 由 event_watch.is_stalled 決定，這裡只看「可不可以主動撈」。
-        return "pollable_watches"
+    if status == "active":
+        # 「查」由 daily ⑩d–⑩g 做；有待判定的命中才是人的工作。「待檢」的定義只住 event_watch.pending_hits（L16）。
+        from engine_b.event_watch import pending_hits
+
+        return "poll_hits_pending" if pending_hits(watch) else None
     return None
 
 

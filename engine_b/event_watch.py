@@ -143,6 +143,10 @@ DEFAULT_OWNERSHIP_FORMS = ("3", "3/A", "4", "4/A", "5", "5/A", "144", "144/A",
                            "SC 13D", "SC 13D/A", "SC 13G", "SC 13G/A")
 
 
+#: T2 輪詢每條等待每輪最多掛幾則命中（daily ⑩g 由程式截，超過的計數不寫）。
+DEFAULT_POLL_HITS_PER_WATCH = 3
+
+
 def load_config() -> dict[str, Any]:
     """T2 力度旋鈕。檔案缺席時 fail-soft 到保守預設（sweep 停用、預篩 0）。"""
     try:
@@ -150,6 +154,7 @@ def load_config() -> dict[str, Any]:
     except (OSError, json.JSONDecodeError):
         return {
             "enabled": False, "sweep_budget_per_run": 0, "min_recheck_days": 3,
+            "poll_hits_per_watch": DEFAULT_POLL_HITS_PER_WATCH,
             "trace_ttl_days": DEFAULT_TRACE_TTL_DAYS,
             "semantic_screen_daily_limit": 0, "prescreen_text_max_chars": 20000,
             "ownership_forms_excluded": list(DEFAULT_OWNERSHIP_FORMS),
@@ -158,6 +163,7 @@ def load_config() -> dict[str, Any]:
         "enabled": bool(cfg.get("enabled", True)),
         "sweep_budget_per_run": int(cfg.get("sweep_budget_per_run", 2)),
         "min_recheck_days": int(cfg.get("min_recheck_days", 3)),
+        "poll_hits_per_watch": int(cfg.get("poll_hits_per_watch", DEFAULT_POLL_HITS_PER_WATCH)),
         "trace_ttl_days": int(cfg.get("trace_ttl_days", DEFAULT_TRACE_TTL_DAYS)),
         "semantic_screen_daily_limit": int(cfg.get("semantic_screen_daily_limit", 0)),
         "prescreen_text_max_chars": int(cfg.get("prescreen_text_max_chars", 20000)),
@@ -856,11 +862,12 @@ def _t2_candidates(data: Mapping[str, Any], cfg: Mapping[str, Any],
 
 
 def t2_status(data: Mapping[str, Any], *, today: date | None = None) -> dict[str, Any]:
-    """T2 主動輪詢的常駐計數（心跳段 3）：可輪詢幾條、該查幾條、最久幾天沒查、最後一次是哪天。
+    """T2 主動輪詢的常駐計數（心跳段 3）：可輪詢幾條、該查幾條、最久幾天沒查、最後一次是哪天、命中待檢幾則。
 
-    ⚠ 2026-10-06 實測：1.2a 把 sweep 移出 daily 時，心跳一併拿掉了「本輪該查」——之後 registry 的
-    `last_checked` 只有 08-31 與 10-05 兩個日期，10-05 補跑時兩條在等的一手早已出現（NVDA 擔保 8-K 是 08-17）。
-    「最後一次」＝任何 watch 的 `poll.last_checked` 最大值（只有 `mark_checked` 會寫它）。
+    ⚠ 2026-10-06 實測：1.2a 把 sweep 移出 daily 時，心跳一併拿掉了「本輪該查」——09-21 之後兩週沒人輪詢
+    （Phase 7 cases.md），10-05 補跑時兩條在等的一手早已出現（NVDA 擔保 8-K 是 08-17，那則線索等了 49 天才接回）。
+    「最後一次」＝任何 watch 的 `poll.last_checked` 最大值（只有 `mark_checked` 會寫它）。⚠ 每查一次就**覆寫**，
+    registry 只留每條最後一次的日期，看不出空窗多長——歷史看 daily 的收據（`watch_poll_<日期>.json`）。
     `stale`＝有該查的、卻超過 `min_recheck_days` 沒有任何一次輪詢——輪詢沒在跑，不是配額不夠。
     """
     cfg = load_config()
@@ -880,6 +887,9 @@ def t2_status(data: Mapping[str, Any], *, today: date | None = None) -> dict[str
     last_run = max(checked, default=None)
     last_run_days = None if last_run is None else (today - last_run).days
     enabled = bool(cfg["enabled"]) and cfg["sweep_budget_per_run"] > 0
+    # 命中待檢（daily ⑩g 掛上、等互動判定）：數則數、條數、最老幾天——判定沒人做就是另一種「沒在跑」（INV-4）
+    pending = [(w, h) for w in data["watches"] for h in pending_hits(w)]
+    hit_days = [d for _, h in pending if (d := _stamp_day(h.get("at"))) is not None]
     return {
         "enabled": enabled,
         "budget": cfg["sweep_budget_per_run"],
@@ -891,6 +901,9 @@ def t2_status(data: Mapping[str, Any], *, today: date | None = None) -> dict[str
         "last_run": None if last_run is None else last_run.isoformat(),
         "last_run_days": last_run_days,
         "stale": enabled and bool(due) and (last_run_days is None or last_run_days > cfg["min_recheck_days"]),
+        "hits_pending": len(pending),
+        "hits_pending_watches": len({str(w.get("watch_id")) for w, _ in pending}),
+        "oldest_hit_days": (today - min(hit_days)).days if hit_days else None,
     }
 
 
@@ -901,6 +914,78 @@ def mark_checked(data: dict[str, Any], watch_id: str, *, today: date | None = No
             watch.setdefault("poll", {})["last_checked"] = today.isoformat()
             return
     raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+# ---------------------------------------------------------------------------
+# T2 輪詢命中（2026-10-06 使用者指示）：daily ⑩d–⑩g 查到的東西**只掛在那條等待上、不改狀態**；
+# 判定只在互動 session（同語意預篩的「只標旗不判定」，G7）。協調端是 `engine_b/watch_poll.py`。
+# ---------------------------------------------------------------------------
+
+def _find_watch(data: Mapping[str, Any], watch_id: str) -> dict[str, Any]:
+    for watch in data["watches"]:
+        if watch["watch_id"] == watch_id:
+            return watch
+    raise EventWatchError(f"watch 不存在：{watch_id}")
+
+
+def pending_hits(watch: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """還沒判定的 T2 命中。只算 active 的等待——醒了、收了、到期了的，命中已經沒有東西可叫醒。
+    「待檢」的定義只住這裡：心跳、佇列段、稽核、互動 `queue` 都呼叫它（L16）。"""
+    if watch.get("status") != "active":
+        return []
+    return [h for h in (watch.get("poll") or {}).get("hits") or () if isinstance(h, dict) and not h.get("judged")]
+
+
+def record_poll_hit(data: dict[str, Any], watch_id: str, *, url: str, title: str, summary: str, why: str,
+                    claimed_published_at: str | None, run_id: str, session_id: str | None = None) -> dict[str, Any]:
+    """daily ⑩g 的唯一寫入：在 `poll.hits` 追加一則命中——**不改 status、不叫醒**。
+    模型寫的幾格欄名就標明（`summary`／`why` 是模型的話，`claimed_published_at` 是模型說的日期——L18、INV-6）；
+    `title` 取搜尋結果的標題（程式收的），不是模型寫的。"""
+    watch = _find_watch(data, watch_id)
+    if watch.get("status") != "active" or not (watch.get("poll") or {}).get("eligible"):
+        raise EventWatchError(f"只能對 active 且可輪詢的等待掛命中：{watch_id}")
+    entry = {"url": url, "title": title, "summary": summary, "why": why,
+             "claimed_published_at": claimed_published_at, "run_id": run_id, "session_id": session_id,
+             "at": _now()}
+    watch["poll"].setdefault("hits", []).append(entry)
+    return entry
+
+
+def judge_poll_hit(data: dict[str, Any], watch_id: str, *, url: str, touches: bool, note: str,
+                   quote: str | None = None) -> dict[str, Any]:
+    """互動 session 判定一則 T2 命中（判定只在互動）。
+
+    - `touches=False`：命中記 `judged`（no＋note），等待照舊 active。
+    - `touches=True`：命中記 `judged`（yes＋note＋`quote`＝文件逐字，**必填**；L18），等待**叫醒**（fired，
+      `woken_by.kind=poll_hit`）——之後照它的喚醒目標走既有的路：追源線索由 `consume-fired` 排回 pq1、
+      pq2 型由 `todo sync` 翻回球在你、假設型進段 0b（對照後 consume／reactivate）。
+    語意 watch 不走這裡（用 `judge`；它們的叫醒來源是一手 lead，不是搜尋結果）。
+    """
+    if not str(note or "").strip():
+        raise EventWatchError("判定必須附 note（為什麼觸及／無關）")
+    watch = _find_watch(data, watch_id)
+    if watch.get("kind") == SEMANTIC_KIND:
+        raise EventWatchError("語意 watch 用 judge 判定，不用 T2 命中判定")
+    hit = next((h for h in pending_hits(watch) if h.get("url") == url), None)
+    if hit is None:
+        raise EventWatchError(f"{watch_id} 沒有待判定的這則命中：{url}")
+    judgment: dict[str, Any] = {"at": _now(), "touches": "yes" if touches else "no", "note": note}
+    if touches:
+        if not str(quote or "").strip():
+            raise EventWatchError("判定觸及必須附 --quote（文件逐字；L18）")
+        judgment["quote"] = quote
+        woken: dict[str, Any] = {"kind": "poll_hit", "url": url, "title": hit.get("title"),
+                                 "at": judgment["at"], "note": note, "quote": quote}
+        if watch.get("kind") == "fact_verification":
+            woken["fact"] = watch.get("fact")
+            woken["fact_check_ref"] = watch.get("fact_check_ref")
+        for key in ("hypothesis_ref", "wake_lead"):
+            if watch.get(key):
+                woken[key] = watch[key]
+        watch["status"] = "fired"
+        watch["woken_by"] = woken
+    hit["judged"] = judgment
+    return judgment
 
 
 def is_stalled(watch: Mapping[str, Any]) -> bool:

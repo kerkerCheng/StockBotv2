@@ -1,9 +1,12 @@
 {
   "_doc": [
     "Event Watch T2 主動輪詢的力度旋鈕（docs/brainstorms/2026-08-31-event-watch-module-requirements.md）。",
-    "sweep_budget_per_run＝每輪 sweep 最多給出幾個 watch 讓 agent 做 WebSearch；",
+    "sweep_budget_per_run＝每輪最多查幾個 watch——daily ⑩d–⑩g（2026-10-06 起每天自動查）與互動 `event_watch sweep` 共用；",
     "調 0 或 enabled=false ＝退回 T0（被動）＋T1（日期）純零成本運作，系統不會卡。",
+    "2026-10-06 使用者：上限放寬（2 → 20）——原本 16 條可輪詢的等待要 8 天才輪一圈，20 讓每條都能照 min_recheck_days 每 3 天查一次。",
     "min_recheck_days＝同一 watch 兩次主動查詢的最小間隔天數。",
+    "poll_hits_per_watch＝daily 的輪詢每條等待每輪最多掛幾則命中（程式截，超過的計數不寫）；命中只掛在等待上、不改狀態，判定在互動",
+    "（`python -m engine_b.watch_poll queue` → `judge`）。",
     "trace_ttl_days＝追源線索 park 時自動建立的 watch 的存活天數（[321]）。",
     "預設 120＝一個財報週期 90 天＋緩衝：最常見的等待是『下一份季報會不會揭露』，等滿一輪還沒出現就結案，不無聲續等。",
     "⚠ 到期處置（Phase 1 Step 1.7，amendment A3，使用者 2026-09-24 核准）：**追源型的重問＝轉終局並計數現形，不佔 pq2**——",
@@ -23,8 +26,9 @@
     "ownership_forms_excluded＝語意 watch 不比對的持股申報 form（EDGAR lead 七成以上是 Form 4）；比對 lead 的 form_type。"
   ],
   "enabled": true,
-  "sweep_budget_per_run": 2,
+  "sweep_budget_per_run": 20,
   "min_recheck_days": 3,
+  "poll_hits_per_watch": 3,
   "trace_ttl_days": 120,
   "semantic_screen_daily_limit": 10,
   "prescreen_text_max_chars": 60000,

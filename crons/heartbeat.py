@@ -1122,9 +1122,9 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
         section.lines.append(_radar_line(now=moment, record_path=run_record_path))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"外部雷達：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
-    # T2 主動輪詢（2026-10-06 使用者指示）：1.2a 把 sweep 移出 daily 時這一格一起不見，之後 35 天沒人跑也沒有任何地方印。
+    # T2 主動輪詢（2026-10-06 使用者指示）：1.2a 把 sweep 移出 daily 時這一格一起不見——09-21 之後兩週沒人跑，也沒有任何地方印。
     try:
-        section.lines.append(_t2_line(now=moment))
+        section.lines.append(_t2_line(now=moment, record_path=run_record_path))
     except Exception as exc:  # noqa: BLE001
         section.lines.append(f"T2 輪詢：盤點失敗（{type(exc).__name__}；upstream_unavailable）")
 
@@ -1369,11 +1369,39 @@ def _radar_line(*, now: datetime, record_path: Path | None) -> str:
             f"{step.get('reason') or step.get('error') or '—'}）")
 
 
-def _t2_line(*, now: datetime) -> str:
-    """段 3「T2 輪詢：可輪詢 N｜該查 M（最久 D 天沒查）｜最後一次 <日期>（K 天前）｜每輪上限 B」。
+#: T2 輪詢在 daily 執行紀錄裡的四步（⑩d–⑩g）；套用那一步印出 summary。
+T2_STEP_KEYS: tuple[str, ...] = ("10d_poll_prepare", "10e_poll_propose", "10g_poll_apply")
 
-    判定由 `engine_b.event_watch.t2_status` 給（與 `sweep` 同一份篩選，L16）。`stale`（有該查的、卻超過
-    `min_recheck_days` 沒有任何一次輪詢）時粗體並進 Discord 摘要行。sweep 目前沒有排程，只在互動 session 跑。"""
+
+def _t2_run_text(*, now: datetime, record_path: Path | None) -> str:
+    """今天這一輪 daily 的 T2 做了什麼（讀執行紀錄的 ⑩g summary；心跳不重跑、不讀收據）。"""
+    record, problem = _load_run_record(record_path, now=now)
+    if record is None:
+        return f"本輪：{problem}"
+    rows = {str(r.get("key")): r for r in record.get("steps") or [] if isinstance(r, Mapping)}
+    apply = rows.get("10g_poll_apply")
+    if apply is None and "10d_poll_prepare" not in rows:
+        return "本輪：執行紀錄裡沒有 T2 步驟"
+    if apply is not None and apply.get("status") == "ok" and isinstance(apply.get("summary"), Mapping):
+        s = apply["summary"]
+        return (f"本輪查 {s.get('checked', '?')}／{s.get('batch', '?')} 條｜新命中 {s.get('hits_new', '?')} 則"
+                f"｜拒收 {s.get('rejected', '?')}（沒真的查 {s.get('not_searched', '?')}、網址不在搜尋結果 "
+                f"{s.get('url_not_in_search', '?')}、重複 {s.get('duplicate_hit', '?')}、超過上限 {s.get('over_cap', '?')}）"
+                f"｜搜尋 {s.get('searches', '?')} 次")
+    propose = rows.get("10e_poll_propose") or {}
+    if propose.get("status") == "ok" and propose.get("proposed") == 0 and "批次為空" in str(propose.get("note") or ""):
+        return "本輪：沒有到期該查的等待（沒有呼叫模型）"
+    step = next((rows[k] for k in T2_STEP_KEYS if k in rows and rows[k].get("status") != "ok"), None) or apply or {}
+    return (f"本輪沒跑完（{step.get('key') or '?'} {step.get('status')}："
+            f"{step.get('reason') or step.get('error') or '—'}）")
+
+
+def _t2_line(*, now: datetime, record_path: Path | None = None) -> str:
+    """段 3「T2 輪詢：本輪查 N／M 條｜新命中 K 則｜拒收…｜**命中待檢 P**｜可輪詢｜該查｜最後一次｜每日上限」。
+
+    兩個問題分開答（同分類層那一行）：今天 daily 的 ⑩d–⑩g 做了什麼（執行紀錄）、等待登記現在的狀態
+    （`engine_b.event_watch.t2_status`——與 `sweep` 同一份篩選，L16）。`stale`（有該查的、卻超過 `min_recheck_days`
+    沒有任何一次輪詢＝輪詢沒在跑）時粗體並進 Discord 摘要行。命中只掛在等待上，判定只在互動。"""
     from engine_b import event_watch as ew
 
     s = ew.t2_status(ew.load_watches(), today=now.astimezone().date())
@@ -1381,8 +1409,13 @@ def _t2_line(*, now: datetime) -> str:
         return "T2 輪詢：關閉（`config/event_watch.json` 的 enabled／sweep_budget_per_run）"
     last = "從來沒有" if s["last_run"] is None else f"{s['last_run']}（{s['last_run_days']} 天前）"
     oldest = f"（最久 {s['oldest_due_days']} 天沒查）" if s["due"] and s["oldest_due_days"] is not None else ""
-    line = (f"T2 輪詢：可輪詢 {s['eligible']}｜該查 {s['due']}{oldest}｜最後一次 {last}｜每輪上限 {s['budget']}"
-            "｜沒有排程，只在互動 session 跑（`python -m engine_b.event_watch sweep`）")
+    if s["hits_pending"]:
+        pending = (f"**命中待檢 {s['hits_pending']}**（{s['hits_pending_watches']} 條等待；最老 {s['oldest_hit_days']} 天；"
+                   "判定只在互動：`python -m engine_b.watch_poll queue`）")
+    else:
+        pending = "命中待檢 0"
+    line = (f"T2 輪詢：{_t2_run_text(now=now, record_path=record_path)}｜{pending}"
+            f"｜可輪詢 {s['eligible']}｜該查 {s['due']}{oldest}｜最後一次 {last}｜每日上限 {s['budget']}")
     return f"⚠ **{line}**" if s["stale"] else line
 
 
@@ -1812,8 +1845,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "watch.consumed": "watch 已收",
     "semantic.active": "語意 watch 在盯", "semantic.pending_check": "語意 watch 未檢",
     "semantic.flagged": "語意 watch 標旗",
-    # T2 主動輪詢該查幾條（2026-10-06）：sweep 跑過那天降、之後每天回升——較昨 diff 看得到它有沒有在跑。
-    "t2.due": "T2 該查",
+    # T2 主動輪詢（2026-10-06）：該查幾條（輪詢跑過那天降）、命中待檢幾則（判定做了那天降）——較昨 diff 看得到兩邊有沒有在動。
+    "t2.due": "T2 該查", "t2.hits_pending": "T2 命中待檢",
     "pq2.open": "pq2 未結案", "pq2.actionable": "pq2 球在你",
     # 等你提供的文件（2026-10-06 使用者指示；Phase 7 failure log #29）：拿不到的來源要開口、不 park，
     # 開了口的住 pq2 `source_trace_review`——第一次有人開口的那天，較昨 diff 看得到。
@@ -1877,7 +1910,8 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         # 獨立一組：T2 設定讀壞了不該把整組 watch 鍵一起拖成「未讀到」
         from engine_b import event_watch as ew
 
-        return {"t2.due": ew.t2_status(ew.load_watches(), today=now.astimezone().date())["due"]}
+        s = ew.t2_status(ew.load_watches(), today=now.astimezone().date())
+        return {"t2.due": s["due"], "t2.hits_pending": s["hits_pending"]}
 
     def pq2() -> dict[str, Any]:
         from engine_b import todo as todo_mod

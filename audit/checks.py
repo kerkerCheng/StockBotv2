@@ -957,6 +957,14 @@ def check_queue_liveness() -> AuditResult:
         review_ids = _open_review_ids(items)
         stuck_watches = 0
         for watch in watches:
+            # T2 輪詢命中（2026-10-06）：daily 只掛、判定在互動——兩週沒人判定＝查了等於沒查（段 poll_hits_pending 沒有人取）
+            for hit in ew.pending_hits(watch):
+                hit_at = _parse_dt(hit.get("at"))
+                if hit_at and (now - hit_at).days > _STALLED_DAYS:
+                    stuck_watches += 1
+                    findings.append(
+                        f"watch {watch.get('watch_id', '?')} 的 T2 命中掛了 {(now - hit_at).days} 天還沒判定"
+                        f"（{hit.get('title') or hit.get('url')}）——`python -m engine_b.watch_poll queue` → `judge`")
             if watch.get("kind") != ew.SEMANTIC_KIND:
                 continue
             wid = watch.get("watch_id", "?")

@@ -3,7 +3,8 @@
 ⑦a（triage 提議）與 Step 1.4 的 ⑩b（語意預篩）**共用這一組**：同一組 argv、同一份環境變數白名單、
 同一個能力檢查。LLM 只產出提議，寫入由程式驗證後做（L15）；所以 LLM 手上不該有任何東西可越界——
 這件事**每次執行都機械驗證**，不是一次性實測。
-**唯一的例外是 Phase 7 Step 7.0f 的外部雷達（①c）**：它多開**一個**工具 `WebSearch`（`radar_argv`），其餘同一套——
+**例外是 Phase 7 Step 7.0f 的外部雷達（①c）與 2026-10-06 的 T2 輪詢（⑩e，同一組 argv）**：它們多開**一個**工具
+`WebSearch`（`radar_argv`），其餘同一套——
 同一份白名單、同一個能力檢查（期望工具＝{StructuredOutput, WebSearch}）、同一個殺行程規則；放行只用 `--settings` 的
 `permissions.allow: ["WebSearch"]`（2026-10-04 探針：不放行時 `-p` 會拒絕 WebSearch，而且照樣回 `is_error: false`＋
 空結果——所以權限被拒一律判失敗，不得當成「沒有重要變化」）。搜尋結果的網址由程式從 stream 收（`SearchCollector`），
@@ -477,4 +478,23 @@ def compose_radar_prompt(requests: Sequence[Mapping[str, Any]]) -> str:
     return "\n\n".join([
         RADAR_PROMPT.read_text(encoding="utf-8").strip(),
         f"## 本輪資料\n\n{DATA_START}\n{data}\n{DATA_END}",
+    ]) + "\n"
+
+
+# ---------------------------------------------------------------------------
+# T2 輪詢（⑩e；2026-10-06 使用者指示）：與雷達**同一組** argv（`radar_argv`）、能力期望（`RADAR_TOOLS`）與
+# 搜尋結果收集器（`SearchCollector`）——只開 WebSearch，不另開一份（L16）。查詢詞也由收集器收，⑩g 拿它驗「真的查過」。
+# ---------------------------------------------------------------------------
+
+POLL_PROMPT = ROOT / "crons" / "poll_prompt.md"
+POLL_SCHEMA = ROOT / "crons" / "poll_schema.json"
+
+
+def compose_poll_prompt(items: Sequence[Mapping[str, Any]]) -> str:
+    """T2 輪詢的 prompt：固定指示（`crons/poll_prompt.md`）＋程式組的資料（每條到期該查的等待一筆）。
+    **資料只來自 `engine_b.watch_poll.prepare` 的批次**——不讀 Sheet、持股、NAV、私人路徑（測試以哨兵證明）。"""
+    data = json.dumps(list(items), ensure_ascii=False, indent=1)
+    return "\n\n".join([
+        POLL_PROMPT.read_text(encoding="utf-8").strip(),
+        f"## 本輪資料（{len(items)} 條等待）\n\n{DATA_START}\n{data}\n{DATA_END}",
     ]) + "\n"

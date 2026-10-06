@@ -8,8 +8,8 @@
 
 - **步驟清單是程式寫死的封閉清單 `DAILY_STEPS`**——LLM 不決定跑什麼。清單相等由
   `tests/test_daily_task.py` 逐項斷言（守門：不得出現 `webapp serve`、任意欄位寫入者、git 寫入、LLM CLI）。
-- LLM 步驟只有三個提議：triage（⑦a）、語意預篩（⑩b）、外部雷達（①c，Phase 7 Step 7.0f——唯一多開一個工具
-  `WebSearch` 的，見 `crons/llm_step.py`）；各自與寫入（程式驗證後寫）分開。
+- LLM 步驟只有四個提議：triage（⑦a）、語意預篩（⑩b）、外部雷達（①c，Phase 7 Step 7.0f）、T2 輪詢（⑩e，2026-10-06）
+  ——後兩個多開一個工具 `WebSearch`（同一組 argv，見 `crons/llm_step.py`）；各自與寫入（程式驗證後寫）分開。
   `llm.executor=none` 時提議與套用都記 `skipped`，這也是 R2-a 的回滾開關；雷達另有 `radar.enabled`（沒有那一段＝關閉）。
 - 每步獨立 subprocess（`shell=False`、venv python、cwd＝repo root）＋timeout，**失敗記錄後繼續**（fail-soft）。
 
@@ -124,7 +124,7 @@ class DailyStep:
     capture: str | None = None
     #: 前置步驟（它不是 ok 就跳過這一步：LLM 不拿舊批次去跑、套用不套沒成功的提議）。
     requires: str | None = None
-    #: LLM 步驟的任務（`triage`｜`prescreen`｜`radar`）——決定 prompt、schema、批次與結果檔、timeout 與分批大小。
+    #: LLM 步驟的任務（`triage`｜`prescreen`｜`radar`｜`poll`）——決定 prompt、schema、批次與結果檔、timeout 與分批大小。
     llm_task: str | None = None
     #: 這一步只在 config 的 `<switch>.enabled` 為 true 時跑（Phase 7 Step 7.0f：`radar`）；關閉時記 skipped。
     switch: str | None = None
@@ -133,9 +133,10 @@ class DailyStep:
 #: ⚠ **封閉清單**：順序、argv、timeout、寫入與連網宣告都由 `tests/test_daily_task.py` 逐項斷言。
 #: 改這裡＝改無人值守可執行面 → 同一個 change 做 sandbox impact review 五步（`docs/OPERATIONS.md`）。
 #: 刻意不列：`catalyst_watch.py`、`engine_b.cli trace-backlog`、`harvest-health`（唯一消費者是退役的
-#: LLM brief；心跳自己讀 harvest_log）、`event_watch sweep`（拿 WebSearch 判 watch 是研究，互動 session 做）。
-#: ⚠ ①b–①e 外部雷達（Phase 7 Step 7.0f；使用者 Q5）是唯一用 WebSearch 的無人值守步驟，而且**只產出 secondary lead 的提議**：
-#: 不判 watch、不喚醒語意 watch、不寫研究判斷——網址必須出自同一次搜尋結果，其餘由 `engine_b/radar.py` 驗證後寫。
+#: LLM brief；心跳自己讀 harvest_log）、`event_watch sweep`（互動版 T2；無人值守版是下面的 ⑩d–⑩g）。
+#: ⚠ 用 WebSearch 的無人值守步驟只有兩組，而且**都只產出提議、不判定**：①b–①e 外部雷達（Phase 7 Step 7.0f；使用者 Q5）
+#: 只寫 secondary lead、不喚醒語意 watch；⑩d–⑩g T2 輪詢（2026-10-06 使用者指示）只記「查過」與掛命中、不改 watch 狀態——
+#: 「算不算它在等的東西」仍在互動判定。網址都必須出自同一次搜尋結果，其餘由 `engine_b/radar.py`／`engine_b/watch_poll.py` 驗證後寫。
 DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("01_harvest", "harvest（X／EDGAR／MOPS／feeds）",
               ("crons/harvest_leads.py",), 20, True, True),
@@ -197,6 +198,19 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
               ("-m", "engine_b.event_watch", "prescreen-apply", "--file", "{prescreen_result}",
                "--batch", "{prescreen_batch}", "--run-id", "{run_id}"),
               3, True, False, kind="apply", requires="10b_prescreen_propose"),
+    # ⑩d–⑩g T2 輪詢（2026-10-06 使用者指示）：在 ⑩ sync 之後——到期與 T0 已處理過，只查還 active 的等待。
+    # 只查、只掛命中、不改狀態；判定在互動（`python -m engine_b.watch_poll queue`）。⑩d 只寫 library/private 的批次檔，不取鎖。
+    DailyStep("10d_poll_prepare", "T2 輪詢：挑到期該查的等待（每日上限見 config/event_watch.json；不讀持股）",
+              ("-m", "engine_b.watch_poll", "prepare", "--run-id", "{run_id}", "--out", "{poll_batch}"),
+              2, False, False),
+    DailyStep("10e_poll_propose", "T2 輪詢提議（claude -p 只開 WebSearch、只回 JSON）",
+              (), 10, False, True, kind="llm", requires="10d_poll_prepare", llm_task="poll"),
+    DailyStep("10f_integrity_after_poll", "保險檢查（LLM 步驟前後指紋）",
+              (), 1, False, False, kind="integrity", essential=True),
+    DailyStep("10g_poll_apply", "T2 輪詢套用（查詢詞須真的送出、網址須出自同一次搜尋；只記查過與掛命中）",
+              ("-m", "engine_b.watch_poll", "apply", "--file", "{poll_result}", "--batch", "{poll_batch}",
+               "--run-id", "{run_id}"),
+              3, True, False, kind="apply", requires="10e_poll_propose"),
     DailyStep("11_standing_go", "常規授權（封閉清單）",
               ("-m", "engine_b.todo", "standing-go", "--run"), 5, True, False),
     DailyStep("12_fiscal_year_backfill", "XBRL 基期補值（mechanical 欄位）",
@@ -367,6 +381,8 @@ class DailyRun:
             "prescreen_result": str(self.out_dir / f"prescreen_{self.date}.json"),
             "radar_batch": str(self.out_dir / f"radar_batch_{self.date}.json"),
             "radar_result": str(self.out_dir / f"radar_proposals_{self.date}.json"),
+            "poll_batch": str(self.out_dir / f"watch_poll_batch_{self.date}.json"),
+            "poll_result": str(self.out_dir / f"watch_poll_proposals_{self.date}.json"),
         }
 
     def _expand(self, argv: Sequence[str]) -> list[str]:
@@ -667,6 +683,14 @@ class DailyRun:
                     "argv": llm_step.radar_argv, "tools": llm_step.RADAR_TOOLS,
                     "collector": llm_step.SearchCollector,
                     "stamp": lambda item, session: {**item, "session_id": session}}
+        if task == "poll":
+            # T2 輪詢（2026-10-06）：與雷達同一組 argv／能力期望／收集器（只開 WebSearch），只差 prompt、schema、分批
+            return {"batch": Path(paths["poll_batch"]), "result": Path(paths["poll_result"]),
+                    "batch_key": "items", "out_key": "results", "schema": llm_step.POLL_SCHEMA,
+                    "compose": llm_step.compose_poll_prompt, "chunk": int(self.llm["poll_chunk_size"]),
+                    "argv": llm_step.radar_argv, "tools": llm_step.RADAR_TOOLS,
+                    "collector": llm_step.SearchCollector,
+                    "stamp": lambda item, session: {**item, "session_id": session}}
         if task == "triage":
             return {"batch": Path(paths["triage_batch"]), "result": Path(paths["triage_result"]),
                     "batch_key": "payload", "out_key": "items", "schema": llm_step.TRIAGE_SCHEMA,
@@ -725,9 +749,7 @@ class DailyRun:
                                                     llm_step.schema_text(spec["schema"]))
         env = llm_step.llm_env(self.parent_env)
         runner = self.llm_runner or llm_step.run_claude
-        timeout = step_timeout_minutes(step, self.llm, self.radar)
-        if self.deadline is not None:
-            timeout = max(0.5, min(timeout, (self.deadline - now).total_seconds() / 60))
+        per_call = step_timeout_minutes(step, self.llm, self.radar)
         size = spec["chunk"]
         calls: list[dict[str, Any]] = []
         proposals: list[dict[str, Any]] = []
@@ -741,6 +763,11 @@ class DailyRun:
         extra: dict[str, Any] = {}
         for start in range(0, len(batch), size):
             chunk = batch[start:start + size]
+            # 每一批各自重算到 deadline 還剩多少（2026-10-06）：原本只在步驟開頭算一次，分多批的步驟（預篩、T2 輪詢）
+            # 後面幾批會帶著同一個 timeout 越過 deadline——收尾、心跳、發送的保留時間就被吃掉。
+            timeout = per_call
+            if self.deadline is not None:
+                timeout = max(0.5, min(per_call, (self.deadline - self.clock()).total_seconds() / 60))
             outcome = runner(spec["compose"](chunk), argv=argv, cwd=cwd, env=env, timeout_minutes=timeout,
                              **extra_kwargs)
             calls.append(outcome.as_record())

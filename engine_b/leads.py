@@ -1282,16 +1282,20 @@ def consume_fired_lead_watches(
         if status == "parked":
             shared = ", ".join(woken.get("shared_entities") or []) or "（未記錄）"
             trigger_lead = str(woken.get("lead_id") or "")
+            if woken.get("kind") == "poll_hit":
+                # T2 輪詢命中、互動判定觸及（2026-10-06）：沒有觸發 lead，觸發的是那則網址與判定的理由
+                reason = (f"Event Watch {watch_id} 由 T2 輪詢命中叫醒（{woken.get('url')}；互動判定觸及："
+                          f"{woken.get('note')}）；由 consume-fired 排回 pq1 做 bounded 重查")
+            else:
+                reason = (f"Event Watch {watch_id} 已觸發（{watch.get('kind')}；共用具名標的 {shared}"
+                          f"{'；觸發 lead ' + trigger_lead if trigger_lead else ''}）"
+                          "；由 consume-fired 排回 pq1 做 bounded 重查")
             try:
                 requeue_trace(
                     store,
                     lead_id,
                     trigger=f"event_watch:{watch_id}",
-                    reason=(
-                        f"Event Watch {watch_id} 已觸發（{watch.get('kind')}；共用具名標的 {shared}"
-                        f"{'；觸發 lead ' + trigger_lead if trigger_lead else ''}）"
-                        "；由 consume-fired 排回 pq1 做 bounded 重查"
-                    ),
+                    reason=reason,
                     requeued_at=stamp,
                 )
             except (LeadStateError, ValueError) as exc:

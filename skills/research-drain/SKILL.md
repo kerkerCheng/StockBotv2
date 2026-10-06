@@ -98,6 +98,19 @@ fired watch 屬段 0b：拿 `fact` 去對觸發 lead 的一手數字，落 `engi
 實測（2026-09-09）：ew_0005／0007／0057 三個 `fact_verification` 都被**無關的** tier-1 lead
 以 entity 交集誤觸（COHR 8-K 是 RSU、AAOI 8-K 是租賃），當時沒有這個命令，只能直接改 JSON。
 
+**段 `poll_hits_pending`（T2 輪詢命中待檢，2026-10-06 起；與段 0b 同級）**：daily ⑩d–⑩g 每天替到期的等待上網查一輪，
+查到的東西**只掛在那條等待上**（網址出自同一次搜尋；摘要與日期是模型寫的，欄名標明）。判定在這裡：
+
+```powershell
+& '.venv\Scripts\python.exe' -m engine_b.watch_poll queue          # 逐條列命中（標題、網址、模型摘要）與判定命令
+& '.venv\Scripts\python.exe' -m engine_b.watch_poll judge <watch_id> --url <網址> --touches yes --note "…" --quote "文件逐字"
+& '.venv\Scripts\python.exe' -m engine_b.watch_poll judge <watch_id> --url <網址> --touches no --note "為什麼無關"
+```
+
+**先打開網址讀原文再判**——摘要是模型的話，不是原文（L18）；轉載或舊聞重刊判無關（2026-10-06 雷達實例：AK&M 把 2024 年的
+意向書重刊成新事件）。判定觸及＝那條等待被叫醒，之後照它的喚醒目標走既有的路：追源線索跑 `consume-fired` 排回 pq1、
+pq2 型跑 `todo sync` 翻回球在你、假設型進段 0b。命中掛超過兩週沒判，`audit invariants` 的 QueueLiveness 會亮紅。
+
 **段 `narrative_rewrite`（敘事該重寫，2026-09-29 Phase 3 Step 3.4 起；與段 0b 同級，排在下面三段固定之前**——
 它和 0b 一樣是**已經醒來的等待**，醒來的反證不排在新線索後面）：敘事自己的反證（`brief:` 語意 watch）
 與「缺 X」「已定價等回落」在等的事（`wake_brief` watch）**醒來、被判觸及或到期未判**都進這一段——不鑄 pq2、
