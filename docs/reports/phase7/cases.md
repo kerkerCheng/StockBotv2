@@ -354,6 +354,13 @@
   - #11（[721] Google 自己的 CDU 規格 → `co:google depends_on` CDU 被預告成「供應商自報」——第 3 次）、#17（[721] 印 +10 節點、實際新 2 個——第 6 次）、#31（板式熱交換器層主張等層讀圖——第 2 次）
   - #35（高力敘事把年報「個體／合併」兩欄讀成兩個年度；本 session 對話也差點重犯）
 
+## B1 AI 生醫的上游實驗量
+
+- 登記：registration「更正與追加」2026-10-06 B1（開題 2026-10-06）
+- 研究產出：（尚無）
+  - 2026-10-06｜開題稽核 pq2 **[723]**（使用者 2026-10-06 主動選題，受理即 resolve，收據 `authority:user_directive`）
+  - 2026-10-06｜種子 lead `lead_7cb87fe0d59de4b7cf175f5a47be602a`（qinbafrank 轉述 Freda Duan，`user_shared:qinbafrank`，tier 4，triaged_go `interactive:directed`）
+
 ## X1 已定價回放（R1）
 
 - 登記：registration §2 X1、§7.2

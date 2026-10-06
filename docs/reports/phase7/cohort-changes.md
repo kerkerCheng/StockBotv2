@@ -38,3 +38,12 @@
 - **為什麼**：使用者 2026-10-06 點名（三個附理由：AI 供應鏈／光模組細節、前 Qualcomm 半導體研究、技術導向半導體分析；一個未附）。清單推薦與背景不是量測，信任仍為零。
 - **影響哪些量測**：四個帳號**自下一輪 daily harvest 起量、不回溯**（冷啟動只抓一頁 `max_results=25`，不做 30 天 backfill）；帳號計分表（Phase 3）的分母自 2026-10-06 起多四列；H6 的判讀線對新帳號的 lead 一樣適用（來源標籤 `x:<handle>`）。
   T1 manifest 的 `sources_config` 對這兩個檔的差異歸因到這一筆。月花費上限 `monthly_spend_cap_usd=10` 不變——9 月一個帳號實花 $0.14；五個帳號若撞上限，心跳段 1 會印 `budget_exhausted`（不是故障，不推進 since_id）。
+
+## 2026-10-06　題材 5 → 6（加 `aibio`）＋robotics 一個誤報短字換長寫法
+
+- **改了什麼**：`config/themes.txt` 加 `aibio`（AI 生醫——AI 藥物發現把實驗量往下游灌；只有描述與關鍵字、**不列核心公司**，同 power／cooling 的作法）；
+  robotics 的 `Digit` 換成 `Agility Digit`、`Digit humanoid`、`Digit robot`。sha256 `529daf06c3cc9eaeadaf98c044e78c6e4e02c1620bb0563c0f522ae7db545539`。
+- **為什麼**：`aibio`＝使用者 2026-10-06 選題（pq2 [723]；registration B1）。`Digit`：英文比對不分大小寫、要詞邊界，"triple digit"、"single digit" 都會命中——
+  現有 lead 裡 robotics 標記靠 `Digit` 的 5 則中 3 則是這種誤報、0 則只靠它命中真案例（L17 當下修）。
+- **影響哪些量測**：主題標記只對新登記的 lead 生效、舊 lead 不回溯（同 2026-10-04 那筆）；雷達每日搜尋的主題多一個（每日 5 則上限不變）；
+  `aibio` 沒有核心公司，所以 tracked、materialize 頁數、EDGAR 監看都不變。T1 manifest 對 `themes.txt` 的差異歸因到這一筆與 2026-10-04 那筆。

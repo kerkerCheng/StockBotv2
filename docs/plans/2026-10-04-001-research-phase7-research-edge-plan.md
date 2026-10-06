@@ -174,6 +174,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 18 | 7.0f | §6 第 2 項「`run_claude` 加一個只給雷達用的選填收集器（收搜尋結果裡的網址）」 | 照做（`observe` 參數＋`SearchCollector`，只收 `tool_use_result.results[*].content[*].url`，摘要字串裡的網址不收），另外：①收集器同時收搜尋結果的**標題**——lead 的標題用它、不用 LLM 寫的；LLM 那句事實放 `refs.radar_fact`（不放 `raw_text`）；②`run_claude` 對**每一步**都把權限被拒判失敗（零工具步驟不可能被拒，行為不變）；③沒有 `radar` 區塊＝關閉 | 探針 A：不放行時 CLI 拒絕 WebSearch、照樣回 `is_error: false`＋空結果——不判失敗，「被擋住」就和「沒東西」同形（L13）；標籤要指得回原文（L18）；新的無人值守能力要明寫打開才跑 |
 | 19 | 7.1 | §7 第 6 項「落 `library/private/research_notes/layer_notes/mat_inp_epitaxy.md`」 | 檔名照提議的節點 id：`mat_inp_epiwafer.md`（節點 `mat:inp_epiwafer`，RA [715]） | S4 規格「主鍵是節點或轉換 id」；被供應的東西是磊晶片——L4：節點是換掉交易對手也不變的那個東西；與 `mat:inp_substrate`、`prod:quantum_dot_laser_epiwafer` 的命名一致 |
 | 20 | 7.1 | §7 第 6 項 ④「每條主張登記成 watch」 | 牽涉公司賭注的 7 條主張掛在四份敘事的反證上（2455.TW、IQE.L、3081.TWO、4971.TWO 換版）；純屬這一層的 3 條（A6–A8）列在層說明、等 `mat:inp_epiwafer` 入圖後掛層讀圖 | 語意 watch 的來源鍵只認 thesis／reading／brief（failure log #31）；個股頁 plan S4 的程式（層說明 ledger）落地前，層說明沒有自己的來源鍵——不另開臨時來源鍵（那是動 contract） |
+| 21 | 7.1 | §0.1 Q2「新的鏈……光通訊＋電力＋散熱」、§13「decompose 同時 open 最多兩個：電力、散熱正好兩個」 | 使用者 2026-10-06 加選第四條鏈 **AI 生醫**（pq2 [723]，稽核用、受理即 resolve），照 §7 第 2 項電力／散熱的七步走；registration 檔尾 append case **B1**（開題日＝該 commit 日）；`config/themes.txt` 加 `aibio`（只放關鍵字，核心公司由 decompose 定）；R3 母體不追加（§14 第 11 項） | decompose 選題是使用者的（AGENTS「新題材由使用者選」）；「同時 open ≤ 2」數的是**未 resolve 的提案編號**（`engine_b/decompose_proposals.py::open_proposals`），[685]／[686]／[723] 都受理即 resolve，所以不超限——§13 那句是寫 plan 當下的計數，不是第二條上限 |
 
 ---
 
@@ -481,6 +482,7 @@ R2 回 GO 後：本 plan status 改 `completed`、`docs/plans/README.md` 對照�
 8. Phase 6 closeout §5 照帶：#10（424B 股權／債）、#11（同 doc_id 兩份抽取檔）、#12（BD／Hyundai Mobis 的 origin）、#13（策展摘錄的方括號）、#14（lead 代號字串對不上名冊）、#15（wipeout 灰燈 inputs）。
 9. Phase 5 closeout §5 照帶：#5（history lane 退役）、#6（主題等權組換版斷點）、#9（預測表納入 thesis 反證觸及）、#10（計分表逐則記組是否已定義）；#8 FRA:2DG 回填（使用者動作）。
 10. 三題的 as-of 視角（Phase 3 #15）：R1 若因此量不到，它就是第一個有案例的開發項。
+11. **AI 生醫的漏網稽核母體**（2026-10-06，偏差 #21）：R3 只涵蓋 AI 基礎設施；要不要替 AI 生醫另定一個前瞻母體（類別、檔數、起量窗），定了就照 §5.3 從下一個窗口起量、不回溯。
 
 ---
 

@@ -188,6 +188,8 @@ Readiness 規則同步換：核心面板改為 headline、短評、argument、re
 ## 研究主題範圍
 
 - **現行題材（2026-09）：AI capex。** 需求錨 SSOT 是 `config/sector_anchors.json`；**本檔與 AGENTS 都不綁題材**。
+  2026-10-06 使用者加選 **AI 生醫**（AI 藥物發現把實驗量往下游灌；pq2 [723]）——需求錨等 decompose 在圖上長出節點後再進 `sector_anchors.json`，
+  它與 AI capex 共用「前沿 AI 實驗室的支出」這個上游（相關性要點明，N 條鏈 ≠ N 個獨立賭注）。查證：`grep -n aibio config/themes.txt`。
 - 新題材由使用者選；機制是 `system-decompose`，提案自動鑄 pq2（manual 型），同時 open 最多兩個，drop 過的不重生。
 - HBM：SK Hynix／Samsung 不主動 onboarding（擁擠度）。humanoid 的可投資機會在零組件供應商不在整機。
 
