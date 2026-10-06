@@ -1,6 +1,7 @@
 # 多主題等權組（電力、散熱兩鏈的組能落地）——PLAN_PROPOSAL
 
-> **狀態：S1 ✅ GO（2026-10-06）；S2 兩鏈的組已鑄 pq2 [713]（電力）、[714]（散熱），等使用者 go。** 原狀態 PLAN_PROPOSAL → AWAITING_HUMAN（2026-10-05）；
+> **狀態：✅ 完成（2026-10-06）。S1 GO；S2 [713]（電力）、[714]（散熱）使用者 go → `complete-theme-cohort` 寫入
+> `tc_1a8d8a8911b327d5`、`tc_2efac5d9b16b46cf`；散熱四檔「已定價②③」由缺席變有值（驗收③，cases.md C1 2026-10-06）。** 原狀態 PLAN_PROPOSAL → AWAITING_HUMAN（2026-10-05）；
 > 2026-10-06 使用者選 A（非組員列具名缺席）→ S1 實作 → R2 CONDITIONAL_GO（C1、C2）→ 連同 F3 修完 → 窄範圍複審 GO（見文末「R2 與複審」）。Zoom **Z2**（量測口徑：追蹤表與計分表的組基準由「全域一組」改成「每一列用自己所屬的組」）；
 > Review **R2**（命中 trigger 1：已核准的主題組 ledger 被讀的方式改變；Phase 7 plan Q7：開發 Step 命中 trigger 的 R2 常規 opt-in）。
 > 出處：Phase 7 failure log #16（2026-10-05：「否（1 次）；但它擋住新鏈的第一份敘事——7.5 之前若有新鏈要寫敘事，要提前處理」）與 #26（同日，散熱鏈四份敘事寫在組落地之前）。
