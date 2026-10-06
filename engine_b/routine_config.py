@@ -112,7 +112,8 @@ def load_schedule(path: Path = DEFAULT_CONFIG) -> dict[str, Any]:
 #: `llm.executor` 的封閉字彙。一個開關同時管 triage 與語意預篩，也是 R2-a 的回滾開關。
 LLM_EXECUTORS = ("none", "claude")
 #: T2 輪詢（daily ⑩e）的每次呼叫 timeout 與每次幾條等待；config 沒寫時用這兩個值。
-POLL_LLM_DEFAULTS: dict[str, Any] = {"poll_timeout_minutes": 10, "poll_chunk_size": 5}
+#: 每次 1 條是刻意的（R2 條件 1）：⑩g 只認負責這條的那一次呼叫搜過的東西，一次多條就驗不出同一次呼叫裡的照抄。
+POLL_LLM_DEFAULTS: dict[str, Any] = {"poll_timeout_minutes": 3, "poll_chunk_size": 1}
 
 
 def load_llm(path: Path = DEFAULT_CONFIG, *, repo_root: Path = ROOT) -> dict[str, Any]:

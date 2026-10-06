@@ -10,9 +10,11 @@
   題目——在等什麼、查詢提示、要對照的事實、實體名、原本在追的那則線索的標題、已掛過的網址。
   **不讀 Sheet、持股、NAV、私人路徑**（`tests/test_watch_poll.py` 以哨兵證明）。
 - **⑩e**：`claude -p` 只開 WebSearch——與雷達同一組 argv、能力期望與搜尋結果收集器（`crons/llm_step.py`，不另開一份）。
-- **apply**：程式驗證後寫，每一條拒收都有理由、照數（INV-3）：①回報的查詢詞至少一個真的送出去過（daily 從 stream 收的
-  `search.queries`），否則這條**不算查過**、明天再查；②網址必須在同一次執行的搜尋結果裡；③同一條等待已掛過的網址不重複；
-  ④每條每輪最多 `poll_hits_per_watch` 則。查過的記 `poll.last_checked`；命中只追加進 `poll.hits`——
+- **apply**：程式驗證後寫，每一條拒收都有理由、照數（INV-3）。歸屬只認**負責這條等待的那一次呼叫**（daily 每次呼叫一個
+  收集器、逐次寫進 `search_calls`；預設每條一次呼叫——2026-10-06 R2 條件 1：整輪共用時 B 照抄 A 的查詢詞與網址也會過）：
+  ①回答出自那次呼叫；②回報的查詢詞至少一個是那次呼叫真的送出的，否則這條**不算查過**、明天再查；③網址必須在那次呼叫的
+  搜尋結果裡；④同一條等待已掛過的網址不重複；⑤每條每輪最多 `poll_hits_per_watch` 則。沒有逐次紀錄的結果檔不套用。
+  查過的記 `poll.last_checked`；命中只追加進 `poll.hits`——
   **不改 status、不叫醒、不寫 lead**（判定只在互動，同預篩的「只標旗不判定」，G7）。
 - **judge**（互動）：觸及＝叫醒那條等待（`woken_by.kind=poll_hit`），之後照它的喚醒目標走既有的路；無關＝只記判定。
 
@@ -38,8 +40,9 @@ REJECT_REASONS: Mapping[str, str] = {
     "not_in_batch": "watch_id 不在本輪批次",
     "duplicate_answer": "同一條等待回了不只一次（全部不收）",
     "not_active": "等待在套用前已不是 active",
-    "not_searched": "回報的查詢詞沒有一個真的送出去過——這條不算查過，明天再查",
-    "url_not_in_search": "網址不在這一次執行的搜尋結果裡",
+    "wrong_call": "回答不是出自負責這條等待的那一次呼叫",
+    "not_searched": "回報的查詢詞沒有一個是負責這條的那次呼叫真的送出的——這條不算查過，明天再查",
+    "url_not_in_search": "網址不在負責這條的那次呼叫的搜尋結果裡",
     "duplicate_hit": "這條等待已經掛過這個網址",
     "over_cap": "超過每條等待每輪的命中上限",
 }
@@ -51,6 +54,22 @@ def _entity_label(registry: Any, entity: str) -> str:
     company = registry.company(entity) if str(entity).startswith("co:") else None
     name = getattr(company, "display_name", None) if company is not None else None
     return f"{name}（{entity}）" if name else str(entity)
+
+
+def _allowed_urls(record: Mapping[str, Any], leads_mod: Any) -> tuple[dict[str, str], dict[str, str]]:
+    """一次呼叫的搜尋結果 → (正規化網址 → 原網址, 正規化網址 → 搜尋結果的標題)。正規化不了的不進允許清單。"""
+    allowed: dict[str, str] = {}
+    titles: dict[str, str] = {}
+    raw_titles = record.get("titles") or {}
+    for url in record.get("urls") or ():
+        try:
+            key = leads_mod.normalize_url(str(url))
+        except ValueError:
+            continue
+        allowed[key] = str(url)
+        if str(raw_titles.get(url) or "").strip():
+            titles[key] = str(raw_titles[url]).strip()
+    return allowed, titles
 
 
 def _query_key(text: Any) -> str:
@@ -138,18 +157,20 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
     cap = int(batch.get("hits_per_watch") or 0)
     in_batch = {str(i.get("watch_id")): i for i in batch.get("items") or () if isinstance(i, Mapping)}
     search = result.get("search") or {}
-    issued = {_query_key(q) for q in search.get("queries") or ()}
-    allowed: dict[str, str] = {}
-    titles: dict[str, str] = {}
-    raw_titles = search.get("titles") or {}
-    for url in search.get("urls") or ():
-        try:
-            key = leads.normalize_url(str(url))
-        except ValueError:       # 正規化不了的網址不進允許清單——模型提它也會被拒
+    # ⚠ 歸屬只認「負責這條等待的那一次呼叫」（2026-10-06 R2 條件 1）：整輪的聯集只驗得出「今天有沒有人搜過這個字串」，
+    # B 照抄 A 的查詢詞與網址也會過。沒有逐次紀錄就不套用（fail closed）。
+    calls = result.get("search_calls")
+    if not isinstance(calls, list):
+        raise ValueError("結果檔沒有逐次呼叫的搜尋紀錄（search_calls）——驗不出哪一筆是為了哪一條等待搜的，不套用")
+    scopes: dict[str, dict[str, Any]] = {}
+    for call in calls:
+        if not isinstance(call, Mapping):
             continue
-        allowed[key] = str(url)
-        if str(raw_titles.get(url) or "").strip():
-            titles[key] = str(raw_titles[url]).strip()
+        allowed, titles = _allowed_urls(call, leads)
+        scope = {"issued": {_query_key(q) for q in call.get("queries") or ()}, "allowed": allowed,
+                 "titles": titles, "session_id": call.get("session_id")}
+        for watch_id in call.get("items") or ():
+            scopes[str(watch_id)] = scope
     path = Path(watches_path) if watches_path else ew.WATCHES_PATH
     data = ew.load_watches(path)
     by_id = {str(w.get("watch_id")): w for w in data["watches"]}
@@ -187,8 +208,15 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
         if watch is None or watch.get("status") != "active":
             reject("not_active", watch_id)
             continue
+        scope = scopes.get(watch_id)
+        if scope is None:                    # 批次裡有它、卻沒有任何一次呼叫負責它——沒有東西可以證明它被查過
+            reject("not_searched", watch_id)
+            continue
+        if scope["session_id"] and answer.get("session_id") and answer.get("session_id") != scope["session_id"]:
+            reject("wrong_call", watch_id)
+            continue
         queries = [q for q in answer.get("queries") or () if isinstance(q, str) and q.strip()]
-        if not any(_query_key(q) in issued for q in queries):
+        if not any(_query_key(q) in scope["issued"] for q in queries):
             reject("not_searched", watch_id)
             continue
         ew.mark_checked(data, watch_id, today=today)
@@ -213,7 +241,7 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
             except ValueError:
                 reject("invalid", watch_id, url)
                 continue
-            if key not in allowed:
+            if key not in scope["allowed"]:
                 reject("url_not_in_search", watch_id, url)
                 continue
             if key in seen:
@@ -224,22 +252,26 @@ def apply(result_path: Path, batch_path: Path, run_id: str, *, watches_path: Pat
                 continue
             claimed, unparsed = claimed_date(item.get("published_at"), today=today)
             counts["published_unparsed"] += int(unparsed)
-            ew.record_poll_hit(data, watch_id, url=allowed[key],
-                               title=titles.get(key) or str(item.get("title") or "").strip(),
+            title = scope["titles"].get(key)
+            ew.record_poll_hit(data, watch_id, url=scope["allowed"][key],
+                               title=title or str(item.get("title") or "").strip(),
                                summary=summary, why=str(item.get("why") or "").strip(),
                                claimed_published_at=claimed, run_id=run_id,
                                session_id=answer.get("session_id"))
             seen.add(key)
             new_here += 1
             counts["hits_new"] += 1
-            written.append({"watch_id": watch_id, "url": allowed[key], "title": titles.get(key) or None,
+            written.append({"watch_id": watch_id, "url": scope["allowed"][key], "title": title or None,
                             "claimed_published_at": claimed})
         counts["watches_with_new_hits"] += int(bool(new_here))
     counts["unanswered"] = len(set(in_batch) - answered)
     if checked:
         ew.save_watches(data, path)
     summary = {"batch": len(in_batch), **counts, "rejected": len(rejected), "searches": search.get("searches"),
-               "search_urls": len(allowed), "hits_per_watch": cap}
+               "search_urls": len(search.get("urls") or ()), "hits_per_watch": cap, "calls": len(calls),
+               # 一次呼叫負責幾條（>1 時同一次呼叫裡的照抄驗不出來；預設 1，見 config/daily_routine.json）
+               "max_watches_per_call": max((len(c.get("items") or ()) for c in calls if isinstance(c, Mapping)),
+                                           default=0)}
     receipt = {"schema": RECEIPT_SCHEMA, "run_id": run_id, "date": today.isoformat(), "summary": summary,
                "checked": checked, "hits": written, "rejected": rejected,
                "unanswered": sorted(set(in_batch) - answered), "queries": list(search.get("queries") or ()),

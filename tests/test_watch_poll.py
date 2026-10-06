@@ -52,19 +52,27 @@ def _batch(tmp_path: Path, watch_ids: list[str], *, hits_per_watch: int = 3) -> 
     return path
 
 
-def _result(tmp_path: Path, results: list[dict], *, queries: list[str], urls: list[str],
-            titles: dict | None = None, run_id: str = RUN) -> Path:
+def _call(wid: str, *, queries: list[str], urls: list[str] = (), titles: dict | None = None) -> dict:
+    """一次呼叫的搜尋紀錄（daily 每條等待一次呼叫、一個收集器）；session 用 watch_id 區分。"""
+    return {"items": [wid], "session_id": f"s-{wid}", "queries": list(queries), "searches": len(queries),
+            "urls": sorted(urls), "titles": titles or {}}
+
+
+def _result(tmp_path: Path, results: list[dict], *, calls: list[dict] | None, run_id: str = RUN) -> Path:
+    from crons.llm_step import merge_search_records
+
+    payload: dict = {"schema": "llm-result-v1", "run_id": run_id, "sessions": [c["session_id"] for c in calls or ()],
+                     "search": merge_search_records(calls or []), "results": results}
+    if calls is not None:
+        payload["search_calls"] = calls
     path = tmp_path / "result.json"
-    path.write_text(json.dumps({"schema": "llm-result-v1", "run_id": run_id, "sessions": ["s1"],
-                                "search": {"queries": queries, "searches": len(queries), "urls": urls,
-                                           "titles": titles or {}},
-                                "results": results}), encoding="utf-8")
+    path.write_text(json.dumps(payload), encoding="utf-8")
     return path
 
 
-def _answer(wid: str, *, queries: list[str], items: list[dict] = ()) -> dict:
+def _answer(wid: str, *, queries: list[str], items: list[dict] = (), session: str | None = None) -> dict:
     return {"watch_id": wid, "queries": list(queries), "found": bool(items), "items": list(items),
-            "session_id": "s1"}
+            "session_id": session or f"s-{wid}"}
 
 
 def _item(url: str, *, published_at: str | None = "2026-08-17") -> dict:
@@ -125,7 +133,55 @@ def test_daily_runs_the_poll_with_the_radar_argv_tools_and_collector(tmp_path: P
     spec = run._llm_task("poll")
     assert spec["argv"] is llm_step.radar_argv and spec["tools"] == llm_step.RADAR_TOOLS
     assert spec["collector"] is llm_step.SearchCollector and spec["out_key"] == "results"
-    assert spec["chunk"] == run.llm["poll_chunk_size"]
+    assert spec["chunk"] == run.llm["poll_chunk_size"] == 1          # 每條一次呼叫（R2 條件 1）
+    assert spec["item_key"] == "watch_id"
+
+
+def test_daily_keeps_one_search_record_per_call_and_rechecks_the_deadline_per_call(tmp_path: Path,
+                                                                                  monkeypatch) -> None:
+    """R2 條件 1 與 2 的回歸：①每次呼叫一個收集器，逐次紀錄記下這次負責哪一條（整輪聯集另存）；
+    ②每一次呼叫各自重算到 deadline 的剩餘時間——第一次之後牆鐘跳過 deadline，第二次只拿到 0.5 分鐘。"""
+    from datetime import datetime, timedelta, timezone
+
+    from crons import daily_task as dt
+    from crons.llm_step import LlmOutcome
+    from engine_b import routine_config
+
+    # pytest 的 tmp 在 repo 裡、上層有 AGENTS.md——同 tests/test_daily_task.py：指令檔偵測另有專屬測試
+    monkeypatch.setattr(dt, "INSTRUCTION_FILES", ("__no_such_instruction_file__.md",))
+    clock = {"now": datetime(2026, 10, 7, 21, 40, tzinfo=timezone.utc)}
+    seen: list[dict] = []
+
+    def fake_llm(prompt, *, argv, cwd, env, timeout_minutes, tools=None, observe=None):
+        n = len(seen)
+        seen.append({"timeout": timeout_minutes, "tools": tools})
+        observe({"type": "assistant", "message": {"content": [
+            {"type": "tool_use", "name": "WebSearch", "id": f"tu{n}", "input": {"query": f"q{n}"}}]}})
+        observe({"type": "user", "message": {"content": [{"type": "tool_result", "tool_use_id": f"tu{n}"}]},
+                 "tool_use_result": {"searchCount": 1,
+                                     "results": [{"content": [{"url": f"https://x.test/{n}", "title": f"t{n}"}]}]}})
+        clock["now"] += timedelta(hours=10)
+        return LlmOutcome(status="ok", session_id=f"s{n}", init={}, structured={"results": [
+            {"watch_id": f"ew_{n}", "queries": [f"q{n}"], "found": False, "items": []}]})
+
+    run = dt.DailyRun(out_dir=tmp_path / "out", clock=lambda: clock["now"], llm_runner=fake_llm)
+    run.llm = dict(routine_config.load_llm(), cwd_path=tmp_path / "llm_cwd")
+    run.deadline = clock["now"] + timedelta(minutes=30)
+    paths = run._templates()
+    Path(paths["poll_batch"]).parent.mkdir(parents=True, exist_ok=True)
+    Path(paths["poll_batch"]).write_text(json.dumps({"run_id": run.run_id, "items": [
+        {"watch_id": "ew_0"}, {"watch_id": "ew_1"}]}), encoding="utf-8")
+
+    run._llm_propose(next(s for s in dt.DAILY_STEPS if s.key == "10e_poll_propose"), clock["now"])
+
+    result = json.loads(Path(paths["poll_result"]).read_text(encoding="utf-8"))
+    assert [c["items"] for c in result["search_calls"]] == [["ew_0"], ["ew_1"]]
+    assert [c["queries"] for c in result["search_calls"]] == [["q0"], ["q1"]]
+    assert [c["urls"] for c in result["search_calls"]] == [["https://x.test/0"], ["https://x.test/1"]]
+    assert [c["session_id"] for c in result["search_calls"]] == ["s0", "s1"]
+    assert result["search"]["queries"] == ["q0", "q1"] and result["search"]["searches"] == 2
+    assert [s["timeout"] for s in seen] == [run.llm["poll_timeout_minutes"], 0.5]
+    assert all(s["tools"] for s in seen)
 
 
 # ---------------------------------------------------------------------------
@@ -139,7 +195,9 @@ def test_apply_records_checked_and_hangs_hits_without_changing_status(tmp_path: 
     result = _result(tmp_path, [
         _answer("ew_a", queries=["NVDA 8-K OpenAI  guarantee"], items=[_item(SEC_URL), _item("https://made.up/x")]),
         _answer("ew_b", queries=["我沒有真的搜這個"]),
-    ], queries=["nvda 8-k openai guarantee"], urls=[SEC_URL], titles={SEC_URL: "Form 8-K（搜尋結果的標題）"})
+    ], calls=[_call("ew_a", queries=["nvda 8-k openai guarantee"], urls=[SEC_URL],
+                    titles={SEC_URL: "Form 8-K（搜尋結果的標題）"}),
+              _call("ew_b", queries=["另一個字串"]), _call("ew_c", queries=[])])
 
     s = wp.apply(result, batch, RUN, receipt_dir=tmp_path, today=TODAY)["summary"]
 
@@ -164,7 +222,7 @@ def test_apply_dedupes_caps_and_treats_dates_as_claims(tmp_path: Path) -> None:
     fresh = [f"https://news.test/{i}" for i in range(4)]
     result = _result(tmp_path, [_answer("ew_a", queries=["q"],
                                         items=[_item(seen)] + [_item(u, published_at="2099-01-01") for u in fresh])],
-                     queries=["q"], urls=[seen, *fresh])
+                     calls=[_call("ew_a", queries=["q"], urls=[seen, *fresh])])
 
     s = wp.apply(result, _batch(tmp_path, ["ew_a"], hits_per_watch=2), RUN, receipt_dir=tmp_path,
                  today=TODAY)["summary"]
@@ -178,17 +236,43 @@ def test_apply_dedupes_caps_and_treats_dates_as_claims(tmp_path: Path) -> None:
 def test_apply_rejects_answers_it_cannot_attribute(tmp_path: Path) -> None:
     _write_registry([_watch("ew_a", checked="2026-10-01"), _watch("ew_woke", checked="2026-10-01", status="fired")])
     batch = _batch(tmp_path, ["ew_a", "ew_woke"])
+    calls = [_call("ew_a", queries=["q"]), _call("ew_woke", queries=["q"])]
     result = _result(tmp_path, [_answer("ew_a", queries=["q"]), _answer("ew_a", queries=["q"]),
-                                _answer("ew_x", queries=["q"]), _answer("ew_woke", queries=["q"])],
-                     queries=["q"], urls=[])
+                                _answer("ew_x", queries=["q"]), _answer("ew_woke", queries=["q"])], calls=calls)
 
     s = wp.apply(result, batch, RUN, receipt_dir=tmp_path, today=TODAY)["summary"]
 
     assert s["duplicate_answer"] == 2 and s["not_in_batch"] == 1 and s["not_active"] == 1
     assert s["checked"] == 0 and _get("ew_a")["poll"]["last_checked"] == "2026-10-01"
     with pytest.raises(ValueError, match="run_id"):
-        wp.apply(_result(tmp_path, [], queries=[], urls=[], run_id="old"), batch, RUN, receipt_dir=tmp_path,
-                 today=TODAY)
+        wp.apply(_result(tmp_path, [], calls=calls, run_id="old"), batch, RUN, receipt_dir=tmp_path, today=TODAY)
+
+
+def test_a_watch_cannot_borrow_another_calls_search(tmp_path: Path) -> None:
+    """2026-10-06 R2 條件 1 的探針：ew_b 照抄 ew_a 那次呼叫的查詢詞與網址——整輪共用時兩條都會被記查過、都掛上命中。
+    歸屬只認負責這條的那一次呼叫：ew_b 自己那次沒有送出這個字串、也沒有拿到這個網址，所以不算查過、命中不收。"""
+    _write_registry([_watch("ew_a", checked="2026-10-01"), _watch("ew_b", checked="2026-10-01")])
+    calls = [_call("ew_a", queries=["nvda 8-k openai guarantee"], urls=[SEC_URL]), _call("ew_b", queries=[])]
+    copied = dict(queries=["nvda 8-k openai guarantee"], items=[_item(SEC_URL)])
+    result = _result(tmp_path, [_answer("ew_a", **copied), _answer("ew_b", **copied)], calls=calls)
+
+    s = wp.apply(result, _batch(tmp_path, ["ew_a", "ew_b"]), RUN, receipt_dir=tmp_path, today=TODAY)["summary"]
+
+    assert s["checked"] == 1 and s["hits_new"] == 1 and s["not_searched"] == 1
+    assert _get("ew_b")["poll"]["last_checked"] == "2026-10-01" and not _get("ew_b")["poll"].get("hits")
+    # 查詢詞照抄得對、網址也照抄得對，但回答不是出自負責 ew_b 的那次呼叫 → 也不收
+    calls[1] = _call("ew_b", queries=["nvda 8-k openai guarantee"], urls=[SEC_URL])
+    result = _result(tmp_path, [_answer("ew_b", session="s-ew_a", **copied)], calls=calls)
+    s = wp.apply(result, _batch(tmp_path, ["ew_a", "ew_b"]), RUN, receipt_dir=tmp_path, today=TODAY)["summary"]
+    assert s["wrong_call"] == 1 and s["checked"] == 0
+
+
+def test_a_result_without_per_call_search_records_is_not_applied(tmp_path: Path) -> None:
+    _write_registry([_watch("ew_a", checked="2026-10-01")])
+    result = _result(tmp_path, [_answer("ew_a", queries=["q"])], calls=None)
+    with pytest.raises(ValueError, match="search_calls"):
+        wp.apply(result, _batch(tmp_path, ["ew_a"]), RUN, receipt_dir=tmp_path, today=TODAY)
+    assert _get("ew_a")["poll"]["last_checked"] == "2026-10-01"
 
 
 # ---------------------------------------------------------------------------

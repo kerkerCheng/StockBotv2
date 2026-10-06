@@ -471,6 +471,20 @@ class SearchCollector:
                 "titles": dict(sorted(self.titles.items()))}
 
 
+def merge_search_records(records: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """多次呼叫的搜尋紀錄合成整輪的聯集（形狀同 `SearchCollector.as_record`；只有一筆時逐字相同）。
+    聯集只給「整輪」的消費端（雷達、心跳的次數）；要歸屬到某一筆的（T2 輪詢）讀逐次的 `search_calls`。"""
+    queries: list[str] = []
+    titles: dict[str, str] = {}
+    searches = 0
+    for record in records:
+        queries.extend(str(q) for q in record.get("queries") or ())
+        searches += int(record.get("searches") or 0)
+        for url, title in (record.get("titles") or {}).items():
+            titles.setdefault(str(url), str(title))
+    return {"queries": queries, "searches": searches, "urls": sorted(titles), "titles": dict(sorted(titles.items()))}
+
+
 def compose_radar_prompt(requests: Sequence[Mapping[str, Any]]) -> str:
     """雷達的 prompt：固定指示（`crons/radar_prompt.md`）＋程式組的資料（主題與關鍵字、在盯的條件原文與實體）。
     **資料只來自 `engine_b.radar.prepare` 的批次**——不讀 Sheet、持股、NAV、私人路徑（測試以哨兵證明）。"""

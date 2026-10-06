@@ -74,7 +74,7 @@ EXPECTED_STEPS = (
     # 2026-10-06 T2 輪詢（使用者指示）：只開 WebSearch 的提議＋程式驗證後只記查過、只掛命中
     ("10d_poll_prepare", ("-m", "engine_b.watch_poll", "prepare", "--run-id", "{run_id}", "--out", "{poll_batch}"),
      2, False, False, "command", False, None, None, None),
-    ("10e_poll_propose", (), 10, False, True, "llm", False, None, "10d_poll_prepare", "poll"),
+    ("10e_poll_propose", (), 3, False, True, "llm", False, None, "10d_poll_prepare", "poll"),
     ("10f_integrity_after_poll", (), 1, False, False, "integrity", True, None, None, None),
     ("10g_poll_apply", ("-m", "engine_b.watch_poll", "apply", "--file", "{poll_result}", "--batch", "{poll_batch}",
                         "--run-id", "{run_id}"), 3, True, False, "apply", False, None, "10e_poll_propose", None),
@@ -141,6 +141,29 @@ def test_timeouts_fit_inside_the_task_time_limit() -> None:
     assert total < schedule["execution_time_limit_minutes"], (total, schedule["execution_time_limit_minutes"])
     # 必要步驟的保留時間也要塞得進去（deadline 之後它們仍要跑）
     assert dt.essential_reserve_minutes() < schedule["execution_time_limit_minutes"]
+
+
+def test_llm_step_worst_case_counts_every_call() -> None:
+    """2026-10-06 R2 條件 2：加總原本每個 LLM 步驟只算一次呼叫——預篩最多 4 次、T2 最多 20 次，帳面餘裕並不存在。
+    最壞情況＝每次的 timeout × ceil(每日上限 ÷ 每次幾筆)；上限各住自己的 SSOT。"""
+    import math
+
+    from engine_b.event_watch import load_config
+    from engine_b.routine_config import load_llm, triage_daily_limit
+
+    llm = load_llm()
+    cfg = load_config()
+    steps = {s.llm_task: s for s in DAILY_STEPS if s.kind == "llm"}
+    expected_calls = {
+        "radar": 1,
+        "triage": math.ceil(triage_daily_limit() / llm["triage_chunk_size"]),
+        "prescreen": math.ceil(cfg["semantic_screen_daily_limit"] / llm["prescreen_chunk_size"]),
+        "poll": math.ceil(cfg["sweep_budget_per_run"] / llm["poll_chunk_size"]),
+    }
+    for task, calls in expected_calls.items():
+        assert dt.max_llm_calls(steps[task], llm) == calls, task
+        assert dt.step_timeout_minutes(steps[task], llm) == dt.call_timeout_minutes(steps[task], llm) * calls, task
+    assert expected_calls["poll"] == cfg["sweep_budget_per_run"]          # 每條一次呼叫（R2 條件 1）
 
 
 def test_default_runner_uses_shell_false_and_the_list_uses_the_venv_python() -> None:

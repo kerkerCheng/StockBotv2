@@ -203,8 +203,8 @@ DAILY_STEPS: tuple[DailyStep, ...] = (
     DailyStep("10d_poll_prepare", "T2 輪詢：挑到期該查的等待（每日上限見 config/event_watch.json；不讀持股）",
               ("-m", "engine_b.watch_poll", "prepare", "--run-id", "{run_id}", "--out", "{poll_batch}"),
               2, False, False),
-    DailyStep("10e_poll_propose", "T2 輪詢提議（claude -p 只開 WebSearch、只回 JSON）",
-              (), 10, False, True, kind="llm", requires="10d_poll_prepare", llm_task="poll"),
+    DailyStep("10e_poll_propose", "T2 輪詢提議（claude -p 只開 WebSearch、只回 JSON；每條一次呼叫）",
+              (), 3, False, True, kind="llm", requires="10d_poll_prepare", llm_task="poll"),
     DailyStep("10f_integrity_after_poll", "保險檢查（LLM 步驟前後指紋）",
               (), 1, False, False, kind="integrity", essential=True),
     DailyStep("10g_poll_apply", "T2 輪詢套用（查詢詞須真的送出、網址須出自同一次搜尋；只記查過與掛命中）",
@@ -252,14 +252,40 @@ def essential_reserve_minutes(steps: Sequence[DailyStep] = DAILY_STEPS) -> float
     return sum(s.timeout_minutes for s in steps if s.essential) + RESERVE_SLACK_MINUTES
 
 
-def step_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None,
+def call_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None,
                          radar: Mapping[str, Any] | None = None) -> float:
-    """LLM 步驟的 timeout 住 config（`llm.<task>_timeout_minutes`；雷達住 `radar.timeout_minutes`）；其餘寫死在清單。"""
+    """**每一次**呼叫的 timeout。LLM 步驟住 config（`llm.<task>_timeout_minutes`；雷達住 `radar.timeout_minutes`）；
+    其餘寫死在清單（非 LLM 步驟只呼叫一次）。"""
     if step.kind == "llm" and step.llm_task == "radar":
         return float((radar or {}).get("timeout_minutes") or step.timeout_minutes)
     if step.kind == "llm" and llm is not None and step.llm_task:
         return float(llm.get(f"{step.llm_task}_timeout_minutes") or step.timeout_minutes)
     return step.timeout_minutes
+
+
+def max_llm_calls(step: DailyStep, llm: Mapping[str, Any] | None) -> int:
+    """LLM 步驟最多會分成幾次呼叫＝ceil(每日上限 ÷ 每次幾筆)。上限各住自己的 SSOT（triage：`triage.daily_limit`；
+    預篩：`semantic_screen_daily_limit`；T2：`sweep_budget_per_run`——後兩者在 config/event_watch.json）；雷達一輪一次。
+    ⚠ 2026-10-06 R2 條件 2：原本加總只算一次呼叫，帳面 245／300 的餘裕在真的分多批的日子並不存在。"""
+    if step.kind != "llm" or llm is None or step.llm_task in (None, "radar"):
+        return 1
+    if step.llm_task == "triage":
+        from engine_b.routine_config import triage_daily_limit
+
+        cap, chunk = triage_daily_limit(), int(llm["triage_chunk_size"])
+    else:
+        from engine_b.event_watch import load_config
+
+        cfg = load_config()
+        cap, chunk = ((cfg["semantic_screen_daily_limit"], int(llm["prescreen_chunk_size"]))
+                      if step.llm_task == "prescreen" else (cfg["sweep_budget_per_run"], int(llm["poll_chunk_size"])))
+    return max(1, -(-int(cap) // max(1, chunk)))
+
+
+def step_timeout_minutes(step: DailyStep, llm: Mapping[str, Any] | None,
+                         radar: Mapping[str, Any] | None = None) -> float:
+    """這一步的**最壞情況**：每次呼叫的 timeout × 最多幾次呼叫（非 LLM 步驟就是清單上的值）。總時限加總用它。"""
+    return call_timeout_minutes(step, llm, radar) * max_llm_calls(step, llm)
 
 
 def total_timeout_minutes(steps: Sequence[DailyStep] = DAILY_STEPS,
@@ -685,11 +711,12 @@ class DailyRun:
                     "stamp": lambda item, session: {**item, "session_id": session}}
         if task == "poll":
             # T2 輪詢（2026-10-06）：與雷達同一組 argv／能力期望／收集器（只開 WebSearch），只差 prompt、schema、分批
+            # `item_key`：逐次搜尋紀錄記下這次呼叫負責哪幾條（⑩g 只認它自己那次搜過的；R2 條件 1）
             return {"batch": Path(paths["poll_batch"]), "result": Path(paths["poll_result"]),
                     "batch_key": "items", "out_key": "results", "schema": llm_step.POLL_SCHEMA,
                     "compose": llm_step.compose_poll_prompt, "chunk": int(self.llm["poll_chunk_size"]),
                     "argv": llm_step.radar_argv, "tools": llm_step.RADAR_TOOLS,
-                    "collector": llm_step.SearchCollector,
+                    "collector": llm_step.SearchCollector, "item_key": "watch_id",
                     "stamp": lambda item, session: {**item, "session_id": session}}
         if task == "triage":
             return {"batch": Path(paths["triage_batch"]), "result": Path(paths["triage_result"]),
@@ -749,17 +776,18 @@ class DailyRun:
                                                     llm_step.schema_text(spec["schema"]))
         env = llm_step.llm_env(self.parent_env)
         runner = self.llm_runner or llm_step.run_claude
-        per_call = step_timeout_minutes(step, self.llm, self.radar)
+        per_call = call_timeout_minutes(step, self.llm, self.radar)
         size = spec["chunk"]
         calls: list[dict[str, Any]] = []
         proposals: list[dict[str, Any]] = []
-        # 雷達：期望工具＋搜尋結果收集器（網址由程式從 stream 收，⑥ 套用拿它驗）；triage／預篩不帶，呼叫與以前逐字相同
-        collector = spec["collector"]() if spec.get("collector") else None
-        extra_kwargs: dict[str, Any] = {}
+        # 雷達／T2：期望工具＋搜尋結果收集器（網址由程式從 stream 收，套用時拿它驗）；triage／預篩不帶，呼叫與以前逐字相同。
+        # ⚠ 收集器**每次呼叫一個**（2026-10-06 R2 條件 1）：整輪共用一個時，套用端只驗得出「今天這一輪有沒有人搜過這個字串」，
+        # 驗不出「是不是為了這一筆搜的」——B 照抄 A 的查詢詞與網址也會被記成查過。逐次紀錄寫進 `search_calls`。
+        make_collector = spec.get("collector")
+        base_kwargs: dict[str, Any] = {}
         if spec.get("tools"):
-            extra_kwargs["tools"] = spec["tools"]
-        if collector is not None:
-            extra_kwargs["observe"] = collector.observe
+            base_kwargs["tools"] = spec["tools"]
+        search_calls: list[dict[str, Any]] = []
         extra: dict[str, Any] = {}
         for start in range(0, len(batch), size):
             chunk = batch[start:start + size]
@@ -768,8 +796,9 @@ class DailyRun:
             timeout = per_call
             if self.deadline is not None:
                 timeout = max(0.5, min(per_call, (self.deadline - self.clock()).total_seconds() / 60))
-            outcome = runner(spec["compose"](chunk), argv=argv, cwd=cwd, env=env, timeout_minutes=timeout,
-                             **extra_kwargs)
+            collector = make_collector() if make_collector else None
+            kwargs = dict(base_kwargs, **({"observe": collector.observe} if collector is not None else {}))
+            outcome = runner(spec["compose"](chunk), argv=argv, cwd=cwd, env=env, timeout_minutes=timeout, **kwargs)
             calls.append(outcome.as_record())
             row["calls"] = calls
             if outcome.status == "capability_violation":
@@ -784,10 +813,15 @@ class DailyRun:
             for item in structured[spec["out_key"]]:
                 if isinstance(item, dict):
                     proposals.append(spec["stamp"](item, outcome.session_id))
-            if collector is not None and "no_material_change" in structured:
-                extra["no_material_change"] = bool(structured["no_material_change"])
-        if collector is not None:
-            extra["search"] = collector.as_record()
+            if collector is not None:
+                item_key = spec.get("item_key")
+                search_calls.append({**collector.as_record(), "session_id": outcome.session_id,
+                                     "items": [str(i.get(item_key)) for i in chunk] if item_key else []})
+                if "no_material_change" in structured:
+                    extra["no_material_change"] = bool(structured["no_material_change"])
+        if make_collector is not None:
+            extra["search"] = llm_step.merge_search_records(search_calls)   # 整輪聯集（雷達讀它；一次呼叫時與以前相同）
+            extra["search_calls"] = search_calls                            # 逐次（T2 輪詢按這個歸屬）
             row.update(searches=extra["search"]["searches"], search_urls=len(extra["search"]["urls"]))
         self._write_llm_result(result_path, spec["out_key"], proposals,
                                sessions=[c["session_id"] for c in calls], extra=extra)
@@ -909,6 +943,8 @@ def dry_run_text(config_path: Path = CONFIG_PATH) -> str:
     from engine_b import routine_config
 
     lines = []
+    llm: dict[str, Any] | None = None
+    radar: dict[str, Any] | None = None
     try:
         schedule = routine_config.load_schedule(config_path)
         llm = routine_config.load_llm(config_path)
@@ -928,7 +964,13 @@ def dry_run_text(config_path: Path = CONFIG_PATH) -> str:
         flags = ("寫" if step.writes else "讀") + ("／連網" if step.network else "") \
             + ("／必要" if step.essential else "")
         cmd = " ".join(step.argv) if step.argv else f"（{step.kind}）"
-        lines.append(f"  {step.key:28} {step.timeout_minutes:>5g} 分｜{flags}｜{cmd}")
+        # LLM 步驟照實印「每次 × 最多幾次」（R2 條件 2：原本印清單上的字面值，與 config 和分批都對不上）
+        budget = f"{step.timeout_minutes:g}"
+        if step.kind == "llm" and llm is not None:
+            calls = max_llm_calls(step, llm)
+            per = call_timeout_minutes(step, llm, radar)
+            budget = f"{per:g}×{calls}" if calls > 1 else f"{per:g}"
+        lines.append(f"  {step.key:28} {budget:>6} 分｜{flags}｜{cmd}")
     return "\n".join(lines) + "\n"
 
 
