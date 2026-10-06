@@ -81,3 +81,16 @@ Why local patch is insufficient: 「這一列跟哪個組比」是量測口徑�
   追蹤表 `scripts/outcome_if_settled_today.py`、計分表 `engine_b/account_scorecard.py`、APP（positions／account_scorecard 契約各升 /3）、心跳兩格。
 - **四個變異都紅**：以檔挑現行組、檔名改回 slug、只有一組就每列都比、非組員點名不計理由。
 - **真實資料驗收與 R2**：見 STEP_RESULT（本檔不重抄）。
+
+### R2 與複審（2026-10-06）
+
+- **R2（commit 6b568507）＝CONDITIONAL_GO**：C1 APP 計分表寫「不是組員的點名列在每格的濾掉理由裡」但頁面沒印；C2 組員但組報酬取不到的列
+  不在 n 也不在缺席名單（paper 12＋45＝57、分母 58）；另找到既有問題 F3（錨點晚於最後收盤被算成 0.0）。使用者：「C1 修｜C2 修｜F3 修」。
+- **修正（commit be98810b）**：計分表組那幾格印出濾掉的則數與理由；量得到報酬的列構造上不是有值就是具名缺席（新增 `theme_cohort_unpriced`、
+  `no_measurement_window`）；`series_return` 起點晚於終點回 None、paper 錨點那根之後沒有新收盤→`no_close_since_anchor`、live 對稱面同；
+  缺席短標籤收進 `alpha.theme_cohort.ROW_COHORT_ABSENCE_LABELS` 跟著資料走（L16）。
+- **F3 的實際影響比 R2 估的大**：71 檔裡 66 檔的第一份 v2 敘事寫在 10-05，台股最後一根是 10-05（與錨點同一根）、美股資料源只到 10-02——
+  修正前 paper 58 列報酬有 55 列是同一根 K 棒相除的假 0；修正後當天只有 3 列量得到。2026-10-06 那一行 `outcome_aggregate.jsonl`（daily 05:35 舊程式寫的）
+  未改寫（使用者授權不含改舊紀錄）。
+- **窄範圍複審（sonnet）＝GO**：C1 以 headless Edge 實際看到「濾掉 702／994 則：…不是任何組的組員 645」；C2 三條 lane 有值＋缺席＝分母；
+  七個變異在隔離 worktree 重做都紅。non-blocking：markdown 逐列那一格還印種類字串——已當下修（印標籤）。

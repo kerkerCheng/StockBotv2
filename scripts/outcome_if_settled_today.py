@@ -1497,7 +1497,8 @@ def _lane_table(rows: Sequence[Mapping[str, Any]], *, lane: str) -> list[str]:
             last = (f"{named.get('source')} {str(named.get('first_seen') or '')[:10]}" if named
                     else row.get("first_named_absence") or "—")
         cohort = row.get("theme_cohort") or {}
-        absent = (row.get("theme_cohort_absence") or {}).get("kind")
+        absence = row.get("theme_cohort_absence") or {}
+        absent = absence.get("label") or absence.get("kind")       # 標籤跟著缺席走（L16）；舊資料沒帶標籤時印種類
         cohort_cell = (_pct(row.get("excess_theme_cohort")) + f"（{cohort.get('members_used')}/{cohort.get('members_total')}）"
                        if row.get("excess_theme_cohort") is not None else (f"缺席（{absent}）" if absent else "—"))
         out.append(f"| {row.get('ticker')} | {row.get('anchor_date') or '—'} | {third} | "

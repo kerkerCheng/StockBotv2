@@ -286,7 +286,9 @@ def test_each_row_compares_only_with_its_own_cohort_and_non_members_are_named(co
         ("tc_test", "2026-09-30", [])]
     live = OIST.lanes_payload(collected)["live"]["theme_cohort_excess"]
     assert live["absent"] == {"not_in_any_cohort": ["LIVEX"]} and live["n"] == 0   # 缺席逐檔列名（INV-3）
-    assert "對組超額缺席 1 列（不是任何組的組員；not_in_any_cohort）：LIVEX" in "\n".join(OIST.render_lanes(collected))
+    rendered = "\n".join(OIST.render_lanes(collected))
+    assert "對組超額缺席 1 列（不是任何組的組員；not_in_any_cohort）：LIVEX" in rendered
+    assert "缺席（不是任何組的組員）" in rendered                    # markdown 逐列那一格也印標籤，不印種類字串（R2 複審 non-blocking）
 
 
 COHORT_COOLING = ThemeCohort(
