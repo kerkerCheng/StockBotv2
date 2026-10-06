@@ -1,0 +1,9 @@
+SOURCE: Open Compute Project Marketplace——nVent Brazos LTA CDU（液對氣 CDU 上架頁）
+URL: https://www.opencompute.org/marketplace/listing/nvent-brazos-lta-cdu/
+PUBLISHED: 2026-10-04（OCP WordPress REST 的上架發布日）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（上架頁正文）
+NOTE: 廠商提交（供應商自述）。液對氣 CDU 把熱排到空氣、不接廠務水，所以不用液對液板式熱交換器——本份只用來說明這個變體存在。
+
+2026-10-04 | nVent Brazos LTA CDU | https://www.opencompute.org/marketplace/listing/nvent-brazos-lta-cdu/
+Brazos is a Rack mounted Liquid-to-air (LTA) Coolant Distribution Unit (CDU) that can be standalone or stacked on top of each other in an OCP rack and run in series through the manifold system. The maximum units in one system can be three units. The system which is a self-contained cooling system used in data centers to cool high density computer hardware like AI servers without needing a building-wide chilled water pipe network. How It Works Closed- Loop Liquid Circulation: The unit pumps cool liquid directly through cold plates attached to hot computer chips (GPU, TPU or CPU) inside server racks to absorb heat. (Heat Rejection to Air: Instead of transferring that heat to an outdoor water system, internal fans blow air across an internal heat exchanger to release the heat straight into the room’s air stream. Facility Air Handlers: The existing room air conditioners or air handlers then remove the warmed air from the building.)

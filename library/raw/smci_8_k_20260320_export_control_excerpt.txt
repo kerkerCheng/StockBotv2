@@ -1,0 +1,12 @@
+SOURCE: Super Micro Computer, Inc.（SMCI）SEC 8-K（2026-03-20）——三名相關個人遭起訴（出口管制）
+URL: https://www.sec.gov/Archives/edgar/data/1375365/000137536526000011/smci-20260320.htm
+PUBLISHED: 2026-03-20（EDGAR filingDate）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（法定申報的有限逐字節錄）
+NOTE: 法定申報。節錄 Item 8.01 的事實段。要點：被告是三名個人，公司不是被告（媒體寫成「美超微遭起訴」是錯的措辭，L11-1）。
+
+- Attorney’s Office for the Southern District of New York unsealing an indictment of three individuals associated with the Company in connection with an alleged conspiracy to commit export-control violations.
+- The individuals charged are Yih-Shyan "Wally" Liaw, Senior Vice President of Business Development and a member of the Company's Board of Directors; Ruei-Tsang "Steven" Chang, a sales manager in Taiwan; and Ting-Wei "Willy" Sun, a contractor.
+- The Company has placed the two employees on administrative leave and terminated its relationship with the contractor, effective immediately.
+- Liaw has also resigned as a member of the Company’s Board of Directors, effective March 20, 2026.
+- The Company is not named as a defendant in the indictment and has been cooperating fully with the government's investigation and will continue to do so.

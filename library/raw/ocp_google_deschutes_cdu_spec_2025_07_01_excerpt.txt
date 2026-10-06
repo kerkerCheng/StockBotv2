@@ -1,0 +1,18 @@
+SOURCE: Open Compute Project — Project Deschutes: Data Center Facilities 0.80.0 Specification（Google 第五代 CDU 規格）
+URL: https://www.opencompute.org/documents/ocp-specification-deschutes-final-2025-09-05-pdf
+PUBLISHED: 2025-07-01（規格書每頁頁尾「Date: July 01, 2025」；OCP 文件名日期 2025-09-05）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（開放規格，研究必要的有限節錄）
+NOTE: 客戶端一手（Google 寫的規格；§19.3「The term “customer” used in this document refers to Google」「The term “vendor” … refers to the CDU provider」）。PDF 文字層斷行很多，以下節錄已把空白攤平成單行。
+
+（§2.3 Impact、§2.4 Scale）2.3 Impact The specification will enable any CDU supplier in the industry to develop, manufacture and improve upon the “Project Deschutes” design which is informed by more than 7 years of scale liquid cooling experience at Google. Furthermore,1st party hyperscalers and 3rd party data center owners alike all over the world would be able purchase a CDU based on the “Project Deschutes” specification. 2.4 Scale The “Project Deschutes” CDU is assembled from components that are sourced from multiple vendors that are widely known in the industry. Custom components in the CDU are intended to be manufactureable by well-known processes. Beyond supply chain considerations, installation and maintenance procedures are shared to enable fast deployments of reliable equipment. The processes and best practices shared by Google are based on the 7+ years of scale liquid cooling experience.
+
+（§3.2 Product requirements）3.2 Product requirements 1. Weight (wet, max): 6900 lbs 2. Weight (dry, max): 5310 lbs 3. Maximum height with packaging: 100 inches 4. N+1 (pump and accessories) 5. Pump serviceability (front & rear, front preferred) 6. Filtration, front serviceable (44 micron) 7. Side stream (i.e. bypass/parallel) filtration, front serviceable (0.2 micron), ~3 GPM 8. Spirovent (air separator) 9. Flow-through expansion tank, front serviceable 10. Leak rope detection (detected through PLC, 3 zones) 11. Telemetry (temperature & pressure on both sides, CDU flow, pump speed, pump power) 12. Flow meter (+/- 0.5% of reading) 13. Wetted materials: stainless steel, copper, EPDM 14. Fill and purge ports
+
+（§5 熱交換器性能表註）First source vendor: Alfa Laval, part number CB210-276AH, Item 30751 6274 3
+
+（§6.1 Pump）6.1 Pump ● First source vendor: SPECK ● Model: TOEMA065200 ● 500 GPM @ 112 psi ● 37 kW ● Seal less design ● N+1 operation
+
+（§6.2 Heat Exchanger）6.2 Heat Exchanger ● First source vendor: Alfa Laval ● Model: CB210-276AH ● Two pass heat exchanger ● 3 heat exchangers in parallel for lower pressure drop and thermal performance
+
+（§19.3 Nomenclature）19.3 Nomenclature ● The term “customer” used in this document refers to Google ● The term “vendor” used in this document refers to the CDU provider.

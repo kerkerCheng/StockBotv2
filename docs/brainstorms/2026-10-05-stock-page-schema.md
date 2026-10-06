@@ -389,6 +389,7 @@ AXT
 | F45 | **雷射磊晶與光偵測器磊晶是兩個市場**：雷射側要光柵與鐵摻雜再成長（MOCVD），光偵測器側英特磊說 MBE 長的高速 PIN 比較好——兩側方法優勢相反，三家的份額自述對不起來 | 讀圖的單位要對（變體）；讀到邊才算讀懂 | 層說明 ①4b；failure log #28 的候選第 2 例（結論翻在變體上，但這次主因是年報讀漏，算不算同一缺點留 7.5）；pq2 [716] 份額報告 |
 | F46 | **散熱鏈的量訊號在熱交換器，不在快接頭**（S4 第二份層說明，2026-10-06）：同時賣快接頭（CPC）與硬焊板式熱交換器（SWEP）的 Dover，2026 年兩季 10-Q 不再把資料中心快接頭列為成長來源，Q2 法說說「lead times overall are in balance … But in areas like heat exchangers, people are trying out there to secure supply」、熱交換器訂單「including longer lead-time orders」、產能 12 個月翻倍；同一家公司兩條產品線的口氣不對稱，比任何一家的自述都乾淨 | power-law：集中需求灌進一層薄的供應商（找對那一層） | 快接頭層讀 neither、富世達「缺 → 不要」；下一份層說明改做 CDU 裡的熱交換器（高力的本業，敘事停在「缺：CDU 與分歧管的量的證據」）；查證：`library/raw/dov_10_q_20260723_lc_excerpt.txt`、`dov_q2_2026_earnings_call_transcript_excerpt.txt` |
 | F47 | **讀圖字彙 `neither` 收兩種不卡**：註解寫「需求側可替代」，快接頭是「需求繞不過、但供給側本來就擴得動」（開放互換規格、上架 5 → 18 家、資本輕）——推翻條件相反（前者看替代品消失、後者看缺貨出現） | 讀圖可量（Phase 5 量測把 neither 當非斷言） | 這次把原因與推翻條件寫進反證；消費端兩種原因後果相同（都不是賭注），**暫不動契約**；7.5 量讀圖時若「neither 翻 volume」的案例集中在供給側那一種，再提把原因變成欄位 |
+| F48 | **同一台機器兩種形狀：CDU 層厚、CDU 裡的大型熱交換器層薄**（S4 第三份層說明，2026-10-06）：照 Google Deschutes 規格做 2 MW CDU 的有 8 家（OCP 目錄），規格把熱交換器第一來源寫成 Alfa Laval、每台三顆；Dover 說大型與特大型熱交換器交期「extended materially」、「very few competitors」，Alfa Laval 說資料中心訂單主要在 2027 年交貨。讀圖只看「CDU」這一格會讀成厚、讀不出卡——卡的在它的下一層，而圖上那一格原本是 0 條 | power-law：集中需求灌進一層薄的供應商（薄的那層常在下一層） | 板式熱交換器層說明、建層包 pq2 [721]（`co:google depends_on` CDU 是 CDU 需求側第一條客戶端的邊）；量的受益者是大型股（Alfa Laval、Dover），邊緣的高力要先證明它的熱交換器進了資料中心（[722]）；走圖「下一層 0 條」的層，下一份層說明優先看它的下一層 |
 
 ### 11.1 第四輪畫布（Version 10，2026-10-05）
 

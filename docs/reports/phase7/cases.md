@@ -323,6 +323,14 @@
     入圖包 pq2 **[719]**（`ra_2fc72a02a98b6f249fc1e391faeba09b`）：Dover／CPC 新聞稿（2026-07-22，逐字「a leading provider of quick disconnect couplings … for thermal management」——**10-05 那筆「Dover 的層邊不做、DOV 留在未到終局」由此接上**）、Stäubli 新聞稿（自述在 NVIDIA RVL）、Parker 與英維克的 OCP 上架頁 → 快接頭層四條自報供貨邊；名冊 co:parker_hannifin、co:staubli、co:envicool 隨包 staged；不改任何既有節點。
     向你要文件 pq2 **[720]**：Rubin 托盤快接頭的合格名單或份額（NVIDIA RVL 不公開）。
     **沒問到卻讀到：散熱鏈的量訊號在 CDU 裡的硬焊板式熱交換器**（Dover／SWEP），高力的本業正是它——下一份層說明直接做（高力敘事停在「缺：CDU 與分歧管兩層的量的證據」）
+  - 2026-10-06｜**板式熱交換器層說明 v1**（個股頁 S4 第三份、散熱鏈第二份；`library/private/research_notes/layer_notes/tech_brazed_plate_heat_exchanger.md`；提議節點 `tech:brazed_plate_heat_exchanger`——CDU 層讀圖的「下一層」原本 0 條）。
+    讀法：**這一層在排隊，而且是量（B）不是護城河。**Google 的 Deschutes CDU 規格（客戶端）：熱交換器「First source vendor: Alfa Laval ● Model: CB210-276AH」、每台 2 MW CDU 三顆，同時寫零件「sourced from multiple vendors that are widely known in the industry」；
+    Dover 第一季法說：大型與特大型熱交換器交期「extended materially」、客戶「would need to get in line」、「very few competitors」；第二季：12 個月內產能翻倍、客戶「securing capacity well ahead of need」；Alfa Laval 第二季報：資料中心需求轉成訂單「mainly for delivery in 2027」。
+    OCP 目錄：照 Deschutes 做 2 MW CDU 的 8 家，板式熱交換器上架只有 Alfa Laval——**同一台機器，CDU 層厚、熱交換器層薄**。沒有任何 CDU 買方一手說熱交換器缺（Vertiv：壅塞多半在自家供應鏈）。
+    **量的受益者是 Alfa Laval、Dover 這類大型股；邊緣公司在這一層看不到**——高力的板式熱交換器是本業，但沒有一份文件說它進了資料中心 CDU。
+    **改正：高力敘事 10-05 版寫的「熱能產品 62.3% → 73.7%」是同一年的個體與合併兩欄**（failure log #35）；真正跨年的是主要客戶表：「SMC」1.50 億（3.75%）→ 26.50 億（40.26%）、Bloom Energy 31.27%。美超微 2026-03-20 8-K：三名相關個人因出口管制被起訴、公司不是被告（媒體寫成公司被起訴）。
+    高力敘事換版 `ib_e94c9d2cc0c11d46`（仍「缺」，X 換成「板式熱交換器有沒有進資料中心 CDU」＋「美超微以外客戶量產」；反證 `ew_0298`、加碼條件 `ew_0299`、`ew_0300`；舊 `ew_0278` 收掉）——**因層說明改變的候選狀態 0 筆**（改寫不是改判）。
+    建層入圖包 pq2 **[721]**（`ra_d1e2d64cda6c73c3d2ed568ddeab803c`：新節點＋Alfa Laval（客戶端點名，designed_in）、Danfoss 供貨邊＋「是 CDU 元件」＋`co:google depends_on` CDU；名冊 co:alfa_laval 隨包 staged）；向你要文件 pq2 **[722]**（高力的客戶與產品拆分）。H1–H3 三條層主張等 [721] 入圖後的層讀圖（failure log #31 第 2 次）
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
 - failure log：（尚無）
@@ -333,6 +341,8 @@
   - #16（同 P1：第二個主題等權組會讓組基準整格缺席——本鏈的組因此延後）
   - #17（[719] 的圖影響印 +8 節點，實際新節點 3 個——第 5 次）
   - #34（富世達「缺 → 不要」換版後，舊「缺」的 wake_brief 等待 `ew_0246` 沒人收，10-12 會叫醒一份剛寫好的「不要」敘事）
+  - #11（[721] Google 自己的 CDU 規格 → `co:google depends_on` CDU 被預告成「供應商自報」——第 3 次）、#17（[721] 印 +10 節點、實際新 2 個——第 6 次）、#31（板式熱交換器層主張等層讀圖——第 2 次）
+  - #35（高力敘事把年報「個體／合併」兩欄讀成兩個年度；本 session 對話也差點重犯）
 
 ## X1 已定價回放（R1）
 

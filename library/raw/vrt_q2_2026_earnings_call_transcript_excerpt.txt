@@ -1,0 +1,31 @@
+SOURCE: Vertiv Holdings 2026 年第二季法說會逐字稿（第三方轉錄：Alpha Spread）
+URL: https://www.alphaspread.com/security/nyse/vrt/investor-relations/earnings-call/q2-2026
+PUBLISHED: 2026-07-29（法說會日期＝8-K 財報發布日 2026-07-29）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（逐字稿有限節錄）
+NOTE: 第三方轉錄；Vertiv 是 CDU 大廠（板式熱交換器的買方）。機械節錄含 supply chain／congestion／ThermoKey／heat exchang／CDU 的句子——沒有一句點名熱交換器缺貨。
+
+- Execution issues: Management said some Q2 revenue slipped because of large-project timing shifts and temporary supply chain congestion, but called this a learning-curve issue rather than a demand problem.
+- Revenue timing and project complexity Vertiv said some Q2 revenue was pushed out because of multiphase project timing and temporary supply chain congestion.
+- The recent ThermoKey and Strategic Thermal Labs deals were highlighted as adding thermal and liquid-cooling capabilities.
+- We experienced some minor timing shifts in Q2 revenue, primarily driven by multiphase project execution and temporary supply chain dynamics, but the demand is there and the trajectory is strong.
+- Examples are Vertiv Trim Cooler, Vertiv CoolChip CDUs, to name a few, fully enable this approach.
+- These shifts were reflected in the Americas revenue numbers and were primarily driven by multiphase project execution and temporary supply chain congestion.
+- On M&A, we closed the ThermoKey in June, strengthening our heat rejection capabilities.
+- S Scott Davis analyst Look, I just want to address a little bit of the issue that may be hurting your stock a little bit today with the timing shifts in 2Q revenues, the supply chain congestion comment.
+- Some of the projects are not only bigger but multidimensional, and there can be a lot of supply chain interdependencies.
+- And this supply chain is not necessarily an external supply chain.
+- It can be very often an internal within Vertiv supply chain.
+- A Amit Daryanani analyst I guess, Gio, if you just go back to the supply chain issues and delays, can you just talk about how much revenues were actually pushed out due to these challenges you had in the quarter? I think you missed the Street number by $100 million, but I'm actually wondering if the supply issues were perhaps much larger than that from a dollar perspective.
+- Is it on the supply chain? The supply chain is always a matter of working the sequence of things.
+- C Craig Chamberlin executive And Amit, I would just add that just to clarify, we're talking about the large project deployments and the learning curve around that, which has compounding effects from both the external supply chain and our own internal supply chain.
+- So there are some, I'd say, gray areas in there when we typically can recover from a late part in our smaller supply chains when it becomes a larger supply chain, it becomes more compounding.
+- I mean the ThermoKey acquisition seemed quite small, but did it come with quite a big balance sheet? C Craig Chamberlin executive ThermoKey didn't come with a large balance sheet.
+- ThermoKey had little impact to that.
+- C Christopher Snyder analyst I wanted to follow up on the conversation around the production disruption and some of the supply chain impact.
+- C Craig Chamberlin executive I think on your second point of why do we feel comfortable about the second half, as Gio said, it's a learning curve when you have these large projects and you do have congestion in your supply chain, which, again, some of that stuff is normal on point products, which is easier to iron out as you have a learning project for a larger project, some of it takes a little bit more time to get smoothed out and understand.
+- And as we think about the second half, we've also assumed some of that congestion continues as we normally would.
+- But on these projects, it might be a little bit further of congestion that we would have assumed than normal.
+- When it comes to some elements of congestion, possible elements of congestions, as Craig mentioned, we are prudent in our guidance, though we believe that there will be -- and we see -- we are seeing certainly a strong acceleration and improvement from an operational standpoint.
+- What I mean by that is that are there multiple points of challenges? Or is there sort of one main challenge that's sort of cascading across the supply chain? A little bit color there would be helpful.
+- So then clearly, we are in good control of the supply chain in that respect.

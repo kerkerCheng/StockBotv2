@@ -1,0 +1,13 @@
+SOURCE: Danfoss——Coolant distribution units for data centers（官網產品頁）
+URL: https://www.danfoss.com/en/industries/buildings-commercial/dps/data-center-liquid-cooling/coolant-distribution-units-for-data-centers/
+PUBLISHED: 2026-10-06（官網頁面無發布日；以擷取日標示，L11-5：不是發布日）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（官網頁面有限節錄）
+NOTE: 供應商自述（私人公司）。節錄 CDU 元件段與 FAQ 的熱交換器問答。
+
+- From heat exchangers over to valves, drives, and sensors to controllers – with Danfoss, you get almost every component to build an efficient, reliable CDU.
+- From heat exchangers to valves, drives, and sensors to controllers – with Danfoss, you get almost every component for almost the entire CDU ecosystem.
+- Show more Show less Learn more Brazed and gasketed heat exchangers Superior thermal management.
+- Learn more: Show more Show less Brazed plate heat exchangers Gasketed plate heat exchangers Pressure independent control valves Precise flow control and hydronic independence.
+- The integration of CDUs with direct-to-chip cooling and rear door heat exchanger solutions allows data center operators to implement full liquid cooling systems or hybrid cooling strategies.
+- to temperature variations - Filters: remove particulate matter and contaminants from the coolant, ensuring its purity and optimal performance - Control systems: regulate temperature, flow rates, and other critical parameters to maintain system stability - Sensors: monitor temperature, pressure, flow, and other variables, providing real-time data for system monitoring and control What types of heat exchangers are commonly employed in CDU applications? Brazed plate heat exchangers (BPHEs) are widely favored in CDUs due to their exceptional efficiency, compact design, and ability to handle high pressures and temperatures.

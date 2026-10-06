@@ -1,0 +1,135 @@
+SOURCE: Open Compute Project Marketplace——Alfa Laval 硬焊板式熱交換器上架頁三則＋依 Google Deschutes 5 規格的 CDU 上架清單
+URL: https://www.opencompute.org/wp-json/wp/v2/marketplace?search=Alfa%20Laval（及 search=Deschutes）
+PUBLISHED: 2026-10-06（擷取當日快照；每則日期是該上架的 WordPress 發布日）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（目錄標題、日期與上架頁正文）
+NOTE: OCP 官方目錄，內容由廠商提交（供應商自述）。關鍵字搜尋 SWEP、Kaori、BPHE 皆 0 筆；Deschutes CDU 上架頁只有 STULZ 一則寫了內含硬焊板式熱交換器、沒有寫廠商。
+
+【Alfa Laval 板式熱交換器上架頁】
+### 2026-10-04 | Alfa Laval Brazed Plate Heat Exchanger – Model CB410 / CB410AQ | https://www.opencompute.org/marketplace/listing/alfa-laval-brazed-plate-heat-exchanger-model-cb410-cb410aq/
+INTRODUCTION
+
+The Alfa Laval CB410 copper brazed plate heat exchanger (BHE) is engineered to provide efficient heat transfer with a compact footprint. The brazing material seals and holds the plates together at the contact points ensuring optimal heat transfer efficiency and pressure resistance. Using advanced design technologies and extensive verification guarantees the highest performance and longest possible service life.
+
+Alfa Laval CB410AQ is AHRI Certified through the Liquid to Liquid Heat Exchangers (LLHE) Certification Program which ensures thermal performance in accordance with the product specifications.
+
+POSITION IN DATA CENTER
+
+The plate heat exchanger may be an option for an In-row & Centralised Cooling Distribution Unit (CCDU, large skid based CDUs) and functions as a circuit breaker between the medias in the system, minimizing the volume of the coolant required.
+
+The CB410 may also be used in chillers as a free cooling heat exchanger and as a interface heat exchanger for waste heat recovery.
+
+TECHNICAL DATA
+
+Component – Material
+
+• Cover plates – Stainless steel
+
+• Connections – Stainless steel
+
+• Plates – Stainless steel
+
+• Brazing material – Copper
+
+OPERATIONAL DATA
+
+Specification – Value
+
+• Pressure vessel approvals – UL, PED, ASME
+
+CONNECTIONS
+
+• Wide range of connection offerings, e.g. TriClamp, Victaulic, Threaded, Flanges
+
+SUITABLE FLUIDS (AHRI APPROVED)
+
+• Fresh water
+
+• Propylene Glycol (different concentrations)
+
+• Ethylene Glycol (different concentrations)
+
+OTHER FLUIDS
+
+• Refrigerants excluding ammonia
+
+### 2026-07-23 | Alfa Laval Brazed Plate Heat Exchanger – Model CB112 / CB112AQ | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-model-cb112-cb112aq/
+INTRODUCTION
+
+The Alfa Laval CB112 copper brazed plate heat exchanger (BHE) is engineered to provide efficient heat transfer with a compact footprint. The brazing material seals and holds the plates together at the contact points ensuring optimal heat transfer efficiency and pressure resistance. Using advanced design technologies and extensive verification guarantees the highest performance and longest possible service life. Alfa Laval CB112AQ is AHRI Certified through the Liquid to Liquid Heat Exchangers (LLHE) Certification Program which ensures thermal performance in accordance with the product specifications.
+
+POSITION IN DATA CENTER
+
+The plate heat exchanger is part of the In-Row CDU and functions as a circuit breaker between the medias in the system, minimizing the volume of the coolant required. The CB112 may also be used as a interface heat exchanger for waste heat recovery.
+
+TECHNICAL DATA
+
+Component – Material
+
+• Cover plates – Stainless steel
+
+• Connections – Stainless steel
+
+• Plates – Stainless steel
+
+• Brazing material – Copper
+
+OPERATIONAL DATA
+
+Specification – Value
+
+• Pressure vessel approvals – UL, PED, ASME CONNECTIONS
+
+• Wide range of connection offerings, e.g. TriClamp, Victaulic, Threaded, Flanges
+
+### 2025-10-12 | Alfa Laval Brazed Plate Heat Exchanger – Model CB210 / CB210AQ | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-bphe-cb210-model/
+INTRODUCTION
+The Alfa Laval CB210 copper brazed plate heat exchanger (BHE) is engineered to provide efficient heat transfer with a compact footprint. The brazing material seals and holds the plates together at the contact points ensuring optimal heat transfer efficiency and pressure resistance. Using advanced design technologies and extensive verification guarantees the highest performance and longest possible service life.
+
+Alfa Laval CB210AQ is AHRI Certified through the Liquid to Liquid Heat Exchangers (LLHE) Certification Program which ensures thermal performance in accordance with the product specifications.
+
+Google Deschutes 5 CDU project – CB210-276AH-F
+The CB210-276AH-F heat exchanger has been specified for use in the Google Deschutes 5 CDU project.
+
+POSITIONS IN DATA CENTER
+The plate heat exchanger may be an option for an In-Row & Centralised Cooling Distribution Unit (CCDU, large skid based CDUs) and functions as a circuit breaker between the medias in the system, minimizing the volume of the coolant required.
+
+The CB210 may also be used in chillers as a free cooling heat exchanger and as a interface heat exchanger for waste heat recovery.
+
+TECHNICAL DATA
+Component – Material
+• Cover plates – Stainless steel
+• Connections – Stainless steel
+• Plates – Stainless steel
+• Brazing material – Copper
+
+OPERATIONAL DATA
+Specification – Value
+• Pressure vessel approvals – UL, PED, ASME
+
+CONNECTIONS
+• Wide range of connection offerings, e.g. TriClamp, Victaulic, Threaded, Flanges
+
+SUITABLE FLUIDS (AHRI APPROVED)
+• Fresh water
+• Propylene Glycol (different concentrations)
+• Ethylene Glycol (different concentrations)
+
+OTHER FLUIDS
+• Refrigerants excluding ammonia
+
+【Deschutes CDU 上架清單（標題｜日期｜連結）】
+### 2026-03-17 | Beehe IB2000 In Row L2L Deschutes 5 CDU | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/beehe-ib2000-in-row-l2l-deschutes-5-cdu/
+### 2026-01-26 | Nidec – Project Deschutes 5 CDU | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/nidec-project-deschutes-5-cdu/
+### 2025-10-14 | Vertiv CoolChip CDU – Project Deschutes 5 | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/vertiv-coolchip-cdu-project-deschutes-5/
+### 2025-10-13 | STULZ Deschutes CDU – CyberCool Liquid Cooling Distribution Unit | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/stulz-deschutes-cdu-cybercool-liquid-cooling-distribution-unit/
+### 2025-10-12 | nVent Project Deschutes Open CDU | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/nvent-project-deschutes-open-cdu/
+### 2025-10-12 | Delta 2MW Deschutes 5 CDU | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/delta-2mw-deschutes-5-cdu/
+### 2025-10-12 | Alfa Laval Brazed Plate Heat Exchanger – Model CB210 / CB210AQ | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-bphe-cb210-model/
+### 2025-10-11 | Eaton ROL4000-48U65 Deschutes CDU | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/boyd-rol4000-48u65-deschutes-cdu/
+### 2025-10-09 | Envicool – Deschutes 5 CDU | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/envicool-deschutes-5-cdu/
+
+【STULZ 上架頁提到熱交換器的句子】
+- Featuring a precision-engineered brazed plate heat exchanger, sanitary-grade stainless steel piping, and advanced variable-speed pump technology, the Deschutes CDU maximizes heat transfer efficiency within a compact footprint.
+- 2 um Side Stream Filtration ### 2025-10-12 | Alfa Laval Brazed Plate Heat Exchanger – Model CB210 / CB210AQ | https://www.
+- org/marketplace/facilities-physical-infrastructure/alfa-laval-brazed-plate-heat-exchanger-bphe-cb210-model/ INTRODUCTION The Alfa Laval CB210 copper brazed plate heat exchanger (BHE) is engineered to provide efficient heat transfer with a compact footprint.
