@@ -213,7 +213,8 @@ def _research_panel(view: AlphaInvestmentView) -> AnalystPanel:
     return AnalystPanel(
         key="research", title="研究現況：thesis、催化劑、什麼會推翻它、什麼需要重看",
         questions=("q6_change",),
-        status=worst_status(list(statuses.values())), optional=False,
+        # 2026-10-07（Phase 7 Step 7.0g-3）：降選配——不再決定 readiness（contracts.CORE_PANELS 的註解）
+        status=worst_status(list(statuses.values())), optional=True,
         source_sections=("variant_view", "falsification", "catalysts", "refresh_status"),
         source_statuses=statuses, source_absence_kinds=kinds, lines=lines,
         catalysts=ct.structured, checkpoints=ct.checkpoints,

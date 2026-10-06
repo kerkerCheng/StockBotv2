@@ -426,8 +426,12 @@ def test_review_required_and_stale_are_never_rendered_as_clean() -> None:
     a = analyst(scenario="consensus_revision")
     text = render_analyst_view_markdown(a)
     assert a.refresh.overall == "review_required"
-    assert a.readiness.state in ("ready_with_flags", "blocked")
-    assert a.readiness.flags, "有段落被標記需要重看，readiness 卻沒有任何 flag"
+    # ⚠ 2026-10-07（Phase 7 Step 7.0g-3，使用者 Q4 A）：`research` 降選配後，refresh 的「需要重看」不再升級成
+    # readiness 的旗標——它只經由 research 這一格進 readiness，而真實資料裡這一格的旗標 23／23 是雜訊
+    # （18 筆「ResearchContext digest 已變但沒有已分類的變化能解釋」、5 筆分析師目標價小幅變動；退役估值鏈的殘留，L14-4 恆亮）。
+    # **不得畫成乾淨的原則照守**：那一格自己的狀態仍是 review_required，畫面照印。
+    assert a.research.status == "review_required", "需要重看的那一格不得被畫成乾淨"
+    assert a.research.optional is True and not any(f.panel == "research" for f in a.readiness.flag_details)
     assert "review_required" in text
 
 

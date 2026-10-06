@@ -74,7 +74,10 @@ QUESTIONS: Mapping[str, str] = {
 #:   「review_required 的路」）。讀圖面板在讀圖 stale 時自己是 `review_required` → readiness `ready_with_flags`；
 #:   **它的狀態只由讀圖對圖決定，不吃 `refresh.overall`**（今天的 `review_required` 全是退役估值鏈殘留）。
 #:   沒有讀圖的公司因此多一個 blocker（`not_yet_recorded`）——真實 backlog，下一步是寫讀圖（research-drain 段 5）。
-CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "readings", "wipeout")
+#: ⚠ **2026-10-07（Phase 7 Step 7.0g-3；plan A4，使用者 Q4 A）：`research` 降選配**。它是舊式 session 判斷
+#:   （thesis／variant view／催化劑／refresh），研究判斷的主體已是 v2 敘事（`brief`）與讀圖（`readings`）；
+#:   當時 10 檔以它為卡點之一、0 檔只卡它。內容照印，只是不再決定 readiness。
+CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "readings", "wipeout")
 #: `fundamental`：稽核區的原始數字（內部預測／共識／落差）。2026-09-23 由核心降選配。
 #: `bet`：賭注。2026-09-23 起是**純文字**（讀 `our_bet`），不再是四個價格。optional——
 #: 沒寫賭注的檔 readiness 不變差；它回答的是「值不值得看」，不是「研究完不完整」。
@@ -87,7 +90,7 @@ CORE_PANELS: tuple[str, ...] = ("headline", "brief", "argument", "research", "re
 #: - `candidate`：首屏末行——候選狀態（與候選板同一個推導）＋財務三題三個字；由 materialize 注入。
 #: - `three_questions`：稽核區——三題每一行的值、來源、as_of、口徑、規則，或缺席分型。
 #: - `downside`：每一條反證連到盯它的 watch（沒有的印「未盯」）；由 materialize 注入。
-OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "candidate", "three_questions", "downside")
+OPTIONAL_PANELS: tuple[str, ...] = ("fundamental", "bet", "candidate", "three_questions", "downside", "research")
 
 #: panel status 的嚴重度序（**由輕到重**）。取最嚴＝取這個序裡 index 最大的那一個。
 #: 它只在既有 `SECTION_STATUSES` 上定義先後，不新增任何狀態字。

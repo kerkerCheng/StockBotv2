@@ -183,7 +183,8 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
     analyst = build_analyst_view(_bare_view(fundamentals=_FakeFundamentals(available=False)))
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b）：E 組（賭注四價 overlay）退役。 `downside` panel 退役。
     # Phase 2 Step 2.7：`readings`（讀圖）加入選配；Phase 3 Step 3.7 升核心，另加三個選配。
-    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "candidate", "three_questions", "downside"}
+    # Phase 7 Step 7.0g-3（2026-10-07，使用者 Q4 A）：`research`（舊式 session 判斷）由核心降選配。
+    assert set(OPTIONAL_PANELS) == {"fundamental", "bet", "candidate", "three_questions", "downside", "research"}
     for name in OPTIONAL_PANELS:
         assert getattr(analyst, name).optional is True, name
     # optional 的缺席一律不進 blockers／flags，只進 optional_unavailable。
@@ -194,7 +195,7 @@ def test_optional_panel_absence_does_not_change_core_readiness() -> None:
     unavailable = "｜".join(analyst.readiness.optional_unavailable)
     assert "fundamental" in unavailable and "bet" in unavailable
     # 而核心 panel 的缺席**必須**進 blockers——短評與歸零旗標 2026-09-23 起是核心；讀圖 2026-09-30（Step 3.7）起。
-    assert set(CORE_PANELS) == {"headline", "brief", "argument", "research", "readings", "wipeout"}
+    assert set(CORE_PANELS) == {"headline", "brief", "argument", "readings", "wipeout"}
     assert "brief" in blocked_panels and "wipeout" in blocked_panels and "readings" in blocked_panels
 
 
