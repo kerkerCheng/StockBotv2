@@ -1,0 +1,50 @@
+SOURCE: Optical Internetworking Forum — External Laser Small Form Factor Pluggable (ELSFP) Implementation Agreement, OIF-ELSFP-02.0
+URL: https://www.oiforum.com/wp-content/uploads/OIF-ELSFP-02.0.pdf
+PUBLISHED: 2025-01（OIF 標準 2.0 版；1.0 版 2023-08）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（開放標準，研究必要的有限節錄）
+NOTE: 第三方標準文件（OIF）。節錄：§1 Introduction／Objectives、§1.1 Applications 的設計理由、§3.5 光功率等級表。發布月份依 OIF 公告與轉載（2.0 版 2025 年 1 月），規格 PDF 本身的日期未另核。
+
+1 Introduction
+Figure 1 ELSFP module
+The External Laser Small Form-Factor Pluggable (ELSFP) is a faceplate pluggable form factor to address
+the laser packaging requirements for co-packaged optical (CPO) systems with optical engines (OEs)
+which do not have integrated lasers, but rather choose to locate lasers external to the OE.
+
+1.0 Objectives
+The ELSFP module includes a blindmate optical connector to ensure a safe method to field replace lasers
+in the event of failure.  Flexibility has been added to the form factor to enable a range of applications
+from massive scale data center switches to special purpose optically enabled ASICs.
+
+The ELSFP is targeted primarily at CPO applications, which may include but are not limited to the use of
+external lasers to provide optical power to the OEs incorporated in switches, network interface cards,
+artificial intelligent and machine learning application specific integrated circuits (ASICs), and more. The
+major advantages of this form factor are to reliably provide a replaceable light source package, couple
+that light in a safe way to maintain the system as an IEC 60825-2 Hazard Level 1 product, and decouple
+the thermal environment of the laser from that of the co-packaged ASIC assembly. Lasers have
+historically demonstrated significantly lower maximum reliable junction temperatures than silicon die
+(including silicon photonic circuit elements and germanium photodetectors). By placing the ELSFP at the
+faceplate of CPO systems (removed from the heat of the co-package ASIC and OEs) a more efficient
+cooling solution can be designed for these systems, and greater reliability is achievable with the fail-safe
+of a field replaceable pluggable module in case of a laser failure.
+
+Figure 3 Possible laser solutions for Co-Packaged Optical Systems.
+Figure 3 shows an example of the many possible solutions to provide laser light to CPO
+modules. The ELSFP defines 2 types of Front Panel Pluggable Laser Sources (FPLS) which
+enables a compact, eye safe, and versatile solution. Explicitly, 2a (Conventional ELSFP) and 2b
+(Pass-Through ELSFP) which are mechanically compatible with the same fundamental ELSFP
+port design assuming their keying features are compatible.
+
+3.5 Optical Power Classes
+Table 6 specifies the nominal fiber optical power for each of the optical power classes is measured at
+TPL2 described in §7.4.1. The power is specified per wavelength per core and follows the naming
+convention proposed in the ITU nomenclature for radio frequency band naming [18], so can be
+expanded to lower or high powers as required.
+Table 6 Optical power classes
+Optical Power Classes Power/λ/Core (+/- 1.5dB)
+Low Power - LP 11dBm
+Medium Power - MP 14dBm
+High Power - HP 17dBm
+Very High Power - VHP 20dBm
+Ultra High Power - UHP 23dBm
+Super High Power - SHP 26dBm

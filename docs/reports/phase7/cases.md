@@ -108,6 +108,12 @@
     11/18 H1'27 業績叫醒）——寫之前補 Engine C mechanical 三筆：FY2024-25 分部占比 `mo_528c25876a644d9d82a53ae2997d8a8e`（URD 比較欄）、
     Q1'27 營收 `mo_cdf9ed0095729b3551848732f1c1ef51`（一手 PDF：Edge & Cloud AI 6,500 萬歐元、固定匯率年增 46%，Photonics-SOI「sales doubling」）、
     FY27 指引 `mo_336a965dfca0eebd7bceba03f227b0f2`（Photonics-SOI 營收倍增以上）；光寶 2301.TW `ib_f496cf15e39a2f7a`（非邊緣的不要，約 201 億美元；研究判斷沿用 09 月版）
+  - 2026-10-06｜**外部光源層說明 v1**（個股頁 S4 第四份；`library/private/research_notes/layer_notes/tech_external_laser_source.md`）——O5 的層級補完：
+    客戶端點名的 ELS 供應商仍只有 Coherent（NVIDIA 部落格）；Lumentum 第一張 ELS 模組單 2027 下半年交貨、Cignal 2026 Q1「largest purchase order ever for the ELSFPs」但「no products shipping in volume yet」；
+    AAOI 法說：ELSFP「very limited production now」、2028 年約每月 40 萬顆、CPO 雷射「just can't make enough of them to be involved in their current first-generation deployments」；
+    「為什麼外接」寫在 OIF ELSFP 2.0 標準裡（可替換、眼睛安全、熱隔離：「Lasers have historically demonstrated significantly lower maximum reliable junction temperatures than silicon die」），Broadcom TH6-Davisson 用「Field-Replaceable ELSFP Laser Modules」。
+    讀圖換版 `sr_879ba9bc8ad69222` → **`sr_b17aaffaae5665a0`（仍 undecided）**：模組這一層沒有任何交期或配額原文，量的限制在下一層的 CW 雷射（`sr_3a4fe5719994dfdc`，volume）；E1–E5 五條條件登成 watch（模組本身短缺、第二家被客戶點名、改用 ILM、整合方具名量產、AAOI 放量改口或被具名）。
+    因層說明改變的候選狀態 0 筆（AAOI、POET 維持「不要」）；沒有敘事騎在這份讀圖上。下一輪的 RA：AAOI 的 ELS 供貨邊（要具名原文）、Broadcom depends_on 外部光源（更正走廊）
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
 
