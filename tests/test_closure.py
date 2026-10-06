@@ -38,38 +38,33 @@ def test_row_from_artifact_copies_blocker_details_without_parsing_prose() -> Non
 
 def test_next_pick_follows_the_rules_in_order() -> None:
     """⚠ 2026-09-23（Step 0b.3）：第 4 條原本是「瓶頸排序名次」；排序退役後改成
-    「有沒有帶 substitutability 的結構邊」，同產業同條件的兩檔只剩 ticker 字典序分先後。"""
+    「有沒有帶 substitutability 的結構邊」，同產業同條件的兩檔只剩 ticker 字典序分先後。
+    ⚠ 2026-10-07（Phase 7 Step 7.0g-2）：「有共識」「EPS 為正」兩條退役（Phase 0 殭屍），守它們的三列（NOCONS／LOSS／
+    UNKNOWN_CONS）同 commit 退役；虧損、沒共識的邊緣小公司不再因此排到最後。"""
     rows = [
         _row("READY1", readiness="ready", open_panels=(), sector="AI 光互連／CPO", has_structure_edge=True),
-        # 1. 有共識 > 沒共識
-        _row("NOCONS", has_consensus=False, forward_eps_positive=None, sector="機器人", has_structure_edge=True),
-        # 2. EPS 為正 > 非正
-        _row("LOSS", has_consensus=True, forward_eps_positive=False, sector="機器人", has_structure_edge=True),
-        # 3. 產業能加一（機器人尚無 ready）> 已有 ready 的產業（AI）
-        _row("AI2", has_consensus=True, forward_eps_positive=True, sector="AI 光互連／CPO", has_structure_edge=True),
-        _row("ROBOT", has_consensus=True, forward_eps_positive=True, sector="機器人", has_structure_edge=True),
-        # 4. 同產業、同條件：沒有名次了，只剩 ticker 字典序
-        _row("ROBOT_B", has_consensus=True, forward_eps_positive=True, sector="機器人", has_structure_edge=True),
+        # 1. 產業能加一（機器人尚無 ready）> 已有 ready 的產業（AI）
+        _row("AI2", sector="AI 光互連／CPO", has_structure_edge=True),
+        _row("ROBOT", sector="機器人", has_structure_edge=True),
+        # 2. 同產業、同條件：沒有名次了，只剩 ticker 字典序
+        _row("ROBOT_B", sector="機器人", has_structure_edge=True),
         # 結構表讀不到（None）：產業未知、結構邊未知 → 排在有結構邊者之後
-        _row("UNRANKED", has_consensus=True, forward_eps_positive=True, sector=None, has_structure_edge=None),
-        # 讀不到（None）排在 False 之後、True 之前
-        _row("UNKNOWN_CONS", has_consensus=None, forward_eps_positive=None, sector="機器人", has_structure_edge=True),
+        _row("UNRANKED", sector=None, has_structure_edge=None),
     ]
     order = [r.ticker for r in closure.rank_backlog(rows)]
-    assert order == ["ROBOT", "ROBOT_B", "AI2", "UNRANKED", "LOSS", "UNKNOWN_CONS", "NOCONS"]
+    assert order == ["ROBOT", "ROBOT_B", "AI2", "UNRANKED"]
     assert "READY1" not in order                       # 到終局的不在佇列裡
+    assert not any("EPS" in rule or "共識" in rule for rule in closure.NEXT_PICK_RULE)
 
 
 def test_user_defer_sorts_last_but_is_never_hidden() -> None:
     """「使用者剛說先不要」與「系統排第一」不得同時成立（L12）——但也不得消失（INV-3）。"""
     rows = [
-        _row("DEFERRED_BEST", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", has_structure_edge=True, user_deferred=True),
-        _row("PLAIN_WORST", has_consensus=False, forward_eps_positive=False,
-             sector="AI 光互連／CPO", has_structure_edge=False),
+        _row("DEFERRED_BEST", sector="機器人", has_structure_edge=True, user_deferred=True),
+        _row("PLAIN_WORST", sector="AI 光互連／CPO", has_structure_edge=False),
     ]
     order = [r.ticker for r in closure.rank_backlog(rows)]
-    assert order == ["PLAIN_WORST", "DEFERRED_BEST"], "四條研究判準不得蓋過使用者的明示指示"
+    assert order == ["PLAIN_WORST", "DEFERRED_BEST"], "研究判準不得蓋過使用者的明示指示"
     assert len(order) == 2, "往後排不是過濾——藏起來會讓「沒做」與「不存在」同形"
     why = closure.explain_pick(rows[0], frozenset())
     assert "使用者已 defer" in why
@@ -100,13 +95,10 @@ def test_base_observation_only_breaks_ties_and_never_outranks_the_four_rules() -
     """
     rows = [
         # 前四條同分，只差有無基期觀測
-        _row("TIE_NOBASE", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", has_structure_edge=True, has_base_observation=False),
-        _row("TIE_BASE", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", has_structure_edge=True, has_base_observation=True),
+        _row("TIE_NOBASE", sector="機器人", has_structure_edge=True, has_base_observation=False),
+        _row("TIE_BASE", sector="機器人", has_structure_edge=True, has_base_observation=True),
         # 有基期觀測但沒有結構邊——第四條仍然贏過成本維度
-        _row("NOEDGE_BASE", has_consensus=True, forward_eps_positive=True,
-             sector="機器人", has_structure_edge=False, has_base_observation=True),
+        _row("NOEDGE_BASE", sector="機器人", has_structure_edge=False, has_base_observation=True),
     ]
     assert [r.ticker for r in closure.rank_backlog(rows)] == [
         "TIE_BASE", "TIE_NOBASE", "NOEDGE_BASE"]
@@ -115,9 +107,9 @@ def test_base_observation_only_breaks_ties_and_never_outranks_the_four_rules() -
 def test_base_observation_unknown_sorts_between_have_and_have_not() -> None:
     """讀不到 Engine C 時是 None，不是 False——否則整批會被推到最後（L12）。"""
     rows = [
-        _row("NOBASE", has_consensus=True, sector="機器人", has_structure_edge=True, has_base_observation=False),
-        _row("UNKNOWN", has_consensus=True, sector="機器人", has_structure_edge=True, has_base_observation=None),
-        _row("HASBASE", has_consensus=True, sector="機器人", has_structure_edge=True, has_base_observation=True),
+        _row("NOBASE", sector="機器人", has_structure_edge=True, has_base_observation=False),
+        _row("UNKNOWN", sector="機器人", has_structure_edge=True, has_base_observation=None),
+        _row("HASBASE", sector="機器人", has_structure_edge=True, has_base_observation=True),
     ]
     assert [r.ticker for r in closure.rank_backlog(rows)] == ["HASBASE", "UNKNOWN", "NOBASE"]
 
@@ -136,8 +128,8 @@ def test_summary_counts_terminal_and_names_the_next_pick_with_reasons() -> None:
     rows = [
         _row("COHR", readiness="ready", open_panels=(), sector="AI 光互連／CPO", has_structure_edge=True),
         _row("6324.T", readiness="blocked", open_panels=(), settled=("headline",), sector="機器人", has_structure_edge=True),
-        _row("SHA0.DE", has_consensus=True, forward_eps_positive=True, sector="機器人", has_structure_edge=True),
-        _row("NVDA", has_consensus=True, forward_eps_positive=True, sector="AI 光互連／CPO", has_structure_edge=True),
+        _row("SHA0.DE", sector="機器人", has_structure_edge=True),
+        _row("NVDA", sector="AI 光互連／CPO", has_structure_edge=True),
     ]
     s = closure.summarize(rows)
     assert s["total"] == 4 and s["terminal_count"] == 2
@@ -158,24 +150,7 @@ def test_render_says_unread_instead_of_zero() -> None:
     assert "未讀到：Engine C 共識讀不到" in text and "全部到終局" in text
 
 
-def test_consensus_flags_prefer_next_year_and_latest_snapshot() -> None:
-    class _Conn:
-        def execute(self, _sql):
-            class _Cur:
-                def fetchall(self_inner):
-                    return [
-                        ("AAA", "2026-09-01", "0y", 1.0), ("AAA", "2026-09-01", "+1y", -0.5),   # 舊快照
-                        ("AAA", "2026-09-08", "0y", 1.2), ("AAA", "2026-09-08", "+1y", 2.0),    # 最新
-                        ("BBB", "2026-09-08", "0y", -1.0),                                        # 只有 0y 且為負
-                        ("CCC", "2026-09-08", "+1y", None),                                       # 有列沒值
-                    ]
-            return _Cur()
-
-    flags = closure._consensus_flags(["AAA", "BBB", "CCC", "DDD"], _Conn())
-    assert flags["AAA"] == (True, True)
-    assert flags["BBB"] == (True, False)
-    assert flags["CCC"] == (True, None)
-    assert flags["DDD"] == (False, None)
+# ⚠ 2026-10-07（Phase 7 Step 7.0g-2）：`test_consensus_flags_prefer_next_year_and_latest_snapshot` 隨 `_consensus_flags` 退役。
 
 
 def test_sector_and_structure_edge_come_from_the_table_and_registry_ticker() -> None:
@@ -284,17 +259,16 @@ def test_open_profile_counts_only_open_rows_and_honours_skip() -> None:
 def test_open_profile_treats_none_as_unread_not_as_no() -> None:
     """`None` 是讀不到，不是「否」。把它算進去等於 Missing != Zero 那個毛病（L12）。"""
     rows = [
-        _row("A", has_consensus=None, forward_eps_positive=None),
-        _row("B", has_consensus=False, forward_eps_positive=False),
+        _row("A", has_base_observation=None),
+        _row("B", has_base_observation=False),
     ]
     prof = closure.open_profile(rows)
-    assert prof["no_consensus"] == ["B"]
-    assert prof["forward_eps_not_positive"] == ["B"]
+    assert prof["no_base_observation"] == ["B"]          # 2026-10-07：原本綁 EPS 兩欄（退役），原則照守
 
 
 def test_open_profile_render_prints_every_field_even_at_zero() -> None:
     """0 也是資訊：某一項歸零時那一行仍要在，否則「沒印」與「沒發生」同形（L12／L13）。"""
-    rows = [_row("A", has_structure_edge=True, has_consensus=True, forward_eps_positive=True)]
+    rows = [_row("A", has_structure_edge=True)]
     lines = closure.render_open_profile(closure.open_profile(rows))
     assert len(lines) == len(closure.OPEN_PROFILE_FIELDS)
     assert all("0／1 檔" in line for line in lines)
@@ -305,32 +279,7 @@ def test_open_profile_says_nothing_left_when_everything_is_terminal() -> None:
     assert closure.render_open_profile(closure.open_profile(rows)) == ["未到終局 0 檔"]
 
 
-def test_consensus_flag_requires_both_periods_positive(tmp_path) -> None:
-    """0y 與 +1y 必須同時為正（2026-09-11 改）。
-
-    事發（2026-09-10 實測 MP）：舊規則「+1y 優先、0y 兜底」會把虧損年的檔選成「可以做」，
-    而它存在的理由正是要避開那些檔——MP 的 +1y 是 +0.89562，實際建模的 0y 是 −0.00374，
-    整檔只能走 Abstention。實測改完有 2 檔旗標翻轉（MP、XPEV），兩檔的 0y 都是負的。
-    """
-    import sqlite3
-
-    from alpha import closure
-
-    conn = sqlite3.connect(":memory:")
-    conn.execute("CREATE TABLE consensus_estimates(ticker TEXT, snapshot_date TEXT, "
-                 "relative_label TEXT, estimate_avg REAL, metric TEXT)")
-    conn.executemany(
-        "INSERT INTO consensus_estimates VALUES (?,?,?,?, 'eps')",
-        [("MPX", "2026-09-10", "0y", -0.004), ("MPX", "2026-09-10", "+1y", 0.90),
-         ("GOODX", "2026-09-10", "0y", 1.1), ("GOODX", "2026-09-10", "+1y", 1.4),
-         ("ONLYFARX", "2026-09-10", "+1y", 2.0)],
-    )
-    flags = closure._consensus_flags(["MPX", "GOODX", "ONLYFARX", "NOPEX"], conn)
-    assert flags["MPX"] == (True, False), "虧損的 0y 不得被 +1y 蓋過"
-    assert flags["GOODX"] == (True, True)
-    # 0y 缺值時退回 +1y——方向一致地偏保守，不是把缺值當成負
-    assert flags["ONLYFARX"] == (True, True)
-    assert flags["NOPEX"] == (False, None)
+# ⚠ 2026-10-07（Phase 7 Step 7.0g-2）：`test_consensus_flag_requires_both_periods_positive` 隨 `_consensus_flags` 退役（MP 那個事發的教訓——虧損年被選成「可以做」——不再適用：排序不再看 EPS）。
 
 # ---------------------------------------------------------------------------
 # 「有折溢價主張」不得把價格漂移算成主張（2026-09-12）

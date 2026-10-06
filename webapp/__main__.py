@@ -562,6 +562,8 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
                             {"ticker": tk, "basis": b, "reported": rep, "implied": imp,
                              "relative_gap": rel} for tk, b, rep, imp, rel in eps_rows]},
             "open_profile": profile,
+            # 7.0g-2：母體外逐檔列名（非倍率／邊緣沒座位已查），附理由
+            "outside": closure.summarize(rows).get("outside"),
         }, ensure_ascii=False, indent=2))
     else:
         mark = {"closed": "✅", "open": "▶", "unknown": "✗"}[result.state]
@@ -577,6 +579,9 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             # 不會變成「安靜消失」——INV-3：查不到了不是合法 lifecycle。
             print(f"- 等財報公布（目標期間已結束、財報未出；會自己解開）{len(awaiting)} 檔："
                   f"{'、'.join(awaiting)}")
+        # 7.0g-2：母體外逐檔列名——退出閉環不是「做完了」，也不得安靜消失（#22 選項②、INV-3）
+        for line in closure.render_outside(closure.summarize(rows)):
+            print(f"- {line}")
         for note in notes:
             print(f"- 未讀到：{note}")
         for line in closure.render_share_count_mismatches(share_rows):

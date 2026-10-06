@@ -525,7 +525,10 @@ def load_board(tickers: Sequence[str], *, today: date | None = None,
         if row is None:
             no_narrative.append({"ticker": ticker, "company_id": cid,
                                  "three_words": three_words(tq, brief, not_read=(f"未讀到（{note}）" if note
-                                                                                 else "未讀到"))})
+                                                                                 else "未讀到")),
+                                 # 7.0g-2：閉環母體要分「非倍率」與「邊緣」——邊緣判定本來就對整個宇宙算好了，
+                                 # 這裡只是寫出來（不進 freshness_identity：市值每天在動，那不是認知變了）。
+                                 "edge": edges.get(ticker)})
     for cid, info in (held.get("by_company") or {}).items():                   # registry 沒有 research ticker 的持有
         if cid not in {r["company_id"] for r in rows if r} and cid not in extra.values():
             rows.append(derive_row(str(info.get("sheet_ticker")), cid, records=[], today=today,

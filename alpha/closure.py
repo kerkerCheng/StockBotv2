@@ -49,10 +49,9 @@ from typing import Any, Iterable, Mapping, Sequence
 READY_STATES: frozenset[str] = frozenset({"ready", "ready_with_flags"})
 
 #: 選取規則的**可讀版本**——與 `_sort_key` 一一對應；drain／skill 印這個，不另寫一份。
+#: ⚠ 2026-10-07（Phase 7 Step 7.0g-2）：「有同期 EPS 共識」「forward EPS 共識為正（v1 只有本益比法）」兩條退役（Phase 0 殭屍）。
 NEXT_PICK_RULE: tuple[str, ...] = (
     "使用者沒有明示 defer（pq2 有 deferred_at 的往後排，仍列出不藏）",
-    "有同期 EPS 共識",
-    "forward EPS 共識為正（v1 只有本益比法）",
     "產業能加一（所屬產業尚無 ready 檔）",
     "有帶 substitutability 的結構邊（沒有的排後；結構表讀不到的居中）",
     "已有基期觀測（缺的要另外找一手年報／決算短信，實測成本約 3 倍）",
@@ -67,8 +66,9 @@ class BacklogRow:
     open_panels: tuple[str, ...]
     settled_panels: tuple[str, ...]
     absence_kinds: Mapping[str, str] = field(default_factory=dict)
-    has_consensus: bool | None = None
-    forward_eps_positive: bool | None = None
+    # ⚠ 2026-10-07（Phase 7 Step 7.0g-2）：`has_consensus`／`forward_eps_positive` 兩欄退役——它們餵的兩條排序
+    # （「有同期 EPS 共識」「forward EPS 為正」）理由引用的 `alpha/fundamental/bridge.py` 在 Phase 0 已刪（殭屍），
+    # 而它們讓有共識的大型股排在前面，與決定紀錄 G4（預算從深挖大公司移到列舉薄層的供應商）相反。
     sector: str | None = None
     #: 結構表上這檔有沒有任何一條帶 `substitutability` 的向下邊。`None`＝結構表讀不到。
     #: ⚠ 2026-09-23（Step 0b.3）之前這一格是 `bottleneck_rank`（可行動排序名次）；排序退役後
@@ -83,6 +83,27 @@ class BacklogRow:
     #: ⚠ 判定用到「今天」，所以它由 provider 算好帶進來——`alpha/closure.py` 保持無時鐘。
     awaiting_report_since: str | None = None
     generated_at: str | None = None
+    #: 閉環母體（2026-10-07，Phase 7 Step 7.0g-2；plan A4、failure log #22 選項②）：封閉字彙 `POPULATIONS`。
+    #: provider 用 `population_for` 算好帶進來（要讀候選板、結構表、lifecycle）。**預設 `in`**＝沒算或讀不到時
+    #: 留在母體——寧可多排一檔，不因為讀不到就退出（INV-3）。
+    population: str = "in"
+    #: 母體外那幾檔的理由（逐檔列名用：非倍率附市值與覆蓋、邊緣沒座位附上次短檢查日）。
+    population_reason: str | None = None
+    #: 邊緣沒座位：「坐哪一層」短檢查到期了嗎（90 天內有 v2 敘事＝查過）。用到今天，所以 provider 算（本檔無時鐘）。
+    short_check_due: bool | None = None
+
+    @property
+    def queued(self) -> bool:
+        """在不在段 5 的佇列裡（`rank_backlog`／`closure_gate`／`open_profile` 都讀這一格）。
+
+        母體內：照舊「未到終局」。非倍率：永遠不排（它的文件進層說明當證據，不寫敘事）。
+        邊緣沒座位：短檢查到期才排（沒查過、或上次查超過 90 天）——每個等待都有到期（INV-2）。
+        """
+        if self.population == "non_multiple":
+            return False
+        if self.population == "edge_no_seat":
+            return bool(self.short_check_due)
+        return self.terminal is None
 
     @property
     def terminal(self) -> str | None:
@@ -178,18 +199,16 @@ def sectors_with_ready(rows: Iterable[BacklogRow]) -> frozenset[str]:
 
 
 def _sort_key(row: BacklogRow, ready_sectors: frozenset[str]) -> tuple:
-    # False 排前面：有共識（not True=False）、EPS 為正、產業尚無 ready；None（讀不到）排在 False 之後、True 之前
+    # True 排前面；None（讀不到）排在 False 之前、True 之後
     def _flag(value: bool | None) -> int:
         return 0 if value is True else (1 if value is None else 2)
 
     return (
         # 第 0 條（2026-09-11）：「使用者剛說先不要」與「系統排第一」不得同時成立（L12）。
         # 往後排、**不過濾**——藏起來會讓「沒做」與「不存在」同形（INV-3）。
-        # 它排在四條研究判準之前，因為那四條是機器對研究價值的啟發法，而這一條是
+        # 它排在研究判準之前，因為那幾條是機器對研究價值的啟發法，而這一條是
         # 使用者的明示指示；讓啟發法蓋過指示，方向就反了。
         1 if row.user_deferred else 0,
-        _flag(row.has_consensus),
-        _flag(row.forward_eps_positive),
         # 只有「產業已知、且該產業還沒有 ready 檔」才算能加一；產業未知（不在排序內）不給分散度加分
         0 if (row.sector and row.sector not in ready_sectors) else 1,
         _flag(row.has_structure_edge),
@@ -203,17 +222,50 @@ def _sort_key(row: BacklogRow, ready_sectors: frozenset[str]) -> tuple:
 
 
 def rank_backlog(rows: Sequence[BacklogRow]) -> list[BacklogRow]:
-    """未到終局的列，依 NEXT_PICK_RULE 排序。到終局的不在裡面。"""
+    """在佇列裡的列（`BacklogRow.queued`），依 NEXT_PICK_RULE 排序。到終局的、母體外的不在裡面。"""
     ready_sectors = sectors_with_ready(rows)
-    pending = [r for r in rows if r.terminal is None]
+    pending = [r for r in rows if r.queued]
     return sorted(pending, key=lambda r: _sort_key(r, ready_sectors))
+
+
+#: 閉環母體的封閉字彙（2026-10-07，Phase 7 Step 7.0g-2；plan A4、failure log #22 選項②）。
+#: in＝已持有 ∪ 有 thesis（使用者明示）∪（邊緣或量不到 ∩ 供給側有座位）∪ 現行候選（缺 X／等回落／可開）；
+#: non_multiple＝非邊緣、沒持有、沒有 thesis、不是現行候選——不寫敘事，它的文件進層說明當在位者或客戶的證據；
+#: edge_no_seat＝邊緣或量不到但圖上沒有供貨座位——做一次「坐哪一層」短檢查，90 天後重問。
+POPULATIONS: tuple[str, ...] = ("in", "non_multiple", "edge_no_seat")
+#: 現行候選（這幾個狀態本身就是「還在研究」，不論邊緣與座位都留在母體）。
+_CANDIDATE_STATES_IN: frozenset[str] = frozenset({"missing", "priced_wait", "open"})
+#: 邊緣沒座位的短檢查多久重問一次（天）。
+SHORT_CHECK_DAYS = 90
+
+
+def population_for(*, held: bool | None, has_thesis: bool | None, candidate_state: str | None,
+                   edge_state: str | None, has_seat: bool | None) -> tuple[str, str]:
+    """→ (母體, 理由代碼)。**每一檔各自判的是非題，不跨檔比較**（G2）。純函式。
+
+    讀不到（None）的那一格一律往「留在母體」那一邊倒：邊緣判定讀不到 → in；座位讀不到 → in——
+    不因為讀不到就退出（INV-3）。非邊緣只看邊緣判定（市值 AND 覆蓋，`config/alpha_screen.json`）。
+    """
+    if held:
+        return "in", "held"
+    if has_thesis:
+        return "in", "thesis"
+    if candidate_state in _CANDIDATE_STATES_IN:
+        return "in", "candidate"
+    if edge_state == "not_edge":
+        return "non_multiple", "not_edge"
+    if edge_state in ("edge", "unmeasurable"):
+        if has_seat is False:
+            return "edge_no_seat", "no_supply_seat"
+        return "in", ("seat" if has_seat else "seat_unknown")
+    return "in", "edge_unknown"
 
 
 def explain_pick(row: BacklogRow, ready_sectors: frozenset[str]) -> str:
     parts = [
         *(["⚠ 使用者已 defer 相關 pq2——已往後排，仍列出"] if row.user_deferred else []),
-        "有共識" if row.has_consensus else ("共識未讀到" if row.has_consensus is None else "無共識"),
-        "EPS 為正" if row.forward_eps_positive else ("EPS 未讀到" if row.forward_eps_positive is None else "EPS 非正"),
+        *(["邊緣但圖上沒有供貨座位——這一輪做「坐哪一層」短檢查（補供貨邊、開發中、或不坐任何層）"]
+          if row.population == "edge_no_seat" else []),
         (f"產業「{row.sector}」尚無 ready 檔" if row.sector and row.sector not in ready_sectors
          else (f"產業「{row.sector}」已有 ready 檔" if row.sector else "產業未知（結構表上沒有它走得到錨的邊）")),
         ("有帶 substitutability 的結構邊" if row.has_structure_edge
@@ -225,9 +277,11 @@ def explain_pick(row: BacklogRow, ready_sectors: frozenset[str]) -> str:
 
 
 def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
-    ready = [r for r in rows if r.terminal == "ready"]
-    settled = [r for r in rows if r.terminal == "settled"]
-    awaiting = [r for r in rows if r.terminal == "awaiting_report"]
+    # 終局三種只數母體內的列（7.0g-2）：母體外的檔不是「做完了」，是「不在這個佇列」——分開列，不混進終局數。
+    inside = [r for r in rows if r.population == "in"]
+    ready = [r for r in inside if r.terminal == "ready"]
+    settled = [r for r in inside if r.terminal == "settled"]
+    awaiting = [r for r in inside if r.terminal == "awaiting_report"]
     ready_sectors = sectors_with_ready(rows)
     all_sectors = {r.sector for r in rows if r.sector}
     ranked = rank_backlog(rows)
@@ -241,6 +295,13 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
                                    sorted(awaiting, key=lambda x: x.ticker)},
         "terminal_count": len(ready) + len(settled) + len(awaiting),
         "open_count": len(ranked),
+        # 母體外逐檔列名、附理由（7.0g-2；#22 選項②「其餘退出閉環母體並印出退出數」）
+        "outside": {
+            "non_multiple": [[r.ticker, r.population_reason] for r in sorted(rows, key=lambda x: x.ticker)
+                             if r.population == "non_multiple"],
+            "edge_no_seat_checked": [[r.ticker, r.population_reason] for r in sorted(rows, key=lambda x: x.ticker)
+                                     if r.population == "edge_no_seat" and not r.short_check_due],
+        },
         "sectors_with_ready": sorted(ready_sectors),
         "sectors_seen": sorted(all_sectors),
         "next": None if nxt is None else {
@@ -257,11 +318,11 @@ def summarize(rows: Sequence[BacklogRow]) -> dict[str, Any]:
 #: 未到終局那一批「卡在哪」的彙總欄位。**刻意只用 `_sort_key` 已經在讀的那幾個**——
 #: 新造一組分類就會是 L16 說的「我需要一個分類，系統有，但我手上的介面沒帶」的第二份。
 OPEN_PROFILE_FIELDS: tuple[tuple[str, str], ...] = (
-    ("no_bottleneck_edge", "沒有帶 substitutability 的結構邊（Q1 結構分算不出）"),
-    ("no_consensus", "沒有同期 EPS 共識"),
-    ("forward_eps_not_positive", "forward EPS 共識非正（v1 只有本益比法）"),
+    ("no_bottleneck_edge", "沒有帶 substitutability 的結構邊"),
+    # ⚠ 2026-10-07（7.0g-2）：「沒有同期 EPS 共識」「forward EPS 共識非正」兩項隨 EPS 排序退役
     ("no_base_observation", "沒有基期觀測（要先自己找一手年報／決算短信，實測成本約 3 倍）"),
     ("user_deferred", "使用者已 defer 相關 pq2（已往後排，仍列出）"),
+    ("edge_no_seat_due", "邊緣但沒有供貨座位、短檢查到期（坐哪一層）"),
 )
 
 
@@ -277,16 +338,14 @@ def open_profile(rows: Sequence[BacklogRow], *, skip: Iterable[str] = ()) -> dic
     ⚠ `None` 是「讀不到」不是「否」：只數明確為否的那些（Missing != Zero，L12）。
     """
     skip_set = {str(t).upper() for t in skip}
-    open_rows = [r for r in rows if r.terminal is None and r.ticker.upper() not in skip_set]
+    open_rows = [r for r in rows if r.queued and r.ticker.upper() not in skip_set]
     return {
         "open_count": len(open_rows),
         "no_bottleneck_edge": sorted(r.ticker for r in open_rows if r.has_structure_edge is False),
-        "no_consensus": sorted(r.ticker for r in open_rows if r.has_consensus is False),
-        "forward_eps_not_positive": sorted(
-            r.ticker for r in open_rows if r.forward_eps_positive is False),
         "no_base_observation": sorted(
             r.ticker for r in open_rows if r.has_base_observation is False),
         "user_deferred": sorted(r.ticker for r in open_rows if r.user_deferred),
+        "edge_no_seat_due": sorted(r.ticker for r in open_rows if r.population == "edge_no_seat"),
     }
 
 
@@ -300,6 +359,19 @@ def render_open_profile(profile: Mapping[str, Any]) -> list[str]:
         hit = list(profile.get(key) or [])
         out.append(f"{label}：{len(hit)}／{total} 檔")
     return out
+
+
+def render_outside(summary: Mapping[str, Any]) -> list[str]:
+    """母體外逐檔列名（7.0g-2）。**0 也印**——「沒有人退出」與「沒算」不得同形（L13）。"""
+    outside = summary.get("outside") or {}
+    non = list(outside.get("non_multiple") or ())
+    checked = list(outside.get("edge_no_seat_checked") or ())
+    return [
+        (f"母體外·非倍率 {len(non)} 檔（不寫敘事；它的文件進層說明當在位者或客戶證據；每次 materialize 重算，翻回邊緣就回母體）"
+         + ("：" + "、".join(f"{t}（{why}）" for t, why in non) if non else "")),
+        (f"母體外·邊緣沒座位、{SHORT_CHECK_DAYS} 天內已做過短檢查 {len(checked)} 檔"
+         + ("：" + "、".join(f"{t}（{why}）" for t, why in checked) if checked else "")),
+    ]
 
 
 def render_awaiting_report(summary: Mapping[str, Any], *, today: date | None = None) -> list[str]:
@@ -331,9 +403,13 @@ def render_summary(summary: Mapping[str, Any], *, notes: Sequence[str] = ()) -> 
     parts = f"ready {len(summary['ready'])}／settled {len(summary['settled'])}"
     if awaiting:
         parts += f"／等財報 {len(awaiting)}"
+    outside = summary.get("outside") or {}
+    n_non, n_checked = len(outside.get("non_multiple") or ()), len(outside.get("edge_no_seat_checked") or ())
     line = (
         f"段5 每檔閉環：到終局 {summary['terminal_count']}（{parts}）"
-        f"／未到終局 {summary['open_count']}｜有 ready 檔的產業 {len(summary['sectors_with_ready'])}／{len(summary['sectors_seen'])}"
+        f"／未到終局 {summary['open_count']}"
+        f"／母體外 {n_non + n_checked}（非倍率 {n_non}、邊緣沒座位已查 {n_checked}）"
+        f"｜有 ready 檔的產業 {len(summary['sectors_with_ready'])}／{len(summary['sectors_seen'])}"
     )
     if nxt:
         line += (f"｜下一檔：{nxt['ticker']}（{nxt['why']}；缺：{'、'.join(nxt['open_panels']) or '—'}）")
@@ -386,47 +462,7 @@ def _base_observation_tickers(conn: Any) -> frozenset[str]:
     return frozenset(str(r[0]).upper() for r in rows if r and r[0])
 
 
-def _consensus_flags(tickers: Iterable[str], conn: Any) -> dict[str, tuple[bool, bool | None]]:
-    """ticker → (有 EPS 共識, forward EPS 為正)。取每檔最新 snapshot 的 eps 列。
-
-    ⚠ **要求 0y 與 +1y 同時為正**（2026-09-11 改；原本是「+1y 優先、0y 兜底」）。
-
-    事發（2026-09-10 實測 MP）：舊規則刻意優先 +1y，但 `alpha/fundamental/bridge.py` 建模的
-    目標期間是「基期後一個會計年度」——對 12 月結算的公司就是 **0y**。MP 的 +1y（FY2027）
-    共識 EPS 是 +0.89562，於是 gate 判「EPS 為正」並把它選為下一檔；而實際建模的 FY2026
-    同期共識是 **−0.00374**，內部 GAAP EPS 推出來 −0.2685，forward_earnings_multiple
-    型別上不適用，整檔只能走 Abstention（[521]）。
-    **這條規則會系統性地把虧損年的檔選成「可以做」，而它存在的理由正是要避開那些檔。**
-
-    為什麼是「兩者皆正」而不是「只讀 0y」：0y 缺值的檔不少（新上市、換會計年度），
-    只讀 0y 會把它們全判成 None 而排到後面；要求兩者皆正在資料完整時等於讀 0y，
-    在 0y 缺值時退回 +1y——**方向一致地偏保守**，不會把虧損年放進來。
-    """
-    rows = conn.execute(
-        "SELECT ticker, snapshot_date, relative_label, estimate_avg FROM consensus_estimates WHERE metric = 'eps'"
-    ).fetchall()
-    latest: dict[str, str] = {}
-    for ticker, snap, _label, _val in rows:
-        t = str(ticker).upper()
-        if t not in latest or str(snap) > latest[t]:
-            latest[t] = str(snap)
-    values: dict[str, dict[str, float | None]] = {}
-    for ticker, snap, label, val in rows:
-        t = str(ticker).upper()
-        if str(snap) != latest.get(t):
-            continue
-        values.setdefault(t, {})[str(label)] = (float(val) if val is not None else None)
-    out: dict[str, tuple[bool, bool | None]] = {}
-    for t in tickers:
-        vals = values.get(t.upper())
-        if not vals:
-            out[t] = (False, None)
-            continue
-        near, far = vals.get("0y"), vals.get("+1y")
-        present = [v for v in (near, far) if v is not None]
-        # 兩者皆正才算正；任一為負就不算——虧損年不得被選成「可以做」。
-        out[t] = (True, all(v > 0 for v in present) if present else None)
-    return out
+# ⚠ 2026-10-07（Phase 7 Step 7.0g-2）：`_consensus_flags`（有 EPS 共識／forward EPS 為正）隨兩條 EPS 排序退役——理由引用的 `alpha/fundamental/bridge.py` 在 Phase 0 已刪。
 
 
 def _target_period_ends(tickers: Iterable[str], conn: Any) -> dict[str, str | None]:
