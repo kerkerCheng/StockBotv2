@@ -81,6 +81,7 @@ KEEP: dict[tuple[str,str],str] = {
     ("webapp/materialize.py","B"): "retirement_note: materialize_basket 退役註記；positions 的 power_law note 用「籃子總報酬」量測用語",
     ("webapp/contracts.py","B"): "retirement_note: basket kind 退役註記（0a.2）",
     ("webapp/api.py","B"): "retirement_note: /basket 路由退役註記（0a.2）",
+    ("alpha/theme_cohort.py","B"): "retirement_note: L12 註解——「非組員也拿光通訊籃子當基準」是舊的全域一組語意，說明為什麼改成每列用自己所屬的組（多主題等權組 S1，2026-10-06）",
     ("webapp/static/app.js","B"): "retirement_note: 結構表區塊註記寫明籃子頁移除；positions 頁「籃子總報酬」量測用語",
     ("alpha/gap_closure.py","B"): "boundary_sentence: 引 AGENTS「籃子總報酬＝最大單檔＋其餘」的量測取捨",
     ("alpha/abstention/contracts.py","B"): "kept_file: ABSTENTION_SUBJECTS 的 bet 字彙是 append-only abstention ledger 的 subject（資料留，L10）；第 49／53 行的籃子註記是歷史消費端的說明，Phase 0 未改寫（R2 2026-09-24 指出，屬註記非機制）",

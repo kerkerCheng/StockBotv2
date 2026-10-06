@@ -95,6 +95,16 @@ derived_from: docs/brainstorms/2026-10-04-phase7-research-edge-proposal.md（能
 | why | 使用者 2026-10-04：開發必須由真實失敗驅動；這句是邊界不是手段（不指名函數、表、門檻或 Phase），符合 AGENTS 准入判準；使用者直接指示的開發項不受它限制（AGENTS「使用者主動指示＝已授權」） |
 | impact | AGENTS 一句；development-flow 八欄的範圍欄加「暴露它的案例」（Step 7.0b）；ROADMAP 新開發項的「為什麼」照寫 |
 
+**A3｜O6（光通訊磊晶與 MOCVD 產能）從 7.4 提前到 7.1，以「層說明」形式產出（2026-10-06 使用者定案）**
+
+| 欄 | 內容 |
+|---|---|
+| 原 plan | 進度表：O6 是 7.4 Wave 2 的二階瓶頸三個 case 之一；7.1 的清單是積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 |
+| 新觀察 | 2026-10-06 brainstorm（個股頁 schema §11 F40–F42、failure log #28）：讀圖五角度全是拓撲，沒有「客戶為什麼選這家的變體」那一格；11 檔「缺 X」裡 X 是層說明補得了的，InP 磊晶最多（IQE.L 缺的就是這一層的讀圖、全新 2455 缺 CW 雷射客戶、聯亞等回落），而且圖上沒有這一層（聯亞掛在下一層、IQE 的磊晶邊接在客戶公司上） |
+| proposed change | 7.1 加一項、排第一件：InP 磊晶層說明（個股頁 plan S4 的四段規格：物理與變體／各家變體與階段附證據等級／客戶為什麼選這家的變體附客戶端出處／主張登記成 watch），落 `library/private/research_notes/`，新層節點與重掛邊走 RA → pq2；它同時是 O6 的 case 段 |
+| why | 使用者 2026-10-06：「選對我系統來說最有價值的」；一份研究兩邊用（O6 與 S4）；圖的形狀本身是錯的，層說明寫完會動圖 |
+| impact | 進度表 7.1 一行；§7 清單加第 6 項；ROADMAP Phase 7 列不改（它只寫「二階瓶頸」不列 case）；7.4 的二階 case 少一個、不補 |
+
 ## 0.5 核准狀態、續工方式、進度表
 
 **本 plan 是使用者已核准的 PLAN_PROPOSAL**（§0.1）。`AGENTS.md`「常規推進授權」照用：Verdict 為 `GO` 且沒有待使用者決定的問題就**直接做下一個 Step**；
@@ -125,7 +135,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ✅（v2 選填欄、只在非空時進 id——真實 ledger 20 行重算逐位相同；watch `brief:<id>#c<n>`＋`condition_role=confirm`，判斷只住 `is_confirm`，反證計數、downside、可開都不吃〔變異紅〕；觸及與到期進 `narrative_rewrite`、以 `confirmed` 處置、候選狀態不自動改；心跳一行＋三個快照鍵、候選板與個股頁逐條列〔句子在 materialize 端組好、前端照印〕；**R2-a GO**〔獨立重算 20/20、兩個變異紅、consumer 逐處盤點無漏〕；偏差 #12） | 執行模型 | 見 git log「Step 7.0d」 |
 | 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ✅（五題對照唯一一份 `FIRST_SCREEN_QUESTIONS` 經 `.meta.json`、app.js 不留第二份；`shared_bet` 只呈現、依 ticker 字母列、缺席分型由產生端宣告；改前改後各 materialize 76 頁——拿掉新欄位、時間戳與價格脈絡後 76/76 逐字相同、`freshness_identity` 76/76 相同；Edge 實點四頁五題 5/5、COHR 與 SIVE.ST 互列 CW DFB 層；變異六個紅；偏差 #13–#14） | 執行模型 | 見 git log「Step 7.0e」 |
 | 7.0f | 外部雷達：daily 只開 WebSearch 的 LLM 步驟、八週試驗（R2-b；sandbox impact review） | ✅（探針：不放行時 WebSearch 被拒、卻回 `is_error: false`＋空結果→一律判失敗；最窄放行＝`permissions.allow`；雷達 init 與零工具那份只差 `tools`；daily ①b–①e、`radar.enabled`（沒有那一段＝關閉）；網址必須出自同一次搜尋〔程式從 stream 收〕、去重且已登記的不碰、每日 5 則、secondary、不喚醒語意 watch；triage 批次雷達排最後〔偏差 #16〕；真資料試跑：搜尋 16 次、148 網址、提議 0；變異八個紅；**R2-b GO**〔11 種網址變體無一繞過、找不到多拿能力的路徑、prompt 無持股〕；偏差 #15–#18；**第一輪真實排程 2026-10-05 05:30——看心跳段 3 那一行與 `radar_2026-10-05.json`（ROADMAP 驗收⑦）**） | 執行模型 | 見 git log「Step 7.0f」 |
-| 7.1 | Wave 1 研究（約 4 週）：積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 | ○ | 強模型 | |
+| 7.1 | Wave 1 研究（約 4 週）：**InP 磊晶層說明（O6 提前，A3，排第一件）**、積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 | ○ | 強模型 | |
 | 7.2 | 回放：R1 已定價、R3 漏網稽核（機械）；R2 parked 回查、R4 輸家驗屍（研究） | ✅（四份 `docs/reports/phase7/replay-*.md`，產生程式碼逐字附錄、偏差標註齊全。R1：124 格有值 10、PIT 違規 0，H9 兩個子群都「不足」（#12 價格歷史深度）；R3 第一窗：Q3 前四分之一逐檔有 `first_seen` 或「沒有接觸」（#13 名冊新增後 lead 身分不重掃；第二窗在 7.5）；R2：36 則證實 1（CCXI S-4）、H2 的 X2 部分「不足」、與 P3 合併判（#15 park 等的東西出現了卻沒接回；「無法判」「不適用」兩類是回查時加的，報告已註明不影響判讀）；R4：五檔全部「證據不足以判」（#14 反證做成被評公司的供貨邊）） | 執行模型（R1、R3）＋強模型（R2、R4） | 見 git log「Step 7.2」 |
 | 7.3 | 中迴路裁決（Q3 財報季；到點插隊）：AXTI、COHR、LITE、SIVE.ST＋新鏈有裁決點的 | ○ | 強模型 | |
 | 7.4 | Wave 2 研究（約 4–6 週）：二階瓶頸三個 case、800VDC 回看、依 failure log 選題 | ○ | 強模型 | |
@@ -333,6 +343,10 @@ L11-6 ④：最先壞的是 daily 的保險檢查（LLM 步驟前後的檔案指
 4. **O3 POET**：寫 v2 敘事（候選狀態照研究結論；預期「不要」，理由：供應商給認股權證換訂單＝不是瓶頸，ARCHITECTURE §6 四維度）＋case 段。
    **O5 COHR 外部光源第二來源**：從 thesis mutation 歷史與當時的圖寫 case 段（斷言、被推翻的文件與日期、之後的價格），填 2×2。
 5. **使用者加 X 帳號**（Q4，隨時）：照 `config/signal_sources.json` 的規則以 probation 加入、`crons/harvest_config.json` 的 handles 同步，記進 `cohort-changes.md`。
+
+6. **InP 磊晶層說明（A3，2026-10-06；排第一件）**：照個股頁 plan S4 的四段規格寫——①物理與變體（InP 磊晶對 CW DFB／EML／PD 各是什麼、MOCVD 與 6 吋基板、自製 vs 外購）②各家變體與階段附證據等級（聯亞、全新、英特磊、IQE；Coherent／Lumentum／MACOM 內製）③客戶為什麼選這家的變體、什麼會讓它被換掉，附客戶端出處（IDM 法說、10-K 供應商段、論文）④每條主張登記成 watch。落 `library/private/research_notes/layer_notes/mat_inp_epitaxy.md`（S4 ledger 落地後搬）；新層節點與重掛邊（聯亞、IQE 的磊晶邊）寫 RA → pq2 `ra_admission`；同時是 O6 的 case 段。
+   **撞到拿不到的文件就照 source-trace 的要求格式列給使用者（有問題型附結果表、探索型附上限），鑄 `source_trace_review`，不 park。**
+   怎麼驗：讀完的報告（問了什麼／答到／沒答到／相反／沒問到卻讀到的）；registry 裡因它改變候選狀態的筆數；它的主張變成 watch 的條數。
 
 **怎麼驗：** ①光通訊以外 **≥2 條鏈各有現行讀圖、每份 ≥1 條登記反證**（讀圖、registry）；②本波新寫的每份敘事都有候選狀態、`rides[]`、翻倍條件那一句（持有或可開的另有 `confirm[]`）（敘事）；
 ③23 則 triaged_go 各到終局（registry）；④S1 的 40 則各有裁決或到期（registry）；⑤新鏈的主題等權組在該鏈第一份敘事之前落地（registry：pq2 編號與 ledger 時間）；
