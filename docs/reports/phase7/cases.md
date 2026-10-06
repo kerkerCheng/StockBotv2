@@ -360,6 +360,10 @@
 - 研究產出：（尚無）
   - 2026-10-06｜開題稽核 pq2 **[723]**（使用者 2026-10-06 主動選題，受理即 resolve，收據 `authority:user_directive`）
   - 2026-10-06｜種子 lead `lead_7cb87fe0d59de4b7cf175f5a47be602a`（qinbafrank 轉述 Freda Duan，`user_shared:qinbafrank`，tier 4，triaged_go `interactive:directed`）
+  - 2026-10-07｜**decompose 收據**——系統 A：Anthropic 2026-08-18 那一輪 AI binder「設計→濕實驗驗證」campaign（1,320 個設計交 Adaptyv 全收、Twist 收 1,260，HT-SPR 量結合，354 個有結合——Adaptyv 單家 336）；系統 B：一個單抗 program 的 IND-enabling 臨床前包（FDA 估典型 program 用 144 隻 NHP）；旁支 A′：擾動圖譜（不在原文那條 binder 迴路上）。選題理由＝使用者原話（[723]）。一手來源 160 多份（Anthropic 技術報告與資料集、Adaptyv 方法頁、Twist 10-K／10-Q／法說、GenScript 中報、CRL 10-K 與法說、昭衍／美迪西／百普賽斯／義翹半年報、FDA 文件）；拆出 22 層，反方查證補 4 層可開題的（表達細胞株與培養基、抗體庫與 display、齧齒類與比格犬、CMC／毒理批）＋7 層併入既有題目或只記錄；圖上全是未知層（🔴，圖上生醫節點 0）。研究地圖（含 160 多個出處與反方查證全文）存 `library/private/research_notes/decompose/aibio_aidd_2026-10-07.md`（private）
+  - 2026-10-07｜研究題目（pq1，`decompose:aibio-aidd-2026-10-07`，triaged_go interactive:directed；**一層一則**，同層的問題綁在一起）20 則：A2 基因合成 lead_e4d82d83、A2d 合成原料 lead_85e28284、A3 蛋白表達 lead_6e52b6fc、A3b 無細胞試劑 lead_f7129a60、A4 標靶抗原 lead_bf44dbb5、A4b 捕捉表面 lead_cb4b5bf7、A5 HT-SPR lead_7abdbb7b、A6 驗證資料工廠 lead_6a976956、A8 自動化 lead_286783b8、A9 可開發性 lead_76d64853、A10 迴路內 NGS lead_49ab494d、B1 GLP 毒理 lead_e2dc4890、B2 實驗猴 lead_872257be、B3 跨境 lead_341c3850、B5 NAMs（反證開關）lead_e354e088、表達細胞株與培養基 lead_8c8f5ea9、抗體庫 lead_347614bf、齧齒類與比格犬 lead_0a06ea04、CMC／毒理批 lead_26c8d843、需求端 D1–D7 lead_0d1081c8。不開題：A1 設計（開源、非瓶頸）、A7 數據擬合（無上市者）、A′ 定序與單細胞（大型股、不在迴路上；只當證據）
+  - 2026-10-07｜**開題原文逐條對照**（原文＝SNS t4）：TWST 三位數訂單成長（供應商指引，FY25 基數約 $25M）、GenScript AIDD 1H26 翻倍、4,000+ designs/day（官網自述、口徑未定義）、1,320／354 都有一手；**「通路調查 8,000／日、往 16,000」沒有一手**（Adaptyv 自述量級差兩個數量級以上）；猴價上行在中國有買方原文（美迪西）、價位只有二手（中檢院 19 萬是招標預算、成交 17.8 萬）、美國不成立（CRL：「lower NHP sourcing costs」）；**「CRO 產能緊」在美國被否認**（CRL：「we don't see a bottleneck there」），中國只有匿名轉述；**鏈上的「定序」不在 binder 迴路上**（讀出是 HT-SPR）
+  - 2026-10-07｜反方查證抓到的讀法錯（研究地圖內已標，未進任何 ledger）：§5 把半年報裡就有的營收拆分寫成「沒有數字」（L11-5）——百普賽斯重組蛋白 80.37%、技術服務 2.82%，所以它的曝險在抗原試劑（A4）、不在 AI 表達服務；昭衍的 4,384 萬是預付款總額（它自己持猴，不是乾淨的買方訊號）；Twist 增資兩個數字是基本額對含超額配售、不矛盾
 
 ## X1 已定價回放（R1）
 
