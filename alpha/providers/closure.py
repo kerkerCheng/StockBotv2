@@ -185,7 +185,9 @@ def population_detail(population: str, code: str, info: Any, *, board_day: str |
     """→ (逐檔列名用的理由, 短檢查是否到期)。時鐘住這一層（`alpha/closure.py` 無時鐘）。"""
     if population == "non_multiple":
         edge = (info or {}).get("edge") or {}
-        cap = edge.get("market_cap_label") or "市值未知"
+        # 標籤只在敘事列上有；沒有敘事的列只有數值——從數值照印（2026-10-07：曾把 103 億美元印成「市值未知」，L18）
+        usd = edge.get("market_cap_usd")
+        cap = edge.get("market_cap_label") or (f"{usd / 1e9:.1f}B USD" if isinstance(usd, (int, float)) else "市值未知")
         cov = edge.get("analyst_count")
         return f"非邊緣：{cap}、分析師 {cov if cov is not None else '未知'} 位（判定 {board_day or '日期未知'}）", None
     if population == "edge_no_seat":

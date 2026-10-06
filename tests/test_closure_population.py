@@ -137,6 +137,14 @@ def test_short_check_due_after_ninety_days() -> None:
     assert due is True and "到期重問" in reason
 
 
+def test_non_multiple_reason_prints_the_number_when_the_row_has_no_label() -> None:
+    """沒有敘事的列只有 market_cap_usd、沒有 label——不得印成「市值未知」（2026-10-07 真資料：002837.SZ 103 億美元）。"""
+    info = {"edge": {"market_cap_usd": 10310058668.7, "analyst_count": 2}}
+    reason, _due = provider.population_detail("non_multiple", "not_edge", info, board_day="2026-10-07",
+                                              last_brief=None, today=date(2026, 10, 7))
+    assert "10.3B USD" in reason and "市值未知" not in reason
+
+
 def test_non_multiple_reason_carries_the_numbers() -> None:
     info = {"edge": {"market_cap_label": "2032.8B USD", "analyst_count": 53}}
     reason, due = provider.population_detail("non_multiple", "not_edge", info, board_day="2026-10-07",
