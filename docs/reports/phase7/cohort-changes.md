@@ -30,3 +30,11 @@
 - **改了什麼**：R3 母體（registration §5）追加 ATS.VI、009150.KS、4062.T、3037.TW、3189.TW、8046.TW——登記文件檔尾「更正與追加」同日一筆。
 - **為什麼**：載板層兩檔 2026 年各漲約 20 倍，而 T0 的 43 檔觀察名單沒有 IC 載板類（cases X3 2026-10-05）。
 - **影響哪些量測**：R3 從第二個窗口（2026-10-01 →）起分母 58 → 64；第一個窗口不追溯。不進任何研究佇列、不入圖、不建主題等權組。
+
+## 2026-10-06　X 帳號 1 → 5（使用者點名加入四個）
+
+- **改了什麼**：`config/signal_sources.json` 與 `crons/harvest_config.json` 的 `x_accounts.handles` 加 `jukan05`、`vikramskr`、`dnystedt`、`carrioresearch`，四個都是 `status=active`、`tier=probation`（自 2026-10-06，D5）。
+  sha256：`crons/harvest_config.json` `7c23e745f0ab1ae4fc34a216aefd800f7f5e23e6c86929691313db8349808a0b`、`config/signal_sources.json` `b487baa64dec035245c94daf756733889cd519ee33746cafee4f4a354668417c`。
+- **為什麼**：使用者 2026-10-06 點名（三個附理由：AI 供應鏈／光模組細節、前 Qualcomm 半導體研究、技術導向半導體分析；一個未附）。清單推薦與背景不是量測，信任仍為零。
+- **影響哪些量測**：四個帳號**自下一輪 daily harvest 起量、不回溯**（冷啟動只抓一頁 `max_results=25`，不做 30 天 backfill）；帳號計分表（Phase 3）的分母自 2026-10-06 起多四列；H6 的判讀線對新帳號的 lead 一樣適用（來源標籤 `x:<handle>`）。
+  T1 manifest 的 `sources_config` 對這兩個檔的差異歸因到這一筆。月花費上限 `monthly_spend_cap_usd=10` 不變——9 月一個帳號實花 $0.14；五個帳號若撞上限，心跳段 1 會印 `budget_exhausted`（不是故障，不推進 since_id）。

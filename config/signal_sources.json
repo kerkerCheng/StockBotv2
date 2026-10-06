@@ -11,6 +11,50 @@
       "tier": "probation",
       "tier_since": "2026-09-17",
       "tier_rationale": "登記表建立時一律 probation（D5：新帳號一律 probation，信任為零）。⚠ 本帳號雖已有 495 則樣本，但**升等必須走一季一次的 pq2 manual**，不得由建表的 session 自行認定——那正是「量測先於信任」要防的事（INV-5）。計分表算得出來之後才具備升 measured 的討論條件。"
+    },
+    {
+      "source_id": "jukan05",
+      "status": "active",
+      "research_priority": 100,
+      "auto_capture": true,
+      "platform": "x",
+      "handle": "jukan05",
+      "tier": "probation",
+      "tier_since": "2026-10-06",
+      "tier_rationale": "2026-10-06 使用者點名加入（理由轉述：多份 AI 供應鏈帳號清單常列第一，半導體／光模組／供應鏈細節）。新帳號一律 probation、信任為零（D5）；清單推薦不是量測，升等仍走一季一次的 pq2 manual。加入日起量、不回溯（cohort-changes 2026-10-06）。"
+    },
+    {
+      "source_id": "vikramskr",
+      "status": "active",
+      "research_priority": 100,
+      "auto_capture": true,
+      "platform": "x",
+      "handle": "vikramskr",
+      "tier": "probation",
+      "tier_since": "2026-10-06",
+      "tier_rationale": "2026-10-06 使用者點名加入（理由轉述：前 Qualcomm 背景、半導體研究）。新帳號一律 probation、信任為零（D5）；背景不是量測，升等仍走一季一次的 pq2 manual。加入日起量、不回溯（cohort-changes 2026-10-06）。"
+    },
+    {
+      "source_id": "dnystedt",
+      "status": "active",
+      "research_priority": 100,
+      "auto_capture": true,
+      "platform": "x",
+      "handle": "dnystedt",
+      "tier": "probation",
+      "tier_since": "2026-10-06",
+      "tier_rationale": "2026-10-06 使用者點名加入（理由轉述：技術導向半導體分析）。新帳號一律 probation、信任為零（D5）；升等仍走一季一次的 pq2 manual。加入日起量、不回溯（cohort-changes 2026-10-06）。"
+    },
+    {
+      "source_id": "carrioresearch",
+      "status": "active",
+      "research_priority": 100,
+      "auto_capture": true,
+      "platform": "x",
+      "handle": "carrioresearch",
+      "tier": "probation",
+      "tier_since": "2026-10-06",
+      "tier_rationale": "2026-10-06 使用者點名加入（未附理由）。新帳號一律 probation、信任為零（D5）；升等仍走一季一次的 pq2 manual。加入日起量、不回溯（cohort-changes 2026-10-06）。"
     }
   ],
   "schema_version": 2,

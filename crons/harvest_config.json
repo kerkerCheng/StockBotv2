@@ -3,7 +3,11 @@
   "x_accounts": {
     "note": "X API v2 pay-per-use（約 $0.005/則、按回傳貼文數計費）。Daily 由 since_id＋exclude replies/retweets＋max_results page size＋max_posts_per_run 成本硬上限控制；超過單輪上限時保存 pagination checkpoint，下輪續抓，完成前不推進 since_id。具名探索 campaign 可用 bounded 30-day 分頁 backfill。note_tweet 全文與 media expansion 使用同一份貼文 response；圖片／影片預覽另存 ignored private cache，不做 OCR。需 .env 的 X_BEARER_TOKEN。加帳號只要往 handles 加，不必改程式。 ⚠ 2026-09-17（ROADMAP Phase 3／D5 §6）新增 monthly_spend_cap_usd：每月 X 總花費上限（美元），**必填**，載入時驗證。每個 handle 開抓之前重算本月已花金額（harvest_log 的 cost_usd 加總），達到上限就記一筆 result=budget_exhausted 並跳過——不抓、也不推進 since_id，所以解除上限之後不會漏抓。budget_exhausted 刻意不是 fetch_failed（它不是故障，是保護生效），但心跳第 1 段會印出來，避免「這個月不再抓了」安靜發生。",
     "handles": [
-      "aleabitoreddit"
+      "aleabitoreddit",
+      "jukan05",
+      "vikramskr",
+      "dnystedt",
+      "carrioresearch"
     ],
     "exclude_replies": true,
     "exclude_retweets": true,
