@@ -199,7 +199,7 @@ fetchers/{edgar,mops,mfn,rns}.py ↑      engine_c/etl_yfinance.py → SQLite
 > `library/private/heartbeat/snapshots/<日期>.json`（鍵是封閉清單 `crons/heartbeat.SNAPSHOT_KEYS`、留 14 天；derived、只給 diff，
 > **不是** current-state authority），只印變了的鍵。段 1 加備份／健康審查（⑭ capture）／invariants（⑮ capture）；段 2 的 watch 行改讀
 > registry（今日醒／今日到期／已觸發未消化／語意標旗／未檢），加**新點名雷達**（今天第一次被點名、registry 沒有的名字，依首次點名
-> 時間排、不依次數）與讀圖重讀理由；段 3 加預篩本輪結果、LLM 額度（不是 allowed 才印）、**pq2 逐筆**（go／不含字串取自
+> 時間排、不依次數）與讀圖重讀理由；段 3 加預篩本輪結果、LLM 額度（不是 allowed 才印）、「等你提供的文件 N 份」（2026-10-06；pq2 `source_trace_review` 未結案數，拿不到的來源要開口、不 park）、**pq2 逐筆**（go／不含字串取自
 > `todo.GO_AUTHORIZATION`，超過 10 筆印前 10）、到期行（今日／累計，累計照 `EXPIRY_RESOLUTION_KINDS` 逐格）、**距上次掃題材 N 天**
 > （每天印；≥ `theme_scan.nudge_after_days` 時粗體並移到訊息第一行）；段 4 加 NAV（bucket 分布、最大單筆；producer 是
 > `materialize --positions` 的 `nav_exposure`）；段 5 **每天印** tier 分布＋較昨，完整表在 APP（`--weekly` 拿掉）。

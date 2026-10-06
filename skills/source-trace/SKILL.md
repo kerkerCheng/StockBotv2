@@ -128,7 +128,7 @@ ASR 只用來找 timestamp；數字、技術詞與 quote 必須回聽核對。
 4. **供應商自己的文件**（年報競爭者段、法說）：可以列舉，但不算印證（L8：供應商自稱是弱主張）。
 
 找到 → RA request 帶 `layer_enumerations`（`origin_role` 照實填；prepare 會核對引文真的具名每一家）→ pq2 `ra_admission`。
-公開一手找不到、或只有付費 → lead 停在 `awaiting_named_disclosure`（trigger entities＝這一層的客戶或供應商），
+公開一手找不到、或只有付費 → 先照「向使用者要文件」一節開口（`trace_requires_user=true`）；使用者說拿不到或不要，lead 才停在 `awaiting_named_disclosure`（trigger entities＝這一層的客戶或供應商），
 不要用再讀一份供應商自述去補（L8）。路徑表的 `layer_document` 那一格指的就是這一節。
 
 ### 3. access boundary
@@ -195,15 +195,41 @@ trace_requires_user: false
 - **公開一手來源可驗證的 atoms：** 照正常 SOP 處理。
 - **只有報告原文能證明的 atoms：** 如排名、TAM、目標價、券商原句；未合法取得前維持未驗證。
 
-預設 `trace_requires_user=false` 並 park。只有 exact atom 對現有 thesis／decision 具實質影響，且下一步
-確實需要使用者提供合法副本、決定是否付費或提高優先權時，才設 `true` 建立
-`source_trace_review`。一般 `go` 只 dispatch bounded pq1，不授權購買；購買必須另列 vendor、方案、
-exact 金額、保存範圍與預期解鎖的 atoms。
+**預設改成開口（2026-10-06 使用者指示；Phase 7 failure log #29）：** 拿不到的來源若是使用者可能拿得到的（券商報告、法說逐字或 memo、
+論文全文、付費資料庫、公司 IR 回覆），而且 atom 落在「薄層上的邊緣公司」或層說明的範圍，就設 `trace_requires_user=true` 建立
+`source_trace_review`，照下一節的格式開口；**不得只因為拿不到就 park**。仍可設 `false` 並 park 的只有兩種情形：atom 不影響任何讀圖、敘事或候選狀態；
+或它根本不存在於任何可取得的文件（要寫出「如果答案存在，它會在哪一節」，L11-5）。
+一般 `go` 只 dispatch bounded pq1，不授權購買；購買必須另列 vendor、方案、exact 金額、保存範圍與預期解鎖的 atoms
+（`config/standing_authorization.json`：付費永不列入常規授權）。
+
+## 向使用者要文件（2026-10-06）
+
+要之前答不出「它說了什麼」，但答得出「它是不是回答這個問題的指定位置」。所以要求分兩種，寫明是哪一種：
+
+| 種類 | 什麼時候 | 要求裡必須有 |
+|---|---|---|
+| **有問題型** | 已經有一個具體問題，這份文件是答案該在的地方 | 問題一句；**結果表**：每一種可能的答案各會改變什麼（證實 → 哪個狀態或邊會變；推翻 → 哪個主張記「講過頭」、哪個 watch 改期；沒提 → 缺席怎麼寫） |
+| **探索型** | 這一層很薄、這份是該層的指定一手來源、我們這邊沒人讀過；事前講不出會變什麼 | 明標「探索」；**上限**（例：一層一份初次覆蓋加兩份法說）；不假裝有目標 |
+
+兩種都用同一格式：
+
+```text
+要：<文件名、發布者、日期或期別>
+種類：<有問題型｜探索型>
+為什麼：<有問題型＝問題＋結果表；探索型＝這一層薄在哪、為什麼是指定來源、上限>
+你可能從哪拿：<券商帳號／IR／MOPS／論文庫／其他>
+拿不到的替代：<退而求其次的公開來源，或「沒有，等」>
+```
+
+**讀完必交報告**（問責的時點在讀後，不在讀前）：問了什麼／哪些答到／哪些沒答到／哪些答案相反／哪些是沒問到卻讀到的新東西。
+它讓「要你拿文件」這條管道可量：你拿來的文件裡，有幾份真的改了一條主張或一個候選狀態（ledger／registry）。
+心跳段 3 印「等你提供的文件 N 份」＝pq2 `source_trace_review` 未結案數。
 
 ## Queue 契約
 
-- `trace_requires_user=false`：留 trace backlog；明確 trigger 命中後回 pq1。
-- `trace_requires_user=true`：`todo sync` 建 `source_trace_review`；`go` 不接受 claim、不提高 tier、不入圖。
+- `trace_requires_user=false`（只限「付費報告」一節的兩種情形）：留 trace backlog；明確 trigger 命中後回 pq1。
+- `trace_requires_user=true`：`todo sync` 建 `source_trace_review`，hint 帶「向使用者要文件」的格式；`go` 不接受 claim、不提高 tier、不入圖；
+  心跳「等你提供的文件 N 份」數的就是它。
 - 取得原文且有 graph delta：prepare RA，另進 `ra_admission` pq2。
 - 只屬 Engine C observation：交對應 authority lane，不製造空 RA。
 - 仍未取得：以 `trace:<trace_status>` terminal receipt 結束本次 review，保留下一個 trigger。

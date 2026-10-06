@@ -1130,6 +1130,14 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # 逐筆（Phase 1 Step 1.8）：go／不含的字串取自 `todo.GO_AUTHORIZATION`（L16：不在這裡另寫一份），
     # 使用者不展開就知道 go 會做什麼、不會做什麼（AGENTS 收尾摘要契約）。
     section.lines.extend(_pq2_item_lines(actionable, todo_mod=todo_mod))
+    # 等你提供的文件（2026-10-06 使用者指示；Phase 7 failure log #29）：拿不到的來源要開口、不 park。
+    # 開了口的住 pq2 `source_trace_review`；這一行讓「等你拿文件」自己出現（L14），不靠人記得去翻 skill。
+    # 與上面同一個 SSOT（`active_items`）——不另外從 lead registry 數 `trace_requires_user`（L16）。
+    asking = [it for it in active if it.get("type") == "source_trace_review"]
+    section.lines.append(
+        f"**等你提供的文件 {len(asking)}**（pq2 `source_trace_review` 未結案；拿不到的來源要開口、不 park）"
+        + (("：" + "、".join(f"[{it.get('n')}]" for it in asking[:6])) if asking else "")
+    )
 
     # 到期（Phase 1 Step 1.7／1.8；A3、A7）：今日與累計分開，累計照處置封閉字彙逐格列——加起來要等於累計。
     section.lines.append(_expiry_line(watches, now=moment, event_watch=event_watch))
@@ -1749,6 +1757,9 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "semantic.active": "語意 watch 在盯", "semantic.pending_check": "語意 watch 未檢",
     "semantic.flagged": "語意 watch 標旗",
     "pq2.open": "pq2 未結案", "pq2.actionable": "pq2 球在你",
+    # 等你提供的文件（2026-10-06 使用者指示；Phase 7 failure log #29）：拿不到的來源要開口、不 park，
+    # 開了口的住 pq2 `source_trace_review`——第一次有人開口的那天，較昨 diff 看得到。
+    "pq2.source_trace_review": "等你提供的文件",
     **{f"lead.{s}": f"lead {s}" for s in LEAD_STATUSES},
     "reading.current": "讀圖現行", "reading.needs_reread": "讀圖該重讀",
     # 走圖九型各自的命中（Phase 2 Step 2.6）——由封閉字彙導出，不抄一份（L16）；各自一鍵、不加總。
@@ -1808,7 +1819,9 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         from engine_b import todo as todo_mod
 
         pool = todo_mod.load()
-        return {"pq2.open": len(todo_mod.active_items(pool)), "pq2.actionable": len(todo_mod.actionable_items(pool))}
+        active = todo_mod.active_items(pool)
+        return {"pq2.open": len(active), "pq2.actionable": len(todo_mod.actionable_items(pool)),
+                "pq2.source_trace_review": sum(1 for it in active if it.get("type") == "source_trace_review")}
 
     def lead_states() -> dict[str, Any]:
         leads = (_read_json(leads_path) or {}).get("leads") or {}

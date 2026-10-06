@@ -282,6 +282,16 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 | **4 contract test** | `tests/test_stock_page_phase3.py`（downside 歸屬與落格、個股頁與候選板同一推導、三種缺席、讀圖升核心兩個方向＋圖變動端到端、鏈段需求端、三題稽核格是同一個 Datum、bet 三段純文字、history_not_comparable 對稱面）；`tests/test_analyst_view.py`（封閉清單、INJECTED_PANELS）；`tests/test_argument_layer.py` |
 | **5 端到端 smoke** | 見 Step 3.7 的合併驗收（真實資料 materialize、readiness 前後對照、鏈段逐檔比對、headless Edge 渲染 AXTI 與無敘事一檔） |
 
+### Sandbox impact review 結論（2026-10-06：心跳段 3 加「等你提供的文件 N 份」；source-trace 預設改開口）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 心跳段 3 多一行、快照多一鍵 `pq2.source_trace_review`：數的是 `engine_b.todo.active_items()` 裡 `type == "source_trace_review"` 的筆數——與「球在你手上」同一個 SSOT、同一次 `todo.load()`，**不新增任何讀取面、不寫任何 authority、不連外、不開 subprocess**。skill 的改動只影響互動 session（研究者撞到拿不到的來源時鑄 `source_trace_review` 而不是 park）；daily 裡沒有任何步驟讀 source-trace skill |
+| **2 canonical skill／prompt／本檔** | `skills/source-trace/SKILL.md`「付費報告」預設翻轉＋新節「向使用者要文件」（兩種要求、格式、讀後報告）；`.agents/`、`.claude/skills` 副本由 `scripts/sync_agent_skills.py` 同步；本節；Phase 7 failure log #29 |
+| **3 最窄 rule** | 無新 rule、無新 allowlist、daily 的 argv 不變；`.codex/rules` 仍是 0 條 |
+| **4 contract test** | `tests/test_heartbeat.py::test_documents_awaiting_user_line_counts_source_trace_review_from_todo_ssot`（數字等於 todo SSOT；快照鍵存在）；既有 `test_heartbeat_phase1` 的快照鍵封閉清單測試隨鍵更新照跑 |
+| **5 端到端 smoke** | 2026-10-06 本機 `crons\heartbeat.py`：段 3 印「等你提供的文件 0」（pool 裡目前沒有未結案的 `source_trace_review`——這個 0 是「沒人開口」，不是「沒東西要」；第一次開口那天較昨 diff 會亮） |
+
 ### Sandbox impact review 結論（2026-09-29，Phase 3 Step 3.6：候選狀態板＋心跳）
 
 | 步 | 結論 |

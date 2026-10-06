@@ -123,6 +123,21 @@ def test_pq2_ball_in_user_court_uses_todo_ssot() -> None:
     assert any(f"pq2 球在你手上 {expected}" in line for line in section.lines), section.lines
 
 
+def test_documents_awaiting_user_line_counts_source_trace_review_from_todo_ssot() -> None:
+    """「等你提供的文件 N」＝todo pool 裡 type=source_trace_review 的未結案數（Phase 7 failure log #29）。
+
+    拿不到的來源要開口、不 park；開了口的住這個 kind。數字來自同一個 SSOT（`active_items`），
+    不另外從 lead registry 數 `trace_requires_user`。
+    """
+    from engine_b import todo as todo_mod
+
+    pool = todo_mod.load()
+    expected = sum(1 for it in todo_mod.active_items(pool) if it.get("type") == "source_trace_review")
+    section = hb.build_queue()
+    assert any(f"等你提供的文件 {expected}" in line for line in section.lines), section.lines
+    assert "pq2.source_trace_review" in hb.SNAPSHOT_KEYS
+
+
 def test_missing_artifacts_say_which_kind_of_missing(broken_env: dict[str, Path]) -> None:
     """讀不到 artifact 時，每一行都要說**是哪一種讀不到**，並給出讓它回來的指令。
 
