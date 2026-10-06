@@ -1,6 +1,8 @@
 """退役機制的殭屍 grep（ROADMAP Phase 0 驗收；2026-09-22）。
 
-**不是 linter、不進 CI 或 hook**（L16-4）：Phase 0 結案時跑一次，之後每季跑一次。
+**不進 daily、不進 hook**；2026-10-06 起 `tests/test_retired_mechanisms_stay_retired.py` 在每次 pytest 重現下面三個驗收數字
+（使用者指示；事發：7.0f 與多主題等權組 S1 兩週內各帶進一筆回流，季檢看不到——Phase 7 failure log #30）。
+L16-4 的誤報顧慮由 keep-list 的合法類別承擔：誤報的處理是改字、或列 keep-list 並寫出類別與理由，不是放寬 regex。
 八組 regex（A～H）對應 ROADMAP「Phase 0 退役清單」；驗收＝code／static／skills／tests／config 全部命中 0。
 第九組 I（遠端 Graph MCP，2026-09-25 Phase 2 Step 2.1）掃**所有 tracked 檔**（`git ls-files`，含每一個 .md），
 keep-list 只准 historical_record；A～H 的驗收範圍維持 Phase 0 的定義不動（改它等於事後改 Phase 0 的驗收）。
@@ -34,14 +36,17 @@ def files():
                     fp=os.path.join(dp,f)
                     if skip.search(fp): continue
                     if f.endswith(('.py','.md','.js','.html','.json','.toml','.txt')): yield area,fp
-idx=collections.defaultdict(lambda:collections.defaultdict(dict))
-for area,p in files():
-    if area=='code' and p.startswith('webapp'+os.sep+'static'): area='static'
-    try: t=io.open(p,encoding='utf-8',errors='ignore').read()
-    except: continue
-    for g,pat in GROUPS.items():
-        n=len(re.findall(pat,t))
-        if n: idx[g][area][p]=n
+def build_index():
+    """A～H 八組在各 area 的命中數：idx[組][area][檔]=次數（相對 repo 根目錄跑）。"""
+    idx=collections.defaultdict(lambda:collections.defaultdict(dict))
+    for area,p in files():
+        if area=='code' and p.startswith('webapp'+os.sep+'static'): area='static'
+        try: t=io.open(p,encoding='utf-8',errors='ignore').read()
+        except: continue
+        for g,pat in GROUPS.items():
+            n=len(re.findall(pat,t))
+            if n: idx[g][area][p]=n
+    return idx
 #: keep-list：合法提及的白名單，鍵是（檔案 posix 路徑, 組字母），值是「類別: 一句理由」。
 #: 類別是封閉字彙（五類）；驗收數字＝「命中但不在本表的（檔，組）數」；本表本身會腐壞，所以同時印「已列但不再命中」。
 #: 由執行 Phase 0 的人逐條填，結案 R2 逐條審理由。範例：
@@ -409,7 +414,8 @@ def _mcp_key(path):
         if k.endswith('/') and path.startswith(k): return k
     return None
 
-def _verdict(idx):
+def verdict_data(idx, mcp_hits):
+    """三個驗收數字的資料版（tests 用；不印）：回 (unlisted, stale, bad)。"""
     bad=[(k,v) for k,v in KEEP.items() if v.split(":",1)[0] not in KEEP_CLASSES]
     bad+=[((k,'I'),v) for k,v in KEEP_MCP.items() if v.split(":",1)[0]!='historical_record']
     hits=set(); unlisted=[]
@@ -420,33 +426,43 @@ def _verdict(idx):
                 key=(p.replace(os.sep,'/'),letter); hits.add(key)
                 if key not in KEEP: unlisted.append((letter,area,key[0],n))
     used=set()
-    for p,n in MCP_HITS.items():
+    for p,n in mcp_hits.items():
         k=_mcp_key(p)
         if k is None: unlisted.append(('I','tracked',p,n))
         else:
             used.add(k)
             if k in KEEP_MCP_PIN and KEEP_MCP_PIN[k]!=n: unlisted.append(('I',f'pinned={KEEP_MCP_PIN[k]}',p,n))
     stale=[k for k in KEEP if k not in hits]+[(k,'I') for k in KEEP_MCP if k not in used]
-    print("\n## 驗收（差集；Phase 0 結案要三個數字都是 0）")
-    print(f"  未列 keep-list 的命中（檔，組）數：{len(unlisted)}")
-    for letter,area,p,n in sorted(unlisted): print(f"    {letter} {area} {p} ({n})")
-    print(f"  已列但不再命中（腐壞條目）數：{len(stale)}")
-    for k in stale: print(f"    {k}")
-    print(f"  keep-list 條目數：{len(KEEP)}＋I 組 {len(KEEP_MCP)}｜理由類別不合法：{len(bad)}")
-    for k,v in bad: print(f"    {k}: {v}")
+    return unlisted, stale, bad
+
+def _verdict(idx, mcp_hits, out=print):
+    unlisted, stale, bad = verdict_data(idx, mcp_hits)
+    out("\n## 驗收（差集；Phase 0 結案要三個數字都是 0）")
+    out(f"  未列 keep-list 的命中（檔，組）數：{len(unlisted)}")
+    for letter,area,p,n in sorted(unlisted): out(f"    {letter} {area} {p} ({n})")
+    out(f"  已列但不再命中（腐壞條目）數：{len(stale)}")
+    for k in stale: out(f"    {k}")
+    out(f"  keep-list 條目數：{len(KEEP)}＋I 組 {len(KEEP_MCP)}｜理由類別不合法：{len(bad)}")
+    for k,v in bad: out(f"    {k}: {v}")
     return 0 if (not unlisted and not stale and not bad) else 1
 
-for g in GROUPS:
-    print(f"\n## {g}")
-    for area in ('code','static','skills','crons','tests','config','livedocs','docs'):
-        d=idx[g].get(area,{})
-        if not d: continue
-        top=sorted(d.items(),key=lambda x:-x[1])[:8]
-        print(f"  {area}: {len(d)} 檔｜"+"、".join(f"{p.replace(os.sep,'/')}({n})" for p,n in top))
-MCP_HITS=_mcp_hits()
-print(f"\n## {MCP_GROUP}（所有 tracked 檔）")
-by_top=collections.Counter(p.split('/')[0] if '/' in p else p for p in MCP_HITS)
-print(f"  {len(MCP_HITS)} 檔｜"+"、".join(f"{k}({v})" for k,v in by_top.most_common()))
-print(f"  非 UTF-8 而沒掃到的 tracked 檔：{len(MCP_UNREADABLE)}"+("｜"+"、".join(MCP_UNREADABLE[:8]) if MCP_UNREADABLE else ""))
-print("  釘住命中數："+"、".join(f"{k}={MCP_HITS.get(k,0)}（釘 {v}）" for k,v in KEEP_MCP_PIN.items()))
-raise SystemExit(_verdict(idx))
+def main(out=print):
+    """CLI：印八組分布、I 組分布、三個驗收數字；回 exit code（0＝三個都是 0）。"""
+    idx=build_index()
+    for g in GROUPS:
+        out(f"\n## {g}")
+        for area in ('code','static','skills','crons','tests','config','livedocs','docs'):
+            d=idx[g].get(area,{})
+            if not d: continue
+            top=sorted(d.items(),key=lambda x:-x[1])[:8]
+            out(f"  {area}: {len(d)} 檔｜"+"、".join(f"{p.replace(os.sep,'/')}({n})" for p,n in top))
+    mcp_hits=_mcp_hits()
+    out(f"\n## {MCP_GROUP}（所有 tracked 檔）")
+    by_top=collections.Counter(p.split('/')[0] if '/' in p else p for p in mcp_hits)
+    out(f"  {len(mcp_hits)} 檔｜"+"、".join(f"{k}({v})" for k,v in by_top.most_common()))
+    out(f"  非 UTF-8 而沒掃到的 tracked 檔：{len(MCP_UNREADABLE)}"+("｜"+"、".join(MCP_UNREADABLE[:8]) if MCP_UNREADABLE else ""))
+    out("  釘住命中數："+"、".join(f"{k}={mcp_hits.get(k,0)}（釘 {v}）" for k,v in KEEP_MCP_PIN.items()))
+    return _verdict(idx, mcp_hits, out=out)
+
+if __name__=='__main__':
+    raise SystemExit(main())

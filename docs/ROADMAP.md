@@ -132,6 +132,8 @@ Readiness 規則同步換：核心面板改為 headline、短評、argument、re
 > 數字是**檔案數**（同一檔可能命中多組）。盤點腳本的八組 regex 就是驗收用的殭屍 grep；
 > 範圍：`alpha briefing webapp engine_b engine_c decision_lab thesis query crons scripts mcp_server shared portfolio risk loader identity audit skills tests config .codex webapp/static`，
 > 排除 `docs/archive`、`docs/lessons-incidents.md`、`library/`。**不做成常駐 linter**（L16-4）；Phase 0 結案時跑一次，之後每季跑一次。
+> **2026-10-06 使用者指示改成每次 pytest 跑**（`tests/test_retired_mechanisms_stay_retired.py` 重現同一支腳本的三個驗收數字；仍不進 daily、不進 hook）：
+> 季檢看不到回流——7.0f 與多主題等權組 S1 兩週內各帶進一筆（Phase 7 failure log #30）。誤報的處理不變：改字，或列 keep-list 並寫出合法類別與理由，不放寬 regex。
 > **驗收是差集不是絕對零**（2026-09-23 執行者實測後定案）：合法的提及有五類——留下的檔名（如 `decision_lab/store.py`）、讀歷史用的 legacy key（如 `decision_review`）、
 > 廢止註記、禁止句、守門斷言——逐（檔，組）列進腳本的 keep-list 並附一句理由；驗收數字是「命中但不在 keep-list 的（檔，組）數」。
 > 它抓的是「沒有殭屍機制」，字串只是 proxy；keep-list 讓 proxy 的誤報變成可被質疑的一行字，而不是縮窄 regex（那會變第二份要維護的退役清單）。
