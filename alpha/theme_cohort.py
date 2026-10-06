@@ -169,20 +169,44 @@ ROW_COHORT_ABSENCES: Mapping[str, str] = {
     "not_in_any_cohort": "這一檔不是任何主題等權組的組員——不借別的題材的組；補的路是替它的題材定組（研究）",
     "ambiguous_membership": "這一檔同時是兩組以上的組員——哪一組適用不由程式猜",
     "identity_unresolved": "這一列沒有 company_id——不拿 ticker 猜組員（INV-1）",
+    # 以下三種是「是組員（或組 ledger 讀壞），但這一格算不出來」——不是「不是組員」（R2 2026-10-06 C2：對稱面）
+    "theme_cohort_unpriced": "這一檔是組員，但組裡其他成員在這段期間都取不到價——不是 0",
+    "no_measurement_window": "這一列有報酬但沒有起訖日——組報酬的窗算不出來（不猜）",
+    "upstream_unavailable": "主題等權組 ledger 讀不到——上游缺席，不是「不是組員」",
 }
+#: 給人看的短標籤（APP、心跳、markdown 共用）。**跟著資料走**（每一筆缺席與每份摘要都帶），消費端不另寫一份對照表（L16）。
+ROW_COHORT_ABSENCE_LABELS: Mapping[str, str] = {
+    "not_yet_recorded": "還沒有組",
+    "not_in_any_cohort": "不是任何組的組員",
+    "ambiguous_membership": "同時屬於多組，不猜",
+    "identity_unresolved": "身分未解析",
+    "theme_cohort_unpriced": "組員都取不到價",
+    "no_measurement_window": "沒有起訖日",
+    "upstream_unavailable": "組讀不到",
+}
+#: 「不是組員」的那幾種——計分表判斷「等時間」只看組員點名時，要排除的就是這幾種（組員但組報酬取不到的不在裡面）。
+NON_MEMBER_KINDS: frozenset[str] = frozenset({"not_in_any_cohort", "ambiguous_membership", "identity_unresolved"})
+
+
+def cohort_absence(kind: str, **extra: Any) -> dict[str, Any]:
+    """一筆具名缺席 `{kind, label, reason, ...}`——種類、標籤、理由都從上面兩張表取（產生缺席的程式宣告，L16）。"""
+    if kind not in ROW_COHORT_ABSENCES:
+        raise ContractViolation(f"未登記的主題等權組缺席種類 {kind!r}；只收 {sorted(ROW_COHORT_ABSENCES)}")
+    return {"kind": kind, "label": ROW_COHORT_ABSENCE_LABELS[kind],
+            "reason": str(extra.pop("reason", None) or ROW_COHORT_ABSENCES[kind]), **extra}
 
 
 def summarize_cohorts(cohorts: Sequence[ThemeCohort], errors: Sequence[str]) -> dict[str, Any]:
     """現行各組的來歷（追蹤表與計分表共用）：`{mode, cohorts: [{cohort_id, theme, decided_on, members, members_total}],
-    absence, parse_errors}`。一組都沒有＝`not_yet_recorded`；壞行原樣帶出（INV-3）。**哪一列用哪一組不在這裡**——
+    absence, absence_labels, parse_errors}`。一組都沒有＝`not_yet_recorded`；壞行原樣帶出（INV-3）。**哪一列用哪一組不在這裡**——
     那是 `cohort_for_row` 的事，這裡只說「有哪些組」。"""
     info: dict[str, Any] = {
         "mode": "per_row",
         "cohorts": [{"cohort_id": c.cohort_id, "theme": c.theme, "decided_on": c.decided_on.isoformat(),
                      "members": [m.ticker for m in c.members], "members_total": len(c.members)} for c in cohorts],
-        "absence": None, "parse_errors": list(errors)}
+        "absence": None, "absence_labels": dict(ROW_COHORT_ABSENCE_LABELS), "parse_errors": list(errors)}
     if not cohorts:
-        info["absence"] = {"kind": "not_yet_recorded", "reason": ROW_COHORT_ABSENCES["not_yet_recorded"]}
+        info["absence"] = cohort_absence("not_yet_recorded")
     return info
 
 
@@ -194,17 +218,16 @@ def cohort_for_row(cohorts: Sequence[ThemeCohort], *, company_id: str | None
     1 組＝`(組, None)`；0 組＝`not_in_any_cohort`；≥2 組＝`ambiguous_membership`（列出組 id，不猜）；
     沒有 company_id＝`identity_unresolved`；一組都還沒定義＝`not_yet_recorded`。"""
     if not cohorts:
-        return None, {"kind": "not_yet_recorded", "reason": ROW_COHORT_ABSENCES["not_yet_recorded"]}
+        return None, cohort_absence("not_yet_recorded")
     cid = str(company_id or "").strip()
     if not cid:
-        return None, {"kind": "identity_unresolved", "reason": ROW_COHORT_ABSENCES["identity_unresolved"]}
+        return None, cohort_absence("identity_unresolved")
     hits = [c for c in cohorts if any(m.company_id == cid for m in c.members)]
     if len(hits) == 1:
         return hits[0], None
     if not hits:
-        return None, {"kind": "not_in_any_cohort", "reason": ROW_COHORT_ABSENCES["not_in_any_cohort"]}
-    return None, {"kind": "ambiguous_membership", "reason": ROW_COHORT_ABSENCES["ambiguous_membership"],
-                  "cohort_ids": [c.cohort_id for c in hits]}
+        return None, cohort_absence("not_in_any_cohort")
+    return None, cohort_absence("ambiguous_membership", cohort_ids=[c.cohort_id for c in hits])
 
 
 def _usable_close(value: Any) -> bool:
@@ -224,7 +247,12 @@ def close_on_or_before(series: Mapping[date, float] | None, day: date) -> tuple[
 
 def series_return(series: Mapping[date, float] | None, start: date, end: date) -> float | None:
     """同一條收盤序列 `start`→`end` 的報酬：兩端各取該日或之前最近的可用收盤；**同序列相除，報價單位自動相消**
-    （GBp 不必先換成 GBP）。任一端取不到、或起點那根晚於終點那根，回 `None`——不是 0。"""
+    （GBp 不必先換成 GBP）。任一端取不到、起點那根晚於終點那根、或**要求的起點本身就晚於終點**，回 `None`——不是 0。
+
+    ⚠ 最後一條是 R2（2026-10-06 F3）找到的：錨點 10-05、終點 10-02（最後一根）時，兩端都落在 10-02 那一根，
+    K 棒日期相同所以舊的比法放行、算出 0.0——窗是倒過來的，那不是「沒漲」，是「還量不到」。"""
+    if start > end:
+        return None
     a = close_on_or_before(series, start)
     b = close_on_or_before(series, end)
     if a is None or b is None or a[0] > b[0]:
@@ -261,6 +289,7 @@ def cohort_return(cohort: ThemeCohort, *, start: date, end: date, series: Mappin
     }
 
 
-__all__ = ["RECORD_VERSION", "ROW_COHORT_ABSENCES", "SPEC_FIELDS", "CohortMember", "ThemeCohort", "close_on_or_before",
-           "cohort_for_row", "cohort_record", "cohort_return", "new_cohort_id", "parse_cohort_record", "select_current",
-           "series_return", "spec_digest", "summarize_cohorts", "validate_spec"]
+__all__ = ["NON_MEMBER_KINDS", "RECORD_VERSION", "ROW_COHORT_ABSENCES", "ROW_COHORT_ABSENCE_LABELS", "SPEC_FIELDS",
+           "CohortMember", "ThemeCohort", "close_on_or_before", "cohort_absence", "cohort_for_row", "cohort_record",
+           "cohort_return", "new_cohort_id", "parse_cohort_record", "select_current", "series_return", "spec_digest",
+           "summarize_cohorts", "validate_spec"]

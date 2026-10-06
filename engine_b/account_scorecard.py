@@ -306,7 +306,7 @@ def score_account(
             excess[key] = Metric(n=0, absence_kind=str(absence.get("kind")), reason=str(absence.get("reason")))
             horizon_reports[key] = report.as_dict()
             continue
-        from alpha.theme_cohort import ROW_COHORT_ABSENCES, cohort_for_row, cohort_return
+        from alpha.theme_cohort import NON_MEMBER_KINDS, cohort_for_row, cohort_return
 
         values = []
         member_days: list[date] = []
@@ -340,15 +340,16 @@ def score_account(
         horizon_reports[key] = report.as_dict()
         if report.input_count and not member_days:
             # 一則組員點名都沒有：缺席種類照實寫（全是同一種就用那一種），不壓成「樣本不足」——等多久都不會有值。
-            kinds = sorted(k for k in report.reasons if k in ROW_COHORT_ABSENCES)
+            kinds = sorted(k for k in report.reasons if k in NON_MEMBER_KINDS)
             excess[key] = Metric(
                 n=0, absence_kind=kinds[0] if len(kinds) == 1 else "not_in_any_cohort",
                 reason=(f"{report.input_count} 則點名沒有一則是主題等權組的組員（"
                         + "、".join(f"{k} {report.reasons[k]}" for k in kinds) + "）——不借別的題材的組"))
             continue
         # 等時間的判斷只看組員點名：非組員的點名不該讓「持有期還沒走完」的到期日消失（INV-2）。
+        # 只排除「不是組員」的那幾種——「組員但組報酬取不到」（theme_cohort_unpriced）是組員的理由，留著。
         members_only = FilterReport(input_count=len(member_days), accepted_count=report.accepted_count,
-                                    reasons={k: v for k, v in report.reasons.items() if k not in ROW_COHORT_ABSENCES})
+                                    reasons={k: v for k, v in report.reasons.items() if k not in NON_MEMBER_KINDS})
         excess[key] = _median_or_absence(values, members_only, horizon=horizon,
                                          first_call_day=min(member_days) if member_days else first_call_day,
                                          unpriced="沒有任何一則組員點名同時有標的與主題等權組的價格")
@@ -466,9 +467,11 @@ def build_scorecard(
         cohort_list = list(cohorts[0])
         cohort_info = summarize_cohorts(*cohorts)
     except Exception as exc:  # noqa: BLE001
+        from alpha.theme_cohort import cohort_absence as _absence
+
         cohort_list = []
-        cohort_info = {"mode": "per_row", "cohorts": [], "parse_errors": [], "absence": {
-            "kind": "upstream_unavailable", "reason": f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}}
+        cohort_info = {"mode": "per_row", "cohorts": [], "parse_errors": [], "absence": _absence(
+            "upstream_unavailable", reason=f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）")}
     member_tickers: list[str] = sorted({t for c in cohort_list for t in c.tickers})
 
     accounts: list[dict[str, Any]] = []
@@ -544,7 +547,7 @@ def build_scorecard(
         })
 
     # 主題等權組這一格的來歷：**每一組**哪天定的、幾個成員、幾個取得到價、缺誰（逐檔列，不平均掉；INV-3）。
-    from alpha.theme_cohort import close_on_or_before
+    from alpha.theme_cohort import ROW_COHORT_ABSENCE_LABELS, close_on_or_before
 
     priced = {t for t in member_tickers if close_on_or_before(prices.get(t), day) is not None}
     theme_cohort_block: dict[str, Any] = {
@@ -553,6 +556,8 @@ def build_scorecard(
                      "members_total": len(c.tickers), "members_priced": sum(1 for t in c.tickers if t in priced),
                      "missing": [t for t in c.tickers if t not in priced]} for c in cohort_list],
         "absence": cohort_info.get("absence"),
+        # 每格 `excess_return_filters` 的理由用得到的短標籤（跟著 artifact 走，APP 不另寫一份對照表；L16）
+        "absence_labels": dict(ROW_COHORT_ABSENCE_LABELS),
         "parse_errors": list(cohort_info.get("parse_errors") or []),
     }
 

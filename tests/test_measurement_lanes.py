@@ -187,6 +187,29 @@ def test_series_return_skips_nan_and_never_looks_ahead() -> None:
     assert series_return(PRICES["AAA"], date(2026, 10, 2), date(2026, 9, 29)) is None
 
 
+def test_an_inverted_window_is_none_even_when_both_ends_land_on_the_same_bar() -> None:
+    """R2 F3：要求的起點（10-05）晚於終點（10-02），兩端都落在 10-02 那一根——舊的比法只比 K 棒日期，算出 0.0。
+
+    變異：拿掉 `series_return` 的 `start > end` 檢查 → 這裡回 0.0，這條紅。"""
+    assert series_return(PRICES["AAA"], date(2026, 10, 5), date(2026, 10, 2)) is None
+    assert series_return(PRICES["AAA"], date(2026, 10, 3), date(2026, 10, 4)) == pytest.approx(0.0)   # 窗裡沒交易：真的是 0
+
+
+def test_membership_is_by_company_id_only_and_every_absence_carries_its_label() -> None:
+    """INV-1：ticker 不是 identity——ticker 對得上、company_id 對不上＝不是組員；沒有 company_id＝identity_unresolved（不拿 ticker 猜）。
+    每一筆缺席都帶 SSOT 的短標籤（L16：消費端不另寫對照表）。
+
+    變異：`cohort_for_row` 改成 ticker 也算組員 → 第一條紅；拿掉沒有 company_id 的那一支 → 第二條紅。"""
+    from alpha.theme_cohort import ROW_COHORT_ABSENCE_LABELS, cohort_for_row
+
+    cohort, absence = cohort_for_row([COHORT], company_id="co:someone_else_named_aaa")
+    assert cohort is None and absence["kind"] == "not_in_any_cohort"
+    cohort, absence = cohort_for_row([COHORT], company_id=None)
+    assert cohort is None and absence["kind"] == "identity_unresolved"
+    assert absence["label"] == ROW_COHORT_ABSENCE_LABELS["identity_unresolved"]
+    assert cohort_for_row([COHORT], company_id="co:aaa") == (COHORT, None)
+
+
 # ---------------------------------------------------------------------------
 # 三條 lane
 # ---------------------------------------------------------------------------
@@ -263,7 +286,7 @@ def test_each_row_compares_only_with_its_own_cohort_and_non_members_are_named(co
         ("tc_test", "2026-09-30", [])]
     live = OIST.lanes_payload(collected)["live"]["theme_cohort_excess"]
     assert live["absent"] == {"not_in_any_cohort": ["LIVEX"]} and live["n"] == 0   # 缺席逐檔列名（INV-3）
-    assert "對組超額缺席 1 列（not_in_any_cohort）：LIVEX" in "\n".join(OIST.render_lanes(collected))
+    assert "對組超額缺席 1 列（不是任何組的組員；not_in_any_cohort）：LIVEX" in "\n".join(OIST.render_lanes(collected))
 
 
 COHORT_COOLING = ThemeCohort(
@@ -318,6 +341,59 @@ def test_missing_cohort_is_not_yet_recorded_and_excess_stays_absent(tmp_path, co
     assert empty["theme_cohort"]["absence"]["kind"] == "not_yet_recorded"
     assert all("excess_theme_cohort" not in r for r in empty["lanes"]["paper"]["rows"])
     assert {r["theme_cohort_absence"]["kind"] for r in empty["lanes"]["paper"]["rows"]} == {"not_yet_recorded"}
+
+
+def _lane_balance(collected) -> dict:
+    """每條 lane：有對組超額的列數＋各種缺席的列數，對分母（量得到報酬的列數）。"""
+    out = {}
+    for lane, summary in OIST.lanes_payload(collected).items():
+        ex = summary["theme_cohort_excess"]
+        out[lane] = (ex["n"] + sum(len(v) for v in ex["absent"].values()), ex["of"])
+    return out
+
+
+def test_every_measured_row_is_either_compared_or_named_absent(tmp_path, collected) -> None:
+    """R2 C2：量得到報酬的列，不是有對組超額、就是具名缺席——每條 lane「有值＋缺席＝分母」。
+    事發：組員 300308.SZ 的組員們都取不到價，它既不在 n、也不在缺席名單（paper 12＋45＝57，分母 58）。
+
+    變異：拿掉 `theme_cohort_unpriced` 那一支 → 下面那一組的 lane 對不起來，這條紅。"""
+    assert all(have == of for have, of in _lane_balance(collected).values())
+    lonely = ThemeCohort(cohort_id="tc_lonely", theme="只有一個有價的組員",
+                         members=(CohortMember("AAA", "co:aaa", "成員"), CohortMember("NOPX", "co:nopx", "成員")),
+                         excluded=(), reason="測試", decided_on=date(2026, 9, 30), pq2_ref=4,
+                         created_at=datetime(2026, 9, 30, tzinfo=timezone.utc))
+    unpriced = _collect(tmp_path, cohorts=([lonely], []))
+    aaa = _row(unpriced, "paper", "AAA")
+    assert aaa["theme_cohort_absence"]["kind"] == "theme_cohort_unpriced" and "NOPX" in aaa["theme_cohort_absence"]["reason"]
+    assert aaa["theme_cohort_absence"]["label"] == "組員都取不到價" and "excess_theme_cohort" not in aaa
+    assert all(have == of for have, of in _lane_balance(unpriced).values())
+    paper = OIST.lanes_payload(unpriced)["paper"]["theme_cohort_excess"]
+    assert paper["absent"]["theme_cohort_unpriced"] == ["AAA"]
+    assert paper["absent_labels"]["theme_cohort_unpriced"] == "組員都取不到價"
+
+
+def test_a_narrative_written_after_the_last_close_is_not_yet_measurable_not_zero(tmp_path, monkeypatch) -> None:
+    """R2 F3：敘事寫在最後一根收盤之後（錨點 10-03、序列停在 10-02）→ `no_close_since_anchor`，不是 0.0，也不進聚合；
+    live 的對稱面：成交在最後一根收盤之後，同樣缺席。
+
+    變異：拿掉 `_price_paper_row`（或 `_price_live_row`）那道檢查 → 那一列會算出報酬，這條紅。"""
+    import engine_b.event_watch as ew
+
+    monkeypatch.setattr(ew, "_local_timezone", lambda: timezone(timedelta(hours=8)))
+    briefs = {**BRIEFS, "LATE": ([_Brief("ib_l1", "co:late", _at("2026-10-02", 22), candidate_state=_State("open"))], [])}
+    prices = {**PRICES, "LATE": _series(date(2026, 9, 25), [10, 10, 10, 10, 10, 10, 10, 11])}
+    events = EVENTS + [{"trade_id": "t6", "symbol": "LIVEX", "side": "buy", "broker": "IB", "currency": "USD",
+                        "price": 31.0, "shares": 1, "executed_at": "2026-10-03T10:00:00-04:00", "research_receipt": RECEIPT}]
+    late = _collect(tmp_path, briefs=briefs, events=events, today=date(2026, 10, 3),
+                    price_loader=lambda symbol, start: (dict(prices.get(symbol) or {}), UNITS.get(symbol, "USD")))
+    row = _row(late, "paper", "LATE")
+    assert row["absence_kind"] == "no_close_since_anchor" and row.get("absolute_return") is None
+    assert "還量不到" in row["note"][-1]
+    t6 = next(r for r in late["lanes"]["live"]["rows"] if r["trade_id"] == "t6")
+    assert t6["absence_kind"] == "no_close_since_anchor" and t6.get("absolute_return") is None
+    summary = OIST.lane_summary(late["lanes"]["paper"]["rows"], lane="paper")
+    assert summary["measured"] == 2 and summary["n"] == 3                  # LATE 在列，但不在「量得到報酬」的分母裡
+    assert all(have == of for have, of in _lane_balance(late).values())
 
 
 def test_a_member_of_two_cohorts_is_ambiguous_not_guessed(tmp_path, collected) -> None:

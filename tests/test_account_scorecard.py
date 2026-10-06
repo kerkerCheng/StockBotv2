@@ -390,6 +390,21 @@ def test_a_call_on_a_non_member_is_filtered_and_named_never_borrows_another_coho
     assert mixed["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {"not_in_any_cohort": 1}
 
 
+def test_a_member_whose_cohort_is_unpriced_is_still_a_member_not_an_outsider() -> None:
+    """「組員但組報酬取不到」（theme_cohort_unpriced）是組員的理由：旁邊有非組員點名時，那一格是「樣本不足」，
+    不得被併成「沒有一則是組員」（R2 2026-10-06：兩種缺席分開；`NON_MEMBER_KINDS` 不含它）。
+
+    變異：只把「組報酬算得出」的點名算成組員（`member_days` 移到組報酬之後）→ 這一格變成 not_in_any_cohort，這條紅。
+    （把 theme_cohort_unpriced 塞進 `NON_MEMBER_KINDS` 在現行邏輯裡是等價變異：組員與否看 `member_days`，不看理由集合。）"""
+    scored = sc.score_account([_call("AAA", "2026-08-01"), _call("CCC", "2026-08-01")],
+                              prices=_prices("AAA", "CCC", "QQQ", "SOXX"), today=date(2026, 10, 31),
+                              no_go_rate=sc.Metric(), trace_metric=sc.Metric(), cohorts=[_cohort("AAA", "BBB")])
+    cell = scored["excess_returns"]["excess_30d_vs_theme_cohort"]
+    assert cell["value"] is None and cell["absence_kind"] == sc.ABSENCE_INSUFFICIENT
+    assert scored["excess_return_filters"]["excess_30d_vs_theme_cohort"]["reasons"] == {
+        "theme_cohort_unpriced": 1, "not_in_any_cohort": 1}
+
+
 def test_waiting_member_calls_keep_their_revisit_date_even_with_non_members_around() -> None:
     """INV-2：組員點名的持有期還沒走完 → `revisit_after` 照算；旁邊多一則非組員點名不得讓到期日消失。"""
     scored = sc.score_account([_call("AAA", "2026-10-20"), _call("CCC", "2026-08-01")],
@@ -452,8 +467,11 @@ def test_build_adds_cohort_members_to_the_price_list_and_reports_the_block(score
     assert budget["theme_cohort_added"] == ["BBB", "CCC"]           # AAA（點名）與 QQQ（基準）本來就在
     assert budget["requested"] == 2 + 1 + 2 and budget["truncated"] == []
     assert scorecard_env["asked"] == [["AAA", "BBB", "CCC", "QQQ", "SOXX"]]
+    from alpha.theme_cohort import ROW_COHORT_ABSENCE_LABELS
+
     block = card["theme_cohort"]
     assert block == {"mode": "per_row", "absence": None, "parse_errors": [],
+                     "absence_labels": dict(ROW_COHORT_ABSENCE_LABELS),
                      "cohorts": [{"cohort_id": "tc_test", "theme": "ai_capex_optical", "decided_on": "2026-09-30",
                                   "members_total": 4, "members_priced": 4, "missing": []}]}
     cell = card["accounts"][0]["metrics"]["excess_returns"]["excess_30d_vs_theme_cohort"]

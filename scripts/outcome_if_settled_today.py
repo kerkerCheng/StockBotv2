@@ -562,6 +562,11 @@ def _price_live_row(row: dict, *, series: Mapping[date, float], provider_unit: s
             row["absence_kind"] = "no_price_series"
             row["note"].append(f"provider 沒有 {row.get('execution_symbol')} 的收盤序列 → 不計算")
             return
+        if bar[0] < anchor:
+            # 成交之後還沒有任何一根收盤（例：今天成交、序列最後一根是昨天）：窗是倒過來的——還量不到，不是 0（R2 F3 的對稱面）。
+            row["absence_kind"] = "no_close_since_anchor"
+            row["note"].append(f"成交日 {anchor} 之後還沒有收盤（最後一根 {bar[0]}）→ 還量不到，不算報酬")
+            return
         end_day, end_raw, end_unit = bar[0], bar[1], provider_unit
         row["realized"] = False
     end_val, end_ccy = _to_settlement(end_raw, end_unit)
@@ -678,6 +683,12 @@ def _price_paper_row(row: dict, *, series: Mapping[date, float], quote_unit: str
         row["absence_kind"] = "no_close_on_or_before_anchor"
         row["note"].append(f"錨點日 {anchor} 或之前沒有可用收盤 → 不計算（INV-6：不拿之後的價當錨）")
         return
+    if bar[0] <= at[0]:
+        # 錨點那根之後還沒有新的收盤（R2 2026-10-06 F3）：兩端是同一根 K 棒，相除得 0.0——那不是「沒漲」，是「還量不到」。
+        # 事發：10-05 寫的敘事、序列最後一根停在 09-30／10-02，9 列被算成 0.0 混進 paper 的等權與對組超額。
+        row["absence_kind"] = "no_close_since_anchor"
+        row["note"].append(f"錨點 {anchor}（取 {at[0]} 收盤）之後還沒有新的收盤（最後一根 {bar[0]}）→ 還量不到，不算報酬")
+        return
     anchor_val, anchor_ccy = _to_settlement(at[1], quote_unit)
     current_val, current_ccy = _to_settlement(bar[1], quote_unit)
     if anchor_val is None or current_val is None or anchor_val <= 0 or anchor_ccy != current_ccy:
@@ -727,8 +738,11 @@ def _apply_theme_cohort(rows: Sequence[dict], cohorts: Sequence[Any], series: Ma
 
     哪一組由 `alpha.theme_cohort.cohort_for_row` 以 company_id 決定（計分表同一支）；不是組員的列印具名缺席
     `theme_cohort_absence`，**不借別的題材的組**——先前只有一組時每一列都拿它比，非組員的「對組超額」其實是跨題材比較（L12）。
-    組 ledger 讀不到時 `unavailable` 照抄到每一列（那是上游缺席，不是「不是組員」）。組報酬共用 `cohort_return`。**只印不比。**"""
-    from alpha.theme_cohort import cohort_for_row, cohort_return
+    組 ledger 讀不到時 `unavailable` 照抄到每一列（那是上游缺席，不是「不是組員」）。組報酬共用 `cohort_return`。**只印不比。**
+
+    構造上保證：量得到報酬的列，**不是有對組超額、就是有具名缺席**，每條 lane「有值＋缺席＝分母」（R2 2026-10-06 C2——
+    先前「是組員、但組裡其他成員都取不到價」的列兩邊都不在，分母比名單多一列）。"""
+    from alpha.theme_cohort import cohort_absence, cohort_for_row, cohort_return
 
     for row in rows:
         if unavailable is not None:
@@ -738,15 +752,22 @@ def _apply_theme_cohort(rows: Sequence[dict], cohorts: Sequence[Any], series: Ma
         if absence is not None:
             row["theme_cohort_absence"] = absence
             continue
-        if row.get("absolute_return") is None or not row.get("anchor_date") or not row.get("current_date"):
+        if row.get("absolute_return") is None:
+            continue                                  # 沒有報酬的列不在分母裡（lane 的 of 只數量得到報酬的列）
+        if not row.get("anchor_date") or not row.get("current_date"):
+            row["theme_cohort_absence"] = cohort_absence("no_measurement_window", cohort_id=cohort.cohort_id)
             continue
         result = cohort_return(cohort, start=row["anchor_date"], end=row["current_date"], series=series,
                                exclude_company=row.get("company_id"),
                                exclude_ticker=row.get("research_ticker") or row.get("ticker"))
         row["theme_cohort"] = {**result, "cohort_id": cohort.cohort_id}
-        if result["return"] is not None:
-            row["theme_cohort_return"] = result["return"]
-            row["excess_theme_cohort"] = row["absolute_return"] - result["return"]
+        if result["return"] is None:
+            row["theme_cohort_absence"] = cohort_absence(
+                "theme_cohort_unpriced", cohort_id=cohort.cohort_id,
+                reason=f"組裡其他成員（排除本檔）在這段期間都取不到價：{'、'.join(result['missing']) or '沒有其他成員'}——不是 0")
+            continue
+        row["theme_cohort_return"] = result["return"]
+        row["excess_theme_cohort"] = row["absolute_return"] - result["return"]
 
 
 def chase_count(rows: Sequence[Mapping[str, Any]]) -> dict:
@@ -763,11 +784,15 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
     excess = [r["excess_theme_cohort"] for r in measured if r.get("excess_theme_cohort") is not None]
     anchors = [r["anchor_date"] for r in measured if r.get("anchor_date")]
     # 量得到報酬、卻沒有對組超額的列：依缺席種類逐檔列名（INV-3：filter 要報得出誰、為什麼）。
+    # 標籤跟著缺席走（`alpha.theme_cohort.cohort_absence` 宣告；L16），消費端不另寫一份對照表。
     cohort_absent: dict[str, list[str]] = {}
+    absent_labels: dict[str, str] = {}
     for r in measured:
-        kind = (r.get("theme_cohort_absence") or {}).get("kind")
+        absence = r.get("theme_cohort_absence") or {}
+        kind = absence.get("kind")
         if kind:
             cohort_absent.setdefault(str(kind), []).append(str(r.get("ticker")))
+            absent_labels[str(kind)] = str(absence.get("label") or kind)
     return {
         "lane": lane, "label": LANE_LABELS[lane], "n": len(rows), "measured": len(measured),
         "measurement_start": min(anchors).isoformat() if anchors else None,
@@ -775,7 +800,8 @@ def lane_summary(rows: Sequence[Mapping[str, Any]], *, lane: str) -> dict:
         "power_law": power_law_aggregate(list(rows), lane=lane),
         "theme_cohort_excess": {"n": len(excess), "mean": (sum(excess) / len(excess)) if excess else None,
                                 "of": len(measured),
-                                "absent": {k: sorted(v) for k, v in sorted(cohort_absent.items())}},
+                                "absent": {k: sorted(v) for k, v in sorted(cohort_absent.items())},
+                                "absent_labels": dict(sorted(absent_labels.items()))},
         "chase": chase_count(rows),
         "absences": sorted({str(r["absence_kind"]) for r in rows if r.get("absence_kind")}),
     }
@@ -865,10 +891,13 @@ def collect(*, no_benchmark: bool = False, today: date | None = None,
         cohort_list = list(cohorts[0])
         cohort_info = _theme_cohort_info(*cohorts)
     except Exception as exc:  # noqa: BLE001
+        from alpha.theme_cohort import ROW_COHORT_ABSENCE_LABELS, cohort_absence
+
         cohort_list = []
-        cohort_unavailable = {"kind": "upstream_unavailable",
-                              "reason": f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）"}
-        cohort_info = {"mode": "per_row", "cohorts": [], "parse_errors": [], "absence": cohort_unavailable}
+        cohort_unavailable = cohort_absence("upstream_unavailable",
+                                            reason=f"主題等權組讀不到（{type(exc).__name__}: {str(exc)[:120]}）")
+        cohort_info = {"mode": "per_row", "cohorts": [], "parse_errors": [], "absence": cohort_unavailable,
+                       "absence_labels": dict(ROW_COHORT_ABSENCE_LABELS)}
 
     # 取價（新 lane＋組成員；有上限）。最早需要的起點＝各列錨點往前 PRE_ANCHOR_DAYS＋15 天。
     wanted: dict[str, date] = {}
@@ -1440,7 +1469,8 @@ def render_lanes(collected: Mapping[str, Any]) -> list[str]:
                    + (f"{_pct(excess['mean'])}（{excess['n']}/{excess['of']} 列有值）" if excess["n"]
                       else f"還沒有值（{excess['of']} 列量得到報酬）"))
         for kind, tickers in (excess.get("absent") or {}).items():
-            out.append(f"  - 對組超額缺席 {len(tickers)} 列（{kind}）：{'、'.join(tickers)}")
+            label = (excess.get("absent_labels") or {}).get(kind, kind)
+            out.append(f"  - 對組超額缺席 {len(tickers)} 列（{label}；{kind}）：{'、'.join(tickers)}")
         chase = summary["chase"]
         label = {"history": "入圖前已漲", "paper": "敘事前已漲", "live": "成交前已漲"}[lane]
         out.append(f"- {label}：{chase['chasing']}/{chase['paired']}"

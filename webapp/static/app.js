@@ -2827,20 +2827,13 @@ function signedPct(value) {
   return text === null ? '—' : (value > 0 ? '+' : '') + text;
 }
 
-/* 多主題等權組 S1（2026-10-06）：每一列只跟自己所屬的組比；不是組員的列印「為什麼沒有」，不印 0、不印空白。
-   種類由產生缺席的程式宣告（`alpha.theme_cohort.cohort_for_row`），這裡只翻成人話（L16：不從 reason 猜）。 */
-const COHORT_ABSENCE_LABELS = {
-  not_in_any_cohort: '不是任何組的組員',
-  ambiguous_membership: '同時屬於多組，不猜',
-  identity_unresolved: '身分未解析',
-  not_yet_recorded: '還沒有組',
-  upstream_unavailable: '組讀不到',
-};
-
+/* 多主題等權組 S1（2026-10-06）：每一列只跟自己所屬的組比；沒有值的列印「為什麼沒有」，不印 0、不印空白。
+   種類與短標籤都由產生缺席的程式宣告、跟著資料走（`alpha.theme_cohort.cohort_absence`）——前端不維護第二份對照表（L16）；
+   舊 artifact 沒帶標籤時照印種類字串。 */
 function cohortExcessCell(row) {
   if (row.excess_theme_cohort !== null && row.excess_theme_cohort !== undefined) return returnCell(row.excess_theme_cohort);
-  const kind = (row.theme_cohort_absence || {}).kind;
-  if (kind) return el('td', 'note', `不比（${COHORT_ABSENCE_LABELS[kind] || kind}）`);
+  const absence = row.theme_cohort_absence || {};
+  if (absence.kind) return el('td', 'note', `不比（${absence.label || absence.kind}）`);
   return returnCell(null);
 }
 
@@ -2873,8 +2866,8 @@ function laneSummaryText(entry) {
   const agg = entry.aggregate || {};
   const ex = entry.theme_cohort_excess || {};
   const pl = entry.power_law || {};
-  const absent = Object.entries(ex.absent || {}).map(([kind, tickers]) =>
-    `${COHORT_ABSENCE_LABELS[kind] || kind} ${tickers.length} 列`);
+  const labels = ex.absent_labels || {};
+  const absent = Object.entries(ex.absent || {}).map(([kind, tickers]) => `${labels[kind] || kind} ${tickers.length} 列`);
   return [`${entry.n} 列（算得出報酬 ${entry.measured}）`, `量測起始 ${entry.measurement_start || '—'}`,
     `等權 ${signedPct(agg.absolute)}`, `比 ${agg.benchmark || 'QQQ'} ${signedPct(agg.excess)}`,
     (ex.n ? `比自己所屬的組 ${signedPct(ex.mean)}（${ex.n}/${ex.of} 列）` : '比自己所屬的組：還沒有值')
@@ -3422,6 +3415,14 @@ function scorecardCell(cell) {
   return `${fmtPercent(cell.value)}（n=${cell.n}）`;
 }
 
+/* 組那一格的分母為什麼比 QQQ／SOXX 少：照抄該格的 filter reasons（INV-3），標籤跟著 artifact 走（`theme_cohort.absence_labels`）。
+   R2 2026-10-06 C1：先前頁首寫「不是組員的點名列在每格的濾掉理由裡」，但沒有任何一格印出來——那句話是假的。 */
+function scorecardFilterLine(filter, labels) {
+  const reasons = Object.entries((filter || {}).reasons || {});
+  if (!reasons.length) return null;
+  return `濾掉 ${filter.filtered}／${filter.input} 則：` + reasons.map(([k, n]) => `${labels[k] || k} ${n}`).join('、');
+}
+
 function scorecardExcessTable(account, payload) {
   const box = el('div', 'table-view');
   const table = el('table');
@@ -3433,14 +3434,22 @@ function scorecardExcessTable(account, payload) {
   const body = el('tbody');
   const all = (account.metrics || {}).excess_returns || {};
   const first = ((account.metrics_first_call_per_symbol || {}).excess_returns) || {};
+  const allFilters = (account.metrics || {}).excess_return_filters || {};
+  const firstFilters = ((account.metrics_first_call_per_symbol || {}).excess_return_filters) || {};
+  const labels = (payload.theme_cohort || {}).absence_labels || {};
   const benches = [...(payload.benchmarks || []), 'theme_cohort'];
   (payload.horizons_days || []).forEach((h) => {
     benches.forEach((b) => {
       const key = `excess_${h}d_vs_${b}`;
       if (!(key in all)) return;          // 早於 5.5 的 artifact 沒有主題等權組那兩格——不補、不寫 0
       const tr = el('tr');
-      [`點名後 ${h} 天`, SCORECARD_BENCHMARK_LABELS[b] || b, scorecardCell(all[key]), scorecardCell(first[key])]
-        .forEach((t) => tr.appendChild(el('td', null, t)));
+      [`點名後 ${h} 天`, SCORECARD_BENCHMARK_LABELS[b] || b].forEach((t) => tr.appendChild(el('td', null, t)));
+      [[all[key], allFilters[key]], [first[key], firstFilters[key]]].forEach(([cell, filter]) => {
+        const td = el('td', null, scorecardCell(cell));
+        const line = b === 'theme_cohort' ? scorecardFilterLine(filter, labels) : null;
+        if (line) td.appendChild(el('div', 'note', line));
+        tr.appendChild(td);
+      });
       body.appendChild(tr);
     });
   });
@@ -3484,7 +3493,7 @@ async function renderScorecard() {
   } else if (!Array.isArray(cohort.cohorts)) {
     sec0.appendChild(el('p', 'warn', '主題等權組基準：這份 artifact 早於「每則點名只跟自己所屬的組比」——跑 `python -m webapp materialize --scorecard` 重算（不是 0）。'));
   } else {
-    sec0.appendChild(el('p', 'note', `主題等權組基準 ${cohort.cohorts.length} 組：每則點名只跟自己所屬的組比；不是組員的點名列在每格的「濾掉」理由裡。`));
+    sec0.appendChild(el('p', 'note', `主題等權組基準 ${cohort.cohorts.length} 組：每則點名只跟自己所屬的組比；不是組員的點名不比——每個帳號表格裡「主題等權組」那幾格下面，印出被濾掉幾則、各是什麼理由。`));
     cohort.cohorts.forEach((entry) => {
       const missing = entry.missing || [];
       sec0.appendChild(el('p', 'note', `・${entry.cohort_id}（${entry.theme}，決定於 ${entry.decided_on}）`
