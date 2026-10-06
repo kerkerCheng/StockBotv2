@@ -184,6 +184,49 @@ def test_daily_keeps_one_search_record_per_call_and_rechecks_the_deadline_per_ca
     assert all(s["tools"] for s in seen)
 
 
+def test_a_day_with_nothing_due_is_ok_end_to_end(tmp_path: Path, monkeypatch) -> None:
+    """2026-10-06 R2 條件 A：沒有任何等待到期時批次是空的——提議不呼叫模型、仍寫空的逐次紀錄，套用乾淨地回全零；
+    心跳說「沒有到期該查的等待」。原本結果檔缺 `search_calls`，套用照規定拒收，「沒事」被記成套用失敗（L13 同形）。"""
+    from crons import daily_task as dt
+    from crons import heartbeat as hb
+    from engine_b import routine_config
+
+    monkeypatch.setattr(dt, "INSTRUCTION_FILES", ("__no_such_instruction_file__.md",))
+    run = dt.DailyRun(out_dir=tmp_path / "out", llm_runner=lambda *a, **k: pytest.fail("空批次不該呼叫模型"))
+    run.llm = dict(routine_config.load_llm(), cwd_path=tmp_path / "llm_cwd")
+    paths = run._templates()
+    Path(paths["poll_batch"]).parent.mkdir(parents=True, exist_ok=True)
+    Path(paths["poll_batch"]).write_text(json.dumps({"run_id": run.run_id, "hits_per_watch": 3, "items": []}),
+                                         encoding="utf-8")
+    step = next(s for s in dt.DAILY_STEPS if s.key == "10e_poll_propose")
+
+    run._llm_propose(step, run.clock())
+
+    assert json.loads(Path(paths["poll_result"]).read_text(encoding="utf-8"))["search_calls"] == []
+    out = wp.apply(Path(paths["poll_result"]), Path(paths["poll_batch"]), run.run_id, receipt_dir=tmp_path,
+                   today=TODAY)
+    assert out["summary"]["batch"] == 0 and out["summary"]["rejected"] == 0 and out["summary"]["checked"] == 0
+    record = tmp_path / "run.json"
+    record.write_text(json.dumps({"steps": [{"key": "10d_poll_prepare", "status": "ok"},
+                                            {"key": "10e_poll_propose", "status": "ok", "proposed": 0},
+                                            {"key": "10g_poll_apply", "status": "ok", "summary": out["summary"]}]}),
+                      encoding="utf-8")
+    assert "本輪：沒有到期該查的等待" in hb._t2_line(now=hb.datetime.now(hb.timezone.utc), record_path=record)
+
+
+def test_dry_run_survives_an_unreadable_cap(monkeypatch) -> None:
+    """R2 條件 B：上限讀不到時 dry-run 照字面印並標「×?」，不讓整份診斷清單崩掉。"""
+    from crons import daily_task as dt
+    from engine_b import event_watch
+
+    def broken():
+        raise ValueError("型別錯")
+
+    monkeypatch.setattr(event_watch, "load_config", broken)
+    text = dt.dry_run_text()
+    assert "10e_poll_propose" in text and "×?" in text
+
+
 # ---------------------------------------------------------------------------
 # apply
 # ---------------------------------------------------------------------------

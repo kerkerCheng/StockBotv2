@@ -756,7 +756,11 @@ class DailyRun:
         batch = [item for item in envelope.get(spec["batch_key"]) or [] if isinstance(item, dict)]
         assert self.llm is not None
         if not batch:
-            self._write_llm_result(result_path, spec["out_key"], [])
+            # 有收集器的任務（雷達、T2）空批次也寫空的逐次紀錄（2026-10-06 R2 條件 A）：缺 `search_calls` 時 ⑩g 照規定拒收，
+            # 「今天沒有到期的等待」會被記成套用失敗——沒事與壞了同形（L13）。
+            empty = ({"search": llm_step.merge_search_records([]), "search_calls": []}
+                     if spec.get("collector") else None)
+            self._write_llm_result(result_path, spec["out_key"], [], extra=empty)
             row.update(status="ok", proposed=0, note="批次為空，沒有呼叫模型")
             self.log(f"{step.key} ok：批次為空")
             return
@@ -967,9 +971,12 @@ def dry_run_text(config_path: Path = CONFIG_PATH) -> str:
         # LLM 步驟照實印「每次 × 最多幾次」（R2 條件 2：原本印清單上的字面值，與 config 和分批都對不上）
         budget = f"{step.timeout_minutes:g}"
         if step.kind == "llm" and llm is not None:
-            calls = max_llm_calls(step, llm)
-            per = call_timeout_minutes(step, llm, radar)
-            budget = f"{per:g}×{calls}" if calls > 1 else f"{per:g}"
+            try:
+                calls = max_llm_calls(step, llm)
+                per = call_timeout_minutes(step, llm, radar)
+                budget = f"{per:g}×{calls}" if calls > 1 else f"{per:g}"
+            except Exception:  # noqa: BLE001 — dry-run 是診斷：上限讀不到就照字面印並標出來，不讓整份清單崩掉（R2 條件 B）
+                budget = f"{step.timeout_minutes:g}×?"
         lines.append(f"  {step.key:28} {budget:>6} 分｜{flags}｜{cmd}")
     return "\n".join(lines) + "\n"
 

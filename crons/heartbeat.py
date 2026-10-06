@@ -1384,6 +1384,8 @@ def _t2_run_text(*, now: datetime, record_path: Path | None) -> str:
         return "本輪：執行紀錄裡沒有 T2 步驟"
     if apply is not None and apply.get("status") == "ok" and isinstance(apply.get("summary"), Mapping):
         s = apply["summary"]
+        if s.get("batch") == 0:
+            return "本輪：沒有到期該查的等待（沒有呼叫模型）"
         return (f"本輪查 {s.get('checked', '?')}／{s.get('batch', '?')} 條｜新命中 {s.get('hits_new', '?')} 則"
                 f"｜拒收 {s.get('rejected', '?')}（沒真的查 {s.get('not_searched', '?')}、網址不在搜尋結果 "
                 f"{s.get('url_not_in_search', '?')}、重複 {s.get('duplicate_hit', '?')}、超過上限 {s.get('over_cap', '?')}）"
