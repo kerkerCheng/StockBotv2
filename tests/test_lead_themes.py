@@ -36,7 +36,17 @@ def test_robotics_theme_covers_the_parked_backlog() -> None:
     themes = load_themes()
     assert "robotics" in themes
     lowered = {k.lower() for k in themes["robotics"].keywords}
-    assert {"humanoid", "digit"} <= lowered
+    # 2026-10-06：單獨的 Digit 換成長寫法——英文比對要詞邊界但不分大小寫，"triple digit"／"single digit" 都會命中，
+    # 當時 robotics 標記靠 Digit 的 5 則裡 3 則是這種誤報；另 2 則真案例仍由 humanoid／Agility Robotics 標到。
+    assert {"humanoid", "agility digit", "agility robotics"} <= lowered
+    assert "digit" not in lowered
+
+
+def test_robotics_does_not_match_digit_as_a_number_word() -> None:
+    """L17 當下修（2026-10-06）：「三位數成長」不是 Agility 的 Digit。"""
+    assert "robotics" not in match_themes("triple-digit growth and single digit forward P/E")
+    hits = match_themes("Agility Digit humanoid deployed at GXO")
+    assert "agility digit" in [t.lower() for t in hits["robotics"]["terms"]]
 
 
 def test_keyword_match_is_case_insensitive_for_ascii() -> None:
