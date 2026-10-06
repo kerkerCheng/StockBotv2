@@ -1,0 +1,15 @@
+SOURCE: Smit, M. et al., “An introduction to InP-based generic integration technology,” Semicond. Sci. Technol. 29 (2014) 083001（綜述論文，開放取用）
+URL: https://iopscience.iop.org/article/10.1088/0268-1242/29/8/083001（DOI 10.1088/0268-1242/29/8/083001）
+PUBLISHED: 2014-06（期刊卷期 29(8) 2014；只取到月份）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（學術論文，有限摘錄）
+NOTE: 學理出處：§2.1 Epitaxial growth 的有限逐字（主動／被動整合要多次磊晶、butt-joint、SAG）。pypdf 抽字。
+
+【§2.1 Epitaxial growth】
+2.1. Epitaxial growth For the integration of active (ampli ﬁer) and passive (trans- parent waveguide) materials a number of integration schemes have been reported, which can be divided into single and multistep epitaxial growth processes. Single step epitaxial processes . In single-step processes the full layer stack, including active and passive layers is grown in one single epitaxial step and the transparent wave- 
+
+Single step pro- cesses are simple from an epitaxial point of view, but ef ﬁcient and well controlled coupling between the active and the passive parts introduces additional complexity in the form of taper structures and/or additional growth steps. Figure 7(d) illustrates the most frequently applied approach: butt-joint integration. Here the active and passive waveguide structures are created in different growth steps, thus providing a large ﬂexibility in the epitaxial layer structure and in the doping levels. In the past the additional growth stages cou
+
+In the COBRA generic process a three step epitaxial process is used to obtain the structure depicted schematically in ﬁgure 7(d), and in more detail in ﬁgure 8(a). In a ﬁrst growth step the active layer stack is grown including the lower part of the p-doped cladding. Next the active regions are masked and the exposed area is etched away. In a second selective area regrowth step the etched- away part is replaced with a transparent waveguide stack, up to the same level as the ﬁrst growth. In the transparent part the cladding layer is not doped in order to avoid absorption loss incurred by the p-dopant. In a third growth step the whole
+
+A process offering more ﬂexibility in bandgap properties is selective area growth (SAG). Here the growth rate in the active regions is enhanced by masking the area besides the active region. During MOVPE growth, species migrate from the masked areas to the unmasked areas where the growth rate becomes higher. If the waveguide consists of an MQW stack the wells in the active region will become thicker and this will lead to a reduction in the bandgap. The reduction can be controlled by controlling the growth enhancement via the width of the mask and the gap between the masked regions. In this way each active region can be controlled individually over a bandgap range as wide as 100 nm [ 49]. Because the bandgap changes are caused by a diffusion process t

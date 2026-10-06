@@ -269,6 +269,30 @@ def test_fetch_company_writes_published_at_into_meta(monkeypatch, tmp_path) -> N
     assert meta["retrieved_at"] >= meta["published_at"]     # 不可能在發表前抓到它
 
 
+def test_include_english_never_overwrites_the_chinese_edition(monkeypatch, tmp_path) -> None:
+    """2026-10-06 事發（Phase 7 failure log #33）：4971 的英文版修訂本（FE6）上傳晚於中文版修訂本（F11），
+    `--include-english` 時被當成「最新修訂」、用基礎 doc_id 寫進 raw——tracked 的中文版全文被英文版蓋掉，
+    沒有任何東西說話。中英文是同一份文件的兩種語言，不是彼此的修訂：各自只留最新一份，英文版 doc_id 帶表單碼。"""
+    from fetchers import mops
+
+    docs = [dict(d) for d in DOCS if d["filename"].endswith(("F04.pdf", "F11.pdf", "FE4.pdf"))] + [{
+        "co_id": "4971", "data_year": "114 年", "category": "股東會相關資料",
+        "detail": "英文版-股東會年報(股東會後修訂本)", "filename": "2025_4971_20260623FE6.pdf",
+        "size": "2,201,285", "uploaded_at": "115/08/27 17:08:17",
+    }]
+    monkeypatch.setattr(mops, "list_documents", lambda *a, **k: docs)
+    monkeypatch.setattr(mops, "fetch_document", lambda co_id, filename, **k: filename.encode())
+    monkeypatch.setattr(mops, "pdf_to_text", lambda content: (content.decode(), 1))
+
+    written = mops.fetch_company("4971", year="115", kind="annual_report", out_dir=tmp_path,
+                                 include_english=True)
+
+    assert [m["doc_id"] for m in written] == ["mops_4971_annual_report_2025", "mops_4971_annual_report_2025_fe6"]
+    # 基礎 doc_id 的檔是中文版最新修訂（F11），不是上傳更晚的英文版
+    assert (tmp_path / "mops_4971_annual_report_2025.txt").read_text(encoding="utf-8") == "2025_4971_20260623F11.pdf"
+    assert (tmp_path / "mops_4971_annual_report_2025_fe6.txt").read_text(encoding="utf-8") == "2025_4971_20260623FE6.pdf"
+
+
 # ---------------------------------------------------------------------------
 # 坑 5（2026-09-17）：PDF 吐出的 CJK 相容表意文字
 # ---------------------------------------------------------------------------

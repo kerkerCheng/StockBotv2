@@ -267,6 +267,10 @@ def latest_only(documents: list[dict[str, str]]) -> list[dict[str, str]]:
     return sorted(documents, key=_sort_key)[-1:] if documents else []
 
 
+def _is_english(doc: dict[str, str]) -> bool:
+    return "英文版" in doc.get("detail", "")
+
+
 def fetch_company(
     co_id: str,
     *,
@@ -290,8 +294,11 @@ def fetch_company(
 
     superseded: list[dict[str, str]] = []
     if not all_revisions and len(picked) > 1:
-        newest = latest_only(picked)
-        superseded = [d for d in picked if d is not newest[0]]
+        # 中文版與英文版是同一份文件的兩種語言，不是彼此的修訂——各自只留最新一份，英文版的 doc_id 一律帶表單碼
+        # （2026-10-06 事發：--include-english 時英文版上傳較晚，被當成「最新修訂」用基礎 doc_id 蓋掉中文版的 raw 檔）。
+        newest = (latest_only([d for d in picked if not _is_english(d)])
+                  + latest_only([d for d in picked if _is_english(d)]))
+        superseded = [d for d in picked if not any(d is n for n in newest)]
         for doc in superseded:
             print(
                 f"[mops] ⚠ 略過較舊修訂：{doc['detail']}（{doc['filename']}，"
@@ -305,7 +312,7 @@ def fetch_company(
         filename = doc["filename"]
         content = fetch_document(co_id, filename, mtype=mtype)
         text, pages = pdf_to_text(content)
-        doc_id = make_mops_doc_id(co_id, kind, filename, disambiguate=all_revisions)
+        doc_id = make_mops_doc_id(co_id, kind, filename, disambiguate=all_revisions or _is_english(doc))
         published_at = roc_upload_time_to_iso_date(doc.get("uploaded_at", ""))
         if not published_at:
             print(f"[mops] ⚠ {filename} 的上傳時間 {doc.get('uploaded_at')!r} 解析不到，"

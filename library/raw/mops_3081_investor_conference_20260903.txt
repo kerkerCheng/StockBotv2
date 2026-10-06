@@ -1,0 +1,311 @@
+SOURCE: 公開資訊觀測站（MOPS）法人說明會一覽——聯亞光電受邀參加 Citi 2026 Semicon Tour 的簡報（英文檔 308120260828E002.pdf，與中文檔 M002 位元相同）
+URL: https://mopsov.twse.com.tw/nas/STR/308120260828E002.pdf（一覽表：ajax_t100sb07_1，co_id=3081）
+PUBLISHED: 2026-09-03（MOPS 法人說明會一覽表的召開日期 115/09/03；檔名日期 20260828 是上傳批次，不當發布日）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（公司於 MOPS 公開的法說簡報）
+NOTE: pypdf 抽出的逐頁文字（版面文字順序可能錯置）。第 6 頁「Our Business Model」是流程圖，文字層只剩標籤；圖面逐格讀法（研究者讀頁面圖像所記，非原文）：Sales 3（Solution）＝聯亞做 Design 與 Manufacture，Process 由 Contract Manufacturing 的「L-company」承做並標「5000 Hours」，模組由「CL-company」做，終端客戶「G-company」，聯亞到 G-company 的箭頭標「2-3 years」。字母代號照原文，不得對應到任何具名公司。
+
+
+=== PAGE 1 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+1 1
+LandMark Optoelectronics Corporation
+LandMark Optoelectronics Corporation
+Ticker: 3081
+=== PAGE 2 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+2
+Safe Harbor Notice
+Land Mark 2
+This presentation and discussions contain forward-looking statements. These statements are
+based on current expectations and are subject to known and unknown risks and
+uncertainties. Actual results may differ materially from those expressed or implied by these
+forward-looking statements. Except as required by law, we undertake no obligation to
+update any forward-looking statement, whether as a result of new information, future
+events, or otherwise.
+=== PAGE 3 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+3
+LandMark Optoelectronics Corporation
+LandMark Confidential Property3
+Positioning, Vision and Mission
+● Innovative R&D, a business model driven by advanced 
+products and services
+● A design and manufacturing service platform for 
+optoelectronic lasers
+● To become a technology and manufacturing leader that can 
+collaborate and compete with integrated component 
+manufacturers
+● Service-oriented, providing reliable technology and 
+production capabilities
+Positioning
+Vision
+● To become the world’s largest, most advanced, and most 
+trusted epitaxial manufacturing service provider
+● To form an optoelectronics industry alliance with customers 
+who are integrated component manufacturers
+Mission
+Core Competitiveness
+Design and 
+Manufacturing 
+Platform for 
+Optoelectronic 
+Lasers
+Process 
+Integration
+Customer 
+Partnership
+Volume 
+Production 
+Advantage
+Technologica
+l Leadership
+=== PAGE 4 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+4
+GaAs
+PD Epiwafer
+InGaAs PD/ C-PD 
+& APD / C-APD
+GaAs PD 
+(0.6~0.85μm)
+LD Epiwafer
+InP material
+(1.2~1.65μm)
+GaAs material
+(0.6~1.06μm)
+2.5G/10G/25G FP/DFB LD
+2.5G/10G/25G/50G C-DFB / EML LD 
+(grating and overgrowth completed)
+High Power LD
+VCSEL
+ InP
+SiPh LD
+Product Categories
+Land Mark 4
+=== PAGE 5 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+5
+Optical Telecom 
+FTTX / 5G
+Product Applications
+Industrial/ Consumer
+Data Center
+/ Silicon Photonics
+Land Mark 5
+=== PAGE 6 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+6
+LandMark Optoelectronics Corporation
+LandMark Confidential Property6
+Our Business Model
+Sales 2（ODM）
+Manufacture
+Process
+Design
+Module
+Design
+Sales 1 （OEM）
+Manufacture
+Process Module
+Customer
+Sales 3（Solution）
+Manufacture
+Contract Manufacturing
+Customer
+Customer
+Process
+Module
+Customer
+2-3 years
+5000 Hours
+G-company
+L-company
+G-company
+CL-company
+Design
+
+=== PAGE 7 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+7
+Strategy Map
+ Customers: CSPs + IDMs + Module Makers + Design Houses
+ Capacity: the Most MOCVDs + NIL + DUV
+ Products: Single Wave + Multi Waves + High Powers
+ Key Materials: 18 months inventories + LTAs
+=== PAGE 8 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+8 8
+AI optical Demand 
+( The Next Generation of Interconnect & Optical I/O)
+LandMark Confidential Property
+Note: * means module level estimation; Sources: Nvidia Presentation at OFC (3/2026, Los Angeles), Landmark research
+Scale-In
+Optics TAM
+(Relatively)
+Time-to-Market
+Representative 
+Companies
+110x100x 0.10x
+Now Now2027-282029-30
+Est. Laser
+Demands (800G, 1.6T) ~ 1B (1,000M)5-10B (5,000-10,000M)50-100B 5-10M*
+=== PAGE 9 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+9
+Source: Google
+Example of Optical Architecture for AI
+Source: Intel
+Regular Data Center AI Application
+Land Mark 12
+=== PAGE 10 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+10
+Example Layouts of SiPh Transceiver
+Source: Juniper Networks
+Land Mark 8
+
+=== PAGE 11 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+11
+Example of SiPh
+Land Mark 11
+Source: Photonic Network Communications
+=== PAGE 12 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+12
+Developing Roadmap of SiPh and CPO
+Source: TSMC
+10
+Land Mark
+=== PAGE 13 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+13
+Revenue & Margin Trend 
+13
+Land Mark
+15%
+28% 31% 32%
+43% 44%
+49%
+55% 57%
+-17%
+2% -2%
+10%
+27%
+19%
+21%
+41% 47%
+-11%
+3% 4% 9%
+17% 18%
+30%
+35% 38%
+Gross Margin
+Operating Margin
+Net Margin
+2Q-24 3Q-24 4Q-24 1Q-25 2Q-25 3Q-25 4Q-25 1Q-26 2Q-26
+Net Revenue 273 323 289 455 553 553 642 904 1,221
+Gross profit 40 89 90 147 240 241 313 495 702
+Operating Income -47 8 -6 45 149 104 135 373 573
+Net Income -31 8 8 42 97 99 190 318 468
+-200
+ 100
+ 400
+ 700
+ 1,000
+ 1,300
+NT$M
+=== PAGE 14 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+14
+Income Statement
+14
+Land Mark
+Unit: NTD Million
+2026
+2Q
+2026
+1Q
+2025
+2Q QoQ YoY 2026
+1H
+2025
+1H YoY
+Net revenue 1,221 904 553 +35% +121% 2,126 1,008 +111%
+Gross profit 702 495 240 +42% +193% 1,197 387 +210%
+Gross margin(%) 57% 55% 43% 56% 38%
+Operating expenses (129) (122) (91) +6% +42% (251) (193) +30%
+Operating income 573 373 149 +53% +284% 946 194 +388%
+Operating margin(%) 47% 41% 27% 44% 19%
+Non-operating incomes and expenses 13 24 (28) 37 (20)
+Income before income tax 586 397 121 +48% +384% 982 174 +465%
+Income tax benefit (expense) (117) (79) (24) (196) (35)
+Net income 468 318 97 +48% +384% 786 139 +465%
+Net margin(%) 38% 35% 17% 37% 14%
+Comprehensive income 470 317 96 +48% +392% 788 138 +469%
+EPS (NT$) 4.62 3.13 0.96 7.75 1.38
+=== PAGE 15 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+15
+Unit: NTD Million
+June 30, 2026 December 31, 2025 June 30, 2025
+Amount % Amount % Amount %
+Cash and cash equivalents 514 8 703 14 467 10 
+Time deposits 1,119 18 1,270 25 1,270 28 
+Accounts receivable, net 934 15 337 7 286 6 
+Inventories 640 10 571 11 360 8 
+Corporate bonds 333 5 231 5 200 4 
+Net property, plant and equipment 1,718 28 1,522 30 1,571 35 
+Other assets 960 15 374 7 376 8 
+Total assets 6,218 100 5,008 100 4,530 100 
+Current liabilities 1,163 19 532 11 358 8 
+Non-current liabilities 335 5 286 6 290 6 
+Total liabilities 1,499 24 817 16 648 14 
+Capital stock 1,018 16 925 18 925 20 
+Capital surplus 1,800 29 1,800 36 1,800 40 
+Retained earnings 1,904 31 1,488 30 1,199 26 
+Other equity (3) 0 (23) 0 (42) -1 
+Total shareholders' equity 4,719 76 4,191 84 3,882 86 
+Book value per share (NT$) 46.37 45.29 41.96
+Balance Sheets
+15
+Land Mark
+=== PAGE 16 ===
+L a n d M a r k O p t o e l e c t r o n i c s C o r p o r a t i o n
+Land Mark
+O pt eo l tce nor sci
+16
+Thank you!
+16
+Source: Huawei

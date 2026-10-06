@@ -1,0 +1,12 @@
+SOURCE: Semiconductor Today（產業媒體）——Veeco receives LUMINA+ MOCVD system order for manufacturing InP lasers
+URL: https://www.semiconductor-today.com/news_items/2026/aug/veeco-060826.shtml
+PUBLISHED: 2026-08-06（網址路徑 2026/aug 與頁面日期；轉述 Veeco 新聞稿）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（媒體報導，有限摘錄）
+NOTE: 媒體轉述設備商（Veeco）的新聞稿；客戶未具名（「a global leader in optical and photonic technologies」）。
+
+Veeco receives LUMINA+ MOCVD system order for manufacturing InP lasers
+
+Epitaxial deposition and process equipment maker Veeco Instruments Inc of Plainview, NY, USA says that a global leader in optical and photonic technologies has selected its LUMINA+ metal-organic chemical vapor deposition (MOCVD) system to fabricate indium phosphide (InP) lasers for innovative communication solutions in the datacom industry. The firm adds that its LUMINA+ system has now been adopted across all major applications in the arsenide and phosphide (As/P) epitaxial space, including the fast-growing InP laser market.
+
+“Following a series of recent orders and qualifications, this order extends the strong position of our LUMINA+ system for high-volume As/P production,” says Anil Vijayendran, VP of MOCVD products at Veeco. “Offering the same great process performance as the original LUMINA system, the LUMINA+ system achieves breakthrough productivity, bringing much-needed scale to the optical transceiver industry.”

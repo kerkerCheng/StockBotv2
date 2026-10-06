@@ -1,0 +1,62 @@
+SOURCE: Yole Développement——InP Wafer, Epiwafer and Device Market 2021: Photonics and RF Applications（報告宣傳單 YINTR21188，2021-09）
+URL: https://medias.yolegroup.com/uploads/2021/09/YINTR21188_InP_Wafer_Epiwafer_and_Device_Market_Sept2021_Flyer.pdf
+PUBLISHED: 2021-09（宣傳單封面「Yole Développement, September 2021」；上傳路徑 2021/09）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（公開宣傳單，有限摘錄）
+NOTE: 產業研究機構的公開宣傳單（報告本體付費）。只保留研究必要的三段逐字（pypdf 抽字，行尾斷字照原樣）；數字是 2020–2021 年的市場資料，五年前的快照。
+
+【p.2 併購與垂直整合】
+The InP industry is fragmented, with numerous 
+players at the device level. Two American 
+players lead the InP market: II-VI and Lumentum. 
+Both have increased their market share and 
+strengthened their position thanks to strategic 
+M&A. II-VI acquired Finisar in 2019, and Lumentum 
+acquired Oclaro in 2018. II-VI and Lumentum both 
+have vertically integrated business models: they 
+generate revenues at bare die, device, and module-
+level (II-VI also offers epiwafer products). Their 
+combined bare die market share is around 30%. 
+
+【p.2 成本圖註】
+InP process yield losses 
+on passivation, metal 
+deposition, 
+cleaving… etc. reflecting 
+to the increase cost.
+Expensive 
+epitaxy due to 
+regrowth.
+4" InP
+substrate is 3 
+times more 
+expensive 
+than 6" GaAs 
+substrate.
+MOVEMENTS IN THE VALUE CHAIN: OPPORTUNITIES AT THE DEVICE LEVEL TO ADD 
+MORE FUNCTIONALITY WHILE WAFER AND EPIWAFER REMAIN CONCENTRATED 
+
+【p.2 價值鏈集中】
+substrate.
+MOVEMENTS IN THE VALUE CHAIN: OPPORTUNITIES AT THE DEVICE LEVEL TO ADD 
+MORE FUNCTIONALITY WHILE WAFER AND EPIWAFER REMAIN CONCENTRATED 
+The bare die market shows a significant growth rate 
+of 25% year-on-year (YoY) in 2020, compared to 
+the single-digit YoY at wafer and epiwafer markets. 
+The increasing demand for higher data rates 
+contributes to higher $/Gbps at the laser markets. 
+Due to the diversified needs, the ecosystem at the 
+device level is highly fragmented. Moreover, we 
+identified more than 30 foundries supplied by only a 
+few leading companies, mainly Sumitomo and AXT 
+with more than 80% combined market share at the 
+wafer level, and Landmark, with 67% of the market 
+at the epiwafer level. This is very well correlated 
+with the cost chart, where the processing cost at 
+the foundry level is more than 67% of the total cost. 
+A complete analysis of price and cost in value are 
+detailed in the report.
+A mainstream feature of InP lasers is their distributed 
+feedback (DFB) structure. The complex etching 
+and regrowth lead to yield losses and higher costs 
+compared to GaAs lasers. InP is mainly processed 

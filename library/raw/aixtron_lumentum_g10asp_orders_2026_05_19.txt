@@ -1,0 +1,20 @@
+SOURCE: AIXTRON SE 新聞稿（EQS-Media）——AIXTRON receives multiple orders for G10-AsP MOCVD Systems from Lumentum to support expansion of High-Speed Optical Solutions for AI Networks
+URL: https://www.aixtron.com/en/investors/AIXTRON%20receives%20multiple%20orders%20for%20G10-AsP%20MOCVD%20Systems%20from%20Lumentum%20to%20support%20expansion%20of%20High-Speed%20Optical%20Solutions%20for%20AI%20Networks_n13987
+PUBLISHED: 2026-05-19（EQS-Media 19.05.2026 07:30 CET/CEST；正文 dateline「Herzogenrath, Germany, 19 May 2026」）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（發行人公開新聞稿）
+NOTE: 設備供應商的新聞稿；內含客戶端（Lumentum 晶圓廠營運資深副總 Jeff Brown）具名引言。fetchers.utils.html_to_text 轉文字，逐字未改寫。
+
+AIXTRON receives multiple orders for G10-AsP MOCVD Systems from Lumentum to support expansion of High-Speed Optical Solutions for AI Networks
+
+Herzogenrath, Germany, 19 May 2026 – AIXTRON SE (FSE: AIXA) a technology provider of MOCVD solutions for advanced photonics, announced today that Lumentum, a global leader in optical and photonic technologies for artificial intelligence (AI) and cloud data centres, has placed multiple orders for the G10-AsP platform.
+
+The orders reflect the growing demand for indium phosphide (InP)-based lasers and detectors, which are becoming essential for the rapid growth of large-scale AI data center networks. Lumentum is at the forefront of deploying ultra-high-speed optical connectivity solutions, including next-generation high-speed InP technologies designed for 800G and beyond, addressing the rapidly increasing bandwidth requirements of AI data center architectures.
+
+To meet rapidly increasing customer demand for AI-driven optical connectivity, Lumentum is expanding its manufacturing capacity with the support of AIXTRON's G10-AsP system. Widely regarded as the industry benchmark for high-volume, high-performance indium phosphide (InP) production, this platform delivers superior wafer uniformity thanks to advanced temperature control and injector engineering. Its fully automated, cassette-to-cassette wafer handling supports maximum throughput in world-class manufacturing environments, and its integrated in-situ cleaning ensures exceptional process stability over extended production runs. Furthermore, the system's ability to handle 6-inch InP wafers enables customers to lead the way in true mass production.
+
+Dr. Felix Grawert, CEO of AIXTRON SE, emphasized the strategic significance of the collaboration: "Lumentum is shaping the future of AI-driven high-speed optical communications. We are proud to support this trajectory with our G10-AsP platform, enabling scalable and highly stable InP manufacturing in line with accelerating market demands. As the industry transitions toward larger wafer formats and higher integration levels, AIXTRON provides the technological foundation required for sustainable volume growth."
+
+Jeff Brown, Senior Vice President, Fab Operations at Lumentum, said:
+
+"Lumentum’s world-class InP technology platform continues to set the standard for high-performance photonics, enabling the next generation of bandwidth scaling and energy-efficient optical interconnects. Our collaboration with AIXTRON strengthens our ability to innovate at scale, combining a leading-edge manufacturing platform with our device expertise to accelerate advanced InP solutions for the global market."

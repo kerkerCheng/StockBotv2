@@ -1,6 +1,7 @@
 # 個股頁 schema（十三塊、防 overfit、慢慢磨）——PLAN_PROPOSAL
 
-> 狀態：**S1 凍結判準達成（2026-10-06）；v1.0 等 brainstorm §14.1 ②③④ 與負錨點驗收；Amendment 2026-10-06 已納入 Steps（S4 升主產品並提前、四段規格、S5 前置）。** 原狀態 AWAITING_HUMAN（2026-10-05）。設計與盤點：[`docs/brainstorms/2026-10-05-stock-page-schema.md`](../brainstorms/2026-10-05-stock-page-schema.md)。
+> 狀態：**S1 凍結判準達成（2026-10-06）；v1.0 等 brainstorm §14.1 ②③④ 與負錨點驗收；Amendment 2026-10-06 已納入 Steps（S4 升主產品並提前、四段規格、S5 前置）。**
+> **S4 第一份層說明：InP 磊晶片 v1（2026-10-06，`library/private/research_notes/layer_notes/mat_inp_epiwafer.md`；層節點入圖 pq2 [715]；因它改變候選狀態 1 筆、主張變成 watch 7 條＋3 條待層讀圖）。** 下一份照 Amendment 的順序：散熱鏈 → 外部光源 → FAU。 原狀態 AWAITING_HUMAN（2026-10-05）。設計與盤點：[`docs/brainstorms/2026-10-05-stock-page-schema.md`](../brainstorms/2026-10-05-stock-page-schema.md)。
 > 樣稿：<https://claude.ai/artifact/Q5TL6rQyYp87uYgXgG3vfH>（第九輪九張板，Version 16）。
 
 ```

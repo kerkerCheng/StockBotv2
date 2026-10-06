@@ -1,0 +1,48 @@
+SOURCE: AIXTRON SE 財務新聞（EQS）——Inflection point driven by rising optoelectronics demand（Q1 2026 結果）
+URL: https://www.aixtron.com/en/investors/Inflection%20point%20driven%20by%20rising%20optoelectronics%20demand_n13958
+PUBLISHED: 2026-04-30（EQS-Media 30.04.2026 07:30 CET/CEST；正文 dateline「Herzogenrath, Germany, April 30, 2026」）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（發行人公開財報新聞稿）
+NOTE: 只保留正文前段（訂單、出貨時程、CEO 引言）；財務表略。
+
+Herzogenrath, Germany, April 30, 2026 – AIXTRON SE (FSE: AIXA, ISIN DE000A0WMPJ6) confirms the preliminary figures released on April 14, 2026. Order intake of EUR 171.4 million in the first quarter of 2026 signals a clear improvement in market momentum, driven by very strong demand for optoelectronics systems. This development is underscored by multi‑tool orders from several customers. Major system shipments are expected to begin in Q2/2026 and continue well beyond the current fiscal year.
+
+In the power electronics market, demand for SiC-tools remained soft, while demand for GaN-tools stayed stable at a low level. Q1/2026 revenues of EUR 59.4 million were in line with guidance of EUR 65 million in a range of ± EUR 10 million and seasonal expectations (Q1/2025: EUR 112.5 million).
+
+Operational measures
+
+During the first three months of 2026, AIXTRON implemented the personnel reduction announced earlier. This resulted in one‑off costs in the mid-single‑digit EUR million range and creates a more flexible operating structure.
+
+Strategic flexibility
+
+In Q1/2026, AIXTRON announced plans for a new production site in Malaysia to strengthen long‑term manufacturing flexibility and resilience, particularly in supporting customers in Asia. In April, the company successfully placed its first EUR 450 million convertible bond, further enhancing long-term financial flexibility. The bonds do not bear periodic interest and, unless converted before then, will be redeemed in April 2031.
+
+"The first quarter of 2026 marked a clear improvement in market dynamics, with exceptionally strong order momentum in optoelectronics,” says Dr. Felix Grawert, CEO of AIXTRON SE. “Laser‑related demand exceeded our expectations, and the visibility provided by orders extending beyond 2026 supports the start of a new structural growth trend. As we expect this momentum to continue, we have raised our full‑year 2026 guidance. At the same time, the planned Malaysia site strengthens our foundation for profitable growth.”
+
+Order intake and order backlog
+
+Optoelectronics accounted for almost 70% of order intake in Q1/2026 and is currently AIXTRON's main demand driver. Total order intake in the first three months of 2026 was EUR 171.4 million, 30% above the previous year's level (Q1/2025: EUR 132.2 million). The company continues to see high multi‑tool order activity, supporting a robust pipeline well beyond 2026. As of March 31, 2026, equipment order backlog stood at EUR 359.1 million, up from EUR 307.9 million a year earlier and from EUR 257.8 million at the end of 2025.
+
+Revenue development
+
+Revenue in Q1/2026 amounted to EUR 59.4 million (-47% yoy) in line with seasonal expectations. This was within the guidance of EUR 65 million in a range of ± EUR 10 million (Q1/2025: EUR 112.5 million).
+
+Gross profit and gross margin
+
+AIXTRON recorded gross profit of EUR 10.8 million in the first three months of 2026 (Q1/2025: EUR 34.1 million), corresponding to a gross margin of 18% (Q1/2025: 30%). This includes one-off expenses in the mid single-digit EUR million range related to the announced personnel reduction in the operations area.
+
+Operating expenses and EBIT
+
+Operating expenses increased by 7% in the first quarter of 2026 to EUR 33.0 million (Q1/2025: EUR 30.8 million). Research and development expenses, which accounted for the largest share, increased by 40% to EUR 24.8 million in the first quarter of 2026 (Q1/2025: EUR 17.7 million).
+
+The operating result (EBIT) in the first three months of 2026 was EUR -22.3 million, corresponding to an EBIT margin of -38% (Q1/2025: EUR 3.3 million, 3%). Compared with the previous year, the decline in EBIT was mainly due to lower volume and expenses for the one-off effects described above. Net result for the first three months of 2026 came in at EUR -21.9 million (Q1/2025: EUR 5.1 million).
+
+Positive free cash flow
+
+Cash flow from operating activities in the first quarter of 2026 was EUR 53.6 million (Q1/2025: EUR 35.1 million). In particular, the reduction in working capital had a positive impact compared with the previous year. Free cash flow benefited from the improved operating cash flow and amounted to EUR 48.5 million in the first three months of 2026. This corresponds to an improvement of EUR 18.7 million compared with the previous year (Q1/2025: EUR 29.8 million).
+
+As of March 31, 2026, AIXTRON reported cash and cash equivalents, including other current financial assets, of EUR 272.7 million (December 31, 2025: EUR 224.6 million). The equity ratio of 85% as of March 31, 2026 underscores AIXTRON's financial strength (December 31, 2025: 88%).
+
+"The successful placement of AIXTRON’s first convertible bond underscores the capital markets’ confidence in the strength and long-term potential of our strategy. We have been able to raise EUR 450 million with zero coupon. This now gives us full flexibility to act on future business opportunities. At the same time, we will remain financially disciplined and continue further optimizing working capital," says Dr. Christian Danninger, CFO of AIXTRON SE.
+
+Updated 2026 full-year guidance confirmed
