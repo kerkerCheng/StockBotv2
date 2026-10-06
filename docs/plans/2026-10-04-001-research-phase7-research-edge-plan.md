@@ -145,7 +145,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 7.0d | 敘事「加碼條件」`confirm[]`：寫下即登記 watch、觸及只提醒、到期重問；心跳、候選板、個股頁（R2-a） | ✅（v2 選填欄、只在非空時進 id——真實 ledger 20 行重算逐位相同；watch `brief:<id>#c<n>`＋`condition_role=confirm`，判斷只住 `is_confirm`，反證計數、downside、可開都不吃〔變異紅〕；觸及與到期進 `narrative_rewrite`、以 `confirmed` 處置、候選狀態不自動改；心跳一行＋三個快照鍵、候選板與個股頁逐條列〔句子在 materialize 端組好、前端照印〕；**R2-a GO**〔獨立重算 20/20、兩個變異紅、consumer 逐處盤點無漏〕；偏差 #12） | 執行模型 | 見 git log「Step 7.0d」 |
 | 7.0e | 個股頁首屏照五題排列＋候選板與個股頁標「和持股共用需求錨」 | ✅（五題對照唯一一份 `FIRST_SCREEN_QUESTIONS` 經 `.meta.json`、app.js 不留第二份；`shared_bet` 只呈現、依 ticker 字母列、缺席分型由產生端宣告；改前改後各 materialize 76 頁——拿掉新欄位、時間戳與價格脈絡後 76/76 逐字相同、`freshness_identity` 76/76 相同；Edge 實點四頁五題 5/5、COHR 與 SIVE.ST 互列 CW DFB 層；變異六個紅；偏差 #13–#14） | 執行模型 | 見 git log「Step 7.0e」 |
 | 7.0f | 外部雷達：daily 只開 WebSearch 的 LLM 步驟、八週試驗（R2-b；sandbox impact review） | ✅（探針：不放行時 WebSearch 被拒、卻回 `is_error: false`＋空結果→一律判失敗；最窄放行＝`permissions.allow`；雷達 init 與零工具那份只差 `tools`；daily ①b–①e、`radar.enabled`（沒有那一段＝關閉）；網址必須出自同一次搜尋〔程式從 stream 收〕、去重且已登記的不碰、每日 5 則、secondary、不喚醒語意 watch；triage 批次雷達排最後〔偏差 #16〕；真資料試跑：搜尋 16 次、148 網址、提議 0；變異八個紅；**R2-b GO**〔11 種網址變體無一繞過、找不到多拿能力的路徑、prompt 無持股〕；偏差 #15–#18；**第一輪真實排程 2026-10-05 05:30——看心跳段 3 那一行與 `radar_2026-10-05.json`（ROADMAP 驗收⑦）**） | 執行模型 | 見 git log「Step 7.0f」 |
-| 7.0g | 研究預算分層（A4）：資料檢查跟著全部個股頁 → 閉環母體收窄（#22 提前）＋刪兩條 EPS → `research` 面板降選配 → 段 5 分流文字 | ○ | 執行模型 | |
+| 7.0g | 研究預算分層（A4）：資料檢查跟著全部個股頁 → 閉環母體收窄（#22 提前）＋刪兩條 EPS → `research` 面板降選配 → 段 5 分流文字 | ✅（2026-10-07；R1。①資料檢查母體＝全部 92 頁：股數比 60／比不了 32 逐檔列、營收量級（新，materialize 端換匯）比 67／0 檔對不上／比不了 25、同日多筆生效 14 組；三個原始案例回放 3／3〔#20、#23、#27〕；幣別標籤抽成 `alpha.contracts.reporting_currency_for` 單一函式。②`closure.population_for`：可推進 26 → 6〔短檢查 6481.T、XFAB.PA、XPEV、5411.T；廣度敘事 CLF、SILEX.ST〕、非倍率 56 檔逐檔列名、邊緣沒座位已查 2〔2768.T、CCXI〕；#22 的量 17 → 0；EPS 兩條與 `_consensus_flags` 退役。③research 降選配：10 檔少一個卡點、0 檔只卡它；refresh 雜訊旗標 23／23 不再升級成整頁旗標〔可逆，§14 #17〕。④段 5 改寫＋OPERATIONS 一句；偏差 #22） | 執行模型 | 見 git log「Step 7.0g」 |
 | 7.1 | Wave 1 研究（約 4 週）：**InP 磊晶層說明（O6 提前，A3，排第一件）**、積壓、電力與散熱開題、S1 claim 抽樣、O3、O5 | ○ | 強模型 | |
 | 7.2 | 回放：R1 已定價、R3 漏網稽核（機械）；R2 parked 回查、R4 輸家驗屍（研究） | ✅（四份 `docs/reports/phase7/replay-*.md`，產生程式碼逐字附錄、偏差標註齊全。R1：124 格有值 10、PIT 違規 0，H9 兩個子群都「不足」（#12 價格歷史深度）；R3 第一窗：Q3 前四分之一逐檔有 `first_seen` 或「沒有接觸」（#13 名冊新增後 lead 身分不重掃；第二窗在 7.5）；R2：36 則證實 1（CCXI S-4）、H2 的 X2 部分「不足」、與 P3 合併判（#15 park 等的東西出現了卻沒接回；「無法判」「不適用」兩類是回查時加的，報告已註明不影響判讀）；R4：五檔全部「證據不足以判」（#14 反證做成被評公司的供貨邊）） | 執行模型（R1、R3）＋強模型（R2、R4） | 見 git log「Step 7.2」 |
 | 7.3 | 中迴路裁決（Q3 財報季；到點插隊）：AXTI、COHR、LITE、SIVE.ST＋新鏈有裁決點的 | ○ | 強模型 | |
@@ -186,6 +186,7 @@ trigger 1）、**R2-b**＝7.0f（無人值守 LLM 步驟的能力變更，trigge
 | 19 | 7.1 | §7 第 6 項「落 `library/private/research_notes/layer_notes/mat_inp_epitaxy.md`」 | 檔名照提議的節點 id：`mat_inp_epiwafer.md`（節點 `mat:inp_epiwafer`，RA [715]） | S4 規格「主鍵是節點或轉換 id」；被供應的東西是磊晶片——L4：節點是換掉交易對手也不變的那個東西；與 `mat:inp_substrate`、`prod:quantum_dot_laser_epiwafer` 的命名一致 |
 | 20 | 7.1 | §7 第 6 項 ④「每條主張登記成 watch」 | 牽涉公司賭注的 7 條主張掛在四份敘事的反證上（2455.TW、IQE.L、3081.TWO、4971.TWO 換版）；純屬這一層的 3 條（A6–A8）列在層說明、等 `mat:inp_epiwafer` 入圖後掛層讀圖 | 語意 watch 的來源鍵只認 thesis／reading／brief（failure log #31）；個股頁 plan S4 的程式（層說明 ledger）落地前，層說明沒有自己的來源鍵——不另開臨時來源鍵（那是動 contract） |
 | 21 | 7.1 | §0.1 Q2「新的鏈……光通訊＋電力＋散熱」、§13「decompose 同時 open 最多兩個：電力、散熱正好兩個」 | 使用者 2026-10-06 加選第四條鏈 **AI 生醫**（pq2 [723]，稽核用、受理即 resolve），照 §7 第 2 項電力／散熱的七步走；registration 檔尾 append case **B1**（開題日＝該 commit 日）；`config/themes.txt` 加 `aibio`（只放關鍵字，核心公司由 decompose 定）；R3 母體不追加（§14 第 11 項） | decompose 選題是使用者的（AGENTS「新題材由使用者選」）；「同時 open ≤ 2」數的是**未 resolve 的提案編號**（`engine_b/decompose_proposals.py::open_proposals`），[685]／[686]／[723] 都受理即 resolve，所以不超限——§13 那句是寫 plan 當下的計數，不是第二條上限 |
+| 22 | 7.0g | §6b 第 2 項「母體外……邊緣沒座位（列「坐哪一層」短檢查……結論＝補座位走 RA，或 v2 敘事寫「不坐任何層」）」；第 3 項「只因 `research` 卡住的檔逐檔列出改前改後的 readiness」 | ①短檢查結論分**三種**（補供貨邊／開發中／不坐任何層或在需求側），②③都寫 v2 敘事；②research 降選配時，refresh 的「需要重看」不再升級成整頁旗標（不保留「只旗標不擋」）；③只卡 research 的檔是 0，改列「research 是卡點之一」的 10 檔改前改後 | ①只有 develops 邊的公司（#22 第二型）不是「不坐任何層」，壓成一種就是 L12；②真實資料這個旗標 23／23 是雜訊（L14-4 恆亮），保留它等於延續退役估值鏈的殘留——可逆（§14 #17）；③照實量，0 就寫 0 |
 
 ---
 
@@ -524,6 +525,8 @@ R2 回 GO 後：本 plan status 改 `completed`、`docs/plans/README.md` 對照�
 13. **廣度短敘事抽樣複核**：隨機抽首版敘事，數事實錯的份數（今天的 3／7 是層說明挑過的樣本，不外推）。
 14. **層主張的預期裁決日**：InP 磊晶 A6–A8、板式熱交換器 H1–H3 共 6 條還在等待 registry 外（`layer_note:` 來源鍵等個股頁 plan S4 程式），檢查點列出各條預期裁決日。
 15. **用邊緣門檻分配注意力的代價**：R1 的 2 倍贏家裡 MU、000660.KS、300308.SZ、GFS、LITE 今天都算非邊緣——用 R1 現成資料量一次「當時非邊緣的翻倍格有幾格」。
+16. **APP 清單分組仍只看 readiness**（7.0g 非阻擋債，L16 的形狀）：closure-gate 說「母體外·非倍率」的頁，APP 照舊分在「還沒做」——要讓 materialize 的 overview 也帶母體分類（它要讀候選板、結構表、lifecycle），或 APP 改讀 closure 的分類。
+17. **research 的「需要重看」不再升級成整頁旗標**（7.0g-3 的可逆選擇）：真實資料 23／23 是雜訊（18 筆 digest 變化無法解釋、5 筆目標價小動）；若之後 refresh 長出有鑑別力的訊號（例如反證觸及），改成「只旗標不擋」只要一行。
 
 ---
 
