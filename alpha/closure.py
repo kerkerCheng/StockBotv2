@@ -611,6 +611,110 @@ def render_share_count_mismatches(rows: Sequence[tuple[str, float, float, float]
             "（絕對不是靜默給錯的值）。"]
 
 
+def share_count_uncompared(
+    pairs: Mapping[str, tuple[float | None, float | None]],
+    reasons: Mapping[str, str] | None = None,
+) -> tuple[tuple[str, str], ...]:
+    """比不了的逐檔＋理由（2026-10-07，Phase 7 Step 7.0g-1）。
+
+    ⚠ 2026-10-05 failure log #20：6680.HK 的快照股數只算 H 股（市值低估約 5.7 倍），而這個檢查當時
+    「沒有財報股數就跳過」——比不了與「比過、沒問題」同形（INV-3）。所以比不了的要逐檔列出。
+    港股另標一句：名冊沒有記 A 股那一邊，A＋H 判不出來——照實印，不猜。
+    """
+    out: list[tuple[str, str]] = []
+    for ticker in sorted(pairs):
+        snapshot_shares, filed_shares = pairs[ticker]
+        if snapshot_shares and filed_shares:
+            continue
+        reason = (reasons or {}).get(ticker) or (
+            "快照沒有股數" if not snapshot_shares else "沒有財報股數（無生效基期觀測）")
+        if ticker.upper().endswith(".HK"):
+            reason += "；港股：快照可能只含 H 股（名冊沒有 A 股那一邊，判不出 A＋H）"
+        out.append((ticker, reason))
+    return tuple(out)
+
+
+def render_share_count_coverage(compared: int, uncompared: Sequence[tuple[str, str]]) -> list[str]:
+    """常駐一行：比了幾檔、比不了幾檔（依理由分組、逐檔列）。母體＝全部個股頁，不跟閉環母體走（7.0g-1）。"""
+    if not uncompared:
+        return [f"股數比對覆蓋：全部個股頁 {compared} 檔都比得了"]
+    groups: dict[str, list[str]] = {}
+    for ticker, why in uncompared:
+        groups.setdefault(why, []).append(ticker)
+    return [f"股數比對覆蓋：比了 {compared} 檔；比不了 {len(uncompared)} 檔——"
+            + "；".join(f"{why} {len(ts)} 檔：{'、'.join(ts)}" for why, ts in groups.items())]
+
+
+#: 營收量級檢查的容忍帶（2026-10-07，Phase 7 Step 7.0g-1；failure log #23）。
+#: 比的是**同一家公司的兩個獨立量級**：個股頁印的近四季營收（快照的值＋builder 貼上的幣別標籤）對基期觀測的
+#: 年營收，各自換成美元。帶子刻意寬：近四季對上一個會計年度，營收成長合法地可以到幾倍；而幣別或單位貼錯
+#: 至少差 7 倍（CNY、HKD 對 USD），多半 30 倍以上（TWD、JPY、KRW、GBp）。UMC 修法前印「2,507 億 USD」
+#: 對 20-F 基期 75.7 億 USD＝33 倍。⚠ 帶子內的標錯抓不到（EUR、GBP 對 USD 這類 1.1–1.4 倍）——說明行照實寫。
+REVENUE_MAGNITUDE_BAND: tuple[float, float] = (0.2, 5.0)
+
+
+def revenue_magnitude_mismatches(
+    pairs: Mapping[str, Mapping[str, Any]]
+) -> tuple[tuple[str, float, str, float, str, float], ...]:
+    """`{ticker: {printed_value, printed_currency, printed_usd, base_value, base_currency, base_usd}}`
+    → 超出帶子的那幾檔：`(ticker, 印出的值, 標籤幣別, 基期年營收, 基期幣別, 比值)`。
+
+    兩邊的美元值由 materialize 用同一個 FX 快取算好（一輪只打一次外部）；本函式只比、不換匯、不看時鐘。
+    """
+    low, high = REVENUE_MAGNITUDE_BAND
+    out: list[tuple[str, float, str, float, str, float]] = []
+    for ticker in sorted(pairs):
+        p = pairs[ticker]
+        printed_usd, base_usd = p.get("printed_usd"), p.get("base_usd")
+        if not (isinstance(printed_usd, (int, float)) and printed_usd > 0
+                and isinstance(base_usd, (int, float)) and base_usd > 0):
+            continue
+        ratio = float(printed_usd) / float(base_usd)
+        if low <= ratio <= high:
+            continue
+        out.append((ticker, float(p["printed_value"]), str(p["printed_currency"]),
+                    float(p["base_value"]), str(p["base_currency"]), ratio))
+    return tuple(out)
+
+
+def revenue_magnitude_uncompared(pairs: Mapping[str, Mapping[str, Any]]) -> tuple[tuple[str, str], ...]:
+    """比不了的逐檔＋理由（讀不到快照、沒有生效基期、缺匯率、標籤答不出幣別……）——跳過不得安靜（INV-3）。"""
+    out: list[tuple[str, str]] = []
+    for ticker in sorted(pairs):
+        p = pairs[ticker]
+        printed_usd, base_usd = p.get("printed_usd"), p.get("base_usd")
+        if (isinstance(printed_usd, (int, float)) and printed_usd > 0
+                and isinstance(base_usd, (int, float)) and base_usd > 0):
+            continue
+        out.append((ticker, str(p.get("missing") or "缺值（理由沒有宣告）")))
+    return tuple(out)
+
+
+def render_revenue_magnitude(
+    pairs: Mapping[str, Mapping[str, Any]] | None, *, absence: str | None = None,
+) -> list[str]:
+    """常駐兩行：命中（沒有命中也印 0）＋覆蓋。`pairs is None` → 只印缺席理由（materialize 還沒算、artifact 讀不到）。"""
+    low, high = REVENUE_MAGNITUDE_BAND
+    if pairs is None:
+        return [f"營收量級（個股頁印的近四季營收 vs 基期年營收）：沒有跑——{absence or '理由未宣告'}"]
+    rows = revenue_magnitude_mismatches(pairs)
+    uncompared = revenue_magnitude_uncompared(pairs)
+    compared = len(pairs) - len(uncompared)
+    if rows:
+        head = (f"⚠⚠ 營收量級對不上：{len(rows)} 檔——"
+                + "、".join(f"{t} 比值 {r:.1f}（個股頁 {pv:,.0f} {pc} vs 基期 {bv:,.0f} {bc}）"
+                            for t, pv, pc, bv, bc, r in rows)
+                + f"。帶子 [{low}, {high}]：成長到不了這麼遠，多半是幣別或單位貼錯（failure log #23）。")
+    else:
+        head = (f"營收量級對不上：0 檔（帶子 [{low}, {high}]；EUR、GBP 對 USD 這類 1.1–1.4 倍的標錯在帶子內，抓不到）")
+    if uncompared:
+        cover = (f"營收量級覆蓋：比了 {compared} 檔；比不了 {len(uncompared)} 檔——"
+                 + "、".join(f"{t}（{why}）" for t, why in uncompared))
+    else:
+        cover = f"營收量級覆蓋：全部個股頁 {compared} 檔都比得了"
+    return [head, cover]
+
+
 #: 基期觀測自我對帳的門檻。**兩個條件都要成立**才算命中：
 #: 絕對差 > 0.01（財報印出的每股盈餘通常只到小數第二位，半步就是 0.005）
 #: **且** 相對差 > 1%。只用相對差會在 EPS 很小時全部誤報（實測 NBIS 0.04 的半步是 ±12.5%）；

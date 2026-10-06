@@ -334,26 +334,58 @@ def cmd_status(args: argparse.Namespace) -> int:
     return 0 if ok else 1
 
 
-def _share_count_pairs(tickers) -> dict[str, tuple[float | None, float | None]]:
-    """`{ticker: (快照流通股數, 財報稀釋加權平均)}`——兩邊都由 provider 讀，本檔不算任何東西。"""
+def _share_count_pairs(tickers) -> tuple[dict[str, tuple[float | None, float | None]], dict[str, str]]:
+    """(`{ticker: (快照流通股數, 財報稀釋加權平均)}`, `{ticker: 比不了的理由}`)——兩邊都由 provider 讀，本檔不算任何東西。
+
+    ⚠ 2026-10-07（Phase 7 Step 7.0g-1）：**每一檔都回一列**，比不了的那一邊是 None、理由另給。
+    原本讀不到或沒有基期就 `continue`——比不了與「比過、沒問題」同形（failure log #20，INV-3）。
+    """
     from alpha.contracts import Ticker
     from alpha.providers.fundamentals import EngineCFundamentalsProvider
 
     provider = EngineCFundamentalsProvider()
     out: dict[str, tuple[float | None, float | None]] = {}
+    reasons: dict[str, str] = {}
     for raw in tickers:
         ticker = Ticker(str(raw))
         try:
             snap, _fresh = provider.fundamentals(ticker)
-            actuals, _reason = provider.fiscal_year_results(ticker)
-        except Exception:                      # noqa: BLE001 — 讀不到一檔不該讓整支命令掛掉
+            actuals, reason = provider.fiscal_year_results(ticker)
+        except Exception as exc:               # noqa: BLE001 — 讀不到一檔不該讓整支命令掛掉
+            out[str(ticker)] = (None, None)
+            reasons[str(ticker)] = f"讀不到（{type(exc).__name__}）"
             continue
         if actuals is None:
+            out[str(ticker)] = (snap.shares_outstanding, None)
+            # 「Engine C 無這檔的 fiscal_year_results 觀測」是預設理由（closure 端會補）；其餘（例：同年度兩筆
+            # 生效且幣別不一致）照抄 provider 的第一句——那是要人去修的資料，不能被壓成「沒有基期」（L12）。
+            text = str(reason or "")
+            if text and "fiscal_year_results 觀測" not in text:
+                reasons[str(ticker)] = "沒有財報股數：" + text.split("：")[0].split("。")[0][:90]
             continue
         block = actuals.gaap or actuals.non_gaap or {}
         filed = block.get("diluted_shares") if isinstance(block, dict) else None
         out[str(ticker)] = (snap.shares_outstanding, filed)
-    return out
+    return out, reasons
+
+
+def _revenue_magnitude_pairs(state_store: "StateArtifactStore") -> tuple[dict | None, str | None]:
+    """候選板 artifact 的 `data_checks.revenue_magnitude`（materialize 用同一個 FX 快取算好）。
+
+    讀不到或還沒產生 → `(None, 理由)`，closure-gate 照實印「沒有跑」——不在這裡打外部補算
+    （closure-gate 每輪都跑，換匯放這裡等於每輪都打 yfinance；`alpha/providers/market_normalization.py` 的理由）。
+    """
+    try:
+        payload, _fresh = state_store.read("candidates")
+    except Exception as exc:  # noqa: BLE001
+        return None, f"候選板 artifact 讀不到（{type(exc).__name__}）"
+    if payload is None:
+        return None, "候選板 artifact 還沒 materialize"
+    block = (payload.get("data_checks") or {}).get("revenue_magnitude")
+    if not isinstance(block, dict):
+        return None, "materialize 還沒算這一項（候選板 artifact 沒有 data_checks.revenue_magnitude）"
+    pairs = block.get("pairs")
+    return (pairs if isinstance(pairs, dict) else None), (None if isinstance(pairs, dict) else "pairs 缺或型別不對")
 
 
 def _base_payloads(tickers) -> dict[str, dict]:
@@ -470,9 +502,17 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
     # 快照股數 vs 財報股數（2026-09-13 ROADMAP 交付）。掛在這裡的理由與品質計數器同一條：
     # skill 已規定每輪必跑 closure-gate，掛上去它才會**自己出現**（L17-3③：偵測要有消費端）。
     # ⚠ 它看**全部**標的不只終局那幾檔——股數錯不錯與 readiness 無關。
-    share_pairs = _share_count_pairs([r.ticker for r in rows])
+    # ⚠ 2026-10-07（Phase 7 Step 7.0g-1）：資料檢查的母體＝**全部個股頁**，明確不跟閉環母體走——
+    # 閉環收窄之後（7.0g-2），非倍率檔不再寫敘事，資料錯就只剩這裡會叫（#20、#23、#27 都是寫非邊緣敘事時撞到的）。
+    page_tickers = sorted({t for t, p, _f, _r in ArtifactStore(
+        Path(args.dir) if args.dir else None).read_all() if p is not None})
+    share_pairs, share_reasons = _share_count_pairs(page_tickers)
     share_rows = closure.share_count_mismatches(share_pairs)
-    eps_rows = closure.base_eps_reconciliation_gaps(_base_payloads([r.ticker for r in rows]))
+    share_uncompared = closure.share_count_uncompared(share_pairs, share_reasons)
+    revenue_pairs, revenue_absence = _revenue_magnitude_pairs(
+        StateArtifactStore(resolve_state_dir(Path(args.dir) if args.dir else None,
+                                             Path(args.state_dir) if args.state_dir else None)))
+    eps_rows = closure.base_eps_reconciliation_gaps(_base_payloads(page_tickers))
     dup_rows = closure.duplicate_live_observations(_live_observation_groups())
     series = _consensus_series()
     all_bases = _base_payloads(list(series))
@@ -493,6 +533,19 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
             "quality": {"share_count_mismatch": [
                             {"ticker": tk, "snapshot_shares": s, "filed_shares": f, "ratio": r}
                             for tk, s, f, r in share_rows],
+                        # 2026-10-07（7.0g-1）：比不了的逐檔＋理由；母體＝全部個股頁
+                        "share_count_uncompared": [
+                            {"ticker": tk, "reason": why} for tk, why in share_uncompared],
+                        "page_count": len(page_tickers),
+                        "revenue_magnitude_mismatch": [
+                            {"ticker": tk, "printed_value": pv, "printed_currency": pc,
+                             "base_value": bv, "base_currency": bc, "ratio": r}
+                            for tk, pv, pc, bv, bc, r in closure.revenue_magnitude_mismatches(revenue_pairs or {})],
+                        "revenue_magnitude_uncompared": (
+                            [{"ticker": tk, "reason": why}
+                             for tk, why in closure.revenue_magnitude_uncompared(revenue_pairs)]
+                            if revenue_pairs is not None else None),
+                        "revenue_magnitude_absence": revenue_absence,
                         "consensus_self_contradiction": [
                             {"ticker": tk, "metric": m, "estimate_0y": e,
                              "year_ago_actual_next": p2, "relative_gap": d}
@@ -525,6 +578,10 @@ def cmd_closure_gate(args: argparse.Namespace) -> int:
         for note in notes:
             print(f"- 未讀到：{note}")
         for line in closure.render_share_count_mismatches(share_rows):
+            print(f"- {line}")
+        for line in closure.render_share_count_coverage(len(share_pairs) - len(share_uncompared), share_uncompared):
+            print(f"- {line}")
+        for line in closure.render_revenue_magnitude(revenue_pairs, absence=revenue_absence):
             print(f"- {line}")
         for line in closure.render_base_eps_reconciliation(eps_rows):
             print(f"- {line}")
