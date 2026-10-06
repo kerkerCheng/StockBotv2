@@ -1,0 +1,30 @@
+SOURCE: NVIDIA Technical Blog——How Industry Collaboration Fosters NVIDIA Co-Packaged Optics
+URL: https://developer.nvidia.com/blog/how-industry-collaboration-fosters-nvidia-co-packaged-optics/
+PUBLISHED: 2025-08-26（article:published_time 2025-08-26T17:00:00+00:00）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（技術部落格有限節錄）
+NOTE: 客戶端一手（NVIDIA）。機械節錄含 detachable／fiber／connector／laser／TSMC 的句子。
+
+- Networking / Communications English中文 How Industry Collaboration Fosters NVIDIA Co-Packaged Optics Aug 26, 2025 By Ashkan Seyedi Like Discuss (0) - L - T - F - R - E AI-Generated Summary - NVIDIA co-packaged optics (CPO) platform integrates silicon photonics, electronic ICs, fiber, packaging, connectors, and lasers through deep collaboration with ecosystem partners including TSMC.
+- - The NVIDIA Micro Ring Modulator silicon photonics engine achieves direct 200Gbps PAM4 modulation per wavelength with an ultra-low density footprint, and TSMC collaboration solved manufacturing challenges including precise fabrication control, thermal sensitivity mitigation, and consistent high-speed modulation at production scale.
+- 8Tbps receive bandwidth through three COUPE-based optical engines operating on eight 200Gbps PAM4 lanes, with socket-based modular design for rapid deployment and hermetically sealed fiber interfaces for long-term reliability.
+- 2Tbps per engine, using solder reflow directly onto the module substrate and a detachable optical connector for automated mass manufacturing.
+- - External laser source (ELS) modules centralize light generation in a dedicated thermally controlled environment, reducing the total number of lasers in the data center by a factor of four compared to legacy designs, with each ELS containing eight high-quality lasers capable of powering 32 of the Quantum-X switch's 576 transmit lanes.
+- The NVIDIA networking platform brings together best-in-class technologies from leading partners specializing in advanced foundry processes, cutting-edge lasers, and advanced fiber-to-chip solutions.
+- Join us as we take an in-depth look at the innovation, partnerships, and technical foundations behind the NVIDIA co-packaged optics (CPO) platform: photonics ICs, electronic ICs, fiber, packaging, connectors, and lasers.
+- How TSMC helped solve Micro Ring Modulator problems At the heart of CPO innovation lies the NVIDIA Micro Ring Modulator silicon photonics engine—a breakthrough that redefines the possible density and efficiency of optical interconnects.
+- Deep collaboration with TSMC has helped NVIDIA solve—at production scale—some of the longstanding manufacturing problems associated with Micro Ring Modulators.
+- Through advanced process engineering and refined control techniques, NVIDIA and TSMC have achieved reliable, repeatable performance, ensuring that even at the smallest geometries, each modulator meets exacting standards required for hyperscale deployment.
+- Wafer-level integration of micro-lenses reduces both the duration and sensitivity of fiber alignment processes.
+- These engines harness the advanced integration of photonics and electronic circuits, leveraging TSMC’s COUPE technology to achieve not only dense co-packaging but also high power and thermal efficiency.
+- Each optical engine operates on eight 200Gbps PAM4 lanes for both transmit and receive, enabled through eight transmit, eight receive, and two laser input fibers per engine.
+- In parallel, the subassembly maintains a hermetically sealed fiber interface to the optical engines.
+- Connecting seamlessly to the outside world, the module employs a detachable optical connector that enhances assembly yield and supports fully automated, mass-manufacturing workflows.
+- This innovative interface not only simplifies fiber attachment but also ensures precision and repeatability, making the Spectrum-X Ethernet Photonics package a transformative solution for hyperscale data centers and next-generation AI infrastructures.
+- How an external laser source enables reliable, scalable light delivery in photonics switches The backbone driving optical performance in the Quantum-X Photonics and Spectrum-X Ethernet Photonics switches is their advanced external laser source (ELS) module—a high-power, field-replaceable unit that redefines how laser power is delivered to integrated optical engines.
+- Positioned in its own dedicated, thermally controlled environment separate from the main switch chassis, the ELS ensures each laser operates within a stable thermal envelope.
+- This approach addresses one of the most persistent reliability bottlenecks in traditional data-center optics, where repeated thermal cycling rapidly degrades laser lifetime and causes costly network interruptions and maintenance activities.
+- NVIDIA’s adoption of high-power ELS modules enables Quantum-X Photonics and Spectrum-X Ethernet Photonics switches to centralize light generation, reducing the total number of lasers in the data center by a factor of four compared to legacy designs.
+- This consolidation not only lowers capital and operating costs, but also reduces the probability of network failures associated with individual laser outages.
+- Each ELS contains eight high-quality lasers that have been precisely coupled via fiber to the optical engines.
+- These co-packaged switches address complex challenges at the silicon and transistor levels, as well as thermal management, reliability, high-volume fiber integration with the chip, and consistent laser performance.

@@ -114,6 +114,10 @@
     「為什麼外接」寫在 OIF ELSFP 2.0 標準裡（可替換、眼睛安全、熱隔離：「Lasers have historically demonstrated significantly lower maximum reliable junction temperatures than silicon die」），Broadcom TH6-Davisson 用「Field-Replaceable ELSFP Laser Modules」。
     讀圖換版 `sr_879ba9bc8ad69222` → **`sr_b17aaffaae5665a0`（仍 undecided）**：模組這一層沒有任何交期或配額原文，量的限制在下一層的 CW 雷射（`sr_3a4fe5719994dfdc`，volume）；E1–E5 五條條件登成 watch（模組本身短缺、第二家被客戶點名、改用 ILM、整合方具名量產、AAOI 放量改口或被具名）。
     因層說明改變的候選狀態 0 筆（AAOI、POET 維持「不要」）；沒有敘事騎在這份讀圖上。下一輪的 RA：AAOI 的 ELS 供貨邊（要具名原文）、Broadcom depends_on 外部光源（更正走廊）
+  - 2026-10-06｜**FAU 層說明 v1**（個股頁 S4 第五份，Amendment 第一批收齊；`library/private/research_notes/layer_notes/tech_fiber_attach_unit.md`）。
+    **舊讀圖寫「沒有客戶端點名誰是主力」是表示法造成的錯**：NVIDIA 夥伴角色部落格（2025-03-27，已入圖）點名「Browave, Corning, Senko, TFC Communication, and Coherent」做 CPO 光纖組件，但那份抽取建的是同義節點 `tech:cpo_fiber_attach`，FAU 讀圖看不到（failure log #36；合併＋補邊登 pq1 `lead_0c2c98b5b76b7696376923480ca613bf`）。
+    NVIDIA 2025-08-26 另一篇：「detachable optical connector that enhances assembly yield and supports fully automated, mass-manufacturing workflows」。上詮不在點名的五家；2025 年營收跳接線 63%、「C 公司」70.16%。
+    讀圖換版 `sr_4c83c85cdb490db9` → **`sr_b93ee89a97c130e6`（仍 undecided；F2 交期／配額、F4 Coherent 整合廠量產兩條條件登 watch）**；上詮敘事換版 `ib_9becf6585056d78d`（仍「缺」，X 換成「FAU 用在哪個 CPO 平台、客戶是誰」；反證改寫加入 C 公司占比、加碼條件「任一 CPO 平台具名上詮」）。因層說明改變的候選狀態 0 筆
 - failure log：（尚無）
   - #27（SOI.PA FY2026 分部占比兩筆都生效，「出現在數字裡」被默默丟——當下修為印衝突；序列仍成不了，合併紀錄留 7.5）
 
