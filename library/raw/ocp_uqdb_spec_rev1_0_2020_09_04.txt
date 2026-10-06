@@ -1,0 +1,30 @@
+SOURCE: Open Compute Project — Universal Quick Disconnect Blind-Mate (UQDB) Specification Revision 1.0
+URL: https://www.opencompute.org/documents/uqdb-spec-1-0-pdf
+PUBLISHED: 2020-09-04（規格書每頁頁首日期 9/4/2020）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（開放規格，研究必要的有限節錄）
+NOTE: 第三方標準文件（OCP）。節錄：範圍（p.4）、自我對位容差註（p.8）、致謝（p.13）。
+
+2. Scope & Overview
+Scope:
+This document defines the technical specifications for the Universal Quick Disconnect Blind (UQDB) used
+in non-combustible single-phase (water/glycol) systems for liquid cooling of electronics.
+Overview:
+In liquid cooled systems, fluid is transported under pressure within a Technology Cooling System (TCS)
+fluid loop [1].  The IT equipment loop is joined to the TCS using a fluid connector.
+This specification defines the fluid connector as Universal Quick Disconnect (UQDB) with interface
+dimensions for universal interchangeability and defines acceptable performance for a hand-mate, drip-
+free, hot-pluggable, fluid line connector for use in TCS for electronics. The UQDB maintains a leak-tight
+seal under pressure when coupled and on both sides when decoupled.
+
+* SA = Self Alignment.  Shall be incorporated into the connector housing the dimension specified is a
+radial allowance.
+
+8. Acknowledgements
+Would like to thank the following companies and people for their contribution to this specification. From
+Avic Jonhon Optronic Technology Company, Hanyu Lou. From CPC (Colder Products Company), Dennis
+Downs, Elizabeth Langer and Barry Nielsen. From Fujikura, Thang Nguyen and Vijit Wuttijumnong. From
+Intel Corporation, Peggy Burroughs, Juan Cevallos, Peipei Ding, Jessica Gullbrand, Jordan Johnson,
+David Shia, Rodel Samiley, Sean Sivapalan. Bret Henkel and Casey Winkel. From LBNL Open
+Specification for a Liquid Cooled Rack Working Group, Dale Sartor.  From Parker Hannifin Corporation,
+Quick Coupling Division, Cameron Koller, Todd Lambert, Timothy Marquis and Lenny Nick.

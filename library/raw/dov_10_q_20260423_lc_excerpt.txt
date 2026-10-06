@@ -1,0 +1,18 @@
+SOURCE: Dover Corporation（DOV）SEC 10-Q（2026 年第一季，期末 2026-03-31）——液冷、熱交換器與各部門成長來源相關句
+URL: https://www.sec.gov/Archives/edgar/data/29905/000002990526000015/dov-20260331.htm
+PUBLISHED: 2026-04-23（EDGAR filingDate）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（法定申報的有限逐字節錄）
+NOTE: 法定申報（self_reported_costly）。機械節錄：凡含 thermal connector／liquid cooling／heat exchanger／data center 或各部門「organic revenue growth/decline was」「bookings … was」的句子逐字列出，讓「哪一年把快接頭（thermal connectors）點名為成長來源」可以逐份對照。CPC（快接頭）在 Pumps & Process Solutions；SWEP（硬焊板式熱交換器）在 Climate & Sustainability Technologies。
+
+- 3% organic revenue growth for the first quarter of 2026 was driven by our Climate & Sustainability Technologies, Clean Energy & Fueling, and Engineered Products segments which grew 15.
+- The organic revenue growth was primarily driven by pricing actions and solid demand trends across end markets.
+- The bookings increase was driven by strength in our aerospace and defense business and winch and hoist demand.
+- The organic revenue growth was primarily driven by pricing actions and favorable demand trends in our above and below-ground retail fueling, fluid transport, and clean energy components businesses.
+- The bookings increase was primarily driven by demand in clean energy components and North America above and below-ground retail fueling equipment.
+- The organic revenue decline was primarily due to shipment timing for marking and coding equipment, partially offset by pricing actions.
+- The bookings increase was primarily driven by order strength in our core marking and coding business.
+- The organic revenue decline was primarily due to anticipated revenue declines in our plastics and polymer processing solutions business as customers continue to focus on optimizing the significant capacity investments made over the last several years, partially offset by robust demand for single-use biopharma components and precision components for midstream natural gas compression and power generation.
+- The bookings increase was primarily driven by positive demand trends in biopharmaceutical and power generation end markets, as well as the favorable impact from acquisitions.
+- The organic revenue growth was primarily driven by continued strong demand in CO2 refrigerant systems and recovery in refrigerated door case volumes, as well as accelerating demand for heat exchangers used in data center cooling and other applications.
+- The bookings increase was primarily driven by demand strength in retail refrigeration and heat exchanger demand trends, including longer lead-time orders.

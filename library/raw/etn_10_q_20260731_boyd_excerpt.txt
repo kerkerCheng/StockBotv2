@@ -1,0 +1,23 @@
+SOURCE: Eaton Corporation plc（ETN）SEC 10-Q（2026 年第二季，期末 2026-06-30）——Boyd Thermal 收購相關句
+URL: https://www.sec.gov/Archives/edgar/data/1551182/000155118226000030/etn-20260630.htm
+PUBLISHED: 2026-07-31（EDGAR filingDate）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（法定申報的有限逐字節錄）
+NOTE: 法定申報。機械節錄含「Boyd」的句子（PDF→HTML 文字層會在「$9.」這種小數點斷句，照原樣保留）。只證實收購與收購後營收；Boyd 自述進 NVIDIA GB200 NVL72 RVL 的原頁 404、Eaton 頁逾時，沒有取得。
+
+- Acquisition of Boyd Thermal On March 12, 2026, Eaton acquired Boyd Thermal for $9.
+- Boyd Thermal is a U.
+- Boyd Thermal employs more than 6,000 people with manufacturing sites across North America, Asia, and Europe.
+- Boyd Thermal is reported within the Electrical Global business segment.
+- The acquisition of Boyd Thermal has been accounted for using the acquisition method of accounting which requires the assets acquired and liabilities assumed be recognized at their respective fair values on the acquisition date, as well as measurement period adjustments recorded as of June 30, 2026.
+- lant and equipment190 6 196 Other intangible assets5,587 1,603 7,190 Other assets43 — 43 Accounts payable(307)— (307) Other current liabilities(47)(12)(59) Other noncurrent liabilities(1,439)(427)(1,866) Total identifiable net assets4,648 1,169 5,817 Goodwill4,901 (1,169)3,733 Total consideration, net of cash received$9,549 $— $9,549 Goodwill is calculated as the excess of the consideration transferred over the net assets recognized and represents the anticipated synergies of acquiring Boyd Thermal.
+- The Company incurred $1 million and $36 million of acquisition related transaction costs during the second quarter and first six months of 2026, respectively, for Boyd Thermal that were included in Selling and administrative expense on the Consolidated Statements of Income.
+- Eaton's 2026 condensed consolidated financial statements include Boyd Thermal results of operations, including segment operating profit of $121 million on sales of $524 million, from the date of acquisition through June 30, 2026.
+- The 2026 additions to goodwill relate primarily to the anticipated synergies of acquiring Boyd Thermal and Ultra PCS.
+- The allocation of the purchase price from the Ultra PCS and Boyd Thermal acquisitions are preliminary and will be completed during the measurement period.
+- The increase in the effective tax rate in the second quarter and first six months of 2026 was primarily due to greater levels of income in higher tax jurisdictions and withholding tax expense related to funding the acquisition of Boyd Thermal.
+- Boyd Thermal March 12, 2026 Electrical Global A U.
+- , Ultra PCS Limited, Boyd Thermal, and Exertherm, the anticipated divestiture of the Mobility business, transactions completed prior to 2023, and other charges to acquire and exit businesses.
+- Additionally, during the second quarter and the first six months of 2026, Eaton incurred $52 million of withholding taxes related to funding the acquisition of Boyd Thermal, which are included in Income tax expense (benefit) in the table above.
+- 55 billion, net of cash acquired, to acquire Boyd Thermal.
+- The Company does not intend to pursue share repurchases in 2026 due to the acquisition of Boyd Thermal on March 12, 2026.

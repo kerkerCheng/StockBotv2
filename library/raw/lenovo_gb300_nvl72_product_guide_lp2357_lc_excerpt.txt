@@ -1,0 +1,84 @@
+SOURCE: Lenovo Press LP2357——Lenovo NVIDIA GB300 NVL72 Rack Scale AI Product Guide（液冷段與 Table 18 Liquid Cooling Manifold）
+URL: https://lenovopress.lenovo.com/lp2357-lenovo-nvidia-gb300-nvl72-rack-scale-ai
+PUBLISHED: 2026-08-30（頁面「Changes in the August 30, 2026 update」＝擷取版本）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（產品指南有限節錄）
+NOTE: 整機廠（OEM）產品文件：寫的是 NVIDIA 參考設計下它採用的接頭型式，沒有寫快接頭廠商名或每櫃顆數。
+
+The components of the AI rack solution are designed to be compliant with the NVIDIA MGX rack. The liquid cooling solution consists of a CDU, rear manifold, quick disconnects, and cold plates for the CPUs, GPUs, ConnectX-8 network adapters, and all NVSwitch components.
+
+The liquid cooling solution consists of a coolant distribution unit (CDU), rear manifold, Disconnect Quick Connect (QD)s, and cold plates for the CPUs, GPUs, CX-8 NICs and all NVL Switch components.
+
+The following table lists the reference design cooling percentages.
+
+Table 15. NVIDIA GB300 NVL72 reference
+
+Subsystem
+Cooling Method
+% of Heat Removed
+
+Compute Trays
+Hybrid (primarily liquid, some air)
+Part of overall 90 % liquid / 10 % air
+
+NVL Switch Trays
+Fully liquid-cooled
+Included in the 90 % liquid
+
+Rack Ancillary Systems
+Air-cooled
+~10 %
+
+Total Rack Cooling Split
+~90 % liquid / ~10 % air
+N/A
+
+Water connections
+
+Water connections to the MGX Rack are provided using hoses that connect directly to the coolant distribution unit (CDU), inlet and return, either an in-rack CDU or in-row CDU. As shown in the following figure, hose lengths required depend on the placement of the Compute Trays and GB300 NVL Switch Trays in the rack cabinet.
+
+The midplane in the chassis routes the water via QuickConnects to each of the Compute Tray, and each of the NVL Switch Trays.
+
+Table 18. Liquid Cooling Manifold
+
+Components
+Specification
+
+Ownership
+Vendor
+
+System Support
+Per NVIDIA reference
+
+Universal
+Per NVIDIA reference
+
+Hybrid Tray Support
+N/A
+
+Material
+Manifold shall be made from 304L or 316L austenitic stainless steel
+
+Serviceability
+Serviceable from rear of the rack
+
+Mounting
+Per NVIDIA reference
+
+QD Type
+UQDB04
+
+Bleed Valve
+Manifold should employ UQD04 on top of manifold for bleed valve port
+
+Hose Connection
+Manifold shall use tri-clamp connectors for hose adaption
+
+QD Type to CDU
+1” FD83 BSPP
+
+Static Pressure at QD
+30psi
+
+Form Factor
+Per NVIDIA reference

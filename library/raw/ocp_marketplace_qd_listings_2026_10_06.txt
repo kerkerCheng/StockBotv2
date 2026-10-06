@@ -1,0 +1,53 @@
+SOURCE: Open Compute Project Marketplace——快接頭類上架清單（segment：Universal Quick Disconnect (UQD) 168／Blind-Mate Quick Connectors 158／Large Quick Connectors 159）
+URL: https://www.opencompute.org/wp-json/wp/v2/marketplace?segments=168（及 158、159）
+PUBLISHED: 2026-10-06（擷取當日快照；每列日期是該上架的 WordPress 發布日（date 欄））
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（目錄標題與日期）
+NOTE: OCP 網站的官方目錄，內容由廠商提交；certification_tier 欄全部為空——上架不是 OCP 認證，也不是 NVIDIA 合格名單。關鍵字搜尋另查：Fositek、CPC、Colder、Jonhon、AVIC、Lenginee 皆 0 筆；Titan 另有 2026-10-04 UQD-B 一筆未掛 segment。
+
+2023-10-10 | Blind-Mate Quick Connectors | CEJN Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/cejn-universal-quick-disconnect-blind-mate-uqdb/
+2024-03-25 | Blind-Mate Quick Connectors | Danfoss Hansen® Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/danfoss-hansen-universal-quick-disconnect-blind-mate-uqdb/
+2024-05-15 | Blind-Mate Quick Connectors | Parker UQDB Series – Universal Quick Disconnect Blindmate Couplings | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-uqdb-series-universal-quick-disconnect-blindmate-couplings/
+2024-06-21 | Blind-Mate Quick Connectors | Envicool® Universal Quick Disconnect Blind | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/envicool-universal-quick-disconnect-blind/
+2024-07-10 | Blind-Mate Quick Connectors | Danfoss Hansen® OCP Open Rack V3 Blind Mate Quick Connector | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/danfoss-hansen-ocp-open-rack-v3-blind-mate-quick-connector/
+2024-07-30 | Blind-Mate Quick Connectors | Parker ORV Series – OCP Open Rack V3 Blind Mate Quick Connector (BMQC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-orv-series-ocp-open-rack-v3-blind-mate-quick-connector-bmqc/
+2024-08-21 | Blind-Mate Quick Connectors | CEJN – Universal Blind-Mate Quick Connector (BMQC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/cejn-universal-blind-mate-quick-connector-bmqc/
+2024-09-19 | Blind-Mate Quick Connectors | SafeWay® SW1015 Series | OCP ORv3 Blind Mate Quick Connector (BMQC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/safeway-sw1015-series-ocp-orv3-blind-mate-quick-connector-bmqc/
+2025-02-04 | Blind-Mate Quick Connectors | Parker Convoluted PTFE Tubing | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-convoluted-ptfe-tubing/
+2025-03-08 | Blind-Mate Quick Connectors | KRES Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/kres-universal-quick-disconnect-blind-mate-uqdb/
+2025-05-20 | Blind-Mate Quick Connectors | Parker Universal Quick Disconnect Blindmate Couplings for Liquid Cooling | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-universal-quick-disconnect-blindmate-couplings-for-liquid-cooling/
+2025-07-07 | Blind-Mate Quick Connectors | SITELIN S Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/sitelin-s-universal-quick-disconnect-blind-mate-uqdb/
+2025-09-15 | Blind-Mate Quick Connectors | Amphenol Industrial Universal Quick Disconnect with Blind-Mate Technology (UQDB) Series | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/amphenol-industrial-universal-quick-disconnect-with-blind-mate-technology-uqdb-series/
+2025-09-18 | Blind-Mate Quick Connectors | BEEHE Universal Quick Disconnect Blind-Mate(UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/beehe-universal-quick-disconnect-blind-mateuqdb/
+2026-05-12 | Blind-Mate Quick Connectors | CEJN Universal Pivoting Blind Mate Coupling (PBMC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/cejn-universal-pivoting-blind-mate-coupling-pbmc/
+2026-05-12 | Blind-Mate Quick Connectors | LÜDECKE Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/ludecke-universal-quick-disconnect-blind-mate-uqdb/
+2026-06-08 | Blind-Mate Quick Connectors | Parker BQC Series (PBMC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-bqc-series-pbmc/
+2026-06-24 | Blind-Mate Quick Connectors | IMG KOI Series Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/img-koi-series-universal-quick-disconnect-blind-mate-uqdb/
+2026-07-29 | Blind-Mate Quick Connectors | FITOK Universal Quick Disconnect Blind-Mate (UQDB) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/fitok-universal-quick-disconnect-blind-mate-uqdb/
+2023-10-10 | Large Quick Connectors | CEJN OCP Large Quick Connector | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/cejn-ocp-large-quick-connector/
+2024-06-06 | Large Quick Connectors | Parker CDT Series – Large Quick Connector – Threaded, Dripless QD | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-cdt-series-large-quick-connector-threaded-dripless-qd/
+2025-02-25 | Large Quick Connectors | SafeWay®  OCP Large Quick Connector (LQC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/safeway-ocp-large-quick-connector-lqc/
+2026-05-12 | Large Quick Connectors | Titan Cooling Locking Quick Connect (TLQC) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/titan-cooling-locking-quick-connect-tlqc/
+2023-06-27 | Universal Quick Disconnect (UQD) | CEJN Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/cejn-universal-quick-disconnect-uqd/
+2023-08-09 | Universal Quick Disconnect (UQD) | Danfoss Hansen® Universal Quick Disconnect Coupling (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/danfoss-hansen-universal-quick-disconnect-coupling-uqd/
+2024-05-15 | Universal Quick Disconnect (UQD) | Parker UQD Series – Universal Quick Disconnect Couplings | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-uqd-series-universal-quick-disconnect-couplings/
+2024-06-21 | Universal Quick Disconnect (UQD) | Envicool® Universal Quick Disconnect | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/envicool-universal-quick-disconnect/
+2024-10-09 | Universal Quick Disconnect (UQD) | Stäubli Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/staubli-universal-quick-disconnect-uqd/
+2025-03-08 | Universal Quick Disconnect (UQD) | KRES Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/kres-universal-quick-disconnect-uqd/
+2025-03-26 | Universal Quick Disconnect (UQD) | JPC Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/jpc-universal-quick-disconnect-uqd/
+2025-05-12 | Universal Quick Disconnect (UQD) | Aeroquip® by Danfoss DataCryo EHW194 Hose | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/boston-by-danfoss-royal-ehw194-hose/
+2025-05-20 | Universal Quick Disconnect (UQD) | Parker Push-Button Universal Quick Disconnect | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/parker-push-button-universal-quick-disconnect/
+2025-05-28 | Universal Quick Disconnect (UQD) | Amphenol LTW SnapQD Connectors (SQD) – Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/amphenol-ltw-snapqd-connectors-sqd-universal-quick-disconnect-uqd/
+2025-07-07 | Universal Quick Disconnect (UQD) | SITELIN 959 tube for Liquid Cooling | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/sitelin-959-tube-for-liquid-cooling/
+2025-07-07 | Universal Quick Disconnect (UQD) | SITELIN Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/sitelin-universal-quick-disconnect-uqd/
+2025-09-15 | Universal Quick Disconnect (UQD) | Amphenol Industrial Blind Mate Quick Disconnect (BMQC) Series | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/amphenol-industrial-blind-mate-quick-disconnect-bmqc-series/
+2025-09-15 | Universal Quick Disconnect (UQD) | Amphenol Industrial Universal Quick Disconnect (UQD) Series | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/amphenol-industrial-universal-quick-disconnect-uqd-series/
+2025-09-18 | Universal Quick Disconnect (UQD) | BEEHE Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/beehe-universal-quick-disconnect-uqd/
+2026-01-29 | Universal Quick Disconnect (UQD) | FITOK Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/fitok-universal-quick-disconnect-uqd/
+2026-05-26 | Universal Quick Disconnect (UQD) | IMG KOI Series Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/img-koi-series-universal-quick-disconnect-uqd/
+2026-06-02 | Universal Quick Disconnect (UQD) | LÜDECKE Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/ludecke-universal-quick-disconnect-uqd/
+2026-06-12 | Universal Quick Disconnect (UQD) | Titan UQD Series | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/titan-uqd-series/
+2026-07-02 | Universal Quick Disconnect (UQD) | BUTZ Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/butz-universal-quick-disconnect-uqd/
+2026-07-06 | Universal Quick Disconnect (UQD) | Ideal Tridon Group Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/ideal-tridon-group-universal-quick-disconnect-uqd/
+2026-08-10 | Universal Quick Disconnect (UQD) | Union Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/union-universal-quick-disconnect-uqd/
+2026-08-25 | Universal Quick Disconnect (UQD) | Emyte Universal Quick Disconnect (UQD) | https://www.opencompute.org/marketplace/facilities-physical-infrastructure/emyte-universal-quick-disconnect-uqd/

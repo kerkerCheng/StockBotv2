@@ -1,0 +1,28 @@
+SOURCE: Dover／CPC（PR Newswire）——CPC Launches Everis DC Full-Flow Connectors for High-Performance AI Cooling
+URL: https://www.prnewswire.com/news-releases/cpc-launches-everis-dc-full-flow-connectors-for-high-performance-ai-cooling-302832498.html
+PUBLISHED: 2026-07-22（PR Newswire datePublished 2026-07-22T16:15:00-04:00）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（新聞稿正文與 About CPC；去除聯絡人）
+NOTE: 發行人（Dover）新聞稿，供應商自述。
+
+DOWNERS GROVE, Ill., July 22, 2026 /PRNewswire/ -- CPC (Colder Products Company), part of PSG, a Dover company (NYSE: DOV), and a leading manufacturer of connection technologies used in liquid cooling of electronics, today announced the launch of the Everis® DC Series, a family of full-flow connectors designed to support the increasing thermal demands of artificial intelligence (AI) and high-performance computing infrastructure.
+
+As the thermal design power (TDP) of modern compute platforms continues to rise, system engineers are turning to innovative liquid cooling solutions to manage higher heat loads. Created specifically for AI applications, the Everis DC in-line connector's full-flow design contributes up to 90% less pressure drop compared to valved connectors of the same size, optimizing cooling efficiency in tight spaces.
+
+"With a growing focus on power consumption, hyperscale customers want solutions that minimize the draw from pumps and coolant distribution units (CDUs)," said Patrick Gerst, General Manager of the CPC thermal business unit. "As a full-flow connector, the Everis DC facilitates more effective coolant flow, helping data center customers improve energy efficiency and reduce operating costs."
+
+Unlike traditional valved connectors, Everis DC Series fittings can be integrated directly into cold plates or manifolds for enhanced space utilization. Their lower height profile also supports compact 1U tray form factors commonly used in high-density server environments.
+
+The Everis DC product family includes both in-line and elbow configurations. Its swivel design adds flexibility compared with traditional hard-plumbed options. The connectors are manufactured from 304 stainless steel for broad material compatibility and produced in cleanroom environments to support high-purity liquid cooling applications.
+
+"As a trusted technology partner to leading chip manufacturers and cooling integrators, we continue to advance our liquid cooling solutions to meet the complex and rapidly evolving needs of the market," continued Gerst. "Our goal is to help optimize cooling efficiency today and for next-generation compute platforms."
+
+Everis DC connectors expand CPC's established portfolio of liquid cooling solutions, including the UQD and LQ connector families. These products reflect CPC's commitment to quality, supported by extensive component testing and global engineering and manufacturing expertise.
+
+CPC will showcase the Everis DC connector series at the Open Compute Project (OCP) APAC Summit, a premier event for open data center infrastructure, on August 11-12 in Taipei, Taiwan.
+
+For more information about CPC's liquid cooling portfolio, visit cpcworldwide.com/cool.
+
+About CPC:
+
+CPC (Colder Products Company) is a leading provider of quick disconnect couplings, fittings and connectors for thermal management (liquid cooling of electronics), life sciences, biopharma, industrial and chemical handling markets. During its nearly 50-year history, CPC has built a portfolio of more than 10,000 connector products. CPC is a business unit of Pump Solutions Group (PSG), an operating company within Dover Corporation.

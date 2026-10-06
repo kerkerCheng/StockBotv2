@@ -1,0 +1,54 @@
+SOURCE: Dover Corporation 2026 年第二季法說會逐字稿（第三方轉錄：Alpha Spread）
+URL: https://www.alphaspread.com/security/nyse/dov/investor-relations/earnings-call/q2-2026
+PUBLISHED: 2026-07-23（法說會日期＝8-K 財報發布日 2026-07-23）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（逐字稿有限節錄）
+NOTE: 第三方轉錄的逐字稿（非發行人申報）；頁面前段有轉錄站自寫的摘要句（Growth areas…、Management said…），不是講者原話，引用時以講者段為準。機械節錄：含 heat exchanger／SWEP／connector／liquid cooling／data center／lead time／double／capacity 的句子。
+
+- Growth areas: Demand remained especially strong in data center liquid cooling, aerospace and defense, biopharma, CO2 refrigeration, and energy infrastructure, with several of these markets outpacing supply.
+- Data center and liquid cooling Dover said demand for heat exchangers tied to liquid cooling for data centers was exceptionally strong, with the business delivering its best quarter ever.
+- Management said it plans to double capacity over the next 12 months and described the market as one where customers are securing supply well ahead of need.
+- Management said adoption of CO2 is now being driven more by economics than regulation, and that the business was unable to meet all delivery obligations in the quarter because demand outpaced capacity.
+- 74 per share, up 12% year-over-year, marking another quarter of double-digit earnings growth.
+- During the quarter, we advanced capacity expansion projects to support growth as well as productivity investments to drive margin improvement across the portfolio.
+- We are committed to delivering double-digit adjusted EPS growth consistent with Dover's long-term performance trajectory.
+- Heat exchangers delivered their best quarter ever with particularly strong demand tied to liquid cooling for data centers.
+- We are actively working to double capacity for these products over the next 12 months.
+- We are seeing particular strength in the areas we have highlighted as secular growth priorities, aerospace and defense, components for steam and gas turbines, and broader power generation infrastructure, single-use biopharma, CO2 refrigeration systems, and heat exchangers for liquid cooling of data centers, where in many cases, demand is outpacing supply and extending lead times and we are actively expanding capacity in those areas.
+- We participate in the natural gas ecosystem through cryogenic components such as valves and vacuum jacketed piping for LNG infrastructure and through precision components for reciprocating compressors, engines, steam and gas turbines where OEM lead times now extend for years.
+- Our acquisition of SIKORA a year ago continues to meaningfully outperform its underwriting case, providing test and measurement equipment for high-voltage wires tied to electrification and increasingly for polymer-coated fiber optic cables tied to the data center build-out.
+- In data centers, the density of thermal requirements of new chips are driving a shift towards liquid cooling, as we all know, which directly benefits our connector and heat exchanger businesses.
+- Through SWEP, we participate across multiple parts of the liquid cooling ecosystem, supplying brazed plate heat exchangers in both cooling distribution unit and chiller OEMs.
+- Our OPW business is also capitalizing on this growth through supplying couplers, adapters, and cryogenic cooling infrastructure as well as fiberglass trench systems, which were originally designed for retail fueling and are increasingly being specified for data center applications by hyperscalers.
+- Demand tied to data center infrastructure remains exceptional with customers securing capacity well ahead of need.
+- We are also seeing robust growth across our exposures to semiconductor and electronics manufacturing, where cryogenic components, flow meters, and specialized heat exchangers position us well against a durable multiyear investment cycle.
+- In biopharma and medical, our single-use connectors pumps and flow meters continue to benefit from investment behind new therapies, increasing production rates and secular shift towards single-use batch manufacturing.
+- I think that demand in certain categories is outstripping capacity of the industry.
+- So we thought the redundant capacity and the training of the workforce was going to pressure the margins a little bit.
+- So look, I'm looking at this cryogenic cooling opportunity that -- on the data center slide.
+- We bought a bunch of companies in the cryogenic space that specialize in valve connectors and piping, because of the amount of cooling that's needed in data centers, a lot of those products are becoming viable in data center applications.
+- The capacity increase you're doing in SWEP, can you maybe quantify that? Because it definitely seems to be a capacity-constrained market and maybe just kind of quantify that in terms of how much capacity, when is it going to come on and maybe that will help us translate to some revenue opportunity as well.
+- R Richard Tobin executive I'm going to talk in general terms because there's a competitive aspect about capacity.
+- A Amit Mehrotra analyst And would growth in the second quarter have been higher if that capacity was there? I assume the answer is obviously yes to that.
+- Maybe just circling back on the heat exchangers.
+- How do you land on 2x capacity as the right number? I mean we've seen some of the folks in liquid cooling quadrupling capacity.
+- But everyone is focused on what the margin impact as you bring on new capacity is because it's never at peak efficiency on day 1.
+- Number one, the beauty of the business is that it is very hard to ramp capacity in it.
+- So the defensive nature of that business is it's hard to ramp capacity, number one.
+- Number two, we've been ramping capacity into this demand cycle over the previous 2.
+- So if you go back and look over the previous 2 years, and I was to show you margins in heat exchangers, you'd say, you know what, I see the top line growth, but it's not converting.
+- Maybe you can double-click on what that means.
+- Maybe, Rich, talk about how you're seeing lead times.
+- R Richard Tobin executive Our lead times overall are in balance, except where we've had execution problems where that's led out.
+- But in areas like heat exchangers, people are trying out there to secure supply.
+- So you're beginning to see -- so it's not a reflection of our lead times.
+- It's a reflection of demand outstripping supply capacity in the market in total.
+- So look, we can -- in the grand scheme of things, we're not a data center play.
+- We participate in data centers, but proportionately, it is what it is in the portfolio.
+- So I think we have to be careful about just doing the math on backlog as if there's excess capacity sitting there waiting and then there's a timing difference of when somebody actually wants to take delivery on something.
+- And then I guess just given the issues that you kind of -- you've already talked about on the refrigeration side, I'm just curious like what your level of concern is on the capacity ramp in SWEP? R Richard Tobin executive Well, we always have concern, but less so.
+- SWEP is the highest automated business that we have in the portfolio and the issues that we've had in refrigeration have been largely driven by labor ramp.
+- C Christopher Snyder analyst I think you guys talked about in Q1 that customers started placing orders for brazed plate heat exchangers further into the future than maybe they were in '25.
+- Did that continue here into Q2? And then can you just maybe talk about your plans to add capacity there? What is the time line for that capacity to come on? And would you expect that those lead times start to come in as that capacity comes on over the next 12 months or whatever that may be? R Richard Tobin executive I guess this is the last question, so let me answer it real quick here.
+- The answer to the question is yes, and the capacity will come on sequentially over the back half of '26 going into 2027.
+- Is there anything you could talk about on Q3? Like, is it fair to assume like similar to the full year, low double-digit EPS growth? And is it also fair to assume that Q3 organic is better than Q4, just given how much more difficult that Q4 comp is? R Richard Tobin executive Yes.

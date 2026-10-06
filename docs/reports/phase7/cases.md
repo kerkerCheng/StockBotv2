@@ -312,6 +312,17 @@
   - 2026-10-06｜S1 GO 後鑄 [714]、使用者 go、`complete-theme-cohort 714` 寫入 `tc_2efac5d9b16b46cf`（成員與排除照 10-05 候選，未改）。
     驗收（個股頁 artifact，重算後）：四檔「已定價②」由缺席變有值（奇鋐、富世達 13.76 倍；健策、高力 10.49 倍——組內其他成員的股價營收比中位數）、
     「已定價③」30／90 日相對組漲幅有值；追蹤表裡四檔改跟散熱組比（今天錨點 10-05、還沒有新收盤，明天起有數字），台達照舊「不是任何組的組員」。
+  - 2026-10-06｜**快接頭層說明 v1**（個股頁 schema S4 第二份、散熱鏈第一份；`library/private/research_notes/layer_notes/tech_liquid_cooling_quick_disconnect.md`，四段規格＋讀後報告＋要文件）。
+    讀法：**需求繞不過，但這一層不卡**——OCP UQD 規格把介面寫死、明文「universal interchangeability」，v2 由 NVIDIA 與 CPC 執筆寫「any willing supplier」；
+    OCP 目錄上架 UQD／UQDB 的廠商 2023 年 2 → 2024 年 5 → 2025 年 10 → 2026-10-06 共 18（富世達、CPC、中航光電不在目錄）；富世達 2025 年「重大資本支出：無」、月產 300 萬顆——資本輕。
+    **量的那一格答成反面**：同時賣快接頭（CPC）與熱交換器（SWEP）的 Dover，2025 年 Q2／Q3 10-Q 與 10-K 都把「thermal connectors used in liquid cooling of data centers」列為成長來源，2026 年 Q1／Q2 10-Q 不再列；
+    Q2 法說「Our lead times overall are in balance … But in areas like heat exchangers, people are trying out there to secure supply」（熱交換器訂單「including longer lead-time orders」、產能 12 個月翻倍）。
+    2024–25 年確實緊過（經濟日報 2024-07-22 國際大廠零件漏水、雲端業者要台廠進來；富世達 2025-03 法說「供貨吃緊」）。富世達 2025 年營收 25.43% 賣給「奇宏深圳」（關係企業，奇鋐的深圳子公司）——快接頭主要跟著奇鋐的冷板模組出貨，是換供應商、不是大家都缺。
+    讀圖換版 `sr_c7d89e1c0d9dae02`（undecided）→ **`sr_d46b2882a58b8dfc`（neither）**，反證 5 條 `ew_0291`–`ew_0295`（Q1 一兩家合格／Q2 缺貨一手／Q4 以年計擴產／Q6 無閥接頭吃掉用量／Q3 在位者退出），舊的 2 條隨換版收掉；
+    **因層說明改變的候選狀態 1 筆：富世達 6805.TW「缺 → 不要」**（`ib_188e19ab994e5234`；重開條件 `ew_0296`、`ew_0297`，Q2 連結 `ew_0292`）；奇鋐維持「不要」（非邊緣）。
+    入圖包 pq2 **[719]**（`ra_2fc72a02a98b6f249fc1e391faeba09b`）：Dover／CPC 新聞稿（2026-07-22，逐字「a leading provider of quick disconnect couplings … for thermal management」——**10-05 那筆「Dover 的層邊不做、DOV 留在未到終局」由此接上**）、Stäubli 新聞稿（自述在 NVIDIA RVL）、Parker 與英維克的 OCP 上架頁 → 快接頭層四條自報供貨邊；名冊 co:parker_hannifin、co:staubli、co:envicool 隨包 staged；不改任何既有節點。
+    向你要文件 pq2 **[720]**：Rubin 托盤快接頭的合格名單或份額（NVIDIA RVL 不公開）。
+    **沒問到卻讀到：散熱鏈的量訊號在 CDU 裡的硬焊板式熱交換器**（Dover／SWEP），高力的本業正是它——下一份層說明直接做（高力敘事停在「缺：CDU 與分歧管兩層的量的證據」）
 - 裁決：（尚無）
 - 2×2：尚未到裁決點
 - failure log：（尚無）
@@ -320,6 +331,8 @@
   - #11（[694] NVIDIA 自己的 depends_on 被預告成「供應商自報」——買方自述與供應商自誇共用一個值）
   - #3（[698] 是 [697] 重跑 prepare 的重複號，內容逐位相同）
   - #16（同 P1：第二個主題等權組會讓組基準整格缺席——本鏈的組因此延後）
+  - #17（[719] 的圖影響印 +8 節點，實際新節點 3 個——第 5 次）
+  - #34（富世達「缺 → 不要」換版後，舊「缺」的 wake_brief 等待 `ew_0246` 沒人收，10-12 會叫醒一份剛寫好的「不要」敘事）
 
 ## X1 已定價回放（R1）
 

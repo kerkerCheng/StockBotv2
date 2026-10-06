@@ -1,0 +1,141 @@
+SOURCE: Open Compute Project — Universal Quick Disconnect (UQD) Specification Revision 1.0（Author: Mark Sprenger, Intel Corporation）
+URL: https://www.opencompute.org/documents/ocp-universal-quick-disconnect-uqd-specification-rev-1-0-2-pdf
+PUBLISHED: 2020-09-04（規格書每頁頁首日期 9/4/2020）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（開放規格，研究必要的有限節錄）
+NOTE: 第三方標準文件（OCP；貢獻者 Intel）。節錄：範圍與定義（p.4）、耐久與漏液與壓力（p.9–10）、標示與致謝（p.11）。PDF 文字層抽取，表格欄位次序照抽取結果。
+
+2. Scope & Overview
+Scope:
+This document defines the technical specifications for the Universal Quick Disconnect (UQD) used in non-
+combustible single-phase (water/glycol) systems for liquid cooling of electronics.
+Overview:
+In liquid cooled systems, fluid is transported under pressure within a Technology Cooling System (TCS)
+fluid loop [1].  The IT equipment loop is joined to the TCS using a fluid connector.
+This specification defines the fluid connector as Universal Quick Disconnect (UQD) with interface
+dimensions for universal interchangeability and defines acceptable performance for a hand-mate, drip-
+free, hot-pluggable, fluid line connector for use in TCS for electronics. The UQD maintains a leak-tight
+seal under pressure when coupled and on both sides when decoupled.
+2.1 Terms & Definitions
+Plug
+The male side of the coupling
+Socket
+The female side of the coupling
+Coupled
+The state when the plug and socket are fully engaged and locked together
+Coupling
+The act of connecting the plug and socket together so that they are locked together to join a fluid line.
+Cv
+Flow coefficient defined as 𝐶𝑣 = 𝑄 √∆𝑃⁄ , where Q is flow rate in gallons/min (GPM) and ΔP is pressure
+drop in lbs/in² (psi) for water at 60 degrees F
+Termination
+Both plug and socket have terminations on the ends to connect a tube or pipe to the coupling
+UQD
+Universal Quick Disconnect
+Break
+Act of de-coupling the plug and socket
+Make
+Act of coupling the plug and socket such that the pair are fully mated and locked
+Universal Quick Disconnect
+Fully interchangeable with other plug and socket parts meeting the UQD Requirements of the same
+nominal size
+KPI
+Key Performance Indicator
+UQD02
+Universal Quick Disconnect Dash 02 (1/8”)
+UQD04
+Universal Quick Disconnect Dash 04 (1/4”)
+UQD06
+Universal Quick Disconnect Dash 06 (3/8”)
+UQD08
+Universal Quick Disconnect Dash 08 (1/2”)
+
+3. Feature & Dimensional Requirements
+Physical features of the socket shall conform to the dimensions shown in Figure 2 UQD Socket
+Dimensions and given in Table 1 UQD Socket Dimensional Specification.  Physical features of the plug
+shall conform to the dimensions shown in Figure 3 UQD Plug Dimensions and given by Table 2 UQD
+Plug Dimensional Specification.  Where no dimension is given the geometry is left to the discretion of the
+manufacturer and should consider end user (datacenter environment) requirements for fit and function.
+
+4.2 Shelf & Service Life Requirements
+UQD performance requirements shall be met when exposed to the following life cycles at end of life.
+Table 5 Life Requirements
+Parameter Requirement Priority
+Shelf Life1 5 years Required
+Service Life2 10 Years Required
+
+4.3 Durability Requirements
+The socket must withstand 5000 make and break cycles. All performance requirements listed in  Section 4
+Performance Requirements must be met or exceeded when the socket and plug are mated in the first
+(time 0) and 5000th cycle and at end of service life required in Table 5
+
+Table 6 Fluid Loss Requirement.  Fluid loss requirements to be measured with water as the fluid medium.
+
+1 Shelf life is defined as the period of time after manufacturing and prior to service that the component
+must remain useable.
+2 Service life is defined as the period of time following a period of shelf life (storage), including time zero
+up to the maximum shelf life, that last up to end of service life.
+=== PAGE 10 ===
+Open Compute Project  Universal Quick Disconnect (UQD) Specification
+9/4/2020 Page 10
+
+Table 6 Fluid Loss Requirement
+Parameter UQD02 UQD04 UQD06 UQD08 Priority
+Maximum fluid loss per
+couple/decouple cycle
+at 0 psi
+0.020 ml 0.025 ml 0.035 ml 0.070 ml Required
+
+4.5 Flow Rate, Pressure and Temperature Requirements
+
+Table 7 Flow and Temperature Requirements
+Parameter UQD02 UQD04 UQD06 UQD08 Priority
+Maximum
+operating pressure 100 psi Required
+Minimum burst
+pressure 300 psi Required
+Minimum Cv3  0.25 0.80 1.60 2.50 Required
+Flow Rating4
+At least
+0.55
+GPM
+At least
+1.7 GPM
+At least
+3.0 GPM
+At Least
+4.7
+GPM
+Recommended
+Manufacturer discretion
+(ratings shall be
+published by supplier)
+Operating
+temperature
+range5
+17°C - 65°C Required
+Shipping
+temperature
+range6
+-40°C – 75°C Required
+
+5.1 Identification
+Within digital or printed catalogs supplier shall identify products meeting these requirements as
+“Dimensional & performance requirements conform to OCP Universal Quick Disconnect (UQD)
+Specification rev 1.0”
+6. Wetted Materials
+Wetted materials shall be compatible with DOW Chemical DOWFROST™ LC25 [9] and Huntsman
+Chemical JEFFCOOL® ISF-25 heat transfer fluids [10]. Supplier is responsible to confirm all materials
+used in the UQD are compatible with the coolant fluids above and within the operating parameters
+specified in this document.  If coolant fluid is other than stated above supplier should confirm the
+materials used are compatible with end user fluid chemistry.
+7. Safety and Regulatory Requirements
+As a minimum supplier shall meet the requirements of IEC62368-1 clause G.15.
+8. Acknowledgements
+Would like to thank the following companies and people for their contribution to this specification.  From Avic Jonhon
+Optronic Technology Company, Ella Li and Hanyu Lou. From CPC (Colder Products Company), Dennis Downs,
+Elizabeth Langer and Barry Nielsen. From Fujikura, Thang Nguyen and Vijit Wuttijumnong. From Intel Corporation,
+Peggy Burroughs, Juan Cevallos, Peipei Ding, Jessica Gullbrand, Jordan Johnson, David Shia, Rodel Samiley, Sean
+Sivapalan and Casey Winkel. From LBNL Open Specification for a Liquid Cooled Rack Working Group, Dale Sartor.
+From Parker Hannifin Corporation, Quick Coupling Division, Cameron Koller, Todd Lambert, Timothy Marquis and
+Lenny Nick.  From Stäubli, Jean-Christophe Duisit and Nicolas Monnier.

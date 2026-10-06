@@ -1,0 +1,38 @@
+SOURCE: Stäubli（PR Newswire）——Stäubli Expands U.S. Manufacturing and Reinforces Leadership in Liquid Cooling
+URL: https://www.prnewswire.com/news-releases/staubli-expands-us-manufacturing-and-reinforces-leadership-in-liquid-cooling-302612065.html
+PUBLISHED: 2025-11-12（PR Newswire datePublished 2025-11-12T09:01:00-05:00）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（新聞稿正文，去除分享按鈕與尾段廣告）
+NOTE: 供應商自述（未經 NVIDIA 證實）。staubli.com 原頁（uqd-staubli-nvidia-approved）被 Cloudflare 擋，未取得。
+
+First to assemble quick-disconnects in cleanroom environments, Stäubli addresses global demand with localized UQD production and sustained NVIDIA certification.
+
+DUNCAN, S.C., Nov. 12, 2025 /PRNewswire/ -- Following last week's announcement of its involvement with the Mini-QD and leadership in the UQD v2 standardization, Stäubli is underscoring its growing role as the global benchmark for precision, reliability, and scalability in liquid cooling. As AI workloads continue to accelerate power density in data centers, Stäubli is expanding its U.S. manufacturing capabilities and setting new quality standards for quick-disconnect connector assembly.
+
+Continue Reading
+
+Staubli's cleanroom facility in Duncan, South Carolina is part of the company's U.S. expansion to meet surging demand for high-reliability liquid-cooling components in AI data centers.
+
+Read more about Staubli's liquid cooling solutions: https://www.staubli.com/us/en/fluid-connectors/lp/it-cooling.html
+
+Pioneering cleanroom assembly for data center reliability
+
+Stäubli was the first company in the data center industry to assemble quick-disconnect connectors in a certified cleanroom environment, a practice that has since become the industry standard. This cleanroom process eliminates the risk of debris contamination that can lead to leaks or performance degradation in high-pressure liquid cooling circuits.
+
+Today, the company's new cleanroom facility in Duncan, South Carolina supports North American production for multiple connector families, including the UQD. By assembling these precision components in a controlled environment close to major OEM and hyperscaler operations, Stäubli helps customers achieve shorter lead times, reduced logistics costs, and enhanced quality assurance across their supply chains.
+
+"When we introduced cleanroom assembly to the data center industry, it was a commitment to reliability," said Nicolas Monnier, Head of IT Cooling at Stäubli. "That same mindset drives our expansion in the U.S. today. We're giving customers local access to the same Swiss-engineered precision, zero-leak performance, and always-on support that define Stäubli globally."
+
+Meeting demands with localized production
+
+The demand for liquid-cooling components has grown rapidly as AI systems become more power-intensive. Industry forecasts project the global liquid cooling market to grow more than 20 percent annually through 2030, with AI deployments driving the steepest increases in demand.
+
+Localized production at Stäubli's South Carolina site allows the company to respond swiftly to market surges while maintaining uncompromised standards of cleanliness and precision.
+
+Certified performance for the AI ecosystem
+
+Stäubli's UQD and UQDB connectors remain approved by NVIDIA and are included in NVIDIA's Recommended Vendor List (RVL), recognizing their compliance with NVIDIA's stringent performance, pressure, and leak-free requirements. These connectors are endorsed specifically for the GPU's new generation, reinforcing Stäubli's leadership in thermal management for high-performance computing tasks.
+
+Stäubli continues to be a trusted partner to leading chipmakers and OEMs in the rapidly evolving AI and high-performance computing ecosystem.
+
+Together, these achievements – cleanroom leadership, localized production, and industry recognition – reinforce Stäubli's position as the partner of choice for scalable, reliable, and globally supported liquid-cooling solutions.

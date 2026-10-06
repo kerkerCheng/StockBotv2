@@ -1,0 +1,28 @@
+SOURCE: Stäubli（PR Newswire）——Stäubli Drives Next-Generation Liquid Cooling Standards for AI Data Centers at OCP Global Summit
+URL: https://www.prnewswire.com/news-releases/staubli-drives-next-generation-liquid-cooling-standards-for-ai-data-centers-at-ocp-global-summit-302607085.html
+PUBLISHED: 2025-11-06（PR Newswire datePublished 2025-11-06T09:00:00-05:00）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（新聞稿正文）
+NOTE: 供應商自述；UQD v2 於 2025-10 OCP Global Summit 發布、v1 由 Stäubli、Parker、CPC 等組成的工作小組於 2020 年制定（此句是 Stäubli 的說法，v1 規格書的貢獻者見 ocp_uqd_spec_rev1_0_2020_09_04）。
+
+New Mini-QD connector enables use of next-generation optical pluggable modules; UQD v2 specification enforces greater precision
+
+DUNCAN, S.C., Nov. 6, 2025 /PRNewswire/ -- As AI workloads push thermal limits in data centers higher than ever, Stäubli is leading a new phase of standardization in liquid-cooling technology designed for the next generation of high-performance computing.
+
+Read more about Staubli's liquid cooling solutions: https://www.staubli.com/content/staubli-aem/us/en/fluid-connectors/lp/it-cooling.html
+
+At the Open Compute Project (OCP) Global Summit in October, a new, micro quick-disconnect connector, known as the Mini-QD, developed by Staubli, was introduced by Ciena as the enabler for Ciena's liquid-cooled OSFP module. Staubli will lead the standardization initiative for the Mini-QD, helping to progress applications that compact, high-performance liquid cooling. At the same event, OCP also announced the UQD v2 update, an evolution of the original Universal Quick Disconnect (UQD) standard first developed in 2020 by a working group including Stäubli, Parker, and CPC.
+
+Miniaturized connector design brings liquid cooling to high-performance optical modules
+
+The new Mini-QD technology enables the liquid cooling of next-generation optical pluggable modules such as OSFP and QSFP devices that are expected to reach up to 1.6 terabits per second by 2027, requiring a shift from traditional air cooling to liquid cooling.
+
+By integrating liquid cooling directly into the pluggable optical module, the Mini-QD removes thermal constraints that limit bandwidth expansion and system density. The Mini-QD is designed for future scalability and interchangeability, allowing other manufacturers to adopt a common interface once standardized.
+
+"As compute densities and power levels rise, it's no longer enough to innovate in isolation," said Nicolas Monnier, Head of IT Cooling at Stäubli. "The industry depends on open standards that evolve as quickly as the technologies they enable. Our work to lead the standardization of the Mini-QD with Ciena, and to help define the next generation of the UQD specification, shows how collaboration accelerates progress in a rapidly changing ecosystem."
+
+UQD v2 sharpens testing, geometry, and interoperability standards
+
+The UQD v2 update introduces more rigorous testing protocols, tighter flow-performance limits, and standardized mechanical geometry for blind-mate and manual connectors, advancements that improve cross compatibility and reliability across suppliers.
+
+Together, the Mini-QD initiative and the UQD v2 specification support the growing demand for reliable, interoperable liquid cooling components in AI and high-performance computing environments.

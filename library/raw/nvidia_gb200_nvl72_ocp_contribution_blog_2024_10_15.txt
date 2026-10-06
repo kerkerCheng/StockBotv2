@@ -1,0 +1,28 @@
+SOURCE: NVIDIA Technical Blog——NVIDIA Contributes NVIDIA GB200 NVL72 Designs to Open Compute Project（Amr Elmeleegy）
+URL: https://developer.nvidia.com/blog/nvidia-contributes-nvidia-gb200-nvl72-designs-to-open-compute-project/
+PUBLISHED: 2024-10-15（article:published_time 2024-10-15T16:30:00+00:00（modified 2024-11-26））
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（技術部落格有限節錄）
+NOTE: 客戶端（NVIDIA）一手。節錄：重點條列、機櫃設計、液冷分歧管與浮動盲插、DCI 夥伴名單（名單沒寫各家供哪個零件）。
+
+NVIDIA contributed the NVIDIA GB200 NVL72 rack and compute and switch tray liquid cooled designs to the Open Compute Project (OCP) during the 2024 OCP Global Summit.
+
+- The GB200 NVL72 design expands the NVLink domain to 72 NVIDIA Blackwell GPUs with 1.8 TB/s per GPU communication speed, accelerating training and inference of trillion-parameter models by up to 4x and 30x respectively.
+
+- Key design modifications include rack reinforcements with over 100 lbs of steel, a high capacity bus bar supporting 1,400 amp current flow, four NVLink cartridges with over 5,000 copper cables delivering 260 TB/s AllReduce bandwidth, enhanced liquid cooling manifolds with floating blind mates, and 1RU liquid-cooled compute and switch tray form factors.
+
+-
+
+Incorporating rear rack extensions to safeguard cable bracings and manifold fittings, ensuring the longevity and proper functioning of these elements.
+
+- Introducing blind mate slide rails and latching features to facilitate NVLink installations, liquid cooling system integration, and easier maintenance procedures using blind mate connectors.
+
+Liquid cooling manifolds and floating blind mates
+
+To efficiently manage the 120 KW cooling capacity required for the rack, we’ve implemented direct liquid cooling techniques. Building upon existing designs, we’ve introduced two key innovations. First, we developed an enhanced Blind Mate Liquid Cooling Manifold design, capable of delivering efficient cooling.
+
+Second, we created a novel Floating Blind Mate Tray connection, which effectively distributes coolant to both compute and switch trays significantly improving the ability of the liquid quick disconnects to align and reliably mate in the rack. By leveraging these enhanced liquid cooling solutions, we are able to address the high thermal management demands of modern high-performance computing environments, ensuring optimal performance and longevity of the rack components.
+
+Compute and switch tray mechanical form factors
+
+Vertiv is a great example of how data center infrastructure (DCI) providers are building on top of the NVIDIA Blackwell platform. Over 40 DCIs are now building and innovating on top of the Blackwell platform including Amphenol, Auras, Astron, AVC, Beehe, Bellwether, BizLink, Boyd, Chenbro, Chengfwa, CoolIT, Cooler Master, CPC, Danfoss, Delta, Envicool, Flex, Foxconn, Interplex, JPC, Kingslide, Lead Wealth, LiteOn, LOTES, Luxshare, Megmeet, Molex, Motivair, Nidec, Nvent, Ourack, Parker, Pinda, QCT, Refas, Readore, Repon, Rittal, Sanyo Denki, Schneider Electronic, Simula, Staubli, SUNON, Taicheng, TE Connectivity, and Yuans Technology.

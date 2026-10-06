@@ -1,0 +1,126 @@
+SOURCE: OCP Universal Quick Disconnect (UQD) Specification v2.0.1 DRAFT（16 Apr 2025；Authors: Travis Gaskill – NVIDIA, Elizabeth Langer – CPC）
+URL: http://www.hansenfluid.com/news/DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25.html
+PUBLISHED: 2025-04-16（文件標題 DRAFT_OCP+UQD+Spec+v2.0.1_16Apr25；內文 Effective XXXX, 2025）
+RETRIEVED: 2026-10-06
+STORAGE: repo_excerpt（規格草案的有限節錄）
+NOTE: ⚠ 草案、且託管在第三方（hansenfluid.com，一家接頭廠的網站）而非 OCP——不是定稿。定稿 v2 於 2025-10 OCP Global Summit 發布（見 staubli_uqd_v2_mini_qd_pr_2025_11_06）。HTML 原檔是 UTF-8 被當 latin-1 解，已還原。節錄：作者、貢獻者、致謝、OCP 原則（開放、規模）、範圍、與 v1 的互換、驗證報告與氦氣測漏、v1→v2 互換考量表。
+
+Authors: Travis Gaskill - NVIDIA, Elizabeth Langer – CPC
+
+Open Web Foundation (OWF) CLA
+
+Contributions to this Specification are made under the terms and conditions set forth in Modified Open Web Foundation Agreement 0.9 (OWFa 0.9). (As of October 16, 2024) (“Contribution License”) by:
+
+-
+Colder Products Company (CPC)
+
+-
+NVIDIA
+
+Acknowledgments
+
+Version 1 Author(s): Mark Sprenger (Intel), Jordan Johnson (Intel), Bret Henkel (Intel)
+
+The Contributors of this Specification would like to acknowledge the following companies for their feedback:
+
+AMD
+
+Intel
+
+CPC
+
+Staubli
+
+Parker
+
+Nvidia
+
+Dell
+
+CoolIT
+
+Danfoss
+
+Cejn
+
+-
+
+Openness,
+
+Scale, and
+
+Scope
+
+This document defines the technical specifications for the Universal Quick Disconnect (UQD) and Universal Quick Disconnect Blind-Mate (UQDB) used in non-combustible single-phase (water/glycol) systems for liquid cooling of electronics.
+
+-
+Overview
+
+In liquid cooled systems, fluid is transported under pressure within a Technology Cooling System (TCS) fluid loop [1]. The IT equipment loop is joined to the TCS using a fluid connector.
+
+This specification defines interface dimensions and performance criteria for supplier interoperability across UQD configurations used in liquid cooling systems. UQD nominal sizes are represented by a dash size reflective of the inner diameter of an equivalent hydraulic hose in 1/16” increments. Nominal sizes captured in this specification version are shown in Table 1. Coupling configurations include handmate (Figure 1), blindmate (Figure 2), and hybrid (Figure 3).
+
+Interchangeability with Previous Versions
+
+UQD Specification Version 2 is designed to be backwards compatible with the previously separate Version 1 Specifications for UQD and UQDB, and end user deployment assessment is encouraged. Risks and considerations for interchanging or co- deploying v1 and v2 components are outlined in the appendix (15.1).
+
+-
+Connected Length Coupled State
+
+Each test shall be conducted and the test data collated in a test report. A “QD Validation Report Template” is provided with
+
+this specification as the preferred template for reporting. The test report shall be provided to customers upon request. All helium leak tests conducted shall be in accordance with ASTM E493.
+
+（p.? Thermal/Mechanical Cycling 判準）No visible leakage. After testing, helium leak rate <= 1x10-5 mbar-L/s
+
+Version Interchangeability
+
+Reference considerations for evaluating co-deployment of v1 and v2 UQDs in application.
+
+Version 1 (V1)
+
+Version 2 (V2)
+
+Interchange Consideration
+
+UQD & UQDB plug end condition undefined
+
+UQD & UQDB plug end conditions defined
+
+V1 plug end with minimal/no chamfer may damage V1 & V2 socket seal(s)
+
+UQD plug & socket overall length undefined
+
+UQD plug & socket overall length defined
+
+V1 lengths may vary from standard V2 length, retain V1 panel/space
+
+UQD plug & socket outer diameter undefined
+
+UQD plug & socket maximum outer diameter defined
+
+V1 outer diameter may vary from standard V2 outer diameter, retain v1 pitch/space
+
+Performance requirement of
+
+‘Minimum Cv’
+
+Performance requirement adjusted to ‘Minimum & Maximum’ PQ curves (Cv REF), nominal values increased over v1
+
+V1 pressure drop across QD valves may be higher than V2 (V1 Cv lower than V2)
+
+Minimum ‘S’ valve stroke defined
+
+Increase minimum ‘S’ valve stroke to account for tolerances
+
+V1 QD sets may not fully couple due to tolerance stacks of internal valving (issue present in V1)
+
+UQDB minimum & nominal engagement stroke defined, requiring full flow in “under coupled” condition
+
+Tolerance loops do not support minimum engagement requirement without further changes, remove from specification and replace with guidance to ensure full coupling at
+
+hard-stop
+
+V1 systems without built in tolerance compliance may see coupling panel distance and flow variation
+
+-
