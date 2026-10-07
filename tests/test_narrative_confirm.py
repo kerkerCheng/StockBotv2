@@ -216,6 +216,7 @@ def test_the_heartbeat_prints_confirm_on_its_own_line(monkeypatch: pytest.Monkey
     monkeypatch.setattr(ew, "load_watches", lambda: {"watches": watches})
     monkeypatch.setattr(ew, "primary_coverage", lambda: frozenset())
     monkeypatch.setattr(disproof, "current_readings", lambda: {})
+    monkeypatch.setattr(disproof, "current_layer_notes", lambda: {})   # 2026-10-07 S4a：不讀真實層說明 ledger
     monkeypatch.setattr(disproof, "frozen_history_count", lambda: 0)
     monkeypatch.setattr(disproof, "load_lifecycle", lambda: {})
     monkeypatch.setattr(disproof, "current_briefs", lambda: [])

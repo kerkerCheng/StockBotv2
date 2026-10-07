@@ -3,22 +3,31 @@
 純邏輯在 `alpha/layer_note/contracts.py`；本檔照 `alpha/providers/structure_readings.py` 的分工與慣例：
 一個節點一個 JSONL、只 append、壞行不靜默丟棄、寫入端核對（不過就整筆拒收並逐條說出原因）。
 
+**唯一的寫入入口是 `write_note`**（R2 C1，同敘事寫入端 R2-a C1）：①寫入端核對 ②在 registry **副本**上預演 watch 登記
+（實體不在名冊、到期日已過、條件不到 20 字……任何一條在這裡就拒收）③append ④正式登記並存檔。
+預演放在 append 之前：否則 ledger 已有一行、registry 一筆都沒有，同一份重跑又被「已在 ledger 中」擋掉。
+
 **寫入端核對（契約層驗不了、要碰檔案的那幾件）：**
-- 出處 `raw:<id>` 要在 `library/raw/` 找得到同名檔、`lead:<id>` 要在 lead registry 找得到（L18：標籤要指得回原始證據）。
-- `supersedes_id` 要在同節點 ledger 裡；同內容不得重複 append。
+- 出處 `raw:<檔名>` 要在 `library/raw/` 找得到同名檔、`lead:<id>` 要在 lead registry 找得到（L18：標籤要指得回原始證據）。
+- `supersedes_id` 要在同節點 ledger 裡；同內容不得重複 append；同一份裡兩條主張條件相同拒收（同一個條件會被叫醒兩次）。
 - 密鑰形狀的內容拒收（`shared.redaction`）。
 
-**watch（`register_note_watches`，冪等）：** 每條主張一筆語意 watch，`source_ref=layer_note:<note_id>#<n>`、帶 `node`；
-到期＝主張自己的 `expires`，沒寫就用整份的重讀日（INV-2）。換版或撤回時，舊那一份還在盯的條件收掉（consume）——
-與讀圖同一條規則：同一個節點同時只有一份現行，舊條件不得掛著變孤兒。到期分類走「重讀」（`expiry_class` 的 `reread`）：
-不鑄號，列進該節點的重讀理由，換版時收掉換新。
+**watch：** 每條主張一筆語意 watch，`source_ref=layer_note:<note_id>#<n>`、帶 `node`；到期＝主張自己的 `expires`，
+沒寫就用整份的重讀日（INV-2）。換版或撤回時，同節點其他每一份還在盯的條件收掉、觸及未處置的標 handled、
+到期待決的記 `source_superseded`——與讀圖同一條規則（同一個節點同時只有一份現行，舊條件不得掛著變孤兒）。
+
+**該重讀（`layer_note_reread_rows`，R2 C2）：** 逐節點、**不依賴結構讀圖**（轉換型節點永遠沒有讀圖）。理由四種：
+整份重讀日到期、主張到期未處置、主張被判觸及未處置、主張沒有 watch 在盯。心跳與 audit 讀這一份。
+到期分類（`expiry_class`）走 `reread`：不鑄號，重問＝換版。
 
 ⚠ 經 providers 呼叫 `engine_b`：`alpha/` 核心不得 import 它（`tests/test_layer_separation.py`）。
 """
 from __future__ import annotations
 
+import copy
 import json
 import re
+from datetime import date
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -57,24 +66,33 @@ def read_note_records(node: str, *, directory: Path | None = None) -> tuple[list
         if not text:
             continue
         try:
-            records.append(parse_layer_note_record(json.loads(text)))
+            raw = json.loads(text)
+            if not isinstance(raw, dict):
+                raise ContractViolation("這一行不是 object")
+            records.append(parse_layer_note_record(raw))
         except (ValueError, ContractViolation) as exc:
             errors.append(f"{path.name}:{number}: {str(exc)[:120]}")
     return records, errors
 
 
 def all_nodes(*, directory: Path | None = None) -> list[str]:
-    """ledger 裡有紀錄的節點（讀每個檔第一行的 node；檔名是正規化過的，不能反推）。"""
+    """ledger 裡有紀錄的節點（讀每個檔**第一個解析得到 node 的行**；檔名是正規化過的，不能反推）。
+
+    ⚠ 壞行跳過、繼續讀下一行（R2 F4：原本第一行壞掉就整個檔案消失）。"""
     out: set[str] = set()
     for path in sorted((directory or LAYER_NOTE_DIR).glob("*.jsonl")):
         for line in path.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                try:
-                    out.add(str(json.loads(line).get("node") or ""))
-                except ValueError:
-                    pass
+            if not line.strip():
+                continue
+            try:
+                raw = json.loads(line)
+            except ValueError:
+                continue
+            node = raw.get("node") if isinstance(raw, dict) else None
+            if node:
+                out.add(str(node))
                 break
-    return sorted(n for n in out if n)
+    return sorted(out)
 
 
 def current_notes(*, directory: Path | None = None) -> dict[str, LayerNote]:
@@ -104,7 +122,7 @@ def _refs(record: Mapping[str, Any]) -> list[tuple[str, str]]:
 
 def verify_citation_refs(record: Mapping[str, Any], *, raw_dir: Path | None = None,
                          lead_exists: Any = None) -> list[str]:
-    """每個出處指不指得回去：`raw:<id>` 在 library/raw 有同名檔、`lead:<id>` 在 lead registry 裡。回問題清單（空＝全過）。"""
+    """每個出處指不指得回去：`raw:<檔名>` 在 library/raw 有同名檔、`lead:<id>` 在 lead registry 裡。回問題清單（空＝全過）。"""
     raw_dir = raw_dir or RAW_DIR
     if lead_exists is None:
         def lead_exists(lead_id: str) -> bool:
@@ -116,16 +134,33 @@ def verify_citation_refs(record: Mapping[str, Any], *, raw_dir: Path | None = No
         kind, _, ident = ref.partition(":")
         if kind == "raw":
             if not any(p.stem == ident for p in raw_dir.glob(f"{ident}.*")):
-                problems.append(f"{where}：{ref} 在 library/raw 找不到（出處要先入庫，L18）")
+                problems.append(f"{where}：{ref} 在 library/raw 找不到（出處要先入庫，L18；圖上 SourceDoc id 與檔名可能不同——引用檔名）")
         elif kind == "lead":
             if not lead_exists(ident):
                 problems.append(f"{where}：{ref} 不在 lead registry")
     return problems
 
 
+def _duplicate_conditions(parsed: LayerNote) -> list[str]:
+    """同一份裡兩條主張的條件正規化後相同（判準同敘事 4.7d：`engine_b.disproof.normalize`）。"""
+    from engine_b.disproof import normalize
+
+    seen: dict[str, int] = {}
+    problems = []
+    for index, claim in enumerate(parsed.claims, 1):
+        key = normalize(claim.condition)
+        if key in seen:
+            problems.append(f"claims[{index}] 的條件與 claims[{seen[key]}] 相同——同一個條件登記兩次會被叫醒兩次")
+        else:
+            seen[key] = index
+    return problems
+
+
 def append_note_record(record: Mapping[str, Any], *, directory: Path | None = None,
                        raw_dir: Path | None = None, lead_exists: Any = None) -> Path:
-    """append 一筆（已由 `layer_note_record()` 驗證過的）紀錄；只 append，永不改寫既有行。"""
+    """append 一筆（已由 `layer_note_record()` 驗證過的）紀錄；只 append，永不改寫既有行。
+
+    ⚠ 只有寫入端核對、**沒有** watch 預演——正式寫入請走 `write_note`（它先預演再呼叫本函式）。"""
     from shared.redaction import sensitive_payload_path
 
     parsed = parse_layer_note_record(record)
@@ -138,7 +173,7 @@ def append_note_record(record: Mapping[str, Any], *, directory: Path | None = No
     if parsed.supersedes_id and not any(r.note_id == parsed.supersedes_id for r in existing):
         raise ContractViolation(f"supersedes_id {parsed.supersedes_id} 不在 {parsed.node} 的 ledger 中")
     if not parsed.retracted:
-        problems = verify_citation_refs(record, raw_dir=raw_dir, lead_exists=lead_exists)
+        problems = verify_citation_refs(record, raw_dir=raw_dir, lead_exists=lead_exists) + _duplicate_conditions(parsed)
         if problems:
             raise ContractViolation("層說明拒收：\n  - " + "\n  - ".join(problems))
     path = ledger_path(parsed.node, directory=directory)
@@ -148,22 +183,12 @@ def append_note_record(record: Mapping[str, Any], *, directory: Path | None = No
     return path
 
 
-def register_note_watches(record: Mapping[str, Any], *, watches_path: Path | None = None,
-                          directory: Path | None = None) -> dict[str, list[str]]:
-    """層說明 append 成功後的等待登記（冪等，可重跑）。
-
-    1. 同節點其他每一份（換版）或被撤回的那一份：還在盯的語意 watch → consume；到期待決的 → `source_superseded`。
-    2. 這一份的 `claims[]` → 每條一筆語意 watch（`source_ref=layer_note:<id>#<n>`、`node`）。已登記的不重登。
-    """
-    from datetime import datetime, timezone
-
+def _apply_note_watches(parsed: LayerNote, data: dict[str, Any], records: Sequence[LayerNote], *,
+                        stamp: str) -> dict[str, list[str]]:
+    """在 `data`（registry 的記憶體版本）上做登記／收舊；不存檔。預演與正式登記共用這一份（不寫兩套，L16）。"""
     from engine_b import event_watch as ew
 
-    parsed = parse_layer_note_record(record)
-    stamp = datetime.now(timezone.utc).isoformat()
-    data = ew.load_watches(watches_path)
     summary: dict[str, list[str]] = {"registered": [], "consumed": []}
-    records, _errors = read_note_records(parsed.node, directory=directory)
     if parsed.retracted:
         stale_ids = {str(parsed.supersedes_id)} if parsed.supersedes_id else set()
     else:
@@ -190,7 +215,7 @@ def register_note_watches(record: Mapping[str, Any], *, watches_path: Path | Non
     if not parsed.retracted:
         for index, claim in enumerate(parsed.claims, 1):
             ref = f"{SOURCE_PREFIX}{parsed.note_id}#{index}"
-            if any(w.get("source_ref") == ref for w in data["watches"]):
+            if any(w.get("source_ref") == ref and w.get("status") != "consumed" for w in data["watches"]):
                 continue
             expires = claim.expires or parsed.expires
             watch = ew.add_watch(
@@ -201,13 +226,53 @@ def register_note_watches(record: Mapping[str, Any], *, watches_path: Path | Non
                 note=f"層說明 {parsed.note_id}（{parsed.node}）的第 {index} 條主張：{claim.claim[:60]}",
             )
             summary["registered"].append(watch["watch_id"])
+    return summary
+
+
+def register_note_watches(record: Mapping[str, Any], *, watches_path: Path | None = None,
+                          directory: Path | None = None) -> dict[str, list[str]]:
+    """層說明 append 成功後的等待登記（冪等，可重跑；`--register-watches` 用它）。"""
+    from datetime import datetime, timezone
+
+    from engine_b import event_watch as ew
+
+    parsed = parse_layer_note_record(record)
+    data = ew.load_watches(watches_path)
+    records, _errors = read_note_records(parsed.node, directory=directory)
+    summary = _apply_note_watches(parsed, data, records, stamp=datetime.now(timezone.utc).isoformat())
     ew.save_watches(data, watches_path)
     return summary
 
 
+def write_note(record: Mapping[str, Any], *, watches_path: Path | None = None, directory: Path | None = None,
+               raw_dir: Path | None = None, lead_exists: Any = None) -> dict[str, Any]:
+    """**唯一的寫入入口**（R2 C1）：預演 → append → 正式登記 → 存 registry。預演失敗整筆拒收、ledger 不動。"""
+    from datetime import datetime, timezone
+
+    from engine_b import event_watch as ew
+
+    parsed = parse_layer_note_record(record)
+    data = ew.load_watches(watches_path)
+    records, _errors = read_note_records(parsed.node, directory=directory)
+    stamp = datetime.now(timezone.utc).isoformat()
+    try:
+        _apply_note_watches(parsed, copy.deepcopy(data), records, stamp=stamp)
+    except ew.EventWatchError as exc:
+        raise ContractViolation(f"層說明拒收（watch 登記預演失敗，ledger 未動）：{exc}") from None
+    path = append_note_record(record, directory=directory, raw_dir=raw_dir, lead_exists=lead_exists)
+    records, _errors = read_note_records(parsed.node, directory=directory)
+    summary = _apply_note_watches(parsed, data, records, stamp=stamp)
+    ew.save_watches(data, watches_path)
+    return {"path": str(path), "note_id": parsed.note_id, **summary}
+
+
 def claim_watch_rows(note: LayerNote, watches: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """每條主張配它的 watch 狀態（閱讀頁與個股頁入口用；沒登記的印「未盯」，不得安靜消失）。"""
-    by_ref = {str(w.get("source_ref") or ""): w for w in watches}
+    by_ref: dict[str, Mapping[str, Any]] = {}
+    for w in watches:
+        ref = str(w.get("source_ref") or "")
+        if ref and (ref not in by_ref or by_ref[ref].get("status") == "consumed"):
+            by_ref[ref] = w
     rows = []
     for index, claim in enumerate(note.claims, 1):
         ref = f"{SOURCE_PREFIX}{note.note_id}#{index}"
@@ -218,7 +283,34 @@ def claim_watch_rows(note: LayerNote, watches: Sequence[Mapping[str, Any]]) -> l
     return rows
 
 
+def layer_note_reread_rows(notes: Mapping[str, LayerNote], watches: Sequence[Mapping[str, Any]], *,
+                           today: date) -> list[dict[str, Any]]:
+    """逐節點的「該重讀」（R2 C2：不依賴結構讀圖；R2 F6：整份重讀日也有消費端）。只回有理由的節點，依節點 id 排。"""
+    from engine_b import event_watch as ew
+
+    rows = []
+    for node in sorted(notes):
+        note = notes[node]
+        reasons: list[str] = []
+        if note.expires is not None and note.expires < today:
+            reasons.append(f"整份重讀日 {note.expires.isoformat()} 已過：{note.reread_reason}")
+        for row in claim_watch_rows(note, watches):
+            label = ew.condition_label(row["condition"])
+            watch = next((w for w in watches if w.get("watch_id") == row["watch_id"]), {}) if row["watch_id"] else {}
+            judgment = watch.get("judgment") or {}
+            if row["status"] == "未盯" or row["status"] == "consumed":
+                reasons.append(f"主張 {row['n']} 沒有 watch 在盯（`--register-watches` 補登）：{label}")
+            elif judgment.get("touches") == "yes" and not judgment.get("handled"):
+                reasons.append(f"層說明主張被判觸及：{label}")
+            elif watch.get("status") == "expired" and not watch.get("expiry_resolution"):
+                reasons.append(f"層說明主張等滿一輪都沒發生：{label}（換版時換新一批）")
+        if reasons:
+            rows.append({"node": node, "note_id": note.note_id, "title": note.title, "reasons": reasons})
+    return rows
+
+
 __all__ = [
     "LAYER_NOTE_DIR", "SOURCE_PREFIX", "all_nodes", "append_note_record", "claim_watch_rows", "current_notes",
-    "ledger_path", "read_note_records", "register_note_watches", "verify_citation_refs",
+    "layer_note_reread_rows", "ledger_path", "read_note_records", "register_note_watches", "verify_citation_refs",
+    "write_note",
 ]

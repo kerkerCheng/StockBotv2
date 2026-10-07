@@ -658,7 +658,7 @@ def cmd_layer_note(args: argparse.Namespace) -> int:
     from datetime import datetime, timezone
 
     from .layer_note import EVIDENCE_LABELS, SECTION_LABELS, layer_note_record, select_current
-    from .providers.layer_notes import append_note_record, ledger_path, read_note_records, register_note_watches
+    from .providers.layer_notes import ledger_path, read_note_records, register_note_watches, write_note
 
     node = str(args.node)
     records, errors = read_note_records(node)
@@ -694,13 +694,15 @@ def cmd_layer_note(args: argparse.Namespace) -> int:
             record = layer_note_record({"node": node, "unit": target.unit, "title": target.title, "retracted": True,
                                         "supersedes_id": target.note_id, "sections": {}, "claims": []},
                                        created_at=stamp, author=target.author)
+        # 唯一的寫入入口（R2 C1）：先在 registry 副本上預演 watch 登記，失敗就整筆拒收、ledger 不動
         try:
-            path = append_note_record(record)
+            result = write_note(record)
         except AlphaError as exc:
             print(f"✗ {exc}", file=sys.stderr)
             return 2
-        print(f"✓ {record['note_id']}（{record['unit']}）→ {path}")
-        return _register(record)
+        print(f"✓ {record['note_id']}（{record['unit']}）→ {result['path']}")
+        print(f"  主張 watch 新登 {len(result['registered'])}、舊版條件收掉 {len(result['consumed'])}")
+        return 0
 
     if getattr(args, "register_watches", False):
         current = select_current(records)
@@ -724,11 +726,12 @@ def cmd_layer_note(args: argparse.Namespace) -> int:
     for r in records:
         mark = "▶ 現行" if current is not None and r.note_id == current.note_id else (
             "撤回" if r.retracted else "已被取代")
+        day = r.created_at.date().isoformat()
         if r.retracted:
-            print(f"- {r.note_id}｜{r.created_at[:10]}｜{mark}（撤回 {r.supersedes_id}）")
+            print(f"- {r.note_id}｜{day}｜{mark}（撤回 {r.supersedes_id}）")
             continue
         levels = sorted({c.evidence for s in r.sections.values() for c in s.citations})
-        print(f"- {r.note_id}｜{r.created_at[:10]}｜{mark}｜{r.title}｜重讀日 {r.expires}｜主張 {len(r.claims)} 條｜"
+        print(f"- {r.note_id}｜{day}｜{mark}｜{r.title}｜重讀日 {r.expires}｜主張 {len(r.claims)} 條｜"
               f"段：{'、'.join(SECTION_LABELS[k] for k in r.sections)}｜證據等級：{'、'.join(EVIDENCE_LABELS[x] for x in levels)}")
     if errors:
         print(f"⚠ 解析失敗 {len(errors)} 行：" + "；".join(errors[:3]))

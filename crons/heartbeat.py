@@ -842,6 +842,7 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
                     f"其中 **{triggers['n']} 份同時是 disproof 觸發**（供給側多一家／反向路徑變動）："
                     + "、".join(str(n) for n in (triggers.get("nodes") or [])[:5])
                     + "——thesis 要不要改由人決定，系統只標記")
+    section.lines.extend(_layer_note_lines(now=now))
 
     # ⚠ 2026-09-23（Phase 0 Step 0b.1b，C／H 組）：原本這裡印「目標倍數背離 N 檔」（估值假設 ledger 的
     # target_pe 對今天的市場倍數）。目標倍數隨估值鏈退役；2026-09-29（Step 3.6）起由三題的有值／缺席計數取代。
@@ -858,6 +859,32 @@ def build_changes(*, now: datetime, state_dir: Path | None, thesis_path: Path,
             line += "：" + "、".join(str(w) for w in warnings)
         section.lines.append(line)
     return section
+
+
+def _layer_note_lines(*, now: datetime) -> list[str]:
+    """層說明（2026-10-07 個股頁 plan S4a，R2 C2）：份數與逐節點的「該重讀」——**不依賴結構讀圖**（轉換型節點
+    永遠沒有讀圖）；理由四種：整份重讀日已過、主張到期未處置、主張被判觸及未處置、主張沒有 watch 在盯。
+    0 也印（常駐計數器，L14）；讀不到就說讀不到，不印 0（INV-3）。"""
+    try:
+        from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
+        from engine_b import event_watch as ew
+
+        notes = current_notes()
+        rows = layer_note_reread_rows(notes, ew.load_watches().get("watches") or [],
+                                      today=ew._today(now))
+    except Exception as exc:  # noqa: BLE001 — 這一行讀不到不帶走整段
+        return [f"層說明：讀不到（{type(exc).__name__}）——該重讀未算"]
+    if not notes:
+        return ["層說明：一份都還沒寫（`python -m alpha layer-note <node> --add`）"]
+    line = f"層說明 {len(notes)} 份｜**該重讀 {len(rows)}**"
+    if rows:
+        line += "：" + "、".join(r["node"] for r in rows[:5]) + ("…" if len(rows) > 5 else "")
+    lines = [line]
+    for row in rows[:10]:
+        reasons = list(row["reasons"])
+        lines.append(f"  {row['node']} 層說明該重讀：" + "；".join(reasons[:3])
+                     + (f"（另 {len(reasons) - 3} 條）" if len(reasons) > 3 else ""))
+    return lines
 
 
 def _disproof_lines() -> list[str]:
@@ -1856,6 +1883,8 @@ SNAPSHOT_KEYS: dict[str, str] = {
     "pq2.source_trace_review": "等你提供的文件",
     **{f"lead.{s}": f"lead {s}" for s in LEAD_STATUSES},
     "reading.current": "讀圖現行", "reading.needs_reread": "讀圖該重讀",
+    # 層說明（2026-10-07 個股頁 S4a）：第一份寫下、第一次該重讀的那天，較昨 diff 看得到
+    "layer_note.current": "層說明現行", "layer_note.reread": "層說明該重讀",
     # 走圖九型各自的命中（Phase 2 Step 2.6）——由封閉字彙導出，不抄一份（L16）；各自一鍵、不加總。
     **{f"walk.{q.key}": f"走圖 {q.short}" for q in WALK_QUESTION_TYPES},
     **{f"thesis.{s}": f"thesis {s}" for s in THESIS_STATUSES},
@@ -1935,6 +1964,14 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
             return {}
         return {"reading.current": (payload.get("counts") or {}).get("current"),
                 "reading.needs_reread": (payload.get("needs_reread") or {}).get("n")}
+
+    def layer_notes() -> dict[str, Any]:
+        from alpha.providers.layer_notes import current_notes, layer_note_reread_rows
+        from engine_b import event_watch as ew
+
+        notes = current_notes()
+        rows = layer_note_reread_rows(notes, ew.load_watches().get("watches") or [], today=ew._today(now))
+        return {"layer_note.current": len(notes), "layer_note.reread": len(rows)}
 
     def walk() -> dict[str, Any]:
         payload, absence = _load_state(state_dir, "graph_walk")
@@ -2038,8 +2075,8 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
         return {"predictions.held": counts.get("held"), "predictions.wrong": table.get("wrong_total"),
                 "predictions.expired_unread": counts.get("expired_unread")}
 
-    for fn in (watches, t2, pq2, lead_states, readings, walk, thesis, disproof_counts, confirm_counts, prescreen, radar,
-               captures, tiers, candidates, positions, predictions):
+    for fn in (watches, t2, pq2, lead_states, readings, layer_notes, walk, thesis, disproof_counts, confirm_counts,
+               prescreen, radar, captures, tiers, candidates, positions, predictions):
         guard(fn)
     return values
 

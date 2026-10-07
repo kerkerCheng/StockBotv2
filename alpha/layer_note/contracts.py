@@ -15,9 +15,13 @@
 之後要加段是**加字**（`SECTION_KEYS` 加一個鍵），不是搬資料（L2：表的形狀鎖死、字彙留鬆）。
 
 **證據等級**：圖外的研究內容用封閉字彙（brainstorm §5.2）「一手／學理／產業報告／推一步／共識／媒體／沒有」；
-圖上的內容沿用 `evidence_class`，兩者不另造第三套。**每句有出處或標「推一步」**——出處只認 `raw:<SourceDoc id>`
-（`library/raw/<id>.txt`）或 `lead:<lead id>`，「推一步」與「沒有」可以不附出處但必須標明。出處指不指得回去由寫入端
+圖上的內容沿用 `evidence_class`，兩者不另造第三套。**每句有出處或標「推一步」**——出處只認 `raw:<library/raw 檔名>`
+或 `lead:<lead id>`，「推一步」與「沒有」可以不附出處但必須標明。出處指不指得回去由寫入端
 （`alpha/providers/layer_notes.py`）機械核對；本檔只驗形狀（與 `alpha/structure_reading/contracts.py` 同一個分工）。
+⚠ 圖上的 SourceDoc id 可能與 library/raw 的檔名不一致（2026-10-07 遷移時查到 1 例）——引用一律用**檔名**。
+
+**現行（`select_current`）**：同一個節點**最新一筆**就是現行；最新一筆是撤回＝沒有現行（不讓更早的版本「復活」——
+那一份的 watch 早在換版時收掉了，復活會變成沒人盯的現行；R2 F3）。與讀圖的選法一致。
 """
 from __future__ import annotations
 
@@ -25,14 +29,14 @@ import hashlib
 import json
 import re
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from alpha.errors import ContractViolation
 
 RECORD_VERSION = "layer-note/v1"
 
-#: 這份說明掛在哪種單位上：一個層（節點）或一個技術轉換（例：可插拔 → CPO）。
+#: 這份說明掛在哪種單位上：一個層（節點）或一個技術轉換（例：可插拔 → CPO；id 用 `transition:` 前綴）。
 UNITS: tuple[str, ...] = ("layer", "transition")
 
 #: 四段裡的前三段（文字＋出處）。第四段是 `claims[]`。**封閉字彙**——未登記的段鍵拒收。
@@ -51,8 +55,16 @@ EVIDENCE_LABELS: Mapping[str, str] = {
 }
 #: 可以不附出處的兩級（「推一步」要寫出是從哪裡推的，但那是文字，不是出處）。
 _REF_OPTIONAL: frozenset[str] = frozenset({"inference", "none"})
-#: 出處只認這兩種：SourceDoc（library/raw）與 lead registry。網址不算——網址會死、也不經過入庫紀律（L11、L18）。
+#: 出處只認這兩種：library/raw 的檔名與 lead registry。網址不算——網址會死、也不經過入庫紀律（L11、L18）。
 CITATION_PREFIXES: tuple[str, ...] = ("raw:", "lead:")
+
+#: 每一層物件允許的鍵（**未知鍵拒收**——例：出處多寫 `page` 會被靜默丟掉，R2 INFO；L16 形狀封閉）。
+_CITATION_KEYS = frozenset({"evidence", "ref", "quote"})
+_SECTION_FIELD_KEYS = frozenset({"text", "citations"})
+_CLAIM_KEYS = frozenset({"claim", "condition", "entities", "check_frequency", "action_48h", "evidence",
+                         "citations", "expires"})
+_SPEC_KEYS = frozenset({"node", "unit", "title", "expires", "reread_reason", "sections", "claims", "supersedes_id",
+                        "retracted", "body_ref", "author"})
 
 #: 節點或轉換 id 的形狀：`前綴:snake_case`（轉換用 `transition:` 前綴）。
 _NODE_RE = re.compile(r"^[a-z]+:[a-z0-9][a-z0-9_]*$")
@@ -61,6 +73,23 @@ MIN_CLAIM_CHARS = 20
 
 _ID_FIELDS = ("record_version", "node", "unit", "title", "created_at", "author", "expires", "reread_reason",
               "sections", "claims", "supersedes_id", "retracted", "body_ref")
+
+
+def _unknown(raw: Mapping[str, Any], allowed: frozenset[str], where: str) -> None:
+    extra = sorted(set(raw) - allowed)
+    if extra:
+        raise ContractViolation(f"{where} 有未登記的欄位 {extra}——不收（會被靜默丟掉的欄位不如一開始就拒收）")
+
+
+def _utc(value: Any) -> datetime:
+    """寫入時間：必須是帶時區的 ISO 時間，統一換成 UTC（R2 F5：字串比大小會把不同時區排錯）。"""
+    try:
+        stamp = value if isinstance(value, datetime) else datetime.fromisoformat(str(value))
+    except ValueError as exc:
+        raise ContractViolation(f"created_at 不是 ISO 時間：{value!r}") from exc
+    if stamp.tzinfo is None:
+        raise ContractViolation(f"created_at 必須帶時區：{value!r}")
+    return stamp.astimezone(timezone.utc)
 
 
 @dataclass(frozen=True, slots=True)
@@ -77,7 +106,7 @@ class Citation:
         if self.ref is None:
             if self.evidence not in _REF_OPTIONAL:
                 raise ContractViolation(
-                    f"citation 證據等級是「{EVIDENCE_LABELS[self.evidence]}」就必須附出處（raw:<SourceDoc id> 或 lead:<id>）")
+                    f"citation 證據等級是「{EVIDENCE_LABELS[self.evidence]}」就必須附出處（raw:<檔名> 或 lead:<id>）")
         elif not str(self.ref).startswith(CITATION_PREFIXES) or len(str(self.ref).split(":", 1)[1].strip()) < 4:
             raise ContractViolation(f"citation.ref 只認 {list(CITATION_PREFIXES)} 開頭：{self.ref!r}")
 
@@ -95,6 +124,7 @@ def _citations(raw: Any, where: str) -> tuple[Citation, ...]:
     for item in raw or ():
         if not isinstance(item, Mapping):
             raise ContractViolation(f"{where}.citations 的每一項必須是 object")
+        _unknown(item, _CITATION_KEYS, f"{where}.citations")
         ref = item.get("ref")
         quote = item.get("quote")
         out.append(Citation(evidence=str(item.get("evidence") or ""),
@@ -162,6 +192,7 @@ def _claims(raw: Any) -> tuple[Claim, ...]:
     for index, item in enumerate(raw or (), 1):
         if not isinstance(item, Mapping):
             raise ContractViolation("claims 的每一條必須是 object")
+        _unknown(item, _CLAIM_KEYS, f"claims[{index}]")
         expires = item.get("expires")
         out.append(Claim(
             claim=str(item.get("claim") or ""), condition=str(item.get("condition") or ""),
@@ -179,7 +210,7 @@ class LayerNote:
     node: str
     unit: str
     title: str
-    created_at: str
+    created_at: datetime
     author: str
     expires: date | None
     reread_reason: str
@@ -195,6 +226,8 @@ class LayerNote:
             raise ContractViolation(f"node 的形狀必須是 前綴:snake_case：{self.node!r}")
         if self.unit not in UNITS:
             raise ContractViolation(f"unit 未登記：{self.unit!r}；已知 {list(UNITS)}")
+        if (self.unit == "transition") != self.node.startswith("transition:"):
+            raise ContractViolation("unit=transition 與 transition: 前綴必須一起出現（一個轉換不是一個層）")
         if self.supersedes_id is not None and not str(self.supersedes_id).startswith("ln_"):
             raise ContractViolation(f"supersedes_id 必須是 ln_*：{self.supersedes_id!r}")
         if self.retracted:
@@ -205,13 +238,20 @@ class LayerNote:
             raise ContractViolation("title 必填")
         if self.expires is None:
             raise ContractViolation("expires（重讀日）必填——每份層說明都要有到期（INV-2）")
+        if self.expires <= self.created_at.date():
+            raise ContractViolation("expires（重讀日）必須晚於寫入日——寫下時就已經過去的等待不是等待")
         if not str(self.reread_reason).strip():
             raise ContractViolation("reread_reason 必填：到期時要重看什麼")
         missing = [SECTION_LABELS[k] for k in SECTION_KEYS if k not in self.sections]
         if missing:
             raise ContractViolation(f"缺段：{'、'.join(missing)}")
-        if self.body_ref is not None and not str(self.body_ref).startswith("library/private/research_notes/"):
-            raise ContractViolation("body_ref 只能指向 library/private/research_notes/ 底下的全文")
+        for claim in self.claims:
+            if claim.expires is not None and claim.expires <= self.created_at.date():
+                raise ContractViolation("claims[].expires 必須晚於寫入日")
+        if self.body_ref is not None:
+            ref = str(self.body_ref).replace("\\", "/")
+            if not ref.startswith("library/private/research_notes/") or ".." in ref.split("/"):
+                raise ContractViolation("body_ref 只能指向 library/private/research_notes/ 底下的全文（不得用 .. 穿出）")
 
     @property
     def current_claim_refs(self) -> tuple[str, ...]:
@@ -219,7 +259,10 @@ class LayerNote:
 
 
 def new_note_id(payload: Mapping[str, Any]) -> str:
-    """content-addressed id：同一份內容永遠得到同一個 id（重複 append 可被偵測）。"""
+    """content-addressed id：**同一筆紀錄**（含寫入時間）永遠得到同一個 id——改內容即對不上（防竄改）。
+
+    ⚠ id 含 `created_at`：同樣的內容在不同時間寫兩次是兩個 id（與讀圖同一個設計）；重複寫入不靠 id 擋，
+    靠「同節點最新一筆才是現行、舊的條件換版時收掉」。"""
     body = {k: payload.get(k) for k in _ID_FIELDS}
     canonical = json.dumps(body, ensure_ascii=False, sort_keys=True, separators=(",", ":"), default=str)
     return "ln_" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
@@ -228,13 +271,18 @@ def new_note_id(payload: Mapping[str, Any]) -> str:
 def layer_note_record(spec: Mapping[str, Any], *, created_at: datetime | str | None = None,
                       author: str = "session") -> dict[str, Any]:
     """spec（研究 session 寫的 JSON）→ 驗證過、帶 `note_id` 的 ledger 紀錄。任何一處不合形狀就整筆拒收。"""
-    stamp = created_at.isoformat() if isinstance(created_at, datetime) else (created_at or datetime.now().astimezone().isoformat())
+    _unknown(spec, _SPEC_KEYS, "spec")
+    stamp = _utc(created_at if created_at is not None else datetime.now(timezone.utc)).isoformat()
     sections_raw = spec.get("sections") or {}
     if not isinstance(sections_raw, Mapping):
         raise ContractViolation("sections 必須是 object（段鍵 → {text, citations}）")
     unknown = sorted(set(sections_raw) - set(SECTION_KEYS))
     if unknown:
         raise ContractViolation(f"段鍵未登記：{unknown}；已知 {list(SECTION_KEYS)}")
+    for key, value in sections_raw.items():
+        if not isinstance(value, Mapping):
+            raise ContractViolation(f"sections.{key} 必須是 object（text、citations）")
+        _unknown(value, _SECTION_FIELD_KEYS, f"sections.{key}")
     record: dict[str, Any] = {
         "record_version": RECORD_VERSION,
         "node": str(spec.get("node") or "").strip(),
@@ -244,8 +292,8 @@ def layer_note_record(spec: Mapping[str, Any], *, created_at: datetime | str | N
         "author": author,
         "expires": str(spec.get("expires"))[:10] if spec.get("expires") else None,
         "reread_reason": str(spec.get("reread_reason") or ""),
-        "sections": {k: {"text": str((v or {}).get("text") or ""),
-                         "citations": [c.as_dict() for c in _citations((v or {}).get("citations"), k)]}
+        "sections": {k: {"text": str(v.get("text") or ""),
+                         "citations": [c.as_dict() for c in _citations(v.get("citations"), k)]}
                      for k, v in sections_raw.items()},
         "claims": [c.as_dict() for c in _claims(spec.get("claims"))],
         "supersedes_id": spec.get("supersedes_id") or None,
@@ -270,7 +318,7 @@ def parse_layer_note_record(raw: Mapping[str, Any]) -> LayerNote:
     expires = raw.get("expires")
     note = LayerNote(
         note_id=str(raw.get("note_id") or ""), node=str(raw.get("node") or ""), unit=str(raw.get("unit") or ""),
-        title=str(raw.get("title") or ""), created_at=str(raw.get("created_at") or ""),
+        title=str(raw.get("title") or ""), created_at=_utc(raw.get("created_at")),
         author=str(raw.get("author") or ""),
         expires=date.fromisoformat(str(expires)[:10]) if expires else None,
         reread_reason=str(raw.get("reread_reason") or ""), sections=sections, claims=_claims(raw.get("claims")),
@@ -283,11 +331,11 @@ def parse_layer_note_record(raw: Mapping[str, Any]) -> LayerNote:
 
 
 def select_current(records: Sequence[LayerNote]) -> LayerNote | None:
-    """一個節點的現行層說明：最新一份、沒有被取代、沒有被撤回。沒有就回 None（不猜）。"""
-    superseded = {r.supersedes_id for r in records if r.supersedes_id}
-    retracted = {r.supersedes_id for r in records if r.retracted and r.supersedes_id}
-    live = [r for r in records if not r.retracted and r.note_id not in superseded and r.note_id not in retracted]
-    return max(live, key=lambda r: r.created_at) if live else None
+    """一個節點的現行層說明：**最新一筆**；最新一筆是撤回＝沒有現行（不讓舊版復活，見模組 docstring）。"""
+    if not records:
+        return None
+    latest = max(records, key=lambda r: (r.created_at, r.note_id))
+    return None if latest.retracted else latest
 
 
 __all__ = [

@@ -994,7 +994,7 @@ _WATCHES_AUTHORITY = {
 WAKE_STATE_LABELS = {
     "watching": "有機制在等（具名標的還沒全部觸發過）",
     "stalled": "停滯——具名標的都觸發過一輪，只剩到期日或主動輪詢能救它",
-    "expired": "等待已到期——追源型由 daily 轉終局並計數；thesis／讀圖的反證併進複查與重讀；只有假設型等才進 pq2 watch_decision",
+    "expired": "等待已到期——追源型由 daily 轉終局並計數；thesis／讀圖的反證併進複查與重讀、層說明的主張併進換版；只有假設型等才進 pq2 watch_decision",
     "unwatched": "**沒有任何機制在等它**——唯一真正的黑洞，必須當場處置",
 }
 

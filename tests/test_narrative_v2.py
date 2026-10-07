@@ -276,6 +276,22 @@ def test_a_condition_already_watched_is_linked_not_registered_twice(tmp_path: Pa
     assert len(ctx.watches["watches"]) == 1          # 搬讀圖反證不產生第二筆 watch
 
 
+def test_a_condition_already_watched_by_a_layer_note_is_linked_too(tmp_path: Path) -> None:
+    """2026-10-07 S4a（R2 M10）：層說明主張在盯的條件——敘事同條件只准連結，不登第二筆（同一條件會被叫醒兩次）。"""
+    ctx = _ctx()
+    cond = "若任一 IDM 公告自建磊晶產能足以自給、不再外包磊晶，則外包磊晶放量的論點不成立並需要重讀"
+    ref = "layer_note:ln_aaaaaaaaaaaaaaaa#1"
+    existing = ew.add_watch(ctx.watches, kind=ew.SEMANTIC_KIND, disproof_ref=ref, source_ref=ref, expires=FAR,
+                            entities=[CO], condition=cond, check_frequency="每季", action_48h="重讀",
+                            node="mat:inp_epiwafer")
+    with pytest.raises(ContractViolation, match="只填 link_source_ref"):
+        _write(tmp_path, _record(disproof=[_disproof(condition=cond, source=READ)]), ctx)
+    out = _write(tmp_path, _record(disproof=[_disproof(condition=cond, source=READ,
+                                                       link_source_ref=existing["source_ref"])]), ctx)
+    assert out["registered"] == [] and out["linked"] == [ref]
+    assert len(ctx.watches["watches"]) == 1
+
+
 def test_open_is_refused_while_an_attributed_watch_waits_for_judgment(tmp_path: Path) -> None:
     ctx = _ctx()
     w = ew.add_watch(ctx.watches, kind=ew.SEMANTIC_KIND, disproof_ref=f"reading:{READ}#2",
