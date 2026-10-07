@@ -1,0 +1,28 @@
+SOURCE: X-FAB Silicon Foundries SE — "X-FAB Second Quarter 2026 Results"（Intermediate declaration by the Board of Directors；Regulatory News，Business Wire）
+URL: https://www.finanznachrichten.de/nachrichten-2026-07/69173292-x-fab-silicon-foundries-se-x-fab-second-quarter-2026-results-004.htm
+PUBLISHED: 2026-07-30（Business Wire 30.07.2026 17:42 Uhr）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（發行人法定公告有限節錄；HTML 轉文字後逐字照抄）
+NOTE: 發行人自己的季報公告（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（XFAB.PA）用。整份沒有任何一家資料中心或 CPO 客戶的名字；光子「量產預計 2028 年開始」。
+
+Highlights Q2 2026:
+"Revenue was USD 199.8 million, down 7% year-on-year (YoY) and up 2% quarter-on-quarter (QoQ)"
+"Several data center design wins across diverse technologies"
+
+Revenue breakdown per quarter（in millions of USD；Q2 2026 / Q2 y-o-y growth）：
+Automotive 116.0（-19%）；Industrial 45.2（-4%）；Medical 21.0（39%）；Subtotal core business 182.1（-11%，92.9%）；CCC 13.5（11%）；Revenue* 196.0；Total revenue 199.8（-7%）
+Smart CMOS SOI 156.7（-15%）；Microsystems Photonics 28.7（14%；"Photonics revenue included as from Q1 2026"）；Wide-bandgap technologies 10.6（34%；"SiC and GaN; GaN revenue included as from Q1 2026"）
+
+Business development:
+"Industrial revenue in the second quarter amounted to USD 45.2 million*, down 4% year-on-year and down 13% quarter-on-quarter, with the sequential decline primarily driven by temporary order volatility from a major silicon carbide customer, which is expected to recover in the third quarter."
+"X-FAB's technology portfolio addresses key data center infrastructure applications, including power management, protection devices, monitoring sensors, optical connectivity, cooling actuators, and timing ICs. In the second quarter, X-FAB saw a growing number of data center opportunities in smart CMOS and SOI technologies, complemented by three silicon carbide design wins. Across its business units Smart CMOS SOI, Microsystems Photonics, and Wide Bandgap X-FAB expects data center applications to become an increasingly important growth driver over the coming years with a long-term annual revenue potential of approximately USD 300 million."
+"In addition to the anticipated automotive recovery and data center opportunities, market dynamics including strong AI-related demand in combination with the reallocation of 8-inch CMOS fabs in Asia to AI applications are creating further opportunities for X-FAB, supported by available capacity."
+"X-FAB also advanced in the development of photonics applications and saw strong traction for customer-specific opportunities across co-packaged optics, quantum computing, AR/VR, and data communications. Photonics volume production is expected to begin in 2028."
+"In June 2026, X-FAB secured EUR 127.4 million in public funding under the EU Chips Act to expand its microsystems and photonics manufacturing at its Erfurt site in Germany (see press announcement here). The new facility, which is scheduled to begin initial production by the end of 2028, is essential to meet existing customer demand in X-FAB's fastest-growing business."
+"Second-quarter wide bandgap revenue was USD 10.6 million*, up 34% year-on-year and down 30% quarter-on-quarter. The sequential decline was mainly due to temporary order volatility from one customer, while underlying momentum remained positive, with SiC prototyping activities continuing to grow. Looking ahead, the transition toward 800V power distribution in data centers is expected to support demand for both SiC and GaN technologies, strengthening the long-term growth prospects of X-FAB's wide bandgap business."
+
+Financial update:
+"Cash and cash equivalents totaled USD 163.6 million at the end of the quarter, while net debt amounted to USD 312.3 million, up USD 20.9 million from the previous quarter."
+
+Outlook:
+"Q3 2026 revenue is expected to come in within the range of USD 195-205 million with an EBITDA margin in the range of 17-20%."

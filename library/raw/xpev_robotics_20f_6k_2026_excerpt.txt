@@ -1,0 +1,21 @@
+SOURCE: XPeng Inc.（NYSE: XPEV；HKEX: 9868）——三份 SEC 申報的機器人段落節錄：①Form 20-F（FY2025，2026-04-16，accession 0001193125-26-157849）②Form 6-K Exhibit 99.1「Discloseable Transaction and Connected Transaction in relation to the Subscription, the Grant of the Redemption Rights and the Adoption of the Dogotix 2026 Equity Incentive Plan」（2026-08-24，accession 0001193125-26-361758）③Form 6-K Exhibit 99.1「XPENG Reports Second Quarter 2026 Unaudited Financial Results」（2026-08-25，accession 0001193125-26-364050）
+URL: ① https://www.sec.gov/Archives/edgar/data/1810997/000119312526157849/d36361d20f.htm ② https://www.sec.gov/Archives/edgar/data/1810997/000119312526361758/d46050dex991.htm ③ https://www.sec.gov/Archives/edgar/data/1810997/000119312526364050/d75446dex991.htm
+PUBLISHED: ① 2026-04-16 ② 2026-08-24 ③ 2026-08-25（EDGAR filingDate）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（發行人法定申報有限節錄；HTML 轉文字後逐字照抄）
+NOTE: 發行人自己的申報（自述）。Phase 7 Step 7.1 段 5「坐哪一層」短檢查（XPEV）用：它的機器人業務是人形整機（研發、尚無營收揭露），在零組件那幾層是買方。
+
+① 20-F（FY2025）：
+"In September 2023, we entered into share purchase agreements to acquire shares of Dogotix, which has been dedicated to research and development of robots with human-robot interaction functions since its incorporation."
+"(ii) Dogotix Inc. (“Dogotix”) is primarily engaged in research and development of robots with human-robot interaction functions since 2021. ... Substantially all of the fair value of the gross assets ... acquired was concentrated in the robotics platform technology. The acquisition was determined to be an asset acquisition for accounting purposes. The Group accounted for the acquisition of the robotics platform technology as an intangible asset with a total cost of RMB 778 million."
+
+② 6-K Exhibit 99.1（2026-08-24）：
+"pursuant to which (1) XPeng Dogotix conditionally agreed to subscribe for an aggregate of 98,675,200 Dogotix Series A Preferred Shares to be newly issued by Dogotix at an aggregate purchase price of US$200 million, (2) the Investors conditionally agreed to subscribe for an aggregate of 296,025,600 Dogotix Series A Preferred Shares to be newly issued by Dogotix at an aggregate purchase price of US$600 million, and (3) the Executive Subscribers conditionally agreed to subscribe for (i) an aggregate of 49,337,600 Dogotix Ordinary Shares to be newly issued by Dogotix at an aggregate purchase price of US$100 million ..."
+"This round of equity financing of Dogotix contemplated under the Dogotix Share Purchase Agreement was initiated by leading global investment institutions and led by IDG Capital, with participation from Gaorong Ventures and support from Tencent and Alibaba as strategic investors."
+"The purchase price for the Dogotix Series A Preferred Shares payable by XPeng Dogotix and the Investors represents an implied pre-transaction valuation of Dogotix of US$5 billion ... and an implied post-transaction valuation of Dogotix of US$6.3 billion"
+"“XPeng Robotics Business” research, design, development, manufacturing, licensing, commercialization and operation of general purpose robots and robotic systems capable of autonomously or adaptively perceiving, understanding, navigating, manipulating, controlling or otherwise interacting with the physical environment in the forms of humanoid, animaloid, bipedal, wheeled-bipedal, quadrupedal or tracked robots or robotic systems ..."
+"(c) the Subscription will provide Dogotix with a significant amount of capital to fund the research and development and commercialisation of humanoid ..."
+
+③ 6-K Exhibit 99.1（2026-08-25，第二季財報新聞稿）：
+"“The development of the mass-production version of XPENG’s humanoid robot has recently reached several significant milestones. I believe XPENG will not only build one of China’s most valuable humanoid robotics companies, but also become a global leader in physical AI, spearheading the large-scale adoption and commercialization of advanced general-purpose humanoid robots and autonomous driving technologies in China and overseas.”"
+"Through in-house R&D, XPENG has developed a full-stack Physical AI architecture spanning Turing AI chips, world foundation models, and highly integrated software and hardware applications. This unified technology foundation of XPENG powers an expansive product portfolio of smart EVs, robotaxis, and humanoid robots, advancing the deployment of Physical AI at scale."

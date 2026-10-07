@@ -1,0 +1,36 @@
+SOURCE: Silex Microsystems AB (publ)（Nasdaq Stockholm: SILEX）——Interim report January-June 2026（PDF，22 頁）
+URL: https://storage.mfn.se/c0953113-ba73-40a7-bfb4-a789af0023b2/silex-q2-2026-interim-report.pdf（發布頁：https://www.silexmicrosystems.com/en/silex-microsystems-interim-report-for-the-second-quarter-2026-strong-growth-and-profitability/）
+PUBLISHED: 2026-07-17 07:30 CEST（Regulatory；EU MAR 公告）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（發行人法定季報有限節錄；pypdf 抽字、逐字照抄；表格抽字時欄位黏在一起，下面照抽字順序抄、括號內是欄名）
+NOTE: 發行人自己的季報（自述）。Phase 7 Step 7.1 段 5 廣度短敘事（SILEX.ST）用。整份沒有任何客戶名字，也沒有寫 OCS 占營收多少；「optical switches」只出現在 CEO 段與營收說明的 telecom 終端市場。
+
+p.2 April-June 2026：
+"Net sales amounted to SEKm 393 (309), corresponding to a growth of 27.3% (3.4)."
+"Operating profit (EBIT) amounted to SEKm 134 (56), corresponding to an EBIT margin of 34.0% (18.1)."
+"Net debt amounted to SEKm -979 (102)."
+"On May 7, Silex Microsystems AB’s (Silex) share was listed on Nasdaq Stockholm. In connection with the listing, 12,345,679 new ordinary shares were issued, generating gross proceeds of SEKm 1,000 before transaction costs of SEKm 39."
+"After the end of the period, on July 7, Silex entered into an agreement to acquire a semiconductor facility in Pennsylvania, USA. The purchase price amounted to USDm 40, of which USDm 10 was paid upon signing. ... Completion of the transaction is expected around the turn of the year 2027/2028 and is subject to regulatory approvals in the United States."
+Financial overview（R12＝Jul–Jun）："Net sales393 309 768 643 1,510 1,385"（Apr-Jun 2026／2025、Jan-Jun 2026／2025、R12、Jan-Dec 2025）；"Earnings per share after dilution, in SEK²0.94 0.42 1.92 1.11 3.59 2.91"
+
+p.3 CEO comments（Edvard Kälvesten）：
+"We continue to see stable and growing demand across all Silex’s geographic and end markets. Customer interest was particularly strong for optical switches in data centers within the end market telecom in North America."
+"After the end of the quarter, and two months after the listing on Nasdaq Stockholm, Silex entered into a binding agreement with the U.S. semiconductor manufacturer Onsemi to acquire a semiconductor fab in Mountain Top, Pennsylvania, USA."
+"This is an important step in our strategy to get closer to our largest customers, expand our production capacity, shorten lead times and reduce geopolitical exposure."
+"The objective is for the facility to reach EBIT break-even between 2029 and 2030 and to achieve revenue and profitability levels comparable to those of Silex's Swedish 200 mm facility in 2025 by 2034."
+"The expansion of the cleanroom in Järfälla is progressing according to plan and is expected to increase capacity by approximately 35%."
+
+p.4 Group performance, net sales：
+"Net sales from development projects increased by SEKm 61 compared with the corresponding quarter last year, while production projects accounted for SEKm 23 of the total increase."
+"Continued strong demand for AI and optical switches among the Company's customers contributed to growth in the telecom end market, which accounted for SEKm 34, or 34.5%, of the total increase."
+"Geographically, growth was primarily driven by North America, where net sales increased by SEKm 70 compared with the corresponding quarter last year."
+
+p.18 Net sales by end market（SEKm；Apr-Jun 2026／2025、Jan-Jun 2026／2025、R12、Jan-Dec 2025）：
+"Industrials & Automotive7573170168375373Life Science & Medical714213784228175Consumer11294223191446414Telecom134100239199462423Total 393 309 768 643 1,510 1,385"
+→ Telecom：134／100（Q2）、239／199（H1）、462（R12）、423（2025）
+同頁 by geography："North America240170460345865751"（Q2 240／170、H1 460／345、R12 865、2025 751）
+同頁 by project type："Development projects201140392274732614 Production projects192168377369778771"
+
+p.22 Financial calendar：
+"Interim report Q3 2026 4 November 2026"
+"Year-end report 2026 18 February 2027"

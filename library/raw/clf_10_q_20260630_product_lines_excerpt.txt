@@ -1,0 +1,19 @@
+SOURCE: Cleveland-Cliffs Inc. Form 10-Q（quarter ended 2026-06-30）— Note 3 Revenues by product line；MD&A Steel shipments by product／Steelmaking revenues by market
+URL: https://www.sec.gov/Archives/edgar/data/764065/000076406526000100/clf-20260630.htm
+PUBLISHED: 2026-07-23（EDGAR filed；同一份 10-Q 的 MD&A 電工鋼段另見 library/raw/clf_10_q_20260630_electrical_steel.txt）
+RETRIEVED: 2026-10-07
+STORAGE: repo_excerpt（美國 SEC 法定申報有限節錄；HTML 轉文字、空白攤平後逐字照抄）
+NOTE: 發行人申報（自述）。Phase 7 Step 7.1 段 5 廣度短敘事（CLF）與電工鋼層判讀用：電工鋼與不鏽鋼合併成一個產品線，GOES 沒有單獨揭露。
+
+Note 3 Revenues by product line（In millions；Three Months Ended June 30, 2026 / 2025；Six Months Ended June 30, 2026 / 2025）：
+"Steelmaking Hot-rolled steel $ 1,539 $ 1,332 $ 2,949 $ 2,498 Cold-rolled steel 660 645 1,297 1,236 Coated steel 1,532 1,392 2,963 2,753 Stainless and electrical steel 525 434 990 878 Plate steel 253 275 507 522 Other steel products 16 276 124 523 Other 527 417 979 828 Total Steelmaking 5,052 4,771 9,809 9,238 Other Businesses Other 174 163 339 325 Total revenues $ 5,226 $ 4,934 $ 10,148 $ 9,563"
+
+MD&A Steel shipments by product（In thousands of net tons；Three Months 2026 / 2025 / % Change；Six Months 2026 / 2025 / % Change）：
+"Steel shipments by product: Hot-rolled steel 1,824 1,727 6 % 3,622 3,420 6 % Cold-rolled steel 614 627 (2) % 1,231 1,235 — % Coated steel 1,240 1,142 9 % 2,427 2,265 7 % Stainless and electrical steel 159 135 18 % 302 277 9 % Plate 172 217 (21) % 362 420 (14) % Slab and other steel products 16 442 (96) % 189 813 (77) % Total steel shipments by product 4,025 4,290 (6) % 8,133 8,430 (4) %"
+
+MD&A Steelmaking revenues by market：
+"Direct automotive $ 1,461 $ 1,249 17 % $ 2,829 $ 2,546 11 % Infrastructure and manufacturing 1,427 1,489 (4) % 2,801 2,843 (1) % Distributors and converters 1,638 1,433 14 % 3,101 2,661 17 % Steel producers 526 600 (12) % 1,078 1,188 (9) % Total Steelmaking revenues by market $ 5,052 $ 4,771 6 % $ 9,809 $ 9,238 6 %"
+"The increase was primarily driven by higher steel pricing, favorable sales mix, and improved non-steel product revenue, partially offset by lower steel product shipment volumes: • Higher steel pricing: Steel product revenue increased by approximately $240 million due to rising pricing, particularly for hot-rolled steel, which increased our average selling price to $1,124 per net ton of steel"
+
+MD&A Overview（Section 232）：
+"This proclamation also added new steel derivative products, including certain types of transformers, while simplifying the steel derivative product tariff regime."
