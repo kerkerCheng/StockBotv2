@@ -329,49 +329,106 @@ def _ensure_drive_folder(service) -> str:
     return created["id"]
 
 
-def upload_backup_to_drive(zip_path: Path) -> dict:
-    """上傳一份 zip 並做雲端 rotation。回傳寫進 status 的 drive dict。"""
+#: Drive 暫時性錯誤的重試間隔（秒）——2026-10-07 daily ⑯ 撞到 Google 端 HTTP 500「Internal Error」，手動補傳一次就過。
+#: 只重試暫時性的（429／5xx、連線中斷、逾時）；授權錯誤（RefreshError）與其他 4xx 不重試——那要人處理，重試只會拖時間。
+#: 最壞情況多花約 40 秒＋兩次上傳時間，在 ⑯ 的 15 分鐘時限內。
+DRIVE_RETRY_DELAYS_SECONDS: tuple[float, ...] = (10.0, 30.0)
+_TRANSIENT_HTTP_STATUS = frozenset({429, 500, 502, 503, 504})
+
+
+def _is_transient(exc: BaseException) -> bool:
+    status = getattr(getattr(exc, "resp", None), "status", None)
+    if status is not None:
+        try:
+            return int(status) in _TRANSIENT_HTTP_STATUS
+        except (TypeError, ValueError):
+            return False
+    import ssl
+
+    return isinstance(exc, (ConnectionError, TimeoutError, ssl.SSLError))
+
+
+def _with_retry(call, *, sleep=None, delays: tuple[float, ...] | None = None):
+    """跑 `call()`；暫時性錯誤照 `delays` 等一下再試。回傳 (結果, 試了幾次)；不是暫時性的或次數用完就照原樣 raise。"""
+    import time
+
+    waits = DRIVE_RETRY_DELAYS_SECONDS if delays is None else delays
+    pause = sleep or time.sleep
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            return call(), attempt
+        except Exception as exc:  # noqa: BLE001 — 是不是暫時性的由 _is_transient 決定
+            if attempt > len(waits) or not _is_transient(exc):
+                raise
+            pause(waits[attempt - 1])
+
+
+def upload_backup_to_drive(zip_path: Path, *, sleep=None) -> dict:
+    """上傳一份 zip 並做雲端 rotation。回傳寫進 status 的 drive dict（`retries`＝因暫時性錯誤多試了幾次）。
+
+    三段各自重試（找資料夾、上傳、輪替）：上傳成功之後輪替才失敗時不整份重傳——那會在雲端留兩份。"""
     if not TOKEN_PATH.is_file():
         return {"status": "not_configured"}
     try:
         from google.auth.exceptions import RefreshError
     except ImportError:  # pragma: no cover - google-auth 是既有相依
         RefreshError = ()  # type: ignore[assignment]
+    retries = 0
     try:
         service, creds = _drive_service()
-        folder_id = _ensure_drive_folder(service)
+        folder_id, tries = _with_retry(lambda: _ensure_drive_folder(service), sleep=sleep)
+        retries += tries - 1
         from googleapiclient.http import MediaFileUpload
 
-        media = MediaFileUpload(
-            str(zip_path), mimetype="application/zip", resumable=True
-        )
-        uploaded = (
-            service.files()
-            .create(
-                body={"name": zip_path.name, "parents": [folder_id]},
-                media_body=media,
-                fields="id,name,size",
+        def create():
+            media = MediaFileUpload(
+                str(zip_path), mimetype="application/zip", resumable=True
             )
-            .execute()
-        )
+            return (
+                service.files()
+                .create(
+                    body={"name": zip_path.name, "parents": [folder_id]},
+                    media_body=media,
+                    fields="id,name,size",
+                )
+                .execute()
+            )
+
+        uploaded, tries = _with_retry(create, sleep=sleep)
+        retries += tries - 1
+
         # 雲端 rotation：只動自己命名前綴的檔案，超過保留數的移到垃圾桶（30 天可救）。
-        listing = (
-            service.files()
-            .list(
-                q=(
-                    f"'{folder_id}' in parents and trashed = false"
-                    f" and name contains '{DRIVE_ZIP_PREFIX}'"
-                ),
-                fields="files(id,name,createdTime)",
-                orderBy="createdTime desc",
-                pageSize=100,
+        def rotate():
+            listing = (
+                service.files()
+                .list(
+                    q=(
+                        f"'{folder_id}' in parents and trashed = false"
+                        f" and name contains '{DRIVE_ZIP_PREFIX}'"
+                    ),
+                    fields="files(id,name,createdTime)",
+                    orderBy="createdTime desc",
+                    pageSize=100,
+                )
+                .execute()
             )
-            .execute()
-        )
-        trashed = []
-        for stale in (listing.get("files") or [])[DRIVE_RETENTION:]:
-            service.files().update(fileId=stale["id"], body={"trashed": True}).execute()
-            trashed.append(stale["name"])
+            out = []
+            for stale in (listing.get("files") or [])[DRIVE_RETENTION:]:
+                service.files().update(fileId=stale["id"], body={"trashed": True}).execute()
+                out.append(stale["name"])
+            return out
+
+        # 上傳已成功：輪替失敗不能把整份標成上傳失敗（備份確實在雲端了）——另記 rotation_error 讓它現形。
+        rotation_error = None
+        try:
+            trashed, tries = _with_retry(rotate, sleep=sleep)
+            retries += tries - 1
+        except RefreshError:
+            raise
+        except Exception as exc:  # noqa: BLE001
+            trashed, rotation_error = [], str(exc)[:300]
         # 存回可能已 refresh 的 access token；refresh token 不變。
         _write_token(creds)
         return {
@@ -381,6 +438,8 @@ def upload_backup_to_drive(zip_path: Path) -> dict:
             "bytes": int(uploaded.get("size") or 0),
             "uploaded_at": _utc_now().isoformat(),
             "rotated_out": trashed,
+            "retries": retries,
+            **({"rotation_error": rotation_error} if rotation_error else {}),
         }
     except RefreshError as exc:
         return {
@@ -389,8 +448,9 @@ def upload_backup_to_drive(zip_path: Path) -> dict:
             "hint": "重跑 python scripts/backup_private.py auth；若一週內重複發生，"
             "檢查 consent screen 是否停在 Testing 模式",
         }
-    except Exception as exc:  # 網路／API 失敗：現形但不回滾本機備份
-        return {"status": "delivery_failed", "error": str(exc)[:500]}
+    except Exception as exc:  # 網路／API 失敗（重試用完或不是暫時性的）：現形但不回滾本機備份
+        return {"status": "delivery_failed", "error": str(exc)[:500], "retries": retries,
+                "transient": _is_transient(exc)}
 
 
 def _build_outer_zip(backup_dir: Path) -> Path:

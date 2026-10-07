@@ -488,6 +488,9 @@ def advance(
     if to_status not in ALLOWED_TRANSITIONS[current]:
         raise LeadStateError(f"非法轉移：{current} → {to_status}")
     lead["status"] = to_status
+    # 轉移紀錄（2026-10-07 使用者：「Lead 抓了什麼 我們做了哪些處理的數字也要印」）：每日訊息①數「今天研究到終局幾條」
+    # 讀的就是這裡。之前的轉移沒有時間戳，不補（不編時間，INV-6）——這個數從 10-07 起才有。
+    lead.setdefault("transitions", []).append({"at": _now(), "from": current, "to": to_status})
     if to_status == "pending":
         # un-park：清掉舊 triage，回到待判斷
         lead["triage"] = None
@@ -951,7 +954,8 @@ def last_entered_pq1_at(lead: Mapping[str, Any]) -> str:
 
 
 #: 使用者本人觸發的排回（給排序的「使用者指定」一鍵讀；`engine_b/priority.py::rank_lead`）。
-USER_REQUEUE_TRIGGERS = frozenset({"user_go", "user_requested", "access_granted"})
+#: `user_document`（2026-10-07）：向你要文件——使用者提供了文件才排回（`todo dispatch <n> --doc …`）。
+USER_REQUEUE_TRIGGERS = frozenset({"user_go", "user_requested", "access_granted", "user_document"})
 
 
 _PRIORITY_FLAG_KEYS = (

@@ -114,6 +114,17 @@ Get-Content library\private\heartbeat\daily_task.log -Tail 30
 `StockBotv2-Daily` 的 ⑱⑲ 取代（1.2a 停用、2026-09-25 1.2b 刪除）；它們的理由（LLM 失敗心跳照發、永遠 exit 0、Python 不用 `.cmd`、
 發送走 subprocess）搬進 `crons/daily_task.py` 的 docstring，守它們的測試改主詞搬進 `tests/test_daily_task.py`「無人值守入口」節。
 
+### Sandbox impact review 結論（2026-10-07 下午：向你要文件另一區、提供文件才算 go；①處理數字；分類上限 90／總時限 400；備份上傳重試；雷達搜尋上限照實寫）
+
+| 步 | 結論 |
+|---|---|
+| **1 path／side effect／capability** | 使用者 10-07 指示（「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」「我們做了哪些處理的數字也要印」「Daily 備份看要不要設 retry」）。⑪ standing-go：`config/standing_authorization.json` 的 `authorized` 變空（`source_trace_review` 移到 `never`）——段 2b 照跑、0 候選，**少一個能力、沒有新能力**。`todo dispatch <n>`（互動）必附 `--doc <檔案或網址>`，檔案要真的在、在 repo 裡的只收 `library/private/` 底下；寫 lead 的 `trace_user_document`、排回觸發字 `user_document`（`USER_REQUEUE_TRIGGERS` 多一個，排序照舊讀）。`leads.advance` 每次轉移多寫一筆 `transitions`（時間、從、到；所有呼叫 advance 的寫入者都會寫，含 daily 的排回）。⑱ 心跳第 3 段與短版 ③／③b 分兩區（唯一名單 `todo.actionable_items()`／`todo.document_requests()`）；短版 ① 多一行處理數字（唯讀 lead registry）。⑦a：每輪最多 3 次呼叫（90 則），與原本同一組零工具 argv、每次 timeout 8 分（實測 30 則 240 秒）；各步加總 363 → 總時限 360 → **400**，已跑 `register_daily_task.py --apply`。①c 雷達：只改提示字（搜尋上限 12 → 24，照題目數算得出來的數）。⑯ 備份：Drive 三段（找資料夾、上傳、輪替）各自對暫時性錯誤（429／5xx、連線中斷、逾時）重試，間隔 10 秒、30 秒；授權錯誤與其他 4xx 不重試；上傳成功後輪替才失敗不再標成上傳失敗（另記 `rotation_error`）。同一組主機，最壞多約 40 秒＋兩次上傳時間，在 ⑯ 的 15 分內。 |
+| **2 canonical skill／prompt／本檔** | `config/standing_authorization.json`、`config/daily_routine.json`（`triage.daily_limit`、`llm.triage_timeout_minutes`、`schedule.execution_time_limit_minutes` 與各自 `_doc`）、`config/lead_ref_keys.json`（`trace_user_document`）、`crons/radar_prompt.md`；AGENTS「授權介面唯一」兩處（使用者原話）；`skills/daily-brief/SKILL.md`（dispatch 必附文件、③b 呈現）；本節、常用指令的 `dispatch`／`standing-go` 兩行；`docs/ARCHITECTURE.md` 常規授權那一列。 |
+| **3 最窄 rule** | `.codex/rules` 仍是 0 條；沒有新增任何放行。回滾：config 改回（`authorized` 放回 `source_trace_review`、`daily_limit` 30、`triage_timeout_minutes` 15、總時限 360）並重跑 `register_daily_task.py --apply`；備份重試設 `DRIVE_RETRY_DELAYS_SECONDS = ()` 就是不重試。 |
+| **4 contract test** | `tests/test_standing_authorization.py`（shipped 的斷言翻面：向你要文件在 never、authorized 為空；跳過規則改用測試自己的 legacy config 驗——用 shipped 的會恆綠；10-07 事發形狀：shipped config 下 standing-go 不碰文件要求）；`tests/test_engine_b_todo.py`（沒附文件拒收且 lead 不動、附網址排回並記在 lead 上、追蹤區的檔拒收、不存在的檔拒收、go 邊界字）；`tests/test_heartbeat.py`（待你決定與等你提供的文件各自等於 SSOT、文件要求不進 go 行）；`tests/test_daily_digest.py`（處理數字：窗內的分類與研究終局、窗外不算；③b 隔區）；`tests/test_engine_b_leads.py`（轉移紀錄、非法轉移不留）；`tests/test_backup_entrypoint.py`（500 兩次後成功、403 不重試、重試用完照報、輪替失敗不算上傳失敗、連線錯誤算暫時性）；`tests/test_daily_task.py`（加總 363 < 400）。另：`scripts/verify_test_nonvacuity.py` 9 個對不上的突變點修好（7 個改對到現行程式、逐一驗過會紅；2 個隨 Phase 0 退役移除）。 |
+| **5 端到端 smoke** | `register_daily_task.py` dry-run 差異只有 `execution_time_limit_minutes: 360 → 400`，`--apply` 後再 dry-run 無差異；以真資料產短版：③ 待你決定 [712][715][719][721]、③b 等你提供的文件 [716][720][722][724][725]（說明都改成「提供文件才算 go」）、① 第二行印處理數字（分類分 LLM／互動／機械三格，照 `decided_by`）。Drive 暫時性失敗無法在本機重現，以假 service 驗；⚠ 端到端驗收是 10-08 05:30 真正的排程觸發。 |
+| **互動工具** | `scripts/triage_catchup.py`（**互動用，不進 daily 清單**）：積壓時在互動 session 補跑分類，走 daily ⑥⑦a⑦b 同一條路（同一組零工具 argv、prompt、schema；`triage-apply` 逐則驗證後才寫；分類記成 `claude-p:<session>`，所以①的「LLM／互動」照實）；沒持互動 writer lock 拒跑；批次與結果只寫 `--out`。測試 `tests/test_triage_catchup.py`。 |
+
 ### Sandbox impact review 結論（2026-10-07：Discord 改送短版；daily ⑪b–⑪e 每日摘要；①c 雷達加市場層；⑱b APP「每日」頁；lead ref 寫入端擋 raw 引用）
 
 | 步 | 結論 |
@@ -674,12 +685,12 @@ custom-agent 機制。**不要再包一層 skill** ——那層才是當初重�
 & '.venv\Scripts\python.exe' -m engine_b.todo resolve <n> --verb go|drop|pending [--reason ...] [--receipt ...]
 & '.venv\Scripts\python.exe' -m engine_b.todo resolve <n> --verb pending --until 2026-08-27 --trigger "Q2 財報"
 & '.venv\Scripts\python.exe' -m engine_b.todo add "<標題>" [--hint ...] [--company-id co:x]   # 手動項；帶 company_id（名冊驗證）再 pending，每檔閉環才認得是使用者 defer（2026-10-05）
-& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <n>  # source_trace_review → pq1 job（decision_review 已於 2026-09-23 退役，legacy 只能 drop）
+& '.venv\Scripts\python.exe' -m engine_b.todo dispatch <n> --doc <檔案或網址>  # 向你要文件：提供文件才算 go（2026-10-07；沒附文件拒收；私人文件放 library/private/inbox/）→ pq1 讀完交報告
 & '.venv\Scripts\python.exe' -m engine_b.todo work <n> --to researching|completed|parked --receipt ...
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-ra <n> --digest <sha256> [--company-id ...]
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-observation <n>       # Engine C 人工觀測寫入
 & '.venv\Scripts\python.exe' -m engine_b.todo complete-thesis-mutation <n>   # thesis lifecycle 變更
-& '.venv\Scripts\python.exe' -m engine_b.todo standing-go [--run]         # 佇列段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go；pending／等世界／付費的不碰
+& '.venv\Scripts\python.exe' -m engine_b.todo standing-go [--run]         # 佇列段 2b：常規授權類別（config/standing_authorization.json）直接下使用者本來會下的 go；2026-10-07 起 authorized 是空的（向你要文件移到 never），段 2b 照跑、0 候選
 ```
 
 `pending` 帶 `--until`／`--trigger` 會歸入「等事件」區，觸發前不佔決策注意力。⚠ **2026-09-26 起 `--trigger` 必須同時帶 `--until <日期>` 或 `--watch <ew_id>`**（那筆 watch 的 `wake_pq2` 必須是這個編號、仍在等）——只有散文 trigger 的等待沒有到期（INV-2），CLI 拒收並印兩種正確寫法；既有項目不回溯改寫。分類判準見 `config/decision_blockers.json` 的 `resolution_mode`。

@@ -227,6 +227,10 @@
         "value_type": "string",
         "description": "是否需要使用者提供 access／決策"
       },
+      "trace_user_document": {
+        "value_type": "string",
+        "description": "向你要文件：使用者提供的文件（路徑或網址）——提供文件才算 go（2026-10-07，`todo dispatch <n> --doc`）"
+      },
       "trace_review_hint": {
         "value_type": "string",
         "description": "source trace review 的完整提示"

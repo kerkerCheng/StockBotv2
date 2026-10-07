@@ -114,28 +114,42 @@ def test_queue_section_consumes_queue_segments_not_its_own_count(monkeypatch: py
 
 
 def test_pq2_ball_in_user_court_uses_todo_ssot() -> None:
-    """「球在你手上」的數字必須等於 `engine_b.todo.actionable_items()`，不是另一套推導。"""
+    """「待你決定」的數字必須等於 `engine_b.todo.actionable_items()`，不是另一套推導。
+    2026-10-07 起它不含向你要文件（另一區，`document_requests`）。"""
     from engine_b import todo as todo_mod
 
     pool = todo_mod.load()
     expected = len(todo_mod.actionable_items(pool))
     section = hb.build_queue()
-    assert any(f"pq2 球在你手上 {expected}" in line for line in section.lines), section.lines
+    assert any(f"pq2 待你決定 {expected}" in line for line in section.lines), section.lines
 
 
 def test_documents_awaiting_user_line_counts_source_trace_review_from_todo_ssot() -> None:
-    """「等你提供的文件 N」＝todo pool 裡 type=source_trace_review 的未結案數（Phase 7 failure log #29）。
+    """「等你提供的文件 N」＝`todo.document_requests()`——向你要文件、還沒提供的那幾筆（Phase 7 failure log #29；
+    2026-10-07 使用者：「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）。
 
-    拿不到的來源要開口、不 park；開了口的住這個 kind。數字來自同一個 SSOT（`active_items`），
-    不另外從 lead registry 數 `trace_requires_user`。
+    拿不到的來源要開口、不 park；開了口的住這個 kind。數字來自同一個 SSOT，不另外從 lead registry 數
+    `trace_requires_user`；已提供文件（dispatch 過）的不再算「等你」。
     """
     from engine_b import todo as todo_mod
 
     pool = todo_mod.load()
-    expected = sum(1 for it in todo_mod.active_items(pool) if it.get("type") == "source_trace_review")
+    expected = len(todo_mod.document_requests(pool))
     section = hb.build_queue()
     assert any(f"等你提供的文件 {expected}" in line for line in section.lines), section.lines
     assert "pq2.source_trace_review" in hb.SNAPSHOT_KEYS
+
+
+def test_document_requests_are_their_own_block_and_not_in_the_go_batch() -> None:
+    """文件要求逐筆列在自己那一區、寫明「提供文件才算 go」；不出現在「待你決定」的 go 行裡。"""
+    from engine_b import todo as todo_mod
+
+    asking = [{"n": 724, "type": "source_trace_review", "title": "向你要文件：全新光電券商報告"}]
+    lines = hb._document_request_lines(asking, todo_mod=todo_mod)
+    assert lines[0].strip().startswith("[724] 全新光電券商報告")
+    assert "go" in lines[-1] and "drop" in lines[-1] and "入圖" in lines[-1]
+    decisions = hb._pq2_item_lines([{"n": 715, "type": "ra_admission", "title": "InP 磊晶片層建層"}], todo_mod=todo_mod)
+    assert not any("724" in line for line in decisions)
 
 
 def test_missing_artifacts_say_which_kind_of_missing(broken_env: dict[str, Path]) -> None:

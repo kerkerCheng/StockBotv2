@@ -25,12 +25,27 @@ def test_shipped_config_is_closed_over_item_types_and_never_lists_the_gates() ->
     assert not (set(auth.authorized) & set(auth.never))
     for gate_type in ("ra_admission", "engine_c_observation", "thesis_mutation"):
         assert gate_type in auth.never and not auth.is_authorized(gate_type)
-    assert auth.is_authorized("source_trace_review")
-    assert "付費" in auth.skip_hint_tokens("source_trace_review")
-    # 2026-09-22 Step 0a.1：退役後唯一的 authorized 類型就是追源派回 pq1。
-    assert set(auth.authorized) == {"source_trace_review"}
+    # 2026-10-07（使用者：「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）：向你要文件也翻到 never——
+    # 斷言跟著**翻面**而不是刪掉（同 09-22 decision_review 的做法）：有人把它加回 authorized 會變紅。
+    assert not auth.is_authorized("source_trace_review")
+    assert "向你要文件" in (auth.why_never("source_trace_review") or "")
+    assert set(auth.authorized) == set()
     assert not auth.is_authorized("decision_review")
     assert "退役" in (auth.why_never("decision_review") or "")
+
+
+def _legacy_config(tmp_path: Path) -> Path:
+    """機制本身（pending／等世界／付費跳過）仍要被驗：用一份把 source_trace_review 放回 authorized 的**測試用** config。
+    shipped config 已經沒有任何 authorized 類型，拿它驗跳過規則會恆綠（零鑑別力）。"""
+    base = json.loads(sa.DEFAULT_PATH.read_text(encoding="utf-8"))
+    legacy = dict(base)
+    legacy["never"] = {k: v for k, v in base["never"].items() if k != "source_trace_review"}
+    legacy["authorized"] = {"source_trace_review": {
+        "label": "追源派回 pq1（測試用）", "go_means": "requeue_trace",
+        "skip_when_hint_mentions": ["付費", "訂閱", "購買", "paywall", "paid"]}}
+    path = tmp_path / "legacy_standing_authorization.json"
+    path.write_text(json.dumps(legacy, ensure_ascii=False), encoding="utf-8")
+    return path
 
 
 def test_loader_rejects_unclassified_or_overlapping_types(tmp_path: Path) -> None:
@@ -42,14 +57,25 @@ def test_loader_rejects_unclassified_or_overlapping_types(tmp_path: Path) -> Non
     with pytest.raises(sa.StandingAuthorizationError, match="未分類"):
         sa.load(p)
     overlap = dict(base)
-    # 用一個**現在確實在 authorized 裡**的 key 來製造交集；拿已經在 never 的 decision_review
-    # 來試會驗不到任何東西（它本來就在那邊）。
-    overlap["never"] = {**base["never"], "source_trace_review": "x"}
+    # 2026-10-07：shipped 的 authorized 是空的——交集改從 authorized 那一邊造：把已在 never 的類型也放進 authorized。
+    overlap["authorized"] = {"source_trace_review": {"label": "x"}}
     p.write_text(json.dumps(overlap), encoding="utf-8")
     with pytest.raises(sa.StandingAuthorizationError, match="同時"):
         sa.load(p)
     with pytest.raises(sa.StandingAuthorizationError, match="不存在"):
         sa.load(tmp_path / "nope.json")
+
+
+def test_shipped_config_never_auto_dispatches_a_document_request(monkeypatch) -> None:
+    """10-07 事發：常規授權把「向你要文件」[717][718] 自動 go 掉、派回 pq1 重查同樣查不到的東西，使用者沒看到要求。"""
+    pool = todo.empty_pool()
+    todo.sync(pool, [{"type": "source_trace_review", "ref_id": "lead_doc", "title": "向你要文件：券商報告",
+                      "hint": "要：券商報告"}])
+    calls: list[int] = []
+    monkeypatch.setattr(todo, "dispatch_source_trace_review", lambda p, n, **kw: calls.append(n))
+    out = todo.standing_go(pool, at="2026-10-08T00:00:00+00:00")
+    assert out["candidates"] == [] and calls == []
+    assert [it["ref_id"] for it in todo.document_requests(pool)] == ["lead_doc"]
 
 
 def _pool():
@@ -72,11 +98,11 @@ def _pool():
     return pool, by
 
 
-def test_candidates_exclude_pending_waiting_inflight_paid_and_never_types() -> None:
+def test_candidates_exclude_pending_waiting_inflight_paid_and_never_types(tmp_path) -> None:
     pool, by = _pool()
     todo.sync(pool, [{"type": "decision_review", "ref_id": "dc_stale_only", "title": "I"}])
     by = {it["ref_id"]: it for it in todo.active_items(pool)}
-    candidates, skipped = todo.standing_go_candidates(pool, authorization=sa.load())
+    candidates, skipped = todo.standing_go_candidates(pool, authorization=sa.load(_legacy_config(tmp_path)))
     # 2026-09-22 Step 0a.1：decision_review 已是 never 類型——**一個都不進候選**。
     # 2026-09-23 Step 0b.4：「有 work order」「有 user_decision blocker」「brief 讀不到」三條路
     # 連程式都不存在了（store／brief_items 參數一併拿掉），這裡只剩封閉字彙那一層在擋。
@@ -88,8 +114,9 @@ def test_candidates_exclude_pending_waiting_inflight_paid_and_never_types() -> N
         assert by[ref]["n"] not in reasons, ref
 
 
-def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) -> None:
+def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch, tmp_path) -> None:
     pool, by = _pool()
+    legacy = sa.load(_legacy_config(tmp_path))
     calls: list[tuple] = []
 
     def fake_dispatch(p, n, *, leads_path, at=None):
@@ -101,10 +128,10 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
     # 2026-09-23 Step 0b.4：`advance_decision_review` 連函式都不存在了——退役生效的可證偽斷言。
     assert not hasattr(todo, "advance_decision_review")
 
-    dry = todo.standing_go(pool, dry_run=True)
+    dry = todo.standing_go(pool, dry_run=True, authorization=legacy)
     assert dry["dry_run"] and calls == []
 
-    out = todo.standing_go(pool, at="2026-09-09T00:00:00+00:00")
+    out = todo.standing_go(pool, at="2026-09-09T00:00:00+00:00", authorization=legacy)
     assert [(c[0]) for c in calls] == ["trace"]
     assert [row["outcome"] for row in out["done"]] == ["dispatched"]
     logs = [e for e in pool["log"] if e["verb"] == "standing_go"]
@@ -116,7 +143,7 @@ def test_standing_go_runs_the_same_go_the_user_would_and_logs_it(monkeypatch) ->
     assert todo.get(pool, by["dc_deferred"]["n"]).get("deferred_at")
 
 
-def test_standing_go_reports_single_failures_without_stopping(monkeypatch) -> None:
+def test_standing_go_reports_single_failures_without_stopping(monkeypatch, tmp_path) -> None:
     """一筆失敗不得讓其餘停下。
 
     ⚠ 2026-09-22 Step 0a.1：原本的失敗源是 `advance_decision_review`（decision_review 退役後
@@ -133,7 +160,7 @@ def test_standing_go_reports_single_failures_without_stopping(monkeypatch) -> No
         return {"item": todo.get(p, n)}
 
     monkeypatch.setattr(todo, "dispatch_source_trace_review", dispatch)
-    out = todo.standing_go(pool)
+    out = todo.standing_go(pool, authorization=sa.load(_legacy_config(tmp_path)))
     assert [row["n"] for row in out["failed"]] == [by["lead_free"]["n"]]
     assert [row["n"] for row in out["done"]] == [by["lead_free2"]["n"]]
 

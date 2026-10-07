@@ -1064,3 +1064,18 @@ def test_directed_research_is_its_own_classifier_not_a_graph_walk_hit() -> None:
         lead_id, _ = leads.register(store, source="x:test", url=f"https://x.io/{synonym}")
         with pytest.raises(ValueError, match="未登記"):
             leads.triage(store, lead_id, go=True, tier=4, reason="r", classification=_PASS, classified_by=synonym)
+
+
+def test_advance_records_each_transition_with_a_time() -> None:
+    """2026-10-07：每日訊息①「研究到終局幾條」數的是這裡——每次轉移一筆（時間、從哪、到哪）；非法轉移不留紀錄。"""
+    store = leads.empty_store()
+    lead_id, _ = leads.register(store, source="test", url="https://example.com/transitions")
+    leads.triage(store, lead_id, go=True, tier=3, reason="test")
+    leads.advance(store, lead_id, "researching")
+    leads.advance(store, lead_id, "parked", ref={"trace_status": "not_pursued"})
+    moves = store["leads"][lead_id]["transitions"]
+    assert [(m["from"], m["to"]) for m in moves] == [("triaged_go", "researching"), ("researching", "parked")]
+    assert all(m["at"] for m in moves)
+    with pytest.raises(leads.LeadStateError):
+        leads.advance(store, lead_id, "applied")
+    assert len(store["leads"][lead_id]["transitions"]) == 2

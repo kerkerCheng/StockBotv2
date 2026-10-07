@@ -1192,21 +1192,19 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
     # 在這裡自己用 `dispatch_status` 重數一份就是 L16 的形狀：猜錯不會有東西壞掉，只會安靜偏掉。
     active = todo_mod.active_items(pool)
     actionable = todo_mod.actionable_items(pool)
+    asking = todo_mod.document_requests(pool)
     section.lines.append(
-        f"**pq2 球在你手上 {len(actionable)}**｜池中未結案 {len(active)}"
+        f"**pq2 待你決定 {len(actionable)}**｜等你提供的文件 {len(asking)}（另一區）｜池中未結案 {len(active)}"
         f"（差額＝等事件或已在 pq1 跑）"
     )
     # 逐筆（Phase 1 Step 1.8）：go／不含的字串取自 `todo.GO_AUTHORIZATION`（L16：不在這裡另寫一份），
     # 使用者不展開就知道 go 會做什麼、不會做什麼（AGENTS 收尾摘要契約）。
     section.lines.extend(_pq2_item_lines(actionable, todo_mod=todo_mod))
-    # 等你提供的文件（2026-10-06 使用者指示；Phase 7 failure log #29）：拿不到的來源要開口、不 park。
-    # 開了口的住 pq2 `source_trace_review`；這一行讓「等你拿文件」自己出現（L14），不靠人記得去翻 skill。
-    # 與上面同一個 SSOT（`active_items`）——不另外從 lead registry 數 `trace_requires_user`（L16）。
-    asking = [it for it in active if it.get("type") == "source_trace_review"]
+    # 等你提供的文件（2026-10-06 使用者指示：拿不到的來源要開口、不 park；10-07：「隔離一區讓我知道 也不要讓我直接 go
+    # 提供文件才算 go」）。名單只有 `todo.document_requests()` 一份（L16）；0 也印（L14）。
     section.lines.append(
-        f"**等你提供的文件 {len(asking)}**（pq2 `source_trace_review` 未結案；拿不到的來源要開口、不 park）"
-        + (("：" + "、".join(f"[{it.get('n')}]" for it in asking[:6])) if asking else "")
-    )
+        f"**等你提供的文件 {len(asking)}**（獨立一區：提供文件才算 go——`todo dispatch <n> --doc …`；拿不到就 drop）")
+    section.lines.extend(_document_request_lines(asking, todo_mod=todo_mod))
 
     # 到期（Phase 1 Step 1.7／1.8；A3、A7）：今日與累計分開，累計照處置封閉字彙逐格列——加起來要等於累計。
     section.lines.append(_expiry_line(watches, now=moment, event_watch=event_watch))
@@ -1240,6 +1238,23 @@ def build_queue(*, state_dir: Path | None = None, now: datetime | None = None,
 
 #: pq2 逐筆最多印幾筆（其餘寫「其餘 N 筆」）。
 PQ2_LIST_LIMIT = 10
+
+
+def _document_request_lines(items: Sequence[Mapping[str, Any]], *, todo_mod: Any) -> list[str]:
+    """向你要文件逐筆＋一行怎麼回（2026-10-07）。「不含」取自 `todo.GO_AUTHORIZATION`（L16）。
+    批次 `go` 不收這一區——提供文件才算 go。"""
+    if not items:
+        return []
+    ordered = sorted(items, key=lambda i: int(i["n"]))
+    lines = []
+    for item in ordered[:PQ2_LIST_LIMIT]:
+        title = " ".join(str(item.get("title") or "").split()).removeprefix("向你要文件：")
+        lines.append(f"  [{item['n']}] {title[:80]}{'…' if len(title) > 80 else ''}")
+    if len(ordered) > PQ2_LIST_LIMIT:
+        lines.append(f"  其餘 {len(ordered) - PQ2_LIST_LIMIT} 筆（`python -m engine_b.todo list`）")
+    excludes = todo_mod.go_authorization("source_trace_review")["go_excludes"]
+    lines.append(f"  有文件就直接給我（放 library/private/inbox/ 或貼路徑）＝go，我讀完交報告；拿不到回 `<編號> drop`｜不含：{excludes}")
+    return lines
 
 
 def _pq2_item_lines(actionable: Sequence[Mapping[str, Any]], *, todo_mod: Any) -> list[str]:
@@ -1987,8 +2002,9 @@ def collect_snapshot(*, now: datetime, state_dir: Path | None, leads_path: Path,
 
         pool = todo_mod.load()
         active = todo_mod.active_items(pool)
+        # 2026-10-07：「球在你」只算要你決定的；向你要文件另一區（`document_requests`：還沒提供文件的那幾筆）
         return {"pq2.open": len(active), "pq2.actionable": len(todo_mod.actionable_items(pool)),
-                "pq2.source_trace_review": sum(1 for it in active if it.get("type") == "source_trace_review")}
+                "pq2.source_trace_review": len(todo_mod.document_requests(pool))}
 
     def lead_states() -> dict[str, Any]:
         leads = (_read_json(leads_path) or {}).get("leads") or {}
@@ -2288,6 +2304,9 @@ def summary_line(*, now: datetime, snapshot: Mapping[str, Any], run_record_path:
     today = now.astimezone().date().isoformat()
     actionable = snapshot.get("pq2.actionable")
     head = f"Daily {today}｜球在你 {'未讀到' if actionable is None else actionable}"
+    asking = snapshot.get("pq2.source_trace_review")
+    if asking:
+        head += f"｜等你給文件 {asking}"
     flags: list[str] = []
     try:
         log = list((_read_json(leads_path) or {}).get("harvest_log") or [])

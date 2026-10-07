@@ -6,8 +6,12 @@ Websearch 大事件 TL;DR、幾件事待我決定、健康度等等」。
 五塊、固定順序、**每塊一定出現**（沒東西也說沒東西——INV-3）：
 
 ① lead 抓了什麼：⑪c LLM 寫的 TL;DR（每句都指得回今天的 lead）；沒產生時退回程式組的來源計數與分流 go 的標題。
+   第二行是**我們做了哪些處理**（同日使用者：「我們做了哪些處理的數字也要印」）：分類幾則（go／no-go、LLM／互動）、
+   研究到終局幾條（入圖包／已入圖／停放；lead 的轉移紀錄 10-07 起才有）、還沒分類與待深挖的總數。
 ② 市場大事：同上；退回雷達收據收下的那幾則（層別｜標題｜一句事實）。
-③ 待你決定：pq2 球在你手上的每一條（程式組，與心跳段 3 同一個 `_pq2_item_lines`）。
+③ 待你決定：pq2 要你決定的每一條（程式組，與心跳段 3 同一個 `_pq2_item_lines`）。
+③b 等你提供的文件：向你要文件的每一條，**獨立一區、批次 go 不收**——提供文件才算 go（同日使用者：「隔離一區讓我知道
+   也不要讓我直接 go 提供文件才算 go」；名單只有 `todo.document_requests()` 一份）。
 ④ 狀態與健康度：**每天都印**的基本狀態（daily 步數、較昨變動、候選各格檔數與最老滯留、watch 今日醒／到期／標旗／未檢、
    反證與加碼條件、無到期的等待、今天第一次被點名的新名字——2026-10-07 使用者：「daily 心跳基本重要的 status 還是要印」），
    再接健康度：沒問題就一行；有問題才逐條（daily 失敗的步驟、LLM 額度、invariants FAIL、健康紅燈）。
@@ -56,8 +60,60 @@ def _read_json(path: Path) -> Any:
         return None
 
 
+#: 研究到終局＝轉到這三個狀態（入圖包／已入圖／停放）。
+RESEARCH_TERMINAL_STATES: tuple[str, ...] = ("action_prepared", "applied", "parked")
+
+
+def _stamp(raw: Any) -> datetime | None:
+    try:
+        moment = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    return moment if moment.tzinfo else moment.replace(tzinfo=timezone.utc)
+
+
+def processing_line(store: Mapping[str, Any], *, now: datetime, hours: int | None = None) -> str:
+    """① 的處理數字（2026-10-07 使用者：「Lead 抓了什麼 我們做了哪些處理的數字也要印」）。
+
+    同一個時間窗（`engine_b.digest.WINDOW_HOURS`）：分類（`triage.decided_at` 在窗內；go／no-go、LLM／互動分開）、
+    研究到終局（`transitions` 在窗內轉到入圖包／已入圖／停放——10-07 起才有轉移紀錄）、還沒分類與待深挖的總數。"""
+    from datetime import timedelta
+
+    from engine_b.digest import WINDOW_HOURS
+
+    cutoff = now - timedelta(hours=hours or WINDOW_HOURS)
+    leads = [lead for lead in (store.get("leads") or {}).values() if isinstance(lead, Mapping)]
+    go = no_go = by_llm = by_hand = by_rule = 0
+    finished = {state: 0 for state in RESEARCH_TERMINAL_STATES}
+    for lead in leads:
+        triage = lead.get("triage") or {}
+        decided = _stamp(triage.get("decided_at"))
+        if decided is not None and decided >= cutoff:
+            go += triage.get("decision") == "go"
+            no_go += triage.get("decision") == "no_go"
+            # 誰判的：`decided_by` 是唯一記錄（claude-p:<session>＝分類層 LLM；harvest:…＝機械篩選）；
+            # 互動判的看 `classified_by`（interactive:…）。三格分開——機械篩選不算進 LLM（L12）。
+            decided_by = str(triage.get("decided_by") or "")
+            classified_by = str((triage.get("classification") or {}).get("classified_by") or "")
+            if decided_by.startswith("claude-p"):
+                by_llm += 1
+            elif classified_by.startswith("interactive"):
+                by_hand += 1
+            else:
+                by_rule += 1
+        for move in lead.get("transitions") or ():
+            moment = _stamp((move or {}).get("at"))
+            if moment is not None and moment >= cutoff and move.get("to") in finished:
+                finished[move["to"]] += 1
+    pending = sum(1 for lead in leads if lead.get("status") == "pending")
+    queued = sum(1 for lead in leads if lead.get("status") == "triaged_go")
+    return (f"- 處理：分類 {go + no_go}（go {go}／no-go {no_go}；LLM {by_llm}／互動 {by_hand}／機械或舊資料 {by_rule}）"
+            f"｜研究到終局 {sum(finished.values())}（入圖包 {finished['action_prepared']}／已入圖 {finished['applied']}"
+            f"／停放 {finished['parked']}）｜還沒分類 {pending}｜待深挖 {queued}")
+
+
 def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[str, Any]],
-                digest_problem: str | None) -> list[str]:
+                digest_problem: str | None, processing: str | None = None) -> list[str]:
     """① lead 抓了什麼。標題行永遠是程式數的（外面新進幾則、哪些來源；我們自己登記的研究題另計、不摘要）；
     內容是 LLM 的 TL;DR，沒有就退回分流 go 的標題。"""
     from collections import Counter
@@ -71,6 +127,8 @@ def leads_block(*, digest: Mapping[str, Any] | None, todays: Sequence[Mapping[st
         "：" + "、".join(f"{name} {n}" for name, n in families.most_common()) if external else "") + (
         f"；另有我們自己登記的研究題 {internal} 則，不摘要" if internal else "") + "）"
     lines = [head]
+    if processing:
+        lines.append(processing)
     bullets = list((digest or {}).get("leads") or ())
     if bullets:
         lines.extend(f"- {b['text']}" for b in bullets)
@@ -114,7 +172,7 @@ def events_block(*, digest: Mapping[str, Any] | None, receipt: Mapping[str, Any]
 
 def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: str | None,
                     todo_mod: Any) -> list[str]:
-    """③ 待你決定：與心跳段 3 同一份清單與同一個格式（`_pq2_item_lines`）。"""
+    """③ 待你決定：與心跳段 3 同一份清單與同一個格式（`_pq2_item_lines`）。2026-10-07 起不含向你要文件（另一區）。"""
     from crons.heartbeat import _pq2_item_lines
 
     if actionable is None:
@@ -124,6 +182,21 @@ def decisions_block(*, actionable: Sequence[Mapping[str, Any]] | None, problem: 
         lines.append("- 沒有")
         return lines
     lines.extend("- " + line.strip() for line in _pq2_item_lines(actionable, todo_mod=todo_mod))
+    return lines
+
+
+def documents_block(*, asking: Sequence[Mapping[str, Any]] | None, problem: str | None, todo_mod: Any) -> list[str]:
+    """③b 等你提供的文件（2026-10-07 使用者：「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）。
+    與心跳段 3 同一份名單（`todo.document_requests`）與同一個格式（`_document_request_lines`）；0 也印。"""
+    from crons.heartbeat import _document_request_lines
+
+    if asking is None:
+        return [f"**③b 等你提供的文件**（讀不到：{problem}）"]
+    lines = [f"**③b 等你提供的文件**（{len(asking)}；提供文件才算 go，批次 go 不收這一區）"]
+    if not asking:
+        lines.append("- 沒有")
+        return lines
+    lines.extend("- " + line.strip() for line in _document_request_lines(asking, todo_mod=todo_mod))
     return lines
 
 
@@ -246,16 +319,25 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
         from engine_b import leads as leads_mod
 
         store = leads_mod.load(leads_path) if leads_path else leads_mod.load()
-        return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now), digest_problem=digest_problem)
+        try:
+            processing = processing_line(store, now=now)
+        except Exception as exc:  # noqa: BLE001 — 這一行算不出來就說，不帶走整塊
+            processing = f"- 處理：算不出來（{type(exc).__name__}）"
+        return leads_block(digest=digest, todays=digest_mod.select_leads(store, now=now), digest_problem=digest_problem,
+                           processing=processing)
 
     def decisions_part() -> list[str]:
         from engine_b import todo as todo_mod
 
         try:
-            actionable = todo_mod.actionable_items(todo_mod.load())
+            pool = todo_mod.load()
+            actionable, asking = todo_mod.actionable_items(pool), todo_mod.document_requests(pool)
         except Exception as exc:  # noqa: BLE001
-            return decisions_block(actionable=None, problem=f"{type(exc).__name__}", todo_mod=todo_mod)
-        return decisions_block(actionable=actionable, problem=None, todo_mod=todo_mod)
+            problem = f"{type(exc).__name__}"
+            return [*decisions_block(actionable=None, problem=problem, todo_mod=todo_mod), "",
+                    *documents_block(asking=None, problem=problem, todo_mod=todo_mod)]
+        return [*decisions_block(actionable=actionable, problem=None, todo_mod=todo_mod), "",
+                *documents_block(asking=asking, problem=None, todo_mod=todo_mod)]
 
     def line(build: Any, label: str) -> str:
         try:
@@ -291,5 +373,6 @@ def compose_brief(*, now: datetime, summary: str, snapshot: Mapping[str, Any], r
     return "\n\n".join("\n".join(block) for block in blocks).rstrip() + "\n"
 
 
-__all__ = ["RADAR_SCOPE_WORDS", "SOURCE_LABELS", "TODO_COUNTERS", "compose_brief", "decisions_block",
-           "disproof_line", "events_block", "health_block", "leads_block", "status_lines", "todo_block"]
+__all__ = ["RADAR_SCOPE_WORDS", "RESEARCH_TERMINAL_STATES", "SOURCE_LABELS", "TODO_COUNTERS", "compose_brief",
+           "decisions_block", "disproof_line", "documents_block", "events_block", "health_block", "leads_block",
+           "processing_line", "status_lines", "todo_block"]

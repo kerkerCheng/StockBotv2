@@ -15,29 +15,17 @@
     "⚠ 2026-09-22（Phase 0 Step 0a.1）：`decision_review` 已從 authorized 移到 never——decision_lab",
     "研究側整批退役（G3／G12），那個 `go` 沒有東西可以推進了。authorized 現在只剩 source_trace_review。",
     "",
+    "⚠ 2026-10-07（使用者核准：「可以繼續鑄號但隔離一區讓我知道 也不要讓我直接go 提供文件才算go」）：",
+    "`source_trace_review` 也移到 never——10-06 起它一律是「向你要文件」，要的是使用者手上的文件，不是注意力 gate；",
+    "自動 go 會把要求收回、派回 pq1 重查同樣查不到的東西（10-07 早上 [717][718] 就這樣被吃掉，使用者沒看到）。",
+    "authorized 現在是空的；standing-go 機制保留（段 2b 照跑、0 候選），等下一個真的只是注意力 gate 的類型出現再登記。",
+    "",
     "兩種例外一律不動：使用者明示 `pending`（deferred_at）與在等世界（waiting_on）——常規授權買的是",
     "注意力，不是替使用者改決定、也不是替世界發生事情。"
   ],
-  "authorized": {
-    "source_trace_review": {
-      "label": "追源派回 pq1",
-      "go_means": "requeue_trace 回 pq1 做 bounded 追源",
-      "excludes": [
-        "付費取得（訂閱、報告購買——另核准 exact 金額）",
-        "接受 claim",
-        "提高 evidence tier",
-        "入圖"
-      ],
-      "skip_when_hint_mentions": [
-        "付費",
-        "訂閱",
-        "購買",
-        "paywall",
-        "paid"
-      ]
-    }
-  },
+  "authorized": {},
   "never": {
+    "source_trace_review": "向你要文件（2026-10-07 使用者：「隔離一區讓我知道 也不要讓我直接 go 提供文件才算 go」）——它要的是使用者手上的文件，不是注意力 gate：go 必須附文件（`todo dispatch <n> --doc …`），沒有任何東西會替使用者按這個 go。原本的「go＝派回 pq1 再追一次」在 10-06 開口要文件之後沒有意義，自動 go 只會讓要求消失",
     "decision_review": "機制退役（ROADMAP Phase 0 Step 0a.1，2026-09-22 使用者定案 G3／G12）——池裡的歷史項目仍是這個 type，讀取要認得，但它不再有常規授權：沒有任何東西會替使用者按這個 go。它從 authorized 搬到這裡而不是整格刪掉，因為 ITEM_TYPES 的封閉性驗證要求每一種都明寫在 authorized 或 never 其中之一",
     "ra_admission": "graph admission 是四個 authority gate 之一",
     "engine_c_observation": "Engine C 判讀寫入是 authority gate",
